@@ -71,11 +71,11 @@ static const int best_track_time_step = 21600;
 ////////////////////////////////////////////////////////////////////////
 
 // Input files
-static StringArray     adeck_source, adeck_model_suffix;
-static StringArray     edeck_source, edeck_model_suffix;
-static StringArray     bdeck_source, bdeck_model_suffix;
-static StringArray     tcdiag_source, tcdiag_model_name;
-static StringArray     lsdiag_source, lsdiag_model_name;
+static StringArray     adeck_path, adeck_model_suffix;
+static StringArray     edeck_path, edeck_model_suffix;
+static StringArray     bdeck_path, bdeck_model_suffix;
+static std::vector<DiagType> diag_source;
+static StringArray     diag_path, diag_model_name;
 static ConcatString    config_file;
 static TCPairsConfInfo conf_info;
 

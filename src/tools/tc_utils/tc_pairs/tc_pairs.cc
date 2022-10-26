@@ -125,9 +125,6 @@ static bool   is_keeper            (const ATCFLineBase *);
 static void   filter_tracks        (TrackInfoArray &);
 static void   filter_probs         (ProbInfoArray &);
 static void   process_diags        (TrackInfoArray &);
-static void   get_diag_files       (const StringArray &,
-                                    const StringArray &,
-                                    StringArray &, StringArray &);
 
 static bool   check_masks          (const MaskPoly &, const Grid &,
                                     const MaskPlane &,
@@ -153,12 +150,9 @@ static void   usage                ();
 static void   set_adeck            (const StringArray &);
 static void   set_edeck            (const StringArray &);
 static void   set_bdeck            (const StringArray &);
-static void   set_atcf_source      (const StringArray &,
+static void   set_atcf_path        (const StringArray &,
                                     StringArray &, StringArray &);
-static void   set_tcdiag           (const StringArray &);
-static void   set_lsdiag           (const StringArray &);
-static void   set_diag_source      (const StringArray &,
-                                    StringArray &, StringArray &);
+static void   set_diag             (const StringArray &);
 static void   set_config           (const StringArray &);
 static void   set_out              (const StringArray &);
 
@@ -207,8 +201,7 @@ void process_command_line(int argc, char **argv) {
    cline.add(set_adeck,  "-adeck",  -1);
    cline.add(set_edeck,  "-edeck",  -1);
    cline.add(set_bdeck,  "-bdeck",  -1);
-   cline.add(set_tcdiag, "-tcdiag", -1);
-   cline.add(set_lsdiag, "-lsdiag", -1);
+   cline.add(set_diag,   "-diag",   -1);
    cline.add(set_config, "-config",  1);
    cline.add(set_out,    "-out",     1);
 
@@ -216,11 +209,10 @@ void process_command_line(int argc, char **argv) {
    cline.parse();
 
    // Check for the minimum number of arguments
-   if((adeck_source.n() == 0 && edeck_source.n() == 0) ||
-      bdeck_source.n()  == 0 || config_file.length() == 0) {
-      mlog << Error
-           << "\nprocess_command_line(int argc, char **argv) -> "
-           << "You must specify at least one source of ADECK or EDECK "
+   if((adeck_path.n() == 0 && edeck_path.n() == 0) ||
+      bdeck_path.n()  == 0 || config_file.length() == 0) {
+      mlog << Error << "\nprocess_command_line(int argc, char **argv) -> "
+           << "You must specify at least one path of ADECK or EDECK "
            << "data, BDECK data, and the config file using the "
            << "\"-adeck\", \"-edeck\", \"-bdeck\", and \"-config\" "
            << "command line options.\n\n";
@@ -228,43 +220,36 @@ void process_command_line(int argc, char **argv) {
    }
 
    // List the input ADECK track files
-   for(i=0; i<adeck_source.n(); i++) {
+   for(i=0; i<adeck_path.n(); i++) {
       mlog << Debug(1)
-           << "[Source " << i+1 << " of " << adeck_source.n()
-           << "] ADECK Source: " << adeck_source[i] << ", Model Suffix: "
+           << "[Path " << i+1 << " of " << adeck_path.n()
+           << "] ADECK Path: " << adeck_path[i] << ", Model Suffix: "
            << adeck_model_suffix[i] << "\n";
    }
 
    // List the input EDECK track files
-   for(i=0; i<edeck_source.n(); i++) {
+   for(i=0; i<edeck_path.n(); i++) {
       mlog << Debug(1)
-           << "[Source " << i+1 << " of " << edeck_source.n()
-           << "] EDECK Source: " << edeck_source[i] << ", Model Suffix: "
+           << "[Path " << i+1 << " of " << edeck_path.n()
+           << "] EDECK Path: " << edeck_path[i] << ", Model Suffix: "
            << edeck_model_suffix[i] << "\n";
    }
 
    // List the input BDECK track files
-   for(i=0; i<bdeck_source.n(); i++) {
+   for(i=0; i<bdeck_path.n(); i++) {
       mlog << Debug(1)
-           << "[Source " << i+1 << " of " << bdeck_source.n()
-           << "] BDECK Source: " << bdeck_source[i] << ", Model Suffix: "
+           << "[Path " << i+1 << " of " << bdeck_path.n()
+           << "] BDECK Path: " << bdeck_path[i] << ", Model Suffix: "
            << bdeck_model_suffix[i] << "\n";
    }
 
-   // List the input TCDIAG files
-   for(i=0; i<tcdiag_source.n(); i++) {
+   // List the input diagnostic files
+   for(i=0; i<diag_path.n(); i++) {
       mlog << Debug(1)
-           << "[Source " << i+1 << " of " << tcdiag_source.n()
-           << "] TCDIAG Source: " << tcdiag_source[i] << ", Model Name(s): "
-           << tcdiag_model_name[i] << "\n";
-   }
-
-   // List the input LSDIAG files
-   for(i=0; i<lsdiag_source.n(); i++) {
-      mlog << Debug(1)
-           << "[Source " << i+1 << " of " << lsdiag_source.n()
-           << "] LSDIAG Source: " << lsdiag_source[i] << ", Model Name(s): "
-           << lsdiag_model_name[i] << "\n";
+           << "[Path " << i+1 << " of " << diag_path.n()
+           << "] " << diagtype_to_string(diag_source[i])
+           << " Path: " << diag_path[i] << ", Model Name(s): "
+           << diag_model_name[i] << "\n";
    }
 
    // Create the default config file name
@@ -295,12 +280,12 @@ void process_decks() {
    process_bdecks(bdeck_tracks);
 
    // Process ADECK files
-   if(adeck_source.n() > 0) {
+   if(adeck_path.n() > 0) {
       process_adecks(bdeck_tracks);
    }
 
    // Process EDECK files
-   if(edeck_source.n() > 0) {
+   if(edeck_path.n() > 0) {
       process_edecks(bdeck_tracks);
    }
 
@@ -316,7 +301,7 @@ void process_bdecks(TrackInfoArray &bdeck_tracks) {
    bdeck_tracks.clear();
 
    // Get the list of track files
-   get_atcf_files(bdeck_source, bdeck_model_suffix,
+   get_atcf_files(bdeck_path, bdeck_model_suffix,
                   files, files_model_suffix);
 
    mlog << Debug(2)
@@ -339,7 +324,7 @@ void process_adecks(const TrackInfoArray &bdeck_tracks) {
    int i, j, n_match;
 
    // Get the list of track files
-   get_atcf_files(adeck_source, adeck_model_suffix,
+   get_atcf_files(adeck_path, adeck_model_suffix,
                   files, files_model_suffix);
 
    mlog << Debug(2)
@@ -459,7 +444,7 @@ void process_edecks(const TrackInfoArray &bdeck_tracks) {
    int n_match, i, j;
 
    // Get the list of ATCF files
-   get_atcf_files(edeck_source, edeck_model_suffix,
+   get_atcf_files(edeck_path, edeck_model_suffix,
                   files, files_model_suffix);
 
    mlog << Debug(2)
@@ -539,17 +524,16 @@ void process_edecks(const TrackInfoArray &bdeck_tracks) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void get_atcf_files(const StringArray &source,
+void get_atcf_files(const StringArray &path,
                     const StringArray &model_suffix,
                     StringArray &files,
                     StringArray &files_model_suffix) {
-   StringArray cur_source, cur_files;
+   StringArray cur_path, cur_files;
    int i, j;
 
-   if(source.n() != model_suffix.n()) {
-      mlog << Error
-           << "\nget_atcf_files() -> "
-           << "the source and suffix arrays must be equal length!\n\n";
+   if(path.n() != model_suffix.n()) {
+      mlog << Error << "\nget_atcf_files() -> "
+           << "the path and suffix arrays must be equal length!\n\n";
       exit(1);
    }
 
@@ -558,10 +542,10 @@ void get_atcf_files(const StringArray &source,
    files_model_suffix.clear();
 
    // Build list of files and corresponding model suffix list
-   for(i=0; i<source.n(); i++) {
-      cur_source.clear();
-      cur_source.add(source[i]);
-      cur_files = get_filenames(cur_source, NULL, atcf_suffix);
+   for(i=0; i<path.n(); i++) {
+      cur_path.clear();
+      cur_path.add(path[i]);
+      cur_files = get_filenames(cur_path, NULL, atcf_suffix);
 
       for(j=0; j<cur_files.n(); j++) {
          files.add(cur_files[j]);
@@ -599,8 +583,7 @@ void process_track_files(const StringArray &files,
 
       // Open the current file
       if(!f.open(files[i].c_str())) {
-         mlog << Error
-              << "\nprocess_track_files() -> "
+         mlog << Error << "\nprocess_track_files() -> "
               << "unable to open file \"" << files[i] << "\"\n\n";
          exit(1);
       }
@@ -693,8 +676,7 @@ void process_prob_files(const StringArray &files,
 
       // Open the current file
       if(!f.open(files[i].c_str())) {
-         mlog << Error
-              << "\nprocess_prob_files() -> "
+         mlog << Error << "\nprocess_prob_files() -> "
               << "unable to open file \"" << files[i] << "\"\n\n";
          exit(1);
       }
@@ -1025,52 +1007,62 @@ void filter_probs(ProbInfoArray &probs) {
 ////////////////////////////////////////////////////////////////////////
 
 void process_diags(TrackInfoArray &tracks) {
+   StringArray cur_path, cur_model_name;
    StringArray files, files_model_name, model_names;
    DiagFile diag_file;
-   int i, n;
+   int i, j, n;
+   map<DiagType,int> n_diag_map;
 
-   // Process TCDIAG inputs
-   if(tcdiag_source.n() > 0) {
-      get_atcf_files(tcdiag_source, tcdiag_model_name,
+   // Process the diagnostic inputs
+   for(i=0; i<diag_source.size(); i++) {
+
+      // Process the current source
+      cur_path.clear();
+      cur_path.add(diag_path[i]);
+      cur_model_name.clear();
+      cur_model_name.add(diag_model_name[i]);
+
+      // Get the list of diagnostic files for this source
+      get_atcf_files(cur_path, cur_model_name,
                      files, files_model_name);
 
       mlog << Debug(2)
            << "Processing " << files.n()
-           << " TCDIAG diagnostic file(s).\n";
+           << " " << diagtype_to_string(diag_source[i])
+           << " diagnostic file(s).\n";
 
       // Loop over the input files
-      for(i=0,n=0; i<files.n(); i++) {
-         model_names.parse_css(files_model_name[i]);
-         diag_file.read_tcdiag(files[i], model_names,
-                               conf_info.TCDiagConvertFxMap);
+      for(j=0,n=0; j<files.n(); j++) {
+
+         // Parse model names as a comma-separated list
+         model_names.parse_css(files_model_name[j]);
+
+         // Pointer to the conversion map for this source
+         map<ConcatString,UserFunc_1Arg> * convert_ptr = 0;
+         if(conf_info.DiagConvertMap.count(diag_source[i]) > 0) {
+            convert_ptr = &conf_info.DiagConvertMap.at(diag_source[i]);
+         }
+
+         // Process the diagnostic files
+         diag_file.read(diag_source[i], files[j], model_names, convert_ptr);
+
+         // Add diagnostics data to existing tracks
          n += tracks.add_diag_data(diag_file, conf_info.DiagName);
-      }
 
+      } // end for j
+
+      // Update the diagnostic track counts
+      if(n_diag_map.count(diag_source[i]) > 0) n_diag_map[diag_source[i]] += n;
+      else                                     n_diag_map[diag_source[i]]  = n;
+
+   } // end for i
+
+   // Print the diagnostic track counts
+   for(map<DiagType,int>::iterator it = n_diag_map.begin();
+       it != n_diag_map.end(); it++) {
       mlog << Debug(3)
-           << "Added diagnostics information to " << n
-           << " tracks.\n";
-   }
-
-   // Process LSDIAG inputs
-   if(lsdiag_source.n() > 0) {
-      get_atcf_files(lsdiag_source, lsdiag_model_name,
-                     files, files_model_name);
-
-      mlog << Debug(2)
-           << "Processing " << files.n()
-           << " LSDIAG diagnostic file(s).\n";
-
-      // Loop over the input files
-      for(i=0,n=0; i<files.n(); i++) {
-         model_names.parse_css(files_model_name[i]);
-         diag_file.read_lsdiag(files[i], model_names,
-                               conf_info.LSDiagConvertFxMap);
-         n += tracks.add_diag_data(diag_file, conf_info.DiagName);
-      }
-
-      mlog << Debug(3)
-           << "Added diagnostics information to " << n
-           << " tracks.\n";
+           << "Added " << diagtype_to_string(it->first)
+           << " diagnostics to " << it->second << " tracks.\n";
    }
 
    return;
@@ -1534,8 +1526,7 @@ void derive_baseline_model(const ConcatString &model,
 
    // Check bounds
    if(i_start < 0 || i_start >= ti.n_points()) {
-       mlog << Error
-            << "\n" << method_name
+       mlog << Error << "\n" << method_name
             << "range check error for i_start = " << i_start << "\n\n";
        exit(1);
    }
@@ -1651,8 +1642,7 @@ void derive_baseline_model(const ConcatString &model,
          bl_lat,   bl_lon,   bl_vmax);
    }
    else {
-       mlog << Error
-            << "\n" << method_name
+       mlog << Error << "\n" << method_name
             << "unsupported baseline model type \"" << model
             << "\".\n\n";
        exit(1);
@@ -1894,8 +1884,7 @@ void compute_track_err(const TrackInfo &adeck, const TrackInfo &bdeck,
 
    // Check for too many track points
    if(n_ut > mxp) {
-      mlog << Error
-           << "\ncompute_track_err() -> "
+      mlog << Error << "\ncompute_track_err() -> "
            << "exceeded the maximum number of allowable track points ("
            << n_ut << " > " << mxp << ")\n\n";
       exit(1);
@@ -2214,26 +2203,25 @@ void usage() {
         << ") ***\n\n"
 
         << "Usage: " << program_name << "\n"
-        << "\t-adeck source and/or -edeck source\n"
-        << "\t-bdeck source\n"
+        << "\t-adeck path and/or -edeck path\n"
+        << "\t-bdeck path\n"
         << "\t-config file\n"
-        << "\t[-tcdiag source]\n"
-        << "\t[-lsdiag source]\n"
+        << "\t[-diag source path]\n"
         << "\t[-out base]\n"
         << "\t[-log file]\n"
         << "\t[-v level]\n\n"
 
-        << "\twhere\t\"-adeck source\" is used one or more times to "
+        << "\twhere\t\"-adeck path\" is used one or more times to "
         << "specify a file or top-level directory containing ATCF "
         << "model output \"" << atcf_suffix
         << "\" data to process (required if no -edeck).\n"
 
-        << "\t\t\"-edeck source\" is used one or more times to "
+        << "\t\t\"-edeck path\" is used one or more times to "
         << "specify a file or top-level directory containing ATCF "
         << "ensemble model output \"" << atcf_suffix
         << "\" data to process (required if no -adeck).\n"
 
-        << "\t\t\"-bdeck source\" is used one or more times to "
+        << "\t\t\"-bdeck path\" is used one or more times to "
         << "specify a file or top-level directory containing ATCF "
         << "best track \"" << atcf_suffix
         << "\" data to process (required).\n"
@@ -2242,15 +2230,11 @@ void usage() {
         << "TCPairsConfig file containing the desired configuration "
         << "settings (required).\n"
 
-        << "\t\t\"-tcdiag source\" is used one or more times to "
+        << "\t\t\"-diag source path\" is used one or more times to "
         << "specify a file or top-level directory containing tropical "
         << "cyclone diagnostics \"" << atcf_suffix
-        << "\" data to process (optional).\n"
-
-        << "\t\t\"-lsdiag source\" is used one or more times to "
-        << "specify a file or top-level directory containing large "
-        << "scale diagnostics \"" << atcf_suffix
-        << "\" data to process (optional).\n"
+        << "\" data to process. The supported formats are TCDIAG, "
+        << "LSDIAG_RT, LSDIAG_DEV (optional).\n"
 
         << "\t\t\"-out base\" overrides the default output file base "
         << "(" << out_base << ") (optional).\n"
@@ -2263,11 +2247,11 @@ void usage() {
 
         << "\tNote: The \"-adeck\", \"-edeck\", and \"-bdeck\" options "
         << "may include \"suffix=string\" to modify the model names "
-        << "from that source.\n\n"
+        << "from that path.\n\n"
 
-        << "\tNote: The \"-tcdiag\" and \"-lsdiag\" options may include "
-        << "\"model=string\" to override the model name of the tracks to "
-        << "which those diagnostics correspond.\n\n";
+        << "\tNote: The \"-diag\" option may include \"model=string\" to "
+        << "override the model name of the tracks to which those diagnostics "
+        << "correspond.\n\n";
 
    exit(1);
 }
@@ -2275,25 +2259,25 @@ void usage() {
 ////////////////////////////////////////////////////////////////////////
 
 void set_adeck(const StringArray &a) {
-   set_atcf_source(a, adeck_source, adeck_model_suffix);
+   set_atcf_path(a, adeck_path, adeck_model_suffix);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void set_edeck(const StringArray &a) {
-   set_atcf_source(a, edeck_source, edeck_model_suffix);
+   set_atcf_path(a, edeck_path, edeck_model_suffix);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void set_bdeck(const StringArray &a) {
-   set_atcf_source(a, bdeck_source, bdeck_model_suffix);
+   set_atcf_path(a, bdeck_path, bdeck_model_suffix);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_atcf_source(const StringArray &a,
-                     StringArray &source, StringArray &model_suffix) {
+void set_atcf_path(const StringArray &a,
+                   StringArray &path, StringArray &model_suffix) {
    int i;
    StringArray sa;
    ConcatString cs, suffix;
@@ -2304,8 +2288,7 @@ void set_atcf_source(const StringArray &a,
       if(cs.startswith("suffix")) {
          sa = cs.split("=");
          if(sa.n() != 2) {
-            mlog << Error
-                 << "\nset_atcf_source() -> "
+            mlog << Error << "\nset_atcf_path() -> "
                  << "the model suffix must be specified as "
                  << "\"suffix=string\".\n\n";
             usage();
@@ -2316,11 +2299,11 @@ void set_atcf_source(const StringArray &a,
       }
    }
 
-   // Parse the remaining sources
+   // Parse the remaining paths
    for(i=0; i<a.n(); i++) {
       cs = a[i];
       if(cs.startswith("suffix")) continue;
-      source.add(a[i]);
+      path.add(a[i]);
       model_suffix.add(suffix);
    }
 
@@ -2329,48 +2312,47 @@ void set_atcf_source(const StringArray &a,
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_tcdiag(const StringArray &a) {
-   set_diag_source(a, tcdiag_source, tcdiag_model_name);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_lsdiag(const StringArray &a) {
-   set_diag_source(a, lsdiag_source, lsdiag_model_name);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_diag_source(const StringArray &a,
-                     StringArray &source, StringArray &model_name) {
+void set_diag(const StringArray &a) {
    int i;
    StringArray sa;
-   ConcatString cs, name;
+   DiagType source;
+   ConcatString cs, model_name;
 
-   // Check for optional model sub-argument
-   for(i=0; i<a.n(); i++) {
+   // Should have length of at least 2
+   if(a.n() < 2) {
+      mlog << Error << "\nset_diag_path() -> "
+           << "the \"-diag source path\" command line option "
+           << "must have length >= 2.\n\n";
+      exit(1);
+   }
+
+   // Parse the DiagType source
+   source = string_to_diagtype(a[0].c_str());
+
+   // Check for the model sub-argument
+   for(i=1; i<a.n(); i++) {
       cs = a[i];
       if(cs.startswith("model")) {
          sa = cs.split("=");
          if(sa.n() != 2) {
-            mlog << Error
-                 << "\nset_diag_source() -> "
+            mlog << Error << "\nset_diag_path() -> "
                  << "the model name must be specified as "
                  << "\"model=string\".\n\n";
             usage();
          }
          else {
-            name = sa[1];
+            model_name = sa[1];
          }
       }
    }
 
-   // Parse the remaining sources
-   for(i=0; i<a.n(); i++) {
+   // Parse the remaining paths
+   for(i=1; i<a.n(); i++) {
       cs = a[i];
       if(cs.startswith("model")) continue;
-      source.add(a[i]);
-      model_name.add(name);
+      diag_source.push_back(source);
+      diag_path.add(a[i]);
+      diag_model_name.add(model_name);
    }
 
    return;

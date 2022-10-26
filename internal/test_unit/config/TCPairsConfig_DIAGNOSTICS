@@ -135,11 +135,9 @@ diag_name = [ ${DIAG_NAME} ];
 
 //
 // Unit conversions to be applied to diagnostic values
-// 
-
 // Commented out to use settings from the default config file
-// tcdiag_convert_map = [];
-// lsdiag_convert_map = [];
+//
+// diag_convert_map = [];
 
 //
 // Modify basin names to make them consistent across ATCF input files.
