@@ -26,7 +26,7 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 void parse_conf_diag_convert_map(Dictionary *,
-        map<DiagType,map<ConcatString,UserFunc_1Arg>> &);
+        map<DiagType,map<ConcatString,UserFunc_1Arg> > &);
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -331,7 +331,7 @@ void TCPairsConfInfo::process_config() {
 ////////////////////////////////////////////////////////////////////////
 
 void parse_conf_diag_convert_map(Dictionary *dict,
-        map<DiagType,map<ConcatString,UserFunc_1Arg>> &source_map) {
+        map<DiagType,map<ConcatString,UserFunc_1Arg> > &source_map) {
    int i, j;
    Dictionary *map_dict = (Dictionary *) 0;
    map<ConcatString,UserFunc_1Arg> cur_map;
@@ -386,7 +386,7 @@ void parse_conf_diag_convert_map(Dictionary *dict,
       }
       // Add a new source entry
       else {
-         source_map.insert(pair<DiagType,map<ConcatString,UserFunc_1Arg>>(source, cur_map));
+         source_map.insert(pair<DiagType,map<ConcatString,UserFunc_1Arg> >(source, cur_map));
       }
 
    } // end for i
