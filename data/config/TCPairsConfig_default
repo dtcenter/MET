@@ -143,9 +143,8 @@ watch_warn = {
 diag_name = [];
 
 //
-// Unit conversions to be applied to diagnostic values
+// Unit conversions to be applied based on diagnostic names and units
 //
-
 diag_convert_map = [
    { source = "TCDIAG";
      key = [ "(10C)", "(10KT)", "(10M/S)" ];

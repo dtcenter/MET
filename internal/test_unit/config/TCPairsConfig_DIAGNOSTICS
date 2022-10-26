@@ -134,7 +134,7 @@ watch_warn = {
 diag_name = [ ${DIAG_NAME} ];
 
 //
-// Unit conversions to be applied to diagnostic values
+// Unit conversions to be applied based on diagnostic names and units
 // Commented out to use settings from the default config file
 //
 // diag_convert_map = [];
