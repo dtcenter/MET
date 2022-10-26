@@ -27,7 +27,7 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
-static const char default_lsdiag_technique[] = "SHIP";
+static const char default_lsdiag_technique[] = "OFCL";
 
 static const int lsdiag_wdth[] = {
    5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
