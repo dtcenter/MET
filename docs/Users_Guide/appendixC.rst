@@ -470,6 +470,7 @@ Mean Error (ME)
 ---------------
 
 Called "ME" in CNT output :numref:`table_PS_format_info_CNT`
+Called "ME_OERR", "ME_GE_OBS", and "ME_LT_OBS" in ECNT output :numref:`table_ES_header_info_es_out_ECNT`
 
 The Mean Error, ME, is a measure of overall bias for continuous variables; in particular ME = Bias. It is defined as 
 
@@ -1008,11 +1009,13 @@ Bias Ratio
 
 Called "BIAS_RATIO" in ECNT output :numref:`table_ES_header_info_es_out_ECNT`
 
-The bias ratio (BIAS_RATIO) is computed when verifying an ensemble against gridded analyses or point observations. It is defined as the mean error (ME) of ensemble member values greater than or equal to the observation value divided by the mean absolute error (MAE) of ensemble member values less than the observation value.
+The bias ratio (BIAS_RATIO) is computed when verifying an ensemble against gridded analyses or point observations. It is defined as the mean error (ME) of ensemble member values greater than or equal to the observation value to which they are matched divided by the absolute value of the mean error (ME) of ensemble member values less than the observation values.
 
-.. math:: \text{BIAS_RATIO} = \frac{ \frac{ \sum_{f_i >= o_i} f_i - o_i }{ \text{count}(f_i >= o_i) } }{ \frac{ | \sum_{f_i < o_i} f_i - o_i | }{ \text{count}(f_i < o_i) } }
+.. math:: \text{BIAS_RATIO} = \frac{ \text{ME}_{f >= o} }{ |\text{ME}_{f < o}| }
 
-TODO: Define the perfect score and advice on interpretation.
+A perfect forecast has ME = 0. Since BIAS_RATIO is the ratio of the high bias ME (ME_GE_OBS) and the absolute value of the low bias ME (ME_LT_OBS), a perfect forecast has BIAS_RATIO = 0/0, which is undefined. In practice, the high and low bias ME values are unlikely to be 0.
+
+The range for BIAS_RATIO is 0 to infinity. A score of 1 indicates that the magnitude of the average high and low biases are eqaul. A score greater than 1 indicates that the average high bias is larger than the magnitude of the average low bias. A score less than 1 indicates the opposite behavior.
 
 IGN
 ---
