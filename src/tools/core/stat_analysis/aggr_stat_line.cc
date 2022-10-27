@@ -3199,6 +3199,17 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &job,
          m[key].ens_pd.ign_na.add(compute_ens_ign(cur.obs, cur.ens_mean, cur.spread));
          m[key].ens_pd.pit_na.add(compute_ens_pit(cur.obs, cur.ens_mean, cur.spread));
 
+         // Store BIAS_RATIO terms
+         int n_ge_obs, n_lt_obs;
+         double me_ge_obs, me_lt_obs;
+         compute_bias_ratio_terms(cur.obs, cur.ens_na,
+                                  n_ge_obs, me_ge_obs,
+                                  n_lt_obs, me_lt_obs);
+         m[key].ens_pd.n_ge_obs_na.add(n_ge_obs);
+         m[key].ens_pd.me_ge_obs_na.add(me_ge_obs);
+         m[key].ens_pd.n_lt_obs_na.add(n_lt_obs);
+         m[key].ens_pd.me_lt_obs_na.add(me_lt_obs);
+
          //
          // Increment the RHIST counts
          //

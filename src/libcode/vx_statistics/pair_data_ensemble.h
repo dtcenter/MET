@@ -317,6 +317,9 @@ extern double compute_crps_emp(double, const NumArray &);
 extern double compute_crps_gaus(double, double, double);
 extern double compute_ens_ign(double, double, double);
 extern double compute_ens_pit(double, double, double);
+extern void   compute_bias_ratio_terms(double, const NumArray &,
+                                       int &, double &, int &, double &);
+extern double compute_bias_ratio(double, double);
 
 ////////////////////////////////////////////////////////////////////////
 

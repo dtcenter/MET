@@ -355,8 +355,7 @@ void PairDataEnsemble::add_obs_error_entry(ObsErrorEntry *e) {
 ////////////////////////////////////////////////////////////////////////
 
 void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
-   int i, j, k, n_vld, n_bel, n_tie, n_abv;
-   double err, sum_err_lt_obs, sum_err_ge_obs;
+   int i, j, k, n_vld, n_bel, n_tie;
    int n_skip_const, n_skip_vld;
    NumArray src_na, dest_na, cur_ens, cur_clm;
    double mean, stdev, var_unperturbed, var_perturbed;
@@ -387,13 +386,11 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
    // Compute the rank for each observation
    for(i=0, n_pair=0, n_skip_const=0, n_skip_vld=0; i<o_na.n(); i++) {
 
-      // Initialize counts and sums
+      // Initialize
       cur_ens.erase();
-      n_vld = n_bel = n_tie = n_abv = 0;
-      sum_err_lt_obs = sum_err_ge_obs = 0.0;
 
       // Compute the number of ensemble values above and below the observation
-      for(j=0; j<n_ens; j++) {
+      for(j=0, n_vld = n_bel = n_tie = 0; j<n_ens; j++) {
 
          // Skip bad data
          if(e_na[j].n() > i && !is_bad_data(e_na[j][i])) {
@@ -404,13 +401,9 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
             // Store the current ensemble value
             cur_ens.add(e_na[j][i]);
 
-            // Ensemble value minus observation value
-            err = e_na[j][i] - o_na[i];
-
             // Track running counts and sums
-            if(is_eq(e_na[j][i], o_na[i])) { n_tie++; sum_err_ge_obs += err; }
-            else if(e_na[j][i] < o_na[i])  { n_bel++; sum_err_lt_obs += err; }
-            else                           { n_abv++; sum_err_ge_obs += err; }
+            if(is_eq(e_na[j][i], o_na[i])) n_tie++;
+            else if(e_na[j][i] < o_na[i])  n_bel++;
          }
 
       } // end for j
@@ -523,11 +516,18 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
          ign_na.add(compute_ens_ign(o_na[i], mean, stdev));
          pit_na.add(compute_ens_pit(o_na[i], mean, stdev));
 
-         // Store Bias Ratio components
-         n_ge_obs_na.add(n_tie + n_abv);
-         me_ge_obs_na.add(sum_err_ge_obs/(n_tie + n_abv));
-         n_lt_obs_na.add(n_bel);
-         me_lt_obs_na.add(sum_err_lt_obs/n_bel);
+         // Compute the Bias Ratio terms 
+         int n_ge_obs, n_lt_obs;
+         double me_ge_obs, me_lt_obs;
+         compute_bias_ratio_terms(o_na[i], cur_ens,
+                                  n_ge_obs, me_ge_obs,
+                                  n_lt_obs, me_lt_obs);
+
+         // Store the Bias Ratio terms 
+         n_ge_obs_na.add(n_ge_obs);
+         me_ge_obs_na.add(me_ge_obs);
+         n_lt_obs_na.add(n_lt_obs);
+         me_lt_obs_na.add(me_lt_obs);
       }
    } // end for i
 
@@ -2043,6 +2043,60 @@ double compute_ens_pit(double obs, double m, double s) {
    }
    else {
       v = normal_cdf(obs, m, s);
+   }
+
+   return(v);
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Compute the bias ratio terms
+//
+////////////////////////////////////////////////////////////////////////
+
+void compute_bias_ratio_terms(double obs, const NumArray &e_na,
+                              int &n_ge_obs, double &me_ge_obs,
+                              int &n_lt_obs, double &me_lt_obs) {
+
+   // Initialize
+   n_ge_obs  = n_lt_obs  = 0;
+   me_ge_obs = me_lt_obs = 0.0;
+
+   // Loop over ensemble member values
+   for(int i=0; i<e_na.n(); i++) {
+
+      // Track counts and sums
+      if(e_na[i] >= obs) {
+         n_ge_obs  += 1;
+         me_ge_obs += (e_na[i] - obs);
+      }
+      else {
+         n_lt_obs  += 1;
+         me_lt_obs += (e_na[i] - obs);
+      }
+   }
+
+   // Convert sums to means
+   if(n_ge_obs > 0) me_ge_obs /= n_ge_obs;
+   else             me_ge_obs  = bad_data_double;
+   if(n_lt_obs > 0) me_lt_obs /= n_lt_obs;
+   else             me_lt_obs  = bad_data_double;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double compute_bias_ratio(double me_ge_obs, double me_lt_obs) {
+   double v;
+
+   // Compute bias ratio
+   if(is_bad_data(me_ge_obs) ||
+      is_bad_data(me_lt_obs) || is_eq(me_lt_obs, 0.0)) {
+      v = bad_data_double;
+   }
+   else {
+      v = me_ge_obs / abs(me_lt_obs);
    }
 
    return(v);

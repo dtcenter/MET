@@ -346,20 +346,14 @@ void ECNTInfo::set(const PairDataEnsemble &pd) {
    // Compute the square root of the average variance plus oerr
    spread_plus_oerr = square_root(pd.var_plus_oerr_na.wmean(pd.wgt_na));
 
-   // Compute bias ratio components
+   // Compute bias ratio terms 
    n_ge_obs  = nint(pd.n_ge_obs_na.sum());
    me_ge_obs = pd.me_ge_obs_na.wmean(pd.n_ge_obs_na);
    n_lt_obs  = nint(pd.n_lt_obs_na.sum());
    me_lt_obs = pd.me_lt_obs_na.wmean(pd.n_lt_obs_na);
 
    // Compute bias ratio
-   if(is_bad_data(me_ge_obs) ||
-      is_bad_data(me_lt_obs) || is_eq(me_lt_obs, 0.0)) {
-      bias_ratio = bad_data_double;
-   }
-   else {
-      bias_ratio = me_ge_obs / abs(me_lt_obs);
-   }
+   bias_ratio = compute_bias_ratio(me_ge_obs, me_lt_obs);
 
    return;
 }
