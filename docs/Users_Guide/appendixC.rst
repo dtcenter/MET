@@ -1013,9 +1013,9 @@ The bias ratio (BIAS_RATIO) is computed when verifying an ensemble against gridd
 
 .. math:: \text{BIAS_RATIO} = \frac{ \text{ME}_{f >= o} }{ |\text{ME}_{f < o}| }
 
-A perfect forecast has ME = 0. Since BIAS_RATIO is the ratio of the high bias ME (ME_GE_OBS) and the absolute value of the low bias ME (ME_LT_OBS), a perfect forecast has BIAS_RATIO = 0/0, which is undefined. In practice, the high and low bias ME values are unlikely to be 0.
+A perfect forecast has ME = 0. Since BIAS_RATIO is computed as the high bias (ME_GE_OBS) divide by the absolute value of the low bias (ME_LT_OBS), a perfect forecast has BIAS_RATIO = 0/0, which is undefined. In practice, the high and low bias values are unlikely to be 0.
 
-The range for BIAS_RATIO is 0 to infinity. A score of 1 indicates that the magnitude of the average high and low biases are eqaul. A score greater than 1 indicates that the average high bias is larger than the magnitude of the average low bias. A score less than 1 indicates the opposite behavior.
+The range for BIAS_RATIO is 0 to infinity. A score of 1 indicates that the high and low biases are equal. A score greater than 1 indicates that the high bias is larger than the magnitude of the low bias. A score less than 1 indicates the opposite behavior.
 
 IGN
 ---
