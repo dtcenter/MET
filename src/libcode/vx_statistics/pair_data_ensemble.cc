@@ -107,6 +107,11 @@ void PairDataEnsemble::clear() {
    ign_na.clear();
    pit_na.clear();
 
+   n_ge_obs_na.clear();
+   me_ge_obs_na.clear();
+   n_lt_obs_na.clear();
+   me_lt_obs_na.clear();
+
    n_ens = 0;
    n_pair = 0;
    ctrl_index = bad_data_int;
@@ -141,6 +146,8 @@ void PairDataEnsemble::clear() {
    me_oerr        = bad_data_double;
    rmse_oerr      = bad_data_double;
 
+   bias_ratio     = bad_data_double;
+
    return;
 }
 
@@ -168,6 +175,10 @@ void PairDataEnsemble::extend(int n) {
    crpscl_gaus_na.extend     (n);
    ign_na.extend             (n);
    pit_na.extend             (n);
+   n_ge_obs_na.extend        (n);
+   me_ge_obs_na.extend       (n);
+   n_lt_obs_na.extend        (n);
+   me_lt_obs_na.extend       (n);
    skip_ba.extend            (n);
    var_na.extend             (n);
    var_oerr_na.extend        (n);
@@ -227,6 +238,12 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
    crpscl_gaus_na = pd.crpscl_gaus_na;
    ign_na         = pd.ign_na;
    pit_na         = pd.pit_na;
+
+   n_ge_obs_na    = pd.n_ge_obs_na;
+   me_ge_obs_na   = pd.me_ge_obs_na;
+   n_lt_obs_na    = pd.n_lt_obs_na;
+   me_lt_obs_na   = pd.me_lt_obs_na;
+
    n_pair         = pd.n_pair;
    ctrl_index     = pd.ctrl_index;
    skip_const     = pd.skip_const;
@@ -264,6 +281,8 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
    rmse           = pd.rmse;
    me_oerr        = pd.me_oerr;
    rmse_oerr      = pd.rmse_oerr;
+
+   bias_ratio     = pd.bias_ratio;
 
    set_ens_size(pd.n_ens);
 
@@ -336,7 +355,8 @@ void PairDataEnsemble::add_obs_error_entry(ObsErrorEntry *e) {
 ////////////////////////////////////////////////////////////////////////
 
 void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
-   int i, j, k, n_vld, n_bel, n_tie;
+   int i, j, k, n_vld, n_bel, n_tie, n_abv;
+   double err, sum_err_lt_obs, sum_err_ge_obs;
    int n_skip_const, n_skip_vld;
    NumArray src_na, dest_na, cur_ens, cur_clm;
    double mean, stdev, var_unperturbed, var_perturbed;
@@ -367,11 +387,13 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
    // Compute the rank for each observation
    for(i=0, n_pair=0, n_skip_const=0, n_skip_vld=0; i<o_na.n(); i++) {
 
-      // Initialize
+      // Initialize counts and sums
       cur_ens.erase();
+      n_vld = n_bel = n_tie = n_abv = 0;
+      sum_err_lt_obs = sum_err_ge_obs = 0.0;
 
-      // Compute the number of ensemble values less than the observation
-      for(j=0, n_vld=0, n_bel=0, n_tie=0; j<n_ens; j++) {
+      // Compute the number of ensemble values above and below the observation
+      for(j=0; j<n_ens; j++) {
 
          // Skip bad data
          if(e_na[j].n() > i && !is_bad_data(e_na[j][i])) {
@@ -382,9 +404,13 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
             // Store the current ensemble value
             cur_ens.add(e_na[j][i]);
 
-            // Keep track of the number of ties and the number below
-            if(is_eq(e_na[j][i], o_na[i])) n_tie++;
-            else if(e_na[j][i] < o_na[i])  n_bel++;
+            // Ensemble value minus observation value
+            err = e_na[j][i] - o_na[i];
+
+            // Track running counts and sums
+            if(is_eq(e_na[j][i], o_na[i])) { n_tie++; sum_err_ge_obs += err; }
+            else if(e_na[j][i] < o_na[i])  { n_bel++; sum_err_lt_obs += err; }
+            else                           { n_abv++; sum_err_ge_obs += err; }
          }
 
       } // end for j
@@ -422,6 +448,10 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
          crpscl_gaus_na.add(bad_data_double);
          ign_na.add(bad_data_double);
          pit_na.add(bad_data_double);
+         n_ge_obs_na.add(bad_data_double);
+         me_ge_obs_na.add(bad_data_double);
+         n_lt_obs_na.add(bad_data_double);
+         me_lt_obs_na.add(bad_data_double);
       }
       // Otherwise, compute scores
       else {
@@ -492,6 +522,12 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
          crpscl_gaus_na.add(compute_crps_gaus(o_na[i], cmn_na[i], csd_na[i]));
          ign_na.add(compute_ens_ign(o_na[i], mean, stdev));
          pit_na.add(compute_ens_pit(o_na[i], mean, stdev));
+
+         // Store Bias Ratio components
+         n_ge_obs_na.add(n_tie + n_abv);
+         me_ge_obs_na.add(sum_err_ge_obs/(n_tie + n_abv));
+         n_lt_obs_na.add(n_bel);
+         me_lt_obs_na.add(sum_err_lt_obs/n_bel);
       }
    } // end for i
 
@@ -820,7 +856,8 @@ PairDataEnsemble PairDataEnsemble::subset_pairs_obs_thresh(const SingleThresh &o
       // Include in subset:
       //   wgt_na, o_na, cmn_na, csd_na, v_na, r_na,
       //   crps_emp_na, crps_emp_fair_na, crpscl_emp_na, crps_gaus_na, crpscl_gaus_na,
-      //   ign_na, pit_na, var_na, var_oerr_na, var_plus_oerr_na,
+      //   ign_na, pit_na, n_gt_obs_na, me_gt_obs_na, n_lt_obs_na, me_lt_obs_na,
+      //   var_na, var_oerr_na, var_plus_oerr_na,
       //   mn_na, mn_oerr_na, e_na
       //
       // Exclude from subset:
@@ -841,6 +878,10 @@ PairDataEnsemble PairDataEnsemble::subset_pairs_obs_thresh(const SingleThresh &o
       pd.crpscl_gaus_na.add(crpscl_gaus_na[i]);
       pd.ign_na.add(ign_na[i]);
       pd.pit_na.add(pit_na[i]);
+      pd.n_ge_obs_na.add(n_ge_obs_na[i]);
+      pd.me_ge_obs_na.add(me_ge_obs_na[i]);
+      pd.n_lt_obs_na.add(n_lt_obs_na[i]);
+      pd.me_lt_obs_na.add(me_lt_obs_na[i]);
       pd.skip_ba.add(false);
       pd.var_na.add(var_na[i]);
       pd.var_oerr_na.add(var_oerr_na[i]);

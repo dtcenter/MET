@@ -183,6 +183,9 @@ void ECNTInfo::clear() {
    me         = rmse       = spread      = bad_data_double;
    me_oerr    = rmse_oerr  = spread_oerr = bad_data_double;
    spread_plus_oerr        = bad_data_double;
+
+   n_ge_obs   = n_lt_obs   = 0;
+   me_ge_obs  = me_lt_obs  = bias_ratio  = bad_data_double;
    
    return;
 }
@@ -215,6 +218,12 @@ void ECNTInfo::assign(const ECNTInfo &c) {
    spread_oerr      = c.spread_oerr;
    spread_plus_oerr = c.spread_plus_oerr;
 
+   n_ge_obs         = c.n_ge_obs;
+   n_lt_obs         = c.n_lt_obs;
+   me_ge_obs        = c.me_ge_obs;
+   me_lt_obs        = c.me_lt_obs;
+   bias_ratio       = c.bias_ratio;
+
    return;
 }
 
@@ -230,7 +239,7 @@ void ECNTInfo::set(const PairDataEnsemble &pd) {
    n_ens = pd.n_ens;
 
    // Compute empirical CRPS scores
-   crps_emp   = pd.crps_emp_na.wmean(pd.wgt_na);
+   crps_emp  = pd.crps_emp_na.wmean(pd.wgt_na);
    if(is_eq(crps_emp, 0.0)) crps_emp = 0.0;
    
    crps_emp_fair = pd.crps_emp_fair_na.wmean(pd.wgt_na);
@@ -336,6 +345,21 @@ void ECNTInfo::set(const PairDataEnsemble &pd) {
 
    // Compute the square root of the average variance plus oerr
    spread_plus_oerr = square_root(pd.var_plus_oerr_na.wmean(pd.wgt_na));
+
+   // Compute bias ratio components
+   n_ge_obs  = nint(pd.n_ge_obs_na.sum());
+   me_ge_obs = pd.me_ge_obs_na.wmean(pd.n_ge_obs_na);
+   n_lt_obs  = nint(pd.n_lt_obs_na.sum());
+   me_lt_obs = pd.me_lt_obs_na.wmean(pd.n_lt_obs_na);
+
+   // Compute bias ratio
+   if(is_bad_data(me_ge_obs) ||
+      is_bad_data(me_lt_obs) || is_eq(me_lt_obs, 0.0)) {
+      bias_ratio = bad_data_double;
+   }
+   else {
+      bias_ratio = me_ge_obs / abs(me_lt_obs);
+   }
 
    return;
 }

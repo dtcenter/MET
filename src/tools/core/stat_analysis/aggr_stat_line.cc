@@ -2632,6 +2632,10 @@ void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &job,
          m[key].ens_pd.crps_gaus_na.add(cur.crps_gaus);
          m[key].ens_pd.crpscl_gaus_na.add(cur.crpscl_gaus);
          m[key].ens_pd.ign_na.add(cur.ign);
+         m[key].ens_pd.n_ge_obs_na.add(cur.n_ge_obs);
+         m[key].ens_pd.me_ge_obs_na.add(cur.me_ge_obs);
+         m[key].ens_pd.n_lt_obs_na.add(cur.n_lt_obs);
+         m[key].ens_pd.me_lt_obs_na.add(cur.me_lt_obs);
          m[key].ens_pd.var_na.add(square(cur.spread));
          m[key].ens_pd.var_oerr_na.add(square(cur.spread_oerr));
          m[key].ens_pd.var_plus_oerr_na.add(square(cur.spread_plus_oerr));
@@ -2668,18 +2672,18 @@ void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &job,
       it->second.ens_pd.n_pair    = it->second.ens_pd.wgt_na.sum();
 
       // Compute ME and RMSE as weighted averages
-      it->second.ens_pd.me        = it->second.me_na.wmean(it->second.ens_pd.wgt_na);
-      v                           = it->second.mse_na.wmean(it->second.ens_pd.wgt_na);
-      it->second.ens_pd.rmse      = (is_bad_data(v) ? bad_data_double : sqrt(v));
-      it->second.ens_pd.me_oerr   = it->second.me_oerr_na.wmean(it->second.ens_pd.wgt_na);
-      v                           = it->second.mse_oerr_na.wmean(it->second.ens_pd.wgt_na);
-      it->second.ens_pd.rmse_oerr = (is_bad_data(v) ? bad_data_double : sqrt(v));
+      it->second.ens_pd.me         = it->second.me_na.wmean(it->second.ens_pd.wgt_na);
+      v                            = it->second.mse_na.wmean(it->second.ens_pd.wgt_na);
+      it->second.ens_pd.rmse       = (is_bad_data(v) ? bad_data_double : sqrt(v));
+      it->second.ens_pd.me_oerr    = it->second.me_oerr_na.wmean(it->second.ens_pd.wgt_na);
+      v                            = it->second.mse_oerr_na.wmean(it->second.ens_pd.wgt_na);
+      it->second.ens_pd.rmse_oerr  = (is_bad_data(v) ? bad_data_double : sqrt(v));
 
-      crps_emp    = it->second.ens_pd.crps_emp_na.wmean(it->second.ens_pd.wgt_na);
-      crps_emp_fair    = it->second.ens_pd.crps_emp_fair_na.wmean(it->second.ens_pd.wgt_na);
-      crpscl_emp  = it->second.ens_pd.crpscl_emp_na.wmean(it->second.ens_pd.wgt_na);
-      crps_gaus   = it->second.ens_pd.crps_gaus_na.wmean(it->second.ens_pd.wgt_na);
-      crpscl_gaus = it->second.ens_pd.crpscl_gaus_na.wmean(it->second.ens_pd.wgt_na);
+      crps_emp      = it->second.ens_pd.crps_emp_na.wmean(it->second.ens_pd.wgt_na);
+      crps_emp_fair = it->second.ens_pd.crps_emp_fair_na.wmean(it->second.ens_pd.wgt_na);
+      crpscl_emp    = it->second.ens_pd.crpscl_emp_na.wmean(it->second.ens_pd.wgt_na);
+      crps_gaus     = it->second.ens_pd.crps_gaus_na.wmean(it->second.ens_pd.wgt_na);
+      crpscl_gaus   = it->second.ens_pd.crpscl_gaus_na.wmean(it->second.ens_pd.wgt_na);
 
       // Compute aggregated empirical CRPSS
       it->second.ens_pd.crpss_emp =

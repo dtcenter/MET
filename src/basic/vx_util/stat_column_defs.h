@@ -262,12 +262,14 @@ static const char * isc_columns [] = {
 };
 
 static const char * ecnt_columns [] = {
-   "TOTAL",       "N_ENS",       "CRPS",
-   "CRPSS",       "IGN",         "ME",
-   "RMSE",        "SPREAD",      "ME_OERR",
-   "RMSE_OERR",   "SPREAD_OERR", "SPREAD_PLUS_OERR",
-   "CRPSCL",      "CRPS_EMP",    "CRPSCL_EMP",
-   "CRPSS_EMP",   "CRPS_EMP_FAIR"
+   "TOTAL",       "N_ENS",         "CRPS",
+   "CRPSS",       "IGN",           "ME",
+   "RMSE",        "SPREAD",        "ME_OERR",
+   "RMSE_OERR",   "SPREAD_OERR",   "SPREAD_PLUS_OERR",
+   "CRPSCL",      "CRPS_EMP",      "CRPSCL_EMP",
+   "CRPSS_EMP",   "CRPS_EMP_FAIR", "BIAS_RATIO",
+   "N_GE_OBS",    "ME_GE_OBS",     "N_LT_OBS",
+   "ME_LT_OBS"
 };
 
 static const char * rps_columns [] = {
