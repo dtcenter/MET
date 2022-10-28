@@ -90,6 +90,12 @@ vector<netCDF::NcDim> data_var_dims;
 vector<netCDF::NcVar> hist_vars;
 vector<netCDF::NcVar> joint_hist_vars;
 
+static bool multiple_data_sources = false;
+static bool unique_variable_names = true;
+
+// List of output NetCDF variable names
+static StringArray nc_var_sa;
+
 ////////////////////////////////////////////////////////////////////////
 //
 // Miscellaneous Variables
