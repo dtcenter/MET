@@ -66,8 +66,7 @@ QuadInfo & QuadInfo::operator+=(const QuadInfo &t) {
    // Check intensity
    if(is_bad_data(Intensity)) Intensity = t.intensity();
    else if(Intensity != t.intensity()) {
-      mlog << Error
-           << "\nQuadInfo::operator+=(const QuadInfo &t) -> "
+      mlog << Error << "\nQuadInfo::operator+=(const QuadInfo &t) -> "
            << "cannot call += for two different intensity values ("
            << Intensity << " != " << t.intensity() << ").\n\n";
       exit(1);
@@ -265,8 +264,7 @@ void QuadInfo::set_quad_vals(QuadrantType ref_quad,
         break;
 
      default:
-       mlog << Error
-            << "\nQuadInfo::set_quad_vals() -> "
+       mlog << Error << "\nQuadInfo::set_quad_vals() -> "
             << "unexpected quadrant type encountered \""
             << quadranttype_to_string(ref_quad) << "\".\n\n";
        exit(1);
@@ -343,8 +341,7 @@ TrackPoint & TrackPoint::operator+=(const TrackPoint &p) {
    // Check valid time
    if(ValidTime == (unixtime) 0) ValidTime = p.valid();
    else if(ValidTime != p.valid()) {
-      mlog << Error
-           << "\nTrackPoint::operator+=(const TrackPoint &p) -> "
+      mlog << Error << "\nTrackPoint::operator+=(const TrackPoint &p) -> "
            << "cannot call += for two different valid times ("
            << unix_to_yyyymmdd_hhmmss(ValidTime) << " != "
            << unix_to_yyyymmdd_hhmmss(p.valid()) << ").\n\n";
@@ -354,8 +351,7 @@ TrackPoint & TrackPoint::operator+=(const TrackPoint &p) {
    // Check lead time
    if(is_bad_data(LeadTime)) LeadTime = p.lead();
    else if(LeadTime != p.lead()) {
-      mlog << Error
-           << "\nTrackPoint::operator+=(const TrackPoint &p) -> "
+      mlog << Error << "\nTrackPoint::operator+=(const TrackPoint &p) -> "
            << "cannot call += for two different lead times ("
            << sec_to_hhmmss(LeadTime) << " != "
            << sec_to_hhmmss(p.lead()) << ").\n\n";
@@ -430,13 +426,15 @@ void TrackPoint::clear() {
    Depth     = NoSystemsDepth;
    WarmCore  = false;
    WatchWarn = NoWatchWarnType;
-   
+
    NumMembers = bad_data_int;
    Spread     = bad_data_double;
    DistMean   = bad_data_double;
    VmaxStdev  = bad_data_double;
    MSLPStdev  = bad_data_double;
-   
+
+   DiagVal.clear();
+
    // Call clear for each Wind object and then set intensity value
    for(i=0; i<NWinds; i++) {
       Wind[i].clear();
@@ -468,6 +466,8 @@ void TrackPoint::dump(ostream &out, int indent_depth) const {
    out << prefix << "Speed     = " << Speed << "\n";
    out << prefix << "Depth     = " << systemsdepth_to_string(Depth) << "\n";
    out << prefix << "WarmCore  = " << bool_to_string(WarmCore) << "\n";
+   out << prefix << "WatchWarn = " << watchwarntype_to_string(WatchWarn);
+   out << prefix << "NDiag     = " << DiagVal.n() << "\n";
 
    out << prefix << "NumMembers = " << NumMembers << "\n";
    out << prefix << "Spread     = " << Spread << "\n";
@@ -508,13 +508,13 @@ ConcatString TrackPoint::serialize() const {
      << ", Depth = " << systemsdepth_to_string(Depth)
      << ", WarmCore = " << bool_to_string(WarmCore)
      << ", WatchWarn = " << watchwarntype_to_string(WatchWarn)
-      
      << ", NumMembers = " << NumMembers
      << ", Spread = " << Spread
      << ", DistMean = " << DistMean
      << ", VmaxStdev = " << VmaxStdev      
-     << ", MSLPStdev = " << MSLPStdev;      
-   
+     << ", MSLPStdev = " << MSLPStdev
+     << ", NDiag = " << DiagVal.n();
+
    return(s);
 }
 
@@ -559,13 +559,15 @@ void TrackPoint::assign(const TrackPoint &t) {
    Depth     = t.Depth;
    WarmCore  = t.WarmCore;
    WatchWarn = t.WatchWarn;
-   
+
    NumMembers = t.NumMembers;
    Spread     = t.Spread;
    DistMean   = t.DistMean;
    VmaxStdev  = t.VmaxStdev;
    MSLPStdev  = t.MSLPStdev;
-   
+
+   DiagVal    = t.DiagVal;
+
    for(i=0; i<NWinds; i++) Wind[i] = t.Wind[i];
 
    return;
@@ -577,23 +579,22 @@ void TrackPoint::initialize(const ATCFTrackLine &l) {
 
    IsSet     = true;
 
-   ValidTime = l.valid();
-   LeadTime  = l.lead();
-   Lat       = l.lat();
-   Lon       = l.lon();
-   Vmax      = l.v_max();
-   MSLP      = l.mslp();
-   Level     = l.level();
-   RadP      = l.isobar_pressure();
-   RRP       = l.isobar_radius();
-   MRD       = l.max_wind_radius();
-   Gusts     = l.gusts();
-   Eye       = l.eye_diameter();
-   Direction = l.storm_direction();
-   Speed     = l.storm_speed();
-   Depth     = l.depth();
-   WarmCore  = l.warm_core();
-
+   ValidTime  = l.valid();
+   LeadTime   = l.lead();
+   Lat        = l.lat();
+   Lon        = l.lon();
+   Vmax       = l.v_max();
+   MSLP       = l.mslp();
+   Level      = l.level();
+   RadP       = l.isobar_pressure();
+   RRP        = l.isobar_radius();
+   MRD        = l.max_wind_radius();
+   Gusts      = l.gusts();
+   Eye        = l.eye_diameter();
+   Direction  = l.storm_direction();
+   Speed      = l.storm_speed();
+   Depth      = l.depth();
+   WarmCore   = l.warm_core();
    NumMembers = bad_data_int;
    Spread     = bad_data_double;
    DistMean   = bad_data_double;
@@ -609,8 +610,7 @@ const QuadInfo & TrackPoint::operator[](int n) const {
 
    // Check range
    if((n < 0) || (n >= NWinds)) {
-      mlog << Error
-           << "\nTrackPoint::operator[](int) -> "
+      mlog << Error << "\nTrackPoint::operator[](int) -> "
            << "range check error for index value " << n << "\n\n";
       exit(1);
    }
@@ -626,6 +626,12 @@ void TrackPoint::set_watch_warn(WatchWarnType ww_type, unixtime ww_ut) {
    if(ValidTime >= ww_ut) set_watch_warn(ww_type);
 
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double TrackPoint::diag_val(int i) const {
+   return(i>=0 && i<DiagVal.n() ? DiagVal[i] : bad_data_double);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -648,8 +654,7 @@ void TrackPoint::set_wind(int n, const QuadInfo &w) {
 
    // Check the range
    if((n < 0) || (n >= NWinds)) {
-      mlog << Error
-           << "\nQuadInfo::set_wind(int, const QuadInfo) -> "
+      mlog << Error << "\nQuadInfo::set_wind(int, const QuadInfo) -> "
            << "range check error (" << n << ").\n\n";
       exit(1);
    }
@@ -676,6 +681,16 @@ bool TrackPoint::is_match(const ATCFTrackLine &l) const {
       match = false;
 
    return(match);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TrackPoint::add_diag_value(double val) {
+
+   // Store the diagnostic value
+   DiagVal.add(val);
+
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
