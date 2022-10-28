@@ -10,6 +10,15 @@ MET Version |version| release notes (|release_date|)
 
 * Bugfixes:
 
+   * **Fix Stat-Analysis aggregation of the neighborhood statistics line types** (`#2271 <http://github.com/dtcenter/MET/issues/2271>`_)
+   * Fix support for int64 NetCDF variable types (`#2123 <http://github.com/dtcenter/MET/issues/2123>`_)
+   * Fix regression test differences in pb2nc and ioda2nc output (`#2102 <http://github.com/dtcenter/MET/issues/2102>`_)
+
+MET Version 10.0.1 release notes (2021-12-01)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Bugfixes:
+
    * **Fix MTD to compute the CDIST_TRAVELLED value correctly** (`#1976 <http://github.com/dtcenter/MET/issues/1976>`_)
    * **Fix MADIS2NC to handle the 2016 changes to its format** (`#1936 <http://github.com/dtcenter/MET/issues/1936>`_).
    * Fix TC-Stat event equalization logic to include any model name requested using -amodel (`#1932 <http://github.com/dtcenter/MET/issues/1932>`_).
@@ -20,7 +29,7 @@ MET Version |version| release notes (|release_date|)
    * Fix the Plot-Point-Obs documentation to remove the duplicate configuration section (`#1789 <http://github.com/dtcenter/MET/issues/1789>`_).
 
 MET Version 10.0.0 release notes (2021-05-10)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * Repository and build:
   
