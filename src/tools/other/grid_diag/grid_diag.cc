@@ -211,7 +211,7 @@ void process_command_line(int argc, char **argv) {
       }
 
    } // end for i
-   
+
    // Process the configuration
    conf_info.process_config(file_types);
 
@@ -492,17 +492,17 @@ void setup_joint_histograms(void) {
 
 void setup_nc_file(void) {
    ConcatString cs, i_var_str, j_var_str;
-   
+
    // Create NetCDF file
    nc_out = open_ncfile(out_file.c_str(), true);
-   
+
    if(IS_INVALID_NC_P(nc_out)) {
       mlog << Error << "\nsetup_nc_file() -> "
            << "trouble opening output NetCDF file "
            << out_file << "\n\n";
       exit(1);
    }
-   
+
    // Add global attributes
    write_netcdf_global(nc_out, out_file.c_str(), program_name,
                        NULL, NULL, conf_info.desc.c_str());
@@ -520,7 +520,7 @@ void setup_nc_file(void) {
    add_att(nc_out, "valid_end", (string)unix_to_yyyymmdd_hhmmss(valid_end));
    add_att(nc_out, "lead_beg",  (string)sec_to_hhmmss(lead_beg));
    add_att(nc_out, "lead_end",  (string)sec_to_hhmmss(lead_end));
-   
+
    // Write the grid size, mask size, and series length
    write_nc_var_int("grid_size", "number of grid points", grid.nxy());
    write_nc_var_int("mask_size", "number of mask points", conf_info.mask_area.count());
@@ -529,23 +529,23 @@ void setup_nc_file(void) {
    // Compression level
    int deflate_level = compress_level;
    if(deflate_level < 0) deflate_level = conf_info.conf.nc_compression();
-   
+
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
-      
+
       i_var_str << cs_erase << "VAR" << i_var;
-      
+
       VarInfo *data_info = conf_info.data_info[i_var];
-      
+
       // Set variable NetCDF name
       ConcatString var_name = data_info->name_attr();
       var_name.add("_");
       var_name.add(data_info->level_attr());
-      
+
       if(multiple_data_sources && !unique_variable_names) {
          var_name.add("_");
          var_name.add(i_var_str);
       }
-      
+
       // Define histogram dimensions
       NcDim var_dim = add_dim(nc_out, var_name,
                               (long) data_info->n_bins());
@@ -577,55 +577,55 @@ void setup_nc_file(void) {
       cs << cs_erase << "Midpoint value of " << var_name << " bin";
       add_var_att_local(&var_mid, "long_name", cs);
       add_var_att_local(&var_mid, "units", data_info->units_attr());
-      
+
       // Write bin values
       var_min.putVar(bin_mins[i_var_str].data());
       var_max.putVar(bin_maxs[i_var_str].data());
       var_mid.putVar(bin_mids[i_var_str].data());
    }
-   
+
    // Define histograms
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
       i_var_str << cs_erase << "VAR" << i_var;
-      
+
       VarInfo *data_info = conf_info.data_info[i_var];
 
       // Set variable NetCDF name
       ConcatString var_name = data_info->name_attr();
       var_name.add("_");
       var_name.add(data_info->level_attr());
-      
+
       if(multiple_data_sources && !unique_variable_names) {
          var_name.add("_");
          var_name.add(i_var_str);
       }
-      
+
       ConcatString hist_name("hist_");
       hist_name.add(var_name);
       NcDim var_dim = data_var_dims[i_var];
       NcVar hist_var = add_var(nc_out, hist_name, ncInt64, var_dim,
                                deflate_level);
       hist_vars.push_back(hist_var);
-      
+
       // Add variable attributes
       cs << cs_erase << "Histogram of " << var_name << " values";
       add_var_att_local(&hist_var, "long_name", cs);
    }
-   
+
    // Define joint histograms
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
       i_var_str << cs_erase << "VAR" << i_var;
-      
+
       VarInfo *data_info = conf_info.data_info[i_var];
-      
+
       for(int j_var=i_var+1; j_var<conf_info.get_n_data(); j_var++) {
 
          j_var_str << cs_erase << "VAR" << j_var;
-         
+
          VarInfo *joint_info = conf_info.data_info[j_var];
-         
+
          ConcatString hist_name("hist_");
          hist_name.add(data_info->name_attr());
          hist_name.add("_");
@@ -635,7 +635,7 @@ void setup_nc_file(void) {
             hist_name.add("_");
             hist_name.add(i_var_str);
          }
-         
+
          hist_name.add("_");
          hist_name.add(joint_info->name_attr());
          hist_name.add("_");
@@ -645,7 +645,7 @@ void setup_nc_file(void) {
             hist_name.add("_");
             hist_name.add(j_var_str);
          }
-         
+
          NcDim var_dim = data_var_dims[i_var];
          NcDim joint_dim = data_var_dims[j_var];
          vector<NcDim> dims;
