@@ -265,7 +265,7 @@ void process_series(void) {
       // Process the 1d histograms
       for(int i_var=0; i_var<conf_info.get_n_data(); i_var++) {
 
-        i_var_str << cs_erase << "VAR" << i_var;
+        i_var_str << cs_erase << "VAR" << i_var+1;
 
         VarInfo *data_info = conf_info.data_info[i_var];
 
@@ -347,13 +347,13 @@ void process_series(void) {
      // Process the 2d joint histograms
      for(int i_var=0; i_var<conf_info.get_n_data(); i_var++) {
 
-        i_var_str << cs_erase << "VAR" << i_var;
+        i_var_str << cs_erase << "VAR" << i_var+1;
 
         VarInfo *data_info = conf_info.data_info[i_var];
 
         for(int j_var=i_var+1; j_var<conf_info.get_n_data(); j_var++) {
 
-           j_var_str << cs_erase << "VAR" << j_var;
+           j_var_str << cs_erase << "VAR" << j_var+1;
 
            VarInfo *joint_info = conf_info.data_info[j_var];
 
@@ -406,7 +406,7 @@ void setup_histograms(void) {
 
    for(int i_var=0; i_var<conf_info.get_n_data(); i_var++) {
 
-      i_var_str << cs_erase << "VAR" << i_var;
+      i_var_str << cs_erase << "VAR" << i_var+1;
 
       VarInfo *data_info = conf_info.data_info[i_var];
 
@@ -462,14 +462,14 @@ void setup_joint_histograms(void) {
 
 	for(int i_var=0; i_var<conf_info.get_n_data(); i_var++) {
 
-      i_var_str << cs_erase << "VAR" << i_var;
+      i_var_str << cs_erase << "VAR" << i_var+1;
 
       VarInfo *data_info = conf_info.data_info[i_var];
       int n_bins = data_info->n_bins();
 
       for(int j_var=i_var+1; j_var<conf_info.get_n_data(); j_var++) {
 
-         j_var_str << cs_erase << "VAR" << j_var;
+         j_var_str << cs_erase << "VAR" << j_var+1;
    
          VarInfo *joint_info = conf_info.data_info[j_var];
          int n_joint_bins = joint_info->n_bins();
@@ -532,7 +532,7 @@ void setup_nc_file(void) {
 
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
-      i_var_str << cs_erase << "VAR" << i_var;
+      i_var_str << cs_erase << "VAR" << i_var+1;
 
       VarInfo *data_info = conf_info.data_info[i_var];
 
@@ -587,7 +587,7 @@ void setup_nc_file(void) {
    // Define histograms
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
-      i_var_str << cs_erase << "VAR" << i_var;
+      i_var_str << cs_erase << "VAR" << i_var+1;
 
       VarInfo *data_info = conf_info.data_info[i_var];
 
@@ -616,13 +616,13 @@ void setup_nc_file(void) {
    // Define joint histograms
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
-      i_var_str << cs_erase << "VAR" << i_var;
+      i_var_str << cs_erase << "VAR" << i_var+1;
 
       VarInfo *data_info = conf_info.data_info[i_var];
 
       for(int j_var=i_var+1; j_var<conf_info.get_n_data(); j_var++) {
 
-         j_var_str << cs_erase << "VAR" << j_var;
+         j_var_str << cs_erase << "VAR" << j_var+1;
 
          VarInfo *joint_info = conf_info.data_info[j_var];
 
@@ -696,7 +696,7 @@ void write_histograms(void) {
 
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
-      i_var_str << cs_erase << "VAR" << i_var;
+      i_var_str << cs_erase << "VAR" << i_var+1;
 
       VarInfo *data_info = conf_info.data_info[i_var];
       NcVar hist_var = hist_vars[i_var];
@@ -724,8 +724,8 @@ void write_joint_histograms(void) {
          VarInfo *joint_info = conf_info.data_info[j_var];
 
          ij_var_str << cs_erase
-                    << "VAR" << i_var << "_"
-                    << "VAR" << j_var;
+                    << "VAR" << i_var+1 << "_"
+                    << "VAR" << j_var+1;
 
          long long *hist = joint_histograms[ij_var_str].data();
 
