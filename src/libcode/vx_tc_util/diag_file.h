@@ -23,15 +23,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 //
-// Real-time LSDIAG files:
-//   - https://ftp.nhc.noaa.gov/atcf/lsdiag
-//   - Header:
-//       BBCC YYMMDD HH WS LAT LON 9999 BBCCYYYY
-//       BB is 2-letter basin name
-//       CC is 2-digit cyclone number
-//       YYMMDD HH is the initialization time
-//       WS is the wind speed
-//
 // TCDIAG files:
 //   - Add link to sample data
 //   - Header:
@@ -41,6 +32,18 @@
 //       YYYYMMDDHH is the initialization time
 //       BB is the 2-letter basin name
 //       CC is the 2-digit cyclone number
+//
+// Real-time LSDIAG files:
+//   - https://ftp.nhc.noaa.gov/atcf/lsdiag
+//   - Header:
+//       BBCC YYMMDD HH WS LAT LON 9999 BBCCYYYY
+//       BB is 2-letter basin name
+//       CC is 2-digit cyclone number
+//       YYMMDD HH is the initialization time
+//       WS is the wind speed
+//
+// Developmental LSDIAG files (not currently supported):
+//   - https://rammb2.cira.colostate.edu/research/tropical-cyclones/ships
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -115,13 +118,13 @@ class DiagFile : public LineDataFile {
          //  do stuff
          //
 
-      void read          (const DiagType,
-                          const ConcatString &, const StringArray &,
-                          const std::map<ConcatString,UserFunc_1Arg> *);
-      void read_tcdiag   (const ConcatString &, const StringArray &,
-                          const std::map<ConcatString,UserFunc_1Arg> *);
-      void read_lsdiagrt (const ConcatString &, const StringArray &,
-                          const std::map<ConcatString,UserFunc_1Arg> *);
+      void read           (const DiagType,
+                           const ConcatString &, const StringArray &,
+                           const std::map<ConcatString,UserFunc_1Arg> *);
+      void read_tcdiag    (const ConcatString &, const StringArray &,
+                           const std::map<ConcatString,UserFunc_1Arg> *);
+      void read_lsdiag_rt (const ConcatString &, const StringArray &,
+                           const std::map<ConcatString,UserFunc_1Arg> *);
 
 };
 

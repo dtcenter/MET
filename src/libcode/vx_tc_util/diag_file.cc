@@ -39,7 +39,7 @@ static int n_lsdiag_wdth = sizeof(lsdiag_wdth)/sizeof(*lsdiag_wdth);
 static const int tcdiag_fill_value = 9999;
 static const int lsdiag_fill_value = 9999;
 
-static const char lsdiag_skip_str[] = "MTPW,IR00,IRM1,IRM3,PC00,PCM1,PCM3,PSLV,IRXX";
+static const char lsdiag_skip_str[] = "TIME,DELV,MTPW,IR00,IRM1,IRM3,PC00,PCM1,PCM3,PSLV,IRXX";
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -218,7 +218,7 @@ void DiagFile::read(const DiagType source,
       read_tcdiag(path, model_names, convert_map);
    }
    else if(source == LSDiagRTType) {
-      read_lsdiagrt(path, model_names, convert_map);
+      read_lsdiag_rt(path, model_names, convert_map);
    }
    else {
       mlog << Error << "\nDiagFile::read() -> "
@@ -234,8 +234,8 @@ void DiagFile::read(const DiagType source,
 
 void DiagFile::read_tcdiag(const ConcatString &path, const StringArray &model_names,
                            const map<ConcatString,UserFunc_1Arg> *convert_map) {
-   int i, v_int;
-   double v_dbl;
+   int i;
+   double v_in, v_out;
    NumArray data;
    const UserFunc_1Arg *fx_ptr = 0;
 
@@ -285,7 +285,7 @@ void DiagFile::read_tcdiag(const ConcatString &path, const StringArray &model_na
          NTime = atoi(dl[1]);
       }
       else if(cs == "TIME") {
-         for(int i=2; i<dl.n_items(); i++) {
+         for(i=2; i<dl.n_items(); i++) {
             LeadTime.add(atoi(dl[i])*sec_per_hour);
          }
       }
@@ -299,7 +299,7 @@ void DiagFile::read_tcdiag(const ConcatString &path, const StringArray &model_na
             Lon.add(rescale_lon(atof(dl[i])));
          }
 
-         // Finished parsing header
+         // Finished parsing the metadata
          break;
       }
    } // end while
@@ -315,21 +315,22 @@ void DiagFile::read_tcdiag(const ConcatString &path, const StringArray &model_na
       exit(1);
    }
 
+   // Rewind to beginning in case data rows precede the header
+   rewind();
+
    // Store the diagnostics data
    while(dl.read_line(this)) {
 
       // Skip empty lines
       if(dl.n_items() == 0) continue;
 
-      // Quit reading at the COMMENTS section
-      if((cs = dl[1]) == "COMMENTS") break;
-
-      // First column contains the name
+      // First column contains the diagnostic name
       cs = dl[0];
 
-      // Skip certain lines
-      if(cs.startswith("----") || cs.startswith("TIME") ||
-         cs.startswith("NLEV") || cs.startswith("NVAR")) continue;
+      // Skip non-diagnostic data lines
+      if(cs.startswith("*")     || cs.startswith("----") ||
+         cs.startswith("NTIME") || cs.startswith("TIME") ||
+         cs.startswith("NLEV")  || cs.startswith("NVAR")) continue;
 
       // Check for a conversion function based on the diagnostic name or units
       if(convert_map) {
@@ -343,17 +344,18 @@ void DiagFile::read_tcdiag(const ConcatString &path, const StringArray &model_na
 
       // Parse the data values
       data.erase();
-      for(i=2; i<dl.n_items(); i++) {
+      for(int i=2; i<dl.n_items(); i++) {
 
-         v_int = atoi(dl[i]);
+         // Read as float since LAT and LON as specified that way
+         v_in = atof(dl[i]);
 
          // Check for bad data and apply conversions
-         if(v_int == tcdiag_fill_value) v_dbl = bad_data_double;
-         else if(fx_ptr)                v_dbl = (*fx_ptr)(v_int);
-         else                           v_dbl = (double) v_int;
+         if(atoi(dl[i]) == tcdiag_fill_value) v_out = bad_data_double;
+         else if(fx_ptr)                      v_out = (*fx_ptr)(v_in);
+         else                                 v_out = v_in;
 
          // Store the value
-         data.add(v_dbl);
+         data.add(v_out);
       }
 
       // Check for the expected number of items
@@ -383,8 +385,8 @@ void DiagFile::read_tcdiag(const ConcatString &path, const StringArray &model_na
 
 ////////////////////////////////////////////////////////////////////////
 
-void DiagFile::read_lsdiagrt(const ConcatString &path, const StringArray &model_names,
-                             const map<ConcatString,UserFunc_1Arg> *convert_map) {
+void DiagFile::read_lsdiag_rt(const ConcatString &path, const StringArray &model_names,
+                              const map<ConcatString,UserFunc_1Arg> *convert_map) {
    int i, v_int;
    double v_dbl;
    NumArray data;
@@ -404,8 +406,8 @@ void DiagFile::read_lsdiagrt(const ConcatString &path, const StringArray &model_
    open(path.c_str());
 
    // Diagnostic names to ignore
-   StringArray skip_sa;
-   skip_sa.parse_css(lsdiag_skip_str);
+   StringArray skip_diag_sa;
+   skip_diag_sa.parse_css(lsdiag_skip_str);
 
    // Parse the header information from the first line
    DataLine dl;
@@ -414,7 +416,7 @@ void DiagFile::read_lsdiagrt(const ConcatString &path, const StringArray &model_
 
    // Check for the expected number of items
    if(dl.n_items() != 9 || strncasecmp(dl[8], "HEAD", strlen("HEAD") != 0)) {
-      mlog << Error << "\nDiagFile::open_lsdiag() -> "
+      mlog << Error << "\nDiagFile::read_lsdiag_rt() -> "
            << "unexpected header line: " << path << "\n\n";
       exit(1);
    }
@@ -431,6 +433,9 @@ void DiagFile::read_lsdiagrt(const ConcatString &path, const StringArray &model_
    int day  = atoi(cs.string().substr(4, 2).c_str());
    int hr   = atoi(dl[2]);
    InitTime = mdyhms_to_unix(mon, day, yr, hr, 0, 0);
+
+   // Store the location of the beginning of the data
+   int data_start_location = in->tellg();
 
    // Parse time and location info
    while(read_fwf_line(dl, lsdiag_wdth, n_lsdiag_wdth)) {
@@ -459,10 +464,13 @@ void DiagFile::read_lsdiagrt(const ConcatString &path, const StringArray &model_
             Lon.add(rescale_lon(-1.0*atof(dl[i])/10.0));
          }
 
-         // Finished parsing header
+         // Finished parsing the metadata
          break;
       }
    } // end while
+
+   // Rewind to the beginning of the data
+   in->seekg(data_start_location);
 
    // Store the diagnostics data
    while(read_fwf_line(dl, lsdiag_wdth, n_lsdiag_wdth)) {
@@ -470,14 +478,14 @@ void DiagFile::read_lsdiagrt(const ConcatString &path, const StringArray &model_
       // Skip empty lines
       if(dl.n_items() == 0) continue;
 
-      // Check the 24th column
+      // The 24th column contains the diagnostic name
       cs = dl[23];
 
       // Strip any whitespace from the fixed-width column
       cs.ws_strip();
 
       // Check for diagnostic names to skip
-      if(skip_sa.has(cs)) continue;
+      if(skip_diag_sa.has(cs)) continue;
 
       // Quit reading at the LAST line
       if(cs == "LAST") break;
@@ -508,7 +516,7 @@ void DiagFile::read_lsdiagrt(const ConcatString &path, const StringArray &model_
 
       // Check for the expected number of items
       if(NTime != data.n()) {
-         mlog << Error << "\nDiagFile::read_lsdiag() -> "
+         mlog << Error << "\nDiagFile::read_lsdiag_rt() -> "
               << "the number of \"" << cs << "\" diagnostic values ("
               << data.n() << ") does not match the expected number ("
               << NTime << ")!\n\n";
