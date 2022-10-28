@@ -4220,12 +4220,14 @@ void write_ecnt_cols(const ECNTInfo &ecnt_info,
    //
    // Ensemble Continuous Statistics
    // Dump out the ECNT line:
-   //    TOTAL,            N_ENS,        CRPS,
-   //    CRPSS,            IGN,          ME,
-   //    RMSE,             SPREAD,       ME_OERR,
-   //    RMSE_OERR,        SPREAD_OERR,  SPREAD_PLUS_OERR,
-   //    CRPSCL,           CRPS_EMP,     CRPSCL_EMP,
-   //    CRPSS_EMP         CRPS_EMP_FAIR
+   //    TOTAL,            N_ENS,         CRPS,
+   //    CRPSS,            IGN,           ME,
+   //    RMSE,             SPREAD,        ME_OERR,
+   //    RMSE_OERR,        SPREAD_OERR,   SPREAD_PLUS_OERR,
+   //    CRPSCL,           CRPS_EMP,      CRPSCL_EMP,
+   //    CRPSS_EMP         CRPS_EMP_FAIR, BIAS RATIO,
+   //    N_GE_OBS,         ME_GE_OBS,     N_LT_OBS,
+   //    ME_LT_OBS
    //
    at.set_entry(r, c+0,  // Total Number of Pairs
       ecnt_info.n_pair);
@@ -4277,6 +4279,21 @@ void write_ecnt_cols(const ECNTInfo &ecnt_info,
 
    at.set_entry(r, c+16,  // Empirical ensemble CRPS FAIR
       ecnt_info.crps_emp_fair);
+
+   at.set_entry(r, c+17,  // Bias Ratio
+      ecnt_info.bias_ratio);
+
+   at.set_entry(r, c+18,  // Number of ensemble values >= observations
+      ecnt_info.n_ge_obs);
+
+   at.set_entry(r, c+19,  // ME of ensemble values >= observations
+      ecnt_info.me_ge_obs);
+
+   at.set_entry(r, c+20,  // Number of ensemble values < observations
+      ecnt_info.n_lt_obs);
+
+   at.set_entry(r, c+21,  // ME of ensemble values < observations
+      ecnt_info.me_lt_obs);
 
    return;
 }

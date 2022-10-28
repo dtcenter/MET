@@ -470,6 +470,7 @@ Mean Error (ME)
 ---------------
 
 Called "ME" in CNT output :numref:`table_PS_format_info_CNT`
+Called "ME_OERR", "ME_GE_OBS", and "ME_LT_OBS" in ECNT output :numref:`table_ES_header_info_es_out_ECNT`
 
 The Mean Error, ME, is a measure of overall bias for continuous variables; in particular ME = Bias. It is defined as 
 
@@ -1002,6 +1003,19 @@ The continuous ranked probability skill score (CRPSS) is similar to the MSESS an
 .. math:: \text{CRPSS} = 1 - \frac{\text{CRPS}_{fcst}}{ \text{CRPS}_{ref}}
 
 For the normal distribution fit (CRPSS), the reference CRPS is computed using the climatological mean and standard deviation. For the empirical distribution (CRPSS_EMP), the reference CRPS is computed by sampling from the assumed normal climatological distribution defined by the mean and standard deviation.  
+
+Bias Ratio
+----------
+
+Called "BIAS_RATIO" in ECNT output :numref:`table_ES_header_info_es_out_ECNT`
+
+The bias ratio (BIAS_RATIO) is computed when verifying an ensemble against gridded analyses or point observations. It is defined as the mean error (ME) of ensemble member values greater than or equal to the observation value to which they are matched divided by the absolute value of the mean error (ME) of ensemble member values less than the observation values.
+
+.. math:: \text{BIAS_RATIO} = \frac{ \text{ME}_{f >= o} }{ |\text{ME}_{f < o}| }
+
+A perfect forecast has ME = 0. Since BIAS_RATIO is computed as the high bias (ME_GE_OBS) divide by the absolute value of the low bias (ME_LT_OBS), a perfect forecast has BIAS_RATIO = 0/0, which is undefined. In practice, the high and low bias values are unlikely to be 0.
+
+The range for BIAS_RATIO is 0 to infinity. A score of 1 indicates that the high and low biases are equal. A score greater than 1 indicates that the high bias is larger than the magnitude of the low bias. A score less than 1 indicates the opposite behavior.
 
 IGN
 ---
