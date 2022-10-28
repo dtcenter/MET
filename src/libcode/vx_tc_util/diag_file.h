@@ -23,7 +23,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 //
-// LSDIAG files:
+// Real-time LSDIAG files:
 //   - https://ftp.nhc.noaa.gov/atcf/lsdiag
 //   - Header:
 //       BBCC YYMMDD HH WS LAT LON 9999 BBCCYYYY

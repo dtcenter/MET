@@ -262,7 +262,7 @@ ____________________
 
 The **diag_name** entry specifies a comma-separated list of strings for the tropical cyclone diagnostics of interest. This applies when the **-tcdiag** and/or **-lsdiag** command line options have been used to provide storm diagnostics data. If a non-zero list of diagnostic names is specified, only those diagnostics appearing in the list are written to the TCDIAG output line type. If defined as an empty list (default), all diagnostics found in the input are written to the TCDIAG output lines.
 
-A TCMPR line is written to the output for each track point. If diagnostics data is also defined for that track point, a TCDIAG line is written immediately after the corresponding TCMPR line. The contents of that TCDIAG line is deteremined by diagnostic names requrested in the **diag_name** entry.
+A TCMPR line is written to the output for each track point. If diagnostics data is also defined for that track point, a TCDIAG line is written immediately after the corresponding TCMPR line. The contents of that TCDIAG line is determined by diagnostic names requested in the **diag_name** entry.
 
 ____________________
 
@@ -274,23 +274,35 @@ ____________________
        convert(x) = x / 10; },
 
      { source = "LSDIAG_RT";
-       key = [ "CSST", "RSST", "DSST", "DSTA", "XDST", "XNST", "NSST", "NSTA",
-               "NTMX", "NTFR", "U200", "U20C", "V20C", "E000", "EPOS", "ENEG", "EPSS", "ENSS",
-               "T000", "TLAT", "TLON", "TWAC", "TWXC", "G150", "G200", "G250", "V000", "V850",
-               "V500", "V300", "PENC", "SHDC", "SHGC", "T150", "T200", "T250", "SHRD", "SHRS",
-               "SHRG", "PENV", "HE07", "HE05", "PW01", "PW02", "PW03", "PW04", "PW05", "PW06",
-               "PW07", "PW08", "PW09", "PW10", "PW11", "PW12", "PW13", "PW14", "PW15", "PW16",
-               "PW17", "PW18", "PW20", "PW21" ];
+       key = [ "CSST", "RSST", "DSST", "DSTA", "XDST", "XNST", "NSST", "NSTA", "NTMX", "NTFR",
+               "U200", "U20C", "V20C", "E000", "EPOS", "ENEG", "EPSS", "ENSS", "T000", "TLAT",
+               "TLON", "TWAC", "TWXC", "G150", "G200", "G250", "V000", "V850", "V500", "V300",
+               "SHDC", "SHGC", "T150", "T200", "T250", "SHRD", "SHRS", "SHRG", "HE07", "HE05",
+               "PW01", "PW02", "PW03", "PW04", "PW05", "PW06", "PW07", "PW08", "PW09", "PW10",
+               "PW11", "PW12", "PW13", "PW14", "PW15", "PW16", "PW17", "PW18", "PW20", "PW21" ];
        convert(x) = x / 10; },
 
      { source = "LSDIAG_RT";
        key = [ "VVAV", "VMFX", "VVAC" ];
-       convert(x) = x / 100; }
+       convert(x) = x / 100; },
+
+     { source = "LSDIAG_RT";
+       key = [ "TADV" ];
+       convert(x) = x / 1000000; },
+
+     { source = "LSDIAG_RT";
+       key = [ "Z850", "D200", "TGRD", "DIVC" ];
+       convert(x) = x / 10000000; },
+
+     { source = "LSDIAG_RT";
+       key = [ "PENC", "PENV" ];
+       convert(x) = x / 10 + 1000; }
+
   ];
 
 The **diag_convert_map** entries define conversion functions to be applied to diagnostics data read with the **-diag** command line option. Each array element is a dictionary consisting of a **source**, **key**, and **convert(x)** entry.
 
-The **source** is one of the supported diagnostics data sources. The **key** is an array of strings. The strings can specify diagnostic names or units, although units are only checked for **TCDIAG** sources. If both the name and units are specified, the conversion function for the name takes precedence. **convert(x)** is a function of one variable which defines how the diagnostic data should be converted. The defined function is applied to any diagnostic value who name or units appears in the **key**.
+The **source** is one of the supported diagnostics data sources. The **key** is an array of strings. The strings can specify diagnostic names or units, although units are only checked for **TCDIAG** sources. If both the name and units are specified, the conversion function for the name takes precedence. **convert(x)** is a function of one variable which defines how the diagnostic data should be converted. The defined function is applied to any diagnostic value whose name or units appears in the **key**.
 
 ____________________
 
