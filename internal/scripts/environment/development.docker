@@ -24,8 +24,8 @@ export MET_FREETYPELIB=/usr/lib64
 export MET_JASPERLIB=/usr/lib64
 
 export MET_PYTHON=/usr/bin/python3
-export MET_PYTHON_CC="-I/usr/include/python3.8m -I/usr/include/python3.8m"
-export MET_PYTHON_LD="-L/usr/lib64 -lpython3.8m -lpthread -ldl -lutil -lm"
+export MET_PYTHON_CC="-I/usr/local/include/python3.8"
+export MET_PYTHON_LD="-L/usr/local/lib -lpython3.8 -lpthread -ldl -lutil -lm"
 
 # -D__64BIT__ is required because we've compiled libgrib2c.a with that flag
 export CFLAGS="-DUNDERSCORE -fPIC -D__64BIT__ -g"
