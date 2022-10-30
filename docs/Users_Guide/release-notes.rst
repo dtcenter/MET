@@ -45,7 +45,7 @@ MET Version 11.0.0-beta4 release notes (20220930)
    * **Enhance ASCII2NC to read NDBC buoy data** (`#2276 <https://github.com/dtcenter/MET/issues/2276>`_).
    * **Enhance IODA2NC to support IODA v2.0 format** (`#2068 <https://github.com/dtcenter/MET/issues/2068>`_).
    * **Add new bias ratio statistic to the ECNT line type from Ensemble-Stat and for HiRA** (`#2058 <https://github.com/dtcenter/MET/issues/2058>`_).
-   * **Enhance TC-Pairs consensus logic to compute the spread of the location, wind speed, and pressure**(`#2036 <https://github.com/dtcenter/MET/issues/2036>`_).
+   * **Enhance TC-Pairs consensus logic to compute the spread of the location, wind speed, and pressure** (`#2036 <https://github.com/dtcenter/MET/issues/2036>`_).
    * **Enhance TC-Pairs to read hurricane model diagnostic files (e.g. SHIPS) and TC-Stat to filter the new data** (`#392 <https://github.com/dtcenter/MET/issues/392>`_).
    * Refine Grid-Diag output variable names when specifying two input data sources (`#2232 <https://github.com/dtcenter/MET/issues/2232>`_).
 
