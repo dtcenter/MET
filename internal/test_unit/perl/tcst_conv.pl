@@ -29,7 +29,11 @@ my @fld_tcmpr  = qw(AMODEL BMODEL DESC STORM_ID BASIN CYCLONE STORM_NAME INIT_MA
                     AAL_WIND_34 BAL_WIND_34 ANE_WIND_34 BNE_WIND_34 ASE_WIND_34 BSE_WIND_34 ASW_WIND_34 BSW_WIND_34 ANW_WIND_34 BNW_WIND_34
                     AAL_WIND_50 BAL_WIND_50 ANE_WIND_50 BNE_WIND_50 ASE_WIND_50 BSE_WIND_50 ASW_WIND_50 BSW_WIND_50 ANW_WIND_50 BNW_WIND_50
                     AAL_WIND_64 BAL_WIND_64 ANE_WIND_64 BNE_WIND_64 ASE_WIND_64 BSE_WIND_64 ASW_WIND_64 BSW_WIND_64 ANW_WIND_64 BNW_WIND_64
-                    ARADP BRADP ARRP BRRP AMRD BMRD AGUSTS BGUSTS AEYE BEYE ADIR BDIR ASPEED BSPEED ADEPTH BDEPTH);
+                    ARADP BRADP ARRP BRRP AMRD BMRD AGUSTS BGUSTS AEYE BEYE ADIR BDIR ASPEED BSPEED ADEPTH BDEPTH
+		    NUM_MEMBERS TRACK_SPREAD DIST_MEAN MSLP_SPREAD MAX_WIND_SPREAD);
+
+my @fld_tcdiag = qw(AMODEL BMODEL DESC STORM_ID BASIN CYCLONE STORM_NAME INIT_MASK VALID_MASK
+                    TOTAL INDEX LEVEL SOURCE N_DIAG DIAG_ VALUE_);
 
 my @fld_probrirw = qw(AMODEL BMODEL DESC STORM_ID BASIN CYCLONE STORM_NAME INIT_MASK VALID_MASK
                       ALAT ALON BLAT BLON INITIALS TK_ERR X_ERR Y_ERR ADLAND BDLAND RI_BEG RI_END RI_WINDOW
@@ -136,7 +140,26 @@ my $fmt_tcmpr =
       "%15s"  . # ASPEED
       "%15s"  . # BSPEED
       "%15s"  . # ADEPTH
-      "%15s";   # BDEPTH
+      "%15s"  . # BDEPTH
+      "%15s"  . # NUM_MEMBERS
+      "%15s"  . # TRACK_SPREAD
+      "%15s"  . # DIST_MEAN
+      "%15s"  . # MSLP_SPREAD
+      "%15s";   # MAX_WIND_SPREAD
+
+my $fmt_tcdiag =
+      "%15s"  . # AMODEL
+      "%15s"  . # BMODEL
+      "%15s"  . # STORM_ID
+      "%15s"  . # BASIN
+      "%15s"  . # CYCLONE
+      "%15s"  . # STORM_NAME
+      "%15s"  . # INIT_MASK
+      "%15s"  . # VALID_MASK
+      "%15s"  . # TOTAL
+      "%15s"  . # INDEX
+      "%15s"  . # SOURCE 
+      "%15s";   # N_DIAG 
 
 my $fmt_probrirw =
       "%15s"  . # AMODEL
@@ -215,8 +238,18 @@ while(<$fh_tcst_in>){
   # write a TCMPR line
   my $fmt_val;
   if( $vals[13] eq "TCMPR" ){
-    push @outs, (" TCST_TCMPR ", @vals[1,2,4 .. 7,11,12,14 .. 79]);
+    push @outs, (" TCST_TCMPR ", @vals[1,2,4 .. 7,11,12,14 .. 84]);
     $fmt_val = $fmt_tcmpr;
+  }
+
+  # write a TCDIAG line
+  elsif( $vals[13] eq "TCDIAG" ) {
+    push @outs, (" TCST_TCDIAG ", @vals[1,2,4 .. 7,11,12,14 .. 17]);
+    $fmt_val = $fmt_tcdiag;
+    foreach my $i ( 18 .. $#vals ) {
+      $fmt_val = $fmt_val . "%15s";
+      push @outs, ($vals[$i]);
+    }
   }
 
   # write a PROBRIRW line
@@ -318,6 +351,19 @@ close($fh_tcst_in);
 # 77 - BSPEED
 # 78 - ADEPTH
 # 79 - BDEPTH
+# 80 - NUM_MEMBERS
+# 81 - TRACK_SPREAD
+# 82 - DIST_MEAN
+# 83 - MSLP_SPREAD
+# 84 - MAX_WIND_SPREAD
+
+# TCDIAG Line Type
+# 14 - TOTAL
+# 15 - INDEX
+# 16 - SOURCE
+# 17 - N_DIAG
+# 18 - DIAG_i
+# 19 - VALUE_i
 
 # PROBRIRW Line Type
 # 14 - ALAT
@@ -341,13 +387,5 @@ close($fh_tcst_in);
 # 32 - BLEVEL_BEG
 # 33 - BLEVEL_END
 # 34 - N_THRESH
-# 35 - THRESH_1
-# 36 - PROB_1
-# 37 - THRESH_2
-# 38 - PROB_2
-# 39 - THRESH_3
-# 40 - PROB_3
-# 41 - THRESH_4
-# 42 - PROB_4
-# 43 - THRESH_5
-# 44 - PROB_5
+# 35 - THRESH_i
+# 36 - PROB_i
