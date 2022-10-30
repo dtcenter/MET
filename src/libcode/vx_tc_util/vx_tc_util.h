@@ -14,6 +14,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 #include "atcf_track_line.h"
+#include "diag_file.h"
 #include "track_point.h"
 #include "track_info.h"
 #include "track_pair_info.h"

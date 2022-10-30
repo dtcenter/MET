@@ -1372,6 +1372,21 @@ void compute_ecnt_mean(const ECNTInfo *ecnt_info, int n,
    for(i=0,na.erase(); i<n; i++) na.add(ecnt_info[i].spread_plus_oerr);
    ecnt_mean.spread_plus_oerr = na.mean();
 
+   for(i=0,na.erase(); i<n; i++) na.add(ecnt_info[i].bias_ratio);
+   ecnt_mean.bias_ratio = na.mean();
+
+   for(i=0,na.erase(); i<n; i++) na.add(ecnt_info[i].n_ge_obs);
+   ecnt_mean.n_ge_obs = na.mean();
+
+   for(i=0,na.erase(); i<n; i++) na.add(ecnt_info[i].me_ge_obs);
+   ecnt_mean.me_ge_obs = na.mean();
+
+   for(i=0,na.erase(); i<n; i++) na.add(ecnt_info[i].n_lt_obs);
+   ecnt_mean.n_lt_obs = na.mean();
+
+   for(i=0,na.erase(); i<n; i++) na.add(ecnt_info[i].me_lt_obs);
+   ecnt_mean.me_lt_obs = na.mean();
+
    return;
 }
 

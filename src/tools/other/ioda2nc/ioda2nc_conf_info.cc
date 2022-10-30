@@ -170,6 +170,7 @@ void IODA2NCConfInfo::process_config() {
    obs_name_map = parse_conf_obs_name_map(&conf);
    message_type_map = parse_conf_message_type_map(&conf);
    metadata_map = parse_conf_metadata_map(&conf);
+   obs_to_qc_map = parse_conf_obs_to_qc_map(&conf);
 
    if ( sid_list ) delete [] sid_list;
 

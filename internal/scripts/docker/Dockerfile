@@ -1,5 +1,5 @@
 ARG MET_BASE_REPO=met-base
-ARG MET_BASE_TAG=v1.0
+ARG MET_BASE_TAG=v1.1
 
 FROM dtcenter/${MET_BASE_REPO}:${MET_BASE_TAG}
 MAINTAINER John Halley Gotway <johnhg@ucar.edu>

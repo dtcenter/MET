@@ -190,6 +190,8 @@ class LineDataFile {
 
       virtual int operator>>(DataLine &);
 
+      int peek_line(DataLine &);
+
       int read_fwf_line(DataLine &, const int *wdth, int n_wdth);
 
       const char * filename() const;
