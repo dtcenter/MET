@@ -9,10 +9,48 @@ When applicable, release notes are followed by the GitHub issue number which des
 enhancement, or new feature (`MET GitHub issues <https://github.com/dtcenter/MET/issues>`_).
 Important issues are listed **in bold** for emphasis.
 
-MET Version 11.0.0-beta3 release notes (20220921)
+.. warning:: **Ensemble post-processing was added to Gen-Ens-Prod in version 10.1.0 and will be removed from Ensemble-Stat in version 11.0.0!**
+
+MET Version 11.0.0-beta4 release notes (20220930)
 -------------------------------------------------
 
-.. warning:: **Ensemble post-processing was added to Gen-Ens-Prod in version 10.1.0 and will be removed from Ensemble-Stat in version 11.0.0!**
+* Repository, build, and testing:
+
+   * Enhance the MET base image to support NetCDF files using groups in the enhanced data model (`dtcenter/METbaseimage#6 <https://github.com/dtcenter/METbaseimage/issues/6>`_).
+   * Update the SonarQube version used for routine software scans (`#2270 <https://github.com/dtcenter/MET/issues/2270>`_).
+   * Create test to replicate MET-11.0.0-beta3 linker errors and fix them (`#2281 <https://github.com/dtcenter/MET/issues/2281>`_).
+   * Fix GHA documentation workflow (`#2282 <https://github.com/dtcenter/MET/issues/2282>`_).
+   * Fix GHA warnings and update the version of actions (i.e. actions/checkout@v3) (`#2297 <https://github.com/dtcenter/MET/issues/2297>`_).
+
+* Code cleanup and documentation:
+
+   * Remove namespace specification from header files (`#2227 <https://github.com/dtcenter/MET/issues/2227>`_).
+   * Move release notes into its own chapter in the User's Guide (`#2298 <https://github.com/dtcenter/MET/issues/2298>`_).
+
+* Bugfixes:
+
+   * Fix Stat-Analysis aggregation of the neighborhood statistics line types (`#2271 <https://github.com/dtcenter/MET/issues/2271>`_).
+   * Fix the ascii2nc_airnow_hourly test in unit_ascii2nc.xml (`#2306 <https://github.com/dtcenter/MET/issues/2306>`_).
+   * Fix TC-Stat parsing of TCMPR lines (`#2309 <https://github.com/dtcenter/MET/issues/2309>`_).
+   * Fix the Point-Stat and Ensemble-Stat GRIB table lookup logic for python embedding of point observations (`#2286 <https://github.com/dtcenter/MET/issues/2286>`_).
+
+* Library Enhancments:
+
+   * Add support for point-based climatologies for use in SEEPS (`#1941 <https://github.com/dtcenter/MET/issues/1941>`_).
+   * Enhance MET to handle NC strings when processing CF-Compliant NetCDF files (`#2042 <https://github.com/dtcenter/MET/issues/2042>`_).
+   * Enhance the MET library code to handle CF-compliant time strings with an offset defined in months or years (`#2155 <https://github.com/dtcenter/MET/issues/2155>`_).
+
+* Application Enhancements:
+
+   * **Enhance ASCII2NC to read NDBC buoy data** (`#2276 <https://github.com/dtcenter/MET/issues/2276>`_).
+   * **Enhance IODA2NC to support IODA v2.0 format** (`#2068 <https://github.com/dtcenter/MET/issues/2068>`_).
+   * **Add new bias ratio statistic to the ECNT line type from Ensemble-Stat and for HiRA** (`#2058 <https://github.com/dtcenter/MET/issues/2058>`_).
+   * **Enhance TC-Pairs consensus logic to compute the spread of the location, wind speed, and pressure**(`#2036 <https://github.com/dtcenter/MET/issues/2036>`_).
+   * **Enhance TC-Pairs to read hurricane model diagnostic files (e.g. SHIPS) and TC-Stat to filter the new data** (`#392 <https://github.com/dtcenter/MET/issues/392>`_).
+   * Refine Grid-Diag output variable names when specifying two input data sources (`#2232 <https://github.com/dtcenter/MET/issues/2232>`_).
+
+MET Version 11.0.0-beta3 release notes (20220921)
+-------------------------------------------------
 
 * Repository and build:
 
