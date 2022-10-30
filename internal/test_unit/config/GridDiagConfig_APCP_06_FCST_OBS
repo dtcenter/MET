@@ -42,8 +42,8 @@ data = {
    range  = [0,25];
 
    field = [
-      { set_attr_name = "FCST_APCP"; },
-      { set_attr_name = "OBS_APCP"; }
+      { ${FIELD1} },
+      { ${FIELD2} }
    ];
 }
 

@@ -121,6 +121,17 @@ static const int n_tc_cols_xy = sizeof(tc_cols_xy)/sizeof(*tc_cols_xy);
 
 ////////////////////////////////////////////////////////////////////////
 
+static const char * tc_diag_cols [] = {
+      "TOTAL",  "INDEX", "SOURCE",
+      "N_DIAG", "DIAG_", "VALUE_"
+};
+
+static const int n_tc_diag_cols = sizeof(tc_diag_cols)/sizeof(*tc_diag_cols);
+
+inline int get_n_tc_diag_cols (int n) { return(n_tc_diag_cols + (2*n)); } // n = NDiag
+
+////////////////////////////////////////////////////////////////////////
+
 static const char * prob_rirw_cols [] = {
    "ALAT",        "ALON",
    "BLAT",        "BLON",
@@ -151,17 +162,19 @@ extern void write_tc_header_row(const char **, int, int, AsciiTable &, int, int)
 
 // Write out the header row
 extern void write_tc_mpr_header_row   (int,      AsciiTable &, int, int);
+extern void write_tc_diag_header_row  (int, int, AsciiTable &, int, int);
 extern void write_prob_rirw_header_row(int, int, AsciiTable &, int, int);
 
 // Write out the data lines
-extern void write_tc_mpr_row   (TcHdrColumns &, const TrackPairInfo &,    AsciiTable &, int &);
-extern void write_prob_rirw_row(TcHdrColumns &, const ProbRIRWPairInfo &, AsciiTable &, int &);
+extern void write_track_pair_info    (TcHdrColumns &, const TrackPairInfo &,    AsciiTable &, int &);
+extern void write_prob_rirw_pair_info(TcHdrColumns &, const ProbRIRWPairInfo &, AsciiTable &, int &);
 
 // Write out the header entries
 extern void write_tc_header_cols(const TcHdrColumns &, AsciiTable &, int);
 
 // Write out the data columns
-extern void write_tc_mpr_cols   (const TrackPairInfo  &,   int, AsciiTable &, int, int);
+extern void write_tc_mpr_cols   (const TrackPairInfo &,    int, AsciiTable &, int, int);
+extern void write_tc_diag_cols  (const TrackPairInfo &,    int, AsciiTable &, int, int);
 extern void write_prob_rirw_cols(const ProbRIRWPairInfo &, int, AsciiTable &, int, int);
 
 // Setup column justification for TC-STAT AsciiTable objects

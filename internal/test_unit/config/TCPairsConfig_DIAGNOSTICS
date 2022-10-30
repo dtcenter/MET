@@ -24,7 +24,7 @@ desc = "NA";
 //
 // Storm identifiers
 //
-storm_id = [];
+storm_id = [ ${STORM_ID} ];
 
 //
 // Basins
@@ -44,8 +44,8 @@ storm_name = [];
 //
 // Model initialization time windows to include or exclude
 //
-init_beg = "";
-init_end = "";
+init_beg = ${INIT_BEG};
+init_end = ${INIT_END};
 init_inc = [];
 init_exc = [];
 
@@ -68,15 +68,15 @@ write_valid = [];
 init_hour = [];
 
 //
+// Required lead time in hours
+//
+lead_req = [];
+
+//
 // lat/lon polylines defining masking regions
 //
 init_mask  = "";
 valid_mask = "";
-
-//
-// Select tracks which contain all required lead times.
-//
-lead_req = [];
 
 //
 // Specify if the code should check for duplicate ATCF lines
@@ -103,8 +103,8 @@ lag_time = [];
 // CLIPER/SHIFOR baseline forecasts to be derived from the BEST
 // and operational (CARQ) tracks.
 //
-best_baseline = [ "BCLP" ];
-oper_baseline = [ "OCLP" ];
+best_baseline = [];
+oper_baseline = [];
 
 //
 // Specify if only those track points common to both the ADECK and BDECK
@@ -131,7 +131,13 @@ watch_warn = {
 //
 // Diagnostics to be extracted
 //
-diag_name = [];
+diag_name = [ ${DIAG_NAME} ];
+
+//
+// Unit conversions to be applied based on diagnostic names and units
+// Commented out to use settings from the default config file
+//
+// diag_convert_map = [];
 
 //
 // Modify basin names to make them consistent across ATCF input files.
@@ -141,8 +147,7 @@ basin_map = [
    { key = "SP"; val = "SH"; },
    { key = "AU"; val = "SH"; },
    { key = "AB"; val = "IO"; },
-   { key = "BB"; val = "IO"; },
-   { key = "AL"; val = "ATLANTIC"; }
+   { key = "BB"; val = "IO"; }
 ];
 
 //

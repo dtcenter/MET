@@ -377,6 +377,12 @@ void parse_ecnt_line(STATLine &l, ECNTData &e_data) {
 
    e_data.spread_plus_oerr = atof(l.get_item("SPREAD_PLUS_OERR"));
 
+   e_data.bias_ratio = atof(l.get_item("BIAS_RATIO"));
+   e_data.n_ge_obs   = atoi(l.get_item("N_GE_OBS"));
+   e_data.me_ge_obs  = atof(l.get_item("ME_GE_OBS"));
+   e_data.n_lt_obs   = atoi(l.get_item("N_LT_OBS"));
+   e_data.me_lt_obs  = atof(l.get_item("ME_LT_OBS"));
+
    return;
 }
 

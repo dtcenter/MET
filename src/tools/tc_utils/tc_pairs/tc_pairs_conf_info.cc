@@ -24,6 +24,11 @@ using namespace std;
 #include "vx_log.h"
 
 ////////////////////////////////////////////////////////////////////////
+
+void parse_conf_diag_convert_map(Dictionary *,
+        map<DiagType,map<ConcatString,UserFunc_1Arg> > &);
+
+////////////////////////////////////////////////////////////////////////
 //
 //  Code for class TCPairsConfInfo
 //
@@ -96,6 +101,8 @@ void TCPairsConfInfo::clear() {
    DLandFile.clear();
    WatchWarnFile.clear();
    WatchWarnOffset = bad_data_int;
+   DiagName.clear();
+   DiagConvertMap.clear();
    BasinMap.clear();
    Version.clear();
 
@@ -305,8 +312,84 @@ void TCPairsConfInfo::process_config() {
    // Conf: WatchWarnOffset
    WatchWarnOffset = dict->lookup_int(conf_key_time_offset);
 
+   // Conf: DiagName
+   DiagName = dict->lookup_string_array(conf_key_diag_name);
+
+   // Conf: DiagConvertMap
+   parse_conf_diag_convert_map(dict, DiagConvertMap);
+
    // Conf: BasinMap
    BasinMap = parse_conf_key_value_map(dict, conf_key_basin_map);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Utility functions
+//
+////////////////////////////////////////////////////////////////////////
+
+void parse_conf_diag_convert_map(Dictionary *dict,
+        map<DiagType,map<ConcatString,UserFunc_1Arg> > &source_map) {
+   int i, j;
+   Dictionary *map_dict = (Dictionary *) 0;
+   map<ConcatString,UserFunc_1Arg> cur_map;
+   DiagType source;
+   StringArray sa;
+   ConcatString key;
+   UserFunc_1Arg fx;
+
+   const char *method_name = "parse_conf_diag_convert_map() -> ";
+
+   if(!dict) {
+      mlog << Error << "\n" << method_name
+           << "empty dictionary!\n\n";
+      exit(1);
+   }
+
+   // Conf: diag_convert_map
+   map_dict = dict->lookup_array(conf_key_diag_convert_map);
+
+   // Loop through the array entries
+   for(i=0; i<map_dict->n_entries(); i++) {
+
+      // Initialize the current map
+      cur_map.clear();
+
+      // Lookup the source, key, and convert function
+      source = string_to_diagtype(
+               (*map_dict)[i]->dict_value()->lookup_string(conf_key_source).c_str());
+      sa     = (*map_dict)[i]->dict_value()->lookup_string_array(conf_key_key);
+      fx.clear();
+      fx.set((*map_dict)[i]->dict_value()->lookup(conf_key_convert));
+
+      // Check the function
+      if(!fx.is_set()) {
+         mlog << Error << "\n" << method_name
+              << "lookup for \"" << conf_key_convert << "\" failed in the \""
+              << conf_key_diag_convert_map << "\" map!\n\n";
+         exit(1);
+      }
+
+      // Add entry to the current map for each string
+      for(j=0; j<sa.n(); j++) {
+         cur_map.insert(pair<ConcatString,UserFunc_1Arg>(sa[j],fx));
+      }
+
+      // Append to the existing source entry
+      if(source_map.count(source) > 0) {
+         for(map<ConcatString,UserFunc_1Arg>::iterator it = cur_map.begin();
+             it != cur_map.end(); it++) {
+            source_map.at(source).insert(pair<ConcatString,UserFunc_1Arg>(it->first, it->second));
+         }
+      }
+      // Add a new source entry
+      else {
+         source_map.insert(pair<DiagType,map<ConcatString,UserFunc_1Arg> >(source, cur_map));
+      }
+
+   } // end for i
 
    return;
 }
