@@ -153,7 +153,8 @@ struct AggrENSInfo {
    StatHdrInfo hdr;
    PairDataEnsemble ens_pd;
    ClimoCDFInfo cdf_info;
-   NumArray me_na, mse_na, me_oerr_na, mse_oerr_na;
+   NumArray me_na, mae_na, mse_na;
+   NumArray me_oerr_na, mae_oerr_na, mse_oerr_na;
    void clear();
 };
 
