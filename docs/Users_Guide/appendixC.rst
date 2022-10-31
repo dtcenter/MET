@@ -505,6 +505,7 @@ Root-mean-squared error (RMSE)
 ------------------------------
 
 Called "RMSE" in CNT output :numref:`table_PS_format_info_CNT`
+Called "RMSE" and "RMSE_OERR" in ECNT output :numref:`table_ES_header_info_es_out_ECNT`
 
 RMSE is simply the square root of the MSE, :math:`\text{RMSE} = \sqrt{\text{MSE}}`. 
 
@@ -540,6 +541,7 @@ Mean Absolute Error (MAE)
 -------------------------
 
 Called "MAE" in CNT output :numref:`table_PS_format_info_CNT`
+Called "MAE" and "MAE_OERR" in ECNT output :numref:`table_ES_header_info_es_out_ECNT`
 
 The Mean Absolute Error (MAE) is defined as :math:`\text{MAE} = \frac{1}{n} \sum|f_{i} - o_{i}|`.
 

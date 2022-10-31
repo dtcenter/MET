@@ -142,8 +142,10 @@ void PairDataEnsemble::clear() {
    crpss_gaus     = bad_data_double;
 
    me             = bad_data_double;
+   mae            = bad_data_double;
    rmse           = bad_data_double;
    me_oerr        = bad_data_double;
+   mae_oerr       = bad_data_double;
    rmse_oerr      = bad_data_double;
 
    bias_ratio     = bad_data_double;
@@ -278,8 +280,10 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
    crpss_gaus     = pd.crpss_gaus;
 
    me             = pd.me;
+   mae            = pd.mae;
    rmse           = pd.rmse;
    me_oerr        = pd.me_oerr;
+   mae_oerr       = pd.mae_oerr;
    rmse_oerr      = pd.rmse_oerr;
 
    bias_ratio     = pd.bias_ratio;

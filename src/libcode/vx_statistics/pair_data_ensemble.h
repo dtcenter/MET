@@ -124,8 +124,10 @@ class PairDataEnsemble : public PairBase {
       double     crpss_gaus;      // Guassian CRPS skill score
 
       double     me;              // ME for ensemble mean
+      double     mae;             // MAE for ensemble mean
       double     rmse;            // RMSE for ensemble mean
       double     me_oerr;         // ME for mean of perturbed members
+      double     mae_oerr;        // MAE for mean of perturbed members
       double     rmse_oerr;       // RMSE for mean of perturbed members
 
       double     bias_ratio;      // Bias ratio

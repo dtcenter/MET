@@ -624,18 +624,24 @@ The format of the STAT and ASCII output of the Ensemble-Stat tool are described 
     - CRPS_EMP_FAIR
     - The Continuous Ranked Probability Skill Score (empirical distribution) adjusted by subtracting 1/2(m) times the mean absolute difference of the ensemble members (m is the ensemble size)
   * - 42
+    - MAE
+    - The Mean Absolute Error of the ensemble mean (unperturbed or supplied)
+  * - 43
+    - MAE_OERR
+    - The Mean Absolute Error of the PERTURBED ensemble mean (e.g. with Observation Error)
+  * - 44
     - BIAS_RATIO
     - The Bias Ratio
-  * - 43
+  * - 45
     - N_GE_OBS
     - The number of ensemble values greater than or equal to their observations
-  * - 44
+  * - 46
     - ME_GE_OBS
     - The Mean Error of the ensemble values greater than or equal to their observations
-  * - 45
+  * - 47
     - N_LT_OBS
     - The number of ensemble values less than their observations
-  * - 46
+  * - 48
     - ME_LT_OBS
     - The Mean Error of the ensemble values less than or equal to their observations
 
