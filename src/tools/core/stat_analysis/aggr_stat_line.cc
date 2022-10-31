@@ -585,8 +585,10 @@ void AggrENSInfo::clear() {
    hdr.clear();
    ens_pd.clear();
    me_na.clear();
+   mae_na.clear();
    mse_na.clear();
    me_oerr_na.clear();
+   mae_oerr_na.clear();
    mse_oerr_na.clear();
 }
 
@@ -2646,10 +2648,12 @@ void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &job,
          // Store the summary statistics
          //
          m[key].me_na.add(cur.me);
+         m[key].mae_na.add(cur.mae);
          m[key].mse_na.add((is_bad_data(cur.rmse) ?
                             bad_data_double :
                             cur.rmse * cur.rmse));
          m[key].me_oerr_na.add(cur.me_oerr);
+         m[key].mae_oerr_na.add(cur.mae_oerr);
          m[key].mse_oerr_na.add((is_bad_data(cur.rmse_oerr) ?
                                  bad_data_double :
                                  cur.rmse_oerr * cur.rmse_oerr));
@@ -2673,9 +2677,11 @@ void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &job,
 
       // Compute ME and RMSE as weighted averages
       it->second.ens_pd.me         = it->second.me_na.wmean(it->second.ens_pd.wgt_na);
+      it->second.ens_pd.mae        = it->second.mae_na.wmean(it->second.ens_pd.wgt_na);
       v                            = it->second.mse_na.wmean(it->second.ens_pd.wgt_na);
       it->second.ens_pd.rmse       = (is_bad_data(v) ? bad_data_double : sqrt(v));
       it->second.ens_pd.me_oerr    = it->second.me_oerr_na.wmean(it->second.ens_pd.wgt_na);
+      it->second.ens_pd.mae_oerr   = it->second.mae_oerr_na.wmean(it->second.ens_pd.wgt_na);
       v                            = it->second.mse_oerr_na.wmean(it->second.ens_pd.wgt_na);
       it->second.ens_pd.rmse_oerr  = (is_bad_data(v) ? bad_data_double : sqrt(v));
 
