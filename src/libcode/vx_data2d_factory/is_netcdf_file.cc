@@ -40,9 +40,6 @@ static const char netcdf_magic  [] = "CDF";
 static const char hdf_magic     [] = "HDF";
 static const int  netcdf_magic_len = m_strlen(netcdf_magic);
 
-static const string nccf_att_name   = "Conventions";
-static const string nccf_att_name_l = "conventions";
-static const string nccf_att_name_U = "CONVENTIONS";
 static const string nccf_att_value  = "CF-";
 static const string nccf_att_value2 = "CF ";
 static const string nccf_att_value3 = "COARDS";
@@ -96,9 +93,7 @@ bool is_nccf_file(const char * filename)
       NcFile *nc_file = open_ncfile(filename);
 
       if (!IS_INVALID_NC_P(nc_file)) {
-         bool found = get_global_att(nc_file, nccf_att_name, att_val);
-         if (!found) found = get_global_att(nc_file, nccf_att_name_l, att_val);
-         if (!found) found = get_global_att(nc_file, nccf_att_name_U, att_val);
+         bool found = get_cf_conventions(nc_file, att_val); // "Conventions" attrribute
          if (found) {
             status = (att_val.compare(0, nccf_att_value.length(),
                       nccf_att_value) == 0  ||

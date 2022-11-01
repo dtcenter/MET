@@ -8,19 +8,22 @@
 
 //
 // The parameters listed below are used to filter the TC-STAT data down to the
-// desired subset of lines over which statistics are to be computed.  Only
-// those lines which meet ALL of the criteria specified will be retained.
+// desired subset of lines over which statistics are to be computed. Only those
+// lines which meet ALL of the criteria specified will be retained.
 //
 // The settings that are common to all jobs may be specified once at the top
-// level.  If no selection is listed for a parameter, that parameter will not
-// be used for filtering.  If multiple selections are listed for a parameter,
+// level. If no selection is listed for a parameter, that parameter will not
+// be used for filtering. If multiple selections are listed for a parameter,
 // the analyses will be performed on their union.
+//
+// Each configuration filtering option may be overridden by a corresponding
+// job command option of the same name, as described in the MET User's Guide.
 //
 
 //
 // Stratify by the AMODEL or BMODEL columns.
 //
-amodel = [ "AHWI", "BCLP" ];
+amodel = [];
 bmodel = [];
 
 //
@@ -31,31 +34,26 @@ desc = [];
 //
 // Stratify by the STORM_ID column.
 //
-storm_id = [ "ALAL2010" ];
+storm_id = [];
 
 //
 // Stratify by the BASIN column.
-// May add using the "-basin" job command option.
 //
 basin = [];
 
 //
 // Stratify by the CYCLONE column.
-// May add using the "-cyclone" job command option.
 //
 cyclone = [];
 
 //
 // Stratify by the STORM_NAME column.
-// May add using the "-storm_name" job command option.
 //
 storm_name = [];
 
 //
 // Stratify by the INIT times.
 // Model initialization time windows to include or exclude
-// May modify using the "-init_beg", "-init_end", "-init_inc",
-// and "-init_exc" job command options.
 //
 init_beg = "";
 init_end = "";
@@ -95,7 +93,7 @@ line_type = [];
 
 //
 // Stratify by checking the watch/warning status for each track point
-// common to both the ADECK and BDECK tracks.  If the watch/warning status
+// common to both the ADECK and BDECK tracks. If the watch/warning status
 // of any of the track points appears in the list, retain the entire track.
 //
 track_watch_warn = [];
@@ -162,9 +160,12 @@ water_only = FALSE;
 //
 rirw = {
    track  = NONE;
-   time   = "24";
-   exact  = TRUE;
-   thresh = >=30.0;
+   adeck = {
+      time   = "24";
+      exact  = TRUE;
+      thresh = >=30.0;
+   }
+   bdeck = adeck;
 }
 
 //
@@ -178,8 +179,7 @@ landfall_end = "00";
 
 //
 // Specify whether only those track points common to both the ADECK and BDECK
-// tracks should be retained.  May modify using the "-match_points" job command
-// option.
+// tracks should be retained.
 //
 match_points = TRUE;
 
@@ -188,6 +188,12 @@ match_points = TRUE;
 // be retained.
 //
 event_equal = FALSE;
+
+//
+// Specify lead times that must be present for a track to be included in the
+// event equalization logic.
+//
+event_equal_lead = [];
 
 //
 // Apply polyline masking logic to the location of the ADECK track at the
@@ -205,13 +211,12 @@ out_valid_mask = "";
 // Array of TCStat analysis jobs to be performed on the filtered data
 //
 jobs = [
-   "-job summary -column TRACK -by AMODEL      -dump_row ${MET_TEST_OUTPUT}/tc_stat/ALAL2010_AHWI_vs_BCLP.tcst",
-   "-job summary -column TRACK -by AMODEL,INIT -dump_row ${MET_TEST_OUTPUT}/tc_stat/ALAL2010_AHWI_vs_BCLP_by_INIT.tcst",
-   "-job summary -column WIND  -by AMODEL      -column_union true",
-   "-job filter  -amodel AHWI  -rirw_track BDECK -rirw_thresh >=30  -rirw_exact FALSE -dump_row ${MET_TEST_OUTPUT}/tc_stat/ALAL2010_AHWI_ri.tcst",
-   "-job filter  -amodel AHWI  -rirw_track BDECK -rirw_thresh <=-30 -rirw_exact TRUE  -dump_row ${MET_TEST_OUTPUT}/tc_stat/ALAL2010_AHWI_rw.tcst",
-   "-job rirw                  -rirw_window 00   -rirw_thresh <=-15 -out_line_type CTC,CTS,MPR",
-   "-job rirw                  -rirw_window 12   -rirw_thresh <=-15 -out_line_type CTC,CTS,MPR"
+   "-job filter  -dump_row ${MET_TEST_OUTPUT}/tc_stat/DIAGNOSTICS_filter_match_points.tcst",
+   "-job summary -diag_thresh PW01 lt60 -column TK_ERR -by AMODEL",
+   "-job summary -diag_thresh PW01 ge60 -column TK_ERR -by AMODEL",
+   "-job summary -diag_thresh TPW  lt60 -column TK_ERR -by AMODEL",
+   "-job summary -diag_thresh TPW  ge60 -column TK_ERR -by AMODEL",
+   "-job summary -init_diag_thresh DTL lt325 -amodel OFCL -column TK_ERR -by AMODEL,LEAD"
 ];
 
 //

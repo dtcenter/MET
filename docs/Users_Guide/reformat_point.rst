@@ -961,10 +961,21 @@ _____________________
 		{ key = "station_id";   val = "station_id,report_identifier"; },
 		{ key = "pressure";     val = "air_pressure,pressure"; },
 		{ key = "height";       val = "height,height_above_mean_sea_level"; },
-		{ key = "elevation";    val = ""; }
+		{ key = "elevation";    val = "elevation,station_elevation"; }
 		];
 
 This entry is an array of dictionaries, each containing a **key** string and **val** string which define a mapping of metadata for IODA data files.
+
+_____________________
+
+.. code-block:: none
+		
+		obs_to_qc_map  = [
+		{ key = "wind_from_direction"; val = "eastward_wind,northward_wind"; },
+		{ key = "wind_speed";          val = "eastward_wind,northward_wind"; }
+		];
+
+This entry is an array of dictionaries, each containing a **key** string and **val** string which define a mapping of QC variable name for IODA data files.
 
 _____________________
 

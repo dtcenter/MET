@@ -137,7 +137,7 @@ bool TCStatFiles::operator>>(TrackPairInfo &pair) {
       CurFile++;
 
       // Check for the last file
-      if(CurFile == FileList.n_elements()) return(false);
+      if(CurFile == FileList.n()) return(false);
       else {
 
          // Open the next file for reading
@@ -152,7 +152,7 @@ bool TCStatFiles::operator>>(TrackPairInfo &pair) {
          // List file being read
          mlog << Debug(3)
               << "Reading file " << CurFile+1 << " of "
-              << FileList.n_elements() << ": " << FileList[CurFile]
+              << FileList.n() << ": " << FileList[CurFile]
               << "\n";
 
       } // end else
@@ -161,16 +161,28 @@ bool TCStatFiles::operator>>(TrackPairInfo &pair) {
    // Read lines to the end of the track or file
    while(CurLDF >> line) {
 
-      // Skip header and non-TCMPR lines
-      if(line.is_header() || line.type() != TCStatLineType_TCMPR) continue;
+      // Skip header and non-TCMPR/TCDIAG lines
+      if(line.is_header() ||
+         (line.type() != TCStatLineType_TCMPR &&
+          line.type() != TCStatLineType_TCDIAG)) continue;
 
       // Add the current point
       pair.add(line);
 
       // Break out of the loop at the end of the track
       if(atoi(line.get_item("TOTAL")) ==
-         atoi(line.get_item("INDEX"))) break;
+         atoi(line.get_item("INDEX"))) {
 
+         // Check for a trailing TCDIAG line
+         if(CurLDF.peek_line(line)) {
+            if(line.type() == TCStatLineType_TCDIAG) {
+               pair.add(line);
+               CurLDF >> line;
+            }
+         }
+
+         break;
+      }
    } // end while
 
    return(true);
@@ -192,7 +204,7 @@ bool TCStatFiles::operator>>(ProbRIRWPairInfo &pair) {
       CurFile++;
 
       // Check for the last file
-      if(CurFile == FileList.n_elements()) return(false);
+      if(CurFile == FileList.n()) return(false);
       else {
 
          // Open the next file for reading
@@ -207,7 +219,7 @@ bool TCStatFiles::operator>>(ProbRIRWPairInfo &pair) {
          // List file being read
          mlog << Debug(3)
               << "Reading file " << CurFile+1 << " of "
-              << FileList.n_elements() << ": " << FileList[CurFile]
+              << FileList.n() << ": " << FileList[CurFile]
               << "\n";
 
       } // end else
@@ -224,7 +236,7 @@ bool TCStatFiles::operator>>(ProbRIRWPairInfo &pair) {
 
       break;
 
-   } //end while
+   } // end while
 
    return(status);
 }
@@ -241,7 +253,7 @@ bool TCStatFiles::operator>>(TCStatLine &line) {
       CurFile++;
 
       // Check for the last file
-      if(CurFile == FileList.n_elements()) return(false);
+      if(CurFile == FileList.n()) return(false);
       else {
 
          // Open the next file for reading
@@ -256,7 +268,7 @@ bool TCStatFiles::operator>>(TCStatLine &line) {
          // List file being read
          mlog << Debug(3)
               << "Reading file " << CurFile+1 << " of "
-              << FileList.n_elements() << ": " << FileList[CurFile]
+              << FileList.n() << ": " << FileList[CurFile]
               << "\n";
 
       } // end else
@@ -270,7 +282,7 @@ bool TCStatFiles::operator>>(TCStatLine &line) {
 
       break;
 
-   } //end while
+   } // end while
 
    return(status);
 }

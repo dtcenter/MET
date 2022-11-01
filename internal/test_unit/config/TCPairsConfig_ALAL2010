@@ -129,6 +129,11 @@ watch_warn = {
 }
 
 //
+// Diagnostics to be extracted
+//
+diag_name = [];
+
+//
 // Modify basin names to make them consistent across ATCF input files.
 //
 basin_map = [

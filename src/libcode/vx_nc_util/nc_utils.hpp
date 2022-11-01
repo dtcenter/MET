@@ -46,12 +46,21 @@ extern void set_def_fill_value(unsigned short     *val);
 
 template <typename T>
 bool get_att_num_value_(const netCDF::NcAtt *att, T &att_val, int matching_type) {
-   bool status = false;
-   if (IS_VALID_NC_P(att)) {
+   bool status = IS_VALID_NC_P(att);
+   if (status) {
       int nc_type_id = GET_NC_TYPE_ID_P(att);
       if (matching_type == nc_type_id) {
          att->getValues(&att_val);
-         status = true;
+      }
+      else if (NC_FLOAT == nc_type_id) {
+         float att_value;
+         att->getValues(&att_value);
+         att_val = att_value;
+      }
+      else if (NC_DOUBLE == nc_type_id) {
+         double att_value;
+         att->getValues(&att_value);
+         att_val = att_value;
       }
       else if (NC_CHAR == nc_type_id) {
          std::string att_value;
@@ -62,7 +71,6 @@ bool get_att_num_value_(const netCDF::NcAtt *att, T &att_val, int matching_type)
             att_val = (double)atof(att_value.c_str());
          else // if (matching_type == NC_INT)
             att_val = atoi(att_value.c_str());
-         status = true;
       }
    }
    return(status);
@@ -74,8 +82,6 @@ template <typename T>
 bool get_nc_att_value_(const netCDF::NcVar *var, const ConcatString &att_name,
                        T &att_val, bool exit_on_error,
                        T bad_data, const char *caller_name) {
-   bool status = false;
-
    // Initialize
    att_val = bad_data;
 
@@ -83,7 +89,7 @@ bool get_nc_att_value_(const netCDF::NcVar *var, const ConcatString &att_name,
    // Retrieve the NetCDF variable attribute.
    //
    netCDF::NcVarAtt *att = get_nc_att(var, att_name);
-   status = get_att_value((netCDF::NcAtt *)att, att_val);
+   bool status = get_att_value((netCDF::NcAtt *)att, att_val);
    if (!status) {
       mlog << Error << "\n" << caller_name
            << get_log_msg_for_att(att, GET_SAFE_NC_NAME_P(var), att_name);
@@ -102,7 +108,6 @@ bool get_nc_att_value_(const netCDF::NcVar *var, const ConcatString &att_name,
 template <typename T>
 bool get_nc_att_value_(const netCDF::NcVarAtt *att, T &att_val, bool exit_on_error,
                        T bad_data, const char *caller_name) {
-   bool status = true;
 
    // Initialize
    att_val = bad_data;
@@ -110,7 +115,7 @@ bool get_nc_att_value_(const netCDF::NcVarAtt *att, T &att_val, bool exit_on_err
    //
    // Retrieve the NetCDF variable attribute.
    //
-   status = get_att_value((netCDF::NcAtt *)att, att_val);
+   bool status = get_att_value((netCDF::NcAtt *)att, att_val);
    if (!status) {
       mlog << Error << "\n" << caller_name << get_log_msg_for_att(att);
 
@@ -259,12 +264,10 @@ void apply_scale_factor_(T *data, const int cell_count,
 
 template <typename T>
 bool get_nc_data_t(netCDF::NcVar *var, T *data) {
-   bool return_status = false;
+   bool return_status = IS_VALID_NC_P(var);
 
-   if (IS_VALID_NC_P(var)) {
+   if (return_status) {
       var->getVar(data);
-
-      return_status = true;
    }
    return(return_status);
 }

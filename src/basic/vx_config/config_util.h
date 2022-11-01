@@ -52,9 +52,9 @@ extern NumArray        parse_conf_eclv_points(Dictionary *dict);
 extern ClimoCDFInfo    parse_conf_climo_cdf(Dictionary *dict);
 extern TimeSummaryInfo parse_conf_time_summary(Dictionary *dict);
 extern std::map<ConcatString,ConcatString> parse_conf_key_value_map(
-                            Dictionary *dict, const char *conf_key_map_name, const char *caller=0);
+                          Dictionary *dict, const char *conf_key_map_name, const char *caller=0);
 extern void            parse_add_conf_key_value_map(
-                            Dictionary *dict, const char *conf_key_map_name, std::map<ConcatString,ConcatString> *m);
+                          Dictionary *dict, const char *conf_key_map_name, std::map<ConcatString,ConcatString> *m);
 extern std::map<ConcatString,ConcatString>
                        parse_conf_message_type_map(Dictionary *dict);
 extern std::map<ConcatString,StringArray>
@@ -62,6 +62,11 @@ extern std::map<ConcatString,StringArray>
 extern std::map<ConcatString,StringArray> parse_conf_metadata_map(Dictionary *dict);
 extern std::map<ConcatString,ConcatString>
                        parse_conf_obs_name_map(Dictionary *dict);
+extern std::map<ConcatString,StringArray>
+                       parse_conf_obs_to_qc_map(Dictionary *dict);
+extern std::map<ConcatString,UserFunc_1Arg>
+                       parse_conf_key_convert_map(
+                          Dictionary *dict, const char *conf_key_map_name, const char *caller=0);
 extern BootInfo        parse_conf_boot(Dictionary *dict);
 extern RegridInfo      parse_conf_regrid(Dictionary *dict, bool error_out = default_dictionary_error_out);
 extern InterpInfo      parse_conf_interp(Dictionary *dict, const char *);
@@ -108,6 +113,9 @@ extern SetLogic     check_setlogic(SetLogic, SetLogic);
 extern TrackType    int_to_tracktype(int);
 extern TrackType    string_to_tracktype(const char *);
 extern ConcatString tracktype_to_string(TrackType);
+
+extern DiagType     string_to_diagtype(const char *);
+extern ConcatString diagtype_to_string(DiagType);
 
 extern Interp12Type int_to_interp12type(int);
 extern Interp12Type string_to_interp12type(const char *);

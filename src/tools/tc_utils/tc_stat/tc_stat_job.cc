@@ -224,6 +224,9 @@ void TCStatJob::clear() {
    InitThreshMap.clear();
    InitStrIncMap.clear();
    InitStrExcMap.clear();
+   DiagThreshMap.clear();
+   InitDiagThreshMap.clear();
+   PrintDiagWarning.clear();
    EventEqualLead.clear();
    EventEqualCases.clear();
 
@@ -307,6 +310,9 @@ void TCStatJob::assign(const TCStatJob & j) {
    InitThreshMap = j.InitThreshMap;
    InitStrIncMap = j.InitStrIncMap;
    InitStrExcMap = j.InitStrExcMap;
+   DiagThreshMap = j.DiagThreshMap;
+   InitDiagThreshMap = j.InitDiagThreshMap;
+   PrintDiagWarning = j.PrintDiagWarning;
 
    DumpFile = j.DumpFile;
    open_dump_file();
@@ -456,6 +462,18 @@ void TCStatJob::dump(ostream & out, int depth) const {
       str_it->second.dump(out, depth + 1);
    }
 
+   out << prefix << "DiagThreshMap ...\n";
+   for(thr_it=DiagThreshMap.begin(); thr_it!= DiagThreshMap.end(); thr_it++) {
+      out << prefix << thr_it->first << ": \n";
+      thr_it->second.dump(out, depth + 1);
+   }
+
+   out << prefix << "InitDiagThreshMap ...\n";
+   for(thr_it=InitDiagThreshMap.begin(); thr_it!= InitDiagThreshMap.end(); thr_it++) {
+      out << prefix << thr_it->first << ": \n";
+      thr_it->second.dump(out, depth + 1);
+   }
+
    out << prefix << "WaterOnly = " << bool_to_string(WaterOnly) << "\n";
 
    out << prefix << "RIRWTrack = " << tracktype_to_string(RIRWTrack) << "\n";
@@ -507,7 +525,7 @@ void TCStatJob::dump(ostream & out, int depth) const {
 ////////////////////////////////////////////////////////////////////////
 
 bool TCStatJob::is_keeper_track(const TrackPairInfo &pair,
-                                TCLineCounts &n) const {
+                                TCPointCounts &n) {
    bool keep = true;
    int i, i_init;
    double v_dbl;
@@ -546,7 +564,7 @@ bool TCStatJob::is_keeper_track(const TrackPairInfo &pair,
    if(!keep) n.RejTrackWatchWarn += pair.n_points();
 
    // Get the index of the track initialization point
-   i_init=pair.i_init();
+   i_init = pair.i_init();
 
    // Check for bad track initialization point
    if(is_bad_data(i_init)) {
@@ -562,6 +580,10 @@ bool TCStatJob::is_keeper_track(const TrackPairInfo &pair,
          keep = false;
          n.RejInitStr += pair.n_points();
       }
+      else if(InitDiagThreshMap.size() > 0) {
+         keep = false;
+         n.RejInitDiagThresh += pair.n_points();
+      }
       else if(OutInitMaskName.nonempty()) {
          keep = false;
          n.RejOutInitMask += pair.n_points();
@@ -575,7 +597,7 @@ bool TCStatJob::is_keeper_track(const TrackPairInfo &pair,
       for(thr_it=InitThreshMap.begin(); thr_it!= InitThreshMap.end(); thr_it++) {
 
          // Get the numeric init column value
-         v_dbl = get_column_double(*pair.line(i_init), thr_it->first);
+         v_dbl = get_column_double(*pair.tcmpr_line(i_init), thr_it->first);
 
          // Check the column threshold
          if(!thr_it->second.check_dbl(v_dbl)) {
@@ -592,7 +614,7 @@ bool TCStatJob::is_keeper_track(const TrackPairInfo &pair,
       for(str_it=InitStrIncMap.begin(); str_it!= InitStrIncMap.end(); str_it++) {
 
          // Retrieve the column value
-         v_str = pair.line(i_init)->get_item(str_it->first.c_str());
+         v_str = pair.tcmpr_line(i_init)->get_item(str_it->first.c_str());
 
          // Check the string value
          if(!str_it->second.has(v_str)) {
@@ -609,12 +631,33 @@ bool TCStatJob::is_keeper_track(const TrackPairInfo &pair,
       for(str_it=InitStrExcMap.begin(); str_it!= InitStrExcMap.end(); str_it++) {
 
          // Retrieve the column value
-         v_str = pair.line(i_init)->get_item(str_it->first.c_str());
+         v_str = pair.tcmpr_line(i_init)->get_item(str_it->first.c_str());
 
          // Check the string value
          if(str_it->second.has(v_str)) {
             keep = false;
             n.RejInitStr += pair.n_points();
+            break;
+         }
+      }
+   }
+
+   // Check InitDiagThreshMap
+   if(keep == true) {
+
+      int i_diag;
+
+      // Loop through the numeric diagnostic thresholds
+      for(thr_it=InitDiagThreshMap.begin(); thr_it!= InitDiagThreshMap.end(); thr_it++) {
+
+         // Get the numeric diagnostic value
+         v_dbl = get_diag_double(pair.adeck().diag_name(),
+                                 pair.adeck()[i_init], thr_it->first);
+
+         // Check the diagnostic value threshold
+         if(!thr_it->second.check_dbl(v_dbl)) {
+            keep = false;
+            n.RejInitDiagThresh += pair.n_points();
             break;
          }
       }
@@ -665,7 +708,11 @@ bool TCStatJob::is_keeper_track(const TrackPairInfo &pair,
 ////////////////////////////////////////////////////////////////////////
 
 bool TCStatJob::is_keeper_line(const TCStatLine &line,
-                               TCLineCounts &n) const {
+                               TCPointCounts &n) const {
+
+   // Does not apply to TCDIAG lines
+   if(line.type() == TCStatLineType_TCDIAG) return(true);
+
    bool keep = true;
    double v_dbl, alat, alon, blat, blon;
    ConcatString v_str;
@@ -881,6 +928,62 @@ double TCStatJob::get_column_double(const TCStatLine &line,
 
 ////////////////////////////////////////////////////////////////////////
 
+bool TCStatJob::is_keeper_tcdiag(const StringArray &diag_name,
+                                 const TrackPoint &point,
+                                 TCPointCounts &n) {
+   bool keep = true;
+   double v_dbl;
+   map<ConcatString,ThreshArray>::const_iterator thr_it;
+
+   // Check DiagThreshMap
+
+   // Loop through the numeric diagnostic thresholds
+   for(thr_it=DiagThreshMap.begin(); thr_it!= DiagThreshMap.end(); thr_it++) {
+
+      // Get the numeric diagnostic value
+      v_dbl = get_diag_double(diag_name, point, thr_it->first);
+
+      // Check the diagnostic value threshold
+      if(!thr_it->second.check_dbl(v_dbl)) {
+         keep = false;
+         n.RejDiagThresh++;
+         break;
+      }
+   }
+
+   // Update counts
+   if(!keep) n.NKeep -= 1;
+
+   return(keep);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double TCStatJob::get_diag_double(const StringArray &diag_name,
+                                  const TrackPoint &point,
+                                  const ConcatString &diag_cs) {
+   double v = bad_data_double;
+   int i_diag;
+
+   // Check whether the diagnostic name exists
+   if(diag_name.has(diag_cs, i_diag)) {
+      v = point.diag_val(i_diag);
+   }
+   // Print a single warning message if diagnostics are present
+   // but not the requested one
+   else if(diag_name.n() > 0 &&
+           !PrintDiagWarning.has(diag_cs)) {
+      mlog << Warning << "\nTCStatJob::get_diag_double() -> "
+           << "diagnostic \"" << diag_cs
+           << "\" not defined for TrackPoint.\n\n";
+      PrintDiagWarning.add(diag_cs);
+   }
+
+   return(v);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 StringArray TCStatJob::parse_job_command(const char *jobstring) {
    StringArray a, b;
    string c;
@@ -939,6 +1042,10 @@ StringArray TCStatJob::parse_job_command(const char *jobstring) {
       else if(c.compare("-init_str"          ) == 0) { parse_string_option(a[i+1].c_str(), a[i+2].c_str(), InitStrIncMap);
                                                                                                           a.shift_down(i, 2); }
       else if(c.compare("-init_str_exc"      ) == 0) { parse_string_option(a[i+1].c_str(), a[i+2].c_str(), InitStrExcMap);
+                                                                                                          a.shift_down(i, 2); }
+      else if(c.compare("-diag_thresh"       ) == 0) { parse_thresh_option(a[i+1].c_str(), a[i+2].c_str(), DiagThreshMap);
+                                                                                                          a.shift_down(i, 2); }
+      else if(c.compare("-init_diag_thresh"  ) == 0) { parse_thresh_option(a[i+1].c_str(), a[i+2].c_str(), InitDiagThreshMap);
                                                                                                           a.shift_down(i, 2); }
       else if(c.compare("-water_only"        ) == 0) { WaterOnly = string_to_bool(a[i+1].c_str());        a.shift_down(i, 1); }
       else if(c.compare("-rirw_track"        ) == 0) { RIRWTrack = string_to_tracktype(a[i+1].c_str());   a.shift_down(i, 1); }
@@ -1102,15 +1209,25 @@ void TCStatJob::dump_pair(const TrackPairInfo &pair, ofstream *out) {
 
    TcHdrColumns tchc;
    AsciiTable out_at;
-   int i_row, hdr_row;
+   int i_row, hdr_row, n_row, n_col, n_diag;
+
+   // Number of output rows and columns
+   n_row = pair.n_points();
+   n_col = n_tc_mpr_cols;
 
    // Determine if we need to write a header row
    if((int) out->tellp() == 0) hdr_row = 1;
    else                        hdr_row = 0;
 
+   // Update rows and columns for diagnosics output
+   if((n_diag = pair.adeck().n_diag()) > 0) {
+      n_row += pair.n_points();
+      n_col = max(n_col, get_n_tc_diag_cols(n_diag));
+   }
+
    // Initialize the output AsciiTable
-   out_at.set_size(pair.n_points() + hdr_row,
-                   n_tc_header_cols + n_tc_mpr_cols);
+   out_at.set_size(n_row + hdr_row,
+                   n_tc_header_cols + n_col);
 
    // Write the TCMPR header row
    write_tc_mpr_header_row(1, out_at, 0, 0);
@@ -1138,7 +1255,7 @@ void TCStatJob::dump_pair(const TrackPairInfo &pair, ofstream *out) {
 
    // Write the TrackPairInfo object
    i_row = hdr_row;
-   write_tc_mpr_row(tchc, pair, out_at, i_row);
+   write_track_pair_info(tchc, pair, out_at, i_row);
 
    // Write the AsciiTable to the file
    *out << out_at;
@@ -1253,6 +1370,18 @@ ConcatString TCStatJob::serialize() const {
            << str_it->second[i] << " ";
       }
    }
+   for(thr_it=DiagThreshMap.begin(); thr_it!= DiagThreshMap.end(); thr_it++) {
+      for(i=0; i<thr_it->second.n(); i++) {
+         s << "-diag_thresh " << thr_it->first << " "
+           << thr_it->second[i].get_str() << " ";
+      }
+   }
+   for(thr_it=InitDiagThreshMap.begin(); thr_it!= InitDiagThreshMap.end(); thr_it++) {
+      for(i=0; i<thr_it->second.n(); i++) {
+         s << "-init_diag_thresh " << thr_it->first << " "
+           << thr_it->second[i].get_str() << " ";
+      }
+   }
    if(WaterOnly != default_water_only)
       s << "-water_only " << bool_to_string(WaterOnly) << " ";
    if(RIRWTrack != default_rirw_track) {
@@ -1309,7 +1438,7 @@ ConcatString TCStatJob::serialize() const {
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCStatJob::do_job(const StringArray &file_list, TCLineCounts &n) {
+void TCStatJob::do_job(const StringArray &file_list, TCPointCounts &n) {
 
    mlog << Error << "\nTCStatJob::do_job() -> "
         << "the do_job() base class function should never be called!\n\n";
@@ -1326,7 +1455,7 @@ void TCStatJob::do_job(const StringArray &file_list, TCLineCounts &n) {
 
 void TCStatJob::event_equalize_tracks() {
    TrackPairInfo pair;
-   TCLineCounts n;
+   TCPointCounts n;
    ConcatString key, val;
    StringArray case_list;
    ConcatString models;
@@ -1362,11 +1491,11 @@ void TCStatJob::event_equalize_tracks() {
       if(skip) continue;
 
       // Add event equalization information for each track point
-      for(i=0; i<pair.n_lines(); i++) {
+      for(i=0; i<pair.n_points(); i++) {
 
          // Store the current map key and value
-         key = pair.adeck().technique(); // ADECK model name
-         val = pair.line(i)->header();   // Track line header
+         key = pair.adeck().technique();     // ADECK model name
+         val = pair.tcmpr_line(i)->header(); // Track line header
 
          // Add a new map entry, if necessary
          if(case_map.count(key) == 0) {
@@ -1414,7 +1543,7 @@ void TCStatJob::event_equalize_tracks() {
 ////////////////////////////////////////////////////////////////////////
 
 void TCStatJob::event_equalize_lines() {
-   TCLineCounts n;
+   TCPointCounts n;
    TCStatLine line;
    ConcatString key, val;
    StringArray case_list;
@@ -1484,7 +1613,7 @@ void TCStatJob::event_equalize_lines() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCStatJob::subset_track_pair(TrackPairInfo &pair, TCLineCounts &n) {
+void TCStatJob::subset_track_pair(TrackPairInfo &pair, TCPointCounts &n) {
    int i, n_rej;
 
    // Check for no points
@@ -1537,13 +1666,19 @@ void TCStatJob::subset_track_pair(TrackPairInfo &pair, TCLineCounts &n) {
    }
 
    // Loop over the track points to check line by line
-   for(i=0; i<pair.n_lines(); i++) {
+   for(i=0; i<pair.n_points(); i++) {
 
-      // Skip marked lines
-      if(!pair.keep(i)) continue;
-
-      // Check if this line should be discarded
-      if(!is_keeper_line(*pair.line(i), n)) pair.set_keep(i, 0);
+      // Check if this TCMPR line should be discarded
+      if(pair.keep(i) &&
+         !is_keeper_line(*pair.tcmpr_line(i), n)) {
+         pair.set_keep(i, 0);
+      }
+      // Check if this TCDIAG line should be discarded
+      else if(pair.keep(i) &&
+              !is_keeper_tcdiag(pair.adeck().diag_name(),
+                                pair.adeck()[i], n)) {
+         pair.set_keep(i, 0);
+      }
    }
 
    // Subset the points marked for retention
@@ -1624,7 +1759,7 @@ void TCStatJobFilter::assign(const TCStatJobFilter & j) {
 ////////////////////////////////////////////////////////////////////////
 
 void TCStatJobFilter::do_job(const StringArray &file_list,
-                             TCLineCounts &n) {
+                             TCPointCounts &n) {
    int i;
 
    // Check that the -dump_row option has been supplied
@@ -1640,8 +1775,11 @@ void TCStatJobFilter::do_job(const StringArray &file_list,
    // Apply logic based on the LineType
    //
 
-   // If not specified, assume TCMPR by adding it to the LineType
-   if(LineType.n() == 0) LineType.add(TCStatLineType_TCMPR_Str);
+   // If not specified, assume TCMPR/TCDIAG by adding them to the LineType
+   if(LineType.n() == 0) {
+      LineType.add(TCStatLineType_TCMPR_Str);
+      LineType.add(TCStatLineType_TCDIAG_Str);
+   }
 
    // Add the input file list
    TCSTFiles.add_files(file_list);
@@ -1649,12 +1787,14 @@ void TCStatJobFilter::do_job(const StringArray &file_list,
    // Process track-based filter job
    if(LineType.has(TCStatLineType_TCMPR_Str)) {
 
-      // TCMPR and non-TCMPR LineTypes cannot be mixed
+      // TCMPR and non-TCMPR/TCDIAG LineTypes cannot be mixed
       for(i=0; i<LineType.n(); i++) {
-         if(strcasecmp(LineType[i].c_str(), TCStatLineType_TCMPR_Str) != 0) {
+         if(strcasecmp(LineType[i].c_str(), TCStatLineType_TCMPR_Str)  != 0 &&
+            strcasecmp(LineType[i].c_str(), TCStatLineType_TCDIAG_Str) != 0) {
             mlog << Error << "\nTCStatJobFilter::do_job() -> "
                  << "the track-based " << TCStatLineType_TCMPR_Str
-                 << " line type cannot be mixed with the "
+                 << " and " << TCStatLineType_TCDIAG_Str
+                 << " line types cannot be mixed with the "
                  << LineType[i] << " line type.\n\n";
             exit(1);
          }
@@ -1680,7 +1820,7 @@ void TCStatJobFilter::do_job(const StringArray &file_list,
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCStatJobFilter::filter_tracks(TCLineCounts &n) {
+void TCStatJobFilter::filter_tracks(TCPointCounts &n) {
    TrackPairInfo pair;
 
    // Apply the event equalization logic to build a list of common cases
@@ -1719,7 +1859,7 @@ void TCStatJobFilter::filter_tracks(TCLineCounts &n) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCStatJobFilter::filter_lines(TCLineCounts &n) {
+void TCStatJobFilter::filter_lines(TCPointCounts &n) {
    TCStatLine line;
 
    // Apply the event equalization logic to build a list of common cases
@@ -1962,7 +2102,7 @@ ConcatString TCStatJobSummary::serialize() const {
 ////////////////////////////////////////////////////////////////////////
 
 void TCStatJobSummary::do_job(const StringArray &file_list,
-                              TCLineCounts &n) {
+                              TCPointCounts &n) {
    TrackPairInfo pair;
    int i;
 
@@ -1979,8 +2119,11 @@ void TCStatJobSummary::do_job(const StringArray &file_list,
    // Apply logic based on the LineType
    //
 
-   // If not specified, assume TCMPR by adding it to the LineType
-   if(LineType.n() == 0) LineType.add(TCStatLineType_TCMPR_Str);
+   // If not specified, assume TCMPR/TCDIAG by adding them to the LineType
+   if(LineType.n() == 0) {
+      LineType.add(TCStatLineType_TCMPR_Str);
+      LineType.add(TCStatLineType_TCDIAG_Str);
+   }
 
    // Add the input file list
    TCSTFiles.add_files(file_list);
@@ -1988,12 +2131,14 @@ void TCStatJobSummary::do_job(const StringArray &file_list,
    // Process track-based filter job
    if(LineType.has(TCStatLineType_TCMPR_Str)) {
 
-      // TCMPR and non-TCMPR LineTypes cannot be mixed
+      // TCMPR and non-TCMPR/TCDIAG LineTypes cannot be mixed
       for(i=0; i<LineType.n(); i++) {
-         if(strcasecmp(LineType[i].c_str(), TCStatLineType_TCMPR_Str) != 0) {
+         if(strcasecmp(LineType[i].c_str(), TCStatLineType_TCMPR_Str)  != 0 &&
+            strcasecmp(LineType[i].c_str(), TCStatLineType_TCDIAG_Str) != 0) {
             mlog << Error << "\nTCStatJobSummary::do_job() -> "
                  << "the track-based " << TCStatLineType_TCMPR_Str
-                 << " line type cannot be mixed with the "
+                 << " and " << TCStatLineType_TCDIAG_Str
+                 << " line types cannot be mixed with the "
                  << LineType[i] << " line type.\n\n";
             exit(1);
          }
@@ -2019,7 +2164,7 @@ void TCStatJobSummary::do_job(const StringArray &file_list,
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCStatJobSummary::summarize_tracks(TCLineCounts &n) {
+void TCStatJobSummary::summarize_tracks(TCPointCounts &n) {
    TrackPairInfo pair;
 
    // Apply the event equalization logic to build a list of common cases
@@ -2061,7 +2206,7 @@ void TCStatJobSummary::summarize_tracks(TCLineCounts &n) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCStatJobSummary::summarize_lines(TCLineCounts &n) {
+void TCStatJobSummary::summarize_lines(TCPointCounts &n) {
    TCStatLine line;
 
    // Apply the event equalization logic to build a list of common cases
@@ -2111,8 +2256,8 @@ void TCStatJobSummary::process_pair(TrackPairInfo &pair) {
    // Initialize the map
    cur_map.clear();
 
-   // Loop over TCStatLines and construct a summary map
-   for(i=0; i<pair.n_lines(); i++) {
+   // Loop over track points and construct a summary map
+   for(i=0; i<pair.n_points(); i++) {
 
       // Add summary info to the current map
       for(j=0; j<Column.n(); j++) {
@@ -2121,19 +2266,29 @@ void TCStatJobSummary::process_pair(TrackPairInfo &pair) {
          // For -column_union, put all columns in the same key
          if(ColumnUnion) prefix = write_css(ReqColumn);
          else            prefix = Column[j];
-         key = build_map_key(prefix.c_str(), *pair.line(i), ByColumn);
-         val = get_column_double(*pair.line(i), Column[j]);
+
+         key = build_map_key(prefix.c_str(), *pair.tcmpr_line(i), ByColumn);
+
+         // Parse TCDIAG values
+         if(pair.adeck().diag_name().has(Column[j])) {
+            val = get_diag_double(pair.adeck().diag_name(),
+                                  pair.adeck()[i], Column[j]);
+         }
+         // Parse TCMPR values
+         else {
+            val = get_column_double(*pair.tcmpr_line(i), Column[j]);
+         }
 
          // Add map entry for this key, if necessary
          if(cur_map.count(key) == 0) cur_map[key] = data;
 
          // Add values for this key
          cur_map[key].Val.add(val);
-         cur_map[key].Hdr.add(pair.line(i)->header());
-         cur_map[key].AModel.add(pair.line(i)->amodel());
-         cur_map[key].Init.add(pair.line(i)->init());
-         cur_map[key].Lead.add(pair.line(i)->lead());
-         cur_map[key].Valid.add(pair.line(i)->valid());
+         cur_map[key].Hdr.add(pair.tcmpr_line(i)->header());
+         cur_map[key].AModel.add(pair.tcmpr_line(i)->amodel());
+         cur_map[key].Init.add(pair.tcmpr_line(i)->init());
+         cur_map[key].Lead.add(pair.tcmpr_line(i)->lead());
+         cur_map[key].Valid.add(pair.tcmpr_line(i)->valid());
 
       } // end for j
    } // end for i
@@ -2967,7 +3122,7 @@ ConcatString TCStatJobRIRW::serialize() const {
 ////////////////////////////////////////////////////////////////////////
 
 void TCStatJobRIRW::do_job(const StringArray &file_list,
-                           TCLineCounts &n) {
+                           TCPointCounts &n) {
    TrackPairInfo pair;
 
    // Add the input file list
@@ -3039,7 +3194,7 @@ void TCStatJobRIRW::process_pair(TrackPairInfo &pair) {
    for(i=0; i<pair.n_points(); i++) {
 
       // Build the map key
-      key = build_map_key("RIRW", *pair.line(i), ByColumn);
+      key = build_map_key("RIRW", *pair.tcmpr_line(i), ByColumn);
 
       // Add map entry for this key, if necessary
       if(cur_map.count(key) == 0) cur_map[key] = data;
@@ -3118,7 +3273,7 @@ void TCStatJobRIRW::process_pair(TrackPairInfo &pair) {
 
             // Create a track for the current point
             pair_pt.clear();
-            pair_pt.add(*pair.line(i));
+            pair_pt.add(*pair.tcmpr_line(i));
 
                  if(a == 1 && b == 1) dump_pair(pair_pt, DumpOutCTC[0]);
             else if(a == 1 && b == 0) dump_pair(pair_pt, DumpOutCTC[1]);
@@ -3134,12 +3289,12 @@ void TCStatJobRIRW::process_pair(TrackPairInfo &pair) {
       //    BMAX_WIND_PRV BMAX_WIND_CUR BMAX_WIND_DLT BRIRW
       //    CATEGORY
       cur << cs_erase
-          << pair.line(i)->amodel() << sep
-          << pair.line(i)->bmodel() << sep
-          << pair.line(i)->storm_id() << sep
-          << unix_to_yyyymmdd_hhmmss(pair.line(i)->init()) << sep
+          << pair.tcmpr_line(i)->amodel() << sep
+          << pair.tcmpr_line(i)->bmodel() << sep
+          << pair.tcmpr_line(i)->storm_id() << sep
+          << unix_to_yyyymmdd_hhmmss(pair.tcmpr_line(i)->init()) << sep
           << (is_bad_data(lead) ? na_str : sec_to_hhmmss(lead).text()) << sep
-          << unix_to_yyyymmdd_hhmmss(pair.line(i)->valid()) << sep
+          << unix_to_yyyymmdd_hhmmss(pair.tcmpr_line(i)->valid()) << sep
           << aprv << sep << acur << sep << adlt << sep
           << (is_bad_data(a) ? na_str : bool_to_string(a)) << sep
           << bprv << sep << bcur << sep << bdlt << sep
@@ -3619,7 +3774,7 @@ StringArray TCStatJobProbRIRW::parse_job_command(const char *jobstring) {
 ////////////////////////////////////////////////////////////////////////
 
 void TCStatJobProbRIRW::close_dump_file() {
-   const char *method_name = "TCStatJobProbRIRW::do_job() -> ";
+   const char *method_name = "TCStatJobProbRIRW::close_dump_file() -> ";
 
    // Close the current output dump file stream
    if(DumpOut) {
@@ -3716,7 +3871,7 @@ ConcatString TCStatJobProbRIRW::serialize() const {
 ////////////////////////////////////////////////////////////////////////
 
 void TCStatJobProbRIRW::do_job(const StringArray &file_list,
-                             TCLineCounts &n) {
+                               TCPointCounts &n) {
    ProbRIRWPairInfo pair;
 
    // Check that -probrirw_thresh has been supplied
@@ -3967,7 +4122,8 @@ void TCStatJobProbRIRW::do_output(ostream &out) {
 
 ////////////////////////////////////////////////////////////////////////
 
-TCLineCounts::TCLineCounts() {
+TCPointCounts::TCPointCounts() {
+
    // Read and keep counts
    NRead = 0;
    NKeep = 0;
@@ -3976,6 +4132,7 @@ TCLineCounts::TCLineCounts() {
    RejTrackWatchWarn = 0;
    RejInitThresh = 0;
    RejInitStr = 0;
+   RejInitDiagThresh = 0;
 
    // Filtering on track attributes
    RejRIRW = 0;
@@ -4000,6 +4157,7 @@ TCLineCounts::TCLineCounts() {
    RejWaterOnly = 0;
    RejColumnThresh = 0;
    RejColumnStr = 0;
+   RejDiagThresh = 0;
    RejMatchPoints = 0;
    RejEventEqual = 0;
    RejOutInitMask = 0;

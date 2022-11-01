@@ -107,6 +107,11 @@ void PairDataEnsemble::clear() {
    ign_na.clear();
    pit_na.clear();
 
+   n_ge_obs_na.clear();
+   me_ge_obs_na.clear();
+   n_lt_obs_na.clear();
+   me_lt_obs_na.clear();
+
    n_ens = 0;
    n_pair = 0;
    ctrl_index = bad_data_int;
@@ -137,9 +142,13 @@ void PairDataEnsemble::clear() {
    crpss_gaus     = bad_data_double;
 
    me             = bad_data_double;
+   mae            = bad_data_double;
    rmse           = bad_data_double;
    me_oerr        = bad_data_double;
+   mae_oerr       = bad_data_double;
    rmse_oerr      = bad_data_double;
+
+   bias_ratio     = bad_data_double;
 
    return;
 }
@@ -168,6 +177,10 @@ void PairDataEnsemble::extend(int n) {
    crpscl_gaus_na.extend     (n);
    ign_na.extend             (n);
    pit_na.extend             (n);
+   n_ge_obs_na.extend        (n);
+   me_ge_obs_na.extend       (n);
+   n_lt_obs_na.extend        (n);
+   me_lt_obs_na.extend       (n);
    skip_ba.extend            (n);
    var_na.extend             (n);
    var_oerr_na.extend        (n);
@@ -227,6 +240,12 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
    crpscl_gaus_na = pd.crpscl_gaus_na;
    ign_na         = pd.ign_na;
    pit_na         = pd.pit_na;
+
+   n_ge_obs_na    = pd.n_ge_obs_na;
+   me_ge_obs_na   = pd.me_ge_obs_na;
+   n_lt_obs_na    = pd.n_lt_obs_na;
+   me_lt_obs_na   = pd.me_lt_obs_na;
+
    n_pair         = pd.n_pair;
    ctrl_index     = pd.ctrl_index;
    skip_const     = pd.skip_const;
@@ -261,9 +280,13 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
    crpss_gaus     = pd.crpss_gaus;
 
    me             = pd.me;
+   mae            = pd.mae;
    rmse           = pd.rmse;
    me_oerr        = pd.me_oerr;
+   mae_oerr       = pd.mae_oerr;
    rmse_oerr      = pd.rmse_oerr;
+
+   bias_ratio     = pd.bias_ratio;
 
    set_ens_size(pd.n_ens);
 
@@ -370,8 +393,8 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
       // Initialize
       cur_ens.erase();
 
-      // Compute the number of ensemble values less than the observation
-      for(j=0, n_vld=0, n_bel=0, n_tie=0; j<n_ens; j++) {
+      // Compute the number of ensemble values above and below the observation
+      for(j=0, n_vld = n_bel = n_tie = 0; j<n_ens; j++) {
 
          // Skip bad data
          if(e_na[j].n() > i && !is_bad_data(e_na[j][i])) {
@@ -382,7 +405,7 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
             // Store the current ensemble value
             cur_ens.add(e_na[j][i]);
 
-            // Keep track of the number of ties and the number below
+            // Track running counts and sums
             if(is_eq(e_na[j][i], o_na[i])) n_tie++;
             else if(e_na[j][i] < o_na[i])  n_bel++;
          }
@@ -422,6 +445,10 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
          crpscl_gaus_na.add(bad_data_double);
          ign_na.add(bad_data_double);
          pit_na.add(bad_data_double);
+         n_ge_obs_na.add(bad_data_double);
+         me_ge_obs_na.add(bad_data_double);
+         n_lt_obs_na.add(bad_data_double);
+         me_lt_obs_na.add(bad_data_double);
       }
       // Otherwise, compute scores
       else {
@@ -492,6 +519,19 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
          crpscl_gaus_na.add(compute_crps_gaus(o_na[i], cmn_na[i], csd_na[i]));
          ign_na.add(compute_ens_ign(o_na[i], mean, stdev));
          pit_na.add(compute_ens_pit(o_na[i], mean, stdev));
+
+         // Compute the Bias Ratio terms 
+         int n_ge_obs, n_lt_obs;
+         double me_ge_obs, me_lt_obs;
+         compute_bias_ratio_terms(o_na[i], cur_ens,
+                                  n_ge_obs, me_ge_obs,
+                                  n_lt_obs, me_lt_obs);
+
+         // Store the Bias Ratio terms 
+         n_ge_obs_na.add(n_ge_obs);
+         me_ge_obs_na.add(me_ge_obs);
+         n_lt_obs_na.add(n_lt_obs);
+         me_lt_obs_na.add(me_lt_obs);
       }
    } // end for i
 
@@ -820,7 +860,8 @@ PairDataEnsemble PairDataEnsemble::subset_pairs_obs_thresh(const SingleThresh &o
       // Include in subset:
       //   wgt_na, o_na, cmn_na, csd_na, v_na, r_na,
       //   crps_emp_na, crps_emp_fair_na, crpscl_emp_na, crps_gaus_na, crpscl_gaus_na,
-      //   ign_na, pit_na, var_na, var_oerr_na, var_plus_oerr_na,
+      //   ign_na, pit_na, n_gt_obs_na, me_gt_obs_na, n_lt_obs_na, me_lt_obs_na,
+      //   var_na, var_oerr_na, var_plus_oerr_na,
       //   mn_na, mn_oerr_na, e_na
       //
       // Exclude from subset:
@@ -841,6 +882,10 @@ PairDataEnsemble PairDataEnsemble::subset_pairs_obs_thresh(const SingleThresh &o
       pd.crpscl_gaus_na.add(crpscl_gaus_na[i]);
       pd.ign_na.add(ign_na[i]);
       pd.pit_na.add(pit_na[i]);
+      pd.n_ge_obs_na.add(n_ge_obs_na[i]);
+      pd.me_ge_obs_na.add(me_ge_obs_na[i]);
+      pd.n_lt_obs_na.add(n_lt_obs_na[i]);
+      pd.me_lt_obs_na.add(me_lt_obs_na[i]);
       pd.skip_ba.add(false);
       pd.var_na.add(var_na[i]);
       pd.var_oerr_na.add(var_oerr_na[i]);
@@ -2002,6 +2047,60 @@ double compute_ens_pit(double obs, double m, double s) {
    }
    else {
       v = normal_cdf(obs, m, s);
+   }
+
+   return(v);
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Compute the bias ratio terms
+//
+////////////////////////////////////////////////////////////////////////
+
+void compute_bias_ratio_terms(double obs, const NumArray &e_na,
+                              int &n_ge_obs, double &me_ge_obs,
+                              int &n_lt_obs, double &me_lt_obs) {
+
+   // Initialize
+   n_ge_obs  = n_lt_obs  = 0;
+   me_ge_obs = me_lt_obs = 0.0;
+
+   // Loop over ensemble member values
+   for(int i=0; i<e_na.n(); i++) {
+
+      // Track counts and sums
+      if(e_na[i] >= obs) {
+         n_ge_obs  += 1;
+         me_ge_obs += (e_na[i] - obs);
+      }
+      else {
+         n_lt_obs  += 1;
+         me_lt_obs += (e_na[i] - obs);
+      }
+   }
+
+   // Convert sums to means
+   if(n_ge_obs > 0) me_ge_obs /= n_ge_obs;
+   else             me_ge_obs  = bad_data_double;
+   if(n_lt_obs > 0) me_lt_obs /= n_lt_obs;
+   else             me_lt_obs  = bad_data_double;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double compute_bias_ratio(double me_ge_obs, double me_lt_obs) {
+   double v;
+
+   // Compute bias ratio
+   if(is_bad_data(me_ge_obs) ||
+      is_bad_data(me_lt_obs) || is_eq(me_lt_obs, 0.0)) {
+      v = bad_data_double;
+   }
+   else {
+      v = me_ge_obs / abs(me_lt_obs);
    }
 
    return(v);

@@ -70,10 +70,6 @@ Tropical cyclone forecasts and observations are quite different than numerical m
 
 The following sections of this MET User's Guide contain usage statements for each tool, which may be viewed if you type the name of the tool. Alternatively, the user can also type the name of the tool followed by **-help** to obtain the usage statement. Each tool also has a **-version** command line option associated with it so that the user can determine what version of the tool they are using.
 
-.. _release-notes:
-
-.. include:: release-notes.rst
-
 Future development plans
 ========================
 
