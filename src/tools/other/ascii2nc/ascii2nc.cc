@@ -601,6 +601,9 @@ void set_format(const StringArray & a) {
      ascii_format = ASCIIFormat_Python;
    }
    #endif
+   else if("python" == a[0]) {
+      python_compile_error("set_format()");
+   }
    else {
       mlog << Error << "\nset_format() -> "
            << "unsupported ASCII observation format \""

@@ -96,10 +96,7 @@ VarInfo * VarInfoFactory::new_var_info(GrdFileType type)
          p = 0;
          break;
 #else
-         mlog << Error << "\nVarInfoFactory::new_var_info() -> "
-              << "Support for Python has not been compiled!\n"
-              << "To run Python scripts, recompile with the --enable-python option.\n\n";
-         exit(1);
+         python_compile_error("VarInfoFactory::new_var_info()");
 #endif
 
       case FileType_NcCF:
