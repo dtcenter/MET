@@ -104,7 +104,7 @@ MetPythonDataFile * p = 0;
       case FileType_Python_Numpy:
       case FileType_Python_Xarray:
 
-         python_compile_error("Met2dDataFileFactory::new_met_2d_data_file()");
+         python_compile_error("Met2dDataFileFactory::new_met_2d_data_file() -> ");
 
 #endif
 

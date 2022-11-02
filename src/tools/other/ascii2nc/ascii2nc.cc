@@ -602,7 +602,7 @@ void set_format(const StringArray & a) {
    }
    #endif
    else if("python" == a[0]) {
-      python_compile_error("set_format()");
+      python_compile_error("set_format() -> ");
    }
    else {
       mlog << Error << "\nset_format() -> "

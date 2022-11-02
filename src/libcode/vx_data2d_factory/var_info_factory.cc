@@ -96,7 +96,7 @@ VarInfo * VarInfoFactory::new_var_info(GrdFileType type)
          p = 0;
          break;
 #else
-         python_compile_error("VarInfoFactory::new_var_info()");
+         python_compile_error("VarInfoFactory::new_var_info() -> ");
 #endif
 
       case FileType_NcCF:
