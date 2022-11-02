@@ -2570,7 +2570,7 @@ void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &job,
    AggrENSInfo aggr;
    ECNTData cur;
    ConcatString key;
-   double crps_emp, crps_emp_fair, crpscl_emp, crps_gaus, crpscl_gaus, v;
+   double crps_emp, crps_emp_fair, spread_md, crpscl_emp, crps_gaus, crpscl_gaus, v;
    map<ConcatString, AggrENSInfo>::iterator it;
 
    //
@@ -2630,6 +2630,7 @@ void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &job,
          //
          m[key].ens_pd.crps_emp_na.add(cur.crps_emp);
          m[key].ens_pd.crps_emp_fair_na.add(cur.crps_emp_fair);
+         m[key].ens_pd.spread_md_na.add(cur.spread_md_na);
          m[key].ens_pd.crpscl_emp_na.add(cur.crpscl_emp);
          m[key].ens_pd.crps_gaus_na.add(cur.crps_gaus);
          m[key].ens_pd.crpscl_gaus_na.add(cur.crpscl_gaus);
@@ -2687,6 +2688,7 @@ void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &job,
 
       crps_emp      = it->second.ens_pd.crps_emp_na.wmean(it->second.ens_pd.wgt_na);
       crps_emp_fair = it->second.ens_pd.crps_emp_fair_na.wmean(it->second.ens_pd.wgt_na);
+      spread_md     = it->second.ens_pd.spread_md_na.wmean(it->second.ens_pd.wgt_na);
       crpscl_emp    = it->second.ens_pd.crpscl_emp_na.wmean(it->second.ens_pd.wgt_na);
       crps_gaus     = it->second.ens_pd.crps_gaus_na.wmean(it->second.ens_pd.wgt_na);
       crpscl_gaus   = it->second.ens_pd.crpscl_gaus_na.wmean(it->second.ens_pd.wgt_na);
@@ -3197,6 +3199,7 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &job,
          double crps_emp = compute_crps_emp(cur.obs, cur.ens_na);
          m[key].ens_pd.crps_emp_na.add(crps_emp);
          m[key].ens_pd.crps_emp_fair_na.add(crps_emp - cur.ens_na.wmean_abs_diff());
+         m[key].ens_pd.spread_md_na.add(cur.ens_na.mean_abs_diff());
          m[key].ens_pd.crpscl_emp_na.add(compute_crps_emp(cur.obs, climo_vals));
 
          // Store Gaussian CRPS stats

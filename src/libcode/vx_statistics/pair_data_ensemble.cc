@@ -100,6 +100,7 @@ void PairDataEnsemble::clear() {
 
    crps_emp_na.clear();
    crps_emp_fair_na.clear();
+   spread_md.clear();
    crpscl_emp_na.clear();
    crps_gaus_na.clear();
    crpscl_gaus_na.clear();
@@ -172,6 +173,7 @@ void PairDataEnsemble::extend(int n) {
    r_na.extend               (n);
    crps_emp_na.extend        (n);
    crps_emp_fair_na.extend   (n);
+   spread_md.extend          (n);
    crpscl_emp_na.extend      (n);
    crps_gaus_na.extend       (n);
    crpscl_gaus_na.extend     (n);
@@ -231,15 +233,16 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
    cdf_na         = pd.cdf_na;
 
    // PairDataEnsemble
-   v_na           = pd.v_na;
-   r_na           = pd.r_na;
-   crps_emp_na    = pd.crps_emp_na;
+   v_na             = pd.v_na;
+   r_na             = pd.r_na;
+   crps_emp_na      = pd.crps_emp_na;
    crps_emp_fair_na = pd.crps_emp_fair_na;
-   crpscl_emp_na  = pd.crpscl_emp_na;
-   crps_gaus_na   = pd.crps_gaus_na;
-   crpscl_gaus_na = pd.crpscl_gaus_na;
-   ign_na         = pd.ign_na;
-   pit_na         = pd.pit_na;
+   spread_md        = pd.spread_md;
+   crpscl_emp_na    = pd.crpscl_emp_na;
+   crps_gaus_na     = pd.crps_gaus_na;
+   crpscl_gaus_na   = pd.crpscl_gaus_na;
+   ign_na           = pd.ign_na;
+   pit_na           = pd.pit_na;
 
    n_ge_obs_na    = pd.n_ge_obs_na;
    me_ge_obs_na   = pd.me_ge_obs_na;
@@ -440,6 +443,7 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
          r_na.add(bad_data_int);
          crps_emp_na.add(bad_data_double);
          crps_emp_fair_na.add(bad_data_double);
+         spread_md.add(bad_data_double);
          crpscl_emp_na.add(bad_data_double);
          crps_gaus_na.add(bad_data_double);
          crpscl_gaus_na.add(bad_data_double);
@@ -507,6 +511,7 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
          double crps_emp = compute_crps_emp(o_na[i], cur_ens);
          crps_emp_na.add(crps_emp);
          crps_emp_fair_na.add(crps_emp - cur_ens.wmean_abs_diff());
+         spread_md_na.add(cur_ens.mean_abs_diff());
          crpscl_emp_na.add(compute_crps_emp(o_na[i], cur_clm));
 
          // Ensemble mean and standard deviation
@@ -859,7 +864,7 @@ PairDataEnsemble PairDataEnsemble::subset_pairs_obs_thresh(const SingleThresh &o
       //
       // Include in subset:
       //   wgt_na, o_na, cmn_na, csd_na, v_na, r_na,
-      //   crps_emp_na, crps_emp_fair_na, crpscl_emp_na, crps_gaus_na, crpscl_gaus_na,
+      //   crps_emp_na, crps_emp_fair_na, spread_md_na, crpscl_emp_na, crps_gaus_na, crpscl_gaus_na,
       //   ign_na, pit_na, n_gt_obs_na, me_gt_obs_na, n_lt_obs_na, me_lt_obs_na,
       //   var_na, var_oerr_na, var_plus_oerr_na,
       //   mn_na, mn_oerr_na, e_na
@@ -877,6 +882,7 @@ PairDataEnsemble PairDataEnsemble::subset_pairs_obs_thresh(const SingleThresh &o
       pd.r_na.add(r_na[i]);
       pd.crps_emp_na.add(crps_emp_na[i]);
       pd.crps_emp_fair_na.add(crps_emp_fair_na[i]);
+      pd.spread_md_na.add(spread_md_na[i]);
       pd.crpscl_emp_na.add(crpscl_emp_na[i]);
       pd.crps_gaus_na.add(crps_gaus_na[i]);
       pd.crpscl_gaus_na.add(crpscl_gaus_na[i]);
