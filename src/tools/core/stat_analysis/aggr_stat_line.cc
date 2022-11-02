@@ -2630,7 +2630,7 @@ void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &job,
          //
          m[key].ens_pd.crps_emp_na.add(cur.crps_emp);
          m[key].ens_pd.crps_emp_fair_na.add(cur.crps_emp_fair);
-         m[key].ens_pd.spread_md_na.add(cur.spread_md_na);
+         m[key].ens_pd.spread_md_na.add(cur.spread_md);
          m[key].ens_pd.crpscl_emp_na.add(cur.crpscl_emp);
          m[key].ens_pd.crps_gaus_na.add(cur.crps_gaus);
          m[key].ens_pd.crpscl_gaus_na.add(cur.crpscl_gaus);
