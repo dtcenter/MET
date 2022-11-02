@@ -80,7 +80,7 @@ class PairDataEnsemble : public PairBase {
 
       NumArray   crps_emp_na;       // Empirical Continuous Ranked Probability Score [n_obs]
       NumArray   crps_emp_fair_na;  // Fair Empirical Continuous Ranked Probability Score [n_obs]
-      NumArray   spread_md;         // Mean absolute difference of ensemble members [n_obs]
+      NumArray   spread_md_na;      // Mean absolute difference of ensemble members [n_obs]
       NumArray   crpscl_emp_na;     // Empirical climatological CRPS [n_obs]
 
       NumArray   crps_gaus_na;    // Gaussian CRPS [n_obs]

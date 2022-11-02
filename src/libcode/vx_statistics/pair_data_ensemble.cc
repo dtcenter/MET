@@ -100,7 +100,7 @@ void PairDataEnsemble::clear() {
 
    crps_emp_na.clear();
    crps_emp_fair_na.clear();
-   spread_md.clear();
+   spread_md_na.clear();
    crpscl_emp_na.clear();
    crps_gaus_na.clear();
    crpscl_gaus_na.clear();
@@ -173,7 +173,7 @@ void PairDataEnsemble::extend(int n) {
    r_na.extend               (n);
    crps_emp_na.extend        (n);
    crps_emp_fair_na.extend   (n);
-   spread_md.extend          (n);
+   spread_md_na.extend       (n);
    crpscl_emp_na.extend      (n);
    crps_gaus_na.extend       (n);
    crpscl_gaus_na.extend     (n);
@@ -237,7 +237,7 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
    r_na             = pd.r_na;
    crps_emp_na      = pd.crps_emp_na;
    crps_emp_fair_na = pd.crps_emp_fair_na;
-   spread_md        = pd.spread_md;
+   spread_md_na     = pd.spread_md_na;
    crpscl_emp_na    = pd.crpscl_emp_na;
    crps_gaus_na     = pd.crps_gaus_na;
    crpscl_gaus_na   = pd.crpscl_gaus_na;
@@ -443,7 +443,7 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
          r_na.add(bad_data_int);
          crps_emp_na.add(bad_data_double);
          crps_emp_fair_na.add(bad_data_double);
-         spread_md.add(bad_data_double);
+         spread_md_na.add(bad_data_double);
          crpscl_emp_na.add(bad_data_double);
          crps_gaus_na.add(bad_data_double);
          crpscl_gaus_na.add(bad_data_double);
