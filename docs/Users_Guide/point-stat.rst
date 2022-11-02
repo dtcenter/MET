@@ -866,13 +866,13 @@ The first set of header columns are common to all of the output files generated 
   * - 113-115
     - RMSFA, :raw-html:`<br />` RMSFA_BCL, :raw-html:`<br />` RMSFA_BCU
     - Root mean squared forecast anomaly (f-c) including bootstrap upper and lower confidence limits
-  * - 117-119
+  * - 116-118
     - RMSOA, :raw-html:`<br />` RMSOA_BCL, :raw-html:`<br />` RMSOA_BCU
     - Root mean squared observation anomaly (o-c) including bootstrap upper and lower confidence limits
-  * - 120-122
+  * - 119-121
     - ANOM_CORR_UNCNTR, :raw-html:`<br />` ANOM_CORR_UNCNTR_BCL, :raw-html:`<br />` ANOM_CORR_UNCNTR_BCU
     - The uncentered Anomaly Correlation excluding mean error including bootstrap upper and lower confidence limits
-  * - 123-125
+  * - 122-124
     - SI, :raw-html:`<br />` SI_BCL, :raw-html:`<br />` SI_BCU
     - Scatter Index including bootstrap upper and lower confidence limits
       
