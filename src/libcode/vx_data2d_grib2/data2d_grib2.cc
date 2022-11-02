@@ -160,6 +160,8 @@ bool MetGrib2DataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
    vector<Grib2Record*> listMatch, listMatchRange;
    find_record_matches(vinfo_g2, listMatch, listMatchRange);
 
+   cout << "listMatch.size() = " << listMatch.size() << endl;
+   
    //  if no matches were found, check for derived records
    if( 1 > listMatch.size() ){
 
@@ -471,6 +473,8 @@ void MetGrib2DataFile::find_record_matches( VarInfoGrib2* vinfo,
          }
       }
 
+      cout << "vinfo->record() = " << vinfo->record() << " (*it)->RecNum = " << (*it)->RecNum << endl;
+      
       //  test for a record number match
       if( vinfo->record() == (*it)->RecNum ){
          rec_match_ex = true;
@@ -496,7 +500,10 @@ void MetGrib2DataFile::find_record_matches( VarInfoGrib2* vinfo,
 
             continue;
          }
-
+         
+         cout << " vinfo->discipline() = " << vinfo->discipline() << " vinfo->parm_cat() = " << vinfo->parm_cat() << " vinfo->parm() = " << vinfo->parm() << " vinfo->name().text() = " << vinfo->name().text() << endl;
+         cout << " (*it)->Discipline = " << (*it)->Discipline << " (*it)->ParmCat = " << (*it)->ParmCat << " (*it)->Parm = " << (*it)->Parm << " (*it)->ParmName = " << (*it)->ParmName << endl;
+         
          //  record number level type
          if( LevelType_RecNumber == vinfo_lty && is_eq(lvl1, (*it)->RecNum) ){
             rec_match_ex = true;

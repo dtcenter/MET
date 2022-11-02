@@ -284,6 +284,8 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
    int ltab                = dict.lookup_int   (conf_key_GRIB2_ltab,      false);
    int mtab                = dict.lookup_int   (conf_key_GRIB2_mtab,      false);
 
+   cout << "field_name = " << field_name << " field_disc = " << field_disc << " field_parm_cat = " << field_parm_cat << " field_parm = " << field_parm << " cntr = " << cntr << endl;
+   
    //  user-specified GRIB2 record filters
    PDTmpl                  = dict.lookup_int   (conf_key_GRIB2_pdt,       false);
    Process                 = dict.lookup_int   (conf_key_GRIB2_process,   false);
@@ -353,6 +355,8 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
       field_name = tab.parm_name;
    }
 
+   cout << " Updated field_name = " << field_name << endl;
+   
    set_ens          (ens_str.c_str());
    //  set the matched parameter lookup information
    set_name         ( field_name    );
@@ -361,10 +365,11 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
       set_discipline( tab.index_a   );
       set_parm_cat  ( tab.index_b   );
       set_parm      ( tab.index_c   );
+      cout << " tab.units.c_str() = " << tab.units.c_str() << endl;
       set_units     ( tab.units.c_str()     );
       set_long_name ( tab.full_name.c_str() );
    }
-
+   
    //  call the parent to set the level information
    set_level_info_grib(dict);
 
