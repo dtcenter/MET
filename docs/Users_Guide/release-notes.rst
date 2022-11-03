@@ -11,7 +11,7 @@ Important issues are listed **in bold** for emphasis.
 
 .. warning:: **Ensemble post-processing was added to Gen-Ens-Prod in version 10.1.0 and will be removed from Ensemble-Stat in version 11.0.0!**
 
-MET Version 11.0.0-beta4 release notes (20221031)
+MET Version 11.0.0-beta4 release notes (20221103)
 -------------------------------------------------
 
 * Repository, build, and testing:
@@ -44,6 +44,7 @@ MET Version 11.0.0-beta4 release notes (20221031)
 
    * **Enhance ASCII2NC to read NDBC buoy data** (`#2276 <https://github.com/dtcenter/MET/issues/2276>`_).
    * **Enhance IODA2NC to support IODA v2.0 format** (`#2068 <https://github.com/dtcenter/MET/issues/2068>`_).
+   * **Add the Mean Absolute Difference (SPREAD_MD) to the ECNT line type** (`#2332 <https://github.com/dtcenter/MET/issues/2332>`_).
    * **Add MAE to the ECNT line type from Ensemble-Stat and for HiRA** (`#2325 <https://github.com/dtcenter/MET/issues/2325>`_).
    * **Add new bias ratio statistic to the ECNT line type from Ensemble-Stat and for HiRA** (`#2058 <https://github.com/dtcenter/MET/issues/2058>`_).
    * **Enhance TC-Pairs consensus logic to compute the spread of the location, wind speed, and pressure** (`#2036 <https://github.com/dtcenter/MET/issues/2036>`_).
