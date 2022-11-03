@@ -139,6 +139,8 @@ extern ConcatString wavelettype_to_string(WaveletType);
 
 extern int parse_conf_percentile(Dictionary *dict);
 
+extern void python_compile_error(const char *caller=0);
+
 ////////////////////////////////////////////////////////////////////////
 
 #endif   /*  __CONFIG_UTIL_H__  */

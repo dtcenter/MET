@@ -1731,11 +1731,18 @@ NbrhdInfo parse_conf_nbrhd(Dictionary *dict, const char *conf_key) {
    nbrhd_dict = dict->lookup_dictionary(conf_key);
 
    // Conf: field - may be missing
-   v = nbrhd_dict->lookup_int(conf_key_field, false);
 
-   // If found, interpret value.  Otherwise, default to BOTH
-   if(nbrhd_dict->last_lookup_status()) info.field = int_to_fieldtype(v);
-   else                                 info.field = FieldType_Both;
+   // Default info.field to BOTH
+   info.field = FieldType_Both;
+
+   // Skip lookup for conf_key_nbrhd_prob
+   if(strncmp(conf_key, conf_key_nbrhd_prob, strlen(conf_key_nbrhd_prob)) != 0) {
+
+      v = nbrhd_dict->lookup_int(conf_key_field, false);
+
+      // If found, interpret value
+      if(nbrhd_dict->last_lookup_status()) info.field = int_to_fieldtype(v);
+   }
 
    // Conf: vld_thresh
    info.vld_thresh = nbrhd_dict->lookup_double(conf_key_vld_thresh);
@@ -3118,6 +3125,23 @@ NormalizeType parse_conf_normalize(Dictionary *dict) {
    }
 
    return(t);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// Print consistent error message and exit
+//
+///////////////////////////////////////////////////////////////////////////////
+
+void python_compile_error(const char *caller) {
+
+   const char *method_name = (0 != caller) ? caller : "python_compile_error() -> ";
+
+   mlog << Error << "\n" << method_name
+        << "Support for Python has not been compiled!\n"
+        << "To run Python scripts, recompile with the --enable-python option.\n\n";
+
+   exit(1);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

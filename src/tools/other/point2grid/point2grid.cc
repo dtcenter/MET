@@ -282,11 +282,13 @@ void process_command_line(int argc, char **argv) {
    RGInfo.name    = cline[1];
    OutputFilename = cline[2];
 
-   // Check if the input file
-#ifdef WITH_PYTHON
+   // Check for python format
    string python_command = InputFilename;
    bool use_xarray = (0 == python_command.find(conf_val_python_xarray));
    bool use_python = use_xarray || (0 == python_command.find(conf_val_python_numpy));
+
+   // Check if the input file
+#ifdef WITH_PYTHON
    if (use_python) {
       int offset = python_command.find("=");
       if (offset == std::string::npos) {
@@ -296,6 +298,8 @@ void process_command_line(int argc, char **argv) {
       }
    }
    else
+#else
+   if (use_python) python_compile_error(method_name);
 #endif
       if ( !file_exists(InputFilename.c_str()) ) {
          mlog << Error << "\n" << method_name
