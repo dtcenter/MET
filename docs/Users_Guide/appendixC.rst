@@ -1000,6 +1000,21 @@ To calculate crps_emp_fair (bias adjusted, empirical ensemble CRPS) for each ind
 The overall CRPS_EMP_FAIR is calculated as the average of the individual measures. In equation form:
 
 .. math:: \text{CRPS_EMP_FAIR} = \text{average(crps_emp_fair) } = \frac{1}{N} \sum_{i=1}^N \text{crps_emp_fair}_i
+
+Ensemble Mean Absolute Difference
+---------------------------------
+
+Called "SPREAD_MD" in ECNT output :numref:`table_ES_header_info_es_out_ECNT`
+
+The ensemble mean absolute difference is an alternative measure of ensemble spread. It is computed for each individual observation (denoted by a lowercase spread_md) with m ensemble members:
+
+.. math:: \text{spread_md}_i = \frac{1}{m*(m-1)} \sum_{i \ne j}|f_{i} - f_{j}|
+
+The overall SPREAD_MD is calculated as the average of the individual measures. In equation form:
+
+.. math:: \text{SPREAD_MD} = \text{average(spread_md) } = \frac{1}{N} \sum_{i=1}^N \text{spread_md}_i
+
+A perfect forecast would have ensemble mean absolute difference = 0.
           
 CRPS Skill Score
 ----------------

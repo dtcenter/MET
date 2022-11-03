@@ -4225,9 +4225,10 @@ void write_ecnt_cols(const ECNTInfo &ecnt_info,
    //    RMSE,      SPREAD,        ME_OERR,
    //    RMSE_OERR, SPREAD_OERR,   SPREAD_PLUS_OERR,
    //    CRPSCL,    CRPS_EMP,      CRPSCL_EMP,
-   //    CRPSS_EMP  CRPS_EMP_FAIR, MAE,
-   //    MAE_OERR,  BIAS RATIO,    N_GE_OBS,
-   //    ME_GE_OBS, N_LT_OBS,      ME_LT_OBS
+   //    CRPSS_EMP  CRPS_EMP_FAIR, SPREAD_MD,
+   //    MAE,       MAE_OERR,      BIAS_RATIO,
+   //    N_GE_OBS,  ME_GE_OBS,     N_LT_OBS,
+   //    ME_LT_OBS
    //
    at.set_entry(r, c+0,  // Total Number of Pairs
       ecnt_info.n_pair);
@@ -4280,25 +4281,28 @@ void write_ecnt_cols(const ECNTInfo &ecnt_info,
    at.set_entry(r, c+16,  // Empirical ensemble CRPS FAIR
       ecnt_info.crps_emp_fair);
 
-   at.set_entry(r, c+17,  // MAE for unperturbed ensemble mean
+   at.set_entry(r, c+17,  // Mean absolute difference measure of spread
+      ecnt_info.spread_md);
+
+   at.set_entry(r, c+18,  // MAE for unperturbed ensemble mean
       ecnt_info.mae);
 
-   at.set_entry(r, c+18,  // MAE for mean of perturbed members
+   at.set_entry(r, c+19,  // MAE for mean of perturbed members
       ecnt_info.mae_oerr);
 
-   at.set_entry(r, c+19,  // Bias Ratio
+   at.set_entry(r, c+20,  // Bias Ratio
       ecnt_info.bias_ratio);
 
-   at.set_entry(r, c+20,  // Number of ensemble values >= observations
+   at.set_entry(r, c+21,  // Number of ensemble values >= observations
       ecnt_info.n_ge_obs);
 
-   at.set_entry(r, c+21,  // ME of ensemble values >= observations
+   at.set_entry(r, c+22,  // ME of ensemble values >= observations
       ecnt_info.me_ge_obs);
 
-   at.set_entry(r, c+22,  // Number of ensemble values < observations
+   at.set_entry(r, c+23,  // Number of ensemble values < observations
       ecnt_info.n_lt_obs);
 
-   at.set_entry(r, c+23,  // ME of ensemble values < observations
+   at.set_entry(r, c+24,  // ME of ensemble values < observations
       ecnt_info.me_lt_obs);
 
    return;
