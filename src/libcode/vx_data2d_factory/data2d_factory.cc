@@ -104,10 +104,7 @@ MetPythonDataFile * p = 0;
       case FileType_Python_Numpy:
       case FileType_Python_Xarray:
 
-         mlog << Error << "\nMet2dDataFileFactory::new_met_2d_data_file() -> "
-              << "Support for Python has not been compiled!\n"
-              << "To run Python scripts, recompile with the --enable-python option.\n\n";
-         exit(1);
+         python_compile_error("Met2dDataFileFactory::new_met_2d_data_file() -> ");
 
 #endif
 

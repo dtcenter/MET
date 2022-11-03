@@ -3128,3 +3128,20 @@ NormalizeType parse_conf_normalize(Dictionary *dict) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+//
+// Print consistent error message and exit
+//
+///////////////////////////////////////////////////////////////////////////////
+
+void python_compile_error(const char *caller) {
+
+   const char *method_name = (0 != caller) ? caller : "python_compile_error() -> ";
+
+   mlog << Error << "\n" << method_name
+        << "Support for Python has not been compiled!\n"
+        << "To run Python scripts, recompile with the --enable-python option.\n\n";
+
+   exit(1);
+}
+
+///////////////////////////////////////////////////////////////////////////////
