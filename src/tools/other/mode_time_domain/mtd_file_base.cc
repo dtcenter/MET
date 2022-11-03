@@ -20,6 +20,9 @@ using namespace std;
 #include <cstdio>
 #include <cmath>
 
+#include <netcdf>
+using namespace netCDF;
+
 #include "mtd_file.h"
 #include "mtd_partition.h"
 #include "mtd_nc_defs.h"

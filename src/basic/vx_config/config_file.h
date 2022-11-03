@@ -48,7 +48,7 @@ class MetConfig : public Dictionary {
 
       void clear();
 
-      void dump(ostream &, int = 0) const;
+      void dump(std::ostream &, int = 0) const;
 
          //
          //  set stuff

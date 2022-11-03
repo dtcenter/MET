@@ -27,6 +27,11 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
+static StringArray env_name_list;
+static StringArray nested_env_name_list;
+
+////////////////////////////////////////////////////////////////////////
+
 
 inline int imin(int a, int b)  { return ( (a < b) ? a : b ); }
 
@@ -1201,8 +1206,11 @@ if ((ptr = getenv(env_name)) == NULL) return(false);
 env_value = ptr;
 str = env_value;
 
-mlog << Debug(10) << method_name
-     << " " << env_name << " to " << env_value << "\n";
+if (!env_name_list.has(env_name)) {
+   env_name_list.add(env_name);
+   mlog << Debug(10) << method_name
+        << " " << env_name << " to " << env_value << "\n";
+}
 
 int count_replaced = 0;
 string nested_value;
@@ -1241,8 +1249,11 @@ while ((pos = str.find('$', pos)) != string::npos) {
    }
    nested_value = ptr;
    str.replace(pos, (pos_end - pos), nested_value);
-   mlog << Debug(7) << method_name << " " << nested_name
-        << " to " << nested_value << "\n";
+   if (!nested_env_name_list.has(nested_name)) {
+      nested_env_name_list.add(nested_name);
+      mlog << Debug(7) << method_name << " " << nested_name
+           << " to " << nested_value << "\n";
+   }
    count_replaced++;
 }
 

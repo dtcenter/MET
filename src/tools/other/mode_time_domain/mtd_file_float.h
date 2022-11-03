@@ -47,8 +47,8 @@ class MtdFloatFile : public MtdFileBase {
 
       void float_assign(const MtdFloatFile &);
 
-      virtual void read  (NcFile &);
-      virtual void write (NcFile &) const;
+      virtual void read  (netCDF::NcFile &);
+      virtual void write (netCDF::NcFile &) const;
 
 
       float * Data;   //  allocated

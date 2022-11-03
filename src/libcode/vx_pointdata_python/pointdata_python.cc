@@ -95,7 +95,6 @@ void MetPythonPointDataFile::python_init_from_scratch()
 {
 
 PythonCommand.clear();
-//met_data.clear();
 
 close();
 
@@ -122,20 +121,6 @@ return;
 
 }
 
-
-////////////////////////////////////////////////////////////////////////
-
-/*
-void MetPythonPointDataFile::set_type(const GrdFileType t)
-
-{
-
-Type = t;
-
-return;
-
-}
-*/
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -216,23 +201,7 @@ void MetPythonPointDataFile::dump(ostream & out, int depth) const
 Indent prefix(depth);
 
 out << prefix << "File = ";
-/*
-if ( Filename.empty() )  out << "(nul)\n";
-else                     out << '\"' << Filename << "\"\n";
 
-if ( Raw_Grid )  {
-
-   out << prefix << "Grid:\n";
-
-//   Raw_Grid->dump(out, depth + 1);
-
-} else {
-
-   out << prefix << "No Grid!\n";
-
-}
-*/
-   //
    //  done
    //
 
@@ -242,35 +211,6 @@ return;
 
 }
 
-
-////////////////////////////////////////////////////////////////////////
-/*
-
-bool MetPythonPointDataFile::data_ok(int x, int y) const
-
-{
-
-//const double value = get(x, y);
-
-//return ( !is_bad_data(value) );
-return true;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void MetPythonPointDataFile::data_minmax(double & data_min, double & data_max) const
-
-{
-
-//Plane.data_range(data_min, data_max);
-
-return;
-
-}
-*/
 
 ////////////////////////////////////////////////////////////////////////
 

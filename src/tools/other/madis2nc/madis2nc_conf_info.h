@@ -27,8 +27,8 @@ public:
   Madis2NcConfInfo();
   ~Madis2NcConfInfo();
 
-  void read_config(const string &default_filename,
-		   const string &user_filename);
+  void read_config(const std::string &default_filename,
+		   const std::string &user_filename);
 
   TimeSummaryInfo getSummaryInfo() const
   {

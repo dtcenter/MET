@@ -212,6 +212,16 @@ void TCStatConfInfo::process_config() {
                          conf_key_init_str_exc_name, conf_key_init_str_exc_val,
                          Filter.InitStrExcMap);
 
+   // Conf: TCStatJob::DiagThreshName, TCStatJob::DiagThreshVal
+   parse_conf_thresh_map(Conf,
+                         conf_key_diag_thresh_name, conf_key_diag_thresh_val,
+                         Filter.DiagThreshMap);
+
+   // Conf: TCStatJob::InitDiagThreshName, TCStatJob::InitDiagThreshVal
+   parse_conf_thresh_map(Conf,
+                         conf_key_init_diag_thresh_name, conf_key_init_diag_thresh_val,
+                         Filter.InitDiagThreshMap);
+
    // Conf: TCStatJob::WaterOnly
    Filter.WaterOnly = Conf.lookup_bool(conf_key_water_only);
 

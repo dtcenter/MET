@@ -525,13 +525,17 @@ for (x=0; x<nx; ++x)  {
 
 }   //  for x
 
- 
    //
-   //  dimensions
+   //  add global attributes and projection information
    //
 
-lat_dim = nc.addDim(string("lat"), ny);
-lon_dim = nc.addDim(string("lon"), nx);
+write_netcdf_global(&nc, path, program_name);
+
+   //
+   //  add dimensions and write projection info
+   //
+
+write_netcdf_proj(&nc, grid, lat_dim, lon_dim);
 
    //
    //  variable
@@ -543,14 +547,6 @@ vdim[1] = lon_dim;
 var = nc.addVar(string(super_object_var_name), ncFloat, vdim);
 
 var.putVar(data);
-
-   //
-   //  atrributes
-   //
-
-nc.putAtt(string("MET_version"), string(met_version));
-
-grid_output(grid.info(), &nc);
 
    //
    //  done

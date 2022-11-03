@@ -28,9 +28,12 @@
 //   010    08/30/21  Halley Gotway   MET #1891 Fix input and mask fields.
 //   011    12/13/21  Halley Gotway   MET #1993 Fix -type grid.
 //   012    05/05/22  Halley Gotway   MET #2152 Add -type poly_xy.
-//   013    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
+//   013    07/06/22  Howard Soh      METplus-Internal #19 Rename main to met_main
+//   014    09/28/22  Prestopnik      MET #2227 Remove namespace std and netCDF from header files
 //
 ////////////////////////////////////////////////////////////////////////
+
+using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
@@ -42,6 +45,9 @@
 #include <sys/types.h>
 #include <fcntl.h>
 #include <unistd.h>
+
+#include <netcdf>
+using namespace netCDF;
 
 #include "main.h"
 #include "gen_vx_mask.h"
@@ -1259,11 +1265,7 @@ void write_netcdf(const DataPlane &dp) {
    write_netcdf_global(f_out, out_filename.c_str(), program_name);
 
    // Add the projection information
-   write_netcdf_proj(f_out, grid);
-
-   // Define Dimensions
-   lat_dim = add_dim(f_out, "lat", (long) grid.ny());
-   lon_dim = add_dim(f_out, "lon", (long) grid.nx());
+   write_netcdf_proj(f_out, grid, lat_dim, lon_dim);
 
    // Add the lat/lon variables
    write_netcdf_latlon(f_out, &lat_dim, &lon_dim, grid);

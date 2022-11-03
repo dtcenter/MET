@@ -60,6 +60,7 @@ SUBDIRS += vx_data2d_factory \
 	vx_regrid \
 	vx_nc_obs \
 	vx_solar \
-	vx_bool_calc
+	vx_bool_calc \
+	vx_seeps
 
 MAINTAINERCLEANFILES 	= Makefile.in

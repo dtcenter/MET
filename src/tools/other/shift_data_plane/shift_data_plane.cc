@@ -22,8 +22,12 @@
 //   000    11-12-14  Halley Gotway  New
 //   001    06-07-22  Halley Gotway  MET #2173 Fix python embedding
 //   002    07-06-22  Howard Soh     METplus-Internal #19 Rename main to met_main
+//   003    09-12-22  Prestopnik     MET #2227 Remove namespace std and netCDF
+//                                   from header files
 //
 ////////////////////////////////////////////////////////////////////////
+
+using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
@@ -35,6 +39,9 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+
+#include <netcdf>
+using namespace netCDF;
 
 #include "GridTemplate.h"
 
@@ -279,6 +286,7 @@ void process_data_file() {
 void write_netcdf(const DataPlane &dp, const Grid &grid,
                   const VarInfo *vinfo, const GrdFileType &ftype) {
    ConcatString cs;
+   NcDim lat_dim, lon_dim;
 
    // Create a new NetCDF file and open it
    NcFile *f_out = open_ncfile(OutputFilename.c_str(), true);
@@ -297,11 +305,7 @@ void write_netcdf(const DataPlane &dp, const Grid &grid,
    add_att(f_out, "RunCommand", shift_cs);
 
    // Add the projection information
-   write_netcdf_proj(f_out, grid);
-
-   // Define Dimensions
-   NcDim lat_dim = add_dim(f_out, "lat", (long) grid.ny());
-   NcDim lon_dim = add_dim(f_out, "lon", (long) grid.nx());
+   write_netcdf_proj(f_out, grid, lat_dim, lon_dim);
 
    // Add the lat/lon variables
    write_netcdf_latlon(f_out, &lat_dim, &lon_dim, grid);
@@ -378,7 +382,7 @@ void usage() {
         << "\t-to   lat lon\n"
         << "\t[-method type]\n"
         << "\t[-width n]\n"
-	      << "\t[-shape SHAPE]\n"
+        << "\t[-shape SHAPE]\n"
         << "\t[-log file]\n"
         << "\t[-v level]\n"
         << "\t[-compress level]\n\n"
@@ -408,8 +412,6 @@ void usage() {
 
         << "\t\t\"-shape\" overrides the default interpolation shape (SQUARE) "
         << "(optional).\n"
-
-
 
         << "\t\t\"-log file\" outputs log messages to the specified "
         << "file (optional).\n"

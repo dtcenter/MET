@@ -470,6 +470,7 @@ Mean Error (ME)
 ---------------
 
 Called "ME" in CNT output :numref:`table_PS_format_info_CNT`
+Called "ME_OERR", "ME_GE_OBS", and "ME_LT_OBS" in ECNT output :numref:`table_ES_header_info_es_out_ECNT`
 
 The Mean Error, ME, is a measure of overall bias for continuous variables; in particular ME = Bias. It is defined as 
 
@@ -504,6 +505,7 @@ Root-mean-squared error (RMSE)
 ------------------------------
 
 Called "RMSE" in CNT output :numref:`table_PS_format_info_CNT`
+Called "RMSE" and "RMSE_OERR" in ECNT output :numref:`table_ES_header_info_es_out_ECNT`
 
 RMSE is simply the square root of the MSE, :math:`\text{RMSE} = \sqrt{\text{MSE}}`. 
 
@@ -539,6 +541,7 @@ Mean Absolute Error (MAE)
 -------------------------
 
 Called "MAE" in CNT output :numref:`table_PS_format_info_CNT`
+Called "MAE" and "MAE_OERR" in ECNT output :numref:`table_ES_header_info_es_out_ECNT`
 
 The Mean Absolute Error (MAE) is defined as :math:`\text{MAE} = \frac{1}{n} \sum|f_{i} - o_{i}|`.
 
@@ -974,7 +977,7 @@ CRPS
 
 Called "CRPS", "CRPSCL", "CRPS_EMP", "CRPS_EMP_FAIR" and "CRPSCL_EMP" in ECNT output :numref:`table_ES_header_info_es_out_ECNT`
 
-The continuous ranked probability score (CRPS) is the integral, over all possible thresholds, of the Brier scores (:ref:`Gneiting et al., 2004 <Gneiting-2004>`). In MET, the CRPS is calculated two ways: using a normal distribution fit to the ensemble forecasts (CRPS and CRPSCL), and using the empirical ensemble distribution (CRPS_EMP and CRPSCL_EMP). The empirical ensemble CRPS is also adjusted by subtracting 1/2(m) times the mean absolute difference of the ensemble members (where m is the ensemble size), this is saved as CRPS_EMP_FAIR. In some cases, use of other distributions would be better.
+The continuous ranked probability score (CRPS) is the integral, over all possible thresholds, of the Brier scores (:ref:`Gneiting et al., 2004 <Gneiting-2004>`). In MET, the CRPS is calculated two ways: using a normal distribution fit to the ensemble forecasts (CRPS and CRPSCL), and using the empirical ensemble distribution (CRPS_EMP and CRPSCL_EMP). The empirical ensemble CRPS can be adjusted (bias corrected) by subtracting 1/(2*m) times the mean absolute difference of the ensemble members, where m is the ensemble size. This is reported as a separate statistic called CRPS_EMP_FAIR. In some cases, use of other distributions would be better.
 
 WARNING: The normal distribution is probably a good fit for temperature and pressure, and possibly a not horrible fit for winds. However, the normal approximation will not work on most precipitation forecasts and may fail for many other atmospheric variables.
 
@@ -984,13 +987,34 @@ Closed form expressions for the CRPS are difficult to define when using data rat
 
 In this equation, the y represents the event threshold. The estimated mean and standard deviation of the ensemble forecasts ( :math:`\mu \text{ and } \sigma`) are used as the parameters of the normal distribution. The values of the normal distribution are represented by the probability density function (PDF) denoted by :math:`\Phi` and the cumulative distribution function (CDF), denoted in the above equation by :math:`\phi`. 
 
-The overall CRPS is calculated as the average of the individual measures. In equation form: :math:`\text{CRPS} = \text{average(crps) } = \frac{1}{N} \sum_i^N \text{crps}_i`.
+The overall CRPS is calculated as the average of the individual measures. In equation form:
+
+.. math:: \text{CRPS} = \text{average(crps) } = \frac{1}{N} \sum_{i=1}^N \text{crps}_i
 
 The score can be interpreted as a continuous version of the mean absolute error (MAE). Thus, the score is negatively oriented, so smaller is better. Further, similar to MAE, bias will inflate the CRPS. Thus, bias should also be calculated and considered when judging forecast quality using CRPS.
 
-To calculate CRPS_EMP_FAIR (bias adjusted, empirical ensemble CRPS)
+To calculate crps_emp_fair (bias adjusted, empirical ensemble CRPS) for each individual observation with m ensemble members:
 
-.. math:: \text{CRPS_EMP_FAIR} = \text{CRPS_EMP} - \frac{1}{2*n} *  \frac{1}{n*(n-1)} \sum|f_{i} - f_{j}|
+.. math:: \text{crps_emp_fair}_i = \text{crps_emp}_i - \frac{1}{2*m} *  \frac{1}{m*(m-1)} \sum_{i \ne j}|f_{i} - f_{j}|
+
+The overall CRPS_EMP_FAIR is calculated as the average of the individual measures. In equation form:
+
+.. math:: \text{CRPS_EMP_FAIR} = \text{average(crps_emp_fair) } = \frac{1}{N} \sum_{i=1}^N \text{crps_emp_fair}_i
+
+Ensemble Mean Absolute Difference
+---------------------------------
+
+Called "SPREAD_MD" in ECNT output :numref:`table_ES_header_info_es_out_ECNT`
+
+The ensemble mean absolute difference is an alternative measure of ensemble spread. It is computed for each individual observation (denoted by a lowercase spread_md) with m ensemble members:
+
+.. math:: \text{spread_md}_i = \frac{1}{m*(m-1)} \sum_{i \ne j}|f_{i} - f_{j}|
+
+The overall SPREAD_MD is calculated as the average of the individual measures. In equation form:
+
+.. math:: \text{SPREAD_MD} = \text{average(spread_md) } = \frac{1}{N} \sum_{i=1}^N \text{spread_md}_i
+
+A perfect forecast would have ensemble mean absolute difference = 0.
           
 CRPS Skill Score
 ----------------
@@ -1002,6 +1026,19 @@ The continuous ranked probability skill score (CRPSS) is similar to the MSESS an
 .. math:: \text{CRPSS} = 1 - \frac{\text{CRPS}_{fcst}}{ \text{CRPS}_{ref}}
 
 For the normal distribution fit (CRPSS), the reference CRPS is computed using the climatological mean and standard deviation. For the empirical distribution (CRPSS_EMP), the reference CRPS is computed by sampling from the assumed normal climatological distribution defined by the mean and standard deviation.  
+
+Bias Ratio
+----------
+
+Called "BIAS_RATIO" in ECNT output :numref:`table_ES_header_info_es_out_ECNT`
+
+The bias ratio (BIAS_RATIO) is computed when verifying an ensemble against gridded analyses or point observations. It is defined as the mean error (ME) of ensemble member values greater than or equal to the observation value to which they are matched divided by the absolute value of the mean error (ME) of ensemble member values less than the observation values.
+
+.. math:: \text{BIAS_RATIO} = \frac{ \text{ME}_{f >= o} }{ |\text{ME}_{f < o}| }
+
+A perfect forecast has ME = 0. Since BIAS_RATIO is computed as the high bias (ME_GE_OBS) divide by the absolute value of the low bias (ME_LT_OBS), a perfect forecast has BIAS_RATIO = 0/0, which is undefined. In practice, the high and low bias values are unlikely to be 0.
+
+The range for BIAS_RATIO is 0 to infinity. A score of 1 indicates that the high and low biases are equal. A score greater than 1 indicates that the high bias is larger than the magnitude of the low bias. A score less than 1 indicates the opposite behavior.
 
 IGN
 ---

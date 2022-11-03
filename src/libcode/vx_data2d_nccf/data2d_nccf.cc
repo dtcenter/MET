@@ -17,6 +17,9 @@ using namespace std;
 #include <stdlib.h>
 #include <cmath>
 
+#include <netcdf>
+using namespace netCDF;
+
 #include "data2d_nccf.h"
 #include "vx_math.h"
 #include "vx_log.h"

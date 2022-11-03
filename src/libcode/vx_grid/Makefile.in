@@ -118,7 +118,8 @@ am_libvx_grid_a_OBJECTS = libvx_grid_a-earth_rotation.$(OBJEXT) \
 	libvx_grid_a-latlon_xyz.$(OBJEXT) \
 	libvx_grid_a-rot_latlon_grid.$(OBJEXT) \
 	libvx_grid_a-tcrmw_grid.$(OBJEXT) \
-	libvx_grid_a-goes_grid.$(OBJEXT)
+	libvx_grid_a-goes_grid.$(OBJEXT) \
+	libvx_grid_a-semilatlon_grid.$(OBJEXT)
 libvx_grid_a_OBJECTS = $(am_libvx_grid_a_OBJECTS)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -145,6 +146,7 @@ am__depfiles_remade = ./$(DEPDIR)/libvx_grid_a-earth_rotation.Po \
 	./$(DEPDIR)/libvx_grid_a-lc_grid.Po \
 	./$(DEPDIR)/libvx_grid_a-merc_grid.Po \
 	./$(DEPDIR)/libvx_grid_a-rot_latlon_grid.Po \
+	./$(DEPDIR)/libvx_grid_a-semilatlon_grid.Po \
 	./$(DEPDIR)/libvx_grid_a-st_grid.Po \
 	./$(DEPDIR)/libvx_grid_a-tcrmw_grid.Po
 am__mv = mv -f
@@ -370,7 +372,10 @@ libvx_grid_a_SOURCES = \
               latlon_xyz.h latlon_xyz.cc \
               rot_latlon_grid.cc rot_latlon_grid.h \
               tcrmw_grid.cc tcrmw_grid.h \
-              goes_grid_defs.h goes_grid.cc goes_grid.h \
+              goes_grid_defs.h \
+              goes_grid.cc goes_grid.h \
+              semilatlon_grid_defs.h \
+              semilatlon_grid.cc semilatlon_grid.h \
               vx_grid.h
 
 libvx_grid_a_CPPFLAGS = ${MET_CPPFLAGS}
@@ -432,6 +437,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_grid_a-lc_grid.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_grid_a-merc_grid.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_grid_a-rot_latlon_grid.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_grid_a-semilatlon_grid.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_grid_a-st_grid.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_grid_a-tcrmw_grid.Po@am__quote@ # am--include-marker
 
@@ -623,6 +629,20 @@ libvx_grid_a-goes_grid.obj: goes_grid.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_grid_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_grid_a-goes_grid.obj `if test -f 'goes_grid.cc'; then $(CYGPATH_W) 'goes_grid.cc'; else $(CYGPATH_W) '$(srcdir)/goes_grid.cc'; fi`
 
+libvx_grid_a-semilatlon_grid.o: semilatlon_grid.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_grid_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_grid_a-semilatlon_grid.o -MD -MP -MF $(DEPDIR)/libvx_grid_a-semilatlon_grid.Tpo -c -o libvx_grid_a-semilatlon_grid.o `test -f 'semilatlon_grid.cc' || echo '$(srcdir)/'`semilatlon_grid.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvx_grid_a-semilatlon_grid.Tpo $(DEPDIR)/libvx_grid_a-semilatlon_grid.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='semilatlon_grid.cc' object='libvx_grid_a-semilatlon_grid.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_grid_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_grid_a-semilatlon_grid.o `test -f 'semilatlon_grid.cc' || echo '$(srcdir)/'`semilatlon_grid.cc
+
+libvx_grid_a-semilatlon_grid.obj: semilatlon_grid.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_grid_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_grid_a-semilatlon_grid.obj -MD -MP -MF $(DEPDIR)/libvx_grid_a-semilatlon_grid.Tpo -c -o libvx_grid_a-semilatlon_grid.obj `if test -f 'semilatlon_grid.cc'; then $(CYGPATH_W) 'semilatlon_grid.cc'; else $(CYGPATH_W) '$(srcdir)/semilatlon_grid.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvx_grid_a-semilatlon_grid.Tpo $(DEPDIR)/libvx_grid_a-semilatlon_grid.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='semilatlon_grid.cc' object='libvx_grid_a-semilatlon_grid.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_grid_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_grid_a-semilatlon_grid.obj `if test -f 'semilatlon_grid.cc'; then $(CYGPATH_W) 'semilatlon_grid.cc'; else $(CYGPATH_W) '$(srcdir)/semilatlon_grid.cc'; fi`
+
 ID: $(am__tagged_files)
 	$(am__define_uniq_tagged_files); mkid -fID $$unique
 tags: tags-am
@@ -758,6 +778,7 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/libvx_grid_a-lc_grid.Po
 	-rm -f ./$(DEPDIR)/libvx_grid_a-merc_grid.Po
 	-rm -f ./$(DEPDIR)/libvx_grid_a-rot_latlon_grid.Po
+	-rm -f ./$(DEPDIR)/libvx_grid_a-semilatlon_grid.Po
 	-rm -f ./$(DEPDIR)/libvx_grid_a-st_grid.Po
 	-rm -f ./$(DEPDIR)/libvx_grid_a-tcrmw_grid.Po
 	-rm -f Makefile
@@ -815,6 +836,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/libvx_grid_a-lc_grid.Po
 	-rm -f ./$(DEPDIR)/libvx_grid_a-merc_grid.Po
 	-rm -f ./$(DEPDIR)/libvx_grid_a-rot_latlon_grid.Po
+	-rm -f ./$(DEPDIR)/libvx_grid_a-semilatlon_grid.Po
 	-rm -f ./$(DEPDIR)/libvx_grid_a-st_grid.Po
 	-rm -f ./$(DEPDIR)/libvx_grid_a-tcrmw_grid.Po
 	-rm -f Makefile

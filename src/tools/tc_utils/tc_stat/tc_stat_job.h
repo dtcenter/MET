@@ -118,8 +118,8 @@ extern ConcatString  tcstatjobtype_to_string(const TCStatJobType);
 
 ////////////////////////////////////////////////////////////////////////
 
-// Struct for counts of lines read and rejected
-struct TCLineCounts {
+// Struct for counts of track points read and rejected
+struct TCPointCounts {
 
    // Read and keep counts
    int NRead;
@@ -129,6 +129,7 @@ struct TCLineCounts {
    int RejTrackWatchWarn;
    int RejInitThresh;
    int RejInitStr;
+   int RejInitDiagThresh;
 
    // Filtering on track attributes
    int RejRIRW;
@@ -153,13 +154,14 @@ struct TCLineCounts {
    int RejWaterOnly;
    int RejColumnThresh;
    int RejColumnStr;
+   int RejDiagThresh;
    int RejMatchPoints;
    int RejEventEqual;
    int RejOutInitMask;
    int RejOutValidMask;
    int RejLeadReq;
 
-   TCLineCounts();
+   TCPointCounts();
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -195,7 +197,7 @@ class TCStatJob {
 
       void clear();
 
-      void dump(ostream &, int depth = 0) const;
+      void dump(std::ostream &, int depth = 0) const;
 
       //////////////////////////////////////////////////////////////////
 
@@ -205,11 +207,15 @@ class TCStatJob {
 
       //////////////////////////////////////////////////////////////////
 
-      bool is_keeper_track(const TrackPairInfo &, TCLineCounts &) const;
+      bool is_keeper_track(const TrackPairInfo &, TCPointCounts &);
 
-      bool is_keeper_line(const TCStatLine &, TCLineCounts &) const;
+      bool is_keeper_line(const TCStatLine &, TCPointCounts &) const;
 
       double get_column_double(const TCStatLine &, const ConcatString &) const;
+
+      bool is_keeper_tcdiag(const StringArray &, const TrackPoint &, TCPointCounts &);
+
+      double get_diag_double(const StringArray &, const TrackPoint &, const ConcatString &);
 
       //////////////////////////////////////////////////////////////////
 
@@ -224,20 +230,20 @@ class TCStatJob {
       void open_stat_file();
       void close_stat_file();
 
-      void dump_pair(const TrackPairInfo &, ofstream *);
-      void dump_line(const TCStatLine &,    ofstream *);
+      void dump_pair(const TrackPairInfo &, std::ofstream *);
+      void dump_line(const TCStatLine &,    std::ofstream *);
 
       virtual ConcatString serialize() const;
 
       //////////////////////////////////////////////////////////////////
 
-      virtual void do_job(const StringArray &, TCLineCounts &);
+      virtual void do_job(const StringArray &, TCPointCounts &);
 
       void event_equalize_tracks();
 
       void event_equalize_lines();
 
-      void subset_track_pair(TrackPairInfo &,  TCLineCounts &);
+      void subset_track_pair(TrackPairInfo &,  TCPointCounts &);
 
       //////////////////////////////////////////////////////////////////
 
@@ -285,27 +291,32 @@ class TCStatJob {
       bool WaterOnly;
 
       // Numeric column thresholds
-      map<ConcatString,ThreshArray> ColumnThreshMap;
+      std::map<ConcatString,ThreshArray> ColumnThreshMap;
 
       // ASCII column string matching
-      map<ConcatString,StringArray> ColumnStrIncMap;
-      map<ConcatString,StringArray> ColumnStrExcMap;
+      std::map<ConcatString,StringArray> ColumnStrIncMap;
+      std::map<ConcatString,StringArray> ColumnStrExcMap;
 
       // Numeric column thresholds
-      map<ConcatString,ThreshArray> InitThreshMap;
+      std::map<ConcatString,ThreshArray> InitThreshMap;
 
       // ASCII column string matching
-      map<ConcatString,StringArray> InitStrIncMap;
-      map<ConcatString,StringArray> InitStrExcMap;
+      std::map<ConcatString,StringArray> InitStrIncMap;
+      std::map<ConcatString,StringArray> InitStrExcMap;
+
+      // Numeric diagnostic thresholds
+      std::map<ConcatString,ThreshArray> DiagThreshMap;
+      std::map<ConcatString,ThreshArray> InitDiagThreshMap;
+      StringArray                        PrintDiagWarning;
 
       // Variables to the store the analysis job specification
-      ConcatString DumpFile;        // Dump TrackPairInfo used to a file
-      ofstream    *DumpOut;         // Dump output file stream
-      ofstream    *JobOut;          // Job output file stream (not allocated)
+      ConcatString DumpFile;             // Dump TrackPairInfo used to a file
+      std::ofstream    *DumpOut;         // Dump output file stream
+      std::ofstream    *JobOut;          // Job output file stream (not allocated)
 
       // Derived output statistics
-      ConcatString StatFile;        // File name for output statistics
-      ofstream    *StatOut;         // Output statistics file stream
+      ConcatString StatFile;             // File name for output statistics
+      std::ofstream    *StatOut;         // Output statistics file stream
 
       // Polyline masking regions
       ConcatString OutInitMaskFile;
@@ -371,12 +382,12 @@ class TCStatJobFilter : public TCStatJob {
 
       void clear();
 
-      void do_job(const StringArray &, TCLineCounts &); // virtual from base class
+      void do_job(const StringArray &, TCPointCounts &); // virtual from base class
 
-      void filter_tracks(TCLineCounts &);
-      void filter_lines (TCLineCounts &);
+      void filter_tracks(TCPointCounts &);
+      void filter_lines (TCPointCounts &);
 
-      void do_output(ostream &);
+      void do_output(std::ostream &);
 
 };
 
@@ -405,17 +416,17 @@ class TCStatJobSummary : public TCStatJob {
 
       ConcatString serialize() const;
 
-      void do_job(const StringArray &, TCLineCounts &); // virtual from base class
+      void do_job(const StringArray &, TCPointCounts &); // virtual from base class
 
-      void summarize_tracks(TCLineCounts &);
-      void summarize_lines (TCLineCounts &);
+      void summarize_tracks(TCPointCounts &);
+      void summarize_lines (TCPointCounts &);
 
       void process_pair(TrackPairInfo &);
       void process_line(TCStatLine &);
 
-      void add_map(map<ConcatString,SummaryMapData,cs_cmp>&);
+      void add_map(std::map<ConcatString,SummaryMapData,cs_cmp>&);
 
-      void do_output(ostream &);
+      void do_output(std::ostream &);
 
       void compute_fsp(NumArray &, NumArray &, NumArray &);
 
@@ -436,7 +447,7 @@ class TCStatJobSummary : public TCStatJob {
       SingleThresh FSPThresh;
 
       // Map column and case info to column values
-      map<ConcatString,SummaryMapData,cs_cmp> SummaryMap;
+      std::map<ConcatString,SummaryMapData,cs_cmp> SummaryMap;
 
 };
 
@@ -451,7 +462,7 @@ class TCStatJobRIRW : public TCStatJob {
       void assign(const TCStatJobRIRW &);
 
       ConcatString DumpFileCTC[4];
-      ofstream    *DumpOutCTC[4];
+      std::ofstream    *DumpOutCTC[4];
 
    public:
 
@@ -469,16 +480,16 @@ class TCStatJobRIRW : public TCStatJob {
 
       ConcatString serialize() const;
 
-      void do_job(const StringArray &, TCLineCounts &); // virtual from base class
+      void do_job(const StringArray &, TCPointCounts &); // virtual from base class
 
       void process_pair(TrackPairInfo &);
 
-      void add_map(map<ConcatString,RIRWMapData,cs_cmp>&);
+      void add_map(std::map<ConcatString,RIRWMapData,cs_cmp>&);
 
-      void do_output    (ostream &);
-      void do_ctc_output(ostream &);
-      void do_cts_output(ostream &);
-      void do_mpr_output(ostream &);
+      void do_output    (std::ostream &);
+      void do_ctc_output(std::ostream &);
+      void do_cts_output(std::ostream &);
+      void do_mpr_output(std::ostream &);
 
       // Store the case information
       StringArray ByColumn;
@@ -490,7 +501,7 @@ class TCStatJobRIRW : public TCStatJob {
       StringArray OutLineType;
 
       // Map column and case info to column values
-      map<ConcatString,RIRWMapData,cs_cmp> RIRWMap;
+      std::map<ConcatString,RIRWMapData,cs_cmp> RIRWMap;
 
 };
 
@@ -519,11 +530,11 @@ class TCStatJobProbRIRW : public TCStatJob {
 
       ConcatString serialize() const;
 
-      void do_job(const StringArray &, TCLineCounts &); // virtual from base class
+      void do_job(const StringArray &, TCPointCounts &); // virtual from base class
 
       void process_pair(ProbRIRWPairInfo &);
 
-      void do_output(ostream &);
+      void do_output(std::ostream &);
 
       // Probability information
       bool         ProbRIRWExact;        // True for exact change, false for maximum change
@@ -544,7 +555,7 @@ class TCStatJobProbRIRW : public TCStatJob {
       StringArray OutLineType;
 
       // Map column and case info to column values
-      map<ConcatString,ProbRIRWMapData,cs_cmp> ProbRIRWMap;
+      std::map<ConcatString,ProbRIRWMapData,cs_cmp> ProbRIRWMap;
 
 };
 

@@ -24,6 +24,10 @@ ascii2nc_SOURCES = ascii2nc.cc \
 	met_handler.cc met_handler.h \
 	surfrad_handler.cc surfrad_handler.h \
 	wwsis_handler.cc wwsis_handler.h \
+	airnow_handler.cc airnow_handler.h \
+	ndbc_handler.cc ndbc_handler.h \
+	ndbc_locations.cc ndbc_locations.h \
+	airnow_locations.cc airnow_locations.h \
 	aeronet_handler.cc aeronet_handler.h $(OPT_PYTHON_SOURCES)
 
 ascii2nc_CPPFLAGS = ${MET_CPPFLAGS} -I../../../basic/vx_log

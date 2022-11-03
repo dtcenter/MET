@@ -39,6 +39,8 @@ tablefiles_DATA = \
 	met_header_columns_V3.0.1.txt \
 	met_header_columns_V3.0.txt \
 	met_header_columns_V2.0.txt \
+	airnow_monitoring_site_locations_v2.txt \
+	ndbc_stations.xml \
 	stat_column_description.txt \
 	obs_error_table.txt \
 	grib1_af_131_57.txt \

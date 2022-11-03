@@ -63,9 +63,6 @@ TrackPairInfo & TrackPairInfo::operator=(const TrackPairInfo & t) {
 
 void TrackPairInfo::init_from_scratch() {
 
-   // Initialize pointers
-   Line = (TCStatLine *) 0;
-
    clear();
 
    return;
@@ -76,6 +73,7 @@ void TrackPairInfo::init_from_scratch() {
 void TrackPairInfo::clear() {
 
    NPoints = 0;
+   NLines = 0;
    ADeck.clear();
    BDeck.clear();
    ADeckDLand.clear();
@@ -90,9 +88,8 @@ void TrackPairInfo::clear() {
    ADeckPrvInt.clear();
    BDeckPrvInt.clear();
    Keep.clear();
-
-   if(Line) { delete [] Line; Line = (TCStatLine *) 0; }
-   NLines = NAlloc = 0;
+   TCMPRLine.clear();
+   TCDIAGLine.clear();
 
    return;
 }
@@ -103,6 +100,7 @@ void TrackPairInfo::dump(ostream &out, int indent_depth) const {
    Indent prefix(indent_depth);
 
    out << prefix << "NPoints = " << NPoints << "\n";
+   out << prefix << "NLines = " << NLines << "\n";
    out << prefix << "ADeck:\n";
    ADeck.dump(out, indent_depth+1);
    out << prefix << "BDeck:\n";
@@ -131,7 +129,6 @@ void TrackPairInfo::dump(ostream &out, int indent_depth) const {
    BDeckPrvInt.dump(out, indent_depth+1);
    out << prefix << "Keep:\n";
    Keep.dump(out, indent_depth+1);
-   out << prefix << "NLines = " << NLines << "\n";
    out << flush;
 
    return;
@@ -199,6 +196,7 @@ void TrackPairInfo::assign(const TrackPairInfo &t) {
    clear();
 
    NPoints       = t.NPoints;
+   NLines        = t.NLines;
    ADeck         = t.ADeck;
    BDeck         = t.BDeck;
    ADeckDLand    = t.ADeckDLand;
@@ -213,54 +211,8 @@ void TrackPairInfo::assign(const TrackPairInfo &t) {
    ADeckPrvInt   = t.ADeckPrvInt;
    BDeckPrvInt   = t.BDeckPrvInt;
    Keep          = t.Keep;
-
-   extend(t.NLines);
-
-   for(i=0; i<t.NLines; i++) Line[i] = t.Line[i];
-
-   NLines = t.NLines;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void TrackPairInfo::extend(int n, bool exact) {
-   int j, k;
-   TCStatLine *new_line = (TCStatLine *) 0;
-
-   // Check if enough memory is already allocated
-   if(NAlloc >= n) return;
-
-   // Compute the allocation size
-   if(!exact) {
-      k = n/TrackPairLineAllocInc;
-      if(n%TrackPairLineAllocInc) k++;
-      n = k*TrackPairLineAllocInc;
-   }
-
-   // Allocate a new TCStatLine array of the required length
-   new_line = new TCStatLine [n];
-
-   if(!new_line) {
-      mlog << Error
-           << "\nvoid TrackPairInfo::extend(int, bool) -> "
-           << "memory allocation error\n\n";
-      exit(1);
-   }
-
-   // Copy the array contents and delete the old one
-   if(Line) {
-      for(j=0; j<NLines; j++) new_line[j] = Line[j];
-      delete [] Line; Line = (TCStatLine *) 0;
-   }
-
-   // Point to the new array
-   Line     = new_line;
-   new_line = (TCStatLine *) 0;
-
-   // Store the allocated length
-   NAlloc = n;
+   TCMPRLine     = t.TCMPRLine;
+   TCDIAGLine    = t.TCDIAGLine;
 
    return;
 }
@@ -311,8 +263,7 @@ void TrackPairInfo::set_keep(int i, int val) {
 
    // Check range
    if(i < 0 || i >= NPoints) {
-      mlog << Error
-           << "\nTrackPairInfo::set_keep(int, int) -> "
+      mlog << Error << "\nTrackPairInfo::set_keep(int, int) -> "
            << "range check error for index value " << i << "\n\n";
       exit(1);
    }
@@ -322,6 +273,10 @@ void TrackPairInfo::set_keep(int i, int val) {
    return;
 }
 
+////////////////////////////////////////////////////////////////////////
+//
+// Add derived TrackPoint pairs such as for consensus tracks
+//
 ////////////////////////////////////////////////////////////////////////
 
 void TrackPairInfo::add(const TrackPoint &a, const TrackPoint &b,
@@ -354,6 +309,17 @@ void TrackPairInfo::add(const TrackPoint &a, const TrackPoint &b,
 ////////////////////////////////////////////////////////////////////////
 
 void TrackPairInfo::add(const TCStatLine &l) {
+
+   // Check the line type
+        if(l.type() == TCStatLineType_TCMPR)  add_tcmpr_line(l);
+   else if(l.type() == TCStatLineType_TCDIAG) add_tcdiag_line(l);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TrackPairInfo::add_tcmpr_line(const TCStatLine &l) {
    TrackPoint apoint, bpoint;
    TrackPoint *tp = (TrackPoint *) 0;
    QuadInfo wind;
@@ -363,8 +329,14 @@ void TrackPairInfo::add(const TCStatLine &l) {
    // Check the line type
    if(l.type() != TCStatLineType_TCMPR) return;
 
-   // Increment the count
+   // Store the input TCMPR line and TCDIAG placeholder
+   TCMPRLine.push_back(l);
+   TCStatLine empty_line;
+   TCDIAGLine.push_back(empty_line);
+
+   // Increment the point and line count
    NPoints++;
+   NLines++;
 
    // Initialize the ADECK/BDECK tracks
    if(NPoints == 1) initialize(l);
@@ -404,7 +376,7 @@ void TrackPairInfo::add(const TCStatLine &l) {
       cs << cs_erase << deck[i] << "SPEED";
       tp->set_speed(atof(l.get_item(cs.c_str())));
       cs << cs_erase << deck[i] << "DEPTH";
-      tp->set_eye(string_to_systemsdepth(l.get_item(cs.c_str())));
+      tp->set_depth(string_to_systemsdepth(l.get_item(cs.c_str())));
       tp->set_watch_warn(string_to_watchwarntype(l.get_item("WATCH_WARN")));
 
       // Loop over the winds
@@ -433,6 +405,13 @@ void TrackPairInfo::add(const TCStatLine &l) {
       } // end for j
    } // end for i
 
+   // Set the consensus track variables
+   apoint.set_num_members(atoi(l.get_item("NUM_MEMBERS")));
+   apoint.set_spread(atof(l.get_item("TRACK_SPREAD")));
+   apoint.set_dist_mean(atof(l.get_item("DIST_MEAN")));
+   apoint.set_v_max_stdev(atof(l.get_item("MAX_WIND_SPREAD")));
+   apoint.set_mslp_stdev(atof(l.get_item("MSLP_SPREAD")));
+   
    // Add the TrackPoints to the ADECK/BDECK tracks
    ADeck.add(apoint);
    BDeck.add(bpoint);
@@ -450,9 +429,88 @@ void TrackPairInfo::add(const TCStatLine &l) {
    BDeckPrvInt.add(bad_data_double);
    Keep.add(1);
 
-   // Store the input line
-   extend(NLines + 1, false);
-   Line[NLines++] = l;
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TrackPairInfo::add_tcdiag_line(const TCStatLine &l) {
+   int n_diag, i;
+   ConcatString cs;
+
+   // Check the line type
+   if(l.type() != TCStatLineType_TCDIAG) return;
+
+   // Should have already parsed TCMPR
+   if(NPoints == 0) {
+      mlog << Error << "\nTrackPairInfo::add_tcdiag_line() -> "
+           << "each TCDIAG line must be preceded by the TCMPR line "
+           << "to which it corresponds:\n"
+           << "  " << l << "\n\n";
+      exit(1);
+   }
+
+   // Check for a match
+   if(ADeck.storm_id()        != l.storm_id() ||
+      ADeck.technique()       != l.amodel()   ||
+      ADeck.init()            != l.init()     ||
+      ADeck[NPoints-1].lead() != l.lead()) {
+      mlog << Error << "\nTrackPairInfo::add_tcdiag_line() -> "
+           << "the TCDIAG data does not match the TCMPR data:\n"
+           << "   TCMPR Line: " << TCMPRLine[NPoints-1] << "\n"
+           << "  TCDIAG Line: " << l << "\n\n";
+      exit(1);
+   }
+
+   // Update the TCDIAGLine for this TrackPoint
+   TCDIAGLine[NPoints-1] = l;
+
+   // Increment the line count
+   NLines++;
+
+   // Name of diagnostics read
+   StringArray diag_name;
+
+   // Diagnostic source type
+   DiagType t = string_to_diagtype(l.get_item("SOURCE"));
+
+   // Make sure the source type does not change
+   if(ADeck.diag_source() != DiagType_None &&
+      ADeck.diag_source() != t) {
+      mlog << Error << "\nTrackPairInfo::add_tcdiag_line() -> "
+           << "the diagnostic source type has changed ("
+           << diagtype_to_string(ADeck.diag_source()) << " != "
+           << diagtype_to_string(t) << ")!\n\n";
+      exit(1);
+   }
+
+   // Store the source type
+   ADeck.set_diag_source(t);
+
+   // Number of diagnostics
+   n_diag = atoi(l.get_item("N_DIAG"));
+
+   // Parse all the diagnostics entries
+   for(i=0; i<n_diag; i++) {
+      cs << cs_erase << "DIAG_" << i+1;
+      diag_name.add(l.get_item(cs.c_str()));
+      cs << cs_erase << "VALUE_" << i+1;
+      ADeck.add_diag_value(NPoints-1,
+                           atof(l.get_item(cs.c_str())));
+   }
+
+   // Store the diagnostic names
+   if(ADeck.n_diag() == 0) {
+      ADeck.set_diag_name(diag_name);
+   }
+   // Make sure they do not change
+   else if(ADeck.diag_name().n() != diag_name.n()) {
+      mlog << Error << "\nTrackPairInfo::add_tcdiag_line() -> "
+           << "the number of TCDIAG diagnostics have changed ("
+           << ADeck.diag_name().n() << " != " << diag_name.n()
+           << ")!\n\n";
+      exit(1);
+   }
 
    return;
 }
@@ -568,7 +626,7 @@ int TrackPairInfo::check_rirw(const TrackType track_type,
    if(!exact_adeck &&
       st_adeck.get_type() != thresh_lt && st_adeck.get_type() != thresh_le &&
       st_adeck.get_type() != thresh_gt && st_adeck.get_type() != thresh_ge) {
-      mlog << Error << "\ncheck_rirw() -> "
+      mlog << Error << "\nTrackPairInfo::check_rirw() -> "
            << "for non-exact intensity differences the RI/RW threshold ("
            << st_adeck.get_str() << ") must be of type <, <=, >, or >=.\n\n";
       exit(1);
@@ -578,7 +636,7 @@ int TrackPairInfo::check_rirw(const TrackType track_type,
    if(!exact_bdeck &&
       st_bdeck.get_type() != thresh_lt && st_bdeck.get_type() != thresh_le &&
       st_bdeck.get_type() != thresh_gt && st_bdeck.get_type() != thresh_ge) {
-      mlog << Error << "\ncheck_rirw() -> "
+      mlog << Error << "\nTrackPairInfo::check_rirw() -> "
            << "for non-exact intensity differences the RI/RW threshold ("
            << st_bdeck.get_str() << ") must be of type <, <=, >, or >=.\n\n";
       exit(1);
@@ -794,8 +852,9 @@ TrackPairInfo TrackPairInfo::keep_subset() const {
       if(Keep[i] == 0) continue;
 
       // Add from TC-Stat line data
-      if(NLines == NPoints) {
-         tpi.add(Line[i]);
+      if(TCMPRLine.size() > 0) {
+         tpi.add_tcmpr_line(TCMPRLine[i]);
+         tpi.add_tcdiag_line(TCDIAGLine[i]);
       }
       // Otherwise, add from TC-Pairs track pair
       else {
@@ -956,8 +1015,7 @@ void TrackPairInfoArray::extend(int n, bool exact) {
    new_info = new TrackPairInfo [n];
 
    if(!new_info) {
-      mlog << Error
-           << "\nvoid TrackPairInfoArray::extend(int, bool) -> "
+      mlog << Error << "\nTrackPairInfoArray::extend(int, bool) -> "
            << "memory allocation error\n\n";
       exit(1);
    }
@@ -984,8 +1042,7 @@ const TrackPairInfo & TrackPairInfoArray::operator[](int n) const {
 
    // Check range
    if((n < 0) || (n >= NPairs)) {
-      mlog << Error
-           << "\nTrackPairInfoArray::operator[](int) -> "
+      mlog << Error << "\nTrackPairInfoArray::operator[](int) -> "
            << "range check error for index value " << n << "\n\n";
       exit(1);
    }
@@ -999,6 +1056,18 @@ int TrackPairInfoArray::n_points() const {
    int i, n;
 
    for(i=0,n=0; i<NPairs; i++) n += Pair[i].adeck().n_points();
+
+   return(n);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int TrackPairInfoArray::max_n_diag() const {
+   int i, n;
+
+   for(i=0,n=0; i<NPairs; i++) {
+      if(Pair[i].adeck().n_diag() > n) n = Pair[i].adeck().n_diag();
+   }
 
    return(n);
 }

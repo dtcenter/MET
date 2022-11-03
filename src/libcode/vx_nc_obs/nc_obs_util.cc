@@ -18,6 +18,9 @@ using namespace std;
 
 #include <iostream>
 
+#include <netcdf>
+using namespace netCDF;
+
 #include "vx_nc_util.h"
 
 #include "nc_obs_util.h"
@@ -477,6 +480,9 @@ void NetcdfObsVars::read_dims_vars(NcFile *f_in) {
    obs_dim     = get_nc_dim(f_in, nc_dim_nobs);     // Observation array length
    hdr_dim     = get_nc_dim(f_in, nc_dim_nhdr);     // Header array length
 
+   use_var_id = false;
+   get_global_att(f_in, nc_att_use_var_id, use_var_id);
+
    // Get netCDF header variables
    hdr_typ_var = get_var(f_in, nc_var_hdr_typ);     // Message type (String or int)
    hdr_sid_var = get_var(f_in, nc_var_hdr_sid);     // Station ID (String or int)
@@ -500,10 +506,14 @@ void NetcdfObsVars::read_dims_vars(NcFile *f_in) {
       obs_arr_var = get_var(f_in, nc_var_obs_arr);
    } else {
       obs_hid_var = ncVar;                             // Obs. header id array
-      ncVar = get_var(f_in, nc_var_obs_gc);
-      if (!IS_INVALID_NC(ncVar)) obs_gc_var  = ncVar;  // Obs. grib code array
-      ncVar = get_var(f_in, nc_var_obs_vid);
-      if (!IS_INVALID_NC(ncVar)) obs_vid_var = ncVar;  // Obs. variable id array
+      if (use_var_id) {
+         ncVar = get_var(f_in, nc_var_obs_vid);
+         if (!IS_INVALID_NC(ncVar)) obs_vid_var = ncVar;  // Obs. variable id array
+      }
+      else {
+         ncVar = get_var(f_in, nc_var_obs_gc);
+         if (!IS_INVALID_NC(ncVar)) obs_gc_var  = ncVar;  // Obs. grib code array
+      }
       obs_lvl_var = get_var(f_in, nc_var_obs_lvl);     // Obs. pressure level array
       obs_hgt_var = get_var(f_in, nc_var_obs_hgt);     // Obs. highth array
       obs_val_var = get_var(f_in, nc_var_obs_val);     // Obs. value array
@@ -513,12 +523,14 @@ void NetcdfObsVars::read_dims_vars(NcFile *f_in) {
    ncVar = get_var(f_in, nc_var_obs_qty_tbl);
    if (!IS_INVALID_NC(ncVar)) obs_qty_tbl_var = ncVar;
 
-   ncVar = get_var(f_in, nc_var_obs_var);
-   if (!IS_INVALID_NC(ncVar)) obs_var = ncVar;
-   ncVar = get_var(f_in, nc_var_unit);
-   if (!IS_INVALID_NC(ncVar)) unit_var = ncVar;
-   ncVar = get_var(f_in, nc_var_desc);
-   if (!IS_INVALID_NC(ncVar)) desc_var = ncVar;
+   if (use_var_id) {
+      ncVar = get_var(f_in, nc_var_obs_var);
+      if (!IS_INVALID_NC(ncVar)) obs_var = ncVar;
+      ncVar = get_var(f_in, nc_var_unit);
+      if (!IS_INVALID_NC(ncVar)) unit_var = ncVar;
+      ncVar = get_var(f_in, nc_var_desc);
+      if (!IS_INVALID_NC(ncVar)) desc_var = ncVar;
+   }
 
    // PrepBufr only headers
    ncVar = get_var(f_in, nc_var_hdr_prpt_typ);
@@ -528,12 +540,6 @@ void NetcdfObsVars::read_dims_vars(NcFile *f_in) {
    ncVar = get_var(f_in, nc_var_hdr_inst_typ);
    if (!IS_INVALID_NC(ncVar)) hdr_inst_typ_var = ncVar;
 
-   bool _use_var_id = false;
-   if (!get_global_att(f_in, nc_att_use_var_id, _use_var_id)) {
-      _use_var_id = IS_VALID_NC(obs_var);
-   }
-
-   use_var_id = _use_var_id;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1249,7 +1255,7 @@ bool is_using_var_id(const char * nc_name) {
    return use_var_id;
 }
 
-////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
 bool is_using_var_id(NcFile *nc_file) {
    bool use_var_id = false;

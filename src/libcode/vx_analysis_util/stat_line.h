@@ -49,7 +49,7 @@ class STATLine : public DataLine {
 
       void clear();
 
-      void dump(ostream &, int depth = 0) const;
+      void dump(std::ostream &, int depth = 0) const;
 
       int read_line(LineDataFile *);   //  virtual from base class
 

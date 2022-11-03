@@ -16,6 +16,7 @@
 //   Mod#   Date      Name           Description
 //   ----   ----      ----           -----------
 //   000    04-15-05  Halley Gotway
+//   001    10-03-22  Prestopnik     MET #2227 Remove using namespace std from header files
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -89,7 +90,7 @@ extern FcstObsSet union_fcst_obs_sets(const FcstObsSet &, const FcstObsSet &);
 
 extern int fcst_obs_sets_overlap(const FcstObsSet &, const FcstObsSet &);
 
-extern ostream & operator<<(ostream &, const FcstObsSet &);
+extern std::ostream & operator<<(std::ostream &, const FcstObsSet &);
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -159,7 +160,7 @@ class SetCollection {
 ///////////////////////////////////////////////////////////////////////////////
 
 
-extern ostream & operator<<(ostream &, const SetCollection &);
+extern std::ostream & operator<<(std::ostream &, const SetCollection &);
 
 
 inline void SetCollection::make_room(const int __n)  { if ( __n > 0 )  extend(n_sets + __n);  return; }

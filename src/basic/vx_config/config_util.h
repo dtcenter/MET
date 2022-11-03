@@ -33,9 +33,9 @@ static const char conf_key_old_prepbufr_map[] = "obs_prefbufr_map";    // for ba
 extern ConcatString    parse_conf_version(Dictionary *dict);
 extern ConcatString    parse_conf_string(Dictionary *dict, const char *, bool check_empty = true);
 extern GrdFileType     parse_conf_file_type(Dictionary *dict);
-extern map<STATLineType,STATOutputType>
+extern std::map<STATLineType,STATOutputType>
                        parse_conf_output_flag(Dictionary *dict, const STATLineType *, int);
-extern map<STATLineType,StringArray>
+extern std::map<STATLineType,StringArray>
                        parse_conf_output_stats(Dictionary *dict);
 extern int             parse_conf_n_vx(Dictionary *dict);
 extern Dictionary      parse_conf_i_vx_dict(Dictionary *dict, int index);
@@ -43,7 +43,7 @@ extern StringArray     parse_conf_tc_model(Dictionary *dict, bool error_out = de
 extern StringArray     parse_conf_message_type(Dictionary *dict, bool error_out = default_dictionary_error_out);
 extern StringArray     parse_conf_sid_list(Dictionary *dict, const char *);
 extern void            parse_sid_mask(const ConcatString &, StringArray &, ConcatString &);
-extern vector<MaskLatLon>
+extern std::vector<MaskLatLon>
                        parse_conf_llpnt_mask(Dictionary *dict);
 extern StringArray     parse_conf_obs_qty_inc(Dictionary *dict);
 extern StringArray     parse_conf_obs_qty_exc(Dictionary *dict);
@@ -51,17 +51,22 @@ extern NumArray        parse_conf_ci_alpha(Dictionary *dict);
 extern NumArray        parse_conf_eclv_points(Dictionary *dict);
 extern ClimoCDFInfo    parse_conf_climo_cdf(Dictionary *dict);
 extern TimeSummaryInfo parse_conf_time_summary(Dictionary *dict);
-extern map<ConcatString,ConcatString> parse_conf_key_value_map(
-                            Dictionary *dict, const char *conf_key_map_name, const char *caller=0);
+extern std::map<ConcatString,ConcatString> parse_conf_key_value_map(
+                          Dictionary *dict, const char *conf_key_map_name, const char *caller=0);
 extern void            parse_add_conf_key_value_map(
-                            Dictionary *dict, const char *conf_key_map_name, map<ConcatString,ConcatString> *m);
-extern map<ConcatString,ConcatString>
+                          Dictionary *dict, const char *conf_key_map_name, std::map<ConcatString,ConcatString> *m);
+extern std::map<ConcatString,ConcatString>
                        parse_conf_message_type_map(Dictionary *dict);
-extern map<ConcatString,StringArray>
+extern std::map<ConcatString,StringArray>
                        parse_conf_message_type_group_map(Dictionary *dict);
-extern map<ConcatString,StringArray> parse_conf_metadata_map(Dictionary *dict);
-extern map<ConcatString,ConcatString>
+extern std::map<ConcatString,StringArray> parse_conf_metadata_map(Dictionary *dict);
+extern std::map<ConcatString,ConcatString>
                        parse_conf_obs_name_map(Dictionary *dict);
+extern std::map<ConcatString,StringArray>
+                       parse_conf_obs_to_qc_map(Dictionary *dict);
+extern std::map<ConcatString,UserFunc_1Arg>
+                       parse_conf_key_convert_map(
+                          Dictionary *dict, const char *conf_key_map_name, const char *caller=0);
 extern BootInfo        parse_conf_boot(Dictionary *dict);
 extern RegridInfo      parse_conf_regrid(Dictionary *dict, bool error_out = default_dictionary_error_out);
 extern InterpInfo      parse_conf_interp(Dictionary *dict, const char *);
@@ -74,7 +79,7 @@ extern ConcatString    parse_conf_tmp_dir(Dictionary *dict);
 extern GridDecompType  parse_conf_grid_decomp_flag(Dictionary *dict);
 extern WaveletType     parse_conf_wavelet_type(Dictionary *dict);
 extern PlotInfo        parse_conf_plot_info(Dictionary *dict);
-extern map<ConcatString,ThreshArray>
+extern std::map<ConcatString,ThreshArray>
                        parse_conf_filter_attr_map(Dictionary *dict);
 extern void            parse_conf_range_int(Dictionary *dict, int &beg, int &end);
 extern void            parse_conf_range_double(Dictionary *dict, double &beg, double &end);
@@ -109,6 +114,9 @@ extern TrackType    int_to_tracktype(int);
 extern TrackType    string_to_tracktype(const char *);
 extern ConcatString tracktype_to_string(TrackType);
 
+extern DiagType     string_to_diagtype(const char *);
+extern ConcatString diagtype_to_string(DiagType);
+
 extern Interp12Type int_to_interp12type(int);
 extern Interp12Type string_to_interp12type(const char *);
 extern ConcatString interp12type_to_string(Interp12Type);
@@ -130,6 +138,8 @@ extern ConcatString griddecomptype_to_string(GridDecompType);
 extern ConcatString wavelettype_to_string(WaveletType);
 
 extern int parse_conf_percentile(Dictionary *dict);
+
+extern void python_compile_error(const char *caller=0);
 
 ////////////////////////////////////////////////////////////////////////
 

@@ -7,25 +7,37 @@ Ensemble-Stat Tool
 Introduction
 ============
 
-The Ensemble-Stat tool may be run to create simple ensemble forecasts (mean, probability, spread, etc) from a set of several forecast model files to be used by the MET statistics tools. If observations are also included, ensemble statistics such as rank histograms, probability integral transform histograms, spread/skill variance, relative position and continuous ranked probability score are produced. Climatological mean and standard deviation data may also be provided, and will be used as a reference forecast in several of the output statistics. Finally, observation error perturbations can be included prior to calculation of statistics. Details about and equations for the statistics produced for ensembles are given in :numref:`Appendix C, Section %s <App_C-ensemble>`.
+The Ensemble-Stat tool verifies deterministic ensemble members against gridded and/or point observations. It computes ensemble statistics such as rank histograms, probability integral transform histograms, spread/skill variance, relative position and continuous ranked probability score. Climatological mean and standard deviation data may also be provided, and is used as a reference forecast in several of the output statistics. Finally, observation error perturbations can be included prior to calculation of statistics. Details about and equations for the statistics produced for ensembles are given in :numref:`Appendix C, Section %s <App_C-ensemble>`.
 
-.. note:: This tool will be changing! The ensemble product generation step provided by Ensemble-Stat is now found within the :ref:`Gen-Ens-Prod Tool<gen-ens-prod>`. The Gen-Ens-Prod tool replaces and extends that functionality. Users are strongly encouraged to migrate ensemble product generation from Ensemble-Stat to Gen-Ens-Prod, as new features will only be added to Gen-Ens-Prod and the existing Ensemble-Stat functionality will be deprecated in a future version.
+.. note:: Earlier versions of the Ensemble-Stat tool supported both ensemble product generation and ensemble verification. However, the ensemble product generation logic has moved to the :ref:`Gen-Ens-Prod Tool<gen-ens-prod>`, which replaces and extends that functionality. Ensemble product generation was removed from Ensemble-Stat in version 11.0.0.
 
 Scientific and statistical aspects
 ==================================
 
-Ensemble forecasts derived from a set of deterministic ensemble members
------------------------------------------------------------------------
+.. _ES_HiRA_framework:
 
-Ensemble forecasts are often created as a set of deterministic forecasts. The ensemble members are rarely used separately. Instead, they can be combined in various ways to produce a forecast. MET can combine the ensemble members into some type of summary forecast according to user specifications. Ensemble means are the most common, and can be paired with the ensemble variance or spread. Maximum, minimum and other summary values are also available, with details in the practical information section.
+HiRA framework
+--------------
 
-Typically an ensemble is constructed by selecting a single forecast value from each member for each observation. When the High Resolution Assessment (HiRA) interpolation method is chosen, all of the nearby neighborhood points surrounding each observation from each member are used. Therefore, processing an N-member ensemble using a HiRA neighborhood of size M produces ensemble output with size N*M. This approach fully leverages information from all nearby grid points to evaluate the ensemble quality.
+The HiRA framework described in :numref:`PS_HiRA_framework` is also supported in the Ensemble-Stat tool. That support is provided as an interpolation option via the **interp** dictionary. The interpolation dictionary defines how gridded model data is matched to each observation value. Most interpolation methods, such as **UW_MEAN** for the unweighted mean or **BILIN** for bilinear, compute a single value for each ensemble member. When the High Resolution Assessment (HiRA) interpolation method is chosen, as shown below, all of the nearby neighborhood points surrounding each observation from each member are used. Therefore, processing an N-member ensemble using a HiRA neighborhood of size M produces ensemble output with size N*M. This approach fully leverages information from all nearby grid points to evaluate the ensemble quality.
 
-The ensemble relative frequency is the simplest method for turning a set of deterministic forecasts into something resembling a probability forecast. For each categorical threshold (cat_thresh) listed for each field array entry of the ensemble dictionary (ens.field), MET will create the ensemble relative frequency as the proportion of ensemble members forecasting that event. For example, if 5 out of 10 ensemble members predict measurable precipitation at a grid location, then the ensemble relative frequency of precipitation will be :math:`5/10=0.5`. If the ensemble relative frequency is calibrated (unlikely) then this could be thought of as a probability of precipitation.
+.. code ::
 
-The neighborhood ensemble probability (NEP) and neighborhood maximum ensemble probability (NMEP) methods are described in :ref:`Schwartz and Sobash (2017) <Schwartz-2017>`. They are an extension of the ensemble relative frequencies described above. The NEP value is computed by averaging the relative frequency of the event within the neighborhood over all ensemble members. The NMEP value is computed as the fraction of ensemble members for which the event is occurring somewhere within the surrounding neighborhood. The NMEP output is typically smoothed using a Gaussian kernel filter. The neighborhood sizes and smoothing options can be customized in the configuration file.
+  interp = {
+    field      = BOTH;
+    vld_thresh = 1.0;
+    shape      = SQUARE;
 
-The Ensemble-Stat tool writes the gridded relative frequencies, NEP, and NMEP fields to a NetCDF output file. Probabilistic verification methods can then be applied to those fields by evaluating them with the Grid-Stat and/or Point-Stat tools.
+    type = [
+       {
+          method = HIRA;
+          width  = 2;
+          shape  = SQUARE;
+       }
+    ];
+  }
+
+In this example, all four grid points of the 2x2 square surrounding each observation point are used to define the ensemble. Therefore, an N-member ensemble is evaluated as an ensemble of size Nx4.
 
 Ensemble statistics
 -------------------
@@ -36,7 +48,7 @@ Often, the goal of ensemble forecasting is to reproduce the distribution of obse
 
 The relative position (RELP) is a count of the number of times each ensemble member is closest to the observation. For stochastic or randomly derived ensembles, this statistic is meaningless. For specified ensemble members, however, it can assist users in determining if any ensemble member is performing consistently better or worse than the others.
 
-The ranked probability score (RPS) is included in the Ranked Probability Score (RPS) line type. It is the mean of the Brier scores computed from ensemble probabilities derived for each probability category threshold (prob_cat_thresh) specified in the configuration file. The continuous ranked probability score (CRPS) is the average the distance between the forecast (ensemble) cumulative distribution function and the observation cumulative distribution function. It is an analog of the Brier score, but for continuous forecast and observation fields. The CRPS statistic is computed using two methods: assuming a normal distribution defined by the ensemble mean and spread (:ref:`Gneiting et al., 2004 <Gneiting-2004>`) and using the empirical ensemble distribution (:ref:`Hersbach, 2000 <Hersbach-2000>`). The CRPS statistic using the empirical ensemble distribution can be adjusted (bias corrected) by subtracting 1/2(m) times the mean absolute difference of the ensemble members (where m is the ensemble size), this is saved as a separate stastics called CRPS_EMP_FAIR. The CRPS (and CRPS FAIR) statistic is included in the Ensemble Continuous Statistics (ECNT) line type, along with other statistics quantifying the ensemble spread and ensemble mean skill.
+The ranked probability score (RPS) is included in the Ranked Probability Score (RPS) line type. It is the mean of the Brier scores computed from ensemble probabilities derived for each probability category threshold (prob_cat_thresh) specified in the configuration file. The continuous ranked probability score (CRPS) is the average the distance between the forecast (ensemble) cumulative distribution function and the observation cumulative distribution function. It is an analog of the Brier score, but for continuous forecast and observation fields. The CRPS statistic is computed using two methods: assuming a normal distribution defined by the ensemble mean and spread (:ref:`Gneiting et al., 2004 <Gneiting-2004>`) and using the empirical ensemble distribution (:ref:`Hersbach, 2000 <Hersbach-2000>`). The CRPS statistic using the empirical ensemble distribution can be adjusted (bias corrected) by subtracting 1/(2*m) times the mean absolute difference of the ensemble members, where m is the ensemble size. This is reported as a separate statistic called CRPS_EMP_FAIR. The empirical CRPS and its fair version are included in the Ensemble Continuous Statistics (ECNT) line type, along with other statistics quantifying the ensemble spread and ensemble mean skill.
 
 The Ensemble-Stat tool can derive ensemble relative frequencies and verify them as probability forecasts all in the same run. Note however that these simple ensemble relative frequencies are not actually calibrated probability forecasts. If probabilistic line types are requested (output_flag), this logic is applied to each pair of fields listed in the forecast (fcst) and observation (obs) dictionaries of the configuration file. Each probability category threshold (prob_cat_thresh) listed for the forecast field is applied to the input ensemble members to derive a relative frequency forecast. The probability category threshold (prob_cat_thresh) parsed from the corresponding observation entry is applied to the (gridded or point) observations to determine whether or not the event actually occurred. The paired ensemble relative freqencies and observation events are used to populate an Nx2 probabilistic contingency table. The dimension of that table is determined by the probability PCT threshold (prob_pct_thresh) configuration file option parsed from the forecast dictionary. All probabilistic output types requested are derived from the this Nx2 table and written to the ascii output files. Note that the FCST_VAR name header column is automatically reset as "PROB({FCST_VAR}{THRESH})" where {FCST_VAR} is the current field being evaluated and {THRESH} is the threshold that was applied.
 
@@ -138,7 +150,7 @@ ensemble_stat configuration file
 
 The default configuration file for the Ensemble-Stat tool named **EnsembleStatConfig_default** can be found in the installed *share/met/config* directory. Another version is located in *scripts/config*. We encourage users to make a copy of these files prior to modifying their contents. Each configuration file (both the default and sample) contains many comments describing its contents. The contents of the configuration file are also described in the subsections below.
 
-Note that environment variables may be used when editing configuration files, as described in the :numref:`pb2nc configuration file` for the PB2NC tool.
+Note that environment variables may be used when editing configuration files, as described in the :numref:`config_env_vars`.
 
 ____________________
 
@@ -168,33 +180,16 @@ ____________________
   output_prefix  = "";
   version        = "VN.N";
 
+
 The configuration options listed above are common to many MET tools and are described in :numref:`config_options`.
 
 Note that the **HIRA** interpolation method is only supported in Ensemble-Stat.
 
 _____________________
 
-.. code-block:: none
+When processing the **fcst** data, compute a ratio of the number of valid ensemble fields to the total number of ensemble members. If this ratio is less than the **ens_thresh**, then quit with an error. This threshold must be between 0 and 1. Setting this threshold to 1 will require that all ensemble members be present to be processed.
 
-  ens = {
-  ens_thresh = 1.0;
-  vld_thresh = 1.0;
-  field = [
-           {
-            name = "APCP";
-            level = "A03";
-            cat_thresh = [ >0.0, >=5.0 ];
-           }
-         ];
-       }
-
-The **ens** dictionary defines which ensemble fields should be processed.
-
-When summarizing the ensemble, compute a ratio of the number of valid ensemble fields to the total number of ensemble members. If this ratio is less than the **ens_thresh**, then quit with an error. This threshold must be between 0 and 1. Setting this threshold to 1 will require that all ensemble members be present to be processed.
-
-
-When summarizing the ensemble, for each grid point compute a ratio of the number of valid data values to the number of ensemble members. If that ratio is less than **vld_thresh**, write out bad data. This threshold must be between 0 and 1. Setting this threshold to 1 will require each grid point to contain valid data for all ensemble members.
-
+When processing the **fcst** data, for each grid point compute a ratio of the number of valid data values to the number of ensemble members. If that ratio is less than **vld_thresh**, write out bad data. This threshold must be between 0 and 1. Setting this threshold to 1 will require each grid point to contain valid data for all ensemble members.
 
 For each **field** listed in the forecast field, give the name and vertical or accumulation level, plus one or more categorical thresholds. The thresholds are specified using symbols, as shown above. It is the user's responsibility to know the units for each model variable and to choose appropriate threshold values. The thresholds are used to define ensemble relative frequencies, e.g. a threshold of >=5 can be used to compute the proportion of ensemble members predicting precipitation of at least 5mm at each grid point.
 
@@ -204,6 +199,7 @@ _______________________
 
   ens_member_ids = [];
   control_id = "";
+
 
 The **ens_member_ids** array is only used if reading a single file that contains all ensemble members.
 It should contain a list of string identifiers that are substituted into the **ens** and/or **fcst** dictionary fields
@@ -215,7 +211,7 @@ Each value in the array will replace the text **MET_ENS_MEMBER_ID**.
 
 .. code-block:: none
 
-  ens = {
+  fcst = {
     field = [
       {
         name  = "fcst";
@@ -224,11 +220,12 @@ Each value in the array will replace the text **MET_ENS_MEMBER_ID**.
     ];
   }
 
+
 **GRIB Example:**
 
 .. code-block:: none
 
-  ens = {
+  fcst = {
     field = [
       {
         name     = "fcst";
@@ -238,51 +235,10 @@ Each value in the array will replace the text **MET_ENS_MEMBER_ID**.
     ];
   }
 
+
 **control_id** is a string that is substituted in the same way as the **ens_member_ids** values
 to read a control member. This value is only used when the **-ctrl** command line argument is
 used. The value should not be found in the **ens_member_ids** array.
-
-_______________________
-
-.. code-block:: none
-
-  nbrhd_prob = {
-     width      = [ 5 ];
-     shape      = CIRCLE;
-     vld_thresh = 0.0;
-  }
-
-
-The **nbrhd_prob** dictionary defines the neighborhoods used to compute NEP and NMEP output.
-
-
-The neighborhood **shape** is a **SQUARE** or **CIRCLE** centered on the current point, and the **width** array specifies the width of the square or diameter of the circle as an odd integer. The **vld_thresh** entry is a number between 0 and 1 specifying the required ratio of valid data in the neighborhood for an output value to be computed.
-
-
-If **ensemble_flag.nep** is set to TRUE, NEP output is created for each combination of the categorical threshold (**cat_thresh**) and neighborhood width specified.
-
-_____________________
-
-.. code-block:: none
-
-  nmep_smooth = {
-     vld_thresh      = 0.0;
-     shape           = CIRCLE;
-     gaussian_dx     = 81.27;
-     gaussian_radius = 120;
-     type = [
-        {
-          method = GAUSSIAN;
-          width  = 1;
-        }
-    ];
-  }
-
-
-Similar to the **interp** dictionary, the **nmep_smooth** dictionary includes a **type** array of dictionaries to define one or more methods for smoothing the NMEP data. Setting the interpolation method to nearest neighbor (**NEAREST**) effectively disables this smoothing step.
-
-
-If **ensemble_flag.nmep** is set to TRUE, NMEP output is created for each combination of the categorical threshold (**cat_thresh**), neighborhood width (**nbrhd_prob.width**), and smoothing method(**nmep_smooth.type**) specified.
 
 _____________________
 
@@ -333,6 +289,7 @@ The **prob_pct_thresh** entry is an array of thresholds which define the Nx2 pro
 .. code-block:: none
 
   prob_cat_thresh = [ ==0.25 ];
+
 
 __________________
 
@@ -386,7 +343,6 @@ _________________
 
 The **output_flag** array controls the type of output that is generated. Each flag corresponds to an output line type in the STAT file. Setting the flag to NONE indicates that the line type should not be generated. Setting the flag to STAT indicates that the line type should be written to the STAT file only. Setting the flag to BOTH indicates that the line type should be written to the STAT file as well as a separate ASCII file where the data is grouped by line type. The output flags correspond to the following output line types:
 
-
 1. **ECNT** for Continuous Ensemble Statistics
 
 2. **RPS** for Ranked Probability Score Statistics
@@ -414,53 +370,33 @@ The **output_flag** array controls the type of output that is generated. Each fl
 _____________________
 
 .. code-block:: none
-		
-  ensemble_flag = {
+
+  nc_orank_flag = {
      latlon    = TRUE;
-	  mean      = TRUE;
-	  stdev     = TRUE;
-	  minus     = TRUE;
-	  plus      = TRUE;
-	  min       = TRUE;
-	  max       = TRUE;
-	  range     = TRUE;
-	  vld_count = TRUE;
-	  frequency = TRUE;
-	  nep       = FALSE;
-	  nmep      = FALSE;
-	  rank      = TRUE;
-	  weight    = FALSE;
+     mean      = TRUE;
+     raw       = TRUE;
+     rank      = TRUE;
+     pit       = TRUE;
+     vld_count = TRUE;
+     weight    = FALSE;
   }
 
-The **ensemble_flag** specifies which derived ensemble fields should be calculated and output. Setting the flag to TRUE produces output of the specified field, while FALSE produces no output for that field type. The flags correspond to the following output line types:
+
+The **nc_orank_flag** specifies which gridded verification output types should be written to the Observation Rank (**_orank.nc**) NetCDF file. This output file is only created when gridded observations have been provided with the -grid_obs command line option. Setting the flag to TRUE produces output of the specified field, while FALSE produces no output for that field type. The flags correspond to the following output line types:
 
 1. Grid Latitude and Longitude Fields
 
-2. Ensemble Mean Field
+2. Ensemble mean field
 
-3. Ensemble Standard Deviation Field
+3. Raw observation values
 
-4. Ensemble Mean - One Standard Deviation Field
+4. Observation ranks
 
-5. Ensemble Mean + One Standard Deviation Field
+5. Observation probability-integral transform values
 
-6. Ensemble Minimum Field
+6. Ensemble valid data count
 
-7. Ensemble Maximum Field
-
-8. Ensemble Range Field
-
-9. Ensemble Valid Data Count
-
-10. Ensemble Relative Frequency for each categorical threshold (**cat_thresh**) specified. This is an uncalibrated probability forecast.
-
-11. Neighborhood Ensemble Probability for each categorical threshold (**cat_thresh**) and neighborhood width (**nbrhd_prob.width**) specified.
-
-12. Neighborhood Maximum Ensemble Probability for each categorical threshold (**cat_thresh**), neighborhood width (**nbrhd_prob.width**), and smoothing method (**nmep_smooth.type**) specified.
-
-13. Observation Ranks for input gridded observations are written to a separate NetCDF output file.
-
-14. The grid area weights applied are written to the Observation Rank output file.
+7. Grid area weight values
 
 __________________
 
@@ -505,49 +441,15 @@ ensemble_stat_PREFIX_YYYYMMDD_HHMMSSV.stat where PREFIX indicates the user-defin
 The output ASCII files are named similarly:
 
 
-ensemble_stat_PREFIX_YYYYMMDD_HHMMSSV_TYPE.txt where TYPE is one of ecnt, rps, rhist, phist, relp, orank, and ssvar to indicate the line type it contains.
+ensemble_stat_PREFIX_YYYYMMDD_HHMMSSV_TYPE.txt where TYPE is one of elements of the **output_flag** configuration option to indicate the line type it contains.
 
 
-When fields are requested in the ens dictionary of the configuration file or verification against gridded fields is performed, ensemble_stat can produce output NetCDF files using the following naming convention:
+When verification against gridded analyses is performed, Ensemble-Stat can produce output NetCDF files using the following naming convention:
 
 
-ensemble_stat_PREFIX_YYYYMMDD_HHMMSSV_TYPE.nc where TYPE is either ens or orank. The orank NetCDF output file contains gridded fields of observation ranks when the -grid_obs command line option is used. The ens NetCDF output file contains ensemble products derived from the fields requested in the ens dictionary of the configuration file. The Ensemble-Stat tool can calculate any of the following fields from the input ensemble members, as specified in the ensemble_flag dictionary in the configuration file:
+ensemble_stat_PREFIX_YYYYMMDD_HHMMSSV_orank.nc contains gridded fields of observation ranks when the -grid_obs command line option is used. Its contents are specified by the **nc_orank_flag** configuration option.
 
-
-Ensemble Mean fields
-
-
-Ensemble Standard Deviation fields
-
-
-Ensemble Mean - 1 Standard Deviation fields
-
-
-Ensemble Mean + 1 Standard Deviation fields
-
-
-Ensemble Minimum fields
-
-
-Ensemble Maximum fields
-
-
-Ensemble Range fields
-
-
-Ensemble Valid Data Count fields
-
-
-Ensemble Relative Frequency by threshold fields (e.g. ensemble probabilities)
-
-
-Neighborhood Ensemble Probability and Neighborhood Maximum Ensemble Probability
-
-
-Rank for each Observation Value (if gridded observation field provided)
-
-
-When gridded or point observations are provided, using the -grid_obs and -point_obs command line options, respectively, the Ensemble-Stat tool can compute the following statistics for the fields specified in the fcst and obs dictionaries of the configuration file:
+The Ensemble-Stat tool can compute the following statistics for the fields specified in the fcst and obs dictionaries of the configuration file:
 
 
 Continuous Ensemble Statistics
@@ -720,7 +622,31 @@ The format of the STAT and ASCII output of the Ensemble-Stat tool are described 
     - The Continuous Ranked Probability Skill Score (empirical distribution)
   * - 41 
     - CRPS_EMP_FAIR
-    - The Continuous Ranked Probability Skill Score (empirical distribution) adjusted by subtracting 1/2(m) times the mean absolute difference of the ensemble members (m is the ensemble size)
+    - The Continuous Ranked Probability Score (empirical distribution) adjusted by the mean absolute difference of the ensemble members
+  * - 42
+    - SPREAD_MD
+    - The pairwise Mean Absolute Difference of the unperturbed ensemble members
+  * - 43
+    - MAE
+    - The Mean Absolute Error of the ensemble mean (unperturbed or supplied)
+  * - 44
+    - MAE_OERR
+    - The Mean Absolute Error of the PERTURBED ensemble mean (e.g. with Observation Error)
+  * - 45
+    - BIAS_RATIO
+    - The Bias Ratio
+  * - 46
+    - N_GE_OBS
+    - The number of ensemble values greater than or equal to their observations
+  * - 47
+    - ME_GE_OBS
+    - The Mean Error of the ensemble values greater than or equal to their observations
+  * - 48
+    - N_LT_OBS
+    - The number of ensemble values less than their observations
+  * - 49
+    - ME_LT_OBS
+    - The Mean Error of the ensemble values less than or equal to their observations
 
 .. _table_ES_header_info_es_out_RPS:
       

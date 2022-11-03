@@ -20,6 +20,9 @@ using namespace std;
 #include <cmath>
 #include <time.h>
 
+#include <netcdf>
+using namespace netCDF;
+
 #include "vx_math.h"
 #include "vx_cal.h"
 #include "vx_log.h"
@@ -30,10 +33,6 @@ using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-static const char x_dim_name []            = "lon";
-static const char y_dim_name []            = "lat";
 
 static const int  max_met_args             = 30;
 
@@ -171,7 +170,42 @@ read_netcdf_grid(Nc, grid);
 StringArray gDimNames;
 get_dim_names(Nc, &gDimNames);
 
-Ndims = gDimNames.n_elements();
+Ndims = gDimNames.n();
+
+string x_dim_name, y_dim_name;
+
+   //
+   //  semilatlon dimension names
+   //
+
+if ( grid.is_set() && grid.info().sl ) {
+
+        if ( gDimNames.has("latlon") )  x_dim_name = "latlon";
+   else if ( gDimNames.has("lon")    )  x_dim_name = "lon";
+   else if ( gDimNames.has("lat")    )  y_dim_name = "lat";
+
+   if ( gDimNames.has("level") ) {
+           if ( x_dim_name.empty() )  x_dim_name = "level";
+      else if ( y_dim_name.empty() )  y_dim_name = "level";
+   }
+   else if ( gDimNames.has("time") ) {
+           if ( x_dim_name.empty() )  x_dim_name = "time";
+      else if ( y_dim_name.empty() )  y_dim_name = "time";
+   }
+
+}
+
+   //
+   //  default dimension names
+   //
+
+else {
+
+   x_dim_name = "lon";
+   y_dim_name = "lat";
+
+}
+
 
 for (j=0; j<Ndims; ++j)  {
    c = to_lower(gDimNames[j]);
@@ -383,7 +417,7 @@ status = get_nc_data(var, &d, (long *)a);
 
 if ( !status )  {
 
-   mlog << Error << "\n" << method_name << " bad status for var->get()\n\n";
+   mlog << Error << "\n" << method_name << "bad status for var->get()\n\n";
 
    exit ( 1 );
 }
@@ -484,7 +518,7 @@ for (j=0; j<(a.n_elements()); ++j)  {
 
       if ( (var == NULL) || ( (j != var->x_slot) && (j != var->y_slot) ) )  {
 
-         mlog << Error << "\n" << method_name << " star found in bad slot\n\n";
+         mlog << Error << "\n" << method_name << "star found in bad slot\n\n";
 
          exit ( 1 );
 
@@ -511,7 +545,7 @@ if ( count != 2 )  {
  int y_slot_tmp = 0;
  if ( var == NULL || (var->x_slot < 0) || (var->y_slot < 0)  )  {
 
-   mlog << Error << "\n" << method_name << " bad x|y|z slot\n\n";
+   mlog << Error << "\n" << method_name << "bad x|y|z slot\n\n";
 
    exit ( 1 );
 

@@ -34,6 +34,7 @@ wavelet_stat_LDADD = -lvx_pxm \
 	-lvx_data2d_nccf \
 	-lvx_statistics \
 	-lvx_data2d \
+        -lvx_seeps \
 	-lvx_nc_util \
 	-lvx_regrid \
 	-lvx_grid \

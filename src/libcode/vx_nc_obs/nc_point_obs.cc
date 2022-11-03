@@ -20,6 +20,9 @@ using namespace std;
 #include <cmath>
 #include <time.h>
 
+#include <netcdf>
+using namespace netCDF;
+
 #include "vx_log.h"
 #include "is_bad_data.h"
 

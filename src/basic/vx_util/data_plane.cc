@@ -16,6 +16,7 @@
 //   Mod#   Date      Name           Description
 //   ----   ----      ----           -----------
 //   000    11-01-11  Halley Gotway
+//   001    22-09-29  Prestopnik     MET #2227 Remove namespace std from header files
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -63,6 +64,51 @@ DataPlane & DataPlane::operator=(const DataPlane &d) {
    if(this == &d) return(*this);
 
    assign(d);
+
+   return(*this);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+DataPlane & DataPlane::operator+=(const DataPlane &d) {
+   const char *method_name = "DataPlane::operator+=(const DataPlane &) -> ";
+
+   // Check for matching dimensions
+   if(Nx != d.Nx || Ny != d.Ny) {
+      mlog << Error << "\n" << method_name
+           << "the dimensions do not match: ("
+           << Nx << ", " << Ny << ") != ("
+           << d.Nx << ", " << d.Ny << ")\n\n";
+      exit(1);
+   }
+
+   // Increment values, checking for bad data
+   double v;
+   for(int i=0; i<Nxy; i++) {
+      v = (is_bad_data(Data[i]) || is_bad_data(d.Data[i]) ?
+           bad_data_double : Data[i] + d.Data[i]);
+      Data[i] = v;
+   }
+
+   return(*this);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+DataPlane & DataPlane::operator/=(const double v) {
+   const char *method_name = "DataPlane::operator/=(const double) -> ";
+
+   // Check for matching dimensions
+   if(is_eq(v, 0.0)) {
+      mlog << Error << "\n" << method_name
+           << "divide by 0!\n\n";
+      exit(1);
+   }
+
+   // Apply the operation, checking for bad data
+   for(int i=0; i<Nxy; i++) {
+      if(!is_bad_data(Data[i])) Data[i] /= v;
+   }
 
    return(*this);
 }
@@ -127,7 +173,6 @@ void DataPlane::erase() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-
 
 void DataPlane::dump(ostream & out, int depth) const {
    ConcatString time_str;
@@ -619,7 +664,7 @@ if ( N == 0 )  return;   //  no shift, so do nothing
 
 int x, y, x_new;
 int index_old, index_new;
-std::vector<double> new_data(Nxy);
+vector<double> new_data(Nxy);
 
 for (x=0; x<Nx; ++x)  {
 
@@ -1016,6 +1061,46 @@ return ( * this );
 
 }
 
+///////////////////////////////////////////////////////////////////////////////
+
+DataPlaneArray & DataPlaneArray::operator+=(const DataPlaneArray &d) {
+   const char *method_name = "DataPlaneArray::operator+=(const DataPlaneArray &) -> ";
+
+   // Check for matching number of levels
+   if(Nplanes != d.Nplanes) {
+      mlog << Error << "\n" << method_name
+           << "the number of levels do not match: "
+           << Nplanes << " != " << d.Nplanes << "\n\n";
+      exit(1);
+   }
+
+   double v;
+   for(int i=0; i<Nplanes; i++) {
+
+      // Check for matching level values
+      if(Lower[i] != d.Lower[i] || Upper[i] != d.Upper[i]) {
+         mlog << Error << "\n" << method_name
+              << "for level " << i+1 << " the lower and upper values do not match: ("
+              << Lower[i] << ", " << Upper[i] << ") != ("
+              << d.Lower[i] << ", " << d.Upper[i] << ")\n\n";
+         exit(1);
+      }
+
+      // Increment values for each level
+      *Plane[i] += *d.Plane[i];
+   }
+
+   return(*this);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+DataPlaneArray & DataPlaneArray::operator/=(const double v) {
+
+   for(int i=0; i<Nplanes; i++) *Plane[i] /= v;
+
+   return(*this);
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 

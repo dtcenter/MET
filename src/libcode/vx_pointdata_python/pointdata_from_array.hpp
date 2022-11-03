@@ -36,7 +36,7 @@ T value;
 
 for (j=0; j<n; ++j)  {
 
-   //nympy_array_one_to_two(j, Nx, r, c);
+   //numpy_array_one_to_two(j, Nx, r, c);
 
    memcpy(&value, u + j, sizeof(T));
 
@@ -73,7 +73,7 @@ T value;
 
 for (j=0; j<n; ++j)  {
 
-   //nympy_array_one_to_two(j, Nx, r, c);
+   //numpy_array_one_to_two(j, Nx, r, c);
 
    memcpy(&value, u + j, sizeof(T));
 
@@ -112,7 +112,7 @@ out->extend(n);
 
 for (j=0; j<n; ++j)  {
 
-   //nympy_array_one_to_two(j, Nx, r, c);
+   //numpy_array_one_to_two(j, Nx, r, c);
 
    memcpy(&value, u + j, sizeof(T));
 
@@ -152,7 +152,7 @@ out->extend(n);
 
 for (j=0; j<n; ++j)  {
 
-   //nympy_array_one_to_two(j, Nx, r, c);
+   //numpy_array_one_to_two(j, Nx, r, c);
 
    memcpy(&value, u + j, sizeof(T));
 

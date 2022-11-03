@@ -129,6 +129,8 @@ output_flag = {
    rps    = STAT;
    eclv   = STAT;
    mpr    = STAT;
+   seeps  = NONE;
+   seeps_mpr = NONE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

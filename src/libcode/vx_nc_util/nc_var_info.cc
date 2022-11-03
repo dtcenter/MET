@@ -12,6 +12,9 @@
 
 using namespace std;
 
+#include <netcdf>
+using namespace netCDF;
+
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>

@@ -14,6 +14,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 #include <iostream>
+#include <vector>
 
 #include "track_point.h"
 #include "track_info.h"
@@ -42,10 +43,10 @@ class TrackPairInfo {
 
       void init_from_scratch();
       void assign(const TrackPairInfo &);
-      void extend(int, bool exact = true);
 
-      // Number of track points
+      // Number of track points and input lines
       int          NPoints;
+      int          NLines;
 
       // ADECK and BDECK tracks
       TrackInfo    ADeck;
@@ -63,9 +64,8 @@ class TrackPairInfo {
       NumArray     CrossTrackErr;
 
       // TCStatLines used to construct this track
-      int          NLines;
-      int          NAlloc;
-      TCStatLine * Line;
+      std::vector <TCStatLine> TCMPRLine;  // sized by NPoint
+      std::vector <TCStatLine> TCDIAGLine; // sized by NPoint
 
       // Status for whether RI/RW occurred
       NumArray     ADeckRIRW;
@@ -87,7 +87,7 @@ class TrackPairInfo {
 
       void clear();
 
-      void         dump(ostream &, int = 0)  const;
+      void         dump(std::ostream &, int = 0)  const;
       ConcatString case_info()               const;
       ConcatString serialize()               const;
       ConcatString serialize_r(int, int = 0) const;
@@ -121,7 +121,8 @@ class TrackPairInfo {
       int                bdeck_prv_int(int)   const;
 
       int                n_lines()            const;
-      const TCStatLine * line(int i)          const;
+      const TCStatLine * tcmpr_line(int i)    const;
+      const TCStatLine * tcdiag_line(int i)   const;
       int                i_init()             const;
 
       bool               keep(int)            const;
@@ -134,6 +135,8 @@ class TrackPairInfo {
       void add(const TrackPoint &, const TrackPoint &,
                double, double, double, double, double, double, double);
       void add(const TCStatLine &);
+      void add_tcmpr_line(const TCStatLine &);
+      void add_tcdiag_line(const TCStatLine &);
       void add_watch_warn(const ConcatString &, WatchWarnType, unixtime);
 
       int  check_water_only();
@@ -163,7 +166,8 @@ inline int                TrackPairInfo::bdeck_rirw(int i)      const { return(n
 inline int                TrackPairInfo::adeck_prv_int(int i)   const { return(nint(ADeckPrvInt[i])); }
 inline int                TrackPairInfo::bdeck_prv_int(int i)   const { return(nint(BDeckPrvInt[i])); }
 inline int                TrackPairInfo::n_lines()              const { return(NLines);               }
-inline const TCStatLine * TrackPairInfo::line(int i)            const { return(&Line[i]);             }
+inline const TCStatLine * TrackPairInfo::tcmpr_line(int i)      const { return(&TCMPRLine[i]);        }
+inline const TCStatLine * TrackPairInfo::tcdiag_line(int i)     const { return(&TCDIAGLine[i]);       }
 inline bool               TrackPairInfo::keep(int i)            const { return(Keep[i] != 0);         }
 
 ////////////////////////////////////////////////////////////////////////
@@ -193,7 +197,7 @@ class TrackPairInfoArray {
 
       void clear();
 
-      void         dump(ostream &, int = 0) const;
+      void         dump(std::ostream &, int = 0) const;
       ConcatString serialize()              const;
       ConcatString serialize_r(int = 0)     const;
 
@@ -206,8 +210,9 @@ class TrackPairInfoArray {
          //
 
       const TrackPairInfo & operator[](int) const;
-      int n_pairs()  const;
-      int n_points() const;
+      int n_pairs()    const;
+      int n_points()   const;
+      int max_n_diag() const;
 
          //
          //  do stuff

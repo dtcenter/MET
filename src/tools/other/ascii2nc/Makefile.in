@@ -106,8 +106,11 @@ am__ascii2nc_SOURCES_DIST = ascii2nc.cc ascii2nc_conf_info.cc \
 	ascii2nc_conf_info.h file_handler.cc file_handler.h \
 	little_r_handler.cc little_r_handler.h met_handler.cc \
 	met_handler.h surfrad_handler.cc surfrad_handler.h \
-	wwsis_handler.cc wwsis_handler.h aeronet_handler.cc \
-	aeronet_handler.h python_handler.h python_handler.cc
+	wwsis_handler.cc wwsis_handler.h airnow_handler.cc \
+	airnow_handler.h ndbc_handler.cc ndbc_handler.h \
+	ndbc_locations.cc ndbc_locations.h airnow_locations.cc \
+	airnow_locations.h aeronet_handler.cc aeronet_handler.h \
+	python_handler.h python_handler.cc
 @ENABLE_PYTHON_TRUE@am__objects_1 = ascii2nc-python_handler.$(OBJEXT)
 am__objects_2 = $(am__objects_1)
 am_ascii2nc_OBJECTS = ascii2nc-ascii2nc.$(OBJEXT) \
@@ -117,6 +120,10 @@ am_ascii2nc_OBJECTS = ascii2nc-ascii2nc.$(OBJEXT) \
 	ascii2nc-met_handler.$(OBJEXT) \
 	ascii2nc-surfrad_handler.$(OBJEXT) \
 	ascii2nc-wwsis_handler.$(OBJEXT) \
+	ascii2nc-airnow_handler.$(OBJEXT) \
+	ascii2nc-ndbc_handler.$(OBJEXT) \
+	ascii2nc-ndbc_locations.$(OBJEXT) \
+	ascii2nc-airnow_locations.$(OBJEXT) \
 	ascii2nc-aeronet_handler.$(OBJEXT) $(am__objects_2)
 ascii2nc_OBJECTS = $(am_ascii2nc_OBJECTS)
 am__DEPENDENCIES_1 =
@@ -140,11 +147,15 @@ DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__maybe_remake_depfiles = depfiles
 am__depfiles_remade = ./$(DEPDIR)/ascii2nc-aeronet_handler.Po \
+	./$(DEPDIR)/ascii2nc-airnow_handler.Po \
+	./$(DEPDIR)/ascii2nc-airnow_locations.Po \
 	./$(DEPDIR)/ascii2nc-ascii2nc.Po \
 	./$(DEPDIR)/ascii2nc-ascii2nc_conf_info.Po \
 	./$(DEPDIR)/ascii2nc-file_handler.Po \
 	./$(DEPDIR)/ascii2nc-little_r_handler.Po \
 	./$(DEPDIR)/ascii2nc-met_handler.Po \
+	./$(DEPDIR)/ascii2nc-ndbc_handler.Po \
+	./$(DEPDIR)/ascii2nc-ndbc_locations.Po \
 	./$(DEPDIR)/ascii2nc-python_handler.Po \
 	./$(DEPDIR)/ascii2nc-surfrad_handler.Po \
 	./$(DEPDIR)/ascii2nc-wwsis_handler.Po
@@ -359,6 +370,10 @@ ascii2nc_SOURCES = ascii2nc.cc \
 	met_handler.cc met_handler.h \
 	surfrad_handler.cc surfrad_handler.h \
 	wwsis_handler.cc wwsis_handler.h \
+	airnow_handler.cc airnow_handler.h \
+	ndbc_handler.cc ndbc_handler.h \
+	ndbc_locations.cc ndbc_locations.h \
+	airnow_locations.cc airnow_locations.h \
 	aeronet_handler.cc aeronet_handler.h $(OPT_PYTHON_SOURCES)
 
 ascii2nc_CPPFLAGS = ${MET_CPPFLAGS} -I../../../basic/vx_log
@@ -478,11 +493,15 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ascii2nc-aeronet_handler.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ascii2nc-airnow_handler.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ascii2nc-airnow_locations.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ascii2nc-ascii2nc.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ascii2nc-ascii2nc_conf_info.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ascii2nc-file_handler.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ascii2nc-little_r_handler.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ascii2nc-met_handler.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ascii2nc-ndbc_handler.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ascii2nc-ndbc_locations.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ascii2nc-python_handler.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ascii2nc-surfrad_handler.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ascii2nc-wwsis_handler.Po@am__quote@ # am--include-marker
@@ -604,6 +623,62 @@ ascii2nc-wwsis_handler.obj: wwsis_handler.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='wwsis_handler.cc' object='ascii2nc-wwsis_handler.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(ascii2nc_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ascii2nc-wwsis_handler.obj `if test -f 'wwsis_handler.cc'; then $(CYGPATH_W) 'wwsis_handler.cc'; else $(CYGPATH_W) '$(srcdir)/wwsis_handler.cc'; fi`
+
+ascii2nc-airnow_handler.o: airnow_handler.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(ascii2nc_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ascii2nc-airnow_handler.o -MD -MP -MF $(DEPDIR)/ascii2nc-airnow_handler.Tpo -c -o ascii2nc-airnow_handler.o `test -f 'airnow_handler.cc' || echo '$(srcdir)/'`airnow_handler.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/ascii2nc-airnow_handler.Tpo $(DEPDIR)/ascii2nc-airnow_handler.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='airnow_handler.cc' object='ascii2nc-airnow_handler.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(ascii2nc_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ascii2nc-airnow_handler.o `test -f 'airnow_handler.cc' || echo '$(srcdir)/'`airnow_handler.cc
+
+ascii2nc-airnow_handler.obj: airnow_handler.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(ascii2nc_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ascii2nc-airnow_handler.obj -MD -MP -MF $(DEPDIR)/ascii2nc-airnow_handler.Tpo -c -o ascii2nc-airnow_handler.obj `if test -f 'airnow_handler.cc'; then $(CYGPATH_W) 'airnow_handler.cc'; else $(CYGPATH_W) '$(srcdir)/airnow_handler.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/ascii2nc-airnow_handler.Tpo $(DEPDIR)/ascii2nc-airnow_handler.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='airnow_handler.cc' object='ascii2nc-airnow_handler.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(ascii2nc_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ascii2nc-airnow_handler.obj `if test -f 'airnow_handler.cc'; then $(CYGPATH_W) 'airnow_handler.cc'; else $(CYGPATH_W) '$(srcdir)/airnow_handler.cc'; fi`
+
+ascii2nc-ndbc_handler.o: ndbc_handler.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(ascii2nc_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ascii2nc-ndbc_handler.o -MD -MP -MF $(DEPDIR)/ascii2nc-ndbc_handler.Tpo -c -o ascii2nc-ndbc_handler.o `test -f 'ndbc_handler.cc' || echo '$(srcdir)/'`ndbc_handler.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/ascii2nc-ndbc_handler.Tpo $(DEPDIR)/ascii2nc-ndbc_handler.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='ndbc_handler.cc' object='ascii2nc-ndbc_handler.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(ascii2nc_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ascii2nc-ndbc_handler.o `test -f 'ndbc_handler.cc' || echo '$(srcdir)/'`ndbc_handler.cc
+
+ascii2nc-ndbc_handler.obj: ndbc_handler.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(ascii2nc_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ascii2nc-ndbc_handler.obj -MD -MP -MF $(DEPDIR)/ascii2nc-ndbc_handler.Tpo -c -o ascii2nc-ndbc_handler.obj `if test -f 'ndbc_handler.cc'; then $(CYGPATH_W) 'ndbc_handler.cc'; else $(CYGPATH_W) '$(srcdir)/ndbc_handler.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/ascii2nc-ndbc_handler.Tpo $(DEPDIR)/ascii2nc-ndbc_handler.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='ndbc_handler.cc' object='ascii2nc-ndbc_handler.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(ascii2nc_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ascii2nc-ndbc_handler.obj `if test -f 'ndbc_handler.cc'; then $(CYGPATH_W) 'ndbc_handler.cc'; else $(CYGPATH_W) '$(srcdir)/ndbc_handler.cc'; fi`
+
+ascii2nc-ndbc_locations.o: ndbc_locations.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(ascii2nc_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ascii2nc-ndbc_locations.o -MD -MP -MF $(DEPDIR)/ascii2nc-ndbc_locations.Tpo -c -o ascii2nc-ndbc_locations.o `test -f 'ndbc_locations.cc' || echo '$(srcdir)/'`ndbc_locations.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/ascii2nc-ndbc_locations.Tpo $(DEPDIR)/ascii2nc-ndbc_locations.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='ndbc_locations.cc' object='ascii2nc-ndbc_locations.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(ascii2nc_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ascii2nc-ndbc_locations.o `test -f 'ndbc_locations.cc' || echo '$(srcdir)/'`ndbc_locations.cc
+
+ascii2nc-ndbc_locations.obj: ndbc_locations.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(ascii2nc_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ascii2nc-ndbc_locations.obj -MD -MP -MF $(DEPDIR)/ascii2nc-ndbc_locations.Tpo -c -o ascii2nc-ndbc_locations.obj `if test -f 'ndbc_locations.cc'; then $(CYGPATH_W) 'ndbc_locations.cc'; else $(CYGPATH_W) '$(srcdir)/ndbc_locations.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/ascii2nc-ndbc_locations.Tpo $(DEPDIR)/ascii2nc-ndbc_locations.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='ndbc_locations.cc' object='ascii2nc-ndbc_locations.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(ascii2nc_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ascii2nc-ndbc_locations.obj `if test -f 'ndbc_locations.cc'; then $(CYGPATH_W) 'ndbc_locations.cc'; else $(CYGPATH_W) '$(srcdir)/ndbc_locations.cc'; fi`
+
+ascii2nc-airnow_locations.o: airnow_locations.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(ascii2nc_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ascii2nc-airnow_locations.o -MD -MP -MF $(DEPDIR)/ascii2nc-airnow_locations.Tpo -c -o ascii2nc-airnow_locations.o `test -f 'airnow_locations.cc' || echo '$(srcdir)/'`airnow_locations.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/ascii2nc-airnow_locations.Tpo $(DEPDIR)/ascii2nc-airnow_locations.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='airnow_locations.cc' object='ascii2nc-airnow_locations.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(ascii2nc_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ascii2nc-airnow_locations.o `test -f 'airnow_locations.cc' || echo '$(srcdir)/'`airnow_locations.cc
+
+ascii2nc-airnow_locations.obj: airnow_locations.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(ascii2nc_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ascii2nc-airnow_locations.obj -MD -MP -MF $(DEPDIR)/ascii2nc-airnow_locations.Tpo -c -o ascii2nc-airnow_locations.obj `if test -f 'airnow_locations.cc'; then $(CYGPATH_W) 'airnow_locations.cc'; else $(CYGPATH_W) '$(srcdir)/airnow_locations.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/ascii2nc-airnow_locations.Tpo $(DEPDIR)/ascii2nc-airnow_locations.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='airnow_locations.cc' object='ascii2nc-airnow_locations.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(ascii2nc_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ascii2nc-airnow_locations.obj `if test -f 'airnow_locations.cc'; then $(CYGPATH_W) 'airnow_locations.cc'; else $(CYGPATH_W) '$(srcdir)/airnow_locations.cc'; fi`
 
 ascii2nc-aeronet_handler.o: aeronet_handler.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(ascii2nc_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ascii2nc-aeronet_handler.o -MD -MP -MF $(DEPDIR)/ascii2nc-aeronet_handler.Tpo -c -o ascii2nc-aeronet_handler.o `test -f 'aeronet_handler.cc' || echo '$(srcdir)/'`aeronet_handler.cc
@@ -762,11 +837,15 @@ clean-am: clean-binPROGRAMS clean-generic mostlyclean-am
 
 distclean: distclean-am
 		-rm -f ./$(DEPDIR)/ascii2nc-aeronet_handler.Po
+	-rm -f ./$(DEPDIR)/ascii2nc-airnow_handler.Po
+	-rm -f ./$(DEPDIR)/ascii2nc-airnow_locations.Po
 	-rm -f ./$(DEPDIR)/ascii2nc-ascii2nc.Po
 	-rm -f ./$(DEPDIR)/ascii2nc-ascii2nc_conf_info.Po
 	-rm -f ./$(DEPDIR)/ascii2nc-file_handler.Po
 	-rm -f ./$(DEPDIR)/ascii2nc-little_r_handler.Po
 	-rm -f ./$(DEPDIR)/ascii2nc-met_handler.Po
+	-rm -f ./$(DEPDIR)/ascii2nc-ndbc_handler.Po
+	-rm -f ./$(DEPDIR)/ascii2nc-ndbc_locations.Po
 	-rm -f ./$(DEPDIR)/ascii2nc-python_handler.Po
 	-rm -f ./$(DEPDIR)/ascii2nc-surfrad_handler.Po
 	-rm -f ./$(DEPDIR)/ascii2nc-wwsis_handler.Po
@@ -816,11 +895,15 @@ installcheck-am:
 
 maintainer-clean: maintainer-clean-am
 		-rm -f ./$(DEPDIR)/ascii2nc-aeronet_handler.Po
+	-rm -f ./$(DEPDIR)/ascii2nc-airnow_handler.Po
+	-rm -f ./$(DEPDIR)/ascii2nc-airnow_locations.Po
 	-rm -f ./$(DEPDIR)/ascii2nc-ascii2nc.Po
 	-rm -f ./$(DEPDIR)/ascii2nc-ascii2nc_conf_info.Po
 	-rm -f ./$(DEPDIR)/ascii2nc-file_handler.Po
 	-rm -f ./$(DEPDIR)/ascii2nc-little_r_handler.Po
 	-rm -f ./$(DEPDIR)/ascii2nc-met_handler.Po
+	-rm -f ./$(DEPDIR)/ascii2nc-ndbc_handler.Po
+	-rm -f ./$(DEPDIR)/ascii2nc-ndbc_locations.Po
 	-rm -f ./$(DEPDIR)/ascii2nc-python_handler.Po
 	-rm -f ./$(DEPDIR)/ascii2nc-surfrad_handler.Po
 	-rm -f ./$(DEPDIR)/ascii2nc-wwsis_handler.Po

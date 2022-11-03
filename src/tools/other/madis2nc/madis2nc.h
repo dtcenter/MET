@@ -19,15 +19,12 @@
 //   Mod#   Date      Name           Description
 //   ----   ----      ----           -----------
 //   000    07-21-11  Halley Gotway  Adapted from contributed code.
+//   001    09-29-22  Prestopnik     MET #2227 Remove namespace std from header files
 //
 ////////////////////////////////////////////////////////////////////////
 
 #ifndef  __MADIS2NC_H__
 #define  __MADIS2NC_H__
-
-////////////////////////////////////////////////////////////////////////
-
-using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 

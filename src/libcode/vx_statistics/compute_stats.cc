@@ -1372,6 +1372,100 @@ void compute_ecnt_mean(const ECNTInfo *ecnt_info, int n,
    for(i=0,na.erase(); i<n; i++) na.add(ecnt_info[i].spread_plus_oerr);
    ecnt_mean.spread_plus_oerr = na.mean();
 
+   for(i=0,na.erase(); i<n; i++) na.add(ecnt_info[i].bias_ratio);
+   ecnt_mean.bias_ratio = na.mean();
+
+   for(i=0,na.erase(); i<n; i++) na.add(ecnt_info[i].n_ge_obs);
+   ecnt_mean.n_ge_obs = na.mean();
+
+   for(i=0,na.erase(); i<n; i++) na.add(ecnt_info[i].me_ge_obs);
+   ecnt_mean.me_ge_obs = na.mean();
+
+   for(i=0,na.erase(); i<n; i++) na.add(ecnt_info[i].n_lt_obs);
+   ecnt_mean.n_lt_obs = na.mean();
+
+   for(i=0,na.erase(); i<n; i++) na.add(ecnt_info[i].me_lt_obs);
+   ecnt_mean.me_lt_obs = na.mean();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Compute aggregated SEEPS.
+//
+////////////////////////////////////////////////////////////////////////
+
+void compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps) {
+   static const char *method_name = "compute_seeps_agg() -> ";
+
+   //
+   // Check that the forecast and observation arrays of the same length
+   //
+   if(pd->f_na.n() != pd->o_na.n()) {
+      mlog << Error << "\n" << method_name
+           << "the forecast and observation arrays must have the same "
+           << "length!\n\n";
+      throw(1);
+   }
+
+   SeepsScore *seeps_mpr;
+   int count, count_diagonal;
+   int c12, c13, c21, c23, c31, c32;
+   double score, obs_sum, fcst_sum;
+
+   score = obs_sum = fcst_sum = 0.0;
+   count = count_diagonal = c12 = c13 = c21 = c23 = c31 = c32 = 0;
+   for(int i=0; i<pd->n_obs; i++) {
+
+      if (i >= pd->seeps_mpr.size()) break;
+      seeps_mpr = pd->seeps_mpr[i];
+      if (!seeps_mpr || is_eq(seeps_mpr->score, bad_data_double)) continue;
+
+      count++;
+      obs_sum  += pd->o_na[i];   // Observation Value
+      fcst_sum += pd->f_na[i];   // Forecast Value
+      score += seeps_mpr->score;
+
+      if (seeps_mpr->model_cat == 0) {
+         if (seeps_mpr->obs_cat == 1) c12++;
+         else if(seeps_mpr->obs_cat == 2) c13++;
+         else count_diagonal++;
+         // pd.pf1
+      }
+      else if (seeps_mpr->model_cat == 1) {
+         if (seeps_mpr->obs_cat == 0) c21++;
+         else if(seeps_mpr->obs_cat == 2) c23++;
+         else count_diagonal++;
+         // pd.pf2
+      }
+      else if (seeps_mpr->model_cat == 2) {
+         if (seeps_mpr->obs_cat == 0) c31++;
+         else if (seeps_mpr->obs_cat == 1) c32++;
+         else count_diagonal++;
+         // pd.pf3
+      }
+   }
+   if (count > 0) {
+      seeps->n_obs = count;
+      seeps->mean_fcst = fcst_sum / count;
+      seeps->mean_obs = obs_sum / count;
+      seeps->score = score / count;
+   }
+   seeps->c12 = c12;
+   seeps->c13 = c13;
+   seeps->c21 = c21;
+   seeps->c23 = c23;
+   seeps->c31 = c31;
+   seeps->c32 = c32;
+
+   if (count != (c12+c13+c21+c23+c31+c32+count_diagonal)){
+      mlog << Debug(2) << method_name
+           << "INFO check count: all=" << count << " s12=" << c12<< " s13=" << c13
+           << " s21=" << c21 << " s23=" << c23
+           << " s31=" << c31 << " s32=" << c32 << "\n";
+   }
+
    return;
 }
 

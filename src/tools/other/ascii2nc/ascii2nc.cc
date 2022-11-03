@@ -46,8 +46,13 @@
 //   018    03-01-21  Fillmore       Replace pickle files for temporary
 //                                   ascii.
 //   019    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
+//   020    08/26/22  Dave Albo      MET #2142 Add AirNow observations
+//   021    10/03/22  Prestopnik     MET #2227 Remove using namespace std from header files
+//   022    10/07/22  Dave Albo      MET #2276 Add NDBC Buoy data
 //
 ////////////////////////////////////////////////////////////////////////
+
+using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
@@ -79,6 +84,8 @@
 #include "surfrad_handler.h"
 #include "wwsis_handler.h"
 #include "aeronet_handler.h"
+#include "airnow_handler.h"
+#include "ndbc_handler.h"
 
 #ifdef ENABLE_PYTHON
 #include "global_python.h"
@@ -102,6 +109,10 @@ enum ASCIIFormat {
    ASCIIFormat_Little_R,
    ASCIIFormat_SurfRad,
    ASCIIFormat_WWSIS,
+   ASCIIFormat_Airnow_dailyv2,
+   ASCIIFormat_Airnow_hourlyaqobs,
+   ASCIIFormat_Airnow_hourly,
+   ASCIIFormat_NDBC_standard,
    ASCIIFormat_Aeronet_v2,
    ASCIIFormat_Aeronet_v3, 
    ASCIIFormat_Python, 
@@ -144,6 +155,7 @@ static void setup_wrapper_path();
 
 int met_main(int argc, char *argv[]) {
    CommandLine cline;
+
 
    //
    // Check for zero arguments
@@ -286,6 +298,30 @@ FileHandler *create_file_handler(const ASCIIFormat format, const ConcatString &a
          return((FileHandler *) new WwsisHandler(program_name));
       }
 
+      case ASCIIFormat_Airnow_dailyv2: {
+         AirnowHandler *handler = new AirnowHandler(program_name);
+         handler->setFormatVersion(AirnowHandler::AIRNOW_FORMAT_VERSION_DAILYV2);
+         return((FileHandler *) handler);
+      }
+
+      case ASCIIFormat_Airnow_hourlyaqobs: {
+         AirnowHandler *handler = new AirnowHandler(program_name);
+         handler->setFormatVersion(AirnowHandler::AIRNOW_FORMAT_VERSION_HOURLYAQOBS);
+         return((FileHandler *) handler);
+      }
+
+      case ASCIIFormat_Airnow_hourly: {
+         AirnowHandler *handler = new AirnowHandler(program_name);
+         handler->setFormatVersion(AirnowHandler::AIRNOW_FORMAT_VERSION_HOURLY);
+         return((FileHandler *) handler);
+      }
+
+      case ASCIIFormat_NDBC_standard: {
+         NdbcHandler *handler = new NdbcHandler(program_name);
+         handler->setFormatVersion(NdbcHandler::NDBC_FORMAT_VERSION_STANDARD);
+         return((FileHandler *) handler);
+      }
+
       case ASCIIFormat_Aeronet_v2: {
          AeronetHandler *handler = new AeronetHandler(program_name);
          handler->setFormatVersion(2);
@@ -399,6 +435,32 @@ FileHandler *determine_ascii_format(const ConcatString &ascii_filename) {
    delete aeronet_file;
 
    //
+   // See if this is an Airnow file.
+   //
+   f_in.rewind();
+   AirnowHandler *airnow_file = new AirnowHandler(program_name);
+
+   if(airnow_file->isFileType(f_in)) {
+     f_in.close();
+     return((FileHandler *) airnow_file);
+   }
+
+   delete airnow_file;
+
+   //
+   // See if this is an NDBC file.
+   //
+   f_in.rewind();
+   NdbcHandler *ndbc_file = new NdbcHandler(program_name);
+
+   if(ndbc_file->isFileType(f_in)) {
+     f_in.close();
+     return((FileHandler *) ndbc_file);
+   }
+
+   delete ndbc_file;
+
+   //
    // If we get here, we didn't recognize the file contents.
    //
 
@@ -441,6 +503,10 @@ void usage() {
         << LittleRHandler::getFormatString() << "\", \""
         << SurfradHandler::getFormatString() << "\", \""
         << WwsisHandler::getFormatString() << "\", \""
+        << AirnowHandler::getFormatStringDailyV2() << "\", \""
+        << AirnowHandler::getFormatStringHourlyAqObs() << "\", \""
+        << AirnowHandler::getFormatStringHourly() << "\", \""
+        << NdbcHandler::getFormatStringStandard() << "\", \""
         << AeronetHandler::getFormatString() << "\", \""
         << AeronetHandler::getFormatString_v2() << "\", \""
         << AeronetHandler::getFormatString_v3() << "\"";
@@ -511,6 +577,18 @@ void set_format(const StringArray & a) {
    else if(WwsisHandler::getFormatString() == a[0]) {
      ascii_format = ASCIIFormat_WWSIS;
    }
+   else if(AirnowHandler::getFormatStringDailyV2() == a[0]) {
+     ascii_format = ASCIIFormat_Airnow_dailyv2;
+   }
+   else if(AirnowHandler::getFormatStringHourlyAqObs() == a[0]) {
+     ascii_format = ASCIIFormat_Airnow_hourlyaqobs;
+   }
+   else if(AirnowHandler::getFormatStringHourly() == a[0]) {
+     ascii_format = ASCIIFormat_Airnow_hourly;
+   }
+   else if(NdbcHandler::getFormatStringStandard() == a[0]) {
+     ascii_format = ASCIIFormat_NDBC_standard;
+   }
    else if(AeronetHandler::getFormatString() == a[0]
      || AeronetHandler::getFormatString_v2() == a[0]) {
      ascii_format = ASCIIFormat_Aeronet_v2;
@@ -523,6 +601,9 @@ void set_format(const StringArray & a) {
      ascii_format = ASCIIFormat_Python;
    }
    #endif
+   else if("python" == a[0]) {
+      python_compile_error("set_format() -> ");
+   }
    else {
       mlog << Error << "\nset_format() -> "
            << "unsupported ASCII observation format \""

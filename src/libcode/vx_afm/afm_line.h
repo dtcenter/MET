@@ -28,7 +28,7 @@
 
 class AfmLine {
 
-   friend istream & operator>>(istream &, AfmLine &);
+   friend std::istream & operator>>(std::istream &, AfmLine &);
 
    private:
 
@@ -70,7 +70,7 @@ class AfmLine {
 ////////////////////////////////////////////////////////////////////////
 
 
-extern istream & operator>>(istream &, AfmLine &);
+extern std::istream & operator>>(std::istream &, AfmLine &);
 
 
 ////////////////////////////////////////////////////////////////////////

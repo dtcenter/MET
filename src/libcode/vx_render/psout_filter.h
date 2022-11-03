@@ -31,9 +31,9 @@ class PSOutputFilter : public PSFilter {
       PSOutputFilter();
      ~PSOutputFilter();
 
-      PSOutputFilter(ofstream &);
+      PSOutputFilter(std::ofstream &);
 
-      ofstream *file;
+      std::ofstream *file;
 
       bool ignore_columns;   //  default: false
 
@@ -44,7 +44,7 @@ class PSOutputFilter : public PSFilter {
       virtual void eod();
 
 
-      void attach(ofstream *);
+      void attach(std::ofstream *);
       void detach();
 
 };

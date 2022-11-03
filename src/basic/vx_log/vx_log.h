@@ -17,8 +17,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include "concat_string.h"
 #include "indent.h"
 #include "string_array.h"
