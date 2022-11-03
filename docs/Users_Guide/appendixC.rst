@@ -977,7 +977,7 @@ CRPS
 
 Called "CRPS", "CRPSCL", "CRPS_EMP", "CRPS_EMP_FAIR" and "CRPSCL_EMP" in ECNT output :numref:`table_ES_header_info_es_out_ECNT`
 
-The continuous ranked probability score (CRPS) is the integral, over all possible thresholds, of the Brier scores (:ref:`Gneiting et al., 2004 <Gneiting-2004>`). In MET, the CRPS is calculated two ways: using a normal distribution fit to the ensemble forecasts (CRPS and CRPSCL), and using the empirical ensemble distribution (CRPS_EMP and CRPSCL_EMP). The empirical ensemble CRPS is also adjusted by subtracting 1/2(m) times the mean absolute difference of the ensemble members (where m is the ensemble size), this is saved as CRPS_EMP_FAIR. In some cases, use of other distributions would be better.
+The continuous ranked probability score (CRPS) is the integral, over all possible thresholds, of the Brier scores (:ref:`Gneiting et al., 2004 <Gneiting-2004>`). In MET, the CRPS is calculated two ways: using a normal distribution fit to the ensemble forecasts (CRPS and CRPSCL), and using the empirical ensemble distribution (CRPS_EMP and CRPSCL_EMP). The empirical ensemble CRPS can be adjusted (bias corrected) by subtracting 1/(2*m) times the mean absolute difference of the ensemble members, where m is the ensemble size. This is reported as a separate statistic called CRPS_EMP_FAIR. In some cases, use of other distributions would be better.
 
 WARNING: The normal distribution is probably a good fit for temperature and pressure, and possibly a not horrible fit for winds. However, the normal approximation will not work on most precipitation forecasts and may fail for many other atmospheric variables.
 
@@ -987,13 +987,34 @@ Closed form expressions for the CRPS are difficult to define when using data rat
 
 In this equation, the y represents the event threshold. The estimated mean and standard deviation of the ensemble forecasts ( :math:`\mu \text{ and } \sigma`) are used as the parameters of the normal distribution. The values of the normal distribution are represented by the probability density function (PDF) denoted by :math:`\Phi` and the cumulative distribution function (CDF), denoted in the above equation by :math:`\phi`. 
 
-The overall CRPS is calculated as the average of the individual measures. In equation form: :math:`\text{CRPS} = \text{average(crps) } = \frac{1}{N} \sum_i^N \text{crps}_i`.
+The overall CRPS is calculated as the average of the individual measures. In equation form:
+
+.. math:: \text{CRPS} = \text{average(crps) } = \frac{1}{N} \sum_{i=1}^N \text{crps}_i
 
 The score can be interpreted as a continuous version of the mean absolute error (MAE). Thus, the score is negatively oriented, so smaller is better. Further, similar to MAE, bias will inflate the CRPS. Thus, bias should also be calculated and considered when judging forecast quality using CRPS.
 
-To calculate CRPS_EMP_FAIR (bias adjusted, empirical ensemble CRPS)
+To calculate crps_emp_fair (bias adjusted, empirical ensemble CRPS) for each individual observation with m ensemble members:
 
-.. math:: \text{CRPS_EMP_FAIR} = \text{CRPS_EMP} - \frac{1}{2*n} *  \frac{1}{n*(n-1)} \sum|f_{i} - f_{j}|
+.. math:: \text{crps_emp_fair}_i = \text{crps_emp}_i - \frac{1}{2*m} *  \frac{1}{m*(m-1)} \sum_{i \ne j}|f_{i} - f_{j}|
+
+The overall CRPS_EMP_FAIR is calculated as the average of the individual measures. In equation form:
+
+.. math:: \text{CRPS_EMP_FAIR} = \text{average(crps_emp_fair) } = \frac{1}{N} \sum_{i=1}^N \text{crps_emp_fair}_i
+
+Ensemble Mean Absolute Difference
+---------------------------------
+
+Called "SPREAD_MD" in ECNT output :numref:`table_ES_header_info_es_out_ECNT`
+
+The ensemble mean absolute difference is an alternative measure of ensemble spread. It is computed for each individual observation (denoted by a lowercase spread_md) with m ensemble members:
+
+.. math:: \text{spread_md}_i = \frac{1}{m*(m-1)} \sum_{i \ne j}|f_{i} - f_{j}|
+
+The overall SPREAD_MD is calculated as the average of the individual measures. In equation form:
+
+.. math:: \text{SPREAD_MD} = \text{average(spread_md) } = \frac{1}{N} \sum_{i=1}^N \text{spread_md}_i
+
+A perfect forecast would have ensemble mean absolute difference = 0.
           
 CRPS Skill Score
 ----------------

@@ -357,10 +357,11 @@ void parse_ecnt_line(STATLine &l, ECNTData &e_data) {
    e_data.total  = atoi(l.get_item("TOTAL"));
    e_data.n_ens  = atof(l.get_item("N_ENS"));
 
-   e_data.crps_emp   = atof(l.get_item("CRPS_EMP"));
-   e_data.crps_emp_fair   = atof(l.get_item("CRPS_EMP_FAIR"));
-   e_data.crpscl_emp = atof(l.get_item("CRPSCL_EMP"));
-   e_data.crpss_emp  = atof(l.get_item("CRPSS_EMP"));
+   e_data.crps_emp      = atof(l.get_item("CRPS_EMP"));
+   e_data.crps_emp_fair = atof(l.get_item("CRPS_EMP_FAIR"));
+   e_data.spread_md     = atof(l.get_item("SPREAD_MD"));
+   e_data.crpscl_emp    = atof(l.get_item("CRPSCL_EMP"));
+   e_data.crpss_emp     = atof(l.get_item("CRPSS_EMP"));
 
    e_data.crps_gaus   = atof(l.get_item("CRPS"));
    e_data.crpscl_gaus = atof(l.get_item("CRPSCL"));
