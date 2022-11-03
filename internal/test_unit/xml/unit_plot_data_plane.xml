@@ -507,5 +507,19 @@
       <ps>&OUTPUT_DIR;/plot_data_plane/nbm_2022021513_F119_GRIB2_FICEAC_A48_Perc-10.ps</ps>
     </output>
   </test>
- 
+
+  <test name="plot_data_plane_GRIB2_LAEA">
+  <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/ukv_agl_temperature_1.5_12.grib2 \
+      &OUTPUT_DIR;/plot_data_plane/ukv_agl_temperature_laea.ps \
+      'name="TMP"; level="Z1.5"; lead_time="24";' \
+      -title "GRIB2 LAEA 24-hour 1.5m Temperature" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/ukv_agl_temperature_laea.ps</ps>
+    </output>
+  </test>
+
 </met_test>
