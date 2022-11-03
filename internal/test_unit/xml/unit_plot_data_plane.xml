@@ -507,5 +507,19 @@
       <ps>&OUTPUT_DIR;/plot_data_plane/nbm_2022021513_F119_GRIB2_FICEAC_A48_Perc-10.ps</ps>
     </output>
   </test>
- 
+
+  <test name="plot_data_plane_NCCF_POLAR_STEREO">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/nccf/radolan_sp.nc \
+      &OUTPUT_DIR;/plot_data_plane/radolan_sp_PREC.ps \
+      'name="PREC"; level="(0,*,*)";' \
+      -title "NCCF Polar Stereographic Precipitation" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/radolan_sp_PREC.ps</ps>
+    </output>
+  </test>
+
 </met_test>
