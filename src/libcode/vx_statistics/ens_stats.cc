@@ -176,13 +176,14 @@ void ECNTInfo::init_from_scratch() {
 void ECNTInfo::clear() {
 
    othresh.clear();
-   n_ens      = n_pair      = 0;
-   crps_emp   = crpscl_emp  = crpss_emp  = crps_emp_fair = bad_data_double;
-   crps_gaus  = crpscl_gaus = crpss_gaus = bad_data_double;
-   ign        = bad_data_double;
-   me         = mae        = rmse        = spread        = bad_data_double;
-   me_oerr    = mae_oerr   = rmse_oerr   = spread_oerr   = bad_data_double;
-   spread_plus_oerr        = bad_data_double;
+   n_ens            = n_pair      = 0;
+   crps_emp         = crpscl_emp  = crpss_emp  = bad_data_double;
+   crps_emp_fair    = spread_md   = bad_data_double;
+   crps_gaus        = crpscl_gaus = crpss_gaus = bad_data_double;
+   ign              = bad_data_double;
+   me               = mae        = rmse        = spread        = bad_data_double;
+   me_oerr          = mae_oerr   = rmse_oerr   = spread_oerr   = bad_data_double;
+   spread_plus_oerr = bad_data_double;
 
    n_ge_obs   = n_lt_obs   = 0;
    me_ge_obs  = me_lt_obs  = bias_ratio  = bad_data_double;
@@ -203,6 +204,7 @@ void ECNTInfo::assign(const ECNTInfo &c) {
    crpscl_emp       = c.crpscl_emp;
    crpss_emp        = c.crpss_emp;
    crps_emp_fair    = c.crps_emp_fair;
+   spread_md        = c.spread_md;
    
    crps_gaus        = c.crps_gaus;
    crpscl_gaus      = c.crpscl_gaus;
@@ -246,6 +248,8 @@ void ECNTInfo::set(const PairDataEnsemble &pd) {
    
    crps_emp_fair = pd.crps_emp_fair_na.wmean(pd.wgt_na);
    if(is_eq(crps_emp_fair, 0.0)) crps_emp_fair = 0.0;
+
+   spread_md = pd.spread_md_na.wmean(pd.wgt_na);
    
    crpscl_emp = pd.crpscl_emp_na.wmean(pd.wgt_na);
    crpss_emp  = (is_bad_data(crps_emp)   ||
