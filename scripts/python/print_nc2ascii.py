@@ -179,7 +179,6 @@ class met_nc_point_obs():
             if self.EPSILON2_L < abs(a_value*100-int(a_value*100)) < self.EPSILON2_U:
                 if abs(a_value*10-int(a_value*10)) < self.EPSILON2_U:   # to filter x.x9996
                     result = False
-                    print(" ======================= is_2_digit_precision ", result , a_value, abs(a_value*100-int(a_value*100)) )
                     break
         return result
 
