@@ -357,10 +357,11 @@ void parse_ecnt_line(STATLine &l, ECNTData &e_data) {
    e_data.total  = atoi(l.get_item("TOTAL"));
    e_data.n_ens  = atof(l.get_item("N_ENS"));
 
-   e_data.crps_emp   = atof(l.get_item("CRPS_EMP"));
-   e_data.crps_emp_fair   = atof(l.get_item("CRPS_EMP_FAIR"));
-   e_data.crpscl_emp = atof(l.get_item("CRPSCL_EMP"));
-   e_data.crpss_emp  = atof(l.get_item("CRPSS_EMP"));
+   e_data.crps_emp      = atof(l.get_item("CRPS_EMP"));
+   e_data.crps_emp_fair = atof(l.get_item("CRPS_EMP_FAIR"));
+   e_data.spread_md     = atof(l.get_item("SPREAD_MD"));
+   e_data.crpscl_emp    = atof(l.get_item("CRPSCL_EMP"));
+   e_data.crpss_emp     = atof(l.get_item("CRPSS_EMP"));
 
    e_data.crps_gaus   = atof(l.get_item("CRPS"));
    e_data.crpscl_gaus = atof(l.get_item("CRPSCL"));
@@ -376,6 +377,15 @@ void parse_ecnt_line(STATLine &l, ECNTData &e_data) {
    e_data.spread_oerr = atof(l.get_item("SPREAD_OERR"));
 
    e_data.spread_plus_oerr = atof(l.get_item("SPREAD_PLUS_OERR"));
+
+   e_data.mae        = atof(l.get_item("MAE"));
+   e_data.mae_oerr   = atof(l.get_item("MAE_OERR"));
+
+   e_data.bias_ratio = atof(l.get_item("BIAS_RATIO"));
+   e_data.n_ge_obs   = atoi(l.get_item("N_GE_OBS"));
+   e_data.me_ge_obs  = atof(l.get_item("ME_GE_OBS"));
+   e_data.n_lt_obs   = atoi(l.get_item("N_LT_OBS"));
+   e_data.me_lt_obs  = atof(l.get_item("ME_LT_OBS"));
 
    return;
 }

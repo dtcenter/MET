@@ -44,6 +44,7 @@ The National Center for Atmospheric Research (NCAR) is sponsored by NSF. The DTC
    :numbered: 4
 
    overview
+   release-notes
    installation
    data_io
    config_options

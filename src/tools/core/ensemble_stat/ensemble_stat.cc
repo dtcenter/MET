@@ -907,11 +907,14 @@ void process_point_obs(int i_nc) {
    bool use_python = false;
    MetNcPointObsIn nc_point_obs;
    MetPointData *met_point_obs = 0;
-#ifdef WITH_PYTHON
-   MetPythonPointDataFile met_point_file;
+
+   // Check for python format
    string python_command = point_obs_file_list[i_nc];
    bool use_xarray = (0 == python_command.find(conf_val_python_xarray));
    use_python = use_xarray || (0 == python_command.find(conf_val_python_numpy));
+
+#ifdef WITH_PYTHON
+   MetPythonPointDataFile met_point_file;
    if (use_python) {
       int offset = python_command.find("=");
       if (offset == std::string::npos) {
@@ -932,6 +935,8 @@ void process_point_obs(int i_nc) {
       use_var_id = met_point_file.is_using_var_id();
    }
    else {
+#else
+   if (use_python) python_compile_error(method_name);
 #endif
       if(!nc_point_obs.open(point_obs_file_list[i_nc].c_str())) {
          nc_point_obs.close();

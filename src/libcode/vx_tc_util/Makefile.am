@@ -15,6 +15,7 @@ libvx_tc_util_a_SOURCES = \
               atcf_line_base.cc atcf_line_base.h atcf_offsets.h \
               atcf_track_line.cc atcf_track_line.h \
               atcf_prob_line.cc atcf_prob_line.h \
+              diag_file.cc diag_file.h \
               track_point.cc track_point.h \
               track_info.cc track_info.h \
               track_pair_info.cc track_pair_info.h \

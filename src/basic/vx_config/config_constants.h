@@ -86,6 +86,19 @@ enum TrackType {
 ////////////////////////////////////////////////////////////////////////
 
 //
+// Enumeration for tropical cyclone diagnostic types
+//
+
+enum DiagType {
+   DiagType_None, // Default
+   TCDiagType,    // Tropical Cyclone Diagnostics
+   LSDiagRTType,  // Realtime Large Scale Diagnostics
+   LSDiagDevType  // Development Large Scale Diagnostics
+};
+
+////////////////////////////////////////////////////////////////////////
+
+//
 // Enumeration for 12-hour interpolation logic
 //
 
@@ -637,6 +650,7 @@ static const char conf_key_trunc_factor[]      = "gaussian_trunc_factor";
 static const char conf_key_eclv_points[]       = "eclv_points";
 static const char conf_key_var_name_map[]      = "var_name_map";
 static const char conf_key_metadata_map[]      = "metadata_map";
+static const char conf_key_obs_to_qc_map[]     = "obs_to_qc_map";
 static const char conf_key_missing_thresh[]    = "missing_thresh";
 static const char conf_key_control_id[]        = "control_id";
 static const char conf_key_ens_member_ids[]    = "ens_member_ids";
@@ -884,6 +898,7 @@ static const char conf_key_do_polylines_flag   [] = "do_polylines";
 // PB2NC specific parameter key names
 //
 
+static const char conf_key_datetime[]              = "datetime";
 static const char conf_key_station_id[]            = "station_id";
 static const char conf_key_elevation_range[]       = "elevation_range";
 static const char conf_key_pb_report_type[]        = "pb_report_type";
@@ -1066,6 +1081,9 @@ static const char conf_key_dland_file[]               = "dland_file";
 static const char conf_key_basin_file[]               = "basin_file";
 static const char conf_key_track_watch_warn[]         = "track_watch_warn";
 static const char conf_key_watch_warn[]               = "watch_warn";
+static const char conf_key_diag_name[]                = "diag_name";
+static const char conf_key_diag_convert_map[]         = "diag_convert_map";
+static const char conf_key_source[]                   = "source";
 static const char conf_key_basin_map[]                = "basin_map";
 static const char conf_key_time_offset[]              = "time_offset";
 static const char conf_key_amodel[]                   = "amodel";
@@ -1082,6 +1100,10 @@ static const char conf_key_init_str_name[]            = "init_str_name";
 static const char conf_key_init_str_val[]             = "init_str_val";
 static const char conf_key_init_str_exc_name[]        = "init_str_exc_name";
 static const char conf_key_init_str_exc_val[]         = "init_str_exc_val";
+static const char conf_key_diag_thresh_name[]         = "diag_thresh_name";
+static const char conf_key_diag_thresh_val[]          = "diag_thresh_val";
+static const char conf_key_init_diag_thresh_name[]    = "init_diag_thresh_name";
+static const char conf_key_init_diag_thresh_val[]     = "init_diag_thresh_val";
 static const char conf_key_water_only[]               = "water_only";
 static const char conf_key_rirw_track[]               = "rirw.track";
 static const char conf_key_rirw_time_adeck[]          = "rirw.adeck.time";

@@ -165,9 +165,10 @@ bool get_att_value_chars(const NcAtt *att, ConcatString &value) {
    static const char *method_name = "get_att_value_chars(NcAtt) -> ";
    if (IS_VALID_NC_P(att)) {
       nc_type attType = GET_NC_TYPE_ID_P(att);
-      if (attType == NC_CHAR || attType == NC_STRING) {
+      if (attType == NC_CHAR) {
          try {
-            string att_value;
+            char att_value[tmp_buf_size];
+            memset(att_value, 0, tmp_buf_size);
             att->getValues(att_value);
             value = att_value;
          }
@@ -179,6 +180,33 @@ bool get_att_value_chars(const NcAtt *att, ConcatString &value) {
                  << "Fail to read " << GET_NC_NAME_P(att) << " attribute ("
                  << GET_NC_TYPE_NAME_P(att) << " type).\n"
                  << "Please check the encoding of the "<< GET_NC_NAME_P(att) << " attribute.\n\n";
+         }
+      }
+      else if (attType == NC_STRING) {
+         try {
+            string att_value;
+            att->getValues(att_value);
+            value = att_value;
+         }
+         catch (exceptions::NcChar ex) {
+            int num_elements_sub = 8096;
+            int num_elements = att->getAttLength();;
+            char *att_value[num_elements];
+            for (int i = 0; i < num_elements; i++ ) {
+               att_value[i] = (char*) calloc(num_elements_sub, sizeof(char));
+            }
+            try {
+               att->getValues(att_value);
+               value = att_value[0];
+            }
+            catch (exceptions::NcException ex) {
+               mlog << Warning << "\n" << method_name
+                    << "Exception: " << ex.what() << "\n"
+                    << "Fail to read " << GET_NC_NAME_P(att) << " attribute ("
+                    << GET_NC_TYPE_NAME_P(att) << " type).\n"
+                    << "Please check the encoding of the "<< GET_NC_NAME_P(att) << " attribute.\n\n";
+            }
+            for (int i = 0; i < num_elements; i++ ) delete att_value[i];
          }
       }
       else { // MET-788: to handle a custom modified NetCDF
@@ -338,6 +366,23 @@ bool    get_att_no_leap_year(const NcVar *var) {
 
 ////////////////////////////////////////////////////////////////////////
 
+bool get_cf_conventions(const netCDF::NcFile *nc, ConcatString& conventions_value) {
+   bool has_attr = false;
+   multimap<string,NcGroupAtt>::iterator it_att;
+   multimap<string,NcGroupAtt> map_attrs = nc->getAtts();
+   for (it_att = map_attrs.begin(); it_att != map_attrs.end(); it_att++) {
+      if (to_lower(it_att->first) == to_lower(cf_att_name)) {
+         NcGroupAtt cf_att = it_att->second;
+         if (IS_VALID_NC(cf_att))
+            has_attr = get_att_value_chars(&cf_att, conventions_value);
+      }
+   }
+   return has_attr;
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
 ConcatString get_log_msg_for_att(const NcVarAtt *att) {
    ConcatString log_msg("can't read attribute");
    if(IS_INVALID_NC_P(att)) {
@@ -354,7 +399,7 @@ ConcatString get_log_msg_for_att(const NcVarAtt *att) {
 ////////////////////////////////////////////////////////////////////////
 
 ConcatString get_log_msg_for_att(const NcVarAtt *att, string var_name,
-                             const ConcatString att_name) {
+                                 const ConcatString att_name) {
    ConcatString log_msg;
    log_msg << "can't read attribute" << " \""
            << ((att_name.length() > 0) ? att_name.c_str() : GET_SAFE_NC_NAME_P(att))
@@ -445,7 +490,7 @@ NcGroupAtt *get_nc_att(const NcFile * nc, const ConcatString &att_name, bool exi
 ////////////////////////////////////////////////////////////////////////
 
 bool get_nc_att_value(const NcVar *var, const ConcatString &att_name,
-                      ConcatString &att_val, bool exit_on_error) {
+                      ConcatString &att_val, int grp_id, bool exit_on_error) {
    bool status = false;
    NcVarAtt *att = (NcVarAtt *) 0;
 
@@ -833,28 +878,49 @@ void add_att(NcVar *var, const string &att_name, const double att_val) {
 
 ////////////////////////////////////////////////////////////////////////
 
-int get_var_names(NcFile *nc, StringArray *varNames) {
+int get_var_names(NcFile *nc, StringArray *var_names) {
 
-   int i, varCount;
    NcVar var;
+   int i = 0;
+   int var_count = nc->getVarCount();
 
-   varCount = nc->getVarCount();
-
-   i = 0;
-   multimap<string,NcVar>::iterator itVar;
    multimap<string,NcVar> mapVar = GET_NC_VARS_P(nc);
-   for (itVar = mapVar.begin(); itVar != mapVar.end(); ++itVar) {
-      var = (*itVar).second;
-      varNames->add(var.getName());
+   for (multimap<string,NcVar>::iterator it_var = mapVar.begin();
+        it_var != mapVar.end(); ++it_var) {
+      var = (*it_var).second;
+      var_names->add(var.getName());
       i++;
    }
 
-   if (i != varCount) {
+   if (i != var_count) {
       mlog << Error << "\n\tget_var_names() -> "
-           << "does not match array, allocated " << varCount << " but assigned "
+           << "does not match array, allocated " << var_count << " but assigned "
            << i << ".\n\n";
    }
-   return(varCount);
+   return(var_count);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int get_var_names(NcFile *nc, StringArray *var_names, StringArray &group_names) {
+
+   NcVar var;
+   NcGroup nc_group;
+   int var_count = 0;
+   multimap<string,NcVar> var_map;
+   multimap<string,NcVar>::iterator it_var;
+
+   for (int idx=0; idx<group_names.n(); idx++) {
+      nc_group = get_nc_group(nc, group_names[idx].c_str());
+      if (IS_VALID_NC(nc_group)) {
+         var_map = GET_NC_VARS(nc_group);
+         for (it_var = var_map.begin(); it_var != var_map.end(); it_var++) {
+            var_names->add(it_var->first);
+            var_count++;
+         }
+      }
+   }
+   return(var_count);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1657,6 +1723,14 @@ bool get_nc_data(NcVar *var, char *data) {
 
 ////////////////////////////////////////////////////////////////////////
 
+bool get_nc_data(NcVar *var, char **data) {
+   bool return_status = get_nc_data_t(var, data);
+
+   return(return_status);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 bool get_nc_data(NcVar *var, uchar *data) {
    bool return_status = false;
    int data_type = GET_NC_TYPE_ID_P(var);
@@ -2114,6 +2188,18 @@ bool args_ok(const LongArray & a) {
 }
 
 ////////////////////////////////////////////////////////////////////////
+// Continue even though not exists
+
+NcGroup get_nc_group(NcFile *nc, const char *group_name) {
+   NcGroup nc_group;
+   multimap<string,NcGroup> group_map = nc->getGroups();
+   multimap<string,NcGroup>::iterator it = group_map.find(group_name);
+   if (it != group_map.end()) nc_group = it->second;
+   return nc_group;
+}
+
+////////////////////////////////////////////////////////////////////////
+// Exit if exists but invalid
 
 NcVar get_var(NcFile *nc, const char *var_name) {
    string new_var_name = var_name;
@@ -2123,23 +2209,57 @@ NcVar get_var(NcFile *nc, const char *var_name) {
    // Retrieve the variable from the NetCDF file.
    //
    NcVar var;
-   multimap<string,NcVar> varMap = GET_NC_VARS_P(nc);
-   multimap<string,NcVar>::iterator it = varMap.find(new_var_name);
-   if (it != varMap.end()) {
-      NcVar tmpVar = it->second;
-      if(IS_INVALID_NC(tmpVar)) {
-         mlog << Error << "\nget_var() -> "
+   multimap<string,NcVar> var_map = GET_NC_VARS_P(nc);
+   multimap<string,NcVar>::iterator it = var_map.find(new_var_name);
+   if (it != var_map.end()) {
+      var = it->second;
+      if(IS_INVALID_NC(var)) {
+         mlog << Error << "\nget_var(var_name) -> "
               << "can't read \"" << new_var_name << "\" variable.\n\n";
          exit(1);
       }
-
-      var = tmpVar;
    }
 
    return(var);
 }
 
 ////////////////////////////////////////////////////////////////////////
+// Exit if exists but invalid
+
+NcVar get_var(NcFile *nc, const char *var_name, const char *group_name) {
+   string nc_var_name;
+   string new_var_name = var_name;
+   patch_nc_name(&new_var_name);
+
+   //
+   // Retrieve the variable from the NetCDF file.
+   //
+   NcVar var;
+   multimap<string,NcVar> var_map;
+   NcGroup nc_group = get_nc_group(nc, group_name);
+   if (IS_VALID_NC(nc_group)) {
+      nc_var_name = new_var_name;
+      var_map = GET_NC_VARS(nc_group);
+   }
+   else {   // This is for IODA data format 1.0
+      nc_var_name = new_var_name + "@" + group_name;
+      var_map = GET_NC_VARS_P(nc);
+   }
+   multimap<string,NcVar>::iterator it = var_map.find(nc_var_name);
+   if (it != var_map.end()) {
+      var = it->second;
+      if(IS_INVALID_NC(var)) {
+         mlog << Error << "\nget_var(var_name, group_name) -> "
+              << "can't read \"" << new_var_name << "\" variable.\n\n";
+         exit(1);
+      }
+   }
+
+   return(var);
+}
+
+////////////////////////////////////////////////////////////////////////
+// Continue even though not exists
 
 NcVar get_nc_var(NcFile *nc, const char *var_name, bool log_as_error) {
    string new_var_name = var_name;
@@ -2151,7 +2271,7 @@ NcVar get_nc_var(NcFile *nc, const char *var_name, bool log_as_error) {
    NcVar var = nc->getVar(new_var_name);
    if(IS_INVALID_NC(var)) {
       ConcatString log_message;
-      log_message << "\nget_nc_var(NcFile) --> The variable \""
+      log_message << "\nget_nc_var(var_name) --> The variable \""
                   << new_var_name << "\" does not exist!\n\n";
       if (log_as_error)
          mlog << Error << log_message;
@@ -2160,6 +2280,60 @@ NcVar get_nc_var(NcFile *nc, const char *var_name, bool log_as_error) {
    }
 
    return(var);
+}
+
+////////////////////////////////////////////////////////////////////////
+// Continue even though not exists
+
+NcVar get_nc_var(NcFile *nc, const ConcatString &var_name, bool log_as_error) {
+   return get_nc_var(nc, var_name.c_str(), log_as_error);
+}
+
+////////////////////////////////////////////////////////////////////////
+// Continue even though not exists
+
+NcVar get_nc_var(NcFile *nc, const char *var_name, const char *group_name,
+                 bool log_as_error) {
+   string nc_var_name;
+   string new_var_name = var_name;
+   patch_nc_name(&new_var_name);
+
+   //
+   // Retrieve the variable from the NetCDF file.
+   //
+   NcVar var;
+   multimap<string,NcVar> var_map;
+   NcGroup nc_group = get_nc_group(nc, group_name);
+   if (IS_VALID_NC(nc_group)) {
+      nc_var_name = new_var_name;
+      var_map = GET_NC_VARS(nc_group);
+   }
+   else {   // This is for IODA data format 1.0
+      nc_var_name = new_var_name + "@" + group_name;
+      var_map = GET_NC_VARS_P(nc);
+   }
+   multimap<string,NcVar>::iterator it = var_map.find(nc_var_name);
+   if (it != var_map.end()) var = it->second;
+
+   if(IS_INVALID_NC(var)) {
+      ConcatString log_message;
+      log_message << "\nget_nc_var(var_name, group_name) --> The variable \""
+                  << nc_var_name << "\" does not exist!\n\n";
+      if (log_as_error)
+         mlog << Error << log_message;
+      else
+         mlog << Warning << log_message;
+   }
+
+   return(var);
+}
+
+////////////////////////////////////////////////////////////////////////
+// Continue even though not exists
+
+NcVar get_nc_var(NcFile *nc, const ConcatString &var_name, const char *group_name,
+                 bool log_as_error) {
+   return get_nc_var(nc, var_name.c_str(), group_name, log_as_error);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2506,8 +2680,8 @@ void copy_nc_atts(NcFile *nc_from, NcFile *nc_to, const bool all_attrs) {
    for (multimap<string,NcGroupAtt>::iterator itr = ncAttMap.begin();
          itr != ncAttMap.end(); ++itr) {
       if (all_attrs ||
-            (  (itr->first != "Conventions")
-            && (itr->first != "missing_value") ) ) {
+            (  (itr->first != cf_att_name)
+            && (itr->first != missing_value_att_name) ) ) {
          NcGroupAtt *from_att = &(itr->second);
          int dataType = GET_NC_TYPE_ID_P(from_att);
          switch (dataType) {
@@ -2654,6 +2828,7 @@ void copy_nc_data_short(NcVar *var_from, NcVar *var_to, int data_size) {
    delete[] data;
 }
 
+////////////////////////////////////////////////////////////////////////
 
 void copy_nc_var_data(NcVar *var_from, NcVar *var_to) {
    const string method_name = "copy_nc_var_data()";
@@ -2698,9 +2873,56 @@ void copy_nc_var_dims(NcVar *var_from, NcVar *var_to) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool has_var(NcFile *nc, const char * var_name) {
-   NcVar v = get_var(nc, var_name);
+bool has_nc_group(NcFile *nc, const char *group_name) {
+   multimap<string,NcGroup> group_map = nc->getGroups();
+   multimap<string,NcGroup>::iterator it = group_map.find(group_name);
+   return (it != group_map.end());
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool has_var(NcFile *nc, const char *var_name) {
+   string new_var_name = var_name;
+   patch_nc_name(&new_var_name);
+   NcVar v = get_var(nc, new_var_name.c_str());
    return IS_VALID_NC(v);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool has_var(NcFile *nc, const ConcatString var_name) {
+   return has_var(nc, var_name.c_str());
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool has_var(NcFile *nc, const char *var_name, const char *group_name) {
+   string nc_var_name;
+   string new_var_name = var_name;
+   patch_nc_name(&new_var_name);
+
+   //
+   // Retrieve the variable from the NetCDF file.
+   //
+   multimap<string,NcVar> var_map;
+   NcGroup nc_group = get_nc_group(nc, group_name);
+   if (IS_VALID_NC(nc_group)) {
+      nc_var_name = new_var_name;
+      var_map = GET_NC_VARS(nc_group);
+   }
+   else {   // This is for IODA data format 1.0
+      nc_var_name = new_var_name + "@" + group_name;
+      var_map = GET_NC_VARS_P(nc);
+   }
+   multimap<string,NcVar>::iterator it = var_map.find(nc_var_name);
+
+   return (it != var_map.end());
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool has_var(NcFile *nc, const ConcatString var_name, const char *group_name) {
+   return has_var(nc, var_name.c_str(), group_name);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -3009,26 +3231,24 @@ vector<NcDim> get_dims(const NcVar *var, int *dim_count) {
 ////////////////////////////////////////////////////////////////////////
 
 bool is_nc_name_lat(const ConcatString name) {
-   bool is_latitude = (name == "lat" || name == "LAT"
-           || name == "Lat" || name == "Latitude"
-           || name == "latitude" || name == "LATITUDE");
+   ConcatString name_l = to_lower(name);
+   bool is_latitude = (name_l == "lat" || name_l == "latitude");
    return is_latitude;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool is_nc_name_lon(const ConcatString name) {
-   bool is_longitude = (name == "lon" || name == "LON"
-           || name == "Lon" || name == "Longitude"
-           || name == "longitude" || name == "LONGITUDE");
+   ConcatString name_l = to_lower(name);
+   bool is_longitude = (name_l == "lon" || name_l == "longitude");
    return is_longitude;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool is_nc_name_time(const ConcatString name) {
-   bool is_time = (name == "t" || name == "time" || name == "Time" || name == "TIME"
-           || name == "datetime" || name == "Datetime" || name == "DATETIME");
+   ConcatString name_l = to_lower(name);
+   bool is_time = (name == "t" || name_l == "time" || name_l == "datetime");
    return is_time;
 }
 
@@ -3061,26 +3281,26 @@ NcVar get_nc_var_lat(const NcFile *nc) {
    multimap<string,NcVar> mapVar = GET_NC_VARS_P(nc);
    static const char *method_name = "get_nc_var_lat() ";
 
-   for (multimap<string,NcVar>::iterator itVar = mapVar.begin();
-        itVar != mapVar.end(); ++itVar) {
-      ConcatString name = (*itVar).first;
+   for (multimap<string,NcVar>::iterator it_var = mapVar.begin();
+        it_var != mapVar.end(); ++it_var) {
+      ConcatString name = (*it_var).first;
       //if (is_nc_name_lat(name)) found = true;
-      if (get_var_standard_name(&(*itVar).second, name)) {
+      if (get_var_standard_name(&(*it_var).second, name)) {
          if (is_nc_name_lat(name)) found = true;
       }
-      if (!found && get_var_units(&(*itVar).second, name)) {
+      if (!found && get_var_units(&(*it_var).second, name)) {
          if (is_nc_unit_latitude(name.c_str())) {
-            if (get_nc_att_value(&(*itVar).second, axis_att_name, name)) {
+            if (get_nc_att_value(&(*it_var).second, axis_att_name, name)) {
                if (is_nc_attr_lat(name)) found = true;
             }
-            else if (get_nc_att_value(&(*itVar).second,
+            else if (get_nc_att_value(&(*it_var).second,
                                       coordinate_axis_type_att_name, name)) {
                if (is_nc_attr_lat(name)) found = true;
             }
          }
       }
       if (found) {
-         var = (*itVar).second;
+         var = (*it_var).second;
          break;
       }
    }
@@ -3103,26 +3323,26 @@ NcVar get_nc_var_lon(const NcFile *nc) {
    multimap<string,NcVar> mapVar = GET_NC_VARS_P(nc);
    static const char *method_name = "get_nc_var_lon() ";
 
-   for (multimap<string,NcVar>::iterator itVar = mapVar.begin();
-        itVar != mapVar.end(); ++itVar) {
-      ConcatString name = (*itVar).first;
+   for (multimap<string,NcVar>::iterator it_var = mapVar.begin();
+        it_var != mapVar.end(); ++it_var) {
+      ConcatString name = (*it_var).first;
       //if (is_nc_name_lon(name)) found = true;
-      if (get_var_standard_name(&(*itVar).second, name)) {
+      if (get_var_standard_name(&(*it_var).second, name)) {
          if (is_nc_name_lon(name)) found = true;
       }
-      if (!found && get_var_units(&(*itVar).second, name)) {
+      if (!found && get_var_units(&(*it_var).second, name)) {
          if (is_nc_unit_longitude(name.c_str())) {
-            if (get_nc_att_value(&(*itVar).second, axis_att_name, name)) {
+            if (get_nc_att_value(&(*it_var).second, axis_att_name, name)) {
                if (is_nc_attr_lon(name)) found = true;
             }
-            else if (get_nc_att_value(&(*itVar).second,
+            else if (get_nc_att_value(&(*it_var).second,
                                       coordinate_axis_type_att_name, name)) {
                if (is_nc_attr_lon(name)) found = true;
             }
          }
       }
       if (found) {
-         var = (*itVar).second;
+         var = (*it_var).second;
          break;
       }
    }
@@ -3145,28 +3365,28 @@ NcVar get_nc_var_time(const NcFile *nc) {
    multimap<string,NcVar> mapVar = GET_NC_VARS_P(nc);
    static const char *method_name = "get_nc_var_time() ";
 
-   for (multimap<string,NcVar>::iterator itVar = mapVar.begin();
-        itVar != mapVar.end(); ++itVar) {
-      ConcatString name = (*itVar).first;
+   for (multimap<string,NcVar>::iterator it_var = mapVar.begin();
+        it_var != mapVar.end(); ++it_var) {
+      ConcatString name = (*it_var).first;
       //if (is_nc_name_time(name)) found = true;
-      if (get_var_standard_name(&(*itVar).second, name)) {
+      if (get_var_standard_name(&(*it_var).second, name)) {
          if (is_nc_name_time(name)) found = true;
          mlog << Debug(7) << method_name << "checked variable \""
            << name << "\"  is_time: " << found << "\n";
       }
-      if (!found && get_var_units(&(*itVar).second, name)) {
+      if (!found && get_var_units(&(*it_var).second, name)) {
          if (is_nc_unit_time(name.c_str())) {
-            if (get_nc_att_value(&(*itVar).second, axis_att_name, name)) {
+            if (get_nc_att_value(&(*it_var).second, axis_att_name, name)) {
                if (is_nc_attr_time(name)) found = true;
             }
-            else if (get_nc_att_value(&(*itVar).second,
+            else if (get_nc_att_value(&(*it_var).second,
                                       coordinate_axis_type_att_name, name)) {
                if (is_nc_attr_time(name)) found = true;
             }
          }
       }
       if (found) {
-         var = (*itVar).second;
+         var = (*it_var).second;
          break;
       }
    }
@@ -3226,7 +3446,7 @@ unixtime get_reference_unixtime(NcVar *time_var, int &sec_per_unit,
 
    if (get_var_units(time_var, time_unit_str)) {
       parse_cf_time_string(time_unit_str.c_str(), ref_ut, sec_per_unit);
-      no_leap_year = (86400 == sec_per_unit) ? get_att_no_leap_year(time_var) : false;
+      no_leap_year = (sec_per_day == sec_per_unit) ? get_att_no_leap_year(time_var) : false;
    }
    else {
       sec_per_unit = 1;
@@ -3304,7 +3524,13 @@ void parse_cf_time_string(const char *str, unixtime &ref_ut,
               tok.has("h"))      sec_per_unit = 3600;
       else if(tok.has("day")     ||
               tok.has("days")    ||
-              tok.has("d"))      sec_per_unit = 86400;
+              tok.has("d"))      sec_per_unit = sec_per_day;
+      else if(tok.has("month")   ||
+              tok.has("months")  ||
+              tok.has("m"))      sec_per_unit = sec_per_day * 30;
+      else if(tok.has("year")    ||
+              tok.has("years")   ||
+              tok.has("y"))      sec_per_unit = sec_per_day * 30 * 12;
       else {
          mlog << Warning << "\n" << method_name
               << "Unsupported time step in the CF convention time unit \""

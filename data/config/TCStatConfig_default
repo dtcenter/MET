@@ -93,7 +93,7 @@ line_type = [];
 
 //
 // Stratify by checking the watch/warning status for each track point
-// common to both the ADECK and BDECK tracks.  If the watch/warning status
+// common to both the ADECK and BDECK tracks. If the watch/warning status
 // of any of the track points appears in the list, retain the entire track.
 //
 track_watch_warn = [];
@@ -133,6 +133,20 @@ init_str_val  = [];
 //
 init_str_exc_name = [];
 init_str_exc_val  = [];
+
+//
+// Stratify track points by applying thresholds to numeric
+// storm diagnostic values in the TCDIAG lines.
+//
+diag_thresh_name = [];
+diag_thresh_val  = [];
+
+//
+// Stratify entire tracks by applying thresholds to numeric
+// storm diagnostic values in the TCDIAG lines for lead time 0.
+//
+init_diag_thresh_name = [];
+init_diag_thresh_val  = [];
 
 //
 // Stratify by the ADECK and BDECK distances to land.

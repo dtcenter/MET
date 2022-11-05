@@ -977,7 +977,7 @@ TimeSummaryInfo parse_conf_time_summary(Dictionary *dict) {
 
 void parse_add_conf_key_value_map(
       Dictionary *dict, const char *conf_key_map_name, map<ConcatString,ConcatString> *m) {
-   Dictionary *msg_typ_dict = (Dictionary *) 0;
+   Dictionary *map_dict = (Dictionary *) 0;
    ConcatString key, val;
    int i;
 
@@ -988,14 +988,14 @@ void parse_add_conf_key_value_map(
    }
 
    // Conf: map_name: message_type_map, obs)var_map, etc
-   msg_typ_dict = dict->lookup_array(conf_key_map_name);
+   map_dict = dict->lookup_array(conf_key_map_name);
 
    // Loop through the array entries
-   for(i=0; i<msg_typ_dict->n_entries(); i++) {
+   for(i=0; i<map_dict->n_entries(); i++) {
 
       // Lookup the key and value
-      key = (*msg_typ_dict)[i]->dict_value()->lookup_string(conf_key_key);
-      val = (*msg_typ_dict)[i]->dict_value()->lookup_string(conf_key_val);
+      key = (*map_dict)[i]->dict_value()->lookup_string(conf_key_key);
+      val = (*map_dict)[i]->dict_value()->lookup_string(conf_key_val);
 
       if(m->count(key) >= 1) {
          (*m)[key] = val;
@@ -1011,10 +1011,9 @@ void parse_add_conf_key_value_map(
 
 ///////////////////////////////////////////////////////////////////////////////
 
-
 map<ConcatString,ConcatString> parse_conf_key_value_map(
       Dictionary *dict, const char *conf_key_map_name, const char *caller) {
-   Dictionary *msg_typ_dict = (Dictionary *) 0;
+   Dictionary *map_dict = (Dictionary *) 0;
    map<ConcatString,ConcatString> m;
    ConcatString key, val;
    int i;
@@ -1026,14 +1025,14 @@ map<ConcatString,ConcatString> parse_conf_key_value_map(
    }
 
    // Conf: map_name: message_type_map, obs_var_map, etc
-   msg_typ_dict = dict->lookup_array(conf_key_map_name);
+   map_dict = dict->lookup_array(conf_key_map_name);
 
    // Loop through the array entries
-   for(i=0; i<msg_typ_dict->n_entries(); i++) {
+   for(i=0; i<map_dict->n_entries(); i++) {
 
       // Lookup the key and value
-      key = (*msg_typ_dict)[i]->dict_value()->lookup_string(conf_key_key);
-      val = (*msg_typ_dict)[i]->dict_value()->lookup_string(conf_key_val);
+      key = (*map_dict)[i]->dict_value()->lookup_string(conf_key_key);
+      val = (*map_dict)[i]->dict_value()->lookup_string(conf_key_val);
 
       if(m.count(key) >= 1) {
          mlog << Warning << "\n" << method_name
@@ -1096,6 +1095,69 @@ map<ConcatString,StringArray> parse_conf_metadata_map(Dictionary *dict) {
 map<ConcatString,ConcatString> parse_conf_obs_name_map(Dictionary *dict) {
    const char *method_name = "parse_conf_obs_name_map() -> ";
    return parse_conf_key_value_map(dict, conf_key_obs_name_map);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+map<ConcatString,StringArray> parse_conf_obs_to_qc_map(Dictionary *dict) {
+   const char *method_name = "parse_conf_obs_to_qc_map() -> ";
+   return parse_conf_key_values_map(dict, conf_key_obs_to_qc_map, method_name);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+map<ConcatString,UserFunc_1Arg> parse_conf_key_convert_map(
+      Dictionary *dict, const char *conf_key_map_name, const char *caller) {
+   Dictionary *map_dict = (Dictionary *) 0;
+   int i, j;
+   StringArray sa;
+   ConcatString key;
+   UserFunc_1Arg fx;
+   map<ConcatString,UserFunc_1Arg> m;
+   const char *method_name = (0 != caller) ? caller : "parse_conf_key_convert_map() -> ";
+
+   if(!dict) {
+      mlog << Error << "\n" << method_name << "empty dictionary!\n\n";
+      exit(1);
+   }
+
+   // Conf: tcdiag_convert_map, lsdiag_convert_map, etc
+   map_dict = dict->lookup_array(conf_key_map_name);
+
+   // Loop through the array entries
+   for(i=0; i<map_dict->n_entries(); i++) {
+
+      // Lookup the key and convert function
+      sa =   (*map_dict)[i]->dict_value()->lookup_string_array(conf_key_key);
+      fx.clear();
+      fx.set((*map_dict)[i]->dict_value()->lookup(conf_key_convert));
+
+      // Check the function
+      if(!fx.is_set()) {
+         mlog << Error << "\n" << method_name
+              << "lookup for \"" << conf_key_convert << "\" failed in the \""
+              << conf_key_map_name << "\" map!\n\n";
+         exit(1);
+      }
+
+      // Add map entry for each string
+      for(j=0; j<sa.n(); j++) {
+
+         key = sa[j];
+
+         if(m.count(key) >= 1) {
+            mlog << Warning << "\n" << method_name
+                 << "found multiple entries for key \"" << key << "\" in the \""
+                 << conf_key_map_name << "\" map!\n\n";
+         }
+
+         // Add entry to the map
+         m.insert(pair<ConcatString,UserFunc_1Arg>(key,fx));
+
+      } // end for j
+   } // end for i
+
+   return(m);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1669,11 +1731,18 @@ NbrhdInfo parse_conf_nbrhd(Dictionary *dict, const char *conf_key) {
    nbrhd_dict = dict->lookup_dictionary(conf_key);
 
    // Conf: field - may be missing
-   v = nbrhd_dict->lookup_int(conf_key_field, false);
 
-   // If found, interpret value.  Otherwise, default to BOTH
-   if(nbrhd_dict->last_lookup_status()) info.field = int_to_fieldtype(v);
-   else                                 info.field = FieldType_Both;
+   // Default info.field to BOTH
+   info.field = FieldType_Both;
+
+   // Skip lookup for conf_key_nbrhd_prob
+   if(strncmp(conf_key, conf_key_nbrhd_prob, strlen(conf_key_nbrhd_prob)) != 0) {
+
+      v = nbrhd_dict->lookup_int(conf_key_field, false);
+
+      // If found, interpret value
+      if(nbrhd_dict->last_lookup_status()) info.field = int_to_fieldtype(v);
+   }
 
    // Conf: vld_thresh
    info.vld_thresh = nbrhd_dict->lookup_double(conf_key_vld_thresh);
@@ -2685,6 +2754,45 @@ ConcatString tracktype_to_string(TrackType type) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+DiagType string_to_diagtype(const char *s) {
+   DiagType t = DiagType_None;
+
+   // Convert string to enumerated DiagType
+        if(strcasecmp(s, conf_val_none)  == 0) t = DiagType_None;
+   else if(strcasecmp(s, "TCDIAG")       == 0) t = TCDiagType;
+   else if(strcasecmp(s, "LSDIAG_RT")    == 0) t = LSDiagRTType;
+   else if(strcasecmp(s, "LSDIAG_DEV")   == 0) t = LSDiagDevType;
+   else {
+      mlog << Error << "\nstring_to_diagtype() -> "
+           << "Unexpected DiagType string \"" << s << "\".\n\n";
+      exit(1);
+   }
+
+   return(t);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+ConcatString diagtype_to_string(DiagType type) {
+   ConcatString s;
+
+   // Convert enumerated DiagType to string
+   switch(type) {
+      case(DiagType_None):  s = conf_val_none; break;
+      case(TCDiagType):     s = "TCDIAG";      break;
+      case(LSDiagRTType):   s = "LSDIAG_RT";   break;
+      case(LSDiagDevType):  s = "LSDIAG_DEV";  break;
+      default:
+         mlog << Error << "\ndiagtype_to_string() -> "
+              << "Unexpected DiagType value of " << type << ".\n\n";
+         exit(1);
+   }
+
+   return(s);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 Interp12Type int_to_interp12type(int v) {
    Interp12Type t = Interp12Type_None;
 
@@ -3017,6 +3125,23 @@ NormalizeType parse_conf_normalize(Dictionary *dict) {
    }
 
    return(t);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// Print consistent error message and exit
+//
+///////////////////////////////////////////////////////////////////////////////
+
+void python_compile_error(const char *caller) {
+
+   const char *method_name = (0 != caller) ? caller : "python_compile_error() -> ";
+
+   mlog << Error << "\n" << method_name
+        << "Support for Python has not been compiled!\n"
+        << "To run Python scripts, recompile with the --enable-python option.\n\n";
+
+   exit(1);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

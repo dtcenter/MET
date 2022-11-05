@@ -150,6 +150,7 @@ bool AirnowLocations::lookupLatLonElev(const string aqsid, double &lat, double &
 {
   string method_name = "AirnowLocations::lookupLatLonElev()";
 
+  int index = -1;
   vector<string>::const_iterator it = find(monitoringSiteAqsid.begin(), monitoringSiteAqsid.end(), aqsid);
   if (it == monitoringSiteAqsid.end()) {
     it = find(monitoringSiteStationId.begin(), monitoringSiteStationId.end(), aqsid);
@@ -157,10 +158,19 @@ bool AirnowLocations::lookupLatLonElev(const string aqsid, double &lat, double &
       it = find(monitoringSiteFullAqsid.begin(), monitoringSiteFullAqsid.end(), aqsid);
       if (it == monitoringSiteFullAqsid.end()) {
 	return false;
+      } else {
+	index = (int)(it - monitoringSiteStationId.begin());
       }
+    } else {
+      index = (int)(it - monitoringSiteFullAqsid.begin());
     }
+  } else {
+    index = (int)(it - monitoringSiteAqsid.begin());
+  }    
+  if (index < 0) {
+    return false;
   }
-  int index = (int)(it - monitoringSiteAqsid.begin());
+  
   lat = monitoringSiteLat[index];
   lon = monitoringSiteLon[index];
   elev = monitoringSiteElev[index];

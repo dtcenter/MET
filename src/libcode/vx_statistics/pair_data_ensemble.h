@@ -79,7 +79,8 @@ class PairDataEnsemble : public PairBase {
       NumArray   r_na;            // Observation ranks [n_obs]
 
       NumArray   crps_emp_na;       // Empirical Continuous Ranked Probability Score [n_obs]
-      NumArray   crps_emp_fair_na;  // Empirical Continuous Ranked Probability Score [n_obs], adjusted with the mean absolute difference of the ensmble members
+      NumArray   crps_emp_fair_na;  // Fair Empirical Continuous Ranked Probability Score [n_obs]
+      NumArray   spread_md_na;      // Mean absolute difference of ensemble members [n_obs]
       NumArray   crpscl_emp_na;     // Empirical climatological CRPS [n_obs]
 
       NumArray   crps_gaus_na;    // Gaussian CRPS [n_obs]
@@ -87,6 +88,11 @@ class PairDataEnsemble : public PairBase {
 
       NumArray   ign_na;          // Ignorance Score [n_obs]
       NumArray   pit_na;          // Probability Integral Transform [n_obs]
+
+      NumArray   n_ge_obs_na;     // Number of ensemble memebers >= obs [n_obs]
+      NumArray   me_ge_obs_na;    // Mean error of ensemble members >= obs [n_obs]
+      NumArray   n_lt_obs_na;     // Number of ensemble members < obs [n_obs]
+      NumArray   me_lt_obs_na;    // Mean error of ensemble members < obs [n_obs]
 
       int        n_ens;           // Number of ensemble members
       int        n_pair;          // Number of valid pairs, n_obs - sum(skip_ba)
@@ -119,9 +125,13 @@ class PairDataEnsemble : public PairBase {
       double     crpss_gaus;      // Guassian CRPS skill score
 
       double     me;              // ME for ensemble mean
+      double     mae;             // MAE for ensemble mean
       double     rmse;            // RMSE for ensemble mean
       double     me_oerr;         // ME for mean of perturbed members
+      double     mae_oerr;        // MAE for mean of perturbed members
       double     rmse_oerr;       // RMSE for mean of perturbed members
+
+      double     bias_ratio;      // Bias ratio
 
       //////////////////////////////////////////////////////////////////
 
@@ -310,6 +320,9 @@ extern double compute_crps_emp(double, const NumArray &);
 extern double compute_crps_gaus(double, double, double);
 extern double compute_ens_ign(double, double, double);
 extern double compute_ens_pit(double, double, double);
+extern void   compute_bias_ratio_terms(double, const NumArray &,
+                                       int &, double &, int &, double &);
+extern double compute_bias_ratio(double, double);
 
 ////////////////////////////////////////////////////////////////////////
 
