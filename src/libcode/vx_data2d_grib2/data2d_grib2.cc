@@ -419,6 +419,10 @@ void MetGrib2DataFile::find_record_matches( VarInfoGrib2* vinfo,
       bool rec_match_ex = false;
       bool rec_match_rn = false;
 
+      // Notes to be removed
+      // match_ex = exact match
+      // match_rn = range match (range of levels)
+      
       double rec_lvl1 = min((double)((*it)->LvlVal1), (double)((*it)->LvlVal2));
       double rec_lvl2 = max((double)((*it)->LvlVal1), (double)((*it)->LvlVal2));
 
@@ -501,8 +505,14 @@ void MetGrib2DataFile::find_record_matches( VarInfoGrib2* vinfo,
             continue;
          }
          
-         cout << " vinfo->discipline() = " << vinfo->discipline() << " vinfo->parm_cat() = " << vinfo->parm_cat() << " vinfo->parm() = " << vinfo->parm() << " vinfo->name().text() = " << vinfo->name().text() << endl;
+         //cout << " vinfo->discipline() = " << vinfo->discipline() << " vinfo->parm_cat() = " << vinfo->parm_cat() << " vinfo->parm() = " << vinfo->parm() << " vinfo->name().text() = " << vinfo->name().text() << endl;
+         cout << " vinfo->discipline() = " << vinfo->discipline() << " vinfo->parm_cat() = " << vinfo->parm_cat() << " vinfo->parm() = " << vinfo->parm() << " vinfo->name().text() = " << vinfo->name().text() << " vinfo->units() = " << vinfo->units() << endl;
+         
          cout << " (*it)->Discipline = " << (*it)->Discipline << " (*it)->ParmCat = " << (*it)->ParmCat << " (*it)->Parm = " << (*it)->Parm << " (*it)->ParmName = " << (*it)->ParmName << endl;
+
+         if(  vinfo->units().empty() )
+            cout << "Units is missing" << endl;
+         
          
          //  record number level type
          if( LevelType_RecNumber == vinfo_lty && is_eq(lvl1, (*it)->RecNum) ){
@@ -566,7 +576,24 @@ void MetGrib2DataFile::find_record_matches( VarInfoGrib2* vinfo,
                                 is_eq(v_thr_lo.get_value(), (*it)->ProbLower) );
             }
 
-         }
+         } // end if match for probabilistic field
+
+         //if( (rec_match_ex || rec_match_rn) && is_bad_data(vinfo->units()) ) {
+         
+         // JHG ... if we have a match at this point and have not yet set the units
+         // execute a GRIB2 table lookup to do so
+         //if ( (rec_match_ex || rec_match_rn) && vinfo.units has not been set yet ) {
+         //   
+         //   Do a GRIB2 table lookup using the current mtab, ltab, cntr to figure the units out.
+         //   (*it)->Center, (*it)->MasterTable, (*it)->LocalTable
+         //   wgrib2 -d 1 -V -varX ...
+         //   Prints :var0_2_1_7_3_5
+         //      
+         //   If we get an exact match for (*it)->Center, (*it)->MasterTable, (*it)->LocalTable, use it.
+         //                                             If not, we want a "partial match"
+         //                                          
+         // }
+
       }  //  END: else if( parameter match )
 
       //  add the record to the result lists, depending on the match type

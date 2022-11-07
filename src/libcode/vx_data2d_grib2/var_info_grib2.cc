@@ -284,7 +284,7 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
    int ltab                = dict.lookup_int   (conf_key_GRIB2_ltab,      false);
    int mtab                = dict.lookup_int   (conf_key_GRIB2_mtab,      false);
 
-   cout << "field_name = " << field_name << " field_disc = " << field_disc << " field_parm_cat = " << field_parm_cat << " field_parm = " << field_parm << " cntr = " << cntr << endl;
+   cout << "field_name = " << field_name << " field_disc = " << field_disc << " field_parm_cat = " << field_parm_cat << " field_parm = " << field_parm << " cntr = " << cntr << " ltab = " << ltab << " mtab = " << mtab << endl;
    
    //  user-specified GRIB2 record filters
    PDTmpl                  = dict.lookup_int   (conf_key_GRIB2_pdt,       false);
@@ -365,9 +365,10 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
       set_discipline( tab.index_a   );
       set_parm_cat  ( tab.index_b   );
       set_parm      ( tab.index_c   );
-      cout << " tab.units.c_str() = " << tab.units.c_str() << endl;
-      set_units     ( tab.units.c_str()     );
-      set_long_name ( tab.full_name.c_str() );
+      // We want to comment out set_units and set_long_name
+      //cout << " tab.units.c_str() = " << tab.units.c_str() << endl;
+      //set_units     ( tab.units.c_str()     );
+      //set_long_name ( tab.full_name.c_str() );
    }
    
    //  call the parent to set the level information
