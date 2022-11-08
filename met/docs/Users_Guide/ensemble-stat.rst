@@ -332,7 +332,7 @@ The **prob_pct_thresh** entry is an array of thresholds which define the Nx2 pro
 
 .. code-block:: none
 
-  prob_cat_thresh = [ ==0.25 ];
+  prob_pct_thresh = [ ==0.25 ];
 
 __________________
 
