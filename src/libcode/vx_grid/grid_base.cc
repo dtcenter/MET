@@ -226,6 +226,28 @@ void LaeaData::dump() const
 
 mlog << Debug(grid_debug_level)
      << "\nLaea Grid Data:\n"
+     << "    geoid: " << geoid   << "\n"
+     << "    lat_1: " << lat_1   << "\n"
+     << "    lon_1: " << lon_1   << "\n"
+     << "  lat_std: " << lat_std << "\n"
+     << "  lon_cen: " << lon_cen << "\n"
+     << "     dx_m: " << dx_m    << "\n"
+     << "     dy_m: " << dy_m    << "\n"
+     << "       nx: " << nx      << "\n"
+     << "       ny: " << ny      << "\n\n";
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void LaeaCornerData::dump() const
+
+{
+
+mlog << Debug(grid_debug_level)
+     << "\nLaea Corner Grid Data:\n"
      << "    geoid: " << geoid << "\n"
      << "   lat_ll: " << lat_ll << "\n"
      << "   lon_ll: " << lon_ll << "\n"
@@ -334,6 +356,7 @@ m   = (const MercatorData *)      0;
 g   = (const GaussianData *)      0;
 gi  = (const GoesImagerData *)    0;
 la  = (const LaeaData *)          0;
+cl  = (const LaeaCornerData *)    0;
 tc  = (const TcrmwData *)         0;
 sl  = (const SemiLatLonData *)    0;
 
@@ -359,6 +382,7 @@ if ( m   )  { delete m;    m   = (const MercatorData *)      0; };
 if ( g   )  { delete g;    g   = (const GaussianData *)      0; };
 if ( gi  )  { delete gi;   gi  = (const GoesImagerData *)    0; };
 if ( la  )  { delete la;   la  = (const LaeaData *)          0; };
+if ( cl  )  { delete cl;   cl  = (const LaeaCornerData *)    0; };
 if ( tc  )  { delete tc;   tc  = (const TcrmwData *)         0; };
 if ( sl  )  { delete sl;   sl  = (const SemiLatLonData *)    0; };
 
@@ -382,6 +406,7 @@ if ( info.m   )  set( *(info.m )  );
 if ( info.g   )  set( *(info.g )  );
 if ( info.gi  )  set( *(info.gi ) );
 if ( info.la  )  set( *(info.la ) );
+if ( info.cl  )  set( *(info.cl ) );
 if ( info.sl  )  set( *(info.sl ) );
 
 return;
@@ -613,6 +638,28 @@ D = new LaeaData;
 memcpy(D, &data, sizeof(data));
 
 la = D;  D = (LaeaData *) 0;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void GridInfo::set(const LaeaCornerData & data)
+
+{
+
+clear();
+
+LaeaCornerData * D = (LaeaCornerData *) 0;
+
+D = new LaeaCornerData;
+
+memcpy(D, &data, sizeof(data));
+
+cl = D;  D = (LaeaCornerData *) 0;
 
 return;
 
@@ -1297,6 +1344,7 @@ else if ( i1.m   && i2.m   )  return ( is_eq(i1.m,   i2.m  ) );
 else if ( i1.g   && i2.g   )  return ( is_eq(i1.g,   i2.g  ) );
 else if ( i1.gi  && i2.gi  )  return ( is_eq(i1.gi,  i2.gi ) );
 else if ( i1.la  && i2.la  )  return ( is_eq(i1.la,  i2.la ) );
+else if ( i1.cl  && i2.cl  )  return ( is_eq(i1.cl,  i2.cl ) );
 else if ( i1.sl  && i2.sl  )  return ( is_eq(i1.sl,  i2.sl ) );
 
 return ( false );
@@ -1504,6 +1552,33 @@ return ( status );
 
 
 bool is_eq(const LaeaData * g1, const LaeaData * g2)
+
+{
+
+if ( !g1 || !g2 )  return ( false );
+
+bool status = false;
+
+if ( g1->lat_1 == g2->lat_1 &&
+     is_eq  (rescale_lon(g1->lon_1),
+             rescale_lon(g2->lon_1), loose_tol) &&
+     g1->lat_std == g2->lat_std &&
+     is_eq  (rescale_lon(g1->lon_cen),
+             rescale_lon(g2->lon_cen), loose_tol) &&
+     g1->dx_m == g2->dx_m &&
+     g1->dy_m == g2->dy_m &&
+     g1->nx   == g2->nx   &&
+     g1->ny   == g2->ny )  status = true;
+
+return ( status );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool is_eq(const LaeaCornerData * g1, const LaeaCornerData * g2)
 
 {
 

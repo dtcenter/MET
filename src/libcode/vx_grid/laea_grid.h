@@ -36,10 +36,12 @@ class LaeaGrid : public GridRep {
       LaeaGrid();
      ~LaeaGrid();
       LaeaGrid(const LaeaData &);
+      LaeaGrid(const LaeaCornerData &);
 
       Spheroid geoid;
 
-      LaeaData Data;
+      LaeaData       Data;
+      LaeaCornerData CornerData;
 
       double snyder_m_func(double lat) const;
 

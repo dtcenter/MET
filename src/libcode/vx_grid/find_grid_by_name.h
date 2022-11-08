@@ -328,7 +328,7 @@ static const int n_ncep_gaussian_grids = sizeof(ncep_gaussian_grids)/sizeof(*nce
    //
 
 
-static const LaeaData misc_laea_grids [] = {
+static const LaeaCornerData misc_laea_grids [] = {
 
    { "EUMETNET", "WGS_84", 31.7462, 10.4346, 67.0228, 39.5358, 31.9877, -29.421, 55.0, -10.0, 1900, 2200 },
 

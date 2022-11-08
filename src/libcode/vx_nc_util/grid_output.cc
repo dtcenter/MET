@@ -37,6 +37,7 @@ static void stereographic_grid_output  (const GridInfo &, NcFile * ncfile);
 static void mercator_grid_output       (const GridInfo &, NcFile * ncfile);
 static void gaussian_grid_output       (const GridInfo &, NcFile * ncfile);
 static void laea_grid_output           (const GridInfo &, NcFile * ncfile);
+static void laea_corner_grid_output    (const GridInfo &, NcFile * ncfile);
 static void semilatlon_grid_output     (const GridInfo &, NcFile * ncfile, NcDim &, NcDim &);
 static void write_semilatlon_var       (NcFile * ncfile, const char *,
                                         NcDim *, const NumArray &, const char *,
@@ -67,6 +68,7 @@ else if ( info.rll )  rotated_latlon_grid_output  (info, ncfile);
 else if ( info.m   )  mercator_grid_output        (info, ncfile);
 else if ( info.g   )  gaussian_grid_output        (info, ncfile);
 else if ( info.la  )  laea_grid_output            (info, ncfile);
+else if ( info.cl  )  laea_corner_grid_output     (info, ncfile);
 else if ( info.sl  )  semilatlon_grid_output      (info, ncfile, lat_dim, lon_dim);
 else {
 
@@ -652,6 +654,102 @@ void laea_grid_output(const GridInfo & info, NcFile * ncfile)
 char junk[256];
 double t;
 const LaeaData & data = *(info.la);
+
+ncfile->putAtt("Projection", "Lambert Azimuthal Equal Area");
+
+ncfile->putAtt("geoid", data.geoid);
+
+   //
+   //  lat_1
+   //
+
+snprintf(junk, sizeof(junk), "%f degrees_north", data.lat_1);
+
+ncfile->putAtt("lat_1", junk);
+
+   //
+   //  lon_1
+   //
+
+t = data.lon_1;
+
+if ( !west_longitude_positive )  t = -t;
+
+snprintf(junk, sizeof(junk), "%f degrees_east", t);
+
+ncfile->putAtt("lon_1", junk);
+
+   //
+   //  lat_std
+   //
+
+snprintf(junk, sizeof(junk), "%f degrees_north", data.lat_std);
+
+ncfile->putAtt("lat_std", junk);
+
+   //
+   //  lon_cen
+   //
+
+t = data.lon_cen;
+
+if ( !west_longitude_positive )  t = -t;
+
+snprintf(junk, sizeof(junk), "%f degrees_east", t);
+
+ncfile->putAtt("lon_cen", junk);
+
+   //
+   //  dx_m
+   //
+
+snprintf(junk, sizeof(junk), "%f meters", data.dx_m);
+
+ncfile->putAtt("dx_m", junk);
+
+   //
+   //  dy_m
+   //
+
+snprintf(junk, sizeof(junk), "%f meters", data.dy_m);
+
+ncfile->putAtt("dy_m", junk);
+
+   //
+   //  nx
+   //
+
+snprintf(junk, sizeof(junk), "%d", data.nx);
+
+ncfile->putAtt("nx", junk);
+
+   //
+   //  ny
+   //
+
+snprintf(junk, sizeof(junk), "%d", data.ny);
+
+ncfile->putAtt("ny", junk);
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void laea_corner_grid_output(const GridInfo & info, NcFile * ncfile)
+
+{
+
+char junk[256];
+double t;
+const LaeaCornerData & data = *(info.cl);
 
 ncfile->putAtt("Projection", "Lambert Azimuthal Equal Area");
 
