@@ -25,6 +25,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 static const char *MET_ENV_SEEPS_CLIMO_NAME = "MET_SEEPS_CLIMO_NAME";
+static const char *MET_ENV_SEEPS_CLIMO_GRID_NAME = "MET_SEEPS_CLIMO_GRID_NAME";
 
 static const char *dim_name_nstn      = "nstn";
 
@@ -38,12 +39,29 @@ static const char *var_name_t1_12     = "t1_12";
 static const char *var_name_t2_12     = "t2_12";
 static const char *var_name_matrix_00 = "matrix_00";
 static const char *var_name_matrix_12 = "matrix_12";
+static const char *var_name_s12_00    = "s12_00";
+static const char *var_name_s13_00    = "s13_00";
+static const char *var_name_s21_00    = "s21_00";
+static const char *var_name_s23_00    = "s23_00";
+static const char *var_name_s31_00    = "s31_00";
+static const char *var_name_s32_00    = "s32_00";
+static const char *var_name_s12_12    = "s12_12";
+static const char *var_name_s13_12    = "s13_12";
+static const char *var_name_s21_12    = "s21_12";
+static const char *var_name_s23_12    = "s23_12";
+static const char *var_name_s31_12    = "s31_12";
+static const char *var_name_s32_12    = "s32_12";
+
+//density_radius = 0.75 degrees (83km; this is described as “the smallest possible
+// value that ensures approximately equal representation of all subregions of Europe”.)
+static double density_radius = 0.75;
 
 ////////////////////////////////////////////////////////////////////////
 
-struct SeepsScore {
+struct SeepsScore { // For SEEPS_MPR
    int   obs_cat;   // i = obs category 0,1,2
-   int   model_cat; // j = model category 0,1,2
+   int   fcst_cat;  // j = model category 0,1,2
+   int   s_idx;     // index for 3 by 3 matrix as 1 dimensional (fcst_cat*3)+obs_cat
    float p1;
    float p2;
    float t1;
@@ -53,7 +71,7 @@ struct SeepsScore {
 
 ////////////////////////////////////////////////////////////////////////
 
-struct SeepsAggScore {
+struct SeepsAggScore {  // For SEEPS
    void init();
    
    int   n_obs;
@@ -78,6 +96,7 @@ struct SeepsAggScore {
    float mean_fcst;
    float mean_obs;
    float score;
+   float weighted_score;
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -150,8 +169,63 @@ class SeepsClimo {
 
 ////////////////////////////////////////////////////////////////////////
 
+class SeepsClimoGrid {
+
+   private:
+
+      int   month;
+      int   hour;
+      int   nx;
+      int   ny;
+      float *p1_buf;
+      float *p2_buf;
+      float *t1_buf;
+      float *t2_buf;
+      float *s12_buf;
+      float *s13_buf;
+      float *s21_buf;
+      float *s23_buf;
+      float *s31_buf;
+      float *s32_buf;
+
+      bool seeps_ready;
+      //int nstn;
+      //std::map<int,SeepsClimoRecord *> seeps_score_00_map;
+      //std::map<int,SeepsClimoRecord *> seeps_score_12_map;
+      //
+      //SeepsClimoRecord *create_climo_record(int sid, float lat, float lon, float elv,
+      //                                      float *p1, float *p2, float *t1, float *t2,
+      //                                      float *scores);
+      ConcatString get_seeps_climo_filename();
+      //void print_record(SeepsClimoRecord *record, bool with_header=false);
+      void read_seeps_scores(ConcatString filename);
+
+   public:
+
+      SeepsClimoGrid(int month, int hour);
+     ~SeepsClimoGrid();
+
+      void clear();
+      SeepsScore *get_record(int ix, int iy, float p_fcst, float p_obs);
+      float get_score(int offset, int obs_cat, int fcst_cat);
+      float get_score(int ix, int iy, float p_fcst, float p_obs);
+      void print_all();
+      //void print_record(bool with_header=false);
+
+      //
+      //
+      //
+
+};
+
+
+////////////////////////////////////////////////////////////////////////
+
 extern SeepsClimo *get_seeps_climo();
+extern SeepsClimoGrid *get_seeps_climo_grid(int month, int hour=0);
+
 extern void release_seeps_climo();
+extern void release_seeps_climo_grid();
 
 ////////////////////////////////////////////////////////////////////////
 

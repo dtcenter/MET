@@ -27,36 +27,80 @@ using namespace netCDF;
 
 bool standalone_debug_seeps = false;
 
-static SeepsClimo *seeps_Climo = 0;
+static SeepsClimo *seeps_climo = 0;
+static std::map<int,SeepsClimoGrid *> seeps_climo_grid_map_00;
 
 static const char *def_seeps_filename = "MET_BASE/climo/seeps/PPT24_seepsweights.nc";
+static const char *def_seeps_grid_filename = "MET_BASE/climo/seeps/PPT24_seepsweights_grid.nc";
 
 static const char *var_name_sid       = "sid";
 static const char *var_name_lat       = "lat";
 static const char *var_name_lon       = "lon";
 static const char *var_name_elv       = "elv";
 
+static const char *dim_name_lat       = "latitude";
+static const char *dim_name_lon       = "longitude";
+
 ////////////////////////////////////////////////////////////////////////
 
 SeepsClimo *get_seeps_climo() {
-   if (! seeps_Climo) seeps_Climo = new SeepsClimo();
-   return seeps_Climo;
+   if (! seeps_climo) seeps_climo = new SeepsClimo();
+   return seeps_climo;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void release_seeps_climo() {
-   if (seeps_Climo) { delete seeps_Climo; seeps_Climo = 0; }
+   if (seeps_climo) { delete seeps_climo; seeps_climo = 0; }
 }
 
 ////////////////////////////////////////////////////////////////////////
 
+SeepsClimoGrid *get_seeps_climo_grid(int month, int hour) {
+   bool not_found = true;
+   SeepsClimoGrid *seeps_climo_grid = NULL;
+   for (map<int,SeepsClimoGrid *>::iterator it=seeps_climo_grid_map_00.begin();
+        it!=seeps_climo_grid_map_00.end(); ++it) {
+      if (it->first == month) {
+         not_found = false;
+         seeps_climo_grid = (SeepsClimoGrid *)it->second;
+         break;
+      }
+   }
+
+   if (not_found) {
+      seeps_climo_grid = new SeepsClimoGrid(month, hour);
+      seeps_climo_grid_map_00[month] = seeps_climo_grid;
+   }
+   return seeps_climo_grid;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void release_seeps_climo_grid(int month, int hour) {
+   for (map<int,SeepsClimoGrid *>::iterator it=seeps_climo_grid_map_00.begin();
+        it!=seeps_climo_grid_map_00.end(); ++it) {
+      if (it->first == month) {
+         delete it->second;
+         seeps_climo_grid_map_00.erase(it);
+         break;
+      }
+   }
+}
+
+
+////////////////////////////////////////////////////////////////////////
 
 SeepsClimo::SeepsClimo() {
 
-   ConcatString seeps_name= get_seeps_climo_filename();
-   if (file_exists(seeps_name.c_str())) {
-      read_records(seeps_name);
+   ConcatString seeps_name = get_seeps_climo_filename();
+   seeps_ready = file_exists(seeps_name.c_str());
+   if (seeps_ready) read_records(seeps_name);
+   else {
+      mlog << Error << "\nSeepsClimo::SeepsClimo() -> "
+           << "The SEEPS climo data \"" << seeps_name << "\" is missing!"
+           << " Turn off SEEPS and SEEPS_MPR to continue\n\n";
+      exit(1);
    }
 }
 
@@ -171,10 +215,8 @@ ConcatString SeepsClimo::get_seeps_climo_filename() {
    const char *method_name = "SeepsClimo::get_seeps_climo_filename() -> ";
 
    // Use the MET_TMP_DIR environment variable, if set.
-   bool use_env = get_env(MET_ENV_SEEPS_CLIMO_NAME, seeps_filename);
-   if(use_env) {
-      seeps_filename = replace_path(seeps_filename);
-   }
+   bool use_env = get_env(MET_ENV_SEEPS_CLIMO_GRID_NAME, seeps_filename);
+   if(use_env) seeps_filename = replace_path(seeps_filename);
    else seeps_filename = replace_path(def_seeps_filename);
 
    if (seeps_ready = file_exists(seeps_filename.c_str())) {
@@ -199,7 +241,7 @@ ConcatString SeepsClimo::get_seeps_climo_filename() {
 
 float SeepsClimo::get_score(int sid, float p_fcst, float p_obs,
                             int month, int hour) {
-   float score = (float)bad_data_double;
+   float score = bad_data_float;
    SeepsRecord *record = get_record(sid, month, hour);
 
    if (NULL != record) {
@@ -224,13 +266,14 @@ SeepsScore *SeepsClimo::get_seeps_score(int sid, float p_fcst,
    if (NULL != record) {
       score = new SeepsScore();
       score->p1 = record->p1;
-      score->p2 = record->p1;
+      score->p2 = record->p2;
       score->t1 = record->t1;
       score->t2 = record->t2;
 
       score->obs_cat = (p_obs>record->t1)+(p_obs>record->t2);
-      score->model_cat = (p_fcst>record->t1)+(p_fcst>record->t2);
-      score->score = record->scores[(score->model_cat*3)+score->obs_cat];
+      score->fcst_cat = (p_fcst>record->t1)+(p_fcst>record->t2);
+      score->s_idx = (score->fcst_cat*3)+score->obs_cat;
+      score->score = record->scores[score->s_idx];
       delete record;
    }
 
@@ -300,204 +343,541 @@ void SeepsClimo::print_record(SeepsRecord *record, bool with_header) {
 
 void SeepsClimo::read_records(ConcatString filename) {
    clock_t clock_time = clock();
-   float p1_00_buf[SEEPS_MONTH];
-   float p2_00_buf[SEEPS_MONTH];
-   float t1_00_buf[SEEPS_MONTH];
-   float t2_00_buf[SEEPS_MONTH];
-   float p1_12_buf[SEEPS_MONTH];
-   float p2_12_buf[SEEPS_MONTH];
-   float t1_12_buf[SEEPS_MONTH];
-   float t2_12_buf[SEEPS_MONTH];
-   float matrix_00_buf[SEEPS_MONTH*SEEPS_MATRIX_SIZE];
-   float matrix_12_buf[SEEPS_MONTH*SEEPS_MATRIX_SIZE];
-   NcFile *nc_file = open_ncfile(filename.c_str());
    const char *method_name = "SeepsClimo::read_records() -> ";
 
-   // dimensions: month = 12 ; nstn = 5293 ; nmatrix = 9 ;
-   get_dim(nc_file, dim_name_nstn, nstn, true);
-   mlog << Debug(3) << method_name << "dimension nstn = " << nstn << "\n";
-   if (standalone_debug_seeps) cout << "dimension nstn = " << nstn << "\n";
+   try {
+      float p1_00_buf[SEEPS_MONTH];
+      float p2_00_buf[SEEPS_MONTH];
+      float t1_00_buf[SEEPS_MONTH];
+      float t2_00_buf[SEEPS_MONTH];
+      float p1_12_buf[SEEPS_MONTH];
+      float p2_12_buf[SEEPS_MONTH];
+      float t1_12_buf[SEEPS_MONTH];
+      float t2_12_buf[SEEPS_MONTH];
+      float matrix_00_buf[SEEPS_MONTH*SEEPS_MATRIX_SIZE];
+      float matrix_12_buf[SEEPS_MONTH*SEEPS_MATRIX_SIZE];
+      NcFile *nc_file = open_ncfile(filename.c_str());
 
-   int   *sid_array = new int[nstn];
-   float *lat_array = new float[nstn];
-   float *lon_array = new float[nstn];
-   float *elv_array = new float[nstn];
-   float *p1_00_array = new float[nstn*SEEPS_MONTH];
-   float *p2_00_array = new float[nstn*SEEPS_MONTH];
-   float *t1_00_array = new float[nstn*SEEPS_MONTH];
-   float *t2_00_array = new float[nstn*SEEPS_MONTH];
-   float *p1_12_array = new float[nstn*SEEPS_MONTH];
-   float *p2_12_array = new float[nstn*SEEPS_MONTH];
-   float *t1_12_array = new float[nstn*SEEPS_MONTH];
-   float *t2_12_array = new float[nstn*SEEPS_MONTH];
-   float *matrix_00_array = new float[nstn*SEEPS_MONTH*SEEPS_MATRIX_SIZE];
-   float *matrix_12_array = new float[nstn*SEEPS_MONTH*SEEPS_MATRIX_SIZE];
-   
-   NcVar var_sid       = get_nc_var(nc_file, var_name_sid);
-   NcVar var_lat       = get_nc_var(nc_file, var_name_lat);
-   NcVar var_lon       = get_nc_var(nc_file, var_name_lon);
-   NcVar var_elv       = get_nc_var(nc_file, var_name_elv);
-   NcVar var_p1_00     = get_nc_var(nc_file, var_name_p1_00);
-   NcVar var_p2_00     = get_nc_var(nc_file, var_name_p2_00);
-   NcVar var_t1_00     = get_nc_var(nc_file, var_name_t1_00);
-   NcVar var_t2_00     = get_nc_var(nc_file, var_name_t2_00);
-   NcVar var_p1_12     = get_nc_var(nc_file, var_name_p1_12);
-   NcVar var_p2_12     = get_nc_var(nc_file, var_name_p2_12);
-   NcVar var_t1_12     = get_nc_var(nc_file, var_name_t1_12);
-   NcVar var_t2_12     = get_nc_var(nc_file, var_name_t2_12);
-   NcVar var_matrix_00 = get_nc_var(nc_file, var_name_matrix_00);
-   NcVar var_matrix_12 = get_nc_var(nc_file, var_name_matrix_12);
+      // dimensions: month = 12 ; nstn = 5293 ; nmatrix = 9 ;
+      get_dim(nc_file, dim_name_nstn, nstn, true);
+      mlog << Debug(3) << method_name << "dimension nstn = " << nstn << "\n";
+      if (standalone_debug_seeps) cout << "dimension nstn = " << nstn << "\n";
 
-   if (IS_INVALID_NC(var_sid) || !get_nc_data(&var_sid, sid_array)) {
-      mlog << Error << "\n" << method_name
-           << "Did not get sid\n\n";
-      exit(1);
-   }
-   if (IS_INVALID_NC(var_lat) || !get_nc_data(&var_lat, lat_array)) {
-      mlog << Error << "\n" << method_name
-           << "Did not get lat\n\n";
-      exit(1);
-   }
-   if (IS_INVALID_NC(var_lon) || !get_nc_data(&var_lon, lon_array)) {
-      mlog << Error << "\n" << method_name
-           << "Did not get lon\n\n";
-      exit(1);
-   }
-   if (IS_INVALID_NC(var_elv) || !get_nc_data(&var_elv, elv_array)) {
-      mlog << Error << "\n" << method_name
-           << "Did not get elv\n\n";
-      exit(1);
-   }
-   if (IS_INVALID_NC(var_p1_00) || !get_nc_data(&var_p1_00, p1_00_array)) {
-      mlog << Error << "\n" << method_name
-           << "Did not get p1_00\n\n";
-      exit(1);
-   }
-   if (IS_INVALID_NC(var_p2_00) || !get_nc_data(&var_p2_00, p2_00_array)) {
-      mlog << Error << "\n" << method_name
-           << "Did not get p2_00\n\n";
-      exit(1);
-   }
-   if (IS_INVALID_NC(var_t1_00) || !get_nc_data(&var_t1_00, t1_00_array)) {
-      mlog << Error << "\n" << method_name
-           << "Did not get t1_00\n\n";
-      exit(1);
-   }
-   if (IS_INVALID_NC(var_t2_00) || !get_nc_data(&var_t2_00, t2_00_array)) {
-      mlog << Error << "\n" << method_name
-           << "Did not get t2_00\n\n";
-      exit(1);
-   }
-   if (IS_INVALID_NC(var_p1_12) || !get_nc_data(&var_p1_12, p1_12_array)) {
-      mlog << Error << "\n" << method_name
-           << "Did not get p1_12\n\n";
-      exit(1);
-   }
-   if (IS_INVALID_NC(var_p2_12) || !get_nc_data(&var_p2_12, p2_12_array)) {
-      mlog << Error << "\n" << method_name
-           << "Did not get p2_12\n\n";
-      exit(1);
-   }
-   if (IS_INVALID_NC(var_t1_12) || !get_nc_data(&var_t1_12, t1_12_array)) {
-      mlog << Error << "\n" << method_name
-           << "Did not get t1_12\n\n";
-      exit(1);
-   }
-   if (IS_INVALID_NC(var_t2_12) || !get_nc_data(&var_t2_12, t2_12_array)) {
-      mlog << Error << "\n" << method_name
-           << "Did not get t2_12\n\n";
-      exit(1);
-   }
-   if (IS_INVALID_NC(var_matrix_00) || !get_nc_data(&var_matrix_00, matrix_00_array)) {
-      mlog << Error << "\n" << method_name
-           << "Did not get matrix_00\n\n";
-      exit(1);
-   }
-   if (IS_INVALID_NC(var_matrix_12) || !get_nc_data(&var_matrix_12, matrix_12_array)) {
-      mlog << Error << "\n" << method_name
-           << "Did not get matrix_12\n\n";
-      exit(1);
-   }
+      int   *sid_array = new int[nstn];
+      float *lat_array = new float[nstn];
+      float *lon_array = new float[nstn];
+      float *elv_array = new float[nstn];
+      float *p1_00_array = new float[nstn*SEEPS_MONTH];
+      float *p2_00_array = new float[nstn*SEEPS_MONTH];
+      float *t1_00_array = new float[nstn*SEEPS_MONTH];
+      float *t2_00_array = new float[nstn*SEEPS_MONTH];
+      float *p1_12_array = new float[nstn*SEEPS_MONTH];
+      float *p2_12_array = new float[nstn*SEEPS_MONTH];
+      float *t1_12_array = new float[nstn*SEEPS_MONTH];
+      float *t2_12_array = new float[nstn*SEEPS_MONTH];
+      float *matrix_00_array = new float[nstn*SEEPS_MONTH*SEEPS_MATRIX_SIZE];
+      float *matrix_12_array = new float[nstn*SEEPS_MONTH*SEEPS_MATRIX_SIZE];
 
-   SeepsClimoRecord *rec_00; 
-   SeepsClimoRecord *rec_12;
-   for (int idx=0; idx<nstn; idx++) {
-      int sid = sid_array[idx];
-      int start_offset = idx * SEEPS_MONTH;
-      for (int idx2=0; idx2<SEEPS_MONTH; idx2++) {
-         p1_00_buf[idx2] = p1_00_array[start_offset + idx2];
-         p2_00_buf[idx2] = p2_00_array[start_offset + idx2];
-         t1_00_buf[idx2] = t1_00_array[start_offset + idx2];
-         t2_00_buf[idx2] = t2_00_array[start_offset + idx2];
-         p1_12_buf[idx2] = p1_12_array[start_offset + idx2];
-         p2_12_buf[idx2] = p2_12_array[start_offset + idx2];
-         t1_12_buf[idx2] = t1_12_array[start_offset + idx2];
-         t2_12_buf[idx2] = t2_12_array[start_offset + idx2];
-         int offset_to = idx2 * SEEPS_MATRIX_SIZE;
-         int offset_from = (start_offset + idx2) * SEEPS_MATRIX_SIZE;
-         for (int idx3=0; idx3<SEEPS_MATRIX_SIZE; idx3++) {
-            matrix_00_buf[offset_to+idx3] = matrix_00_array[offset_from+idx3];
-            matrix_12_buf[offset_to+idx3] = matrix_12_array[offset_from+idx3];
-         }
+      NcVar var_sid       = get_nc_var(nc_file, var_name_sid);
+      NcVar var_lat       = get_nc_var(nc_file, var_name_lat);
+      NcVar var_lon       = get_nc_var(nc_file, var_name_lon);
+      NcVar var_elv       = get_nc_var(nc_file, var_name_elv);
+      NcVar var_p1_00     = get_nc_var(nc_file, var_name_p1_00);
+      NcVar var_p2_00     = get_nc_var(nc_file, var_name_p2_00);
+      NcVar var_t1_00     = get_nc_var(nc_file, var_name_t1_00);
+      NcVar var_t2_00     = get_nc_var(nc_file, var_name_t2_00);
+      NcVar var_p1_12     = get_nc_var(nc_file, var_name_p1_12);
+      NcVar var_p2_12     = get_nc_var(nc_file, var_name_p2_12);
+      NcVar var_t1_12     = get_nc_var(nc_file, var_name_t1_12);
+      NcVar var_t2_12     = get_nc_var(nc_file, var_name_t2_12);
+      NcVar var_matrix_00 = get_nc_var(nc_file, var_name_matrix_00);
+      NcVar var_matrix_12 = get_nc_var(nc_file, var_name_matrix_12);
+
+      if (IS_INVALID_NC(var_sid) || !get_nc_data(&var_sid, sid_array)) {
+         mlog << Error << "\n" << method_name
+              << "Did not get sid\n\n";
+         exit(1);
       }
-      rec_00 = create_climo_record(sid, lat_array[idx], lon_array[idx], elv_array[idx],
-                                   p1_00_buf, p2_00_buf, t1_00_buf, t2_00_buf, matrix_00_buf);
-      rec_12 = create_climo_record(sid, lat_array[idx], lon_array[idx], elv_array[idx],
-                                   p1_12_buf, p2_12_buf, t1_12_buf, t2_12_buf, matrix_12_buf);
-      seeps_score_00_map[sid] = rec_00;
-      seeps_score_12_map[sid] = rec_12;
+      if (IS_INVALID_NC(var_lat) || !get_nc_data(&var_lat, lat_array)) {
+         mlog << Error << "\n" << method_name
+              << "Did not get lat\n\n";
+         exit(1);
+      }
+      if (IS_INVALID_NC(var_lon) || !get_nc_data(&var_lon, lon_array)) {
+         mlog << Error << "\n" << method_name
+              << "Did not get lon\n\n";
+         exit(1);
+      }
+      if (IS_INVALID_NC(var_elv) || !get_nc_data(&var_elv, elv_array)) {
+         mlog << Error << "\n" << method_name
+              << "Did not get elv\n\n";
+         exit(1);
+      }
+      if (IS_INVALID_NC(var_p1_00) || !get_nc_data(&var_p1_00, p1_00_array)) {
+         mlog << Error << "\n" << method_name
+              << "Did not get p1_00\n\n";
+         exit(1);
+      }
+      if (IS_INVALID_NC(var_p2_00) || !get_nc_data(&var_p2_00, p2_00_array)) {
+         mlog << Error << "\n" << method_name
+              << "Did not get p2_00\n\n";
+         exit(1);
+      }
+      if (IS_INVALID_NC(var_t1_00) || !get_nc_data(&var_t1_00, t1_00_array)) {
+         mlog << Error << "\n" << method_name
+              << "Did not get t1_00\n\n";
+         exit(1);
+      }
+      if (IS_INVALID_NC(var_t2_00) || !get_nc_data(&var_t2_00, t2_00_array)) {
+         mlog << Error << "\n" << method_name
+              << "Did not get t2_00\n\n";
+         exit(1);
+      }
+      if (IS_INVALID_NC(var_p1_12) || !get_nc_data(&var_p1_12, p1_12_array)) {
+         mlog << Error << "\n" << method_name
+              << "Did not get p1_12\n\n";
+         exit(1);
+      }
+      if (IS_INVALID_NC(var_p2_12) || !get_nc_data(&var_p2_12, p2_12_array)) {
+         mlog << Error << "\n" << method_name
+              << "Did not get p2_12\n\n";
+         exit(1);
+      }
+      if (IS_INVALID_NC(var_t1_12) || !get_nc_data(&var_t1_12, t1_12_array)) {
+         mlog << Error << "\n" << method_name
+              << "Did not get t1_12\n\n";
+         exit(1);
+      }
+      if (IS_INVALID_NC(var_t2_12) || !get_nc_data(&var_t2_12, t2_12_array)) {
+         mlog << Error << "\n" << method_name
+              << "Did not get t2_12\n\n";
+         exit(1);
+      }
+      if (IS_INVALID_NC(var_matrix_00) || !get_nc_data(&var_matrix_00, matrix_00_array)) {
+         mlog << Error << "\n" << method_name
+              << "Did not get matrix_00\n\n";
+         exit(1);
+      }
+      if (IS_INVALID_NC(var_matrix_12) || !get_nc_data(&var_matrix_12, matrix_12_array)) {
+         mlog << Error << "\n" << method_name
+              << "Did not get matrix_12\n\n";
+         exit(1);
+      }
+
+      SeepsClimoRecord *rec_00;
+      SeepsClimoRecord *rec_12;
+      for (int idx=0; idx<nstn; idx++) {
+         int sid = sid_array[idx];
+         int start_offset = idx * SEEPS_MONTH;
+         for (int idx2=0; idx2<SEEPS_MONTH; idx2++) {
+            p1_00_buf[idx2] = p1_00_array[start_offset + idx2];
+            p2_00_buf[idx2] = p2_00_array[start_offset + idx2];
+            t1_00_buf[idx2] = t1_00_array[start_offset + idx2];
+            t2_00_buf[idx2] = t2_00_array[start_offset + idx2];
+            p1_12_buf[idx2] = p1_12_array[start_offset + idx2];
+            p2_12_buf[idx2] = p2_12_array[start_offset + idx2];
+            t1_12_buf[idx2] = t1_12_array[start_offset + idx2];
+            t2_12_buf[idx2] = t2_12_array[start_offset + idx2];
+            int offset_to = idx2 * SEEPS_MATRIX_SIZE;
+            int offset_from = (start_offset + idx2) * SEEPS_MATRIX_SIZE;
+            for (int idx3=0; idx3<SEEPS_MATRIX_SIZE; idx3++) {
+               matrix_00_buf[offset_to+idx3] = matrix_00_array[offset_from+idx3];
+               matrix_12_buf[offset_to+idx3] = matrix_12_array[offset_from+idx3];
+            }
+         }
+         rec_00 = create_climo_record(sid, lat_array[idx], lon_array[idx], elv_array[idx],
+                                      p1_00_buf, p2_00_buf, t1_00_buf, t2_00_buf, matrix_00_buf);
+         rec_12 = create_climo_record(sid, lat_array[idx], lon_array[idx], elv_array[idx],
+                                      p1_12_buf, p2_12_buf, t1_12_buf, t2_12_buf, matrix_12_buf);
+         seeps_score_00_map[sid] = rec_00;
+         seeps_score_12_map[sid] = rec_12;
+      }
+
+      if (sid_array) delete [] sid_array;
+      if (lat_array) delete [] lat_array;
+      if (lon_array) delete [] lon_array;
+      if (elv_array) delete [] elv_array;
+      if (p1_00_array) delete [] p1_00_array;
+      if (p2_00_array) delete [] p2_00_array;
+      if (t1_00_array) delete [] t1_00_array;
+      if (t2_00_array) delete [] t2_00_array;
+      if (p1_12_array) delete [] p1_12_array;
+      if (p2_12_array) delete [] p2_12_array;
+      if (t1_12_array) delete [] t1_12_array;
+      if (t2_12_array) delete [] t2_12_array;
+      if (matrix_00_array) delete [] matrix_00_array;
+      if (matrix_12_array) delete [] matrix_12_array;
+
+      nc_file->close();
+
+      float duration = (float)(clock() - clock_time)/CLOCKS_PER_SEC;
+      mlog << Debug(4) << method_name << "took " << duration << " seconds\n";
+      if (standalone_debug_seeps) cout << method_name << "took " << duration  << " seconds\n";
    }
+   catch(int i_err) {
 
-   if (sid_array) delete [] sid_array;
-   if (lat_array) delete [] lat_array;
-   if (lon_array) delete [] lon_array;
-   if (elv_array) delete [] elv_array;
-   if (p1_00_array) delete [] p1_00_array;
-   if (p2_00_array) delete [] p2_00_array;
-   if (t1_00_array) delete [] t1_00_array;
-   if (t2_00_array) delete [] t2_00_array;
-   if (p1_12_array) delete [] p1_12_array;
-   if (p2_12_array) delete [] p2_12_array;
-   if (t1_12_array) delete [] t1_12_array;
-   if (t2_12_array) delete [] t2_12_array;
-   if (matrix_00_array) delete [] matrix_00_array;
-   if (matrix_12_array) delete [] matrix_12_array;
+      seeps_ready = false;
+      mlog << Error << "\n" << method_name
+           << "encountered an error on reading " << filename << ". ecception_code="  << i_err << "\n\n";
 
-   nc_file->close();
+      exit(i_err);
+   } // end catch block
 
-   float duration = (float)(clock() - clock_time)/CLOCKS_PER_SEC;
-   mlog << Debug(4) << method_name << "took " << duration << " seconds\n";
-   if (standalone_debug_seeps) cout << method_name << "took " << duration  << " seconds\n";
-   
 }
 
+
 ////////////////////////////////////////////////////////////////////////
+
 
 void SeepsAggScore::init() {
 
    n_obs = 0;
-   c12 = 0;
-   c13 = 0;
-   c21 = 0;
-   c23 = 0;
-   c31 = 0;
-   c32 = 0;
-   s12 = 0.;
-   s13 = 0.;
-   s21 = 0.;
-   s23 = 0.;
-   s31 = 0.;
-   s32 = 0.;
-   pv1 = 0.;
-   pv2 = 0.;
-   pv3 = 0.;
-   pf1 = 0.;
-   pf2 = 0.;
-   pf3 = 0.;
+   c12 = c13 = c21 = c23 = c31 = c32 = 0;
+   s12 = s13 = s21 = s23 = s31 = s32 = 0.;
+   pv1 = pv2 = pv3 = 0.;
+   pf1 = pf2 = pf3 = 0.;
    mean_fcst = bad_data_double;
    mean_obs = bad_data_double;
    score = bad_data_double;
 
 }
 
+
 ////////////////////////////////////////////////////////////////////////
+
+
+SeepsClimoGrid::SeepsClimoGrid(int month, int hour) : month{month}, hour{hour}
+{
+
+   p1_buf = p2_buf = t1_buf = t2_buf = NULL;
+   s12_buf = s13_buf = s21_buf = s23_buf = s31_buf = s32_buf = NULL;
+
+   ConcatString seeps_name = get_seeps_climo_filename();
+   seeps_ready = file_exists(seeps_name.c_str());
+   if (seeps_ready) read_seeps_scores(seeps_name);
+   else {
+      mlog << Error << "\nSeepsClimoGrid::SeepsClimoGrid -> "
+           << "The SEEPS climo data \"" << seeps_name << "\" is missing!"
+           << " Turn off SEEPS to continue\n\n";
+      exit(1);
+   }
+
+}
+
+////////////////////////////////////////////////////////////////////////
+
+SeepsClimoGrid::~SeepsClimoGrid() {
+   clear();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void SeepsClimoGrid::clear() {
+   if (NULL != p1_buf) { delete [] p1_buf; p1_buf = NULL; }
+   if (NULL != p2_buf) { delete [] p2_buf; p2_buf = NULL; }
+   if (NULL != t1_buf) { delete [] t1_buf; t1_buf = NULL; }
+   if (NULL != t2_buf) { delete [] t2_buf; t2_buf = NULL; }
+   if (NULL != s12_buf) { delete [] s12_buf; s12_buf = NULL; }
+   if (NULL != s13_buf) { delete [] s13_buf; s13_buf = NULL; }
+   if (NULL != s21_buf) { delete [] s21_buf; s21_buf = NULL; }
+   if (NULL != s23_buf) { delete [] s23_buf; s23_buf = NULL; }
+   if (NULL != s31_buf) { delete [] s31_buf; s31_buf = NULL; }
+   if (NULL != s32_buf) { delete [] s32_buf; s32_buf = NULL; }
+};
+
+////////////////////////////////////////////////////////////////////////
+
+SeepsScore *SeepsClimoGrid::get_record(int ix, int iy, float p_fcst, float p_obs) {
+   SeepsScore *seeps_record = NULL;
+   if (!is_eq(p_fcst, -9999.0) && !is_eq(p_obs, -9999.0)) {
+      int offset = ix * ny + ny;
+      // Determine location in contingency table
+      int ic = (p_obs>t1_buf[offset])+(p_obs>t2_buf[offset]);
+      int jc = (p_fcst>t1_buf[offset])+(p_fcst>t2_buf[offset]);
+      float score = get_score(offset, ic, jc);
+
+      seeps_record = new SeepsScore();
+      seeps_record->obs_cat = ic;
+      seeps_record->fcst_cat = jc;
+      seeps_record->s_idx = (jc*3)+ic;
+      seeps_record->p1 = p1_buf[offset];
+      seeps_record->p2 = p2_buf[offset];
+      seeps_record->t1 = t1_buf[offset];
+      seeps_record->t2 = t2_buf[offset];
+      seeps_record->score = score;
+   }
+
+   return seeps_record;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+float SeepsClimoGrid::get_score(int offset, int obs_cat, int fcst_cat) {
+   float score = bad_data_float;
+
+   if (obs_cat == 0) {
+      if (fcst_cat == 1) score = s12_buf[offset];
+      else if (fcst_cat == 2) score = s13_buf[offset];
+      else score = 0.;
+   }
+   else if (obs_cat == 1) {
+      if (fcst_cat == 0) score = s21_buf[offset];
+      else if (fcst_cat == 2) score = s23_buf[offset];
+      else score = 0.;
+   }
+   else {
+      if (fcst_cat == 0) score = s31_buf[offset];
+      else if (fcst_cat == 1) score = s32_buf[offset];
+      else score = 0.;
+   }
+
+   return score;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+float SeepsClimoGrid::get_score(int ix, int iy, float p_fcst, float p_obs) {
+   float score = bad_data_float;
+
+   if (!is_eq(p_fcst, -9999.0) && !is_eq(p_obs, -9999.0)) {
+      int offset = ix * ny + ny;
+      // Determine location in contingency table
+      int ic = (p_obs>t1_buf[offset])+(p_obs>t2_buf[offset]);
+      int jc = (p_fcst>t1_buf[offset])+(p_fcst>t2_buf[offset]);
+      score = get_score(offset, ic, jc);
+   }
+
+   return score;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ConcatString SeepsClimoGrid::get_seeps_climo_filename() {
+   ConcatString seeps_filename;
+   const char *method_name = "SeepsClimoGrid::get_seeps_climo_filename() -> ";
+
+   // Use the MET_TMP_DIR environment variable, if set.
+   bool use_env = get_env(MET_ENV_SEEPS_CLIMO_NAME, seeps_filename);
+   if(use_env) {
+      seeps_filename = replace_path(seeps_filename);
+   }
+   else seeps_filename = replace_path(def_seeps_grid_filename);
+
+   if (seeps_ready = file_exists(seeps_filename.c_str())) {
+      mlog << Debug(7) << method_name << "SEEPS climo name=\""
+           << seeps_filename.c_str() << "\"\n";
+   }
+   else {
+      ConcatString message = " ";
+      if (use_env) {
+         message.add("from the env. name ");
+         message.add(MET_ENV_SEEPS_CLIMO_NAME);
+      }
+      mlog << Warning << "\n" << method_name
+           << "The SEEPS climo name \"" << seeps_filename.c_str()
+           << "\"" << message << " does not exist!\n\n";
+   }
+
+   return seeps_filename;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void SeepsClimoGrid::read_seeps_scores(ConcatString filename) {
+   clock_t clock_time = clock();
+   const char *method_name = "SeepsClimoGrid::read_seeps_scores() -> ";
+
+   try {
+      NcFile *nc_file = open_ncfile(filename.c_str());
+
+      // dimensions: month = 12;
+      if (!has_dim(nc_file, dim_name_lat) || !has_dim(nc_file, dim_name_lon)) {
+         mlog << Error << "\n" << method_name
+              << "\"" << filename << "\" is not valid SEEPS climo file\n\n";
+         //exit(1);
+      }
+
+      get_dim(nc_file, dim_name_lat, ny, true);
+      get_dim(nc_file, dim_name_lon, nx, true);
+      mlog << Debug(3)  << method_name << "dimension lon = " << nx << " lat = " << ny << "\n";
+      if (standalone_debug_seeps) cout << "dimension lon = " << nx << " lat = " << ny << "\n";;
+
+      p1_buf = new float[nx*ny];
+      p2_buf = new float[nx*ny];
+      t1_buf = new float[nx*ny];
+      t2_buf = new float[nx*ny];
+      s12_buf = new float[nx*ny];
+      s13_buf = new float[nx*ny];
+      s21_buf = new float[nx*ny];
+      s23_buf = new float[nx*ny];
+      s31_buf = new float[nx*ny];
+      s32_buf = new float[nx*ny];
+
+      long curs[3] = { month-1, 0, 0 };
+      long dims[3] = { 1, ny, nx };
+      NcVar var_p1_00  = get_nc_var(nc_file, var_name_p1_00);
+      NcVar var_p2_00  = get_nc_var(nc_file, var_name_p2_00);
+      NcVar var_t1_00  = get_nc_var(nc_file, var_name_t1_00);
+      NcVar var_t2_00  = get_nc_var(nc_file, var_name_t2_00);
+      NcVar var_s12_00 = get_nc_var(nc_file, var_name_s12_00);
+      NcVar var_s13_00 = get_nc_var(nc_file, var_name_s13_00);
+      NcVar var_s21_00 = get_nc_var(nc_file, var_name_s21_00);
+      NcVar var_s23_00 = get_nc_var(nc_file, var_name_s23_00);
+      NcVar var_s31_00 = get_nc_var(nc_file, var_name_s31_00);
+      NcVar var_s32_00 = get_nc_var(nc_file, var_name_s32_00);
+
+      if (IS_INVALID_NC(var_p1_00) || !get_nc_data(&var_p1_00, p1_buf, dims, curs)) {
+         mlog << Error << "\n" << method_name
+              << "Did not get p1_00\n\n";
+         exit(1);
+      }
+      if (IS_INVALID_NC(var_p2_00) || !get_nc_data(&var_p2_00, p2_buf, dims, curs)) {
+         mlog << Error << "\n" << method_name
+              << "Did not get p2_00\n\n";
+         exit(1);
+      }
+      if (IS_INVALID_NC(var_t1_00) || !get_nc_data(&var_t1_00, t1_buf, dims, curs)) {
+         mlog << Error << "\n" << method_name
+              << "Did not get t1_00\n\n";
+         exit(1);
+      }
+      if (IS_INVALID_NC(var_t2_00) || !get_nc_data(&var_t2_00, t2_buf, dims, curs)) {
+         mlog << Error << "\n" << method_name
+              << "Did not get t2_00\n\n";
+         exit(1);
+      }
+      if (IS_INVALID_NC(var_s12_00) || !get_nc_data(&var_s12_00, s12_buf, dims, curs)) {
+         mlog << Error << "\n" << method_name
+              << "Did not get s12_00\n\n";
+         exit(1);
+      }
+      if (IS_INVALID_NC(var_s13_00) || !get_nc_data(&var_s12_00, s13_buf, dims, curs)) {
+         mlog << Error << "\n" << method_name
+              << "Did not get s13_00\n\n";
+         exit(1);
+      }
+      if (IS_INVALID_NC(var_s21_00) || !get_nc_data(&var_s21_00, s21_buf, dims, curs)) {
+         mlog << Error << "\n" << method_name
+              << "Did not get s21_00\n\n";
+         exit(1);
+      }
+      if (IS_INVALID_NC(var_s23_00) || !get_nc_data(&var_s23_00, s23_buf, dims, curs)) {
+         mlog << Error << "\n" << method_name
+              << "Did not get s23_00\n\n";
+         exit(1);
+      }
+      if (IS_INVALID_NC(var_s31_00) || !get_nc_data(&var_s31_00, s31_buf, dims, curs)) {
+         mlog << Error << "\n" << method_name
+              << "Did not get s31_00\n\n";
+         exit(1);
+      }
+      if (IS_INVALID_NC(var_s32_00) || !get_nc_data(&var_s32_00, s32_buf, dims, curs)) {
+         mlog << Error << "\n" << method_name
+              << "Did not get s32_00\n\n";
+         exit(1);
+      }
+/*
+      SeepsClimoRecord *rec_00;
+      SeepsClimoRecord *rec_12;
+      for (int idx=0; idx<nstn; idx++) {
+         int sid = sid_array[idx];
+         int start_offset = idx * SEEPS_MONTH;
+         for (int idx2=0; idx2<SEEPS_MONTH; idx2++) {
+            p1_00_buf[idx2] = p1_00_array[start_offset + idx2];
+            p2_00_buf[idx2] = p2_00_array[start_offset + idx2];
+            t1_00_buf[idx2] = t1_00_array[start_offset + idx2];
+            t2_00_buf[idx2] = t2_00_array[start_offset + idx2];
+            p1_12_buf[idx2] = p1_12_array[start_offset + idx2];
+            p2_12_buf[idx2] = p2_12_array[start_offset + idx2];
+            t1_12_buf[idx2] = t1_12_array[start_offset + idx2];
+            t2_12_buf[idx2] = t2_12_array[start_offset + idx2];
+            int offset_to = idx2 * SEEPS_MATRIX_SIZE;
+            int offset_from = (start_offset + idx2) * SEEPS_MATRIX_SIZE;
+            for (int idx3=0; idx3<SEEPS_MATRIX_SIZE; idx3++) {
+               matrix_00_buf[offset_to+idx3] = matrix_00_array[offset_from+idx3];
+               matrix_12_buf[offset_to+idx3] = matrix_12_array[offset_from+idx3];
+            }
+         }
+         rec_00 = create_climo_record(sid, lat_array[idx], lon_array[idx], elv_array[idx],
+                                      p1_00_buf, p2_00_buf, t1_00_buf, t2_00_buf, matrix_00_buf);
+         rec_12 = create_climo_record(sid, lat_array[idx], lon_array[idx], elv_array[idx],
+                                      p1_12_buf, p2_12_buf, t1_12_buf, t2_12_buf, matrix_12_buf);
+         seeps_score_00_map[sid] = rec_00;
+         seeps_score_12_map[sid] = rec_12;
+      }
+
+      if (sid_array) delete [] sid_array;
+      if (lat_array) delete [] lat_array;
+      if (lon_array) delete [] lon_array;
+      if (elv_array) delete [] elv_array;
+      if (p1_00_array) delete [] p1_00_array;
+      if (p2_00_array) delete [] p2_00_array;
+      if (t1_00_array) delete [] t1_00_array;
+      if (t2_00_array) delete [] t2_00_array;
+      if (p1_12_array) delete [] p1_12_array;
+      if (p2_12_array) delete [] p2_12_array;
+      if (t1_12_array) delete [] t1_12_array;
+      if (t2_12_array) delete [] t2_12_array;
+      if (matrix_00_array) delete [] matrix_00_array;
+      if (matrix_12_array) delete [] matrix_12_array;
+*/
+      nc_file->close();
+
+      float duration = (float)(clock() - clock_time)/CLOCKS_PER_SEC;
+      mlog << Debug(4) << method_name << "took " << duration << " seconds\n";
+      if (standalone_debug_seeps) cout << method_name << "took " << duration  << " seconds\n";
+   }
+   catch(...) {
+
+      seeps_ready = false;
+      mlog << Error << "\n" << method_name
+           << "encountered an error on reading " << filename << ".\n\n";
+
+      exit(-1);
+   } // end catch block
+
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void SeepsClimoGrid::print_all() {
+   const char *method_name = "SeepsClimoGrid::print_all() -> ";
+   if (standalone_debug_seeps) {
+      int offset;
+      offset = 0;
+      cout << method_name << " p1_buf[" << offset << "] = " <<  p1_buf[offset]  << "\n";
+      cout << method_name << " p2_buf[" << offset << "] = " <<  p2_buf[offset]  << "\n";
+      cout << method_name << " t1_buf[" << offset << "] = " <<  t1_buf[offset]  << "\n";
+      cout << method_name << " t2_buf[" << offset << "] = " <<  t2_buf[offset]  << "\n";
+      cout << method_name << "s12_buf[" << offset << "] = " << s12_buf[offset]  << "\n";
+      cout << method_name << "s13_buf[" << offset << "] = " << s13_buf[offset]  << "\n";
+      cout << method_name << "s21_buf[" << offset << "] = " << s21_buf[offset]  << "\n";
+      cout << method_name << "s23_buf[" << offset << "] = " << s23_buf[offset]  << "\n";
+      cout << method_name << "s31_buf[" << offset << "] = " << s31_buf[offset]  << "\n";
+      cout << method_name << "s32_buf[" << offset << "] = " << s32_buf[offset]  << "\n";
+
+      offset = 400;
+      cout << method_name << " p1_buf[" << offset << "] = " <<  p1_buf[offset]  << "\n";
+      cout << method_name << " p2_buf[" << offset << "] = " <<  p2_buf[offset]  << "\n";
+      cout << method_name << " t1_buf[" << offset << "] = " <<  t1_buf[offset]  << "\n";
+      cout << method_name << " t2_buf[" << offset << "] = " <<  t2_buf[offset]  << "\n";
+      cout << method_name << "s12_buf[" << offset << "] = " << s12_buf[offset]  << "\n";
+      cout << method_name << "s13_buf[" << offset << "] = " << s13_buf[offset]  << "\n";
+      cout << method_name << "s21_buf[" << offset << "] = " << s21_buf[offset]  << "\n";
+      cout << method_name << "s23_buf[" << offset << "] = " << s23_buf[offset]  << "\n";
+      cout << method_name << "s31_buf[" << offset << "] = " << s31_buf[offset]  << "\n";
+      cout << method_name << "s32_buf[" << offset << "] = " << s32_buf[offset]  << "\n";
+
+      offset = (nx*ny) - 1;
+      cout << method_name << " p1_buf[" << offset << "] = " <<  p1_buf[offset]  << "\n";
+      cout << method_name << " p2_buf[" << offset << "] = " <<  p2_buf[offset]  << "\n";
+      cout << method_name << " t1_buf[" << offset << "] = " <<  t1_buf[offset]  << "\n";
+      cout << method_name << " t2_buf[" << offset << "] = " <<  t2_buf[offset]  << "\n";
+      cout << method_name << "s12_buf[" << offset << "] = " << s12_buf[offset]  << "\n";
+      cout << method_name << "s13_buf[" << offset << "] = " << s13_buf[offset]  << "\n";
+      cout << method_name << "s21_buf[" << offset << "] = " << s21_buf[offset]  << "\n";
+      cout << method_name << "s23_buf[" << offset << "] = " << s23_buf[offset]  << "\n";
+      cout << method_name << "s31_buf[" << offset << "] = " << s31_buf[offset]  << "\n";
+      cout << method_name << "s32_buf[" << offset << "] = " << s32_buf[offset]  << "\n";
+   }
+}
