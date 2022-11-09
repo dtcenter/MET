@@ -582,7 +582,7 @@ TC-Pairs produces output in TCST format. The default output file name can be ove
     - INDEX
     - Index of the current track pair
   * - 16
-    - SOURCE
+    - DIAG_SOURCE
     - Diagnostics data source
   * - 17
     - N_DIAG

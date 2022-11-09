@@ -33,7 +33,7 @@ my @fld_tcmpr  = qw(AMODEL BMODEL DESC STORM_ID BASIN CYCLONE STORM_NAME INIT_MA
 		    NUM_MEMBERS TRACK_SPREAD DIST_MEAN MSLP_SPREAD MAX_WIND_SPREAD);
 
 my @fld_tcdiag = qw(AMODEL BMODEL DESC STORM_ID BASIN CYCLONE STORM_NAME INIT_MASK VALID_MASK
-                    TOTAL INDEX LEVEL SOURCE N_DIAG DIAG_ VALUE_);
+                    TOTAL INDEX LEVEL DIAG_SOURCE N_DIAG DIAG_ VALUE_);
 
 my @fld_probrirw = qw(AMODEL BMODEL DESC STORM_ID BASIN CYCLONE STORM_NAME INIT_MASK VALID_MASK
                       ALAT ALON BLAT BLON INITIALS TK_ERR X_ERR Y_ERR ADLAND BDLAND RI_BEG RI_END RI_WINDOW
@@ -158,7 +158,7 @@ my $fmt_tcdiag =
       "%15s"  . # VALID_MASK
       "%15s"  . # TOTAL
       "%15s"  . # INDEX
-      "%15s"  . # SOURCE 
+      "%15s"  . # DIAG_SOURCE 
       "%15s";   # N_DIAG 
 
 my $fmt_probrirw =
@@ -360,7 +360,7 @@ close($fh_tcst_in);
 # TCDIAG Line Type
 # 14 - TOTAL
 # 15 - INDEX
-# 16 - SOURCE
+# 16 - DIAG_SOURCE
 # 17 - N_DIAG
 # 18 - DIAG_i
 # 19 - VALUE_i

@@ -472,7 +472,7 @@ void TrackPairInfo::add_tcdiag_line(const TCStatLine &l) {
    StringArray diag_name;
 
    // Diagnostic source type
-   DiagType t = string_to_diagtype(l.get_item("SOURCE"));
+   DiagType t = string_to_diagtype(l.get_item("DIAG_SOURCE"));
 
    // Make sure the source type does not change
    if(ADeck.diag_source() != DiagType_None &&
