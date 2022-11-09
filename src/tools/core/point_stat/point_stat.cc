@@ -1054,7 +1054,7 @@ void process_scores() {
                // Write out the SEEPS lines
                if(conf_info.vx_opt[i].output_flag[i_seeps] != STATOutputType_None) {
                   compute_aggregated_seeps(pd_ptr, &pd_ptr->seeps);
-                  write_seeps_row(shc, pd_ptr,
+                  write_seeps_row(shc, &pd_ptr->seeps,
                      conf_info.vx_opt[i].output_flag[i_seeps],
                      stat_at, i_stat_row,
                      txt_at[i_seeps], i_txt_row[i_seeps]);
