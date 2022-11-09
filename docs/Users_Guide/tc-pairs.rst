@@ -122,9 +122,9 @@ ____________________
   valid_inc    = [];
   valid_exc    = [];
   init_hour    = [];
-  init_mask    = [];
+  init_mask    = "";
+  valid_mask   = "";
   lead_req     = [];
-  valid_mask   = [];
   match_points = TRUE;
   version      = "VN.N";
 
