@@ -24,7 +24,7 @@ def usage():
     print(f'       Note: <> indicates optional arguments')
 
 def create_parser_options(parser):
-    parser.add_option("--hide-header", "--hide_header", dest="hide_header",
+    parser.add_option("--hide-header", "--hide_header", "--skip-header", "--skip_header", dest="hide_header",
             action="store_true", default=False, help=" Hide header (default: False)")
     parser.add_option("--use-comma", "--use_comma", dest="use_comma",
             action="store_true", default=False, help=" Use comma as separator (default: False)")
