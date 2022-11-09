@@ -234,6 +234,7 @@ output_flag = {
    nbrcnt = NONE;
    grad   = NONE;
    dmap   = NONE;
+   seeps  = NONE;
 }
 
 //
@@ -246,6 +247,7 @@ nc_pairs_flag = {
    diff         = TRUE;
    climo        = TRUE;
    climo_cdp    = FALSE;
+   seeps        = FALSE;
    weight       = FALSE;
    nbrhd        = FALSE;
    fourier      = FALSE;

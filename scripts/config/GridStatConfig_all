@@ -230,6 +230,7 @@ output_flag = {
    nbrcnt = BOTH;
    grad   = BOTH;
    dmap   = BOTH;
+   seeps  = NONE;
 }
 
 //

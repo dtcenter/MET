@@ -194,6 +194,7 @@ output_flag = {
    nbrcnt = NONE;
    grad   = BOTH;
    dmap   = NONE;
+   seeps  = NONE;
 }
 
 //
