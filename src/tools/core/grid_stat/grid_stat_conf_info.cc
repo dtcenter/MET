@@ -1125,6 +1125,10 @@ int GridStatVxOpt::n_txt_row(int i_txt_row) const {
               get_n_mask() * get_n_interp() * get_n_cat_thresh());
          break;
 
+      case(i_seeps):
+         n = (prob_flag ? 0 : get_n_mask() * get_n_interp());
+         break;
+
       default:
          mlog << Error << "\nGridStatVxOpt::n_txt_row(int) -> "
               << "unexpected output type index value: " << i_txt_row

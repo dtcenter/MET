@@ -138,6 +138,7 @@ using namespace netCDF;
 #include "vx_nc_util.h"
 #include "vx_regrid.h"
 #include "vx_log.h"
+#include "seeps.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -394,6 +395,7 @@ void setup_txt_files(unixtime valid_ut, int lead_sec) {
 
    // Setup the STAT AsciiTable
    stat_at.set_size(conf_info.n_stat_row() + 1, max_col);
+
    setup_table(stat_at);
 
    // Write the text header row
@@ -630,6 +632,7 @@ void process_scores() {
    DataPlane fu_dp, ou_dp;
    DataPlane fu_dp_smooth, ou_dp_smooth;
    DataPlane cmnu_dp, csdu_dp, cmnu_dp_smooth;
+   DataPlane seeps_dp;
    PairDataPoint pd_u;
 
    CTSInfo    *cts_info    = (CTSInfo *) 0;
@@ -1117,6 +1120,19 @@ void process_scores() {
                            i, mthd, pnts, conf_info.vx_opt[i].interp_info.field);
                }
             } // end for it
+         }
+
+         // Write out the fields of requested SEEPS
+         if(conf_info.vx_opt[i].output_flag[i_seeps] != STATOutputType_None
+               && conf_info.vx_opt[i].fcst_info->is_precipitation()
+               && conf_info.vx_opt[i].obs_info->is_precipitation()) {
+            SeepsAggScore seeps;
+            int month, day, year, hour, minute, second;
+            unix_to_mdyhms(fcst_dp.valid(), month, day, year, hour, minute, second);
+            compute_aggregated_seeps_grid(fcst_dp_smooth, obs_dp_smooth,
+                                          seeps_dp, &seeps, month, hour);
+            write_seeps_row(shc, &seeps, conf_info.output_flag[i_seeps],
+                            stat_at, i_stat_row, txt_at[i_seeps], i_txt_row[i_seeps]);
          }
 
          // Compute gradient statistics if requested in the config file
