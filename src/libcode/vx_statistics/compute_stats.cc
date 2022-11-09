@@ -1412,10 +1412,10 @@ void compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps) {
    SeepsScore *seeps_mpr;
    int count, count_diagonal;
    int c12, c13, c21, c23, c31, c32;
-   double score, obs_sum, fcst_sum;
-
-   score = obs_sum = fcst_sum = 0.0;
+   double score_sum, obs_sum, fcst_sum;
+   score_sum = obs_sum = fcst_sum = 0.0;
    count = count_diagonal = c12 = c13 = c21 = c23 = c31 = c32 = 0;
+   vector<SeepsScore *> seeps_mprs;
    for(int i=0; i<pd->n_obs; i++) {
 
       if (i >= pd->seeps_mpr.size()) break;
@@ -1425,32 +1425,81 @@ void compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps) {
       count++;
       obs_sum  += pd->o_na[i];   // Observation Value
       fcst_sum += pd->f_na[i];   // Forecast Value
-      score += seeps_mpr->score;
+      score_sum += seeps_mpr->score;
 
-      if (seeps_mpr->model_cat == 0) {
+      if (seeps_mpr->fcst_cat == 0) {
          if (seeps_mpr->obs_cat == 1) c12++;
          else if(seeps_mpr->obs_cat == 2) c13++;
          else count_diagonal++;
-         // pd.pf1
       }
-      else if (seeps_mpr->model_cat == 1) {
+      else if (seeps_mpr->fcst_cat == 1) {
          if (seeps_mpr->obs_cat == 0) c21++;
          else if(seeps_mpr->obs_cat == 2) c23++;
          else count_diagonal++;
-         // pd.pf2
       }
-      else if (seeps_mpr->model_cat == 2) {
+      else if (seeps_mpr->fcst_cat == 2) {
          if (seeps_mpr->obs_cat == 0) c31++;
          else if (seeps_mpr->obs_cat == 1) c32++;
          else count_diagonal++;
-         // pd.pf3
       }
+      seeps_mprs.push_back(seeps_mpr);
    }
    if (count > 0) {
       seeps->n_obs = count;
       seeps->mean_fcst = fcst_sum / count;
       seeps->mean_obs = obs_sum / count;
-      seeps->score = score / count;
+      seeps->score = score_sum / count;
+
+      double weighted_score, weight_sum, weight[count];
+      double pvf[SEEPS_MATRIX_SIZE];
+      double *density_vector = compute_seeps_density_vector(pd, seeps);
+
+      //IDL: w = 1/d
+      weight_sum = 0.;
+      for (int i=0; i<count; i++) {
+         if (density_vector[i] == 0) weight[i] = 0;
+         else {
+            weight[i] = 1 / density_vector[i];
+            weight_sum += weight[i];
+         }
+      }
+      //IDL: w = w/sum(w)
+      if (!is_eq(weight_sum, 0)) {
+         for (int i=0; i<count; i++) weight[i] /= weight_sum;
+      }
+
+      weighted_score = 0.;
+      for (int i=0; i<SEEPS_MATRIX_SIZE; i++) pvf[i] = 0.;
+      //IDL: for i=0l, n-1l do begin
+      for (int i=0; i<seeps_mprs.size(); i++) {
+         seeps_mpr = seeps_mprs[i];
+         //IDL: s = s + c(4+cat(i) * w{i)
+         weighted_score += seeps_mpr->score * weight[i];
+         //IDL: svf(cat{i)) = svf(cat{i)) + c(4+cat(i) * w{i)
+         //IDL: pvf(cat{i)) = pvf(cat{i)) + w{i)
+         pvf[seeps_mpr->s_idx] += weight[i];
+      }
+
+      if (density_vector != NULL) delete [] density_vector;
+      seeps_mprs.clear();
+
+      // The weight for s12 to s32 should come from climo file, but not available yet
+      seeps->pv1 = pvf[0] + pvf[3] + pvf[6];    // sum by column for obs
+      seeps->pv2 = pvf[1] + pvf[4] + pvf[7];    // sum by column for obs
+      seeps->pv3 = pvf[2] + pvf[5] + pvf[8];    // sum by column for obs
+      seeps->pf1 = pvf[0] + pvf[1] + pvf[2];    // sum by row for forecast
+      seeps->pf2 = pvf[3] + pvf[4] + pvf[5];    // sum by row for forecast
+      seeps->pf3 = pvf[6] + pvf[7] + pvf[8];    // sum by row for forecast
+      seeps->weighted_score = weighted_score;
+
+      mlog << Debug(10) << method_name
+           << "SEEPS score=" << seeps->score << " weighted_score=" << weighted_score
+           << " pv1=" << seeps->pv1 << " pv2=" << seeps->pv2 << " pv3=" << seeps->pv3
+           << " pf1=" << seeps->pf1 << " pf2=" << seeps->pf2 << " pf3=" << seeps->pf3 << "\n";
+   }
+   else {
+      mlog << Debug(5) << method_name
+           << "SEEPS_MPR count is 0\n";
    }
    seeps->c12 = c12;
    seeps->c13 = c13;
@@ -1460,13 +1509,215 @@ void compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps) {
    seeps->c32 = c32;
 
    if (count != (c12+c13+c21+c23+c31+c32+count_diagonal)){
-      mlog << Debug(2) << method_name
+      mlog << Debug(6) << method_name
            << "INFO check count: all=" << count << " s12=" << c12<< " s13=" << c13
            << " s21=" << c21 << " s23=" << c23
            << " s31=" << c31 << " s32=" << c32 << "\n";
    }
 
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void compute_aggregated_seeps_grid(const DataPlane &fcst_dp, const DataPlane &obs_dp,
+                                   DataPlane &seeps_dp, SeepsAggScore *seeps,
+                                   int month, int hour) {
+   int seeps_count, count_diagonal;
+   int nx = fcst_dp.nx();
+   int ny = fcst_dp.ny();
+   double pvf[SEEPS_MATRIX_SIZE];
+   int c12, c13, c21, c23, c31, c32;
+   double obs_sum, fcst_sum;
+   double seeps_score, seeps_score_sum, weighted_score;
+   float weight = 1 / (nx * ny);
+   SeepsScore *seeps_mpr;
+   static const char *method_name = "compute_aggregated_seeps_grid() -> ";
+
+   seeps_dp.set_size(nx, ny);
+   obs_sum = fcst_sum = weighted_score = seeps_score_sum = 0.;
+   seeps_count = count_diagonal = c12 = c13 = c21 = c23 = c31 = c32 = 0;
+
+   SeepsClimoGrid *seeps_climo = get_seeps_climo_grid(month);
+   for (int i=0; i<SEEPS_MATRIX_SIZE; i++) pvf[i] = 0.;
+
+   for (int ix=0; ix<nx; ix++) {
+      for (int iy=0; iy<ny; iy++) {
+         float fcst_value = fcst_dp.get(ix, iy);
+         float obs_value = obs_dp.get(ix, iy);
+         if (is_eq(fcst_value, -9999.0) || is_eq(obs_value, -9999.0)) seeps_score = bad_data_float;
+         else {
+            if (is_eq(fcst_value, 0.) && is_eq(obs_value, 0.)) {
+               seeps_score = 0;
+               pvf[0] += weight;
+            }
+            else {
+               obs_sum += obs_value;
+               fcst_sum += fcst_value;
+               seeps_mpr = seeps_climo->get_record(ix, iy, fcst_value, obs_value);
+               if (seeps_mpr != NULL) {
+                  if (seeps_mpr->fcst_cat == 0) {
+                     if (seeps_mpr->obs_cat == 1) c12++;
+                     else if(seeps_mpr->obs_cat == 2) c13++;
+                     else count_diagonal++;
+                  }
+                  else if (seeps_mpr->fcst_cat == 1) {
+                     if (seeps_mpr->obs_cat == 0) c21++;
+                     else if(seeps_mpr->obs_cat == 2) c23++;
+                     else count_diagonal++;
+                  }
+                  else if (seeps_mpr->fcst_cat == 2) {
+                     if (seeps_mpr->obs_cat == 0) c31++;
+                     else if (seeps_mpr->obs_cat == 1) c32++;
+                     else count_diagonal++;
+                  }
+                  seeps_score = seeps_mpr->score;
+                  seeps_score_sum += seeps_score;
+                  //IDL: s = s + c(4+cat(i) * w{i)
+                  weighted_score += seeps_score * weight;
+                  //IDL: svf(cat{i)) = svf(cat{i)) + c(4+cat(i) * w{i)
+                  //IDL: pvf(cat{i)) = pvf(cat{i)) + w{i)
+                  pvf[seeps_mpr->s_idx] += weight;
+                  delete seeps_mpr;
+               }
+            }
+            seeps_count++;
+         }
+         seeps_dp.set(seeps_score, ix, iy);
+      }
+   }
+
+   seeps->n_obs = seeps_count;
+   if (seeps_count > 0) {
+      seeps->mean_fcst = fcst_sum / seeps_count;
+      seeps->mean_obs = obs_sum / seeps_count;
+
+
+      // The weight for s12 to s32 should come from climo file, but not available yet
+      seeps->pv1 = pvf[0] + pvf[3] + pvf[6];    // sum by column for obs
+      seeps->pv2 = pvf[1] + pvf[4] + pvf[7];    // sum by column for obs
+      seeps->pv3 = pvf[2] + pvf[5] + pvf[8];    // sum by column for obs
+      seeps->pf1 = pvf[0] + pvf[1] + pvf[2];    // sum by row for forecast
+      seeps->pf2 = pvf[3] + pvf[4] + pvf[5];    // sum by row for forecast
+      seeps->pf3 = pvf[6] + pvf[7] + pvf[8];    // sum by row for forecast
+      seeps->score = seeps_score_sum / seeps_count;
+   }
+   seeps->c12 = c12;
+   seeps->c13 = c13;
+   seeps->c21 = c21;
+   seeps->c23 = c23;
+   seeps->c31 = c31;
+   seeps->c32 = c32;
+   seeps->weighted_score = weighted_score;
+   mlog << Debug(6) << method_name
+        << "SEEPS score=" << seeps->score << " weighted_score=" << weighted_score
+        << " pv1=" << seeps->pv1 << " pv2=" << seeps->pv2 << " pv3=" << seeps->pv3
+        << " pf1=" << seeps->pf1 << " pf2=" << seeps->pf2 << " pf3=" << seeps->pf3 << "\n";
+}
+
+////////////////////////////////////////////////////////////////////////
+// IDL code:
+//
+// my_pi = 3.1415926
+// r0 = density_radius*my_pi/180
+// lat =  reform(float(data_geo(0,*)))
+// lon =  reform( ((float(data_geo(1,*)+360.) mod 360.)))
+// n = n_elements(lat)
+// lat = lat * my_pi / 180
+// slat = sin(lat)
+// clat = cos(lat)
+// lon = lon * my_pi / 180
+// slon = sin(lon)
+// clon = cos(lon)
+// r=(clat#transpose(clat))*(slon#transpose(slon)) + (clon#transpose(clon))*(slat#transpose(slat))
+// r=r*((r lt 1.) and (r gt -1.)) + (r ge 1.) - (r le -1.)
+// r=acos(r)
+// if r0 gt 0.0 then r = exp( -(r / r0) ^ 2) * ( r le 4. * r0) else r = (r*0.) + 1
+// r=sum(r,1)
+//
+// SUM function (not built-in)
+// PRINT, array2
+// ; PV-WAVE prints the following:
+// ; 0.00000      1.00000
+// ; 2.00000      3.00000
+// PRINT, SUM(array2, 0)
+// ; PV-WAVE prints: 1.00000      5.00000
+// PRINT, SUM(array2, 1)
+// ; PV-WAVE prints: 2.00000      4.00000
+
+
+double *compute_seeps_density_vector(const PairDataPoint *pd, SeepsAggScore *seeps) {
+   int seeps_idx;
+   SeepsScore *seeps_mpr;
+   int seeps_cnt = seeps->n_obs;
+   const double density_radidus_rad = density_radius * rad_per_deg;
+   double rlat[seeps_cnt], rlon[seeps_cnt];
+   double clat[seeps_cnt], clon[seeps_cnt], slat[seeps_cnt], slon[seeps_cnt];
+   double clat_m[seeps_cnt][seeps_cnt], clon_m[seeps_cnt][seeps_cnt];
+   double slat_m[seeps_cnt][seeps_cnt], slon_m[seeps_cnt][seeps_cnt];
+   double clat_slon[seeps_cnt][seeps_cnt], clon_slat[seeps_cnt][seeps_cnt];
+   double density_m[seeps_cnt][seeps_cnt];
+   double *density_vector = new double[seeps_cnt];
+   static const char *method_name = "compute_seeps_density_vector() -> ";
+
+   // Get lat/lon & convert them to radian and get sin/cos values
+   seeps_idx = 0;
+   for(int i=0; i<pd->n_obs; i++) {
+      if (i >= pd->seeps_mpr.size()) break;
+      seeps_mpr = pd->seeps_mpr[i];
+      if (!seeps_mpr || is_eq(seeps_mpr->score, bad_data_double)) continue;
+
+      rlat[seeps_idx] = pd->lat_na[i] * rad_per_deg;    // radian of lat
+      rlon[seeps_idx] = fmod((pd->lon_na[i] + 360.), 360.) * rad_per_deg;    // radian of long
+      clat[seeps_idx] = cos(rlat[seeps_idx]);
+      clon[seeps_idx] = cos(rlon[seeps_idx]);
+      slat[seeps_idx] = sin(rlat[seeps_idx]);
+      slon[seeps_idx] = sin(rlon[seeps_idx]);
+
+      seeps_idx++;
+   }
+
+   // prooducs n by n matrix by multipling transposed vector
+   double density, mask1, mask2, mask3, temp;
+   // Initialize
+   if (seeps_idx < seeps_cnt) seeps_cnt = seeps_idx;
+   for(int i=0; i<seeps_cnt; i++) {
+      for(int j=0; j<seeps_cnt; j++) {
+         clat_slon[i][j] = clon_slat[i][j] = 0.;
+      }
+      density_vector[i] = 0.;
+   }
+   for(int j=0; j<seeps_cnt; j++) {
+      for(int i=0; i<seeps_cnt; i++) {
+         // Make n by n matrix: clat_m = clat#transpose(clat), slat_m = slat#transpose(slat) by IDL
+         clat_m[i][j] = clat[i] * clat[j];
+         slat_m[i][j] = slat[i] * slat[i];
+         clon_m[i][j] = clon[i] * clon[i];
+         slon_m[i][j] = slon[i] * slon[i];
+         //IDL: r=(clat#transpose(clat))*(slon#transpose(slon)) + (clon#transpose(clon))*(slat#transpose(slat))
+         density = clat_m[i][j] * slon_m[i][j] + clon_m[i][j] * slat_m[i][j];
+         //IDL: r * ((r lt 1.) and (r gt -1.)) + (r ge 1.) - (r le -1.)
+         mask1 = (density < 1.0 && density > -1.0) ? 1. : 0.;
+         mask2 = (density >= 1.0 ) ? 1. : 0.;
+         mask3 = (density <= -1.0) ? 1. : 0.;
+         density = density * mask1 + mask2 - mask3;
+         //IDL: r = acos(r)
+         density = acos(density);
+         //IDL: if r0 gt 0.0 then r = exp(-(r/r0)^2) * (r le 4. * r0) else r = (r*0.)+1.
+         if (density_radidus_rad <= 0.) density = 1.0;
+         else {
+            mask3 = (density <= 4.0) ? 1. : 0.;
+            temp = density / density_radidus_rad;
+            density = exp(-(temp * temp)) * mask3 * density_radidus_rad;
+         }
+         density_vector[j] += density;
+      }
+   }
+   mlog << Debug(10) << method_name
+        << "density_vector[0]=" << density_vector[0]
+        << " density_vector[" << (seeps_cnt-1) << "]=" << density_vector[seeps_cnt-1] << "\n";
+
+   return density_vector;
 }
 
 ////////////////////////////////////////////////////////////////////////
