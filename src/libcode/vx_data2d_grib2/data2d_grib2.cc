@@ -442,13 +442,18 @@ void MetGrib2DataFile::find_record_matches( VarInfoGrib2* vinfo,
           (!is_bad_data(vinfo->perc_val())  && vinfo->perc_val()  != (*it)->PercVal  ) ){
          continue;
       }
-
+      
       //  test ipdtmpl array values
+      cout << "vinfo->n_ipdtmpl() = " << vinfo->n_ipdtmpl() << endl;
       if(vinfo->n_ipdtmpl() > 0) {
          int i, j;
          bool skip = false;
          for(i=0; i<vinfo->n_ipdtmpl(); i++) {
+
             j = vinfo->ipdtmpl_index(i);
+            
+            cout << "i: " << i << " vinfo->ipdtmpl_val(i) = " << vinfo->ipdtmpl_val(i) << " j: " << j << " (*it)->IPDTmpl[j] = " << (*it)->IPDTmpl[j] << endl;
+            
             if(j >= (*it)->IPDTmpl.n() ||
               (j < (*it)->IPDTmpl.n() &&
               (*it)->IPDTmpl[j] != vinfo->ipdtmpl_val(i))) {
@@ -765,18 +770,23 @@ void MetGrib2DataFile::read_grib2_record_list() {
          rec->ParmCat      = gfld->ipdtmpl[0];
          rec->Parm         = gfld->ipdtmpl[1];
          rec->Process      = gfld->ipdtmpl[2];
-
+         
+         cout << "gfld->idsect[0] (center) = " << gfld->idsect[0] << " gfld->idsect[2] (master table) = " << gfld->idsect[2] << " gfld->idsect[3] (local table) = " << gfld->idsect[3] << endl;
+         
          //  get the level type
          if( gfld->ipdtnum == 46 ) {
             rec->LvlTyp    = gfld->ipdtmpl[15];
          } else {
             rec->LvlTyp    = gfld->ipdtmpl[9];
          }
-
+         
          //  store the full pdtmpl values
          for(int j=0; j < gfld->ipdtlen; j++) {
+            //cout << "gfld->ipdtmpl[" << j << "] = " << gfld->ipdtmpl[j] << endl;
             rec->IPDTmpl.add((int) gfld->ipdtmpl[j]);
          }
+
+         cout << endl;
          
          //  check for template number 46
          if( gfld->ipdtnum == 46 ) {
