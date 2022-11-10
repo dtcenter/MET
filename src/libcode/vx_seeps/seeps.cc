@@ -529,7 +529,7 @@ void SeepsClimo::read_records(ConcatString filename) {
 ////////////////////////////////////////////////////////////////////////
 
 
-void SeepsAggScore::init() {
+void SeepsAggScore::clear() {
 
    n_obs = 0;
    c12 = c13 = c21 = c23 = c31 = c32 = 0;

@@ -72,7 +72,8 @@ struct SeepsScore { // For SEEPS_MPR
 ////////////////////////////////////////////////////////////////////////
 
 struct SeepsAggScore {  // For SEEPS
-   void init();
+
+   void clear();
    
    int   n_obs;
    int   c12;
