@@ -495,22 +495,21 @@
     </output>
   </test>
 
-  <test name="python_plot_point_obs_CONFIG_XXX">
+  <test name="python_plot_point_obs_with_point_data">
     <exec>&MET_BIN;/plot_point_obs</exec>
     <env>
       <pair><name>TO_GRID</name> <value>NONE</value></pair>
     </env>
     <param> \
-      &OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.nc \
-      &OUTPUT_DIR;/python/nam_and_ndas.20120409.t12z.prepbufr_CONFIG.ps \
-      -point_obs &OUTPUT_DIR;/ascii2nc/trmm_2012040912_3hr.nc \
-      -plot_grid &DATA_DIR_MODEL;/grib2/nam/nam_2012040900_F012.grib2 \
+      'PYTHON_NUMPY=&MET_BASE;/python/read_ascii_point.py &MET_DATA;/sample_obs/ascii/precip24_2010010112.ascii' \
+      &OUTPUT_DIR;/python/precip24_2010010112.ps \
       -config &CONFIG_DIR;/PlotPointObsConfig \
-      -title "NAM 2012040900 F12 vs NDAS 500mb RH and TRMM 3h > 0" \
+      -plot_grid &DATA_DIR_MODEL;/grib2/nam/nam_2012040900_F012.grib2 \
+      -title "Precip24 from python embedding" -gc 61 \
       -v 3
     </param>
     <output>
-      <ps>&OUTPUT_DIR;/python/nam_and_ndas.20120409.t12z.prepbufr_CONFIG.ps</ps>
+      <ps>&OUTPUT_DIR;/python/precip24_2010010112.ps</ps>
     </output>
   </test>
 
