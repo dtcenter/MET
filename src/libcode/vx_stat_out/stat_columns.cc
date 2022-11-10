@@ -4087,7 +4087,7 @@ void write_seeps_cols(const SeepsAggScore *seeps,
    at.set_entry(r, c+0, seeps->n_obs);  // Total Number of Pairs
 
    at.set_entry(r, c+1, seeps->s12);    // s12
-   at.set_entry(r, c+2, seeps->s13);    // S13
+   at.set_entry(r, c+2, seeps->s13);    // s13
    at.set_entry(r, c+3, seeps->s21);    // s21
    at.set_entry(r, c+4, seeps->s23);    // s23
    at.set_entry(r, c+5, seeps->s31);    // s31

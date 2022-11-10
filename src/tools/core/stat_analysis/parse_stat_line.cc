@@ -29,6 +29,8 @@
 //   009    10/09/17  Halley Gotway   Add GRAD line type.
 //   010    04/25/18  Halley Gotway   Add ECNT line type.
 //   011    01/24/20  Halley Gotway   Add RPS line type.
+//   012    11/10/22  Halley Gotway   MET #2339 Add SEEPS and SEEPS_MPR
+//                                      line types.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -544,6 +546,62 @@ void parse_ssvar_line(STATLine &l, SSVARInfo &ssvar_info) {
    ssvar_info.sl1l2_info.fobar  = atof(l.get_item("FOBAR"));
    ssvar_info.sl1l2_info.ffbar  = atof(l.get_item("FFBAR"));
    ssvar_info.sl1l2_info.oobar  = atof(l.get_item("OOBAR"));
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void parse_seeps_line(STATLine &l, SeepsAggScore &agg_score) {
+
+   agg_score.clear();
+
+   agg_score.n_obs = atoi(l.get_item("TOTAL"));
+
+   agg_score.s12 = atoi(l.get_item("S12"));
+   agg_score.s13 = atoi(l.get_item("S13"));
+   agg_score.s21 = atof(l.get_item("S21"));
+   agg_score.s23 = atof(l.get_item("S23"));
+   agg_score.s31 = atof(l.get_item("S31"));
+   agg_score.s32 = atof(l.get_item("S32"));
+
+   agg_score.pf1 = atof(l.get_item("PF1"));
+   agg_score.pf2 = atof(l.get_item("PF2"));
+   agg_score.pf3 = atof(l.get_item("PF3"));
+
+   agg_score.pv1 = atof(l.get_item("PV1"));
+   agg_score.pv2 = atof(l.get_item("PV2"));
+   agg_score.pv3 = atof(l.get_item("PV3"));
+
+   agg_score.mean_fcst = atof(l.get_item("MEAN_FCST"));
+   agg_score.mean_obs  = atof(l.get_item("MEAN_OBS"));
+
+   agg_score.score          = atof(l.get_item("SEEPS"));
+   agg_score.weighted_score = agg_score.score;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void parse_seeps_mpr_line(STATLine &l, SEEPSMPRData &s_data) {
+
+   s_data.fcst_var = l.fcst_var();
+   s_data.obs_var  = l.obs_var();
+
+   s_data.obs_sid = l.get_item("OBS_SID");
+   s_data.obs_lat = atof(l.get_item("OBS_LAT"));
+   s_data.obs_lon = atof(l.get_item("OBS_LON"));
+   s_data.fcst    = atof(l.get_item("FCST"));
+   s_data.obs     = atof(l.get_item("OBS"));
+   s_data.obs_qc  = l.get_item("OBS_QC");
+
+   s_data.seeps_mpr.fcst_cat = atoi(l.get_item("FCST_CAT"));
+   s_data.seeps_mpr.obs_cat  = atoi(l.get_item("OBS_CAT"));
+   s_data.seeps_mpr.p1       = atof(l.get_item("P1"));
+   s_data.seeps_mpr.p2       = atof(l.get_item("P2"));
+   s_data.seeps_mpr.t1       = atof(l.get_item("T1"));
+   s_data.seeps_mpr.t2       = atof(l.get_item("T2"));
 
    return;
 }

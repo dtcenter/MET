@@ -86,7 +86,7 @@ void PairDataPoint::clear() {
       if (seeps_mpr[idx]) delete seeps_mpr[idx];
    }
    seeps_mpr.clear();
-   seeps.init();
+   seeps.clear();
 
    return;
 }
