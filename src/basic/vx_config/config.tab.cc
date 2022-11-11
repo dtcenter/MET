@@ -185,7 +185,6 @@ static const char apm = 'b';   //  assign_prefix mark
 static const char fcm = 'f';   //  function def mark
 
 
-
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -262,7 +261,7 @@ static void do_user_function_def();
 
 
 
-#line 266 "config.tab.cc" /* yacc.c:337  */
+#line 265 "config.tab.cc" /* yacc.c:337  */
 # ifndef YY_NULLPTR
 #  if defined __cplusplus
 #   if 201103L <= __cplusplus
@@ -343,7 +342,7 @@ extern int configdebug;
 
 union YYSTYPE
 {
-#line 192 "config.tab.yy" /* yacc.c:352  */
+#line 191 "config.tab.yy" /* yacc.c:352  */
 
 
    char text[max_id_length + 1];
@@ -363,7 +362,7 @@ union YYSTYPE
    PC_info pc_info;
 
 
-#line 367 "config.tab.cc" /* yacc.c:352  */
+#line 366 "config.tab.cc" /* yacc.c:352  */
 };
 
 typedef union YYSTYPE YYSTYPE;
@@ -668,14 +667,14 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,   256,   256,   257,   260,   261,   262,   266,   267,   271,
-     276,   277,   278,   279,   281,   282,   283,   285,   286,   287,
-     288,   289,   290,   292,   298,   299,   303,   307,   311,   311,
-     315,   319,   320,   324,   325,   329,   330,   333,   334,   338,
-     339,   340,   341,   342,   346,   347,   348,   349,   353,   354,
-     358,   359,   363,   364,   368,   369,   373,   374,   375,   376,
-     377,   378,   379,   380,   381,   382,   382,   383,   383,   388,
-     389,   393,   397,   398,   402
+       0,   255,   255,   256,   259,   260,   261,   265,   266,   270,
+     275,   276,   277,   278,   280,   281,   282,   284,   285,   286,
+     287,   288,   289,   291,   297,   298,   302,   306,   310,   310,
+     314,   318,   319,   323,   324,   328,   329,   332,   333,   337,
+     338,   339,   340,   341,   345,   346,   347,   348,   352,   353,
+     357,   358,   362,   363,   367,   368,   372,   373,   374,   375,
+     376,   377,   378,   379,   380,   381,   381,   382,   382,   387,
+     388,   392,   396,   397,   401
 };
 #endif
 
@@ -1386,7 +1385,7 @@ yyparse (void)
 
   YYDPRINTF ((stderr, "Starting parse\n"));
 
-  yystate = 8;
+  yystate = 0;
   yyerrstatus = 0;
   yynerrs = 0;
   yychar = YYEMPTY; /* Cause a token to be read.  */
@@ -1573,397 +1572,397 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 256 "config.tab.yy" /* yacc.c:1652  */
+#line 255 "config.tab.yy" /* yacc.c:1652  */
     { is_lhs = true; }
-#line 1579 "config.tab.cc" /* yacc.c:1652  */
+#line 1578 "config.tab.cc" /* yacc.c:1652  */
     break;
 
   case 3:
-#line 257 "config.tab.yy" /* yacc.c:1652  */
+#line 256 "config.tab.yy" /* yacc.c:1652  */
     { is_lhs = true; }
-#line 1585 "config.tab.cc" /* yacc.c:1652  */
+#line 1584 "config.tab.cc" /* yacc.c:1652  */
     break;
 
   case 4:
-#line 260 "config.tab.yy" /* yacc.c:1652  */
+#line 259 "config.tab.yy" /* yacc.c:1652  */
     { is_lhs = true; }
-#line 1591 "config.tab.cc" /* yacc.c:1652  */
+#line 1590 "config.tab.cc" /* yacc.c:1652  */
     break;
 
   case 5:
-#line 261 "config.tab.yy" /* yacc.c:1652  */
+#line 260 "config.tab.yy" /* yacc.c:1652  */
     { is_lhs = true; }
-#line 1597 "config.tab.cc" /* yacc.c:1652  */
+#line 1596 "config.tab.cc" /* yacc.c:1652  */
     break;
 
   case 6:
-#line 262 "config.tab.yy" /* yacc.c:1652  */
+#line 261 "config.tab.yy" /* yacc.c:1652  */
     { }
-#line 1603 "config.tab.cc" /* yacc.c:1652  */
+#line 1602 "config.tab.cc" /* yacc.c:1652  */
     break;
 
   case 7:
-#line 266 "config.tab.yy" /* yacc.c:1652  */
+#line 265 "config.tab.yy" /* yacc.c:1652  */
     { do_print( 0); }
-#line 1609 "config.tab.cc" /* yacc.c:1652  */
+#line 1608 "config.tab.cc" /* yacc.c:1652  */
     break;
 
   case 8:
-#line 267 "config.tab.yy" /* yacc.c:1652  */
+#line 266 "config.tab.yy" /* yacc.c:1652  */
     { do_print((yyvsp[-3].text)); }
-#line 1615 "config.tab.cc" /* yacc.c:1652  */
+#line 1614 "config.tab.cc" /* yacc.c:1652  */
     break;
 
   case 9:
-#line 271 "config.tab.yy" /* yacc.c:1652  */
+#line 270 "config.tab.yy" /* yacc.c:1652  */
     { is_lhs = false; }
-#line 1621 "config.tab.cc" /* yacc.c:1652  */
+#line 1620 "config.tab.cc" /* yacc.c:1652  */
     break;
 
   case 10:
-#line 276 "config.tab.yy" /* yacc.c:1652  */
+#line 275 "config.tab.yy" /* yacc.c:1652  */
     { do_assign_boolean   ((yyvsp[-2].text), (yyvsp[-1].bval)); }
-#line 1627 "config.tab.cc" /* yacc.c:1652  */
+#line 1626 "config.tab.cc" /* yacc.c:1652  */
     break;
 
   case 11:
-#line 277 "config.tab.yy" /* yacc.c:1652  */
+#line 276 "config.tab.yy" /* yacc.c:1652  */
     { do_assign_exp       ((yyvsp[-2].text)); }
-#line 1633 "config.tab.cc" /* yacc.c:1652  */
+#line 1632 "config.tab.cc" /* yacc.c:1652  */
     break;
 
   case 12:
-#line 278 "config.tab.yy" /* yacc.c:1652  */
+#line 277 "config.tab.yy" /* yacc.c:1652  */
     { do_assign_id        ((yyvsp[-2].text), (yyvsp[-1].text)); }
-#line 1639 "config.tab.cc" /* yacc.c:1652  */
+#line 1638 "config.tab.cc" /* yacc.c:1652  */
     break;
 
   case 13:
-#line 279 "config.tab.yy" /* yacc.c:1652  */
+#line 278 "config.tab.yy" /* yacc.c:1652  */
     { do_pwl              ((yyvsp[-2].text)); }
-#line 1645 "config.tab.cc" /* yacc.c:1652  */
+#line 1644 "config.tab.cc" /* yacc.c:1652  */
     break;
 
   case 14:
-#line 281 "config.tab.yy" /* yacc.c:1652  */
+#line 280 "config.tab.yy" /* yacc.c:1652  */
     { do_assign_threshold ((yyvsp[-2].text)); }
-#line 1651 "config.tab.cc" /* yacc.c:1652  */
+#line 1650 "config.tab.cc" /* yacc.c:1652  */
     break;
 
   case 15:
-#line 282 "config.tab.yy" /* yacc.c:1652  */
+#line 281 "config.tab.yy" /* yacc.c:1652  */
     { do_assign_string    ((yyvsp[-2].text), (yyvsp[-1].text)); }
-#line 1657 "config.tab.cc" /* yacc.c:1652  */
+#line 1656 "config.tab.cc" /* yacc.c:1652  */
     break;
 
   case 16:
-#line 283 "config.tab.yy" /* yacc.c:1652  */
+#line 282 "config.tab.yy" /* yacc.c:1652  */
     { do_assign_dict      ((yyvsp[-1].text)); }
-#line 1663 "config.tab.cc" /* yacc.c:1652  */
+#line 1662 "config.tab.cc" /* yacc.c:1652  */
     break;
 
   case 17:
-#line 285 "config.tab.yy" /* yacc.c:1652  */
+#line 284 "config.tab.yy" /* yacc.c:1652  */
     { do_assign_dict((yyvsp[-3].text)); }
-#line 1669 "config.tab.cc" /* yacc.c:1652  */
+#line 1668 "config.tab.cc" /* yacc.c:1652  */
     break;
 
   case 18:
-#line 286 "config.tab.yy" /* yacc.c:1652  */
+#line 285 "config.tab.yy" /* yacc.c:1652  */
     { do_assign_exp_array((yyvsp[-3].text)); }
-#line 1675 "config.tab.cc" /* yacc.c:1652  */
+#line 1674 "config.tab.cc" /* yacc.c:1652  */
     break;
 
   case 19:
-#line 287 "config.tab.yy" /* yacc.c:1652  */
+#line 286 "config.tab.yy" /* yacc.c:1652  */
     { do_assign_dict((yyvsp[-3].text)); }
-#line 1681 "config.tab.cc" /* yacc.c:1652  */
+#line 1680 "config.tab.cc" /* yacc.c:1652  */
     break;
 
   case 20:
-#line 288 "config.tab.yy" /* yacc.c:1652  */
+#line 287 "config.tab.yy" /* yacc.c:1652  */
     { do_assign_dict((yyvsp[-3].text)); }
-#line 1687 "config.tab.cc" /* yacc.c:1652  */
+#line 1686 "config.tab.cc" /* yacc.c:1652  */
     break;
 
   case 21:
-#line 289 "config.tab.yy" /* yacc.c:1652  */
+#line 288 "config.tab.yy" /* yacc.c:1652  */
     { do_assign_dict((yyvsp[-3].text)); }
-#line 1693 "config.tab.cc" /* yacc.c:1652  */
+#line 1692 "config.tab.cc" /* yacc.c:1652  */
     break;
 
   case 22:
-#line 290 "config.tab.yy" /* yacc.c:1652  */
+#line 289 "config.tab.yy" /* yacc.c:1652  */
     { do_assign_dict((yyvsp[-2].text)); }
-#line 1699 "config.tab.cc" /* yacc.c:1652  */
+#line 1698 "config.tab.cc" /* yacc.c:1652  */
     break;
 
   case 23:
-#line 292 "config.tab.yy" /* yacc.c:1652  */
+#line 291 "config.tab.yy" /* yacc.c:1652  */
     { do_user_function_def(); }
-#line 1705 "config.tab.cc" /* yacc.c:1652  */
+#line 1704 "config.tab.cc" /* yacc.c:1652  */
     break;
 
   case 24:
-#line 298 "config.tab.yy" /* yacc.c:1652  */
+#line 297 "config.tab.yy" /* yacc.c:1652  */
     { ida.add((yyvsp[0].text)); }
-#line 1711 "config.tab.cc" /* yacc.c:1652  */
+#line 1710 "config.tab.cc" /* yacc.c:1652  */
     break;
 
   case 25:
-#line 299 "config.tab.yy" /* yacc.c:1652  */
+#line 298 "config.tab.yy" /* yacc.c:1652  */
     { ida.add((yyvsp[0].text)); }
-#line 1717 "config.tab.cc" /* yacc.c:1652  */
+#line 1716 "config.tab.cc" /* yacc.c:1652  */
     break;
 
   case 26:
-#line 303 "config.tab.yy" /* yacc.c:1652  */
+#line 302 "config.tab.yy" /* yacc.c:1652  */
     { is_lhs = false;  function_name = (yyvsp[-4].text);  is_function_def = true; }
-#line 1723 "config.tab.cc" /* yacc.c:1652  */
+#line 1722 "config.tab.cc" /* yacc.c:1652  */
     break;
 
   case 27:
-#line 307 "config.tab.yy" /* yacc.c:1652  */
+#line 306 "config.tab.yy" /* yacc.c:1652  */
     { is_lhs = false;  strcpy((yyval.text), (yyvsp[-1].text)); }
-#line 1729 "config.tab.cc" /* yacc.c:1652  */
+#line 1728 "config.tab.cc" /* yacc.c:1652  */
     break;
 
   case 28:
-#line 311 "config.tab.yy" /* yacc.c:1652  */
+#line 310 "config.tab.yy" /* yacc.c:1652  */
     { mark(apm); }
-#line 1735 "config.tab.cc" /* yacc.c:1652  */
+#line 1734 "config.tab.cc" /* yacc.c:1652  */
     break;
 
   case 29:
-#line 311 "config.tab.yy" /* yacc.c:1652  */
+#line 310 "config.tab.yy" /* yacc.c:1652  */
     { is_lhs = false;  strcpy((yyval.text), (yyvsp[-2].text)); }
-#line 1741 "config.tab.cc" /* yacc.c:1652  */
+#line 1740 "config.tab.cc" /* yacc.c:1652  */
     break;
 
   case 30:
-#line 315 "config.tab.yy" /* yacc.c:1652  */
+#line 314 "config.tab.yy" /* yacc.c:1652  */
     { do_dict(); }
-#line 1747 "config.tab.cc" /* yacc.c:1652  */
+#line 1746 "config.tab.cc" /* yacc.c:1652  */
     break;
 
   case 33:
-#line 324 "config.tab.yy" /* yacc.c:1652  */
+#line 323 "config.tab.yy" /* yacc.c:1652  */
     { do_string((yyvsp[0].text)); }
-#line 1753 "config.tab.cc" /* yacc.c:1652  */
+#line 1752 "config.tab.cc" /* yacc.c:1652  */
     break;
 
   case 34:
-#line 325 "config.tab.yy" /* yacc.c:1652  */
+#line 324 "config.tab.yy" /* yacc.c:1652  */
     { do_string((yyvsp[0].text)); }
-#line 1759 "config.tab.cc" /* yacc.c:1652  */
+#line 1758 "config.tab.cc" /* yacc.c:1652  */
     break;
 
   case 37:
-#line 333 "config.tab.yy" /* yacc.c:1652  */
+#line 332 "config.tab.yy" /* yacc.c:1652  */
     { do_thresh    ((yyvsp[0].node)); }
-#line 1765 "config.tab.cc" /* yacc.c:1652  */
+#line 1764 "config.tab.cc" /* yacc.c:1652  */
     break;
 
   case 38:
-#line 334 "config.tab.yy" /* yacc.c:1652  */
+#line 333 "config.tab.yy" /* yacc.c:1652  */
     { do_na_thresh (); }
-#line 1771 "config.tab.cc" /* yacc.c:1652  */
+#line 1770 "config.tab.cc" /* yacc.c:1652  */
     break;
 
   case 39:
-#line 338 "config.tab.yy" /* yacc.c:1652  */
+#line 337 "config.tab.yy" /* yacc.c:1652  */
     { (yyval.node) = (yyvsp[0].node); }
-#line 1777 "config.tab.cc" /* yacc.c:1652  */
+#line 1776 "config.tab.cc" /* yacc.c:1652  */
     break;
 
   case 40:
-#line 339 "config.tab.yy" /* yacc.c:1652  */
+#line 338 "config.tab.yy" /* yacc.c:1652  */
     { (yyval.node) = do_and_thresh   ((yyvsp[-2].node), (yyvsp[0].node)); }
-#line 1783 "config.tab.cc" /* yacc.c:1652  */
+#line 1782 "config.tab.cc" /* yacc.c:1652  */
     break;
 
   case 41:
-#line 340 "config.tab.yy" /* yacc.c:1652  */
+#line 339 "config.tab.yy" /* yacc.c:1652  */
     { (yyval.node) = do_or_thresh    ((yyvsp[-2].node), (yyvsp[0].node)); }
-#line 1789 "config.tab.cc" /* yacc.c:1652  */
+#line 1788 "config.tab.cc" /* yacc.c:1652  */
     break;
 
   case 42:
-#line 341 "config.tab.yy" /* yacc.c:1652  */
+#line 340 "config.tab.yy" /* yacc.c:1652  */
     { (yyval.node) = do_not_thresh   ((yyvsp[0].node));     }
-#line 1795 "config.tab.cc" /* yacc.c:1652  */
+#line 1794 "config.tab.cc" /* yacc.c:1652  */
     break;
 
   case 43:
-#line 342 "config.tab.yy" /* yacc.c:1652  */
+#line 341 "config.tab.yy" /* yacc.c:1652  */
     { (yyval.node) = do_paren_thresh ((yyvsp[-1].node));     }
-#line 1801 "config.tab.cc" /* yacc.c:1652  */
+#line 1800 "config.tab.cc" /* yacc.c:1652  */
     break;
 
   case 44:
-#line 346 "config.tab.yy" /* yacc.c:1652  */
+#line 345 "config.tab.yy" /* yacc.c:1652  */
     { (yyval.node) = do_simple_thresh((yyvsp[-1].cval), (yyvsp[0].nval));     }
-#line 1807 "config.tab.cc" /* yacc.c:1652  */
+#line 1806 "config.tab.cc" /* yacc.c:1652  */
     break;
 
   case 45:
-#line 347 "config.tab.yy" /* yacc.c:1652  */
+#line 346 "config.tab.yy" /* yacc.c:1652  */
     { (yyval.node) = do_simple_perc_thresh((yyvsp[-1].cval), (yyvsp[0].pc_info)); }
-#line 1813 "config.tab.cc" /* yacc.c:1652  */
+#line 1812 "config.tab.cc" /* yacc.c:1652  */
     break;
 
   case 46:
-#line 348 "config.tab.yy" /* yacc.c:1652  */
+#line 347 "config.tab.yy" /* yacc.c:1652  */
     { (yyval.node) = do_compound_perc_thresh((yyvsp[-4].cval), (yyvsp[-3].pc_info), (yyvsp[-1].nval)); }
-#line 1819 "config.tab.cc" /* yacc.c:1652  */
+#line 1818 "config.tab.cc" /* yacc.c:1652  */
     break;
 
   case 47:
-#line 349 "config.tab.yy" /* yacc.c:1652  */
+#line 348 "config.tab.yy" /* yacc.c:1652  */
     { (yyval.node) = do_fortran_thresh((yyvsp[0].text));        }
-#line 1825 "config.tab.cc" /* yacc.c:1652  */
+#line 1824 "config.tab.cc" /* yacc.c:1652  */
     break;
 
   case 48:
-#line 353 "config.tab.yy" /* yacc.c:1652  */
+#line 352 "config.tab.yy" /* yacc.c:1652  */
     { set_number_string(); }
-#line 1831 "config.tab.cc" /* yacc.c:1652  */
+#line 1830 "config.tab.cc" /* yacc.c:1652  */
     break;
 
   case 49:
-#line 354 "config.tab.yy" /* yacc.c:1652  */
+#line 353 "config.tab.yy" /* yacc.c:1652  */
     { set_number_string(); }
-#line 1837 "config.tab.cc" /* yacc.c:1652  */
+#line 1836 "config.tab.cc" /* yacc.c:1652  */
     break;
 
   case 50:
-#line 358 "config.tab.yy" /* yacc.c:1652  */
+#line 357 "config.tab.yy" /* yacc.c:1652  */
     { do_boolean((yyvsp[0].bval)); }
-#line 1843 "config.tab.cc" /* yacc.c:1652  */
+#line 1842 "config.tab.cc" /* yacc.c:1652  */
     break;
 
   case 51:
-#line 359 "config.tab.yy" /* yacc.c:1652  */
+#line 358 "config.tab.yy" /* yacc.c:1652  */
     { do_boolean((yyvsp[0].bval)); }
-#line 1849 "config.tab.cc" /* yacc.c:1652  */
+#line 1848 "config.tab.cc" /* yacc.c:1652  */
     break;
 
   case 56:
-#line 373 "config.tab.yy" /* yacc.c:1652  */
+#line 372 "config.tab.yy" /* yacc.c:1652  */
     { do_number((yyvsp[0].nval)); }
-#line 1855 "config.tab.cc" /* yacc.c:1652  */
+#line 1854 "config.tab.cc" /* yacc.c:1652  */
     break;
 
   case 57:
-#line 374 "config.tab.yy" /* yacc.c:1652  */
+#line 373 "config.tab.yy" /* yacc.c:1652  */
     { do_local_var((yyvsp[0].index)); }
-#line 1861 "config.tab.cc" /* yacc.c:1652  */
+#line 1860 "config.tab.cc" /* yacc.c:1652  */
     break;
 
   case 58:
-#line 375 "config.tab.yy" /* yacc.c:1652  */
+#line 374 "config.tab.yy" /* yacc.c:1652  */
     { do_op('+'); }
-#line 1867 "config.tab.cc" /* yacc.c:1652  */
+#line 1866 "config.tab.cc" /* yacc.c:1652  */
     break;
 
   case 59:
-#line 376 "config.tab.yy" /* yacc.c:1652  */
+#line 375 "config.tab.yy" /* yacc.c:1652  */
     { do_op('-'); }
-#line 1873 "config.tab.cc" /* yacc.c:1652  */
+#line 1872 "config.tab.cc" /* yacc.c:1652  */
     break;
 
   case 60:
-#line 377 "config.tab.yy" /* yacc.c:1652  */
+#line 376 "config.tab.yy" /* yacc.c:1652  */
     { do_op('*'); }
-#line 1879 "config.tab.cc" /* yacc.c:1652  */
+#line 1878 "config.tab.cc" /* yacc.c:1652  */
     break;
 
   case 61:
-#line 378 "config.tab.yy" /* yacc.c:1652  */
+#line 377 "config.tab.yy" /* yacc.c:1652  */
     { do_op('/'); }
-#line 1885 "config.tab.cc" /* yacc.c:1652  */
+#line 1884 "config.tab.cc" /* yacc.c:1652  */
     break;
 
   case 62:
-#line 379 "config.tab.yy" /* yacc.c:1652  */
+#line 378 "config.tab.yy" /* yacc.c:1652  */
     { do_op('^'); }
-#line 1891 "config.tab.cc" /* yacc.c:1652  */
+#line 1890 "config.tab.cc" /* yacc.c:1652  */
     break;
 
   case 63:
-#line 380 "config.tab.yy" /* yacc.c:1652  */
+#line 379 "config.tab.yy" /* yacc.c:1652  */
     { do_negate(); }
-#line 1897 "config.tab.cc" /* yacc.c:1652  */
+#line 1896 "config.tab.cc" /* yacc.c:1652  */
     break;
 
   case 64:
-#line 381 "config.tab.yy" /* yacc.c:1652  */
+#line 380 "config.tab.yy" /* yacc.c:1652  */
     { do_paren_exp(); }
-#line 1903 "config.tab.cc" /* yacc.c:1652  */
+#line 1902 "config.tab.cc" /* yacc.c:1652  */
     break;
 
   case 65:
-#line 382 "config.tab.yy" /* yacc.c:1652  */
+#line 381 "config.tab.yy" /* yacc.c:1652  */
     { mark(fcm); }
-#line 1909 "config.tab.cc" /* yacc.c:1652  */
+#line 1908 "config.tab.cc" /* yacc.c:1652  */
     break;
 
   case 66:
-#line 382 "config.tab.yy" /* yacc.c:1652  */
+#line 381 "config.tab.yy" /* yacc.c:1652  */
     { do_builtin_call((yyvsp[-4].index));  }
-#line 1915 "config.tab.cc" /* yacc.c:1652  */
+#line 1914 "config.tab.cc" /* yacc.c:1652  */
     break;
 
   case 67:
-#line 383 "config.tab.yy" /* yacc.c:1652  */
+#line 382 "config.tab.yy" /* yacc.c:1652  */
     { mark(fcm); }
-#line 1921 "config.tab.cc" /* yacc.c:1652  */
+#line 1920 "config.tab.cc" /* yacc.c:1652  */
     break;
 
   case 68:
-#line 383 "config.tab.yy" /* yacc.c:1652  */
+#line 382 "config.tab.yy" /* yacc.c:1652  */
     { do_user_function_call((yyvsp[-4].entry)); }
-#line 1927 "config.tab.cc" /* yacc.c:1652  */
+#line 1926 "config.tab.cc" /* yacc.c:1652  */
     break;
 
   case 69:
-#line 388 "config.tab.yy" /* yacc.c:1652  */
+#line 387 "config.tab.yy" /* yacc.c:1652  */
     { store_exp(); }
-#line 1933 "config.tab.cc" /* yacc.c:1652  */
+#line 1932 "config.tab.cc" /* yacc.c:1652  */
     break;
 
   case 70:
-#line 389 "config.tab.yy" /* yacc.c:1652  */
+#line 388 "config.tab.yy" /* yacc.c:1652  */
     { store_exp(); }
-#line 1939 "config.tab.cc" /* yacc.c:1652  */
+#line 1938 "config.tab.cc" /* yacc.c:1652  */
     break;
 
   case 71:
-#line 393 "config.tab.yy" /* yacc.c:1652  */
+#line 392 "config.tab.yy" /* yacc.c:1652  */
     { }
-#line 1945 "config.tab.cc" /* yacc.c:1652  */
+#line 1944 "config.tab.cc" /* yacc.c:1652  */
     break;
 
   case 72:
-#line 397 "config.tab.yy" /* yacc.c:1652  */
+#line 396 "config.tab.yy" /* yacc.c:1652  */
     { }
-#line 1951 "config.tab.cc" /* yacc.c:1652  */
+#line 1950 "config.tab.cc" /* yacc.c:1652  */
     break;
 
   case 73:
-#line 398 "config.tab.yy" /* yacc.c:1652  */
+#line 397 "config.tab.yy" /* yacc.c:1652  */
     { }
-#line 1957 "config.tab.cc" /* yacc.c:1652  */
+#line 1956 "config.tab.cc" /* yacc.c:1652  */
     break;
 
   case 74:
-#line 402 "config.tab.yy" /* yacc.c:1652  */
+#line 401 "config.tab.yy" /* yacc.c:1652  */
     { add_point(); }
-#line 1963 "config.tab.cc" /* yacc.c:1652  */
+#line 1962 "config.tab.cc" /* yacc.c:1652  */
     break;
 
 
-#line 1967 "config.tab.cc" /* yacc.c:1652  */
+#line 1966 "config.tab.cc" /* yacc.c:1652  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -2194,7 +2193,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 406 "config.tab.yy" /* yacc.c:1918  */
+#line 405 "config.tab.yy" /* yacc.c:1918  */
 
 
 
