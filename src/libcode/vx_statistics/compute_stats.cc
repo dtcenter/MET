@@ -25,6 +25,11 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
+const int detailed_debug_level = 5;
+
+
+////////////////////////////////////////////////////////////////////////
+
 void compute_cntinfo(const SL1L2Info &s, bool aflag, CNTInfo &cnt_info) {
    double fbar, obar, ffbar, fobar, oobar, den;
    int n;
@@ -1529,73 +1534,104 @@ void compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps) {
 ////////////////////////////////////////////////////////////////////////
 
 void compute_aggregated_seeps_grid(const DataPlane &fcst_dp, const DataPlane &obs_dp,
-                                   DataPlane &seeps_dp, SeepsAggScore *seeps,
-                                   int month, int hour) {
-   int seeps_count, count_diagonal;
+                                   DataPlane &seeps_dp, DataPlane &seeps_dp_fcat,
+                                   DataPlane &seeps_dp_ocat,SeepsAggScore *seeps,
+                                   int month, int hour, bool do_qc) {
+   int fcst_cat, obs_cat;
+   int seeps_count, count_diagonal, nan_count, bad_count;
    int nx = fcst_dp.nx();
    int ny = fcst_dp.ny();
+   int dp_size = (nx * ny);
+   int pvf_cnt[SEEPS_MATRIX_SIZE];
    double pvf[SEEPS_MATRIX_SIZE];
    int c12, c13, c21, c23, c31, c32;
    double obs_sum, fcst_sum;
-   double seeps_score, seeps_score_sum, weighted_score;
-   float weight = 1 / (nx * ny);
+   double seeps_score, seeps_score_sum, seeps_score_partial_sum;
    SeepsScore *seeps_mpr;
    static const char *method_name = "compute_aggregated_seeps_grid() -> ";
 
    seeps_dp.set_size(nx, ny);
-   obs_sum = fcst_sum = weighted_score = seeps_score_sum = 0.;
-   seeps_count = count_diagonal = c12 = c13 = c21 = c23 = c31 = c32 = 0;
+   seeps_dp_fcat.set_size(nx, ny);
+   seeps_dp_ocat.set_size(nx, ny);
+   obs_sum = fcst_sum = seeps_score_sum = 0.;
+   seeps_count = count_diagonal = nan_count = bad_count = 0;
+   c12 = c13 = c21 = c23 = c31 = c32 = 0;
 
+   seeps->clear();
    SeepsClimoGrid *seeps_climo = get_seeps_climo_grid(month);
-   for (int i=0; i<SEEPS_MATRIX_SIZE; i++) pvf[i] = 0.;
-
+   for (int i=0; i<SEEPS_MATRIX_SIZE; i++) {
+      pvf[i] = 0.;
+      pvf_cnt[i] = 0;
+   }
    for (int ix=0; ix<nx; ix++) {
+      seeps_score_partial_sum = 0.;
       for (int iy=0; iy<ny; iy++) {
          float fcst_value = fcst_dp.get(ix, iy);
          float obs_value = obs_dp.get(ix, iy);
-         if (is_eq(fcst_value, -9999.0) || is_eq(obs_value, -9999.0)) seeps_score = bad_data_float;
-         else {
-            if (is_eq(fcst_value, 0.) && is_eq(obs_value, 0.)) {
-               seeps_score = 0;
-               pvf[0] += weight;
-            }
-            else {
-               obs_sum += obs_value;
-               fcst_sum += fcst_value;
-               seeps_mpr = seeps_climo->get_record(ix, iy, fcst_value, obs_value);
-               if (seeps_mpr != NULL) {
-                  if (seeps_mpr->fcst_cat == 0) {
-                     if (seeps_mpr->obs_cat == 1) c12++;
-                     else if(seeps_mpr->obs_cat == 2) c13++;
-                     else count_diagonal++;
-                  }
-                  else if (seeps_mpr->fcst_cat == 1) {
-                     if (seeps_mpr->obs_cat == 0) c21++;
-                     else if(seeps_mpr->obs_cat == 2) c23++;
-                     else count_diagonal++;
-                  }
-                  else if (seeps_mpr->fcst_cat == 2) {
-                     if (seeps_mpr->obs_cat == 0) c31++;
-                     else if (seeps_mpr->obs_cat == 1) c32++;
-                     else count_diagonal++;
-                  }
-                  seeps_score = seeps_mpr->score;
-                  seeps_score_sum += seeps_score;
-                  //IDL: s = s + c(4+cat(i) * w{i)
-                  weighted_score += seeps_score * weight;
+         fcst_cat = obs_cat = bad_data_int;
+         seeps_score = bad_data_double;
+         if (!is_eq(fcst_value, -9999.0) && !is_eq(obs_value, -9999.0)) {
+            seeps_mpr = seeps_climo->get_record(ix, iy, fcst_value, obs_value, do_qc);
+            if (seeps_mpr != NULL) {
+               fcst_cat = seeps_mpr->fcst_cat;
+               obs_cat = seeps_mpr->obs_cat;
+               if (fcst_cat == 0) {
+                  if (obs_cat == 1) c12++;
+                  else if(obs_cat == 2) c13++;
+                  else count_diagonal++;
+               }
+               else if (fcst_cat == 1) {
+                  if (obs_cat == 0) c21++;
+                  else if(obs_cat == 2) c23++;
+                  else count_diagonal++;
+               }
+               else if (fcst_cat == 2) {
+                  if (obs_cat == 0) c31++;
+                  else if (obs_cat == 1) c32++;
+                  else count_diagonal++;
+               }
+               seeps_score = seeps_mpr->score;
+               if (isnan(seeps_score)) {
+                  nan_count++;
+                  seeps_score = bad_data_double;
+               }
+               else if (is_eq(seeps_score, bad_data_double)) bad_count++;
+               else {
+                  seeps_count++;
+                  obs_sum += obs_value;
+                  fcst_sum += fcst_value;
+                  seeps_score_partial_sum += seeps_score;
+                  //IDL: s = s + c(4+cat(i) * w{i)  <-- this is done by summing scores
                   //IDL: svf(cat{i)) = svf(cat{i)) + c(4+cat(i) * w{i)
                   //IDL: pvf(cat{i)) = pvf(cat{i)) + w{i)
-                  pvf[seeps_mpr->s_idx] += weight;
-                  delete seeps_mpr;
+                  //pvf[seeps_mpr->s_idx] += weight;
+                  pvf_cnt[seeps_mpr->s_idx] += 1;
                }
+
+               delete seeps_mpr;
             }
-            seeps_count++;
          }
          seeps_dp.set(seeps_score, ix, iy);
+         seeps_dp_fcat.set(fcst_cat, ix, iy);
+         seeps_dp_ocat.set(obs_cat, ix, iy);
+      }
+      seeps_score_sum += seeps_score_partial_sum;
+   }
+   int cell_count = dp_size - nan_count - bad_count;
+   if (cell_count > 0) {
+      seeps->weighted_score = seeps_score_sum/cell_count;
+      for (int i=0; i<SEEPS_MATRIX_SIZE; i++) {
+         pvf[i] = ((double)pvf_cnt[i]) / cell_count;
       }
    }
 
    seeps->n_obs = seeps_count;
+   seeps->c12 = c12;
+   seeps->c13 = c13;
+   seeps->c21 = c21;
+   seeps->c23 = c23;
+   seeps->c31 = c31;
+   seeps->c32 = c32;
    if (seeps_count > 0) {
       seeps->mean_fcst = fcst_sum / seeps_count;
       seeps->mean_obs = obs_sum / seeps_count;
@@ -1614,17 +1650,25 @@ void compute_aggregated_seeps_grid(const DataPlane &fcst_dp, const DataPlane &ob
       seeps->s32 = c32 * seeps->pf3 * seeps->pv2;
       seeps->score = seeps_score_sum / seeps_count;
    }
-   seeps->c12 = c12;
-   seeps->c13 = c13;
-   seeps->c21 = c21;
-   seeps->c23 = c23;
-   seeps->c31 = c31;
-   seeps->c32 = c32;
-   seeps->weighted_score = weighted_score;
    mlog << Debug(6) << method_name
-        << "SEEPS score=" << seeps->score << " weighted_score=" << weighted_score
+        << "SEEPS score=" << seeps->score << " weighted_score=" << seeps->weighted_score
         << " pv1=" << seeps->pv1 << " pv2=" << seeps->pv2 << " pv3=" << seeps->pv3
         << " pf1=" << seeps->pf1 << " pf2=" << seeps->pf2 << " pf3=" << seeps->pf3 << "\n";
+   if(mlog.verbosity_level() >= detailed_debug_level) {
+      char buffer[100];
+      ConcatString log_message;
+      for (int i=0; i<SEEPS_MATRIX_SIZE; i++) {
+         snprintf ( buffer, 100, "%f ", pvf[i]);
+         log_message.add(buffer);
+      }
+      if (nan_count > 0) {
+         snprintf ( buffer, 100, " nan: %d ", nan_count);
+         log_message.add(buffer);
+      }
+      mlog << Debug(7) << method_name << "pvf = " << log_message
+           << " weight=" << (1. / cell_count) << " (1/" << cell_count << ")" << "\n";
+   }
+
 }
 
 ////////////////////////////////////////////////////////////////////////

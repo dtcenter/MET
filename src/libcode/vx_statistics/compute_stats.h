@@ -63,8 +63,9 @@ extern void   compute_i_mean_stdev(const NumArray &,
 extern void   compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps);
 extern double *compute_seeps_density_vector(const PairDataPoint *pd, SeepsAggScore *seeps);
 extern void compute_aggregated_seeps_grid(const DataPlane &fcst_dp, const DataPlane &obs_dp,
-                                          DataPlane &seeps_dp, SeepsAggScore *seeps,
-                                          int month, int hour=0);
+                                          DataPlane &seeps_dp, DataPlane &seeps_dp_fcat,
+                                          DataPlane &seeps_dp_ocat,SeepsAggScore *seeps,
+                                          int month, int hour, bool do_qc);
 
 ////////////////////////////////////////////////////////////////////////
 //
