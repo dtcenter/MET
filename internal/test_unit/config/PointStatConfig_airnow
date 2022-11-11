@@ -47,6 +47,7 @@ wind_thresh    = [ NA ];
 wind_logic     = UNION;
 eclv_points    = 0.05;
 rank_corr_flag = FALSE;
+seeps_qc       = FALSE;
 
 //
 // Forecast and observation fields to be verified

@@ -211,6 +211,7 @@ output_flag = {
 ////////////////////////////////////////////////////////////////////////////////
 
 rank_corr_flag = TRUE;
+seeps_qc       = FALSE;
 tmp_dir        = "/tmp";
 output_prefix  = "";
 version        = "V11.0.0";
