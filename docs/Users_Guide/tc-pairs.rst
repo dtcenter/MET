@@ -17,24 +17,24 @@ Scientific and statistical aspects
 TC Diagnostics
 -----------------
 
-TC diagnostics are measures that provide information about a TC's structure or its environment. Each TC diagnostic is a single-valued measure that corresponds to some aspect of the storm itself or the surrounding large-scale environment. There are many types of TC diagnostics which can be drived from observational analyses, model fields, or even satellite observations. Examples include:
-- Inner core diagnostics, such as the maximum winds and radius of maximum wind provide information about the structure of the storm.
-- Large scale diagnostics, which provide information about quantities such as the environmental vertical wind shear, humidity, instability, and the upper bound of intensity that a storm may be expected to achieve. These diagnostics are typically derived from model fields over a circular area or annulus centered on the storm center. Often, the storm center is taken to the be underlying model's storm center. In other cases, the diagnostics may be computed along some other specified track.
-- Ocean-based diagnostics include the sea surface temperature, ocean heat content, and information about how deep water of a given temperature extends to, all taken in the vicinity of the storm center.
-- Satellite-based diagnostics are derived from geostationary satellite infrared imagery and provide information about the shape and extent of the cold-cirrus canopy of the TC as well as information such as the presence of an eye or other patterns which may portend intensification.
+TC diagnostics provide information about a TC's structure or its environment. Each TC diagnostic is a single-valued measure that corresponds to some aspect of the storm itself or the surrounding large-scale environment. TC diagnostics can be derived from observational analyses, model fields, or even satellite observations. Examples include:
+* Inner core diagnostics, such as the maximum winds and radius of maximum wind provide information about the structure of the storm.
+* Large scale diagnostics, which provide information about quantities such as the environmental vertical wind shear, humidity, instability, and the upper bound of intensity that a storm may be expected to achieve. These diagnostics are typically derived from model fields over a circular area or annulus centered on the storm center. Often, the storm center is taken to the be underlying model's storm center. In other cases, the diagnostics may be computed along some other specified track.
+* Ocean-based diagnostics include the sea surface temperature, ocean heat content, and information about how deep water of a given temperature extends to, all taken in the vicinity of the storm center.
+* Satellite-based diagnostics are derived from geostationary satellite infrared imagery and provide information about the shape and extent of the cold-cirrus canopy of the TC as well as information such as the presence of an eye or other patterns which may portend intensification.
 
 Diagnostics are critically important for training and running statistical-dynamical models that predict a TC's intensity or size. One of the most well-known diagnostics sets was and continues to be developed for the Statistical Hurricane Intensity Prediction Scheme (SHIPS), which provides predictions of TC intensity. A large 30-year development dataset of TC diagnostics has been retrospectively derived to support the training of the SHIPS intensity model as well as other related models such as the Logistic Growth Equation Model (LGEM), SHIPS Rapid Intensification Index (SHIPS-RII), and others. These diagnostics, called "lsdiag" for "large scale" environment, are computed using a "perfect prog" approach in which the diagnostics are computed on reference model's verifying analyses to generate a set of time-dependent diagnostics from t=0 out to a desired maximum forecast lead time. By using the subsequent verifying analysis for later lead times, the model is taken to be "perfect", reducing the impact of model forecast errors. The resulting developmental dataset is ideal for training statistical-dynamical models such as SHIPS. To generate forecasts, the diagnostics are computed along a forecast track (often taken to be the National Hurricane Center's official forecast) using the fields of the underlying NWP model (e.g, the Global Forecast System, or GFS model). The resulting "real-time" diagnostics are then used as "predictors" in models like SHIPS and LGEM to predict a TC's future intensity or probability of undergoing rapid intensification.
 
 Beside their use in TC prediction, TC diagnostics can be very useful to forecasters in understanding the forecast scenario. They are also very useful to model developers for evaluating model errors and understanding model performance under different environmental conditions. For instance, a modeler may wish to understand their model's track biases under conditions of high vertical wind shear. Another example is to understand the sensitivity of the model's intensity predictions to oceanic conditions such as upwelling. The TC-Pairs tool allows filtering and subsetting based on the values of numerous TC diagnostics.
 
 As of MET v11.0.0, three types of TC diagnostics are supported in TC-Pairs:
-- SHIPS_DIAG_DEV: A multitude of inner core, environmental, oceanic, and satellite-based diagnostics. The model-based diagnostics are computed using the "perfect prog" approach.
-- SHIPS_DIAG_RT: Real-time SHIPS diagnostics computed from a NWP model such as the Global Forecast System (GFS) model along the NHC Official forecast track.
-- CIRA_DIAG_RT: Real-time model-based diagnostics computed along the model's predicted track.
+* SHIPS_DIAG_DEV: A multitude of inner core, environmental, oceanic, and satellite-based diagnostics. The model-based diagnostics are computed using the "perfect prog" approach.
+* SHIPS_DIAG_RT: Real-time SHIPS diagnostics computed from a NWP model such as the Global Forecast System (GFS) model along the NHC Official forecast track.
+* CIRA_DIAG_RT: Real-time model-based diagnostics computed along the model's predicted track.
 
 A future version of MET will allow the CIRA model diagnostics to be computed directly from model forecast fields. Until then, users may obtain the SHIPS diagnostics at the following locations:
-- SHIPS_DIAG_DEV: https://rammb2.cira.colostate.edu/research/tropical-cyclones/ships/#DevelopmentalData
-- SHIPS_DIAG_RT: https://ftp.nhc.noaa.gov/atcf/lsdiag/
+* SHIPS_DIAG_DEV: https://rammb2.cira.colostate.edu/research/tropical-cyclones/ships/#DevelopmentalData
+* SHIPS_DIAG_RT: https://ftp.nhc.noaa.gov/atcf/lsdiag/
 
 
 .. _TC-Pairs_Practical-information:
