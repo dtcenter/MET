@@ -167,7 +167,7 @@ SeepsClimoRecord *SeepsClimo::create_climo_record(
 
 ////////////////////////////////////////////////////////////////////////
 
-SeepsRecord *SeepsClimo::get_record(int sid, int month, int hour) {
+SeepsRecord *SeepsClimo::get_record(int sid, int month, int hour, bool do_qc) {
    SeepsRecord *record = NULL;
    const char *method_name = "SeepsClimo::get_record() -> ";
 
@@ -182,7 +182,11 @@ SeepsRecord *SeepsClimo::get_record(int sid, int month, int hour) {
          it = seeps_score_12_map.find(sid);
          if (it != seeps_score_12_map.end()) climo_record = it->second;
       }
-      if (climo_record) {
+      // The ‘probability of being dry’, p1, is between 0.1 and 0.85.
+      // The restriction on values of p1 is recommended in the Rodwell et al. (2010) paper
+      if (NULL != climo_record &&
+          (!do_qc || (climo_record->p1[month-1] >= 0.1
+                      && climo_record->p1[month-1] <= 0.85))) {
 
          record = new SeepsRecord;
          record->sid = climo_record->sid;
@@ -240,9 +244,9 @@ ConcatString SeepsClimo::get_seeps_climo_filename() {
 ////////////////////////////////////////////////////////////////////////
 
 double SeepsClimo::get_score(int sid, double p_fcst, double p_obs,
-                             int month, int hour) {
+                             int month, int hour, bool do_qc) {
    double score = bad_data_double;
-   SeepsRecord *record = get_record(sid, month, hour);
+   SeepsRecord *record = get_record(sid, month, hour, do_qc);
 
    if (NULL != record) {
       // Determine location in contingency table
@@ -258,10 +262,10 @@ double SeepsClimo::get_score(int sid, double p_fcst, double p_obs,
 
 ////////////////////////////////////////////////////////////////////////
 
-SeepsScore *SeepsClimo::get_seeps_score(int sid, double p_fcst,
-                                        double p_obs, int month, int hour) {
+SeepsScore *SeepsClimo::get_seeps_score(int sid, double p_fcst, double p_obs,
+                                        int month, int hour, bool do_qc) {
    SeepsScore *score = NULL;
-   SeepsRecord *record = get_record(sid, month, hour);
+   SeepsRecord *record = get_record(sid, month, hour, do_qc);
 
    if (NULL != record) {
       score = new SeepsScore();
@@ -586,24 +590,30 @@ void SeepsClimoGrid::clear() {
 
 ////////////////////////////////////////////////////////////////////////
 
-SeepsScore *SeepsClimoGrid::get_record(int ix, int iy, double p_fcst, double p_obs) {
+SeepsScore *SeepsClimoGrid::get_record(int ix, int iy,
+                                       double p_fcst, double p_obs,
+                                       bool do_qc) {
    SeepsScore *seeps_record = NULL;
    if (!is_eq(p_fcst, -9999.0) && !is_eq(p_obs, -9999.0)) {
       int offset = iy * nx + ix;
-      // Determine location in contingency table
-      int ic = (p_obs>t1_buf[offset])+(p_obs>t2_buf[offset]);
-      int jc = (p_fcst>t1_buf[offset])+(p_fcst>t2_buf[offset]);
-      double score = get_score(offset, ic, jc);
+      // The ‘probability of being dry’, p1, is between 0.1 and 0.85.
+      // The restriction on values of p1 is recommended in the Rodwell et al. (2010) paper
+      if (p1_buf[offset] >= 0.1 && p1_buf[offset] <= 0.85) {
+         // Determine location in contingency table
+         int ic = (p_obs>t1_buf[offset])+(p_obs>t2_buf[offset]);
+         int jc = (p_fcst>t1_buf[offset])+(p_fcst>t2_buf[offset]);
+         double score = get_score(offset, ic, jc);
 
-      seeps_record = new SeepsScore();
-      seeps_record->obs_cat = ic;
-      seeps_record->fcst_cat = jc;
-      seeps_record->s_idx = (jc*3)+ic;
-      seeps_record->p1 = p1_buf[offset];
-      seeps_record->p2 = p2_buf[offset];
-      seeps_record->t1 = t1_buf[offset];
-      seeps_record->t2 = t2_buf[offset];
-      seeps_record->score = score;
+         seeps_record = new SeepsScore();
+         seeps_record->obs_cat = ic;
+         seeps_record->fcst_cat = jc;
+         seeps_record->s_idx = (jc*3)+ic;
+         seeps_record->p1 = p1_buf[offset];
+         seeps_record->p2 = p2_buf[offset];
+         seeps_record->t1 = t1_buf[offset];
+         seeps_record->t2 = t2_buf[offset];
+         seeps_record->score = score;
+      }
    }
 
    return seeps_record;
