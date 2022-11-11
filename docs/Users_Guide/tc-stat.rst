@@ -169,7 +169,7 @@ _________________________
   valid_hour = [];
   lead       = [];
 
-The **valid_hour**, and **lead** fields stratify by the initialization time, valid time, and lead time, respectively. This field specifies a comma-separated list of initialization times, valid times, and lead times in **HH[MMSS]** format. Using the **-valid_hour** and **-lead** options within the job command lines may further refine these selections.
+The **valid_hour**, and **lead** fields stratify by the valid time and lead time, respectively. This field specifies a comma-separated list of valid times and lead times in **HH[MMSS]** format. Using the **-valid_hour** and **-lead** options within the job command lines may further refine these selections.
 
 _________________________
 

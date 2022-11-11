@@ -11,7 +11,7 @@ Important issues are listed **in bold** for emphasis.
 
 .. warning:: **Ensemble post-processing was added to Gen-Ens-Prod in version 10.1.0 and will be removed from Ensemble-Stat in version 11.0.0!**
 
-MET Version 11.0.0-beta4 release notes (20221103)
+MET Version 11.0.0-beta4 release notes (20221102)
 -------------------------------------------------
 
 * Repository, build, and testing:

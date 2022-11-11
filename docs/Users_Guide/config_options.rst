@@ -493,8 +493,8 @@ override the default value set in ConfigConstants.
 		
   output_precision = 5;
 
-tmp_dir_1
-^^^^^^^^^
+tmp_dir
+^^^^^^^
       
 The "tmp_dir" entry in ConfigConstants defines the directory for the
 temporary files. The directory must exist and be writable. The environment
@@ -506,8 +506,8 @@ Some tools override the temporary directory by the command line argument
 		
   tmp_dir = "/tmp";
 
-message_type_group_map_1
-^^^^^^^^^^^^^^^^^^^^^^^^
+message_type_group_map
+^^^^^^^^^^^^^^^^^^^^^^
       
 The "message_type_group_map" entry is an array of dictionaries, each
 containing a "key" string and "val" string. This defines a mapping of
@@ -2230,17 +2230,6 @@ forecast field:
 The "obs_raw_plot", "wvlt_plot", and "object_plot" entries are dictionaries
 similar to the "fcst_raw_plot" described above.
 
-tmp_dir_2
-^^^^^^^^^
-
-The "tmp_dir" entry is a string specifying the location where temporary
-files should be written.
-
-.. code-block:: none
-		
-  tmp_dir = "/tmp";
-
-
 output_prefix
 ^^^^^^^^^^^^^
 
@@ -2445,8 +2434,8 @@ combination of the categorical threshold (cat_thresh), neighborhood width
      ];
   }
 
-fcst, obs_1
-"""""""""""
+fcst, obs
+"""""""""
 
 The fcst and obs entries define the fields for which Ensemble-Stat should
 compute rank histograms, probability integral transform histograms,
@@ -3009,8 +2998,8 @@ MODE will be run.
 		
   quilt = false;
 
-fcst, obs_2
-"""""""""""
+fcst, obs
+"""""""""
 
 The object definition settings for MODE are contained within the "fcst" and
 "obs" entries:
@@ -3374,22 +3363,6 @@ For example:
 .. code-block:: none
 		
   message_type = [];
-
-message_type_group_map_2
-""""""""""""""""""""""""
-
-Mapping of message type group name to comma-separated list of values.
-The default setting defines ANYAIR, ANYSFC, and ONLYSF as groups.
-Derive PRMSL only for SURFACE message types.
-
-.. code-block:: none
-		
-  message_type_group_map = [
-     { key = "SURFACE"; val = "ADPSFC,SFCSHP,MSONET";               },
-     { key = "ANYAIR";  val = "AIRCAR,AIRCFT";                      },
-     { key = "ANYSFC";  val = "ADPSFC,SFCSHP,ADPUPA,PROFLR,MSONET"; },
-     { key = "ONLYSF";  val = "ADPSFC,SFCSHP";                      }
-  ];
 
 station_id
 """"""""""

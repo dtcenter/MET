@@ -845,7 +845,7 @@ The first set of header columns are common to all of the output files generated 
   * - 78-80
     - RMSE, :raw-html:`<br />` RMSE_BCL, :raw-html:`<br />` RMSE_BCU
     - Root mean squared error including bootstrap upper and lower confidence limits
-  * - 81-94
+  * - 81-95
     - E10, :raw-html:`<br />` E10_BCL, :raw-html:`<br />` E10_BCU, :raw-html:`<br />` E25, :raw-html:`<br />` E25_BCL, :raw-html:`<br />` E25_BCU, :raw-html:`<br />` E50, :raw-html:`<br />` E50_BCL, :raw-html:`<br />` E50_BCU, :raw-html:`<br />` E75, :raw-html:`<br />` E75_BCL, :raw-html:`<br />` E75_BCU, :raw-html:`<br />` E90, :raw-html:`<br />` E90_BCL, :raw-html:`<br />` E90_BCU
     - 10th, 25th, 50th, 75th, and 90th percentiles of the error including bootstrap upper and lower confidence limits
   * - 96-98

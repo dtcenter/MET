@@ -1304,10 +1304,10 @@ double NumArray::mean_abs_diff() const
          count++;
       }
    }
-      
+   
    if(count == 0) mad = bad_data_double;
-   else           mad = sum / (n*(n-1));
-
+   else           mad = sum / count;
+   
    return(mad);
 
 }
