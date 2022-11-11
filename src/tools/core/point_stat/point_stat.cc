@@ -166,7 +166,6 @@ static void do_vl1l2     (VL1L2Info *&, int, const PairDataPoint *, const PairDa
 static void do_pct       (const PointStatVxOpt &, const PairDataPoint *);
 static void do_hira_ens  (              int, const PairDataPoint *);
 static void do_hira_prob (              int, const PairDataPoint *);
-static void do_seeps_agg (const PairDataPoint *);
 
 static void finish_txt_files();
 

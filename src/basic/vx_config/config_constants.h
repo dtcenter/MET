@@ -655,6 +655,7 @@ static const char conf_key_obs_to_qc_map[]     = "obs_to_qc_map";
 static const char conf_key_missing_thresh[]    = "missing_thresh";
 static const char conf_key_control_id[]        = "control_id";
 static const char conf_key_ens_member_ids[]    = "ens_member_ids";
+static const char conf_key_seeps_qc[]          = "seeps_qc";
 
 //
 // Entries to override file metadata 
