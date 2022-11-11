@@ -43,6 +43,8 @@
 //   021    04/12/21  Halley Gotway   MET #1735 Support multiple 
 //                    -out_thresh and -out_line_type options.
 //   022    05/28/21  Halley Gotway   Add MCTS HSS_EC output.
+//   023    11/10/22  Halley Gotway   MET #2339 Add SEEPS and SEEPS_MPR
+//                                      line types.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -421,6 +423,7 @@ void do_job_aggr(const ConcatString &jobstring, LineDataFile &f,
    map<ConcatString, AggrENSInfo>   ens_map;
    map<ConcatString, AggrRPSInfo>   rps_map;
    map<ConcatString, AggrSSVARInfo> ssvar_map;
+   map<ConcatString, AggrSEEPSInfo> seeps_map;
 
    //
    // Check that the -line_type option has been supplied exactly once
@@ -449,13 +452,14 @@ void do_job_aggr(const ConcatString &jobstring, LineDataFile &f,
       lt != stat_grad   && lt != stat_ecnt   &&
       lt != stat_rps    && lt != stat_rhist  &&
       lt != stat_phist  && lt != stat_relp   &&
-      lt != stat_ssvar  && lt != stat_isc) {
+      lt != stat_ssvar  && lt != stat_isc    &&
+      lt != stat_seeps) {
       mlog << Error << "\ndo_job_aggr() -> "
            << "the \"-line_type\" option must be set to one of:\n"
            << "\tFHO, CTC, MCTC,\n"
            << "\tSL1L2, SAL1L2, VL1L2, VAL1L2,\n"
            << "\tPCT, NBRCTC, NBRCNT, GRAD, ISC,\n"
-           << "\tECNT, RPS, RHIST, PHIST, RELP, SSVAR\n\n";
+           << "\tECNT, RPS, RHIST, PHIST, RELP, SSVAR, SEEPS\n\n";
       throw(1);
    }
 
@@ -569,6 +573,14 @@ void do_job_aggr(const ConcatString &jobstring, LineDataFile &f,
    else if(lt == stat_ssvar) {
       aggr_ssvar_lines(f, job, ssvar_map, n_in, n_out);
       write_job_aggr_ssvar(job, lt, ssvar_map, out_at);
+   }
+
+   //
+   // Sum the SEEPS line types
+   //
+   else if(lt == stat_seeps) {
+      aggr_seeps_lines(f, job, seeps_map, n_in, n_out);
+      write_job_aggr_seeps(job, lt, seeps_map, out_at);
    }
 
    //
@@ -2671,6 +2683,70 @@ void write_job_aggr_ssvar(STATAnalysisJob &job, STATLineType lt,
          }
       } // end for bin_it
    } // end for case_it
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_job_aggr_seeps(STATAnalysisJob &job, STATLineType lt,
+                         map<ConcatString, AggrSEEPSInfo> &m,
+                         AsciiTable &at) {
+   map<ConcatString, AggrSEEPSInfo>::iterator it;
+   int n, n_row, n_col, r, c;
+   StatHdrColumns shc;
+
+   //
+   // Setup the output table
+   //
+   n_row = 1 + m.size();
+   n_col = 1 + job.by_column.n() + n_seeps_columns;
+   write_job_aggr_hdr(job, n_row, n_col, at);
+
+   //
+   // Write the rest of the header row
+   //
+   c = 1 + job.by_column.n();
+   write_header_row(seeps_columns, n_seeps_columns, 0, at, 0, c);
+
+   //
+   // Setup the output STAT file
+   //
+   job.setup_stat_file(n_row, n);
+
+   mlog << Debug(2) << "Computing output for "
+        << (int) m.size() << " case(s).\n";
+
+   //
+   // Loop through the map
+   //
+   for(it = m.begin(), r=1; it != m.end(); it++) {
+
+      //
+      // Write the output STAT header columns
+      //
+      shc = it->second.hdr.get_shc(it->first, job.by_column,
+                                   job.hdr_name, job.hdr_value, lt);
+
+      //
+      // Initialize
+      //
+      c = 0;
+
+      //
+      // SEEPS output line
+      //
+      if(job.stat_out) {
+         write_header_cols(shc, job.stat_at, job.stat_row);
+         write_seeps_cols(&it->second.agg_score, job.stat_at,
+                          job.stat_row++, n_header_columns);
+      }
+      else {
+         at.set_entry(r, c++, "SEEPS:");
+         write_case_cols(it->first, at, r, c);
+         write_seeps_cols(&it->second.agg_score, at, r++, c);
+      }
+   } // end for it
 
    return;
 }

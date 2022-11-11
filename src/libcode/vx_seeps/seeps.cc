@@ -41,6 +41,8 @@ static const char *var_name_elv       = "elv";
 static const char *dim_name_lat       = "latitude";
 static const char *dim_name_lon       = "longitude";
 
+double weighted_average(double, double, double, double);
+
 ////////////////////////////////////////////////////////////////////////
 
 SeepsClimo *get_seeps_climo() {
@@ -540,6 +542,65 @@ void SeepsAggScore::clear() {
    mean_obs = bad_data_double;
    score = bad_data_double;
 
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+SeepsAggScore & SeepsAggScore::operator+=(const SeepsAggScore &c) {
+
+   // Check for degenerate case
+   if(n_obs == 0 && c.n_obs == 0) return(*this);
+
+   // Compute weights
+   double w1 = (double)   n_obs / (n_obs + c.n_obs);
+   double w2 = (double) c.n_obs / (n_obs + c.n_obs);
+
+   // Increment number of obs
+   n_obs += c.n_obs;
+
+   // Increment counts
+   c12 += c.c12;
+   c13 += c.c13;
+   c21 += c.c21;
+   c23 += c.c23;
+   c31 += c.c31;
+   c32 += c.c32;
+
+   // Compute weighted averages
+   s12 = weighted_average(s12, w1, c.s12, w2);
+   s13 = weighted_average(s13, w1, c.s13, w2);
+   s21 = weighted_average(s21, w1, c.s21, w2);
+   s23 = weighted_average(s23, w1, c.s23, w2);
+   s31 = weighted_average(s31, w1, c.s31, w2);
+   s32 = weighted_average(s32, w1, c.s32, w2);
+
+   pv1 = weighted_average(pv1, w1, c.pv1, w2);
+   pv2 = weighted_average(pv2, w1, c.pv2, w2);
+   pv3 = weighted_average(pv3, w1, c.pv3, w2);
+
+   pf1 = weighted_average(pf1, w1, c.pf1, w2);
+   pf2 = weighted_average(pf2, w1, c.pf2, w2);
+   pf3 = weighted_average(pf3, w1, c.pf3, w2);
+
+   mean_fcst = weighted_average(mean_fcst, w1, c.mean_fcst, w2);
+   mean_obs  = weighted_average(mean_obs,  w1, c.mean_obs,  w2);
+
+   score          = weighted_average(score,          w1, c.score,          w2);
+   weighted_score = weighted_average(weighted_score, w1, c.weighted_score, w2);
+
+   return(*this);
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+double weighted_average(double v1, double w1, double v2, double w2) {
+   return(is_bad_data(v1) || is_bad_data(v2) ?
+          bad_data_double :
+          v1 * w1 + v2 * w2);
 }
 
 

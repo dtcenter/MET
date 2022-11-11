@@ -74,7 +74,8 @@ struct SeepsScore { // For SEEPS_MPR
 struct SeepsAggScore {  // For SEEPS
 
    void clear();
-   
+   SeepsAggScore & operator+=(const SeepsAggScore &);
+
    int   n_obs;
    int   c12;
    int   c13;
