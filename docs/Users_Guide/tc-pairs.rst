@@ -33,8 +33,7 @@ Beside their use in TC prediction, TC diagnostics can be very useful to forecast
 
 As of MET v11.0.0, two types of TC diagnostics are supported in TC-Pairs:
 
-..
-    SHIPS_DIAG_DEV: Includes a plethora of inner core, environmental, oceanic, and satellite-based diagnostics. These diagnostics are computed using the *perfect prog* approach.
+  .. SHIPS_DIAG_DEV: Includes a plethora of inner core, environmental, oceanic, and satellite-based diagnostics. These diagnostics are computed using the *perfect prog* approach.
 
   * SHIPS_DIAG_RT: Real-time SHIPS diagnostics computed from a NWP model such as the Global Forecast System (GFS) model along the NHC Official forecast track.
 
