@@ -1456,6 +1456,9 @@ In this way, the number of bins impacts the resolution of the climatological
 probabilities. These derived probability values are used to compute the
 climatological Brier Score and Brier Skill Score.
 
+The "seeps_qc" entry may be set to TRUE or FALSE to control the QC of
+SEEPS (Stable Equitable Error in Probability Space) climo.
+
 mask_missing_flag
 ^^^^^^^^^^^^^^^^^
 
