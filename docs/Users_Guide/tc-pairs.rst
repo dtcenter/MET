@@ -32,6 +32,7 @@ Diagnostics are critically important for training and running statistical-dynami
 Beside their use in TC prediction, TC diagnostics can be very useful to forecasters to understand the forecast scenario. They are also useful to model developers for evaluation of model errors and understanding model performance under different environmental conditions. For instance, a modeler may wish to understand their model's track biases under conditions of high vertical wind shear. TC diagnostics can also be used to understand the sensitivity of the model's intensity predictions to oceanic conditions such as upwelling. The TC-Pairs tool allows filtering and subsetting based on the values of one or several TC diagnostics.
 
 As of MET v11.0.0, two types of TC diagnostics are supported in TC-Pairs:
+
 ..
     SHIPS_DIAG_DEV: Includes a plethora of inner core, environmental, oceanic, and satellite-based diagnostics. These diagnostics are computed using the *perfect prog* approach.
 
