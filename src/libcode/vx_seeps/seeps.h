@@ -55,6 +55,7 @@ static const char *var_name_s32_12    = "s32_12";
 //density_radius = 0.75 degrees (83km; this is described as “the smallest possible
 // value that ensures approximately equal representation of all subregions of Europe”.)
 static double density_radius = 0.75;
+const double density_radius_rad = density_radius * rad_per_deg;
 
 ////////////////////////////////////////////////////////////////////////
 
