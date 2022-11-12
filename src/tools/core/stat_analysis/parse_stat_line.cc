@@ -599,6 +599,7 @@ void parse_seeps_mpr_line(STATLine &l, SEEPSMPRData &s_data) {
    s_data.seeps_mpr.p2       = atof(l.get_item("P2"));
    s_data.seeps_mpr.t1       = atof(l.get_item("T1"));
    s_data.seeps_mpr.t2       = atof(l.get_item("T2"));
+   s_data.seeps_mpr.score    = atof(l.get_item("SEEPS"));
 
    return;
 }

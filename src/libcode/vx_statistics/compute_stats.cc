@@ -1673,7 +1673,6 @@ double *compute_seeps_density_vector(const PairDataPoint *pd, SeepsAggScore *see
    vector<vector<double>> clat_slon(seeps_cnt, vector<double> (seeps_cnt));
    vector<vector<double>> clon_slat(seeps_cnt, vector<double> (seeps_cnt));
    vector<vector<double>> density_m(seeps_cnt, vector<double> (seeps_cnt));
-
    static const char *method_name = "compute_seeps_density_vector() -> ";
 
    if (seeps_cnt == 0) {
