@@ -48,6 +48,7 @@ wind_logic     = UNION;
 eclv_points    = 0.05;
 hss_ec_value   = NA;
 rank_corr_flag = FALSE;
+seeps_qc       = FALSE;
 
 //
 // Forecast and observation fields to be verified

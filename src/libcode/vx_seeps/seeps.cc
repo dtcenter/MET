@@ -132,8 +132,8 @@ void SeepsClimo::clear() {
 ////////////////////////////////////////////////////////////////////////
 
 SeepsClimoRecord *SeepsClimo::create_climo_record(
-      int sid, float lat, float lon, float elv,
-      float *p1, float *p2, float *t1, float *t2, float *scores) {
+      int sid, double lat, double lon, double elv,
+      double *p1, double *p2, double *t1, double *t2, double *scores) {
    int offset;
    SeepsClimoRecord *record = new SeepsClimoRecord();
    
@@ -169,7 +169,7 @@ SeepsClimoRecord *SeepsClimo::create_climo_record(
 
 ////////////////////////////////////////////////////////////////////////
 
-SeepsRecord *SeepsClimo::get_record(int sid, int month, int hour) {
+SeepsRecord *SeepsClimo::get_record(int sid, int month, int hour, bool do_qc) {
    SeepsRecord *record = NULL;
    const char *method_name = "SeepsClimo::get_record() -> ";
 
@@ -184,7 +184,11 @@ SeepsRecord *SeepsClimo::get_record(int sid, int month, int hour) {
          it = seeps_score_12_map.find(sid);
          if (it != seeps_score_12_map.end()) climo_record = it->second;
       }
-      if (climo_record) {
+      // The ‘probability of being dry’, p1, is between 0.1 and 0.85.
+      // The restriction on values of p1 is recommended in the Rodwell et al. (2010) paper
+      if (NULL != climo_record &&
+          (!do_qc || (climo_record->p1[month-1] >= 0.1
+                      && climo_record->p1[month-1] <= 0.85))) {
 
          record = new SeepsRecord;
          record->sid = climo_record->sid;
@@ -241,10 +245,10 @@ ConcatString SeepsClimo::get_seeps_climo_filename() {
 
 ////////////////////////////////////////////////////////////////////////
 
-float SeepsClimo::get_score(int sid, float p_fcst, float p_obs,
-                            int month, int hour) {
-   float score = bad_data_float;
-   SeepsRecord *record = get_record(sid, month, hour);
+double SeepsClimo::get_score(int sid, double p_fcst, double p_obs,
+                             int month, int hour, bool do_qc) {
+   double score = bad_data_double;
+   SeepsRecord *record = get_record(sid, month, hour, do_qc);
 
    if (NULL != record) {
       // Determine location in contingency table
@@ -260,10 +264,10 @@ float SeepsClimo::get_score(int sid, float p_fcst, float p_obs,
 
 ////////////////////////////////////////////////////////////////////////
 
-SeepsScore *SeepsClimo::get_seeps_score(int sid, float p_fcst,
-                                        float p_obs, int month, int hour) {
+SeepsScore *SeepsClimo::get_seeps_score(int sid, double p_fcst, double p_obs,
+                                        int month, int hour, bool do_qc) {
    SeepsScore *score = NULL;
-   SeepsRecord *record = get_record(sid, month, hour);
+   SeepsRecord *record = get_record(sid, month, hour, do_qc);
 
    if (NULL != record) {
       score = new SeepsScore();
@@ -348,37 +352,37 @@ void SeepsClimo::read_records(ConcatString filename) {
    const char *method_name = "SeepsClimo::read_records() -> ";
 
    try {
-      float p1_00_buf[SEEPS_MONTH];
-      float p2_00_buf[SEEPS_MONTH];
-      float t1_00_buf[SEEPS_MONTH];
-      float t2_00_buf[SEEPS_MONTH];
-      float p1_12_buf[SEEPS_MONTH];
-      float p2_12_buf[SEEPS_MONTH];
-      float t1_12_buf[SEEPS_MONTH];
-      float t2_12_buf[SEEPS_MONTH];
-      float matrix_00_buf[SEEPS_MONTH*SEEPS_MATRIX_SIZE];
-      float matrix_12_buf[SEEPS_MONTH*SEEPS_MATRIX_SIZE];
+      double p1_00_buf[SEEPS_MONTH];
+      double p2_00_buf[SEEPS_MONTH];
+      double t1_00_buf[SEEPS_MONTH];
+      double t2_00_buf[SEEPS_MONTH];
+      double p1_12_buf[SEEPS_MONTH];
+      double p2_12_buf[SEEPS_MONTH];
+      double t1_12_buf[SEEPS_MONTH];
+      double t2_12_buf[SEEPS_MONTH];
+      double matrix_00_buf[SEEPS_MONTH*SEEPS_MATRIX_SIZE];
+      double matrix_12_buf[SEEPS_MONTH*SEEPS_MATRIX_SIZE];
       NcFile *nc_file = open_ncfile(filename.c_str());
 
       // dimensions: month = 12 ; nstn = 5293 ; nmatrix = 9 ;
       get_dim(nc_file, dim_name_nstn, nstn, true);
-      mlog << Debug(3) << method_name << "dimension nstn = " << nstn << "\n";
-      if (standalone_debug_seeps) cout << "dimension nstn = " << nstn << "\n";
+      mlog << Debug(6) << method_name << "dimensions nstn = " << nstn << "\n";
+      if (standalone_debug_seeps) cout << "dimensions nstn = " << nstn << "\n";
 
-      int   *sid_array = new int[nstn];
-      float *lat_array = new float[nstn];
-      float *lon_array = new float[nstn];
-      float *elv_array = new float[nstn];
-      float *p1_00_array = new float[nstn*SEEPS_MONTH];
-      float *p2_00_array = new float[nstn*SEEPS_MONTH];
-      float *t1_00_array = new float[nstn*SEEPS_MONTH];
-      float *t2_00_array = new float[nstn*SEEPS_MONTH];
-      float *p1_12_array = new float[nstn*SEEPS_MONTH];
-      float *p2_12_array = new float[nstn*SEEPS_MONTH];
-      float *t1_12_array = new float[nstn*SEEPS_MONTH];
-      float *t2_12_array = new float[nstn*SEEPS_MONTH];
-      float *matrix_00_array = new float[nstn*SEEPS_MONTH*SEEPS_MATRIX_SIZE];
-      float *matrix_12_array = new float[nstn*SEEPS_MONTH*SEEPS_MATRIX_SIZE];
+      int    *sid_array = new int[nstn];
+      double *lat_array = new double[nstn];
+      double *lon_array = new double[nstn];
+      double *elv_array = new double[nstn];
+      double *p1_00_array = new double[nstn*SEEPS_MONTH];
+      double *p2_00_array = new double[nstn*SEEPS_MONTH];
+      double *t1_00_array = new double[nstn*SEEPS_MONTH];
+      double *t2_00_array = new double[nstn*SEEPS_MONTH];
+      double *p1_12_array = new double[nstn*SEEPS_MONTH];
+      double *p2_12_array = new double[nstn*SEEPS_MONTH];
+      double *t1_12_array = new double[nstn*SEEPS_MONTH];
+      double *t2_12_array = new double[nstn*SEEPS_MONTH];
+      double *matrix_00_array = new double[nstn*SEEPS_MONTH*SEEPS_MATRIX_SIZE];
+      double *matrix_12_array = new double[nstn*SEEPS_MONTH*SEEPS_MATRIX_SIZE];
 
       NcVar var_sid       = get_nc_var(nc_file, var_name_sid);
       NcVar var_lat       = get_nc_var(nc_file, var_name_lat);
@@ -513,7 +517,7 @@ void SeepsClimo::read_records(ConcatString filename) {
       nc_file->close();
 
       float duration = (float)(clock() - clock_time)/CLOCKS_PER_SEC;
-      mlog << Debug(4) << method_name << "took " << duration << " seconds\n";
+      mlog << Debug(6) << method_name << "took " << duration << " seconds\n";
       if (standalone_debug_seeps) cout << method_name << "took " << duration  << " seconds\n";
    }
    catch(int i_err) {
@@ -538,9 +542,8 @@ void SeepsAggScore::clear() {
    s12 = s13 = s21 = s23 = s31 = s32 = 0.;
    pv1 = pv2 = pv3 = 0.;
    pf1 = pf2 = pf3 = 0.;
-   mean_fcst = bad_data_double;
-   mean_obs = bad_data_double;
-   score = bad_data_double;
+   mean_fcst = mean_obs = bad_data_double;
+   weighted_score = score = bad_data_double;
 
 }
 
@@ -648,24 +651,30 @@ void SeepsClimoGrid::clear() {
 
 ////////////////////////////////////////////////////////////////////////
 
-SeepsScore *SeepsClimoGrid::get_record(int ix, int iy, float p_fcst, float p_obs) {
+SeepsScore *SeepsClimoGrid::get_record(int ix, int iy,
+                                       double p_fcst, double p_obs,
+                                       bool do_qc) {
    SeepsScore *seeps_record = NULL;
    if (!is_eq(p_fcst, -9999.0) && !is_eq(p_obs, -9999.0)) {
-      int offset = ix * ny + ny;
-      // Determine location in contingency table
-      int ic = (p_obs>t1_buf[offset])+(p_obs>t2_buf[offset]);
-      int jc = (p_fcst>t1_buf[offset])+(p_fcst>t2_buf[offset]);
-      float score = get_score(offset, ic, jc);
+      int offset = iy * nx + ix;
+      // The ‘probability of being dry’, p1, is between 0.1 and 0.85.
+      // The restriction on values of p1 is recommended in the Rodwell et al. (2010) paper
+      if (p1_buf[offset] >= 0.1 && p1_buf[offset] <= 0.85) {
+         // Determine location in contingency table
+         int ic = (p_obs>t1_buf[offset])+(p_obs>t2_buf[offset]);
+         int jc = (p_fcst>t1_buf[offset])+(p_fcst>t2_buf[offset]);
+         double score = get_score(offset, ic, jc);
 
-      seeps_record = new SeepsScore();
-      seeps_record->obs_cat = ic;
-      seeps_record->fcst_cat = jc;
-      seeps_record->s_idx = (jc*3)+ic;
-      seeps_record->p1 = p1_buf[offset];
-      seeps_record->p2 = p2_buf[offset];
-      seeps_record->t1 = t1_buf[offset];
-      seeps_record->t2 = t2_buf[offset];
-      seeps_record->score = score;
+         seeps_record = new SeepsScore();
+         seeps_record->obs_cat = ic;
+         seeps_record->fcst_cat = jc;
+         seeps_record->s_idx = (jc*3)+ic;
+         seeps_record->p1 = p1_buf[offset];
+         seeps_record->p2 = p2_buf[offset];
+         seeps_record->t1 = t1_buf[offset];
+         seeps_record->t2 = t2_buf[offset];
+         seeps_record->score = score;
+      }
    }
 
    return seeps_record;
@@ -673,8 +682,14 @@ SeepsScore *SeepsClimoGrid::get_record(int ix, int iy, float p_fcst, float p_obs
 
 ////////////////////////////////////////////////////////////////////////
 
-float SeepsClimoGrid::get_score(int offset, int obs_cat, int fcst_cat) {
-   float score = bad_data_float;
+double SeepsClimoGrid::get_score(int offset, int obs_cat, int fcst_cat) {
+   double score = bad_data_double;
+
+   if (offset >= (nx * ny)) {
+      mlog << Error << "\nSeepsClimoGrid::get_score() --> offset (" << offset
+           << " is too big (" << (nx*ny) << ")\n";
+      return score;
+   }
 
    if (obs_cat == 0) {
       if (fcst_cat == 1) score = s12_buf[offset];
@@ -697,11 +712,11 @@ float SeepsClimoGrid::get_score(int offset, int obs_cat, int fcst_cat) {
 
 ////////////////////////////////////////////////////////////////////////
 
-float SeepsClimoGrid::get_score(int ix, int iy, float p_fcst, float p_obs) {
-   float score = bad_data_float;
+double SeepsClimoGrid::get_score(int ix, int iy, double p_fcst, double p_obs) {
+   double score = bad_data_double;
 
    if (!is_eq(p_fcst, -9999.0) && !is_eq(p_obs, -9999.0)) {
-      int offset = ix * ny + ny;
+      int offset = iy * nx + ix;
       // Determine location in contingency table
       int ic = (p_obs>t1_buf[offset])+(p_obs>t2_buf[offset]);
       int jc = (p_fcst>t1_buf[offset])+(p_fcst>t2_buf[offset]);
@@ -760,19 +775,21 @@ void SeepsClimoGrid::read_seeps_scores(ConcatString filename) {
 
       get_dim(nc_file, dim_name_lat, ny, true);
       get_dim(nc_file, dim_name_lon, nx, true);
-      mlog << Debug(3)  << method_name << "dimension lon = " << nx << " lat = " << ny << "\n";
-      if (standalone_debug_seeps) cout << "dimension lon = " << nx << " lat = " << ny << "\n";;
+      mlog << Debug(6) << method_name << "dimensions lon = " << nx << " lat = " << ny
+           << " month=" << month << "\n";
+      if (standalone_debug_seeps) cout << "dimensions lon = " << nx << " lat = " << ny
+                                       << " month=" << month << "\n";;
 
-      p1_buf = new float[nx*ny];
-      p2_buf = new float[nx*ny];
-      t1_buf = new float[nx*ny];
-      t2_buf = new float[nx*ny];
-      s12_buf = new float[nx*ny];
-      s13_buf = new float[nx*ny];
-      s21_buf = new float[nx*ny];
-      s23_buf = new float[nx*ny];
-      s31_buf = new float[nx*ny];
-      s32_buf = new float[nx*ny];
+      p1_buf = new double[nx*ny];
+      p2_buf = new double[nx*ny];
+      t1_buf = new double[nx*ny];
+      t2_buf = new double[nx*ny];
+      s12_buf = new double[nx*ny];
+      s13_buf = new double[nx*ny];
+      s21_buf = new double[nx*ny];
+      s23_buf = new double[nx*ny];
+      s31_buf = new double[nx*ny];
+      s32_buf = new double[nx*ny];
 
       long curs[3] = { month-1, 0, 0 };
       long dims[3] = { 1, ny, nx };
@@ -837,55 +854,10 @@ void SeepsClimoGrid::read_seeps_scores(ConcatString filename) {
               << "Did not get s32_00\n\n";
          exit(1);
       }
-/*
-      SeepsClimoRecord *rec_00;
-      SeepsClimoRecord *rec_12;
-      for (int idx=0; idx<nstn; idx++) {
-         int sid = sid_array[idx];
-         int start_offset = idx * SEEPS_MONTH;
-         for (int idx2=0; idx2<SEEPS_MONTH; idx2++) {
-            p1_00_buf[idx2] = p1_00_array[start_offset + idx2];
-            p2_00_buf[idx2] = p2_00_array[start_offset + idx2];
-            t1_00_buf[idx2] = t1_00_array[start_offset + idx2];
-            t2_00_buf[idx2] = t2_00_array[start_offset + idx2];
-            p1_12_buf[idx2] = p1_12_array[start_offset + idx2];
-            p2_12_buf[idx2] = p2_12_array[start_offset + idx2];
-            t1_12_buf[idx2] = t1_12_array[start_offset + idx2];
-            t2_12_buf[idx2] = t2_12_array[start_offset + idx2];
-            int offset_to = idx2 * SEEPS_MATRIX_SIZE;
-            int offset_from = (start_offset + idx2) * SEEPS_MATRIX_SIZE;
-            for (int idx3=0; idx3<SEEPS_MATRIX_SIZE; idx3++) {
-               matrix_00_buf[offset_to+idx3] = matrix_00_array[offset_from+idx3];
-               matrix_12_buf[offset_to+idx3] = matrix_12_array[offset_from+idx3];
-            }
-         }
-         rec_00 = create_climo_record(sid, lat_array[idx], lon_array[idx], elv_array[idx],
-                                      p1_00_buf, p2_00_buf, t1_00_buf, t2_00_buf, matrix_00_buf);
-         rec_12 = create_climo_record(sid, lat_array[idx], lon_array[idx], elv_array[idx],
-                                      p1_12_buf, p2_12_buf, t1_12_buf, t2_12_buf, matrix_12_buf);
-         seeps_score_00_map[sid] = rec_00;
-         seeps_score_12_map[sid] = rec_12;
-      }
-
-      if (sid_array) delete [] sid_array;
-      if (lat_array) delete [] lat_array;
-      if (lon_array) delete [] lon_array;
-      if (elv_array) delete [] elv_array;
-      if (p1_00_array) delete [] p1_00_array;
-      if (p2_00_array) delete [] p2_00_array;
-      if (t1_00_array) delete [] t1_00_array;
-      if (t2_00_array) delete [] t2_00_array;
-      if (p1_12_array) delete [] p1_12_array;
-      if (p2_12_array) delete [] p2_12_array;
-      if (t1_12_array) delete [] t1_12_array;
-      if (t2_12_array) delete [] t2_12_array;
-      if (matrix_00_array) delete [] matrix_00_array;
-      if (matrix_12_array) delete [] matrix_12_array;
-*/
       nc_file->close();
 
       float duration = (float)(clock() - clock_time)/CLOCKS_PER_SEC;
-      mlog << Debug(4) << method_name << "took " << duration << " seconds\n";
+      mlog << Debug(6) << method_name << "took " << duration << " seconds\n";
       if (standalone_debug_seeps) cout << method_name << "took " << duration  << " seconds\n";
    }
    catch(...) {

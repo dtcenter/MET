@@ -131,6 +131,8 @@ output_flag = {
    seeps_mpr = ${SEEPS_FLAG};
 }
 
+seeps_qc       = ${SEEPS_QC};
+
 ////////////////////////////////////////////////////////////////////////////////
 
 duplicate_flag = NONE;

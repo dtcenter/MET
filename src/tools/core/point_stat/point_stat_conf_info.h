@@ -149,6 +149,7 @@ class PointStatVxOpt {
 
       double          hss_ec_value;       // HSS expected correct value
       bool            rank_corr_flag;     // Flag for computing rank correlations
+      bool            seeps_qc;           // enable SEEPS QC
 
       StringArray     msg_typ;            // Array of message types
 

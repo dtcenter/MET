@@ -53,6 +53,7 @@ nc_pairs_var_name   = "";
 nc_pairs_var_suffix = "";
 hss_ec_value        = NA;
 rank_corr_flag      = FALSE;
+seeps_qc            = FALSE;
 
 tmp_field = [ { name = "TMP"; level = [ "P500" ]; } ];
 

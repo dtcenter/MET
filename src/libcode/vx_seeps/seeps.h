@@ -24,8 +24,8 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-static const char *MET_ENV_SEEPS_CLIMO_NAME = "MET_SEEPS_CLIMO_NAME";
-static const char *MET_ENV_SEEPS_CLIMO_GRID_NAME = "MET_SEEPS_CLIMO_GRID_NAME";
+static const char *MET_ENV_SEEPS_CLIMO_NAME      = "MET_SEEPS_POINT_CLIMO_NAME";
+static const char *MET_ENV_SEEPS_CLIMO_GRID_NAME = "MET_SEEPS_GRID_CLIMO_NAME";
 
 static const char *dim_name_nstn      = "nstn";
 
@@ -62,17 +62,16 @@ struct SeepsScore { // For SEEPS_MPR
    int   obs_cat;   // i = obs category 0,1,2
    int   fcst_cat;  // j = model category 0,1,2
    int   s_idx;     // index for 3 by 3 matrix as 1 dimensional (fcst_cat*3)+obs_cat
-   float p1;
-   float p2;
-   float t1;
-   float t2;
-   float score;
+   double p1;
+   double p2;
+   double t1;
+   double t2;
+   double score;
 };
 
 ////////////////////////////////////////////////////////////////////////
 
 struct SeepsAggScore {  // For SEEPS
-
    void clear();
    SeepsAggScore & operator+=(const SeepsAggScore &);
 
@@ -83,22 +82,22 @@ struct SeepsAggScore {  // For SEEPS
    int   c23;
    int   c31;
    int   c32;
-   float s12;
-   float s13;
-   float s21;
-   float s23;
-   float s31;
-   float s32;
-   float pv1;   // marginal probabilities of the observed values
-   float pv2;
-   float pv3;
-   float pf1;   // marginal probabilities of the forecast values
-   float pf2;
-   float pf3;
-   float mean_fcst;
-   float mean_obs;
-   float score;
-   float weighted_score;
+   double s12;
+   double s13;
+   double s21;
+   double s23;
+   double s31;
+   double s32;
+   double pv1;   // marginal probabilities of the observed values
+   double pv2;
+   double pv3;
+   double pf1;   // marginal probabilities of the forecast values
+   double pf2;
+   double pf3;
+   double mean_fcst;
+   double mean_obs;
+   double score;
+   double weighted_score;
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -107,28 +106,28 @@ struct SeepsAggScore {  // For SEEPS
 struct SeepsRecord {
    int   sid;
    int   month;    // 1 to 12, not 0 to 11
-   float lat;
-   float lon;
-   float elv;
-   float p1;
-   float p2;
-   float t1;
-   float t2;
-   float scores[SEEPS_MATRIX_SIZE];
+   double lat;
+   double lon;
+   double elv;
+   double p1;
+   double p2;
+   double t1;
+   double t2;
+   double scores[SEEPS_MATRIX_SIZE];
 };
 
 ////////////////////////////////////////////////////////////////////////
 
 struct SeepsClimoRecord {
    int   sid;
-   float lat;
-   float lon;
-   float elv;
-   float p1[SEEPS_MONTH];
-   float p2[SEEPS_MONTH];
-   float t1[SEEPS_MONTH];
-   float t2[SEEPS_MONTH];
-   float scores[SEEPS_MONTH][SEEPS_MATRIX_SIZE];
+   double lat;
+   double lon;
+   double elv;
+   double p1[SEEPS_MONTH];
+   double p2[SEEPS_MONTH];
+   double t1[SEEPS_MONTH];
+   double t2[SEEPS_MONTH];
+   double scores[SEEPS_MONTH][SEEPS_MATRIX_SIZE];
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -142,9 +141,9 @@ class SeepsClimo {
       std::map<int,SeepsClimoRecord *> seeps_score_00_map;
       std::map<int,SeepsClimoRecord *> seeps_score_12_map;
 
-      SeepsClimoRecord *create_climo_record(int sid, float lat, float lon, float elv,
-                                            float *p1, float *p2, float *t1, float *t2, 
-                                            float *scores);
+      SeepsClimoRecord *create_climo_record(int sid, double lat, double lon, double elv,
+                                            double *p1, double *p2, double *t1, double *t2, 
+                                            double *scores);
       ConcatString get_seeps_climo_filename();
       void print_record(SeepsClimoRecord *record, bool with_header=false);
       void read_records(ConcatString filename);
@@ -155,9 +154,9 @@ class SeepsClimo {
      ~SeepsClimo();
 
       void clear();
-      SeepsRecord *get_record(int sid, int month, int hour=0);
-      float get_score(int sid, float p_fcst, float p_obs, int month, int hour=0);
-      SeepsScore *get_seeps_score(int sid, float p_fcst, float p_obs, int month, int hour=0);
+      SeepsRecord *get_record(int sid, int month, int hour, bool do_qc);
+      double get_score(int sid, double p_fcst, double p_obs, int month, int hour, bool do_qc);
+      SeepsScore *get_seeps_score(int sid, double p_fcst, double p_obs, int month, int hour, bool do_qc);
       void print_all();
       void print_record(SeepsRecord *record, bool with_header=false);
 
@@ -179,25 +178,25 @@ class SeepsClimoGrid {
       int   hour;
       int   nx;
       int   ny;
-      float *p1_buf;
-      float *p2_buf;
-      float *t1_buf;
-      float *t2_buf;
-      float *s12_buf;
-      float *s13_buf;
-      float *s21_buf;
-      float *s23_buf;
-      float *s31_buf;
-      float *s32_buf;
+      double *p1_buf;
+      double *p2_buf;
+      double *t1_buf;
+      double *t2_buf;
+      double *s12_buf;
+      double *s13_buf;
+      double *s21_buf;
+      double *s23_buf;
+      double *s31_buf;
+      double *s32_buf;
 
       bool seeps_ready;
       //int nstn;
       //std::map<int,SeepsClimoRecord *> seeps_score_00_map;
       //std::map<int,SeepsClimoRecord *> seeps_score_12_map;
       //
-      //SeepsClimoRecord *create_climo_record(int sid, float lat, float lon, float elv,
-      //                                      float *p1, float *p2, float *t1, float *t2,
-      //                                      float *scores);
+      //SeepsClimoRecord *create_climo_record(int sid, double lat, double lon, double elv,
+      //                                      double *p1, double *p2, double *t1, double *t2,
+      //                                      double *scores);
       ConcatString get_seeps_climo_filename();
       //void print_record(SeepsClimoRecord *record, bool with_header=false);
       void read_seeps_scores(ConcatString filename);
@@ -208,9 +207,9 @@ class SeepsClimoGrid {
      ~SeepsClimoGrid();
 
       void clear();
-      SeepsScore *get_record(int ix, int iy, float p_fcst, float p_obs);
-      float get_score(int offset, int obs_cat, int fcst_cat);
-      float get_score(int ix, int iy, float p_fcst, float p_obs);
+      SeepsScore *get_record(int ix, int iy, double p_fcst, double p_obs, bool do_qc);
+      double get_score(int offset, int obs_cat, int fcst_cat);
+      double get_score(int ix, int iy, double p_fcst, double p_obs);
       void print_all();
       //void print_record(bool with_header=false);
 

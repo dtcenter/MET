@@ -194,6 +194,7 @@ class GridStatVxOpt {
 
       double           hss_ec_value;      // HSS expected correct value
       bool             rank_corr_flag;    // Flag for computing rank correlations
+      bool             seeps_qc;          // enable SEEPS QC
 
       // Output file options
       STATOutputType    output_flag[n_txt]; // Flag for each output line type
