@@ -121,6 +121,9 @@ extern void write_job_aggr_ssvar(STATAnalysisJob &, STATLineType,
 extern void write_job_aggr_seeps(STATAnalysisJob &, STATLineType,
                std::map<ConcatString, AggrSEEPSInfo> &, AsciiTable &);
 
+extern void write_job_aggr_seeps_mpr(STATAnalysisJob &, STATLineType,
+               std::map<ConcatString, AggrSEEPSMPRInfo> &, AsciiTable &);
+
 extern void write_job_aggr_orank(STATAnalysisJob &, STATLineType,
                std::map<ConcatString, AggrENSInfo> &, AsciiTable &,
                gsl_rng *);

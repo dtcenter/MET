@@ -197,6 +197,11 @@ struct AggrSEEPSInfo {
    SeepsAggScore agg_score;
 };
 
+struct AggrSEEPSMPRInfo {
+   StatHdrInfo hdr;
+   PairDataPoint pd;
+};
+
 struct AggrTimeSeriesInfo {
    StatHdrInfo hdr;
    ConcatString fcst_var, obs_var;
@@ -298,6 +303,11 @@ extern void aggr_ssvar_lines(
 extern void aggr_seeps_lines(
                LineDataFile &, STATAnalysisJob &,
                std::map<ConcatString, AggrSEEPSInfo> &,
+               int &, int &);
+
+extern void aggr_seeps_mpr_lines(
+               LineDataFile &, STATAnalysisJob &,
+               std::map<ConcatString, AggrSEEPSMPRInfo> &,
                int &, int &);
 
 extern void aggr_time_series_lines(

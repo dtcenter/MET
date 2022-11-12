@@ -586,9 +586,6 @@ void parse_seeps_line(STATLine &l, SeepsAggScore &agg_score) {
 
 void parse_seeps_mpr_line(STATLine &l, SEEPSMPRData &s_data) {
 
-   s_data.fcst_var = l.fcst_var();
-   s_data.obs_var  = l.obs_var();
-
    s_data.obs_sid = l.get_item("OBS_SID");
    s_data.obs_lat = atof(l.get_item("OBS_LAT"));
    s_data.obs_lon = atof(l.get_item("OBS_LON"));

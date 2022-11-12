@@ -3439,6 +3439,101 @@ void aggr_seeps_lines(LineDataFile &f, STATAnalysisJob &job,
    return;
 }
 
+
+////////////////////////////////////////////////////////////////////////
+
+void aggr_seeps_mpr_lines(LineDataFile &f, STATAnalysisJob &job,
+                          map<ConcatString, AggrSEEPSMPRInfo> &m,
+                          int &n_in, int &n_out) {
+   STATLine line;
+   AggrSEEPSMPRInfo aggr;
+   SEEPSMPRData cur;
+   ConcatString key, fcst_var, obs_var;
+
+   //
+   // Process the STAT lines
+   //
+   while(f >> line) {
+
+      if(line.is_header()) continue;
+
+      n_in++;
+
+      if(job.is_keeper(line)) {
+
+         job.dump_stat_line(line);
+
+         if(line.type() != stat_seeps_mpr) {
+            mlog << Error << "\naggr_seeps_mpr_lines() -> "
+                 << "should only encounter SEEPS_MPR line types.\n"
+                 << "ERROR occurred on STAT line:\n" << line << "\n\n";
+            throw(1);
+         }
+
+         //
+         // Only aggregate consistent variable names
+         //
+         if(fcst_var.empty()) fcst_var = line.fcst_var();
+         if(obs_var.empty())  obs_var  = line.obs_var();
+
+         if(fcst_var != line.fcst_var() ||
+            obs_var  != line.obs_var()) {
+            mlog << Error << "\naggr_seeps_mpr_lines() -> "
+                 << "both the forecast and observation variable types must "
+                 << "remain constant.  Try setting \"-fcst_var\" and/or "
+                 << "\"-obs_var\".\n"
+                 << "ERROR occurred on STAT line:\n" << line << "\n\n";
+            throw(1);
+         }
+
+         //
+         // Parse the current SSVAR line
+         //
+         parse_seeps_mpr_line(line, cur);
+
+         //
+         // Build the map key for the current line
+         //
+         key = job.get_case_info(line);
+
+         //
+         // Add a new map entry, if necessary
+         //
+         if(m.count(key) == 0) {
+            aggr.pd.n_obs = 0;
+            aggr.pd.f_na.clear();
+            aggr.pd.o_na.clear();
+            aggr.pd.seeps_mpr.clear();
+            aggr.hdr.clear();
+            m[key] = aggr;
+         }
+
+         //
+         // Increment counts
+         //
+         m[key].pd.n_obs += 1;
+         m[key].pd.f_na.add(cur.fcst);
+         m[key].pd.o_na.add(cur.obs);
+         m[key].pd.lat_na.add(cur.obs_lat);
+         m[key].pd.lon_na.add(cur.obs_lon);
+
+         // Allocated here but deallocated by PairDataPoint
+         SeepsScore *score = new SeepsScore;
+         *score = cur.seeps_mpr;
+         m[key].pd.seeps_mpr.push_back(score);
+
+         //
+         // Keep track of the unique header column entries
+         //
+         m[key].hdr.add(line);
+
+         n_out++;
+      }
+   } // end while
+
+   return;
+}
+
 ////////////////////////////////////////////////////////////////////////
 
 void aggr_time_series_lines(LineDataFile &f, STATAnalysisJob &job,
