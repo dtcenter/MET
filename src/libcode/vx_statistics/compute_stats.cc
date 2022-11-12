@@ -1710,13 +1710,13 @@ double *compute_seeps_density_vector(const PairDataPoint *pd, SeepsAggScore *see
    vector<double> rlat(seeps_cnt), rlon(seeps_cnt);
    vector<double> clat(seeps_cnt), clon(seeps_cnt);
    vector<double> slat(seeps_cnt), slon(seeps_cnt);
-   vector<vector<double>> clat_m(seeps_cnt, vector<double> (seeps_cnt));
-   vector<vector<double>> clon_m(seeps_cnt, vector<double> (seeps_cnt));
-   vector<vector<double>> slat_m(seeps_cnt, vector<double> (seeps_cnt));
-   vector<vector<double>> slon_m(seeps_cnt, vector<double> (seeps_cnt));
-   vector<vector<double>> clat_slon(seeps_cnt, vector<double> (seeps_cnt));
-   vector<vector<double>> clon_slat(seeps_cnt, vector<double> (seeps_cnt));
-   vector<vector<double>> density_m(seeps_cnt, vector<double> (seeps_cnt));
+   vector< vector<double> > clat_m(seeps_cnt, vector<double> (seeps_cnt));
+   vector< vector<double> > clon_m(seeps_cnt, vector<double> (seeps_cnt));
+   vector< vector<double> > slat_m(seeps_cnt, vector<double> (seeps_cnt));
+   vector< vector<double> > slon_m(seeps_cnt, vector<double> (seeps_cnt));
+   vector< vector<double> > clat_slon(seeps_cnt, vector<double> (seeps_cnt));
+   vector< vector<double> > clon_slat(seeps_cnt, vector<double> (seeps_cnt));
+   vector< vector<double> > density_m(seeps_cnt, vector<double> (seeps_cnt));
    static const char *method_name = "compute_seeps_density_vector() -> ";
 
    if (seeps_cnt == 0) {
