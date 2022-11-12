@@ -1459,6 +1459,7 @@ void compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps) {
       seeps->score = score_sum / count;
       density_vector = compute_seeps_density_vector(pd, seeps);
 
+      weighted_score = 0.;
       for (int i=0; i<SEEPS_MATRIX_SIZE; i++) pvf[i] = 0.;
       if (density_vector != NULL) {
          //IDL: w = 1/d
@@ -1470,7 +1471,6 @@ void compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps) {
                weight_sum += weight[i];
             }
          }
-         weighted_score = 0.;
          if (!is_eq(weight_sum, 0)) {
             //IDL: w = w/sum(w)
             for (int i=0; i<count; i++) weight[i] /= weight_sum;
@@ -1479,10 +1479,14 @@ void compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps) {
             for (int i=0; i<seeps_mprs.size(); i++) {
                seeps_mpr = seeps_mprs[i];
                //IDL: s = s + c(4+cat(i) * w{i)
-               weighted_score += seeps_mpr->score * weight[i];
-               //IDL: svf(cat{i)) = svf(cat{i)) + c(4+cat(i) * w{i)
-               //IDL: pvf(cat{i)) = pvf(cat{i)) + w{i)
-               pvf[seeps_mpr->s_idx] += weight[i];
+               if (i < count) {
+                  weighted_score += seeps_mpr->score * weight[i];
+                  //IDL: svf(cat{i)) = svf(cat{i)) + c(4+cat(i) * w{i)
+                  //IDL: pvf(cat{i)) = pvf(cat{i)) + w{i)
+                  pvf[seeps_mpr->s_idx] += weight[i];
+               }
+               else mlog << Debug(1) << method_name
+                         << "the length of density vector (" << count << ") is less than MPR.\n";
             }
          }
 
@@ -1706,7 +1710,6 @@ double *compute_seeps_density_vector(const PairDataPoint *pd, SeepsAggScore *see
    int seeps_idx;
    SeepsScore *seeps_mpr;
    int seeps_cnt = seeps->n_obs;
-   const double density_radius_rad = density_radius * rad_per_deg;
    vector<double> rlat(seeps_cnt), rlon(seeps_cnt);
    vector<double> clat(seeps_cnt), clon(seeps_cnt);
    vector<double> slat(seeps_cnt), slon(seeps_cnt);
@@ -1714,7 +1717,6 @@ double *compute_seeps_density_vector(const PairDataPoint *pd, SeepsAggScore *see
    vector< vector<double> > clon_m(seeps_cnt, vector<double> (seeps_cnt));
    vector< vector<double> > slat_m(seeps_cnt, vector<double> (seeps_cnt));
    vector< vector<double> > slon_m(seeps_cnt, vector<double> (seeps_cnt));
-   vector< vector<double> > clat_slon(seeps_cnt, vector<double> (seeps_cnt));
    vector< vector<double> > clon_slat(seeps_cnt, vector<double> (seeps_cnt));
    vector< vector<double> > density_m(seeps_cnt, vector<double> (seeps_cnt));
    static const char *method_name = "compute_seeps_density_vector() -> ";
@@ -1724,6 +1726,7 @@ double *compute_seeps_density_vector(const PairDataPoint *pd, SeepsAggScore *see
            << "no SEEPS_MPR available.\n";
       return NULL;
    }
+
    // Get lat/lon & convert them to radian and get sin/cos values
    seeps_idx = 0;
    double *density_vector = new double[seeps_cnt];
@@ -1749,9 +1752,6 @@ double *compute_seeps_density_vector(const PairDataPoint *pd, SeepsAggScore *see
    v_count = 0;
    if (seeps_idx < seeps_cnt) seeps_cnt = seeps_idx;
    for(int i=0; i<seeps_cnt; i++) {
-      for(int j=0; j<seeps_cnt; j++) {
-         clat_slon[i][j] = clon_slat[i][j] = 0.;
-      }
       density_vector[i] = 0.;
    }
    for(int j=0; j<seeps_cnt; j++) {
@@ -1785,10 +1785,12 @@ double *compute_seeps_density_vector(const PairDataPoint *pd, SeepsAggScore *see
       mlog << Debug(4) << method_name
            << "no non-zero values at density_vector\n";
    }
-   mlog << Debug(10) << method_name
-        << " non zero count=" << v_count
-        << " density_vector[0]=" << density_vector[0]
-        << " density_vector[" << (seeps_cnt-1) << "]=" << density_vector[seeps_cnt-1] << "\n";
+   if (seeps_cnt > 0) {
+      mlog << Debug(10) << method_name
+           << " non zero count=" << v_count
+           << " density_vector[0]=" << density_vector[0]
+           << " density_vector[" << (seeps_cnt-1) << "]=" << density_vector[seeps_cnt-1] << "\n";
+   }
 
    return density_vector;
 }
