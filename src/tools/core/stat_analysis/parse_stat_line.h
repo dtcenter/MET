@@ -107,8 +107,6 @@ struct ORANKData {
 
 // SEEPS Matched Pair (SEEPS_MPR) data structure
 struct SEEPSMPRData {
-   ConcatString fcst_var;
-   ConcatString obs_var;
    ConcatString obs_sid, obs_qc;
    double obs_lat, obs_lon, fcst, obs;
    SeepsScore seeps_mpr;
