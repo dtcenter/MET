@@ -1656,19 +1656,24 @@ void compute_aggregated_seeps_grid(const DataPlane &fcst_dp, const DataPlane &ob
 // ; PV-WAVE prints: 1.00000      5.00000
 // PRINT, SUM(array2, 1)
 // ; PV-WAVE prints: 2.00000      4.00000
-
+////////////////////////////////////////////////////////////////////////
 
 double *compute_seeps_density_vector(const PairDataPoint *pd, SeepsAggScore *seeps) {
    int seeps_idx;
    SeepsScore *seeps_mpr;
    int seeps_cnt = seeps->n_obs;
-   const double density_radidus_rad = density_radius * rad_per_deg;
-   double rlat[seeps_cnt], rlon[seeps_cnt];
-   double clat[seeps_cnt], clon[seeps_cnt], slat[seeps_cnt], slon[seeps_cnt];
-   double clat_m[seeps_cnt][seeps_cnt], clon_m[seeps_cnt][seeps_cnt];
-   double slat_m[seeps_cnt][seeps_cnt], slon_m[seeps_cnt][seeps_cnt];
-   double clat_slon[seeps_cnt][seeps_cnt], clon_slat[seeps_cnt][seeps_cnt];
-   double density_m[seeps_cnt][seeps_cnt];
+   const double density_radius_rad = density_radius * rad_per_deg;
+   vector<double> rlat(seeps_cnt), rlon(seeps_cnt);
+   vector<double> clat(seeps_cnt), clon(seeps_cnt);
+   vector<double> slat(seeps_cnt), slon(seeps_cnt);
+   vector<vector<double>> clat_m(seeps_cnt, vector<double> (seeps_cnt));
+   vector<vector<double>> clon_m(seeps_cnt, vector<double> (seeps_cnt));
+   vector<vector<double>> slat_m(seeps_cnt, vector<double> (seeps_cnt));
+   vector<vector<double>> slon_m(seeps_cnt, vector<double> (seeps_cnt));
+   vector<vector<double>> clat_slon(seeps_cnt, vector<double> (seeps_cnt));
+   vector<vector<double>> clon_slat(seeps_cnt, vector<double> (seeps_cnt));
+   vector<vector<double>> density_m(seeps_cnt, vector<double> (seeps_cnt));
+
    static const char *method_name = "compute_seeps_density_vector() -> ";
 
    if (seeps_cnt == 0) {
@@ -1723,11 +1728,11 @@ double *compute_seeps_density_vector(const PairDataPoint *pd, SeepsAggScore *see
          //IDL: r = acos(r)
          density = acos(density);
          //IDL: if r0 gt 0.0 then r = exp(-(r/r0)^2) * (r le 4. * r0) else r = (r*0.)+1.
-         if (density_radidus_rad <= 0.) density = 1.0;
+         if (density_radius_rad <= 0.) density = 1.0;
          else {
             mask3 = (density <= 4.0) ? 1. : 0.;
-            temp = density / density_radidus_rad;
-            density = exp(-(temp * temp)) * mask3 * density_radidus_rad;
+            temp = density / density_radius_rad;
+            density = exp(-(temp * temp)) * mask3 * density_radius_rad;
          }
          density_vector[j] += density;
       }
