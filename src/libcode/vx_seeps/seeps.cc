@@ -221,7 +221,7 @@ ConcatString SeepsClimo::get_seeps_climo_filename() {
    const char *method_name = "SeepsClimo::get_seeps_climo_filename() -> ";
 
    // Use the MET_TMP_DIR environment variable, if set.
-   bool use_env = get_env(MET_ENV_SEEPS_CLIMO_GRID_NAME, seeps_filename);
+   bool use_env = get_env(MET_ENV_SEEPS_CLIMO_NAME, seeps_filename);
    if(use_env) seeps_filename = replace_path(seeps_filename);
    else seeps_filename = replace_path(def_seeps_filename);
 
@@ -733,7 +733,7 @@ ConcatString SeepsClimoGrid::get_seeps_climo_filename() {
    const char *method_name = "SeepsClimoGrid::get_seeps_climo_filename() -> ";
 
    // Use the MET_TMP_DIR environment variable, if set.
-   bool use_env = get_env(MET_ENV_SEEPS_CLIMO_NAME, seeps_filename);
+   bool use_env = get_env(MET_ENV_SEEPS_CLIMO_GRID_NAME, seeps_filename);
    if(use_env) {
       seeps_filename = replace_path(seeps_filename);
    }
@@ -747,7 +747,7 @@ ConcatString SeepsClimoGrid::get_seeps_climo_filename() {
       ConcatString message = " ";
       if (use_env) {
          message.add("from the env. name ");
-         message.add(MET_ENV_SEEPS_CLIMO_NAME);
+         message.add(MET_ENV_SEEPS_CLIMO_GRID_NAME);
       }
       mlog << Warning << "\n" << method_name
            << "The SEEPS climo name \"" << seeps_filename.c_str()
