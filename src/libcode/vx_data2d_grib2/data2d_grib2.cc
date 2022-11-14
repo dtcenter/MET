@@ -160,8 +160,6 @@ bool MetGrib2DataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
    vector<Grib2Record*> listMatch, listMatchRange;
    find_record_matches(vinfo_g2, listMatch, listMatchRange);
 
-   cout << "listMatch.size() = " << listMatch.size() << endl;
-   
    //  if no matches were found, check for derived records
    if( 1 > listMatch.size() ){
 
@@ -509,10 +507,6 @@ void MetGrib2DataFile::find_record_matches( VarInfoGrib2* vinfo,
          
          cout << " (*it)->Discipline = " << (*it)->Discipline << " (*it)->ParmCat = " << (*it)->ParmCat << " (*it)->Parm = " << (*it)->Parm << " (*it)->ParmName = " << (*it)->ParmName << " (*it)->Center = " << (*it)->Center << " (*it)->MasterTable = " << (*it)->MasterTable << " (*it)->LocalTable = " << (*it)->LocalTable << endl;
          
-         if(  vinfo->units().empty() )
-            cout << "Units is missing" << endl;
-         
-         
          //  record number level type
          if( LevelType_RecNumber == vinfo_lty && is_eq(lvl1, (*it)->RecNum) ){
             rec_match_ex = true;
@@ -577,42 +571,36 @@ void MetGrib2DataFile::find_record_matches( VarInfoGrib2* vinfo,
 
          } // end if match for probabilistic field
 
+         // If units are empty (which indicates we did not have an exact match from the grib2 table)
+         // Then use the input data fields to do an additional grib2 table look and set Discipline, ParmCat, Parm, Units and LongName
          Grib2TableEntry tab;
          if( (rec_match_ex || rec_match_rn) && vinfo->units().empty() ) {
             
             if( !GribTable.lookup_grib2((*it)->Discipline, (*it)->ParmCat, (*it)->Parm,
                                         (*it)->MasterTable, (*it)->Center, (*it)->LocalTable, tab) ){
                
-               mlog << Debug(4) << "MetGrib2DataFile::find_record_matches - unrecognized GRIB2 from input file "
+               mlog << Error << "MetGrib2DataFile::find_record_matches - unrecognized GRIB2 from input file, can't find grib2 table match "
                     << "field indicies - Discipline: " << (*it)->Discipline << ", ParmCat: " << (*it)->ParmCat
                     << ", Parm: " << (*it)->Parm << ", MasterTable: " << (*it)->MasterTable
                     << ", Center: " << (*it)->Center << ", LocalTable: " << (*it)->LocalTable << "\n";
                
+               exit(1);
+               
             } else {
 
-               cout << "Found table match" << endl;
-               cout << "Units (tab.units.c_str()) = " << tab.units.c_str() << " Long name (tab.full_name.c_str()) = " << tab.full_name.c_str() << endl;
-
+               mlog << Debug(3) << "MetGrib2DataFile::find_record_matches - Found exact grib2 table match using input data fields. "
+                    << "Setting grib2 fields from tab values: Discipline: " << tab.index_a << ", ParmCat: " << tab.index_b
+                    << ", Parm: " << tab.index_c << ", Units: " << tab.units.c_str() << ", LongName: " << tab.full_name.c_str() << "\n";
+               
+               vinfo->set_discipline(tab.index_a);
+               vinfo->set_parm_cat(tab.index_b);
+               vinfo->set_parm(tab.index_c);
                vinfo->set_units(tab.units.c_str());
                vinfo->set_long_name(tab.full_name.c_str());
             }
             
-         }
+         } // end if match but unis are missing
          
-         // JHG ... if we have a match at this point and have not yet set the units
-         // execute a GRIB2 table lookup to do so
-         //if ( (rec_match_ex || rec_match_rn) && vinfo.units has not been set yet ) {
-         //   
-         //   Do a GRIB2 table lookup using the current mtab, ltab, cntr to figure the units out.
-         //   (*it)->Center, (*it)->MasterTable, (*it)->LocalTable
-         //   wgrib2 -d 1 -V -varX ...
-         //   Prints :var0_2_1_7_3_5
-         //      
-         //   If we get an exact match for (*it)->Center, (*it)->MasterTable, (*it)->LocalTable, use it.
-         //                                             If not, we want a "partial match"
-         //                                          
-         // }
-
       }  //  END: else if( parameter match )
 
       //  add the record to the result lists, depending on the match type
