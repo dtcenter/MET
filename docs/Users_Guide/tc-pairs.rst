@@ -122,9 +122,9 @@ ____________________
   valid_inc    = [];
   valid_exc    = [];
   init_hour    = [];
-  init_mask    = [];
+  init_mask    = "";
+  valid_mask   = "";
   lead_req     = [];
-  valid_mask   = [];
   match_points = TRUE;
   version      = "VN.N";
 
@@ -582,7 +582,7 @@ TC-Pairs produces output in TCST format. The default output file name can be ove
     - INDEX
     - Index of the current track pair
   * - 16
-    - SOURCE
+    - DIAG_SOURCE
     - Diagnostics data source
   * - 17
     - N_DIAG
