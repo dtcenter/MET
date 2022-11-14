@@ -2112,16 +2112,6 @@ in those cases.
 		
   duplicate_flag = NONE;
 
-seeps_qc
-^^^^^^^^
-
-The "seeps_qc" entry is a boolean to indicate whether SEEPS (Stable Equitable
-Error in Probability Space) QC by the probability of being dry is enabled.
-
-.. code-block:: none
-		
-  seeps_qc = FALSE;
-
 obs_summary
 ^^^^^^^^^^^
 
