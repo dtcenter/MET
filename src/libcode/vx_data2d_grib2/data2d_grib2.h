@@ -43,6 +43,9 @@ typedef struct {
    int ParmCat;
    int Parm;
    int Process;
+   int Center;
+   int MasterTable;
+   int LocalTable;
    int LvlTyp;
    double LvlVal1;
    double LvlVal2;

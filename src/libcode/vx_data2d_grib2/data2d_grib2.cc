@@ -444,16 +444,11 @@ void MetGrib2DataFile::find_record_matches( VarInfoGrib2* vinfo,
       }
       
       //  test ipdtmpl array values
-      cout << "vinfo->n_ipdtmpl() = " << vinfo->n_ipdtmpl() << endl;
       if(vinfo->n_ipdtmpl() > 0) {
          int i, j;
          bool skip = false;
          for(i=0; i<vinfo->n_ipdtmpl(); i++) {
-
             j = vinfo->ipdtmpl_index(i);
-            
-            cout << "i: " << i << " vinfo->ipdtmpl_val(i) = " << vinfo->ipdtmpl_val(i) << " j: " << j << " (*it)->IPDTmpl[j] = " << (*it)->IPDTmpl[j] << endl;
-            
             if(j >= (*it)->IPDTmpl.n() ||
               (j < (*it)->IPDTmpl.n() &&
               (*it)->IPDTmpl[j] != vinfo->ipdtmpl_val(i))) {
@@ -463,7 +458,7 @@ void MetGrib2DataFile::find_record_matches( VarInfoGrib2* vinfo,
          }
          if(skip) continue;
       }
-
+      
       // if this is ensemble record - test for ensemble information
       if((*it)->PdsTmpl == 1 || (*it)->PdsTmpl == 11){
 
@@ -510,11 +505,10 @@ void MetGrib2DataFile::find_record_matches( VarInfoGrib2* vinfo,
             continue;
          }
          
-         //cout << " vinfo->discipline() = " << vinfo->discipline() << " vinfo->parm_cat() = " << vinfo->parm_cat() << " vinfo->parm() = " << vinfo->parm() << " vinfo->name().text() = " << vinfo->name().text() << endl;
-         cout << " vinfo->discipline() = " << vinfo->discipline() << " vinfo->parm_cat() = " << vinfo->parm_cat() << " vinfo->parm() = " << vinfo->parm() << " vinfo->name().text() = " << vinfo->name().text() << " vinfo->units() = " << vinfo->units() << endl;
+         cout << " vinfo->discipline() = " << vinfo->discipline() << " vinfo->parm_cat() = " << vinfo->parm_cat() << " vinfo->parm() = " << vinfo->parm() << " vinfo->name().text() = " << vinfo->name().text() << " vinfo->units() = " << vinfo->units() << " vinfo->long_name().text() = " << vinfo->long_name().text() << endl;
          
-         cout << " (*it)->Discipline = " << (*it)->Discipline << " (*it)->ParmCat = " << (*it)->ParmCat << " (*it)->Parm = " << (*it)->Parm << " (*it)->ParmName = " << (*it)->ParmName << endl;
-
+         cout << " (*it)->Discipline = " << (*it)->Discipline << " (*it)->ParmCat = " << (*it)->ParmCat << " (*it)->Parm = " << (*it)->Parm << " (*it)->ParmName = " << (*it)->ParmName << " (*it)->Center = " << (*it)->Center << " (*it)->MasterTable = " << (*it)->MasterTable << " (*it)->LocalTable = " << (*it)->LocalTable << endl;
+         
          if(  vinfo->units().empty() )
             cout << "Units is missing" << endl;
          
@@ -583,7 +577,27 @@ void MetGrib2DataFile::find_record_matches( VarInfoGrib2* vinfo,
 
          } // end if match for probabilistic field
 
-         //if( (rec_match_ex || rec_match_rn) && is_bad_data(vinfo->units()) ) {
+         Grib2TableEntry tab;
+         if( (rec_match_ex || rec_match_rn) && vinfo->units().empty() ) {
+            
+            if( !GribTable.lookup_grib2((*it)->Discipline, (*it)->ParmCat, (*it)->Parm,
+                                        (*it)->MasterTable, (*it)->Center, (*it)->LocalTable, tab) ){
+               
+               mlog << Debug(4) << "MetGrib2DataFile::find_record_matches - unrecognized GRIB2 from input file "
+                    << "field indicies - Discipline: " << (*it)->Discipline << ", ParmCat: " << (*it)->ParmCat
+                    << ", Parm: " << (*it)->Parm << ", MasterTable: " << (*it)->MasterTable
+                    << ", Center: " << (*it)->Center << ", LocalTable: " << (*it)->LocalTable << "\n";
+               
+            } else {
+
+               cout << "Found table match" << endl;
+               cout << "Units (tab.units.c_str()) = " << tab.units.c_str() << " Long name (tab.full_name.c_str()) = " << tab.full_name.c_str() << endl;
+
+               vinfo->units() = tab.units.c_str();
+               vinfo->long_name() = tab.full_name.c_str();
+            }
+            
+         }
          
          // JHG ... if we have a match at this point and have not yet set the units
          // execute a GRIB2 table lookup to do so
@@ -770,6 +784,9 @@ void MetGrib2DataFile::read_grib2_record_list() {
          rec->ParmCat      = gfld->ipdtmpl[0];
          rec->Parm         = gfld->ipdtmpl[1];
          rec->Process      = gfld->ipdtmpl[2];
+         rec->Center       = gfld->idsect[0];
+         rec->MasterTable  = gfld->idsect[2];
+         rec->LocalTable   = gfld->idsect[3];
          
          cout << "gfld->idsect[0] (center) = " << gfld->idsect[0] << " gfld->idsect[2] (master table) = " << gfld->idsect[2] << " gfld->idsect[3] (local table) = " << gfld->idsect[3] << endl;
          
