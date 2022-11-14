@@ -284,7 +284,7 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
    int ltab                = dict.lookup_int   (conf_key_GRIB2_ltab,      false);
    int mtab                = dict.lookup_int   (conf_key_GRIB2_mtab,      false);
 
-   cout << "field_name = " << field_name << " field_disc = " << field_disc << " field_parm_cat = " << field_parm_cat << " field_parm = " << field_parm << " cntr = " << cntr << " ltab = " << ltab << " mtab = " << mtab << endl;
+   cout << "User supplied field_name = " << field_name << " field_disc = " << field_disc << " field_parm_cat = " << field_parm_cat << " field_parm = " << field_parm << " cntr = " << cntr << " ltab = " << ltab << " mtab = " << mtab << endl;
    
    //  user-specified GRIB2 record filters
    PDTmpl                  = dict.lookup_int   (conf_key_GRIB2_pdt,       false);
@@ -297,6 +297,8 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
    IPDTmplIndex = dict.lookup_int_array(conf_key_GRIB2_ipdtmpl_index, false);
    IPDTmplVal   = dict.lookup_int_array(conf_key_GRIB2_ipdtmpl_val,   false);
 
+   cout << "User supplied IPDTmplIndex.n() = " << IPDTmplIndex.n() << " IPDTmplVal.n()" << IPDTmplVal.n() << endl;
+   
    //  arrays must have the same length
    if(IPDTmplIndex.n() != IPDTmplVal.n()) {
       mlog << Error << "\nVarInfoGrib2::set_dict() -> "
@@ -356,19 +358,20 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
    }
 
    cout << " Updated field_name = " << field_name << endl;
-   
-   set_ens          (ens_str.c_str());
+
    //  set the matched parameter lookup information
+   set_ens          (ens_str.c_str());
    set_name         ( field_name    );
    set_req_name     ( field_name.c_str()    );
-   if( field_name != "PROB" ){
+   
+   // Only save specific fields if we have 1 match, otherwise we will do the loopup later
+   if( field_name != "PROB" && tab_match == 1 ){
+      cout << "Found only 1 table match" << endl;
       set_discipline( tab.index_a   );
       set_parm_cat  ( tab.index_b   );
       set_parm      ( tab.index_c   );
-      // We want to comment out set_units and set_long_name
-      //cout << " tab.units.c_str() = " << tab.units.c_str() << endl;
-      //set_units     ( tab.units.c_str()     );
-      //set_long_name ( tab.full_name.c_str() );
+      set_units     ( tab.units.c_str()     );
+      set_long_name ( tab.full_name.c_str() );
    }
    
    //  call the parent to set the level information
