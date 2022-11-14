@@ -593,8 +593,8 @@ void MetGrib2DataFile::find_record_matches( VarInfoGrib2* vinfo,
                cout << "Found table match" << endl;
                cout << "Units (tab.units.c_str()) = " << tab.units.c_str() << " Long name (tab.full_name.c_str()) = " << tab.full_name.c_str() << endl;
 
-               vinfo->units() = tab.units.c_str();
-               vinfo->long_name() = tab.full_name.c_str();
+               vinfo->set_units(tab.units.c_str());
+               vinfo->set_long_name(tab.full_name.c_str());
             }
             
          }
