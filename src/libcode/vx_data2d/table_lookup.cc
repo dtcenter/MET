@@ -1347,27 +1347,23 @@ bool TableFlatFile::lookup_grib2(const char * parm_name, int a, int b, int c,
       matches.push_back( g2e[j] );
 
    }
+   
+   // If there are any matches, print a descriptive message
+   ConcatString msg;
+   msg << "Multiple GRIB2 table entries match lookup criteria ("
+       << "parm_name = " << parm_name;
+   if( bad_data_int != a ) msg << ", index_a = " << a;
+   if( bad_data_int != b ) msg << ", index_b = " << b;
+   if( bad_data_int != c ) msg << ", index_c = " << c;
+   msg << "):\n";
+   mlog << Debug(3) << "\n" << msg;
 
-   //  if there are multiple matches, print a descriptive message
-   if( 1 < n_matches ){
-
-      ConcatString msg;
-      msg << "Multiple GRIB2 table entries match lookup criteria ("
-          << "parm_name = " << parm_name;
-      if( bad_data_int != a ) msg << ", index_a = " << a;
-      if( bad_data_int != b ) msg << ", index_b = " << b;
-      if( bad_data_int != c ) msg << ", index_c = " << c;
-      msg << "):\n";
-      mlog << Debug(3) << "\n" << msg;
-
-      for(vector<Grib2TableEntry*>::iterator it = matches.begin();
-          it < matches.end(); it++)
-         mlog << Debug(3) << "  parm_name: " << (*it)->parm_name
-                          << ", index_a = "  << (*it)->index_a
-                          << ", index_b = "  << (*it)->index_b
-                          << ", index_c = "  << (*it)->index_c << "\n";
-      
-   }
+   for(vector<Grib2TableEntry*>::iterator it = matches.begin();
+       it < matches.end(); it++)
+      mlog << Debug(3) << "  parm_name: " << (*it)->parm_name
+           << ", index_a = "  << (*it)->index_a
+           << ", index_b = "  << (*it)->index_b
+           << ", index_c = "  << (*it)->index_c << "\n";
    
    return (n_matches > 0);
 }
@@ -1405,34 +1401,30 @@ bool TableFlatFile::lookup_grib2(const char * parm_name,
 
    }
 
-   //  if there are multiple matches, print a descriptive message
-   if( 1 < n_matches ){
+   // If there are any matches, print a descriptive message   
+   ConcatString msg;
+   msg << "One or more GRIB2 table entries match lookup criteria ("
+       << "parm_name = " << parm_name;
+   if( bad_data_int != a ) msg << ", index_a = " << a;
+   if( bad_data_int != mtab ) msg << ", grib2_mtab = " << mtab;
+   if( bad_data_int != cntr ) msg << ", grib2_cntr = " << cntr;
+   if( bad_data_int != ltab ) msg << ", grib2_ltab = " << ltab;
+   if( bad_data_int != b ) msg << ", index_b = " << b;
+   if( bad_data_int != c ) msg << ", index_c = " << c;
+   msg << "):\n";
+   mlog << Debug(3) << "\n" << msg;
 
-      ConcatString msg;
-      msg << "Multiple GRIB2 table entries match lookup criteria ("
-      << "parm_name = " << parm_name;
-      if( bad_data_int != a ) msg << ", index_a = " << a;
-      if( bad_data_int != mtab ) msg << ", grib2_mtab = " << mtab;
-      if( bad_data_int != cntr ) msg << ", grib2_cntr = " << cntr;
-      if( bad_data_int != ltab ) msg << ", grib2_ltab = " << ltab;
-      if( bad_data_int != b ) msg << ", index_b = " << b;
-      if( bad_data_int != c ) msg << ", index_c = " << c;
-      msg << "):\n";
-      mlog << Debug(3) << "\n" << msg;
-
-      for(vector<Grib2TableEntry*>::iterator it = matches.begin();
-          it < matches.end(); it++)
-         mlog << Debug(3) << "  parm_name: "   << (*it)->parm_name
-                          << ", index_a = "    << (*it)->index_a
-                          << ", grib2_mtab = " << (*it)->mtab_set
-                          << ", grib2_cntr = " << (*it)->cntr
-                          << ", grib2_ltab = " << (*it)->ltab
-                          << ", index_b = "    << (*it)->index_b
-                          << ", index_c = "    << (*it)->index_c
-                          << "\n";
+   for(vector<Grib2TableEntry*>::iterator it = matches.begin();
+       it < matches.end(); it++)
+      mlog << Debug(3) << "  parm_name: "   << (*it)->parm_name
+           << ", index_a = "    << (*it)->index_a
+           << ", grib2_mtab = " << (*it)->mtab_set
+           << ", grib2_cntr = " << (*it)->cntr
+           << ", grib2_ltab = " << (*it)->ltab
+           << ", index_b = "    << (*it)->index_b
+           << ", index_c = "    << (*it)->index_c
+           << "\n";
       
-   }
-
    return (n_matches > 0);
 }
 
