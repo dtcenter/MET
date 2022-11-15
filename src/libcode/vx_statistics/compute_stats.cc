@@ -1540,7 +1540,7 @@ void compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps) {
 void compute_aggregated_seeps_grid(const DataPlane &fcst_dp, const DataPlane &obs_dp,
                                    DataPlane &seeps_dp, DataPlane &seeps_dp_fcat,
                                    DataPlane &seeps_dp_ocat,SeepsAggScore *seeps,
-                                   int month, int hour, bool do_qc) {
+                                   int month, int hour, const SingleThresh &seeps_p1_thresh) {
    int fcst_cat, obs_cat;
    int seeps_count, count_diagonal, nan_count, bad_count;
    int nx = fcst_dp.nx();
@@ -1563,6 +1563,7 @@ void compute_aggregated_seeps_grid(const DataPlane &fcst_dp, const DataPlane &ob
 
    seeps->clear();
    SeepsClimoGrid *seeps_climo = get_seeps_climo_grid(month);
+   seeps_climo->set_p1_thresh(seeps_p1_thresh);
    for (int i=0; i<SEEPS_MATRIX_SIZE; i++) {
       pvf[i] = 0.;
       pvf_cnt[i] = 0;
@@ -1575,7 +1576,7 @@ void compute_aggregated_seeps_grid(const DataPlane &fcst_dp, const DataPlane &ob
          fcst_cat = obs_cat = bad_data_int;
          seeps_score = bad_data_double;
          if (!is_eq(fcst_value, -9999.0) && !is_eq(obs_value, -9999.0)) {
-            seeps_mpr = seeps_climo->get_record(ix, iy, fcst_value, obs_value, do_qc);
+            seeps_mpr = seeps_climo->get_record(ix, iy, fcst_value, obs_value);
             if (seeps_mpr != NULL) {
                fcst_cat = seeps_mpr->fcst_cat;
                obs_cat = seeps_mpr->obs_cat;

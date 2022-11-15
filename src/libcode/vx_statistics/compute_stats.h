@@ -65,7 +65,7 @@ extern double *compute_seeps_density_vector(const PairDataPoint *pd, SeepsAggSco
 extern void compute_aggregated_seeps_grid(const DataPlane &fcst_dp, const DataPlane &obs_dp,
                                           DataPlane &seeps_dp, DataPlane &seeps_dp_fcat,
                                           DataPlane &seeps_dp_ocat,SeepsAggScore *seeps,
-                                          int month, int hour, bool do_qc);
+                                          int month, int hour, const SingleThresh &seeps_p1_thresh);
 
 ////////////////////////////////////////////////////////////////////////
 //
