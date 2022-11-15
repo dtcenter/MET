@@ -667,9 +667,10 @@ void PointStatVxOpt::clear() {
 
    hss_ec_value = bad_data_double;
    rank_corr_flag = false;
-   seeps_qc = false;
 
    msg_typ.clear();
+
+   seeps_p1_thresh.clear();
 
    duplicate_flag = DuplicateType_None;
    obs_summary = ObsSummary_None;
@@ -917,8 +918,8 @@ void PointStatVxOpt::process_config(GrdFileType ftype,
    // Conf: rank_corr_flag
    rank_corr_flag = odict.lookup_bool(conf_key_rank_corr_flag);
 
-   // Conf: seeps_qc
-   seeps_qc = odict.lookup_bool(conf_key_seeps_qc);
+   // Conf: threshold for SEEPS p1
+   seeps_p1_thresh = odict.lookup_thresh(conf_key_seeps_p1_thresh);
 
    // Conf: message_type
    msg_typ = parse_conf_message_type(&odict);
@@ -1083,8 +1084,7 @@ void PointStatVxOpt::set_vx_pd(PointStatConfInfo *conf_info) {
    vx_pd.set_duplicate_flag(duplicate_flag);
    vx_pd.set_obs_summary(obs_summary);
    vx_pd.set_obs_perc_value(obs_perc);
-   vx_pd.set_seeps_qc(seeps_qc);
-
+   vx_pd.set_seeps_thresh(seeps_p1_thresh);
    return;
 }
 

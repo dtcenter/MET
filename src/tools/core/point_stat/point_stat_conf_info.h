@@ -131,6 +131,7 @@ class PointStatVxOpt {
 
       StringArray     mpr_sa;             // MPR column names
       ThreshArray     mpr_ta;             // MPR column thresholds
+      SingleThresh    seeps_p1_thresh;    // SEESP p1 threshold
 
       // Vector of MaskLatLon objects defining Lat/Lon Point masks
       vector<MaskLatLon> mask_llpnt;
@@ -149,7 +150,6 @@ class PointStatVxOpt {
 
       double          hss_ec_value;       // HSS expected correct value
       bool            rank_corr_flag;     // Flag for computing rank correlations
-      bool            seeps_qc;           // enable SEEPS QC
 
       StringArray     msg_typ;            // Array of message types
 

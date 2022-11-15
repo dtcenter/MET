@@ -634,7 +634,6 @@ void process_scores() {
    DataPlane cmnu_dp, csdu_dp, cmnu_dp_smooth;
    PairDataPoint pd_u;
 
-   bool do_seeps_qc;
    DataPlane seeps_dp, seeps_dp_fcat, seeps_dp_ocat;
 
    CTSInfo    *cts_info    = (CTSInfo *) 0;
@@ -1131,12 +1130,11 @@ void process_scores() {
             SeepsAggScore seeps;
             int month, day, year, hour, minute, second;
 
-cout << " DEBUG HS conf_info.vx_opt[i].do_seeps_qc=" << conf_info.vx_opt[i].seeps_qc <<"\n'";
             unix_to_mdyhms(fcst_dp.valid(), month, day, year, hour, minute, second);
             compute_aggregated_seeps_grid(fcst_dp_smooth, obs_dp_smooth,
                                           seeps_dp, seeps_dp_fcat, seeps_dp_ocat,
                                           &seeps, month, hour,
-                                          conf_info.vx_opt[i].seeps_qc);
+                                          conf_info.vx_opt[i].seeps_p1_thresh);
 
             write_nc("SEEPS_MPR_SCORE", seeps_dp, i, mthd, pnts,
                      conf_info.vx_opt[i].interp_info.field);
