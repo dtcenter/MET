@@ -86,7 +86,6 @@ void PairDataPoint::clear() {
    for (int idx=0; idx<seeps_mpr.size(); idx++) {
       if (seeps_mpr[idx]) delete seeps_mpr[idx];
    }
-   do_seeps_qc = false;
    seeps_mpr.clear();
    seeps.clear();
 
@@ -181,14 +180,8 @@ bool PairDataPoint::add_point_pair(const char *sid, double lat, double lon,
 
 ////////////////////////////////////////////////////////////////////////
 
-bool PairDataPoint::get_seeps_qc() {
-   return do_seeps_qc;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void PairDataPoint::set_seeps_qc(bool do_qc) {
-   do_seeps_qc = do_qc;
+void PairDataPoint::set_seeps_thresh(const SingleThresh &p1_thresh) {
+   seeps_climo->set_p1_thresh(p1_thresh);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -300,7 +293,7 @@ SeepsScore *PairDataPoint::compute_seeps(const char *sid, double f,
    int sid_no = atoi(sid);
    if (sid_no) {
       unix_to_mdyhms(ut, month, day, year, hour, minute, second);
-      seeps = seeps_climo->get_seeps_score(sid_no, f, o, month, hour, do_seeps_qc);
+      seeps = seeps_climo->get_seeps_score(sid_no, f, o, month, hour);
       if (mlog.verbosity_level() >= seeps_debug_level
           && seeps && !is_eq(seeps->score, bad_data_double)
           && !is_eq(seeps->score, 0) && seeps_record_count < 10) {
@@ -1477,11 +1470,11 @@ void VxPairDataPoint::set_obs_perc_value(int percentile) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairDataPoint::set_seeps_qc(bool do_qc) {
+void VxPairDataPoint::set_seeps_thresh(const SingleThresh &p1_thresh) {
    for(int i=0; i < n_msg_typ; i++){
       for(int j=0; j < n_mask; j++){
          for(int k=0; k < n_interp; k++){
-            pd[i][j][k].set_seeps_qc(do_qc);
+            pd[i][j][k].set_seeps_thresh(p1_thresh);
          }
       }
    }

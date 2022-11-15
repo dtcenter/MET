@@ -33,8 +33,7 @@ class PairDataPoint : public PairBase {
       void init_from_scratch();
       void assign(const PairDataPoint &);
 
-      bool do_seeps_qc;
-      SeepsClimo *seeps_climo;
+      SeepsClimo   *seeps_climo;
    public:
 
       PairDataPoint();
@@ -59,8 +58,7 @@ class PairDataPoint : public PairBase {
       bool add_point_pair(const char *, double, double, double, double,
                           unixtime, double, double, double, double,
                           const char *, double, double, double);
-      bool get_seeps_qc();
-      void set_seeps_qc(bool do_qc);
+      void set_seeps_thresh(const SingleThresh &p1_thresh);
       void set_seeps_score(SeepsScore *, int index=-1);
 
       void set_point_pair(int, const char *, double, double, double, double,
@@ -229,7 +227,7 @@ class VxPairDataPoint {
 
       void set_mpr_thresh(const StringArray &, const ThreshArray &);
 
-      void set_seeps_thresh(const StringArray &, const ThreshArray &);
+      void set_seeps_thresh(const SingleThresh &p1_thresh);
 
       void set_climo_cdf_info_ptr(const ClimoCDFInfo *);
 
@@ -254,8 +252,6 @@ class VxPairDataPoint {
       void set_obs_summary(ObsSummary obs_summary);
 
       void set_obs_perc_value(int percentile);
-
-      void set_seeps_qc(bool do_qc);
 
       void print_obs_summary();
 
