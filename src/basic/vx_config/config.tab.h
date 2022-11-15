@@ -92,7 +92,7 @@ extern int configdebug;
 
 union YYSTYPE
 {
-#line 192 "config.tab.yy" /* yacc.c:1921  */
+#line 191 "config.tab.yy" /* yacc.c:1921  */
 
 
    char text[max_id_length + 1];

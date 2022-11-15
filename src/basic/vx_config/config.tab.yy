@@ -110,7 +110,6 @@ static const char apm = 'b';   //  assign_prefix mark
 static const char fcm = 'f';   //  function def mark
 
 
-
 ////////////////////////////////////////////////////////////////////////
 
 

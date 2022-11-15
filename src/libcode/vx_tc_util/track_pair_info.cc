@@ -407,10 +407,10 @@ void TrackPairInfo::add_tcmpr_line(const TCStatLine &l) {
 
    // Set the consensus track variables
    apoint.set_num_members(atoi(l.get_item("NUM_MEMBERS")));
-   apoint.set_spread(atof(l.get_item("TRACK_SPREAD")));
-   apoint.set_dist_mean(atof(l.get_item("DIST_MEAN")));
-   apoint.set_v_max_stdev(atof(l.get_item("MAX_WIND_SPREAD")));
-   apoint.set_mslp_stdev(atof(l.get_item("MSLP_SPREAD")));
+   apoint.set_track_spread(atof(l.get_item("TRACK_SPREAD")));
+   apoint.set_track_stdev(atof(l.get_item("TRACK_STDEV")));
+   apoint.set_mslp_stdev(atof(l.get_item("MSLP_STDEV")));
+   apoint.set_v_max_stdev(atof(l.get_item("MAX_WIND_STDEV")));
    
    // Add the TrackPoints to the ADECK/BDECK tracks
    ADeck.add(apoint);
@@ -472,7 +472,7 @@ void TrackPairInfo::add_tcdiag_line(const TCStatLine &l) {
    StringArray diag_name;
 
    // Diagnostic source type
-   DiagType t = string_to_diagtype(l.get_item("SOURCE"));
+   DiagType t = string_to_diagtype(l.get_item("DIAG_SOURCE"));
 
    // Make sure the source type does not change
    if(ADeck.diag_source() != DiagType_None &&
