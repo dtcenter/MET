@@ -90,14 +90,114 @@ void release_seeps_climo_grid(int month, int hour) {
    }
 }
 
+////////////////////////////////////////////////////////////////////////
+
+double weighted_average(double v1, double w1, double v2, double w2) {
+   return(is_bad_data(v1) || is_bad_data(v2) ?
+          bad_data_double :
+          v1 * w1 + v2 * w2);
+}
+
 
 ////////////////////////////////////////////////////////////////////////
+
+
+void SeepsAggScore::clear() {
+
+   n_obs = 0;
+   c12 = c13 = c21 = c23 = c31 = c32 = 0;
+   s12 = s13 = s21 = s23 = s31 = s32 = 0.;
+   pv1 = pv2 = pv3 = 0.;
+   pf1 = pf2 = pf3 = 0.;
+   mean_fcst = mean_obs = bad_data_double;
+   weighted_score = score = bad_data_double;
+
+}
+
+////////////////////////////////////////////////////////////////////////
+
+SeepsAggScore & SeepsAggScore::operator+=(const SeepsAggScore &c) {
+
+   // Check for degenerate case
+   if(n_obs == 0 && c.n_obs == 0) return(*this);
+
+   // Compute weights
+   double w1 = (double)   n_obs / (n_obs + c.n_obs);
+   double w2 = (double) c.n_obs / (n_obs + c.n_obs);
+
+   // Increment number of obs
+   n_obs += c.n_obs;
+
+   // Increment counts
+   c12 += c.c12;
+   c13 += c.c13;
+   c21 += c.c21;
+   c23 += c.c23;
+   c31 += c.c31;
+   c32 += c.c32;
+
+   // Compute weighted averages
+   s12 = weighted_average(s12, w1, c.s12, w2);
+   s13 = weighted_average(s13, w1, c.s13, w2);
+   s21 = weighted_average(s21, w1, c.s21, w2);
+   s23 = weighted_average(s23, w1, c.s23, w2);
+   s31 = weighted_average(s31, w1, c.s31, w2);
+   s32 = weighted_average(s32, w1, c.s32, w2);
+
+   pv1 = weighted_average(pv1, w1, c.pv1, w2);
+   pv2 = weighted_average(pv2, w1, c.pv2, w2);
+   pv3 = weighted_average(pv3, w1, c.pv3, w2);
+
+   pf1 = weighted_average(pf1, w1, c.pf1, w2);
+   pf2 = weighted_average(pf2, w1, c.pf2, w2);
+   pf3 = weighted_average(pf3, w1, c.pf3, w2);
+
+   mean_fcst = weighted_average(mean_fcst, w1, c.mean_fcst, w2);
+   mean_obs  = weighted_average(mean_obs,  w1, c.mean_obs,  w2);
+
+   score          = weighted_average(score,          w1, c.score,          w2);
+   weighted_score = weighted_average(weighted_score, w1, c.weighted_score, w2);
+
+   return(*this);
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+SeepsClimoBase::SeepsClimoBase() {
+   clear();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+SeepsClimoBase::~SeepsClimoBase() {
+   clear();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void SeepsClimoBase::clear() {
+   seeps_ready = false;
+   filtered_count = 0;
+   seeps_p1_thresh.clear();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void SeepsClimoBase::set_p1_thresh(const SingleThresh &p1_thresh) {
+   seeps_p1_thresh = p1_thresh;
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
 
 SeepsClimo::SeepsClimo() {
 
    ConcatString seeps_name = get_seeps_climo_filename();
    seeps_ready = file_exists(seeps_name.c_str());
-   if (seeps_ready) read_records(seeps_name);
+   if (seeps_ready) read_seeps_scores(seeps_name);
    else {
       mlog << Error << "\nSeepsClimo::SeepsClimo() -> "
            << "The SEEPS climo data \"" << seeps_name << "\" is missing!"
@@ -115,6 +215,7 @@ SeepsClimo::~SeepsClimo() {
 ////////////////////////////////////////////////////////////////////////
 
 void SeepsClimo::clear() {
+   SeepsClimoBase::clear();
    for (map<int,SeepsClimoRecord *>::iterator it=seeps_score_00_map.begin();
         it!=seeps_score_00_map.end(); ++it) {
       delete it->second;
@@ -152,7 +253,8 @@ SeepsClimoRecord *SeepsClimo::create_climo_record(
 
       if (standalone_debug_seeps && SAMPLE_STATION_ID == sid) {
          cout << str_format("\t%2d: %6.3f %6.3f  %6.3f %6.3f   ",
-                            (idx+1), record->p1[idx], record->p2[idx], record->t1[idx], record->t2[idx]);
+                            (idx+1), record->p1[idx], record->p2[idx],
+                            record->t1[idx], record->t2[idx]);
       }
       for (int idx_m=0; idx_m<SEEPS_MATRIX_SIZE; idx_m++) {
          offset = idx*SEEPS_MATRIX_SIZE + idx_m;
@@ -169,7 +271,7 @@ SeepsClimoRecord *SeepsClimo::create_climo_record(
 
 ////////////////////////////////////////////////////////////////////////
 
-SeepsRecord *SeepsClimo::get_record(int sid, int month, int hour, bool do_qc) {
+SeepsRecord *SeepsClimo::get_record(int sid, int month, int hour) {
    SeepsRecord *record = NULL;
    const char *method_name = "SeepsClimo::get_record() -> ";
 
@@ -184,24 +286,27 @@ SeepsRecord *SeepsClimo::get_record(int sid, int month, int hour, bool do_qc) {
          it = seeps_score_12_map.find(sid);
          if (it != seeps_score_12_map.end()) climo_record = it->second;
       }
-      // The ‘probability of being dry’, p1, is between 0.1 and 0.85.
-      // The restriction on values of p1 is recommended in the Rodwell et al. (2010) paper
-      if (NULL != climo_record &&
-          (!do_qc || (climo_record->p1[month-1] >= 0.1
-                      && climo_record->p1[month-1] <= 0.85))) {
-
-         record = new SeepsRecord;
-         record->sid = climo_record->sid;
-         record->lat = climo_record->lat;
-         record->lon = climo_record->lon;
-         record->elv = climo_record->elv;
-         record->month = month;
-         record->p1 = climo_record->p1[month-1];
-         record->p2 = climo_record->p2[month-1];
-         record->t1 = climo_record->t1[month-1];
-         record->t2 = climo_record->t2[month-1];
-         for (int idx=0; idx<SEEPS_MATRIX_SIZE; idx++) {
-            record->scores[idx] = climo_record->scores[month-1][idx];
+      if (NULL != climo_record) {
+         double p1 = climo_record->p1[month-1];
+         if (seeps_p1_thresh.check(p1)) {
+            record = new SeepsRecord;
+            record->sid = climo_record->sid;
+            record->lat = climo_record->lat;
+            record->lon = climo_record->lon;
+            record->elv = climo_record->elv;
+            record->month = month;
+            record->p1 = climo_record->p1[month-1];
+            record->p2 = climo_record->p2[month-1];
+            record->t1 = climo_record->t1[month-1];
+            record->t2 = climo_record->t2[month-1];
+            for (int idx=0; idx<SEEPS_MATRIX_SIZE; idx++) {
+               record->scores[idx] = climo_record->scores[month-1][idx];
+            }
+         }
+         else if (!is_eq(p1, bad_data_double)) {
+            filtered_count++;
+            mlog << Debug(7) << method_name << " filtered by threshold p1="
+                 << climo_record->p1[month-1] <<"\n";
          }
       }
    }
@@ -246,9 +351,9 @@ ConcatString SeepsClimo::get_seeps_climo_filename() {
 ////////////////////////////////////////////////////////////////////////
 
 double SeepsClimo::get_score(int sid, double p_fcst, double p_obs,
-                             int month, int hour, bool do_qc) {
+                             int month, int hour) {
    double score = bad_data_double;
-   SeepsRecord *record = get_record(sid, month, hour, do_qc);
+   SeepsRecord *record = get_record(sid, month, hour);
 
    if (NULL != record) {
       // Determine location in contingency table
@@ -265,9 +370,9 @@ double SeepsClimo::get_score(int sid, double p_fcst, double p_obs,
 ////////////////////////////////////////////////////////////////////////
 
 SeepsScore *SeepsClimo::get_seeps_score(int sid, double p_fcst, double p_obs,
-                                        int month, int hour, bool do_qc) {
+                                        int month, int hour) {
    SeepsScore *score = NULL;
-   SeepsRecord *record = get_record(sid, month, hour, do_qc);
+   SeepsRecord *record = get_record(sid, month, hour);
 
    if (NULL != record) {
       score = new SeepsScore();
@@ -347,7 +452,7 @@ void SeepsClimo::print_record(SeepsRecord *record, bool with_header) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void SeepsClimo::read_records(ConcatString filename) {
+void SeepsClimo::read_seeps_scores(ConcatString filename) {
    clock_t clock_time = clock();
    const char *method_name = "SeepsClimo::read_records() -> ";
 
@@ -532,80 +637,6 @@ void SeepsClimo::read_records(ConcatString filename) {
 }
 
 
-////////////////////////////////////////////////////////////////////////
-
-
-void SeepsAggScore::clear() {
-
-   n_obs = 0;
-   c12 = c13 = c21 = c23 = c31 = c32 = 0;
-   s12 = s13 = s21 = s23 = s31 = s32 = 0.;
-   pv1 = pv2 = pv3 = 0.;
-   pf1 = pf2 = pf3 = 0.;
-   mean_fcst = mean_obs = bad_data_double;
-   weighted_score = score = bad_data_double;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-SeepsAggScore & SeepsAggScore::operator+=(const SeepsAggScore &c) {
-
-   // Check for degenerate case
-   if(n_obs == 0 && c.n_obs == 0) return(*this);
-
-   // Compute weights
-   double w1 = (double)   n_obs / (n_obs + c.n_obs);
-   double w2 = (double) c.n_obs / (n_obs + c.n_obs);
-
-   // Increment number of obs
-   n_obs += c.n_obs;
-
-   // Increment counts
-   c12 += c.c12;
-   c13 += c.c13;
-   c21 += c.c21;
-   c23 += c.c23;
-   c31 += c.c31;
-   c32 += c.c32;
-
-   // Compute weighted averages
-   s12 = weighted_average(s12, w1, c.s12, w2);
-   s13 = weighted_average(s13, w1, c.s13, w2);
-   s21 = weighted_average(s21, w1, c.s21, w2);
-   s23 = weighted_average(s23, w1, c.s23, w2);
-   s31 = weighted_average(s31, w1, c.s31, w2);
-   s32 = weighted_average(s32, w1, c.s32, w2);
-
-   pv1 = weighted_average(pv1, w1, c.pv1, w2);
-   pv2 = weighted_average(pv2, w1, c.pv2, w2);
-   pv3 = weighted_average(pv3, w1, c.pv3, w2);
-
-   pf1 = weighted_average(pf1, w1, c.pf1, w2);
-   pf2 = weighted_average(pf2, w1, c.pf2, w2);
-   pf3 = weighted_average(pf3, w1, c.pf3, w2);
-
-   mean_fcst = weighted_average(mean_fcst, w1, c.mean_fcst, w2);
-   mean_obs  = weighted_average(mean_obs,  w1, c.mean_obs,  w2);
-
-   score          = weighted_average(score,          w1, c.score,          w2);
-   weighted_score = weighted_average(weighted_score, w1, c.weighted_score, w2);
-
-   return(*this);
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-double weighted_average(double v1, double w1, double v2, double w2) {
-   return(is_bad_data(v1) || is_bad_data(v2) ?
-          bad_data_double :
-          v1 * w1 + v2 * w2);
-}
-
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -637,6 +668,7 @@ SeepsClimoGrid::~SeepsClimoGrid() {
 ////////////////////////////////////////////////////////////////////////
 
 void SeepsClimoGrid::clear() {
+   SeepsClimoBase::clear();
    if (NULL != p1_buf) { delete [] p1_buf; p1_buf = NULL; }
    if (NULL != p2_buf) { delete [] p2_buf; p2_buf = NULL; }
    if (NULL != t1_buf) { delete [] t1_buf; t1_buf = NULL; }
@@ -652,14 +684,14 @@ void SeepsClimoGrid::clear() {
 ////////////////////////////////////////////////////////////////////////
 
 SeepsScore *SeepsClimoGrid::get_record(int ix, int iy,
-                                       double p_fcst, double p_obs,
-                                       bool do_qc) {
+                                       double p_fcst, double p_obs) {
    SeepsScore *seeps_record = NULL;
+   const char *method_name = "SeepsClimoGrid::get_record() -> ";
    if (!is_eq(p_fcst, -9999.0) && !is_eq(p_obs, -9999.0)) {
       int offset = iy * nx + ix;
-      // The ‘probability of being dry’, p1, is between 0.1 and 0.85.
-      // The restriction on values of p1 is recommended in the Rodwell et al. (2010) paper
-      if (p1_buf[offset] >= 0.1 && p1_buf[offset] <= 0.85) {
+      double p1 = p1_buf[offset];
+
+      if (seeps_p1_thresh.check(p1)) {
          // Determine location in contingency table
          int ic = (p_obs>t1_buf[offset])+(p_obs>t2_buf[offset]);
          int jc = (p_fcst>t1_buf[offset])+(p_fcst>t2_buf[offset]);
@@ -674,6 +706,10 @@ SeepsScore *SeepsClimoGrid::get_record(int ix, int iy,
          seeps_record->t1 = t1_buf[offset];
          seeps_record->t2 = t2_buf[offset];
          seeps_record->score = score;
+      }
+      else if (~is_eq(p1, bad_data_double)) {
+         filtered_count++;
+         mlog << Debug(7) << method_name << " filtered by threshold p1=" << p1_buf[offset] <<"\n";
       }
    }
 
@@ -914,3 +950,6 @@ void SeepsClimoGrid::print_all() {
       cout << method_name << "s32_buf[" << offset << "] = " << s32_buf[offset]  << "\n";
    }
 }
+
+////////////////////////////////////////////////////////////////////////
+

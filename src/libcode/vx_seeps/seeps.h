@@ -133,11 +133,32 @@ struct SeepsClimoRecord {
 
 ////////////////////////////////////////////////////////////////////////
 
-class SeepsClimo {
+class SeepsClimoBase {
+
+   protected:
+
+      bool seeps_ready;
+      int filtered_count;
+      SingleThresh seeps_p1_thresh;      // Range of SEEPS p1 (probability of being dry)std::map<int,SeepsClimoRecord *> seeps_score_00_map;
+
+      virtual void clear();
+
+   public:
+
+      SeepsClimoBase();
+     ~SeepsClimoBase();
+
+      void set_p1_thresh(const SingleThresh &p1_thresh);
+      int get_filtered_count();
+
+};
+
+////////////////////////////////////////////////////////////////////////
+
+class SeepsClimo : public SeepsClimoBase {
 
    private:
 
-      bool seeps_ready;
       int nstn;
       std::map<int,SeepsClimoRecord *> seeps_score_00_map;
       std::map<int,SeepsClimoRecord *> seeps_score_12_map;
@@ -145,19 +166,21 @@ class SeepsClimo {
       SeepsClimoRecord *create_climo_record(int sid, double lat, double lon, double elv,
                                             double *p1, double *p2, double *t1, double *t2, 
                                             double *scores);
-      ConcatString get_seeps_climo_filename();
       void print_record(SeepsClimoRecord *record, bool with_header=false);
       void read_records(ConcatString filename);
+
+      ConcatString get_seeps_climo_filename();
+      void read_seeps_scores(ConcatString filename);
 
    public:
 
       SeepsClimo();
      ~SeepsClimo();
 
-      void clear();
-      SeepsRecord *get_record(int sid, int month, int hour, bool do_qc);
-      double get_score(int sid, double p_fcst, double p_obs, int month, int hour, bool do_qc);
-      SeepsScore *get_seeps_score(int sid, double p_fcst, double p_obs, int month, int hour, bool do_qc);
+      void clear() override;
+      SeepsRecord *get_record(int sid, int month, int hour);
+      double get_score(int sid, double p_fcst, double p_obs, int month, int hour);
+      SeepsScore *get_seeps_score(int sid, double p_fcst, double p_obs, int month, int hour);
       void print_all();
       void print_record(SeepsRecord *record, bool with_header=false);
 
@@ -171,7 +194,7 @@ class SeepsClimo {
 
 ////////////////////////////////////////////////////////////////////////
 
-class SeepsClimoGrid {
+class SeepsClimoGrid : public SeepsClimoBase {
 
    private:
 
@@ -190,16 +213,7 @@ class SeepsClimoGrid {
       double *s31_buf;
       double *s32_buf;
 
-      bool seeps_ready;
-      //int nstn;
-      //std::map<int,SeepsClimoRecord *> seeps_score_00_map;
-      //std::map<int,SeepsClimoRecord *> seeps_score_12_map;
-      //
-      //SeepsClimoRecord *create_climo_record(int sid, double lat, double lon, double elv,
-      //                                      double *p1, double *p2, double *t1, double *t2,
-      //                                      double *scores);
       ConcatString get_seeps_climo_filename();
-      //void print_record(SeepsClimoRecord *record, bool with_header=false);
       void read_seeps_scores(ConcatString filename);
 
    public:
@@ -207,12 +221,11 @@ class SeepsClimoGrid {
       SeepsClimoGrid(int month, int hour);
      ~SeepsClimoGrid();
 
-      void clear();
-      SeepsScore *get_record(int ix, int iy, double p_fcst, double p_obs, bool do_qc);
+      void clear() override;
+      SeepsScore *get_record(int ix, int iy, double p_fcst, double p_obs);
       double get_score(int offset, int obs_cat, int fcst_cat);
       double get_score(int ix, int iy, double p_fcst, double p_obs);
       void print_all();
-      //void print_record(bool with_header=false);
 
       //
       //
@@ -220,6 +233,10 @@ class SeepsClimoGrid {
 
 };
 
+
+////////////////////////////////////////////////////////////////////////
+
+inline int SeepsClimoBase::get_filtered_count() { return filtered_count; }
 
 ////////////////////////////////////////////////////////////////////////
 
