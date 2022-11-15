@@ -167,7 +167,7 @@
       <pair><name>FCST_FIELD_LEVEL</name> <value>A3</value></pair>
       <pair><name>OBS_DICT</name>         <value>fcst</value></pair>
       <pair><name>SEEPS_FLAG</name>       <value>NONE</value></pair>
-      <pair><name>SEEPS_QC</name>         <value>FALSE</value></pair>
+      <pair><name>SEEPS_P1_THRESH</name>  <value>NA</value></pair>
       <pair><name>OUTPUT_PREFIX</name>    <value>GRIB1_NAM_TRMM</value></pair>
     </env>
     <param> \
@@ -195,7 +195,7 @@
       <pair><name>FCST_FIELD_LEVEL</name> <value>A3</value></pair>
       <pair><name>OBS_DICT</name>         <value>fcst</value></pair>
       <pair><name>SEEPS_FLAG</name>       <value>NONE</value></pair>
-      <pair><name>SEEPS_QC</name>         <value>FALSE</value></pair>
+      <pair><name>SEEPS_P1_THRESH</name>  <value>NA</value></pair>
       <pair><name>OUTPUT_PREFIX</name>    <value>GRIB2_SREF_TRMM</value></pair>
     </env>
     <param> \
@@ -223,7 +223,7 @@
       <pair><name>FCST_FIELD_LEVEL</name> <value>(*,*)</value></pair>
       <pair><name>OBS_DICT</name>         <value>{ field = [ { name  = "APCP"; level = "A24"; } ]; }</value></pair>
       <pair><name>SEEPS_FLAG</name>       <value>NONE</value></pair>
-      <pair><name>SEEPS_QC</name>         <value>FALSE</value></pair>
+      <pair><name>SEEPS_P1_THRESH</name>  <value>NA</value></pair>
       <pair><name>OUTPUT_PREFIX</name>    <value>NCMET_NAM_HMTGAGE</value></pair>
     </env>
     <param> \
@@ -281,7 +281,7 @@
       <pair><name>FCST_FIELD_LEVEL</name> <value>(0,*,*)</value></pair>
       <pair><name>OBS_DICT</name>         <value>{ field = [ { name = "APCP"; level = "A3"; } ]; }</value></pair>
       <pair><name>SEEPS_FLAG</name>       <value>NONE</value></pair>
-      <pair><name>SEEPS_QC</name>         <value>FALSE</value></pair>
+      <pair><name>SEEPS_P1_THRESH</name>  <value>NA</value></pair>
       <pair><name>OUTPUT_PREFIX</name>    <value>NCPINT_TRMM</value></pair>
     </env>
     <param> \
