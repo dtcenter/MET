@@ -340,7 +340,6 @@ ________________________
   eclv_points    = 0.05;
   hss_ec_value   = NA;
   rank_corr_flag = TRUE;
-  seeps_qc       = FALSE;
   sid_inc        = [];
   sid_exc        = [];
   duplicate_flag = NONE;

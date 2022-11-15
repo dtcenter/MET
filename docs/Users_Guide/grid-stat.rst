@@ -249,7 +249,6 @@ __________________________
   eclv_points    = 0.05;
   hss_ec_value   = NA;
   rank_corr_flag = TRUE;
-  seeps_qc       = FALSE;
   tmp_dir        = "/tmp";
   output_prefix  = "";
   version        = "VN.N";
