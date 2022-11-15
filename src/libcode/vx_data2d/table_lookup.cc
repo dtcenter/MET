@@ -1329,7 +1329,6 @@ bool TableFlatFile::lookup_grib2(const char * parm_name, int a, int b, int c,
                                  Grib2TableEntry & e, int & n_matches)
 
 {
-
    //  clear the by-reference arguments
    e.clear();
    n_matches = 0;
@@ -1367,17 +1366,10 @@ bool TableFlatFile::lookup_grib2(const char * parm_name, int a, int b, int c,
                           << ", index_a = "  << (*it)->index_a
                           << ", index_b = "  << (*it)->index_b
                           << ", index_c = "  << (*it)->index_c << "\n";
-
-      mlog << Debug(3) << "Using the first match found: "
-                       << "  parm_name: " << e.parm_name
-                       << ", index_a = "  << e.index_a
-                       << ", index_b = "  << e.index_b
-                       << ", index_c = "  << e.index_c << "\n\n";
-
+      
    }
-
+   
    return (n_matches > 0);
-
 }
 
 
@@ -1404,8 +1396,8 @@ bool TableFlatFile::lookup_grib2(const char * parm_name,
           (bad_data_int != c    && g2e[j]->index_c != c) ||
           (bad_data_int != mtab && g2e[j]->mtab_low  > mtab) ||
           (bad_data_int != mtab && g2e[j]->mtab_high < mtab) ||
-          (bad_data_int != cntr && g2e[j]->cntr > 0 && g2e[j]->cntr != cntr) ||
-          (bad_data_int != ltab && g2e[j]->ltab > 0 && g2e[j]->ltab != ltab) )
+          (bad_data_int != cntr && g2e[j]->cntr != cntr) ||
+          (bad_data_int != ltab && g2e[j]->ltab != ltab) )
          continue;
 
       if( n_matches++ == 0 ) e = *(g2e[j]);
@@ -1438,17 +1430,7 @@ bool TableFlatFile::lookup_grib2(const char * parm_name,
                           << ", index_b = "    << (*it)->index_b
                           << ", index_c = "    << (*it)->index_c
                           << "\n";
-
-      mlog << Debug(3) << "Using the first match found: "
-                       << "  parm_name: "   << e.parm_name
-                       << ", index_a = "    << e.index_a
-                       << ", grib2_mtab = " << e.mtab_set
-                       << ", grib2_cntr = " << e.cntr
-                       << ", grib2_ltab = " << e.ltab
-                       << ", index_b = "    << e.index_b
-                       << ", index_c = "    << e.index_c
-                       << "\n\n";
-
+      
    }
 
    return (n_matches > 0);
