@@ -162,6 +162,8 @@ class GridStatVxOpt {
       ThreshArray      owind_ta;         // obs wind speed thresholds
       SetLogic         wind_logic;       // wind speed field logic
 
+      SingleThresh     seeps_p1_thresh;    // SEESP p1 threshold
+
       StringArray      mask_grid;        // Masking grid strings
       StringArray      mask_poly;        // Masking polyline strings
 
@@ -194,7 +196,6 @@ class GridStatVxOpt {
 
       double           hss_ec_value;      // HSS expected correct value
       bool             rank_corr_flag;    // Flag for computing rank correlations
-      bool             seeps_qc;          // enable SEEPS QC
 
       // Output file options
       STATOutputType    output_flag[n_txt]; // Flag for each output line type

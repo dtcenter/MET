@@ -537,8 +537,8 @@ void GridStatVxOpt::clear() {
 
    hss_ec_value = bad_data_double;
    rank_corr_flag = false;
-   seeps_qc = false;
 
+   seeps_p1_thresh.clear();
 
    for(i=0; i<n_txt; i++) output_flag[i] = STATOutputType_None;
 
@@ -833,8 +833,8 @@ void GridStatVxOpt::process_config(
    // Conf: rank_corr_flag
    rank_corr_flag = odict.lookup_bool(conf_key_rank_corr_flag);
 
-   // Conf: seeps_qc
-   seeps_qc = odict.lookup_bool(conf_key_seeps_qc);
+   // Conf: threshold for SEEPS p1
+   seeps_p1_thresh = odict.lookup_thresh(conf_key_seeps_p1_thresh);
 
    // Conf: nc_pairs_flag
    parse_nc_info(odict);
