@@ -583,14 +583,20 @@ TC-Pairs produces output in TCST format. The default output file name can be ove
     - Index of the current track pair
   * - 16
     - DIAG_SOURCE
-    - Diagnostics data source
+    - Diagnostics data source indicated by the `-diag` command line option
   * - 17
+    - TRACK_SOURCE
+    - ATCF ID of the track data used to define the diagnostics
+  * - 18
+    - FIELD_SOURCE
+    - Description of gridded field data source used to define the diagnostics
+  * - 19
     - N_DIAG
     - Number of storm diagnostic name and value columns to follow
-  * - 18
+  * - 20
     - DIAG_i
     - Name of the of the ith storm diagnostic (repeated)
-  * - 19
+  * - 21
     - VALUE_i
     - Value of the ith storm diagnostic (repeated)
 
