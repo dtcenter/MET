@@ -90,11 +90,25 @@ enum TrackType {
 //
 
 enum DiagType {
-   DiagType_None, // Default
-   TCDiagType,    // Tropical Cyclone Diagnostics
-   LSDiagRTType,  // Realtime Large Scale Diagnostics
-   LSDiagDevType  // Development Large Scale Diagnostics
+   DiagType_None,      // Default
+   DiagType_CIRA_RT,   // Realtime CIRA Tropical Cyclone Diagnostics
+   DiagType_CIRA_Dev,  // Developmental CIRA Tropical Cyclone Diagnostics
+   DiagType_SHIPS_RT,  // Realtime SHIPS Large Scale Diagnostics
+   DiagType_SHIPS_Dev  // Developmental SHIPS Large Scale Diagnostics
 };
+
+////////////////////////////////////////////////////////////////////////
+
+//
+// Corresponding diagnostic type strings
+//
+
+static const char cira_diag_str[]      = "CIRA_DIAG";
+static const char cira_diag_rt_str[]   = "CIRA_DIAG_RT";
+static const char cira_diag_dev_str[]  = "CIRA_DIAG_DEV";
+static const char ships_diag_str[]     = "SHIPS_DIAG";
+static const char ships_diag_rt_str[]  = "SHIPS_DIAG_RT";
+static const char ships_diag_dev_str[] = "SHIPS_DIAG_DEV";
 
 ////////////////////////////////////////////////////////////////////////
 

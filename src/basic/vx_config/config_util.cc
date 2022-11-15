@@ -2757,16 +2757,13 @@ ConcatString tracktype_to_string(TrackType type) {
 DiagType string_to_diagtype(const char *s) {
    DiagType t = DiagType_None;
 
-   // Convert string to enumerated DiagType
-        if(strcasecmp(s, conf_val_none)  == 0) t = DiagType_None;
-   else if(strcasecmp(s, "TCDIAG")       == 0) t = TCDiagType;
-   else if(strcasecmp(s, "LSDIAG_RT")    == 0) t = LSDiagRTType;
-   else if(strcasecmp(s, "LSDIAG_DEV")   == 0) t = LSDiagDevType;
-   else {
-      mlog << Error << "\nstring_to_diagtype() -> "
-           << "Unexpected DiagType string \"" << s << "\".\n\n";
-      exit(1);
-   }
+   // Convert string to enumerated DiagType, storing unknown strings
+   // as the default type
+        if(strcasecmp(s, cira_diag_rt_str)   == 0) t = DiagType_CIRA_RT;
+   else if(strcasecmp(s, cira_diag_dev_str)  == 0) t = DiagType_CIRA_Dev;
+   else if(strcasecmp(s, ships_diag_rt_str)  == 0) t = DiagType_SHIPS_RT;
+   else if(strcasecmp(s, ships_diag_dev_str) == 0) t = DiagType_SHIPS_Dev;
+   else                                            t = DiagType_None;
 
    return(t);
 }
@@ -2778,10 +2775,11 @@ ConcatString diagtype_to_string(DiagType type) {
 
    // Convert enumerated DiagType to string
    switch(type) {
-      case(DiagType_None):  s = conf_val_none; break;
-      case(TCDiagType):     s = "TCDIAG";      break;
-      case(LSDiagRTType):   s = "LSDIAG_RT";   break;
-      case(LSDiagDevType):  s = "LSDIAG_DEV";  break;
+      case(DiagType_None):      s = conf_val_none;      break;
+      case(DiagType_CIRA_RT):   s = cira_diag_rt_str;   break;
+      case(DiagType_CIRA_Dev):  s = cira_diag_dev_str;  break;
+      case(DiagType_SHIPS_RT):  s = ships_diag_rt_str;  break;
+      case(DiagType_SHIPS_Dev): s = ships_diag_dev_str; break;
       default:
          mlog << Error << "\ndiagtype_to_string() -> "
               << "Unexpected DiagType value of " << type << ".\n\n";
