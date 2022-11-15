@@ -274,10 +274,14 @@ output_flag = {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Threshold for SEEPS p1 (Probability of being dry): >=min_p1&&<=max_p1
+
+seeps_p1_thresh = NA;
+
+////////////////////////////////////////////////////////////////////////////////
 
 duplicate_flag = NONE;
 rank_corr_flag = TRUE;
-seeps_qc       = FALSE;
 tmp_dir        = "/tmp";
 output_prefix  = "${OUTPUT_PREFIX}";
 version        = "V11.0.0";

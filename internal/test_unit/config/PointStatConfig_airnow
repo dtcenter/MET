@@ -47,7 +47,6 @@ wind_thresh    = [ NA ];
 wind_logic     = UNION;
 eclv_points    = 0.05;
 rank_corr_flag = FALSE;
-seeps_qc       = FALSE;
 
 //
 // Forecast and observation fields to be verified
@@ -233,6 +232,11 @@ output_flag = {
    seeps  = NONE;
    seeps_mpr = NONE;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Threshold for SEEPS p1 (Probability of being dry)
+
+seeps_p1_thresh = NA;
 
 ////////////////////////////////////////////////////////////////////////////////
 

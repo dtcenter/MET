@@ -54,7 +54,6 @@ nc_pairs_var_name   = "";
 nc_pairs_var_suffix = "";
 hss_ec_value        = NA;
 rank_corr_flag      = FALSE;
-seeps_qc            = FALSE;
 
 //
 // Forecast and observation fields to be verified
@@ -250,6 +249,11 @@ nc_pairs_flag   = {
    distance_map = TRUE;
    apply_mask   = TRUE;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Threshold for SEEPS p1 (Probability of being dry)
+
+seeps_p1_thresh = NA;
 
 ////////////////////////////////////////////////////////////////////////////////
 
