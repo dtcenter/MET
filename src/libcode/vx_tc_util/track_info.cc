@@ -543,9 +543,9 @@ bool TrackInfo::add_diag_data(DiagFile &diag_file, const StringArray &req_diag_n
       !diag_file.technique().has(Technique)) return(false);
 
    // Store the diagnostic metadata
-   DiagSource = diag_file.source();
-   TrackSource = "JHG";
-   FieldSource = "JHG";
+   DiagSource  = diag_file.diag_source();
+   TrackSource = diag_file.track_source();
+   FieldSource = diag_file.field_source();
 
    // If empty, store all diagnostics
    bool store_all_diag = (req_diag_name.n() == 0 ? true : false);

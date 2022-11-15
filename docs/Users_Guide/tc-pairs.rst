@@ -58,7 +58,7 @@ Required arguments for tc_pairs
 Optional arguments for tc_pairs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-5. The **-diag source path** argument indicates the TC-Pairs acceptable format data containing the tropical cyclone diagnostics dataset corresponding to the adeck tracks. The **source** can be set to TCDIAG, LSDIAG_RT, or LSDIAG_DEV to indicate the input diagnostics data source. The **path** argument specifies the name of a TC-Pairs acceptable format file or top-level directory containing TC-Pairs acceptable format files ending in ".dat" to be processed.
+5. The **-diag source path** argument indicates the TC-Pairs acceptable format data containing the tropical cyclone diagnostics dataset corresponding to the adeck tracks. The **source** can be set to CIRA_DIAG_RT and SHIPS_DIAG_RT to indicate the input diagnostics data source. The **path** argument specifies the name of a TC-Pairs acceptable format file or top-level directory containing TC-Pairs acceptable format files ending in ".dat" to be processed.
 
 6. The -**out base** argument indicates the path of the output file base. This argument overrides the default output file base (**./out_tcmpr**).
 
@@ -69,8 +69,6 @@ Optional arguments for tc_pairs
 This tool currently only supports the rapid intensification (**RI**) edeck probability type but support for additional edeck probability types will be added in future releases.
 
 At least one **-adeck** or **-edeck** option must be specified. The **-adeck, -edeck**, and **-bdeck** options may optionally be followed with **suffix=string** to append that string to all model names found within that data source. This option may be useful when processing track data from two different sources which reuse the same model names.
-
-The **-diag** option may optionally be followed with **model=string** to override the model name of the tracks to which those diagnostics correspond. The **string** specifies a comma-separated list of one or more ATCF ID's to which these diagnostics should be paired (e.g. **model=OFCL,SHIP**).
 
 An example of the tc_pairs calling sequence is shown below:
 
@@ -258,52 +256,75 @@ ____________________
 
 .. code-block:: none
 
- diag_name = [];
+ diag_info_map = [
+    {
+       diag_source    = "CIRA_DIAG_RT";
+       track_source   = "GFS";
+       field_source   = "GFS_0p50";
+       match_to_track = [ "GFS" ];
+       diag_name      = [];
+    },
+    {
+       diag_source    = "SHIPS_DIAG_RT";
+       track_source   = "OFCL";
+       field_source   = "GFS_0p50";
+       match_to_track = [ "OFCL" ];
+       diag_name      = [];
+    }
+ ];
 
-The **diag_name** entry specifies a comma-separated list of strings for the tropical cyclone diagnostics of interest. This applies when the **-tcdiag** and/or **-lsdiag** command line options have been used to provide storm diagnostics data. If a non-zero list of diagnostic names is specified, only those diagnostics appearing in the list are written to the TCDIAG output line type. If defined as an empty list (default), all diagnostics found in the input are written to the TCDIAG output lines.
+A TCMPR line is written to the output for each track point. If diagnostics data is also defined for that track point, a TCDIAG line is written immediately after the corresponding TCMPR line. The contents of that TCDIAG line is determined by the **diag_info_map** entry.
 
-A TCMPR line is written to the output for each track point. If diagnostics data is also defined for that track point, a TCDIAG line is written immediately after the corresponding TCMPR line. The contents of that TCDIAG line is determined by diagnostic names requested in the **diag_name** entry.
+The **diag_info_map** entries define how the diagnostics read with the **-diag** command line option should be used. Each array element is a dictionary consisting of entries for **diag_source**, **track_source**, **field_source**, **match_to_track**, and **diag_name**.
+
+The **diag_source** entry is one of the supported diagnostics data sources. The **track_source** entry is a string defining the ATCF ID of the track data used to define the locations at which diagnostics are computed. This string is written to the **TRACK_SOURCE** column of the TCDIAG output line. The **field_source** entry is a string describing the gridded data over which the diagnostic are computed. This string is written to the **FIELD_SOURCE** column of the TCDIAG output line type. The **match_to_track** entry specifies a comma-separated list of strings defining the ATCF ID(s) of the tracks to which these diagnostic values should be matched. The **diag_name** entry specifies a comma-separated list of strings for the tropical cyclone diagnostics of interest. If a non-zero list of diagnostic names is specified, only those diagnostics appearing in the list are written to the TCDIAG output line type. If defined as an empty list (default), all diagnostics found in the input are written to the TCDIAG output lines.
 
 ____________________
 
 .. code-block:: none
 
-  diag_convert_map = [
-     { source = "TCDIAG";
-       key = [ "(10C)", "(10KT)", "(10M/S)" ];
-       convert(x) = x / 10; },
+ diag_convert_map = [
+    {
+       diag_source = "CIRA_DIAG";
+       key         = [ "(10C)", "(10KT)", "(10M/S)" ];
+       convert(x)  = x / 10;
+    },
+    {
+       diag_source = "SHIPS_DIAG";
+       key         = [ "LAT",  "LON",  "CSST", "RSST", "DSST", "DSTA", "XDST", "XNST", "NSST", "NSTA",
+                       "NTMX", "NTFR", "U200", "U20C", "V20C", "E000", "EPOS", "ENEG", "EPSS", "ENSS",
+                       "T000", "TLAT", "TLON", "TWAC", "TWXC", "G150", "G200", "G250", "V000", "V850",
+                       "V500", "V300", "SHDC", "SHGC", "T150", "T200", "T250", "SHRD", "SHRS", "SHRG",
+                       "HE07", "HE05", "PW01", "PW02", "PW03", "PW04", "PW05", "PW06", "PW07", "PW08",
+                       "PW09", "PW10", "PW11", "PW12", "PW13", "PW14", "PW15", "PW16", "PW17", "PW18",
+                       "PW20", "PW21" ];
+       convert(x)  = x / 10;
+    },
+    {
+       diag_source = "SHIPS_DIAG";
+       key         = [ "VVAV", "VMFX", "VVAC" ];
+       convert(x)  = x / 100;
+    },
+    {
+        diag_source = "SHIPS_DIAG";
+        key         = [ "TADV" ];
+        convert(x)  = x / 1000000;
+    },
+    {
+       diag_source = "SHIPS_DIAG";
+       key         = [ "Z850", "D200", "TGRD", "DIVC" ];
+       convert(x)  = x / 10000000;
+    },
+    {
+       diag_source = "SHIPS_DIAG";
+       key         = [ "PENC", "PENV" ];
+       convert(x)  = x / 10 + 1000;
+    }
+ ];
 
-     { source = "LSDIAG_RT";
-       key = [ "LAT",  "LON",  "CSST", "RSST", "DSST", "DSTA", "XDST", "XNST", "NSST", "NSTA",
-               "NTMX", "NTFR", "U200", "U20C", "V20C", "E000", "EPOS", "ENEG", "EPSS", "ENSS",
-               "T000", "TLAT", "TLON", "TWAC", "TWXC", "G150", "G200", "G250", "V000", "V850",
-               "V500", "V300", "SHDC", "SHGC", "T150", "T200", "T250", "SHRD", "SHRS", "SHRG",
-               "HE07", "HE05", "PW01", "PW02", "PW03", "PW04", "PW05", "PW06", "PW07", "PW08",
-               "PW09", "PW10", "PW11", "PW12", "PW13", "PW14", "PW15", "PW16", "PW17", "PW18",
-               "PW20", "PW21" ];
-       convert(x) = x / 10; },
+The **diag_convert_map** entries define conversion functions to be applied to diagnostics data read with the **-diag** command line option. Each array element is a dictionary consisting of a **diag_source**, **key**, and **convert(x)** entry.
 
-     { source = "LSDIAG_RT";
-       key = [ "VVAV", "VMFX", "VVAC" ];
-       convert(x) = x / 100; },
-
-     { source = "LSDIAG_RT";
-       key = [ "TADV" ];
-       convert(x) = x / 1000000; },
-
-     { source = "LSDIAG_RT";
-       key = [ "Z850", "D200", "TGRD", "DIVC" ];
-       convert(x) = x / 10000000; },
-
-     { source = "LSDIAG_RT";
-       key = [ "PENC", "PENV" ];
-       convert(x) = x / 10 + 1000; }
-
-  ];
-
-The **diag_convert_map** entries define conversion functions to be applied to diagnostics data read with the **-diag** command line option. Each array element is a dictionary consisting of a **source**, **key**, and **convert(x)** entry.
-
-The **source** is one of the supported diagnostics data sources. The **key** is an array of strings. The strings can specify diagnostic names or units, although units are only checked for **TCDIAG** sources. If both the name and units are specified, the conversion function for the name takes precedence. **convert(x)** is a function of one variable which defines how the diagnostic data should be converted. The defined function is applied to any diagnostic value whose name or units appears in the **key**.
+The **diag_source** entry is one of the supported diagnostics data sources. Partial string matching logic is applied, so **SHIPS_DIAG** entries are matched to both **SHIPS_DIAG_RT** and **SHIPS_DIAG_DEV** diagnostic sources. The **key** entry is an array of strings. The strings can specify diagnostic names or units, although units are only checked for **CIRA_DIAG** sources. If both the name and units are specified, the conversion function for the name takes precedence. The **convert(x)** entry is a function of one variable which defines how the diagnostic data should be converted. The defined function is applied to any diagnostic value whose name or units appears in the **key**.
 
 ____________________
 

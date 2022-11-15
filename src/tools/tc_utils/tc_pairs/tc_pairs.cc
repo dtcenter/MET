@@ -247,9 +247,8 @@ void process_command_line(int argc, char **argv) {
    for(i=0; i<diag_path.n(); i++) {
       mlog << Debug(1)
            << "[Path " << i+1 << " of " << diag_path.n()
-           << "] " << diagtype_to_string(diag_source[i])
-           << " Path: " << diag_path[i] << ", Model Name(s): "
-           << diag_model_name[i] << "\n";
+           << "] " << diag_source[i]
+           << " Path: " << diag_path[i] << "\n";
    }
 
    // Create the default config file name
@@ -1007,47 +1006,62 @@ void filter_probs(ProbInfoArray &probs) {
 ////////////////////////////////////////////////////////////////////////
 
 void process_diags(TrackInfoArray &tracks) {
-   StringArray cur_path, cur_model_name;
-   StringArray files, files_model_name, model_names;
+   StringArray cur_files;
    DiagFile diag_file;
+   map<ConcatString,int> n_diag_map;
    int i, j, n;
-   map<DiagType,int> n_diag_map;
+
+   // Matching array lengths
+   if(diag_source.n() != diag_path.n()) {
+      mlog << Error << "\nprocess_diags() -> "
+           << "the diagnostic path and source arrays must have equal length!\n\n";
+      exit(1);
+   }
 
    // Process the diagnostic inputs
-   for(i=0; i<diag_source.size(); i++) {
+   for(i=0; i<diag_source.n(); i++) {
 
-      // Process the current source
-      cur_path.clear();
-      cur_path.add(diag_path[i]);
-      cur_model_name.clear();
-      cur_model_name.add(diag_model_name[i]);
-
-      // Get the list of diagnostic files for this source
-      get_atcf_files(cur_path, cur_model_name,
-                     files, files_model_name);
+      // Process the current diagnostic source
+      cur_files = get_filenames(diag_path[i], NULL, atcf_suffix);
 
       mlog << Debug(2)
-           << "Processing " << files.n()
-           << " " << diagtype_to_string(diag_source[i])
-           << " diagnostic file(s).\n";
+           << "Processing " << cur_files.n() << " "
+           << diag_source[i] << " diagnostic file(s).\n";
 
       // Loop over the input files
-      for(j=0,n=0; j<files.n(); j++) {
+      for(j=0,n=0; j<cur_files.n(); j++) {
 
-         // Parse model names as a comma-separated list
-         model_names.parse_css(files_model_name[j]);
+         // Check for diagnostic info map entry
+         DiagInfo * info_ptr = 0;
+         if(conf_info.DiagInfoMap.count(diag_source[i]) < 1) {
+            mlog << Error << "\nprocess_diags() -> "
+                 << "no \"" << conf_key_diag_info_map
+                 << "\" entry found for diagnostic source \""
+                 << diag_source[i] << "\"!\n\n";
+            exit(1);
+         }
+         info_ptr = &conf_info.DiagInfoMap.at(diag_source[i]);
 
-         // Pointer to the conversion map for this source
+         // Check for diagnostic conversion map entry
          map<ConcatString,UserFunc_1Arg> * convert_ptr = 0;
-         if(conf_info.DiagConvertMap.count(diag_source[i]) > 0) {
-            convert_ptr = &conf_info.DiagConvertMap.at(diag_source[i]);
+         map< ConcatString,map<ConcatString,UserFunc_1Arg> >::iterator it;
+         for(it = conf_info.DiagConvertMap.begin();
+             it != conf_info.DiagConvertMap.end(); it++) {
+
+            // Partial string matching for diag_source
+            if(check_reg_exp(it->first.c_str(), diag_source[i].c_str())) {
+               convert_ptr = &it->second;
+               break;
+            }
          }
 
          // Process the diagnostic files
-         diag_file.read(diag_source[i], files[j], model_names, convert_ptr);
+         diag_file.read(cur_files[j], diag_source[i],
+                        info_ptr->TrackSource, info_ptr->FieldSource,
+                        info_ptr->MatchToTrack, convert_ptr);
 
          // Add diagnostics data to existing tracks
-         n += tracks.add_diag_data(diag_file, conf_info.DiagName);
+         n += tracks.add_diag_data(diag_file, info_ptr->DiagName);
 
       } // end for j
 
@@ -1058,11 +1072,11 @@ void process_diags(TrackInfoArray &tracks) {
    } // end for i
 
    // Print the diagnostic track counts
-   for(map<DiagType,int>::iterator it = n_diag_map.begin();
+   for(map<ConcatString,int>::iterator it = n_diag_map.begin();
        it != n_diag_map.end(); it++) {
       mlog << Debug(3)
-           << "Added " << diagtype_to_string(it->first)
-           << " diagnostics to " << it->second << " tracks.\n";
+           << "Added " << it->first << " diagnostics to "
+           << it->second << " tracks.\n";
    }
 
    return;
@@ -2247,11 +2261,7 @@ void usage() {
 
         << "\tNote: The \"-adeck\", \"-edeck\", and \"-bdeck\" options "
         << "may include \"suffix=string\" to modify the model names "
-        << "from that path.\n\n"
-
-        << "\tNote: The \"-diag\" option may include \"model=string\" to "
-        << "override the model name of the tracks to which those diagnostics "
-        << "correspond.\n\n";
+        << "from that path.\n\n";
 
    exit(1);
 }
@@ -2313,10 +2323,6 @@ void set_atcf_path(const StringArray &a,
 ////////////////////////////////////////////////////////////////////////
 
 void set_diag(const StringArray &a) {
-   int i;
-   StringArray sa;
-   DiagType source;
-   ConcatString cs, model_name;
 
    // Should have length of at least 2
    if(a.n() < 2) {
@@ -2326,33 +2332,10 @@ void set_diag(const StringArray &a) {
       exit(1);
    }
 
-   // Parse the DiagType source
-   source = string_to_diagtype(a[0].c_str());
-
-   // Check for the model sub-argument
-   for(i=1; i<a.n(); i++) {
-      cs = a[i];
-      if(cs.startswith("model")) {
-         sa = cs.split("=");
-         if(sa.n() != 2) {
-            mlog << Error << "\nset_diag_path() -> "
-                 << "the model name must be specified as "
-                 << "\"model=string\".\n\n";
-            usage();
-         }
-         else {
-            model_name = sa[1];
-         }
-      }
-   }
-
    // Parse the remaining paths
-   for(i=1; i<a.n(); i++) {
-      cs = a[i];
-      if(cs.startswith("model")) continue;
-      diag_source.push_back(source);
+   for(int i=1; i<a.n(); i++) {
+      diag_source.add(a[0]);
       diag_path.add(a[i]);
-      diag_model_name.add(model_name);
    }
 
    return;
