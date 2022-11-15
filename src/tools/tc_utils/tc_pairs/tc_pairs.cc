@@ -2247,8 +2247,8 @@ void usage() {
         << "\t\t\"-diag source path\" is used one or more times to "
         << "specify a file or top-level directory containing tropical "
         << "cyclone diagnostics \"" << atcf_suffix
-        << "\" data to process. The supported formats are TCDIAG, "
-        << "LSDIAG_RT, LSDIAG_DEV (optional).\n"
+        << "\" data to process. The supported sources are CIRA_DIAG_RT "
+        << "and SHIPS_DIAG_RT (optional).\n"
 
         << "\t\t\"-out base\" overrides the default output file base "
         << "(" << out_base << ") (optional).\n"

@@ -14,10 +14,39 @@ Scientific and statistical aspects
 
 .. _TC-Pairs_Diagnostics:
 
-Storm Diagnostics
+TC Diagnostics
 -----------------
 
-TODO: Add a paragraph about storm diagnostics, describing what they are, why they are important, and how they can be generated.
+TC diagnostics provide information about a TC's structure or its environment. Each TC diagnostic is a single-valued measure that corresponds to some aspect of the storm itself or the surrounding large-scale environment. TC diagnostics can be derived from observational analyses, model fields, or even satellite observations. Examples include:
+
+  * Inner core diagnostics provide information about the structure of the storm near the storm center. Examples include the intensity of the storm and the radius of maximum winds.
+
+  * Large scale diagnostics provide information about quantities that characterize its environment. Examples include environmental vertical wind shear, total precipitable water, the average relative humidity, measures of convective instability, and the upper bound of intensity that a storm may be expected to achieve in its current environment. These diagnostics are typically derived from model fields as an average of the quantity of interest over either a circular area or an annulus centered on the storm center. Often, the storm center is taken to be the underlying model's storm center. In other cases, the diagnostics may be computed along some other specified track.
+
+  * Ocean-based diagnostics provide information about the sea's thermal characteristics in the vicinity of the storm center. Examples include the sea surface temperature, ocean heat content, and the depth of warm water of a given temperature.
+
+  * Satellite-based diagnostics provide information about the storm structure as observed by geostationary satellite infrared imagery. Examples include information about the shape and extent of the cold-cirrus canopy of the TC and whether patterns are present that may portend intensification.
+
+Diagnostics are critically important for training and running statistical-dynamical models that predict a TC's intensity or size. One of the most well-known diagnostics sets is that of the Statistical Hurricane Intensity Prediction Scheme (SHIPS), which supports predictions of TC intensity. A large 30-year development dataset of TC diagnostics has been retrospectively derived to support the training of the SHIPS intensity model as well as other related models such as the Logistic Growth Equation Model (LGEM), SHIPS Rapid Intensification Index (SHIPS-RII), and others. These diagnostics, called *lsdiag* for "large scale" environment, are computed using a *perfect prog* approach in which the diagnostics are computed on the reference model's verifying analyses to generate a set of time-dependent diagnostics from t=0 out to the desired maximum forecast lead time. This is repeated for each initialization, building up a full history of diagnostics for each storm. By using the subsequent verifying analysis for later lead times, the model is taken to be "perfect", removing the impact of model forecast errors. The resulting developmental dataset is ideal for training statistical-dynamical models such as SHIPS. To generate forecasts in real-time, the diagnostics are computed along a forecast track (often taken to be the National Hurricane Center's official forecast) using the fields of the underlying NWP model (e.g, the Global Forecast System, or GFS model). The resulting diagnostics are then used as *predictors* in models like SHIPS and LGEM to predict a TC's future intensity or probability of undergoing rapid intensification.
+
+Beside their use in TC prediction, TC diagnostics can be very useful to forecasters to understand the forecast scenario. They are also useful to model developers for evaluation of model errors and understanding model performance under different environmental conditions. For instance, a modeler may wish to understand their model's track biases under conditions of high vertical wind shear. TC diagnostics can also be used to understand the sensitivity of the model's intensity predictions to oceanic conditions such as upwelling. The TC-Pairs tool allows filtering and subsetting based on the values of one or several TC diagnostics.
+
+As of MET v11.0.0, two types of TC diagnostics are supported in TC-Pairs:
+
+  .. SHIPS_DIAG_DEV: Includes a plethora of inner core, environmental, oceanic, and satellite-based diagnostics. These diagnostics are computed using the *perfect prog* approach.
+
+  * SHIPS_DIAG_RT: Real-time SHIPS diagnostics computed from a NWP model such as the Global Forecast System (GFS) model along the NHC Official forecast track.
+
+  * CIRA_DIAG_RT: Real-time model-based diagnostics computed along the model's predicted track.
+
+Diagnostics from the SHIPS Development Datasets (SHIPS_DIAG_DEV) will be supported in a future release of MET.
+
+A future version of MET will also allow the CIRA model diagnostics to be computed directly from model forecast fields. Until then, users may obtain the SHIPS diagnostics at the following locations:
+
+  * SHIPS_DIAG_DEV: https://rammb2.cira.colostate.edu/research/tropical-cyclones/ships/#DevelopmentalData
+
+  * SHIPS_DIAG_RT: https://ftp.nhc.noaa.gov/atcf/lsdiag/
+
 
 .. _TC-Pairs_Practical-information:
 
@@ -58,7 +87,7 @@ Required arguments for tc_pairs
 Optional arguments for tc_pairs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-5. The **-diag source path** argument indicates the TC-Pairs acceptable format data containing the tropical cyclone diagnostics dataset corresponding to the adeck tracks. The **source** can be set to CIRA_DIAG_RT and SHIPS_DIAG_RT to indicate the input diagnostics data source. The **path** argument specifies the name of a TC-Pairs acceptable format file or top-level directory containing TC-Pairs acceptable format files ending in ".dat" to be processed.
+5. The **-diag source path** argument indicates the TC-Pairs acceptable format data containing the tropical cyclone diagnostics dataset corresponding to the adeck tracks. The **source** can be set to CIRA_DIAG_RT or SHIPS_DIAG_RT to indicate the input diagnostics data source. The **path** argument specifies the name of a TC-Pairs acceptable format file or top-level directory containing TC-Pairs acceptable format files ending in ".dat" to be processed. Support for additional diagnostic sources will be added in future releases.
 
 6. The -**out base** argument indicates the path of the output file base. This argument overrides the default output file base (**./out_tcmpr**).
 

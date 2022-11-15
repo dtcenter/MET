@@ -1121,7 +1121,7 @@ map<ConcatString,UserFunc_1Arg> parse_conf_key_convert_map(
       exit(1);
    }
 
-   // Conf: tcdiag_convert_map, lsdiag_convert_map, etc
+   // Conf: diag_convert_map
    map_dict = dict->lookup_array(conf_key_map_name);
 
    // Loop through the array entries
