@@ -580,17 +580,17 @@ void MetGrib2DataFile::find_record_matches( VarInfoGrib2* vinfo,
                                         (*it)->MasterTable, (*it)->Center, (*it)->LocalTable, tab) ){
                
                mlog << Error << "MetGrib2DataFile::find_record_matches - unrecognized GRIB2 from input file, can't find grib2 table match "
-                    << "field indicies - Discipline: " << (*it)->Discipline << ", ParmCat: " << (*it)->ParmCat
-                    << ", Parm: " << (*it)->Parm << ", MasterTable: " << (*it)->MasterTable
-                    << ", Center: " << (*it)->Center << ", LocalTable: " << (*it)->LocalTable << "\n";
+                    << "field indicies - discipline: " << (*it)->Discipline << ", parm cat: " << (*it)->ParmCat
+                    << ", parm: " << (*it)->Parm << ", master table: " << (*it)->MasterTable
+                    << ", center: " << (*it)->Center << ", local table: " << (*it)->LocalTable << "\n";
                
                exit(1);
                
             } else {
 
-               mlog << Debug(3) << "MetGrib2DataFile::find_record_matches - Found exact grib2 table match using input data fields. "
-                    << "Setting grib2 fields from tab values: Discipline: " << tab.index_a << ", ParmCat: " << tab.index_b
-                    << ", Parm: " << tab.index_c << ", Units: " << tab.units.c_str() << ", LongName: " << tab.full_name.c_str() << "\n";
+               mlog << Debug(3) << "MetGrib2DataFile::find_record_matches - Found exact GRIB2 table match using input data fields. "
+                    << "Using GRIB2 fields:: discipline: " << tab.index_a << ", parm_cat: " << tab.index_b
+                    << ", parm: " << tab.index_c << ", units: " << tab.units.c_str() << ", long_name: " << tab.full_name.c_str() << "\n";
                
                vinfo->set_discipline(tab.index_a);
                vinfo->set_parm_cat(tab.index_b);
@@ -776,8 +776,6 @@ void MetGrib2DataFile::read_grib2_record_list() {
          rec->MasterTable  = gfld->idsect[2];
          rec->LocalTable   = gfld->idsect[3];
          
-         cout << "gfld->idsect[0] (center) = " << gfld->idsect[0] << " gfld->idsect[2] (master table) = " << gfld->idsect[2] << " gfld->idsect[3] (local table) = " << gfld->idsect[3] << endl;
-         
          //  get the level type
          if( gfld->ipdtnum == 46 ) {
             rec->LvlTyp    = gfld->ipdtmpl[15];
@@ -787,11 +785,8 @@ void MetGrib2DataFile::read_grib2_record_list() {
          
          //  store the full pdtmpl values
          for(int j=0; j < gfld->ipdtlen; j++) {
-            //cout << "gfld->ipdtmpl[" << j << "] = " << gfld->ipdtmpl[j] << endl;
             rec->IPDTmpl.add((int) gfld->ipdtmpl[j]);
          }
-
-         cout << endl;
          
          //  check for template number 46
          if( gfld->ipdtnum == 46 ) {

@@ -284,8 +284,6 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
    int ltab                = dict.lookup_int   (conf_key_GRIB2_ltab,      false);
    int mtab                = dict.lookup_int   (conf_key_GRIB2_mtab,      false);
 
-   cout << "User supplied field_name = " << field_name << " field_disc = " << field_disc << " field_parm_cat = " << field_parm_cat << " field_parm = " << field_parm << " cntr = " << cntr << " ltab = " << ltab << " mtab = " << mtab << endl;
-   
    //  user-specified GRIB2 record filters
    PDTmpl                  = dict.lookup_int   (conf_key_GRIB2_pdt,       false);
    Process                 = dict.lookup_int   (conf_key_GRIB2_process,   false);
@@ -297,8 +295,6 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
    IPDTmplIndex = dict.lookup_int_array(conf_key_GRIB2_ipdtmpl_index, false);
    IPDTmplVal   = dict.lookup_int_array(conf_key_GRIB2_ipdtmpl_val,   false);
 
-   cout << "User supplied IPDTmplIndex.n() = " << IPDTmplIndex.n() << " IPDTmplVal.n()" << IPDTmplVal.n() << endl;
-   
    //  arrays must have the same length
    if(IPDTmplIndex.n() != IPDTmplVal.n()) {
       mlog << Error << "\nVarInfoGrib2::set_dict() -> "
@@ -357,8 +353,6 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
       field_name = tab.parm_name;
    }
 
-   cout << " Updated field_name = " << field_name << endl;
-
    //  set the matched parameter lookup information
    set_ens          (ens_str.c_str());
    set_name         ( field_name    );
@@ -366,7 +360,15 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
    
    // Only save specific fields if we have 1 match, otherwise we will do the loopup later
    if( field_name != "PROB" && tab_match == 1 ){
-      cout << "Found only 1 table match" << endl;
+
+      mlog << Debug(3) << "\nVarInfoGrib2::set_dict() -> "
+           << "Found only 1 table match. Using GRIB2 fields:"
+           << " discipline: " << tab.index_a
+           << ", parm_cat: " << tab.index_b
+           << ", parm: " << tab.index_c
+           << ", units: " << tab.units.c_str()
+           << ", long_name: " << tab.full_name.c_str() << "\n";
+      
       set_discipline( tab.index_a   );
       set_parm_cat  ( tab.index_b   );
       set_parm      ( tab.index_c   );
