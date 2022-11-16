@@ -23,7 +23,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 //
-// TCDIAG files:
+// Realtime CIRA Diagnostics files:
 //   - Add link to sample data
 //   - Header:
 //       * ATCF_ID YYYYMMDDHH *
@@ -33,7 +33,7 @@
 //       BB is the 2-letter basin name
 //       CC is the 2-digit cyclone number
 //
-// Real-time LSDIAG files:
+// Real-time SHIPS Diagnostics files:
 //   - https://ftp.nhc.noaa.gov/atcf/lsdiag
 //   - Header:
 //       BBCC YYMMDD HH WS LAT LON 9999 BBCCYYYY
@@ -42,7 +42,7 @@
 //       YYMMDD HH is the initialization time
 //       WS is the wind speed
 //
-// Developmental LSDIAG files (not currently supported):
+// Developmental SHIPS Diagnostics files (not currently supported):
 //   - https://rammb2.cira.colostate.edu/research/tropical-cyclones/ships
 //
 ////////////////////////////////////////////////////////////////////////
@@ -58,8 +58,10 @@ class DiagFile : public LineDataFile {
 
       void init_from_scratch();
 
-      // Diagnostics file type
-      DiagType SourceType;
+      // Diagnostics Metadata
+      DiagType     DiagSource;
+      ConcatString TrackSource;
+      ConcatString FieldSource;
 
       // Storm and model identification
       ConcatString StormId;
@@ -108,7 +110,9 @@ class DiagFile : public LineDataFile {
       double               lat(int)    const;
       double               lon(int)    const;
 
-      DiagType             source()                      const;
+      DiagType             diag_source()                 const;
+      const ConcatString & track_source()                const;
+      const ConcatString & field_source()                const;
       int                  n_diag()                      const;
       const StringArray &  diag_name()                   const;
       bool                 has_diag(const std::string &) const;
@@ -118,27 +122,30 @@ class DiagFile : public LineDataFile {
          //  do stuff
          //
 
-      void read           (const DiagType,
-                           const ConcatString &, const StringArray &,
-                           const std::map<ConcatString,UserFunc_1Arg> *);
-      void read_tcdiag    (const ConcatString &, const StringArray &,
-                           const std::map<ConcatString,UserFunc_1Arg> *);
-      void read_lsdiag_rt (const ConcatString &, const StringArray &,
-                           const std::map<ConcatString,UserFunc_1Arg> *);
+      void read          (const ConcatString &, const ConcatString &,
+                          const ConcatString &, const ConcatString &,
+                          const StringArray &,
+                          const std::map<ConcatString,UserFunc_1Arg> *);
+      void read_cira_rt  (const ConcatString &,
+                          const std::map<ConcatString,UserFunc_1Arg> *);
+      void read_ships_rt (const ConcatString &,
+                          const std::map<ConcatString,UserFunc_1Arg> *);
 
 };
 
 ////////////////////////////////////////////////////////////////////////
 
-inline const ConcatString & DiagFile::storm_id()  const { return(StormId);      }
-inline const ConcatString & DiagFile::basin()     const { return(Basin);        }
-inline const ConcatString & DiagFile::cyclone()   const { return(Cyclone);      }
-inline const StringArray  & DiagFile::technique() const { return(Technique);    }
-inline unixtime             DiagFile::init()      const { return(InitTime);     }
-inline int                  DiagFile::n_time()    const { return(NTime);        }
-inline DiagType             DiagFile::source()    const { return(SourceType);   }
-inline int                  DiagFile::n_diag()    const { return(DiagName.n()); }
-inline const StringArray &  DiagFile::diag_name() const { return(DiagName);     }
+inline const ConcatString & DiagFile::storm_id()     const { return(StormId);      }
+inline const ConcatString & DiagFile::basin()        const { return(Basin);        }
+inline const ConcatString & DiagFile::cyclone()      const { return(Cyclone);      }
+inline const StringArray  & DiagFile::technique()    const { return(Technique);    }
+inline unixtime             DiagFile::init()         const { return(InitTime);     }
+inline int                  DiagFile::n_time()       const { return(NTime);        }
+inline DiagType             DiagFile::diag_source()  const { return(DiagSource);   }
+inline const ConcatString & DiagFile::track_source() const { return(TrackSource);  }
+inline const ConcatString & DiagFile::field_source() const { return(FieldSource);  }
+inline int                  DiagFile::n_diag()       const { return(DiagName.n()); }
+inline const StringArray &  DiagFile::diag_name()    const { return(DiagName);     }
 
 ////////////////////////////////////////////////////////////////////////
 
