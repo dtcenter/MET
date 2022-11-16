@@ -24,6 +24,10 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
+const bool use_weighted_seeps = false;
+
+////////////////////////////////////////////////////////////////////////
+
 void parse_row_col(const char *col_name, int &r, int &c) {
    const char *ptr = (const char *) 0;
 
@@ -1567,7 +1571,7 @@ void write_mpr_row(StatHdrColumns &shc, const PairDataPoint *pd_ptr,
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_seeps_row(StatHdrColumns &shc, const PairDataPoint *pd_ptr,
+void write_seeps_row(StatHdrColumns &shc, const SeepsAggScore *seeps,
                      STATOutputType out_type,
                      AsciiTable &stat_at, int &stat_row,
                      AsciiTable &txt_at, int &txt_row,
@@ -1589,14 +1593,13 @@ void write_seeps_row(StatHdrColumns &shc, const PairDataPoint *pd_ptr,
    shc.set_alpha(bad_data_double);
 
    // Write a line
-   if(pd_ptr->seeps.n_obs > 0 &&
-      !is_bad_data(pd_ptr->seeps.score)) {
+   if(seeps->n_obs > 0 && !is_bad_data(seeps->score)) {
 
       // Write the header columns
       write_header_cols(shc, stat_at, stat_row);
 
       // Write the data columns
-      write_seeps_cols(pd_ptr, stat_at, stat_row, n_header_columns);
+      write_seeps_cols(seeps, stat_at, stat_row, n_header_columns);
 
       // If requested, copy row to the text file
       if(out_type == STATOutputType_Both) {
@@ -4068,8 +4071,8 @@ void write_mpr_cols(const PairDataPoint *pd_ptr, int i,
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_seeps_cols(const PairDataPoint *pd_ptr,
-                          AsciiTable &at, int r, int c) {
+void write_seeps_cols(const SeepsAggScore *seeps,
+                      AsciiTable &at, int r, int c) {
    //
    // Stable Equitable Error in Probability Space (SEEPS)
    // Dump out the SEEPS line:
@@ -4081,27 +4084,27 @@ void write_seeps_cols(const PairDataPoint *pd_ptr,
    //    SEEPS
    //
 
-   at.set_entry(r, c+0, pd_ptr->seeps.n_obs); // Total Number of Pairs
+   at.set_entry(r, c+0, seeps->n_obs);  // Total Number of Pairs
 
-   at.set_entry(r, c+1, bad_data_double); // pd_ptr->seeps.s12);  // s12
-   at.set_entry(r, c+2, bad_data_double); // pd_ptr->seeps.s13);  // S13
-   at.set_entry(r, c+3, bad_data_double); // pd_ptr->seeps.s21);  // s21
-   at.set_entry(r, c+4, bad_data_double); // pd_ptr->seeps.s23);  // s23
-   at.set_entry(r, c+5, bad_data_double); // pd_ptr->seeps.s31);  // s31
-   at.set_entry(r, c+6, bad_data_double); // pd_ptr->seeps.s32);  // s32
+   at.set_entry(r, c+1, seeps->s12);    // s12
+   at.set_entry(r, c+2, seeps->s13);    // s13
+   at.set_entry(r, c+3, seeps->s21);    // s21
+   at.set_entry(r, c+4, seeps->s23);    // s23
+   at.set_entry(r, c+5, seeps->s31);    // s31
+   at.set_entry(r, c+6, seeps->s32);    // s32
 
-   at.set_entry(r, c+7, bad_data_double); // pd_ptr->seeps.pf1);  // pf1
-   at.set_entry(r, c+8, bad_data_double); // pd_ptr->seeps.pf2);  // pf2
-   at.set_entry(r, c+9, bad_data_double); // pd_ptr->seeps.pf3);  // pf3
+   at.set_entry(r, c+7, seeps->pf1);    // pf1
+   at.set_entry(r, c+8, seeps->pf2);    // pf2
+   at.set_entry(r, c+9, seeps->pf3);    // pf3
 
-   at.set_entry(r, c+10, bad_data_double); // pd_ptr->seeps.pv1);   // pv1
-   at.set_entry(r, c+11, bad_data_double); // pd_ptr->seeps.pv2);   // pv2
-   at.set_entry(r, c+12, bad_data_double); // pd_ptr->seeps.pv3);   // pv3
+   at.set_entry(r, c+10, seeps->pv1);   // pv1
+   at.set_entry(r, c+11, seeps->pv2);   // pv2
+   at.set_entry(r, c+12, seeps->pv3);   // pv3
 
-   at.set_entry(r, c+13, pd_ptr->seeps.mean_fcst);  // mean_fcst
-   at.set_entry(r, c+14, pd_ptr->seeps.mean_obs);   // mean_obs
+   at.set_entry(r, c+13, seeps->mean_fcst); // mean_fcst
+   at.set_entry(r, c+14, seeps->mean_obs);  // mean_obs
 
-   at.set_entry(r, c+15, pd_ptr->seeps.score);      // SEEPS score
+   at.set_entry(r, c+15, (use_weighted_seeps ? seeps->weighted_score : seeps->score)); // SEEPS score/weighted score
 
    return;
 }
@@ -4132,7 +4135,7 @@ void write_seeps_mpr_cols(const PairDataPoint *pd_ptr, int i,
 
    at.set_entry(r, c+5, (string)pd_ptr->o_qc_sa[i]);    // Observation Quality Control
 
-   at.set_entry(r, c+6, pd_ptr->seeps_mpr[i]->model_cat);   // model category
+   at.set_entry(r, c+6, pd_ptr->seeps_mpr[i]->fcst_cat);    // model category
    at.set_entry(r, c+7, pd_ptr->seeps_mpr[i]->obs_cat);     // observation category
 
    at.set_entry(r, c+8, pd_ptr->seeps_mpr[i]->p1);  // p1

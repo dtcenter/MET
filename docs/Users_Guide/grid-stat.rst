@@ -362,6 +362,7 @@ _____________________
      nbrcnt = BOTH;
      grad   = BOTH;
      dmap   = BOTH;
+     seeps  = NONE;
   }
 
 
@@ -410,8 +411,13 @@ The **output_flag** array controls the type of output that the Grid-Stat tool ge
 
 21. **DMAP** for Distance Map Statistics
 
+22. **SEEPS** for SEEPS (Stable Equitable Error in Probability Space) score. It's described in :numref:`table_PS_format_info_SEEPS`. The SEEPS score of matched pair data is saved into the NetCDF.
+
 
 Note that the first two line types are easily derived from one another. The user is free to choose which measure is most desired. The output line types are described in more detail in :numref:`grid_stat-output`.
+
+The SEEPS climo file is not distributed with MET tools because of the file size. It should be configured by using the environment variable, MET_SEEPS_GRID_CLIMO_NAME.
+
 
 _____________________
 

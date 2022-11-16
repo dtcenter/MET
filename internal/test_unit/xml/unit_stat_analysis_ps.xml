@@ -100,6 +100,23 @@
     </output>
   </test>
 
+  <test name="stat_analysis_POINT_STAT_SEEPS">
+    <env>
+      <pair><name>OUTPUT_DIR</name> <value>&OUTPUT_DIR;/stat_analysis_ps</value></pair>
+    </env>
+    <exec>&MET_BIN;/stat_analysis</exec>
+    <param> \
+      -lookin &OUTPUT_DIR;/point_stat/point_stat_NCMET_NAM_NDAS_SEEPS_360000L_20120410_120000V.stat \
+      -config &CONFIG_DIR;/STATAnalysisConfig_seeps \
+      -out &OUTPUT_DIR;/stat_analysis_ps/POINT_STAT_SEEPS.out \
+      -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/stat_analysis_ps/CONFIG_POINT_STAT_filter_seeps.stat</stat>
+      <exist>&OUTPUT_DIR;/stat_analysis_ps/POINT_STAT_SEEPS.out</exist>
+    </output>
+  </test>
+
   <test name="stat_analysis_RAMPS">
     <env>
       <pair><name>OUTPUT_DIR</name> <value>&OUTPUT_DIR;/stat_analysis_ps</value></pair>

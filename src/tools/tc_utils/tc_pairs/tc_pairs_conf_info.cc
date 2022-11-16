@@ -25,8 +25,11 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
+void parse_conf_diag_info_map(Dictionary *,
+        map<ConcatString,DiagInfo> &);
+
 void parse_conf_diag_convert_map(Dictionary *,
-        map<DiagType,map<ConcatString,UserFunc_1Arg> > &);
+        map< ConcatString,map<ConcatString,UserFunc_1Arg> > &);
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -101,7 +104,7 @@ void TCPairsConfInfo::clear() {
    DLandFile.clear();
    WatchWarnFile.clear();
    WatchWarnOffset = bad_data_int;
-   DiagName.clear();
+   DiagInfoMap.clear();
    DiagConvertMap.clear();
    BasinMap.clear();
    Version.clear();
@@ -312,8 +315,8 @@ void TCPairsConfInfo::process_config() {
    // Conf: WatchWarnOffset
    WatchWarnOffset = dict->lookup_int(conf_key_time_offset);
 
-   // Conf: DiagName
-   DiagName = dict->lookup_string_array(conf_key_diag_name);
+   // Conf: DiagInfoMap
+   parse_conf_diag_info_map(dict, DiagInfoMap);
 
    // Conf: DiagConvertMap
    parse_conf_diag_convert_map(dict, DiagConvertMap);
@@ -330,14 +333,74 @@ void TCPairsConfInfo::process_config() {
 //
 ////////////////////////////////////////////////////////////////////////
 
+void DiagInfo::clear() {
+
+   TrackSource.clear();
+   FieldSource.clear();
+   MatchToTrack.clear();
+   DiagName.clear();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void parse_conf_diag_info_map(Dictionary *dict, map<ConcatString,DiagInfo> &source_map) {
+   int i;
+   Dictionary *map_dict = (Dictionary *) 0;
+   ConcatString diag_source;
+   DiagInfo cur_info;
+
+   const char *method_name = "parse_conf_diag_info_map() -> ";
+
+   if(!dict) {
+      mlog << Error << "\n" << method_name
+           << "empty dictionary!\n\n";
+      exit(1);
+   }
+
+   // Conf: diag_info_map
+   map_dict = dict->lookup_array(conf_key_diag_info_map);
+
+   // Loop through the array entries
+   for(i=0; i<map_dict->n_entries(); i++) {
+
+      // Initialize the current map
+      cur_info.clear();
+
+      // Lookup the metadata entries
+      diag_source           = (*map_dict)[i]->dict_value()->lookup_string(conf_key_diag_source);
+      cur_info.TrackSource  = (*map_dict)[i]->dict_value()->lookup_string(conf_key_track_source);
+      cur_info.FieldSource  = (*map_dict)[i]->dict_value()->lookup_string(conf_key_field_source);
+      cur_info.MatchToTrack = (*map_dict)[i]->dict_value()->lookup_string_array(conf_key_match_to_track);
+      cur_info.DiagName     = (*map_dict)[i]->dict_value()->lookup_string_array(conf_key_diag_name);
+
+      // diag_source entries must be unique
+      if(source_map.count(diag_source) > 0) {
+         mlog << Error << "\n" << method_name
+              << "multiple entries found for diag_source \"" << diag_source
+              << "\" in \"" << conf_key_diag_info_map << "\"!\n\n";
+         exit(1);
+      }
+      // Add a new source entry
+      else {
+         source_map[diag_source] = cur_info;
+      }
+
+   } // end for i
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void parse_conf_diag_convert_map(Dictionary *dict,
-        map<DiagType,map<ConcatString,UserFunc_1Arg> > &source_map) {
+        map< ConcatString,map<ConcatString,UserFunc_1Arg> > &source_map) {
    int i, j;
    Dictionary *map_dict = (Dictionary *) 0;
    map<ConcatString,UserFunc_1Arg> cur_map;
-   DiagType source;
+   ConcatString diag_source, key;
    StringArray sa;
-   ConcatString key;
    UserFunc_1Arg fx;
 
    const char *method_name = "parse_conf_diag_convert_map() -> ";
@@ -358,9 +421,8 @@ void parse_conf_diag_convert_map(Dictionary *dict,
       cur_map.clear();
 
       // Lookup the source, key, and convert function
-      source = string_to_diagtype(
-               (*map_dict)[i]->dict_value()->lookup_string(conf_key_source).c_str());
-      sa     = (*map_dict)[i]->dict_value()->lookup_string_array(conf_key_key);
+      diag_source = (*map_dict)[i]->dict_value()->lookup_string(conf_key_diag_source);
+      sa          = (*map_dict)[i]->dict_value()->lookup_string_array(conf_key_key);
       fx.clear();
       fx.set((*map_dict)[i]->dict_value()->lookup(conf_key_convert));
 
@@ -378,15 +440,15 @@ void parse_conf_diag_convert_map(Dictionary *dict,
       }
 
       // Append to the existing source entry
-      if(source_map.count(source) > 0) {
+      if(source_map.count(diag_source) > 0) {
          for(map<ConcatString,UserFunc_1Arg>::iterator it = cur_map.begin();
              it != cur_map.end(); it++) {
-            source_map.at(source).insert(pair<ConcatString,UserFunc_1Arg>(it->first, it->second));
+            source_map.at(diag_source).insert(pair<ConcatString,UserFunc_1Arg>(it->first, it->second));
          }
       }
       // Add a new source entry
       else {
-         source_map.insert(pair<DiagType,map<ConcatString,UserFunc_1Arg> >(source, cur_map));
+         source_map.insert(pair< ConcatString,map<ConcatString,UserFunc_1Arg> >(diag_source, cur_map));
       }
 
    } // end for i

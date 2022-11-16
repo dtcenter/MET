@@ -381,11 +381,11 @@ TrackPoint & TrackPoint::operator+=(const TrackPoint &p) {
    else                                             Speed += p.speed();
    
    // Set consensus (spread) variables to missing
-   NumMembers = bad_data_int;
-   Spread     = bad_data_double;
-   DistMean   = bad_data_double;
-   VmaxStdev  = bad_data_double;
-   MSLPStdev  = bad_data_double;
+   NumMembers  = bad_data_int;
+   TrackSpread = bad_data_double;
+   TrackStdev  = bad_data_double;
+   VmaxStdev   = bad_data_double;
+   MSLPStdev   = bad_data_double;
    
    // Increment wind quadrants
    for(i=0; i<NWinds; i++) Wind[i] += p[i];
@@ -427,11 +427,11 @@ void TrackPoint::clear() {
    WarmCore  = false;
    WatchWarn = NoWatchWarnType;
 
-   NumMembers = bad_data_int;
-   Spread     = bad_data_double;
-   DistMean   = bad_data_double;
-   VmaxStdev  = bad_data_double;
-   MSLPStdev  = bad_data_double;
+   NumMembers  = bad_data_int;
+   TrackSpread = bad_data_double;
+   TrackStdev  = bad_data_double;
+   VmaxStdev   = bad_data_double;
+   MSLPStdev   = bad_data_double;
 
    DiagVal.clear();
 
@@ -469,11 +469,11 @@ void TrackPoint::dump(ostream &out, int indent_depth) const {
    out << prefix << "WatchWarn = " << watchwarntype_to_string(WatchWarn);
    out << prefix << "NDiag     = " << DiagVal.n() << "\n";
 
-   out << prefix << "NumMembers = " << NumMembers << "\n";
-   out << prefix << "Spread     = " << Spread << "\n";
-   out << prefix << "DistMean   = " << DistMean << "\n";
-   out << prefix << "VmaxStdev  = " << VmaxStdev << "\n";
-   out << prefix << "MSLPStdev  = " << MSLPStdev << "\n";
+   out << prefix << "NumMembers  = " << NumMembers << "\n";
+   out << prefix << "TrackSpread = " << TrackSpread << "\n";
+   out << prefix << "TrackStdev  = " << TrackStdev << "\n";
+   out << prefix << "VmaxStdev   = " << VmaxStdev << "\n";
+   out << prefix << "MSLPStdev   = " << MSLPStdev << "\n";
    
    for(i=0; i<NWinds; i++) {
       out << prefix << "Wind[" << i+1 << "]:" << "\n";
@@ -509,8 +509,8 @@ ConcatString TrackPoint::serialize() const {
      << ", WarmCore = " << bool_to_string(WarmCore)
      << ", WatchWarn = " << watchwarntype_to_string(WatchWarn)
      << ", NumMembers = " << NumMembers
-     << ", Spread = " << Spread
-     << ", DistMean = " << DistMean
+     << ", TrackSpread = " << TrackSpread
+     << ", TrackStdev = " << TrackStdev
      << ", VmaxStdev = " << VmaxStdev      
      << ", MSLPStdev = " << MSLPStdev
      << ", NDiag = " << DiagVal.n();
@@ -560,13 +560,13 @@ void TrackPoint::assign(const TrackPoint &t) {
    WarmCore  = t.WarmCore;
    WatchWarn = t.WatchWarn;
 
-   NumMembers = t.NumMembers;
-   Spread     = t.Spread;
-   DistMean   = t.DistMean;
-   VmaxStdev  = t.VmaxStdev;
-   MSLPStdev  = t.MSLPStdev;
+   NumMembers  = t.NumMembers;
+   TrackSpread = t.TrackSpread;
+   TrackStdev  = t.TrackStdev;
+   VmaxStdev   = t.VmaxStdev;
+   MSLPStdev   = t.MSLPStdev;
 
-   DiagVal    = t.DiagVal;
+   DiagVal = t.DiagVal;
 
    for(i=0; i<NWinds; i++) Wind[i] = t.Wind[i];
 
@@ -577,29 +577,29 @@ void TrackPoint::assign(const TrackPoint &t) {
 
 void TrackPoint::initialize(const ATCFTrackLine &l) {
 
-   IsSet     = true;
+   IsSet       = true;
 
-   ValidTime  = l.valid();
-   LeadTime   = l.lead();
-   Lat        = l.lat();
-   Lon        = l.lon();
-   Vmax       = l.v_max();
-   MSLP       = l.mslp();
-   Level      = l.level();
-   RadP       = l.isobar_pressure();
-   RRP        = l.isobar_radius();
-   MRD        = l.max_wind_radius();
-   Gusts      = l.gusts();
-   Eye        = l.eye_diameter();
-   Direction  = l.storm_direction();
-   Speed      = l.storm_speed();
-   Depth      = l.depth();
-   WarmCore   = l.warm_core();
-   NumMembers = bad_data_int;
-   Spread     = bad_data_double;
-   DistMean   = bad_data_double;
-   VmaxStdev  = bad_data_double;
-   MSLPStdev  = bad_data_double;
+   ValidTime   = l.valid();
+   LeadTime    = l.lead();
+   Lat         = l.lat();
+   Lon         = l.lon();
+   Vmax        = l.v_max();
+   MSLP        = l.mslp();
+   Level       = l.level();
+   RadP        = l.isobar_pressure();
+   RRP         = l.isobar_radius();
+   MRD         = l.max_wind_radius();
+   Gusts       = l.gusts();
+   Eye         = l.eye_diameter();
+   Direction   = l.storm_direction();
+   Speed       = l.storm_speed();
+   Depth       = l.depth();
+   WarmCore    = l.warm_core();
+   NumMembers  = bad_data_int;
+   TrackSpread = bad_data_double;
+   TrackStdev  = bad_data_double;
+   VmaxStdev   = bad_data_double;
+   MSLPStdev   = bad_data_double;
    
    return;
 }

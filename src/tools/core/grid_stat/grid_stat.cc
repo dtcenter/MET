@@ -138,6 +138,7 @@ using namespace netCDF;
 #include "vx_nc_util.h"
 #include "vx_regrid.h"
 #include "vx_log.h"
+#include "seeps.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -394,6 +395,7 @@ void setup_txt_files(unixtime valid_ut, int lead_sec) {
 
    // Setup the STAT AsciiTable
    stat_at.set_size(conf_info.n_stat_row() + 1, max_col);
+
    setup_table(stat_at);
 
    // Write the text header row
@@ -631,6 +633,8 @@ void process_scores() {
    DataPlane fu_dp_smooth, ou_dp_smooth;
    DataPlane cmnu_dp, csdu_dp, cmnu_dp_smooth;
    PairDataPoint pd_u;
+
+   DataPlane seeps_dp, seeps_dp_fcat, seeps_dp_ocat;
 
    CTSInfo    *cts_info    = (CTSInfo *) 0;
    MCTSInfo    mcts_info;
@@ -1117,6 +1121,29 @@ void process_scores() {
                            i, mthd, pnts, conf_info.vx_opt[i].interp_info.field);
                }
             } // end for it
+         }
+
+         // Write out the fields of requested SEEPS
+         if(conf_info.vx_opt[i].output_flag[i_seeps] != STATOutputType_None
+               && conf_info.vx_opt[i].fcst_info->is_precipitation()
+               && conf_info.vx_opt[i].obs_info->is_precipitation()) {
+            SeepsAggScore seeps;
+            int month, day, year, hour, minute, second;
+
+            unix_to_mdyhms(fcst_dp.valid(), month, day, year, hour, minute, second);
+            compute_aggregated_seeps_grid(fcst_dp_smooth, obs_dp_smooth,
+                                          seeps_dp, seeps_dp_fcat, seeps_dp_ocat,
+                                          &seeps, month, hour,
+                                          conf_info.vx_opt[i].seeps_p1_thresh);
+
+            write_nc("SEEPS_MPR_SCORE", seeps_dp, i, mthd, pnts,
+                     conf_info.vx_opt[i].interp_info.field);
+            write_nc("SEEPS_MPR_FCAT", seeps_dp_fcat, i, mthd, pnts,
+                     conf_info.vx_opt[i].interp_info.field);
+            write_nc("SEEPS_MPR_OCAT", seeps_dp_ocat, i, mthd, pnts,
+                     conf_info.vx_opt[i].interp_info.field);
+            write_seeps_row(shc, &seeps, conf_info.output_flag[i_seeps],
+                            stat_at, i_stat_row, txt_at[i_seeps], i_txt_row[i_seeps]);
          }
 
          // Compute gradient statistics if requested in the config file
@@ -2659,6 +2686,26 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
                    << obs_long_name;
          level_att = shc.get_obs_lev();
          units_att = conf_info.vx_opt[i_vx].obs_info->units_attr();
+      }
+      else if(strncmp(field_name.c_str(), "SEEPS_MPR", 9) == 0) {
+         ConcatString seeps_desc;
+         var_name  << cs_erase << field_name << "_"
+                   << obs_name << var_suffix << "_" << mask_str;
+         if(field_type == FieldType_Obs ||
+            field_type == FieldType_Both) {
+            var_name << interp_str;
+         }
+         if(strncmp(field_name.c_str(), "SEEPS_MPR_SCORE", 15) == 0)
+            seeps_desc = "score";
+         else if(strncmp(field_name.c_str(), "SEEPS_MPR_FCAT", 14) == 0)
+            seeps_desc = "forecast category";
+         else if(strncmp(field_name.c_str(), "SEEPS_MPR_OCAT", 14) == 0)
+            seeps_desc = "observation category";
+         long_att << cs_erase
+                  << "SEEPS MPR " << seeps_desc << " for "
+                  << obs_long_name;
+         level_att = shc.get_obs_lev();
+         units_att = "";
       }
       else {
          mlog << Error << "\nwrite_nc() -> "
