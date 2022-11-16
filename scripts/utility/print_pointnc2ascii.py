@@ -19,13 +19,13 @@ from netCDF4 import Dataset
 def usage():
     print(f'Usage: python3 print_nc2ascii.py MET_point_obs_nc <--hide-header> <--use-comma>')
     print(f'            MET_point_obs_nc: NetCDF filename to read (required)')
-    print(f'               --hide-header: to hide the header (optional)')
-    print(f'                 --use-comma: use the "comma" as separator for comma separated output (optional)"')
+    print(f'                --add-header: to add the header (optional, default: not included)')
+    print(f'                 --use-comma: use the "comma" as separator for comma separated output (optional, default: use spaces)"')
     print(f'       Note: <> indicates optional arguments')
 
 def create_parser_options(parser):
-    parser.add_option("--hide-header", "--hide_header", "--skip-header", "--skip_header", dest="hide_header",
-            action="store_true", default=False, help=" Hide header (default: False)")
+    parser.add_option("--add-header", "--add_header", dest="add_header",
+            action="store_true", default=False, help=" Add header (default: not include header)")
     parser.add_option("--use-comma", "--use_comma", dest="use_comma",
             action="store_true", default=False, help=" Use comma as separator (default: False)")
     return parser.parse_args()
@@ -217,6 +217,5 @@ if __name__ == '__main__':
                 continue
 
             met_nc_data.read_data(nc_name)
-            met_nc_data.dump(not options.hide_header, options.use_comma)
+            met_nc_data.dump(options.add_header, options.use_comma)
             print()
-
