@@ -573,12 +573,21 @@ bool TrackInfo::add_diag_data(DiagFile &diag_file, const StringArray &req_diag_n
          if(i_name == 0) {
             if(!is_eq(diag_file.lat(i_time), Point[i_pnt].lat()) ||
                !is_eq(diag_file.lon(i_time), Point[i_pnt].lon())) {
-               mlog << Warning << "\nTrackInfo::add_diag_data() -> "
-                    << "the " << StormId << " " << Technique << " " << unix_to_yyyymmddhh(InitTime)
+               ConcatString cs;
+               cs << "The " << StormId << " " << Technique << " " << unix_to_yyyymmddhh(InitTime)
                     << " lead time " << sec_to_timestring(diag_file.lead(i_time))
                     << " track location (" << Point[i_pnt].lat() << ", "
-                    << Point[i_pnt].lon() << ") does not match the diagnostic location ("
-                    << diag_file.lat(i_time) << ", " << diag_file.lon(i_time) << ")\n";
+                    << Point[i_pnt].lon() << ") does not match the "
+                    << diagtype_to_string(DiagSource) << " diagnostic location ("
+                    << diag_file.lat(i_time) << ", " << diag_file.lon(i_time) << ")";
+
+               // Print a warning if the TrackSource and Technique match
+               if(TrackSource == Technique) {
+                  mlog << Warning << "\nTrackInfo::add_diag_data() -> " << cs << "\n\n";
+               }
+               else {
+                  mlog << Debug(4) << cs << "\n";
+               }
             }
          }
 
