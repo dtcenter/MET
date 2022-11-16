@@ -26,6 +26,8 @@
 //   009    04/25/18  Halley Gotway   Add ECNT line type.
 //   010    01/24/20  Halley Gotway   Add RPS line type.
 //   011    09/28/22  Prestopnik      MET #2227 Remove namespace std
+//   012    11/10/22  Halley Gotway   MET #2339 Add SEEPS and SEEPS_MPR
+//                                      line types.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -45,6 +47,7 @@
 #include "vx_analysis_util.h"
 #include "vx_util.h"
 #include "vx_statistics.h"
+#include "seeps.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -102,6 +105,13 @@ struct ORANKData {
    NumArray ens_na;
 };
 
+// SEEPS Matched Pair (SEEPS_MPR) data structure
+struct SEEPSMPRData {
+   ConcatString obs_sid, obs_qc;
+   double obs_lat, obs_lon, fcst, obs;
+   SeepsScore seeps_mpr;
+};
+
 ////////////////////////////////////////////////////////////////////////
 
 extern void parse_fho_ctable   (STATLine &, TTContingencyTable &);
@@ -127,6 +137,9 @@ extern void parse_phist_line   (STATLine &, PHISTData &);
 extern void parse_relp_line    (STATLine &, RELPData &);
 extern void parse_orank_line   (STATLine &, ORANKData &);
 extern void parse_ssvar_line   (STATLine &, SSVARInfo &);
+
+extern void parse_seeps_line    (STATLine &, SeepsAggScore &);
+extern void parse_seeps_mpr_line(STATLine &, SEEPSMPRData &);
 
 ////////////////////////////////////////////////////////////////////////
 

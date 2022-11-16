@@ -27,13 +27,13 @@ obtype = "ANALYS";
 //
 // Verification grid
 //
-regrid = {
-   to_grid    = NONE;
-   method     = NEAREST;
-   width      = 1;
-   vld_thresh = 0.5;
-   shape      = SQUARE;
-}
+//regrid = {
+//   to_grid    = ${TO_GRID};
+//   method     = BUDGET;
+//   width      = 2;
+//   vld_thresh = 0.5;
+//   shape      = SQUARE;
+//}
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -59,25 +59,15 @@ rank_corr_flag      = FALSE;
 // Forecast and observation fields to be verified
 //
 fcst = {
-
    field = [
-      { name = "TMP";   level = [ "Z2" ];  cat_thresh = [ ==FBIAS1, <SFP50, >=SFP50     ];
-                                           cnt_thresh = [ ==FBIAS1, <SFP50, >=SFP50, NA ];
-                                           cnt_logic  = INTERSECTION;        },
-      { name = "WIND";  level = [ "Z10" ]; cat_thresh = [ ==FBIAS1, >SFP50, >SFP75, >SFP90 ]; }
+      {
+         name = "precipitation_amount";
+         level = [ "(*,*)" ];
+         is_precipitation = TRUE;
+      }
    ];
-
 }
-obs = {
-
-   field = [
-      { name = "TMP";   level = [ "Z2" ];  cat_thresh = [ >273, <SOP50, >=SOP50     ];
-                                           cnt_thresh = [ >273, <SOP50, >=SOP50, NA ];
-                                           cnt_logic  = INTERSECTION;        },
-      { name = "WIND";  level = [ "Z10" ]; cat_thresh = [ >5, >SOP50, >SOP75, >SOP90 ]; }
-   ];
-
-}
+obs = fcst;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -85,8 +75,8 @@ obs = {
 // Verification masking regions
 //
 mask = {
-   grid = [ "DTC165", "DTC166" ];
-   poly = [ ];
+   grid = [ "FULL" ];
+   poly = [];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -94,7 +84,7 @@ mask = {
 //
 // Confidence interval settings
 //
-ci_alpha  = [ 0.10, 0.05 ];
+ci_alpha  = [ 0.05 ];
 
 boot = {
    interval = PCTILE;
@@ -110,12 +100,15 @@ boot = {
 // Data smoothing methods
 //
 interp = {
-   field      = FCST;
+   field      = BOTH;
    vld_thresh = 1.0;
    shape      = SQUARE;
 
    type = [
-      { method = NEAREST; width  = 1; }
+      {
+         method = NEAREST;
+         width  = 1;
+      }
    ];
 }
 
@@ -125,7 +118,7 @@ interp = {
 // Neighborhood methods
 //
 nbrhd = {
-   width      = [ 3, 5 ];
+   width      = [ 1 ];
    cov_thresh = [ >=0.5 ];
    vld_thresh = 1.0;
    shape      = SQUARE;
@@ -173,12 +166,12 @@ distance_map = {
 //
 output_flag = {
    fho    = NONE;
-   ctc    = BOTH;
-   cts    = BOTH;
+   ctc    = NONE;
+   cts    = NONE;
    mctc   = NONE;
    mcts   = NONE;
-   cnt    = BOTH;
-   sl1l2  = BOTH;
+   cnt    = STAT;
+   sl1l2  = STAT;
    sal1l2 = NONE;
    vl1l2  = NONE;
    val1l2 = NONE;
@@ -188,12 +181,12 @@ output_flag = {
    pjc    = NONE;
    prc    = NONE;
    eclv   = NONE;
-   nbrctc = BOTH;
-   nbrcts = BOTH;
-   nbrcnt = BOTH;
+   nbrctc = NONE;
+   nbrcts = NONE;
+   nbrcnt = NONE;
    grad   = NONE;
    dmap   = NONE;
-   seeps  = NONE;
+   seeps  = ${SEEPS_FLAG};
 }
 
 //
@@ -206,7 +199,7 @@ nc_pairs_flag = {
    climo        = TRUE;
    climo_cdp    = FALSE;
    weight       = FALSE;
-   nbrhd        = TRUE;
+   nbrhd        = FALSE;
    fourier      = FALSE;
    gradient     = FALSE;
    distance_map = FALSE;
@@ -216,7 +209,7 @@ nc_pairs_flag = {
 ////////////////////////////////////////////////////////////////////////////////
 // Threshold for SEEPS p1 (Probability of being dry)
 
-seeps_p1_thresh = NA;
+seeps_p1_thresh = ${SEEPS_P1_THRESH};
 
 ////////////////////////////////////////////////////////////////////////////////
 
