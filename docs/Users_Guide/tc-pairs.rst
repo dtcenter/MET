@@ -35,7 +35,7 @@ As of MET v11.0.0, two types of TC diagnostics are supported in TC-Pairs:
 
   .. SHIPS_DIAG_DEV: Includes a plethora of inner core, environmental, oceanic, and satellite-based diagnostics. These diagnostics are computed using the *perfect prog* approach.
 
-  * SHIPS_DIAG_RT: Real-time SHIPS diagnostics computed from a NWP model such as the Global Forecast System (GFS) model along a GFS forecast track defined by the SHIPS model itself. Note that the SHIPS-derived forecast track does not appear in NHC adeck data.
+  * SHIPS_DIAG_RT: Real-time SHIPS diagnostics computed from a NWP model such as the Global Forecast System (GFS) model along a GFS forecast track defined by a SHIPS-specific tracker. Note that these SHIPS-derived forecast tracks do not appear in the NHC adeck data.
 
   * CIRA_DIAG_RT: Real-time model-based diagnostics computed along the model's predicted track.
 
