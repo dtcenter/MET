@@ -358,9 +358,9 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
    set_name         ( field_name    );
    set_req_name     ( field_name.c_str()    );
    
-   // Only save specific fields if we have 1 match, otherwise we will do the loopup later
+   // Only save specific fields if we have 1 match, otherwise we will do the lookup later
    if( field_name != "PROB" && tab_match == 1 ){
-
+      
       mlog << Debug(3) << "\nVarInfoGrib2::set_dict() -> "
            << "Found only 1 table match. Using GRIB2 fields:"
            << " discipline: " << tab.index_a
@@ -368,12 +368,12 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
            << ", parm: " << tab.index_c
            << ", units: " << tab.units.c_str()
            << ", long_name: " << tab.full_name.c_str() << "\n";
-      
+         
       set_discipline( tab.index_a   );
       set_parm_cat  ( tab.index_b   );
       set_parm      ( tab.index_c   );
       set_units     ( tab.units.c_str()     );
-      set_long_name ( tab.full_name.c_str() );
+      set_long_name ( tab.full_name.c_str() );   
    }
    
    //  call the parent to set the level information
