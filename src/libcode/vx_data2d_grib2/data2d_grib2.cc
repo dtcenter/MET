@@ -475,8 +475,6 @@ void MetGrib2DataFile::find_record_matches( VarInfoGrib2* vinfo,
          }
       }
 
-      cout << "vinfo->record() = " << vinfo->record() << " (*it)->RecNum = " << (*it)->RecNum << endl;
-      
       //  test for a record number match
       if( vinfo->record() == (*it)->RecNum ){
          rec_match_ex = true;
@@ -503,10 +501,15 @@ void MetGrib2DataFile::find_record_matches( VarInfoGrib2* vinfo,
             continue;
          }
          
-         cout << " vinfo->discipline() = " << vinfo->discipline() << " vinfo->parm_cat() = " << vinfo->parm_cat() << " vinfo->parm() = " << vinfo->parm() << " vinfo->name().text() = " << vinfo->name().text() << " vinfo->units() = " << vinfo->units() << " vinfo->long_name().text() = " << vinfo->long_name().text() << endl;
-         
-         cout << " (*it)->Discipline = " << (*it)->Discipline << " (*it)->ParmCat = " << (*it)->ParmCat << " (*it)->Parm = " << (*it)->Parm << " (*it)->ParmName = " << (*it)->ParmName << " (*it)->Center = " << (*it)->Center << " (*it)->MasterTable = " << (*it)->MasterTable << " (*it)->LocalTable = " << (*it)->LocalTable << endl;
-         
+         mlog << Debug(3) << "MetGrib2DataFile::find_record_matches - Input file GRIB2 field:"
+              << " Discipline: " << (*it)->Discipline
+              << ", ParmCat: " << (*it)->ParmCat
+              << ", Parm: " << (*it)->Parm
+              << ", ParmName: " << (*it)->ParmName
+              << ", Center: " << (*it)->Center
+              << ", MasterTable: " << (*it)->MasterTable
+              << ", LocalTable: " << (*it)->LocalTable << "\n";
+
          //  record number level type
          if( LevelType_RecNumber == vinfo_lty && is_eq(lvl1, (*it)->RecNum) ){
             rec_match_ex = true;
