@@ -957,7 +957,7 @@ TrackInfo consensus(const TrackInfoArray &tracks,
    QuadInfo   wavg;
    NumArray   plon, plat, pvmax, pmslp;
    double     lon_range, lon_shift, lon_avg;
-   double     track_spread, vmax_stdev, mslp_stdev;
+   double     track_spread, track_stdev, vmax_stdev, mslp_stdev;
    
    // Check for at least one track
    if(tracks.n() == 0) {
@@ -1082,18 +1082,15 @@ TrackInfo consensus(const TrackInfoArray &tracks,
       // Save the number of members that went into the consensus
       if(pcnt > 0) pavg.set_num_members(pcnt);
       
-      // Compute track spread and distance mean, convert to nautical-miles
-      double track_spread, dist_mean;
-      compute_gc_dist_stdev(pavg.lat(), pavg.lon(), plat, plon, track_spread, dist_mean);
+      // Compute track mean and standard deviation, convert to nautical-miles
+      compute_gc_dist_stdev(pavg.lat(), pavg.lon(), plat, plon, track_spread, track_stdev);
 
       if(!is_bad_data(track_spread)) {
-         track_spread *= tc_nautical_miles_per_km;
-         pavg.set_spread(track_spread);
+         pavg.set_track_spread(track_spread*tc_nautical_miles_per_km);
       }
 
-      if(!is_bad_data(dist_mean)) {
-         dist_mean *= tc_nautical_miles_per_km;
-         pavg.set_dist_mean(dist_mean);
+      if(!is_bad_data(track_stdev)) {
+         pavg.set_track_stdev(track_stdev*tc_nautical_miles_per_km);
       }
       
       // Compute wind-speed (v_max) and pressure (mslp) standard deviation
@@ -1132,28 +1129,20 @@ TrackInfo consensus(const TrackInfoArray &tracks,
 
 ////////////////////////////////////////////////////////////////////////
 
-void compute_gc_dist_stdev(const double lat, const double lon, const NumArray &lats, const NumArray &lons, double &spread, double &mean) {
-
-   int i, count;
+void compute_gc_dist_stdev(const double lat, const double lon,
+                           const NumArray &lats, const NumArray &lons,
+                           double &mean, double &stdev) {
    NumArray dist_na;
    
    // Loop over member lat/lon track values, calculate great-circle distance between memmber values and consensus track
-   for(i=0, count=0; i<lats.n_elements(); i++) {
-      if( is_bad_data(lats[i]) || is_bad_data(lons[i]) || is_bad_data(lat) || is_bad_data(lon) ) continue;
+   for(int i=0; i<lats.n(); i++) {
+      if(is_bad_data(lat)     || is_bad_data(lon) ||
+         is_bad_data(lats[i]) || is_bad_data(lons[i])) continue;
       dist_na.add(gc_dist(lats[i], lons[i], lat, lon));
-      count++;
    }
    
-   // Compute spread (standard-deviation of the distances)
-   // and the mean of the distnaces
-   if(count == 0) {
-      spread = bad_data_double;
-      mean = bad_data_double;
-   }
-   else {
-      spread = dist_na.stdev();
-      mean = dist_na.mean();
-   }
+   // Compute the mean and standard deviation of the distances
+   dist_na.compute_mean_stdev(mean, stdev);
    
    return;
 }

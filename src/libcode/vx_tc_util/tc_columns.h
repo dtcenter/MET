@@ -70,10 +70,8 @@ static const char * tc_mpr_cols [] = {
    "ASPEED",      "BSPEED",
    "ADEPTH",      "BDEPTH",
    "NUM_MEMBERS",
-   "TRACK_SPREAD",
-   "DIST_MEAN",
-   "MSLP_SPREAD",
-   "MAX_WIND_SPREAD"
+   "TRACK_SPREAD", "TRACK_STDEV",
+   "MSLP_STDEV",  "MAX_WIND_STDEV"
 };
 
 static const int n_tc_mpr_cols = sizeof(tc_mpr_cols)/sizeof(*tc_mpr_cols);
