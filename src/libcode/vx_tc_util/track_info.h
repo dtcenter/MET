@@ -195,6 +195,8 @@ inline void TrackInfo::set_init(const unixtime u)          { InitTime = u;      
 inline void TrackInfo::set_valid_min(const unixtime u)     { MinValidTime = u;    }
 inline void TrackInfo::set_valid_max(const unixtime u)     { MaxValidTime = u;    }
 inline void TrackInfo::set_diag_source(DiagType t)         { DiagSource = t;      }
+inline void TrackInfo::set_track_source(const char *s)     { TrackSource = s;     }
+inline void TrackInfo::set_field_source(const char *s)     { FieldSource = s;     }
 inline void TrackInfo::set_diag_name(const StringArray &s) { DiagName = s;        }
 
 inline const ConcatString & TrackInfo::storm_id()         const { return(StormId);                      }
