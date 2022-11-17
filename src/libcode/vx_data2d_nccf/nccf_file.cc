@@ -1964,9 +1964,9 @@ double get_nc_var_att_double(const NcVar *nc_var, const char *att_name, bool is_
 
 void NcCfFile::get_grid_mapping_polar_stereographic(const NcVar *grid_mapping_var)
 {
-  static const string method_name = "NcCfFile::get_grid_mapping_polar_stereographic() --> ";
   double x_coord_to_m_cf = 1.0;
   double y_coord_to_m_cf = 1.0;
+  static const string method_name = "NcCfFile::get_grid_mapping_polar_stereographic() --> ";
 
   // Get projection attributes
   // proj_origin_lat: either 90.0 or -90.0, to decide the northern/southern hemisphere
@@ -2064,21 +2064,21 @@ if (!is_eq(inverse_flattening, bad_data_double) ||
 
   if (_xDim == 0)
   {
-    mlog << Error << "\n" << method_name << " -> "
+    mlog << Error << "\n" << method_name
          << "Didn't find X dimension (projection_x_coordinate) in netCDF file.\n\n";
     exit(1);
   }
 
   if (_yDim == 0)
   {
-    mlog << Error << "\n" << method_name << " -> "
+    mlog << Error << "\n" << method_name
          << "Didn't find Y dimension (projection_y_coordinate) in netCDF file.\n\n";
     exit(1);
   }
 
   if (_xCoordVar == 0)
   {
-    mlog << Error << "\n" << method_name << " -> "
+    mlog << Error << "\n" << method_name
          << "Didn't find X coord variable (" << GET_NC_NAME_P(_xDim)
          << ") in netCDF file.\n\n";
     exit(1);
@@ -2086,7 +2086,7 @@ if (!is_eq(inverse_flattening, bad_data_double) ||
 
   if (_yCoordVar == 0)
   {
-    mlog << Error << "\n" << method_name << " -> "
+    mlog << Error << "\n" << method_name
          << "Didn't find Y coord variable (" << GET_NC_NAME_P(_yDim)
          << ") in netCDF file.\n\n";
     exit(1);
@@ -2095,7 +2095,7 @@ if (!is_eq(inverse_flattening, bad_data_double) ||
   if (get_data_size(_xCoordVar) != (int) GET_NC_SIZE_P(_xDim) ||
       get_data_size(_yCoordVar) != (int) GET_NC_SIZE_P(_yDim))
   {
-    mlog << Error << "\n" << method_name << " -> "
+    mlog << Error << "\n" << method_name
          << "Coordinate variables don't match dimension sizes in netCDF file.\n\n";
     exit(1);
   }
@@ -2107,12 +2107,12 @@ if (!is_eq(inverse_flattening, bad_data_double) ||
   ConcatString x_coord_units_name;
   const NcVarAtt *x_coord_units_att = get_nc_att(_xCoordVar, units_att_name);
   if (!get_var_units(_xCoordVar, x_coord_units_name)) {
-    mlog << Warning << "\n" << method_name << " -> "
+    mlog << Warning << "\n" << method_name
          << "Units not given for X coordinate variable -- assuming meters.\n\n";
   }
   else {
     if (0 == x_coord_units_name.length()) {
-      mlog << Warning << "\n" << method_name << " -> "
+      mlog << Warning << "\n" << method_name
            << "Cannot extract X coordinate units from netCDF file -- "
            << "assuming meters.\n\n";
     }
@@ -2121,7 +2121,7 @@ if (!is_eq(inverse_flattening, bad_data_double) ||
                 x_coord_units_name == "meters") x_coord_to_m_cf = 1.0;
       else if ( x_coord_units_name == "km") x_coord_to_m_cf = 1000.0;
       else {
-        mlog << Error << "\n" << method_name << " -> "
+        mlog << Error << "\n" << method_name
              << "The X coordinates (" << x_coord_units_name
              << ") must be in meters or kilometers for MET.\n\n";
         exit(1);
@@ -2132,12 +2132,12 @@ if (!is_eq(inverse_flattening, bad_data_double) ||
   ConcatString y_coord_units_name;
   const NcVarAtt *y_coord_units_att = get_nc_att(_yCoordVar, units_att_name);
   if (!get_var_units(_yCoordVar, y_coord_units_name)) {
-    mlog << Warning << "\n" << method_name << " -> "
+    mlog << Warning << "\n" << method_name
          << "Units not given for Y coordinate variable -- assuming meters.\n\n";
   }
   else {
     if (0 == y_coord_units_name.length()) {
-      mlog << Warning << "\n" << method_name << " -> "
+      mlog << Warning << "\n" << method_name
            << "Cannot extract Y coordinate units from netCDF file -- "
            << "assuming meters.\n\n";
     }
@@ -2146,7 +2146,7 @@ if (!is_eq(inverse_flattening, bad_data_double) ||
                 y_coord_units_name == "meters" ) y_coord_to_m_cf = 1.0;
       else if ( y_coord_units_name == "km") y_coord_to_m_cf = 1000.0;
       else {
-        mlog << Error << "\n" << method_name << " -> "
+        mlog << Error << "\n" << method_name
              << "The Y coordinates (" << y_coord_units_name
              << ") must be in meters or kilometers for MET.\n\n";
         exit(1);
@@ -2179,7 +2179,7 @@ if (!is_eq(inverse_flattening, bad_data_double) ||
 
   if (fabs(dx_m - dy_m) > DELTA_TOLERANCE && fabs(dx_m+dy_m) > DELTA_TOLERANCE)
   {
-    mlog << Error << "\n" << method_name << " -> "
+    mlog << Error << "\n" << method_name
          << "MET can only process Polar Stereographic files where the x-axis and y-axis deltas are the same.\n\n";
     exit(1);
   }
