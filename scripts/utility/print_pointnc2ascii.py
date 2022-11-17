@@ -21,7 +21,7 @@ def usage():
     print(f'            MET_point_obs_nc: NetCDF filename to read (required)')
     print(f'                --add-header: to add the header (optional, default: not included)')
     print(f'                 --use-comma: use the "comma" as separator for comma separated output (optional, default: use spaces)"')
-    print(f'          --out=out_filename: save the text into the file (optional, default: display to the scrteen)"')
+    print(f'          --out=out_filename: save the text into the file (optional, default: display to the screen)"')
     print(f'       Note: <> indicates optional arguments')
 
 def create_parser_options(parser):
