@@ -25,9 +25,9 @@ struct StereographicData {
 
    const char * name;
 
-   char hemisphere;   //  'N' or 'S'
+   char hemisphere;     //  'N' or 'S' from latitude_of_projection_origin
 
-   double scale_lat;
+   double scale_lat;    //latitude_of_projection_origin
 
    double lat_pin;
    double lon_pin;
@@ -35,11 +35,11 @@ struct StereographicData {
    double x_pin;
    double y_pin;
 
-   double lon_orient;
+   double lon_orient;   // -straight_vertical_longitude_from_pole
 
    double d_km;
 
-   double r_km;
+   double r_km;     // semi_major_axis
 
    int nx;
    int ny;
