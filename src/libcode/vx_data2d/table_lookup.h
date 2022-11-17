@@ -100,10 +100,10 @@ class Grib2TableEntry {
       int mtab_set;    // Section 1 Master Tables Version Number used by set_var
       int mtab_low;    // Section 1 Master Tables Version Number low range of tables
       int mtab_high;   // Section 1 Master Tables Version Number high range of tables
-      int cntr;        //Section 1 originating centre, used for local tables
-      int ltab;        //Section 1 Local Tables Version Number
+      int cntr;        // Section 1 Originating center, used for local tables
+      int ltab;        // Section 1 Local Tables Version Number
       int index_b;     // Section 4 Template 4.0 Parameter category
-      int index_c;     //Section 4 Template 4.0 Parameter number
+      int index_c;     // Section 4 Template 4.0 Parameter number
 
       ConcatString parm_name;
 
@@ -124,6 +124,8 @@ class Grib2TableEntry {
          //
 
       bool parse_line(const char *);
+
+      ConcatString serialize() const;
 
 };
 

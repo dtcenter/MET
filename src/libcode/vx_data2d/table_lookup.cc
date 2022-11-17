@@ -395,11 +395,11 @@ out << prefix << "Index values = ("
               << index_b << ", "
               << index_c << ")\n";
 
-out << prefix << "parm_name = " << parm_name.contents() << "\n";
+out << prefix << "ParmName = " << parm_name.contents() << "\n";
 
-out << prefix << "full_name = " << full_name.contents() << "\n";
+out << prefix << "LongName = " << full_name.contents() << "\n";
 
-out << prefix << "units     = " << units.contents()     << "\n";
+out << prefix << "Units    = " << units.contents()     << "\n";
 
 return;
 
@@ -465,6 +465,30 @@ if (units.empty()) units = na_str;
    //
 
 return ( true );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+ConcatString Grib2TableEntry::serialize() const
+
+{
+
+ConcatString cs;
+
+cs <<   "Discipline = "  << index_a
+   << ", MasterTable = " << mtab_set
+   << ", Center = "      << cntr
+   << ", LocalTable = "  << ltab
+   << ", ParmCat = "     << index_b
+   << ", Parm = "        << index_c
+   << ", ParmName = \""  << parm_name.c_str() << "\""
+   << ", LongName = \""  << full_name.c_str() << "\""
+   << ", Units = \""     << units.c_str() << "\"";
+
+return ( cs );
 
 }
 
@@ -1160,15 +1184,15 @@ bool TableFlatFile::lookup_grib1(const char * parm_name, int table_number, int c
       if( bad_data_int != table_number ) msg << ", table_number = " << table_number;
       if( bad_data_int != code         ) msg << ", code = "         << code;
       msg << "):\n";
-      mlog << Debug(3) << "\n" << msg;
+      mlog << Debug(4) << "\n" << msg;
 
       for(vector<Grib1TableEntry*>::iterator it = matches.begin();
           it < matches.end(); it++)
-         mlog << Debug(3) << "  parm_name: "     << (*it)->parm_name
+         mlog << Debug(4) << "  parm_name: "     << (*it)->parm_name
                           << ", table_number = " << (*it)->table_number
                           << ", code = "         << (*it)->code << "\n";
 
-      mlog << Debug(3) << "Using the first match found: "
+      mlog << Debug(4) << "Using the first match found: "
                        << "  parm_name: "     << e.parm_name
                        << ", table_number = " << e.table_number
                        << ", code = "         << e.code << "\n\n";
@@ -1222,19 +1246,19 @@ bool TableFlatFile::lookup_grib1(const char * parm_name, int table_number, int c
       if( bad_data_int != table_number ) msg << ", table_number = " << table_number;
       if( bad_data_int != code         ) msg << ", code = "         << code;
       msg << "):\n";
-      mlog << Debug(3) << "\n" << msg;
+      mlog << Debug(4) << "\n" << msg;
 
       for(vector<Grib1TableEntry*>::iterator it = matches.begin();
           it < matches.end(); it++)
       {
-         mlog << Debug(3) << "  parm_name: "     << (*it)->parm_name
+         mlog << Debug(4) << "  parm_name: "     << (*it)->parm_name
                           << ", table_number = " << (*it)->table_number
                           << ", code = "         << (*it)->code
                           << ", center = "       << (*it)->center
                           << ", subcenter = "    << (*it)->subcenter << "\n";
       }
 
-      mlog << Debug(3) << "Using the first match found: "
+      mlog << Debug(4) << "Using the first match found: "
                        << "  parm_name: "     << e.parm_name
                        << ", table_number = " << e.table_number
                        << ", code = "         << e.code << "\n\n";
@@ -1309,8 +1333,8 @@ bool TableFlatFile::lookup_grib2(int a, int b, int c,
       // Check master table, center, and local table
       if ( (bad_data_int != mtab && g2e[j]->mtab_low  > mtab) ||
            (bad_data_int != mtab && g2e[j]->mtab_high < mtab) ||
-           (bad_data_int != cntr && g2e[j]->cntr > 0 && g2e[j]->cntr != cntr) ||
-           (bad_data_int != ltab && g2e[j]->ltab > 0 && g2e[j]->ltab != ltab) ) continue;
+           (bad_data_int != cntr && g2e[j]->cntr != cntr)     ||
+           (bad_data_int != ltab && g2e[j]->ltab != ltab) ) continue;
 
       e = *(g2e[j]);
 
@@ -1350,20 +1374,17 @@ bool TableFlatFile::lookup_grib2(const char * parm_name, int a, int b, int c,
    
    // If there are any matches, print a descriptive message
    ConcatString msg;
-   msg << "Multiple GRIB2 table entries match lookup criteria ("
-       << "parm_name = " << parm_name;
-   if( bad_data_int != a ) msg << ", index_a = " << a;
-   if( bad_data_int != b ) msg << ", index_b = " << b;
-   if( bad_data_int != c ) msg << ", index_c = " << c;
+   msg << "Found " << n_matches << " GRIB2 table entries matching lookup criteria ("
+       << "ParmName = " << parm_name;
+   if( bad_data_int != a )    msg << ", GRIB2_disc = " << a;
+   if( bad_data_int != b )    msg << ", GRIB2_parm_cat = " << b;
+   if( bad_data_int != c )    msg << ", GRIB2_parm = " << c;
    msg << "):\n";
-   mlog << Debug(3) << "\n" << msg;
+   mlog << Debug(4) << msg;
 
    for(vector<Grib2TableEntry*>::iterator it = matches.begin();
        it < matches.end(); it++)
-      mlog << Debug(3) << "  parm_name: " << (*it)->parm_name
-           << ", index_a = "  << (*it)->index_a
-           << ", index_b = "  << (*it)->index_b
-           << ", index_c = "  << (*it)->index_c << "\n";
+      mlog << Debug(4) << "  " << (*it)->serialize() << "\n";
    
    return (n_matches > 0);
 }
@@ -1387,13 +1408,12 @@ bool TableFlatFile::lookup_grib2(const char * parm_name,
    for(int j=0; j<N_grib2_elements; ++j){
 
       if( g2e[j]->parm_name != parm_name ||
-          (bad_data_int != a    && g2e[j]->index_a != a) ||
-          (bad_data_int != b    && g2e[j]->index_b != b) ||
-          (bad_data_int != c    && g2e[j]->index_c != c) ||
-          (bad_data_int != mtab && g2e[j]->mtab_low  > mtab) ||
-          (bad_data_int != mtab && g2e[j]->mtab_high < mtab) ||
-          (bad_data_int != cntr && g2e[j]->cntr != cntr) ||
-          (bad_data_int != ltab && g2e[j]->ltab != ltab) )
+          (bad_data_int != a    && g2e[j]->index_a  != a)    ||
+          (bad_data_int != b    && g2e[j]->index_b  != b)    ||
+          (bad_data_int != c    && g2e[j]->index_c  != c)    ||
+          (bad_data_int != mtab && g2e[j]->mtab_set != mtab) ||
+          (bad_data_int != cntr && g2e[j]->cntr     != cntr) ||
+          (bad_data_int != ltab && g2e[j]->ltab     != ltab) )
          continue;
 
       if( n_matches++ == 0 ) e = *(g2e[j]);
@@ -1403,27 +1423,20 @@ bool TableFlatFile::lookup_grib2(const char * parm_name,
 
    // If there are any matches, print a descriptive message   
    ConcatString msg;
-   msg << "One or more GRIB2 table entries match lookup criteria ("
-       << "parm_name = " << parm_name;
-   if( bad_data_int != a ) msg << ", index_a = " << a;
-   if( bad_data_int != mtab ) msg << ", grib2_mtab = " << mtab;
-   if( bad_data_int != cntr ) msg << ", grib2_cntr = " << cntr;
-   if( bad_data_int != ltab ) msg << ", grib2_ltab = " << ltab;
-   if( bad_data_int != b ) msg << ", index_b = " << b;
-   if( bad_data_int != c ) msg << ", index_c = " << c;
+   msg << "Found " << n_matches << " GRIB2 table entries matching lookup criteria ("
+       << "ParmName = " << parm_name;
+   if( bad_data_int != a )    msg << ", GRIB2_disc = " << a;
+   if( bad_data_int != mtab ) msg << ", GRIB2_mtab = " << mtab;
+   if( bad_data_int != cntr ) msg << ", GRIB2_cntr = " << cntr;
+   if( bad_data_int != ltab ) msg << ", GRIB2_ltab = " << ltab;
+   if( bad_data_int != b )    msg << ", GRIB2_parm_cat = " << b;
+   if( bad_data_int != c )    msg << ", GRIB2_parm = " << c;
    msg << "):\n";
-   mlog << Debug(3) << "\n" << msg;
+   mlog << Debug(4) << msg;
 
    for(vector<Grib2TableEntry*>::iterator it = matches.begin();
        it < matches.end(); it++)
-      mlog << Debug(3) << "  parm_name: "   << (*it)->parm_name
-           << ", index_a = "    << (*it)->index_a
-           << ", grib2_mtab = " << (*it)->mtab_set
-           << ", grib2_cntr = " << (*it)->cntr
-           << ", grib2_ltab = " << (*it)->ltab
-           << ", index_b = "    << (*it)->index_b
-           << ", index_c = "    << (*it)->index_c
-           << "\n";
+      mlog << Debug(4) << "  " << (*it)->serialize() << "\n";
       
    return (n_matches > 0);
 }
