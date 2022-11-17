@@ -280,7 +280,7 @@ if __name__ == '__main__':
     options, args = create_parser_options(parser)
 
     if 0 == len(args):
-        print('" == INFO == Missing input NetCDF filename')
+        print(' == INFO == Missing input NetCDF filename')
         usage()
     else:
         if options.out_file is not None:
