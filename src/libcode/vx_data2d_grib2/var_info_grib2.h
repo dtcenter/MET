@@ -23,6 +23,7 @@
 #include "vx_util.h"
 #include "var_info.h"
 #include "data_file_type.h"
+#include "table_lookup.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -35,7 +36,7 @@ class VarInfoGrib2 : public VarInfo
          //   http://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc.shtml
          //
 
-      // QUESTION: How many of these are necessary for filtering input records?
+      Grib2TableEntry FirstTableMatch;
 
       int Record;     // Record number of interest
 
@@ -75,23 +76,25 @@ class VarInfoGrib2 : public VarInfo
          // get stuff
          //
 
-      GrdFileType file_type()   const;
-      int         record()      const;
-      int         discipline()  const;
-      int         m_table()     const;
-      int         l_table()     const;
-      int         parm_cat()    const;
-      int         parm()        const;
-      int         pdt()         const;
-      int         process()     const;
-      int         ens_type()    const;
-      int         der_type()    const;
-      int         stat_type()   const;
-      int         perc_val()    const;
+      GrdFileType     file_type()         const;
+      Grib2TableEntry first_table_match() const;
 
-      int         n_ipdtmpl()        const;
-      int         ipdtmpl_index(int) const;
-      int         ipdtmpl_val(int)   const;
+      int record()     const;
+      int discipline() const;
+      int m_table()    const;
+      int l_table()    const;
+      int parm_cat()   const;
+      int parm()       const;
+      int pdt()        const;
+      int process()    const;
+      int ens_type()   const;
+      int der_type()   const;
+      int stat_type()  const;
+      int perc_val()   const;
+
+      int n_ipdtmpl()        const;
+      int ipdtmpl_index(int) const;
+      int ipdtmpl_val(int)   const;
 
          //
          // set stuff
@@ -132,7 +135,9 @@ class VarInfoGrib2 : public VarInfo
 
 ///////////////////////////////////////////////////////////////////////////////
 
-inline GrdFileType VarInfoGrib2::file_type()  const { return(FileType_Gb2); }
+inline GrdFileType     VarInfoGrib2::file_type()         const { return(FileType_Gb2);    }
+inline Grib2TableEntry VarInfoGrib2::first_table_match() const { return(FirstTableMatch); }
+
 inline int         VarInfoGrib2::record()     const { return(Record);       }
 inline int         VarInfoGrib2::discipline() const { return(Discipline);   }
 inline int         VarInfoGrib2::m_table()    const { return(MTable);       }
@@ -145,16 +150,10 @@ inline int         VarInfoGrib2::ens_type()   const { return(EnsType);      }
 inline int         VarInfoGrib2::der_type()   const { return(DerType);      }
 inline int         VarInfoGrib2::stat_type()  const { return(StatType);     }
 inline int         VarInfoGrib2::perc_val()   const { return(PercVal);      }
-inline int         VarInfoGrib2::n_ipdtmpl()  const {
-                                    return(IPDTmplIndex.n()); }
-inline int         VarInfoGrib2::ipdtmpl_index(int i) const {
-                                    return(IPDTmplIndex[i]); }
-inline int         VarInfoGrib2::ipdtmpl_val(int i) const {
-                                    return(IPDTmplVal[i]); }
 
-///////////////////////////////////////////////////////////////////////////////
-
-
+inline int         VarInfoGrib2::n_ipdtmpl()          const { return(IPDTmplIndex.n()); }
+inline int         VarInfoGrib2::ipdtmpl_index(int i) const { return(IPDTmplIndex[i]);  }
+inline int         VarInfoGrib2::ipdtmpl_val(int i)   const { return(IPDTmplVal[i]);    }
 
 ///////////////////////////////////////////////////////////////////////////////
 

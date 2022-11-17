@@ -97,6 +97,9 @@ void VarInfoGrib2::assign(const VarInfoGrib2 &v) {
    VarInfo::assign(v);
 
    // Copy
+
+   FirstTableMatch = v.FirstTableMatch;
+
    Record     = v.Record;
    Discipline = v.Discipline;
    MTable     = v.MTable;
@@ -124,6 +127,9 @@ void VarInfoGrib2::clear() {
    VarInfo::clear();
 
    // Initialize
+
+   FirstTableMatch.clear();
+
    Record     = bad_data_int;
    Discipline = bad_data_int;
    MTable     = bad_data_int;
@@ -273,8 +279,7 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
 
    VarInfo::set_dict(dict);
 
-   int tab_match = -1;
-   Grib2TableEntry tab;
+   int n_table_matches = -1;
    ConcatString field_name = dict.lookup_string(conf_key_name,            false);
    ConcatString ens_str    = dict.lookup_string(conf_key_GRIB_ens,        false);
    int field_disc          = dict.lookup_int   (conf_key_GRIB2_disc,      false);
@@ -313,7 +318,7 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
 
       //  look up the name in the grib tables
       if( !GribTable.lookup_grib2(field_name.c_str(), field_disc, field_parm_cat, field_parm, mtab, cntr, ltab,
-                                  tab, tab_match) &&
+                                  FirstTableMatch, n_table_matches) &&
           field_name != "PROB" ){
          mlog << Error << "\nVarInfoGrib2::set_dict() -> "
               << "unrecognized GRIB2 field abbreviation '" << field_name
@@ -338,7 +343,7 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
 
       //  use the specified indexes to look up the field name
       if( !GribTable.lookup_grib2(field_disc, field_parm_cat,
-                                  field_parm, mtab, cntr, ltab, tab) ){
+                                  field_parm, mtab, cntr, ltab, FirstTableMatch) ){
          mlog << Error << "\nVarInfoGrib2::set_dict() -> "
               << "no parameter found with matching "
               << "GRIB2_disc ("     << field_disc     << ") "
@@ -350,7 +355,7 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
       }
 
       //  use the lookup parameter name
-      field_name = tab.parm_name;
+      field_name = FirstTableMatch.parm_name;
    }
 
    //  set the matched parameter lookup information
@@ -359,21 +364,17 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
    set_req_name     ( field_name.c_str()    );
    
    // Only save specific fields if we have 1 match, otherwise we will do the lookup later
-   if( field_name != "PROB" && tab_match == 1 ){
-      
-      mlog << Debug(3) << "\nVarInfoGrib2::set_dict() -> "
-           << "Found only 1 table match. Using GRIB2 fields:"
-           << " discipline: " << tab.index_a
-           << ", parm_cat: " << tab.index_b
-           << ", parm: " << tab.index_c
-           << ", units: " << tab.units.c_str()
-           << ", long_name: " << tab.full_name.c_str() << "\n";
-         
-      set_discipline( tab.index_a   );
-      set_parm_cat  ( tab.index_b   );
-      set_parm      ( tab.index_c   );
-      set_units     ( tab.units.c_str()     );
-      set_long_name ( tab.full_name.c_str() );   
+   if( field_name != "PROB" && n_table_matches == 1 ){
+
+      mlog << Debug(3) << "VarInfoGrib2::set_dict() -> "
+           << "Using single GRIB2 table match:\n"
+           << "  " << FirstTableMatch.serialize() << "\n";
+
+      set_discipline( FirstTableMatch.index_a   );
+      set_parm_cat  ( FirstTableMatch.index_b   );
+      set_parm      ( FirstTableMatch.index_c   );
+      set_units     ( FirstTableMatch.units.c_str()     );
+      set_long_name ( FirstTableMatch.full_name.c_str() );
    }
    
    //  call the parent to set the level information
@@ -404,18 +405,18 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
 
    //  look up the probability field abbreviation
    if(!GribTable.lookup_grib2(prob_name.c_str(), field_disc, field_parm_cat,
-                              field_parm, mtab, cntr, ltab, tab, tab_match)){
+                              field_parm, mtab, cntr, ltab, FirstTableMatch, n_table_matches)){
       mlog << Error << "\nVarInfoGrib2::set_dict() -> "
            << "unrecognized GRIB2 probability field abbreviation '"
            << prob_name << "'\n\n";
       exit(1);
    }
 
-   set_discipline ( tab.index_a );
-   set_parm_cat   ( tab.index_b );
-   set_parm       ( tab.index_c );
+   set_discipline ( FirstTableMatch.index_a );
+   set_parm_cat   ( FirstTableMatch.index_b );
+   set_parm       ( FirstTableMatch.index_c );
    set_p_flag     ( true        );
-   set_p_units    ( tab.units.c_str() );
+   set_p_units    ( FirstTableMatch.units.c_str() );
    set_units      ( "%" );
 
    set_prob_info_grib(prob_name, thresh_lo, thresh_hi);
