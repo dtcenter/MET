@@ -126,6 +126,13 @@ extern double st_der_func (double lat, bool is_north_hemisphere);
 
 extern double st_inv_func (double r, bool is_north_hemisphere);
 
+extern double st_eccentricity_func(double semi_major_axis, double semi_minor_axis,
+                                   double inverse_flattening);
+extern double st_sf_func(double standard_parallel, double eccentricity, bool is_north_hemisphere);
+extern bool st_lat_lon_func(double &lat, double &lon, double scale_factor,
+                            double semi_major_axis, double lonO,
+                            double east, double north, double false_east, double false_north,
+                            double eccentricity, bool is_north_hemisphere);
 
 ////////////////////////////////////////////////////////////////////////
 

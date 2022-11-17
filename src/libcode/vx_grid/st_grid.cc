@@ -1,5 +1,6 @@
 
 
+
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
@@ -656,6 +657,87 @@ return ( a );
 
 }
 
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+bool st_lat_lon_func(double &lat, double &lon, double scale_factor,
+                     double semi_major_axis, double proj_vertical_lon,
+                     double east, double north, double false_east, double false_north,
+                     double eccentricity, bool is_north_hemisphere)
+{
+
+bool result = true;
+double chi;
+double east_diff = east - false_east;
+double north_diff = north - false_north;
+double lonO_rad = proj_vertical_lon * rad_per_deg;
+double rho = sqrt(east_diff*east_diff + north_diff*north_diff);
+double t   = rho * sqrt(pow((1+eccentricity),(1+eccentricity)) * pow((1-eccentricity),(1-eccentricity)))
+             / (2*semi_major_axis*scale_factor);
+if (is_north_hemisphere) chi = M_PI/2 - 2 * atan(t);
+else chi = 2 * atan(t) - M_PI/2;
+
+lat = chi + (eccentricity*eccentricity/2 + 5*pow(eccentricity,4)/24
+      + pow(eccentricity,6)/12 + 13*pow(eccentricity,8)/360*sin(2 * chi)
+      + (7*pow(eccentricity,4)/48 + 29*pow(eccentricity,6)/240 + 811*pow(eccentricity,8)/11520)*sin(4*chi)
+      + (7*pow(eccentricity,6)/120 + 81*pow(eccentricity,8)/1120)*sin(6*chi)
+      + (4279*pow(eccentricity,8)/161280)*sin(8*chi));
+
+if (east == false_east) lon = lonO_rad;
+else if (is_north_hemisphere) lon = lonO_rad + atan2(east_diff,-north_diff);
+else lon = lonO_rad + atan2(east_diff,north_diff);
+
+lat /= rad_per_deg;
+lon /= rad_per_deg;
+
+return result;
+
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+double st_eccentricity_func(double semi_major_axis, double semi_minor_axis,
+                            double inverse_flattening)
+{
+
+double c;
+double eccentricity = bad_data_double;
+
+if (is_eq(semi_minor_axis, bad_data_double)) {
+   semi_minor_axis = semi_major_axis - semi_major_axis/inverse_flattening;
+}
+eccentricity = sqrt(semi_major_axis*semi_major_axis - semi_minor_axis*semi_minor_axis) / semi_major_axis;
+
+return ( eccentricity );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+double st_sf_func(double standard_parallel, double eccentricity, bool is_north_hemisphere)
+{
+
+double scale_factor;
+double tF, mF, temp1, temp2;
+double sp_rad = standard_parallel * rad_per_deg;
+double lat_sin = sin(sp_rad);
+double lat_cos = cos(sp_rad);
+
+temp1 = eccentricity * lat_sin;
+temp2 = pow((1 + temp1)/(1 - temp1), eccentricity/2);
+if (is_north_hemisphere) tF = tan(M_PI/4 - sp_rad/2) * temp2;
+else tF = tan(M_PI/4 + sp_rad/2) / temp2;
+mF = lat_cos / sqrt(1 - eccentricity*eccentricity * lat_sin*lat_sin);
+scale_factor = mF * sqrt(pow((1+eccentricity),(1+eccentricity)) * pow((1-eccentricity),(1-eccentricity))) / (2 * tF);
+
+return ( scale_factor );
+
+}
 
 ////////////////////////////////////////////////////////////////////////
 
