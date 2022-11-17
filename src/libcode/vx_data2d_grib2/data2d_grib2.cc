@@ -401,7 +401,7 @@ void MetGrib2DataFile::find_record_matches( VarInfoGrib2* vinfo,
 
       // if one of the parameters was not set - error
       if( is_bad_data(vinfo_ens_number) || is_bad_data(vinfo_ens_type) ){
-         mlog << Error << "\nfind_record_matches() -> "
+         mlog << Error << "\n" << method_name
               << "unrecognized GRIB_ens value '" << vinfo_ens << "' Should be '"
               << conf_key_grib_ens_hi_res_ctl << "' or '"
               << conf_key_grib_ens_low_res_ctl << "' or '+/-' followed by the number\n\n";
@@ -416,10 +416,6 @@ void MetGrib2DataFile::find_record_matches( VarInfoGrib2* vinfo,
 
       bool rec_match_ex = false;
       bool rec_match_rn = false;
-
-      // Notes to be removed
-      // match_ex = exact match
-      // match_rn = range match (range of levels)
       
       double rec_lvl1 = min((double)((*it)->LvlVal1), (double)((*it)->LvlVal2));
       double rec_lvl2 = max((double)((*it)->LvlVal1), (double)((*it)->LvlVal2));
@@ -464,15 +460,13 @@ void MetGrib2DataFile::find_record_matches( VarInfoGrib2* vinfo,
          int ens_number = (*it)->EnsNumber;
 
          // if both of ens info properties are valid in vinfo - use them to match value
-         if( !is_bad_data(vinfo_ens_number) && !is_bad_data(vinfo_ens_type)){
+         if( !is_bad_data(vinfo_ens_number) && !is_bad_data(vinfo_ens_type) ){
             ens_number = vinfo_ens_number;
             ens_type = vinfo_ens_type;
          }
 
-
-         if( (*it)->EnsNumber != ens_number || (*it)->EnsType != ens_type){
-            continue;
-         }
+         if( (*it)->EnsNumber != ens_number ||
+             (*it)->EnsType   != ens_type ) continue;
       }
 
       //  test for a record number match
@@ -481,18 +475,16 @@ void MetGrib2DataFile::find_record_matches( VarInfoGrib2* vinfo,
       }
 
       //  test for an index or field name match
-      else if(
-               ( vinfo->discipline() == (*it)->Discipline &&
-                 vinfo->parm_cat()   == (*it)->ParmCat    &&
-                 vinfo->parm()       == (*it)->Parm       ) ||
-               vinfo->name().text()  == (*it)->ParmName
-             ){
+      else if( ( vinfo->discipline()      == (*it)->Discipline &&
+                 vinfo->parm_cat()        == (*it)->ParmCat    &&
+                 vinfo->parm()            == (*it)->Parm          ) ||
+               ( vinfo->req_name().text() == (*it)->ParmName ) ){
 
          //  test the level type number, if specified
          if ( !is_bad_data(vinfo->level().type_num()) &&
               vinfo->level().type_num() != (*it)->LvlTyp ){
 
-            mlog << Debug(4)
+            mlog << Debug(4) << method_name
                  << "For GRIB2 record number " << (*it)->RecNum
                  << ", the requested level type (" << vinfo->level().type_num()
                  << ") does not match the current level type ("
@@ -500,15 +492,6 @@ void MetGrib2DataFile::find_record_matches( VarInfoGrib2* vinfo,
 
             continue;
          }
-         
-         mlog << Debug(3) << "MetGrib2DataFile::find_record_matches - Input file GRIB2 field:"
-              << " Discipline: " << (*it)->Discipline
-              << ", ParmCat: " << (*it)->ParmCat
-              << ", Parm: " << (*it)->Parm
-              << ", ParmName: " << (*it)->ParmName
-              << ", Center: " << (*it)->Center
-              << ", MasterTable: " << (*it)->MasterTable
-              << ", LocalTable: " << (*it)->LocalTable << "\n";
 
          //  record number level type
          if( LevelType_RecNumber == vinfo_lty && is_eq(lvl1, (*it)->RecNum) ){
@@ -574,35 +557,34 @@ void MetGrib2DataFile::find_record_matches( VarInfoGrib2* vinfo,
 
          } // end if match for probabilistic field
 
-         // If units are empty (which indicates we did not have an exact match from the grib2 table)
-         // Then use the input data fields to do an additional grib2 table look and set Discipline, ParmCat, Parm, Units and LongName
+         //  empty units indicates that there are multiple GRIB2 table matches
          Grib2TableEntry tab;
          if( (rec_match_ex || rec_match_rn) && vinfo->units().empty() ) {
-            
-            if( !GribTable.lookup_grib2((*it)->Discipline, (*it)->ParmCat, (*it)->Parm,
-                                        (*it)->MasterTable, (*it)->Center, (*it)->LocalTable, tab) ){
-               
-               mlog << Error << "MetGrib2DataFile::find_record_matches - unrecognized GRIB2 from input file, can't find grib2 table match "
-                    << "field indicies - discipline: " << (*it)->Discipline << ", parm cat: " << (*it)->ParmCat
-                    << ", parm: " << (*it)->Parm << ", master table: " << (*it)->MasterTable
-                    << ", center: " << (*it)->Center << ", local table: " << (*it)->LocalTable << "\n";
-               
-               exit(1);
-               
-            } else {
 
-               mlog << Debug(3) << "MetGrib2DataFile::find_record_matches - Found exact GRIB2 table match using input data fields. "
-                    << "Using GRIB2 fields:: discipline: " << tab.index_a << ", parm_cat: " << tab.index_b
-                    << ", parm: " << tab.index_c << ", units: " << tab.units.c_str() << ", long_name: " << tab.full_name.c_str() << "\n";
-               
-               vinfo->set_discipline(tab.index_a);
-               vinfo->set_parm_cat(tab.index_b);
-               vinfo->set_parm(tab.index_c);
-               vinfo->set_units(tab.units.c_str());
-               vinfo->set_long_name(tab.full_name.c_str());
+            //  look for an exact GRIB2 table match using the parameters of the current GRIB2 record
+            if( GribTable.lookup_grib2((*it)->Discipline, (*it)->ParmCat, (*it)->Parm,
+                                       (*it)->MasterTable, (*it)->Center, (*it)->LocalTable, tab) ) {
+               mlog << Debug(4) << method_name
+                    << "For GRIB2 record " << (*it)->RecNum
+                    << ", using exact GRIB2 table match:\n"
+                    << "  " << tab.serialize() << "\n";
             }
-            
-         } // end if match but unis are missing
+            //  otherwise use to the first table match found previously
+            else {
+               tab = vinfo->first_table_match();
+               mlog << Debug(4) << method_name
+                    << "For GRIB2 record " << (*it)->RecNum
+                    << ", using partial GRIB2 table match:\n"
+                    << "  " << tab.serialize() << "\n";
+            }
+
+            vinfo->set_discipline(tab.index_a);
+            vinfo->set_parm_cat(tab.index_b);
+            vinfo->set_parm(tab.index_c);
+            vinfo->set_units(tab.units.c_str());
+            vinfo->set_long_name(tab.full_name.c_str());
+
+         } // end if match but units are missing
          
       }  //  END: else if( parameter match )
 
