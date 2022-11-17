@@ -28,6 +28,8 @@ def create_parser_options(parser):
             action="store_true", default=False, help=" Add header (default: not include header)")
     parser.add_option("--use-comma", "--use_comma", dest="use_comma",
             action="store_true", default=False, help=" Use comma as separator (default: False)")
+    parser.add_option("-o", "--out", dest="out_file",
+            default=None, help=" Save into the file (default: False)")
     return parser.parse_args()
 
 
@@ -63,6 +65,13 @@ class met_nc_point_obs():
     def get_dim_size(self, nc_group, dim_name):
         nc_dim = nc_group.dimensions.get(dim_name, None)
         return 0 if nc_dim is None else nc_dim.size
+
+    def get_max_string_length(self, str_list):
+        str_len = 0;
+        for str_value in str_list:
+            if len(str_value) > str_len:
+                str_len = len(str_value)
+        return str_len
 
     def get_nc_var_string_data(self, nc_group, var_name):
         nc_var = nc_group.variables.get(var_name, None)
@@ -109,7 +118,7 @@ class met_nc_point_obs():
         self.obs_qty_table = self.get_nc_var_string_data(nc_group, 'obs_qty_table') # (nobs_qty, mxstr) string
         self.obs_var_table = self.get_nc_var_string_data(nc_group, 'obs_var') # (nobs_var, mxstr2) string, required if self.use_var_id is True
 
-    def dump(self, show_header=True, use_comma=False):
+    def dump(self, out_handler, show_header=True, use_comma=False):
         hdr_typ = self.hdr_zero if 0 == self.nhdr_typ else self.hdr_typ
         hdr_sid = self.hdr_zero if 0 == self.nhdr_sid else self.hdr_sid
         if use_comma:
@@ -144,24 +153,40 @@ class met_nc_point_obs():
 
         if show_header:
             if use_comma:
-                print(f'#msg_type,station_id,valid_time,lat,lon,elv,var_name/gc,level,height,qty,value')
+                self.out_data(out_handler, f'#msg_type,station_id,valid_time,lat,lon,elv,var_name/gc,level,height,qty,value')
             else:
-                print(f'#msg_type s_id valid_time  lat  lon  elv  var_name/gc  level  height  qty  value')
+                self.out_data(out_handler, f'#msg_type s_id valid_time  lat  lon  elv  var_name/gc  level  height  qty  value')
+
+        hdr_typ_len = self.get_max_string_length(self.hdr_typ_table)
+        hdr_sid_len = self.get_max_string_length(self.hdr_sid_table)
+        hdr_lat_len = self.get_max_string_length(hdr_lat)
+        hdr_lon_len = self.get_max_string_length(hdr_lon)
+        hdr_elv_len = self.get_max_string_length(hdr_elv)
+
+        obs_lvl_len = self.get_max_string_length(obs_lvl)
+        obs_hgt_len = self.get_max_string_length(obs_hgt)
+        obs_val_len = self.get_max_string_length(obs_val)
+
+        var_name_len = self.get_max_string_length(self.obs_var_table)
+        obs_qty_len = self.get_max_string_length(self.obs_qty_table)
 
         for obs_data in [list(i) for i in zip(obs_vid, obs_lvl, obs_hgt, obs_qty, obs_val, self.obs_hid)]:
             header_arr = headers[obs_data[-1]]
             if use_comma:
-                print(f'"{self.hdr_typ_table[header_arr[0]]}",'
+                self.out_data(out_handler,
+                      f'"{self.hdr_typ_table[header_arr[0]]}",'
                       f'"{self.hdr_sid_table[header_arr[1]]}",'
                       f'"{self.hdr_vld_table[header_arr[2]]}",'
                       f'{header_arr[3]},{header_arr[4]},{header_arr[5]},'
                       f'{obs_data[0]},{obs_data[1]},{obs_data[2]},{obs_data[3]},{obs_data[4]}')
             else:
-                print(f'{self.hdr_typ_table[header_arr[0]]} '
-                      f'{self.hdr_sid_table[header_arr[1]]} '
+                self.out_data(out_handler,
+                      f'{self.hdr_typ_table[header_arr[0]]:<{hdr_typ_len}s} '
+                      f'{self.hdr_sid_table[header_arr[1]]:<{hdr_sid_len}s} '
                       f'{self.hdr_vld_table[header_arr[2]]} '
-                      f'{header_arr[3]} {header_arr[4]} {header_arr[5]} '
-                      f'{obs_data[0]:4} {obs_data[1]} {obs_data[2]} {obs_data[3]} {obs_data[4]}')
+                      f'{header_arr[3]:>{hdr_lat_len}s} {header_arr[4]:>{hdr_lon_len}s} {header_arr[5]:>{hdr_elv_len}s} '
+                      f'{obs_data[0]:<{var_name_len}s} {obs_data[1]:>{obs_lvl_len}s} '
+                      f'{obs_data[2]:>{obs_hgt_len}s} {obs_data[3]:>{obs_qty_len}s} {obs_data[4]:>{obs_val_len}s}')
 
     def is_all_int(self, value_array):
         all_int = True
@@ -190,13 +215,21 @@ class met_nc_point_obs():
                 if use_comma:
                     str_array = [ '"NA"' if np.ma.is_masked(i) else f'{i:.2f}' for i in value_array ]
                 else:
-                    str_array = [ 'NA' if np.ma.is_masked(i) else f'{i:8.2f}' for i in value_array ]
+                    str_array = [ 'NA' if np.ma.is_masked(i) else f'{i:.2f}' for i in value_array ]
             else:
                 if use_comma:
                     str_array = [ '"NA"' if np.ma.is_masked(i) else f'{i:.4f}' for i in value_array ]
                 else:
-                    str_array = [ 'NA' if np.ma.is_masked(i) else f'{i:8.4f}' for i in value_array ]
+                    str_array = [ 'NA' if np.ma.is_masked(i) else f'{i:.4f}' for i in value_array ]
         return str_array
+
+    def out_data(self, out_filehandler, line_buf):
+        if out_filehandler is not None:
+            out_filehandler.write(line_buf)
+            out_filehandler.write('\n')
+        else:
+            print(line_buf)
+
 
 if __name__ == '__main__':
     usage_str = "%prog [options]"
@@ -207,6 +240,10 @@ if __name__ == '__main__':
         print('" == INFO == Missing input NetCDF filename')
         usage()
     else:
+        if options.out_file is not None:
+            out_handler = open(options.out_file, 'w')
+        else:
+            out_handler = None
         met_nc_data = met_nc_point_obs()
         for nc_name in args:
             if not path.exists(nc_name):
@@ -217,5 +254,9 @@ if __name__ == '__main__':
                 continue
 
             met_nc_data.read_data(nc_name)
-            met_nc_data.dump(options.add_header, options.use_comma)
+            met_nc_data.dump(out_handler, options.add_header, options.use_comma)
             print()
+
+        if out_handler is not None:
+            out_handler.close()
+            print(f'Saved to {options.out_file}')
