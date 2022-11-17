@@ -17,10 +17,11 @@ import numpy as np
 from netCDF4 import Dataset
 
 def usage():
-    print(f'Usage: python3 print_nc2ascii.py MET_point_obs_nc <--hide-header> <--use-comma>')
+    print(f'Usage: python3 print_nc2ascii.py MET_point_obs_nc <--hide-header> <--use-comma> <--out=out_filename>')
     print(f'            MET_point_obs_nc: NetCDF filename to read (required)')
     print(f'                --add-header: to add the header (optional, default: not included)')
     print(f'                 --use-comma: use the "comma" as separator for comma separated output (optional, default: use spaces)"')
+    print(f'          --out=out_filename: save the text into the file (optional, default: display to the scrteen)"')
     print(f'       Note: <> indicates optional arguments')
 
 def create_parser_options(parser):
@@ -29,7 +30,7 @@ def create_parser_options(parser):
     parser.add_option("--use-comma", "--use_comma", dest="use_comma",
             action="store_true", default=False, help=" Use comma as separator (default: False)")
     parser.add_option("-o", "--out", dest="out_file",
-            default=None, help=" Save into the file (default: False)")
+            default=None, help=" Save the text into the file (default: False)")
     return parser.parse_args()
 
 
