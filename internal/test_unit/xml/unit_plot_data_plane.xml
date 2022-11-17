@@ -522,7 +522,7 @@
     </output>
   </test>
 
-  <test name="plot_data_plane_NCCF_POLAR_ELLIPSIDAL">
+  <test name="plot_data_plane_NCCF_POLAR_ELLIPSOIDAL">
     <exec>&MET_BIN;/plot_data_plane</exec>
     <param> \
       &DATA_DIR_MODEL;/nccf/NSIDC0081_SEAICE_PS_N25km_20220723_v2.0.nc \
