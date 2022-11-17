@@ -1186,4 +1186,4 @@ For how to use the script, issue the command:
 
 .. code-block:: none
 
-   python3 MET_BASE/shared/met/utility/print_pointnc2ascii.py
+   python3 MET_BASE/shared/met/utility/print_pointnc2ascii.py -h
