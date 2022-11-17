@@ -53,7 +53,7 @@ static const char var_lon_nt[] = "tlon";
 static ConcatString x_dim_var_name;
 static ConcatString y_dim_var_name;
 
-static double get_nc_var_att_double(const NcVar *nc_var, const char *att_name);
+static double get_nc_var_att_double(const NcVar *nc_var, const char *att_name, bool is_required=true);
 
 #define USE_BUFFER  1
 
@@ -1938,16 +1938,19 @@ void NcCfFile::get_grid_mapping_orthographic(const NcVar *grid_mapping_var)
 ////////////////////////////////////////////////////////////////////////
 
 
-double get_nc_var_att_double(const NcVar *nc_var, const char *att_name)
+double get_nc_var_att_double(const NcVar *nc_var, const char *att_name, bool is_required)
 {
    NcVarAtt *nc_att = get_nc_att(nc_var, (string)att_name);
 
    if(IS_INVALID_NC_P(nc_att))
    {
-      mlog << Error << "\nget_nc_var_att_double() -> "
-           << "Cannot get \"" << att_name << "\" from "
-           << GET_NC_NAME_P(nc_var) << " variable.\n\n";
-      exit(1);
+      if (is_required) {
+         mlog << Error << "\nget_nc_var_att_double() -> "
+              << "Cannot get \"" << att_name << "\" from "
+              << GET_NC_NAME_P(nc_var) << " variable.\n\n";
+         exit(1);
+      }
+      else return bad_data_double;
    }
    double att_val = get_att_value_double(nc_att);
    if (nc_att) delete nc_att;
@@ -1966,34 +1969,43 @@ void NcCfFile::get_grid_mapping_polar_stereographic(const NcVar *grid_mapping_va
   double y_coord_to_m_cf = 1.0;
 
   // Get projection attributes
-  const char *att_name_lon = "longitude_of_projection_origin";
-
-  double proj_origin_lat =
-            get_nc_var_att_double(grid_mapping_var,
-                              "latitude_of_projection_origin");
-  double proj_origin_lon = has_att((NcVar *)grid_mapping_var, att_name_lon)
-            ? get_nc_var_att_double(grid_mapping_var, att_name_lon)
-            : has_att((NcVar *)grid_mapping_var, "longitude_of_prime_meridian")
-              ? get_nc_var_att_double(grid_mapping_var, "longitude_of_prime_meridian")
-              : bad_data_double;
-  double proj_vertical_lon =
-            get_nc_var_att_double(grid_mapping_var,
-                              "straight_vertical_longitude_from_pole");
-  double proj_origin_scale_factor =
-            get_nc_var_att_double(grid_mapping_var, "scale_factor_at_projection_origin");
+  // proj_origin_lat: either 90.0 or -90.0, to decide the northern/southern hemisphere
+  bool is_spherical_earch = true;
+  double proj_origin_lat = get_nc_var_att_double(
+                grid_mapping_var, "latitude_of_projection_origin");
+  double proj_vertical_lon = get_nc_var_att_double(
+                grid_mapping_var, "straight_vertical_longitude_from_pole");
+  double proj_origin_lon = get_nc_var_att_double(
+                grid_mapping_var, "longitude_of_projection_origin", false);
+  double proj_standard_parallel = get_nc_var_att_double(
+                grid_mapping_var, "standard_parallel", false);
+  double proj_origin_scale_factor = get_nc_var_att_double(
+                grid_mapping_var, "scale_factor_at_projection_origin", false);
+  double semi_major_axis = get_nc_var_att_double(
+                grid_mapping_var, "semi_major_axis", false);
+  double semi_minor_axis = get_nc_var_att_double(
+                grid_mapping_var, "semi_minor_axis", false);
+  double inverse_flattening = get_nc_var_att_double(
+                grid_mapping_var, "inverse_flattening", false);
+  bool has_scale_factor = !is_eq(proj_origin_scale_factor, bad_data_double);
+  bool has_standard_parallel = !is_eq(proj_standard_parallel, bad_data_double);
 
   // Check that the scale factor at the origin is 1.
 
-  if(is_eq(proj_origin_lon, bad_data_double)) {
-    mlog << Error << "\n" << method_name << " -> "
-         << "The attribute \"" << att_name_lon << "\" of the "
-         << GET_NC_NAME_P(grid_mapping_var) << " variable does not exist.\n\n";
+if (!is_eq(inverse_flattening, bad_data_double) ||
+    (!is_eq(semi_minor_axis, bad_data_double) && !is_eq(semi_minor_axis,semi_major_axis))) {
+    is_spherical_earch = false;
+    mlog << Warning << "\n" << method_name
+         << "This is an ellipsoidal earth which is not fully supported.\n\n";
+  }
+  else if(!has_scale_factor && !has_standard_parallel) {
+    mlog << Error << "\n" << method_name
+         << "The attribute \"scale_factor_at_projection_origin\" and \"standard_parallel\" of the "
+         << GET_NC_NAME_P(grid_mapping_var) << " variable do not exist.\n\n";
     exit(1);
   }
-
-  if(!is_eq(proj_origin_scale_factor, 1.0))
-  {
-    mlog << Error << "\n" << method_name << " -> "
+  else if(has_scale_factor && !is_eq(proj_origin_scale_factor, 1.0)) {
+    mlog << Error << "\n" << method_name
          << "Unexpected attribute value of " << proj_origin_scale_factor
          << " for the scale_factor_at_projection_origin attribute of the "
          << GET_NC_NAME_P(grid_mapping_var) << " variable.\n\n";
@@ -2172,6 +2184,9 @@ void NcCfFile::get_grid_mapping_polar_stereographic(const NcVar *grid_mapping_va
     exit(1);
   }
 
+  if (is_eq(semi_major_axis, bad_data_double)) semi_major_axis = 6371.20;
+  else semi_major_axis /= x_coord_to_m_cf; // meter to km
+
   // Calculate the pin indices.  The pin will be located at the grid's reference
   // location since that's the only lat/lon location we know about.
 
@@ -2183,16 +2198,42 @@ void NcCfFile::get_grid_mapping_polar_stereographic(const NcVar *grid_mapping_va
   StereographicData data;
   data.name = stereographic_proj_type;
   data.lat_pin = proj_origin_lat;
-  data.lon_pin = -1.0 * proj_origin_lon;
-  data.hemisphere = (data.lat_pin > 0 ? 'N' : 'S');
+  data.lon_pin = -1.0 * (is_eq(proj_origin_lon, bad_data_double) ? 0 : proj_origin_lon);
+  data.hemisphere = (proj_origin_lat > 0 ? 'N' : 'S');
   data.x_pin = x_pin;
   data.y_pin = y_pin;
   data.scale_lat = proj_origin_lat;
   data.lon_orient = -1.0 * proj_vertical_lon;
   data.d_km = dx_m / 1000.0;
-  data.r_km = 6371.20;
+  data.r_km = semi_major_axis;
   data.nx = _xDim->getSize();
   data.ny = _yDim->getSize();
+
+  if(!has_scale_factor && has_standard_parallel) {
+    double east, north;
+    double lat, lon, scale_factor;
+    double eccentricity = 0;
+    double false_east = get_nc_var_att_double(grid_mapping_var, "false_east", false);
+    double false_north = get_nc_var_att_double(grid_mapping_var, "false_north", false);
+    bool is_north_hemisphere = proj_origin_lat > 0;
+
+    if (is_eq(false_east, bad_data_double)) false_east = 0.;
+    if (is_eq(false_north, bad_data_double)) false_north = 0.;
+    if(!is_spherical_earch) eccentricity = st_eccentricity_func(semi_major_axis, semi_minor_axis,
+                                                                inverse_flattening);
+    east = (dx_m > 0) ? x_values[0] : x_values[x_counts-1];
+    north = (dy_m > 0) ? y_values[0] : y_values[y_counts-1];
+    scale_factor = st_sf_func(proj_standard_parallel, eccentricity, is_north_hemisphere);
+    st_lat_lon_func(lat, lon, scale_factor, semi_major_axis, proj_vertical_lon,
+                    east/x_coord_to_m_cf, north/y_coord_to_m_cf,
+                    false_east, false_north, eccentricity, is_north_hemisphere);
+
+    data.x_pin = 0.;
+    data.y_pin = 0.;
+    data.lat_pin = lat;
+    data.lon_pin = -lon;
+    data.scale_lat = proj_standard_parallel;   //60.0;
+  }
 
   grid.set(data);
   if (dy_m < 0) grid.set_swap_to_north(true);
