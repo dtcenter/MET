@@ -62,6 +62,82 @@ class met_nc_point_obs():
     EPSILON2_L = 0.0025
     EPSILON2_U = 0.9996
  
+    def dump(self, out_handler, show_header=True, use_comma=False):
+        hdr_typ = self.hdr_zero if 0 == self.nhdr_typ else self.hdr_typ
+        hdr_sid = self.hdr_zero if 0 == self.nhdr_sid else self.hdr_sid
+        hdr_lat, hdr_lat_len = self.formated_num_array(self.hdr_lat, use_comma)
+        hdr_lon, hdr_lon_len = self.formated_num_array(self.hdr_lon, use_comma)
+        hdr_elv, hdr_elv_len = self.formated_num_array(self.hdr_elv, use_comma)
+        headers = [list(i) for i in zip(hdr_typ, hdr_sid, self.hdr_vld, hdr_lat, hdr_lon, hdr_elv)]
+
+        obs_lvl, obs_lvl_len = self.formated_num_array(self.obs_lvl, use_comma)
+        obs_hgt, obs_hgt_len = self.formated_num_array(self.obs_hgt, use_comma)
+        if use_comma:
+            obs_qty = [ '"NA"' if np.ma.is_masked(i) else f'"{self.obs_qty_table[i]}"' for i in self.obs_qty ]
+            obs_vid = [ f'"{self.obs_var_table[i]}"' if self.use_var_id else f'"{i}"' for i in self.obs_vid ]
+        else:
+            obs_qty = [ 'NA' if np.ma.is_masked(i) else f'{self.obs_qty_table[i]}' for i in self.obs_qty ]
+            obs_vid = [ f'{self.obs_var_table[i]}' if self.use_var_id else f'{i:3}' for i in self.obs_vid ]
+
+        if self.is_all_int(self.obs_val):
+            obs_val = [ f'{i:.0f}' for i in self.obs_val ]
+        else:
+            obs_precision = self.get_precision(self.obs_val)
+            obs_val = [ f'{i:.1f}' if abs((i*10)-int(i*10)) < 0.000001 else
+                        f'{i:.1f}' if abs((i*10)-int(i*10)) > 0.999998 else
+                        f'{i:.2f}' if abs((i*100)-int(i*100)) < 0.000001 else
+                        f'{i:.2f}' if abs((i*100)-int(i*100)) > 0.999998 else
+                        f'{i:.3f}' if abs((i*1000)-int(i*1000)) < 0.000001 else
+                        f'{i:.3f}' if abs((i*1000)-int(i*1000)) > 0.999998 else
+                        f'{i:.{obs_precision}f}' for i in self.obs_val ]
+
+            for i in range(0, len(obs_val)):
+                v = obs_val[i]
+                v1 = v.split('.')
+                if len(v1) > 1:
+                    pad_len = obs_precision - len(v1[-1])
+                    obs_val[i] = self.pad(v, pad_len)
+
+        hdr_typ_len = self.get_max_string_length(self.hdr_typ_table)
+        hdr_sid_len = self.get_max_string_length(self.hdr_sid_table)
+        obs_val_len = self.get_max_string_length(obs_val)
+        obs_qty_len = self.get_max_string_length(self.obs_qty_table)
+        var_name_len = self.get_max_string_length(self.obs_var_table)
+
+        if show_header:
+            if use_comma:
+                self.out_data(out_handler, f'#msg_type,station_id,valid_time,lat,lon,elv,var_name/gc,level,height,qty,value')
+            else:
+                self.out_data(out_handler, f'#msg_type s_id valid_time  lat  lon  elv  var_name/gc  level  height  qty  value')
+
+        for obs_data in [list(i) for i in zip(obs_vid, obs_lvl, obs_hgt, obs_qty, obs_val, self.obs_hid)]:
+            header_arr = headers[obs_data[-1]]
+            if use_comma:
+                self.out_data(out_handler,
+                      f'"{self.hdr_typ_table[header_arr[0]]}",'
+                      f'"{self.hdr_sid_table[header_arr[1]]}",'
+                      f'"{self.hdr_vld_table[header_arr[2]]}",'
+                      f'{header_arr[3]},{header_arr[4]},{header_arr[5]},'
+                      f'{obs_data[0]},{obs_data[1]},{obs_data[2]},{obs_data[3]},{obs_data[4]}')
+            else:
+                self.out_data(out_handler,
+                      f'{self.hdr_typ_table[header_arr[0]]:<{hdr_typ_len}s} '
+                      f'{self.hdr_sid_table[header_arr[1]]:<{hdr_sid_len}s} '
+                      f'{self.hdr_vld_table[header_arr[2]]} '
+                      f'{header_arr[3]:>{hdr_lat_len}s} {header_arr[4]:>{hdr_lon_len}s} {header_arr[5]:>{hdr_elv_len}s} '
+                      f'{obs_data[0]:<{var_name_len}s} {obs_data[1]:>{obs_lvl_len}s} '
+                      f'{obs_data[2]:>{obs_hgt_len}s} {obs_data[3]:>{obs_qty_len}s} {obs_data[4]:>{obs_val_len}s}')
+
+    def formated_num_array(self, value_array, use_comma):
+        if self.is_all_int(value_array):
+            str_array = [ f'{i:.0f}' for i in value_array ]
+        else:
+            na_str = '"NA"' if use_comma else 'NA'
+            format_digits = 2 if self.is_2_digit_precision(value_array) else 4
+            str_array = [ na_str if np.ma.is_masked(i) else f'{i:.{format_digits}f}' for i in value_array ]
+        max_len = self.get_max_string_length(str_array)
+        return str_array, max_len
+
     def get_dim_size(self, nc_group, dim_name):
         nc_dim = nc_group.dimensions.get(dim_name, None)
         return 0 if nc_dim is None else nc_dim.size
@@ -77,8 +153,86 @@ class met_nc_point_obs():
         nc_var = nc_group.variables.get(var_name, None)
         return ['NA'] if nc_var is None else nc_tools.get_string_array(nc_group, var_name)
 
+    def get_precision(self, data_list):
+        precision = 0
+        for v in data_list:
+            if abs((v*10)-int(v*10)) < 0.000001 or abs((v*10)-int(v*10)) > 0.999998:
+                if precision < 1:
+                    precision = 1
+            elif abs((v*100)-int(v*100)) < 0.000001 or abs((v*100)-int(v*100)) > 0.999998:
+                if precision < 2:
+                    precision = 2
+            elif abs((v*1000)-int(v*1000)) < 0.000001 or abs((v*1000)-int(v*1000)) > 0.999998:
+                if precision < 3:
+                    precision = 3
+            elif abs(v*100000000-int(v*100000000)) > 0.:
+                precision = 8
+                break
+            elif abs(v*10000000-int(v*10000000)) > 0.:
+                if precision < 7:
+                    precision = 7
+            elif abs(v*1000000-int(v*1000000)) > 0.:
+                if precision < 6:
+                    precision = 6
+            elif abs(v*100000-int(v*100000)) > 0.:
+                if precision < 5:
+                    precision = 5
+            elif abs(v*10000-int(v*10000)) > 0.:
+                if precision < 4:
+                    precision = 4
+            elif abs(v*1000-int(v*1000)) > 0.:
+                if precision < 3:
+                    precision = 3
+            elif abs(v*100-int(v*100)) > 0.:
+                if precision < 2:
+                    precision = 2
+        return precision
+
+    def is_2_digit_precision(self, value_array):
+        result = True
+        for a_value in value_array:
+            if np.ma.is_masked(a_value):
+                continue
+            if self.EPSILON2_L < abs(a_value*100-int(a_value*100)) < self.EPSILON2_U:
+                if abs(a_value*10-int(a_value*10)) < self.EPSILON2_U:   # to filter x.x9996
+                    result = False
+                    break
+        return result
+
+    def is_all_int(self, value_array):
+        all_int = True
+        for a_value in value_array:
+            if np.ma.is_masked(a_value) or not self.is_integer(a_value):
+                all_int = False
+                break
+        return all_int
+
     def is_integer(self, value):
         return (abs(value - int(value)) < self.EPSILON_L) or (abs(value - int(value)) < self.EPSILON_U)
+
+    def out_data(self, out_filehandler, line_buf):
+        if out_filehandler is not None:
+            out_filehandler.write(line_buf)
+            out_filehandler.write('\n')
+        else:
+            print(line_buf)
+
+    def pad(self, v, pad_len):
+        if pad_len == 1:
+            v = f'{v}0'
+        elif pad_len == 2:
+            v = f'{v}00'
+        elif pad_len == 3:
+            v = f'{v}000'
+        elif pad_len == 4:
+            v = f'{v}0000'
+        elif pad_len == 5:
+            v = f'{v}00000'
+        elif pad_len == 6:
+            v = f'{v}000000'
+        elif pad_len == 7:
+            v = f'{v}0000000'
+        return v
 
     def read_data(self, met_nc_name):
         nc_group = Dataset(met_nc_name, "r")
@@ -117,118 +271,6 @@ class met_nc_point_obs():
         self.obs_val = nc_tools.get_num_array(nc_group, 'obs_val')  # (nobs) float
         self.obs_qty_table = self.get_nc_var_string_data(nc_group, 'obs_qty_table') # (nobs_qty, mxstr) string
         self.obs_var_table = self.get_nc_var_string_data(nc_group, 'obs_var') # (nobs_var, mxstr2) string, required if self.use_var_id is True
-
-    def dump(self, out_handler, show_header=True, use_comma=False):
-        hdr_typ = self.hdr_zero if 0 == self.nhdr_typ else self.hdr_typ
-        hdr_sid = self.hdr_zero if 0 == self.nhdr_sid else self.hdr_sid
-        if use_comma:
-            hdr_lat = [ f'{i:.0f}' if self.is_integer(i) else f'{i:.4f}' for i in self.hdr_lat ]
-            hdr_lon = [ f'{i:.0f}' if self.is_integer(i) else f'{i:.4f}' for i in self.hdr_lon ]
-        else:
-            hdr_lat = self.formated_num_array(self.hdr_lat, use_comma)
-            hdr_lon = self.formated_num_array(self.hdr_lon, use_comma)
-        hdr_elv = self.formated_num_array(self.hdr_elv, use_comma)
-        headers = [list(i) for i in zip(hdr_typ, hdr_sid, self.hdr_vld, hdr_lat, hdr_lon, hdr_elv)]
-
-        obs_lvl = self.formated_num_array(self.obs_lvl, use_comma)
-        obs_hgt = self.formated_num_array(self.obs_hgt, use_comma)
-        if use_comma:
-            obs_qty = [ '"NA"' if np.ma.is_masked(i) else f'"{self.obs_qty_table[i]}"' for i in self.obs_qty ]
-            obs_vid = [ f'"{self.obs_var_table[i]}"' if self.use_var_id else f'"{i}"' for i in self.obs_vid ]
-        else:
-            obs_qty = [ 'NA' if np.ma.is_masked(i) else f'{self.obs_qty_table[i]}' for i in self.obs_qty ]
-            obs_vid = [ f'{self.obs_var_table[i]}' if self.use_var_id else f'{i:3}' for i in self.obs_vid ]
-        obs_val = [ f'{i:.2f}' if (i == 0) else
-                    f'{i:.8f}' if (abs(i) < 0.00001) else
-                    f'{i:.6f}' if (abs(i) < 0.001) else
-                    f'{i:.3f}' if (abs(i) < 0.01 and abs((i*1000)-int(i*1000)) < 0.0000001) else
-                    f'{i:.3f}' if (abs(i) < 0.01 and abs((i*1000)-int(i*1000)) > 0.999998) else
-                    f'{i:.5f}' if (abs(i) < 0.01) else
-                    f'{i:.2f}' if (abs(i) < 0.1 and abs((i*100)-int(i*100)) < 0.0000001) else
-                    f'{i:.2f}' if (abs(i) < 0.1 and abs((i*100)-int(i*100)) > 0.999998) else
-                    f'{i:.4f}' if (abs(i) < 0.1) else
-                    f'{i:.2f}' if (abs(i*100 - int(i*100))   < 0.00009) else
-                    f'{i:.2f}' if (abs(i*100 - int(i*100))   > 0.99877) else
-                    f'{i:.4f}' for i in self.obs_val ]
-
-        if show_header:
-            if use_comma:
-                self.out_data(out_handler, f'#msg_type,station_id,valid_time,lat,lon,elv,var_name/gc,level,height,qty,value')
-            else:
-                self.out_data(out_handler, f'#msg_type s_id valid_time  lat  lon  elv  var_name/gc  level  height  qty  value')
-
-        hdr_typ_len = self.get_max_string_length(self.hdr_typ_table)
-        hdr_sid_len = self.get_max_string_length(self.hdr_sid_table)
-        hdr_lat_len = self.get_max_string_length(hdr_lat)
-        hdr_lon_len = self.get_max_string_length(hdr_lon)
-        hdr_elv_len = self.get_max_string_length(hdr_elv)
-
-        obs_lvl_len = self.get_max_string_length(obs_lvl)
-        obs_hgt_len = self.get_max_string_length(obs_hgt)
-        obs_val_len = self.get_max_string_length(obs_val)
-
-        var_name_len = self.get_max_string_length(self.obs_var_table)
-        obs_qty_len = self.get_max_string_length(self.obs_qty_table)
-
-        for obs_data in [list(i) for i in zip(obs_vid, obs_lvl, obs_hgt, obs_qty, obs_val, self.obs_hid)]:
-            header_arr = headers[obs_data[-1]]
-            if use_comma:
-                self.out_data(out_handler,
-                      f'"{self.hdr_typ_table[header_arr[0]]}",'
-                      f'"{self.hdr_sid_table[header_arr[1]]}",'
-                      f'"{self.hdr_vld_table[header_arr[2]]}",'
-                      f'{header_arr[3]},{header_arr[4]},{header_arr[5]},'
-                      f'{obs_data[0]},{obs_data[1]},{obs_data[2]},{obs_data[3]},{obs_data[4]}')
-            else:
-                self.out_data(out_handler,
-                      f'{self.hdr_typ_table[header_arr[0]]:<{hdr_typ_len}s} '
-                      f'{self.hdr_sid_table[header_arr[1]]:<{hdr_sid_len}s} '
-                      f'{self.hdr_vld_table[header_arr[2]]} '
-                      f'{header_arr[3]:>{hdr_lat_len}s} {header_arr[4]:>{hdr_lon_len}s} {header_arr[5]:>{hdr_elv_len}s} '
-                      f'{obs_data[0]:<{var_name_len}s} {obs_data[1]:>{obs_lvl_len}s} '
-                      f'{obs_data[2]:>{obs_hgt_len}s} {obs_data[3]:>{obs_qty_len}s} {obs_data[4]:>{obs_val_len}s}')
-
-    def is_all_int(self, value_array):
-        all_int = True
-        for a_value in value_array:
-            if np.ma.is_masked(a_value) or not self.is_integer(a_value):
-                all_int = False
-                break
-        return all_int
-
-    def is_2_digit_precision(self, value_array):
-        result = True
-        for a_value in value_array:
-            if np.ma.is_masked(a_value):
-                continue
-            if self.EPSILON2_L < abs(a_value*100-int(a_value*100)) < self.EPSILON2_U:
-                if abs(a_value*10-int(a_value*10)) < self.EPSILON2_U:   # to filter x.x9996
-                    result = False
-                    break
-        return result
-
-    def formated_num_array(self, value_array, use_comma):
-        if self.is_all_int(value_array):
-            str_array = [ f'{i:.0f}' for i in value_array ] if use_comma else [ f'{i:5.0f}' for i in value_array ]
-        else:
-            if self.is_2_digit_precision(value_array):
-                if use_comma:
-                    str_array = [ '"NA"' if np.ma.is_masked(i) else f'{i:.2f}' for i in value_array ]
-                else:
-                    str_array = [ 'NA' if np.ma.is_masked(i) else f'{i:.2f}' for i in value_array ]
-            else:
-                if use_comma:
-                    str_array = [ '"NA"' if np.ma.is_masked(i) else f'{i:.4f}' for i in value_array ]
-                else:
-                    str_array = [ 'NA' if np.ma.is_masked(i) else f'{i:.4f}' for i in value_array ]
-        return str_array
-
-    def out_data(self, out_filehandler, line_buf):
-        if out_filehandler is not None:
-            out_filehandler.write(line_buf)
-            out_filehandler.write('\n')
-        else:
-            print(line_buf)
 
 
 if __name__ == '__main__':
