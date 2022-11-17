@@ -131,6 +131,7 @@ class PointStatVxOpt {
 
       StringArray     mpr_sa;             // MPR column names
       ThreshArray     mpr_ta;             // MPR column thresholds
+      SingleThresh    seeps_p1_thresh;    // SEESP p1 threshold
 
       // Vector of MaskLatLon objects defining Lat/Lon Point masks
       vector<MaskLatLon> mask_llpnt;

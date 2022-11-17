@@ -69,6 +69,7 @@ PairDataPoint & PairDataPoint::operator=(const PairDataPoint &pd) {
 void PairDataPoint::init_from_scratch() {
 
    seeps_mpr.clear();
+   seeps.clear();
    clear();
    seeps_climo = get_seeps_climo();
 
@@ -86,7 +87,7 @@ void PairDataPoint::clear() {
       if (seeps_mpr[idx]) delete seeps_mpr[idx];
    }
    seeps_mpr.clear();
-   seeps.init();
+   seeps.clear();
 
    return;
 }
@@ -175,6 +176,12 @@ bool PairDataPoint::add_point_pair(const char *sid, double lat, double lon,
    seeps_mpr.push_back((SeepsScore *)NULL);
 
    return(true);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void PairDataPoint::set_seeps_thresh(const SingleThresh &p1_thresh) {
+   seeps_climo->set_p1_thresh(p1_thresh);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1459,6 +1466,18 @@ void VxPairDataPoint::set_obs_perc_value(int percentile) {
    }
 
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void VxPairDataPoint::set_seeps_thresh(const SingleThresh &p1_thresh) {
+   for(int i=0; i < n_msg_typ; i++){
+      for(int j=0; j < n_mask; j++){
+         for(int k=0; k < n_interp; k++){
+            pd[i][j][k].set_seeps_thresh(p1_thresh);
+         }
+      }
+   }
 }
 
 ////////////////////////////////////////////////////////////////////////

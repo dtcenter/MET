@@ -33,6 +33,16 @@ struct ConsensusInfo {
 
 ////////////////////////////////////////////////////////////////////////
 
+struct DiagInfo {
+   ConcatString TrackSource;
+   ConcatString FieldSource;
+   StringArray  MatchToTrack;
+   StringArray  DiagName;
+   void clear();
+};
+
+////////////////////////////////////////////////////////////////////////
+
 class TCPairsConfInfo {
 
    private:
@@ -111,11 +121,11 @@ class TCPairsConfInfo {
       // Watch/warnings time offset
       int WatchWarnOffset;
 
-      // Diagnostics to be extracted
-      StringArray DiagName;
+      // Diagnostics metadata
+      std::map<ConcatString,DiagInfo> DiagInfoMap;
 
       // Diagnostic conversions
-      std::map< DiagType, std::map<ConcatString,UserFunc_1Arg> > DiagConvertMap;
+      std::map< ConcatString,std::map<ConcatString,UserFunc_1Arg> > DiagConvertMap;
 
       // Basin Map
       std::map<ConcatString,ConcatString> BasinMap;

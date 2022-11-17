@@ -59,7 +59,9 @@ static const int i_vcnt   = 19;
 
 static const int i_dmap   = 20;
 
-static const int n_txt    = 21;
+static const int i_seeps  = 21;
+
+static const int n_txt    = 22;
 
 // Text file type
 static const STATLineType txt_file_type[n_txt] = {
@@ -90,7 +92,8 @@ static const STATLineType txt_file_type[n_txt] = {
 
    stat_grad,       //  18
    stat_vcnt,       //  19
-   stat_dmap        //  20
+   stat_dmap,       //  20
+   stat_seeps       //  21
 
 };
 
@@ -158,6 +161,8 @@ class GridStatVxOpt {
       ThreshArray      fwind_ta;         // fcst wind speed thresholds
       ThreshArray      owind_ta;         // obs wind speed thresholds
       SetLogic         wind_logic;       // wind speed field logic
+
+      SingleThresh     seeps_p1_thresh;    // SEESP p1 threshold
 
       StringArray      mask_grid;        // Masking grid strings
       StringArray      mask_poly;        // Masking polyline strings
