@@ -250,54 +250,29 @@ The Ensemble-Stat, Series-Analysis, and MTD tools support the use of file lists 
 Python Embedding for Point Observations
 =======================================
 
-The ASCII2NC tool supports the "-format python" option. With this option, point observations may be passed as input. An example of this is provided in :numref:`ascii2nc-pyembed`. That example uses the **read_ascii_point.py** sample script which is included with the MET code. It reads ASCII data in MET's 11-column point observation format and stores it in a Pandas dataframe to be read by the ASCII2NC tool with Python.
+The ASCII2NC tool supports the "-format python" option. With this option, point observations may be passed as input. An example of this is shown below:
 
-The **read_ascii_point.py** sample script can be found in:
+.. code-block:: none
+
+                ascii2nc -format python \
+                "MET_BASE/python/read_ascii_point.py sample_ascii_obs.txt" \
+                sample_ascii_obs_python.nc
+
+The Point2Grid, Plot-Point-Obs, Ensemble-Stat, and Point-Stat tools also process point observations. They support POython embedding of point observations directly on the command line by replacing the input MET NetCDF point observation file name with the Python command to be run. The Python command must begin with the prefix 'PYTHON_NUMPY=' and be followed by the path to the User's Python script and any arguments. The full command should be enclosed in single quotes to prevent embedded whitespace from causing parsing errors. An example of this is shown below:
+
+.. code-block:: none
+
+                plot_point_obs \
+                "PYTHON_NUMPY=MET_BASE/python/read_ascii_point.py sample_ascii_obs.txt" \
+                output_image.ps
+
+Both of the above examples use the **read_ascii_point.py** sample script which is included with the MET code. It reads ASCII data in MET's 11-column point observation format and stores it in a Pandas DataFrame to be read by the MET tools using Python embedding for point data. The **read_ascii_point.py** sample script can be found in:
 
 • MET installation directory in *MET_BASE/python*.
 
 • `MET GitHub repository <https://github.com/dtcenter/MET>`_ in *met/scripts/python*.
 
-The Point2Grid, Plot-Point-Obs, Ensemble-Stat, and Point-Stat tools also process point observations. They support python embedding of point observations directly on the command line by replacing the input MET NetCDF point observation file name with the python command to be run. The command must begin with the prefix 'PYTHON_NUMPY=' and be followed by the path to python script and any arguments. The full command should be enclosed in single quotes to prevent embedded whitespace from causing parsing errors. The customized python script is expected to extend MET_BASE/python/met_point_obs.py. That script creates a python variable named **met_point_data** which is a dictionary containing formatted point observation data.
-
-.. code-block:: none
-
-  met_point_data = {
-
-     'use_var_id':  True/False,     # obs_vid are variable index if True, otherwise GRIB codes
-
-     # Header data
-     'nhdr':        integer_value,  # number of headers
-     'pbhdr':       integer_value,  # number of PREPBUFR specific headers
-     'nhdr_typ':    integer_value,  # number of message types
-     'nhdr_sid':    integer_value,  # number of station IDs
-     'nhdr_vld':    integer_value,  # number of valid times
-     'hdr_typ':     nympy_integer_array,    # index of message type
-     'hdr_sid':     nympy_integer_array,    # index of station ID
-     'hdr_vld':     nympy_integer_array,    # index of valid time
-     'hdr_lat':     nympy_float_array,      # latitude
-     'hdr_lon':     nympy_float_array,      # longitude
-     'hdr_elv':     nympy_float_array,      # station elevation
-     'hdr_typ_table':   string_value,       # message types
-     'hdr_sid_table':   string_value,       # station IDs
-     'hdr_vld_table':   string_value,       # valid times "yyyymmdd_hhmmss"
-     'hdr_prpt_typ':    nympy_integer_array,   # optional
-     'hdr_irpt_typ':    nympy_integer_array,   # optional
-     'hdr_inst_typ':    nympy_integer_array,   # optional
-
-     # Observation data
-     'nobs':       integer_value,       # number of observation
-     'nobs_qty':   integer_value        # number of quality marks
-     'nobs_var':   integer_value        # number of variable names
-     'obs_qty':    nympy_integer_array, # index of quality mark
-     'obs_hid':    nympy_integer_array, # index of header
-     'obs_vid':    nympy_integer_array, # index of veriable or GRIB code
-     'obs_lvl':    nympy_float_array,   # pressure level
-     'obs_hgt':    nympy_float_array,   # height of observation data
-     'obs_val'     nympy_float_array,   # observatin value
-     'obs_qty_table':  string_array,    # quality marks
-     'obs_var_table':  string_array,    # variable names
-  }
+.. _pyembed-mpr-data:
 
 Python Embedding for MPR data
 =============================
