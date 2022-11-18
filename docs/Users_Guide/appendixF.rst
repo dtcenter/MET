@@ -258,8 +258,6 @@ The ASCII2NC tool supports the "-format python" option. With this option, point 
                 "MET_BASE/python/read_ascii_point.py sample_ascii_obs.txt" \
                 sample_ascii_obs_python.nc
 
-The example uses the **read_ascii_point.py** sample script which is included with the MET code. It reads ASCII data in MET's 11-column point observation format and stores it in a Pandas DataFrame to be read by the ASCII2NC tool with Python.
-
 The Point2Grid, Plot-Point-Obs, Ensemble-Stat, and Point-Stat tools also process point observations. They support POython embedding of point observations directly on the command line by replacing the input MET NetCDF point observation file name with the Python command to be run. The Python command must begin with the prefix 'PYTHON_NUMPY=' and be followed by the path to the User's Python script and any arguments. The full command should be enclosed in single quotes to prevent embedded whitespace from causing parsing errors. An example of this is shown below:
 
 .. code-block:: none
