@@ -1171,4 +1171,19 @@ The configuration option listed above is common to many MET tools and are descri
 This entry is an array of dictionaries, each containing a **GRIB code** string and mathcing **variable name** string which define a mapping of GRIB code to the output variable names.
 
 
+Point NetCDF to ASCII Python Utility
+====================================
 
+As a tool for debugging, a utility script called print_pointnc2ascii.py is included for users. This script reads the MET point NetCDF file format and returns an ASCII representation to the screen, with either space or comma delimiting. Optionally, the user can request that the output be written to a file.
+
+The script can be found at:
+
+.. code-block:: none
+
+   MET_BASE/shared/met/utility/print_pointnc2ascii.py
+
+For how to use the script, issue the command:
+
+.. code-block:: none
+
+   python3 MET_BASE/shared/met/utility/print_pointnc2ascii.py -h

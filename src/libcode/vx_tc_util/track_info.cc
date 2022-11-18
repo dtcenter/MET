@@ -92,6 +92,8 @@ void TrackInfo::clear() {
    MinWarmCore     = (unixtime) 0;
    MaxWarmCore     = (unixtime) 0;
    DiagSource      = DiagType_None;
+   TrackSource.clear();
+   FieldSource.clear();
    DiagName.clear();
    TrackLines.clear();
 
@@ -133,6 +135,8 @@ void TrackInfo::dump(ostream &out, int indent_depth) const {
    out << prefix << "MinWarmCore     = \"" << (MinWarmCore  > 0 ? unix_to_yyyymmdd_hhmmss(MinWarmCore).text()  : na_str) << "\n";
    out << prefix << "MaxWarmCore     = \"" << (MaxWarmCore  > 0 ? unix_to_yyyymmdd_hhmmss(MaxWarmCore).text()  : na_str) << "\n";
    out << prefix << "DiagSource      = " << diagtype_to_string(DiagSource) << "\n";
+   out << prefix << "TrackSource     = " << TrackSource.contents() << "\n";
+   out << prefix << "FieldSource     = " << FieldSource.contents() << "\n";
    out << prefix << "NDiag           = " << DiagName.n() << "\n";
    out << prefix << "NPoints         = " << NPoints << "\n";
    out << prefix << "NAlloc          = " << NAlloc << "\n";
@@ -172,6 +176,8 @@ ConcatString TrackInfo::serialize() const {
      << ", MinWarmCore = " << (MinWarmCore > 0 ? unix_to_yyyymmdd_hhmmss(MinWarmCore).text() : na_str)
      << ", MaxWarmCore = " << (MaxWarmCore > 0 ? unix_to_yyyymmdd_hhmmss(MaxWarmCore).text() : na_str)
      << ", DiagSource = " << diagtype_to_string(DiagSource)
+     << ", TrackSource = " << TrackSource.contents()
+     << ", FieldSource = " << FieldSource.contents()
      << ", NDiag = " << DiagName.n()
      << ", NPoints = " << NPoints
      << ", NAlloc = " << NAlloc
@@ -223,6 +229,8 @@ void TrackInfo::assign(const TrackInfo &t) {
    MinWarmCore     = t.MinWarmCore;
    MaxWarmCore     = t.MaxWarmCore;
    DiagSource      = t.DiagSource;
+   TrackSource     = t.TrackSource;
+   FieldSource     = t.FieldSource;
    DiagName        = t.DiagName;
    TrackLines      = t.TrackLines;
 
@@ -534,8 +542,10 @@ bool TrackInfo::add_diag_data(DiagFile &diag_file, const StringArray &req_diag_n
       InitTime != diag_file.init()     ||
       !diag_file.technique().has(Technique)) return(false);
 
-   // Store the diagnostic source
-   DiagSource = diag_file.source();
+   // Store the diagnostic metadata
+   DiagSource  = diag_file.diag_source();
+   TrackSource = diag_file.track_source();
+   FieldSource = diag_file.field_source();
 
    // If empty, store all diagnostics
    bool store_all_diag = (req_diag_name.n() == 0 ? true : false);
@@ -563,12 +573,21 @@ bool TrackInfo::add_diag_data(DiagFile &diag_file, const StringArray &req_diag_n
          if(i_name == 0) {
             if(!is_eq(diag_file.lat(i_time), Point[i_pnt].lat()) ||
                !is_eq(diag_file.lon(i_time), Point[i_pnt].lon())) {
-               mlog << Warning << "\nTrackInfo::add_diag_data() -> "
-                    << "the " << StormId << " " << Technique << " " << unix_to_yyyymmddhh(InitTime)
+               ConcatString cs;
+               cs << "The " << StormId << " " << Technique << " " << unix_to_yyyymmddhh(InitTime)
                     << " lead time " << sec_to_timestring(diag_file.lead(i_time))
                     << " track location (" << Point[i_pnt].lat() << ", "
-                    << Point[i_pnt].lon() << ") does not match the diagnostic location ("
-                    << diag_file.lat(i_time) << ", " << diag_file.lon(i_time) << ")\n";
+                    << Point[i_pnt].lon() << ") does not match the "
+                    << diagtype_to_string(DiagSource) << " diagnostic location ("
+                    << diag_file.lat(i_time) << ", " << diag_file.lon(i_time) << ")";
+
+               // Print a warning if the TrackSource and Technique match
+               if(TrackSource == Technique) {
+                  mlog << Warning << "\nTrackInfo::add_diag_data() -> " << cs << "\n\n";
+               }
+               else {
+                  mlog << Debug(4) << cs << "\n";
+               }
             }
          }
 

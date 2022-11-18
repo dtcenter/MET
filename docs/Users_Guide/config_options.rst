@@ -1456,6 +1456,14 @@ In this way, the number of bins impacts the resolution of the climatological
 probabilities. These derived probability values are used to compute the
 climatological Brier Score and Brier Skill Score.
 
+
+The "seeps_p1_thresh" option controls the threshold of p1 (probability of being dry) values.
+
+.. code-block:: none
+		
+  seeps_p1_thresh = >=0.1&&<=0.85;
+
+
 mask_missing_flag
 ^^^^^^^^^^^^^^^^^
 
