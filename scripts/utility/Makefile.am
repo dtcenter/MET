@@ -16,32 +16,18 @@
 ## Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 ## MA 02110-1301, USA.
 
-SUBDIRS = include
+# SUBDIRS = include
 
-## NOTE: some Rscripts use the path MET_BASE. ie. plot_tcmpr.R
-## MET_BASE = $(prefix)/share/met, which is $(pkddatadir)
-## If you want to install outside of MET_BASE you
-## will need to update the R scripts.
 
 ## Example of how to Install outside of $(pkgdatadir)
 ## scriptsrootdir = $(prefix)/share/scripts
-## rscriptsdir = ${scriptsrootdir}/Rscripts
+## pythonutilitydir = ${scriptsrootdir}/utility
 
-rscriptsdir = $(pkgdatadir)/Rscripts
+pythonutilitydir = $(pkgdatadir)/utility
 
-rscripts_DATA = \
-	gspairs2mpr.R \
-	mode_nc_inventory.R \
-	mode_quilt_plot.R \
-	mode_summary.R \
-	plot_cnt.R \
-	plot_mpr.R \
-	plot_ensemble.R \
-	plot_probri.R \
-	plot_tcmpr.R \
-	trmm2nc.R \
-	trmmbin2nc.R
+pythonutility_DATA = \
+	print_pointnc2ascii.py
 
-EXTRA_DIST = ${rscripts_DATA}
+EXTRA_DIST = ${pythonutility_DATA}
 
 MAINTAINERCLEANFILES 	= Makefile.in
