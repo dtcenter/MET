@@ -226,15 +226,17 @@ void LaeaData::dump() const
 
 mlog << Debug(grid_debug_level)
      << "\nLaea Grid Data:\n"
-     << "    geoid: " << geoid   << "\n"
-     << "    lat_1: " << lat_1   << "\n"
-     << "    lon_1: " << lon_1   << "\n"
-     << "  lat_std: " << lat_std << "\n"
-     << "  lon_cen: " << lon_cen << "\n"
-     << "     dx_m: " << dx_m    << "\n"
-     << "     dy_m: " << dy_m    << "\n"
-     << "       nx: " << nx      << "\n"
-     << "       ny: " << ny      << "\n\n";
+     << "    geoid: " << geoid << "\n"
+     << "   lat_LL: " << lat_LL << "\n"
+     << "   lon_LL: " << lon_LL << "\n"
+     << "   lat_UL: " << lat_UL << "\n"
+     << "   lon_UL: " << lon_UL << "\n"
+     << "   lat_LR: " << lat_LR << "\n"
+     << "   lon_LR: " << lon_LR << "\n"
+     << " lat_pole: " << lat_pole << "\n"
+     << " lon_pole: " << lon_pole << "\n"
+     << "       nx: " << nx << "\n"
+     << "       ny: " << ny << "\n\n";
 
 }
 
@@ -242,23 +244,25 @@ mlog << Debug(grid_debug_level)
 ////////////////////////////////////////////////////////////////////////
 
 
-void LaeaCornerData::dump() const
+void LaeaGrib2Data::dump() const
 
 {
 
 mlog << Debug(grid_debug_level)
-     << "\nLaea Corner Grid Data:\n"
-     << "    geoid: " << geoid << "\n"
-     << "   lat_ll: " << lat_ll << "\n"
-     << "   lon_ll: " << lon_ll << "\n"
-     << "   lat_ul: " << lat_ul << "\n"
-     << "   lon_ul: " << lon_ul << "\n"
-     << "   lat_lr: " << lat_lr << "\n"
-     << "   lon_lr: " << lon_lr << "\n"
-     << " lat_pole: " << lat_pole << "\n"
-     << " lon_pole: " << lon_pole << "\n"
-     << "       nx: " << nx << "\n"
-     << "       ny: " << ny << "\n\n";
+     << "\nLaea Grid Data:\n"
+     << "        spheroid_name: " << spheroid_name             << "\n"
+     << "            radius_km: " << radius_km                 << "\n"
+     << " equatorial_radius_km: " << equatorial_radius_km      << "\n"
+     << "      polar_radius_km: " << polar_radius_km           << "\n"
+     << "            lat_first: " << lat_first                 << "\n"
+     << "            lon_first: " << lon_first                 << "\n"
+     << "         standard_lat: " << standard_lat              << "\n"
+     << "          central_lon: " << central_lon               << "\n"
+     << "                dx_km: " << dx_km                     << "\n"
+     << "                dy_km: " << dy_km                     << "\n"
+     << "                   nx: " << nx                        << "\n"
+     << "                   ny: " << ny                        << "\n"
+     << "            is_sphere: " << bool_to_string(is_sphere) << "\n\n";
 
 }
 
@@ -356,7 +360,7 @@ m   = (const MercatorData *)      0;
 g   = (const GaussianData *)      0;
 gi  = (const GoesImagerData *)    0;
 la  = (const LaeaData *)          0;
-cl  = (const LaeaCornerData *)    0;
+lg  = (const LaeaGrib2Data *)     0;
 tc  = (const TcrmwData *)         0;
 sl  = (const SemiLatLonData *)    0;
 
@@ -382,7 +386,7 @@ if ( m   )  { delete m;    m   = (const MercatorData *)      0; };
 if ( g   )  { delete g;    g   = (const GaussianData *)      0; };
 if ( gi  )  { delete gi;   gi  = (const GoesImagerData *)    0; };
 if ( la  )  { delete la;   la  = (const LaeaData *)          0; };
-if ( cl  )  { delete cl;   cl  = (const LaeaCornerData *)    0; };
+if ( lg  )  { delete lg;   lg  = (const LaeaGrib2Data *)     0; };
 if ( tc  )  { delete tc;   tc  = (const TcrmwData *)         0; };
 if ( sl  )  { delete sl;   sl  = (const SemiLatLonData *)    0; };
 
@@ -406,7 +410,7 @@ if ( info.m   )  set( *(info.m )  );
 if ( info.g   )  set( *(info.g )  );
 if ( info.gi  )  set( *(info.gi ) );
 if ( info.la  )  set( *(info.la ) );
-if ( info.cl  )  set( *(info.cl ) );
+if ( info.lg  )  set( *(info.lg ) );
 if ( info.sl  )  set( *(info.sl ) );
 
 return;
@@ -431,6 +435,7 @@ if ( m   ) ++count;
 if ( g   ) ++count;
 if ( gi  ) ++count;
 if ( la  ) ++count;
+if ( lg  ) ++count;
 if ( sl  ) ++count;
 
 return ( count == 1 );
@@ -461,6 +466,7 @@ else if ( m   )  gg.set( *m   );
 else if ( g   )  gg.set( *g   );
 else if ( gi  )  gg.set( *gi  );
 else if ( la  )  gg.set( *la  );
+else if ( lg  )  gg.set( *lg  );
 else if ( sl  )  gg.set( *sl  );
 
 return;
@@ -647,19 +653,19 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void GridInfo::set(const LaeaCornerData & data)
+void GridInfo::set(const LaeaGrib2Data & grib2_data)
 
 {
 
 clear();
 
-LaeaCornerData * D = (LaeaCornerData *) 0;
+LaeaGrib2Data * D = (LaeaGrib2Data *) 0;
 
-D = new LaeaCornerData;
+D = new LaeaGrib2Data;
 
-memcpy(D, &data, sizeof(data));
+memcpy(D, &grib2_data, sizeof(grib2_data));
 
-cl = D;  D = (LaeaCornerData *) 0;
+lg = D;  D = (LaeaGrib2Data *) 0;
 
 return;
 
@@ -1344,7 +1350,7 @@ else if ( i1.m   && i2.m   )  return ( is_eq(i1.m,   i2.m  ) );
 else if ( i1.g   && i2.g   )  return ( is_eq(i1.g,   i2.g  ) );
 else if ( i1.gi  && i2.gi  )  return ( is_eq(i1.gi,  i2.gi ) );
 else if ( i1.la  && i2.la  )  return ( is_eq(i1.la,  i2.la ) );
-else if ( i1.cl  && i2.cl  )  return ( is_eq(i1.cl,  i2.cl ) );
+else if ( i1.lg  && i2.lg  )  return ( is_eq(i1.lg,  i2.lg ) );
 else if ( i1.sl  && i2.sl  )  return ( is_eq(i1.sl,  i2.sl ) );
 
 return ( false );
@@ -1559,16 +1565,17 @@ if ( !g1 || !g2 )  return ( false );
 
 bool status = false;
 
-if ( g1->lat_1 == g2->lat_1 &&
-     is_eq  (rescale_lon(g1->lon_1),
-             rescale_lon(g2->lon_1), loose_tol) &&
-     g1->lat_std == g2->lat_std &&
-     is_eq  (rescale_lon(g1->lon_cen),
-             rescale_lon(g2->lon_cen), loose_tol) &&
-     g1->dx_m == g2->dx_m &&
-     g1->dy_m == g2->dy_m &&
-     g1->nx   == g2->nx   &&
-     g1->ny   == g2->ny )  status = true;
+if ( g1->lat_LL == g2->lat_LL &&
+     g1->lat_UL == g2->lat_UL &&
+     g1->lat_LR == g2->lat_LR &&
+     is_eq  (rescale_lon(g1->lon_LL),
+             rescale_lon(g2->lon_LL), loose_tol) &&
+     is_eq  (rescale_lon(g1->lon_UL),
+             rescale_lon(g2->lon_UL), loose_tol) &&
+     is_eq  (rescale_lon(g1->lon_LR),
+             rescale_lon(g2->lon_LR), loose_tol) &&
+     g1->nx  == g2->nx                           &&
+     g1->ny  == g2->ny )  status = true;
 
 return ( status );
 
@@ -1578,7 +1585,7 @@ return ( status );
 ////////////////////////////////////////////////////////////////////////
 
 
-bool is_eq(const LaeaCornerData * g1, const LaeaCornerData * g2)
+bool is_eq(const LaeaGrib2Data * g1, const LaeaGrib2Data * g2)
 
 {
 
@@ -1586,17 +1593,20 @@ if ( !g1 || !g2 )  return ( false );
 
 bool status = false;
 
-if ( g1->lat_ll == g2->lat_ll &&
-     g1->lat_ul == g2->lat_ul &&
-     g1->lat_lr == g2->lat_lr &&
-     is_eq  (rescale_lon(g1->lon_ll),
-             rescale_lon(g2->lon_ll), loose_tol) &&
-     is_eq  (rescale_lon(g1->lon_ul),
-             rescale_lon(g2->lon_ul), loose_tol) &&
-     is_eq  (rescale_lon(g1->lon_lr),
-             rescale_lon(g2->lon_lr), loose_tol) &&
-     g1->nx  == g2->nx                           &&
-     g1->ny  == g2->ny )  status = true;
+if ( g1->radius_km            == g2->radius_km &&
+     g1->equatorial_radius_km == g2->equatorial_radius_km &&
+     g1->polar_radius_km      == g2->polar_radius_km &&
+     g1->lat_first            == g2->lat_first &&
+     is_eq (rescale_lon(g1->lon_first),
+            rescale_lon(g2->lon_first), loose_tol) &&
+     g1->standard_lat         == g2->standard_lat &&
+     is_eq (rescale_lon(g1->central_lon),
+            rescale_lon(g2->central_lon), loose_tol) &&
+     g1->dx_km                == g2->dx_km &&
+     g1->dy_km                == g2->dy_km &&
+     g1->nx                   == g2->nx &&
+     g1->ny                   == g2->ny &&
+     g1->is_sphere            == g2->is_sphere )  status = true;
 
 return ( status );
 

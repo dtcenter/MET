@@ -22,8 +22,9 @@ using namespace std;
 
 #include "vx_math.h"
 #include "vx_util.h"
-#include "vx_log.h"
+#include "vx_geodesy.h"
 
+// JHG #include "grid_xml_keywords.h"
 #include "laea_grid.h"
 #include "latlon_xyz.h"
 
@@ -31,17 +32,7 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-static void laea_reduce(double & angle);
-
 static double laea_segment_area(double u0, double v0, double u1, double v1);
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-static double laea_r(double lat_deg);
-
-static double laea_r_inv(double r);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -83,17 +74,18 @@ LaeaGrid::LaeaGrid(const LaeaData & data)
 
 {
 
-// TODO: this is just stubbed in.
-// Need to add logic from Randy Bullock to actually support this grid.
-
 clear();
+
+UseGrib2Data = false;
+
+memset(&Grib2Data, 0, sizeof(Grib2Data));
+Data = data;
 
 Nx = data.nx;
 Ny = data.ny;
-
+ 
 Name = data.name;
-
-Data = data;
+SpheroidName = data.geoid;
 
 if ( strcmp(data.geoid, "WGS_84") == 0 )  {
 
@@ -118,35 +110,56 @@ calc_aff();
 ////////////////////////////////////////////////////////////////////////
 
 
-LaeaGrid::LaeaGrid(const LaeaCornerData & corner_data)
+LaeaGrid::LaeaGrid(const LaeaGrib2Data & grib2_data)
 
 {
 
 clear();
 
-Nx = corner_data.nx;
-Ny = corner_data.ny;
- 
-Name = corner_data.name;
+UseGrib2Data = true;
 
-CornerData = corner_data;
+memset(&Data, 0, sizeof(Data));
+Grib2Data = grib2_data;
 
-if ( strcmp(corner_data.geoid, "WGS_84") == 0 )  {
+Data.lat_LL = grib2_data.lat_first;
+Data.lon_LL = grib2_data.lon_first;
 
-   geoid.set_ab(6378.137, 6356.752);
+Data.lat_pole = grib2_data.standard_lat;
+Data.lon_pole = grib2_data.central_lon;
 
-   geoid.set_name("WGS_84");
+Name = grib2_data.name;
+SpheroidName = grib2_data.spheroid_name;
+Grib2Data.spheroid_name = SpheroidName.c_str();
 
-} else {
+Nx = grib2_data.nx;
+Ny = grib2_data.ny;
 
-   mlog << Error << "\nLaeaGrid::LaeaGrid(const LaeaCornerData &) -> "
-        << "unrecognized geoid ... \"" << corner_data.geoid << "\"\n\n";
+geoid.set_ab(grib2_data.equatorial_radius_km, grib2_data.polar_radius_km);
 
-   exit ( 1 );
+geoid.set_name(grib2_data.spheroid_name);
 
-}
+// aff.set_mb(1.0, 0.0, 0.0, 1.0, 1.0, 1.0);
+// aff.set_mb(2.0, 0.0, 0.0, 2.0, 1.0, 1.0);
 
-calc_aff();
+double s = 1.0;
+
+aff.set_mb(s, 0.0, 0.0, s, 1.0, 1.0);
+
+// aff.set_mb(grib2_data.dx_km, 0.0, 0.0, grib2_data.dy_km, 1.0, 1.0);
+
+double xx, yy;
+
+// latlon_to_xy(Data.lat_pole, Data.lon_pole, xx, yy);
+// aff.set_pin(xx, yy, 0.5*(Nx - 1.0), 0.5*(Ny - 1.0));
+
+latlon_to_xy(grib2_data.lat_first, grib2_data.lon_first, xx, yy);
+aff.set_pin(xx, yy, 0.0, 0.0);
+
+   //
+   //  done
+   //
+
+return;
 
 }
 
@@ -158,34 +171,38 @@ void LaeaGrid::calc_aff()
 
 {
 
-double u_ll, v_ll;
-double u_lr, v_lr;
-double u_ul, v_ul;
+double u_LL, v_LL;
+double u_LR, v_LR;
+double u_UL, v_UL;
 
-double x_ll, y_ll;
-double x_lr, y_lr;
-double x_ul, y_ul;
-
-
-snyder_latlon_to_xy(CornerData.lat_ll, CornerData.lon_ll, u_ll, v_ll);
-snyder_latlon_to_xy(CornerData.lat_lr, CornerData.lon_lr, u_lr, v_lr);
-snyder_latlon_to_xy(CornerData.lat_ul, CornerData.lon_ul, u_ul, v_ul);
+double x_LL, y_LL;
+double x_LR, y_LR;
+double x_UL, y_UL;
 
 
-x_ll = 0.0;
-y_ll = 0.0;
+snyder_latlon_to_xy(Data.lat_LL, Data.lon_LL, u_LL, v_LL);
+snyder_latlon_to_xy(Data.lat_LR, Data.lon_LR, u_LR, v_LR);
+snyder_latlon_to_xy(Data.lat_UL, Data.lon_UL, u_UL, v_UL);
 
-x_lr = CornerData.nx - 1.0;
-y_lr = 0.0;
 
-x_ul = 0.0;
-y_ul = CornerData.ny  - 1.0;
+x_LL = 0.0;
+y_LL = 0.0;
 
+x_LR = Data.nx - 1.0;
+y_LR = 0.0;
+
+x_UL = 0.0;
+y_UL = Data.ny  - 1.0;
+
+
+// JHG version 2? aff.set_three_points_v2(
 aff.set_three_points(
 
-   u_ll, v_ll, u_lr, v_lr, u_ul, v_ul,
+   u_LL, v_LL, x_LL, y_LL, 
 
-   x_ll, y_ll, x_lr, y_lr, x_ul, y_ul
+   u_LR, v_LR, x_LR, y_LR, 
+
+   u_UL, v_UL, x_UL, y_UL
 
 );
 
@@ -208,11 +225,12 @@ Nx = 0;
 Ny = 0;
 
 Name.clear();
+SpheroidName.clear();
 
 geoid.clear();
 
-memset(&Data, 0, sizeof(Data));
-memset(&CornerData, 0, sizeof(CornerData));
+memset(&Data,      0, sizeof(Data));
+memset(&Grib2Data, 0, sizeof(Grib2Data));
 
 return;
 
@@ -247,6 +265,8 @@ void LaeaGrid::xy_to_latlon(double x, double y, double & lat, double & lon) cons
 
 {
 
+lat = lon = 0.0;
+
 double u, v, uu, vv;
 double D, Rq, rho, beta, beta1, lambda0, lat1, ce, m1;
 double num, denom, cor;
@@ -258,14 +278,11 @@ const double E2 = E*E;
 const double E4 = E2*E2;
 const double E6 = E2*E4;
 
-
 xy_to_uv(x, y, u, v);
 
+lat1    = (Data.lat_pole);
 
-
-lat1    = (CornerData.lat_pole);
-
-lambda0 = -(CornerData.lon_pole);
+lambda0 = -(Data.lon_pole);
 
 
 beta1 = geoid.beta(lat1);
@@ -295,7 +312,9 @@ num = u*sind(ce);
 
 denom = D*rho*cosd(beta1)*cosd(ce) - D*D*v*sind(beta1)*sind(ce);
 
-lon = lambda0 + atan2d(num, denom);   //  Eq 24-26, page 188
+
+// lon = lambda0 + atand(num/denom);   //  maybe want atan2 here?   //  Eq 24-26, page 188
+lon = lambda0 + atan2d(num, denom);   //  maybe want atan2 here?
 
 lon = -lon;
 
@@ -312,6 +331,9 @@ cor = t2*s2 + t4*s4 + t6*s6;   //  Eq 3-18, page 189
 lat = beta + cor*deg_per_rad;
 
 
+   //
+   //  done
+   //
 
 return;
 
@@ -383,6 +405,18 @@ return ( Name );
 ////////////////////////////////////////////////////////////////////////
 
 
+ConcatString LaeaGrid::spheroid_name() const
+
+{
+
+return ( SpheroidName );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 const char * LaeaGrid::projection_name() const
 
 {
@@ -438,7 +472,7 @@ v = new double [n];
 if ( !u || !v )  {
 
    mlog << Error << "\nLaeaGrid::xy_closedpolyline_area() -> "
-        << "memory allocation error\n\n";
+	<< "memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -501,21 +535,19 @@ Indent prefix(depth);
 
 
 
-out << prefix << "Name       = ";
+out << prefix << "Name         = ";
+out << prefix << "SpheroidName = ";
 
 if ( Name.length() > 0 )  out << '\"' << Name << '\"';
 else                      out << "(nul)\n";
 
 out << '\n';   //  no prefix
 
-out << prefix << "Projection = Laea\n";
+out << prefix << "Projection   = Laea\n";
 
-out << prefix << "Nx         = " << comma_string(Nx) << "\n";
+out << prefix << "Nx           = " << comma_string(Nx) << "\n";
 
-out << prefix << "Ny         = " << comma_string(Ny) << "\n";
-
-// aff.dump(out, depth + 1);
-
+out << prefix << "Ny           = " << comma_string(Ny) << "\n";
 
    //
    //  done
@@ -536,42 +568,14 @@ ConcatString LaeaGrid::serialize(const char *sep) const
 {
 
 ConcatString a;
-char junk[256];
 
-a << "Projection: Lambert Azimuthal Equal Area" << sep;
+a << "Projection: Labmbert Azimuthal Equal Area" << sep;
 
 a << "Nx: " << Nx << sep;
 a << "Ny: " << Ny << sep;
 
-a << "geoid: " << Data.geoid << sep;
+a << "SpheroidName: " << SpheroidName << sep;
 
-if ( Data.nx > 0 ) {
-
-   snprintf(junk, sizeof(junk), "lat_1: %.3f", Data.lat_1);   a << junk << sep;
-   snprintf(junk, sizeof(junk), "lon_1: %.3f", Data.lon_1);   a << junk << sep;
-
-   snprintf(junk, sizeof(junk), "lat_std: %.3f", Data.lat_std);   a << junk << sep;
-   snprintf(junk, sizeof(junk), "lon_ctr: %.3f", Data.lon_cen);   a << junk << sep;
-
-   snprintf(junk, sizeof(junk), "dx_m: %.3f", Data.dx_m);   a << junk << sep;
-   snprintf(junk, sizeof(junk), "dy_m: %.3f", Data.dy_m);   a << junk << sep;
-
-}
-else if ( CornerData.nx > 0 ) {
-
-   snprintf(junk, sizeof(junk), "lat_ll: %.3f", CornerData.lat_ll);   a << junk << sep;
-   snprintf(junk, sizeof(junk), "lon_ll: %.3f", CornerData.lon_ll);   a << junk << sep;
-
-   snprintf(junk, sizeof(junk), "lat_ul: %.3f", CornerData.lat_ul);   a << junk << sep;
-   snprintf(junk, sizeof(junk), "lon_ul: %.3f", CornerData.lon_ul);   a << junk << sep;
-
-   snprintf(junk, sizeof(junk), "lat_lr: %.3f", CornerData.lat_lr);   a << junk << sep;
-   snprintf(junk, sizeof(junk), "lon_lr: %.3f", CornerData.lon_lr);   a << junk << sep;
-
-   snprintf(junk, sizeof(junk), "lat_pole: %.3f", CornerData.lat_pole);   a << junk << sep;
-   snprintf(junk, sizeof(junk), "lon_pole: %.3f", CornerData.lon_pole);   a << junk << sep;
-
-}
    //
    //  done
    //
@@ -589,7 +593,7 @@ void LaeaGrid::deserialize(const StringArray &)
 {
 
 mlog << Error << "\nLaeaGrid::deserialize(const StringArray &) -> "
-     << " not yet implemented\n\n";
+     << "not yet implemented\n\n";
 
 exit ( 1 );
 
@@ -607,8 +611,7 @@ GridInfo LaeaGrid::info() const
 
 GridInfo i;
 
-     if ( Data.nx       > 0 ) i.set(Data);
-else if ( CornerData.nx > 0 ) i.set(CornerData);
+i.set(Data);
 
 return ( i );
 
@@ -634,26 +637,14 @@ return ( 0.0 );
 ////////////////////////////////////////////////////////////////////////
 
 
-bool LaeaGrid::wrap_lon() const
-
-{
-
-return ( false );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 GridRep * LaeaGrid::copy() const
 
 {
 
-LaeaGrid * p = (LaeaGrid *) 0;
+LaeaGrid * p = 0;
 
-     if ( Data.nx       > 0 ) p = new LaeaGrid (Data);
-else if ( CornerData.nx > 0 ) p = new LaeaGrid (CornerData);
+if(UseGrib2Data)  p = new LaeaGrid (Grib2Data);
+else              p = new LaeaGrid (Data);
 
 return ( p );
 
@@ -688,6 +679,11 @@ return ( z );
 ////////////////////////////////////////////////////////////////////////
 
 
+   //
+   //  Snyder, page 187
+   //
+
+
 void LaeaGrid::snyder_latlon_to_xy(double lat, double lon, double & x_snyder, double & y_snyder) const
 
 {
@@ -697,11 +693,13 @@ double beta1, beta;
 double m1, lambda, lambda0, lat1, delta;
 
 A = geoid.a_km();
+// A = 1.0;
+
 
 lambda  = -lon;
 
-lambda0 = -(CornerData.lon_pole);
-lat1    =  (CornerData.lat_pole);
+lambda0 = -(Data.lon_pole);
+lat1    =  (Data.lat_pole);
 
 
 delta   =  lambda - lambda0;
@@ -718,6 +716,7 @@ Rq = A*sqrt(0.5*Qp);
 
 
 m1 = snyder_m_func(lat1);
+
 
 
 B = 1.0 + sind(beta1)*sind(beta) + cosd(beta1)*cosd(beta)*cosd(delta);
@@ -752,19 +751,31 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-double LaeaGrid::scale_km() const
+   //
+   //  Code for misc functions
+   //
 
+
+////////////////////////////////////////////////////////////////////////
+
+
+double laea_segment_area(double u0, double v0, double u1, double v1)
+ 
 {
 
-return ( 0.0 );
-
+double answer;
+ 
+answer = 0.5*( u0*v1 - v0*u1 );
+                                                   
+return ( answer );                                 
+                                                   
 }
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-bool LaeaGrid::is_global() const
+bool LaeaGrid::wrap_lon() const
 
 {
 
@@ -776,89 +787,18 @@ return ( false );
 ////////////////////////////////////////////////////////////////////////
 
 
-void LaeaGrid::shift_right(int)
+void LaeaGrid::shift_right(int N)
 
 {
 
+if ( N == 0 )  return;
+
 mlog << Error << "\nLaeaGrid::shift_right(int) -> "
-     << "not yet implemented!\n\n";
+     << "shifting is not allowed for non-global grids\n\n";
 
 exit ( 1 );
 
 return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-   //
-   //  Code for misc functions
-   //
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void laea_reduce(double & angle)
-
-{
-
-angle -= 360.0*floor( (angle/360.0) + 0.5 );
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-double laea_segment_area(double u0, double v0, double u1, double v1)
- 
-{
- 
-double answer;
- 
-answer = 0.5*( u0*v1 - v0*u1 );
-                                                   
-return ( answer );                                 
-                                                   
-}
-
-////////////////////////////////////////////////////////////////////////
-
-
-double laea_r(double lat_deg)
-
-{
-
-double t, r;
-
-t = 2.0*(1.0 - sind(lat_deg));
-
-r = sqrt(t);
-
-return ( r );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-double laea_r_inv(double r)
-
-{
-
-double t, lat_deg;
-
-t = 1.0 - 0.5*r*r;
-
-lat_deg = asind(t);
-
-return ( lat_deg );
 
 }
 
@@ -888,20 +828,6 @@ set(data);
 ////////////////////////////////////////////////////////////////////////
 
 
-Grid::Grid(const LaeaCornerData & corner_data)
-
-{
-
-init_from_scratch();
-
-set(corner_data);
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 void Grid::set(const LaeaData & data)
 
 {
@@ -913,7 +839,7 @@ rep = new LaeaGrid (data);
 if ( !rep )  {
 
    mlog << Error << "\nGrid::set(const LaeaData &) -> "
-        << "memory allocation error\n\n";
+	<< "memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -927,18 +853,32 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void Grid::set(const LaeaCornerData & corner_data)
+Grid::Grid(const LaeaGrib2Data & grib2_data)
+
+{
+
+init_from_scratch();
+
+set(grib2_data);
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void Grid::set(const LaeaGrib2Data & grib2_data)
 
 {
 
 clear();
 
-rep = new LaeaGrid (corner_data);
+rep = new LaeaGrid (grib2_data);
 
 if ( !rep )  {
 
-   mlog << Error << "\nGrid::set(const LaeaCornerData &) -> "
-        << "memory allocation error\n\n";
+   mlog << Error << "\nGrid::set(const LaeaGrib2Data &) -> "
+	<< "memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -950,3 +890,4 @@ return;
 
 
 ////////////////////////////////////////////////////////////////////////
+

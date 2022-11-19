@@ -61,6 +61,7 @@ if ( i.ll )  { g.set( *(i.ll) );  status = true; }
 if ( i.m  )  { g.set( *(i.m)  );  status = true; }
 if ( i.g  )  { g.set( *(i.g)  );  status = true; }
 if ( i.la )  { g.set( *(i.la) );  status = true; }
+if ( i.lg )  { g.set( *(i.lg) );  status = true; }
 
 return ( status );
 
@@ -199,6 +200,22 @@ for (j=0; j<n_misc_laea_grids; ++j)  {
    if ( strcmp(name, misc_laea_grids[j].name) == 0 )  {
 
       i.set( misc_laea_grids[j] );
+
+      return ( true );
+
+   }
+
+}
+
+   //
+   //  try misc laea grib2 grids
+   //
+
+for (j=0; j<n_misc_laea_grib2_grids; ++j)  {
+
+   if ( strcmp(name, misc_laea_grib2_grids[j].name) == 0 )  {
+
+      i.set( misc_laea_grib2_grids[j] );
 
       return ( true );
 

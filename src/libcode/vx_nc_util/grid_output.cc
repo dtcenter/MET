@@ -37,7 +37,7 @@ static void stereographic_grid_output  (const GridInfo &, NcFile * ncfile);
 static void mercator_grid_output       (const GridInfo &, NcFile * ncfile);
 static void gaussian_grid_output       (const GridInfo &, NcFile * ncfile);
 static void laea_grid_output           (const GridInfo &, NcFile * ncfile);
-static void laea_corner_grid_output    (const GridInfo &, NcFile * ncfile);
+static void laea_grib2_grid_output     (const GridInfo &, NcFile * ncfile);
 static void semilatlon_grid_output     (const GridInfo &, NcFile * ncfile, NcDim &, NcDim &);
 static void write_semilatlon_var       (NcFile * ncfile, const char *,
                                         NcDim *, const NumArray &, const char *,
@@ -68,7 +68,7 @@ else if ( info.rll )  rotated_latlon_grid_output  (info, ncfile);
 else if ( info.m   )  mercator_grid_output        (info, ncfile);
 else if ( info.g   )  gaussian_grid_output        (info, ncfile);
 else if ( info.la  )  laea_grid_output            (info, ncfile);
-else if ( info.cl  )  laea_corner_grid_output     (info, ncfile);
+else if ( info.lg  )  laea_grib2_grid_output      (info, ncfile);
 else if ( info.sl  )  semilatlon_grid_output      (info, ncfile, lat_dim, lon_dim);
 else {
 
@@ -657,163 +657,68 @@ const LaeaData & data = *(info.la);
 
 ncfile->putAtt("Projection", "Lambert Azimuthal Equal Area");
 
-ncfile->putAtt("geoid", data.geoid);
+// JHG work here
+if(data.geoid) ncfile->putAtt("geoid", data.geoid);
 
    //
-   //  lat_1
+   //  lat_LL
    //
 
-snprintf(junk, sizeof(junk), "%f degrees_north", data.lat_1);
+snprintf(junk, sizeof(junk), "%f degrees_north", data.lat_LL);
 
-ncfile->putAtt("lat_1", junk);
+ncfile->putAtt("lat_LL", junk);
 
    //
-   //  lon_1
+   //  lon_LL
    //
 
-t = data.lon_1;
+t = data.lon_LL;
 
 if ( !west_longitude_positive )  t = -t;
 
 snprintf(junk, sizeof(junk), "%f degrees_east", t);
 
-ncfile->putAtt("lon_1", junk);
+ncfile->putAtt("lon_LL", junk);
 
    //
-   //  lat_std
+   //  lat_UL
    //
 
-snprintf(junk, sizeof(junk), "%f degrees_north", data.lat_std);
+snprintf(junk, sizeof(junk), "%f degrees_north", data.lat_UL);
 
-ncfile->putAtt("lat_std", junk);
+ncfile->putAtt("lat_UL", junk);
 
    //
-   //  lon_cen
+   //  lon_UL
    //
 
-t = data.lon_cen;
+t = data.lon_UL;
 
 if ( !west_longitude_positive )  t = -t;
 
 snprintf(junk, sizeof(junk), "%f degrees_east", t);
 
-ncfile->putAtt("lon_cen", junk);
+ncfile->putAtt("lon_UL", junk);
 
    //
-   //  dx_m
+   //  lat_LR
    //
 
-snprintf(junk, sizeof(junk), "%f meters", data.dx_m);
+snprintf(junk, sizeof(junk), "%f degrees_north", data.lat_LR);
 
-ncfile->putAtt("dx_m", junk);
-
-   //
-   //  dy_m
-   //
-
-snprintf(junk, sizeof(junk), "%f meters", data.dy_m);
-
-ncfile->putAtt("dy_m", junk);
+ncfile->putAtt("lat_LR", junk);
 
    //
-   //  nx
+   //  lon_LR
    //
 
-snprintf(junk, sizeof(junk), "%d", data.nx);
-
-ncfile->putAtt("nx", junk);
-
-   //
-   //  ny
-   //
-
-snprintf(junk, sizeof(junk), "%d", data.ny);
-
-ncfile->putAtt("ny", junk);
-
-   //
-   //  done
-   //
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void laea_corner_grid_output(const GridInfo & info, NcFile * ncfile)
-
-{
-
-char junk[256];
-double t;
-const LaeaCornerData & data = *(info.cl);
-
-ncfile->putAtt("Projection", "Lambert Azimuthal Equal Area");
-
-ncfile->putAtt("geoid", data.geoid);
-
-   //
-   //  lat_ll
-   //
-
-snprintf(junk, sizeof(junk), "%f degrees_north", data.lat_ll);
-
-ncfile->putAtt("lat_ll", junk);
-
-   //
-   //  lon_ll
-   //
-
-t = data.lon_ll;
+t = data.lon_LR;
 
 if ( !west_longitude_positive )  t = -t;
 
 snprintf(junk, sizeof(junk), "%f degrees_east", t);
 
-ncfile->putAtt("lon_ll", junk);
-
-   //
-   //  lat_ul
-   //
-
-snprintf(junk, sizeof(junk), "%f degrees_north", data.lat_ul);
-
-ncfile->putAtt("lat_ul", junk);
-
-   //
-   //  lon_ul
-   //
-
-t = data.lon_ul;
-
-if ( !west_longitude_positive )  t = -t;
-
-snprintf(junk, sizeof(junk), "%f degrees_east", t);
-
-ncfile->putAtt("lon_ul", junk);
-
-   //
-   //  lat_lr
-   //
-
-snprintf(junk, sizeof(junk), "%f degrees_north", data.lat_lr);
-
-ncfile->putAtt("lat_lr", junk);
-
-   //
-   //  lon_lr
-   //
-
-t = data.lon_lr;
-
-if ( !west_longitude_positive )  t = -t;
-
-snprintf(junk, sizeof(junk), "%f degrees_east", t);
-
-ncfile->putAtt("lon_lr", junk);
+ncfile->putAtt("lon_LR", junk);
 
    //
    //  lat_pole
@@ -850,6 +755,134 @@ ncfile->putAtt("nx", junk);
 snprintf(junk, sizeof(junk), "%d", data.ny);
 
 ncfile->putAtt("ny", junk);
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void laea_grib2_grid_output(const GridInfo & info, NcFile * ncfile)
+
+{
+
+char junk[256];
+double t;
+const LaeaGrib2Data & data = *(info.lg);
+
+ncfile->putAtt("Projection", "Grib2 Lambert Azimuthal Equal Area");
+
+ncfile->putAtt("spheroid_name", data.spheroid_name);
+
+   //
+   //  radius_km
+   //
+
+snprintf(junk, sizeof(junk), "%f km", data.radius_km);
+
+ncfile->putAtt("radius_km", junk);
+
+   //
+   //  equatorial_radius_km
+   //
+
+snprintf(junk, sizeof(junk), "%f km", data.equatorial_radius_km);
+
+ncfile->putAtt("equatorial_radius_km", junk);
+
+   //
+   //  polar_radius_km
+   //
+
+snprintf(junk, sizeof(junk), "%f km", data.polar_radius_km);
+
+ncfile->putAtt("polar_radius_km", junk);
+
+   //
+   //  lat_first
+   //
+
+snprintf(junk, sizeof(junk), "%f degrees_north", data.lat_first);
+
+ncfile->putAtt("lat_first", junk);
+
+   //
+   //  lon_first
+   //
+
+t = data.lon_first;
+
+if ( !west_longitude_positive )  t = -t;
+
+snprintf(junk, sizeof(junk), "%f degrees_east", t);
+
+ncfile->putAtt("lon_first", junk);
+
+   //
+   //  standard_lat
+   //
+
+snprintf(junk, sizeof(junk), "%f degrees_north", data.standard_lat);
+
+ncfile->putAtt("standard_lat", junk);
+
+   //
+   //  central_lon
+   //
+
+t = data.central_lon;
+
+if ( !west_longitude_positive )  t = -t;
+
+snprintf(junk, sizeof(junk), "%f degrees_east", t);
+
+ncfile->putAtt("central_lon", junk);
+
+   //
+   //  dx_km
+   //
+
+snprintf(junk, sizeof(junk), "%.6f", data.dx_km);
+
+ncfile->putAtt("dx_km", junk);
+
+   //
+   //  dy_km
+   //
+
+snprintf(junk, sizeof(junk), "%.6f", data.dy_km);
+
+ncfile->putAtt("dy_km", junk);
+
+   //
+   //  nx
+   //
+
+snprintf(junk, sizeof(junk), "%d", data.nx);
+
+ncfile->putAtt("nx", junk);
+
+   //
+   //  ny
+   //
+
+snprintf(junk, sizeof(junk), "%d", data.ny);
+
+ncfile->putAtt("ny", junk);
+
+   //
+   //  is_sphere
+   //
+
+snprintf(junk, sizeof(junk), "%s", bool_to_string(data.is_sphere));
+
+ncfile->putAtt("is_sphere", junk);
 
    //
    //  done

@@ -17,6 +17,18 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+   //
+   //   Reference:  
+   //
+   //   "Map Projections --- A Working Manual", by John P. Snyder
+   //
+   //   U. S. Geological Survey Professional Paper 1395
+   //                  
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 #include "affine.h"
 #include "vx_geodesy.h"
 
@@ -36,12 +48,14 @@ class LaeaGrid : public GridRep {
       LaeaGrid();
      ~LaeaGrid();
       LaeaGrid(const LaeaData &);
-      LaeaGrid(const LaeaCornerData &);
+      LaeaGrid(const LaeaGrib2Data &);
 
       Spheroid geoid;
 
-      LaeaData       Data;
-      LaeaCornerData CornerData;
+      LaeaData Data;
+      LaeaGrib2Data Grib2Data;
+
+      bool UseGrib2Data;
 
       double snyder_m_func(double lat) const;
 
@@ -52,6 +66,7 @@ class LaeaGrid : public GridRep {
          //
 
       void clear();
+
 
       void calc_aff();
 
@@ -68,6 +83,7 @@ class LaeaGrid : public GridRep {
       int Ny;
 
       ConcatString Name;
+      ConcatString SpheroidName;
 
          //
          //  grid interface
@@ -85,15 +101,19 @@ class LaeaGrid : public GridRep {
       int nx() const;
       int ny() const;
 
+      double scale_km() const;
+
       void set_so2(double);
 
       ConcatString name() const;
+
+      ConcatString spheroid_name() const;
 
       const char * projection_name() const;
 
       void dump(std::ostream &, int = 0) const;
 
-      ConcatString serialize(const char *sep=" ") const;
+      ConcatString serialize(const char *) const;
 
       void deserialize(const StringArray &);
 
@@ -103,13 +123,9 @@ class LaeaGrid : public GridRep {
 
       bool wrap_lon() const;
 
-      GridRep * copy() const;
-
-      double scale_km() const;
-
-      bool is_global() const;
-
       void shift_right(int);
+
+      GridRep * copy() const;
 
 };
 
@@ -117,10 +133,11 @@ class LaeaGrid : public GridRep {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline bool LaeaGrid::is_north () const { return ( true ); }
-inline bool LaeaGrid::is_south () const { return ( false ); }
+inline bool   LaeaGrid::is_north () const { return ( true );  }
+inline bool   LaeaGrid::is_south () const { return ( false ); }
+inline double LaeaGrid::scale_km()  const { return ( -1.0 );  }
 
-inline void LaeaGrid::set_so2(double) { return; }
+inline void   LaeaGrid::set_so2(double) { return; }
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -130,3 +147,4 @@ inline void LaeaGrid::set_so2(double) { return; }
 
 
 ////////////////////////////////////////////////////////////////////////
+
