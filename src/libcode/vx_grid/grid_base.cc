@@ -406,12 +406,12 @@ if ( info.lc  )  set( *(info.lc)  );
 if ( info.st  )  set( *(info.st)  );
 if ( info.ll  )  set( *(info.ll)  );
 if ( info.rll )  set( *(info.rll) );
-if ( info.m   )  set( *(info.m )  );
-if ( info.g   )  set( *(info.g )  );
-if ( info.gi  )  set( *(info.gi ) );
-if ( info.la  )  set( *(info.la ) );
-if ( info.lg  )  set( *(info.lg ) );
-if ( info.sl  )  set( *(info.sl ) );
+if ( info.m   )  set( *(info.m)   );
+if ( info.g   )  set( *(info.g)   );
+if ( info.gi  )  set( *(info.gi)  );
+if ( info.la  )  set( *(info.la)  );
+if ( info.lg  )  set( *(info.lg)  );
+if ( info.sl  )  set( *(info.sl)  );
 
 return;
 

@@ -657,7 +657,6 @@ const LaeaData & data = *(info.la);
 
 ncfile->putAtt("Projection", "Lambert Azimuthal Equal Area");
 
-// JHG work here
 if(data.geoid) ncfile->putAtt("geoid", data.geoid);
 
    //

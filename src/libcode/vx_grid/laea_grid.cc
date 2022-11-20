@@ -24,7 +24,6 @@ using namespace std;
 #include "vx_util.h"
 #include "vx_geodesy.h"
 
-// JHG #include "grid_xml_keywords.h"
 #include "laea_grid.h"
 #include "latlon_xyz.h"
 
@@ -195,7 +194,6 @@ x_UL = 0.0;
 y_UL = Data.ny  - 1.0;
 
 
-// JHG version 2? aff.set_three_points_v2(
 aff.set_three_points(
 
    u_LL, v_LL, x_LL, y_LL, 
