@@ -18,7 +18,7 @@ MET Version 11.0.0-beta5 release notes (20221120)
 
    * MET: Enhance MET to have better signal handling for shutdown events (`dtcenter/METplus-Internal#21 <https://github.com/dtcenter/METplus-Internal/issues/21>`_).
 
-* Library Enhancments:
+* Library Enhancements:
 
    * Reimplement the pntnc2ascii.R utility Rscript in Python (`#2085 <https://github.com/dtcenter/MET/issues/2085>`_).
    * **Add a Python helper script/function to transform point_data objects to met_point_data objects for Python Embedding** (`#2302 <https://github.com/dtcenter/MET/issues/2302>`_).
@@ -27,7 +27,7 @@ MET Version 11.0.0-beta5 release notes (20221120)
 
    * **Enhance Grid-Stat to compute SEEPS for gridded observations and write the SEEPS STAT line type** (`#1943 <https://github.com/dtcenter/MET/issues/1943>`_).
    * **Enhance Stat-Analysis to aggregate SEEPS_MPR and SEEPS line types** (`#2339 <https://github.com/dtcenter/MET/issues/2339>`_).
-   * **Refine **TCDIAG output from TC-Pairs as needed** (`#2321 <https://github.com/dtcenter/MET/issues/2321>`_).
+   * **Refine TCDIAG output from TC-Pairs as needed** (`#2321 <https://github.com/dtcenter/MET/issues/2321>`_).
    * Rename the TCDIAG SOURCE column as DIAG_SOURCE (`#2337 <https://github.com/dtcenter/MET/issues/2337>`_).
    * Enhance TC-Pairs consensus logic to compute the spread of the location, wind speed, and pressure (`#2036 <https://github.com/dtcenter/MET/issues/2036>`_).
    * Print ASCII2NC warning message about python embedding support not being compiled (`#2277 <https://github.com/dtcenter/MET/issues/2277>`_).
