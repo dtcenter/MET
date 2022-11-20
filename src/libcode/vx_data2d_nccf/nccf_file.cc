@@ -2209,31 +2209,83 @@ if (!is_eq(inverse_flattening, bad_data_double) ||
   data.nx = _xDim->getSize();
   data.ny = _yDim->getSize();
 
+  double eccentricity, false_east,false_north, scale_factor;
   if(!has_scale_factor && has_standard_parallel) {
-    double east, north;
-    double lat, lon, scale_factor;
-    double eccentricity = 0;
-    double false_east = get_nc_var_att_double(grid_mapping_var, "false_east", false);
-    double false_north = get_nc_var_att_double(grid_mapping_var, "false_north", false);
+    double x, y, east, north;
+    double lat, lon, lat2, lon2;
     bool is_north_hemisphere = proj_origin_lat > 0;
+    false_east = get_nc_var_att_double(grid_mapping_var, "false_east", false);
+    false_north = get_nc_var_att_double(grid_mapping_var, "false_north", false);
 
     if (is_eq(false_east, bad_data_double)) false_east = 0.;
     if (is_eq(false_north, bad_data_double)) false_north = 0.;
     if(!is_spherical_earch) eccentricity = st_eccentricity_func(semi_major_axis, semi_minor_axis,
                                                                 inverse_flattening);
-    east = (dx_m > 0) ? x_values[0] : x_values[x_counts-1];
-    north = (dy_m > 0) ? y_values[0] : y_values[y_counts-1];
+    x = (dx_m > 0) ? x_values[0] : x_values[x_counts-1];
+    y = (dy_m > 0) ? y_values[0] : y_values[y_counts-1];
     scale_factor = st_sf_func(proj_standard_parallel, eccentricity, is_north_hemisphere);
-    st_lat_lon_func(lat, lon, scale_factor, semi_major_axis, proj_vertical_lon,
-                    east/x_coord_to_m_cf, north/y_coord_to_m_cf,
-                    false_east, false_north, eccentricity, is_north_hemisphere);
-
+    st_xy_to_latlon_func(x*x_coord_to_m_cf, y*y_coord_to_m_cf, lat, lon,
+                         scale_factor, semi_major_axis, proj_vertical_lon,
+                         false_east, false_north, eccentricity, is_north_hemisphere);
     data.x_pin = 0.;
     data.y_pin = 0.;
     data.lat_pin = lat;
     data.lon_pin = -lon;
-    data.scale_lat = proj_standard_parallel;   //60.0;
+
+    if(mlog.verbosity_level() >= 10) {
+      double x1, y1, x2, y2;
+      double lat1, lon1;
+
+      st_latlon_to_xy_func(lat, lon, x2, y2, scale_factor, proj_vertical_lon,
+                           semi_major_axis, false_east, false_north,
+                           eccentricity, is_north_hemisphere);
+      mlog << Debug(10) << method_name
+           << "left bottom: (x,y)km -> (lat,lon) -> (x2,y2)km: ("
+           << x/m_per_km << "," << y/m_per_km << ") -> ("
+           << lat << "," << lon << ") -> (" << x2/m_per_km << "," << y2/m_per_km
+           << ") Diff (m): x=" << (x-x2) <<", y=" << (y-y2)
+           << ") dx_m=" << dx_m << ", dy_m=" << dx_m << "\n";
+
+      x1 = x_values[int(x_counts/2)];
+      y1 = y_values[int(x_counts/2)];
+      st_xy_to_latlon_func(x1*x_coord_to_m_cf, y1*y_coord_to_m_cf, lat1, lon1,
+                           scale_factor, semi_major_axis, proj_vertical_lon,
+                           false_east, false_north, eccentricity, is_north_hemisphere);
+      st_latlon_to_xy_func(lat1, lon1, x2, y2, scale_factor, proj_vertical_lon,
+                           semi_major_axis, false_east, false_north,
+                           eccentricity, is_north_hemisphere);
+      mlog << Debug(10) << method_name
+           << "     center: (x,y)km -> (lat,lon) -> (x2,y2km): (" << x1/m_per_km
+           << "," << y1/m_per_km << ") -> ("
+           << lat1 << "," << lon1 << ") -> (" << x2/m_per_km << "," << y2/m_per_km
+           << ") Diff (m): x=" << (x1-x2) <<", y=" << (y1-y2)
+           << ") dx_m=" << dx_m << ", dy_m=" << dx_m << ")\n";
+
+      x1 = (dx_m > 0) ? x_values[x_counts-1] : x_values[0];
+      y1 = (dy_m > 0) ? y_values[y_counts-1] : y_values[0];
+      st_xy_to_latlon_func(x1*x_coord_to_m_cf, y1*y_coord_to_m_cf, lat1, lon1,
+                           scale_factor, semi_major_axis, proj_vertical_lon,
+                           false_east, false_north, eccentricity, is_north_hemisphere);
+      st_latlon_to_xy_func(lat1, lon1, x2, y2, scale_factor, proj_vertical_lon,
+                           semi_major_axis, false_east, false_north,
+                           eccentricity, is_north_hemisphere);
+      mlog << Debug(10) << method_name
+           << "  top-right: (x,y)km -> (lat,lon) -> (x2,y2)km: (" << x1/m_per_km
+           << "," << y1/m_per_km << ") -> ("
+           << lat1 << "," << lon1 << ") -> (" << x2/m_per_km << "," << y2/m_per_km
+           << ") Diff (m): x=" << (x1-x2) <<", y=" << (y1-y2)
+           << ") dx_m=" << dx_m << ", dy_m=" << dx_m << ")\n";
+    }
   }
+  else {
+     scale_factor = proj_origin_scale_factor;
+     eccentricity = false_east = false_north = 0.;
+  }
+  // ellipsoidal earth
+  data.scale_factor = scale_factor;
+  data.eccentricity = eccentricity;
+  data.false_east = false_east;
+  data.false_north = false_north;
 
   grid.set(data);
   if (dy_m < 0) grid.set_swap_to_north(true);
