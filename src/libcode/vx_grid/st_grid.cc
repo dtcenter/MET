@@ -109,6 +109,7 @@ Ny = data.ny;
 Name = data.name;
 
 Lon_orient = data.lon_orient;
+Data = data;
 
 
    //
@@ -116,6 +117,7 @@ Lon_orient = data.lon_orient;
    //
 
 Alpha = (1.0 + H*sind(data.scale_lat))*((data.r_km)/(data.d_km));
+
 
    //
    //  Calculate Bx, By
@@ -129,8 +131,6 @@ theta0 = H*(Lon_orient - data.lon_pin);
 
 Bx = data.x_pin - Alpha*r0*H*sind(theta0);
 By = data.y_pin + Alpha*r0*H*cosd(theta0);
-
-Data = data;
 
    //
    //  Done
@@ -204,13 +204,19 @@ const double H = ( IsNorthHemisphere ? 1.0 : -1.0 );
 
 reduce(lon);
 
-r = st_func(lat, is_north());
+if(is_eq(Data.eccentricity, 0.0)) {
 
-theta = H*(Lon_orient - lon);
+   r = st_func(lat, is_north());
 
-x = Bx + Alpha*r*H*sind(theta);
+   theta = H*(Lon_orient - lon);
 
-y = By - Alpha*r*H*cosd(theta);
+   x = Bx + Alpha*r*H*sind(theta);
+
+   y = By - Alpha*r*H*cosd(theta);
+}
+else st_latlon_to_xy_func(lat, lon, x, y, Data.scale_factor, Data.scale_lat,
+                          (Data.r_km*m_per_km), Data.false_east, Data.false_north,
+                          Data.eccentricity, IsNorthHemisphere);
 
 return;
 
@@ -228,19 +234,27 @@ double r, theta;
 
 const double H = ( IsNorthHemisphere ? 1.0 : -1.0 );
 
-x = (x - Bx)/Alpha;
-y = (y - By)/Alpha;
+if(is_eq(Data.eccentricity, 0.0)) {
+   x = (x - Bx)/Alpha;
+   y = (y - By)/Alpha;
 
-r = sqrt( x*x + y*y );
+   r = sqrt( x*x + y*y );
 
-lat = st_inv_func(r, is_north());
+   lat = st_inv_func(r, is_north());
 
-if ( fabs(r) < 1.0e-5 )  theta = 0.0;
-else                     theta = atan2d(H*x, -H*y);   //  NOT atan2d(y, x);
+   if ( fabs(r) < 1.0e-5 )  theta = 0.0;
+   else                     theta = atan2d(H*x, -H*y);   //  NOT atan2d(y, x);
 
-if ( is_south() )  theta = -theta;
+   if ( is_south() )  theta = -theta;
 
-lon = Lon_orient - theta;
+   lon = Lon_orient - theta;
+}
+else {
+   st_xy_to_latlon_func(x, y, lat, lon, Data.scale_factor, (Data.r_km*m_per_km),
+                        (-1.0*Data.lon_orient), Data.false_east, Data.false_north,
+                        Data.eccentricity, IsNorthHemisphere);
+}
+
 
 reduce(lon);
 
@@ -609,7 +623,7 @@ return ( p );
 ////////////////////////////////////////////////////////////////////////
 
 
-double st_func(double lat, bool is_north_hemisphere)
+double st_func(double lat, bool is_north_hemisphere, double eccentricity)
 
 {
 
@@ -618,6 +632,9 @@ double r;
 if ( is_north_hemisphere )  r = tand(45.0 - 0.5*lat);
 else                        r = tand(45.0 + 0.5*lat);
 
+if (!is_eq(eccentricity, 0.)) {
+   r *= pow(((1 + eccentricity*sind(lat)) / (1 - eccentricity*sind(lat))),(eccentricity/2));
+}
 return ( r );
 
 }
@@ -658,22 +675,44 @@ return ( a );
 }
 
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////
 
 
-bool st_lat_lon_func(double &lat, double &lon, double scale_factor,
-                     double semi_major_axis, double proj_vertical_lon,
-                     double east, double north, double false_east, double false_north,
-                     double eccentricity, bool is_north_hemisphere)
+bool st_latlon_to_xy_func(double lat, double lon, double &x_m, double &y_m,
+                          double scale_factor, double scale_lat, double semi_major_axis,
+                          double false_east, double false_north,
+                          double e, bool is_north_hemisphere)
 {
 
+   const double lat_rad = lat * rad_per_deg;
+   const double lon_rad = lon * rad_per_deg;
+   const double lat_sin = sin(lat_rad);
+   const double lonO_rad = scale_lat * rad_per_deg;
+   const double H = (is_north_hemisphere? 1.0 : -1.0 );
+   double t = tan(M_PI/4 - H*lat_rad/2) * pow((1 + e*lat_sin)/(1 - e*lat_sin), e/2);
+   double rho = (2 * semi_major_axis * scale_factor * t)
+                 / sqrt(pow(1+e,1+e) * pow(1-e,1-e));
+   x_m = false_east + rho*sin(lon_rad - lonO_rad);
+   y_m = false_north - H*rho*cos(lon_rad - lonO_rad);
+
+   return true;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool st_xy_to_latlon_func(double x_m, double y_m, double &lat, double &lon,
+                          double scale_factor, double semi_major_axis,
+                          double proj_vertical_lon, double false_east, double false_north,
+                          double eccentricity, bool is_north_hemisphere)
+{
 bool result = true;
 double chi;
-double east_diff = east - false_east;
-double north_diff = north - false_north;
+double x_diff = x_m - false_east;
+double y_diff = y_m - false_north;
 double lonO_rad = proj_vertical_lon * rad_per_deg;
-double rho = sqrt(east_diff*east_diff + north_diff*north_diff);
-double t   = rho * sqrt(pow((1+eccentricity),(1+eccentricity)) * pow((1-eccentricity),(1-eccentricity)))
+double r_rho = sqrt(x_diff*x_diff + y_diff*y_diff);
+double t   = r_rho * sqrt(pow((1+eccentricity),(1+eccentricity)) * pow((1-eccentricity),(1-eccentricity)))
              / (2*semi_major_axis*scale_factor);
 if (is_north_hemisphere) chi = M_PI/2 - 2 * atan(t);
 else chi = 2 * atan(t) - M_PI/2;
@@ -684,13 +723,12 @@ lat = chi + (eccentricity*eccentricity/2 + 5*pow(eccentricity,4)/24
       + (7*pow(eccentricity,6)/120 + 81*pow(eccentricity,8)/1120)*sin(6*chi)
       + (4279*pow(eccentricity,8)/161280)*sin(8*chi));
 
-if (east == false_east) lon = lonO_rad;
-else if (is_north_hemisphere) lon = lonO_rad + atan2(east_diff,-north_diff);
-else lon = lonO_rad + atan2(east_diff,north_diff);
+if (x_m == false_east) lon = lonO_rad;
+else if (is_north_hemisphere) lon = lonO_rad + atan2(x_diff,-y_diff);
+else lon = lonO_rad + atan2(x_diff,y_diff);
 
 lat /= rad_per_deg;
 lon /= rad_per_deg;
-
 return result;
 
 }
