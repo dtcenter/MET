@@ -1288,6 +1288,58 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld) {
 
    }   //  gaussian
 
+   //  Lambert Azimuthal Equal Area
+   else if ( gfld->igdtnum == 140 )  {
+
+      const g2int * p = gfld->igdtmpl;
+
+      ScanMode = p[16];
+
+      //  build an LaeaGrib2Data struct with the projection information
+      LaeaGrib2Data laea;
+      laea.name           = laea_proj_type;
+      laea.spheroid_name  = "Grib template";
+      int earth_shape_int = p[0];
+      if(earth_shape_int == 4) {
+         laea.radius_km            = 0;
+	 laea.equatorial_radius_km = 0.5*6378.1370;
+	 laea.polar_radius_km      = 0.5*6356.752314;
+	 laea.is_sphere            = false;
+      }
+      else {
+         mlog << Error << "\nMetGrib2DataFile::read_grib2_grid() -> "
+              << "unsupported earth shape value of " << earth_shape_int << "!\n\n";
+         exit(1);
+      }
+      laea.nx           = p[7];
+      laea.ny           = p[8];
+      laea.lat_first    = (double)p[9] / 1000000.0; 
+      // TODO: Suspect a bug in g2clib
+      // laea.lon_first = -1.0*rescale_lon( (double)p[10] / 1000000.0 );
+      //
+      // grib_dump: longitudeOfFirstGridPointInDegrees = -17.1171;
+      // wgrib2: Lon1 2164.600777
+      //    3-43=129,5,47,201
+      // g2clib-1.6.0 grid_templates.h
+      //    3.140: Lambert Azimuthal Equal Area Projection
+      // BAD?   {140, 17, 0, {1,1,4,1,4,1,4,4,4,-4,4,4,4,1,4,4,1} },
+      // FIX?   {140, 17, 0, {1,1,4,1,4,1,4,4,4,-4,4,-4,4,1,4,4,1} },
+      cout << "TODO LAEA p[10] should be 17.1171 = "<< (double)p[10] / 1000000.0 << "\n";
+      laea.lon_first    = 17.1171;
+      laea.standard_lat = (double)p[11] / 1000000.0; 
+      laea.central_lon  = -1.0*rescale_lon( (double)p[12] / 1000000.0 );
+      laea.dx_km        = (double)p[14] / 1000000.0;
+      laea.dy_km        = (double)p[15] / 1000000.0;
+
+         //  store the grid information
+
+      Raw_Grid->set(laea);
+
+      copy_raw_grid_to_dest();
+
+      laea.dump();
+
+   }   //  laea
 
    //  unrecognized grid
    else {
