@@ -2224,9 +2224,9 @@ if (!is_eq(inverse_flattening, bad_data_double) ||
     x = (dx_m > 0) ? x_values[0] : x_values[x_counts-1];
     y = (dy_m > 0) ? y_values[0] : y_values[y_counts-1];
     scale_factor = st_sf_func(proj_standard_parallel, eccentricity, is_north_hemisphere);
-    st_xy_to_latlon_func(x*x_coord_to_m_cf, y*y_coord_to_m_cf, lat, lon,
-                         scale_factor, semi_major_axis, proj_vertical_lon,
-                         false_east, false_north, eccentricity, is_north_hemisphere);
+    st_xy_to_latlon_func(x, y, lat, lon, scale_factor, semi_major_axis,
+                         proj_vertical_lon, false_east, false_north,
+                         eccentricity, is_north_hemisphere);
     data.x_pin = 0.;
     data.y_pin = 0.;
     data.lat_pin = lat;
@@ -2239,23 +2239,25 @@ if (!is_eq(inverse_flattening, bad_data_double) ||
       st_latlon_to_xy_func(lat, lon, x2, y2, scale_factor, proj_vertical_lon,
                            semi_major_axis, false_east, false_north,
                            eccentricity, is_north_hemisphere);
+      x1 = x;
+      y1 = y;
       mlog << Debug(10) << method_name
            << "left bottom: (x,y)km -> (lat,lon) -> (x2,y2)km: ("
-           << x/m_per_km << "," << y/m_per_km << ") -> ("
+           << x1/m_per_km << "," << y1/m_per_km << ") -> ("
            << lat << "," << lon << ") -> (" << x2/m_per_km << "," << y2/m_per_km
-           << ") Diff (m): x=" << (x-x2) <<", y=" << (y-y2)
+           << ") Diff (m): x=" << (x1-x2) <<", y=" << (y1-y2)
            << ") dx_m=" << dx_m << ", dy_m=" << dx_m << "\n";
 
       x1 = x_values[int(x_counts/2)];
       y1 = y_values[int(x_counts/2)];
-      st_xy_to_latlon_func(x1*x_coord_to_m_cf, y1*y_coord_to_m_cf, lat1, lon1,
-                           scale_factor, semi_major_axis, proj_vertical_lon,
-                           false_east, false_north, eccentricity, is_north_hemisphere);
+      st_xy_to_latlon_func(x1, y1, lat1, lon1, scale_factor, semi_major_axis,
+                           proj_vertical_lon, false_east, false_north,
+                           eccentricity, is_north_hemisphere);
       st_latlon_to_xy_func(lat1, lon1, x2, y2, scale_factor, proj_vertical_lon,
                            semi_major_axis, false_east, false_north,
                            eccentricity, is_north_hemisphere);
       mlog << Debug(10) << method_name
-           << "     center: (x,y)km -> (lat,lon) -> (x2,y2km): (" << x1/m_per_km
+           << "     center: (x,y)km -> (lat,lon) -> (x2,y)2km: (" << x1/m_per_km
            << "," << y1/m_per_km << ") -> ("
            << lat1 << "," << lon1 << ") -> (" << x2/m_per_km << "," << y2/m_per_km
            << ") Diff (m): x=" << (x1-x2) <<", y=" << (y1-y2)
@@ -2263,9 +2265,9 @@ if (!is_eq(inverse_flattening, bad_data_double) ||
 
       x1 = (dx_m > 0) ? x_values[x_counts-1] : x_values[0];
       y1 = (dy_m > 0) ? y_values[y_counts-1] : y_values[0];
-      st_xy_to_latlon_func(x1*x_coord_to_m_cf, y1*y_coord_to_m_cf, lat1, lon1,
-                           scale_factor, semi_major_axis, proj_vertical_lon,
-                           false_east, false_north, eccentricity, is_north_hemisphere);
+      st_xy_to_latlon_func(x1, y1, lat1, lon1, scale_factor, semi_major_axis,
+                           proj_vertical_lon, false_east, false_north,
+                           eccentricity, is_north_hemisphere);
       st_latlon_to_xy_func(lat1, lon1, x2, y2, scale_factor, proj_vertical_lon,
                            semi_major_axis, false_east, false_north,
                            eccentricity, is_north_hemisphere);
