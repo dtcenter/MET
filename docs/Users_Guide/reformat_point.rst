@@ -538,19 +538,6 @@ In this example, the ASCII2NC tool will reformat the input **sample_ascii_obs.tx
 
 .. _ascii2nc-pyembed:
 
-Python Embedding for Point Observations
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Here is an example of processing the same set of observations but using Python embedding instead:
-
-.. code-block:: none
-		
-		ascii2nc -format python \
-		"MET_BASE/python/read_ascii_point.py sample_ascii_obs.txt" \
-		sample_ascii_obs_python.nc
-
-Please refer to :numref:`Appendix F, Section %s <appendixF>` for more details about Python embedding in MET.
-
 ascii2nc configuration file
 ---------------------------
 
@@ -1081,7 +1068,7 @@ For the GOES-16 and GOES-17 data, the computing lat/long is time consuming. So t
 
 When processing GOES-16 data, the **-qc** option may also be used to specify the acceptable quality control flag values. The example above regrids the GOES-16 AOD values to NCEP Grid number 212 (which QC flags are high, medium, and low), writing to the output the maximum AOD value falling inside each grid box.
 
-Listed below is an example of processing the same set of observations but using python embedding instead:
+Listed below is an example of processing the same set of observations but using Python embedding instead:
 
 .. code-block:: none
 		
@@ -1090,10 +1077,7 @@ Listed below is an example of processing the same set of observations but using 
 		G212 python_gridded_ascii_python.nc -config Point2GridConfig_edr \
 		-field 'name="200"; level="*"; valid_time="20130827_205959";' -method MAX -v 1
 
-The user should replace the python script with the customized python script for the custom point observation data. This is an example for the python embedding.
-
 Please refer to :numref:`Appendix F, Section %s <appendixF>` for more details about Python embedding in MET.
-
 
 point2grid output
 -----------------
@@ -1171,4 +1155,19 @@ The configuration option listed above is common to many MET tools and are descri
 This entry is an array of dictionaries, each containing a **GRIB code** string and mathcing **variable name** string which define a mapping of GRIB code to the output variable names.
 
 
+Point NetCDF to ASCII Python Utility
+====================================
 
+As a tool for debugging, a utility script called print_pointnc2ascii.py is included for users. This script reads the MET point NetCDF file format and returns an ASCII representation to the screen, with either space or comma delimiting. Optionally, the user can request that the output be written to a file.
+
+The script can be found at:
+
+.. code-block:: none
+
+   MET_BASE/shared/met/utility/print_pointnc2ascii.py
+
+For how to use the script, issue the command:
+
+.. code-block:: none
+
+   python3 MET_BASE/shared/met/utility/print_pointnc2ascii.py -h
