@@ -1508,14 +1508,14 @@ void process_pbfile(int i_pb) {
 
                   // Track of the maximum quality mark for CAPE components
                   if (is_cape_input && (cape_level == 0) &&
-                     (is_bad_data(cape_qm) || quality_mark > cape_qm) {
+                     (is_bad_data(cape_qm) || quality_mark > cape_qm)) {
                      cape_qm = quality_mark;
                   }
                }
 
                // Track the maximum quality mark for PBL components
                if (do_pbl && (pbl_level == 0) &&
-                  (is_bad_data(pbl_qm) || quality_mark > pbl_qm) {
+                  (is_bad_data(pbl_qm) || quality_mark > pbl_qm)) {
                   pbl_qm = quality_mark;
                }
             }
