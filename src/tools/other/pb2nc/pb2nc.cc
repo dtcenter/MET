@@ -1505,12 +1505,17 @@ void process_pbfile(int i_pb) {
                      if (cape_level < MAX_CAPE_LEVEL) cape_data_temp[cape_level] = obs_arr[4];
                      cape_member_cnt++;
                   }
-                  if (is_cape_input && (cape_level == 0)) {
+
+                  // Track of the maximum quality mark for CAPE components
+                  if (is_cape_input && (cape_level == 0) &&
+                     (is_bad_data(cape_qm) || quality_mark > cape_qm) {
                      cape_qm = quality_mark;
                   }
                }
 
-               if (do_pbl && (pbl_level == 0)) {
+               // Track the maximum quality mark for PBL components
+               if (do_pbl && (pbl_level == 0) &&
+                  (is_bad_data(pbl_qm) || quality_mark > pbl_qm) {
                   pbl_qm = quality_mark;
                }
             }
