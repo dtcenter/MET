@@ -243,7 +243,7 @@ The example **obs_bufr_var** setting above retains observations of QOB, TOB, ZOB
 • **D_MLCAPE** for mixed layer convective available potential energy (from POB, QOB, and TOB)
 
 
-In BUFR, lower quality mark values indicate higher quality observations. The quality marks for derived observations are computed as the maximum of the quality marks for its components. For example, **D_DPT** derived from **POB** with quality mark 1 and **QOB** with quality mark 2 is assigned a quality mark value of 2. **D_DBL**, **D_CAPE**, and **D_MLCAPE** are derived using data from multiple vertical levels. However, their quality marks are computed as the maximum of their components only at the first vertical level.
+In BUFR, lower quality mark values indicate higher quality observations. The quality marks for derived observations are computed as the maximum of the quality marks for its components. For example, **D_DPT** derived from **POB** with quality mark 1 and **QOB** with quality mark 2 is assigned a quality mark value of 2. **D_PBL**, **D_CAPE**, and **D_MLCAPE** are derived using data from multiple vertical levels. Their quality marks are computed as the maximum of their components over all vertical levels.
 
 _____________________
 
