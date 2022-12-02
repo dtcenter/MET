@@ -1003,7 +1003,6 @@ void process_pbfile(int i_pb) {
    float cape_qm = bad_data_float;
 
    // To compute PBL
-   int pbl_level = 0;
    int pbl_code = -1;
    float pbl_p, pbl_h;
    float pbl_qm = bad_data_float;
@@ -1352,10 +1351,6 @@ void process_pbfile(int i_pb) {
       }
 
       do_pbl = cal_pbl && 0 == strcmp("ADPUPA", hdr_typ);
-      if (do_pbl) {
-         pbl_level = 0;
-         pbl_qm = bad_data_float;
-      }
 
       // Search through the vertical levels
       for(lv=0, n_hdr_obs = 0; lv<buf_nlev; lv++) {
@@ -1894,7 +1889,6 @@ void process_pbfile(int i_pb) {
       }
 
       if (do_pbl) {
-         pbl_level = 0;
          is_same_header = (prev_hdr_vld_ut == hdr_vld_ut)
                && is_eq(prev_hdr_lat, hdr_lat)
                && is_eq(prev_hdr_lon, hdr_lon)
@@ -1915,6 +1909,7 @@ void process_pbfile(int i_pb) {
             pqtzuv_list.clear();
             pqtzuv_map_tq.clear();
             pqtzuv_map_uv.clear();
+            pbl_qm = bad_data_float;
          }
          //is_same_header = false;
          prev_hdr_vld_ut = hdr_vld_ut;
