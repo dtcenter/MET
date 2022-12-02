@@ -226,7 +226,7 @@ The example **obs_bufr_var** setting above retains observations of QOB, TOB, ZOB
 
 • **D_DPT** for dew point (from POB and QOB)
 
-• **D_WDIR** for wind speed (from UOB and VOB)
+• **D_WDIR** for wind direction (from UOB and VOB)
 
 • **D_WIND** for wind speed (from UOB and VOB)
 
