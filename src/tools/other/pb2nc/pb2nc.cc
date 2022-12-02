@@ -1345,17 +1345,21 @@ void process_pbfile(int i_pb) {
          }
       }
 
+      // Initialize for CAPE and PBL
       if (cal_cape || cal_mlcape) {
          cape_level = 0;
+         cape_qm = bad_data_float;
       }
 
       do_pbl = cal_pbl && 0 == strcmp("ADPUPA", hdr_typ);
       if (do_pbl) {
          pbl_level = 0;
+         pbl_qm = bad_data_float;
       }
 
       // Search through the vertical levels
       for(lv=0, n_hdr_obs = 0; lv<buf_nlev; lv++) {
+
          // If the observation vertical level is not within the
          // specified valid range, continue to the next vertical
          // level
