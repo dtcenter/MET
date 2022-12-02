@@ -126,15 +126,6 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
    // Conf: message_type_group_map
    msg_typ_group_map = parse_conf_message_type_group_map(&conf);
 
-   // Conf: message_type_group_map(SURFACE)
-   if(msg_typ_group_map.count((string)surface_msg_typ_group_str) == 0) {
-      mlog << Error << "\nPointStatConfInfo::process_config() -> "
-           << "\"" << conf_key_message_type_group_map
-           << "\" must contain an entry for \""
-           << surface_msg_typ_group_str << "\".\n\n";
-      exit(1);
-   }
-
    // Conf: fcst.field and obs.field
    fdict = conf.lookup_array(conf_key_fcst_field);
    odict = conf.lookup_array(conf_key_obs_field);
@@ -422,6 +413,18 @@ void PointStatConfInfo::process_geog(const Grid &grid,
       geog_dp   = parse_geog_data(dict, grid, fcst_file);
       geog_dp.threshold(dict->lookup_thresh(conf_key_thresh));
       land_mask = geog_dp.mask_plane();
+
+      // Conf: message_type_group_map for LANDSF and WATERSF
+      if(msg_typ_group_map.count((string)landsf_msg_typ_group_str) == 0 ||
+         msg_typ_group_map.count((string)watersf_msg_typ_group_str) == 0 ) {
+         mlog << Error << "\nPointStatConfInfo::process_geog() -> "
+              << "when \"" << conf_key_land_mask_flag << "\" is true, \""
+              << conf_key_message_type_group_map
+              << "\" must contain entries for \""
+              << landsf_msg_typ_group_str << "\" and \""
+              << watersf_msg_typ_group_str << "\".\n\n";
+         exit(1);
+      }
    }
 
    // Conf: topo
@@ -430,6 +433,16 @@ void PointStatConfInfo::process_geog(const Grid &grid,
       topo_dp                 = parse_geog_data(dict, grid, fcst_file);
       topo_use_obs_thresh     = dict->lookup_thresh(conf_key_use_obs_thresh);
       topo_interp_fcst_thresh = dict->lookup_thresh(conf_key_interp_fcst_thresh);
+
+      // Conf: message_type_group_map for SURFACE
+      if(msg_typ_group_map.count((string)surface_msg_typ_group_str) == 0) {
+         mlog << Error << "\nPointStatConfInfo::process_geog() -> "
+              << "when \"" << conf_key_topo_mask_flag << "\" is true, \""
+              << conf_key_message_type_group_map
+              << "\" must contain an entry for \""
+              << surface_msg_typ_group_str << "\".\n\n";
+         exit(1);
+      }
    }
 
    // Loop over the verification tasks and set the geography info
@@ -1002,37 +1015,19 @@ void PointStatVxOpt::set_vx_pd(PointStatConfInfo *conf_info) {
 
    // Store the surface message type group
    cs = surface_msg_typ_group_str;
-   if(conf_info->msg_typ_group_map.count(cs) == 0) {
-      mlog << Error << "\nPointStatVxOpt::set_vx_pd() -> "
-           << "\"" << conf_key_message_type_group_map
-           << "\" must contain an entry for \"" << cs << "\".\n\n";
-      exit(1);
-   }
-   else {
+   if(conf_info->msg_typ_group_map.count(cs) > 0) {
       vx_pd.set_msg_typ_sfc(conf_info->msg_typ_group_map[cs]);
    }
 
    // Store the surface land message type group
    cs = landsf_msg_typ_group_str;
-   if(conf_info->msg_typ_group_map.count(cs) == 0) {
-      mlog << Error << "\nPointStatVxOpt::set_vx_pd() -> "
-           << "\"" << conf_key_message_type_group_map
-           << "\" must contain an entry for \"" << cs << "\".\n\n";
-      exit(1);
-   }
-   else {
+   if(conf_info->msg_typ_group_map.count(cs) > 0) {
       vx_pd.set_msg_typ_lnd(conf_info->msg_typ_group_map[cs]);
    }
 
    // Store the surface water message type group
    cs = watersf_msg_typ_group_str;
-   if(conf_info->msg_typ_group_map.count(cs) == 0) {
-      mlog << Error << "\nPointStatVxOpt::set_vx_pd() -> "
-           << "\"" << conf_key_message_type_group_map
-           << "\" must contain an entry for \"" << cs << "\".\n\n";
-      exit(1);
-   }
-   else {
+   if(conf_info->msg_typ_group_map.count(cs) > 0) {
       vx_pd.set_msg_typ_wtr(conf_info->msg_typ_group_map[cs]);
    }
 
