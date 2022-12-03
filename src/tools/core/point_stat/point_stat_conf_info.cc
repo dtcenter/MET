@@ -1018,17 +1018,29 @@ void PointStatVxOpt::set_vx_pd(PointStatConfInfo *conf_info) {
    if(conf_info->msg_typ_group_map.count(cs) > 0) {
       vx_pd.set_msg_typ_sfc(conf_info->msg_typ_group_map[cs]);
    }
+   else {
+      sa.parse_css(default_msg_typ_group_surface);
+      vx_pd.set_msg_typ_sfc(sa);
+   }
 
    // Store the surface land message type group
    cs = landsf_msg_typ_group_str;
    if(conf_info->msg_typ_group_map.count(cs) > 0) {
       vx_pd.set_msg_typ_lnd(conf_info->msg_typ_group_map[cs]);
    }
+   else {
+      sa.parse_css(default_msg_typ_group_landsf);
+      vx_pd.set_msg_typ_lnd(sa);
+   }
 
    // Store the surface water message type group
    cs = watersf_msg_typ_group_str;
    if(conf_info->msg_typ_group_map.count(cs) > 0) {
       vx_pd.set_msg_typ_wtr(conf_info->msg_typ_group_map[cs]);
+   }
+   else {
+      sa.parse_css(default_msg_typ_group_watersf);
+      vx_pd.set_msg_typ_wtr(sa);
    }
 
    // Define the verifying message type name and values

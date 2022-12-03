@@ -514,8 +514,9 @@ containing a "key" string and "val" string. This defines a mapping of
 message type group names to a comma-separated list of values. This map is
 defined in the config files for PB2NC, Point-Stat, or Ensemble-Stat. Modify
 this map to define sets of message types that should be processed together as
-a group. The "SURFACE" entry must be present to define message types for
-which surface verification logic should be applied.
+a group. The "SURFACE" entry defines message types for which surface verification
+logic should be applied. If not defined, the default values listed below are
+used.
 
 .. code-block:: none
 		
