@@ -1509,7 +1509,7 @@ void process_pbfile(int i_pb) {
                      cape_member_cnt++;
                   }
 
-                  // Track of the maximum quality mark for CAPE components
+                  // Track the maximum quality mark for CAPE components
                   if (is_cape_input && (is_bad_data(cape_qm) || quality_mark > cape_qm)) {
                      cape_qm = quality_mark;
                   }
