@@ -185,12 +185,8 @@ void GridStatConfInfo::process_config(GrdFileType ftype,
 
             // Search for corresponding v-wind
             for(j=0; j<n_vx; j++) {
-               if(vx_opt[j].fcst_info->is_v_wind()      &&
-                  vx_opt[j].obs_info->is_v_wind()       &&
-                  vx_opt[i].fcst_info->req_level_name() ==
-                  vx_opt[j].fcst_info->req_level_name() &&
-                  vx_opt[i].obs_info->req_level_name()  ==
-                  vx_opt[j].obs_info->req_level_name()  &&
+               if(vx_opt[j].fcst_info->is_v_wind() &&
+                  vx_opt[j].obs_info->is_v_wind()  &&
                   vx_opt[i].is_uv_match(vx_opt[j])) {
 
                   vx_opt[i].fcst_info->set_uv_index(j);
@@ -204,12 +200,8 @@ void GridStatConfInfo::process_config(GrdFileType ftype,
 
             // Search for corresponding u-wind
             for(j=0; j<n_vx; j++) {
-               if(vx_opt[j].fcst_info->is_u_wind()      &&
-                  vx_opt[j].obs_info->is_u_wind()       &&
-                  vx_opt[i].fcst_info->req_level_name() ==
-                  vx_opt[j].fcst_info->req_level_name() &&
-                  vx_opt[i].obs_info->req_level_name()  ==
-                  vx_opt[j].obs_info->req_level_name()  &&
+               if(vx_opt[j].fcst_info->is_u_wind() &&
+                  vx_opt[j].obs_info->is_u_wind()  &&
                   vx_opt[i].is_uv_match(vx_opt[j])) {
 
                   vx_opt[i].fcst_info->set_uv_index(j);
@@ -905,6 +897,20 @@ bool GridStatVxOpt::is_uv_match(const GridStatVxOpt &v) const {
    bool match = true;
 
    //
+   // Check that requested forecast and observation levels match.
+   // Requested levels are empty for python embedding.
+   //
+        if( (  fcst_info->req_level_name().nonempty() ||
+             v.fcst_info->req_level_name().nonempty()) &&
+           !(  fcst_info->req_level_name() ==
+             v.fcst_info->req_level_name())) match = false;
+
+   else if( (  obs_info->req_level_name().nonempty() ||
+             v.obs_info->req_level_name().nonempty()) &&
+           !(  obs_info->req_level_name() ==
+             v.obs_info->req_level_name())) match = false;
+
+   //
    // The following do not impact matched pairs:
    //    desc, var_name, var_suffix,
    //    mpr_sa, mpr_ta,
@@ -917,12 +923,10 @@ bool GridStatVxOpt::is_uv_match(const GridStatVxOpt &v) const {
    //    hss_ec_value, rank_corr_flag, output_flag, nc_info
    //
 
-   if(!(mask_grid   == v.mask_grid  ) ||
-      !(mask_poly   == v.mask_poly  ) ||
-      !(mask_name   == v.mask_name  ) ||
-      !(interp_info == v.interp_info)) {
-      match = false;
-   }
+   else if(!(mask_grid   == v.mask_grid  ) ||
+           !(mask_poly   == v.mask_poly  ) ||
+           !(mask_name   == v.mask_name  ) ||
+           !(interp_info == v.interp_info)) match = false;
 
    return(match);
 }

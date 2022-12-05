@@ -179,12 +179,8 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
 
             // Search for corresponding v-wind
             for(j=0; j<n_vx; j++) {
-               if(vx_opt[j].vx_pd.fcst_info->is_v_wind()      &&
-                  vx_opt[j].vx_pd.obs_info->is_v_wind()       &&
-                  vx_opt[i].vx_pd.fcst_info->req_level_name() ==
-                  vx_opt[j].vx_pd.fcst_info->req_level_name() &&
-                  vx_opt[i].vx_pd.obs_info->req_level_name()  ==
-                  vx_opt[j].vx_pd.obs_info->req_level_name()  &&
+               if(vx_opt[j].vx_pd.fcst_info->is_v_wind() &&
+                  vx_opt[j].vx_pd.obs_info->is_v_wind()  &&
                   vx_opt[i].is_uv_match(vx_opt[j])) {
 
                   vx_opt[i].vx_pd.fcst_info->set_uv_index(j);
@@ -198,12 +194,8 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
 
             // Search for corresponding u-wind
             for(j=0; j<n_vx; j++) {
-               if(vx_opt[j].vx_pd.fcst_info->is_u_wind()      &&
-                  vx_opt[j].vx_pd.obs_info->is_u_wind()       &&
-                  vx_opt[i].vx_pd.fcst_info->req_level_name() ==
-                  vx_opt[j].vx_pd.fcst_info->req_level_name() &&
-                  vx_opt[i].vx_pd.obs_info->req_level_name()  ==
-                  vx_opt[j].vx_pd.obs_info->req_level_name()  &&
+               if(vx_opt[j].vx_pd.fcst_info->is_u_wind() &&
+                  vx_opt[j].vx_pd.obs_info->is_u_wind()  &&
                   vx_opt[i].is_uv_match(vx_opt[j])) {
 
                   vx_opt[i].vx_pd.fcst_info->set_uv_index(j);
@@ -705,6 +697,20 @@ bool PointStatVxOpt::is_uv_match(const PointStatVxOpt &v) const {
    bool match = true;
 
    //
+   // Check that requested forecast and observation levels match.
+   // Requested levels are empty for python embedding.
+   //
+        if( (  vx_pd.fcst_info->req_level_name().nonempty() ||
+             v.vx_pd.fcst_info->req_level_name().nonempty()) &&
+           !(  vx_pd.fcst_info->req_level_name() ==
+             v.vx_pd.fcst_info->req_level_name())) match = false;
+
+   else if( (  vx_pd.obs_info->req_level_name().nonempty() ||
+             v.vx_pd.obs_info->req_level_name().nonempty()) &&
+           !(  vx_pd.obs_info->req_level_name() ==
+             v.vx_pd.obs_info->req_level_name())) match = false;
+
+   //
    // The following do not impact matched pairs:
    //    fcat_ta, ocat_ta,
    //    fcnt_ta, ocnt_ta, cnt_logic,
@@ -714,22 +720,20 @@ bool PointStatVxOpt::is_uv_match(const PointStatVxOpt &v) const {
    //    rank_corr_flag, output_flag
    //
 
-   if(!(beg_ds         == v.beg_ds        ) ||
-      !(end_ds         == v.end_ds        ) ||
-      !(land_flag      == v.land_flag     ) ||
-      !(topo_flag      == v.topo_flag     ) ||
-      !(mask_grid      == v.mask_grid     ) ||
-      !(mask_poly      == v.mask_poly     ) ||
-      !(mask_sid       == v.mask_sid      ) ||
-      !(mask_llpnt     == v.mask_llpnt    ) ||
-      !(mask_name      == v.mask_name     ) ||
-      !(interp_info    == v.interp_info   ) ||
-      !(msg_typ        == v.msg_typ       ) ||
-      !(duplicate_flag == v.duplicate_flag) ||
-      !(obs_summary    == v.obs_summary   ) ||
-      !(obs_perc       == v.obs_perc      )) {
-      match = false;
-   }
+   else if(!(beg_ds         == v.beg_ds        ) ||
+           !(end_ds         == v.end_ds        ) ||
+           !(land_flag      == v.land_flag     ) ||
+           !(topo_flag      == v.topo_flag     ) ||
+           !(mask_grid      == v.mask_grid     ) ||
+           !(mask_poly      == v.mask_poly     ) ||
+           !(mask_sid       == v.mask_sid      ) ||
+           !(mask_llpnt     == v.mask_llpnt    ) ||
+           !(mask_name      == v.mask_name     ) ||
+           !(interp_info    == v.interp_info   ) ||
+           !(msg_typ        == v.msg_typ       ) ||
+           !(duplicate_flag == v.duplicate_flag) ||
+           !(obs_summary    == v.obs_summary   ) ||
+           !(obs_perc       == v.obs_perc      )) match = false;
 
    return(match);
 }
