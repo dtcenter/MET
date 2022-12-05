@@ -189,7 +189,7 @@ void PairDataPoint::load_seeps_climo() {
 void PairDataPoint::set_seeps_thresh(const SingleThresh &p1_thresh) {
    if (NULL != seeps_climo) seeps_climo->set_p1_thresh(p1_thresh);
    else mlog << Warning << "\nPairDataPoint::set_seeps_thresh() ignored t1_threshold."
-             << " Load SEESP climo first\n\n";
+             << " Load SEEPS climo first\n\n";
 }
 
 ////////////////////////////////////////////////////////////////////////
