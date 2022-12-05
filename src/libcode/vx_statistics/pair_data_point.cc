@@ -1479,17 +1479,12 @@ void VxPairDataPoint::set_obs_perc_value(int percentile) {
 ////////////////////////////////////////////////////////////////////////
 
 void VxPairDataPoint::load_seeps_climo() {
-   bool loaded = false;
    for(int i=0; i < n_msg_typ; i++){
       for(int j=0; j < n_mask; j++){
          for(int k=0; k < n_interp; k++){
             pd[i][j][k].load_seeps_climo();
-            loaded = true;
-            break;
          }
-         if (loaded) break;
       }
-      if (loaded) break;
    }
 }
 
