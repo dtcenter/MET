@@ -487,7 +487,7 @@ Note that writing out matched pair data (MPR lines) for a large number of cases 
 
 If all line types corresponding to a particular verification method are set to NONE, the computation of those statistics will be skipped in the code and thus make the Point-Stat tool run more efficiently. For example, if FHO, CTC, and CTS are all set to NONE, the Point-Stat tool will skip the categorical verification step.
 
-The default SEEPS climo file exists at MET_BASE/share/met/climo/seeps/PPT24_seepsweights.nc. It can be overridden by using the environment variable, MET_SEEPS_POINT_CLIMO_NAME.
+The default SEEPS climo file exists at MET_BASE/climo/seeps/PPT24_seepsweights.nc. It can be overridden by using the environment variable, MET_SEEPS_POINT_CLIMO_NAME.
 
 .. _point_stat-output:
 
