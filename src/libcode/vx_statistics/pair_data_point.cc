@@ -299,7 +299,7 @@ SeepsScore *PairDataPoint::compute_seeps(const char *sid, double f,
    int month, day, year, hour, minute, second;
 
    int sid_no = atoi(sid);
-   if (sid_no) {
+   if (sid_no && NULL != seeps_climo) {
       unix_to_mdyhms(ut, month, day, year, hour, minute, second);
       seeps = seeps_climo->get_seeps_score(sid_no, f, o, month, hour);
       if (mlog.verbosity_level() >= seeps_debug_level
