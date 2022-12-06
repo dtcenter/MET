@@ -183,10 +183,29 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
                   vx_opt[j].vx_pd.obs_info->is_v_wind()  &&
                   vx_opt[i].is_uv_match(vx_opt[j])) {
 
+                  mlog << Debug(3) << "U-wind field array entry " << i+1
+                       << " matches V-wind field array entry " << j+1 << ".\n";
+
+                  // Print warning about multiple matches
+                  if(vx_opt[i].vx_pd.fcst_info->uv_index() >= 0 ||
+                     vx_opt[i].vx_pd.obs_info->uv_index()  >= 0) {
+                     mlog << Warning << "\nPointStatConfInfo::process_config() -> "
+                          << "For U-wind, found multiple matching V-wind field array entries! "
+                          << "Set the \"level\" strings to differentiate between them.\n\n";
+                  }
+
                   vx_opt[i].vx_pd.fcst_info->set_uv_index(j);
                   vx_opt[i].vx_pd.obs_info->set_uv_index(j);
                }
             }
+
+            // No match found
+            if(vx_opt[i].vx_pd.fcst_info->uv_index() < 0 ||
+               vx_opt[i].vx_pd.obs_info->uv_index()  < 0) {
+               mlog << Debug(3) << "U-wind field array entry " << i+1
+                    << " has no matching V-wind field array entry.\n";
+            }
+
          }
          // Process v-wind
          else if(vx_opt[i].vx_pd.fcst_info->is_v_wind() &&
@@ -198,10 +217,29 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
                   vx_opt[j].vx_pd.obs_info->is_u_wind()  &&
                   vx_opt[i].is_uv_match(vx_opt[j])) {
 
+                  mlog << Debug(3) << "V-wind field array entry " << i+1
+                       << " matches U-wind field array entry " << j+1 << ".\n";
+
+                  // Print warning about multiple matches
+                  if(vx_opt[i].vx_pd.fcst_info->uv_index() >= 0 ||
+                     vx_opt[i].vx_pd.obs_info->uv_index()  >= 0) {
+                     mlog << Warning << "\nPointStatConfInfo::process_config() -> "
+                          << "For U-wind, found multiple matching V-wind field array entries! "
+                          << "Set the \"level\" strings to differentiate between them.\n\n";
+                  }
+
                   vx_opt[i].vx_pd.fcst_info->set_uv_index(j);
                   vx_opt[i].vx_pd.obs_info->set_uv_index(j);
                }
             }
+
+            // No match found
+            if(vx_opt[i].vx_pd.fcst_info->uv_index() < 0 ||
+               vx_opt[i].vx_pd.obs_info->uv_index()  < 0) {
+               mlog << Debug(3) << "V-wind field array entry " << i+1
+                    << " has no matching U-wind field array entry.\n";
+            }
+
          }
       } // end for i
    } // end if
