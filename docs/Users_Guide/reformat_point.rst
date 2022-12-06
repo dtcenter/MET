@@ -1191,10 +1191,10 @@ The script can be found at:
 
 .. code-block:: none
 
-   MET_BASE/shared/met/utility/print_pointnc2ascii.py
+   MET_BASE/utility/print_pointnc2ascii.py
 
 For how to use the script, issue the command:
 
 .. code-block:: none
 
-   python3 MET_BASE/shared/met/utility/print_pointnc2ascii.py -h
+   python3 MET_BASE/utility/print_pointnc2ascii.py -h

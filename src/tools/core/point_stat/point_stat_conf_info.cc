@@ -1091,7 +1091,11 @@ void PointStatVxOpt::set_vx_pd(PointStatConfInfo *conf_info) {
    vx_pd.set_duplicate_flag(duplicate_flag);
    vx_pd.set_obs_summary(obs_summary);
    vx_pd.set_obs_perc_value(obs_perc);
-   vx_pd.set_seeps_thresh(seeps_p1_thresh);
+   if (output_flag[i_seeps_mpr] != STATOutputType_None
+       || output_flag[i_seeps] != STATOutputType_None) {
+     vx_pd.load_seeps_climo();
+     vx_pd.set_seeps_thresh(seeps_p1_thresh);
+   }
    return;
 }
 
