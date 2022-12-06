@@ -173,9 +173,10 @@ void GridStatConfInfo::process_config(GrdFileType ftype,
    // Summarize output flags across all verification tasks
    process_flags();
 
-   // If VL1L2 or VAL1L2 is requested, set the uv_index
+   // If VL1L2, VAL1L2, or VCNT is requested, set the uv_index
    if(output_flag[i_vl1l2]  != STATOutputType_None ||
-      output_flag[i_val1l2] != STATOutputType_None) {
+      output_flag[i_val1l2] != STATOutputType_None ||
+      output_flag[i_vcnt]   != STATOutputType_None) {
 
       for(i=0; i<n_vx; i++) {
 
