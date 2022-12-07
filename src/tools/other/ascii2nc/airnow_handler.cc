@@ -223,7 +223,6 @@ bool AirnowHandler::_readObservations(LineDataFile &ascii_file)
     header_type = "AIRNOW_HOURLY";
     return false;
   }
-  header_names.dump(cout);
 
   if (format_version == AIRNOW_FORMAT_VERSION_HOURLYAQOBS) {
     // need to process this a special way because of comma separated strings with
