@@ -380,3 +380,5 @@ void FileHandler::debug_print_observations(vector< Observation > my_observation,
        << "  GC/VarIdx: " << last_obs.getGribCode() << "  Value: " << last_obs.getValue()
        << "  HeaderType: " << last_obs.getHeaderType() << "\n";
 }
+
+////////////////////////////////////////////////////////////////////////

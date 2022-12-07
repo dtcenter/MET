@@ -104,6 +104,7 @@ protected:
   int varnamePtr;
   int unitsPtr;
   int valuePtr;
+  int avgperiodPtr;
   int aqiPtr;
   int aqiCategoryPtr;
 
@@ -189,7 +190,7 @@ protected:
   void _initializeColumnPointers();
 
   string _extractColumn(const DataLine &data_line, int ptr) const;
-  vector<string> _parseHourlyAqobsLine(const string &asciiLine);
+  int    _getVarIndex(const string &);
 
 };
 
