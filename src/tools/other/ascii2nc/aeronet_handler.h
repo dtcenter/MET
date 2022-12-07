@@ -103,7 +103,7 @@ protected:
   
   // Get the observation valid time from the given observation line
 
-  time_t _getValidTime(const DataLine &data_line) const;
+  time_t _getValidTime(const DataLine &data_line, int start_offset=0) const;
   
   // Read the observations from the given file and add them to the
   // _observations vector.
