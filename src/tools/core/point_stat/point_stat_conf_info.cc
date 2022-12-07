@@ -195,9 +195,11 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
                           << "Using the first match found. Set the \"level\" strings to "
                           << "differentiate between them.\n\n";
                   }
-
-                  vx_opt[i].vx_pd.fcst_info->set_uv_index(j);
-                  vx_opt[i].vx_pd.obs_info->set_uv_index(j);
+                  // Use the first match
+                  else {
+                     vx_opt[i].vx_pd.fcst_info->set_uv_index(j);
+                     vx_opt[i].vx_pd.obs_info->set_uv_index(j);
+                  }
                }
             }
 
@@ -230,6 +232,7 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
                           << "Using the first match found. Set the \"level\" strings to "
                           << "differentiate between them.\n\n";
                   }
+                  // Use the first match
                   else {
                      vx_opt[i].vx_pd.fcst_info->set_uv_index(j);
                      vx_opt[i].vx_pd.obs_info->set_uv_index(j);

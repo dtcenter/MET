@@ -937,7 +937,7 @@ ConcatString raw_magic_str(Dictionary i_edict, GrdFileType file_type) {
 bool is_req_level_match(const ConcatString &s1, const ConcatString &s2) {
    bool match = true;
 
-   // No match if either is non-empty and they are not equal.
+   // No match if either is non-empty and they are not equal
    if((s1.nonempty() || s2.nonempty()) && !(s1 == s2)) match = false;
 
    return(match);

@@ -201,6 +201,7 @@ void GridStatConfInfo::process_config(GrdFileType ftype,
                           << "Using the first match found. Set the \"level\" strings to "
                           << "differentiate between them.\n\n";
                   }
+                  // Use the first match
                   else {
                      vx_opt[i].fcst_info->set_uv_index(j);
                      vx_opt[i].obs_info->set_uv_index(j);
@@ -237,9 +238,11 @@ void GridStatConfInfo::process_config(GrdFileType ftype,
                           << "Using the first match found. Set the \"level\" strings to "
                           << "differentiate between them.\n\n";
                   }
-
-                  vx_opt[i].fcst_info->set_uv_index(j);
-                  vx_opt[i].obs_info->set_uv_index(j);
+                  // Use the first match
+                  else {
+                     vx_opt[i].fcst_info->set_uv_index(j);
+                     vx_opt[i].obs_info->set_uv_index(j);
+                  }
                }
             }
 
