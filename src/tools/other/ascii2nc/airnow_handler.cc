@@ -291,11 +291,14 @@ bool AirnowHandler::_parseObservationLineStandard(DataLine &data_line,
   string col;
     
   if (format_version == AIRNOW_FORMAT_VERSION_HOURLY) {
+
+    // skip lines for which no location is found
     if (!locations.lookupLatLonElev(stationId, lat, lon, elev)) {
-      mlog << Warning << method_name
+      mlog << Warning << "\n" << method_name
 	        << "Skipping line number " << data_line.line_number()
-	        << " StationId " << stationId << " Not found in locations file\n";
-      // skip this line
+	        << " since StationId " << stationId << " not found in locations file ("
+           << monitoringSiteFileName << ")! Set the " << airnow_stations_env
+           << " environment variable to define an updated version.\n\n";
       return false;
     }
   } else {
@@ -332,7 +335,7 @@ bool AirnowHandler::_parseObservationLineStandard(DataLine &data_line,
 
     // add the observation
     _addObservations(Observation(header_type, stationId, valid_time,
-				 lat, lon, elev, na_str, _getVarIndex(varName),
+				 lat, lon, elev, na_str, _getVarIndex(varName, units),
 				 avgPeriodSec, bad_data_double,
 				 value, varName));
 
@@ -348,7 +351,7 @@ bool AirnowHandler::_parseObservationLineStandard(DataLine &data_line,
 
     // add the observation
     _addObservations(Observation(header_type, stationId, valid_time,
-				 lat, lon, elev, na_str, _getVarIndex(varName),
+				 lat, lon, elev, na_str, _getVarIndex(varName, units),
 				 avgPeriodSec, bad_data_double,
 				 value, varName));
   }
@@ -508,10 +511,11 @@ void AirnowHandler::_addHourlyAqobsObs(const vector<string> &data_line, const st
   if (status == 1) {
     aqi = atoi(data_line[aqiPtr].c_str());
     if (doubleOrMissing(data_line[valuePtr], value)) {
-      units = data_line[unitPtr];  // ignored for now
-      // for now only the single variable is written as an observation
+      units = data_line[unitPtr];
+
+      // add the observation
       _addObservations(Observation(header_type, stationId, valid_time,
-				   lat, lon, elev, na_str, _getVarIndex(varname),
+				   lat, lon, elev, na_str, _getVarIndex(varname, units),
 				   avgPeriodSec, bad_data_double,
 				   value, varname));
     }	
@@ -534,9 +538,11 @@ void AirnowHandler::_addHourlyAqobsObs(const vector<string> &data_line, const st
   int avgPeriodSec = 3600;
 
   if (doubleOrMissing(data_line[valuePtr], value)) {
-    units = data_line[unitPtr]; // ignored for now
+    units = data_line[unitPtr];
+
+    // add the observation
     _addObservations(Observation(header_type, stationId, valid_time,
-				 lat, lon, elev, na_str, _getVarIndex(varname),
+				 lat, lon, elev, na_str, _getVarIndex(varname, units),
 				 avgPeriodSec, bad_data_double,
 				 value, varname));
   }
@@ -910,7 +916,7 @@ string AirnowHandler::_extractColumn(const DataLine &data_line, int ptr) const
 
 ////////////////////////////////////////////////////////////////////////
 
-int AirnowHandler::_getVarIndex(const string &var_name)
+int AirnowHandler::_getVarIndex(const string &var_name, const string &units)
 {
    int var_index = bad_data_int;
 
@@ -918,6 +924,7 @@ int AirnowHandler::_getVarIndex(const string &var_name)
    // add a new name to the list, if needed
    if (!var_name.empty() && !obs_names.has(var_name, var_index)) {
       obs_names.add(var_name);
+      obs_units.add(units);
       var_index = obs_names.n() - 1;
    }
 

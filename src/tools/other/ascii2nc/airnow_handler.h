@@ -190,7 +190,7 @@ protected:
   void _initializeColumnPointers();
 
   string _extractColumn(const DataLine &data_line, int ptr) const;
-  int    _getVarIndex(const string &);
+  int    _getVarIndex(const string &, const string &);
 
 };
 
