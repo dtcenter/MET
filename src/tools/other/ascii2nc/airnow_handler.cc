@@ -316,7 +316,6 @@ bool AirnowHandler::_parseObservationLineStandard(DataLine &data_line,
   int avgPeriodSec;
   int aqiValue;
   int aqiCategory;
-  double height_m = elev;
   
   if (format_version == AIRNOW_FORMAT_VERSION_DAILYV2) {
 
@@ -334,20 +333,23 @@ bool AirnowHandler::_parseObservationLineStandard(DataLine &data_line,
     // add the observation
     _addObservations(Observation(header_type, stationId, valid_time,
 				 lat, lon, elev, na_str, _getVarIndex(varName),
-				 avgPeriodSec, height_m,
+				 avgPeriodSec, bad_data_double,
 				 value, varName));
 
   } else if (format_version == AIRNOW_FORMAT_VERSION_HOURLY) {
 
-    varName = _extractColumn(data_line, varnamePtr);
-    units   = _extractColumn(data_line, unitsPtr);
-    col     = _extractColumn(data_line, valuePtr);
-    value   = atof(col.c_str());
+    varName      = _extractColumn(data_line, varnamePtr);
+    units        = _extractColumn(data_line, unitsPtr);
+    col          = _extractColumn(data_line, valuePtr);
+    value        = atof(col.c_str());
+
+   // averaging period is 1-hour
+    avgPeriodSec = 3600;
 
     // add the observation
     _addObservations(Observation(header_type, stationId, valid_time,
 				 lat, lon, elev, na_str, _getVarIndex(varName),
-				 bad_data_double, height_m,
+				 avgPeriodSec, bad_data_double,
 				 value, varName));
   }
   return true;
@@ -498,7 +500,9 @@ void AirnowHandler::_addHourlyAqobsObs(const vector<string> &data_line, const st
   int aqi;
   double value;
   string units;
-  double height_m = elev;
+
+  // averging period is 1-hour
+  int avgPeriodSec = 3600;
   
   status = atoi(data_line[measuredPtr].c_str());
   if (status == 1) {
@@ -508,7 +512,7 @@ void AirnowHandler::_addHourlyAqobsObs(const vector<string> &data_line, const st
       // for now only the single variable is written as an observation
       _addObservations(Observation(header_type, stationId, valid_time,
 				   lat, lon, elev, na_str, _getVarIndex(varname),
-				   bad_data_double, height_m,
+				   avgPeriodSec, bad_data_double,
 				   value, varname));
     }	
   }
@@ -525,13 +529,15 @@ void AirnowHandler::_addHourlyAqobsObs(const vector<string> &data_line, const st
   string col;
   double value;
   string units;
-  double height_m = elev;
-      
+
+  // averging period is 1-hour
+  int avgPeriodSec = 3600;
+
   if (doubleOrMissing(data_line[valuePtr], value)) {
     units = data_line[unitPtr]; // ignored for now
     _addObservations(Observation(header_type, stationId, valid_time,
 				 lat, lon, elev, na_str, _getVarIndex(varname),
-				 bad_data_double, height_m,
+				 avgPeriodSec, bad_data_double,
 				 value, varname));
   }
 }
