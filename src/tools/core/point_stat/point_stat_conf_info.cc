@@ -192,7 +192,8 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
                      vx_opt[i].vx_pd.obs_info->uv_index()  >= 0) {
                      mlog << Warning << "\nPointStatConfInfo::process_config() -> "
                           << "For U-wind, found multiple matching V-wind field array entries! "
-                          << "Set the \"level\" strings to differentiate between them.\n\n";
+                          << "Using the first match found. Set the \"level\" strings to "
+                          << "differentiate between them.\n\n";
                   }
 
                   vx_opt[i].vx_pd.fcst_info->set_uv_index(j);
@@ -226,11 +227,13 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
                      vx_opt[i].vx_pd.obs_info->uv_index()  >= 0) {
                      mlog << Warning << "\nPointStatConfInfo::process_config() -> "
                           << "For U-wind, found multiple matching V-wind field array entries! "
-                          << "Set the \"level\" strings to differentiate between them.\n\n";
+                          << "Using the first match found. Set the \"level\" strings to "
+                          << "differentiate between them.\n\n";
                   }
-
-                  vx_opt[i].vx_pd.fcst_info->set_uv_index(j);
-                  vx_opt[i].vx_pd.obs_info->set_uv_index(j);
+                  else {
+                     vx_opt[i].vx_pd.fcst_info->set_uv_index(j);
+                     vx_opt[i].vx_pd.obs_info->set_uv_index(j);
+                  }
                }
             }
 
@@ -737,18 +740,8 @@ bool PointStatVxOpt::is_uv_match(const PointStatVxOpt &v) const {
 
    //
    // Check that requested forecast and observation levels match.
-   // Requested levels are empty for python embedding.
-   //
-        if( (  vx_pd.fcst_info->req_level_name().nonempty() ||
-             v.vx_pd.fcst_info->req_level_name().nonempty()) &&
-           !(  vx_pd.fcst_info->req_level_name() ==
-             v.vx_pd.fcst_info->req_level_name())) match = false;
-
-   else if( (  vx_pd.obs_info->req_level_name().nonempty() ||
-             v.vx_pd.obs_info->req_level_name().nonempty()) &&
-           !(  vx_pd.obs_info->req_level_name() ==
-             v.vx_pd.obs_info->req_level_name())) match = false;
-
+   // Requested levels are optional for python embedding and may be empty.
+   // Check that several other config options also match.
    //
    // The following do not impact matched pairs:
    //    fcat_ta, ocat_ta,
@@ -759,20 +752,24 @@ bool PointStatVxOpt::is_uv_match(const PointStatVxOpt &v) const {
    //    rank_corr_flag, output_flag
    //
 
-   else if(!(beg_ds         == v.beg_ds        ) ||
-           !(end_ds         == v.end_ds        ) ||
-           !(land_flag      == v.land_flag     ) ||
-           !(topo_flag      == v.topo_flag     ) ||
-           !(mask_grid      == v.mask_grid     ) ||
-           !(mask_poly      == v.mask_poly     ) ||
-           !(mask_sid       == v.mask_sid      ) ||
-           !(mask_llpnt     == v.mask_llpnt    ) ||
-           !(mask_name      == v.mask_name     ) ||
-           !(interp_info    == v.interp_info   ) ||
-           !(msg_typ        == v.msg_typ       ) ||
-           !(duplicate_flag == v.duplicate_flag) ||
-           !(obs_summary    == v.obs_summary   ) ||
-           !(obs_perc       == v.obs_perc      )) match = false;
+   if(!is_req_level_match(  vx_pd.fcst_info->req_level_name(),
+                          v.vx_pd.fcst_info->req_level_name()) ||
+      !is_req_level_match(  vx_pd.obs_info->req_level_name(),
+                          v.vx_pd.obs_info->req_level_name()) ||
+      !(beg_ds         == v.beg_ds        ) ||
+      !(end_ds         == v.end_ds        ) ||
+      !(land_flag      == v.land_flag     ) ||
+      !(topo_flag      == v.topo_flag     ) ||
+      !(mask_grid      == v.mask_grid     ) ||
+      !(mask_poly      == v.mask_poly     ) ||
+      !(mask_sid       == v.mask_sid      ) ||
+      !(mask_llpnt     == v.mask_llpnt    ) ||
+      !(mask_name      == v.mask_name     ) ||
+      !(interp_info    == v.interp_info   ) ||
+      !(msg_typ        == v.msg_typ       ) ||
+      !(duplicate_flag == v.duplicate_flag) ||
+      !(obs_summary    == v.obs_summary   ) ||
+      !(obs_perc       == v.obs_perc      )) match = false;
 
    return(match);
 }

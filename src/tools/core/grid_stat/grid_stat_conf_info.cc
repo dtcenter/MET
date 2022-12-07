@@ -198,11 +198,13 @@ void GridStatConfInfo::process_config(GrdFileType ftype,
                      vx_opt[i].obs_info->uv_index()  >= 0) {
                      mlog << Warning << "\nGridStatConfInfo::process_config() -> "
                           << "For U-wind, found multiple matching V-wind field array entries! "
-                          << "Set the \"level\" strings to differentiate between them.\n\n";
+                          << "Using the first match found. Set the \"level\" strings to "
+                          << "differentiate between them.\n\n";
                   }
-
-                  vx_opt[i].fcst_info->set_uv_index(j);
-                  vx_opt[i].obs_info->set_uv_index(j);
+                  else {
+                     vx_opt[i].fcst_info->set_uv_index(j);
+                     vx_opt[i].obs_info->set_uv_index(j);
+                  }
                }
             }
 
@@ -232,7 +234,8 @@ void GridStatConfInfo::process_config(GrdFileType ftype,
                      vx_opt[i].obs_info->uv_index()  >= 0) {
                      mlog << Warning << "\nGridStatConfInfo::process_config() -> "
                           << "For V-wind, found multiple matching U-wind field array entries! "
-                          << "Set the \"level\" strings to differentiate between them.\n\n";
+                          << "Using the first match found. Set the \"level\" strings to "
+                          << "differentiate between them.\n\n";
                   }
 
                   vx_opt[i].fcst_info->set_uv_index(j);
@@ -937,18 +940,8 @@ bool GridStatVxOpt::is_uv_match(const GridStatVxOpt &v) const {
 
    //
    // Check that requested forecast and observation levels match.
-   // Requested levels are empty for python embedding.
-   //
-        if( (  fcst_info->req_level_name().nonempty() ||
-             v.fcst_info->req_level_name().nonempty()) &&
-           !(  fcst_info->req_level_name() ==
-             v.fcst_info->req_level_name())) match = false;
-
-   else if( (  obs_info->req_level_name().nonempty() ||
-             v.obs_info->req_level_name().nonempty()) &&
-           !(  obs_info->req_level_name() ==
-             v.obs_info->req_level_name())) match = false;
-
+   // Requested levels are optional for python embedding and may be empty.
+   // Check that the masking regions and interpolation options match.
    //
    // The following do not impact matched pairs:
    //    desc, var_name, var_suffix,
@@ -962,10 +955,14 @@ bool GridStatVxOpt::is_uv_match(const GridStatVxOpt &v) const {
    //    hss_ec_value, rank_corr_flag, output_flag, nc_info
    //
 
-   else if(!(mask_grid   == v.mask_grid  ) ||
-           !(mask_poly   == v.mask_poly  ) ||
-           !(mask_name   == v.mask_name  ) ||
-           !(interp_info == v.interp_info)) match = false;
+   if(!is_req_level_match(  fcst_info->req_level_name(),
+                          v.fcst_info->req_level_name()) ||
+      !is_req_level_match(  obs_info->req_level_name(),
+                          v.obs_info->req_level_name()) ||
+      !(mask_grid   == v.mask_grid  ) ||
+      !(mask_poly   == v.mask_poly  ) ||
+      !(mask_name   == v.mask_name  ) ||
+      !(interp_info == v.interp_info)) match = false;
 
    return(match);
 }
