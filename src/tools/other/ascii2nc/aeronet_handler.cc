@@ -47,6 +47,7 @@ const string lat_col2      = "Latitude";            // "Latitude(degrees)"
 const string lon_col2      = "Longitude";           // "Longitude(degrees)"
 const string elv_col2      = "Elevation";           // "Elevation(meters)"
 const string date_col      = "Date";                // "Date(dd:mm:yyyy)"
+const string month_col     = "Month";               // "Month"
 
 const string AeronetHandler::HEADER_TYPE = "";
 
@@ -199,7 +200,7 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
 
   int flag;
   int aod_var_id = bad_data_int;
-  int var_idx, sid_idx, elv_idx, lat_idx, lon_idx, date_idx;
+  int var_idx, sid_idx, elv_idx, lat_idx, lon_idx, date_idx, month_idx;
   double height_from_header;
   string aot = "AOT";
   //string angstrom = "Angstrom";
@@ -210,7 +211,7 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
   StringArray header_var_names;
 
   date_idx = 0;
-  sid_idx = elv_idx = lat_idx = lon_idx = -1;
+  sid_idx = elv_idx = lat_idx = lon_idx = month_idx = -1;
 
   for (int j = 0; j < hdr_tokens.n_elements(); j++)
   {
@@ -252,7 +253,8 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
       else if (0 == hdr_field.find(lat_col1) || 0 == hdr_field.find(lat_col2))  lat_idx = j;
       else if (0 == hdr_field.find(lon_col1) || 0 == hdr_field.find(lon_col2))  lon_idx = j;
       else if (0 == hdr_field.find(elv_col1) || 0 == hdr_field.find(elv_col2))  elv_idx = j;
-      else if (0 == hdr_field.find(date_col))  date_idx = j;
+      else if (0 == strcmp(hdr_field.c_str(), month_col.c_str())) month_idx = j;
+      else if (0 == hdr_field.find(date_col)) date_idx = j;
 
       // Collect variable names and index
       var_name = make_var_name_from_header(hdr_field);
@@ -370,7 +372,7 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
     // Pull the valid time from the data line
     //
 
-    time_t valid_time = _getValidTime(data_line, date_idx);
+    time_t valid_time = _getValidTime(data_line, (0 <= month_idx ? month_idx : date_idx));
 
     if (valid_time == 0)
       return false;
@@ -498,29 +500,44 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
 
 ////////////////////////////////////////////////////////////////////////
 
-time_t AeronetHandler::_getValidTime(const DataLine &data_line, int start_offset) const
+time_t AeronetHandler::_getValidTime(const DataLine &data_line, int date_offset) const
 {
   //
   // Pull out the date information
   //
 
-  ConcatString date_string(data_line[start_offset+0]);
+  string mday;
+  string mon;
+  string year;
+  int month = -1;
+  ConcatString date_string(data_line[date_offset]);
+  bool date_yyyymmm = false;
   StringArray dateTokens = date_string.split(":");
   if (1 == dateTokens.n_elements()) {
-    mlog << Error << "\nAeronetHandler::_getValidTime -> "
-         << "Not supported date: \"" << date_string << "\".\n\n";
-    return 0;
+    // Support "yyyy-MMM"
+    StringArray ymTokens = date_string.split("-");
+    if (2 == ymTokens.n_elements()) {
+      year = ymTokens[0];
+      month = month_name_to_m(ymTokens[1].c_str());
+      if (0 < month && month <= 12) date_yyyymmm = true;
+    }
+    if (!date_yyyymmm) {
+      mlog << Error << "\nAeronetHandler::_getValidTime -> "
+           << "Not supported date: \"" << date_string << "\".\n\n";
+      return 0;
+    }
   }
-
-  string mday = dateTokens[0];
-  string mon  = dateTokens[1];
-  string year = dateTokens[2];
+  else {
+    mday = dateTokens[0];
+    mon  = dateTokens[1];
+    year = dateTokens[2];
+  }
 
   //
   // Pull out the time information
   //
 
-  ConcatString time_string(data_line[start_offset+1]);
+  ConcatString time_string(data_line[date_offset+1]);
   StringArray timeTokens = time_string.split(":");
 
   //
@@ -531,9 +548,9 @@ time_t AeronetHandler::_getValidTime(const DataLine &data_line, int start_offset
   memset(&time_struct, 0, sizeof(time_struct));
 
   time_struct.tm_year = atoi(year.c_str()) - 1900;
-  time_struct.tm_mon = atoi(mon.c_str()) - 1;
-  time_struct.tm_mday = atoi(mday.c_str());
-  if (3 <= timeTokens.n_elements()) {
+  time_struct.tm_mon = ((0 < month) ? month : atoi(mon.c_str())) - 1;
+  time_struct.tm_mday = (0 < month) ? 1 : atoi(mday.c_str());
+  if (3 <= timeTokens.n_elements() && !date_yyyymmm) {
     string hour = timeTokens[0];
     string min = timeTokens[1];
     string sec = timeTokens[2];
