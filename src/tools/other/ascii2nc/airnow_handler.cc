@@ -906,6 +906,7 @@ string AirnowHandler::_extractColumn(const DataLine &data_line, int ptr) const
   if (doStripQuotes) {
     c = remove_quotes(c);
   }
+
   // if you see a '\r' at the end remove that 
   std::size_t i1 = c.find_last_of("\r");
   if (i1 == string::npos) {
@@ -920,9 +921,19 @@ int AirnowHandler::_getVarIndex(const string &var_name, const string &units)
 {
    int var_index = bad_data_int;
 
-   // search the array for this variable name
-   // add a new name to the list, if needed
-   if (!var_name.empty() && !obs_names.has(var_name, var_index)) {
+   // variable name already exists
+   if (obs_names.has(var_name, var_index)) {
+
+      // print warning if the units change
+      if (units != obs_units[var_index]) {
+         mlog << Warning << "\nAirnowHandler::_getVarIndex() -> "
+	           << "the units for observation variable \"" << var_name
+              << "\" changed from \"" << obs_units[var_index]
+              << "\" to \"" << units << "\"!\n\n";
+      }
+   }
+   // add new variable name and units
+   else {
       obs_names.add(var_name);
       obs_units.add(units);
       var_index = obs_names.n() - 1;
