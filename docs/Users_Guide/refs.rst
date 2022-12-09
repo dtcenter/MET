@@ -7,14 +7,14 @@ References
 .. _Aberson-1998:
 
 | Aberson, S.D., 1998: Five-day Tropical cyclone track forecasts in the North
-|   Atlantic Basin. *Weather & Forecasting*,  13, 1005-1015.
+|   Atlantic Basin. *Weather and Forecasting*,  13, 1005-1015.
 |
 
 .. _Ahijevych-2009:
 
-| Ahijevych, D., E. Gilleland, B.G. Brown, and E.E. Ebert, 2009. Application of
+| Ahijevych, D., E. Gilleland, B.G. Brown, and E.E. Ebert, 2009: Application of
 |   spatial verification methods to idealized and NWP-gridded precipitation forecasts.
-|   Weather Forecast., 24 (6), 1485 - 1497, doi: 10.1175/2009WAF2222298.1.
+|   *Weather and Forecasting*, 24 (6), 1485 - 1497, doi: 10.1175/2009WAF2222298.1.
 |
 
 .. _Barker-1991:
@@ -127,30 +127,30 @@ References
 
 .. _Gilleland-2017:
 
-| Gilleland, E., 2017. A new characterization in the spatial verification
+| Gilleland, E., 2017: A new characterization in the spatial verification
 |   framework for false alarms, misses, and overall patterns.
-|   Weather Forecast., 32 (1), 187 - 198, doi: 10.1175/WAF-D-16-0134.1.
+|   *Weather and Forecasting*, 32 (1), 187 - 198, doi: 10.1175/WAF-D-16-0134.1.
 |
 
 .. _Gilleland_PartI-2020:
 
-| Gilleland, E., 2020. Bootstrap methods for statistical inference.
+| Gilleland, E., 2020: Bootstrap methods for statistical inference.
 |   Part I: Comparative forecast verification for continuous variables.
-|   Journal of Atmospheric and Oceanic Technology, 37 (11), 2117 - 2134,
+|   *Journal of Atmospheric and Oceanic Technology*, 37 (11), 2117 - 2134,
 |   doi: 10.1175/JTECH-D-20-0069.1.
 |
 
 .. _Gilleland_PartII-2020:
 
-| Gilleland, E., 2020. Bootstrap methods for statistical inference.
-|   Part II: Extreme-value analysis. Journal of Atmospheric and Oceanic
-|   Technology, 37 (11), 2135 - 2144, doi: 10.1175/JTECH-D-20-0070.1.
+| Gilleland, E., 2020: Bootstrap methods for statistical inference.
+|   Part II: Extreme-value analysis. *Journal of Atmospheric and Oceanic*
+|   *Technology*, 37 (11), 2135 - 2144, doi: 10.1175/JTECH-D-20-0070.1.
 |
 
 .. _Gilleland-2021:
 
-| Gilleland, E., 2021. Novel measures for summarizing high-resolution forecast
-|   performance. Advances in Statistical Climatology, Meteorology and Oceanography,
+| Gilleland, E., 2021: Novel measures for summarizing high-resolution forecast
+|   performance. *Advances in Statistical Climatology, Meteorology and Oceanography*,
 |   7 (1), 13 - 34, doi: 10.5194/ascmo-7-13-2021.
 |
 
@@ -165,9 +165,9 @@ References
 
 .. _Haiden-2012:
 
-| Haiden, T., M.J. Rodwell, D.S. Richardson, A. Okagaki, T. Robinson, T. Hewson, 2012.
-|   *Intercomparison of Global Model Precipitation Forecast Skill in 2010/11*
-|   *Using the SEEPS Score*. Monthly Weather Review, 140, 2720-2733.
+| Haiden, T., M.J. Rodwell, D.S. Richardson, A. Okagaki, T. Robinson, T. Hewson, 2012:
+|   Intercomparison of Global Model Precipitation Forecast Skill in 2010/11
+|   Using the SEEPS Score. *Monthly Weather Review*, 140, 2720-2733.
 |   https://doi.org/10.1175/MWR-D-11-00301.1
 |
 
@@ -193,7 +193,7 @@ References
 
 | Knaff, J.A., M. DeMaria, C.R. Sampson, and J.M. Gross, 2003: Statistical,
 |   Five-Day Tropical Cyclone Intensity Forecasts Derived from Climatology
-|   and Persistence. *Weather & Forecasting,* Vol. 18 Issue 2, p. 80-92.
+|   and Persistence. *Weather and Forecasting,* Vol. 18 Issue 2, p. 80-92.
 | 
 
 .. _Mason-2004:
@@ -239,8 +239,8 @@ References
 .. _North-2022:
 
 | North, R.C.,  M.P. Mittermaier, S.F. Milton, 2022. *Using SEEPS with a*
-|   *TRMM-derived Climatology to Assess Global NWP Precipitation Forecast Skill*.
-|   Monthly Weather Review, 150, 135-155.
+|   TRMM-derived Climatology to Assess Global NWP Precipitation Forecast Skill.
+|   *Monthly Weather Review*, 150, 135-155.
 |   https://doi.org/10.1175/MWR-D-20-0347.1
 |
 
@@ -248,28 +248,28 @@ References
 
 | Ou, M. H., Charles, M., & Collins, D. C. 2016: Sensitivity of calibrated week-2
 |   probabilistic forecast skill to reforecast sampling of the NCEP global
-|   ensemble forecast system. *Weather and Forecasting,* 31(4), 1093-1107.
+|   ensemble forecast system. *Weather and Forecasting*, 31(4), 1093-1107.
 |
 
 .. _Roberts-2008:
 
 | Roberts, N.M., and H.W. Lean, 2008: Scale-selective verification of rainfall
 |   accumulations from high-resolution forecasts of convective events.
-|   *Monthly Weather Review,* 136, 78-97.
+|   *Monthly Weather Review*, 136, 78-97.
 | 
 
 .. _Rodwell-2010:
 
-| Rodwell, M.J., D.S. Richardson, T.D. Hewson and T. Haiden, 2010. *A new equitable*
-|   *score suitable for verifying precipitation in numerical weather prediction*.
-|   Quarterly Journal of the Royal Meteorological Society, 136: 1344-1463.
+| Rodwell, M.J., D.S. Richardson, T.D. Hewson and T. Haiden, 2010: A new equitable
+|   score suitable for verifying precipitation in numerical weather prediction.
+|   *Quarterly Journal of the Royal Meteorological Society*, 136: 1344-1463.
 |   https://doi.org/10.1002/qj.656
 |
 
 .. _Rodwell-2011:
 
-| Rodwell, M.J., T. Haiden, D.S. Richardson, 2011. *Developments in Precipitation*
-|   *Verification*. ECMWF Newsletter Number 128.
+| Rodwell, M.J., T. Haiden, D.S. Richardson, 2011: Developments in Precipitation
+|   Verification. *ECMWF Newsletter* Number 128.
 |   https://www.ecmwf.int/node/14595
 |
 
@@ -310,7 +310,7 @@ References
 .. _Todter-2012:
 
 | Tödter, J. and B. Ahrens, 2012: Generalization of the Ignorance Score:
-|   Continuous ranked version and its decomposition. *Mon. Wea. Rev.*,
+|   Continuous ranked version and its decomposition. *Monthly Weather Review*,
 |   140 (6), 2005 - 2017, doi: 10.1175/MWR-D-11-00266.1.
 |
 
@@ -318,14 +318,14 @@ References
 
 | Weniger, M., F. Kapp, and P. Friederichs, 2016: Spatial Verification Using
 |   Wavelet Transforms: A Review. *Quarterly Journal of the Royal*
-|   *Meteorological Society,* 143, 120-136.
+|   *Meteorological Society*, 143, 120-136.
 | 
 
 .. _Wilks-2010:
 
 | Wilks, D.S. 2010: Sampling distributions of the Brier score and Brier skill
 |   score under serial dependence. *Quarterly Journal of the Royal*
-|   *Meteorological Society,*, 136, 2109-2118. doi:10.1002/qj.709
+|   *Meteorological Society*, 136, 2109-2118. doi:10.1002/qj.709
 | 
 
 .. _Wilks-2011:
