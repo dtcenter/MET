@@ -200,8 +200,8 @@ bool AirnowHandler::_readObservations(LineDataFile &ascii_file)
   }
   else if (format_version == AIRNOW_FORMAT_VERSION_HOURLYAQOBS) {
     doStripQuotes = true;
-    if (!_readHeaderInfo(ascii_file))
-      return false;
+    if (!_readHeaderInfo(ascii_file)) return false;
+
     header_type = "AIRNOW_HOURLY_AQOBS";
     delimiter = ",";
     column_cnt = NUM_COLS_HOURLYAQOBS;
@@ -209,9 +209,7 @@ bool AirnowHandler::_readObservations(LineDataFile &ascii_file)
   else if (format_version == AIRNOW_FORMAT_VERSION_HOURLY) {
     doStripQuotes = false;
     _setHourlyHeaderInfo();
-    if (!locations.initialize(monitoringSiteFileName)) {
-      return false;
-    }
+    if (!locations.initialize(monitoringSiteFileName)) return false;
     header_type = "AIRNOW_HOURLY";
     delimiter = "|";
     column_cnt = NUM_COLS_HOURLY;
@@ -219,8 +217,8 @@ bool AirnowHandler::_readObservations(LineDataFile &ascii_file)
   else {
     mlog << Error << method_name
          << "format value=" << format_version << " expect "
-	      << AIRNOW_FORMAT_VERSION_DAILYV2 << " or " << AIRNOW_FORMAT_VERSION_HOURLYAQOBS
-	      << " or " << AIRNOW_FORMAT_VERSION_HOURLY << "\n\n";
+         << AIRNOW_FORMAT_VERSION_DAILYV2 << " or " << AIRNOW_FORMAT_VERSION_HOURLYAQOBS
+         << " or " << AIRNOW_FORMAT_VERSION_HOURLY << "\n\n";
     header_type = "AIRNOW_HOURLY";
     return false;
   }
@@ -237,8 +235,8 @@ bool AirnowHandler::_readObservations(LineDataFile &ascii_file)
 ////////////////////////////////////////////////////////////////////////
 
 bool AirnowHandler::_readObservationsStandard(LineDataFile &ascii_file,
-					      int column_cnt, const string &delimiter,
-					      const string &header_type)
+                                              int column_cnt, const string &delimiter,
+                                              const string &header_type)
 {
   DataLine data_line;
   //
@@ -248,7 +246,7 @@ bool AirnowHandler::_readObservationsStandard(LineDataFile &ascii_file,
   data_line.set_delimiter(delimiter.c_str());
   while (ascii_file >> data_line) {
     if (!_parseObservationLineStandard(data_line, ascii_file.filename(),
-				                           column_cnt, header_type)) {
+                                                           column_cnt, header_type)) {
       bad_line_count++;
     }
   }
@@ -258,9 +256,9 @@ bool AirnowHandler::_readObservationsStandard(LineDataFile &ascii_file,
 ////////////////////////////////////////////////////////////////////////
 
 bool AirnowHandler::_parseObservationLineStandard(DataLine &data_line,
-						  const string &filename,
-						  int column_cnt,
-						  const string &header_type)
+                                                  const string &filename,
+                                                  int column_cnt,
+                                                  const string &header_type)
 {
   string method_name = "AirnowHandler::_parseObservationLineStandard() -> ";
 
@@ -269,19 +267,19 @@ bool AirnowHandler::_parseObservationLineStandard(DataLine &data_line,
   //
   if (data_line.n_items() != column_cnt) {
     mlog << Error << "\n" << method_name
-	      << "line number " << data_line.line_number()
+         << "line number " << data_line.line_number()
          << " does not have the correct number of columns " << data_line.n_items()
-	      << " (" << column_cnt << "). Skipping this line in \""
-	      << filename << "\".\n\n";
+         << " (" << column_cnt << "). Skipping this line in \""
+         << filename << "\".\n\n";
     return false;
   }
 
   time_t valid_time = _getValidTime(data_line);
   if (valid_time == 0) {
     mlog << Error << "\n" << method_name
-	      << "line number " << data_line.line_number()
-	      << " time could not be parsed, skipping this line in \""
-	      << filename << "\".\n\n";
+         << "line number " << data_line.line_number()
+         << " time could not be parsed, skipping this line in \""
+         << filename << "\".\n\n";
     return false;
   }
     
@@ -295,8 +293,8 @@ bool AirnowHandler::_parseObservationLineStandard(DataLine &data_line,
     // skip lines for which no location is found
     if (!locations.lookupLatLonElev(stationId, lat, lon, elev)) {
       mlog << Warning << "\n" << method_name
-	        << "Skipping line number " << data_line.line_number()
-	        << " since StationId " << stationId << " not found in locations file ("
+           << "Skipping line number " << data_line.line_number()
+           << " since StationId " << stationId << " not found in locations file ("
            << monitoringSiteFileName << ")! Set the " << airnow_stations_env
            << " environment variable to define an updated version.\n\n";
       return false;
@@ -335,9 +333,9 @@ bool AirnowHandler::_parseObservationLineStandard(DataLine &data_line,
 
     // add the observation
     _addObservations(Observation(header_type, stationId, valid_time,
-				 lat, lon, elev, na_str, _getVarIndex(varName, units),
-				 avgPeriodSec, bad_data_double,
-				 value, varName));
+                                 lat, lon, elev, na_str, _getVarIndex(varName, units),
+                                 avgPeriodSec, bad_data_double,
+                                 value, varName));
 
   } else if (format_version == AIRNOW_FORMAT_VERSION_HOURLY) {
 
@@ -351,9 +349,9 @@ bool AirnowHandler::_parseObservationLineStandard(DataLine &data_line,
 
     // add the observation
     _addObservations(Observation(header_type, stationId, valid_time,
-				 lat, lon, elev, na_str, _getVarIndex(varName, units),
-				 avgPeriodSec, bad_data_double,
-				 value, varName));
+                                 lat, lon, elev, na_str, _getVarIndex(varName, units),
+                                 avgPeriodSec, bad_data_double,
+                                 value, varName));
   }
   return true;
 }
@@ -361,8 +359,8 @@ bool AirnowHandler::_parseObservationLineStandard(DataLine &data_line,
 ////////////////////////////////////////////////////////////////////////
 
 bool AirnowHandler::_readObservationsHourlyAqobs(LineDataFile &ascii_file,
-						 int column_cnt, const string &delimiter,
-						 const string &header_type)
+                                                 int column_cnt, const string &delimiter,
+                                                 const string &header_type)
 {
   string method_name = "AirnowHandler::_readObservationsHourlyAqobs() -> ";
 
@@ -381,7 +379,7 @@ bool AirnowHandler::_readObservationsHourlyAqobs(LineDataFile &ascii_file,
   while (ascii_file >> data_line) {
     lineNumber++;
     if (!_parseObservationLineAqobs(data_line[0], column_cnt, header_type,
-				    lineNumber, ascii_file.filename())) {
+                                    lineNumber, ascii_file.filename())) {
       ++bad_line_count;
     }
   }
@@ -391,10 +389,10 @@ bool AirnowHandler::_readObservationsHourlyAqobs(LineDataFile &ascii_file,
 ////////////////////////////////////////////////////////////////////////
 
 bool AirnowHandler::_parseObservationLineAqobs(const string &data_line,
-					       int column_cnt,
-					       const string &header_type,
-					       int lineNumber,
-					       const string &filename)
+                                               int column_cnt,
+                                               const string &header_type,
+                                               int lineNumber,
+                                               const string &filename)
 {
   string method_name = "AirnowHandler::_parseObservationLineAqobs() -> ";
 
@@ -406,19 +404,19 @@ bool AirnowHandler::_parseObservationLineAqobs(const string &data_line,
 
   if ((int)tokens.size()  != column_cnt) {
     mlog << Error << "\nAirnowHandler" << method_name
-	      << "line number " << lineNumber
+         << "line number " << lineNumber
          << " does not have the correct number of columns " << tokens.size()
-	      << " (" << column_cnt << "). Skipping this line in \""
-	      << filename << "\".\n\n";
+         << " (" << column_cnt << "). Skipping this line in \""
+         << filename << "\".\n\n";
     // for now just skip this line
     return false;
   }
   time_t valid_time = _getValidTime(tokens);
   if (valid_time == 0) {
     mlog << Error << "\n" << method_name
-	      << "line number " << lineNumber
-	      << " time could not be parsed, skipping this line in \""
-	      << filename << "\".\n\n";
+         << "line number " << lineNumber
+         << " time could not be parsed, skipping this line in \""
+         << filename << "\".\n\n";
     return false;
   }
     
@@ -436,21 +434,21 @@ bool AirnowHandler::_parseObservationLineAqobs(const string &data_line,
   }
     
   _addHourlyAqobsObs(tokens, header_type, stationId, valid_time, lat, lon, elev,
-		     ozoneMeasuredPtr, ozoneAqiPtr, ozonePtr, ozoneUnitPtr,
-		     hdr_hourlyaqobs_ozone);
+                     ozoneMeasuredPtr, ozoneAqiPtr, ozonePtr, ozoneUnitPtr,
+                     hdr_hourlyaqobs_ozone);
   _addHourlyAqobsObs(tokens, header_type, stationId, valid_time, lat, lon, elev,
-		     pm10MeasuredPtr, pm10AqiPtr, pm10Ptr, pm10UnitPtr,
-		     hdr_hourlyaqobs_pm10);
+                     pm10MeasuredPtr, pm10AqiPtr, pm10Ptr, pm10UnitPtr,
+                     hdr_hourlyaqobs_pm10);
   _addHourlyAqobsObs(tokens, header_type, stationId, valid_time, lat, lon, elev,
-		     pm25MeasuredPtr, pm25AqiPtr, pm25Ptr, pm25UnitPtr,
-		     hdr_hourlyaqobs_pm25);
+                     pm25MeasuredPtr, pm25AqiPtr, pm25Ptr, pm25UnitPtr,
+                     hdr_hourlyaqobs_pm25);
   _addHourlyAqobsObs(tokens, header_type, stationId, valid_time, lat, lon, elev,
-		     no2MeasuredPtr, no2AqiPtr, no2Ptr, no2UnitPtr,
-		     hdr_hourlyaqobs_no2);
+                     no2MeasuredPtr, no2AqiPtr, no2Ptr, no2UnitPtr,
+                     hdr_hourlyaqobs_no2);
   _addHourlyAqobsObs(tokens, header_type, stationId, valid_time, lat, lon, elev,
-		     coPtr, coUnitPtr,  hdr_hourlyaqobs_co);
+                     coPtr, coUnitPtr,  hdr_hourlyaqobs_co);
   _addHourlyAqobsObs(tokens, header_type, stationId, valid_time, lat, lon, elev,
-		     so2Ptr, so2UnitPtr,  hdr_hourlyaqobs_so2);
+                     so2Ptr, so2UnitPtr,  hdr_hourlyaqobs_so2);
   return true;
 }
 
@@ -493,10 +491,10 @@ bool AirnowHandler::_determineFileType(LineDataFile &ascii_file)
 ////////////////////////////////////////////////////////////////////////
 
 void AirnowHandler::_addHourlyAqobsObs(const vector<string> &data_line, const string &header_type,
-				       const string &stationId, const time_t &valid_time,
-				       double lat, double lon, double elev,
-				       int measuredPtr, int aqiPtr, int valuePtr,
-				       int unitPtr, const string &varname)
+                                       const string &stationId, const time_t &valid_time,
+                                       double lat, double lon, double elev,
+                                       int measuredPtr, int aqiPtr, int valuePtr,
+                                       int unitPtr, const string &varname)
 {
   string col;
   int status;
@@ -515,10 +513,10 @@ void AirnowHandler::_addHourlyAqobsObs(const vector<string> &data_line, const st
 
       // add the observation
       _addObservations(Observation(header_type, stationId, valid_time,
-				   lat, lon, elev, na_str, _getVarIndex(varname, units),
-				   avgPeriodSec, bad_data_double,
-				   value, varname));
-    }	
+                                   lat, lon, elev, na_str, _getVarIndex(varname, units),
+                                   avgPeriodSec, bad_data_double,
+                                   value, varname));
+    }        
   }
 }
 
@@ -526,9 +524,9 @@ void AirnowHandler::_addHourlyAqobsObs(const vector<string> &data_line, const st
 
 
 void AirnowHandler::_addHourlyAqobsObs(const vector<string> &data_line, const string &header_type,
-				       const string &stationId, const time_t &valid_time,
-				       double lat, double lon, double elev,
-				       int valuePtr, int unitPtr, const string &varname)
+                                       const string &stationId, const time_t &valid_time,
+                                       double lat, double lon, double elev,
+                                       int valuePtr, int unitPtr, const string &varname)
 {
   string col;
   double value;
@@ -542,9 +540,9 @@ void AirnowHandler::_addHourlyAqobsObs(const vector<string> &data_line, const st
 
     // add the observation
     _addObservations(Observation(header_type, stationId, valid_time,
-				 lat, lon, elev, na_str, _getVarIndex(varname, units),
-				 avgPeriodSec, bad_data_double,
-				 value, varname));
+                                 lat, lon, elev, na_str, _getVarIndex(varname, units),
+                                 avgPeriodSec, bad_data_double,
+                                 value, varname));
   }
 }
 
@@ -558,7 +556,7 @@ time_t AirnowHandler::_getValidTime(const DataLine &data_line) const
   //
   if (datePtr  < 0) {
     mlog << Error << "\nAirnowHandler::_getValidTime -> "
-	 << "Date column pointer is not set\n\n";
+         << "Date column pointer is not set\n\n";
     return 0;
   }
   string dateStr = _extractColumn(data_line, datePtr);
@@ -580,7 +578,7 @@ time_t AirnowHandler::_getValidTime(const vector<string> &data_line) const
   //
   if (datePtr  < 0) {
     mlog << Error << "\nAirnowHandler::_getValidTime -> "
-	 << "Date column pointer is not set\n\n";
+         << "Date column pointer is not set\n\n";
     return 0;
   }
   string dateStr = data_line[datePtr];
@@ -604,7 +602,7 @@ time_t AirnowHandler::_getValidTime(const string &dateStr, const string &timeStr
   StringArray dateTokens = date_string.split("/");
   if (1 == dateTokens.n()) {
     mlog << Error << "\nAirnowHandler::_getValidTime -> "
-	 << "Not supported date: \"" << date_string << "\".\n\n";
+         << "Not supported date: \"" << date_string << "\".\n\n";
     return 0;
   }
   mon = dateTokens[0];
@@ -638,7 +636,7 @@ time_t AirnowHandler::_getValidTime(const string &dateStr, const string &timeStr
       sec = timeTokens[2];
     } else {
       mlog << Error << "\nAirnowHandler::_getValidTime -> "
-	   << "Not supported time: \"" << time_string << "\".\n\n";
+           << "Not supported time: \"" << time_string << "\".\n\n";
       return 0;
     }
   }
@@ -767,9 +765,8 @@ bool AirnowHandler::_readHeaderInfo(LineDataFile &ascii_file)
   if (!(ascii_file >> data_line))
     {
       mlog << Error << "\nAirnowHandler::_readHeaderInfo() -> "
-	   << "error reading header line from input ASCII file \""
-	   << ascii_file.filename() << "\"\n\n";
-
+           << "error reading header line from input ASCII file \""
+           << ascii_file.filename() << "\"\n\n";
       return false;
     }
 
@@ -797,61 +794,61 @@ bool AirnowHandler::_readHeaderInfo(LineDataFile &ascii_file)
     if (reference_headers.has(s)) {
       header_names.add(s);
       if (s == hdr_aqsid) {
-	stationIdPtr = i;
+        stationIdPtr = i;
       } else if (s == hdr_valid_date) {
-	datePtr = i;
+        datePtr = i;
       } else if (s == hdr_valid_time) {
-	timePtr = i;
+        timePtr = i;
       } else if (s == hdr_lat) {
-	latPtr = i;
+        latPtr = i;
       } else if (s == hdr_lon) {
-	lonPtr = i;
+        lonPtr = i;
       } else if (s == hdr_hourlyaqobs_elevation) {
-	elevPtr = i;
+        elevPtr = i;
       } else if (s == hdr_hourlyaqobs_ozone_aqi) {
-	ozoneAqiPtr = i;
+        ozoneAqiPtr = i;
       } else if (s == hdr_hourlyaqobs_ozone_measured) {
-	ozoneMeasuredPtr = i;
+        ozoneMeasuredPtr = i;
       } else if (s == hdr_hourlyaqobs_ozone) {
-	ozonePtr = i;
+        ozonePtr = i;
       } else if (s == hdr_hourlyaqobs_ozone_units) {
-	ozoneUnitPtr = i;
+        ozoneUnitPtr = i;
       } else if (s == hdr_hourlyaqobs_pm10_aqi) {
-	pm10AqiPtr = i;
+        pm10AqiPtr = i;
       } else if (s == hdr_hourlyaqobs_pm10_measured) {
-	pm10MeasuredPtr = i;
+        pm10MeasuredPtr = i;
       } else if (s == hdr_hourlyaqobs_pm10) {
-	pm10Ptr = i;
+        pm10Ptr = i;
       } else if (s == hdr_hourlyaqobs_pm10_units) {
-	pm10UnitPtr = i;
+        pm10UnitPtr = i;
       } else if (s == hdr_hourlyaqobs_pm25_aqi) {
-	pm25AqiPtr = i;
+        pm25AqiPtr = i;
       } else if (s == hdr_hourlyaqobs_pm25_measured) {
-	pm25MeasuredPtr = i;
+        pm25MeasuredPtr = i;
       } else if (s == hdr_hourlyaqobs_pm25) {
-	pm25Ptr = i;
+        pm25Ptr = i;
       } else if (s == hdr_hourlyaqobs_pm25_units) {
-	pm25UnitPtr = i;
+        pm25UnitPtr = i;
       } else if (s == hdr_hourlyaqobs_no2_aqi) {
-	no2AqiPtr = i;
+        no2AqiPtr = i;
       } else if (s == hdr_hourlyaqobs_no2_measured) {
-	no2MeasuredPtr = i;
+        no2MeasuredPtr = i;
       } else if (s == hdr_hourlyaqobs_no2) {
-	no2Ptr = i;
+        no2Ptr = i;
       } else if (s == hdr_hourlyaqobs_no2_units) {
-	no2UnitPtr = i;
+        no2UnitPtr = i;
       } else if (s == hdr_hourlyaqobs_co) {
-	coPtr = i;
+        coPtr = i;
       } else if (s == hdr_hourlyaqobs_co_units) {
-	coUnitPtr = i;
+        coUnitPtr = i;
       } else if (s == hdr_hourlyaqobs_so2) {
-	so2Ptr = i;
+        so2Ptr = i;
       } else if (s == hdr_hourlyaqobs_so2_units) {
-	so2UnitPtr = i;
+        so2UnitPtr = i;
       }
     } else {
       mlog << Error << "\nAirnowHandler::_readHeaderInfo() -> "
-	   << "AIRNOW file has unknown header item " << s << "\n\n";
+           << "AIRNOW file has unknown header item " << s << "\n\n";
       status = false;
     }
   }
@@ -927,7 +924,7 @@ int AirnowHandler::_getVarIndex(const string &var_name, const string &units)
       // print warning if the units change
       if (units != obs_units[var_index]) {
          mlog << Warning << "\nAirnowHandler::_getVarIndex() -> "
-	           << "the units for observation variable \"" << var_name
+              << "the units for observation variable \"" << var_name
               << "\" changed from \"" << obs_units[var_index]
               << "\" to \"" << units << "\"!\n\n";
       }
@@ -997,8 +994,8 @@ vector<string> parseHourlyAqobsLine(const string &asciiLine, bool &ok)
     i1 = remainder.find_first_of("\"");
     if (i1 == string::npos) {
       mlog << Warning << "\nparseHourlyAqobsLine -> "
-	        << "line doesn't have matching double quotes\n"
-	        << fullLine << "\n\n";
+           << "line doesn't have matching double quotes\n"
+           << fullLine << "\n\n";
       // skip this line
       ok = false;
       break;
@@ -1006,7 +1003,7 @@ vector<string> parseHourlyAqobsLine(const string &asciiLine, bool &ok)
       string token = remainder.substr(0, i1);
       tokens.push_back(token);
       remainder = remainder.substr(i1+1);
-    }	
+    }        
   }
   return tokens;
 }
