@@ -97,7 +97,7 @@ MET Version 11.0.0 release notes (20221209)
    * Configuration and masking:
 
       * Define the Bukovsky masking regions for use in MET (`#1940 <https://github.com/dtcenter/MET/issues/1940>`_).
-      * Enhance Gen-Vx-Mask by adding a new poly_xy masking type option (`#2152 <https://github.com/dtcenter/MET/issues/2152>`_).
+      * **Enhance Gen-Vx-Mask by adding a new poly_xy masking type option** (`#2152 <https://github.com/dtcenter/MET/issues/2152>`_).
       * Add M_to_KFT and KM_to_KFT functions to ConfigConstants (`#2180 <https://github.com/dtcenter/MET/issues/2180>`_).
       * Update map data with more recent NaturalEarth definitions (`#2207 <https://github.com/dtcenter/MET/issues/2207>`_).
 
@@ -130,7 +130,7 @@ MET Version 11.0.0 release notes (20221209)
       * **Enhance TC-Pairs to read hurricane model diagnostic files (e.g. SHIPS) and TC-Stat to filter the new data** (`#392 <https://github.com/dtcenter/MET/issues/392>`_).
       * **Enhance TC-Pairs consensus logic to compute the spread of the location, wind speed, and pressure** (`#2036 <https://github.com/dtcenter/MET/issues/2036>`_).
       * Enhance TC-RMW to compute tangential and radial winds (`#2072 <https://github.com/dtcenter/MET/issues/2072>`_).
-      * **Refine TCDIAG output from TC-Pairs as needed** (`#2321 <https://github.com/dtcenter/MET/issues/2321>`_).
+      * Refine TCDIAG output from TC-Pairs as needed (`#2321 <https://github.com/dtcenter/MET/issues/2321>`_).
       * Rename the TCDIAG SOURCE column as DIAG_SOURCE (`#2337 <https://github.com/dtcenter/MET/issues/2337>`_).
 
    * Miscellaneous:
