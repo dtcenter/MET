@@ -74,7 +74,7 @@ public:
   static const int NUM_COLS_HOURLYAQOBS;
   static const int NUM_COLS_DAILYV2;
 
-protected:  
+protected:
 
   /////////////////////////
   // Protected constants //
@@ -131,7 +131,7 @@ protected:
   int coUnitPtr;
   int so2Ptr;
   int so2UnitPtr;
-  
+
   string monitoringSiteFileName;
 
   AirnowLocations locations;
@@ -151,7 +151,7 @@ protected:
   // _stationLat, _stationLon and _stationAlt values.
 
   bool _readHeaderInfo(LineDataFile &ascii_file);
-  
+
   bool _determineFileType(LineDataFile &ascii_file);
 
   void _addHourlyAqobsObs(const vector<string> &data_line, const string &header_type,
@@ -170,7 +170,7 @@ protected:
   time_t _getValidTime(const DataLine &data_line) const;
   time_t _getValidTime(const string &dateStr, const string &timeStr) const;
 
-  
+
   // Read the observations from the given file and add them to the
   // _observations vector.
 

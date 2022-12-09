@@ -16,7 +16,7 @@ using namespace std;
 #include <iostream>
 #include <string>
 #include <sstream>
-#include <assert.h> 
+#include <assert.h>
 #include <algorithm>
 
 #include "vx_log.h"
@@ -183,14 +183,14 @@ bool AirnowHandler::_readObservations(LineDataFile &ascii_file)
   int column_cnt;
 
   _initializeColumnPointers();
-  
+
   if (format_version == AIRNOW_FORMAT_VERSION_UNKNOWN) {
     // try to figure out which one it is and set it
     if (!_determineFileType(ascii_file)) {
       return false;
     }
   }
-  
+
   if (format_version == AIRNOW_FORMAT_VERSION_DAILYV2) {
     doStripQuotes = false;
     _setDailyv2HeaderInfo();
@@ -252,7 +252,7 @@ bool AirnowHandler::_readObservationsStandard(LineDataFile &ascii_file,
   }
   return true;
 }
-  
+
 ////////////////////////////////////////////////////////////////////////
 
 bool AirnowHandler::_parseObservationLineStandard(DataLine &data_line,
@@ -282,12 +282,12 @@ bool AirnowHandler::_parseObservationLineStandard(DataLine &data_line,
          << filename << "\".\n\n";
     return false;
   }
-    
+
   // fill in expected things
   double lat, lon, elev;
   string stationId = _extractColumn(data_line, stationIdPtr);
   string col;
-    
+
   if (format_version == AIRNOW_FORMAT_VERSION_HOURLY) {
 
     // skip lines for which no location is found
@@ -317,7 +317,7 @@ bool AirnowHandler::_parseObservationLineStandard(DataLine &data_line,
   int avgPeriodSec;
   int aqiValue;
   int aqiCategory;
-  
+
   if (format_version == AIRNOW_FORMAT_VERSION_DAILYV2) {
 
     varName      = _extractColumn(data_line, varnamePtr);
@@ -419,12 +419,12 @@ bool AirnowHandler::_parseObservationLineAqobs(const string &data_line,
          << filename << "\".\n\n";
     return false;
   }
-    
+
   // fill in expected things
   double lat, lon, elev;
   string stationId = tokens[stationIdPtr];
   string col;
-    
+
   lat = atof(tokens[latPtr].c_str());
   lon = atof(tokens[lonPtr].c_str());
   if (elevPtr >= 0) {
@@ -432,7 +432,7 @@ bool AirnowHandler::_parseObservationLineAqobs(const string &data_line,
   } else {
     elev = 0.0;
   }
-    
+
   _addHourlyAqobsObs(tokens, header_type, stationId, valid_time, lat, lon, elev,
                      ozoneMeasuredPtr, ozoneAqiPtr, ozonePtr, ozoneUnitPtr,
                      hdr_hourlyaqobs_ozone);
@@ -504,7 +504,7 @@ void AirnowHandler::_addHourlyAqobsObs(const vector<string> &data_line, const st
 
   // averging period is 1-hour
   int avgPeriodSec = 3600;
-  
+
   status = atoi(data_line[measuredPtr].c_str());
   if (status == 1) {
     aqi = atoi(data_line[aqiPtr].c_str());
@@ -516,7 +516,7 @@ void AirnowHandler::_addHourlyAqobsObs(const vector<string> &data_line, const st
                                    lat, lon, elev, na_str, _getVarIndex(varname, units),
                                    avgPeriodSec, bad_data_double,
                                    value, varname));
-    }        
+    }
   }
 }
 
@@ -549,7 +549,7 @@ void AirnowHandler::_addHourlyAqobsObs(const vector<string> &data_line, const st
 ////////////////////////////////////////////////////////////////////////
 
 time_t AirnowHandler::_getValidTime(const DataLine &data_line) const
-   
+
 {
   //
   // Pull out the date information
@@ -597,7 +597,7 @@ time_t AirnowHandler::_getValidTime(const string &dateStr, const string &timeStr
 {
   string mon, mday, year;
   string hour, min, sec;
-  
+
   ConcatString date_string(dateStr);
   StringArray dateTokens = date_string.split("/");
   if (1 == dateTokens.n()) {
@@ -614,7 +614,7 @@ time_t AirnowHandler::_getValidTime(const string &dateStr, const string &timeStr
     // assumptions are true
     year = "20" + year;
   }
-  
+
   hour = "00";
   min = "00";
   sec = "00";
@@ -640,7 +640,7 @@ time_t AirnowHandler::_getValidTime(const string &dateStr, const string &timeStr
       return 0;
     }
   }
-  
+
   //
   // Set up the time structure
   //
@@ -786,7 +786,7 @@ bool AirnowHandler::_readHeaderInfo(LineDataFile &ascii_file)
   // reference strings, while also setting pointers to
   // the columns that are of interest
   //
-  
+
   header_names.clear();
   bool status = true;
   for (int i=0; i<NUM_COLS_HOURLYAQOBS; ++i) {
@@ -904,7 +904,7 @@ string AirnowHandler::_extractColumn(const DataLine &data_line, int ptr) const
     c = remove_quotes(c);
   }
 
-  // if you see a '\r' at the end remove that 
+  // if you see a '\r' at the end remove that
   std::size_t i1 = c.find_last_of("\r");
   if (i1 == string::npos) {
     return c;
@@ -1003,7 +1003,7 @@ vector<string> parseHourlyAqobsLine(const string &asciiLine, bool &ok)
       string token = remainder.substr(0, i1);
       tokens.push_back(token);
       remainder = remainder.substr(i1+1);
-    }        
+    }
   }
   return tokens;
 }
