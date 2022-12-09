@@ -82,7 +82,7 @@ MET Version 11.0.0 release notes (20221209)
       * Remove namespace specification from header files (`#2227 <https://github.com/dtcenter/MET/issues/2227>`_).
       * Update MET version number to 11.0.0 (`#2132 <https://github.com/dtcenter/MET/issues/2132>`_).
       * Store unspecified accumulation interval as 0 rather than bad data (`#2250 <https://github.com/dtcenter/MET/issues/2250>`_).
-      * Add sanity check to error out when both is_u_wind and is_v_wind are set to true (`# <https://github.com/dtcenter/MET/issues/2357>`_).
+      * Add sanity check to error out when both is_u_wind and is_v_wind are set to true (`#2357 <https://github.com/dtcenter/MET/issues/2357>`_).
 
    * Statistics:
 
