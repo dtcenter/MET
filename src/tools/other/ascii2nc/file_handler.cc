@@ -188,7 +188,7 @@ bool FileHandler::summarizeObs(const TimeSummaryInfo &summary_info)
    _dataSummarized = true;
    _summaryInfo = summary_info;
    StringArray summary_vnames = summary_obs.getObsNames();
-   for (int idx=0; idx<summary_vnames.n_elements(); idx++) {
+   for (int idx=0; idx<summary_vnames.n(); idx++) {
       if (!obs_names.has(summary_vnames[idx])) obs_names.add(summary_vnames[idx]);
    }
    return result;
@@ -200,7 +200,6 @@ bool FileHandler::summarizeObs(const TimeSummaryInfo &summary_info)
 
 void FileHandler::_closeNetcdf()
 {
-   //_ncFile->close();
    delete _ncFile;
    _ncFile = (NcFile *) 0;
 }
@@ -257,7 +256,6 @@ bool FileHandler::_openNetcdf(const string &nc_filename)
    int obs_cnt, hdr_cnt;
    nc_point_obs.get_dim_counts(&obs_cnt, &hdr_cnt);
    nc_point_obs.init_netcdf(obs_cnt, hdr_cnt, _programName);
-
 
    //
    // Initialize the header and observation record counters
@@ -340,8 +338,8 @@ bool FileHandler::_addObservations(const Observation &obs)
 
 bool FileHandler::_writeObservations()
 {
-  StringArray descs, units;
-  nc_point_obs.write_to_netcdf(obs_names, units, descs);
+  StringArray descs;
+  nc_point_obs.write_to_netcdf(obs_names, obs_units, descs);
 
   return true;
 }
@@ -380,3 +378,5 @@ void FileHandler::debug_print_observations(vector< Observation > my_observation,
        << "  GC/VarIdx: " << last_obs.getGribCode() << "  Value: " << last_obs.getValue()
        << "  HeaderType: " << last_obs.getHeaderType() << "\n";
 }
+
+////////////////////////////////////////////////////////////////////////

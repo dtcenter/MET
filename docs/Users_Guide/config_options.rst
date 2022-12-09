@@ -240,6 +240,7 @@ Referencing that environment variable inside a MET configuration file:
 In addition to supporting user-specified environment variables within configuration
 files, the environment variables listed below have special meaning if set at runtime.
 
+.. _met_airnow_stations:
 
 MET_AIRNOW_STATIONS
 ^^^^^^^^^^^^^^^^^^^
@@ -249,7 +250,17 @@ will override the default file. If set, it should be the full path to the file.
 The default table can be found in the installed
 *share/met/table_files/airnow_monitoring_site_locations_v2.dat*. This file contains
 ascii column data that allows lookups of latitude, longitude, and elevation for all
-airnow stations based on stationId and/or AqSid.
+AirNow stations based on stationId and/or AqSid.
+
+Additional information and updated site locations can be found at the
+`EPA AirNow website <https://www.airnow.gov>`_. While some monitoring stations are
+permanent, others are temporary, and theirs locations can change. When running the
+ascii2nc tool with the `-format airnowhourly` option, users should
+`download <https://test.airnowtech.org/>`_ the `Monitoring_Site_Locations_V2.dat` data file
+data file corresponding to the date being processed and set the MET_AIRNOW_STATIONS
+envrionment variable to define its location.
+
+.. _met_ndbc_stations:
 
 MET_NDBC_STATIONS
 ^^^^^^^^^^^^^^^^^
