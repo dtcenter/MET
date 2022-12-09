@@ -382,6 +382,29 @@ For cost / loss ratio above the base rate, the ECLV is defined as:
 
 .. math:: \text{ECLV } = \frac{(cl \ast (h + f)) + m - b}{b \ast (cl - 1)}.
 
+Stable Equitable Error in Probability Space (SEEPS)
+---------------------------------------------------
+
+Included in SEEPS output :numref:`table_PS_format_info_SEEPS` and SEEPS_MPR output :numref:`table_PS_format_info_SEEPS_MPR`
+
+The SEEPS scoring matrix (equation 15 from :ref:`Rodwell et al, 2010 <Rodwell-2010>`) is:
+
+.. math:: \{S^{S}_{vf}\} = \frac{1}{2}
+          \begin{Bmatrix}
+             0 & \frac{1}{1-p_1} & \frac{1}{p_3} + \frac{1}{1-p_1}\\
+             \frac{1}{p_1} & 0 & \frac{1}{p_3}\\
+             \frac{1}{p_1} + \frac{1}{1-p_3} & \frac{1}{1-p_3} & 0
+          \end{Bmatrix}
+
+In addition, Rodwell et al (2011) note that SEEPS can be written as the mean of two 2-category scores that individually assess the dry/light and light/heavy thresholds (:ref:`Rodwell et al., 2011 <Rodwell-2011>`). Each of these scores is like 1 – HK, but written as:
+
+.. math:: \frac{n_{01}}{\text{Expected n}_{.1}} + \frac{n_{10}}{\text{Expected n}_{.0}}
+
+
+where the word expected refers to the mean value deduced from the climatology, rather than the sample mean.
+
+SEEPS scores are expected to lie between 0 and 1, with a perfect forecast having a value of 0. Individual values can be much larger than 1. Results can be presented as a skill score by using the value of 1 – SEEPS.
+
 MET verification measures for continuous variables
 ==================================================
 

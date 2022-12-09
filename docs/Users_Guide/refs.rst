@@ -132,7 +132,6 @@ References
 |   Weather Forecast., 32 (1), 187 - 198, doi: 10.1175/WAF-D-16-0134.1.
 |
 
-
 .. _Gilleland_PartI-2020:
 
 | Gilleland, E., 2020. Bootstrap methods for statistical inference.
@@ -163,6 +162,14 @@ References
 |   Statistics, University of Washington. Available at
 |   http://www.stat.washington.edu/www/research/reports/
 | 
+
+.. _Haiden-2012:
+
+| Haiden, T., M.J. Rodwell, D.S. Richardson, A. Okagaki, T. Robinson, T. Hewson, 2012.
+|   *Intercomparison of Global Model Precipitation Forecast Skill in 2010/11*
+|   *Using the SEEPS Score*. Monthly Weather Review, 140, 2720-2733.
+|   https://doi.org/10.1175/MWR-D-11-00301.1
+|
 
 .. _Hamill-2001:
 
@@ -228,6 +235,15 @@ References
 |   verification. *Monthly Weather Review*, 115, 1330-1338.
 | 
 
+
+.. _North-2022:
+
+| North, R.C.,  M.P. Mittermaier, S.F. Milton, 2022. *Using SEEPS with a*
+|   *TRMM-derived Climatology to Assess Global NWP Precipitation Forecast Skill*.
+|   Monthly Weather Review, 150, 135-155.
+|   https://doi.org/10.1175/MWR-D-20-0347.1
+|
+
 .. _Ou-2016:
 
 | Ou, M. H., Charles, M., & Collins, D. C. 2016: Sensitivity of calibrated week-2
@@ -241,6 +257,21 @@ References
 |   accumulations from high-resolution forecasts of convective events.
 |   *Monthly Weather Review,* 136, 78-97.
 | 
+
+.. _Rodwell-2010:
+
+| Rodwell, M.J., D.S. Richardson, T.D. Hewson and T. Haiden, 2010. *A new equitable*
+|   *score suitable for verifying precipitation in numerical weather prediction*.
+|   Quarterly Journal of the Royal Meteorological Society, 136: 1344-1463.
+|   https://doi.org/10.1002/qj.656
+|
+
+.. _Rodwell-2011:
+
+| Rodwell, M.J., T. Haiden, D.S. Richardson, 2011. *Developments in Precipitation*
+|   *Verification*. ECMWF Newsletter Number 128.
+|   https://www.ecmwf.int/node/14595
+|
 
 .. _Saetra-2004:
 

@@ -136,6 +136,17 @@ The HiRA framework provides a unique method for evaluating models in the neighbo
 
 Often, the neighborhood size is chosen so that multiple models to be compared have approximately the same horizontal resolution. Then, standard metrics for probabilistic forecasts, such as Brier Score, can be used to compare those forecasts. HiRA was developed using surface observation stations so the neighborhood lies completely within the horizontal plane. With any type of upper air observation, the vertical neighborhood must also be defined.
 
+.. _PS_seeps:
+
+SEEPS scores
+------------
+
+The Stable Equitable Error in Probability Space (SEEPS) was devised for monitoring global deterministic forecasts of precipitation against the WMO gauge network (:ref:`Rodwell et al., 2010 <Rodwell-2010>`; :ref:`Haiden et al., 2012 <Haiden-2012>`) and is a multi-category score which uses a climatology to account for local variations in behavior. Since the score uses probability space to define categories using the climatology, it can be aggregated over heterogeneous climate regions. Even though it was developed for use with precipitation forecasts, in principle it could be applied to any forecast parameter for which a sufficiently long time period of observations exists to create a suitable climatology. The computation of SEEPS for precipitation is only supported for now.
+
+For use with precipitation, three categories are used, named ‘dry’, ‘light’ and ‘heavy’. The ‘dry’ category is defined (using the WMO observing guidelines) with any accumulation (rounded to the nearest 0.1 millimeter) that is less than or equal to 0.2 mm.  The remaining precipitation is divided into ‘light’ and ‘heavy’ categories whose thresholds are with respect to a climatology and thus location specific. The light precipitation is defined to occur twice as often as heavy precipitation.
+
+When calculating a single SEEPS value over observing stations for a particular region, the scores should have a density weighting applied which accounts for uneven station distribution in the region of interest (see Section 9.1 in :ref:`Rodwell et al., 2010 <Rodwell-2010>`). This density weighting has not yet been implemented in MET. Global precipitation climatologies calculated from the WMO SYNOP records from 1980-2009 are supplied with the release. At the moment, a 24-hour climatology is available (valid at 00 UTC or 12 UTC), but in future a 6-hour climatology will become available.
+
 .. _PS_Statistical-measures:
 
 Statistical measures
