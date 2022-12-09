@@ -246,7 +246,7 @@ bool AirnowHandler::_readObservationsStandard(LineDataFile &ascii_file,
   data_line.set_delimiter(delimiter.c_str());
   while (ascii_file >> data_line) {
     if (!_parseObservationLineStandard(data_line, ascii_file.filename(),
-                                                           column_cnt, header_type)) {
+                                       column_cnt, header_type)) {
       bad_line_count++;
     }
   }
