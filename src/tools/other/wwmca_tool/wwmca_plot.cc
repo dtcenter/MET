@@ -9,6 +9,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+using namespace std;
 
 static const int gray_min         = 130;   //  these values must be between 0 and 255 inclusive
 static const int gray_max         = 255;

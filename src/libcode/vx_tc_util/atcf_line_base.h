@@ -62,10 +62,10 @@ class ATCFLineBase : public DataLine {
 
       void assign(const ATCFLineBase &);
 
-      const map<ConcatString,ConcatString> * BasinMap;       // not allocated
-      const StringArray                    * BestTechnique;  // not allocated
-      const StringArray                    * OperTechnique;  // not allocated
-      const ConcatString                   * TechSuffix;     // not allocated
+      const std::map<ConcatString,ConcatString> * BasinMap;       // not allocated
+      const StringArray                         * BestTechnique;  // not allocated
+      const StringArray                         * OperTechnique;  // not allocated
+      const ConcatString                        * TechSuffix;     // not allocated
 
       ATCFLineType Type;
       ConcatString Basin;
@@ -81,7 +81,7 @@ class ATCFLineBase : public DataLine {
       ATCFLineBase & operator= (const ATCFLineBase &);
       bool           operator==(const ATCFLineBase &);
 
-      void dump(ostream &, int depth = 0) const;
+      void dump(std::ostream &, int depth = 0) const;
 
       void clear();
 
@@ -93,7 +93,7 @@ class ATCFLineBase : public DataLine {
          // set values
          //
 
-      void set_basin_map     (const map<ConcatString,ConcatString> *);
+      void set_basin_map     (const std::map<ConcatString,ConcatString> *);
       void set_best_technique(const StringArray *);
       void set_oper_technique(const StringArray *);
       void set_tech_suffix   (const ConcatString *);
@@ -130,7 +130,7 @@ class ATCFLineBase : public DataLine {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline void ATCFLineBase::set_basin_map     (const map<ConcatString,ConcatString> *m)
+inline void ATCFLineBase::set_basin_map     (const std::map<ConcatString,ConcatString> *m)
                                                                     { BasinMap = m;         }
 inline void ATCFLineBase::set_best_technique(const StringArray *s)  { BestTechnique = s;    }
 inline void ATCFLineBase::set_oper_technique(const StringArray *s)  { OperTechnique = s;    }

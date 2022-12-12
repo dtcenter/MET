@@ -23,7 +23,6 @@
 #include <vector>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "mask_poly.h"
 #include "vx_grid.h"
@@ -85,7 +84,7 @@ protected:
 
   // Variables for writing output NetCDF file
 
-  NcFile *_ncFile;
+  netCDF::NcFile   *_ncFile;
   MetNcPointObsOut nc_point_obs;
 
   long _nhdr;
@@ -110,6 +109,7 @@ protected:
   vector< Observation > _observations;
   bool  use_var_id;
   StringArray obs_names;
+  StringArray obs_units;
 
   bool do_monitor;
   int start_time, end_time;

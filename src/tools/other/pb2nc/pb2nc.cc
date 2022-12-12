@@ -54,8 +54,12 @@
 //   015    02/10/18  Halley Gotway  Add message_type_group_map.
 //   016    07/23/18  Halley Gotway  Support masks defined by gen_vx_mask.
 //   017    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
+//   018    09/12/22  Prestopnik     MET #2227 Remove namespace std and netCDF
+//                                   from header files
 //
 ////////////////////////////////////////////////////////////////////////
+
+using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
@@ -68,6 +72,9 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <assert.h>
+
+#include <netcdf>
+using namespace netCDF;
 
 #include "main.h"
 #include "pb2nc_conf_info.h"
@@ -1057,7 +1064,7 @@ void process_pbfile(int i_pb) {
             if(mlog.verbosity_level() >= debug_level_for_performance) {
                end_t = clock();
                cout << (end_t-start_t)/double(CLOCKS_PER_SEC)
-                    << " seconds\n";
+                         << " seconds\n";
                start_t = clock();
             }
          }
@@ -1338,8 +1345,10 @@ void process_pbfile(int i_pb) {
          }
       }
 
+      // Initialize for CAPE and PBL
       if (cal_cape || cal_mlcape) {
          cape_level = 0;
+         cape_qm = bad_data_float;
       }
 
       do_pbl = cal_pbl && 0 == strcmp("ADPUPA", hdr_typ);
@@ -1349,6 +1358,7 @@ void process_pbfile(int i_pb) {
 
       // Search through the vertical levels
       for(lv=0, n_hdr_obs = 0; lv<buf_nlev; lv++) {
+
          // If the observation vertical level is not within the
          // specified valid range, continue to the next vertical
          // level
@@ -1498,12 +1508,15 @@ void process_pbfile(int i_pb) {
                      if (cape_level < MAX_CAPE_LEVEL) cape_data_temp[cape_level] = obs_arr[4];
                      cape_member_cnt++;
                   }
-                  if (is_cape_input && (cape_level == 0)) {
+
+                  // Track the maximum quality mark for CAPE components
+                  if (is_cape_input && (is_bad_data(cape_qm) || quality_mark > cape_qm)) {
                      cape_qm = quality_mark;
                   }
                }
 
-               if (do_pbl && (pbl_level == 0)) {
+               // Track the maximum quality mark for PBL components
+               if (do_pbl && (is_bad_data(pbl_qm) || quality_mark > pbl_qm)) {
                   pbl_qm = quality_mark;
                }
             }
@@ -1901,6 +1914,7 @@ void process_pbfile(int i_pb) {
             pqtzuv_list.clear();
             pqtzuv_map_tq.clear();
             pqtzuv_map_uv.clear();
+            pbl_qm = bad_data_float;
          }
          //is_same_header = false;
          prev_hdr_vld_ut = hdr_vld_ut;
@@ -2502,7 +2516,7 @@ void write_netcdf_hdr_data() {
    map<ConcatString, ConcatString> obs_var_map = conf_info.getObsVarMap();
    for(int i=0; i<bufr_obs_name_arr.n_elements(); i++) {
       int var_index;
-      std::string var_name;
+      string var_name;
       ConcatString unit_str, desc_str;
 
       unit_str = "";
@@ -2925,7 +2939,7 @@ int combine_tqz_and_uv(map<float, float*> pqtzuv_map_tq,
       float *pqtzuv_merged = (float *) 0;
       float *next_pqtzuv, *prev_pqtzuv;
       float tq_pres_max, tq_pres_min, uv_pres_max, uv_pres_min;
-      std::map<float,float*>::iterator it, it_tq, it_uv;
+      map<float,float*>::iterator it, it_tq, it_uv;
 
       // Gets pressure levels for TQZ records
       it = pqtzuv_map_tq.begin();
@@ -3042,7 +3056,7 @@ float compute_pbl(map<float, float*> pqtzuv_map_tq,
    int pbl_level;
    int tq_count = pqtzuv_map_tq.size();
    int uv_count = pqtzuv_map_uv.size();
-   std::map<float,float*>::iterator it;
+   map<float,float*>::iterator it;
    static const char *method_name = "compute_pbl() ";
 
    hpbl = bad_data_float;
@@ -3317,7 +3331,7 @@ void merge_records(float *first_pqtzuv, map<float, float*> pqtzuv_map_pivot,
    float cur_pres;
    float *cur_pqtzuv, *next_pqtzuv, *prev_pqtzuv;
    float *pqtzuv_merged;
-   std::map<float,float*>::iterator it_pivot, it_aux;
+   map<float,float*>::iterator it_pivot, it_aux;
    static const char *method_name = "merge_records() ";
 
    float first_pres = first_pqtzuv[0];
@@ -3389,7 +3403,7 @@ void log_tqz_and_uv(map<float, float*> pqtzuv_map_tq,
    int offset;
    ConcatString buf;
    StringArray log_array;
-   std::map<float,float*>::iterator it;
+   map<float,float*>::iterator it;
 
    for (it=pqtzuv_map_tq.begin(); it!=pqtzuv_map_tq.end(); ++it) {
       float *pqtzuv = it->second;
@@ -3429,7 +3443,7 @@ void log_merged_tqz_uv(map<float, float*> pqtzuv_map_tq,
                        const char *method_name) {
    ConcatString buf;
    StringArray log_array;
-   for (std::map<float,float*>::iterator it=pqtzuv_map_merged.begin();
+   for (map<float,float*>::iterator it=pqtzuv_map_merged.begin();
          it!=pqtzuv_map_merged.end(); ++it) {
       float *pqtzuv = it->second;
       buf.clear();

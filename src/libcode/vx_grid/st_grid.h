@@ -91,7 +91,7 @@ class StereographicGrid : public GridRep {
 
       ConcatString name() const;
 
-      void dump(ostream &, int = 0) const;
+      void dump(std::ostream &, int = 0) const;
 
       ConcatString serialize(const char *sep=" ") const;
 

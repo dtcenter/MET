@@ -21,6 +21,7 @@
 //   003    04-25-19  Halley Gotway  Add percentiles to 2D output
 //   004    07-06-22  Howard Soh     METplus-Internal #19 Rename main to met_main
 //   005    08-01-22  Albo           MET #1971 Differing time steps
+//   006    10-03-22  Prestopnik     MET #2227 Remove using namespace std from header files
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -42,6 +43,7 @@ static const char default_prefix               [] = "mtd";
 
 ////////////////////////////////////////////////////////////////////////
 
+using namespace std;
 
 #include <unistd.h>
 #include <stdlib.h>

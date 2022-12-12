@@ -76,6 +76,7 @@
 //   023    08/29/19  Halley Gotway  Support multiple arguments for the
 //                    the -pcpdir option.
 //   024    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
+//   025    09/29/22  Prestopnik     MET #2227 Remove namespace netCDF from header files
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -91,6 +92,9 @@ using namespace std;
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+
+#include <netcdf>
+using namespace netCDF;
 
 #include "main.h"
 #include "vx_log.h"

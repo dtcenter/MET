@@ -19,7 +19,6 @@
 #include <iostream>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "vx_data2d.h"
 #include "vx_data2d_factory.h"
@@ -132,8 +131,8 @@ class ModeExecutive {
 
       void write_obj_stats();
       void write_obj_netcdf(const ModeNcOutInfo &);
-      void write_poly_netcdf(NcFile *);
-      void write_poly_netcdf(NcFile *, const ObjPolyType);
+      void write_poly_netcdf(netCDF::NcFile *);
+      void write_poly_netcdf(netCDF::NcFile *, const ObjPolyType);
       void write_ct_stats();
 
 };

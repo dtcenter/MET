@@ -230,6 +230,7 @@ output_flag = {
    nbrcnt = BOTH;
    grad   = BOTH;
    dmap   = BOTH;
+   seeps  = NONE;
 }
 
 //
@@ -248,6 +249,11 @@ nc_pairs_flag   = {
    distance_map = TRUE;
    apply_mask   = TRUE;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Threshold for SEEPS p1 (Probability of being dry)
+
+seeps_p1_thresh = NA;
 
 ////////////////////////////////////////////////////////////////////////////////
 

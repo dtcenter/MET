@@ -176,13 +176,17 @@ void ECNTInfo::init_from_scratch() {
 void ECNTInfo::clear() {
 
    othresh.clear();
-   n_ens      = n_pair      = 0;
-   crps_emp   = crpscl_emp  = crpss_emp  = crps_emp_fair = bad_data_double;
-   crps_gaus  = crpscl_gaus = crpss_gaus = bad_data_double;
-   ign        = bad_data_double;
-   me         = rmse       = spread      = bad_data_double;
-   me_oerr    = rmse_oerr  = spread_oerr = bad_data_double;
-   spread_plus_oerr        = bad_data_double;
+   n_ens            = n_pair      = 0;
+   crps_emp         = crpscl_emp  = crpss_emp  = bad_data_double;
+   crps_emp_fair    = spread_md   = bad_data_double;
+   crps_gaus        = crpscl_gaus = crpss_gaus = bad_data_double;
+   ign              = bad_data_double;
+   me               = mae        = rmse        = spread        = bad_data_double;
+   me_oerr          = mae_oerr   = rmse_oerr   = spread_oerr   = bad_data_double;
+   spread_plus_oerr = bad_data_double;
+
+   n_ge_obs   = n_lt_obs   = 0;
+   me_ge_obs  = me_lt_obs  = bias_ratio  = bad_data_double;
    
    return;
 }
@@ -200,6 +204,7 @@ void ECNTInfo::assign(const ECNTInfo &c) {
    crpscl_emp       = c.crpscl_emp;
    crpss_emp        = c.crpss_emp;
    crps_emp_fair    = c.crps_emp_fair;
+   spread_md        = c.spread_md;
    
    crps_gaus        = c.crps_gaus;
    crpscl_gaus      = c.crpscl_gaus;
@@ -207,13 +212,21 @@ void ECNTInfo::assign(const ECNTInfo &c) {
 
    ign              = c.ign;
    me               = c.me;
+   mae              = c.mae;
    rmse             = c.rmse;
    spread           = c.spread;
 
    me_oerr          = c.me_oerr;
+   mae_oerr         = c.mae_oerr;
    rmse_oerr        = c.rmse_oerr;
    spread_oerr      = c.spread_oerr;
    spread_plus_oerr = c.spread_plus_oerr;
+
+   n_ge_obs         = c.n_ge_obs;
+   n_lt_obs         = c.n_lt_obs;
+   me_ge_obs        = c.me_ge_obs;
+   me_lt_obs        = c.me_lt_obs;
+   bias_ratio       = c.bias_ratio;
 
    return;
 }
@@ -223,18 +236,20 @@ void ECNTInfo::assign(const ECNTInfo &c) {
 void ECNTInfo::set(const PairDataEnsemble &pd) {
    int i;
    double w, w_sum;
-   double fbar, obar, ffbar, oobar, fobar;
+   double fbar, obar, ffbar, oobar, fobar, abserr;
    NumArray cur;
 
    // Store the number of ensemble members
    n_ens = pd.n_ens;
 
    // Compute empirical CRPS scores
-   crps_emp   = pd.crps_emp_na.wmean(pd.wgt_na);
+   crps_emp  = pd.crps_emp_na.wmean(pd.wgt_na);
    if(is_eq(crps_emp, 0.0)) crps_emp = 0.0;
    
    crps_emp_fair = pd.crps_emp_fair_na.wmean(pd.wgt_na);
    if(is_eq(crps_emp_fair, 0.0)) crps_emp_fair = 0.0;
+
+   spread_md = pd.spread_md_na.wmean(pd.wgt_na);
    
    crpscl_emp = pd.crpscl_emp_na.wmean(pd.wgt_na);
    crpss_emp  = (is_bad_data(crps_emp)   ||
@@ -267,8 +282,10 @@ void ECNTInfo::set(const PairDataEnsemble &pd) {
    // already computed by Stat-Analysis
    if(!is_bad_data(pd.me)) {
       me        = pd.me;
+      mae       = pd.mae;
       rmse      = pd.rmse;
       me_oerr   = pd.me_oerr;
+      mae_oerr  = pd.mae_oerr;
       rmse_oerr = pd.rmse_oerr;
    }
    // If not, compute them from the pairs, if possible
@@ -276,55 +293,62 @@ void ECNTInfo::set(const PairDataEnsemble &pd) {
    else if(!pd.mn_na.is_const(bad_data_double)) {
 
       // Compute ME and RMSE values
-      fbar = obar = ffbar = oobar = fobar = 0.0;
+      fbar = obar = ffbar = oobar = fobar = abserr = 0.0;
       for(i=0; i<pd.n_obs; i++) {
 
          if(pd.skip_ba[i]) continue;
 
          // Track running sums
-         w      = pd.wgt_na[i]/w_sum;
-         obar  += w *  pd.o_na[i];
-         oobar += w *  pd.o_na[i] *  pd.o_na[i];
-         fbar  += w * pd.mn_na[i];
-         ffbar += w * pd.mn_na[i] * pd.mn_na[i];
-         fobar += w * pd.mn_na[i] *  pd.o_na[i];
+         w       = pd.wgt_na[i]/w_sum;
+         obar   += w *  pd.o_na[i];
+         oobar  += w *  pd.o_na[i] *  pd.o_na[i];
+         fbar   += w * pd.mn_na[i];
+         ffbar  += w * pd.mn_na[i] * pd.mn_na[i];
+         fobar  += w * pd.mn_na[i] *  pd.o_na[i];
+         abserr += w * abs(pd.mn_na[i] - pd.o_na[i]);
       }
 
-      // Derive ME and RMSE from partial sums
+      // Derive ME, MAE, and RMSE from partial sums
       me   = fbar - obar;
+      mae  = abserr;
       rmse = sqrt(ffbar + oobar - 2.0*fobar);
 
-      // If observation error was specified, compute ME_OERR and RMSE_OERR
+      // If observation error was specified, compute ME_OERR, MAE_OERR, and RMSE_OERR
       if(pd.has_obs_error()) {
 
-         fbar = obar = ffbar = oobar = fobar = 0.0;
+         fbar = obar = ffbar = oobar = fobar = abserr = 0.0;
          for(i=0; i<pd.n_obs; i++) {
 
             if(pd.skip_ba[i]) continue;
 
             // Track running sums
-            w      = pd.wgt_na[i]/w_sum;
-            obar  += w *       pd.o_na[i];
-            oobar += w *       pd.o_na[i] *       pd.o_na[i];
-            fbar  += w * pd.mn_oerr_na[i];
-            ffbar += w * pd.mn_oerr_na[i] * pd.mn_oerr_na[i];
-            fobar += w * pd.mn_oerr_na[i] *       pd.o_na[i];
+            w       = pd.wgt_na[i]/w_sum;
+            obar   += w *       pd.o_na[i];
+            oobar  += w *       pd.o_na[i] *       pd.o_na[i];
+            fbar   += w * pd.mn_oerr_na[i];
+            ffbar  += w * pd.mn_oerr_na[i] * pd.mn_oerr_na[i];
+            fobar  += w * pd.mn_oerr_na[i] *       pd.o_na[i];
+            abserr += w * abs(pd.mn_oerr_na[i] - pd.o_na[i]);
          }
 
-         // Derive ME_OERR and RMSE_OERR from partial sums
+         // Derive ME_OERR, MAE_OERR, and RMSE_OERR from partial sums
          me_oerr   = fbar - obar;
+         mae_oerr  = abserr;
          rmse_oerr = sqrt(ffbar + oobar - 2.0*fobar);
       }
       else {
          me_oerr   = bad_data_double;
+         mae_oerr  = bad_data_double;
          rmse_oerr = bad_data_double;
       }
    }
    // Set ensemble mean based statistics to bad data
    else {
       me        = bad_data_double;
+      mae       = bad_data_double;
       rmse      = bad_data_double;
       me_oerr   = bad_data_double;
+      mae_oerr  = bad_data_double;
       rmse_oerr = bad_data_double;
    }
 
@@ -336,6 +360,15 @@ void ECNTInfo::set(const PairDataEnsemble &pd) {
 
    // Compute the square root of the average variance plus oerr
    spread_plus_oerr = square_root(pd.var_plus_oerr_na.wmean(pd.wgt_na));
+
+   // Compute bias ratio terms 
+   n_ge_obs  = nint(pd.n_ge_obs_na.sum());
+   me_ge_obs = pd.me_ge_obs_na.wmean(pd.n_ge_obs_na);
+   n_lt_obs  = nint(pd.n_lt_obs_na.sum());
+   me_lt_obs = pd.me_lt_obs_na.wmean(pd.n_lt_obs_na);
+
+   // Compute bias ratio
+   bias_ratio = compute_bias_ratio(me_ge_obs, me_lt_obs);
 
    return;
 }

@@ -26,11 +26,14 @@
 //      void initialize();
 //      void process_command_line(int argc, char **argv);
 //
-//   Mod#   Date      Name            Description
-//   ----   ----      ----            -----------
-//   000    07/06/22  Howard Soh      New
+//   Mod#   Date      Name        Description
+//   ----   ----      ----        -----------
+//   000    07-06-22  Soh         New
+//   001    09-06-22  Prestopnik  MET #2227 Remove namespace std from header files
 //
 ////////////////////////////////////////////////////////////////////////
+
+using namespace std;
 
 #include <csignal>
 #include <pwd.h>
@@ -43,7 +46,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-static std::string met_cmdline = "";
+static string met_cmdline = "";
 
 static int met_start_time;
 static int met_end_time;
@@ -62,6 +65,7 @@ void do_pre_process(int argc, char *argv[]);
 void set_handlers();
 void set_user_id();
 void store_arguments(int argc, char **argv);
+void tidy_and_exit(int signal);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -121,7 +125,6 @@ string get_current_time() {
 
 ////////////////////////////////////////////////////////////////////////
 
-/* not working at Docker
 // based on blog at http://www.alexonlinux.com/how-to-handle-sigsegv-but-also-generate-core-dump
 // NOTE:  that comments on the blog indicate the core file generated on red hat or on multi-threaded programs
 //        might contain unhelpful information.
@@ -131,22 +134,23 @@ void segv_handler(int signum) {
 
    getcwd(cwdbuffer,MET_BUF_SIZE+1);
 
-   fprintf(stderr, "FATAL ERROR (SEGFAULT): Process %d got signal %d @ local time = %s\n", getpid(), signum, timebuffer);
+   fprintf(stderr, "FATAL ERROR (SEGFAULT): Process %d got signal %d @ local time = %s\n", getpid(), signum, timebuffer.c_str());
    fprintf(stderr, "FATAL ERROR (SEGFAULT): Look for a core file in %s\n",cwdbuffer);
    fprintf(stderr, "FATAL ERROR (SEGFAULT): Process command line: %s\n",met_cmdline.c_str());
    signal(signum, SIG_DFL);
    kill(getpid(), signum);
 }
-*/
 
 ////////////////////////////////////////////////////////////////////////
-// Need signal handlers for SIGINT, SIGHUP, SIGTERM, SIGPIPE, and SIGSEGV
-//  PORTsignal(SIGPIPE, (PORTsigfunc)SIG_IGN);
-//  PORTsignal(SIGSEGV, segv_handler);
 
 void set_handlers() {
-
    set_new_handler(oom);
+   signal(SIGSEGV, segv_handler);
+   signal(SIGINT, tidy_and_exit);
+   signal(SIGTERM, tidy_and_exit);
+   signal(SIGABRT, tidy_and_exit);
+   signal(SIGFPE, tidy_and_exit);
+   signal(SIGILL, tidy_and_exit);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -170,6 +174,18 @@ void store_arguments(int argc, char **argv) {
 ////////////////////////////////////////////////////////////////////////
 
 void tidy_and_exit(int signal) {
+   printf("FATAL: ");
+   if(signal == SIGINT) {
+      printf("Received Signal Interrupt. ");
+   } else if(signal == SIGTERM){
+      printf("Received Signal Terminate. ");
+   } else if(signal == SIGABRT){
+      printf("Received Signal Abort. ");
+   } else if(signal == SIGFPE){
+      printf("Received Signal Floating-Point Exception. ");
+   } else if(signal == SIGILL){
+      printf("Received Signal Illegal Instruction. ");
+   }
    printf("Exiting %d\n", signal);
    exit(signal);
 }

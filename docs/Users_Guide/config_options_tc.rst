@@ -9,8 +9,8 @@ See :numref:`config_options` for a description of the configuration file syntax.
 Configuration settings common to multiple tools
 ===============================================
 
-storm_id_1
-----------
+storm_id
+--------
 
 Specify a comma-separated list of storm id's to be used:
 
@@ -64,8 +64,8 @@ For example:
 		
   cyclone = [];
 
-storm_name_1
-------------
+storm_name
+----------
 
 Specify a comma-separated list of storm names to be used. An empty list
 indicates that all should be used.
@@ -105,8 +105,8 @@ For example:
   init_inc = [];
   init_exc = [];
 
-valid_beg end inc exc_1
------------------------
+valid_beg end inc exc
+---------------------
   
 Specify a model valid time window YYYYMMDD[_HH[MMSS]] format or provide a
 list of specific valid times to include (inc) or exclude (exc). If a time
@@ -133,8 +133,8 @@ For example:
   valid_inc = [];
   valid_exc = [];
 
-init_hour_1
------------
+init_hour
+---------
 
 Specify a comma-separated list of model initialization hours to be used
 in HH[MMSS] format. An empty list indicates that all hours should be used.
@@ -162,23 +162,6 @@ all lead times will be used.
 		
   lead_req  = [];
 
-init_mask, valid_mask
----------------------
-
-Specify lat/lon polylines defining masking regions to be applied.
-Tracks whose initial location falls within init_mask will be used.
-Tracks for which all locations fall within valid_mask will be used.
-
-For example:
-
-| init_mask  = "MET_BASE/poly/EAST.poly";
-| 
-
-.. code-block:: none
-		
-  init_mask  = "";
-  valid_mask = "";
-
 version
 -------
 
@@ -197,8 +180,8 @@ Settings specific to individual tools
 TCPairsConfig_default
 ---------------------
 
-model_1
-^^^^^^^
+model
+^^^^^
 
 The "model" entry specifies an array of model names to be verified. If
 verifying multiple models, choose descriptive model names (no whitespace)
@@ -212,6 +195,23 @@ For example:
 .. code-block:: none
 		  
   model  = [];
+
+init_mask, valid_mask
+^^^^^^^^^^^^^^^^^^^^^
+
+Specify lat/lon polylines defining masking regions to be applied.
+Tracks whose initial location falls within init_mask will be used.
+Tracks for which all locations fall within valid_mask will be used.
+
+For example:
+
+| init_mask  = "MET_BASE/poly/EAST.poly";
+|
+
+.. code-block:: none
+
+  init_mask  = "";
+  valid_mask = "";
 
 check_dup
 ^^^^^^^^^
@@ -423,10 +423,10 @@ parameter will result in missed matches.
   ];
 
 TCStatConfig_default
-====================
+--------------------
 
 amodel, bmodel
---------------
+^^^^^^^^^^^^^^
 
 Stratify by the AMODEL or BMODEL columns.
 Specify comma-separated lists of model names to be used for all analyses
@@ -444,32 +444,8 @@ For example:
   amodel = [];
   bmodel = [];
 
-valid_beg end inc exc
----------------------
-  
-Stratify by the VALID times.
-Define beginning and ending time windows in YYYYMMDD[_HH[MMSS]]
-or provide a list of specific valid times to include or exclude.
-May modify using the "-valid_beg", "-valid_end", "-valid_inc",
-and "-valid_exc" job command options.
-
-For example:
-
-| valid_beg = "20100101";
-| valid_end = "20101231_12";
-| valid_inc = [ "20101231_06" ];
-| valid_exc = [ "20101231_00" ];
-| 
-
-.. code-block:: none
-		
-  valid_beg = "";
-  valid_end = "";
-  valid_inc = [];
-  valid_exc = [];
-
 init valid_hour lead req
-------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 Stratify by the initialization and valid hours and lead time.
 Specify a comma-separated list of initialization hours,
@@ -492,9 +468,26 @@ For example:
   lead       = [];
   lead_req   = [];
 
+init_mask, valid_mask
+^^^^^^^^^^^^^^^^^^^^^
+
+Stratify by the contents of the INIT_MASK and VALID_MASK columns.
+Specify a comma-separated list of strings for these options.
+May add using the "-init_mask" and "-valid_mask" job command
+options.
+
+For example:
+
+| init_mask  = [ "AL_BASIN", "EP_BASIN" ];
+|
+
+.. code-block:: none
+
+  init_mask  = [];
+  valid_mask = [];
 
 line_type
----------
+^^^^^^^^^
 
 Stratify by the LINE_TYPE column.  May add using the "-line_type"
 job command option.
@@ -509,7 +502,7 @@ For example:
   line_type = [];
 
 track_watch_warn
-----------------
+^^^^^^^^^^^^^^^^
 
 Stratify by checking the watch/warning status for each track point
 common to both the ADECK and BDECK tracks. If the watch/warning status
@@ -530,7 +523,7 @@ For example:
 
 
 column_thresh_name_and_val
---------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Stratify by applying thresholds to numeric data columns.
 Specify a comma-separated list of columns names and thresholds
@@ -549,7 +542,7 @@ For example:
   column_thresh_val  = [];
 
 column_str_name, column_str_val
--------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Stratify by performing string matching on non-numeric data columns.
 Specify a comma-separated list of columns names and values
@@ -568,7 +561,7 @@ For example:
   column_str_val  = [];
 
 column_str_name val
--------------------  
+^^^^^^^^^^^^^^^^^^^
   
 Stratify by performing string matching on non-numeric data columns.
 Specify a comma-separated list of columns names and values
@@ -587,7 +580,7 @@ For example:
   column_str_exc_val  = [];
 
 init_thresh_name, init_thresh_val
----------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Just like the column_thresh options above, but apply the threshold only
 when lead = 0.  If lead = 0 value does not meet the threshold, discard
@@ -606,7 +599,7 @@ For example:
   init_thresh_val  = [];
   
 init_str_name, init_str_val
----------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Just like the column_str options above, but apply the string matching only
 when lead = 0.  If lead = 0 string does not match, discard the entire track.
@@ -624,7 +617,7 @@ For example:
   init_str_val  = [];
 
 init_str_exc_name and _exc_val
-------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Just like the column_str_exc options above, but apply the string matching only
 when lead = 0.  If lead = 0 string does match, discard the entire track.
@@ -642,7 +635,7 @@ For example:
   init_str_exc_val  = [];
 
 water_only
-----------
+^^^^^^^^^^
 
 Stratify by the ADECK and BDECK distances to land.  Once either the ADECK or
 BDECK track encounters land, discard the remainder of the track.
@@ -657,7 +650,7 @@ For example:
   water_only = FALSE;
 
 rirw
-----
+^^^^
 
 Specify whether only those track points for which rapid intensification
 or weakening of the maximum wind speed occurred in the previous time
@@ -690,7 +683,7 @@ May modify using the following job command options:
   }
 
 landfall beg end
-----------------
+^^^^^^^^^^^^^^^^
 
 Specify whether only those track points occurring near landfall should be
 retained, and define the landfall retention window as a time string in HH[MMSS]
@@ -722,7 +715,7 @@ For example:
   landfall_end = "00";
 
 event_equal
------------
+^^^^^^^^^^^
 
 Specify whether only those cases common to all models in the dataset should
 be retained.  May modify using the "-event_equal" job command option.
@@ -738,7 +731,7 @@ For example:
 
 
 event_equal_lead
-----------------
+^^^^^^^^^^^^^^^^
 
 Specify lead times that must be present for a track to be included in the
 event equalization logic.
@@ -749,7 +742,7 @@ event equalization logic.
 
 
 out_int_mask
-------------
+^^^^^^^^^^^^
 
 Apply polyline masking logic to the location of the ADECK track at the
 initialization time.  If it falls outside the mask, discard the entire track.
@@ -766,7 +759,7 @@ For example:
 
 
 out_valid_mask
---------------
+^^^^^^^^^^^^^^
 
 Apply polyline masking logic to the location of the ADECK track at the
 valid time.  If it falls outside the mask, discard only the current track
@@ -782,7 +775,7 @@ For example:
   out_valid_mask = "";
 
 job
----
+^^^
 
 The "jobs" entry is an array of TCStat jobs to be performed.
 Each element in the array contains the specifications for a single analysis
@@ -967,10 +960,10 @@ Where "job_name" is set to one of the following:
   jobs = [];
 
 TCGenConfig_default
-===================
+-------------------
 
-int_freq
---------
+init_freq
+^^^^^^^^^
 
 Model initialization frequency in hours, starting at 0.
 
@@ -979,7 +972,7 @@ Model initialization frequency in hours, starting at 0.
   init_freq = 6;
 
 lead_window
------------
+^^^^^^^^^^^
 
 Lead times in hours to be searched for genesis events.
 
@@ -992,7 +985,7 @@ Lead times in hours to be searched for genesis events.
   }
 
 min_duration
-------------
+^^^^^^^^^^^^
 
 Minimum track duration for genesis event in hours.
 
@@ -1001,7 +994,7 @@ Minimum track duration for genesis event in hours.
   min_duration = 12;
 
 fcst_genesis
-------------
+^^^^^^^^^^^^
 
 Forecast genesis event criteria.  Defined as tracks reaching the specified
 intensity category, maximum wind speed threshold, and minimum sea-level
@@ -1017,7 +1010,7 @@ track point where all of these criteria are met.
   }
 
 best_genesis
-------------
+^^^^^^^^^^^^
 
 BEST track genesis event criteria.  Defined as tracks reaching the specified
 intensity category, maximum wind speed threshold, and minimum sea-level
@@ -1034,7 +1027,7 @@ first track point where all of these criteria are met.
   }
 
 oper_genesis
-------------
+^^^^^^^^^^^^
 
 Operational track genesis event criteria.  Defined as tracks reaching the
 specified intensity category, maximum wind speed threshold, and minimum
@@ -1049,9 +1042,6 @@ time of the first track point where all of these criteria are met.
      vmax_thresh = NA;
      mslp_thresh = NA;
   }
-
-Track filtering options which may be specified separately in each filter array entry
-------------------------------------------------------------------------------------
 
 filter
 ^^^^^^
@@ -1073,38 +1063,19 @@ Description written to output DESC column
 		
   desc = "NA";
 
-model_2
-^^^^^^^
+model
+^^^^^
 
 Forecast ATCF ID's
 If empty, all ATCF ID's found will be processed.
 Statistics will be generated separately for each ATCF ID.
 
-
 .. code-block:: none
 		
   model = [];
 
-storm_id_2
-^^^^^^^^^^
-
-BEST and operational track storm identifiers
-
-.. code-block:: none
-		
-  storm_id = [];
-
-storm_name_2
-^^^^^^^^^^^^
-
-BEST and operational track storm names
-
-.. code-block:: none
-
-  storm_name = [];
-
-init_beg, init_end2
-^^^^^^^^^^^^^^^^^^^
+init_beg, init_end
+^^^^^^^^^^^^^^^^^^
 
 Forecast and operational initialization time window
 
@@ -1113,8 +1084,8 @@ Forecast and operational initialization time window
   init_beg = "";
   init_end = "";
 
-valid_beg, valid_end_2
-^^^^^^^^^^^^^^^^^^^^^^
+valid_beg, valid_end
+^^^^^^^^^^^^^^^^^^^^
 
 Forecast, BEST, and operational valid time window
 
@@ -1122,15 +1093,6 @@ Forecast, BEST, and operational valid time window
 		
   valid_beg = "";
   valid_end = "";
-
-init_hour_2
-^^^^^^^^^^^
-
-Forecast and operational initialization hours
-
-.. code-block:: none
-		
-  init_hour = [];
 
 lead
 ^^^^
@@ -1180,11 +1142,8 @@ Genesis matching search radius in km.
 		
   genesis_radius = 300;
 
-Global settings
-===============
-
 ci_alpha
---------
+^^^^^^^^
 
 Confidence interval alpha value
 
@@ -1193,14 +1152,19 @@ Confidence interval alpha value
   ci_alpha = 0.05;
 
 output_flag
------------
+^^^^^^^^^^^
 
 Statistical output types
 
 .. code-block:: none
-		
+
   output_flag = {
      fho    = NONE;
      ctc    = BOTH;
      cts    = BOTH;
+     pct    = NONE;
+     pstd   = NONE;
+     pjc    = NONE;
+     prc    = NONE;
+     genmpr = NONE;
   }

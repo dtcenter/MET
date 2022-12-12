@@ -17,6 +17,9 @@ using namespace std;
 #include <stdlib.h>
 #include <cmath>
 
+#include <netcdf>
+using namespace netCDF;
+
 #include "mode_exec.h"
 #include "nc_utils.h"
 #include "vx_regrid.h"

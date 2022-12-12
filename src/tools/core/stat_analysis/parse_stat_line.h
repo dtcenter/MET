@@ -25,6 +25,9 @@
 //   008    10/09/17  Halley Gotway   Add GRAD line type.
 //   009    04/25/18  Halley Gotway   Add ECNT line type.
 //   010    01/24/20  Halley Gotway   Add RPS line type.
+//   011    09/28/22  Prestopnik      MET #2227 Remove namespace std
+//   012    11/10/22  Halley Gotway   MET #2339 Add SEEPS and SEEPS_MPR
+//                                      line types.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -32,8 +35,6 @@
 #define  __PARSE_STAT_LINE_H__
 
 ////////////////////////////////////////////////////////////////////////
-
-using namespace std;
 
 #include <cmath>
 #include <cstdio>
@@ -46,6 +47,7 @@ using namespace std;
 #include "vx_analysis_util.h"
 #include "vx_util.h"
 #include "vx_statistics.h"
+#include "seeps.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -62,11 +64,14 @@ struct MPRData {
 // Ensemble continuous statistics (ECNT) data structure
 struct ECNTData {
    int total, n_ens;
-   double crps_emp, crps_emp_fair, crpscl_emp, crpss_emp;
+   double crps_emp, crps_emp_fair, spread_md, crpscl_emp, crpss_emp;
    double crps_gaus, crpscl_gaus, crpss_gaus;
-   double ign, me, rmse, spread;
-   double me_oerr, rmse_oerr, spread_oerr;
+   double ign, me, mae, rmse, spread;
+   double me_oerr, mae_oerr, rmse_oerr, spread_oerr;
    double spread_plus_oerr;
+   double bias_ratio;
+   int n_ge_obs, n_lt_obs;
+   double me_ge_obs, me_lt_obs;
 };
 
 // Ranked Histogram (RHIST) data structure
@@ -100,6 +105,13 @@ struct ORANKData {
    NumArray ens_na;
 };
 
+// SEEPS Matched Pair (SEEPS_MPR) data structure
+struct SEEPSMPRData {
+   ConcatString obs_sid, obs_qc;
+   double obs_lat, obs_lon, fcst, obs;
+   SeepsScore seeps_mpr;
+};
+
 ////////////////////////////////////////////////////////////////////////
 
 extern void parse_fho_ctable   (STATLine &, TTContingencyTable &);
@@ -125,6 +137,9 @@ extern void parse_phist_line   (STATLine &, PHISTData &);
 extern void parse_relp_line    (STATLine &, RELPData &);
 extern void parse_orank_line   (STATLine &, ORANKData &);
 extern void parse_ssvar_line   (STATLine &, SSVARInfo &);
+
+extern void parse_seeps_line    (STATLine &, SeepsAggScore &);
+extern void parse_seeps_mpr_line(STATLine &, SEEPSMPRData &);
 
 ////////////////////////////////////////////////////////////////////////
 

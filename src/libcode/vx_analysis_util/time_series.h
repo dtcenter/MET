@@ -52,7 +52,7 @@ class TimeSeries {
 
       void clear();
 
-      void dump(ostream &, int depth = 0) const;
+      void dump(std::ostream &, int depth = 0) const;
 
       void set(unixtime _start, int _delta, int _n);
 

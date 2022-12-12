@@ -83,4 +83,42 @@
     </output>
   </test>
 
+  <test name="ioda2nc_int_datetime">
+    <exec>&MET_BIN;/ioda2nc</exec>
+    <env>
+      <pair><name>STATION_ID</name>   <value></value></pair>
+      <pair><name>MASK_GRID</name>    <value></value></pair>
+      <pair><name>MASK_POLY</name>    <value></value></pair>
+      <pair><name>MESSAGE_TYPE</name> <value></value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_OBS;/ioda/jopa_satwind_20210701T1200Z_out_0000_reduced.nc4 \
+      &OUTPUT_DIR;/ioda2nc/jopa_satwind_20210701T1200Z_int_datetime.nc \
+      -config &CONFIG_DIR;/IODA2NCConfig_mask \
+      -v 2
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/ioda2nc/jopa_satwind_20210701T1200Z_int_datetime.nc</point_nc>
+    </output>
+  </test>
+
+  <test name="ioda2nc_v2_string_sid">
+    <exec>&MET_BIN;/ioda2nc</exec>
+    <env>
+      <pair><name>STATION_ID</name>   <value></value></pair>
+      <pair><name>MASK_GRID</name>    <value></value></pair>
+      <pair><name>MASK_POLY</name>    <value></value></pair>
+      <pair><name>MESSAGE_TYPE</name> <value></value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_OBS;/ioda/2021081612_sonde_small.nc \
+      &OUTPUT_DIR;/ioda2nc/2021081612_sonde_small_sid.nc \
+      -config &CONFIG_DIR;/IODA2NCConfig_mask \
+      -v 2
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/ioda2nc/2021081612_sonde_small_sid.nc</point_nc>
+    </output>
+  </test>
+
 </met_test>

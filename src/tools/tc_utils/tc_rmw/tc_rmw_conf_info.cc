@@ -8,6 +8,8 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+using namespace std;
+
 #include <dirent.h>
 #include <iostream>
 #include <unistd.h>

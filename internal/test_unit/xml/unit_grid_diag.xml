@@ -72,6 +72,10 @@
                 &DATA_DIR_OBS;/stage4_hmt/stage4_2012041018_06h.grib" \
                 > &OUTPUT_DIR;/grid_diag/obs_file_list; \
          &MET_BIN;/grid_diag</exec>
+    <env>
+      <pair><name>FIELD1</name> <value>set_attr_name = "FCST_APCP";</value></pair>
+      <pair><name>FIELD2</name> <value>set_attr_name = "OBS_APCP";</value></pair>
+    </env>
     <param> \
       -data &OUTPUT_DIR;/grid_diag/fcst_file_list \
       -data &OUTPUT_DIR;/grid_diag/obs_file_list \
@@ -81,6 +85,42 @@
     </param>
     <output>
       <grid_nc>&OUTPUT_DIR;/grid_diag/grid_diag_APCP_06_FCST_OBS.nc</grid_nc>
+    </output>
+  </test>
+
+  <!-- Test the logic for avoiding name conflicts -->
+
+  <test name="grid_diag_APCP_06_VARN">
+    <exec>echo "&DATA_DIR_MODEL;/grib1/gfs_hmt/gfs_2012040900_F006.grib \
+                &DATA_DIR_MODEL;/grib1/gfs_hmt/gfs_2012040900_F012.grib \
+                &DATA_DIR_MODEL;/grib1/gfs_hmt/gfs_2012040900_F018.grib \
+                &DATA_DIR_MODEL;/grib1/gfs_hmt/gfs_2012040900_F024.grib \
+                &DATA_DIR_MODEL;/grib1/gfs_hmt/gfs_2012040900_F030.grib \
+                &DATA_DIR_MODEL;/grib1/gfs_hmt/gfs_2012040900_F036.grib \
+                &DATA_DIR_MODEL;/grib1/gfs_hmt/gfs_2012040900_F042.grib" \
+                > &OUTPUT_DIR;/grid_diag/fcst_file_list; \
+          echo "&DATA_DIR_OBS;/stage4_hmt/stage4_2012040906_06h.grib \
+                &DATA_DIR_OBS;/stage4_hmt/stage4_2012040912_06h.grib \
+                &DATA_DIR_OBS;/stage4_hmt/stage4_2012040918_06h.grib \
+                &DATA_DIR_OBS;/stage4_hmt/stage4_2012041000_06h.grib \
+                &DATA_DIR_OBS;/stage4_hmt/stage4_2012041006_06h.grib \
+                &DATA_DIR_OBS;/stage4_hmt/stage4_2012041012_06h.grib \
+                &DATA_DIR_OBS;/stage4_hmt/stage4_2012041018_06h.grib" \
+                > &OUTPUT_DIR;/grid_diag/obs_file_list; \
+         &MET_BIN;/grid_diag</exec>
+    <env>
+      <pair><name>FIELD1</name> <value>name = "APCP";</value></pair>
+      <pair><name>FIELD2</name> <value>name = "APCP";</value></pair>
+    </env>
+    <param> \
+      -data &OUTPUT_DIR;/grid_diag/fcst_file_list \
+      -data &OUTPUT_DIR;/grid_diag/obs_file_list \
+      -config &CONFIG_DIR;/GridDiagConfig_APCP_06_FCST_OBS \
+      -out &OUTPUT_DIR;/grid_diag/grid_diag_APCP_06_VARN.nc \
+      -v 3
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/grid_diag/grid_diag_APCP_06_VARN.nc</grid_nc>
     </output>
   </test>
 

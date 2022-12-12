@@ -16,9 +16,11 @@
 //   Mod#   Date      Name           Description
 //   ----   ----      ----           -----------
 //   000   05/11/22   Albo           Pulled the wind conversion into a class
+//   001   09/28/22   Prestopnik     MET #2227 Remove namespace std from header files
 //
 ////////////////////////////////////////////////////////////////////////
 
+using namespace std;
 
 #include "tc_rmw_wind_converter.h"
 #include "series_data.h"
@@ -111,7 +113,7 @@ void TCRMW_WindConverter::init(const TCRMWConfInfo *conf) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCRMW_WindConverter::update_input(const std::string &variableName, const std::string &units) {
+void TCRMW_WindConverter::update_input(const string &variableName, const string &units) {
   if (_computeWinds) {
     if (variableName == _conf->u_wind_field_name.string()) {
       _foundUInInput = true;

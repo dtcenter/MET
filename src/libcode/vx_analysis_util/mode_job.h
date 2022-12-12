@@ -62,13 +62,13 @@ class BasicModeAnalysisJob {
 
       virtual void clear();
 
-      virtual void dump(ostream &, int depth = 0) const;
+      virtual void dump(std::ostream &, int depth = 0) const;
 
 
       virtual void add_column_by_name   (const char *);
       virtual void add_column_by_number (int);   //  numbers start at zero
 
-      virtual void do_output(ostream &) const = 0;
+      virtual void do_output(std::ostream &) const = 0;
 
       virtual void setup() = 0;
 
@@ -84,8 +84,8 @@ class BasicModeAnalysisJob {
       int n_lines_read;
       int n_lines_kept;
 
-      ostream * dumpfile;   //  NOT allocated, so don't delete
-      ostream * outfile;    //  NOT allocated, so don't delete
+      std::ostream * dumpfile;   //  NOT allocated, so don't delete
+      std::ostream * outfile;    //  NOT allocated, so don't delete
 
       int        n_dump;    //  number of lines written to dump file
       AsciiTable dump_at;   //  AsciiTable object to buffer dump data
@@ -123,7 +123,7 @@ class SummaryJob : public BasicModeAnalysisJob {
 
       void clear();
 
-      void do_output(ostream &) const;
+      void do_output(std::ostream &) const;
 
       void setup();
 
@@ -154,7 +154,7 @@ class ByCaseJob : public BasicModeAnalysisJob {
 
       void clear();
 
-      void do_output(ostream &) const;
+      void do_output(std::ostream &) const;
 
       void setup();
 

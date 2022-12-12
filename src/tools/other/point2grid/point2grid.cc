@@ -20,12 +20,18 @@
 //   000    12-11-19  Howard Soh     Support GOES-16
 //   001    01-25-21  Halley Gotway  MET #1630 Handle zero obs.
 //   002    07-06-22  Howard Soh     METplus-Internal #19 Rename main to met_main
+//   003    10-03-23  Prestopnik     MET #2227 Remove namespace std and netCDF from header files
 //
 ////////////////////////////////////////////////////////////////////////
+
+using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
 #include <dirent.h>
+
+#include<netcdf>
+using namespace netCDF;
 
 #include "main.h"
 #include "vx_log.h"
@@ -276,11 +282,13 @@ void process_command_line(int argc, char **argv) {
    RGInfo.name    = cline[1];
    OutputFilename = cline[2];
 
-   // Check if the input file
-#ifdef WITH_PYTHON
+   // Check for python format
    string python_command = InputFilename;
    bool use_xarray = (0 == python_command.find(conf_val_python_xarray));
    bool use_python = use_xarray || (0 == python_command.find(conf_val_python_numpy));
+
+   // Check if the input file
+#ifdef WITH_PYTHON
    if (use_python) {
       int offset = python_command.find("=");
       if (offset == std::string::npos) {
@@ -290,6 +298,8 @@ void process_command_line(int argc, char **argv) {
       }
    }
    else
+#else
+   if (use_python) python_compile_error(method_name);
 #endif
       if ( !file_exists(InputFilename.c_str()) ) {
          mlog << Error << "\n" << method_name

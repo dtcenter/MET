@@ -22,8 +22,12 @@
 //   000    11-12-14  Halley Gotway  New
 //   001    06-07-22  Halley Gotway  MET #2173 Fix python embedding
 //   002    07-06-22  Howard Soh     METplus-Internal #19 Rename main to met_main
+//   003    09-12-22  Prestopnik     MET #2227 Remove namespace std and netCDF
+//                                   from header files
 //
 ////////////////////////////////////////////////////////////////////////
+
+using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
@@ -35,6 +39,9 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+
+#include <netcdf>
+using namespace netCDF;
 
 #include "GridTemplate.h"
 
@@ -375,7 +382,7 @@ void usage() {
         << "\t-to   lat lon\n"
         << "\t[-method type]\n"
         << "\t[-width n]\n"
-	      << "\t[-shape SHAPE]\n"
+        << "\t[-shape SHAPE]\n"
         << "\t[-log file]\n"
         << "\t[-v level]\n"
         << "\t[-compress level]\n\n"
@@ -405,8 +412,6 @@ void usage() {
 
         << "\t\t\"-shape\" overrides the default interpolation shape (SQUARE) "
         << "(optional).\n"
-
-
 
         << "\t\t\"-log file\" outputs log messages to the specified "
         << "file (optional).\n"

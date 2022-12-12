@@ -42,7 +42,7 @@ class VarInfoPython : public VarInfo
       VarInfoPython(const VarInfoPython &);
       VarInfoPython & operator=(const VarInfoPython &);
 
-      void dump(ostream &) const;
+      void dump(std::ostream &) const;
       void clear();
 
          //

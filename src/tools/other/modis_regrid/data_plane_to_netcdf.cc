@@ -21,6 +21,9 @@ using namespace std;
 #include <string.h>
 #include <cmath>
 
+#include <netcdf>
+using namespace netCDF;
+
 #include "data_plane_to_netcdf.h"
 #include "vx_log.h"             // mlog
 #include "vx_cal.h"             // bad_data_float

@@ -100,8 +100,9 @@
 //                    Added code for obs_qty_exc.
 //   049    12/11/21  Halley Gotway  MET #1991 Fix VCNT output.
 //   050    02/11/22  Halley Gotway  MET #2045 Fix HiRA output.
-//   051    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main.
+//   051    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
 //   052    09/29/22  Halley Gotway  MET #2286 Refine GRIB1 table lookup logic.
+//   053    10/03/22  Prestopnik     MET #2227 Remove using namespace netCDF from header files
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -116,6 +117,9 @@ using namespace std;
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+
+#include <netcdf>
+using namespace netCDF;
 
 #include "main.h"
 #include "point_stat.h"
@@ -162,7 +166,6 @@ static void do_vl1l2     (VL1L2Info *&, int, const PairDataPoint *, const PairDa
 static void do_pct       (const PointStatVxOpt &, const PairDataPoint *);
 static void do_hira_ens  (              int, const PairDataPoint *);
 static void do_hira_prob (              int, const PairDataPoint *);
-static void do_seeps_agg (const PairDataPoint *);
 
 static void finish_txt_files();
 
@@ -689,11 +692,14 @@ void process_obs_file(int i_nc) {
    bool use_python = false;
    MetNcPointObsIn nc_point_obs;
    MetPointData *met_point_obs = 0;
-#ifdef WITH_PYTHON
-   MetPythonPointDataFile met_point_file;
+
+   // Check for python format
    string python_command = obs_file[i_nc];
    bool use_xarray = (0 == python_command.find(conf_val_python_xarray));
    use_python = use_xarray || (0 == python_command.find(conf_val_python_numpy));
+
+#ifdef WITH_PYTHON
+   MetPythonPointDataFile met_point_file;
    if (use_python) {
       int offset = python_command.find("=");
       if (offset == std::string::npos) {
@@ -714,6 +720,8 @@ void process_obs_file(int i_nc) {
       use_var_id = met_point_file.is_using_var_id();
    }
    else {
+#else
+   if (use_python) python_compile_error(method_name);
 #endif
       if( !nc_point_obs.open(obs_file[i_nc].c_str()) ) {
          nc_point_obs.close();
@@ -736,6 +744,7 @@ void process_obs_file(int i_nc) {
 
    // Perform GRIB table lookups, if needed
    if(!use_var_id) conf_info.process_grib_codes();
+   is_vgrd = is_ugrd = false;
 
    int hdr_count = met_point_obs->get_hdr_cnt();
    int obs_count = met_point_obs->get_obs_cnt();
@@ -1044,7 +1053,7 @@ void process_scores() {
                // Write out the SEEPS lines
                if(conf_info.vx_opt[i].output_flag[i_seeps] != STATOutputType_None) {
                   compute_aggregated_seeps(pd_ptr, &pd_ptr->seeps);
-                  write_seeps_row(shc, pd_ptr,
+                  write_seeps_row(shc, &pd_ptr->seeps,
                      conf_info.vx_opt[i].output_flag[i_seeps],
                      stat_at, i_stat_row,
                      txt_at[i_seeps], i_txt_row[i_seeps]);

@@ -35,6 +35,8 @@
 //   015    01/24/20  Halley Gotway   Add aggregate RPS lines.
 //   016    04/12/21  Halley Gotway   MET #1735 Support multiple
 //                    -out_thresh and -out_line_type options.
+//   017    11/10/22  Halley Gotway   MET #2339 Add SEEPS and SEEPS_MPR
+//                                      line types.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -585,8 +587,10 @@ void AggrENSInfo::clear() {
    hdr.clear();
    ens_pd.clear();
    me_na.clear();
+   mae_na.clear();
    mse_na.clear();
    me_oerr_na.clear();
+   mae_oerr_na.clear();
    mse_oerr_na.clear();
 }
 
@@ -2568,7 +2572,7 @@ void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &job,
    AggrENSInfo aggr;
    ECNTData cur;
    ConcatString key;
-   double crps_emp, crps_emp_fair, crpscl_emp, crps_gaus, crpscl_gaus, v;
+   double crps_emp, crps_emp_fair, spread_md, crpscl_emp, crps_gaus, crpscl_gaus, v;
    map<ConcatString, AggrENSInfo>::iterator it;
 
    //
@@ -2628,10 +2632,15 @@ void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &job,
          //
          m[key].ens_pd.crps_emp_na.add(cur.crps_emp);
          m[key].ens_pd.crps_emp_fair_na.add(cur.crps_emp_fair);
+         m[key].ens_pd.spread_md_na.add(cur.spread_md);
          m[key].ens_pd.crpscl_emp_na.add(cur.crpscl_emp);
          m[key].ens_pd.crps_gaus_na.add(cur.crps_gaus);
          m[key].ens_pd.crpscl_gaus_na.add(cur.crpscl_gaus);
          m[key].ens_pd.ign_na.add(cur.ign);
+         m[key].ens_pd.n_ge_obs_na.add(cur.n_ge_obs);
+         m[key].ens_pd.me_ge_obs_na.add(cur.me_ge_obs);
+         m[key].ens_pd.n_lt_obs_na.add(cur.n_lt_obs);
+         m[key].ens_pd.me_lt_obs_na.add(cur.me_lt_obs);
          m[key].ens_pd.var_na.add(square(cur.spread));
          m[key].ens_pd.var_oerr_na.add(square(cur.spread_oerr));
          m[key].ens_pd.var_plus_oerr_na.add(square(cur.spread_plus_oerr));
@@ -2642,10 +2651,12 @@ void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &job,
          // Store the summary statistics
          //
          m[key].me_na.add(cur.me);
+         m[key].mae_na.add(cur.mae);
          m[key].mse_na.add((is_bad_data(cur.rmse) ?
                             bad_data_double :
                             cur.rmse * cur.rmse));
          m[key].me_oerr_na.add(cur.me_oerr);
+         m[key].mae_oerr_na.add(cur.mae_oerr);
          m[key].mse_oerr_na.add((is_bad_data(cur.rmse_oerr) ?
                                  bad_data_double :
                                  cur.rmse_oerr * cur.rmse_oerr));
@@ -2668,18 +2679,21 @@ void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &job,
       it->second.ens_pd.n_pair    = it->second.ens_pd.wgt_na.sum();
 
       // Compute ME and RMSE as weighted averages
-      it->second.ens_pd.me        = it->second.me_na.wmean(it->second.ens_pd.wgt_na);
-      v                           = it->second.mse_na.wmean(it->second.ens_pd.wgt_na);
-      it->second.ens_pd.rmse      = (is_bad_data(v) ? bad_data_double : sqrt(v));
-      it->second.ens_pd.me_oerr   = it->second.me_oerr_na.wmean(it->second.ens_pd.wgt_na);
-      v                           = it->second.mse_oerr_na.wmean(it->second.ens_pd.wgt_na);
-      it->second.ens_pd.rmse_oerr = (is_bad_data(v) ? bad_data_double : sqrt(v));
+      it->second.ens_pd.me         = it->second.me_na.wmean(it->second.ens_pd.wgt_na);
+      it->second.ens_pd.mae        = it->second.mae_na.wmean(it->second.ens_pd.wgt_na);
+      v                            = it->second.mse_na.wmean(it->second.ens_pd.wgt_na);
+      it->second.ens_pd.rmse       = (is_bad_data(v) ? bad_data_double : sqrt(v));
+      it->second.ens_pd.me_oerr    = it->second.me_oerr_na.wmean(it->second.ens_pd.wgt_na);
+      it->second.ens_pd.mae_oerr   = it->second.mae_oerr_na.wmean(it->second.ens_pd.wgt_na);
+      v                            = it->second.mse_oerr_na.wmean(it->second.ens_pd.wgt_na);
+      it->second.ens_pd.rmse_oerr  = (is_bad_data(v) ? bad_data_double : sqrt(v));
 
-      crps_emp    = it->second.ens_pd.crps_emp_na.wmean(it->second.ens_pd.wgt_na);
-      crps_emp_fair    = it->second.ens_pd.crps_emp_fair_na.wmean(it->second.ens_pd.wgt_na);
-      crpscl_emp  = it->second.ens_pd.crpscl_emp_na.wmean(it->second.ens_pd.wgt_na);
-      crps_gaus   = it->second.ens_pd.crps_gaus_na.wmean(it->second.ens_pd.wgt_na);
-      crpscl_gaus = it->second.ens_pd.crpscl_gaus_na.wmean(it->second.ens_pd.wgt_na);
+      crps_emp      = it->second.ens_pd.crps_emp_na.wmean(it->second.ens_pd.wgt_na);
+      crps_emp_fair = it->second.ens_pd.crps_emp_fair_na.wmean(it->second.ens_pd.wgt_na);
+      spread_md     = it->second.ens_pd.spread_md_na.wmean(it->second.ens_pd.wgt_na);
+      crpscl_emp    = it->second.ens_pd.crpscl_emp_na.wmean(it->second.ens_pd.wgt_na);
+      crps_gaus     = it->second.ens_pd.crps_gaus_na.wmean(it->second.ens_pd.wgt_na);
+      crpscl_gaus   = it->second.ens_pd.crpscl_gaus_na.wmean(it->second.ens_pd.wgt_na);
 
       // Compute aggregated empirical CRPSS
       it->second.ens_pd.crpss_emp =
@@ -3187,6 +3201,7 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &job,
          double crps_emp = compute_crps_emp(cur.obs, cur.ens_na);
          m[key].ens_pd.crps_emp_na.add(crps_emp);
          m[key].ens_pd.crps_emp_fair_na.add(crps_emp - cur.ens_na.wmean_abs_diff());
+         m[key].ens_pd.spread_md_na.add(cur.ens_na.mean_abs_diff());
          m[key].ens_pd.crpscl_emp_na.add(compute_crps_emp(cur.obs, climo_vals));
 
          // Store Gaussian CRPS stats
@@ -3194,6 +3209,17 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &job,
          m[key].ens_pd.crpscl_gaus_na.add(compute_crps_gaus(cur.obs, cur.climo_mean, cur.climo_stdev));
          m[key].ens_pd.ign_na.add(compute_ens_ign(cur.obs, cur.ens_mean, cur.spread));
          m[key].ens_pd.pit_na.add(compute_ens_pit(cur.obs, cur.ens_mean, cur.spread));
+
+         // Store BIAS_RATIO terms
+         int n_ge_obs, n_lt_obs;
+         double me_ge_obs, me_lt_obs;
+         compute_bias_ratio_terms(cur.obs, cur.ens_na,
+                                  n_ge_obs, me_ge_obs,
+                                  n_lt_obs, me_lt_obs);
+         m[key].ens_pd.n_ge_obs_na.add(n_ge_obs);
+         m[key].ens_pd.me_ge_obs_na.add(me_ge_obs);
+         m[key].ens_pd.n_lt_obs_na.add(n_lt_obs);
+         m[key].ens_pd.me_lt_obs_na.add(me_lt_obs);
 
          //
          // Increment the RHIST counts
@@ -3322,6 +3348,184 @@ void aggr_ssvar_lines(LineDataFile &f, STATAnalysisJob &job,
          // Keep track of the unique header column entries
          //
          m[case_key].hdr.add(line);
+
+         n_out++;
+      }
+   } // end while
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void aggr_seeps_lines(LineDataFile &f, STATAnalysisJob &job,
+                      map<ConcatString, AggrSEEPSInfo> &m,
+                      int &n_in, int &n_out) {
+   STATLine line;
+   AggrSEEPSInfo aggr;
+   SeepsAggScore cur;
+   ConcatString key, fcst_var, obs_var;
+
+   //
+   // Process the STAT lines
+   //
+   while(f >> line) {
+
+      if(line.is_header()) continue;
+
+      n_in++;
+
+      if(job.is_keeper(line)) {
+
+         job.dump_stat_line(line);
+
+         if(line.type() != stat_seeps) {
+            mlog << Error << "\naggr_seeps_lines() -> "
+                 << "should only encounter SEEPS line types.\n"
+                 << "ERROR occurred on STAT line:\n" << line << "\n\n";
+            throw(1);
+         }
+
+         //
+         // Only aggregate consistent variable names
+         //
+         if(fcst_var.empty()) fcst_var = line.fcst_var();
+         if(obs_var.empty())  obs_var  = line.obs_var();
+
+         if(fcst_var != line.fcst_var() ||
+            obs_var  != line.obs_var()) {
+            mlog << Error << "\naggr_seeps_lines() -> "
+                 << "both the forecast and observation variable types must "
+                 << "remain constant.  Try setting \"-fcst_var\" and/or "
+                 << "\"-obs_var\".\n"
+                 << "ERROR occurred on STAT line:\n" << line << "\n\n";
+            throw(1);
+         }
+
+         //
+         // Parse the current SSVAR line
+         //
+         parse_seeps_line(line, cur);
+
+         //
+         // Build the map key for the current line
+         //
+         key = job.get_case_info(line);
+
+         //
+         // Add a new map entry, if necessary
+         //
+         if(m.count(key) == 0) {
+            aggr.agg_score = cur;
+            aggr.hdr.clear();
+            m[key] = aggr;
+         }
+         //
+         // Increment counts in the existing map entry
+         //
+         else {
+            m[key].agg_score += cur;
+         }
+
+         //
+         // Keep track of the unique header column entries
+         //
+         m[key].hdr.add(line);
+
+         n_out++;
+      }
+   } // end while
+
+   return;
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+void aggr_seeps_mpr_lines(LineDataFile &f, STATAnalysisJob &job,
+                          map<ConcatString, AggrSEEPSMPRInfo> &m,
+                          int &n_in, int &n_out) {
+   STATLine line;
+   AggrSEEPSMPRInfo aggr;
+   SEEPSMPRData cur;
+   ConcatString key, fcst_var, obs_var;
+
+   //
+   // Process the STAT lines
+   //
+   while(f >> line) {
+
+      if(line.is_header()) continue;
+
+      n_in++;
+
+      if(job.is_keeper(line)) {
+
+         job.dump_stat_line(line);
+
+         if(line.type() != stat_seeps_mpr) {
+            mlog << Error << "\naggr_seeps_mpr_lines() -> "
+                 << "should only encounter SEEPS_MPR line types.\n"
+                 << "ERROR occurred on STAT line:\n" << line << "\n\n";
+            throw(1);
+         }
+
+         //
+         // Only aggregate consistent variable names
+         //
+         if(fcst_var.empty()) fcst_var = line.fcst_var();
+         if(obs_var.empty())  obs_var  = line.obs_var();
+
+         if(fcst_var != line.fcst_var() ||
+            obs_var  != line.obs_var()) {
+            mlog << Error << "\naggr_seeps_mpr_lines() -> "
+                 << "both the forecast and observation variable types must "
+                 << "remain constant.  Try setting \"-fcst_var\" and/or "
+                 << "\"-obs_var\".\n"
+                 << "ERROR occurred on STAT line:\n" << line << "\n\n";
+            throw(1);
+         }
+
+         //
+         // Parse the current SSVAR line
+         //
+         parse_seeps_mpr_line(line, cur);
+
+         //
+         // Build the map key for the current line
+         //
+         key = job.get_case_info(line);
+
+         //
+         // Add a new map entry, if necessary
+         //
+         if(m.count(key) == 0) {
+            aggr.pd.n_obs = 0;
+            aggr.pd.f_na.clear();
+            aggr.pd.o_na.clear();
+            aggr.pd.seeps_mpr.clear();
+            aggr.hdr.clear();
+            m[key] = aggr;
+         }
+
+         //
+         // Increment counts
+         //
+         m[key].pd.n_obs += 1;
+         m[key].pd.f_na.add(cur.fcst);
+         m[key].pd.o_na.add(cur.obs);
+         m[key].pd.lat_na.add(cur.obs_lat);
+         m[key].pd.lon_na.add(cur.obs_lon);
+
+         // Allocated here but deallocated by PairDataPoint
+         SeepsScore *score = new SeepsScore;
+         *score = cur.seeps_mpr;
+         m[key].pd.seeps_mpr.push_back(score);
+
+         //
+         // Keep track of the unique header column entries
+         //
+         m[key].hdr.add(line);
 
          n_out++;
       }

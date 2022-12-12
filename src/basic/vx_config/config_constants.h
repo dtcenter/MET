@@ -86,6 +86,33 @@ enum TrackType {
 ////////////////////////////////////////////////////////////////////////
 
 //
+// Enumeration for tropical cyclone diagnostic types
+//
+
+enum DiagType {
+   DiagType_None,      // Default
+   DiagType_CIRA_RT,   // Realtime CIRA Tropical Cyclone Diagnostics
+   DiagType_CIRA_Dev,  // Developmental CIRA Tropical Cyclone Diagnostics
+   DiagType_SHIPS_RT,  // Realtime SHIPS Large Scale Diagnostics
+   DiagType_SHIPS_Dev  // Developmental SHIPS Large Scale Diagnostics
+};
+
+////////////////////////////////////////////////////////////////////////
+
+//
+// Corresponding diagnostic type strings
+//
+
+static const char cira_diag_str[]      = "CIRA_DIAG";
+static const char cira_diag_rt_str[]   = "CIRA_DIAG_RT";
+static const char cira_diag_dev_str[]  = "CIRA_DIAG_DEV";
+static const char ships_diag_str[]     = "SHIPS_DIAG";
+static const char ships_diag_rt_str[]  = "SHIPS_DIAG_RT";
+static const char ships_diag_dev_str[] = "SHIPS_DIAG_DEV";
+
+////////////////////////////////////////////////////////////////////////
+
+//
 // Enumeration for 12-hour interpolation logic
 //
 
@@ -621,6 +648,7 @@ static const char conf_key_raw_flag[]          = "raw";
 static const char conf_key_diff_flag[]         = "diff";
 static const char conf_key_climo_flag[]        = "climo";
 static const char conf_key_climo_cdp_flag[]    = "climo_cdp";
+static const char conf_key_seeps_flag[]        = "seeps";
 static const char conf_key_apply_mask_flag[]   = "apply_mask";
 static const char conf_key_object_raw_flag[]   = "object_raw";
 static const char conf_key_object_id_flag[]    = "object_id";
@@ -637,9 +665,11 @@ static const char conf_key_trunc_factor[]      = "gaussian_trunc_factor";
 static const char conf_key_eclv_points[]       = "eclv_points";
 static const char conf_key_var_name_map[]      = "var_name_map";
 static const char conf_key_metadata_map[]      = "metadata_map";
+static const char conf_key_obs_to_qc_map[]     = "obs_to_qc_map";
 static const char conf_key_missing_thresh[]    = "missing_thresh";
 static const char conf_key_control_id[]        = "control_id";
 static const char conf_key_ens_member_ids[]    = "ens_member_ids";
+static const char conf_key_seeps_p1_thresh[]   = "seeps_p1_thresh";
 
 //
 // Entries to override file metadata 
@@ -884,6 +914,7 @@ static const char conf_key_do_polylines_flag   [] = "do_polylines";
 // PB2NC specific parameter key names
 //
 
+static const char conf_key_datetime[]              = "datetime";
 static const char conf_key_station_id[]            = "station_id";
 static const char conf_key_elevation_range[]       = "elevation_range";
 static const char conf_key_pb_report_type[]        = "pb_report_type";
@@ -1066,6 +1097,13 @@ static const char conf_key_dland_file[]               = "dland_file";
 static const char conf_key_basin_file[]               = "basin_file";
 static const char conf_key_track_watch_warn[]         = "track_watch_warn";
 static const char conf_key_watch_warn[]               = "watch_warn";
+static const char conf_key_diag_info_map[]            = "diag_info_map";
+static const char conf_key_diag_source[]              = "diag_source";
+static const char conf_key_track_source[]             = "track_source";
+static const char conf_key_field_source[]             = "field_source";
+static const char conf_key_match_to_track[]           = "match_to_track";
+static const char conf_key_diag_name[]                = "diag_name";
+static const char conf_key_diag_convert_map[]         = "diag_convert_map";
 static const char conf_key_basin_map[]                = "basin_map";
 static const char conf_key_time_offset[]              = "time_offset";
 static const char conf_key_amodel[]                   = "amodel";
@@ -1082,6 +1120,10 @@ static const char conf_key_init_str_name[]            = "init_str_name";
 static const char conf_key_init_str_val[]             = "init_str_val";
 static const char conf_key_init_str_exc_name[]        = "init_str_exc_name";
 static const char conf_key_init_str_exc_val[]         = "init_str_exc_val";
+static const char conf_key_diag_thresh_name[]         = "diag_thresh_name";
+static const char conf_key_diag_thresh_val[]          = "diag_thresh_val";
+static const char conf_key_init_diag_thresh_name[]    = "init_diag_thresh_name";
+static const char conf_key_init_diag_thresh_val[]     = "init_diag_thresh_val";
 static const char conf_key_water_only[]               = "water_only";
 static const char conf_key_rirw_track[]               = "rirw.track";
 static const char conf_key_rirw_time_adeck[]          = "rirw.adeck.time";

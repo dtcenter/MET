@@ -65,7 +65,7 @@ class ModeAttributes {
 
       void clear();
 
-      void dump(ostream & out, int depth = 0) const;
+      void dump(std::ostream & out, int depth = 0) const;
 
       int is_keeper(const ModeLine &) const;
 
@@ -587,7 +587,7 @@ class ModeAttributes {
 ////////////////////////////////////////////////////////////////////////
 
 
-extern void mode_atts_usage(ostream &);
+extern void mode_atts_usage(std::ostream &);
 
 
 ////////////////////////////////////////////////////////////////////////

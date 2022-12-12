@@ -18,9 +18,13 @@
 //   001    07/28/20  Halley Gotway   Updates for #1391.
 //   002    03/04/21  Halley Gotway   Bugfix #1694.
 //   003    08/20/21  Halley Gotway   Bugfix #1886 for integer overflow.
-//   004    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
+//   004    07/06/22  Howard Soh      METplus-Internal #19 Rename main to met_main
+//   005    10/03/22  Prestopnik      MET #2227 Remove using namespace std and netCDF from header files
+//   006    10/26/22  Linden          MET #2232 Refine the Grid-Diag output variable names when specifying two input data sources
 //
 ////////////////////////////////////////////////////////////////////////
+
+using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
@@ -32,6 +36,9 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+
+#include <netcdf>
+using namespace netCDF;
 
 #include "main.h"
 #include "grid_diag.h"
@@ -258,7 +265,7 @@ void process_series(void) {
       // Process the 1d histograms
       for(int i_var=0; i_var<conf_info.get_n_data(); i_var++) {
 
-        i_var_str << cs_erase << "VAR" << i_var;
+        i_var_str << cs_erase << "VAR" << i_var+1;
 
         VarInfo *data_info = conf_info.data_info[i_var];
 
@@ -340,13 +347,13 @@ void process_series(void) {
      // Process the 2d joint histograms
      for(int i_var=0; i_var<conf_info.get_n_data(); i_var++) {
 
-        i_var_str << cs_erase << "VAR" << i_var;
+        i_var_str << cs_erase << "VAR" << i_var+1;
 
         VarInfo *data_info = conf_info.data_info[i_var];
 
         for(int j_var=i_var+1; j_var<conf_info.get_n_data(); j_var++) {
 
-           j_var_str << cs_erase << "VAR" << j_var;
+           j_var_str << cs_erase << "VAR" << j_var+1;
 
            VarInfo *joint_info = conf_info.data_info[j_var];
 
@@ -399,7 +406,7 @@ void setup_histograms(void) {
 
    for(int i_var=0; i_var<conf_info.get_n_data(); i_var++) {
 
-      i_var_str << cs_erase << "VAR" << i_var;
+      i_var_str << cs_erase << "VAR" << i_var+1;
 
       VarInfo *data_info = conf_info.data_info[i_var];
 
@@ -437,8 +444,14 @@ void setup_histograms(void) {
 	      << "Initializing " << data_info->magic_str_attr()
 	      << " histogram with " << n_bins << " bins from "
 	      << min << " to " << max << ".\n";
+      
       histograms[i_var_str] = vector<long long>();
       init_pdf(n_bins, histograms[i_var_str]);
+
+      // Keep track of unique output variable names
+      if(nc_var_sa.has( data_info->magic_str_attr() )) unique_variable_names = false;
+      nc_var_sa.add(data_info->magic_str_attr());
+      
    } // for i_var
 }
 
@@ -449,14 +462,14 @@ void setup_joint_histograms(void) {
 
 	for(int i_var=0; i_var<conf_info.get_n_data(); i_var++) {
 
-      i_var_str << cs_erase << "VAR" << i_var;
+      i_var_str << cs_erase << "VAR" << i_var+1;
 
       VarInfo *data_info = conf_info.data_info[i_var];
       int n_bins = data_info->n_bins();
 
       for(int j_var=i_var+1; j_var<conf_info.get_n_data(); j_var++) {
 
-         j_var_str << cs_erase << "VAR" << j_var;
+         j_var_str << cs_erase << "VAR" << j_var+1;
    
          VarInfo *joint_info = conf_info.data_info[j_var];
          int n_joint_bins = joint_info->n_bins();
@@ -478,48 +491,48 @@ void setup_joint_histograms(void) {
 ////////////////////////////////////////////////////////////////////////
 
 void setup_nc_file(void) {
-   ConcatString cs, i_var_str;
+   ConcatString cs, i_var_str, j_var_str;
 
-	// Create NetCDF file
-	nc_out = open_ncfile(out_file.c_str(), true);
+   // Create NetCDF file
+   nc_out = open_ncfile(out_file.c_str(), true);
 
-	if(IS_INVALID_NC_P(nc_out)) {
+   if(IS_INVALID_NC_P(nc_out)) {
       mlog << Error << "\nsetup_nc_file() -> "
-			  << "trouble opening output NetCDF file "
-			  << out_file << "\n\n";
-		exit(1);
-	}
+           << "trouble opening output NetCDF file "
+           << out_file << "\n\n";
+      exit(1);
+   }
 
-	// Add global attributes
-	write_netcdf_global(nc_out, out_file.c_str(), program_name,
-			NULL, NULL, conf_info.desc.c_str());
-	add_att(nc_out, "mask_grid", (conf_info.mask_grid_name.nonempty() ?
-				(string)conf_info.mask_grid_name :
-				na_str));
-	add_att(nc_out, "mask_poly", (conf_info.mask_poly_name.nonempty() ?
-				(string)conf_info.mask_poly_name :
-				na_str));
+   // Add global attributes
+   write_netcdf_global(nc_out, out_file.c_str(), program_name,
+                       NULL, NULL, conf_info.desc.c_str());
+   add_att(nc_out, "mask_grid", (conf_info.mask_grid_name.nonempty() ?
+                                 (string)conf_info.mask_grid_name :
+                                 na_str));
+   add_att(nc_out, "mask_poly", (conf_info.mask_poly_name.nonempty() ?
+                                 (string)conf_info.mask_poly_name :
+                                 na_str));
 
-	// Add time range information to the global attributes
-	add_att(nc_out, "init_beg",  (string)unix_to_yyyymmdd_hhmmss(init_beg));
-	add_att(nc_out, "init_end",  (string)unix_to_yyyymmdd_hhmmss(init_end));
-	add_att(nc_out, "valid_beg", (string)unix_to_yyyymmdd_hhmmss(valid_beg));
-	add_att(nc_out, "valid_end", (string)unix_to_yyyymmdd_hhmmss(valid_end));
-	add_att(nc_out, "lead_beg",  (string)sec_to_hhmmss(lead_beg));
-	add_att(nc_out, "lead_end",  (string)sec_to_hhmmss(lead_end));
+   // Add time range information to the global attributes
+   add_att(nc_out, "init_beg",  (string)unix_to_yyyymmdd_hhmmss(init_beg));
+   add_att(nc_out, "init_end",  (string)unix_to_yyyymmdd_hhmmss(init_end));
+   add_att(nc_out, "valid_beg", (string)unix_to_yyyymmdd_hhmmss(valid_beg));
+   add_att(nc_out, "valid_end", (string)unix_to_yyyymmdd_hhmmss(valid_end));
+   add_att(nc_out, "lead_beg",  (string)sec_to_hhmmss(lead_beg));
+   add_att(nc_out, "lead_end",  (string)sec_to_hhmmss(lead_end));
 
-	// Write the grid size, mask size, and series length
-	write_nc_var_int("grid_size", "number of grid points", grid.nxy());
-	write_nc_var_int("mask_size", "number of mask points", conf_info.mask_area.count());
-	write_nc_var_int("n_series", "length of series", n_series);
+   // Write the grid size, mask size, and series length
+   write_nc_var_int("grid_size", "number of grid points", grid.nxy());
+   write_nc_var_int("mask_size", "number of mask points", conf_info.mask_area.count());
+   write_nc_var_int("n_series", "length of series", n_series);
 
-	// Compression level
-	int deflate_level = compress_level;
-	if(deflate_level < 0) deflate_level = conf_info.conf.nc_compression();
+   // Compression level
+   int deflate_level = compress_level;
+   if(deflate_level < 0) deflate_level = conf_info.conf.nc_compression();
 
-	for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
+   for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
-      i_var_str << cs_erase << "VAR" << i_var;
+      i_var_str << cs_erase << "VAR" << i_var+1;
 
       VarInfo *data_info = conf_info.data_info[i_var];
 
@@ -528,11 +541,16 @@ void setup_nc_file(void) {
       var_name.add("_");
       var_name.add(data_info->level_attr());
 
+      if(multiple_data_sources && !unique_variable_names) {
+         var_name.add("_");
+         var_name.add(i_var_str);
+      }
+
       // Define histogram dimensions
       NcDim var_dim = add_dim(nc_out, var_name,
                               (long) data_info->n_bins());
       data_var_dims.push_back(var_dim);
-
+      
       // Define histogram bins
       ConcatString var_min_name = var_name;
       ConcatString var_max_name = var_name;
@@ -569,12 +587,19 @@ void setup_nc_file(void) {
    // Define histograms
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
+      i_var_str << cs_erase << "VAR" << i_var+1;
+
       VarInfo *data_info = conf_info.data_info[i_var];
 
       // Set variable NetCDF name
       ConcatString var_name = data_info->name_attr();
       var_name.add("_");
       var_name.add(data_info->level_attr());
+
+      if(multiple_data_sources && !unique_variable_names) {
+         var_name.add("_");
+         var_name.add(i_var_str);
+      }
 
       ConcatString hist_name("hist_");
       hist_name.add(var_name);
@@ -591,9 +616,13 @@ void setup_nc_file(void) {
    // Define joint histograms
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
+      i_var_str << cs_erase << "VAR" << i_var+1;
+
       VarInfo *data_info = conf_info.data_info[i_var];
 
       for(int j_var=i_var+1; j_var<conf_info.get_n_data(); j_var++) {
+
+         j_var_str << cs_erase << "VAR" << j_var+1;
 
          VarInfo *joint_info = conf_info.data_info[j_var];
 
@@ -601,10 +630,21 @@ void setup_nc_file(void) {
          hist_name.add(data_info->name_attr());
          hist_name.add("_");
          hist_name.add(data_info->level_attr());
+
+         if(multiple_data_sources && !unique_variable_names) {
+            hist_name.add("_");
+            hist_name.add(i_var_str);
+         }
+
          hist_name.add("_");
          hist_name.add(joint_info->name_attr());
          hist_name.add("_");
          hist_name.add(joint_info->level_attr());
+
+         if(multiple_data_sources && !unique_variable_names) {
+            hist_name.add("_");
+            hist_name.add(j_var_str);
+         }
 
          NcDim var_dim = data_var_dims[i_var];
          NcDim joint_dim = data_var_dims[j_var];
@@ -656,7 +696,7 @@ void write_histograms(void) {
 
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
-      i_var_str << cs_erase << "VAR" << i_var;
+      i_var_str << cs_erase << "VAR" << i_var+1;
 
       VarInfo *data_info = conf_info.data_info[i_var];
       NcVar hist_var = hist_vars[i_var];
@@ -684,8 +724,8 @@ void write_joint_histograms(void) {
          VarInfo *joint_info = conf_info.data_info[j_var];
 
          ij_var_str << cs_erase
-                    << "VAR" << i_var << "_"
-                    << "VAR" << j_var;
+                    << "VAR" << i_var+1 << "_"
+                    << "VAR" << j_var+1;
 
          long long *hist = joint_histograms[ij_var_str].data();
 
@@ -810,6 +850,7 @@ void usage() {
 
 void set_data_files(const StringArray & a) {
    data_files.push_back(a);
+   if(data_files.size() > 0) multiple_data_sources = true;
 }
 
 ////////////////////////////////////////////////////////////////////////

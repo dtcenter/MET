@@ -82,9 +82,9 @@ class GenEnsProdConfInfo {
       ConcatString         desc;            // Description
       ConcatString         control_id;      // Control ID
 
-      vector<GenEnsProdVarInfo *> ens_input; // Vector of GenEnsProdVarInfo pointers (allocated)
-      vector<ClimoCDFInfo> cdf_info;         // Array of climo CDF info objects
-      StringArray          ens_member_ids;   // Array of ensemble member ID strings
+      std::vector<GenEnsProdVarInfo *> ens_input;        // Vector of GenEnsProdVarInfo pointers (allocated)
+      std::vector<ClimoCDFInfo>        cdf_info;         // Array of climo CDF info objects
+      StringArray                      ens_member_ids;   // Array of ensemble member ID strings
 
       NbrhdInfo            nbrhd_prob;      // Neighborhood probability definition
       InterpInfo           nmep_smooth;     // Neighborhood maximum smoothing information

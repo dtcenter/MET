@@ -48,7 +48,7 @@ class PyLineDataFile;   //  forward reference
 class DataLine {
 
       friend class LineDataFile;
-      friend ostream & operator<<(ostream &, const DataLine &);
+      friend std::ostream & operator<<(std::ostream &, const DataLine &);
       friend Logger & operator<<(Logger &, const DataLine &);
 
    protected:
@@ -96,7 +96,7 @@ class DataLine {
 
       void clear();
 
-      void dump(ostream &, int depth = 0) const;
+      void dump(std::ostream &, int depth = 0) const;
 
          //
          //  retrieve stuff
@@ -178,7 +178,7 @@ class LineDataFile {
       LineDataFile();
       virtual ~LineDataFile();
 
-      ifstream * in;
+      std::ifstream * in;
 
       int open(const char *);
 
@@ -189,6 +189,8 @@ class LineDataFile {
       int ok() const;
 
       virtual int operator>>(DataLine &);
+
+      int peek_line(DataLine &);
 
       int read_fwf_line(DataLine &, const int *wdth, int n_wdth);
 
@@ -217,7 +219,7 @@ inline const StringArray & LineDataFile::header() const { return ( Header ); }
 ////////////////////////////////////////////////////////////////////////
 
 
-extern ostream & operator<<(ostream &, const DataLine &);
+extern std::ostream & operator<<(std::ostream &, const DataLine &);
 
 
 ////////////////////////////////////////////////////////////////////////

@@ -72,7 +72,6 @@ init_hour = [];
 //
 lead_req = [];
 
-
 //
 // lat/lon polylines defining masking regions
 //
@@ -128,6 +127,11 @@ watch_warn = {
    file_name   = "MET_BASE/tc_data/wwpts_us.txt";
    time_offset = -14400;
 }
+
+//
+// Diagnostics to be extracted
+//
+diag_name = [];
 
 //
 // Modify basin names to make them consistent across ATCF input files.

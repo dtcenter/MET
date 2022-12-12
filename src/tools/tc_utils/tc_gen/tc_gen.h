@@ -13,8 +13,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
@@ -30,7 +28,6 @@ using namespace std;
 #include <unistd.h>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "tc_gen_conf_info.h"
 
@@ -116,9 +113,9 @@ static ConcatString out_base;
 
 // Output NetCDF file
 static ConcatString out_nc_file;
-static NcFile      *nc_out = (NcFile *) 0;
-static NcDim        lat_dim;
-static NcDim        lon_dim;
+static netCDF::NcFile      *nc_out = (netCDF::NcFile *) 0;
+static netCDF::NcDim        lat_dim;
+static netCDF::NcDim        lon_dim;
 
 // List of output NetCDF variable names
 static StringArray nc_var_sa;

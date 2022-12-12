@@ -70,7 +70,7 @@ struct RotatedLatLonData {
 
    void dump() const;   //  doesn't work if verbosity level < 4
 
-   void dump(ostream &, int depth) const;
+   void dump(std::ostream &, int depth) const;
 
 };
 

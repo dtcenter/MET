@@ -1183,6 +1183,7 @@ AC_CONFIG_FILES([Makefile
                  scripts/Rscripts/Makefile
                  scripts/Rscripts/include/Makefile
                  scripts/python/Makefile
+                 scripts/utility/Makefile
                  data/Makefile
                  data/climo/Makefile
                  data/climo/seeps/Makefile

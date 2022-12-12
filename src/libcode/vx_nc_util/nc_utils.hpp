@@ -13,21 +13,21 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-extern bool get_att_value(const NcAtt *att, int &att_val);
-extern bool get_att_value(const NcAtt *att, ConcatString &value);
-extern bool get_att_value(const NcAtt *att, ncbyte &att_val);
-extern bool get_att_value(const NcAtt *att, short &att_val);
-extern bool get_att_value(const NcAtt *att, int &att_val);
-extern bool get_att_value(const NcAtt *att, unsigned int &att_val);
-extern bool get_att_value(const NcAtt *att, float &att_val);
-extern bool get_att_value(const NcAtt *att, double &att_val);
-extern ConcatString get_log_msg_for_att(const NcVarAtt *att);
-extern ConcatString get_log_msg_for_att(const NcVarAtt *att, string var_name,
+extern bool get_att_value(const netCDF::NcAtt *att, int &att_val);
+extern bool get_att_value(const netCDF::NcAtt *att, ConcatString &value);
+extern bool get_att_value(const netCDF::NcAtt *att, ncbyte &att_val);
+extern bool get_att_value(const netCDF::NcAtt *att, short &att_val);
+extern bool get_att_value(const netCDF::NcAtt *att, int &att_val);
+extern bool get_att_value(const netCDF::NcAtt *att, unsigned int &att_val);
+extern bool get_att_value(const netCDF::NcAtt *att, float &att_val);
+extern bool get_att_value(const netCDF::NcAtt *att, double &att_val);
+extern ConcatString get_log_msg_for_att(const netCDF::NcVarAtt *att);
+extern ConcatString get_log_msg_for_att(const netCDF::NcVarAtt *att, std::string var_name,
                                         const ConcatString att_name);
-extern double get_var_add_offset(const NcVar *var);
-extern double get_var_scale_factor(const NcVar *var);
-extern bool has_add_offset_attr(NcVar *var);
-extern bool has_scale_factor_attr(NcVar *var);
+extern double get_var_add_offset(const netCDF::NcVar *var);
+extern double get_var_scale_factor(const netCDF::NcVar *var);
+extern bool has_add_offset_attr(netCDF::NcVar *var);
+extern bool has_scale_factor_attr(netCDF::NcVar *var);
 extern void set_def_fill_value(ncbyte *val);
 extern void set_def_fill_value(char   *val);
 extern void set_def_fill_value(double *val);
@@ -45,16 +45,25 @@ extern void set_def_fill_value(unsigned short     *val);
 ////////////////////////////////////////////////////////////////////////
 
 template <typename T>
-bool get_att_num_value_(const NcAtt *att, T &att_val, int matching_type) {
-   bool status = false;
-   if (IS_VALID_NC_P(att)) {
+bool get_att_num_value_(const netCDF::NcAtt *att, T &att_val, int matching_type) {
+   bool status = IS_VALID_NC_P(att);
+   if (status) {
       int nc_type_id = GET_NC_TYPE_ID_P(att);
       if (matching_type == nc_type_id) {
          att->getValues(&att_val);
-         status = true;
+      }
+      else if (NC_FLOAT == nc_type_id) {
+         float att_value;
+         att->getValues(&att_value);
+         att_val = att_value;
+      }
+      else if (NC_DOUBLE == nc_type_id) {
+         double att_value;
+         att->getValues(&att_value);
+         att_val = att_value;
       }
       else if (NC_CHAR == nc_type_id) {
-         string att_value;
+         std::string att_value;
          att->getValues(att_value);
          if (matching_type == NC_FLOAT)
             att_val = atof(att_value.c_str());
@@ -62,7 +71,6 @@ bool get_att_num_value_(const NcAtt *att, T &att_val, int matching_type) {
             att_val = (double)atof(att_value.c_str());
          else // if (matching_type == NC_INT)
             att_val = atoi(att_value.c_str());
-         status = true;
       }
    }
    return(status);
@@ -71,19 +79,17 @@ bool get_att_num_value_(const NcAtt *att, T &att_val, int matching_type) {
 ////////////////////////////////////////////////////////////////////////
 
 template <typename T>
-bool get_nc_att_value_(const NcVar *var, const ConcatString &att_name,
+bool get_nc_att_value_(const netCDF::NcVar *var, const ConcatString &att_name,
                        T &att_val, bool exit_on_error,
                        T bad_data, const char *caller_name) {
-   bool status = false;
-
    // Initialize
    att_val = bad_data;
 
    //
    // Retrieve the NetCDF variable attribute.
    //
-   NcVarAtt *att = get_nc_att(var, att_name);
-   status = get_att_value((NcAtt *)att, att_val);
+   netCDF::NcVarAtt *att = get_nc_att(var, att_name);
+   bool status = get_att_value((netCDF::NcAtt *)att, att_val);
    if (!status) {
       mlog << Error << "\n" << caller_name
            << get_log_msg_for_att(att, GET_SAFE_NC_NAME_P(var), att_name);
@@ -100,9 +106,8 @@ bool get_nc_att_value_(const NcVar *var, const ConcatString &att_name,
 ////////////////////////////////////////////////////////////////////////
 
 template <typename T>
-bool get_nc_att_value_(const NcVarAtt *att, T &att_val, bool exit_on_error,
+bool get_nc_att_value_(const netCDF::NcVarAtt *att, T &att_val, bool exit_on_error,
                        T bad_data, const char *caller_name) {
-   bool status = true;
 
    // Initialize
    att_val = bad_data;
@@ -110,7 +115,7 @@ bool get_nc_att_value_(const NcVarAtt *att, T &att_val, bool exit_on_error,
    //
    // Retrieve the NetCDF variable attribute.
    //
-   status = get_att_value((NcAtt *)att, att_val);
+   bool status = get_att_value((netCDF::NcAtt *)att, att_val);
    if (!status) {
       mlog << Error << "\n" << caller_name << get_log_msg_for_att(att);
 
@@ -123,16 +128,16 @@ bool get_nc_att_value_(const NcVarAtt *att, T &att_val, bool exit_on_error,
 ////////////////////////////////////////////////////////////////////////
 
 template <typename T>
-bool get_global_att_value_(const NcFile *nc, const ConcatString& att_name,
+bool get_global_att_value_(const netCDF::NcFile *nc, const ConcatString& att_name,
                            T &att_val, T bad_data, bool error_out, const char *caller_name) {
    bool status = false;
    // Initialize
    att_val = bad_data;
 
-   NcGroupAtt *nc_att = get_nc_att(nc, att_name);
+   netCDF::NcGroupAtt *nc_att = get_nc_att(nc, att_name);
    if (IS_VALID_NC_P(nc_att)) {
-      status = get_att_value((NcAtt *)nc_att, att_val);
-      string data_type = GET_NC_TYPE_NAME_P(nc_att);
+      status = get_att_value((netCDF::NcAtt *)nc_att, att_val);
+      std::string data_type = GET_NC_TYPE_NAME_P(nc_att);
       if (error_out && !status) {
          mlog << Error << caller_name
               << "The data type \"" << data_type
@@ -154,14 +159,14 @@ bool get_global_att_value_(const NcFile *nc, const ConcatString& att_name,
 ////////////////////////////////////////////////////////////////////////
 
 template <typename T>
-bool get_var_att_num_(const NcVar *var, const ConcatString &att_name,
+bool get_var_att_num_(const netCDF::NcVar *var, const ConcatString &att_name,
                       T &att_val, T bad_data) {
    bool status = false;
 
    // Initialize
    att_val = bad_data;
 
-   NcVarAtt *att = get_nc_att(var, att_name);
+   netCDF::NcVarAtt *att = get_nc_att(var, att_name);
    // Look for a match
    if (IS_VALID_NC_P(att)) {
       att->getValues(&att_val);
@@ -175,10 +180,10 @@ bool get_var_att_num_(const NcVar *var, const ConcatString &att_name,
 ////////////////////////////////////////////////////////////////////////
 
 template <typename T>
-bool get_var_fill_value(const NcVar *var, T &att_val) {
+bool get_var_fill_value(const netCDF::NcVar *var, T &att_val) {
    bool found = false;
 
-   NcVarAtt *att = get_nc_att(var, fill_value_att_name);
+   netCDF::NcVarAtt *att = get_nc_att(var, fill_value_att_name);
    if (IS_INVALID_NC_P(att)) {
       if (att) delete att;
       att = get_nc_att(var, missing_value_att_name);
@@ -258,13 +263,11 @@ void apply_scale_factor_(T *data, const int cell_count,
 // - template <function_name>_ reads data and applies scale_factor and add_offset.
 
 template <typename T>
-bool get_nc_data_t(NcVar *var, T *data) {
-   bool return_status = false;
+bool get_nc_data_t(netCDF::NcVar *var, T *data) {
+   bool return_status = IS_VALID_NC_P(var);
 
-   if (IS_VALID_NC_P(var)) {
+   if (return_status) {
       var->getVar(data);
-
-      return_status = true;
    }
    return(return_status);
 }
@@ -272,7 +275,7 @@ bool get_nc_data_t(NcVar *var, T *data) {
 ////////////////////////////////////////////////////////////////////////
 
 template <typename T>
-bool get_nc_data_(NcVar *var, T *data, const T met_missing) {
+bool get_nc_data_(netCDF::NcVar *var, T *data, const T met_missing) {
    //const char *method_name = "get_nc_data_() ";
 
    int data_size = get_data_size(var);
@@ -302,7 +305,7 @@ bool get_nc_data_(NcVar *var, T *data, const T met_missing) {
 ////////////////////////////////////////////////////////////////////////
 
 template <typename T>
-bool get_nc_data_(NcVar *var, T *data, T bad_data, const long *dims, const long *curs) {
+bool get_nc_data_(netCDF::NcVar *var, T *data, T bad_data, const long *dims, const long *curs) {
    bool return_status = false;
    const char *method_name = "get_nc_data_(T, *dims, *curs) ";
 
@@ -315,7 +318,7 @@ bool get_nc_data_(NcVar *var, T *data, T bad_data, const long *dims, const long 
       for (int idx = 0 ; idx < dimC; idx++) {
          int dim_size = get_dim_size(var, idx);
          if ((curs[idx]+dims[idx]) > dim_size) {
-            NcDim nc_dim = get_nc_dim(var, idx);
+            netCDF::NcDim nc_dim = get_nc_dim(var, idx);
             mlog << Error << "\n" << method_name << "The start offset and count ("
                  << curs[idx] << ", " << dims[idx] << ") exceeds the dimension["
                  << idx << "] " << dim_size << " "
@@ -358,7 +361,7 @@ bool get_nc_data_(NcVar *var, T *data, T bad_data, const long *dims, const long 
 ////////////////////////////////////////////////////////////////////////
 
 template <typename T>
-bool get_nc_data_(NcVar *var, T *data, T met_missing, const long dim, const long cur) {
+bool get_nc_data_(netCDF::NcVar *var, T *data, T met_missing, const long dim, const long cur) {
    bool return_status = false;
    const char *method_name = "get_nc_data_(T, dim, cur) ";
    for (int idx=0; idx<dim; idx++) {
@@ -381,7 +384,7 @@ bool get_nc_data_(NcVar *var, T *data, T met_missing, const long dim, const long
          }
       }
       else if (((cur+dim) > dim_size) && (0 < dim_size)) {
-         NcDim nc_dim = get_nc_dim(var, dim_idx);
+         netCDF::NcDim nc_dim = get_nc_dim(var, dim_idx);
          mlog << Error << "\n" << method_name << "The start offset and count ("
               << cur << " + " << dim << ") exceeds the dimension " << dim_size << " "
               << (IS_VALID_NC(nc_dim) ? GET_NC_NAME(nc_dim) : " ")
@@ -415,7 +418,7 @@ bool get_nc_data_(NcVar *var, T *data, T met_missing, const long dim, const long
 // read a single data
 
 template <typename T>
-bool get_nc_data_(NcVar *var, T *data, T bad_data, const long *curs) {
+bool get_nc_data_(netCDF::NcVar *var, T *data, T bad_data, const long *curs) {
    bool return_status = false;
    const char *method_name = "get_nc_data_(*curs) ";
 
@@ -436,7 +439,7 @@ bool get_nc_data_(NcVar *var, T *data, T bad_data, const long *curs) {
 ////////////////////////////////////////////////////////////////////////
 
 template <typename T>
-void copy_nc_data_t(NcVar *var, float *data, const T *packed_data,
+void copy_nc_data_t(netCDF::NcVar *var, float *data, const T *packed_data,
                     const int cell_count, const char *data_type,
                     double add_offset, double scale_factor,
                     bool has_missing, T missing_value) {
@@ -525,7 +528,7 @@ void copy_nc_data_t(NcVar *var, float *data, const T *packed_data,
 ////////////////////////////////////////////////////////////////////////
 
 template <typename T>
-void copy_nc_data_(NcVar *var, float *data, const T *packed_data,
+void copy_nc_data_(netCDF::NcVar *var, float *data, const T *packed_data,
                    const int cell_count, const char *data_type,
                    double add_offset, double scale_factor) {
    T missing_value;
@@ -538,7 +541,7 @@ void copy_nc_data_(NcVar *var, float *data, const T *packed_data,
 ////////////////////////////////////////////////////////////////////////
 
 template <typename T>
-void copy_nc_data_t(NcVar *var, double *data, const T *packed_data,
+void copy_nc_data_t(netCDF::NcVar *var, double *data, const T *packed_data,
                     const int cell_count, const char *data_type,
                     double add_offset, double scale_factor,
                     bool has_missing, T missing_value) {
@@ -622,7 +625,7 @@ void copy_nc_data_t(NcVar *var, double *data, const T *packed_data,
 ////////////////////////////////////////////////////////////////////////
 
 template <typename T>
-void copy_nc_data_(NcVar *var, double *data, const T *packed_data,
+void copy_nc_data_(netCDF::NcVar *var, double *data, const T *packed_data,
                    const int cell_count, const char *data_type,
                    double add_offset, double scale_factor) {
    T missing_value;
@@ -635,8 +638,8 @@ void copy_nc_data_(NcVar *var, double *data, const T *packed_data,
 ////////////////////////////////////////////////////////////////////////
 
 template <typename T>
-bool put_nc_data_T(NcVar *var, const T data, long offset0, long offset1, long offset2) {
-   vector<size_t> offsets;
+bool put_nc_data_T(netCDF::NcVar *var, const T data, long offset0, long offset1, long offset2) {
+   std::vector<size_t> offsets;
    offsets.push_back((size_t)offset0);
    if (0 <= offset1) {
      offsets.push_back((size_t)offset1);
@@ -651,8 +654,8 @@ bool put_nc_data_T(NcVar *var, const T data, long offset0, long offset1, long of
 ////////////////////////////////////////////////////////////////////////
 
 template <typename T>
-bool put_nc_data_T(NcVar *var, const T *data,    const long length, const long offset) {
-   vector<size_t> offsets, counts;
+bool put_nc_data_T(netCDF::NcVar *var, const T *data,    const long length, const long offset) {
+   std::vector<size_t> offsets, counts;
    int dim_count = get_dim_count(var);
    offsets.push_back(offset);
    if (dim_count >= 2) {
@@ -667,9 +670,9 @@ bool put_nc_data_T(NcVar *var, const T *data,    const long length, const long o
 ////////////////////////////////////////////////////////////////////////
 
 template <typename T>
-bool put_nc_data_T(NcVar *var, const T *data , const long *lengths, const long *offsets) {
+bool put_nc_data_T(netCDF::NcVar *var, const T *data , const long *lengths, const long *offsets) {
    int dim = get_dim_count(var);
-   vector<size_t> nc_offsets, counts;
+   std::vector<size_t> nc_offsets, counts;
    for (int idx = 0 ; idx < dim; idx++) {
       nc_offsets.push_back(offsets[idx]);
    }
@@ -683,9 +686,9 @@ bool put_nc_data_T(NcVar *var, const T *data , const long *lengths, const long *
 ////////////////////////////////////////////////////////////////////////
 
 template <typename T>
-bool put_nc_data_T_with_dims(NcVar *var, const T *data,
+bool put_nc_data_T_with_dims(netCDF::NcVar *var, const T *data,
                              const long len0, const long len1, const long len2) {
-   vector<size_t> offsets, counts;
+   std::vector<size_t> offsets, counts;
    if (0 < len0) {
      offsets.push_back(0);
      counts.push_back(len0);

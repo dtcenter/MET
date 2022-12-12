@@ -19,6 +19,9 @@ using namespace std;
 #include <cstdio>
 #include <cmath>
 
+#include <netcdf>
+using namespace netCDF;
+
 #include "vx_math.h"
 #include "vx_cal.h"
 #include "vx_log.h"

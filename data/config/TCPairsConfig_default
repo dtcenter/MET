@@ -138,6 +138,68 @@ watch_warn = {
 }
 
 //
+// Metadata for diagnostic sources
+//
+diag_info_map = [
+   { 
+      diag_source    = "CIRA_DIAG_RT";
+      track_source   = "GFS";
+      field_source   = "GFS_0p50";
+      match_to_track = [ "GFS" ];
+      diag_name      = [];
+   },
+   { 
+      diag_source    = "SHIPS_DIAG_RT";
+      track_source   = "SHIPS_TRK";
+      field_source   = "GFS_0p50";
+      match_to_track = [ "OFCL" ];
+      diag_name      = [];
+   }
+];
+
+//
+// Unit conversions for diagnostic sources, names, and units
+//
+diag_convert_map = [
+   {
+      diag_source = "CIRA_DIAG";
+      key         = [ "(10C)", "(10KT)", "(10M/S)" ];
+      convert(x)  = x / 10;
+   },
+   {
+      diag_source = "SHIPS_DIAG";
+      key         = [ "LAT",  "LON",  "CSST", "RSST", "DSST", "DSTA", "XDST", "XNST", "NSST", "NSTA",
+                      "NTMX", "NTFR", "U200", "U20C", "V20C", "E000", "EPOS", "ENEG", "EPSS", "ENSS",
+                      "T000", "TLAT", "TLON", "TWAC", "TWXC", "G150", "G200", "G250", "V000", "V850",
+                      "V500", "V300", "SHDC", "SHGC", "T150", "T200", "T250", "SHRD", "SHRS", "SHRG",
+                      "HE07", "HE05", "PW01", "PW02", "PW03", "PW04", "PW05", "PW06", "PW07", "PW08",
+                      "PW09", "PW10", "PW11", "PW12", "PW13", "PW14", "PW15", "PW16", "PW17", "PW18",
+                      "PW20", "PW21" ];
+      convert(x)  = x / 10;
+   },
+   {
+      diag_source = "SHIPS_DIAG";
+      key         = [ "VVAV", "VMFX", "VVAC" ];
+      convert(x)  = x / 100;
+   },
+   {
+      diag_source = "SHIPS_DIAG";
+      key         = [ "TADV" ];
+      convert(x)  = x / 1000000;
+   },
+   {
+      diag_source = "SHIPS_DIAG";
+      key         = [ "Z850", "D200", "TGRD", "DIVC" ];
+      convert(x)  = x / 10000000;
+   },
+   {
+      diag_source = "SHIPS_DIAG";
+      key         = [ "PENC", "PENV" ];
+      convert(x)  = x / 10 + 1000;
+   }
+];
+
+//
 // Modify basin names to make them consistent across ATCF input files.
 //
 basin_map = [
