@@ -16,6 +16,7 @@ using namespace std;
 
 #include <iostream>
 #include <unistd.h>
+#include <string.h>
 #include <stdlib.h>
 #include <cmath>
 
@@ -92,6 +93,35 @@ const char * short_month_name[] = {
    "Dec"     //  12
 
 };
+
+
+////////////////////////////////////////////////////////////////////////
+// Converts a month string to month (1 to 12).
+
+int month_name_to_m (const char *month_str)
+
+{
+
+int month = -1;
+int str_len = strlen(month_str);
+char t_month_str[str_len + 1];
+
+for (int idx=0; idx<str_len; idx++) {
+   t_month_str[idx] = (idx==0) ? toupper(month_str[idx]) : tolower(month_str[idx]);
+}
+t_month_str[str_len] = 0;
+
+for (int idx=1; idx<=12; idx++) {
+   if (0 == strcmp(short_month_name[idx], t_month_str)
+       || 0 == strcmp(month_name[idx], t_month_str)) {
+      month = idx;
+      break;
+   }
+}
+
+return month;
+
+}
 
 
 ////////////////////////////////////////////////////////////////////////

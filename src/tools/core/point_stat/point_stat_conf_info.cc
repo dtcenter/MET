@@ -165,11 +165,12 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
    // Summarize output flags across all verification tasks
    process_flags();
 
-   // If VL1L2 or VAL1L2 is requested, set the uv_index.
+   // If VL1L2, VAL1L2, or VCNT is requested, set the uv_index.
    // When processing vectors, need to make sure the message types,
    // masking regions, and interpolation methods are consistent.
    if(output_flag[i_vl1l2]  != STATOutputType_None ||
-      output_flag[i_val1l2] != STATOutputType_None) {
+      output_flag[i_val1l2] != STATOutputType_None ||
+      output_flag[i_vcnt]   != STATOutputType_None) {
 
       for(i=0; i<n_vx; i++) {
 
@@ -179,18 +180,36 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
 
             // Search for corresponding v-wind
             for(j=0; j<n_vx; j++) {
-               if(vx_opt[j].vx_pd.fcst_info->is_v_wind()      &&
-                  vx_opt[j].vx_pd.obs_info->is_v_wind()       &&
-                  vx_opt[i].vx_pd.fcst_info->req_level_name() ==
-                  vx_opt[j].vx_pd.fcst_info->req_level_name() &&
-                  vx_opt[i].vx_pd.obs_info->req_level_name()  ==
-                  vx_opt[j].vx_pd.obs_info->req_level_name()  &&
+               if(vx_opt[j].vx_pd.fcst_info->is_v_wind() &&
+                  vx_opt[j].vx_pd.obs_info->is_v_wind()  &&
                   vx_opt[i].is_uv_match(vx_opt[j])) {
 
-                  vx_opt[i].vx_pd.fcst_info->set_uv_index(j);
-                  vx_opt[i].vx_pd.obs_info->set_uv_index(j);
+                  mlog << Debug(3) << "U-wind field array entry " << i+1
+                       << " matches V-wind field array entry " << j+1 << ".\n";
+
+                  // Print warning about multiple matches
+                  if(vx_opt[i].vx_pd.fcst_info->uv_index() >= 0 ||
+                     vx_opt[i].vx_pd.obs_info->uv_index()  >= 0) {
+                     mlog << Warning << "\nPointStatConfInfo::process_config() -> "
+                          << "For U-wind, found multiple matching V-wind field array entries! "
+                          << "Using the first match found. Set the \"level\" strings to "
+                          << "differentiate between them.\n\n";
+                  }
+                  // Use the first match
+                  else {
+                     vx_opt[i].vx_pd.fcst_info->set_uv_index(j);
+                     vx_opt[i].vx_pd.obs_info->set_uv_index(j);
+                  }
                }
             }
+
+            // No match found
+            if(vx_opt[i].vx_pd.fcst_info->uv_index() < 0 ||
+               vx_opt[i].vx_pd.obs_info->uv_index()  < 0) {
+               mlog << Debug(3) << "U-wind field array entry " << i+1
+                    << " has no matching V-wind field array entry.\n";
+            }
+
          }
          // Process v-wind
          else if(vx_opt[i].vx_pd.fcst_info->is_v_wind() &&
@@ -198,18 +217,36 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
 
             // Search for corresponding u-wind
             for(j=0; j<n_vx; j++) {
-               if(vx_opt[j].vx_pd.fcst_info->is_u_wind()      &&
-                  vx_opt[j].vx_pd.obs_info->is_u_wind()       &&
-                  vx_opt[i].vx_pd.fcst_info->req_level_name() ==
-                  vx_opt[j].vx_pd.fcst_info->req_level_name() &&
-                  vx_opt[i].vx_pd.obs_info->req_level_name()  ==
-                  vx_opt[j].vx_pd.obs_info->req_level_name()  &&
+               if(vx_opt[j].vx_pd.fcst_info->is_u_wind() &&
+                  vx_opt[j].vx_pd.obs_info->is_u_wind()  &&
                   vx_opt[i].is_uv_match(vx_opt[j])) {
 
-                  vx_opt[i].vx_pd.fcst_info->set_uv_index(j);
-                  vx_opt[i].vx_pd.obs_info->set_uv_index(j);
+                  mlog << Debug(3) << "V-wind field array entry " << i+1
+                       << " matches U-wind field array entry " << j+1 << ".\n";
+
+                  // Print warning about multiple matches
+                  if(vx_opt[i].vx_pd.fcst_info->uv_index() >= 0 ||
+                     vx_opt[i].vx_pd.obs_info->uv_index()  >= 0) {
+                     mlog << Warning << "\nPointStatConfInfo::process_config() -> "
+                          << "For U-wind, found multiple matching V-wind field array entries! "
+                          << "Using the first match found. Set the \"level\" strings to "
+                          << "differentiate between them.\n\n";
+                  }
+                  // Use the first match
+                  else {
+                     vx_opt[i].vx_pd.fcst_info->set_uv_index(j);
+                     vx_opt[i].vx_pd.obs_info->set_uv_index(j);
+                  }
                }
             }
+
+            // No match found
+            if(vx_opt[i].vx_pd.fcst_info->uv_index() < 0 ||
+               vx_opt[i].vx_pd.obs_info->uv_index()  < 0) {
+               mlog << Debug(3) << "V-wind field array entry " << i+1
+                    << " has no matching U-wind field array entry.\n";
+            }
+
          }
       } // end for i
    } // end if
@@ -705,6 +742,10 @@ bool PointStatVxOpt::is_uv_match(const PointStatVxOpt &v) const {
    bool match = true;
 
    //
+   // Check that requested forecast and observation levels match.
+   // Requested levels are optional for python embedding and may be empty.
+   // Check that several other config options also match.
+   //
    // The following do not impact matched pairs:
    //    fcat_ta, ocat_ta,
    //    fcnt_ta, ocnt_ta, cnt_logic,
@@ -714,7 +755,11 @@ bool PointStatVxOpt::is_uv_match(const PointStatVxOpt &v) const {
    //    rank_corr_flag, output_flag
    //
 
-   if(!(beg_ds         == v.beg_ds        ) ||
+   if(!is_req_level_match(  vx_pd.fcst_info->req_level_name(),
+                          v.vx_pd.fcst_info->req_level_name()) ||
+      !is_req_level_match(  vx_pd.obs_info->req_level_name(),
+                          v.vx_pd.obs_info->req_level_name()) ||
+      !(beg_ds         == v.beg_ds        ) ||
       !(end_ds         == v.end_ds        ) ||
       !(land_flag      == v.land_flag     ) ||
       !(topo_flag      == v.topo_flag     ) ||
@@ -727,9 +772,7 @@ bool PointStatVxOpt::is_uv_match(const PointStatVxOpt &v) const {
       !(msg_typ        == v.msg_typ       ) ||
       !(duplicate_flag == v.duplicate_flag) ||
       !(obs_summary    == v.obs_summary   ) ||
-      !(obs_perc       == v.obs_perc      )) {
-      match = false;
-   }
+      !(obs_perc       == v.obs_perc      )) match = false;
 
    return(match);
 }
@@ -1091,7 +1134,11 @@ void PointStatVxOpt::set_vx_pd(PointStatConfInfo *conf_info) {
    vx_pd.set_duplicate_flag(duplicate_flag);
    vx_pd.set_obs_summary(obs_summary);
    vx_pd.set_obs_perc_value(obs_perc);
-   vx_pd.set_seeps_thresh(seeps_p1_thresh);
+   if (output_flag[i_seeps_mpr] != STATOutputType_None
+       || output_flag[i_seeps] != STATOutputType_None) {
+     vx_pd.load_seeps_climo();
+     vx_pd.set_seeps_thresh(seeps_p1_thresh);
+   }
    return;
 }
 

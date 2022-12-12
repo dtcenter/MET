@@ -173,9 +173,10 @@ void GridStatConfInfo::process_config(GrdFileType ftype,
    // Summarize output flags across all verification tasks
    process_flags();
 
-   // If VL1L2 or VAL1L2 is requested, set the uv_index
+   // If VL1L2, VAL1L2, or VCNT is requested, set the uv_index
    if(output_flag[i_vl1l2]  != STATOutputType_None ||
-      output_flag[i_val1l2] != STATOutputType_None) {
+      output_flag[i_val1l2] != STATOutputType_None ||
+      output_flag[i_vcnt]   != STATOutputType_None) {
 
       for(i=0; i<n_vx; i++) {
 
@@ -185,18 +186,36 @@ void GridStatConfInfo::process_config(GrdFileType ftype,
 
             // Search for corresponding v-wind
             for(j=0; j<n_vx; j++) {
-               if(vx_opt[j].fcst_info->is_v_wind()      &&
-                  vx_opt[j].obs_info->is_v_wind()       &&
-                  vx_opt[i].fcst_info->req_level_name() ==
-                  vx_opt[j].fcst_info->req_level_name() &&
-                  vx_opt[i].obs_info->req_level_name()  ==
-                  vx_opt[j].obs_info->req_level_name()  &&
+               if(vx_opt[j].fcst_info->is_v_wind() &&
+                  vx_opt[j].obs_info->is_v_wind()  &&
                   vx_opt[i].is_uv_match(vx_opt[j])) {
 
-                  vx_opt[i].fcst_info->set_uv_index(j);
-                  vx_opt[i].obs_info->set_uv_index(j);
+                  mlog << Debug(3) << "U-wind field array entry " << i+1
+                       << " matches V-wind field array entry " << j+1 << ".\n";
+
+                  // Print warning about multiple matches
+                  if(vx_opt[i].fcst_info->uv_index() >= 0 ||
+                     vx_opt[i].obs_info->uv_index()  >= 0) {
+                     mlog << Warning << "\nGridStatConfInfo::process_config() -> "
+                          << "For U-wind, found multiple matching V-wind field array entries! "
+                          << "Using the first match found. Set the \"level\" strings to "
+                          << "differentiate between them.\n\n";
+                  }
+                  // Use the first match
+                  else {
+                     vx_opt[i].fcst_info->set_uv_index(j);
+                     vx_opt[i].obs_info->set_uv_index(j);
+                  }
                }
             }
+
+            // No match found
+            if(vx_opt[i].fcst_info->uv_index() < 0 ||
+               vx_opt[i].obs_info->uv_index()  < 0) {
+               mlog << Debug(3) << "U-wind field array entry " << i+1
+                    << " has no matching V-wind field array entry.\n";
+            }
+
          }
          // Process v-wind
          else if(vx_opt[i].fcst_info->is_v_wind() &&
@@ -204,18 +223,36 @@ void GridStatConfInfo::process_config(GrdFileType ftype,
 
             // Search for corresponding u-wind
             for(j=0; j<n_vx; j++) {
-               if(vx_opt[j].fcst_info->is_u_wind()      &&
-                  vx_opt[j].obs_info->is_u_wind()       &&
-                  vx_opt[i].fcst_info->req_level_name() ==
-                  vx_opt[j].fcst_info->req_level_name() &&
-                  vx_opt[i].obs_info->req_level_name()  ==
-                  vx_opt[j].obs_info->req_level_name()  &&
+               if(vx_opt[j].fcst_info->is_u_wind() &&
+                  vx_opt[j].obs_info->is_u_wind()  &&
                   vx_opt[i].is_uv_match(vx_opt[j])) {
 
-                  vx_opt[i].fcst_info->set_uv_index(j);
-                  vx_opt[i].obs_info->set_uv_index(j);
+                  mlog << Debug(3) << "V-wind field array entry " << i+1
+                       << " matches U-wind field array entry " << j+1 << ".\n";
+
+                  // Print warning about multiple matches
+                  if(vx_opt[i].fcst_info->uv_index() >= 0 ||
+                     vx_opt[i].obs_info->uv_index()  >= 0) {
+                     mlog << Warning << "\nGridStatConfInfo::process_config() -> "
+                          << "For V-wind, found multiple matching U-wind field array entries! "
+                          << "Using the first match found. Set the \"level\" strings to "
+                          << "differentiate between them.\n\n";
+                  }
+                  // Use the first match
+                  else {
+                     vx_opt[i].fcst_info->set_uv_index(j);
+                     vx_opt[i].obs_info->set_uv_index(j);
+                  }
                }
             }
+
+            // No match found
+            if(vx_opt[i].fcst_info->uv_index() < 0 ||
+               vx_opt[i].obs_info->uv_index()  < 0) {
+               mlog << Debug(3) << "V-wind field array entry " << i+1
+                    << " has no matching U-wind field array entry.\n";
+            }
+
          }
       } // end for i
    } // end if
@@ -905,6 +942,10 @@ bool GridStatVxOpt::is_uv_match(const GridStatVxOpt &v) const {
    bool match = true;
 
    //
+   // Check that requested forecast and observation levels match.
+   // Requested levels are optional for python embedding and may be empty.
+   // Check that the masking regions and interpolation options match.
+   //
    // The following do not impact matched pairs:
    //    desc, var_name, var_suffix,
    //    mpr_sa, mpr_ta,
@@ -917,12 +958,14 @@ bool GridStatVxOpt::is_uv_match(const GridStatVxOpt &v) const {
    //    hss_ec_value, rank_corr_flag, output_flag, nc_info
    //
 
-   if(!(mask_grid   == v.mask_grid  ) ||
+   if(!is_req_level_match(  fcst_info->req_level_name(),
+                          v.fcst_info->req_level_name()) ||
+      !is_req_level_match(  obs_info->req_level_name(),
+                          v.obs_info->req_level_name()) ||
+      !(mask_grid   == v.mask_grid  ) ||
       !(mask_poly   == v.mask_poly  ) ||
       !(mask_name   == v.mask_name  ) ||
-      !(interp_info == v.interp_info)) {
-      match = false;
-   }
+      !(interp_info == v.interp_info)) match = false;
 
    return(match);
 }

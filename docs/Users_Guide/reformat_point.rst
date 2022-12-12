@@ -451,9 +451,9 @@ While initial versions of the ASCII2NC tool only supported a simple 11 column AS
 
 • Western Wind and Solar Integration Study (WWSIS) format. WWSIS data are available by request from National Renewable Energy Laboratory (NREL) in Boulder, CO. 
 
-• `AirNow DailyData_v2, AirNow HourlyData, and AirNow HourlyAQObs formats <https://www.epa.gov/outdoor-air-quality-data>`_
+• `AirNow DailyData_v2, AirNow HourlyData, and AirNow HourlyAQObs formats <https://www.epa.gov/outdoor-air-quality-data>`_. See the :ref:`MET_AIRNOW_STATIONS` environment variable.
 
-• `National Data Buoy (NDBC) Standard Meteorlogical Data format <https://www.ndbc.noaa.gov/measdes.shtml>`_
+• `National Data Buoy (NDBC) Standard Meteorlogical Data format <https://www.ndbc.noaa.gov/measdes.shtml>`_. See the :ref:`MET_NDBC_STATIONS` environment variable.
 
 • `AErosol RObotic NEtwork (AERONET) versions 2 and 3 format <http://aeronet.gsfc.nasa.gov/>`_
 
@@ -1191,10 +1191,10 @@ The script can be found at:
 
 .. code-block:: none
 
-   MET_BASE/shared/met/utility/print_pointnc2ascii.py
+   MET_BASE/utility/print_pointnc2ascii.py
 
 For how to use the script, issue the command:
 
 .. code-block:: none
 
-   python3 MET_BASE/shared/met/utility/print_pointnc2ascii.py -h
+   python3 MET_BASE/utility/print_pointnc2ascii.py -h

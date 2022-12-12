@@ -24,8 +24,8 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-static const char *MET_ENV_SEEPS_CLIMO_NAME      = "MET_SEEPS_POINT_CLIMO_NAME";
-static const char *MET_ENV_SEEPS_CLIMO_GRID_NAME = "MET_SEEPS_GRID_CLIMO_NAME";
+static const char *MET_ENV_SEEPS_POINT_CLIMO_NAME = "MET_SEEPS_POINT_CLIMO_NAME";
+static const char *MET_ENV_SEEPS_GRID_CLIMO_NAME  = "MET_SEEPS_GRID_CLIMO_NAME";
 
 static const char *dim_name_nstn      = "nstn";
 

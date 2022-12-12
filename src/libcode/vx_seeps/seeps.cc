@@ -30,8 +30,10 @@ bool standalone_debug_seeps = false;
 static SeepsClimo *seeps_climo = 0;
 static std::map<int,SeepsClimoGrid *> seeps_climo_grid_map_00;
 
-static const char *def_seeps_filename = "MET_BASE/climo/seeps/PPT24_seepsweights.nc";
-static const char *def_seeps_grid_filename = "MET_BASE/climo/seeps/PPT24_seepsweights_grid.nc";
+static const char *def_seeps_filename =
+   "MET_BASE/climo/seeps/PPT24_seepsweights.nc";
+static const char *def_seeps_grid_filename =
+   "MET_BASE/climo/seeps/PPT24_seepsweights_grid.nc";
 
 static const char *var_name_sid       = "sid";
 static const char *var_name_lat       = "lat";
@@ -200,8 +202,10 @@ SeepsClimo::SeepsClimo() {
    if (seeps_ready) read_seeps_scores(seeps_name);
    else {
       mlog << Error << "\nSeepsClimo::SeepsClimo() -> "
-           << "The SEEPS climo data \"" << seeps_name << "\" is missing!"
-           << " Turn off SEEPS and SEEPS_MPR to continue\n\n";
+           << "The SEEPS point climo data \"" << seeps_name << "\" is missing!\n"
+           << "Set the " << MET_ENV_SEEPS_POINT_CLIMO_NAME
+           << " environment variable to define its location "
+           << "or disable output for SEEPS and SEEPS_MPR.\n\n";
       exit(1);
    }
 }
@@ -312,10 +316,13 @@ SeepsRecord *SeepsClimo::get_record(int sid, int month, int hour) {
    }
    else {
       mlog << Error << "\n" << method_name
-           << "The SEEPS climo data is missing!"
-           << " Turn off SEEPS and SEEPS_MPR to continue\n\n";
+           << "The SEEPS point climo data is missing!\n"
+           << "Set the " << MET_ENV_SEEPS_POINT_CLIMO_NAME
+           << " environment variable to define its location "
+           << "or disable output for SEEPS and SEEPS_MPR.\n\n";
       exit(1);
    }
+
    return record;
 }
 
@@ -326,22 +333,22 @@ ConcatString SeepsClimo::get_seeps_climo_filename() {
    const char *method_name = "SeepsClimo::get_seeps_climo_filename() -> ";
 
    // Use the MET_TMP_DIR environment variable, if set.
-   bool use_env = get_env(MET_ENV_SEEPS_CLIMO_NAME, seeps_filename);
+   bool use_env = get_env(MET_ENV_SEEPS_POINT_CLIMO_NAME, seeps_filename);
    if(use_env) seeps_filename = replace_path(seeps_filename);
    else seeps_filename = replace_path(def_seeps_filename);
 
    if (seeps_ready = file_exists(seeps_filename.c_str())) {
-      mlog << Debug(7) << method_name << "SEEPS climo name=\""
+      mlog << Debug(7) << method_name << "SEEPS point climo name=\""
            << seeps_filename.c_str() << "\"\n";
    }
    else {
-      ConcatString message = " ";
+      ConcatString message = "";
       if (use_env) {
          message.add("from the env. name ");
-         message.add(MET_ENV_SEEPS_CLIMO_NAME);
+         message.add(MET_ENV_SEEPS_POINT_CLIMO_NAME);
       }
       mlog << Warning << "\n" << method_name
-           << "The SEEPS climo name \"" << seeps_filename.c_str()
+           << "The SEEPS point climo name \"" << seeps_filename.c_str()
            << "\"" << message << " does not exist!\n\n";
    }
 
@@ -652,8 +659,10 @@ SeepsClimoGrid::SeepsClimoGrid(int month, int hour) : month{month}, hour{hour}
    if (seeps_ready) read_seeps_scores(seeps_name);
    else {
       mlog << Error << "\nSeepsClimoGrid::SeepsClimoGrid -> "
-           << "The SEEPS climo data \"" << seeps_name << "\" is missing!"
-           << " Turn off SEEPS to continue\n\n";
+           << "The SEEPS grid climo data \"" << seeps_name << "\" is missing!\n"
+           << "Set the " << MET_ENV_SEEPS_GRID_CLIMO_NAME
+           << " environment variable to define its location "
+           << "or disable output for SEEPS.\n\n";
       exit(1);
    }
 
@@ -769,24 +778,24 @@ ConcatString SeepsClimoGrid::get_seeps_climo_filename() {
    const char *method_name = "SeepsClimoGrid::get_seeps_climo_filename() -> ";
 
    // Use the MET_TMP_DIR environment variable, if set.
-   bool use_env = get_env(MET_ENV_SEEPS_CLIMO_GRID_NAME, seeps_filename);
+   bool use_env = get_env(MET_ENV_SEEPS_GRID_CLIMO_NAME, seeps_filename);
    if(use_env) {
       seeps_filename = replace_path(seeps_filename);
    }
    else seeps_filename = replace_path(def_seeps_grid_filename);
 
    if (seeps_ready = file_exists(seeps_filename.c_str())) {
-      mlog << Debug(7) << method_name << "SEEPS climo name=\""
+      mlog << Debug(7) << method_name << "SEEPS grid climo name=\""
            << seeps_filename.c_str() << "\"\n";
    }
    else {
-      ConcatString message = " ";
+      ConcatString message = "";
       if (use_env) {
          message.add("from the env. name ");
-         message.add(MET_ENV_SEEPS_CLIMO_GRID_NAME);
+         message.add(MET_ENV_SEEPS_GRID_CLIMO_NAME);
       }
       mlog << Warning << "\n" << method_name
-           << "The SEEPS climo name \"" << seeps_filename.c_str()
+           << "The SEEPS grid climo name \"" << seeps_filename.c_str()
            << "\"" << message << " does not exist!\n\n";
    }
 
