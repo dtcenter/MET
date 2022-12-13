@@ -19,7 +19,7 @@ on:
     types: [opened, reopened, synchronize]
     branches:
       - develop
-      - 'main_v*'
+      - 'main_v**'
     paths-ignore:
       - 'docs/**'
 
