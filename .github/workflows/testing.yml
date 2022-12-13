@@ -1,9 +1,19 @@
 name: Testing
 
-# Compile MET and run unit tests
-# for pull requests into develop branch
+# Compile MET for feature branches
+# Run unit tests for pull requests
 
 on:
+
+  push:
+    branches:
+      - develop
+      - develop-ref
+      - 'feature_**'
+      - 'main_v**'
+      - 'bugfix_**'
+    paths-ignore:
+      - 'docs/**'
 
   pull_request:
     types: [opened, reopened, synchronize]
@@ -11,17 +21,7 @@ on:
       - develop
       - 'main_v*'
     paths-ignore:
-      - 'met/docs/**'
-
-  push:
-    branches:
-      - 'feature_*'
-      - 'bugfix_*'
-      - 'develop'
-      - 'develop-ref'
-      - 'main_v*'
-    paths-ignore:
-      - 'met/docs/**'
+      - 'docs/**'
 
   workflow_dispatch:
     inputs:
