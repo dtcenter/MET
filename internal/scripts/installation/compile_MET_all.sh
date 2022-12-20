@@ -637,8 +637,8 @@ if [ $COMPILE_NETCDF -eq 1 ]; then
   mkdir -p ${LIB_DIR}/netcdf
   cd ${LIB_DIR}/netcdf
   rm -rf netcdf*
-  unzip ${TAR_DIR}/netcdf-4*.zip > /dev/null 2>&1
-  cd netcdf-4*
+  tar -xzf ${TAR_DIR}/netcdf-4*.tar.gz
+  cd netcdf-c-4*
   export FC=''
   export F90=''
   echo "cd `pwd`"
