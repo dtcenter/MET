@@ -246,8 +246,10 @@ void process_diagnostics() {
    process_fields(tracks);
 
    // List the output file
-   mlog << Debug(1) << "Writing output file: "
-        << out_file << "\n";
+   if(write_nc) {
+      mlog << Debug(1) << "Writing output file: "
+           << out_file << "\n";
+   }
 }
 
 ////////////////////////////////////////////////////////////////////////
