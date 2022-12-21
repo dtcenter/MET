@@ -1,18 +1,21 @@
-module load intel/19.0.5
-module load python/3.7.5
-module load netcdf/4.7.4
-ncar_pylib
+module load ncarenv/1.3
+module load intel/2021.2
+module load netcdf/4.8.0
 
-export TEST_BASE=/glade/p/ral/jntp/MET/MET_releases/casper/10.0.0
-export COMPILER=intel_19.0.5
+export TEST_BASE=/glade/p/ral/jntp/MET/MET_releases/casper/11.0.0
+export COMPILER=intel_2021.2
 export MET_SUBDIR=${TEST_BASE}
-export MET_TARBALL=met-10.0.0.20210510.tar.gz
+export MET_TARBALL=v11.0.0.tar.gz
 export USE_MODULES=TRUE
-export MET_PYTHON=/glade/u/apps/dav/opt/python/3.7.5/gnu/8.3.0/
-export MET_PYTHON_CC=-I${MET_PYTHON}/include/python3.7m
-export MET_PYTHON_LD=-L${MET_PYTHON}/lib\ -lpython3.7m\ -lcrypt\ -lpthread\ -ldl\ -lutil\ -lm
-export MET_NETCDF=/glade/u/apps/dav/opt/netcdf/4.7.4/intel/19.0.5
-export EXTERNAL_LIBS=/glade/p/ral/jntp/MET/MET_releases/casper/10.0.0/external_libs
+export MET_PYTHON=/glade/p/ral/jntp/MET/METplus/miniconda/miniconda3/envs/metplus_v5.0_py3.8
+export MET_PYTHON_CC=-I${MET_PYTHON}/include/python3.8
+export MET_PYTHON_LD=-L${MET_PYTHON}/lib\ -lpython3.8\ -lcrypt\ -lpthread\ -ldl\ -lutil\ -lm
+#export MET_PYTHON=/glade/p/ral/jntp/MET/METplus/casper/miniconda/miniconda3
+#export MET_PYTHON_CC=-I${MET_PYTHON}/include/python3.8
+#export MET_PYTHON_LD=-L${MET_PYTHON}/lib\ -lpython3.8\ -lcrypt\ -lpthread\ -ldl\ -lutil\ -lm
+export MET_NETCDF=/glade/u/apps/ch/opt/netcdf/4.8.0/intel/2021.2/
+export MET_HDF5=/glade/u/apps/ch/opt/netcdf/4.8.0/intel/2021.2/
+export EXTERNAL_LIBS=/glade/p/ral/jntp/MET/MET_releases/casper/11.0.0/external_libs
 export MET_GSL=${EXTERNAL_LIBS}
 export MET_BUFRLIB=${EXTERNAL_LIBS}
 export BUFRLIB_NAME=-lbufr

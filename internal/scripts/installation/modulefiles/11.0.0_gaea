@@ -1,0 +1,17 @@
+#%Module######################################################################
+##
+##      Model Evaluation Tools
+##
+proc ModulesHelp { } {
+  puts stderr "Sets up the paths and environment variables to use the Model Evaluation Tools v10.1.2
+     *** For help see the official MET webpage at http://www.dtcenter.org/met/users ***"
+}
+
+module load intel/19.0.5.281
+
+set base /usw/met
+set ver  11.0.0
+set share $base/$ver/share/met
+set lib_base $base/11.0.0
+
+prepend-path PATH $base/$ver/bin:$lib_base/external_libs/bin:/lustre/f2/dev/esrl/Julie.Prestopnik/projects/miniconda/miniconda3/envs/metplus_v5.0_py3.8/bin

@@ -1,27 +1,27 @@
 name: Testing
 
-# Compile MET and run unit tests
-# for pull requests into develop branch
+# Compile MET for feature branches
+# Run unit tests for pull requests
 
 on:
+
+  push:
+    branches:
+      - develop
+      - develop-ref
+      - 'feature_**'
+      - 'main_v**'
+      - 'bugfix_**'
+    paths-ignore:
+      - 'docs/**'
 
   pull_request:
     types: [opened, reopened, synchronize]
     branches:
       - develop
-      - 'main_v*'
+      - 'main_v**'
     paths-ignore:
-      - 'met/docs/**'
-
-  push:
-    branches:
-      - 'feature_*'
-      - 'bugfix_*'
-      - 'develop'
-      - 'develop-ref'
-      - 'main_v*'
-    paths-ignore:
-      - 'met/docs/**'
+      - 'docs/**'
 
   workflow_dispatch:
     inputs:
@@ -104,7 +104,7 @@ jobs:
     needs: [job_control]
     if: ${{ needs.job_control.outputs.run_unit_tests == 'true' }}
     steps:
-      - uses: dtcenter/metplus-action-data-update@v1
+      - uses: dtcenter/metplus-action-data-update@v2
         with:
           docker_name: ${{ secrets.DOCKER_USERNAME }}
           docker_pass: ${{ secrets.DOCKER_PASSWORD }}
