@@ -14,6 +14,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 #include <iostream>
+#include <vector>
 
 #include "vx_config.h"
 #include "vx_data2d_factory.h"
@@ -22,66 +23,129 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-class TCDiagConfInfo {
+struct TCDiagNcOutInfo {
 
-    private:
+   bool do_latlon;
+   bool do_fcst_genesis;
+   bool do_fcst_tracks;
+   bool do_fcst_fy_oy;
+   bool do_fcst_fy_on;
+   bool do_best_genesis;
+   bool do_best_tracks;
+   bool do_best_fy_oy;
+   bool do_best_fn_oy;
 
-        void init_from_scratch();
+      //////////////////////////////////////////////////////////////////
 
-        // Number of data fields
-        int n_data;
+   TCDiagNcOutInfo();
+   TCDiagNcOutInfo & operator+=(const TCDiagNcOutInfo &);
 
-    public:
+   void clear();   //  sets everything to true
 
-        // TCRMW configuration object
-        MetConfig Conf;
+   bool all_false() const;
 
-        // Track line filtering criteria
-        ConcatString Model;
-        ConcatString StormId;
-        ConcatString Basin;
-        ConcatString Cyclone;
-        unixtime     InitInc;
-        unixtime     ValidBeg, ValidEnd;
-        TimeArray    ValidInc, ValidExc;
-        NumArray     ValidHour;
-        NumArray     LeadTime;
-
-        // Range/Azimuth information
-        int    n_range;
-        int    n_azimuth;
-        double max_range_km;
-        double delta_range_km;
-        double rmw_scale;
-
-	// Wind conversion information
-	bool compute_tangential_and_radial_winds;
-	ConcatString u_wind_field_name;
-	ConcatString v_wind_field_name;
-	ConcatString tangential_velocity_field_name;
-	ConcatString radial_velocity_field_name;
-	ConcatString tangential_velocity_long_field_name;
-	ConcatString radial_velocity_long_field_name;
-
-        // Variable information
-        VarInfo** data_info;
-
-        TCDiagConfInfo();
-        ~TCDiagConfInfo();
-
-        void clear();
-
-        void read_config(const char *, const char *);
-        void process_config(GrdFileType);
-
-        int get_n_data() const;
+   void set_all_false();
+   void set_all_true();
 };
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int TCDiagConfInfo::get_n_data() const {
-    return n_data;
-}
+class TCDiagDataOpt {
+
+   private:
+
+      void init_from_scratch();
+
+   public:
+
+      TCDiagDataOpt();
+     ~TCDiagDataOpt();
+
+      //////////////////////////////////////////////////////////////////
+
+      // VarInfo pointer (allocated)
+      VarInfo *var_info;
+
+      // Range/Azimuth grid parameters
+      int    n_range;
+      int    n_azimuth;
+      double max_range_km;
+      double delta_range_km;
+      double rmw_scale;
+
+      // Output file options
+      TCDiagNcOutInfo nc_info;
+
+      //////////////////////////////////////////////////////////////////
+
+      void clear();
+
+      void process_config(GrdFileType, Dictionary &,
+                          GrdFileType, Dictionary &);
+      void parse_nc_info(Dictionary &);
+};
+
+////////////////////////////////////////////////////////////////////////
+
+class TCDiagConfInfo {
+
+   private:
+
+      void init_from_scratch();
+
+   public:
+
+      TCDiagConfInfo();
+      ~TCDiagConfInfo();
+
+      //////////////////////////////////////////////////////////////////
+
+      // TCDiag configuration object
+      MetConfig Conf;
+
+      // Track line filtering criteria
+      ConcatString Model;
+      ConcatString StormId;
+      ConcatString Basin;
+      ConcatString Cyclone;
+      unixtime     InitInc;
+      unixtime     ValidBeg, ValidEnd;
+      TimeArray    ValidInc, ValidExc;
+      NumArray     ValidHour;
+      NumArray     LeadTime;
+
+      // Vector of input data
+      vector<TCDiagDataOpt> DataOpt;
+
+      // Wind conversion information
+      bool compute_tangential_and_radial_winds;
+      ConcatString u_wind_field_name;
+      ConcatString v_wind_field_name;
+      ConcatString tangential_velocity_field_name;
+      ConcatString radial_velocity_field_name;
+      ConcatString tangential_velocity_long_field_name;
+      ConcatString radial_velocity_long_field_name;
+
+      // Variable information
+      VarInfo** data_info;
+
+      ConcatString   tmp_dir;               // Directory for temporary files
+      ConcatString   output_prefix;         // String to customize output file name
+      ConcatString   version;               // Config file version
+
+      //////////////////////////////////////////////////////////////////
+
+      void clear();
+
+      void read_config(const char *, const char *);
+      void process_config(GrdFileType);
+
+      int get_n_data() const;
+};
+
+////////////////////////////////////////////////////////////////////////
+
+inline int TCDiagConfInfo::get_n_data() const { return DataOpt.size(); }
 
 ////////////////////////////////////////////////////////////////////////
 

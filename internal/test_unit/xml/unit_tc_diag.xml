@@ -16,24 +16,23 @@
   <test_dir>&TEST_DIR;</test_dir>
   <exit_on_fail>true</exit_on_fail>
 
-  <test name="tc_diag_GONZALO">
-    <exec>echo "&DATA_DIR_MODEL;/grib2/hwrf_gonzalo/gonzalo08l.subset.2014101312.hwrfprs.core.0p02.f000.grb2  \
-                &DATA_DIR_MODEL;/grib2/hwrf_gonzalo/gonzalo08l.subset.2014101312.hwrfprs.core.0p02.f006.grb2  \
-                &DATA_DIR_MODEL;/grib2/hwrf_gonzalo/gonzalo08l.subset.2014101312.hwrfprs.core.0p02.f012.grb2  \
-                &DATA_DIR_MODEL;/grib2/hwrf_gonzalo/gonzalo08l.subset.2014101312.hwrfprs.core.0p02.f018.grb2  \
-                &DATA_DIR_MODEL;/grib2/hwrf_gonzalo/gonzalo08l.subset.2014101312.hwrfprs.core.0p02.f024.grb2" \
-                > &OUTPUT_DIR;/tc_diag/gonzalo_file_list; \
+  <test name="tc_diag_IAN">
+    <exec>echo "&DATA_DIR_MODEL;/grib2/gfs/2022092400/gfs.0p25.2022092400.f000.grib2 \
+                &DATA_DIR_MODEL;/grib2/gfs/2022092400/gfs.0p25.2022092400.f006.grib2 \
+                &DATA_DIR_MODEL;/grib2/gfs/2022092400/gfs.0p25.2022092400.f012.grib2 \
+                &DATA_DIR_MODEL;/grib2/gfs/2022092400/gfs.0p25.2022092400.f018.grib2 \
+                &DATA_DIR_MODEL;/grib2/gfs/2022092400/gfs.0p25.2022092400.f024.grib2" \
+                > &OUTPUT_DIR;/tc_diag/gfs_2022092400_file_list; \
           &MET_BIN;/tc_diag</exec>
     <param> \
-      -deck &DATA_DIR;/adeck/aal142016_short.dat \
-      -deck &DATA_DIR;/adeck/gonzalo08l.2014101312.trak.hwrf.atcfunix \
-      -data &OUTPUT_DIR;/tc_diag/gonzalo_file_list \
-      -config &CONFIG_DIR;/TCDiagConfig_gonzalo \
-      -out &OUTPUT_DIR;/tc_diag/tc_diag_hwrf_gonzalo.nc \
+      -deck &DATA_DIR;/adeck/aal092022_OFCL_SHIP_AVNO.dat \
+      -data &OUTPUT_DIR;/tc_diag/gfs_2022092400_file_list \
+      -config &CONFIG_DIR;/TCDiagConfig_ian \
+      -outdir &OUTPUT_DIR;/tc_diag/IAN_OFCL_2022092400 \
       -v 2
     </param>
     <output>
-      <grid_nc>&OUTPUT_DIR;/tc_diag/tc_diag_hwrf_gonzalo.nc</grid_nc>
+      <grid_nc>&OUTPUT_DIR;/tc_diag/IAN_OFCL_2022092400</grid_nc>
     </output>
   </test>
 

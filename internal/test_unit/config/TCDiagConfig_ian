@@ -13,12 +13,12 @@
 //
 // Model
 //
-model = "";
+model = "OFCL";
 
 //
 // Storm identifier
 //
-storm_id = "";
+storm_id = "AL092022";
 
 //
 // Basin
@@ -33,7 +33,7 @@ cyclone = "";
 //
 // Model initialization time
 //
-init_inc = "";
+init_inc = "20220924_00";
 
 //
 // Subset by the valid time
@@ -113,17 +113,6 @@ tangential_velocity_field_name = "VT";
 tangential_velocity_long_field_name = "Tangential Velocity";
 radial_velocity_field_name = "VR";
 radial_velocity_long_field_name = "Radial Velocity";
-
-////////////////////////////////////////////////////////////////////////////////
-
-//
-// NetCDF matched pairs output file
-// May be set separately in each "data.field" entry
-//
-nc_pairs_flag = {
-   track = TRUE;
-   data  = TRUE;
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 

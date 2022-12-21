@@ -24,6 +24,91 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 //
+//  Code for struct TCDiagNcOutInfo
+//
+////////////////////////////////////////////////////////////////////////
+
+TCDiagNcOutInfo::TCDiagNcOutInfo() {
+   clear();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+TCDiagNcOutInfo & TCDiagNcOutInfo::operator+=(const TCDiagNcOutInfo &t) {
+
+   if(t.do_latlon)       do_latlon       = true;
+   if(t.do_fcst_genesis) do_fcst_genesis = true;
+   if(t.do_fcst_tracks)  do_fcst_tracks  = true;
+   if(t.do_fcst_fy_oy)   do_fcst_fy_oy   = true;
+   if(t.do_fcst_fy_on)   do_fcst_fy_on   = true;
+   if(t.do_best_genesis) do_best_genesis = true;
+   if(t.do_best_tracks)  do_best_tracks  = true;
+   if(t.do_best_fy_oy)   do_best_fy_oy   = true;
+   if(t.do_best_fn_oy)   do_best_fn_oy   = true;
+
+
+   return(*this);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TCDiagNcOutInfo::clear() {
+
+   set_all_false();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool TCDiagNcOutInfo::all_false() const {
+
+   bool status = do_latlon       ||
+                 do_fcst_genesis || do_fcst_tracks ||
+                 do_fcst_fy_oy   || do_fcst_fy_on  ||
+                 do_best_genesis || do_best_tracks ||
+                 do_best_fy_oy   || do_best_fn_oy;
+
+   return(!status);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TCDiagNcOutInfo::set_all_false() {
+
+   do_latlon       = false;
+   do_fcst_genesis = false;
+   do_fcst_tracks  = false;
+   do_fcst_fy_oy   = false;
+   do_fcst_fy_on   = false;
+   do_best_genesis = false;
+   do_best_tracks  = false;
+   do_best_fy_oy   = false;
+   do_best_fn_oy   = false;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TCDiagNcOutInfo::set_all_true() {
+
+   do_latlon       = true;
+   do_fcst_genesis = true;
+   do_fcst_tracks  = true;
+   do_fcst_fy_oy   = true;
+   do_fcst_fy_on   = true;
+   do_best_genesis = true;
+   do_best_tracks  = true;
+   do_best_fy_oy   = true;
+   do_best_fn_oy   = true;
+
+   return;
+}
+
+
+////////////////////////////////////////////////////////////////////////
+//
 //  Code for class TCDiagConfInfo
 //
 ////////////////////////////////////////////////////////////////////////

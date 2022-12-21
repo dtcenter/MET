@@ -83,7 +83,6 @@ static ConcatString   config_file;
 static TCDiagConfInfo conf_info;
 static GrdFileType    ftype = FileType_None;
 
-
 // Optional arguments
 static ConcatString out_dir;
 static ConcatString out_prefix;

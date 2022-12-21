@@ -59,7 +59,7 @@ static void set_deck(const StringArray&);
 static void set_atcf_source(const StringArray&, StringArray&, StringArray&);
 static void set_data_files(const StringArray&);
 static void set_config(const StringArray&);
-static void set_out(const StringArray&);
+static void set_outdir(const StringArray&);
 static void setup_grid();
 static void setup_nc_file();
 static void build_outfile_name(const ConcatString&, const char*, ConcatString&);
@@ -67,6 +67,8 @@ static void compute_lat_lon(TcrmwGrid&, double*, double*);
 static void process_fields(const TrackInfoArray&);
 
 ////////////////////////////////////////////////////////////////////////
+
+// JHG see: https://github.com/dtcenter/MET/issues/2168#issuecomment-1347477566
 
 int met_main(int argc, char *argv[]) {
 
@@ -101,7 +103,7 @@ void usage() {
         << "\t-data file_1 ... file_n | data_file_list\n"
         << "\t-deck file\n"
         << "\t-config file\n"
-        << "\t-out file\n"
+        << "\t[-outdir path]\n"
         << "\t[-log file]\n"
         << "\t[-v level]\n\n"
 
@@ -112,11 +114,11 @@ void usage() {
         << "\t\t\"-deck source\" is the ATCF format data source "
         << "(required).\n"
 
-        << "\t\t\"config_file\" is a TCDiagConfig file to be used "
+        << "\t\t\"-config file\" is a TCDiagConfig file to be used "
         << "(required).\n"
 
-        << "\t\t\"-out file\" is the NetCDF output file to be written "
-        << "(required).\n"
+        << "\t\t\"-outdir path\" overrides the default output directory "
+        << "(" << out_dir << ") (optional).\n"
 
         << "\t\t\"-log file\" outputs log messages to the specified "
         << "file (optional).\n"
@@ -152,10 +154,19 @@ void process_command_line(int argc, char **argv) {
    cline.add(set_data_files, "-data",   -1);
    cline.add(set_deck,       "-deck",   -1);
    cline.add(set_config,     "-config",  1);
-   cline.add(set_out,        "-out",     1);
+   cline.add(set_outdir,     "-outdir",  1);
 
    // Parse command line
    cline.parse();
+
+   // Check for required arguments
+   if(data_files.n()  == 0 ||
+      deck_source.n() == 0 ||
+      config_file.empty()) {
+      mlog << Error << "\nThe \"-data\", \"-deck\", and \"-config\" "
+           << "command line arguments are required!\n\n";
+      usage();
+   }
 
    // Create default config file name
    default_config_file = replace_path(default_config_filename);
@@ -296,7 +307,7 @@ void get_atcf_files(const StringArray& source,
 void process_track_files(const StringArray& files,
                          const StringArray& model_suffix,
                          TrackInfoArray& tracks) {
-   int cur_read, cur_add, tot_read, tot_add;
+   int i, cur_read, cur_add, tot_read, tot_add;
    LineDataFile f;
    ConcatString cs;
    ATCFTrackLine line;
@@ -308,7 +319,7 @@ void process_track_files(const StringArray& files,
    tot_read = tot_add = 0;
 
    // Process input ATCF files
-   for(int i = 0; i < files.n(); i++) {
+   for(i=0; i<files.n(); i++) {
 
        mlog << Debug(1) << "Reading track file: " << files[i] << "\n";
 
@@ -369,6 +380,9 @@ void process_track_files(const StringArray& files,
            << "multiple tracks found (" << tracks.n()
            << ")! Using the first one. Adjust the configuration file "
            << "filtering options to select a single track.\n\n";
+       TrackInfo first_track = tracks[i];
+       tracks.clear();
+       tracks.add(first_track);
    }
 
    return;
@@ -465,8 +479,8 @@ void set_deck(const StringArray& a) {
 ////////////////////////////////////////////////////////////////////////
 
 void set_atcf_source(const StringArray& a,
-                 StringArray& source,
-                    StringArray& model_suffix) {
+                     StringArray& source,
+                     StringArray& model_suffix) {
    StringArray sa;
    ConcatString cs, suffix;
 
@@ -510,8 +524,8 @@ void set_config(const StringArray& a) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_out(const StringArray& a) {
-   out_file = a[0];
+void set_outdir(const StringArray& a) {
+   out_dir = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -583,6 +597,33 @@ void setup_nc_file() {
        variable_levels, variable_long_names, variable_units,
        range_dim, azimuth_dim, pressure_dim, track_point_dim,
        data_3d_vars);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void build_outfile_name(unixtime valid_ut, int lead_sec,
+                        const char *suffix, ConcatString &str) {
+
+   //
+   // Create output file name
+   //
+
+   // Append the output directory and program name
+   str << cs_erase << out_dir << "/" << program_name;
+
+   // Append the output prefix, if defined
+   if(conf_info.output_prefix.nonempty())
+      str << "_" << conf_info.output_prefix;
+
+   // Append the timing information
+   str << "_"
+       << sec_to_hhmmss(lead_sec) << "L_"
+       << unix_to_yyyymmdd_hhmmss(valid_ut) << "V";
+
+   // Append the suffix
+   str << suffix;
 
    return;
 }
