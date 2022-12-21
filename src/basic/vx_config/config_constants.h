@@ -1194,6 +1194,17 @@ static const char conf_key_radial_velocity_long_field_name[] = "radial_velocity_
 static const char conf_key_tangential_velocity_long_field_name[] = "tangential_velocity_long_field_name";
 
 //
+// TC-Diag specific paramter key names
+//
+
+static const char conf_key_track_flag[]       = "track";
+static const char conf_key_grid_latlon_flag[] = "grid_latlon";
+static const char conf_key_grid_raw_flag[]    = "grid_raw";
+static const char conf_key_cyl_latlon_flag[]  = "cyl_latlon";
+static const char conf_key_cyl_raw_flag[]     = "cyl_raw";
+static const char conf_key_diag_flag[]        = "diag";
+
+//
 // Parameter value names common to multiple tools
 //
 

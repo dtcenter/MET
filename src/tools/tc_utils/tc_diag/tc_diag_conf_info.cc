@@ -75,6 +75,8 @@ void TCDiagConfInfo::clear() {
    tangential_velocity_long_field_name.clear();
    radial_velocity_long_field_name.clear();
 
+   nc_info.clear();
+
    return;
 }
 
@@ -183,13 +185,16 @@ void TCDiagConfInfo::process_config(GrdFileType file_type) {
    // Process each field
    for(i=0; i<n_data; i++) {
 
-     // Get current dictionary
-     Dictionary i_dict = parse_conf_i_vx_dict(dict, i);
+      // Get current dictionary
+      Dictionary i_dict = parse_conf_i_vx_dict(dict, i);
 
-     // Parse and store config options
-     TCDiagDataOpt opt;
-     opt.process_config(file_type, i_dict);
-     data_opt.push_back(opt);
+      // Parse and store config options
+      TCDiagDataOpt opt;
+      opt.process_config(file_type, i_dict);
+      data_opt.push_back(opt);
+
+      // Update top-level TCDiagNcOutInfo settings
+      nc_info += opt.nc_info;
    }
 
    return;

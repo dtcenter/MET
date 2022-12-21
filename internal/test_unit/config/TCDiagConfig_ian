@@ -52,11 +52,22 @@ lead       = [];
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// May be set separately in each "field" entry
+// Data censoring and conversion
+// May be set separately in each "data.field" entry
 //
 censor_thresh = [];
 censor_val    = [];
 convert(x)    = x;
+
+//
+// Range-Azimuth grid parameters
+// May be set separately in each "data.field" entry
+//
+n_range        = 100;
+n_azimuth      = 180;
+max_range_km   = 1000.0;
+delta_range_km = 10.0;
+rmw_scale      = 0.2;
 
 //
 // Data fields
@@ -95,15 +106,6 @@ regrid = {
 }
 
 //
-// Range-Azimuth grid parameters
-//
-n_range        = 100;
-n_azimuth      = 180;
-max_range_km   = 1000.0;
-delta_range_km = 10.0;
-rmw_scale      = 0.2;
-
-//
 // Optionally convert u/v winds to tangential/radial winds
 //
 compute_tangential_and_radial_winds = TRUE;
@@ -113,6 +115,22 @@ tangential_velocity_field_name = "VT";
 tangential_velocity_long_field_name = "Tangential Velocity";
 radial_velocity_field_name = "VR";
 radial_velocity_long_field_name = "Radial Velocity";
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// NetCDF matched pairs output file
+// May be set separately in each "data.field" entry
+//
+nc_pairs_flag = {
+   do_track       = TRUE;
+   do_grid_latlon = TRUE;
+   do_grid_raw    = TRUE;
+   do_cyl_latlon  = TRUE;
+   do_cyl_raw     = TRUE;
+   do_diag        = TRUE;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
