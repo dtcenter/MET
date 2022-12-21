@@ -24,6 +24,314 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 //
+//  Code for class TCDiagConfInfo
+//
+////////////////////////////////////////////////////////////////////////
+
+TCDiagConfInfo::TCDiagConfInfo() {
+
+   init_from_scratch();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+TCDiagConfInfo::~TCDiagConfInfo() {
+
+   clear();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TCDiagConfInfo::init_from_scratch() {
+
+   clear();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TCDiagConfInfo::clear() {
+
+   model.clear();
+   storm_id.clear();
+   basin.clear();
+   cyclone.clear();
+
+   init_inc = (unixtime) 0;
+   valid_beg = valid_end = (unixtime) 0;
+   valid_inc.clear();
+   valid_exc.clear();
+   valid_hour.clear();
+   lead_time.clear();
+
+   data_opt.clear();
+
+   compute_tangential_and_radial_winds = false;
+   u_wind_field_name.clear();
+   v_wind_field_name.clear();
+   tangential_velocity_field_name.clear();
+   radial_velocity_field_name.clear();
+   tangential_velocity_long_field_name.clear();
+   radial_velocity_long_field_name.clear();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TCDiagConfInfo::read_config(const char* default_file_name,
+                                 const char* user_file_name) {
+
+   // Read config file constants
+   conf.read(replace_path(config_const_filename).c_str());
+
+   // Read default config file
+   conf.read(default_file_name);
+
+   // Read user-specified config file
+   conf.read(user_file_name);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TCDiagConfInfo::process_config(GrdFileType file_type) {
+   int i, n_data;
+   StringArray sa;
+   VarInfoFactory info_factory;
+   Dictionary *dict = (Dictionary *) 0;
+
+   // Conf: version
+   check_met_version(conf.lookup_string(conf_key_version).c_str());
+
+   // Conf: model
+   model = conf.lookup_string(conf_key_model);
+
+   // Conf: storm_id
+   storm_id = conf.lookup_string(conf_key_storm_id);
+
+   // Conf: basin
+   basin = conf.lookup_string(conf_key_basin);
+
+   // Conf: cyclone
+   cyclone = conf.lookup_string(conf_key_cyclone);
+
+   // Conf: init_inc
+   init_inc = conf.lookup_unixtime(conf_key_init_inc);
+
+   // Conf: valid_beg, valid_end
+   valid_beg = conf.lookup_unixtime(conf_key_valid_beg);
+   valid_end = conf.lookup_unixtime(conf_key_valid_end);
+
+   // Conf: valid_inc
+   sa = conf.lookup_string_array(conf_key_valid_inc);
+   for(i=0; i<sa.n(); i++) {
+      valid_inc.add(timestring_to_unix(sa[i].c_str()));
+   }
+
+   // Conf: valid_exc
+   sa = conf.lookup_string_array(conf_key_valid_exc);
+   for(i=0; i<sa.n(); i++) {
+      valid_exc.add(timestring_to_unix(sa[i].c_str()));
+   }
+
+   // Conf: valid_hour
+   sa = conf.lookup_string_array(conf_key_valid_hour);
+   for(i=0; i<sa.n(); i++) {
+      valid_hour.add(timestring_to_sec(sa[i].c_str()));
+   }
+
+   // Conf: lead
+   sa = conf.lookup_string_array(conf_key_lead);
+   for(i=0; i<sa.n(); i++) {
+      lead_time.add(timestring_to_sec(sa[i].c_str()));
+   }
+
+   compute_tangential_and_radial_winds =
+      conf.lookup_bool(conf_key_compute_tangential_and_radial_winds);
+   u_wind_field_name =
+      conf.lookup_string(conf_key_u_wind_field_name);
+   v_wind_field_name =
+      conf.lookup_string(conf_key_v_wind_field_name);
+   tangential_velocity_field_name =
+      conf.lookup_string(conf_key_tangential_velocity_field_name);
+   radial_velocity_field_name =
+      conf.lookup_string(conf_key_radial_velocity_field_name);
+   tangential_velocity_long_field_name =
+      conf.lookup_string(conf_key_tangential_velocity_long_field_name);
+   radial_velocity_long_field_name =
+      conf.lookup_string(conf_key_radial_velocity_long_field_name);
+
+   // Conf: data.field
+   dict = conf.lookup_array(conf_key_data_field);
+
+   // Determine number of fields (name/level)
+   n_data = parse_conf_n_vx(dict);
+
+   mlog << Debug(2) << "Found " << n_data << " variable/level fields "
+        << "requested in the configuration file.\n";
+
+   // Check for empty data settings
+   if(n_data == 0) {
+       mlog << Error << "\nTCDiagConfInfo::process_config() -> "
+            << "data may not be empty.\n\n";
+       exit(1);
+   }
+
+   // Process each field
+   for(i=0; i<n_data; i++) {
+
+     // Get current dictionary
+     Dictionary i_dict = parse_conf_i_vx_dict(dict, i);
+
+     // Parse and store config options
+     TCDiagDataOpt opt;
+     opt.process_config(file_type, i_dict);
+     data_opt.push_back(opt);
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+//  Code for class TCDiagDataOpt
+//
+////////////////////////////////////////////////////////////////////////
+
+TCDiagDataOpt::TCDiagDataOpt() {
+
+   init_from_scratch();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+TCDiagDataOpt::~TCDiagDataOpt() {
+
+   clear();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TCDiagDataOpt::init_from_scratch() {
+
+   // Initialize pointer
+   var_info = (VarInfo *) 0;
+
+   clear();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TCDiagDataOpt::clear() {
+   int i;
+
+   // Initialize values
+   n_range        = bad_data_int;
+   n_azimuth      = bad_data_int;
+   max_range_km   = bad_data_double;
+   delta_range_km = bad_data_double;
+   rmw_scale      = bad_data_double;
+
+   nc_info.clear();
+
+   // Deallocate memory
+   if(var_info) { delete var_info; var_info = (VarInfo *) 0; }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TCDiagDataOpt::process_config(GrdFileType file_type, Dictionary &dict) {
+   int i, n;
+   VarInfoFactory info_factory;
+
+   // Initialize
+   clear();
+
+   // Set the VarInfo object
+   var_info = info_factory.new_var_info(file_type);
+   var_info->set_dict(dict);
+
+   // Dump the contents of the current VarInfo
+   if(mlog.verbosity_level() >= 5) {
+      mlog << Debug(5) << "Parsed field:\n";
+      var_info->dump(cout);
+   }
+
+   // Conf: n_range
+   n_range = dict.lookup_int(conf_key_n_range);
+
+   // Conf: n_azimuth
+   n_azimuth = dict.lookup_int(conf_key_n_azimuth);
+
+   // Conf: max_range
+   max_range_km = dict.lookup_double(conf_key_max_range);
+
+   // Conf: delta_range
+   delta_range_km = dict.lookup_double(conf_key_delta_range);
+
+   // Conf: rmw_scale
+   rmw_scale = dict.lookup_double(conf_key_rmw_scale);
+
+   // Conf: nc_pairs_flag
+   parse_nc_info(dict);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TCDiagDataOpt::parse_nc_info(Dictionary &odict) {
+   const DictionaryEntry * e = (const DictionaryEntry *) 0;
+
+   e = odict.lookup(conf_key_nc_pairs_flag);
+
+   if(!e) {
+      mlog << Error << "\nTCDiagDataOpt::parse_nc_info() -> "
+           << "lookup failed for key \"" << conf_key_nc_pairs_flag
+           << "\"\n\n";
+      exit(1);
+   }
+
+   const ConfigObjectType type = e->type();
+
+   if(type == BooleanType) {
+      bool value = e->b_value();
+
+      if(!value) nc_info.set_all_false();
+
+      return;
+   }
+
+   // It should be a dictionary
+   if(type != DictionaryType) {
+      mlog << Error << "\nTCDiagDataOpt::parse_nc_info() -> "
+           << "bad type (" << configobjecttype_to_string(type)
+           << ") for key \"" << conf_key_nc_pairs_flag << "\"\n\n";
+      exit(1);
+   }
+
+   // Parse the various entries
+   Dictionary * d = e->dict_value();
+
+   nc_info.do_track       = d->lookup_bool(conf_key_track_flag);
+   nc_info.do_grid_latlon = d->lookup_bool(conf_key_grid_latlon_flag);
+   nc_info.do_grid_raw    = d->lookup_bool(conf_key_grid_raw_flag);
+   nc_info.do_cyl_latlon  = d->lookup_bool(conf_key_cyl_latlon_flag);
+   nc_info.do_cyl_raw     = d->lookup_bool(conf_key_cyl_raw_flag);
+   nc_info.do_diag        = d->lookup_bool(conf_key_diag_flag);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
 //  Code for struct TCDiagNcOutInfo
 //
 ////////////////////////////////////////////////////////////////////////
@@ -36,16 +344,12 @@ TCDiagNcOutInfo::TCDiagNcOutInfo() {
 
 TCDiagNcOutInfo & TCDiagNcOutInfo::operator+=(const TCDiagNcOutInfo &t) {
 
-   if(t.do_latlon)       do_latlon       = true;
-   if(t.do_fcst_genesis) do_fcst_genesis = true;
-   if(t.do_fcst_tracks)  do_fcst_tracks  = true;
-   if(t.do_fcst_fy_oy)   do_fcst_fy_oy   = true;
-   if(t.do_fcst_fy_on)   do_fcst_fy_on   = true;
-   if(t.do_best_genesis) do_best_genesis = true;
-   if(t.do_best_tracks)  do_best_tracks  = true;
-   if(t.do_best_fy_oy)   do_best_fy_oy   = true;
-   if(t.do_best_fn_oy)   do_best_fn_oy   = true;
-
+   if(t.do_track)       do_track       = true;
+   if(t.do_grid_latlon) do_grid_latlon = true;
+   if(t.do_grid_raw)    do_grid_raw    = true;
+   if(t.do_cyl_latlon)  do_cyl_latlon  = true;
+   if(t.do_cyl_raw)     do_cyl_raw     = true;
+   if(t.do_diag)        do_diag        = true;
 
    return(*this);
 }
@@ -63,11 +367,10 @@ void TCDiagNcOutInfo::clear() {
 
 bool TCDiagNcOutInfo::all_false() const {
 
-   bool status = do_latlon       ||
-                 do_fcst_genesis || do_fcst_tracks ||
-                 do_fcst_fy_oy   || do_fcst_fy_on  ||
-                 do_best_genesis || do_best_tracks ||
-                 do_best_fy_oy   || do_best_fn_oy;
+   bool status = do_track       ||
+                 do_grid_latlon || do_grid_raw ||
+                 do_cyl_latlon  || do_cyl_raw  ||
+                 do_diag;
 
    return(!status);
 }
@@ -76,15 +379,12 @@ bool TCDiagNcOutInfo::all_false() const {
 
 void TCDiagNcOutInfo::set_all_false() {
 
-   do_latlon       = false;
-   do_fcst_genesis = false;
-   do_fcst_tracks  = false;
-   do_fcst_fy_oy   = false;
-   do_fcst_fy_on   = false;
-   do_best_genesis = false;
-   do_best_tracks  = false;
-   do_best_fy_oy   = false;
-   do_best_fn_oy   = false;
+   do_track       = false;
+   do_grid_latlon = false;
+   do_grid_raw    = false;
+   do_cyl_latlon  = false;
+   do_cyl_raw     = false;
+   do_diag        = false;
 
    return;
 }
@@ -93,231 +393,13 @@ void TCDiagNcOutInfo::set_all_false() {
 
 void TCDiagNcOutInfo::set_all_true() {
 
-   do_latlon       = true;
-   do_fcst_genesis = true;
-   do_fcst_tracks  = true;
-   do_fcst_fy_oy   = true;
-   do_fcst_fy_on   = true;
-   do_best_genesis = true;
-   do_best_tracks  = true;
-   do_best_fy_oy   = true;
-   do_best_fn_oy   = true;
-
+   do_track       = true;
+   do_grid_latlon = true;
+   do_grid_raw    = true;
+   do_cyl_latlon  = true;
+   do_cyl_raw     = true;
+   do_diag        = true;
    return;
-}
-
-
-////////////////////////////////////////////////////////////////////////
-//
-//  Code for class TCDiagConfInfo
-//
-////////////////////////////////////////////////////////////////////////
-
-TCDiagConfInfo::TCDiagConfInfo() {
-
-    init_from_scratch();
-}
-
-////////////////////////////////////////////////////////////////////////
-
-TCDiagConfInfo::~TCDiagConfInfo() {
-
-    clear();
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void TCDiagConfInfo::init_from_scratch() {
-
-    // Initialize pointers
-    data_info = (VarInfo**) 0;
-
-    clear();
-
-    return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void TCDiagConfInfo::clear() {
-
-    Model.clear();
-    StormId.clear();
-    Basin.clear();
-    Cyclone.clear();
-
-    InitInc = (unixtime) 0;
-    ValidBeg = ValidEnd = (unixtime) 0;
-    ValidInc.clear();
-    ValidExc.clear();
-    ValidHour.clear();
-    LeadTime.clear();
-
-    n_range        = bad_data_int;
-    n_azimuth      = bad_data_int;
-    max_range_km   = bad_data_double;
-    delta_range_km = bad_data_double;
-    rmw_scale      = bad_data_double;
-
-    compute_tangential_and_radial_winds = false;
-    u_wind_field_name.clear();
-    v_wind_field_name.clear();
-    tangential_velocity_field_name.clear();
-    radial_velocity_field_name.clear();
-    tangential_velocity_long_field_name.clear();
-    radial_velocity_long_field_name.clear();
-
-    // Clear data_info
-    if(data_info) {
-        for(int i = 0; i < n_data; i++) {
-            if(data_info[i]) {
-                data_info[i] = (VarInfo*) 0;
-            }
-        }
-        delete data_info;
-        data_info = (VarInfo**) 0;
-    }
-
-    // Reset field count
-    n_data = 0;
-
-    return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void TCDiagConfInfo::read_config(const char* default_file_name,
-                                const char* user_file_name) {
-
-    // Read config file constants
-    Conf.read(replace_path(config_const_filename).c_str());
-
-    // Read default config file
-    Conf.read(default_file_name);
-
-    // Read user-specified config file
-    Conf.read(user_file_name);
-
-    return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void TCDiagConfInfo::process_config(GrdFileType ftype) {
-    int i;
-    StringArray sa;
-    VarInfoFactory info_factory;
-    Dictionary *fdict = (Dictionary *) 0;
-
-    // Conf: version
-    check_met_version(Conf.lookup_string(conf_key_version).c_str());
-
-    // Conf: model
-    Model = Conf.lookup_string(conf_key_model);
-
-    // Conf: storm_id
-    StormId = Conf.lookup_string(conf_key_storm_id);
-
-    // Conf: basin
-    Basin = Conf.lookup_string(conf_key_basin);
-
-    // Conf: cyclone
-    Cyclone = Conf.lookup_string(conf_key_cyclone);
-
-    // Conf: init_inc
-    InitInc = Conf.lookup_unixtime(conf_key_init_inc);
-
-    // Conf: valid_beg, valid_end
-    ValidBeg = Conf.lookup_unixtime(conf_key_valid_beg);
-    ValidEnd = Conf.lookup_unixtime(conf_key_valid_end);
-
-    // Conf: valid_inc
-    sa = Conf.lookup_string_array(conf_key_valid_inc);
-    for(i=0; i<sa.n(); i++)
-       ValidInc.add(timestring_to_unix(sa[i].c_str()));
-
-    // Conf: valid_exc
-    sa = Conf.lookup_string_array(conf_key_valid_exc);
-    for(i=0; i<sa.n(); i++)
-       ValidExc.add(timestring_to_unix(sa[i].c_str()));
-
-    // Conf: valid_hour
-    sa = Conf.lookup_string_array(conf_key_valid_hour);
-    for(i=0; i<sa.n(); i++)
-       ValidHour.add(timestring_to_sec(sa[i].c_str()));
-
-    // Conf: lead
-    sa = Conf.lookup_string_array(conf_key_lead);
-    for(i=0; i<sa.n(); i++) {
-       LeadTime.add(timestring_to_sec(sa[i].c_str()));
-    }
-
-    // Conf: n_range
-    n_range = Conf.lookup_int(conf_key_n_range);
-
-    // Conf: n_azimuth
-    n_azimuth = Conf.lookup_int(conf_key_n_azimuth);
-
-    // Conf: max_range
-    max_range_km = Conf.lookup_double(conf_key_max_range);
-
-    // Conf: delta_range
-    delta_range_km = Conf.lookup_double(conf_key_delta_range);
-
-    // Conf: rmw_scale
-    rmw_scale = Conf.lookup_double(conf_key_rmw_scale);
-
-    compute_tangential_and_radial_winds = Conf.lookup_bool(conf_key_compute_tangential_and_radial_winds);
-    u_wind_field_name = Conf.lookup_string(conf_key_u_wind_field_name);
-    v_wind_field_name = Conf.lookup_string(conf_key_v_wind_field_name);
-    tangential_velocity_field_name = Conf.lookup_string(conf_key_tangential_velocity_field_name);
-    radial_velocity_field_name = Conf.lookup_string(conf_key_radial_velocity_field_name);
-    tangential_velocity_long_field_name = Conf.lookup_string(conf_key_tangential_velocity_long_field_name);
-    radial_velocity_long_field_name = Conf.lookup_string(conf_key_radial_velocity_long_field_name);
-
-    // Conf: data.field
-    fdict = Conf.lookup_array(conf_key_data_field);
-
-    // Determine number of fields (name/level)
-    n_data = parse_conf_n_vx(fdict);
-
-    mlog << Debug(2) << "Found " << n_data << " variable/level fields "
-         << "requested in the configuration file.\n";
-
-    // Check for empty data settings
-    if(n_data == 0) {
-        mlog << Error << "\nTCDiagConfInfo::process_config() -> "
-             << "data may not be empty.\n\n";
-        exit(1);
-    }
-
-    // Allocate space based on number of fields
-    data_info = new VarInfo*[n_data];
-
-    // Initialize pointers
-    for(i=0; i<n_data; i++) data_info[i] = (VarInfo*) 0;
-
-    // Parse data field information
-    for(i=0; i<n_data; i++) {
-
-        // Allocate new VarInfo objects
-        data_info[i] = info_factory.new_var_info(ftype);
-
-        // Get current dictionary
-        Dictionary i_fdict = parse_conf_i_vx_dict(fdict, i);
-
-        // Set current dictionary
-        data_info[i]->set_dict(i_fdict);
-
-        // Dump contents of current VarInfo
-        if(mlog.verbosity_level() >=5) {
-            mlog << Debug(5) << "Parsed data field "
-                 << i + 1 << ":\n";
-            data_info[i]->dump(cout);
-        }
-    }
-
-    return;
 }
 
 ////////////////////////////////////////////////////////////////////////

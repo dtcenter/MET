@@ -25,15 +25,12 @@
 
 struct TCDiagNcOutInfo {
 
-   bool do_latlon;
-   bool do_fcst_genesis;
-   bool do_fcst_tracks;
-   bool do_fcst_fy_oy;
-   bool do_fcst_fy_on;
-   bool do_best_genesis;
-   bool do_best_tracks;
-   bool do_best_fy_oy;
-   bool do_best_fn_oy;
+   bool do_track;
+   bool do_grid_latlon;
+   bool do_grid_raw;
+   bool do_cyl_latlon;
+   bool do_cyl_raw;
+   bool do_diag;
 
       //////////////////////////////////////////////////////////////////
 
@@ -80,8 +77,7 @@ class TCDiagDataOpt {
 
       void clear();
 
-      void process_config(GrdFileType, Dictionary &,
-                          GrdFileType, Dictionary &);
+      void process_config(GrdFileType, Dictionary &);
       void parse_nc_info(Dictionary &);
 };
 
@@ -101,21 +97,21 @@ class TCDiagConfInfo {
       //////////////////////////////////////////////////////////////////
 
       // TCDiag configuration object
-      MetConfig Conf;
+      MetConfig conf;
 
       // Track line filtering criteria
-      ConcatString Model;
-      ConcatString StormId;
-      ConcatString Basin;
-      ConcatString Cyclone;
-      unixtime     InitInc;
-      unixtime     ValidBeg, ValidEnd;
-      TimeArray    ValidInc, ValidExc;
-      NumArray     ValidHour;
-      NumArray     LeadTime;
+      ConcatString model;
+      ConcatString storm_id;
+      ConcatString basin;
+      ConcatString cyclone;
+      unixtime     init_inc;
+      unixtime     valid_beg, valid_end;
+      TimeArray    valid_inc, valid_exc;
+      NumArray     valid_hour;
+      NumArray     lead_time;
 
       // Vector of input data
-      vector<TCDiagDataOpt> DataOpt;
+      vector<TCDiagDataOpt> data_opt;
 
       // Wind conversion information
       bool compute_tangential_and_radial_winds;
@@ -129,9 +125,12 @@ class TCDiagConfInfo {
       // Variable information
       VarInfo** data_info;
 
-      ConcatString   tmp_dir;               // Directory for temporary files
-      ConcatString   output_prefix;         // String to customize output file name
-      ConcatString   version;               // Config file version
+      ConcatString tmp_dir;       // Directory for temporary files
+      ConcatString output_prefix; // String to customize output file name
+      ConcatString version;       // Config file version
+
+      // Output file options
+      TCDiagNcOutInfo nc_info;
 
       //////////////////////////////////////////////////////////////////
 
@@ -145,7 +144,7 @@ class TCDiagConfInfo {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int TCDiagConfInfo::get_n_data() const { return DataOpt.size(); }
+inline int TCDiagConfInfo::get_n_data() const { return data_opt.size(); }
 
 ////////////////////////////////////////////////////////////////////////
 

@@ -62,7 +62,7 @@ static const char* atcf_suffix = ".dat";
 
 // Default configuration file name
 static const char* default_config_filename =
-    "MET_BASE/config/TCDiagConfig_default";
+   "MET_BASE/config/TCDiagConfig_default";
 
 // Default output directory
 static const char* default_out_dir = ".";

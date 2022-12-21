@@ -69,6 +69,9 @@ static void process_fields(const TrackInfoArray&);
 ////////////////////////////////////////////////////////////////////////
 
 // JHG see: https://github.com/dtcenter/MET/issues/2168#issuecomment-1347477566
+// JHG eventually support different cylindrical coordinate definitions but for now
+//     just used the first one. Eventually replace instances of "conf_info.data_opt[0]"
+//     with something else.
 
 int met_main(int argc, char *argv[]) {
 
@@ -97,7 +100,7 @@ const string get_tool_name() {
 
 void usage() {
 
-   cout << "\n*** Model Evaluation Tools (MET" << met_version
+   cout << "\n*** model Evaluation Tools (MET" << met_version
         << ") ***\n\n"
         << "Usage: " << program_name << "\n"
         << "\t-data file_1 ... file_n | data_file_list\n"
@@ -199,7 +202,7 @@ void set_file_type(const StringArray &file_list) {
    int i;
 
    // Get data file type from config
-   GrdFileType conf_ftype = parse_conf_file_type(conf_info.Conf.lookup_dictionary(conf_key_data));
+   GrdFileType conf_ftype = parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_data));
 
    // Find the first file that actually exists
    for(i=0; i<file_list.n(); i++) {
@@ -240,8 +243,8 @@ void process_diagnostics() {
    process_fields(tracks);
 
    // List the output file
-   mlog << Debug(1)
-        << "Writing output file: " << out_file << "\n";
+   mlog << Debug(1) << "Writing output file: "
+        << out_file << "\n";
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -256,8 +259,8 @@ void process_tracks(TrackInfoArray& tracks) {
    get_atcf_files(deck_source, deck_model_suffix,
                   files, files_model_suffix);
 
-   mlog << Debug(2)
-        << "Processing " << files.n() << " track data file(s).\n";
+   mlog << Debug(2) << "Processing " << files.n()
+        << " track data file(s).\n";
 
    process_track_files(files, files_model_suffix, tracks);
 
@@ -267,7 +270,7 @@ void process_tracks(TrackInfoArray& tracks) {
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Automated Tropical Cyclone Forecasting System
+// Automated Tropical cyclone Forecasting System
 // https://www.nrlmry.navy.mil/atcf_web/docs/ATCF-FAQ.html
 
 void get_atcf_files(const StringArray& source,
@@ -399,64 +402,64 @@ bool is_keeper(const ATCFLineBase * line) {
    ConcatString cs;
 
    // Check model
-   if(conf_info.Model.nonempty() &&
-     conf_info.Model != line->technique()) {
-     cs << "model " << line->technique() << " != " << conf_info.Model;
+   if(conf_info.model.nonempty() &&
+     conf_info.model != line->technique()) {
+     cs << "model " << line->technique() << " != " << conf_info.model;
      keep = false;
    }
 
    // Check storm id
-   else if(conf_info.StormId.nonempty() &&
-         conf_info.StormId != line->storm_id()) {
-     cs << "storm_id " << line->storm_id() << " != " << conf_info.StormId;
+   else if(conf_info.storm_id.nonempty() &&
+         conf_info.storm_id != line->storm_id()) {
+     cs << "storm_id " << line->storm_id() << " != " << conf_info.storm_id;
      keep = false;
    }
 
    // Check basin
-   else if(conf_info.Basin.nonempty() &&
-         conf_info.Basin != line->basin()) {
-     cs << "basin " << line->basin() << " != " << conf_info.Basin;
+   else if(conf_info.basin.nonempty() &&
+           conf_info.basin != line->basin()) {
+     cs << "basin " << line->basin() << " != " << conf_info.basin;
      keep = false;
    }
 
    // Check cyclone
-   else if(conf_info.Cyclone.nonempty() &&
-         conf_info.Cyclone != line->cyclone_number()) {
-     cs << "cyclone " << line->cyclone_number() << " != " << conf_info.Cyclone;
+   else if(conf_info.cyclone.nonempty() &&
+         conf_info.cyclone != line->cyclone_number()) {
+     cs << "cyclone " << line->cyclone_number() << " != " << conf_info.cyclone;
      keep = false;
    }
 
    // Check initialization time
-   else if(conf_info.InitInc != (unixtime) 0 &&
-         conf_info.InitInc != line->warning_time()) {
+   else if(conf_info.init_inc != (unixtime) 0 &&
+         conf_info.init_inc != line->warning_time()) {
      cs << "init_inc " << unix_to_yyyymmddhh(line->warning_time())
-       << " != " << unix_to_yyyymmdd_hhmmss(conf_info.InitInc);
+       << " != " << unix_to_yyyymmdd_hhmmss(conf_info.init_inc);
      keep = false;
    }
 
    // Check valid time
-   else if((conf_info.ValidBeg > 0 &&
-          conf_info.ValidBeg > line->valid())   ||
-         (conf_info.ValidEnd > 0 &&
-          conf_info.ValidEnd < line->valid())   ||
-         (conf_info.ValidInc.n() > 0 &&
-         !conf_info.ValidInc.has(line->valid())) ||
-         (conf_info.ValidExc.n() > 0 &&
-          conf_info.ValidExc.has(line->valid()))) {
+   else if((conf_info.valid_beg > 0 &&
+          conf_info.valid_beg > line->valid())   ||
+         (conf_info.valid_end > 0 &&
+          conf_info.valid_end < line->valid())   ||
+         (conf_info.valid_inc.n() > 0 &&
+         !conf_info.valid_inc.has(line->valid())) ||
+         (conf_info.valid_exc.n() > 0 &&
+          conf_info.valid_exc.has(line->valid()))) {
       cs << "valid_time " << unix_to_yyyymmddhh(line->valid());
       keep = false;
    }
 
    // Check valid hour
-   else if(conf_info.ValidHour.n() > 0 &&
-         !conf_info.ValidHour.has(line->valid_hour())) {
+   else if(conf_info.valid_hour.n() > 0 &&
+         !conf_info.valid_hour.has(line->valid_hour())) {
       cs << "valid_hour " << line->valid_hour();
       keep = false;
    }
 
    // Check lead time
-   else if(conf_info.LeadTime.n() > 0 &&
-        !conf_info.LeadTime.has(line->lead())){
+   else if(conf_info.lead_time.n() > 0 &&
+        !conf_info.lead_time.has(line->lead())){
      cs << "lead_time " << sec_to_hhmmss(line->lead());
      keep = false;
    }
@@ -533,9 +536,9 @@ void set_outdir(const StringArray& a) {
 void setup_grid() {
 
    grid_data.name = "TCDiag";
-   grid_data.range_n = conf_info.n_range;
-   grid_data.azimuth_n = conf_info.n_azimuth;
-   grid_data.range_max_km = conf_info.max_range_km;
+   grid_data.range_n = conf_info.data_opt[0].n_range;
+   grid_data.azimuth_n = conf_info.data_opt[0].n_azimuth;
+   grid_data.range_max_km = conf_info.data_opt[0].max_range_km;
 
    tcrmw_grid.set_from_data(grid_data);
    grid.set(grid_data);
@@ -569,7 +572,7 @@ void setup_nc_file() {
 
    // Define range and azimuth dimensions
    def_tc_range_azimuth(nc_out, range_dim, azimuth_dim, tcrmw_grid,
-      conf_info.rmw_scale);
+      conf_info.data_opt[0].rmw_scale);
 
    // Define latitude and longitude arrays
    def_tc_lat_lon_time(nc_out, range_dim, azimuth_dim,
@@ -580,7 +583,7 @@ void setup_nc_file() {
       // Get VarInfo
       data_info = conf_info.data_info[i_var];
       mlog << Debug(4) << "Processing field: " << data_info->magic_str() << "\n";
-	   string fname = data_info->name_attr();
+      string fname = data_info->name_attr();
       variable_levels[fname].push_back(data_info->level_attr());
       variable_long_names[fname] = data_info->long_name_attr();
       variable_units[fname] = data_info->units_attr();
@@ -687,8 +690,8 @@ void process_fields(const TrackInfoArray& tracks) {
       grid_data.lon_center = -1.0*point.lon(); // internal sign change
 
       // RMW is same as mrd()
-      grid_data.range_max_km = conf_info.rmw_scale * point.mrd() *
-                               tc_km_per_nautical_miles * conf_info.n_range;
+      grid_data.range_max_km = conf_info.data_opt[0].rmw_scale * point.mrd() *
+                               tc_km_per_nautical_miles * conf_info.data_opt[0].n_range;
       tcrmw_grid.clear();
       tcrmw_grid.set_from_data(grid_data);
       grid.clear();
@@ -709,10 +712,10 @@ void process_fields(const TrackInfoArray& tracks) {
          // Update the variable info with the valid time of the track point
          data_info = conf_info.data_info[i_var];
 
-	      string sname = data_info->name_attr().string();
-	      string slevel = data_info->level_attr().string();
+         string sname = data_info->name_attr().string();
+         string slevel = data_info->level_attr().string();
 
-	      data_info->set_valid(valid_time);
+         data_info->set_valid(valid_time);
 
          // Find data for this track point
          get_series_entry(i_point, data_info, data_files, ftype, data_dp,
@@ -726,7 +729,7 @@ void process_fields(const TrackInfoArray& tracks) {
 
          // Regrid data
          data_dp = met_regrid(data_dp, latlon_arr, grid, data_info->regrid());
-	      data_dp.data_range(data_min, data_max);
+         data_dp.data_range(data_min, data_max);
          mlog << Debug(4) << "data_min:" << data_min << "\n";
          mlog << Debug(4) << "data_max:" << data_max << "\n";
 
