@@ -1197,6 +1197,7 @@ static const char conf_key_tangential_velocity_long_field_name[] = "tangential_v
 // TC-Diag specific paramter key names
 //
 
+static const char conf_key_nc_out_flag[]      = "nc_out_flag";
 static const char conf_key_track_flag[]       = "track";
 static const char conf_key_grid_latlon_flag[] = "grid_latlon";
 static const char conf_key_grid_raw_flag[]    = "grid_raw";

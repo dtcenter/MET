@@ -119,16 +119,16 @@ radial_velocity_long_field_name = "Radial Velocity";
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// NetCDF matched pairs output file
+// NetCDF output file
 // May be set separately in each "data.field" entry
 //
-nc_pairs_flag = {
-   do_track       = TRUE;
-   do_grid_latlon = TRUE;
-   do_grid_raw    = TRUE;
-   do_cyl_latlon  = TRUE;
-   do_cyl_raw     = TRUE;
-   do_diag        = TRUE;
+nc_out_flag = {
+   track       = TRUE;
+   grid_latlon = TRUE;
+   grid_raw    = TRUE;
+   cyl_latlon  = TRUE;
+   cyl_raw     = TRUE;
+   diag        = TRUE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -81,7 +81,7 @@ static StringArray    data_files;
 static StringArray    deck_source, deck_model_suffix;
 static ConcatString   config_file;
 static TCDiagConfInfo conf_info;
-static GrdFileType    ftype = FileType_None;
+static GrdFileType    file_type = FileType_None;
 
 // Optional arguments
 static ConcatString out_dir;
@@ -94,6 +94,7 @@ static ConcatString out_prefix;
 ////////////////////////////////////////////////////////////////////////
 
 // Output NetCDF file
+static bool         write_nc = false;
 static ConcatString out_file;
 static NcFile*      nc_out = (NcFile*) 0;
 static NcDim        range_dim;

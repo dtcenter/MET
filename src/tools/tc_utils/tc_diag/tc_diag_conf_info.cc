@@ -44,6 +44,9 @@ TCDiagConfInfo::~TCDiagConfInfo() {
 
 void TCDiagConfInfo::init_from_scratch() {
 
+   // Initialize pointer
+   data_opt = (TCDiagDataOpt *) 0;
+
    clear();
 
    return;
@@ -65,8 +68,6 @@ void TCDiagConfInfo::clear() {
    valid_hour.clear();
    lead_time.clear();
 
-   data_opt.clear();
-
    compute_tangential_and_radial_winds = false;
    u_wind_field_name.clear();
    v_wind_field_name.clear();
@@ -77,13 +78,19 @@ void TCDiagConfInfo::clear() {
 
    nc_info.clear();
 
+   // Deallocate memory
+   for(int i=0; i<n_data; i++) data_opt[i].clear();
+   if(data_opt) { delete [] data_opt; data_opt = (TCDiagDataOpt *) 0; }
+
+   n_data = 0;
+
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCDiagConfInfo::read_config(const char* default_file_name,
-                                 const char* user_file_name) {
+void TCDiagConfInfo::read_config(const char *default_file_name,
+                                 const char *user_file_name) {
 
    // Read config file constants
    conf.read(replace_path(config_const_filename).c_str());
@@ -172,6 +179,9 @@ void TCDiagConfInfo::process_config(GrdFileType file_type) {
    // Determine number of fields (name/level)
    n_data = parse_conf_n_vx(dict);
 
+   // Allocate memory for data field options
+   data_opt = new TCDiagDataOpt [n_data];
+
    mlog << Debug(2) << "Found " << n_data << " variable/level fields "
         << "requested in the configuration file.\n";
 
@@ -189,12 +199,10 @@ void TCDiagConfInfo::process_config(GrdFileType file_type) {
       Dictionary i_dict = parse_conf_i_vx_dict(dict, i);
 
       // Parse and store config options
-      TCDiagDataOpt opt;
-      opt.process_config(file_type, i_dict);
-      data_opt.push_back(opt);
+      data_opt[i].process_config(file_type, i_dict);
 
       // Update top-level TCDiagNcOutInfo settings
-      nc_info += opt.nc_info;
+      nc_info += data_opt[i].nc_info;
    }
 
    return;
@@ -295,11 +303,11 @@ void TCDiagDataOpt::process_config(GrdFileType file_type, Dictionary &dict) {
 void TCDiagDataOpt::parse_nc_info(Dictionary &odict) {
    const DictionaryEntry * e = (const DictionaryEntry *) 0;
 
-   e = odict.lookup(conf_key_nc_pairs_flag);
+   e = odict.lookup(conf_key_nc_out_flag);
 
    if(!e) {
       mlog << Error << "\nTCDiagDataOpt::parse_nc_info() -> "
-           << "lookup failed for key \"" << conf_key_nc_pairs_flag
+           << "lookup failed for key \"" << conf_key_nc_out_flag
            << "\"\n\n";
       exit(1);
    }
@@ -318,7 +326,7 @@ void TCDiagDataOpt::parse_nc_info(Dictionary &odict) {
    if(type != DictionaryType) {
       mlog << Error << "\nTCDiagDataOpt::parse_nc_info() -> "
            << "bad type (" << configobjecttype_to_string(type)
-           << ") for key \"" << conf_key_nc_pairs_flag << "\"\n\n";
+           << ") for key \"" << conf_key_nc_out_flag << "\"\n\n";
       exit(1);
    }
 

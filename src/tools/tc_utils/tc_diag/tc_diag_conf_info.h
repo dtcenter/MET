@@ -14,7 +14,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 #include <iostream>
-#include <vector>
 
 #include "vx_config.h"
 #include "vx_data2d_factory.h"
@@ -87,6 +86,7 @@ class TCDiagConfInfo {
 
    private:
 
+      int n_data;
       void init_from_scratch();
 
    public:
@@ -110,8 +110,8 @@ class TCDiagConfInfo {
       NumArray     valid_hour;
       NumArray     lead_time;
 
-      // Vector of input data
-      vector<TCDiagDataOpt> data_opt;
+      // Array of options for each data.field entry [n_data] (allocated)
+      TCDiagDataOpt * data_opt;
 
       // Wind conversion information
       bool compute_tangential_and_radial_winds;
@@ -122,12 +122,14 @@ class TCDiagConfInfo {
       ConcatString tangential_velocity_long_field_name;
       ConcatString radial_velocity_long_field_name;
 
-      // Variable information
-      VarInfo** data_info;
+      // Directory for temporary files
+      ConcatString tmp_dir;
 
-      ConcatString tmp_dir;       // Directory for temporary files
-      ConcatString output_prefix; // String to customize output file name
-      ConcatString version;       // Config file version
+      // String to customize output file name
+      ConcatString output_prefix;
+
+      // Config file version
+      ConcatString version;
 
       // Output file options
       TCDiagNcOutInfo nc_info;
@@ -144,7 +146,7 @@ class TCDiagConfInfo {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int TCDiagConfInfo::get_n_data() const { return data_opt.size(); }
+inline int TCDiagConfInfo::get_n_data() const { return n_data; }
 
 ////////////////////////////////////////////////////////////////////////
 

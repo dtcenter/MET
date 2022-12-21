@@ -82,7 +82,8 @@ int met_main(int argc, char *argv[]) {
    setup_grid();
 
    // Setup NetCDF output
-   setup_nc_file();
+   write_nc = !conf_info.nc_info.all_false();
+   if(write_nc) setup_nc_file();
 
    // Process gridded and track data
    process_diagnostics();
@@ -189,7 +190,7 @@ void process_command_line(int argc, char **argv) {
    set_file_type(data_files);
 
    // Process the configuration
-   conf_info.process_config(ftype);
+   conf_info.process_config(file_type);
 
    return;
 }
@@ -202,11 +203,13 @@ void set_file_type(const StringArray &file_list) {
    int i;
 
    // Get data file type from config
-   GrdFileType conf_ftype = parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_data));
+   GrdFileType conf_file_type =
+      parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_data));
 
    // Find the first file that actually exists
    for(i=0; i<file_list.n(); i++) {
-      if(file_exists(file_list[i].c_str()) || is_python_grdfiletype(conf_ftype)) break;
+      if(file_exists(file_list[i].c_str()) ||
+         is_python_grdfiletype(conf_file_type)) break;
    }
 
    // Check for no valid files
@@ -216,14 +219,14 @@ void set_file_type(const StringArray &file_list) {
    }
 
    // Read first valid file
-   if(!(mtddf = mtddf_factory.new_met_2d_data_file(file_list[i].c_str(), conf_ftype))) {
+   if(!(mtddf = mtddf_factory.new_met_2d_data_file(file_list[i].c_str(), conf_file_type))) {
        mlog << Error << "\nTrouble reading data file \""
             << file_list[i] << "\"\n\n";
        exit(1);
    }
 
    // Store the actual file type
-   ftype = mtddf->file_type();
+   file_type = mtddf->file_type();
 
    // Clean up
    if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) 0; }
@@ -264,7 +267,7 @@ void process_tracks(TrackInfoArray& tracks) {
 
    process_track_files(files, files_model_suffix, tracks);
 
-   write_tc_tracks(nc_out, track_point_dim, tracks);
+   if(write_nc) write_tc_tracks(nc_out, track_point_dim, tracks);
 
    return;
 }
@@ -579,9 +582,10 @@ void setup_nc_file() {
       track_point_dim, lat_arr_var, lon_arr_var, valid_time_var);
 
    // Find all variable levels, long names, and units
-   for(int i_var = 0; i_var < conf_info.get_n_data(); i_var++) {
+   for(int i_var=0; i_var<conf_info.get_n_data(); i_var++) {
+
       // Get VarInfo
-      data_info = conf_info.data_info[i_var];
+      data_info = conf_info.data_opt[i_var].var_info;
       mlog << Debug(4) << "Processing field: " << data_info->magic_str() << "\n";
       string fname = data_info->name_attr();
       variable_levels[fname].push_back(data_info->level_attr());
@@ -700,26 +704,27 @@ void process_fields(const TrackInfoArray& tracks) {
       // Compute lat and lon coordinate arrays
       compute_lat_lon(tcrmw_grid, lat_arr, lon_arr);
 
-      // Write coordinate arrays
-      write_tc_data(nc_out, tcrmw_grid, i_point, lat_arr_var, lat_arr);
-      write_tc_data(nc_out, tcrmw_grid, i_point, lon_arr_var, lon_arr);
+      // Write NetCDF output
+      if(write_nc) {
 
-      // Write valid time
-      write_tc_valid_time(nc_out, i_point, valid_time_var, valid_yyyymmddhh);
+         // Write coordinate arrays
+         write_tc_data(nc_out, tcrmw_grid, i_point, lat_arr_var, lat_arr);
+         write_tc_data(nc_out, tcrmw_grid, i_point, lon_arr_var, lon_arr);
+
+         // Write valid time
+         write_tc_valid_time(nc_out, i_point, valid_time_var, valid_yyyymmddhh);
+      }
 
       for(int i_var=0; i_var<conf_info.get_n_data(); i_var++) {
 
          // Update the variable info with the valid time of the track point
-         data_info = conf_info.data_info[i_var];
-
-         string sname = data_info->name_attr().string();
-         string slevel = data_info->level_attr().string();
+         data_info = conf_info.data_opt[i_var].var_info;
 
          data_info->set_valid(valid_time);
 
          // Find data for this track point
-         get_series_entry(i_point, data_info, data_files, ftype, data_dp,
-                          latlon_arr);
+         get_series_entry(i_point, data_info, data_files, file_type,
+                          data_dp, latlon_arr);
 
          // Check data range
          double data_min, data_max;
@@ -733,17 +738,21 @@ void process_fields(const TrackInfoArray& tracks) {
          mlog << Debug(4) << "data_min:" << data_min << "\n";
          mlog << Debug(4) << "data_max:" << data_max << "\n";
 
-         // Write data
-         if(variable_levels[data_info->name_attr()].size() > 1) {
-            write_tc_pressure_level_data(nc_out, tcrmw_grid,
-               pressure_level_indices, data_info->level_attr(),
-               i_point, data_3d_vars[data_info->name_attr()], data_dp.data());
-         }
-         else {
-            write_tc_data_rev(nc_out, tcrmw_grid, i_point,
-               data_3d_vars[data_info->name_attr()], data_dp.data());
+         // Write NetCDF output
+         if(write_nc) {
+
+            if(variable_levels[data_info->name_attr()].size() > 1) {
+               write_tc_pressure_level_data(nc_out, tcrmw_grid,
+                  pressure_level_indices, data_info->level_attr(),
+                  i_point, data_3d_vars[data_info->name_attr()], data_dp.data());
+            }
+            else {
+               write_tc_data_rev(nc_out, tcrmw_grid, i_point,
+                  data_3d_vars[data_info->name_attr()], data_dp.data());
+            }
          }
       } // end for i_var
+
    } // end for i_point
 
    // Clean up
