@@ -644,19 +644,19 @@ ConcatString build_outfile_name(const TrackInfo &track,
 ////////////////////////////////////////////////////////////////////////
 
 void compute_lat_lon(TcrmwGrid& tcrmw_grid,
-        double *lat_arr, double *lon_arr) {
+                     double *lat_arr, double *lon_arr) {
 
    // Compute lat and lon coordinate arrays
-   for(int ir = 0; ir < tcrmw_grid.range_n(); ir++) {
-      for(int ia = 0; ia < tcrmw_grid.azimuth_n(); ia++) {
+   for(int ir=0; ir<tcrmw_grid.range_n(); ir++) {
+      for(int ia=0; ia<tcrmw_grid.azimuth_n(); ia++) {
          double lat, lon;
          int i = ir * tcrmw_grid.azimuth_n() + ia;
          tcrmw_grid.range_azi_to_latlon(
             ir * tcrmw_grid.range_delta_km(),
             ia * tcrmw_grid.azimuth_delta_deg(),
             lat, lon);
-         lat_arr[i] = lat;
-         lon_arr[i] = - lon;
+         lat_arr[i] =   lat;
+         lon_arr[i] = - lon; // degrees east to west
       }
    }
 
@@ -694,7 +694,6 @@ void process_track_points(const TrackInfo& track) {
 ////////////////////////////////////////////////////////////////////////
 
 void process_fields(const TrackPoint& point) {
-/* JHG work here
    DataPlane data_dp;
 
    // Loop over the fields to be processed
@@ -703,27 +702,45 @@ void process_fields(const TrackPoint& point) {
       // Update the variable info with the valid time of the track point
       VarInfo *var_info = conf_info.data_opt[i_var].var_info;
 
-      //
-      //
-   // Define latitude and longitude arrays
-   int nra = tcrmw_grid.range_n() * tcrmw_grid.azimuth_n();
-   lat_arr = new double[nra];
-   lon_arr = new double[nra];
+      // Store pointer to the grid info
+      TCRMWGridInfo *gi = conf_info.data_opt[i_var].grid_info;
+
+      // Define latitude and longitude arrays
+      int nra = gi->data.range_n * gi->data.azimuth_n;
+      double *lat_arr = new double[nra];
+      double *lon_arr = new double[nra];
 
       // Set grid center
-      tcrmw_data.lat_center = point.lat();
-      tcrmw_data.lon_center = -1.0*point.lon(); // internal sign change
+      gi->data.lat_center =      point.lat();
+      gi->data.lon_center = -1.0*point.lon(); // degrees east to west
 
       // RMW is same as mrd()
-      tcrmw_data.range_max_km = conf_info.rmw_scale * point.mrd() *
-                                tc_km_per_nautical_miles * conf_info.n_range;
-      tcrmw_grid.clear();
-      tcrmw_grid.set_from_data(tcrmw_data);
-      output_grid.clear();
-      output_grid.set(tcrmw_data);
+      gi->data.range_max_km = gi->rmw_scale * point.mrd() *
+                              tc_km_per_nautical_miles * gi->data.range_n;
+
+      // Instantiate the grid
+      TcrmwGrid tcrmw_grid(gi->data);
 
       // Compute lat and lon coordinate arrays
       compute_lat_lon(tcrmw_grid, lat_arr, lon_arr);
+
+      // JHG, write to nc?
+
+      // Clean up
+      if(lat_arr) { delete[] lat_arr; lat_arr = (double *) 0; }
+      if(lon_arr) { delete[] lon_arr; lon_arr = (double *) 0; }
+
+   } // end for i_var
+
+   return;
+}
+/* JHG keep working here
+      //
+      //
+
+
+
+
 
       // Write NetCDF output
       if(nc_out) {
@@ -774,11 +791,7 @@ void process_fields(const TrackPoint& point) {
          }
       } // end for i_var
 
-   // Clean up
-   if(lat_arr) { delete[] lat_arr; lat_arr = (double *) 0; }
-   if(lon_arr) { delete[] lon_arr; lon_arr = (double *) 0; }
+
 */
-   return;
-}
 
 ////////////////////////////////////////////////////////////////////////
