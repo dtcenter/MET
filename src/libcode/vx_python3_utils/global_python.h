@@ -59,7 +59,7 @@ inline void GlobalPython::initialize()
 { 
 
 if ( ! is_initialized )  {
-
+   Py_SetProgramName(L"/usr/local/met-python3/bin/python3");
    Py_Initialize();
 
    is_initialized = true;
