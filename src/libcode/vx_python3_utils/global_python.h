@@ -75,6 +75,9 @@ if ( ! is_initialized )  {
    command << cs_erase
            << "sys.path.append(\""
            << replace_path(wrappers_dir)
+           << "\");"
+           << "sys.path.append(\""
+           << replace_path(python_dir)
            << "\")";
 
    run_python_string(command.text());
