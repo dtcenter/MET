@@ -14,6 +14,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 #include <iostream>
+#include <netcdf>
 
 #include "vx_config.h"
 #include "vx_data2d_factory.h"
@@ -36,12 +37,37 @@ struct TCDiagNcOutInfo {
    TCDiagNcOutInfo();
    TCDiagNcOutInfo & operator+=(const TCDiagNcOutInfo &);
 
-   void clear();   //  sets everything to true
+   void clear();
 
    bool all_false() const;
 
    void set_all_false();
    void set_all_true();
+};
+
+////////////////////////////////////////////////////////////////////////
+
+struct TCRMWGridInfo {
+
+   // TcrmwData structure for creating a TcrmwGrid object
+   TcrmwData data;
+
+   double delta_range_km;
+   double rmw_scale;
+
+   // Flag to write this grid to the output
+   bool write_nc;
+
+   // Corresponding NetCDF dimensions
+   netCDF::NcDim range_dim;
+   netCDF::NcDim azimuth_dim;
+
+      //////////////////////////////////////////////////////////////////
+
+   TCRMWGridInfo();
+   bool operator==(const TCRMWGridInfo &);
+
+   void clear();
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -62,12 +88,8 @@ class TCDiagDataOpt {
       // VarInfo pointer (allocated)
       VarInfo *var_info;
 
-      // Range/Azimuth grid parameters
-      int    n_range;
-      int    n_azimuth;
-      double max_range_km;
-      double delta_range_km;
-      double rmw_scale;
+      // TCRmwGridInfo pointer (not allocated)
+      TCRMWGridInfo *grid_info;
 
       // Output file options
       TCDiagNcOutInfo nc_info;
@@ -111,7 +133,10 @@ class TCDiagConfInfo {
       NumArray     lead_time;
 
       // Array of options for each data.field entry [n_data] (allocated)
-      TCDiagDataOpt * data_opt;
+      TCDiagDataOpt *data_opt;
+
+      // Vector of TCRMWGridInfo objects
+      vector<TCRMWGridInfo> grid_info_list;
 
       // Wind conversion information
       bool compute_tangential_and_radial_winds;
@@ -128,9 +153,6 @@ class TCDiagConfInfo {
       // String to customize output file name
       ConcatString output_prefix;
 
-      // Config file version
-      ConcatString version;
-
       // Output file options
       TCDiagNcOutInfo nc_info;
 
@@ -140,6 +162,7 @@ class TCDiagConfInfo {
 
       void read_config(const char *, const char *);
       void process_config(GrdFileType);
+      TCRMWGridInfo parse_grid_info(Dictionary &);
 
       int get_n_data() const;
 };

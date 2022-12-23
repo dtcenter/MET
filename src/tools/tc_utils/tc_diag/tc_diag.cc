@@ -54,17 +54,17 @@ static void process_diagnostics();
 static void process_tracks(TrackInfoArray&);
 static void get_atcf_files(const StringArray&, const StringArray&, StringArray&, StringArray&);
 static void process_track_files(const StringArray&, const StringArray&, TrackInfoArray&);
+static void process_track_points(const TrackInfo &);
+static void process_fields(const TrackPoint &);
 static bool is_keeper(const ATCFLineBase *);
 static void set_deck(const StringArray&);
 static void set_atcf_source(const StringArray&, StringArray&, StringArray&);
 static void set_data_files(const StringArray&);
 static void set_config(const StringArray&);
 static void set_outdir(const StringArray&);
-static void setup_grid();
-static void setup_nc_file();
-static void build_outfile_name(const ConcatString&, const char*, ConcatString&);
+static void setup_nc_file(const TrackInfo &);
+static ConcatString build_outfile_name(const TrackInfo &, const char*);
 static void compute_lat_lon(TcrmwGrid&, double*, double*);
-static void process_fields(const TrackInfoArray&);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -72,18 +72,14 @@ static void process_fields(const TrackInfoArray&);
 // JHG eventually support different cylindrical coordinate definitions but for now
 //     just used the first one. Eventually replace instances of "conf_info.data_opt[0]"
 //     with something else.
+// JHG tcrmw output dimensions should be changed:
+// FROM:	double TMP(range, azimuth, pressure, track_point) ;
+// TO:  	double TMP(track_point, pressure, range, azimuth) ; the last 2 are the "gridded dimensions"
 
 int met_main(int argc, char *argv[]) {
 
    // Process command line arguments
    process_command_line(argc, argv);
-
-   // Setup grid
-   setup_grid();
-
-   // Setup NetCDF output
-   write_nc = !conf_info.nc_info.all_false();
-   if(write_nc) setup_nc_file();
 
    // Process gridded and track data
    process_diagnostics();
@@ -243,12 +239,15 @@ void process_diagnostics() {
    process_tracks(tracks);
 
    // Process the gridded data
-   process_fields(tracks);
+   process_track_points(tracks[0]);
+
+   // Setup NetCDF output
+   if(!conf_info.nc_info.all_false()) setup_nc_file(tracks[0]);
 
    // List the output file
-   if(write_nc) {
+   if(nc_out) {
       mlog << Debug(1) << "Writing output file: "
-           << out_file << "\n";
+           << nc_out_file << "\n";
    }
 }
 
@@ -269,7 +268,7 @@ void process_tracks(TrackInfoArray& tracks) {
 
    process_track_files(files, files_model_suffix, tracks);
 
-   if(write_nc) write_tc_tracks(nc_out, track_point_dim, tracks);
+   if(nc_out) write_tc_tracks(nc_out, track_point_dim, tracks);
 
    return;
 }
@@ -538,46 +537,54 @@ void set_outdir(const StringArray& a) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void setup_grid() {
+void setup_nc_file(const TrackInfo &track) {
+   VarInfo* var_info = (VarInfo*) 0;
 
-   grid_data.name = "TCDiag";
-   grid_data.range_n = conf_info.data_opt[0].n_range;
-   grid_data.azimuth_n = conf_info.data_opt[0].n_azimuth;
-   grid_data.range_max_km = conf_info.data_opt[0].max_range_km;
-
-   tcrmw_grid.set_from_data(grid_data);
-   grid.set(grid_data);
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void setup_nc_file() {
-   VarInfo* data_info = (VarInfo*) 0;
+   // Build the output file name
+   nc_out_file = build_outfile_name(track, ".nc");
 
    // Create NetCDF file
-   nc_out = open_ncfile(out_file.c_str(), true);
+   nc_out = open_ncfile(nc_out_file.c_str(), true);
 
    if(IS_INVALID_NC_P(nc_out)) {
       mlog << Error << "\nsetup_nc_file() -> "
            << "trouble opening output NetCDF file "
-           << out_file << "\n\n";
+           << nc_out_file << "\n\n";
       exit(1);
    }
 
-   mlog << Debug(4)
-        << "Range = " << tcrmw_grid.range_n()
-        << ", Azimuth = " << tcrmw_grid.azimuth_n() << "\n";
-
-   // Define dimensions
-   range_dim = add_dim(nc_out, "range", (long) tcrmw_grid.range_n());
-   azimuth_dim = add_dim(nc_out, "azimuth", (long) tcrmw_grid.azimuth_n());
+   // Track point dimension
    track_point_dim = add_dim(nc_out, "track_point", NC_UNLIMITED);
 
+   // Loop over the grid definitions
+   for(int i=0; i<conf_info.grid_info_list.size(); i++) {
+
+      TCRMWGridInfo *gi = &conf_info.grid_info_list[i];
+
+      mlog << Debug(4) << "Writing cylindrical coordinates grid " << i+1
+           << " with range = " << gi->data.range_n
+           << " and azimuth = " << gi->data.azimuth_n << ".\n";
+
+      // Define dimension names
+      ConcatString rng_cs("range");
+      ConcatString azi_cs("azimuth");
+      if(conf_info.grid_info_list.size() > 1) {
+         rng_cs << "_" << i+1;
+         azi_cs << "_" << i+1;
+      }
+
+      // Define dimensions
+      gi->range_dim   = add_dim(nc_out, rng_cs.c_str(), (long) gi->data.range_n);
+      gi->azimuth_dim = add_dim(nc_out, azi_cs.c_str(), (long) gi->data.azimuth_n);
+   }
+
+   return;
+}
+
+/* JHG, gotta do this stuff later
    // Define range and azimuth dimensions
    def_tc_range_azimuth(nc_out, range_dim, azimuth_dim, tcrmw_grid,
-      conf_info.data_opt[0].rmw_scale);
+      conf_info.rmw_scale);
 
    // Define latitude and longitude arrays
    def_tc_lat_lon_time(nc_out, range_dim, azimuth_dim,
@@ -587,12 +594,12 @@ void setup_nc_file() {
    for(int i_var=0; i_var<conf_info.get_n_data(); i_var++) {
 
       // Get VarInfo
-      data_info = conf_info.data_opt[i_var].var_info;
-      mlog << Debug(4) << "Processing field: " << data_info->magic_str() << "\n";
-      string fname = data_info->name_attr();
-      variable_levels[fname].push_back(data_info->level_attr());
-      variable_long_names[fname] = data_info->long_name_attr();
-      variable_units[fname] = data_info->units_attr();
+      var_info = conf_info.data_opt[i_var].var_info;
+      mlog << Debug(4) << "Processing field: " << var_info->magic_str() << "\n";
+      string fname = var_info->name_attr();
+      variable_levels[fname].push_back(var_info->level_attr());
+      variable_long_names[fname] = var_info->long_name_attr();
+      variable_units[fname] = var_info->units_attr();
    }
 
    // Define pressure levels
@@ -609,32 +616,29 @@ void setup_nc_file() {
 
    return;
 }
-
+*/
 ////////////////////////////////////////////////////////////////////////
 
-void build_outfile_name(unixtime valid_ut, int lead_sec,
-                        const char *suffix, ConcatString &str) {
+ConcatString build_outfile_name(const TrackInfo &track,
+                                const char *suffix) {
+   ConcatString cs;
 
-   //
-   // Create output file name
-   //
-
-   // Append the output directory and program name
-   str << cs_erase << out_dir << "/" << program_name;
+   // Build the output file name
+   cs << out_dir << "/" << program_name;
 
    // Append the output prefix, if defined
    if(conf_info.output_prefix.nonempty())
-      str << "_" << conf_info.output_prefix;
+      cs << "_" << conf_info.output_prefix;
 
-   // Append the timing information
-   str << "_"
-       << sec_to_hhmmss(lead_sec) << "L_"
-       << unix_to_yyyymmdd_hhmmss(valid_ut) << "V";
+   // Append the model, storm ID, and initialization time
+   cs << "_" << conf_info.model
+      << "_" << track.storm_id()
+      << "_" << unix_to_yyyymmddhh(track.init());
 
    // Append the suffix
-   str << suffix;
+   cs << suffix;
 
-   return;
+   return(cs);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -661,17 +665,7 @@ void compute_lat_lon(TcrmwGrid& tcrmw_grid,
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_fields(const TrackInfoArray& tracks) {
-   VarInfo * data_info = (VarInfo *) 0;
-   DataPlane data_dp;
-
-   // Define latitude and longitude arrays
-   int nra = tcrmw_grid.range_n() * tcrmw_grid.azimuth_n();
-   lat_arr = new double[nra];
-   lon_arr = new double[nra];
-
-   // Take only first track
-   TrackInfo track = tracks[0];
+void process_track_points(const TrackInfo& track) {
 
    mlog << Debug(2) << "Processing 1 track consisting of "
         << track.n_points() << " points.\n";
@@ -679,35 +673,60 @@ void process_fields(const TrackInfoArray& tracks) {
    mlog << Debug(3) << track.serialize() << "\n";
 
    // Loop over track points
-   for(int i_point=0; i_point<track.n_points(); i_point++) {
+   for(int i=0; i<track.n_points(); i++) {
 
-      TrackPoint point = track[i_point];
-      unixtime valid_time = point.valid();
-      long valid_yyyymmddhh = unix_to_long_yyyymmddhh(valid_time);
-
-      mlog << Debug(3) << "[" << i_point+1 << " of "
+      mlog << Debug(3) << "[" << i+1 << " of "
            << track.n_points()  << "] Processing track point valid at "
-           << unix_to_yyyymmdd_hhmmss(valid_time)
-           << " with center (lat, lon) = (" << point.lat() << ", "
-           << point.lon() << ").\n";
+           << unix_to_yyyymmdd_hhmmss(track[i].valid())
+           << " with center (lat, lon) = (" << track[i].lat() << ", "
+           << track[i].lon() << ").\n";
+
+      // Process the fields for this track point
+      process_fields(track[i]);
+
+   } // end for i
+
+   // JHG here's where we'd make calls to python scripts to compute diagnostics!
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void process_fields(const TrackPoint& point) {
+/* JHG work here
+   DataPlane data_dp;
+
+   // Loop over the fields to be processed
+   for(int i_var=0; i_var<conf_info.get_n_data(); i_var++) {
+
+      // Update the variable info with the valid time of the track point
+      VarInfo *var_info = conf_info.data_opt[i_var].var_info;
+
+      //
+      //
+   // Define latitude and longitude arrays
+   int nra = tcrmw_grid.range_n() * tcrmw_grid.azimuth_n();
+   lat_arr = new double[nra];
+   lon_arr = new double[nra];
 
       // Set grid center
-      grid_data.lat_center = point.lat();
-      grid_data.lon_center = -1.0*point.lon(); // internal sign change
+      tcrmw_data.lat_center = point.lat();
+      tcrmw_data.lon_center = -1.0*point.lon(); // internal sign change
 
       // RMW is same as mrd()
-      grid_data.range_max_km = conf_info.data_opt[0].rmw_scale * point.mrd() *
-                               tc_km_per_nautical_miles * conf_info.data_opt[0].n_range;
+      tcrmw_data.range_max_km = conf_info.rmw_scale * point.mrd() *
+                                tc_km_per_nautical_miles * conf_info.n_range;
       tcrmw_grid.clear();
-      tcrmw_grid.set_from_data(grid_data);
-      grid.clear();
-      grid.set(grid_data);
+      tcrmw_grid.set_from_data(tcrmw_data);
+      output_grid.clear();
+      output_grid.set(tcrmw_data);
 
       // Compute lat and lon coordinate arrays
       compute_lat_lon(tcrmw_grid, lat_arr, lon_arr);
 
       // Write NetCDF output
-      if(write_nc) {
+      if(nc_out) {
 
          // Write coordinate arrays
          write_tc_data(nc_out, tcrmw_grid, i_point, lat_arr_var, lat_arr);
@@ -720,13 +739,13 @@ void process_fields(const TrackInfoArray& tracks) {
       for(int i_var=0; i_var<conf_info.get_n_data(); i_var++) {
 
          // Update the variable info with the valid time of the track point
-         data_info = conf_info.data_opt[i_var].var_info;
+         var_info = conf_info.data_opt[i_var].var_info;
 
-         data_info->set_valid(valid_time);
+         var_info->set_valid(valid_time);
 
          // Find data for this track point
-         get_series_entry(i_point, data_info, data_files, file_type,
-                          data_dp, latlon_arr);
+         get_series_entry(i_point, var_info, data_files, file_type,
+                          data_dp, input_grid);
 
          // Check data range
          double data_min, data_max;
@@ -735,32 +754,30 @@ void process_fields(const TrackInfoArray& tracks) {
          mlog << Debug(4) << "data_max:" << data_max << "\n";
 
          // Regrid data
-         data_dp = met_regrid(data_dp, latlon_arr, grid, data_info->regrid());
+         data_dp = met_regrid(data_dp, input_grid, output_grid, var_info->regrid());
          data_dp.data_range(data_min, data_max);
          mlog << Debug(4) << "data_min:" << data_min << "\n";
          mlog << Debug(4) << "data_max:" << data_max << "\n";
 
          // Write NetCDF output
-         if(write_nc) {
+         if(nc_out) {
 
-            if(variable_levels[data_info->name_attr()].size() > 1) {
+            if(variable_levels[var_info->name_attr()].size() > 1) {
                write_tc_pressure_level_data(nc_out, tcrmw_grid,
-                  pressure_level_indices, data_info->level_attr(),
-                  i_point, data_3d_vars[data_info->name_attr()], data_dp.data());
+                  pressure_level_indices, var_info->level_attr(),
+                  i_point, data_3d_vars[var_info->name_attr()], data_dp.data());
             }
             else {
                write_tc_data_rev(nc_out, tcrmw_grid, i_point,
-                  data_3d_vars[data_info->name_attr()], data_dp.data());
+                  data_3d_vars[var_info->name_attr()], data_dp.data());
             }
          }
       } // end for i_var
 
-   } // end for i_point
-
    // Clean up
    if(lat_arr) { delete[] lat_arr; lat_arr = (double *) 0; }
    if(lon_arr) { delete[] lon_arr; lon_arr = (double *) 0; }
-
+*/
    return;
 }
 

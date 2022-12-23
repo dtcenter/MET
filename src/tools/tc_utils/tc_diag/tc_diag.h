@@ -39,7 +39,7 @@ using namespace std;
 #include <unistd.h>
 
 #include <netcdf>
-using namespace netCDF;
+using namespace netCDF; // JHG delete this!
 
 #include "tc_diag_conf_info.h"
 
@@ -94,11 +94,8 @@ static ConcatString out_prefix;
 ////////////////////////////////////////////////////////////////////////
 
 // Output NetCDF file
-static bool         write_nc = false;
-static ConcatString out_file;
+static ConcatString nc_out_file;
 static NcFile*      nc_out = (NcFile*) 0;
-static NcDim        range_dim;
-static NcDim        azimuth_dim;
 static NcDim        pressure_dim;
 static NcDim        track_point_dim;
 static NcVar        lat_arr_var;
@@ -130,11 +127,7 @@ static map<string, int> pressure_level_indices;
 //
 ////////////////////////////////////////////////////////////////////////
 
-static DataPlane dp;
-static Grid      latlon_arr;
-static TcrmwData grid_data;
-static TcrmwGrid tcrmw_grid;
-static Grid      grid;
+static Grid input_grid;
 
 // Grid coordinate arrays
 static double *lat_arr = (double *) 0;

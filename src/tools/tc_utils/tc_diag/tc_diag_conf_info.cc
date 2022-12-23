@@ -76,6 +76,9 @@ void TCDiagConfInfo::clear() {
    tangential_velocity_long_field_name.clear();
    radial_velocity_long_field_name.clear();
 
+   tmp_dir.clear();
+   output_prefix.clear();
+
    nc_info.clear();
 
    // Deallocate memory
@@ -107,7 +110,7 @@ void TCDiagConfInfo::read_config(const char *default_file_name,
 ////////////////////////////////////////////////////////////////////////
 
 void TCDiagConfInfo::process_config(GrdFileType file_type) {
-   int i, n_data;
+   int i;
    StringArray sa;
    VarInfoFactory info_factory;
    Dictionary *dict = (Dictionary *) 0;
@@ -158,20 +161,41 @@ void TCDiagConfInfo::process_config(GrdFileType file_type) {
       lead_time.add(timestring_to_sec(sa[i].c_str()));
    }
 
+   // Conf: compute_tangential_and_radial_winds
    compute_tangential_and_radial_winds =
       conf.lookup_bool(conf_key_compute_tangential_and_radial_winds);
+
+// JHG, replace this with is_u_wind/is_v_wind?
+
+   // Conf: u_wind_field_name
    u_wind_field_name =
       conf.lookup_string(conf_key_u_wind_field_name);
+
+   // Conf: v_wind_field_name
    v_wind_field_name =
       conf.lookup_string(conf_key_v_wind_field_name);
+
+   // Conf: tangential_velocity_field_name
    tangential_velocity_field_name =
       conf.lookup_string(conf_key_tangential_velocity_field_name);
+
+   // Conf: radial_velocity_field_name
    radial_velocity_field_name =
       conf.lookup_string(conf_key_radial_velocity_field_name);
+
+   // Conf: tangential_velocity_long_field_name
    tangential_velocity_long_field_name =
       conf.lookup_string(conf_key_tangential_velocity_long_field_name);
+
+   // Conf: radial_velocity_long_field_name
    radial_velocity_long_field_name =
       conf.lookup_string(conf_key_radial_velocity_long_field_name);
+
+   // Conf: tmp_dir
+   tmp_dir = parse_conf_tmp_dir(&conf);
+
+   // Conf: output_prefix
+   output_prefix = conf.lookup_string(conf_key_output_prefix);
 
    // Conf: data.field
    dict = conf.lookup_array(conf_key_data_field);
@@ -203,9 +227,63 @@ void TCDiagConfInfo::process_config(GrdFileType file_type) {
 
       // Update top-level TCDiagNcOutInfo settings
       nc_info += data_opt[i].nc_info;
+
+      // Parse field-specific grid info
+      TCRMWGridInfo gi = parse_grid_info(i_dict);
+
+      // Search for existing grid info
+      int i_match = -1;
+      for(int i_gi=0; i_gi<grid_info_list.size(); i_gi++) {
+         if(grid_info_list[i_gi] == gi) {
+            i_match = i_gi;
+            break;
+         }
+      }
+
+      // Add new grid info, if needed
+      if(i_match < 0) {
+         grid_info_list.push_back(gi);
+         i_match = grid_info_list.size()-1;
+      }
+
+      // Store the grid info pointer
+      data_opt[i].grid_info = &grid_info_list[i_match];
+
+      // Update the write_nc flag, if needed
+      if(data_opt[i].nc_info.do_cyl_latlon ||
+         data_opt[i].nc_info.do_cyl_raw) {
+         data_opt[i].grid_info->write_nc = true;
+      }
+
    }
 
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+TCRMWGridInfo TCDiagConfInfo::parse_grid_info(Dictionary &dict) {
+   TCRMWGridInfo gi;
+
+   // Constant name
+   gi.data.name = "TCRMW";
+
+   // Conf: n_range
+   gi.data.range_n = dict.lookup_int(conf_key_n_range);
+
+   // Conf: azimuth_n
+   gi.data.azimuth_n = dict.lookup_int(conf_key_n_azimuth);
+
+   // Conf: max_range
+   gi.data.range_max_km = dict.lookup_double(conf_key_max_range);
+
+   // Conf: delta_range
+   gi.delta_range_km = dict.lookup_double(conf_key_delta_range);
+
+   // Conf: rmw_scale
+   gi.rmw_scale = dict.lookup_double(conf_key_rmw_scale);
+
+   return(gi);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -243,13 +321,6 @@ void TCDiagDataOpt::init_from_scratch() {
 void TCDiagDataOpt::clear() {
    int i;
 
-   // Initialize values
-   n_range        = bad_data_int;
-   n_azimuth      = bad_data_int;
-   max_range_km   = bad_data_double;
-   delta_range_km = bad_data_double;
-   rmw_scale      = bad_data_double;
-
    nc_info.clear();
 
    // Deallocate memory
@@ -277,21 +348,6 @@ void TCDiagDataOpt::process_config(GrdFileType file_type, Dictionary &dict) {
       var_info->dump(cout);
    }
 
-   // Conf: n_range
-   n_range = dict.lookup_int(conf_key_n_range);
-
-   // Conf: n_azimuth
-   n_azimuth = dict.lookup_int(conf_key_n_azimuth);
-
-   // Conf: max_range
-   max_range_km = dict.lookup_double(conf_key_max_range);
-
-   // Conf: delta_range
-   delta_range_km = dict.lookup_double(conf_key_delta_range);
-
-   // Conf: rmw_scale
-   rmw_scale = dict.lookup_double(conf_key_rmw_scale);
-
    // Conf: nc_pairs_flag
    parse_nc_info(dict);
 
@@ -300,10 +356,10 @@ void TCDiagDataOpt::process_config(GrdFileType file_type, Dictionary &dict) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCDiagDataOpt::parse_nc_info(Dictionary &odict) {
+void TCDiagDataOpt::parse_nc_info(Dictionary &dict) {
    const DictionaryEntry * e = (const DictionaryEntry *) 0;
 
-   e = odict.lookup(conf_key_nc_out_flag);
+   e = dict.lookup(conf_key_nc_out_flag);
 
    if(!e) {
       mlog << Error << "\nTCDiagDataOpt::parse_nc_info() -> "
@@ -412,6 +468,45 @@ void TCDiagNcOutInfo::set_all_true() {
    do_cyl_latlon  = true;
    do_cyl_raw     = true;
    do_diag        = true;
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+//  Code for struct TCRMWGridInfo
+//
+////////////////////////////////////////////////////////////////////////
+
+TCRMWGridInfo::TCRMWGridInfo() {
+   clear();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool TCRMWGridInfo::operator==(const TCRMWGridInfo &t) {
+
+   return(data.range_n ==          t.data.range_n &&
+          data.azimuth_n ==        t.data.azimuth_n &&
+          is_eq(data.range_max_km, t.data.range_max_km) &&
+          is_eq(delta_range_km,    t.delta_range_km) &&
+          is_eq(rmw_scale,         t.rmw_scale));
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TCRMWGridInfo::clear() {
+
+   data.range_n      = bad_data_int;
+   data.azimuth_n    = bad_data_int;
+   data.range_max_km = bad_data_double;
+   data.lat_center   = bad_data_double;
+   data.lon_center   = bad_data_double;
+
+   delta_range_km = bad_data_double;
+   rmw_scale      = bad_data_double;
+
+   write_nc = false;
+
    return;
 }
 
