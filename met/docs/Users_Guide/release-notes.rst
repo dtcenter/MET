@@ -114,6 +114,6 @@ Version 9.1 release notes (20200810)
       - Fix TC-Gen BEST track genesis event definition (`#1447 <http://github.com/dtcenter/MET/issues/1447>`_).
       - Fix TC-Gen to correctly apply the genesis event definition criteria from the configuration file to BEST and operational tracks (`#1427 <http://github.com/dtcenter/MET/issues/1427>`_).
       - Add TC-Gen warning for duplicate genesis events (`#1380 <http://github.com/dtcenter/MET/issues/1380>`_).
-      - Enhance TC-Gen to support file lists for teh -genesis and -track command line options (`#1442 <http://github.com/dtcenter/MET/issues/1442>`_).
+      - Enhance TC-Gen to support file lists for the -genesis and -track command line options (`#1442 <http://github.com/dtcenter/MET/issues/1442>`_).
    - TC-RMW
       - Add many TC-RMW track filtering configuration options (`#1315 <http://github.com/dtcenter/MET/issues/1315>`_).
