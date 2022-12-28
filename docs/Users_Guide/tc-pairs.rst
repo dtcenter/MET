@@ -14,10 +14,39 @@ Scientific and statistical aspects
 
 .. _TC-Pairs_Diagnostics:
 
-Storm Diagnostics
+TC Diagnostics
 -----------------
 
-TODO: Add a paragraph about storm diagnostics, describing what they are, why they are important, and how they can be generated.
+TC diagnostics provide information about a TC's structure or its environment. Each TC diagnostic is a single-valued measure that corresponds to some aspect of the storm itself or the surrounding large-scale environment. TC diagnostics can be derived from observational analyses, model fields, or even satellite observations. Examples include:
+
+  * Inner core diagnostics provide information about the structure of the storm near the storm center. Examples include the intensity of the storm and the radius of maximum winds.
+
+  * Large scale diagnostics provide information about quantities that characterize its environment. Examples include environmental vertical wind shear, total precipitable water, the average relative humidity, measures of convective instability, and the upper bound of intensity that a storm may be expected to achieve in its current environment. These diagnostics are typically derived from model fields as an average of the quantity of interest over either a circular area or an annulus centered on the storm center. Often, the storm center is taken to be the underlying model's storm center. In other cases, the diagnostics may be computed along some other specified track.
+
+  * Ocean-based diagnostics provide information about the sea's thermal characteristics in the vicinity of the storm center. Examples include the sea surface temperature, ocean heat content, and the depth of warm water of a given temperature.
+
+  * Satellite-based diagnostics provide information about the storm structure as observed by geostationary satellite infrared imagery. Examples include information about the shape and extent of the cold-cirrus canopy of the TC and whether patterns are present that may portend intensification.
+
+Diagnostics are critically important for training and running statistical-dynamical models that predict a TC's intensity or size. One of the most well-known diagnostics sets is that of the Statistical Hurricane Intensity Prediction Scheme (SHIPS), which supports predictions of TC intensity. A large 30-year development dataset of TC diagnostics has been retrospectively derived to support the training of the SHIPS intensity model as well as other related models such as the Logistic Growth Equation Model (LGEM), SHIPS Rapid Intensification Index (SHIPS-RII), and others. These diagnostics, called *lsdiag* for "large scale" environment, are computed using a *perfect prog* approach in which the diagnostics are computed on the reference model's verifying analyses to generate a set of time-dependent diagnostics from t=0 out to the desired maximum forecast lead time. This is repeated for each initialization, building up a full history of diagnostics for each storm. By using the subsequent verifying analysis for later lead times, the model is taken to be "perfect", removing the impact of model forecast errors. The resulting developmental dataset is ideal for training statistical-dynamical models such as SHIPS. To generate forecasts in real-time, the diagnostics are computed along a forecast track (often taken to be the National Hurricane Center's official forecast) using the fields of the underlying NWP model (e.g, the Global Forecast System, or GFS model). The resulting diagnostics are then used as *predictors* in models like SHIPS and LGEM to predict a TC's future intensity or probability of undergoing rapid intensification.
+
+Beside their use in TC prediction, TC diagnostics can be very useful to forecasters to understand the forecast scenario. They are also useful to model developers for evaluation of model errors and understanding model performance under different environmental conditions. For instance, a modeler may wish to understand their model's track biases under conditions of high vertical wind shear. TC diagnostics can also be used to understand the sensitivity of the model's intensity predictions to oceanic conditions such as upwelling. The TC-Pairs tool allows filtering and subsetting based on the values of one or several TC diagnostics.
+
+As of MET v11.0.0, two types of TC diagnostics are supported in TC-Pairs:
+
+  .. SHIPS_DIAG_DEV: Includes a plethora of inner core, environmental, oceanic, and satellite-based diagnostics. These diagnostics are computed using the *perfect prog* approach.
+
+  * SHIPS_DIAG_RT: Real-time SHIPS diagnostics computed from a NWP model such as the Global Forecast System (GFS) model along a GFS forecast track defined by a SHIPS-specific tracker. Note that these SHIPS-derived forecast tracks do not appear in the NHC adeck data.
+
+  * CIRA_DIAG_RT: Real-time model-based diagnostics computed along the model's predicted track.
+
+Diagnostics from the SHIPS Development Datasets (SHIPS_DIAG_DEV) will be supported in a future release of MET.
+
+A future version of MET will also allow the CIRA model diagnostics to be computed directly from model forecast fields. Until then, users may obtain the SHIPS diagnostics at the following locations:
+
+  * SHIPS_DIAG_DEV: https://rammb2.cira.colostate.edu/research/tropical-cyclones/ships/#DevelopmentalData
+
+  * SHIPS_DIAG_RT: https://ftp.nhc.noaa.gov/atcf/lsdiag/
+
 
 .. _TC-Pairs_Practical-information:
 
@@ -58,7 +87,7 @@ Required arguments for tc_pairs
 Optional arguments for tc_pairs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-5. The **-diag source path** argument indicates the TC-Pairs acceptable format data containing the tropical cyclone diagnostics dataset corresponding to the adeck tracks. The **source** can be set to TCDIAG, LSDIAG_RT, or LSDIAG_DEV to indicate the input diagnostics data source. The **path** argument specifies the name of a TC-Pairs acceptable format file or top-level directory containing TC-Pairs acceptable format files ending in ".dat" to be processed.
+5. The **-diag source path** argument indicates the TC-Pairs acceptable format data containing the tropical cyclone diagnostics dataset corresponding to the adeck tracks. The **source** can be set to CIRA_DIAG_RT or SHIPS_DIAG_RT to indicate the input diagnostics data source. The **path** argument specifies the name of a TC-Pairs acceptable format file or top-level directory containing TC-Pairs acceptable format files ending in ".dat" to be processed. Support for additional diagnostic sources will be added in future releases.
 
 6. The -**out base** argument indicates the path of the output file base. This argument overrides the default output file base (**./out_tcmpr**).
 
@@ -69,8 +98,6 @@ Optional arguments for tc_pairs
 This tool currently only supports the rapid intensification (**RI**) edeck probability type but support for additional edeck probability types will be added in future releases.
 
 At least one **-adeck** or **-edeck** option must be specified. The **-adeck, -edeck**, and **-bdeck** options may optionally be followed with **suffix=string** to append that string to all model names found within that data source. This option may be useful when processing track data from two different sources which reuse the same model names.
-
-The **-diag** option may optionally be followed with **model=string** to override the model name of the tracks to which those diagnostics correspond. The **string** specifies a comma-separated list of one or more ATCF ID's to which these diagnostics should be paired (e.g. **model=OFCL,SHIP**).
 
 An example of the tc_pairs calling sequence is shown below:
 
@@ -122,9 +149,9 @@ ____________________
   valid_inc    = [];
   valid_exc    = [];
   init_hour    = [];
-  init_mask    = [];
+  init_mask    = "";
+  valid_mask   = "";
   lead_req     = [];
-  valid_mask   = [];
   match_points = TRUE;
   version      = "VN.N";
 
@@ -175,7 +202,7 @@ ____________________
      }
   ];
 
-The **consensus** field allows the user to generate a user-defined consensus forecasts from any number of models. All models used in the consensus forecast need to be included in the **model** field (first entry in **TCPairsConfig_default**). The name field is the desired consensus model name. The **members** field is a comma-separated list of model IDs that make up the members of the consensus. The **required** field is a comma-separated list of true/false values associated with each consensus member. If a member is designated as true, the member is required to be present in order for the consensus to be generated. If a member is false, the consensus will be generated regardless of whether the member is present. The length of the required array must be the same length as the members array. The **min_req** field is the number of members required in order for the consensus to be computed. The required and min_req field options are applied at each forecast lead time. If any member of the consensus has a non-valid position or intensity value, the consensus for that valid time will not be generated. If a consensus model is indicated in the configuration file there will be non-missing output for the consensus track variables in the output file (NUM_MEMBERS, TRACK_SPREAD, DIST_MEAN, MSLP_SPREAD, MAX_WIND_SPREAD). See the TCMPR line type definitions below.
+The **consensus** field allows the user to generate a user-defined consensus forecasts from any number of models. All models used in the consensus forecast need to be included in the **model** field (first entry in **TCPairsConfig_default**). The name field is the desired consensus model name. The **members** field is a comma-separated list of model IDs that make up the members of the consensus. The **required** field is a comma-separated list of true/false values associated with each consensus member. If a member is designated as true, the member is required to be present in order for the consensus to be generated. If a member is false, the consensus will be generated regardless of whether the member is present. The length of the required array must be the same length as the members array. The **min_req** field is the number of members required in order for the consensus to be computed. The required and min_req field options are applied at each forecast lead time. If any member of the consensus has a non-valid position or intensity value, the consensus for that valid time will not be generated. If a consensus model is indicated in the configuration file there will be non-missing output for the consensus track variables in the output file (NUM_MEMBERS, TRACK_SPREAD, TRACK_STDEV, MSLP_STDEV, MAX_WIND_STDEV). See the TCMPR line type definitions below.
 
 ____________________
 
@@ -258,52 +285,75 @@ ____________________
 
 .. code-block:: none
 
- diag_name = [];
+ diag_info_map = [
+    {
+       diag_source    = "CIRA_DIAG_RT";
+       track_source   = "GFS";
+       field_source   = "GFS_0p50";
+       match_to_track = [ "GFS" ];
+       diag_name      = [];
+    },
+    {
+       diag_source    = "SHIPS_DIAG_RT";
+       track_source   = "SHIPS_TRK";
+       field_source   = "GFS_0p50";
+       match_to_track = [ "OFCL" ];
+       diag_name      = [];
+    }
+ ];
 
-The **diag_name** entry specifies a comma-separated list of strings for the tropical cyclone diagnostics of interest. This applies when the **-tcdiag** and/or **-lsdiag** command line options have been used to provide storm diagnostics data. If a non-zero list of diagnostic names is specified, only those diagnostics appearing in the list are written to the TCDIAG output line type. If defined as an empty list (default), all diagnostics found in the input are written to the TCDIAG output lines.
+A TCMPR line is written to the output for each track point. If diagnostics data is also defined for that track point, a TCDIAG line is written immediately after the corresponding TCMPR line. The contents of that TCDIAG line is determined by the **diag_info_map** entry.
 
-A TCMPR line is written to the output for each track point. If diagnostics data is also defined for that track point, a TCDIAG line is written immediately after the corresponding TCMPR line. The contents of that TCDIAG line is determined by diagnostic names requested in the **diag_name** entry.
+The **diag_info_map** entries define how the diagnostics read with the **-diag** command line option should be used. Each array element is a dictionary consisting of entries for **diag_source**, **track_source**, **field_source**, **match_to_track**, and **diag_name**.
+
+The **diag_source** entry is one of the supported diagnostics data sources. The **track_source** entry is a string defining the ATCF ID of the track data used to define the locations at which diagnostics are computed. This string is written to the **TRACK_SOURCE** column of the TCDIAG output line. The **field_source** entry is a string describing the gridded model data from which the diagnostics are computed. This string is written to the **FIELD_SOURCE** column of the TCDIAG output line type. The **match_to_track** entry specifies a comma-separated list of strings defining the ATCF ID(s) of the tracks to which these diagnostic values should be matched. The **diag_name** entry specifies a comma-separated list of strings for the tropical cyclone diagnostics of interest. If a non-zero list of diagnostic names is specified, only those diagnostics appearing in the list are written to the TCDIAG output line type. If defined as an empty list (default), all diagnostics found in the input are written to the TCDIAG output lines.
 
 ____________________
 
 .. code-block:: none
 
-  diag_convert_map = [
-     { source = "TCDIAG";
-       key = [ "(10C)", "(10KT)", "(10M/S)" ];
-       convert(x) = x / 10; },
+ diag_convert_map = [
+    {
+       diag_source = "CIRA_DIAG";
+       key         = [ "(10C)", "(10KT)", "(10M/S)" ];
+       convert(x)  = x / 10;
+    },
+    {
+       diag_source = "SHIPS_DIAG";
+       key         = [ "LAT",  "LON",  "CSST", "RSST", "DSST", "DSTA", "XDST", "XNST", "NSST", "NSTA",
+                       "NTMX", "NTFR", "U200", "U20C", "V20C", "E000", "EPOS", "ENEG", "EPSS", "ENSS",
+                       "T000", "TLAT", "TLON", "TWAC", "TWXC", "G150", "G200", "G250", "V000", "V850",
+                       "V500", "V300", "SHDC", "SHGC", "T150", "T200", "T250", "SHRD", "SHRS", "SHRG",
+                       "HE07", "HE05", "PW01", "PW02", "PW03", "PW04", "PW05", "PW06", "PW07", "PW08",
+                       "PW09", "PW10", "PW11", "PW12", "PW13", "PW14", "PW15", "PW16", "PW17", "PW18",
+                       "PW20", "PW21" ];
+       convert(x)  = x / 10;
+    },
+    {
+       diag_source = "SHIPS_DIAG";
+       key         = [ "VVAV", "VMFX", "VVAC" ];
+       convert(x)  = x / 100;
+    },
+    {
+        diag_source = "SHIPS_DIAG";
+        key         = [ "TADV" ];
+        convert(x)  = x / 1000000;
+    },
+    {
+       diag_source = "SHIPS_DIAG";
+       key         = [ "Z850", "D200", "TGRD", "DIVC" ];
+       convert(x)  = x / 10000000;
+    },
+    {
+       diag_source = "SHIPS_DIAG";
+       key         = [ "PENC", "PENV" ];
+       convert(x)  = x / 10 + 1000;
+    }
+ ];
 
-     { source = "LSDIAG_RT";
-       key = [ "LAT",  "LON",  "CSST", "RSST", "DSST", "DSTA", "XDST", "XNST", "NSST", "NSTA",
-               "NTMX", "NTFR", "U200", "U20C", "V20C", "E000", "EPOS", "ENEG", "EPSS", "ENSS",
-               "T000", "TLAT", "TLON", "TWAC", "TWXC", "G150", "G200", "G250", "V000", "V850",
-               "V500", "V300", "SHDC", "SHGC", "T150", "T200", "T250", "SHRD", "SHRS", "SHRG",
-               "HE07", "HE05", "PW01", "PW02", "PW03", "PW04", "PW05", "PW06", "PW07", "PW08",
-               "PW09", "PW10", "PW11", "PW12", "PW13", "PW14", "PW15", "PW16", "PW17", "PW18",
-               "PW20", "PW21" ];
-       convert(x) = x / 10; },
+The **diag_convert_map** entries define conversion functions to be applied to diagnostics data read with the **-diag** command line option. Each array element is a dictionary consisting of a **diag_source**, **key**, and **convert(x)** entry.
 
-     { source = "LSDIAG_RT";
-       key = [ "VVAV", "VMFX", "VVAC" ];
-       convert(x) = x / 100; },
-
-     { source = "LSDIAG_RT";
-       key = [ "TADV" ];
-       convert(x) = x / 1000000; },
-
-     { source = "LSDIAG_RT";
-       key = [ "Z850", "D200", "TGRD", "DIVC" ];
-       convert(x) = x / 10000000; },
-
-     { source = "LSDIAG_RT";
-       key = [ "PENC", "PENV" ];
-       convert(x) = x / 10 + 1000; }
-
-  ];
-
-The **diag_convert_map** entries define conversion functions to be applied to diagnostics data read with the **-diag** command line option. Each array element is a dictionary consisting of a **source**, **key**, and **convert(x)** entry.
-
-The **source** is one of the supported diagnostics data sources. The **key** is an array of strings. The strings can specify diagnostic names or units, although units are only checked for **TCDIAG** sources. If both the name and units are specified, the conversion function for the name takes precedence. **convert(x)** is a function of one variable which defines how the diagnostic data should be converted. The defined function is applied to any diagnostic value whose name or units appears in the **key**.
+The **diag_source** entry is one of the supported diagnostics data sources. Partial string matching logic is applied, so **SHIPS_DIAG** entries are matched to both **SHIPS_DIAG_RT** and **SHIPS_DIAG_DEV** diagnostic sources. The **key** entry is an array of strings. The strings can specify diagnostic names or units, although units are only checked for **CIRA_DIAG** sources. If both the name and units are specified, the conversion function for the name takes precedence. The **convert(x)** entry is a function of one variable which defines how the diagnostic data should be converted. The defined function is applied to any diagnostic value whose name or units appears in the **key**.
 
 ____________________
 
@@ -549,15 +599,15 @@ TC-Pairs produces output in TCST format. The default output file name can be ove
     - consensus variable: number of models (or ensemble members) that were used to build the consensus track
   * - 81
     - TRACK_SPREAD
-    - consensus variable: the standard deviation of the distances from the member locations to the consensus track location (nm)
-  * - 82
-    - DIST_MEAN
     - consensus variable: the mean of the distances from the member location to the consensus track location (nm)
+  * - 82
+    - TRACK_STDEV
+    - consensus variable: the standard deviation of the distances from the member locations to the consensus track location (nm)
   * - 83
-    - MSLP_SPREAD
+    - MSLP_STDEV
     - consensus variable: the standard deviation of the member's mean sea level pressure values 
   * - 84
-    - MAX_WIND_SPREAD
+    - MAX_WIND_STDEV
     - consensus variable: the standard deviation of the member's maximum wind speed values 
 
 .. _TCDIAG Line Type:
@@ -582,15 +632,21 @@ TC-Pairs produces output in TCST format. The default output file name can be ove
     - INDEX
     - Index of the current track pair
   * - 16
-    - SOURCE
-    - Diagnostics data source
+    - DIAG_SOURCE
+    - Diagnostics data source indicated by the `-diag` command line option
   * - 17
+    - TRACK_SOURCE
+    - ATCF ID of the track data used to define the diagnostics
+  * - 18
+    - FIELD_SOURCE
+    - Description of gridded field data source used to define the diagnostics
+  * - 19
     - N_DIAG
     - Number of storm diagnostic name and value columns to follow
-  * - 18
+  * - 20
     - DIAG_i
     - Name of the of the ith storm diagnostic (repeated)
-  * - 19
+  * - 21
     - VALUE_i
     - Value of the ith storm diagnostic (repeated)
 

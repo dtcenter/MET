@@ -27,19 +27,17 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
-static const char default_lsdiag_technique[] = "OFCL";
-
-static const int lsdiag_wdth[] = {
+static const int ships_wdth[] = {
    5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
    5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
    5, 5, 5, 5
 };
-static int n_lsdiag_wdth = sizeof(lsdiag_wdth)/sizeof(*lsdiag_wdth);
+static int n_ships_wdth = sizeof(ships_wdth)/sizeof(*ships_wdth);
 
-static const int tcdiag_fill_value = 9999;
-static const int lsdiag_fill_value = 9999;
+static const int cira_fill_value  = 9999;
+static const int ships_fill_value = 9999;
 
-static const char lsdiag_skip_str[] = "TIME,DELV,MTPW,IR00,IRM1,IRM3,PC00,PCM1,PCM3,PSLV,IRXX";
+static const char ships_skip_str[] = "TIME,DELV,MTPW,IR00,IRM1,IRM3,PC00,PCM1,PCM3,PSLV,IRXX";
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -167,7 +165,9 @@ void DiagFile::init_from_scratch() {
 void DiagFile::clear() {
 
    // Initialize values
-   SourceType = DiagType_None;
+   DiagSource = DiagType_None;
+   TrackSource.clear();
+   FieldSource.clear();
    StormId.clear();
    Basin.clear();
    Cyclone.clear();
@@ -209,30 +209,38 @@ void DiagFile::add_technique(const string &str) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void DiagFile::read(const DiagType source,
-                    const ConcatString &path, const StringArray &model_names,
-                          const std::map<ConcatString,UserFunc_1Arg> *convert_map) {
+void DiagFile::read(const ConcatString &path, const ConcatString &diag_source,
+                    const ConcatString &track_source, const ConcatString &field_source,
+                    const StringArray &match_to_track,
+                    const std::map<ConcatString,UserFunc_1Arg> *convert_map) {
 
-   // Read diagnostics baesd on the source type
-   if(source == TCDiagType) {
-      read_tcdiag(path, model_names, convert_map);
+   DiagType type = string_to_diagtype(diag_source.c_str());
+
+   // Read diagnostics based on the source type
+   if(type == DiagType_CIRA_RT) {
+      read_cira_rt(path, convert_map);
    }
-   else if(source == LSDiagRTType) {
-      read_lsdiag_rt(path, model_names, convert_map);
+   else if(type == DiagType_SHIPS_RT) {
+      read_ships_rt(path, convert_map);
    }
    else {
       mlog << Error << "\nDiagFile::read() -> "
-           << "diagnostics of type " << diagtype_to_string(source)
-           << " are not currently supported!\n\n";
+           << "diagnostics of type \"" << diag_source
+           << "\" are not currently supported!\n\n";
       exit(1);
    }
+
+   // Store the metadata
+   TrackSource = track_source;
+   FieldSource = field_source;
+   set_technique(match_to_track);
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void DiagFile::read_tcdiag(const ConcatString &path, const StringArray &model_names,
+void DiagFile::read_cira_rt(const ConcatString &path,
                            const map<ConcatString,UserFunc_1Arg> *convert_map) {
    int i;
    double v_in, v_out;
@@ -243,10 +251,7 @@ void DiagFile::read_tcdiag(const ConcatString &path, const StringArray &model_na
    clear();
 
    // Store the file type
-   SourceType = TCDiagType;
-
-   // Store user-specified model names or read it from the file below
-   if(model_names.n() > 0) set_technique(model_names);
+   DiagSource = DiagType_CIRA_RT;
 
    // Open the file
    open(path.c_str());
@@ -306,7 +311,7 @@ void DiagFile::read_tcdiag(const ConcatString &path, const StringArray &model_na
 
    // Check for the expected number of items
    if(NTime != LeadTime.n() || NTime != Lat.n() || NTime != Lon.n()) {
-      mlog << Error << "\nDiagFile::read_tcdiag() -> "
+      mlog << Error << "\nDiagFile::read_cira_rt() -> "
            << "the NTIME value (" << NTime
            << ") does not match the actual number of times ("
            << LeadTime.n() << "), latitudes (" << Lat.n()
@@ -350,7 +355,7 @@ void DiagFile::read_tcdiag(const ConcatString &path, const StringArray &model_na
          v_in = atof(dl[i]);
 
          // Check for bad data and apply conversions
-         if(atoi(dl[i]) == tcdiag_fill_value) v_out = bad_data_double;
+         if(atoi(dl[i]) == cira_fill_value) v_out = bad_data_double;
          else if(fx_ptr)                      v_out = (*fx_ptr)(v_in);
          else                                 v_out = v_in;
 
@@ -360,7 +365,7 @@ void DiagFile::read_tcdiag(const ConcatString &path, const StringArray &model_na
 
       // Check for the expected number of items
       if(NTime != data.n()) {
-         mlog << Error << "\nDiagFile::read_tcdiag() -> "
+         mlog << Error << "\nDiagFile::read_cira_rt() -> "
               << "the number of \"" << cs << "\" diagnostic values ("
               << data.n() << ") does not match the expected number ("
               << NTime << "): " << path << "\n\n";
@@ -385,8 +390,8 @@ void DiagFile::read_tcdiag(const ConcatString &path, const StringArray &model_na
 
 ////////////////////////////////////////////////////////////////////////
 
-void DiagFile::read_lsdiag_rt(const ConcatString &path, const StringArray &model_names,
-                              const map<ConcatString,UserFunc_1Arg> *convert_map) {
+void DiagFile::read_ships_rt(const ConcatString &path,
+                             const map<ConcatString,UserFunc_1Arg> *convert_map) {
    int i, v_int;
    double v_dbl;
    NumArray data;
@@ -396,18 +401,14 @@ void DiagFile::read_lsdiag_rt(const ConcatString &path, const StringArray &model
    clear();
 
    // Store the file type
-   SourceType = LSDiagRTType;
-
-   // Store user-specified model names or the default one
-   if(model_names.n() > 0) set_technique(model_names);
-   else                    add_technique(default_lsdiag_technique);
+   DiagSource = DiagType_SHIPS_RT;
 
    // Open the file
    open(path.c_str());
 
    // Diagnostic names to ignore
    StringArray skip_diag_sa;
-   skip_diag_sa.parse_css(lsdiag_skip_str);
+   skip_diag_sa.parse_css(ships_skip_str);
 
    // Parse the header information from the first line
    DataLine dl;
@@ -416,7 +417,7 @@ void DiagFile::read_lsdiag_rt(const ConcatString &path, const StringArray &model
 
    // Check for the expected number of items
    if(dl.n_items() != 9 || strncasecmp(dl[8], "HEAD", strlen("HEAD") != 0)) {
-      mlog << Error << "\nDiagFile::read_lsdiag_rt() -> "
+      mlog << Error << "\nDiagFile::read_ships_rt() -> "
            << "unexpected header line: " << path << "\n\n";
       exit(1);
    }
@@ -438,7 +439,7 @@ void DiagFile::read_lsdiag_rt(const ConcatString &path, const StringArray &model
    int data_start_location = in->tellg();
 
    // Parse time and location info
-   while(read_fwf_line(dl, lsdiag_wdth, n_lsdiag_wdth)) {
+   while(read_fwf_line(dl, ships_wdth, n_ships_wdth)) {
 
       // Fixed width column 24 has the data name
       cs = dl[23];
@@ -473,7 +474,7 @@ void DiagFile::read_lsdiag_rt(const ConcatString &path, const StringArray &model
    in->seekg(data_start_location);
 
    // Store the diagnostics data
-   while(read_fwf_line(dl, lsdiag_wdth, n_lsdiag_wdth)) {
+   while(read_fwf_line(dl, ships_wdth, n_ships_wdth)) {
 
       // Skip empty lines
       if(dl.n_items() == 0) continue;
@@ -506,7 +507,7 @@ void DiagFile::read_lsdiag_rt(const ConcatString &path, const StringArray &model
          v_int = atoi(dl[i]);
 
          // Check for bad data and apply conversions
-         if(v_int == lsdiag_fill_value) v_dbl = bad_data_double;
+         if(v_int == ships_fill_value) v_dbl = bad_data_double;
          else if(fx_ptr)                v_dbl = (*fx_ptr)(v_int);
          else                           v_dbl = (double) v_int;
 
@@ -516,7 +517,7 @@ void DiagFile::read_lsdiag_rt(const ConcatString &path, const StringArray &model
 
       // Check for the expected number of items
       if(NTime != data.n()) {
-         mlog << Error << "\nDiagFile::read_lsdiag_rt() -> "
+         mlog << Error << "\nDiagFile::read_ships_rt() -> "
               << "the number of \"" << cs << "\" diagnostic values ("
               << data.n() << ") does not match the expected number ("
               << NTime << ")!\n\n";

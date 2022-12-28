@@ -92,6 +92,8 @@ void TrackInfo::clear() {
    MinWarmCore     = (unixtime) 0;
    MaxWarmCore     = (unixtime) 0;
    DiagSource      = DiagType_None;
+   TrackSource.clear();
+   FieldSource.clear();
    DiagName.clear();
    TrackLines.clear();
 
@@ -133,6 +135,8 @@ void TrackInfo::dump(ostream &out, int indent_depth) const {
    out << prefix << "MinWarmCore     = \"" << (MinWarmCore  > 0 ? unix_to_yyyymmdd_hhmmss(MinWarmCore).text()  : na_str) << "\n";
    out << prefix << "MaxWarmCore     = \"" << (MaxWarmCore  > 0 ? unix_to_yyyymmdd_hhmmss(MaxWarmCore).text()  : na_str) << "\n";
    out << prefix << "DiagSource      = " << diagtype_to_string(DiagSource) << "\n";
+   out << prefix << "TrackSource     = " << TrackSource.contents() << "\n";
+   out << prefix << "FieldSource     = " << FieldSource.contents() << "\n";
    out << prefix << "NDiag           = " << DiagName.n() << "\n";
    out << prefix << "NPoints         = " << NPoints << "\n";
    out << prefix << "NAlloc          = " << NAlloc << "\n";
@@ -172,6 +176,8 @@ ConcatString TrackInfo::serialize() const {
      << ", MinWarmCore = " << (MinWarmCore > 0 ? unix_to_yyyymmdd_hhmmss(MinWarmCore).text() : na_str)
      << ", MaxWarmCore = " << (MaxWarmCore > 0 ? unix_to_yyyymmdd_hhmmss(MaxWarmCore).text() : na_str)
      << ", DiagSource = " << diagtype_to_string(DiagSource)
+     << ", TrackSource = " << TrackSource.contents()
+     << ", FieldSource = " << FieldSource.contents()
      << ", NDiag = " << DiagName.n()
      << ", NPoints = " << NPoints
      << ", NAlloc = " << NAlloc
@@ -223,6 +229,8 @@ void TrackInfo::assign(const TrackInfo &t) {
    MinWarmCore     = t.MinWarmCore;
    MaxWarmCore     = t.MaxWarmCore;
    DiagSource      = t.DiagSource;
+   TrackSource     = t.TrackSource;
+   FieldSource     = t.FieldSource;
    DiagName        = t.DiagName;
    TrackLines      = t.TrackLines;
 
@@ -534,8 +542,10 @@ bool TrackInfo::add_diag_data(DiagFile &diag_file, const StringArray &req_diag_n
       InitTime != diag_file.init()     ||
       !diag_file.technique().has(Technique)) return(false);
 
-   // Store the diagnostic source
-   DiagSource = diag_file.source();
+   // Store the diagnostic metadata
+   DiagSource  = diag_file.diag_source();
+   TrackSource = diag_file.track_source();
+   FieldSource = diag_file.field_source();
 
    // If empty, store all diagnostics
    bool store_all_diag = (req_diag_name.n() == 0 ? true : false);
@@ -563,12 +573,21 @@ bool TrackInfo::add_diag_data(DiagFile &diag_file, const StringArray &req_diag_n
          if(i_name == 0) {
             if(!is_eq(diag_file.lat(i_time), Point[i_pnt].lat()) ||
                !is_eq(diag_file.lon(i_time), Point[i_pnt].lon())) {
-               mlog << Warning << "\nTrackInfo::add_diag_data() -> "
-                    << "the " << StormId << " " << Technique << " " << unix_to_yyyymmddhh(InitTime)
+               ConcatString cs;
+               cs << "The " << StormId << " " << Technique << " " << unix_to_yyyymmddhh(InitTime)
                     << " lead time " << sec_to_timestring(diag_file.lead(i_time))
                     << " track location (" << Point[i_pnt].lat() << ", "
-                    << Point[i_pnt].lon() << ") does not match the diagnostic location ("
-                    << diag_file.lat(i_time) << ", " << diag_file.lon(i_time) << ")\n";
+                    << Point[i_pnt].lon() << ") does not match the "
+                    << diagtype_to_string(DiagSource) << " diagnostic location ("
+                    << diag_file.lat(i_time) << ", " << diag_file.lon(i_time) << ")";
+
+               // Print a warning if the TrackSource and Technique match
+               if(TrackSource == Technique) {
+                  mlog << Warning << "\nTrackInfo::add_diag_data() -> " << cs << "\n\n";
+               }
+               else {
+                  mlog << Debug(4) << cs << "\n";
+               }
             }
          }
 
@@ -957,7 +976,7 @@ TrackInfo consensus(const TrackInfoArray &tracks,
    QuadInfo   wavg;
    NumArray   plon, plat, pvmax, pmslp;
    double     lon_range, lon_shift, lon_avg;
-   double     track_spread, vmax_stdev, mslp_stdev;
+   double     track_spread, track_stdev, vmax_stdev, mslp_stdev;
    
    // Check for at least one track
    if(tracks.n() == 0) {
@@ -1082,18 +1101,15 @@ TrackInfo consensus(const TrackInfoArray &tracks,
       // Save the number of members that went into the consensus
       if(pcnt > 0) pavg.set_num_members(pcnt);
       
-      // Compute track spread and distance mean, convert to nautical-miles
-      double track_spread, dist_mean;
-      compute_gc_dist_stdev(pavg.lat(), pavg.lon(), plat, plon, track_spread, dist_mean);
+      // Compute track mean and standard deviation, convert to nautical-miles
+      compute_gc_dist_stdev(pavg.lat(), pavg.lon(), plat, plon, track_spread, track_stdev);
 
       if(!is_bad_data(track_spread)) {
-         track_spread *= tc_nautical_miles_per_km;
-         pavg.set_spread(track_spread);
+         pavg.set_track_spread(track_spread*tc_nautical_miles_per_km);
       }
 
-      if(!is_bad_data(dist_mean)) {
-         dist_mean *= tc_nautical_miles_per_km;
-         pavg.set_dist_mean(dist_mean);
+      if(!is_bad_data(track_stdev)) {
+         pavg.set_track_stdev(track_stdev*tc_nautical_miles_per_km);
       }
       
       // Compute wind-speed (v_max) and pressure (mslp) standard deviation
@@ -1132,28 +1148,20 @@ TrackInfo consensus(const TrackInfoArray &tracks,
 
 ////////////////////////////////////////////////////////////////////////
 
-void compute_gc_dist_stdev(const double lat, const double lon, const NumArray &lats, const NumArray &lons, double &spread, double &mean) {
-
-   int i, count;
+void compute_gc_dist_stdev(const double lat, const double lon,
+                           const NumArray &lats, const NumArray &lons,
+                           double &mean, double &stdev) {
    NumArray dist_na;
    
    // Loop over member lat/lon track values, calculate great-circle distance between memmber values and consensus track
-   for(i=0, count=0; i<lats.n_elements(); i++) {
-      if( is_bad_data(lats[i]) || is_bad_data(lons[i]) || is_bad_data(lat) || is_bad_data(lon) ) continue;
+   for(int i=0; i<lats.n(); i++) {
+      if(is_bad_data(lat)     || is_bad_data(lon) ||
+         is_bad_data(lats[i]) || is_bad_data(lons[i])) continue;
       dist_na.add(gc_dist(lats[i], lons[i], lat, lon));
-      count++;
    }
    
-   // Compute spread (standard-deviation of the distances)
-   // and the mean of the distnaces
-   if(count == 0) {
-      spread = bad_data_double;
-      mean = bad_data_double;
-   }
-   else {
-      spread = dist_na.stdev();
-      mean = dist_na.mean();
-   }
+   // Compute the mean and standard deviation of the distances
+   dist_na.compute_mean_stdev(mean, stdev);
    
    return;
 }

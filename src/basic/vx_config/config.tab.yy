@@ -53,16 +53,13 @@ extern void           yyerror(const char *);
 extern "C" int        configwrap();
 
 
-
-
    //
    //  definitions that have external linkage
    //
 
-char *         configtext;
+char *            configtext;
 
-FILE *         configin;
-
+FILE *            configin;
 
 int               LineNumber            = 1;
 
@@ -111,7 +108,6 @@ static ConcatString function_name;
 
 static const char apm = 'b';   //  assign_prefix mark
 static const char fcm = 'f';   //  function def mark
-
 
 
 ////////////////////////////////////////////////////////////////////////

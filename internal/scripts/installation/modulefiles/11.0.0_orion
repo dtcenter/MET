@@ -8,7 +8,6 @@ proc ModulesHelp { } {
 }
 
 prereq intel/2020.2
-prereq intelpython3/2020.2
 
 set base /apps/contrib/MET
 set ver 11.0.0
@@ -16,7 +15,7 @@ set share $base/$ver/share/met
 set lib_base $base/11.0.0
 setenv MET_ROOT $base/$ver/MET-11.0.0
 
-prepend-path PATH $base/$ver/bin:$lib_base/external_libs/bin
+prepend-path PATH $base/$ver/bin:$lib_base/external_libs/bin:/work/noaa/ovp/miniconda/miniconda3/envs/metplus_v5.0_py3.8/bin
 
 #export CC=icc
 #export CXX=icc
@@ -38,9 +37,9 @@ prepend-path PATH $base/$ver/bin:$lib_base/external_libs/bin
 #export MET_HDFLIB=$libdir
 #export MET_HDFEOSINC=$incdir
 #export MET_HDFEOSLIB=$libdir
-#export MET_PYTHON=/apps/intel-2020/intel-2020/intelpython3/
-#export MET_PYTHON_CC=-I/apps/intel-2020/intel-2020/intelpython3/include/python3.7m
-#exoprt MET_PYTHON_LD=-L/apps/intel-2020/intel-2020/intelpython3/lib\ -lpython3.7m\ -lcrypt\ -lpthread\ -ldl\ -lutil\ -lrt\ -lm
+#export MET_PYTHON=/work/noaa/ovp/miniconda/miniconda3/envs/metplus_v5.0_py3.8
+#export MET_PYTHON_CC=-I${MET_PYTHON}/include/python3.8
+#export MET_PYTHON_LD=-L${MET_PYTHON}/lib/python3.8/config-3.8-x86_64-linux-gnu\ -L${MET_PYTHON}/lib\ -lpython3.8\ -lcrypt\ -lpthread\ -ldl\ -lutil\ -lrt\ -lm
 #export MET_FONT_DIR=$basedir/fonts/
 #export LDFLAGS=-Wl,--disable-new-dtags -Wl,-rpath,${libdir}:${MET_PYTHON}/lib
 #export CPPFLAGS=-I/apps/contrib/met/11.0.0/external_libs/include

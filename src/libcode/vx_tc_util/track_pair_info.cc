@@ -407,10 +407,10 @@ void TrackPairInfo::add_tcmpr_line(const TCStatLine &l) {
 
    // Set the consensus track variables
    apoint.set_num_members(atoi(l.get_item("NUM_MEMBERS")));
-   apoint.set_spread(atof(l.get_item("TRACK_SPREAD")));
-   apoint.set_dist_mean(atof(l.get_item("DIST_MEAN")));
-   apoint.set_v_max_stdev(atof(l.get_item("MAX_WIND_SPREAD")));
-   apoint.set_mslp_stdev(atof(l.get_item("MSLP_SPREAD")));
+   apoint.set_track_spread(atof(l.get_item("TRACK_SPREAD")));
+   apoint.set_track_stdev(atof(l.get_item("TRACK_STDEV")));
+   apoint.set_mslp_stdev(atof(l.get_item("MSLP_STDEV")));
+   apoint.set_v_max_stdev(atof(l.get_item("MAX_WIND_STDEV")));
    
    // Add the TrackPoints to the ADECK/BDECK tracks
    ADeck.add(apoint);
@@ -471,21 +471,43 @@ void TrackPairInfo::add_tcdiag_line(const TCStatLine &l) {
    // Name of diagnostics read
    StringArray diag_name;
 
-   // Diagnostic source type
-   DiagType t = string_to_diagtype(l.get_item("SOURCE"));
-
-   // Make sure the source type does not change
+   // Make sure DIAG_SOURCE does not change
+   DiagType diag_source = string_to_diagtype(l.get_item("DIAG_SOURCE"));
    if(ADeck.diag_source() != DiagType_None &&
-      ADeck.diag_source() != t) {
+      ADeck.diag_source() != diag_source) {
       mlog << Error << "\nTrackPairInfo::add_tcdiag_line() -> "
            << "the diagnostic source type has changed ("
            << diagtype_to_string(ADeck.diag_source()) << " != "
-           << diagtype_to_string(t) << ")!\n\n";
+           << diagtype_to_string(diag_source) << ")!\n\n";
       exit(1);
    }
 
-   // Store the source type
-   ADeck.set_diag_source(t);
+   // Make sure TRACK_SOURCE does not change
+   ConcatString track_source = l.get_item("TRACK_SOURCE");
+   if(ADeck.track_source().length() > 0 &&
+      ADeck.track_source() != track_source) {
+      mlog << Error << "\nTrackPairInfo::add_tcdiag_line() -> "
+           << "the diagnostic track source has changed ("
+           << ADeck.track_source() << " != "
+           << track_source << ")!\n\n";
+      exit(1);
+   }
+
+   // Make sure FIELD_SOURCE does not change
+   ConcatString field_source = l.get_item("FIELD_SOURCE");
+   if(ADeck.field_source().length() > 0 &&
+      ADeck.field_source() != field_source) {
+      mlog << Error << "\nTrackPairInfo::add_tcdiag_line() -> "
+           << "the diagnostic field source has changed ("
+           << ADeck.field_source() << " != "
+           << field_source << ")!\n\n";
+      exit(1);
+   }
+
+   // Store the diagnostic metadata
+   ADeck.set_diag_source(diag_source);
+   ADeck.set_track_source(track_source.c_str());
+   ADeck.set_field_source(field_source.c_str());
 
    // Number of diagnostics
    n_diag = atoi(l.get_item("N_DIAG"));

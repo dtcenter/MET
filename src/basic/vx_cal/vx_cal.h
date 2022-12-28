@@ -54,6 +54,7 @@ extern  unixtime  doyhms_to_unix  (int doy, int year, int hour, int minute, int 
 extern  unixtime  mdyhms_to_unix  (int month, int day, int year, int hour, int minute, int second);
 
 extern  void      unix_to_mdyhms  (unixtime u, int & month, int & day, int & year, int & hour, int & minute, int & second);
+extern  int       month_name_to_m (const char *month_str);
 
 
 extern  int       date_to_mjd     (int m, int d, int y);

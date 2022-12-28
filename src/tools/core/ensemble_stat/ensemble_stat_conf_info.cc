@@ -165,15 +165,12 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
    msg_typ_group_map = parse_conf_message_type_group_map(&conf);
 
    // Conf: message_type_group_map(SURFACE)
-   if(msg_typ_group_map.count((string)surface_msg_typ_group_str) == 0) {
-      mlog << Error << "\nEnsembleStatConfInfo::process_config() -> "
-           << "\"" << conf_key_message_type_group_map
-           << "\" must contain an entry for \""
-           << surface_msg_typ_group_str << "\".\n\n";
-      exit(1);
+   ConcatString cs = surface_msg_typ_group_str;
+   if(msg_typ_group_map.count(cs) > 0) {
+      msg_typ_sfc = msg_typ_group_map[cs];
    }
    else {
-     msg_typ_sfc = msg_typ_group_map[(string)surface_msg_typ_group_str];
+      msg_typ_sfc.parse_css(default_msg_typ_group_surface);
    }
 
    // Conf: ens_member_ids

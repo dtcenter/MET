@@ -219,7 +219,31 @@ _____________________
   obs_bufr_var = [ 'QOB', 'TOB', 'ZOB', 'UOB', 'VOB' ];
 
 
-Each PrepBUFR message will likely contain multiple observation variables. The **obs_bufr_var** variable is used to specify which observation variables should be retained or derived. The variable name comes from BUFR file which includes BUFR table. The following BUFR names may be retained: QOB, TOB, ZOB, UOB, and VOB for specific humidity, temperature, height, and the u and v components of winds. The following BUFR names may be derived: D_DPT, D_WIND, D_RH, D_MIXR, D_PRMSL, D_PBL, D_CAPE, and D_MLCAPE for dew point, wind speed, relative humidity, mixing ratio, pressure reduced to MSL, planetary boundary layer height, convective available potential energy, and mixed layer convective available potential energy. This configuration replaces **obs_grib_code**. If the list is empty, all BUFR variables are retained.
+Each PrepBUFR message will likely contain multiple observation variables. The **obs_bufr_var** variable is used to specify which observation variables should be retained or derived. The observation variable names are retrieved from the BUFR table embedded within the file. Users can run PB2NC with the **-index** command line argument to list out the variable names present in the file, and those names can be listed in this setting. If the list is empty, all BUFR variables present in the file are retained. This setting replaces the deprecated **obs_grib_code**.
+
+
+The example **obs_bufr_var** setting above retains observations of QOB, TOB, ZOB, UOB, and VOB for specific humidity, temperature, height, and the u and v components of winds. Observations of those types are reported at the corresponding POB pressure level. In addition, PB2NC can derive several other variables from these observations. By convention, all observations that are derivable are named with a **D_** prefix:
+
+• **D_DPT** for dew point (from POB and QOB)
+
+• **D_WDIR** for wind direction (from UOB and VOB)
+
+• **D_WIND** for wind speed (from UOB and VOB)
+
+• **D_RH** for relative humidity (from POB, QOB, and TOB)
+
+• **D_MIXR** for mixing ratio (from QOB)
+
+• **D_PRMSL** for pressure reduced to mean sea level (from POB, TOB, and ZOB)
+
+• **D_PBL** for planetary boundary layer height (from POB, QOB, TOB, ZOB, UOB, and VOB)
+
+• **D_CAPE** for convective available potential energy (from POB, QOB, and TOB)
+
+• **D_MLCAPE** for mixed layer convective available potential energy (from POB, QOB, and TOB)
+
+
+In BUFR, lower quality mark values indicate higher quality observations. The quality marks for derived observations are computed as the maximum of the quality marks for its components. For example, **D_DPT** derived from **POB** with quality mark 1 and **QOB** with quality mark 2 is assigned a quality mark value of 2. **D_PBL**, **D_CAPE**, and **D_MLCAPE** are derived using data from multiple vertical levels. Their quality marks are computed as the maximum of their components over all vertical levels.
 
 _____________________
 
@@ -301,6 +325,9 @@ The summaries will only be calculated for the observations specified in the **gr
 
 
 The **vld_freq** and **vld_thresh** entries specify the required ratio of valid data for an output time summary value to be computed. This option is only applied when these entries are set to non-zero values. The **vld_freq** entry specifies the expected frequency of observations in seconds. The width of the time window is divided by this frequency to compute the expected number of observations for the time window. The actual number of valid observations is divided by the expected number to compute the ratio of valid data. An output time summary value will only be written if that ratio is greater than or equal to the **vld_thresh** entry. Detailed information about which observations are excluded is provided at debug level 4.
+
+
+The quality mark for time summaries is always reported by PB2NC as bad data. Time summaries are computed by several MET point pre-processing tools using common library code. While BUFR quality marks are integers, the quality flags for other point data formats (MADIS NetCDF, for example) are stored as strings. MET does not currently contain logic to determine which quality flag strings are better or worse. Note however that any point observation whose quality mark does not meet the **quality_mark_thresh** criteria is not used in the computation of time summaries.
 
 .. _pb2nc output:
 
@@ -424,9 +451,9 @@ While initial versions of the ASCII2NC tool only supported a simple 11 column AS
 
 • Western Wind and Solar Integration Study (WWSIS) format. WWSIS data are available by request from National Renewable Energy Laboratory (NREL) in Boulder, CO. 
 
-• `AirNow DailyData_v2, AirNow HourlyData, and AirNow HourlyAQObs formats <https://www.epa.gov/outdoor-air-quality-data>`_
+• `AirNow DailyData_v2, AirNow HourlyData, and AirNow HourlyAQObs formats <https://www.epa.gov/outdoor-air-quality-data>`_. See the :ref:`MET_AIRNOW_STATIONS` environment variable.
 
-• `National Data Buoy (NDBC) Standard Meteorlogical Data format <https://www.ndbc.noaa.gov/measdes.shtml>`_
+• `National Data Buoy (NDBC) Standard Meteorlogical Data format <https://www.ndbc.noaa.gov/measdes.shtml>`_. See the :ref:`MET_NDBC_STATIONS` environment variable.
 
 • `AErosol RObotic NEtwork (AERONET) versions 2 and 3 format <http://aeronet.gsfc.nasa.gov/>`_
 
@@ -537,19 +564,6 @@ An example of the ascii2nc calling sequence is shown below:
 In this example, the ASCII2NC tool will reformat the input **sample_ascii_obs.txt file** into NetCDF format and write the output to a file named **sample_ascii_obs.nc**.
 
 .. _ascii2nc-pyembed:
-
-Python Embedding for Point Observations
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Here is an example of processing the same set of observations but using Python embedding instead:
-
-.. code-block:: none
-		
-		ascii2nc -format python \
-		"MET_BASE/python/read_ascii_point.py sample_ascii_obs.txt" \
-		sample_ascii_obs_python.nc
-
-Please refer to :numref:`Appendix F, Section %s <appendixF>` for more details about Python embedding in MET.
 
 ascii2nc configuration file
 ---------------------------
@@ -1081,7 +1095,7 @@ For the GOES-16 and GOES-17 data, the computing lat/long is time consuming. So t
 
 When processing GOES-16 data, the **-qc** option may also be used to specify the acceptable quality control flag values. The example above regrids the GOES-16 AOD values to NCEP Grid number 212 (which QC flags are high, medium, and low), writing to the output the maximum AOD value falling inside each grid box.
 
-Listed below is an example of processing the same set of observations but using python embedding instead:
+Listed below is an example of processing the same set of observations but using Python embedding instead:
 
 .. code-block:: none
 		
@@ -1090,10 +1104,7 @@ Listed below is an example of processing the same set of observations but using 
 		G212 python_gridded_ascii_python.nc -config Point2GridConfig_edr \
 		-field 'name="200"; level="*"; valid_time="20130827_205959";' -method MAX -v 1
 
-The user should replace the python script with the customized python script for the custom point observation data. This is an example for the python embedding.
-
 Please refer to :numref:`Appendix F, Section %s <appendixF>` for more details about Python embedding in MET.
-
 
 point2grid output
 -----------------
@@ -1171,4 +1182,19 @@ The configuration option listed above is common to many MET tools and are descri
 This entry is an array of dictionaries, each containing a **GRIB code** string and mathcing **variable name** string which define a mapping of GRIB code to the output variable names.
 
 
+Point NetCDF to ASCII Python Utility
+====================================
 
+As a tool for debugging, a utility script called print_pointnc2ascii.py is included for users. This script reads the MET point NetCDF file format and returns an ASCII representation to the screen, with either space or comma delimiting. Optionally, the user can request that the output be written to a file.
+
+The script can be found at:
+
+.. code-block:: none
+
+   MET_BASE/utility/print_pointnc2ascii.py
+
+For how to use the script, issue the command:
+
+.. code-block:: none
+
+   python3 MET_BASE/utility/print_pointnc2ascii.py -h

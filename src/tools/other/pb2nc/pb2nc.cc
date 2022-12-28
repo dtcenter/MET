@@ -1345,8 +1345,10 @@ void process_pbfile(int i_pb) {
          }
       }
 
+      // Initialize for CAPE and PBL
       if (cal_cape || cal_mlcape) {
          cape_level = 0;
+         cape_qm = bad_data_float;
       }
 
       do_pbl = cal_pbl && 0 == strcmp("ADPUPA", hdr_typ);
@@ -1356,6 +1358,7 @@ void process_pbfile(int i_pb) {
 
       // Search through the vertical levels
       for(lv=0, n_hdr_obs = 0; lv<buf_nlev; lv++) {
+
          // If the observation vertical level is not within the
          // specified valid range, continue to the next vertical
          // level
@@ -1505,12 +1508,15 @@ void process_pbfile(int i_pb) {
                      if (cape_level < MAX_CAPE_LEVEL) cape_data_temp[cape_level] = obs_arr[4];
                      cape_member_cnt++;
                   }
-                  if (is_cape_input && (cape_level == 0)) {
+
+                  // Track the maximum quality mark for CAPE components
+                  if (is_cape_input && (is_bad_data(cape_qm) || quality_mark > cape_qm)) {
                      cape_qm = quality_mark;
                   }
                }
 
-               if (do_pbl && (pbl_level == 0)) {
+               // Track the maximum quality mark for PBL components
+               if (do_pbl && (is_bad_data(pbl_qm) || quality_mark > pbl_qm)) {
                   pbl_qm = quality_mark;
                }
             }
@@ -1908,6 +1914,7 @@ void process_pbfile(int i_pb) {
             pqtzuv_list.clear();
             pqtzuv_map_tq.clear();
             pqtzuv_map_uv.clear();
+            pbl_qm = bad_data_float;
          }
          //is_same_header = false;
          prev_hdr_vld_ut = hdr_vld_ut;

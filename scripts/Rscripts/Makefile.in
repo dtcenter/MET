@@ -365,7 +365,6 @@ rscripts_DATA = \
 	plot_ensemble.R \
 	plot_probri.R \
 	plot_tcmpr.R \
-	pntnc2ascii.R \
 	trmm2nc.R \
 	trmmbin2nc.R
 

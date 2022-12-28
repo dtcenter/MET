@@ -71,8 +71,10 @@ class TrackInfo {
       unixtime     MaxWarmCore;
 
       // Diagnostic source and names
-      DiagType    DiagSource;
-      StringArray DiagName;
+      DiagType     DiagSource;
+      ConcatString TrackSource;
+      ConcatString FieldSource;
+      StringArray  DiagName;
 
       // TrackPoints
       TrackPoint  *Point;
@@ -115,6 +117,8 @@ class TrackInfo {
       void set_valid_max(const unixtime);
       void set_point(int, const TrackPoint &);
       void set_diag_source(DiagType);
+      void set_track_source(const char *);
+      void set_field_source(const char *);
       void set_diag_name(const StringArray &);
 
          //
@@ -148,6 +152,8 @@ class TrackInfo {
       int                  n_points()         const;
    
       DiagType             diag_source()      const;
+      const ConcatString & track_source()     const;
+      const ConcatString & field_source()     const;
       int                  n_diag()           const;
       const StringArray &  diag_name()        const;
       const char *         diag_name(int)     const;
@@ -189,6 +195,8 @@ inline void TrackInfo::set_init(const unixtime u)          { InitTime = u;      
 inline void TrackInfo::set_valid_min(const unixtime u)     { MinValidTime = u;    }
 inline void TrackInfo::set_valid_max(const unixtime u)     { MaxValidTime = u;    }
 inline void TrackInfo::set_diag_source(DiagType t)         { DiagSource = t;      }
+inline void TrackInfo::set_track_source(const char *s)     { TrackSource = s;     }
+inline void TrackInfo::set_field_source(const char *s)     { FieldSource = s;     }
 inline void TrackInfo::set_diag_name(const StringArray &s) { DiagName = s;        }
 
 inline const ConcatString & TrackInfo::storm_id()         const { return(StormId);                      }
@@ -207,6 +215,8 @@ inline unixtime             TrackInfo::warm_core_max()    const { return(MaxWarm
 inline int                  TrackInfo::n_points()         const { return(NPoints);                      }
 
 inline DiagType             TrackInfo::diag_source()      const { return(DiagSource);   }
+inline const ConcatString & TrackInfo::track_source()     const { return(TrackSource);  }
+inline const ConcatString & TrackInfo::field_source()     const { return(FieldSource);  }
 inline int                  TrackInfo::n_diag()           const { return(DiagName.n()); }
 inline const StringArray &  TrackInfo::diag_name()        const { return(DiagName);     }
 
@@ -272,7 +282,7 @@ inline int TrackInfoArray::n() const { return(Track.size()); }
 extern TrackInfo consensus(const TrackInfoArray &, const ConcatString &, int, const StringArray &);
 extern void compute_gc_dist_stdev(const double lat, const double lon,
                                   const NumArray &lats, const NumArray &lons,
-                                  double &spread, double &mean);
+                                  double &mean, double &stdev);
 extern bool has_storm_id(const StringArray &, const ConcatString &basin,
                          const ConcatString &cyclone, unixtime init);
 extern void latlon_to_xytk_err(double alat, double alon,

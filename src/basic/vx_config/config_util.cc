@@ -1121,7 +1121,7 @@ map<ConcatString,UserFunc_1Arg> parse_conf_key_convert_map(
       exit(1);
    }
 
-   // Conf: tcdiag_convert_map, lsdiag_convert_map, etc
+   // Conf: diag_convert_map
    map_dict = dict->lookup_array(conf_key_map_name);
 
    // Loop through the array entries
@@ -1731,11 +1731,18 @@ NbrhdInfo parse_conf_nbrhd(Dictionary *dict, const char *conf_key) {
    nbrhd_dict = dict->lookup_dictionary(conf_key);
 
    // Conf: field - may be missing
-   v = nbrhd_dict->lookup_int(conf_key_field, false);
 
-   // If found, interpret value.  Otherwise, default to BOTH
-   if(nbrhd_dict->last_lookup_status()) info.field = int_to_fieldtype(v);
-   else                                 info.field = FieldType_Both;
+   // Default info.field to BOTH
+   info.field = FieldType_Both;
+
+   // Skip lookup for conf_key_nbrhd_prob
+   if(strncmp(conf_key, conf_key_nbrhd_prob, strlen(conf_key_nbrhd_prob)) != 0) {
+
+      v = nbrhd_dict->lookup_int(conf_key_field, false);
+
+      // If found, interpret value
+      if(nbrhd_dict->last_lookup_status()) info.field = int_to_fieldtype(v);
+   }
 
    // Conf: vld_thresh
    info.vld_thresh = nbrhd_dict->lookup_double(conf_key_vld_thresh);
@@ -2750,16 +2757,13 @@ ConcatString tracktype_to_string(TrackType type) {
 DiagType string_to_diagtype(const char *s) {
    DiagType t = DiagType_None;
 
-   // Convert string to enumerated DiagType
-        if(strcasecmp(s, conf_val_none)  == 0) t = DiagType_None;
-   else if(strcasecmp(s, "TCDIAG")       == 0) t = TCDiagType;
-   else if(strcasecmp(s, "LSDIAG_RT")    == 0) t = LSDiagRTType;
-   else if(strcasecmp(s, "LSDIAG_DEV")   == 0) t = LSDiagDevType;
-   else {
-      mlog << Error << "\nstring_to_diagtype() -> "
-           << "Unexpected DiagType string \"" << s << "\".\n\n";
-      exit(1);
-   }
+   // Convert string to enumerated DiagType, storing unknown strings
+   // as the default type
+        if(strcasecmp(s, cira_diag_rt_str)   == 0) t = DiagType_CIRA_RT;
+   else if(strcasecmp(s, cira_diag_dev_str)  == 0) t = DiagType_CIRA_Dev;
+   else if(strcasecmp(s, ships_diag_rt_str)  == 0) t = DiagType_SHIPS_RT;
+   else if(strcasecmp(s, ships_diag_dev_str) == 0) t = DiagType_SHIPS_Dev;
+   else                                            t = DiagType_None;
 
    return(t);
 }
@@ -2771,10 +2775,11 @@ ConcatString diagtype_to_string(DiagType type) {
 
    // Convert enumerated DiagType to string
    switch(type) {
-      case(DiagType_None):  s = conf_val_none; break;
-      case(TCDiagType):     s = "TCDIAG";      break;
-      case(LSDiagRTType):   s = "LSDIAG_RT";   break;
-      case(LSDiagDevType):  s = "LSDIAG_DEV";  break;
+      case(DiagType_None):      s = conf_val_none;      break;
+      case(DiagType_CIRA_RT):   s = cira_diag_rt_str;   break;
+      case(DiagType_CIRA_Dev):  s = cira_diag_dev_str;  break;
+      case(DiagType_SHIPS_RT):  s = ships_diag_rt_str;  break;
+      case(DiagType_SHIPS_Dev): s = ships_diag_dev_str; break;
       default:
          mlog << Error << "\ndiagtype_to_string() -> "
               << "Unexpected DiagType value of " << type << ".\n\n";
@@ -3118,6 +3123,23 @@ NormalizeType parse_conf_normalize(Dictionary *dict) {
    }
 
    return(t);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// Print consistent error message and exit
+//
+///////////////////////////////////////////////////////////////////////////////
+
+void python_compile_error(const char *caller) {
+
+   const char *method_name = (0 != caller) ? caller : "python_compile_error() -> ";
+
+   mlog << Error << "\n" << method_name
+        << "Support for Python has not been compiled!\n"
+        << "To run Python scripts, recompile with the --enable-python option.\n\n";
+
+   exit(1);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

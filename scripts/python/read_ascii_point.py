@@ -1,6 +1,7 @@
 import pandas as pd
 import os
 import sys
+from met_point_obs import convert_point_data
 
 ########################################################################
 
@@ -36,8 +37,10 @@ try:
     point_data = pd.read_csv(input_file, header=None, delim_whitespace=True, keep_default_na=False,
                              names=['typ', 'sid', 'vld', 'lat', 'lon', 'elv', 'var', 'lvl', 'hgt', 'qc', 'obs'],
                              dtype={'typ':'str', 'sid':'str', 'vld':'str', 'var':'str', 'qc':'str'}).values.tolist()
-    print("Data Length:\t" + repr(len(point_data)))
-    print("Data Type:\t" + repr(type(point_data)))
+    print("     point_data: Data Length:\t" + repr(len(point_data)))
+    print("     point_data: Data Type:\t" + repr(type(point_data)))
+    met_point_data = convert_point_data(point_data)
+    print(" met_point_data: Data Type:\t" + repr(type(met_point_data)))
 except NameError:
     print("Can't find the input file")
     sys.exit(1)

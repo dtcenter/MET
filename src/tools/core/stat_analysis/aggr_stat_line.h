@@ -153,7 +153,8 @@ struct AggrENSInfo {
    StatHdrInfo hdr;
    PairDataEnsemble ens_pd;
    ClimoCDFInfo cdf_info;
-   NumArray me_na, mse_na, me_oerr_na, mse_oerr_na;
+   NumArray me_na, mae_na, mse_na;
+   NumArray me_oerr_na, mae_oerr_na, mse_oerr_na;
    void clear();
 };
 
@@ -189,6 +190,16 @@ struct ssvar_bin_cmp {
 struct AggrSSVARInfo {
    StatHdrInfo hdr;
    std::map<ConcatString, SSVARInfo, ssvar_bin_cmp> ssvar_bins;
+};
+
+struct AggrSEEPSInfo {
+   StatHdrInfo hdr;
+   SeepsAggScore agg_score;
+};
+
+struct AggrSEEPSMPRInfo {
+   StatHdrInfo hdr;
+   PairDataPoint pd;
 };
 
 struct AggrTimeSeriesInfo {
@@ -287,6 +298,16 @@ extern void aggr_orank_lines(
 extern void aggr_ssvar_lines(
                LineDataFile &, STATAnalysisJob &,
                std::map<ConcatString, AggrSSVARInfo> &,
+               int &, int &);
+
+extern void aggr_seeps_lines(
+               LineDataFile &, STATAnalysisJob &,
+               std::map<ConcatString, AggrSEEPSInfo> &,
+               int &, int &);
+
+extern void aggr_seeps_mpr_lines(
+               LineDataFile &, STATAnalysisJob &,
+               std::map<ConcatString, AggrSEEPSMPRInfo> &,
                int &, int &);
 
 extern void aggr_time_series_lines(

@@ -80,6 +80,11 @@ static const char surface_msg_typ_group_str [] = "SURFACE"; // Surface message t
 static const char landsf_msg_typ_group_str  [] = "LANDSF";  // Surface land message type group
 static const char watersf_msg_typ_group_str [] = "WATERSF"; // Surface water message type group
 
+// Default message type group values
+static const char default_msg_typ_group_surface [] = "ADPSFC,SFCSHP,MSONET";
+static const char default_msg_typ_group_landsf  [] = "ADPSFC,MSONET";
+static const char default_msg_typ_group_watersf [] = "SFCSHP";
+
 // Commonly used regular expressions
 static const char yyyymmdd_hhmmss_reg_exp[] =
    "[0-9]\\{8,8\\}_[0-9]\\{6,6\\}";

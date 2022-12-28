@@ -2223,6 +2223,14 @@ void STATAnalysisJob::dump_stat_line(const STATLine &line) {
                write_header_row(ssvar_columns, n_ssvar_columns, 1, dump_at, 0, 0);
                break;
 
+            case(stat_seeps):
+               write_header_row(seeps_columns, n_seeps_columns, 1, dump_at, 0, 0);
+               break;
+
+            case(stat_seeps_mpr):
+               write_header_row(seeps_mpr_columns, n_seeps_mpr_columns, 1, dump_at, 0, 0);
+               break;
+
             // Just write a STAT header line for indeterminant line types
             case(stat_mctc):
             case(stat_mcts):

@@ -342,8 +342,8 @@ void write_tc_mpr_cols(const TrackPairInfo &p, int i,
    at.set_entry(r, c++, systemsdepth_to_string(p.bdeck()[i].depth()));
 
    at.set_entry(r, c++, p.adeck()[i].num_members());
-   at.set_entry(r, c++, p.adeck()[i].spread());
-   at.set_entry(r, c++, p.adeck()[i].dist_mean());
+   at.set_entry(r, c++, p.adeck()[i].track_spread());
+   at.set_entry(r, c++, p.adeck()[i].track_stdev());
    at.set_entry(r, c++, p.adeck()[i].mslp_stdev());
    at.set_entry(r, c++, p.adeck()[i].v_max_stdev());
    
@@ -360,6 +360,8 @@ void write_tc_diag_cols(const TrackPairInfo &p, int i,
    at.set_entry(r, c++, p.n_points());
    at.set_entry(r, c++, i+1);
    at.set_entry(r, c++, diagtype_to_string(p.adeck().diag_source()));
+   at.set_entry(r, c++, p.adeck().track_source());
+   at.set_entry(r, c++, p.adeck().field_source());
    at.set_entry(r, c++, p.adeck()[i].n_diag());
 
    // Check the number of names and values match

@@ -136,6 +136,17 @@ The HiRA framework provides a unique method for evaluating models in the neighbo
 
 Often, the neighborhood size is chosen so that multiple models to be compared have approximately the same horizontal resolution. Then, standard metrics for probabilistic forecasts, such as Brier Score, can be used to compare those forecasts. HiRA was developed using surface observation stations so the neighborhood lies completely within the horizontal plane. With any type of upper air observation, the vertical neighborhood must also be defined.
 
+.. _PS_seeps:
+
+SEEPS scores
+------------
+
+The Stable Equitable Error in Probability Space (SEEPS) was devised for monitoring global deterministic forecasts of precipitation against the WMO gauge network (:ref:`Rodwell et al., 2010 <Rodwell-2010>`; :ref:`Haiden et al., 2012 <Haiden-2012>`) and is a multi-category score which uses a climatology to account for local variations in behavior. Since the score uses probability space to define categories using the climatology, it can be aggregated over heterogeneous climate regions. Even though it was developed for use with precipitation forecasts, in principle it could be applied to any forecast parameter for which a sufficiently long time period of observations exists to create a suitable climatology. The computation of SEEPS for precipitation is only supported for now.
+
+For use with precipitation, three categories are used, named ‘dry’, ‘light’ and ‘heavy’. The ‘dry’ category is defined (using the WMO observing guidelines) with any accumulation (rounded to the nearest 0.1 millimeter) that is less than or equal to 0.2 mm.  The remaining precipitation is divided into ‘light’ and ‘heavy’ categories whose thresholds are with respect to a climatology and thus location specific. The light precipitation is defined to occur twice as often as heavy precipitation.
+
+When calculating a single SEEPS value over observing stations for a particular region, the scores should have a density weighting applied which accounts for uneven station distribution in the region of interest (see Section 9.1 in :ref:`Rodwell et al., 2010 <Rodwell-2010>`). This density weighting has not yet been implemented in MET. Global precipitation climatologies calculated from the WMO SYNOP records from 1980-2009 are supplied with the release. At the moment, a 24-hour climatology is available (valid at 00 UTC or 12 UTC), but in future a 6-hour climatology will become available.
+
 .. _PS_Statistical-measures:
 
 Statistical measures
@@ -486,6 +497,8 @@ Note that the FHO and CTC line types are easily derived from each other. Users a
 Note that writing out matched pair data (MPR lines) for a large number of cases is generally not recommended. The MPR lines create very large output files and are only intended for use on a small set of cases.
 
 If all line types corresponding to a particular verification method are set to NONE, the computation of those statistics will be skipped in the code and thus make the Point-Stat tool run more efficiently. For example, if FHO, CTC, and CTS are all set to NONE, the Point-Stat tool will skip the categorical verification step.
+
+The default SEEPS climo file exists at MET_BASE/climo/seeps/PPT24_seepsweights.nc. It can be overridden by using the environment variable, MET_SEEPS_POINT_CLIMO_NAME.
 
 .. _point_stat-output:
 
@@ -845,7 +858,7 @@ The first set of header columns are common to all of the output files generated 
   * - 78-80
     - RMSE, :raw-html:`<br />` RMSE_BCL, :raw-html:`<br />` RMSE_BCU
     - Root mean squared error including bootstrap upper and lower confidence limits
-  * - 81-94
+  * - 81-95
     - E10, :raw-html:`<br />` E10_BCL, :raw-html:`<br />` E10_BCU, :raw-html:`<br />` E25, :raw-html:`<br />` E25_BCL, :raw-html:`<br />` E25_BCU, :raw-html:`<br />` E50, :raw-html:`<br />` E50_BCL, :raw-html:`<br />` E50_BCU, :raw-html:`<br />` E75, :raw-html:`<br />` E75_BCL, :raw-html:`<br />` E75_BCU, :raw-html:`<br />` E90, :raw-html:`<br />` E90_BCL, :raw-html:`<br />` E90_BCU
     - 10th, 25th, 50th, 75th, and 90th percentiles of the error including bootstrap upper and lower confidence limits
   * - 96-98
@@ -866,13 +879,13 @@ The first set of header columns are common to all of the output files generated 
   * - 113-115
     - RMSFA, :raw-html:`<br />` RMSFA_BCL, :raw-html:`<br />` RMSFA_BCU
     - Root mean squared forecast anomaly (f-c) including bootstrap upper and lower confidence limits
-  * - 117-119
+  * - 116-118
     - RMSOA, :raw-html:`<br />` RMSOA_BCL, :raw-html:`<br />` RMSOA_BCU
     - Root mean squared observation anomaly (o-c) including bootstrap upper and lower confidence limits
-  * - 120-122
+  * - 119-121
     - ANOM_CORR_UNCNTR, :raw-html:`<br />` ANOM_CORR_UNCNTR_BCL, :raw-html:`<br />` ANOM_CORR_UNCNTR_BCU
     - The uncentered Anomaly Correlation excluding mean error including bootstrap upper and lower confidence limits
-  * - 123-125
+  * - 122-124
     - SI, :raw-html:`<br />` SI_BCL, :raw-html:`<br />` SI_BCU
     - Scatter Index including bootstrap upper and lower confidence limits
       
