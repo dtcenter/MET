@@ -1333,8 +1333,8 @@ bool TableFlatFile::lookup_grib2(int a, int b, int c,
       // Check master table, center, and local table
       if ( (bad_data_int != mtab && g2e[j]->mtab_low  > mtab) ||
            (bad_data_int != mtab && g2e[j]->mtab_high < mtab) ||
-           (bad_data_int != cntr && g2e[j]->cntr != cntr)     ||
-           (bad_data_int != ltab && g2e[j]->ltab != ltab) ) continue;
+           (bad_data_int != cntr && g2e[j]->cntr > 0 && g2e[j]->cntr != cntr) ||
+           (bad_data_int != ltab && g2e[j]->ltab > 0 && g2e[j]->ltab != ltab) ) continue;
 
       e = *(g2e[j]);
 
@@ -1408,12 +1408,13 @@ bool TableFlatFile::lookup_grib2(const char * parm_name,
    for(int j=0; j<N_grib2_elements; ++j){
 
       if( g2e[j]->parm_name != parm_name ||
-          (bad_data_int != a    && g2e[j]->index_a  != a)    ||
-          (bad_data_int != b    && g2e[j]->index_b  != b)    ||
-          (bad_data_int != c    && g2e[j]->index_c  != c)    ||
-          (bad_data_int != mtab && g2e[j]->mtab_set != mtab) ||
-          (bad_data_int != cntr && g2e[j]->cntr     != cntr) ||
-          (bad_data_int != ltab && g2e[j]->ltab     != ltab) )
+          (bad_data_int != a    && g2e[j]->index_a  != a) ||
+          (bad_data_int != b    && g2e[j]->index_b  != b) ||
+          (bad_data_int != c    && g2e[j]->index_c  != c) ||
+          (bad_data_int != mtab && g2e[j]->mtab_low  > mtab) ||
+          (bad_data_int != mtab && g2e[j]->mtab_high < mtab) ||
+          (bad_data_int != cntr && g2e[j]->cntr > 0 && g2e[j]->cntr != cntr) ||
+          (bad_data_int != ltab && g2e[j]->ltab > 0 && g2e[j]->ltab != ltab) )
          continue;
 
       if( n_matches++ == 0 ) e = *(g2e[j]);
