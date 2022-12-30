@@ -421,6 +421,8 @@ if [ $COMPILE_ZLIB -eq 1 ]; then
     echo "make install returned with non-zero ($ret) status"
     exit 1
   fi
+  # GPM: why is this removed? Could we add a comment to
+  # describe why this is needed?
   echo "rm ${LIB_DIR}/lib/zlib.a"
   rm ${LIB_DIR}/lib/libz.a
 fi
