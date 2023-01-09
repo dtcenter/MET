@@ -79,6 +79,7 @@ echo "COMPILER  = ${COMPILER?  "ERROR: COMPILER must be set"}"
 echo "MET_SUBDIR = ${MET_SUBDIR? "ERROR: MET_SUBDIR must be set"}"
 echo "MET_TARBALL = ${MET_TARBALL? "ERROR: MET_TARBALL must be set"}"
 echo "USE_MODULES = ${USE_MODULES? "ERROR: USE_MODULES must be set to TRUE if using modules or FALSE otherwise"}"
+echo ${MAKE_ARGS:+MAKE_ARGS = $MAKE_ARGS}
 
 export LIB_DIR=${TEST_BASE}/external_libs
 MET_DIR=${MET_SUBDIR}
@@ -347,15 +348,15 @@ if [ $COMPILE_GSL -eq 1 ]; then
     echo "configure returned with non-zero ($ret) status"
     exit 1
   fi
-  echo "make > make.log 2>&1"
-  make > make.log 2>&1
+  echo "make ${MAKE_ARGS} > make.log 2>&1"
+  make ${MAKE_ARGS} > make.log 2>&1
   ret=$?
   if [ $ret != 0 ]; then
     echo "make returned with non-zero ($ret) status"
     exit 1
   fi
-  echo "make install > make_install.log 2>&1"
-  make install > make_install.log 2>&1
+  echo "make ${MAKE_ARGS} install > make_install.log 2>&1"
+  make ${MAKE_ARGS} install > make_install.log 2>&1
   ret=$?
   if [ $? != 0 ]; then
     echo "make install returned with non-zero ($ret) status"
@@ -413,15 +414,15 @@ if [ $COMPILE_ZLIB -eq 1 ]; then
     echo "configure returned with non-zero ($ret) status"
     exit 1
   fi
-  echo "make > make.log 2>&1"
-  make > make.log 2>&1
+  echo "make ${MAKE_ARGS} > make.log 2>&1"
+  make ${MAKE_ARGS} > make.log 2>&1
   ret=$?
   if [ $ret != 0 ]; then
     echo "make returned with non-zero ($ret) status"
     exit 1
   fi
-  echo "make install > make_install.log 2>&1"
-  make install > make_install.log 2>&1
+  echo "make ${MAKE_ARGS} install > make_install.log 2>&1"
+  make ${MAKE_ARGS} install > make_install.log 2>&1
   ret=$?
   if [ $? != 0 ]; then
     echo "make install returned with non-zero ($ret) status"
@@ -450,15 +451,15 @@ if [[ $COMPILE_LIBPNG -eq 1 && $HOST != ys* ]]; then
     echo "configure returned with non-zero ($ret) status"
     exit 1
   fi
-  echo "make > make.log 2>&1"
-  make > make.log 2>&1
+  echo "make ${MAKE_ARGS} > make.log 2>&1"
+  make ${MAKE_ARGS} > make.log 2>&1
   ret=$?
   if [ $ret != 0 ]; then
     echo "make returned with non-zero ($ret) status"
     exit 1
   fi
-  echo "make install > make_install.log 2>&1"
-  make install > make_install.log 2>&1
+  echo "make ${MAKE_ARGS} install > make_install.log 2>&1"
+  make ${MAKE_ARGS} install > make_install.log 2>&1
   ret=$?
   if [ $? != 0 ]; then
     echo "make install returned with non-zero ($ret) status"
@@ -484,15 +485,15 @@ if [ $COMPILE_JASPER -eq 1 ]; then
     echo "configure returned with non-zero ($ret) status"
     exit 1
   fi
-  echo "make > make.log 2>&1"
-  make > make.log 2>&1
+  echo "make ${MAKE_ARGS} > make.log 2>&1"
+  make ${MAKE_ARGS} > make.log 2>&1
   ret=$?
   if [ $ret != 0 ]; then
     echo "make returned with non-zero ($ret) status"
     exit 1
   fi
-  echo "make install > make_install.log 2>&1"
-  make install > make_install.log 2>&1
+  echo "make ${MAKE_ARGS} install > make_install.log 2>&1"
+  make ${MAKE_ARGS} install > make_install.log 2>&1
   ret=$?
   if [ $? != 0 ]; then
     echo "make install returned with non-zero ($ret) status"
@@ -517,6 +518,8 @@ if [ $COMPILE_G2CLIB -eq 1 ]; then
   mv makefile_new makefile
   export CC_COMPILER=${CC}
   echo "cd `pwd`"
+  # g2clib appears to compile but causes failure compiling MET if -j argument is used
+  # so exclude it from this call
   echo "make > make.log 2>&1"
   make > make.log 2>&1
   ret=$?
@@ -563,15 +566,15 @@ if [ $COMPILE_HDF -eq 1 ]; then
       > Makefile_new
   fi
   mv Makefile_new hdf/src/Makefile
-  echo "make > make.log 2>&1"
-  make > make.log 2>&1
+  echo "make ${MAKE_ARGS} > make.log 2>&1"
+  make ${MAKE_ARGS} > make.log 2>&1
   ret=$?
   if [ $ret != 0 ]; then
     echo "make returned with non-zero ($ret) status"
     exit 1
   fi
-  echo "make install > make_install.log 2>&1"
-  make install > make_install.log 2>&1
+  echo "make ${MAKE_ARGS} install > make_install.log 2>&1"
+  make ${MAKE_ARGS} install > make_install.log 2>&1
   ret=$?
   if [ $? != 0 ]; then
     echo "make install returned with non-zero ($ret) status"
@@ -597,15 +600,15 @@ if [ $COMPILE_HDFEOS -eq 1 ]; then
     echo "configure returned with non-zero ($ret) status"
     exit 1
   fi
-  echo "make > make.log 2>&1"
-  make > make.log 2>&1
+  echo "make ${MAKE_ARGS} > make.log 2>&1"
+  make ${MAKE_ARGS} > make.log 2>&1
   ret=$?
   if [ $ret != 0 ]; then
     echo "make returned with non-zero ($ret) status"
     exit 1
   fi
-  echo "make install > make_install.log 2>&1"
-  make install > make_install.log 2>&1
+  echo "make ${MAKE_ARGS} install > make_install.log 2>&1"
+  make ${MAKE_ARGS} install > make_install.log 2>&1
   ret=$?
   if [ $? != 0 ]; then
     echo "make install returned with non-zero ($ret) status"
@@ -632,8 +635,8 @@ if [ $COMPILE_NETCDF -eq 1 ]; then
     echo "configure returned with non-zero ($ret) status"
     exit 1
   fi
-  echo "make install > make_install.log 2>&1"
-  make install > make_install.log 2>&1
+  echo "make ${MAKE_ARGS} install > make_install.log 2>&1"
+  make ${MAKE_ARGS} install > make_install.log 2>&1
   ret=$?
   if [ $? != 0 ]; then
     echo "make install returned with non-zero ($ret) status"
@@ -657,8 +660,8 @@ if [ $COMPILE_NETCDF -eq 1 ]; then
     echo "configure returned with non-zero ($ret) status"
     exit 1
   fi
-  echo "make install > make_install.log 2>&1"
-  make install > make_install.log 2>&1
+  echo "make ${MAKE_ARGS} install > make_install.log 2>&1"
+  make ${MAKE_ARGS} install > make_install.log 2>&1
   ret=$?
   if [ $? != 0 ]; then
     echo "make install returned with non-zero ($ret) status"
@@ -678,8 +681,8 @@ if [ $COMPILE_NETCDF -eq 1 ]; then
     echo "configure returned with non-zero ($ret) status"
     exit 1
   fi
-  echo "make install > make_install.log 2>&1"
-  make install > make_install.log 2>&1
+  echo "make ${MAKE_ARGS} install > make_install.log 2>&1"
+  make ${MAKE_ARGS} install > make_install.log 2>&1
   ret=$?
   if [ $? != 0 ]; then
     echo "make install returned with non-zero ($ret) status"
@@ -704,15 +707,15 @@ if [ $COMPILE_FREETYPE -eq 1 ]; then
     echo "configure returned with non-zero ($ret) status"
     exit 1
   fi
-  echo "make > make.log 2>&1"
-  make > make.log 2>&1
+  echo "make ${MAKE_ARGS} > make.log 2>&1"
+  make ${MAKE_ARGS} > make.log 2>&1
   ret=$?
   if [ $ret != 0 ]; then
     echo "make returned with non-zero ($ret) status"
     exit 1
   fi
-  echo "make install > make_install.log 2>&1 --with-zlib=${LIB_DIR} LDFLAGS=-L${LIB_DIR} CPPFLAGS=-I${LIB_DIR}"
-  make install > make_install.log 2>&1
+  echo "make ${MAKE_ARGS} install > make_install.log 2>&1 --with-zlib=${LIB_DIR} LDFLAGS=-L${LIB_DIR} CPPFLAGS=-I${LIB_DIR}"
+  make ${MAKE_ARGS} install > make_install.log 2>&1
   ret=$?
   if [ $? != 0 ]; then
     echo "make install returned with non-zero ($ret) status"
@@ -741,15 +744,15 @@ if [ $COMPILE_CAIRO -eq 1 ]; then
       echo "configure returned with non-zero ($ret) status"
       exit 1
     fi
-    echo "make > make.log 2>&1"
-    make > make.log 2>&1
+    echo "make ${MAKE_ARGS} > make.log 2>&1"
+    make ${MAKE_ARGS} > make.log 2>&1
     ret=$?
     if [ $ret != 0 ]; then
       echo "make returned with non-zero ($ret) status"
       exit 1
     fi
-    echo "make install > make_install.log 2>&1"
-    make install > make_install.log 2>&1
+    echo "make ${MAKE_ARGS} install > make_install.log 2>&1"
+    make ${MAKE_ARGS} install > make_install.log 2>&1
     ret=$?
     if [ $? != 0 ]; then
       echo "make install returned with non-zero ($ret) status"
@@ -776,15 +779,15 @@ if [ $COMPILE_CAIRO -eq 1 ]; then
     echo "configure returned with non-zero ($ret) status"
     exit 1
   fi
-  echo "make > make.log 2>&1"
-  make > make.log 2>&1
+  echo "make ${MAKE_ARGS} > make.log 2>&1"
+  make ${MAKE_ARGS} > make.log 2>&1
   ret=$?
   if [ $ret != 0 ]; then
     echo "make returned with non-zero ($ret) status"
     exit 1
   fi
-  echo "make install > make_install.log 2>&1"
-  make install > make_install.log 2>&1
+  echo "make ${MAKE_ARGS} install > make_install.log 2>&1"
+  make ${MAKE_ARGS} install > make_install.log 2>&1
   ret=$?
   if [ $? != 0 ]; then
     echo "make install returned with non-zero ($ret) status"
@@ -904,24 +907,24 @@ g 2>&1"
     exit 1
   fi
 
-  echo "make > make.log 2>&1"
-  make > make.log 2>&1
+  echo "make ${MAKE_ARGS} > make.log 2>&1"
+  make ${MAKE_ARGS} > make.log 2>&1
   ret=$?
   if [ $ret != 0 ]; then
     echo "make returned with non-zero ($ret) status"
     exit 1
   fi
 
-  echo "make install > make_install.log 2>&1"
-  make install > make_install.log 2>&1
+  echo "make ${MAKE_ARGS} install > make_install.log 2>&1"
+  make ${MAKE_ARGS} install > make_install.log 2>&1
   ret=$?
   if [ $? != 0 ]; then
     echo "make install returned with non-zero ($ret) status"
     exit 1
   fi
 
-  echo "make test > make_test.log 2>&1"
-  make test > make_test.log 2>&1
+  echo "make ${MAKE_ARGS} test > make_test.log 2>&1"
+  make ${MAKE_ARGS} test > make_test.log 2>&1
   ret=$?
   if [ $? != 0 ]; then
     echo "make test returned with non-zero ($ret) status"
