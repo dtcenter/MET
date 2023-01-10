@@ -816,50 +816,24 @@ if [ $COMPILE_MET -eq 1 ]; then
     export OPT_ARGS="${OPT_ARGS} FFLAGS=-lpgf90"
   fi
 
-  echo "cd `pwd`"
-  if [[ -z ${MET_PYTHON_CC} && -z ${MET_PYTHON_LD} ]]; then
-    if [[ ! -z ${MET_FREETYPEINC} && ! -z ${MET_FREETYPELIB} && ! -z ${MET_CAIROINC} && ! -z ${MET_CAIROLIB} ]]; then
-      if [[ ! -z $MET_HDF && ! -z $MET_HDFEOS ]]; then
-        echo "./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-modis --enable-mode_graphics --enable-lidar2nc ${OPT_ARGS} > configure.log 2>&1"
-        ./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-modis --enable-mode_graphics --enable-lidar2nc ${OPT_ARGS} > configure.log 2>&1
-      else
-        echo "./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-mode_graphics ${OPT_ARGS} > configure.log 2>&1"
-        ./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-mode_graphics ${OPT_ARGS} > configure.log 2>&1
-      fi
-    else
-      if [[ ! -z $MET_HDF && ! -z $MET_HDFEOS ]]; then
-        echo "./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-modis --enable-lidar2nc ${OPT_ARGS} > configure.log 2>&1"
-        ./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-modis --enable-lidar2nc ${OPT_ARGS} > configure.log 2>&1
-      else
-        echo "./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 ${OPT_ARGS} > configure.lo\
-g 2>&1"
-        ./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 ${OPT_ARGS} > configure.log 2>&1
-      fi
-    fi
-  else
-    if [[ ! -z ${MET_FREETYPEINC} && ! -z ${MET_FREETYPELIB} && ! -z ${MET_CAIROINC} && ! -z ${MET_CAIROLIB} ]]; then
-      if [[ ! -z $MET_HDF && ! -z $MET_HDFEOS ]]; then
-        echo "./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-modis --enable-mode_graphics --enable-lidar2nc --enable-python ${OPT_ARGS} > configure.lo\
-g 2>&1"
-        ./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-modis --enable-mode_graphics --enable-lidar2nc --enable-python ${OPT_ARGS} > configure.log 2>&1
-      else
-        echo "./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-mode_graphics --enable-python ${OPT_ARGS} > configure.lo\
-g 2>&1"
-        ./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-mode_graphics --enable-python ${OPT_ARGS} > configure.log 2>&1
-      fi
-    else
-      if [[ ! -z $MET_HDF && ! -z $MET_HDFEOS ]]; then
-        echo "./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-modis --enable-lidar2nc --enable-python ${OPT_ARGS} > configure.lo\
-g 2>&1"
-        ./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-modis --enable-lidar2nc --enable-python ${OPT_ARGS} > configure.log 2>&1
-      else
-        echo "./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-python ${OPT_ARGS} > configure.lo\
-g 2>&1"
-        ./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-python ${OPT_ARGS} > configure.log 2>&1
-      fi
-    fi
+  configure_cmd="./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME}  GRIB2CLIB_NAME=${GRIB2CLIB_NAME}  --enable-grib2"
+  if [[ ! -z ${MET_FREETYPEINC} && ! -z ${MET_FREETYPELIB} && ! -z ${MET_CAIROINC} && ! -z ${MET_CAIROLIB} ]]; then
+    OPT_ARGS="--enable-mode_graphics ${OPT_ARGS}"
   fi
 
+  if [[ ! -z $MET_HDF && ! -z $MET_HDFEOS ]]; then
+    OPT_ARGS="--enable-modis --enable-lidar2nc ${OPT_ARGS}"
+  fi
+
+  if [[ ! -z ${MET_PYTHON_CC} || ! -z ${MET_PYTHON_LD} ]]; then
+    OPT_ARGS="--enable-python ${OPT_ARGS}"
+  fi
+
+  configure_cmd="${configure_cmd} ${OPT_ARGS}"
+
+  echo "cd `pwd`"
+  echo "${configure_cmd} > configure.log 2>&1"
+  ${configure_cmd} > configure.log 2>&1
   ret=$?
   if [ $ret != 0 ]; then
     echo "configure returned with non-zero ($ret) status"
@@ -892,4 +866,3 @@ g 2>&1"
 fi
 
 echo "Finished compiling at `date`"
-
