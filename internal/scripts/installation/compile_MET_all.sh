@@ -224,77 +224,36 @@ if [ ${USE_MODULES} = "TRUE" ]; then
 fi
 
 if [ ${COMPILER_FAMILY} = "gnu" ]; then
-  if [ -z ${CC} ]; then
-    export CC=`which gcc`
-  else
-    export CC=${CC}
-  fi
-  if [ -z ${CXX} ]; then
-    export CXX=`which g++`
-  else
-    export CXX=${CXX}
-  fi
-  if [ -z ${FC} ]; then
-    export FC=`which gfortran`
-  else
-    export FC=${FC}
-  fi
-  if [ -z ${F77} ]; then
-    export F77=`which gfortran`
-  else
-    export F77=${F77}
-  fi
-  if [ -z ${F90} ]; then
-    export F90=`which gfortran`
-  else
-    export F90=${F90}
-  fi
+  if [ -z ${CC} ]; then CC=`which gcc`; fi
+  export CC
+  if [ -z ${CXX} ]; then CXX=`which g++`; fi
+  export CXX
+  if [ -z ${FC} ]; then FC=`which gfortran`; fi
+  export FC
+  if [ -z ${F77} ]; then F77=`which gfortran`; fi
+  export F77
+  if [ -z ${F90} ]; then F90=`which gfortran`;  fi
+  export F90
 elif [ ${COMPILER_FAMILY} = "pgi" ]; then
-  if [ -z ${CC} ]; then
-    export CC=`which pgcc`
-  else
-    export CC=${CC}
-  fi
-  if [ -z ${CXX} ]; then
-    export CXX=`which pgc++`
-  else
-    export CXX=${CXX}
-  fi
-  if [ -z ${F90} ]; then
-    export F90=`which pgf90`
-    export F77=${F90}
-    export FC=${F90}
-  else
-    export F90=${F90}
-    export F77=${F90}
-    export FC=${F90}
-  fi
+  if [ -z ${CC} ]; then CC=`which pgcc`; fi
+  export CC
+  if [ -z ${CXX} ]; then CXX=`which pgc++`; fi
+  export CXX
+  if [ -z ${F90} ]; then F90=`which pgf90`; fi
+  export F90
+  export F77=${F90}
+  export FC=${F90}
 elif [[ ${COMPILER_FAMILY} == "intel" ]] || [[ ${COMPILER_FAMILY} == "ics" ]] || [[ ${COMPILER_FAMILY} == "ips" ]] || [[ ${COMPILER_FAMILY} == "PrgEnv-intel" ]]; then
-  if [ -z ${CC} ]; then
-    export CC=`which icc`
-  else
-    export CC=${CC}
-  fi
-  if [ -z ${CXX} ]; then
-    export CXX=`which icc`
-  else
-    export CXX=${CXX}
-  fi
-  if [ -z ${FC} ]; then
-    export FC=`which ifort`
-  else
-    export FC=${FC}
-  fi
-  if [ -z ${F77} ]; then
-    export F77=`which ifort`
-  else
-    export F77=${F77}
-  fi
-  if [ -z ${F90} ]; then
-    export F90=`which ifort`
-  else
-    export F90=${F90}
-  fi
+  if [ -z ${CC} ]; then CC=`which icc`; fi
+  export CC
+  if [ -z ${CXX} ]; then CXX=`which icc`; fi
+  export CXX
+  if [ -z ${FC} ]; then FC=`which ifort`; fi
+  export FC
+  if [ -z ${F77} ]; then F77=`which ifort`; fi
+  export F77
+  if [ -z ${F90} ]; then F90=`which ifort`; fi
+  export F90
 else
   echo "ERROR: \${COMPILER} must start with gnu, intel, ics, ips, PrgEnv-intel, or pgi"
   exit
