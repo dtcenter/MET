@@ -1013,9 +1013,9 @@ void NetcdfObsVars::write_header_to_nc(NcDataBuffer &data_buf,
    ConcatString log_message;
    if (is_prepbufr) {
       log_message.add(", pb_hdr_data_offset: ");
-      log_message.add(data_buf.pb_hdr_data_offset);
+      log_message.add(std::to_string(data_buf.pb_hdr_data_offset));
       log_message.add(", raw_hdr_cnt: ");
-      log_message.add(raw_hdr_cnt);
+      log_message.add(std::to_string(raw_hdr_cnt));
    }
 
    mlog << Debug(7) << method_name << " buf_size: " << buf_size
