@@ -202,8 +202,6 @@ fi
 
 if [ -z ${BIN_DIR_PATH} ]; then
   BIN_DIR_PATH=${TEST_BASE}/bin
-else
-  BIN_DIR_PATH=${BIN_DIR_PATH}
 fi
 
 if [ -z ${USE_MET_TAR_FILE} ]; then
