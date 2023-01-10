@@ -182,8 +182,23 @@ fi
 
 COMPILE_MET=1
 
-# skip compilation of components if SKIP_* is set
+# skip compilation of MET if SKIP_MET is set
 if [ ! -z "${SKIP_MET}" ]; then COMPILE_MET=0; fi
+
+# skip compilation of external libraries if SKIP_LIBS is set
+if [ ! -z "${SKIP_LIBS}" ]; then
+  COMPILE_GSL=0
+  COMPILE_BUFRLIB=0
+  COMPILE_ZLIB=0
+  COMPILE_LIBPNG=0
+  COMPILE_JASPER=0
+  COMPILE_G2CLIB=0
+  COMPILE_HDF=0
+  COMPILE_HDFEOS=0
+  COMPILE_NETCDF=0
+  COMPILE_FREETYPE=0
+  COMPILE_CAIRO=0
+fi
 
 if [ -z ${BIN_DIR_PATH} ]; then
   BIN_DIR_PATH=${TEST_BASE}/bin
