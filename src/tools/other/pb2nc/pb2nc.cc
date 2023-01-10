@@ -445,6 +445,10 @@ int met_main(int argc, char *argv[]) {
          process_pbfile(i);
       }
 
+      mlog << Debug(2)
+           << "\nTotal Observations retained\t\t= " << n_total_obs << "\n";
+
+
       if (do_summary) {
          TimeSummaryInfo summaryInfo = conf_info.getSummaryInfo();
          summary_obs->summarizeObs(summaryInfo);
@@ -948,8 +952,8 @@ void process_pbfile(int i_pb) {
    }
 
    // Initialize counts
-   n_derived_obs = 0;
-   i_ret   = n_file_obs = i_msg      = 0;
+   n_derived_obs = n_file_obs = 0;
+   i_ret   = i_msg      = 0;
    rej_typ = rej_sid    = rej_vld    = rej_grid = rej_poly = 0;
    rej_elv = rej_pb_rpt = rej_in_rpt = rej_itp  = rej_nobs = 0;
 
@@ -1581,7 +1585,6 @@ void process_pbfile(int i_pb) {
                         OBS_BUFFER_SIZE);
 
                   // Increment the current and total observations counts
-                  n_file_obs++;
                   n_total_obs++;
                   n_derived_obs++;
 
@@ -1985,7 +1988,7 @@ void process_pbfile(int i_pb) {
    if(mlog.verbosity_level() > 0) cout << "\n" << flush;
 
    mlog << Debug(2)
-        << "Total Messages processed\t\t= " << npbmsg << "\n"
+        << "Messages processed\t\t\t= " << npbmsg << "\n"
         << "Rejected based on message type\t\t= "
         << rej_typ << "\n"
         << "Rejected based on station id\t\t= "
@@ -2006,9 +2009,9 @@ void process_pbfile(int i_pb) {
         << rej_itp << "\n"
         << "Rejected based on zero observations\t= "
         << rej_nobs << "\n"
-        << "Total Messages retained\t\t= "
+        << "Messages retained\t\t\t= "
         << i_msg << "\n"
-        << "Total observations retained or derived\t= "
+        << "Observations retained or derived\t= "
         << (n_file_obs + n_derived_obs) << "\n";
 
    if (cal_cape) {
@@ -2073,11 +2076,10 @@ void process_pbfile(int i_pb) {
               << "Saved the derived variables only. No " << (is_prepbufr ? "PrepBufr" : "Bufr")
               << " messages retained from file: "
               << pbfile[i_pb] << "\n";
-      else
-         mlog << Warning << "\n" << method_name
-              << "No " << (is_prepbufr ? "PrepBufr" : "Bufr")
-              << " messages retained from file: "
-              << pbfile[i_pb] << "\n\n";
+      else mlog << Warning << "\n" << method_name
+                << "No " << (is_prepbufr ? "PrepBufr" : "Bufr")
+                << " messages retained from file: "
+                << pbfile[i_pb] << "\n\n";
    }
 
    return;
