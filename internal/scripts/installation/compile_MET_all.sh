@@ -60,6 +60,17 @@
 #
 #================================================
 
+# print command, run it, then error and exit if non-zero value is returned
+function run_cmd {
+  echo $*
+  eval "$@"
+  ret=$?
+  if [ $ret != 0 ]; then
+    cmd_name=$(basename $1)
+    echo "${cmd_name} returned with non-zero ($ret) status"
+    exit $ret
+  fi
+}
 
 if [ -z $1 ]; then
   echo
@@ -304,32 +315,13 @@ if [ $COMPILE_GSL -eq 1 ]; then
   echo
   echo "Compiling GSL_${vrs} at `date`"
   mkdir -p ${LIB_DIR}/gsl
-  cd ${LIB_DIR}/gsl
-  rm -rf gsl*
-  tar -xf ${TAR_DIR}/gsl-${vrs}.tar.gz
-  cd gsl*
+  rm -rf ${LIB_DIR}/gsl/gsl*
+  tar -xf ${TAR_DIR}/gsl-${vrs}.tar.gz -C ${LIB_DIR}/gsl
+  cd ${LIB_DIR}/gsl/gsl*
   echo "cd `pwd`"
-  echo "./configure --prefix=${LIB_DIR} > configure.log 2>&1"
-  ./configure --prefix=${LIB_DIR} > configure.log 2>&1
-  ret=$?
-  if [ $ret != 0 ]; then
-    echo "configure returned with non-zero ($ret) status"
-    exit 1
-  fi
-  echo "make ${MAKE_ARGS} > make.log 2>&1"
-  make ${MAKE_ARGS} > make.log 2>&1
-  ret=$?
-  if [ $ret != 0 ]; then
-    echo "make returned with non-zero ($ret) status"
-    exit 1
-  fi
-  echo "make ${MAKE_ARGS} install > make_install.log 2>&1"
-  make ${MAKE_ARGS} install > make_install.log 2>&1
-  ret=$?
-  if [ $? != 0 ]; then
-    echo "make install returned with non-zero ($ret) status"
-    exit 1
-  fi
+  run_cmd "./configure --prefix=${LIB_DIR} > configure.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} > make.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} install > make_install.log 2>&1"
 fi
 
 # Compile BUFRLIB
@@ -340,10 +332,10 @@ if [ $COMPILE_BUFRLIB -eq 1 ]; then
   echo
   echo "Compiling BUFRLIB_${vrs} at `date`"
   mkdir -p ${LIB_DIR}/bufrlib/BUFRLIB_${vrs}
+  rm -rf ${LIB_DIR}/bufrlib/BUFRLIB_${vrs}/*
   cd ${LIB_DIR}/bufrlib/BUFRLIB_${vrs}
   echo "cd `pwd`"
-  rm -rf *
-  tar -xf ${TAR_DIR}/BUFRLIB_`echo $vrs | sed 's/\./-/g'`.tar
+  tar -xf ${TAR_DIR}/BUFRLIB_`echo $vrs | sed 's/\./-/g'`.tar -C ${LIB_DIR}/bufrlib/BUFRLIB_${vrs}
 
   ${CC} -c -DUNDERSCORE `./getdefflags_C.sh` *.c >> make.log 2>&1
 
@@ -370,32 +362,14 @@ if [ $COMPILE_ZLIB -eq 1 ]; then
   echo
   echo "Compiling ZLIB at `date`"
   mkdir -p ${LIB_DIR}/zlib
-  cd ${LIB_DIR}/zlib
-  rm -rf zlib*
-  tar -xzf ${TAR_DIR}/zlib*.tar.gz
-  cd zlib*
+  rm -rf ${LIB_DIR}/zlib/zlib*
+  tar -xzf ${TAR_DIR}/zlib*.tar.gz -C ${LIB_DIR}/zlib
+  cd ${LIB_DIR}/zlib/zlib*
   echo "cd `pwd`"
-  echo "./configure --prefix=${LIB_DIR} > configure.log 2>&1"
-  ./configure --prefix=${LIB_DIR} > configure.log 2>&1
-  ret=$?
-  if [ $ret != 0 ]; then
-    echo "configure returned with non-zero ($ret) status"
-    exit 1
-  fi
-  echo "make ${MAKE_ARGS} > make.log 2>&1"
-  make ${MAKE_ARGS} > make.log 2>&1
-  ret=$?
-  if [ $ret != 0 ]; then
-    echo "make returned with non-zero ($ret) status"
-    exit 1
-  fi
-  echo "make ${MAKE_ARGS} install > make_install.log 2>&1"
-  make ${MAKE_ARGS} install > make_install.log 2>&1
-  ret=$?
-  if [ $? != 0 ]; then
-    echo "make install returned with non-zero ($ret) status"
-    exit 1
-  fi
+  run_cmd "./configure --prefix=${LIB_DIR} > configure.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} > make.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} install > make_install.log 2>&1"
+
   # GPM: why is this removed? Could we add a comment to
   # describe why this is needed?
   echo "rm ${LIB_DIR}/lib/zlib.a"
@@ -407,32 +381,13 @@ if [[ $COMPILE_LIBPNG -eq 1 && $HOST != ys* ]]; then
   echo
   echo "Compiling LIBPNG at `date`"
   mkdir -p ${LIB_DIR}/libpng
-  cd ${LIB_DIR}/libpng
-  rm -rf libpng*
-  tar -xzf ${TAR_DIR}/libpng*.tar.gz
-  cd libpng*
+  rm -rf ${LIB_DIR}/libpng/libpng*
+  tar -xzf ${TAR_DIR}/libpng*.tar.gz -C ${LIB_DIR}/libpng
+  cd ${LIB_DIR}/libpng/libpng*
   echo "cd `pwd`"
-  echo "./configure --prefix=${LIB_DIR} LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include > configure.log 2>&1"
-  ./configure --prefix=${LIB_DIR} LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include > configure.log 2>&1
-  ret=$?
-  if [ $ret != 0 ]; then
-    echo "configure returned with non-zero ($ret) status"
-    exit 1
-  fi
-  echo "make ${MAKE_ARGS} > make.log 2>&1"
-  make ${MAKE_ARGS} > make.log 2>&1
-  ret=$?
-  if [ $ret != 0 ]; then
-    echo "make returned with non-zero ($ret) status"
-    exit 1
-  fi
-  echo "make ${MAKE_ARGS} install > make_install.log 2>&1"
-  make ${MAKE_ARGS} install > make_install.log 2>&1
-  ret=$?
-  if [ $? != 0 ]; then
-    echo "make install returned with non-zero ($ret) status"
-    exit 1
-  fi
+  run_cmd "./configure --prefix=${LIB_DIR} LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include > configure.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} > make.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} install > make_install.log 2>&1"
 fi
 
 # Compile JASPER
@@ -441,32 +396,14 @@ if [ $COMPILE_JASPER -eq 1 ]; then
   echo "Compiling JASPER at `date`"
   mkdir -p ${LIB_DIR}/jasper
   cd ${LIB_DIR}/jasper
-  rm -rf jasper*
-  unzip ${TAR_DIR}/jasper*.zip > /dev/null 2>&1
-  cd jasper*
+  rm -rf ${LIB_DIR}/jasper/jasper*
+  unzip ${TAR_DIR}/jasper*.zip -d ${LIB_DIR}/jasper > /dev/null 2>&1
+  cd ${LIB_DIR}/jasper/jasper*
   export CPPFLAGS="-I${LIB_DIR}/include"
   echo "cd `pwd`"
-  echo "./configure --prefix=${LIB_DIR} > configure.log 2>&1"
-  ./configure --prefix=${LIB_DIR} > configure.log 2>&1
-  ret=$?
-  if [ $ret != 0 ]; then
-    echo "configure returned with non-zero ($ret) status"
-    exit 1
-  fi
-  echo "make ${MAKE_ARGS} > make.log 2>&1"
-  make ${MAKE_ARGS} > make.log 2>&1
-  ret=$?
-  if [ $ret != 0 ]; then
-    echo "make returned with non-zero ($ret) status"
-    exit 1
-  fi
-  echo "make ${MAKE_ARGS} install > make_install.log 2>&1"
-  make ${MAKE_ARGS} install > make_install.log 2>&1
-  ret=$?
-  if [ $? != 0 ]; then
-    echo "make install returned with non-zero ($ret) status"
-    exit 1
-  fi
+  run_cmd "./configure --prefix=${LIB_DIR} > configure.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} > make.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} install > make_install.log 2>&1"
 fi
 
 # Compile G2CLIB
@@ -474,10 +411,9 @@ if [ $COMPILE_G2CLIB -eq 1 ]; then
   echo
   echo "Compiling G2CLIB at `date`"
   mkdir -p ${LIB_DIR}/g2clib
-  cd ${LIB_DIR}/g2clib
-  rm -rf g2clib*
-  tar -xf ${TAR_DIR}/g2clib*.tar
-  cd g2clib*
+  rm -rf ${LIB_DIR}/g2clib/g2clib*
+  tar -xf ${TAR_DIR}/g2clib*.tar -C ${LIB_DIR}/g2clib
+  cd ${LIB_DIR}/g2clib/g2clib*
   cat makefile | \
     sed -r 's/INC=.*/INC=-I${LIB_DIR}\/include -I${LIB_DIR}\/include\/jasper/g' | \
     sed 's/CC=gcc/CC=${CC_COMPILER}/g' | \
@@ -488,13 +424,8 @@ if [ $COMPILE_G2CLIB -eq 1 ]; then
   echo "cd `pwd`"
   # g2clib appears to compile but causes failure compiling MET if -j argument is used
   # so exclude it from this call
-  echo "make > make.log 2>&1"
-  make > make.log 2>&1
-  ret=$?
-  if [ $ret != 0 ]; then
-    echo "make returned with non-zero ($ret) status"
-    exit 1
-  fi
+  run_cmd "make > make.log 2>&1"
+
   cp libg2c*.a ${LIB_DIR}/lib/libgrib2c.a
   cp *.h ${LIB_DIR}/include/.
 fi
@@ -508,18 +439,11 @@ if [ $COMPILE_HDF -eq 1 ]; then
   echo
   echo "Compiling HDF at `date`"
   mkdir -p ${LIB_DIR}/hdf
-  cd ${LIB_DIR}/hdf
-  rm -rf HDF*
-  tar -xf ${TAR_DIR}/HDF4.2*.tar.gz
-  cd HDF*
+  rm -rf ${LIB_DIR}/hdf/HDF*
+  tar -xf ${TAR_DIR}/HDF4.2*.tar.gz -C ${LIB_DIR}/hdf
+  cd ${LIB_DIR}/hdf/HDF*
   echo "cd `pwd`"
-  echo "./configure --prefix=${LIB_DIR} --disable-netcdf --with-jpeg=${LIB_DIR} --with-zlib=${LIB_DIR} > configure.log 2>&1"
-  ./configure --prefix=${LIB_DIR} --disable-netcdf --with-jpeg=${LIB_DIR} --with-zlib=${LIB_DIR} > configure.log 2>&1
-  ret=$?
-  if [ $ret != 0 ]; then
-    echo "configure returned with non-zero ($ret) status"
-    exit 1
-  fi
+  run_cmd "./configure --prefix=${LIB_DIR} --disable-netcdf --with-jpeg=${LIB_DIR} --with-zlib=${LIB_DIR} > configure.log 2>&1"
   cat mfhdf/hdiff/Makefile | \
     sed 's/LIBS = -ljpeg -lz/LIBS = -ljpeg -lz -lm/g' \
     > Makefile_new
@@ -534,20 +458,8 @@ if [ $COMPILE_HDF -eq 1 ]; then
       > Makefile_new
   fi
   mv Makefile_new hdf/src/Makefile
-  echo "make ${MAKE_ARGS} > make.log 2>&1"
-  make ${MAKE_ARGS} > make.log 2>&1
-  ret=$?
-  if [ $ret != 0 ]; then
-    echo "make returned with non-zero ($ret) status"
-    exit 1
-  fi
-  echo "make ${MAKE_ARGS} install > make_install.log 2>&1"
-  make ${MAKE_ARGS} install > make_install.log 2>&1
-  ret=$?
-  if [ $? != 0 ]; then
-    echo "make install returned with non-zero ($ret) status"
-    exit 1
-  fi
+  run_cmd "make ${MAKE_ARGS} > make.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} install > make_install.log 2>&1"
 fi
 
 # Compile HDFEOS
@@ -556,32 +468,14 @@ if [ $COMPILE_HDFEOS -eq 1 ]; then
   echo
   echo "Compiling HDFEOS at `date`"
   mkdir -p ${LIB_DIR}/hdfeos
-  cd ${LIB_DIR}/hdfeos
-  rm -rf HDF-EOS*
-  tar -xzf ${TAR_DIR}/HDF-EOS*.tar.*
-  cd hdfeos
+  rm -rf ${LIB_DIR}/hdfeos/HDF-EOS*
+  tar -xzf ${TAR_DIR}/HDF-EOS*.tar.* -C ${LIB_DIR}/hdfeos
+  cd ${LIB_DIR}/hdfeos/hdfeos
   echo "cd `pwd`"
-  echo "./configure --prefix=${LIB_DIR} --with-hdf4=${LIB_DIR} > configure.log 2>&1"
-  ./configure --prefix=${LIB_DIR} --with-hdf4=${LIB_DIR} --with-jpeg=${LIB_DIR} > configure.log 2>&1
-  ret=$?
-  if [ $ret != 0 ]; then
-    echo "configure returned with non-zero ($ret) status"
-    exit 1
-  fi
-  echo "make ${MAKE_ARGS} > make.log 2>&1"
-  make ${MAKE_ARGS} > make.log 2>&1
-  ret=$?
-  if [ $ret != 0 ]; then
-    echo "make returned with non-zero ($ret) status"
-    exit 1
-  fi
-  echo "make ${MAKE_ARGS} install > make_install.log 2>&1"
-  make ${MAKE_ARGS} install > make_install.log 2>&1
-  ret=$?
-  if [ $? != 0 ]; then
-    echo "make install returned with non-zero ($ret) status"
-    exit 1
-  fi
+  run_cmd "./configure --prefix=${LIB_DIR} --with-hdf4=${LIB_DIR} --with-jpeg=${LIB_DIR} > configure.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} > make.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} install > make_install.log 2>&1"
+
   cp include/*.h ${LIB_DIR}/include/
 fi
 
@@ -591,71 +485,32 @@ if [ $COMPILE_NETCDF -eq 1 ]; then
   echo
   echo "Compiling HDF5 at `date`"
   mkdir -p ${LIB_DIR}/hdf5
-  cd ${LIB_DIR}/hdf5
-  rm -rf hdf5*
-  tar -xzf ${TAR_DIR}/hdf5*.tar.gz
-  cd hdf5*
+  rm -rf ${LIB_DIR}/hdf5/hdf5*
+  tar -xzf ${TAR_DIR}/hdf5*.tar.gz -C ${LIB_DIR}/hdf5
+  cd ${LIB_DIR}/hdf5/hdf5*
   echo "cd `pwd`"
-  echo "./configure --prefix=${LIB_DIR} --with-zlib=${LIB_Z} CFLAGS=-fPIC CXXFLAGS=-fPIC FFLAGS=-fPIC LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include > configure.log 2>&1"
-  ./configure --prefix=${LIB_DIR} --with-zlib=${LIB_Z} CFLAGS=-fPIC CXXFLAGS=-fPIC FFLAGS=-fPIC LDFLAGS=-L${LIB_DIR}/lib:${LIB_Z} CPPFLAGS=-I${LIB_DIR}/include > configure.log 2>&1
-  ret=$?
-  if [ $ret != 0 ]; then
-    echo "configure returned with non-zero ($ret) status"
-    exit 1
-  fi
-  echo "make ${MAKE_ARGS} install > make_install.log 2>&1"
-  make ${MAKE_ARGS} install > make_install.log 2>&1
-  ret=$?
-  if [ $? != 0 ]; then
-    echo "make install returned with non-zero ($ret) status"
-    exit 1
-  fi
+  run_cmd "./configure --prefix=${LIB_DIR} --with-zlib=${LIB_Z} CFLAGS=-fPIC CXXFLAGS=-fPIC FFLAGS=-fPIC LDFLAGS=-L${LIB_DIR}/lib:${LIB_Z} CPPFLAGS=-I${LIB_DIR}/include > configure.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} install > make_install.log 2>&1"
 
   echo
   echo "Compiling NetCDF-C at `date`"
   mkdir -p ${LIB_DIR}/netcdf
-  cd ${LIB_DIR}/netcdf
-  rm -rf netcdf*
-  tar -xzf ${TAR_DIR}/netcdf-4*.tar.gz
-  cd netcdf-c-4*
+  rm -rf ${LIB_DIR}/netcdf/netcdf*
+  tar -xzf ${TAR_DIR}/netcdf-4*.tar.gz -C ${LIB_DIR}/netcdf
+  cd ${LIB_DIR}/netcdf/netcdf-c-4*
   export FC=''
   export F90=''
   echo "cd `pwd`"
-  echo "./configure --prefix=${LIB_DIR} CFLAGS=-fPIC CXXFLAGS=-fPIC LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include > configure.log 2>&1"
-  ./configure --prefix=${LIB_DIR} CFLAGS=-fPIC CXXFLAGS=-fPIC LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include > configure.log 2>&1
-  ret=$?
-  if [ $ret != 0 ]; then
-    echo "configure returned with non-zero ($ret) status"
-    exit 1
-  fi
-  echo "make ${MAKE_ARGS} install > make_install.log 2>&1"
-  make ${MAKE_ARGS} install > make_install.log 2>&1
-  ret=$?
-  if [ $? != 0 ]; then
-    echo "make install returned with non-zero ($ret) status"
-    exit 1
-  fi
+  run_cmd "./configure --prefix=${LIB_DIR} CFLAGS=-fPIC CXXFLAGS=-fPIC LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include > configure.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} install > make_install.log 2>&1"
 
   echo
   echo "Compiling NetCDF-CXX at `date`"
-  cd ${LIB_DIR}/netcdf
-  tar -xzf ${TAR_DIR}/netcdf-cxx*.tar.gz
-  cd netcdf-cxx*
+  tar -xzf ${TAR_DIR}/netcdf-cxx*.tar.gz -C ${LIB_DIR}/netcdf
+  cd ${LIB_DIR}/netcdf/netcdf-cxx*
   echo "cd `pwd`"
-  echo "./configure --prefix=${LIB_DIR} LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include > configure.log 2>&1"
-  ./configure --prefix=${LIB_DIR} LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include > configure.log 2>&1
-  ret=$?
-  if [ $ret != 0 ]; then
-    echo "configure returned with non-zero ($ret) status"
-    exit 1
-  fi
-  echo "make ${MAKE_ARGS} install > make_install.log 2>&1"
-  make ${MAKE_ARGS} install > make_install.log 2>&1
-  ret=$?
-  if [ $? != 0 ]; then
-    echo "make install returned with non-zero ($ret) status"
-    exit 1
-  fi
+  run_cmd "./configure --prefix=${LIB_DIR} LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include > configure.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} install > make_install.log 2>&1"
 fi
 
 # Compile FREETYPE
@@ -663,32 +518,13 @@ if [ $COMPILE_FREETYPE -eq 1 ]; then
   echo
   echo "Compiling FREETYPE at `date`"
   mkdir -p ${LIB_DIR}/freetype
-  cd ${LIB_DIR}/freetype
-  rm -rf freetype*
-  tar -xzf ${TAR_DIR}/freetype*.tar.gz
-  cd freetype*
+  rm -rf ${LIB_DIR}/freetype/freetype*
+  tar -xzf ${TAR_DIR}/freetype*.tar.gz -C ${LIB_DIR}/freetype
+  cd ${LIB_DIR}/freetype/freetype*
   echo "cd `pwd`"
-  echo "./configure --prefix=${LIB_DIR} --with-png=yes > configure.log 2>&1"
-  ./configure --prefix=${LIB_DIR} --with-png=yes > configure.log 2>&1
-  ret=$?
-  if [ $ret != 0 ]; then
-    echo "configure returned with non-zero ($ret) status"
-    exit 1
-  fi
-  echo "make ${MAKE_ARGS} > make.log 2>&1"
-  make ${MAKE_ARGS} > make.log 2>&1
-  ret=$?
-  if [ $ret != 0 ]; then
-    echo "make returned with non-zero ($ret) status"
-    exit 1
-  fi
-  echo "make ${MAKE_ARGS} install > make_install.log 2>&1 --with-zlib=${LIB_DIR} LDFLAGS=-L${LIB_DIR} CPPFLAGS=-I${LIB_DIR}"
-  make ${MAKE_ARGS} install > make_install.log 2>&1
-  ret=$?
-  if [ $? != 0 ]; then
-    echo "make install returned with non-zero ($ret) status"
-    exit 1
-  fi
+  run_cmd "./configure --prefix=${LIB_DIR} --with-png=yes > configure.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} > make.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} install > make_install.log 2>&1"
 fi
 
 
@@ -700,67 +536,29 @@ if [ $COMPILE_CAIRO -eq 1 ]; then
     echo
     echo "Compiling pixman at `date`"
     mkdir -p  ${LIB_DIR}/pixman
-    cd ${LIB_DIR}/pixman
-    rm -rf pixman*
-    tar -xzf ${TAR_DIR}/pixman*.tar.gz
-    cd pixman*
+    rm -rf ${LIB_DIR}/pixman/pixman*
+    tar -xzf ${TAR_DIR}/pixman*.tar.gz -C ${LIB_DIR}/pixman
+    cd ${LIB_DIR}/pixman/pixman*
     echo "cd `pwd`"
-    echo "./configure --prefix=${LIB_DIR} > configure.log 2>&1"
-    ./configure --prefix=${LIB_DIR} > configure.log 2>&1
-    ret=$?
-    if [ $ret != 0 ]; then
-      echo "configure returned with non-zero ($ret) status"
-      exit 1
-    fi
-    echo "make ${MAKE_ARGS} > make.log 2>&1"
-    make ${MAKE_ARGS} > make.log 2>&1
-    ret=$?
-    if [ $ret != 0 ]; then
-      echo "make returned with non-zero ($ret) status"
-      exit 1
-    fi
-    echo "make ${MAKE_ARGS} install > make_install.log 2>&1"
-    make ${MAKE_ARGS} install > make_install.log 2>&1
-    ret=$?
-    if [ $? != 0 ]; then
-      echo "make install returned with non-zero ($ret) status"
-      exit 1
-    fi
+    run_cmd "./configure --prefix=${LIB_DIR} > configure.log 2>&1"
+    run_cmd "make ${MAKE_ARGS} > make.log 2>&1"
+    run_cmd "make ${MAKE_ARGS} install > make_install.log 2>&1"
   fi
 
   echo
   echo "Compiling CAIRO at `date`"
   mkdir -p ${LIB_DIR}/cairo
-  cd ${LIB_DIR}/cairo
-  rm -rf cairo*
-  tar -xf ${TAR_DIR}/cairo*.tar*
-  cd cairo*
+  rm -rf ${LIB_DIR}/cairo/cairo*
+  tar -xf ${TAR_DIR}/cairo*.tar* -C ${LIB_DIR}/cairo
+  cd ${LIB_DIR}/cairo/cairo*
   export PKG_CONFIG=`which pkg-config`
   if [ ${COMPILER_FAMILY} =  "PrgEnv-intel" ]; then
     export PKG_CONFIG_PATH=${LIB_DIR}/lib/pkgconfig/
   fi
   echo "cd `pwd`"
-  echo "./configure --prefix=${LIB_DIR} ax_cv_c_float_words_bigendian=no LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include > configure.log 2>&1"
-  ./configure --prefix=${LIB_DIR} ax_cv_c_float_words_bigendian=no LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include > configure.log 2>&1
-  ret=$?
-  if [ $ret != 0 ]; then
-    echo "configure returned with non-zero ($ret) status"
-    exit 1
-  fi
-  echo "make ${MAKE_ARGS} > make.log 2>&1"
-  make ${MAKE_ARGS} > make.log 2>&1
-  ret=$?
-  if [ $ret != 0 ]; then
-    echo "make returned with non-zero ($ret) status"
-    exit 1
-  fi
-  echo "make ${MAKE_ARGS} install > make_install.log 2>&1"
-  make ${MAKE_ARGS} install > make_install.log 2>&1
-  ret=$?
-  if [ $? != 0 ]; then
-    echo "make install returned with non-zero ($ret) status"
-    exit 1
-  fi
+  run_cmd "./configure --prefix=${LIB_DIR} ax_cv_c_float_words_bigendian=no LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include > configure.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} > make.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} install > make_install.log 2>&1"
 fi
 
 # Compile MET
@@ -768,14 +566,13 @@ if [ $COMPILE_MET -eq 1 ]; then
 
   echo
   echo "Compiling MET at `date`"
-  cd ${MET_DIR}
   # If using source from a tar file remove everything and unpack the tar file
   # FALSE = compiling from github repo and we don't want to overwrite the files
   if [ ${USE_MET_TAR_FILE} = "TRUE" ]; then
-    rm -rf MET*
-    tar -xzf ${MET_TARBALL}
+    rm -rf ${MET_DIR}/MET*
+    tar -xzf ${MET_TARBALL} -C ${MET_DIR}
   fi
-  cd MET*
+  cd ${MET_DIR}/MET*
 
   if [ -z ${MET_BUFRLIB} ]; then
     export MET_BUFRLIB=${LIB_DIR}/lib
@@ -800,8 +597,8 @@ if [ $COMPILE_MET -eq 1 ]; then
     export MET_GSL=${LIB_DIR}
   fi
 
-  export MET_PYTHON_LD=${MET_PYTHON_LD}
-  export MET_PYTHON_CC=${MET_PYTHON_CC}
+  export MET_PYTHON_LD
+  export MET_PYTHON_CC
   export LDFLAGS="-Wl,--disable-new-dtags"
   # https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html
   # ${parameter:+word}
@@ -841,37 +638,10 @@ if [ $COMPILE_MET -eq 1 ]; then
   configure_cmd="${configure_cmd} ${OPT_ARGS}"
 
   echo "cd `pwd`"
-  echo "${configure_cmd} > configure.log 2>&1"
-  ${configure_cmd} > configure.log 2>&1
-  ret=$?
-  if [ $ret != 0 ]; then
-    echo "configure returned with non-zero ($ret) status"
-    exit 1
-  fi
-
-  echo "make ${MAKE_ARGS} > make.log 2>&1"
-  make ${MAKE_ARGS} > make.log 2>&1
-  ret=$?
-  if [ $ret != 0 ]; then
-    echo "make returned with non-zero ($ret) status"
-    exit 1
-  fi
-
-  echo "make ${MAKE_ARGS} install > make_install.log 2>&1"
-  make ${MAKE_ARGS} install > make_install.log 2>&1
-  ret=$?
-  if [ $? != 0 ]; then
-    echo "make install returned with non-zero ($ret) status"
-    exit 1
-  fi
-
-  echo "make ${MAKE_ARGS} test > make_test.log 2>&1"
-  make ${MAKE_ARGS} test > make_test.log 2>&1
-  ret=$?
-  if [ $? != 0 ]; then
-    echo "make test returned with non-zero ($ret) status"
-    exit 1
-  fi
+  run_cmd "${configure_cmd} > configure.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} > make.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} install > make_install.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} test > make_test.log 2>&1"
 fi
 
 echo "Finished compiling at `date`"
