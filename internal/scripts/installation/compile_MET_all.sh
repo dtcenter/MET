@@ -182,6 +182,9 @@ fi
 
 COMPILE_MET=1
 
+# skip compilation of components if SKIP_* is set
+if [ ! -z "${SKIP_MET}" ]; then COMPILE_MET=0; fi
+
 if [ -z ${BIN_DIR_PATH} ]; then
   BIN_DIR_PATH=${TEST_BASE}/bin
 else
