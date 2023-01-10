@@ -109,6 +109,7 @@ protected:
   vector< Observation > _observations;
   bool  use_var_id;
   StringArray obs_names;
+  StringArray obs_units;
 
   bool do_monitor;
   int start_time, end_time;

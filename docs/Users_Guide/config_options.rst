@@ -240,6 +240,7 @@ Referencing that environment variable inside a MET configuration file:
 In addition to supporting user-specified environment variables within configuration
 files, the environment variables listed below have special meaning if set at runtime.
 
+.. _met_airnow_stations:
 
 MET_AIRNOW_STATIONS
 ^^^^^^^^^^^^^^^^^^^
@@ -249,7 +250,17 @@ will override the default file. If set, it should be the full path to the file.
 The default table can be found in the installed
 *share/met/table_files/airnow_monitoring_site_locations_v2.dat*. This file contains
 ascii column data that allows lookups of latitude, longitude, and elevation for all
-airnow stations based on stationId and/or AqSid.
+AirNow stations based on stationId and/or AqSid.
+
+Additional information and updated site locations can be found at the
+`EPA AirNow website <https://www.airnow.gov>`_. While some monitoring stations are
+permanent, others are temporary, and theirs locations can change. When running the
+ascii2nc tool with the `-format airnowhourly` option, users should
+`download <https://test.airnowtech.org/>`_ the `Monitoring_Site_Locations_V2.dat` data file
+data file corresponding to the date being processed and set the MET_AIRNOW_STATIONS
+envrionment variable to define its location.
+
+.. _met_ndbc_stations:
 
 MET_NDBC_STATIONS
 ^^^^^^^^^^^^^^^^^
@@ -514,8 +525,9 @@ containing a "key" string and "val" string. This defines a mapping of
 message type group names to a comma-separated list of values. This map is
 defined in the config files for PB2NC, Point-Stat, or Ensemble-Stat. Modify
 this map to define sets of message types that should be processed together as
-a group. The "SURFACE" entry must be present to define message types for
-which surface verification logic should be applied.
+a group. The "SURFACE" entry defines message types for which surface verification
+logic should be applied. If not defined, the default values listed below are
+used.
 
 .. code-block:: none
 		
@@ -1797,20 +1809,20 @@ This dictionary may include the following entries:
 land_mask
 ^^^^^^^^^
      
-The "land_mask" dictionary defines the land/sea mask field which is used
-when verifying at the surface. For point observations whose message type
-appears in the "LANDSF" entry of the "message_type_group_map" setting,
-only use forecast grid points where land = TRUE. For point observations
-whose message type appears in the "WATERSF" entry of the
-"message_type_group_map" setting, only use forecast grid points where
-land = FALSE. The "flag" entry enables/disables this logic. If the
-"file_name" entry is left empty, then the land/sea is assumed to exist in
-the input forecast file. Otherwise, the specified file(s) are searched for
-the data specified in the "field" entry. The "regrid" settings specify how
-this field should be regridded to the verification domain. Lastly, the
-"thresh" entry is the threshold which defines land (threshold is true) and
-water (threshold is false).
-land_mask.flag may be set separately in each "obs.field" entry.
+The "land_mask" dictionary defines the land/sea mask field used when
+verifying at the surface. The "flag" entry enables/disables this logic.
+When enabled, the "message_type_group_map" dictionary must contain entries
+for "LANDSF" and "WATERSF". For point observations whose message type
+appears in the "LANDSF" entry, only use forecast grid points where land =
+TRUE. For point observations whose message type appears in the "WATERSF"
+entry, only use forecast grid points where land = FALSE. If the "file_name"
+entry is left empty, the land/sea is assumed to exist in the input forecast
+file. Otherwise, the specified file(s) are searched for the data specified
+in the "field" entry. The "regrid" settings specify how this field should be
+regridded to the verification domain. Lastly, the "thresh" entry is the
+threshold which defines land (threshold is true) and water (threshold is false).
+
+The "land_mask.flag" entry may be set separately in each "obs.field" entry.
 
 .. code-block:: none
 		
@@ -1825,21 +1837,21 @@ land_mask.flag may be set separately in each "obs.field" entry.
 topo_mask
 ^^^^^^^^^
      
-The "topo_mask" dictionary defines the model topography field which is used
-when verifying at the surface. This logic is applied to point observations
-whose message type appears in the "SURFACE" entry of the
-"message_type_group_map" setting. Only use point observations where the
-topo - station elevation difference meets the "use_obs_thresh" threshold
+The "topo_mask" dictionary defines the model topography field used when
+verifying at the surface. The flag entry enables/disables this logic.
+When enabled, the "message_type_group_map" dictionary must contain an entry
+for "SURFACE". This logic is applied to point observations whose message type
+appears in the "SURFACE" entry. Only use point observations where the
+topo minus station elevation difference meets the "use_obs_thresh" threshold
 entry. For the observations kept, when interpolating forecast data to the
-observation location, only use forecast grid points where the topo - station
-difference meets the "interp_fcst_thresh" threshold entry. The flag entry
-enables/disables this logic. If the "file_name" is left empty, then the
-topography data is assumed to exist in the input forecast file. Otherwise,
-the specified file(s) are searched for the data specified in the "field"
+observation location, only use forecast grid points where the topo minus station
+difference meets the "interp_fcst_thresh" threshold entry.  If the "file_name"
+is left empty, the topography data is assumed to exist in the input forecast file.
+Otherwise, the specified file(s) are searched for the data specified in the "field"
 entry. The "regrid" settings specify how this field should be regridded to
 the verification domain.
 
-topo_mask.flag may be set separately in each "obs.field" entry.
+The "topo_mask.flag" entry may be set separately in each "obs.field" entry.
 
 .. code-block:: none
 		

@@ -70,8 +70,8 @@ void PairDataPoint::init_from_scratch() {
 
    seeps_mpr.clear();
    seeps.clear();
+   seeps_climo = NULL;
    clear();
-   seeps_climo = get_seeps_climo();
 
    return;
 }
@@ -180,8 +180,16 @@ bool PairDataPoint::add_point_pair(const char *sid, double lat, double lon,
 
 ////////////////////////////////////////////////////////////////////////
 
+void PairDataPoint::load_seeps_climo() {
+   if (NULL == seeps_climo) seeps_climo = get_seeps_climo();
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void PairDataPoint::set_seeps_thresh(const SingleThresh &p1_thresh) {
-   seeps_climo->set_p1_thresh(p1_thresh);
+   if (NULL != seeps_climo) seeps_climo->set_p1_thresh(p1_thresh);
+   else mlog << Warning << "\nPairDataPoint::set_seeps_thresh() ignored t1_threshold."
+             << " Load SEEPS climo first\n\n";
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -291,7 +299,7 @@ SeepsScore *PairDataPoint::compute_seeps(const char *sid, double f,
    int month, day, year, hour, minute, second;
 
    int sid_no = atoi(sid);
-   if (sid_no) {
+   if (sid_no && NULL != seeps_climo) {
       unix_to_mdyhms(ut, month, day, year, hour, minute, second);
       seeps = seeps_climo->get_seeps_score(sid_no, f, o, month, hour);
       if (mlog.verbosity_level() >= seeps_debug_level
@@ -1466,6 +1474,18 @@ void VxPairDataPoint::set_obs_perc_value(int percentile) {
    }
 
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void VxPairDataPoint::load_seeps_climo() {
+   for(int i=0; i < n_msg_typ; i++){
+      for(int j=0; j < n_mask; j++){
+         for(int k=0; k < n_interp; k++){
+            pd[i][j][k].load_seeps_climo();
+         }
+      }
+   }
 }
 
 ////////////////////////////////////////////////////////////////////////
