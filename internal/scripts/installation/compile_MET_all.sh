@@ -564,86 +564,92 @@ if [ $COMPILE_CAIRO -eq 1 ]; then
 fi
 
 # Compile MET
-if [ $COMPILE_MET -eq 1 ]; then
-
-  echo
-  echo "Compiling MET at `date`"
-  # If using source from a tar file remove everything and unpack the tar file
-  # FALSE = compiling from github repo and we don't want to overwrite the files
-  if [ ${USE_MET_TAR_FILE} = "TRUE" ]; then
-    rm -rf ${MET_DIR}/MET*
-    tar -xzf ${MET_TARBALL} -C ${MET_DIR}
-  fi
-  cd ${MET_DIR}/MET*
-
-  if [ -z ${MET_BUFRLIB} ]; then
-    export MET_BUFRLIB=${LIB_DIR}/lib
-    export BUFRLIB_NAME=-lbufr
-  fi
-
-  if [ -z ${MET_GRIB2CLIB} ]; then
-    export MET_GRIB2CLIB=${LIB_DIR}/lib
-    export MET_GRIB2CINC=${LIB_DIR}/include
-    export LIB_JASPER=${LIB_DIR}/lib
-    export LIB_LIBPNG=${LIB_DIR}/lib
-    export LIB_Z=${LIB_DIR}/lib
-    export GRIB2CLIB_NAME=-lgrib2c
-  fi
-
-  if [ -z ${MET_NETCDF} ]; then
-    export MET_NETCDF=${LIB_DIR}
-    export MET_HDF5=${LIB_DIR}
-  fi
-
-  if [ -z ${MET_GSL} ]; then
-    export MET_GSL=${LIB_DIR}
-  fi
-
-  export MET_PYTHON_LD
-  export MET_PYTHON_CC
-  export LDFLAGS="-Wl,--disable-new-dtags"
-  # https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html
-  # ${parameter:+word}
-  # If parameter is null or unset, nothing is substituted, otherwise the expansion of word is substituted.
-  export LDFLAGS="${LDFLAGS} -Wl,-rpath,${LIB_DIR}/lib${MET_NETCDF:+:$MET_NETCDF/lib}${MET_HDF5:+:$MET_HDF5/lib}${MET_BUFRLIB:+:$MET_BUFRLIB}${MET_GRIB2CLIB:+:$MET_GRIB2CLIB}${MET_PYTHON:+:$MET_PYTHON/lib}${MET_GSL:+:$MET_GSL/lib}"
-  export LDFLAGS="${LDFLAGS} -Wl,-rpath,${LIB_JASPER:+$LIB_JASPER}${LIB_LIBPNG:+:$LIB_PNG}${LIB_Z:+$LIB_Z}"
-  export LDFLAGS="${LDFLAGS} ${LIB_JASPER:+-L$LIB_JASPER} ${LIB_LIBPNG:+-L$LIB_LIBPNG} ${MET_HDF5:+-L$MET_HDF5/lib}"
-  export LIBS="${LIBS} -lhdf5_hl -lhdf5 -lz"
-  export MET_FONT_DIR=${TEST_BASE}/fonts
-
-  if [ "${SET_D64BIT}" = "TRUE" ]; then
-    export CFLAGS="-D__64BIT__"
-    export CXXFLAGS="-D__64BIT__"
-  fi
-
-  echo "MET Configuration settings..."
-  printenv | egrep "^MET_" | sed -r 's/^/export /g'
-  echo "LDFLAGS = ${LDFLAGS}"
-  export OPT_ARGS=''
-  if [[ $COMPILER_FAMILY == "pgi" ]]; then
-    export OPT_ARGS="${OPT_ARGS} FFLAGS=-lpgf90"
-  fi
-
-  configure_cmd="./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH} BUFRLIB_NAME=${BUFRLIB_NAME}  GRIB2CLIB_NAME=${GRIB2CLIB_NAME}  --enable-grib2"
-  if [[ ! -z ${MET_FREETYPEINC} && ! -z ${MET_FREETYPELIB} && ! -z ${MET_CAIROINC} && ! -z ${MET_CAIROLIB} ]]; then
-    OPT_ARGS="--enable-mode_graphics ${OPT_ARGS}"
-  fi
-
-  if [[ ! -z $MET_HDF && ! -z $MET_HDFEOS ]]; then
-    OPT_ARGS="--enable-modis --enable-lidar2nc ${OPT_ARGS}"
-  fi
-
-  if [[ ! -z ${MET_PYTHON_CC} || ! -z ${MET_PYTHON_LD} ]]; then
-    OPT_ARGS="--enable-python ${OPT_ARGS}"
-  fi
-
-  configure_cmd="${configure_cmd} ${OPT_ARGS}"
-
-  echo "cd `pwd`"
-  run_cmd "${configure_cmd} > configure.log 2>&1"
-  run_cmd "make ${MAKE_ARGS} > make.log 2>&1"
-  run_cmd "make ${MAKE_ARGS} install > make_install.log 2>&1"
-  run_cmd "make ${MAKE_ARGS} test > make_test.log 2>&1"
+if [ $COMPILE_MET -eq 0 ]; then
+  echo Skipping MET compilation
+  echo "Finished compiling at `date`"
+  exit 0
 fi
+
+echo
+echo "Compiling MET at `date`"
+# If using source from a tar file remove everything and unpack the tar file
+# FALSE = compiling from github repo and we don't want to overwrite the files
+if [ ${USE_MET_TAR_FILE} = "TRUE" ]; then
+  rm -rf ${MET_DIR}/MET*
+  tar -xzf ${MET_TARBALL} -C ${MET_DIR}
+fi
+cd ${MET_DIR}/MET*
+
+if [ -z ${MET_BUFRLIB} ]; then
+  export MET_BUFRLIB=${LIB_DIR}/lib
+  export BUFRLIB_NAME=-lbufr
+fi
+
+if [ -z ${MET_GRIB2CLIB} ]; then
+  export MET_GRIB2CLIB=${LIB_DIR}/lib
+  export MET_GRIB2CINC=${LIB_DIR}/include
+  export LIB_JASPER=${LIB_DIR}/lib
+  export LIB_LIBPNG=${LIB_DIR}/lib
+  export LIB_Z=${LIB_DIR}/lib
+  export GRIB2CLIB_NAME=-lgrib2c
+fi
+
+if [ -z ${MET_NETCDF} ]; then
+  export MET_NETCDF=${LIB_DIR}
+  export MET_HDF5=${LIB_DIR}
+fi
+
+if [ -z ${MET_GSL} ]; then
+  export MET_GSL=${LIB_DIR}
+fi
+
+export MET_PYTHON_LD
+export MET_PYTHON_CC
+export LDFLAGS="-Wl,--disable-new-dtags"
+# https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html
+# ${parameter:+word}
+# If parameter is null or unset, nothing is substituted, otherwise the expansion of word is substituted.
+export LDFLAGS="${LDFLAGS} -Wl,-rpath,${LIB_DIR}/lib${MET_NETCDF:+:$MET_NETCDF/lib}${MET_HDF5:+:$MET_HDF5/lib}${MET_BUFRLIB:+:$MET_BUFRLIB}${MET_GRIB2CLIB:+:$MET_GRIB2CLIB}${MET_PYTHON:+:$MET_PYTHON/lib}${MET_GSL:+:$MET_GSL/lib}"
+export LDFLAGS="${LDFLAGS} -Wl,-rpath,${LIB_JASPER:+$LIB_JASPER}${LIB_LIBPNG:+:$LIB_PNG}${LIB_Z:+$LIB_Z}"
+export LDFLAGS="${LDFLAGS} ${LIB_JASPER:+-L$LIB_JASPER} ${LIB_LIBPNG:+-L$LIB_LIBPNG} ${MET_HDF5:+-L$MET_HDF5/lib}"
+export LIBS="${LIBS} -lhdf5_hl -lhdf5 -lz"
+export MET_FONT_DIR=${TEST_BASE}/fonts
+
+if [ "${SET_D64BIT}" = "TRUE" ]; then
+  export CFLAGS="-D__64BIT__"
+  export CXXFLAGS="-D__64BIT__"
+fi
+
+echo "MET Configuration settings..."
+printenv | egrep "^MET_" | sed -r 's/^/export /g'
+echo "LDFLAGS = ${LDFLAGS}"
+export OPT_ARGS=''
+if [[ $COMPILER_FAMILY == "pgi" ]]; then
+  export OPT_ARGS="${OPT_ARGS} FFLAGS=-lpgf90"
+fi
+
+configure_cmd="./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH}"
+configure_cmd="${configure_cmd} BUFRLIB_NAME=${BUFRLIB_NAME}"
+configure_cmd="${configure_cmd} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2"
+if [[ ! -z ${MET_FREETYPEINC} && ! -z ${MET_FREETYPELIB} && \
+      ! -z ${MET_CAIROINC} && ! -z ${MET_CAIROLIB} ]]; then
+  configure_cmd="${configure_cmd} --enable-mode_graphics"
+fi
+
+if [[ ! -z $MET_HDF && ! -z $MET_HDFEOS ]]; then
+  configure_cmd="${configure_cmd} --enable-modis --enable-lidar2nc"
+fi
+
+if [[ ! -z ${MET_PYTHON_CC} || ! -z ${MET_PYTHON_LD} ]]; then
+  configure_cmd="${configure_cmd} --enable-python"
+fi
+
+configure_cmd="${configure_cmd} ${OPT_ARGS}"
+
+echo "cd `pwd`"
+run_cmd "${configure_cmd} > configure.log 2>&1"
+run_cmd "make ${MAKE_ARGS} > make.log 2>&1"
+run_cmd "make ${MAKE_ARGS} install > make_install.log 2>&1"
+run_cmd "make ${MAKE_ARGS} test > make_test.log 2>&1"
 
 echo "Finished compiling at `date`"
