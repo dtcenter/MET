@@ -398,7 +398,6 @@ if [ $COMPILE_JASPER -eq 1 ]; then
   echo
   echo "Compiling JASPER at `date`"
   mkdir -p ${LIB_DIR}/jasper
-  cd ${LIB_DIR}/jasper
   rm -rf ${LIB_DIR}/jasper/jasper*
   unzip ${TAR_DIR}/jasper*.zip -d ${LIB_DIR}/jasper > /dev/null 2>&1
   cd ${LIB_DIR}/jasper/jasper*
