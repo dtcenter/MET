@@ -262,7 +262,10 @@ elif [ ${COMPILER_FAMILY} = "pgi" ]; then
   if [ -z ${FC} ]; then FC=`which pgf90`; fi
   if [ -z ${F77} ]; then F77=`which pgf90`; fi
   if [ -z ${F90} ]; then F90=`which pgf90`; fi
-elif [[ ${COMPILER_FAMILY} == "intel" ]] || [[ ${COMPILER_FAMILY} == "ics" ]] || [[ ${COMPILER_FAMILY} == "ips" ]] || [[ ${COMPILER_FAMILY} == "PrgEnv-intel" ]]; then
+elif [[ ${COMPILER_FAMILY} == "intel" ]] || \
+     [[ ${COMPILER_FAMILY} == "ics" ]] || \
+     [[ ${COMPILER_FAMILY} == "ips" ]] || \
+     [[ ${COMPILER_FAMILY} == "PrgEnv-intel" ]]; then
   if [ -z ${CC} ]; then CC=`which icc`; fi
   if [ -z ${CXX} ]; then CXX=`which icc`; fi
   if [ -z ${FC} ]; then FC=`which ifort`; fi
