@@ -65,8 +65,7 @@ function run_cmd {
   eval "$@"
   ret=$?
   if [ $ret != 0 ]; then
-    cmd_name=$(basename $1)
-    echo "${cmd_name} returned with non-zero ($ret) status"
+    echo "ERROR: Command returned with non-zero ($ret) status: $*"
     exit $ret
   fi
 }
