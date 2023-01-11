@@ -49,9 +49,8 @@
 # The optional libraries HDF4, HDFEOS, FREETYPE, and CAIRO are
 # used for the following, not widely used tools, MODIS-Regrid,
 # lidar2nc, and MODE Graphics.  To enable building of these libraries,
-# directly modify this script changing the value of the compile flags
-# for the library (e.g. COMPILE_HDF, COMPILE_HDFEOS) in the code
-# below as directed by the comments.  If these libraries have already
+# set the compile flags for the library (e.g. COMPILE_HDF, COMPILE_HDFEOS) to
+# any value in the environment config file. If these libraries have already
 # been installed and don't need to be reinstalled, please
 # supply values for the following environment variables in the input
 # environment configuration file (install_met_env.<machine_name>):
@@ -147,10 +146,15 @@ else
   COMPILE_GSL=0
 fi
 
+# Only set COMPILE_HDF and COMPILE_HDFEOS if you want to compile and enable MODIS-Regrid (not widely used)
+if [ ! -z "${COMPILE_HDF}" ]; then COMPILE_HDF=1; else COMPILE_HDF=0; fi
+if [ ! -z "${COMPILE_HDFEOS}" ]; then COMPILE_HDFEOS=1; else COMPILE_HDFEOS=0;  fi
+
+# Only set COMPILE_FREETYPE and COMPILE_CAIRO if you want to compile and enable MODE Graphics (not widely used)
+if [ ! -z "${COMPILE_FREETYPE}" ]; then COMPILE_FREETYPE=1; else COMPILE_FREETYPE=0; fi
+if [ ! -z "${COMPILE_CAIRO}" ]; then COMPILE_CAIRO=1; else COMPILE_CAIRO=0; fi
+
 if [[ -z ${MET_HDF} ]] && [[ -z ${MET_HDFEOS} ]]; then
-  # Only set COMPILE_HDF and COMPILE_HDFEOS to 1 if you want to compile and enable MODIS-Regrid (not widely used)
-  COMPILE_HDF=0
-  COMPILE_HDFEOS=0
   if [[ $COMPILE_HDF -eq 1 && $COMPILE_HDFEOS -eq 1 ]]; then
     export MET_HDF=${LIB_DIR}
     export MET_HDFEOS=${LIB_DIR}
@@ -174,9 +178,6 @@ if [[ ! -z ${MET_CAIRO} ]]; then
 fi
 
 if [[ -z ${MET_FREETYPEINC} && -z ${MET_FREETYPELIB} && -z ${MET_CAIROINC} && -z ${MET_CAIROLIB} ]]; then
-  # Only set COMPILE_FREETYPE and COMPILE_CAIRO to 1 if you want to compile and enable MODE Graphics (not widely used)
-  COMPILE_FREETYPE=0
-  COMPILE_CAIRO=0
   if [[ $COMPILE_CAIRO -eq 1 && $COMPILE_FREETYPE -eq 1 ]]; then
     export MET_CAIROINC=${LIB_DIR}/include/cairo
     export MET_CAIROLIB=${LIB_DIR}/lib
