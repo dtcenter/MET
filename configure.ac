@@ -155,13 +155,34 @@ if test -n "$MET_GRIB2CLIB"; then
 fi
 
 #
-# Look for the PYTHON library
+# Look for the PYTHON executable and library
 #
 
 # Configure the variables.  The help text will appear if the user uses "configure --help".
 
-AC_ARG_VAR([MET_PYTHON_CC], [Where the python header files are located, e.g. -I<include dir>. Set to the output of 'python-config --cflags'.])
-AC_ARG_VAR([MET_PYTHON_LD], [Where the python library files are located, e.g. -L<lib dir>, followed by the python library names, e.g. -l<library>. Set to the output of 'python-config --ldflags'.])
+AC_ARG_VAR([MET_PYTHON_BIN_EXE], [Full path to the python executable corresponding to MET_PYTHON_CC and MET_PYTHON_LD, e.g. /usr/local/bin/python3.])
+AC_ARG_VAR([MET_PYTHON_CC], [Where the python header files are located, e.g. -I<include dir>. Set to the output of 'python3-config --cflags'.])
+AC_ARG_VAR([MET_PYTHON_LD], [Where the python library files are located, e.g. -L<lib dir>, followed by the python library names, e.g. -l<library>. Set to the output of 'python3-config --ldflags'.])
+
+# Ensure that all or none are specified.
+
+if (test -n "$MET_PYTHON_BIN_EXE" || \
+    test -n "$MET_PYTHON_CC" || \
+    test -n "$MET_PYTHON_LD"); then
+  if test -z "$MET_PYTHON_BIN_EXE"; then
+    AC_MSG_ERROR([MET_PYTHON_CC or MET_PYTHON_LD environment variable set, but MET_PYTHON_BIN_EXE not set.  If one of these variables is set, then all must be set.])
+  elif test -z "$MET_PYTHON_CC"; then
+    AC_MSG_ERROR([MET_PYTHON_BIN_EXE or MET_PYTHON_LD environment variable set, but MET_PYTHON_CC not set.  If one of these variables is set, then all must be set.])
+  elif test -z "$MET_PYTHON_LD"; then
+    AC_MSG_ERROR([MET_PYTHON_BIN_EXE or MET_PYTHON_CC environment variable set, but MET_PYTHON_LD not set.  If one of these variables is set, then all must be set.])
+  fi
+fi
+
+# Add MET_PYTHON_BIN_EXE to the CPPFLAGS
+
+if test -n "$MET_PYTHON_BIN_EXE"; then
+   CPPFLAGS=$CPPFLAGS' -DMET_PYTHON_BIN_EXE="\"${MET_PYTHON_BIN_EXE}\""'
+fi
 
 if test -n "$MET_PYTHON_CC"; then
    CPPFLAGS="${CPPFLAGS} -I../../basic/vx_log -I../../basic/vx_util ${MET_PYTHON_CC}"

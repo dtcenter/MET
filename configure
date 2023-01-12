@@ -746,6 +746,7 @@ MET_GSLINC
 MET_GSL
 MET_PYTHON_LD
 MET_PYTHON_CC
+MET_PYTHON_BIN_EXE
 GRIB2CLIB_NAME
 MET_GRIB2CLIB
 MET_GRIB2CINC
@@ -897,6 +898,7 @@ MET_GRIB2C
 MET_GRIB2CINC
 MET_GRIB2CLIB
 GRIB2CLIB_NAME
+MET_PYTHON_BIN_EXE
 MET_PYTHON_CC
 MET_PYTHON_LD
 MET_GSL
@@ -1647,13 +1649,16 @@ Some influential environment variables:
               Name of grib2c library to link with. For example,
               -lgrib2c_v1.6.0 or -lgrib2c, etc. If it is -lgrib2c, you don't
               have to specify it.
+  MET_PYTHON_BIN_EXE
+              Full path to the python executable corresponding to
+              MET_PYTHON_CC and MET_PYTHON_LD, e.g. /usr/local/bin/python3.
   MET_PYTHON_CC
               Where the python header files are located, e.g. -I<include dir>.
-              Set to the output of 'python-config --cflags'.
+              Set to the output of 'python3-config --cflags'.
   MET_PYTHON_LD
               Where the python library files are located, e.g. -L<lib dir>,
               followed by the python library names, e.g. -l<library>. Set to
-              the output of 'python-config --ldflags'.
+              the output of 'python3-config --ldflags'.
   MET_GSL     Where gsl lib and include subdirectories are located. If they
               are installed in /usr/local, you don't have to specify them.
   MET_GSLINC  Where gsl include files are located. Use if the libraries and
@@ -4648,13 +4653,34 @@ if test -n "$MET_GRIB2CLIB"; then
 fi
 
 #
-# Look for the PYTHON library
+# Look for the PYTHON executable and library
 #
 
 # Configure the variables.  The help text will appear if the user uses "configure --help".
 
 
 
+
+
+# Ensure that all or none are specified.
+
+if (test -n "$MET_PYTHON_BIN_EXE" || \
+    test -n "$MET_PYTHON_CC" || \
+    test -n "$MET_PYTHON_LD"); then
+  if test -z "$MET_PYTHON_BIN_EXE"; then
+    as_fn_error $? "MET_PYTHON_CC or MET_PYTHON_LD environment variable set, but MET_PYTHON_BIN_EXE not set.  If one of these variables is set, then all must be set." "$LINENO" 5
+  elif test -z "$MET_PYTHON_CC"; then
+    as_fn_error $? "MET_PYTHON_BIN_EXE or MET_PYTHON_LD environment variable set, but MET_PYTHON_CC not set.  If one of these variables is set, then all must be set." "$LINENO" 5
+  elif test -z "$MET_PYTHON_LD"; then
+    as_fn_error $? "MET_PYTHON_BIN_EXE or MET_PYTHON_CC environment variable set, but MET_PYTHON_LD not set.  If one of these variables is set, then all must be set." "$LINENO" 5
+  fi
+fi
+
+# Add MET_PYTHON_BIN_EXE to the CPPFLAGS
+
+if test -n "$MET_PYTHON_BIN_EXE"; then
+   CPPFLAGS=$CPPFLAGS' -DMET_PYTHON_BIN_EXE="\"${MET_PYTHON_BIN_EXE}\""'
+fi
 
 if test -n "$MET_PYTHON_CC"; then
    CPPFLAGS="${CPPFLAGS} -I../../basic/vx_log -I../../basic/vx_util ${MET_PYTHON_CC}"

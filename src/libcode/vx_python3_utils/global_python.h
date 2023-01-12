@@ -28,6 +28,7 @@ extern "C" {
 
 #include "python3_util.h"
 #include "concat_string.h"
+#include "vx_log.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -59,7 +60,11 @@ inline void GlobalPython::initialize()
 { 
 
 if ( ! is_initialized )  {
-   Py_SetProgramName(L"/usr/local/met-python3/bin/python3");
+
+   mlog << Debug(3) << "Initializing python: " << MET_PYTHON_BIN_EXE << "\n";
+
+   wchar_t *python_path = Py_DecodeLocale(MET_PYTHON_BIN_EXE, NULL);
+   Py_SetProgramName(python_path);
    Py_Initialize();
 
    is_initialized = true;
