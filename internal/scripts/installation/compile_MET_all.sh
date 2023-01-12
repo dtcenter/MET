@@ -10,8 +10,7 @@
 # and USE_MODULES.
 #
 # If compiling support for Python embedding, users will need to
-# set MET_PYTHON, MET_PYTHON_CC, and
-# MET_PYTHON_LD.
+# set MET_PYTHON, MET_PYTHON_BIN_EXE, MET_PYTHON_CC, and MET_PYTHON_LD.
 #
 # For a description of these and other variables, visit the MET
 # downloads page under "Sample Script For Compiling External
@@ -821,6 +820,7 @@ if [ $COMPILE_MET -eq 1 ]; then
     export MET_GSL=${LIB_DIR}
   fi
 
+  export MET_PYTHON_BIN_EXE=${MET_PYTHON_BIN_EXE:=${MET_PYTHON}/bin/python3}
   export MET_PYTHON_LD=${MET_PYTHON_LD}
   export MET_PYTHON_CC=${MET_PYTHON_CC}
   export LDFLAGS="-Wl,--disable-new-dtags"
