@@ -84,7 +84,7 @@ class met_nc_point_obs():
             obs_val = [ f'{i:.0f}' for i in self.obs_val ]
         else:
             obs_precision = self.get_precision(self.obs_val)
-            obs_val = [ 'NA'       if np.ma.is_masked(i) else
+            obs_val = [ 'NA' if np.ma.is_masked(i) or np.isnan(i) else
                         f'{i:.1f}' if abs((i*10)-int(i*10)) < 0.000001 else
                         f'{i:.1f}' if abs((i*10)-int(i*10)) > 0.999998 else
                         f'{i:.2f}' if abs((i*100)-int(i*100)) < 0.000001 else
