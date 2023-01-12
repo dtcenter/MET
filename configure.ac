@@ -160,7 +160,7 @@ fi
 
 # Configure the variables.  The help text will appear if the user uses "configure --help".
 
-AC_ARG_VAR([MET_PYTHON_BIN_EXE], [Full path to the python executable corresponding to MET_PYTHON_CC and MET_PYTHON_LD, e.g. /usr/local/bin/python3.])
+AC_ARG_VAR([MET_PYTHON_BIN_EXE], [Full path to the python executable corresponding to MET_PYTHON_CC and MET_PYTHON_LD, e.g. /usr/bin/python3.])
 AC_ARG_VAR([MET_PYTHON_CC], [Where the python header files are located, e.g. -I<include dir>. Set to the output of 'python3-config --cflags'.])
 AC_ARG_VAR([MET_PYTHON_LD], [Where the python library files are located, e.g. -L<lib dir>, followed by the python library names, e.g. -l<library>. Set to the output of 'python3-config --ldflags'.])
 

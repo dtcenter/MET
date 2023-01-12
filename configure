@@ -1651,7 +1651,7 @@ Some influential environment variables:
               have to specify it.
   MET_PYTHON_BIN_EXE
               Full path to the python executable corresponding to
-              MET_PYTHON_CC and MET_PYTHON_LD, e.g. /usr/local/bin/python3.
+              MET_PYTHON_CC and MET_PYTHON_LD, e.g. /usr/bin/python3.
   MET_PYTHON_CC
               Where the python header files are located, e.g. -I<include dir>.
               Set to the output of 'python3-config --cflags'.
