@@ -9,8 +9,11 @@ MAINTAINERCLEANFILES	= Makefile.in
 include ${top_srcdir}/Make-include
 
 # Yacc/lex flags
+# Initialize yystate to 8 to allow for empty configuartion files
 
-AM_YFLAGS	= --defines=config.tab.h -p config
+AM_YFLAGS	= --defines=config.tab.h -p config ; \
+                  cat config.tab.cc | sed 's/yystate = 0;/yystate = 8;/g' > config.tab.cc.patch ; \
+                  mv config.tab.cc.patch config.tab.cc
 
 # The library
 
