@@ -21,6 +21,10 @@ netcdf_filename = sys.argv[1]
 pyembed_module_name = sys.argv[2]
 sys.argv = sys.argv[2:]
 
+# add share/met/python directory to system path to find met_point_obs
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__),
+                                             os.pardir, 'python')))
+
 # append user script dir to system path
 pyembed_dir, pyembed_file = os.path.split(pyembed_module_name)
 if pyembed_dir:

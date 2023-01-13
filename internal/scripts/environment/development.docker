@@ -23,7 +23,7 @@ export MET_FREETYPEINC=/usr/include/freetype2
 export MET_FREETYPELIB=/usr/lib64
 export MET_JASPERLIB=/usr/lib64
 
-export MET_PYTHON=/usr/bin/python3
+export MET_PYTHON_BIN_EXE=/usr/bin/python3
 export MET_PYTHON_CC="-I/usr/include/python3.6m"
 export MET_PYTHON_LD="-L/usr/lib64 -lpython3.6m -lpthread -ldl -lutil -lm"
 
