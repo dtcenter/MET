@@ -34,3 +34,5 @@ export COMPILER=gnu
 export MET_SUBDIR=${TEST_BASE}
 export MET_TARBALL=none
 export USE_MODULES=FALSE
+
+export BIN_DIR_PATH=/usr/local/bin
