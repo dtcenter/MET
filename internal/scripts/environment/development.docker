@@ -46,3 +46,9 @@ export MET_TEST_RSCRIPT=/usr/bin/Rscript
 
 # set make arguments to build using multiple jobs
 export MAKE_ARGS=-j
+
+export TEST_BASE=/usr/local
+export COMPILER=gnu
+export MET_SUBDIR=${TEST_BASE}
+export MET_TARBALL=none
+export USE_MODULES=FALSE
