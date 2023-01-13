@@ -28,6 +28,7 @@ extern "C" {
 
 #include "python3_util.h"
 #include "concat_string.h"
+#include "vx_log.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -60,6 +61,10 @@ inline void GlobalPython::initialize()
 
 if ( ! is_initialized )  {
 
+   mlog << Debug(3) << "Initializing python: " << MET_PYTHON_BIN_EXE << "\n";
+
+   wchar_t *python_path = Py_DecodeLocale(MET_PYTHON_BIN_EXE, NULL);
+   Py_SetProgramName(python_path);
    Py_Initialize();
 
    is_initialized = true;
@@ -75,6 +80,9 @@ if ( ! is_initialized )  {
    command << cs_erase
            << "sys.path.append(\""
            << replace_path(wrappers_dir)
+           << "\");"
+           << "sys.path.append(\""
+           << replace_path(python_dir)
            << "\")";
 
    run_python_string(command.text());
