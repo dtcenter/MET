@@ -30,6 +30,8 @@ static const char user_python_path_env [] = "MET_PYTHON_EXE";
 
 static const char wrappers_dir         [] = "MET_BASE/wrappers";
 
+static const char python_dir           [] = "MET_BASE/python";
+
 
 ////////////////////////////////////////////////////////////////////////
 

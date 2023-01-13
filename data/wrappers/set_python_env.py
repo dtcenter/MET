@@ -7,3 +7,4 @@
 import os
 import sys
 import numpy as np
+print(f'Python executable: {sys.executable}')
