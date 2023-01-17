@@ -1581,7 +1581,6 @@ void process_pbfile(int i_pb) {
                         OBS_BUFFER_SIZE);
 
                   // Increment the current and total observations counts
-                  n_file_obs++;
                   n_total_obs++;
                   n_derived_obs++;
 
