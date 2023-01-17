@@ -23,6 +23,7 @@ export MET_JASPER=${MET_DST}/jasper-1.900.1
 
 # For Python 3 in met-9.0
 export MET_PYTHON=/usr/local/met-python3
+export MET_PYTHON_BIN_EXE=${MET_PYTHON}/bin/python3.8
 export MET_PYTHON_CC="-I${MET_PYTHON}/include/python3.8"
 export MET_PYTHON_LD="-L${MET_PYTHON}/lib -lpython3.8 -lcrypt -lpthread -ldl -lutil -lm"
 
@@ -53,4 +54,4 @@ export PATH="/usr/local/nco/bin:/usr/local/netcdf/bin:\
 # SonarQube
 export SONARQUBE_DIR=/d1/projects/SonarQube/
 export SONARQUBE_WRAPPER_BIN=$SONARQUBE_DIR/build-wrapper-linux-x86
-export SONARQUBE_SCANNER_BIN=$SONARQUBE_DIR/sonar-scanner-4.6.2.2472-linux/bin
+export SONARQUBE_SCANNER_BIN=$SONARQUBE_DIR/sonar-scanner-linux/bin
