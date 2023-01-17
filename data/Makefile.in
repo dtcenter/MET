@@ -279,6 +279,7 @@ MET_HDFLIB = @MET_HDFLIB@
 MET_NETCDF = @MET_NETCDF@
 MET_NETCDFINC = @MET_NETCDFINC@
 MET_NETCDFLIB = @MET_NETCDFLIB@
+MET_PYTHON_BIN_EXE = @MET_PYTHON_BIN_EXE@
 MET_PYTHON_CC = @MET_PYTHON_CC@
 MET_PYTHON_LD = @MET_PYTHON_LD@
 MKDIR_P = @MKDIR_P@
@@ -354,6 +355,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 SUBDIRS = \
+	climo \
 	colortables \
 	config \
 	map \
@@ -361,7 +363,7 @@ SUBDIRS = \
 	ps \
 	table_files \
 	tc_data \
-     wrappers
+	wrappers
 
 topdir = $(pkgdatadir)
 top_DATA = \

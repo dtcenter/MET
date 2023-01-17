@@ -108,6 +108,7 @@ void VarInfoGrib2::assign(const VarInfoGrib2 &v) {
    EnsType    = v.EnsType;
    DerType    = v.DerType;
    StatType   = v.StatType;
+   PercVal    = v.PercVal;
 
    IPDTmplIndex = v.IPDTmplIndex;
    IPDTmplVal   = v.IPDTmplVal;
@@ -134,6 +135,7 @@ void VarInfoGrib2::clear() {
    EnsType    = bad_data_int;
    DerType    = bad_data_int;
    StatType   = bad_data_int;
+   PercVal    = bad_data_int;
 
    IPDTmplIndex.clear();
    IPDTmplVal.clear();
@@ -157,7 +159,8 @@ void VarInfoGrib2::dump(ostream &out) const {
        << "  Process    = " << Process    << "\n"
        << "  EnsType    = " << EnsType    << "\n"
        << "  DerType    = " << DerType    << "\n"
-       << "  StatType   = " << StatType   << "\n";
+       << "  StatType   = " << StatType   << "\n"
+       << "  PercVal    = " << PercVal    << "\n";
    out << "  IPDTmplIndex:\n";
    IPDTmplIndex.dump(out);
    out << "  IPDTmplVal:\n";
@@ -245,6 +248,13 @@ void VarInfoGrib2::set_stat_type(int v) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void VarInfoGrib2::set_perc_val(int v) {
+   PercVal = v;
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 void VarInfoGrib2::set_ipdtmpl_index(const IntArray &v) {
    IPDTmplIndex = v;
    return;
@@ -280,6 +290,7 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
    EnsType                 = dict.lookup_int   (conf_key_GRIB2_ens_type,  false);
    DerType                 = dict.lookup_int   (conf_key_GRIB2_der_type,  false);
    StatType                = dict.lookup_int   (conf_key_GRIB2_stat_type, false);
+   PercVal                 = dict.lookup_int   (conf_key_GRIB2_perc_val,  false);
 
    IPDTmplIndex = dict.lookup_int_array(conf_key_GRIB2_ipdtmpl_index, false);
    IPDTmplVal   = dict.lookup_int_array(conf_key_GRIB2_ipdtmpl_val,   false);

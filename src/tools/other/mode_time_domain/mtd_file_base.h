@@ -21,7 +21,6 @@
 #include <iostream>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "vx_util.h"
 #include "vx_cal.h"
@@ -77,17 +76,19 @@ class MtdFileBase {
 
       void base_assign(const MtdFileBase &);
 
-      virtual void read  (NcFile &);
-      virtual void write (NcFile &) const;
+      virtual void read  (netCDF::NcFile &);
+      virtual void write (netCDF::NcFile &) const;
 
 
       Grid * G;        //  allocated
 
       int Nx, Ny, Nt;
 
-      unixtime StartValidTime;
+      unixtime StartValidTime;   // useful for constant time increments
 
-      int DeltaT;   //  seconds
+      int DeltaT;   //  seconds, useful for constant time increments
+
+      vector<unixtime> ActualValidTimes; // useful for uneven time increments
 
       IntArray Lead_Times;
 
@@ -113,7 +114,10 @@ class MtdFileBase {
       void set_grid(const Grid &);
 
       void set_start_valid_time (unixtime);
+
       void set_delta_t          (int);   //  seconds
+
+      void init_actual_valid_times(const vector<unixtime> &validTimes);
 
       void set_lead_time(int index, int value);
 
@@ -142,6 +146,8 @@ class MtdFileBase {
       int      delta_t          () const;   //  seconds
 
       unixtime valid_time (int) const;
+
+      unixtime actual_valid_time (int) const;
 
       int lead_time (int index) const;
 

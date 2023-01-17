@@ -101,7 +101,7 @@ class PxmBase {
 
       virtual  void   all_white() = 0;
 
-      virtual  void   dump (ostream &, int depth = 0) const = 0;
+      virtual  void   dump (std::ostream &, int depth = 0) const = 0;
 
          //
          //  non-abstract member functions

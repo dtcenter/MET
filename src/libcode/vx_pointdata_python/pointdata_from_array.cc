@@ -19,160 +19,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-static const int api_delug_level = 11;
-
-////////////////////////////////////////////////////////////////////////
-
-
-template <typename T>
-void load_numpy (void * buf,
-                 const int n,
-                 const int data_endian,
-                 void (*shuf)(void *), 
-                 float * out)
-{
-
-bool need_swap = (shuf != 0) && (native_endian != data_endian);
-
-int j, x, y, r, c;
-T * u = (T *) buf;
-T value;
-
-for (j=0; j<n; ++j)  {
-
-   //nympy_array_one_to_two(j, Nx, r, c);
-
-   memcpy(&value, u + j, sizeof(T));
-
-   if ( need_swap )  shuf(&value);
-
-   out[j] = value;
-   
-   mlog << Debug(api_delug_level) << "load_numpy(float): [" << j << "] value=" << value << "\n";
-}   //  for j
-
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-template <typename T>
-void load_numpy (void * buf,
-                 const int n,
-                 const int data_endian,
-                 void (*shuf)(void *), 
-                 int * out)
-{
-
-const char *method_name = "load_numpy(int *) ";
-bool need_swap = (shuf != 0) && (native_endian != data_endian);
-
-int j;
-T * u = (T *) buf;
-T value;
-
-for (j=0; j<n; ++j)  {
-
-   //nympy_array_one_to_two(j, Nx, r, c);
-
-   memcpy(&value, u + j, sizeof(T));
-
-   if ( need_swap )  shuf(&value);
-
-   out[j] = (int)value;
-
-   mlog << Debug(api_delug_level) << method_name << "[" << j << "] value=" << value << "\n";
-}   //  for j
-
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-template <typename T>
-void load_numpy_int (void * buf,
-                     const int n,
-                     const int data_endian,
-                     void (*shuf)(void *),
-                     IntArray *out)
-{
-
-const char *method_name = "load_numpy_int(IntArray *) ";
-bool need_swap = (shuf != 0) && (native_endian != data_endian);
-
-int j;
-T * u = (T *) buf;
-T value;
-
-out->extend(n);
-
-for (j=0; j<n; ++j)  {
-
-   //nympy_array_one_to_two(j, Nx, r, c);
-
-   memcpy(&value, u + j, sizeof(T));
-
-   if ( need_swap )  shuf(&value);
-
-   out->add((int)value);
-
-   mlog << Debug(api_delug_level) << method_name << " [" << j << "] value=" << value << "\n";
-}   //  for j
-
-
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-template <typename T>
-void load_numpy_num (void * buf,
-                     const int n,
-                     const int data_endian,
-                     void (*shuf)(void *),
-                     NumArray *out)
-{
-
-const char *method_name = "load_numpy_num(NumArray *) ";
-bool need_swap = (shuf != 0) && (native_endian != data_endian);
-
-int j;
-T * u = (T *) buf;
-T value;
-
-out->extend(n);
-
-for (j=0; j<n; ++j)  {
-
-   //nympy_array_one_to_two(j, Nx, r, c);
-
-   memcpy(&value, u + j, sizeof(T));
-
-   if ( need_swap )  shuf(&value);
-
-   out->add((float)value);
-
-   mlog << Debug(api_delug_level) << method_name << "[" << j << "] value=" << value << "\n";
-}   //  for j
-
-
-
-return;
-
-}
-
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -594,64 +440,74 @@ return ( true );
 
 ////////////////////////////////////////////////////////////////////////
 
-   //
-   //  we just grab the numpy array and the attributes dictionary
-   //
-   //    from the xarray DataArray object, and then hand them
-   //
-   //    off to pointdata_from_numpy_array
-   //
-
-bool pointdata_from_xarray(PyObject * data_array, float *data_out)
+bool pointdata_from_python_list(PyObject * data_array, float *data_out)
 {
 
-Python3_Numpy np;
-PyObject *numpy_array = PyObject_GetAttrString(data_array, data_attr_name);
-
-   /////////////////////
-
-np.set(numpy_array);
-
-bool status = pointdata_from_np_array(np, data_out);
-
-   //
-   //  done
-   //
-
-return ( status );
+   // Support PyFloat, PyLong and numpy.float32 type
+   for (int idx=0; idx<PyList_Size(data_array); idx++) {
+      *(data_out+idx) = (float)PyFloat_AsDouble(PyList_GetItem(data_array, idx));
+   }
+   return ( true );
 
 }
 
+////////////////////////////////////////////////////////////////////////
+
+bool pointdata_from_python_list(PyObject * data_array, NumArray *data_out)
+{
+
+   // Support PyFloat, PyLong and numpy.float32 type
+   for (int idx=0; idx<PyList_Size(data_array); idx++) {
+      data_out->add((float)PyFloat_AsDouble(PyList_GetItem(data_array, idx)));
+   }
+
+   return ( true );
+
+}
 
 ////////////////////////////////////////////////////////////////////////
 
-   //
-   //  we just grab the numpy array and the attributes dictionary
-   //
-   //    from the xarray DataArray object, and then hand them
-   //
-   //    off to pointdata_from_numpy_array
-   //
 
-bool pointdata_from_xarray(PyObject * data_array, int *data_out)
+bool pointdata_from_python_list(PyObject * data_array, int *data_out)
 {
+   bool status = false;
+   PyObject* item;
+   item = PyList_GetItem(data_array, 0);
+   if (PyLong_Check(item)) {
+      for (int idx=0; idx<PyList_Size(data_array); idx++) {
+         *(data_out+idx) = (int)PyLong_AsLong(PyList_GetItem(data_array, idx));
+      }
+      status = true;
+   }
+   else {
+       mlog << Error << "\nOnly int type is supported at python list."
+            << " Please check the data type\n\n";
+       // exit by caller with additional log message
+   }
 
-Python3_Numpy np;
-PyObject *numpy_array = PyObject_GetAttrString(data_array, data_attr_name);
+   return ( status );
+}
 
+////////////////////////////////////////////////////////////////////////
 
-   /////////////////////
+bool pointdata_from_python_list(PyObject * data_array, IntArray *data_out)
+{
+   bool status = false;
+   PyObject* item;
+   item = PyList_GetItem(data_array, 0);
+   if (PyLong_Check(item)) {
+      for (int idx=0; idx<PyList_Size(data_array); idx++) {
+         data_out->add((int)PyLong_AsLong(PyList_GetItem(data_array, idx)));
+      }
+      status = true;
+   }
+   else {
+       mlog << Error << "\nOnly int type is supported at python list."
+            << " Please check the data type\n\n";
+       // exit by caller with additional log message
+   }
 
-
-np.set(numpy_array);
-
-bool status = pointdata_from_np_array(np, data_out);
-
-   //
-   //  done
-   //
-
-return ( status );
+   return ( status );
 
 }
 

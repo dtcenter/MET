@@ -1,5 +1,3 @@
-
-
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
@@ -7,8 +5,6 @@
 // ** Research Applications Lab (RAL)
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-
-
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -20,7 +16,11 @@ using namespace std;
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
+#include <string.h>
 #include <cmath>
+
+#include <netcdf>
+using namespace netCDF;
 
 #include "grid_output.h"
 #include "vx_log.h"
@@ -36,12 +36,17 @@ static void rotated_latlon_grid_output (const GridInfo &, NcFile * ncfile);
 static void stereographic_grid_output  (const GridInfo &, NcFile * ncfile);
 static void mercator_grid_output       (const GridInfo &, NcFile * ncfile);
 static void gaussian_grid_output       (const GridInfo &, NcFile * ncfile);
+static void semilatlon_grid_output     (const GridInfo &, NcFile * ncfile, NcDim &, NcDim &);
+static void write_semilatlon_var       (NcFile * ncfile, const char *,
+                                        NcDim *, const NumArray &, const char *,
+                                        const char *, const char *);
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-void grid_output(const GridInfo & info, NcFile * ncfile)
+void grid_output(const GridInfo & info, NcFile * ncfile,
+                 NcDim & lat_dim, NcDim & lon_dim)
 
 {
 
@@ -60,6 +65,7 @@ else if ( info.ll  )  latlon_grid_output          (info, ncfile);
 else if ( info.rll )  rotated_latlon_grid_output  (info, ncfile);
 else if ( info.m   )  mercator_grid_output        (info, ncfile);
 else if ( info.g   )  gaussian_grid_output        (info, ncfile);
+else if ( info.sl  )  semilatlon_grid_output      (info, ncfile, lat_dim, lon_dim);
 else {
 
    mlog << Error << "\ngrid_output(const GridInfo &, NcFile *) -> can't determine projection!\n\n";
@@ -89,7 +95,7 @@ double t;
 const LambertData & data = *(info.lc);
 
 
-add_att(ncfile, "Projection", "Lambert Conformal");
+add_att(ncfile, "Projection", lambert_proj_type);
 
    //
    //  hemisphere
@@ -217,7 +223,7 @@ double t;
 const LatLonData & data = *(info.ll);
 
 
-ncfile->putAtt("Projection", "LatLon");
+ncfile->putAtt("Projection", latlon_proj_type);
 
    //
    //  lat_ll
@@ -400,7 +406,7 @@ double t;
 const StereographicData & data = *(info.st);
 
 
-ncfile->putAtt("Projection", "Polar Stereographic");
+ncfile->putAtt("Projection", stereographic_proj_type);
 
    //
    //  hemisphere
@@ -519,7 +525,7 @@ double t;
 const MercatorData & data = *(info.m);
 
 
-ncfile->putAtt("Projection", "Mercator");
+ncfile->putAtt("Projection", mercator_proj_type);
 
    //
    //  lat_ll
@@ -598,7 +604,7 @@ const GaussianData & data = *(info.g);
 
 
 
-ncfile->putAtt("Projection", "Gaussian");
+ncfile->putAtt("Projection", gaussian_proj_type);
 
    //
    //  Lon_Zero
@@ -637,4 +643,125 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+void semilatlon_grid_output(const GridInfo & info, NcFile * ncfile,
+                            NcDim & lat_dim, NcDim & lon_dim)
+
+{
+
+const SemiLatLonData & data = *(info.sl);
+
+ncfile->putAtt("Projection", semilatlon_proj_type);
+
+NcDim nc_dim, new_lat_dim, new_lon_dim;
+
+   //
+   //  lat and lon data
+   //  create new lat/lon dimensions in case the inputs
+   //  are already defined
+   //
+
+if ( data.lats.n() == data.lons.n() && data.lats.n() > 0 )  {
+   new_lon_dim = add_dim(ncfile, "latlon", (long) data.lats.n());
+   write_semilatlon_var(ncfile, "lat", &new_lon_dim, data.lats,
+                        "latitude", "degrees_north", "latitude");
+   write_semilatlon_var(ncfile, "lon", &new_lon_dim, data.lons,
+                        "longitude", "degrees_east", "longitude");
+}
+else if ( data.lats.n() > 0 )  {
+   new_lat_dim = add_dim(ncfile, "lat", (long) data.lats.n());
+   write_semilatlon_var(ncfile, "lat", &new_lat_dim, data.lats,
+                        "latitude", "degrees_north", "latitude");
+}
+else if ( data.lons.n() > 0 )  {
+   new_lon_dim = add_dim(ncfile, "lon", (long) data.lons.n());
+   write_semilatlon_var(ncfile, "lon", &new_lon_dim, data.lons,
+                        "longitude", "degrees_east", "longitude");
+}
+else {
+   mlog << Error << "\nsemilatlon_grid_output(const GridInfo & info, NcFile * ncfile) -> "
+        << "lat and lon arrays should not both be empty!\n\n";
+   exit ( 1 );
+}
+
+   //
+   //  level and time data
+   //
+
+if ( data.levels.n() > 0 )  {
+   nc_dim = add_dim(ncfile, "level", (long) data.levels.n());
+   write_semilatlon_var(ncfile, "level", &nc_dim, data.levels,
+                        "level", 0, 0);
+}
+else if ( data.times.n() > 0 )  {
+   nc_dim = add_dim(ncfile, "time", (long) data.times.n());
+   write_semilatlon_var(ncfile, "times", &nc_dim, data.times,
+                        "time", 0, 0);
+}
+else {
+   mlog << Error << "\nsemilatlon_grid_output(const GridInfo & info, NcFile * ncfile) -> "
+        << "level and time arrays should not both be empty!\n\n";
+   exit ( 1 );
+}
+
+   //
+   //  store the second dimension
+   //
+
+     if ( new_lat_dim.isNull() )  new_lat_dim = nc_dim;
+else if ( new_lon_dim.isNull() )  new_lon_dim = nc_dim;
+
+   //
+   //  save the newly created dimensions
+   //
+
+lat_dim = new_lat_dim;
+lon_dim = new_lon_dim;
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void write_semilatlon_var(NcFile * ncfile, const char * var_name,
+                          NcDim * nc_dim, const NumArray &var,
+                          const char * long_name_str, const char * units_str,
+                          const char * standard_name_str) {
+
+NcVar nc_var = ncfile->addVar(var_name, ncFloat, *nc_dim);
+float * var_data = new float [var.n()];
+for (int i=0; i<var.n(); i++)  var_data[i] = var[i];
+
+   //
+   //  add attributes
+   //
+
+if ( long_name_str )      add_att(&nc_var, long_name_att_name, long_name_str);
+if ( units_str )          add_att(&nc_var, units_att_name, units_str);
+if ( standard_name_str )  add_att(&nc_var, standard_name_att_name, standard_name_str);
+
+   //
+   //  write data and cleanup
+   //
+
+put_nc_data(&nc_var, &var_data[0], nc_dim->getSize(), 0);
+
+if ( var_data )  { delete [] var_data; var_data = (float *) 0; }
+
+   //
+   //  done
+   //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
 

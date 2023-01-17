@@ -242,6 +242,7 @@ MET_HDFLIB = @MET_HDFLIB@
 MET_NETCDF = @MET_NETCDF@
 MET_NETCDFINC = @MET_NETCDFINC@
 MET_NETCDFLIB = @MET_NETCDFLIB@
+MET_PYTHON_BIN_EXE = @MET_PYTHON_BIN_EXE@
 MET_PYTHON_CC = @MET_PYTHON_CC@
 MET_PYTHON_LD = @MET_PYTHON_LD@
 MKDIR_P = @MKDIR_P@
@@ -346,6 +347,7 @@ plot_point_obs_LDADD = -lvx_statistics \
 	-lvx_config \
 	-lvx_gsl_prob \
 	-lvx_color \
+	-lvx_util_math \
 	-lvx_util \
 	-lvx_math \
 	-lvx_cal \

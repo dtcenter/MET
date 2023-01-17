@@ -7,13 +7,12 @@ Grid-Stat Tool
 Introduction
 ============
 
-The Grid-Stat tool provides verification statistics for a matched forecast and observation grid. All of the forecast grid points in the region of interest are matched to observation grid points on the same grid. All the matched grid points are used to compute the verification statistics. The Grid-Stat tool functions in much the same way as the Point-Stat tool, except that no interpolation is required because the forecasts and observations are on the same grid. However, the interpolation parameters may be used to perform a smoothing operation on the forecast and observation fields prior to verification. In addition to traditional verification approaches, the Grid-Stat tool includes Fourier decompositions, gradient statistics, distance metrics, and neighborhood methods, designed to examine forecast performance as a function of spatial scale.
+The Grid-Stat tool functions in much the same way as the Point-Stat tool, except that the verification statistics it calculates are for a matched forecast-observation grid (as opposed to a set of observation points). Neither the forecast nor the observation grid needs to be identical to the final matched grid. If the forecast grid is different from the final matched grid, then forecast values are regridded (interpolated) to the final matched grid. The same procedure is followed for observations. No regridding is necessary if the forecast and observation grids are identical but remains optional. A smoothing operation may be performed on the forecast and observation fields prior to verification. All the matched forecast-observation grid points are used to compute the verification statistics. In addition to traditional verification approaches, the Grid-Stat tool includes Fourier decompositions, gradient statistics, distance metrics, and neighborhood methods, designed to examine forecast performance as a function of spatial scale.
 
 Scientific and statistical aspects of the Grid-Stat tool are briefly described in this section, followed by practical details regarding usage and output from the tool.
 
 Scientific and statistical aspects
 ==================================
-
 
 Statistical measures
 --------------------
@@ -71,6 +70,15 @@ MET also incorporates several neighborhood methods to give credit to forecasts t
 There are several ways to present the results of the neighborhood approaches, such as the Fractions Skill Score (FSS) or the Fractions Brier Score (FBS). These scores are presented in :numref:`Appendix C, Section %s <appendixC>`. One can also simply up-scale the information on the forecast verification grid by smoothing or resampling within a specified neighborhood around each grid point and recalculate the traditional verification metrics on the coarser grid. The MET output includes traditional contingency table statistics for each threshold and neighborhood window size.
 
 The user must specify several parameters in the grid_stat configuration file to utilize the neighborhood approach, such as the interpolation method, size of the smoothing window, and required fraction of valid data points within the smoothing window. For FSS-specific results, the user must specify the size of the neighborhood window, the required fraction of valid data points within the window, and the fractional coverage threshold from which the contingency tables are defined. These parameters are described further in the practical information section below.
+
+.. _grid-stat_seeps:
+
+SEEPS scores
+------------
+
+The Stable Equitable Error in Probability Space (SEEPS) was devised for monitoring global deterministic forecasts of precipitation against the WMO gauge network (:ref:`Rodwell et al., 2010 <Rodwell-2010>`; :ref:`Haiden et al., 2012 <Haiden-2012>`) and is a multi-category score which uses a climatology to account for local variations in behavior. Please see Point-Stat documentation :numref:`PS_seeps` for more details.
+
+The capability to calculate the SEEPS has also been added to Grid-Stat. This follows the method described in :ref:`North et al, 2022 <North-2022>`, which uses the TRMM 3B42 v7 gridded satellite product for the climatological values and interpolates the forecast and observed products onto this grid for evaluation. A 24-hour TRMM climatology (valid at 00 UTC) constructed from data over the time period 1998-2015 is supplied with the release. Expansion of the capability to other fields will occur as well vetted examples and funding allow.
 
 Fourier Decomposition
 ---------------------
@@ -222,7 +230,7 @@ grid_stat configuration file
 
 The default configuration file for the Grid-Stat tool, named **GridStatConfig_default**, can be found in the installed *share/met/config* directory. Other versions of the configuration file are included in *scripts/config*. We recommend that users make a copy of the default (or other) configuration file prior to modifying it. The contents are described in more detail below.
 
-Note that environment variables may be used when editing configuration files, as described in :numref:`pb2nc configuration file` for the PB2NC tool.
+Note that environment variables may be used when editing configuration files, as described in the :numref:`config_env_vars`.
 
 __________________________
 
@@ -363,6 +371,7 @@ _____________________
      nbrcnt = BOTH;
      grad   = BOTH;
      dmap   = BOTH;
+     seeps  = NONE;
   }
 
 
@@ -411,8 +420,13 @@ The **output_flag** array controls the type of output that the Grid-Stat tool ge
 
 21. **DMAP** for Distance Map Statistics
 
+22. **SEEPS** for SEEPS (Stable Equitable Error in Probability Space) score. It's described in :numref:`table_PS_format_info_SEEPS`. The SEEPS score of matched pair data is saved into the NetCDF.
+
 
 Note that the first two line types are easily derived from one another. The user is free to choose which measure is most desired. The output line types are described in more detail in :numref:`grid_stat-output`.
+
+The SEEPS climo file is not distributed with MET tools because of the file size. It should be configured by using the environment variable, MET_SEEPS_GRID_CLIMO_NAME.
+
 
 _____________________
 
@@ -681,7 +695,7 @@ The format of the STAT and ASCII output of the Grid-Stat tool are the same as th
     - Symmetric Extremal Dependency Index including normal and bootstrap upper and lower confidence limits
   * - 115-117
     - BAGSS, :raw-html:`<br />` BAGSS_BCL, :raw-html:`<br />` BAGSS_BCU
-    - Bias Adjusted Gilbert Skill Score including bootstrap upper and lower confidence limits
+    - Bias-Adjusted Gilbert Skill Score including bootstrap upper and lower confidence limits
 
 
 .. role:: raw-html(raw)

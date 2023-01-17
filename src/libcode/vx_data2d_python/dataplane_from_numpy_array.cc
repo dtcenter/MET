@@ -27,56 +27,13 @@
    //  2D numpy arrays seem to store things in row-major order
    //
 
-inline void nympy_array_one_to_two(const int n, const int Ncols, int & row, int & col)
+inline void numpy_array_one_to_two(const int n, const int Ncols, int & row, int & col)
 
 {
 
 row = n/Ncols;
 
 col = n%Ncols;
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-template <typename T>
-void load_numpy (void * buf,
-                 const int Nx, const int Ny,
-                 const int data_endian,
-                 void (*shuf)(void *), 
-                 DataPlane & out)
-
-
-{
-
-bool need_swap = (shuf != 0) && (native_endian != data_endian);
-
-int j, x, y, r, c;
-const int Nxy = Nx*Ny;
-T * u = (T *) buf;
-T value;
-
-for (j=0; j<Nxy; ++j)  {
-
-   nympy_array_one_to_two(j, Nx, r, c);
-
-   x = c;
-
-   y = Ny - 1 - r;
-
-   memcpy(&value, u + j, sizeof(T));
-
-   if ( need_swap )  shuf(&value);
-
-   out.set((double) value, x, y);
-
-}   //  for j
-
-
 
 return;
 

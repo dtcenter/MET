@@ -22,11 +22,19 @@
 
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "vx_util.h"
 
-extern unixtime  get_att_value_unixtime(const NcAtt *);
+////////////////////////////////////////////////////////////////////////
+
+static const std::string accum_time_att_name     = "accum_time";
+static const std::string accum_time_sec_att_name = "accum_time_sec";
+static const std::string init_time_att_name      = "init_time";
+static const std::string init_time_ut_att_name   = "init_time_ut";
+static const std::string level_att_name          = "level";
+static const std::string name_att_name           = "name";
+static const std::string valid_time_att_name     = "valid_time";
+static const std::string valid_time_ut_att_name  = "valid_time_ut";
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -48,10 +56,10 @@ class NcVarInfo {
 
       void clear();
 
-      void dump(ostream &, int = 0) const;
+      void dump(std::ostream &, int = 0) const;
 
 
-      NcVar * var;   //  not allocated
+      netCDF::NcVar * var;   //  not allocated
 
       ConcatString name;
 
@@ -73,7 +81,7 @@ class NcVarInfo {
 
       int Ndims;
 
-      NcDim ** Dims; //  allocated
+      netCDF::NcDim ** Dims; //  allocated
 
       int x_slot;    //   starting from zero
       int y_slot;    //
@@ -85,15 +93,23 @@ class NcVarInfo {
 ////////////////////////////////////////////////////////////////////////
 
 
-
 extern bool get_att_str(const NcVarInfo &, const ConcatString, ConcatString &);
-
 extern bool get_att_int(const NcVarInfo &, const ConcatString, int &);
 
-   //  unixtimes could be ints or strings
+extern bool get_att_accum_time(const NcVarInfo &, int &);
+extern bool get_att_level(const NcVarInfo &, ConcatString &);
+extern bool get_att_name(const NcVarInfo &, ConcatString &);
 
+//  unixtimes could be ints or strings
+extern bool get_att_unixtime(const netCDF::NcVar *, const ConcatString, unixtime &);
 extern bool get_att_unixtime(const NcVarInfo &, const ConcatString, unixtime &);
 
+extern unixtime  get_att_value_unixtime(const netCDF::NcAtt *);
+
+extern unixtime  get_att_value_unixtime(const netCDF::NcAtt *);
+
+extern NcVarInfo* find_var_info_by_dim_name(NcVarInfo *vars, const std::string dim_name,
+                                            const int nvars);
 
 ////////////////////////////////////////////////////////////////////////
 

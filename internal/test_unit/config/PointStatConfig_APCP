@@ -39,6 +39,9 @@ wind_thresh = [ NA ];
 wind_logic  = UNION;
 eclv_points = 0.05;
 
+cat_thresh   = [ >0.254, >0.635, >1.270, >2.540 ];
+message_type = "ADPSFC";
+
 fcst = {
    sid_inc = [];
    sid_exc = [];
@@ -47,10 +50,8 @@ fcst = {
    
    field = [
       {
-         name         = "${FCST_FIELD_NAME}";
-         level        = "${FCST_FIELD_LEVEL}";
-         cat_thresh   = [ >0.254, >0.635, >1.270, >2.540 ];
-         message_type = "ADPSFC";
+         name  = "${FCST_FIELD_NAME}";
+         level = "${FCST_FIELD_LEVEL}";         
       }
    ];
 
@@ -126,7 +127,14 @@ output_flag = {
    rps    = NONE;
    eclv   = BOTH;
    mpr    = NONE;
+   seeps  = ${SEEPS_FLAG};
+   seeps_mpr = ${SEEPS_FLAG};
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Threshold for SEEPS p1 (Probability of being dry)
+
+seeps_p1_thresh = ${SEEPS_P1_THRESH};
 
 ////////////////////////////////////////////////////////////////////////////////
 

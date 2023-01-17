@@ -56,6 +56,7 @@ static const char mercator_proj_type       [] = "Mercator";
 static const char lambert_proj_type        [] = "Lambert Conformal";
 static const char stereographic_proj_type  [] = "Polar Stereographic";
 static const char gaussian_proj_type       [] = "Gaussian";
+static const char semilatlon_proj_type     [] = "SemiLatLon";
 
 // String containing all valid PrepBufr message types
 static const char vld_msg_typ_str[] =
@@ -78,6 +79,11 @@ static const int n_vld_msg_typ =
 static const char surface_msg_typ_group_str [] = "SURFACE"; // Surface message type group
 static const char landsf_msg_typ_group_str  [] = "LANDSF";  // Surface land message type group
 static const char watersf_msg_typ_group_str [] = "WATERSF"; // Surface water message type group
+
+// Default message type group values
+static const char default_msg_typ_group_surface [] = "ADPSFC,SFCSHP,MSONET";
+static const char default_msg_typ_group_landsf  [] = "ADPSFC,MSONET";
+static const char default_msg_typ_group_watersf [] = "SFCSHP";
 
 // Commonly used regular expressions
 static const char yyyymmdd_hhmmss_reg_exp[] =
@@ -119,6 +125,7 @@ static const double const_gop   = 9.80616; // from The Ceaseless Wind
 static const double const_rd    = 287.0;   // kg/k dry gas constant
 
 static const int vx_data2d_star = -12345;
+static const int vx_data2d_dim_by_value = -123456; // apply the value instead of offset for slicing
 
 ////////////////////////////////////////////////////////////////////////
 

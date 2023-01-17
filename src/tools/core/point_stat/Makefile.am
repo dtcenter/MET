@@ -27,12 +27,14 @@ point_stat_LDADD = -lvx_stat_out \
 	$(PYTHON_LIBS) \
 	-lvx_data2d \
 	-lvx_nc_obs \
+        -lvx_seeps \
 	-lvx_nc_util \
 	-lvx_regrid \
 	-lvx_grid \
 	-lvx_config \
 	-lvx_gsl_prob \
 	-lvx_color \
+	-lvx_util_math \
 	-lvx_util \
 	-lvx_math \
 	-lvx_cal \

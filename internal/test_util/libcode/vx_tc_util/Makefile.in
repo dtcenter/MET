@@ -247,6 +247,7 @@ MET_HDFLIB = @MET_HDFLIB@
 MET_NETCDF = @MET_NETCDF@
 MET_NETCDFINC = @MET_NETCDFINC@
 MET_NETCDFLIB = @MET_NETCDFLIB@
+MET_PYTHON_BIN_EXE = @MET_PYTHON_BIN_EXE@
 MET_PYTHON_CC = @MET_PYTHON_CC@
 MET_PYTHON_LD = @MET_PYTHON_LD@
 MKDIR_P = @MKDIR_P@
@@ -349,6 +350,7 @@ test_read_LDADD = -lvx_stat_out \
 	-lvx_gsl_prob \
 	-lvx_cal \
 	-lvx_nav \
+	-lvx_util_math \
 	-lvx_util \
 	-lvx_math \
 	-lvx_color \
@@ -365,6 +367,7 @@ test_read_prob_LDADD = -lvx_stat_out \
 	-lvx_analysis_util \
 	-lvx_tc_util \
 	-lvx_shapedata \
+	-lvx_util_math \
 	-lvx_util \
 	$(PYTHON_LIBS) \
 	-lvx_statistics \
@@ -382,6 +385,7 @@ test_read_prob_LDADD = -lvx_stat_out \
 	-lvx_gsl_prob \
 	-lvx_cal \
 	-lvx_nav \
+	-lvx_util_math \
 	-lvx_util \
 	-lvx_math \
 	-lvx_color \

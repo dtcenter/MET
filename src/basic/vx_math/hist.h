@@ -115,7 +115,7 @@ inline int Histogram::too_small_count  () const { return ( TooSmallCount ); }
 ////////////////////////////////////////////////////////////////////////
 
 
-extern ostream & operator<<(ostream &, const Histogram &);
+extern std::ostream & operator<<(std::ostream &, const Histogram &);
 
 
 ////////////////////////////////////////////////////////////////////////

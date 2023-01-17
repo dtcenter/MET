@@ -496,7 +496,7 @@ for (j=0; j<(fcst_simple_att.n()); ++j)  {
 
    table.set_entry(r, fcst_valid_column, unix_to_yyyymmdd_hhmmss(fcst_simple_att.valid_time(j)));
 
-   table.set_entry(r,  obs_valid_column, unix_to_yyyymmdd_hhmmss(obs_raw.valid_time(t)));
+   table.set_entry(r,  obs_valid_column, unix_to_yyyymmdd_hhmmss(obs_raw.actual_valid_time(t)));
 
    table.set_entry(r,  obs_lead_column,  sec_to_hhmmss(obs_raw.lead_time(t)));
 
@@ -508,7 +508,7 @@ for (j=0; j<(obs_simple_att.n()); ++j)  {
 
    t = obs_simple_att.time_index(j);
 
-   table.set_entry(r, fcst_valid_column, unix_to_yyyymmdd_hhmmss(fcst_raw.valid_time(t)));
+   table.set_entry(r, fcst_valid_column, unix_to_yyyymmdd_hhmmss(fcst_raw.actual_valid_time(t)));
 
    table.set_entry(r,  fcst_lead_column, sec_to_hhmmss(fcst_raw.lead_time(t)));
 
@@ -528,7 +528,7 @@ for (j=0; j<(fcst_cluster_att.n()); ++j)  {
 
    table.set_entry(r, fcst_valid_column, unix_to_yyyymmdd_hhmmss(fcst_cluster_att.valid_time(j)));
 
-   table.set_entry(r,  obs_valid_column, unix_to_yyyymmdd_hhmmss(obs_raw.valid_time(t)));
+   table.set_entry(r,  obs_valid_column, unix_to_yyyymmdd_hhmmss(obs_raw.actual_valid_time(t)));
 
    table.set_entry(r,  obs_lead_column,  sec_to_hhmmss(obs_raw.lead_time(t)));
 
@@ -540,7 +540,7 @@ for (j=0; j<(obs_cluster_att.n()); ++j)  {
 
    t = obs_cluster_att.time_index(j);
 
-   table.set_entry(r, fcst_valid_column, unix_to_yyyymmdd_hhmmss(fcst_raw.valid_time(t)));
+   table.set_entry(r, fcst_valid_column, unix_to_yyyymmdd_hhmmss(fcst_raw.actual_valid_time(t)));
 
    table.set_entry(r,  fcst_lead_column, sec_to_hhmmss(fcst_raw.lead_time(t)));
 

@@ -51,36 +51,40 @@ static const int i_rps       = 16;
 static const int i_eclv      = 17;
 static const int i_mpr       = 18;
 static const int i_vcnt      = 19;
+static const int i_seeps_mpr = 20;
+static const int i_seeps     = 21;
 
-static const int n_txt       = 20;
+static const int n_txt       = 22;
 
 // Text file type
 static const STATLineType txt_file_type[n_txt] = {
 
-   stat_fho,    //  0
-   stat_ctc,    //  1
-   stat_cts,    //  2
-   stat_mctc,   //  3
-   stat_mcts,   //  4
+   stat_fho,       //  0
+   stat_ctc,       //  1
+   stat_cts,       //  2
+   stat_mctc,      //  3
+   stat_mcts,      //  4
 
-   stat_cnt,    //  5
-   stat_sl1l2,  //  6
-   stat_sal1l2, //  7
-   stat_vl1l2,  //  8
-   stat_val1l2, //  9
+   stat_cnt,       //  5
+   stat_sl1l2,     //  6
+   stat_sal1l2,    //  7
+   stat_vl1l2,     //  8
+   stat_val1l2,    //  9
 
-   stat_pct,    //  10   
-   stat_pstd,   //  11
-   stat_pjc,    //  12
-   stat_prc,    //  13
-   stat_ecnt,   //  14
+   stat_pct,       //  10   
+   stat_pstd,      //  11
+   stat_pjc,       //  12
+   stat_prc,       //  13
+   stat_ecnt,      //  14
 
-   stat_orank,  //  15
-   stat_rps,    //  16
-   stat_eclv,   //  17
-   stat_mpr,    //  18
-   stat_vcnt,   //  19
+   stat_orank,     //  15
+   stat_rps,       //  16
+   stat_eclv,      //  17
+   stat_mpr,       //  18
+   stat_vcnt,      //  19
 
+   stat_seeps_mpr, //  20
+   stat_seeps      //  21
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -127,6 +131,7 @@ class PointStatVxOpt {
 
       StringArray     mpr_sa;             // MPR column names
       ThreshArray     mpr_ta;             // MPR column thresholds
+      SingleThresh    seeps_p1_thresh;    // SEESP p1 threshold
 
       // Vector of MaskLatLon objects defining Lat/Lon Point masks
       vector<MaskLatLon> mask_llpnt;
@@ -143,7 +148,7 @@ class PointStatVxOpt {
       InterpInfo      interp_info;        // Interpolation information
       HiRAInfo        hira_info;          // HiRA verification logic
 
-      double          hss_ec_value;       // MCTS HSS expected correct value
+      double          hss_ec_value;       // HSS expected correct value
       bool            rank_corr_flag;     // Flag for computing rank correlations
 
       StringArray     msg_typ;            // Array of message types
@@ -159,7 +164,7 @@ class PointStatVxOpt {
 
       void clear();
 
-      void process_config(GrdFileType, Dictionary &, Dictionary &, bool);
+      void process_config(GrdFileType, Dictionary &, Dictionary &);
       void set_vx_pd(PointStatConfInfo *);
       bool is_uv_match(const PointStatVxOpt &) const;
 
@@ -221,6 +226,7 @@ class PointStatConfInfo {
       ConcatString model;                   // Model name
 
       PointStatVxOpt * vx_opt;              // Array of vx task options [n_vx] (allocated)
+      bool             grib_codes_set;
 
       // Land/sea mask and topography info for data filtering
       MaskPlane    land_mask;
@@ -249,7 +255,8 @@ class PointStatConfInfo {
       void clear();
 
       void read_config(const char *, const char *);
-      void process_config(GrdFileType, bool);
+      void process_config(GrdFileType);
+      void process_grib_codes();
       void process_flags();
       void process_masks(const Grid &);
       void process_geog(const Grid &, const char *);

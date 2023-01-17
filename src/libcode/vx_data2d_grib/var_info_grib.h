@@ -68,7 +68,7 @@ class VarInfoGrib : public VarInfo
       VarInfoGrib(const VarInfoGrib &);
       VarInfoGrib & operator=(const VarInfoGrib &);
 
-      void dump(ostream &) const;
+      void dump(std::ostream &) const;
       void clear();
 
          //

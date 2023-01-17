@@ -48,7 +48,7 @@ class ProbGenInfo : public ProbInfoBase {
 
       void clear();
 
-      void         dump(ostream &, int = 0)  const;
+      void         dump(std::ostream &, int = 0)  const;
       ConcatString serialize()               const;
       ConcatString serialize_r(int, int = 0) const;
 

@@ -12,9 +12,10 @@
 //
 //   Description:
 //
-//   Mod#  Date      Name      Description
-//   ----  ----      ----      -----------
-//   000   04/18/19  Fillmore  New
+//   Mod#  Date      Name       Description
+//   ----  ----      ----       -----------
+//   000   04/18/19  Fillmore   New
+//   001   09/28/22  Prestopnik MET #2227 Remove namespace std and netCDF from header files
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -23,7 +24,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
@@ -39,9 +39,9 @@ using namespace std;
 #include <unistd.h>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "tc_rmw_conf_info.h"
+#include "tc_rmw_wind_converter.h"
 
 #include "vx_data2d_factory.h"
 #include "vx_tc_util.h"
@@ -82,6 +82,8 @@ static StringArray   deck_source, deck_model_suffix;
 static ConcatString  config_file;
 static TCRMWConfInfo conf_info;
 static GrdFileType   ftype;
+static TCRMW_WindConverter wind_converter;
+
 
 // Optional arguments
 static ConcatString out_dir;
@@ -95,33 +97,33 @@ static ConcatString out_prefix;
 
 // Output NetCDF file
 static ConcatString out_file;
-static NcFile*      nc_out = (NcFile*) 0;
-static NcDim        range_dim;
-static NcDim        azimuth_dim;
-static NcDim        pressure_dim;
-static NcDim        track_point_dim;
-static NcVar        lat_arr_var;
-static NcVar        lon_arr_var;
-static NcVar        valid_time_var;
-static NcVar        data_var;
-static NcVar        wind_r_var;
-static NcVar        wind_a_var;
+static netCDF::NcFile*      nc_out = (netCDF::NcFile*) 0;
+static netCDF::NcDim        range_dim;
+static netCDF::NcDim        azimuth_dim;
+static netCDF::NcDim        pressure_dim;
+static netCDF::NcDim        track_point_dim;
+static netCDF::NcVar        lat_arr_var;
+static netCDF::NcVar        lon_arr_var;
+static netCDF::NcVar        valid_time_var;
+static netCDF::NcVar        data_var;
+static netCDF::NcVar        wind_r_var;
+static netCDF::NcVar        wind_a_var;
 
-static vector<NcVar> data_vars;
-static vector<NcVar> azi_mean_data_vars;
+static std::vector<netCDF::NcVar> data_vars;
+static std::vector<netCDF::NcVar> azi_mean_data_vars;
 
-static map<string, NcVar> data_3d_vars;
+static std::map<std::string, netCDF::NcVar> data_3d_vars;
 
 // List of output NetCDF variable names
 static StringArray nc_var_sa;
 
-static map<string, vector<string> > variable_levels;
-static map<string, string> variable_long_names;
-static map<string, string> variable_units;
+static std::map<std::string, std::vector<std::string> > variable_levels;
+static std::map<std::string, std::string> variable_long_names;
+static std::map<std::string, std::string> variable_units;
 
-static set<string> pressure_level_strings;
-static set<double> pressure_levels;
-static map<string, int> pressure_level_indices;
+static std::set<std::string> pressure_level_strings;
+static std::set<double> pressure_levels;
+static std::map<std::string, int> pressure_level_indices;
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -140,8 +142,8 @@ static double* lat_arr;
 static double* lon_arr;
 
 // Wind arrays
-static double* wind_r_arr;
-static double* wind_a_arr;
+/* static double* wind_r_arr; */
+/* static double* wind_t_arr; */
 
 ////////////////////////////////////////////////////////////////////////
 

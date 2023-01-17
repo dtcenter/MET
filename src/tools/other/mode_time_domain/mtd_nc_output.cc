@@ -17,6 +17,9 @@ using namespace std;
 #include <stdlib.h>
 #include <cmath>
 
+#include <netcdf>
+using namespace netCDF;
+
 #include "mtd_nc_output.h"
 
 #include "write_netcdf.h"

@@ -43,6 +43,8 @@
 //   021    04/12/21  Halley Gotway   MET #1735 Support multiple 
 //                    -out_thresh and -out_line_type options.
 //   022    05/28/21  Halley Gotway   Add MCTS HSS_EC output.
+//   023    11/10/22  Halley Gotway   MET #2339 Add SEEPS and SEEPS_MPR
+//                                      line types.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -421,6 +423,7 @@ void do_job_aggr(const ConcatString &jobstring, LineDataFile &f,
    map<ConcatString, AggrENSInfo>   ens_map;
    map<ConcatString, AggrRPSInfo>   rps_map;
    map<ConcatString, AggrSSVARInfo> ssvar_map;
+   map<ConcatString, AggrSEEPSInfo> seeps_map;
 
    //
    // Check that the -line_type option has been supplied exactly once
@@ -449,13 +452,14 @@ void do_job_aggr(const ConcatString &jobstring, LineDataFile &f,
       lt != stat_grad   && lt != stat_ecnt   &&
       lt != stat_rps    && lt != stat_rhist  &&
       lt != stat_phist  && lt != stat_relp   &&
-      lt != stat_ssvar  && lt != stat_isc) {
+      lt != stat_ssvar  && lt != stat_isc    &&
+      lt != stat_seeps) {
       mlog << Error << "\ndo_job_aggr() -> "
            << "the \"-line_type\" option must be set to one of:\n"
            << "\tFHO, CTC, MCTC,\n"
            << "\tSL1L2, SAL1L2, VL1L2, VAL1L2,\n"
            << "\tPCT, NBRCTC, NBRCNT, GRAD, ISC,\n"
-           << "\tECNT, RPS, RHIST, PHIST, RELP, SSVAR\n\n";
+           << "\tECNT, RPS, RHIST, PHIST, RELP, SSVAR, SEEPS\n\n";
       throw(1);
    }
 
@@ -572,6 +576,14 @@ void do_job_aggr(const ConcatString &jobstring, LineDataFile &f,
    }
 
    //
+   // Sum the SEEPS line types
+   //
+   else if(lt == stat_seeps) {
+      aggr_seeps_lines(f, job, seeps_map, n_in, n_out);
+      write_job_aggr_seeps(job, lt, seeps_map, out_at);
+   }
+
+   //
    // Check for no matching STAT lines
    //
    if(n_out == 0) {
@@ -609,13 +621,14 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
    AsciiTable out_at;
    int i, n;
 
-   map<ConcatString, AggrCTCInfo>  ctc_map;
-   map<ConcatString, AggrMCTCInfo> mctc_map;
-   map<ConcatString, AggrPCTInfo>  pct_map;
-   map<ConcatString, AggrPSumInfo> psum_map;
-   map<ConcatString, AggrWindInfo> wind_map;
-   map<ConcatString, AggrENSInfo>  orank_map;
-   map<ConcatString, AggrMPRInfo>  mpr_map;
+   map<ConcatString, AggrCTCInfo>      ctc_map;
+   map<ConcatString, AggrMCTCInfo>     mctc_map;
+   map<ConcatString, AggrPCTInfo>      pct_map;
+   map<ConcatString, AggrPSumInfo>     psum_map;
+   map<ConcatString, AggrWindInfo>     wind_map;
+   map<ConcatString, AggrENSInfo>      orank_map;
+   map<ConcatString, AggrMPRInfo>      mpr_map;
+   map<ConcatString, AggrSEEPSMPRInfo> seeps_mpr_map;
 
    //
    // Check that the -line_type and -out_line_type options have been
@@ -658,6 +671,7 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
    //                                             PCT, PSTD, PJC, PRC, ECLV,
    //                                             WDIR (wind direction)
    //    -line_type ORANK,         -out_line_type RHIST, PHIST, RELP, SSVAR
+   //    -line_type SEEPS_MPR,     -out_line_type SEEPS
    //
 
    //
@@ -724,10 +738,11 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
 
    //
    // Sum the vector partial sum line types:
-   //    VL1L2 -> VCNT
+   //    VL1L2, VAL1L2 -> VCNT
    //
-   else if(in_lt == stat_vl1l2 &&
-           has_line_type(out_lt, stat_vcnt)) {
+   else if((in_lt == stat_vl1l2 ||
+            in_lt == stat_val1l2) &&
+            has_line_type(out_lt, stat_vcnt)) {
       aggr_psum_lines(f, job, psum_map, n_in, n_out);
       for(it=out_lt.begin(); it!=out_lt.end(); it++) {
          write_job_aggr_psum(job, *it, psum_map, out_at);
@@ -808,6 +823,21 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
          if(!job.stat_out) write_table(out_at, sa_out);
       }
    }
+
+   //
+   // Sum the SEEPS_MPR lines:
+   //    SEEPS_MPR -> SEEPS
+   //
+   else if(in_lt == stat_seeps_mpr &&
+           has_line_type(out_lt, stat_seeps)) {
+
+      aggr_seeps_mpr_lines(f, job, seeps_mpr_map, n_in, n_out);
+      for(it=out_lt.begin(); it!=out_lt.end(); it++) {
+         write_job_aggr_seeps_mpr(job, *it, seeps_mpr_map, out_at);
+         if(!job.stat_out) write_table(out_at, sa_out);
+      }
+   }
+
 
    //
    // Read the matched pair lines:
@@ -1763,7 +1793,9 @@ void write_job_aggr_psum(STATAnalysisJob &job, STATLineType lt,
       shc = it->second.hdr.get_shc(it->first, job.by_column,
                                    job.hdr_name, job.hdr_value, lt);
       if(job.stat_out) {
-         if(lt == stat_cnt || lt == stat_nbrcnt) shc.set_alpha(job.out_alpha);
+         if(lt == stat_cnt || lt == stat_vcnt || lt == stat_nbrcnt) {
+            shc.set_alpha(job.out_alpha);
+         }
          write_header_cols(shc, job.stat_at, job.stat_row);
       }
 
@@ -1864,13 +1896,13 @@ void write_job_aggr_psum(STATAnalysisJob &job, STATLineType lt,
       //
       else if(lt == stat_vcnt) {
          if(job.stat_out) {
-            write_vcnt_cols(it->second.vl1l2_info, job.stat_at,
+            write_vcnt_cols(it->second.vl1l2_info, 0, job.stat_at,
                             job.stat_row++, n_header_columns);
          }
          else {
             at.set_entry(r, c++, (string)"VCNT:");
             write_case_cols(it->first, at, r, c);
-            write_vcnt_cols(it->second.vl1l2_info, at, r++, c);
+            write_vcnt_cols(it->second.vl1l2_info, 0, at, r++, c);
          }
       }
       //
@@ -2674,6 +2706,140 @@ void write_job_aggr_ssvar(STATAnalysisJob &job, STATLineType lt,
 
 ////////////////////////////////////////////////////////////////////////
 
+void write_job_aggr_seeps(STATAnalysisJob &job, STATLineType lt,
+                         map<ConcatString, AggrSEEPSInfo> &m,
+                         AsciiTable &at) {
+   map<ConcatString, AggrSEEPSInfo>::iterator it;
+   int n, n_row, n_col, r, c;
+   StatHdrColumns shc;
+
+   //
+   // Setup the output table
+   //
+   n_row = 1 + m.size();
+   n_col = 1 + job.by_column.n() + n_seeps_columns;
+   write_job_aggr_hdr(job, n_row, n_col, at);
+
+   //
+   // Write the rest of the header row
+   //
+   c = 1 + job.by_column.n();
+   write_header_row(seeps_columns, n_seeps_columns, 0, at, 0, c);
+
+   //
+   // Setup the output STAT file
+   //
+   job.setup_stat_file(n_row, n);
+
+   mlog << Debug(2) << "Computing output for "
+        << (int) m.size() << " case(s).\n";
+
+   //
+   // Loop through the map
+   //
+   for(it = m.begin(), r=1; it != m.end(); it++) {
+
+      //
+      // Write the output STAT header columns
+      //
+      shc = it->second.hdr.get_shc(it->first, job.by_column,
+                                   job.hdr_name, job.hdr_value, lt);
+
+      //
+      // Initialize
+      //
+      c = 0;
+
+      //
+      // SEEPS output line
+      //
+      if(job.stat_out) {
+         write_header_cols(shc, job.stat_at, job.stat_row);
+         write_seeps_cols(&it->second.agg_score, job.stat_at,
+                          job.stat_row++, n_header_columns);
+      }
+      else {
+         at.set_entry(r, c++, "SEEPS:");
+         write_case_cols(it->first, at, r, c);
+         write_seeps_cols(&it->second.agg_score, at, r++, c);
+      }
+   } // end for it
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_job_aggr_seeps_mpr(STATAnalysisJob &job, STATLineType lt,
+                              map<ConcatString, AggrSEEPSMPRInfo> &m,
+                              AsciiTable &at) {
+   map<ConcatString, AggrSEEPSMPRInfo>::iterator it;
+   int n, n_row, n_col, r, c;
+   StatHdrColumns shc;
+   SeepsAggScore agg_score;
+
+   //
+   // Setup the output table
+   //
+   n_row = 1 + m.size();
+   n_col = 1 + job.by_column.n() + n_seeps_columns;
+   write_job_aggr_hdr(job, n_row, n_col, at);
+
+   //
+   // Write the rest of the header row
+   //
+   c = 1 + job.by_column.n();
+   write_header_row(seeps_columns, n_seeps_columns, 0, at, 0, c);
+
+   //
+   // Setup the output STAT file
+   //
+   job.setup_stat_file(n_row, n);
+
+   mlog << Debug(2) << "Computing output for "
+        << (int) m.size() << " case(s).\n";
+
+   //
+   // Loop through the map
+   //
+   for(it = m.begin(), r=1; it != m.end(); it++) {
+
+      //
+      // Write the output STAT header columns
+      //
+      shc = it->second.hdr.get_shc(it->first, job.by_column,
+                                   job.hdr_name, job.hdr_value, lt);
+
+      //
+      // Initialize
+      //
+      c = 0;
+
+      //
+      // Compute the aggregated SEEPS score
+      //
+      compute_aggregated_seeps(&it->second.pd, &agg_score);
+
+      //
+      // SEEPS output line
+      //
+      if(job.stat_out) {
+         write_header_cols(shc, job.stat_at, job.stat_row);
+         write_seeps_cols(&agg_score, job.stat_at,
+                          job.stat_row++, n_header_columns);
+      }
+      else {
+         at.set_entry(r, c++, "SEEPS:");
+         write_case_cols(it->first, at, r, c);
+         write_seeps_cols(&agg_score, at, r++, c);
+      }
+   } // end for it
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void write_job_aggr_orank(STATAnalysisJob &job, STATLineType lt,
                           map<ConcatString, AggrENSInfo> &m,
                           AsciiTable &at, gsl_rng *rng_ptr) {
@@ -3428,13 +3594,13 @@ void write_job_aggr_mpr_wind(STATAnalysisJob &job, STATLineType lt,
       //
       else if(lt == stat_vcnt) {
          if(job.stat_out) {
-            write_vcnt_cols(it->second.vl1l2_info, job.stat_at,
+            write_vcnt_cols(it->second.vl1l2_info, 0, job.stat_at,
                             job.stat_row++, n_header_columns);
          }
          else {
             at.set_entry(r, c++, "VCNT:");
             write_case_cols(it->first, at, r, c);
-            write_vcnt_cols(it->second.vl1l2_info, at, r++, c);
+            write_vcnt_cols(it->second.vl1l2_info, 0, at, r++, c);
          }
       }
       //

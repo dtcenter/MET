@@ -22,7 +22,6 @@
 
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "vx_grid.h"
 
@@ -32,7 +31,7 @@ using namespace netCDF;
 
 extern bool get_pinterp_grid(const char * pinterp_filename, Grid &);
 
-extern bool get_pinterp_grid(NcFile &, Grid &);
+extern bool get_pinterp_grid(netCDF::NcFile &, Grid &);
 
 
 ////////////////////////////////////////////////////////////////////////

@@ -9,17 +9,15 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-
 using namespace std;
 
-#include <iostream>
 #include <fstream>
 #include <unistd.h>
 #include <stdlib.h>
-#include <string.h>
 #include <cstdio>
 #include <cmath>
 
+#include "main.h"
 #include "vx_util.h"
 
 
@@ -40,7 +38,7 @@ static void reformat(const char * input_filename, const char * output_filename);
 ////////////////////////////////////////////////////////////////////////
 
 
-int main(int argc, char * argv [])
+int met_main(int argc, char * argv [])
 
 {
 
@@ -60,6 +58,14 @@ reformat(input_filename, output_filename);
 
 return ( 0 );
 
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+const string get_tool_name() {
+   return "reformat_country_data";
 }
 
 

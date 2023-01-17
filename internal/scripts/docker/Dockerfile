@@ -1,6 +1,7 @@
-ARG MET_BASE_IMAGE=minimum
+ARG MET_BASE_REPO=met-base
+ARG MET_BASE_TAG=v1.1
 
-FROM dtcenter/met-base:${MET_BASE_IMAGE}
+FROM dtcenter/${MET_BASE_REPO}:${MET_BASE_TAG}
 MAINTAINER John Halley Gotway <johnhg@ucar.edu>
 
 #
@@ -36,4 +37,4 @@ RUN echo "Checking out MET ${MET_GIT_NAME} from ${MET_GIT_URL}" \
  && git clone ${MET_GIT_URL} ${MET_REPO_DIR} \
  && cd ${MET_REPO_DIR} \
  && git checkout ${MET_GIT_NAME} \
- && ../scripts/docker/build_met_docker.sh
+ && internal/scripts/docker/build_met_docker.sh

@@ -25,6 +25,8 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    12/19/11  Holmes          New
+//   001    07/06/22  Howard Soh      METplus-Internal #19 Rename main to met_main
+//   002    09/28/22  Prestopnik      MET #2227 Remove namespace std from header files
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -32,17 +34,15 @@ using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
-#include <ctime>
 #include <ctype.h>
 #include <dirent.h>
-#include <iostream>
 #include <fstream>
 #include <math.h>
-#include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
 
+#include "main.h"
 #include "vx_log.h"
 #include "data_plane.h"
 #include "vx_data2d.h"
@@ -85,7 +85,7 @@ static void set_title_string(const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
-int main(int argc, char * argv[]) {
+int met_main(int argc, char * argv[]) {
 
    program_name = get_short_name(argv[0]);
 
@@ -94,14 +94,13 @@ int main(int argc, char * argv[]) {
    VarInfo * var_ptr = (VarInfo * ) 0;
    VarInfoFactory v_factory;
    DataPlane data_plane;
-   DataPlaneArray data_plane_array;
    Grid grid;
    GrdFileType ftype;
    ColorTable color_table;
    double data_min, data_max;
    bool status = false;
 
-   std::ios::sync_with_stdio(true);
+   ios::sync_with_stdio(true);
 
    //
    // set the default color table
@@ -214,6 +213,12 @@ int main(int argc, char * argv[]) {
    #endif
 
    return(0);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+const string get_tool_name() {
+   return "plot_data_plane";
 }
 
 ////////////////////////////////////////////////////////////////////////

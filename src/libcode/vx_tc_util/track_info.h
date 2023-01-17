@@ -18,9 +18,11 @@
 #include "vx_cal.h"
 #include "vx_math.h"
 #include "vx_util.h"
+#include "nav.h"
 
 #include "atcf_track_line.h"
 #include "track_point.h"
+#include "diag_file.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -68,6 +70,12 @@ class TrackInfo {
       unixtime     MinWarmCore;
       unixtime     MaxWarmCore;
 
+      // Diagnostic source and names
+      DiagType     DiagSource;
+      ConcatString TrackSource;
+      ConcatString FieldSource;
+      StringArray  DiagName;
+
       // TrackPoints
       TrackPoint  *Point;
       int          NPoints;
@@ -86,7 +94,7 @@ class TrackInfo {
       void clear();
       void clear_points();
 
-      void         dump(ostream &, int = 0)  const;
+      void         dump(std::ostream &, int = 0)  const;
       ConcatString serialize()               const;
       ConcatString serialize_r(int, int = 0) const;
 
@@ -108,6 +116,10 @@ class TrackInfo {
       void set_valid_min(const unixtime);
       void set_valid_max(const unixtime);
       void set_point(int, const TrackPoint &);
+      void set_diag_source(DiagType);
+      void set_track_source(const char *);
+      void set_field_source(const char *);
+      void set_diag_name(const StringArray &);
 
          //
          //  get stuff
@@ -138,6 +150,13 @@ class TrackInfo {
       int                  warm_core_dur()    const;
       int                  valid_inc()        const;
       int                  n_points()         const;
+   
+      DiagType             diag_source()      const;
+      const ConcatString & track_source()     const;
+      const ConcatString & field_source()     const;
+      int                  n_diag()           const;
+      const StringArray &  diag_name()        const;
+      const char *         diag_name(int)     const;
 
       StringArray          track_lines()      const;
 
@@ -148,6 +167,8 @@ class TrackInfo {
       void add(const TrackPoint &);
       bool add(const ATCFTrackLine &, bool check_dup = false, bool check_anly = false);
       void add_watch_warn(const ConcatString &, WatchWarnType, unixtime);
+      bool add_diag_data(DiagFile &, const StringArray &);
+      void add_diag_value(int, double);
 
       bool has(const ATCFTrackLine &) const;
 
@@ -160,19 +181,23 @@ class TrackInfo {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline bool TrackInfo::is_best_track() const           { return(IsBestTrack); }
-inline bool TrackInfo::is_oper_track() const           { return(IsOperTrack); }
-inline bool TrackInfo::is_anly_track() const           { return(IsAnlyTrack); }
-inline void TrackInfo::set_storm_id(const char *s)     { StormId = s;         }
-inline void TrackInfo::set_basin(const char *s)        { Basin = s;           }
-inline void TrackInfo::set_cyclone(const char *s)      { Cyclone = s;         }
-inline void TrackInfo::set_storm_name(const char *s)   { StormName = s;       }
-inline void TrackInfo::set_technique_number(int i)     { TechniqueNumber = i; }
-inline void TrackInfo::set_technique(const char *s)    { Technique = s;       }
-inline void TrackInfo::set_initials(const char *s)     { Initials = s;        }
-inline void TrackInfo::set_init(const unixtime u)      { InitTime = u;        }
-inline void TrackInfo::set_valid_min(const unixtime u) { MinValidTime = u;    }
-inline void TrackInfo::set_valid_max(const unixtime u) { MaxValidTime = u;    }
+inline bool TrackInfo::is_best_track() const               { return(IsBestTrack); }
+inline bool TrackInfo::is_oper_track() const               { return(IsOperTrack); }
+inline bool TrackInfo::is_anly_track() const               { return(IsAnlyTrack); }
+inline void TrackInfo::set_storm_id(const char *s)         { StormId = s;         }
+inline void TrackInfo::set_basin(const char *s)            { Basin = s;           }
+inline void TrackInfo::set_cyclone(const char *s)          { Cyclone = s;         }
+inline void TrackInfo::set_storm_name(const char *s)       { StormName = s;       }
+inline void TrackInfo::set_technique_number(int i)         { TechniqueNumber = i; }
+inline void TrackInfo::set_technique(const char *s)        { Technique = s;       }
+inline void TrackInfo::set_initials(const char *s)         { Initials = s;        }
+inline void TrackInfo::set_init(const unixtime u)          { InitTime = u;        }
+inline void TrackInfo::set_valid_min(const unixtime u)     { MinValidTime = u;    }
+inline void TrackInfo::set_valid_max(const unixtime u)     { MaxValidTime = u;    }
+inline void TrackInfo::set_diag_source(DiagType t)         { DiagSource = t;      }
+inline void TrackInfo::set_track_source(const char *s)     { TrackSource = s;     }
+inline void TrackInfo::set_field_source(const char *s)     { FieldSource = s;     }
+inline void TrackInfo::set_diag_name(const StringArray &s) { DiagName = s;        }
 
 inline const ConcatString & TrackInfo::storm_id()         const { return(StormId);                      }
 inline const ConcatString & TrackInfo::basin()            const { return(Basin);                        }
@@ -188,7 +213,14 @@ inline unixtime             TrackInfo::valid_max()        const { return(MaxVali
 inline unixtime             TrackInfo::warm_core_min()    const { return(MinWarmCore);                  }
 inline unixtime             TrackInfo::warm_core_max()    const { return(MaxWarmCore);                  }
 inline int                  TrackInfo::n_points()         const { return(NPoints);                      }
-inline StringArray          TrackInfo::track_lines()      const { return(TrackLines);                   }
+
+inline DiagType             TrackInfo::diag_source()      const { return(DiagSource);   }
+inline const ConcatString & TrackInfo::track_source()     const { return(TrackSource);  }
+inline const ConcatString & TrackInfo::field_source()     const { return(FieldSource);  }
+inline int                  TrackInfo::n_diag()           const { return(DiagName.n()); }
+inline const StringArray &  TrackInfo::diag_name()        const { return(DiagName);     }
+
+inline StringArray          TrackInfo::track_lines()      const { return(TrackLines); }
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -206,7 +238,7 @@ class TrackInfoArray {
       void init_from_scratch();
       void assign(const TrackInfoArray &);
 
-      vector<TrackInfo> Track;
+      std::vector<TrackInfo> Track;
 
    public:
 
@@ -217,7 +249,7 @@ class TrackInfoArray {
 
       void clear();
 
-      void         dump(ostream &, int = 0) const;
+      void         dump(std::ostream &, int = 0) const;
       ConcatString serialize()              const;
       ConcatString serialize_r(int = 0)     const;
 
@@ -230,6 +262,7 @@ class TrackInfoArray {
       bool add(const ATCFTrackLine &, bool check_dup = false, bool check_anly = false);
       bool has(const ATCFTrackLine &) const;
       bool erase_storm_id(const ConcatString &);
+      int  add_diag_data(DiagFile &, const StringArray &);
 
          //
          //  get stuff
@@ -247,6 +280,9 @@ inline int TrackInfoArray::n() const { return(Track.size()); }
 ////////////////////////////////////////////////////////////////////////
 
 extern TrackInfo consensus(const TrackInfoArray &, const ConcatString &, int, const StringArray &);
+extern void compute_gc_dist_stdev(const double lat, const double lon,
+                                  const NumArray &lats, const NumArray &lons,
+                                  double &mean, double &stdev);
 extern bool has_storm_id(const StringArray &, const ConcatString &basin,
                          const ConcatString &cyclone, unixtime init);
 extern void latlon_to_xytk_err(double alat, double alon,

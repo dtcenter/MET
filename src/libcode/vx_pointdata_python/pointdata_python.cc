@@ -95,7 +95,6 @@ void MetPythonPointDataFile::python_init_from_scratch()
 {
 
 PythonCommand.clear();
-//met_data.clear();
 
 close();
 
@@ -122,20 +121,6 @@ return;
 
 }
 
-
-////////////////////////////////////////////////////////////////////////
-
-/*
-void MetPythonPointDataFile::set_type(const GrdFileType t)
-
-{
-
-Type = t;
-
-return;
-
-}
-*/
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -189,8 +174,8 @@ file_name.chomp(".py");   //  remove possible ".py" suffix from script filename
 
 bool status = python_point_data(file_name.c_str(), file_argc, file_argv, use_xarray, met_data);
 
-int hdr_cnt = met_data.get_hdr_cnt();
-int obs_cnt = met_data.get_obs_cnt();
+met_data.get_hdr_cnt();
+met_data.get_obs_cnt();
 MetPointHeader *hdr_data = met_data.get_header_data();
 MetPointObsData *obs_data = met_data.get_point_obs_data();
 
@@ -216,23 +201,7 @@ void MetPythonPointDataFile::dump(ostream & out, int depth) const
 Indent prefix(depth);
 
 out << prefix << "File = ";
-/*
-if ( Filename.empty() )  out << "(nul)\n";
-else                     out << '\"' << Filename << "\"\n";
 
-if ( Raw_Grid )  {
-
-   out << prefix << "Grid:\n";
-
-//   Raw_Grid->dump(out, depth + 1);
-
-} else {
-
-   out << prefix << "No Grid!\n";
-
-}
-*/
-   //
    //  done
    //
 
@@ -242,35 +211,6 @@ return;
 
 }
 
-
-////////////////////////////////////////////////////////////////////////
-/*
-
-bool MetPythonPointDataFile::data_ok(int x, int y) const
-
-{
-
-//const double value = get(x, y);
-
-//return ( !is_bad_data(value) );
-return true;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void MetPythonPointDataFile::data_minmax(double & data_min, double & data_max) const
-
-{
-
-//Plane.data_range(data_min, data_max);
-
-return;
-
-}
-*/
 
 ////////////////////////////////////////////////////////////////////////
 

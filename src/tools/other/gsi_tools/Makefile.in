@@ -277,6 +277,7 @@ MET_HDFLIB = @MET_HDFLIB@
 MET_NETCDF = @MET_NETCDF@
 MET_NETCDFINC = @MET_NETCDFINC@
 MET_NETCDFLIB = @MET_NETCDFLIB@
+MET_PYTHON_BIN_EXE = @MET_PYTHON_BIN_EXE@
 MET_PYTHON_CC = @MET_PYTHON_CC@
 MET_PYTHON_LD = @MET_PYTHON_LD@
 MKDIR_P = @MKDIR_P@
@@ -386,12 +387,14 @@ gsid2mpr_LDADD = -lvx_stat_out \
 	-lvx_data2d_nccf \
 	-lvx_data2d_grib $(GRIB2_LIBS) \
 	-lvx_data2d \
+        -lvx_seeps \
 	-lvx_nc_util \
 	-lvx_regrid \
 	-lvx_grid \
 	-lvx_config \
 	-lvx_gsl_prob \
 	-lvx_cal \
+	-lvx_util_math \
 	-lvx_util \
 	-lvx_math \
 	-lvx_color \
@@ -432,12 +435,14 @@ gsidens2orank_LDADD = -lvx_stat_out \
 	-lvx_data2d_nccf \
 	-lvx_data2d_grib $(GRIB2_LIBS) \
 	-lvx_data2d \
+        -lvx_seeps \
 	-lvx_nc_util \
 	-lvx_regrid \
 	-lvx_grid \
 	-lvx_config \
 	-lvx_gsl_prob \
 	-lvx_cal \
+	-lvx_util_math \
 	-lvx_util \
 	-lvx_math \
 	-lvx_color \

@@ -101,9 +101,9 @@ class CRC_Array {
 
       void extend(int, bool exact = true);
 
-      void dump(ostream &, int depth = 0) const;
+      void dump(std::ostream &, int depth = 0) const;
 
-      void dump_one_line(ostream & out, int depth) const;
+      void dump_one_line(std::ostream & out, int depth) const;
 
          //
          //  set stuff
@@ -330,7 +330,7 @@ return;
 
 template <typename T>
 
-void CRC_Array<T>::dump(ostream & out, int depth) const
+void CRC_Array<T>::dump(std::ostream & out, int depth) const
 
 {
 
@@ -364,7 +364,7 @@ return;
 
 template <typename T>
 
-void CRC_Array<T>::dump_one_line(ostream & out, int depth) const
+void CRC_Array<T>::dump_one_line(std::ostream & out, int depth) const
 
 {
 
@@ -385,7 +385,7 @@ for (j=0; j<Nelements; ++j)  {
    //  done
    //
 
-out << '\n' << flush;
+ out << '\n' << std::flush;
 
 return;
 

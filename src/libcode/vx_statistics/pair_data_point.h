@@ -17,6 +17,7 @@
 #include "vx_grid.h"
 #include "vx_data2d.h"
 #include "vx_data2d_grib.h"
+#include "seeps.h"
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -32,6 +33,8 @@ class PairDataPoint : public PairBase {
       void init_from_scratch();
       void assign(const PairDataPoint &);
 
+      SeepsClimo   *seeps_climo;
+
    public:
 
       PairDataPoint();
@@ -43,6 +46,8 @@ class PairDataPoint : public PairBase {
 
       // Forecast values
       NumArray f_na; // Forecast [n_obs]
+      std::vector<SeepsScore *> seeps_mpr;
+      SeepsAggScore seeps;
 
       //////////////////////////////////////////////////////////////////
 
@@ -54,10 +59,13 @@ class PairDataPoint : public PairBase {
       bool add_point_pair(const char *, double, double, double, double,
                           unixtime, double, double, double, double,
                           const char *, double, double, double);
+      void load_seeps_climo();
+      void set_seeps_thresh(const SingleThresh &p1_thresh);
+      void set_seeps_score(SeepsScore *, int index=-1);
 
       void set_point_pair(int, const char *, double, double, double, double,
                           unixtime, double, double, double, double,
-                          const char *, double, double, double);
+                          const char *, double, double, double, SeepsScore *);
 
       bool add_grid_pair(double, double, double, double, double);
 
@@ -68,6 +76,8 @@ class PairDataPoint : public PairBase {
       PairDataPoint subset_pairs_cnt_thresh(const SingleThresh &ft,
                                             const SingleThresh &ot,
                                             const SetLogic type) const;
+      SeepsScore *compute_seeps(const char *, double, double, unixtime);
+
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -219,6 +229,9 @@ class VxPairDataPoint {
 
       void set_mpr_thresh(const StringArray &, const ThreshArray &);
 
+      void load_seeps_climo();
+      void set_seeps_thresh(const SingleThresh &p1_thresh);
+
       void set_climo_cdf_info_ptr(const ClimoCDFInfo *);
 
       void set_msg_typ_sfc(const StringArray &);
@@ -230,6 +243,10 @@ class VxPairDataPoint {
       void add_point_obs(float *, const char *, const char *, unixtime,
                          const char *, float *, Grid &, const char * = 0,
                          const DataPlane * = 0);
+
+      void add_prec_point_obs(float *, const char *, const char *, unixtime,
+                              const char *, float *, Grid &, int month, int hour,
+                              const char * = 0, const DataPlane * = 0);
 
       int  get_n_pair() const;
 
@@ -248,6 +265,7 @@ class VxPairDataPoint {
       void inc_count(int ***&, int, int);
       void inc_count(int ***&, int, int, int);
 };
+
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -268,6 +286,16 @@ extern double get_mpr_column_value(double, double, double, double,
 
 extern void apply_mpr_thresh_mask(DataPlane &, DataPlane &,
                         DataPlane &, DataPlane &,
+                        const StringArray &, const ThreshArray &);
+
+extern bool check_seeps_thresh(double, double,
+                        const StringArray &, const ThreshArray &,
+                        ConcatString * = 0);
+
+extern double get_seeps_column_value(double, double,
+                        const char *);
+
+extern void apply_seeps_thresh_mask(DataPlane &, DataPlane &,
                         const StringArray &, const ThreshArray &);
 
 // Apply conditional thresholds to subset the wind pairs

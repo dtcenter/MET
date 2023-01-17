@@ -102,7 +102,8 @@ CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am_tc_rmw_OBJECTS = tc_rmw-tc_rmw.$(OBJEXT) \
-	tc_rmw-tc_rmw_conf_info.$(OBJEXT)
+	tc_rmw-tc_rmw_conf_info.$(OBJEXT) \
+	tc_rmw-tc_rmw_wind_converter.$(OBJEXT)
 tc_rmw_OBJECTS = $(am_tc_rmw_OBJECTS)
 am__DEPENDENCIES_1 =
 tc_rmw_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
@@ -125,7 +126,8 @@ DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__maybe_remake_depfiles = depfiles
 am__depfiles_remade = ./$(DEPDIR)/tc_rmw-tc_rmw.Po \
-	./$(DEPDIR)/tc_rmw-tc_rmw_conf_info.Po
+	./$(DEPDIR)/tc_rmw-tc_rmw_conf_info.Po \
+	./$(DEPDIR)/tc_rmw-tc_rmw_wind_converter.Po
 am__mv = mv -f
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -242,6 +244,7 @@ MET_HDFLIB = @MET_HDFLIB@
 MET_NETCDF = @MET_NETCDF@
 MET_NETCDFINC = @MET_NETCDFINC@
 MET_NETCDFLIB = @MET_NETCDFLIB@
+MET_PYTHON_BIN_EXE = @MET_PYTHON_BIN_EXE@
 MET_PYTHON_CC = @MET_PYTHON_CC@
 MET_PYTHON_LD = @MET_PYTHON_LD@
 MKDIR_P = @MKDIR_P@
@@ -318,7 +321,8 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 MAINTAINERCLEANFILES = Makefile.in
 tc_rmw_SOURCES = tc_rmw.cc \
-	tc_rmw_conf_info.cc
+	tc_rmw_conf_info.cc \
+	tc_rmw_wind_converter.cc 
 
 tc_rmw_CPPFLAGS = ${MET_CPPFLAGS}
 tc_rmw_LDFLAGS = ${MET_LDFLAGS}
@@ -341,6 +345,8 @@ tc_rmw_LDADD = -lvx_stat_out \
 	-lvx_config \
 	-lvx_gsl_prob \
 	-lvx_cal \
+	-lvx_nav \
+	-lvx_util_math \
 	-lvx_util \
 	-lvx_math \
 	-lvx_color \
@@ -439,6 +445,7 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tc_rmw-tc_rmw.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tc_rmw-tc_rmw_conf_info.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tc_rmw-tc_rmw_wind_converter.Po@am__quote@ # am--include-marker
 
 $(am__depfiles_remade):
 	@$(MKDIR_P) $(@D)
@@ -487,6 +494,20 @@ tc_rmw-tc_rmw_conf_info.obj: tc_rmw_conf_info.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='tc_rmw_conf_info.cc' object='tc_rmw-tc_rmw_conf_info.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tc_rmw_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o tc_rmw-tc_rmw_conf_info.obj `if test -f 'tc_rmw_conf_info.cc'; then $(CYGPATH_W) 'tc_rmw_conf_info.cc'; else $(CYGPATH_W) '$(srcdir)/tc_rmw_conf_info.cc'; fi`
+
+tc_rmw-tc_rmw_wind_converter.o: tc_rmw_wind_converter.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tc_rmw_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT tc_rmw-tc_rmw_wind_converter.o -MD -MP -MF $(DEPDIR)/tc_rmw-tc_rmw_wind_converter.Tpo -c -o tc_rmw-tc_rmw_wind_converter.o `test -f 'tc_rmw_wind_converter.cc' || echo '$(srcdir)/'`tc_rmw_wind_converter.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tc_rmw-tc_rmw_wind_converter.Tpo $(DEPDIR)/tc_rmw-tc_rmw_wind_converter.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='tc_rmw_wind_converter.cc' object='tc_rmw-tc_rmw_wind_converter.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tc_rmw_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o tc_rmw-tc_rmw_wind_converter.o `test -f 'tc_rmw_wind_converter.cc' || echo '$(srcdir)/'`tc_rmw_wind_converter.cc
+
+tc_rmw-tc_rmw_wind_converter.obj: tc_rmw_wind_converter.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tc_rmw_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT tc_rmw-tc_rmw_wind_converter.obj -MD -MP -MF $(DEPDIR)/tc_rmw-tc_rmw_wind_converter.Tpo -c -o tc_rmw-tc_rmw_wind_converter.obj `if test -f 'tc_rmw_wind_converter.cc'; then $(CYGPATH_W) 'tc_rmw_wind_converter.cc'; else $(CYGPATH_W) '$(srcdir)/tc_rmw_wind_converter.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tc_rmw-tc_rmw_wind_converter.Tpo $(DEPDIR)/tc_rmw-tc_rmw_wind_converter.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='tc_rmw_wind_converter.cc' object='tc_rmw-tc_rmw_wind_converter.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tc_rmw_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o tc_rmw-tc_rmw_wind_converter.obj `if test -f 'tc_rmw_wind_converter.cc'; then $(CYGPATH_W) 'tc_rmw_wind_converter.cc'; else $(CYGPATH_W) '$(srcdir)/tc_rmw_wind_converter.cc'; fi`
 
 ID: $(am__tagged_files)
 	$(am__define_uniq_tagged_files); mkid -fID $$unique
@@ -618,6 +639,7 @@ clean-am: clean-binPROGRAMS clean-generic mostlyclean-am
 distclean: distclean-am
 		-rm -f ./$(DEPDIR)/tc_rmw-tc_rmw.Po
 	-rm -f ./$(DEPDIR)/tc_rmw-tc_rmw_conf_info.Po
+	-rm -f ./$(DEPDIR)/tc_rmw-tc_rmw_wind_converter.Po
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -665,6 +687,7 @@ installcheck-am:
 maintainer-clean: maintainer-clean-am
 		-rm -f ./$(DEPDIR)/tc_rmw-tc_rmw.Po
 	-rm -f ./$(DEPDIR)/tc_rmw-tc_rmw_conf_info.Po
+	-rm -f ./$(DEPDIR)/tc_rmw-tc_rmw_wind_converter.Po
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 

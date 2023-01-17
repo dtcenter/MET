@@ -9,6 +9,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+using namespace std;
 
 static const int gray_min         = 130;   //  these values must be between 0 and 255 inclusive
 static const int gray_max         = 255;
@@ -22,17 +23,14 @@ static const char map_filename [] = "MET_BASE/map/country_major_lakes_data";
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
-#include <iostream>
 #include <fstream>
 #include <unistd.h>
 #include <stdlib.h>
 #include <cstdio>
-#include <string.h>
 #include <cmath>
 #include <ctype.h>
 
+#include "main.h"
 #include "vx_log.h"
 #include "vx_util.h"
 #include "vx_math.h"
@@ -124,7 +122,7 @@ static void draw_meridian(PSfile & plot, const char hemisphere, double lon);
 ////////////////////////////////////////////////////////////////////////
 
 
-int main(int argc, char * argv [])
+int met_main(int argc, char * argv [])
 
 {
 
@@ -166,6 +164,14 @@ for (j=0; j<(cline.n()); ++j)  {
 
 return ( 0 );
 
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+const string get_tool_name() {
+   return "wwmca_plot";
 }
 
 

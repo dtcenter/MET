@@ -8,6 +8,8 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+using namespace std;
+
 #include <cstdio>
 #include <fstream>
 #include <iostream>
@@ -15,6 +17,9 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <string.h>
+
+#include <netcdf>
+using namespace netCDF;
 
 #include "series_pdf.h"
 

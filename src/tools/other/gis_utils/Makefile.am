@@ -20,9 +20,9 @@ gis_dump_shp_CPPFLAGS = ${MET_CPPFLAGS}
 gis_dump_shp_LDFLAGS = ${MET_LDFLAGS}
 gis_dump_shp_LDADD = -lvx_config \
 	-lvx_gis \
-	-lvx_util \
 	-lvx_cal \
 	-lvx_log \
+	-lvx_util \
 	-lm
 
 gis_dump_shx_SOURCES = gis_dump_shx.cc 
@@ -31,9 +31,9 @@ gis_dump_shx_CPPFLAGS = ${MET_CPPFLAGS}
 gis_dump_shx_LDFLAGS = ${MET_LDFLAGS}
 gis_dump_shx_LDADD = -lvx_config \
 	-lvx_gis \
-	-lvx_util \
 	-lvx_cal \
 	-lvx_log \
+	-lvx_util \
 	-lm
 
 gis_dump_dbf_SOURCES = gis_dump_dbf.cc
@@ -42,8 +42,8 @@ gis_dump_dbf_CPPFLAGS = ${MET_CPPFLAGS}
 gis_dump_dbf_LDFLAGS = ${MET_LDFLAGS}
 gis_dump_dbf_LDADD = -lvx_config \
 	-lvx_gis \
-	-lvx_util \
 	-lvx_cal \
 	-lvx_log \
+	-lvx_util \
 	-lm
 

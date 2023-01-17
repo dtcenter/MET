@@ -12,7 +12,8 @@ include ${top_srcdir}/Make-include
 
 bin_PROGRAMS   = tc_rmw
 tc_rmw_SOURCES = tc_rmw.cc \
-	tc_rmw_conf_info.cc
+	tc_rmw_conf_info.cc \
+	tc_rmw_wind_converter.cc 
 tc_rmw_CPPFLAGS = ${MET_CPPFLAGS}
 tc_rmw_LDFLAGS = ${MET_LDFLAGS}
 tc_rmw_LDADD = -lvx_stat_out \
@@ -34,6 +35,8 @@ tc_rmw_LDADD = -lvx_stat_out \
 	-lvx_config \
 	-lvx_gsl_prob \
 	-lvx_cal \
+	-lvx_nav \
+	-lvx_util_math \
 	-lvx_util \
 	-lvx_math \
 	-lvx_color \

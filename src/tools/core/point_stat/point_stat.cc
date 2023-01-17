@@ -100,6 +100,9 @@
 //                    Added code for obs_qty_exc.
 //   049    12/11/21  Halley Gotway  MET #1991 Fix VCNT output.
 //   050    02/11/22  Halley Gotway  MET #2045 Fix HiRA output.
+//   051    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
+//   052    09/29/22  Halley Gotway  MET #2286 Refine GRIB1 table lookup logic.
+//   053    10/03/22  Prestopnik     MET #2227 Remove using namespace netCDF from header files
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -107,23 +110,25 @@ using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
-#include <ctime>
 #include <ctype.h>
 #include <dirent.h>
-#include <iostream>
 #include <fstream>
 #include <math.h>
-#include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
 
+#include <netcdf>
+using namespace netCDF;
+
+#include "main.h"
 #include "point_stat.h"
 
 #include "vx_statistics.h"
 #include "vx_nc_util.h"
 #include "vx_regrid.h"
 #include "vx_log.h"
+#include "seeps.h"
 
 #include "nc_obs_util.h"
 #include "nc_point_obs_in.h"
@@ -132,6 +137,10 @@ using namespace std;
 #include "data2d_nc_met.h"
 #include "pointdata_python.h"
 #endif
+
+////////////////////////////////////////////////////////////////////////
+
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -171,11 +180,8 @@ static void set_outdir(const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
-int main(int argc, char *argv[]) {
+int met_main(int argc, char *argv[]) {
    int i;
-
-   // Set handler to be called for memory allocation error
-   set_new_handler(oom);
 
    // Process the command line arguments
    process_command_line(argc, argv);
@@ -201,6 +207,12 @@ int main(int argc, char *argv[]) {
    clean_up();
 
    return(0);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+const string get_tool_name() {
+   return "point_stat";
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -276,14 +288,11 @@ void process_command_line(int argc, char **argv) {
       exit(1);
    }
 
-   // Use a variable index from var_name instead of GRIB code
-   bool use_var_id = is_using_var_id(obs_file[0].c_str());
-
    // Store the forecast file type
    ftype = fcst_mtddf->file_type();
 
    // Process the configuration
-   conf_info.process_config(ftype, use_var_id);
+   conf_info.process_config(ftype);
 
    // Set the model name
    shc.set_model(conf_info.model.c_str());
@@ -363,8 +372,8 @@ void setup_txt_files() {
 
    // Determine the maximum number of data columns
    max_col = (max_prob_col  > max_stat_col ? max_prob_col  : max_stat_col);
-   max_col = (max_mctc_col  > max_col      ? max_mctc_col  : max_col);
-   max_col = (max_orank_col > max_col      ? max_orank_col : max_col);
+   if (max_mctc_col  > max_col) max_col = max_mctc_col;
+   if (max_orank_col > max_col) max_col = max_orank_col;
 
    // Add the header columns
    max_col += n_header_columns + 1;
@@ -683,11 +692,14 @@ void process_obs_file(int i_nc) {
    bool use_python = false;
    MetNcPointObsIn nc_point_obs;
    MetPointData *met_point_obs = 0;
-#ifdef WITH_PYTHON
-   MetPythonPointDataFile met_point_file;
+
+   // Check for python format
    string python_command = obs_file[i_nc];
    bool use_xarray = (0 == python_command.find(conf_val_python_xarray));
    use_python = use_xarray || (0 == python_command.find(conf_val_python_numpy));
+
+#ifdef WITH_PYTHON
+   MetPythonPointDataFile met_point_file;
    if (use_python) {
       int offset = python_command.find("=");
       if (offset == std::string::npos) {
@@ -705,8 +717,11 @@ void process_obs_file(int i_nc) {
       }
 
       met_point_obs = met_point_file.get_met_point_data();
+      use_var_id = met_point_file.is_using_var_id();
    }
    else {
+#else
+   if (use_python) python_compile_error(method_name);
 #endif
       if( !nc_point_obs.open(obs_file[i_nc].c_str()) ) {
          nc_point_obs.close();
@@ -727,6 +742,10 @@ void process_obs_file(int i_nc) {
    }
 #endif
 
+   // Perform GRIB table lookups, if needed
+   if(!use_var_id) conf_info.process_grib_codes();
+   is_vgrd = is_ugrd = false;
+
    int hdr_count = met_point_obs->get_hdr_cnt();
    int obs_count = met_point_obs->get_obs_cnt();
    mlog << Debug(2)
@@ -737,7 +756,7 @@ void process_obs_file(int i_nc) {
    ConcatString var_name("");
    StringArray var_names;
    StringArray obs_qty_array = met_point_obs->get_qty_data();
-   if( use_var_id ) var_names = met_point_obs->get_var_names();
+   if(use_var_id) var_names = met_point_obs->get_var_names();
 
    const int buf_size = ((obs_count > BUFFER_SIZE) ? BUFFER_SIZE : (obs_count));
    int   obs_qty_idx_block[buf_size];
@@ -745,6 +764,7 @@ void process_obs_file(int i_nc) {
 
    // Process each observation in the file
    int str_length, block_size;
+   int prev_grib_code = bad_data_int;
    for(int i_block_start_idx=0; i_block_start_idx<obs_count; i_block_start_idx+=buf_size) {
       block_size = (obs_count - i_block_start_idx);
       if (block_size > buf_size) block_size = buf_size;
@@ -796,19 +816,22 @@ void process_obs_file(int i_nc) {
          // Store the variable name
          int org_grib_code = met_point_obs->get_grib_code_or_var_index(obs_arr);
          int grib_code = org_grib_code;
-         if (use_var_id && grib_code < var_names.n()) {
-            var_name   = var_names[grib_code];
-            grib_code = bad_data_int;
-         }
-         else {
-            var_name = "";
-         }
+         if (prev_grib_code != org_grib_code) {
+            if (use_var_id && grib_code < var_names.n()) {
+               var_name   = var_names[grib_code];
+               grib_code = bad_data_int;
+            }
+            else {
+               var_name = "";
+            }
 
-         // Check for wind components
-         is_ugrd = ( use_var_id &&        var_name == ugrd_abbr_str ) ||
-                   (!use_var_id && nint(grib_code) == ugrd_grib_code);
-         is_vgrd = ( use_var_id &&        var_name == vgrd_abbr_str ) ||
-                   (!use_var_id && nint(grib_code) == vgrd_grib_code);
+            // Check for wind components
+            is_ugrd = ( use_var_id &&        var_name == ugrd_abbr_str ) ||
+                      (!use_var_id && nint(grib_code) == ugrd_grib_code);
+            is_vgrd = ( use_var_id &&        var_name == vgrd_abbr_str ) ||
+                      (!use_var_id && nint(grib_code) == vgrd_grib_code);
+            prev_grib_code = org_grib_code;
+         }
 
          // If the current observation is UGRD, save it as the
          // previous.  If vector winds are to be computed, UGRD
@@ -1013,6 +1036,27 @@ void process_scores() {
                   // Reset the observation valid time
                   shc.set_obs_valid_beg(conf_info.vx_opt[i].vx_pd.beg_ut);
                   shc.set_obs_valid_end(conf_info.vx_opt[i].vx_pd.end_ut);
+               }
+
+               // Write out the SEEPS MPR lines
+               if(conf_info.vx_opt[i].output_flag[i_seeps_mpr] != STATOutputType_None) {
+                  write_seeps_mpr_row(shc, pd_ptr,
+                     conf_info.vx_opt[i].output_flag[i_seeps_mpr],
+                     stat_at, i_stat_row,
+                     txt_at[i_seeps_mpr], i_txt_row[i_seeps_mpr]);
+
+                  // Reset the observation valid time
+                  shc.set_obs_valid_beg(conf_info.vx_opt[i].vx_pd.beg_ut);
+                  shc.set_obs_valid_end(conf_info.vx_opt[i].vx_pd.end_ut);
+               }
+
+               // Write out the SEEPS lines
+               if(conf_info.vx_opt[i].output_flag[i_seeps] != STATOutputType_None) {
+                  compute_aggregated_seeps(pd_ptr, &pd_ptr->seeps);
+                  write_seeps_row(shc, &pd_ptr->seeps,
+                     conf_info.vx_opt[i].output_flag[i_seeps],
+                     stat_at, i_stat_row,
+                     txt_at[i_seeps], i_txt_row[i_seeps]);
                }
 
                // Compute CTS scores
@@ -1268,6 +1312,7 @@ void do_cts(CTSInfo *&cts_info, int i_vx, const PairDataPoint *pd_ptr) {
    //
    n_cat = conf_info.vx_opt[i_vx].fcat_ta.n();
    for(i=0; i<n_cat; i++) {
+      cts_info[i].cts.set_ec_value(conf_info.vx_opt[i_vx].hss_ec_value);
       cts_info[i].fthresh = conf_info.vx_opt[i_vx].fcat_ta[i];
       cts_info[i].othresh = conf_info.vx_opt[i_vx].ocat_ta[i];
       cts_info[i].allocate_n_alpha(conf_info.vx_opt[i_vx].get_n_ci_alpha());
@@ -1551,7 +1596,7 @@ void do_cnt_sl1l2(const PointStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
 
 void do_vl1l2(VL1L2Info *&v_info, int i_vx,
               const PairDataPoint *pd_u_ptr, const PairDataPoint *pd_v_ptr) {
-   int i;
+   int i, j;
 
    //
    // Check that the number of pairs are the same
@@ -1576,6 +1621,11 @@ void do_vl1l2(VL1L2Info *&v_info, int i_vx,
       v_info[i].fthresh = conf_info.vx_opt[i_vx].fwind_ta[i];
       v_info[i].othresh = conf_info.vx_opt[i_vx].owind_ta[i];
       v_info[i].logic   = conf_info.vx_opt[i_vx].wind_logic;
+      v_info[i].allocate_n_alpha(conf_info.vx_opt[i_vx].get_n_ci_alpha());
+
+      for(j=0; j<conf_info.vx_opt[i_vx].get_n_ci_alpha(); j++) {
+         v_info[i].alpha[j] = conf_info.vx_opt[i_vx].ci_alpha[j];
+      }
 
       //
       // Compute partial sums
@@ -1893,6 +1943,8 @@ void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
    // Set flag for specific humidity
    bool spfh_flag = conf_info.vx_opt[i_vx].vx_pd.fcst_info->is_specific_humidity() &&
                     conf_info.vx_opt[i_vx].vx_pd.obs_info->is_specific_humidity();
+   bool precip_flag = conf_info.vx_opt[i_vx].vx_pd.fcst_info->is_precipitation() &&
+                      conf_info.vx_opt[i_vx].vx_pd.obs_info->is_precipitation();
 
    shc.set_interp_mthd(InterpMthd_Nbrhd,
                        conf_info.vx_opt[i_vx].hira_info.shape);

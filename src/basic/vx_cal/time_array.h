@@ -52,6 +52,7 @@ class TimeArray {
      ~TimeArray();
       TimeArray(const TimeArray &);
       TimeArray & operator=(const TimeArray &);
+      bool operator==(const TimeArray &) const;
 
       void clear();
 
@@ -59,7 +60,7 @@ class TimeArray {
 
       void extend(int, bool exact = true);
 
-      void dump(ostream &, int depth = 0) const;
+      void dump(std::ostream &, int depth = 0) const;
 
       unixtime operator[](int) const;
 
@@ -80,6 +81,8 @@ class TimeArray {
       unixtime min() const;
       unixtime max() const;
 
+      ConcatString serialize() const;
+
       int n_elements() const;
       int n() const;
 
@@ -96,7 +99,7 @@ inline int TimeArray::n()          const { return ( Nelements ); }
 ////////////////////////////////////////////////////////////////////////
 
 
-extern ConcatString write_css                (const TimeArray &);
+extern ConcatString write_css(const TimeArray &);
 
 
 ////////////////////////////////////////////////////////////////////////

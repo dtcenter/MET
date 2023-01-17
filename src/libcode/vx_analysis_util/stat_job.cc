@@ -2046,9 +2046,9 @@ void STATAnalysisJob::setup_stat_file(int n_row, int n) {
          case stat_prc:    write_prc_header_row   (1, n,                                    stat_at, 0, 0); break;
          case stat_eclv:   write_eclv_header_row  (1, n,                                    stat_at, 0, 0); break;
          case stat_mpr:    write_header_row       (mpr_columns, n_mpr_columns, 1,           stat_at, 0, 0); break;
-         case stat_nbrctc: write_header_row       (nbrctc_columns, n_sl1l2_columns, 1,      stat_at, 0, 0); break;
-         case stat_nbrcts: write_header_row       (nbrcts_columns, n_sl1l2_columns, 1,      stat_at, 0, 0); break;
-         case stat_nbrcnt: write_header_row       (nbrcnt_columns, n_sl1l2_columns, 1,      stat_at, 0, 0); break;
+         case stat_nbrctc: write_header_row       (nbrctc_columns, n_nbrctc_columns, 1,     stat_at, 0, 0); break;
+         case stat_nbrcts: write_header_row       (nbrcts_columns, n_nbrcts_columns, 1,     stat_at, 0, 0); break;
+         case stat_nbrcnt: write_header_row       (nbrcnt_columns, n_nbrcnt_columns, 1,     stat_at, 0, 0); break;
          case stat_grad:   write_header_row       (grad_columns, n_grad_columns, 1,         stat_at, 0, 0); break;
          case stat_isc:    write_header_row       (isc_columns, n_isc_columns, 1,           stat_at, 0, 0); break;
          case stat_wdir:   write_header_row       (job_wdir_columns, n_job_wdir_columns, 1, stat_at, 0, 0); break;
@@ -2221,6 +2221,14 @@ void STATAnalysisJob::dump_stat_line(const STATLine &line) {
 
             case(stat_ssvar):
                write_header_row(ssvar_columns, n_ssvar_columns, 1, dump_at, 0, 0);
+               break;
+
+            case(stat_seeps):
+               write_header_row(seeps_columns, n_seeps_columns, 1, dump_at, 0, 0);
+               break;
+
+            case(stat_seeps_mpr):
+               write_header_row(seeps_mpr_columns, n_seeps_mpr_columns, 1, dump_at, 0, 0);
                break;
 
             // Just write a STAT header line for indeterminant line types

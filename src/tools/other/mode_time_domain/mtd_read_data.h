@@ -26,9 +26,13 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+//
+// returns the actual valid times
+//
 
-extern void mtd_read_data(MtdConfigInfo &, VarInfo &,
-                          const StringArray & filenames, MtdFloatFile &);
+extern vector<unixtime> mtd_read_data(MtdConfigInfo &, VarInfo &,
+                                      const StringArray & filenames,
+                                      MtdFloatFile &);
 
 
 ////////////////////////////////////////////////////////////////////////

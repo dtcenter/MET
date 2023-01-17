@@ -19,6 +19,8 @@
 //   ----   ----      ----           -----------
 //   000    12-11-19  Howard Soh     Support GOES-16
 //   001    01-25-21  Halley Gotway  MET #1630 Handle zero obs.
+//   002    07-06-22  Howard Soh     METplus-Internal #19 Rename main to met_main
+//   003    10-03-23  Prestopnik     MET #2227 Remove namespace std and netCDF from header files
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -26,10 +28,12 @@ using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
-#include <ctime>
 #include <dirent.h>
-#include <iostream>
 
+#include<netcdf>
+using namespace netCDF;
+
+#include "main.h"
 #include "vx_log.h"
 #include "vx_data2d_factory.h"
 #include "vx_data2d.h"
@@ -204,13 +208,10 @@ static void set_qc_flags(const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
-int main(int argc, char *argv[]) {
+int met_main(int argc, char *argv[]) {
 
    // Store the program name
    program_name = get_short_name(argv[0]);
-
-   // Set handler to be called for memory allocation error
-   set_new_handler(oom);
 
    // Process the command line arguments
    process_command_line(argc, argv);
@@ -219,6 +220,12 @@ int main(int argc, char *argv[]) {
    process_data_file();
 
    return(0);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+const string get_tool_name() {
+   return "point2grid";
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -275,12 +282,13 @@ void process_command_line(int argc, char **argv) {
    RGInfo.name    = cline[1];
    OutputFilename = cline[2];
 
-   // Check if the input file
-   bool use_python = false;
-#ifdef WITH_PYTHON
+   // Check for python format
    string python_command = InputFilename;
    bool use_xarray = (0 == python_command.find(conf_val_python_xarray));
-   use_python = use_xarray || (0 == python_command.find(conf_val_python_numpy));
+   bool use_python = use_xarray || (0 == python_command.find(conf_val_python_numpy));
+
+   // Check if the input file
+#ifdef WITH_PYTHON
    if (use_python) {
       int offset = python_command.find("=");
       if (offset == std::string::npos) {
@@ -290,6 +298,8 @@ void process_command_line(int argc, char **argv) {
       }
    }
    else
+#else
+   if (use_python) python_compile_error(method_name);
 #endif
       if ( !file_exists(InputFilename.c_str()) ) {
          mlog << Error << "\n" << method_name
@@ -375,12 +385,11 @@ void process_data_file() {
    mlog << Debug(1)  << "Reading data file: " << InputFilename << "\n";
    bool goes_data = false;
    bool use_python = false;
-   int obs_type = TYPE_UNKNOWN;
+   int obs_type;
    Met2dDataFileFactory m_factory;
    Met2dDataFile *fr_mtddf = (Met2dDataFile *) 0;
 #ifdef WITH_PYTHON
    string python_command = InputFilename;
-   MetPointData *met_point_obs = 0;
    bool use_xarray = (0 == python_command.find(conf_val_python_xarray));
    use_python = use_xarray || (0 == python_command.find(conf_val_python_numpy));
    if (use_python) {
@@ -605,7 +614,8 @@ int get_obs_type(NcFile *nc) {
       input_type = "OBS_MET";
    }
 
-   mlog << Debug(5) << method_name << "input type: " << input_type << "\".\n";
+   mlog << Debug(5) << method_name << "input type: \"" << input_type << "\"\n";
+
    return obs_type;
 }
 
@@ -917,7 +927,7 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
          }
 
          if (cellMapping) {
-            for (int idx=0; idx<(nx*ny); idx++) cellMapping[idx].clear();
+            for (idx=0; idx<(nx*ny); idx++) cellMapping[idx].clear();
             delete [] cellMapping;
          }
          cellMapping = new IntArray[nx * ny];
@@ -1134,11 +1144,6 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
 
 void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
                         const Grid to_grid) {
-   int nhdr, nobs;
-   int nx, ny, var_count, to_count, var_count2;
-   int idx, hdr_idx;
-   int var_idx_or_gc;
-   int filtered_by_time, filtered_by_msg_type, filtered_by_qc;
    ConcatString vname, vname_cnt, vname_mask;
    DataPlane fr_dp, to_dp;
    DataPlane cnt_dp, mask_dp;
@@ -1146,7 +1151,6 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
    NcVar var_obs_gc, var_obs_var;
 
    clock_t start_clock =  clock();
-   bool has_prob_thresh = !prob_cat_thresh.check(bad_data_double);
 
    unixtime requested_valid_time, valid_time;
    static const char *method_name = "process_point_file() -> ";
@@ -1181,11 +1185,7 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
 
 void process_point_python(string python_command, MetConfig &config, VarInfo *vinfo,
                           const Grid to_grid, bool use_xarray) {
-   int nhdr, nobs;
-   int nx, ny, var_count, to_count, var_count2;
    int idx, hdr_idx;
-   int var_idx_or_gc;
-   int filtered_by_time, filtered_by_msg_type, filtered_by_qc;
    ConcatString vname, vname_cnt, vname_mask;
    DataPlane fr_dp, to_dp;
    DataPlane cnt_dp, mask_dp;
@@ -1561,11 +1561,7 @@ void open_nc(const Grid &grid, ConcatString run_cs) {
    add_att(nc_out, "RunCommand", run_cs);
 
    // Add the projection information
-   write_netcdf_proj(nc_out, grid);
-
-   // Define Dimensions
-   lat_dim = add_dim(nc_out, "lat", (long) grid.ny());
-   lon_dim = add_dim(nc_out, "lon", (long) grid.nx());
+   write_netcdf_proj(nc_out, grid, lat_dim, lon_dim);
 
    // Add the lat/lon variables
    write_netcdf_latlon(nc_out, &lat_dim, &lon_dim, grid);

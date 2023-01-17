@@ -14,6 +14,8 @@
 //
 //   Mod#   Date      Name           Description
 //   ----   ----      ----           -----------
+//   000    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
+//   001    09/29/22  Prestopnik     MET #2227 Remove namespace netCDF from header files
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -21,18 +23,19 @@ using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
-#include <ctime>
 #include <ctype.h>
 #include <dirent.h>
-#include <iostream>
 #include <fstream>
 #include <math.h>
-#include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <fcntl.h>
 #include <unistd.h>
 
+#include <netcdf>
+using namespace netCDF;
+
+#include "main.h"
 #include "vx_util.h"
 #include "vx_nc_util.h"
 #include "vx_log.h"
@@ -86,7 +89,7 @@ static void usage();
 
 ////////////////////////////////////////////////////////////////////////
 
-int main(int argc, char *argv[]) {
+int met_main(int argc, char *argv[]) {
 
    program_name = get_short_name(argv[0]);
 
@@ -127,6 +130,12 @@ int main(int argc, char *argv[]) {
    nc_out = (NcFile *) 0;
 
    return(0);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+const string get_tool_name() {
+   return "gen_climo_bin";
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -246,11 +255,9 @@ void setup_nc_file() {
    write_netcdf_global(nc_out, out_file.text(), program_name.c_str(), "Climatology", "NA");
 
    // Add the projection information
-   write_netcdf_proj(nc_out, grid);
+   write_netcdf_proj(nc_out, grid, lat_dim, lon_dim);
 
-   // Add dimensions
-   lat_dim = add_dim(nc_out, "lat", (long) grid.ny());
-   lon_dim = add_dim(nc_out, "lon", (long) grid.nx());
+   // Add the lat/lon variables
    write_netcdf_latlon(nc_out, &lat_dim, &lon_dim, grid);
 
    // The number of CDF values is one less than the number of bins

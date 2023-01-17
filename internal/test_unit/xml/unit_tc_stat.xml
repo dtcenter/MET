@@ -92,4 +92,17 @@
     </output>
   </test>
 
+  <test name="tc_stat_DIAGNOSTICS">
+    <exec>&MET_BIN;/tc_stat</exec>
+    <param> \
+      -lookin &OUTPUT_DIR;/tc_pairs/al092022_20220926_DIAGNOSTICS.tcst \
+      -config &CONFIG_DIR;/TCStatConfig_DIAGNOSTICS \
+      -out &OUTPUT_DIR;/tc_stat/DIAGNOSTICS_stat.out \
+      -v 2
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/tc_stat/DIAGNOSTICS_stat.out</stat>
+    </output>
+  </test>
+
 </met_test>

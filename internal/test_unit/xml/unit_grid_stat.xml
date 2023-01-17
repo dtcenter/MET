@@ -289,4 +289,26 @@
     </output>
   </test>
 
+  <test name="grid_stat_UK_SEEPS">
+    <exec>&MET_BIN;/grid_stat</exec>
+    <env>
+      <pair><name>OMP_NUM_THREADS</name> <value>2</value></pair>
+      <pair><name>SEEPS_FLAG</name>      <value>BOTH</value></pair>
+      <pair><name>SEEPS_P1_THRESH</name> <value>NA</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>   <value>SEEPS</value></pair>
+      <pair><name>MET_SEEPS_GRID_CLIMO_NAME</name><value>&DATA_DIR_CLIMO;/seeps/PPT24_seepsweights_grid.nc</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/seeps/gpm_2021120100_2021120200_trmmgrid.nc \
+      &DATA_DIR_MODEL;/seeps/prods_op_gl-mn_2021120100_f024_A24_trmmgrid.nc \
+      &CONFIG_DIR;/GridStatConfig_SEEPS \
+      -outdir &OUTPUT_DIR;/grid_stat -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/grid_stat/grid_stat_SEEPS_000000L_20211202_000000V.stat</stat>
+      <stat>&OUTPUT_DIR;/grid_stat/grid_stat_SEEPS_000000L_20211202_000000V_seeps.txt</stat>
+      <grid_nc>&OUTPUT_DIR;/grid_stat/grid_stat_SEEPS_000000L_20211202_000000V_pairs.nc</grid_nc>
+    </output>
+  </test>
+
 </met_test>

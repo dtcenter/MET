@@ -286,8 +286,14 @@ output_flag = {
    rps    = NONE; // Only for HiRA.
    eclv   = NONE;
    mpr    = NONE;
+   seeps  = NONE;
+   seeps_mpr = NONE;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Threshold for SEEPS p1 (Probability of being dry)
+
+seeps_p1_thresh = NA;
 ////////////////////////////////////////////////////////////////////////////////
 
 tmp_dir        = "/tmp";

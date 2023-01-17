@@ -54,6 +54,7 @@
 //   017    05/20/16  Prestopnik J   Removed -version (now in command_line.cc)
 //   018    04/08/19  Halley Gotway  Add percentile thresholds.
 //   019    04/01/19  Fillmore       Add FCST and OBS units.
+//   020    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -62,17 +63,15 @@ using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
-#include <ctime>
 #include <ctype.h>
 #include <dirent.h>
-#include <iostream>
 #include <fstream>
 #include <math.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <unistd.h>
 
+#include "main.h"
 #include "string_array.h"
 #include "mode_usage.h"
 #include "mode_conf_info.h"
@@ -119,8 +118,7 @@ static const char default_config_filename [] = "MET_BASE/config/MODEConfig_defau
 ///////////////////////////////////////////////////////////////////////
 
 
-int main(int argc, char * argv [])
-
+int met_main(int argc, char * argv [])
 {
 
 int j, n;
@@ -189,6 +187,13 @@ return ( status );
 
 }
 
+
+////////////////////////////////////////////////////////////////////////
+
+const string get_tool_name()
+{
+   return "mode";
+}
 
 ///////////////////////////////////////////////////////////////////////
 

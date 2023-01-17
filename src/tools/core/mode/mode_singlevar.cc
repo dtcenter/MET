@@ -85,12 +85,6 @@ int main_singlevar(int argc, char * argv [])
 {
 
    //
-   // Set handler to be called for memory allocation error
-   //
-
-set_new_handler(oom);
-
-   //
    // Process the command line arguments
    //
 

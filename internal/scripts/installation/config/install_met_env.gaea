@@ -1,0 +1,12 @@
+module load intel/19.0.5.281
+
+export TEST_BASE=/usw/met/11.0.0
+export COMPILER=intel_19.0.5.281
+export MET_SUBDIR=${TEST_BASE}
+export MET_TARBALL=v11.0.0.tar.gz
+export USE_MODULES=TRUE
+export MET_PYTHON=/lustre/f2/dev/esrl/Julie.Prestopnik/projects/miniconda/miniconda3/envs/metplus_v5.0_py3.8/
+export MET_PYTHON_CC=-I${MET_PYTHON}/include/python3.8
+export MET_PYTHON_LD=-L${MET_PYTHON}/lib/python3.8/config-3.8-x86_64-linux-gnu\ -L${MET_PYTHON}/lib\ -lpython3.8\ -lcrypt\ -lpthread\ -ldl\ -lutil\ -lm
+export EXTERNAL_LIBS=/usw/met/11.0.0/external_libs
+export LIB_Z=${EXTERNAL_LIBS}/lib

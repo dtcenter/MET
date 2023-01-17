@@ -24,7 +24,6 @@
 #include <ostream>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "vx_grid.h"
 #include "data_plane.h"
@@ -53,10 +52,10 @@ class PinterpFile {
 
       void close();
 
-      void dump(ostream &, int = 0) const;
+      void dump(std::ostream &, int = 0) const;
 
 
-      NcFile * Nc;      //  allocated
+      netCDF::NcFile * Nc;      //  allocated
 
          //
          //  time
@@ -77,14 +76,14 @@ class PinterpFile {
 
       int Ndims;
 
-      NcDim ** Dim;   //  allocated
+      netCDF::NcDim ** Dim;   //  allocated
 
       StringArray DimNames;
 
-      NcDim * Xdim;   //  not allocated
-      NcDim * Ydim;   //  not allocated
-      NcDim * Zdim;   //  not allocated
-      NcDim * Tdim;   //  not allocated
+      netCDF::NcDim * Xdim;   //  not allocated
+      netCDF::NcDim * Ydim;   //  not allocated
+      netCDF::NcDim * Zdim;   //  not allocated
+      netCDF::NcDim * Tdim;   //  not allocated
 
          //
          //  variables
@@ -108,13 +107,14 @@ class PinterpFile {
          //  data
          //
 
-      double data(NcVar *, const LongArray &) const;
+      double data(netCDF::NcVar *, const LongArray &) const;
 
-      bool data(NcVar *, const LongArray &, DataPlane &, double & pressure) const;
+      bool data(netCDF::NcVar *, const LongArray &, DataPlane &, double & pressure) const;
 
       bool data(const char *, const LongArray &, DataPlane &,
                 double & pressure, NcVarInfo *&) const;
 
+      bool get_nc_var_info(const char *var_name, NcVarInfo *&info) const;
 };
 
 

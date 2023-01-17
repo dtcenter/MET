@@ -1,5 +1,3 @@
-
-
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -14,19 +12,17 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-
 using namespace std;
 
-#include <iostream>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <stdlib.h>
 #include <errno.h>
-#include <string.h>
 #include <cmath>
 
+#include "main.h"
 #include "vx_util.h"
 #include "vx_log.h"
 
@@ -77,7 +73,7 @@ static void do_point_dump (ShpFile &);
 ////////////////////////////////////////////////////////////////////////
 
 
-int main(int argc, char * argv [])
+int met_main(int argc, char * argv [])
 
 {
 
@@ -94,7 +90,7 @@ cline.parse();
 if ( cline.n() != 1 )  usage();
 
 
- ConcatString input_filename = (string)cline[0];
+ConcatString input_filename = (string)cline[0];
 ShpFile f;
 
 
@@ -158,6 +154,12 @@ return ( 0 );
 
 }
 
+
+////////////////////////////////////////////////////////////////////////
+
+const string get_tool_name() {
+   return "gis_dump_shp";
+}
 
 ////////////////////////////////////////////////////////////////////////
 

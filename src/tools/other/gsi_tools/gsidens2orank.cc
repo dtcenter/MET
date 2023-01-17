@@ -15,22 +15,23 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    07/09/15  Halley Gotway   New
+//   001    07/06/22  Howard Soh      METplus-Internal #19 Rename main to met_main
+//   002    10/03/22  Prestopnik      MET #2227 Remove namespace std from header files
 //
 ////////////////////////////////////////////////////////////////////////
 
 using namespace std;
 
-#include <iostream>
 #include <fstream>
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <string.h>
 #include <cstdio>
 #include <cmath>
 
+#include "main.h"
 #include "vx_data2d_factory.h"
 #include "vx_util.h"
 #include "vx_math.h"
@@ -75,7 +76,7 @@ static void set_hdr(const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
-int main(int argc, char * argv []) {
+int met_main(int argc, char * argv []) {
    CommandLine cline;
    StringArray ens_file_list;
    int i;
@@ -182,6 +183,12 @@ int main(int argc, char * argv []) {
 //
 // Process conventional GSI data.
 //
+////////////////////////////////////////////////////////////////////////
+
+const string get_tool_name() {
+   return "gsidens2orank";
+}
+
 ////////////////////////////////////////////////////////////////////////
 
 void process_conv(const char *conv_filename, int i_mem) {

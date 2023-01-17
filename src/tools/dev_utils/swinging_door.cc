@@ -18,6 +18,8 @@
 //   ----   ----      ----           -----------
 //   000    08-19-14  Rehak          New
 //   001    04-27-154 Halley Gotway  List and format output files
+//   002    07-06-22  Howard Soh     METplus-Internal #19 Rename main to met_main
+//   003    09-12-22  Prestopnik     MET #2227 Remove namespace std from header files
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -25,20 +27,18 @@ using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
-#include <ctime>
 #include <ctype.h>
 #include <dirent.h>
-#include <iostream>
 #include <fstream>
 #include <math.h>
 #include <regex.h>
 #include <stdio.h>
-#include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include <vector>
 
+#include "main.h"
 #include "vx_nc_util.h"
 #include "vx_util.h"
 #include "vx_math.h"
@@ -74,13 +74,9 @@ static bool write_ramps(const vector< SDObservation > &observations,
 
 ////////////////////////////////////////////////////////////////////////
 
-int main(int argc, char *argv[])
+int met_main(int argc, char *argv[])
 {
   CommandLine cline;
-
-  // Set handler to be called for memory allocation error
-
-  set_new_handler(oom);
 
   // Check for zero arguments
 
@@ -117,6 +113,12 @@ int main(int argc, char *argv[])
     return -1;
 
   return 0;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+const string get_tool_name() {
+   return program_name;
 }
 
 ////////////////////////////////////////////////////////////////////////

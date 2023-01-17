@@ -48,7 +48,7 @@ class ContingencyTable {
 
       int rc_to_n(int r, int c) const;
 
-      vector<int> *E;   //  this is really a two-dimensional array
+      std::vector<int> *E;   //  this is really a two-dimensional array
 
       int Nrows;
       int Ncols;
@@ -69,7 +69,7 @@ class ContingencyTable {
 
       void zero_out();
 
-      virtual void dump(ostream & out, int depth = 0) const;
+      virtual void dump(std::ostream & out, int depth = 0) const;
 
          //
          //  condition on an event

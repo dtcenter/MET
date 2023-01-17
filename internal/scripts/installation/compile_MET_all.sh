@@ -10,8 +10,7 @@
 # and USE_MODULES.
 #
 # If compiling support for Python embedding, users will need to
-# set MET_PYTHON, MET_PYTHON_CC, and
-# MET_PYTHON_LD.
+# set MET_PYTHON, MET_PYTHON_BIN_EXE, MET_PYTHON_CC, and MET_PYTHON_LD.
 #
 # For a description of these and other variables, visit the MET
 # downloads page under "Sample Script For Compiling External
@@ -637,8 +636,8 @@ if [ $COMPILE_NETCDF -eq 1 ]; then
   mkdir -p ${LIB_DIR}/netcdf
   cd ${LIB_DIR}/netcdf
   rm -rf netcdf*
-  unzip ${TAR_DIR}/netcdf-4*.zip > /dev/null 2>&1
-  cd netcdf-4*
+  tar -xzf ${TAR_DIR}/netcdf-4*.tar.gz
+  cd netcdf-c-4*
   export FC=''
   export F90=''
   echo "cd `pwd`"
@@ -821,6 +820,7 @@ if [ $COMPILE_MET -eq 1 ]; then
     export MET_GSL=${LIB_DIR}
   fi
 
+  export MET_PYTHON_BIN_EXE=${MET_PYTHON_BIN_EXE:=${MET_PYTHON}/bin/python3}
   export MET_PYTHON_LD=${MET_PYTHON_LD}
   export MET_PYTHON_CC=${MET_PYTHON_CC}
   export LDFLAGS="-Wl,--disable-new-dtags"

@@ -18,9 +18,10 @@ make_mapfiles_CPPFLAGS = ${MET_CPPFLAGS}
 make_mapfiles_LDFLAGS = ${MET_LDFLAGS}
 make_mapfiles_LDADD = -lvx_config \
 	-lvx_gis \
+	-lvx_log \
 	-lvx_util \
-	-lvx_math \
 	-lvx_cal \
+	-lvx_math \
 	-lvx_log \
 	-lm
 

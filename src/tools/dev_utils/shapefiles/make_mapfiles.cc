@@ -12,17 +12,16 @@
 
 using namespace std;
 
-#include <iostream>
 #include <fstream>
 #include <unistd.h>
 #include <stdlib.h>
-#include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <cstdio>
 #include <cmath>
 
+#include "main.h"
 #include "vx_util.h"
 
 #include "shp_file.h"
@@ -58,7 +57,7 @@ static ConcatString program_name;
 
 static CommandLine cline;
 
-static const int buf_size = 1200000;
+static const int buf_size = 2400000;
 
 static unsigned char buf[buf_size];
 
@@ -108,7 +107,7 @@ static void patch(ConcatString &);
 ////////////////////////////////////////////////////////////////////////
 
 
-int main(int argc, char * argv [])
+int met_main(int argc, char * argv [])
 
 {
 
@@ -183,6 +182,14 @@ if ( do_separate_files )   {
 
 return ( 0 );
 
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+const string get_tool_name() {
+   return "make_mapfiles";
 }
 
 

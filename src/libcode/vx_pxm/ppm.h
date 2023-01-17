@@ -75,7 +75,7 @@ class Ppm : public PxmBase {
 
       void all_white();
 
-      void dump(ostream &, int depth = 0) const;
+      void dump(std::ostream &, int depth = 0) const;
 
          //
          //  not from base class

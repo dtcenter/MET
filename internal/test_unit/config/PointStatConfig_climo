@@ -269,7 +269,14 @@ output_flag = {
    rps    = NONE;
    eclv   = NONE;
    mpr    = BOTH;
+   seeps  = NONE;
+   seeps_mpr = NONE;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Threshold for SEEPS p1 (Probability of being dry): >=min_p1&&<=max_p1
+
+seeps_p1_thresh = NA;
 
 ////////////////////////////////////////////////////////////////////////////////
 

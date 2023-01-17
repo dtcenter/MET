@@ -17,6 +17,9 @@
 //   000    03/19/12  Halley Gotway   New
 //   001    07/25/14  Halley Gotway   Add -land option and update how
 //                                    distances are computed.
+//   002    07/06/22  Howard Soh      METplus-Internal #19 Rename main to met_main
+//   003    09/28/22  Prestopnik      MET #2227 Remove namspace std and netCDF
+//                                    from header files
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -24,17 +27,18 @@ using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
-#include <ctime>
 #include <ctype.h>
 #include <dirent.h>
-#include <iostream>
 #include <fstream>
 #include <math.h>
-#include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
 
+#include <netcdf>
+using namespace netCDF;
+
+#include "main.h"
 #include "grib_classes.h"
 
 #include "vx_log.h"
@@ -96,13 +100,10 @@ static void set_compress(const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
-int main(int argc, char *argv[]) {
+int met_main(int argc, char *argv[]) {
 
    program_name = get_short_name(argv[0]);
 
-   // Set handler to be called for memory allocation error
-   set_new_handler(oom);
-   
    // Process the command line arguments
    process_command_line(argc, argv);
 
@@ -113,6 +114,12 @@ int main(int argc, char *argv[]) {
    process_distances();
    
    return(0);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+const string get_tool_name() {
+   return "tc_dland";
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -223,12 +230,8 @@ void process_distances() {
 
    // Add the projection information
    mlog << Debug(3) << "Writing NetCDF map projection.\n";
-   write_netcdf_proj(f_out, grid);
+   write_netcdf_proj(f_out, grid, lat_dim, lon_dim);
 
-   // Define Dimensions
-   lat_dim = add_dim(f_out, "lat", (long) grid.ny());
-   lon_dim = add_dim(f_out, "lon", (long) grid.nx());
-   
    // Add the lat/lon variables
    if(latlon_flag) {
       mlog << Debug(3) << "Writing NetCDF lat/lon variables.\n";
@@ -315,7 +318,7 @@ void process_distances() {
 void usage() {
 
    cout << "\n*** Model Evaluation Tools (MET" << met_version
-        << ") ***\n\n"
+             << ") ***\n\n"
 
         << "Usage: " << program_name << "\n"
         << "\tout_file\n"

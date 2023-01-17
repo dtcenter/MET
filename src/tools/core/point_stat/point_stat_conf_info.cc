@@ -23,8 +23,6 @@ using namespace std;
 #include "vx_data2d.h"
 #include "vx_log.h"
 
-extern bool use_var_id;
-
 ////////////////////////////////////////////////////////////////////////
 //
 //  Code for class PointStatConfInfo
@@ -61,6 +59,7 @@ void PointStatConfInfo::clear() {
 
    // Initialize values
    model.clear();
+   grib_codes_set = false;
    land_mask.clear();
    topo_dp.clear();
    topo_use_obs_thresh.clear();
@@ -100,8 +99,7 @@ void PointStatConfInfo::read_config(const char *default_file_name,
 
 ////////////////////////////////////////////////////////////////////////
 
-void PointStatConfInfo::process_config(GrdFileType ftype,
-        bool cur_use_var_id) {
+void PointStatConfInfo::process_config(GrdFileType ftype) {
    int i, j, n_fvx, n_ovx;
    Dictionary *fdict = (Dictionary *) 0;
    Dictionary *odict = (Dictionary *) 0;
@@ -127,15 +125,6 @@ void PointStatConfInfo::process_config(GrdFileType ftype,
 
    // Conf: message_type_group_map
    msg_typ_group_map = parse_conf_message_type_group_map(&conf);
-
-   // Conf: message_type_group_map(SURFACE)
-   if(msg_typ_group_map.count((string)surface_msg_typ_group_str) == 0) {
-      mlog << Error << "\nPointStatConfInfo::process_config() -> "
-           << "\"" << conf_key_message_type_group_map
-           << "\" must contain an entry for \""
-           << surface_msg_typ_group_str << "\".\n\n";
-      exit(1);
-   }
 
    // Conf: fcst.field and obs.field
    fdict = conf.lookup_array(conf_key_fcst_field);
@@ -170,17 +159,18 @@ void PointStatConfInfo::process_config(GrdFileType ftype,
       i_odict = parse_conf_i_vx_dict(odict, i);
 
       // Process the options for this verification task
-      vx_opt[i].process_config(ftype, i_fdict, i_odict, cur_use_var_id);
+      vx_opt[i].process_config(ftype, i_fdict, i_odict);
    }
 
    // Summarize output flags across all verification tasks
    process_flags();
 
-   // If VL1L2 or VAL1L2 is requested, set the uv_index.
+   // If VL1L2, VAL1L2, or VCNT is requested, set the uv_index.
    // When processing vectors, need to make sure the message types,
    // masking regions, and interpolation methods are consistent.
    if(output_flag[i_vl1l2]  != STATOutputType_None ||
-      output_flag[i_val1l2] != STATOutputType_None) {
+      output_flag[i_val1l2] != STATOutputType_None ||
+      output_flag[i_vcnt]   != STATOutputType_None) {
 
       for(i=0; i<n_vx; i++) {
 
@@ -190,18 +180,36 @@ void PointStatConfInfo::process_config(GrdFileType ftype,
 
             // Search for corresponding v-wind
             for(j=0; j<n_vx; j++) {
-               if(vx_opt[j].vx_pd.fcst_info->is_v_wind()      &&
-                  vx_opt[j].vx_pd.obs_info->is_v_wind()       &&
-                  vx_opt[i].vx_pd.fcst_info->req_level_name() ==
-                  vx_opt[j].vx_pd.fcst_info->req_level_name() &&
-                  vx_opt[i].vx_pd.obs_info->req_level_name()  ==
-                  vx_opt[j].vx_pd.obs_info->req_level_name()  &&
+               if(vx_opt[j].vx_pd.fcst_info->is_v_wind() &&
+                  vx_opt[j].vx_pd.obs_info->is_v_wind()  &&
                   vx_opt[i].is_uv_match(vx_opt[j])) {
 
-                  vx_opt[i].vx_pd.fcst_info->set_uv_index(j);
-                  vx_opt[i].vx_pd.obs_info->set_uv_index(j);
+                  mlog << Debug(3) << "U-wind field array entry " << i+1
+                       << " matches V-wind field array entry " << j+1 << ".\n";
+
+                  // Print warning about multiple matches
+                  if(vx_opt[i].vx_pd.fcst_info->uv_index() >= 0 ||
+                     vx_opt[i].vx_pd.obs_info->uv_index()  >= 0) {
+                     mlog << Warning << "\nPointStatConfInfo::process_config() -> "
+                          << "For U-wind, found multiple matching V-wind field array entries! "
+                          << "Using the first match found. Set the \"level\" strings to "
+                          << "differentiate between them.\n\n";
+                  }
+                  // Use the first match
+                  else {
+                     vx_opt[i].vx_pd.fcst_info->set_uv_index(j);
+                     vx_opt[i].vx_pd.obs_info->set_uv_index(j);
+                  }
                }
             }
+
+            // No match found
+            if(vx_opt[i].vx_pd.fcst_info->uv_index() < 0 ||
+               vx_opt[i].vx_pd.obs_info->uv_index()  < 0) {
+               mlog << Debug(3) << "U-wind field array entry " << i+1
+                    << " has no matching V-wind field array entry.\n";
+            }
+
          }
          // Process v-wind
          else if(vx_opt[i].vx_pd.fcst_info->is_v_wind() &&
@@ -209,21 +217,65 @@ void PointStatConfInfo::process_config(GrdFileType ftype,
 
             // Search for corresponding u-wind
             for(j=0; j<n_vx; j++) {
-               if(vx_opt[j].vx_pd.fcst_info->is_u_wind()      &&
-                  vx_opt[j].vx_pd.obs_info->is_u_wind()       &&
-                  vx_opt[i].vx_pd.fcst_info->req_level_name() ==
-                  vx_opt[j].vx_pd.fcst_info->req_level_name() &&
-                  vx_opt[i].vx_pd.obs_info->req_level_name()  ==
-                  vx_opt[j].vx_pd.obs_info->req_level_name()  &&
+               if(vx_opt[j].vx_pd.fcst_info->is_u_wind() &&
+                  vx_opt[j].vx_pd.obs_info->is_u_wind()  &&
                   vx_opt[i].is_uv_match(vx_opt[j])) {
 
-                  vx_opt[i].vx_pd.fcst_info->set_uv_index(j);
-                  vx_opt[i].vx_pd.obs_info->set_uv_index(j);
+                  mlog << Debug(3) << "V-wind field array entry " << i+1
+                       << " matches U-wind field array entry " << j+1 << ".\n";
+
+                  // Print warning about multiple matches
+                  if(vx_opt[i].vx_pd.fcst_info->uv_index() >= 0 ||
+                     vx_opt[i].vx_pd.obs_info->uv_index()  >= 0) {
+                     mlog << Warning << "\nPointStatConfInfo::process_config() -> "
+                          << "For U-wind, found multiple matching V-wind field array entries! "
+                          << "Using the first match found. Set the \"level\" strings to "
+                          << "differentiate between them.\n\n";
+                  }
+                  // Use the first match
+                  else {
+                     vx_opt[i].vx_pd.fcst_info->set_uv_index(j);
+                     vx_opt[i].vx_pd.obs_info->set_uv_index(j);
+                  }
                }
             }
+
+            // No match found
+            if(vx_opt[i].vx_pd.fcst_info->uv_index() < 0 ||
+               vx_opt[i].vx_pd.obs_info->uv_index()  < 0) {
+               mlog << Debug(3) << "V-wind field array entry " << i+1
+                    << " has no matching U-wind field array entry.\n";
+            }
+
          }
       } // end for i
    } // end if
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void PointStatConfInfo::process_grib_codes() {
+
+   // Only needs to be set once
+   if(grib_codes_set) return;
+
+   mlog << Debug(3) << "Processing each \"" << conf_key_obs_field
+        << "\" name as a GRIB code abbreviation since the point "
+        << "observations are specified as GRIB codes.\n";
+
+   Dictionary *odict = conf.lookup_array(conf_key_obs_field);
+   Dictionary i_odict;
+
+   // Add the GRIB code by parsing each observation dictionary
+   for(int i=0; i<n_vx; i++) {
+      i_odict = parse_conf_i_vx_dict(odict, i);
+      vx_opt[i].vx_pd.obs_info->add_grib_code(i_odict);
+   }
+
+   // Flag to prevent processing more than once
+   grib_codes_set = true;
 
    return;
 }
@@ -398,6 +450,18 @@ void PointStatConfInfo::process_geog(const Grid &grid,
       geog_dp   = parse_geog_data(dict, grid, fcst_file);
       geog_dp.threshold(dict->lookup_thresh(conf_key_thresh));
       land_mask = geog_dp.mask_plane();
+
+      // Conf: message_type_group_map for LANDSF and WATERSF
+      if(msg_typ_group_map.count((string)landsf_msg_typ_group_str) == 0 ||
+         msg_typ_group_map.count((string)watersf_msg_typ_group_str) == 0 ) {
+         mlog << Error << "\nPointStatConfInfo::process_geog() -> "
+              << "when \"" << conf_key_land_mask_flag << "\" is true, \""
+              << conf_key_message_type_group_map
+              << "\" must contain entries for \""
+              << landsf_msg_typ_group_str << "\" and \""
+              << watersf_msg_typ_group_str << "\".\n\n";
+         exit(1);
+      }
    }
 
    // Conf: topo
@@ -406,6 +470,16 @@ void PointStatConfInfo::process_geog(const Grid &grid,
       topo_dp                 = parse_geog_data(dict, grid, fcst_file);
       topo_use_obs_thresh     = dict->lookup_thresh(conf_key_use_obs_thresh);
       topo_interp_fcst_thresh = dict->lookup_thresh(conf_key_interp_fcst_thresh);
+
+      // Conf: message_type_group_map for SURFACE
+      if(msg_typ_group_map.count((string)surface_msg_typ_group_str) == 0) {
+         mlog << Error << "\nPointStatConfInfo::process_geog() -> "
+              << "when \"" << conf_key_topo_mask_flag << "\" is true, \""
+              << conf_key_message_type_group_map
+              << "\" must contain an entry for \""
+              << surface_msg_typ_group_str << "\".\n\n";
+         exit(1);
+      }
    }
 
    // Loop over the verification tasks and set the geography info
@@ -646,6 +720,8 @@ void PointStatVxOpt::clear() {
 
    msg_typ.clear();
 
+   seeps_p1_thresh.clear();
+
    duplicate_flag = DuplicateType_None;
    obs_summary = ObsSummary_None;
    obs_perc = bad_data_int;
@@ -666,6 +742,10 @@ bool PointStatVxOpt::is_uv_match(const PointStatVxOpt &v) const {
    bool match = true;
 
    //
+   // Check that requested forecast and observation levels match.
+   // Requested levels are optional for python embedding and may be empty.
+   // Check that several other config options also match.
+   //
    // The following do not impact matched pairs:
    //    fcat_ta, ocat_ta,
    //    fcnt_ta, ocnt_ta, cnt_logic,
@@ -675,7 +755,11 @@ bool PointStatVxOpt::is_uv_match(const PointStatVxOpt &v) const {
    //    rank_corr_flag, output_flag
    //
 
-   if(!(beg_ds         == v.beg_ds        ) ||
+   if(!is_req_level_match(  vx_pd.fcst_info->req_level_name(),
+                          v.vx_pd.fcst_info->req_level_name()) ||
+      !is_req_level_match(  vx_pd.obs_info->req_level_name(),
+                          v.vx_pd.obs_info->req_level_name()) ||
+      !(beg_ds         == v.beg_ds        ) ||
       !(end_ds         == v.end_ds        ) ||
       !(land_flag      == v.land_flag     ) ||
       !(topo_flag      == v.topo_flag     ) ||
@@ -688,9 +772,7 @@ bool PointStatVxOpt::is_uv_match(const PointStatVxOpt &v) const {
       !(msg_typ        == v.msg_typ       ) ||
       !(duplicate_flag == v.duplicate_flag) ||
       !(obs_summary    == v.obs_summary   ) ||
-      !(obs_perc       == v.obs_perc      )) {
-      match = false;
-   }
+      !(obs_perc       == v.obs_perc      )) match = false;
 
    return(match);
 }
@@ -698,7 +780,7 @@ bool PointStatVxOpt::is_uv_match(const PointStatVxOpt &v) const {
 ////////////////////////////////////////////////////////////////////////
 
 void PointStatVxOpt::process_config(GrdFileType ftype,
-        Dictionary &fdict, Dictionary &odict, bool cur_use_var_id) {
+        Dictionary &fdict, Dictionary &odict) {
    int i, n;
    VarInfoFactory info_factory;
    map<STATLineType,STATOutputType>output_map;
@@ -714,9 +796,6 @@ void PointStatVxOpt::process_config(GrdFileType ftype,
    // Set the VarInfo objects
    vx_pd.fcst_info->set_dict(fdict);
    vx_pd.obs_info->set_dict(odict);
-
-   // Set the GRIB code for point observations
-   if(!cur_use_var_id) vx_pd.obs_info->add_grib_code(odict);
 
    // Dump the contents of the current VarInfo
    if(mlog.verbosity_level() >= 5) {
@@ -895,6 +974,9 @@ void PointStatVxOpt::process_config(GrdFileType ftype,
    // Conf: rank_corr_flag
    rank_corr_flag = odict.lookup_bool(conf_key_rank_corr_flag);
 
+   // Conf: threshold for SEEPS p1
+   seeps_p1_thresh = odict.lookup_thresh(conf_key_seeps_p1_thresh);
+
    // Conf: message_type
    msg_typ = parse_conf_message_type(&odict);
 
@@ -976,38 +1058,32 @@ void PointStatVxOpt::set_vx_pd(PointStatConfInfo *conf_info) {
 
    // Store the surface message type group
    cs = surface_msg_typ_group_str;
-   if(conf_info->msg_typ_group_map.count(cs) == 0) {
-      mlog << Error << "\nPointStatVxOpt::set_vx_pd() -> "
-           << "\"" << conf_key_message_type_group_map
-           << "\" must contain an entry for \"" << cs << "\".\n\n";
-      exit(1);
+   if(conf_info->msg_typ_group_map.count(cs) > 0) {
+      vx_pd.set_msg_typ_sfc(conf_info->msg_typ_group_map[cs]);
    }
    else {
-      vx_pd.set_msg_typ_sfc(conf_info->msg_typ_group_map[cs]);
+      sa.parse_css(default_msg_typ_group_surface);
+      vx_pd.set_msg_typ_sfc(sa);
    }
 
    // Store the surface land message type group
    cs = landsf_msg_typ_group_str;
-   if(conf_info->msg_typ_group_map.count(cs) == 0) {
-      mlog << Error << "\nPointStatVxOpt::set_vx_pd() -> "
-           << "\"" << conf_key_message_type_group_map
-           << "\" must contain an entry for \"" << cs << "\".\n\n";
-      exit(1);
+   if(conf_info->msg_typ_group_map.count(cs) > 0) {
+      vx_pd.set_msg_typ_lnd(conf_info->msg_typ_group_map[cs]);
    }
    else {
-      vx_pd.set_msg_typ_lnd(conf_info->msg_typ_group_map[cs]);
+      sa.parse_css(default_msg_typ_group_landsf);
+      vx_pd.set_msg_typ_lnd(sa);
    }
 
    // Store the surface water message type group
    cs = watersf_msg_typ_group_str;
-   if(conf_info->msg_typ_group_map.count(cs) == 0) {
-      mlog << Error << "\nPointStatVxOpt::set_vx_pd() -> "
-           << "\"" << conf_key_message_type_group_map
-           << "\" must contain an entry for \"" << cs << "\".\n\n";
-      exit(1);
+   if(conf_info->msg_typ_group_map.count(cs) > 0) {
+      vx_pd.set_msg_typ_wtr(conf_info->msg_typ_group_map[cs]);
    }
    else {
-      vx_pd.set_msg_typ_wtr(conf_info->msg_typ_group_map[cs]);
+      sa.parse_css(default_msg_typ_group_watersf);
+      vx_pd.set_msg_typ_wtr(sa);
    }
 
    // Define the verifying message type name and values
@@ -1058,7 +1134,11 @@ void PointStatVxOpt::set_vx_pd(PointStatConfInfo *conf_info) {
    vx_pd.set_duplicate_flag(duplicate_flag);
    vx_pd.set_obs_summary(obs_summary);
    vx_pd.set_obs_perc_value(obs_perc);
-
+   if (output_flag[i_seeps_mpr] != STATOutputType_None
+       || output_flag[i_seeps] != STATOutputType_None) {
+     vx_pd.load_seeps_climo();
+     vx_pd.set_seeps_thresh(seeps_p1_thresh);
+   }
    return;
 }
 
@@ -1099,10 +1179,11 @@ void PointStatVxOpt::set_perc_thresh(const PairDataPoint *pd_ptr) {
 int PointStatVxOpt::n_txt_row(int i_txt_row) const {
    int n = 0;
    int n_bin;
+   const char *method_name = "PointStatVxOpt::n_txt_row(int) -> ";
 
    // Range check
    if(i_txt_row < 0 || i_txt_row >= n_txt) {
-      mlog << Error << "\nPointStatVxOpt::n_txt_row(int) -> "
+      mlog << Error << "\n" << method_name
            << "range check error for " << i_txt_row << "\n\n";
       exit(1);
    }
@@ -1111,8 +1192,8 @@ int PointStatVxOpt::n_txt_row(int i_txt_row) const {
    if(output_flag[i_txt_row] == STATOutputType_None) return(0);
 
    bool prob_flag = vx_pd.fcst_info->is_prob();
-   bool vect_flag = (vx_pd.fcst_info->is_u_wind() &&
-                     vx_pd.obs_info->is_u_wind());
+   bool vect_flag = vx_pd.fcst_info->is_v_wind() &&
+                    vx_pd.fcst_info->uv_index() >= 0;
 
    int n_pd = get_n_msg_typ() * get_n_mask() * get_n_interp();
 
@@ -1173,11 +1254,18 @@ int PointStatVxOpt::n_txt_row(int i_txt_row) const {
 
       case(i_vl1l2):
       case(i_val1l2):
-      case(i_vcnt):
          // Number of VL1L2 or VAL1L2 lines =
          //    Message Types * Masks * Interpolations * Thresholds
          n = (!vect_flag ? 0 : n_pd *
               get_n_wind_thresh());
+         break;
+
+      case(i_vcnt):
+         // Number of VCNT lines =
+         //    Message Types * Masks * Interpolations * Thresholds *
+         //    Alphas
+         n = (!vect_flag ? 0 : n_pd *
+              get_n_wind_thresh() * get_n_ci_alpha());
          break;
 
       case(i_pct):
@@ -1273,13 +1361,24 @@ int PointStatVxOpt::n_txt_row(int i_txt_row) const {
 
          break;
 
+      case(i_seeps_mpr):
+         // Compute the number of matched pairs to be written
+         n = vx_pd.get_n_pair();
+
+         break;
+
+      case(i_seeps):
+         // Compute the number of matched pairs to be written
+         n = vx_pd.get_n_pair();
+
+         break;
+
       default:
-         mlog << Error << "\nPointStatVxOpt::n_txt_row(int) -> "
+         mlog << Error << "\n" << method_name
               << "unexpected output type index value: " << i_txt_row
               << "\n\n";
          exit(1);
    }
-
    return(n);
 }
 

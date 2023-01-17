@@ -977,7 +977,7 @@ TimeSummaryInfo parse_conf_time_summary(Dictionary *dict) {
 
 void parse_add_conf_key_value_map(
       Dictionary *dict, const char *conf_key_map_name, map<ConcatString,ConcatString> *m) {
-   Dictionary *msg_typ_dict = (Dictionary *) 0;
+   Dictionary *map_dict = (Dictionary *) 0;
    ConcatString key, val;
    int i;
 
@@ -988,14 +988,14 @@ void parse_add_conf_key_value_map(
    }
 
    // Conf: map_name: message_type_map, obs)var_map, etc
-   msg_typ_dict = dict->lookup_array(conf_key_map_name);
+   map_dict = dict->lookup_array(conf_key_map_name);
 
    // Loop through the array entries
-   for(i=0; i<msg_typ_dict->n_entries(); i++) {
+   for(i=0; i<map_dict->n_entries(); i++) {
 
       // Lookup the key and value
-      key = (*msg_typ_dict)[i]->dict_value()->lookup_string(conf_key_key);
-      val = (*msg_typ_dict)[i]->dict_value()->lookup_string(conf_key_val);
+      key = (*map_dict)[i]->dict_value()->lookup_string(conf_key_key);
+      val = (*map_dict)[i]->dict_value()->lookup_string(conf_key_val);
 
       if(m->count(key) >= 1) {
          (*m)[key] = val;
@@ -1011,10 +1011,9 @@ void parse_add_conf_key_value_map(
 
 ///////////////////////////////////////////////////////////////////////////////
 
-
 map<ConcatString,ConcatString> parse_conf_key_value_map(
       Dictionary *dict, const char *conf_key_map_name, const char *caller) {
-   Dictionary *msg_typ_dict = (Dictionary *) 0;
+   Dictionary *map_dict = (Dictionary *) 0;
    map<ConcatString,ConcatString> m;
    ConcatString key, val;
    int i;
@@ -1026,14 +1025,14 @@ map<ConcatString,ConcatString> parse_conf_key_value_map(
    }
 
    // Conf: map_name: message_type_map, obs_var_map, etc
-   msg_typ_dict = dict->lookup_array(conf_key_map_name);
+   map_dict = dict->lookup_array(conf_key_map_name);
 
    // Loop through the array entries
-   for(i=0; i<msg_typ_dict->n_entries(); i++) {
+   for(i=0; i<map_dict->n_entries(); i++) {
 
       // Lookup the key and value
-      key = (*msg_typ_dict)[i]->dict_value()->lookup_string(conf_key_key);
-      val = (*msg_typ_dict)[i]->dict_value()->lookup_string(conf_key_val);
+      key = (*map_dict)[i]->dict_value()->lookup_string(conf_key_key);
+      val = (*map_dict)[i]->dict_value()->lookup_string(conf_key_val);
 
       if(m.count(key) >= 1) {
          mlog << Warning << "\n" << method_name
@@ -1096,6 +1095,69 @@ map<ConcatString,StringArray> parse_conf_metadata_map(Dictionary *dict) {
 map<ConcatString,ConcatString> parse_conf_obs_name_map(Dictionary *dict) {
    const char *method_name = "parse_conf_obs_name_map() -> ";
    return parse_conf_key_value_map(dict, conf_key_obs_name_map);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+map<ConcatString,StringArray> parse_conf_obs_to_qc_map(Dictionary *dict) {
+   const char *method_name = "parse_conf_obs_to_qc_map() -> ";
+   return parse_conf_key_values_map(dict, conf_key_obs_to_qc_map, method_name);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+map<ConcatString,UserFunc_1Arg> parse_conf_key_convert_map(
+      Dictionary *dict, const char *conf_key_map_name, const char *caller) {
+   Dictionary *map_dict = (Dictionary *) 0;
+   int i, j;
+   StringArray sa;
+   ConcatString key;
+   UserFunc_1Arg fx;
+   map<ConcatString,UserFunc_1Arg> m;
+   const char *method_name = (0 != caller) ? caller : "parse_conf_key_convert_map() -> ";
+
+   if(!dict) {
+      mlog << Error << "\n" << method_name << "empty dictionary!\n\n";
+      exit(1);
+   }
+
+   // Conf: diag_convert_map
+   map_dict = dict->lookup_array(conf_key_map_name);
+
+   // Loop through the array entries
+   for(i=0; i<map_dict->n_entries(); i++) {
+
+      // Lookup the key and convert function
+      sa =   (*map_dict)[i]->dict_value()->lookup_string_array(conf_key_key);
+      fx.clear();
+      fx.set((*map_dict)[i]->dict_value()->lookup(conf_key_convert));
+
+      // Check the function
+      if(!fx.is_set()) {
+         mlog << Error << "\n" << method_name
+              << "lookup for \"" << conf_key_convert << "\" failed in the \""
+              << conf_key_map_name << "\" map!\n\n";
+         exit(1);
+      }
+
+      // Add map entry for each string
+      for(j=0; j<sa.n(); j++) {
+
+         key = sa[j];
+
+         if(m.count(key) >= 1) {
+            mlog << Warning << "\n" << method_name
+                 << "found multiple entries for key \"" << key << "\" in the \""
+                 << conf_key_map_name << "\" map!\n\n";
+         }
+
+         // Add entry to the map
+         m.insert(pair<ConcatString,UserFunc_1Arg>(key,fx));
+
+      } // end for j
+   } // end for i
+
+   return(m);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1669,11 +1731,18 @@ NbrhdInfo parse_conf_nbrhd(Dictionary *dict, const char *conf_key) {
    nbrhd_dict = dict->lookup_dictionary(conf_key);
 
    // Conf: field - may be missing
-   v = nbrhd_dict->lookup_int(conf_key_field, false);
 
-   // If found, interpret value.  Otherwise, default to BOTH
-   if(nbrhd_dict->last_lookup_status()) info.field = int_to_fieldtype(v);
-   else                                 info.field = FieldType_Both;
+   // Default info.field to BOTH
+   info.field = FieldType_Both;
+
+   // Skip lookup for conf_key_nbrhd_prob
+   if(strncmp(conf_key, conf_key_nbrhd_prob, strlen(conf_key_nbrhd_prob)) != 0) {
+
+      v = nbrhd_dict->lookup_int(conf_key_field, false);
+
+      // If found, interpret value
+      if(nbrhd_dict->last_lookup_status()) info.field = int_to_fieldtype(v);
+   }
 
    // Conf: vld_thresh
    info.vld_thresh = nbrhd_dict->lookup_double(conf_key_vld_thresh);
@@ -2320,49 +2389,52 @@ const char * statlinetype_to_string(const STATLineType t) {
    const char *s = (const char *) 0;
 
    switch(t) {
-      case(stat_sl1l2):        s = stat_sl1l2_str;   break;
-      case(stat_sal1l2):       s = stat_sal1l2_str;  break;
-      case(stat_vl1l2):        s = stat_vl1l2_str;   break;
-      case(stat_val1l2):       s = stat_val1l2_str;  break;
-      case(stat_vcnt):         s = stat_vcnt_str;    break;
+      case(stat_sl1l2):        s = stat_sl1l2_str;     break;
+      case(stat_sal1l2):       s = stat_sal1l2_str;    break;
+      case(stat_vl1l2):        s = stat_vl1l2_str;     break;
+      case(stat_val1l2):       s = stat_val1l2_str;    break;
+      case(stat_vcnt):         s = stat_vcnt_str;      break;
 
-      case(stat_fho):          s = stat_fho_str;     break;
-      case(stat_ctc):          s = stat_ctc_str;     break;
-      case(stat_cts):          s = stat_cts_str;     break;
-      case(stat_mctc):         s = stat_mctc_str;    break;
-      case(stat_mcts):         s = stat_mcts_str;    break;
+      case(stat_fho):          s = stat_fho_str;       break;
+      case(stat_ctc):          s = stat_ctc_str;       break;
+      case(stat_cts):          s = stat_cts_str;       break;
+      case(stat_mctc):         s = stat_mctc_str;      break;
+      case(stat_mcts):         s = stat_mcts_str;      break;
 
-      case(stat_cnt):          s = stat_cnt_str;     break;
-      case(stat_pct):          s = stat_pct_str;     break;
-      case(stat_pstd):         s = stat_pstd_str;    break;
-      case(stat_pjc):          s = stat_pjc_str;     break;
-      case(stat_prc):          s = stat_prc_str;     break;
+      case(stat_cnt):          s = stat_cnt_str;       break;
+      case(stat_pct):          s = stat_pct_str;       break;
+      case(stat_pstd):         s = stat_pstd_str;      break;
+      case(stat_pjc):          s = stat_pjc_str;       break;
+      case(stat_prc):          s = stat_prc_str;       break;
 
-      case(stat_eclv):         s = stat_eclv_str;    break;
-      case(stat_mpr):          s = stat_mpr_str;     break;
-      case(stat_nbrctc):       s = stat_nbrctc_str;  break;
-      case(stat_nbrcts):       s = stat_nbrcts_str;  break;
-      case(stat_nbrcnt):       s = stat_nbrcnt_str;  break;
+      case(stat_eclv):         s = stat_eclv_str;      break;
+      case(stat_mpr):          s = stat_mpr_str;       break;
+      case(stat_seeps):        s = stat_seeps_str;     break;
+      case(stat_seeps_mpr):    s = stat_seeps_mpr_str; break;
+      case(stat_nbrctc):       s = stat_nbrctc_str;    break;
 
-      case(stat_grad):         s = stat_grad_str;    break;
-      case(stat_dmap):         s = stat_dmap_str;    break;
-      case(stat_isc):          s = stat_isc_str;     break;
-      case(stat_wdir):         s = stat_wdir_str;    break;
-      case(stat_ecnt):         s = stat_ecnt_str;    break;
+      case(stat_nbrcts):       s = stat_nbrcts_str;    break;
+      case(stat_nbrcnt):       s = stat_nbrcnt_str;    break;
+      case(stat_grad):         s = stat_grad_str;      break;
+      case(stat_dmap):         s = stat_dmap_str;      break;
+      case(stat_isc):          s = stat_isc_str;       break;
 
-      case(stat_rps):          s = stat_rps_str;     break;
-      case(stat_rhist):        s = stat_rhist_str;   break;
-      case(stat_phist):        s = stat_phist_str;   break;
-      case(stat_orank):        s = stat_orank_str;   break;
-      case(stat_ssvar):        s = stat_ssvar_str;   break;
+      case(stat_wdir):         s = stat_wdir_str;      break;
+      case(stat_ecnt):         s = stat_ecnt_str;      break;
+      case(stat_rps):          s = stat_rps_str;       break;
+      case(stat_rhist):        s = stat_rhist_str;     break;
+      case(stat_phist):        s = stat_phist_str;     break;
 
-      case(stat_relp):         s = stat_relp_str;    break;
-      case(stat_genmpr):       s = stat_genmpr_str;  break;
-      case(stat_ssidx):        s = stat_ssidx_str;   break;
-      case(stat_header):       s = stat_header_str;  break;
+      case(stat_orank):        s = stat_orank_str;     break;
+      case(stat_ssvar):        s = stat_ssvar_str;     break;
+      case(stat_relp):         s = stat_relp_str;      break;
+      case(stat_genmpr):       s = stat_genmpr_str;    break;
+      case(stat_ssidx):        s = stat_ssidx_str;     break;
+ 
+      case(stat_header):       s = stat_header_str;    break;
 
       case(no_stat_line_type):
-      default:                 s = stat_na_str;      break;
+      default:                 s = stat_na_str;        break;
    }
 
    return(s);
@@ -2383,48 +2455,51 @@ void statlinetype_to_string(const STATLineType t, char *out) {
 STATLineType string_to_statlinetype(const char *s) {
    STATLineType t;
 
-        if(strcasecmp(s, stat_sl1l2_str)  == 0) t = stat_sl1l2;
-   else if(strcasecmp(s, stat_sal1l2_str) == 0) t = stat_sal1l2;
-   else if(strcasecmp(s, stat_vl1l2_str)  == 0) t = stat_vl1l2;
-   else if(strcasecmp(s, stat_val1l2_str) == 0) t = stat_val1l2;
-   else if(strcasecmp(s, stat_vcnt_str)   == 0) t = stat_vcnt;
+        if(strcasecmp(s, stat_sl1l2_str)     == 0) t = stat_sl1l2;
+   else if(strcasecmp(s, stat_sal1l2_str)    == 0) t = stat_sal1l2;
+   else if(strcasecmp(s, stat_vl1l2_str)     == 0) t = stat_vl1l2;
+   else if(strcasecmp(s, stat_val1l2_str)    == 0) t = stat_val1l2;
+   else if(strcasecmp(s, stat_vcnt_str)      == 0) t = stat_vcnt;
 
-   else if(strcasecmp(s, stat_fho_str)    == 0) t = stat_fho;
-   else if(strcasecmp(s, stat_ctc_str)    == 0) t = stat_ctc;
-   else if(strcasecmp(s, stat_cts_str)    == 0) t = stat_cts;
-   else if(strcasecmp(s, stat_mctc_str)   == 0) t = stat_mctc;
-   else if(strcasecmp(s, stat_mcts_str)   == 0) t = stat_mcts;
+   else if(strcasecmp(s, stat_fho_str)       == 0) t = stat_fho;
+   else if(strcasecmp(s, stat_ctc_str)       == 0) t = stat_ctc;
+   else if(strcasecmp(s, stat_cts_str)       == 0) t = stat_cts;
+   else if(strcasecmp(s, stat_mctc_str)      == 0) t = stat_mctc;
+   else if(strcasecmp(s, stat_mcts_str)      == 0) t = stat_mcts;
 
-   else if(strcasecmp(s, stat_cnt_str)    == 0) t = stat_cnt;
-   else if(strcasecmp(s, stat_pct_str)    == 0) t = stat_pct;
-   else if(strcasecmp(s, stat_pstd_str)   == 0) t = stat_pstd;
-   else if(strcasecmp(s, stat_pjc_str)    == 0) t = stat_pjc;
-   else if(strcasecmp(s, stat_prc_str)    == 0) t = stat_prc;
+   else if(strcasecmp(s, stat_cnt_str)       == 0) t = stat_cnt;
+   else if(strcasecmp(s, stat_pct_str)       == 0) t = stat_pct;
+   else if(strcasecmp(s, stat_pstd_str)      == 0) t = stat_pstd;
+   else if(strcasecmp(s, stat_pjc_str)       == 0) t = stat_pjc;
+   else if(strcasecmp(s, stat_prc_str)       == 0) t = stat_prc;
 
-   else if(strcasecmp(s, stat_eclv_str)   == 0) t = stat_eclv;
-   else if(strcasecmp(s, stat_mpr_str)    == 0) t = stat_mpr;
-   else if(strcasecmp(s, stat_nbrctc_str) == 0) t = stat_nbrctc;
-   else if(strcasecmp(s, stat_nbrcts_str) == 0) t = stat_nbrcts;
-   else if(strcasecmp(s, stat_nbrcnt_str) == 0) t = stat_nbrcnt;
+   else if(strcasecmp(s, stat_eclv_str)      == 0) t = stat_eclv;
+   else if(strcasecmp(s, stat_mpr_str)       == 0) t = stat_mpr;
+   else if(strcasecmp(s, stat_seeps_str)     == 0) t = stat_seeps;
+   else if(strcasecmp(s, stat_seeps_mpr_str) == 0) t = stat_seeps_mpr;
+   else if(strcasecmp(s, stat_nbrctc_str)    == 0) t = stat_nbrctc;
 
-   else if(strcasecmp(s, stat_grad_str)   == 0) t = stat_grad;
-   else if(strcasecmp(s, stat_dmap_str)   == 0) t = stat_dmap;
-   else if(strcasecmp(s, stat_isc_str)    == 0) t = stat_isc;
-   else if(strcasecmp(s, stat_wdir_str)   == 0) t = stat_wdir;
-   else if(strcasecmp(s, stat_ecnt_str)   == 0) t = stat_ecnt;
+   else if(strcasecmp(s, stat_nbrcts_str)    == 0) t = stat_nbrcts;
+   else if(strcasecmp(s, stat_nbrcnt_str)    == 0) t = stat_nbrcnt;
+   else if(strcasecmp(s, stat_grad_str)      == 0) t = stat_grad;
+   else if(strcasecmp(s, stat_dmap_str)      == 0) t = stat_dmap;
+   else if(strcasecmp(s, stat_isc_str)       == 0) t = stat_isc;
 
-   else if(strcasecmp(s, stat_rps_str)    == 0) t = stat_rps;
-   else if(strcasecmp(s, stat_rhist_str)  == 0) t = stat_rhist;
-   else if(strcasecmp(s, stat_phist_str)  == 0) t = stat_phist;
-   else if(strcasecmp(s, stat_orank_str)  == 0) t = stat_orank;
-   else if(strcasecmp(s, stat_ssvar_str)  == 0) t = stat_ssvar;
+   else if(strcasecmp(s, stat_wdir_str)      == 0) t = stat_wdir;
+   else if(strcasecmp(s, stat_ecnt_str)      == 0) t = stat_ecnt;
+   else if(strcasecmp(s, stat_rps_str)       == 0) t = stat_rps;
+   else if(strcasecmp(s, stat_rhist_str)     == 0) t = stat_rhist;
+   else if(strcasecmp(s, stat_phist_str)     == 0) t = stat_phist;
 
-   else if(strcasecmp(s, stat_relp_str)   == 0) t = stat_relp;
-   else if(strcasecmp(s, stat_genmpr_str) == 0) t = stat_genmpr;
-   else if(strcasecmp(s, stat_ssidx_str)  == 0) t = stat_ssidx;
-   else if(strcasecmp(s, stat_header_str) == 0) t = stat_header;
+   else if(strcasecmp(s, stat_orank_str)     == 0) t = stat_orank;
+   else if(strcasecmp(s, stat_ssvar_str)     == 0) t = stat_ssvar;
+   else if(strcasecmp(s, stat_relp_str)      == 0) t = stat_relp;
+   else if(strcasecmp(s, stat_genmpr_str)    == 0) t = stat_genmpr;
+   else if(strcasecmp(s, stat_ssidx_str)     == 0) t = stat_ssidx;
 
-   else                                         t = no_stat_line_type;
+   else if(strcasecmp(s, stat_header_str)    == 0) t = stat_header;
+
+   else                                            t = no_stat_line_type;
 
    return(t);
 }
@@ -2671,6 +2746,43 @@ ConcatString tracktype_to_string(TrackType type) {
       default:
          mlog << Error << "\ntracktype_to_string() -> "
               << "Unexpected TrackType value of " << type << ".\n\n";
+         exit(1);
+   }
+
+   return(s);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+DiagType string_to_diagtype(const char *s) {
+   DiagType t = DiagType_None;
+
+   // Convert string to enumerated DiagType, storing unknown strings
+   // as the default type
+        if(strcasecmp(s, cira_diag_rt_str)   == 0) t = DiagType_CIRA_RT;
+   else if(strcasecmp(s, cira_diag_dev_str)  == 0) t = DiagType_CIRA_Dev;
+   else if(strcasecmp(s, ships_diag_rt_str)  == 0) t = DiagType_SHIPS_RT;
+   else if(strcasecmp(s, ships_diag_dev_str) == 0) t = DiagType_SHIPS_Dev;
+   else                                            t = DiagType_None;
+
+   return(t);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+ConcatString diagtype_to_string(DiagType type) {
+   ConcatString s;
+
+   // Convert enumerated DiagType to string
+   switch(type) {
+      case(DiagType_None):      s = conf_val_none;      break;
+      case(DiagType_CIRA_RT):   s = cira_diag_rt_str;   break;
+      case(DiagType_CIRA_Dev):  s = cira_diag_dev_str;  break;
+      case(DiagType_SHIPS_RT):  s = ships_diag_rt_str;  break;
+      case(DiagType_SHIPS_Dev): s = ships_diag_dev_str; break;
+      default:
+         mlog << Error << "\ndiagtype_to_string() -> "
+              << "Unexpected DiagType value of " << type << ".\n\n";
          exit(1);
    }
 
@@ -3011,6 +3123,23 @@ NormalizeType parse_conf_normalize(Dictionary *dict) {
    }
 
    return(t);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// Print consistent error message and exit
+//
+///////////////////////////////////////////////////////////////////////////////
+
+void python_compile_error(const char *caller) {
+
+   const char *method_name = (0 != caller) ? caller : "python_compile_error() -> ";
+
+   mlog << Error << "\n" << method_name
+        << "Support for Python has not been compiled!\n"
+        << "To run Python scripts, recompile with the --enable-python option.\n\n";
+
+   exit(1);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

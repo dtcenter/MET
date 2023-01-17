@@ -15,6 +15,7 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    04/03/12  Halley Gotway   New
+//   001    09/28/22  Prestopnik      MET #2227 Remove namespace std from header files
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -22,8 +23,6 @@
 #define  __TC_STAT_H__
 
 ////////////////////////////////////////////////////////////////////////
-
-using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
@@ -82,7 +81,7 @@ static ConcatString command_line_job;
 ////////////////////////////////////////////////////////////////////////
 
 // Output file stream
-static ofstream *tc_stat_out = (ofstream *) 0;
+static std::ofstream *tc_stat_out = (std::ofstream *) 0;
 
 ////////////////////////////////////////////////////////////////////////
 //

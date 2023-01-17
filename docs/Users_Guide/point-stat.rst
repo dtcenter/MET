@@ -136,6 +136,17 @@ The HiRA framework provides a unique method for evaluating models in the neighbo
 
 Often, the neighborhood size is chosen so that multiple models to be compared have approximately the same horizontal resolution. Then, standard metrics for probabilistic forecasts, such as Brier Score, can be used to compare those forecasts. HiRA was developed using surface observation stations so the neighborhood lies completely within the horizontal plane. With any type of upper air observation, the vertical neighborhood must also be defined.
 
+.. _PS_seeps:
+
+SEEPS scores
+------------
+
+The Stable Equitable Error in Probability Space (SEEPS) was devised for monitoring global deterministic forecasts of precipitation against the WMO gauge network (:ref:`Rodwell et al., 2010 <Rodwell-2010>`; :ref:`Haiden et al., 2012 <Haiden-2012>`) and is a multi-category score which uses a climatology to account for local variations in behavior. Since the score uses probability space to define categories using the climatology, it can be aggregated over heterogeneous climate regions. Even though it was developed for use with precipitation forecasts, in principle it could be applied to any forecast parameter for which a sufficiently long time period of observations exists to create a suitable climatology. The computation of SEEPS for precipitation is only supported for now.
+
+For use with precipitation, three categories are used, named ‘dry’, ‘light’ and ‘heavy’. The ‘dry’ category is defined (using the WMO observing guidelines) with any accumulation (rounded to the nearest 0.1 millimeter) that is less than or equal to 0.2 mm.  The remaining precipitation is divided into ‘light’ and ‘heavy’ categories whose thresholds are with respect to a climatology and thus location specific. The light precipitation is defined to occur twice as often as heavy precipitation.
+
+When calculating a single SEEPS value over observing stations for a particular region, the scores should have a density weighting applied which accounts for uneven station distribution in the region of interest (see Section 9.1 in :ref:`Rodwell et al., 2010 <Rodwell-2010>`). This density weighting has not yet been implemented in MET. Global precipitation climatologies calculated from the WMO SYNOP records from 1980-2009 are supplied with the release. At the moment, a 24-hour climatology is available (valid at 00 UTC or 12 UTC), but in future a 6-hour climatology will become available.
+
 .. _PS_Statistical-measures:
 
 Statistical measures
@@ -314,7 +325,7 @@ point_stat configuration file
 
 The default configuration file for the Point-Stat tool named **PointStatConfig_default** can be found in the installed *share/met/config* directory. Another version is located in *scripts/config*. We encourage users to make a copy of these files prior to modifying their contents. The contents of the configuration file are described in the subsections below.
 
-Note that environment variables may be used when editing configuration files, as described in :numref:`pb2nc configuration file` for the PB2NC tool.
+Note that environment variables may be used when editing configuration files, as described in the :numref:`config_env_vars`.
 
 ________________________
 
@@ -431,6 +442,8 @@ ________________________
      rps    = BOTH;  // Only for HiRA
      eclv   = BOTH;
      mpr    = BOTH;
+     seeps  = NONE;
+     seeps_mpr = NONE;
   }
 
 The **output_flag** array controls the type of output that the Point-Stat tool generates. Each flag corresponds to an output line type in the STAT file. Setting the flag to NONE indicates that the line type should not be generated. Setting the flag to STAT indicates that the line type should be written to the STAT file only. Setting the flag to BOTH indicates that the line type should be written to the STAT file as well as a separate ASCII file where the data is grouped by line type. The output flags correspond to the following output line types:
@@ -475,11 +488,17 @@ The **output_flag** array controls the type of output that the Point-Stat tool g
 
 20. **MPR** for Matched Pair data
 
+21. **SEEPS** for averaged SEEPS (Stable Equitable Error in Probability Space) score
+
+22. **SEEPS_MPR** for SEEPS score of Matched Pair data
+
 Note that the FHO and CTC line types are easily derived from each other. Users are free to choose which measures are most desired. The output line types are described in more detail in :numref:`point_stat-output`.
 
 Note that writing out matched pair data (MPR lines) for a large number of cases is generally not recommended. The MPR lines create very large output files and are only intended for use on a small set of cases.
 
 If all line types corresponding to a particular verification method are set to NONE, the computation of those statistics will be skipped in the code and thus make the Point-Stat tool run more efficiently. For example, if FHO, CTC, and CTS are all set to NONE, the Point-Stat tool will skip the categorical verification step.
+
+The default SEEPS climo file exists at MET_BASE/climo/seeps/PPT24_seepsweights.nc. It can be overridden by using the environment variable, MET_SEEPS_POINT_CLIMO_NAME.
 
 .. _point_stat-output:
 
@@ -641,6 +660,9 @@ The first set of header columns are common to all of the output files generated 
   * - 29
     - FN_ON
     - Number of forecast no and observation no
+  * - 30
+    - EC_VALUE
+    - Expected correct rate, used for CTS HSS_EC
 
 .. role:: raw-html(raw)
     :format: html
@@ -738,7 +760,13 @@ The first set of header columns are common to all of the output files generated 
     - Symmetric Extremal Dependency Index including normal and bootstrap upper and lower confidence limits
   * - 115-117
     - BAGSS, :raw-html:`<br />` BAGSS_BCL, :raw-html:`<br />` BAGSS_BCU
-    - Bias Adjusted Gilbert Skill Score including bootstrap upper and lower confidence limits
+    - Bias-Adjusted Gilbert Skill Score including bootstrap upper and lower confidence limits
+  * - 118-120
+    - HSS_EC, :raw-html:`<br />` HSS_EC_BCL, :raw-html:`<br />` HSS_EC_BCU
+    - Heidke Skill Score with user-specific expected correct and bootstrap confidence limits
+  * - 121
+    - EC_VALUE
+    - Expected correct rate, used for CTS HSS_EC
 
 
 .. role:: raw-html(raw)
@@ -830,12 +858,12 @@ The first set of header columns are common to all of the output files generated 
   * - 78-80
     - RMSE, :raw-html:`<br />` RMSE_BCL, :raw-html:`<br />` RMSE_BCU
     - Root mean squared error including bootstrap upper and lower confidence limits
-  * - 81-94
+  * - 81-95
     - E10, :raw-html:`<br />` E10_BCL, :raw-html:`<br />` E10_BCU, :raw-html:`<br />` E25, :raw-html:`<br />` E25_BCL, :raw-html:`<br />` E25_BCU, :raw-html:`<br />` E50, :raw-html:`<br />` E50_BCL, :raw-html:`<br />` E50_BCU, :raw-html:`<br />` E75, :raw-html:`<br />` E75_BCL, :raw-html:`<br />` E75_BCU, :raw-html:`<br />` E90, :raw-html:`<br />` E90_BCL, :raw-html:`<br />` E90_BCU
     - 10th, 25th, 50th, 75th, and 90th percentiles of the error including bootstrap upper and lower confidence limits
   * - 96-98
-    - IQR, :raw-html:`<br />` IQR _BCL, :raw-html:`<br />` IQR _BCU
-    - The Interquartile Range including bootstrap upper and lower confidence limits
+    - EIQR, :raw-html:`<br />` IQR _BCL, :raw-html:`<br />` IQR _BCU
+    - The Interquartile Range of the error including bootstrap upper and lower confidence limits
   * - 99-101
     - MAD, :raw-html:`<br />` MAD_BCL, :raw-html:`<br />` MAD_BCU
     - The Median Absolute Deviation including bootstrap upper and lower confidence limits
@@ -851,13 +879,13 @@ The first set of header columns are common to all of the output files generated 
   * - 113-115
     - RMSFA, :raw-html:`<br />` RMSFA_BCL, :raw-html:`<br />` RMSFA_BCU
     - Root mean squared forecast anomaly (f-c) including bootstrap upper and lower confidence limits
-  * - 117-119
+  * - 116-118
     - RMSOA, :raw-html:`<br />` RMSOA_BCL, :raw-html:`<br />` RMSOA_BCU
     - Root mean squared observation anomaly (o-c) including bootstrap upper and lower confidence limits
-  * - 120-122
+  * - 119-121
     - ANOM_CORR_UNCNTR, :raw-html:`<br />` ANOM_CORR_UNCNTR_BCL, :raw-html:`<br />` ANOM_CORR_UNCNTR_BCU
     - The uncentered Anomaly Correlation excluding mean error including bootstrap upper and lower confidence limits
-  * - 123-125
+  * - 122-124
     - SI, :raw-html:`<br />` SI_BCL, :raw-html:`<br />` SI_BCU
     - Scatter Index including bootstrap upper and lower confidence limits
       
@@ -1297,10 +1325,16 @@ The first set of header columns are common to all of the output files generated 
   * - 32
     - UVOOABAR
     - Mean((uo-uc)²+(vo-vc)²)
+  * - 33
+    - FA_SPEED_BAR
+    - Mean forecast wind speed anomaly
+  * - 34
+    - OA_SPEED_BAR
+    - Mean observed wind speed anomaly
 
 .. _table_PS_format_info_VCNT:
 
-.. list-table:: Format information for VCNT (Vector Continuous Statistics) output line type. Note that each statistic (except TOTAL) is followed by two columns giving bootstrap confidence intervals. These confidence intervals are not currently calculated for this release of MET, but will be in future releases.
+.. list-table:: Format information for VCNT (Vector Continuous Statistics) output line type. Note that the bootstrap confidence intervals columns ending with BCL and BCU are not currently calculated for this release of MET, but will be in future releases.
   :widths: auto
   :header-rows: 2
 
@@ -1317,59 +1351,65 @@ The first set of header columns are common to all of the output files generated 
     - TOTAL
     - Total number of data points
   * - 26-28
-    - FBAR
-    - Mean value of forecast wind speed
+    - FBAR, :raw-html:`<br />` FBAR_BCL, :raw-html:`<br />` FBAR_BCU
+    - Mean value of forecast wind speed including bootstrap upper and lower confidence limits
   * - 29-31
-    - OBAR
-    - Mean value of observed wind speed
+    - OBAR, :raw-html:`<br />` OBAR_BCL, :raw-html:`<br />` OBAR_BCU
+    - Mean value of observed wind speed including bootstrap upper and lower confidence limits
   * - 32-34
-    - FS_RMS
-    - Root mean square forecast wind speed
+    - FS_RMS, :raw-html:`<br />` FS_RMS_BCL, :raw-html:`<br />` FS_RMS_BCU
+    - Root mean square forecast wind speed including bootstrap upper and lower confidence limits
   * - 35-37
-    - OS_RMS
-    - Root mean square observed wind speed
+    - OS_RMS, :raw-html:`<br />` OS_RMS_BCL, :raw-html:`<br />` OS_RMS_BCU
+    - Root mean square observed wind speed including bootstrap upper and lower confidence limits
   * - 38-40
-    - MSVE
-    - Mean squared length of the vector difference between the forecast and observed winds
+    - MSVE, :raw-html:`<br />` MSVE_BCL, :raw-html:`<br />` MSVE_BCU
+    - Mean squared length of the vector difference between the forecast and observed winds including bootstrap upper and lower confidence limits
   * - 41-43
-    - RMSVE
-    - Square root of MSVE
+    - RMSVE, :raw-html:`<br />` RMSVE_BCL, :raw-html:`<br />` RMSVE_BCU
+    - Square root of MSVE including bootstrap upper and lower confidence limits
   * - 45-46
-    - FSTDEV
-    - Standard deviation of the forecast wind speed
+    - FSTDEV, :raw-html:`<br />` FSTDEV_BCL, :raw-html:`<br />` FSTDEV_BCU
+    - Standard deviation of the forecast wind speed including bootstrap upper and lower confidence limits
   * - 47-49
-    - OSTDEV
-    - Standard deviation of the observed wind field
+    - OSTDEV, :raw-html:`<br />` OSTDEV_BCL, :raw-html:`<br />` OSTDEV_BCU
+    - Standard deviation of the observed wind field including bootstrap upper and lower confidence limits
   * - 50-52
-    - FDIR
-    - Direction of the average forecast wind vector
+    - FDIR, :raw-html:`<br />` FDIR_BCL, :raw-html:`<br />` FDIR_BCU
+    - Direction of the average forecast wind vector including bootstrap upper and lower confidence limits
   * - 53-55
-    - ODIR
-    - Direction of the average observed wind vector
+    - ODIR, :raw-html:`<br />` ODIR_BCL, :raw-html:`<br />` ODIR_BCU
+    - Direction of the average observed wind vector including bootstrap upper and lower confidence limits
   * - 56-58
-    - FBAR_SPEED
-    - Length (speed) of the average forecast wind vector
+    - FBAR_SPEED, :raw-html:`<br />` FBAR_SPEED_BCL, :raw-html:`<br />` FBAR_SPEED_BCU
+    - Length (speed) of the average forecast wind vector including bootstrap upper and lower confidence limits
   * - 59-61
-    - OBAR_SPEED
-    - Length (speed) of the average observed wind vector
+    - OBAR_SPEED, :raw-html:`<br />` OBAR_SPEED_BCL, :raw-html:`<br />` OBAR_SPEED_BCU
+    - Length (speed) of the average observed wind vector including bootstrap upper and lower confidence limits
   * - 62-64
-    - VDIFF_SPEED
-    - Length (speed) of the vector difference between the average forecast and average observed wind vectors
+    - VDIFF_SPEED, :raw-html:`<br />` VDIFF_SPEED_BCL, :raw-html:`<br />` VDIFF_SPEED_BCU
+    - Length (speed) of the vector difference between the average forecast and average observed wind vectors including bootstrap upper and lower confidence limits
   * - 65-67
-    - VDIFF_DIR
-    - Direction of the vector difference between the average forecast and average wind vectors
+    - VDIFF_DIR, :raw-html:`<br />` VDIFF_DIR_BCL, :raw-html:`<br />` VDIFF_DIR_BCU
+    - Direction of the vector difference between the average forecast and average wind vectors including bootstrap upper and lower confidence limits
   * - 68-70
-    - SPEED_ERR
-    - Difference between the length of the average forecast wind vector and the average observed wind vector (in the sense F - O)
+    - SPEED_ERR, :raw-html:`<br />` SPEED_ERR_BCL, :raw-html:`<br />` SPEED_ERR_BCU
+    - Difference between the length of the average forecast wind vector and the average observed wind vector (in the sense F - O) including bootstrap upper and lower confidence limits
   * - 71-73
-    - SPEED_ABSERR
-    - Absolute value of SPEED_ERR
+    - SPEED_ABSERR, :raw-html:`<br />` SPEED_ABSERR_BCL, :raw-html:`<br />` SPEED_ABSERR_BCU
+    - Absolute value of SPEED_ERR including bootstrap upper and lower confidence limits
   * - 74-76
-    - DIR_ERR
-    - Signed angle between the directions of the average forecast and observed wing vectors. Positive if the forecast wind vector is counterclockwise from the observed wind vector
+    - DIR_ERR, :raw-html:`<br />` DIR_ERR_BCL, :raw-html:`<br />` DIR_ERR_BCU
+    - Signed angle between the directions of the average forecast and observed wing vectors. Positive if the forecast wind vector is counterclockwise from the observed wind vector including bootstrap upper and lower confidence limits
   * - 77-79
-    - DIR_ABSERR
-    - Absolute value of DIR_ABSERR
+    - DIR_ABSERR, :raw-html:`<br />` DIR_ABSERR_BCL, :raw-html:`<br />` DIR_ABSERR_BCU
+    - Absolute value of DIR_ABSERR including bootstrap upper and lower confidence limits
+  * - 80-84
+    - ANOM_CORR, :raw-html:`<br />` ANOM_CORR_NCL, :raw-html:`<br />` ANOM_CORR_NCU, :raw-html:`<br />` ANOM_CORR_BCL, :raw-html:`<br />` ANOM_CORR_BCU
+    - Vector Anomaly Correlation including mean error with normal and bootstrap upper and lower confidence limits
+  * - 85-87
+    - ANOM_CORR_UNCNTR, :raw-html:`<br />` ANOM_CORR_UNCNTR_BCL, :raw-html:`<br />` ANOM_CORR_UNCNTR_BCU
+    - Uncentered vector Anomaly Correlation excluding mean error including bootstrap upper and lower confidence limits
 
 .. _table_PS_format_info_MPR:
 
@@ -1425,5 +1465,120 @@ The first set of header columns are common to all of the output files generated 
   * - 37
     - CLIMO_CDF
     - Climatological cumulative distribution function value
+
+.. _table_PS_format_info_SEEPS_MPR:
+
+.. list-table:: Format information for SEEPS (Stable Equitable Error in Probability Space) of MPR (Matched Pair) output line type.
+  :widths: auto
+  :header-rows: 2
+
+  * - SEEPS_MPR OUTPUT FORMAT
+    -
+    -
+  * - Column Number
+    - SEEPS_MPR Column Name
+    - Description
+  * - 24
+    - SEEPS_MPR
+    - SEEPS Matched Pair line type
+  * - 25
+    - OBS_SID
+    - Station Identifier of observation
+  * - 26
+    - OBS_LAT
+    - Latitude of the observation in degrees north
+  * - 27
+    - OBS_LON
+    - Longitude of the observation in degrees east
+  * - 28
+    - FCST
+    - Forecast value interpolated to the observation location
+  * - 29
+    - OBS
+    - Observation value
+  * - 30
+    - OBS_QC
+    - Quality control flag for observation
+  * - 31
+    - FCST_CAT
+    - Forecast category to 3 by 3 matrix
+  * - 32
+    - OBS_CAT
+    - Observationtegory to 3 by 3 matrix
+  * - 33
+    - P1
+    - Climo-derived probability value for this station (dry)
+  * - 34
+    - P2
+    - Climo-derived probability value for this station (dry + light)
+  * - 35
+    - T1
+    - Threshold 1 for p1
+  * - 36
+    - T2
+    - Threshold 2 for p2
+  * - 37
+    - SEEPS
+    - SEEPS (Stable Equitable Error in Probability Space) score
+
+
+.. _table_PS_format_info_SEEPS:
+
+.. list-table:: Format information for SEEPS (Stable Equitable Error in Probability Space) output line type.
+  :widths: auto
+  :header-rows: 2
+
+  * - SEEPS OUTPUT FORMAT
+    -
+    -
+  * - Column Number
+    - SEEPS Column Name
+    - Description
+  * - 24
+    - SEEPS
+    - SEEPS line type
+  * - 25
+    - TOTAL
+    - Total number of SEEPS matched pairs
+  * - 26
+    - S12
+    - Counts multiplied by the weights for FCST_CAT 1 and OBS_CAT 2
+  * - 27
+    - S13
+    - Counts multiplied by the weights for FCST_CAT 1 and OBS_CAT 3
+  * - 28
+    - S21
+    - Counts multiplied by the weights for FCST_CAT 2 and OBS_CAT 1
+  * - 29
+    - S23
+    - Counts multiplied by the weights for FCST_CAT 2 and OBS_CAT 3
+  * - 30
+    - S31
+    - Counts multiplied by the weights for FCST_CAT 3 and OBS_CAT 1
+  * - 31
+    - S32
+    - Counts multiplied by the weights for FCST_CAT 3 and OBS_CAT 2
+  * - 32
+    - PF1
+    - marginal probabilities of the forecast values (FCST_CAT 1)
+  * - 33
+    - PF2
+    - marginal probabilities of the forecast values (FCST_CAT 2)
+  * - 34
+    - PF3
+    - marginal probabilities of the forecast values (FCST_CAT 3)
+  * - 35
+    - PV1
+    - marginal probabilities of the observed values (OBS_CAT 1)
+  * - 36
+    - PV2
+    - marginal probabilities of the observed values (OBS_CAT 2)
+  * - 37
+    - PV3
+    - marginal probabilities of the observed values (OBS_CAT 3)
+  * - 38
+    - SEEPS
+    - Averaged SEEPS (Stable Equitable Error in Probability Space) score
+
 
 The STAT output files described for point_stat may be used as inputs to the Stat-Analysis tool. For more information on using the Stat-Analysis tool to create stratifications and aggregations of the STAT files produced by point_stat, please see :numref:`stat-analysis`.

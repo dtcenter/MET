@@ -113,7 +113,7 @@ am_libvx_math_a_OBJECTS =  \
 	libvx_math_a-nint.$(OBJEXT) libvx_math_a-nti.$(OBJEXT) \
 	libvx_math_a-ptile.$(OBJEXT) libvx_math_a-pwl.$(OBJEXT) \
 	libvx_math_a-affine.$(OBJEXT) libvx_math_a-legendre.$(OBJEXT) \
-	libvx_math_a-so3.$(OBJEXT) libvx_math_a-vx_vector.$(OBJEXT)
+	libvx_math_a-vx_vector.$(OBJEXT)
 libvx_math_a_OBJECTS = $(am_libvx_math_a_OBJECTS)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -138,7 +138,6 @@ am__depfiles_remade = ./$(DEPDIR)/libvx_math_a-affine.Po \
 	./$(DEPDIR)/libvx_math_a-nti.Po \
 	./$(DEPDIR)/libvx_math_a-ptile.Po \
 	./$(DEPDIR)/libvx_math_a-pwl.Po \
-	./$(DEPDIR)/libvx_math_a-so3.Po \
 	./$(DEPDIR)/libvx_math_a-viewgravity_to_string.Po \
 	./$(DEPDIR)/libvx_math_a-vx_vector.Po
 am__mv = mv -f
@@ -269,6 +268,7 @@ MET_HDFLIB = @MET_HDFLIB@
 MET_NETCDF = @MET_NETCDF@
 MET_NETCDFINC = @MET_NETCDFINC@
 MET_NETCDFLIB = @MET_NETCDFLIB@
+MET_PYTHON_BIN_EXE = @MET_PYTHON_BIN_EXE@
 MET_PYTHON_CC = @MET_PYTHON_CC@
 MET_PYTHON_LD = @MET_PYTHON_LD@
 MKDIR_P = @MKDIR_P@
@@ -359,7 +359,6 @@ libvx_math_a_SOURCES = viewgravity_to_string.cc viewgravity_to_string.h \
                is_bad_data.h \
                trig.h \
                legendre.cc legendre.h \
-               so3.h so3.cc \
                vx_vector.h vx_vector.cc \
                vx_math.h
 
@@ -420,7 +419,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_math_a-nti.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_math_a-ptile.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_math_a-pwl.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_math_a-so3.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_math_a-viewgravity_to_string.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_math_a-vx_vector.Po@am__quote@ # am--include-marker
 
@@ -570,20 +568,6 @@ libvx_math_a-legendre.obj: legendre.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_math_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_math_a-legendre.obj `if test -f 'legendre.cc'; then $(CYGPATH_W) 'legendre.cc'; else $(CYGPATH_W) '$(srcdir)/legendre.cc'; fi`
 
-libvx_math_a-so3.o: so3.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_math_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_math_a-so3.o -MD -MP -MF $(DEPDIR)/libvx_math_a-so3.Tpo -c -o libvx_math_a-so3.o `test -f 'so3.cc' || echo '$(srcdir)/'`so3.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvx_math_a-so3.Tpo $(DEPDIR)/libvx_math_a-so3.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='so3.cc' object='libvx_math_a-so3.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_math_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_math_a-so3.o `test -f 'so3.cc' || echo '$(srcdir)/'`so3.cc
-
-libvx_math_a-so3.obj: so3.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_math_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_math_a-so3.obj -MD -MP -MF $(DEPDIR)/libvx_math_a-so3.Tpo -c -o libvx_math_a-so3.obj `if test -f 'so3.cc'; then $(CYGPATH_W) 'so3.cc'; else $(CYGPATH_W) '$(srcdir)/so3.cc'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvx_math_a-so3.Tpo $(DEPDIR)/libvx_math_a-so3.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='so3.cc' object='libvx_math_a-so3.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_math_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_math_a-so3.obj `if test -f 'so3.cc'; then $(CYGPATH_W) 'so3.cc'; else $(CYGPATH_W) '$(srcdir)/so3.cc'; fi`
-
 libvx_math_a-vx_vector.o: vx_vector.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_math_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_math_a-vx_vector.o -MD -MP -MF $(DEPDIR)/libvx_math_a-vx_vector.Tpo -c -o libvx_math_a-vx_vector.o `test -f 'vx_vector.cc' || echo '$(srcdir)/'`vx_vector.cc
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvx_math_a-vx_vector.Tpo $(DEPDIR)/libvx_math_a-vx_vector.Po
@@ -731,7 +715,6 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/libvx_math_a-nti.Po
 	-rm -f ./$(DEPDIR)/libvx_math_a-ptile.Po
 	-rm -f ./$(DEPDIR)/libvx_math_a-pwl.Po
-	-rm -f ./$(DEPDIR)/libvx_math_a-so3.Po
 	-rm -f ./$(DEPDIR)/libvx_math_a-viewgravity_to_string.Po
 	-rm -f ./$(DEPDIR)/libvx_math_a-vx_vector.Po
 	-rm -f Makefile
@@ -787,7 +770,6 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/libvx_math_a-nti.Po
 	-rm -f ./$(DEPDIR)/libvx_math_a-ptile.Po
 	-rm -f ./$(DEPDIR)/libvx_math_a-pwl.Po
-	-rm -f ./$(DEPDIR)/libvx_math_a-so3.Po
 	-rm -f ./$(DEPDIR)/libvx_math_a-viewgravity_to_string.Po
 	-rm -f ./$(DEPDIR)/libvx_math_a-vx_vector.Po
 	-rm -f Makefile

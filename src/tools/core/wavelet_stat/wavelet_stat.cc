@@ -37,6 +37,8 @@
 //   012    04/08/19  Halley Gotway   Add percentile thresholds.
 //   013    04/01/19  Fillmore        Add FCST and OBS units.
 //   014    07/09/21  Linden          MET #1746 Skip thresholding.
+//   015    07/06/22  Howard Soh      METplus-Internal #19 Rename main to met_main
+//   016    10/03/22  Prestopnik      MET #2227 Remove using namespace netCDF from header files
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -54,6 +56,9 @@ using namespace std;
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+
+#include <netcdf>
+using namespace netCDF;
 
 #include "wavelet_stat.h"
 
@@ -134,10 +139,7 @@ static void set_compress(const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
-int main(int argc, char *argv[]) {
-
-   // Set handler to be called for memory allocation error
-   set_new_handler(oom);
+int met_main(int argc, char *argv[]) {
 
    // Process the command line arguments
    process_command_line(argc, argv);
@@ -149,6 +151,12 @@ int main(int argc, char *argv[]) {
    clean_up();
 
    return(0);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+const string get_tool_name() {
+   return "wavelet_stat";
 }
 
 ////////////////////////////////////////////////////////////////////////

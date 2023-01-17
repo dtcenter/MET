@@ -117,7 +117,7 @@ class STATAnalysisJob {
 
       void clear();
 
-      void dump(ostream &, int depth = 0) const;
+      void dump(std::ostream &, int depth = 0) const;
 
       //////////////////////////////////////////////////////////////////
 
@@ -225,11 +225,11 @@ class STATAnalysisJob {
       NumArray    weight;
 
       // Numeric column thresholds
-      map<ConcatString,ThreshArray> column_thresh_map;
+      std::map<ConcatString,ThreshArray> column_thresh_map;
 
       // ASCII column string matching
-      map<ConcatString,StringArray> column_str_inc_map;
-      map<ConcatString,StringArray> column_str_exc_map;
+      std::map<ConcatString,StringArray> column_str_inc_map;
+      std::map<ConcatString,StringArray> column_str_exc_map;
 
       StringArray hdr_name;
       StringArray hdr_value;
@@ -243,12 +243,12 @@ class STATAnalysisJob {
       // Variables used to the store the analysis job specification
       //
       char        *dump_row; // dump rows used to a file
-      ofstream    *dr_out;   // output file stream for dump row
+      std::ofstream    *dr_out;   // output file stream for dump row
       int         n_dump;    // number of lines written to dump row
       AsciiTable  dump_at;   // AsciiTable for buffering dump row data
 
       char        *stat_file; // dump output statistics to a STAT file
-      ofstream    *stat_out;  // output file stream for -out_stat
+      std::ofstream    *stat_out;  // output file stream for -out_stat
       AsciiTable  stat_at;    // AsciiTable for buffering output STAT data
       int         stat_row;   // Counter for the current stat row
 
@@ -335,7 +335,7 @@ class STATAnalysisJob {
       double ss_index_vld_thresh;
 
       //
-      // MCTS HSS Expected Correct rate
+      // HSS Expected Correct rate
       //
       double hss_ec_value;
 

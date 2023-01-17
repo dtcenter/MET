@@ -22,6 +22,9 @@ using namespace std;
 #include <string>
 #include <time.h>
 
+#include <netcdf>
+using namespace netCDF;
+
 #include "vx_math.h"
 #include "vx_cal.h"
 #include "vx_log.h"
@@ -150,6 +153,8 @@ void NcCfFile::close()
   // Reset the time values
 
   ValidTime.clear();
+  raw_times.clear();
+  vlevels.clear();
   InitTime = (unixtime)0;
   AccumTime = (unixtime)0;
 
@@ -183,7 +188,6 @@ bool NcCfFile::open(const char * filepath)
   // NcError err(NcError::silent_nonfatal);
 
   // Open the file
-
   _ncFile = open_ncfile(filepath);
 
   if (IS_INVALID_NC_P(_ncFile))
@@ -206,15 +210,16 @@ bool NcCfFile::open(const char * filepath)
 
   // Pull out the variables
 
+  int max_dim_count = 0;
+  NcVar *z_var = (NcVar *)0;
   NcVar *valid_time_var = (NcVar *)0;
   ConcatString att_value;
-
 
   StringArray varNames;
   Nvars = get_var_names(_ncFile, &varNames);
   Var = new NcVarInfo [Nvars];
-  //get_vars_info(Nc, &Var);
 
+  NcDim dim;
   for (int j=0; j<Nvars; ++j)  {
     NcVar v = get_var(_ncFile, varNames[j].c_str());
 
@@ -224,26 +229,33 @@ bool NcCfFile::open(const char * filepath)
 
     int dim_count = GET_NC_DIM_COUNT(v);
     Var[j].Ndims = dim_count;
+    if (dim_count > max_dim_count) max_dim_count = dim_count;
 
     Var[j].Dims = new NcDim * [dim_count];
 
     //  parse the variable attributes
-    get_att_str( Var[j], (string)"long_name",  Var[j].long_name_att );
-    get_att_str( Var[j], (string)"units",      Var[j].units_att     );
+    get_att_str( Var[j], long_name_att_name, Var[j].long_name_att );
+    get_att_str( Var[j], units_att_name,     Var[j].units_att     );
 
-    if (get_nc_att_value(Var[j].var, (string)"axis", att_value)) {
+    if (get_var_axis(Var[j].var, att_value)) {
       if ( "T" == att_value ||  "time" == att_value ) {
         valid_time_var = Var[j].var;
         _time_var_info = &Var[j];
       }
+      else if ( "Z" == att_value ||  "z" == att_value ) {
+        z_var = Var[j].var;
+      }
     }
-    if (get_nc_att_value(Var[j].var, (string)"standard_name", att_value)) {
+
+    if (get_var_standard_name(Var[j].var, att_value)) {
       if ( "time" == att_value ) {
         valid_time_var = Var[j].var;
         _time_var_info = &Var[j];
       }
       else if( "latitude" == att_value ) _latVar = Var[j].var;
       else if( "longitude" == att_value ) _lonVar = Var[j].var;
+      else if( ("air_pressure" == att_value || "height" == att_value)
+               && (0 == z_var) ) z_var = Var[j].var;
     }
     if ( Var[j].name == "time" && (valid_time_var == 0)) {
       valid_time_var = Var[j].var;
@@ -297,30 +309,25 @@ bool NcCfFile::open(const char * filepath)
 
     // Parse the units for the time variable.
     ut = sec_per_unit = 0;
-    NcVarAtt *units_att = get_nc_att(valid_time_var, (string)"units", false);
-    if (IS_VALID_NC_P(units_att))
-    {
-      if (!get_att_value_chars(units_att, units) || units.length() == 0)
-      {
+    if (get_var_units(valid_time_var, units)) {
+      if (units.length() == 0) {
          mlog << Warning << "\n" << method_name
               << "the \"time\" variable must contain a \"units\" attribute. "
               << "Using valid time of 0\n\n";
       }
-      else
-      {
+      else {
          mlog << Debug(4) << method_name
               << "parsing units for the time variable \"" << units << "\"\n";
          parse_cf_time_string(units.c_str(), ut, sec_per_unit);
       }
     }
-    if (units_att) delete units_att;
 
     NcVar bounds_time_var;
     NcVar *nc_time_var = (NcVar *)0;
     bool use_bounds_var = false;
     ConcatString bounds_var_name;
     nc_time_var = valid_time_var;
-    NcVarAtt *bounds_att = get_nc_att(valid_time_var, (string)"bounds", false);
+    NcVarAtt *bounds_att = get_nc_att(valid_time_var, bounds_att_name, false);
     if (get_att_value_chars(bounds_att, bounds_var_name)) {
       bounds_time_var = get_nc_var(_ncFile, bounds_var_name.c_str());
       use_bounds_var = IS_VALID_NC(bounds_time_var);
@@ -346,6 +353,7 @@ bool NcCfFile::open(const char * filepath)
           if( latest_time < time_values[i] ) latest_time = time_values[i];
         }
         ValidTime.add(add_to_unixtime(ut, sec_per_unit, latest_time, no_leap_year));
+        raw_times.add(latest_time);
       }
       else {
         if (use_bounds_var) {
@@ -353,6 +361,7 @@ bool NcCfFile::open(const char * filepath)
           double time_fraction;
           for(int i=0; i<n_times; i++) {
             ValidTime.add(add_to_unixtime(ut, sec_per_unit, time_values[i*2+1], no_leap_year));
+            raw_times.add(time_values[i*2+1]);
             bounds_diff = time_values[i*2+1] - time_values[i*2];
             if (abs(bounds_diff - nint(bounds_diff)) < TIME_EPSILON) {
               AccumTime = (unixtime)(sec_per_unit * nint(bounds_diff));
@@ -365,6 +374,7 @@ bool NcCfFile::open(const char * filepath)
         else {
           for(int i=0; i<n_times; i++) {
             ValidTime.add(add_to_unixtime(ut, sec_per_unit, time_values[i], no_leap_year));
+            raw_times.add(time_values[i]);
           }
         }
       }
@@ -392,30 +402,21 @@ bool NcCfFile::open(const char * filepath)
   {
 
     // Parse the units for the time variable.
-    NcVarAtt *units_att = get_nc_att(&init_time_var, (string)"units");
-    if (IS_VALID_NC_P(units_att))
-    {
-      get_att_value_chars(units_att, units);
-
-      if (units.length() == 0)
-      {
+    if (get_var_units(&init_time_var, units)) {
+      if (units.length() == 0) {
          mlog << Warning << "\n" << method_name
               << "the \"forecast_reference_time\" variable must contain a \"units\" attribute.\n\n";
          ut = sec_per_unit = 0;
       }
-      else
-      {
+      else {
          mlog << Debug(4) << method_name
               << "parsing units for the forecast_reference_time variable \"" << units << "\"\n";
          parse_cf_time_string(units.c_str(), ut, sec_per_unit);
       }
     }
-    else
-    {
+    else {
       ut = sec_per_unit = 0;
     }
-
-    if (units_att) delete units_att;
 
     double time_value = get_nc_time(&init_time_var,(int)0);
     InitTime = (unixtime)ut + sec_per_unit * time_value;
@@ -431,29 +432,75 @@ bool NcCfFile::open(const char * filepath)
   // to set the slots.
   // Should be called after read_netcdf_grid() is called
 
+  string z_dim_name;
+  StringArray z_dims;
+  StringArray t_dims;
   StringArray dimNames;
-  for (int j=0; j<Nvars; ++j)  {
+  for (int j=0; j<Nvars; ++j) {
 
-    int dim_count = GET_NC_DIM_COUNT_P(Var[j].var);
+    int dim_count = Var[j].Ndims;
     NcVar *v = Var[j].var;
 
     dimNames.clear();
     get_dim_names(v, &dimNames);
 
-    for (int k=0; k<(dim_count); ++k)  {
-      const ConcatString c = dimNames[k];
+    for (int k=0; k<dim_count; ++k)  {
       NcDim *dim = Var[j].Dims[k];
-      if      ((dim && dim == _xDim) || c == x_dim_var_name) {
+      const ConcatString dim_name = dimNames[k];
+      if      ((dim && dim == _xDim) || dim_name == x_dim_var_name) {
          Var[j].x_slot = k;
       }
-      else if ((dim && dim == _yDim) || c == y_dim_var_name) {
+      else if ((dim && dim == _yDim) || dim_name == y_dim_var_name) {
          Var[j].y_slot = k;
       }
-      else if ((dim && dim == _tDim) || c == t_dim_name) {
+      else if ((dim && dim == _tDim) || dim_name == t_dim_name || t_dims.has(dim_name)) {
          Var[j].t_slot = k;
+      }
+      else if (z_dims.has(dim_name)) {
+         Var[j].z_slot = k;
+      }
+      else if (dim_count == max_dim_count) {
+         NcVarInfo *info = find_var_by_dim_name(dim_name.c_str());
+         if (info) {
+            if (is_nc_unit_time(info->units_att.c_str())) {
+               Var[j].t_slot = k;
+               t_dims.add(dim_name);
+            }
+            else if (is_nc_unit_latitude(info->units_att.c_str())) {
+               Var[j].y_slot = k;
+            }
+            else if (is_nc_unit_longitude(info->units_att.c_str())) {
+               Var[j].x_slot = k;
+            }
+            else {
+               Var[j].z_slot = k;
+               z_dims.add(dim_name);
+               if (0 == z_dim_name.length()) z_dim_name = dim_name;
+            }
+         }
       }
     }
   }   //  for j
+
+  // Find the vertical level variable from dimension name if not found
+  if (IS_INVALID_NC_P(z_var) && (0 < z_dim_name.length())) {
+    NcVarInfo *info = find_var_by_dim_name(z_dim_name.c_str());
+    if (info) z_var = info->var;
+  }
+
+  // Pull out the vertical levels
+  if (IS_VALID_NC_P(z_var)) {
+
+    int z_count = (int) get_data_size(z_var);
+    double *z_values = new double[z_count];
+
+    if( get_nc_data(z_var, z_values) ) {
+      for(int i=0; i<z_count; i++) {
+        vlevels.add(z_values[i]);
+      }
+    }
+    delete [] z_values;
+  }
 
   //  done
 
@@ -848,66 +895,12 @@ double NcCfFile::getData(NcVar * var, const LongArray & a) const
 
   bool status = false;
   double d = bad_data_double;
-  float add_offset = 0.f;
-  float scale_factor = 1.f;
-  NcVarAtt *att_add_offset   = get_nc_att(var, (string)"add_offset");
-  NcVarAtt *att_scale_factor = get_nc_att(var, (string)"scale_factor");
-  if (IS_VALID_NC_P(att_add_offset) && IS_VALID_NC_P(att_scale_factor)) {
-    add_offset = get_att_value_float(att_add_offset);
-    scale_factor = get_att_value_float(att_scale_factor);
-  }
-  if (att_add_offset) delete att_add_offset;
-  if (att_scale_factor) delete att_scale_factor;
 
+  double fill_value;
   double missing_value = get_var_missing_value(var);
-  double fill_value    = get_var_fill_value(var);
+  get_var_fill_value(var, fill_value);
 
-  switch (GET_NC_TYPE_ID_P(var))
-  {
-    case NcType::nc_SHORT:
-    {
-      short s;
-
-      status = get_nc_data(var, &s, (long *)a);
-      d = (double) (s);
-      break;
-    }
-
-    case NcType::nc_INT:
-    {
-      int i;
-
-      status = get_nc_data(var, &i, (long *)a);
-      d = (double) (i);
-      break;
-    }
-
-    case NcType::nc_FLOAT:
-    {
-      float f;
-
-      status = get_nc_data(var, &f, (long *)a);
-      d = (double) (f);
-      break;
-    }
-
-    case NcType::nc_DOUBLE:
-    {
-      status = get_nc_data(var, &d, (long *)a);
-      break;
-    }
-
-    default:
-    {
-      mlog << Error << "\n" << method_name
-           << "bad type [" << GET_NC_TYPE_NAME_P(var)
-           << "] for variable \"" << (GET_NC_NAME_P(var)) << "\"\n\n";
-      exit(1);
-    }
-  }   //  switch
-  if ((add_offset != 0.0 || scale_factor != 1.0) && !is_eq(d, missing_value) && !is_eq(d, fill_value)) {
-    d = d * scale_factor + add_offset;
-  }
+  status = get_nc_data(var, &d, (long *)a);
 
   if (!status)
   {
@@ -1028,8 +1021,9 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
   //  get the bad data values
   //
 
+  double fill_value;
   double missing_value = get_var_missing_value(v);
-  double fill_value    = get_var_fill_value(v);
+  get_var_fill_value(v, fill_value);
 
   //  set up the DataPlane object
 
@@ -1073,54 +1067,7 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
   offsets[y_slot] = 0;
   lengths[y_slot] = ny;
 
-  float add_offset = 0.f;
-  float scale_factor = 1.f;
-  NcVarAtt *att_add_offset   = get_nc_att(v, (string)"add_offset");
-  NcVarAtt *att_scale_factor = get_nc_att(v, (string)"scale_factor");
-  if (IS_VALID_NC_P(att_add_offset) && IS_VALID_NC_P(att_scale_factor)) {
-    add_offset = get_att_value_float(att_add_offset);
-    scale_factor = get_att_value_float(att_scale_factor);
-  }
-  if (att_add_offset) delete att_add_offset;
-  if (att_scale_factor) delete att_scale_factor;
-
-  int type_id = GET_NC_TYPE_ID_P(v);
-  bool do_scale_factor = add_offset != 0.0 || scale_factor != 1.0;
-
-  switch ( type_id )  {
-
-    case NcType::nc_SHORT:
-      s = new short[plane_size];
-      get_nc_data(v, s, lengths, offsets);
-      for (int x=0; x<plane_size; ++x) d[x] = (double)s[x];
-      delete [] s;
-      break;
-
-    case NcType::nc_INT:
-      i = new int[plane_size];
-      get_nc_data(v, i, lengths, offsets);
-      for (int x=0; x<plane_size; ++x) d[x] = (double)i[x];
-      delete [] i;
-      break;
-
-    case NcType::nc_FLOAT:
-      f = new float[plane_size];
-      get_nc_data(v, f, lengths, offsets);
-      for (int x=0; x<plane_size; ++x) d[x] = (double)f[x];
-      delete [] f;
-      break;
-
-    case NcType::nc_DOUBLE:
-      get_nc_data(v, d, lengths, offsets);
-      break;
-  
-    default:
-      mlog << Error << "\n" << method_name
-           << " bad type [" << GET_NC_TYPE_NAME_P(v)
-           << "] for variable \"" << (GET_NC_NAME_P(v)) << "\"\n\n";
-      exit ( 1 );
-  
-  }   //  switch
+  get_nc_data(v, d, lengths, offsets);
 
   int offset = 0;
   if( x_slot > y_slot ) {
@@ -1134,7 +1081,6 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
         if( is_eq(value, missing_value) || is_eq(value, fill_value) ) {
            value = bad_data_double;
         }
-        else if( do_scale_factor ) value = value * scale_factor + add_offset;
     
         plane.set(value, x, y_offset);
     
@@ -1152,7 +1098,6 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
         if( is_eq(value, missing_value) || is_eq(value, fill_value) ) {
            value = bad_data_double;
         }
-        else if( do_scale_factor ) value = value * scale_factor + add_offset;
     
         plane.set(value, x, y_offset);
     
@@ -1227,6 +1172,32 @@ NcVarInfo* NcCfFile::find_var_name(const char * var_name) const
 ////////////////////////////////////////////////////////////////////////
 
 
+NcVarInfo* NcCfFile::find_var_by_dim_name(const char *dim_name) const
+{
+  NcVarInfo *var = find_var_name(dim_name);
+  if (!var) {
+    //StringArray dimNames;
+    for (int i=0; i<Nvars; i++) {
+      if (1 == Var[i].Ndims) {
+        //dimNames.clear();
+        //get_dim_names(Var[j].var, &dimNames);
+        //if (dimNames[i] == dim_name) {
+        NcDim dim = get_nc_dim(Var[i].var, 0);
+        if (GET_NC_NAME(dim) == dim_name) {
+          var = &Var[i];
+          break;
+        }
+      }
+    }
+  }
+
+  return var;
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void NcCfFile::read_netcdf_grid()
 {
   // Loop through the variables looking for the first gridded variable.  We
@@ -1257,32 +1228,25 @@ void NcCfFile::read_netcdf_grid()
 
     // Skip the latitude and longitude variables, if they are present
 
-    NcVarAtt *std_name_att = get_nc_att(var, (string)"standard_name");
-    bool has_standard_name = IS_VALID_NC_P(std_name_att);
+    ConcatString std_name;
+    bool has_standard_name = get_var_standard_name(var, std_name);
 
     ignore = false;
-    if (has_standard_name)
-    {
-      ConcatString std_name;
-      get_att_value_chars(std_name_att, std_name);
-
+    if (has_standard_name) {
       if (std_name == "" || std_name == "latitude"
           || std_name == "longitude" || std_name == "time") {
         ignore = true;
       }
     }
-    if (std_name_att) delete std_name_att;
     if (ignore) continue;
 
     if (max_dim < num_dims) max_dim = num_dims;
 
-    NcVarAtt *nc_attr = get_nc_att(var, (string)"coordinates");
-    if (IS_VALID_NC_P(nc_attr)) {
-      if (nc_attr) delete nc_attr;
+    if (has_att(var, coordinates_att_name)) {
       data_var = var;
       break;
+
     }
-    if (nc_attr) delete nc_attr;
 
     // If we get here, this should be a gridded data variable
     if (tmp_data_var == 0) tmp_data_var = var;
@@ -1313,7 +1277,7 @@ void NcCfFile::read_netcdf_grid()
   // Pull the grid projection from the variable information.  First, look for
   // a grid_mapping attribute.
 
-  NcVarAtt *grid_mapping_att = get_nc_att(data_var, (string)"grid_mapping");
+  NcVarAtt *grid_mapping_att = get_nc_att(data_var, grid_mapping_att_name);
 
   if (IS_VALID_NC_P(grid_mapping_att))
   {
@@ -1343,7 +1307,6 @@ void NcCfFile::read_netcdf_grid()
     _yDim = &lat_dim;
     x_dim_var_name = GET_NC_NAME(lon_dim);
     y_dim_var_name = GET_NC_NAME(lat_dim);
-
     get_grid_from_lat_lon_vars(_latVar, _lonVar, _yDim->getSize(), _xDim->getSize());
     status = true;
   }
@@ -1393,7 +1356,7 @@ void NcCfFile::get_grid_from_grid_mapping(const NcVarAtt *grid_mapping_att)
     }
   } /* endfor - i */
 
-  if (grid_mapping_var == 0 || IS_INVALID_NC_P(grid_mapping_var))
+  if ((grid_mapping_var == 0) || (IS_INVALID_NC_P(grid_mapping_var)))
   {
     mlog << Error << "\n" << method_name << " -> "
          << "Cannot extract grid mapping variable (" << mapping_name
@@ -1403,7 +1366,7 @@ void NcCfFile::get_grid_from_grid_mapping(const NcVarAtt *grid_mapping_att)
 
   // Get the name of the grid mapping
 
-  NcVarAtt *grid_mapping_name_att = get_nc_att(grid_mapping_var, (string)"grid_mapping_name");
+  NcVarAtt *grid_mapping_name_att = get_nc_att(grid_mapping_var, grid_mapping_name_att_name);
 
   if (IS_INVALID_NC_P(grid_mapping_name_att))
   {
@@ -1672,18 +1635,14 @@ void NcCfFile::get_grid_mapping_lambert_conformal_conic(const NcVar *grid_mappin
   // files that are in other units, we'll have to update the code to do the
   // units conversions.
 
-  const NcVarAtt *x_coord_units_att = get_nc_att(_xCoordVar, (string)"units");
-  if (IS_INVALID_NC_P(x_coord_units_att))
-  {
+  ConcatString x_coord_units_name;
+  if (!get_var_units(_xCoordVar, x_coord_units_name)) {
     mlog << Warning << "\n" << method_name << " -> "
          << "Units not given for X coordinate variable -- assuming meters.\n\n";
   }
-  else
-  {
+  else {
     //const char *x_coord_units_name = x_coord_units_att->getValues(att->as_string(0);
-    ConcatString x_coord_units_name;
-    if (!get_att_value_chars(x_coord_units_att, x_coord_units_name))
-    {
+    if (0 == x_coord_units_name.length()) {
       mlog << Warning << "\n" << method_name << " -> "
            << "Cannot extract X coordinate units from netCDF file -- "
            << "assuming meters.\n\n";
@@ -1699,20 +1658,14 @@ void NcCfFile::get_grid_mapping_lambert_conformal_conic(const NcVar *grid_mappin
     }
   }
 
-  if (x_coord_units_att) delete x_coord_units_att;
-
-  const NcVarAtt *y_coord_units_att = get_nc_att(_yCoordVar, (string)"units");
-  if (IS_INVALID_NC_P(y_coord_units_att))
-  {
+  ConcatString y_coord_units_name;
+  if (!get_var_units(_yCoordVar, y_coord_units_name)) {
     mlog << Warning << "\n" << method_name << " -> "
          << "Units not given for Y coordinate variable -- assuming meters.\n\n";
   }
-  else
-  {
+  else {
     //const char *y_coord_units_name = y_coord_units_att->getValues(att->as_string(0);
-    ConcatString y_coord_units_name;
-    if (!get_att_value_chars(y_coord_units_att, y_coord_units_name))
-    {
+    if (0 == y_coord_units_name.length()) {
       mlog << Warning << "\n" << method_name << " -> "
            << "Cannot extract Y coordinate units from netCDF file -- "
            << "assuming meters.\n\n";
@@ -1728,8 +1681,6 @@ void NcCfFile::get_grid_mapping_lambert_conformal_conic(const NcVar *grid_mappin
     }
   }
 
-  if (y_coord_units_att) delete y_coord_units_att;
-
   // Figure out the dx/dy  and x/y pin values from the dimension variables
 
   long x_counts = GET_NC_SIZE_P(_xDim);
@@ -1737,7 +1688,6 @@ void NcCfFile::get_grid_mapping_lambert_conformal_conic(const NcVar *grid_mappin
 
   //_xCoordVar->get(x_values, &x_counts);
   get_nc_data(_xCoordVar, x_values);
-
 
   long y_counts = GET_NC_SIZE_P(_yDim);
   double y_values[y_counts];
@@ -1856,22 +1806,10 @@ void NcCfFile::get_grid_mapping_latitude_longitude(const NcVar *grid_mapping_var
     // The lat/lon dimensions are identified by their units
 
     const NcVar coord_var = get_var(_ncFile, _dims[dim_num]->getName().c_str());
-    if (IS_INVALID_NC(coord_var))
-      continue;
-
-    const NcVarAtt *units_att = get_nc_att(&coord_var, (string)"units");
-    if (IS_INVALID_NC_P(units_att)) {
-      if (units_att) delete units_att;
-      continue;
-    }
+    if (IS_INVALID_NC(coord_var)) continue;
 
     ConcatString dim_units;
-    if (!get_att_value_chars(units_att, dim_units)) {
-      if (units_att) delete units_att;
-      continue;
-    }
-
-    if (units_att) delete units_att;
+    if (!get_var_units(&coord_var, dim_units)) continue;
 
     // See if this is a lat or lon dimension
 
@@ -2062,17 +2000,11 @@ void NcCfFile::get_grid_mapping_polar_stereographic(const NcVar *grid_mapping_va
     if (IS_INVALID_NC(coord_var))
       continue;
 
-    const NcVarAtt *std_name_att = get_nc_att(&coord_var, (string)"standard_name");
-    if (IS_INVALID_NC_P(std_name_att)) {
-      if (std_name_att) delete std_name_att;
-      continue;
-    }
     ConcatString dim_std_name;
-    if (!get_att_value_chars(std_name_att, dim_std_name)) {
-      if (std_name_att) delete std_name_att;
+    const NcVarAtt *std_name_att = get_nc_att(&coord_var, standard_name_att_name);
+    if (!get_var_standard_name(&coord_var, dim_std_name)) {
       continue;
     }
-    if (std_name_att) delete std_name_att;
 
     // See if this is an X or Y dimension
 
@@ -2150,17 +2082,14 @@ void NcCfFile::get_grid_mapping_polar_stereographic(const NcVar *grid_mapping_va
   // files that are in other units, we'll have to update the code to do the
   // units conversions.
 
-  const NcVarAtt *x_coord_units_att = get_nc_att(_xCoordVar, (string)"units");
-  if (IS_INVALID_NC_P(x_coord_units_att))
-  {
+  ConcatString x_coord_units_name;
+  const NcVarAtt *x_coord_units_att = get_nc_att(_xCoordVar, units_att_name);
+  if (!get_var_units(_xCoordVar, x_coord_units_name)) {
     mlog << Warning << "\n" << method_name << " -> "
          << "Units not given for X coordinate variable -- assuming meters.\n\n";
   }
-  else
-  {
-    ConcatString x_coord_units_name;
-    if (!get_att_value_chars(x_coord_units_att, x_coord_units_name))
-    {
+  else {
+    if (0 == x_coord_units_name.length()) {
       mlog << Warning << "\n" << method_name << " -> "
            << "Cannot extract X coordinate units from netCDF file -- "
            << "assuming meters.\n\n";
@@ -2176,19 +2105,14 @@ void NcCfFile::get_grid_mapping_polar_stereographic(const NcVar *grid_mapping_va
     }
   }
 
-  if(x_coord_units_att) delete x_coord_units_att;
-
-  const NcVarAtt *y_coord_units_att = get_nc_att(_yCoordVar, (string)"units");
-  if (IS_INVALID_NC_P(y_coord_units_att))
-  {
+  ConcatString y_coord_units_name;
+  const NcVarAtt *y_coord_units_att = get_nc_att(_yCoordVar, units_att_name);
+  if (!get_var_units(_yCoordVar, y_coord_units_name)) {
     mlog << Warning << "\n" << method_name << " -> "
          << "Units not given for Y coordinate variable -- assuming meters.\n\n";
   }
-  else
-  {
-    ConcatString y_coord_units_name;
-    if (!get_att_value_chars(y_coord_units_att, y_coord_units_name))
-    {
+  else {
+    if (0 == y_coord_units_name.length()) {
       mlog << Warning << "\n" << method_name << " -> "
            << "Cannot extract Y coordinate units from netCDF file -- "
            << "assuming meters.\n\n";
@@ -2203,8 +2127,6 @@ void NcCfFile::get_grid_mapping_polar_stereographic(const NcVar *grid_mapping_va
       }
     }
   }
-
-  if(y_coord_units_att) delete y_coord_units_att;
 
   // Figure out the dx/dy  and x/y pin values from the dimension variables
 
@@ -2307,19 +2229,14 @@ void NcCfFile::get_grid_mapping_rotated_latitude_longitude(const NcVar *grid_map
     if (IS_INVALID_NC(coord_var))
       continue;
 
-    const NcVarAtt *std_name_att = get_nc_att(&coord_var, (string)"standard_name");
-    if (IS_INVALID_NC_P(std_name_att)) {
-      if (std_name_att) delete std_name_att;
-      continue;
-    }
-
     ConcatString dim_standard_name;
-    if (!get_att_value_chars(std_name_att, dim_standard_name)) {
-      if (std_name_att) delete std_name_att;
+    if (!get_var_standard_name(&coord_var, dim_standard_name)) {
       continue;
     }
 
-    if (std_name_att) delete std_name_att;
+    if (0 == dim_standard_name.length()) {
+      continue;
+    }
 
     // See if this is a grid_latitude or grid_longitude dimension
 
@@ -2584,7 +2501,7 @@ void NcCfFile::get_grid_mapping_geostationary(
     if (IS_INVALID_NC(coord_var))
       continue;
 
-    const NcVarAtt *std_name_att = get_nc_att(&coord_var, (string)"standard_name");
+    const NcVarAtt *std_name_att = get_nc_att(&coord_var, standard_name_att_name);
     if (IS_INVALID_NC_P(std_name_att)) {
       if (std_name_att) delete std_name_att;
       continue;
@@ -2779,11 +2696,10 @@ bool NcCfFile::get_grid_from_coordinates(const NcVar *data_var) {
   mlog << Debug(6) << "\n" << method_name << " -> "
        << "collect GRID info from \"" << GET_NC_NAME_P(data_var) << "\".\n\n";
        
-  NcVarAtt *coordinates_att = get_nc_att(data_var, (string)"coordinates");
+  NcVarAtt *coordinates_att = get_nc_att(data_var, coordinates_att_name);
 
   if (IS_VALID_NC_P(coordinates_att)) {
     ConcatString coordinates_value, units_value, axis_value;
-    NcVarAtt *missing_value_att = (NcVarAtt*) 0;
     get_att_value_chars(coordinates_att, coordinates_value);
     StringArray sa = coordinates_value.split(" ");
     int count = sa.n_elements();
@@ -2799,7 +2715,7 @@ bool NcCfFile::get_grid_from_coordinates(const NcVar *data_var) {
       is_x_dim_var = is_y_dim_var = false;
       for (int cIdx = 0; cIdx<count; cIdx++) {
         if ( Var[var_num].name == sa[cIdx]) {
-          if (get_nc_att_value(Var[var_num].var, (string)"units", units_value)) {
+          if (get_var_units(Var[var_num].var, units_value)) {
             if (is_nc_unit_latitude(units_value.c_str())) {
               y_dim_var_name = sa[cIdx];
               is_y_dim_var = true;
@@ -2813,7 +2729,7 @@ bool NcCfFile::get_grid_from_coordinates(const NcVar *data_var) {
                    << "found the longitude variable \"" << Var[var_num].name << "\"\n";
             }
             else if (!is_nc_unit_time(units_value.c_str())) {
-              if (!get_nc_att_value(Var[var_num].var, (string)"axis", axis_value)
+              if (!get_var_axis(Var[var_num].var, axis_value)
                   || (axis_value != "Z" && axis_value != "z")) {
                 mlog << Debug(4) << "\n" << method_name << " -> "
                      << "unknown units [" << units_value << "] for the coordinate variable ["
@@ -2826,21 +2742,11 @@ bool NcCfFile::get_grid_from_coordinates(const NcVar *data_var) {
       }
       if (is_y_dim_var || Var[var_num].name == y_dim_var_name) {
         _yCoordVar = Var[var_num].var;
-        missing_value_att = get_nc_att(_yCoordVar, (string)"_FillValue");
-        if (IS_VALID_NC_P(missing_value_att)) {
-          lat_missing_value = get_att_value_double(missing_value_att);
-        }
+        get_var_fill_value(_yCoordVar, lat_missing_value);
       }
       else if (is_x_dim_var || Var[var_num].name == x_dim_var_name) {
         _xCoordVar = Var[var_num].var;
-        missing_value_att = get_nc_att(_xCoordVar, (string)"_FillValue");
-        if (IS_VALID_NC_P(missing_value_att)) {
-          lon_missing_value = get_att_value_double(missing_value_att);
-        }
-      }
-      if(missing_value_att) {
-        delete missing_value_att;
-        missing_value_att = (NcVarAtt *)0;
+        get_var_fill_value(_xCoordVar, lon_missing_value);
       }
     }
 

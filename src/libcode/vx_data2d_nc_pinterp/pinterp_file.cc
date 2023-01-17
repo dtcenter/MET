@@ -7,8 +7,6 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
-
-
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -20,6 +18,9 @@ using namespace std;
 #include <string.h>
 #include <cstdio>
 #include <cmath>
+
+#include <netcdf>
+using namespace netCDF;
 
 #include "vx_math.h"
 #include "vx_cal.h"
@@ -54,7 +55,7 @@ static const char pressure_var_wrf_interp_name [] = "LEV";
 static const char pa_units_str         [] = "Pa";
 static const char hpa_units_str        [] = "hPa";
 
-static const string init_time_att_name   = "START_DATE";
+static const string start_time_att_name   = "START_DATE";
 
 static const int max_pinterp_args         = 30;
 
@@ -74,7 +75,6 @@ static unixtime parse_init_time(const char *);
 static bool is_bad_data_pinterp(double);
 
 static bool is_accumulation(const char *);
-
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -283,7 +283,7 @@ else {
 }
 
 ConcatString att_value;
-get_global_att(Nc, init_time_att_name, att_value);
+get_global_att(Nc, start_time_att_name, att_value);
 
 InitTime = parse_init_time(att_value.c_str());
 
@@ -566,54 +566,12 @@ bool status = false;
 int i;
 short s;
 float f;
+double fill_value;
 double d = bad_data_double;
-float add_offset   = 0.f;
-float scale_factor = 1.f;
 double missing_value = get_var_missing_value(var);
-double fill_value    = get_var_fill_value(var);
-NcVarAtt *att_add_offset   = get_nc_att(var, (string)"add_offset");
-NcVarAtt *att_scale_factor = get_nc_att(var, (string)"scale_factor");
-if (!IS_INVALID_NC_P(att_add_offset) && !IS_INVALID_NC_P(att_scale_factor)) {
-   add_offset = get_att_value_float(att_add_offset);
-   scale_factor = get_att_value_float(att_scale_factor);
-}
-if (att_add_offset) delete att_add_offset;
-if (att_scale_factor) delete att_scale_factor;
+get_var_fill_value(var, fill_value);
 
-switch ( GET_NC_TYPE_ID_P(var) )  {
-
-   case NcType::nc_INT:
-      status = get_nc_data(var, &i, (long *)a);
-      d = (double) (i);
-      break;
-
-   case NcType::nc_SHORT:
-      status = get_nc_data(var, &s, (long *)a);
-      d = (double) (s);
-      break;
-
-   case NcType::nc_FLOAT:
-      status = get_nc_data(var, &f, (long *)a);
-      d = (double) (f);
-      break;
-
-   case NcType::nc_DOUBLE:
-      status = get_nc_data(var, &d, (long *)a);
-      break;
-
-   default:
-      mlog << Error << "\nPinterpFile::data(NcVar *, const LongArray &) const -> "
-           << " bad type for variable \"" << (GET_NC_NAME_P(var)) << "\"\n\n";
-      exit ( 1 );
-      break;
-
-}   //  switch
-
-if ((add_offset != 0.0 || scale_factor != 1.0) &&
-    !is_eq(d, missing_value)                   &&
-    !is_eq(d, fill_value)) {
-   d = d * scale_factor + add_offset;
-}
+status = get_nc_data(var, &d, (long *)a);
 
 if ( !status )  {
 
@@ -784,22 +742,9 @@ plane.set_size(Nx, Ny);
    //  get the data
    //
 double d[Ny];
-int    i[Ny];
-short  s[Ny];
-float  f[Ny];
 
 long offsets[dim_count];
 long lengths[dim_count];
-float add_offset   = 0.f;
-float scale_factor = 1.f;
-NcVarAtt *att_add_offset   = get_nc_att(v, (string)"add_offset");
-NcVarAtt *att_scale_factor = get_nc_att(v, (string)"scale_factor");
-if (!IS_INVALID_NC_P(att_add_offset) && !IS_INVALID_NC_P(att_scale_factor)) {
-   add_offset = get_att_value_float(att_add_offset);
-   scale_factor = get_att_value_float(att_scale_factor);
-}
-if (att_add_offset) delete att_add_offset;
-if (att_scale_factor) delete att_scale_factor;
 
 for (int k=0; k<dim_count; k++) {
   offsets[k] = (a[k] == vx_data2d_star) ? 0 : a[k];
@@ -810,41 +755,7 @@ lengths[y_slot] = Ny;
 int type_id = GET_NC_TYPE_ID_P(v);
 for (x=0; x<Nx; ++x)  {
    offsets[x_slot] = x;
-   switch ( type_id )  {
-
-      case NcType::nc_INT:
-         get_nc_data(v, (int *)&i, lengths, offsets);
-         for (y=0; y<Ny; ++y)  {
-            d[y] = (double)i[y];
-         }
-         break;
-
-      case NcType::nc_SHORT:
-         get_nc_data(v, (short *)&s, lengths, offsets);
-         for (y=0; y<Ny; ++y)  {
-            d[y] = (double)s[y];
-         }
-         break;
-
-      case NcType::nc_FLOAT:
-         get_nc_data(v, (float *)&f, lengths, offsets);
-         for (y=0; y<Ny; ++y)  {
-            d[y] = (double)f[y];
-         }
-         break;
-
-      case NcType::nc_DOUBLE:
-         get_nc_data(v, (double *)&d, lengths, offsets);
-         break;
-
-      default:
-         mlog << Error << "\nMetNcFile::data(NcVar *, const LongArray &) const -> "
-              << " bad type for variable \"" << (GET_NC_NAME_P(v)) << "\"\n\n";
-         exit ( 1 );
-         break;
-
-   }   //  switch
-
+   get_nc_data(v, (double *)&d, lengths, offsets);
 
    b[x_slot] = x;
 
@@ -853,9 +764,6 @@ for (x=0; x<Nx; ++x)  {
 
       if ( is_bad_data_pinterp( value ) ) {
          value = bad_data_double;
-      }
-      else if (add_offset != 0.0 || scale_factor != 1.0) {
-         value = value * scale_factor + add_offset;
       }
 
       plane.set(value, x, y);
@@ -891,60 +799,71 @@ return ( true );
 
 
 bool PinterpFile::data(const char * var_name, const LongArray & a, DataPlane & plane,
-                       double & pressure, NcVarInfo *&info) const
+                       double & pressure, NcVarInfo *&info) const {
 
-{
+   int time_index;
+   bool found = false;
 
-int j, time_index;
-bool found = false;
+   if (NULL != info) found = true;
+   else found = get_nc_var_info(var_name, info);
 
-for (j=0; j<Nvars; ++j)  {
+   if ( !found )  return ( false );
 
-   if ( Var[j].name == var_name )  {
-      found = true;
-      info = &Var[j];
-      break;
-   }
-
-}
-
-if ( !found )  return ( false );
-
-found = data(Var[j].var, a, plane, pressure);
+   found = data(info->var, a, plane, pressure);
 
    //
    //  store the times
    //
 
-time_index = a[Var[j].t_slot];
+   time_index = a[info->t_slot];
 
-plane.set_init  ( InitTime );
-plane.set_valid ( valid_time(time_index) );
-plane.set_lead  ( lead_time(time_index) );
+   plane.set_init  ( InitTime );
+   plane.set_valid ( valid_time(time_index) );
+   plane.set_lead  ( lead_time(time_index) );
 
    //
    //  since Pinterp files only contain WRF-ARW output, it is always a
    //  a runtime accumulation
    //
 
-if ( is_accumulation(var_name) )  {
+   if ( is_accumulation(var_name) )  {
 
-   plane.set_accum ( lead_time(time_index) );
+      plane.set_accum ( lead_time(time_index) );
 
-} else  {
+   } else  {
 
-   plane.set_accum ( 0 );
+      plane.set_accum ( 0 );
 
-}
+   }
 
    //
    //  done
    //
 
-return ( found );
+   return ( found );
 
 }
 
+
+////////////////////////////////////////////////////////////////////////
+
+bool PinterpFile::get_nc_var_info(const char *var_name, NcVarInfo *&info) const {
+   bool found = false;
+
+   if (NULL == info) {
+      for (int j=0; j<Nvars; ++j)  {
+
+         if ( Var[j].name == var_name )  {
+            found = true;
+            info = &Var[j];
+            break;
+         }
+
+      }
+   }
+
+   return found;
+}
 
 ////////////////////////////////////////////////////////////////////////
 

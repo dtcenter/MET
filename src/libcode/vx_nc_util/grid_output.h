@@ -1,5 +1,3 @@
-
-
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2022
 // ** University Corporation for Atmospheric Research (UCAR)
@@ -7,8 +5,6 @@
 // ** Research Applications Lab (RAL)
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-
-
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -22,7 +18,6 @@
 
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "vx_grid.h"
 
@@ -30,7 +25,7 @@ using namespace netCDF;
 ////////////////////////////////////////////////////////////////////////
 
 
-extern void grid_output(const GridInfo &, NcFile * ncfile);
+extern void grid_output(const GridInfo &, netCDF::NcFile *, netCDF::NcDim &, netCDF::NcDim &);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -40,6 +35,4 @@ extern void grid_output(const GridInfo &, NcFile * ncfile);
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
 

@@ -29,12 +29,12 @@
 //   004    05/14/12  Halley Gotway   Switch to using vx_config library.
 //   005    05/20/16  Prestopnik J    Removed -version (now in command_line.cc).
 //   006    05/15/17  Prestopnik P    Add shape for regrid.
+//   007    07/06/22  Howard Soh      METplus-Internal #19 Rename main to met_main
 //
 ////////////////////////////////////////////////////////////////////////
 
 using namespace std;
 
-#include <iostream>
 #include <fstream>
 #include <dirent.h>
 #include <sys/types.h>
@@ -42,9 +42,9 @@ using namespace std;
 #include <unistd.h>
 #include <cstdio>
 #include <stdlib.h>
-#include <string.h>
 #include <cmath>
 
+#include "main.h"
 #include "vx_util.h"
 #include "vx_analysis_util.h"
 
@@ -106,17 +106,11 @@ static void set_lookin(const char * path);
 ////////////////////////////////////////////////////////////////////////
 
 
-int main(int argc, char * argv [])
+int met_main(int argc, char * argv [])
 
 {
 
 ConcatString default_config_file;
-
-   //
-   //  set handler to be called for memory allocation error
-   //
-
-set_new_handler(oom);
 
 if ( argc == 1 )  { usage(); }
 
@@ -194,6 +188,13 @@ return ( 0 );
 
 }
 
+
+////////////////////////////////////////////////////////////////////////
+
+const string get_tool_name()
+{
+   return "mode_analysis";
+}
 
 ////////////////////////////////////////////////////////////////////////
 

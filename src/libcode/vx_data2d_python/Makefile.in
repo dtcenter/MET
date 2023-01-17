@@ -265,6 +265,7 @@ MET_HDFLIB = @MET_HDFLIB@
 MET_NETCDF = @MET_NETCDF@
 MET_NETCDFINC = @MET_NETCDFINC@
 MET_NETCDFLIB = @MET_NETCDFLIB@
+MET_PYTHON_BIN_EXE = @MET_PYTHON_BIN_EXE@
 MET_PYTHON_CC = @MET_PYTHON_CC@
 MET_PYTHON_LD = @MET_PYTHON_LD@
 MKDIR_P = @MKDIR_P@
@@ -345,6 +346,7 @@ MAINTAINERCLEANFILES = Makefile.in
 noinst_LIBRARIES = libvx_data2d_python.a
 libvx_data2d_python_a_SOURCES = \
               dataplane_from_numpy_array.h dataplane_from_numpy_array.cc \
+              dataplane_from_numpy_array.hpp \
               dataplane_from_xarray.h dataplane_from_xarray.cc \
               grid_from_python_dict.h grid_from_python_dict.cc \
               python_dataplane.h python_dataplane.cc \

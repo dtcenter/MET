@@ -273,6 +273,20 @@
     </output>
   </test>
 
+  <test name="plot_data_plane_NCCF_latlon_by_value">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/nccf/gtg/latlon/gtg_obs_forecast.20130730.i00.f00.nc \
+      &OUTPUT_DIR;/plot_data_plane/gtg_obs_forecast.20130730.i00.f00.NCCF_latlon_20000.ps \
+      'name = "edr"; level = "(0,@20000,*,*)";' \
+      -title "NCCF Latitude/Longitude Level 0" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/gtg_obs_forecast.20130730.i00.f00.NCCF_latlon_20000.ps</ps>
+    </output>
+  </test>
+
   <test name="plot_data_plane_NCCF_north_to_south">
     <exec>&MET_BIN;/plot_data_plane</exec>
     <param> \
@@ -403,7 +417,7 @@
     <param> \
       &DATA_DIR_MODEL;/easm/pr_day_MPI-ESM-MR_rcp85_r1i1p1_20060101-20091231.nc \
       &OUTPUT_DIR;/plot_data_plane/EaSM_CMIP5_pr_day_MPI-ESM-MR_rcp85_r1i1p1_20060101_12_time.ps \
-      'name="pr"; level="(20060102_000000,*,*)";' \
+      'name="pr"; level="(@20060102_000000,*,*)";' \
       -v 4
     </param>
     <output>
@@ -423,5 +437,75 @@
       <ps>&OUTPUT_DIR;/plot_data_plane/CESM_b.e15.B1850.f09_g16.pi_control.all_ga7cpl24.66.cam.i.0083-01-01-00000.ps</ps>
     </output>
   </test>
+  
+  <test name="plot_data_plane_GRIB2_NBM_CWASP_L0">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/nbm/blend.t13z.core.f119.co.grib2 \
+      &OUTPUT_DIR;/plot_data_plane/nbm_2022021513_F119_GRIB2_CWASP_L0.ps \
+      'name="CWASP"; level="L0"; GRIB2_pdt=2;' \
+      -title "GRIB2 NBM Craven-Wiedenfeld Aggregate Severe Parameter at surface" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/nbm_2022021513_F119_GRIB2_CWASP_L0.ps</ps>
+    </output>
+  </test>
 
+  <test name="plot_data_plane_GRIB2_NBM_CWASP_PERC_5">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/nbm/blend.t13z.core.f119.co.grib2 \
+      &OUTPUT_DIR;/plot_data_plane/nbm_2022021513_F119_GRIB2_CWASP_Perc-5.ps \
+      'name="CWASP"; level="L0"; GRIB2_perc_val=5;' \
+      -title "GRIB2 NBM Craven-Wiedenfeld Aggregate Severe Parameter 5% Level" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/nbm_2022021513_F119_GRIB2_CWASP_Perc-5.ps</ps>
+    </output>
+  </test>
+
+  <test name="plot_data_plane_GRIB2_NBM_CWASP_PROB_50">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/nbm/blend.t13z.core.f119.co.grib2 \
+      &OUTPUT_DIR;/plot_data_plane/nbm_2022021513_F119_GRIB2_CWASP_Prob-50.ps \
+      'name = "PROB"; level="L0"; prob = { name = "CWASP"; thresh_lo = 50; }' \
+      -title "GRIB2 NBM Craven-Wiedenfeld Aggregate Severe Parameter Prob > 50" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/nbm_2022021513_F119_GRIB2_CWASP_Prob-50.ps</ps>
+    </output>
+  </test>
+
+  <test name="plot_data_plane_GRIB2_NBM_WETBT_MIXED_LEVELS">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/nbm/blend.t13z.core.f119.co.grib2 \
+      &OUTPUT_DIR;/plot_data_plane/nbm_2022021513_F119_GRIB2_WETBT_L610-40000.ps \
+      'name="WETBT"; level="L610-40000";' \
+      -title "GRIB2 NBM Wet Bulb Temperature 610m above ground - 400mb" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/nbm_2022021513_F119_GRIB2_WETBT_L610-40000.ps</ps>
+    </output>
+  </test>
+
+  <test name="plot_data_plane_GRIB2_NBM_FICEAC_A48_PERC_10">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/nbm/blend.t13z.core.f119.co.grib2 \
+      &OUTPUT_DIR;/plot_data_plane/nbm_2022021513_F119_GRIB2_FICEAC_A48_Perc-10.ps \
+      'name="FICEAC"; level="A48"; GRIB2_perc_val=10;' \
+      -title "GRIB2 NBM 48-hour Flat Ice Accumulation (FRAM) 10% Level" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/nbm_2022021513_F119_GRIB2_FICEAC_A48_Perc-10.ps</ps>
+    </output>
+  </test>
+ 
 </met_test>

@@ -18,7 +18,6 @@ using namespace std;
 #include <cmath>
 
 #include "math_constants.h"
-
 #include "track_info.h"
 
 ////////////////////////////////////////////////////////////////////////
@@ -92,6 +91,10 @@ void TrackInfo::clear() {
    MaxValidTime    = (unixtime) 0;
    MinWarmCore     = (unixtime) 0;
    MaxWarmCore     = (unixtime) 0;
+   DiagSource      = DiagType_None;
+   TrackSource.clear();
+   FieldSource.clear();
+   DiagName.clear();
    TrackLines.clear();
 
    clear_points();
@@ -131,9 +134,13 @@ void TrackInfo::dump(ostream &out, int indent_depth) const {
    out << prefix << "MaxValidTime    = \"" << (MaxValidTime > 0 ? unix_to_yyyymmdd_hhmmss(MaxValidTime).text() : na_str) << "\n";
    out << prefix << "MinWarmCore     = \"" << (MinWarmCore  > 0 ? unix_to_yyyymmdd_hhmmss(MinWarmCore).text()  : na_str) << "\n";
    out << prefix << "MaxWarmCore     = \"" << (MaxWarmCore  > 0 ? unix_to_yyyymmdd_hhmmss(MaxWarmCore).text()  : na_str) << "\n";
+   out << prefix << "DiagSource      = " << diagtype_to_string(DiagSource) << "\n";
+   out << prefix << "TrackSource     = " << TrackSource.contents() << "\n";
+   out << prefix << "FieldSource     = " << FieldSource.contents() << "\n";
+   out << prefix << "NDiag           = " << DiagName.n() << "\n";
    out << prefix << "NPoints         = " << NPoints << "\n";
    out << prefix << "NAlloc          = " << NAlloc << "\n";
-   out << prefix << "NTrackLines     = " << TrackLines.n_elements() << "\n";
+   out << prefix << "NTrackLines     = " << TrackLines.n() << "\n";
 
    for(i=0; i<NPoints; i++) {
       out << prefix << "TrackPoint[" << i+1 << "]:" << "\n";
@@ -168,9 +175,13 @@ ConcatString TrackInfo::serialize() const {
      << ", MaxValidTime = " << (MaxValidTime > 0 ? unix_to_yyyymmdd_hhmmss(MaxValidTime).text() : na_str)
      << ", MinWarmCore = " << (MinWarmCore > 0 ? unix_to_yyyymmdd_hhmmss(MinWarmCore).text() : na_str)
      << ", MaxWarmCore = " << (MaxWarmCore > 0 ? unix_to_yyyymmdd_hhmmss(MaxWarmCore).text() : na_str)
+     << ", DiagSource = " << diagtype_to_string(DiagSource)
+     << ", TrackSource = " << TrackSource.contents()
+     << ", FieldSource = " << FieldSource.contents()
+     << ", NDiag = " << DiagName.n()
      << ", NPoints = " << NPoints
      << ", NAlloc = " << NAlloc
-     << ", NTrackLines = " << TrackLines.n_elements();
+     << ", NTrackLines = " << TrackLines.n();
 
    return(s);
 
@@ -217,6 +228,10 @@ void TrackInfo::assign(const TrackInfo &t) {
    MaxValidTime    = t.MaxValidTime;
    MinWarmCore     = t.MinWarmCore;
    MaxWarmCore     = t.MaxWarmCore;
+   DiagSource      = t.DiagSource;
+   TrackSource     = t.TrackSource;
+   FieldSource     = t.FieldSource;
+   DiagName        = t.DiagName;
    TrackLines      = t.TrackLines;
 
    if(t.NPoints == 0) return;
@@ -250,8 +265,7 @@ void TrackInfo::extend(int n, bool exact) {
    new_line = new TrackPoint [n];
 
    if(!new_line) {
-      mlog << Error
-           << "\nvoid TrackInfo::extend(int, bool) -> "
+      mlog << Error << "\nvoid TrackInfo::extend(int, bool) -> "
            << "memory allocation error\n\n";
       exit(1);
    }
@@ -310,8 +324,7 @@ void TrackInfo::set_point(int n, const TrackPoint &p) {
 
    // Check range
    if((n < 0) || (n >= NPoints)) {
-      mlog << Error
-           << "\nTrackInfo::set_point(int, const TrackPoint &) -> "
+      mlog << Error << "\nTrackInfo::set_point(int, const TrackPoint &) -> "
            << "range check error for index value " << n << "\n\n";
       exit(1);
    }
@@ -357,8 +370,7 @@ const TrackPoint & TrackInfo::operator[](int n) const {
 
    // Check range
    if((n < 0) || (n >= NPoints)) {
-      mlog << Error
-           << "\nTrackInfo::operator[](int) -> "
+      mlog << Error << "\nTrackInfo::operator[](int) -> "
            << "range check error for index value " << n << "\n\n";
       exit(1);
    }
@@ -388,6 +400,12 @@ int TrackInfo::duration() const {
 int TrackInfo::warm_core_dur() const {
    return(MaxWarmCore == 0 || MinWarmCore == 0 ? bad_data_int :
           MaxWarmCore - MinWarmCore);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+const char * TrackInfo::diag_name(int i) const {
+   return(i>=0 && i<DiagName.n() ? DiagName[i].c_str() : na_str);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -511,6 +529,89 @@ void TrackInfo::add_watch_warn(const ConcatString &ww_sid,
 
    // Loop over the TrackPoints
    for(i=0; i<NPoints; i++) Point[i].set_watch_warn(ww_type, ww_ut);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool TrackInfo::add_diag_data(DiagFile &diag_file, const StringArray &req_diag_name) {
+
+   // Check for a match
+   if(StormId  != diag_file.storm_id() ||
+      InitTime != diag_file.init()     ||
+      !diag_file.technique().has(Technique)) return(false);
+
+   // Store the diagnostic metadata
+   DiagSource  = diag_file.diag_source();
+   TrackSource = diag_file.track_source();
+   FieldSource = diag_file.field_source();
+
+   // If empty, store all diagnostics
+   bool store_all_diag = (req_diag_name.n() == 0 ? true : false);
+
+   int i_name, i_time, i_pnt;
+
+   // Loop over the diagnostics in the file
+   for(i_name=0; i_name<diag_file.n_diag(); i_name++) {
+
+      // Skip diagnostics not requested
+      if(!store_all_diag &&
+         !req_diag_name.has(diag_file.diag_name()[i_name])) continue;
+
+      // Store the diagnostic name
+      DiagName.add(diag_file.diag_name()[i_name]);
+      NumArray diag_val = diag_file.diag_val(diag_file.diag_name()[i_name]);
+
+      // Add diagnostic values to the TrackPoints
+      for(i_time=0; i_time<diag_file.n_time(); i_time++) {
+
+         // Get the index of the TrackPoint for this lead time
+         if((i_pnt = lead_index(nint(diag_file.lead(i_time)))) < 0) continue;
+
+         // Check for consistent location, but only once
+         if(i_name == 0) {
+            if(!is_eq(diag_file.lat(i_time), Point[i_pnt].lat()) ||
+               !is_eq(diag_file.lon(i_time), Point[i_pnt].lon())) {
+               ConcatString cs;
+               cs << "The " << StormId << " " << Technique << " " << unix_to_yyyymmddhh(InitTime)
+                    << " lead time " << sec_to_timestring(diag_file.lead(i_time))
+                    << " track location (" << Point[i_pnt].lat() << ", "
+                    << Point[i_pnt].lon() << ") does not match the "
+                    << diagtype_to_string(DiagSource) << " diagnostic location ("
+                    << diag_file.lat(i_time) << ", " << diag_file.lon(i_time) << ")";
+
+               // Print a warning if the TrackSource and Technique match
+               if(TrackSource == Technique) {
+                  mlog << Warning << "\nTrackInfo::add_diag_data() -> " << cs << "\n\n";
+               }
+               else {
+                  mlog << Debug(4) << cs << "\n";
+               }
+            }
+         }
+
+         // Store this diagnostic value in the TrackPoint
+         Point[i_pnt].add_diag_value(diag_val[i_time]);
+
+      } // end for i_time
+   } // end for i_name
+
+   return(true);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TrackInfo::add_diag_value(int i_pnt, double val) {
+
+   // Range check
+   if(i_pnt < 0 || i_pnt >= NPoints) {
+      mlog << Error << "\nTrackInfo::add_diag_value() -> "
+           << "range check error for point " << i_pnt << "\n\n";
+      exit(1);
+   }
+
+   Point[i_pnt].add_diag_value(val);
 
    return;
 }
@@ -735,8 +836,7 @@ const TrackInfo & TrackInfoArray::operator[](int n) const {
 
    // Check range
    if((n < 0) || (n >= Track.size())) {
-      mlog << Error
-           << "\nTrackInfoArray::operator[](int) -> "
+      mlog << Error << "\nTrackInfoArray::operator[](int) -> "
            << "range check error for index value " << n << "\n\n";
       exit(1);
    }
@@ -759,8 +859,7 @@ void TrackInfoArray::set(int n, const TrackInfo &t) {
 
    // Check range
    if((n < 0) || (n >= Track.size())) {
-      mlog << Error
-           << "\nTrackInfoArray::set(int, const TrackInfo &) -> "
+      mlog << Error << "\nTrackInfoArray::set(int, const TrackInfo &) -> "
            << "range check error for index value " << n << "\n\n";
       exit(1);
    }
@@ -845,6 +944,19 @@ bool TrackInfoArray::erase_storm_id(const ConcatString &s) {
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+int TrackInfoArray::add_diag_data(DiagFile &diag_file, const StringArray &diag_name) {
+   int n_match = 0;
+
+   // Set the names for each track
+   for(int i=0; i<Track.size(); i++) {
+      if(Track[i].add_diag_data(diag_file, diag_name)) n_match++;
+   }
+
+   return(n_match);
+}
+
+////////////////////////////////////////////////////////////////////////
 //
 // Code for misc functions
 //
@@ -862,13 +974,13 @@ TrackInfo consensus(const TrackInfoArray &tracks,
    int        pcnt;
    TrackPoint pavg, psum;
    QuadInfo   wavg;
-   NumArray   plon;
+   NumArray   plon, plat, pvmax, pmslp;
    double     lon_range, lon_shift, lon_avg;
-
+   double     track_spread, track_stdev, vmax_stdev, mslp_stdev;
+   
    // Check for at least one track
    if(tracks.n() == 0) {
-      mlog << Error
-           << "\nTrackInfoArray::consensus() -> "
+      mlog << Error << "\nTrackInfoArray::consensus() -> "
            << "cannot compute a consensus for zero tracks!\n\n";
       exit(1);
    }
@@ -889,8 +1001,7 @@ TrackInfo consensus(const TrackInfoArray &tracks,
       if(tavg.basin()   != tracks[i].basin()   ||
          tavg.cyclone() != tracks[i].cyclone() ||
          tavg.init()    != tracks[i].init()) {
-         mlog << Error
-              << "\nTrackInfoArray::consensus() -> "
+         mlog << Error << "\nTrackInfoArray::consensus() -> "
               << "the basin, cyclone number, and init time must "
               << "remain constant.\n\n";
          exit(1);
@@ -920,12 +1031,15 @@ TrackInfo consensus(const TrackInfoArray &tracks,
    }
 
    // Loop through the lead times and construct a TrackPoint for each
-   for(i=0, skip=false; i<lead_list.n_elements(); i++) {
+   for(i=0, skip=false; i<lead_list.n(); i++) {
 
       // Initialize TrackPoint
       pavg.clear();
       psum.clear();
       plon.clear();
+      plat.clear();
+      pvmax.clear();
+      pmslp.clear();
       pcnt = 0;
 
       // Loop through the tracks and get an average TrackPoint
@@ -948,8 +1062,11 @@ TrackInfo consensus(const TrackInfoArray &tracks,
          if(pcnt == 1) psum  = tracks.Track[j][i_pnt];
          else          psum += tracks.Track[j][i_pnt];
 
-         // Store the longitude values
+         // Store the track point latitude, longitude v_max and mslp values         
          plon.add(tracks.Track[j][i_pnt].lon());
+         plat.add(tracks.Track[j][i_pnt].lat());
+         pvmax.add(tracks.Track[j][i_pnt].v_max());
+         pmslp.add(tracks.Track[j][i_pnt].mslp());
       }
 
       // Check for missing required member and the minimum number of points
@@ -971,7 +1088,7 @@ TrackInfo consensus(const TrackInfoArray &tracks,
 
       // Sum the longitudes, shifting negative values if we've crossed
       // the international date line
-      for(j=0, lon_avg=0; j<plon.n_elements(); j++) {
+      for(j=0, lon_avg=0; j<plon.n(); j++) {
          lon_shift = (lon_range > 180.0 && plon[j] < 0.0 ? 360.0 : 0.0);
          lon_avg += (plon[j] + lon_shift);
       }
@@ -980,6 +1097,26 @@ TrackInfo consensus(const TrackInfoArray &tracks,
       // Store the average lat/lon
       if(!is_bad_data(pavg.lat())) pavg.set_lat(psum.lat()/pcnt);
       if(!is_bad_data(pavg.lon())) pavg.set_lon(rescale_deg(lon_avg, -180.0, 180.0));
+
+      // Save the number of members that went into the consensus
+      if(pcnt > 0) pavg.set_num_members(pcnt);
+      
+      // Compute track mean and standard deviation, convert to nautical-miles
+      compute_gc_dist_stdev(pavg.lat(), pavg.lon(), plat, plon, track_spread, track_stdev);
+
+      if(!is_bad_data(track_spread)) {
+         pavg.set_track_spread(track_spread*tc_nautical_miles_per_km);
+      }
+
+      if(!is_bad_data(track_stdev)) {
+         pavg.set_track_stdev(track_stdev*tc_nautical_miles_per_km);
+      }
+      
+      // Compute wind-speed (v_max) and pressure (mslp) standard deviation
+      vmax_stdev = pvmax.stdev();
+      mslp_stdev = pmslp.stdev();
+      if(!is_bad_data(vmax_stdev)) pavg.set_v_max_stdev(vmax_stdev);
+      if(!is_bad_data(mslp_stdev)) pavg.set_mslp_stdev(mslp_stdev);
 
       // Compute the average winds
       for(j=0; j<NWinds; j++) {
@@ -1010,6 +1147,26 @@ TrackInfo consensus(const TrackInfoArray &tracks,
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+void compute_gc_dist_stdev(const double lat, const double lon,
+                           const NumArray &lats, const NumArray &lons,
+                           double &mean, double &stdev) {
+   NumArray dist_na;
+   
+   // Loop over member lat/lon track values, calculate great-circle distance between memmber values and consensus track
+   for(int i=0; i<lats.n(); i++) {
+      if(is_bad_data(lat)     || is_bad_data(lon) ||
+         is_bad_data(lats[i]) || is_bad_data(lons[i])) continue;
+      dist_na.add(gc_dist(lats[i], lons[i], lat, lon));
+   }
+   
+   // Compute the mean and standard deviation of the distances
+   dist_na.compute_mean_stdev(mean, stdev);
+   
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
 //
 // Determine if the basin/cyclone/init of the storm match any of the
 // storm id's specified in the list.  The storm id consists of:
@@ -1030,7 +1187,7 @@ bool has_storm_id(const StringArray &storm_id,
    bool match = false;
 
    // Loop over the storm id entries
-   for(i=0; i<storm_id.n_elements(); i++) {
+   for(i=0; i<storm_id.n(); i++) {
 
       // Check that the basin matches
       if(strncasecmp(storm_id[i].c_str(), basin.c_str(), 2) != 0) continue;

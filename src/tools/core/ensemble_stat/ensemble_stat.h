@@ -7,25 +7,11 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 ////////////////////////////////////////////////////////////////////////
-//
-//   Filename:   ensemble_stat.h
-//
-//   Description:
-//
-//   Mod#   Date      Name           Description
-//   ----   ----      ----           -----------
-//   000    11/11/08  Halley Gotway  New
-//   001    06/03/14  Halley Gotway  Add PHIST line type.
-//   002    05/10/16  Halley Gotway  Add grid weighting.
-//
-////////////////////////////////////////////////////////////////////////
 
 #ifndef  __ENSEMBLE_STAT_H__
 #define  __ENSEMBLE_STAT_H__
 
 ////////////////////////////////////////////////////////////////////////
-
-using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
@@ -41,7 +27,6 @@ using namespace std;
 #include <unistd.h>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "ensemble_stat_conf_info.h"
 
@@ -94,19 +79,13 @@ static const int n_txt_columns[n_txt] = {
 
 // Input Ensemble files
 static int          n_ens_files;   // Number of ensemble members
-static IntArray     n_ens_vld;     // Number of members with valid data for each ensemble field [n_ens_files]
 static IntArray     n_vx_vld;      // Number of members with valid data for each verification field [n_vx]
 
-static StringArray  ens_file_list;  // Array of ensemble input files
-static StringArray  fcst_file_list; // Array of ensemble input files including control
-static IntArray     ens_file_vld;   // Array of ensemble file valid status
-static IntArray     fcst_file_vld;  // Array of forecast file valid status
+static StringArray  ens_file_list; // Array of ensemble input files
+static IntArray     ens_file_vld;  // Array of ensemble file valid status
 static GrdFileType  etype = FileType_None;
 
-static bool         ens_mean_flag; // Flag for ensemble mean processing
-static ConcatString ens_mean_user; // User-specified ensemble mean data file
-static ConcatString ens_mean_file; // Computed ensemble mean output file
-
+static ConcatString ens_mean_file; // User-specified ensemble mean data file
 static ConcatString ctrl_file;     // Control member file
 static int          ctrl_file_index = bad_data_int; // Control member file index
 
@@ -117,8 +96,7 @@ static bool         grid_obs_flag = false;
 static StringArray  point_obs_file_list;
 static bool         point_obs_flag = false;
 
-static GrdFileType  otype   = FileType_None;
-static bool         vx_flag = false;
+static GrdFileType  otype = FileType_None;
 
 // Input Config file
 static EnsembleStatConfInfo conf_info;
@@ -143,26 +121,27 @@ static int compress_level = -1;
 ////////////////////////////////////////////////////////////////////////
 
 // Output NetCDF file
-static StringArray out_nc_file_list;
-static NcFile      *nc_out  = (NcFile *) 0;
-static NcDim       lat_dim;
-static NcDim       lon_dim;
+static bool         out_nc_flag = false;
+static ConcatString out_nc_file;
+static netCDF::NcFile       *nc_out  = (netCDF::NcFile *) 0;
+static netCDF::NcDim        lat_dim;
+static netCDF::NcDim        lon_dim;
 
 // List of output NetCDF variable names
 static StringArray nc_ens_var_sa;
 static StringArray nc_orank_var_sa;
 
 // Output STAT file
-static ConcatString stat_file;
-static ofstream    *stat_out = (ofstream *)  0;
-static AsciiTable   stat_at;
-static int          i_stat_row;
+static ConcatString     stat_file;
+static std::ofstream    *stat_out = (std::ofstream *)  0;
+static AsciiTable       stat_at;
+static int              i_stat_row;
 
 // Optional ASCII output files
-static ConcatString txt_file[n_txt];
-static ofstream    *txt_out[n_txt];
-static AsciiTable   txt_at[n_txt];
-static int          i_txt_row[n_txt];
+static ConcatString     txt_file[n_txt];
+static std::ofstream    *txt_out[n_txt];
+static AsciiTable       txt_at[n_txt];
+static int              i_txt_row[n_txt];
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -182,12 +161,6 @@ static Met2dDataFileFactory mtddf_factory;
 
 // Strings to be output in the STAT and optional text files
 static StatHdrColumns shc;
-
-// Arrays to store running sums and counts
-static NumArray cnt_na, min_na, max_na, sum_na;
-static NumArray stdev_cnt_na, stdev_sum_na, stdev_ssq_na;
-static NumArray *thresh_cnt_na = (NumArray *) 0; // [n_thresh]
-static NumArray **thresh_nbrhd_cnt_na = (NumArray **) 0; // [n_thresh][n_nbrhd]
 
 ////////////////////////////////////////////////////////////////////////
 

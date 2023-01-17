@@ -54,6 +54,7 @@ extern  unixtime  doyhms_to_unix  (int doy, int year, int hour, int minute, int 
 extern  unixtime  mdyhms_to_unix  (int month, int day, int year, int hour, int minute, int second);
 
 extern  void      unix_to_mdyhms  (unixtime u, int & month, int & day, int & year, int & hour, int & minute, int & second);
+extern  int       month_name_to_m (const char *month_str);
 
 
 extern  int       date_to_mjd     (int m, int d, int y);
@@ -180,14 +181,14 @@ static const double TIME_EPSILON = 0.001;
    //  Bad Data Values
    //
 
-static const int        bad_data_int          = -9999;
-static const long long  bad_data_ll           = -9999LL;
-static const float      bad_data_float        = -9999.f;
-static const double     bad_data_double       = -9999.0;
-static const char       bad_data_str[]        = "-9999";
-static const char       bad_data_char         = '\0';
-static const char       na_str[]              = "NA";
-static const string     na_string             = "NA";
+static const int             bad_data_int          = -9999;
+static const long long       bad_data_ll           = -9999LL;
+static const float           bad_data_float        = -9999.f;
+static const double          bad_data_double       = -9999.0;
+static const char            bad_data_str[]        = "-9999";
+static const char            bad_data_char         = '\0';
+static const char            na_str[]              = "NA";
+static const std::string     na_string             = "NA";
 
 
 ////////////////////////////////////////////////////////////////////////

@@ -20,6 +20,10 @@
 //   Mod#   Date      Name           Description
 //   ----   ----      ----           -----------
 //   000    11-12-14  Halley Gotway  New
+//   001    06-07-22  Halley Gotway  MET #2173 Fix python embedding
+//   002    07-06-22  Howard Soh     METplus-Internal #19 Rename main to met_main
+//   003    09-12-22  Prestopnik     MET #2227 Remove namespace std and netCDF
+//                                   from header files
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -27,17 +31,17 @@ using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
-#include <ctime>
 #include <ctype.h>
 #include <dirent.h>
-#include <iostream>
 #include <fstream>
 #include <stdlib.h>
 #include <math.h>
-#include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+
+#include <netcdf>
+using namespace netCDF;
 
 #include "GridTemplate.h"
 
@@ -49,6 +53,10 @@ using namespace std;
 #include "vx_util.h"
 #include "vx_cal.h"
 #include "vx_math.h"
+
+#ifdef WITH_PYTHON
+#include "data2d_python.h"
+#endif
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -86,13 +94,10 @@ static void set_compress(const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
-int main(int argc, char *argv[]) {
+int met_main(int argc, char *argv[]) {
 
    // Store the program name
    program_name = get_short_name(argv[0]);
-
-   // Set handler to be called for memory allocation error
-   set_new_handler(oom);
 
    // Process the command line arguments
    process_command_line(argc, argv);
@@ -101,6 +106,12 @@ int main(int argc, char *argv[]) {
    process_data_file();
 
    return(0);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+const string get_tool_name() {
+   return "shift_data_plane";
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -200,17 +211,11 @@ void process_data_file() {
    // Populate the VarInfo object using config
    vinfo->set_dict(config);
 
-   // Open the input file
-   if(!mtddf->open(InputFilename.c_str())) {
-      mlog << Error << "\nprocess_data_file() -> can't open file \""
-           << InputFilename << "\"\n\n";
-      exit(1);
-   }
-
    // Get the data plane from the file for this VarInfo object
    if(!mtddf->data_plane(*vinfo, dp_in)) {
-      mlog << Error << "\nprocess_data_file() -> trouble getting field \""
-           << FieldString << "\" from file \"" << InputFilename << "\"\n\n";
+      mlog << Error << "\nprocess_data_file() -> "
+           << "trouble getting field \"" << FieldString
+           << "\" from file \"" << InputFilename << "\"\n\n";
       exit(1);
    }
 
@@ -253,7 +258,6 @@ void process_data_file() {
    mlog << Debug(2) << shift_cs << "\n";
 
    // Shift the data
-
    dp_shift = dp_in;
    for(x=0; x<dp_shift.nx(); x++) {
       for(y=0; y<dp_shift.ny(); y++) {
@@ -270,6 +274,10 @@ void process_data_file() {
    if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) 0; }
    if(vinfo) { delete vinfo; vinfo = (VarInfo *)       0; }
 
+   #ifdef  WITH_PYTHON
+      GP.finalize();
+   #endif
+
    return;
 }
 
@@ -278,6 +286,7 @@ void process_data_file() {
 void write_netcdf(const DataPlane &dp, const Grid &grid,
                   const VarInfo *vinfo, const GrdFileType &ftype) {
    ConcatString cs;
+   NcDim lat_dim, lon_dim;
 
    // Create a new NetCDF file and open it
    NcFile *f_out = open_ncfile(OutputFilename.c_str(), true);
@@ -296,11 +305,7 @@ void write_netcdf(const DataPlane &dp, const Grid &grid,
    add_att(f_out, "RunCommand", shift_cs);
 
    // Add the projection information
-   write_netcdf_proj(f_out, grid);
-
-   // Define Dimensions
-   NcDim lat_dim = add_dim(f_out, "lat", (long) grid.ny());
-   NcDim lon_dim = add_dim(f_out, "lon", (long) grid.nx());
+   write_netcdf_proj(f_out, grid, lat_dim, lon_dim);
 
    // Add the lat/lon variables
    write_netcdf_latlon(f_out, &lat_dim, &lon_dim, grid);
@@ -377,7 +382,7 @@ void usage() {
         << "\t-to   lat lon\n"
         << "\t[-method type]\n"
         << "\t[-width n]\n"
-	      << "\t[-shape SHAPE]\n"
+        << "\t[-shape SHAPE]\n"
         << "\t[-log file]\n"
         << "\t[-v level]\n"
         << "\t[-compress level]\n\n"
@@ -407,8 +412,6 @@ void usage() {
 
         << "\t\t\"-shape\" overrides the default interpolation shape (SQUARE) "
         << "(optional).\n"
-
-
 
         << "\t\t\"-log file\" outputs log messages to the specified "
         << "file (optional).\n"

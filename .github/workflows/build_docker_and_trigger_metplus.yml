@@ -7,6 +7,8 @@ on:
     paths-ignore:
       - 'met/docs/**'
 
+  workflow_dispatch:
+
 env:
   DOCKERHUB_REPO: dtcenter/met-dev
 
@@ -16,17 +18,18 @@ jobs:
     name: Handle Docker Image
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Get branch name
         id: get_branch_name
-        run: echo ::set-output name=branch_name::${GITHUB_REF#"refs/heads/"}
+        run: echo branch_name=${GITHUB_REF#refs/heads/} >> $GITHUB_OUTPUT
 
       - name: Build Docker Image
         run: .github/jobs/build_docker_image.sh
         env:
           SOURCE_BRANCH: ${{ steps.get_branch_name.outputs.branch_name }}-lite
-          MET_BASE_IMAGE: minimum
+          MET_BASE_REPO: met-base
+          MET_BASE_TAG: v1.1
 
       - name: Push Docker Image
         run: .github/jobs/push_docker_image.sh
@@ -44,7 +47,7 @@ jobs:
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: echo "$GITHUB_CONTEXT"
-      - uses: actions/github-script@v5
+      - uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.METPLUS_BOT_TOKEN }}
           script: |

@@ -57,8 +57,8 @@ class PB2NCConfInfo {
       ConcatString tmp_dir;             // Directory for temporary files
       ConcatString version;             // Config file version
 
-      map<ConcatString,ConcatString> obs_bufr_map;
-      map<ConcatString,ConcatString> message_type_map;
+      std::map<ConcatString,ConcatString> obs_bufr_map;
+      std::map<ConcatString,ConcatString> message_type_map;
       StringArray                    surface_message_types;
       TimeSummaryInfo                timeSummaryInfo;
 
@@ -70,8 +70,8 @@ class PB2NCConfInfo {
 
       void clear();
 
-      map<ConcatString,ConcatString> getObsVarMap() const {  return obs_bufr_map; }
-      map<ConcatString,ConcatString> getMessageTypeMap() const { return message_type_map; }
+      std::map<ConcatString,ConcatString> getObsVarMap() const {  return obs_bufr_map; }
+      std::map<ConcatString,ConcatString> getMessageTypeMap() const { return message_type_map; }
       TimeSummaryInfo getSummaryInfo() const { return timeSummaryInfo; };
 
       void read_config(const char *, const char *);

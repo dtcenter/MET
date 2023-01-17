@@ -16,8 +16,9 @@
 //   ----   ----      ----           -----------
 //   000    11/11/08  Halley Gotway  New
 //   001    05/03/10  Halley Gotway  Add fcst/obs/diff variable name
-//                    arrays to keep track of NetCDF variables.
+//                                     arrays to keep track of NetCDF variables.
 //   002    05/10/16  Halley Gotway  Add grid weighting.
+//   003    09/28/22  Prestopnik     MET #2227 Remove namespace std and netCDF from header files
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -25,8 +26,6 @@
 #define  __GRID_STAT_H__
 
 ////////////////////////////////////////////////////////////////////////
-
-using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
@@ -42,7 +41,6 @@ using namespace std;
 #include <unistd.h>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "grid_stat_conf_info.h"
 
@@ -75,7 +73,8 @@ static const char **txt_columns[n_txt] = {
    val1l2_columns,  pct_columns,    pstd_columns,
    pjc_columns,     prc_columns,    eclv_columns,
    nbrctc_columns,  nbrcts_columns, nbrcnt_columns,
-   grad_columns,    vcnt_columns,   dmap_columns
+   grad_columns,    vcnt_columns,   dmap_columns,
+   seeps_columns
 };
 
 // Length of header columns
@@ -86,7 +85,8 @@ static const int n_txt_columns[n_txt] = {
    n_val1l2_columns, n_pct_columns,    n_pstd_columns,
    n_pjc_columns,    n_prc_columns,    n_eclv_columns,
    n_nbrctc_columns, n_nbrcts_columns, n_nbrcnt_columns,
-   n_grad_columns,   n_vcnt_columns,   n_dmap_columns
+   n_grad_columns,   n_vcnt_columns,   n_dmap_columns,
+   n_seeps_columns
 };
 
 // Text file abbreviations
@@ -97,7 +97,8 @@ static const char *txt_file_abbr[n_txt] = {
    "val1l2", "pct",    "pstd",
    "pjc",    "prc",    "eclv",
    "nbrctc", "nbrcts", "nbrcnt",
-   "grad",   "vcnt",   "dmap"
+   "grad",   "vcnt",   "dmap",
+   "seeps"
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -123,26 +124,26 @@ static ConcatString out_dir;
 //
 ////////////////////////////////////////////////////////////////////////
 
-// Output NetCDF file
-static ConcatString out_nc_file;
-static NcFile      *nc_out = (NcFile *) 0;
-static NcDim        lat_dim;
-static NcDim        lon_dim;
+// Output Netcdf file
+static ConcatString         out_nc_file;
+static netCDF::NcFile      *nc_out = (netCDF::NcFile *) 0;
+static netCDF::NcDim        lat_dim;
+static netCDF::NcDim        lon_dim;
 
 // List of output NetCDF variable names
 static StringArray nc_var_sa;
 
 // Output STAT file
-static ConcatString stat_file;
-static ofstream    *stat_out = (ofstream *)  0;
-static AsciiTable   stat_at;
-static int          i_stat_row;
+static ConcatString     stat_file;
+static std::ofstream    *stat_out = (std::ofstream *)  0;
+static AsciiTable       stat_at;
+static int              i_stat_row;
 
 // Optional ASCII output files
-static ConcatString txt_file[n_txt];
-static ofstream    *txt_out[n_txt];
-static AsciiTable   txt_at[n_txt];
-static int          i_txt_row[n_txt];
+static ConcatString     txt_file[n_txt];
+static std::ofstream    *txt_out[n_txt];
+static AsciiTable       txt_at[n_txt];
+static int              i_txt_row[n_txt];
 
 static int compress_level = -1;
 

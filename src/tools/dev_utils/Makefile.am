@@ -34,20 +34,20 @@ bin_PROGRAMS = chk4copyright \
 chk4copyright_SOURCES = chk4copyright.cc
 chk4copyright_CPPFLAGS = ${MET_CPPFLAGS}
 chk4copyright_LDFLAGS = ${MET_LDFLAGS}
-chk4copyright_LDADD = -lvx_util \
-	-lvx_log
+chk4copyright_LDADD = -lvx_log \
+	-lvx_util
 
 reformat_map_data_SOURCES = reformat_map_data.cc
 reformat_map_data_CPPFLAGS = ${MET_CPPFLAGS}
 reformat_map_data_LDFLAGS = ${MET_LDFLAGS}
-reformat_map_data_LDADD = -lvx_util \
-	-lvx_log
+reformat_map_data_LDADD = -lvx_log \
+	-lvx_util
 
 reformat_county_data_SOURCES = reformat_county_data.cc
 reformat_county_data_CPPFLAGS = ${MET_CPPFLAGS}
 reformat_county_data_LDFLAGS = ${MET_LDFLAGS}
-reformat_county_data_LDADD = -lvx_util \
-	-lvx_log
+reformat_county_data_LDADD = -lvx_log \
+	-lvx_util
 
 pbtime_SOURCES = pbtime.cc \
 	../other/pb2nc/openpb.f \
@@ -56,9 +56,9 @@ pbtime_CPPFLAGS = ${MET_CPPFLAGS}
 pbtime_LDFLAGS = ${MET_LDFLAGS}
 pbtime_LDADD = -lvx_pb_util \
 	-lvx_config \
-	-lvx_util \
-	-lvx_cal \
 	-lvx_log \
+	-lvx_cal \
+	-lvx_util \
 	$(BLIB_NAME) \
 	$(FLIBS)
 
@@ -69,9 +69,9 @@ gribtab_dat_to_flat_CPPFLAGS = ${MET_CPPFLAGS}
 gribtab_dat_to_flat_LDFLAGS = ${MET_LDFLAGS}
 gribtab_dat_to_flat_LDADD = -lvx_pb_util \
 	-lvx_config \
-	-lvx_util \
-	-lvx_cal \
 	-lvx_log \
+	-lvx_cal \
+	-lvx_util \
 	$(BLIB_NAME) \
 	$(FLIBS)
 
@@ -82,9 +82,9 @@ nceptab_to_flat_CPPFLAGS = ${MET_CPPFLAGS}
 nceptab_to_flat_LDFLAGS = ${MET_LDFLAGS}
 nceptab_to_flat_LDADD = -lvx_pb_util \
 	-lvx_config \
-	-lvx_util \
-	-lvx_cal \
 	-lvx_log \
+	-lvx_cal \
+	-lvx_util \
 	$(BLIB_NAME) \
 	$(FLIBS)
 
@@ -94,10 +94,10 @@ insitu_nc_to_ascii_CPPFLAGS = ${MET_CPPFLAGS}
 insitu_nc_to_ascii_LDFLAGS = ${MET_LDFLAGS}
 insitu_nc_to_ascii_LDADD = -lvx_nc_util \
 	-lvx_config \
+	-lvx_log \
 	-lvx_util \
 	-lvx_cal \
 	-lvx_math \
-	-lvx_log \
 	-lm -lnetcdf_c++4 -lnetcdf
 
 swinging_door_SOURCES = swinging_door.cc \
@@ -111,6 +111,7 @@ swinging_door_LDADD = -lvx_time_series \
 	-lvx_cal \
 	-lvx_math \
 	-lvx_log \
+	-lvx_util \
 	-lm -lnetcdf_c++4 -lnetcdf
 
 gen_climo_bin_SOURCES = gen_climo_bin.cc
@@ -133,6 +134,7 @@ gen_climo_bin_LDADD = -lvx_stat_out \
 	-lvx_regrid \
 	-lvx_grid \
 	-lvx_config \
+	-lvx_util_math \
 	-lvx_util \
 	-lvx_cal \
 	-lvx_gsl_prob \

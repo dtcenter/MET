@@ -14,6 +14,8 @@
 //
 //   Mod#   Date      Name           Description
 //   ----   ----      ----           -----------
+//   000    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
+//   001    09/28/22  Prestopnik     MET #2227 Remove namespace std from header files
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -21,13 +23,10 @@ using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
-#include <ctime>
 #include <ctype.h>
 #include <dirent.h>
-#include <iostream>
 #include <fstream>
 #include <math.h>
-#include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -56,7 +55,7 @@ extern "C" {
 
 ////////////////////////////////////////////////////////////////////////
 
-int main(int argc, char *argv[]) {
+int met_main(int argc, char *argv[]) {
    int i_date;
    ConcatString pb_file, blk_file;
    unixtime ut;
@@ -94,6 +93,12 @@ int main(int argc, char *argv[]) {
    remove_temp_file(blk_file);
 
    return(0);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+const string get_tool_name() {
+   return program_name;
 }
 
 ////////////////////////////////////////////////////////////////////////

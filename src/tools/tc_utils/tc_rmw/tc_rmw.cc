@@ -16,22 +16,27 @@
 //   ----   ----      ----           -----------
 //   000   04/18/19  Fillmore        New
 //   001   05/15/20  Halley Gotway   Fix data file list option logic.
+//   002   07/06/22  Howard Soh      METplus-Internal #19 Rename main to met_main
+//   003   09/28/22  Prestopnik      MET #2227 Remove namspace std and netCDF from header files
 //
 ////////////////////////////////////////////////////////////////////////
 
+using namespace std;
+
 #include <cstdio>
 #include <cstdlib>
-#include <ctime>
 #include <ctype.h>
 #include <dirent.h>
-#include <iostream>
 #include <fstream>
 #include <math.h>
-#include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
 
+#include <netcdf>
+using namespace netCDF;
+
+#include "main.h"
 #include "tc_rmw.h"
 
 #include "tcrmw_grid.h"
@@ -45,6 +50,7 @@
 #include "vx_data2d_nc_met.h"
 #include "vx_util.h"
 #include "vx_log.h"
+#include "vx_math.h"
 
 #include "met_file.h"
 
@@ -75,17 +81,11 @@ static void build_outfile_name(const ConcatString&,
     const char*, ConcatString&);
 static void compute_lat_lon(TcrmwGrid&,
     double*, double*);
-static void wind_ne_to_ra(TcrmwGrid&,
-    DataPlane&, DataPlane&,
-    double*, double*, double*, double*);
 static void process_fields(const TrackInfoArray&);
 
 ////////////////////////////////////////////////////////////////////////
 
-int main(int argc, char *argv[]) {
-
-    // Set handler for memory allocation error
-    set_new_handler(oom); // out of memory
+int met_main(int argc, char *argv[]) {
 
     // Process command line arguments
     process_command_line(argc, argv);
@@ -100,6 +100,12 @@ int main(int argc, char *argv[]) {
     process_rmw();
 
     return(0);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+const string get_tool_name() {
+   return "tc_rmw";
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -194,6 +200,9 @@ void process_command_line(int argc, char **argv) {
 
     // Process the configuration
     conf_info.process_config(ftype);
+
+    // initialize the new thing
+    wind_converter.init(&conf_info);
 
     return;
 }
@@ -583,12 +592,11 @@ void setup_nc_file() {
         // Get VarInfo
         data_info = conf_info.data_info[i_var];
         mlog << Debug(4) << "Processing field: " << data_info->magic_str() << "\n";
-        variable_levels[data_info->name_attr()].push_back(
-            data_info->level_attr());
-        variable_long_names[data_info->name_attr()]
-            = data_info->long_name_attr();
-        variable_units[data_info->name_attr()]
-            = data_info->units_attr();
+	string fname = data_info->name_attr();
+        variable_levels[fname].push_back(data_info->level_attr());
+        variable_long_names[fname] = data_info->long_name_attr();
+        variable_units[fname] = data_info->units_attr();
+	wind_converter.update_input(fname, data_info->units_attr());
     }
 
     // Define pressure levels
@@ -598,6 +606,8 @@ void setup_nc_file() {
         = get_pressure_level_indices(pressure_level_strings, pressure_levels);
     pressure_dim = add_dim(nc_out, "pressure", pressure_levels.size());
     def_tc_pressure(nc_out, pressure_dim, pressure_levels);
+
+    wind_converter.append_nc_output_vars(variable_levels, variable_long_names, variable_units);
 
     def_tc_variables(nc_out,
         variable_levels, variable_long_names, variable_units,
@@ -627,33 +637,6 @@ void compute_lat_lon(TcrmwGrid& tcrmw_grid,
 
 ////////////////////////////////////////////////////////////////////////
 
-void wind_ne_to_ra(TcrmwGrid& tcrmw_grid,
-    DataPlane& u_dp, DataPlane& v_dp,
-    double* lat_arr, double* lon_arr,
-    double* wind_r_arr, double* wind_a_arr) {
-
-    // Transform (u, v) to (radial, azimuthal)
-    for(int ir = 0; ir < tcrmw_grid.range_n(); ir++) {
-        for(int ia = 0; ia < tcrmw_grid.azimuth_n(); ia++) {
-            int i = ir * tcrmw_grid.azimuth_n() + ia;
-            double lat = lat_arr[i];
-            double lon = - lon_arr[i];
-            double u = u_dp.data()[i];
-            double v = v_dp.data()[i];
-            double wind_r;
-            double wind_a;
-            tcrmw_grid.wind_ne_to_ra(
-                lat, lon, u, v, wind_r, wind_a);
-            // tcrmw_grid.wind_ne_to_ra_conventional(
-            //     lat, lon, u, v, wind_r, wind_a);
-            wind_r_arr[i] = wind_r;
-            wind_a_arr[i] = wind_a;
-        }
-    }
-}
-
-////////////////////////////////////////////////////////////////////////
-
 void process_fields(const TrackInfoArray& tracks) {
 
     VarInfo *data_info = (VarInfo *) 0;
@@ -672,7 +655,7 @@ void process_fields(const TrackInfoArray& tracks) {
          << track.n_points() << " points.\n";
 
     // Loop over track points
-    for(int i_point = 0; i_point < track.n_points(); i_point++) {
+    for (int i_point = 0; i_point < track.n_points(); i_point++) {
 
         TrackPoint point = track[i_point];
         unixtime valid_time = point.valid();
@@ -711,7 +694,11 @@ void process_fields(const TrackInfoArray& tracks) {
 
             // Update the variable info with the valid time of the track point
             data_info = conf_info.data_info[i_var];
-            data_info->set_valid(valid_time);
+
+	    string sname = data_info->name_attr().string();
+	    string slevel = data_info->level_attr().string();
+
+	    data_info->set_valid(valid_time);
 
             // Find data for this track point
             get_series_entry(i_point, data_info, data_files, ftype, data_dp,
@@ -725,11 +712,25 @@ void process_fields(const TrackInfoArray& tracks) {
 
             // Regrid data
             data_dp = met_regrid(data_dp,
-                latlon_arr, grid, data_info->regrid());
-            data_dp.data_range(data_min, data_max);
+				 latlon_arr, grid, data_info->regrid());
+	    data_dp.data_range(data_min, data_max);
             mlog << Debug(4) << "data_min:" << data_min << "\n";
             mlog << Debug(4) << "data_max:" << data_max << "\n";
 
+	    // if this is "U", setup everything for matching "V" and compute the radial/tangential
+	    if (wind_converter.compute_winds_if_input_is_u(i_point, sname, slevel, valid_time, data_files, ftype,
+							   latlon_arr, lat_arr, lon_arr, grid, data_dp, tcrmw_grid))
+	    {
+	      write_tc_pressure_level_data(nc_out, tcrmw_grid,
+					   pressure_level_indices, data_info->level_attr(), i_point,
+					   data_3d_vars[conf_info.radial_velocity_field_name.string()],
+					   wind_converter.get_wind_r_arr());
+	      write_tc_pressure_level_data(nc_out, tcrmw_grid,
+					   pressure_level_indices, data_info->level_attr(), i_point,
+					   data_3d_vars[conf_info.tangential_velocity_field_name.string()],
+					   wind_converter.get_wind_t_arr());
+	    }
+	    
             // Write data
             if (variable_levels[data_info->name_attr()].size() > 1) {
                 write_tc_pressure_level_data(nc_out, tcrmw_grid,

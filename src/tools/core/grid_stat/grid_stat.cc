@@ -109,6 +109,8 @@
 //                    filtering options.
 //   052    05/28/21  Halley Gotway  Add MCTS HSS_EC output.
 //   053    12/11/21  Halley Gotway  MET #1991 Fix VCNT output.
+//   054    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
+//   055    10/03/22  Prestopnik     MET #2227 Remove using namespace netCDF from header files
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -116,17 +118,18 @@ using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
-#include <ctime>
 #include <ctype.h>
 #include <dirent.h>
-#include <iostream>
 #include <fstream>
 #include <math.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <unistd.h>
 
+#include <netcdf>
+using namespace netCDF;
+
+#include "main.h"
 #include "handle_openmp.h"
 
 #include "grid_stat.h"
@@ -135,6 +138,7 @@ using namespace std;
 #include "vx_nc_util.h"
 #include "vx_regrid.h"
 #include "vx_log.h"
+#include "seeps.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -185,13 +189,10 @@ static bool read_data_plane(VarInfo* info, DataPlane& dp, Met2dDataFile* mtddf,
 
 ////////////////////////////////////////////////////////////////////////
 
-int main(int argc, char *argv[]) {
+int met_main(int argc, char *argv[]) {
 
    // Set up OpenMP (if enabled)
    init_openmp();
-
-   // Set handler to be called for memory allocation error
-   set_new_handler(oom);
 
    // Process the command line arguments
    process_command_line(argc, argv);
@@ -203,6 +204,13 @@ int main(int argc, char *argv[]) {
    clean_up();
 
    return(0);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+const string get_tool_name()
+{
+   return "grid_stat";
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -387,6 +395,7 @@ void setup_txt_files(unixtime valid_ut, int lead_sec) {
 
    // Setup the STAT AsciiTable
    stat_at.set_size(conf_info.n_stat_row() + 1, max_col);
+
    setup_table(stat_at);
 
    // Write the text header row
@@ -542,11 +551,7 @@ void setup_nc_file(const GridStatNcOutInfo & nc_info,
    }
 
    // Add the projection information
-   write_netcdf_proj(nc_out, grid);
-
-   // Define Dimensions
-   lat_dim = add_dim(nc_out,"lat", (long) grid.ny());
-   lon_dim = add_dim(nc_out,"lon", (long) grid.nx());
+   write_netcdf_proj(nc_out, grid, lat_dim, lon_dim);
 
    // Add the lat/lon variables
    if(nc_info.do_latlon) {
@@ -628,6 +633,8 @@ void process_scores() {
    DataPlane fu_dp_smooth, ou_dp_smooth;
    DataPlane cmnu_dp, csdu_dp, cmnu_dp_smooth;
    PairDataPoint pd_u;
+
+   DataPlane seeps_dp, seeps_dp_fcat, seeps_dp_ocat;
 
    CTSInfo    *cts_info    = (CTSInfo *) 0;
    MCTSInfo    mcts_info;
@@ -1114,6 +1121,29 @@ void process_scores() {
                            i, mthd, pnts, conf_info.vx_opt[i].interp_info.field);
                }
             } // end for it
+         }
+
+         // Write out the fields of requested SEEPS
+         if(conf_info.vx_opt[i].output_flag[i_seeps] != STATOutputType_None
+               && conf_info.vx_opt[i].fcst_info->is_precipitation()
+               && conf_info.vx_opt[i].obs_info->is_precipitation()) {
+            SeepsAggScore seeps;
+            int month, day, year, hour, minute, second;
+
+            unix_to_mdyhms(fcst_dp.valid(), month, day, year, hour, minute, second);
+            compute_aggregated_seeps_grid(fcst_dp_smooth, obs_dp_smooth,
+                                          seeps_dp, seeps_dp_fcat, seeps_dp_ocat,
+                                          &seeps, month, hour,
+                                          conf_info.vx_opt[i].seeps_p1_thresh);
+
+            write_nc("SEEPS_MPR_SCORE", seeps_dp, i, mthd, pnts,
+                     conf_info.vx_opt[i].interp_info.field);
+            write_nc("SEEPS_MPR_FCAT", seeps_dp_fcat, i, mthd, pnts,
+                     conf_info.vx_opt[i].interp_info.field);
+            write_nc("SEEPS_MPR_OCAT", seeps_dp_ocat, i, mthd, pnts,
+                     conf_info.vx_opt[i].interp_info.field);
+            write_seeps_row(shc, &seeps, conf_info.output_flag[i_seeps],
+                            stat_at, i_stat_row, txt_at[i_seeps], i_txt_row[i_seeps]);
          }
 
          // Compute gradient statistics if requested in the config file
@@ -1877,6 +1907,7 @@ void do_cts(CTSInfo *&cts_info, int i_vx,
    //
    n_cts = conf_info.vx_opt[i_vx].fcat_ta.n();
    for(i=0; i<n_cts; i++) {
+      cts_info[i].cts.set_ec_value(conf_info.vx_opt[i_vx].hss_ec_value);
       cts_info[i].fthresh = conf_info.vx_opt[i_vx].fcat_ta[i];
       cts_info[i].othresh = conf_info.vx_opt[i_vx].ocat_ta[i];
       cts_info[i].allocate_n_alpha(conf_info.vx_opt[i_vx].get_n_ci_alpha());
@@ -2155,7 +2186,7 @@ void do_cnt_sl1l2(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
 void do_vl1l2(VL1L2Info *&v_info, int i_vx,
               const PairDataPoint *pd_u_ptr,
               const PairDataPoint *pd_v_ptr) {
-   int i;
+   int i, j;
 
    // Check that the number of pairs are the same
    if(pd_u_ptr->n_obs != pd_v_ptr->n_obs) {
@@ -2178,6 +2209,11 @@ void do_vl1l2(VL1L2Info *&v_info, int i_vx,
       v_info[i].fthresh = conf_info.vx_opt[i_vx].fwind_ta[i];
       v_info[i].othresh = conf_info.vx_opt[i_vx].owind_ta[i];
       v_info[i].logic   = conf_info.vx_opt[i_vx].wind_logic;
+      v_info[i].allocate_n_alpha(conf_info.vx_opt[i_vx].get_n_ci_alpha());
+
+      for(j=0; j<conf_info.vx_opt[i_vx].get_n_ci_alpha(); j++) {
+         v_info[i].alpha[j] = conf_info.vx_opt[i_vx].ci_alpha[j];
+      }
 
       //
       // Compute partial sums
@@ -2650,6 +2686,26 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
                    << obs_long_name;
          level_att = shc.get_obs_lev();
          units_att = conf_info.vx_opt[i_vx].obs_info->units_attr();
+      }
+      else if(strncmp(field_name.c_str(), "SEEPS_MPR", 9) == 0) {
+         ConcatString seeps_desc;
+         var_name  << cs_erase << field_name << "_"
+                   << obs_name << var_suffix << "_" << mask_str;
+         if(field_type == FieldType_Obs ||
+            field_type == FieldType_Both) {
+            var_name << interp_str;
+         }
+         if(strncmp(field_name.c_str(), "SEEPS_MPR_SCORE", 15) == 0)
+            seeps_desc = "score";
+         else if(strncmp(field_name.c_str(), "SEEPS_MPR_FCAT", 14) == 0)
+            seeps_desc = "forecast category";
+         else if(strncmp(field_name.c_str(), "SEEPS_MPR_OCAT", 14) == 0)
+            seeps_desc = "observation category";
+         long_att << cs_erase
+                  << "SEEPS MPR " << seeps_desc << " for "
+                  << obs_long_name;
+         level_att = shc.get_obs_lev();
+         units_att = "";
       }
       else {
          mlog << Error << "\nwrite_nc() -> "

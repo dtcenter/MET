@@ -567,7 +567,9 @@ void DbfSubRecord::set(unsigned char * buf)
 
 clear();
 
-field_name = "";
+string str_buf((char *) buf);
+
+field_name = str_buf.substr(0, 10);
 
 field_type = buf[11];
 

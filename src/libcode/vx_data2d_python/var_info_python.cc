@@ -159,6 +159,13 @@ void VarInfoPython::set_dict(Dictionary & dict) {
    ReqName = dict.lookup_string(conf_key_name, true);
 
    //
+   //  the "level" entry is optional but is used when pairing U/V verification
+   //  tasks and is stored in LevelInfo::ReqName
+   //
+
+   Level.set_req_name(dict.lookup_string(conf_key_level, false, false).c_str());
+
+   //
    //  hard-code the magic string as PYTHON
    //
 

@@ -22,6 +22,7 @@ using namespace std;
 #include "summary_calc_mean.h"
 #include "summary_calc_median.h"
 #include "summary_calc_min.h"
+#include "summary_calc_sum.h"
 #include "summary_calc_percentile.h"
 #include "summary_calc_range.h"
 #include "summary_calc_stdev.h"
@@ -176,11 +177,11 @@ bool SummaryObs::summarizeObs(const TimeSummaryInfo &summary_info)
    {
       mlog << Debug(3) << "Computing "
            << unix_to_yyyymmdd_hhmmss(time_interval->getBaseTime())
-           << " time summary from "
+           << " time summary ("
            << unix_to_yyyymmdd_hhmmss(time_interval->getStartTime())
-           << " to "
+           << " <= time < "
            << unix_to_yyyymmdd_hhmmss(time_interval->getEndTime())
-           << ".\n";
+           << ").\n";
 
       // Initialize the map used to sort observations in this time period
       // into their correct summary groups
@@ -365,6 +366,17 @@ vector< SummaryCalc* > SummaryObs::getSummaryCalculators(const TimeSummaryInfo &
       else if (type == "median") {
         calculators.push_back(new SummaryCalcMedian);
       }
+      else if (type == "sum") {
+        calculators.push_back(new SummaryCalcSum);
+
+        // Check for vld_thresh = 1.0
+        if (!is_eq(info.vld_thresh, 1.0)) {
+           mlog << Warning << "\nIn the \"time_summary\" dictionary, "
+                << "consider setting \"vld_thresh\" (" << info.vld_thresh
+                << ") to 1.0 for the \"sum\" type to better handle "
+                << "missing data.\n\n";
+        }
+      }
       else if (type[0] == 'p') {
         calculators.push_back(new SummaryCalcPercentile(type));
       }
@@ -403,12 +415,12 @@ vector< TimeSummaryInterval > SummaryObs::getTimeIntervals(
    vector< TimeSummaryInterval > time_intervals;
    time_t interval_time = getIntervalTime(first_data_time, info.beg, info.end,
                                           info.step, info.width_beg, info.width_end);
-   while (interval_time < last_data_time) {
+   while (interval_time <= last_data_time) {
       // We need to process each day separately so that we can always start
       // at the indicated start time on each day.
       time_t day_end_time = getEndOfDay(interval_time);
       while (interval_time < day_end_time &&
-             interval_time < last_data_time)
+             interval_time <= last_data_time)
       {
          // See if the current time is within the defined time intervals
          if (isInTimeInterval(interval_time, info.beg, info.end)) {

@@ -169,7 +169,7 @@ _________________________
   valid_hour = [];
   lead       = [];
 
-The **valid_hour**, and **lead** fields stratify by the initialization time, valid time, and lead time, respectively. This field specifies a comma-separated list of initialization times, valid times, and lead times in **HH[MMSS]** format. Using the **-valid_hour** and **-lead** options within the job command lines may further refine these selections.
+The **valid_hour**, and **lead** fields stratify by the valid time and lead time, respectively. This field specifies a comma-separated list of valid times and lead times in **HH[MMSS]** format. Using the **-valid_hour** and **-lead** options within the job command lines may further refine these selections.
 
 _________________________
 
@@ -245,7 +245,7 @@ _________________________
   column_str_name = [];
   column_str_val  = [];
 
-The **column_str_name** and **column_str_val** fields stratify by performing string matching on non-numeric data columns. Specify a comma-separated list of columns names and values to be **included** in the analysis. The length of the **column_str_val** should match that of the **column_str_name**. Using the **-column_str name val** option within the job command lines may further refine these selections.
+The **column_str_name** and **column_str_val** fields stratify by performing string matching on non-numeric data columns. Specify a comma-separated list of columns names and values to be **included** in the analysis. The length of the **column_str_val** should match that of the **column_str_name**. Using the **-column_str name value** option within the job command lines may further refine these selections.
 
 _________________________
 
@@ -254,7 +254,7 @@ _________________________
   column_str_exc_name = [];
   column_str_exc_val  = [];
 
-The **column_str_exc_name** and **column_str_exc_val** fields stratify by performing string matching on non-numeric data columns. Specify a comma-separated list of columns names and values to be **excluded** from the analysis. The length of the **column_str_exc_val** should match that of the **column_str_exc_name**. Using the **-column_str_exc name val** option within the job command lines may further refine these selections.
+The **column_str_exc_name** and **column_str_exc_val** fields stratify by performing string matching on non-numeric data columns. Specify a comma-separated list of columns names and values to be **excluded** from the analysis. The length of the **column_str_exc_val** should match that of the **column_str_exc_name**. Using the **-column_str_exc name value** option within the job command lines may further refine these selections.
 
 _________________________
 
@@ -263,7 +263,7 @@ _________________________
   init_thresh_name = [];
   init_thresh_val  = [];
 
-The **init_thresh_name** and **init_thresh_val** fields stratify by applying thresholds to numeric data columns only when lead = 0. If lead = 0, but the value does not meet the threshold, discard the entire track. The length of the **init_thresh_val** should match that of the **init_thresh_name**. Using the **-init_thresh name val** option within the job command lines may further refine these selections.
+The **init_thresh_name** and **init_thresh_val** fields stratify by applying thresholds to numeric data columns only when lead = 0. If lead = 0, but the value does not meet the threshold, discard the entire track. The length of the **init_thresh_val** should match that of the **init_thresh_name**. Using the **-init_thresh name thresh** option within the job command lines may further refine these selections.
 
 _________________________
 
@@ -272,7 +272,7 @@ _________________________
   init_str_name = [];
   init_str_val  = [];
 
-The **init_str_name** and **init_str_val** fields stratify by performing string matching on non-numeric data columns only when lead = 0. If lead = 0, but the string **does not** match, discard the entire track. The length of the **init_str_val** should match that of the **init_str_name**. Using the **-init_str name val** option within the job command lines may further refine these selections.
+The **init_str_name** and **init_str_val** fields stratify by performing string matching on non-numeric data columns only when lead = 0. If lead = 0, but the string **does not** match, discard the entire track. The length of the **init_str_val** should match that of the **init_str_name**. Using the **-init_str name value** option within the job command lines may further refine these selections.
 
 _________________________
 
@@ -281,7 +281,25 @@ _________________________
   init_str_exc_name = [];
   init_str_exc_val  = [];
 
-The **init_str_exc_name** and **init_str_exc_val** fields stratify by performing string matching on non-numeric data columns only when lead = 0. If lead = 0, and the string **does** match, discard the entire track. The length of the **init_str_exc_val** should match that of the **init_str_exc_name**. Using the **-init_str_exc name val** option within the job command lines may further refine these selections.
+The **init_str_exc_name** and **init_str_exc_val** fields stratify by performing string matching on non-numeric data columns only when lead = 0. If lead = 0, and the string **does** match, discard the entire track. The length of the **init_str_exc_val** should match that of the **init_str_exc_name**. Using the **-init_str_exc name value** option within the job command lines may further refine these selections.
+
+_________________________
+
+.. code-block:: none
+
+  diag_thresh_name = [];
+  diag_thresh_val  = [];
+
+The **diag_thresh_name** and **diag_thresh_val** fields stratify individual track points by applying thresholds to numeric data columns from the TCDIAG lines. Specify a comma-separated list of diagnostics names and thresholds to be applied. The length of **diag_thresh_val** should match that of **diag_thresh_name**. If the storm diagnostic does not meet the threshold, discard both the TCMPR and TCDIAG lines for that track point. Using the **-diag_thresh name thresh** option within the job command lines may further refine these selections.
+
+_________________________
+
+.. code-block:: none
+
+  init_diag_thresh_name = [];
+  init_diag_thresh_val  = [];
+
+The **init_diag_thresh_name** and **init_diag_thresh_val** fields stratify entire tracks by applying thresholds to numeric data columns from the TCDIAG lines, but only when lead = 0. If lead = 0, but the storm diagnostic does not meet the threshold, discard the entire track. The length of the **init_diag_thresh_val** should match that of the **init_diag_thresh_name**. Using the **-init_diag_thresh name thresh** option within the job command lines may further refine these selections.
 
 _________________________
 

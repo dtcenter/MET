@@ -36,7 +36,7 @@ static const char * fho_columns [] = {
 
 static const char * ctc_columns [] = {
    "TOTAL",       "FY_OY",       "FY_ON",
-   "FN_OY",       "FN_ON"
+   "FN_OY",       "FN_ON",       "EC_VALUE"
 };
 
 static const char * cts_columns [] = {
@@ -60,7 +60,8 @@ static const char * cts_columns [] = {
    "SEDS",        "SEDS_NCL",    "SEDS_NCU",    "SEDS_BCL",    "SEDS_BCU",
    "EDI",         "EDI_NCL",     "EDI_NCU",     "EDI_BCL",     "EDI_BCU",
    "SEDI",        "SEDI_NCL",    "SEDI_NCU",    "SEDI_BCL",    "SEDI_BCU",
-   "BAGSS",       "BAGSS_BCL",   "BAGSS_BCU"
+   "BAGSS",       "BAGSS_BCL",   "BAGSS_BCU",
+   "HSS_EC",      "HSS_EC_BCL",  "HSS_EC_BCU",  "EC_VALUE"
 };
 
 static const char * mctc_columns [] = {
@@ -123,39 +124,40 @@ static const char * vl1l2_columns [] = {
    "TOTAL",       "UFBAR",       "VFBAR",
    "UOBAR",       "VOBAR",       "UVFOBAR",
    "UVFFBAR",     "UVOOBAR",     "F_SPEED_BAR",
-   "O_SPEED_BAR",
+   "O_SPEED_BAR"
 };
 
 static const char * val1l2_columns [] = {
    "TOTAL",       "UFABAR",      "VFABAR",
    "UOABAR",      "VOABAR",      "UVFOABAR",
-   "UVFFABAR",    "UVOOABAR"
+   "UVFFABAR",    "UVOOABAR",    "FA_SPEED_BAR",
+   "OA_SPEED_BAR"
 };
 
 
 static const char * vcnt_columns [] = {
-
    "TOTAL",
-
-   "FBAR",         "FBAR_BCL",         "FBAR_BCU",
-   "OBAR",         "OBAR_BCL",         "OBAR_BCU",
-   "FS_RMS",       "FS_RMS_BCL",       "FS_RMS_BCU",
-   "OS_RMS",       "OS_RMS_BCL",       "OS_RMS_BCU",
-   "MSVE",         "MSVE_BCL",         "MSVE_BCU",
-   "RMSVE",        "RMSVE_BCL",        "RMSVE_BCU",
-   "FSTDEV",       "FSTDEV_BCL",       "FSTDEV_BCU",
-   "OSTDEV",       "OSTDEV_BCL",       "OSTDEV_BCU",
-   "FDIR",         "FDIR_BCL",         "FDIR_BCU",
-   "ODIR",         "ODIR_BCL",         "ODIR_BCU",
-   "FBAR_SPEED",   "FBAR_SPEED_BCL",   "FBAR_SPEED_BCU",
-   "OBAR_SPEED",   "OBAR_SPEED_BCL",   "OBAR_SPEED_BCU",
-   "VDIFF_SPEED",  "VDIFF_SPEED_BCL",  "VDIFF_SPEED_BCU",
-   "VDIFF_DIR",    "VDIFF_DIR_BCL",    "VDIFF_DIR_BCU",
-   "SPEED_ERR",    "SPEED_ERR_BCL",    "SPEED_ERR_BCU",
-   "SPEED_ABSERR", "SPEED_ABSERR_BCL", "SPEED_ABSERR_BCU",
-   "DIR_ERR",      "DIR_ERR_BCL",      "DIR_ERR_BCU",
-   "DIR_ABSERR",   "DIR_ABSERR_BCL",   "DIR_ABSERR_BCU",
-
+   "FBAR",             "FBAR_BCL",             "FBAR_BCU",
+   "OBAR",             "OBAR_BCL",             "OBAR_BCU",
+   "FS_RMS",           "FS_RMS_BCL",           "FS_RMS_BCU",
+   "OS_RMS",           "OS_RMS_BCL",           "OS_RMS_BCU",
+   "MSVE",             "MSVE_BCL",             "MSVE_BCU",
+   "RMSVE",            "RMSVE_BCL",            "RMSVE_BCU",
+   "FSTDEV",           "FSTDEV_BCL",           "FSTDEV_BCU",
+   "OSTDEV",           "OSTDEV_BCL",           "OSTDEV_BCU",
+   "FDIR",             "FDIR_BCL",             "FDIR_BCU",
+   "ODIR",             "ODIR_BCL",             "ODIR_BCU",
+   "FBAR_SPEED",       "FBAR_SPEED_BCL",       "FBAR_SPEED_BCU",
+   "OBAR_SPEED",       "OBAR_SPEED_BCL",       "OBAR_SPEED_BCU",
+   "VDIFF_SPEED",      "VDIFF_SPEED_BCL",      "VDIFF_SPEED_BCU",
+   "VDIFF_DIR",        "VDIFF_DIR_BCL",        "VDIFF_DIR_BCU",
+   "SPEED_ERR",        "SPEED_ERR_BCL",        "SPEED_ERR_BCU",
+   "SPEED_ABSERR",     "SPEED_ABSERR_BCL",     "SPEED_ABSERR_BCU",
+   "DIR_ERR",          "DIR_ERR_BCL",          "DIR_ERR_BCU",
+   "DIR_ABSERR",       "DIR_ABSERR_BCL",       "DIR_ABSERR_BCU",
+   "ANOM_CORR",        "ANOM_CORR_NCL",        "ANOM_CORR_NCU",
+   "ANOM_CORR_BCL",    "ANOM_CORR_BCU",
+   "ANOM_CORR_UNCNTR", "ANOM_CORR_UNCNTR_BCL", "ANOM_CORR_UNCNTR_BCU",
 };
 
 static const char * pct_columns [] = {
@@ -260,12 +262,15 @@ static const char * isc_columns [] = {
 };
 
 static const char * ecnt_columns [] = {
-   "TOTAL",       "N_ENS",       "CRPS",
-   "CRPSS",       "IGN",         "ME",
-   "RMSE",        "SPREAD",      "ME_OERR",
-   "RMSE_OERR",   "SPREAD_OERR", "SPREAD_PLUS_OERR",
-   "CRPSCL",      "CRPS_EMP",    "CRPSCL_EMP",
-   "CRPSS_EMP"
+   "TOTAL",       "N_ENS",         "CRPS",
+   "CRPSS",       "IGN",           "ME",
+   "RMSE",        "SPREAD",        "ME_OERR",
+   "RMSE_OERR",   "SPREAD_OERR",   "SPREAD_PLUS_OERR",
+   "CRPSCL",      "CRPS_EMP",      "CRPSCL_EMP",
+   "CRPSS_EMP",   "CRPS_EMP_FAIR", "SPREAD_MD",
+   "MAE",         "MAE_OERR",      "BIAS_RATIO",
+   "N_GE_OBS",    "ME_GE_OBS",     "N_LT_OBS",
+   "ME_LT_OBS"
 };
 
 static const char * rps_columns [] = {
@@ -360,6 +365,23 @@ static const char * job_ramp_mpr_columns [] = {
    "CATEGORY"
 };
 
+static const char * seeps_mpr_columns [] = {
+   "OBS_SID",     "OBS_LAT",     "OBS_LON",
+   "FCST",        "OBS",         "OBS_QC",
+   "FCST_CAT",    "OBS_CAT",     "P1",
+   "P2",          "T1",          "T2",
+   "SEEPS"
+};
+
+static const char * seeps_columns [] = {
+   "TOTAL",       "S12",         "S13",
+   "S21",         "S23",         "S31",
+   "S32",         "PF1",         "PF2",
+   "PF3",         "PV1",         "PV2",
+   "PV3",         "MEAN_FCST",   "MEAN_OBS",
+   "SEEPS"
+};
+
 ////////////////////////////////////////////////////////////////////////
 
 static const int max_stat_col           = 100;
@@ -379,6 +401,8 @@ static const int n_sal1l2_columns       = sizeof(sal1l2_columns)/sizeof(*sal1l2_
 static const int n_vl1l2_columns        = sizeof(vl1l2_columns)/sizeof(*vl1l2_columns);
 static const int n_val1l2_columns       = sizeof(val1l2_columns)/sizeof(*val1l2_columns);
 static const int n_vcnt_columns         = sizeof(vcnt_columns)/sizeof(*vcnt_columns);
+static const int n_seeps_columns        = sizeof(seeps_columns)/sizeof(*seeps_columns);
+static const int n_seeps_mpr_columns    = sizeof(seeps_mpr_columns)/sizeof(*seeps_mpr_columns);
 
 static const int n_pct_columns          = sizeof(pct_columns)/sizeof(*pct_columns);
 static const int n_pstd_columns         = sizeof(pstd_columns)/sizeof(*pstd_columns);
@@ -416,16 +440,16 @@ static const int n_genmpr_columns       = sizeof(genmpr_columns)/sizeof(*genmpr_
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int get_n_mctc_columns  (int n) { return(3  + n*n);             } // n = N_CAT
-inline int get_n_pct_columns   (int n) { return(3  + 3*(max(1, n)-1)); } // n = N_THRESH
-inline int get_n_pstd_columns  (int n) { return(17 +    max(1, n)   ); } // n = N_THRESH
-inline int get_n_pjc_columns   (int n) { return(3  + 7*(max(1, n)-1)); } // n = N_THRESH
-inline int get_n_prc_columns   (int n) { return(3  + 3*(max(1, n)-1)); } // n = N_THRESH
-inline int get_n_eclv_columns  (int n) { return(4  + 2*n);             } // n = N_PNT
-inline int get_n_rhist_columns (int n) { return(2  + n);               } // n = N_RANK
-inline int get_n_phist_columns (int n) { return(3  + n);               } // n = N_BINS
-inline int get_n_relp_columns  (int n) { return(2  + n);               } // n = N_ENS
-inline int get_n_orank_columns (int n) { return(20 + n);               } // n = N_ENS
+inline int get_n_mctc_columns  (int n) { return(3  + n*n);                  } // n = N_CAT
+inline int get_n_pct_columns   (int n) { return(3  + 3*(std::max(1, n)-1)); } // n = N_THRESH
+inline int get_n_pstd_columns  (int n) { return(17 +    std::max(1, n)   ); } // n = N_THRESH
+inline int get_n_pjc_columns   (int n) { return(3  + 7*(std::max(1, n)-1)); } // n = N_THRESH
+inline int get_n_prc_columns   (int n) { return(3  + 3*(std::max(1, n)-1)); } // n = N_THRESH
+inline int get_n_eclv_columns  (int n) { return(4  + 2*n);                  } // n = N_PNT
+inline int get_n_rhist_columns (int n) { return(2  + n);                    } // n = N_RANK
+inline int get_n_phist_columns (int n) { return(3  + n);                    } // n = N_BINS
+inline int get_n_relp_columns  (int n) { return(2  + n);                    } // n = N_ENS
+inline int get_n_orank_columns (int n) { return(20 + n);                    } // n = N_ENS
 
 ////////////////////////////////////////////////////////////////////////
 

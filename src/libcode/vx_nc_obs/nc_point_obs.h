@@ -35,7 +35,7 @@ class MetNcPointObs : public MetPointData {
    protected:
 
       bool keep_nc;
-      NcFile *obs_nc;      //  allocated
+      netCDF::NcFile *obs_nc;      //  allocated
       NetcdfObsVars obs_vars;
 
       void init_from_scratch();
@@ -47,7 +47,7 @@ class MetNcPointObs : public MetPointData {
 
       bool open(const char * filename);
       void close();
-      bool set_netcdf(NcFile *nc_file, bool _keep_nc=false);
+      bool set_netcdf(netCDF::NcFile *nc_file, bool _keep_nc=false);
 
       bool is_using_obs_arr();
 

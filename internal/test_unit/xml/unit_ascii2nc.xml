@@ -101,4 +101,105 @@
     </output>
   </test>
 
+  <test name="ascii2nc_rain_01H_sum">
+    <exec>&MET_BIN;/ascii2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/ascii/aws/aws_20220609_020000.txt \
+      &DATA_DIR_OBS;/ascii/aws/aws_20220609_021500.txt \
+      &DATA_DIR_OBS;/ascii/aws/aws_20220609_023000.txt \
+      &DATA_DIR_OBS;/ascii/aws/aws_20220609_024500.txt \
+      &DATA_DIR_OBS;/ascii/aws/aws_20220609_030000.txt \
+      &OUTPUT_DIR;/ascii2nc/aws_2022060903_rain_01H_sum.nc \
+      -config &CONFIG_DIR;/Ascii2NcConfig_rain_01H_sum
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/ascii2nc/aws_2022060903_rain_01H_sum.nc</point_nc>
+    </output>
+  </test>
+
+  <test name="ascii2nc_airnow_daily_v2">
+    <exec>&MET_BIN;/ascii2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/airnow/daily_data_v2.dat \
+      &OUTPUT_DIR;/ascii2nc/airnow/daily_data_v2_20220312.nc
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/ascii2nc/airnow/daily_data_v2_20220312.nc</point_nc>
+    </output>
+  </test>
+
+  <test name="ascii2nc_airnow_hourly_aqobs">
+    <exec>&MET_BIN;/ascii2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/airnow/HourlyAQObs_2022031200.dat \
+      &OUTPUT_DIR;/ascii2nc/airnow/HourlyAQObs_20220312.nc
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/ascii2nc/airnow/HourlyAQObs_20220312.nc</point_nc>
+    </output>
+  </test>
+
+  <test name="ascii2nc_airnow_hourly">
+    <exec>&MET_BIN;/ascii2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/airnow/HourlyData_2022031200.dat \
+      &OUTPUT_DIR;/ascii2nc/airnow/HourlyData_20220312.nc
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/ascii2nc/airnow/HourlyData_20220312.nc</point_nc>
+    </output>
+  </test>
+  
+  <test name="ascii2nc_ndbc">
+    <exec>&MET_BIN;/ascii2nc</exec>
+    <param> \
+    -format ndbc_standard  \
+    &DATA_DIR_OBS;/ndbc/13001.txt  \
+    &DATA_DIR_OBS;/ndbc/13002.txt \
+    &DATA_DIR_OBS;/ndbc/13008.txt \
+    &DATA_DIR_OBS;/ndbc/13009.txt \
+    &DATA_DIR_OBS;/ndbc/14040.txt \
+    &DATA_DIR_OBS;/ndbc/14043.txt \
+    &DATA_DIR_OBS;/ndbc/15001.txt \
+    &DATA_DIR_OBS;/ndbc/15002.txt \
+    &DATA_DIR_OBS;/ndbc/15006.txt \
+    &DATA_DIR_OBS;/ndbc/28401.txt \
+    &DATA_DIR_OBS;/ndbc/31001.txt \
+    &DATA_DIR_OBS;/ndbc/31003.txt \
+    &DATA_DIR_OBS;/ndbc/31004.txt \
+    &DATA_DIR_OBS;/ndbc/31005.txt \
+    &DATA_DIR_OBS;/ndbc/31006.txt \
+    &DATA_DIR_OBS;/ndbc/31007.txt \
+    &DATA_DIR_OBS;/ndbc/32ST0.txt\
+    &DATA_DIR_OBS;/ndbc/51000.txt \
+    &DATA_DIR_OBS;/ndbc/51001.txt \
+    &DATA_DIR_OBS;/ndbc/51002.txt \
+    &DATA_DIR_OBS;/ndbc/51003.txt \
+    &DATA_DIR_OBS;/ndbc/51004.txt \
+    &DATA_DIR_OBS;/ndbc/51101.txt \
+    &DATA_DIR_OBS;/ndbc/51201.txt \
+    &DATA_DIR_OBS;/ndbc/51202.txt \
+    &DATA_DIR_OBS;/ndbc/51205.txt \
+    &DATA_DIR_OBS;/ndbc/51206.txt \
+    &DATA_DIR_OBS;/ndbc/51207.txt \
+    &DATA_DIR_OBS;/ndbc/51208.txt \
+    &DATA_DIR_OBS;/ndbc/51209.txt \
+    &DATA_DIR_OBS;/ndbc/51211.txt \
+    &DATA_DIR_OBS;/ndbc/51212.txt \
+    &DATA_DIR_OBS;/ndbc/51213.txt \
+    &DATA_DIR_OBS;/ndbc/51WH0.txt \
+    &DATA_DIR_OBS;/ndbc/52200.txt \
+    &DATA_DIR_OBS;/ndbc/52202.txt\
+    &DATA_DIR_OBS;/ndbc/52211.txt \
+    &DATA_DIR_OBS;/ndbc/52212.txt \
+    &OUTPUT_DIR;/ascii2nc/ndbc.nc
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/ascii2nc/ndbc.nc</point_nc>
+    </output>
+  </test>
+
+
+
+
 </met_test>

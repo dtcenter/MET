@@ -19,6 +19,9 @@
 //   002    09/28/16  Halley Gotway   Add DESC output column.
 //   003    07/27/18  Halley Gotway   Support masks defined by
 //                    the gen_vx_mask tool.
+//   004    07/06/22  Howard Soh      METplus-Internal #19 Rename main to met_main
+//   005    09/28/22  Prestopnik      MET #2227 Remove namespace std from header files
+//   006    10/06/22  Halley Gotway   MET #392 Incorporate diagnostics
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -26,17 +29,15 @@ using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
-#include <ctime>
 #include <ctype.h>
 #include <dirent.h>
-#include <iostream>
 #include <fstream>
 #include <math.h>
-#include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
 
+#include "main.h"
 #include "tc_stat.h"
 #include "tc_stat_job.h"
 
@@ -61,10 +62,7 @@ static void   close_out_file      ();
 
 ////////////////////////////////////////////////////////////////////////
 
-int main(int argc, char *argv[]) {
-
-   // Set handler to be called for memory allocation error
-   set_new_handler(oom);
+int met_main(int argc, char *argv[]) {
 
    // Process the command line arguments
    process_command_line(argc, argv);
@@ -76,6 +74,12 @@ int main(int argc, char *argv[]) {
    process_jobs();
 
    return(0);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+const string get_tool_name() {
+   return "tc_stat";
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -164,7 +168,7 @@ void process_jobs() {
    TCStatJob *cur_job = (TCStatJob *) 0;
    ConcatString jobstring;
    int i, n_jobs;
-   TCLineCounts n;
+   TCPointCounts n;
    const char *method_name = "process_jobs() -> ";
 
    // Open the output file
@@ -207,23 +211,24 @@ void process_jobs() {
               << cur_job->serialize() << "\n";
 
          // Initialize counts
-         memset(&n, 0, sizeof(TCLineCounts));
+         memset(&n, 0, sizeof(TCPointCounts));
 
          // Do the job
          cur_job->do_job(tcst_files, n);
 
          mlog << Debug(2) << method_name
               << "Job " << i+1 << " used " << n.NKeep << " out of "
-              << n.NRead << " lines read.\n";
+              << n.NRead << " track points read.\n";
       }
       else mlog << Debug(1) << method_name << "job is missing\n";
 
       mlog << Debug(3)
-           << "Total lines read                 = " << n.NRead             << "\n"
-           << "Total lines kept                 = " << n.NKeep             << "\n"
+           << "Total track points read          = " << n.NRead             << "\n"
+           << "Total track points kept          = " << n.NKeep             << "\n"
            << "Rejected for track watch/warn    = " << n.RejTrackWatchWarn << "\n"
            << "Rejected for init threshold      = " << n.RejInitThresh     << "\n"
            << "Rejected for init string         = " << n.RejInitStr        << "\n"
+           << "Rejected for init diag threshold = " << n.RejInitDiagThresh << "\n"
            << "Rejected for out init mask       = " << n.RejOutInitMask    << "\n"
            << "Rejected for water only          = " << n.RejWaterOnly      << "\n"
            << "Rejected for rapid inten         = " << n.RejRIRW           << "\n"
@@ -246,6 +251,7 @@ void process_jobs() {
            << "Rejected for line type           = " << n.RejLineType       << "\n"
            << "Rejected for numeric threshold   = " << n.RejColumnThresh   << "\n"
            << "Rejected for string matching     = " << n.RejColumnStr      << "\n"
+           << "Rejected for diag threshold      = " << n.RejDiagThresh     << "\n"
            << "Rejected for match points        = " << n.RejMatchPoints    << "\n"
            << "Rejected for event equal         = " << n.RejEventEqual     << "\n"
            << "Rejected for out init mask       = " << n.RejOutInitMask    << "\n"
@@ -307,7 +313,7 @@ void close_out_file() {
 void usage() {
 
    cout << "\n*** Model Evaluation Tools (MET" << met_version
-        << ") ***\n\n"
+             << ") ***\n\n"
 
         << "Usage: " << program_name << "\n"
         << "\t-lookin source\n"

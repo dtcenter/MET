@@ -56,69 +56,43 @@ bool get_att_value(const NcAtt *att, ConcatString &value) {
 
 ////////////////////////////////////////////////////////////////////////
 
-template <typename T>
-bool _get_att_num_value(const NcAtt *att, T &att_val, int matching_type) {
-   bool status = false;
-   if (IS_VALID_NC_P(att)) {
-      int nc_type_id = GET_NC_TYPE_ID_P(att);
-      if (matching_type == nc_type_id) {
-         att->getValues(&att_val);
-         status = true;
-      }
-      else if (NC_CHAR == nc_type_id) {
-         string att_value;
-         att->getValues(att_value);
-         if (matching_type == NC_FLOAT)
-            att_val = atof(att_value.c_str());
-         else if (matching_type == NC_DOUBLE)
-            att_val = (double)atof(att_value.c_str());
-         else // if (matching_type == NC_INT)
-            att_val = atoi(att_value.c_str());
-         status = true;
-      }
-   }
-   return(status);
-}
-
-////////////////////////////////////////////////////////////////////////
-
 bool get_att_value(const NcAtt *att, ncbyte &att_val) {
-   bool status = _get_att_num_value(att, att_val, NC_BYTE);
+   bool status = get_att_num_value_(att, att_val, NC_BYTE);
    return(status);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool get_att_value(const NcAtt *att, short &att_val) {
-   bool status = _get_att_num_value(att, att_val, NC_SHORT);
+   bool status = get_att_num_value_(att, att_val, NC_SHORT);
    return(status);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool get_att_value(const NcAtt *att, int &att_val) {
-   bool status = _get_att_num_value(att, att_val, NC_INT);
+   bool status = get_att_num_value_(att, att_val, NC_INT);
    return(status);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool get_att_value(const NcAtt *att, unsigned int &att_val) {
-   bool status = _get_att_num_value(att, att_val, NC_UINT);
+   bool status = get_att_num_value_(att, att_val, NC_UINT);
    return(status);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool get_att_value(const NcAtt *att, float &att_val) {
-   bool status = _get_att_num_value(att, att_val, NC_FLOAT);
+   bool status = get_att_num_value_(att, att_val, NC_FLOAT);
    return(status);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool get_att_value(const NcAtt *att, double &att_val) {
-   bool status = _get_att_num_value(att, att_val, NC_DOUBLE);
+   bool status = get_att_num_value_(att, att_val, NC_DOUBLE);
    return(status);
 }
 
@@ -191,9 +165,10 @@ bool get_att_value_chars(const NcAtt *att, ConcatString &value) {
    static const char *method_name = "get_att_value_chars(NcAtt) -> ";
    if (IS_VALID_NC_P(att)) {
       nc_type attType = GET_NC_TYPE_ID_P(att);
-      if (attType == NC_CHAR || attType == NC_STRING) {
+      if (attType == NC_CHAR) {
          try {
-            string att_value;
+            char att_value[tmp_buf_size];
+            memset(att_value, 0, tmp_buf_size);
             att->getValues(att_value);
             value = att_value;
          }
@@ -205,6 +180,33 @@ bool get_att_value_chars(const NcAtt *att, ConcatString &value) {
                  << "Fail to read " << GET_NC_NAME_P(att) << " attribute ("
                  << GET_NC_TYPE_NAME_P(att) << " type).\n"
                  << "Please check the encoding of the "<< GET_NC_NAME_P(att) << " attribute.\n\n";
+         }
+      }
+      else if (attType == NC_STRING) {
+         try {
+            string att_value;
+            att->getValues(att_value);
+            value = att_value;
+         }
+         catch (exceptions::NcChar ex) {
+            int num_elements_sub = 8096;
+            int num_elements = att->getAttLength();;
+            char *att_value[num_elements];
+            for (int i = 0; i < num_elements; i++ ) {
+               att_value[i] = (char*) calloc(num_elements_sub, sizeof(char));
+            }
+            try {
+               att->getValues(att_value);
+               value = att_value[0];
+            }
+            catch (exceptions::NcException ex) {
+               mlog << Warning << "\n" << method_name
+                    << "Exception: " << ex.what() << "\n"
+                    << "Fail to read " << GET_NC_NAME_P(att) << " attribute ("
+                    << GET_NC_TYPE_NAME_P(att) << " type).\n"
+                    << "Please check the encoding of the "<< GET_NC_NAME_P(att) << " attribute.\n\n";
+            }
+            for (int i = 0; i < num_elements; i++ ) delete att_value[i];
          }
       }
       else { // MET-788: to handle a custom modified NetCDF
@@ -364,6 +366,23 @@ bool    get_att_no_leap_year(const NcVar *var) {
 
 ////////////////////////////////////////////////////////////////////////
 
+bool get_cf_conventions(const netCDF::NcFile *nc, ConcatString& conventions_value) {
+   bool has_attr = false;
+   multimap<string,NcGroupAtt>::iterator it_att;
+   multimap<string,NcGroupAtt> map_attrs = nc->getAtts();
+   for (it_att = map_attrs.begin(); it_att != map_attrs.end(); it_att++) {
+      if (to_lower(it_att->first) == to_lower(cf_att_name)) {
+         NcGroupAtt cf_att = it_att->second;
+         if (IS_VALID_NC(cf_att))
+            has_attr = get_att_value_chars(&cf_att, conventions_value);
+      }
+   }
+   return has_attr;
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
 ConcatString get_log_msg_for_att(const NcVarAtt *att) {
    ConcatString log_msg("can't read attribute");
    if(IS_INVALID_NC_P(att)) {
@@ -380,7 +399,7 @@ ConcatString get_log_msg_for_att(const NcVarAtt *att) {
 ////////////////////////////////////////////////////////////////////////
 
 ConcatString get_log_msg_for_att(const NcVarAtt *att, string var_name,
-                             const ConcatString att_name) {
+                                 const ConcatString att_name) {
    ConcatString log_msg;
    log_msg << "can't read attribute" << " \""
            << ((att_name.length() > 0) ? att_name.c_str() : GET_SAFE_NC_NAME_P(att))
@@ -471,7 +490,7 @@ NcGroupAtt *get_nc_att(const NcFile * nc, const ConcatString &att_name, bool exi
 ////////////////////////////////////////////////////////////////////////
 
 bool get_nc_att_value(const NcVar *var, const ConcatString &att_name,
-                      ConcatString &att_val, bool exit_on_error) {
+                      ConcatString &att_val, int grp_id, bool exit_on_error) {
    bool status = false;
    NcVarAtt *att = (NcVarAtt *) 0;
 
@@ -489,40 +508,21 @@ bool get_nc_att_value(const NcVar *var, const ConcatString &att_name,
 
 ////////////////////////////////////////////////////////////////////////
 
-template <typename T>
-bool _get_nc_att_value(const NcVar *var, const ConcatString &att_name,
-                       T &att_val, bool exit_on_error,
-                       T bad_data, const char *caller_name) {
-   bool status = false;
-
-   // Initialize
-   att_val = bad_data;
-
-   //
-   // Retrieve the NetCDF variable attribute.
-   //
-   NcVarAtt *att = get_nc_att(var, att_name);
-   status = get_att_value((NcAtt *)att, att_val);
-   if (!status) {
-      mlog << Error << "\n" << caller_name
-           << get_log_msg_for_att(att, GET_SAFE_NC_NAME_P(var), att_name);
-      if (exit_on_error) {
-         if (att) delete att;
-         exit(1);
-      }
-   }
-   if (att) delete att;
-
+bool get_nc_att_value(const NcVar *var, const ConcatString &att_name,
+                      int &att_val, bool exit_on_error) {
+   static const char *method_name = "get_nc_att_value(NcVar,int) -> ";
+   bool status = get_nc_att_value_(var, att_name, att_val, exit_on_error,
+                                   bad_data_int, method_name);
    return(status);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool get_nc_att_value(const NcVar *var, const ConcatString &att_name,
-                      int &att_val, bool exit_on_error) {
-   static const char *method_name = "get_nc_att_value(NcVar,int) -> ";
-   bool status = _get_nc_att_value(var, att_name, att_val, exit_on_error,
-                                   bad_data_int, method_name);
+                      double &att_val, bool exit_on_error) {
+   static const char *method_name = "get_nc_att_value(NcVar,double) -> ";
+   bool status = get_nc_att_value_(var, att_name, att_val, exit_on_error,
+                                   bad_data_double, method_name);
    return(status);
 }
 
@@ -531,7 +531,7 @@ bool get_nc_att_value(const NcVar *var, const ConcatString &att_name,
 bool get_nc_att_value(const NcVar *var, const ConcatString &att_name,
                       float &att_val, bool exit_on_error) {
    static const char *method_name = "get_nc_att_value(NcVar,float) -> ";
-   bool status = _get_nc_att_value(var, att_name, att_val, exit_on_error,
+   bool status = get_nc_att_value_(var, att_name, att_val, exit_on_error,
                                    bad_data_float, method_name);
    return(status);
 }
@@ -557,32 +557,9 @@ bool get_nc_att_value(const NcVarAtt *att, ConcatString &att_val) {
 
 ////////////////////////////////////////////////////////////////////////
 
-template <typename T>
-bool _get_nc_att_value(const NcVarAtt *att, T &att_val, bool exit_on_error,
-                       T bad_data, const char *caller_name) {
-   bool status = true;
-
-   // Initialize
-   att_val = bad_data;
-
-   //
-   // Retrieve the NetCDF variable attribute.
-   //
-   status = get_att_value((NcAtt *)att, att_val);
-   if (!status) {
-      mlog << Error << "\n" << caller_name << get_log_msg_for_att(att);
-
-      if (exit_on_error) exit(1);
-   }
-
-   return(status);
-}
-
-////////////////////////////////////////////////////////////////////////
-
 bool get_nc_att_value(const NcVarAtt *att, int &att_val, bool exit_on_error) {
    static const char *method_name = "get_nc_att_value(NcVarAtt,int) -> ";
-   bool status = _get_nc_att_value(att, att_val, exit_on_error, bad_data_int, method_name);
+   bool status = get_nc_att_value_(att, att_val, exit_on_error, bad_data_int, method_name);
    return(status);
 }
 
@@ -590,7 +567,7 @@ bool get_nc_att_value(const NcVarAtt *att, int &att_val, bool exit_on_error) {
 
 bool get_nc_att_value(const NcVarAtt *att, float &att_val, bool exit_on_error) {
    static const char *method_name = "get_nc_att_value(NcVarAtt,float) -> ";
-   bool status = _get_nc_att_value(att, att_val, exit_on_error, bad_data_float, method_name);
+   bool status = get_nc_att_value_(att, att_val, exit_on_error, bad_data_float, method_name);
    return(status);
 }
 
@@ -598,25 +575,42 @@ bool get_nc_att_value(const NcVarAtt *att, float &att_val, bool exit_on_error) {
 
 bool get_nc_att_value(const NcVarAtt *att, double &att_val, bool exit_on_error) {
    static const char *method_name = "get_nc_att_value(NcVarAtt,double) -> ";
-   bool status = _get_nc_att_value(att, att_val, exit_on_error, bad_data_double, method_name);
+   bool status = get_nc_att_value_(att, att_val, exit_on_error, bad_data_double, method_name);
    return(status);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-bool has_att(NcFile * ncfile, const ConcatString att_name, bool exit_on_error)
-{
+bool has_att(NcFile *ncfile, const ConcatString att_name, bool do_log) {
    bool status = false;
    NcGroupAtt *att;
 
    att = get_nc_att(ncfile, att_name);
-   if ( IS_VALID_NC_P(att)) {
+   if (IS_VALID_NC_P(att)) {
       status = true;
-   } else if(exit_on_error)  {
-      mlog << Error << "\nhas_att() -> "
+   }
+   else if (do_log) {
+      mlog << Warning << "\nhas_att() -> "
            << "can't find global NetCDF attribute " << att_name
            << ".\n\n";
-      exit ( 1 );
+   }
+   if (att) delete att;
+   return status;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+bool has_att(NcVar *var, const ConcatString att_name, bool do_log) {
+   bool status = false;
+
+   NcVarAtt *att = get_nc_att(var, att_name);
+   if (IS_VALID_NC_P(att)) {
+      status = true;
+   }
+   else if (do_log) {
+      mlog << Warning << "\nhas_att() -> "
+           << "can't find NetCDF variable attribute " << att_name
+           << ".\n\n";
    }
    if (att) delete att;
    return status;
@@ -624,10 +618,22 @@ bool has_att(NcFile * ncfile, const ConcatString att_name, bool exit_on_error)
 
 ////////////////////////////////////////////////////////////////////////
 
+bool has_add_offset_attr(NcVar *var) {
+   return has_att(var, add_offset_att_name);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool has_scale_factor_attr(NcVar *var) {
+   return has_att(var, scale_factor_att_name);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 bool has_unsigned_attribute(NcVar *var) {
    bool is_unsigned = false;
    static const char *method_name = "has_unsigned_attribute() -> ";
-   NcVarAtt *att_unsigned     = get_nc_att(var, string("_Unsigned"));
+   NcVarAtt *att_unsigned = get_nc_att(var, string("_Unsigned"));
    if (IS_VALID_NC_P(att_unsigned)) {
       ConcatString att_value;
       get_att_value_chars(att_unsigned, att_value);
@@ -728,51 +734,20 @@ bool get_global_att(const NcFile *nc, const ConcatString &att_name,
 
 ////////////////////////////////////////////////////////////////////////
 
-template <typename T>
-bool _get_global_att_value(const NcFile *nc, const ConcatString& att_name,
-                           T &att_val, T bad_data, bool error_out, const char *caller_name) {
-   bool status = false;
-   // Initialize
-   att_val = bad_data;
-
-   NcGroupAtt *nc_att = get_nc_att(nc, att_name);
-   if (IS_VALID_NC_P(nc_att)) {
-      status = get_att_value((NcAtt *)nc_att, att_val);
-      string data_type = GET_NC_TYPE_NAME_P(nc_att);
-      if (error_out && !status) {
-         mlog << Error << caller_name
-              << "The data type \"" << data_type
-              << "\" for \"" << att_name << "\" does not match...\n\n";
-      }
-   }
-   else if (error_out) {
-      mlog << Error << caller_name
-           << "can't find global NetCDF attribute \"" << att_name
-           << "\".\n\n";
-   }
-   if (nc_att) delete nc_att;
-   // Check error_out status
-   if (error_out && !status) exit(1);
-
-   return(status);
-}
-
-////////////////////////////////////////////////////////////////////////
-
 
 bool get_global_att(const NcFile *nc, const ConcatString& att_name,
                     int &att_val, bool error_out) {
    static const char *method_name = "\nget_global_att(int) -> ";
-   bool status = _get_global_att_value(nc, att_name, att_val, bad_data_int,
+   bool status = get_global_att_value_(nc, att_name, att_val, bad_data_int,
                                        false, method_name);
    if (!status) {
       short tmp_att_val;
-      status = _get_global_att_value(nc, att_name, tmp_att_val, (short)bad_data_int,
+      status = get_global_att_value_(nc, att_name, tmp_att_val, (short)bad_data_int,
                                      false, method_name);
       if (status) att_val = tmp_att_val;
       else {
          ncbyte tmp_val2;
-         status = _get_global_att_value(nc, att_name, tmp_val2, (ncbyte)bad_data_int,
+         status = get_global_att_value_(nc, att_name, tmp_val2, (ncbyte)bad_data_int,
                                         error_out, method_name);
          if (status) att_val = tmp_val2;
       }
@@ -811,8 +786,8 @@ bool get_global_att(const NcFile *nc, const ConcatString& att_name,
 bool get_global_att(const NcFile *nc, const ConcatString& att_name,
                     float &att_val, bool error_out) {
    static const char *method_name = "\nget_global_att(float) -> ";
-   bool status = _get_global_att_value(nc, att_name, att_val, bad_data_float,
-                                       error_out, method_name);
+   bool status = get_global_att_value_(nc, att_name, att_val, bad_data_float,
+                                      error_out, method_name);
 
    return(status);
 }
@@ -823,11 +798,11 @@ bool get_global_att(const NcFile *nc, const ConcatString& att_name,
                     double &att_val, bool error_out) {
    static const char *method_name = "\nget_global_att(double) -> ";
    bool status;
-   status = _get_global_att_value(nc, att_name, att_val, bad_data_double,
-                                      false, method_name);
+   status = get_global_att_value_(nc, att_name, att_val, bad_data_double,
+                                  false, method_name);
    if (!status) {
       float tmp_att_val;
-      status = _get_global_att_value(nc, att_name, tmp_att_val, bad_data_float,
+      status = get_global_att_value_(nc, att_name, tmp_att_val, bad_data_float,
                                      error_out, method_name);
       if (status) att_val = tmp_att_val;
    }
@@ -903,56 +878,56 @@ void add_att(NcVar *var, const string &att_name, const double att_val) {
 
 ////////////////////////////////////////////////////////////////////////
 
-int get_var_names(NcFile *nc, StringArray *varNames) {
+int get_var_names(NcFile *nc, StringArray *var_names) {
 
-   int i, varCount;
    NcVar var;
+   int i = 0;
+   int var_count = nc->getVarCount();
 
-   varCount = nc->getVarCount();
-
-   i = 0;
-   multimap<string,NcVar>::iterator itVar;
    multimap<string,NcVar> mapVar = GET_NC_VARS_P(nc);
-   for (itVar = mapVar.begin(); itVar != mapVar.end(); ++itVar) {
-      var = (*itVar).second;
-      varNames->add(var.getName());
+   for (multimap<string,NcVar>::iterator it_var = mapVar.begin();
+        it_var != mapVar.end(); ++it_var) {
+      var = (*it_var).second;
+      var_names->add(var.getName());
       i++;
    }
 
-   if (i != varCount) {
+   if (i != var_count) {
       mlog << Error << "\n\tget_var_names() -> "
-           << "does not match array, allocated " << varCount << " but assigned "
+           << "does not match array, allocated " << var_count << " but assigned "
            << i << ".\n\n";
    }
-   return(varCount);
+   return(var_count);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-template <typename T>
-bool _get_var_att_num(const NcVar *var, const ConcatString &att_name,
-                      T &att_val, T bad_data) {
-   bool status = false;
+int get_var_names(NcFile *nc, StringArray *var_names, StringArray &group_names) {
 
-   // Initialize
-   att_val = bad_data;
+   NcVar var;
+   NcGroup nc_group;
+   int var_count = 0;
+   multimap<string,NcVar> var_map;
+   multimap<string,NcVar>::iterator it_var;
 
-   NcVarAtt *att = get_nc_att(var, att_name);
-   // Look for a match
-   if (IS_VALID_NC_P(att)) {
-      att->getValues(&att_val);
-      status = true;
+   for (int idx=0; idx<group_names.n(); idx++) {
+      nc_group = get_nc_group(nc, group_names[idx].c_str());
+      if (IS_VALID_NC(nc_group)) {
+         var_map = GET_NC_VARS(nc_group);
+         for (it_var = var_map.begin(); it_var != var_map.end(); it_var++) {
+            var_names->add(it_var->first);
+            var_count++;
+         }
+      }
    }
-   if (att) delete att;
-
-   return(status);
+   return(var_count);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool get_var_att_double(const NcVar *var, const ConcatString &att_name,
                         double &att_val) {
-   bool status = _get_var_att_num(var, att_name, att_val, bad_data_double);
+   bool status = get_var_att_num_(var, att_name, att_val, bad_data_double);
 
    return(status);
 }
@@ -961,23 +936,61 @@ bool get_var_att_double(const NcVar *var, const ConcatString &att_name,
 
 bool get_var_att_float(const NcVar *var, const ConcatString &att_name,
                        float &att_val) {
-   bool status = _get_var_att_num(var, att_name, att_val, bad_data_float);
+   bool status = get_var_att_num_(var, att_name, att_val, bad_data_float);
 
    return(status);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_var_units(const NcVar *var, ConcatString &att_val) {
+double get_var_add_offset(const NcVar *var) {
+   double v;
 
-   return(get_nc_att_value(var, units_att_name, att_val));
+   if(!get_var_att_double(var, add_offset_att_name, v)) {
+      v = 0.f;
+   }
+
+   return(v);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_var_level(const NcVar *var, ConcatString &att_val) {
+bool get_var_axis(const NcVar *var, ConcatString &att_val) {
+   return(get_nc_att_value(var, axis_att_name, att_val));
+}
 
-   return(get_nc_att_value(var, level_att_name, att_val));
+////////////////////////////////////////////////////////////////////////
+
+void set_def_fill_value(ncbyte *val) { *val = bad_data_int/100; }
+void set_def_fill_value(char   *val) { *val = bad_data_char; }
+void set_def_fill_value(double *val) { *val = bad_data_double; }
+void set_def_fill_value(float  *val) { *val = bad_data_float; }
+void set_def_fill_value(int    *val) { *val = bad_data_int; }
+void set_def_fill_value(long   *val) { *val = (long)bad_data_int; }
+void set_def_fill_value(short  *val) { *val = (short)bad_data_int; }
+void set_def_fill_value(long long          *val) { *val = (long long)bad_data_int; }
+void set_def_fill_value(unsigned char      *val) { *val = (unsigned char)-1; }
+void set_def_fill_value(unsigned int       *val) { *val = (unsigned int)-1; }
+void set_def_fill_value(unsigned long      *val) { *val = (unsigned long)-1; }
+void set_def_fill_value(unsigned long long *val) { *val = (unsigned long long)-1; }
+void set_def_fill_value(unsigned short     *val) { *val = (unsigned short)-1; }
+
+////////////////////////////////////////////////////////////////////////
+
+bool get_var_grid_mapping(const NcVar *var, ConcatString &att_val) {
+   return(get_nc_att_value(var, grid_mapping_att_name, att_val));
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool get_var_grid_mapping_name(const NcVar *var, ConcatString &att_val) {
+   return(get_nc_att_value(var, grid_mapping_name_att_name, att_val));
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool get_var_long_name(const NcVar *var, ConcatString &att_val) {
+   return(get_nc_att_value(var, long_name_att_name, att_val));
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -994,14 +1007,27 @@ double get_var_missing_value(const NcVar *var) {
 
 ////////////////////////////////////////////////////////////////////////
 
-double get_var_fill_value(const NcVar *var) {
+double get_var_scale_factor(const NcVar *var) {
    double v;
 
-   if(!get_var_att_double(var, fill_value_att_name, v)) {
-      v = bad_data_double;
+   if(!get_var_att_double(var, scale_factor_att_name, v)) {
+      v = 1.f;
    }
 
    return(v);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool get_var_standard_name(const NcVar *var, ConcatString &att_val) {
+   return(get_nc_att_value(var, standard_name_att_name, att_val));
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool get_var_units(const NcVar *var, ConcatString &att_val) {
+
+   return(get_nc_att_value(var, units_att_name, att_val));
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1015,8 +1041,8 @@ char get_char_val(NcFile * nc, const char * var_name, const int index) {
 
 char get_char_val(NcVar *var, const int index) {
    char k;
-   std::vector<size_t> start;
-   std::vector<size_t> count;
+   vector<size_t> start;
+   vector<size_t> count;
 
    //
    // Retrieve the character array value from the NetCDF variable.
@@ -1042,8 +1068,8 @@ ConcatString* get_string_val(NcFile * nc, const char * var_name, const int index
 ConcatString* get_string_val(NcVar *var, const int index,
                              const int len, ConcatString &tmp_cs) {
    char tmp_str[len];
-   std::vector<size_t> start;
-   std::vector<size_t> count;
+   vector<size_t> start;
+   vector<size_t> count;
    const char *method_name = "get_string_val() ";
 
    if (2 != get_dim_count(var)) {
@@ -1092,8 +1118,8 @@ int get_int_var(NcFile * nc, const char * var_name, const int index) {
 
 int get_int_var(NcVar * var, const int index) {
    int k;
-   std::vector<size_t> start;
-   std::vector<size_t> count;
+   vector<size_t> start;
+   vector<size_t> count;
    const char *method_name = "get_int_var() ";
 
    k = bad_data_int;
@@ -1101,7 +1127,7 @@ int get_int_var(NcVar * var, const int index) {
       int dim_idx = 0;
       int dim_size = get_dim_size(var, dim_idx);
       if (0 >= dim_size) {
-         if ((index > 0) && (0 >= dim_size)) {
+         if (index > 0) {
             mlog << Error << "\n" << method_name << "The start offset ("
                  << index << ") should be 0 because of no dimension at the variable "
                  << GET_NC_NAME_P(var) << ".\n\n";
@@ -1129,8 +1155,8 @@ int get_int_var(NcVar * var, const int index) {
 
 double get_nc_time(NcVar * var, const int index) {
    double k;
-   std::vector<size_t> start;
-   std::vector<size_t> count;
+   vector<size_t> start;
+   vector<size_t> count;
    const char *method_name = "get_nc_time() -> ";
 
    k = bad_data_double;
@@ -1217,8 +1243,8 @@ float get_float_var(NcFile * nc, const char * var_name, const int index) {
 
 float get_float_var(NcVar * var, const int index) {
    float k;
-   std::vector<size_t> start;
-   std::vector<size_t> count;
+   vector<size_t> start;
+   vector<size_t> count;
    const char *method_name = "get_float_var() -> ";
 
    k = bad_data_float;
@@ -1252,202 +1278,37 @@ float get_float_var(NcVar * var, const int index) {
 
 ////////////////////////////////////////////////////////////////////////
 
-template <typename T>
-bool _get_nc_data(NcFile *nc, const char *var_name, T *data,
-                 const long *dim, const long *cur) {
+bool get_nc_data(NcVar *var, int *data, const long *curs) {
+   bool return_status = get_nc_data_(var, data, bad_data_int, curs);
 
-   //
-   // Retrieve the input variables
-   //
-   NcVar var = get_var(nc, var_name);
-   return get_nc_data(&var, data, dim, cur);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-bool get_nc_data(NcFile *nc, const char *var_name, int *data,
-                 const long *dim, const long *cur) {
-
-   return _get_nc_data(nc, var_name, data, dim, cur);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-template <typename T>
-bool _get_nc_data(NcVar *var, T *data) {
-   bool return_status = false;
-
-   if (IS_VALID_NC_P(var)) {
-      //
-      // Retrieve the float value from the NetCDF variable.
-      // Note: missing data was checked here
-      //
-      var->getVar(data);
-      return_status = true;
-   }
    return(return_status);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool get_nc_data(NcVar *var, time_t *data) {
-   bool return_status = _get_nc_data(var, data);
+   bool return_status = get_nc_data_(var, data, (time_t)bad_data_int);
+
    return(return_status);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool get_nc_data(NcVar *var, int *data) {
-   bool return_status = _get_nc_data(var, data);
-   return(return_status);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-template <typename T>
-bool _get_nc_data(NcVar *var, T *data, T bad_data, const long *curs) {
-   bool return_status = false;
-   const char *method_name = "_get_nc_data(const long *curs) ";
-
-   if (IS_VALID_NC_P(var)) {
-      std::vector<size_t> start;
-      std::vector<size_t> count;
-
-      const int dimC = get_dim_count(var);
-      for (int idx = 0 ; idx < dimC; idx++) {
-         int dim_size = get_dim_size(var, idx);
-         if ((curs[idx] > dim_size) && (0 < dim_size)) {
-            NcDim nc_dim = get_nc_dim(var, idx);
-            mlog << Error << "\n" << method_name << "The start offset ("
-                 << curs[idx] << ") exceeds the dimension[" << idx << "] " << dim_size << " "
-                 << (IS_VALID_NC(nc_dim) ? GET_NC_NAME(nc_dim) : " ")
-                 << " for the variable " << GET_NC_NAME_P(var) << ".\n\n";
-            exit(1);
-         }
-         start.push_back((size_t)curs[idx]);
-         count.push_back((size_t)1);
-      }
-
-      *data = bad_data;
-
-      //
-      // Retrieve the float value from the NetCDF variable.
-      // Note: missing data was checked here
-      //
-      var->getVar(start, count, data);
-      return_status = true;
-   }
-   return(return_status);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-
-bool get_nc_data(NcVar *var, int *data, const long *curs) {
-   bool return_status = _get_nc_data(var, data, bad_data_int, curs);
-
-   return(return_status);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-template <typename T>
-bool _get_nc_data(NcVar *var, T *data, T bad_data, const long dim, const long cur) {
-   bool return_status = false;
-   const char *method_name = "_get_nc_data(const long dim, const long cur) ";
-
-   if (IS_VALID_NC_P(var)) {
-      int dim_idx = 0;
-      std::vector<size_t> start;
-      std::vector<size_t> count;
-      start.push_back((size_t)cur);
-      count.push_back((size_t)dim);
-      int dim_size = get_dim_size(var, dim_idx);
-      if (0 >= dim_size) {
-         if ((cur > 0) || (dim > 1)) {
-            mlog << Error << "\n" << method_name << "The start offset and count ("
-                 << cur << ", " << dim << ") should be (0, 1) because of no dimension at the variable "
-                 << GET_NC_NAME_P(var) << ".\n\n";
-            exit(1);
-         }
-      }
-      else if (((cur+dim) > dim_size) && (0 < dim_size)) {
-         NcDim nc_dim = get_nc_dim(var, dim_idx);
-         mlog << Error << "\n" << method_name << "The start offset and count ("
-              << cur << " + " << dim << ") exceeds the dimension " << dim_size << " "
-              << (IS_VALID_NC(nc_dim) ? GET_NC_NAME(nc_dim) : " ")
-              << " for the variable " << GET_NC_NAME_P(var) << ".\n\n";
-         exit(1);
-      }
-
-      for (int idx1=0; idx1<dim; idx1++) {
-         data[idx1] = bad_data;
-      }
-
-      //
-      // Retrieve the float value from the NetCDF variable.
-      // Note: missing data was checked here
-      //
-      var->getVar(start, count, data);
-      return_status = true;
-   }
+   bool return_status = get_nc_data_(var, data, bad_data_int);
    return(return_status);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool get_nc_data(NcVar *var, int *data, const long dim, const long cur) {
-   return(_get_nc_data(var, data, bad_data_int, dim, cur));
-}
-
-////////////////////////////////////////////////////////////////////////
-
-template <typename T>
-bool _get_nc_data(NcVar *var, T *data, T bad_data, const long *dims, const long *curs) {
-   bool return_status = false;
-   const char *method_name = "_get_nc_data(const long *dims, const long *curs) ";
-
-   if (IS_VALID_NC_P(var)) {
-      std::vector<size_t> start;
-      std::vector<size_t> count;
-
-      int data_size = 1;
-      int dimC = get_dim_count(var);
-      for (int idx = 0 ; idx < dimC; idx++) {
-         int dim_size = get_dim_size(var, idx);
-         if ((curs[idx]+dims[idx]) > dim_size) {
-            NcDim nc_dim = get_nc_dim(var, idx);
-            mlog << Error << "\n" << method_name << "The start offset and count ("
-                 << curs[idx] << ", " << dims[idx] << ") exceeds the dimension["
-                 << idx << "] " << dim_size << " "
-                 << (IS_VALID_NC(nc_dim) ? GET_NC_NAME(nc_dim) : " ")
-                 << " for the variable " << GET_NC_NAME_P(var) << ".\n\n";
-            exit(1);
-         }
-
-         start.push_back((size_t)curs[idx]);
-         count.push_back((size_t)dims[idx]);
-         data_size *= dims[idx];
-      }
-
-      for (int idx1=0; idx1<data_size; idx1++) {
-         data[idx1] = bad_data;
-      }
-
-      //
-      // Retrieve the float value from the NetCDF variable.
-      // Note: missing data was checked here
-      //
-      var->getVar(start, count, data);
-      return_status = true;
-   }
-   return(return_status);
+   return(get_nc_data_(var, data, bad_data_int, dim, cur));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool get_nc_data(NcVar *var, int *data, const long *dims, const long *curs) {
-   bool return_status = _get_nc_data(var, data, bad_data_int, dims, curs);
+   bool return_status = get_nc_data_(var, data, bad_data_int, dims, curs);
 
    return(return_status);
 }
@@ -1455,7 +1316,7 @@ bool get_nc_data(NcVar *var, int *data, const long *dims, const long *curs) {
 ////////////////////////////////////////////////////////////////////////
 
 bool get_nc_data(NcVar *var, short *data, const long *curs) {
-   bool return_status = _get_nc_data(var, data, (short)bad_data_int, curs);
+   bool return_status = get_nc_data_(var, data, (short)bad_data_int, curs);
 
    return(return_status);
 }
@@ -1463,66 +1324,16 @@ bool get_nc_data(NcVar *var, short *data, const long *curs) {
 ////////////////////////////////////////////////////////////////////////
 
 bool get_nc_data(NcVar *var, short *data, const long *dims, const long *curs) {
-   bool return_status = _get_nc_data(var, data, (short)bad_data_int, dims, curs);
+   bool return_status = get_nc_data_(var, data, (short)bad_data_int, dims, curs);
 
    return(return_status);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_nc_data(NcFile *nc, const char *var_name, float *data,
-                 const long *dims, const long *curs) {
-
-   //
-   // Retrieve the input variables
-   //
-   NcVar var    = get_var(nc, var_name);
-   return _get_nc_data(&var, data, bad_data_float, dims, curs);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-template <typename T>
-void _apply_scale_factor(float *data, const T *packed_data,
-                        const int cell_count, const T fill_value,
-                        T &raw_min_val, T &raw_max_val, const char *data_type,
-                        float add_offset, float scale_factor) {
-   int positive_cnt = 0;
-   int unpacked_count = 0;
-   float min_value =  10e10;
-   float max_value = -10e10;
-   clock_t start_clock = clock();
-   const char *method_name = "apply_scale_factor(float)";
-
-   for (int idx=0; idx<cell_count; idx++) {
-      if (fill_value == packed_data[idx])
-         data[idx] = bad_data_float;
-      else {
-         if (raw_min_val > packed_data[idx]) raw_min_val = packed_data[idx];
-         if (raw_max_val < packed_data[idx]) raw_max_val = packed_data[idx];
-         data[idx] = ((float)packed_data[idx] * scale_factor) + add_offset;
-         if (data[idx] > 0) positive_cnt++;
-         if (min_value > data[idx]) min_value = data[idx];
-         if (max_value < data[idx]) max_value = data[idx];
-         if (!is_eq(0., add_offset) && !is_eq(1., scale_factor)) unpacked_count++;
-      }
-   }
-   mlog << Debug(4) << method_name << " unpacked data: count="
-        << unpacked_count << " out of " << cell_count
-        << ". FillValue(" << data_type << ")=" << fill_value << "\n";
-   mlog << Debug(4) << method_name << "data range [" << min_value << " - " << max_value
-        << "] raw data: [" << raw_min_val << " - " << raw_max_val << "] Positive count: "
-        << positive_cnt << "\n";
-   mlog << Debug(7) << method_name << " took " 
-        << (clock()-start_clock)/double(CLOCKS_PER_SEC) << " seconds\n";
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
 bool get_nc_data(NcVar *var, float *data) {
-   clock_t start_clock = clock();
    bool return_status = false;
+   clock_t start_clock = clock();
    static const char *method_name = "get_nc_data(NcVar *, float *) ";
 
    if (IS_VALID_NC_P(var)) {
@@ -1531,207 +1342,140 @@ bool get_nc_data(NcVar *var, float *data) {
       // Note: missing data was checked here
       //
       int type_id = GET_NC_TYPE_ID_P(var);
+      int cell_count = get_data_size(var);
+
       return_status = true;
       if (NcType::nc_FLOAT == type_id) {
-         var->getVar(data);
-      }
-      else if (NcType::nc_DOUBLE == type_id) {
-         int cell_count = 1;
-         for (int idx=0; idx<var->getDimCount();idx++) {
-            cell_count *= get_dim_size(var, idx);
+
+         get_nc_data_t(var, data);
+
+         float fill_value;
+         bool has_fill_value = get_var_fill_value(var, fill_value);
+         if (has_fill_value) {
+            for (int idx=0; idx<cell_count; idx++) {
+               if(is_eq(data[idx], fill_value)) data[idx] = bad_data_float;
+            }
          }
-         double *double_data = new double[cell_count];
-         var->getVar(double_data);
-         for (int idx=0; idx<cell_count; idx++) {
-            data[idx] = (float)double_data[idx];
-         }
-         delete [] double_data;
       }
       else {
-         int cell_count = 1;
-         for (int idx=0; idx<var->getDimCount();idx++) {
-            cell_count *= get_dim_size(var, idx);
+         int unpacked_count = 0;
+         float add_offset = get_var_add_offset(var);
+         float scale_factor = get_var_scale_factor(var);
+         bool do_scale_factor = has_scale_factor_attr(var) || has_add_offset_attr(var);
+         bool unsigned_value = has_unsigned_attribute(var);
+         mlog << Debug(6) << method_name << GET_NC_NAME_P(var)
+              << " data_size=" << cell_count << ", is_unsigned_value: "
+              << unsigned_value << "\n";
+         if (do_scale_factor) {
+            mlog << Debug(6) << method_name << GET_NC_NAME_P(var)
+                 << " add_offset = " << add_offset
+                 << ", scale_factor=" << scale_factor << "\n";
          }
 
-         float add_offset = 0.;
-         float scale_factor = 1.;
-         int unpacked_count = 0;
-         bool unsigned_value = has_unsigned_attribute(var);
-         NcVarAtt *att_add_offset   = get_nc_att(var, string("add_offset"));
-         NcVarAtt *att_scale_factor = get_nc_att(var, string("scale_factor"));
-         NcVarAtt *att_fill_value   = get_nc_att(var, string("_FillValue"));
-         if (IS_VALID_NC_P(att_add_offset)) add_offset = get_att_value_float(att_add_offset);
-         if (IS_VALID_NC_P(att_scale_factor)) scale_factor = get_att_value_float(att_scale_factor);
-         mlog << Debug(4) << method_name << "add_offset = " << add_offset
-              << ", scale_factor=" << scale_factor << ", cell_count=" << cell_count
-              << ", is_unsigned_value: " << unsigned_value << " for " << GET_NC_NAME_P(var) << "\n";
-
          switch ( type_id )  {
+            case NcType::nc_DOUBLE:
+               {
+                  double *packed_data = new double[cell_count];
+
+                  get_nc_data_t(var, packed_data);
+
+                  double fill_value;
+                  bool has_fill_value = get_var_fill_value(var, fill_value);
+                  for (int idx=0; idx<cell_count; idx++) {
+                     if(has_fill_value && is_eq(data[idx], fill_value))
+                        data[idx] = bad_data_float;
+                     else data[idx] = (float)packed_data[idx];
+                  }
+                  delete [] packed_data;
+               }
+               break;
             case NcType::nc_INT64:
                {
-                  long long fill_value = bad_data_int;
-                  long long min_value =  2147483647;
-                  long long max_value = -2147483648;
                   long long *packed_data = new long long[cell_count];
 
-                  if (IS_VALID_NC_P(att_fill_value))
-                     fill_value = get_att_value_int(att_fill_value);
-
                   var->getVar(packed_data);
-                  _apply_scale_factor(data, packed_data, cell_count,
-                                      fill_value, min_value, max_value, "int64",
-                                      add_offset, scale_factor);
+                  copy_nc_data_(var, data, packed_data, cell_count,
+                                "int64", add_offset, scale_factor);
                   delete [] packed_data;
                }
                break;
             case NcType::nc_INT:
                {
-                  int fill_value = bad_data_int;
-                  int min_value =  2147483647;
-                  int max_value = -2147483648;
                   int *packed_data = new int[cell_count];
 
-                  if (IS_VALID_NC_P(att_fill_value))
-                     fill_value = get_att_value_int(att_fill_value);
-
                   var->getVar(packed_data);
-                  _apply_scale_factor(data, packed_data, cell_count,
-                                      fill_value, min_value, max_value, "int",
-                                      add_offset, scale_factor);
+                  copy_nc_data_(var, data, packed_data, cell_count,
+                                "int", add_offset, scale_factor);
                   delete [] packed_data;
                }
                break;
             case NcType::nc_SHORT:
                {
-                  short fill_value = (short)bad_data_int;
+                  short missing_value;
+                  bool has_missing = get_var_fill_value(var, missing_value);
                   short *packed_data = new short[cell_count];
 
-                  if (IS_VALID_NC_P(att_fill_value))
-                     fill_value = get_att_value_short(att_fill_value);
-
                   var->getVar(packed_data);
-
                   if (unsigned_value) {
-                     unsigned short value;
-                     int positive_cnt = 0;
-                     int raw_min_value =  70000;
-                     int raw_max_value = -70000;
-                     float min_value =  10e10;
-                     float max_value = -10e10;
-                     unsigned short unsigned_fill_value = (unsigned short)fill_value;
+                     unsigned short *ushort_data = new unsigned short[cell_count];
                      for (int idx=0; idx<cell_count; idx++) {
-                        value = (unsigned short)packed_data[idx];
-                        if (unsigned_fill_value == value)
-                           data[idx] = bad_data_float;
-                        else {
-                           data[idx] = (value * scale_factor) + add_offset;
-                           unpacked_count++;
-                           if (raw_min_value > value) raw_min_value = value;
-                           if (raw_max_value < value) raw_max_value = value;
-                           if (data[idx] > 0) positive_cnt++;
-                           if (min_value > data[idx]) min_value = data[idx];
-                           if (max_value < data[idx]) max_value = data[idx];
-                        }
+                        ushort_data[idx] =(unsigned short)packed_data[idx];
                      }
-                     mlog << Debug(4) << method_name << " unpacked data: count="
-                          << unpacked_count << " out of " << cell_count
-                          << ". FillValue(short with unsigned) " << fill_value
-                          << " data range [" << min_value << " - " << max_value
-                          << "] raw data: [" << raw_min_value << " - " << raw_max_value << "] Positive count: "
-                          << positive_cnt << "\n";
+                     copy_nc_data_t(var, data, ushort_data, cell_count, 
+                                    "ushort", add_offset, scale_factor,
+                                    has_missing, (unsigned short)missing_value);
+                     delete [] ushort_data;
                   }
                   else {
-                     short min_value =  32766;
-                     short max_value = -32767;
-                     _apply_scale_factor(data, packed_data,
-                           cell_count, fill_value, min_value, max_value, "short",
-                           add_offset, scale_factor);
+                     copy_nc_data_t(var, data, packed_data, cell_count, 
+                                    "short", add_offset, scale_factor,
+                                    has_missing, missing_value);
                   }
                   delete [] packed_data;
                }
                break;
             case NcType::nc_USHORT:
                {
-                  unsigned short min_value = 65535;
-                  unsigned short max_value = 0;
-                  unsigned short fill_value = (unsigned short)bad_data_int;
                   unsigned short *packed_data = new unsigned short[cell_count];
 
-                  if (IS_VALID_NC_P(att_fill_value))
-                     fill_value = get_att_value_ushort(att_fill_value);
-
                   var->getVar(packed_data);
-
-                  _apply_scale_factor(data, packed_data, cell_count,
-                                      fill_value, min_value, max_value, "unsigned short",
-                                      add_offset, scale_factor);
+                  copy_nc_data_(var, data, packed_data, cell_count,
+                                "unsigned short", add_offset, scale_factor);
                   delete [] packed_data;
                }
                break;
             case NcType::nc_BYTE:
                {
-                  ncbyte fill_value = (ncbyte)bad_data_int;
+                  ncbyte missing_value;
+                  bool has_missing = get_var_fill_value(var, missing_value);
                   ncbyte *packed_data = new ncbyte[cell_count];
 
-                  if (IS_VALID_NC_P(att_fill_value)) {
-                     fill_value = get_att_value_char(att_fill_value);
-                  }
-
                   var->getVar(packed_data);
-
                   if (unsigned_value) {
-                     int value;
-                     int positive_cnt = 0;
-                     int raw_min_value =  70000;
-                     int raw_max_value = -70000;
-                     float min_value =  10e10;
-                     float max_value = -10e10;
-                     int unsigned_fill_value = (ncbyte)fill_value;
+                     unsigned char *ubyte_data = new unsigned char[cell_count];
                      for (int idx=0; idx<cell_count; idx++) {
-                        value = packed_data[idx];
-                        if (unsigned_fill_value == value)
-                           data[idx] = bad_data_float;
-                        else {
-                           data[idx] = (value * scale_factor) + add_offset;
-                           unpacked_count++;
-                           if (raw_min_value > value) raw_min_value = value;
-                           if (raw_max_value < value) raw_max_value = value;
-                           if (data[idx] > 0) positive_cnt++;
-                           if (min_value > data[idx]) min_value = data[idx];
-                           if (max_value < data[idx]) max_value = data[idx];
-                        }
+                        ubyte_data[idx] =(unsigned char)packed_data[idx];
                      }
-                     mlog << Debug(4) << method_name << " unpacked data: count="
-                          << unpacked_count << " out of " << cell_count
-                          << ". FillValue(byte with unsigned) " << fill_value
-                          << " data range [" << min_value << " - " << max_value
-                          << "] raw data: [" << raw_min_value << " - " << raw_max_value << "] Positive count: "
-                          << positive_cnt << "\n";
+                     copy_nc_data_t(var, data, ubyte_data, cell_count,
+                                    "ncubyte", add_offset, scale_factor,
+                                    has_missing, (unsigned char)missing_value);
+                     delete [] ubyte_data;
                   }
                   else {
-                     ncbyte min_value =  127;
-                     ncbyte max_value = -127;
-                     _apply_scale_factor(data, packed_data, cell_count,
-                                         fill_value, min_value, max_value, "ncbyte",
-                                         add_offset, scale_factor);
+                     copy_nc_data_t(var, data, packed_data, cell_count,
+                                    "ncbyte", add_offset, scale_factor,
+                                    has_missing, missing_value);
                   }
                   delete [] packed_data;
                }
                break;
             case NcType::nc_UBYTE:
                {
-                  unsigned char min_value = 255;
-                  unsigned char max_value = 0;
-                  unsigned char fill_value = (unsigned char)-99;
                   unsigned char *packed_data = new unsigned char[cell_count];
 
-                  if (IS_VALID_NC_P(att_fill_value)) {
-                     fill_value = get_att_value_char(att_fill_value);
-                  }
-
-                  _apply_scale_factor(data, packed_data, cell_count,
-                                      fill_value, min_value, max_value, "unsigned char",
-                                      add_offset, scale_factor);
+                  var->getVar(packed_data);
+                  copy_nc_data_(var, data, packed_data, cell_count,
+                                "unsigned char", add_offset, scale_factor);
                   delete [] packed_data;
                }
                break;
@@ -1741,9 +1485,6 @@ bool get_nc_data(NcVar *var, float *data) {
                     << type_id << ", type name: " << GET_NC_TYPE_NAME_P(var)
                     << ") for " << GET_NC_NAME_P(var) << "\n";
          }
-         if(att_add_offset) delete att_add_offset;
-         if(att_scale_factor) delete att_scale_factor;
-         if(att_fill_value) delete att_fill_value;
       }
    }
 
@@ -1756,7 +1497,7 @@ bool get_nc_data(NcVar *var, float *data) {
 ////////////////////////////////////////////////////////////////////////
 
 bool get_nc_data(NcVar *var, float *data, const long *curs) {
-   bool return_status = _get_nc_data(var, data, bad_data_float, curs);
+   bool return_status = get_nc_data_(var, data, bad_data_float, curs);
 
    return(return_status);
 }
@@ -1764,7 +1505,7 @@ bool get_nc_data(NcVar *var, float *data, const long *curs) {
 ////////////////////////////////////////////////////////////////////////
 
 bool get_nc_data(NcVar *var, float *data, const long *dims, const long *curs) {
-   bool return_status = _get_nc_data(var, data, bad_data_float, dims, curs);
+   bool return_status = get_nc_data_(var, data, bad_data_float, dims, curs);
 
    return(return_status);
 }
@@ -1772,7 +1513,7 @@ bool get_nc_data(NcVar *var, float *data, const long *dims, const long *curs) {
 ////////////////////////////////////////////////////////////////////////
 
 bool get_nc_data(NcVar *var, float *data, const long dim, const long cur) {
-   bool return_status = _get_nc_data(var, data, bad_data_float, dim, cur);
+   bool return_status = get_nc_data_(var, data, bad_data_float, dim, cur);
 
    return(return_status);
 }
@@ -1785,43 +1526,8 @@ bool get_nc_data(NcFile *nc, const char *var_name, double *data,
    //
    // Retrieve the input variables
    //
-   NcVar var    = get_var(nc, var_name);
+   NcVar var = get_var(nc, var_name);
    return get_nc_data(&var, data, dims, curs);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-template <typename T>
-int _apply_scale_factor(double *data, const T *packed_data,
-                        const int cell_count, const T fill_value,
-                        T &raw_min_val, T &raw_max_val, const char *data_type,
-                        double add_offset, double scale_factor) {
-   int positive_cnt = 0;
-   int unpacked_count = 0;
-   double min_value =  10e10;
-   double max_value = -10e10;
-   const char *method_name = "apply_scale_factor(double)";
-
-   for (int idx=0; idx<cell_count; idx++) {
-      if (fill_value == packed_data[idx])
-         data[idx] = bad_data_float;
-      else {
-         if (raw_min_val > packed_data[idx]) raw_min_val = packed_data[idx];
-         if (raw_max_val < packed_data[idx]) raw_max_val = packed_data[idx];
-         data[idx] = ((double)packed_data[idx] * scale_factor) + add_offset;
-         if (data[idx] > 0) positive_cnt++;
-         if (min_value > data[idx]) min_value = data[idx];
-         if (max_value < data[idx]) max_value = data[idx];
-         if (!is_eq(0., add_offset) && !is_eq(1., scale_factor)) unpacked_count++;
-      }
-   }
-   mlog << Debug(4) << method_name << " unpacked data: count="
-        << unpacked_count << " out of " << cell_count
-        << ". FillValue(" << data_type << ")=" << fill_value
-        << " data range [" << min_value << " - " << max_value
-        << "] raw data: [" << raw_min_val << " - " << raw_max_val << "] Positive count: "
-        << positive_cnt << "\n";
-   return unpacked_count;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1837,200 +1543,138 @@ bool get_nc_data(NcVar *var, double *data) {
       //
       int unpacked_count = 0;
       int type_id = GET_NC_TYPE_ID_P(var);
+      const int cell_count = get_data_size(var);
+
       return_status = true;
-      if ((NcType::nc_DOUBLE == type_id) || (NcType::nc_FLOAT == type_id)){
+      if (NcType::nc_DOUBLE == type_id) {
+
          var->getVar(data);
+
+         double fill_value;
+         bool has_fill_value = get_var_fill_value(var, fill_value);
+         if (has_fill_value) {
+            for (int idx=0; idx<cell_count; idx++) {
+               if(is_eq(data[idx], fill_value)) data[idx] = bad_data_double;
+            }
+         }
       }
       else {
-         int cell_count = 1;
-         for (int idx=0; idx<var->getDimCount();idx++) {
-            cell_count *= get_dim_size(var, idx);
-         }
-
-         double add_offset = 0.;
-         double scale_factor = 1.;
          bool unsigned_value = has_unsigned_attribute(var);
-         NcVarAtt *att_add_offset   = get_nc_att(var, (string)"add_offset");
-         NcVarAtt *att_scale_factor = get_nc_att(var, (string)"scale_factor");
-         NcVarAtt *att_fill_value   = get_nc_att(var, (string)"_FillValue");
-         if (IS_VALID_NC_P(att_add_offset)) {
-            add_offset = get_att_value_double(att_add_offset);
+         const double add_offset = get_var_add_offset(var);
+         const double scale_factor = get_var_scale_factor(var);
+         bool do_scale_factor = has_scale_factor_attr(var) || has_add_offset_attr(var);
+         mlog << Debug(6) << method_name << GET_NC_NAME_P(var)
+              << " data_size=" << cell_count << ", is_unsigned_value: "
+              << unsigned_value << "\n";
+         if (do_scale_factor) {
+            mlog << Debug(6) << method_name << GET_NC_NAME_P(var)
+                 << " add_offset = " << add_offset
+                 << ", scale_factor=" << scale_factor << "\n";
          }
-         if (IS_VALID_NC_P(att_scale_factor)) {
-            scale_factor = get_att_value_double(att_scale_factor);
-         }
-         mlog << Debug(4) << method_name << "add_offset = " << add_offset
-              << ", scale_factor=" << scale_factor << ", cell_count=" << cell_count
-              << ", is_unsigned_value: " << unsigned_value << " for " << GET_NC_NAME_P(var) << "\n";
 
          switch ( type_id )  {
-            case NcType::nc_INT64:
+            case NcType::nc_FLOAT:
                {
-                  long long fill_value = bad_data_int;
-                  long long min_value =  2147483647;
-                  long long max_value = -2147483648;
-                  long long *packed_data = new long long[cell_count];
-
-                  if (IS_VALID_NC_P(att_fill_value))
-                     fill_value = get_att_value_int(att_fill_value);
+                  float *packed_data = new float[cell_count];
 
                   var->getVar(packed_data);
-                  _apply_scale_factor(data, packed_data, cell_count,
-                                      fill_value, min_value, max_value, "int64",
-                                      add_offset, scale_factor);
+
+                  float fill_value;
+                  bool has_fill_value = get_var_fill_value(var, fill_value);
+                  for (int idx=0; idx<cell_count; idx++) {
+                     if (has_fill_value && is_eq(data[idx], fill_value))
+                        data[idx] = bad_data_double;
+                     else data[idx] = (double)packed_data[idx];
+                  }
+                  delete [] packed_data;
+               }
+               break;
+            case NcType::nc_INT64:
+               {
+                  long long *packed_data = new long long[cell_count];
+
+                  var->getVar(packed_data);
+                  copy_nc_data_(var, data, packed_data, cell_count,
+                                "int64", add_offset, scale_factor);
                   delete [] packed_data;
                }
                break;
             case NcType::nc_INT:
                {
-                  int fill_value = bad_data_int;
-                  int min_value =  2147483647;
-                  int max_value = -2147483648;
                   int *packed_data = new int[cell_count];
 
-                  if (IS_VALID_NC_P(att_fill_value))
-                     fill_value = get_att_value_int(att_fill_value);
-
                   var->getVar(packed_data);
-                  _apply_scale_factor(data, packed_data, cell_count,
-                                      fill_value, min_value, max_value, "int",
-                                      add_offset, scale_factor);
+                  copy_nc_data_(var, data, packed_data, cell_count,
+                                "int", add_offset, scale_factor);
                   delete [] packed_data;
                }
                break;
             case NcType::nc_SHORT:
                {
-                  short fill_value = (short)bad_data_int;
+                  short missing_value;
+                  bool has_missing = get_var_fill_value(var, missing_value);
                   short *packed_data = new short[cell_count];
-
-                  if (IS_VALID_NC_P(att_fill_value))
-                     fill_value = get_att_value_short(att_fill_value);
-
                   var->getVar(packed_data);
-
                   if (unsigned_value) {
-                     int value;
-                     int positive_cnt = 0;
-                     int raw_min_value =  70000;
-                     int raw_max_value = -70000;
-                     float min_value =  10e10;
-                     float max_value = -10e10;
-                     int unsigned_fill_value = (unsigned short)fill_value;
+                     unsigned short *ushort_data = new unsigned short[cell_count];
                      for (int idx=0; idx<cell_count; idx++) {
-                        value = (unsigned short)packed_data[idx];
-                        if (unsigned_fill_value == value)
-                           data[idx] = bad_data_double;
-                        else {
-                           data[idx] = (value * scale_factor) + add_offset;
-                           unpacked_count++;
-                           if (raw_min_value > value) raw_min_value = value;
-                           if (raw_max_value < value) raw_max_value = value;
-                           if (data[idx] > 0) positive_cnt++;
-                           if (min_value > data[idx]) min_value = data[idx];
-                           if (max_value < data[idx]) max_value = data[idx];
-                        }
+                        ushort_data[idx] =(unsigned short)packed_data[idx];
                      }
-                     mlog << Debug(4) << method_name << " unpacked data: count="
-                          << unpacked_count << " out of " << cell_count
-                          << ". FillValue(short with unsigned) " << fill_value
-                          << " data range [" << min_value << " - " << max_value
-                          << "] raw data: [" << raw_min_value << " - " << raw_max_value << "] Positive count: "
-                          << positive_cnt << "\n";
+                     copy_nc_data_t(var, data, ushort_data, cell_count, 
+                                    "ushort", add_offset, scale_factor,
+                                    has_missing, (unsigned short)missing_value);
+                     delete [] ushort_data;
                   }
                   else {
-                     short min_value =  32766;
-                     short max_value = -32767;
-                     _apply_scale_factor(data, packed_data,
-                           cell_count, fill_value, min_value, max_value, "int",
-                           add_offset, scale_factor);
+                     copy_nc_data_t(var, data, packed_data, cell_count, 
+                                    "short", add_offset, scale_factor,
+                                    has_missing, missing_value);
                   }
                   delete [] packed_data;
                }
                break;
             case NcType::nc_USHORT:
                {
-                  unsigned short fill_value = (unsigned short)bad_data_int;
                   unsigned short *packed_data = new unsigned short[cell_count];
 
-                  if (IS_VALID_NC_P(att_fill_value))
-                     fill_value = get_att_value_short(att_fill_value);
-
                   var->getVar(packed_data);
-
-                  unsigned short min_value = 65535;
-                  unsigned short max_value = 0;
-                  _apply_scale_factor(data, packed_data,
-                        cell_count, fill_value, min_value, max_value, "int",
-                        add_offset, scale_factor);
+                  copy_nc_data_(var, data, packed_data, cell_count,
+                                "ushort", add_offset, scale_factor);
                   delete [] packed_data;
                }
                break;
             case NcType::nc_BYTE:
                {
-                  ncbyte fill_value = (ncbyte)bad_data_int;
+                  ncbyte missing_value;
+                  bool has_missing = get_var_fill_value(var, missing_value);
                   ncbyte *packed_data = new ncbyte[cell_count];
 
-                  if (IS_VALID_NC_P(att_fill_value)) {
-                     fill_value = get_att_value_char(att_fill_value);
-                  }
-
                   var->getVar(packed_data);
-
                   if (unsigned_value) {
-                     int value;
-                     int positive_cnt = 0;
-                     int raw_min_value =  70000;
-                     int raw_max_value = -70000;
-                     float min_value =  10e10;
-                     float max_value = -10e10;
-                     int unsigned_fill_value = (ncbyte)fill_value;
+                     unsigned char *ubyte_data = new unsigned char[cell_count];
                      for (int idx=0; idx<cell_count; idx++) {
-                        value = packed_data[idx];
-                        if (unsigned_fill_value == value)
-                           data[idx] = bad_data_double;
-                        else {
-                           data[idx] = (value * scale_factor) + add_offset;
-                           unpacked_count++;
-                           if (raw_min_value > value) raw_min_value = value;
-                           if (raw_max_value < value) raw_max_value = value;
-                           if (data[idx] > 0) positive_cnt++;
-                           if (min_value > data[idx]) min_value = data[idx];
-                           if (max_value < data[idx]) max_value = data[idx];
-                        }
+                        ubyte_data[idx] =(unsigned char)packed_data[idx];
                      }
-                     mlog << Debug(4) << method_name << " unpacked data: count="
-                          << unpacked_count << " out of " << cell_count
-                          << ". FillValue(short with unsigned) " << fill_value
-                          << " data range [" << min_value << " - " << max_value
-                          << "] raw data: [" << raw_min_value << " - " << raw_max_value << "] Positive count: "
-                          << positive_cnt << "\n";
+                     copy_nc_data_t(var, data, ubyte_data, cell_count,
+                                    "ncubyte", add_offset, scale_factor,
+                                    has_missing, (unsigned char)missing_value);
+                     delete [] ubyte_data;
                   }
                   else {
-                     ncbyte min_value =  127;
-                     ncbyte max_value = -127;
-                     _apply_scale_factor(data, packed_data, cell_count,
-                                         fill_value, min_value, max_value, "ncbyte",
-                                         add_offset, scale_factor);
+                     copy_nc_data_t(var, data, packed_data, cell_count,
+                                    "ncbyte", add_offset, scale_factor,
+                                    has_missing, missing_value);
                   }
                   delete [] packed_data;
                }
                break;
             case NcType::nc_UBYTE:
                {
-                  signed char min_value = 255;
-                  signed char max_value = 0;
-                  signed char fill_value = (signed char)bad_data_int;
-                  signed char *packed_data = new signed char[cell_count];
-
-                  if (IS_VALID_NC_P(att_fill_value)) {
-                     fill_value = get_att_value_char(att_fill_value);
-                  }
+                  unsigned char *packed_data = new unsigned char[cell_count];
 
                   var->getVar(packed_data);
-
-                  _apply_scale_factor(data, packed_data, cell_count,
-                                      fill_value, min_value, max_value, "ncbyte",
-                                      add_offset, scale_factor);
+                  copy_nc_data_(var, data, packed_data, cell_count,
+                                "ncubyte", add_offset, scale_factor);
                   delete [] packed_data;
                }
                break;
@@ -2041,9 +1685,6 @@ bool get_nc_data(NcVar *var, double *data) {
                       << ") for " << GET_NC_NAME_P(var) << "\n";
 
          }
-         if(att_add_offset) delete att_add_offset;
-         if(att_scale_factor) delete att_scale_factor;
-         if(att_fill_value) delete att_fill_value;
       }
    }
    return(return_status);
@@ -2052,14 +1693,14 @@ bool get_nc_data(NcVar *var, double *data) {
 ////////////////////////////////////////////////////////////////////////
 
 bool get_nc_data(NcVar *var, double *data, const long *curs) {
-   bool return_status = _get_nc_data(var, data, bad_data_double, curs);
+   bool return_status = get_nc_data_(var, data, bad_data_double, curs);
    return(return_status);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool get_nc_data(NcVar *var, double *data, const long dim, const long cur) {
-   bool return_status = _get_nc_data(var, data, bad_data_double, dim, cur);;
+   bool return_status = get_nc_data_(var, data, bad_data_double, dim, cur);;
 
    return(return_status);
 }
@@ -2067,7 +1708,7 @@ bool get_nc_data(NcVar *var, double *data, const long dim, const long cur) {
 ////////////////////////////////////////////////////////////////////////
 
 bool get_nc_data(NcVar *var, double *data, const long *dims, const long *curs) {
-   bool return_status = _get_nc_data(var, data, bad_data_double, dims, curs);
+   bool return_status = get_nc_data_(var, data, bad_data_double, dims, curs);
 
    return(return_status);
 }
@@ -2075,7 +1716,15 @@ bool get_nc_data(NcVar *var, double *data, const long *dims, const long *curs) {
 ////////////////////////////////////////////////////////////////////////
 
 bool get_nc_data(NcVar *var, char *data) {
-   bool return_status = _get_nc_data(var, data);
+   bool return_status = get_nc_data_t(var, data);
+
+   return(return_status);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool get_nc_data(NcVar *var, char **data) {
+   bool return_status = get_nc_data_t(var, data);
 
    return(return_status);
 }
@@ -2086,14 +1735,11 @@ bool get_nc_data(NcVar *var, uchar *data) {
    bool return_status = false;
    int data_type = GET_NC_TYPE_ID_P(var);
    static const char *method_name = "get_nc_data(NcVar *, uchar *) -> ";
-   if (NC_UBYTE == data_type) return_status = _get_nc_data(var, data);
+   if (NC_UBYTE == data_type) return_status = get_nc_data_t(var, data);
    else if (NC_BYTE == data_type && has_unsigned_attribute(var)) {
-      int cell_count = 1;
-      for (int idx=0; idx<var->getDimCount(); idx++) {
-         cell_count *= get_dim_size(var, idx);
-      }
+      int cell_count = get_data_size(var);
       ncbyte *signed_data = new ncbyte[cell_count];
-      return_status = _get_nc_data(var, signed_data);
+      return_status = get_nc_data_t(var, signed_data);
       for (int idx=0; idx<cell_count; idx++) {
          data[idx] = (uchar)signed_data[idx];
       }
@@ -2106,6 +1752,7 @@ bool get_nc_data(NcVar *var, uchar *data) {
       exit(1);
    }
 
+   // Do not aplly scale_factor & add_offset to byte/char array output
    return(return_status);
 }
 
@@ -2115,19 +1762,16 @@ bool get_nc_data(NcVar *var, unsigned short *data) {
    bool return_status = false;
    int data_type = GET_NC_TYPE_ID_P(var);
    static const char *method_name = "get_nc_data(NcVar *, unsigned short *) -> ";
-   if (NC_USHORT == data_type) return_status = _get_nc_data(var, data);
+   if (NC_USHORT == data_type) return_status = get_nc_data_t(var, data);
    else if (NC_SHORT == data_type && has_unsigned_attribute(var)) {
-      int cell_count = 1;
+      int cell_count = get_data_size(var);
       short fill_value = (short)bad_data_int;
       NcVarAtt *att_fill_value  = get_nc_att(var, (string)"_FillValue");
       bool has_fill_value = IS_VALID_NC_P(att_fill_value);
       if (has_fill_value) fill_value = get_att_value_int(att_fill_value);
-      for (int idx=0; idx<var->getDimCount(); idx++) {
-         NcDim dim = var->getDim(idx);
-         cell_count *= get_dim_size(&dim);
-      }
+
       short *short_data = new short[cell_count];
-      return_status = _get_nc_data(var, short_data);
+      return_status = get_nc_data_t(var, short_data);
       for (int idx=0; idx<cell_count; idx++) {
          if (has_fill_value && fill_value == short_data[idx])
             data[idx] = (unsigned short)bad_data_int;
@@ -2144,6 +1788,7 @@ bool get_nc_data(NcVar *var, unsigned short *data) {
       exit(1);
    }
 
+   // Do not aplly scale_factor & add_offset to short array output
    return(return_status);
 }
 
@@ -2155,14 +1800,14 @@ bool get_nc_data(NcFile *nc, const char *var_name, char *data,
    //
    // Retrieve the input variables
    //
-   NcVar var    = get_var(nc, var_name);
+   NcVar var = get_var(nc, var_name);
    return get_nc_data(&var, data, dims, curs);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool get_nc_data(NcVar *var, char *data, const long dim, const long cur) {
-   bool return_status = _get_nc_data(var, data, bad_data_char, dim, cur);
+   bool return_status = get_nc_data_(var, data, bad_data_char, dim, cur);
 
    return(return_status);
 }
@@ -2170,18 +1815,20 @@ bool get_nc_data(NcVar *var, char *data, const long dim, const long cur) {
 ////////////////////////////////////////////////////////////////////////
 
 bool get_nc_data(NcVar *var, char *data, const long *dims, const long *curs) {
-   bool return_status = _get_nc_data(var, data, bad_data_char, dims, curs);
+   bool return_status = get_nc_data_(var, data, bad_data_char, dims, curs);
 
    return(return_status);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
+/*
 bool get_nc_data(NcVar *var, ncbyte *data) {
-   bool return_status = _get_nc_data(var, data);
+   bool return_status = get_nc_data_no_scale_T(var, data);
 
    return(return_status);
 }
+*/
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -2198,7 +1845,7 @@ bool get_nc_data(NcFile *nc, const char *var_name, ncbyte *data,
 ////////////////////////////////////////////////////////////////////////
 
 bool get_nc_data(NcVar *var, ncbyte *data, const long dim, const long cur) {
-   bool return_status = _get_nc_data(var, data, (ncbyte)bad_data_char, dim, cur);
+   bool return_status = get_nc_data_(var, data, (ncbyte)bad_data_char, dim, cur);
 
    return(return_status);
 }
@@ -2206,9 +1853,70 @@ bool get_nc_data(NcVar *var, ncbyte *data, const long dim, const long cur) {
 ////////////////////////////////////////////////////////////////////////
 
 bool get_nc_data(NcVar *var, ncbyte *data, const long *dims, const long *curs) {
-   bool return_status = _get_nc_data(var, data, (ncbyte)bad_data_char, dims, curs);
+   bool return_status = get_nc_data_(var, data, (ncbyte)bad_data_char, dims, curs);
 
    return(return_status);
+}
+
+////////////////////////////////////////////////////////////////////////
+// returns matching offset or bad_data_int if not found
+
+int get_index_at_nc_data(NcVar *var, double value, const string dim_name, bool is_time) {
+   int offset = bad_data_int;
+   static const char *method_name = "get_index_at_nc_data() -> ";
+   if (IS_VALID_NC_P(var)) {
+      int data_size = get_data_size(var);
+      double *values = new double[data_size];
+      
+      if (get_nc_data(var, values)) {
+         unixtime ut;
+         int sec_per_unit;
+         bool no_leap_year = get_att_no_leap_year(var);
+         ut = sec_per_unit = 0;
+         if (is_time) {
+            ConcatString units;
+            bool has_attr = get_var_units(var, units);
+            if (has_attr && (0 < units.length()))
+                parse_cf_time_string(units.c_str(), ut, sec_per_unit);
+            else {
+               mlog << Warning << "\n" << method_name
+                    << "the time variable \"" << GET_NC_NAME_P(var)
+                    << "\" must contain a \""
+                    << units_att_name << "\" attribute.\n\n";
+            }
+         }
+         for (int idx=0; idx<data_size; idx++) {
+            if (is_eq(values[idx], value)) {
+               offset = idx;
+               break;
+            }
+            if (is_time) {
+               if (is_eq(add_to_unixtime(ut, sec_per_unit, values[idx], no_leap_year), value)) {
+                  offset = idx;
+                  break;
+               }
+            }
+         }
+      }
+      if (values) delete [] values;
+
+      ConcatString value_str;
+      if (is_time && (value > 10000000.)) value_str << unix_to_yyyymmdd_hhmmss(value);
+      else value_str << value;
+      if (offset == bad_data_int)
+         mlog << Debug(7) << method_name << "Not found value " << value_str
+              << " at " << GET_NC_NAME_P(var)
+              << " by dimension name \"" << dim_name << "\"\n";
+      else
+         mlog << Debug(7) << method_name << "Found value " << value_str
+              << " (index=" << offset << ") at " << GET_NC_NAME_P(var)
+              << " by dimension name \"" << dim_name << "\"\n";
+   }
+   else {
+      mlog << Debug(7) << method_name << "Not found a dimension variable for \""
+           << dim_name << "\"\n";
+   }
+   return(offset);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2300,48 +2008,32 @@ int get_nc_string_length(NcFile *nc_file, NcVar var, const char *var_name) {
 
 ////////////////////////////////////////////////////////////////////////
 
-template <typename T>
-bool _put_nc_data(NcVar *var, const T data, long offset0, long offset1, long offset2) {
-   vector<size_t> offsets;
-   offsets.push_back((size_t)offset0);
-   if (0 <= offset1) {
-     offsets.push_back((size_t)offset1);
-   }
-   if (0 <= offset2) {
-     offsets.push_back((size_t)offset2);
-   }
-   var->putVar(offsets, data);
-   return true;
-}
-
-////////////////////////////////////////////////////////////////////////
-
 bool put_nc_data(NcVar *var, const int data, long offset0, long offset1, long offset2) {
-   return _put_nc_data(var, data, offset0, offset1, offset2);
+   return put_nc_data_T(var, data, offset0, offset1, offset2);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool put_nc_data(NcVar *var, const char data, long offset0, long offset1, long offset2) {
-   return _put_nc_data(var, data, offset0, offset1, offset2);
+   return put_nc_data_T(var, data, offset0, offset1, offset2);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool put_nc_data(NcVar *var, const float data , long offset0, long offset1, long offset2) {
-   return _put_nc_data(var, data, offset0, offset1, offset2);
+   return put_nc_data_T(var, data, offset0, offset1, offset2);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool put_nc_data(NcVar *var, const double data, long offset0, long offset1, long offset2) {
-   return _put_nc_data(var, data, offset0, offset1, offset2);
+   return put_nc_data_T(var, data, offset0, offset1, offset2);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool put_nc_data(NcVar *var, const ncbyte data, long offset0, long offset1, long offset2) {
-   return _put_nc_data(var, data, offset0, offset1, offset2);
+   return put_nc_data_T(var, data, offset0, offset1, offset2);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2381,111 +2073,57 @@ bool put_nc_data(NcVar *var, const ncbyte *data ) {
 
 ////////////////////////////////////////////////////////////////////////
 
-template <typename T>
-bool _put_nc_data(NcVar *var, const T *data,    const long length, const long offset) {
-   vector<size_t> offsets, counts;
-   int dim_count = get_dim_count(var);
-   offsets.push_back(offset);
-   if (dim_count >= 2) {
-      offsets.push_back(0);
-      counts.push_back(1);
-   }
-   counts.push_back(length);
-   var->putVar(offsets, counts, data);
-   return true;
-}
-
-////////////////////////////////////////////////////////////////////////
-
 bool put_nc_data(NcVar *var, const int *data,    const long length, const long offset) {
-   _put_nc_data(var, data, length, offset);
+   put_nc_data_T(var, data, length, offset);
    return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool put_nc_data(NcVar *var, const char *data,   const long length, const long offset) {
-   _put_nc_data(var, data, length, offset);
+   put_nc_data_T(var, data, length, offset);
    return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool put_nc_data(NcVar *var, const float *data , const long length, const long offset) {
-   _put_nc_data(var, data, length, offset);
+   put_nc_data_T(var, data, length, offset);
    return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool put_nc_data(NcVar *var, const double *data, const long length, const long offset) {
-   _put_nc_data(var, data, length, offset);
+   put_nc_data_T(var, data, length, offset);
    return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool put_nc_data(NcVar *var, const ncbyte *data, const long length, const long offset) {
-   _put_nc_data(var, data, length, offset);
-   return true;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-template <typename T>
-bool _put_nc_data(NcVar *var, const T *data , const long *lengths, const long *offsets) {
-   int dim = get_dim_count(var);
-   vector<size_t> nc_offsets, counts;
-   for (int idx = 0 ; idx < dim; idx++) {
-      nc_offsets.push_back(offsets[idx]);
-   }
-   for (int idx = 0 ; idx < dim; idx++) {
-      counts.push_back(lengths[idx]);
-   }
-   var->putVar(nc_offsets, counts, data);
+   put_nc_data_T(var, data, length, offset);
    return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool put_nc_data(NcVar *var, const float *data , const long *lengths, const long *offsets) {
-   _put_nc_data(var, data , lengths, offsets);
+   put_nc_data_T(var, data , lengths, offsets);
    return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool put_nc_data(NcVar *var, const char *data , const long *lengths, const long *offsets) {
-   _put_nc_data(var, data , lengths, offsets);
+   put_nc_data_T(var, data , lengths, offsets);
    return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool put_nc_data(NcVar *var, const int *data , const long *lengths, const long *offsets) {
-   _put_nc_data(var, data , lengths, offsets);
-   return true;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-template <typename T>
-bool _put_nc_data_with_dims(NcVar *var, const T *data,
-                           const long len0, const long len1, const long len2) {
-   vector<size_t> offsets, counts;
-   if (0 < len0) {
-     offsets.push_back(0);
-     counts.push_back(len0);
-   }
-   if (0 < len1) {
-     offsets.push_back(0);
-     counts.push_back(len1);
-   }
-   if (0 < len2) {
-     offsets.push_back(0);
-     counts.push_back(len2);
-   }
-   var->putVar(offsets, counts, data);
+   put_nc_data_T(var, data , lengths, offsets);
    return true;
 }
 
@@ -2500,7 +2138,7 @@ bool put_nc_data_with_dims(NcVar *var, const int *data,
 
 bool put_nc_data_with_dims(NcVar *var, const int *data,
                            const long len0, const long len1, const long len2) {
-   _put_nc_data_with_dims(var, data, len0, len1, len2);
+   put_nc_data_T_with_dims(var, data, len0, len1, len2);
    return true;
 }
 
@@ -2515,7 +2153,7 @@ bool put_nc_data_with_dims(NcVar *var, const float *data,
 
 bool put_nc_data_with_dims(NcVar *var, const float *data,
                            const long len0, const long len1, const long len2) {
-   _put_nc_data_with_dims(var, data, len0, len1, len2);
+   put_nc_data_T_with_dims(var, data, len0, len1, len2);
    return true;
 }
 
@@ -2530,7 +2168,7 @@ bool put_nc_data_with_dims(NcVar *var, const double *data,
 
 bool put_nc_data_with_dims(NcVar *var, const double *data,
                            const long len0, const long len1, const long len2) {
-   _put_nc_data_with_dims(var, data, len0, len1, len2);
+   put_nc_data_T_with_dims(var, data, len0, len1, len2);
    return true;
 }
 
@@ -2550,6 +2188,18 @@ bool args_ok(const LongArray & a) {
 }
 
 ////////////////////////////////////////////////////////////////////////
+// Continue even though not exists
+
+NcGroup get_nc_group(NcFile *nc, const char *group_name) {
+   NcGroup nc_group;
+   multimap<string,NcGroup> group_map = nc->getGroups();
+   multimap<string,NcGroup>::iterator it = group_map.find(group_name);
+   if (it != group_map.end()) nc_group = it->second;
+   return nc_group;
+}
+
+////////////////////////////////////////////////////////////////////////
+// Exit if exists but invalid
 
 NcVar get_var(NcFile *nc, const char *var_name) {
    string new_var_name = var_name;
@@ -2559,23 +2209,57 @@ NcVar get_var(NcFile *nc, const char *var_name) {
    // Retrieve the variable from the NetCDF file.
    //
    NcVar var;
-   multimap<string,NcVar> varMap = GET_NC_VARS_P(nc);
-   multimap<string,NcVar>::iterator it = varMap.find(new_var_name);
-   if (it != varMap.end()) {
-      NcVar tmpVar = it->second;
-      if(IS_INVALID_NC(tmpVar)) {
-         mlog << Error << "\nget_var() -> "
+   multimap<string,NcVar> var_map = GET_NC_VARS_P(nc);
+   multimap<string,NcVar>::iterator it = var_map.find(new_var_name);
+   if (it != var_map.end()) {
+      var = it->second;
+      if(IS_INVALID_NC(var)) {
+         mlog << Error << "\nget_var(var_name) -> "
               << "can't read \"" << new_var_name << "\" variable.\n\n";
          exit(1);
       }
-
-      var = tmpVar;
    }
 
    return(var);
 }
 
 ////////////////////////////////////////////////////////////////////////
+// Exit if exists but invalid
+
+NcVar get_var(NcFile *nc, const char *var_name, const char *group_name) {
+   string nc_var_name;
+   string new_var_name = var_name;
+   patch_nc_name(&new_var_name);
+
+   //
+   // Retrieve the variable from the NetCDF file.
+   //
+   NcVar var;
+   multimap<string,NcVar> var_map;
+   NcGroup nc_group = get_nc_group(nc, group_name);
+   if (IS_VALID_NC(nc_group)) {
+      nc_var_name = new_var_name;
+      var_map = GET_NC_VARS(nc_group);
+   }
+   else {   // This is for IODA data format 1.0
+      nc_var_name = new_var_name + "@" + group_name;
+      var_map = GET_NC_VARS_P(nc);
+   }
+   multimap<string,NcVar>::iterator it = var_map.find(nc_var_name);
+   if (it != var_map.end()) {
+      var = it->second;
+      if(IS_INVALID_NC(var)) {
+         mlog << Error << "\nget_var(var_name, group_name) -> "
+              << "can't read \"" << new_var_name << "\" variable.\n\n";
+         exit(1);
+      }
+   }
+
+   return(var);
+}
+
+////////////////////////////////////////////////////////////////////////
+// Continue even though not exists
 
 NcVar get_nc_var(NcFile *nc, const char *var_name, bool log_as_error) {
    string new_var_name = var_name;
@@ -2587,7 +2271,7 @@ NcVar get_nc_var(NcFile *nc, const char *var_name, bool log_as_error) {
    NcVar var = nc->getVar(new_var_name);
    if(IS_INVALID_NC(var)) {
       ConcatString log_message;
-      log_message << "\nget_nc_var(NcFile) --> The variable \""
+      log_message << "\nget_nc_var(var_name) --> The variable \""
                   << new_var_name << "\" does not exist!\n\n";
       if (log_as_error)
          mlog << Error << log_message;
@@ -2596,6 +2280,60 @@ NcVar get_nc_var(NcFile *nc, const char *var_name, bool log_as_error) {
    }
 
    return(var);
+}
+
+////////////////////////////////////////////////////////////////////////
+// Continue even though not exists
+
+NcVar get_nc_var(NcFile *nc, const ConcatString &var_name, bool log_as_error) {
+   return get_nc_var(nc, var_name.c_str(), log_as_error);
+}
+
+////////////////////////////////////////////////////////////////////////
+// Continue even though not exists
+
+NcVar get_nc_var(NcFile *nc, const char *var_name, const char *group_name,
+                 bool log_as_error) {
+   string nc_var_name;
+   string new_var_name = var_name;
+   patch_nc_name(&new_var_name);
+
+   //
+   // Retrieve the variable from the NetCDF file.
+   //
+   NcVar var;
+   multimap<string,NcVar> var_map;
+   NcGroup nc_group = get_nc_group(nc, group_name);
+   if (IS_VALID_NC(nc_group)) {
+      nc_var_name = new_var_name;
+      var_map = GET_NC_VARS(nc_group);
+   }
+   else {   // This is for IODA data format 1.0
+      nc_var_name = new_var_name + "@" + group_name;
+      var_map = GET_NC_VARS_P(nc);
+   }
+   multimap<string,NcVar>::iterator it = var_map.find(nc_var_name);
+   if (it != var_map.end()) var = it->second;
+
+   if(IS_INVALID_NC(var)) {
+      ConcatString log_message;
+      log_message << "\nget_nc_var(var_name, group_name) --> The variable \""
+                  << nc_var_name << "\" does not exist!\n\n";
+      if (log_as_error)
+         mlog << Error << log_message;
+      else
+         mlog << Warning << log_message;
+   }
+
+   return(var);
+}
+
+////////////////////////////////////////////////////////////////////////
+// Continue even though not exists
+
+NcVar get_nc_var(NcFile *nc, const ConcatString &var_name, const char *group_name,
+                 bool log_as_error) {
+   return get_nc_var(nc, var_name.c_str(), group_name, log_as_error);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2942,8 +2680,8 @@ void copy_nc_atts(NcFile *nc_from, NcFile *nc_to, const bool all_attrs) {
    for (multimap<string,NcGroupAtt>::iterator itr = ncAttMap.begin();
          itr != ncAttMap.end(); ++itr) {
       if (all_attrs ||
-            (  (itr->first != "Conventions")
-            && (itr->first != "missing_value") ) ) {
+            (  (itr->first != cf_att_name)
+            && (itr->first != missing_value_att_name) ) ) {
          NcGroupAtt *from_att = &(itr->second);
          int dataType = GET_NC_TYPE_ID_P(from_att);
          switch (dataType) {
@@ -2977,8 +2715,8 @@ void copy_nc_atts(NcFile *nc_from, NcFile *nc_to, const bool all_attrs) {
 ////////////////////////////////////////////////////////////////////////
 
 void copy_nc_atts(NcVar *var_from, NcVar *var_to, const bool all_attrs) {
-   std::map<std::string,NcVarAtt> ncAttMap = var_from->getAtts();
-   for (std::map<std::string,NcVarAtt>::iterator itr = ncAttMap.begin();
+   map<string,NcVarAtt> ncAttMap = var_from->getAtts();
+   for (map<string,NcVarAtt>::iterator itr = ncAttMap.begin();
          itr != ncAttMap.end(); ++itr) {
       if (all_attrs ||
             (  (itr->first != "scale_factor")
@@ -3090,6 +2828,7 @@ void copy_nc_data_short(NcVar *var_from, NcVar *var_to, int data_size) {
    delete[] data;
 }
 
+////////////////////////////////////////////////////////////////////////
 
 void copy_nc_var_data(NcVar *var_from, NcVar *var_to) {
    const string method_name = "copy_nc_var_data()";
@@ -3134,15 +2873,62 @@ void copy_nc_var_dims(NcVar *var_from, NcVar *var_to) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool has_var(NcFile *nc, const char * var_name) {
-   NcVar v = get_var(nc, var_name);
+bool has_nc_group(NcFile *nc, const char *group_name) {
+   multimap<string,NcGroup> group_map = nc->getGroups();
+   multimap<string,NcGroup>::iterator it = group_map.find(group_name);
+   return (it != group_map.end());
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool has_var(NcFile *nc, const char *var_name) {
+   string new_var_name = var_name;
+   patch_nc_name(&new_var_name);
+   NcVar v = get_var(nc, new_var_name.c_str());
    return IS_VALID_NC(v);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
+bool has_var(NcFile *nc, const ConcatString var_name) {
+   return has_var(nc, var_name.c_str());
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool has_var(NcFile *nc, const char *var_name, const char *group_name) {
+   string nc_var_name;
+   string new_var_name = var_name;
+   patch_nc_name(&new_var_name);
+
+   //
+   // Retrieve the variable from the NetCDF file.
+   //
+   multimap<string,NcVar> var_map;
+   NcGroup nc_group = get_nc_group(nc, group_name);
+   if (IS_VALID_NC(nc_group)) {
+      nc_var_name = new_var_name;
+      var_map = GET_NC_VARS(nc_group);
+   }
+   else {   // This is for IODA data format 1.0
+      nc_var_name = new_var_name + "@" + group_name;
+      var_map = GET_NC_VARS_P(nc);
+   }
+   multimap<string,NcVar>::iterator it = var_map.find(nc_var_name);
+
+   return (it != var_map.end());
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool has_var(NcFile *nc, const ConcatString var_name, const char *group_name) {
+   return has_var(nc, var_name.c_str(), group_name);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 NcVar add_var(NcFile *nc, const string &var_name, const NcType ncType, const int deflate_level) {
-   std::vector<NcDim> ncDimVector;
+   vector<NcDim> ncDimVector;
    string new_var_name = var_name;
    patch_nc_name(&new_var_name);
    NcVar var = nc->addVar(new_var_name, ncType, ncDimVector);
@@ -3445,26 +3231,24 @@ vector<NcDim> get_dims(const NcVar *var, int *dim_count) {
 ////////////////////////////////////////////////////////////////////////
 
 bool is_nc_name_lat(const ConcatString name) {
-   bool is_latitude = (name == "lat" || name == "LAT"
-           || name == "Lat" || name == "Latitude"
-           || name == "latitude" || name == "LATITUDE");
+   ConcatString name_l = to_lower(name);
+   bool is_latitude = (name_l == "lat" || name_l == "latitude");
    return is_latitude;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool is_nc_name_lon(const ConcatString name) {
-   bool is_longitude = (name == "lon" || name == "LON"
-           || name == "Lon" || name == "Longitude"
-           || name == "longitude" || name == "LONGITUDE");
+   ConcatString name_l = to_lower(name);
+   bool is_longitude = (name_l == "lon" || name_l == "longitude");
    return is_longitude;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool is_nc_name_time(const ConcatString name) {
-   bool is_time = (name == "t" || name == "time" || name == "Time" || name == "TIME"
-           || name == "datetime" || name == "Datetime" || name == "DATETIME");
+   ConcatString name_l = to_lower(name);
+   bool is_time = (name == "t" || name_l == "time" || name_l == "datetime");
    return is_time;
 }
 
@@ -3497,25 +3281,26 @@ NcVar get_nc_var_lat(const NcFile *nc) {
    multimap<string,NcVar> mapVar = GET_NC_VARS_P(nc);
    static const char *method_name = "get_nc_var_lat() ";
 
-   for (multimap<string,NcVar>::iterator itVar = mapVar.begin();
-        itVar != mapVar.end(); ++itVar) {
-      ConcatString name = (*itVar).first;
+   for (multimap<string,NcVar>::iterator it_var = mapVar.begin();
+        it_var != mapVar.end(); ++it_var) {
+      ConcatString name = (*it_var).first;
       //if (is_nc_name_lat(name)) found = true;
-      if (get_nc_att_value(&(*itVar).second, "standard_name", name)) {
+      if (get_var_standard_name(&(*it_var).second, name)) {
          if (is_nc_name_lat(name)) found = true;
       }
-      if (!found && get_nc_att_value(&(*itVar).second, "units", name)) {
+      if (!found && get_var_units(&(*it_var).second, name)) {
          if (is_nc_unit_latitude(name.c_str())) {
-            if (get_nc_att_value(&(*itVar).second, "axis", name)) {
+            if (get_nc_att_value(&(*it_var).second, axis_att_name, name)) {
                if (is_nc_attr_lat(name)) found = true;
             }
-            else if (get_nc_att_value(&(*itVar).second, "_CoordinateAxisType", name)) {
+            else if (get_nc_att_value(&(*it_var).second,
+                                      coordinate_axis_type_att_name, name)) {
                if (is_nc_attr_lat(name)) found = true;
             }
          }
       }
       if (found) {
-         var = (*itVar).second;
+         var = (*it_var).second;
          break;
       }
    }
@@ -3538,25 +3323,26 @@ NcVar get_nc_var_lon(const NcFile *nc) {
    multimap<string,NcVar> mapVar = GET_NC_VARS_P(nc);
    static const char *method_name = "get_nc_var_lon() ";
 
-   for (multimap<string,NcVar>::iterator itVar = mapVar.begin();
-        itVar != mapVar.end(); ++itVar) {
-      ConcatString name = (*itVar).first;
+   for (multimap<string,NcVar>::iterator it_var = mapVar.begin();
+        it_var != mapVar.end(); ++it_var) {
+      ConcatString name = (*it_var).first;
       //if (is_nc_name_lon(name)) found = true;
-      if (get_nc_att_value(&(*itVar).second, "standard_name", name)) {
+      if (get_var_standard_name(&(*it_var).second, name)) {
          if (is_nc_name_lon(name)) found = true;
       }
-      if (!found && get_nc_att_value(&(*itVar).second, "units", name)) {
+      if (!found && get_var_units(&(*it_var).second, name)) {
          if (is_nc_unit_longitude(name.c_str())) {
-            if (get_nc_att_value(&(*itVar).second, "axis", name)) {
+            if (get_nc_att_value(&(*it_var).second, axis_att_name, name)) {
                if (is_nc_attr_lon(name)) found = true;
             }
-            else if (get_nc_att_value(&(*itVar).second, "_CoordinateAxisType", name)) {
+            else if (get_nc_att_value(&(*it_var).second,
+                                      coordinate_axis_type_att_name, name)) {
                if (is_nc_attr_lon(name)) found = true;
             }
          }
       }
       if (found) {
-         var = (*itVar).second;
+         var = (*it_var).second;
          break;
       }
    }
@@ -3579,27 +3365,28 @@ NcVar get_nc_var_time(const NcFile *nc) {
    multimap<string,NcVar> mapVar = GET_NC_VARS_P(nc);
    static const char *method_name = "get_nc_var_time() ";
 
-   for (multimap<string,NcVar>::iterator itVar = mapVar.begin();
-        itVar != mapVar.end(); ++itVar) {
-      ConcatString name = (*itVar).first;
+   for (multimap<string,NcVar>::iterator it_var = mapVar.begin();
+        it_var != mapVar.end(); ++it_var) {
+      ConcatString name = (*it_var).first;
       //if (is_nc_name_time(name)) found = true;
-      if (get_nc_att_value(&(*itVar).second, "standard_name", name)) {
+      if (get_var_standard_name(&(*it_var).second, name)) {
          if (is_nc_name_time(name)) found = true;
          mlog << Debug(7) << method_name << "checked variable \""
            << name << "\"  is_time: " << found << "\n";
       }
-      if (!found && get_nc_att_value(&(*itVar).second, "units", name)) {
+      if (!found && get_var_units(&(*it_var).second, name)) {
          if (is_nc_unit_time(name.c_str())) {
-            if (get_nc_att_value(&(*itVar).second, "axis", name)) {
+            if (get_nc_att_value(&(*it_var).second, axis_att_name, name)) {
                if (is_nc_attr_time(name)) found = true;
             }
-            else if (get_nc_att_value(&(*itVar).second, "_CoordinateAxisType", name)) {
+            else if (get_nc_att_value(&(*it_var).second,
+                                      coordinate_axis_type_att_name, name)) {
                if (is_nc_attr_time(name)) found = true;
             }
          }
       }
       if (found) {
-         var = (*itVar).second;
+         var = (*it_var).second;
          break;
       }
    }
@@ -3613,7 +3400,6 @@ NcVar get_nc_var_time(const NcFile *nc) {
    }
    return var;
 }
-
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -3658,9 +3444,9 @@ unixtime get_reference_unixtime(NcVar *time_var, int &sec_per_unit,
    ConcatString time_unit_str;
    static const char *method_name = "get_reference_unixtime() -> ";
 
-   if (get_nc_att_value(time_var, (string)"units", time_unit_str)) {
+   if (get_var_units(time_var, time_unit_str)) {
       parse_cf_time_string(time_unit_str.c_str(), ref_ut, sec_per_unit);
-      no_leap_year = (86400 == sec_per_unit) ? get_att_no_leap_year(time_var) : false;
+      no_leap_year = (sec_per_day == sec_per_unit) ? get_att_no_leap_year(time_var) : false;
    }
    else {
       sec_per_unit = 1;
@@ -3738,7 +3524,13 @@ void parse_cf_time_string(const char *str, unixtime &ref_ut,
               tok.has("h"))      sec_per_unit = 3600;
       else if(tok.has("day")     ||
               tok.has("days")    ||
-              tok.has("d"))      sec_per_unit = 86400;
+              tok.has("d"))      sec_per_unit = sec_per_day;
+      else if(tok.has("month")   ||
+              tok.has("months")  ||
+              tok.has("m"))      sec_per_unit = sec_per_day * 30;
+      else if(tok.has("year")    ||
+              tok.has("years")   ||
+              tok.has("y"))      sec_per_unit = sec_per_day * 30 * 12;
       else {
          mlog << Warning << "\n" << method_name
               << "Unsupported time step in the CF convention time unit \""

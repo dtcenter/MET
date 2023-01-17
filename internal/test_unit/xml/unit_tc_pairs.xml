@@ -36,6 +36,25 @@
     </output>
   </test>
 
+  <test name="tc_pairs_CONSENSUS">
+    <exec>&MET_BIN;/tc_pairs</exec>
+    <env>
+      <pair><name>INIT_BEG</name> <value>"20200823_00"</value></pair>
+      <pair><name>INIT_END</name> <value>"20200823_18"</value></pair>
+    </env>
+    <param> \
+      -adeck &DATA_DIR;/adeck/aal132020.dat \
+      -bdeck &DATA_DIR;/bdeck/bal132020.dat \
+      -config &CONFIG_DIR;/TCPairsConfig_CONSENSUS \
+      -out &OUTPUT_DIR;/tc_pairs/al132020_CONSENSUS \
+      -log &OUTPUT_DIR;/tc_pairs/tc_pairs_CONSENSUS.log \
+      -v 2
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/tc_pairs/al132020_CONSENSUS.tcst</stat>
+    </output>
+  </test>
+
   <test name="tc_pairs_INTERP12_FILL">
     <exec>&MET_BIN;/tc_pairs</exec>
     <env>
@@ -160,6 +179,30 @@
     </param>
     <output>
       <stat>&OUTPUT_DIR;/tc_pairs/alal2015_WRITE_VALID_PROBRIRW.tcst</stat>
+    </output>
+  </test>
+
+  <test name="tc_pairs_DIAGNOSTICS">
+  <exec>&MET_BIN;/tc_pairs</exec>
+    <env>
+      <pair><name>STORM_ID</name> <value>"AL092022"</value></pair>
+      <pair><name>INIT_BEG</name> <value>"20220926_00"</value></pair>
+      <pair><name>INIT_END</name> <value>"20220926_18"</value></pair>
+      <pair><name>CIRA_RT_DIAG_NAME</name> <value>"TPW", "LAND", "SHR_MAG", "STM_SPD"</value></pair>
+      <pair><name>SHIPS_RT_DIAG_NAME</name> <value>"DTL", "PW01", "SHRD"</value></pair>
+    </env>
+    <param> \
+      -adeck &DATA_DIR;/adeck/aal092022_OFCL_SHIP_AVNO.dat \
+      -bdeck &DATA_DIR;/bdeck/bal092022.dat \
+      -diag CIRA_DIAG_RT &DATA_DIR;/diag/cira_diag_rt/2022/sal092022_avno_doper_20220926*_diag.dat \
+      -diag SHIPS_DIAG_RT &DATA_DIR;/diag/ships_diag_rt/2022/220926*AL0922_lsdiag.dat \
+      -config &CONFIG_DIR;/TCPairsConfig_DIAGNOSTICS \
+      -out &OUTPUT_DIR;/tc_pairs/al092022_20220926_DIAGNOSTICS \
+      -log &OUTPUT_DIR;/tc_pairs/tc_pairs_DIAGNOSTICS.log \
+      -v 4
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/tc_pairs/al092022_20220926_DIAGNOSTICS.tcst</stat>
     </output>
   </test>
 

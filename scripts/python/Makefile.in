@@ -221,6 +221,7 @@ MET_HDFLIB = @MET_HDFLIB@
 MET_NETCDF = @MET_NETCDF@
 MET_NETCDFINC = @MET_NETCDFINC@
 MET_NETCDFLIB = @MET_NETCDFLIB@
+MET_PYTHON_BIN_EXE = @MET_PYTHON_BIN_EXE@
 MET_PYTHON_CC = @MET_PYTHON_CC@
 MET_PYTHON_LD = @MET_PYTHON_LD@
 MKDIR_P = @MKDIR_P@
@@ -303,7 +304,8 @@ pythonscripts_DATA = \
 	read_ascii_xarray.py \
 	read_ascii_point.py \
 	read_ascii_mpr.py \
-	read_met_point_obs.py
+	read_met_point_obs.py \
+	derive_WRF_semilatlon.py
 
 EXTRA_DIST = ${pythonscripts_DATA}
 MAINTAINERCLEANFILES = Makefile.in

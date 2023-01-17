@@ -152,7 +152,8 @@ am__define_uniq_tagged_files = \
   done | $(am__uniquify_input)`
 ETAGS = etags
 CTAGS = ctags
-DIST_SUBDIRS = vx_log vx_cal enum_to_string vx_math vx_util vx_config
+DIST_SUBDIRS = vx_log vx_cal enum_to_string vx_math vx_util \
+	vx_util_math vx_config
 am__DIST_COMMON = $(srcdir)/Makefile.in
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 am__relativize = \
@@ -250,6 +251,7 @@ MET_HDFLIB = @MET_HDFLIB@
 MET_NETCDF = @MET_NETCDF@
 MET_NETCDFINC = @MET_NETCDFINC@
 MET_NETCDFLIB = @MET_NETCDFLIB@
+MET_PYTHON_BIN_EXE = @MET_PYTHON_BIN_EXE@
 MET_PYTHON_CC = @MET_PYTHON_CC@
 MET_PYTHON_LD = @MET_PYTHON_LD@
 MKDIR_P = @MKDIR_P@
@@ -324,7 +326,8 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-SUBDIRS = vx_log vx_cal $(am__append_1) vx_math vx_util vx_config
+SUBDIRS = vx_log vx_cal $(am__append_1) vx_math vx_util vx_util_math \
+	vx_config
 MAINTAINERCLEANFILES = Makefile.in
 all: all-recursive
 

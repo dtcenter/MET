@@ -22,6 +22,7 @@ using namespace std;
 
 #include "trig.h"
 #include "vx_log.h"
+#include "vx_math.h"
 
 #include "latlon_xyz.h"
 
@@ -67,6 +68,11 @@ return;
 void grid_xyz_to_latlon(double x, double y, double z, double & lat, double & lon)
 
 {
+// account for numerical errors in which z is actually 1.0 or -1.0 but goes out of bounds
+if (is_eq(z, 1.0, 1.0e-5))
+    z = 1.0;
+else if (is_eq(z, -1.0, 1.0e-5))
+    z = -1.0;
 
 lat = asind(z);
 

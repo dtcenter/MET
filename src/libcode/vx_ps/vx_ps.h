@@ -126,7 +126,7 @@ class PSfile {
       DocumentOrientation Orientation;
       DocumentMedia       Media;
 
-      ofstream * File;   //  the output file ... allocated
+      std::ofstream * File;   //  the output file ... allocated
 
       ConcatString OutputFilename;
 
@@ -163,7 +163,7 @@ class PSfile {
          //  get stuff
          //
 
-      // ofstream & file() const;
+      // std::ofstream & file() const;
       PSFilter & file() const;
 
       DocumentOrientation orientation () const;

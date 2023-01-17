@@ -76,11 +76,16 @@ class ECNTInfo {
       // Number of ensemble members and pairs
       int n_ens, n_pair;
 
-      double crps_emp, crpscl_emp, crpss_emp;
+      double crps_emp, crpscl_emp, crpss_emp, crps_emp_fair, spread_md;
       double crps_gaus, crpscl_gaus, crpss_gaus;
-      double ign, me, rmse, spread;
-      double me_oerr, rmse_oerr, spread_oerr;
+      double ign, me, mae, rmse, spread;
+      double me_oerr, mae_oerr, rmse_oerr, spread_oerr;
       double spread_plus_oerr;
+
+      // Bias ratio information
+      int n_ge_obs, n_lt_obs;
+      double me_ge_obs, me_lt_obs;
+      double bias_ratio;
 
       // Compute statistics
       void set(const PairDataEnsemble &);

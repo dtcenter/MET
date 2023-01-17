@@ -77,7 +77,7 @@ class NCRR_Array {
 
       void clear();
 
-      void dump(ostream &, int = 0) const;
+      void dump(std::ostream &, int = 0) const;
 
          //
          //  set stuff
@@ -254,7 +254,7 @@ return;
 
 template <typename T>
 
-void NCRR_Array<T>::dump(ostream & out, int depth) const
+void NCRR_Array<T>::dump(std::ostream & out, int depth) const
 
 {
 

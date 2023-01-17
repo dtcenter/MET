@@ -112,6 +112,7 @@ am_libvx_summary_a_OBJECTS = libvx_summary_a-summary_calc.$(OBJEXT) \
 	libvx_summary_a-summary_calc_mean.$(OBJEXT) \
 	libvx_summary_a-summary_calc_median.$(OBJEXT) \
 	libvx_summary_a-summary_calc_min.$(OBJEXT) \
+	libvx_summary_a-summary_calc_sum.$(OBJEXT) \
 	libvx_summary_a-summary_calc_percentile.$(OBJEXT) \
 	libvx_summary_a-summary_calc_range.$(OBJEXT) \
 	libvx_summary_a-summary_calc_stdev.$(OBJEXT) \
@@ -142,6 +143,7 @@ am__depfiles_remade = ./$(DEPDIR)/libvx_summary_a-summary_calc.Po \
 	./$(DEPDIR)/libvx_summary_a-summary_calc_percentile.Po \
 	./$(DEPDIR)/libvx_summary_a-summary_calc_range.Po \
 	./$(DEPDIR)/libvx_summary_a-summary_calc_stdev.Po \
+	./$(DEPDIR)/libvx_summary_a-summary_calc_sum.Po \
 	./$(DEPDIR)/libvx_summary_a-summary_key.Po \
 	./$(DEPDIR)/libvx_summary_a-summary_obs.Po \
 	./$(DEPDIR)/libvx_summary_a-time_summary_interval.Po
@@ -273,6 +275,7 @@ MET_HDFLIB = @MET_HDFLIB@
 MET_NETCDF = @MET_NETCDF@
 MET_NETCDFINC = @MET_NETCDFINC@
 MET_NETCDFLIB = @MET_NETCDFLIB@
+MET_PYTHON_BIN_EXE = @MET_PYTHON_BIN_EXE@
 MET_PYTHON_CC = @MET_PYTHON_CC@
 MET_PYTHON_LD = @MET_PYTHON_LD@
 MKDIR_P = @MKDIR_P@
@@ -357,6 +360,7 @@ libvx_summary_a_SOURCES = \
               summary_calc_mean.cc summary_calc_mean.h \
               summary_calc_median.cc summary_calc_median.h \
               summary_calc_min.cc summary_calc_min.h \
+              summary_calc_sum.cc summary_calc_sum.h \
               summary_calc_percentile.cc summary_calc_percentile.h \
               summary_calc_range.cc summary_calc_range.h \
               summary_calc_stdev.cc summary_calc_stdev.h \
@@ -422,6 +426,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_summary_a-summary_calc_percentile.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_summary_a-summary_calc_range.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_summary_a-summary_calc_stdev.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_summary_a-summary_calc_sum.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_summary_a-summary_key.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_summary_a-summary_obs.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_summary_a-time_summary_interval.Po@am__quote@ # am--include-marker
@@ -515,6 +520,20 @@ libvx_summary_a-summary_calc_min.obj: summary_calc_min.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='summary_calc_min.cc' object='libvx_summary_a-summary_calc_min.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_summary_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_summary_a-summary_calc_min.obj `if test -f 'summary_calc_min.cc'; then $(CYGPATH_W) 'summary_calc_min.cc'; else $(CYGPATH_W) '$(srcdir)/summary_calc_min.cc'; fi`
+
+libvx_summary_a-summary_calc_sum.o: summary_calc_sum.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_summary_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_summary_a-summary_calc_sum.o -MD -MP -MF $(DEPDIR)/libvx_summary_a-summary_calc_sum.Tpo -c -o libvx_summary_a-summary_calc_sum.o `test -f 'summary_calc_sum.cc' || echo '$(srcdir)/'`summary_calc_sum.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvx_summary_a-summary_calc_sum.Tpo $(DEPDIR)/libvx_summary_a-summary_calc_sum.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='summary_calc_sum.cc' object='libvx_summary_a-summary_calc_sum.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_summary_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_summary_a-summary_calc_sum.o `test -f 'summary_calc_sum.cc' || echo '$(srcdir)/'`summary_calc_sum.cc
+
+libvx_summary_a-summary_calc_sum.obj: summary_calc_sum.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_summary_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_summary_a-summary_calc_sum.obj -MD -MP -MF $(DEPDIR)/libvx_summary_a-summary_calc_sum.Tpo -c -o libvx_summary_a-summary_calc_sum.obj `if test -f 'summary_calc_sum.cc'; then $(CYGPATH_W) 'summary_calc_sum.cc'; else $(CYGPATH_W) '$(srcdir)/summary_calc_sum.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvx_summary_a-summary_calc_sum.Tpo $(DEPDIR)/libvx_summary_a-summary_calc_sum.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='summary_calc_sum.cc' object='libvx_summary_a-summary_calc_sum.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_summary_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_summary_a-summary_calc_sum.obj `if test -f 'summary_calc_sum.cc'; then $(CYGPATH_W) 'summary_calc_sum.cc'; else $(CYGPATH_W) '$(srcdir)/summary_calc_sum.cc'; fi`
 
 libvx_summary_a-summary_calc_percentile.o: summary_calc_percentile.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_summary_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_summary_a-summary_calc_percentile.o -MD -MP -MF $(DEPDIR)/libvx_summary_a-summary_calc_percentile.Tpo -c -o libvx_summary_a-summary_calc_percentile.o `test -f 'summary_calc_percentile.cc' || echo '$(srcdir)/'`summary_calc_percentile.cc
@@ -733,6 +752,7 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/libvx_summary_a-summary_calc_percentile.Po
 	-rm -f ./$(DEPDIR)/libvx_summary_a-summary_calc_range.Po
 	-rm -f ./$(DEPDIR)/libvx_summary_a-summary_calc_stdev.Po
+	-rm -f ./$(DEPDIR)/libvx_summary_a-summary_calc_sum.Po
 	-rm -f ./$(DEPDIR)/libvx_summary_a-summary_key.Po
 	-rm -f ./$(DEPDIR)/libvx_summary_a-summary_obs.Po
 	-rm -f ./$(DEPDIR)/libvx_summary_a-time_summary_interval.Po
@@ -789,6 +809,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/libvx_summary_a-summary_calc_percentile.Po
 	-rm -f ./$(DEPDIR)/libvx_summary_a-summary_calc_range.Po
 	-rm -f ./$(DEPDIR)/libvx_summary_a-summary_calc_stdev.Po
+	-rm -f ./$(DEPDIR)/libvx_summary_a-summary_calc_sum.Po
 	-rm -f ./$(DEPDIR)/libvx_summary_a-summary_key.Po
 	-rm -f ./$(DEPDIR)/libvx_summary_a-summary_obs.Po
 	-rm -f ./$(DEPDIR)/libvx_summary_a-time_summary_interval.Po

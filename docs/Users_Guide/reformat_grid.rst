@@ -523,7 +523,7 @@ wwmca_regrid configuration file
 
 The default configuration file for the WWMCA-Regrid tool named **WWMCARegridConfig_default** can be found in the installed *share/met/config* directory. We encourage users to make a copy of this file prior to modifying its contents. The contents of the configuration file are described in the subsections below.
 
-Note that environment variables may be used when editing configuration files, as described in :numref:`pb2nc configuration file` for the PB2NC tool.
+Note that environment variables may be used when editing configuration files, as described in the :numref:`config_env_vars`.
 
 ____________________________
 

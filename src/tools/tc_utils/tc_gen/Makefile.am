@@ -30,6 +30,7 @@ tc_gen_LDADD = -lvx_stat_out \
 	-lvx_statistics \
 	-lvx_gis \
 	-lvx_data2d \
+	-lvx_seeps \
 	-lvx_nc_util \
 	-lvx_regrid \
 	-lvx_grid \
@@ -37,6 +38,7 @@ tc_gen_LDADD = -lvx_stat_out \
 	-lvx_pb_util \
 	-lvx_cal \
 	-lvx_nav \
+	-lvx_util_math \
 	-lvx_util \
 	-lvx_math \
 	-lvx_color \

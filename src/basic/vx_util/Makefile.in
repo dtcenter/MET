@@ -117,8 +117,8 @@ am__libvx_util_a_SOURCES_DIST = ascii_table.cc ascii_table.h \
 	is_number.cc is_number.h crc_array.h crr_array.h ncrr_array.h \
 	int_array.h two_d_array.h long_array.cc long_array.h \
 	num_array.cc num_array.h thresh_array.cc thresh_array.h \
-	make_path.cc make_path.h memory.cc memory.h normalize.cc \
-	normalize.h ordinal.cc ordinal.h roman_numeral.cc \
+	main.cc main.h make_path.cc make_path.h memory.cc memory.h \
+	normalize.cc normalize.h ordinal.cc ordinal.h roman_numeral.cc \
 	roman_numeral.h string_fxns.cc string_fxns.h substring.cc \
 	substring.h fix_float.cc fix_float.h command_line.cc \
 	command_line.h file_size.cc file_size.h file_exists.cc \
@@ -151,8 +151,8 @@ am_libvx_util_a_OBJECTS = libvx_util_a-ascii_table.$(OBJEXT) \
 	libvx_util_a-long_array.$(OBJEXT) \
 	libvx_util_a-num_array.$(OBJEXT) \
 	libvx_util_a-thresh_array.$(OBJEXT) \
-	libvx_util_a-make_path.$(OBJEXT) libvx_util_a-memory.$(OBJEXT) \
-	libvx_util_a-normalize.$(OBJEXT) \
+	libvx_util_a-main.$(OBJEXT) libvx_util_a-make_path.$(OBJEXT) \
+	libvx_util_a-memory.$(OBJEXT) libvx_util_a-normalize.$(OBJEXT) \
 	libvx_util_a-ordinal.$(OBJEXT) \
 	libvx_util_a-roman_numeral.$(OBJEXT) \
 	libvx_util_a-string_fxns.$(OBJEXT) \
@@ -181,6 +181,7 @@ am_libvx_util_a_OBJECTS = libvx_util_a-ascii_table.$(OBJEXT) \
 	libvx_util_a-GridOffset.$(OBJEXT) \
 	libvx_util_a-observation.$(OBJEXT) \
 	libvx_util_a-handle_openmp.$(OBJEXT) \
+	libvx_util_a-main.$(OBJEXT) \
 	libvx_util_a-RectangularTemplate.$(OBJEXT) $(am__objects_2)
 libvx_util_a_OBJECTS = $(am_libvx_util_a_OBJECTS)
 AM_V_P = $(am__v_P_@AM_V@)
@@ -226,6 +227,7 @@ am__depfiles_remade = ./$(DEPDIR)/libvx_util_a-CircularTemplate.Po \
 	./$(DEPDIR)/libvx_util_a-interp_util.Po \
 	./$(DEPDIR)/libvx_util_a-is_number.Po \
 	./$(DEPDIR)/libvx_util_a-long_array.Po \
+	./$(DEPDIR)/libvx_util_a-main.Po \
 	./$(DEPDIR)/libvx_util_a-make_path.Po \
 	./$(DEPDIR)/libvx_util_a-mask_poly.Po \
 	./$(DEPDIR)/libvx_util_a-memory.Po \
@@ -371,6 +373,7 @@ MET_HDFLIB = @MET_HDFLIB@
 MET_NETCDF = @MET_NETCDF@
 MET_NETCDFINC = @MET_NETCDFINC@
 MET_NETCDFLIB = @MET_NETCDFLIB@
+MET_PYTHON_BIN_EXE = @MET_PYTHON_BIN_EXE@
 MET_PYTHON_CC = @MET_PYTHON_CC@
 MET_PYTHON_LD = @MET_PYTHON_LD@
 MKDIR_P = @MKDIR_P@
@@ -467,6 +470,7 @@ libvx_util_a_SOURCES = ascii_table.cc ascii_table.h \
                long_array.cc long_array.h \
                num_array.cc num_array.h \
                thresh_array.cc thresh_array.h \
+               main.cc main.h \
                make_path.cc make_path.h \
                memory.cc memory.h \
                normalize.cc normalize.h \
@@ -503,6 +507,7 @@ libvx_util_a_SOURCES = ascii_table.cc ascii_table.h \
                observation.h observation.cc \
                stat_column_defs.h \
                handle_openmp.h handle_openmp.cc \
+               main.cc main.h \
                RectangularTemplate.h RectangularTemplate.cc $(OPT_PYTHON_SOURCES)
 
 libvx_util_a_CPPFLAGS = ${MET_CPPFLAGS}
@@ -582,6 +587,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_util_a-interp_util.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_util_a-is_number.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_util_a-long_array.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_util_a-main.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_util_a-make_path.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_util_a-mask_poly.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_util_a-memory.Po@am__quote@ # am--include-marker
@@ -787,6 +793,20 @@ libvx_util_a-thresh_array.obj: thresh_array.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='thresh_array.cc' object='libvx_util_a-thresh_array.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_util_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_util_a-thresh_array.obj `if test -f 'thresh_array.cc'; then $(CYGPATH_W) 'thresh_array.cc'; else $(CYGPATH_W) '$(srcdir)/thresh_array.cc'; fi`
+
+libvx_util_a-main.o: main.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_util_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_util_a-main.o -MD -MP -MF $(DEPDIR)/libvx_util_a-main.Tpo -c -o libvx_util_a-main.o `test -f 'main.cc' || echo '$(srcdir)/'`main.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvx_util_a-main.Tpo $(DEPDIR)/libvx_util_a-main.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='main.cc' object='libvx_util_a-main.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_util_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_util_a-main.o `test -f 'main.cc' || echo '$(srcdir)/'`main.cc
+
+libvx_util_a-main.obj: main.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_util_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_util_a-main.obj -MD -MP -MF $(DEPDIR)/libvx_util_a-main.Tpo -c -o libvx_util_a-main.obj `if test -f 'main.cc'; then $(CYGPATH_W) 'main.cc'; else $(CYGPATH_W) '$(srcdir)/main.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvx_util_a-main.Tpo $(DEPDIR)/libvx_util_a-main.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='main.cc' object='libvx_util_a-main.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_util_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_util_a-main.obj `if test -f 'main.cc'; then $(CYGPATH_W) 'main.cc'; else $(CYGPATH_W) '$(srcdir)/main.cc'; fi`
 
 libvx_util_a-make_path.o: make_path.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_util_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_util_a-make_path.o -MD -MP -MF $(DEPDIR)/libvx_util_a-make_path.Tpo -c -o libvx_util_a-make_path.o `test -f 'make_path.cc' || echo '$(srcdir)/'`make_path.cc
@@ -1406,6 +1426,7 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/libvx_util_a-interp_util.Po
 	-rm -f ./$(DEPDIR)/libvx_util_a-is_number.Po
 	-rm -f ./$(DEPDIR)/libvx_util_a-long_array.Po
+	-rm -f ./$(DEPDIR)/libvx_util_a-main.Po
 	-rm -f ./$(DEPDIR)/libvx_util_a-make_path.Po
 	-rm -f ./$(DEPDIR)/libvx_util_a-mask_poly.Po
 	-rm -f ./$(DEPDIR)/libvx_util_a-memory.Po
@@ -1496,6 +1517,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/libvx_util_a-interp_util.Po
 	-rm -f ./$(DEPDIR)/libvx_util_a-is_number.Po
 	-rm -f ./$(DEPDIR)/libvx_util_a-long_array.Po
+	-rm -f ./$(DEPDIR)/libvx_util_a-main.Po
 	-rm -f ./$(DEPDIR)/libvx_util_a-make_path.Po
 	-rm -f ./$(DEPDIR)/libvx_util_a-mask_poly.Po
 	-rm -f ./$(DEPDIR)/libvx_util_a-memory.Po

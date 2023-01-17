@@ -56,12 +56,14 @@ class DataPlane {
      ~DataPlane();
       DataPlane(const DataPlane &);
       DataPlane & operator=(const DataPlane &);
+      DataPlane & operator+=(const DataPlane &);
+      DataPlane & operator/=(const double);
 
       void clear();
 
       void erase();
 
-      void dump(ostream &, int = 0) const;
+      void dump(std::ostream &, int = 0) const;
 
          //
          // Set functions
@@ -96,7 +98,7 @@ class DataPlane {
       int      lead() const;
       int      accum() const;
       double   get(int x, int y) const;
-      double   operator () (int x, int y) const;
+      double   operator() (int x, int y) const;
 
       const double * data() const;
       std::vector<double> & buf();
@@ -187,10 +189,12 @@ class DataPlaneArray {
      ~DataPlaneArray();
       DataPlaneArray(const DataPlaneArray &);
       DataPlaneArray & operator=(const DataPlaneArray &);
+      DataPlaneArray & operator+=(const DataPlaneArray &);
+      DataPlaneArray & operator/=(const double);
 
       void clear();
 
-      void dump(ostream &, int = 0) const;
+      void dump(std::ostream &, int = 0) const;
 
          //
          //  set stuff
