@@ -36,3 +36,8 @@ export MET_TARBALL=none
 export USE_MODULES=FALSE
 
 export MET_INSTALL_DIR=/usr/local
+
+export COMPILE_HDF=1
+export COMPILE_HDFEOS=1
+export COMPILE_FREETYPE=1
+export COMPILE_CAIRO=1
