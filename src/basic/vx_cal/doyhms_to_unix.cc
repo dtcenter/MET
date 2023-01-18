@@ -97,7 +97,22 @@ return ( s );
 
 }
 
+
 ////////////////////////////////////////////////////////////////////////
+
+int unix_to_sec_of_year(unixtime u) {
+
+int mon, day, yr, hr, min, sec;
+
+unix_to_mdyhms(u, mon, day, yr, hr, min, sec);
+
+return ( (int) mdyhms_to_unix(mon, day, 1970, hr, min, sec) );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
 
 long unix_to_long_yyyymmddhh(unixtime u) {
 
@@ -111,5 +126,48 @@ yyyymmddhh = 1000000 * yr + 10000 * mon + 100 * day + hr;
 return ( yyyymmddhh );
 
 }
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+int sec_of_day_diff(unixtime ut1, unixtime ut2) {
+
+int sec_per_day = 60 * 60 * 24;
+
+int s1 = unix_to_sec_of_day(ut1);
+
+int s2 = unix_to_sec_of_day(ut2);
+
+int ds = s2 - s1;
+
+     if ( ds < -1 * sec_per_day/2 ) ds += sec_per_day;
+else if ( ds >      sec_per_day/2 ) ds -= sec_per_day;
+
+return ( ds );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+int sec_of_year_diff(unixtime ut1, unixtime ut2) {
+
+int sec_per_year = 60 * 60 * 24 * 365;
+
+int s1 = unix_to_sec_of_year(ut1);
+
+int s2 = unix_to_sec_of_year(ut2);
+
+int ds = s2 - s1;
+
+     if ( ds < -1 * sec_per_year/2 ) ds += sec_per_year;
+else if ( ds >      sec_per_year/2 ) ds -= sec_per_year;
+
+return ( ds );
+
+}
+
 
 ////////////////////////////////////////////////////////////////////////
