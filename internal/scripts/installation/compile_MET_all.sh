@@ -95,8 +95,14 @@ if [ ! -e $TAR_DIR ]; then
 fi
 
 # Update library linker path
-export LD_LIBRARY_PATH=${TEST_BASE}/external_libs/lib${MET_PYTHON:+:$MET_PYTHON/lib}${MET_NETCDF:+:$MET_NETCDF/lib}${MET_HDF5:+:$MET_HDF5/lib}${MET_BUFRLIB:+:$MET_BUFRLIB}${MET_GRIB2CLIB:+:$MET_GRIB2CLIB}${LIB_JASPER:+$LIB_JASPER}${LIB_LIBPNG:+:$LIB_JASPER}${LIB_Z:+$LIB_Z}${MET_GSL:+:$MET_GSL/lib}${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
+export LD_LIBRARY_PATH=${TEST_BASE}/external_libs/lib${MET_PYTHON:+:$MET_PYTHON/lib}${MET_NETCDF:+:$MET_NETCDF/lib}${MET_HDF5:+:$MET_HDF5/lib}${MET_BUFRLIB:+:$MET_BUFRLIB}${MET_GRIB2CLIB:+:$MET_GRIB2CLIB}${LIB_JASPER:+:$LIB_JASPER}${LIB_LIBPNG:+:$LIB_LIBPNG}${LIB_Z:+:$LIB_Z}${MET_GSL:+:$MET_GSL/lib}${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
 echo "LD_LIBRARY_PATH = ${LD_LIBRARY_PATH}"
+
+# if LIB_Z is not set in the environment file, set it to the
+# lib directory so it can be used to install HDF5 with zlib support
+if [[ -z "$LIB_Z" ]]; then
+  LIB_Z=${LIB_DIR}/lib
+fi
 
 # Constants
 if [[ -z ${MET_GRIB2CLIB} ]] && [[ -z ${MET_GRIB2C} ]]; then
@@ -617,7 +623,7 @@ if [ $COMPILE_NETCDF -eq 1 ]; then
   tar -xzf ${TAR_DIR}/hdf5*.tar.gz
   cd hdf5*
   echo "cd `pwd`"
-  echo "./configure --prefix=${LIB_DIR} --with-zlib=${LIB_DIR}/lib CFLAGS=-fPIC CXXFLAGS=-fPIC FFLAGS=-fPIC LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include > configure.log 2>&1"
+  echo "./configure --prefix=${LIB_DIR} --with-zlib=${LIB_Z} CFLAGS=-fPIC CXXFLAGS=-fPIC FFLAGS=-fPIC LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include > configure.log 2>&1"
   ./configure --prefix=${LIB_DIR} --with-zlib=${LIB_Z} CFLAGS=-fPIC CXXFLAGS=-fPIC FFLAGS=-fPIC LDFLAGS=-L${LIB_DIR}/lib:${LIB_Z} CPPFLAGS=-I${LIB_DIR}/include > configure.log 2>&1
   ret=$?
   if [ $ret != 0 ]; then
@@ -635,10 +641,9 @@ if [ $COMPILE_NETCDF -eq 1 ]; then
   echo
   echo "Compiling NetCDF-C at `date`"
   mkdir -p ${LIB_DIR}/netcdf
-  cd ${LIB_DIR}/netcdf
-  rm -rf netcdf*
-  tar -xzf ${TAR_DIR}/netcdf-4*.tar.gz
-  cd netcdf-c-4*
+  rm -rf ${LIB_DIR}/netcdf/netcdf*
+  tar -xzf ${TAR_DIR}/netcdf-4*.tar.gz -C ${LIB_DIR}/netcdf > /dev/null 2>&1 || unzip ${TAR_DIR}/netcdf-4*.zip -d ${LIB_DIR}/netcdf
+  cd ${LIB_DIR}/netcdf/netcdf-*
   export FC=''
   export F90=''
   echo "cd `pwd`"
