@@ -42,3 +42,5 @@ export MET_FONT_DIR=${MET_TEST_INPUT}/fonts
 # Define Rscript to use a version with the ncdf4 package 1.17 or later 
 export MET_TEST_RSCRIPT=/usr/bin/Rscript
 
+# set make arguments to build using multiple jobs
+export MAKE_ARGS=-j
