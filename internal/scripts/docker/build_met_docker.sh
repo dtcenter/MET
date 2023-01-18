@@ -9,7 +9,7 @@ mkdir -p /met/logs
 LOG_FILE=/met/logs/MET-${MET_GIT_NAME}_configure.log
 echo "Configuring MET ${MET_GIT_NAME} and writing log file ${LOG_FILE}"
 ./bootstrap
-./configure --enable-grib2 --enable-mode_graphics --enable-modis --enable-lidar2nc --enable-python > ${LOG_FILE}
+./configure --enable-grib2 --enable-mode_graphics --enable-modis --enable-lidar2nc --enable-python > ${LOG_FILE} 2>&1
 if [ $? != 0 ]; then
   cat ${LOG_FILE}
   exit 1
@@ -17,7 +17,7 @@ fi
 
 LOG_FILE=/met/logs/MET-${MET_GIT_NAME}_make_install.log
 echo "Compiling MET ${MET_GIT_NAME} and writing log file ${LOG_FILE}"
-make install > ${LOG_FILE}
+make install > ${LOG_FILE} 2>&1
 if [ $? != 0 ]; then
   cat ${LOG_FILE}
   exit 1
