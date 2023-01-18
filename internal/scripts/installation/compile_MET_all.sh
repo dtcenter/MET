@@ -224,6 +224,10 @@ if [ ! -z "${SKIP_LIBS}" ]; then
   COMPILE_CAIRO=0
 fi
 
+if [ -z ${BIN_DIR_PATH} ]; then
+  BIN_DIR_PATH=${TEST_BASE}/bin
+fi
+
 if [ -z ${USE_MET_TAR_FILE} ]; then
   export USE_MET_TAR_FILE=TRUE
 fi
@@ -611,7 +615,6 @@ fi
 if [ -z ${MET_GSL} ]; then
   export MET_GSL=${LIB_DIR}
 fi
-
 
 export MET_PYTHON_BIN_EXE=${MET_PYTHON_BIN_EXE:=${MET_PYTHON}/bin/python3}
 export MET_PYTHON_LD

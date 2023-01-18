@@ -15,9 +15,13 @@ if [ $? != 0 ]; then
   exit 1
 fi
 
+if [ ! -z "${MAKE_ARGS}" ]; then
+  echo Adding make arguments: ${MAKE_ARGS}
+fi
+
 LOG_FILE=/met/logs/MET-${MET_GIT_NAME}_make_install.log
 echo "Compiling MET ${MET_GIT_NAME} and writing log file ${LOG_FILE}"
-make install > ${LOG_FILE} 2>&1
+make ${MAKE_ARGS} install > ${LOG_FILE}
 if [ $? != 0 ]; then
   cat ${LOG_FILE}
   exit 1
@@ -25,7 +29,7 @@ fi
 
 LOG_FILE=/met/logs/MET-${MET_GIT_NAME}_make_test.log
 echo "Testing MET ${MET_GIT_NAME} and writing log file ${LOG_FILE}"
-make test > ${LOG_FILE} 2>&1
+make ${MAKE_ARGS} test > ${LOG_FILE} 2>&1
 if [ $? != 0 ]; then
   cat ${LOG_FILE}
   exit 1
