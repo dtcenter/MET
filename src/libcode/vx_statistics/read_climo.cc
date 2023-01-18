@@ -150,21 +150,19 @@ void read_climo_file(const char *climo_file, GrdFileType ctype,
                      int day_ts, int hour_ts, const Grid &vx_grid,
                      const RegridInfo &regrid_info,
                      DataPlaneArray &dpa) {
+
    Met2dDataFileFactory mtddf_factory;
    Met2dDataFile *mtddf = (Met2dDataFile *) 0;
 
    VarInfoFactory info_factory;
    VarInfo *info = (VarInfo *) 0;
 
-   DataPlaneArray cur_dpa;
+   DataPlaneArray clm_dpa;
    DataPlane dp;
 
-   int n_climo, i;
-   int vld_mon, vld_day, vld_yr, vld_hr, vld_min, vld_sec;
-   int clm_mon, clm_day, clm_yr, clm_hr, clm_min, clm_sec;
-   unixtime ut;
+   int n_clm, i, dsec_of_day, dsec_of_year;
 
-   ConcatString cur_ut_cs;
+   ConcatString clm_ut_cs;
 
    // Allocate memory for data file
    if(!(mtddf = mtddf_factory.new_met_2d_data_file(climo_file, ctype))) {
@@ -179,94 +177,62 @@ void read_climo_file(const char *climo_file, GrdFileType ctype,
    info->set_dict(*dict);
 
    // Read data planes
-   n_climo = mtddf->data_plane_array(*info, cur_dpa);
-
-   // Compute the valid month and day
-   unix_to_mdyhms(vld_ut, vld_mon, vld_day, vld_yr,
-                  vld_hr, vld_min, vld_sec);
+   n_clm = mtddf->data_plane_array(*info, clm_dpa);
 
    // Loop through matching records
-   for(i=0; i<n_climo; i++) {
+   for(i=0; i<n_clm; i++) {
 
-      // Store current valid time string
-      cur_ut_cs = unix_to_yyyymmdd_hhmmss(cur_dpa[i].valid());
+      // Store climo time string
+      clm_ut_cs = unix_to_yyyymmdd_hhmmss(clm_dpa[i].valid());
 
-      // Compute the current month and day
-      unix_to_mdyhms(cur_dpa[i].valid(), clm_mon, clm_day, clm_yr,
-                     clm_hr, clm_min, clm_sec);
+      // Compute hour and day time offsets
+      dsec_of_day  = sec_of_day_diff (vld_ut, clm_dpa[i].valid());
+      dsec_of_year = sec_of_year_diff(vld_ut, clm_dpa[i].valid());
 
-      // Recompute the unixtime to check the hour of the day.
-      // Use the valid YYYYMMDD and climo HHMMSS.
-      ut = mdyhms_to_unix(vld_mon, vld_day, vld_yr,
-                          clm_hr, clm_min, clm_sec);
-
-      // Check the hour time step.
-      if(!is_bad_data(hour_ts) && labs(ut - vld_ut) >= hour_ts) {
-         mlog << Debug(3) << "Skipping the " << cur_ut_cs << " \""
+      // Check the hour time step
+      if(!is_bad_data(hour_ts) && abs(dsec_of_day) >= hour_ts) {
+         mlog << Debug(3) << "Skipping the " << clm_ut_cs << " \""
               << info->magic_str()
               << "\" climatology field since the time offset ("
-              << labs(ut - vld_ut)
-              << " seconds) >= the \"" << conf_key_hour_interval
+              << abs(dsec_of_day) << " seconds) >= the \"" << conf_key_hour_interval
               << "\" entry (" << hour_ts << " seconds) from file: "
               << climo_file << "\n";
          continue;
       }
 
-      // Recompute the unixtime to check the day of the year.
-      // Use the valid YYYY and climo MMDD_HHMMSS.
-      ut = mdyhms_to_unix(clm_mon, clm_day, vld_yr,
-                          clm_hr, clm_min, clm_sec);
-
-      // Check the day time step.
-      if(!is_bad_data(day_ts)) {
-
-         // For daily climatology, check the hour timestep. 
-         if(day_ts <= 3600*24 && labs(ut - vld_ut) >= hour_ts) {
-            mlog << Debug(3) << "Skipping the " << cur_ut_cs << " \""
-                 << info->magic_str()
-                 << "\" climatology field since the time offset ("
-                 << labs(ut - vld_ut) << " seconds) >= the \""
-                 << conf_key_hour_interval << "\" entry (" << hour_ts
-                 << " seconds) from daily climatology file: "
-                 << climo_file << "\n";
-            continue;
-         }
-         // For non-daily climatology, check the day timestep. 
-         else if(labs(ut - vld_ut) >= day_ts) {
-            mlog << Debug(3) << "Skipping the " << cur_ut_cs << " \""
-                 << info->magic_str()
-                 << "\" climatology field since the time offset ("
-                 << labs(ut - vld_ut) << " seconds) >= the \""
-                 << conf_key_day_interval << "\" entry (" << day_ts
-                 << " seconds) from file: " << climo_file << "\n";
-            continue;
-         }
+      // Check the day time step
+      if(!is_bad_data(day_ts) && abs(dsec_of_year) >= day_ts) {
+         mlog << Debug(3) << "Skipping the " << clm_ut_cs << " \""
+              << info->magic_str()
+              << "\" climatology field since the time offset ("
+              << abs(dsec_of_year) << " seconds) >= the \""
+              << conf_key_day_interval << "\" entry (" << day_ts
+              << " seconds) from file: " << climo_file << "\n";
+         continue;
       }
 
       // Print log message for matching record
-      mlog << Debug(4)
-           << "Found matching " << cur_ut_cs << " \""
+      mlog << Debug(4) << "Found matching " << clm_ut_cs << " \""
            << info->magic_str() << "\" climatology field in file \""
            << climo_file << "\".\n"; 
 
       // Regrid, if needed
       if(!(mtddf->grid() == vx_grid)) {
-         mlog << Debug(2)
-              << "Regridding the " << cur_ut_cs << " \""
+         mlog << Debug(2) << "Regridding the " << clm_ut_cs << " \""
               << info->magic_str()
               << "\" climatology field to the verification grid.\n";
-         dp = met_regrid(cur_dpa[i], mtddf->grid(), vx_grid,
+         dp = met_regrid(clm_dpa[i], mtddf->grid(), vx_grid,
                          regrid_info);
       }
       else {
-         dp = cur_dpa[i];
+         dp = clm_dpa[i];
       }
 
-      // Set the climo time as valid YYYY and climo MMDD_HHMMSS.
-      dp.set_valid(ut);
+      // Set the climo time relative to the valid time
+      dp.set_valid(vld_ut + dsec_of_year);
 
       // Store the match
-      dpa.add(dp, cur_dpa.lower(i), cur_dpa.upper(i));
+      dpa.add(dp, clm_dpa.lower(i), clm_dpa.upper(i));
 
    } // end for i
 
