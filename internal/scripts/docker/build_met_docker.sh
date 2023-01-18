@@ -9,7 +9,7 @@ mkdir -p /met/logs
 LOG_FILE=/met/logs/MET-${MET_GIT_NAME}_configure.log
 echo "Configuring MET ${MET_GIT_NAME} and writing log file ${LOG_FILE}"
 ./bootstrap
-./configure --enable-grib2 --enable-mode_graphics --enable-modis --enable-lidar2nc --enable-python CPPFLAGS=-I/met/external_libs/include:/met/external_libs/include/freetype2 > ${LOG_FILE} 2>&1
+./configure --enable-grib2 --enable-mode_graphics --enable-modis --enable-lidar2nc --enable-python CPPFLAGS="-I/met/external_libs/include -I/met/external_libs/include/freetype2" > ${LOG_FILE} 2>&1
 if [ $? != 0 ]; then
   cat ${LOG_FILE}
   exit 1
