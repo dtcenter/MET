@@ -9,8 +9,9 @@ export USE_MET_TAR_FILE=FALSE
 
 LOG_FILE=/met/MET-${MET_GIT_NAME}/compile_MET_all.log
 echo "Compiling MET ${MET_GIT_NAME} and writing log file ${LOG_FILE}"
-./internal/scripts/installation/compile_MET_all.sh > ${LOG_FILE}
+./internal/scripts/installation/compile_MET_all.sh > ${LOG_FILE} 2>&1
 if [ $? != 0 ]; then
+  cat ${LOG_FILE}
   echo "ERROR: Compilation failed"
   exit 1
 fi
