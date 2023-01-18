@@ -17,7 +17,7 @@ export CXXFLAGS=${CFLAGS}
 
 # Set LDFLAGS to include -rpath settings when compiling MET
 export LDFLAGS="-Wl,--disable-new-dtags"
-export LDFLAGS="${LDFLAGS} -Wl,-rpath,/usr/local/lib:/usr/lib64"
+export LDFLAGS="${LDFLAGS} -Wl,-rpath,/usr/local/lib:/usr/lib64:/met/external_libs"
 
 # Variables required to run MET
 export MET_TEST_INPUT=${MET_PROJ_DIR}/MET_test_data/unit_test
@@ -35,4 +35,4 @@ export MET_SUBDIR=${TEST_BASE}
 export MET_TARBALL=none
 export USE_MODULES=FALSE
 
-export BIN_DIR_PATH=/usr/local/bin
+export MET_INSTALL_DIR=/usr/local
