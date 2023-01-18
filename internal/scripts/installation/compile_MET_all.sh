@@ -91,6 +91,20 @@ echo ${MAKE_ARGS:+MAKE_ARGS = $MAKE_ARGS}
 
 export LIB_DIR=${TEST_BASE}/external_libs
 MET_DIR=${MET_SUBDIR}
+
+if [ -z "${BIN_DIR_PATH}" ]; then
+  if [ -z "${MET_INSTALL_DIR}" ]; then
+    BIN_DIR_PATH=${TEST_BASE}/bin
+  else
+    BIN_DIR_PATH=${MET_INSTALL_DIR}/bin
+  fi
+fi
+
+if [ -z "${MET_INSTALL_DIR}" ]; then
+  MET_INSTALL_DIR=${MET_DIR}
+fi
+
+
 TAR_DIR=${TEST_BASE}/tar_files
 MET_TARBALL=${TAR_DIR}/${MET_TARBALL}
 
@@ -208,10 +222,6 @@ if [ ! -z "${SKIP_LIBS}" ]; then
   COMPILE_NETCDF=0
   COMPILE_FREETYPE=0
   COMPILE_CAIRO=0
-fi
-
-if [ -z ${BIN_DIR_PATH} ]; then
-  BIN_DIR_PATH=${TEST_BASE}/bin
 fi
 
 if [ -z ${USE_MET_TAR_FILE} ]; then
@@ -629,7 +639,7 @@ if [[ $COMPILER_FAMILY == "pgi" ]]; then
   export OPT_ARGS="${OPT_ARGS} FFLAGS=-lpgf90"
 fi
 
-configure_cmd="./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH}"
+configure_cmd="./configure --prefix=${MET_INSTALL_DIR} --bindir=${BIN_DIR_PATH}"
 configure_cmd="${configure_cmd} BUFRLIB_NAME=${BUFRLIB_NAME}"
 configure_cmd="${configure_cmd} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2"
 if [[ ! -z ${MET_FREETYPEINC} && ! -z ${MET_FREETYPELIB} && \
