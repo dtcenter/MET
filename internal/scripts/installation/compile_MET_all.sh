@@ -429,12 +429,14 @@ if [ $COMPILE_G2CLIB -eq 1 ]; then
   rm -rf ${LIB_DIR}/g2clib/g2clib*
   tar -xf ${TAR_DIR}/g2clib*.tar -C ${LIB_DIR}/g2clib
   cd ${LIB_DIR}/g2clib/g2clib*
-  cat makefile | \
-    sed -r 's/INC=.*/INC=-I${LIB_DIR}\/include -I${LIB_DIR}\/include\/jasper/g' | \
-    sed 's/CC=gcc/CC=${CC_COMPILER}/g' | \
-    sed 's/-D__64BIT__//g' \
-    > makefile_new
-  mv makefile_new makefile
+  sed -i 's|INC=.*|INC=-I${LIB_DIR}/include -I${LIB_DIR}/include/jasper|g' makefile
+
+  # allow other compilers besides gcc
+  sed -i 's/CC=gcc/CC=${CC_COMPILER}/g' makefile
+
+  # remove -D__64BIT__ flag because compiling with it has
+  # shown issues with GRIB/GRIB2 files that are over 2GB in size
+  sed -i 's/-D__64BIT__//g' makefile
   export CC_COMPILER=${CC}
   echo "cd `pwd`"
   # g2clib appears to compile but causes failure compiling MET if -j argument is used
