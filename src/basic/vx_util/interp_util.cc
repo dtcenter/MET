@@ -1287,7 +1287,7 @@ DataPlane valid_time_interp(const DataPlane &in1, const DataPlane &in2,
    // Range check the times
    if(dp1.valid() > to_ut || dp2.valid() < to_ut ||
       dp1.valid() == dp2.valid()) {
-      mlog << Error << "\time_interp() -> "
+      mlog << Error << "\ntime_interp() -> "
            << "the interpolation time " << unix_to_yyyymmdd_hhmmss(to_ut)
            << " must fall between the input times: "
            << unix_to_yyyymmdd_hhmmss(dp1.valid()) << " and "
