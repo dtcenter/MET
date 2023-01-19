@@ -139,8 +139,9 @@ lat/lon points, but typically those lat/lon points are not evenly spaced onto
 a regular grid.
 
 While MET's point2grid tool does support some satellite data inputs, it is
-limited. Using python embedding is another option for handling new datasets
-not supported natively by MET.
+limited. Using Python embedding is another option for handling new datasets
+not supported natively by MET. See :numref:`_appendixF` for more details on Python
+embedding. 
 
 Q. How do I choose a time slice in a NetCDF file?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
