@@ -11,8 +11,7 @@ export MET_PYTHON_BIN_EXE=${MET_PYTHON}/bin/python3
 export MET_PYTHON_CC="-I${MET_PYTHON}/include/python3.10"
 export MET_PYTHON_LD="-L${MET_PYTHON}/lib -lpython3.10 -lcrypt -lpthread -ldl -lutil -lm"
 
-# -D__64BIT__ is required because we've compiled libgrib2c.a with that flag
-export CFLAGS="-DUNDERSCORE -fPIC -D__64BIT__ -g"
+export CFLAGS="-DUNDERSCORE -fPIC -g"
 export CXXFLAGS=${CFLAGS}
 
 # Set LDFLAGS to include -rpath settings when compiling MET
