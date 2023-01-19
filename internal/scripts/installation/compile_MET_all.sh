@@ -436,6 +436,8 @@ if [ $COMPILE_G2CLIB -eq 1 ]; then
 
   # remove -D__64BIT__ flag because compiling with it has
   # shown issues with GRIB/GRIB2 files that are over 2GB in size
+  # This flag was removed in g2clib 1.6.4
+  # so this can be removed if the version is updated
   sed -i 's/-D__64BIT__//g' makefile
   export CC_COMPILER=${CC}
   echo "cd `pwd`"
