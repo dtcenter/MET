@@ -191,34 +191,35 @@ void read_climo_file(const char *climo_file, GrdFileType ctype,
 
       // Check the hour time step
       if(!is_bad_data(hour_ts) && abs(dsec_of_day) >= hour_ts) {
-         mlog << Debug(3) << "Skipping the " << clm_ut_cs << " \""
-              << info->magic_str()
-              << "\" climatology field since the time offset ("
-              << abs(dsec_of_day) << " seconds) >= the \"" << conf_key_hour_interval
-              << "\" entry (" << hour_ts << " seconds) from file: "
+         mlog << Debug(3) << "Skipping " << clm_ut_cs << " \"" << info->magic_str()
+              << "\" climatology field with \"" << conf_key_hour_interval
+              << "\" offset (" << abs(dsec_of_day) / (double) sec_per_hour
+              << " >= " << hour_ts / (double) sec_per_hour << " hours) in file: "
               << climo_file << "\n";
          continue;
       }
 
       // Check the day time step
       if(!is_bad_data(day_ts) && abs(dsec_of_year) >= day_ts) {
-         mlog << Debug(3) << "Skipping the " << clm_ut_cs << " \""
-              << info->magic_str()
-              << "\" climatology field since the time offset ("
-              << abs(dsec_of_year) << " seconds) >= the \""
-              << conf_key_day_interval << "\" entry (" << day_ts
-              << " seconds) from file: " << climo_file << "\n";
+         mlog << Debug(3) << "Skipping " << clm_ut_cs << " \"" << info->magic_str()
+              << "\" climatology field with \"" << conf_key_day_interval
+              << "\" offset (" << abs(dsec_of_year) / (double) sec_per_day
+              << " >= " << day_ts / (double) sec_per_day << " days) in file: "
+              << climo_file << "\n";
          continue;
       }
 
       // Print log message for matching record
-      mlog << Debug(4) << "Found matching " << clm_ut_cs << " \""
-           << info->magic_str() << "\" climatology field in file \""
+      mlog << Debug(3) << "Matching " << clm_ut_cs << " \"" << info->magic_str()
+           << "\" climatology field with \"" << conf_key_hour_interval << "\" offset ("
+           << abs(dsec_of_day) / (double) sec_per_hour << " hours) and \""
+           << conf_key_day_interval << "\" offset ("
+           << abs(dsec_of_year) / (double) sec_per_day << " days) in file: "
            << climo_file << "\".\n"; 
 
       // Regrid, if needed
       if(!(mtddf->grid() == vx_grid)) {
-         mlog << Debug(2) << "Regridding the " << clm_ut_cs << " \""
+         mlog << Debug(2) << "Regridding " << clm_ut_cs << " \""
               << info->magic_str()
               << "\" climatology field to the verification grid.\n";
          dp = met_regrid(clm_dpa[i], mtddf->grid(), vx_grid,
