@@ -343,7 +343,7 @@ DataPlaneArray climo_time_interp(const DataPlaneArray &dpa, int day_ts,
 
          // For equality, do a single time interpolation.
          if(prv_hms == nxt_hms) {
-             ut = (vld_ut / sec_per_day) + prv_hms;
+             ut = (vld_ut / sec_per_day)*sec_per_day + prv_hms;
              interp_dpa.add(climo_hms_interp(
                                dpa, it->second, ut, mthd),
                                dpa.lower(it->second[0]),
