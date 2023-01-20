@@ -100,13 +100,18 @@ return ( s );
 
 ////////////////////////////////////////////////////////////////////////
 
-int unix_to_sec_of_year(unixtime u) {
+
+int unix_to_day_of_year(unixtime u) {
 
 int mon, day, yr, hr, min, sec;
 
 unix_to_mdyhms(u, mon, day, yr, hr, min, sec);
 
-return ( (int) mdyhms_to_unix(mon, day, 1970, hr, min, sec) );
+int sec_of_year = mdyhms_to_unix(mon, day, 1970, 0, 0, 0);
+
+int sec_per_day = 60 * 60 * 24;
+
+return ( sec_of_year / sec_per_day );
 
 }
 
@@ -139,12 +144,12 @@ int s1 = unix_to_sec_of_day(ut1);
 
 int s2 = unix_to_sec_of_day(ut2);
 
-int ds = s2 - s1;
+int dt = s2 - s1;
 
-     if ( ds < -1 * sec_per_day/2 ) ds += sec_per_day;
-else if ( ds >      sec_per_day/2 ) ds -= sec_per_day;
+     if ( dt < -1 * sec_per_day/2 ) dt += sec_per_day;
+else if ( dt >      sec_per_day/2 ) dt -= sec_per_day;
 
-return ( ds );
+return ( dt );
 
 }
 
@@ -152,20 +157,22 @@ return ( ds );
 ////////////////////////////////////////////////////////////////////////
 
 
-int sec_of_year_diff(unixtime ut1, unixtime ut2) {
+int day_of_year_diff(unixtime ut1, unixtime ut2) {
 
-int sec_per_year = 60 * 60 * 24 * 365;
 
-int s1 = unix_to_sec_of_year(ut1);
+int sec_per_day  = 60 * 60 * 24;
+int day_per_year = 365;
 
-int s2 = unix_to_sec_of_year(ut2);
+int d1 = unix_to_day_of_year(ut1);
 
-int ds = s2 - s1;
+int d2 = unix_to_day_of_year(ut2);
 
-     if ( ds < -1 * sec_per_year/2 ) ds += sec_per_year;
-else if ( ds >      sec_per_year/2 ) ds -= sec_per_year;
+int dt = d2 - d1;
 
-return ( ds );
+     if ( dt < -1 * day_per_year/2.0 ) dt += day_per_year;
+else if ( dt >      day_per_year/2.0 ) dt -= day_per_year;
+
+return ( dt );
 
 }
 
