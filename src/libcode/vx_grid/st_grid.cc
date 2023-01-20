@@ -214,9 +214,13 @@ if(is_eq(Data.eccentricity, 0.0)) {
 
    y = By - Alpha*r*H*cosd(theta);
 }
-else st_latlon_to_xy_func(lat, lon, x, y, Data.scale_factor, Data.scale_lat,
-                          (Data.r_km*m_per_km), Data.false_east, Data.false_north,
-                          Data.eccentricity, IsNorthHemisphere);
+else {
+   st_latlon_to_xy_func(lat, lon, x, y, Data.scale_factor, (Data.lon_orient*-1.0),
+                        (Data.r_km*m_per_km), Data.false_east, Data.false_north,
+                        Data.eccentricity, IsNorthHemisphere);
+   x = x / (Data.d_km*m_per_km) - Data.x_pin;
+   y = y / (Data.d_km*m_per_km) - Data.y_pin;
+}
 
 return;
 
@@ -692,6 +696,7 @@ bool st_latlon_to_xy_func(double lat, double lon, double &x_m, double &y_m,
    double t = tan(M_PI/4 - H*lat_rad/2) * pow((1 + e*lat_sin)/(1 - e*lat_sin), e/2);
    double rho = (2 * semi_major_axis * scale_factor * t)
                  / sqrt(pow(1+e,1+e) * pow(1-e,1-e));
+   // meters in polar stereographics, not index
    x_m = false_east + rho*sin(lon_rad - lonO_rad);
    y_m = false_north - H*rho*cos(lon_rad - lonO_rad);
 
