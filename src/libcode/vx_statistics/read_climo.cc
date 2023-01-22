@@ -160,7 +160,7 @@ void read_climo_file(const char *climo_file, GrdFileType ctype,
    DataPlaneArray clm_dpa;
    DataPlane dp;
 
-   int n_clm, i, dsec_of_day, dsec_of_year;
+   int i, n_clm, day_diff_sec, hms_diff_sec;
 
    ConcatString clm_ut_cs;
 
@@ -185,37 +185,39 @@ void read_climo_file(const char *climo_file, GrdFileType ctype,
       // Store climo time string
       clm_ut_cs = unix_to_yyyymmdd_hhmmss(clm_dpa[i].valid());
 
-      // Compute hour and day time offsets
-      dsec_of_day  = sec_of_day_diff (vld_ut, clm_dpa[i].valid());
-      dsec_of_year = sec_of_year_diff(vld_ut, clm_dpa[i].valid());
-
-      // Check the hour time step
-      if(!is_bad_data(hour_ts) && abs(dsec_of_day) >= hour_ts) {
-         mlog << Debug(3) << "Skipping " << clm_ut_cs << " \"" << info->magic_str()
-              << "\" climatology field with \"" << conf_key_hour_interval
-              << "\" offset (" << abs(dsec_of_day) / (double) sec_per_hour
-              << " >= " << hour_ts / (double) sec_per_hour << " hours) in file: "
-              << climo_file << "\n";
-         continue;
-      }
+      // Compute day and hour time offsets in seconds
+      day_diff_sec = day_of_year_diff(vld_ut, clm_dpa[i].valid()) * sec_per_day;
+      hms_diff_sec = sec_of_day_diff (vld_ut, clm_dpa[i].valid());
 
       // Check the day time step
-      if(!is_bad_data(day_ts) && abs(dsec_of_year) >= day_ts) {
+      if(!is_bad_data(day_ts) && abs(day_diff_sec) >= day_ts) {
          mlog << Debug(3) << "Skipping " << clm_ut_cs << " \"" << info->magic_str()
-              << "\" climatology field with \"" << conf_key_day_interval
-              << "\" offset (" << abs(dsec_of_year) / (double) sec_per_day
-              << " >= " << day_ts / (double) sec_per_day << " days) in file: "
-              << climo_file << "\n";
+              << "\" climatology field with " << day_diff_sec / sec_per_day
+              << " day offset (" << conf_key_day_interval << " = "
+              << day_ts / sec_per_day << ") from file \""
+              << climo_file << "\".\n";
          continue;
       }
 
+      // Check the hour time step
+      if(!is_bad_data(hour_ts) && abs(hms_diff_sec) >= hour_ts) {
+         mlog << Debug(3) << "Skipping " << clm_ut_cs << " \"" << info->magic_str()
+              << "\" climatology field with " << (double) hms_diff_sec / sec_per_hour
+              << " hour offset (" << conf_key_hour_interval << " = "
+              << hour_ts / sec_per_hour << ") from file \""
+              << climo_file << "\".\n";
+         continue;
+      }
+
+      // Compute climo timestamp relative to the valid time
+      unixtime clm_vld_ut = vld_ut + day_diff_sec + hms_diff_sec;
+
       // Print log message for matching record
-      mlog << Debug(3) << "Matching " << clm_ut_cs << " \"" << info->magic_str()
-           << "\" climatology field with \"" << conf_key_hour_interval << "\" offset ("
-           << abs(dsec_of_day) / (double) sec_per_hour << " hours) and \""
-           << conf_key_day_interval << "\" offset ("
-           << abs(dsec_of_year) / (double) sec_per_day << " days) in file: "
-           << climo_file << "\".\n"; 
+      mlog << Debug(3) << "Storing " << clm_ut_cs << " \"" << info->magic_str()
+           << "\" climatology field with " << day_diff_sec / sec_per_day
+           << " day, " << (double) hms_diff_sec / sec_per_hour << " hour offset as time "
+           << unix_to_yyyymmdd_hhmmss(clm_vld_ut) << " from file \""
+           << climo_file << "\".\n";
 
       // Regrid, if needed
       if(!(mtddf->grid() == vx_grid)) {
@@ -230,7 +232,7 @@ void read_climo_file(const char *climo_file, GrdFileType ctype,
       }
 
       // Set the climo time relative to the valid time
-      dp.set_valid(vld_ut + dsec_of_year);
+      dp.set_valid(clm_vld_ut);
 
       // Store the match
       dpa.add(dp, clm_dpa.lower(i), clm_dpa.upper(i));
