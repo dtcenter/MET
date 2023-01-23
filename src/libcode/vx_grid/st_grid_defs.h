@@ -41,14 +41,14 @@ struct StereographicData {
 
    double r_km;     // semi_major_axis
 
+   int nx;
+   int ny;
+
    // ellipsoidal earth
    double eccentricity; // 0 for shperical earth
    double false_east;
    double false_north;
    double scale_factor;
-
-   int nx;
-   int ny;
 
    void dump();
 };
