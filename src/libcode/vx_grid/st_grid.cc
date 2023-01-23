@@ -201,7 +201,7 @@ const double H = ( IsNorthHemisphere ? 1.0 : -1.0 );
 
 reduce(lon);
 
-if(is_eq(Data.eccentricity, 0.0) || Data.eccentricity >= 0.1) {
+if(is_eq(Data.eccentricity, 0.0)) {
 
    r = st_func(lat, is_north());
 
@@ -235,7 +235,7 @@ double r, theta;
 
 const double H = ( IsNorthHemisphere ? 1.0 : -1.0 );
 
-if(is_eq(Data.eccentricity, 0.0) || Data.eccentricity >= 0.1) {
+if(is_eq(Data.eccentricity, 0.0)) {
    x = (x - Bx)/Alpha;
    y = (y - By)/Alpha;
 
