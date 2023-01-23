@@ -450,6 +450,11 @@ if ( !west_longitude_positive )  {
 
 }
 
+sdata.eccentricity = 0.;
+sdata.false_east = 0.;
+sdata.false_north = 0.;
+sdata.scale_factor = 1.0;
+
 ToGrid = new Grid ( sdata );
 
 g = *ToGrid;
