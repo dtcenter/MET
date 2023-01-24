@@ -50,4 +50,35 @@
     </output>
   </test>
 
+  <!-- MET#2412: Test interpolation of monthly climo between December 15 and January 15 -->
+
+  <test name="climatology_GRID_STAT_WRAP_YEAR_2.5DEG">
+    <exec>&MET_BIN;/grid_stat</exec>
+    <env>
+      <pair><name>OUTPUT_PREFIX</name> <value>YEAR_WRAP_CLIMO_2.5DEG</value></pair>
+      <pair><name>DAY_INTERVAL</name>  <value>31</value></pair>
+      <pair><name>HOUR_INTERVAL</name> <value>6</value></pair>
+      <pair><name>CLIMO_MEAN_FILE_LIST</name>
+         <value>"&DATA_DIR_CLIMO;/NCEP_2.5deg/pgba_mean.19591215",
+                "&DATA_DIR_CLIMO;/NCEP_2.5deg/pgba_mean.19590115"
+         </value>
+      </pair>
+      <pair><name>CLIMO_STDEV_FILE_LIST</name>
+         <value>"&DATA_DIR_CLIMO;/NCEP_2.5deg/pgba_stdv.19591215",
+                "&DATA_DIR_CLIMO;/NCEP_2.5deg/pgba_stdv.19590115"
+         </value>
+      </pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120409_1200_000.grb2 \
+      &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120409_1200_000.grb2 \
+      &CONFIG_DIR;/GridStatConfig_climo_wrap_year \
+      -outdir &OUTPUT_DIR;/climatology_2.5deg -v 3
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/climatology_2.5deg/grid_stat_WRAP_YEAR_CLIMO_2.5DEG_000000L_20201225_120000V.stat</stat>
+      <grid_nc>&OUTPUT_DIR;/climatology_2.5deg/grid_stat_WRAP_YEAR_CLIMO_2.5DEG_000000L_20201225_120000V_pairs.nc</grid_nc>
+    </output>
+  </test>
+
 </met_test>
