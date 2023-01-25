@@ -55,7 +55,7 @@
   <test name="climatology_GRID_STAT_WRAP_YEAR_2.5DEG">
     <exec>&MET_BIN;/grid_stat</exec>
     <env>
-      <pair><name>OUTPUT_PREFIX</name> <value>YEAR_WRAP_CLIMO_2.5DEG</value></pair>
+      <pair><name>OUTPUT_PREFIX</name> <value>WRAP_YEAR_CLIMO_2.5DEG</value></pair>
       <pair><name>DAY_INTERVAL</name>  <value>31</value></pair>
       <pair><name>HOUR_INTERVAL</name> <value>6</value></pair>
       <pair><name>CLIMO_MEAN_FILE_LIST</name>
