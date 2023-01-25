@@ -1280,14 +1280,16 @@ DataPlane valid_time_interp(const DataPlane &in1, const DataPlane &in2,
    double w1 = bad_data_double;
    double w2 = bad_data_double;
 
-   // Store min and max valid times.
+   // Store min and max valid times
    dp1 = (in1.valid() <= in2.valid() ? in1 : in2);
    dp2 = (in1.valid() >  in2.valid() ? in1 : in2);
 
+   // Check for matching valid times
+   if(dp1.valid() == dp2.valid()) return(dp1);
+
    // Range check the times
-   if(dp1.valid() > to_ut || dp2.valid() < to_ut ||
-      dp1.valid() == dp2.valid()) {
-      mlog << Error << "\time_interp() -> "
+   if(dp1.valid() > to_ut || dp2.valid() < to_ut) {
+      mlog << Error << "\ntime_interp() -> "
            << "the interpolation time " << unix_to_yyyymmdd_hhmmss(to_ut)
            << " must fall between the input times: "
            << unix_to_yyyymmdd_hhmmss(dp1.valid()) << " and "
