@@ -323,6 +323,7 @@ MET_HDFLIB = @MET_HDFLIB@
 MET_NETCDF = @MET_NETCDF@
 MET_NETCDFINC = @MET_NETCDFINC@
 MET_NETCDFLIB = @MET_NETCDFLIB@
+MET_PYTHON_BIN_EXE = @MET_PYTHON_BIN_EXE@
 MET_PYTHON_CC = @MET_PYTHON_CC@
 MET_PYTHON_LD = @MET_PYTHON_LD@
 MKDIR_P = @MKDIR_P@
@@ -400,7 +401,10 @@ top_srcdir = @top_srcdir@
 MAINTAINERCLEANFILES = Makefile.in
 
 # Yacc/lex flags
-AM_YFLAGS = --defines=config.tab.h -p config
+# Initialize yystate to 8 to allow for empty configuartion files
+AM_YFLAGS = --defines=config.tab.h -p config ; \
+                  sed -i 's/yystate = 0;/yystate = 8;/g' config.tab.cc
+
 
 # The library
 noinst_LIBRARIES = libvx_config.a
