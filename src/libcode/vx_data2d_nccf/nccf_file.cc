@@ -2206,6 +2206,16 @@ void NcCfFile::get_grid_mapping_polar_stereographic(const NcVar *grid_mapping_va
   double x_pin = -(x_values[0] / dx_m);
   double y_pin = -(y_values[0] / dy_m);
 
+  if(!has_scale_factor && has_standard_parallel) {
+    if(is_eq(eccentricity, 0.0)) {
+      x_pin = y_pin = 0.;
+    }
+    else {
+      x_pin = x_values[0] / dx_m_a;
+      y_pin = y_values[0] / dy_m_a;
+    }
+  }
+
   // Fill in the data structure.  Remember to negate the longitude values.
 
   StereographicData data;
@@ -2218,6 +2228,7 @@ void NcCfFile::get_grid_mapping_polar_stereographic(const NcVar *grid_mapping_va
   data.scale_lat = proj_origin_lat;
   data.lon_orient = -1.0 * proj_vertical_lon;
   data.d_km = dx_m / 1000.0;
+  data.dy_km = dy_m / 1000.0;
   data.r_km = semi_major_axis / 1000.0;
   data.nx = _xDim->getSize();
   data.ny = _yDim->getSize();
@@ -2238,26 +2249,21 @@ void NcCfFile::get_grid_mapping_polar_stereographic(const NcVar *grid_mapping_va
     if(!is_spherical_earch) eccentricity = st_eccentricity_func(semi_major_axis, semi_minor_axis,
                                                                 inverse_flattening);
 
-    x = (dx_m > 0) ? x_values[0] : x_values[x_counts-1];
-    y = (dy_m > 0) ? y_values[0] : y_values[y_counts-1];
+    x = x_values[0];
+    y = y_values[0];
     scale_factor = st_sf_func(proj_standard_parallel, eccentricity, is_north_hemisphere);
     st_xy_to_latlon_func(x, y, lat, lon, scale_factor, semi_major_axis,
                          proj_vertical_lon, false_east, false_north,
                          eccentricity, is_north_hemisphere);
-    if(is_eq(eccentricity, 0.0)) {
-      data.x_pin = 0.;
-      data.y_pin = 0.;
-    }
-    else {
-      data.x_pin = ((dx_m>0) ? x_values[0] : x_values[x_counts-1]) / dx_m_a;
-      data.y_pin = ((dy_m>0) ? y_values[0] : y_values[x_counts-1]) / dy_m_a;
-    }
     data.lat_pin = lat;
     data.lon_pin = -lon;
 
     st_latlon_to_xy_func(lat, lon, x2, y2, scale_factor, proj_vertical_lon,
                          semi_major_axis, false_east, false_north,
                          eccentricity, is_north_hemisphere);
+    mlog << Debug(6) << method_name
+         << " x: between " << x_values[0] <<" and " << x_values[x_counts-1]
+         << ", y: between " << y_values[0] <<" and " << y_values[y_counts-1] << "\n";
     mlog << Debug(6) << method_name
          << "pin: (x,y)m -> (lat,lon) -> (x2,y2)m: (" << x << "," << y << ") -> ("
          << lat << "," << lon << ") -> (" << x2 << "," << y2
@@ -2273,7 +2279,7 @@ void NcCfFile::get_grid_mapping_polar_stereographic(const NcVar *grid_mapping_va
 
   grid.set(data);
 
-  if (dy_m < 0) grid.set_swap_to_north(true);
+  //Note: do not set grid.set_swap_to_north()
 
   if(mlog.verbosity_level() >= 10) {
     double lat1, lon1;
@@ -2291,7 +2297,22 @@ void NcCfFile::get_grid_mapping_polar_stereographic(const NcVar *grid_mapping_va
                          semi_major_axis, false_east, false_north,
                          eccentricity, is_north_hemisphere);
     mlog << Debug(10) << method_name
-         << "left bottom: (x,y) -> (lat,lon) -> (x2,y2)m: ("
+         << "bottom left: (x,y)m -> (lat,lon) -> (x2,y2)m: ("
+         << x1 << "," << y1 << ") -> ("
+         << lat1 << "," << lon1 << ") -> (" << x2 << "," << y2
+         << ") Diff (m): x=" << (x1-x2) <<", y=" << (y1-y2)
+         << "\n";
+
+    x1 = (dx_m > 0) ? x_values[0] : x_values[x_counts-1];
+    y1 = (dy_m > 0) ? y_values[y_counts-1] : y_values[0];
+    st_xy_to_latlon_func(x1, y1, lat1, lon1, scale_factor, semi_major_axis,
+                         proj_vertical_lon, false_east, false_north,
+                         eccentricity, is_north_hemisphere);
+    st_latlon_to_xy_func(lat1, lon1, x2, y2, scale_factor, proj_vertical_lon,
+                         semi_major_axis, false_east, false_north,
+                         eccentricity, is_north_hemisphere);
+    mlog << Debug(10) << method_name
+         << "   top left: (x,y)m -> (lat,lon) -> (x2,y2)m: ("
          << x1 << "," << y1 << ") -> ("
          << lat1 << "," << lon1 << ") -> (" << x2 << "," << y2
          << ") Diff (m): x=" << (x1-x2) <<", y=" << (y1-y2)
@@ -2321,7 +2342,22 @@ void NcCfFile::get_grid_mapping_polar_stereographic(const NcVar *grid_mapping_va
                          semi_major_axis, false_east, false_north,
                          eccentricity, is_north_hemisphere);
     mlog << Debug(10) << method_name
-         << "  top-right: (x,y)m -> (lat,lon) -> (x2,y2)m: (" << x1
+         << "  top right: (x,y)m -> (lat,lon) -> (x2,y2)m: (" << x1
+         << "," << y1 << ") -> ("
+         << lat1 << "," << lon1 << ") -> (" << x2 << "," << y2
+         << ") Diff (m): x=" << (x1-x2) <<", y=" << (y1-y2)
+         << "\n";
+
+    x1 = (dx_m > 0) ? x_values[x_counts-1] : x_values[0];
+    y1 = (dy_m > 0) ? y_values[0] : y_values[y_counts-1];
+    st_xy_to_latlon_func(x1, y1, lat1, lon1, scale_factor, semi_major_axis,
+                         proj_vertical_lon, false_east, false_north,
+                         eccentricity, is_north_hemisphere);
+    st_latlon_to_xy_func(lat1, lon1, x2, y2, scale_factor, proj_vertical_lon,
+                         semi_major_axis, false_east, false_north,
+                         eccentricity, is_north_hemisphere);
+    mlog << Debug(10) << method_name
+         << "bottom right: (x,y)m -> (lat,lon) -> (x2,y2)m: (" << x1
          << "," << y1 << ") -> ("
          << lat1 << "," << lon1 << ") -> (" << x2 << "," << y2
          << ") Diff (m): x=" << (x1-x2) <<", y=" << (y1-y2)
