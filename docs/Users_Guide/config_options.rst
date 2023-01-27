@@ -1318,8 +1318,9 @@ of several entires defining the climatology file names and fields to be used.
 
 * The "hour_interval" entry is an integer specifying the spacing in hours of
   the climatology data for each day. This should be set between 0 and 24,
-  with 6 and 12 being common choices. Use "NA" if the timing of the
-  climatology data should not be checked.
+  with 6 and 12 being common choices. For example, use 6 for climatology data
+  with 4 times per day, such as 00Z, 06Z, 12Z, and 18Z. Use "NA" if the timing
+  of the climatology data should not be checked.
 
 * The "day_interval" and "hour_interval" entries replace the deprecated
   entries "match_month", "match_day", and "time_step".
