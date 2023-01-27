@@ -212,14 +212,15 @@ if(is_eq(Data.eccentricity, 0.0)) {
    y = By - Alpha*r*H*cosd(theta);
 }
 else {
+   double delta_sign;
    st_latlon_to_xy_func(lat, lon, x, y, Data.scale_factor, (Data.lon_orient*-1.0),
                         (Data.r_km*m_per_km), Data.false_east, Data.false_north,
                         Data.eccentricity, IsNorthHemisphere);
-   x = x / (Data.d_km*m_per_km) - Data.x_pin;
-   y = y / (Data.d_km*m_per_km) - Data.y_pin;
+   delta_sign = ((Data.d_km > 0) ? 1.0 : -1.0 );
+   x = delta_sign * ((x / fabs(Data.d_km)*m_per_km) - Data.x_pin);  // meters to index
+   delta_sign = ((Data.dy_km > 0) ? 1.0 : -1.0 );
+   y = delta_sign * ((y / fabs(Data.dy_km)*m_per_km) - Data.y_pin); // meters to index
 }
-
-return;
 
 }
 
@@ -252,12 +253,11 @@ if(is_eq(Data.eccentricity, 0.0)) {
 }
 else {
    double x1 = Data.x_pin + x * (Data.d_km*m_per_km);   // index to meters
-   double y1 = Data.y_pin + y * (Data.d_km*m_per_km);   // index to meters
+   double y1 = Data.y_pin + y * (Data.dy_km*m_per_km);  // index to meters
    st_xy_to_latlon_func(x1, y1, lat, lon, Data.scale_factor, (Data.r_km*m_per_km),
                         (-1.0*Data.lon_orient), Data.false_east, Data.false_north,
                         Data.eccentricity, IsNorthHemisphere);
 }
-
 
 reduce(lon);
 
@@ -748,6 +748,8 @@ else {
 
    lat /= rad_per_deg;
    lon /= rad_per_deg;
+   reduce(lon);
+
 }
 return result;
 
