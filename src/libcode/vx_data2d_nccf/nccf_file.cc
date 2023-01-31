@@ -2004,8 +2004,8 @@ void NcCfFile::get_grid_mapping_polar_stereographic(const NcVar *grid_mapping_va
   if (!is_eq(inverse_flattening, bad_data_double) ||
     (!is_eq(semi_minor_axis, bad_data_double) && !is_eq(semi_minor_axis,semi_major_axis))) {
     is_spherical_earch = false;
-    mlog << Warning << "\n" << method_name
-         << "This is an ellipsoidal earth which is not fully supported.\n\n";
+    mlog << Debug(2) << "\n" << method_name
+         << "This is an ellipsoidal earth.\n\n";
   }
   else if(!has_scale_factor && !has_standard_parallel) {
     mlog << Error << "\n" << method_name
