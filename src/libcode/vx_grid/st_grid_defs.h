@@ -49,6 +49,7 @@ struct StereographicData {
    double false_east;
    double false_north;
    double scale_factor;
+   double dy_km;
 
    void dump();
 };

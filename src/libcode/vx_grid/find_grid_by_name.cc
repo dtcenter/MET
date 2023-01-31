@@ -454,6 +454,7 @@ sdata.eccentricity = 0.;
 sdata.false_east = 0.;
 sdata.false_north = 0.;
 sdata.scale_factor = 1.0;
+sdata.dy_km = sdata.d_km;
 
 ToGrid = new Grid ( sdata );
 
