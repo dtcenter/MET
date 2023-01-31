@@ -212,14 +212,17 @@ if(is_eq(Data.eccentricity, 0.0)) {
    y = By - Alpha*r*H*cosd(theta);
 }
 else {
-   st_latlon_to_xy_func(lat, lon, x, y, Data.scale_factor, (Data.lon_orient*-1.0),
+   double delta_sign;
+   st_latlon_to_xy_func(lat, -lon, x, y, Data.scale_factor, (Data.lon_orient*-1.0),
                         (Data.r_km*m_per_km), Data.false_east, Data.false_north,
                         Data.eccentricity, IsNorthHemisphere);
-   x = x / (Data.d_km*m_per_km) - Data.x_pin;
-   y = y / (Data.d_km*m_per_km) - Data.y_pin;
-}
 
-return;
+   delta_sign = ((Data.d_km > 0) ? 1.0 : -1.0 );
+   x = delta_sign * ((x / (fabs(Data.d_km)*m_per_km)) - Data.x_pin);    // meters to index
+   delta_sign = ((Data.dy_km > 0) ? 1.0 : -1.0 );
+   y = delta_sign * ((y / (fabs(Data.dy_km)*m_per_km)) - Data.y_pin);   // meters to index
+
+}
 
 }
 
@@ -251,13 +254,12 @@ if(is_eq(Data.eccentricity, 0.0)) {
    lon = Lon_orient - theta;
 }
 else {
-   double x1 = Data.x_pin + x * (Data.d_km*m_per_km);   // index to meters
-   double y1 = Data.y_pin + y * (Data.d_km*m_per_km);   // index to meters
+   double x1 = (Data.x_pin + x) * (Data.d_km*m_per_km);     // index to meters
+   double y1 = (Data.y_pin + y) * (Data.dy_km*m_per_km);    // index to meters
    st_xy_to_latlon_func(x1, y1, lat, lon, Data.scale_factor, (Data.r_km*m_per_km),
                         (-1.0*Data.lon_orient), Data.false_east, Data.false_north,
                         Data.eccentricity, IsNorthHemisphere);
 }
-
 
 reduce(lon);
 
@@ -681,35 +683,38 @@ return ( a );
 ////////////////////////////////////////////////////////////////////////
 // lat/lon to meters
 
+
 bool st_latlon_to_xy_func(double lat, double lon, double &x_m, double &y_m,
                           double scale_factor, double scale_lat, double semi_major_axis,
                           double false_east, double false_north,
                           double e, bool is_north_hemisphere)
 {
 
-if (e >= 0.1) {
-   mlog << Error << "\nst_latlon_to_xy_func() -> "
-        << "eccentricity (" << e << ") should be less than 0.1 for earth\n\n";
-   exit( 1 );
-}
-else {
-   const double lat_rad = lat * rad_per_deg;
-   const double lon_rad = lon * rad_per_deg;
-   const double lat_sin = sin(lat_rad);
-   const double lonO_rad = scale_lat * rad_per_deg;
-   const double H = (is_north_hemisphere? 1.0 : -1.0 );
-   double t = tan(M_PI/4 - H*lat_rad/2) * pow((1 + e*lat_sin)/(1 - e*lat_sin), e/2);
-   double rho = (2 * semi_major_axis * scale_factor * t)
-                 / sqrt(pow(1+e,1+e) * pow(1-e,1-e));
-   // meters in polar stereographics, not index
-   x_m = false_east + rho*sin(lon_rad - lonO_rad);
-   y_m = false_north - H*rho*cos(lon_rad - lonO_rad);
-}
+   if (e >= 0.1) {
+      mlog << Error << "\nst_latlon_to_xy_func() -> "
+           << "eccentricity (" << e << ") should be less than 0.1 for earth\n\n";
+      exit( 1 );
+   }
+   else {
+      const double lat_rad = lat * rad_per_deg;
+      const double lon_rad = lon * rad_per_deg;
+      const double lat_sin = sin(lat_rad);
+      const double lonO_rad = scale_lat * rad_per_deg;
+      const double H = (is_north_hemisphere? 1.0 : -1.0 );
+      double t = tan(M_PI/4 - H*lat_rad/2) * pow((1 + e*lat_sin)/(1 - e*lat_sin), e/2);
+      double rho = (2 * semi_major_axis * scale_factor * t)
+                    / sqrt(pow(1+e,1+e) * pow(1-e,1-e));
+      // meters in polar stereographics, not index
+      x_m = false_east + rho*sin(lon_rad - lonO_rad);
+      y_m = false_north - H*rho*cos(lon_rad - lonO_rad);
+   }
+
    return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
 // meters to lat/lon
+
 
 bool st_xy_to_latlon_func(double x_m, double y_m, double &lat, double &lon,
                           double scale_factor, double semi_major_axis,
@@ -745,6 +750,8 @@ else {
 
    lat /= rad_per_deg;
    lon /= rad_per_deg;
+   reduce(lon);
+
 }
 return result;
 
