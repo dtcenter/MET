@@ -442,13 +442,13 @@ bool NdbcHandler::_readHeaderInfo(LineDataFile &ascii_file)
       }
     }
   }
-  if (column_pointer_year == -1 || column_pointer_month == -1 ||
-      column_pointer_day == -1 || column_pointer_hour == -1  ||
+  if (column_pointer_year   == -1 || column_pointer_month == -1 ||
+      column_pointer_day    == -1 || column_pointer_hour  == -1 ||
       column_pointer_minute == -1) {
-        mlog << Warning << "\nNdbcHandler::_readHeaderInfo() -> "
-             << "NDBC file did not have all time fields in header: "
-             << ascii_file.filename() << "\n\n";
-        status = false;
+    mlog << Warning << "\nNdbcHandler::_readHeaderInfo() -> "
+         << "NDBC file did not have all time fields in header: "
+         << ascii_file.filename() << "\n\n";
+    status = false;
   } 
   for (size_t j=0; j<column.size(); ++j) {
     if (column[j].notSet()) {
