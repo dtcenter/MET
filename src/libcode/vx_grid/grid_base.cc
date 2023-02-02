@@ -1313,6 +1313,7 @@ if ( st1->nx               == st2->nx                    &&
      is_eq  (rescale_lon(st1->lon_orient),
              rescale_lon(st2->lon_orient),    loose_tol) &&
      is_eq  (st1->d_km,       st2->d_km,      loose_tol) &&
+     is_eq  (st1->dy_km,      st2->dy_km,     loose_tol) &&
      is_eq  (st1->r_km,       st2->r_km,      loose_tol) )  status = true;
 
 return ( status );

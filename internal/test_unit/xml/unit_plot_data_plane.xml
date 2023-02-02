@@ -507,5 +507,33 @@
       <ps>&OUTPUT_DIR;/plot_data_plane/nbm_2022021513_F119_GRIB2_FICEAC_A48_Perc-10.ps</ps>
     </output>
   </test>
- 
+
+  <test name="plot_data_plane_NCCF_POLAR_STEREO">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/nccf/radolan_sp.nc \
+      &OUTPUT_DIR;/plot_data_plane/radolan_sp_PREC.ps \
+      'name="PREC"; level="(0,*,*)";' \
+      -title "NCCF Polar Stereographic Precipitation" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/radolan_sp_PREC.ps</ps>
+    </output>
+  </test>
+
+  <test name="plot_data_plane_NCCF_POLAR_ELLIPSOIDAL">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/nccf/NSIDC0081_SEAICE_PS_N25km_20220723_v2.0.nc \
+      &OUTPUT_DIR;/plot_data_plane/NSIDC0081_SEAICE_PS_N25km.ps \
+      'name="F16_ICECON"; level="(0,*,*)";' \
+      -title "Sea Ice Concentration" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/NSIDC0081_SEAICE_PS_N25km.ps</ps>
+    </output>
+  </test>
+
 </met_test>
