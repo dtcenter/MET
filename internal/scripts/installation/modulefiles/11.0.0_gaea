@@ -10,8 +10,8 @@ proc ModulesHelp { } {
 module load intel/19.0.5.281
 
 set base /usw/met
-set ver  10.1.2
+set ver  11.0.0
 set share $base/$ver/share/met
-set lib_base $base/10.1.2
+set lib_base $base/11.0.0
 
-prepend-path PATH $base/$ver/bin:$lib_base/external_libs/bin:/lustre/f2/dev/esrl/Julie.Prestopnik/projects/miniconda/miniconda3/envs/metplus_v4.1_py3.6/bin
+prepend-path PATH $base/$ver/bin:$lib_base/external_libs/bin:/lustre/f2/dev/esrl/Julie.Prestopnik/projects/miniconda/miniconda3/envs/metplus_v5.0_py3.8/bin
