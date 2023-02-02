@@ -37,6 +37,7 @@ using namespace netCDF;
 
 static const int  max_met_args              = 30;
 static const double DELTA_TOLERANCE_PERCENT = 0.05;
+static const double EARTH_MAJOR_AXIS_km = 6371.20;
 
 const double NcCfFile::DELTA_TOLERANCE = 15.0;
 
@@ -53,7 +54,8 @@ static const char var_lon_nt[] = "tlon";
 static ConcatString x_dim_var_name;
 static ConcatString y_dim_var_name;
 
-static double get_nc_var_att_double(const NcVar *nc_var, const char *att_name);
+static double get_nc_var_att_double(const NcVar *nc_var, const char *att_name,
+                                    bool is_required=true);
 
 #define USE_BUFFER  1
 
@@ -1648,7 +1650,9 @@ void NcCfFile::get_grid_mapping_lambert_conformal_conic(const NcVar *grid_mappin
            << "assuming meters.\n\n";
     }
     else {
-           if (x_coord_units_name == "m" ) x_coord_to_m_cf = 1.0;
+           if ( x_coord_units_name == "m" ||
+                x_coord_units_name == "meter" ||
+                x_coord_units_name == "meters") x_coord_to_m_cf = 1.0;
       else if (x_coord_units_name == "km") x_coord_to_m_cf = 1000.0;
       else {
         mlog << Error << "\n" << method_name << " -> "
@@ -1671,7 +1675,9 @@ void NcCfFile::get_grid_mapping_lambert_conformal_conic(const NcVar *grid_mappin
            << "assuming meters.\n\n";
     }
     else {
-           if (y_coord_units_name == "m" ) y_coord_to_m_cf = 1.0;
+           if ( y_coord_units_name == "m" ||
+                y_coord_units_name == "meter" ||
+                y_coord_units_name == "meters" ) y_coord_to_m_cf = 1.0;
       else if (y_coord_units_name == "km") y_coord_to_m_cf = 1000.0;
       else {
         mlog << Error << "\n" << method_name << " -> "
@@ -1705,8 +1711,10 @@ void NcCfFile::get_grid_mapping_lambert_conformal_conic(const NcVar *grid_mappin
 
   double dx_m = (x_values[x_counts-1] - x_values[0]) / (x_counts - 1);
   double dy_m = (y_values[y_counts-1] - y_values[0]) / (y_counts - 1);
+  double dx_m_a = fabs(dx_m);
+  double dy_m_a = fabs(dy_m);
 
-  if (fabs(dx_m - dy_m) > DELTA_TOLERANCE)
+  if (fabs(dx_m_a - dy_m_a) > DELTA_TOLERANCE)
   {
     mlog << Error << "\n" << method_name << " -> "
          << "MET can only process Lambert Conformal files where the x-axis and y-axis deltas are the same\n\n";
@@ -1718,8 +1726,8 @@ void NcCfFile::get_grid_mapping_lambert_conformal_conic(const NcVar *grid_mappin
 
   for (int i = 1; i < (int)x_counts; ++i)
   {
-    double curr_delta = x_values[i] - x_values[i-1];
-    if (fabs(curr_delta - dx_m) > DELTA_TOLERANCE)
+    double curr_delta = fabs(x_values[i] - x_values[i-1]);
+    if (fabs(curr_delta - dx_m_a) > DELTA_TOLERANCE)
     {
       mlog << Error << "\n" << method_name << " -> "
            << "MET can only process Lambert Conformal files where the delta along the x-axis is constant\n\n";
@@ -1729,8 +1737,8 @@ void NcCfFile::get_grid_mapping_lambert_conformal_conic(const NcVar *grid_mappin
 
   for (int i = 1; i < (int)y_counts; ++i)
   {
-    double curr_delta = y_values[i] - y_values[i-1];
-    if (fabs(curr_delta - dy_m) > DELTA_TOLERANCE)
+    double curr_delta = fabs(y_values[i] - y_values[i-1]);
+    if (fabs(curr_delta - dy_m_a) > DELTA_TOLERANCE)
     {
       mlog << Error << "\n" << method_name << " -> "
            << "MET can only process Lambert Conformal files where the delta along the y-axis is constant\n\n";
@@ -1767,12 +1775,14 @@ void NcCfFile::get_grid_mapping_lambert_conformal_conic(const NcVar *grid_mappin
   data.y_pin = y_pin;
   data.lon_orient = -double_datas[0];
   data.d_km = dx_m / 1000.0;
-  data.r_km = 6371.20;
+  data.r_km = EARTH_MAJOR_AXIS_km;
   data.nx = _xDim->getSize();
   data.ny = _yDim->getSize();
   data.so2_angle = 0.0;
 
   grid.set(data);
+  if (dy_m < 0) grid.set_swap_to_north(true);
+
   if(std_parallel_att) delete std_parallel_att;
   if(central_lon_att) delete central_lon_att;
   if(proj_origin_lat_att) delete proj_origin_lat_att;
@@ -1937,16 +1947,19 @@ void NcCfFile::get_grid_mapping_orthographic(const NcVar *grid_mapping_var)
 ////////////////////////////////////////////////////////////////////////
 
 
-double get_nc_var_att_double(const NcVar *nc_var, const char *att_name)
+double get_nc_var_att_double(const NcVar *nc_var, const char *att_name, bool is_required)
 {
    NcVarAtt *nc_att = get_nc_att(nc_var, (string)att_name);
 
    if(IS_INVALID_NC_P(nc_att))
    {
-      mlog << Error << "\nget_nc_var_att_double() -> "
-           << "Cannot get \"" << att_name << "\" from "
-           << GET_NC_NAME_P(nc_var) << " variable.\n\n";
-      exit(1);
+      if (is_required) {
+         mlog << Error << "\nget_nc_var_att_double() -> "
+              << "Cannot get \"" << att_name << "\" from "
+              << GET_NC_NAME_P(nc_var) << " variable.\n\n";
+         exit(1);
+      }
+      else return bad_data_double;
    }
    double att_val = get_att_value_double(nc_att);
    if (nc_att) delete nc_att;
@@ -1960,30 +1973,48 @@ double get_nc_var_att_double(const NcVar *nc_var, const char *att_name)
 
 void NcCfFile::get_grid_mapping_polar_stereographic(const NcVar *grid_mapping_var)
 {
-  static const string method_name = "NcCfFile::get_grid_mapping_polar_stereographic()";
   double x_coord_to_m_cf = 1.0;
   double y_coord_to_m_cf = 1.0;
+  static const string method_name = "NcCfFile::get_grid_mapping_polar_stereographic() --> ";
 
   // Get projection attributes
-
-  double proj_origin_lat =
-            get_nc_var_att_double(grid_mapping_var,
-                              "latitude_of_projection_origin");
-  double proj_origin_lon =
-            get_nc_var_att_double(grid_mapping_var,
-                              "longitude_of_projection_origin");
-  double proj_vertical_lon =
-            get_nc_var_att_double(grid_mapping_var,
-                              "straight_vertical_longitude_from_pole");
-  double proj_origin_scale_factor =
-            get_nc_var_att_double(grid_mapping_var,
-                              "scale_factor_at_projection_origin");
+  // proj_origin_lat: either 90.0 or -90.0, to decide the northern/southern hemisphere
+  bool is_spherical_earch = true;
+  double proj_origin_lat = get_nc_var_att_double(
+                grid_mapping_var, "latitude_of_projection_origin");
+  double proj_vertical_lon = get_nc_var_att_double(
+                grid_mapping_var, "straight_vertical_longitude_from_pole");
+  double proj_origin_lon = get_nc_var_att_double(
+                grid_mapping_var, "longitude_of_projection_origin", false);
+  double proj_standard_parallel = get_nc_var_att_double(
+                grid_mapping_var, "standard_parallel", false);
+  double proj_origin_scale_factor = get_nc_var_att_double(
+                grid_mapping_var, "scale_factor_at_projection_origin", false);
+  double semi_major_axis = get_nc_var_att_double(
+                grid_mapping_var, "semi_major_axis", false);
+  double semi_minor_axis = get_nc_var_att_double(
+                grid_mapping_var, "semi_minor_axis", false);
+  double inverse_flattening = get_nc_var_att_double(
+                grid_mapping_var, "inverse_flattening", false);
+  bool has_scale_factor = !is_eq(proj_origin_scale_factor, bad_data_double);
+  bool has_standard_parallel = !is_eq(proj_standard_parallel, bad_data_double);
 
   // Check that the scale factor at the origin is 1.
 
-  if(!is_eq(proj_origin_scale_factor, 1.0))
-  {
-    mlog << Error << "\n" << method_name << " -> "
+  if (!is_eq(inverse_flattening, bad_data_double) ||
+    (!is_eq(semi_minor_axis, bad_data_double) && !is_eq(semi_minor_axis,semi_major_axis))) {
+    is_spherical_earch = false;
+    mlog << Debug(2) << "\n" << method_name
+         << "This is an ellipsoidal earth.\n\n";
+  }
+  else if(!has_scale_factor && !has_standard_parallel) {
+    mlog << Error << "\n" << method_name
+         << "The attribute \"scale_factor_at_projection_origin\" and \"standard_parallel\" of the "
+         << GET_NC_NAME_P(grid_mapping_var) << " variable do not exist.\n\n";
+    exit(1);
+  }
+  else if(has_scale_factor && !is_eq(proj_origin_scale_factor, 1.0)) {
+    mlog << Error << "\n" << method_name
          << "Unexpected attribute value of " << proj_origin_scale_factor
          << " for the scale_factor_at_projection_origin attribute of the "
          << GET_NC_NAME_P(grid_mapping_var) << " variable.\n\n";
@@ -2042,21 +2073,21 @@ void NcCfFile::get_grid_mapping_polar_stereographic(const NcVar *grid_mapping_va
 
   if (_xDim == 0)
   {
-    mlog << Error << "\n" << method_name << " -> "
+    mlog << Error << "\n" << method_name
          << "Didn't find X dimension (projection_x_coordinate) in netCDF file.\n\n";
     exit(1);
   }
 
   if (_yDim == 0)
   {
-    mlog << Error << "\n" << method_name << " -> "
+    mlog << Error << "\n" << method_name
          << "Didn't find Y dimension (projection_y_coordinate) in netCDF file.\n\n";
     exit(1);
   }
 
   if (_xCoordVar == 0)
   {
-    mlog << Error << "\n" << method_name << " -> "
+    mlog << Error << "\n" << method_name
          << "Didn't find X coord variable (" << GET_NC_NAME_P(_xDim)
          << ") in netCDF file.\n\n";
     exit(1);
@@ -2064,7 +2095,7 @@ void NcCfFile::get_grid_mapping_polar_stereographic(const NcVar *grid_mapping_va
 
   if (_yCoordVar == 0)
   {
-    mlog << Error << "\n" << method_name << " -> "
+    mlog << Error << "\n" << method_name
          << "Didn't find Y coord variable (" << GET_NC_NAME_P(_yDim)
          << ") in netCDF file.\n\n";
     exit(1);
@@ -2073,7 +2104,7 @@ void NcCfFile::get_grid_mapping_polar_stereographic(const NcVar *grid_mapping_va
   if (get_data_size(_xCoordVar) != (int) GET_NC_SIZE_P(_xDim) ||
       get_data_size(_yCoordVar) != (int) GET_NC_SIZE_P(_yDim))
   {
-    mlog << Error << "\n" << method_name << " -> "
+    mlog << Error << "\n" << method_name
          << "Coordinate variables don't match dimension sizes in netCDF file.\n\n";
     exit(1);
   }
@@ -2085,21 +2116,24 @@ void NcCfFile::get_grid_mapping_polar_stereographic(const NcVar *grid_mapping_va
   ConcatString x_coord_units_name;
   const NcVarAtt *x_coord_units_att = get_nc_att(_xCoordVar, units_att_name);
   if (!get_var_units(_xCoordVar, x_coord_units_name)) {
-    mlog << Warning << "\n" << method_name << " -> "
+    mlog << Warning << "\n" << method_name
          << "Units not given for X coordinate variable -- assuming meters.\n\n";
   }
   else {
     if (0 == x_coord_units_name.length()) {
-      mlog << Warning << "\n" << method_name << " -> "
+      mlog << Warning << "\n" << method_name
            << "Cannot extract X coordinate units from netCDF file -- "
            << "assuming meters.\n\n";
     }
     else {
-           if ( x_coord_units_name == "m" ) x_coord_to_m_cf = 1.0;
+           if ( x_coord_units_name == "m" ||
+                x_coord_units_name == "meter" ||
+                x_coord_units_name == "meters") x_coord_to_m_cf = 1.0;
       else if ( x_coord_units_name == "km") x_coord_to_m_cf = 1000.0;
       else {
-        mlog << Error << "\n" << method_name << " -> "
-             << "The X coordinates must be in meters or kilometers for MET.\n\n";
+        mlog << Error << "\n" << method_name
+             << "The X coordinates (" << x_coord_units_name
+             << ") must be in meters or kilometers for MET.\n\n";
         exit(1);
       }
     }
@@ -2108,20 +2142,22 @@ void NcCfFile::get_grid_mapping_polar_stereographic(const NcVar *grid_mapping_va
   ConcatString y_coord_units_name;
   const NcVarAtt *y_coord_units_att = get_nc_att(_yCoordVar, units_att_name);
   if (!get_var_units(_yCoordVar, y_coord_units_name)) {
-    mlog << Warning << "\n" << method_name << " -> "
+    mlog << Warning << "\n" << method_name
          << "Units not given for Y coordinate variable -- assuming meters.\n\n";
   }
   else {
     if (0 == y_coord_units_name.length()) {
-      mlog << Warning << "\n" << method_name << " -> "
+      mlog << Warning << "\n" << method_name
            << "Cannot extract Y coordinate units from netCDF file -- "
            << "assuming meters.\n\n";
     }
     else {
-           if ( y_coord_units_name == "m" ) y_coord_to_m_cf = 1.0;
+           if ( y_coord_units_name == "m" ||
+                y_coord_units_name == "meter" ||
+                y_coord_units_name == "meters" ) y_coord_to_m_cf = 1.0;
       else if ( y_coord_units_name == "km") y_coord_to_m_cf = 1000.0;
       else {
-        mlog << Error << "\n" << method_name << " -> "
+        mlog << Error << "\n" << method_name
              << "The X coordinates must be in meters or kilometers for MET.\n\n";
         exit(1);
       }
@@ -2150,13 +2186,19 @@ void NcCfFile::get_grid_mapping_polar_stereographic(const NcVar *grid_mapping_va
 
   double dx_m = (x_values[x_counts-1] - x_values[0]) / (x_counts - 1);
   double dy_m = (y_values[y_counts-1] - y_values[0]) / (y_counts - 1);
+  double dx_m_a = fabs(dx_m);
+  double dy_m_a = fabs(dy_m);
 
-  if (fabs(dx_m - dy_m) > DELTA_TOLERANCE)
+  if (fabs(dx_m_a - dy_m_a) > DELTA_TOLERANCE)
   {
-    mlog << Error << "\n" << method_name << " -> "
+    mlog << Error << "\n" << method_name
          << "MET can only process Polar Stereographic files where the x-axis and y-axis deltas are the same.\n\n";
     exit(1);
   }
+
+  if (is_eq(semi_major_axis, bad_data_double))
+    semi_major_axis = EARTH_MAJOR_AXIS_km * m_per_km;
+  else if (semi_major_axis < 10000.0) semi_major_axis *= m_per_km; // meters
 
   // Calculate the pin indices.  The pin will be located at the grid's reference
   // location since that's the only lat/lon location we know about.
@@ -2169,17 +2211,193 @@ void NcCfFile::get_grid_mapping_polar_stereographic(const NcVar *grid_mapping_va
   StereographicData data;
   data.name = stereographic_proj_type;
   data.lat_pin = proj_origin_lat;
-  data.lon_pin = -1.0 * proj_origin_lon;
-  data.hemisphere = (data.lat_pin > 0 ? 'N' : 'S');
+  data.lon_pin = -1.0 * (is_eq(proj_origin_lon, bad_data_double) ? 0 : proj_origin_lon);
+  data.hemisphere = (proj_origin_lat > 0 ? 'N' : 'S');
   data.x_pin = x_pin;
   data.y_pin = y_pin;
   data.scale_lat = proj_origin_lat;
   data.lon_orient = -1.0 * proj_vertical_lon;
-  data.d_km = dx_m / 1000.0;
-  data.r_km = 6371.20;
+  data.d_km = dx_m / m_per_km;
+  data.dy_km = dy_m / m_per_km;
+  data.r_km = semi_major_axis / m_per_km;
   data.nx = _xDim->getSize();
   data.ny = _yDim->getSize();
+
+  bool is_north_hemisphere = proj_origin_lat > 0;
+  double eccentricity, false_east,false_north, scale_factor;
+  scale_factor = proj_origin_scale_factor;
+  eccentricity = false_east = false_north = 0.;
+  if(!has_scale_factor && has_standard_parallel) {
+    double lat, lon;
+    double x, y, x2, y2;
+
+    false_east = get_nc_var_att_double(grid_mapping_var, "false_east", false);
+    false_north = get_nc_var_att_double(grid_mapping_var, "false_north", false);
+
+    if (is_eq(false_east, bad_data_double)) false_east = 0.;
+    if (is_eq(false_north, bad_data_double)) false_north = 0.;
+    if(!is_spherical_earch) eccentricity = st_eccentricity_func(semi_major_axis, semi_minor_axis,
+                                                                inverse_flattening);
+
+    x = x_values[0];
+    y = y_values[0];
+    scale_factor = st_sf_func(proj_standard_parallel, eccentricity, is_north_hemisphere);
+    st_xy_to_latlon_func(x, y, lat, lon, scale_factor, semi_major_axis,
+                         proj_vertical_lon, false_east, false_north,
+                         eccentricity, is_north_hemisphere);
+    data.lat_pin = lat;
+    data.lon_pin = -lon;
+
+    if(!has_scale_factor && has_standard_parallel) {
+      if(is_eq(eccentricity, 0.0)) {
+        data.x_pin = data.y_pin = 0.;
+      }
+      else {
+        data.x_pin = x / dx_m_a;
+        data.y_pin = y / dy_m_a;
+      }
+    }
+
+    st_latlon_to_xy_func(lat, lon, x2, y2, scale_factor, proj_vertical_lon,
+                         semi_major_axis, false_east, false_north,
+                         eccentricity, is_north_hemisphere);
+    mlog << Debug(6) << method_name
+         << " x: between " << x_values[0] <<" and " << x_values[x_counts-1]
+         << ", y: between " << y_values[0] <<" and " << y_values[y_counts-1] << "\n";
+    mlog << Debug(6) << method_name
+         << "pin: (x,y) -> (lat,lon) -> (x2,y2): (" << x << "," << y << ") -> ("
+         << lat << "," << lon << ") -> (" << x2 << "," << y2
+         << ") Diff (m): x=" << (x-x2) <<", y=" << (y-y2) << "\n";
+
+  }
+
+  // ellipsoidal earth
+  data.scale_factor = scale_factor;
+  data.eccentricity = eccentricity;
+  data.false_east = false_east;
+  data.false_north = false_north;
+
   grid.set(data);
+
+  //Note: do not set grid.set_swap_to_north()
+
+  if(mlog.verbosity_level() >= 10) {
+    double lat1, lon1;
+    double x1, y1, x2, y2;
+
+    mlog << Debug(15) << method_name
+         << "dx_m=" << dx_m << ", dy_m=" << dy_m << "\n";
+
+    x1 = (dx_m > 0) ? x_values[0] : x_values[x_counts-1];
+    y1 = (dy_m > 0) ? y_values[0] : y_values[y_counts-1];
+    st_xy_to_latlon_func(x1, y1, lat1, lon1, scale_factor, semi_major_axis,
+                         proj_vertical_lon, false_east, false_north,
+                         eccentricity, is_north_hemisphere);
+    st_latlon_to_xy_func(lat1, lon1, x2, y2, scale_factor, proj_vertical_lon,
+                         semi_major_axis, false_east, false_north,
+                         eccentricity, is_north_hemisphere);
+    mlog << Debug(10) << method_name
+         << " bottom left: (x,y) -> (lat,lon) -> (x2,y2): ("
+         << x1 << "," << y1 << ") -> ("
+         << lat1 << "," << lon1 << ") -> (" << x2 << "," << y2
+         << ") Diff (m): x=" << (x1-x2) <<", y=" << (y1-y2)
+         << "\n";
+
+    x1 = (dx_m > 0) ? x_values[0] : x_values[x_counts-1];
+    y1 = (dy_m > 0) ? y_values[y_counts-1] : y_values[0];
+    st_xy_to_latlon_func(x1, y1, lat1, lon1, scale_factor, semi_major_axis,
+                         proj_vertical_lon, false_east, false_north,
+                         eccentricity, is_north_hemisphere);
+    st_latlon_to_xy_func(lat1, lon1, x2, y2, scale_factor, proj_vertical_lon,
+                         semi_major_axis, false_east, false_north,
+                         eccentricity, is_north_hemisphere);
+    mlog << Debug(10) << method_name
+         << "    top left: (x,y) -> (lat,lon) -> (x2,y2): ("
+         << x1 << "," << y1 << ") -> ("
+         << lat1 << "," << lon1 << ") -> (" << x2 << "," << y2
+         << ") Diff (m): x=" << (x1-x2) <<", y=" << (y1-y2)
+         << "\n";
+
+    x1 = x_values[int(x_counts/2)];
+    y1 = y_values[int(y_counts/2)];
+    st_xy_to_latlon_func(x1, y1, lat1, lon1, scale_factor, semi_major_axis,
+                         proj_vertical_lon, false_east, false_north,
+                         eccentricity, is_north_hemisphere);
+    st_latlon_to_xy_func(lat1, lon1, x2, y2, scale_factor, proj_vertical_lon,
+                         semi_major_axis, false_east, false_north,
+                         eccentricity, is_north_hemisphere);
+    mlog << Debug(10) << method_name
+         << "      center: (x,y) -> (lat,lon) -> (x2,y2): (" << x1
+         << "," << y1 << ") -> ("
+         << lat1 << "," << lon1 << ") -> (" << x2 << "," << y2
+         << ") Diff (m): x=" << (x1-x2) <<", y=" << (y1-y2)
+         << "\n";
+
+    x1 = (dx_m > 0) ? x_values[x_counts-1] : x_values[0];
+    y1 = (dy_m > 0) ? y_values[y_counts-1] : y_values[0];
+    st_xy_to_latlon_func(x1, y1, lat1, lon1, scale_factor, semi_major_axis,
+                         proj_vertical_lon, false_east, false_north,
+                         eccentricity, is_north_hemisphere);
+    st_latlon_to_xy_func(lat1, lon1, x2, y2, scale_factor, proj_vertical_lon,
+                         semi_major_axis, false_east, false_north,
+                         eccentricity, is_north_hemisphere);
+    mlog << Debug(10) << method_name
+         << "   top right: (x,y) -> (lat,lon) -> (x2,y2): (" << x1
+         << "," << y1 << ") -> ("
+         << lat1 << "," << lon1 << ") -> (" << x2 << "," << y2
+         << ") Diff (m): x=" << (x1-x2) <<", y=" << (y1-y2)
+         << "\n";
+
+    x1 = (dx_m > 0) ? x_values[x_counts-1] : x_values[0];
+    y1 = (dy_m > 0) ? y_values[0] : y_values[y_counts-1];
+    st_xy_to_latlon_func(x1, y1, lat1, lon1, scale_factor, semi_major_axis,
+                         proj_vertical_lon, false_east, false_north,
+                         eccentricity, is_north_hemisphere);
+    st_latlon_to_xy_func(lat1, lon1, x2, y2, scale_factor, proj_vertical_lon,
+                         semi_major_axis, false_east, false_north,
+                         eccentricity, is_north_hemisphere);
+    mlog << Debug(10) << method_name
+         << "bottom right: (x,y) -> (lat,lon) -> (x2,y2): (" << x1
+         << "," << y1 << ") -> ("
+         << lat1 << "," << lon1 << ") -> (" << x2 << "," << y2
+         << ") Diff (m): x=" << (x1-x2) <<", y=" << (y1-y2)
+         << "\n";
+
+    if(mlog.verbosity_level() >= 15) {
+      mlog << Debug(15) << method_name
+           << "data.scale_factor=" << data.scale_factor
+           <<", -data.lon_orient=" << -1.0*data.lon_orient << ", data.r_km=" << data.r_km
+           << ", data.false_east=" << data.false_east << ", data.false_north=" << data.false_north
+           << ", data.eccentricity=" << data.eccentricity
+           << ", is_north_hemisphere=" << is_north_hemisphere << "\n";
+      for (int ix=0; ix<data.nx; ix++) {
+        for (int iy=0; iy<data.ny; iy++) {
+          double x_diff, y_diff;
+          x1 = x_values[ix];
+          y1 = y_values[iy];
+
+          st_xy_to_latlon_func(x1, y1, lat1, lon1, data.scale_factor, data.r_km*m_per_km,
+                               -data.lon_orient, data.false_east, data.false_north,
+                               data.eccentricity, is_north_hemisphere);
+          st_latlon_to_xy_func(lat1, lon1, x2, y2, data.scale_factor, -data.lon_orient,
+                               data.r_km*m_per_km, data.false_east, data.false_north,
+                               data.eccentricity, is_north_hemisphere);
+          x_diff = (x1-x2);
+          y_diff = (y1-y2);
+          mlog << Debug(15)
+               << "        index=("<< ix << "," << iy << "): (x,y) -> (lat,lon) -> (x2,y2): (" << x1
+               << "," << y1 << ") -> ("
+               << lat1 << "," << lon1 << ") -> (" << x2 << "," << y2
+               << ") Diff (m): x=" << x_diff <<", y=" << y_diff
+               << ((abs(x_diff/dx_m) > 0.5) ? " [x_delta > dx/2] " : " ")
+               << ((abs(y_diff/dy_m) > 0.5) ? " [y_delta > dy/2] " : " ")
+               << ((abs(x_diff) > dx_m_a || abs(y_diff) > dy_m_a) ? "  *** check dx/dy ***" : " ")
+               << "\n";
+        }
+      }
+    }
+  }
+
 }
 
 

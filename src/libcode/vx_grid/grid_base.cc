@@ -200,6 +200,7 @@ mlog << Debug(grid_debug_level)
      << "       y_pin: " << y_pin << "\n"
      << "  lon_orient: " << lon_orient << "\n"
      << "        d_km: " << d_km << "\n"
+     << "       dy_km: " << dy_km << "\n"
      << "        r_km: " << r_km << "\n"
      << "          nx: " << nx << "\n"
      << "          ny: " << ny << "\n\n";
@@ -1313,6 +1314,7 @@ if ( st1->nx               == st2->nx                    &&
      is_eq  (rescale_lon(st1->lon_orient),
              rescale_lon(st2->lon_orient),    loose_tol) &&
      is_eq  (st1->d_km,       st2->d_km,      loose_tol) &&
+     is_eq  (st1->dy_km,      st2->dy_km,     loose_tol) &&
      is_eq  (st1->r_km,       st2->r_km,      loose_tol) )  status = true;
 
 return ( status );
