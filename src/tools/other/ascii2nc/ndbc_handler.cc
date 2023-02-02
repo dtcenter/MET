@@ -88,7 +88,7 @@ NdbcHandler::NdbcHandler(const string &program_name) :
   // read in and parse the locations file
   if (!locations.initialize(locationsFileName)) {
     mlog << Error << "\nCannot initialize NDBC station loations file: "
-	 << locationsFileName << "\n\n";
+         << locationsFileName << "\n\n";
     exit(1);
   }
 
@@ -215,14 +215,14 @@ bool NdbcHandler::_readObservations(LineDataFile &ascii_file)
 ////////////////////////////////////////////////////////////////////////
 
 bool NdbcHandler::_parseObservationLineStandard(DataLine &data_line,
-						const string &filename)
+                                                const string &filename)
 {
   string method_name = "NdbcHandler::_parseObservationLineStandard() ";
 
   if (format_version != NDBC_FORMAT_VERSION_STANDARD) {
     mlog << Warning << "\n" << method_name << "->"
-	 << "Standard NDBC format is the only supported format: " 
-	 << filename << "\n\n";
+         << "Standard NDBC format is the only supported format: " 
+         << filename << "\n\n";
     return false;
   }
 
@@ -231,10 +231,10 @@ bool NdbcHandler::_parseObservationLineStandard(DataLine &data_line,
   //
   if (data_line.n_items() != NUM_COLS_STANDARD) {
     mlog << Warning << "\n" << method_name << "-> "
-	 << "Skipping line number " << data_line.line_number()
-	 << " with an unexpected number of columns ("
-	 << data_line.n_items() << " != " << NUM_COLS_STANDARD << "): "
-	 << filename << "\n\n";
+         << "Skipping line number " << data_line.line_number()
+         << " with an unexpected number of columns ("
+         << data_line.n_items() << " != " << NUM_COLS_STANDARD << "): "
+         << filename << "\n\n";
     return false;
   }
 
@@ -244,9 +244,9 @@ bool NdbcHandler::_parseObservationLineStandard(DataLine &data_line,
   time_t valid_time = _getValidTime(data_line);
   if (valid_time == 0) {
     mlog << Warning << "\n" << method_name << "-> "
-	 << "Skipping line number " << data_line.line_number()
-	 << " whose vaild time cannot not be parsed: "
-	 << filename << "\n\n";
+         << "Skipping line number " << data_line.line_number()
+         << " whose vaild time cannot not be parsed: "
+         << filename << "\n\n";
     return false;
   }
 
@@ -264,9 +264,9 @@ bool NdbcHandler::_parseObservationLineStandard(DataLine &data_line,
     name = column[i].name;
     grib_code = i;  // it's not actually grib code, its obs_vid, according to howard
     _addObservations(Observation(header_type, stationId, valid_time,
-				 stationLat, stationLon, stationAlt,
-				 quality_flag, grib_code, pressure_level_hpa,
-				 height_m, value, name));
+                                 stationLat, stationLon, stationAlt,
+                                 quality_flag, grib_code, pressure_level_hpa,
+                                 height_m, value, name));
   }
   return true;
 }
@@ -289,14 +289,14 @@ bool NdbcHandler::_setStationInfo(const string &filename)
   i0 = fname.find(".txt");
   if (i0 == string::npos) {
     mlog << Warning << "\n" << "NDBC file name does not follow the "
-	 << "expected '<stationid>.txt' format: " << fname << "\n\n";
+         << "expected '<stationid>.txt' format: " << fname << "\n\n";
     return false;
   }
   stationId = fname.substr(0, i0);
   if (!locations.lookupLatLonElev(stationId, stationLat, stationLon,
-				  stationAlt)) {
+                                  stationAlt)) {
     mlog << Warning << "\n" << "NDBC station " << stationId
-	 << " location information not found: " << filename << "\n\n";
+         << " location information not found: " << filename << "\n\n";
     return false;
   }
   return true;
@@ -339,7 +339,7 @@ time_t NdbcHandler::_getValidTime(const DataLine &data_line) const
   if (column_pointer_year < 0 || column_pointer_month  < 0 || column_pointer_day < 0 ||
       column_pointer_hour < 0 || column_pointer_minute < 0) {
     mlog << Warning << "\nNdbcHandler::_getValidTime -> "
-	 << "Not all time related column pointers are set.\n\n";
+         << "Not all time related column pointers are set.\n\n";
     return 0;
   }
   string year = _extractColumn(data_line, column_pointer_year);
@@ -393,8 +393,8 @@ bool NdbcHandler::_readHeaderInfo(LineDataFile &ascii_file)
   //
   if (!(ascii_file >> data_line)) {
     mlog << Warning << "\nNdbcHandler::_readHeaderInfo() -> "
-	 << "Problem reading header line from input ASCII file: "
-	 << ascii_file.filename() << "\n\n";
+         << "Problem reading header line from input ASCII file: "
+         << ascii_file.filename() << "\n\n";
     return false;
   }
 
@@ -404,8 +404,8 @@ bool NdbcHandler::_readHeaderInfo(LineDataFile &ascii_file)
   if (data_line.n_items() != NUM_COLS_STANDARD) {
     mlog << Warning << "\nNdbcHandler::_readHeaderInfo() -> "
          << "Unexpected number of header columns (" << data_line.n_items()
-	 << " != " << NUM_COLS_STANDARD << "): "
-	 << ascii_file.filename() << "\n\n";
+         << " != " << NUM_COLS_STANDARD << "): "
+         << ascii_file.filename() << "\n\n";
     return false;
   }
 
@@ -428,33 +428,33 @@ bool NdbcHandler::_readHeaderInfo(LineDataFile &ascii_file)
     } else {
       bool found = false;
       for (size_t j=0; j<column.size(); ++j) {
-	if (column[j].nameEquals(s)) {
-	  column[j].setPtr(i);
-	  found = true;
-	  break;
-	}
+        if (column[j].nameEquals(s)) {
+          column[j].setPtr(i);
+          found = true;
+          break;
+        }
       }
       if (!found) {
-	mlog << Warning << "\nNdbcHandler::_readHeaderInfo() -> "
-	     << "Unexpected header column (" << s << "): "
-	     << ascii_file.filename() << "\n\n";
-	status = false;
+        mlog << Warning << "\nNdbcHandler::_readHeaderInfo() -> "
+             << "Unexpected header column (" << s << "): "
+             << ascii_file.filename() << "\n\n";
+        status = false;
       }
     }
   }
   if (column_pointer_year == -1 || column_pointer_month == -1 ||
       column_pointer_day == -1 || column_pointer_hour == -1  ||
       column_pointer_minute == -1) {
-	mlog << Warning << "\nNdbcHandler::_readHeaderInfo() -> "
-	     << "NDBC file did not have all time fields in header: "
-	     << ascii_file.filename() << "\n\n";
-	status = false;
+        mlog << Warning << "\nNdbcHandler::_readHeaderInfo() -> "
+             << "NDBC file did not have all time fields in header: "
+             << ascii_file.filename() << "\n\n";
+        status = false;
   } 
   for (size_t j=0; j<column.size(); ++j) {
     if (column[j].notSet()) {
       mlog << Warning << "\nNdbcHandler::_readHeaderInfo() -> "
-	   << "NDBC file did not have all expected fields in header: "
-	   << ascii_file.filename() << "\n\n";
+           << "NDBC file did not have all expected fields in header: "
+           << ascii_file.filename() << "\n\n";
       status = false;
       break;
     }
