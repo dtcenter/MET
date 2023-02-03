@@ -89,7 +89,7 @@ echo "MET_TARBALL = ${MET_TARBALL? "ERROR: MET_TARBALL must be set"}"
 echo "USE_MODULES = ${USE_MODULES? "ERROR: USE_MODULES must be set to TRUE if using modules or FALSE otherwise"}"
 echo ${MAKE_ARGS:+MAKE_ARGS = $MAKE_ARGS}
 
-export LIB_DIR=${TEST_BASE}/external_libs
+LIB_DIR=${TEST_BASE}/external_libs
 MET_DIR=${MET_SUBDIR}
 
 if [ -z "${BIN_DIR_PATH}" ]; then
@@ -102,8 +102,9 @@ fi
 
 if [ -z "${MET_INSTALL_DIR}" ]; then
   MET_INSTALL_DIR=${MET_DIR}
+else
+  LIB_DIR=${MET_INSTALL_DIR}
 fi
-
 
 TAR_DIR=${TEST_BASE}/tar_files
 MET_TARBALL=${TAR_DIR}/${MET_TARBALL}
