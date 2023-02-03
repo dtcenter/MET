@@ -68,18 +68,6 @@ switch ( info.method )  {
 }   //  switch info.method
 
    //
-   //  apply convert logic
-   //
-
-out.convert(info.convert_fx);
-
-   //
-   //  apply censor logic
-   //
-
-out.censor(info.censor_thresh, info.censor_val);
-
-   //
    //  done
    //
 
