@@ -85,6 +85,8 @@ extern  int       unix_to_day_of_year (unixtime u);
 
 extern  long      unix_to_long_yyyymmddhh (unixtime u);
 
+extern  unixtime  match_unix_date (unixtime u_in, unixtime u_ymd );
+
 // Parse time strings
 
 extern  void     substring_vx_cal       (const char * text, char * out, int first, int last);
