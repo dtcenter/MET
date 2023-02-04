@@ -693,14 +693,16 @@ using the following entries:
   smoothing. The default is 120. Ignored if not Gaussian method.
 
 * The "gaussian_dx" and "gaussian_radius" settings must be in the same
-  units, such as kilometers or degress.  Their ratio
+  units, such as kilometers or degress. Their ratio
   (sigma = gaussian_radius / gaussian_dx) determines the Guassian weighting
   function.
 
 * The "convert", "censor_thresh", and "censor_val" entries are described
-  below.  When specified, these operations are applied to the output of the
-  regridding step.  The conversion operation is applied first, followed by
-  the censoring operation.
+  below. When specified, these operations are applied to the output of the
+  regridding step. The conversion operation is applied first, followed by
+  the censoring operation. Note that these operations are limited in scope.
+  They are only applied if defined within the regrid dictionary itself.
+  Settings defined at higher levels of config file context are not applied. 
 
 .. code-block:: none
 		
