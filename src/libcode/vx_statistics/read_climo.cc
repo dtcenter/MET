@@ -299,6 +299,25 @@ DataPlaneArray climo_time_interp(const DataPlaneArray &dpa, int day_ts,
       }
       // For exactly 2 fields, do a simple time interpolation.
       else if(it->second.n() == 2) {
+
+         // If the valid time falls outside the two climo times,
+         // reset the climo days to match the valid time.
+         if(vld_ut < min(dpa[it->second[0]].valid(), dpa[it->second[1]].valid()) ||
+            vld_ut > max(dpa[it->second[0]].valid(), dpa[it->second[1]].valid())) {
+
+            unixtime ut1 = match_unix_date(dpa[it->second[0]].valid(), vld_ut);
+            unixtime ut2 = match_unix_date(dpa[it->second[1]].valid(), vld_ut);
+
+            mlog << Debug(3)
+                 << "Updating climatology times from "
+                 << unix_to_yyyymmdd_hhmmss(dpa[it->second[0]].valid())
+                 << " to " << unix_to_yyyymmdd_hhmmss(ut1) << " and "
+                 << unix_to_yyyymmdd_hhmmss(dpa[it->second[1]].valid())
+                 << " to " << unix_to_yyyymmdd_hhmmss(ut2) << ".\n";
+            dpa[it->second[0]].set_valid(ut1);
+            dpa[it->second[1]].set_valid(ut2);
+         }
+
          mlog << Debug(3)
               << "Interpolating climatology fields at "
               << unix_to_yyyymmdd_hhmmss(dpa[it->second[0]].valid())
