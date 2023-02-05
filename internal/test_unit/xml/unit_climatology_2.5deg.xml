@@ -81,7 +81,7 @@
     </output>
   </test>
 
-  <!-- MET#2437: Test interpolation of monthly climo between December 15 and January 15 -->
+  <!-- MET#2437: Test interpolation with a single input monthly climo file -->
 
   <test name="climatology_GRID_STAT_SINGLE_MONTH_2.5DEG">
     <exec>&MET_BIN;/grid_stat</exec>
