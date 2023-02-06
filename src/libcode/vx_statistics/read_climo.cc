@@ -191,7 +191,7 @@ void read_climo_file(const char *climo_file, GrdFileType ctype,
 
       // Check the day time step
       if(!is_bad_data(day_ts) && abs(day_diff_sec) >= day_ts) {
-         mlog << Debug(3) << "Skipping " << clm_ut_cs << " \"" << info->magic_str()
+         mlog << Debug(4) << "Skipping " << clm_ut_cs << " \"" << info->magic_str()
               << "\" climatology field with " << day_diff_sec / sec_per_day
               << " day offset (" << conf_key_day_interval << " = "
               << day_ts / sec_per_day << ") from file \""
@@ -201,7 +201,7 @@ void read_climo_file(const char *climo_file, GrdFileType ctype,
 
       // Check the hour time step
       if(!is_bad_data(hour_ts) && abs(hms_diff_sec) >= hour_ts) {
-         mlog << Debug(3) << "Skipping " << clm_ut_cs << " \"" << info->magic_str()
+         mlog << Debug(4) << "Skipping " << clm_ut_cs << " \"" << info->magic_str()
               << "\" climatology field with " << (double) hms_diff_sec / sec_per_hour
               << " hour offset (" << conf_key_hour_interval << " = "
               << hour_ts / sec_per_hour << ") from file \""
@@ -300,22 +300,23 @@ DataPlaneArray climo_time_interp(const DataPlaneArray &dpa, int day_ts,
       // For exactly 2 fields, do a simple time interpolation.
       else if(it->second.n() == 2) {
 
-         // If the valid time falls outside the two climo times,
-         // reset the climo days to match the valid time.
+         // If the valid time falls outside the climo times, shift them.
          if(vld_ut < min(dpa[it->second[0]].valid(), dpa[it->second[1]].valid()) ||
             vld_ut > max(dpa[it->second[0]].valid(), dpa[it->second[1]].valid())) {
 
-            unixtime ut1 = match_unix_date(dpa[it->second[0]].valid(), vld_ut);
-            unixtime ut2 = match_unix_date(dpa[it->second[1]].valid(), vld_ut);
+            unixtime ut1 = dpa[it->second[0]].valid();
+            unixtime ut2 = dpa[it->second[1]].valid();
+
+            int shift_sec = day_of_year_diff(min(ut1, ut2), vld_ut) * sec_per_day;
 
             mlog << Debug(3)
-                 << "Updating climatology times from "
-                 << unix_to_yyyymmdd_hhmmss(dpa[it->second[0]].valid())
-                 << " to " << unix_to_yyyymmdd_hhmmss(ut1) << " and "
-                 << unix_to_yyyymmdd_hhmmss(dpa[it->second[1]].valid())
-                 << " to " << unix_to_yyyymmdd_hhmmss(ut2) << ".\n";
-            dpa[it->second[0]].set_valid(ut1);
-            dpa[it->second[1]].set_valid(ut2);
+                 << "Shifting climatology times " << shift_sec / sec_per_day
+                 << " day(s) from " << unix_to_yyyymmdd_hhmmss(ut1)
+                 << " to " << unix_to_yyyymmdd_hhmmss(ut1 + shift_sec)
+                 << " and " << unix_to_yyyymmdd_hhmmss(ut2)
+                 << " to " << unix_to_yyyymmdd_hhmmss(ut2 + shift_sec) << ".\n";
+            dpa[it->second[0]].set_valid(ut1 + shift_sec);
+            dpa[it->second[1]].set_valid(ut2 + shift_sec);
          }
 
          mlog << Debug(3)
