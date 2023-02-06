@@ -191,7 +191,7 @@ void read_climo_file(const char *climo_file, GrdFileType ctype,
 
       // Check the day time step
       if(!is_bad_data(day_ts) && abs(day_diff_sec) >= day_ts) {
-         mlog << Debug(4) << "Skipping " << clm_ut_cs << " \"" << info->magic_str()
+         mlog << Debug(3) << "Skipping " << clm_ut_cs << " \"" << info->magic_str()
               << "\" climatology field with " << day_diff_sec / sec_per_day
               << " day offset (" << conf_key_day_interval << " = "
               << day_ts / sec_per_day << ") from file \""
@@ -201,7 +201,7 @@ void read_climo_file(const char *climo_file, GrdFileType ctype,
 
       // Check the hour time step
       if(!is_bad_data(hour_ts) && abs(hms_diff_sec) >= hour_ts) {
-         mlog << Debug(4) << "Skipping " << clm_ut_cs << " \"" << info->magic_str()
+         mlog << Debug(3) << "Skipping " << clm_ut_cs << " \"" << info->magic_str()
               << "\" climatology field with " << (double) hms_diff_sec / sec_per_hour
               << " hour offset (" << conf_key_hour_interval << " = "
               << hour_ts / sec_per_hour << ") from file \""
