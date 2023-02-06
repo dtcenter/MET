@@ -178,25 +178,3 @@ return ( dt );
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-   //
-   //  Update the input unixtime to match the specified YMD.
-   //  Combine the target month, day, and year with the input
-   //  hours, minutes, and seconds.
-   //
-
-unixtime match_unix_date (unixtime u, unixtime u_date ) {
-
-int mon_match, day_match, yr_match;
-int mon, day, yr, hr, min, sec;
-
-unix_to_mdyhms(u_date, mon_match, day_match, yr_match, hr, min, sec);
-unix_to_mdyhms(u, mon, day, yr, hr, min, sec);
-
-return ( mdyhms_to_unix(mon_match, day_match, yr_match, hr, min, sec) );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
