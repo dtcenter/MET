@@ -74,6 +74,7 @@ void TCPairsConfInfo::clear() {
    Basin.clear();
    Cyclone.clear();
    StormName.clear();
+   SkipConsensusMembers.clear();
    InitBeg = InitEnd = (unixtime) 0;
    InitInc.clear();
    InitExc.clear();
@@ -245,7 +246,9 @@ void TCPairsConfInfo::process_config() {
       Consensus[i].Members  = (*dict)[i]->dict_value()->lookup_string_array(conf_key_members);
       Consensus[i].Required = (*dict)[i]->dict_value()->lookup_num_array(conf_key_required);
       Consensus[i].MinReq   = (*dict)[i]->dict_value()->lookup_int(conf_key_min_req);
-
+      Consensus[i].WriteMembers = true;
+      Consensus[i].WriteMembers = (*dict)[i]->dict_value()->lookup_bool(conf_key_write_members);
+      
       // If required is empty, default to 0
       if(Consensus[i].Required.n_elements() == 0) {
          for(j=0; j<Consensus[i].Members.n_elements(); j++) {
@@ -262,6 +265,11 @@ void TCPairsConfInfo::process_config() {
       }
    }
 
+   // If WriteMembers is false, add the member name to string array to skip output later
+   if(!Consensus[i].WriteMembers) {
+      SkipConsensusMembers.add(Consensus[i].Members);
+   }
+   
    // Conf: LagTime
    sa = Conf.lookup_string_array(conf_key_lag_time);
    for(i=0; i<sa.n_elements(); i++)
