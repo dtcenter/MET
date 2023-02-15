@@ -363,7 +363,7 @@ class csv_point_obs(ABC, base_met_point_obs):
 
     def __init__(self, point_data):
         self.point_data = point_data
-        super(csv_point_obs, self).__init__(not self.is_grib_code())
+        super(csv_point_obs, self).__init__()
 
         self.obs_cnt = obs_cnt = len(point_data)
         self.obs_qty = [ 0 for _ in range(0, obs_cnt) ]  # (nobs_qty) integer, index of self.obs_qty_table
