@@ -30,6 +30,13 @@ static const char user_python_path_env [] = "MET_PYTHON_EXE";
 
 static const char wrappers_dir         [] = "MET_BASE/wrappers";
 
+static const char python_dir           [] = "MET_BASE/python";
+
+static const char tmp_nc_base_name     [] = "tmp_met_nc";
+
+static const char tmp_nc_file_var_name [] = "tmp_nc_filename";
+
+static const char tmp_nc_point_var_name[] = "met_point_data";
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -56,7 +63,7 @@ extern PyObject * get_attribute(PyObject *, const char * attribute_name);
 
 
 extern int          pyobject_as_int           (PyObject *);
-extern bool         pyobject_as_bool           (PyObject *);
+extern bool         pyobject_as_bool          (PyObject *);
 extern double       pyobject_as_double        (PyObject *);
 extern std::string  pyobject_as_string        (PyObject *);
 extern ConcatString pyobject_as_concat_string (PyObject *);
