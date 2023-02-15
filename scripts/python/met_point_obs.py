@@ -280,11 +280,11 @@ class base_met_point_obs(object):
 
     @staticmethod
     def error_msg(msg):
-        print('{get_prompt()} {base_met_point_obs.ERROR_P} {msg}')
+        print(f'{get_prompt()} {base_met_point_obs.ERROR_P} {msg}')
 
     @staticmethod
     def info_msg(msg):
-        print('{get_prompt()} {base_met_point_obs.INFO_P} {msg}')
+        print(f'{get_prompt()} {base_met_point_obs.INFO_P} {msg}')
 
     @staticmethod
     def get_python_script(arg_value):
