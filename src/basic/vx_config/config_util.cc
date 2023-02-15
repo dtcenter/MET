@@ -1299,14 +1299,18 @@ RegridInfo parse_conf_regrid(Dictionary *dict, bool error_out) {
    info.gaussian.trunc_factor = (is_bad_data(conf_value) ? default_trunc_factor : conf_value);
    if (info.method == InterpMthd_Gaussian || info.method == InterpMthd_MaxGauss) info.gaussian.compute();
 
+   // MET#2437 Do not search the higher levels of config file context for convert,
+   //          censor_thresh, and censor_val. They must be specified within the
+   //          regrid dictionary itself.
+
    // Conf: convert
-   info.convert_fx.set(regrid_dict->lookup(conf_key_convert));
+   info.convert_fx.set(regrid_dict->lookup(conf_key_convert, false));
 
    // Conf: censor_thresh
-   info.censor_thresh = regrid_dict->lookup_thresh_array(conf_key_censor_thresh, false);
+   info.censor_thresh = regrid_dict->lookup_thresh_array(conf_key_censor_thresh, false, true, false);
 
    // Conf: censor_val
-   info.censor_val = regrid_dict->lookup_num_array(conf_key_censor_val, false);
+   info.censor_val = regrid_dict->lookup_num_array(conf_key_censor_val, false, true, false);
 
    // Validate the settings
    info.validate();

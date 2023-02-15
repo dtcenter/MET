@@ -1261,7 +1261,7 @@ return ( e[n] );
 ////////////////////////////////////////////////////////////////////////
 
 
-const DictionaryEntry * Dictionary::lookup(const std::string name)
+const DictionaryEntry * Dictionary::lookup(const std::string name, bool search_parent)
 
 {
 
@@ -1288,13 +1288,13 @@ scope = Name.split(".");
 
 if ( scope.n_elements() == 1 )  {
 
-   return ( lookup_simple(name) );
+   return ( lookup_simple(name, search_parent) );
 
 }
 
 for (j=0; j<(scope.n_elements() - 1); ++j)  {
 
-  E = D->lookup(scope[j].c_str());
+  E = D->lookup(scope[j].c_str(), search_parent);
 
    if ( !E )  {
 
@@ -1320,7 +1320,7 @@ for (j=0; j<(scope.n_elements() - 1); ++j)  {
 
 const string stub = scope[scope.n_elements() - 1].c_str();
 
-E = D->lookup_simple(stub);
+E = D->lookup_simple(stub, search_parent);
 
 if ( E )  {
 
@@ -1335,7 +1335,11 @@ if ( E )  {
 
 E = (const DictionaryEntry *) 0;
 
-if ( Parent )  E = Parent->lookup(name);
+if ( search_parent )  {
+
+   if ( Parent )  E = Parent->lookup(name, search_parent);
+
+}
 
    //
    //  done
@@ -1351,7 +1355,7 @@ return ( E );
 ////////////////////////////////////////////////////////////////////////
 
 
-const DictionaryEntry * Dictionary::lookup_simple(const std::string name)
+const DictionaryEntry * Dictionary::lookup_simple(const std::string name, bool search_parent)
 
 {
 
@@ -1381,8 +1385,11 @@ for (j=0; j<Nentries; ++j)  {
 
 const DictionaryEntry * E = (const DictionaryEntry *) 0;
 
-if ( Parent )  E = Parent->lookup(name);
+if ( search_parent )  {
 
+   if ( Parent )  E = Parent->lookup(name);
+
+}
    //
    //  done
    //
@@ -1473,11 +1480,12 @@ return;
 
 bool Dictionary::lookup_bool(const char * name,
                              bool error_out,
-                             bool print_warning)
+                             bool print_warning,
+                             bool search_parent)
 
 {
 
-const DictionaryEntry * Entry = lookup(name);
+const DictionaryEntry * Entry = lookup(name, search_parent);
 bool is_correct_type = false;
 
 if ( Entry )  {
@@ -1521,11 +1529,12 @@ return ( Entry->b_value() );
 
 int Dictionary::lookup_int(const char * name,
                            bool error_out,
-                           bool print_warning)
+                           bool print_warning,
+                           bool search_parent)
 
 {
 
-const DictionaryEntry * Entry = lookup(name);
+const DictionaryEntry * Entry = lookup(name, search_parent);
 bool is_correct_type = false;
 
 if ( Entry )  {
@@ -1569,11 +1578,12 @@ return ( Entry->i_value() );
 
 double Dictionary::lookup_double(const char * name,
                                  bool error_out,
-                                 bool print_warning)
+                                 bool print_warning,
+                                 bool search_parent)
 
 {
 
-const DictionaryEntry * Entry = lookup(name);
+const DictionaryEntry * Entry = lookup(name, search_parent);
 bool is_correct_type = false;
 double v = bad_data_double;
 
@@ -1641,11 +1651,12 @@ return ( v );
 
 NumArray Dictionary::lookup_num_array(const char * name,
                                       bool error_out,
-                                      bool print_warning)
+                                      bool print_warning,
+                                      bool search_parent)
 
 {
 
-const DictionaryEntry * Entry = lookup(name);
+const DictionaryEntry * Entry = lookup(name, search_parent);
 const Dictionary * Dict = (const Dictionary *) 0;
 ConfigObjectType Type = no_config_object_type;
 bool is_correct_type = false;
@@ -1765,12 +1776,13 @@ return ( array );
 
 IntArray Dictionary::lookup_int_array(const char * name,
                                       bool error_out,
-                                      bool print_warning)
+                                      bool print_warning,
+                                      bool search_parent)
 
 {
 
 IntArray array;
-NumArray num_array = lookup_num_array(name, error_out, print_warning);
+NumArray num_array = lookup_num_array(name, error_out, print_warning, search_parent);
 
 for (int i=0; i<num_array.n_elements(); i++)
    array.add( nint(num_array[i]) );
@@ -1785,11 +1797,12 @@ return ( array );
 
 ConcatString Dictionary::lookup_string(const char * name,
                                        bool error_out,
-                                       bool print_warning)
+                                       bool print_warning,
+                                       bool search_parent)
 
 {
 
-const DictionaryEntry * Entry = lookup(name);
+const DictionaryEntry * Entry = lookup(name, search_parent);
 bool is_correct_type = false;
 
 if ( Entry )  {
@@ -1835,11 +1848,12 @@ return ( Entry->string_value() );
 
 StringArray Dictionary::lookup_string_array(const char * name,
                                             bool error_out,
-                                            bool print_warning)
+                                            bool print_warning,
+                                            bool search_parent)
 
 {
 
-const DictionaryEntry * Entry = lookup(name);
+const DictionaryEntry * Entry = lookup(name, search_parent);
 const Dictionary * Dict = (const Dictionary *) 0;
 bool is_correct_type = false;
 StringArray array;
@@ -1934,11 +1948,12 @@ return ( array );
 
 SingleThresh Dictionary::lookup_thresh(const char * name,
                                        bool error_out,
-                                       bool print_warning)
+                                       bool print_warning,
+                                       bool search_parent)
 
 {
 
-const DictionaryEntry * Entry = lookup(name);
+const DictionaryEntry * Entry = lookup(name, search_parent);
 bool is_correct_type = false;
 
 if ( Entry )  {
@@ -1987,11 +2002,12 @@ return ( *(Entry->thresh_value()) );
 
 ThreshArray Dictionary::lookup_thresh_array(const char * name,
                                             bool error_out,
-                                            bool print_warning)
+                                            bool print_warning,
+                                            bool search_parent)
 
 {
 
-const DictionaryEntry * Entry = lookup(name);
+const DictionaryEntry * Entry = lookup(name, search_parent);
 const Dictionary * Dict = (const Dictionary *) 0;
 bool is_correct_type = false;
 ThreshArray array;
@@ -2089,11 +2105,12 @@ return ( array );
 
 Dictionary *Dictionary::lookup_dictionary(const char * name,
                                           bool error_out,
-                                          bool print_warning)
+                                          bool print_warning,
+                                          bool search_parent)
 
 {
 
-const DictionaryEntry * Entry = lookup(name);
+const DictionaryEntry * Entry = lookup(name, search_parent);
 bool is_correct_type = false;
 
 if ( Entry )  {
@@ -2139,11 +2156,12 @@ return ( Entry->dict_value() );
 
 Dictionary *Dictionary::lookup_array(const char * name,
                                      bool error_out,
-                                     bool print_warning)
+                                     bool print_warning,
+                                     bool search_parent)
 
 {
 
-const DictionaryEntry * Entry = lookup(name);
+const DictionaryEntry * Entry = lookup(name, search_parent);
 bool is_correct_type = false;
 
 if ( Entry )  {
@@ -2191,18 +2209,19 @@ return ( Entry->array_value() );
 
 int Dictionary::lookup_seconds(const char * name,
                                bool error_out,
-                               bool print_warning)
+                               bool print_warning,
+                               bool search_parent)
 
 {
 
-ConcatString cs = lookup_string(name, false);
+ConcatString cs = lookup_string(name, false, true, search_parent);
 
 if ( LastLookupStatus )  {
    if ( cs.empty() )  return ( bad_data_int );
    else               return ( timestring_to_sec( cs.c_str() ) );
 }
 
-return ( lookup_int(name, error_out, print_warning) );
+return ( lookup_int(name, error_out, print_warning, search_parent) );
 
 }
 
@@ -2212,11 +2231,12 @@ return ( lookup_int(name, error_out, print_warning) );
 
 IntArray Dictionary::lookup_seconds_array(const char * name,          
                                           bool error_out,
-                                          bool print_warning)
+                                          bool print_warning,
+                                          bool search_parent)
 
 {
 
-StringArray sa = lookup_string_array(name, error_out, print_warning);
+StringArray sa = lookup_string_array(name, error_out, print_warning, search_parent);
 IntArray ia;
 
 int j;
@@ -2232,11 +2252,12 @@ return ( ia );
 
 unixtime Dictionary::lookup_unixtime(const char * name,
                                      bool error_out,
-                                     bool print_warning)
+                                     bool print_warning,
+                                     bool search_parent)
 
 {
 
-ConcatString cs = lookup_string(name, error_out, print_warning);
+ConcatString cs = lookup_string(name, error_out, print_warning, search_parent);
 
 if ( cs.empty() )  return ( (unixtime) 0 );
 else               return ( timestring_to_unix( cs.c_str() ) );
@@ -2248,11 +2269,12 @@ else               return ( timestring_to_unix( cs.c_str() ) );
 
 TimeArray Dictionary::lookup_unixtime_array(const char * name,
                                             bool error_out,
-                                            bool print_warning)
+                                            bool print_warning,
+                                            bool search_parent)
 
 {
 
-StringArray sa = lookup_string_array(name, error_out, print_warning);
+StringArray sa = lookup_string_array(name, error_out, print_warning, search_parent);
 TimeArray ta;
 
 int j;
@@ -2269,11 +2291,12 @@ return ( ta );
 
 PiecewiseLinear *Dictionary::lookup_pwl(const char * name,
                                         bool error_out,
-                                        bool print_warning)
+                                        bool print_warning,
+                                        bool search_parent)
 
 {
 
-const DictionaryEntry * Entry = lookup(name);
+const DictionaryEntry * Entry = lookup(name, search_parent);
 bool is_correct_type = false;
 
 if ( Entry )  {
