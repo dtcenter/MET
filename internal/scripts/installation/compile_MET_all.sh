@@ -89,8 +89,23 @@ echo "MET_TARBALL = ${MET_TARBALL? "ERROR: MET_TARBALL must be set"}"
 echo "USE_MODULES = ${USE_MODULES? "ERROR: USE_MODULES must be set to TRUE if using modules or FALSE otherwise"}"
 echo ${MAKE_ARGS:+MAKE_ARGS = $MAKE_ARGS}
 
-export LIB_DIR=${TEST_BASE}/external_libs
+LIB_DIR=${TEST_BASE}/external_libs
 MET_DIR=${MET_SUBDIR}
+
+if [ -z "${BIN_DIR_PATH}" ]; then
+  if [ -z "${MET_INSTALL_DIR}" ]; then
+    BIN_DIR_PATH=${TEST_BASE}/bin
+  else
+    BIN_DIR_PATH=${MET_INSTALL_DIR}/bin
+  fi
+fi
+
+if [ -z "${MET_INSTALL_DIR}" ]; then
+  MET_INSTALL_DIR=${MET_DIR}
+else
+  LIB_DIR=${MET_INSTALL_DIR}
+fi
+
 TAR_DIR=${TEST_BASE}/tar_files
 MET_TARBALL=${TAR_DIR}/${MET_TARBALL}
 
@@ -415,12 +430,16 @@ if [ $COMPILE_G2CLIB -eq 1 ]; then
   rm -rf ${LIB_DIR}/g2clib/g2clib*
   tar -xf ${TAR_DIR}/g2clib*.tar -C ${LIB_DIR}/g2clib
   cd ${LIB_DIR}/g2clib/g2clib*
-  cat makefile | \
-    sed -r 's/INC=.*/INC=-I${LIB_DIR}\/include -I${LIB_DIR}\/include\/jasper/g' | \
-    sed 's/CC=gcc/CC=${CC_COMPILER}/g' | \
-    sed 's/-D__64BIT__//g' \
-    > makefile_new
-  mv makefile_new makefile
+  sed -i 's|INC=.*|INC=-I${LIB_DIR}/include -I${LIB_DIR}/include/jasper|g' makefile
+
+  # allow other compilers besides gcc
+  sed -i 's/CC=gcc/CC=${CC_COMPILER}/g' makefile
+
+  # remove -D__64BIT__ flag because compiling with it has
+  # shown issues with GRIB/GRIB2 files that are over 2GB in size
+  # This flag was removed in g2clib 1.6.4
+  # so this can be removed if the version is updated
+  sed -i 's/-D__64BIT__//g' makefile
   export CC_COMPILER=${CC}
   echo "cd `pwd`"
   # g2clib appears to compile but causes failure compiling MET if -j argument is used
@@ -628,7 +647,7 @@ if [[ $COMPILER_FAMILY == "pgi" ]]; then
   export OPT_ARGS="${OPT_ARGS} FFLAGS=-lpgf90"
 fi
 
-configure_cmd="./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH}"
+configure_cmd="./configure --prefix=${MET_INSTALL_DIR} --bindir=${BIN_DIR_PATH}"
 configure_cmd="${configure_cmd} BUFRLIB_NAME=${BUFRLIB_NAME}"
 configure_cmd="${configure_cmd} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2"
 if [[ ! -z ${MET_FREETYPEINC} && ! -z ${MET_FREETYPELIB} && \
