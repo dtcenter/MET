@@ -572,6 +572,12 @@ data.nx = char2_to_int(gds.nx);
    // Number of points in the y-direction
 data.ny = char2_to_int(gds.ny);
 
+data.eccentricity = 0.;
+data.false_east = 0.;
+data.false_north = 0.;
+data.scale_factor = 1.0;
+data.dy_km = data.d_km;
+
 data.dump();
 
    //

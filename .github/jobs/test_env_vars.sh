@@ -10,4 +10,4 @@ export MET_TEST_TRUTH=/data/output/met_test_truth
 export MET_TEST_DIFF=/data/output/met_test_diff
 
 export MET_TEST_RSCRIPT=/usr/bin/Rscript
-export MET_TEST_MET_PYTHON_EXE=/usr/bin/python3
+export MET_TEST_MET_PYTHON_EXE=/usr/local/bin/python3
