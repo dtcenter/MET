@@ -1730,12 +1730,12 @@ This dictionary may include the following entries:
 * The "shape" entry may be set to SQUARE or CIRCLE to specify the shape
   of the smoothing area.
 
-* The "type" entry is an array of dictionaries, each specifying an
-  interpolation method. Interpolation is performed over a N by N box
-  centered on each point, where N is the width specified. Each of these
+* The "type" entry is an array of dictionaries, each specifying one or more
+  interpolation methods and widths. Interpolation is performed over an N by N
+  box centered on each point, where N is the width specified. Each of these
   dictionaries must include:
 
-  * The "width" entry is an integer which specifies the size of the
+  * The "width" entry is an array of integers to specify the size of the
     interpolation area. The area is either a square or circle containing
     the observation point. The width value specifies the width of the
     square or diameter of the circle. A width value of 1 is interpreted
@@ -1748,7 +1748,7 @@ This dictionary may include the following entries:
     grid point closest to the observation point. For grid-to-grid
     comparisons (i.e. Grid-Stat), the width must be odd.
 
-  * The "method" entry specifies the interpolation procedure to be
+  * The "method" entry is an array of interpolation procedures to be
     applied to the points in the box:
     
     * MIN         for the minimum value
@@ -1793,6 +1793,9 @@ This dictionary may include the following entries:
     only valid smoothing methods are MIN, MAX, MEDIAN, UW_MEAN, and
     GAUSSIAN, and MAXGAUSS.
 
+  * If multiple "method" and "width" options are specified, all possible
+    permutations of their values are applied.
+
 .. code-block:: none
 		
   interp = {
@@ -1802,8 +1805,8 @@ This dictionary may include the following entries:
   
      type = [
         {
-           method = UW_MEAN;
-           width  = 1;
+           method = [ NEAREST ];
+           width  = [ 1 ];
         }
      ];
   }
