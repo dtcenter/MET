@@ -1387,7 +1387,7 @@ const DictionaryEntry * E = (const DictionaryEntry *) 0;
 
 if ( search_parent )  {
 
-   if ( Parent )  E = Parent->lookup(name);
+   if ( Parent )  E = Parent->lookup(name, search_parent);
 
 }
    //
