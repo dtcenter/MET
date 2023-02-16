@@ -1172,6 +1172,11 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld) {
       data.r_km         = r_km;
       data.nx           = gfld->igdtmpl[7];
       data.ny           = gfld->igdtmpl[8];
+      data.eccentricity = 0.;
+      data.false_east = 0.;
+      data.false_north = 0.;
+      data.scale_factor = 1.0;
+      data.dy_km = data.d_km;
 
       //  check for dx != dy
       if( !is_eq((double)gfld->igdtmpl[14] / 1000000.0,
