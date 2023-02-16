@@ -115,7 +115,7 @@ face = 0;
 if ( !get_env(cg_font_env, gs_font_dir) )  {
 
    mlog << Error
-        << "\n\n  CgFont::init_from_scratch() -> "
+        << "\nCgFont::init_from_scratch() -> "
         << "unable to get environment variable \""
         << cg_font_env << "\"\n\n";
 
@@ -258,7 +258,8 @@ clear();
 
 if ( (n < 0) || (n >= total_predef_fonts) )  {
 
-   mlog << Error << "\n\n  CgFont::set_by_number(int) -> range check error\n\n";
+   mlog << Error << "\nCgFont::set_by_number(int) -> "
+        << "range check error\n\n";
 
    exit ( 1 );
 
@@ -274,7 +275,8 @@ full_afm_name << gs_font_dir << '/' << gs_font_dir << '/' << short_afm_name;
 
 if ( !file_exists(full_afm_name.c_str()) )  {
 
-   mlog << Error << "\n\n  CgFont::set_by_number(int) -> can't find afm file \"" << full_afm_name << "\"\n\n";
+   mlog << Error << "\nCgFont::set_by_number(int) -> "
+        << "can't find afm file \"" << full_afm_name << "\"\n\n";
 
    exit ( 1 );
 
@@ -284,7 +286,8 @@ afm = new Afm;
 
 if ( !(afm->read(full_afm_name)) )  {
 
-   mlog << Error << "\n\n  CgFont::set_by_number(int) -> trouble reading afm file \"" << full_afm_name << "\"\n\n";
+   mlog << Error << "\nCgFont::set_by_number(int) -> "
+        << "trouble reading afm file \"" << full_afm_name << "\"\n\n";
 
    exit ( 1 );
 
@@ -374,8 +377,6 @@ void CgFontCollection::init_from_scratch()
 
 {
 
-e = (CgFont **) 0;
-
 clear();
 
 return;
@@ -390,33 +391,27 @@ void CgFontCollection::clear()
 
 {
 
-if ( e )  {
+int j, error;
 
-   int j, error;
+for (j=0; j<Nalloc; ++j)  {
 
-   for (j=0; j<Nalloc; ++j)  {
+   error = FT_Done_Face(e[j].face);
 
-      if ( ! (e[j]) )  continue;
+   if ( error )  {
 
-      error = FT_Done_Face(e[j]->face);
+      mlog << Error << "\nCgFontCollection::clear() -> "
+           << "trouble closing typeface \"" << e[j].short_pfb_name
+           << "\"\n\n";
 
-      if ( error )  {
-
-         mlog << Error << "\n\n  CgFontCollection::clear() -> trouble closing typeface \"" << e[j]->short_pfb_name << "\"\n\n";
-
-         exit ( 1 );
-
-      }
-
-      e[j]->face = 0;
-
-      if ( e[j] )  { delete e[j];  e[j] = (CgFont *) 0; }
+      exit ( 1 );
 
    }
 
-   delete [] e;  e = (CgFont **) 0;
+   e[j].face = 0;
 
 }
+
+e.clear();
 
 Nelements = Nalloc = 0;
 
@@ -445,7 +440,7 @@ for (j=0; j<Nelements; ++j)  {
 
    out << prefix << "Element # " << j << " ...\n";
 
-   e[j]->dump(out, depth + 1);
+   e[j].dump(out, depth + 1);
 
 }
 
@@ -470,37 +465,13 @@ void CgFontCollection::extend(int n)
 
 if ( n <= Nalloc )  return;
 
-int j, k;
-CgFont ** u = (CgFont **) 0;
-
-
-k = n/alloc_inc;
+int k = n/alloc_inc;
 
 if ( n%alloc_inc )  ++k;
 
 n = k*alloc_inc;
 
-u = new CgFont * [n];
-
-if ( !u )  {
-
-   mlog << Error << "\n\n  CgFontCollection::extend(int) -> memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
-
-for (j=0; j<n; ++j)  u[j] = (CgFont *) 0;
-
-if ( e )  {
-
-   for (j=0; j<Nelements; ++j)  u[j] = e[j];
-
-   delete [] e;  e = (CgFont **) 0;
-
-}
-
-e = u;  u = (CgFont **) 0;
+e.reserve(n);
 
 Nalloc = n;
 
@@ -522,23 +493,11 @@ void CgFontCollection::assign(const CgFontCollection & c)
 
 clear();
 
-if ( !(c.e) )  return;
+if ( c.e.size() == 0 )  return;
 
 extend(c.Nelements);
 
-int j;
-
-for (j=0; j<(c.Nelements); ++j)  {
-
-   if ( c.e[j] )  {
-
-      e[j] = new CgFont;
-
-      *(e[j]) = *(c.e[j]);
-
-   }
-
-}
+e = c.e;
 
 Nelements = c.Nelements;
 
@@ -558,13 +517,9 @@ void CgFontCollection::add(const CgFont & f)
 
 {
 
-// if ( have_it(f) )  return;
-
 extend(Nelements + 1);
 
-e[Nelements] = new CgFont;
-
-*(e[Nelements]) = f;
+e.push_back(f);
 
 ++Nelements;
 
@@ -585,9 +540,7 @@ if ( have_it(f) )  return;
 
 extend(Nelements + 1);
 
-e[Nelements] = new CgFont;
-
-*(e[Nelements]) = f;
+e.push_back(f);
 
 ++Nelements;
 
@@ -608,7 +561,7 @@ int j;
 
 for (j=0; j<Nelements; ++j)  {
 
-   if ( same_font( *(e[j]), f ) )  return ( true );
+   if ( same_font( e[j], f ) )  return ( true );
 
 }
 
@@ -620,7 +573,7 @@ return ( false );
 ////////////////////////////////////////////////////////////////////////
 
 
-CgFont * CgFontCollection::lookup_by_ps_font_number(int n) const
+CgFont * CgFontCollection::lookup_by_ps_font_number(int n)
 
 {
 
@@ -628,7 +581,7 @@ int j;
 
 for (j=0; j<Nelements; ++j)  {
 
-   if ( e[j]->ps_font_number == n )  return ( e[j] );
+   if ( e[j].ps_font_number == n )  return ( & e[j] );
 
 }
 
@@ -641,7 +594,7 @@ return ( (CgFont *) 0 );
 ////////////////////////////////////////////////////////////////////////
 
 
-CgFont * CgFontCollection::lookup_by_ps_name(const char * name) const
+CgFont * CgFontCollection::lookup_by_ps_name(const char * name)
 
 {
 
@@ -649,7 +602,7 @@ int j;
 
 for (j=0; j<Nelements; ++j)  {
 
-   if ( e[j]->ps_name == name )  return ( e[j] );
+   if ( e[j].ps_name == name )  return ( & e[j] );
 
 }
 
@@ -662,19 +615,20 @@ return ( (CgFont *) 0 );
 ////////////////////////////////////////////////////////////////////////
 
 
-CgFont * CgFontCollection::operator[](int k) const
+CgFont * CgFontCollection::operator[](int k)
 
 {
 
 if ( (k < 0) || (k >= Nelements) )  {
 
-   mlog << Error << "\n\n  CgFont * CgFontCollection::operator[](int) const -> range check error\n\n";
+   mlog << Error << "\nCgFont * CgFontCollection::operator[](int) const -> "
+        << "range check error\n\n";
 
    exit ( 1 );
 
 }
 
-return ( e[k] );
+return ( & e[k] );
 
 }
 
@@ -702,8 +656,3 @@ return ( false );
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-
-
-
