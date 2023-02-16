@@ -811,19 +811,30 @@ bool is_keeper(const ATCFLineBase * line) {
 
 void filter_tracks(TrackInfoArray &tracks) {
    int i, j;
-   int n_name, n_vld, n_mask_init, n_mask_vld, n_req_lead;
+   int n_name, n_vld, n_mask_init, n_mask_vld, n_req_lead, n_members;
    bool status;
    TrackInfoArray t = tracks;
 
    // Initialize
    tracks.clear();
-   n_name = n_vld = n_mask_init = n_mask_vld = n_req_lead = 0;
-
+   n_name = n_vld = n_mask_init = n_mask_vld = n_req_lead = n_members = 0;
+   
    // Loop through the tracks and determine which should be retained
    // The is_keeper() function has already filtered by model, storm id,
    // basin, cyclone, and timing information.
    for(i=0; i<t.n(); i++) {
 
+      // Check if we should skip output for certain consensus members
+      // The StringArray conf_info.SkipConsensusMembers contains the members to skip
+      if(conf_info.SkipConsensusMembers.n() > 0 &&
+         conf_info.SkipConsensusMembers.has(t[i].technique())) {
+         mlog << Debug(4)
+              << "Discarding track " << i+1 << " since it is listed in SkipConsensusMembers: "
+              << t[i].technique() << "\n";
+         n_members++;
+         continue;
+      }
+      
       // Check storm name
       if(conf_info.StormName.n() > 0 &&
          !conf_info.StormName.has(t[i].storm_name())) {
@@ -926,8 +937,9 @@ void filter_tracks(TrackInfoArray &tracks) {
         << "Rejected for valid time          = " << n_vld       << "\n"
         << "Rejected for required lead times = " << n_req_lead  << "\n"
         << "Rejected for init mask           = " << n_mask_init << "\n"
-        << "Rejected for valid mask          = " << n_mask_vld  << "\n";
-
+        << "Rejected for valid mask          = " << n_mask_vld  << "\n"
+        << "Rejected for skip members        = " << n_members   << "\n";
+   
    return;
 }
 

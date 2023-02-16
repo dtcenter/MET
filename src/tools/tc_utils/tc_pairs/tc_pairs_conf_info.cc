@@ -241,14 +241,14 @@ void TCPairsConfInfo::process_config() {
    // Loop over the consensus entries
    for(i=0; i<NConsensus; i++) {
 
-      // Conf: Consensus: name, members, required, min_req
+      // Conf: Consensus: name, members, required, min_req, write_members
       Consensus[i].Name     = (*dict)[i]->dict_value()->lookup_string(conf_key_name);
       Consensus[i].Members  = (*dict)[i]->dict_value()->lookup_string_array(conf_key_members);
       Consensus[i].Required = (*dict)[i]->dict_value()->lookup_num_array(conf_key_required);
       Consensus[i].MinReq   = (*dict)[i]->dict_value()->lookup_int(conf_key_min_req);
       Consensus[i].WriteMembers = true;
       Consensus[i].WriteMembers = (*dict)[i]->dict_value()->lookup_bool(conf_key_write_members);
-      
+
       // If required is empty, default to 0
       if(Consensus[i].Required.n_elements() == 0) {
          for(j=0; j<Consensus[i].Members.n_elements(); j++) {
@@ -263,13 +263,15 @@ void TCPairsConfInfo::process_config() {
               << "or the same length as \"consensus.members\".\n\n";
          exit(1);
       }
+
+      // If WriteMembers is false, save the Members to skip output for
+      if(!Consensus[i].WriteMembers) {
+         for(j=0; j<Consensus[i].Members.n_elements(); j++) {
+            SkipConsensusMembers.add(Consensus[i].Members[j]);
+         }
+      }
    }
 
-   // If WriteMembers is false, add the member name to string array to skip output later
-   if(!Consensus[i].WriteMembers) {
-      SkipConsensusMembers.add(Consensus[i].Members);
-   }
-   
    // Conf: LagTime
    sa = Conf.lookup_string_array(conf_key_lag_time);
    for(i=0; i<sa.n_elements(); i++)
