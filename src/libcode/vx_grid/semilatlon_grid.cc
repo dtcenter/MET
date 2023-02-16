@@ -173,7 +173,7 @@ IsLatLon = false;
 Nx = 0;
 Ny = 0;
 
-memset(&Data, 0, sizeof(Data));
+Data.clear();
 
 return;
 
