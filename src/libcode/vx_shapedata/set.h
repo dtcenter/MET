@@ -26,12 +26,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-#include <vector>
-
-
-///////////////////////////////////////////////////////////////////////////////
-
-
 static const int fcst_obs_set_alloc_inc  = 50;
 
 
@@ -46,7 +40,7 @@ class FcstObsSet {
 
       void assign(const FcstObsSet &);
 
-      void extend(std::vector<int> &, int & n_alloc, const int n_new);
+      void extend(int * &, int & n_alloc, const int n_new);
 
    public:
 
@@ -54,8 +48,8 @@ class FcstObsSet {
          //  data
          //
 
-      std::vector<int> fcst_number;
-      std::vector<int> obs_number;
+      int * fcst_number;   //  allocated
+      int * obs_number;    //  allocated
 
       int n_fcst;
       int n_obs;
@@ -102,6 +96,8 @@ extern std::ostream & operator<<(std::ostream &, const FcstObsSet &);
 ///////////////////////////////////////////////////////////////////////////////
 
 
+// static const int max_fcst_obs_sets = 300;
+
 static const int set_alloc_inc = 50;
 
 
@@ -122,7 +118,7 @@ class SetCollection {
          //  data
          //
 
-      std::vector<FcstObsSet> set;
+      FcstObsSet * set;   //  allocated
 
       int n_sets;
 
