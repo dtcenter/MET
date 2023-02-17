@@ -13,6 +13,9 @@ met_base_dir = os.getenv('MET_BASE',None)
 if met_base_dir is not None:
     sys.path.append(os.path.join(met_base_dir, 'python'))
 
+# add share/met/python directory to system path to find met_point_obs
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__),
+                                             os.pardir, 'python')))
 from met_point_obs import met_point_obs
 from met_point_obs_nc import nc_point_obs
 
