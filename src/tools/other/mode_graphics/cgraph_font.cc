@@ -377,6 +377,8 @@ void CgFontCollection::init_from_scratch()
 
 {
 
+Nelements = Nalloc = 0;
+
 clear();
 
 return;
