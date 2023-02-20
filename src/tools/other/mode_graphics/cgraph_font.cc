@@ -395,7 +395,7 @@ void CgFontCollection::clear()
 
 int j, error;
 
-for (j=0; j<Nalloc; ++j)  {
+for (j=0; j<Nelements; ++j)  {
 
    error = FT_Done_Face(e[j].face);
 
