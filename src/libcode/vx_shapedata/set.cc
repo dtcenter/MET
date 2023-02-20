@@ -94,9 +94,7 @@ void FcstObsSet::init_from_scratch()
 
 {
 
-fcst_number = 0;
-
- obs_number = 0;
+n_fcst = n_obs = 0;
 
 all_clear();
 
@@ -115,17 +113,12 @@ void FcstObsSet::clear()
 
 {
 
-// if ( fcst_number )  { delete [] fcst_number;  fcst_number = 0; }
-// if (  obs_number )  { delete []  obs_number;   obs_number = 0; }
-
 int j;
 
-for (j=0; j<n_fcst_alloc; ++j)  fcst_number[j] = 0;
-for (j=0; j<n_obs_alloc;  ++j)   obs_number[j] = 0;
+for (j=0; j<n_fcst; ++j)  fcst_number[j] = 0;
+for (j=0; j<n_obs;  ++j)   obs_number[j] = 0;
 
 n_fcst = n_obs = 0;
-
-// n_fcst_alloc = n_obs_alloc = 0;
 
 return;
 
@@ -139,8 +132,8 @@ void FcstObsSet::all_clear()
 
 {
 
-if ( fcst_number )  { delete [] fcst_number;  fcst_number = 0; }
-if (  obs_number )  { delete []  obs_number;   obs_number = 0; }
+fcst_number.clear();
+ obs_number.clear();
 
 n_fcst = n_obs = 0;
 
@@ -161,20 +154,20 @@ void FcstObsSet::assign(const FcstObsSet & s)
 clear();
 
 
-if ( s.n_fcst_alloc > 0 )  {
+if ( s.n_fcst > 0 )  {
 
    extend_fcst (s.n_fcst_alloc);
 
-   memcpy(fcst_number, s.fcst_number, (s.n_fcst_alloc)*sizeof(int));
+   fcst_number = s.fcst_number;
 
 }
 
    
-if ( s.n_obs_alloc > 0 )   {
+if ( s.n_obs > 0 )   {
 
    extend_obs  (s.n_obs_alloc);
 
-   memcpy(obs_number,  s.obs_number,  (s.n_obs_alloc)*sizeof(int));
+   obs_number = s.obs_number;
 
 }
 
@@ -220,30 +213,19 @@ return;
 ///////////////////////////////////////////////////////////////////////////////
 
 
-void FcstObsSet::extend(int * & a, int & n_alloc, const int N)
+void FcstObsSet::extend(std::vector<int> & a, int & n_alloc, const int N)
 
 {
 
 if ( N <= n_alloc )  return;
 
-int j, k;
-int * u = 0;
-
-k = N/fcst_obs_set_alloc_inc;
+int k = N/fcst_obs_set_alloc_inc;
 
 if ( N%fcst_obs_set_alloc_inc )  ++k;
 
 k *= fcst_obs_set_alloc_inc;
 
-u = new int [k];
-
-if ( a )  memcpy(u, a, n_alloc*sizeof(int));
-
-for (j=n_alloc; j<k; ++j)  u[j] = 0;
-
-if ( a )  { delete [] a;  a = 0; }
-
-a = u;  u = 0;
+a.reserve(k);
 
 n_alloc = k;
 
@@ -307,7 +289,9 @@ void FcstObsSet::add_fcst(int k) {
 
    extend_fcst(n_fcst + 1);
 
-   fcst_number[n_fcst++] = k;
+   fcst_number.push_back(k);
+
+   n_fcst++;
 
    return;
 }
@@ -322,7 +306,9 @@ void FcstObsSet::add_obs(int k) {
 
    extend_obs(n_obs + 1);
 
-   obs_number[n_obs++] = k;
+   obs_number.push_back(k);
+
+   n_obs++;
 
    return;
 
@@ -398,7 +384,7 @@ void SetCollection::init_from_scratch()
 
 {
 
-set = 0;
+n_sets = n_alloc = 0;
 
 all_clear();
 
@@ -416,16 +402,11 @@ void SetCollection::clear()
 
 {
 
-// if ( set )  { delete [] set;  set = 0; }
-
-n_sets  = 0;
-
 int j;
 
-for (j=0; j<n_alloc; ++j)  set[j].clear();
+for (j=0; j<n_sets; ++j)  set[j].clear();
 
-// n_alloc = 0;
-
+n_sets = n_alloc = 0;
 
 return;
 
@@ -439,7 +420,7 @@ void SetCollection::all_clear()
 
 {
 
-if ( set )  { delete [] set;  set = 0; }
+set.clear();
 
 n_sets  = 0;
 
@@ -460,15 +441,13 @@ void SetCollection::assign(const SetCollection & s)
 
 all_clear();
 
-if ( ! (s.set) )  return;
+if ( s.set.size() == 0 )  return;
 
 extend(s.n_alloc);
 
-int j;
+set = s.set;
 
 n_sets = s.n_sets;
-
-for (j=0; j<n_sets; ++j)  set[j] = s.set[j];
 
 
 return;
@@ -485,26 +464,13 @@ void SetCollection::extend(int N)
 
 if ( N <= n_alloc )  return;
 
-int j, k;
-FcstObsSet * u = 0;
-
-k = N/fcst_obs_set_alloc_inc;
+int k = N/fcst_obs_set_alloc_inc;
 
 if ( N%fcst_obs_set_alloc_inc )  ++k;
 
 k *= fcst_obs_set_alloc_inc;
 
-u = new FcstObsSet [k];
-
-if ( set )  { 
-
-   for (j=0; j<n_alloc; ++j)  u[j] = set[j];
-
-   delete [] set;  set = 0;
-
-}
-
-set = u;  u = 0;
+set.reserve(k);
 
 n_alloc = k;
 
@@ -529,11 +495,13 @@ void SetCollection::add_pair(int fcst, int obs)
 
    extend(n_sets + 1);
 
-   set[n_sets].clear();
+   FcstObsSet s;
 
-   set[n_sets].add_pair(fcst, obs);
+   s.add_pair(fcst, obs);
 
-   ++n_sets;
+   set.push_back(s);
+
+   n_sets++;
 
    do {
 
@@ -610,7 +578,7 @@ void SetCollection::merge_two(int index1, int index2)
 
    n_sets++;
 
-   for(j=n_sets; j<n_alloc; j++) {
+   for(j=n_sets; j<set.size(); j++) {
       set[j].clear();
    }
 
