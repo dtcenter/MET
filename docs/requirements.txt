@@ -1,3 +1,4 @@
 sphinx-gallery
 sphinxcontrib-bibtex
 sphinx-panels
+sphinx-design
