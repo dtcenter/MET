@@ -12,7 +12,7 @@ Important issues are listed **in bold** for emphasis.
 MET Version 11.0.0 release notes (20221209)
 -------------------------------------------
 
-* Repository, build, and test:
+:::{dropdown} Repository, build, and test:
 
    * **Restructure the contents of the MET repository so that it matches the existing release tarfiles** (`#1920 <https://github.com/dtcenter/MET/issues/1920>`_).
    * **Add initial files to create the MET compilation environment in the dtcenter/met-base Docker image** (`dtcenter/METbaseimage#1 <https://github.com/dtcenter/METbaseimage/issues/1>`_).
@@ -25,7 +25,9 @@ MET Version 11.0.0 release notes (20221209)
    * Fix MET-11.0.0-beta3 linker errors (`#2281 <https://github.com/dtcenter/MET/issues/2281>`_).
    * Fix GHA documentation workflow (`#2282 <https://github.com/dtcenter/MET/issues/2282>`_).
    * Fix GHA warnings and update the version of actions (i.e. actions/checkout@v3) (`#2297 <https://github.com/dtcenter/MET/issues/2297>`_).
+:::
 
+     
 * Documentation:
 
    * Create outline for the MET Contributor's Guide (`#1774 <https://github.com/dtcenter/MET/issues/1774>`_).
