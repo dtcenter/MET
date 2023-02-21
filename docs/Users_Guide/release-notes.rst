@@ -12,21 +12,21 @@ Important issues are listed **in bold** for emphasis.
 MET Version 11.0.0 release notes (20221209)
 -------------------------------------------
 
-:::{dropdown} Repository, build, and test:
+  .. dropdown:: Repository, build, and test:
 
-   * **Restructure the contents of the MET repository so that it matches the existing release tarfiles** (`#1920 <https://github.com/dtcenter/MET/issues/1920>`_).
-   * **Add initial files to create the MET compilation environment in the dtcenter/met-base Docker image** (`dtcenter/METbaseimage#1 <https://github.com/dtcenter/METbaseimage/issues/1>`_).
-   * Restructure the MET Dockerfiles to create images based on the new METbaseimage (`#2196 <https://github.com/dtcenter/MET/issues/2196>`_).
-   * Enhance METbaseimage to support NetCDF files using groups in the enhanced data model (`dtcenter/METbaseimage#6 <https://github.com/dtcenter/METbaseimage/issues/6>`_).
-   * Add .zenodo.json file to add metadata about releases (`#2198 <https://github.com/dtcenter/MET/issues/2198>`_).
-   * Update the SonarQube version used for routine software scans (`#2270 <https://github.com/dtcenter/MET/issues/2270>`_).
-   * Fix OpenMP compilation error for GCC 9.3.0/9.4.0 (`#2106 <https://github.com/dtcenter/MET/issues/2106>`_).
-   * Fix oom() compile time linker error (`#2238 <https://github.com/dtcenter/MET/issues/2238>`_).
-   * Fix MET-11.0.0-beta3 linker errors (`#2281 <https://github.com/dtcenter/MET/issues/2281>`_).
-   * Fix GHA documentation workflow (`#2282 <https://github.com/dtcenter/MET/issues/2282>`_).
-   * Fix GHA warnings and update the version of actions (i.e. actions/checkout@v3) (`#2297 <https://github.com/dtcenter/MET/issues/2297>`_).
-:::
+     * **Restructure the contents of the MET repository so that it matches the existing release tarfiles** (`#1920 <https://github.com/dtcenter/MET/issues/1920>`_).
+     * **Add initial files to create the MET compilation environment in the dtcenter/met-base Docker image** (`dtcenter/METbaseimage#1 <https://github.com/dtcenter/METbaseimage/issues/1>`_).
+     * Restructure the MET Dockerfiles to create images based on the new METbaseimage (`#2196 <https://github.com/dtcenter/MET/issues/2196>`_).
+     * Enhance METbaseimage to support NetCDF files using groups in the enhanced data model (`dtcenter/METbaseimage#6 <https://github.com/dtcenter/METbaseimage/issues/6>`_).
+     * Add .zenodo.json file to add metadata about releases (`#2198 <https://github.com/dtcenter/MET/issues/2198>`_).
+     * Update the SonarQube version used for routine software scans (`#2270 <https://github.com/dtcenter/MET/issues/2270>`_).
+     * Fix OpenMP compilation error for GCC 9.3.0/9.4.0 (`#2106 <https://github.com/dtcenter/MET/issues/2106>`_).
+     * Fix oom() compile time linker error (`#2238 <https://github.com/dtcenter/MET/issues/2238>`_).
+     * Fix MET-11.0.0-beta3 linker errors (`#2281 <https://github.com/dtcenter/MET/issues/2281>`_).
+     * Fix GHA documentation workflow (`#2282 <https://github.com/dtcenter/MET/issues/2282>`_).
+     * Fix GHA warnings and update the version of actions (i.e. actions/checkout@v3) (`#2297 <https://github.com/dtcenter/MET/issues/2297>`_).
 
+       
      
 * Documentation:
 
