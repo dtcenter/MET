@@ -12,7 +12,7 @@ Important issues are listed **in bold** for emphasis.
 MET Version 11.0.0 release notes (20221209)
 -------------------------------------------
 
-  .. dropdown:: Repository, build, and test:
+  .. dropdown:: Repository, build, and test
 
      * **Restructure the contents of the MET repository so that it matches the existing release tarfiles** (`#1920 <https://github.com/dtcenter/MET/issues/1920>`_).
      * **Add initial files to create the MET compilation environment in the dtcenter/met-base Docker image** (`dtcenter/METbaseimage#1 <https://github.com/dtcenter/METbaseimage/issues/1>`_).
@@ -28,27 +28,27 @@ MET Version 11.0.0 release notes (20221209)
 
        
      
-* Documentation:
+  .. dropdown:: Documentation
 
-   * Create outline for the MET Contributor's Guide (`#1774 <https://github.com/dtcenter/MET/issues/1774>`_).
-   * Document PB2NC's handling of quality markers (`#2278 <https://github.com/dtcenter/MET/issues/2278>`_).
-   * Move release notes into its own chapter in the User's Guide (`#2298 <https://github.com/dtcenter/MET/issues/2298>`_).
+     * Create outline for the MET Contributor's Guide (`#1774 <https://github.com/dtcenter/MET/issues/1774>`_).
+     * Document PB2NC's handling of quality markers (`#2278 <https://github.com/dtcenter/MET/issues/2278>`_).
+     * Move release notes into its own chapter in the User's Guide (`#2298 <https://github.com/dtcenter/MET/issues/2298>`_).
 
-* Bugfixes:
+  .. dropdown:: Bugfixes
 
-   * Fix regression test differences in pb2nc and ioda2nc output (`#2102 <https://github.com/dtcenter/MET/issues/2102>`_).
-   * Fix support for reading rotated lat/lon grids from CF-compliant NetCDF files (`#2115 <https://github.com/dtcenter/MET/issues/2115>`_).
-   * Fix support for reading rotated lat/lon grids from GRIB1 files (grid type 10) (`#2118 <https://github.com/dtcenter/MET/issues/2118>`_).
-   * Fix support for int64 NetCDF variable types (`#2123 <https://github.com/dtcenter/MET/issues/2123>`_).
-   * Fix Stat-Analysis to aggregate the ECNT ME and RMSE values correctly (`#2170 <https://github.com/dtcenter/MET/issues/2170>`_).
-   * Fix NetCDF library code to process scale_factor and add_offset attributes independently (`#2187 <https://github.com/dtcenter/MET/issues/2187>`_).
-   * Fix Ensemble-Stat to work with different missing members for two or more variables (`#2208 <https://github.com/dtcenter/MET/issues/2208>`_).
-   * Fix truncated station_id name in the output from IODA2NC (`#2216 <https://github.com/dtcenter/MET/issues/2216>`_).
-   * Fix Stat-Analysis aggregation of the neighborhood statistics line types (`#2271 <https://github.com/dtcenter/MET/issues/2271>`_).
-   * Fix Point-Stat and Ensemble-Stat GRIB table lookup logic for python embedding of point observations (`#2286 <https://github.com/dtcenter/MET/issues/2286>`_).
-   * Fix ascii2nc_airnow_hourly test in unit_ascii2nc.xml (`#2306 <https://github.com/dtcenter/MET/issues/2306>`_).
-   * Fix TC-Stat parsing of TCMPR lines (`#2309 <https://github.com/dtcenter/MET/issues/2309>`_).
-   * Fix ASCII2NC logic for reading AERONET v3 data (`#2370 <https://github.com/dtcenter/MET/issues/2370>`_).
+     * Fix regression test differences in pb2nc and ioda2nc output (`#2102 <https://github.com/dtcenter/MET/issues/2102>`_).
+     * Fix support for reading rotated lat/lon grids from CF-compliant NetCDF files (`#2115 <https://github.com/dtcenter/MET/issues/2115>`_).
+     * Fix support for reading rotated lat/lon grids from GRIB1 files (grid type 10) (`#2118 <https://github.com/dtcenter/MET/issues/2118>`_).
+     * Fix support for int64 NetCDF variable types (`#2123 <https://github.com/dtcenter/MET/issues/2123>`_).
+     * Fix Stat-Analysis to aggregate the ECNT ME and RMSE values correctly (`#2170 <https://github.com/dtcenter/MET/issues/2170>`_).
+     * Fix NetCDF library code to process scale_factor and add_offset attributes independently (`#2187 <https://github.com/dtcenter/MET/issues/2187>`_).
+     * Fix Ensemble-Stat to work with different missing members for two or more variables (`#2208 <https://github.com/dtcenter/MET/issues/2208>`_).
+     * Fix truncated station_id name in the output from IODA2NC (`#2216 <https://github.com/dtcenter/MET/issues/2216>`_).
+     * Fix Stat-Analysis aggregation of the neighborhood statistics line types (`#2271 <https://github.com/dtcenter/MET/issues/2271>`_).
+     * Fix Point-Stat and Ensemble-Stat GRIB table lookup logic for python embedding of point observations (`#2286 <https://github.com/dtcenter/MET/issues/2286>`_).
+     * Fix ascii2nc_airnow_hourly test in unit_ascii2nc.xml (`#2306 <https://github.com/dtcenter/MET/issues/2306>`_).
+     * Fix TC-Stat parsing of TCMPR lines (`#2309 <https://github.com/dtcenter/MET/issues/2309>`_).
+     * Fix ASCII2NC logic for reading AERONET v3 data (`#2370 <https://github.com/dtcenter/MET/issues/2370>`_).
 
 * Enhancements:
 
