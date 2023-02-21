@@ -50,14 +50,14 @@ MET Version 11.0.0 release notes (20221209)
      * Fix TC-Stat parsing of TCMPR lines (`#2309 <https://github.com/dtcenter/MET/issues/2309>`_).
      * Fix ASCII2NC logic for reading AERONET v3 data (`#2370 <https://github.com/dtcenter/MET/issues/2370>`_).
 
-* Enhancements:
+  .. dropdown:: Enhancements
 
-   * NetCDF:
+     .. grid:: NetCDF
 
-      * **Enhance MET's NetCDF library interface to support level strings that include coordinate variable values instead of just indexes** (`#1815 <https://github.com/dtcenter/MET/issues/1815>`_).
-      * Enhance MET to handle NC strings when processing CF-Compliant NetCDF files (`#2042 <https://github.com/dtcenter/MET/issues/2042>`_).
-      * Enhance MET to handle CF-compliant time strings with an offset defined in months or years (`#2155 <https://github.com/dtcenter/MET/issues/2155>`_).
-      * Refine NetCDF level string handling logic to always interpret @ strings as values (`#2225 <https://github.com/dtcenter/MET/issues/2225>`_).
+        * **Enhance MET's NetCDF library interface to support level strings that include coordinate variable values instead of just indexes** (`#1815 <https://github.com/dtcenter/MET/issues/1815>`_).
+        * Enhance MET to handle NC strings when processing CF-Compliant NetCDF files (`#2042 <https://github.com/dtcenter/MET/issues/2042>`_).
+        * Enhance MET to handle CF-compliant time strings with an offset defined in months or years (`#2155 <https://github.com/dtcenter/MET/issues/2155>`_).
+        * Refine NetCDF level string handling logic to always interpret @ strings as values (`#2225 <https://github.com/dtcenter/MET/issues/2225>`_).
 
    * GRIB:
 
