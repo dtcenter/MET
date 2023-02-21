@@ -219,13 +219,7 @@ if ( a.Nelements == 0 )  return;
 
 extend(a.Nelements);
 
-int j;
-
-for (j=0; j<(a.Nelements); ++j)  {
-
-   e[j] = a.e[j];
-
-}
+e = a.e;
 
 Nelements = a.Nelements;
 
