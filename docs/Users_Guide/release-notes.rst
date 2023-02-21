@@ -52,17 +52,17 @@ MET Version 11.0.0 release notes (20221209)
 
   .. dropdown:: Enhancements
 
-   .. grid:: NetCDF
+    .. dropdown:: NetCDF
 
       * **Enhance MET's NetCDF library interface to support level strings that include coordinate variable values instead of just indexes** (`#1815 <https://github.com/dtcenter/MET/issues/1815>`_).
       * Enhance MET to handle NC strings when processing CF-Compliant NetCDF files (`#2042 <https://github.com/dtcenter/MET/issues/2042>`_).
       * Enhance MET to handle CF-compliant time strings with an offset defined in months or years (`#2155 <https://github.com/dtcenter/MET/issues/2155>`_).
       * Refine NetCDF level string handling logic to always interpret @ strings as values (`#2225 <https://github.com/dtcenter/MET/issues/2225>`_).
 
-   * GRIB:
+    .. dropdown:: GRIB:
 
-      * Add support for reading National Blend Model GRIB2 data (`#2055 <https://github.com/dtcenter/MET/issues/2055>`_).
-      * Update the GRIB2 MRMS table in MET (`#2081 <https://github.com/dtcenter/MET/issues/2081>`_).
+        * Add support for reading National Blend Model GRIB2 data (`#2055 <https://github.com/dtcenter/MET/issues/2055>`_).
+        * Update the GRIB2 MRMS table in MET (`#2081 <https://github.com/dtcenter/MET/issues/2081>`_).
 
    * Python:
 
