@@ -27,6 +27,7 @@ pythonscriptsdir = $(pkgdatadir)/python
 
 pythonscripts_DATA = \
 	met_point_obs.py \
+	met_point_obs_nc.py \
 	read_ascii_numpy.py \
 	read_ascii_numpy_grid.py \
 	read_ascii_xarray.py \
