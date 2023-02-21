@@ -373,7 +373,6 @@ class csv_point_obs(ABC, base_met_point_obs):
         self.obs_hgt = [ self.FILL_VALUE for _ in range(0, obs_cnt) ]  # (nobs) float
         self.obs_val = [ self.FILL_VALUE for _ in range(0, obs_cnt) ]  # (nobs) float
 
-        self.use_var_id = not self.is_grib_code()
         self.convert_point_data()
 
     def check_csv_record(self, csv_point_data, index):
@@ -447,6 +446,8 @@ class csv_point_obs(ABC, base_met_point_obs):
         hdr_vld_map = {}
         obs_var_map = {}
         obs_qty_map = {}
+
+        self.use_var_id = not self.is_grib_code()
 
         index = 0
         #names=['typ', 'sid', 'vld', 'lat', 'lon', 'elv', 'var', 'lvl', 'hgt', 'qc', 'obs']
