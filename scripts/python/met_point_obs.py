@@ -447,6 +447,8 @@ class csv_point_obs(ABC, base_met_point_obs):
         obs_var_map = {}
         obs_qty_map = {}
 
+        self.use_var_id = not self.is_grib_code()
+
         index = 0
         #names=['typ', 'sid', 'vld', 'lat', 'lon', 'elv', 'var', 'lvl', 'hgt', 'qc', 'obs']
         for csv_point_record in self.point_data:
