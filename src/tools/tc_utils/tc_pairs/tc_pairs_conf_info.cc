@@ -266,9 +266,7 @@ void TCPairsConfInfo::process_config() {
 
       // If WriteMembers is false, save the Members to skip output for
       if(!Consensus[i].WriteMembers) {
-         for(j=0; j<Consensus[i].Members.n_elements(); j++) {
-            SkipConsensusMembers.add(Consensus[i].Members[j]);
-         }
+         SkipConsensusMembers.add(Consensus[i].Members);
       }
    }
 
