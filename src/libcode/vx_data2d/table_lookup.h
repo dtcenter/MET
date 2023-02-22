@@ -145,8 +145,8 @@ class TableFlatFile {
       void extend_grib1(int);
       void extend_grib2(int);
 
-      Grib1TableEntry ** g1e;   //  elements ... allocated
-      Grib2TableEntry ** g2e;   //  elements ... allocated
+      std::vector<Grib1TableEntry> g1e;
+      std::vector<Grib2TableEntry> g2e;
 
       int N_grib1_elements;
       int N_grib2_elements;
@@ -229,5 +229,3 @@ extern TableFlatFile GribTable;
 
 
 ////////////////////////////////////////////////////////////////////////
-
-

@@ -18,7 +18,7 @@
 
 
 #include <iostream>
-
+#include <vector>
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -39,17 +39,10 @@ class PiecewiseLinear {
 
    protected:
 
-      void extend(int);
-
-      int N;
-
-      int n_alloc;
-
       ConcatString Name;
 
-      double * X;
-      double * Y;
-
+      std::vector<double> X;
+      std::vector<double> Y;
 
    public:
 
@@ -95,15 +88,9 @@ class PiecewiseLinear {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int PiecewiseLinear::n_points() const { return ( N ); }
+inline int PiecewiseLinear::n_points() const { return ( X.size() ); }
 
 inline const char * PiecewiseLinear::name() const { return ( Name.c_str() ); }
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-extern int pwl_interpolate(const double * y, const double * x, int n, double x_in, double & y_out);
 
 
 ////////////////////////////////////////////////////////////////////////

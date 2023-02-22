@@ -19,6 +19,7 @@ using namespace std;
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <vector>
 
 #include "vx_log.h"
 #include "vx_cal.h"
@@ -1336,20 +1337,13 @@ if ( Nrows < 0 || Nrows >= INT_MAX )  {
 
 if ( Nrows <= 2 )  return;
 
-int * left  = new int [Nrows];
-int * right = new int [Nrows];
+std::vector<int> left (Nrows, 0);
+std::vector<int> right(Nrows, 0);
 
 int r, c, n, k;
 int max_left, max_right;
 const char fill_char = ' ';
 const int r_start = 1;   //  skip the header row
-
-
-for (r=0; r<Nrows; ++r)  {
-
-   left[r] = right[r] = 0;
-
-}
 
 for (c=0; c<Ncols; ++c)  {
 
@@ -1385,10 +1379,6 @@ for (c=0; c<Ncols; ++c)  {
    //
    //  done
    //
-
-if ( left  )  { delete [] left;   left  = 0; }
-if ( right )  { delete [] right;  right = 0; }
-
 
 DecimalPointsAligned = true;
 

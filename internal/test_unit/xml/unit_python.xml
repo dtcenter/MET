@@ -495,6 +495,25 @@
     </output>
   </test>
 
+  <!-- Invokes user-python logic to read a point obs -->
+  <test name="python_point2grid_pb2nc_TMP_user_python">
+    <exec>&MET_BIN;/point2grid</exec>
+    <env>
+      <pair><name>MET_PYTHON_EXE</name> <value>&MET_PYTHON_EXE;</value></pair>
+    </env>
+    <param> \
+      'PYTHON_NUMPY=&MET_BASE;/python/read_met_point_obs.py &OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.nc' \
+      G212 \
+      &OUTPUT_DIR;/python/pb2nc_TMP_user_python.nc \
+      -field 'name="TMP"; level="*"; valid_time="20120409_120000"; censor_thresh=[ &lt;0 ]; censor_val=[0];' \
+      -name TEMP \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/python/pb2nc_TMP_user_python.nc</grid_nc>
+    </output>
+  </test>
+
   <test name="python_plot_point_obs_with_point_data">
     <exec>&MET_BIN;/plot_point_obs</exec>
     <env>

@@ -9,6 +9,26 @@ When applicable, release notes are followed by the GitHub issue number which des
 enhancement, or new feature (`MET GitHub issues <https://github.com/dtcenter/MET/issues>`_).
 Important issues are listed **in bold** for emphasis.
 
+MET Version 11.0.1-rc1 release notes (20230221)
+-----------------------------------------------
+
+* Bugfixes:
+
+   * Bugfix: Fix the MET CF-Compliant NetCDF library code to Polar Stereographic data from NSIDC Sea Ice Edge NetCDF files (`#2218 <https://github.com/dtcenter/MET/issues/2218>`_).
+   * Bugfix: Remove override keyword to avoid C++11 dependency (`#2380 <https://github.com/dtcenter/MET/issues/2380>`_).
+   * Bugfix: Fix ASCII2NC to not compute AOD 550 if other inputs are negative values (`#2383 <https://github.com/dtcenter/MET/issues/2383>`_).
+   * Bugfix: Fix PB2NC to report accurate total observation counts in log messages (`#2387 <https://github.com/dtcenter/MET/issues/2387>`_).
+   * Bugfix: Update the MET flowchart for version 11.0.0 (`#2389 <https://github.com/dtcenter/MET/issues/2389>`_).
+   * Bugfix: Fix issues with the met_compile_all.sh script and associated tar files (`#2390 <https://github.com/dtcenter/MET/issues/2390>`_).
+   * Bugfix: Correct definitions of NCEP grid numbers 172 and 220 (`#2399 <https://github.com/dtcenter/MET/issues/2399>`_).
+   * Bugfix: Address MET-11.0.0 SonarQube Blocker Bugs (`#2402 <https://github.com/dtcenter/MET/issues/2402>`_).
+   * Bugfix: Refine fix for handling empty configuration files (`#2408 <https://github.com/dtcenter/MET/issues/2408>`_).
+   * Bugfix: Fix time interpolation of monthly climatology data between December 15 and January 15 (`#2412 <https://github.com/dtcenter/MET/issues/2412>`_).
+   * Bugfix: Fix ASCII2NC to handle missing NDBC buoy location information (`#2426 <https://github.com/dtcenter/MET/issues/2426>`_).
+   * Bugfix: Fix the MET vx_pointdata_python library to handle MET_PYTHON_EXE for python embedding of point observations (`#2428 <https://github.com/dtcenter/MET/issues/2428>`_).
+   * Bugfix: Refine the regrid dictionary's data conversion and censoring operations and fix climo time matching logic for a single monthly climo file (`#2437 <https://github.com/dtcenter/MET/issues/2437>`_).
+   * Bugfix: Fix inconsistent ASCII2NC AIRNOW location lookup logic (`#2452 <https://github.com/dtcenter/MET/issues/2452>`_).  
+  
 MET Version 11.0.0 release notes (20221209)
 -------------------------------------------
 
