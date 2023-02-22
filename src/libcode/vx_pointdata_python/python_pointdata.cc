@@ -71,7 +71,7 @@ bool status = false;
 
 if ( user_ppath == 0 ) user_ppath = getenv(user_python_path_env);
 
-if ( user_ppath != 0 && 0 != strcmp(user_ppath, MET_PYTHON_BIN_EXE) )  {
+if ( user_ppath != 0 ) {
    //  do_tmp_nc = true;
 
    status = tmp_nc_point_obs(script_name, script_argc, script_argv,
@@ -288,11 +288,6 @@ if ( PyErr_Occurred() )  {
 mlog << Debug(3) << "Running MET compile time python instance ("
      << MET_PYTHON_BIN_EXE << ") to run user's python script ("
      << script_name << ").\n";
-
-if ( user_ppath != 0) {
-   mlog << Debug(3) << "The same python instance with the user-specified python"
-        << " (MET_PYTHON_EXE=" << user_ppath << ").\n";
-}
 
    //
    //  set the arguments
