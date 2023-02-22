@@ -107,7 +107,7 @@ consensus = [
                    "UE35" ];
       required = [];
       min_req  = 36;
-      write_members = TRUE;
+      write_members = FALSE;
    },
    {
       name     = "HCCA_CONS";
