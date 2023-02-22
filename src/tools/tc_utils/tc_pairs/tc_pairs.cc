@@ -940,7 +940,7 @@ void filter_tracks(TrackInfoArray &tracks) {
         << "Rejected for required lead times = " << n_req_lead  << "\n"
         << "Rejected for init mask           = " << n_mask_init << "\n"
         << "Rejected for valid mask          = " << n_mask_vld  << "\n";
-   
+
    return;
 }
 
