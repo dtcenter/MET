@@ -819,7 +819,7 @@ void filter_tracks(TrackInfoArray &tracks) {
    // Initialize
    tracks.clear();
    n_name = n_vld = n_mask_init = n_mask_vld = n_req_lead = n_members = 0;
-   
+
    // Loop through the tracks and determine which should be retained
    // The is_keeper() function has already filtered by model, storm id,
    // basin, cyclone, and timing information.
@@ -934,12 +934,12 @@ void filter_tracks(TrackInfoArray &tracks) {
    mlog << Debug(3)
         << "Total tracks read                = " << t.n()       << "\n"
         << "Total tracks kept                = " << tracks.n()  << "\n"
+        << "Rejected for skip members        = " << n_members   << "\n"
         << "Rejected for storm name          = " << n_name      << "\n"
         << "Rejected for valid time          = " << n_vld       << "\n"
         << "Rejected for required lead times = " << n_req_lead  << "\n"
         << "Rejected for init mask           = " << n_mask_init << "\n"
-        << "Rejected for valid mask          = " << n_mask_vld  << "\n"
-        << "Rejected for skip members        = " << n_members   << "\n";
+        << "Rejected for valid mask          = " << n_mask_vld  << "\n";
    
    return;
 }
