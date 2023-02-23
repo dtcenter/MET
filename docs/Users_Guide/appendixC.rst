@@ -154,7 +154,7 @@ H_RATE is defined as
 
 .. only:: html
 
-  .. math::  \text{H\_RATE } = \frac{n_{11}}{T}.
+  .. math::  \text{H_RATE } = \frac{n_{11}}{T}.
 
 H_RATE is equivalent to the H value computed by the NCEP verification system. H_RATE ranges from 0 to 1; a perfect forecast would have H_RATE = 1.
 
@@ -635,7 +635,7 @@ The centered anomaly correlation coefficient (ANOM_CORR) which includes the mean
 
 .. only:: html
 
-  .. math:: \text{ANOM\_CORR } = \frac{ \overline{[(f - c) - \overline{(f - c)}][(a - c) - \overline{(a - c)}]}}{ \sqrt{ \overline{( (f - c) - \overline{(f - c)})^2} \overline{( (a - c) - \overline{(a - c)})^2}}}
+  .. math:: \text{ANOM_CORR } = \frac{ \overline{[(f - c) - \overline{(f - c)}][(a - c) - \overline{(a - c)}]}}{ \sqrt{ \overline{( (f - c) - \overline{(f - c)})^2} \overline{( (a - c) - \overline{(a - c)})^2}}}
 
 The uncentered anomaly correlation coefficient (ANOM_CORR_UNCNTR) which does not include the mean errors is defined as: 
 
@@ -765,7 +765,7 @@ where the weights are applied at each grid location, with values assigned accord
 
 .. only:: latex
 
-  .. math::  
+  .. math::
 
     \text{S1\_OG} = \frac{\text{EGBAR}}{\text{OGBAR}}
 
@@ -773,10 +773,11 @@ where the weights are applied at each grid location, with values assigned accord
 
 .. only:: html
 
-  .. math::  
-    \text{S1\_OG} = \frac{\text{EGBAR}}{\text{OGBAR}}
-    
-    \text{FGOG\_RATIO} = \frac{\text{FGBAR}}{\text{OGBAR}}
+  .. math::
+
+    \text{S1_OG} = \frac{\text{EGBAR}}{\text{OGBAR}}
+
+    \text{FGOG_RATIO} = \frac{\text{FGBAR}}{\text{OGBAR}}
 
 
 MET verification measures for probabilistic forecasts
@@ -1018,11 +1019,23 @@ The score can be interpreted as a continuous version of the mean absolute error 
 
 To calculate crps_emp_fair (bias adjusted, empirical ensemble CRPS) for each individual observation with m ensemble members:
 
-.. math:: \text{crps\_emp\_fair}_i = \text{crps\_emp}_i - \frac{1}{2*m} *  \frac{1}{m*(m-1)} \sum_{i \neq j}|f_{i} - f_{j}|
+.. only:: latex
+
+  .. math:: \text{crps\_emp\_fair}_i = \text{crps\_emp}_i - \frac{1}{2*m} *  \frac{1}{m*(m-1)} \sum_{i \neq j}|f_{i} - f_{j}|
+
+.. only:: html
+
+  .. math:: \text{crps_emp_fair}_i = \text{crps_emp}_i - \frac{1}{2*m} *  \frac{1}{m*(m-1)} \sum_{i \neq j}|f_{i} - f_{j}|
 
 The overall CRPS_EMP_FAIR is calculated as the average of the individual measures. In equation form:
 
-.. math:: \text{CRPS\_EMP\_FAIR} = \text{average(crps\_emp\_fair) } = \frac{1}{N} \sum_{i=1}^N \text{crps\_emp\_fair}_i
+.. only:: latex
+
+  .. math:: \text{CRPS\_EMP\_FAIR} = \text{average(crps\_emp\_fair) } = \frac{1}{N} \sum_{i=1}^N \text{crps\_emp\_fair}_i
+
+.. only:: html
+
+  .. math:: \text{CRPS_EMP_FAIR} = \text{average(crps_emp_fair) } = \frac{1}{N} \sum_{i=1}^N \text{crps_emp_fair}_i
 
 Ensemble Mean Absolute Difference
 ---------------------------------
@@ -1031,11 +1044,23 @@ Called "SPREAD_MD" in ECNT output :numref:`table_ES_header_info_es_out_ECNT`
 
 The ensemble mean absolute difference is an alternative measure of ensemble spread. It is computed for each individual observation (denoted by a lowercase spread_md) with m ensemble members:
 
-.. math:: \text{spread\_md}_i = \frac{1}{m*(m-1)} \sum_{i \neq j}|f_{i} - f_{j}|
+.. only:: latex
+
+  .. math:: \text{spread\_md}_i = \frac{1}{m*(m-1)} \sum_{i \neq j}|f_{i} - f_{j}|
+
+.. only:: html
+
+  .. math:: \text{spread_md}_i = \frac{1}{m*(m-1)} \sum_{i \neq j}|f_{i} - f_{j}|
 
 The overall SPREAD_MD is calculated as the average of the individual measures. In equation form:
 
-.. math:: \text{SPREAD\_MD} = \text{average(spread\_md) } = \frac{1}{N} \sum_{i=1}^N \text{spread\_md}_i
+.. only:: latex
+
+  .. math:: \text{SPREAD\_MD} = \text{average(spread\_md) } = \frac{1}{N} \sum_{i=1}^N \text{spread\_md}_i
+
+.. only:: html
+
+  .. math:: \text{SPREAD_MD} = \text{average(spread_md) } = \frac{1}{N} \sum_{i=1}^N \text{spread_md}_i
 
 A perfect forecast would have ensemble mean absolute difference = 0.
           
@@ -1057,7 +1082,13 @@ Called "BIAS_RATIO" in ECNT output :numref:`table_ES_header_info_es_out_ECNT`
 
 The bias ratio (BIAS_RATIO) is computed when verifying an ensemble against gridded analyses or point observations. It is defined as the mean error (ME) of ensemble member values greater than or equal to the observation value to which they are matched divided by the absolute value of the mean error (ME) of ensemble member values less than the observation values.
 
-.. math:: \text{BIAS\_RATIO} = \frac{ \text{ME}_{f >= o} }{ |\text{ME}_{f < o}| }
+.. only:: latex
+
+  .. math:: \text{BIAS\_RATIO} = \frac{ \text{ME}_{f >= o} }{ |\text{ME}_{f < o}| }
+
+.. only:: html
+
+  .. math:: \text{BIAS_RATIO} = \frac{ \text{ME}_{f >= o} }{ |\text{ME}_{f < o}| }
 
 A perfect forecast has ME = 0. Since BIAS_RATIO is computed as the high bias (ME_GE_OBS) divide by the absolute value of the low bias (ME_LT_OBS), a perfect forecast has BIAS_RATIO = 0/0, which is undefined. In practice, the high and low bias values are unlikely to be 0.
 
