@@ -64,6 +64,11 @@ class nc_point_obs(met_point_obs):
             self.log_error_msg(f"input NetCDF file ({nc_filename}) does not exist")
         else:
             dataset = nc.Dataset(nc_filename, 'r')
+
+            attr_name = 'use_var_id'
+            use_var_id_str = dataset.getncattr(attr_name) if attr_name in dataset.ncattrs() else "false"
+            self.use_var_id = use_var_id_str.lower() == 'true'
+
             # Header
             self.hdr_typ = dataset['hdr_typ'][:]
             self.hdr_sid = dataset['hdr_sid'][:]
