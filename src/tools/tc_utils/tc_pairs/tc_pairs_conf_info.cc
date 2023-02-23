@@ -246,8 +246,15 @@ void TCPairsConfInfo::process_config() {
       Consensus[i].Members  = (*dict)[i]->dict_value()->lookup_string_array(conf_key_members);
       Consensus[i].Required = (*dict)[i]->dict_value()->lookup_num_array(conf_key_required);
       Consensus[i].MinReq   = (*dict)[i]->dict_value()->lookup_int(conf_key_min_req);
-      Consensus[i].WriteMembers = true;
-      Consensus[i].WriteMembers = (*dict)[i]->dict_value()->lookup_bool(conf_key_write_members);
+
+      // If write_members is missing, print warning message rather than error
+      Consensus[i].WriteMembers = (*dict)[i]->dict_value()->lookup_bool(conf_key_write_members, false);
+      if(!(*dict)[i]->dict_value()->last_lookup_status()) {
+         mlog << Warning 
+              << "\nTCPairsConfInfo::process_config() -> "
+              << "\"consensus.write_members\" is missing. Using default value of true.\n\n";
+         Consensus[i].WriteMembers = true;
+      }
 
       // If required is empty, default to 0
       if(Consensus[i].Required.n_elements() == 0) {
