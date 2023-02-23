@@ -1,17 +1,13 @@
 ########################################################################
 #
-#    Reads temporary file into memory.
+#    Reads temporary point obs. file into memory.
 #
-#    usage:  /path/to/python read_tmp_dataplane.py dataplane.tmp
+#    usage:  /path/to/python read_tmp_point_nc.py tmp_output_filename
 #
 ########################################################################
 
 import os
 import sys
-
-met_base_dir = os.getenv('MET_BASE',None)
-if met_base_dir is not None:
-    sys.path.append(os.path.join(met_base_dir, 'python'))
 
 # add share/met/python directory to system path to find met_point_obs
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__),

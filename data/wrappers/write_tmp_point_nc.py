@@ -1,9 +1,9 @@
 ########################################################################
 #
 #    Adapted from a script provided by George McCabe
-#    Adapted by Randy Bullock
+#    Adapted by Howard Soh
 #
-#    usage:  /path/to/python write_tmp_point.py \
+#    usage:  /path/to/python write_tmp_point_nc.py \
 #            tmp_output_filename <user_python_script>.py <args>
 #
 ########################################################################
@@ -11,10 +11,6 @@
 import os
 import sys
 import importlib.util
-
-met_base_dir = os.getenv('MET_BASE',None)
-if met_base_dir is not None:
-    sys.path.append(os.path.join(met_base_dir, 'python'))
 
 # add share/met/python directory to system path to find met_point_obs
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__),
