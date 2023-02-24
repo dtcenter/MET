@@ -9,18 +9,23 @@ The script reads NDBC station information from two NOAA websites and merges the 
 The list contains latitude, longitude and elevation data for all known stations.
 The local list can be read by ascii2nc for processing of NDBC data.
 Algorithm:
-   Pull down active station xml file from web and create a list of active information.
-   Optionally write the list to an active stations text file.
-
+   Pull down active station xml file from web and create a list of active information objects.
+   Write the list to an active stations text file.
    Pull down complete index list from web.
    for each file refered to in the complete index list contents:
-      pull down that stations web page data and append to list of complete station information
-   optionally write the list of complete station info to a text file.
-   optionally save all the individual web page data that was pulled down into a subdirectory.
+      pull down that stations web page data and append to list of complete station information objects.
+   Write the list of complete station info objects to a text file.
+   Save all the individual web page data that was pulled down into a subdirectory.
 
-   warn about stations that are both active and complete but have different values
-   create a master list of all the unique stations from both lists, defer to active for any conflicts
-   write the master list
+   Warn about stations that are both active and complete but have different values, priority going to TBD.
+   Count up number of stations that are active but not complete, complete but not active and report.
+
+   Create a master list of all the unique stations from both lists, defer to TBD for any conflicts.
+   Write the master list.
+
+   Compare the complete list to the previous list of stations in the MET repo, and report on any stations
+   that have disappeared from the web, or have changed locations.
+
 '''
 
 from optparse import OptionParser
@@ -40,20 +45,26 @@ TOP_WEBSITE = "https://www.ndbc.noaa.gov"
 # hardwired website with active station xml
 ACTIVE_WEBSITE = "https://www.ndbc.noaa.gov/activestations.xml"
 
+# hardwired data subdirectory
+DATA_SUBDIR = "/data"
+
+#hardwired complete stations subdirecdtory
+STATIONS_SUBDIR = "/data/stations"
+
 # hardwired result of a wget of ACTIVE_WEBSITE
-ACTIVE_STATIONS_XML = "activestations.xml"
+ACTIVE_STATIONS_XML = "./data/activestations.xml"
   
 # hardwired website with index to a complete list of stations
 COMPLETE_INDEX_WEBSITE = "https://www.ndbc.noaa.gov/to_station.shtml"
 
 # hardwired result of a wget of COMPLETE_INDEX_WEBSITE
-COMPLETE_STATIONS_INDEX_INFO = "to_station.shtml"
+COMPLETE_STATIONS_INDEX_INFO = "./data/to_station.shtml"
   
 # hardwired name of optionally saved active stations
-ACTIVE_TEXT_FILE = "active.txt"
+ACTIVE_TEXT_FILE = "./data/active.txt"
 
 # hardwired name of optionally saved complete stations
-COMPLETE_TEXT_FILE = "complete.txt"
+COMPLETE_TEXT_FILE = "./data/complete.txt"
 
 # default output file name
 DEFAULT_OUTPUT_FILE = "merged.txt"
@@ -61,21 +72,54 @@ DEFAULT_OUTPUT_FILE = "merged.txt"
 MISSING = -99.9
 
 def usage():
-    print(f'Usage: BuildNdbcStationsFromWeb.py <--save_complete_stations> <--save_intermediate_lists> <--out=out_filename>')
-    print(f'          -s/--save_intermediate_lists: save intermediate active and complete text files, as well as a subdirectory with all the individual complete stations full information (optional, default: False)"')
-    print(f'                                     if True files {ACTIVE_TEXT_FILE} and ${COMPLETE_TEXT_FILE} and contents of subdir ./stations are saved, otherwise deleted"')
+    print(f'Usage: BuildNdbcStationsFromWeb.py , <--diagnostic> <--out=out_filename>')
+    print(f'          -d/--diagnostic: special mode to rerun using already downloaded files, skips all downloading if True')
     print(f'          -o/--out=out_filename: save final text into the named file (default: file name is {DEFAULT_OUTPUT_FILE})"')
     print(f'       Note: <> indicates optional arguments')
 
 #----------------------------------------------
 def create_parser_options(parser):
-    parser.add_option("-i", "--save_intermediate_lists", dest="save_intermediate_lists",
-                          action="store_true", default=False,
-                          help=" save intermediate files pulled from web:" + ACTIVE_TEXT_FILE + "," + COMPLETE_TEXT_FILE + "and save individual complete station info pulled from the web into a subdirectory ./stations  (optional, default: False)")
+    parser.add_option("-d", "--diagnostic", dest="diagnostic", action="store_true", default=False, help="Rerun using downlaoded files, skipping download step (optional, default: False)")
     parser.add_option("-o", "--out", dest="out_file",
             default=DEFAULT_OUTPUT_FILE, help=" Save the text into the named file (default: " + DEFAULT_OUTPUT_FILE +" )")
     parser.add_option("-H", "--Help", dest="full_usage", action="store_true", default=False, help = " show more usage information (optional, default = False)")
     return parser.parse_args()
+
+#----------------------------------------------
+class Station:
+  def __init__(self, name = "", idvalue="", lat=MISSING, lon=MISSING, elev=MISSING):
+    self._name = name
+    self._id = idvalue
+    self._lat = lat
+    self._lon = lon
+    self._elev = elev
+
+  def empty(self):
+    return self._id == ""
+
+  def textForLookups(self):
+    txt = '<station id="{a}" lat="{b}" lon="{c}" elev="{d}"/>'.format(a=self._id,b=self._lat,c=self._lon,d=self._elev)
+    return txt
+  
+  def location_match(self, other):
+    if self.empty() or other.empty():
+      # this method is used to print mismatches, so don't print mismatches to empty stations
+      return True
+    return self._lat == other._lat and self._lon == other._lon and self._elev == other._elev
+
+  def location_string(self):
+    txt = '{a}({b},{c},{d})'.format(a=self._name,b=self._lat,c=self._lon,d=self._elev)
+    return txt
+  
+  def equals(self, other):
+    return self._id == other._id and self._lat == other._lat and self._lon == other._lon and self._elev == other._elev
+  
+#----------------------------------------------
+def matchingId(id, stations):
+  for station in stations:
+    if station._id == id:
+      return station
+  return Station()
 
 #----------------------------------------------
 def doCmd(cmd, debug=False):
@@ -93,79 +137,146 @@ def doCmd(cmd, debug=False):
       print("Command failed ", cmd)
     return ""
 
+#----------------------------------------------------------------------------
+def makeOrScrub(path, debug=False):
+  if (debug):
+    print("Recreating path " + path)
+  if (os.path.exists(path)):
+    try:
+      shutil.rmtree(path)
+      os.makedirs(path)
+    except:
+      print('WARNING: ' + path + ' not completely cleaned out.')
+  else:
+    os.makedirs(path)
+   
+
 #----------------------------------------------
-def main(save_intermediate_lists, out_file):
+def main(diagnostic, out_file):
   status = True
 
-  # pull the active stations xml from the web
-  cmd = "wget " + ACTIVE_WEBSITE
-  print(cmd)
-  s = doCmd(cmd, True)
-  if not s:
-    status = False
+  cwd = os.getcwd()
 
-  # pull the complete stations html from the web
-  cmd = "wget " + COMPLETE_INDEX_WEBSITE
-  print(cmd)
-  s = doCmd(cmd, True)
-  if not s:
-    status = False
-  if not status:
-    print("ERROR reading web content")
-    os.exit(1)
-  
+  if not diagnostic:
+    dataDir = cwd + DATA_SUBDIR
+    print("cleanining out ", dataDir)
+    makeOrScrub(dataDir)
+
+    os.chdir(dataDir)
+
+    # pull the active stations xml from the web
+    cmd = "wget " + ACTIVE_WEBSITE
+    print(cmd)
+    s = doCmd(cmd, True)
+    if not s:
+      status = False
+    # pull the complete stations html from the web
+    cmd = "wget " + COMPLETE_INDEX_WEBSITE
+    print(cmd)
+    s = doCmd(cmd, True)
+    if not s:
+      status = False
+    if not status:
+      print("ERROR reading web content")
+      os.exit(1)
+
+    # move back to top directory
+    os.chdir(cwd)
+
   # prepare to compare to the default stations file to see what has changed
-  [ids0, lats0, lons0, elevs0] = parse(DEFAULT_STATIONS_FILE)
+  default_stations = parse("Default", DEFAULT_STATIONS_FILE)
+  #[ids_default, lats_default, lons_default, elevs_default] = parse(DEFAULT_STATIONS_FILE)
+  print("PARSED DEFAUILT STATIONS FILE NUM=", len(default_stations))
   
-
-  # parse the active stations XML to create a list
-  [ids, lats, lons, elevs] = processActive(save_intermediate_lists)
+  # parse the active stations XML to create a list, which will become the final list
+  if diagnostic:
+    active_stations = parse("Active", ACTIVE_TEXT_FILE)
+    print("PARSED ACTIVE STATION FILES: num=", len(active_stations))
+  else:
+    active_stations = processActive("Active")
+    print("BUILT ACTIVE STATION FILES: num=", len(active_stations))
 
   # read the complete stations html, find all the individual stations web links,
   # pull each stations data, parse that downloaded station content to create a list
-  [ids2, lats2, lons2, elevs2] = processComplete(save_intermediate_lists)
+  if diagnostic:
+    complete_stations = parse("Complete", COMPLETE_TEXT_FILE)
+    #[ids_complete, lats_complete, lons_complete, elevs_complete] = parse(COMPLETE_TEXT_FILE)
+    print("PARSED COMPLETE STATIONS FILES: num=", len(complete_stations))
+  else:
+    complete_stations = processComplete("Complete")
+    #[ids_complete, lats_complete, lons_complete, elevs_complete] = processComplete()
+    print("BUILT COMPLETE STATIONS FILES: num=", len(complete_stations))
 
   # see which ids are not in complete from active,  and which have different lat/lons
-  # note the one used if that happens is always the active one
-  for id in ids:
-    i1 = ids.index(id)
-    if id in ids2:
-      i2 = ids2.index(id)
-      if (lats[i1] != lats2[i2]) or (lons[i1] != lons2[i2]) or (elevs[i1] != elevs2[i2]):
-        print("latlonelev disagree for ", id, " active:(", lats[i1], ",", lons[i1], ",", elevs[i1],
-                ")  complete:(", lats2[i2], ",", lons2[i2], ",", elevs2[i2], ")")
+  # note the one used if that happens is always the active one at this point
+  numConflict = 0
+  numActiveNotComplete = 0
+  numCompleteNotActive = 0
+  numCompleteAndActive = 0
+  
+  for active in active_stations:
+    id = active._id
+    complete = matchingId(id, complete_stations)
+    if complete.empty():
+      numActiveNotComplete = numActiveNotComplete+1
+    else:
+      numCompleteAndActive = numCompleteAndActive+1
+      if (not active.location_match(complete)):
+        numConflict = numConflict + 1
+        print("latlonelev disagree for ", id, ":", active.location_string(), ",", complete.location_string())
+
+  for complete in complete_stations:
+    id = complete._id
+    active = matchingId(id, active_stations)
+  if active.empty():
+    numCompleteNotActive = numCompleteNotActive + 1
+
+  # see which id's have vanished from the current default list 
+  # and which have conflicts with active and/or complete lists
+  numVanished = 0
+  print("Comparing current default stations to final list")
+  for default in default_stations:
+    id = default._id
+    active = matchingId(id, active_stations)
+    complete = matchingId(id, complete_stations)
+    if active.empty() and complete.empty():
+      print("Station in the local table file but no longer on the webpages:", id)
+      numVanished = numVanished+1
+    else:
+      if (not active.location_match(default)):
+        numConflict = numConflict + 1
+        print("latlonelev disagree for ", id, ":", active.location_string(), ",", default.location_string())
+      if not active.equals(complete):
+        if (not complete.location_match(default)):
+          numConflict = numConflict + 1
+          print("latlonelev disagree for ", id, ":", complete.location_string(), ",", default.location_string())
 
   # see which ids are not in active but are in complete, make a list of those as ones to merge
-  toMergeIndex = []
-  for id in ids2:
-    i2 = ids2.index(id)
-    if id in ids:
-      i1 = ids.index(id)
-    else:
-      toMergeIndex.append(i2)
+  # Note might add in something about the default lists as well
+  toMerge = []
+  for complete in complete_stations:
+    id = complete._id
+    active = matchingId(id, active_stations)
+    if active.empty():
+      toMerge.append(complete)
+  print("Merging ", len(toMerge), " items from complete into active to make final list")
+  final_stations = active_stations
+  for m in toMerge:
+    final_stations.append(m)
 
-  print("Merging ", len(toMergeIndex), " items from complete into active")
-
-  for i in toMergeIndex:
-    id = ids2[i]
-    lat = lats2[i]
-    lon = lons2[i]
-    elev = elevs2[i]
-    ids.append(id)
-    lats.append(lat)
-    lons.append(lon)
-    elevs.append(elev)
+  numNew = 0
+  for f in final_stations:
+    id = f._id
+    default = matchingId(id, default_stations)
+    if default.empty():
+      print("New station on web not in local table file:", id)
+      numNew = numNew+1
 
   #now write out the full meal deal by creating a string list
   nout = 0
   txtAll = []
-  for id in ids:
-    i = ids.index(id)
-    station = id
-    lat = lats[i]
-    lon = lons[i]
-    elev = elevs[i]
-    txt = '<station id="{a}" lat="{b}" lon="{c}" elev="{d}"/>'.format(a=station,b=lat,c=lon,d=elev)
+  for f in final_stations:
+    txt = f.textForLookups()
     txtAll.append(txt)
     nout = nout + 1
 
@@ -175,44 +286,34 @@ def main(save_intermediate_lists, out_file):
   for txt in txtAll:
     fout.write(txt+"\n")
   fout.close()
+
   print("Done, wrote out ", nout, " total items to ", out_file)
-
-
-  print("Comparing to current default stations")
-  for id in ids0:
-    if id not in ids:
-      print("Station vanished from web:", id)
-    else:
-      i0 = ids0.index(id)
-      station = id
-      lat0 = lats0[i0]
-      lon0 = lons0[i0]
-      elev0 = elevs0[i0]
-      i = ids.index(id)
-      lat = lats[i]
-      lon = lons[i]
-      elev = elevs[i]
-      if (lat0 != lat or lon0 != lon or elev0 != elev):
-        print("latlonelev disagree for ", id, " web:(", lat, ",", lon, ",", elev,
-                ")  default:(", lat0, ",", lon0, ",", elev0, ")")
-  for id in ids:
-    if id not in ids0:
-      print("New station on web not in defaults:", id)
-
+  print("Number of stations that vanished (are in default ndbc_stations.xml and are not now online): ", numVanished)
+  print("Number of stations that appeared (not in default ndbc_stations.xml and are now online): ", numNew)
+  print("Number of stations for which there is a conflict from the various sources:", numConflict)
+  print("Number of stations for which there is both and active and a complete entry:", numCompleteAndActive)
+  print("Number of stations for which there is an active but no complete entry:", numActiveNotComplete)
+  print("Number of stations for which there is a complete but no active entry:", numCompleteNotActive)
+  
   return 0  
     
 #----------------------------------------------------
-def processComplete(save_intermediate):
+def processComplete(name):
   '''
   read the complete stations html, find all the individual stations web links,
   pull each stations data, parse that downloaded station content to create a list
   '''
 
-  # initialize these lists to empty
-  ids = []
-  lats = []
-  lons = []
-  elevs = []
+  # initialize return to empty
+  stations = []
+  
+  # create the output location, which should be ./data/stations
+  cwd = os.getcwd()
+  outLoc = cwd + STATIONS_SUBDIR
+  if not makeDirIfNeeded(outLoc):
+    print("ERROR creating storage for individual station files ", outLoc)
+    return stations
+
 
   # Open the file with the list of php pages online (or local files pulled down)
   with open(COMPLETE_STATIONS_INDEX_INFO, 'r') as file:
@@ -224,54 +325,39 @@ def processComplete(save_intermediate):
   txtAll = []
   while index < len(data):
     # pull down another stations info if you can, and parse it
-    [index, lat, lon, elev, station] = createNextStationInfo(data, index)
+    [index, station] = createNextStationInfo(name, data, index)
     if index == -1:
       break
-
-    if station:
+    if not station.empty():
       # form a string and append that plus all the individual stuff to lists
-      txt = '<station id="{a}" lat="{b}" lon="{c}" elev="{d}"/>'.format(a=station,b=lat,c=lon,d=elev)
+      txt = station.textForLookups()
       txtAll.append(txt)
-      ids.append(station)
-      lats.append(lat)
-      lons.append(lon)
-      elevs.append(elev)
+      stations.append(station)
 
-  if save_intermediate:
-    # keep the subdirectory of individual stations information
-
-    # sort the list for ease of use, then write it
-    txtAll.sort()
-    fout = open(COMPLETE_TEXT_FILE, "w")
-    for txt in txtAll:
-      fout.write(txt+"\n")
-    fout.close()  
-
-
-  else:
-    # delete the subdirectory stations
-    path = os.getcwd() + "/stations"
-    if (os.path.exists(path)):
-      try:
-        shutil.rmtree(path)
-      except:
-        print('WARNING: ' + path + ' not completely cleaned out.')
-
-  return [ids, lats, lons, elevs]
+  # keep the subdirectory of individual stations information
+  # sort the list for ease of use, then write it
+  txtAll.sort()
+  fout = open(COMPLETE_TEXT_FILE, "w")
+  for txt in txtAll:
+    fout.write(txt+"\n")
+  fout.close()  
+  return stations
 
 #----------------------------------------------
-def createNextStationInfo(data, i):
+def createNextStationInfo(name, data, i):
 
-  lat = MISSING
-  lon = MISSING
-  elev = MISSING
-  station = ""
+  #lat = MISSING
+  #lon = MISSING
+  #elev = MISSING
+  #station = ""
+
+  s = Station()
 
   #data has entries like this:  <a href="station_page.php?station=45001">45001</a>
   #on entry i points to the starting location within data to start looking
   index = data.find('href="station_page.php?', i)
   if index == -1:
-    return [-1, lat, lon, elev, station]
+    return [-1, s]
 
   # the stuff beyond 'href="' is the file name that you get via wget, followed by another  '"'
   index2 = index + 6   # point to 'station_page'
@@ -285,26 +371,22 @@ def createNextStationInfo(data, i):
   # name of returned file
   filename = data[index2:index3]
   
+  # temporarily change to the correct subdirectory
+  cwd = os.getcwd()
+  os.chdir(cwd + STATIONS_SUBDIR)
   # go get it
   cmd = 'wget "' + ref + '"'
   print(cmd)
   s = doCmd(cmd, True)
+  # move back
+  os.chdir(cwd)
   if not s:
     # note try to keep going forward as index has been updated
     print("ERROR data not online: ", ref)
-    return [index, lat, lon, elev, station]
+    return [index, s]
 
-  # make a stations subdirectory if needed
-  cwd = os.getcwd()
-  if not makeDirIfNeeded(cwd + "/stations"):
-    print("ERROR cannot create needed subdirectory 'stations'")
-    return [index, lat, lon, elev, station]
-  
-  # move this file to the stations subdirectory
-  shutil.move(cwd + "/" + filename, cwd + "/stations/" + filename)
-    
   # parse the file and return the information, including the next index
-  return parseStationInfo(filename, index)
+  return parseStationInfo(name, cwd + STATIONS_SUBDIR + "/" + filename, index)
 
 #----------------------------------------------------------------------------
 def makeDirIfNeeded(path, debug=False):
@@ -322,25 +404,20 @@ def makeDirIfNeeded(path, debug=False):
       return True
 
 #----------------------------------------------------------------------------
-def parseStationInfo(filename, index):
+def parseStationInfo(name, fname, index):
 
-  lat = MISSING
-  lon = MISSING
-  elev = MISSING
-  station = ""
+  s = Station()
 
-  # the file is assumed already downloaded,  in subdirectory stations
-  fname = "./stations/" + filename
-
+  # the file is assumed already downloaded
   # initialize station values
   station = setStationId(fname)
   if not station:
-    return [index, lat, lon, elev, station]
+    return [index, s]
   elev = setElev(fname)
   lat = setLat(fname)
   lon = setLon(fname)
-
-  return [index, lat, lon, elev, station]
+  s = Station(name, station, lat, lon, elev)
+  return [index, s]
 
 #----------------------------------------------
 def setStationId(fname):
@@ -400,36 +477,32 @@ def setLon(fname):
   return lon
 
 #----------------------------------------------
-def processActive(save_intermediate):
+def processActive(name):
   '''
   read the active stations XML to create a list
   '''
-  [ids, lats, lons, elevs] = parse(ACTIVE_STATIONS_XML)
+  astations = parse(name, ACTIVE_STATIONS_XML)
   txtAll = []
-  for id in ids:
-    i = ids.index(id)
-    station = ids[i]
-    lat = lats[i]
-    lon = lons[i]
-    elev = elevs[i]
-    txt = '<station id="{a}" lat="{b}" lon="{c}" elev="{d}"/>'.format(a=station,b=lat,c=lon,d=elev)
+  for s in astations:
+    txt = s.textForLookups()
     txtAll.append(txt)
   txtAll.sort()    
 
-  if save_intermediate:
-    fout = open(ACTIVE_TEXT_FILE, "w")
-    for txt in txtAll:
-      fout.write(txt+"\n")
-    fout.close()
-
-  return [ids, lats, lons, elevs]
+  fout = open(ACTIVE_TEXT_FILE, "w")
+  for txt in txtAll:
+    fout.write(txt+"\n")
+  fout.close()
+  return astations
 
 #----------------------------------------------
-def parse(fname):
-  ids = []
-  lats = []
-  lons = []
-  elevs = []
+def parse(name, fname, debug=False):
+  if debug:
+    print("Parsing ", fname)
+  stations = []
+  #ids = []
+  #lats = []
+  #lons = []
+  #elevs = []
 
   with open(fname, 'r') as file:
     data_all = file.read().replace('\n', '')
@@ -445,7 +518,8 @@ def parse(fname):
       break
     
     data = data_all[index_all:indexend+2]
-
+    if debug:
+      print("Parsing this: ", data)
     index = 0
 
     # expect to see '<station id="xxxx" lat="##" lon="##"
@@ -470,13 +544,16 @@ def parse(fname):
       index8 = data.find('"', index7+6)
       elev = float(data[index7+6:index8])
 
-    ids.append(stationId)
-    lats.append(lat)
-    lons.append(lon)
-    elevs.append(elev)
-    index_all = indexend+3
+    stations.append(Station(name, stationId, lat, lon, elev))
+    #ids.append(stationId)
+    #lats.append(lat)
+    #lons.append(lon)
+    #elevs.append(elev)
 
-  return [ids, lats, lons, elevs]
+    index_all = indexend+2
+
+  #return [ids, lats, lons, elevs]
+  return stations
 
 #----------------------------------------------
 if __name__ == "__main__":
@@ -487,5 +564,5 @@ if __name__ == "__main__":
   if options.full_usage:
     usage()
     exit(0)
-  main(options.save_intermediate_lists, options.out_file)
+  main(options.diagnostic, options.out_file)
 
