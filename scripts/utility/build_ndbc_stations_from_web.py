@@ -7,8 +7,9 @@ Created on February 17, 2023
 
 The script reads NDBC station information from two NOAA websites and merges the contents into one local list.
 The list contains latitude, longitude and elevation data for all known stations.
-The local list can be read by ascii2nc for processing of NDBC data.
+The local list can be read by ascii2nc for processing of NDBC data inputs.
 Algorithm:
+   Read the current default ndbc_stations.xml file and create a list of default station information objects.
    Pull down active station xml file from web and create a list of active information objects.
    Write the list to an active stations text file.
    Pull down complete index list from web.
@@ -17,14 +18,22 @@ Algorithm:
    Write the list of complete station info objects to a text file.
    Save all the individual web page data that was pulled down into a subdirectory.
 
-   Warn about stations that are both active and complete but have different values, priority going to TBD.
-   Count up number of stations that are active but not complete, complete but not active and report.
+   Compare the complete stations information to the default station information objects.
+   If a station is on the complete list but not on the default list, add it to the default list.
+   If a station is on both lists, but has different location info, change the locaiton info to that of the complete,
+   (unless the complete has no meaningful lat/lon information, typically 0,0).
 
-   Create a master list of all the unique stations from both lists, defer to TBD for any conflicts.
-   Write the master list.
+   Compare the augmented default list to the active stations list.
+   If a station is on the active list but not on the default list, add it to the default list.
+   If a station is on both lists, but has different location info, keep the default list values
+   (unless the default has no meaningful lat/lon information, typically 0,0, then change to the active).
 
-   Compare the complete list to the previous list of stations in the MET repo, and report on any stations
-   that have disappeared from the web, or have changed locations.
+   Log Warnings about discrepancies.
+   Keep counts of everything.
+
+   Write the final default list a a new output.
+
+   Optionally prune the default list, removing all stations that are not active or complete.
 
 '''
 
@@ -46,25 +55,25 @@ TOP_WEBSITE = "https://www.ndbc.noaa.gov"
 ACTIVE_WEBSITE = "https://www.ndbc.noaa.gov/activestations.xml"
 
 # hardwired data subdirectory
-DATA_SUBDIR = "/data"
+DATA_SUBDIR = "/ndbc_temp_data"
 
 #hardwired complete stations subdirecdtory
-STATIONS_SUBDIR = "/data/stations"
+STATIONS_SUBDIR = "/ndbc_temp_data/stations"
 
 # hardwired result of a wget of ACTIVE_WEBSITE
-ACTIVE_STATIONS_XML = "./data/activestations.xml"
+ACTIVE_STATIONS_XML = "./ndbc_temp_data/activestations.xml"
   
 # hardwired website with index to a complete list of stations
 COMPLETE_INDEX_WEBSITE = "https://www.ndbc.noaa.gov/to_station.shtml"
 
 # hardwired result of a wget of COMPLETE_INDEX_WEBSITE
-COMPLETE_STATIONS_INDEX_INFO = "./data/to_station.shtml"
+COMPLETE_STATIONS_INDEX_INFO = "./ndbc_temp_data/to_station.shtml"
   
 # hardwired name of optionally saved active stations
-ACTIVE_TEXT_FILE = "./data/active.txt"
+ACTIVE_TEXT_FILE = "./ndbc_temp_data/active.txt"
 
 # hardwired name of optionally saved complete stations
-COMPLETE_TEXT_FILE = "./data/complete.txt"
+COMPLETE_TEXT_FILE = "./ndbc_temp_data/complete.txt"
 
 # default output file name
 DEFAULT_OUTPUT_FILE = "merged.txt"
@@ -72,14 +81,16 @@ DEFAULT_OUTPUT_FILE = "merged.txt"
 MISSING = -99.9
 
 def usage():
-    print(f'Usage: BuildNdbcStationsFromWeb.py , <--diagnostic> <--out=out_filename>')
-    print(f'          -d/--diagnostic: special mode to rerun using already downloaded files, skips all downloading if True')
+    print(f'Usage: BuildNdbcStationsFromWeb.py , <--diagnostic> <--out=out_filename> <--prune>')
+    print(f'          -d/--diagnostic: special mode to rerun using already downloaded files, skips all downloading if True (Downloaded files are in ./{DATA_SUBDIR}')
     print(f'          -o/--out=out_filename: save final text into the named file (default: file name is {DEFAULT_OUTPUT_FILE})"')
+    print(f'          -p/--prune: Delete all stations from the local ndbc_stations file that are no longer online')
     print(f'       Note: <> indicates optional arguments')
 
 #----------------------------------------------
 def create_parser_options(parser):
     parser.add_option("-d", "--diagnostic", dest="diagnostic", action="store_true", default=False, help="Rerun using downlaoded files, skipping download step (optional, default: False)")
+    parser.add_option("-p", "--prune", dest="prune", action="store_true", default=False, help="Prune files that are no longer online (optional, default:False)")
     parser.add_option("-o", "--out", dest="out_file",
             default=DEFAULT_OUTPUT_FILE, help=" Save the text into the named file (default: " + DEFAULT_OUTPUT_FILE +" )")
     parser.add_option("-H", "--Help", dest="full_usage", action="store_true", default=False, help = " show more usage information (optional, default = False)")
@@ -113,7 +124,44 @@ class Station:
   
   def equals(self, other):
     return self._id == other._id and self._lat == other._lat and self._lon == other._lon and self._elev == other._elev
+
+  def setName(self, name):
+    self._name = name
   
+#----------------------------------------------
+def replaceLatLonIfGood(header, name, stations, station):
+  if station._lat == 0 and station._lon == 0:
+    #print(header, ",No replacement using:", station.textForLookups())
+    return False
+  for n in range(len(stations)):
+    if stations[n]._id == station._id:
+      print(header, "Replacing: ", stations[n].textForLookups(), " with ", station.textForLookups())
+      s = station
+      s.setName(name)
+      stations[n] = station
+      return True
+  print("Warning:", header, "No match for replacment of station ", station._id)
+  return False
+
+#----------------------------------------------
+def replaceLatLonIfListIsBad(header, name, stations, station):
+  if station._lat == 0 and station._lon == 0:
+    #print(header, ",No replacement using:", station.textForLookups())
+    return False
+  for n in range(len(stations)):
+    if stations[n]._id == station._id:
+      if stations[n]._lat == 0 and stations[n]._lon == 0:
+        print(header, "Replacing: ", stations[n].textForLookups(), " with ", station.textForLookups())
+        s = station
+        s.setName(name)
+        stations[n] = station
+        return True
+      else:
+        return False
+    
+  print("Warning:", header, "No match for replacment of station ", station._id)
+  return False
+
 #----------------------------------------------
 def matchingId(id, stations):
   for station in stations:
@@ -152,12 +200,13 @@ def makeOrScrub(path, debug=False):
    
 
 #----------------------------------------------
-def main(diagnostic, out_file):
-  status = True
+def main(diagnostic, out_file, prune):
 
   cwd = os.getcwd()
 
   if not diagnostic:
+    status = True
+
     dataDir = cwd + DATA_SUBDIR
     print("cleanining out ", dataDir)
     makeOrScrub(dataDir)
@@ -185,8 +234,13 @@ def main(diagnostic, out_file):
 
   # prepare to compare to the default stations file to see what has changed
   default_stations = parse("Default", DEFAULT_STATIONS_FILE)
-  #[ids_default, lats_default, lons_default, elevs_default] = parse(DEFAULT_STATIONS_FILE)
+  numDefault = len(default_stations)
   print("PARSED DEFAUILT STATIONS FILE NUM=", len(default_stations))
+
+  # make a copy of this as the final outputs
+  final_stations = default_stations
+  for f in final_stations:
+    f.setName("Final")
   
   # parse the active stations XML to create a list, which will become the final list
   if diagnostic:
@@ -200,85 +254,99 @@ def main(diagnostic, out_file):
   # pull each stations data, parse that downloaded station content to create a list
   if diagnostic:
     complete_stations = parse("Complete", COMPLETE_TEXT_FILE)
-    #[ids_complete, lats_complete, lons_complete, elevs_complete] = parse(COMPLETE_TEXT_FILE)
     print("PARSED COMPLETE STATIONS FILES: num=", len(complete_stations))
   else:
     complete_stations = processComplete("Complete")
-    #[ids_complete, lats_complete, lons_complete, elevs_complete] = processComplete()
     print("BUILT COMPLETE STATIONS FILES: num=", len(complete_stations))
 
   # see which ids are not in complete from active,  and which have different lat/lons
   # note the one used if that happens is always the active one at this point
+  numNew = 0
+  numNewComplete = 0
+  numNewActive = 0
   numConflict = 0
-  numActiveNotComplete = 0
+  numConflictChanged = 0
+  numComplete = 0
+  numActive = 0
   numCompleteNotActive = 0
-  numCompleteAndActive = 0
+  numActiveNotComplete = 0
   
+  # compare complete stations to default stations
+  for complete in complete_stations:
+    numComplete = numComplete + 1
+    id = complete._id
+    default = matchingId(id, default_stations)
+    active = matchingId(id, active_stations)
+    if active.empty():
+      numCompleteNotActive = numCompleteNotActive + 1
+    if default.empty():
+      # station is on the complete list but not on the default list, add it
+      f = complete
+      f.setName("Final")
+      final_stations.append(f)
+      numNew = numNew+1
+      numNewComplete = numNewComplete + 1
+    else:
+      # compare complete and default
+      if not complete.location_match(default):
+        numConflict = numConflict + 1
+        if replaceLatLonIfGood("Complete to Final", "Final", final_stations, complete):
+          numConflictChanged = numConflictChanged + 1
+
+  # compare active stations to final stations
   for active in active_stations:
+    numActive = numActive + 1
     id = active._id
+    final = matchingId(id, final_stations)
     complete = matchingId(id, complete_stations)
     if complete.empty():
-      numActiveNotComplete = numActiveNotComplete+1
+      numActiveNotComplete = numActiveNotComplete +1
+    if final.empty():
+      # station is on the active list but not on the final list, add it
+      a = active
+      a.setName("Final")
+      final_stations.append(a)
+      numNew = numNew+1
+      numNewActive = numNewActive + 1
     else:
-      numCompleteAndActive = numCompleteAndActive+1
-      if (not active.location_match(complete)):
+      # compare complete and default
+      if not final.location_match(active):
         numConflict = numConflict + 1
-        print("latlonelev disagree for ", id, ":", active.location_string(), ",", complete.location_string())
-
-  for complete in complete_stations:
-    id = complete._id
-    active = matchingId(id, active_stations)
-  if active.empty():
-    numCompleteNotActive = numCompleteNotActive + 1
-
-  # see which id's have vanished from the current default list 
-  # and which have conflicts with active and/or complete lists
+        if replaceLatLonIfListIsBad("Active to Final", "Final", final_stations, active):
+          numConflictChanged = numConflictChanged + 1
+  
+  # see which id's have vanished from the current default list, to be used when prune is true
   numVanished = 0
+  purgeIds = []
   print("Comparing current default stations to final list")
   for default in default_stations:
     id = default._id
     active = matchingId(id, active_stations)
     complete = matchingId(id, complete_stations)
     if active.empty() and complete.empty():
-      print("Station in the local table file but no longer on the webpages:", id)
+      #print("Station in the local table file but no longer on the webpages:", id)
       numVanished = numVanished+1
-    else:
-      if (not active.location_match(default)):
-        numConflict = numConflict + 1
-        print("latlonelev disagree for ", id, ":", active.location_string(), ",", default.location_string())
-      if not active.equals(complete):
-        if (not complete.location_match(default)):
-          numConflict = numConflict + 1
-          print("latlonelev disagree for ", id, ":", complete.location_string(), ",", default.location_string())
+      purgeIds.append(id)
 
-  # see which ids are not in active but are in complete, make a list of those as ones to merge
-  # Note might add in something about the default lists as well
-  toMerge = []
-  for complete in complete_stations:
-    id = complete._id
-    active = matchingId(id, active_stations)
-    if active.empty():
-      toMerge.append(complete)
-  print("Merging ", len(toMerge), " items from complete into active to make final list")
-  final_stations = active_stations
-  for m in toMerge:
-    final_stations.append(m)
-
-  numNew = 0
   for f in final_stations:
     id = f._id
     default = matchingId(id, default_stations)
     if default.empty():
-      print("New station on web not in local table file:", id)
+      #print("New station on web not in local table file:", id)
       numNew = numNew+1
 
   #now write out the full meal deal by creating a string list
   nout = 0
+  nprune = 0
   txtAll = []
   for f in final_stations:
-    txt = f.textForLookups()
-    txtAll.append(txt)
-    nout = nout + 1
+    if prune and f.IdOnList(purgeIds):
+      print("Pruning station: ", f._id, " No longer on line")
+      nprune = nprune + 1
+    else:
+      txt = f.textForLookups()
+      txtAll.append(txt)
+      nout = nout + 1
 
   # sort for ease of use
   txtAll.sort()
@@ -287,14 +355,20 @@ def main(diagnostic, out_file):
     fout.write(txt+"\n")
   fout.close()
 
-  print("Done, wrote out ", nout, " total items to ", out_file)
-  print("Number of stations that vanished (are in default ndbc_stations.xml and are not now online): ", numVanished)
-  print("Number of stations that appeared (not in default ndbc_stations.xml and are now online): ", numNew)
-  print("Number of stations for which there is a conflict from the various sources:", numConflict)
-  print("Number of stations for which there is both and active and a complete entry:", numCompleteAndActive)
-  print("Number of stations for which there is an active but no complete entry:", numActiveNotComplete)
-  print("Number of stations for which there is a complete but no active entry:", numCompleteNotActive)
-  
+  print("Num complete:            ", numComplete)
+  print("Num active:              ", numActive)
+  print("Num default:             ", numDefault)
+  print("Num final:               ", nout)
+  print("Num pruned:              ", nprune)
+  print("Num vanished:            ", numVanished)          
+  print("Num new complete:        ", numNewComplete)
+  print("Num new active:          ", numNewActive)
+  print("Num new total:           ", numNew)
+  print("Num conflict no change:  ", numConflict)
+  print("Num conflict with change:", numConflictChanged)
+  print("Numactivenotcomplete:    ", numActiveNotComplete)
+  print("Numcompletenotactive:    ", numCompleteNotActive)
+
   return 0  
     
 #----------------------------------------------------
@@ -307,7 +381,7 @@ def processComplete(name):
   # initialize return to empty
   stations = []
   
-  # create the output location, which should be ./data/stations
+  # create the output location, which should be ./ndbc_temp_data/stations
   cwd = os.getcwd()
   outLoc = cwd + STATIONS_SUBDIR
   if not makeDirIfNeeded(outLoc):
@@ -564,5 +638,5 @@ if __name__ == "__main__":
   if options.full_usage:
     usage()
     exit(0)
-  main(options.diagnostic, options.out_file)
+  main(options.diagnostic, options.out_file, options.prune)
 
