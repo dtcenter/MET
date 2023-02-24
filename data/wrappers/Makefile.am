@@ -24,8 +24,10 @@ wrappers_DATA = \
      set_python_env.py \
      read_tmp_dataplane.py \
      read_tmp_ascii.py \
+     read_tmp_point_nc.py \
      write_tmp_dataplane.py \
      write_tmp_point.py \
+     write_tmp_point_nc.py \
      write_tmp_mpr.py
 
 EXTRA_DIST = ${wrappers_DATA}
