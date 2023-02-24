@@ -18,6 +18,7 @@
 
 
 #include <iostream>
+#include <vector>
 
 #include "ft2build.h"
 #include FT_FREETYPE_H
@@ -98,7 +99,7 @@ class CgFontCollection {
 
       int Nalloc;
 
-      CgFont ** e;
+      std::vector<CgFont> e;
 
    public:
 
@@ -117,12 +118,11 @@ class CgFontCollection {
       void add           (const CgFont &);
       void add_no_repeat (const CgFont &);
 
-      CgFont * lookup_by_ps_name(const char *) const;
+      CgFont * lookup_by_ps_name(const char *);
 
-      CgFont * lookup_by_ps_font_number(int) const;    //  for builtin fonts
+      CgFont * lookup_by_ps_font_number(int);    //  for builtin fonts
 
-
-      CgFont * operator[](int) const;
+      CgFont * operator[](int);
 
 };
 

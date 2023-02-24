@@ -243,6 +243,23 @@ mlog << Debug(grid_debug_level)
 ////////////////////////////////////////////////////////////////////////
 
 
+void SemiLatLonData::clear()
+
+{
+
+name = (const char *) 0;
+
+lats.clear();
+lons.clear();
+levels.clear();
+times.clear();
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
    //
    //  Code for class GridInfo
    //
