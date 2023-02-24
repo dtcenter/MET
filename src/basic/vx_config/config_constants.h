@@ -1086,6 +1086,7 @@ static const char conf_key_consensus[]                = "consensus";
 static const char conf_key_members[]                  = "members";
 static const char conf_key_required[]                 = "required";
 static const char conf_key_min_req[]                  = "min_req";
+static const char conf_key_write_members[]            = "write_members";
 static const char conf_key_lag_time[]                 = "lag_time";
 static const char conf_key_best_technique[]           = "best_technique";
 static const char conf_key_best_baseline[]            = "best_baseline";

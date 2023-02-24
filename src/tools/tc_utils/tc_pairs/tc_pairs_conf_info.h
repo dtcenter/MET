@@ -29,6 +29,7 @@ struct ConsensusInfo {
    StringArray  Members;
    NumArray     Required;
    int          MinReq;
+   bool         WriteMembers;
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -63,7 +64,8 @@ class TCPairsConfInfo {
       StringArray Basin;     // List of basin names
       StringArray Cyclone;   // List of cyclone numbers
       StringArray StormName; // List of storm names
-
+      StringArray SkipConsensusMembers; // List of consensus members to skip output for
+      
       // Timing information
       unixtime  InitBeg, InitEnd;
       TimeArray InitInc;
