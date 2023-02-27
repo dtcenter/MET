@@ -242,6 +242,7 @@ class base_met_point_obs(object):
         base_met_point_obs.info_msg(info_msg)
 
     def put_data(self, point_obs_dict):
+        self.use_var_id = point_obs_dict['use_var_id']
         self.hdr_typ = point_obs_dict['hdr_typ']
         self.hdr_sid = point_obs_dict['hdr_sid']
         self.hdr_vld = point_obs_dict['hdr_vld']
@@ -446,6 +447,7 @@ class csv_point_obs(ABC, base_met_point_obs):
         hdr_vld_map = {}
         obs_var_map = {}
         obs_qty_map = {}
+        self.use_var_id = not self.is_grib_code()
 
         self.use_var_id = not self.is_grib_code()
 
