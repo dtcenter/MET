@@ -239,6 +239,6 @@ seeps_p1_thresh = NA;
 grid_weight_flag = NONE;
 tmp_dir          = "/tmp";
 output_prefix    = "GRIB_set_attr";
-version          = "V11.0.0";
+version          = "V11.1.0";
 
 ////////////////////////////////////////////////////////////////////////////////

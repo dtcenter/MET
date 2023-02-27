@@ -290,6 +290,6 @@ seeps_p1_thresh = NA;
 grid_weight_flag = COS_LAT;
 tmp_dir          = "/tmp";
 output_prefix    = "${OUTPUT_PREFIX}";
-version          = "V11.0.0";
+version          = "V11.1.0";
 
 ////////////////////////////////////////////////////////////////////////////////
