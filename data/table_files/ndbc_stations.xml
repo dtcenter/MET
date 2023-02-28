@@ -1,32 +1,32 @@
-<station id="00922" lat="30.0" lon="-90.0" elev="-99.9"/>
-<station id="00923" lat="30.0" lon="-90.0" elev="-99.9"/>
-<station id="01500" lat="30.0" lon="-90.0" elev="-99.9"/>
-<station id="01502" lat="30.0" lon="-90.0" elev="-99.9"/>
-<station id="01503" lat="30.0" lon="-90.0" elev="-99.9"/>
-<station id="01504" lat="30.0" lon="-90.0" elev="-99.9"/>
-<station id="01505" lat="30.0" lon="-90.0" elev="-99.9"/>
-<station id="01506" lat="30.0" lon="-90.0" elev="-99.9"/>
-<station id="01507" lat="30.0" lon="-90.0" elev="-99.9"/>
-<station id="01508" lat="30.0" lon="-90.0" elev="-99.9"/>
-<station id="01510" lat="30.0" lon="-90.0" elev="-99.9"/>
-<station id="01511" lat="30.0" lon="-90.0" elev="-99.9"/>
-<station id="01517" lat="30.0" lon="-90.0" elev="-99.9"/>
-<station id="01518" lat="30.0" lon="-90.0" elev="-99.9"/>
-<station id="01519" lat="30.0" lon="-90.0" elev="-99.9"/>
-<station id="01521" lat="30.0" lon="-90.0" elev="-99.9"/>
-<station id="01522" lat="30.0" lon="-90.0" elev="-99.9"/>
-<station id="01523" lat="30.0" lon="-90.0" elev="-99.9"/>
-<station id="01524" lat="30.0" lon="-90.0" elev="-99.9"/>
-<station id="01526" lat="30.0" lon="-90.0" elev="-99.9"/>
-<station id="01531" lat="30.0" lon="-90.0" elev="-99.9"/>
-<station id="01532" lat="30.0" lon="-90.0" elev="-99.9"/>
-<station id="01534" lat="30.0" lon="-90.0" elev="-99.9"/>
-<station id="01535" lat="30.0" lon="-90.0" elev="-99.9"/>
-<station id="01536" lat="30.0" lon="-90.0" elev="-99.9"/>
-<station id="01537" lat="30.0" lon="-90.0" elev="-99.9"/>
-<station id="01538" lat="30.0" lon="-90.0" elev="-99.9"/>
-<station id="01909" lat="30.0" lon="-90.0" elev="-99.9"/>
-<station id="01910" lat="30.0" lon="-90.0" elev="-99.9"/>
+<station id="00922" lat="30.0" lon="-90.0"/>
+<station id="00923" lat="30.0" lon="-90.0"/>
+<station id="01500" lat="30.0" lon="-90.0"/>
+<station id="01502" lat="30.0" lon="-90.0"/>
+<station id="01503" lat="30.0" lon="-90.0"/>
+<station id="01504" lat="30.0" lon="-90.0"/>
+<station id="01505" lat="30.0" lon="-90.0"/>
+<station id="01506" lat="30.0" lon="-90.0"/>
+<station id="01507" lat="30.0" lon="-90.0"/>
+<station id="01508" lat="30.0" lon="-90.0"/>
+<station id="01510" lat="30.0" lon="-90.0"/>
+<station id="01511" lat="30.0" lon="-90.0"/>
+<station id="01517" lat="30.0" lon="-90.0"/>
+<station id="01518" lat="30.0" lon="-90.0"/>
+<station id="01519" lat="30.0" lon="-90.0"/>
+<station id="01521" lat="30.0" lon="-90.0"/>
+<station id="01522" lat="30.0" lon="-90.0"/>
+<station id="01523" lat="30.0" lon="-90.0"/>
+<station id="01524" lat="30.0" lon="-90.0"/>
+<station id="01526" lat="30.0" lon="-90.0"/>
+<station id="01531" lat="30.0" lon="-90.0"/>
+<station id="01532" lat="30.0" lon="-90.0"/>
+<station id="01534" lat="30.0" lon="-90.0"/>
+<station id="01535" lat="30.0" lon="-90.0"/>
+<station id="01536" lat="30.0" lon="-90.0"/>
+<station id="01537" lat="30.0" lon="-90.0"/>
+<station id="01538" lat="30.0" lon="-90.0"/>
+<station id="01909" lat="30.0" lon="-90.0"/>
+<station id="01910" lat="30.0" lon="-90.0"/>
 <station id="0Y2W3" lat="44.794" lon="-87.313" elev="179.0"/>
 <station id="0y2w3" lat="44.794" lon="-87.313" elev="179.0"/>
 <station id="13001" lat="12.0" lon="-23.0" elev="0.0"/>
@@ -43,44 +43,44 @@
 <station id="15006" lat="-6.0" lon="-10.0" elev="0.0"/>
 <station id="15007" lat="-6.0" lon="8.0" elev="0.0"/>
 <station id="18CI3" lat="41.73" lon="-86.91" elev="176.0"/>
-<station id="18CY3" lat="41.73" lon="-86.91" elev="-99.9"/>
+<station id="18CY3" lat="41.73" lon="-86.91"/>
 <station id="18ci3" lat="41.73" lon="-86.91" elev="176.0"/>
 <station id="20CM4" lat="42.09" lon="-86.49" elev="177.0"/>
 <station id="20cm4" lat="42.09" lon="-86.49" elev="177.0"/>
-<station id="21178" lat="33.12" lon="133.62" elev="-99.9"/>
-<station id="21346" lat="40.302" lon="146.192" elev="-99.9"/>
-<station id="21347" lat="39.601" lon="145.799" elev="-99.9"/>
-<station id="21348" lat="38.816" lon="145.595" elev="-99.9"/>
-<station id="21401" lat="42.617" lon="152.583" elev="-99.9"/>
-<station id="21402" lat="46.488" lon="158.343" elev="-99.9"/>
+<station id="21178" lat="33.12" lon="133.62"/>
+<station id="21346" lat="40.302" lon="146.192"/>
+<station id="21347" lat="39.601" lon="145.799"/>
+<station id="21348" lat="38.816" lon="145.595"/>
+<station id="21401" lat="42.617" lon="152.583"/>
+<station id="21402" lat="46.488" lon="158.343"/>
 <station id="21413" lat="30.517" lon="152.127" elev="0.0"/>
-<station id="21414" lat="48.963" lon="178.237" elev="-99.9"/>
-<station id="21415" lat="50.153" lon="171.897" elev="-99.9"/>
+<station id="21414" lat="48.963" lon="178.237"/>
+<station id="21415" lat="50.153" lon="171.897"/>
 <station id="21416" lat="48.12" lon="163.43" elev="0.0"/>
 <station id="21417" lat="43.192" lon="157.142" elev="0.0"/>
 <station id="21418" lat="38.723" lon="148.836" elev="0.0"/>
-<station id="21419" lat="44.401" lon="155.653" elev="-99.9"/>
-<station id="21420" lat="28.912" lon="134.968" elev="-99.9"/>
-<station id="21595" lat="0.0" lon="0.0" elev="-99.9"/>
-<station id="21597" lat="0.0" lon="0.0" elev="-99.9"/>
-<station id="21598" lat="0.0" lon="0.0" elev="-99.9"/>
-<station id="21600" lat="0.0" lon="0.0" elev="-99.9"/>
-<station id="21636" lat="0.0" lon="0.0" elev="-99.9"/>
-<station id="21637" lat="0.0" lon="0.0" elev="-99.9"/>
-<station id="21640" lat="0.0" lon="0.0" elev="-99.9"/>
-<station id="21707" lat="0.0" lon="0.0" elev="-99.9"/>
-<station id="21D18" lat="38.761" lon="148.661" elev="-99.9"/>
-<station id="21D20" lat="28.891" lon="135.022" elev="-99.9"/>
-<station id="21d18" lat="40.6983" lon="172.164" elev="-99.9"/>
-<station id="21d20" lat="37.7143" lon="165.258" elev="-99.9"/>
-<station id="22101" lat="37.23" lon="126.02" elev="-99.9"/>
-<station id="22102" lat="34.8" lon="125.77" elev="-99.9"/>
-<station id="22103" lat="34.0" lon="127.5" elev="-99.9"/>
-<station id="22104" lat="34.77" lon="128.9" elev="-99.9"/>
-<station id="22105" lat="37.53" lon="130.0" elev="-99.9"/>
-<station id="22106" lat="36.35" lon="129.78" elev="-99.9"/>
-<station id="22107" lat="33.08" lon="126.03" elev="-99.9"/>
-<station id="22108" lat="36.25" lon="125.75" elev="-99.9"/>
+<station id="21419" lat="44.401" lon="155.653"/>
+<station id="21420" lat="28.912" lon="134.968"/>
+<station id="21595" lat="0.0" lon="0.0"/>
+<station id="21597" lat="0.0" lon="0.0"/>
+<station id="21598" lat="0.0" lon="0.0"/>
+<station id="21600" lat="0.0" lon="0.0"/>
+<station id="21636" lat="0.0" lon="0.0"/>
+<station id="21637" lat="0.0" lon="0.0"/>
+<station id="21640" lat="0.0" lon="0.0"/>
+<station id="21707" lat="0.0" lon="0.0"/>
+<station id="21D18" lat="38.761" lon="148.661"/>
+<station id="21D20" lat="28.891" lon="135.022"/>
+<station id="21d18" lat="40.6983" lon="172.164"/>
+<station id="21d20" lat="37.7143" lon="165.258"/>
+<station id="22101" lat="37.23" lon="126.02"/>
+<station id="22102" lat="34.8" lon="125.77"/>
+<station id="22103" lat="34.0" lon="127.5"/>
+<station id="22104" lat="34.77" lon="128.9"/>
+<station id="22105" lat="37.53" lon="130.0"/>
+<station id="22106" lat="36.35" lon="129.78"/>
+<station id="22107" lat="33.08" lon="126.03"/>
+<station id="22108" lat="36.25" lon="125.75"/>
 <station id="23001" lat="0.0" lon="81.0" elev="0.0"/>
 <station id="23003" lat="-2.0" lon="81.0" elev="0.0"/>
 <station id="23004" lat="0.0" lon="90.0" elev="0.0"/>
@@ -97,22 +97,22 @@
 <station id="23016" lat="-2.0" lon="67.0" elev="0.0"/>
 <station id="23017" lat="-4.0" lon="67.0" elev="0.0"/>
 <station id="23020" lat="22.162" lon="38.5" elev="0.0"/>
-<station id="23217" lat="3.798" lon="91.701" elev="-99.9"/>
-<station id="23218" lat="10.165" lon="88.5" elev="-99.9"/>
-<station id="23219" lat="13.472" lon="88.998" elev="-99.9"/>
-<station id="23220" lat="14.433" lon="89.333" elev="-99.9"/>
-<station id="23223" lat="17.333" lon="89.483" elev="-99.9"/>
-<station id="23225" lat="18.63" lon="67.18" elev="-99.9"/>
-<station id="23226" lat="20.2" lon="67.333" elev="-99.9"/>
-<station id="23227" lat="6.255" lon="88.792" elev="-99.9"/>
-<station id="23228" lat="20.764" lon="65.284" elev="-99.9"/>
-<station id="23401" lat="8.86" lon="88.55" elev="-99.9"/>
-<station id="23461" lat="9.541" lon="95.668" elev="-99.9"/>
+<station id="23217" lat="3.798" lon="91.701"/>
+<station id="23218" lat="10.165" lon="88.5"/>
+<station id="23219" lat="13.472" lon="88.998"/>
+<station id="23220" lat="14.433" lon="89.333"/>
+<station id="23223" lat="17.333" lon="89.483"/>
+<station id="23225" lat="18.63" lon="67.18"/>
+<station id="23226" lat="20.2" lon="67.333"/>
+<station id="23227" lat="6.255" lon="88.792"/>
+<station id="23228" lat="20.764" lon="65.284"/>
+<station id="23401" lat="8.86" lon="88.55"/>
+<station id="23461" lat="9.541" lon="95.668"/>
 <station id="28401" lat="32.384" lon="144.54" elev="0.0"/>
-<station id="28906" lat="30.0" lon="-90.0" elev="-99.9"/>
-<station id="28907" lat="30.0" lon="-90.0" elev="-99.9"/>
-<station id="28908" lat="30.0" lon="-90.0" elev="-99.9"/>
-<station id="28909" lat="30.0" lon="-90.0" elev="-99.9"/>
+<station id="28906" lat="30.0" lon="-90.0"/>
+<station id="28907" lat="30.0" lon="-90.0"/>
+<station id="28908" lat="30.0" lon="-90.0"/>
+<station id="28909" lat="30.0" lon="-90.0"/>
 <station id="31001" lat="0.0" lon="-35.0" elev="0.0"/>
 <station id="31002" lat="4.0" lon="-38.0" elev="0.0"/>
 <station id="31003" lat="-8.0" lon="-30.0" elev="0.0"/>
@@ -120,18 +120,18 @@
 <station id="31005" lat="-19.0" lon="-34.0" elev="0.0"/>
 <station id="31006" lat="4.0" lon="-23.0" elev="0.0"/>
 <station id="31007" lat="0.0" lon="-23.0" elev="0.0"/>
-<station id="31051" lat="-25.283" lon="-44.933" elev="-99.9"/>
-<station id="31052" lat="-8.15" lon="-34.567" elev="-99.9"/>
-<station id="31053" lat="-32.595" lon="-51.353" elev="-99.9"/>
+<station id="31051" lat="-25.283" lon="-44.933"/>
+<station id="31052" lat="-8.15" lon="-34.567"/>
+<station id="31053" lat="-32.595" lon="-51.353"/>
 <station id="31201" lat="-27.705" lon="-48.134" elev="0.0"/>
-<station id="31260" lat="-23.031" lon="-43.088" elev="-99.9"/>
-<station id="31261" lat="-31.538" lon="-49.862" elev="-99.9"/>
-<station id="31478" lat="-22.882" lon="-43.132" elev="-99.9"/>
+<station id="31260" lat="-23.031" lon="-43.088"/>
+<station id="31261" lat="-31.538" lon="-49.862"/>
+<station id="31478" lat="-22.882" lon="-43.132"/>
 <station id="32012" lat="-19.425" lon="-85.078" elev="0.0"/>
-<station id="32066" lat="-1.136" lon="-81.765" elev="-99.9"/>
-<station id="32067" lat="0.641" lon="-81.262" elev="-99.9"/>
-<station id="32068" lat="-0.888" lon="-81.664" elev="-99.9"/>
-<station id="32069" lat="0.255" lon="-81.211" elev="-99.9"/>
+<station id="32066" lat="-1.136" lon="-81.765"/>
+<station id="32067" lat="0.641" lon="-81.262"/>
+<station id="32068" lat="-0.888" lon="-81.664"/>
+<station id="32069" lat="0.255" lon="-81.211"/>
 <station id="32301" lat="-9.9" lon="-105.2" elev="0.0"/>
 <station id="32302" lat="-18.0" lon="-85.1" elev="0.0"/>
 <station id="32303" lat="5.0" lon="-95.0" elev="0.0"/>
@@ -146,54 +146,54 @@
 <station id="32321" lat="0.0" lon="-95.0" elev="0.0"/>
 <station id="32322" lat="-2.0" lon="-95.0" elev="0.0"/>
 <station id="32323" lat="0.0" lon="-110.0" elev="0.0"/>
-<station id="32401" lat="-20.474" lon="-73.421" elev="-99.9"/>
-<station id="32402" lat="-26.743" lon="-73.983" elev="-99.9"/>
-<station id="32403" lat="-23.163" lon="-72.037" elev="-99.9"/>
-<station id="32404" lat="-32.123" lon="-73.799" elev="-99.9"/>
-<station id="32411" lat="4.958" lon="-90.868" elev="-99.9"/>
-<station id="32412" lat="-17.984" lon="-86.374" elev="-99.9"/>
-<station id="32413" lat="-7.421" lon="-93.484" elev="-99.9"/>
-<station id="32487" lat="3.517" lon="-77.737" elev="-99.9"/>
-<station id="32488" lat="6.258" lon="-77.511" elev="-99.9"/>
-<station id="32489" lat="2.998" lon="-79.101" elev="-99.9"/>
-<station id="32745" lat="0.0" lon="0.0" elev="-99.9"/>
-<station id="32746" lat="-5.0" lon="-110.0" elev="-99.9"/>
-<station id="32D12" lat="-17.98" lon="-86.33" elev="-99.9"/>
-<station id="32D13" lat="-7.43" lon="-93.48" elev="-99.9"/>
+<station id="32401" lat="-20.474" lon="-73.421"/>
+<station id="32402" lat="-26.743" lon="-73.983"/>
+<station id="32403" lat="-23.163" lon="-72.037"/>
+<station id="32404" lat="-32.123" lon="-73.799"/>
+<station id="32411" lat="4.958" lon="-90.868"/>
+<station id="32412" lat="-17.984" lon="-86.374"/>
+<station id="32413" lat="-7.421" lon="-93.484"/>
+<station id="32487" lat="3.517" lon="-77.737"/>
+<station id="32488" lat="6.258" lon="-77.511"/>
+<station id="32489" lat="2.998" lon="-79.101"/>
+<station id="32745" lat="0.0" lon="0.0"/>
+<station id="32746" lat="-5.0" lon="-110.0"/>
+<station id="32D12" lat="-17.98" lon="-86.33"/>
+<station id="32D13" lat="-7.43" lon="-93.48"/>
 <station id="32ST0" lat="-22.0" lon="-85.0" elev="0.0"/>
-<station id="32d13" lat="-7.43" lon="-93.48" elev="-99.9"/>
+<station id="32d13" lat="-7.43" lon="-93.48"/>
 <station id="32st0" lat="-22.0" lon="-85.0" elev="0.0"/>
 <station id="34002" lat="-55.0" lon="-90.0" elev="0.0"/>
-<station id="34420" lat="-35.758" lon="-75.243" elev="-99.9"/>
+<station id="34420" lat="-35.758" lon="-75.243"/>
 <station id="41001" lat="34.714" lon="-72.248" elev="0.0"/>
 <station id="41002" lat="31.759" lon="-74.936" elev="0.0"/>
-<station id="41003" lat="30.4" lon="-80.1" elev="-99.9"/>
+<station id="41003" lat="30.4" lon="-80.1"/>
 <station id="41004" lat="32.502" lon="-79.099" elev="0.0"/>
-<station id="41005" lat="31.7" lon="-79.7" elev="-99.9"/>
-<station id="41006" lat="29.3" lon="-77.4" elev="-99.9"/>
-<station id="41007" lat="34.2" lon="-76.5" elev="-99.9"/>
+<station id="41005" lat="31.7" lon="-79.7"/>
+<station id="41006" lat="29.3" lon="-77.4"/>
+<station id="41007" lat="34.2" lon="-76.5"/>
 <station id="41008" lat="31.4" lon="-80.866" elev="0.0"/>
 <station id="41009" lat="28.508" lon="-80.185" elev="0.0"/>
 <station id="41010" lat="28.878" lon="-78.485" elev="0.0"/>
-<station id="41011" lat="28.2" lon="-80.1" elev="-99.9"/>
+<station id="41011" lat="28.2" lon="-80.1"/>
 <station id="41012" lat="30.042" lon="-80.534" elev="0.0"/>
 <station id="41013" lat="33.441" lon="-77.764" elev="0.0"/>
-<station id="41015" lat="35.4" lon="-75.3" elev="-99.9"/>
-<station id="41016" lat="24.6" lon="-76.5" elev="-99.9"/>
-<station id="41017" lat="35.4" lon="-75.1" elev="-99.9"/>
-<station id="41018" lat="15.0" lon="-75.0" elev="-99.9"/>
-<station id="41021" lat="31.92" lon="-80.85" elev="-99.9"/>
-<station id="41022" lat="31.89" lon="-80.86" elev="-99.9"/>
-<station id="41023" lat="31.92" lon="-80.93" elev="-99.9"/>
+<station id="41015" lat="35.4" lon="-75.3"/>
+<station id="41016" lat="24.6" lon="-76.5"/>
+<station id="41017" lat="35.4" lon="-75.1"/>
+<station id="41018" lat="15.0" lon="-75.0"/>
+<station id="41021" lat="31.92" lon="-80.85"/>
+<station id="41022" lat="31.89" lon="-80.86"/>
+<station id="41023" lat="31.92" lon="-80.93"/>
 <station id="41024" lat="33.837" lon="-78.477" elev="0.0"/>
 <station id="41025" lat="35.01" lon="-75.454" elev="0.0"/>
 <station id="41026" lat="12.0" lon="-38.0" elev="0.0"/>
-<station id="41027" lat="33.302" lon="-78.137" elev="-99.9"/>
+<station id="41027" lat="33.302" lon="-78.137"/>
 <station id="41029" lat="32.803" lon="-79.624" elev="0.0"/>
-<station id="41030" lat="32.52" lon="-79.34" elev="-99.9"/>
+<station id="41030" lat="32.52" lon="-79.34"/>
 <station id="41033" lat="32.279" lon="-80.406" elev="0.0"/>
 <station id="41035" lat="34.476" lon="-77.28" elev="0.0"/>
-<station id="41036" lat="34.207" lon="-76.949" elev="-99.9"/>
+<station id="41036" lat="34.207" lon="-76.949"/>
 <station id="41037" lat="33.988" lon="-77.362" elev="0.0"/>
 <station id="41038" lat="34.141" lon="-77.715" elev="0.0"/>
 <station id="41040" lat="14.54" lon="-53.329" elev="0.0"/>
@@ -218,11 +218,11 @@
 <station id="41065" lat="32.802" lon="-79.619" elev="0.0"/>
 <station id="41066" lat="32.536" lon="-79.656" elev="0.0"/>
 <station id="41076" lat="32.536" lon="-79.659" elev="0.0"/>
-<station id="41096" lat="16.533" lon="-61.404" elev="-99.9"/>
-<station id="41097" lat="14.48" lon="-61.096" elev="-99.9"/>
-<station id="41098" lat="14.894" lon="-61.113" elev="-99.9"/>
-<station id="41100" lat="15.9" lon="-57.883" elev="-99.9"/>
-<station id="41101" lat="14.6" lon="-56.201" elev="-99.9"/>
+<station id="41096" lat="16.533" lon="-61.404"/>
+<station id="41097" lat="14.48" lon="-61.096"/>
+<station id="41098" lat="14.894" lon="-61.113"/>
+<station id="41100" lat="15.9" lon="-57.883"/>
+<station id="41101" lat="14.6" lon="-56.201"/>
 <station id="41108" lat="33.721" lon="-78.016" elev="0.0"/>
 <station id="41109" lat="34.484" lon="-77.3" elev="0.0"/>
 <station id="41110" lat="34.143" lon="-77.716" elev="0.0"/>
@@ -234,27 +234,27 @@
 <station id="41117" lat="30.0" lon="-81.08" elev="0.0"/>
 <station id="41118" lat="28.609" lon="-80.59" elev="0.0"/>
 <station id="41119" lat="33.842" lon="-78.483" elev="0.0"/>
-<station id="41120" lat="35.259" lon="-75.286" elev="-99.9"/>
+<station id="41120" lat="35.259" lon="-75.286"/>
 <station id="41121" lat="18.49" lon="-66.701" elev="0.0"/>
 <station id="41139" lat="20.0" lon="-38.0" elev="0.0"/>
-<station id="41140" lat="17.769" lon="-64.723" elev="-99.9"/>
-<station id="41141" lat="17.684" lon="-64.635" elev="-99.9"/>
+<station id="41140" lat="17.769" lon="-64.723"/>
+<station id="41141" lat="17.684" lon="-64.635"/>
 <station id="41159" lat="34.213" lon="-76.949" elev="0.0"/>
-<station id="41193" lat="12.351" lon="-72.218" elev="-99.9"/>
-<station id="41194" lat="11.161" lon="-74.681" elev="-99.9"/>
-<station id="41300" lat="15.85" lon="-57.467" elev="-99.9"/>
-<station id="41420" lat="23.349" lon="-67.394" elev="-99.9"/>
-<station id="41421" lat="23.373" lon="-63.902" elev="-99.9"/>
-<station id="41424" lat="33.0" lon="-72.66" elev="-99.9"/>
-<station id="41425" lat="28.667" lon="-65.623" elev="-99.9"/>
-<station id="41554" lat="0.0" lon="0.0" elev="-99.9"/>
-<station id="41670" lat="0.0" lon="0.0" elev="-99.9"/>
-<station id="41852" lat="0.0" lon="0.0" elev="-99.9"/>
-<station id="41904" lat="0.0" lon="0.0" elev="-99.9"/>
-<station id="41933" lat="0.0" lon="0.0" elev="-99.9"/>
-<station id="41A46" lat="23.838" lon="-68.333" elev="-99.9"/>
-<station id="41B41" lat="14.329" lon="-46.082" elev="-99.9"/>
-<station id="41D20" lat="23.508" lon="-67.287" elev="-99.9"/>
+<station id="41193" lat="12.351" lon="-72.218"/>
+<station id="41194" lat="11.161" lon="-74.681"/>
+<station id="41300" lat="15.85" lon="-57.467"/>
+<station id="41420" lat="23.349" lon="-67.394"/>
+<station id="41421" lat="23.373" lon="-63.902"/>
+<station id="41424" lat="33.0" lon="-72.66"/>
+<station id="41425" lat="28.667" lon="-65.623"/>
+<station id="41554" lat="0.0" lon="0.0"/>
+<station id="41670" lat="0.0" lon="0.0"/>
+<station id="41852" lat="0.0" lon="0.0"/>
+<station id="41904" lat="0.0" lon="0.0"/>
+<station id="41933" lat="0.0" lon="0.0"/>
+<station id="41A46" lat="23.838" lon="-68.333"/>
+<station id="41B41" lat="14.329" lon="-46.082"/>
+<station id="41D20" lat="23.508" lon="-67.287"/>
 <station id="41NT0" lat="15.0" lon="-51.0" elev="0.0"/>
 <station id="41S43" lat="21.132" lon="-64.856" elev="0.0"/>
 <station id="41S46" lat="23.866" lon="-68.481" elev="0.0"/>
@@ -262,38 +262,38 @@
 <station id="42001" lat="25.919" lon="-89.674" elev="0.0"/>
 <station id="42002" lat="26.055" lon="-93.646" elev="0.0"/>
 <station id="42003" lat="25.925" lon="-85.616" elev="0.0"/>
-<station id="42004" lat="27.5" lon="-85.5" elev="-99.9"/>
-<station id="42005" lat="30.0" lon="-85.9" elev="-99.9"/>
-<station id="42006" lat="26.5" lon="-96.0" elev="-99.9"/>
+<station id="42004" lat="27.5" lon="-85.5"/>
+<station id="42005" lat="30.0" lon="-85.9"/>
+<station id="42006" lat="26.5" lon="-96.0"/>
 <station id="42007" lat="30.09" lon="-88.769" elev="0.0"/>
-<station id="42008" lat="28.7" lon="-95.3" elev="-99.9"/>
-<station id="42009" lat="29.3" lon="-87.5" elev="-99.9"/>
-<station id="42010" lat="29.7" lon="-93.4" elev="-99.9"/>
-<station id="42011" lat="29.7" lon="-93.5" elev="-99.9"/>
+<station id="42008" lat="28.7" lon="-95.3"/>
+<station id="42009" lat="29.3" lon="-87.5"/>
+<station id="42010" lat="29.7" lon="-93.4"/>
+<station id="42011" lat="29.7" lon="-93.5"/>
 <station id="42012" lat="30.06" lon="-87.548" elev="0.0"/>
 <station id="42013" lat="27.173" lon="-82.924" elev="0.0"/>
 <station id="42014" lat="25.254" lon="-82.22" elev="0.0"/>
-<station id="42015" lat="30.1" lon="-88.2" elev="-99.9"/>
-<station id="42016" lat="30.2" lon="-88.1" elev="-99.9"/>
-<station id="42017" lat="27.9" lon="-90.9" elev="-99.9"/>
-<station id="42018" lat="30.0" lon="-88.2" elev="-99.9"/>
+<station id="42015" lat="30.1" lon="-88.2"/>
+<station id="42016" lat="30.2" lon="-88.1"/>
+<station id="42017" lat="27.9" lon="-90.9"/>
+<station id="42018" lat="30.0" lon="-88.2"/>
 <station id="42019" lat="27.91" lon="-95.345" elev="0.0"/>
 <station id="42020" lat="26.968" lon="-96.693" elev="0.0"/>
 <station id="42021" lat="28.311" lon="-83.306" elev="0.0"/>
 <station id="42022" lat="27.505" lon="-83.741" elev="0.0"/>
 <station id="42023" lat="26.01" lon="-83.086" elev="0.0"/>
 <station id="42024" lat="27.464" lon="-84.219" elev="0.0"/>
-<station id="42025" lat="24.9" lon="-80.4" elev="-99.9"/>
+<station id="42025" lat="24.9" lon="-80.4"/>
 <station id="42026" lat="25.171" lon="-83.475" elev="0.0"/>
 <station id="42031" lat="30.09" lon="-88.212" elev="0.0"/>
 <station id="42035" lat="29.232" lon="-94.413" elev="0.0"/>
 <station id="42036" lat="28.501" lon="-84.508" elev="0.0"/>
 <station id="42037" lat="24.5" lon="-81.4" elev="0.0"/>
-<station id="42038" lat="27.421" lon="-92.555" elev="-99.9"/>
+<station id="42038" lat="27.421" lon="-92.555"/>
 <station id="42039" lat="28.787" lon="-86.007" elev="0.0"/>
 <station id="42040" lat="29.207" lon="-88.237" elev="0.0"/>
 <station id="42041" lat="27.504" lon="-90.462" elev="0.0"/>
-<station id="42042" lat="29.88" lon="-88.32" elev="-99.9"/>
+<station id="42042" lat="29.88" lon="-88.32"/>
 <station id="42043" lat="28.982" lon="-94.899" elev="0.0"/>
 <station id="42044" lat="26.191" lon="-97.051" elev="0.0"/>
 <station id="42045" lat="26.217" lon="-96.5" elev="0.0"/>
@@ -303,8 +303,8 @@
 <station id="42049" lat="28.351" lon="-96.006" elev="0.0"/>
 <station id="42050" lat="28.842" lon="-94.242" elev="0.0"/>
 <station id="42051" lat="29.635" lon="-93.642" elev="0.0"/>
-<station id="42053" lat="29.55" lon="-88.5" elev="-99.9"/>
-<station id="42054" lat="26.0" lon="-87.73" elev="-99.9"/>
+<station id="42053" lat="29.55" lon="-88.5"/>
+<station id="42054" lat="26.0" lon="-87.73"/>
 <station id="42055" lat="22.124" lon="-93.941" elev="0.0"/>
 <station id="42056" lat="19.82" lon="-84.945" elev="0.0"/>
 <station id="42057" lat="16.908" lon="-81.422" elev="0.0"/>
@@ -323,51 +323,51 @@
 <station id="42089" lat="19.699" lon="-80.061" elev="0.0"/>
 <station id="42090" lat="18.432" lon="-69.58" elev="0.0"/>
 <station id="42091" lat="29.087" lon="-92.506" elev="0.0"/>
-<station id="42092" lat="27.774" lon="-96.972" elev="-99.9"/>
+<station id="42092" lat="27.774" lon="-96.972"/>
 <station id="42093" lat="29.017" lon="-89.832" elev="0.0"/>
 <station id="42094" lat="29.085" lon="-89.907" elev="0.0"/>
 <station id="42095" lat="24.407" lon="-81.967" elev="0.0"/>
 <station id="42097" lat="25.701" lon="-83.65" elev="0.0"/>
 <station id="42098" lat="27.59" lon="-82.931" elev="0.0"/>
 <station id="42099" lat="27.349" lon="-84.275" elev="0.0"/>
-<station id="42407" lat="15.229" lon="-68.188" elev="-99.9"/>
-<station id="42408" lat="25.2" lon="-87.0" elev="-99.9"/>
-<station id="42409" lat="22.5276" lon="-94.2819" elev="-99.9"/>
-<station id="42429" lat="27.401" lon="-85.671" elev="-99.9"/>
+<station id="42407" lat="15.229" lon="-68.188"/>
+<station id="42408" lat="25.2" lon="-87.0"/>
+<station id="42409" lat="22.5065" lon="-94.4146"/>
+<station id="42429" lat="27.401" lon="-85.671"/>
 <station id="42501" lat="26.03" lon="-89.56" elev="0.0"/>
 <station id="42503" lat="27.91" lon="-87.94" elev="0.0"/>
-<station id="42534" lat="0.0" lon="0.0" elev="-99.9"/>
+<station id="42534" lat="0.0" lon="0.0"/>
 <station id="43001" lat="8.0" lon="-110.0" elev="0.0"/>
 <station id="43010" lat="10.051" lon="-125.032" elev="0.0"/>
 <station id="43301" lat="8.0" lon="-95.0" elev="0.0"/>
-<station id="43412" lat="16.003" lon="-106.989" elev="-99.9"/>
+<station id="43412" lat="16.003" lon="-106.989"/>
 <station id="43413" lat="10.949" lon="-100.03" elev="0.0"/>
-<station id="44001" lat="38.7" lon="-73.6" elev="-99.9"/>
-<station id="44003" lat="40.8" lon="-68.5" elev="-99.9"/>
+<station id="44001" lat="38.7" lon="-73.6"/>
+<station id="44003" lat="40.8" lon="-68.5"/>
 <station id="44004" lat="38.484" lon="-70.433" elev="0.0"/>
 <station id="44005" lat="43.201" lon="-69.127" elev="0.0"/>
-<station id="44006" lat="36.3" lon="-75.4" elev="-99.9"/>
+<station id="44006" lat="36.3" lon="-75.4"/>
 <station id="44007" lat="43.525" lon="-70.14" elev="0.0"/>
 <station id="44008" lat="40.496" lon="-69.25" elev="0.0"/>
 <station id="44009" lat="38.46" lon="-74.692" elev="0.0"/>
-<station id="44010" lat="36.9" lon="-75.7" elev="-99.9"/>
+<station id="44010" lat="36.9" lon="-75.7"/>
 <station id="44011" lat="41.093" lon="-66.562" elev="0.0"/>
-<station id="44012" lat="38.8" lon="-74.6" elev="-99.9"/>
+<station id="44012" lat="38.8" lon="-74.6"/>
 <station id="44013" lat="42.346" lon="-70.651" elev="0.0"/>
 <station id="44014" lat="36.609" lon="-74.842" elev="0.0"/>
-<station id="44015" lat="37.5" lon="-73.4" elev="-99.9"/>
+<station id="44015" lat="37.5" lon="-73.4"/>
 <station id="44017" lat="40.693" lon="-72.049" elev="0.0"/>
 <station id="44018" lat="42.203" lon="-70.154" elev="0.0"/>
-<station id="44019" lat="36.4" lon="-75.2" elev="-99.9"/>
+<station id="44019" lat="36.4" lon="-75.2"/>
 <station id="44020" lat="41.493" lon="-70.279" elev="0.0"/>
 <station id="44021" lat="43.762" lon="-69.988" elev="0.0"/>
 <station id="44022" lat="40.883" lon="-73.728" elev="0.0"/>
-<station id="44023" lat="37.5" lon="-74.4" elev="-99.9"/>
+<station id="44023" lat="37.5" lon="-74.4"/>
 <station id="44024" lat="42.325" lon="-65.909" elev="0.0"/>
 <station id="44025" lat="40.251" lon="-73.164" elev="0.0"/>
-<station id="44026" lat="36.0" lon="-73.5" elev="-99.9"/>
+<station id="44026" lat="36.0" lon="-73.5"/>
 <station id="44027" lat="44.283" lon="-67.3" elev="0.0"/>
-<station id="44028" lat="41.4" lon="-71.08" elev="-99.9"/>
+<station id="44028" lat="41.4" lon="-71.08"/>
 <station id="44029" lat="42.523" lon="-70.566" elev="0.0"/>
 <station id="44030" lat="43.179" lon="-70.426" elev="0.0"/>
 <station id="44031" lat="43.57" lon="-70.06" elev="0.0"/>
@@ -383,11 +383,11 @@
 <station id="44041" lat="37.211" lon="-76.787" elev="0.0"/>
 <station id="44042" lat="38.033" lon="-76.335" elev="0.0"/>
 <station id="44043" lat="39.152" lon="-76.391" elev="0.0"/>
-<station id="44044" lat="38.389" lon="-76.526" elev="-99.9"/>
-<station id="44052" lat="37.236" lon="-76.399" elev="-99.9"/>
-<station id="44053" lat="37.244" lon="-76.5" elev="-99.9"/>
+<station id="44044" lat="38.389" lon="-76.526"/>
+<station id="44052" lat="37.236" lon="-76.399"/>
+<station id="44053" lat="37.244" lon="-76.5"/>
 <station id="44054" lat="38.883" lon="-75.183" elev="0.0"/>
-<station id="44055" lat="39.122" lon="-75.256" elev="-99.9"/>
+<station id="44055" lat="39.122" lon="-75.256"/>
 <station id="44056" lat="36.2" lon="-75.714" elev="0.0"/>
 <station id="44057" lat="39.54" lon="-76.074" elev="0.0"/>
 <station id="44058" lat="37.567" lon="-76.257" elev="0.0"/>
@@ -399,7 +399,7 @@
 <station id="44064" lat="36.998" lon="-76.087" elev="0.0"/>
 <station id="44065" lat="40.369" lon="-73.703" elev="0.0"/>
 <station id="44066" lat="39.618" lon="-72.644" elev="0.0"/>
-<station id="44067" lat="38.368" lon="-76.996" elev="-99.9"/>
+<station id="44067" lat="38.368" lon="-76.996"/>
 <station id="44068" lat="37.314" lon="-77.191" elev="0.0"/>
 <station id="44069" lat="40.698" lon="-73.087" elev="0.0"/>
 <station id="44070" lat="41.392" lon="-71.004" elev="0.0"/>
@@ -432,13 +432,13 @@
 <station id="44139" lat="44.24" lon="-57.1" elev="0.0"/>
 <station id="44140" lat="42.87" lon="-51.47" elev="0.0"/>
 <station id="44141" lat="42.99" lon="-57.96" elev="0.0"/>
-<station id="44142" lat="42.5" lon="-64.033" elev="-99.9"/>
+<station id="44142" lat="42.5" lon="-64.033"/>
 <station id="44150" lat="42.5" lon="-64.02" elev="0.0"/>
 <station id="44172" lat="44.5" lon="-63.408" elev="0.0"/>
 <station id="44174" lat="49.075" lon="-60.822" elev="0.0"/>
 <station id="44175" lat="46.877" lon="-62.0" elev="0.0"/>
 <station id="44176" lat="47.535" lon="-64.527" elev="0.0"/>
-<station id="44235" lat="47.263" lon="-57.341" elev="-99.9"/>
+<station id="44235" lat="47.263" lon="-57.341"/>
 <station id="44251" lat="46.44" lon="-53.39" elev="0.0"/>
 <station id="44255" lat="47.27" lon="-57.34" elev="0.0"/>
 <station id="44258" lat="44.5" lon="-63.4" elev="0.0"/>
@@ -448,7 +448,7 @@
 <station id="44488" lat="45.44" lon="-60.95" elev="0.0"/>
 <station id="44489" lat="45.49" lon="-61.14" elev="0.0"/>
 <station id="44490" lat="44.66" lon="-66.37" elev="0.0"/>
-<station id="44585" lat="0.0" lon="0.0" elev="-99.9"/>
+<station id="44585" lat="0.0" lon="0.0"/>
 <station id="45001" lat="48.061" lon="-87.793" elev="183.0"/>
 <station id="45002" lat="45.344" lon="-86.411" elev="176.0"/>
 <station id="45003" lat="45.351" lon="-82.84" elev="177.0"/>
@@ -457,9 +457,9 @@
 <station id="45006" lat="47.335" lon="-89.793" elev="183.0"/>
 <station id="45007" lat="42.674" lon="-87.026" elev="176.0"/>
 <station id="45008" lat="44.283" lon="-82.416" elev="177.0"/>
-<station id="45009" lat="41.6" lon="-82.0" elev="-99.9"/>
+<station id="45009" lat="41.6" lon="-82.0"/>
 <station id="45010" lat="43.0" lon="-87.8" elev="177.0"/>
-<station id="45011" lat="43.02" lon="-86.27" elev="-99.9"/>
+<station id="45011" lat="43.02" lon="-86.27"/>
 <station id="45012" lat="43.621" lon="-77.401" elev="74.7"/>
 <station id="45013" lat="43.1" lon="-87.85" elev="176.0"/>
 <station id="45014" lat="44.795" lon="-87.759" elev="176.0"/>
@@ -498,9 +498,9 @@
 <station id="45152" lat="46.23" lon="-79.72" elev="196.0"/>
 <station id="45154" lat="46.05" lon="-82.64" elev="177.0"/>
 <station id="45155" lat="43.59" lon="-79.39" elev="75.0"/>
-<station id="45158" lat="59.0" lon="-94.0" elev="-99.9"/>
+<station id="45158" lat="59.0" lon="-94.0"/>
 <station id="45159" lat="43.77" lon="-78.98" elev="75.0"/>
-<station id="45160" lat="43.417" lon="-79.633" elev="-99.9"/>
+<station id="45160" lat="43.417" lon="-79.633"/>
 <station id="45161" lat="43.182" lon="-86.36" elev="176.0"/>
 <station id="45162" lat="44.988" lon="-83.27" elev="176.0"/>
 <station id="45163" lat="43.985" lon="-83.596" elev="176.0"/>
@@ -544,53 +544,53 @@
 <station id="45209" lat="43.129" lon="-82.391" elev="176.0"/>
 <station id="46001" lat="56.3" lon="-148.018" elev="0.0"/>
 <station id="46002" lat="42.662" lon="-130.507" elev="0.0"/>
-<station id="46003" lat="51.831" lon="-155.85" elev="-99.9"/>
+<station id="46003" lat="51.831" lon="-155.85"/>
 <station id="46004" lat="50.93" lon="-136.1" elev="0.0"/>
 <station id="46005" lat="46.134" lon="-131.079" elev="0.0"/>
 <station id="46006" lat="40.764" lon="-137.377" elev="0.0"/>
-<station id="46007" lat="59.2" lon="-152.7" elev="-99.9"/>
-<station id="46008" lat="57.1" lon="-151.7" elev="-99.9"/>
-<station id="46009" lat="60.2" lon="-146.8" elev="-99.9"/>
-<station id="46010" lat="46.2" lon="-124.2" elev="-99.9"/>
+<station id="46007" lat="59.2" lon="-152.7"/>
+<station id="46008" lat="57.1" lon="-151.7"/>
+<station id="46009" lat="60.2" lon="-146.8"/>
+<station id="46010" lat="46.2" lon="-124.2"/>
 <station id="46011" lat="34.936" lon="-120.998" elev="0.0"/>
 <station id="46012" lat="37.356" lon="-122.881" elev="0.0"/>
 <station id="46013" lat="38.235" lon="-123.317" elev="0.0"/>
 <station id="46014" lat="39.231" lon="-123.974" elev="0.0"/>
 <station id="46015" lat="42.752" lon="-124.844" elev="0.0"/>
-<station id="46016" lat="63.283" lon="-170.3" elev="-99.9"/>
-<station id="46017" lat="60.283" lon="-172.3" elev="-99.9"/>
-<station id="46018" lat="60.283" lon="-177.0" elev="-99.9"/>
-<station id="46019" lat="57.2" lon="-170.3" elev="-99.9"/>
-<station id="46020" lat="55.883" lon="-168.0" elev="-99.9"/>
-<station id="46021" lat="57.7" lon="-160.0" elev="-99.9"/>
+<station id="46016" lat="63.283" lon="-170.3"/>
+<station id="46017" lat="60.283" lon="-172.3"/>
+<station id="46018" lat="60.283" lon="-177.0"/>
+<station id="46019" lat="57.2" lon="-170.3"/>
+<station id="46020" lat="55.883" lon="-168.0"/>
+<station id="46021" lat="57.7" lon="-160.0"/>
 <station id="46022" lat="40.748" lon="-124.527" elev="0.0"/>
 <station id="46023" lat="34.714" lon="-120.967" elev="0.0"/>
-<station id="46024" lat="33.0" lon="-119.2" elev="-99.9"/>
+<station id="46024" lat="33.0" lon="-119.2"/>
 <station id="46025" lat="33.755" lon="-119.045" elev="0.0"/>
 <station id="46026" lat="37.754" lon="-122.839" elev="0.0"/>
 <station id="46027" lat="41.84" lon="-124.382" elev="0.0"/>
 <station id="46028" lat="35.77" lon="-121.903" elev="0.0"/>
 <station id="46029" lat="46.163" lon="-124.487" elev="0.0"/>
-<station id="46030" lat="40.423" lon="-124.525" elev="-99.9"/>
-<station id="46031" lat="55.5" lon="-161.683" elev="-99.9"/>
-<station id="46032" lat="54.2" lon="-165.8" elev="-99.9"/>
-<station id="46033" lat="55.783" lon="-159.8" elev="-99.9"/>
-<station id="46034" lat="55.1" lon="-163.1" elev="-99.9"/>
+<station id="46030" lat="40.423" lon="-124.525"/>
+<station id="46031" lat="55.5" lon="-161.683"/>
+<station id="46032" lat="54.2" lon="-165.8"/>
+<station id="46033" lat="55.783" lon="-159.8"/>
+<station id="46034" lat="55.1" lon="-163.1"/>
 <station id="46035" lat="57.016" lon="-177.703" elev="0.0"/>
 <station id="46036" lat="48.36" lon="-133.94" elev="0.0"/>
-<station id="46037" lat="48.3" lon="-133.8" elev="-99.9"/>
-<station id="46038" lat="41.9" lon="-124.4" elev="-99.9"/>
-<station id="46039" lat="48.2" lon="-123.4" elev="-99.9"/>
-<station id="46040" lat="44.8" lon="-124.3" elev="-99.9"/>
+<station id="46037" lat="48.3" lon="-133.8"/>
+<station id="46038" lat="41.9" lon="-124.4"/>
+<station id="46039" lat="48.2" lon="-123.4"/>
+<station id="46040" lat="44.8" lon="-124.3"/>
 <station id="46041" lat="47.352" lon="-124.739" elev="0.0"/>
 <station id="46042" lat="36.785" lon="-122.396" elev="0.0"/>
-<station id="46043" lat="46.9" lon="-124.2" elev="-99.9"/>
+<station id="46043" lat="46.9" lon="-124.2"/>
 <station id="46044" lat="36.7" lon="-122.378" elev="0.0"/>
-<station id="46045" lat="33.84" lon="-118.45" elev="-99.9"/>
+<station id="46045" lat="33.84" lon="-118.45"/>
 <station id="46047" lat="32.388" lon="-119.525" elev="0.0"/>
-<station id="46048" lat="32.9" lon="-117.9" elev="-99.9"/>
+<station id="46048" lat="32.9" lon="-117.9"/>
 <station id="46050" lat="44.669" lon="-124.546" elev="0.0"/>
-<station id="46051" lat="34.48" lon="-120.69" elev="-99.9"/>
+<station id="46051" lat="34.48" lon="-120.69"/>
 <station id="46053" lat="34.241" lon="-119.839" elev="0.0"/>
 <station id="46054" lat="34.274" lon="-120.468" elev="0.0"/>
 <station id="46059" lat="38.053" lon="-129.967" elev="0.0"/>
@@ -608,7 +608,7 @@
 <station id="46076" lat="59.471" lon="-148.009" elev="0.0"/>
 <station id="46077" lat="57.869" lon="-154.211" elev="0.0"/>
 <station id="46078" lat="55.557" lon="-152.641" elev="0.0"/>
-<station id="46079" lat="59.05" lon="-152.23" elev="-99.9"/>
+<station id="46079" lat="59.05" lon="-152.23"/>
 <station id="46080" lat="57.947" lon="-150.042" elev="0.0"/>
 <station id="46081" lat="60.802" lon="-148.283" elev="0.0"/>
 <station id="46082" lat="59.67" lon="-143.353" elev="0.0"/>
@@ -618,7 +618,7 @@
 <station id="46086" lat="32.499" lon="-118.052" elev="0.0"/>
 <station id="46087" lat="48.493" lon="-124.727" elev="0.0"/>
 <station id="46088" lat="48.332" lon="-123.179" elev="0.0"/>
-<station id="46089" lat="45.936" lon="-125.793" elev="-99.9"/>
+<station id="46089" lat="45.936" lon="-125.793"/>
 <station id="46090" lat="32.876" lon="-120.718" elev="0.0"/>
 <station id="46091" lat="36.835" lon="-121.899" elev="0.0"/>
 <station id="46092" lat="36.751" lon="-122.029" elev="0.0"/>
@@ -631,15 +631,15 @@
 <station id="46100" lat="46.851" lon="-124.964" elev="0.0"/>
 <station id="46105" lat="59.049" lon="-152.233" elev="0.0"/>
 <station id="46106" lat="59.76" lon="-152.09" elev="0.0"/>
-<station id="46107" lat="59.925" lon="-147.992" elev="-99.9"/>
+<station id="46107" lat="59.925" lon="-147.992"/>
 <station id="46108" lat="59.596" lon="-151.829" elev="0.0"/>
-<station id="46109" lat="48.123" lon="-123.395" elev="-99.9"/>
-<station id="46110" lat="48.115" lon="-123.032" elev="-99.9"/>
-<station id="46111" lat="48.131" lon="-122.748" elev="-99.9"/>
-<station id="46112" lat="48.1" lon="-122.73" elev="-99.9"/>
-<station id="46113" lat="47.73" lon="-122.646" elev="-99.9"/>
+<station id="46109" lat="48.123" lon="-123.395"/>
+<station id="46110" lat="48.115" lon="-123.032"/>
+<station id="46111" lat="48.131" lon="-122.748"/>
+<station id="46112" lat="48.1" lon="-122.73"/>
+<station id="46113" lat="47.73" lon="-122.646"/>
 <station id="46114" lat="36.7" lon="-122.343" elev="0.0"/>
-<station id="46115" lat="57.069" lon="-177.75" elev="-99.9"/>
+<station id="46115" lat="57.069" lon="-177.75"/>
 <station id="46116" lat="46.287" lon="-124.016" elev="0.0"/>
 <station id="46117" lat="46.176" lon="-123.869" elev="0.0"/>
 <station id="46118" lat="48.724" lon="-122.576" elev="0.0"/>
@@ -656,7 +656,7 @@
 <station id="46131" lat="49.91" lon="-124.98" elev="0.0"/>
 <station id="46132" lat="49.78" lon="-127.89" elev="0.0"/>
 <station id="46134" lat="48.65" lon="-123.5" elev="0.0"/>
-<station id="46138" lat="52.437" lon="-129.795" elev="-99.9"/>
+<station id="46138" lat="52.437" lon="-129.795"/>
 <station id="46139" lat="48.844" lon="-126.01" elev="0.0"/>
 <station id="46145" lat="54.37" lon="-132.42" elev="0.0"/>
 <station id="46146" lat="49.34" lon="-123.73" elev="0.0"/>
@@ -693,11 +693,11 @@
 <station id="46231" lat="32.747" lon="-117.37" elev="0.0"/>
 <station id="46232" lat="32.517" lon="-117.425" elev="0.0"/>
 <station id="46233" lat="32.936" lon="-117.32" elev="0.0"/>
-<station id="46234" lat="34.1" lon="-119.168" elev="-99.9"/>
-<station id="46235" lat="32.57" lon="-117.169" elev="-99.9"/>
+<station id="46234" lat="34.1" lon="-119.168"/>
+<station id="46235" lat="32.57" lon="-117.169"/>
 <station id="46236" lat="36.76" lon="-121.949" elev="0.0"/>
 <station id="46237" lat="37.788" lon="-122.634" elev="0.0"/>
-<station id="46238" lat="33.76" lon="-119.55" elev="-99.9"/>
+<station id="46238" lat="33.76" lon="-119.55"/>
 <station id="46239" lat="36.335" lon="-122.104" elev="0.0"/>
 <station id="46240" lat="36.626" lon="-121.907" elev="0.0"/>
 <station id="46241" lat="33.003" lon="-117.292" elev="0.0"/>
@@ -729,48 +729,48 @@
 <station id="46267" lat="48.173" lon="-123.607" elev="0.0"/>
 <station id="46268" lat="34.022" lon="-118.578" elev="0.0"/>
 <station id="46269" lat="36.934" lon="-122.034" elev="0.0"/>
-<station id="46270" lat="55.003" lon="175.284" elev="-99.9"/>
+<station id="46270" lat="55.003" lon="175.284"/>
 <station id="46273" lat="32.926" lon="-117.277" elev="0.0"/>
-<station id="46274" lat="33.062" lon="-117.314" elev="-99.9"/>
-<station id="46275" lat="33.29" lon="-117.5" elev="-99.9"/>
-<station id="46290" lat="32.659" lon="-120.63" elev="-99.9"/>
+<station id="46274" lat="33.062" lon="-117.314"/>
+<station id="46275" lat="33.29" lon="-117.5"/>
+<station id="46290" lat="32.659" lon="-120.63"/>
 <station id="46303" lat="49.02" lon="-123.43" elev="0.0"/>
 <station id="46304" lat="49.3" lon="-123.36" elev="0.0"/>
-<station id="46401" lat="46.638" lon="-170.79" elev="-99.9"/>
-<station id="46402" lat="50.983" lon="-163.943" elev="-99.9"/>
-<station id="46403" lat="52.663" lon="-156.778" elev="-99.9"/>
-<station id="46404" lat="45.863" lon="-128.761" elev="-99.9"/>
-<station id="46405" lat="42.903" lon="-130.909" elev="-99.9"/>
-<station id="46406" lat="-8.491" lon="-125.022" elev="-99.9"/>
-<station id="46407" lat="42.715" lon="-128.825" elev="-99.9"/>
-<station id="46408" lat="49.666" lon="-169.876" elev="-99.9"/>
-<station id="46409" lat="55.318" lon="-148.547" elev="-99.9"/>
-<station id="46410" lat="57.644" lon="-143.734" elev="-99.9"/>
-<station id="46411" lat="39.335" lon="-127.07" elev="-99.9"/>
-<station id="46412" lat="32.4" lon="-120.582" elev="-99.9"/>
-<station id="46413" lat="48.045" lon="-173.897" elev="-99.9"/>
-<station id="46414" lat="53.766" lon="-152.416" elev="-99.9"/>
-<station id="46415" lat="53.037" lon="-139.88" elev="-99.9"/>
-<station id="46416" lat="48.7794" lon="-129.869" elev="-99.9"/>
-<station id="46419" lat="48.816" lon="-129.614" elev="-99.9"/>
-<station id="46490" lat="32.455" lon="-120.557" elev="-99.9"/>
-<station id="46518" lat="44.5" lon="-170.0" elev="-99.9"/>
-<station id="46531" lat="0.0" lon="0.0" elev="-99.9"/>
-<station id="46534" lat="0.0" lon="0.0" elev="-99.9"/>
-<station id="46538" lat="0.0" lon="0.0" elev="-99.9"/>
-<station id="46551" lat="0.0" lon="0.0" elev="-99.9"/>
-<station id="46553" lat="0.0" lon="0.0" elev="-99.9"/>
-<station id="46565" lat="0.0" lon="0.0" elev="-99.9"/>
-<station id="46779" lat="0.0" lon="0.0" elev="-99.9"/>
-<station id="46780" lat="0.0" lon="0.0" elev="-99.9"/>
-<station id="46781" lat="0.0" lon="0.0" elev="-99.9"/>
-<station id="46782" lat="0.0" lon="0.0" elev="-99.9"/>
-<station id="46785" lat="0.0" lon="0.0" elev="-99.9"/>
-<station id="46B35" lat="57.069" lon="-177.75" elev="-99.9"/>
-<station id="46D04" lat="45.848" lon="-128.775" elev="-99.9"/>
-<station id="48011" lat="67.582" lon="-164.185" elev="-99.9"/>
+<station id="46401" lat="46.638" lon="-170.79"/>
+<station id="46402" lat="50.983" lon="-163.943"/>
+<station id="46403" lat="52.663" lon="-156.778"/>
+<station id="46404" lat="45.863" lon="-128.761"/>
+<station id="46405" lat="42.903" lon="-130.909"/>
+<station id="46406" lat="-8.491" lon="-125.022"/>
+<station id="46407" lat="42.715" lon="-128.825"/>
+<station id="46408" lat="49.666" lon="-169.876"/>
+<station id="46409" lat="55.318" lon="-148.547"/>
+<station id="46410" lat="57.644" lon="-143.734"/>
+<station id="46411" lat="39.335" lon="-127.07"/>
+<station id="46412" lat="32.4" lon="-120.582"/>
+<station id="46413" lat="48.045" lon="-173.897"/>
+<station id="46414" lat="53.766" lon="-152.416"/>
+<station id="46415" lat="53.037" lon="-139.88"/>
+<station id="46416" lat="48.6827" lon="-129.902"/>
+<station id="46419" lat="48.816" lon="-129.614"/>
+<station id="46490" lat="32.455" lon="-120.557"/>
+<station id="46518" lat="44.5" lon="-170.0"/>
+<station id="46531" lat="0.0" lon="0.0"/>
+<station id="46534" lat="0.0" lon="0.0"/>
+<station id="46538" lat="0.0" lon="0.0"/>
+<station id="46551" lat="0.0" lon="0.0"/>
+<station id="46553" lat="0.0" lon="0.0"/>
+<station id="46565" lat="0.0" lon="0.0"/>
+<station id="46779" lat="0.0" lon="0.0"/>
+<station id="46780" lat="0.0" lon="0.0"/>
+<station id="46781" lat="0.0" lon="0.0"/>
+<station id="46782" lat="0.0" lon="0.0"/>
+<station id="46785" lat="0.0" lon="0.0"/>
+<station id="46B35" lat="57.069" lon="-177.75"/>
+<station id="46D04" lat="45.848" lon="-128.775"/>
+<station id="48011" lat="67.582" lon="-164.185"/>
 <station id="48012" lat="70.025" lon="-166.071" elev="0.0"/>
-<station id="48021" lat="70.35" lon="-133.0" elev="-99.9"/>
+<station id="48021" lat="70.35" lon="-133.0"/>
 <station id="48114" lat="65.011" lon="-169.454" elev="0.0"/>
 <station id="48211" lat="70.37" lon="-146.04" elev="0.0"/>
 <station id="48212" lat="70.874" lon="-150.279" elev="0.0"/>
@@ -779,24 +779,24 @@
 <station id="48215" lat="71.502" lon="-164.133" elev="0.0"/>
 <station id="48216" lat="71.758" lon="-167.952" elev="0.0"/>
 <station id="48400" lat="50.055" lon="-144.873" elev="0.0"/>
-<station id="48677" lat="0.0" lon="0.0" elev="-99.9"/>
-<station id="48678" lat="0.0" lon="0.0" elev="-99.9"/>
-<station id="48679" lat="0.0" lon="0.0" elev="-99.9"/>
-<station id="48680" lat="0.0" lon="0.0" elev="-99.9"/>
-<station id="48900" lat="30.0" lon="-90.0" elev="-99.9"/>
-<station id="48901" lat="30.0" lon="-90.0" elev="-99.9"/>
-<station id="48911" lat="30.0" lon="-90.0" elev="-99.9"/>
-<station id="48912" lat="30.0" lon="-90.0" elev="-99.9"/>
-<station id="48915" lat="30.0" lon="-90.0" elev="-99.9"/>
-<station id="48916" lat="30.0" lon="-90.0" elev="-99.9"/>
-<station id="48917" lat="30.0" lon="-90.0" elev="-99.9"/>
-<station id="48919" lat="30.0" lon="-90.0" elev="-99.9"/>
+<station id="48677" lat="0.0" lon="0.0"/>
+<station id="48678" lat="0.0" lon="0.0"/>
+<station id="48679" lat="0.0" lon="0.0"/>
+<station id="48680" lat="0.0" lon="0.0"/>
+<station id="48900" lat="30.0" lon="-90.0"/>
+<station id="48901" lat="30.0" lon="-90.0"/>
+<station id="48911" lat="30.0" lon="-90.0"/>
+<station id="48912" lat="30.0" lon="-90.0"/>
+<station id="48915" lat="30.0" lon="-90.0"/>
+<station id="48916" lat="30.0" lon="-90.0"/>
+<station id="48917" lat="30.0" lon="-90.0"/>
+<station id="48919" lat="30.0" lon="-90.0"/>
 <station id="51000" lat="23.528" lon="-153.792" elev="0.0"/>
-<station id="51001" lat="24.451" lon="-162.008" elev="-99.9"/>
+<station id="51001" lat="24.451" lon="-162.008"/>
 <station id="51002" lat="17.042" lon="-157.746" elev="0.0"/>
 <station id="51003" lat="19.196" lon="-160.639" elev="0.0"/>
 <station id="51004" lat="17.538" lon="-152.23" elev="0.0"/>
-<station id="51005" lat="20.4" lon="-156.1" elev="-99.9"/>
+<station id="51005" lat="20.4" lon="-156.1"/>
 <station id="51006" lat="9.0" lon="-140.0" elev="0.0"/>
 <station id="51007" lat="5.0" lon="-140.0" elev="0.0"/>
 <station id="51008" lat="2.0" lon="-140.0" elev="0.0"/>
@@ -813,14 +813,14 @@
 <station id="51021" lat="2.0" lon="-155.0" elev="0.0"/>
 <station id="51022" lat="-2.0" lon="-155.0" elev="0.0"/>
 <station id="51023" lat="0.0" lon="-155.0" elev="0.0"/>
-<station id="51026" lat="21.35" lon="-156.93" elev="-99.9"/>
-<station id="51027" lat="20.4" lon="-157.1" elev="-99.9"/>
+<station id="51026" lat="21.35" lon="-156.93"/>
+<station id="51027" lat="20.4" lon="-157.1"/>
 <station id="51028" lat="0.0" lon="-153.913" elev="0.0"/>
 <station id="51045" lat="19.734" lon="-155.082" elev="0.0"/>
 <station id="51046" lat="20.024" lon="-155.828" elev="0.0"/>
 <station id="51100" lat="23.558" lon="-153.9" elev="0.0"/>
 <station id="51101" lat="24.359" lon="-162.081" elev="0.0"/>
-<station id="51200" lat="21.096" lon="-158.303" elev="-99.9"/>
+<station id="51200" lat="21.096" lon="-158.303"/>
 <station id="51201" lat="21.671" lon="-158.117" elev="0.0"/>
 <station id="51202" lat="21.417" lon="-157.68" elev="0.0"/>
 <station id="51203" lat="20.788" lon="-157.01" elev="0.0"/>
@@ -845,11 +845,11 @@
 <station id="51309" lat="8.0" lon="-170.0" elev="0.0"/>
 <station id="51310" lat="-8.0" lon="-170.0" elev="0.0"/>
 <station id="51311" lat="0.0" lon="-140.0" elev="0.0"/>
-<station id="51406" lat="-8.48" lon="-125.027" elev="-99.9"/>
-<station id="51407" lat="19.63" lon="-156.577" elev="-99.9"/>
-<station id="51425" lat="-9.511" lon="-176.258" elev="-99.9"/>
-<station id="51426" lat="-23.11" lon="-168.385" elev="-99.9"/>
-<station id="51542" lat="0.0" lon="0.0" elev="-99.9"/>
+<station id="51406" lat="-8.48" lon="-125.027"/>
+<station id="51407" lat="19.63" lon="-156.577"/>
+<station id="51425" lat="-9.511" lon="-176.258"/>
+<station id="51426" lat="-23.11" lon="-168.385"/>
+<station id="51542" lat="0.0" lon="0.0"/>
 <station id="51WH0" lat="23.0" lon="-158.0" elev="0.0"/>
 <station id="51wh0" lat="23.0" lon="-158.0" elev="0.0"/>
 <station id="52001" lat="2.0" lon="165.0" elev="0.0"/>
@@ -858,7 +858,7 @@
 <station id="52004" lat="-5.0" lon="165.0" elev="0.0"/>
 <station id="52006" lat="8.0" lon="165.0" elev="0.0"/>
 <station id="52007" lat="-8.0" lon="165.0" elev="0.0"/>
-<station id="52009" lat="13.729" lon="-144.668" elev="-99.9"/>
+<station id="52009" lat="13.729" lon="-144.668"/>
 <station id="52200" lat="13.354" lon="144.788" elev="0.0"/>
 <station id="52201" lat="7.083" lon="171.392" elev="0.0"/>
 <station id="52202" lat="13.682" lon="144.806" elev="0.0"/>
@@ -872,60 +872,60 @@
 <station id="52315" lat="8.0" lon="180.0" elev="0.0"/>
 <station id="52316" lat="-8.0" lon="180.0" elev="0.0"/>
 <station id="52321" lat="0.0" lon="165.0" elev="0.0"/>
-<station id="52401" lat="19.285" lon="155.739" elev="-99.9"/>
-<station id="52402" lat="11.93" lon="153.895" elev="-99.9"/>
+<station id="52401" lat="19.285" lon="155.739"/>
+<station id="52402" lat="11.93" lon="153.895"/>
 <station id="52403" lat="4.026" lon="145.616" elev="0.0"/>
-<station id="52404" lat="20.629" lon="132.139" elev="-99.9"/>
-<station id="52405" lat="12.991" lon="132.239" elev="-99.9"/>
-<station id="52406" lat="-5.373" lon="164.99" elev="-99.9"/>
-<station id="52834" lat="0.0" lon="0.0" elev="-99.9"/>
-<station id="52837" lat="0.0" lon="0.0" elev="-99.9"/>
-<station id="52838" lat="0.0" lon="0.0" elev="-99.9"/>
-<station id="52839" lat="0.0" lon="0.0" elev="-99.9"/>
-<station id="52840" lat="0.0" lon="0.0" elev="-99.9"/>
-<station id="52841" lat="0.0" lon="0.0" elev="-99.9"/>
-<station id="52842" lat="0.0" lon="0.0" elev="-99.9"/>
-<station id="52843" lat="0.0" lon="0.0" elev="-99.9"/>
-<station id="52849" lat="0.0" lon="0.0" elev="-99.9"/>
-<station id="52858" lat="0.0" lon="0.0" elev="-99.9"/>
-<station id="52862" lat="0.0" lon="0.0" elev="-99.9"/>
-<station id="52901" lat="0.0" lon="0.0" elev="-99.9"/>
+<station id="52404" lat="20.629" lon="132.139"/>
+<station id="52405" lat="12.991" lon="132.239"/>
+<station id="52406" lat="-5.373" lon="164.99"/>
+<station id="52834" lat="0.0" lon="0.0"/>
+<station id="52837" lat="0.0" lon="0.0"/>
+<station id="52838" lat="0.0" lon="0.0"/>
+<station id="52839" lat="0.0" lon="0.0"/>
+<station id="52840" lat="0.0" lon="0.0"/>
+<station id="52841" lat="0.0" lon="0.0"/>
+<station id="52842" lat="0.0" lon="0.0"/>
+<station id="52843" lat="0.0" lon="0.0"/>
+<station id="52849" lat="0.0" lon="0.0"/>
+<station id="52858" lat="0.0" lon="0.0"/>
+<station id="52862" lat="0.0" lon="0.0"/>
+<station id="52901" lat="0.0" lon="0.0"/>
 <station id="53005" lat="-8.0" lon="81.0" elev="0.0"/>
 <station id="53006" lat="-12.0" lon="81.0" elev="0.0"/>
 <station id="53009" lat="-12.0" lon="93.0" elev="0.0"/>
 <station id="53040" lat="-8.0" lon="95.0" elev="0.0"/>
-<station id="53046" lat="-11.445" lon="113.607" elev="-99.9"/>
+<station id="53046" lat="-11.445" lon="113.607"/>
 <station id="53056" lat="-5.0" lon="95.0" elev="0.0"/>
 <station id="53057" lat="-2.0" lon="90.0" elev="0.0"/>
-<station id="53401" lat="0.05" lon="91.899" elev="-99.9"/>
-<station id="54401" lat="-33.109" lon="-173.155" elev="-99.9"/>
-<station id="55012" lat="-15.664" lon="158.453" elev="-99.9"/>
-<station id="55013" lat="-46.665" lon="161.001" elev="-99.9"/>
-<station id="55015" lat="-46.956" lon="160.343" elev="-99.9"/>
-<station id="55016" lat="-26.0" lon="176.0" elev="-99.9"/>
-<station id="55023" lat="-14.715" lon="153.537" elev="-99.9"/>
-<station id="55039" lat="-38.36" lon="148.11" elev="-99.9"/>
-<station id="55042" lat="-44.79" lon="161.7" elev="-99.9"/>
-<station id="55401" lat="-46.922" lon="160.562" elev="-99.9"/>
-<station id="56001" lat="-14.046" lon="110.028" elev="-99.9"/>
-<station id="56003" lat="-15.019" lon="118.073" elev="-99.9"/>
+<station id="53401" lat="0.05" lon="91.899"/>
+<station id="54401" lat="-33.109" lon="-173.155"/>
+<station id="55012" lat="-15.664" lon="158.453"/>
+<station id="55013" lat="-46.665" lon="161.001"/>
+<station id="55015" lat="-46.956" lon="160.343"/>
+<station id="55016" lat="-26.0" lon="176.0"/>
+<station id="55023" lat="-14.715" lon="153.537"/>
+<station id="55039" lat="-38.36" lon="148.11"/>
+<station id="55042" lat="-44.79" lon="161.7"/>
+<station id="55401" lat="-46.922" lon="160.562"/>
+<station id="56001" lat="-14.046" lon="110.028"/>
+<station id="56003" lat="-15.019" lon="118.073"/>
 <station id="56053" lat="-16.0" lon="81.0" elev="0.0"/>
 <station id="56055" lat="-25.0" lon="100.0" elev="0.0"/>
-<station id="58900" lat="30.0" lon="-90.0" elev="-99.9"/>
-<station id="58904" lat="30.0" lon="-90.0" elev="-99.9"/>
-<station id="58906" lat="30.0" lon="-90.0" elev="-99.9"/>
-<station id="58907" lat="30.0" lon="-90.0" elev="-99.9"/>
-<station id="58908" lat="30.0" lon="-90.0" elev="-99.9"/>
-<station id="58909" lat="30.0" lon="-90.0" elev="-99.9"/>
-<station id="61001" lat="43.4" lon="7.8" elev="-99.9"/>
-<station id="61002" lat="42.102" lon="4.703" elev="-99.9"/>
+<station id="58900" lat="30.0" lon="-90.0"/>
+<station id="58904" lat="30.0" lon="-90.0"/>
+<station id="58906" lat="30.0" lon="-90.0"/>
+<station id="58907" lat="30.0" lon="-90.0"/>
+<station id="58908" lat="30.0" lon="-90.0"/>
+<station id="58909" lat="30.0" lon="-90.0"/>
+<station id="61001" lat="43.4" lon="7.8"/>
+<station id="61002" lat="42.102" lon="4.703"/>
 <station id="62001" lat="45.23" lon="-5.0" elev="0.0"/>
-<station id="62027" lat="49.082" lon="-2.218" elev="-99.9"/>
+<station id="62027" lat="49.082" lon="-2.218"/>
 <station id="62028" lat="50.59" lon="-2.3" elev="0.0"/>
 <station id="62029" lat="48.72" lon="-12.43" elev="0.0"/>
-<station id="62030" lat="50.25" lon="-4.217" elev="-99.9"/>
-<station id="62050" lat="50.0" lon="-4.4" elev="-99.9"/>
-<station id="62052" lat="48.5" lon="-5.6" elev="-99.9"/>
+<station id="62030" lat="50.25" lon="-4.217"/>
+<station id="62050" lat="50.0" lon="-4.4"/>
+<station id="62052" lat="48.5" lon="-5.6"/>
 <station id="62081" lat="51.0" lon="-13.55" elev="0.0"/>
 <station id="62090" lat="53.127" lon="-11.2" elev="0.0"/>
 <station id="62091" lat="53.469" lon="-5.418" elev="0.0"/>
@@ -937,67 +937,67 @@
 <station id="62105" lat="55.41" lon="-11.81" elev="0.0"/>
 <station id="62107" lat="50.102" lon="-6.1" elev="0.0"/>
 <station id="62108" lat="53.5" lon="-19.5" elev="0.0"/>
-<station id="62114" lat="58.3" lon="0.0" elev="-99.9"/>
-<station id="62121" lat="53.5" lon="2.7" elev="-99.9"/>
-<station id="62124" lat="53.6" lon="-3.6" elev="-99.9"/>
-<station id="62125" lat="53.8" lon="-3.5" elev="-99.9"/>
-<station id="62126" lat="53.9" lon="-3.6" elev="-99.9"/>
-<station id="62127" lat="54.0" lon="0.7" elev="-99.9"/>
-<station id="62130" lat="58.7" lon="1.3" elev="-99.9"/>
-<station id="62135" lat="54.2" lon="1.6" elev="-99.9"/>
-<station id="62142" lat="53.0" lon="2.101" elev="-99.9"/>
-<station id="62144" lat="53.4" lon="1.7" elev="-99.9"/>
-<station id="62145" lat="53.102" lon="2.8" elev="-99.9"/>
-<station id="62146" lat="57.2" lon="2.1" elev="-99.9"/>
-<station id="62147" lat="55.7" lon="4.7" elev="-99.9"/>
-<station id="62148" lat="53.6" lon="1.5" elev="-99.9"/>
-<station id="62149" lat="53.7" lon="1.1" elev="-99.9"/>
-<station id="62150" lat="53.6" lon="0.7" elev="-99.9"/>
+<station id="62114" lat="58.3" lon="0.0"/>
+<station id="62121" lat="53.5" lon="2.7"/>
+<station id="62124" lat="53.6" lon="-3.6"/>
+<station id="62125" lat="53.8" lon="-3.5"/>
+<station id="62126" lat="53.9" lon="-3.6"/>
+<station id="62127" lat="54.0" lon="0.7"/>
+<station id="62130" lat="58.7" lon="1.3"/>
+<station id="62135" lat="54.2" lon="1.6"/>
+<station id="62142" lat="53.0" lon="2.101"/>
+<station id="62144" lat="53.4" lon="1.7"/>
+<station id="62145" lat="53.102" lon="2.8"/>
+<station id="62146" lat="57.2" lon="2.1"/>
+<station id="62147" lat="55.7" lon="4.7"/>
+<station id="62148" lat="53.6" lon="1.5"/>
+<station id="62149" lat="53.7" lon="1.1"/>
+<station id="62150" lat="53.6" lon="0.7"/>
 <station id="62163" lat="47.55" lon="-8.47" elev="0.0"/>
-<station id="62164" lat="57.2" lon="0.8" elev="-99.9"/>
-<station id="62165" lat="54.0" lon="1.1" elev="-99.9"/>
-<station id="62166" lat="53.0" lon="2.5" elev="-99.9"/>
-<station id="62170" lat="51.24" lon="2.0" elev="-99.9"/>
-<station id="62298" lat="49.4" lon="-8.6" elev="-99.9"/>
+<station id="62164" lat="57.2" lon="0.8"/>
+<station id="62165" lat="54.0" lon="1.1"/>
+<station id="62166" lat="53.0" lon="2.5"/>
+<station id="62170" lat="51.24" lon="2.0"/>
+<station id="62298" lat="49.4" lon="-8.6"/>
 <station id="62301" lat="52.22" lon="-4.42" elev="0.0"/>
 <station id="62303" lat="51.602" lon="-5.1" elev="0.0"/>
 <station id="62304" lat="51.102" lon="1.8" elev="0.0"/>
 <station id="62305" lat="50.4" lon="0.0" elev="0.0"/>
-<station id="62442" lat="49.0" lon="-16.5" elev="-99.9"/>
-<station id="63105" lat="61.0" lon="1.692" elev="-99.9"/>
-<station id="63110" lat="59.5" lon="1.5" elev="-99.9"/>
-<station id="63112" lat="61.1" lon="1.0" elev="-99.9"/>
-<station id="63113" lat="61.0" lon="1.708" elev="-99.9"/>
-<station id="63115" lat="61.6" lon="1.3" elev="-99.9"/>
-<station id="63117" lat="61.4" lon="1.1" elev="-99.9"/>
+<station id="62442" lat="49.0" lon="-16.5"/>
+<station id="63105" lat="61.0" lon="1.692"/>
+<station id="63110" lat="59.5" lon="1.5"/>
+<station id="63112" lat="61.1" lon="1.0"/>
+<station id="63113" lat="61.0" lon="1.708"/>
+<station id="63115" lat="61.6" lon="1.3"/>
+<station id="63117" lat="61.4" lon="1.1"/>
 <station id="64045" lat="59.15" lon="-11.79" elev="0.0"/>
 <station id="64046" lat="60.483" lon="-4.167" elev="0.0"/>
-<station id="68900" lat="30.0" lon="-90.0" elev="-99.9"/>
-<station id="91204" lat="9.9" lon="139.7" elev="-99.9"/>
-<station id="91222" lat="18.13" lon="145.77" elev="-99.9"/>
-<station id="91251" lat="11.43" lon="162.35" elev="-99.9"/>
-<station id="91328" lat="8.6" lon="149.67" elev="-99.9"/>
-<station id="91338" lat="5.28" lon="153.65" elev="-99.9"/>
-<station id="91343" lat="7.63" lon="155.16" elev="-99.9"/>
-<station id="91352" lat="6.21" lon="160.7" elev="-99.9"/>
-<station id="91355" lat="5.36" lon="162.96" elev="-99.9"/>
-<station id="91356" lat="5.36" lon="162.96" elev="-99.9"/>
-<station id="91365" lat="8.93" lon="165.75" elev="-99.9"/>
-<station id="91374" lat="8.7" lon="171.2" elev="-99.9"/>
-<station id="91377" lat="6.1" lon="172.1" elev="-99.9"/>
-<station id="91411" lat="8.3" lon="137.5" elev="-99.9"/>
-<station id="91442" lat="4.6" lon="168.7" elev="-99.9"/>
+<station id="68900" lat="30.0" lon="-90.0"/>
+<station id="91204" lat="9.9" lon="139.7"/>
+<station id="91222" lat="18.13" lon="145.77"/>
+<station id="91251" lat="11.43" lon="162.35"/>
+<station id="91328" lat="8.6" lon="149.67"/>
+<station id="91338" lat="5.28" lon="153.65"/>
+<station id="91343" lat="7.63" lon="155.16"/>
+<station id="91352" lat="6.21" lon="160.7"/>
+<station id="91355" lat="5.36" lon="162.96"/>
+<station id="91356" lat="5.36" lon="162.96"/>
+<station id="91365" lat="8.93" lon="165.75"/>
+<station id="91374" lat="8.7" lon="171.2"/>
+<station id="91377" lat="6.1" lon="172.1"/>
+<station id="91411" lat="8.3" lon="137.5"/>
+<station id="91442" lat="4.6" lon="168.7"/>
 <station id="AAMC1" lat="37.772" lon="-122.3" elev="3.5"/>
 <station id="ABAN6" lat="44.333" lon="-75.933" elev="76.2"/>
-<station id="ACFS1" lat="32.664" lon="-80.413" elev="-99.9"/>
+<station id="ACFS1" lat="32.664" lon="-80.413"/>
 <station id="ACMN4" lat="39.38" lon="-74.42" elev="0.0"/>
-<station id="ACQS1" lat="32.523" lon="-80.357" elev="-99.9"/>
+<station id="ACQS1" lat="32.523" lon="-80.357"/>
 <station id="ACXS1" lat="32.559" lon="-80.454" elev="0.0"/>
 <station id="ACYN4" lat="39.357" lon="-74.418" elev="8.3"/>
 <station id="ADKA2" lat="51.861" lon="-176.637" elev="5.2"/>
 <station id="AGCM4" lat="42.621" lon="-82.527" elev="177.0"/>
 <station id="AGMW3" lat="44.608" lon="-87.433" elev="179.0"/>
-<station id="AGXC1" lat="33.716" lon="-118.246" elev="-99.9"/>
+<station id="AGXC1" lat="33.716" lon="-118.246"/>
 <station id="AJXA2" lat="58.287" lon="-134.398" elev="4.6"/>
 <station id="AKXA2" lat="54.132" lon="-165.782" elev="6.1"/>
 <station id="ALIA2" lat="56.898" lon="-154.247" elev="4.6"/>
@@ -1010,18 +1010,18 @@
 <station id="ANMF1" lat="27.538" lon="-82.739" elev="0.0"/>
 <station id="ANMN6" lat="42.018" lon="-73.917" elev="9.0"/>
 <station id="ANPT2" lat="27.837" lon="-97.039" elev="10.261"/>
-<station id="ANRN6" lat="42.027" lon="-73.926" elev="-99.9"/>
+<station id="ANRN6" lat="42.027" lon="-73.926"/>
 <station id="ANTA2" lat="61.238" lon="-149.89" elev="7.4"/>
 <station id="ANVC1" lat="38.915" lon="-123.711" elev="7.7"/>
 <station id="APAM2" lat="38.983" lon="-76.479" elev="1.4"/>
 <station id="APCF1" lat="29.724" lon="-84.98" elev="1.9"/>
 <station id="APMA2" lat="61.239" lon="-149.889" elev="5.5"/>
 <station id="APNM4" lat="45.06" lon="-83.424" elev="177.5"/>
-<station id="APQF1" lat="29.786" lon="-84.875" elev="-99.9"/>
+<station id="APQF1" lat="29.786" lon="-84.875"/>
 <station id="APRP7" lat="13.444" lon="144.657" elev="3.3"/>
 <station id="APXA2" lat="59.77" lon="-151.868" elev="5.0"/>
 <station id="APXF1" lat="29.769" lon="-84.881" elev="0.6"/>
-<station id="AROP4" lat="18.48" lon="-66.702" elev="-99.9"/>
+<station id="AROP4" lat="18.48" lon="-66.702"/>
 <station id="ARPF1" lat="28.433" lon="-82.667" elev="0.0"/>
 <station id="ASBO1" lat="41.918" lon="-80.796" elev="177.0"/>
 <station id="ASTO3" lat="46.207" lon="-123.768" elev="3.6"/>
@@ -1030,18 +1030,18 @@
 <station id="AUDP4" lat="18.457" lon="-67.165" elev="2.1"/>
 <station id="AUGA2" lat="59.378" lon="-153.348" elev="9.1"/>
 <station id="AVAN4" lat="39.09" lon="-74.72" elev="0.0"/>
-<station id="AWRT2" lat="28.227" lon="-96.796" elev="-99.9"/>
+<station id="AWRT2" lat="28.227" lon="-96.796"/>
 <station id="BABT2" lat="27.297" lon="-97.405" elev="0.0"/>
 <station id="BARA9" lat="17.591" lon="-61.821" elev="1.3"/>
 <station id="BARN6" lat="42.345" lon="-79.595" elev="174.0"/>
 <station id="BATN6" lat="40.701" lon="-74.014" elev="2.0"/>
-<station id="BAXC1" lat="33.766" lon="-118.24" elev="-99.9"/>
+<station id="BAXC1" lat="33.766" lon="-118.24"/>
 <station id="BBNF1" lat="25.601" lon="-80.306" elev="0.0"/>
 <station id="BBSF1" lat="25.472" lon="-80.349" elev="0.0"/>
 <station id="BDRN4" lat="40.082" lon="-74.87" elev="2.2"/>
-<station id="BDSP1" lat="39.98" lon="-75.079" elev="-99.9"/>
+<station id="BDSP1" lat="39.98" lon="-75.079"/>
 <station id="BDVF1" lat="25.478" lon="-80.989" elev="0.0"/>
-<station id="BDXC1" lat="38.317" lon="-123.071" elev="-99.9"/>
+<station id="BDXC1" lat="38.317" lon="-123.071"/>
 <station id="BEPB6" lat="32.374" lon="-64.701" elev="3.4"/>
 <station id="BEXA2" lat="60.791" lon="-161.749" elev="4.5"/>
 <station id="BFTN7" lat="34.717" lon="-76.671" elev="1.9"/>
@@ -1052,11 +1052,11 @@
 <station id="BHRC3" lat="41.175" lon="-73.185" elev="0.0"/>
 <station id="BHRI3" lat="41.646" lon="-87.147" elev="180.0"/>
 <station id="BIGM4" lat="46.827" lon="-87.727" elev="185.0"/>
-<station id="BILW3" lat="46.722" lon="-92.064" elev="-99.9"/>
+<station id="BILW3" lat="46.722" lon="-92.064"/>
 <station id="BISM2" lat="38.22" lon="-76.039" elev="1.1"/>
 <station id="BKBF1" lat="30.192" lon="-81.692" elev="1.4"/>
 <station id="BKTL1" lat="30.19" lon="-93.301" elev="0.0"/>
-<station id="BKYF1" lat="25.119" lon="-80.834" elev="-99.9"/>
+<station id="BKYF1" lat="25.119" lon="-80.834"/>
 <station id="BLIA2" lat="60.839" lon="-146.884" elev="0.0"/>
 <station id="BLIF1" lat="30.393" lon="-81.523" elev="2.0"/>
 <station id="BLTA2" lat="58.455" lon="-135.889" elev="5.0"/>
@@ -1068,24 +1068,24 @@
 <station id="BPHF1" lat="27.608" lon="-82.571" elev="0.0"/>
 <station id="BRBN4" lat="39.61" lon="-74.2" elev="0.0"/>
 <station id="BRHC3" lat="41.174" lon="-73.181" elev="1.9"/>
-<station id="BRIM2" lat="38.781" lon="-76.714" elev="-99.9"/>
+<station id="BRIM2" lat="38.781" lon="-76.714"/>
 <station id="BRND1" lat="38.987" lon="-75.113" elev="1.9"/>
 <station id="BSBM4" lat="44.055" lon="-86.514" elev="184.0"/>
 <station id="BSCA1" lat="30.329" lon="-87.829" elev="0.0"/>
-<station id="BSKF1" lat="25.266" lon="-81.162" elev="-99.9"/>
+<station id="BSKF1" lat="25.266" lon="-81.162"/>
 <station id="BSLM2" lat="38.781" lon="-76.708" elev="0.3"/>
 <station id="BTHD1" lat="38.537" lon="-75.046" elev="-11.0"/>
 <station id="BUFN6" lat="42.878" lon="-78.89" elev="176.5"/>
 <station id="BURL1" lat="28.905" lon="-89.428" elev="0.0"/>
-<station id="BUSL1" lat="27.883" lon="-90.9" elev="-99.9"/>
+<station id="BUSL1" lat="27.883" lon="-90.9"/>
 <station id="BUZM3" lat="41.397" lon="-71.033" elev="0.0"/>
-<station id="BVQW1" lat="48.496" lon="-122.501" elev="-99.9"/>
+<station id="BVQW1" lat="48.496" lon="-122.501"/>
 <station id="BWSF1" lat="25.178" lon="-80.438" elev="0.0"/>
 <station id="BYGL1" lat="29.789" lon="-90.42" elev="0.0"/>
 <station id="BZBM3" lat="41.524" lon="-70.671" elev="2.5"/>
 <station id="BZST2" lat="26.067" lon="-97.155" elev="10.26"/>
 <station id="C58W3" lat="44.146" lon="-87.563" elev="178.0"/>
-<station id="CAMF1" lat="27.765" lon="-82.649" elev="-99.9"/>
+<station id="CAMF1" lat="27.765" lon="-82.649"/>
 <station id="CAMM2" lat="38.574" lon="-76.069" elev="2.3"/>
 <station id="CANF1" lat="25.422" lon="-80.942" elev="0.0"/>
 <station id="CAPL1" lat="29.768" lon="-93.343" elev="0.0"/>
@@ -1093,37 +1093,37 @@
 <station id="CARO3" lat="43.342" lon="-124.375" elev="18.1"/>
 <station id="CASM1" lat="43.656" lon="-70.246" elev="3.5"/>
 <station id="CBBV2" lat="36.967" lon="-76.114" elev="8.2"/>
-<station id="CBIM2" lat="38.317" lon="-76.451" elev="-99.9"/>
+<station id="CBIM2" lat="38.317" lon="-76.451"/>
 <station id="CBLO1" lat="41.981" lon="-80.556" elev="177.0"/>
 <station id="CBRW3" lat="45.198" lon="-87.36" elev="180.0"/>
-<station id="CCUF1" lat="27.663" lon="-82.618" elev="-99.9"/>
+<station id="CCUF1" lat="27.663" lon="-82.618"/>
 <station id="CDEA2" lat="56.001" lon="-134.136" elev="15.0"/>
 <station id="CDRF1" lat="29.136" lon="-83.029" elev="1.8"/>
 <station id="CDXA2" lat="56.001" lon="-134.136" elev="15.2"/>
 <station id="CECC1" lat="41.746" lon="-124.184" elev="2.9"/>
 <station id="CFWM1" lat="44.657" lon="-67.205" elev="3.8"/>
 <station id="CGCL1" lat="28.791" lon="-89.056" elev="0.0"/>
-<station id="CHAO3" lat="43.351" lon="-124.337" elev="-99.9"/>
+<station id="CHAO3" lat="43.351" lon="-124.337"/>
 <station id="CHAV3" lat="18.335" lon="-64.92" elev="1.1"/>
-<station id="CHBV2" lat="37.032" lon="-76.083" elev="-99.9"/>
+<station id="CHBV2" lat="37.032" lon="-76.083"/>
 <station id="CHCM2" lat="39.527" lon="-75.81" elev="1.8"/>
 <station id="CHDS1" lat="33.661" lon="-82.199" elev="116.1"/>
 <station id="CHII2" lat="41.916" lon="-87.572" elev="176.0"/>
 <station id="CHLV2" lat="36.905" lon="-75.713" elev="0.0"/>
 <station id="CHNO3" lat="43.345" lon="-124.329" elev="14.57"/>
-<station id="CHQO3" lat="43.282" lon="-124.32" elev="-99.9"/>
+<station id="CHQO3" lat="43.282" lon="-124.32"/>
 <station id="CHSV3" lat="17.748" lon="-64.699" elev="1.3"/>
 <station id="CHTM3" lat="41.688" lon="-69.95" elev="3.8"/>
 <station id="CHTS1" lat="32.781" lon="-79.924" elev="2.6"/>
-<station id="CHYV2" lat="36.926" lon="-76.007" elev="-99.9"/>
+<station id="CHYV2" lat="36.926" lon="-76.007"/>
 <station id="CHYW1" lat="48.863" lon="-122.759" elev="7.6"/>
 <station id="CLBF1" lat="27.736" lon="-82.686" elev="0.0"/>
 <station id="CLBP4" lat="18.301" lon="-65.302" elev="1.0"/>
 <station id="CLKN7" lat="34.622" lon="-76.525" elev="4.6"/>
-<station id="CLLT2" lat="29.563" lon="-95.067" elev="-99.9"/>
+<station id="CLLT2" lat="29.563" lon="-95.067"/>
 <station id="CLSM4" lat="42.471" lon="-82.877" elev="175.0"/>
 <station id="CMAN4" lat="38.968" lon="-74.96" elev="3.2"/>
-<station id="CMLN3" lat="43.07" lon="-70.7" elev="-99.9"/>
+<station id="CMLN3" lat="43.07" lon="-70.7"/>
 <station id="CMPO1" lat="41.547" lon="-83.015" elev="175.0"/>
 <station id="CMTI2" lat="41.73" lon="-87.538" elev="178.5"/>
 <station id="CNBF1" lat="25.702" lon="-81.186" elev="0.0"/>
@@ -1137,7 +1137,7 @@
 <station id="CPVM2" lat="38.995" lon="-76.388" elev="3.4"/>
 <station id="CPXA2" lat="53.843" lon="-166.583" elev="5.0"/>
 <station id="CPXC1" lat="35.17" lon="-120.741" elev="0.0"/>
-<station id="CQUC1" lat="38.066" lon="-122.23" elev="-99.9"/>
+<station id="CQUC1" lat="38.066" lon="-122.23"/>
 <station id="CRGA2" lat="55.474" lon="-133.136" elev="28.9"/>
 <station id="CRTA1" lat="30.308" lon="-88.14" elev="0.0"/>
 <station id="CRVA2" lat="60.558" lon="-145.752" elev="4.6"/>
@@ -1146,17 +1146,17 @@
 <station id="CSPA2" lat="58.199" lon="-136.64" elev="25.0"/>
 <station id="CSXA2" lat="58.199" lon="-136.641" elev="22.0"/>
 <station id="CTGM1" lat="44.642" lon="-67.297" elev="4.9"/>
-<station id="CVQV2" lat="37.571" lon="-76.884" elev="-99.9"/>
+<station id="CVQV2" lat="37.571" lon="-76.884"/>
 <station id="CWAF1" lat="25.297" lon="-81.013" elev="0.0"/>
 <station id="CWBF1" lat="27.978" lon="-82.832" elev="1.3"/>
 <station id="CWCI" lat="47.334" lon="-85.833" elev="163.0"/>
-<station id="CWQO3" lat="43.338" lon="-124.321" elev="-99.9"/>
-<station id="CWQT2" lat="28.132" lon="-97.034" elev="-99.9"/>
+<station id="CWQO3" lat="43.338" lon="-124.321"/>
+<station id="CWQT2" lat="28.132" lon="-97.034"/>
 <station id="CYGM4" lat="45.658" lon="-84.464" elev="178.0"/>
 <station id="DBLN6" lat="42.494" lon="-79.354" elev="182.9"/>
-<station id="DBQS1" lat="33.36" lon="-79.167" elev="-99.9"/>
+<station id="DBQS1" lat="33.36" lon="-79.167"/>
 <station id="DELD1" lat="39.582" lon="-75.589" elev="2.3"/>
-<station id="DEQD1" lat="39.114" lon="-75.499" elev="-99.9"/>
+<station id="DEQD1" lat="39.114" lon="-75.499"/>
 <station id="DESW1" lat="47.675" lon="-124.485" elev="21.3"/>
 <station id="DHXA2" lat="70.222" lon="-148.419" elev="15.0"/>
 <station id="DILA1" lat="30.25" lon="-88.075" elev="7.1"/>
@@ -1165,8 +1165,8 @@
 <station id="DKKF1" lat="25.18" lon="-80.49" elev="0.0"/>
 <station id="DMBC1" lat="37.507" lon="-122.117" elev="0.0"/>
 <station id="DMNO3" lat="46.226" lon="-123.955" elev="0.0"/>
-<station id="DMSF1" lat="30.387" lon="-81.559" elev="-99.9"/>
-<station id="DOMV2" lat="36.962" lon="-76.424" elev="-99.9"/>
+<station id="DMSF1" lat="30.387" lon="-81.559"/>
+<station id="DOMV2" lat="36.962" lon="-76.424"/>
 <station id="DPHA1" lat="30.251" lon="-88.078" elev="0.0"/>
 <station id="DPIA1" lat="30.25" lon="-88.075" elev="0.0"/>
 <station id="DPLA2" lat="53.884" lon="-166.531" elev="4.6"/>
@@ -1181,47 +1181,47 @@
 <station id="DUCN7" lat="36.184" lon="-75.745" elev="0.0"/>
 <station id="DUKN7" lat="36.184" lon="-75.746" elev="7.7"/>
 <station id="DULM5" lat="46.776" lon="-92.092" elev="186.0"/>
-<station id="EAZC1" lat="36.846" lon="-121.754" elev="-99.9"/>
-<station id="EB01" lat="36.5" lon="-73.5" elev="-99.9"/>
-<station id="EB10" lat="27.5" lon="-88.0" elev="-99.9"/>
-<station id="EB31" lat="27.0" lon="-86.0" elev="-99.9"/>
-<station id="EB32" lat="27.0" lon="-84.3" elev="-99.9"/>
-<station id="EB33" lat="58.5" lon="-141.0" elev="-99.9"/>
-<station id="EB35" lat="55.3" lon="-157.0" elev="-99.9"/>
-<station id="EB36" lat="26.0" lon="-84.8" elev="-99.9"/>
-<station id="EB43" lat="59.8" lon="-142.0" elev="-99.9"/>
-<station id="EB52" lat="38.4" lon="-74.3" elev="-99.9"/>
-<station id="EB53" lat="28.9" lon="-88.3" elev="-99.9"/>
-<station id="EB61" lat="26.9" lon="-84.6" elev="-99.9"/>
-<station id="EB62" lat="29.0" lon="-85.6" elev="-99.9"/>
-<station id="EB70" lat="59.5" lon="-142.3" elev="-99.9"/>
-<station id="EB90" lat="47.0" lon="-130.9" elev="-99.9"/>
-<station id="EB91" lat="38.4" lon="-74.3" elev="-99.9"/>
-<station id="EB92" lat="28.5" lon="-90.0" elev="-99.9"/>
+<station id="EAZC1" lat="36.846" lon="-121.754"/>
+<station id="EB01" lat="36.5" lon="-73.5"/>
+<station id="EB10" lat="27.5" lon="-88.0"/>
+<station id="EB31" lat="27.0" lon="-86.0"/>
+<station id="EB32" lat="27.0" lon="-84.3"/>
+<station id="EB33" lat="58.5" lon="-141.0"/>
+<station id="EB35" lat="55.3" lon="-157.0"/>
+<station id="EB36" lat="26.0" lon="-84.8"/>
+<station id="EB43" lat="59.8" lon="-142.0"/>
+<station id="EB52" lat="38.4" lon="-74.3"/>
+<station id="EB53" lat="28.9" lon="-88.3"/>
+<station id="EB61" lat="26.9" lon="-84.6"/>
+<station id="EB62" lat="29.0" lon="-85.6"/>
+<station id="EB70" lat="59.5" lon="-142.3"/>
+<station id="EB90" lat="47.0" lon="-130.9"/>
+<station id="EB91" lat="38.4" lon="-74.3"/>
+<station id="EB92" lat="28.5" lon="-90.0"/>
 <station id="EBEF1" lat="27.923" lon="-82.421" elev="-0.5"/>
 <station id="EBSW1" lat="47.602" lon="-122.338" elev="3.8"/>
 <station id="EFLA1" lat="30.429" lon="-88.01" elev="4.3"/>
 <station id="EGKF1" lat="27.601" lon="-82.759" elev="0.0"/>
-<station id="EHSC1" lat="36.835" lon="-121.738" elev="-99.9"/>
+<station id="EHSC1" lat="36.835" lon="-121.738"/>
 <station id="EINL1" lat="29.373" lon="-91.384" elev="6.0"/>
-<station id="ELFA2" lat="58.193" lon="-136.347" elev="-99.9"/>
-<station id="ELQC1" lat="36.818" lon="-121.739" elev="-99.9"/>
+<station id="ELFA2" lat="58.193" lon="-136.347"/>
+<station id="ELQC1" lat="36.818" lon="-121.739"/>
 <station id="ELXC1" lat="36.815" lon="-121.738" elev="15.85"/>
 <station id="EMAT2" lat="28.71" lon="-95.914" elev="0.9"/>
 <station id="EPTT2" lat="29.481" lon="-94.917" elev="2.3"/>
 <station id="EREP1" lat="42.172" lon="-80.098" elev="177.0"/>
-<station id="ERKC1" lat="40.778" lon="-124.196" elev="-99.9"/>
+<station id="ERKC1" lat="40.778" lon="-124.196"/>
 <station id="EROA2" lat="58.971" lon="-135.221" elev="17.0"/>
-<station id="ERTF1" lat="27.92" lon="-82.442" elev="-99.9"/>
+<station id="ERTF1" lat="27.92" lon="-82.442"/>
 <station id="ERXA2" lat="58.971" lon="-135.221" elev="16.8"/>
 <station id="ESPP4" lat="18.094" lon="-65.471" elev="2.0"/>
-<station id="EVMC1" lat="36.811" lon="-121.779" elev="-99.9"/>
+<station id="EVMC1" lat="36.811" lon="-121.779"/>
 <station id="FAIO1" lat="41.764" lon="-81.281" elev="176.4"/>
-<station id="FARP2" lat="8.583" lon="144.583" elev="-99.9"/>
+<station id="FARP2" lat="8.583" lon="144.583"/>
 <station id="FBIS1" lat="32.685" lon="-79.888" elev="3.0"/>
-<station id="FBPS1" lat="32.652" lon="-79.938" elev="-99.9"/>
+<station id="FBPS1" lat="32.652" lon="-79.938"/>
 <station id="FCGT2" lat="28.943" lon="-95.302" elev="3.2"/>
-<station id="FFFC1" lat="38.195" lon="-122.033" elev="-99.9"/>
+<station id="FFFC1" lat="38.195" lon="-122.033"/>
 <station id="FFIA2" lat="57.272" lon="-133.63" elev="6.7"/>
 <station id="FGBL1" lat="28.118" lon="-93.67" elev="22.9"/>
 <station id="FHPF1" lat="28.153" lon="-82.801" elev="0.0"/>
@@ -1233,16 +1233,16 @@
 <station id="FPSN7" lat="33.485" lon="-77.59" elev="0.0"/>
 <station id="FPST2" lat="28.936" lon="-95.294" elev="0.0"/>
 <station id="FPTM4" lat="45.619" lon="-86.66" elev="184.0"/>
-<station id="FPTT2" lat="28.948" lon="-95.308" elev="-99.9"/>
-<station id="FPXC1" lat="37.807" lon="-122.466" elev="-99.9"/>
-<station id="FRCB6" lat="32.37" lon="-64.695" elev="-99.9"/>
+<station id="FPTT2" lat="28.948" lon="-95.308"/>
+<station id="FPXC1" lat="37.807" lon="-122.466"/>
+<station id="FRCB6" lat="32.37" lon="-64.695"/>
 <station id="FRDF1" lat="30.675" lon="-81.465" elev="2.2"/>
-<station id="FRDP4" lat="18.335" lon="-65.631" elev="-99.9"/>
+<station id="FRDP4" lat="18.335" lon="-65.631"/>
 <station id="FRDW1" lat="48.545" lon="-123.012" elev="6.1"/>
 <station id="FREL1" lat="30.106" lon="-90.422" elev="4.0"/>
 <station id="FRFN7" lat="36.19" lon="-75.739" elev="-11.4"/>
-<station id="FRKF1" lat="27.591" lon="-82.552" elev="-99.9"/>
-<station id="FRPS1" lat="32.34" lon="-80.46" elev="-99.9"/>
+<station id="FRKF1" lat="27.591" lon="-82.552"/>
+<station id="FRPS1" lat="32.34" lon="-80.46"/>
 <station id="FRVM3" lat="41.704" lon="-71.164" elev="2.3"/>
 <station id="FRWL1" lat="29.552" lon="-92.305" elev="2.1"/>
 <station id="FRXM3" lat="41.696" lon="-71.18" elev="2.1"/>
@@ -1253,53 +1253,53 @@
 <station id="FTPC1" lat="37.806" lon="-122.466" elev="2.7"/>
 <station id="FWIC3" lat="41.15" lon="-73.172" elev="0.0"/>
 <station id="FWYF1" lat="25.591" lon="-80.097" elev="0.0"/>
-<station id="GBCL1" lat="27.8" lon="-93.1" elev="-99.9"/>
-<station id="GBHM6" lat="30.418" lon="-88.405" elev="-99.9"/>
+<station id="GBCL1" lat="27.8" lon="-93.1"/>
+<station id="GBHM6" lat="30.418" lon="-88.405"/>
 <station id="GBIF1" lat="25.378" lon="-81.029" elev="0.0"/>
 <station id="GBLW3" lat="44.653" lon="-87.901" elev="176.0"/>
-<station id="GBQN3" lat="43.134" lon="-70.911" elev="-99.9"/>
-<station id="GBRM6" lat="30.413" lon="-88.403" elev="-99.9"/>
+<station id="GBQN3" lat="43.134" lon="-70.911"/>
+<station id="GBRM6" lat="30.413" lon="-88.403"/>
 <station id="GBTF1" lat="25.167" lon="-80.801" elev="0.0"/>
-<station id="GBWW3" lat="44.538" lon="-88.003" elev="-99.9"/>
+<station id="GBWW3" lat="44.538" lon="-88.003"/>
 <station id="GBXA2" lat="63.777" lon="-171.715" elev="10.0"/>
 <station id="GCTF1" lat="27.774" lon="-82.517" elev="0.0"/>
 <station id="GCVF1" lat="29.982" lon="-81.634" elev="1.4"/>
 <station id="GDIL1" lat="29.267" lon="-89.957" elev="1.8"/>
-<station id="GDIV2" lat="37.222" lon="-76.404" elev="-99.9"/>
+<station id="GDIV2" lat="37.222" lon="-76.404"/>
 <station id="GDMM5" lat="47.749" lon="-90.341" elev="185.2"/>
-<station id="GDQM6" lat="30.357" lon="-88.463" elev="-99.9"/>
-<station id="GDWV2" lat="37.216" lon="-76.393" elev="-99.9"/>
+<station id="GDQM6" lat="30.357" lon="-88.463"/>
+<station id="GDWV2" lat="37.216" lon="-76.393"/>
 <station id="GDXM6" lat="30.359" lon="-88.42" elev="0.0"/>
 <station id="GELO1" lat="41.859" lon="-80.975" elev="177.0"/>
 <station id="GEXA2" lat="58.213" lon="-136.381" elev="11.0"/>
-<station id="GGGC1" lat="38.016" lon="-122.509" elev="-99.9"/>
+<station id="GGGC1" lat="38.016" lon="-122.509"/>
 <station id="GISL1" lat="29.265" lon="-89.958" elev="2.7"/>
 <station id="GIXA2" lat="55.446" lon="-131.881" elev="8.8"/>
-<station id="GKYF1" lat="24.627" lon="-82.872" elev="-99.9"/>
-<station id="GLLN6" lat="43.89" lon="-76.45" elev="-99.9"/>
-<station id="GLPT2" lat="29.3" lon="-94.794" elev="-99.9"/>
+<station id="GKYF1" lat="24.627" lon="-82.872"/>
+<station id="GLLN6" lat="43.89" lon="-76.45"/>
+<station id="GLPT2" lat="29.3" lon="-94.794"/>
 <station id="GNJT2" lat="29.357" lon="-94.725" elev="0.0"/>
-<station id="GOM01" lat="24.899" lon="-83.868" elev="-99.9"/>
-<station id="GPOM6" lat="30.23" lon="-88.982" elev="-99.9"/>
-<station id="GPST2" lat="29.285" lon="-94.788" elev="-99.9"/>
+<station id="GOM01" lat="24.899" lon="-83.868"/>
+<station id="GPOM6" lat="30.23" lon="-88.982"/>
+<station id="GPST2" lat="29.285" lon="-94.788"/>
 <station id="GPTW1" lat="46.273" lon="-123.767" elev="0.0"/>
 <station id="GPXA2" lat="58.062" lon="-134.051" elev="12.0"/>
-<station id="GRBL1" lat="29.101" lon="-89.978" elev="-99.9"/>
+<station id="GRBL1" lat="29.101" lon="-89.978"/>
 <station id="GRIM4" lat="46.721" lon="-87.412" elev="199.0"/>
 <station id="GRMM4" lat="46.684" lon="-85.972" elev="186.0"/>
-<station id="GRRT2" lat="29.302" lon="-94.896" elev="-99.9"/>
+<station id="GRRT2" lat="29.302" lon="-94.896"/>
 <station id="GSLM4" lat="44.018" lon="-83.537" elev="179.0"/>
 <station id="GTBM4" lat="44.767" lon="-85.607" elev="176.0"/>
 <station id="GTLM4" lat="45.211" lon="-85.55" elev="176.0"/>
 <station id="GTOT2" lat="29.311" lon="-94.792" elev="4.8"/>
-<station id="GTQF1" lat="29.667" lon="-81.257" elev="-99.9"/>
+<station id="GTQF1" lat="29.667" lon="-81.257"/>
 <station id="GTRM4" lat="47.179" lon="-88.241" elev="190.0"/>
 <station id="GTXF1" lat="29.658" lon="-81.233" elev="1.3"/>
 <station id="GUXA2" lat="58.408" lon="-135.726" elev="7.0"/>
-<station id="GWPM6" lat="30.348" lon="-89.087" elev="-99.9"/>
+<station id="GWPM6" lat="30.348" lon="-89.087"/>
 <station id="HAXA2" lat="59.234" lon="-135.442" elev="7.6"/>
-<station id="HBMN6" lat="41.314" lon="-73.985" elev="-99.9"/>
-<station id="HBXC1" lat="40.777" lon="-124.197" elev="-99.9"/>
+<station id="HBMN6" lat="41.314" lon="-73.985"/>
+<station id="HBXC1" lat="40.777" lon="-124.197"/>
 <station id="HBYC1" lat="40.767" lon="-124.217" elev="7.6"/>
 <station id="HCEF1" lat="25.254" lon="-80.444" elev="0.0"/>
 <station id="HCGN7" lat="35.209" lon="-75.704" elev="1.9"/>
@@ -1307,16 +1307,16 @@
 <station id="HIST2" lat="29.595" lon="-94.39" elev="0.0"/>
 <station id="HIVT2" lat="27.844" lon="-97.07" elev="1.925"/>
 <station id="HLNM4" lat="42.773" lon="-86.213" elev="178.7"/>
-<station id="HMDO3" lat="46.204" lon="-123.951" elev="-99.9"/>
-<station id="HMNO3" lat="46.203" lon="-123.952" elev="-99.9"/>
+<station id="HMDO3" lat="46.204" lon="-123.951"/>
+<station id="HMNO3" lat="46.203" lon="-123.952"/>
 <station id="HMRA2" lat="59.601" lon="-151.41" elev="12.9"/>
 <station id="HMSA2" lat="59.602" lon="-151.417" elev="15.0"/>
-<station id="HPLM2" lat="38.59" lon="-76.133" elev="-99.9"/>
+<station id="HPLM2" lat="38.59" lon="-76.133"/>
 <station id="HRBM4" lat="43.846" lon="-82.643" elev="178.2"/>
-<station id="HREF1" lat="25.424" lon="-81.06" elev="-99.9"/>
+<station id="HREF1" lat="25.424" lon="-81.06"/>
 <station id="HRVC1" lat="34.469" lon="-120.682" elev="0.0"/>
 <station id="HSSF1" lat="28.772" lon="-82.707" elev="0.0"/>
-<station id="HUQN6" lat="42.036" lon="-73.925" elev="-99.9"/>
+<station id="HUQN6" lat="42.036" lon="-73.925"/>
 <station id="ICAC1" lat="34.008" lon="-118.5" elev="6.6"/>
 <station id="ICYA2" lat="59.923" lon="-141.359" elev="15.0"/>
 <station id="IIWC1" lat="32.714" lon="-117.177" elev="0.0"/>
@@ -1328,85 +1328,85 @@
 <station id="ITKA2" lat="57.052" lon="-135.342" elev="3.8"/>
 <station id="JAKI2" lat="41.781" lon="-87.573" elev="179.0"/>
 <station id="JBYF1" lat="25.224" lon="-80.541" elev="0.0"/>
-<station id="JCQN4" lat="39.548" lon="-74.461" elev="-99.9"/>
+<station id="JCQN4" lat="39.548" lon="-74.461"/>
 <station id="JCRN4" lat="39.535" lon="-74.464" elev="0.9"/>
-<station id="JCTN4" lat="39.508" lon="-74.338" elev="-99.9"/>
+<station id="JCTN4" lat="39.508" lon="-74.338"/>
 <station id="JKYF1" lat="25.053" lon="-80.904" elev="0.0"/>
 <station id="JLXA2" lat="58.298" lon="-134.405" elev="4.6"/>
 <station id="JMLA2" lat="58.286" lon="-134.39" elev="5.5"/>
 <station id="JMPN7" lat="34.213" lon="-77.786" elev="7.4"/>
 <station id="JNEA2" lat="58.298" lon="-134.411" elev="5.4"/>
 <station id="JNGA2" lat="58.291" lon="-134.394" elev="4.6"/>
-<station id="JOBP4" lat="17.944" lon="-66.238" elev="-99.9"/>
-<station id="JOQP4" lat="17.93" lon="-66.211" elev="-99.9"/>
+<station id="JOBP4" lat="17.944" lon="-66.238"/>
+<station id="JOQP4" lat="17.93" lon="-66.211"/>
 <station id="JOXP4" lat="17.956" lon="-66.223" elev="9.0"/>
 <station id="JPRN7" lat="35.912" lon="-75.587" elev="0.0"/>
 <station id="JTAW1" lat="46.266" lon="-124.038" elev="0.0"/>
 <station id="JXUF1" lat="30.354" lon="-81.612" elev="3.0"/>
 <station id="KATA1" lat="30.258" lon="-88.213" elev="0.0"/>
-<station id="KATP" lat="27.195" lon="-90.027" elev="-99.9"/>
-<station id="KBBF" lat="28.058" lon="-95.872" elev="-99.9"/>
-<station id="KBMG1" lat="30.777" lon="-81.487" elev="-99.9"/>
-<station id="KBQX" lat="28.314" lon="-95.62" elev="-99.9"/>
-<station id="KCHA2" lat="59.602" lon="-151.409" elev="-99.9"/>
-<station id="KCMB" lat="29.441" lon="-92.979" elev="-99.9"/>
-<station id="KCRH" lat="28.909" lon="-93.302" elev="-99.9"/>
-<station id="KCVW" lat="29.784" lon="-93.3" elev="-99.9"/>
+<station id="KATP" lat="27.195" lon="-90.027"/>
+<station id="KBBF" lat="28.058" lon="-95.872"/>
+<station id="KBMG1" lat="30.777" lon="-81.487"/>
+<station id="KBQX" lat="28.314" lon="-95.62"/>
+<station id="KCHA2" lat="59.602" lon="-151.409"/>
+<station id="KCMB" lat="29.441" lon="-92.979"/>
+<station id="KCRH" lat="28.909" lon="-93.302"/>
+<station id="KCVW" lat="29.784" lon="-93.3"/>
 <station id="KCXA2" lat="55.566" lon="-162.326" elev="20.0"/>
 <station id="KDAA2" lat="57.731" lon="-152.511" elev="4.8"/>
-<station id="KDLP" lat="29.121" lon="-89.547" elev="-99.9"/>
+<station id="KDLP" lat="29.121" lon="-89.547"/>
 <station id="KECA2" lat="55.331" lon="-131.625" elev="4.6"/>
-<station id="KEHC" lat="28.429" lon="-92.878" elev="-99.9"/>
-<station id="KEIR" lat="28.634" lon="-91.489" elev="-99.9"/>
-<station id="KEMK" lat="27.819" lon="-94.323" elev="-99.9"/>
+<station id="KEHC" lat="28.429" lon="-92.878"/>
+<station id="KEIR" lat="28.634" lon="-91.489"/>
+<station id="KEMK" lat="27.819" lon="-94.323"/>
 <station id="KEXA2" lat="55.352" lon="-131.684" elev="3.7"/>
-<station id="KGBK" lat="27.204" lon="-92.203" elev="-99.9"/>
+<station id="KGBK" lat="27.204" lon="-92.203"/>
 <station id="KGCA2" lat="55.062" lon="-162.327" elev="3.6"/>
-<station id="KGHB" lat="27.84" lon="-91.988" elev="-99.9"/>
+<station id="KGHB" lat="27.84" lon="-91.988"/>
 <station id="KGNA" lat="47.745" lon="-90.346" elev="185.0"/>
-<station id="KGRY" lat="27.625" lon="-90.441" elev="-99.9"/>
-<station id="KGUL" lat="27.304" lon="-93.538" elev="-99.9"/>
-<station id="KGVX" lat="28.577" lon="-94.976" elev="-99.9"/>
+<station id="KGRY" lat="27.625" lon="-90.441"/>
+<station id="KGUL" lat="27.304" lon="-93.538"/>
+<station id="KGVX" lat="28.577" lon="-94.976"/>
 <station id="KGXA2" lat="57.777" lon="-152.425" elev="15.0"/>
-<station id="KHHV" lat="26.939" lon="-94.689" elev="-99.9"/>
-<station id="KHQI" lat="27.934" lon="-93.669" elev="-99.9"/>
-<station id="KIKT" lat="28.521" lon="-88.289" elev="-99.9"/>
-<station id="KIPN" lat="28.085" lon="-87.986" elev="-99.9"/>
+<station id="KHHV" lat="26.939" lon="-94.689"/>
+<station id="KHQI" lat="27.934" lon="-93.669"/>
+<station id="KIKT" lat="28.521" lon="-88.289"/>
+<station id="KIPN" lat="28.085" lon="-87.986"/>
 <station id="KLIH1" lat="20.895" lon="-156.469" elev="2.7"/>
-<station id="KMDJ" lat="28.643" lon="-89.794" elev="-99.9"/>
-<station id="KMIS" lat="29.296" lon="-88.842" elev="-99.9"/>
-<station id="KMIU" lat="27.289" lon="-96.736" elev="-99.9"/>
+<station id="KMDJ" lat="28.643" lon="-89.794"/>
+<station id="KMIS" lat="29.296" lon="-88.842"/>
+<station id="KMIU" lat="27.289" lon="-96.736"/>
 <station id="KMXA2" lat="57.782" lon="-152.439" elev="10.0"/>
-<station id="KMYT" lat="28.221" lon="-89.615" elev="-99.9"/>
-<station id="KMZG" lat="27.727" lon="-96.191" elev="-99.9"/>
-<station id="KNOH1" lat="21.288" lon="-157.865" elev="-99.9"/>
+<station id="KMYT" lat="28.221" lon="-89.615"/>
+<station id="KMZG" lat="27.727" lon="-96.191"/>
+<station id="KNOH1" lat="21.288" lon="-157.865"/>
 <station id="KNSW3" lat="42.589" lon="-87.809" elev="176.0"/>
 <station id="KNXA2" lat="60.552" lon="-151.274" elev="3.7"/>
-<station id="KOPM" lat="26.833" lon="-96.94" elev="-99.9"/>
+<station id="KOPM" lat="26.833" lon="-96.94"/>
 <station id="KOZA2" lat="66.901" lon="-162.589" elev="6.0"/>
-<station id="KP53" lat="46.417" lon="-86.65" elev="-99.9"/>
+<station id="KP53" lat="46.417" lon="-86.65"/>
 <station id="KP58" lat="44.017" lon="-82.8" elev="179.0"/>
-<station id="KP59" lat="47.467" lon="-87.883" elev="-99.9"/>
+<station id="KP59" lat="47.467" lon="-87.883"/>
 <station id="KPTN6" lat="40.811" lon="-73.765" elev="2.1"/>
 <station id="KPTV2" lat="37.165" lon="-75.988" elev="2.6"/>
-<station id="KSCF" lat="29.116" lon="-91.871" elev="-99.9"/>
-<station id="KSPR" lat="28.599" lon="-91.206" elev="-99.9"/>
-<station id="KSQE" lat="28.083" lon="-90.819" elev="-99.9"/>
-<station id="KSTZ" lat="28.16" lon="-90.666" elev="-99.9"/>
+<station id="KSCF" lat="29.116" lon="-91.871"/>
+<station id="KSPR" lat="28.599" lon="-91.206"/>
+<station id="KSQE" lat="28.083" lon="-90.819"/>
+<station id="KSTZ" lat="28.16" lon="-90.666"/>
 <station id="KTNF1" lat="29.819" lon="-83.594" elev="1.8"/>
-<station id="KVAF" lat="27.354" lon="-94.625" elev="-99.9"/>
-<station id="KVBS" lat="29.478" lon="-93.638" elev="-99.9"/>
-<station id="KVKY" lat="29.248" lon="-88.441" elev="-99.9"/>
-<station id="KVNP" lat="29.467" lon="-92.368" elev="-99.9"/>
-<station id="KVOA" lat="29.229" lon="-87.781" elev="-99.9"/>
-<station id="KVQT" lat="28.27" lon="-92.264" elev="-99.9"/>
+<station id="KVAF" lat="27.354" lon="-94.625"/>
+<station id="KVBS" lat="29.478" lon="-93.638"/>
+<station id="KVKY" lat="29.248" lon="-88.441"/>
+<station id="KVNP" lat="29.467" lon="-92.368"/>
+<station id="KVOA" lat="29.229" lon="-87.781"/>
+<station id="KVQT" lat="28.27" lon="-92.264"/>
 <station id="KWHH1" lat="20.037" lon="-155.829" elev="2.3"/>
 <station id="KWJP8" lat="8.732" lon="167.734" elev="1.8"/>
 <station id="KWNW3" lat="44.465" lon="-87.496" elev="179.3"/>
-<station id="KXIH" lat="29.18" lon="-94.521" elev="-99.9"/>
-<station id="KXPY" lat="29.123" lon="-90.202" elev="-99.9"/>
+<station id="KXIH" lat="29.18" lon="-94.521"/>
+<station id="KXPY" lat="29.123" lon="-90.202"/>
 <station id="KYWF1" lat="24.556" lon="-81.808" elev="2.2"/>
-<station id="LABL1" lat="30.05" lon="-90.368" elev="-99.9"/>
+<station id="LABL1" lat="30.05" lon="-90.368"/>
 <station id="LAMV3" lat="18.318" lon="-64.724" elev="1.1"/>
 <station id="LAPW1" lat="47.913" lon="-124.637" elev="3.1"/>
 <station id="LBRF1" lat="25.484" lon="-81.133" elev="0.0"/>
@@ -1421,20 +1421,20 @@
 <station id="LJPC1" lat="32.867" lon="-117.257" elev="0.0"/>
 <station id="LKPL1" lat="30.315" lon="-90.281" elev="0.0"/>
 <station id="LKWF1" lat="26.613" lon="-80.034" elev="5.9"/>
-<station id="LLBP7" lat="15.157" lon="145.77" elev="-99.9"/>
-<station id="LMBV4" lat="19.594" lon="-96.379" elev="-99.9"/>
+<station id="LLBP7" lat="15.157" lon="145.77"/>
+<station id="LMBV4" lat="19.594" lon="-96.379"/>
 <station id="LMDF1" lat="25.176" lon="-80.633" elev="0.0"/>
 <station id="LMFS1" lat="34.107" lon="-81.271" elev="107.9"/>
 <station id="LMRF1" lat="25.556" lon="-81.169" elev="0.0"/>
 <station id="LMSS1" lat="33.552" lon="-80.501" elev="23.16"/>
 <station id="LNDC1" lat="37.795" lon="-122.281" elev="3.0"/>
-<station id="LNEL1" lat="28.2" lon="-89.1" elev="-99.9"/>
+<station id="LNEL1" lat="28.2" lon="-89.1"/>
 <station id="LONF1" lat="24.844" lon="-80.864" elev="0.0"/>
 <station id="LOPL1" lat="28.885" lon="-90.025" elev="0.0"/>
 <station id="LOPW1" lat="46.106" lon="-122.954" elev="7.9"/>
 <station id="LORO1" lat="41.481" lon="-82.195" elev="192.6"/>
 <station id="LPNM4" lat="45.063" lon="-83.429" elev="177.9"/>
-<station id="LPOI1" lat="48.06" lon="-116.5" elev="-99.9"/>
+<station id="LPOI1" lat="48.06" lon="-116.5"/>
 <station id="LPRP4" lat="17.939" lon="-67.052" elev="0.0"/>
 <station id="LPWA2" lat="56.388" lon="-134.637" elev="2.5"/>
 <station id="LQAT2" lat="27.881" lon="-97.285" elev="8.626"/>
@@ -1445,7 +1445,7 @@
 <station id="LSNF1" lat="25.235" lon="-80.457" elev="0.0"/>
 <station id="LTBV3" lat="17.695" lon="-64.754" elev="3.1"/>
 <station id="LTJF1" lat="30.379" lon="-81.446" elev="4.892"/>
-<station id="LTQM2" lat="39.451" lon="-76.275" elev="-99.9"/>
+<station id="LTQM2" lat="39.451" lon="-76.275"/>
 <station id="LTRM4" lat="46.486" lon="-84.302" elev="178.6"/>
 <station id="LUIT2" lat="29.076" lon="-95.122" elev="0.0"/>
 <station id="LUML1" lat="29.255" lon="-90.664" elev="1.0"/>
@@ -1453,7 +1453,7 @@
 <station id="LWTV2" lat="37.995" lon="-76.465" elev="2.0"/>
 <station id="LYBT2" lat="29.765" lon="-95.079" elev="0.0"/>
 <station id="MACM4" lat="45.777" lon="-84.721" elev="179.5"/>
-<station id="MAQT2" lat="27.98" lon="-97.029" elev="-99.9"/>
+<station id="MAQT2" lat="27.98" lon="-97.029"/>
 <station id="MAXT2" lat="28.132" lon="-97.034" elev="3.5"/>
 <station id="MBET2" lat="28.422" lon="-96.327" elev="0.0"/>
 <station id="MBIN7" lat="34.091" lon="-77.868" elev="2.8"/>
@@ -1461,7 +1461,7 @@
 <station id="MBNN7" lat="34.171" lon="-77.824" elev="2.2"/>
 <station id="MBPA1" lat="30.527" lon="-88.086" elev="3.4"/>
 <station id="MBRM4" lat="42.975" lon="-82.419" elev="178.6"/>
-<station id="MBXC1" lat="35.371" lon="-120.859" elev="-99.9"/>
+<station id="MBXC1" lat="35.371" lon="-120.859"/>
 <station id="MCGA1" lat="30.649" lon="-88.058" elev="2.2"/>
 <station id="MCGM4" lat="46.546" lon="-87.379" elev="186.5"/>
 <station id="MCYF1" lat="27.914" lon="-82.425" elev="0.0"/>
@@ -1473,7 +1473,7 @@
 <station id="MGIP4" lat="17.97" lon="-67.046" elev="0.9"/>
 <station id="MGPT2" lat="29.682" lon="-94.985" elev="4.3"/>
 <station id="MGZP4" lat="18.218" lon="-67.159" elev="3.1"/>
-<station id="MHBT2" lat="27.828" lon="-97.201" elev="-99.9"/>
+<station id="MHBT2" lat="27.828" lon="-97.201"/>
 <station id="MHPA1" lat="30.667" lon="-87.936" elev="0.0"/>
 <station id="MHRN6" lat="40.641" lon="-74.162" elev="2.6"/>
 <station id="MISC3" lat="41.074" lon="-73.134" elev="0.0"/>
@@ -1485,14 +1485,14 @@
 <station id="MKGM4" lat="43.227" lon="-86.339" elev="179.3"/>
 <station id="MLRF1" lat="25.012" lon="-80.376" elev="0.0"/>
 <station id="MLSC1" lat="36.802" lon="-121.791" elev="3.05"/>
-<station id="MLTO3" lat="46.214" lon="-123.62" elev="-99.9"/>
+<station id="MLTO3" lat="46.214" lon="-123.62"/>
 <station id="MLWW3" lat="43.005" lon="-87.884" elev="178.0"/>
 <station id="MNBF1" lat="25.239" lon="-80.422" elev="0.0"/>
 <station id="MNMM4" lat="45.096" lon="-87.59" elev="178.7"/>
 <station id="MNPV2" lat="36.778" lon="-76.302" elev="2.9"/>
-<station id="MOKH1" lat="21.433" lon="-157.79" elev="-99.9"/>
-<station id="MPCL1" lat="29.4" lon="-88.6" elev="-99.9"/>
-<station id="MQMT2" lat="28.138" lon="-96.829" elev="-99.9"/>
+<station id="MOKH1" lat="21.433" lon="-157.79"/>
+<station id="MPCL1" lat="29.4" lon="-88.6"/>
+<station id="MQMT2" lat="28.138" lon="-96.829"/>
 <station id="MQTT2" lat="27.581" lon="-97.217" elev="4.8"/>
 <station id="MRCP1" lat="39.809" lon="-75.415" elev="2.4"/>
 <station id="MRHO1" lat="41.544" lon="-82.731" elev="176.0"/>
@@ -1501,36 +1501,36 @@
 <station id="MROS1" lat="33.656" lon="-78.916" elev="4.1"/>
 <station id="MRSL1" lat="29.441" lon="-92.061" elev="0.0"/>
 <station id="MRYA2" lat="55.099" lon="-131.182" elev="4.0"/>
-<station id="MSG10" lat="28.184" lon="-83.956" elev="-99.9"/>
-<station id="MSG12" lat="26.006" lon="-83.991" elev="-99.9"/>
-<station id="MSG14" lat="27.487" lon="-83.987" elev="-99.9"/>
+<station id="MSG10" lat="28.184" lon="-83.956"/>
+<station id="MSG12" lat="26.006" lon="-83.991"/>
+<station id="MSG14" lat="27.487" lon="-83.987"/>
 <station id="MTBF1" lat="27.661" lon="-82.594" elev="0.0"/>
 <station id="MTKN6" lat="41.048" lon="-71.959" elev="2.1"/>
 <station id="MTYC1" lat="36.605" lon="-121.889" elev="2.4"/>
 <station id="MUKF1" lat="25.106" lon="-80.942" elev="0.0"/>
 <station id="MVXA2" lat="58.364" lon="-134.606" elev="7.6"/>
-<station id="MWQT2" lat="27.838" lon="-97.05" elev="-99.9"/>
+<station id="MWQT2" lat="27.838" lon="-97.05"/>
 <station id="MXXA2" lat="58.301" lon="-134.425" elev="5.2"/>
 <station id="MYPF1" lat="30.398" lon="-81.428" elev="5.5"/>
-<station id="MYXC1" lat="36.605" lon="-121.889" elev="-99.9"/>
+<station id="MYXC1" lat="36.605" lon="-121.889"/>
 <station id="MZXC1" lat="38.035" lon="-122.125" elev="4.1"/>
 <station id="NABM4" lat="46.087" lon="-85.444" elev="178.0"/>
-<station id="NAQR1" lat="41.578" lon="-71.321" elev="-99.9"/>
+<station id="NAQR1" lat="41.578" lon="-71.321"/>
 <station id="NAXR1" lat="41.637" lon="-71.339" elev="7.2"/>
 <station id="NBBA3" lat="36.087" lon="-114.728" elev="328.574"/>
 <station id="NBLP1" lat="40.137" lon="-74.752" elev="4.3"/>
 <station id="NCDV2" lat="38.32" lon="-77.037" elev="5.494"/>
-<station id="NCHT2" lat="29.726" lon="-95.266" elev="-99.9"/>
+<station id="NCHT2" lat="29.726" lon="-95.266"/>
 <station id="NCSC3" lat="41.099" lon="-73.147" elev="0.0"/>
 <station id="NEAW1" lat="48.367" lon="-124.614" elev="3.2"/>
 <station id="NFBF1" lat="25.084" lon="-81.096" elev="0.0"/>
 <station id="NFDF1" lat="30.4" lon="-81.627" elev="3.0"/>
 <station id="NGLT2" lat="27.822" lon="-97.204" elev="0.0"/>
 <station id="NIAN6" lat="43.077" lon="-79.014" elev="181.8"/>
-<station id="NIQS1" lat="33.349" lon="-79.189" elev="-99.9"/>
+<station id="NIQS1" lat="33.349" lon="-79.189"/>
 <station id="NIWS1" lat="33.349" lon="-79.189" elev="0.0"/>
 <station id="NJLC1" lat="40.769" lon="-124.239" elev="7.6"/>
-<station id="NKLA2" lat="52.972" lon="-168.855" elev="-99.9"/>
+<station id="NKLA2" lat="52.972" lon="-168.855"/>
 <station id="NKTA2" lat="60.683" lon="-151.399" elev="7.9"/>
 <station id="NKXA2" lat="58.255" lon="-134.945" elev="12.2"/>
 <station id="NLEC1" lat="37.696" lon="-122.192" elev="0.0"/>
@@ -1539,15 +1539,15 @@
 <station id="NLXA2" lat="56.005" lon="-161.177" elev="11.0"/>
 <station id="NMTA2" lat="64.5" lon="-165.43" elev="4.9"/>
 <station id="NMXA2" lat="64.494" lon="-165.44" elev="7.0"/>
-<station id="NOQN7" lat="34.156" lon="-77.85" elev="-99.9"/>
+<station id="NOQN7" lat="34.156" lon="-77.85"/>
 <station id="NOSC3" lat="41.125" lon="-73.159" elev="0.0"/>
 <station id="NOXN7" lat="34.155" lon="-77.851" elev="4.88"/>
 <station id="NPDW3" lat="45.291" lon="-86.977" elev="178.0"/>
-<station id="NPQN6" lat="41.832" lon="-73.942" elev="-99.9"/>
+<station id="NPQN6" lat="41.832" lon="-73.942"/>
 <station id="NPSF1" lat="26.132" lon="-81.807" elev="3.1"/>
 <station id="NPXN6" lat="41.831" lon="-73.942" elev="0.0"/>
 <station id="NREP1" lat="42.258" lon="-79.792" elev="183.0"/>
-<station id="NRRF1" lat="25.338" lon="-80.911" elev="-99.9"/>
+<station id="NRRF1" lat="25.338" lon="-80.911"/>
 <station id="NSTP6" lat="-14.28" lon="-170.688" elev="1.8"/>
 <station id="NSXA2" lat="60.74" lon="-151.311" elev="47.6"/>
 <station id="NTBC1" lat="34.405" lon="-119.692" elev="2.6"/>
@@ -1557,39 +1557,39 @@
 <station id="NWHC3" lat="41.283" lon="-72.908" elev="3.0"/>
 <station id="NWPO3" lat="44.613" lon="-124.067" elev="9.1"/>
 <station id="NWPR1" lat="41.504" lon="-71.326" elev="2.2"/>
-<station id="NWST2" lat="27.75" lon="-96.768" elev="-99.9"/>
+<station id="NWST2" lat="27.75" lon="-96.768"/>
 <station id="NWWH1" lat="21.954" lon="-159.353" elev="1.5"/>
 <station id="OBGN6" lat="44.702" lon="-75.494" elev="76.0"/>
 <station id="OBLA1" lat="30.705" lon="-88.04" elev="3.0"/>
 <station id="OBXC1" lat="37.804" lon="-122.341" elev="1.9"/>
 <station id="OCGN4" lat="40.209" lon="-74.004" elev="5.0"/>
 <station id="OCIM2" lat="38.328" lon="-75.091" elev="2.0"/>
-<station id="OCPN7" lat="33.911" lon="-78.147" elev="-99.9"/>
+<station id="OCPN7" lat="33.911" lon="-78.147"/>
 <station id="OCSM2" lat="38.338" lon="-75.07" elev="-11.0"/>
 <station id="OFPN6" lat="40.973" lon="-73.083" elev="0.0"/>
-<station id="OHBC1" lat="33.72" lon="-118.273" elev="-99.9"/>
+<station id="OHBC1" lat="33.72" lon="-118.273"/>
 <station id="OKSI2" lat="41.912" lon="-87.624" elev="179.0"/>
-<station id="OKXC1" lat="37.811" lon="-122.333" elev="-99.9"/>
+<station id="OKXC1" lat="37.811" lon="-122.333"/>
 <station id="OLCN6" lat="43.341" lon="-78.719" elev="75.0"/>
 <station id="OLSA2" lat="52.94" lon="-168.87" elev="16.6"/>
-<station id="OMHC1" lat="37.801" lon="-122.33" elev="-99.9"/>
+<station id="OMHC1" lat="37.801" lon="-122.33"/>
 <station id="OOUH1" lat="21.303" lon="-157.865" elev="1.6"/>
 <station id="OPTF1" lat="27.858" lon="-82.553" elev="11.1"/>
 <station id="ORIN7" lat="35.796" lon="-75.548" elev="0.8"/>
 <station id="OSGN6" lat="43.464" lon="-76.511" elev="78.0"/>
 <station id="OTNM4" lat="46.87" lon="-89.33" elev="186.0"/>
 <station id="OVIA2" lat="59.44" lon="-151.72" elev="0.0"/>
-<station id="OWDO1" lat="41.365" lon="-82.505" elev="-99.9"/>
+<station id="OWDO1" lat="41.365" lon="-82.505"/>
 <station id="OWMO1" lat="41.247" lon="-82.454" elev="270.3"/>
-<station id="OWQO1" lat="41.382" lon="-82.514" elev="-99.9"/>
-<station id="OWSO1" lat="41.383" lon="-82.514" elev="-99.9"/>
+<station id="OWQO1" lat="41.382" lon="-82.514"/>
+<station id="OWSO1" lat="41.383" lon="-82.514"/>
 <station id="OWXO1" lat="41.378" lon="-82.508" elev="184.1"/>
 <station id="PACF1" lat="30.152" lon="-85.667" elev="2.1"/>
 <station id="PACT2" lat="27.634" lon="-97.237" elev="0.0"/>
 <station id="PAUA2" lat="57.124" lon="-170.271" elev="20.0"/>
 <station id="PAXA2" lat="58.159" lon="-134.178" elev="13.7"/>
 <station id="PBFW1" lat="48.464" lon="-122.469" elev="1.83"/>
-<station id="PBLW1" lat="48.556" lon="-122.53" elev="-99.9"/>
+<station id="PBLW1" lat="48.556" lon="-122.53"/>
 <station id="PBPA2" lat="58.203" lon="-134.148" elev="3.0"/>
 <station id="PCBF1" lat="30.213" lon="-85.88" elev="7.9"/>
 <station id="PCGT2" lat="26.072" lon="-97.167" elev="0.0"/>
@@ -1598,11 +1598,11 @@
 <station id="PCNT2" lat="28.446" lon="-96.396" elev="0.0"/>
 <station id="PCOC1" lat="38.056" lon="-122.039" elev="2.8"/>
 <station id="PCXA2" lat="57.463" lon="-134.867" elev="5.0"/>
-<station id="PDVR1" lat="41.611" lon="-71.41" elev="-99.9"/>
-<station id="PEGF1" lat="26.086" lon="-80.116" elev="-99.9"/>
+<station id="PDVR1" lat="41.611" lon="-71.41"/>
+<station id="PEGF1" lat="26.086" lon="-80.116"/>
 <station id="PEXA2" lat="57.958" lon="-136.227" elev="6.0"/>
-<station id="PFDC1" lat="33.735" lon="-118.241" elev="-99.9"/>
-<station id="PFXC1" lat="33.747" lon="-118.215" elev="-99.9"/>
+<station id="PFDC1" lat="33.735" lon="-118.241"/>
+<station id="PFXC1" lat="33.747" lon="-118.215"/>
 <station id="PGBP7" lat="13.428" lon="144.796" elev="12.8"/>
 <station id="PGXA2" lat="57.016" lon="-134.618" elev="6.1"/>
 <station id="PHBP1" lat="39.933" lon="-75.142" elev="3.5"/>
@@ -1612,7 +1612,7 @@
 <station id="PKBW3" lat="46.672" lon="-92.136" elev="189.0"/>
 <station id="PKYF1" lat="24.918" lon="-80.747" elev="0.0"/>
 <station id="PLSF1" lat="24.693" lon="-82.773" elev="0.0"/>
-<station id="PLSP4" lat="17.973" lon="-66.762" elev="-99.9"/>
+<station id="PLSP4" lat="17.973" lon="-66.762"/>
 <station id="PLXA2" lat="56.247" lon="-134.647" elev="3.8"/>
 <station id="PMAF1" lat="27.638" lon="-82.562" elev="2.4"/>
 <station id="PMNT2" lat="26.559" lon="-97.424" elev="0.0"/>
@@ -1624,14 +1624,14 @@
 <station id="PORT2" lat="29.867" lon="-93.931" elev="0.0"/>
 <station id="POTA2" lat="61.06" lon="-146.7" elev="7.0"/>
 <station id="PPTA1" lat="30.279" lon="-87.556" elev="0.0"/>
-<station id="PPTM2" lat="38.134" lon="-76.533" elev="-99.9"/>
+<station id="PPTM2" lat="38.134" lon="-76.533"/>
 <station id="PPXA2" lat="60.801" lon="-148.357" elev="5.0"/>
-<station id="PPXC1" lat="37.906" lon="-122.365" elev="-99.9"/>
+<station id="PPXC1" lat="37.906" lon="-122.365"/>
 <station id="PRDA2" lat="70.4" lon="-148.527" elev="0.0"/>
 <station id="PRIM4" lat="45.357" lon="-83.492" elev="184.0"/>
-<station id="PRJC1" lat="33.733" lon="-118.186" elev="-99.9"/>
+<station id="PRJC1" lat="33.733" lon="-118.186"/>
 <station id="PRTA2" lat="58.411" lon="-134.955" elev="30.0"/>
-<station id="PRTO3" lat="45.518" lon="-122.669" elev="-99.9"/>
+<station id="PRTO3" lat="45.518" lon="-122.669"/>
 <station id="PRUR1" lat="41.605" lon="-71.304" elev="1.7"/>
 <station id="PRYC1" lat="37.996" lon="-122.977" elev="0.0"/>
 <station id="PSBC1" lat="38.04" lon="-121.887" elev="0.0"/>
@@ -1640,11 +1640,11 @@
 <station id="PSLC1" lat="35.169" lon="-120.754" elev="0.0"/>
 <station id="PSTL1" lat="28.932" lon="-89.407" elev="3.6"/>
 <station id="PSTN6" lat="42.691" lon="-79.048" elev="179.18"/>
-<station id="PSXC1" lat="33.768" lon="-118.226" elev="-99.9"/>
+<station id="PSXC1" lat="33.768" lon="-118.226"/>
 <station id="PTAC1" lat="38.955" lon="-123.741" elev="17.4"/>
 <station id="PTAT2" lat="27.826" lon="-97.051" elev="0.0"/>
 <station id="PTAW1" lat="48.125" lon="-123.441" elev="3.8"/>
-<station id="PTBM6" lat="30.213" lon="-88.505" elev="-99.9"/>
+<station id="PTBM6" lat="30.213" lon="-88.505"/>
 <station id="PTCR1" lat="41.638" lon="-71.34" elev="12.0"/>
 <station id="PTGC1" lat="34.577" lon="-120.648" elev="32.3"/>
 <station id="PTIM4" lat="46.485" lon="-84.631" elev="185.0"/>
@@ -1653,12 +1653,12 @@
 <station id="PTLA2" lat="58.346" lon="-134.752" elev="3.0"/>
 <station id="PTOA1" lat="30.671" lon="-88.031" elev="4.3"/>
 <station id="PTRF1" lat="28.285" lon="-82.733" elev="0.0"/>
-<station id="PTRP4" lat="18.367" lon="-67.251" elev="-99.9"/>
+<station id="PTRP4" lat="18.367" lon="-67.251"/>
 <station id="PTWW1" lat="48.111" lon="-122.76" elev="5.1"/>
 <station id="PVDR1" lat="41.786" lon="-71.383" elev="3.869"/>
 <station id="PVGF1" lat="26.092" lon="-80.109" elev="3.0"/>
 <station id="PWAW3" lat="43.388" lon="-87.867" elev="178.0"/>
-<station id="PXAC1" lat="33.764" lon="-118.265" elev="-99.9"/>
+<station id="PXAC1" lat="33.764" lon="-118.265"/>
 <station id="PXOC1" lat="37.798" lon="-122.393" elev="0.0"/>
 <station id="PXSC1" lat="37.803" lon="-122.397" elev="1.54"/>
 <station id="QPTR1" lat="41.586" lon="-71.407" elev="1.6"/>
@@ -1667,11 +1667,11 @@
 <station id="RCMC1" lat="37.923" lon="-122.41" elev="2.9"/>
 <station id="RCPT2" lat="28.024" lon="-97.048" elev="1.4"/>
 <station id="RCRN6" lat="43.269" lon="-77.626" elev="76.7"/>
-<station id="RCYF1" lat="29.8" lon="-81.55" elev="-99.9"/>
+<station id="RCYF1" lat="29.8" lon="-81.55"/>
 <station id="RDDA2" lat="67.575" lon="-164.067" elev="7.3"/>
 <station id="RDYD1" lat="39.558" lon="-75.572" elev="2.3"/>
 <station id="RIXA2" lat="58.177" lon="-135.052" elev="13.7"/>
-<station id="RKQF1" lat="26.027" lon="-81.734" elev="-99.9"/>
+<station id="RKQF1" lat="26.027" lon="-81.734"/>
 <station id="RKXF1" lat="26.05" lon="-81.701" elev="3.0"/>
 <station id="RLIT2" lat="26.262" lon="-97.285" elev="0.0"/>
 <station id="RLOT2" lat="29.515" lon="-94.513" elev="0.0"/>
@@ -1683,23 +1683,23 @@
 <station id="RTAT2" lat="27.84" lon="-97.072" elev="0.0"/>
 <station id="RTOT2" lat="27.753" lon="-96.967" elev="0.0"/>
 <station id="RTYC1" lat="37.507" lon="-122.212" elev="3.1"/>
-<station id="RYEC1" lat="38.184" lon="-122.014" elev="-99.9"/>
-<station id="SACV4" lat="19.174" lon="-96.093" elev="-99.9"/>
+<station id="RYEC1" lat="38.184" lon="-122.014"/>
+<station id="SACV4" lat="19.174" lon="-96.093"/>
 <station id="SANF1" lat="24.456" lon="-81.877" elev="0.0"/>
 <station id="SAPF1" lat="27.761" lon="-82.627" elev="1.5"/>
-<station id="SAQG1" lat="31.418" lon="-81.296" elev="-99.9"/>
+<station id="SAQG1" lat="31.418" lon="-81.296"/>
 <station id="SAUF1" lat="29.857" lon="-81.265" elev="8.8"/>
 <station id="SAXG1" lat="31.418" lon="-81.296" elev="4.57"/>
 <station id="SBBN2" lat="36.05" lon="-114.748" elev="328.574"/>
 <station id="SBEO3" lat="44.625" lon="-124.045" elev="3.4"/>
 <station id="SBIO1" lat="41.629" lon="-82.841" elev="176.8"/>
-<station id="SBLF1" lat="27.923" lon="-82.445" elev="-99.9"/>
+<station id="SBLF1" lat="27.923" lon="-82.445"/>
 <station id="SBLM4" lat="43.81" lon="-83.72" elev="180.0"/>
 <station id="SBPT2" lat="29.728" lon="-93.87" elev="2.1"/>
-<station id="SCIS1" lat="32.857" lon="-79.707" elev="-99.9"/>
-<station id="SCLD1" lat="39.085" lon="-75.461" elev="-99.9"/>
-<station id="SCQC1" lat="38.001" lon="-122.46" elev="-99.9"/>
-<station id="SCQN6" lat="42.046" lon="-73.911" elev="-99.9"/>
+<station id="SCIS1" lat="32.857" lon="-79.707"/>
+<station id="SCLD1" lat="39.085" lon="-75.461"/>
+<station id="SCQC1" lat="38.001" lon="-122.46"/>
+<station id="SCQN6" lat="42.046" lon="-73.911"/>
 <station id="SCSN6" lat="41.024" lon="-73.108" elev="0.0"/>
 <station id="SCXA2" lat="58.205" lon="-134.646" elev="15.2"/>
 <station id="SDBC1" lat="32.714" lon="-117.174" elev="0.0"/>
@@ -1709,10 +1709,10 @@
 <station id="SECG1" lat="30.8" lon="-80.316" elev="0.0"/>
 <station id="SEFO3" lat="46.204" lon="-123.759" elev="0.0"/>
 <station id="SEIM1" lat="43.08" lon="-70.742" elev="2.05"/>
-<station id="SEQA2" lat="59.441" lon="-151.721" elev="-99.9"/>
+<station id="SEQA2" lat="59.441" lon="-151.721"/>
 <station id="SETO3" lat="46.2" lon="-123.941" elev="0.0"/>
 <station id="SFXC1" lat="38.2" lon="-122.026" elev="2.74"/>
-<station id="SGNT2" lat="28.771" lon="-95.617" elev="-99.9"/>
+<station id="SGNT2" lat="28.771" lon="-95.617"/>
 <station id="SGNW3" lat="43.749" lon="-87.693" elev="175.9"/>
 <station id="SGOF1" lat="29.408" lon="-84.858" elev="0.0"/>
 <station id="SGRN4" lat="40.12" lon="-74.03" elev="0.0"/>
@@ -1725,39 +1725,39 @@
 <station id="SISA2" lat="58.177" lon="-135.259" elev="15.25"/>
 <station id="SISW1" lat="48.321" lon="-122.831" elev="0.0"/>
 <station id="SIXA2" lat="55.599" lon="-132.203" elev="7.5"/>
-<station id="SJLF1" lat="30.4" lon="-81.4" elev="-99.9"/>
+<station id="SJLF1" lat="30.4" lon="-81.4"/>
 <station id="SJNP4" lat="18.459" lon="-66.116" elev="1.3"/>
 <station id="SJOM4" lat="42.098" lon="-86.494" elev="182.0"/>
 <station id="SJSN4" lat="39.305" lon="-75.377" elev="6.3"/>
 <station id="SKCF1" lat="27.921" lon="-82.445" elev="7.3"/>
 <station id="SKMG1" lat="31.534" lon="-80.236" elev="0.0"/>
-<station id="SKQN6" lat="42.017" lon="-73.915" elev="-99.9"/>
+<station id="SKQN6" lat="42.017" lon="-73.915"/>
 <station id="SKTA2" lat="59.45" lon="-135.327" elev="6.4"/>
 <station id="SKXA2" lat="59.448" lon="-135.326" elev="4.6"/>
 <station id="SLIM2" lat="38.321" lon="-76.452" elev="1.5"/>
 <station id="SLMN2" lat="35.389" lon="-114.621" elev="197.206"/>
-<station id="SLOO3" lat="43.296" lon="-124.311" elev="-99.9"/>
+<station id="SLOO3" lat="43.296" lon="-124.311"/>
 <station id="SLPL1" lat="29.517" lon="-91.55" elev="0.0"/>
 <station id="SLVM5" lat="47.278" lon="-91.27" elev="195.0"/>
 <station id="SLXA2" lat="55.34" lon="-131.644" elev="6.7"/>
-<station id="SMBS1" lat="33.655" lon="-78.918" elev="-99.9"/>
+<station id="SMBS1" lat="33.655" lon="-78.918"/>
 <station id="SMKF1" lat="24.628" lon="-81.109" elev="0.0"/>
-<station id="SMOC1" lat="34.008" lon="-118.5" elev="-99.9"/>
+<station id="SMOC1" lat="34.008" lon="-118.5"/>
 <station id="SNDA2" lat="55.336" lon="-160.502" elev="3.6"/>
 <station id="SNDP5" lat="28.215" lon="-177.361" elev="2.2"/>
-<station id="SNSN7" lat="33.865" lon="-78.507" elev="-99.9"/>
+<station id="SNSN7" lat="33.865" lon="-78.507"/>
 <station id="SNTO3" lat="43.279" lon="-124.318" elev="3.6"/>
-<station id="SOQO3" lat="43.317" lon="-124.322" elev="-99.9"/>
+<station id="SOQO3" lat="43.317" lon="-124.322"/>
 <station id="SOSN6" lat="40.998" lon="-73.095" elev="0.0"/>
 <station id="SPAG1" lat="31.375" lon="-80.567" elev="0.0"/>
 <station id="SPGF1" lat="26.704" lon="-78.995" elev="1.5"/>
 <station id="SPLL1" lat="28.867" lon="-90.483" elev="0.0"/>
 <station id="SPTM4" lat="44.713" lon="-83.273" elev="184.0"/>
 <station id="SPXA2" lat="55.599" lon="-132.203" elev="7.5"/>
-<station id="SRAW1" lat="45.572" lon="-122.379" elev="-99.9"/>
+<station id="SRAW1" lat="45.572" lon="-122.379"/>
 <station id="SRBV3" lat="17.784" lon="-64.762" elev="0.0"/>
-<station id="SREF1" lat="25.352" lon="-81.1" elev="-99.9"/>
-<station id="SRFW1" lat="46.185" lon="-123.188" elev="-99.9"/>
+<station id="SREF1" lat="25.352" lon="-81.1"/>
+<station id="SRFW1" lat="46.185" lon="-123.188"/>
 <station id="SRLM4" lat="45.773" lon="-84.137" elev="177.0"/>
 <station id="SRST2" lat="29.683" lon="-94.033" elev="0.7"/>
 <station id="SRXA2" lat="58.383" lon="-134.652" elev="2.0"/>
@@ -1765,7 +1765,7 @@
 <station id="STDM4" lat="47.184" lon="-87.225" elev="182.9"/>
 <station id="STXA2" lat="57.116" lon="-135.391" elev="10.7"/>
 <station id="SUPN6" lat="44.467" lon="-75.8" elev="77.4"/>
-<station id="SVLS1" lat="31.95" lon="-80.68" elev="-99.9"/>
+<station id="SVLS1" lat="31.95" lon="-80.68"/>
 <station id="SVNM4" lat="42.401" lon="-86.288" elev="176.0"/>
 <station id="SVXA2" lat="63.693" lon="-170.492" elev="10.0"/>
 <station id="SWLA2" lat="60.12" lon="-149.427" elev="4.7"/>
@@ -1781,27 +1781,27 @@
 <station id="TARF1" lat="28.156" lon="-82.758" elev="0.0"/>
 <station id="TAWM4" lat="44.254" lon="-83.449" elev="183.0"/>
 <station id="TBIM4" lat="45.035" lon="-83.194" elev="175.9"/>
-<station id="TBYF1" lat="25.155" lon="-80.722" elev="-99.9"/>
+<station id="TBYF1" lat="25.155" lon="-80.722"/>
 <station id="TCBM2" lat="39.213" lon="-76.244" elev="3.0"/>
 <station id="TCMW1" lat="47.276" lon="-122.418" elev="4.1"/>
 <station id="TCNW1" lat="47.267" lon="-122.413" elev="4.1"/>
-<station id="TCSV2" lat="37.415" lon="-76.714" elev="-99.9"/>
+<station id="TCSV2" lat="37.415" lon="-76.714"/>
 <station id="TCVF1" lat="25.213" lon="-80.533" elev="0.0"/>
-<station id="TDPC1" lat="41.055" lon="-124.147" elev="-99.9"/>
+<station id="TDPC1" lat="41.055" lon="-124.147"/>
 <station id="TESL1" lat="29.668" lon="-91.237" elev="0.0"/>
-<station id="TFBLK" lat="65.698" lon="-24.778" elev="-99.9"/>
+<station id="TFBLK" lat="65.698" lon="-24.778"/>
 <station id="THIN6" lat="44.3" lon="-75.983" elev="75.6"/>
 <station id="THLO1" lat="41.826" lon="-83.194" elev="173.5"/>
 <station id="THRF1" lat="25.203" lon="-80.372" elev="0.0"/>
 <station id="THRO1" lat="41.694" lon="-83.473" elev="176.2"/>
 <station id="TIBC1" lat="37.892" lon="-122.447" elev="5.0"/>
-<station id="TIQC1" lat="32.568" lon="-117.131" elev="-99.9"/>
+<station id="TIQC1" lat="32.568" lon="-117.131"/>
 <station id="TIXC1" lat="32.575" lon="-117.127" elev="4.0"/>
 <station id="TKEA2" lat="57.779" lon="-135.219" elev="5.0"/>
-<station id="TKPN6" lat="42.014" lon="-73.939" elev="-99.9"/>
+<station id="TKPN6" lat="42.014" lon="-73.939"/>
 <station id="TLBO3" lat="45.555" lon="-123.919" elev="0.0"/>
 <station id="TLVT2" lat="27.819" lon="-97.454" elev="2.0"/>
-<station id="TNSO3" lat="46.238" lon="-123.468" elev="-99.9"/>
+<station id="TNSO3" lat="46.238" lon="-123.468"/>
 <station id="TOKW1" lat="46.707" lon="-123.967" elev="3.0"/>
 <station id="TPAF1" lat="27.933" lon="-82.433" elev="0.0"/>
 <station id="TPBN4" lat="40.012" lon="-75.043" elev="2.2"/>
@@ -1832,35 +1832,35 @@
 <station id="VDZA2" lat="61.125" lon="-146.361" elev="4.6"/>
 <station id="VENF1" lat="27.072" lon="-82.453" elev="0.0"/>
 <station id="VERV4" lat="19.204" lon="-96.113" elev="0.0"/>
-<station id="VMSV2" lat="37.246" lon="-76.5" elev="-99.9"/>
-<station id="VQSP4" lat="18.153" lon="-65.444" elev="-99.9"/>
+<station id="VMSV2" lat="37.246" lon="-76.5"/>
+<station id="VQSP4" lat="18.153" lon="-65.444"/>
 <station id="VTBT2" lat="27.841" lon="-97.52" elev="1.006"/>
 <station id="WAHV2" lat="37.608" lon="-75.686" elev="1.5"/>
 <station id="WAKP8" lat="19.291" lon="166.618" elev="3.6"/>
-<station id="WAQM3" lat="41.552" lon="-70.549" elev="-99.9"/>
+<station id="WAQM3" lat="41.552" lon="-70.549"/>
 <station id="WASD2" lat="38.873" lon="-77.021" elev="2.2"/>
 <station id="WATS1" lat="34.335" lon="-80.702" elev="85.6"/>
-<station id="WAVM6" lat="30.282" lon="-89.367" elev="-99.9"/>
+<station id="WAVM6" lat="30.282" lon="-89.367"/>
 <station id="WAXM3" lat="41.582" lon="-70.525" elev="10.4"/>
 <station id="WBYA1" lat="30.417" lon="-87.825" elev="0.0"/>
 <station id="WCRP1" lat="42.077" lon="-80.24" elev="174.0"/>
 <station id="WCXA2" lat="55.402" lon="-131.729" elev="7.0"/>
 <station id="WDEL1" lat="28.662" lon="-89.551" elev="0.0"/>
-<station id="WDSV2" lat="36.977" lon="-76.315" elev="-99.9"/>
-<station id="WDYO3" lat="46.252" lon="-123.534" elev="-99.9"/>
-<station id="WEBM1" lat="43.32" lon="-70.563" elev="-99.9"/>
+<station id="WDSV2" lat="36.977" lon="-76.315"/>
+<station id="WDYO3" lat="46.252" lon="-123.534"/>
+<station id="WEBM1" lat="43.32" lon="-70.563"/>
 <station id="WELM1" lat="43.32" lon="-70.563" elev="3.5"/>
-<station id="WEQM1" lat="43.345" lon="-70.549" elev="-99.9"/>
+<station id="WEQM1" lat="43.345" lon="-70.549"/>
 <station id="WEXM1" lat="43.337" lon="-70.549" elev="18.62"/>
 <station id="WFPM4" lat="46.76" lon="-84.97" elev="188.67"/>
 <station id="WGXA2" lat="56.467" lon="-132.382" elev="15.0"/>
 <station id="WHRI2" lat="42.361" lon="-87.813" elev="180.0"/>
 <station id="WIWF1" lat="25.587" lon="-81.044" elev="0.0"/>
 <station id="WIXA2" lat="60.777" lon="-148.682" elev="4.6"/>
-<station id="WKQA1" lat="30.417" lon="-87.823" elev="-99.9"/>
+<station id="WKQA1" lat="30.417" lon="-87.823"/>
 <station id="WKXA1" lat="30.421" lon="-87.828" elev="3.35"/>
 <station id="WLON7" lat="34.228" lon="-77.954" elev="1.5"/>
-<station id="WNDV2" lat="37.615" lon="-76.29" elev="-99.9"/>
+<station id="WNDV2" lat="37.615" lon="-76.29"/>
 <station id="WNEM4" lat="46.285" lon="-84.21" elev="177.9"/>
 <station id="WPLF1" lat="25.71" lon="-81.249" elev="0.0"/>
 <station id="WPOW1" lat="47.662" lon="-122.436" elev="3.0"/>
@@ -1869,25 +1869,25 @@
 <station id="WRXA2" lat="70.636" lon="-160.034" elev="10.0"/>
 <station id="WSLM4" lat="45.842" lon="-85.135" elev="177.0"/>
 <station id="WWEF1" lat="25.232" lon="-80.938" elev="0.0"/>
-<station id="WYBS1" lat="33.309" lon="-79.289" elev="-99.9"/>
+<station id="WYBS1" lat="33.309" lon="-79.289"/>
 <station id="WYCM6" lat="30.326" lon="-89.326" elev="0.0"/>
-<station id="WYSS1" lat="33.309" lon="-79.289" elev="-99.9"/>
-<station id="YABP4" lat="18.055" lon="-65.833" elev="-99.9"/>
+<station id="WYSS1" lat="33.309" lon="-79.289"/>
+<station id="YABP4" lat="18.055" lon="-65.833"/>
 <station id="YATA2" lat="59.548" lon="-139.733" elev="6.6"/>
 <station id="YGNN6" lat="43.262" lon="-79.064" elev="73.0"/>
-<station id="YKRV2" lat="37.251" lon="-76.342" elev="-99.9"/>
+<station id="YKRV2" lat="37.251" lon="-76.342"/>
 <station id="YKTV2" lat="37.227" lon="-76.479" elev="3.7"/>
 <station id="YRSV2" lat="37.414" lon="-76.712" elev="11.0"/>
-<station id="ZBQN7" lat="33.955" lon="-77.935" elev="-99.9"/>
+<station id="ZBQN7" lat="33.955" lon="-77.935"/>
 <station id="aamc1" lat="37.772" lon="-122.3" elev="3.5"/>
-<station id="acfs1" lat="32.664" lon="-80.413" elev="-99.9"/>
-<station id="acqs1" lat="32.523" lon="-80.357" elev="-99.9"/>
+<station id="acfs1" lat="32.664" lon="-80.413"/>
+<station id="acqs1" lat="32.523" lon="-80.357"/>
 <station id="acxs1" lat="32.559" lon="-80.454" elev="0.0"/>
 <station id="acyn4" lat="39.357" lon="-74.418" elev="8.3"/>
 <station id="adka2" lat="51.861" lon="-176.637" elev="5.2"/>
 <station id="agcm4" lat="42.621" lon="-82.527" elev="177.0"/>
 <station id="agmw3" lat="44.608" lon="-87.433" elev="179.0"/>
-<station id="agxc1" lat="33.716" lon="-118.246" elev="-99.9"/>
+<station id="agxc1" lat="33.716" lon="-118.246"/>
 <station id="ajxa2" lat="58.287" lon="-134.398" elev="4.6"/>
 <station id="akxa2" lat="54.132" lon="-165.782" elev="6.1"/>
 <station id="alia2" lat="56.898" lon="-154.247" elev="4.6"/>
@@ -1896,36 +1896,36 @@
 <station id="amrl1" lat="29.45" lon="-91.338" elev="0.0"/>
 <station id="anmn6" lat="42.018" lon="-73.917" elev="9.0"/>
 <station id="anpt2" lat="27.837" lon="-97.039" elev="10.261"/>
-<station id="anrn6" lat="42.027" lon="-73.926" elev="-99.9"/>
+<station id="anrn6" lat="42.027" lon="-73.926"/>
 <station id="anta2" lat="61.238" lon="-149.89" elev="7.4"/>
 <station id="anvc1" lat="38.915" lon="-123.711" elev="7.7"/>
 <station id="apam2" lat="38.983" lon="-76.479" elev="1.4"/>
 <station id="apcf1" lat="29.724" lon="-84.98" elev="1.9"/>
 <station id="apma2" lat="61.239" lon="-149.889" elev="5.5"/>
 <station id="apnm4" lat="45.06" lon="-83.424" elev="177.5"/>
-<station id="apqf1" lat="29.786" lon="-84.875" elev="-99.9"/>
+<station id="apqf1" lat="29.786" lon="-84.875"/>
 <station id="aprp7" lat="13.444" lon="144.657" elev="3.3"/>
 <station id="apxa2" lat="59.77" lon="-151.868" elev="5.0"/>
 <station id="apxf1" lat="29.769" lon="-84.881" elev="0.6"/>
-<station id="arop4" lat="18.48" lon="-66.702" elev="-99.9"/>
+<station id="arop4" lat="18.48" lon="-66.702"/>
 <station id="arpf1" lat="28.433" lon="-82.667" elev="0.0"/>
 <station id="asbo1" lat="41.918" lon="-80.796" elev="177.0"/>
 <station id="asto3" lat="46.207" lon="-123.768" elev="3.6"/>
 <station id="atgm1" lat="44.392" lon="-68.204" elev="3.4"/>
 <station id="atka2" lat="52.232" lon="-174.173" elev="4.4"/>
 <station id="auga2" lat="59.378" lon="-153.348" elev="9.1"/>
-<station id="awrt2" lat="28.227" lon="-96.796" elev="-99.9"/>
+<station id="awrt2" lat="28.227" lon="-96.796"/>
 <station id="babt2" lat="27.297" lon="-97.405" elev="0.0"/>
 <station id="bara9" lat="17.591" lon="-61.821" elev="1.3"/>
 <station id="barn6" lat="42.345" lon="-79.595" elev="174.0"/>
 <station id="batn6" lat="40.701" lon="-74.014" elev="2.0"/>
-<station id="baxc1" lat="33.766" lon="-118.24" elev="-99.9"/>
+<station id="baxc1" lat="33.766" lon="-118.24"/>
 <station id="bbnf1" lat="25.601" lon="-80.306" elev="0.0"/>
 <station id="bbsf1" lat="25.472" lon="-80.349" elev="0.0"/>
 <station id="bdrn4" lat="40.082" lon="-74.87" elev="2.2"/>
-<station id="bdsp1" lat="39.98" lon="-75.079" elev="-99.9"/>
+<station id="bdsp1" lat="39.98" lon="-75.079"/>
 <station id="bdvf1" lat="25.478" lon="-80.989" elev="0.0"/>
-<station id="bdxc1" lat="38.317" lon="-123.071" elev="-99.9"/>
+<station id="bdxc1" lat="38.317" lon="-123.071"/>
 <station id="bepb6" lat="32.374" lon="-64.701" elev="3.4"/>
 <station id="bexa2" lat="60.791" lon="-161.749" elev="4.5"/>
 <station id="bftn7" lat="34.717" lon="-76.671" elev="1.9"/>
@@ -1935,11 +1935,11 @@
 <station id="bhbm3" lat="42.355" lon="-71.05" elev="3.4"/>
 <station id="bhri3" lat="41.646" lon="-87.147" elev="180.0"/>
 <station id="bigm4" lat="46.827" lon="-87.727" elev="185.0"/>
-<station id="bilw3" lat="46.722" lon="-92.064" elev="-99.9"/>
+<station id="bilw3" lat="46.722" lon="-92.064"/>
 <station id="bism2" lat="38.22" lon="-76.039" elev="1.1"/>
 <station id="bkbf1" lat="30.192" lon="-81.692" elev="1.4"/>
 <station id="bktl1" lat="30.19" lon="-93.301" elev="0.0"/>
-<station id="bkyf1" lat="25.119" lon="-80.834" elev="-99.9"/>
+<station id="bkyf1" lat="25.119" lon="-80.834"/>
 <station id="blia2" lat="60.839" lon="-146.884" elev="0.0"/>
 <station id="blif1" lat="30.393" lon="-81.523" elev="2.0"/>
 <station id="blta2" lat="58.455" lon="-135.889" elev="5.0"/>
@@ -1949,17 +1949,17 @@
 <station id="bnkf1" lat="25.087" lon="-80.519" elev="0.0"/>
 <station id="bobf1" lat="25.027" lon="-80.681" elev="0.0"/>
 <station id="brhc3" lat="41.174" lon="-73.181" elev="1.9"/>
-<station id="brim2" lat="38.781" lon="-76.714" elev="-99.9"/>
+<station id="brim2" lat="38.781" lon="-76.714"/>
 <station id="brnd1" lat="38.987" lon="-75.113" elev="1.9"/>
 <station id="bsbm4" lat="44.055" lon="-86.514" elev="184.0"/>
 <station id="bsca1" lat="30.329" lon="-87.829" elev="0.0"/>
-<station id="bskf1" lat="25.266" lon="-81.162" elev="-99.9"/>
+<station id="bskf1" lat="25.266" lon="-81.162"/>
 <station id="bslm2" lat="38.781" lon="-76.708" elev="0.3"/>
 <station id="bthd1" lat="38.537" lon="-75.046" elev="-11.0"/>
 <station id="bufn6" lat="42.878" lon="-78.89" elev="176.5"/>
 <station id="burl1" lat="28.905" lon="-89.428" elev="0.0"/>
 <station id="buzm3" lat="41.397" lon="-71.033" elev="0.0"/>
-<station id="bvqw1" lat="48.496" lon="-122.501" elev="-99.9"/>
+<station id="bvqw1" lat="48.496" lon="-122.501"/>
 <station id="bwsf1" lat="25.178" lon="-80.438" elev="0.0"/>
 <station id="bygl1" lat="29.789" lon="-90.42" elev="0.0"/>
 <station id="bzbm3" lat="41.524" lon="-70.671" elev="2.5"/>
@@ -1977,24 +1977,24 @@
 <station id="cecc1" lat="41.746" lon="-124.184" elev="2.9"/>
 <station id="cfwm1" lat="44.657" lon="-67.205" elev="3.8"/>
 <station id="cgcl1" lat="28.791" lon="-89.056" elev="0.0"/>
-<station id="chao3" lat="43.351" lon="-124.337" elev="-99.9"/>
+<station id="chao3" lat="43.351" lon="-124.337"/>
 <station id="chav3" lat="18.335" lon="-64.92" elev="1.1"/>
-<station id="chbv2" lat="37.032" lon="-76.083" elev="-99.9"/>
+<station id="chbv2" lat="37.032" lon="-76.083"/>
 <station id="chcm2" lat="39.527" lon="-75.81" elev="1.8"/>
 <station id="chds1" lat="33.661" lon="-82.199" elev="116.1"/>
 <station id="chii2" lat="41.916" lon="-87.572" elev="176.0"/>
-<station id="chqo3" lat="43.282" lon="-124.32" elev="-99.9"/>
+<station id="chqo3" lat="43.282" lon="-124.32"/>
 <station id="chsv3" lat="17.748" lon="-64.699" elev="1.3"/>
 <station id="chtm3" lat="41.688" lon="-69.95" elev="3.8"/>
 <station id="chts1" lat="32.781" lon="-79.924" elev="2.6"/>
-<station id="chyv2" lat="36.926" lon="-76.007" elev="-99.9"/>
+<station id="chyv2" lat="36.926" lon="-76.007"/>
 <station id="chyw1" lat="48.863" lon="-122.759" elev="7.6"/>
 <station id="clbf1" lat="27.736" lon="-82.686" elev="0.0"/>
 <station id="clbp4" lat="18.301" lon="-65.302" elev="1.0"/>
 <station id="clkn7" lat="34.622" lon="-76.525" elev="4.6"/>
 <station id="clsm4" lat="42.471" lon="-82.877" elev="175.0"/>
 <station id="cman4" lat="38.968" lon="-74.96" elev="3.2"/>
-<station id="cmln3" lat="43.07" lon="-70.7" elev="-99.9"/>
+<station id="cmln3" lat="43.07" lon="-70.7"/>
 <station id="cmpo1" lat="41.547" lon="-83.015" elev="175.0"/>
 <station id="cmti2" lat="41.73" lon="-87.538" elev="178.5"/>
 <station id="cnbf1" lat="25.702" lon="-81.186" elev="0.0"/>
@@ -2007,30 +2007,30 @@
 <station id="cpvm2" lat="38.995" lon="-76.388" elev="3.4"/>
 <station id="cpxa2" lat="53.843" lon="-166.583" elev="5.0"/>
 <station id="cpxc1" lat="35.17" lon="-120.741" elev="0.0"/>
-<station id="cquc1" lat="38.066" lon="-122.23" elev="-99.9"/>
+<station id="cquc1" lat="38.066" lon="-122.23"/>
 <station id="crga2" lat="55.474" lon="-133.136" elev="28.9"/>
 <station id="crta1" lat="30.308" lon="-88.14" elev="0.0"/>
 <station id="crva2" lat="60.558" lon="-145.752" elev="4.6"/>
 <station id="cryv2" lat="36.888" lon="-76.338" elev="1.0"/>
 <station id="cspa2" lat="58.199" lon="-136.64" elev="25.0"/>
 <station id="csxa2" lat="58.199" lon="-136.641" elev="22.0"/>
-<station id="cvqv2" lat="37.571" lon="-76.884" elev="-99.9"/>
+<station id="cvqv2" lat="37.571" lon="-76.884"/>
 <station id="cwaf1" lat="25.297" lon="-81.013" elev="0.0"/>
 <station id="cwbf1" lat="27.978" lon="-82.832" elev="1.3"/>
 <station id="cwci" lat="47.334" lon="-85.833" elev="163.0"/>
-<station id="cwqo3" lat="43.338" lon="-124.321" elev="-99.9"/>
-<station id="cwqt2" lat="28.132" lon="-97.034" elev="-99.9"/>
+<station id="cwqo3" lat="43.338" lon="-124.321"/>
+<station id="cwqt2" lat="28.132" lon="-97.034"/>
 <station id="cygm4" lat="45.658" lon="-84.464" elev="178.0"/>
 <station id="dbln6" lat="42.494" lon="-79.354" elev="182.9"/>
-<station id="dbqs1" lat="33.36" lon="-79.167" elev="-99.9"/>
+<station id="dbqs1" lat="33.36" lon="-79.167"/>
 <station id="deld1" lat="39.582" lon="-75.589" elev="2.3"/>
 <station id="desw1" lat="47.675" lon="-124.485" elev="21.3"/>
 <station id="dhxa2" lat="70.222" lon="-148.419" elev="15.0"/>
 <station id="dila1" lat="30.25" lon="-88.075" elev="7.1"/>
 <station id="disw3" lat="47.079" lon="-90.728" elev="191.7"/>
 <station id="dkkf1" lat="25.18" lon="-80.49" elev="0.0"/>
-<station id="dmsf1" lat="30.387" lon="-81.559" elev="-99.9"/>
-<station id="domv2" lat="36.962" lon="-76.424" elev="-99.9"/>
+<station id="dmsf1" lat="30.387" lon="-81.559"/>
+<station id="domv2" lat="36.962" lon="-76.424"/>
 <station id="dpha1" lat="30.251" lon="-88.078" elev="0.0"/>
 <station id="dpia1" lat="30.25" lon="-88.075" elev="0.0"/>
 <station id="dpla2" lat="53.884" lon="-166.531" elev="4.6"/>
@@ -2041,14 +2041,14 @@
 <station id="dtlm4" lat="45.993" lon="-83.898" elev="178.5"/>
 <station id="dukn7" lat="36.184" lon="-75.746" elev="7.7"/>
 <station id="dulm5" lat="46.776" lon="-92.092" elev="186.0"/>
-<station id="eazc1" lat="36.846" lon="-121.754" elev="-99.9"/>
+<station id="eazc1" lat="36.846" lon="-121.754"/>
 <station id="ebef1" lat="27.923" lon="-82.421" elev="-0.5"/>
 <station id="ebsw1" lat="47.602" lon="-122.338" elev="3.8"/>
 <station id="efla1" lat="30.429" lon="-88.01" elev="4.3"/>
-<station id="ehsc1" lat="36.835" lon="-121.738" elev="-99.9"/>
+<station id="ehsc1" lat="36.835" lon="-121.738"/>
 <station id="einl1" lat="29.373" lon="-91.384" elev="6.0"/>
-<station id="elfa2" lat="58.193" lon="-136.347" elev="-99.9"/>
-<station id="elqc1" lat="36.818" lon="-121.739" elev="-99.9"/>
+<station id="elfa2" lat="58.193" lon="-136.347"/>
+<station id="elqc1" lat="36.818" lon="-121.739"/>
 <station id="elxc1" lat="36.815" lon="-121.738" elev="15.85"/>
 <station id="emat2" lat="28.71" lon="-95.914" elev="0.9"/>
 <station id="eptt2" lat="29.481" lon="-94.917" elev="2.3"/>
@@ -2056,10 +2056,10 @@
 <station id="eroa2" lat="58.971" lon="-135.221" elev="17.0"/>
 <station id="erxa2" lat="58.971" lon="-135.221" elev="16.8"/>
 <station id="espp4" lat="18.094" lon="-65.471" elev="2.0"/>
-<station id="evmc1" lat="36.811" lon="-121.779" elev="-99.9"/>
+<station id="evmc1" lat="36.811" lon="-121.779"/>
 <station id="faio1" lat="41.764" lon="-81.281" elev="176.4"/>
 <station id="fbis1" lat="32.685" lon="-79.888" elev="3.0"/>
-<station id="fffc1" lat="38.195" lon="-122.033" elev="-99.9"/>
+<station id="fffc1" lat="38.195" lon="-122.033"/>
 <station id="ffia2" lat="57.272" lon="-133.63" elev="6.7"/>
 <station id="fhpf1" lat="28.153" lon="-82.801" elev="0.0"/>
 <station id="fila2" lat="59.332" lon="-151.995" elev="17.9"/>
@@ -2069,10 +2069,10 @@
 <station id="fpkg1" lat="32.035" lon="-80.903" elev="2.9"/>
 <station id="fpst2" lat="28.936" lon="-95.294" elev="0.0"/>
 <station id="fptm4" lat="45.619" lon="-86.66" elev="184.0"/>
-<station id="fpxc1" lat="37.807" lon="-122.466" elev="-99.9"/>
-<station id="frcb6" lat="32.37" lon="-64.695" elev="-99.9"/>
+<station id="fpxc1" lat="37.807" lon="-122.466"/>
+<station id="frcb6" lat="32.37" lon="-64.695"/>
 <station id="frdf1" lat="30.675" lon="-81.465" elev="2.2"/>
-<station id="frdp4" lat="18.335" lon="-65.631" elev="-99.9"/>
+<station id="frdp4" lat="18.335" lon="-65.631"/>
 <station id="frdw1" lat="48.545" lon="-123.012" elev="6.1"/>
 <station id="frel1" lat="30.106" lon="-90.422" elev="4.0"/>
 <station id="frfn7" lat="36.19" lon="-75.739" elev="-11.4"/>
@@ -2085,39 +2085,39 @@
 <station id="ftgm4" lat="43.007" lon="-82.422" elev="178.9"/>
 <station id="ftpc1" lat="37.806" lon="-122.466" elev="2.7"/>
 <station id="fwyf1" lat="25.591" lon="-80.097" elev="0.0"/>
-<station id="gbhm6" lat="30.418" lon="-88.405" elev="-99.9"/>
+<station id="gbhm6" lat="30.418" lon="-88.405"/>
 <station id="gbif1" lat="25.378" lon="-81.029" elev="0.0"/>
-<station id="gbqn3" lat="43.134" lon="-70.911" elev="-99.9"/>
-<station id="gbrm6" lat="30.413" lon="-88.403" elev="-99.9"/>
+<station id="gbqn3" lat="43.134" lon="-70.911"/>
+<station id="gbrm6" lat="30.413" lon="-88.403"/>
 <station id="gbtf1" lat="25.167" lon="-80.801" elev="0.0"/>
-<station id="gbww3" lat="44.538" lon="-88.003" elev="-99.9"/>
+<station id="gbww3" lat="44.538" lon="-88.003"/>
 <station id="gbxa2" lat="63.777" lon="-171.715" elev="10.0"/>
 <station id="gctf1" lat="27.774" lon="-82.517" elev="0.0"/>
 <station id="gdmm5" lat="47.749" lon="-90.341" elev="185.2"/>
-<station id="gdqm6" lat="30.357" lon="-88.463" elev="-99.9"/>
+<station id="gdqm6" lat="30.357" lon="-88.463"/>
 <station id="gdxm6" lat="30.359" lon="-88.42" elev="0.0"/>
 <station id="gelo1" lat="41.859" lon="-80.975" elev="177.0"/>
 <station id="gexa2" lat="58.213" lon="-136.381" elev="11.0"/>
-<station id="gggc1" lat="38.016" lon="-122.509" elev="-99.9"/>
+<station id="gggc1" lat="38.016" lon="-122.509"/>
 <station id="gisl1" lat="29.265" lon="-89.958" elev="2.7"/>
 <station id="gixa2" lat="55.446" lon="-131.881" elev="8.8"/>
-<station id="gkyf1" lat="24.627" lon="-82.872" elev="-99.9"/>
+<station id="gkyf1" lat="24.627" lon="-82.872"/>
 <station id="gnjt2" lat="29.357" lon="-94.725" elev="0.0"/>
 <station id="gpxa2" lat="58.062" lon="-134.051" elev="12.0"/>
-<station id="grbl1" lat="29.101" lon="-89.978" elev="-99.9"/>
+<station id="grbl1" lat="29.101" lon="-89.978"/>
 <station id="grim4" lat="46.721" lon="-87.412" elev="199.0"/>
 <station id="grmm4" lat="46.684" lon="-85.972" elev="186.0"/>
-<station id="grrt2" lat="29.302" lon="-94.896" elev="-99.9"/>
+<station id="grrt2" lat="29.302" lon="-94.896"/>
 <station id="gslm4" lat="44.018" lon="-83.537" elev="179.0"/>
 <station id="gtlm4" lat="45.211" lon="-85.55" elev="176.0"/>
 <station id="gtot2" lat="29.311" lon="-94.792" elev="4.8"/>
-<station id="gtqf1" lat="29.667" lon="-81.257" elev="-99.9"/>
+<station id="gtqf1" lat="29.667" lon="-81.257"/>
 <station id="gtrm4" lat="47.179" lon="-88.241" elev="190.0"/>
 <station id="gtxf1" lat="29.658" lon="-81.233" elev="1.3"/>
 <station id="guxa2" lat="58.408" lon="-135.726" elev="7.0"/>
 <station id="haxa2" lat="59.234" lon="-135.442" elev="7.6"/>
-<station id="hbmn6" lat="41.314" lon="-73.985" elev="-99.9"/>
-<station id="hbxc1" lat="40.777" lon="-124.197" elev="-99.9"/>
+<station id="hbmn6" lat="41.314" lon="-73.985"/>
+<station id="hbxc1" lat="40.777" lon="-124.197"/>
 <station id="hbyc1" lat="40.767" lon="-124.217" elev="7.6"/>
 <station id="hcef1" lat="25.254" lon="-80.444" elev="0.0"/>
 <station id="hcgn7" lat="35.209" lon="-75.704" elev="1.9"/>
@@ -2128,9 +2128,9 @@
 <station id="hmra2" lat="59.601" lon="-151.41" elev="12.9"/>
 <station id="hmsa2" lat="59.602" lon="-151.417" elev="15.0"/>
 <station id="hrbm4" lat="43.846" lon="-82.643" elev="178.2"/>
-<station id="href1" lat="25.424" lon="-81.06" elev="-99.9"/>
+<station id="href1" lat="25.424" lon="-81.06"/>
 <station id="hrvc1" lat="34.469" lon="-120.682" elev="0.0"/>
-<station id="huqn6" lat="42.036" lon="-73.925" elev="-99.9"/>
+<station id="huqn6" lat="42.036" lon="-73.925"/>
 <station id="icac1" lat="34.008" lon="-118.5" elev="6.6"/>
 <station id="icya2" lat="59.923" lon="-141.359" elev="15.0"/>
 <station id="iloh1" lat="19.73" lon="-155.056" elev="2.4"/>
@@ -2140,74 +2140,74 @@
 <station id="itka2" lat="57.052" lon="-135.342" elev="3.8"/>
 <station id="jaki2" lat="41.781" lon="-87.573" elev="179.0"/>
 <station id="jbyf1" lat="25.224" lon="-80.541" elev="0.0"/>
-<station id="jcqn4" lat="39.548" lon="-74.461" elev="-99.9"/>
+<station id="jcqn4" lat="39.548" lon="-74.461"/>
 <station id="jcrn4" lat="39.535" lon="-74.464" elev="0.9"/>
-<station id="jctn4" lat="39.508" lon="-74.338" elev="-99.9"/>
+<station id="jctn4" lat="39.508" lon="-74.338"/>
 <station id="jkyf1" lat="25.053" lon="-80.904" elev="0.0"/>
 <station id="jlxa2" lat="58.298" lon="-134.405" elev="4.6"/>
 <station id="jmla2" lat="58.286" lon="-134.39" elev="5.5"/>
 <station id="jmpn7" lat="34.213" lon="-77.786" elev="7.4"/>
 <station id="jnea2" lat="58.298" lon="-134.411" elev="5.4"/>
 <station id="jnga2" lat="58.291" lon="-134.394" elev="4.6"/>
-<station id="jobp4" lat="17.944" lon="-66.238" elev="-99.9"/>
-<station id="joqp4" lat="17.93" lon="-66.211" elev="-99.9"/>
+<station id="jobp4" lat="17.944" lon="-66.238"/>
+<station id="joqp4" lat="17.93" lon="-66.211"/>
 <station id="joxp4" lat="17.956" lon="-66.223" elev="9.0"/>
 <station id="jprn7" lat="35.912" lon="-75.587" elev="0.0"/>
 <station id="jxuf1" lat="30.354" lon="-81.612" elev="3.0"/>
 <station id="kata1" lat="30.258" lon="-88.213" elev="0.0"/>
-<station id="katp" lat="27.195" lon="-90.027" elev="-99.9"/>
-<station id="kbbf" lat="28.058" lon="-95.872" elev="-99.9"/>
+<station id="katp" lat="27.195" lon="-90.027"/>
+<station id="kbbf" lat="28.058" lon="-95.872"/>
 <station id="kbmg1" lat="30.777" lon="-81.487" elev="2.67"/>
-<station id="kbqx" lat="28.314" lon="-95.62" elev="-99.9"/>
-<station id="kcha2" lat="59.602" lon="-151.409" elev="-99.9"/>
-<station id="kcvw" lat="29.784" lon="-93.3" elev="-99.9"/>
+<station id="kbqx" lat="28.314" lon="-95.62"/>
+<station id="kcha2" lat="59.602" lon="-151.409"/>
+<station id="kcvw" lat="29.784" lon="-93.3"/>
 <station id="kcxa2" lat="55.566" lon="-162.326" elev="20.0"/>
 <station id="kdaa2" lat="57.731" lon="-152.511" elev="4.8"/>
-<station id="kdlp" lat="29.121" lon="-89.547" elev="-99.9"/>
+<station id="kdlp" lat="29.121" lon="-89.547"/>
 <station id="keca2" lat="55.331" lon="-131.625" elev="4.6"/>
-<station id="kehc" lat="28.429" lon="-92.878" elev="-99.9"/>
-<station id="keir" lat="28.634" lon="-91.489" elev="-99.9"/>
-<station id="kemk" lat="27.819" lon="-94.323" elev="-99.9"/>
+<station id="kehc" lat="28.429" lon="-92.878"/>
+<station id="keir" lat="28.634" lon="-91.489"/>
+<station id="kemk" lat="27.819" lon="-94.323"/>
 <station id="kexa2" lat="55.352" lon="-131.684" elev="3.7"/>
-<station id="kgbk" lat="27.204" lon="-92.203" elev="-99.9"/>
+<station id="kgbk" lat="27.204" lon="-92.203"/>
 <station id="kgca2" lat="55.062" lon="-162.327" elev="3.6"/>
-<station id="kghb" lat="27.84" lon="-91.988" elev="-99.9"/>
+<station id="kghb" lat="27.84" lon="-91.988"/>
 <station id="kgna" lat="47.745" lon="-90.346" elev="185.0"/>
-<station id="kgry" lat="27.625" lon="-90.441" elev="-99.9"/>
-<station id="kgul" lat="27.304" lon="-93.538" elev="-99.9"/>
-<station id="kgvx" lat="28.577" lon="-94.976" elev="-99.9"/>
+<station id="kgry" lat="27.625" lon="-90.441"/>
+<station id="kgul" lat="27.304" lon="-93.538"/>
+<station id="kgvx" lat="28.577" lon="-94.976"/>
 <station id="kgxa2" lat="57.777" lon="-152.425" elev="15.0"/>
-<station id="khhv" lat="26.939" lon="-94.689" elev="-99.9"/>
-<station id="khqi" lat="27.934" lon="-93.669" elev="-99.9"/>
-<station id="kikt" lat="28.521" lon="-88.289" elev="-99.9"/>
-<station id="kipn" lat="28.085" lon="-87.986" elev="-99.9"/>
+<station id="khhv" lat="26.939" lon="-94.689"/>
+<station id="khqi" lat="27.934" lon="-93.669"/>
+<station id="kikt" lat="28.521" lon="-88.289"/>
+<station id="kipn" lat="28.085" lon="-87.986"/>
 <station id="klih1" lat="20.895" lon="-156.469" elev="2.7"/>
-<station id="kmdj" lat="28.643" lon="-89.794" elev="-99.9"/>
-<station id="kmis" lat="29.296" lon="-88.842" elev="-99.9"/>
+<station id="kmdj" lat="28.643" lon="-89.794"/>
+<station id="kmis" lat="29.296" lon="-88.842"/>
 <station id="kmxa2" lat="57.782" lon="-152.439" elev="10.0"/>
-<station id="kmzg" lat="27.727" lon="-96.191" elev="-99.9"/>
+<station id="kmzg" lat="27.727" lon="-96.191"/>
 <station id="knsw3" lat="42.589" lon="-87.809" elev="176.0"/>
 <station id="knxa2" lat="60.552" lon="-151.274" elev="3.7"/>
 <station id="koza2" lat="66.901" lon="-162.589" elev="6.0"/>
-<station id="kp53" lat="46.417" lon="-86.65" elev="-99.9"/>
+<station id="kp53" lat="46.417" lon="-86.65"/>
 <station id="kp58" lat="44.017" lon="-82.8" elev="179.0"/>
-<station id="kp59" lat="47.467" lon="-87.883" elev="-99.9"/>
+<station id="kp59" lat="47.467" lon="-87.883"/>
 <station id="kptn6" lat="40.811" lon="-73.765" elev="2.1"/>
 <station id="kptv2" lat="37.165" lon="-75.988" elev="2.6"/>
-<station id="kscf" lat="29.116" lon="-91.871" elev="-99.9"/>
-<station id="kspr" lat="28.599" lon="-91.206" elev="-99.9"/>
-<station id="ksqe" lat="28.083" lon="-90.819" elev="-99.9"/>
+<station id="kscf" lat="29.116" lon="-91.871"/>
+<station id="kspr" lat="28.599" lon="-91.206"/>
+<station id="ksqe" lat="28.083" lon="-90.819"/>
 <station id="ktnf1" lat="29.819" lon="-83.594" elev="1.8"/>
-<station id="kvaf" lat="27.354" lon="-94.625" elev="-99.9"/>
-<station id="kvbs" lat="29.478" lon="-93.638" elev="-99.9"/>
-<station id="kvky" lat="29.248" lon="-88.441" elev="-99.9"/>
-<station id="kvoa" lat="29.229" lon="-87.781" elev="-99.9"/>
-<station id="kvqt" lat="28.27" lon="-92.264" elev="-99.9"/>
+<station id="kvaf" lat="27.354" lon="-94.625"/>
+<station id="kvbs" lat="29.478" lon="-93.638"/>
+<station id="kvky" lat="29.248" lon="-88.441"/>
+<station id="kvoa" lat="29.229" lon="-87.781"/>
+<station id="kvqt" lat="28.27" lon="-92.264"/>
 <station id="kwhh1" lat="20.037" lon="-155.829" elev="2.3"/>
 <station id="kwjp8" lat="8.732" lon="167.734" elev="1.8"/>
 <station id="kwnw3" lat="44.465" lon="-87.496" elev="179.3"/>
-<station id="kxih" lat="29.18" lon="-94.521" elev="-99.9"/>
-<station id="kxpy" lat="29.123" lon="-90.202" elev="-99.9"/>
+<station id="kxih" lat="29.18" lon="-94.521"/>
+<station id="kxpy" lat="29.123" lon="-90.202"/>
 <station id="kywf1" lat="24.556" lon="-81.808" elev="2.2"/>
 <station id="lamv3" lat="18.318" lon="-64.724" elev="1.1"/>
 <station id="lapw1" lat="47.913" lon="-124.637" elev="3.1"/>
@@ -2221,7 +2221,7 @@
 <station id="ljac1" lat="32.867" lon="-117.257" elev="9.3"/>
 <station id="ljpc1" lat="32.867" lon="-117.257" elev="0.0"/>
 <station id="lkwf1" lat="26.613" lon="-80.034" elev="5.9"/>
-<station id="lmbv4" lat="19.594" lon="-96.379" elev="-99.9"/>
+<station id="lmbv4" lat="19.594" lon="-96.379"/>
 <station id="lmdf1" lat="25.176" lon="-80.633" elev="0.0"/>
 <station id="lmfs1" lat="34.107" lon="-81.271" elev="107.9"/>
 <station id="lmrf1" lat="25.556" lon="-81.169" elev="0.0"/>
@@ -2239,14 +2239,14 @@
 <station id="lsnf1" lat="25.235" lon="-80.457" elev="0.0"/>
 <station id="ltbv3" lat="17.695" lon="-64.754" elev="3.1"/>
 <station id="ltjf1" lat="30.379" lon="-81.446" elev="4.892"/>
-<station id="ltqm2" lat="39.451" lon="-76.275" elev="-99.9"/>
+<station id="ltqm2" lat="39.451" lon="-76.275"/>
 <station id="ltrm4" lat="46.486" lon="-84.302" elev="178.6"/>
 <station id="luit2" lat="29.076" lon="-95.122" elev="0.0"/>
 <station id="luml1" lat="29.255" lon="-90.664" elev="1.0"/>
 <station id="lwsd1" lat="38.783" lon="-75.119" elev="2.6"/>
 <station id="lwtv2" lat="37.995" lon="-76.465" elev="2.0"/>
 <station id="macm4" lat="45.777" lon="-84.721" elev="179.5"/>
-<station id="maqt2" lat="27.98" lon="-97.029" elev="-99.9"/>
+<station id="maqt2" lat="27.98" lon="-97.029"/>
 <station id="maxt2" lat="28.132" lon="-97.034" elev="3.5"/>
 <station id="mbet2" lat="28.422" lon="-96.327" elev="0.0"/>
 <station id="mbin7" lat="34.091" lon="-77.868" elev="2.8"/>
@@ -2254,7 +2254,7 @@
 <station id="mbnn7" lat="34.171" lon="-77.824" elev="2.2"/>
 <station id="mbpa1" lat="30.527" lon="-88.086" elev="3.4"/>
 <station id="mbrm4" lat="42.975" lon="-82.419" elev="178.6"/>
-<station id="mbxc1" lat="35.371" lon="-120.859" elev="-99.9"/>
+<station id="mbxc1" lat="35.371" lon="-120.859"/>
 <station id="mcga1" lat="30.649" lon="-88.058" elev="2.2"/>
 <station id="mcgm4" lat="46.546" lon="-87.379" elev="186.5"/>
 <station id="mcyi3" lat="41.729" lon="-86.912" elev="176.0"/>
@@ -2265,7 +2265,7 @@
 <station id="mgip4" lat="17.97" lon="-67.046" elev="0.9"/>
 <station id="mgpt2" lat="29.682" lon="-94.985" elev="4.3"/>
 <station id="mgzp4" lat="18.218" lon="-67.159" elev="3.1"/>
-<station id="mhbt2" lat="27.828" lon="-97.201" elev="-99.9"/>
+<station id="mhbt2" lat="27.828" lon="-97.201"/>
 <station id="mhpa1" lat="30.667" lon="-87.936" elev="0.0"/>
 <station id="mhrn6" lat="40.641" lon="-74.162" elev="2.6"/>
 <station id="mism1" lat="43.784" lon="-68.855" elev="16.2"/>
@@ -2279,8 +2279,8 @@
 <station id="mnbf1" lat="25.239" lon="-80.422" elev="0.0"/>
 <station id="mnmm4" lat="45.096" lon="-87.59" elev="178.7"/>
 <station id="mnpv2" lat="36.778" lon="-76.302" elev="2.9"/>
-<station id="mokh1" lat="21.433" lon="-157.79" elev="-99.9"/>
-<station id="mqmt2" lat="28.138" lon="-96.829" elev="-99.9"/>
+<station id="mokh1" lat="21.433" lon="-157.79"/>
+<station id="mqmt2" lat="28.138" lon="-96.829"/>
 <station id="mrcp1" lat="39.809" lon="-75.415" elev="2.4"/>
 <station id="mrho1" lat="41.544" lon="-82.731" elev="176.0"/>
 <station id="mrka2" lat="61.082" lon="-146.662" elev="0.0"/>
@@ -2292,25 +2292,25 @@
 <station id="mtkn6" lat="41.048" lon="-71.959" elev="2.1"/>
 <station id="mukf1" lat="25.106" lon="-80.942" elev="0.0"/>
 <station id="mvxa2" lat="58.364" lon="-134.606" elev="7.6"/>
-<station id="mwqt2" lat="27.838" lon="-97.05" elev="-99.9"/>
+<station id="mwqt2" lat="27.838" lon="-97.05"/>
 <station id="mxxa2" lat="58.301" lon="-134.425" elev="5.2"/>
 <station id="mypf1" lat="30.398" lon="-81.428" elev="5.5"/>
-<station id="myxc1" lat="36.605" lon="-121.889" elev="-99.9"/>
+<station id="myxc1" lat="36.605" lon="-121.889"/>
 <station id="mzxc1" lat="38.035" lon="-122.125" elev="4.1"/>
 <station id="nabm4" lat="46.087" lon="-85.444" elev="178.0"/>
-<station id="naqr1" lat="41.578" lon="-71.321" elev="-99.9"/>
+<station id="naqr1" lat="41.578" lon="-71.321"/>
 <station id="naxr1" lat="41.637" lon="-71.339" elev="7.2"/>
 <station id="nbba3" lat="36.087" lon="-114.728" elev="328.574"/>
 <station id="nblp1" lat="40.137" lon="-74.752" elev="4.3"/>
 <station id="ncdv2" lat="38.32" lon="-77.037" elev="5.494"/>
-<station id="ncht2" lat="29.726" lon="-95.266" elev="-99.9"/>
+<station id="ncht2" lat="29.726" lon="-95.266"/>
 <station id="neaw1" lat="48.367" lon="-124.614" elev="3.2"/>
 <station id="nfdf1" lat="30.4" lon="-81.627" elev="3.0"/>
 <station id="nian6" lat="43.077" lon="-79.014" elev="181.8"/>
-<station id="niqs1" lat="33.349" lon="-79.189" elev="-99.9"/>
+<station id="niqs1" lat="33.349" lon="-79.189"/>
 <station id="niws1" lat="33.349" lon="-79.189" elev="0.0"/>
 <station id="njlc1" lat="40.769" lon="-124.239" elev="7.6"/>
-<station id="nkla2" lat="52.972" lon="-168.855" elev="-99.9"/>
+<station id="nkla2" lat="52.972" lon="-168.855"/>
 <station id="nkta2" lat="60.683" lon="-151.399" elev="7.9"/>
 <station id="nkxa2" lat="58.255" lon="-134.945" elev="12.2"/>
 <station id="nlma3" lat="35.458" lon="-114.666" elev="197.206"/>
@@ -2318,14 +2318,14 @@
 <station id="nlxa2" lat="56.005" lon="-161.177" elev="11.0"/>
 <station id="nmta2" lat="64.5" lon="-165.43" elev="4.9"/>
 <station id="nmxa2" lat="64.494" lon="-165.44" elev="7.0"/>
-<station id="noqn7" lat="34.156" lon="-77.85" elev="-99.9"/>
+<station id="noqn7" lat="34.156" lon="-77.85"/>
 <station id="noxn7" lat="34.155" lon="-77.851" elev="4.88"/>
 <station id="npdw3" lat="45.291" lon="-86.977" elev="178.0"/>
-<station id="npqn6" lat="41.832" lon="-73.942" elev="-99.9"/>
+<station id="npqn6" lat="41.832" lon="-73.942"/>
 <station id="npsf1" lat="26.132" lon="-81.807" elev="3.1"/>
 <station id="npxn6" lat="41.831" lon="-73.942" elev="0.0"/>
 <station id="nrep1" lat="42.258" lon="-79.792" elev="183.0"/>
-<station id="nrrf1" lat="25.338" lon="-80.911" elev="-99.9"/>
+<station id="nrrf1" lat="25.338" lon="-80.911"/>
 <station id="nstp6" lat="-14.28" lon="-170.688" elev="1.8"/>
 <station id="nsxa2" lat="60.74" lon="-151.311" elev="47.6"/>
 <station id="ntbc1" lat="34.405" lon="-119.692" elev="2.6"/>
@@ -2341,29 +2341,29 @@
 <station id="obxc1" lat="37.804" lon="-122.341" elev="1.9"/>
 <station id="ocim2" lat="38.328" lon="-75.091" elev="2.0"/>
 <station id="ocsm2" lat="38.338" lon="-75.07" elev="-11.0"/>
-<station id="ohbc1" lat="33.72" lon="-118.273" elev="-99.9"/>
+<station id="ohbc1" lat="33.72" lon="-118.273"/>
 <station id="oksi2" lat="41.912" lon="-87.624" elev="179.0"/>
-<station id="okxc1" lat="37.811" lon="-122.333" elev="-99.9"/>
+<station id="okxc1" lat="37.811" lon="-122.333"/>
 <station id="olcn6" lat="43.341" lon="-78.719" elev="75.0"/>
 <station id="olsa2" lat="52.94" lon="-168.87" elev="16.6"/>
-<station id="omhc1" lat="37.801" lon="-122.33" elev="-99.9"/>
+<station id="omhc1" lat="37.801" lon="-122.33"/>
 <station id="oouh1" lat="21.303" lon="-157.865" elev="1.6"/>
 <station id="optf1" lat="27.858" lon="-82.553" elev="11.1"/>
 <station id="orin7" lat="35.796" lon="-75.548" elev="0.8"/>
 <station id="osgn6" lat="43.464" lon="-76.511" elev="78.0"/>
 <station id="otnm4" lat="46.87" lon="-89.33" elev="186.0"/>
 <station id="ovia2" lat="59.44" lon="-151.72" elev="0.0"/>
-<station id="owdo1" lat="41.365" lon="-82.505" elev="-99.9"/>
+<station id="owdo1" lat="41.365" lon="-82.505"/>
 <station id="owmo1" lat="41.247" lon="-82.454" elev="270.3"/>
-<station id="owqo1" lat="41.382" lon="-82.514" elev="-99.9"/>
-<station id="owso1" lat="41.383" lon="-82.514" elev="-99.9"/>
+<station id="owqo1" lat="41.382" lon="-82.514"/>
+<station id="owso1" lat="41.383" lon="-82.514"/>
 <station id="owxo1" lat="41.378" lon="-82.508" elev="184.1"/>
 <station id="pacf1" lat="30.152" lon="-85.667" elev="2.1"/>
 <station id="pact2" lat="27.634" lon="-97.237" elev="0.0"/>
 <station id="paua2" lat="57.124" lon="-170.271" elev="20.0"/>
 <station id="paxa2" lat="58.159" lon="-134.178" elev="13.7"/>
 <station id="pbfw1" lat="48.464" lon="-122.469" elev="1.83"/>
-<station id="pblw1" lat="48.556" lon="-122.53" elev="-99.9"/>
+<station id="pblw1" lat="48.556" lon="-122.53"/>
 <station id="pbpa2" lat="58.203" lon="-134.148" elev="3.0"/>
 <station id="pcbf1" lat="30.213" lon="-85.88" elev="7.9"/>
 <station id="pcgt2" lat="26.072" lon="-97.167" elev="0.0"/>
@@ -2372,11 +2372,11 @@
 <station id="pcnt2" lat="28.446" lon="-96.396" elev="0.0"/>
 <station id="pcoc1" lat="38.056" lon="-122.039" elev="2.8"/>
 <station id="pcxa2" lat="57.463" lon="-134.867" elev="5.0"/>
-<station id="pdvr1" lat="41.611" lon="-71.41" elev="-99.9"/>
-<station id="pegf1" lat="26.086" lon="-80.116" elev="-99.9"/>
+<station id="pdvr1" lat="41.611" lon="-71.41"/>
+<station id="pegf1" lat="26.086" lon="-80.116"/>
 <station id="pexa2" lat="57.958" lon="-136.227" elev="6.0"/>
-<station id="pfdc1" lat="33.735" lon="-118.241" elev="-99.9"/>
-<station id="pfxc1" lat="33.747" lon="-118.215" elev="-99.9"/>
+<station id="pfdc1" lat="33.735" lon="-118.241"/>
+<station id="pfxc1" lat="33.747" lon="-118.215"/>
 <station id="pgbp7" lat="13.428" lon="144.796" elev="12.8"/>
 <station id="pgxa2" lat="57.016" lon="-134.618" elev="6.1"/>
 <station id="phbp1" lat="39.933" lon="-75.142" elev="3.5"/>
@@ -2396,12 +2396,12 @@
 <station id="port2" lat="29.867" lon="-93.931" elev="0.0"/>
 <station id="pota2" lat="61.06" lon="-146.7" elev="7.0"/>
 <station id="ppta1" lat="30.279" lon="-87.556" elev="0.0"/>
-<station id="pptm2" lat="38.134" lon="-76.533" elev="-99.9"/>
+<station id="pptm2" lat="38.134" lon="-76.533"/>
 <station id="ppxa2" lat="60.801" lon="-148.357" elev="5.0"/>
-<station id="ppxc1" lat="37.906" lon="-122.365" elev="-99.9"/>
+<station id="ppxc1" lat="37.906" lon="-122.365"/>
 <station id="prda2" lat="70.4" lon="-148.527" elev="0.0"/>
 <station id="prim4" lat="45.357" lon="-83.492" elev="184.0"/>
-<station id="prjc1" lat="33.733" lon="-118.186" elev="-99.9"/>
+<station id="prjc1" lat="33.733" lon="-118.186"/>
 <station id="prta2" lat="58.411" lon="-134.955" elev="30.0"/>
 <station id="prur1" lat="41.605" lon="-71.304" elev="1.7"/>
 <station id="pryc1" lat="37.996" lon="-122.977" elev="0.0"/>
@@ -2411,21 +2411,21 @@
 <station id="pslc1" lat="35.169" lon="-120.754" elev="0.0"/>
 <station id="pstl1" lat="28.932" lon="-89.407" elev="3.6"/>
 <station id="pstn6" lat="42.691" lon="-79.048" elev="179.18"/>
-<station id="psxc1" lat="33.768" lon="-118.226" elev="-99.9"/>
+<station id="psxc1" lat="33.768" lon="-118.226"/>
 <station id="ptat2" lat="27.826" lon="-97.051" elev="0.0"/>
 <station id="ptaw1" lat="48.125" lon="-123.441" elev="3.8"/>
-<station id="ptbm6" lat="30.213" lon="-88.505" elev="-99.9"/>
+<station id="ptbm6" lat="30.213" lon="-88.505"/>
 <station id="ptcr1" lat="41.638" lon="-71.34" elev="12.0"/>
 <station id="ptgc1" lat="34.577" lon="-120.648" elev="32.3"/>
 <station id="ptim4" lat="46.485" lon="-84.631" elev="185.0"/>
 <station id="ptit2" lat="26.061" lon="-97.215" elev="3.2"/>
 <station id="ptla2" lat="58.346" lon="-134.752" elev="3.0"/>
 <station id="ptoa1" lat="30.671" lon="-88.031" elev="4.3"/>
-<station id="ptrp4" lat="18.367" lon="-67.251" elev="-99.9"/>
+<station id="ptrp4" lat="18.367" lon="-67.251"/>
 <station id="ptww1" lat="48.111" lon="-122.76" elev="5.1"/>
 <station id="pvdr1" lat="41.786" lon="-71.383" elev="3.869"/>
 <station id="pwaw3" lat="43.388" lon="-87.867" elev="178.0"/>
-<station id="pxac1" lat="33.764" lon="-118.265" elev="-99.9"/>
+<station id="pxac1" lat="33.764" lon="-118.265"/>
 <station id="pxoc1" lat="37.798" lon="-122.393" elev="0.0"/>
 <station id="pxsc1" lat="37.803" lon="-122.397" elev="1.54"/>
 <station id="qptr1" lat="41.586" lon="-71.407" elev="1.6"/>
@@ -2436,7 +2436,7 @@
 <station id="rdda2" lat="67.575" lon="-164.067" elev="7.3"/>
 <station id="rdyd1" lat="39.558" lon="-75.572" elev="2.3"/>
 <station id="rixa2" lat="58.177" lon="-135.052" elev="13.7"/>
-<station id="rkqf1" lat="26.027" lon="-81.734" elev="-99.9"/>
+<station id="rkqf1" lat="26.027" lon="-81.734"/>
 <station id="rkxf1" lat="26.05" lon="-81.701" elev="3.0"/>
 <station id="rlit2" lat="26.262" lon="-97.285" elev="0.0"/>
 <station id="rlot2" lat="29.515" lon="-94.513" elev="0.0"/>
@@ -2447,20 +2447,20 @@
 <station id="rsjt2" lat="26.801" lon="-97.471" elev="0.0"/>
 <station id="rtat2" lat="27.84" lon="-97.072" elev="0.0"/>
 <station id="rtyc1" lat="37.507" lon="-122.212" elev="3.1"/>
-<station id="ryec1" lat="38.184" lon="-122.014" elev="-99.9"/>
-<station id="sacv4" lat="19.174" lon="-96.093" elev="-99.9"/>
+<station id="ryec1" lat="38.184" lon="-122.014"/>
+<station id="sacv4" lat="19.174" lon="-96.093"/>
 <station id="sanf1" lat="24.456" lon="-81.877" elev="0.0"/>
 <station id="sapf1" lat="27.761" lon="-82.627" elev="1.5"/>
-<station id="saqg1" lat="31.418" lon="-81.296" elev="-99.9"/>
+<station id="saqg1" lat="31.418" lon="-81.296"/>
 <station id="sauf1" lat="29.857" lon="-81.265" elev="8.8"/>
 <station id="saxg1" lat="31.418" lon="-81.296" elev="4.57"/>
 <station id="sbbn2" lat="36.05" lon="-114.748" elev="328.574"/>
 <station id="sbeo3" lat="44.625" lon="-124.045" elev="3.4"/>
 <station id="sbio1" lat="41.629" lon="-82.841" elev="176.8"/>
 <station id="sblm4" lat="43.81" lon="-83.72" elev="180.0"/>
-<station id="scld1" lat="39.085" lon="-75.461" elev="-99.9"/>
-<station id="scqc1" lat="38.001" lon="-122.46" elev="-99.9"/>
-<station id="scqn6" lat="42.046" lon="-73.911" elev="-99.9"/>
+<station id="scld1" lat="39.085" lon="-75.461"/>
+<station id="scqc1" lat="38.001" lon="-122.46"/>
+<station id="scqn6" lat="42.046" lon="-73.911"/>
 <station id="scxa2" lat="58.205" lon="-134.646" elev="15.2"/>
 <station id="sdbc1" lat="32.714" lon="-117.174" elev="0.0"/>
 <station id="sdhn4" lat="40.467" lon="-74.009" elev="1.9"/>
@@ -2468,10 +2468,10 @@
 <station id="sdrt2" lat="28.407" lon="-96.712" elev="0.0"/>
 <station id="sefo3" lat="46.204" lon="-123.759" elev="0.0"/>
 <station id="seim1" lat="43.08" lon="-70.742" elev="2.05"/>
-<station id="seqa2" lat="59.441" lon="-151.721" elev="-99.9"/>
+<station id="seqa2" lat="59.441" lon="-151.721"/>
 <station id="seto3" lat="46.2" lon="-123.941" elev="0.0"/>
 <station id="sfxc1" lat="38.2" lon="-122.026" elev="2.74"/>
-<station id="sgnt2" lat="28.771" lon="-95.617" elev="-99.9"/>
+<station id="sgnt2" lat="28.771" lon="-95.617"/>
 <station id="sgnw3" lat="43.749" lon="-87.693" elev="175.9"/>
 <station id="sgof1" lat="29.408" lon="-84.858" elev="0.0"/>
 <station id="sgxa2" lat="56.599" lon="-169.542" elev="60.0"/>
@@ -2490,21 +2490,21 @@
 <station id="skxa2" lat="59.448" lon="-135.326" elev="4.6"/>
 <station id="slim2" lat="38.321" lon="-76.452" elev="1.5"/>
 <station id="slmn2" lat="35.389" lon="-114.621" elev="197.206"/>
-<station id="sloo3" lat="43.296" lon="-124.311" elev="-99.9"/>
+<station id="sloo3" lat="43.296" lon="-124.311"/>
 <station id="slvm5" lat="47.278" lon="-91.27" elev="195.0"/>
 <station id="slxa2" lat="55.34" lon="-131.644" elev="6.7"/>
 <station id="smkf1" lat="24.628" lon="-81.109" elev="0.0"/>
 <station id="snda2" lat="55.336" lon="-160.502" elev="3.6"/>
 <station id="sndp5" lat="28.215" lon="-177.361" elev="2.2"/>
 <station id="snto3" lat="43.279" lon="-124.318" elev="3.6"/>
-<station id="soqo3" lat="43.317" lon="-124.322" elev="-99.9"/>
+<station id="soqo3" lat="43.317" lon="-124.322"/>
 <station id="spgf1" lat="26.704" lon="-78.995" elev="1.5"/>
 <station id="spll1" lat="28.867" lon="-90.483" elev="0.0"/>
 <station id="sptm4" lat="44.713" lon="-83.273" elev="184.0"/>
 <station id="spxa2" lat="55.599" lon="-132.203" elev="7.5"/>
-<station id="sraw1" lat="45.572" lon="-122.379" elev="-99.9"/>
-<station id="sref1" lat="25.352" lon="-81.1" elev="-99.9"/>
-<station id="srfw1" lat="46.185" lon="-123.188" elev="-99.9"/>
+<station id="sraw1" lat="45.572" lon="-122.379"/>
+<station id="sref1" lat="25.352" lon="-81.1"/>
+<station id="srfw1" lat="46.185" lon="-123.188"/>
 <station id="srlm4" lat="45.773" lon="-84.137" elev="177.0"/>
 <station id="srst2" lat="29.683" lon="-94.033" elev="0.7"/>
 <station id="srxa2" lat="58.383" lon="-134.652" elev="2.0"/>
@@ -2523,23 +2523,23 @@
 <station id="taqt2" lat="27.815" lon="-97.389" elev="0.0"/>
 <station id="tawm4" lat="44.254" lon="-83.449" elev="183.0"/>
 <station id="tbim4" lat="45.035" lon="-83.194" elev="175.9"/>
-<station id="tbyf1" lat="25.155" lon="-80.722" elev="-99.9"/>
+<station id="tbyf1" lat="25.155" lon="-80.722"/>
 <station id="tcbm2" lat="39.213" lon="-76.244" elev="3.0"/>
 <station id="tcmw1" lat="47.276" lon="-122.418" elev="4.1"/>
 <station id="tcnw1" lat="47.267" lon="-122.413" elev="4.1"/>
-<station id="tcsv2" lat="37.415" lon="-76.714" elev="-99.9"/>
+<station id="tcsv2" lat="37.415" lon="-76.714"/>
 <station id="tcvf1" lat="25.213" lon="-80.533" elev="0.0"/>
-<station id="tdpc1" lat="41.055" lon="-124.147" elev="-99.9"/>
+<station id="tdpc1" lat="41.055" lon="-124.147"/>
 <station id="tesl1" lat="29.668" lon="-91.237" elev="0.0"/>
-<station id="tfblk" lat="65.698" lon="-24.778" elev="-99.9"/>
+<station id="tfblk" lat="65.698" lon="-24.778"/>
 <station id="thlo1" lat="41.826" lon="-83.194" elev="173.5"/>
 <station id="thrf1" lat="25.203" lon="-80.372" elev="0.0"/>
 <station id="thro1" lat="41.694" lon="-83.473" elev="176.2"/>
 <station id="tibc1" lat="37.892" lon="-122.447" elev="5.0"/>
-<station id="tiqc1" lat="32.568" lon="-117.131" elev="-99.9"/>
+<station id="tiqc1" lat="32.568" lon="-117.131"/>
 <station id="tixc1" lat="32.575" lon="-117.127" elev="4.0"/>
 <station id="tkea2" lat="57.779" lon="-135.219" elev="5.0"/>
-<station id="tkpn6" lat="42.014" lon="-73.939" elev="-99.9"/>
+<station id="tkpn6" lat="42.014" lon="-73.939"/>
 <station id="tlbo3" lat="45.555" lon="-123.919" elev="0.0"/>
 <station id="tlvt2" lat="27.819" lon="-97.454" elev="2.0"/>
 <station id="tokw1" lat="46.707" lon="-123.967" elev="3.0"/>
@@ -2568,11 +2568,11 @@
 <station id="vdza2" lat="61.125" lon="-146.361" elev="4.6"/>
 <station id="venf1" lat="27.072" lon="-82.453" elev="0.0"/>
 <station id="verv4" lat="19.204" lon="-96.113" elev="0.0"/>
-<station id="vqsp4" lat="18.153" lon="-65.444" elev="-99.9"/>
+<station id="vqsp4" lat="18.153" lon="-65.444"/>
 <station id="vtbt2" lat="27.841" lon="-97.52" elev="1.006"/>
 <station id="wahv2" lat="37.608" lon="-75.686" elev="1.5"/>
 <station id="wakp8" lat="19.291" lon="166.618" elev="3.6"/>
-<station id="waqm3" lat="41.552" lon="-70.549" elev="-99.9"/>
+<station id="waqm3" lat="41.552" lon="-70.549"/>
 <station id="wasd2" lat="38.873" lon="-77.021" elev="2.2"/>
 <station id="wats1" lat="34.335" lon="-80.702" elev="85.6"/>
 <station id="waxm3" lat="41.582" lon="-70.525" elev="10.4"/>
@@ -2580,17 +2580,17 @@
 <station id="wcrp1" lat="42.077" lon="-80.24" elev="174.0"/>
 <station id="wcxa2" lat="55.402" lon="-131.729" elev="7.0"/>
 <station id="wdel1" lat="28.662" lon="-89.551" elev="0.0"/>
-<station id="wdsv2" lat="36.977" lon="-76.315" elev="-99.9"/>
-<station id="webm1" lat="43.32" lon="-70.563" elev="-99.9"/>
+<station id="wdsv2" lat="36.977" lon="-76.315"/>
+<station id="webm1" lat="43.32" lon="-70.563"/>
 <station id="welm1" lat="43.32" lon="-70.563" elev="3.5"/>
-<station id="weqm1" lat="43.345" lon="-70.549" elev="-99.9"/>
+<station id="weqm1" lat="43.345" lon="-70.549"/>
 <station id="wexm1" lat="43.337" lon="-70.549" elev="18.62"/>
 <station id="wfpm4" lat="46.76" lon="-84.97" elev="188.67"/>
 <station id="wgxa2" lat="56.467" lon="-132.382" elev="15.0"/>
 <station id="whri2" lat="42.361" lon="-87.813" elev="180.0"/>
 <station id="wiwf1" lat="25.587" lon="-81.044" elev="0.0"/>
 <station id="wixa2" lat="60.777" lon="-148.682" elev="4.6"/>
-<station id="wkqa1" lat="30.417" lon="-87.823" elev="-99.9"/>
+<station id="wkqa1" lat="30.417" lon="-87.823"/>
 <station id="wkxa1" lat="30.421" lon="-87.828" elev="3.35"/>
 <station id="wlon7" lat="34.228" lon="-77.954" elev="1.5"/>
 <station id="wnem4" lat="46.285" lon="-84.21" elev="177.9"/>
@@ -2601,13 +2601,13 @@
 <station id="wrxa2" lat="70.636" lon="-160.034" elev="10.0"/>
 <station id="wslm4" lat="45.842" lon="-85.135" elev="177.0"/>
 <station id="wwef1" lat="25.232" lon="-80.938" elev="0.0"/>
-<station id="wybs1" lat="33.309" lon="-79.289" elev="-99.9"/>
+<station id="wybs1" lat="33.309" lon="-79.289"/>
 <station id="wycm6" lat="30.326" lon="-89.326" elev="0.0"/>
-<station id="wyss1" lat="33.309" lon="-79.289" elev="-99.9"/>
-<station id="yabp4" lat="18.055" lon="-65.833" elev="-99.9"/>
+<station id="wyss1" lat="33.309" lon="-79.289"/>
+<station id="yabp4" lat="18.055" lon="-65.833"/>
 <station id="yata2" lat="59.548" lon="-139.733" elev="6.6"/>
 <station id="ygnn6" lat="43.262" lon="-79.064" elev="73.0"/>
-<station id="ykrv2" lat="37.251" lon="-76.342" elev="-99.9"/>
+<station id="ykrv2" lat="37.251" lon="-76.342"/>
 <station id="yktv2" lat="37.227" lon="-76.479" elev="3.7"/>
 <station id="yrsv2" lat="37.414" lon="-76.712" elev="11.0"/>
-<station id="zbqn7" lat="33.955" lon="-77.935" elev="-99.9"/>
+<station id="zbqn7" lat="33.955" lon="-77.935"/>

@@ -109,7 +109,10 @@ class Station:
     return self._id == ""
 
   def textForLookups(self):
-    txt = '<station id="{a}" lat="{b}" lon="{c}" elev="{d}"/>'.format(a=self._id,b=self._lat,c=self._lon,d=self._elev)
+    if self._elev == MISSING:
+      txt = '<station id="{a}" lat="{b}" lon="{c}"/>'.format(a=self._id,b=self._lat,c=self._lon)
+    else:
+      txt = '<station id="{a}" lat="{b}" lon="{c}" elev="{d}"/>'.format(a=self._id,b=self._lat,c=self._lon,d=self._elev)
     return txt
   
   def location_match(self, other):
@@ -119,7 +122,10 @@ class Station:
     return self._lat == other._lat and self._lon == other._lon and self._elev == other._elev
 
   def location_string(self):
-    txt = '{a}({b},{c},{d})'.format(a=self._name,b=self._lat,c=self._lon,d=self._elev)
+    if self._elev == MISSING:
+      txt = '{a}({b},{c})'.format(a=self._name,b=self._lat,c=self._lon)
+    else:
+      txt = '{a}({b},{c},{d})'.format(a=self._name,b=self._lat,c=self._lon,d=self._elev)
     return txt
   
   def equals(self, other):
@@ -420,11 +426,6 @@ def processComplete(name):
 #----------------------------------------------
 def createNextStationInfo(name, data, i):
 
-  #lat = MISSING
-  #lon = MISSING
-  #elev = MISSING
-  #station = ""
-
   s = Station()
 
   #data has entries like this:  <a href="station_page.php?station=45001">45001</a>
@@ -573,10 +574,6 @@ def parse(name, fname, debug=False):
   if debug:
     print("Parsing ", fname)
   stations = []
-  #ids = []
-  #lats = []
-  #lons = []
-  #elevs = []
 
   with open(fname, 'r') as file:
     data_all = file.read().replace('\n', '')
@@ -619,14 +616,9 @@ def parse(name, fname, debug=False):
       elev = float(data[index7+6:index8])
 
     stations.append(Station(name, stationId, lat, lon, elev))
-    #ids.append(stationId)
-    #lats.append(lat)
-    #lons.append(lon)
-    #elevs.append(elev)
 
     index_all = indexend+2
 
-  #return [ids, lats, lons, elevs]
   return stations
 
 #----------------------------------------------
