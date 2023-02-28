@@ -372,8 +372,8 @@ def main(diagnostic, out_file, prune):
   print("Num new total:           ", numNew)
   print("Num conflict no change:  ", numConflict)
   print("Num conflict with change:", numConflictChanged)
-  print("Numactivenotcomplete:    ", numActiveNotComplete)
-  print("Numcompletenotactive:    ", numCompleteNotActive)
+  print("Num active not complete: ", numActiveNotComplete)
+  print("Num complete not active: ", numCompleteNotActive)
 
   return 0  
     
