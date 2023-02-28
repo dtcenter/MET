@@ -20,7 +20,7 @@ print(sys.path)
 project = 'MET'
 author = 'UCAR/NCAR, NOAA, CSU/CIRA, and CU/CIRES'
 author_list = 'Opatz, J., T. Jensen, J. Prestopnik, H. Soh, L. Goodrich, B. Brown, R. Bullock, J. Halley Gotway, K. Newman'
-version = '11.0.0'
+version = '11.1.0'
 verinfo = version
 release = f'{version}'
 release_year = '2022'
