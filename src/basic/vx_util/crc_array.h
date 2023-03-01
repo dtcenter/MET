@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -19,6 +19,7 @@
 
 
 #include <iostream>
+#include <vector>
 
 #include "num_array.h"
 #include "int_array.h"
@@ -39,27 +40,6 @@ static const int crc_array_alloc_inc = 25;
 
 template <typename T>
 
-int is_bigger(const void * p1, const void * p2)
-
-{
-
-const T & a = *((T *) p1);
-const T & b = *((T *) p2);
-
-if ( a < b )  return ( -1 );
-if ( a > b )  return (  1 );
-
-return ( 0 );
-
-}
-
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-template <typename T>
-
 class CRC_Array {
 
    private:
@@ -69,7 +49,7 @@ class CRC_Array {
       void assign(const CRC_Array &);
 
 
-      T * e;
+      std::vector<T> e;
 
       int Nelements;
 
@@ -147,12 +127,6 @@ class CRC_Array {
 ////////////////////////////////////////////////////////////////////////
 
 
-// static int is_bigger(const void *, const void *);
-
-
-////////////////////////////////////////////////////////////////////////
-
-
    //
    //  Code for class CRC_Array
    //
@@ -205,8 +179,6 @@ void CRC_Array<T>::init_from_scratch()
 
 {
 
-e = (T *) 0;
-
 clear();
 
 return;
@@ -223,7 +195,7 @@ void CRC_Array<T>::clear()
 
 {
 
-if ( e )  { delete [] e;  e = (T *) 0; }
+e.clear();
 
 Nelements = Nalloc = 0;
 
@@ -247,13 +219,7 @@ if ( a.Nelements == 0 )  return;
 
 extend(a.Nelements);
 
-int j;
-
-for (j=0; j<(a.Nelements); ++j)  {
-
-   e[j] = a.e[j];
-
-}
+e = a.e;
 
 Nelements = a.Nelements;
 
@@ -286,36 +252,7 @@ if ( ! exact )  {
 
 }
 
-T * u = (T *) 0;
-
-u = new T [len];
-
-if ( !u )  {
-
-   mlog << Error << "\nvoid CRC_Array::extend(int, bool) -> "
-        << "memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
-
-int j;
-
-memset(u, 0, len*sizeof(T));
-
-if ( e )  {
-
-   for (j=0; j<Nelements; ++j)  {
-
-      u[j] = e[j];
-
-   }
-
-   delete [] e;  e = (T *) 0;
-
-}
-
-e = u;   u = (T *) 0;
+e.reserve( len );
 
 Nalloc = len;
 
@@ -533,7 +470,9 @@ void CRC_Array<T>::add(const T & k)
 
 extend(Nelements + 1, false);
 
-e[Nelements++] = k;
+e.push_back(k);
+
+Nelements++;
 
 return;
 
@@ -555,7 +494,9 @@ int j;
 
 for (j=0; j<(a.Nelements); ++j)  {
 
-   e[Nelements++] = a.e[j];
+   e.push_back(a.e[j]);
+
+   Nelements++;
 
 }
 
@@ -604,7 +545,7 @@ void CRC_Array<T>::sort_increasing()
 
 if ( Nelements <= 1 )  return;
 
-qsort(e, Nelements, sizeof(*e), is_bigger<T>);
+std::sort(e.begin(), e.end());
 
 return;
 

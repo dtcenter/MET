@@ -1,7 +1,7 @@
 
 
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -121,10 +121,22 @@ inline double StereographicGrid::scale_km () const { return ( Data.d_km ); }
 
 extern double stereographic_alpha(double scale_lat, double r_km, double d_km);
 
-extern double     st_func (double lat, bool is_north_hemisphere);
+extern double     st_func (double lat, bool is_north_hemisphere, double eccentricity = 0.);
 extern double st_der_func (double lat, bool is_north_hemisphere);
 
 extern double st_inv_func (double r, bool is_north_hemisphere);
+
+extern double st_eccentricity_func(double semi_major_axis, double semi_minor_axis,
+                                   double inverse_flattening);
+extern double st_sf_func(double standard_parallel, double eccentricity, bool is_north_hemisphere);
+extern bool st_latlon_to_xy_func(double lat, double lon, double &x_m, double &y_m,
+                                 double scale_factor, double scale_lat, double semi_major_axis,
+                                 double false_east, double false_north,
+                                 double e, bool is_north_hemisphere);
+extern bool st_xy_to_latlon_func(double x_m, double y_m, double &lat, double &lon,
+                                 double scale_factor, double semi_major_axis,
+                                 double proj_vertical_lon, double false_east, double false_north,
+                                 double eccentricity, bool is_north_hemisphere);
 
 
 ////////////////////////////////////////////////////////////////////////
