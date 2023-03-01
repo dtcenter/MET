@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -81,6 +81,8 @@ extern  int       hms_to_sec      (int hour, int min, int sec);
 
 extern  int       unix_to_sec_of_day (unixtime u);
 
+extern  int       unix_to_day_of_year (unixtime u);
+
 extern  long      unix_to_long_yyyymmddhh (unixtime u);
 
 // Parse time strings
@@ -123,6 +125,14 @@ extern  ConcatString HH(int hours);
 
 extern  int          timestring_to_sec(const char *);
 extern  ConcatString sec_to_timestring(int);
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+extern  int  sec_of_day_diff (unixtime ut1, unixtime ut2);
+
+extern  int  day_of_year_diff (unixtime ut1, unixtime ut2);
 
 
 ////////////////////////////////////////////////////////////////////////

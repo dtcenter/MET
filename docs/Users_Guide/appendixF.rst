@@ -16,7 +16,9 @@ In order to use Python embedding, the user's local Python installation must have
 
 The local Python installation must also support a minimum set of required packages. The MET build includes some python wrapper scripts to facilitate the passing of data in memory as well as the reading and writing of temporary files. The packages required by those wrapper scripts are **sys, os, argparse, importlib, numpy and netCDF4**. While most of these are standard packages and readily available, numpy and netCDF4 may not be. Users are advised to confirm their availability prior to compiling MET with python embedding support.
 
-In addition to the **configure** option mentioned above, two variables, **MET_PYTHON_CC** and **MET_PYTHON_LD**, must also be set for the configuration process. These may either be set as environment variables or as command line options to **configure**. These constants are passed as compiler command line options when building MET to enable the compiler to find the requisite Python header files and libraries in the user's local filesystem. Fortunately, Python provides a way to set these variables properly. This frees the user from the necessity of having any expert knowledge of the compiling and linking process. Along with the **Python** executable, there should be another executable called **python3-config**, whose output can be used to set these environment variables as follows:
+In addition to the **configure** option mentioned above, three variables, **MET_PYTHON_BIN_EXE**, **MET_PYTHON_CC**, and **MET_PYTHON_LD**, must also be set for the configuration process. These may either be set as environment variables or as command line options to **configure**. These constants are passed as compiler command line options when building MET to enable the compiler to find the requisite Python executable, header files, and libraries in the user's local filesystem. Fortunately, Python provides a way to set these variables properly. This frees the user from the necessity of having any expert knowledge of the compiling and linking process. Along with the **Python** executable, there should be another executable called **python3-config**, whose output can be used to set these environment variables as follows:
+
+• Set **MET_PYTHON_BIN_EXE** to the full path of the desired python executable.
 
 • On the command line, run "**python3-config --cflags**". Set the value of **MET_PYTHON_CC** to the output of that command.
 
@@ -258,7 +260,7 @@ The ASCII2NC tool supports the "-format python" option. With this option, point 
                 "MET_BASE/python/read_ascii_point.py sample_ascii_obs.txt" \
                 sample_ascii_obs_python.nc
 
-The Point2Grid, Plot-Point-Obs, Ensemble-Stat, and Point-Stat tools also process point observations. They support POython embedding of point observations directly on the command line by replacing the input MET NetCDF point observation file name with the Python command to be run. The Python command must begin with the prefix 'PYTHON_NUMPY=' and be followed by the path to the User's Python script and any arguments. The full command should be enclosed in single quotes to prevent embedded whitespace from causing parsing errors. An example of this is shown below:
+The Point2Grid, Plot-Point-Obs, Ensemble-Stat, and Point-Stat tools also process point observations. They support Python embedding of point observations directly on the command line by replacing the input MET NetCDF point observation file name with the Python command to be run. The Python command must begin with the prefix 'PYTHON_NUMPY=' and be followed by the path to the User's Python script and any arguments. The full command should be enclosed in single quotes to prevent embedded whitespace from causing parsing errors. An example of this is shown below:
 
 .. code-block:: none
 

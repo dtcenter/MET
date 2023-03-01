@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -179,6 +179,8 @@ static const bool default_dictionary_error_out = true;
 
 static const bool default_dictionary_print_warning = true;
 
+static const bool default_dictionary_search_parent = true;
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -195,7 +197,8 @@ class Dictionary {
 
       void patch_parents();
 
-      virtual const DictionaryEntry * lookup_simple(const std::string name);   //  no scope
+      virtual const DictionaryEntry * lookup_simple(const std::string name,
+                                                    bool search_parent = true);   //  no scope
 
 
       int Nentries;
@@ -253,7 +256,7 @@ class Dictionary {
 
       virtual void store(const Dictionary &);
 
-      virtual const DictionaryEntry * lookup(const std::string name);
+      virtual const DictionaryEntry * lookup(const std::string name, bool search_parent = true);
 
          //
          //  convenience functions
@@ -261,43 +264,56 @@ class Dictionary {
 
       bool         lookup_bool           (const char * name,
                                           bool error_out = default_dictionary_error_out,
-                                          bool print_warning = default_dictionary_print_warning);
+                                          bool print_warning = default_dictionary_print_warning,
+                                          bool search_parent = default_dictionary_search_parent);
       int          lookup_int            (const char * name,
                                           bool error_out = default_dictionary_error_out,
-                                          bool print_warning = default_dictionary_print_warning);
+                                          bool print_warning = default_dictionary_print_warning,
+                                          bool search_parent = default_dictionary_search_parent);
       double       lookup_double         (const char * name,
                                           bool error_out = default_dictionary_error_out,
-                                          bool print_warning = default_dictionary_print_warning);
+                                          bool print_warning = default_dictionary_print_warning,
+                                          bool search_parent = default_dictionary_search_parent);
       NumArray     lookup_num_array      (const char * name,
                                           bool error_out = default_dictionary_error_out,
-                                          bool print_warning = default_dictionary_print_warning);
+                                          bool print_warning = default_dictionary_print_warning,
+                                          bool search_parent = default_dictionary_search_parent);
       IntArray     lookup_int_array      (const char * name,
                                           bool error_out = default_dictionary_error_out,
-                                          bool print_warning = default_dictionary_print_warning);
+                                          bool print_warning = default_dictionary_print_warning,
+                                          bool search_parent = default_dictionary_search_parent);
       ConcatString lookup_string         (const char * name,
                                           bool error_out = default_dictionary_error_out,
-                                          bool print_warning = default_dictionary_print_warning);
+                                          bool print_warning = default_dictionary_print_warning,
+                                          bool search_parent = default_dictionary_search_parent);
       StringArray  lookup_string_array   (const char * name,
                                           bool error_out = default_dictionary_error_out,
-                                          bool print_warning = default_dictionary_print_warning);
+                                          bool print_warning = default_dictionary_print_warning,
+                                          bool search_parent = default_dictionary_search_parent);
       SingleThresh lookup_thresh         (const char * name,
                                           bool error_out = default_dictionary_error_out,
-                                          bool print_warning = default_dictionary_print_warning);
+                                          bool print_warning = default_dictionary_print_warning,
+                                          bool search_parent = default_dictionary_search_parent);
       ThreshArray  lookup_thresh_array   (const char * name,
                                           bool error_out = default_dictionary_error_out,
-                                          bool print_warning = default_dictionary_print_warning);
+                                          bool print_warning = default_dictionary_print_warning,
+                                          bool search_parent = default_dictionary_search_parent);
       int          lookup_seconds        (const char * name,
                                           bool error_out = default_dictionary_error_out,
-                                          bool print_warning = default_dictionary_print_warning);
+                                          bool print_warning = default_dictionary_print_warning,
+                                          bool search_parent = default_dictionary_search_parent);
       IntArray     lookup_seconds_array  (const char * name,
                                           bool error_out = default_dictionary_error_out,
-                                          bool print_warning = default_dictionary_print_warning);
+                                          bool print_warning = default_dictionary_print_warning,
+                                          bool search_parent = default_dictionary_search_parent);
       unixtime     lookup_unixtime       (const char * name,
                                           bool error_out = default_dictionary_error_out,
-                                          bool print_warning = default_dictionary_print_warning);
+                                          bool print_warning = default_dictionary_print_warning,
+                                          bool search_parent = default_dictionary_search_parent);
       TimeArray    lookup_unixtime_array (const char * name,
                                           bool error_out = default_dictionary_error_out,
-                                          bool print_warning = default_dictionary_print_warning);
+                                          bool print_warning = default_dictionary_print_warning,
+                                          bool search_parent = default_dictionary_search_parent);
 
          //
          //  return value not allocated
@@ -305,13 +321,16 @@ class Dictionary {
 
       Dictionary *      lookup_dictionary (const char * name,
                                            bool error_out = default_dictionary_error_out,
-                                           bool print_warning = default_dictionary_print_warning);
+                                           bool print_warning = default_dictionary_print_warning,
+                                           bool search_parent = default_dictionary_search_parent);
       Dictionary *      lookup_array      (const char * name,
                                            bool error_out = default_dictionary_error_out,
-                                           bool print_warning = default_dictionary_print_warning);
+                                           bool print_warning = default_dictionary_print_warning,
+                                           bool search_parent = default_dictionary_search_parent);
       PiecewiseLinear * lookup_pwl        (const char * name,
                                            bool error_out = default_dictionary_error_out,
-                                           bool print_warning = default_dictionary_print_warning);
+                                           bool print_warning = default_dictionary_print_warning,
+                                           bool search_parent = default_dictionary_search_parent);
 };
 
 

@@ -1,14 +1,12 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
-
 ////////////////////////////////////////////////////////////////////////
-
 
 using namespace std;
 
@@ -26,14 +24,11 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
-
 //
 //  Code for class AirnowLocations
 //
 
-
 ////////////////////////////////////////////////////////////////////////
-
 
 AirnowLocations::AirnowLocations() 
 {
@@ -43,27 +38,24 @@ AirnowLocations::AirnowLocations()
   monitoringSiteFileName = "Monitoring_Site_Locations_V2.dat";
 }
 
-
 ////////////////////////////////////////////////////////////////////////
-
 
 AirnowLocations::~AirnowLocations()
 {
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 
 bool AirnowLocations::initialize(const string &fileName)
 {
-  string method_name = "AirnowLocations::initialize() ";
+  string method_name = "AirnowLocations::initialize()";
 
   monitoringSiteFileName = fileName;
   LineDataFile locFile;
   if (!locFile.open(monitoringSiteFileName.c_str())) {
-    mlog << Error << method_name << "->"
-	 << "can't open input ASCII file \"" << monitoringSiteFileName 
-	 << "\" for reading\n\n";
+    mlog << Warning << "\n" << method_name << " -> "
+	      << "can't open input ASCII file \"" << monitoringSiteFileName
+	      << "\" for reading\n\n";
     return false;
   }
   DataLine data_line;
@@ -119,12 +111,12 @@ bool AirnowLocations::initialize(const string &fileName)
       double lon2 = monitoringSiteLon[index];
       double elev2 = monitoringSiteElev[index];
       if (lat != lat2 || lon != lon2 || elev != elev2 || aqsid2 != aqsid || stationid2 != stationid) {
-	mlog << Warning << "AirnowLocations" << method_name << "-> "
-	     << "Multiple values seen for a single FullAQSID (" << fullaqsid << ")"
-	     << "Values used:  StationId:" << stationid << " Aqsid:" << aqsid << " Lat,Lon,Elev:"
-	     << lat << "," << lon << "," << elev
-	     << "Not    used   StationId:" << stationid2 << " Aqsid:" << aqsid2 << " Lat,Lon,Elev:"
-	     << lat2 << "," << lon2 << "," << elev2 << "\n\n";
+        mlog << Warning << "\n" << method_name << " -> "
+             << "Multiple values seen for a single FullAQSID (" << fullaqsid << ")"
+             << "Values used:  StationId:" << stationid << " Aqsid:" << aqsid << " Lat,Lon,Elev:"
+             << lat << "," << lon << "," << elev
+             << "Not    used   StationId:" << stationid2 << " Aqsid:" << aqsid2 << " Lat,Lon,Elev:"
+             << lat2 << "," << lon2 << "," << elev2 << "\n\n";
       }
     }      
   }
@@ -157,12 +149,12 @@ bool AirnowLocations::lookupLatLonElev(const string aqsid, double &lat, double &
     if (it == monitoringSiteStationId.end()) {
       it = find(monitoringSiteFullAqsid.begin(), monitoringSiteFullAqsid.end(), aqsid);
       if (it == monitoringSiteFullAqsid.end()) {
-	return false;
+        return false;
       } else {
-	index = (int)(it - monitoringSiteStationId.begin());
+        index = (int)(it - monitoringSiteFullAqsid.begin());
       }
     } else {
-      index = (int)(it - monitoringSiteFullAqsid.begin());
+      index = (int)(it - monitoringSiteStationId.begin());
     }
   } else {
     index = (int)(it - monitoringSiteAqsid.begin());
@@ -188,9 +180,10 @@ bool AirnowLocations::_setPtr(DataLine &data_line, const string &headerName, int
       return true;
     }
   }
-  mlog << Error << "AirnowLocations::_setPtr() ->"
+  mlog << Warning << "\nAirnowLocations::_setPtr() -> "
        << "Did not see '" << headerName << "' in the header line of file "
-       << monitoringSiteFileName << "\n";
+       << monitoringSiteFileName << "\n\n";
   return false;
 }
 
+////////////////////////////////////////////////////////////////////////

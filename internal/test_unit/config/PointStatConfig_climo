@@ -53,21 +53,24 @@ fcst = {
 
    field = [
       {
-        name         = "TMP";
-        level        = [ "Z2" ];
-        desc         = "KELVIN";
+        name           = "TMP";
+        level          = [ "Z2" ];
+        desc           = "KELVIN";
+        set_attr_units = "K";
       },
       {
-        name         = "TMP";
-        level        = [ "Z2" ];
-        desc         = "CELCIUS";
-        convert(x)   = K_to_C(x);
+        name           = "TMP";
+        level          = [ "Z2" ];
+        desc           = "CELCIUS";
+        convert(x)     = K_to_C(x);
+        set_attr_units = "C";
       },
       {
-        name         = "TMP";
-        level        = [ "Z2" ];
-        desc         = "FAHRENHEIT";
-        convert(x)   = K_to_F(x);
+        name           = "TMP";
+        level          = [ "Z2" ];
+        desc           = "FAHRENHEIT";
+        convert(x)     = K_to_F(x);
+        set_attr_units = "F";
       },
       {
         name         = "TMP";
@@ -284,6 +287,6 @@ duplicate_flag = NONE;
 rank_corr_flag = TRUE;
 tmp_dir        = "/tmp";
 output_prefix  = "${OUTPUT_PREFIX}";
-version        = "V11.0.0";
+version        = "V11.1.0";
 
 ////////////////////////////////////////////////////////////////////////////////

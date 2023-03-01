@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -1013,9 +1013,9 @@ void NetcdfObsVars::write_header_to_nc(NcDataBuffer &data_buf,
    ConcatString log_message;
    if (is_prepbufr) {
       log_message.add(", pb_hdr_data_offset: ");
-      log_message.add(data_buf.pb_hdr_data_offset);
+      log_message.add(str_format("%i", data_buf.pb_hdr_data_offset));
       log_message.add(", raw_hdr_cnt: ");
-      log_message.add(raw_hdr_cnt);
+      log_message.add(str_format("%i", raw_hdr_cnt));
    }
 
    mlog << Debug(7) << method_name << " buf_size: " << buf_size

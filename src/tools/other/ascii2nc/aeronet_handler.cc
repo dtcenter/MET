@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -29,6 +29,7 @@ using namespace std;
 
 #include "aeronet_handler.h"
 
+static bool test_AOD_550 = false;
 static const char *AERONET_NA_STR = "N/A";
 static const char *AERONET_V3_STR = "AERONET Version 3";
 
@@ -436,15 +437,17 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
         var_name = AOD_NAME;
         double dheight  = 550;
         double aod_at_550 = angstrom_power_interplation(aod_at_675,aod_at_440,675.,440.,dheight);
-        _addObservations(Observation(header_type,
-                                     (sid_idx<0 ? _stationId : data_line[sid_idx]),
-                                     valid_time, _stationLat, _stationLon, _stationAlt,
-                                     na_str, var_id, bad_data_double, dheight,
-                                     aod_at_550,
-                                     var_name));
-        mlog << Debug(7) << method_name << " AOD at 550: "
-             << aod_at_550 << "\t440: " << aod_at_440
-             << "\t675: " << aod_at_675 << "\n";
+        if (!is_eq(aod_at_550, bad_data_double)) {
+           _addObservations(Observation(header_type,
+                                        (sid_idx<0 ? _stationId : data_line[sid_idx]),
+                                        valid_time, _stationLat, _stationLon, _stationAlt,
+                                        na_str, var_id, bad_data_double, dheight,
+                                        aod_at_550,
+                                        var_name));
+           mlog << Debug(7) << method_name << " AOD at 550: "
+                << aod_at_550 << "\t440: " << aod_at_440
+                << "\t675: " << aod_at_675 << "\n";
+        }
       }
     }
   } // end while
@@ -455,7 +458,7 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
          << ascii_file.filename() << "\".\n\n";
   }
 
-  if (format_version == 3) {
+  if (format_version == 3 && test_AOD_550) {
     double aod_at_675, aod_at_440;
     double aod_at_550_expected, aod_at_550;
 
@@ -785,8 +788,11 @@ string AeronetHandler::make_var_name_from_header(string hdr_field) {
 
 double angstrom_power_interplation(double value_1, double value_2,
     double level_1, double level_2, double target_level) {
-  double angstrom_log = -log10(value_1/value_2)/log10(level_1/level_2);
-  double angstrom_value = value_2 * pow((target_level/level_2),-angstrom_log);
+  double angstrom_value = bad_data_double;
+  if ((value_1*value_2) >=0 && (level_1*level_2) >=0) {
+     double angstrom_log = -log10(value_1/value_2)/log10(level_1/level_2);
+     angstrom_value = value_2 * pow((target_level/level_2),-angstrom_log);
+  }
   return angstrom_value;
 }
 

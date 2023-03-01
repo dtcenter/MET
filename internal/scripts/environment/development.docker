@@ -1,5 +1,4 @@
-# Define the development environment for NCAR project machine seneca
-# Based on settings in /usr/local/src/met/README.snat
+# Define the development environment for Docker
 
 # Top-level MET project directory
 MET_PROJ_DIR=`ls -1d /met/MET*`
@@ -7,33 +6,17 @@ MET_PROJ_DIR=`ls -1d /met/MET*`
 # Variables required to build MET
 export MET_DEVELOPMENT=true
 
-export MET_NETCDF=/usr/local
-export MET_HDF5INC=/usr/include
-export MET_HDF5LIB=/usr/lib64
-export MET_HDF=/usr/local/hdf
-export MET_HDFEOS=/usr/local/hdfeos
-export MET_BUFR=/usr/local
-export MET_GRIB2CINC=/usr/include
-export MET_GRIB2CLIB=/usr/lib64
-export MET_GSLINC=/usr/include/gsl
-export MET_GSLLIB=/usr/lib64
-export MET_CAIROINC=/usr/include/cairo
-export MET_CAIROLIB=/usr/lib64 
-export MET_FREETYPEINC=/usr/include/freetype2
-export MET_FREETYPELIB=/usr/lib64
-export MET_JASPERLIB=/usr/lib64
+export MET_PYTHON=/usr/local
+export MET_PYTHON_BIN_EXE=${MET_PYTHON}/bin/python3
+export MET_PYTHON_CC="-I${MET_PYTHON}/include/python3.10"
+export MET_PYTHON_LD="-L${MET_PYTHON}/lib -lpython3.10 -lcrypt -lpthread -ldl -lutil -lm"
 
-export MET_PYTHON=/usr/bin/python3
-export MET_PYTHON_CC="-I/usr/include/python3.6m"
-export MET_PYTHON_LD="-L/usr/lib64 -lpython3.6m -lpthread -ldl -lutil -lm"
-
-# -D__64BIT__ is required because we've compiled libgrib2c.a with that flag
-export CFLAGS="-DUNDERSCORE -fPIC -D__64BIT__ -g"
+export CFLAGS="-DUNDERSCORE -fPIC -g"
 export CXXFLAGS=${CFLAGS}
 
 # Set LDFLAGS to include -rpath settings when compiling MET
 export LDFLAGS="-Wl,--disable-new-dtags"
-export LDFLAGS="${LDFLAGS} -Wl,-rpath,/usr/local/lib:/usr/lib64:${MET_HDF}/lib:${MET_HDFEOS}/lib"
+export LDFLAGS="${LDFLAGS} -Wl,-rpath,/usr/local/lib:/usr/lib64"
 
 # Variables required to run MET
 export MET_TEST_INPUT=${MET_PROJ_DIR}/MET_test_data/unit_test
@@ -42,3 +25,18 @@ export MET_FONT_DIR=${MET_TEST_INPUT}/fonts
 # Define Rscript to use a version with the ncdf4 package 1.17 or later 
 export MET_TEST_RSCRIPT=/usr/bin/Rscript
 
+# set make arguments to build using multiple jobs
+export MAKE_ARGS=-j
+
+export TEST_BASE=/met
+export COMPILER=gnu
+export MET_SUBDIR=${TEST_BASE}
+export MET_TARBALL=none
+export USE_MODULES=FALSE
+
+export MET_INSTALL_DIR=/usr/local
+
+export COMPILE_HDF=1
+export COMPILE_HDFEOS=1
+export COMPILE_FREETYPE=1
+export COMPILE_CAIRO=1

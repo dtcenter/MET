@@ -219,6 +219,7 @@ MET_HDFLIB = @MET_HDFLIB@
 MET_NETCDF = @MET_NETCDF@
 MET_NETCDFINC = @MET_NETCDFINC@
 MET_NETCDFLIB = @MET_NETCDFLIB@
+MET_PYTHON_BIN_EXE = @MET_PYTHON_BIN_EXE@
 MET_PYTHON_CC = @MET_PYTHON_CC@
 MET_PYTHON_LD = @MET_PYTHON_LD@
 MKDIR_P = @MKDIR_P@
@@ -295,6 +296,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 tablefilesdir = $(pkgdatadir)/table_files
 tablefiles_DATA = \
+	met_header_columns_V11.1.txt \
 	met_header_columns_V11.0.txt \
 	met_header_columns_V10.1.txt \
 	met_header_columns_V10.0.txt \

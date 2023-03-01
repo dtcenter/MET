@@ -90,7 +90,6 @@ climo_mean = {
    }
 
    time_interp_method = DW_MEAN;
-   match_month        = TRUE;
    day_interval       = 31;
    hour_interval      = 6;
 }
@@ -266,6 +265,6 @@ seeps_p1_thresh = NA;
 grid_weight_flag = NONE;
 tmp_dir          = "/tmp";
 output_prefix    = "";
-version          = "V11.0.0";
+version          = "V11.1.0";
 
 ////////////////////////////////////////////////////////////////////////////////

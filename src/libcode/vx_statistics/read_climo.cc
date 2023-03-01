@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -150,21 +150,19 @@ void read_climo_file(const char *climo_file, GrdFileType ctype,
                      int day_ts, int hour_ts, const Grid &vx_grid,
                      const RegridInfo &regrid_info,
                      DataPlaneArray &dpa) {
+
    Met2dDataFileFactory mtddf_factory;
    Met2dDataFile *mtddf = (Met2dDataFile *) 0;
 
    VarInfoFactory info_factory;
    VarInfo *info = (VarInfo *) 0;
 
-   DataPlaneArray cur_dpa;
+   DataPlaneArray clm_dpa;
    DataPlane dp;
 
-   int n_climo, i;
-   int vld_mon, vld_day, vld_yr, vld_hr, vld_min, vld_sec;
-   int clm_mon, clm_day, clm_yr, clm_hr, clm_min, clm_sec;
-   unixtime ut;
+   int i, n_clm, day_diff_sec, hms_diff_sec;
 
-   ConcatString cur_ut_cs;
+   ConcatString clm_ut_cs;
 
    // Allocate memory for data file
    if(!(mtddf = mtddf_factory.new_met_2d_data_file(climo_file, ctype))) {
@@ -179,94 +177,65 @@ void read_climo_file(const char *climo_file, GrdFileType ctype,
    info->set_dict(*dict);
 
    // Read data planes
-   n_climo = mtddf->data_plane_array(*info, cur_dpa);
-
-   // Compute the valid month and day
-   unix_to_mdyhms(vld_ut, vld_mon, vld_day, vld_yr,
-                  vld_hr, vld_min, vld_sec);
+   n_clm = mtddf->data_plane_array(*info, clm_dpa);
 
    // Loop through matching records
-   for(i=0; i<n_climo; i++) {
+   for(i=0; i<n_clm; i++) {
 
-      // Store current valid time string
-      cur_ut_cs = unix_to_yyyymmdd_hhmmss(cur_dpa[i].valid());
+      // Store climo time string
+      clm_ut_cs = unix_to_yyyymmdd_hhmmss(clm_dpa[i].valid());
 
-      // Compute the current month and day
-      unix_to_mdyhms(cur_dpa[i].valid(), clm_mon, clm_day, clm_yr,
-                     clm_hr, clm_min, clm_sec);
+      // Compute day and hour time offsets in seconds
+      day_diff_sec = day_of_year_diff(vld_ut, clm_dpa[i].valid()) * sec_per_day;
+      hms_diff_sec = sec_of_day_diff (vld_ut, clm_dpa[i].valid());
 
-      // Recompute the unixtime to check the hour of the day.
-      // Use the valid YYYYMMDD and climo HHMMSS.
-      ut = mdyhms_to_unix(vld_mon, vld_day, vld_yr,
-                          clm_hr, clm_min, clm_sec);
-
-      // Check the hour time step.
-      if(!is_bad_data(hour_ts) && labs(ut - vld_ut) >= hour_ts) {
-         mlog << Debug(3) << "Skipping the " << cur_ut_cs << " \""
-              << info->magic_str()
-              << "\" climatology field since the time offset ("
-              << labs(ut - vld_ut)
-              << " seconds) >= the \"" << conf_key_hour_interval
-              << "\" entry (" << hour_ts << " seconds) from file: "
-              << climo_file << "\n";
+      // Check the day time step
+      if(!is_bad_data(day_ts) && abs(day_diff_sec) >= day_ts) {
+         mlog << Debug(3) << "Skipping " << clm_ut_cs << " \"" << info->magic_str()
+              << "\" climatology field with " << day_diff_sec / sec_per_day
+              << " day offset (" << conf_key_day_interval << " = "
+              << day_ts / sec_per_day << ") from file \""
+              << climo_file << "\".\n";
          continue;
       }
 
-      // Recompute the unixtime to check the day of the year.
-      // Use the valid YYYY and climo MMDD_HHMMSS.
-      ut = mdyhms_to_unix(clm_mon, clm_day, vld_yr,
-                          clm_hr, clm_min, clm_sec);
-
-      // Check the day time step.
-      if(!is_bad_data(day_ts)) {
-
-         // For daily climatology, check the hour timestep. 
-         if(day_ts <= 3600*24 && labs(ut - vld_ut) >= hour_ts) {
-            mlog << Debug(3) << "Skipping the " << cur_ut_cs << " \""
-                 << info->magic_str()
-                 << "\" climatology field since the time offset ("
-                 << labs(ut - vld_ut) << " seconds) >= the \""
-                 << conf_key_hour_interval << "\" entry (" << hour_ts
-                 << " seconds) from daily climatology file: "
-                 << climo_file << "\n";
-            continue;
-         }
-         // For non-daily climatology, check the day timestep. 
-         else if(labs(ut - vld_ut) >= day_ts) {
-            mlog << Debug(3) << "Skipping the " << cur_ut_cs << " \""
-                 << info->magic_str()
-                 << "\" climatology field since the time offset ("
-                 << labs(ut - vld_ut) << " seconds) >= the \""
-                 << conf_key_day_interval << "\" entry (" << day_ts
-                 << " seconds) from file: " << climo_file << "\n";
-            continue;
-         }
+      // Check the hour time step
+      if(!is_bad_data(hour_ts) && abs(hms_diff_sec) >= hour_ts) {
+         mlog << Debug(3) << "Skipping " << clm_ut_cs << " \"" << info->magic_str()
+              << "\" climatology field with " << (double) hms_diff_sec / sec_per_hour
+              << " hour offset (" << conf_key_hour_interval << " = "
+              << hour_ts / sec_per_hour << ") from file \""
+              << climo_file << "\".\n";
+         continue;
       }
 
+      // Compute climo timestamp relative to the valid time
+      unixtime clm_vld_ut = vld_ut + day_diff_sec + hms_diff_sec;
+
       // Print log message for matching record
-      mlog << Debug(4)
-           << "Found matching " << cur_ut_cs << " \""
-           << info->magic_str() << "\" climatology field in file \""
-           << climo_file << "\".\n"; 
+      mlog << Debug(3) << "Storing " << clm_ut_cs << " \"" << info->magic_str()
+           << "\" climatology field with " << day_diff_sec / sec_per_day
+           << " day, " << (double) hms_diff_sec / sec_per_hour << " hour offset as time "
+           << unix_to_yyyymmdd_hhmmss(clm_vld_ut) << " from file \""
+           << climo_file << "\".\n";
 
       // Regrid, if needed
       if(!(mtddf->grid() == vx_grid)) {
-         mlog << Debug(2)
-              << "Regridding the " << cur_ut_cs << " \""
+         mlog << Debug(2) << "Regridding " << clm_ut_cs << " \""
               << info->magic_str()
               << "\" climatology field to the verification grid.\n";
-         dp = met_regrid(cur_dpa[i], mtddf->grid(), vx_grid,
+         dp = met_regrid(clm_dpa[i], mtddf->grid(), vx_grid,
                          regrid_info);
       }
       else {
-         dp = cur_dpa[i];
+         dp = clm_dpa[i];
       }
 
-      // Set the climo time as valid YYYY and climo MMDD_HHMMSS.
-      dp.set_valid(ut);
+      // Set the climo time relative to the valid time
+      dp.set_valid(clm_vld_ut);
 
       // Store the match
-      dpa.add(dp, cur_dpa.lower(i), cur_dpa.upper(i));
+      dpa.add(dp, clm_dpa.lower(i), clm_dpa.upper(i));
 
    } // end for i
 
@@ -330,6 +299,26 @@ DataPlaneArray climo_time_interp(const DataPlaneArray &dpa, int day_ts,
       }
       // For exactly 2 fields, do a simple time interpolation.
       else if(it->second.n() == 2) {
+
+         // If the valid time falls outside the climo times, shift them.
+         if(vld_ut < min(dpa[it->second[0]].valid(), dpa[it->second[1]].valid()) ||
+            vld_ut > max(dpa[it->second[0]].valid(), dpa[it->second[1]].valid())) {
+
+            unixtime ut1 = dpa[it->second[0]].valid();
+            unixtime ut2 = dpa[it->second[1]].valid();
+
+            int shift_sec = day_of_year_diff(min(ut1, ut2), vld_ut) * sec_per_day;
+
+            mlog << Debug(3)
+                 << "Shifting climatology times " << shift_sec / sec_per_day
+                 << " day(s) from " << unix_to_yyyymmdd_hhmmss(ut1)
+                 << " to " << unix_to_yyyymmdd_hhmmss(ut1 + shift_sec)
+                 << " and " << unix_to_yyyymmdd_hhmmss(ut2)
+                 << " to " << unix_to_yyyymmdd_hhmmss(ut2 + shift_sec) << ".\n";
+            dpa[it->second[0]].set_valid(ut1 + shift_sec);
+            dpa[it->second[1]].set_valid(ut2 + shift_sec);
+         }
+
          mlog << Debug(3)
               << "Interpolating climatology fields at "
               << unix_to_yyyymmdd_hhmmss(dpa[it->second[0]].valid())
@@ -376,7 +365,7 @@ DataPlaneArray climo_time_interp(const DataPlaneArray &dpa, int day_ts,
 
          // For equality, do a single time interpolation.
          if(prv_hms == nxt_hms) {
-             ut = (vld_ut / sec_per_day) + prv_hms;
+             ut = (vld_ut / sec_per_day)*sec_per_day + prv_hms;
              interp_dpa.add(climo_hms_interp(
                                dpa, it->second, ut, mthd),
                                dpa.lower(it->second[0]),
