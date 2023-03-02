@@ -272,9 +272,9 @@ The default table can be found in the installed
 XML content for all stations that allows lookups of latitude, longitude,
 and, in some cases, elevation for all stations based on stationId.
 
-This set of stations comes from 2 online sources
-`The active stations website <https://www.ndbc.noaa.gov/activestations.xml>`_
-and `The complete stations website <https://www.airnow.gov>`_.
+This set of stations comes from 2 online sources: the
+`active stations website <https://www.ndbc.noaa.gov/activestations.xml>`_
+and the `complete stations website <https://www.airnow.gov>`_.
 As these lists can change as a function of time, a script can be run to pull
 down the contents of both websites and merge any changes with the existing stations
 file content, creating an updated stations file locally.
@@ -284,21 +284,20 @@ run this script and update *share/met/table_files/ndbc_stations.xml*.
 
 To run this utility:
 
-build_ndbc_stations_from_web.py <-d> <-p> <-o OUTPUT_FILE>
-Usage: build_ndbc_stations_from_web.py [options]
-Options:
-  -h, --help            show this help message and exit
-  -d, --diagnostic      Rerun using downlaoded files, skipping download step
-                        (optional, default: False)
-  -p, --prune           Prune files that are no longer online (optional,
-                        default:False)
-  -o OUT_FILE, --out=OUT_FILE
-                         Save the text into the named file (default:
-                        merged.txt )
+.. code-block:: none
+
+  build_ndbc_stations_from_web.py <-d> <-p> <-o OUTPUT_FILE>
+
+  Usage: build_ndbc_stations_from_web.py [options]
+  Options:
+    -h, --help            show this help message and exit
+    -d, --diagnostic      Rerun using downlaoded files, skipping download step (optional, default: False)
+    -p, --prune           Prune files that are no longer online (optional, default: False)
+    -o OUT_FILE, --out=OUT_FILE
+                          Save the text into the named file (optional, default: merged.txt)
 
 NOTE: The downloaded files are written to a subdirectory ndbc_temp_data which
 can be deleted once the final output file is created.
-
 
 MET_BASE
 ^^^^^^^^
