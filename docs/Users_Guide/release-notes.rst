@@ -179,8 +179,10 @@ MET Version 11.0.0 release notes (20221209)
 MET Upgrade Instructions
 ========================
 
-MET Version 11.0.1 upgrade instructions
+MET Version 11.1.0 upgrade instructions
 ---------------------------------------
+
+* If compiling support for PYTHON (:numref:`compiling_python_support`), in addition to $MET_PYTHON_CC and $MET_PYTHON_LD, set **$MET_PYTHON_BIN_EXE** to specify the desired python executable to be used (`#2428 <https://github.com/dtcenter/MET/issues/2428>`_).
 
 * If running TC-Pairs to generate consensus tracks, update your TC-Pairs configuration file to include the new **write_members** option (`#2429 <https://github.com/dtcenter/MET/issues/2429>`_).
 
