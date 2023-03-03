@@ -28,7 +28,7 @@ export USE_MODULES=FALSE
 export PYTHON_LOC="$(python3-config --prefix)"
 
 #Directory of your python executable
-export MET_PYTHON=${PYTHON_LOC}/bin
+export MET_PYTHON=${PYTHON_LOC}
 
 #Python ldflags created using python3-config
 export MET_PYTHON_LD="$(python3-config --ldflags)"
