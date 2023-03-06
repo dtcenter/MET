@@ -281,7 +281,13 @@ void VarInfoNcCF::set_magic(const ConcatString &nstr, const ConcatString &lstr) 
                // Single level
                int level = 0;
                double level_value = bad_data_double;
-               if (is_number(ptr2)) {
+               if (is_datestring(ptr2)) {
+                  unixtime unix_time = timestring_to_unix(ptr2);
+                  level = vx_data2d_dim_by_value;
+                  level_value = unix_time;
+                  as_offset = false;
+               }
+	       else if (is_number(ptr2)) {
                   if (as_offset) level = atoi(ptr2);
                   else {
                      level = vx_data2d_dim_by_value;
