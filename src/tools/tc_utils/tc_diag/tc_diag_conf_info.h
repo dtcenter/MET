@@ -122,7 +122,7 @@ class TCDiagConfInfo {
       MetConfig conf;
 
       // Track line filtering criteria
-      ConcatString model;
+      StringArray  model;
       ConcatString storm_id;
       ConcatString basin;
       ConcatString cyclone;

@@ -119,7 +119,7 @@ void TCDiagConfInfo::process_config(GrdFileType file_type) {
    check_met_version(conf.lookup_string(conf_key_version).c_str());
 
    // Conf: model
-   model = conf.lookup_string(conf_key_model);
+   model = conf.lookup_string_array(conf_key_model);
 
    // Conf: storm_id
    storm_id = conf.lookup_string(conf_key_storm_id);

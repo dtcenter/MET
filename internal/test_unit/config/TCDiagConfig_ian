@@ -13,7 +13,7 @@
 //
 // Model
 //
-model = "OFCL";
+model = [ "GFSO", "OFCL" ];
 
 //
 // Storm identifier

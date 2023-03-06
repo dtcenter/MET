@@ -13,7 +13,7 @@
 //
 // Model
 //
-model = "";
+model = [];
 
 //
 // Storm identifier

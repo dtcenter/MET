@@ -97,7 +97,7 @@ const string get_tool_name() {
 
 void usage() {
 
-   cout << "\n*** model Evaluation Tools (MET" << met_version
+   cout << "\n*** Model Evaluation Tools (MET" << met_version
         << ") ***\n\n"
         << "Usage: " << program_name << "\n"
         << "\t-data file_1 ... file_n | data_file_list\n"
@@ -315,6 +315,7 @@ void process_track_files(const StringArray& files,
                          const StringArray& model_suffix,
                          TrackInfoArray& tracks) {
    int i, cur_read, cur_add, tot_read, tot_add;
+   TimeArray init_ta;
    LineDataFile f;
    ConcatString cs;
    ATCFTrackLine line;
@@ -374,22 +375,27 @@ void process_track_files(const StringArray& files,
 
    } // End loop over files
 
-   // Check the number of tracks: exit for 0 and warning for > 1
+   // Check for no matching tracks
    if(tracks.n() == 0) {
        mlog << Error << "\nprocess_track_files() -> "
            << "no tracks retained! Adjust the configuration file "
            << "filtering options to select a single track.\n\n";
        exit(1);
    }
-   // Issue warning if more than one track found
-   else if(tracks.n() > 1) {
-       mlog << Warning << "\nprocess_track_files() -> "
-           << "multiple tracks found (" << tracks.n()
-           << ")! Using the first one. Adjust the configuration file "
-           << "filtering options to select a single track.\n\n";
-       TrackInfo first_track = tracks[i];
-       tracks.clear();
-       tracks.add(first_track);
+
+   // Get list of unique track initialization times
+   for(i=0; i<tracks.n(); i++) {
+      if(!init_ta.has(tracks[i].init())) init_ta.add(tracks[i].init());
+   }
+
+   // Check for a single track initialization time
+   if(init_ta.n() > 1) {
+      mlog << Error << "\nprocess_track_files() -> "
+           << "set the \"init_inc\" configuration option to select one of the "
+           << init_ta.n() << " track initialization times between "
+           << unix_to_yyyymmdd_hhmmss(init_ta.min()) << " and "
+           << unix_to_yyyymmdd_hhmmss(init_ta.max()) << ".\n\n";
+      exit(1);
    }
 
    return;
@@ -406,9 +412,9 @@ bool is_keeper(const ATCFLineBase * line) {
    ConcatString cs;
 
    // Check model
-   if(conf_info.model.nonempty() &&
-     conf_info.model != line->technique()) {
-     cs << "model " << line->technique() << " != " << conf_info.model;
+   if(conf_info.model.n() > 0 &&
+      !conf_info.model.has(line->technique())) {
+     cs << "model " << line->technique() << " not in " << write_css(conf_info.model);
      keep = false;
    }
 
@@ -631,8 +637,7 @@ ConcatString build_outfile_name(const TrackInfo &track,
       cs << "_" << conf_info.output_prefix;
 
    // Append the model, storm ID, and initialization time
-   cs << "_" << conf_info.model
-      << "_" << track.storm_id()
+   cs << "_" << track.storm_id()
       << "_" << unix_to_yyyymmddhh(track.init());
 
    // Append the suffix

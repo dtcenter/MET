@@ -13,7 +13,7 @@ Practical information
 =====================
 
 tc_diag usage
-------------
+-------------
 
 The following sections describe the usage statement, required arguments, and optional arguments for tc_diag.
 
@@ -52,13 +52,28 @@ tc_diag configuration file
 
 The default configuration file for the TC-Diag tool named **TCDiagConfig_default** can be found in the installed *share/met/config/* directory. It is encouraged for users to copy these default files before modifying their contents. The contents of the configuration file are described in the subsections below.
 
+The TC-Diag tool should be configured to filter the input track data (**-deck**) down to the subset of tracks that correspond to the gridded data files provided (**-data**). The filtered tracks should contain data for only one initialization time but may contain tracks for multiple models.
+
 _______________________
 
 .. code-block:: none
 
-  model =       "GFS";
+  model = [ "GFSO", "OFCL" ];
+  storm_id = "";
+  basin = "";
+  cyclone = "";
+  init_inc = "";
+  valid_beg = "";
+  valid_end = "";
+  valid_inc = [];
+  valid_exc = [];
+  valid_hour = [];
+  lead = [];
+
   censor_thresh = [];
   censor_val    = [];
+  convert(x)    = x;
+
   data  = {
      field = [
           {
