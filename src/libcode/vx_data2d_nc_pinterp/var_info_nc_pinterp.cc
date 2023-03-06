@@ -220,18 +220,18 @@ void VarInfoNcPinterp::set_magic(const ConcatString &nstr, const ConcatString &l
             else {
                int level = 0;
                double level_value = bad_data_double;
-               if (is_number(ptr2)) {
+               if (is_datestring(ptr2)) {
+                  unixtime unix_time = timestring_to_unix(ptr2);
+                  level = vx_data2d_dim_by_value;
+                  level_value = unix_time;
+                  as_offset = false;
+               }
+               else if (is_number(ptr2)) {
                   if (as_offset) level = atoi(ptr2);
                   else {
                      level = vx_data2d_dim_by_value;
                      level_value = atof(ptr2);
                   }
-               }
-               else if (is_datestring(ptr2)) {
-                  unixtime unix_time = timestring_to_unix(ptr2);
-                  level = vx_data2d_dim_by_value;
-                  level_value = unix_time;
-                  as_offset = false;
                }
                else {
                   mlog << Error << "\n" << method_name
