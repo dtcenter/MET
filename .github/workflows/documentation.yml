@@ -8,7 +8,7 @@ on:
       - main_*
       - bugfix_*
     paths:
-      - met/docs/**
+      - docs/**
   pull_request:
     types: [opened, reopened, synchronize]
   workflow_dispatch:
