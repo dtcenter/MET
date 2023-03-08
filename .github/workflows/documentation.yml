@@ -26,6 +26,7 @@ jobs:
         run: |
           python -m pip install --upgrade python-dateutil requests sphinx \
           sphinx-gallery Pillow sphinx_rtd_theme sphinx-panels
+          python -m pip install -r docs/requirements.txt
       - name: Build docs
         run: ./.github/jobs/build_documentation.sh
       - uses: actions/upload-artifact@v3
