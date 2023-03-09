@@ -18,9 +18,14 @@ from met_point_obs_nc import nc_point_obs
 netcdf_filename = sys.argv[1]
 
 # read NetCDF file
-print('{p}  reading{f}'.format(p=met_point_obs.get_prompt(), f=netcdf_filename))
-point_obs_data = nc_point_obs()
-point_obs_data.read_data(netcdf_filename)
+print('{p}  reading {f}'.format(p=met_point_obs.get_prompt(), f=netcdf_filename))
+try:
+    point_obs_data = nc_point_obs()
+    point_obs_data.read_data(netcdf_filename)
 
-met_point_data = point_obs_data.get_point_data() 
-met_point_data['met_point_data'] = point_obs_data
+    met_point_data = point_obs_data.get_point_data()
+    met_point_data['met_point_data'] = point_obs_data
+except:
+    from read_tmp_ascii import read_tmp_ascii
+
+    point_data = read_tmp_ascii(netcdf_filename)
