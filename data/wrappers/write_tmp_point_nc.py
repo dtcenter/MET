@@ -42,7 +42,11 @@ spec = importlib.util.spec_from_file_location(user_base, pyembed_module_name)
 met_in = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(met_in)
 
-if hasattr(met_in, 'point_obs_data'):
+if hasattr(met_in, 'point_data'):
+    from write_tmp_point import write_tmp_ascii
+
+    write_tmp_ascii(tmp_filename, met_in.point_data)
+elif hasattr(met_in, 'point_obs_data'):
     met_in.point_obs_data.save_ncfile(tmp_filename)
 else:
     if hasattr(met_in.met_point_data, 'point_obs_data'):
