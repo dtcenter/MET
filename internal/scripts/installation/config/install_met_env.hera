@@ -1,28 +1,25 @@
-module use -a /contrib/anaconda/modulefiles
 module load intel/2022.1.2
-module load anaconda/latest 
-export TEST_BASE=/contrib/met/11.0.0
+export PATH=/scratch1/BMC/dtc/miniconda/miniconda3/envs/metplus_v5.1_py3.10/bin:${PATH}
+export TEST_BASE=/contrib/met/11.1.0-beta1
 export COMPILER=intel_2022.1.2
 export MET_SUBDIR=${TEST_BASE}
-export MET_TARBALL=v11.0.0.tar.gz
+export MET_TARBALL=v11.1.0-beta1.tar.gz
 export USE_MODULES=TRUE
-export PYTHON_MODULE=anaconda_latest
-export MET_PYTHON=/contrib/anaconda/anaconda3/latest/
-export MET_PYTHON_CC=-I${MET_PYTHON}/include/python3.7m
-export MET_PYTHON_LD=-L${MET_PYTHON}/lib/python3.7/config-3.7m-x86_64-linux-gnu\ -L${MET_PYTHON}/lib\ -lpython3.7m\ -lcrypt\ -lpthread\ -ldl\ -lutil\ -lrt\ -lm\ -Xlinker\ -export-dynamic
+export MET_PYTHON=/scratch1/BMC/dtc/miniconda/miniconda3/envs/metplus_v5.1_py3.10
+export MET_PYTHON_CC=-I${MET_PYTHON}/include/python3.10
+export MET_PYTHON_LD=`python3-config --ldflags --embed`
 export SET_D64BIT=FALSE
-export EXTERNAL_LIBS=/contrib/met/11.0.0/external_libs/
+export EXTERNAL_LIBS=/contrib/met/11.1.0-beta1/external_libs/
 #export MET_NETCDF=${EXTERNAL_LIBS}
-export MET_GSL=${EXTERNAL_LIBS}
-export MET_BUFRLIB=${EXTERNAL_LIBS}
-export BUFRLIB_NAME=-lbufr
+#export MET_GSL=${EXTERNAL_LIBS}
+#export MET_BUFRLIB=${EXTERNAL_LIBS}
+#export BUFRLIB_NAME=-lbufr
 #export MET_HDF5=${EXTERNAL_LIBS}
-export MET_GRIB2CLIB=${EXTERNAL_LIBS}/lib
-export MET_GRIB2CINC=${EXTERNAL_LIBS}/include
-export GRIB2CLIB_NAME=-lgrib2c
-export LIB_JASPER=${EXTERNAL_LIBS}/lib
-export LIB_LIBPNG=${EXTERNAL_LIBS}/lib
-export LIB_Z=${EXTERNAL_LIBS}/lib
-#export SET_D64BIT=FALSE
+#export MET_GRIB2CLIB=${EXTERNAL_LIBS}/lib
+#export MET_GRIB2CINC=${EXTERNAL_LIBS}/include
+#export GRIB2CLIB_NAME=-lgrib2c
+#export LIB_JASPER=${EXTERNAL_LIBS}/lib
+#export LIB_LIBPNG=${EXTERNAL_LIBS}/lib
+#export LIB_Z=${EXTERNAL_LIBS}/lib
 #export CFLAGS="-Wall -g"
 #export CXXFLAGS="-Wall -g -lcurl"

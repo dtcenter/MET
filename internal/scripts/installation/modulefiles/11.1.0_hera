@@ -3,25 +3,21 @@
 ##      Model Evaluation Tools
 ##
 proc ModulesHelp { } {
-  puts stderr "Sets up the paths and environment variables to use the Model Evaluation Tools v11.0.0
+  puts stderr "Sets up the paths and environment variables to use the Model Evaluation Tools v11.1.0
      *** For help see the official MET webpage at http://www.dtcenter.org/met/users ***"
 }
 
 # The intel compiler is required to run MET
 prereq intel
-prereq anaconda/latest
 
 set base /contrib/met
-set ver  11.0.0
+set ver  11.1.0
 set share $base/$ver/share/met
-set lib_base $base/11.0.0
-setenv MET_ROOT $base/$ver/MET-11.0.0
+set lib_base $base/11.1.0
+setenv MET_ROOT $base/$ver
 
 
-prepend-path PATH $base/$ver/bin:$lib_base/external_libs/bin
-
-
-#prepend-path LD_LIBRARY_PATH $lib_base/external_libs/lib
+prepend-path PATH $base/$ver/bin:$lib_base/external_libs/bin:/scratch1/BMC/dtc/miniconda/miniconda3/envs/metplus_v5.1_py3.10/bin
 
 #setenv METversion $ver
 #setenv MET_CONFIG $share/config
@@ -36,12 +32,11 @@ prepend-path PATH $base/$ver/bin:$lib_base/external_libs/bin
 #setenv F77 ifort
 
 #module load intel/2022.1.2
-#module load anaconda/latest
 
-#setenv libdir /contrib/met/11.0.0/external_libs/lib
-#setenv incdir /contrib/met/11.0.0/external_libs/include
-#setenv iprefix /contrib/met/11.0.0/external_libs
-#setenv basedir /contrib/met/11.0.0/met-11.0.0
+#setenv libdir /contrib/met/11.1.0/external_libs/lib
+#setenv incdir /contrib/met/11.1.0/external_libs/include
+#setenv iprefix /contrib/met/11.1.0/external_libs
+#setenv basedir /contrib/met/11.1.0/met-11.1.0
 
 #setenv MET_HDF5 $iprefix
 #setenv MET_NETCDF $incdir
@@ -54,9 +49,9 @@ prepend-path PATH $base/$ver/bin:$lib_base/external_libs/bin
 #setenv MET_HDFLIB $libdir
 #setenv MET_HDFEOSINC $incdir
 #setenv MET_HDFEOSLIB $libdir
-#setenv MET_PYTHON /contrib/anaconda3/latest
-#setenv MET_PYTHON_CC -I/contrib/anaconda/anaconda3/latest/include/python3.7m
-#setenv MET_PYTHON_LD -L/contrib/anaconda/anaconda3/latest/lib\ -lpython3.7m\ -lpthread\ -ldl\ -lutil\ -lm\ -Xlinker\ -export-dynamic
+#setenv MET_PYTHON /scratch1/BMC/dtc/miniconda/miniconda3/envs/metplus_v5.1_py3.10
+#setenv MET_PYTHON_CC -I${MET_PYTHON}/include/python3.10
+#setenv MET_PYTHON_LD `python3-config --ldflags --embed`
 #setenv MET_FONT_DIR $basedir/fonts/
 
 # CAIRO and FREETYPE were not used
@@ -64,5 +59,3 @@ prepend-path PATH $base/$ver/bin:$lib_base/external_libs/bin
 #setenv MET_CAIROINC $incdir/cairo
 #setenv MET_FREETYPELIB $libdir
 #setenv MET_FREETYPEINC $incdir/freetype2
-
-
