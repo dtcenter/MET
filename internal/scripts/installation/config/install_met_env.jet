@@ -2,17 +2,17 @@ module load intel/2022.1.2
 module load netcdf/4.7.0
 module load hdf5/1.10.5
 
-export TEST_BASE=/contrib/met/11.0.0
+export TEST_BASE=/contrib/met/11.0.1
 export COMPILER=intel_18.0.5.274
 export MET_SUBDIR=${TEST_BASE}
-export MET_TARBALL=v11.0.0.tar.gz
+export MET_TARBALL=v11.0.1.tar.gz
 export USE_MODULES=TRUE
 export MET_PYTHON=/mnt/lfs1/HFIP/dtc-hurr/METplus/miniconda/miniconda3/envs/metplus_v5.0_py3.8
 export MET_PYTHON_CC=-I${MET_PYTHON}/include/python3.8
 export MET_PYTHON_LD=-L${MET_PYTHON}/lib\ -L${MET_PYTHON}/lib/python3.8/config-3.8-x86_64-linux-gnu\ -lpython3.8\ -lpthread\ -ldl\ -lutil\ -lrt\ -lm\ -Xlinker\ -export-dynamic
 export MET_NETCDF=/apps/netcdf/4.7.0/intel/18.0.5.274
 export MET_HDF5=/apps/hdf5/1.10.5/intel/18.0.5.274
-export EXTERNAL_LIBS=/contrib/met/11.0.0/external_libs/
+export EXTERNAL_LIBS=/contrib/met/11.0.1/external_libs/
 #export MET_GSL=${EXTERNAL_LIBS}
 #export MET_BUFRLIB=${EXTERNAL_LIBS}
 #export BUFRLIB_NAME=-lbufr
