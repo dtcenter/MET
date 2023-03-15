@@ -1,14 +1,14 @@
 module load intel/2020.2
 
-export TEST_BASE=/apps/contrib/MET/11.0.0
+export TEST_BASE=/apps/contrib/MET/11.0.1
 export COMPILER=intel_2020
 export MET_SUBDIR=${TEST_BASE}/
-export MET_TARBALL=v11.0.0.tar.gz
+export MET_TARBALL=v11.0.1.tar.gz
 export USE_MODULES=TRUE
 export MET_PYTHON=/work/noaa/ovp/miniconda/miniconda3/envs/metplus_v5.0_py3.8
 export MET_PYTHON_CC=-I${MET_PYTHON}/include/python3.8
 export MET_PYTHON_LD=-L${MET_PYTHON}/lib/python3.8/config-3.8-x86_64-linux-gnu\ -L${MET_PYTHON}/lib\ -lpython3.8\ -lcrypt\ -lpthread\ -ldl\ -lutil\ -lrt\ -lm
-export EXTERNAL_LIBS=/apps/contrib/MET/11.0.0/external_libs
+export EXTERNAL_LIBS=/apps/contrib/MET/11.0.1/external_libs
 export MET_GSL=${EXTERNAL_LIBS}
 export MET_BUFRLIB=${EXTERNAL_LIBS}
 export BUFRLIB_NAME=-lbufr

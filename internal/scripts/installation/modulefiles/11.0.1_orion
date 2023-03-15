@@ -1,0 +1,45 @@
+#%Module######################################################################
+##
+##      Model Evaluation Tools
+##
+proc ModulesHelp { } {
+  puts stderr "Sets up the paths and environment variables to use the Model Evaluation Tools v11.0.1
+     *** For help see the official MET webpage at http://www.dtcenter.org/met/users ***"
+}
+
+prereq intel/2020.2
+
+set base /apps/contrib/MET
+set ver 11.0.1
+set share $base/$ver/share/met
+set lib_base $base/11.0.1
+setenv MET_ROOT $base/$ver/MET-11.0.1
+
+prepend-path PATH $base/$ver/bin:$lib_base/external_libs/bin:/work/noaa/ovp/miniconda/miniconda3/envs/metplus_v5.0_py3.8/bin
+
+#export CC=icc
+#export CXX=icc
+#export F77=ifort
+#module load intel/2020.2
+#module load intelpython3/2020.2
+#export libdir=/apps/contrib/MET/11.0.1/external_libs/lib
+#export incdir=/apps/contrib/MET/11.0.1/external_libs/include
+#export iprefix=/apps/contrib/MET/11.0.1/external_libs
+#export basedir=/apps/contrib/MET/11.0.1/MET-11.0.1
+#export MET_HDF5=$iprefix
+#export MET_NETCDF=$incdir
+#export MET_GRIB2CINC=$incdir
+#export MET_GRIB2CLIB=$libdir
+#setenv MET_GSLLIB=$libdir
+#export MET_GSLINC=$incdir
+#export MET_BUFR=$libdir
+#export MET_HDFINC=$incdir
+#export MET_HDFLIB=$libdir
+#export MET_HDFEOSINC=$incdir
+#export MET_HDFEOSLIB=$libdir
+#export MET_PYTHON=/work/noaa/ovp/miniconda/miniconda3/envs/metplus_v5.0_py3.8
+#export MET_PYTHON_CC=-I${MET_PYTHON}/include/python3.8
+#export MET_PYTHON_LD=-L${MET_PYTHON}/lib/python3.8/config-3.8-x86_64-linux-gnu\ -L${MET_PYTHON}/lib\ -lpython3.8\ -lcrypt\ -lpthread\ -ldl\ -lutil\ -lrt\ -lm
+#export MET_FONT_DIR=$basedir/fonts/
+#export LDFLAGS=-Wl,--disable-new-dtags -Wl,-rpath,${libdir}:${MET_PYTHON}/lib
+#export CPPFLAGS=-I/apps/contrib/met/11.0.1/external_libs/include
