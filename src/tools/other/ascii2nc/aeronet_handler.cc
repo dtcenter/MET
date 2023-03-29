@@ -204,8 +204,8 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
   int var_idx, sid_idx, elv_idx, lat_idx, lon_idx, date_idx, month_idx;
   double height_from_header;
   string aot = "AOT";
-  //string angstrom = "Angstrom";
   string var_name;
+  string prev_sid, cur_sid;
   StringArray hdr_names;
   NumArray header_heights;
   IntArray header_var_index;
@@ -286,6 +286,7 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
   //
   int bad_line_count = 0;
   bool first_line = true;
+  bool update_lat_lon;
   data_line.set_delimiter(",");
   while (ascii_file >> data_line)
   {
@@ -322,6 +323,8 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
       }
     }
 
+    cur_sid = (sid_idx < 0) ? _stationId : data_line[sid_idx];
+    update_lat_lon = (cur_sid.compare(prev_sid) != 0);
     if (first_line) {
       if (format_version == 3) {
         // Get the stationId
@@ -352,22 +355,28 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
             break;
           }
         }
-
-        // Get the stationLat
-        _stationLat = atof(data_line[lat_idx]);
-        // Get the stationLon
-        _stationLon = atof(data_line[lon_idx]);
-        // Get the stationAlt
-        if (elv_idx >= 0) _stationAlt = atof(data_line[elv_idx]);
-        else _stationAlt = bad_data_float;
-
-        mlog << Debug(7) << "\n" << method_name << "stationID: "
-             << ((sid_idx < 0) ? _stationId : data_line[sid_idx]) << " from index " << sid_idx
-             << "  lat: " << _stationLat
-             << "  lon: " << _stationLon
-             << "  elv: " << _stationAlt << " from index " << elv_idx << "\n";
+        mlog << Debug(7) << method_name << "station_idx=" << sid_idx
+             << " elv_idx=" << elv_idx << "\n";
+        first_line = false;
       }
-      first_line = false;
+    }
+
+    if (update_lat_lon) {
+      prev_sid = cur_sid;
+
+      // Get the stationLat
+      _stationLat = atof(data_line[lat_idx]);
+      // Get the stationLon
+      _stationLon = atof(data_line[lon_idx]);
+      // Get the stationAlt
+      if (elv_idx >= 0) _stationAlt = atof(data_line[elv_idx]);
+      else _stationAlt = bad_data_float;
+
+      mlog << Debug(7) << "\n" << method_name
+           << "stationID: " << cur_sid << "  lat: " << _stationLat
+           << "  lon: " << _stationLon << "  elv: " << _stationAlt
+           << "\n";
+      update_lat_lon = false;
     }
     //
     // Pull the valid time from the data line
