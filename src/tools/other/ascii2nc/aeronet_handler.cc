@@ -286,7 +286,6 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
   //
   int bad_line_count = 0;
   bool first_line = true;
-  bool update_lat_lon;
   data_line.set_delimiter(",");
   while (ascii_file >> data_line)
   {
@@ -323,8 +322,6 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
       }
     }
 
-    cur_sid = (sid_idx < 0) ? _stationId : data_line[sid_idx];
-    update_lat_lon = (cur_sid.compare(prev_sid) != 0);
     if (first_line) {
       if (format_version == 3) {
         // Get the stationId
@@ -361,7 +358,8 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
       }
     }
 
-    if (update_lat_lon) {
+    cur_sid = (sid_idx < 0) ? _stationId : data_line[sid_idx];
+    if (cur_sid.compare(prev_sid) != 0) {
       prev_sid = cur_sid;
 
       // Get the stationLat
@@ -376,7 +374,6 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
            << "stationID: " << cur_sid << "  lat: " << _stationLat
            << "  lon: " << _stationLon << "  elv: " << _stationAlt
            << "\n";
-      update_lat_lon = false;
     }
     //
     // Pull the valid time from the data line
