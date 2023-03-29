@@ -430,7 +430,7 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
       }
 
       _addObservations(Observation(header_type,
-                                   (sid_idx<0 ? _stationId : data_line[sid_idx]),
+                                   cur_sid,
                                    valid_time,
                                    _stationLat, _stationLon,
                                    _stationAlt,
@@ -448,7 +448,7 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
         double aod_at_550 = angstrom_power_interplation(aod_at_675,aod_at_440,675.,440.,dheight);
         if (!is_eq(aod_at_550, bad_data_double)) {
            _addObservations(Observation(header_type,
-                                        (sid_idx<0 ? _stationId : data_line[sid_idx]),
+                                        cur_sid,
                                         valid_time, _stationLat, _stationLon, _stationAlt,
                                         na_str, var_id, bad_data_double, dheight,
                                         aod_at_550,
