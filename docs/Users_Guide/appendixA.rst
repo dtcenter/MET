@@ -66,185 +66,183 @@ File-IO
 	  "${MET_BUILD_BASE}/data/map/admin_by_country/admin_China_data"; } \
 	  ]; }'
 
-Q. How can I understand the number of matched pairs?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  .. dropdown:: Q. How can I understand the number of matched pairs?
 
-A.
-Statistics are computed on matched forecast/observation pairs data.
-For example, if the dimension of the grid is 37x37 up to
-1369 matched pairs are possible. However, if the forecast or
-observation contains bad data at a point, that matched pair would
-not be included in the calculations. There are a number of reasons that
-observations could be rejected - mismatches in station id, variable names,
-valid times, bad values, data off the grid, etc.
-For example, if the forecast field contains missing data around the
-edge of the domain, then that is a reason there may be 992 matched pairs
-instead of 1369. Users can use the ncview tool to look at an example
-netCDF file or run their files through plot_data_plane to help identify
-any potential issues.
+     A.
+     Statistics are computed on matched forecast/observation pairs data.
+     For example, if the dimension of the grid is 37x37 up to
+     1369 matched pairs are possible. However, if the forecast or
+     observation contains bad data at a point, that matched pair would
+     not be included in the calculations. There are a number of reasons that
+     observations could be rejected - mismatches in station id, variable names,
+     valid times, bad values, data off the grid, etc.
+     For example, if the forecast field contains missing data around the
+     edge of the domain, then that is a reason there may be 992 matched pairs
+     instead of 1369. Users can use the ncview tool to look at an example
+     netCDF file or run their files through plot_data_plane to help identify
+     any potential issues.
 
-One common support question is "Why am I getting 0 matched pairs from
-Point-Stat?". As mentioned above, there are many reasons why point
-observations can be excluded from your analysis. If running point_stat with
-at least verbosity level 2 (-v 2, the default value), zero matched pairs
-will result in the following type of log messages to be printed:
+     One common support question is "Why am I getting 0 matched pairs from
+     Point-Stat?". As mentioned above, there are many reasons why point
+     observations can be excluded from your analysis. If running point_stat with
+     at least verbosity level 2 (-v 2, the default value), zero matched pairs
+     will result in the following type of log messages to be printed:
 
-.. code-block:: none
+     .. code-block:: none
 
-    DEBUG 2: Processing TMP/Z2 versus TMP/Z2, for observation type ADPSFC, over region FULL, for interpolation method UW_MEAN(1), using 0 pairs.
-    DEBUG 2: Number of matched pairs   = 0
-    DEBUG 2: Observations processed    = 1166
-    DEBUG 2: Rejected: station id      = 0
-    DEBUG 2: Rejected: obs var name    = 1166
-    DEBUG 2: Rejected: valid time      = 0
-    DEBUG 2: Rejected: bad obs value   = 0
-    DEBUG 2: Rejected: off the grid    = 0
-    DEBUG 2: Rejected: topography      = 0
-    DEBUG 2: Rejected: level mismatch  = 0
-    DEBUG 2: Rejected: quality marker  = 0
-    DEBUG 2: Rejected: message type    = 0
-    DEBUG 2: Rejected: masking region  = 0
-    DEBUG 2: Rejected: bad fcst value  = 0
-    DEBUG 2: Rejected: bad climo mean  = 0
-    DEBUG 2: Rejected: bad climo stdev = 0
-    DEBUG 2: Rejected: mpr filter      = 0
-    DEBUG 2: Rejected: duplicates      = 0
+	 DEBUG 2: Processing TMP/Z2 versus TMP/Z2, for observation type ADPSFC, over region FULL, for interpolation method UW_MEAN(1), using 0 pairs.
+	 DEBUG 2: Number of matched pairs   = 0
+	 DEBUG 2: Observations processed    = 1166
+	 DEBUG 2: Rejected: station id      = 0
+	 DEBUG 2: Rejected: obs var name    = 1166
+	 DEBUG 2: Rejected: valid time      = 0
+	 DEBUG 2: Rejected: bad obs value   = 0
+	 DEBUG 2: Rejected: off the grid    = 0
+	 DEBUG 2: Rejected: topography      = 0
+	 DEBUG 2: Rejected: level mismatch  = 0
+	 DEBUG 2: Rejected: quality marker  = 0
+	 DEBUG 2: Rejected: message type    = 0
+	 DEBUG 2: Rejected: masking region  = 0
+	 DEBUG 2: Rejected: bad fcst value  = 0
+	 DEBUG 2: Rejected: bad climo mean  = 0
+	 DEBUG 2: Rejected: bad climo stdev = 0
+	 DEBUG 2: Rejected: mpr filter      = 0
+	 DEBUG 2: Rejected: duplicates      = 0
 
-This list of the rejection reason counts above matches the order in
-which the filtering logic is applied in the code. In this example,
-none of the point observations match the variable name requested
-in the configuration file. So all of the 1166 observations are rejected
-for the same reason.
+     This list of the rejection reason counts above matches the order in
+     which the filtering logic is applied in the code. In this example,
+     none of the point observations match the variable name requested
+     in the configuration file. So all of the 1166 observations are rejected
+     for the same reason.
 
-Q. What types of NetCDF files can MET read?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  .. dropdown:: Q. What types of NetCDF files can MET read?
 
-A.
-There are three flavors of NetCDF that MET can read directly.
+     A.
+     There are three flavors of NetCDF that MET can read directly.
 
-1. Gridded NetCDF output from one of the MET tools
+     1. Gridded NetCDF output from one of the MET tools
 
-2. Output from the WRF model that has been post-processed using the wrf_interp utility
+     2. Output from the WRF model that has been post-processed using the wrf_interp utility
 
-3. NetCDF data following the `climate-forecast (CF) convention
-   <https://cfconventions.org/Data/cf-conventions/cf-conventions-1.8/cf\
-   -conventions.html>`_
+     3. NetCDF data following the `climate-forecast (CF) convention
+	<https://cfconventions.org/Data/cf-conventions/cf-conventions-1.8/cf\
+	-conventions.html>`_
 
-Lastly, users can write python scripts to pass data that's gridded to the
-MET tools in memory. If the data doesn't fall into one of those categories,
-then it's not a gridded dataset that MET can handle directly. Satellite data,
-in general, will not be gridded. Typically it contains a dense mesh of data at
-lat/lon points, but typically those lat/lon points are not evenly spaced onto
-a regular grid.
+     Lastly, users can write python scripts to pass data that's gridded to the
+     MET tools in memory. If the data doesn't fall into one of those categories,
+     then it's not a gridded dataset that MET can handle directly. Satellite data,
+     in general, will not be gridded. Typically it contains a dense mesh of data at
+     lat/lon points, but typically those lat/lon points are not evenly spaced onto
+     a regular grid.
 
-While MET's point2grid tool does support some satellite data inputs, it is
-limited. Using python embedding is another option for handling new datasets
-not supported natively by MET.
+     While MET's point2grid tool does support some satellite data inputs, it is
+     limited. Using python embedding is another option for handling new datasets
+     not supported natively by MET.
 
-Q. How do I choose a time slice in a NetCDF file?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  .. dropdown:: Q. How do I choose a time slice in a NetCDF file?
 
-A.
-When processing NetCDF files, the level information needs to be
-specified to tell MET which 2D slice of data to use. The index is selected from
-a value when it starts with "@" for vertical level (pressure or height)
-and time. The actual time, @YYYYMMDD_HHMM, is allowed instead of selecting
-the time index.
+     A.
+     When processing NetCDF files, the level information needs to be
+     specified to tell MET which 2D slice of data to use.
+     The index is selected from
+     a value when it starts with "@" for vertical level (pressure or height)
+     and time. The actual time, @YYYYMMDD_HHMM, is allowed instead of selecting
+     the time index.
 
-Let's use plot_data_plane as an example:
+     Let's use plot_data_plane as an example:
 
-.. code-block:: none
-		      
-		plot_data_plane \
-		MERGE_20161201_20170228.nc \ 
-		obs.ps \ 
-		'name="APCP"; level="(5,*,*)";'
-		
-		plot_data_plane \
-		gtg_obs_forecast.20130730.i00.f00.nc \
-		altitude_20000.ps \
-		'name = "edr"; level = "(@20130730_0000,@20000,*,*)";'
-		
-Assuming that the first array is the time, this will select the 6-th
-time slice of the APCP data and plot it since these indices are 0-based.
+     .. code-block:: none
 
-Q. How do I use the UNIX time conversion?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+		     plot_data_plane \
+		     MERGE_20161201_20170228.nc \ 
+		     obs.ps \ 
+		     'name="APCP"; level="(5,*,*)";'
 
-A.
-Regarding the timing information in the NetCDF variable attributes:
+		     plot_data_plane \
+		     gtg_obs_forecast.20130730.i00.f00.nc \
+		     altitude_20000.ps \
+		     'name = "edr"; level = "(@20130730_0000,@20000,*,*)";'
 
-.. code-block:: none
-		      
-     APCP_24:init_time_ut = 1306886400 ;
-		      
-“ut” stands for UNIX time, which is the number of seconds
-since Jan 1, 1970. It is a convenient way of storing timing
-information since it is easy to add/subtract. The UNIX date command
-can be used to convert back/forth between unix time and time strings:
+     Assuming that the first array is the time, this will select the 6-th
+     time slice of the APCP data and plot it since these indices are 0-based.
 
-To convert unix time to ymd_hms date:
+  .. dropdown:: Q. How do I use the UNIX time conversion?
 
-.. code-block:: none
-		
-     date -ud '1970-01-01 UTC '1306886400' seconds' +%Y%m%d_%H%M%S 20110601_000000
+     A.
+     Regarding the timing information in the NetCDF variable attributes:
 
-To convert ymd_hms to unix date:
+     .. code-block:: none
 
-.. code-block:: none
-		      
-     date -ud ''2011-06-01' UTC '00:00:00'' +%s 1306886400
-		  
-Regarding TRMM data, it may be easier to work with the binary data and
-use the trmm2nc.R script described on this
-`page <http://dtcenter.org/community-code/model-evaluation-tools-met/input-data>`_
-under observation datasets.
+	  APCP_24:init_time_ut = 1306886400 ;
 
-Follow the TRMM binary links to either the 3 or 24-hour accumulations,
-save the files, and run them through that script. That is faster
-and easier than trying to get an ASCII dump. That Rscript can also
-subset the TRMM data if needed. Look for the section of it titled
-"Output domain specification" and define the lat/lon's that needs
-to be included in the output.
+     “ut” stands for UNIX time, which is the number of seconds
+     since Jan 1, 1970. It is a convenient way of storing timing
+     information since it is easy to add/subtract. The UNIX date command
+     can be used to convert back/forth between unix time and time strings:
 
-Q. Does MET use a fixed-width output format for its ASCII output files?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     To convert unix time to ymd_hms date:
 
-A.
-MET does not use the Fortran-like fixed width format in its
-ASCII output file. Instead, the column widths are adjusted for each
-run to insert at least one space between adjacent columns. The header
-columns of the MET output contain user-defined strings which may be
-of arbitrary length. For example, columns such as MODEL, OBTYPE, and
-DESC may be set by the user to any string value. Additionally, the
-amount of precision written is also configurable. The
-"output_precision" config file entry can be changed from its default
-value of 5 decimal places to up to 12 decimal places, which would also
-impact the column widths of the output.
+     .. code-block:: none
 
-Due to these issues, it is not possible to select a reasonable fixed
-width for each column ahead of time. The AsciiTable class in MET does
-a lot of work to line up the output columns, to make sure there is
-at least one space between them.
+	  date -ud '1970-01-01 UTC '1306886400' seconds' +%Y%m%d_%H%M%S 20110601_000000
 
-If a fixed-width format is needed, the easiest option would be
-writing a script to post-process the MET output into the fixed-width
-format that is needed or that the code expects.
+     To convert ymd_hms to unix date:
 
-Q. Do the ASCII output files created by MET use scientific notation?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     .. code-block:: none
 
-A.
-By default, the ASCII output files created by MET make use of
-scientific notation when appropriate. The formatting of the
-numbers that the AsciiTable class writes is handled by a call
-to printf. The "%g" formatting option can result in
-scientific notation:
-http://www.cplusplus.com/reference/cstdio/printf/
+	  date -ud ''2011-06-01' UTC '00:00:00'' +%s 1306886400
 
-It has been recommended that a configuration option be added to
-MET to disable the use of scientific notation. That enhancement
-is planned for a future release.
+     Regarding TRMM data, it may be easier to work with the binary data and
+     use the trmm2nc.R script described on this
+     `page <http://dtcenter.org/community-code/model-evaluation-tools-met/input-data>`_
+     under observation datasets.
+
+     Follow the TRMM binary links to either the 3 or 24-hour accumulations,
+     save the files, and run them through that script. That is faster
+     and easier than trying to get an ASCII dump. That Rscript can also
+     subset the TRMM data if needed. Look for the section of it titled
+     "Output domain specification" and define the lat/lon's that needs
+     to be included in the output.
+
+  .. dropdown:: Q. Does MET use a fixed-width output format for
+		its ASCII output files?
+
+     A.
+     MET does not use the Fortran-like fixed width format in its
+     ASCII output file. Instead, the column widths are adjusted for each
+     run to insert at least one space between adjacent columns. The header
+     columns of the MET output contain user-defined strings which may be
+     of arbitrary length. For example, columns such as MODEL, OBTYPE, and
+     DESC may be set by the user to any string value. Additionally, the
+     amount of precision written is also configurable. The
+     "output_precision" config file entry can be changed from its default
+     value of 5 decimal places to up to 12 decimal places, which would also
+     impact the column widths of the output.
+
+     Due to these issues, it is not possible to select a reasonable fixed
+     width for each column ahead of time. The AsciiTable class in MET does
+     a lot of work to line up the output columns, to make sure there is
+     at least one space between them.
+
+     If a fixed-width format is needed, the easiest option would be
+     writing a script to post-process the MET output into the fixed-width
+     format that is needed or that the code expects.
+
+  .. dropdown:: Q. Do the ASCII output files created by MET use
+		scientific notation?
+
+
+     A.
+     By default, the ASCII output files created by MET make use of
+     scientific notation when appropriate. The formatting of the
+     numbers that the AsciiTable class writes is handled by a call
+     to printf. The "%g" formatting option can result in
+     scientific notation:
+     http://www.cplusplus.com/reference/cstdio/printf/
+
+     It has been recommended that a configuration option be added to
+     MET to disable the use of scientific notation. That enhancement
+     is planned for a future release.
 
 Gen-Vx-Mask
 -----------
