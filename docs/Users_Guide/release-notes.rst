@@ -14,7 +14,7 @@ MET Version 11.0.2 release notes (20230330)
 
 * Bugfixes:
 
-  * Bugfix: Fix support for the YYYYMMDD format in NetCDF level timestrings (`#2482 <https://github.com/dtcenter/MET/issues/2482>`_).
+   * Bugfix: Fix support for the YYYYMMDD format in NetCDF level timestrings (`#2482 <https://github.com/dtcenter/MET/issues/2482>`_).
   * Bugfix: AERONET the lat/lon is not changed with different station ID (`#2493 <https://github.com/dtcenter/MET/issues/2493>`_).
 
 MET Version 11.0.1 release notes (20230228)
