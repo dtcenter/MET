@@ -10,7 +10,7 @@ Frequently Asked Questions
 File-IO
 -------
 
-  .. dropdown: Q. How do I improve the speed of MET tools using Gen-Vx-Mask?
+  .. dropdown:: Q. How do I improve the speed of MET tools using Gen-Vx-Mask?
 
      A.
      The main reason to run gen_vx_mask is to make the MET
@@ -24,7 +24,8 @@ File-IO
      only contains a small number of points or the grid is sparse running
      gen_vx_mask first would only save a second or two.
 
-  .. dropdown:Q. How do I use map_data?
+     
+  .. dropdown:: Q. How do I use map_data?
 
      A.
      The MET repository includes several map data files. Users can modify which
