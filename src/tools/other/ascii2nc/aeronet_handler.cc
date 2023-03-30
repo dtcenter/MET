@@ -363,12 +363,12 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
       prev_sid = cur_sid;
 
       // Get the stationLat
-      _stationLat = atof(data_line[lat_idx]);
+      if (lat_idx >= 0) _stationLat = atof(data_line[lat_idx]);
       // Get the stationLon
-      _stationLon = atof(data_line[lon_idx]);
+      if (lon_idx >= 0) _stationLon = atof(data_line[lon_idx]);
       // Get the stationAlt
       if (elv_idx >= 0) _stationAlt = atof(data_line[elv_idx]);
-      else _stationAlt = bad_data_float;
+      else if (format_version == 3) _stationAlt = bad_data_float;
 
       mlog << Debug(7) << "\n" << method_name
            << "stationID: " << cur_sid << "  lat: " << _stationLat
