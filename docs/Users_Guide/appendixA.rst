@@ -10,20 +10,20 @@ Frequently Asked Questions
 File-IO
 -------
 
-Q. How do I improve the speed of MET tools using Gen-Vx-Mask?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  .. dropdown: Q. How do I improve the speed of MET tools using Gen-Vx-Mask?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-A.
-The main reason to run gen_vx_mask is to make the MET
-statistics tools (e.g. point_stat, grid_stat, or ensemble_stat) run
-faster. The verification masking regions in those tools can be specified
-as Lat/Lon polyline files or the NetCDF output of gen_vx_mask. However,
-determining which grid points are inside/outside a polyline region can be
-slow if the polyline contains many points or the grid is dense. Running
-gen_vx_mask once to create a binary mask is much more efficient than
-recomputing the mask when each MET statistics tool is run. If the polyline
-only contains a small number of points or the grid is sparse running
-gen_vx_mask first would only save a second or two.
+     A.
+    The main reason to run gen_vx_mask is to make the MET
+    statistics tools (e.g. point_stat, grid_stat, or ensemble_stat) run
+    faster. The verification masking regions in those tools can be specified
+    as Lat/Lon polyline files or the NetCDF output of gen_vx_mask. However,
+    determining which grid points are inside/outside a polyline region can be
+    slow if the polyline contains many points or the grid is dense. Running
+    gen_vx_mask once to create a binary mask is much more efficient than
+    recomputing the mask when each MET statistics tool is run. If the polyline
+    only contains a small number of points or the grid is sparse running
+    gen_vx_mask first would only save a second or two.
 
 Q. How do I use map_data?
 ^^^^^^^^^^^^^^^^^^^^^^^^^
