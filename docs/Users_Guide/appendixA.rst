@@ -10,9 +10,10 @@ Frequently Asked Questions
 File-IO
 -------
 
-  .. dropdown:: Q. How do I improve the speed of MET tools using Gen-Vx-Mask?
-
-     A.
+Q. How do I improve the speed of MET tools using Gen-Vx-Mask?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   .. dropdown:: Answer
+		 
      The main reason to run gen_vx_mask is to make the MET
      statistics tools (e.g. point_stat, grid_stat, or ensemble_stat) run
      faster. The verification masking regions in those tools can be specified
@@ -25,9 +26,11 @@ File-IO
      gen_vx_mask first would only save a second or two.
 
      
-  .. dropdown:: Q. How do I use map_data?
+Q. How do I use map_data?
+^^^^^^^^^^^^^^^^^^^^^^^^^   
 
-     A.
+  .. dropdown:: Answer
+		
      The MET repository includes several map data files. Users can modify which
      map datasets are included in the plots created by modifying the
      configuration files for those tools. The default map datasets are defined
@@ -66,9 +69,11 @@ File-IO
 	  "${MET_BUILD_BASE}/data/map/admin_by_country/admin_China_data"; } \
 	  ]; }'
 
-  .. dropdown:: Q. How can I understand the number of matched pairs?
+Q. How can I understand the number of matched pairs?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-     A.
+  .. dropdown:: Answer
+		
      Statistics are computed on matched forecast/observation pairs data.
      For example, if the dimension of the grid is 37x37 up to
      1369 matched pairs are possible. However, if the forecast or
@@ -115,9 +120,11 @@ File-IO
      in the configuration file. So all of the 1166 observations are rejected
      for the same reason.
 
-  .. dropdown:: Q. What types of NetCDF files can MET read?
+Q. What types of NetCDF files can MET read?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-     A.
+  .. dropdown:: Answer
+		
      There are three flavors of NetCDF that MET can read directly.
 
      1. Gridded NetCDF output from one of the MET tools
@@ -139,9 +146,11 @@ File-IO
      limited. Using python embedding is another option for handling new datasets
      not supported natively by MET.
 
-  .. dropdown:: Q. How do I choose a time slice in a NetCDF file?
+Q. How do I choose a time slice in a NetCDF file?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-     A.
+ .. dropdown:: Answer
+	       
      When processing NetCDF files, the level information needs to be
      specified to tell MET which 2D slice of data to use.
      The index is selected from
@@ -166,9 +175,11 @@ File-IO
      Assuming that the first array is the time, this will select the 6-th
      time slice of the APCP data and plot it since these indices are 0-based.
 
-  .. dropdown:: Q. How do I use the UNIX time conversion?
+Q. How do I use the UNIX time conversion?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-     A.
+ .. dropdown:: Answer
+	       
      Regarding the timing information in the NetCDF variable attributes:
 
      .. code-block:: none
@@ -204,10 +215,11 @@ File-IO
      "Output domain specification" and define the lat/lon's that needs
      to be included in the output.
 
-  .. dropdown:: Q. Does MET use a fixed-width output format for
-		its ASCII output files?
+Q. Does MET use a fixed-width output format for	its ASCII output files?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-     A.
+ .. dropdown:: Answer
+	       
      MET does not use the Fortran-like fixed width format in its
      ASCII output file. Instead, the column widths are adjusted for each
      run to insert at least one space between adjacent columns. The header
@@ -228,11 +240,11 @@ File-IO
      writing a script to post-process the MET output into the fixed-width
      format that is needed or that the code expects.
 
-  .. dropdown:: Q. Do the ASCII output files created by MET use
-		scientific notation?
+Q. Do the ASCII output files created by MET use scientific notation?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-
-     A.
+ .. dropdown:: Answer
+	       
      By default, the ASCII output files created by MET make use of
      scientific notation when appropriate. The formatting of the
      numbers that the AsciiTable class writes is handled by a call
