@@ -11,7 +11,6 @@ File-IO
 -------
 
   .. dropdown: Q. How do I improve the speed of MET tools using Gen-Vx-Mask?
-  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
      A.
     The main reason to run gen_vx_mask is to make the MET
