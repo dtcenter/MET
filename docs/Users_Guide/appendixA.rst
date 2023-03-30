@@ -33,38 +33,38 @@ File-IO
      configuration files for those tools. The default map datasets are defined
      by the map_data dictionary in the ConfigMapData file.
 
-.. code-block:: none
+     .. code-block:: none
 
-   map_data = {
+	map_data = {
 
-      line_color = [ 25, 25, 25 ]; // rgb triple values, 0-255
-      line_width = 0.5;
-      line_dash  = "";
+	   line_color = [ 25, 25, 25 ]; // rgb triple values, 0-255
+	   line_width = 0.5;
+	   line_dash  = "";
 
-      source = [
-         { file_name = "MET_BASE/map/country_data"; },
-         { file_name = "MET_BASE/map/usa_state_data"; },
-         { file_name = "MET_BASE/map/major_lakes_data"; }
-      ];
-   }
+	   source = [
+	      { file_name = "MET_BASE/map/country_data"; },
+	      { file_name = "MET_BASE/map/usa_state_data"; },
+	      { file_name = "MET_BASE/map/major_lakes_data"; }
+	   ];
+	}
 
-Users can modify the ConfigMapData contents prior to running 'make install'.
-This will change the default map data for all of the MET tools which plots.
-Alternatively, users can copy/paste/modify the map_data dictionary into the
-configuration file for a MET tool. For example, you could add map_data to
-the end of the MODE configuration file to customize plots created by MODE.
+     Users can modify the ConfigMapData contents prior to running 'make install'.
+     This will change the default map data for all of the MET tools which plots.
+     Alternatively, users can copy/paste/modify the map_data dictionary into the
+     configuration file for a MET tool. For example, you could add map_data to
+     the end of the MODE configuration file to customize plots created by MODE.
 
-Here is an example of running plot_data_plane and specifying the map_data
-in the configuration string on the command line:
+     Here is an example of running plot_data_plane and specifying the map_data
+     in the configuration string on the command line:
 
-.. code-block:: none
-		
-     plot_data_plane
-     sample.grib china_tmp_2m_admin.ps \
-     'name="TMP"; level="Z2"; \
-     map_data = { source = [ { file_name = \
-     "${MET_BUILD_BASE}/data/map/admin_by_country/admin_China_data"; } \
-     ]; }'
+     .. code-block:: none
+
+	  plot_data_plane
+	  sample.grib china_tmp_2m_admin.ps \
+	  'name="TMP"; level="Z2"; \
+	  map_data = { source = [ { file_name = \
+	  "${MET_BUILD_BASE}/data/map/admin_by_country/admin_China_data"; } \
+	  ]; }'
 
 Q. How can I understand the number of matched pairs?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
