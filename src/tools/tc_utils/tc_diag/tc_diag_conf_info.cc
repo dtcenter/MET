@@ -66,7 +66,7 @@ void TCDiagConfInfo::clear() {
    lead_time.clear();
 
    data_opt.clear();
-   grid_info_map.clear();
+   domain_info_map.clear();
 
    compute_tangential_and_radial_winds = false;
    u_wind_field_name.clear();
@@ -76,10 +76,11 @@ void TCDiagConfInfo::clear() {
    tangential_velocity_long_field_name.clear();
    radial_velocity_long_field_name.clear();
 
+   nc_diag_info.clear();
+   cira_diag_flag = false;
+
    tmp_dir.clear();
    output_prefix.clear();
-
-   nc_info.clear();
 
    return;
 }
@@ -108,6 +109,11 @@ void TCDiagConfInfo::process_config(GrdFileType file_type) {
    StringArray sa;
    VarInfoFactory info_factory;
    Dictionary *dict = (Dictionary *) 0;
+
+// JHG note that "regrid" appears in the TC-Diag and TC-RMW config files
+// I think it currently only applies to the raw data, meaning we can regrid
+// the raw data PRIOR TO the cyl coordinate transformation. Wondering if we
+// need options to support the cyl coordinate transformation?
 
    // Conf: version
    check_met_version(conf.lookup_string(conf_key_version).c_str());
@@ -155,42 +161,6 @@ void TCDiagConfInfo::process_config(GrdFileType file_type) {
       lead_time.add(timestring_to_sec(sa[i].c_str()));
    }
 
-   // Conf: compute_tangential_and_radial_winds
-   compute_tangential_and_radial_winds =
-      conf.lookup_bool(conf_key_compute_tangential_and_radial_winds);
-
-// JHG, replace this with is_u_wind/is_v_wind?
-
-   // Conf: u_wind_field_name
-   u_wind_field_name =
-      conf.lookup_string(conf_key_u_wind_field_name);
-
-   // Conf: v_wind_field_name
-   v_wind_field_name =
-      conf.lookup_string(conf_key_v_wind_field_name);
-
-   // Conf: tangential_velocity_field_name
-   tangential_velocity_field_name =
-      conf.lookup_string(conf_key_tangential_velocity_field_name);
-
-   // Conf: radial_velocity_field_name
-   radial_velocity_field_name =
-      conf.lookup_string(conf_key_radial_velocity_field_name);
-
-   // Conf: tangential_velocity_long_field_name
-   tangential_velocity_long_field_name =
-      conf.lookup_string(conf_key_tangential_velocity_long_field_name);
-
-   // Conf: radial_velocity_long_field_name
-   radial_velocity_long_field_name =
-      conf.lookup_string(conf_key_radial_velocity_long_field_name);
-
-   // Conf: tmp_dir
-   tmp_dir = parse_conf_tmp_dir(&conf);
-
-   // Conf: output_prefix
-   output_prefix = conf.lookup_string(conf_key_output_prefix);
-
    // Conf: data.field
    dict = conf.lookup_array(conf_key_data_field);
 
@@ -222,33 +192,72 @@ void TCDiagConfInfo::process_config(GrdFileType file_type) {
    }
 
    // Parse the cyclindrical coordinate grids
-   parse_grid_info_map();
+   parse_domain_info_map();
 
-   // Conf: nc_out_flag
-   parse_nc_info();
+   // Conf: compute_tangential_and_radial_winds
+   compute_tangential_and_radial_winds =
+      conf.lookup_bool(conf_key_compute_tangential_and_radial_winds);
+
+// JHG, replace this with is_u_wind/is_v_wind?
+
+   // Conf: u_wind_field_name
+   u_wind_field_name =
+      conf.lookup_string(conf_key_u_wind_field_name);
+
+   // Conf: v_wind_field_name
+   v_wind_field_name =
+      conf.lookup_string(conf_key_v_wind_field_name);
+
+   // Conf: tangential_velocity_field_name
+   tangential_velocity_field_name =
+      conf.lookup_string(conf_key_tangential_velocity_field_name);
+
+   // Conf: radial_velocity_field_name
+   radial_velocity_field_name =
+      conf.lookup_string(conf_key_radial_velocity_field_name);
+
+   // Conf: tangential_velocity_long_field_name
+   tangential_velocity_long_field_name =
+      conf.lookup_string(conf_key_tangential_velocity_long_field_name);
+
+   // Conf: radial_velocity_long_field_name
+   radial_velocity_long_field_name =
+      conf.lookup_string(conf_key_radial_velocity_long_field_name);
+
+   // Conf: nc_diag_flag
+   parse_nc_diag_info();
 
    // Set the write_nc flag, if needed
-   if(nc_info.do_cyl_latlon || nc_info.do_cyl_raw) {
-      map<string,TCRMWGridInfo>::iterator it;
-      for(it = grid_info_map.begin(); it != grid_info_map.end(); it++) {
+   if(nc_diag_info.do_cyl_latlon || nc_diag_info.do_cyl_raw) {
+      map<string,TCDiagDomainInfo>::iterator it;
+      for(it = domain_info_map.begin(); it != domain_info_map.end(); it++) {
          it->second.write_nc = true;
       }
    }
+
+   // Conf: cira_diag_flag
+   cira_diag_flag = conf.lookup_bool(conf_key_cira_diag_flag);
+
+   // Conf: tmp_dir
+   tmp_dir = parse_conf_tmp_dir(&conf);
+
+   // Conf: output_prefix
+   output_prefix = conf.lookup_string(conf_key_output_prefix);
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCDiagConfInfo::parse_grid_info_map() {
+void TCDiagConfInfo::parse_domain_info_map() {
 
    const DictionaryEntry * e = (const DictionaryEntry *) 0;
 
-   e = conf.lookup(conf_key_cyl_coord_grid);
+   e = conf.lookup(conf_key_domain_info);
 
    if(!e) {
-      mlog << Error << "\nTCDiagConfInfo::parse_grid_info_map() -> "
-           << "lookup failed for key \"" << conf_key_cyl_coord_grid
+      mlog << Error << "\nTCDiagConfInfo::parse_domain_info_map() -> "
+           << "lookup failed for key \"" << conf_key_domain_info
            << "\"\n\n";
       exit(1);
    }
@@ -257,30 +266,30 @@ void TCDiagConfInfo::parse_grid_info_map() {
 
    // It should be an array of dictionaries
    if(type != ArrayType) {
-      mlog << Error << "\nTCDiagConfInfo::parse_grid_info_map() -> "
+      mlog << Error << "\nTCDiagConfInfo::parse_domain_info_map() -> "
            << "bad type (" << configobjecttype_to_string(type)
-           << ") for key \"" << conf_key_cyl_coord_grid << "\"\n\n";
+           << ") for key \"" << conf_key_domain_info << "\"\n\n";
       exit(1);
    }
 
    // Parse each grid info object
    for(int i=0; i<e->array_value()->n_entries(); i++) {
-      TCRMWGridInfo gi;
       ConcatString domain;
+      TCDiagDomainInfo di;
 
-      parse_domain_grid_info(e->array_value()[i],
-                             domain, gi);
+      parse_domain_info(e->array_value()[i],
+                        domain, di);
 
       // Check for duplicate entries
-      if(grid_info_map.count(domain) > 0) {
-         mlog << Error << "\nTCDiagConfInfo::parse_grid_info_map() -> "
-              << "multiple \"" << conf_key_cyl_coord_grid
+      if(domain_info_map.count(domain) > 0) {
+         mlog << Error << "\nTCDiagConfInfo::parse_domain_info_map() -> "
+              << "multiple \"" << conf_key_domain_info
               << "\" entries found for domain \"" << domain << "\"!\n\n";
          exit(1);
       }
       // Store a new entry
       else {
-         grid_info_map[domain] = gi;
+         domain_info_map[domain] = di;
       }
    }
 
@@ -289,47 +298,47 @@ void TCDiagConfInfo::parse_grid_info_map() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCDiagConfInfo::parse_domain_grid_info(Dictionary &dict,
-                                            ConcatString &domain,
-                                            TCRMWGridInfo &gi) {
+void TCDiagConfInfo::parse_domain_info(Dictionary &dict,
+                                       ConcatString &domain,
+                                       TCDiagDomainInfo &di) {
 
    // Conf: domain
    domain = dict.lookup_string(conf_key_domain);
 
-   gi.clear();
+   // Initialize
+   di.clear();
 
    // Hard-code the name for now
-   gi.data.name = "TCRMW";
+   di.data.name = "TCRMW";
 
    // Conf: n_range
-   gi.data.range_n = dict.lookup_int(conf_key_n_range);
+   di.data.range_n = dict.lookup_int(conf_key_n_range);
 
    // Conf: azimuth_n
-   gi.data.azimuth_n = dict.lookup_int(conf_key_n_azimuth);
+   di.data.azimuth_n = dict.lookup_int(conf_key_n_azimuth);
 
    // Conf: max_range
-   gi.data.range_max_km = dict.lookup_double(conf_key_max_range);
+   di.data.range_max_km = dict.lookup_double(conf_key_max_range);
 
    // Conf: delta_range
-   gi.delta_range_km = dict.lookup_double(conf_key_delta_range);
+   di.delta_range_km = dict.lookup_double(conf_key_delta_range);
 
-   // Conf: rmw_scale
-   gi.rmw_scale = dict.lookup_double(conf_key_rmw_scale);
+   // Conf: diag_script
+   di.diag_script = dict.lookup_string_array(conf_key_diag_script);
 
-   // Store grid
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCDiagConfInfo::parse_nc_info() {
+void TCDiagConfInfo::parse_nc_diag_info() {
    const DictionaryEntry * e = (const DictionaryEntry *) 0;
 
-   e = conf.lookup(conf_key_nc_out_flag);
+   e = conf.lookup(conf_key_nc_diag_flag);
 
    if(!e) {
-      mlog << Error << "\nTCDiagConfInfo::parse_nc_info() -> "
-           << "lookup failed for key \"" << conf_key_nc_out_flag
+      mlog << Error << "\nTCDiagConfInfo::parse_nc_diag_info() -> "
+           << "lookup failed for key \"" << conf_key_nc_diag_flag
            << "\"\n\n";
       exit(1);
    }
@@ -339,28 +348,28 @@ void TCDiagConfInfo::parse_nc_info() {
    if(type == BooleanType) {
       bool value = e->b_value();
 
-      if(!value) nc_info.set_all_false();
+      if(!value) nc_diag_info.set_all_false();
 
       return;
    }
 
    // It should be a dictionary
    if(type != DictionaryType) {
-      mlog << Error << "\nTCDiagConfInfo::parse_nc_info() -> "
+      mlog << Error << "\nTCDiagConfInfo::parse_nc_diag_info() -> "
            << "bad type (" << configobjecttype_to_string(type)
-           << ") for key \"" << conf_key_nc_out_flag << "\"\n\n";
+           << ") for key \"" << conf_key_nc_diag_flag << "\"\n\n";
       exit(1);
    }
 
    // Parse the various entries
    Dictionary * d = e->dict_value();
 
-   nc_info.do_track       = d->lookup_bool(conf_key_track_flag);
-   nc_info.do_grid_latlon = d->lookup_bool(conf_key_grid_latlon_flag);
-   nc_info.do_grid_raw    = d->lookup_bool(conf_key_grid_raw_flag);
-   nc_info.do_cyl_latlon  = d->lookup_bool(conf_key_cyl_latlon_flag);
-   nc_info.do_cyl_raw     = d->lookup_bool(conf_key_cyl_raw_flag);
-   nc_info.do_diag        = d->lookup_bool(conf_key_diag_flag);
+   nc_diag_info.do_track       = d->lookup_bool(conf_key_track_flag);
+   nc_diag_info.do_diag        = d->lookup_bool(conf_key_diag_flag);
+   nc_diag_info.do_grid_latlon = d->lookup_bool(conf_key_grid_latlon_flag);
+   nc_diag_info.do_grid_raw    = d->lookup_bool(conf_key_grid_raw_flag);
+   nc_diag_info.do_cyl_latlon  = d->lookup_bool(conf_key_cyl_latlon_flag);
+   nc_diag_info.do_cyl_raw     = d->lookup_bool(conf_key_cyl_raw_flag);
 
    return;
 }
@@ -400,6 +409,8 @@ void TCDiagDataOpt::init_from_scratch() {
 void TCDiagDataOpt::clear() {
    int i;
 
+   domain_sa.clear();
+
    // Deallocate memory
    if(var_info) { delete var_info; var_info = (VarInfo *) 0; }
 
@@ -415,15 +426,17 @@ void TCDiagDataOpt::process_config(GrdFileType file_type, Dictionary &dict) {
    // Initialize
    clear();
 
-   // Set the VarInfo object
+   // Conf: field.domain
+   domain_sa = dict.lookup_string_array(conf_key_domain);
+
+   // Conf: field.name and field.level
    var_info = info_factory.new_var_info(file_type);
    var_info->set_dict(dict);
 
    // Dump the contents of the current VarInfo
-   if(mlog.verbosity_level() >= 5) {
-      mlog << Debug(5) << "Parsed field:\n";
-      var_info->dump(cout);
-   }
+   mlog << Debug(3) << "Parsed field \"" << var_info->magic_str()
+        << "\" for domains \"" << write_css(domain_sa) << "\".\n";
+   if(mlog.verbosity_level() >= 5) var_info->dump(cout);
 
    return;
 }
@@ -443,11 +456,11 @@ TCDiagNcOutInfo::TCDiagNcOutInfo() {
 TCDiagNcOutInfo & TCDiagNcOutInfo::operator+=(const TCDiagNcOutInfo &t) {
 
    if(t.do_track)       do_track       = true;
+   if(t.do_diag)        do_diag        = true;
    if(t.do_grid_latlon) do_grid_latlon = true;
    if(t.do_grid_raw)    do_grid_raw    = true;
    if(t.do_cyl_latlon)  do_cyl_latlon  = true;
    if(t.do_cyl_raw)     do_cyl_raw     = true;
-   if(t.do_diag)        do_diag        = true;
 
    return(*this);
 }
@@ -465,10 +478,9 @@ void TCDiagNcOutInfo::clear() {
 
 bool TCDiagNcOutInfo::all_false() const {
 
-   bool status = do_track       ||
+   bool status = do_track       || do_diag     ||
                  do_grid_latlon || do_grid_raw ||
-                 do_cyl_latlon  || do_cyl_raw  ||
-                 do_diag;
+                 do_cyl_latlon  || do_cyl_raw;
 
    return(!status);
 }
@@ -478,11 +490,11 @@ bool TCDiagNcOutInfo::all_false() const {
 void TCDiagNcOutInfo::set_all_false() {
 
    do_track       = false;
+   do_diag        = false;
    do_grid_latlon = false;
    do_grid_raw    = false;
    do_cyl_latlon  = false;
    do_cyl_raw     = false;
-   do_diag        = false;
 
    return;
 }
@@ -492,38 +504,38 @@ void TCDiagNcOutInfo::set_all_false() {
 void TCDiagNcOutInfo::set_all_true() {
 
    do_track       = true;
+   do_diag        = true;
    do_grid_latlon = true;
    do_grid_raw    = true;
    do_cyl_latlon  = true;
    do_cyl_raw     = true;
-   do_diag        = true;
+
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 //
-//  Code for struct TCRMWGridInfo
+//  Code for struct TCDiagDomainInfo
 //
 ////////////////////////////////////////////////////////////////////////
 
-TCRMWGridInfo::TCRMWGridInfo() {
+TCDiagDomainInfo::TCDiagDomainInfo() {
    clear();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool TCRMWGridInfo::operator==(const TCRMWGridInfo &t) {
+bool TCDiagDomainInfo::operator==(const TCDiagDomainInfo &t) {
 
    return(data.range_n ==          t.data.range_n &&
           data.azimuth_n ==        t.data.azimuth_n &&
           is_eq(data.range_max_km, t.data.range_max_km) &&
-          is_eq(delta_range_km,    t.delta_range_km) &&
-          is_eq(rmw_scale,         t.rmw_scale));
+          is_eq(delta_range_km,    t.delta_range_km));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCRMWGridInfo::clear() {
+void TCDiagDomainInfo::clear() {
 
    data.range_n      = bad_data_int;
    data.azimuth_n    = bad_data_int;
@@ -532,7 +544,8 @@ void TCRMWGridInfo::clear() {
    data.lon_center   = bad_data_double;
 
    delta_range_km = bad_data_double;
-   rmw_scale      = bad_data_double;
+
+   diag_script.clear();
 
    write_nc = false;
 

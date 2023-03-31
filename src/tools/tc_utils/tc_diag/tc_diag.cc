@@ -81,6 +81,11 @@ static void compute_lat_lon(TcrmwGrid&, double*, double*);
 // FROM:	double TMP(range, azimuth, pressure, track_point) ;
 // TO:  	double TMP(track_point, pressure, range, azimuth) ; the last 2 are the "gridded dimensions"
 // JHG, parallelize the processing of VALID TIMES. For each one, process all the data for all the track points
+// Propose that we have TC-Diag write:
+// - 1 ASCII CIRA diag file per track (unless that's turned off)
+// - 1 NetCDF diag file per track (unless that's turned off)
+// - 1 Gridded NetCDF file per track with the raw and/or cyl coordinate data used to compute diagnostics (unless that's turned off) - Should we combine with above?
+//
 
 int met_main(int argc, char *argv[]) {
 
@@ -142,7 +147,7 @@ void usage() {
 void process_command_line(int argc, char **argv) {
    CommandLine cline;
    ConcatString default_config_file;
-   StringArray data_files;
+   StringArray domain_list, data_files;
 
    // Default output directory
    out_dir = replace_path(default_out_dir);
@@ -190,6 +195,7 @@ void process_command_line(int argc, char **argv) {
    for(it = data_files_map.begin(); it != data_files_map.end(); it++) {
       data_files = parse_file_list(it->second);
       data_files_map[it->first] = data_files;
+      domain_list.add(it->first);
    }
 
    // Read config files
@@ -200,6 +206,17 @@ void process_command_line(int argc, char **argv) {
 
    // Process the configuration
    conf_info.process_config(file_type);
+
+   // Check that each command line domain appears in the config file
+   for(int i=0; i<domain_list.n(); i++) {
+      if(conf_info.domain_info_map.count(domain_list[i]) == 0) {
+         mlog << Error << "\nprocess_command_line() -> "
+              << "the \"" << domain_list[i] << "\" domain is specified "
+              << "on the command line but does not appear in the \""
+              << conf_key_domain_info << "\" config file entry!\n\n";
+         exit(1);
+      }
+   }
 
    return;
 }
@@ -255,7 +272,7 @@ void process_diagnostics() {
    process_track_points(tracks);
 
    // Setup NetCDF output
-   if(!conf_info.nc_info.all_false()) setup_nc_file(tracks[0]);
+   if(!conf_info.nc_diag_info.all_false()) setup_nc_file(tracks[0]);
 
    // List the output file
    if(nc_out) {
@@ -595,29 +612,29 @@ void setup_nc_file(const TrackInfo &track) {
    // Track point dimension
    track_point_dim = add_dim(nc_out, "track_point", NC_UNLIMITED);
 
-   // Loop over the grid definitions
-   map<std::string,TCRMWGridInfo>::iterator it;
-   for(it  = conf_info.grid_info_map.begin();
-       it != conf_info.grid_info_map.end();
+   // Loop over the domains definitions
+   map<std::string,TCDiagDomainInfo>::iterator it;
+   for(it  = conf_info.domain_info_map.begin();
+       it != conf_info.domain_info_map.end();
        it++) {
 
-      TCRMWGridInfo *gi = &(it->second);
+      TCDiagDomainInfo *di = &(it->second);
 
       mlog << Debug(4) << "Writing cylindrical coordinates grid for domain \""
-           << it->first << "\" with range = " << gi->data.range_n
-           << " and azimuth = " << gi->data.azimuth_n << ".\n";
+           << it->first << "\" with range = " << di->data.range_n
+           << " and azimuth = " << di->data.azimuth_n << ".\n";
 
       // Define dimension names
       ConcatString rng_cs("range");
       ConcatString azi_cs("azimuth");
-      if(conf_info.grid_info_map.size() > 1) {
+      if(conf_info.domain_info_map.size() > 1) {
          rng_cs << "_" << it->first;
          azi_cs << "_" << it->first;
       }
 
       // Define dimensions
-      gi->range_dim   = add_dim(nc_out, rng_cs.c_str(), (long) gi->data.range_n);
-      gi->azimuth_dim = add_dim(nc_out, azi_cs.c_str(), (long) gi->data.azimuth_n);
+      di->range_dim   = add_dim(nc_out, rng_cs.c_str(), (long) di->data.range_n);
+      di->azimuth_dim = add_dim(nc_out, azi_cs.c_str(), (long) di->data.azimuth_n);
    }
 
    return;

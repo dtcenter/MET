@@ -27,11 +27,11 @@
 struct TCDiagNcOutInfo {
 
    bool do_track;
+   bool do_diag;
    bool do_grid_latlon;
    bool do_grid_raw;
    bool do_cyl_latlon;
    bool do_cyl_raw;
-   bool do_diag;
 
       //////////////////////////////////////////////////////////////////
 
@@ -48,13 +48,15 @@ struct TCDiagNcOutInfo {
 
 ////////////////////////////////////////////////////////////////////////
 
-struct TCRMWGridInfo {
+struct TCDiagDomainInfo {
 
    // TcrmwData structure for creating a TcrmwGrid object
    TcrmwData data;
 
    double delta_range_km;
-   double rmw_scale;
+
+   // Diagnostic scripts to be run
+   StringArray diag_script;
 
    // Flag to write this grid to the output
    bool write_nc;
@@ -65,8 +67,8 @@ struct TCRMWGridInfo {
 
       //////////////////////////////////////////////////////////////////
 
-   TCRMWGridInfo();
-   bool operator==(const TCRMWGridInfo &);
+   TCDiagDomainInfo();
+   bool operator==(const TCDiagDomainInfo &);
 
    void clear();
 };
@@ -88,6 +90,9 @@ class TCDiagDataOpt {
 
       // VarInfo pointer (allocated)
       VarInfo *var_info;
+
+      // Domains for which this variable should be read
+      StringArray domain_sa;
 
       //////////////////////////////////////////////////////////////////
 
@@ -129,8 +134,8 @@ class TCDiagConfInfo {
       // Vector of options for each data.field entry
       std::vector<TCDiagDataOpt> data_opt;
 
-      // Mapping of domain name to TCRMWGridInfo
-      std::map<std::string,TCRMWGridInfo> grid_info_map;
+      // Mapping of domain name to TCDiagDomainInfo
+      std::map<std::string,TCDiagDomainInfo> domain_info_map;
 
       // Wind conversion information
       bool compute_tangential_and_radial_winds;
@@ -148,7 +153,8 @@ class TCDiagConfInfo {
       ConcatString output_prefix;
 
       // Output file options
-      TCDiagNcOutInfo nc_info;
+      TCDiagNcOutInfo nc_diag_info;
+      bool cira_diag_flag;
 
       //////////////////////////////////////////////////////////////////
 
@@ -157,11 +163,11 @@ class TCDiagConfInfo {
       void read_config(const char *, const char *);
       void process_config(GrdFileType);
 
-      void parse_grid_info_map();
-      void parse_domain_grid_info(Dictionary &,
-                                  ConcatString &,
-                                  TCRMWGridInfo &);
-      void parse_nc_info();
+      void parse_domain_info_map();
+      void parse_domain_info(Dictionary &,
+                             ConcatString &,
+                             TCDiagDomainInfo &);
+      void parse_nc_diag_info();
 
       int get_n_data() const;
 };

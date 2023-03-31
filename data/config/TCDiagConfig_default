@@ -92,46 +92,23 @@ data = {
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// Cylindrical Coordinate Range-Azimuth grid parameters
+// Domain-specific cylindrical coordinate transformation and diagnostics scripts
 //
-
-cyl_coord_grid = [
+domain_info = [
    {
       domain         = "parent";
       n_range        = 150;
       n_azimuth      = 8;
       delta_range_km = 10.0;
-      // JHG, likely don't even want to use rmw_scale.
-      max_range_km   = NA;
-      rmw_scale      = NA;
+      diag_script    = [ "MET_BASE/python/tc_diag/compute_all_diagnostics.py",
+                         "MET_BASE/python/tc_diag/compute_custom_diagnostics.py" ];
    },
-   {   
+   {
       domain         = "nest";
       n_range        = 100;
       n_azimuth      = 8;
       delta_range_km = 10.0;
-      // JHG, likely don't even want to use rmw_scale.
-      max_range_km   = NA;
-      rmw_scale      = NA;
-   }
-];
-
-//
-// Diagnostic data scripts to be run for each domain
-//
-
-diag_scripts = [
-   {
-      domain = "parent";
-      script = "MET_BASE/python/tc_diag/compute_all_diagnostics.py";
-   },
-   {
-      domain = "nest";
-      script = "MET_BASE/python/tc_diag/compute_sst_diagnostics.py";
-   },
-   {
-      domain = "parent";
-      script = "MET_BASE/python/tc_diag/compute_custom_diagnostics.py";
+      diag_script    = [ "MET_BASE/python/tc_diag/compute_sst_diagnostics.py" ];
    }
 ];
 
@@ -163,14 +140,19 @@ radial_velocity_long_field_name = "Radial Velocity";
 //
 // NetCDF output file
 //
-nc_out_flag = {
+nc_diag_flag = {
    track       = TRUE;
+   diag        = TRUE;
    grid_latlon = TRUE;
    grid_raw    = TRUE;
    cyl_latlon  = TRUE;
    cyl_raw     = TRUE;
-   diag        = TRUE;
 }
+
+//
+// ASCII CIRA Diagnositc output file
+//
+cira_diag_flag = TRUE;
 
 ////////////////////////////////////////////////////////////////////////////////
 
