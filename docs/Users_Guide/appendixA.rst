@@ -1837,9 +1837,9 @@ BUFRLIB Errors during MET installation
 		error message: /usr/bin/ld: cannot find -lbufr
 		The linker can not find the BUFRLIB library archive file it needs. 
 
-		export MET_BUFRLIB=/home/username/BUFRLIB_v10.2.3:$MET_BUFRLIB
+		export MET_BUFRLIB=/home/username/BUFRLIB_v11.3.0:$MET_BUFRLIB
 
-It isn't making it's way into the configuration because BUFRLIB_v10.2.3
+It isn't making it's way into the configuration because BUFRLIB_v11.3.0
 isn't showing up in the output of make. This may indicate the wrong shell
 type. The .bashrc file sets the environment for the Bourne shell, but
 the above error could indicate that the c- shell is being used instead.
@@ -1850,14 +1850,14 @@ Try the following 2 things:
 
   .. code-block:: none
 
-  		  ls /home/username/BUFRLIB_v10.2.3/libbufr.a
+  		  ls /home/username/BUFRLIB_v11.3.0/libbufr.a
 
 2. Rerun the MET configure command using the following option on the
    command line: 
 
   .. code-block:: none
 		
-		  MET_BUFRLIB=/home/username/BUFRLIB_v10.2.3 
+		  MET_BUFRLIB=/home/username/BUFRLIB_v11.3.0 
 
 After doing that, please try recompiling MET. If it fails, please
 submit the following log files: "make_install.log" as well as
