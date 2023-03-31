@@ -51,7 +51,8 @@ Q. How do I use map_data?
 	   ];
 	}
 
-     Users can modify the ConfigMapData contents prior to running 'make install'.
+     Users can modify the ConfigMapData contents prior to running
+     'make install'.
      This will change the default map data for all of the MET tools which plots.
      Alternatively, users can copy/paste/modify the map_data dictionary into the
      configuration file for a MET tool. For example, you could add map_data to
@@ -129,7 +130,8 @@ Q. What types of NetCDF files can MET read?
 
      1. Gridded NetCDF output from one of the MET tools
 
-     2. Output from the WRF model that has been post-processed using the wrf_interp utility
+     2. Output from the WRF model that has been post-processed using
+	the wrf_interp utility
 
      3. NetCDF data following the `climate-forecast (CF) convention
 	<https://cfconventions.org/Data/cf-conventions/cf-conventions-1.8/cf\
@@ -137,9 +139,10 @@ Q. What types of NetCDF files can MET read?
 
      Lastly, users can write python scripts to pass data that's gridded to the
      MET tools in memory. If the data doesn't fall into one of those categories,
-     then it's not a gridded dataset that MET can handle directly. Satellite data,
-     in general, will not be gridded. Typically it contains a dense mesh of data at
-     lat/lon points, but typically those lat/lon points are not evenly spaced onto
+     then it's not a gridded dataset that MET can handle directly.
+     Satellite data, in general, will not be gridded. Typically it
+     contains a dense mesh of data at lat/lon points, but typically
+     those lat/lon points are not evenly spaced onto
      a regular grid.
 
      While MET's point2grid tool does support some satellite data inputs, it is
@@ -334,13 +337,15 @@ Q. How do I define a complex masking region?
 
   .. dropdown:: Answer
 		
-     A user can define intersections and unions of multiple fields to define masks.
+     A user can define intersections and unions of multiple fields to
+     define masks.
      Prior to running Grid-Stat, the user can run the Gen-VX-Mask tool one or
      more times to define a more complex masking area by thresholding multiple
      fields.
 
-     For example, using a forecast GRIB file (fcst.grb) which contains 2 records,
-     one for 2-m temperature and a second for 6-hr accumulated precip. The only
+     For example, using a forecast GRIB file (fcst.grb) which contains
+     2 records, one for 2-m temperature and a second for 6-hr
+     accumulated precip. The only
      grid points that are desired are grid points below freezing with non-zero
      precip. The user should run Gen-Vx-Mask twice -  once to define the
      temperature mask and a second time to intersect that with the precip mask:
@@ -371,7 +376,8 @@ Q. How do I define a complex masking region?
 
      1. Do data masking (-type data)
 
-     2. Read the NetCDF variable named "TMP_Z2" from the input file (tmp_mask.nc)
+     2. Read the NetCDF variable named "TMP_Z2" from the input file
+	(tmp_mask.nc)
 
      3. Define the mask by reading 6-hour precip from the mask file
 	(fcst.grb) and looking for values > 0 (-mask_field)
@@ -541,7 +547,8 @@ Q. How do I use one mask for the forecast field and a different mask for the obs
   .. dropdown:: Answer
 		
      You can't define different
-     masks for the forecast and observation fields in MET tools. MET only lets you
+     masks for the forecast and observation fields in MET tools.
+     MET only lets you
      define a single mask (a masking grid or polyline) and then you choose
      whether you want to apply it to the FCST, OBS, or BOTH of them.
 
@@ -743,7 +750,8 @@ Q. How do I correct a precipitation time range?
 		     pcp_combine -add rmf_gra_2016040600.24 'name="APCP"; level="L0-24";' \
 		     rmf_gra_2016040600_APCP_00_24.nc
 
-     The resulting file should have the accumulation listed at 24h rather than 0-24.
+     The resulting file should have the accumulation listed at
+     24h rather than 0-24.
 
 Q. How do I use Pcp-Combine as a pass-through to simply reformat from GRIB to NetCDF or to change output variable name?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -879,25 +887,27 @@ Q. How do I use Pcp-Combine when my GRIB data doesn't have the appropriate accum
      1. Notice in the wgrib output that the forecast times are 1015 min and
 	965 min. In HHMMSS format, that's "165500" and "160500".
 
-     2. An accumulation interval can’t be specified since the data isn't stored
-	that way. Instead, use a config file string to describe the data to use.
+     2. An accumulation interval can’t be specified since the data
+	isn't stored that way. Instead, use a config file string to
+	describe the data to use.
 
-     3. The config file string specifies a "name" (APCP) and "level" string. APCP
+     3. The config file string specifies a "name" (APCP) and "level" string.
+	APCP
 	is defined at the surface, so a level value of 0 (L0) was specified.
 
      4. Technically, the "lead_time" doesn’t need to be specified at all,
 	pcp_combine
 	would find the single APCP record in each input GRIB file and use them.
-	But just in case, the lead_time option was included to be extra certain to
-	get exactly the data that is needed.
+	But just in case, the lead_time option was included to be extra
+	certain to get exactly the data that is needed.
 
      5. The default output variable name pcp_combine would write would be
 	"APCP_L0". However, to indicate that its a 50-minute
 	"accumulation interval" use a
 	different output variable name (APCP_A005000). Any string name is
 	possible. Maybe "Precip50Minutes" or "RAIN50". But whatever string is
-	chosen will be used in the Grid-Stat, Point-Stat, or MODE config file to
-	tell that tool what variable to process.
+	chosen will be used in the Grid-Stat, Point-Stat, or MODE config file
+	to tell that tool what variable to process.
 
 Q. How do I use “-sum”, “-add”, and “-subtract“ to achieve the same accumulation interval?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -913,8 +923,8 @@ Q. How do I use “-sum”, “-add”, and “-subtract“ to achieve the same 
      Therefore, only the 24-hour StageIV data can be used to evaluate 12Z to
      12Z accumulations from the model. Alternatively, the 6- hour StageIV
      accumulations could be used to evaluate any 24 hour accumulation from
-     the model. For the latter, run the 6-hour StageIV files through pcp_combine
-     to generate the desired 24-hour accumulation.
+     the model. For the latter, run the 6-hour StageIV files through
+     pcp_combine to generate the desired 24-hour accumulation.
 
      Here is an example. Run pcp_combine to compute 24-hour accumulations for
      GFS. In this example, process the 20150220 00Z initialization of GFS.
@@ -936,8 +946,8 @@ Q. How do I use “-sum”, “-add”, and “-subtract“ to achieve the same 
      valid at 20150221_00. This results in a 24-hour accumulation between
      forecast hours 0 and 24.
 
-     The following command will compute the 24-hour accumulation between forecast
-     hours 12 and 36:
+     The following command will compute the 24-hour accumulation between
+     forecast hours 12 and 36:
 
      .. code-block:: none
 
@@ -1000,8 +1010,8 @@ Q. How do I inspect Gen-Vx-Mask output?
   .. dropdown:: Answer
 		
      Check to see if the call to Gen-Vx-Mask actually did create good output
-     with Plot-Data-Plane. The following commands assume that the MET executables
-     are found in your path.
+     with Plot-Data-Plane. The following commands assume that the MET
+     executables are found in your path.
 
      .. code-block:: none
 
@@ -1043,8 +1053,9 @@ Q. How do I specify the GRIB version?
 
 		     "file_type = GRIB2;"
 
-     To keep the files named this as they are, add "file_type = GRIB2;" to all the
-     MET configuration files (i.e. Grid-Stat, MODE, and so on) that you use:
+     To keep the files named this as they are, add "file_type = GRIB2;"
+     to all the MET configuration files (i.e. Grid-Stat, MODE, and so on)
+     that you use:
 
      .. code-block:: none
 
@@ -1088,7 +1099,8 @@ Q. How do I compute and verify wind speed?
      U and V records and derive wind speed to use on the fly.
 
      In this example the RTMA file is named rtma.grb2 and the UPP file is
-     named wrf.grb, please try running the following commands to plot wind speed:
+     named wrf.grb, please try running the following commands to
+     plot wind speed:
 
      .. code-block:: none
 
@@ -1123,7 +1135,8 @@ Q. How does '-aggregate_stat' work?
      Stat-Analysis has the ability to read MPR lines and recompute statistics
      from them using the same library code that the other MET tools use. The
      job command options which begin with "-out" are used to specify settings
-     to be applied to the output of that process. For example, the "-fcst_thresh"
+     to be applied to the output of that process. For example,
+     the "-fcst_thresh"
      option filters strings from the input "FCST_THRESH" header column. The
      "-out_fcst_thresh" option defines the threshold to be applied to the output
      of Stat-Analysis. So reading MPR lines and applying a threshold to define
@@ -1191,10 +1204,11 @@ Q. How do I use '-by' to capture unique entries?
    
   .. dropdown:: Answer
 		
-     Here is a stat-analysis job that could be used to run, read the MPR lines,
-     define the probabilistic forecast thresholds, define the single observation
-     threshold, and compute a PSTD output line. Using "-by FCST_VAR" tells it
-     to run the job separately for each unique entry found in the FCST_VAR column.
+     Here is a stat-analysis job that could be used to run, read the
+     MPR lines, define the probabilistic forecast thresholds, define the
+     single observation threshold, and compute a PSTD output line.
+     Using "-by FCST_VAR" tells it to run the job separately for
+     each unique entry found in the FCST_VAR column.
 
      .. code-block:: none
 
@@ -1270,7 +1284,8 @@ Q. How do I speed up run times?
      Disabling these two options will create quicker run times:
 
      1. The computation of rank correlation statistics, Spearman's Rank
-	Correlation and Kendall's Tau. Disable them using "-rank_corr_flag FALSE".
+	Correlation and Kendall's Tau. Disable them using
+	"-rank_corr_flag FALSE".
 
      2. The computation of bootstrap confidence intervals. Disable them using
 	"-n_boot_rep 0".
@@ -1278,7 +1293,8 @@ Q. How do I speed up run times?
      Two more suggestions for faster run times.
 
      1. Instead of using "-fcst_var u", use "-by fcst_var". This will compute
-	statistics separately for each unique entry found in the FCST_VAR column.
+	statistics separately for each unique entry found in the
+	FCST_VAR column.
 
      2. Instead of using "-out" to write the output to a text file,
 	use "-out_stat"
@@ -1356,7 +1372,8 @@ Q. How do I use rapid intensification verification?
 		     -out_line_type CTC,CTS,MPR
 
      To evaluate Rapid Weakening (RW) by setting "-rirw_thresh <=-30".
-     To stratify your results by lead time, you could add the "-by LEAD" option.
+     To stratify your results by lead time, you could add the
+     "-by LEAD" option.
 
      .. code-block:: none
 
@@ -1430,14 +1447,14 @@ Q. How do I convert TRMM data files?
      1. In that Rscript, choose different boundaries (i.e. out_lat/lon_ll/ur)
 	to specify the tile of data to be selected.
 
-     2. As of version 5.1, MET includes support for regridding the data it reads.
-	Keep TRMM on it's native domain and use the MET tools to do the
-	regridding.
+     2. As of version 5.1, MET includes support for regridding the
+	data it reads. Keep TRMM on it's native domain and use the
+	MET tools to do the regridding.
 	For example, the Regrid-Data-Plane" tool reads a NetCDF file, regrids
 	the data, and writes a NetCDF file. Alternatively, the "regrid" section
 	of the configuration files for the MET tools may be used to do the
-	regridding on the fly. For example, run Grid-Stat to compare to the model
-	output to TRMM and say 
+	regridding on the fly. For example, run Grid-Stat to compare to
+	the model output to TRMM and say 
 
      .. code-block:: none
 
@@ -1449,58 +1466,60 @@ Q. How do I convert TRMM data files?
 
 Q. How do I convert a PostScript to png?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-   
-A.
-Use the linux “convert” tool to convert a Plot-Data-Plane PostScript
-file to a png: 
 
-.. code-block:: none
+  .. dropdown:: Answer
+		
+     Use the linux “convert” tool to convert a Plot-Data-Plane PostScript
+     file to a png: 
 
-		convert -rotate 90 -background white plot_dbz.ps plot_dbz.png
+     .. code-block:: none
 
-To convert a MODE PostScript to png
+		     convert -rotate 90 -background white plot_dbz.ps plot_dbz.png
 
-.. code-block:: none
+     To convert a MODE PostScript to png
 
-		convert mode_out.ps mode_out.png
+     .. code-block:: none
 
-Will result in all 6-7 pages in the PostScript file be written out to a
-seperate .png with the following naming convention:
+		     convert mode_out.ps mode_out.png
 
-mode_out-0.png, mode_out-1.png, mode_out-2.png, etc.
+     Will result in all 6-7 pages in the PostScript file be written out to a
+     seperate .png with the following naming convention:
+
+     mode_out-0.png, mode_out-1.png, mode_out-2.png, etc.
 
 Q. How does pairwise differences using plot_tcmpr.R work?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    
-A.
-One necessary step in computing pairwise differences is "event equalizing"
-the data. This means extracting a subset of cases that are common to
-both models.
+  .. dropdown:: Answer
+		
+     One necessary step in computing pairwise differences is "event equalizing"
+     the data. This means extracting a subset of cases that are common to
+     both models.
 
-While the tc_stat tool does not compute pairwise differences, it can apply
-the "event_equalization" logic to extract the cases common to two models.
-This is done using the config file "event_equal = TRUE;" option or
-setting "-event_equal true" on the command line.
+     While the tc_stat tool does not compute pairwise differences, it can apply
+     the "event_equalization" logic to extract the cases common to two models.
+     This is done using the config file "event_equal = TRUE;" option or
+     setting "-event_equal true" on the command line.
 
-Most of the hurricane track analysis and plotting is done using the
-plot_tcmpr.R Rscript. It makes a call to the tc_stat tool to track
-data down to the desired subset, compute pairwise differences if needed,
-and then plot the result. 
+     Most of the hurricane track analysis and plotting is done using the
+     plot_tcmpr.R Rscript. It makes a call to the tc_stat tool to track
+     data down to the desired subset, compute pairwise differences if needed,
+     and then plot the result. 
 
-.. code-block:: none
+     .. code-block:: none
 
-		Rscript ${MET_BUILD_BASE}/scripts/Rscripts/plot_tcmpr.R \
-		-lookin tc_pairs_output.tcst \
-		-filter '-amodel AHWI,GFSI' \
-		-series AMODEL AHWI,GFSI,AHWI-GFSI \
-		-plot MEAN,BOXPLOT
+		     Rscript ${MET_BUILD_BASE}/scripts/Rscripts/plot_tcmpr.R \
+		     -lookin tc_pairs_output.tcst \
+		     -filter '-amodel AHWI,GFSI' \
+		     -series AMODEL AHWI,GFSI,AHWI-GFSI \
+		     -plot MEAN,BOXPLOT
 
-The resulting plots include three series - one for AHWI, one for GFSI,
-and one for their pairwise difference.
+     The resulting plots include three series - one for AHWI, one for GFSI,
+     and one for their pairwise difference.
 
-It's a bit cumbersome to understand all the options available, but this may
-be really useful. If nothing else, it could be adapted to dump out the
-pairwise differences that are needed.
+     It's a bit cumbersome to understand all the options available, but this may
+     be really useful. If nothing else, it could be adapted to dump out the
+     pairwise differences that are needed.
 
 
 Miscellaneous
@@ -1750,8 +1769,8 @@ Q. What graphical features does MET provide?
      and GNUPlot.
      METViewer is also currently being developed and used by the DTC and NOAA
      It creates basic plots of MET output verification statistics. The types of
-     plots include series plots with confidence intervals, box plots, x-y scatter
-     plots and histograms.
+     plots include series plots with confidence intervals, box plots,
+     x-y scatter plots and histograms.
 
      R is a language and environment for statistical computing and graphics.
      It's a free package that runs on most operating systems and provides nice
@@ -1840,7 +1859,10 @@ Try the following 2 things:
 		
 		  MET_BUFRLIB=/home/username/BUFRLIB_v10.2.3 
 
-After doing that, please try recompiling MET. If it fails, please submit the following log files: "make_install.log" as well as "config.log" with a new post in the `METplus GitHub Discussions Forum <https://github.com/dtcenter/METplus/discussions>`_.
+After doing that, please try recompiling MET. If it fails, please
+submit the following log files: "make_install.log" as well as
+"config.log" with a new post in the
+`METplus GitHub Discussions Forum <https://github.com/dtcenter/METplus/discussions>`_.
 
 
 Command line double quotes
