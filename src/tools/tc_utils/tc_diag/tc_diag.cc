@@ -18,6 +18,8 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
+using namespace std;
+
 #include <cstdio>
 #include <cstdlib>
 #include <ctype.h>
@@ -27,6 +29,9 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+
+#include <netcdf>
+using namespace netCDF;
 
 #include "main.h"
 #include "tc_diag.h"
@@ -54,12 +59,12 @@ static void process_diagnostics();
 static void process_tracks(TrackInfoArray&);
 static void get_atcf_files(const StringArray&, const StringArray&, StringArray&, StringArray&);
 static void process_track_files(const StringArray&, const StringArray&, TrackInfoArray&);
-static void process_track_points(const TrackInfo &);
+static void process_track_points(const TrackInfoArray &);
 static void process_fields(const TrackPoint &);
 static bool is_keeper(const ATCFLineBase *);
 static void set_deck(const StringArray&);
 static void set_atcf_source(const StringArray&, StringArray&, StringArray&);
-static void set_data_files(const StringArray&);
+static void set_data(const StringArray&);
 static void set_config(const StringArray&);
 static void set_outdir(const StringArray&);
 static void setup_nc_file(const TrackInfo &);
@@ -75,6 +80,7 @@ static void compute_lat_lon(TcrmwGrid&, double*, double*);
 // JHG tcrmw output dimensions should be changed:
 // FROM:	double TMP(range, azimuth, pressure, track_point) ;
 // TO:  	double TMP(track_point, pressure, range, azimuth) ; the last 2 are the "gridded dimensions"
+// JHG, parallelize the processing of VALID TIMES. For each one, process all the data for all the track points
 
 int met_main(int argc, char *argv[]) {
 
@@ -100,16 +106,18 @@ void usage() {
    cout << "\n*** Model Evaluation Tools (MET" << met_version
         << ") ***\n\n"
         << "Usage: " << program_name << "\n"
-        << "\t-data file_1 ... file_n | data_file_list\n"
+        << "\t-data domain [ file_1 ... file_n | data_file_list ]\n"
         << "\t-deck file\n"
         << "\t-config file\n"
         << "\t[-outdir path]\n"
         << "\t[-log file]\n"
         << "\t[-v level]\n\n"
 
-        << "\twhere\t\"-data file_1 ... file_n | data_file_list\" "
-        << "specifies the gridded data files or an ASCII file "
-        << "containing a list of files to be used (required).\n"
+        << "\twhere\t\"-data domain [ file_1 ... file_n | data_file_list ]\"\n"
+
+        << "\t\t\tSpecifies a domain name followed by the gridded data files\n"
+        << "\t\t\tor an ASCII file containing a list of files to be used.\n"
+        << "\t\t\tSpecify \"-data\" once for each \"domain\" data source (required).\n"
 
         << "\t\t\"-deck source\" is the ATCF format data source "
         << "(required).\n"
@@ -134,6 +142,7 @@ void usage() {
 void process_command_line(int argc, char **argv) {
    CommandLine cline;
    ConcatString default_config_file;
+   StringArray data_files;
 
    // Default output directory
    out_dir = replace_path(default_out_dir);
@@ -151,17 +160,17 @@ void process_command_line(int argc, char **argv) {
    cline.set_usage(usage);
 
    // Add function calls for arguments
-   cline.add(set_data_files, "-data",   -1);
-   cline.add(set_deck,       "-deck",   -1);
-   cline.add(set_config,     "-config",  1);
-   cline.add(set_outdir,     "-outdir",  1);
+   cline.add(set_data,   "-data",   -1);
+   cline.add(set_deck,   "-deck",   -1);
+   cline.add(set_config, "-config",  1);
+   cline.add(set_outdir, "-outdir",  1);
 
    // Parse command line
    cline.parse();
 
    // Check for required arguments
-   if(data_files.n()  == 0 ||
-      deck_source.n() == 0 ||
+   if(data_files_map.size() == 0 ||
+      deck_source.n()       == 0 ||
       config_file.empty()) {
       mlog << Error << "\nThe \"-data\", \"-deck\", and \"-config\" "
            << "command line arguments are required!\n\n";
@@ -176,8 +185,12 @@ void process_command_line(int argc, char **argv) {
         << "Config File Default: " << default_config_file << "\n"
         << "Config File User: " << config_file << "\n";
 
-   // Parse the data file list
-   data_files = parse_file_list(data_files);
+   // Parse the data file lists
+   map<string,StringArray>::iterator it;
+   for(it = data_files_map.begin(); it != data_files_map.end(); it++) {
+      data_files = parse_file_list(it->second);
+      data_files_map[it->first] = data_files;
+   }
 
    // Read config files
    conf_info.read_config(default_config_file.c_str(), config_file.c_str());
@@ -239,7 +252,7 @@ void process_diagnostics() {
    process_tracks(tracks);
 
    // Process the gridded data
-   process_track_points(tracks[0]);
+   process_track_points(tracks);
 
    // Setup NetCDF output
    if(!conf_info.nc_info.all_false()) setup_nc_file(tracks[0]);
@@ -268,7 +281,8 @@ void process_tracks(TrackInfoArray& tracks) {
 
    process_track_files(files, files_model_suffix, tracks);
 
-   if(nc_out) write_tc_tracks(nc_out, track_point_dim, tracks);
+   // JHG, not yet ready to write the tracks to the output
+   // if(nc_out) write_tc_tracks(nc_out, track_point_dim, tracks);
 
    return;
 }
@@ -525,8 +539,27 @@ void set_atcf_source(const StringArray& a,
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_data_files(const StringArray& a) {
-   data_files = a;
+void set_data(const StringArray& a) {
+
+   // Check for enough arguments
+   if(a.n() < 2) {
+      mlog << Error << "\nset_data() -> "
+           << "each \"-data\" command line option must specify a domain name "
+           << "followed by the corresponding data files.\n\n";
+      usage();
+   }
+
+   // First argument is the domain name
+   string domain = a[0];
+
+   // Remaining arguments are the data files
+   StringArray sa;
+   for(int i=1; i<a.n(); i++) sa.add(a[i]);
+
+   // Update the data file map
+   if(data_files_map.count(domain) == 0) data_files_map[domain] = sa;
+   else                                  data_files_map[domain].add(sa);
+
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -563,20 +596,23 @@ void setup_nc_file(const TrackInfo &track) {
    track_point_dim = add_dim(nc_out, "track_point", NC_UNLIMITED);
 
    // Loop over the grid definitions
-   for(int i=0; i<conf_info.grid_info_list.size(); i++) {
+   map<std::string,TCRMWGridInfo>::iterator it;
+   for(it  = conf_info.grid_info_map.begin();
+       it != conf_info.grid_info_map.end();
+       it++) {
 
-      TCRMWGridInfo *gi = &conf_info.grid_info_list[i];
+      TCRMWGridInfo *gi = &(it->second);
 
-      mlog << Debug(4) << "Writing cylindrical coordinates grid " << i+1
-           << " with range = " << gi->data.range_n
+      mlog << Debug(4) << "Writing cylindrical coordinates grid for domain \""
+           << it->first << "\" with range = " << gi->data.range_n
            << " and azimuth = " << gi->data.azimuth_n << ".\n";
 
       // Define dimension names
       ConcatString rng_cs("range");
       ConcatString azi_cs("azimuth");
-      if(conf_info.grid_info_list.size() > 1) {
-         rng_cs << "_" << i+1;
-         azi_cs << "_" << i+1;
+      if(conf_info.grid_info_map.size() > 1) {
+         rng_cs << "_" << it->first;
+         azi_cs << "_" << it->first;
       }
 
       // Define dimensions
@@ -670,13 +706,64 @@ void compute_lat_lon(TcrmwGrid& tcrmw_grid,
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_track_points(const TrackInfo& track) {
+void process_track_points(const TrackInfoArray& tracks) {
+   int i, j, n_pts;
 
-   mlog << Debug(2) << "Processing 1 track consisting of "
-        << track.n_points() << " points.\n";
+   // Build list of unique valid times
+   TimeArray valid_ta;
+   for(i=0,n_pts=0; i<tracks.n(); i++) {
+      n_pts += tracks[i].n_points();
+      for(j=0; j<tracks[i].n_points(); j++) {
+         if(!valid_ta.has(tracks[i][j].valid())) valid_ta.add(tracks[i][j].valid());
+      }
+   }
 
-   mlog << Debug(3) << track.serialize() << "\n";
+   // Sort the valid times
+   valid_ta.sort_array();
 
+   mlog << Debug(2) << "Processing " << tracks.n() << " tracks consisting of "
+        << n_pts << " points over " << valid_ta.n() << " valid times.\n";
+
+   // Parallel: Loop over the unique valid times
+   for(i=0; i<valid_ta.n(); i++) {
+
+      mlog << Debug(3) << "Processing track points for "
+           << unix_to_yyyymmdd_hhmmss(valid_ta[i]) << ".\n";
+
+      // Read the data gridded data for this valid time
+      // JHG process_fields(valid_ta[i], tracks);
+
+      // Parallel: Process the current valid time for all the tracks
+      for(j=0; j<tracks.n(); j++) {
+
+         // JHG work here
+         // compute_diagnostics(...);
+         cout << "JHG track " << j << " of " << tracks.n() << "\n";
+
+      } // end for j
+   } // end for i
+/*
+
+Need a data structure to map TrackInfo objects to data sources:
+
+struct TrackDataInfo
+{
+   TrackInfo *track_ptr;
+   vector<string> domains;
+   vector<StringArray *> data_files;
+};
+
+// Array of structs that
+vector<TrackDataInfo> track_data_info;
+
+John Halley Gotway, 2 min
+I've been thinking more about this and realize that the logic gets tricky pretty quickly. For 5 active storms, we'd have 5 nests and 5 tracks to process. But there's currently no logic that'd connect "domain = d01" with a particular storm_id... so no obvious way of connecting the model data to the track to which it corresponds.
+
+John Halley Gotway, Now
+I could either require that the domain name be set to the storm id (or something that connects it to the track data)... or I could do it automatically, making sure that the track point being processed actually falls INSIDE the nest. Only drawback is whether it's conceivable for the track points of 2 storms to exist inside the same nest.
+*/
+
+/* JHG
    // Loop over track points
    for(int i=0; i<track.n_points(); i++) {
 
@@ -692,7 +779,7 @@ void process_track_points(const TrackInfo& track) {
    } // end for i
 
    // JHG here's where we'd make calls to python scripts to compute diagnostics!
-
+*/
    return;
 }
 
@@ -702,11 +789,11 @@ void process_fields(const TrackPoint& point) {
    DataPlane data_dp;
 
    // Loop over the fields to be processed
-   for(int i_var=0; i_var<conf_info.get_n_data(); i_var++) {
+   for(int i_var=0; i_var<conf_info.data_opt.size(); i_var++) {
 
       // Update the variable info with the valid time of the track point
       VarInfo *var_info = conf_info.data_opt[i_var].var_info;
-
+/* JHG this has moved up
       // Store pointer to the grid info
       TCRMWGridInfo *gi = conf_info.data_opt[i_var].grid_info;
 
@@ -728,7 +815,7 @@ void process_fields(const TrackPoint& point) {
 
       // Compute lat and lon coordinate arrays
       compute_lat_lon(tcrmw_grid, lat_arr, lon_arr);
-
+*/
       // JHG, write to nc?
 
       // Clean up

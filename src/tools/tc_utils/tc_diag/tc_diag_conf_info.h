@@ -14,6 +14,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 #include <iostream>
+#include <map>
 #include <netcdf>
 
 #include "vx_config.h"
@@ -88,18 +89,12 @@ class TCDiagDataOpt {
       // VarInfo pointer (allocated)
       VarInfo *var_info;
 
-      // TCRmwGridInfo pointer (not allocated)
-      TCRMWGridInfo *grid_info;
-
-      // Output file options
-      TCDiagNcOutInfo nc_info;
-
       //////////////////////////////////////////////////////////////////
 
       void clear();
 
       void process_config(GrdFileType, Dictionary &);
-      void parse_nc_info(Dictionary &);
+
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -108,7 +103,6 @@ class TCDiagConfInfo {
 
    private:
 
-      int n_data;
       void init_from_scratch();
 
    public:
@@ -132,11 +126,11 @@ class TCDiagConfInfo {
       NumArray     valid_hour;
       NumArray     lead_time;
 
-      // Array of options for each data.field entry [n_data] (allocated)
-      TCDiagDataOpt *data_opt;
+      // Vector of options for each data.field entry
+      std::vector<TCDiagDataOpt> data_opt;
 
-      // Vector of TCRMWGridInfo objects
-      vector<TCRMWGridInfo> grid_info_list;
+      // Mapping of domain name to TCRMWGridInfo
+      std::map<std::string,TCRMWGridInfo> grid_info_map;
 
       // Wind conversion information
       bool compute_tangential_and_radial_winds;
@@ -162,14 +156,19 @@ class TCDiagConfInfo {
 
       void read_config(const char *, const char *);
       void process_config(GrdFileType);
-      TCRMWGridInfo parse_grid_info(Dictionary &);
+
+      void parse_grid_info_map();
+      void parse_domain_grid_info(Dictionary &,
+                                  ConcatString &,
+                                  TCRMWGridInfo &);
+      void parse_nc_info();
 
       int get_n_data() const;
 };
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int TCDiagConfInfo::get_n_data() const { return n_data; }
+inline int TCDiagConfInfo::get_n_data() const { return data_opt.size(); }
 
 ////////////////////////////////////////////////////////////////////////
 

@@ -23,8 +23,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
@@ -32,6 +30,7 @@ using namespace std;
 #include <dirent.h>
 #include <iostream>
 #include <fstream>
+#include <map>
 #include <math.h>
 #include <string.h>
 #include <sys/stat.h>
@@ -39,7 +38,6 @@ using namespace std;
 #include <unistd.h>
 
 #include <netcdf>
-using namespace netCDF; // JHG delete this!
 
 #include "tc_diag_conf_info.h"
 
@@ -77,7 +75,7 @@ static const char* default_out_prefix = "";
 ////////////////////////////////////////////////////////////////////////
 
 // Input files
-static StringArray    data_files;
+static std::map<std::string,StringArray> data_files_map;
 static StringArray    deck_source, deck_model_suffix;
 static ConcatString   config_file;
 static TCDiagConfInfo conf_info;

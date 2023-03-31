@@ -44,9 +44,6 @@ TCDiagConfInfo::~TCDiagConfInfo() {
 
 void TCDiagConfInfo::init_from_scratch() {
 
-   // Initialize pointer
-   data_opt = (TCDiagDataOpt *) 0;
-
    clear();
 
    return;
@@ -68,6 +65,9 @@ void TCDiagConfInfo::clear() {
    valid_hour.clear();
    lead_time.clear();
 
+   data_opt.clear();
+   grid_info_map.clear();
+
    compute_tangential_and_radial_winds = false;
    u_wind_field_name.clear();
    v_wind_field_name.clear();
@@ -80,12 +80,6 @@ void TCDiagConfInfo::clear() {
    output_prefix.clear();
 
    nc_info.clear();
-
-   // Deallocate memory
-   for(int i=0; i<n_data; i++) data_opt[i].clear();
-   if(data_opt) { delete [] data_opt; data_opt = (TCDiagDataOpt *) 0; }
-
-   n_data = 0;
 
    return;
 }
@@ -201,10 +195,7 @@ void TCDiagConfInfo::process_config(GrdFileType file_type) {
    dict = conf.lookup_array(conf_key_data_field);
 
    // Determine number of fields (name/level)
-   n_data = parse_conf_n_vx(dict);
-
-   // Allocate memory for data field options
-   data_opt = new TCDiagDataOpt [n_data];
+   int n_data = parse_conf_n_vx(dict);
 
    mlog << Debug(2) << "Found " << n_data << " variable/level fields "
         << "requested in the configuration file.\n";
@@ -223,38 +214,25 @@ void TCDiagConfInfo::process_config(GrdFileType file_type) {
       Dictionary i_dict = parse_conf_i_vx_dict(dict, i);
 
       // Parse and store config options
-      data_opt[i].process_config(file_type, i_dict);
+      TCDiagDataOpt vx_opt;
+      vx_opt.process_config(file_type, i_dict);
 
-      // Update top-level TCDiagNcOutInfo settings
-      nc_info += data_opt[i].nc_info;
+      // Store the options
+      data_opt.push_back(vx_opt);
+   }
 
-      // Parse field-specific grid info
-      TCRMWGridInfo gi = parse_grid_info(i_dict);
+   // Parse the cyclindrical coordinate grids
+   parse_grid_info_map();
 
-      // Search for existing grid info
-      int i_match = -1;
-      for(int i_gi=0; i_gi<grid_info_list.size(); i_gi++) {
-         if(grid_info_list[i_gi] == gi) {
-            i_match = i_gi;
-            break;
-         }
+   // Conf: nc_out_flag
+   parse_nc_info();
+
+   // Set the write_nc flag, if needed
+   if(nc_info.do_cyl_latlon || nc_info.do_cyl_raw) {
+      map<string,TCRMWGridInfo>::iterator it;
+      for(it = grid_info_map.begin(); it != grid_info_map.end(); it++) {
+         it->second.write_nc = true;
       }
-
-      // Add new grid info, if needed
-      if(i_match < 0) {
-         grid_info_list.push_back(gi);
-         i_match = grid_info_list.size()-1;
-      }
-
-      // Store the grid info pointer
-      data_opt[i].grid_info = &grid_info_list[i_match];
-
-      // Update the write_nc flag, if needed
-      if(data_opt[i].nc_info.do_cyl_latlon ||
-         data_opt[i].nc_info.do_cyl_raw) {
-         data_opt[i].grid_info->write_nc = true;
-      }
-
    }
 
    return;
@@ -262,10 +240,65 @@ void TCDiagConfInfo::process_config(GrdFileType file_type) {
 
 ////////////////////////////////////////////////////////////////////////
 
-TCRMWGridInfo TCDiagConfInfo::parse_grid_info(Dictionary &dict) {
-   TCRMWGridInfo gi;
+void TCDiagConfInfo::parse_grid_info_map() {
 
-   // Constant name
+   const DictionaryEntry * e = (const DictionaryEntry *) 0;
+
+   e = conf.lookup(conf_key_cyl_coord_grid);
+
+   if(!e) {
+      mlog << Error << "\nTCDiagConfInfo::parse_grid_info_map() -> "
+           << "lookup failed for key \"" << conf_key_cyl_coord_grid
+           << "\"\n\n";
+      exit(1);
+   }
+
+   const ConfigObjectType type = e->type();
+
+   // It should be an array of dictionaries
+   if(type != ArrayType) {
+      mlog << Error << "\nTCDiagConfInfo::parse_grid_info_map() -> "
+           << "bad type (" << configobjecttype_to_string(type)
+           << ") for key \"" << conf_key_cyl_coord_grid << "\"\n\n";
+      exit(1);
+   }
+
+   // Parse each grid info object
+   for(int i=0; i<e->array_value()->n_entries(); i++) {
+      TCRMWGridInfo gi;
+      ConcatString domain;
+
+      parse_domain_grid_info(e->array_value()[i],
+                             domain, gi);
+
+      // Check for duplicate entries
+      if(grid_info_map.count(domain) > 0) {
+         mlog << Error << "\nTCDiagConfInfo::parse_grid_info_map() -> "
+              << "multiple \"" << conf_key_cyl_coord_grid
+              << "\" entries found for domain \"" << domain << "\"!\n\n";
+         exit(1);
+      }
+      // Store a new entry
+      else {
+         grid_info_map[domain] = gi;
+      }
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TCDiagConfInfo::parse_domain_grid_info(Dictionary &dict,
+                                            ConcatString &domain,
+                                            TCRMWGridInfo &gi) {
+
+   // Conf: domain
+   domain = dict.lookup_string(conf_key_domain);
+
+   gi.clear();
+
+   // Hard-code the name for now
    gi.data.name = "TCRMW";
 
    // Conf: n_range
@@ -283,7 +316,53 @@ TCRMWGridInfo TCDiagConfInfo::parse_grid_info(Dictionary &dict) {
    // Conf: rmw_scale
    gi.rmw_scale = dict.lookup_double(conf_key_rmw_scale);
 
-   return(gi);
+   // Store grid
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TCDiagConfInfo::parse_nc_info() {
+   const DictionaryEntry * e = (const DictionaryEntry *) 0;
+
+   e = conf.lookup(conf_key_nc_out_flag);
+
+   if(!e) {
+      mlog << Error << "\nTCDiagConfInfo::parse_nc_info() -> "
+           << "lookup failed for key \"" << conf_key_nc_out_flag
+           << "\"\n\n";
+      exit(1);
+   }
+
+   const ConfigObjectType type = e->type();
+
+   if(type == BooleanType) {
+      bool value = e->b_value();
+
+      if(!value) nc_info.set_all_false();
+
+      return;
+   }
+
+   // It should be a dictionary
+   if(type != DictionaryType) {
+      mlog << Error << "\nTCDiagConfInfo::parse_nc_info() -> "
+           << "bad type (" << configobjecttype_to_string(type)
+           << ") for key \"" << conf_key_nc_out_flag << "\"\n\n";
+      exit(1);
+   }
+
+   // Parse the various entries
+   Dictionary * d = e->dict_value();
+
+   nc_info.do_track       = d->lookup_bool(conf_key_track_flag);
+   nc_info.do_grid_latlon = d->lookup_bool(conf_key_grid_latlon_flag);
+   nc_info.do_grid_raw    = d->lookup_bool(conf_key_grid_raw_flag);
+   nc_info.do_cyl_latlon  = d->lookup_bool(conf_key_cyl_latlon_flag);
+   nc_info.do_cyl_raw     = d->lookup_bool(conf_key_cyl_raw_flag);
+   nc_info.do_diag        = d->lookup_bool(conf_key_diag_flag);
+
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -321,8 +400,6 @@ void TCDiagDataOpt::init_from_scratch() {
 void TCDiagDataOpt::clear() {
    int i;
 
-   nc_info.clear();
-
    // Deallocate memory
    if(var_info) { delete var_info; var_info = (VarInfo *) 0; }
 
@@ -347,54 +424,6 @@ void TCDiagDataOpt::process_config(GrdFileType file_type, Dictionary &dict) {
       mlog << Debug(5) << "Parsed field:\n";
       var_info->dump(cout);
    }
-
-   // Conf: nc_pairs_flag
-   parse_nc_info(dict);
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void TCDiagDataOpt::parse_nc_info(Dictionary &dict) {
-   const DictionaryEntry * e = (const DictionaryEntry *) 0;
-
-   e = dict.lookup(conf_key_nc_out_flag);
-
-   if(!e) {
-      mlog << Error << "\nTCDiagDataOpt::parse_nc_info() -> "
-           << "lookup failed for key \"" << conf_key_nc_out_flag
-           << "\"\n\n";
-      exit(1);
-   }
-
-   const ConfigObjectType type = e->type();
-
-   if(type == BooleanType) {
-      bool value = e->b_value();
-
-      if(!value) nc_info.set_all_false();
-
-      return;
-   }
-
-   // It should be a dictionary
-   if(type != DictionaryType) {
-      mlog << Error << "\nTCDiagDataOpt::parse_nc_info() -> "
-           << "bad type (" << configobjecttype_to_string(type)
-           << ") for key \"" << conf_key_nc_out_flag << "\"\n\n";
-      exit(1);
-   }
-
-   // Parse the various entries
-   Dictionary * d = e->dict_value();
-
-   nc_info.do_track       = d->lookup_bool(conf_key_track_flag);
-   nc_info.do_grid_latlon = d->lookup_bool(conf_key_grid_latlon_flag);
-   nc_info.do_grid_raw    = d->lookup_bool(conf_key_grid_raw_flag);
-   nc_info.do_cyl_latlon  = d->lookup_bool(conf_key_cyl_latlon_flag);
-   nc_info.do_cyl_raw     = d->lookup_bool(conf_key_cyl_raw_flag);
-   nc_info.do_diag        = d->lookup_bool(conf_key_diag_flag);
 
    return;
 }
