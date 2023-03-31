@@ -204,7 +204,6 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
   int var_idx, sid_idx, elv_idx, lat_idx, lon_idx, date_idx, month_idx;
   double height_from_header;
   string aot = "AOT";
-  //string angstrom = "Angstrom";
   string var_name;
   StringArray hdr_names;
   NumArray header_heights;
@@ -281,17 +280,57 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
     column_cnt = get_header_count_v3(hdr_tokens);
   }
 
+  bool has_lat_lon_idx = false;
+  bool ready_to_process = true;
+  if (format_version == 3) {
+    if (lat_idx < 0) {
+      mlog << Error << "\n" << method_name << "Can not find header column \""
+           << lat_col1 << "\" or \"" << lat_col2
+           << "\". Skip the input \"" << ascii_file.filename() << "\"\n\n";
+      ready_to_process = false;
+    }
+    else if (lon_idx < 0) {
+      mlog << Error << "\n" << method_name << "Can not find header column \""
+           << lon_col1 << "\". or \"" << lon_col2
+           << "\". Skip the input \"" << ascii_file.filename() << "\"\n\n";
+      ready_to_process = false;
+    }
+    else if (elv_idx < 0) {
+      mlog << Warning << "\n" << method_name << "Can not find header column \""
+           << elv_col1 << "\" or \"" << elv_col2
+           << "\". Skip the input \"" << ascii_file.filename() << "\".\n\n";
+      ready_to_process = false;
+    }
+    else if (sid_idx < 0) {
+      mlog << Warning << "\n" << method_name << "Can not find header column \""
+           << site_name_col << "\". Skip the input \"" << ascii_file.filename()
+           << "\"\n\n";
+      ready_to_process = false;
+    }
+    else {
+      has_lat_lon_idx = true;
+      mlog << Debug(7) << method_name << "station_idx=" << sid_idx
+           << " lat_idx=" << lat_idx << " lon_idx=" << lon_idx
+           << " elv_idx=" << elv_idx << "\n";
+    }
+  }
+
   //
   // Process the observation lines
   //
   int bad_line_count = 0;
   bool first_line = true;
+  string prev_sid, cur_sid;
+
+  if (sid_idx < 0) prev_sid = _stationId;
   data_line.set_delimiter(",");
   while (ascii_file >> data_line)
   {
     //
     // Make sure that the line contains the correct number of tokens
     //
+
+    if (!ready_to_process) break;
 
     if (data_line.n_items() != column_cnt)
     {
@@ -324,51 +363,47 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
 
     if (first_line) {
       if (format_version == 3) {
-        // Get the stationId
-        if (elv_idx < 0) {
-          mlog << Warning << "\n" << method_name << "Can not find header column \""
-               << elv_col2 << "\". from " << ascii_file.filename() << "\".\n\n";
-          break;
-        }
-        else if ((lat_idx < 0) || (lon_idx < 0)) {
-          string field_name = (lat_idx < 0) ? lat_col2 : lon_col2;
-          mlog << Error << "\n" << method_name << "Can not find header column \""
-               << field_name << "\". Skip the input \"" << ascii_file.filename()
+        // Check the stationId
+        if (sid_idx >= 0 && _stationId != data_line[sid_idx] && _stationId != SITE_MISSING) {
+          mlog << Error << "\n" << method_name
+               << "The header and data columns don't match."
+               << " The station ID from data column (" << data_line[sid_idx] << ") at " << sid_idx
+               << " is different from " << _stationId
+               << ". Skip this input \"" << ascii_file.filename()
                << "\"\n\n";
           break;
         }
-        else {
-          if (sid_idx < 0) {
-            mlog << Warning << "\n" << method_name << "Can not find header column \""
-                 << site_name_col << "\" from the input \"" << ascii_file.filename()
-                 << "\"\n\n";
-          }
-          else if (_stationId != data_line[sid_idx] && _stationId != SITE_MISSING) {
-            mlog << Error << "\n" << method_name << "The header and data columns don't match."
-                 << " The station ID from data column (" << data_line[sid_idx] << ") at " << sid_idx
-                 << " is different from " << _stationId
-                 << ". Skip this input \"" << ascii_file.filename()
-                 << "\"\n\n";
-            break;
-          }
-        }
+      }
+      first_line = false;
+    }
 
+    // Get the stationId for version 3
+    cur_sid = (sid_idx < 0) ? _stationId : data_line[sid_idx];
+    if (cur_sid.compare(prev_sid) != 0) {
+      if (has_lat_lon_idx) {
         // Get the stationLat
         _stationLat = atof(data_line[lat_idx]);
         // Get the stationLon
         _stationLon = atof(data_line[lon_idx]);
         // Get the stationAlt
-        if (elv_idx >= 0) _stationAlt = atof(data_line[elv_idx]);
-        else _stationAlt = bad_data_float;
-
-        mlog << Debug(7) << "\n" << method_name << "stationID: "
-             << ((sid_idx < 0) ? _stationId : data_line[sid_idx]) << " from index " << sid_idx
+        _stationAlt = (elv_idx >= 0)
+                       ? atof(data_line[elv_idx]) : bad_data_float;
+        mlog << Debug(7) << "\n" << method_name
+             << "stationID: " << cur_sid << " from index " << sid_idx
              << "  lat: " << _stationLat
              << "  lon: " << _stationLon
              << "  elv: " << _stationAlt << " from index " << elv_idx << "\n";
       }
-      first_line = false;
+      else {
+        mlog << Warning << "\n" << method_name
+             << "stationID is changed (" << prev_sid << " to " << cur_sid
+             << "). But lat/lon/elv are not available."
+             << " Stop processing \"" << ascii_file.filename() << "\".\n\n";
+        break;
+      }
+      prev_sid = cur_sid;
     }
+
     //
     // Pull the valid time from the data line
     //
@@ -421,7 +456,7 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
       }
 
       _addObservations(Observation(header_type,
-                                   (sid_idx<0 ? _stationId : data_line[sid_idx]),
+                                   cur_sid,
                                    valid_time,
                                    _stationLat, _stationLon,
                                    _stationAlt,
@@ -439,7 +474,7 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
         double aod_at_550 = angstrom_power_interplation(aod_at_675,aod_at_440,675.,440.,dheight);
         if (!is_eq(aod_at_550, bad_data_double)) {
            _addObservations(Observation(header_type,
-                                        (sid_idx<0 ? _stationId : data_line[sid_idx]),
+                                        cur_sid,
                                         valid_time, _stationLat, _stationLon, _stationAlt,
                                         na_str, var_id, bad_data_double, dheight,
                                         aod_at_550,
