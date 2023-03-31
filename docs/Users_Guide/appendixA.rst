@@ -1373,76 +1373,79 @@ Utilities
 Q. What would be an example of scripting to call MET?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    
-A.
-The following is an example of how to call MET from a bash script
-including passing in variables. This shell script is listed below to run
-Grid-Stat, call Plot-Data-Plane to plot the resulting difference field,
-and call convert to reformat from PostScript to PNG.
+  .. dropdown:: Answer
 
-.. code-block:: none
+     The following is an example of how to call MET from a bash script
+     including passing in variables. This shell script is listed below to run
+     Grid-Stat, call Plot-Data-Plane to plot the resulting difference field,
+     and call convert to reformat from PostScript to PNG.
 
-		#!/bin/sh
-		for case in `echo "FCST OBS"`; do 
-		export TO_GRID=${case} 
-		grid_stat gfs.t00z.pgrb2.0p25.f000 \
-		nam.t00z.conusnest.hiresf00.tm00.grib2 GridStatConfig
-		plot_data_plane \
-		*TO_GRID_${case}*_pairs.nc TO_GRID_${case}.ps 'name="DIFF_TMP_P500_TMP_P500_FULL"; \
-		level="(*,*)";' 
-		convert -rotate 90 -background white -flatten TO_GRID_${case}.ps 
-		TO_GRID_${case}.png 
-		done
+     .. code-block:: none
 
+		     #!/bin/sh
+		     for case in `echo "FCST OBS"`; do 
+		     export TO_GRID=${case} 
+		     grid_stat gfs.t00z.pgrb2.0p25.f000 \
+		     nam.t00z.conusnest.hiresf00.tm00.grib2 GridStatConfig
+		     plot_data_plane \
+		     *TO_GRID_${case}*_pairs.nc TO_GRID_${case}.ps 'name="DIFF_TMP_P500_TMP_P500_FULL"; \
+		     level="(*,*)";' 
+		     convert -rotate 90 -background white -flatten TO_GRID_${case}.ps 
+		     TO_GRID_${case}.png 
+		     done
 
 Q. How do I convert TRMM data files?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    
-A.
-Here is an example of NetCDF that the MET software is not expecting. Here
-is an option for accessing that same TRMM data, following links from the
-MET website:
-http://dtcenter.org/community-code/model-evaluation-tools-met/input-data
+  .. dropdown:: Answer
 
-.. code-block:: none
+     Here is an example of NetCDF that the MET software is not expecting. Here
+     is an option for accessing that same TRMM data, following links from the
+     MET website:
+     http://dtcenter.org/community-code/model-evaluation-tools-met/input-data
 
-		# Pull binary 3-hourly TRMM data file 
-		wget 
-		ftp://disc2.nascom.nasa.gov/data/TRMM/Gridded/3B42_V7/201009/3B42.100921.00z.7.
-		precipitation.bin
-		# Pull Rscript from MET website 
-		wget http://dtcenter.org/sites/default/files/community-code/met/r-scripts/trmmbin2nc.R
-		# Edit that Rscript by setting 
-		out_lat_ll = -50 
-		out_lon_ll = 0 
-		out_lat_ur = 50 
-		out_lon_ur = 359.75
-		# Run the Rscript 
-		Rscript trmmbin2nc.R 3B42.100921.00z.7.precipitation.bin \
-		3B42.100921.00z.7.precipitation.nc
-		# Plot the result 
-		plot_data_plane 3B42.100921.00z.7.precipitation.nc \
-		3B42.100921.00z.7.precipitation.ps 'name="APCP_03"; level="(*,*)";'
+     .. code-block:: none
 
-It may be possible that the domain of the data is smaller. Here are some options:
+		     # Pull binary 3-hourly TRMM data file 
+		     wget 
+		     ftp://disc2.nascom.nasa.gov/data/TRMM/Gridded/3B42_V7/201009/3B42.100921.00z.7.
+		     precipitation.bin
+		     # Pull Rscript from MET website 
+		     wget http://dtcenter.org/sites/default/files/community-code/met/r-scripts/trmmbin2nc.R
+		     # Edit that Rscript by setting 
+		     out_lat_ll = -50 
+		     out_lon_ll = 0 
+		     out_lat_ur = 50 
+		     out_lon_ur = 359.75
+		     # Run the Rscript 
+		     Rscript trmmbin2nc.R 3B42.100921.00z.7.precipitation.bin \
+		     3B42.100921.00z.7.precipitation.nc
+		     # Plot the result 
+		     plot_data_plane 3B42.100921.00z.7.precipitation.nc \
+		     3B42.100921.00z.7.precipitation.ps 'name="APCP_03"; level="(*,*)";'
 
-1. In that Rscript, choose different boundaries (i.e. out_lat/lon_ll/ur)
-   to specify the tile of data to be selected.
+     It may be possible that the domain of the data is smaller.
+     Here are some options:
 
-2. As of version 5.1, MET includes support for regridding the data it reads.
-   Keep TRMM on it's native domain and use the MET tools to do the regridding.
-   For example, the Regrid-Data-Plane" tool reads a NetCDF file, regrids
-   the data, and writes a NetCDF file. Alternatively, the "regrid" section
-   of the configuration files for the MET tools may be used to do the
-   regridding on the fly. For example, run Grid-Stat to compare to the model
-   output to TRMM and say 
+     1. In that Rscript, choose different boundaries (i.e. out_lat/lon_ll/ur)
+	to specify the tile of data to be selected.
 
-.. code-block:: none
-		
-		"regrid = { field = FCST; 
-		...}"
+     2. As of version 5.1, MET includes support for regridding the data it reads.
+	Keep TRMM on it's native domain and use the MET tools to do the
+	regridding.
+	For example, the Regrid-Data-Plane" tool reads a NetCDF file, regrids
+	the data, and writes a NetCDF file. Alternatively, the "regrid" section
+	of the configuration files for the MET tools may be used to do the
+	regridding on the fly. For example, run Grid-Stat to compare to the model
+	output to TRMM and say 
 
-That tells Grid-Stat to automatically regrid the TRMM observations to
-the model domain.
+     .. code-block:: none
+
+		     "regrid = { field = FCST; 
+		     ...}"
+
+     That tells Grid-Stat to automatically regrid the TRMM observations to
+     the model domain.
 
 Q. How do I convert a PostScript to png?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1505,266 +1508,281 @@ Miscellaneous
 
 Q. Regrid-Data-Plane - How do I define a LatLon grid?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-   
-A.
-Here is an example of the NetCDF variable attributes that MET uses to
-define a LatLon grid:
 
-.. code-block:: none
+  .. dropdown:: Answer
+		
+     Here is an example of the NetCDF variable attributes that MET uses to
+     define a LatLon grid:
 
-		:Projection = "LatLon" ; 
-		:lat_ll = "25.063000 degrees_north" ; 
-		:lon_ll = "-124.938000 degrees_east" ;
-		:delta_lat = "0.125000 degrees" ; 
-		:delta_lon = "0.125000 degrees" ; 
-		:Nlat = "224 grid_points" ;
-		:Nlon = "464 grid_points" ;
+     .. code-block:: none
 
-This can be created by running the Regrid-Data-Plane" tool to regrid
-some GFS data to a LatLon grid:
+		     :Projection = "LatLon" ; 
+		     :lat_ll = "25.063000 degrees_north" ; 
+		     :lon_ll = "-124.938000 degrees_east" ;
+		     :delta_lat = "0.125000 degrees" ; 
+		     :delta_lon = "0.125000 degrees" ; 
+		     :Nlat = "224 grid_points" ;
+		     :Nlon = "464 grid_points" ;
 
-.. code-block:: none
+     This can be created by running the Regrid-Data-Plane" tool to regrid
+     some GFS data to a LatLon grid:
 
-		regrid_data_plane \
-		gfs_2012040900_F012.grib G110 \ 
-		gfs_g110.nc -field 'name="TMP"; level="Z2";'
+     .. code-block:: none
 
-Use ncdump to look at the attributes. As an exercise, try defining
-these global attributes (and removing the other projection-related ones)
-and then try again.
+		     regrid_data_plane \
+		     gfs_2012040900_F012.grib G110 \ 
+		     gfs_g110.nc -field 'name="TMP"; level="Z2";'
+
+     Use ncdump to look at the attributes. As an exercise, try defining
+     these global attributes (and removing the other projection-related ones)
+     and then try again.
 
 Q. Pre-processing - How do I use wgrib2, pcp_combine regrid and reformat to format NetCDF files?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    
-A.
-If you are extracting only one or two fields from a file, using MET's
-Regrid-Data-Plane can be used to generate a Lat-Lon projection. If
-regridding all fields, the wgrib2 utility may be more useful. Here's an
-example of using wgrib2 and pcp_combine to generate NetCDF files
-MET can read:
-
-.. code-block:: none
-
-		wgrib2 gfsrain06.grb -new_grid latlon 112:131:0.1 \
-		25:121:0.1 gfsrain06_regrid.grb2
+  .. dropdown:: Answer
 		
-And then run that GRIB2 file through pcp_combine using the "-add" option
-with only one file provided:
+     If you are extracting only one or two fields from a file, using MET's
+     Regrid-Data-Plane can be used to generate a Lat-Lon projection. If
+     regridding all fields, the wgrib2 utility may be more useful. Here's an
+     example of using wgrib2 and pcp_combine to generate NetCDF files
+     MET can read:
 
-.. code-block:: none
+     .. code-block:: none
 
-		pcp_combine -add gfsrain06_regrid.grb2 'name="APCP"; \
-		level="A6";' gfsrain06_regrid.nc
+		     wgrib2 gfsrain06.grb -new_grid latlon 112:131:0.1 \
+		     25:121:0.1 gfsrain06_regrid.grb2
 
-Then the output NetCDF file does not have this problem:
+     And then run that GRIB2 file through pcp_combine using the "-add" option
+     with only one file provided:
 
-.. code-block:: none
+     .. code-block:: none
 
-		ncdump -h 2a_wgrib2_regrid.nc | grep "_ll"
-		:lat_ll = "25.000000 degrees_north" ;
-		:lon_ll = "112.000000 degrees_east" ;
+		     pcp_combine -add gfsrain06_regrid.grb2 'name="APCP"; \
+		     level="A6";' gfsrain06_regrid.nc
+
+     Then the output NetCDF file does not have this problem:
+
+     .. code-block:: none
+
+		     ncdump -h 2a_wgrib2_regrid.nc | grep "_ll"
+		     :lat_ll = "25.000000 degrees_north" ;
+		     :lon_ll = "112.000000 degrees_east" ;
 
 Q. TC-Pairs - How do I get rid of WARNING: TrackInfo Using Specify Model Suffix?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    
-A.
-Below is a command example to run:
+  .. dropdown:: Answer
 
-.. code-block:: none
+     Below is a command example to run:
 
-		tc_pairs \
-		-adeck aep142014.h4hw.dat \ 
-		-bdeck bep142014.dat \ 
-		-config TCPairsConfig_v5.0 \ 
-		-out tc_pairs_v5.0_patch \ 
-		-log tc_pairs_v5.0_patch.log \ 
-		-v 3
+     .. code-block:: none
 
-Below is a warning message:
+		     tc_pairs \
+		     -adeck aep142014.h4hw.dat \ 
+		     -bdeck bep142014.dat \ 
+		     -config TCPairsConfig_v5.0 \ 
+		     -out tc_pairs_v5.0_patch \ 
+		     -log tc_pairs_v5.0_patch.log \ 
+		     -v 3
 
-.. code-block:: none
+     Below is a warning message:
 
-		WARNING: TrackInfo::add(const ATCFLine &) -> 
-		skipping ATCFLine since the valid time is not
-		increasing (20140801_000000 < 20140806_060000):
-		WARNING: AL, 03, 2014080100, 03, H4HW, 000,
-		120N, 547W, 38, 1009, XX, 34, NEQ, 0084, 0000, 
-		0000, 0083, -99, -99, 59, 0, 0, , 0, , 0, 0,
+     .. code-block:: none
 
-As a sanity check, the MET-TC code makes sure that the valid time of
-the track data doesn't go backwards in time. This warning states that
-this is
-occurring. The very likely reason for this is that the data being used
-are probably passing tc_pairs duplicate track data.
+		     WARNING: TrackInfo::add(const ATCFLine &) -> 
+		     skipping ATCFLine since the valid time is not
+		     increasing (20140801_000000 < 20140806_060000):
+		     WARNING: AL, 03, 2014080100, 03, H4HW, 000,
+		     120N, 547W, 38, 1009, XX, 34, NEQ, 0084, 0000, 
+		     0000, 0083, -99, -99, 59, 0, 0, , 0, , 0, 0,
 
-Using grep, notice that the same track data shows up in
-"aal032014.h4hw.dat" and "aal032014_hfip_d2014_BERTHA.dat". Try this: 
+     As a sanity check, the MET-TC code makes sure that the valid time of
+     the track data doesn't go backwards in time. This warning states that
+     this is
+     occurring. The very likely reason for this is that the data being used
+     are probably passing tc_pairs duplicate track data.
 
-.. code-block:: none
+     Using grep, notice that the same track data shows up in
+     "aal032014.h4hw.dat" and "aal032014_hfip_d2014_BERTHA.dat". Try this: 
 
-		grep H4HW aal*.dat | grep 2014080100 | grep ", 000,"
-		aal032014.h4hw.dat:AL, 03, 2014080100, 03, H4HW, 000, 
-		120N, 547W, 38, 1009, XX, 34, NEQ, 0084,
-		0000, 0000, 0083, -99, -99, 59, 0, 0, , 
-		0, , 0, 0, , , , , 0, 0, 0, 0, THERMO PARAMS, 
-		-9999, -9999, -9999, Y, 10, DT, -999 
-		aal032014_hfip_d2014_BERTHA.dat:AL, 03, 2014080100, 
-		03, H4HW, 000, 120N, 547W, 38, 1009, XX, 34, NEQ, 
-		0084, 0000, 0000, 0083, -99, -99, 59, 0, 0, , 0, , 0,
-		0, , , , , 0, 0, 0, 0, THERMOPARAMS, -9999 ,-9999 ,
-		-9999 ,Y ,10 ,DT ,-999
+     .. code-block:: none
 
-Those 2 lines are nearly identical, except for the spelling of
-"THERMO PARAMS" with a space vs "THERMOPARAMS" with no space.
+		     grep H4HW aal*.dat | grep 2014080100 | grep ", 000,"
+		     aal032014.h4hw.dat:AL, 03, 2014080100, 03, H4HW, 000, 
+		     120N, 547W, 38, 1009, XX, 34, NEQ, 0084,
+		     0000, 0000, 0083, -99, -99, 59, 0, 0, , 
+		     0, , 0, 0, , , , , 0, 0, 0, 0, THERMO PARAMS, 
+		     -9999, -9999, -9999, Y, 10, DT, -999 
+		     aal032014_hfip_d2014_BERTHA.dat:AL, 03, 2014080100, 
+		     03, H4HW, 000, 120N, 547W, 38, 1009, XX, 34, NEQ, 
+		     0084, 0000, 0000, 0083, -99, -99, 59, 0, 0, , 0, , 0,
+		     0, , , , , 0, 0, 0, 0, THERMOPARAMS, -9999 ,-9999 ,
+		     -9999 ,Y ,10 ,DT ,-999
 
-Passing tc_pairs duplicate track data results in this sort of warning.
-The DTC had the same sort of problem when setting up a real-time
-verification system. The same track data was making its way into
-multiple ATCF files.
+     Those 2 lines are nearly identical, except for the spelling of
+     "THERMO PARAMS" with a space vs "THERMOPARAMS" with no space.
 
-If this really is duplicate track data, work on the logic for where/how
-to store the track data. However, if the H4HW data in the first file
-actually differs from that in the second file, there is another option.
-You can specify a model suffix to be used for each ADECK source, as in
-this example (suffix=_EXP):
+     Passing tc_pairs duplicate track data results in this sort of warning.
+     The DTC had the same sort of problem when setting up a real-time
+     verification system. The same track data was making its way into
+     multiple ATCF files.
 
-.. code-block:: none
+     If this really is duplicate track data, work on the logic for where/how
+     to store the track data. However, if the H4HW data in the first file
+     actually differs from that in the second file, there is another option.
+     You can specify a model suffix to be used for each ADECK source, as in
+     this example (suffix=_EXP):
 
-		tc_pairs \
-		-adeck aal032014.h4hw.dat suffix=_EXP \ 
-		-adeck aal032014_hfip_d2014_BERTHA.dat \ 
-		-bdeck bal032014.dat \ 
-		-config TCPairsConfig_match \ 
-		-out tc_pairs_v5.0_patch \ 
-		-log tc_pairs_v5.0_patch.log -v 3
+     .. code-block:: none
 
-Any model names found in "aal032014.h4hw.dat" will now have _EXP tacked
-onto the end. Note that if a list of model names in the TCPairsConfig file
-needs specifying, include the _EXP variants to get them to show up in
-the output or it won’t show up.
+		     tc_pairs \
+		     -adeck aal032014.h4hw.dat suffix=_EXP \ 
+		     -adeck aal032014_hfip_d2014_BERTHA.dat \ 
+		     -bdeck bal032014.dat \ 
+		     -config TCPairsConfig_match \ 
+		     -out tc_pairs_v5.0_patch \ 
+		     -log tc_pairs_v5.0_patch.log -v 3
 
-That'll get rid of the warnings because they will be storing the track
-data from the first source using a slightly different model name. This
-feature was added for users who are testing multiple versions of a
-model on the same set of storms. They might be using the same ATCF ID
-in all their output. But this enables them to distinguish the output
-in tc_pairs.
+     Any model names found in "aal032014.h4hw.dat" will now have _EXP tacked
+     onto the end. Note that if a list of model names in the TCPairsConfig file
+     needs specifying, include the _EXP variants to get them to show up in
+     the output or it won’t show up.
+
+     That'll get rid of the warnings because they will be storing the track
+     data from the first source using a slightly different model name. This
+     feature was added for users who are testing multiple versions of a
+     model on the same set of storms. They might be using the same ATCF ID
+     in all their output. But this enables them to distinguish the output
+     in tc_pairs.
 
 Q. Why is the grid upside down?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    
-A.
-The user provides a gridded data file to MET and it runs without error,
-but the data is packed upside down.
+  .. dropdown:: Answer
+		
+     The user provides a gridded data file to MET and it runs without error,
+     but the data is packed upside down.
 
-Try using the "file_type" entry. The "file_type" entry specifies the
-input file type (e.g. GRIB1, GRIB2, NETCDF_MET, NETCDF_PINT, NETCDF_NCCF)
-rather than letting the code determine it itself. For valid file_type
-values, see "File types" in the *data/config/ConfigConstants* file. This
-entry should be defined within the "fcst" or "obs" dictionaries.
-Sometimes, directly specifying the type of file will help MET figure
-out what to properly do with the data.
+     Try using the "file_type" entry. The "file_type" entry specifies the
+     input file type (e.g. GRIB1, GRIB2, NETCDF_MET, NETCDF_PINT, NETCDF_NCCF)
+     rather than letting the code determine it itself. For valid file_type
+     values, see "File types" in the *data/config/ConfigConstants* file. This
+     entry should be defined within the "fcst" or "obs" dictionaries.
+     Sometimes, directly specifying the type of file will help MET figure
+     out what to properly do with the data.
 
-Another option is to use the Regrid-Data-Plane tool. The Regrid-Data-Plane
-tool may be run to read data from any gridded data file MET supports
-(i.e. GRIB1, GRIB2, and a variety of NetCDF formats), interpolate to a
-user-specified grid, and write the field(s) out in NetCDF format. See the
-Regrid-Data-Plane tool :numref:`regrid-data-plane` in the MET
-User's Guide for more
-detailed information. While the Regrid-Data-Plane tool is useful as a
-stand-alone tool, the capability is also included to automatically regrid
-data in most of the MET tools that handle gridded data. This "regrid"
-entry is a dictionary containing information about how to handle input
-gridded data files. The "regird" entry specifies regridding logic and
-has a "to_grid" entry that can be set to NONE, FCST, OBS, a named grid,
-the path to a gridded data file defining the grid, or an explicit grid
-specification string. See the :ref:`regrid` entry in
-the Configuration File Overview in the MET User's Guide for a more detailed
-description of the configuration file entries that control automated
-regridding.
+     Another option is to use the Regrid-Data-Plane tool. The Regrid-Data-Plane
+     tool may be run to read data from any gridded data file MET supports
+     (i.e. GRIB1, GRIB2, and a variety of NetCDF formats), interpolate to a
+     user-specified grid, and write the field(s) out in NetCDF format. See the
+     Regrid-Data-Plane tool :numref:`regrid-data-plane` in the MET
+     User's Guide for more
+     detailed information. While the Regrid-Data-Plane tool is useful as a
+     stand-alone tool, the capability is also included to automatically regrid
+     data in most of the MET tools that handle gridded data. This "regrid"
+     entry is a dictionary containing information about how to handle input
+     gridded data files. The "regird" entry specifies regridding logic and
+     has a "to_grid" entry that can be set to NONE, FCST, OBS, a named grid,
+     the path to a gridded data file defining the grid, or an explicit grid
+     specification string. See the :ref:`regrid` entry in
+     the Configuration File Overview in the MET User's Guide for a more detailed
+     description of the configuration file entries that control automated
+     regridding.
 
-A single model level can be plotted using the plot_data_plane utility.
-This tool can assist the user by showing the data to be verified to
-ensure that times and locations matchup as expected.
+     A single model level can be plotted using the plot_data_plane utility.
+     This tool can assist the user by showing the data to be verified to
+     ensure that times and locations matchup as expected.
 		
 Q. Why was the MET written largely in C++ instead of FORTRAN?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    
-A.
-MET relies upon the object-oriented aspects of C++, particularly in
-using the MODE tool. Due to time and budget constraints, it also makes
-use of a pre-existing forecast verification library that was developed
-at NCAR.
+  .. dropdown:: Answer
+
+     MET relies upon the object-oriented aspects of C++, particularly in
+     using the MODE tool. Due to time and budget constraints, it also makes
+     use of a pre-existing forecast verification library that was developed
+     at NCAR.
 
 Q. How does MET differ from the previously mentioned existing verification packages?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^   
 
-A.
-MET is an actively maintained, evolving software package that is being
-made freely available to the public through controlled version releases.
+  .. dropdown:: Answer
+
+     MET is an actively maintained, evolving software package that is being
+     made freely available to the public through controlled version releases.
 
 Q. Will the MET work on data in native model coordinates?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    
-A.
-No - it will not. In the future, we may add options to allow additional
-model grid coordinate systems.
+  .. dropdown:: Answer
+		
+     No - it will not. In the future, we may add options to allow additional
+     model grid coordinate systems.
 
 Q. How do I get help if my questions are not answered in the User's Guide?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-A.
-First, look on our
-`MET User's Guide website <https://dtcenter.org/community-code/model-evaluation-tools-met>`_.
-If that doesn't answer your question, create a post in the
-`METplus GitHub Discussions Forum <https://github.com/dtcenter/METplus/discussions>`_.
+  .. dropdown:: Answer
+		
+     First, look on our
+     `MET User's Guide website <https://dtcenter.org/community-code/model-evaluation-tools-met>`_.
+     If that doesn't answer your question, create a post in the
+     `METplus GitHub Discussions Forum <https://github.com/dtcenter/METplus/discussions>`_.
 
 
 Q. What graphical features does MET provide?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    
-A.
-MET provides some :ref:`plotting and graphics support<plotting>`. The plotting
-tools, including plot_point_obs, plot_data_plane, and plot_mode_field, can
-help users visualize the data. 
+  .. dropdown:: Answer
+		
+     MET provides some :ref:`plotting and graphics support<plotting>`.
+     The plotting
+     tools, including plot_point_obs, plot_data_plane, and plot_mode_field, can
+     help users visualize the data. 
 
-MET is intended to be a set of command line tools for evaluating forecast
-quality. So, the development effort is focused on providing the latest,
-state of the art verification approaches, rather than on providing nice
-plotting features. However, the ASCII output statistics of MET may be plotted
-with a wide variety of plotting packages, including R, NCL, IDL, and GNUPlot.
-METViewer is also currently being developed and used by the DTC and NOAA
-It creates basic plots of MET output verification statistics. The types of
-plots include series plots with confidence intervals, box plots, x-y scatter
-plots and histograms.
+     MET is intended to be a set of command line tools for evaluating forecast
+     quality. So, the development effort is focused on providing the latest,
+     state of the art verification approaches, rather than on providing nice
+     plotting features. However, the ASCII output statistics of MET may
+     be plotted
+     with a wide variety of plotting packages, including R, NCL, IDL,
+     and GNUPlot.
+     METViewer is also currently being developed and used by the DTC and NOAA
+     It creates basic plots of MET output verification statistics. The types of
+     plots include series plots with confidence intervals, box plots, x-y scatter
+     plots and histograms.
 
-R is a language and environment for statistical computing and graphics.
-It's a free package that runs on most operating systems and provides nice
-plotting features and a wide array of powerful statistical analysis tools.
-There are sample scripts on the
-`MET website <http://dtcenter.org/community-code/model-evaluation-tools-met/sample-analysis-scripts>`_
-that you can use and modify to perform the type of analysis you need.  If
-you create your own scripts, we encourage you to submit them to us through the
-`METplus GitHub Discussions Forum <https://github.com/dtcenter/METplus/discussions>`_
-so that we can post them for other users. 
+     R is a language and environment for statistical computing and graphics.
+     It's a free package that runs on most operating systems and provides nice
+     plotting features and a wide array of powerful statistical analysis tools.
+     There are sample scripts on the
+     `MET website <http://dtcenter.org/community-code/model-evaluation-tools-met/sample-analysis-scripts>`_
+     that you can use and modify to perform the type of analysis you need.  If
+     you create your own scripts, we encourage you to submit them to us
+     through the
+     `METplus GitHub Discussions Forum <https://github.com/dtcenter/METplus/discussions>`_
+     so that we can post them for other users. 
 
 Q. How do I find the version of the tool I am using?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    
-A.
-Type the name of the tool followed by **-version**. For example,
-type “pb2nc **-version**”.
+  .. dropdown:: Answer
+		
+     Type the name of the tool followed by **-version**. For example,
+     type “pb2nc **-version**”.
 
 Q. What are MET's conventions for latitude, longitude, azimuth and bearing angles?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    
-A.
-MET considers north latitude and east longitude positive. Latitudes
-have range from :math:`-90^\circ` to :math:`+90^\circ`. Longitudes have
-range from :math:`-180^\circ` to :math:`+180^\circ`. Plane angles such
-as azimuths and bearing (example: horizontal wind direction) have
-range :math:`0^\circ` to :math:`360^\circ` and are measured clockwise
-from the north.
+  .. dropdown:: Answer
+		
+     MET considers north latitude and east longitude positive. Latitudes
+     have range from :math:`-90^\circ` to :math:`+90^\circ`. Longitudes have
+     range from :math:`-180^\circ` to :math:`+180^\circ`. Plane angles such
+     as azimuths and bearing (example: horizontal wind direction) have
+     range :math:`0^\circ` to :math:`360^\circ` and are measured clockwise
+     from the north.
 
 .. _Troubleshooting:   
    
