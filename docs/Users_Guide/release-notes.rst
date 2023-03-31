@@ -9,6 +9,44 @@ When applicable, release notes are followed by the GitHub issue number which des
 enhancement, or new feature (`MET GitHub issues <https://github.com/dtcenter/MET/issues>`_).
 Important issues are listed **in bold** for emphasis.
 
+MET Version 11.1.0-beta1 release notes (20230228)
+-------------------------------------------------
+
+  .. dropdown:: Repository, build, and test
+
+     * Add modulefiles for supported systems to the repository (`#2415 <https://github.com/dtcenter/MET/issues/2415>`_).
+     * Add LICENSE.md to the repository (`#2461 <https://github.com/dtcenter/MET/issues/2461>`_).
+     * Update the copyright year to 2023 and increase the version number to 11.1.0 (`#2469 <https://github.com/dtcenter/MET/issues/2469>`_).
+
+  .. dropdown:: Documentation 
+
+     * Enhance the Release Notes by adding dropdown menus (`#2146 <https://github.com/dtcenter/MET/issues/2146>`_).
+
+  .. dropdown:: Enhancements 
+
+     * Convert the python list to the numpy array for the python embedding at the base class (`#2386 <https://github.com/dtcenter/MET/issues/2386>`_).
+     * Refine Python runtime environment (`#2388 <https://github.com/dtcenter/MET/issues/2388>`_).
+     * Upgrade to using Python 3.10.4 (`#2421 <https://github.com/dtcenter/MET/issues/2421>`_).
+     * **Enhance TC-Pairs to disable the output of consensus track members** (`#2429 <https://github.com/dtcenter/MET/issues/2429>`_).
+
+  .. dropdown:: Bugfixes 
+
+     * Bugfix: Fix the MET CF-Compliant NetCDF library code to Polar Stereographic data from NSIDC Sea Ice Edge NetCDF files (`#2218 <https://github.com/dtcenter/MET/issues/2218>`_).
+     * Bugfix: Remove override keyword to avoid C++11 dependency (`#2380 <https://github.com/dtcenter/MET/issues/2380>`_).
+     * Bugfix: Fix ASCII2NC to not compute AOD 550 if other inputs are negative values (`#2383 <https://github.com/dtcenter/MET/issues/2383>`_).
+     * Bugfix: Fix PB2NC to report accurate total observation counts in log messages (`#2387 <https://github.com/dtcenter/MET/issues/2387>`_).
+     * Bugfix: Update the MET flowchart for version 11.0.0 (`#2389 <https://github.com/dtcenter/MET/issues/2389>`_).
+     * Bugfix: Fix issues with the met_compile_all.sh script and associated tar files (`#2390 <https://github.com/dtcenter/MET/issues/2390>`_).
+     * Bugfix: Correct definitions of NCEP grid numbers 172 and 220 (`#2399 <https://github.com/dtcenter/MET/issues/2399>`_).
+     * Bugfix: Address MET-11.0.0 SonarQube Blocker Bugs (`#2402 <https://github.com/dtcenter/MET/issues/2402>`_).
+     * Bugfix: Refine fix for handling empty configuration files (`#2408 <https://github.com/dtcenter/MET/issues/2408>`_).
+     * Bugfix: Fix time interpolation of monthly climatology data between December 15 and January 15 (`#2412 <https://github.com/dtcenter/MET/issues/2412>`_).
+     * Bugfix: Fix ASCII2NC to handle missing NDBC buoy location information (`#2426 <https://github.com/dtcenter/MET/issues/2426>`_).
+     * Bugfix: Fix the MET vx_pointdata_python library to handle MET_PYTHON_EXE for python embedding of point observations (`#2428 <https://github.com/dtcenter/MET/issues/2428>`_).
+     * Bugfix: Refine the regrid dictionary's data conversion and censoring operations and fix climo time matching logic for a single monthly climo file (`#2437 <https://github.com/dtcenter/MET/issues/2437>`_).
+     * Bugfix: Fix the creation of the MET User's Guide PDF (`#2449 <https://github.com/dtcenter/MET/issues/2449>`_).
+     * Bugfix: Fix inconsistent ASCII2NC AIRNOW location lookup logic (`#2452 <https://github.com/dtcenter/MET/issues/2452>`_).
+
 MET Version 11.0.0 release notes (20221209)
 -------------------------------------------
 
@@ -26,8 +64,6 @@ MET Version 11.0.0 release notes (20221209)
      * Fix GHA documentation workflow (`#2282 <https://github.com/dtcenter/MET/issues/2282>`_).
      * Fix GHA warnings and update the version of actions (i.e. actions/checkout@v3) (`#2297 <https://github.com/dtcenter/MET/issues/2297>`_).
 
-       
-     
   .. dropdown:: Documentation
 
      * Create outline for the MET Contributor's Guide (`#1774 <https://github.com/dtcenter/MET/issues/1774>`_).
@@ -142,5 +178,15 @@ MET Version 11.0.0 release notes (20221209)
 
 MET Upgrade Instructions
 ========================
+
+MET Version 11.1.0 upgrade instructions
+---------------------------------------
+
+* If compiling support for PYTHON (:numref:`compiling_python_support`), in addition to $MET_PYTHON_CC and $MET_PYTHON_LD, set **$MET_PYTHON_BIN_EXE** to specify the desired python executable to be used (`#2428 <https://github.com/dtcenter/MET/issues/2428>`_).
+
+* If running TC-Pairs to generate consensus tracks, update your TC-Pairs configuration file to include the new **write_members** option (`#2429 <https://github.com/dtcenter/MET/issues/2429>`_).
+
+MET Version 11.0.0 upgrade instructions
+---------------------------------------
 
 * Ensemble post-processing has been fully removed from Ensemble-Stat in version 11.0.0. It can be performed using the Gen-Ens-Prod tool.
