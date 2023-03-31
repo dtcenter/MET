@@ -262,67 +262,69 @@ Gen-Vx-Mask
 Q. I have a list of stations to use for verification. I also have a poly region defined. If I specify both of these should the result be a union of them?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    
-A.
-These settings are defined in the "mask" section of the Point-Stat
-configuration file. You can define masking regions in one of 3 ways,
-as a "grid", a "poly" line file, or a "sid" list of station ID's.
+  .. dropdown:: Answer
+		
+     These settings are defined in the "mask" section of the Point-Stat
+     configuration file. You can define masking regions in one of 3 ways,
+     as a "grid", a "poly" line file, or a "sid" list of station ID's.
 
-If you specify one entry for "poly" and one entry for "sid", you
-should see output for those two different masks. Note that each of
-these settings is an array of values, as indicated by the square
-brackets "[]" in the default config file. If you specify 5 grids,
-3 poly's, and 2 SID lists, you'd get output for those 10 separate
-masking regions. Point-Stat does not compute unions or intersections
-of masking regions. Instead, they are each processed separately.
+     If you specify one entry for "poly" and one entry for "sid", you
+     should see output for those two different masks. Note that each of
+     these settings is an array of values, as indicated by the square
+     brackets "[]" in the default config file. If you specify 5 grids,
+     3 poly's, and 2 SID lists, you'd get output for those 10 separate
+     masking regions. Point-Stat does not compute unions or intersections
+     of masking regions. Instead, they are each processed separately.
 
-Is it true that you really want to use a polyline to define an area
-and then use a SID list to capture additional points outside of
-that polyline?
+     Is it true that you really want to use a polyline to define an area
+     and then use a SID list to capture additional points outside of
+     that polyline?
 
-If so, your options are:
+     If so, your options are:
 
-1. Define one single SID list which include all the points currently
-   inside the polyline as well as the extra ones outside. 
+     1. Define one single SID list which include all the points currently
+	inside the polyline as well as the extra ones outside. 
 
-2. Continue verifying using one polyline and one SID list and
-   write partial sums and contingency table counts. 
+     2. Continue verifying using one polyline and one SID list and
+	write partial sums and contingency table counts. 
 
-Then aggregate the results together by running a Stat-Analysis job.
+     Then aggregate the results together by running a Stat-Analysis job.
 
 Q. How do I define a masking region with a GFS file?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-A.
-Grab a sample GFS file: 
+  .. dropdown:: Answer
+		
+     Grab a sample GFS file: 
 
-.. code-block:: none
-		      
-		wget 
-		http://www.ftp.ncep.noaa.gov/data/nccf/com/gfs/prod/gfs/2016102512/gfs.t12z.pgrb2.0p50.f000
-		      
-Use the MET regrid_data_plane tool to put some data on a
-lat/lon grid over Europe:
+     .. code-block:: none
 
-.. code-block:: none
+		     wget 
+		     http://www.ftp.ncep.noaa.gov/data/nccf/com/gfs/prod/gfs/2016102512/gfs.t12z.pgrb2.0p50.f000
 
-		regrid_data_plane gfs.t12z.pgrb2.0p50.f000 \
-		'latlon 100 100 25 0 0.5 0.5' gfs_euro.nc -field 'name="TMP"; level="Z2";'
+     Use the MET regrid_data_plane tool to put some data on a
+     lat/lon grid over Europe:
 
-Run the MET gen_vx_mask tool to apply your polyline to the European domain:
+     .. code-block:: none
 
-.. code-block:: none
+		     regrid_data_plane gfs.t12z.pgrb2.0p50.f000 \
+		     'latlon 100 100 25 0 0.5 0.5' gfs_euro.nc -field 'name="TMP"; level="Z2";'
 
-		gen_vx_mask gfs_euro.nc POLAND.poly POLAND_mask.nc
+     Run the MET gen_vx_mask tool to apply your polyline to the European domain:
 
-Run the MET plot_data_plane tool to display the resulting mask field:
+     .. code-block:: none
 
-.. code-block:: none
-		      
-		plot_data_plane POLAND_mask.nc POLAND_mask.ps 'name="POLAND"; level="(*,*)";'
+		     gen_vx_mask gfs_euro.nc POLAND.poly POLAND_mask.nc
 
-In this example, the mask is in roughly the right spot, but there
-are obvious problems with the latitude and longitude values used
-to define that mask for Poland.
+     Run the MET plot_data_plane tool to display the resulting mask field:
+
+     .. code-block:: none
+
+		     plot_data_plane POLAND_mask.nc POLAND_mask.ps 'name="POLAND"; level="(*,*)";'
+
+     In this example, the mask is in roughly the right spot, but there
+     are obvious problems with the latitude and longitude values used
+     to define that mask for Poland.
 
 Grid-Stat
 ---------
@@ -330,277 +332,282 @@ Grid-Stat
 Q. How do I define a complex masking region?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-A.
-A user can define intersections and unions of multiple fields to define masks.
-Prior to running Grid-Stat, the user can run the Gen-VX-Mask tool one or
-more times to define a more complex masking area by thresholding multiple
-fields.
+  .. dropdown:: Answer
+		
+     A user can define intersections and unions of multiple fields to define masks.
+     Prior to running Grid-Stat, the user can run the Gen-VX-Mask tool one or
+     more times to define a more complex masking area by thresholding multiple
+     fields.
 
-For example, using a forecast GRIB file (fcst.grb) which contains 2 records,
-one for 2-m temperature and a second for 6-hr accumulated precip. The only
-grid points that are desired are grid points below freezing with non-zero
-precip. The user should run Gen-Vx-Mask twice -  once to define the
-temperature mask and a second time to intersect that with the precip mask:
+     For example, using a forecast GRIB file (fcst.grb) which contains 2 records,
+     one for 2-m temperature and a second for 6-hr accumulated precip. The only
+     grid points that are desired are grid points below freezing with non-zero
+     precip. The user should run Gen-Vx-Mask twice -  once to define the
+     temperature mask and a second time to intersect that with the precip mask:
 
-.. code-block:: none
+     .. code-block:: none
 
-		gen_vx_mask fcst.grb fcst.grb tmp_mask.nc \ 
-		-type data \ 
-		-mask_field 'name="TMP"; level="Z2"' -thresh le273
-		gen_vx_mask tmp_mask.nc fcst.grb tmp_and_precip_mask.nc \ 
-		-type data \ 
-		-input_field 'name="TMP_Z2"; level="(*,*)";' \ 
-		-mask_field 'name="APCP"; level="A6";' -thresh gt0 \ 
-		-intersection -name "FREEZING_PRECIP"
+		     gen_vx_mask fcst.grb fcst.grb tmp_mask.nc \ 
+		     -type data \ 
+		     -mask_field 'name="TMP"; level="Z2"' -thresh le273
+		     gen_vx_mask tmp_mask.nc fcst.grb tmp_and_precip_mask.nc \ 
+		     -type data \ 
+		     -input_field 'name="TMP_Z2"; level="(*,*)";' \ 
+		     -mask_field 'name="APCP"; level="A6";' -thresh gt0 \ 
+		     -intersection -name "FREEZING_PRECIP"
 
-The first one is pretty straight-forward. 
+     The first one is pretty straight-forward. 
 
-1. The input field (fcst.grb) defines the domain for the mask.
+     1. The input field (fcst.grb) defines the domain for the mask.
 
-2. Since we're doing data masking and the data we want lives in
-   fcst.grb, we pass it in again as the mask_file.
+     2. Since we're doing data masking and the data we want lives in
+	fcst.grb, we pass it in again as the mask_file.
 
-3. Lastly "-mask_field" specifies the data we want from the mask file
-   and "-thresh" specifies the event threshold.
+     3. Lastly "-mask_field" specifies the data we want from the mask file
+	and "-thresh" specifies the event threshold.
 
 
-The second call is a bit tricky.
+     The second call is a bit tricky.
 
-1. Do data masking (-type data)
+     1. Do data masking (-type data)
 
-2. Read the NetCDF variable named "TMP_Z2" from the input file (tmp_mask.nc)
+     2. Read the NetCDF variable named "TMP_Z2" from the input file (tmp_mask.nc)
 
-3. Define the mask by reading 6-hour precip from the mask file
-   (fcst.grb) and looking for values > 0 (-mask_field)
+     3. Define the mask by reading 6-hour precip from the mask file
+	(fcst.grb) and looking for values > 0 (-mask_field)
 
-4. Apply intersection logic when combining the "input" value with
-   the "mask" value (-intersection).
+     4. Apply intersection logic when combining the "input" value with
+	the "mask" value (-intersection).
 
-5. Name the output NetCDF variable as "FREEZING_PRECIP" (-name).
-   This is totally optional, but convenient.
+     5. Name the output NetCDF variable as "FREEZING_PRECIP" (-name).
+	This is totally optional, but convenient.
 
-A user can write a script with multiple calls to Gen-Vx-Mask to
-apply complex masking logic and then pass the output mask file
-to Grid-Stat in its configuration file.
+     A user can write a script with multiple calls to Gen-Vx-Mask to
+     apply complex masking logic and then pass the output mask file
+     to Grid-Stat in its configuration file.
 
 
 Q. How do I use neighborhood methods to compute fraction skill score?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-A.
-A common application of fraction skill score (FSS) is comparing forecast
-and observed thunderstorms. When computing FSS, first threshold the fields
-to define events and non-events. Then look at successively larger and
-larger areas around each grid point to see how the forecast event frequency
-compares to the observed event frequency.
+  .. dropdown:: Answer
+		
+     A common application of fraction skill score (FSS) is comparing forecast
+     and observed thunderstorms. When computing FSS, first threshold the fields
+     to define events and non-events. Then look at successively larger and
+     larger areas around each grid point to see how the forecast event frequency
+     compares to the observed event frequency.
 
-Applying this method to rainfall (and monsoons) is also reasonable.
-Keep in mind that Grid-Stat is the tool that computes FSS. Grid-Stat will
-need to be run once for each evaluation time. As an example, evaluating
-once per day, run Grid-Stat 122 times for the 122 days of a monsoon season.
-This will result in 122 FSS values. These can be viewed as a time series,
-or the Stat-Analysis tool could be used to aggregate them together into
-a single FSS value, like this:
+     Applying this method to rainfall (and monsoons) is also reasonable.
+     Keep in mind that Grid-Stat is the tool that computes FSS. Grid-Stat will
+     need to be run once for each evaluation time. As an example, evaluating
+     once per day, run Grid-Stat 122 times for the 122 days of a monsoon season.
+     This will result in 122 FSS values. These can be viewed as a time series,
+     or the Stat-Analysis tool could be used to aggregate them together into
+     a single FSS value, like this:
 
-.. code-block:: none
-		     
-		stat_analysis -job aggregate -line_type NBRCNT \
-		-lookin out/grid_stat
+     .. code-block:: none
 
-Be sure to pick thresholds (e.g. for the thunderstorms and monsoons)
-that capture the "events" that are of interest in studying.
+		     stat_analysis -job aggregate -line_type NBRCNT \
+		     -lookin out/grid_stat
 
-Also be aware that MET uses the "vld_thresh" setting in the configuration
-file to decide how to handle data along the edge of the domain. Let us say
-it is computing a fractional coverage field using a 5x5 neighborhood
-and it is at the edge of the domain. 15 points contain valid data and
-10 points are outside the domain. Grid-Stat computes the valid data ratio
-as 15/25 = 0.6. Then it applies the valid data threshold. Suppose
-vld_thresh = 0.5. Since 0.6 > 0.5 MET will compute a fractional coverage
-value for that point using the 15 valid data points. Next suppose
-vld_thresh = 1.0. Since 0.6 is less than 1.0, MET will just skip that
-point by setting it to bad data.
+     Be sure to pick thresholds (e.g. for the thunderstorms and monsoons)
+     that capture the "events" that are of interest in studying.
 
-Setting vld_thresh = 1.0 will ensure that FSS will only be computed at
-points where all NxN values contain valid data. Setting it to 0.5 only
-requires half of them.
+     Also be aware that MET uses the "vld_thresh" setting in the configuration
+     file to decide how to handle data along the edge of the domain. Let us say
+     it is computing a fractional coverage field using a 5x5 neighborhood
+     and it is at the edge of the domain. 15 points contain valid data and
+     10 points are outside the domain. Grid-Stat computes the valid data ratio
+     as 15/25 = 0.6. Then it applies the valid data threshold. Suppose
+     vld_thresh = 0.5. Since 0.6 > 0.5 MET will compute a fractional coverage
+     value for that point using the 15 valid data points. Next suppose
+     vld_thresh = 1.0. Since 0.6 is less than 1.0, MET will just skip that
+     point by setting it to bad data.
+
+     Setting vld_thresh = 1.0 will ensure that FSS will only be computed at
+     points where all NxN values contain valid data. Setting it to 0.5 only
+     requires half of them.
 
 Q. Is an example of verifying forecast probabilities?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-A.
-There is an example of verifying probabilities in the test scripts
-included with the MET release. Take a look in: 
-
-.. code-block:: none
-		   
-		${MET_BUILD_BASE}/scripts/config/GridStatConfig_POP_12
-
-The config file should look something like this:
-
-.. code-block:: none
-
-		fcst = { 
-		        wind_thresh = [ NA ];
-		        field = [ 
-		         { 
-		          name = "LCDC"; 
-		          level = [ "L0" ]; 
-		          prob = TRUE; 
-		          cat_thresh = [ >=0.0, >=0.1, >=0.2, >=0.3, >=0.4, >=0.5, >=0.6, >=0.7, >=0.8, >=0.9];
-		         }    
-		                ];
-		       }; 
+  .. dropdown:: Answer
 		
-		obs = {
-		       wind_thresh = [ NA ];
-		       field = [ 
-		        { 
-		         name = "WIND"; 
-			 level = [ "Z2" ]; 
-			 cat_thresh = [ >=34 ]; 
-			 } 
-			       ];
-		       };
+     There is an example of verifying probabilities in the test scripts
+     included with the MET release. Take a look in: 
 
-The PROB flag is set to TRUE to tell grid_stat to process this as
-probability data. The cat_thresh is set to partition the probability
-values between 0 and 1. Note that if the probability data contains
-values from 0 to 100, MET automatically divides by 100 to rescale to
-the 0 to 1 range.
+     .. code-block:: none
+
+		     ${MET_BUILD_BASE}/scripts/config/GridStatConfig_POP_12
+
+     The config file should look something like this:
+
+     .. code-block:: none
+
+		     fcst = { 
+			     wind_thresh = [ NA ];
+			     field = [ 
+			      { 
+			       name = "LCDC"; 
+			       level = [ "L0" ]; 
+			       prob = TRUE; 
+			       cat_thresh = [ >=0.0, >=0.1, >=0.2, >=0.3, >=0.4, >=0.5, >=0.6, >=0.7, >=0.8, >=0.9];
+			      }    
+				     ];
+			    }; 
+
+		     obs = {
+			    wind_thresh = [ NA ];
+			    field = [ 
+			     { 
+			      name = "WIND"; 
+			      level = [ "Z2" ]; 
+			      cat_thresh = [ >=34 ]; 
+			      } 
+				    ];
+			    };
+
+     The PROB flag is set to TRUE to tell grid_stat to process this as
+     probability data. The cat_thresh is set to partition the probability
+     values between 0 and 1. Note that if the probability data contains
+     values from 0 to 100, MET automatically divides by 100 to rescale to
+     the 0 to 1 range.
 
 Q. What is an example of using Grid-Stat with regridding and masking turned on?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-A.
-Run Grid-Stat using the following commands and the attached config file 
-
-.. code-block:: none
-		   
-		mkdir out 
-		grid_stat \
-		gfs_4_20160220_0000_012.grb2 \ 
-		ST4.2016022012.06h \ 
-		GridStatConfig \
-		-outdir out
-
-Note the following two sections of the Grid-Stat config file: 
-
-.. code-block:: none
-		   
-		regrid = { 
-		          to_grid = OBS; 
-		          vld_thresh = 0.5; 
-		          method = BUDGET; 
-		          width = 2; 
-		         } 
-
-This tells Grid-Stat to do verification on the "observation" grid.
-Grid-Stat reads the GFS and Stage4 data and then automatically regrids
-the GFS data to the Stage4 domain using budget interpolation.
-Use "FCST" to verify the forecast domain. And use either a named
-grid or a grid specification string to regrid both the forecast and
-observation to a common grid. For example, to_grid = "G212"; will
-regrid both to NCEP Grid 212 before comparing them.
-
-.. code-block:: none
-		   
-		mask = { grid = [ "FULL" ]; 	
-		poly = [ "MET_BASE/poly/CONUS.poly" ]; } 
+  .. dropdown:: Answer
 		
-This will compute statistics over the FULL model domain as well
-as the CONUS masking area.
+     Run Grid-Stat using the following commands and the attached config file 
 
-To demonstrate that Grid-Stat worked as expected, run the following
-commands to plot its NetCDF matched pairs output file:
+     .. code-block:: none
 
-.. code-block:: none
-		   
-		plot_data_plane \
-		out/grid_stat_120000L_20160220_120000V_pairs.nc \ 
-		out/DIFF_APCP_06_A06_APCP_06_A06_CONUS.ps \ 
-		'name="DIFF_APCP_06_A06_APCP_06_A06_CONUS"; level="(*,*)";'
+		     mkdir out 
+		     grid_stat \
+		     gfs_4_20160220_0000_012.grb2 \ 
+		     ST4.2016022012.06h \ 
+		     GridStatConfig \
+		     -outdir out
 
-Examine the resulting plot of that difference field.
+     Note the following two sections of the Grid-Stat config file: 
 
-Lastly, there is another option for defining that masking region.
-Rather than passing the ascii CONUS.poly file to grid_stat, run the
-gen_vx_mask tool and pass the NetCDF output of that tool to grid_stat.
-The advantage to gen_vx_mask is that it will make grid_stat run a
-bit faster. It can be used to construct much more complex masking areas.
+     .. code-block:: none
+
+		     regrid = { 
+			       to_grid = OBS; 
+			       vld_thresh = 0.5; 
+			       method = BUDGET; 
+			       width = 2; 
+			      } 
+
+     This tells Grid-Stat to do verification on the "observation" grid.
+     Grid-Stat reads the GFS and Stage4 data and then automatically regrids
+     the GFS data to the Stage4 domain using budget interpolation.
+     Use "FCST" to verify the forecast domain. And use either a named
+     grid or a grid specification string to regrid both the forecast and
+     observation to a common grid. For example, to_grid = "G212"; will
+     regrid both to NCEP Grid 212 before comparing them.
+
+     .. code-block:: none
+
+		     mask = { grid = [ "FULL" ]; 	
+		     poly = [ "MET_BASE/poly/CONUS.poly" ]; } 
+
+     This will compute statistics over the FULL model domain as well
+     as the CONUS masking area.
+
+     To demonstrate that Grid-Stat worked as expected, run the following
+     commands to plot its NetCDF matched pairs output file:
+
+     .. code-block:: none
+
+		     plot_data_plane \
+		     out/grid_stat_120000L_20160220_120000V_pairs.nc \ 
+		     out/DIFF_APCP_06_A06_APCP_06_A06_CONUS.ps \ 
+		     'name="DIFF_APCP_06_A06_APCP_06_A06_CONUS"; level="(*,*)";'
+
+     Examine the resulting plot of that difference field.
+
+     Lastly, there is another option for defining that masking region.
+     Rather than passing the ascii CONUS.poly file to grid_stat, run the
+     gen_vx_mask tool and pass the NetCDF output of that tool to grid_stat.
+     The advantage to gen_vx_mask is that it will make grid_stat run a
+     bit faster. It can be used to construct much more complex masking areas.
 
 Q. How do I use one mask for the forecast field and a different mask for the observation field?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    
-A.
-You can't define different
-masks for the forecast and observation fields in MET tools. MET only lets you
-define a single mask (a masking grid or polyline) and then you choose
-whether you want to apply it to the FCST, OBS, or BOTH of them.
-
-Nonetheless, there is a way you can accomplish this logic using the
-gen_vx_mask tool. You run it once to pre-process the forecast field
-and a second time to pre-process the observation field. And then pass
-those output files to your desired MET tool.
-
-Below is an example using sample data that is included with the MET
-release tarball. To illustrate, this command will read 3-hour
-precip and 2-meter temperature, and resets the precip at any grid
-point where the temperature is less than 290 K to a value of 0:
-
-.. code-block:: none
+  .. dropdown:: Answer
 		
-		gen_vx_mask \
-		data/sample_fcst/2005080700/wrfprs_ruc13_12.tm00_G212 \ 
-		data/sample_fcst/2005080700/wrfprs_ruc13_12.tm00_G212 \ 
-		APCP_03_where_2m_TMPge290.nc \ 
-		-type data \ 
-		-input_field 'name="APCP"; level="A3";' \ 
-		-mask_field 'name="TMP"; level="Z2";' \ 
-		-thresh 'lt290&&ne-9999' -v 4 -value 0
-		
-So this is a bit confusing. Here's what is happening:
+     You can't define different
+     masks for the forecast and observation fields in MET tools. MET only lets you
+     define a single mask (a masking grid or polyline) and then you choose
+     whether you want to apply it to the FCST, OBS, or BOTH of them.
 
-* The first argument is the input file which defines the grid. 
+     Nonetheless, there is a way you can accomplish this logic using the
+     gen_vx_mask tool. You run it once to pre-process the forecast field
+     and a second time to pre-process the observation field. And then pass
+     those output files to your desired MET tool.
 
-* The second argument is used to define the masking region and
-  since I'm reading data from the same input file, I've listed
-  that file twice. 
+     Below is an example using sample data that is included with the MET
+     release tarball. To illustrate, this command will read 3-hour
+     precip and 2-meter temperature, and resets the precip at any grid
+     point where the temperature is less than 290 K to a value of 0:
 
-* The third argument is the output file name. 
+     .. code-block:: none
 
-* The type of masking is "data" masking where we read a 2D field of
-  data and apply a threshold. 
+		     gen_vx_mask \
+		     data/sample_fcst/2005080700/wrfprs_ruc13_12.tm00_G212 \ 
+		     data/sample_fcst/2005080700/wrfprs_ruc13_12.tm00_G212 \ 
+		     APCP_03_where_2m_TMPge290.nc \ 
+		     -type data \ 
+		     -input_field 'name="APCP"; level="A3";' \ 
+		     -mask_field 'name="TMP"; level="Z2";' \ 
+		     -thresh 'lt290&&ne-9999' -v 4 -value 0
 
-* By default, gen_vx_mask initializes each grid point to a value
-  of 0. Specifying "-input_field" tells it to initialize each grid
-  point to the value of that field (in my example 3-hour precip). 
-  
-* The "-mask_field" option defines the data field that should be
-  thresholded. 
+     So this is a bit confusing. Here's what is happening:
 
-* The "-thresh" option defines the threshold to be applied. 
-     
-* The "-value" option tells it what "mask" value to write to the
-  output, and I've chosen 0.
+     * The first argument is the input file which defines the grid. 
 
-The example threshold is less than 290 and not -9999 (which is MET's
-internal missing data value). So any grid point where the 2 meter
-temperature is less than 290 K and is not bad data will be replaced
-by a value of 0.
+     * The second argument is used to define the masking region and
+       since I'm reading data from the same input file, I've listed
+       that file twice. 
 
-To more easily demonstrate this, I changed to using "-value 10" and ran
-the output through plot_data_plane: 
+     * The third argument is the output file name. 
 
-.. code-block:: none
-		
-        plot_data_plane \
-	     APCP_03_where_2m_TMPge290.nc \
-        APCP_03_where_2m_TMPge290.ps \
-        'name="data_mask"; level="(*,*)";'
+     * The type of masking is "data" masking where we read a 2D field of
+       data and apply a threshold. 
 
-In the resulting plot, anywhere you see the pink value of 10, that's
-where gen_vx_mask has masked out the grid point.
+     * By default, gen_vx_mask initializes each grid point to a value
+       of 0. Specifying "-input_field" tells it to initialize each grid
+       point to the value of that field (in my example 3-hour precip). 
+
+     * The "-mask_field" option defines the data field that should be
+       thresholded. 
+
+     * The "-thresh" option defines the threshold to be applied. 
+
+     * The "-value" option tells it what "mask" value to write to the
+       output, and I've chosen 0.
+
+     The example threshold is less than 290 and not -9999 (which is MET's
+     internal missing data value). So any grid point where the 2 meter
+     temperature is less than 290 K and is not bad data will be replaced
+     by a value of 0.
+
+     To more easily demonstrate this, I changed to using "-value 10" and ran
+     the output through plot_data_plane: 
+
+     .. code-block:: none
+
+	     plot_data_plane \
+		  APCP_03_where_2m_TMPge290.nc \
+	     APCP_03_where_2m_TMPge290.ps \
+	     'name="data_mask"; level="(*,*)";'
+
+     In the resulting plot, anywhere you see the pink value of 10, that's
+     where gen_vx_mask has masked out the grid point.
 
 Pcp-Combine
 -----------
