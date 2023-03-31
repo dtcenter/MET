@@ -1789,7 +1789,7 @@ Q. How do I find the version of the tool I am using?
   .. dropdown:: Answer
 		
      Type the name of the tool followed by **--version**. For example,
-     type “pb2nc **-version**”.
+     type “pb2nc **--version**”.
 
 Q. What are MET's conventions for latitude, longitude, azimuth and bearing angles?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
