@@ -1149,7 +1149,7 @@ Q. How does '-aggregate_stat' work?
 
      However, there is currently no "-mask_sid" option. 
 
-     With met-5.2 and later versions, one option is to apply column string
+     With MET-5.2 and later versions, one option is to apply column string
      matching using the "-column_str" option to define the list of station
      ID's you would like to aggregate. That job would look something like this:
 
