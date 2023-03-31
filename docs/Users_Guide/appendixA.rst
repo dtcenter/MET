@@ -615,371 +615,381 @@ Pcp-Combine
 Q. How do I add and subtract with Pcp-Combine?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-A.
-An example of running the MET pcp_combine tool to put NAM 3-hourly
-precipitation accumulations data into user-desired 3 hour intervals is
-provided below. 
-
-If the user wanted a 0-3 hour accumulation, this is already available
-in the 03 UTC file. Run this file
-through pcp_combine as a pass-through to put it into NetCDF format: 
-
-.. code-block:: none
+  .. dropdown:: Answer
 		
-		pcp_combine -add 03_file.grb 03 APCP_00_03.nc
-		
-If the user wanted the 3-6 hour accumulation, they would subtract
-0-6 and 0-3 accumulations:
+     An example of running the MET pcp_combine tool to put NAM 3-hourly
+     precipitation accumulations data into user-desired 3 hour intervals is
+     provided below. 
 
-.. code-block:: none
-		
-		pcp_combine -subtract 06_file.grb 06 03_file.grb 03 APCP_03_06.nc
+     If the user wanted a 0-3 hour accumulation, this is already available
+     in the 03 UTC file. Run this file
+     through pcp_combine as a pass-through to put it into NetCDF format: 
 
-Similarly, if they wanted the 6-9 hour accumulation, they would
-subtract 0-9 and 0-6 accumulations: 
+     .. code-block:: none
 
-.. code-block:: none		
+		     pcp_combine -add 03_file.grb 03 APCP_00_03.nc
 
-		pcp_combine -subtract 09_file.grb 09 06_file.grb 06 APCP_06_09.nc
+     If the user wanted the 3-6 hour accumulation, they would subtract
+     0-6 and 0-3 accumulations:
 
-And so on.
+     .. code-block:: none
 
-Run the 0-3 and 12-15 through pcp_combine even though they already have
-the 3-hour accumulation. That way, all of the NAM files will be in the
-same file format, and can use the same configuration file settings for
-the other MET tools (grid_stat, mode, etc.). If the NAM files are a mix
-of GRIB and NetCDF, the logic would need to be a bit more complicated.
+		     pcp_combine -subtract 06_file.grb 06 03_file.grb 03 APCP_03_06.nc
+
+     Similarly, if they wanted the 6-9 hour accumulation, they would
+     subtract 0-9 and 0-6 accumulations: 
+
+     .. code-block:: none		
+
+		     pcp_combine -subtract 09_file.grb 09 06_file.grb 06 APCP_06_09.nc
+
+     And so on.
+
+     Run the 0-3 and 12-15 through pcp_combine even though they already have
+     the 3-hour accumulation. That way, all of the NAM files will be in the
+     same file format, and can use the same configuration file settings for
+     the other MET tools (grid_stat, mode, etc.). If the NAM files are a mix
+     of GRIB and NetCDF, the logic would need to be a bit more complicated.
 
 Q. How do I combine 12-hour accumulated precipitation from two different initialization times?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-A. 
-The "-sum" command assumes the same initialization time. Use the "-add"
-option instead.
+  .. dropdown:: Answer
+		
+     The "-sum" command assumes the same initialization time. Use the "-add"
+     option instead.
 
-.. code-block:: none
+     .. code-block:: none
 
-		pcp_combine -add \
-		WRFPRS_1997-06-03_APCP_A12.nc 'name="APCP_12"; level="(*,*)";' \ 
-		WRFPRS_d01_1997-06-04_00_APCP_A12.grb 12 \ 
-		Sum.nc
+		     pcp_combine -add \
+		     WRFPRS_1997-06-03_APCP_A12.nc 'name="APCP_12"; level="(*,*)";' \ 
+		     WRFPRS_d01_1997-06-04_00_APCP_A12.grb 12 \ 
+		     Sum.nc
 
-For the first file, list the file name followed by a config string
-describing the field to use from the NetCDF file. For the second file,
-list the file name followed by the accumulation interval to use
-(12 for 12 hours). The output file, Sum.nc, will contain the
-combine 12-hour accumulated precipitation.
+     For the first file, list the file name followed by a config string
+     describing the field to use from the NetCDF file. For the second file,
+     list the file name followed by the accumulation interval to use
+     (12 for 12 hours). The output file, Sum.nc, will contain the
+     combine 12-hour accumulated precipitation.
 
-Here is a small excerpt from the pcp_combine usage statement: 
+     Here is a small excerpt from the pcp_combine usage statement: 
 
-Note: For “-add” and "-subtract”, the accumulation intervals may be
-substituted with config file strings. For that first file, we replaced
-the accumulation interval with a config file string.
+     Note: For “-add” and "-subtract”, the accumulation intervals may be
+     substituted with config file strings. For that first file, we replaced
+     the accumulation interval with a config file string.
 
-Here are 3 commands you could use to plot these data files:
+     Here are 3 commands you could use to plot these data files:
 
-.. code-block:: none
+     .. code-block:: none
 
-		plot_data_plane WRFPRS_1997-06-03_APCP_A12.nc \
-		WRFPRS_1997-06-03_APCP_A12.ps 'name="APCP_12"; level="(*,*)";' 
+		     plot_data_plane WRFPRS_1997-06-03_APCP_A12.nc \
+		     WRFPRS_1997-06-03_APCP_A12.ps 'name="APCP_12"; level="(*,*)";' 
 
-.. code-block:: none
+     .. code-block:: none
 
-		plot_data_plane WRFPRS_d01_1997-06-04_00_APCP_A12.grb \
-		WRFPRS_d01_1997-06-04_00_APCP_A12.ps 'name="APCP" level="A12";' 
+		     plot_data_plane WRFPRS_d01_1997-06-04_00_APCP_A12.grb \
+		     WRFPRS_d01_1997-06-04_00_APCP_A12.ps 'name="APCP" level="A12";' 
 
-.. code-block:: none
+     .. code-block:: none
 
-		plot_data_plane sum.nc sum.ps 'name="APCP_24"; level="(*,*)";'
+		     plot_data_plane sum.nc sum.ps 'name="APCP_24"; level="(*,*)";'
 
 Q. How do I correct a precipitation time range?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-A.
-Typically, accumulated precipitation is stored in GRIB files using an
-accumulation interval with a "time range" indicator value of 4. Here is
-a description of the different time range indicator values and
-meanings: http://www.nco.ncep.noaa.gov/pmb/docs/on388/table5.html
-
-For example, take a look at the APCP in the GRIB files included in the
-MET tar ball:
-
-.. code-block:: none
-
-		wgrib ${MET_BUILD_BASE}/data/sample_fcst/2005080700/wrfprs_ruc13_12.tm00_G212 | grep APCP
-		1:0:d=05080700:APCP:kpds5=61:kpds6=1:kpds7=0:TR=4:P1=0: \
-		P2=12:TimeU=1:sfc:0- 12hr acc:NAve=0
-		2:31408:d=05080700:APCP:kpds5=61:kpds6=1:kpds7=0:TR=4: \
-		P1=9:P2=12:TimeU=1:sfc:9- 12hr acc:NAve=0
-
-The "TR=4" indicates that these records contain an accumulation
-between times P1 and P2. In the first record, the precip is accumulated
-between 0 and 12 hours. In the second record, the precip is accumulated
-between 9 and 12 hours.
-
-However, the GRIB data uses a time range indicator of 5, not 4.
-
-.. code-block:: none
-
-		wgrib rmf_gra_2016040600.24 | grep APCP
-		291:28360360:d=16040600:APCP:kpds5=61:kpds6=1:kpds7=0: \
-		TR=5:P1=0:P2=24:TimeU=1:sfc:0-24hr diff:NAve=0
-
-pcp_combine is looking in "rmf_gra_2016040600.24" for a 24 hour
-*accumulation*, but since the time range indicator is no 4, it doesn't
-find a match.
-
-If possible switch the time range indicator to 4 on the GRIB files. If
-this is not possible, there is another workaround. Instead of telling
-pcp_combine to look for a particular accumulation interval, give it a
-more complete description of the chosen field to use from each file.
-Here is an example:
-
-.. code-block:: none
-
-		pcp_combine -add rmf_gra_2016040600.24 'name="APCP"; level="L0-24";' \
-		rmf_gra_2016040600_APCP_00_24.nc
+  .. dropdown:: Answer
 		
-The resulting file should have the accumulation listed at 24h rather than 0-24.
+     Typically, accumulated precipitation is stored in GRIB files using an
+     accumulation interval with a "time range" indicator value of 4. Here is
+     a description of the different time range indicator values and
+     meanings: http://www.nco.ncep.noaa.gov/pmb/docs/on388/table5.html
+
+     For example, take a look at the APCP in the GRIB files included in the
+     MET tar ball:
+
+     .. code-block:: none
+
+		     wgrib ${MET_BUILD_BASE}/data/sample_fcst/2005080700/wrfprs_ruc13_12.tm00_G212 | grep APCP
+		     1:0:d=05080700:APCP:kpds5=61:kpds6=1:kpds7=0:TR=4:P1=0: \
+		     P2=12:TimeU=1:sfc:0- 12hr acc:NAve=0
+		     2:31408:d=05080700:APCP:kpds5=61:kpds6=1:kpds7=0:TR=4: \
+		     P1=9:P2=12:TimeU=1:sfc:9- 12hr acc:NAve=0
+
+     The "TR=4" indicates that these records contain an accumulation
+     between times P1 and P2. In the first record, the precip is accumulated
+     between 0 and 12 hours. In the second record, the precip is accumulated
+     between 9 and 12 hours.
+
+     However, the GRIB data uses a time range indicator of 5, not 4.
+
+     .. code-block:: none
+
+		     wgrib rmf_gra_2016040600.24 | grep APCP
+		     291:28360360:d=16040600:APCP:kpds5=61:kpds6=1:kpds7=0: \
+		     TR=5:P1=0:P2=24:TimeU=1:sfc:0-24hr diff:NAve=0
+
+     pcp_combine is looking in "rmf_gra_2016040600.24" for a 24 hour
+     *accumulation*, but since the time range indicator is no 4, it doesn't
+     find a match.
+
+     If possible switch the time range indicator to 4 on the GRIB files. If
+     this is not possible, there is another workaround. Instead of telling
+     pcp_combine to look for a particular accumulation interval, give it a
+     more complete description of the chosen field to use from each file.
+     Here is an example:
+
+     .. code-block:: none
+
+		     pcp_combine -add rmf_gra_2016040600.24 'name="APCP"; level="L0-24";' \
+		     rmf_gra_2016040600_APCP_00_24.nc
+
+     The resulting file should have the accumulation listed at 24h rather than 0-24.
 
 Q. How do I use Pcp-Combine as a pass-through to simply reformat from GRIB to NetCDF or to change output variable name?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-A.
-The pcp_combine tool is typically used to modify the accumulation interval
-of precipitation amounts in model and/or analysis datasets. For example,
-when verifying model output in GRIB format containing runtime accumulations
-of precipitation, run the pcp_combine -subtract option every 6 hours to
-create 6-hourly precipitation amounts. In this example, it is not really
-necessary to run pcp_combine on the 6-hour GRIB forecast file since the
-model output already contains the 0 to 6 hour accumulation. However, the
-output of pcp_combine is typically passed to point_stat, grid_stat, or mode
-for verification. Having the 6-hour forecast in GRIB format and all other
-forecast hours in NetCDF format (output of pcp_combine) makes the logic
-for configuring the other MET tools messy. To make the configuration
-consistent for all forecast hours, one option is to choose to run
-pcp_combine as a pass-through to simply reformat from GRIB to NetCDF.
-Listed below is an example of passing a single record to the
-pcp_combine -add option to do the reformatting:
+  .. dropdown:: Answer
 
-.. code-block:: none
+     The pcp_combine tool is typically used to modify the accumulation interval
+     of precipitation amounts in model and/or analysis datasets. For example,
+     when verifying model output in GRIB format containing runtime accumulations
+     of precipitation, run the pcp_combine -subtract option every 6 hours to
+     create 6-hourly precipitation amounts. In this example, it is not really
+     necessary to run pcp_combine on the 6-hour GRIB forecast file since the
+     model output already contains the 0 to 6 hour accumulation. However, the
+     output of pcp_combine is typically passed to point_stat, grid_stat, or mode
+     for verification. Having the 6-hour forecast in GRIB format and all other
+     forecast hours in NetCDF format (output of pcp_combine) makes the logic
+     for configuring the other MET tools messy. To make the configuration
+     consistent for all forecast hours, one option is to choose to run
+     pcp_combine as a pass-through to simply reformat from GRIB to NetCDF.
+     Listed below is an example of passing a single record to the
+     pcp_combine -add option to do the reformatting:
 
-		$MET_BUILD/bin/pcp_combine -add forecast_F06.grb \
-		'name="APCP"; level="A6";' \
-		forecast_APCP_06_F06.nc -name APCP_06
+     .. code-block:: none
 
-Reformatting from GRIB to NetCDF may be done for any other reason the
-user may have. For example, the -name option can be used to define the
-NetCDF output variable name. Presuming this file is then passed to
-another MET tool, the new variable name (CompositeReflectivity) will
-appear in the output of downstream tools:
+		     $MET_BUILD/bin/pcp_combine -add forecast_F06.grb \
+		     'name="APCP"; level="A6";' \
+		     forecast_APCP_06_F06.nc -name APCP_06
 
-.. code-block:: none
+     Reformatting from GRIB to NetCDF may be done for any other reason the
+     user may have. For example, the -name option can be used to define the
+     NetCDF output variable name. Presuming this file is then passed to
+     another MET tool, the new variable name (CompositeReflectivity) will
+     appear in the output of downstream tools:
 
-		$MET_BUILD/bin/pcp_combine -add forecast.grb \
-		'name="REFC"; level="L0"; GRIB1_ptv=129; lead_time="120000";' \
-		forecast.nc -name CompositeReflectivity
+     .. code-block:: none
+
+		     $MET_BUILD/bin/pcp_combine -add forecast.grb \
+		     'name="REFC"; level="L0"; GRIB1_ptv=129; lead_time="120000";' \
+		     forecast.nc -name CompositeReflectivity
 
 Q. How do I use “-pcprx" to run a project faster?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-A.
-To run a project faster, the “-pcprx” option may be used to narrow the
-search down to whatever regular expression you provide. Here are a two
-examples:
+  .. dropdown:: Answer
 
-.. code-block:: none
-		
-		# Only using Stage IV data (ST4)
-		pcp_combine -sum 00000000_000000 06 \
-		20161015_18 12 ST4.2016101518.APCP_12_SUM.nc -pcprx "ST4.*.06h"
+     To run a project faster, the “-pcprx” option may be used to narrow the
+     search down to whatever regular expression you provide. Here are a two
+     examples:
 
-		# Specify that files starting with pgbq[number][number]be used:
-		pcp_combine \
-		-sum 20160221_18 06 20160222_18 24 \
-		gfs_APCP_24_20160221_18_F00_F24.nc \
-		-pcpdir /scratch4/BMC/shout/ptmp/Andrew.Kren/pre2016c3_corr/temp \
-		-pcprx 'pgbq[0-9][0-9].gfs.2016022118' -v 3
+     .. code-block:: none
+
+		     # Only using Stage IV data (ST4)
+		     pcp_combine -sum 00000000_000000 06 \
+		     20161015_18 12 ST4.2016101518.APCP_12_SUM.nc -pcprx "ST4.*.06h"
+
+		     # Specify that files starting with pgbq[number][number]be used:
+		     pcp_combine \
+		     -sum 20160221_18 06 20160222_18 24 \
+		     gfs_APCP_24_20160221_18_F00_F24.nc \
+		     -pcpdir /scratch4/BMC/shout/ptmp/Andrew.Kren/pre2016c3_corr/temp \
+		     -pcprx 'pgbq[0-9][0-9].gfs.2016022118' -v 3
 
 Q. How do I enter the time format correctly?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-A.
-Here is an **incorrect example** of running pcp_combine with sub-hourly
-accumulation intervals: 
+  .. dropdown:: Answer
+		
+     Here is an **incorrect example** of running pcp_combine with sub-hourly
+     accumulation intervals: 
 
-.. code-block:: none
+     .. code-block:: none
 
-		# incorrect example:
-		pcp_combine -subtract forecast.grb 0055 \
-		forecast2.grb 0005 forecast.nc -field APCP
+		     # incorrect example:
+		     pcp_combine -subtract forecast.grb 0055 \
+		     forecast2.grb 0005 forecast.nc -field APCP
 
-The time signature is entered incorrectly. Let’s assume that "0055"
-meant 0 hours and 55 minutes and "0005" meant 0 hours and 5 minutes.
+     The time signature is entered incorrectly. Let’s assume that "0055"
+     meant 0 hours and 55 minutes and "0005" meant 0 hours and 5 minutes.
 
-Looking at the usage statement for pcp_combine (just type pcp_combine with
-no arguments): "accum1" indicates the accumulation interval to be used
-from in_file1 in HH[MMSS] format (required).
+     Looking at the usage statement for pcp_combine (just type pcp_combine with
+     no arguments): "accum1" indicates the accumulation interval to be used
+     from in_file1 in HH[MMSS] format (required).
 
-The time format listed "HH[MMSS]" means specifying hours or
-hours/minutes/seconds. The incorrect example is using hours/minutes.
+     The time format listed "HH[MMSS]" means specifying hours or
+     hours/minutes/seconds. The incorrect example is using hours/minutes.
 
-Below is the **correct example**. Add the seconds to the end of the
-time strings, like this: 
+     Below is the **correct example**. Add the seconds to the end of the
+     time strings, like this: 
 
-.. code-block:: none
+     .. code-block:: none
 
-		# correct example:
-		pcp_combine -subtract forecast.grb 005500 \
-		forecast2.grb 000500 forecast.nc -field APCP		
+		     # correct example:
+		     pcp_combine -subtract forecast.grb 005500 \
+		     forecast2.grb 000500 forecast.nc -field APCP		
 
 Q. How do I use Pcp-Combine when my GRIB data doesn't have the appropriate accumulation interval time range indicator?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    
-A.
-Run wgrib on the data files and the output is listed below:
+  .. dropdown:: Answer
+		
+     Run wgrib on the data files and the output is listed below:
 
-.. code-block:: none
+     .. code-block:: none
 
-		279:503477484:d=15062313:APCP:kpds5=61:kpds6=1:kpds7=0:TR= 10:P1=3:P2=247:TimeU=0:sfc:1015min \
-		fcst:NAve=0 \
-		279:507900854:d=15062313:APCP:kpds5=61:kpds6=1:kpds7=0:TR= 10:P1=3:P2=197:TimeU=0:sfc:965min \
-		fcst:NAve=0
+		     279:503477484:d=15062313:APCP:kpds5=61:kpds6=1:kpds7=0:TR= 10:P1=3:P2=247:TimeU=0:sfc:1015min \
+		     fcst:NAve=0 \
+		     279:507900854:d=15062313:APCP:kpds5=61:kpds6=1:kpds7=0:TR= 10:P1=3:P2=197:TimeU=0:sfc:965min \
+		     fcst:NAve=0
 
-Notice the output which says "TR=10". TR means time range indicator and
-a value of 10 means that the level information contains an instantaneous
-forecast time, not an accumulation interval. 
+     Notice the output which says "TR=10". TR means time range indicator and
+     a value of 10 means that the level information contains an instantaneous
+     forecast time, not an accumulation interval. 
 
-Here's a table describing the TR values:
-http://www.nco.ncep.noaa.gov/pmb/docs/on388/table5.html
+     Here's a table describing the TR values:
+     http://www.nco.ncep.noaa.gov/pmb/docs/on388/table5.html
 
-The default logic for pcp_combine is to look for GRIB code 61 (i.e. APCP)
-defined with an accumulation interval (TR = 4). Since the data doesn't
-meet that criteria, the default logic of pcp_combine won't work. The
-arguments need to be more specific to tell pcp_combine exactly what to do.
+     The default logic for pcp_combine is to look for GRIB code 61 (i.e. APCP)
+     defined with an accumulation interval (TR = 4). Since the data doesn't
+     meet that criteria, the default logic of pcp_combine won't work. The
+     arguments need to be more specific to tell pcp_combine exactly what to do.
 
-Try the command:
+     Try the command:
 
-.. code-block:: none
+     .. code-block:: none
 
-		pcp_combine -subtract \
-		forecast.grb 'name="APCP"; level="L0"; lead_time="165500";' \ 
-		forecast2.grb 'name="APCP"; level="L0"; lead_time="160500";' \ 
-		forecast.nc -name APCP_A005000
+		     pcp_combine -subtract \
+		     forecast.grb 'name="APCP"; level="L0"; lead_time="165500";' \ 
+		     forecast2.grb 'name="APCP"; level="L0"; lead_time="160500";' \ 
+		     forecast.nc -name APCP_A005000
 
-Some things to point out here:
+     Some things to point out here:
 
-1. Notice in the wgrib output that the forecast times are 1015 min and
-   965 min. In HHMMSS format, that's "165500" and "160500".
+     1. Notice in the wgrib output that the forecast times are 1015 min and
+	965 min. In HHMMSS format, that's "165500" and "160500".
 
-2. An accumulation interval can’t be specified since the data isn't stored
-   that way. Instead, use a config file string to describe the data to use.
+     2. An accumulation interval can’t be specified since the data isn't stored
+	that way. Instead, use a config file string to describe the data to use.
 
-3. The config file string specifies a "name" (APCP) and "level" string. APCP
-   is defined at the surface, so a level value of 0 (L0) was specified.
+     3. The config file string specifies a "name" (APCP) and "level" string. APCP
+	is defined at the surface, so a level value of 0 (L0) was specified.
 
-4. Technically, the "lead_time" doesn’t need to be specified at all,
-   pcp_combine
-   would find the single APCP record in each input GRIB file and use them.
-   But just in case, the lead_time option was included to be extra certain to
-   get exactly the data that is needed.
+     4. Technically, the "lead_time" doesn’t need to be specified at all,
+	pcp_combine
+	would find the single APCP record in each input GRIB file and use them.
+	But just in case, the lead_time option was included to be extra certain to
+	get exactly the data that is needed.
 
-5. The default output variable name pcp_combine would write would be
-   "APCP_L0". However, to indicate that its a 50-minute
-   "accumulation interval" use a
-   different output variable name (APCP_A005000). Any string name is
-   possible. Maybe "Precip50Minutes" or "RAIN50". But whatever string is
-   chosen will be used in the Grid-Stat, Point-Stat, or MODE config file to
-   tell that tool what variable to process.
+     5. The default output variable name pcp_combine would write would be
+	"APCP_L0". However, to indicate that its a 50-minute
+	"accumulation interval" use a
+	different output variable name (APCP_A005000). Any string name is
+	possible. Maybe "Precip50Minutes" or "RAIN50". But whatever string is
+	chosen will be used in the Grid-Stat, Point-Stat, or MODE config file to
+	tell that tool what variable to process.
 
 Q. How do I use “-sum”, “-add”, and “-subtract“ to achieve the same accumulation interval?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    
-A. 
-Here is an example of using pcp_combine to put GFS into 24- hour intervals
-for comparison against 24-hourly StageIV precipitation with GFS data
-through the pcp_combine tool. Be aware that the 24-hour StageIV data is
-defined as an accumulation from 12Z on one day to 12Z on the next day:
-http://www.emc.ncep.noaa.gov/mmb/ylin/pcpanl/stage4/
-
-Therefore, only the 24-hour StageIV data can be used to evaluate 12Z to
-12Z accumulations from the model. Alternatively, the 6- hour StageIV
-accumulations could be used to evaluate any 24 hour accumulation from
-the model. For the latter, run the 6-hour StageIV files through pcp_combine
-to generate the desired 24-hour accumulation.
-
-Here is an example. Run pcp_combine to compute 24-hour accumulations for
-GFS. In this example, process the 20150220 00Z initialization of GFS.
-
-.. code-block:: none
+  .. dropdown:: Answer
 		
-		pcp_combine \
-		-sum 20150220_00 06 20150221_00 24 \ 
-		gfs_APCP_24_20150220_00_F00_F24.nc \ 
-		-pcprx "gfs_4_20150220_00.*grb2" \
-		-pcpdir /d1/model_data/20150220
-		
-pcp_combine is looking in the */d1/SBU/GFS/model_data/20150220* directory
-at files which match this regular expression "gfs_4_20150220_00.*grb2".
-That directory contains data for 00, 06, 12, and 18 hour initializations,
-but the "-pcprx" option narrows the search down to the 00 hour
-initialization which makes it run faster. It inspects all the matching
-files, looking for 6-hour APCP data to sum up to a 24-hour accumulation
-valid at 20150221_00. This results in a 24-hour accumulation between
-forecast hours 0 and 24.
+     Here is an example of using pcp_combine to put GFS into 24- hour intervals
+     for comparison against 24-hourly StageIV precipitation with GFS data
+     through the pcp_combine tool. Be aware that the 24-hour StageIV data is
+     defined as an accumulation from 12Z on one day to 12Z on the next day:
+     http://www.emc.ncep.noaa.gov/mmb/ylin/pcpanl/stage4/
 
-The following command will compute the 24-hour accumulation between forecast
-hours 12 and 36:
+     Therefore, only the 24-hour StageIV data can be used to evaluate 12Z to
+     12Z accumulations from the model. Alternatively, the 6- hour StageIV
+     accumulations could be used to evaluate any 24 hour accumulation from
+     the model. For the latter, run the 6-hour StageIV files through pcp_combine
+     to generate the desired 24-hour accumulation.
 
-.. code-block:: none
+     Here is an example. Run pcp_combine to compute 24-hour accumulations for
+     GFS. In this example, process the 20150220 00Z initialization of GFS.
 
-		pcp_combine \
-		-sum 20150220_00 06 20150221_12 24 \ 
-		gfs_APCP_24_20150220_00_F12_F36.nc \ 
-		-pcprx "gfs_4_20150220_00.*grb2" \ 
-		-pcpdir /d1/model_data/20150220
+     .. code-block:: none
 
-The "-sum" command is meant to make things easier by searching the
-directory. But instead of using "-sum", another option would be the
-"- add" command. Explicitly list the 4 files that need to be extracted
-from the 6-hour APCP and add them up to 24. In the directory structure,
-the previous "-sum" job could be rewritten with "-add" like this:
+		     pcp_combine \
+		     -sum 20150220_00 06 20150221_00 24 \ 
+		     gfs_APCP_24_20150220_00_F00_F24.nc \ 
+		     -pcprx "gfs_4_20150220_00.*grb2" \
+		     -pcpdir /d1/model_data/20150220
 
-.. code-block:: none
+     pcp_combine is looking in the */d1/SBU/GFS/model_data/20150220* directory
+     at files which match this regular expression "gfs_4_20150220_00.*grb2".
+     That directory contains data for 00, 06, 12, and 18 hour initializations,
+     but the "-pcprx" option narrows the search down to the 00 hour
+     initialization which makes it run faster. It inspects all the matching
+     files, looking for 6-hour APCP data to sum up to a 24-hour accumulation
+     valid at 20150221_00. This results in a 24-hour accumulation between
+     forecast hours 0 and 24.
 
-		pcp_combine -add \
-		/d1/model_data/20150220/gfs_4_20150220_0000_018.grb2 06 \ 
-		/d1/model_data/20150220/gfs_4_20150220_0000_024.grb2 06 \ 
-		/d1/model_data/20150220/gfs_4_20150220_0000_030.grb2 06 \ 
-		/d1/model_data/20150220/gfs_4_20150220_0000_036.grb2 06 \
-		gfs_APCP_24_20150220_00_F12_F36_add_option.nc
+     The following command will compute the 24-hour accumulation between forecast
+     hours 12 and 36:
 
-This example explicitly tells pcp_combine which files to read and
-what accumulation interval (6 hours) to extract from them. The resulting
-output should be identical to the output of the "-sum" command.
+     .. code-block:: none
+
+		     pcp_combine \
+		     -sum 20150220_00 06 20150221_12 24 \ 
+		     gfs_APCP_24_20150220_00_F12_F36.nc \ 
+		     -pcprx "gfs_4_20150220_00.*grb2" \ 
+		     -pcpdir /d1/model_data/20150220
+
+     The "-sum" command is meant to make things easier by searching the
+     directory. But instead of using "-sum", another option would be the
+     "- add" command. Explicitly list the 4 files that need to be extracted
+     from the 6-hour APCP and add them up to 24. In the directory structure,
+     the previous "-sum" job could be rewritten with "-add" like this:
+
+     .. code-block:: none
+
+		     pcp_combine -add \
+		     /d1/model_data/20150220/gfs_4_20150220_0000_018.grb2 06 \ 
+		     /d1/model_data/20150220/gfs_4_20150220_0000_024.grb2 06 \ 
+		     /d1/model_data/20150220/gfs_4_20150220_0000_030.grb2 06 \ 
+		     /d1/model_data/20150220/gfs_4_20150220_0000_036.grb2 06 \
+		     gfs_APCP_24_20150220_00_F12_F36_add_option.nc
+
+     This example explicitly tells pcp_combine which files to read and
+     what accumulation interval (6 hours) to extract from them. The resulting
+     output should be identical to the output of the "-sum" command.
 
 Q. What is the difference between “-sum” vs. “-add”?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-A.
-The -sum and -add options both do the same thing. It's just that
-'-sum' could find files more quickly with the use of the -pcprx flag.
-This could also be accomplished by using a calling script.
+  .. dropdown:: Answer
+		
+     The -sum and -add options both do the same thing. It's just that
+     '-sum' could find files more quickly with the use of the -pcprx flag.
+     This could also be accomplished by using a calling script.
 
 Q. How do I select a specific GRIB record?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-A.
-In this example, record 735 needs to be selected. 
-
-.. code-block:: none
+  .. dropdown:: Answer
 		
-		pcp_combine -add 20160101_i12_f015_HRRR_wrfnat.grb2 \ 
-		'name="APCP"; level="R735";' \
-		-name "APCP_01" HRRR_wrfnat.20160101_i12_f015.nc
+     In this example, record 735 needs to be selected. 
 
-Instead of having the level as "L0", tell it to use "R735" to select
-grib record 735.
+     .. code-block:: none
+
+		     pcp_combine -add 20160101_i12_f015_HRRR_wrfnat.grb2 \ 
+		     'name="APCP"; level="R735";' \
+		     -name "APCP_01" HRRR_wrfnat.20160101_i12_f015.nc
+
+     Instead of having the level as "L0", tell it to use "R735" to select
+     grib record 735.
 
 Plot-Data-Plane
 ---------------
@@ -987,112 +997,115 @@ Plot-Data-Plane
 Q. How do I inspect Gen-Vx-Mask output?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-A.
-Check to see if the call to Gen-Vx-Mask actually did create good output
-with Plot-Data-Plane. The following commands assume that the MET executables
-are found in your path.
-
-.. code-block:: none
+  .. dropdown:: Answer
 		
-		plot_data_plane \
-		out/gen_vx_mask/CONUS_poly.nc \ 
-		out/gen_vx_mask/CONUS_poly.ps \
-		'name="CONUS"; level="(*,*)";'
+     Check to see if the call to Gen-Vx-Mask actually did create good output
+     with Plot-Data-Plane. The following commands assume that the MET executables
+     are found in your path.
 
-View that postscript output file, using something like "gv"
-for ghostview: 
+     .. code-block:: none
 
-.. code-block:: none
-		
-		gv out/gen_vx_mask/CONUS_poly.ps
+		     plot_data_plane \
+		     out/gen_vx_mask/CONUS_poly.nc \ 
+		     out/gen_vx_mask/CONUS_poly.ps \
+		     'name="CONUS"; level="(*,*)";'
 
-Please review a map of 0's and 1's over the USA to determine if the output
-file is what the user expects. It always a good idea to start with
-plot_data_plane when working with data to make sure MET
-is plotting the data correctly and in the expected location.
+     View that postscript output file, using something like "gv"
+     for ghostview: 
+
+     .. code-block:: none
+
+		     gv out/gen_vx_mask/CONUS_poly.ps
+
+     Please review a map of 0's and 1's over the USA to determine if the output
+     file is what the user expects. It always a good idea to start with
+     plot_data_plane when working with data to make sure MET
+     is plotting the data correctly and in the expected location.
 
 Q. How do I specify the GRIB version?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    
-A.
-When MET reads Gridded data files, it must determine the type of
-file it's reading. The first thing it checks is the suffix of the file.
-The following are all interpreted as GRIB1: .grib, .grb, and .gb.
-While these mean GRIB2: .grib2, .grb2, and .gb2.
-
-There are 2 choices to control how MET interprets a grib file. Renaming
-the files to use a particular suffix, or keep them
-named and explicitly tell MET to interpret them as GRIB1 or GRIB2 using
-the "file_type" configuration option.
-
-The examples below use the plot_data_plane tool to plot the data. Set 
-
-.. code-block:: none
+  .. dropdown:: Answer
 		
-		"file_type = GRIB2;"
+     When MET reads Gridded data files, it must determine the type of
+     file it's reading. The first thing it checks is the suffix of the file.
+     The following are all interpreted as GRIB1: .grib, .grb, and .gb.
+     While these mean GRIB2: .grib2, .grb2, and .gb2.
 
-To keep the files named this as they are, add "file_type = GRIB2;" to all the
-MET configuration files (i.e. Grid-Stat, MODE, and so on) that you use:
+     There are 2 choices to control how MET interprets a grib file. Renaming
+     the files to use a particular suffix, or keep them
+     named and explicitly tell MET to interpret them as GRIB1 or GRIB2 using
+     the "file_type" configuration option.
 
-.. code-block:: none
-		
-		plot_data_plane \
-		test_2.5_prog.grib \ 
-		test_2.5_prog.ps \
-		'name="TSTM"; level="A0"; file_type=GRIB2;' \ 
-		-plot_range 0 100
+     The examples below use the plot_data_plane tool to plot the data. Set 
 
+     .. code-block:: none
+
+		     "file_type = GRIB2;"
+
+     To keep the files named this as they are, add "file_type = GRIB2;" to all the
+     MET configuration files (i.e. Grid-Stat, MODE, and so on) that you use:
+
+     .. code-block:: none
+
+		     plot_data_plane \
+		     test_2.5_prog.grib \ 
+		     test_2.5_prog.ps \
+		     'name="TSTM"; level="A0"; file_type=GRIB2;' \ 
+		     -plot_range 0 100
 
 Q. How do I test the variable naming convention? (Record number example.)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-A.
-Make sure MET can read GRIB2 data. Plot the data from that GRIB2 file
-by running: 
+  .. dropdown:: Answer
+		
+     Make sure MET can read GRIB2 data. Plot the data from that GRIB2 file
+     by running: 
 
-.. code-block:: none
+     .. code-block:: none
 
-		plot_data_plane LTIA98_KWBR_201305180600.grb2 tmp_z2.ps 'name="TMP"; level="R2";
+		     plot_data_plane LTIA98_KWBR_201305180600.grb2 tmp_z2.ps 'name="TMP"; level="R2";
 
-"R2" tells MET to plot record number 2. Record numbers 1 and 2 both
-contain temperature data and 2-meters. Here's some wgrib2 output:
+     "R2" tells MET to plot record number 2. Record numbers 1 and 2 both
+     contain temperature data and 2-meters. Here's some wgrib2 output:
 
-.. code-block:: none
+     .. code-block:: none
 
-		1:0:d=2013051806:TMP:2 m above ground:anl:analysis/forecast error 2:3323062:d=2013051806:TMP:2 m above ground:anl:
+		     1:0:d=2013051806:TMP:2 m above ground:anl:analysis/forecast error 2:3323062:d=2013051806:TMP:2 m above ground:anl:
 
-The GRIB id info has been the same between records 1 and 2.
+     The GRIB id info has been the same between records 1 and 2.
 
 Q. How do I compute and verify wind speed?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    
-A.
-Here's how to compute and verify wind speed using MET. Good news, MET
-already includes logic for deriving wind speed on the fly. The GRIB
-abbreviation for wind speed is WIND. To request WIND from a GRIB1 or
-GRIB2 file, MET first checks to see if it already exists in the current
-file. If so, it'll use it as is. If not, it'll search for the corresponding
-U and V records and derive wind speed to use on the fly.
-
-In this example the RTMA file is named rtma.grb2 and the UPP file is
-named wrf.grb, please try running the following commands to plot wind speed:
-
-.. code-block:: none
-
-		plot_data_plane wrf.grb wrf_wind.ps \
-		'name"WIND"; level="Z10";' -v 3 
-		plot_data_plane rtma.grb2 rtma_wind.ps \
-		'name"WIND"; level="Z10";' -v 3
+  .. dropdown:: Answer
 		
-In the first call, the log message should be similar to this: 
+     Here's how to compute and verify wind speed using MET. Good news, MET
+     already includes logic for deriving wind speed on the fly. The GRIB
+     abbreviation for wind speed is WIND. To request WIND from a GRIB1 or
+     GRIB2 file, MET first checks to see if it already exists in the current
+     file. If so, it'll use it as is. If not, it'll search for the corresponding
+     U and V records and derive wind speed to use on the fly.
 
-.. code-block:: none
+     In this example the RTMA file is named rtma.grb2 and the UPP file is
+     named wrf.grb, please try running the following commands to plot wind speed:
 
-		DEBUG 3: MetGrib1DataFile::data_plane_array() -> 
-		Attempt to derive winds from U and V components.
+     .. code-block:: none
 
-In the second one, this won't appear since wind speed already exists
-in the RTMA file.
+		     plot_data_plane wrf.grb wrf_wind.ps \
+		     'name"WIND"; level="Z10";' -v 3 
+		     plot_data_plane rtma.grb2 rtma_wind.ps \
+		     'name"WIND"; level="Z10";' -v 3
+
+     In the first call, the log message should be similar to this: 
+
+     .. code-block:: none
+
+		     DEBUG 3: MetGrib1DataFile::data_plane_array() -> 
+		     Attempt to derive winds from U and V components.
+
+     In the second one, this won't appear since wind speed already exists
+     in the RTMA file.
 
 Stat-Analysis
 -------------
@@ -1100,184 +1113,192 @@ Stat-Analysis
 Q. How does '-aggregate_stat' work?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    
-A.
-In Stat-Analysis, there is a "-vx_mask" job filtering option. That option
-reads the VX_MASK column from the input STAT lines and applies string
-matching with the values in that column. Presumably, all of the MPR lines
-will have the value of "FULL" in the VX_MASK column.
-
-Stat-Analysis has the ability to read MPR lines and recompute statistics
-from them using the same library code that the other MET tools use. The
-job command options which begin with "-out" are used to specify settings
-to be applied to the output of that process. For example, the "-fcst_thresh"
-option filters strings from the input "FCST_THRESH" header column. The
-"-out_fcst_thresh" option defines the threshold to be applied to the output
-of Stat-Analysis. So reading MPR lines and applying a threshold to define
-contingency table statistics (CTS) would be done using the
-"-out_fcst_thresh" option.
-
-Stat-Analysis does have the ability to filter MPR lat/lon locations
-using the "-mask_poly" option for a lat/lon polyline and the "-mask_grid"
-option to define a retention grid.
-
-However, there is currently no "-mask_sid" option. 
-
-With met-5.2 and later versions, one option is to apply column string
-matching using the "-column_str" option to define the list of station
-ID's you would like to aggregate. That job would look something like this:
-
-.. code-block:: none
+  .. dropdown:: Answer
 		
-		stat_analysis -lookin path/to/mpr/directory \
-		-job aggregate_stat -line_type MPR -out_line_type CNT \ 
-		-column_str OBS_SID SID1,SID2,SID3,...,SIDN \ 
-		-set_hdr VX_MASK SID_GROUP_NAME \ 
-		-out_stat mpr_to_cnt.stat
+     In Stat-Analysis, there is a "-vx_mask" job filtering option. That option
+     reads the VX_MASK column from the input STAT lines and applies string
+     matching with the values in that column. Presumably, all of the MPR lines
+     will have the value of "FULL" in the VX_MASK column.
 
-Where SID1...SIDN is a comma-separated list of the station id's in the
-group. Notice that a value for the output VX_MASK column using the
-"-set_hdr" option has been specified. Otherwise, this would show a list
-of the unique values found in that column. Presumably, all the input
-VX_MASK columns say "FULL" so that's what the output would say. Use
-"-set_hdr" to explicitly set the output value.
+     Stat-Analysis has the ability to read MPR lines and recompute statistics
+     from them using the same library code that the other MET tools use. The
+     job command options which begin with "-out" are used to specify settings
+     to be applied to the output of that process. For example, the "-fcst_thresh"
+     option filters strings from the input "FCST_THRESH" header column. The
+     "-out_fcst_thresh" option defines the threshold to be applied to the output
+     of Stat-Analysis. So reading MPR lines and applying a threshold to define
+     contingency table statistics (CTS) would be done using the
+     "-out_fcst_thresh" option.
+
+     Stat-Analysis does have the ability to filter MPR lat/lon locations
+     using the "-mask_poly" option for a lat/lon polyline and the "-mask_grid"
+     option to define a retention grid.
+
+     However, there is currently no "-mask_sid" option. 
+
+     With met-5.2 and later versions, one option is to apply column string
+     matching using the "-column_str" option to define the list of station
+     ID's you would like to aggregate. That job would look something like this:
+
+     .. code-block:: none
+
+		     stat_analysis -lookin path/to/mpr/directory \
+		     -job aggregate_stat -line_type MPR -out_line_type CNT \ 
+		     -column_str OBS_SID SID1,SID2,SID3,...,SIDN \ 
+		     -set_hdr VX_MASK SID_GROUP_NAME \ 
+		     -out_stat mpr_to_cnt.stat
+
+     Where SID1...SIDN is a comma-separated list of the station id's in the
+     group. Notice that a value for the output VX_MASK column using the
+     "-set_hdr" option has been specified. Otherwise, this would show a list
+     of the unique values found in that column. Presumably, all the input
+     VX_MASK columns say "FULL" so that's what the output would say. Use
+     "-set_hdr" to explicitly set the output value.
 
 Q. What is the best way to average the FSS scores within several days or even several months using 'Aggregate to Average Scores'?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    
-A.
-Below is the best way to aggregate together the Neighborhood Continuous
-(NBRCNT) lines across multiple days, specifically the fractions skill
-score (FSS). The Stat-Analysis tool is designed to do this. This example
-is for aggregating scores for the accumulated precipitation (APCP) field. 
+  .. dropdown:: Answer
+		
+     Below is the best way to aggregate together the Neighborhood Continuous
+     (NBRCNT) lines across multiple days, specifically the fractions skill
+     score (FSS). The Stat-Analysis tool is designed to do this. This example
+     is for aggregating scores for the accumulated precipitation (APCP) field. 
 
-Run the "aggregate" job type in stat_analysis to do this:
+     Run the "aggregate" job type in stat_analysis to do this:
 
-.. code-block:: none
+     .. code-block:: none
 
-		stat_analysis -lookin directory/file*_nbrcnt.txt \
-		-job aggregate -line_type NBRCNT -by FCST_VAR,FCST_LEAD,FCST_THRESH,INTERP_MTHD,INTERP_PNTS -out_stat agg_nbrcnt.txt
+		     stat_analysis -lookin directory/file*_nbrcnt.txt \
+		     -job aggregate -line_type NBRCNT -by FCST_VAR,FCST_LEAD,FCST_THRESH,INTERP_MTHD,INTERP_PNTS -out_stat agg_nbrcnt.txt
 
-This job reads all the files that are passed to it on the command line with
-the "-lookin" option. List explicit filenames to read them directly.
-Listing a top-level directory name will search that directory for files
-ending in ".stat".
+     This job reads all the files that are passed to it on the command line with
+     the "-lookin" option. List explicit filenames to read them directly.
+     Listing a top-level directory name will search that directory for files
+     ending in ".stat".
 
-In this case, the job running is to "aggregate" the "NBRCNT" line type.
+     In this case, the job running is to "aggregate" the "NBRCNT" line type.
 
-In this case, the "-by" option is being used and lists several header
-columns. Stat-Analysis will run this job separately for each unique
-combination of those header column entries.
+     In this case, the "-by" option is being used and lists several header
+     columns. Stat-Analysis will run this job separately for each unique
+     combination of those header column entries.
 
-The output is printed to the screen, or use the "-out_stat" option to
-also write the aggregated output to a file named "agg_nbrcnt.txt".
+     The output is printed to the screen, or use the "-out_stat" option to
+     also write the aggregated output to a file named "agg_nbrcnt.txt".
 
 Q. How do I use '-by' to capture unique entries?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    
-A.
-Here is a stat-analysis job that could be used to run, read the MPR lines,
-define the probabilistic forecast thresholds, define the single observation
-threshold, and compute a PSTD output line. Using "-by FCST_VAR" tells it
-to run the job separately for each unique entry found in the FCST_VAR column.
-
-.. code-block:: none
+  .. dropdown:: Answer
 		
-		stat_analysis \
-		-lookin point_stat_model2_120000L_20160501_120000V.stat \ 
-		-job aggregate_stat -line_type MPR -out_line_type PSTD \ 
-		-out_fcst_thresh ge0,ge0.1,ge0.2,ge0.3,ge0.4,ge0.5,ge0.6,ge0.7,ge0.8,ge0.9,ge1.0 \ 
-		-out_obs_thresh eq1.0 \ 
-		-by FCST_VAR \ 
-		-out_stat out_pstd.txt
+     Here is a stat-analysis job that could be used to run, read the MPR lines,
+     define the probabilistic forecast thresholds, define the single observation
+     threshold, and compute a PSTD output line. Using "-by FCST_VAR" tells it
+     to run the job separately for each unique entry found in the FCST_VAR column.
 
-The output statistics are written to "out_pstd.txt".
+     .. code-block:: none
+
+		     stat_analysis \
+		     -lookin point_stat_model2_120000L_20160501_120000V.stat \ 
+		     -job aggregate_stat -line_type MPR -out_line_type PSTD \ 
+		     -out_fcst_thresh ge0,ge0.1,ge0.2,ge0.3,ge0.4,ge0.5,ge0.6,ge0.7,ge0.8,ge0.9,ge1.0 \ 
+		     -out_obs_thresh eq1.0 \ 
+		     -by FCST_VAR \ 
+		     -out_stat out_pstd.txt
+
+     The output statistics are written to "out_pstd.txt".
 
 Q. How do I use '-filter' to refine my output?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-   
-A.
-Here is an example of running a Stat-Analysis filter job to discard any
-CNT lines (continuous statistics) where the forecast rate and observation
-rate are less than 0.05. This is an alternative way of tossing out those
-cases without having to modify the source code.
+  .. dropdown:: Answer
 
-.. code-block:: none
+     Here is an example of running a Stat-Analysis filter job to discard any
+     CNT lines (continuous statistics) where the forecast rate and observation
+     rate are less than 0.05. This is an alternative way of tossing out those
+     cases without having to modify the source code.
 
-		stat_analysis \
-		-lookin out/grid_stat/grid_stat_120000L_20050807_120000V.stat \ 
-		-job filter -dump_row filter_cts.txt -line_type CTS \ 
-		-column_min BASER 0.05 -column_min FMEAN 0.05
-		DEBUG 2: STAT Lines read = 436 
-		DEBUG 2: STAT Lines retained = 36 
-		DEBUG 2: 
-		DEBUG 2: Processing Job 1: -job filter -line_type CTS -column_min BASER 
-		0.05 -column_min 
-		FMEAN 0.05 -dump_row filter_cts.txt 
-		DEBUG 1: Creating 
-		STAT output file "filter_cts.txt" 
-		FILTER: -job filter -line_type 
-		CTS -column_min 
-		BASER 0.05 -column_min 
-		FMEAN 0.05 -dump_row filter_cts.txt 
-		DEBUG 2: Job 1 used 36 out of 36 STAT lines.
+     .. code-block:: none
 
-This job reads find 56 CTS lines, but only keeps 36 of them where both
-the BASER and FMEAN columns are at least 0.05.
+		     stat_analysis \
+		     -lookin out/grid_stat/grid_stat_120000L_20050807_120000V.stat \ 
+		     -job filter -dump_row filter_cts.txt -line_type CTS \ 
+		     -column_min BASER 0.05 -column_min FMEAN 0.05
+		     DEBUG 2: STAT Lines read = 436 
+		     DEBUG 2: STAT Lines retained = 36 
+		     DEBUG 2: 
+		     DEBUG 2: Processing Job 1: -job filter -line_type CTS -column_min BASER 
+		     0.05 -column_min 
+		     FMEAN 0.05 -dump_row filter_cts.txt 
+		     DEBUG 1: Creating 
+		     STAT output file "filter_cts.txt" 
+		     FILTER: -job filter -line_type 
+		     CTS -column_min 
+		     BASER 0.05 -column_min 
+		     FMEAN 0.05 -dump_row filter_cts.txt 
+		     DEBUG 2: Job 1 used 36 out of 36 STAT lines.
+
+     This job reads find 56 CTS lines, but only keeps 36 of them where both
+     the BASER and FMEAN columns are at least 0.05.
 
 Q. How do I use the “-by” flag to stratify results?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    
-A.
-Adding "-by FCST_VAR" is a great way to associate a single value,
-of say RMSE, with each of the forecast variables (UGRD,VGRD and WIND).
-
-Run the following job on the output from Grid-Stat generated when the
-"make test" command is run:
-
-.. code-block:: none
+  .. dropdown:: Answer
 		
-		stat_analysis -lookin out/grid_stat \
-		-job aggregate_stat -line_type SL1L2 -out_line_type CNT \ 
-		-by FCST_VAR,FCST_LEV \ 
-		-out_stat cnt.txt
+     Adding "-by FCST_VAR" is a great way to associate a single value,
+     of say RMSE, with each of the forecast variables (UGRD,VGRD and WIND).
 
-The resulting cnt.txt file includes separate output for 6 different
-FCST_VAR values at different levels.
+     Run the following job on the output from Grid-Stat generated when the
+     "make test" command is run:
+
+     .. code-block:: none
+
+		     stat_analysis -lookin out/grid_stat \
+		     -job aggregate_stat -line_type SL1L2 -out_line_type CNT \ 
+		     -by FCST_VAR,FCST_LEV \ 
+		     -out_stat cnt.txt
+
+     The resulting cnt.txt file includes separate output for 6 different
+     FCST_VAR values at different levels.
 
 Q. How do I speed up run times?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-   
-A.
-By default, Stat-Analysis has two options enabled which slow it down.
-Disabling these two options will create quicker run times:
 
-1. The computation of rank correlation statistics, Spearman's Rank
-   Correlation and Kendall's Tau. Disable them using "-rank_corr_flag FALSE".
+  .. dropdown:: Answer
 
-2. The computation of bootstrap confidence intervals. Disable them using
-   "-n_boot_rep 0".
+     By default, Stat-Analysis has two options enabled which slow it down.
+     Disabling these two options will create quicker run times:
 
-Two more suggestions for faster run times.
+     1. The computation of rank correlation statistics, Spearman's Rank
+	Correlation and Kendall's Tau. Disable them using "-rank_corr_flag FALSE".
 
-1. Instead of using "-fcst_var u", use "-by fcst_var". This will compute
-   statistics separately for each unique entry found in the FCST_VAR column.
+     2. The computation of bootstrap confidence intervals. Disable them using
+	"-n_boot_rep 0".
 
-2. Instead of using "-out" to write the output to a text file, use "-out_stat"
-   which will write a full STAT output file, including all the header columns.
-   This will create a long list of values in the OBTYPE column. To avoid the
-   long, OBTYPE column value, manually set the output using
-   "-set_hdr OBTYPE ALL_TYPES". Or set its value to whatever is needed.
+     Two more suggestions for faster run times.
 
-.. code-block:: none
-		
-		stat_analysis \
-		-lookin diag_conv_anl.2015060100.stat \ 
-		-job aggregate_stat -line_type MPR -out_line_type CNT -by FCST_VAR \ 
-		-out_stat diag_conv_anl.2015060100_cnt.txt -set_hdr OBTYPE ALL_TYPES \ 
-		-n_boot_rep 0 -rank_corr_flag FALSE -v 4
+     1. Instead of using "-fcst_var u", use "-by fcst_var". This will compute
+	statistics separately for each unique entry found in the FCST_VAR column.
 
-Adding the "-by FCST_VAR" option to compute stats for all variables and
-runs quickly.
+     2. Instead of using "-out" to write the output to a text file,
+	use "-out_stat"
+	which will write a full STAT output file, including all the
+	header columns.
+	This will create a long list of values in the OBTYPE column.
+	To avoid the
+	long, OBTYPE column value, manually set the output using
+	"-set_hdr OBTYPE ALL_TYPES". Or set its value to whatever is needed.
+
+     .. code-block:: none
+
+		     stat_analysis \
+		     -lookin diag_conv_anl.2015060100.stat \ 
+		     -job aggregate_stat -line_type MPR -out_line_type CNT -by FCST_VAR \ 
+		     -out_stat diag_conv_anl.2015060100_cnt.txt -set_hdr OBTYPE ALL_TYPES \ 
+		     -n_boot_rep 0 -rank_corr_flag FALSE -v 4
+
+     Adding the "-by FCST_VAR" option to compute stats for all variables and
+     runs quickly.
 
 TC-Stat
 -------
@@ -1285,7 +1306,8 @@ TC-Stat
 Q. How do I use the “-by” flag to stratify results?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    
-A.
+  .. dropdown:: Answer
+
 To perform tropical cyclone evaluations for multiple models use the
 "-by AMODEL" option with the tc_stat tool. Here is an example.
 
