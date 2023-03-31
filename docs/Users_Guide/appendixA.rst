@@ -1819,155 +1819,172 @@ on other things to check if you are having problems installing or running MET.
 MET won't compile
 -----------------
 
-* Have you specified the locations of NetCDF, GNU Scientific Library,
-  and BUFRLIB, and optional additional libraries using corresponding
-  MET\_ environment variables prior to running configure?
+  .. dropdown:: Troubleshooting Help
 
-* Have these libraries been compiled and installed using the same set
-  of compilers used to build MET?
+     * Have you specified the locations of NetCDF, GNU Scientific Library,
+       and BUFRLIB, and optional additional libraries using corresponding
+       MET\_ environment variables prior to running configure?
+
+     * Have these libraries been compiled and installed using the same set
+       of compilers used to build MET?
 
 BUFRLIB Errors during MET installation
 --------------------------------------
 
-.. code-block:: none
-
-		error message: /usr/bin/ld: cannot find -lbufr
-		The linker can not find the BUFRLIB library archive file it needs. 
-
-		export MET_BUFRLIB=/home/username/BUFRLIB_v11.3.0:$MET_BUFRLIB
-
-It isn't making it's way into the configuration because BUFRLIB_v11.3.0
-isn't showing up in the output of make. This may indicate the wrong shell
-type. The .bashrc file sets the environment for the Bourne shell, but
-the above error could indicate that the c- shell is being used instead.
-
-Try the following 2 things:
-
-1. Check to make sure this file exists: 
-
-  .. code-block:: none
-
-  		  ls /home/username/BUFRLIB_v11.3.0/libbufr.a
-
-2. Rerun the MET configure command using the following option on the
-   command line: 
-
-  .. code-block:: none
+  .. dropdown:: Troubleshooting Help
 		
-		  MET_BUFRLIB=/home/username/BUFRLIB_v11.3.0 
+     .. code-block:: none
 
-After doing that, please try recompiling MET. If it fails, please
-submit the following log files: "make_install.log" as well as
-"config.log" with a new post in the
-`METplus GitHub Discussions Forum <https://github.com/dtcenter/METplus/discussions>`_.
+		     error message: /usr/bin/ld: cannot find -lbufr
+		     The linker can not find the BUFRLIB library archive file it needs. 
+
+		     export MET_BUFRLIB=/home/username/BUFRLIB_v11.3.0:$MET_BUFRLIB
+
+     It isn't making it's way into the configuration because BUFRLIB_v11.3.0
+     isn't showing up in the output of make. This may indicate the wrong shell
+     type. The .bashrc file sets the environment for the Bourne shell, but
+     the above error could indicate that the c- shell is being used instead.
+
+     Try the following 2 things:
+
+     1. Check to make sure this file exists: 
+
+       .. code-block:: none
+
+		       ls /home/username/BUFRLIB_v11.3.0/libbufr.a
+
+     2. Rerun the MET configure command using the following option on the
+	command line: 
+
+       .. code-block:: none
+
+		       MET_BUFRLIB=/home/username/BUFRLIB_v11.3.0 
+
+     After doing that, please try recompiling MET. If it fails, please
+     submit the following log files: "make_install.log" as well as
+     "config.log" with a new post in the
+     `METplus GitHub Discussions Forum <https://github.com/dtcenter/METplus/discussions>`_.
 
 
 Command line double quotes
 --------------------------
 
-Single quotes, double quotes, and escape characters can be difficult for
-MET to parse. If there are problems, especially in Python code, try
-breaking the command up like the below example.
+  .. dropdown:: Troubleshooting Help
 
-.. code-block:: none
+     Single quotes, double quotes, and escape characters can be difficult for
+     MET to parse. If there are problems, especially in Python code, try
+     breaking the command up like the below example.
 
-		['regrid_data_plane',
-		'/h/data/global/WXQC/data/umm/1701150006', 
-		'G003', '/h/data/global/WXQC/data/met/nc_mdl/umm/1701150006', '- field',
-		'\'name="HGT"; level="P500";\'', '-v', '6']
+     .. code-block:: none
+
+		     ['regrid_data_plane',
+		     '/h/data/global/WXQC/data/umm/1701150006', 
+		     'G003', '/h/data/global/WXQC/data/met/nc_mdl/umm/1701150006', '- field',
+		     '\'name="HGT"; level="P500";\'', '-v', '6']
 
 Environment variable settings
 -----------------------------
 
-In the below incorrect example for many environment variables have both
-the main variable set and the INC and LIB variables set:
-
-.. code-block:: none
-
-		export MET_GSL=$MET_LIB_DIR/gsl 
-		export MET_GSLINC=$MET_LIB_DIR/gsl/include/gsl 
-		export MET_GSLLIB=$MET_LIB_DIR/gsl/lib
+  .. dropdown:: Troubleshooting Help
 		
-**only MET_GSL *OR *MET_GSLINC *AND *MET_GSLLIB need to be set.**
-So, for example, either set:
+     In the below incorrect example for many environment variables have both
+     the main variable set and the INC and LIB variables set:
 
-.. code-block:: none
+     .. code-block:: none
 
-		export MET_GSL=$MET_LIB_DIR/gsl
+		     export MET_GSL=$MET_LIB_DIR/gsl 
+		     export MET_GSLINC=$MET_LIB_DIR/gsl/include/gsl 
+		     export MET_GSLLIB=$MET_LIB_DIR/gsl/lib
 
-or set:
+     **only MET_GSL *OR *MET_GSLINC *AND *MET_GSLLIB need to be set.**
+     So, for example, either set:
 
-.. code-block:: none
+     .. code-block:: none
 
-		export MET_GSLINC=$MET_LIB_DIR/gsl/include/gsl export MET_GSLLIB=$MET_LIB_DIR/gsl/lib
+		     export MET_GSL=$MET_LIB_DIR/gsl
 
-Additionally, MET does not use MET_HDF5INC and MET_HDF5LIB.
-It only uses MET_HDF5.
+     or set:
 
-Our online tutorial can help figure out what should be set and what the
-value should be:
-https://met.readthedocs.io/en/latest/Users_Guide/installation.html
+     .. code-block:: none
+
+		     export MET_GSLINC=$MET_LIB_DIR/gsl/include/gsl export MET_GSLLIB=$MET_LIB_DIR/gsl/lib
+
+     Additionally, MET does not use MET_HDF5INC and MET_HDF5LIB.
+     It only uses MET_HDF5.
+
+     Our online tutorial can help figure out what should be set and what the
+     value should be:
+     https://met.readthedocs.io/en/latest/Users_Guide/installation.html
 
 NetCDF install issues
 ---------------------
 
-This example shows a problem with NetCDF in the make_install.log file:
+  .. dropdown:: Troubleshooting Help
+		
+     This example shows a problem with NetCDF in the make_install.log file:
 
-.. code-block:: none
+     .. code-block:: none
 
-		/usr/bin/ld: warning: libnetcdf.so.11, 
-		needed by /home/zzheng25/metinstall/lib/libnetcdf_c++4.so, 
-		may conflict with libnetcdf.so.7
+		     /usr/bin/ld: warning: libnetcdf.so.11, 
+		     needed by /home/zzheng25/metinstall/lib/libnetcdf_c++4.so, 
+		     may conflict with libnetcdf.so.7
 
-Below are examples of too many MET_NETCDF options:
+     Below are examples of too many MET_NETCDF options:
 
-.. code-block:: none
+     .. code-block:: none
 
-		MET_NETCDF='/home/username/metinstall/' 
-		MET_NETCDFINC='/home/username/local/include' 
-		MET_NETCDFLIB='/home/username/local/lib'
+		     MET_NETCDF='/home/username/metinstall/' 
+		     MET_NETCDFINC='/home/username/local/include' 
+		     MET_NETCDFLIB='/home/username/local/lib'
 
 
-Either MET_NETCDF **OR** MET_NETCDFINC **AND** MET_NETCDFLIB need to be set.
-If the NetCDF include files are in */home/username/local/include* and the
-NetCDF library files are in */home/username/local/lib*, unset the
-MET_NETCDF environment variable, then run "make clean", reconfigure,
-and then run "make install" and "make test" again.
+     Either MET_NETCDF **OR** MET_NETCDFINC **AND** MET_NETCDFLIB need to be set.
+     If the NetCDF include files are in */home/username/local/include* and the
+     NetCDF library files are in */home/username/local/lib*, unset the
+     MET_NETCDF environment variable, then run "make clean", reconfigure,
+     and then run "make install" and "make test" again.
 
 Error while loading shared libraries
 ------------------------------------
 
-* Add the lib dir to your LD_LIBRARY_PATH. For example, if you receive
-  the following error: "./mode_analysis: error while loading shared
-  libraries: libgsl.so.19: cannot open shared object file:
-  No such file or directory", you should add the path to the
-  gsl lib (for example, */home/user/MET/gsl-2.1/lib*)
-  to your LD_LIBRARY_PATH.
+  .. dropdown:: Troubleshooting Help
+		
+     * Add the lib dir to your LD_LIBRARY_PATH. For example, if you receive
+       the following error: "./mode_analysis: error while loading shared
+       libraries: libgsl.so.19: cannot open shared object file:
+       No such file or directory", you should add the path to the
+       gsl lib (for example, */home/user/MET/gsl-2.1/lib*)
+       to your LD_LIBRARY_PATH.
 
 General troubleshooting
 -----------------------
 
-* For configuration files used, make certain to use empty square brackets
-  (e.g. [ ]) to indicate no stratification is desired. Do NOT use empty
-  double quotation marks inside square brackets (e.g. [""]).
+  .. dropdown:: Troubleshooting Help
+		
+     * For configuration files used, make certain to use empty square brackets
+       (e.g. [ ]) to indicate no stratification is desired. Do NOT use empty
+       double quotation marks inside square brackets (e.g. [""]).
 
-* Have you designated all the required command line arguments?
+     * Have you designated all the required command line arguments?
 
-* Try rerunning with a higher verbosity level. Increasing the verbosity
-  level to 4 or 5 prints much more diagnostic information to the screen. 
+     * Try rerunning with a higher verbosity level. Increasing the verbosity
+       level to 4 or 5 prints much more diagnostic information to the screen. 
 
 Where to get help
 =================
 
-If none of the above suggestions have helped solve your problem, help
-is available through the
-`METplus GitHub Discussions Forum <https://github.com/dtcenter/METplus/discussions>`_.
+  .. dropdown:: Troubleshooting Help
+
+     If none of the above suggestions have helped solve your problem, help
+     is available through the
+     `METplus GitHub Discussions Forum <https://github.com/dtcenter/METplus/discussions>`_.
 
 
 How to contribute code
 ======================
 
-If you have code you would like to contribute, we will gladly consider
-your contribution. Please create a post in the
-`METplus GitHub Discussions Forum <https://github.com/dtcenter/METplus/discussions>`_.
-
+  .. dropdown:: Troubleshooting Help
+		
+     If you have code you would like to contribute, we will gladly consider
+     your contribution. Please create a post in the
+     `METplus GitHub Discussions Forum <https://github.com/dtcenter/METplus/discussions>`_.
