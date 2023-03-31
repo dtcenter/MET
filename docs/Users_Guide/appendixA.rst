@@ -1938,7 +1938,8 @@ NetCDF install issues
 		     MET_NETCDFLIB='/home/username/local/lib'
 
 
-     Either MET_NETCDF **OR** MET_NETCDFINC **AND** MET_NETCDFLIB need to be set.
+     Either MET_NETCDF **OR** MET_NETCDFINC **AND** MET_NETCDFLIB
+     need to be set.
      If the NetCDF include files are in */home/username/local/include* and the
      NetCDF library files are in */home/username/local/lib*, unset the
      MET_NETCDF environment variable, then run "make clean", reconfigure,
