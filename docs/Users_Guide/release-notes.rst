@@ -9,8 +9,16 @@ When applicable, release notes are followed by the GitHub issue number which des
 enhancement, or new feature (`MET GitHub issues <https://github.com/dtcenter/MET/issues>`_).
 Important issues are listed **in bold** for emphasis.
 
-MET Version 11.0.1-rc1 release notes (20230221)
------------------------------------------------
+MET Version 11.0.2 release notes (20230330)
+-------------------------------------------
+
+* Bugfixes:
+
+   * Bugfix: Fix support for the YYYYMMDD format in NetCDF level timestrings (`#2482 <https://github.com/dtcenter/MET/issues/2482>`_).
+   * Bugfix: AERONET the lat/lon is not changed with different station ID (`#2493 <https://github.com/dtcenter/MET/issues/2493>`_).
+
+MET Version 11.0.1 release notes (20230228)
+-------------------------------------------
 
 * Bugfixes:
 
@@ -27,6 +35,7 @@ MET Version 11.0.1-rc1 release notes (20230221)
    * Bugfix: Fix ASCII2NC to handle missing NDBC buoy location information (`#2426 <https://github.com/dtcenter/MET/issues/2426>`_).
    * Bugfix: Fix the MET vx_pointdata_python library to handle MET_PYTHON_EXE for python embedding of point observations (`#2428 <https://github.com/dtcenter/MET/issues/2428>`_).
    * Bugfix: Refine the regrid dictionary's data conversion and censoring operations and fix climo time matching logic for a single monthly climo file (`#2437 <https://github.com/dtcenter/MET/issues/2437>`_).
+   * Bugfix: Fix the creation of the MET User's Guide PDF (`#2449 <https://github.com/dtcenter/MET/issues/2449>`_).  
    * Bugfix: Fix inconsistent ASCII2NC AIRNOW location lookup logic (`#2452 <https://github.com/dtcenter/MET/issues/2452>`_).  
   
 MET Version 11.0.0 release notes (20221209)
