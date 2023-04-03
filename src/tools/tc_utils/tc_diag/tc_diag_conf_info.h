@@ -48,34 +48,7 @@ struct TCDiagNcOutInfo {
 
 ////////////////////////////////////////////////////////////////////////
 
-struct TCDiagDomainInfo {
-
-   // TcrmwData structure for creating a TcrmwGrid object
-   TcrmwData data;
-
-   double delta_range_km;
-
-   // Diagnostic scripts to be run
-   StringArray diag_script;
-
-   // Flag to write this grid to the output
-   bool write_nc;
-
-   // Corresponding NetCDF dimensions
-   netCDF::NcDim range_dim;
-   netCDF::NcDim azimuth_dim;
-
-      //////////////////////////////////////////////////////////////////
-
-   TCDiagDomainInfo();
-   bool operator==(const TCDiagDomainInfo &);
-
-   void clear();
-};
-
-////////////////////////////////////////////////////////////////////////
-
-class TCDiagDataOpt {
+class TCDiagDomainInfo {
 
    private:
 
@@ -83,24 +56,41 @@ class TCDiagDataOpt {
 
    public:
 
-      TCDiagDataOpt();
-     ~TCDiagDataOpt();
+      TCDiagDomainInfo();
+      ~TCDiagDomainInfo();
 
-      //////////////////////////////////////////////////////////////////
+      // TcrmwData structure for creating a TcrmwGrid object
+      TcrmwData data;
+      double delta_range_km;
 
-      // VarInfo pointer (allocated)
-      VarInfo *var_info;
+      // Domain data files
+      StringArray data_files;
 
-      // Domains for which this variable should be read
-      StringArray domain_sa;
+      // Vector of VarInfo pointers (not allocated)
+      std::vector<VarInfo *> var_info_ptr;
+
+      // Diagnostic scripts to be run
+      StringArray diag_script;
+
+      // Flag to write this grid to the output
+      bool write_nc;
+
+      // Corresponding NetCDF dimensions
+      netCDF::NcDim range_dim;
+      netCDF::NcDim azimuth_dim;
 
       //////////////////////////////////////////////////////////////////
 
       void clear();
 
-      void process_config(GrdFileType, Dictionary &);
+      ConcatString parse_domain_info(Dictionary &);
 
+      int get_n_data() const;
 };
+
+////////////////////////////////////////////////////////////////////////
+
+inline int TCDiagDomainInfo::get_n_data() const { return var_info_ptr.size(); }
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -131,8 +121,8 @@ class TCDiagConfInfo {
       NumArray     valid_hour;
       NumArray     lead_time;
 
-      // Vector of options for each data.field entry
-      std::vector<TCDiagDataOpt> data_opt;
+      // Vector of VarInfo objects from data.field (allocated)
+      std::vector<VarInfo *> var_info;
 
       // Mapping of domain name to TCDiagDomainInfo
       std::map<std::string,TCDiagDomainInfo> domain_info_map;
@@ -161,20 +151,18 @@ class TCDiagConfInfo {
       void clear();
 
       void read_config(const char *, const char *);
-      void process_config(GrdFileType);
+      void process_config(GrdFileType,
+                          std::map<std::string,StringArray>);
 
-      void parse_domain_info_map();
-      void parse_domain_info(Dictionary &,
-                             ConcatString &,
-                             TCDiagDomainInfo &);
+      void parse_domain_info_map(std::map<std::string,StringArray>);
       void parse_nc_diag_info();
 
-      int get_n_data() const;
+      int get_n_domain() const;
 };
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int TCDiagConfInfo::get_n_data() const { return data_opt.size(); }
+inline int TCDiagConfInfo::get_n_domain() const { return domain_info_map.size(); }
 
 ////////////////////////////////////////////////////////////////////////
 

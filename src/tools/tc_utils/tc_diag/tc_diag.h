@@ -94,30 +94,7 @@ static ConcatString out_prefix;
 // Output NetCDF file
 static ConcatString nc_out_file;
 static NcFile*      nc_out = (NcFile*) 0;
-static NcDim        pressure_dim;
 static NcDim        track_point_dim;
-static NcVar        lat_arr_var;
-static NcVar        lon_arr_var;
-static NcVar        valid_time_var;
-static NcVar        data_var;
-static NcVar        wind_r_var;
-static NcVar        wind_a_var;
-
-static vector<NcVar> data_vars;
-static vector<NcVar> azi_mean_data_vars;
-
-static map<string, NcVar> data_3d_vars;
-
-// List of output NetCDF variable names
-static StringArray nc_var_sa;
-
-static map<string, vector<string> > variable_levels;
-static map<string, string> variable_long_names;
-static map<string, string> variable_units;
-
-static set<string> pressure_level_strings;
-static set<double> pressure_levels;
-static map<string, int> pressure_level_indices;
 
 ////////////////////////////////////////////////////////////////////////
 //

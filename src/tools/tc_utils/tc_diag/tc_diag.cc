@@ -86,6 +86,10 @@ static void compute_lat_lon(TcrmwGrid&, double*, double*);
 // - 1 NetCDF diag file per track (unless that's turned off)
 // - 1 Gridded NetCDF file per track with the raw and/or cyl coordinate data used to compute diagnostics (unless that's turned off) - Should we combine with above?
 //
+// JHG note that "regrid" appears in the TC-Diag and TC-RMW config files
+// I think it currently only applies to the raw data, meaning we can regrid
+// the raw data PRIOR TO the cyl coordinate transformation. Wondering if we
+// need options to support the cyl coordinate transformation?
 
 int met_main(int argc, char *argv[]) {
 
@@ -147,7 +151,7 @@ void usage() {
 void process_command_line(int argc, char **argv) {
    CommandLine cline;
    ConcatString default_config_file;
-   StringArray domain_list, data_files;
+   StringArray data_files;
 
    // Default output directory
    out_dir = replace_path(default_out_dir);
@@ -195,7 +199,6 @@ void process_command_line(int argc, char **argv) {
    for(it = data_files_map.begin(); it != data_files_map.end(); it++) {
       data_files = parse_file_list(it->second);
       data_files_map[it->first] = data_files;
-      domain_list.add(it->first);
    }
 
    // Read config files
@@ -205,18 +208,7 @@ void process_command_line(int argc, char **argv) {
    set_file_type(data_files);
 
    // Process the configuration
-   conf_info.process_config(file_type);
-
-   // Check that each command line domain appears in the config file
-   for(int i=0; i<domain_list.n(); i++) {
-      if(conf_info.domain_info_map.count(domain_list[i]) == 0) {
-         mlog << Error << "\nprocess_command_line() -> "
-              << "the \"" << domain_list[i] << "\" domain is specified "
-              << "on the command line but does not appear in the \""
-              << conf_key_domain_info << "\" config file entry!\n\n";
-         exit(1);
-      }
-   }
+   conf_info.process_config(file_type, data_files_map);
 
    return;
 }
@@ -747,11 +739,16 @@ void process_track_points(const TrackInfoArray& tracks) {
       mlog << Debug(3) << "Processing track points for "
            << unix_to_yyyymmdd_hhmmss(valid_ta[i]) << ".\n";
 
-      // Read the data gridded data for this valid time
+      // Read ALL the gridded data for this valid time for ALL domains
       // JHG process_fields(valid_ta[i], tracks);
+      // store it as a map of domain to DataPlaneArray?
 
       // Parallel: Process the current valid time for all the tracks
       for(j=0; j<tracks.n(); j++) {
+
+         // Parallel: Loop over domain info, do coordinate transformation, and run diagnostic scripts
+
+
 
          // JHG work here
          // compute_diagnostics(...);
@@ -804,13 +801,13 @@ I could either require that the domain name be set to the storm id (or something
 
 void process_fields(const TrackPoint& point) {
    DataPlane data_dp;
-
+/* JHG this has moved up
    // Loop over the fields to be processed
-   for(int i_var=0; i_var<conf_info.data_opt.size(); i_var++) {
+   for(int i_var=0; i_var<conf_info.domain_info_map.size(); i_var++) {
 
       // Update the variable info with the valid time of the track point
       VarInfo *var_info = conf_info.data_opt[i_var].var_info;
-/* JHG this has moved up
+
       // Store pointer to the grid info
       TCRMWGridInfo *gi = conf_info.data_opt[i_var].grid_info;
 
@@ -832,7 +829,7 @@ void process_fields(const TrackPoint& point) {
 
       // Compute lat and lon coordinate arrays
       compute_lat_lon(tcrmw_grid, lat_arr, lon_arr);
-*/
+
       // JHG, write to nc?
 
       // Clean up
@@ -840,7 +837,7 @@ void process_fields(const TrackPoint& point) {
       if(lon_arr) { delete[] lon_arr; lon_arr = (double *) 0; }
 
    } // end for i_var
-
+*/
    return;
 }
 /* JHG keep working here
