@@ -1974,18 +1974,14 @@ General troubleshooting
 Where to get help
 =================
 
-  .. dropdown:: Troubleshooting Help
-
-     If none of the above suggestions have helped solve your problem, help
-     is available through the
-     `METplus GitHub Discussions Forum <https://github.com/dtcenter/METplus/discussions>`_.
+If none of the above suggestions have helped solve your problem, help
+is available through the
+`METplus GitHub Discussions Forum <https://github.com/dtcenter/METplus/discussions>`_.
 
 
 How to contribute code
 ======================
-
-  .. dropdown:: Troubleshooting Help
 		
-     If you have code you would like to contribute, we will gladly consider
-     your contribution. Please create a post in the
-     `METplus GitHub Discussions Forum <https://github.com/dtcenter/METplus/discussions>`_.
+If you have code you would like to contribute, we will gladly consider
+your contribution. Please create a post in the
+`METplus GitHub Discussions Forum <https://github.com/dtcenter/METplus/discussions>`_.
