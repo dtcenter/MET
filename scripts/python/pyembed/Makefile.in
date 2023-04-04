@@ -88,7 +88,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-subdir = data/wrappers
+subdir = scripts/python/pyembed
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -152,8 +152,8 @@ am__uninstall_files_from_dir = { \
     || { echo " ( cd '$$dir' && rm -f" $$files ")"; \
          $(am__cd) "$$dir" && rm -f $$files; }; \
   }
-am__installdirs = "$(DESTDIR)$(wrappersdir)"
-DATA = $(wrappers_DATA)
+am__installdirs = "$(DESTDIR)$(pyembeddir)"
+DATA = $(pyembed_DATA)
 RECURSIVE_CLEAN_TARGETS = mostlyclean-recursive clean-recursive	\
   distclean-recursive maintainer-clean-recursive
 am__recursive_targets = \
@@ -355,9 +355,9 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 SUBDIRS = 
-wrappersdir = $(pkgdatadir)/wrappers
-wrappers_DATA = \
-     set_python_env.py \
+pyembeddir = $(pkgdatadir)/python/pyembed
+pyembed_DATA = \
+     python_embedding.py \
      read_tmp_dataplane.py \
      read_tmp_ascii.py \
      read_tmp_point_nc.py \
@@ -366,7 +366,7 @@ wrappers_DATA = \
      write_tmp_point_nc.py \
      write_tmp_mpr.py
 
-EXTRA_DIST = ${wrappers_DATA}
+EXTRA_DIST = ${pyembed_DATA}
 MAINTAINERCLEANFILES = Makefile.in 
 all: all-recursive
 
@@ -380,9 +380,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign data/wrappers/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign scripts/python/pyembed/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign data/wrappers/Makefile
+	  $(AUTOMAKE) --foreign scripts/python/pyembed/Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
 	  *config.status*) \
@@ -400,27 +400,27 @@ $(top_srcdir)/configure:  $(am__configure_deps)
 $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(am__aclocal_m4_deps):
-install-wrappersDATA: $(wrappers_DATA)
+install-pyembedDATA: $(pyembed_DATA)
 	@$(NORMAL_INSTALL)
-	@list='$(wrappers_DATA)'; test -n "$(wrappersdir)" || list=; \
+	@list='$(pyembed_DATA)'; test -n "$(pyembeddir)" || list=; \
 	if test -n "$$list"; then \
-	  echo " $(MKDIR_P) '$(DESTDIR)$(wrappersdir)'"; \
-	  $(MKDIR_P) "$(DESTDIR)$(wrappersdir)" || exit 1; \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(pyembeddir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(pyembeddir)" || exit 1; \
 	fi; \
 	for p in $$list; do \
 	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
 	  echo "$$d$$p"; \
 	done | $(am__base_list) | \
 	while read files; do \
-	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(wrappersdir)'"; \
-	  $(INSTALL_DATA) $$files "$(DESTDIR)$(wrappersdir)" || exit $$?; \
+	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(pyembeddir)'"; \
+	  $(INSTALL_DATA) $$files "$(DESTDIR)$(pyembeddir)" || exit $$?; \
 	done
 
-uninstall-wrappersDATA:
+uninstall-pyembedDATA:
 	@$(NORMAL_UNINSTALL)
-	@list='$(wrappers_DATA)'; test -n "$(wrappersdir)" || list=; \
+	@list='$(pyembed_DATA)'; test -n "$(pyembeddir)" || list=; \
 	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
-	dir='$(DESTDIR)$(wrappersdir)'; $(am__uninstall_files_from_dir)
+	dir='$(DESTDIR)$(pyembeddir)'; $(am__uninstall_files_from_dir)
 
 # This directory's subdirectories are mostly independent; you can cd
 # into them and run 'make' without going through this Makefile.
@@ -584,7 +584,7 @@ check: check-recursive
 all-am: Makefile $(DATA)
 installdirs: installdirs-recursive
 installdirs-am:
-	for dir in "$(DESTDIR)$(wrappersdir)"; do \
+	for dir in "$(DESTDIR)$(pyembeddir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
 install: install-recursive
@@ -638,7 +638,7 @@ info: info-recursive
 
 info-am:
 
-install-data-am: install-wrappersDATA
+install-data-am: install-pyembedDATA
 
 install-dvi: install-dvi-recursive
 
@@ -682,7 +682,7 @@ ps: ps-recursive
 
 ps-am:
 
-uninstall-am: uninstall-wrappersDATA
+uninstall-am: uninstall-pyembedDATA
 
 .MAKE: $(am__recursive_targets) install-am install-strip
 
@@ -693,11 +693,11 @@ uninstall-am: uninstall-wrappersDATA
 	install-data-am install-dvi install-dvi-am install-exec \
 	install-exec-am install-html install-html-am install-info \
 	install-info-am install-man install-pdf install-pdf-am \
-	install-ps install-ps-am install-strip install-wrappersDATA \
+	install-ps install-ps-am install-pyembedDATA install-strip \
 	installcheck installcheck-am installdirs installdirs-am \
 	maintainer-clean maintainer-clean-generic mostlyclean \
 	mostlyclean-generic pdf pdf-am ps ps-am tags tags-am uninstall \
-	uninstall-am uninstall-wrappersDATA
+	uninstall-am uninstall-pyembedDATA
 
 .PRECIOUS: Makefile
 

@@ -18,10 +18,10 @@
 
 SUBDIRS =
 
-wrappersdir = $(pkgdatadir)/wrappers
+pyembeddir = $(pkgdatadir)/python/pyembed
 
-wrappers_DATA = \
-     set_python_env.py \
+pyembed_DATA = \
+     python_embedding.py \
      read_tmp_dataplane.py \
      read_tmp_ascii.py \
      read_tmp_point_nc.py \
@@ -30,6 +30,6 @@ wrappers_DATA = \
      write_tmp_point_nc.py \
      write_tmp_mpr.py
 
-EXTRA_DIST = ${wrappers_DATA}
+EXTRA_DIST = ${pyembed_DATA}
 
 MAINTAINERCLEANFILES 	= Makefile.in 

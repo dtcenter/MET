@@ -298,6 +298,12 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 pythonexamplesdir = $(pkgdatadir)/python/examples
 pythonexamples_DATA = \
+	derive_WRF_semilatlon.py \
+	read_ascii_mpr.py \
+	read_ascii_numpy_grid.py \
+	read_ascii_numpy.py \
+	read_ascii_point.py \
+	read_ascii_xarray.py \
 	read_met_point_obs.py
 
 EXTRA_DIST = ${pythonexamples_DATA}
