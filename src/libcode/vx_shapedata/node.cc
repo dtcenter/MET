@@ -130,7 +130,7 @@ void Node::add_child(const Polyline * poly) {
    Node *n_ptr = (Node *) 0;
 
    // Check for first child
-   if(child == NULL) {
+   if(child == nullptr) {
 
       child = new Node;
 
@@ -144,8 +144,8 @@ void Node::add_child(const Polyline * poly) {
 
       child->p = *(poly);
 
-      child->child = NULL;
-      child->sibling = NULL;
+      child->child = nullptr;
+      child->sibling = nullptr;
    }
    // Existing children
    else {
@@ -172,8 +172,8 @@ void Node::add_child(const Polyline * poly) {
 
       n_ptr->sibling->p = *(poly);
 
-      n_ptr->sibling->child = NULL;
-      n_ptr->sibling->sibling = NULL;
+      n_ptr->sibling->child = nullptr;
+      n_ptr->sibling->sibling = nullptr;
    }
 
    return;

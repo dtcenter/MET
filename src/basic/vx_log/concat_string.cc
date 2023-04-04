@@ -530,7 +530,7 @@ int ConcatString::format(const char *fmt, ...)
 {
    va_list vl;
    int status = -1;
-   char *tmp = NULL;
+   char *tmp = nullptr;
 
    va_start(vl, fmt);
    status = vasprintf(&tmp, fmt, vl);
@@ -1180,7 +1180,7 @@ bool is_empty(const char * text)
 
 {
 
-return ( (text == NULL) || (*text == 0) || (m_strlen(text) == 0));
+return ( (text == nullptr) || (*text == 0) || (m_strlen(text) == 0));
 
 }
 
@@ -1201,7 +1201,7 @@ env_value.clear();
 
 // SonarQube: two ifs to avoid the side effect by the logical || operator
 if (str.find('/') != string::npos) return(false);
-if ((ptr = getenv(env_name)) == NULL) return(false);
+if ((ptr = getenv(env_name)) == nullptr) return(false);
 
 env_value = ptr;
 str = env_value;
@@ -1241,7 +1241,7 @@ while ((pos = str.find('$', pos)) != string::npos) {
       }
    }
    nested_name = str.substr(pos_env, (pos_env_end-pos_env));
-   if((ptr = getenv(nested_name.c_str())) == NULL) {
+   if((ptr = getenv(nested_name.c_str())) == nullptr) {
       mlog << Error << "\n" << method_name
            << "can't get value of nested environment variable \""
            << nested_name << "\" from " << env_name << "\n\n";

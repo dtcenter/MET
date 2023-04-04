@@ -672,7 +672,7 @@ void PairBase::calc_obs_summary(){
       station_values_t svt = map_val[map_key[i]];
 
       //  parse the single key string
-      char** mat = NULL;
+      char** mat = nullptr;
       if( 5 != regex_apply("^([^:]+):([^:]+):([^:]+):([^:]+)$", 5,
                            map_key[i].c_str(), mat) ){
          mlog << Error << "\nPairBase::calc_obs_summary() -> "

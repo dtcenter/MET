@@ -148,7 +148,7 @@ void process_command_line(int argc, char **argv) {
 void process_search_dirs() {
 
    // Retrieve the file lists
-   tcst_files = get_filenames(tcst_source, NULL, tc_stat_file_ext);
+   tcst_files = get_filenames(tcst_source, nullptr, tc_stat_file_ext);
 
    // Check for matching files
    if(tcst_files.n_elements() == 0) {

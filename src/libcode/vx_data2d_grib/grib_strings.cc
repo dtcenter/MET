@@ -278,7 +278,7 @@ int str_to_grib_code(const char *c, int &pcode,
    m_strncpy(tmp_str, c, buf_len, method_name);
 
    // Retrieve the first token containing the GRIB code info
-   if((ptr = strtok_r(tmp_str, "()", &save_ptr)) == NULL) {
+   if((ptr = strtok_r(tmp_str, "()", &save_ptr)) == nullptr) {
       mlog << Error << "\n" << method_name
            << "problems parsing the string \""
            << c << "\".\n\n";
@@ -289,7 +289,7 @@ int str_to_grib_code(const char *c, int &pcode,
    gc = str_to_grib_code(ptr, ptv);
 
    // Check for probability information
-   if((ptr = strtok_r(NULL, "()", &save_ptr)) != NULL) {
+   if((ptr = strtok_r(nullptr, "()", &save_ptr)) != nullptr) {
       pcode = str_to_prob_info(ptr, pthresh_lo, pthresh_hi, ptv);
    }
    // No probability information specified
@@ -335,7 +335,7 @@ int str_to_prob_info(const char *c, double &pthresh_lo, double &pthresh_hi,
       gc  = str_to_grib_code(ptr, ptv);
 
       // Parse the threshold
-      ptr = strtok_r(NULL, "<>", &save_ptr);
+      ptr = strtok_r(nullptr, "<>", &save_ptr);
       if(n_lt > 0) pthresh_hi = atof(ptr);
       else         pthresh_lo = atof(ptr);
    }
@@ -348,11 +348,11 @@ int str_to_prob_info(const char *c, double &pthresh_lo, double &pthresh_hi,
       else         pthresh_hi = atof(ptr);
 
       // Parse the GRIB code
-      ptr = strtok_r(NULL, "<>", &save_ptr);
+      ptr = strtok_r(nullptr, "<>", &save_ptr);
       gc  = str_to_grib_code(ptr, ptv);
 
       // Parse the second threshold
-      ptr = strtok_r(NULL, "<>", &save_ptr);
+      ptr = strtok_r(nullptr, "<>", &save_ptr);
       if(n_lt > 0) pthresh_hi = atof(ptr);
       else         pthresh_lo = atof(ptr);
    }
