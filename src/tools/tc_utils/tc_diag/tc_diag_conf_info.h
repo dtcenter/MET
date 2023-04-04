@@ -83,7 +83,7 @@ class TCDiagDomainInfo {
 
       void clear();
 
-      ConcatString parse_domain_info(Dictionary &);
+      void parse_domain_info(Dictionary &, ConcatString &);
 
       int get_n_data() const;
 };

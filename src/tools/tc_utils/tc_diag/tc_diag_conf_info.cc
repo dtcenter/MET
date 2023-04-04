@@ -145,10 +145,10 @@ void TCDiagDomainInfo::clear() {
 
 ////////////////////////////////////////////////////////////////////////
 
-ConcatString TCDiagDomainInfo::parse_domain_info(Dictionary &dict) {
+void TCDiagDomainInfo::parse_domain_info(Dictionary &dict, ConcatString &domain) {
 
    // Conf: domain
-   ConcatString domain(dict.lookup_string(conf_key_domain));
+   domain = dict.lookup_string(conf_key_domain);
 
    // Initialize
    clear();
@@ -162,16 +162,13 @@ ConcatString TCDiagDomainInfo::parse_domain_info(Dictionary &dict) {
    // Conf: azimuth_n
    data.azimuth_n = dict.lookup_int(conf_key_n_azimuth);
 
-   // Conf: max_range
-   data.range_max_km = dict.lookup_double(conf_key_max_range);
-
    // Conf: delta_range
    delta_range_km = dict.lookup_double(conf_key_delta_range);
 
    // Conf: diag_script
    diag_script = dict.lookup_string_array(conf_key_diag_script);
 
-   return(domain);
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -410,34 +407,28 @@ void TCDiagConfInfo::process_config(GrdFileType file_type,
 ////////////////////////////////////////////////////////////////////////
 
 void TCDiagConfInfo::parse_domain_info_map(map<string,StringArray> data_files_map) {
+   Dictionary *dict = (Dictionary *) 0;
 
-   const DictionaryEntry * e = (const DictionaryEntry *) 0;
+   // Conf: domain_info
+   dict = conf.lookup_array(conf_key_domain_info);
 
-   e = conf.lookup(conf_key_domain_info);
-
-   if(!e) {
+   if(!dict) {
       mlog << Error << "\nTCDiagConfInfo::parse_domain_info_map() -> "
-           << "lookup failed for key \"" << conf_key_domain_info
+           << "array lookup failed for key \"" << conf_key_domain_info
            << "\"\n\n";
       exit(1);
    }
 
-   const ConfigObjectType type = e->type();
-
-   // It should be an array of dictionaries
-   if(type != ArrayType) {
-      mlog << Error << "\nTCDiagConfInfo::parse_domain_info_map() -> "
-           << "bad type (" << configobjecttype_to_string(type)
-           << ") for key \"" << conf_key_domain_info << "\"\n\n";
-      exit(1);
-   }
-
    // Parse each grid info object
-   for(int i=0; i<e->array_value()->n_entries(); i++) {
+   for(int i=0; i<dict->n_entries(); i++) {
       ConcatString domain;
+      Dictionary di_dict;
       TCDiagDomainInfo di;
 
-      domain = di.parse_domain_info(e->array_value()[i]);
+      di_dict = *((*dict)[i]->dict_value());
+
+      // Parse the current domain info
+      di.parse_domain_info(di_dict, domain);
 
       // Store the domain-specifc data files
       if(data_files_map.count(domain) > 0) {
@@ -445,8 +436,9 @@ void TCDiagConfInfo::parse_domain_info_map(map<string,StringArray> data_files_ma
       }
       else {
          mlog << Error << "\nTCDiagConfInfo::parse_domain_info_map() -> "
-              << "no \"-data\" command line option provided for the \"" << domain
-              << "\" domain \"" << conf_key_domain_info << "\" config file entry!\n\n";
+              << "no \"-data " << domain << "\" command line option provided for the \""
+              << conf_key_domain_info << "." << conf_key_domain << "\" = \"" << domain
+              << "\" config file entry!\n\n";
          exit(1);
       }
 
@@ -468,8 +460,9 @@ void TCDiagConfInfo::parse_domain_info_map(map<string,StringArray> data_files_ma
    for(it = data_files_map.begin(); it != data_files_map.end(); it++) {
       if(domain_info_map.count(it->first) == 0) {
          mlog << Error << "\nTCDiagConfInfo::parse_domain_info_map() -> "
-              << "no \"" << conf_key_domain_info << "\" entry found for the \""
-              << it->first << "\" domain \"-data\" command line option!\n\n";
+              << "no \"" << conf_key_domain_info << "." << conf_key_domain << "\" = \""
+              << it->first << "\" config file entry provided for the \"-data "
+              << it->first << "\" command line option!\n\n";
          exit(1);
       }
    }
