@@ -1037,12 +1037,6 @@ mlog << Error
 
 exit ( 1 );
 
-   //
-   //  done
-   //
-
-return;
-
 }
 
 
@@ -1997,8 +1991,6 @@ mlog << Error
      << "\n\n  CloudsatSwathFile::operator=(const CloudsatSwathFile &) -> should never be called!\n\n";
 
 exit ( 1 );
-
-return ( * this );
 
 }
 

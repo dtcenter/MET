@@ -143,10 +143,6 @@ mlog << Error << "\n\n  CgraphBase::CgraphBase(const CgraphBase &) -> should nev
 
 exit ( 1 );
 
-   // cgraph_init_from_scratch();
-   // 
-   // assign(c);
-
 }
 
 
@@ -160,13 +156,6 @@ CgraphBase & CgraphBase::operator=(const CgraphBase &)
 mlog << Error << "\n\n  operator=CgraphBase(const CgraphBase &) -> should never be called!\n\n";
 
 exit ( 1 );
-
-
-// if ( this == &c )  return ( * this );
-// 
-// assign(c);
-
-return ( * this );
 
 }
 
@@ -314,8 +303,6 @@ if ( empty (filename) )  {
    mlog << Error << "\n\n  CgraphBase::open() -> empty filename!\n\n";
 
    exit ( 1 );
-
-   // return ( false );
 
 }
 
@@ -1662,10 +1649,6 @@ mlog << Error << "\n\n  Cgraph::Cgraph(const Cgraph &) -> should never be called
 
 exit ( 1 );
 
-   // cgraph2_init_from_scratch();
-   // 
-   // assign(c);
-
 }
 
 
@@ -1679,13 +1662,6 @@ Cgraph & Cgraph::operator=(const Cgraph &)
 mlog << Error << "\n\n  operator=Cgraph(const Cgraph &) -> should never be called!\n\n";
 
 exit ( 1 );
-
-
-// if ( this == &c )  return ( * this );
-// 
-// assign(c);
-
-return ( * this );
 
 }
 
@@ -2226,8 +2202,6 @@ int my_conic (const FT_Vector * control, const FT_Vector * to, void * u)
 mlog << Error << "\n\n  my_conic() -> should never be called!\n\n";
 
 exit ( 1 );
-
-return ( 0 );
 
 }
 

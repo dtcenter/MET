@@ -904,10 +904,6 @@ mlog << Error << "\nvoid Pcm::autocrop() -> not yet implemented\n\n";
 
 exit ( 1 );
 
-
-
-return;
-
 }
 
 

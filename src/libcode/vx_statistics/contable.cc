@@ -1649,8 +1649,6 @@ mlog << Error << "\nTTContingencyTable::set_size(int) -> "
 
 exit ( 1 );
 
-return;
-
 }
 
 
@@ -1665,8 +1663,6 @@ mlog << Error << "\nTTContingencyTable::set_size(int, int) -> "
      << "2 x 2 tables cannot be resized!\n\n";
 
 exit ( 1 );
-
-return;
 
 }
 

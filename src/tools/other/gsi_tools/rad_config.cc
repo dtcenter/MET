@@ -66,10 +66,6 @@ GsiRadConfig::GsiRadConfig(const GsiRadConfig & c)
 
 {
 
-// init_from_scratch();
-// 
-// assign(c);
-
 mlog << Error  << "\n\n  GsiRadConfig::GsiRadConfig(const GsiRadConfig &) -> should never be called!\n\n";
 
 exit ( 1 );
@@ -84,16 +80,9 @@ GsiRadConfig & GsiRadConfig::operator=(const GsiRadConfig & c)
 
 {
 
-// if ( this == &c )  return ( * this );
-// 
-// assign(c);
-
 mlog << Error  << "\n\n  GsiRadConfig::operator=(const GsiRadConfig &) -> should never be called!\n\n";
 
 exit ( 1 );
-
-
-return ( * this );
 
 }
 

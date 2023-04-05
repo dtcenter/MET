@@ -123,8 +123,6 @@ cerr << "\n\n   usage: " << program_name << " nceptab_source_file.c [ more such 
 
 exit ( 1 );
 
-return;
-
 }
 
 
