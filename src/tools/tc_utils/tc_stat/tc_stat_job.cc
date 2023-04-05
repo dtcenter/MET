@@ -1431,7 +1431,7 @@ ConcatString TCStatJob::serialize() const {
    if(DumpFile.length() > 0)
       s << "-dump_row " << DumpFile << " ";
    if(StatFile.length() > 0)
-      s << "-stat_row " << StatFile << " ";
+      s << "-out_stat " << StatFile << " ";
 
    return(s);
 }
@@ -2158,7 +2158,7 @@ void TCStatJobSummary::do_job(const StringArray &file_list,
    // Process the filter output
    if(JobOut) do_output(*JobOut);
    else       do_output(cout);
-
+   
    return;
 }
 
@@ -3166,6 +3166,8 @@ void TCStatJobRIRW::do_job(const StringArray &file_list,
    if(JobOut) do_output(*JobOut);
    else       do_output(cout);
 
+   if(StatOut) do_output(*StatOut);
+   
    return;
 }
 
@@ -3394,6 +3396,10 @@ void TCStatJobRIRW::do_ctc_output(ostream &out) {
    // Initialize row and column indices
    r = c = 0;
 
+   // testing
+   if(StatOut)
+      cout << "YES, -out_stat option invoked" << endl;
+   
    // Write the header row
    out_at.set_entry(r, c++, "COL_NAME:");
 
@@ -3412,7 +3418,7 @@ void TCStatJobRIRW::do_ctc_output(ostream &out) {
       out_at.set_entry(r, c++, ByColumn[i]);
    }
 
-   // Write the header columns
+   // Write the header columns   
    write_header_row(ctc_columns, n_ctc_columns, 0, out_at, r, c);
 
    // Loop over the map entries and populate the output table
