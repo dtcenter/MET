@@ -57,8 +57,6 @@ MetNcMetDataFile & MetNcMetDataFile::operator=(const MetNcMetDataFile &) {
    mlog << Error << "\nMetNcMetDataFile::operator=(const MetNcMetDataFile &) -> "
         << "should never be called!\n\n";
    exit(1);
-
-   return(*this);
 }
 
 ////////////////////////////////////////////////////////////////////////

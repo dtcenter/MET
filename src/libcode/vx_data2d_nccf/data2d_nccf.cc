@@ -71,8 +71,6 @@ MetNcCFDataFile & MetNcCFDataFile::operator=(const MetNcCFDataFile &) {
    mlog << Error << "\nMetNcCFDataFile::operator=(const MetNcCFDataFile &) -> "
         << "should never be called!\n\n";
    exit(1);
-
-   return(*this);
 }
 
 ////////////////////////////////////////////////////////////////////////

@@ -536,8 +536,6 @@ mlog << Error << "\nColorTable::interp(double) const -> confused!\n\n";
 
 exit ( 1 );
 
-return ( black );
-
 }
 
 

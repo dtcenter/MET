@@ -2417,17 +2417,11 @@ DictionaryStack & DictionaryStack::operator=(const DictionaryStack & s)
 
 {
 
-// if ( this == &s )  return ( * this );
-//
-// assign(s);
-
 mlog << Error
      << "\nDictionaryStack::operator=(const DictionaryStack &) -> "
      << "should never be called!\n\n";
 
 exit ( 1 );
-
-return ( * this );
 
 }
 
