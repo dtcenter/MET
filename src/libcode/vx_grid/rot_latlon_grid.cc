@@ -383,8 +383,6 @@ mlog << Error << "\nRotatedLatLonGrid::shift_right(int) -> "
 
 exit ( 1 );
 
-return;
-
 }
 
 

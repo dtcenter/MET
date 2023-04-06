@@ -1943,8 +1943,6 @@ mlog << Error << "\ndefault_media() -> "
 
 exit ( 1 );
 
-return ( no_document_media );
-
 }
 
 

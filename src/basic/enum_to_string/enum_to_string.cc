@@ -386,8 +386,6 @@ if ( debug )  {
 
 exit ( 1 );
 
-return;
-
 }
 
 

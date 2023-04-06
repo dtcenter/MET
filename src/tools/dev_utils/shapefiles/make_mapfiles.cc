@@ -206,8 +206,6 @@ cerr << "\nusage: " << program_name << ' '
 
 exit ( 1 );
 
-return;
-
 }
 
 
