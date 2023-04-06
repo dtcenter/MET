@@ -1362,7 +1362,7 @@ if ( rep ) {
 
    if (--rep->referenceCount == 0) delete rep;
 
-   rep = (GribFileRep *) NULL;
+   rep = (GribFileRep *) nullptr;
 
 }
 

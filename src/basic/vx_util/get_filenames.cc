@@ -185,7 +185,7 @@ if ( !directory )  {
 
 }
 
-while ( (entry = readdir(directory)) != NULL )  {
+while ( (entry = readdir(directory)) != nullptr )  {
 
    if ( strcmp(entry->d_name, "." ) == 0 )  continue;
    if ( strcmp(entry->d_name, "..") == 0 )  continue;

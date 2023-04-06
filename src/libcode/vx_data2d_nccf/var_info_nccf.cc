@@ -167,7 +167,7 @@ void VarInfoNcCF::set_magic(const ConcatString &nstr, const ConcatString &lstr) 
    set_name(nstr);
 
    // If there's no level specification, assume (*, *)
-   if(strchr(lstr.c_str(), '(') == NULL) {
+   if(strchr(lstr.c_str(), '(') == nullptr) {
       Level.set_req_name("*,*");
       Level.set_name("*,*");
       clear_dimension();
@@ -188,20 +188,20 @@ void VarInfoNcCF::set_magic(const ConcatString &nstr, const ConcatString &lstr) 
       Level.set_name(ptr);
 
       // If dimensions are specified, clear the default value
-      if (strchr(ptr, ',') != NULL) clear_dimension();
+      if (strchr(ptr, ',') != nullptr) clear_dimension();
 
       // Parse the dimensions
       bool as_offset = true;
-      while ((ptr2 = strtok_r(ptr, ",", &save_ptr)) != NULL) {
+      while ((ptr2 = strtok_r(ptr, ",", &save_ptr)) != nullptr) {
          // Check for wildcards
-         if (strchr(ptr2, '*') != NULL) { add_dimension(vx_data2d_star);
+         if (strchr(ptr2, '*') != nullptr) { add_dimension(vx_data2d_star);
          }
          else {
             as_offset = (*ptr2 != '@');
             if (!as_offset) ptr2++;
 
             // Check for a range of levels
-            if ((ptr3 = strchr(ptr2, '-')) != NULL) {
+            if ((ptr3 = strchr(ptr2, '-')) != nullptr) {
 
                // Check if a range has already been supplied
                if (Dimension.has(range_flag)) {
@@ -223,7 +223,7 @@ void VarInfoNcCF::set_magic(const ConcatString &nstr, const ConcatString &lstr) 
                }
             }
             // Check for a range of times
-            else if ((ptr3 = strchr(ptr2, ':')) != NULL) {
+            else if ((ptr3 = strchr(ptr2, ':')) != nullptr) {
                // Check if a range has already been supplied
                if (Dimension.has(range_flag)) {
                   mlog << Error << "\n" << method_name
@@ -236,7 +236,7 @@ void VarInfoNcCF::set_magic(const ConcatString &nstr, const ConcatString &lstr) 
                   // Store the dimension of the range and limits
                   *ptr3++ = 0;
                   char *ptr_inc = strchr(ptr3, ':');
-                  if (ptr_inc != NULL) *ptr_inc++ = 0;
+                  if (ptr_inc != nullptr) *ptr_inc++ = 0;
                   mlog << Debug(7) << method_name
                        << " start: " << ptr2 << ", end: " << ptr3 << "\n";
 
@@ -256,7 +256,7 @@ void VarInfoNcCF::set_magic(const ConcatString &nstr, const ConcatString &lstr) 
                   unixtime time_upper = datestring_end
                                         ? timestring_to_unix(ptr3)
                                         : (as_offset ? atoi(ptr3) : atof(ptr3));
-                  if (ptr_inc != NULL) {
+                  if (ptr_inc != nullptr) {
                      if (as_offset) increment = atoi(ptr_inc);
                      else {
                         increment = is_float(ptr_inc)
@@ -311,15 +311,15 @@ void VarInfoNcCF::set_magic(const ConcatString &nstr, const ConcatString &lstr) 
             }
          }
 
-         // Set ptr to NULL for next call to strtok
-         ptr = NULL;
+         // Set ptr to nullptr for next call to strtok
+         ptr = nullptr;
 
       } // end while
 
    } // end else
 
    // Check for "/PROB" to indicate a probability forecast
-   if (strstr(MagicStr.c_str(), "/PROB") != NULL) PFlag = 1;
+   if (strstr(MagicStr.c_str(), "/PROB") != nullptr) PFlag = 1;
 
    // Set the long name
    tmp_str.format("%s(%s)", req_name().text(), Level.req_name().text());

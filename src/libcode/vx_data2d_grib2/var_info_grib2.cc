@@ -376,7 +376,7 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
 
    //  check for a probability dictionary setting
    Dictionary* dict_prob;
-   if(NULL == (dict_prob = dict.lookup_dictionary(conf_key_prob, false, false))){
+   if(nullptr == (dict_prob = dict.lookup_dictionary(conf_key_prob, false, false))){
       mlog << Error << "\nVarInfoGrib2::set_dict() -> "
            << "if the field name is set to \"PROB\", then a prob dictionary "
            << "must be defined\n\n";

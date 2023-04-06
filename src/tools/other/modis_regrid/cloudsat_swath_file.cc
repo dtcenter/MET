@@ -1295,7 +1295,7 @@ StringArray a;
 
 Nattributes = 0;
 
-if ( (retval = SWinqattrs(SwathId, NULL, &att_buf_size)) < 0 )  {
+if ( (retval = SWinqattrs(SwathId, nullptr, &att_buf_size)) < 0 )  {
 
    mlog << Error
         << "\n\n  CloudsatSwath::get_attributes() -> can't get attribute buffer size\n\n";

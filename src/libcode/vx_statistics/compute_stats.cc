@@ -1461,7 +1461,7 @@ void compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps) {
 
       weighted_score = 0.;
       for (int i=0; i<SEEPS_MATRIX_SIZE; i++) pvf[i] = 0.;
-      if (density_vector != NULL) {
+      if (density_vector != nullptr) {
          //IDL: w = 1/d
          weight_sum = 0.;
          for (int i=0; i<count; i++) {
@@ -1490,7 +1490,7 @@ void compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps) {
             }
          }
 
-         if (density_vector != NULL) delete [] density_vector;
+         if (density_vector != nullptr) delete [] density_vector;
       }
       seeps_mprs.clear();
 
@@ -1577,7 +1577,7 @@ void compute_aggregated_seeps_grid(const DataPlane &fcst_dp, const DataPlane &ob
          seeps_score = bad_data_double;
          if (!is_eq(fcst_value, -9999.0) && !is_eq(obs_value, -9999.0)) {
             seeps_mpr = seeps_climo->get_record(ix, iy, fcst_value, obs_value);
-            if (seeps_mpr != NULL) {
+            if (seeps_mpr != nullptr) {
                fcst_cat = seeps_mpr->fcst_cat;
                obs_cat = seeps_mpr->obs_cat;
                if (fcst_cat == 0) {
@@ -1725,7 +1725,7 @@ double *compute_seeps_density_vector(const PairDataPoint *pd, SeepsAggScore *see
    if (seeps_cnt == 0) {
       mlog << Debug(1) << method_name
            << "no SEEPS_MPR available.\n";
-      return NULL;
+      return nullptr;
    }
 
    // Get lat/lon & convert them to radian and get sin/cos values

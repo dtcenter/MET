@@ -810,7 +810,7 @@ FT_UInt previous;
 FT_Glyph_Metrics * metrics = (FT_Glyph_Metrics *) 0;
 FT_Vector k_delta;
 const bool use_kerning = DoKerning && FT_HAS_KERNING(face);
-const char * new_string = (const char *) NULL;
+const char * new_string = (const char *) nullptr;
 bool first_char = false;
 bool last_char  = false;
 double x_bearing, y_bearing, advance;
@@ -2115,7 +2115,7 @@ if ( empty(in) )  {
 int j, k;
 char c0, c1;
 const int N = m_strlen(in);
-char * s = (char *) NULL;
+char * s = (char *) nullptr;
 FT_UInt fi_glyph_index = 0;
 FT_UInt fl_glyph_index = 0;
 
@@ -2161,7 +2161,7 @@ while ( j < N )  {
    //  done
    //
 
-out = s;  s = (char *) NULL;
+out = s;  s = (char *) nullptr;
 
 return;
 

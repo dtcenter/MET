@@ -274,7 +274,7 @@ void process_directory(const char * dir_name)
       // just skip it. If it is a directory, then call this function
       // with the directory name.
       //
-   while ((pde = readdir(dir)) != NULL)
+   while ((pde = readdir(dir)) != nullptr)
    {
          //
          // check if this is the directory "." or ".." and also skip
@@ -351,7 +351,7 @@ void process_directory(const char * dir_name)
                if (line.empty())
                   continue;
 
-               if (strstr(line.c_str(), "// ** Copyright UCAR (c) 19") != NULL)
+               if (strstr(line.c_str(), "// ** Copyright UCAR (c) 19") != nullptr)
                {
                   notice_found = true;
                   break;

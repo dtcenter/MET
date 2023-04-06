@@ -669,7 +669,7 @@ if ( !found )  {
    //  check x_slot and y_slot
    //
 
-if ( var == NULL || (var->x_slot < 0) || (var->y_slot < 0) )  {
+if ( var == nullptr || (var->x_slot < 0) || (var->y_slot < 0) )  {
 
    mlog << Error
         << "\nPinterpFile::data(NcVar *, const LongArray &, DataPlane &, double &) const -> "
@@ -804,7 +804,7 @@ bool PinterpFile::data(const char * var_name, const LongArray & a, DataPlane & p
    int time_index;
    bool found = false;
 
-   if (NULL != info) found = true;
+   if (nullptr != info) found = true;
    else found = get_nc_var_info(var_name, info);
 
    if ( !found )  return ( false );
@@ -850,7 +850,7 @@ bool PinterpFile::data(const char * var_name, const LongArray & a, DataPlane & p
 bool PinterpFile::get_nc_var_info(const char *var_name, NcVarInfo *&info) const {
    bool found = false;
 
-   if (NULL == info) {
+   if (nullptr == info) {
       for (int j=0; j<Nvars; ++j)  {
 
          if ( Var[j].name == var_name )  {

@@ -45,7 +45,7 @@ void write_netcdf_global(NcFile * f_out, const char *file_name,
    char hostname_str[max_str_len];
    char time_str[max_str_len];
 
-   unix_to_mdyhms(time(NULL), mon, day, yr, hr, min, sec);
+   unix_to_mdyhms(time(nullptr), mon, day, yr, hr, min, sec);
    snprintf(time_str, sizeof(time_str), "%.4i%.2i%.2i_%.2i%.2i%.2i",
            yr, mon, day, hr, min, sec);
    gethostname(hostname_str, max_str_len);

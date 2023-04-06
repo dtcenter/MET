@@ -104,7 +104,7 @@ void MetGrib2DataFile::close() {
 
 bool MetGrib2DataFile::open(const char * _filename) {
    Filename = _filename;
-   if( NULL == (FileGrib2 = met_fopen(Filename.c_str(), "r")) ){
+   if( nullptr == (FileGrib2 = met_fopen(Filename.c_str(), "r")) ){
       mlog << Error << "\nMetGrib2DataFile::open() -> "
            << "unable to open input GRIB2 file " << _filename << "\n\n";
       exit(1);
