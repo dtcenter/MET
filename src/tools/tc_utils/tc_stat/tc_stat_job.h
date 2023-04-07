@@ -228,8 +228,9 @@ class TCStatJob {
       void close_dump_file();
 
       void open_stat_file();
+      void setup_stat_file(int n_row, int n);
       void close_stat_file();
-
+      
       void dump_pair(const TrackPairInfo &, std::ofstream *);
       void dump_line(const TCStatLine &,    std::ofstream *);
 
@@ -317,6 +318,8 @@ class TCStatJob {
       // Derived output statistics
       ConcatString StatFile;             // File name for output statistics
       std::ofstream    *StatOut;         // Output statistics file stream
+      AsciiTable  stat_at;               // AsciiTable for buffering output STAT data
+      int         stat_row;              // Counter for the current stat row
 
       // Polyline masking regions
       ConcatString OutInitMaskFile;
