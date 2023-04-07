@@ -32,9 +32,13 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-static const char set_python_env_wrapper [] = "set_python_env";
+static const char env_PYTHONPATH         [] = "PYTHONPATH";
 
-static const char write_tmp_mpr_wrapper  [] = "MET_BASE/wrappers/write_tmp_mpr.py";
+static const char met_python_path        [] = "MET_BASE/python";
+
+static const char set_python_env_wrapper [] = "pyembed.set_python_env";
+
+static const char write_tmp_mpr_wrapper  [] = "MET_BASE/python/pyembed/write_tmp_mpr.py";
 
 static const char list_name              [] = "mpr_data";
 
@@ -301,9 +305,7 @@ void PyLineDataFile::do_straight()
 
 {
 
-ConcatString command, path, user_base;
-
-path = set_python_env_wrapper;
+ConcatString command, user_base;
 
 mlog << Debug(3) 
      << "PyLineDataFile::do_straight() -> "
@@ -318,7 +320,7 @@ user_base.chomp(".py");
    //  start up the python interpreter
    //
 
-script = new Python3_Script (path.text());
+script = get_python3_script();
 
    //
    //  set up a "new" sys.argv list
@@ -434,11 +436,7 @@ if ( status )  {
 
 }
 
-ConcatString wrapper;
-
-wrapper = set_python_env_wrapper;
-
-script = new Python3_Script (wrapper.text());
+script = get_python3_script();
 
 mlog << Debug(4) << "Reading temporary Python line data file: "
      << tmp_ascii_path << "\n";
@@ -573,6 +571,36 @@ return;
 
 }
 
+
+////////////////////////////////////////////////////////////////////////
+
+Python3_Script *get_python3_script()
+
+{
+
+const char *method_name = "get_python3_script()";
+ConcatString path = set_python_env_wrapper;
+ConcatString python_path = met_python_path;
+
+const char *env_pythonpath = getenv(env_PYTHONPATH);
+
+if (env_pythonpath) {
+   python_path = env_pythonpath;
+   python_path.add(':');
+}
+python_path.add(replace_path(met_python_path));
+mlog << Debug(0) << method_name << " -> added python path "
+     << replace_path(met_python_path) << ") to " << env_PYTHONPATH << "\n";
+
+setenv(env_PYTHONPATH, python_path.c_str(),1);
+
+   //
+   //  start up the python interpreter
+   //
+
+return new Python3_Script (path.text());
+
+}
 
 ////////////////////////////////////////////////////////////////////////
 
