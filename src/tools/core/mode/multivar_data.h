@@ -41,7 +41,7 @@ class MultiVarData {
       
     inline ~MultiVarData() {
       if (fcst_obj_data) delete [] fcst_obj_data;
-      if (obs_obj_data) delete [] fcst_obj_data;
+      if (obs_obj_data) delete [] obs_obj_data;
       if (fcst_raw_data) delete [] fcst_raw_data;
       if (obs_raw_data) delete [] obs_raw_data;
       if (Fcst_sd) delete Fcst_sd;
