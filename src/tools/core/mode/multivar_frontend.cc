@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -56,7 +56,8 @@ using namespace std;
 #include "combine_boolplanes.h"
 #include "objects_from_netcdf.h"
 #include "parse_file_list.h"
-
+#include "mode_frontend.h"
+#include "multivar_data.h"
 
 using namespace netCDF;
 
@@ -95,6 +96,7 @@ static void set_outdir    (const StringArray &);
 static void set_logfile   (const StringArray &);
 static void set_verbosity (const StringArray &);
 
+static void mask_data(int nx, int ny, const BoolPlane &mask, DataPlane &data);
 
 static void read_config(const string & filename);
 
@@ -163,11 +165,9 @@ if ( fcst_filenames.n() != obs_filenames.n() )  {
 }
 
 const int n_files = fcst_filenames.n();
-ConcatString mode_args;
-ConcatString command;
-StringArray a, nc_files, mode_argv;
-int status;
-char junk [256];
+StringArray nc_files;
+ 
+//ConcatString mode_args;
 
 mlog << Debug(2) << "\n" << sep << "\n";
 
@@ -188,8 +188,14 @@ if ( n_files == 0 )  {
    //  do the individual mode runs
    //
 
+ vector<MultiVarData *> mvd;
+
 for (j=0; j<n_files; ++j)  {
 
+  ConcatString command;
+  StringArray a, mode_argv;
+  int status;
+  char junk [256];
    mlog << Debug(2) 
         << "\n starting mode run " << (j + 1) << " of " << n_files
         << "\n" << sep << "\n";
@@ -267,11 +273,31 @@ for (j=0; j<n_files; ++j)  {
 
    mlog << Debug(1) << "Running mode command: \"" << command << "\"\n\n";
 
-   run_command(command);
+   
 
+   //run_command(command);
    // [TODO] MET #1238: run MODE in memory instead of via system calls.
    // (void) mode_frontend(mode_argv);
 
+   ModeFrontEnd *frontend = new ModeFrontEnd;
+   status = frontend->run(mode_argv);
+   MultiVarData *mvdi = frontend->get_multivar_data();
+   mvd.push_back(mvdi);
+   
+   // int nx = frontend->get_fcst_obj_nx();
+   // int ny = frontend->get_fcst_obj_ny();
+   // int *fcst_obj_data = frontend->get_fcst_obj_data();
+   // int *obs_obj_data = frontend->get_obs_obj_data();
+   // float *fcst_raw_data = frontend->get_fcst_raw_data();
+   // float *obs_raw_data = frontend->get_obs_raw_data();
+   // mode_fcst_objects.push_back(fcst_obj_data);
+   // mode_fcst_raw_data.push_back(fcst_raw_data);
+   // mode_obs_objects.push_back(obs_obj_data);
+   // mode_obs_raw_data.push_back(obs_raw_data);
+   // mode_nx.push_back(nx);
+   // mode_ny.push_back(ny);
+
+   delete frontend;
    mlog << Debug(2) << "\n finished mode run " << (j + 1) << " of " << n_files
         << "\n" << sep << "\n";
 
@@ -292,10 +318,13 @@ Pgm image;
    //
    //  load the objects from the mode output files
    //
+nc_files.dump(cout, 0);
+
 
 for (j=0; j<n_files; ++j)  {
 
-   objects_from_netcdf(nc_files[j].c_str(), do_clusters, f_plane[j], o_plane[j]);  
+  //objects_from_netcdf(nc_files[j].c_str(), do_clusters, f_plane[j], o_plane[j]);  
+  objects_from_arrays(nc_files[j].c_str(), do_clusters, mvd[j]->fcst_obj_data, mvd[j]->obs_obj_data, mvd[j]->nx, mvd[j]->ny, f_plane[j], o_plane[j]);  
 
 }
 
@@ -316,7 +345,103 @@ o_result.set_size(nx, ny);
 combine_boolplanes(f_plane, n_files, f_calc, f_result);
 combine_boolplanes(o_plane, n_files, o_calc, o_result);
 
+   // Filter the data to within the superobjects only
+for (j=0; j<n_files; ++j) {
+  mask_data(nx, ny, f_result, mvd[j]->Fcst_sd->data);
+  mask_data(nx, ny, o_result, mvd[j]->Obs_sd->data);
 
+  // to test concept, go ahead and run mode on each individual field
+  ConcatString command;
+  StringArray a, mode_argv;
+  int status;
+  char junk [256];
+   mlog << Debug(2) 
+        << "\n starting filtered data mode run " << (j + 1) << " of " << n_files
+        << "\n" << sep << "\n";
+
+      //
+      //  test to see of the output directory for this
+      //    mode runs exists, and if not, create it
+      //
+
+   dir.clear();
+
+   if ( outdir.length() > 0 )  dir << outdir << '/';
+
+   snprintf(junk, sizeof(junk), "%02d", j);
+
+   dir << junk;
+
+   if ( ! directory_exists(dir.c_str()) )  {
+
+      mlog << Debug(2)
+           << program_name << ": creating output directory \""
+           << dir << "\"\n\n";
+
+      status = mkdir(dir.c_str(), dir_creation_mode);       
+
+      if ( status < 0 )  {
+
+         mlog << Error << "\n" << program_name
+              << ": unable to create output directory \""
+              << dir << "\"\n\n";
+
+         exit ( 1 );
+
+      }
+
+   }
+
+      //
+      //  build the command for running mode
+      //
+
+   mode_argv.clear();
+
+   mode_argv.add(mode_path);
+   mode_argv.add(fcst_filenames[j]);
+   mode_argv.add(obs_filenames[j]);
+   mode_argv.add(config_file);
+
+   command << cs_erase
+           << mode_path         << ' '
+           << fcst_filenames[j] << ' '
+           <<  obs_filenames[j] << ' '
+           << config_file;
+
+   mode_argv.add("-v");
+   snprintf(junk, sizeof(junk), "%d", mlog.verbosity_level());
+   mode_argv.add(junk);
+
+   mode_argv.add("-outdir");
+   mode_argv.add(dir);
+
+   command << " -v " << mlog.verbosity_level();
+
+   command << " -outdir " << dir;
+
+   mode_argv.add("-field_index");
+   snprintf(junk, sizeof(junk), "%d", j);
+   mode_argv.add(junk);
+
+   command << " -field_index " << j;
+
+      //
+      //  run mode
+      //
+
+   mlog << Debug(1) << "Running filtered mode command: \"" << command << "\"\n\n";
+
+   
+
+   //run_command(command);
+   // [TODO] MET #1238: run MODE in memory instead of via system calls.
+   // (void) mode_frontend(mode_argv);
+
+   ModeFrontEnd *frontend = new ModeFrontEnd;
+   status = frontend->run(mode_argv, *mvd[j]);
+ }
+ 
    //
    //  write the output files
    //
@@ -347,6 +472,9 @@ write_output_nc_file( obs_file.text(), met, o_result);
    //
    //  done
    //
+for (size_t i=0; i<mvd.size(); ++i) {
+  delete mvd[i];
+ }
 
 return ( 0 );
 
@@ -413,6 +541,7 @@ void run_command(const ConcatString & command)
 
 int status;
 
+ printf("%s\n", command.text());
 status = system(command.text());
 
 if ( status )  {
@@ -562,3 +691,26 @@ return;
 
 
 ////////////////////////////////////////////////////////////////////////
+void mask_data(int nx, int ny, const BoolPlane &bp, DataPlane &data)
+{
+if (nx != data.nx() || ny != data.ny()) {
+  printf("ERROR dimensions don't match %d %d    %d %d\n",
+  nx, ny, data.nx(), data.ny());
+  return;
+}
+  
+for (int x=0; x<nx; ++x)  {
+
+   for (int y=0; y<ny; ++y)  {
+
+      if ( bp(x, y) == false) {
+	data.set(bad_data_float, x, y);;
+      }
+
+   }   //  for x
+
+}   //  for x
+
+
+}
+

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -48,6 +48,16 @@ static const string  obs_cluster_id_var_name =  "obs_clus_id";
 
 
 static void populate_bool_plane(const int * buf, const int nx, const int ny, BoolPlane & bp_out);
+
+
+void  objects_from_arrays(const char *netcf_filename, bool do_clusters,
+			  int *fcst_objects, int *obs_objects, int nx, int ny,
+			  BoolPlane & fcst_out, 
+			  BoolPlane & obs_out)
+{
+  populate_bool_plane(fcst_objects, nx, ny, fcst_out);
+  populate_bool_plane(obs_objects, nx, ny, obs_out);
+}  
 
 
 ////////////////////////////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -29,6 +29,10 @@
 
 
 ////////////////////////////////////////////////////////////////////////
+extern void  objects_from_arrays(const char *netcf_filename, bool do_clusters,
+				 int *fcst_objects, int *obs_objects, int nx, int ny,
+				 BoolPlane & fcst_out, 
+				 BoolPlane & obs_out);
 
 
 extern void objects_from_netcdf(const char * netcdf_filename, 

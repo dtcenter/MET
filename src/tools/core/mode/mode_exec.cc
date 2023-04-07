@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -16,7 +16,7 @@ using namespace std;
 #include <unistd.h>
 #include <stdlib.h>
 #include <cmath>
-
+#include <algorithm>
 #include <netcdf>
 using namespace netCDF;
 
@@ -35,6 +35,9 @@ static const char * cts_str[n_cts] = {"RAW", "OBJECT"};
 static const char program_name [] = "mode";
 
 static const char * default_config_filename = "MET_BASE/config/MODEConfig_default";
+
+// took this out of the do_conv_thresh() method 
+static int local_r_index = -1;
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -354,6 +357,165 @@ return;
 
 }
 
+///////////////////////////////////////////////////////////////////////
+
+void ModeExecutive::setup_fcst_obs_data(const MultiVarData &mvd)
+
+{
+
+   // ShapeData fcst_sd, obs_sd;
+   double fmin, omin, fmax, omax;
+
+   // Fcst_sd.clear();
+   //  Obs_sd.clear();
+   Fcst_sd = *(mvd.Fcst_sd);
+   Obs_sd = *(mvd.Obs_sd);
+   grid = *(mvd.grid);
+
+#ifdef NOTFORTHIS
+   // copy the raw data from mvd into the Fcst_sd and Obs_sd objects locally
+   
+      // Read the gridded data from the input forecast file
+
+   if ( !(fcst_mtddf->data_plane(*(engine.conf_info.Fcst->var_info), Fcst_sd.data)) )  {
+
+      mlog << Error << "\nsetup_fcst_obs_data() -> "
+           << "can't get forecast data \""
+           << engine.conf_info.Fcst->var_info->magic_str()
+           << "\" from file \"" << fcst_file << "\"\n\n";
+      exit(1);
+   }
+
+   // Read the gridded data from the input observation file
+
+   if ( !(obs_mtddf->data_plane(*(engine.conf_info.Obs->var_info), Obs_sd.data)) )  {
+
+      mlog << Error << "\nsetup_fcst_obs_data() -> "
+           << "can't get observation data \""
+           << engine.conf_info.Obs->var_info->magic_str()
+           << "\" from file \"" << obs_file << "\"\n\n";
+      exit(1);
+   }
+
+      // Determine the verification grid
+
+   grid = parse_vx_grid(engine.conf_info.Fcst->var_info->regrid(),
+                        &(fcst_mtddf->grid()), &(obs_mtddf->grid()));
+#endif
+
+      // Store the grid
+
+   engine.set_grid(&grid);
+
+#ifdef NOTFORTHIS
+      // Regrid, if necessary
+
+   if ( !(fcst_mtddf->grid() == grid) )  {
+      mlog << Debug(1)
+           << "Regridding forecast " << engine.conf_info.Fcst->var_info->magic_str()
+           << " to the verification grid.\n";
+      Fcst_sd.data = met_regrid(Fcst_sd.data, fcst_mtddf->grid(), grid,
+                                engine.conf_info.Fcst->var_info->regrid());
+   }
+
+      // Regrid, if necessary
+
+   if ( !(obs_mtddf->grid() == grid) )  {
+      mlog << Debug(1)
+           << "Regridding observation " << engine.conf_info.Obs->var_info->magic_str()
+           << " to the verification grid.\n";
+      Obs_sd.data = met_regrid(Obs_sd.data, obs_mtddf->grid(), grid,
+                               engine.conf_info.Obs->var_info->regrid());
+   }
+
+      // Rescale probabilites from [0, 100] to [0, 1]
+
+   if ( engine.conf_info.Fcst->var_info->p_flag() ) rescale_probability(Fcst_sd.data);
+
+      // Rescale probabilites from [0, 100] to [0, 1]
+
+   if ( engine.conf_info.Obs->var_info->p_flag() ) rescale_probability(Obs_sd.data);
+
+#endif
+      // Print a warning if the valid times do not match
+
+   if(Fcst_sd.data.valid() != Obs_sd.data.valid()) {
+
+      mlog << Warning << "\nsetup_fcst_obs_data() -> "
+           << "Forecast and observation valid times do not match "
+           << unix_to_yyyymmdd_hhmmss(Fcst_sd.data.valid()) << " != "
+           << unix_to_yyyymmdd_hhmmss(Obs_sd.data.valid()) << " for "
+           << engine.conf_info.Fcst->var_info->magic_str() << " versus "
+           << engine.conf_info.Obs->var_info->magic_str() << ".\n\n";
+   }
+
+      // Print a warning if the accumulation intervals do not match
+
+   if(engine.conf_info.Fcst->var_info->level().type() == LevelType_Accum &&
+      engine.conf_info.Obs->var_info->level().type()  == LevelType_Accum &&
+      Fcst_sd.data.accum()                       != Obs_sd.data.accum()) {
+
+      mlog << Warning << "\nsetup_fcst_obs_data() -> "
+           << "Forecast and observation accumulation times do not match "
+           << sec_to_hhmmss(Fcst_sd.data.valid()) << " != "
+           << sec_to_hhmmss(Obs_sd.data.valid()) << " for "
+           << engine.conf_info.Fcst->var_info->magic_str() << " versus "
+           << engine.conf_info.Obs->var_info->magic_str() << ".\n\n";
+   }
+
+   mlog << Debug(1)
+        << "Forecast Field: "
+        << engine.conf_info.Fcst->var_info->name_attr() << " at "
+        << engine.conf_info.Fcst->var_info->level_attr()
+        << "\n"
+        << "Observation Field: "
+        << engine.conf_info.Obs->var_info->name_attr() << " at "
+        << engine.conf_info.Obs->var_info->level_attr()
+        << "\n";
+
+#ifdef NOTFORTHIS
+
+      // Mask out the missing data between fields
+
+   if(engine.conf_info.mask_missing_flag == FieldType_Fcst ||
+      engine.conf_info.mask_missing_flag == FieldType_Both)
+      mask_bad_data(Fcst_sd.data, Obs_sd.data);
+
+      // Mask out the missing data between fields
+
+   if(engine.conf_info.mask_missing_flag == FieldType_Obs ||
+      engine.conf_info.mask_missing_flag == FieldType_Both)
+      mask_bad_data(Obs_sd.data, Fcst_sd.data);
+
+      // Parse the grid and/or polyline masks from the configuration
+
+   process_masks(Fcst_sd, Obs_sd);
+#endif
+   
+      // Compute the min and max data values across both raw fields
+
+   Fcst_sd.data.data_range(fmin, fmax);
+   Obs_sd.data.data_range(omin, omax);
+   if     (!is_bad_data(fmin) && !is_bad_data(omin)) data_min = min(fmin, omin);
+   else if(!is_bad_data(fmin) &&  is_bad_data(omin)) data_min = fmin;
+   else if( is_bad_data(fmin) && !is_bad_data(omin)) data_min = omin;
+
+   if     (!is_bad_data(fmax) && !is_bad_data(omax)) data_max = max(fmax, omax);
+   else if(!is_bad_data(fmax) &&  is_bad_data(omax)) data_max = fmax;
+   else if( is_bad_data(fmax) && !is_bad_data(omax)) data_max = omax;
+
+      // Process percentile thresholds
+
+   engine.conf_info.set_perc_thresh(Fcst_sd.data, Obs_sd.data);
+
+   //
+   //  done
+   //
+
+return;
+
+}
+  
 
 ///////////////////////////////////////////////////////////////////////
 
@@ -363,8 +525,6 @@ void ModeExecutive::do_conv_thresh(const int r_index, const int t_index)
 {
 
 ModeConfInfo & conf = engine.conf_info;
-
-static int local_r_index = -1;
 
 R_index = r_index;
 T_index = t_index;
@@ -409,6 +569,10 @@ return;
 
 }
 
+void ModeExecutive::clear_internal_r_index()
+{
+  local_r_index = -1;
+}
 
 ///////////////////////////////////////////////////////////////////////
 
@@ -814,6 +978,52 @@ void ModeExecutive::write_obj_stats()
    return;
 }
 
+MultiVarData *ModeExecutive::get_multivar_data()
+{
+  MultiVarData *mvd = new MultiVarData();
+  mvd->nx = grid.nx();
+  mvd->ny = grid.ny();
+  mvd->fcst_obj_data = new int [grid.nx()*grid.ny()];
+  for (int x=0; x<grid.nx(); ++x) {
+    for (int y=0; y<grid.ny(); ++y) {
+      int n = DefaultTO.two_to_one(grid.nx(), grid.ny(), x, y);
+      if (engine.fcst_split->is_nonzero(x,y) ) {
+	mvd->fcst_obj_data[n] = nint(engine.fcst_split->data(x, y));
+      } else {
+	mvd->fcst_obj_data[n] = bad_data_int;
+      }
+    }
+  }
+  mvd->fcst_raw_data = new float   [grid.nx()*grid.ny()];
+  for (int x=0; x<grid.nx(); ++x) {
+    for (int y=0; y<grid.ny(); ++y) {
+      int n = DefaultTO.two_to_one(grid.nx(), grid.ny(), x, y);
+      mvd->fcst_raw_data[n] = engine.fcst_raw->data(x, y);
+    }
+  }
+  mvd->obs_raw_data = new float   [grid.nx()*grid.ny()];
+  for (int x=0; x<grid.nx(); ++x) {
+    for (int y=0; y<grid.ny(); ++y) {
+      int n = DefaultTO.two_to_one(grid.nx(), grid.ny(), x, y);
+      mvd->obs_raw_data[n] = engine.obs_raw->data(x, y);
+    }
+  }
+  mvd->obs_obj_data = new int   [grid.nx()*grid.ny()];
+  for (int x=0; x<grid.nx(); ++x) {
+    for (int y=0; y<grid.ny(); ++y) {
+      int n = DefaultTO.two_to_one(grid.nx(), grid.ny(), x, y);
+      if (engine.obs_split->is_nonzero(x,y) ) {
+	mvd->obs_obj_data[n] = nint(engine.obs_split->data(x, y));
+      } else {
+	mvd->obs_obj_data[n] = bad_data_int;
+      }
+    }
+  }
+  mvd->Fcst_sd = new ShapeData(Fcst_sd);
+  mvd->Obs_sd = new ShapeData(Obs_sd);
+  mvd->grid = new Grid(grid);
+  return mvd;
+}
 
 ///////////////////////////////////////////////////////////////////////
 
@@ -1061,6 +1271,9 @@ if ( info.all_false() )  return;
 
    }
 
+   vector<int> fcstValues, obsValues;
+   vector<int> fcstCValues, obsCValues;
+
    for(x=0; x<grid.nx(); x++) {
 
       for(y=0; y<grid.ny(); y++) {
@@ -1086,6 +1299,11 @@ if ( info.all_false() )  return;
 	   }
            if ( info.do_object_id && fcst_obj_data != NULL && engine.fcst_split != NULL ) {
              fcst_obj_data[n] = nint(engine.fcst_split->data(x, y));
+	     if (find(fcstValues.begin(), fcstValues.end(), fcst_obj_data[n]) == fcstValues.end())
+	       {
+		 printf("FcstValue=%d\n", fcst_obj_data[n]);
+		 fcstValues.push_back(fcst_obj_data[n]);
+	       }
            }
          }
          else {
@@ -1103,6 +1321,11 @@ if ( info.all_false() )  return;
 	   }
 	   if ( info.do_object_id && obs_obj_data != NULL ) {
 	     obs_obj_data[n] = nint(engine.obs_split->data(x, y));
+	     if (find(obsValues.begin(), obsValues.end(), obs_obj_data[n]) == obsValues.end())
+	       {
+		 printf("ObsValue=%d\n", obs_obj_data[n]);
+		 obsValues.push_back(obs_obj_data[n]);
+	       }
 	   }
          }
          else {

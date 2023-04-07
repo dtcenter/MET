@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -25,74 +25,56 @@ using namespace std;
 #include <sys/types.h>
 #include <unistd.h>
 
-
-#include "string_array.h"
-
+#include "mode_frontend.h"
+//#include "string_array.h"
 #include "mode_usage.h"
-#include "mode_exec.h"
+//#include "mode_exec.h"
 
 #ifdef WITH_PYTHON
 #include "global_python.h"
 #endif
 
-
-///////////////////////////////////////////////////////////////////////
-//
-// Create output files using the following naming convention:
-//
-//    mode_YYYYMMDDI_FHH_HHA.ps/.txt
-//
-//    Where I indicates initilization time, L indicates lead time,
-//    and A indicates accumulation time.
-//
-///////////////////////////////////////////////////////////////////////
-
-
 extern const char * const program_name;
 
-static ModeExecutive * mode_exec = 0;
-
-
-///////////////////////////////////////////////////////////////////////
-
-
-static const char * default_out_dir = ".";
-
+static ModeExecutive *mode_exec = 0;
 static int compress_level = -1;
-
 static int field_index = -1;
 
+ModeFrontEnd::ModeFrontEnd() :
+  default_out_dir(".")
+{
+  mode_exec = 0;
+  compress_level = -1;
+  field_index = -1;
+}  
+
+ModeFrontEnd::~ModeFrontEnd()
+{
+if ( mode_exec ) {
+  delete mode_exec;  mode_exec = 0;
+}
+}
 
 ///////////////////////////////////////////////////////////////////////
 
 
-static void do_quilt    ();
-static void do_straight ();
-
-static void process_command_line(const StringArray &);
-
-
-static void set_config_merge_file (const StringArray &);
-static void set_outdir            (const StringArray &);
-static void set_logfile           (const StringArray &);
-static void set_verbosity         (const StringArray &);
-static void set_compress          (const StringArray &);
-
-static void set_field_index       (const StringArray &);   //  undocumented
-
-
 ///////////////////////////////////////////////////////////////////////
 
 
-int mode_frontend(const StringArray & Argv)
+int ModeFrontEnd::run(const StringArray & Argv)
 
 {
+  Argv.dump(cout, 0);
+
 
    //
    // Process the command line arguments
    //
+if ( mode_exec )  { delete mode_exec;  mode_exec = 0; }
 
 mode_exec = new ModeExecutive;
+compress_level = -1;
+field_index = -1;
 
 process_command_line(Argv);
 
@@ -117,11 +99,11 @@ if ( conf.quilt )  {
 
 } else {
 
-   do_straight();
+  do_straight();
 
 }
 
-// mode_exec.clear();
+//mode_exe.clear();
 
    //
    //  done
@@ -130,18 +112,65 @@ if ( conf.quilt )  {
 #ifdef  WITH_PYTHON
    GP.finalize();
 #endif
+return (0);
+}
 
+int ModeFrontEnd::run(const StringArray & Argv, const MultiVarData &mvd)
+{
+  Argv.dump(cout, 0);
+
+
+   //
+   // Process the command line arguments
+   //
 if ( mode_exec )  { delete mode_exec;  mode_exec = 0; }
 
-return ( 0 );
+mode_exec = new ModeExecutive;
+compress_level = -1;
+field_index = -1;
+
+process_command_line(Argv);
+
+
+   //
+   // Process the forecast and observation files
+   //
+
+ModeConfInfo & conf = mode_exec->engine.conf_info;
+
+if ( field_index >= 0 )  conf.set_field_index(field_index);
+
+ mode_exec->setup_fcst_obs_data(mvd);
+
+if (compress_level >= 0) conf.nc_info.set_compress_level(compress_level);
+
+
+if ( conf.quilt )  {
+
+   do_quilt();
+
+} else {
+
+  do_straight();
 
 }
 
+//mode_exe.clear();
+
+   //
+   //  done
+   //
+
+#ifdef  WITH_PYTHON
+   GP.finalize();
+#endif
+return (0);
+}
 
 ///////////////////////////////////////////////////////////////////////
 
 
-void do_straight()
+void ModeFrontEnd::do_straight()
 
 {
 
@@ -163,6 +192,8 @@ if ( NCT != NCR )  {
 
 int index;
 
+mode_exec->clear_internal_r_index();
+
 for (index=0; index<NCT; ++index)  {
 
    mode_exec->do_conv_thresh(index, index);
@@ -173,7 +204,8 @@ for (index=0; index<NCT; ++index)  {
 
 }
 
-
+ mode_exec->clear_internal_r_index();
+  
    //
    //  done
    //
@@ -186,12 +218,14 @@ return;
 ///////////////////////////////////////////////////////////////////////
 
 
-void do_quilt()
+void ModeFrontEnd::do_quilt()
 
 {
 
 int t_index, r_index;   //  indices into the convolution threshold and radius arrays
 
+
+mode_exec->clear_internal_r_index();
 
 for (r_index=0; r_index<(mode_exec->n_conv_radii()); ++r_index)  {
 
@@ -207,6 +241,8 @@ for (r_index=0; r_index<(mode_exec->n_conv_radii()); ++r_index)  {
 
 }
 
+mode_exec->clear_internal_r_index();
+
    //
    //  done
    //
@@ -215,11 +251,21 @@ return;
 
 }
 
+MultiVarData *ModeFrontEnd::get_multivar_data() {return mode_exec->get_multivar_data();}
+
+// int ModeFrontEnd::get_fcst_obj_nx() {return mode_exec->get_fcst_obj_nx();}
+// int ModeFrontEnd::get_fcst_obj_ny() {return mode_exec->get_fcst_obj_ny();}
+// int *ModeFrontEnd::get_fcst_obj_data() {return mode_exec->get_fcst_obj_data();}
+// float *ModeFrontEnd::get_fcst_raw_data() {return mode_exec->get_fcst_raw_data();}
+// int ModeFrontEnd::get_obs_obj_nx() {return mode_exec->get_obs_obj_nx();}
+// int ModeFrontEnd::get_obs_obj_ny() {return mode_exec->get_obs_obj_ny();}
+// int *ModeFrontEnd::get_obs_obj_data() {return mode_exec->get_obs_obj_data();}
+// float *ModeFrontEnd::get_obs_raw_data() {return mode_exec->get_obs_raw_data();}
 
 ///////////////////////////////////////////////////////////////////////
 
 
-void process_command_line(const StringArray & argv)
+void ModeFrontEnd::process_command_line(const StringArray & argv)
 
 {
 
@@ -273,21 +319,21 @@ void process_command_line(const StringArray & argv)
 
 ///////////////////////////////////////////////////////////////////////
 
-void set_config_merge_file(const StringArray & a)
+void ModeFrontEnd::set_config_merge_file(const StringArray & a)
 {
    mode_exec->merge_config_file = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_outdir(const StringArray & a)
+void ModeFrontEnd::set_outdir(const StringArray & a)
 {
    mode_exec->out_dir = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_logfile(const StringArray & a)
+void ModeFrontEnd::set_logfile(const StringArray & a)
 {
    ConcatString filename;
 
@@ -298,21 +344,21 @@ void set_logfile(const StringArray & a)
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_verbosity(const StringArray & a)
+void ModeFrontEnd::set_verbosity(const StringArray & a)
 {
   mlog.set_verbosity_level(atoi(a[0].c_str()));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_compress(const StringArray & a) {
+void ModeFrontEnd::set_compress(const StringArray & a) {
   compress_level = atoi(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 
-void set_field_index(const StringArray & a)
+void ModeFrontEnd::set_field_index(const StringArray & a)
 
 {
 

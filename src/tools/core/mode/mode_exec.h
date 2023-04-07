@@ -1,4 +1,4 @@
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -39,7 +39,7 @@
 #include "vx_plot_util.h"
 
 #include "mode_ps_file.h"
-
+#include "multivar_data.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -113,12 +113,28 @@ class ModeExecutive {
 
       ShapeData Fcst_sd, Obs_sd;
 
+      void clear_internal_r_index();
       void setup_fcst_obs_data();
+      void setup_fcst_obs_data(const MultiVarData &mvd);
       void do_conv_thresh(const int r_index, const int t_index);
       void do_match_merge();
 
       void process_masks(ShapeData &, ShapeData &);
       void process_output();
+
+  
+      // owned by caller
+      MultiVarData *get_multivar_data();
+
+      // int get_fcst_obj_nx();
+      // int get_fcst_obj_ny();
+      // int *get_fcst_obj_data();
+      // float *get_fcst_raw_data();
+
+      // int get_obs_obj_nx();
+      // int get_obs_obj_ny();
+      // int *get_obs_obj_data();
+      // float *get_obs_raw_data();
 
       void plot_engine();
 
