@@ -25,8 +25,8 @@
 pythonmetscriptsdir = $(pkgdatadir)/python/met
 
 pythonmetscripts_DATA = \
-	mprbase.py \
 	dataplane.py \
+	mprbase.py \
 	point.py
 
 EXTRA_DIST = ${pythonmetscripts_DATA}

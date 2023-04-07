@@ -25,6 +25,7 @@ pyembed_DATA = \
      read_tmp_dataplane.py \
      read_tmp_ascii.py \
      read_tmp_point_nc.py \
+     set_python_env.py \
      write_tmp_dataplane.py \
      write_tmp_point.py \
      write_tmp_point_nc.py \
