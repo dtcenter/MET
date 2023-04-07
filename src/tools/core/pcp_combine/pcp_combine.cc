@@ -729,7 +729,7 @@ int search_pcp_dir(const char *cur_dir, const unixtime cur_ut,
    //
    // Process each file contained in the directory.
    //
-   while((dirp = readdir(dp)) != NULL) {
+   while((dirp = readdir(dp)) != nullptr) {
 
       //
       // Ignore any hidden files.

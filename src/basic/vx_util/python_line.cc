@@ -344,8 +344,6 @@ if ( PyErr_Occurred() )  {
 
    exit ( 1 );
 
-   return;
-
 }
 
    //

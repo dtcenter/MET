@@ -172,7 +172,7 @@ pad = 8 - nx%8;
 
 if ( pad == 8 )  pad = 0;
 
-if ( out == NULL) { return; }
+if ( out == nullptr) { return; }
 
 for (r=0; r<ny; ++r)  {
 

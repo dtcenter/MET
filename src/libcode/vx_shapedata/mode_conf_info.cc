@@ -928,7 +928,6 @@ switch ( e2->type() )  {
       mlog << Error
            << "\n\n  ModeConfInfo::is_multivar() const -> bad object type for entry \"fcst.field\"\n\n";
       exit ( 1 );
-      break;
 
 }
 

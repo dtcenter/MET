@@ -302,7 +302,7 @@ if ( cmd_line.n_elements() != 0 )  {
 
 StringArray a;
 
-a = get_filenames(lookin_dirs, NULL, "_obj.txt");
+a = get_filenames(lookin_dirs, nullptr, "_obj.txt");
 
 mode_files.add(a);
 

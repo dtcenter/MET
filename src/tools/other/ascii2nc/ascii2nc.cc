@@ -345,8 +345,6 @@ FileHandler *create_file_handler(const ASCIIFormat format, const ConcatString &a
         return(determine_ascii_format(ascii_filename));
       }
    }
-
-   return(0);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -470,8 +468,6 @@ FileHandler *determine_ascii_format(const ConcatString &ascii_filename) {
    f_in.close();
 
    exit(1);
-
-   return(0);
 }
 
 ////////////////////////////////////////////////////////////////////////
