@@ -847,10 +847,7 @@ else {
 
 }
 
-
 exit ( 1 );
-
-return;
 
 }
 
@@ -892,8 +889,6 @@ version_file = replace_path("MET_BASE/version.txt");
 cout << "\n";
 
 exit ( 1 );
-
-return;
 
 }
 

@@ -94,17 +94,17 @@ void EnumInfo::init_from_scratch()
 
 {
 
-s = (char **) NULL;
+s = (char **) nullptr;
 
-Name = (char *) NULL;
+Name = (char *) nullptr;
 
-LowerCaseName = (char *) NULL;
+LowerCaseName = (char *) nullptr;
 
-Scope = (char *) NULL;
+Scope = (char *) nullptr;
 
-U_Scope = (char *) NULL;
+U_Scope = (char *) nullptr;
 
-Header = (char *) NULL;
+Header = (char *) nullptr;
 
 Nalloc = Nids = 0;
 
@@ -127,21 +127,21 @@ int j;
 
 for (j=0; j<Nids; ++j)  {
 
-   if ( s[j] )  { delete [] s[j];  s[j] = (char *) NULL; }
+   if ( s[j] )  { delete [] s[j];  s[j] = (char *) nullptr; }
 
 }
 
-delete [] s;   s = (char **) NULL;
+delete [] s;   s = (char **) nullptr;
 
-if ( Name )  { delete [] Name;  Name = (char *) NULL; }
+if ( Name )  { delete [] Name;  Name = (char *) nullptr; }
 
-if ( LowerCaseName )  { delete [] LowerCaseName;  LowerCaseName = (char *) NULL; }
+if ( LowerCaseName )  { delete [] LowerCaseName;  LowerCaseName = (char *) nullptr; }
 
-if ( Scope )  { delete [] Scope;  Scope = (char *) NULL; }
+if ( Scope )  { delete [] Scope;  Scope = (char *) nullptr; }
 
-if ( U_Scope )  { delete [] U_Scope;  U_Scope = (char *) NULL; }
+if ( U_Scope )  { delete [] U_Scope;  U_Scope = (char *) nullptr; }
 
-if ( Header )  { delete [] Header;  Header = (char *) NULL; }
+if ( Header )  { delete [] Header;  Header = (char *) nullptr; }
 
 Nalloc = Nids = 0;
 
@@ -199,7 +199,7 @@ n = (n + enuminfo_alloc_increment - 1)/enuminfo_alloc_increment;
 n *= enuminfo_alloc_increment;
 
 int j;
-char ** u = (char **) NULL;
+char ** u = (char **) nullptr;
 
 u = s;
 
@@ -213,7 +213,7 @@ if ( !s )  {
 
 }
 
-for (j=0; j<n; ++j)  s[j] = (char *) NULL;
+for (j=0; j<n; ++j)  s[j] = (char *) nullptr;
 
 if ( u )  {
 
@@ -315,9 +315,9 @@ void EnumInfo::set_name(const char * text)
 {
 const char *method_name = "EnumInfo::set_name() -> ";
 
-if ( Name )  { delete [] Name;  Name = (char *) NULL; }
+if ( Name )  { delete [] Name;  Name = (char *) nullptr; }
 
-if ( LowerCaseName )  { delete [] LowerCaseName;  LowerCaseName = (char *) NULL; }
+if ( LowerCaseName )  { delete [] LowerCaseName;  LowerCaseName = (char *) nullptr; }
 
 if ( !text )  return;
 
@@ -355,9 +355,9 @@ void EnumInfo::set_scope(const char * text)
 {
 const char *method_name = "EnumInfo::set_scope() -> ";
 
-if ( Scope )  { delete [] Scope;  Scope = (char *) NULL; }
+if ( Scope )  { delete [] Scope;  Scope = (char *) nullptr; }
 
-if ( U_Scope )  { delete [] U_Scope;  U_Scope = (char *) NULL; }
+if ( U_Scope )  { delete [] U_Scope;  U_Scope = (char *) nullptr; }
 
 if ( !text )  return;
 
@@ -404,7 +404,7 @@ void EnumInfo::set_header(const char * text)
 {
 const char *method_name = "EnumInfo::set_header() -> ";
 
-if ( Header )  { delete [] Header;  Header = (char *) NULL; }
+if ( Header )  { delete [] Header;  Header = (char *) nullptr; }
 
 int k;
 

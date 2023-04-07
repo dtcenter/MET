@@ -71,8 +71,6 @@ MetNcCFDataFile & MetNcCFDataFile::operator=(const MetNcCFDataFile &) {
    mlog << Error << "\nMetNcCFDataFile::operator=(const MetNcCFDataFile &) -> "
         << "should never be called!\n\n";
    exit(1);
-
-   return(*this);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -90,7 +88,7 @@ void MetNcCFDataFile::nccf_init_from_scratch() {
 ////////////////////////////////////////////////////////////////////////
 
 NcVarInfo *MetNcCFDataFile::find_first_data_var() {
-   NcVarInfo *first_data_var = NULL;
+   NcVarInfo *first_data_var = nullptr;
    // Store the name of the first data variable
    for (int i = 0; i < _file->Nvars; ++i) {
       if (is_nc_unit_time(_file->Var[i].units_att.c_str()) || 
@@ -161,7 +159,7 @@ bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
 {
   // Not sure why we do this
 
-  NcVarInfo *data_var = (NcVarInfo *)NULL;
+  NcVarInfo *data_var = (NcVarInfo *)nullptr;
   VarInfoNcCF *vinfo_nc = (VarInfoNcCF *)&vinfo;
   static const string method_name
       = "MetNcCFDataFile::data_plane(VarInfo &, DataPlane &) -> ";
@@ -175,7 +173,7 @@ bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
   {
     // Store the name of the first data variable
     data_var = find_first_data_var();
-    if (NULL != data_var) vinfo_nc->set_req_name(data_var->name.c_str());
+    if (nullptr != data_var) vinfo_nc->set_req_name(data_var->name.c_str());
   }
 
   int zdim_slot = bad_data_int;
@@ -187,7 +185,7 @@ bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
   BoolArray is_offset = vinfo_nc->is_offset();
 
   data_var = _file->find_var_name(vinfo_nc->req_name().c_str());
-  if (NULL != data_var) {
+  if (nullptr != data_var) {
     time_dim_slot = data_var->t_slot;
     for (int idx=0; idx<is_offset.n(); idx++) {
       long dim_offset = dimension[idx];
@@ -348,7 +346,7 @@ int MetNcCFDataFile::data_plane_array(VarInfo &vinfo,
    if ( vinfo_nc->req_name() == na_str ) {
       // Store the name of the first data variable
       NcVarInfo *data_var = find_first_data_var();
-      if (NULL != data_var) vinfo_nc->set_req_name(data_var->name.c_str());
+      if (nullptr != data_var) vinfo_nc->set_req_name(data_var->name.c_str());
    }
 
    LongArray time_offsets = collect_time_offsets(vinfo);
@@ -595,7 +593,7 @@ LongArray MetNcCFDataFile::collect_time_offsets(VarInfo &vinfo) {
 
 int MetNcCFDataFile::index(VarInfo &vinfo){
 
-   if( NULL == _file->find_var_name( vinfo.name().c_str() ) ) return -1;
+   if( nullptr == _file->find_var_name( vinfo.name().c_str() ) ) return -1;
 
    if( ( vinfo.valid() != 0         && _file->ValidTime[0] != vinfo.valid() ) ||
        ( vinfo.init()  != 0         && _file->InitTime     != vinfo.init()  ) ||

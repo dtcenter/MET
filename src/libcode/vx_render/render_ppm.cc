@@ -146,7 +146,7 @@ for (j=(info.n_filters() - 1); j>= 0; --j)  {
 
 plot.file() << "\n>>\n\nimage\n\n";
 
-if ( out == NULL) { return; }
+if ( out == nullptr) { return; }
 
 for (r=0; r<(image.nrows()); ++r)  {
 

@@ -2031,7 +2031,7 @@ int parse_conf_percentile(Dictionary *dict) {
 ///////////////////////////////////////////////////////////////////////////////
 
 ConcatString parse_conf_tmp_dir(Dictionary *dict) {
-   DIR* odir = NULL;
+   DIR* odir = nullptr;
    ConcatString tmp_dir_path;
 
    if(!get_env("MET_TMP_DIR", tmp_dir_path)) {
@@ -2045,7 +2045,7 @@ ConcatString parse_conf_tmp_dir(Dictionary *dict) {
    }
 
    // Make sure that it exists
-   if((odir = met_opendir(tmp_dir_path.c_str())) == NULL) {
+   if((odir = met_opendir(tmp_dir_path.c_str())) == nullptr) {
       mlog << Error << "\nparse_conf_tmp_dir() -> "
            << "Cannot access the \"" << conf_key_tmp_dir << "\" directory: "
            << tmp_dir_path << "\n\n";

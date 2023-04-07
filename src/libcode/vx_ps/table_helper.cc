@@ -75,10 +75,6 @@ mlog << Error
 
 exit ( 1 );
 
-// init_from_scratch();
-// 
-// assign(t);
-
 }
 
 
@@ -93,12 +89,6 @@ mlog << Error
      << "\n\n  TableHelper::operator=(const TableHelper &) -> should never be called!\n\n";
 
 exit ( 1 );
-
-// if ( this == &t )  returnt ( * this );
-// 
-// assign(t);
-
-return ( * this );
 
 }
 
@@ -163,7 +153,6 @@ if ( (Nrows <= 0) || (Ncols <= 0) )  {
         << "\n\n  TableHelper::set_size_rc() -> bad nrows or ncols\n\n";
 
    exit ( 1 );
-
 
 }
 
@@ -262,7 +251,6 @@ if ( !Plot )  {
    exit ( 1 );
 
 }
-
 
 return;
 

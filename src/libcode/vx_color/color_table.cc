@@ -536,8 +536,6 @@ mlog << Error << "\nColorTable::interp(double) const -> confused!\n\n";
 
 exit ( 1 );
 
-return ( black );
-
 }
 
 
@@ -554,7 +552,7 @@ clear();
 
 input_filename = filename;
 
-if ( (colorin = fopen(input_filename, "r")) == NULL )  {
+if ( (colorin = fopen(input_filename, "r")) == nullptr )  {
 
    colorin = (FILE *) 0;
 

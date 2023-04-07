@@ -201,8 +201,6 @@ cout << "\nUsage: " << program_name << "\n"
 
 exit ( 1 );
 
-return;
-
 }
 
 

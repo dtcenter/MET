@@ -476,8 +476,6 @@ mlog << Error
 
 exit ( 1 );
 
-return;
-
 }
 
 
@@ -528,8 +526,6 @@ switch ( op )  {
    default:
       cerr << "\n\n  do_op() -> unrecognized op ... \"" << op << "\"\n\n";
       exit ( 1 );
-      break;
-
 
 }   //  switch
 
@@ -579,7 +575,6 @@ switch ( op )  {
       mlog << Error << "\ndo_integer_op() -> "
            << "bad operator ... \"" << op << "\"\n\n";
       exit ( 1 );
-      break;
 
 }
 

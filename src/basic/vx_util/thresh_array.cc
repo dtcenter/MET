@@ -277,7 +277,7 @@ void ThreshArray::parse_thresh_str(const char *thresh_str) {
 
       lp = line;
       
-      while((c = strtok(lp, delim)) != NULL ) {
+      while((c = strtok(lp, delim)) != nullptr ) {
       
          add(c);
       

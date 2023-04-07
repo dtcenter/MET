@@ -63,7 +63,7 @@ void rng_set(gsl_rng *&r, const char *rng_name, const char *rng_seed) {
    T = gsl_rng_default;
    r = gsl_rng_alloc(T);
 
-   if(r == NULL) {
+   if(r == nullptr) {
       mlog << Error << "\nrng_set() -> "
            << "error allocating the random number generator!\n\n";
       exit(1);
@@ -309,7 +309,7 @@ int get_seed() {
    unsigned char *u = (unsigned char *) 0, t;
 
    // Get the current time
-   curr_time = time(NULL);
+   curr_time = time(nullptr);
 
    // Swap the first and fourth bytes and the second and third bytes
    u    = (unsigned char *) &(curr_time);
