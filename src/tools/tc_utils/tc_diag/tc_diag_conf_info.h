@@ -24,30 +24,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-struct TCDiagNcOutInfo {
-
-   bool do_track;
-   bool do_diag;
-   bool do_grid_latlon;
-   bool do_grid_raw;
-   bool do_cyl_latlon;
-   bool do_cyl_raw;
-
-      //////////////////////////////////////////////////////////////////
-
-   TCDiagNcOutInfo();
-   TCDiagNcOutInfo & operator+=(const TCDiagNcOutInfo &);
-
-   void clear();
-
-   bool all_false() const;
-
-   void set_all_false();
-   void set_all_true();
-};
-
-////////////////////////////////////////////////////////////////////////
-
 class TCDiagDomainInfo {
 
    private:
@@ -72,10 +48,8 @@ class TCDiagDomainInfo {
       // Diagnostic scripts to be run
       StringArray diag_script;
 
-      // Flag to write this grid to the output
-      bool write_nc;
-
       // Corresponding NetCDF dimensions
+      netCDF::NcDim track_dim;
       netCDF::NcDim range_dim;
       netCDF::NcDim azimuth_dim;
 
@@ -143,7 +117,8 @@ class TCDiagConfInfo {
       ConcatString output_prefix;
 
       // Output file options
-      TCDiagNcOutInfo nc_diag_info;
+      bool nc_cyl_coord_flag;
+      bool nc_diag_flag;
       bool cira_diag_flag;
 
       //////////////////////////////////////////////////////////////////
@@ -155,7 +130,6 @@ class TCDiagConfInfo {
                           std::map<std::string,StringArray>);
 
       void parse_domain_info_map(std::map<std::string,StringArray>);
-      void parse_nc_diag_info();
 
       int get_n_domain() const;
 };

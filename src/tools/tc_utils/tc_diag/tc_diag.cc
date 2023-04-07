@@ -55,7 +55,6 @@ using namespace netCDF;
 static void usage();
 static void process_command_line(int, char**);static void set_file_type(const StringArray &);
 
-static void process_diagnostics();
 static void process_tracks(TrackInfoArray&);
 static void get_atcf_files(const StringArray&, const StringArray&, StringArray&, StringArray&);
 static void process_track_files(const StringArray&, const StringArray&, TrackInfoArray&);
@@ -68,15 +67,13 @@ static void set_data(const StringArray&);
 static void set_config(const StringArray&);
 static void set_outdir(const StringArray&);
 static void setup_nc_file(const TrackInfo &);
-static ConcatString build_outfile_name(const TrackInfo &, const char*);
+static ConcatString build_tmpfile_name(const TrackInfo &, const char *);
+static ConcatString build_outfile_name(const TrackInfo &, const char *);
 static void compute_lat_lon(TcrmwGrid&, double*, double*);
 
 ////////////////////////////////////////////////////////////////////////
 
 // JHG see: https://github.com/dtcenter/MET/issues/2168#issuecomment-1347477566
-// JHG eventually support different cylindrical coordinate definitions but for now
-//     just used the first one. Eventually replace instances of "conf_info.data_opt[0]"
-//     with something else.
 // JHG tcrmw output dimensions should be changed:
 // FROM:	double TMP(range, azimuth, pressure, track_point) ;
 // TO:  	double TMP(track_point, pressure, range, azimuth) ; the last 2 are the "gridded dimensions"
@@ -96,8 +93,28 @@ int met_main(int argc, char *argv[]) {
    // Process command line arguments
    process_command_line(argc, argv);
 
-   // Process gridded and track data
-   process_diagnostics();
+   // Process the track data
+   TrackInfoArray tracks;
+   process_tracks(tracks);
+
+   // Process the gridded data
+   process_track_points(tracks);
+
+
+/* JHG work here
+
+   // JHG, not yet ready to write the tracks to the output
+   // if(nc_out) write_tc_tracks(nc_out, track_point_dim, tracks);
+
+   // Setup NetCDF output
+   if(!conf_info.nc_diag_info.all_false()) setup_nc_file(tracks[0]);
+
+   // List the output file
+   if(nc_out) {
+      mlog << Debug(1) << "Writing output file: "
+           << nc_out_file << "\n";
+   }
+*/
 
    return(0);
 }
@@ -254,32 +271,10 @@ void set_file_type(const StringArray &file_list) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_diagnostics() {
-
-   // Process the track data
-   TrackInfoArray tracks;
-   process_tracks(tracks);
-
-   // Process the gridded data
-   process_track_points(tracks);
-
-   // Setup NetCDF output
-   if(!conf_info.nc_diag_info.all_false()) setup_nc_file(tracks[0]);
-
-   // List the output file
-   if(nc_out) {
-      mlog << Debug(1) << "Writing output file: "
-           << nc_out_file << "\n";
-   }
-}
-
-////////////////////////////////////////////////////////////////////////
-
 void process_tracks(TrackInfoArray& tracks) {
    StringArray files, files_model_suffix;
-
-   // Initialize
-   tracks.clear();
+   TimeArray init_ta;
+   int i;
 
    // Get list of track files
    get_atcf_files(deck_source, deck_model_suffix,
@@ -290,15 +285,30 @@ void process_tracks(TrackInfoArray& tracks) {
 
    process_track_files(files, files_model_suffix, tracks);
 
-   // JHG, not yet ready to write the tracks to the output
-   // if(nc_out) write_tc_tracks(nc_out, track_point_dim, tracks);
+   // Get list of unique track initialization times
+   for(i=0; i<tracks.n(); i++) {
+      if(!init_ta.has(tracks[i].init())) init_ta.add(tracks[i].init());
+   }
+
+   // Check for a single track initialization time
+   if(init_ta.n() > 1) {
+      mlog << Error << "\nprocess_tracks() -> "
+           << "set the \"init_inc\" config option to select one of the "
+           << init_ta.n() << " track initialization times between "
+           << unix_to_yyyymmdd_hhmmss(init_ta.min()) << " and "
+           << unix_to_yyyymmdd_hhmmss(init_ta.max()) << ".\n\n";
+      exit(1);
+   }
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
+//
 // Automated Tropical cyclone Forecasting System
 // https://www.nrlmry.navy.mil/atcf_web/docs/ATCF-FAQ.html
+//
+////////////////////////////////////////////////////////////////////////
 
 void get_atcf_files(const StringArray& source,
                     const StringArray& model_suffix,
@@ -338,7 +348,6 @@ void process_track_files(const StringArray& files,
                          const StringArray& model_suffix,
                          TrackInfoArray& tracks) {
    int i, cur_read, cur_add, tot_read, tot_add;
-   TimeArray init_ta;
    LineDataFile f;
    ConcatString cs;
    ATCFTrackLine line;
@@ -401,24 +410,9 @@ void process_track_files(const StringArray& files,
    // Check for no matching tracks
    if(tracks.n() == 0) {
        mlog << Error << "\nprocess_track_files() -> "
-           << "no tracks retained! Adjust the configuration file "
+           << "no tracks retained! Adjust the config file "
            << "filtering options to select a single track.\n\n";
        exit(1);
-   }
-
-   // Get list of unique track initialization times
-   for(i=0; i<tracks.n(); i++) {
-      if(!init_ta.has(tracks[i].init())) init_ta.add(tracks[i].init());
-   }
-
-   // Check for a single track initialization time
-   if(init_ta.n() > 1) {
-      mlog << Error << "\nprocess_track_files() -> "
-           << "set the \"init_inc\" configuration option to select one of the "
-           << init_ta.n() << " track initialization times between "
-           << unix_to_yyyymmdd_hhmmss(init_ta.min()) << " and "
-           << unix_to_yyyymmdd_hhmmss(init_ta.max()) << ".\n\n";
-      exit(1);
    }
 
    return;
@@ -587,9 +581,9 @@ void set_outdir(const StringArray& a) {
 
 void setup_nc_file(const TrackInfo &track) {
    VarInfo* var_info = (VarInfo*) 0;
-
+/* JHG
    // Build the output file name
-   nc_out_file = build_outfile_name(track, ".nc");
+   nc_out_file = build_outfile_name(track, out_dir, fcst_hour, domain, ".nc");
 
    // Create NetCDF file
    nc_out = open_ncfile(nc_out_file.c_str(), true);
@@ -604,7 +598,7 @@ void setup_nc_file(const TrackInfo &track) {
    // Track point dimension
    track_point_dim = add_dim(nc_out, "track_point", NC_UNLIMITED);
 
-   // Loop over the domains definitions
+   // Loop over the domain definitions
    map<std::string,TCDiagDomainInfo>::iterator it;
    for(it  = conf_info.domain_info_map.begin();
        it != conf_info.domain_info_map.end();
@@ -628,7 +622,7 @@ void setup_nc_file(const TrackInfo &track) {
       di->range_dim   = add_dim(nc_out, rng_cs.c_str(), (long) di->data.range_n);
       di->azimuth_dim = add_dim(nc_out, azi_cs.c_str(), (long) di->data.azimuth_n);
    }
-
+*/
    return;
 }
 
@@ -668,6 +662,30 @@ void setup_nc_file(const TrackInfo &track) {
    return;
 }
 */
+
+////////////////////////////////////////////////////////////////////////
+//
+// Build the output temp file name using the program name,
+// track/timing information and the domain name
+//
+////////////////////////////////////////////////////////////////////////
+
+ConcatString build_tmpfile_name(const TrackInfo &track,
+                                const TrackPoint &point,
+                                const char *domain) {
+   ConcatString cs;
+
+   cs << conf_info.tmp_dir
+      << "/tmp_" << program_name
+      << "_"     << track.technique()
+      << "_"     << track.storm_id()
+      << "_"     << unix_to_yyyymmddhh(track.init())
+      << "_f"    << point.lead() / sec_per_hour
+      << "_"     << domain;
+
+   return(make_temp_file_name(cs.text(), ".nc"));
+}
+
 ////////////////////////////////////////////////////////////////////////
 
 ConcatString build_outfile_name(const TrackInfo &track,

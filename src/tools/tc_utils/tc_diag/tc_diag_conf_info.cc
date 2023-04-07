@@ -24,78 +24,6 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 //
-//  Code for struct TCDiagNcOutInfo
-//
-////////////////////////////////////////////////////////////////////////
-
-TCDiagNcOutInfo::TCDiagNcOutInfo() {
-   clear();
-}
-
-////////////////////////////////////////////////////////////////////////
-
-TCDiagNcOutInfo & TCDiagNcOutInfo::operator+=(const TCDiagNcOutInfo &t) {
-
-   if(t.do_track)       do_track       = true;
-   if(t.do_diag)        do_diag        = true;
-   if(t.do_grid_latlon) do_grid_latlon = true;
-   if(t.do_grid_raw)    do_grid_raw    = true;
-   if(t.do_cyl_latlon)  do_cyl_latlon  = true;
-   if(t.do_cyl_raw)     do_cyl_raw     = true;
-
-   return(*this);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void TCDiagNcOutInfo::clear() {
-
-   set_all_false();
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-bool TCDiagNcOutInfo::all_false() const {
-
-   bool status = do_track       || do_diag     ||
-                 do_grid_latlon || do_grid_raw ||
-                 do_cyl_latlon  || do_cyl_raw;
-
-   return(!status);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void TCDiagNcOutInfo::set_all_false() {
-
-   do_track       = false;
-   do_diag        = false;
-   do_grid_latlon = false;
-   do_grid_raw    = false;
-   do_cyl_latlon  = false;
-   do_cyl_raw     = false;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void TCDiagNcOutInfo::set_all_true() {
-
-   do_track       = true;
-   do_diag        = true;
-   do_grid_latlon = true;
-   do_grid_raw    = true;
-   do_cyl_latlon  = true;
-   do_cyl_raw     = true;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-//
 //  Code for class TCDiagDomainInfo
 //
 ////////////////////////////////////////////////////////////////////////
@@ -137,8 +65,6 @@ void TCDiagDomainInfo::clear() {
    data_files.clear();
    var_info_ptr.clear();
    diag_script.clear();
-
-   write_nc = false;
 
    return;
 }
@@ -230,8 +156,9 @@ void TCDiagConfInfo::clear() {
    tangential_velocity_long_field_name.clear();
    radial_velocity_long_field_name.clear();
 
-   nc_diag_info.clear();
-   cira_diag_flag = false;
+   nc_cyl_coord_flag = false;
+   nc_diag_flag      = false;
+   cira_diag_flag    = false;
 
    tmp_dir.clear();
    output_prefix.clear();
@@ -327,7 +254,8 @@ void TCDiagConfInfo::process_config(GrdFileType file_type,
    // Check for empty data settings
    if(n_data == 0) {
        mlog << Error << "\nTCDiagConfInfo::process_config() -> "
-            << "data may not be empty.\n\n";
+            << "the \"" << conf_key_data_field
+            << "\" config file entry cannot be empty!\n\n";
        exit(1);
    }
 
@@ -382,18 +310,23 @@ void TCDiagConfInfo::process_config(GrdFileType file_type,
    radial_velocity_long_field_name =
       conf.lookup_string(conf_key_radial_velocity_long_field_name);
 
-   // Conf: nc_diag_flag
-   parse_nc_diag_info();
+   // Conf: nc_cyl_coord_flag
+   nc_cyl_coord_flag = conf.lookup_bool(conf_key_nc_cyl_coord_flag);
 
-   // Set the write_nc flag, if needed
-   if(nc_diag_info.do_cyl_latlon || nc_diag_info.do_cyl_raw) {
-      for(it = domain_info_map.begin(); it != domain_info_map.end(); it++) {
-         it->second.write_nc = true;
-      }
-   }
+   // Conf: nc_diag_flag
+   nc_diag_flag = conf.lookup_bool(conf_key_nc_diag_flag);
 
    // Conf: cira_diag_flag
    cira_diag_flag = conf.lookup_bool(conf_key_cira_diag_flag);
+
+   // At least one should be true
+   if(!nc_diag_flag && !cira_diag_flag) {
+      mlog << Error << "\nTCDiagConfInfo::process_config() -> "
+           << "the \"" << conf_key_nc_diag_flag << "\" and \""
+           << conf_key_cira_diag_flag
+           << "\" config entries cannot both be false.\n\n";
+      exit(1);
+   }
 
    // Conf: tmp_dir
    tmp_dir = parse_conf_tmp_dir(&conf);
@@ -422,13 +355,10 @@ void TCDiagConfInfo::parse_domain_info_map(map<string,StringArray> data_files_ma
    // Parse each grid info object
    for(int i=0; i<dict->n_entries(); i++) {
       ConcatString domain;
-      Dictionary di_dict;
       TCDiagDomainInfo di;
 
-      di_dict = *((*dict)[i]->dict_value());
-
       // Parse the current domain info
-      di.parse_domain_info(di_dict, domain);
+      di.parse_domain_info(*((*dict)[i]->dict_value()), domain);
 
       // Store the domain-specifc data files
       if(data_files_map.count(domain) > 0) {
@@ -466,51 +396,6 @@ void TCDiagConfInfo::parse_domain_info_map(map<string,StringArray> data_files_ma
          exit(1);
       }
    }
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void TCDiagConfInfo::parse_nc_diag_info() {
-   const DictionaryEntry * e = (const DictionaryEntry *) 0;
-
-   e = conf.lookup(conf_key_nc_diag_flag);
-
-   if(!e) {
-      mlog << Error << "\nTCDiagConfInfo::parse_nc_diag_info() -> "
-           << "lookup failed for key \"" << conf_key_nc_diag_flag
-           << "\"\n\n";
-      exit(1);
-   }
-
-   const ConfigObjectType type = e->type();
-
-   if(type == BooleanType) {
-      bool value = e->b_value();
-
-      if(!value) nc_diag_info.set_all_false();
-
-      return;
-   }
-
-   // It should be a dictionary
-   if(type != DictionaryType) {
-      mlog << Error << "\nTCDiagConfInfo::parse_nc_diag_info() -> "
-           << "bad type (" << configobjecttype_to_string(type)
-           << ") for key \"" << conf_key_nc_diag_flag << "\"\n\n";
-      exit(1);
-   }
-
-   // Parse the various entries
-   Dictionary * d = e->dict_value();
-
-   nc_diag_info.do_track       = d->lookup_bool(conf_key_track_flag);
-   nc_diag_info.do_diag        = d->lookup_bool(conf_key_diag_flag);
-   nc_diag_info.do_grid_latlon = d->lookup_bool(conf_key_grid_latlon_flag);
-   nc_diag_info.do_grid_raw    = d->lookup_bool(conf_key_grid_raw_flag);
-   nc_diag_info.do_cyl_latlon  = d->lookup_bool(conf_key_cyl_latlon_flag);
-   nc_diag_info.do_cyl_raw     = d->lookup_bool(conf_key_cyl_raw_flag);
 
    return;
 }

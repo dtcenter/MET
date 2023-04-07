@@ -91,10 +91,9 @@ static ConcatString out_prefix;
 //
 ////////////////////////////////////////////////////////////////////////
 
-// Output NetCDF file
-static ConcatString nc_out_file;
-static NcFile*      nc_out = (NcFile*) 0;
-static NcDim        track_point_dim;
+// Output NetCDF files
+static StringArray nc_diag_files;
+static std::vector<NcFile *> nc_diag_out;
 
 ////////////////////////////////////////////////////////////////////////
 //
