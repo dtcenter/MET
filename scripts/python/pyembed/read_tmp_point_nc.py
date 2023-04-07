@@ -6,26 +6,25 @@
 #
 ########################################################################
 
-import os
 import sys
 
-# add share/met/python directory to system path to find met_point_obs
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__),
-                                             os.pardir, 'python')))
-from met_point_obs import met_point_obs
-from met_point_obs_nc import nc_point_obs
+from met.point import met_point_tools
+try:
+    from python_embedding import pyembed_tools
+except:
+    from pyembed.python_embedding import pyembed_tools
 
-netcdf_filename = sys.argv[1]
+#pyembed_tools.add_python_path(__file__)
+
+input_filename = sys.argv[1]
 
 # read NetCDF file
-print('{p}  reading {f}'.format(p=met_point_obs.get_prompt(), f=netcdf_filename))
+print('{p}  reading {f}'.format(p=met_point_tools.get_prompt(), f=input_filename))
 try:
-    point_obs_data = nc_point_obs()
-    point_obs_data.read_data(netcdf_filename)
+    point_obs_data = met_point_tools.get_nc_point_obs()
+    point_obs_data.read_data(input_filename)
 
     met_point_data = point_obs_data.get_point_data()
     met_point_data['met_point_data'] = point_obs_data
 except:
-    from read_tmp_ascii import read_tmp_ascii
-
-    point_data = read_tmp_ascii(netcdf_filename)
+    point_data = pyembed_tools.read_tmp_ascii(input_filename)

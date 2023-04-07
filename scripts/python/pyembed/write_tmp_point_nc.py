@@ -10,50 +10,28 @@
 
 import os
 import sys
-import importlib.util
 
-# add share/met/python directory to system path to find met_point_obs
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__),
-                                             os.pardir, 'python')))
+try:
+    from python_embedding import pyembed_tools
+except:
+    from pyembed.python_embedding import pyembed_tools
 
-from met_point_obs import met_point_obs
-from met_point_obs_nc import nc_point_obs
-    
-PROMPT = met_point_obs.get_prompt()
-print("{p} Python Script:\t".format(p=PROMPT)  + repr(sys.argv[0]))
-print("{p} User Command:\t".format(p=PROMPT)   + repr(' '.join(sys.argv[2:])))
-print("{p} Temporary File:\t".format(p=PROMPT) + repr(sys.argv[1]))
+pyembed_tools.add_python_path(__file__)
+from met.point import met_point_tools
 
-tmp_filename = sys.argv[1]
-pyembed_module_name = sys.argv[2]
-sys.argv = sys.argv[2:]
+if __name__ == '__main__':
+    argv_org = sys.argv[:]
+    tmp_filename = sys.argv[1]
+    met_in = pyembed_tools.call_python(sys.argv)
 
-# append user script dir to system path
-pyembed_dir, pyembed_file = os.path.split(pyembed_module_name)
-if pyembed_dir:
-    sys.path.insert(0, pyembed_dir)
-
-if not pyembed_module_name.endswith('.py'):
-    pyembed_module_name += '.py'
-
-user_base = os.path.basename(pyembed_module_name).replace('.py','')
-
-spec = importlib.util.spec_from_file_location(user_base, pyembed_module_name)
-met_in = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(met_in)
-
-if hasattr(met_in, 'point_data'):
-    from write_tmp_point import write_tmp_ascii
-
-    write_tmp_ascii(tmp_filename, met_in.point_data)
-elif hasattr(met_in, 'point_obs_data'):
-    met_in.point_obs_data.save_ncfile(tmp_filename)
-else:
-    if hasattr(met_in.met_point_data, 'point_obs_data'):
-        met_in.met_point_data['point_obs_data'].save_ncfile(tmp_filename)
+    if hasattr(met_in, 'point_data'):
+        pyembed_tools.write_tmp_ascii(tmp_filename, met_in.point_data)
+    elif hasattr(met_in, 'point_obs_data'):
+        met_in.point_obs_data.save_ncfile(tmp_filename)
     else:
-        tmp_point_obs = nc_point_obs()
-        tmp_point_obs.put_data(met_in.met_point_data)
-        tmp_point_obs.save_ncfile(tmp_filename)
-
-#print('{p} writing {f}'.format(p=PROMPT, f=tmp_filename))
+        if hasattr(met_in.met_point_data, 'point_obs_data'):
+            met_in.met_point_data['point_obs_data'].save_ncfile(tmp_filename)
+        else:
+            tmp_point_obs = met_point_tools.get_nc_point_obs()
+            tmp_point_obs.put_data(met_in.met_point_data)
+            tmp_point_obs.save_ncfile(tmp_filename)

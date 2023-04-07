@@ -1,6 +1,6 @@
 import os
 import sys
-from met.dataplane import load_txt, get_grid_metadata_from_env
+from met.dataplane import dataplane
 
 ###########################################
 
@@ -19,11 +19,11 @@ if len(sys.argv) != 3:
 input_file = os.path.expandvars(sys.argv[1])
 data_name  = sys.argv[2]
 
-met_data = load_txt(input_file, data_name)
+met_data = dataplane.load_txt(input_file, data_name)
 
 ## create the metadata dictionary from the environment variable,
 ## Default env_name = 'PYTHON_GRID'
 
-attrs = get_grid_metadata_from_env(data_name)
+attrs = dataplane.get_grid_metadata_from_env(data_name)
 
 print("Attributes:\t" + repr(attrs))

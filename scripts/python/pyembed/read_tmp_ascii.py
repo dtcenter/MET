@@ -20,21 +20,14 @@ __version__ = '1.0.0'
 
 import argparse
 
+try:
+    from python_embedding import pyembed_tools
+except:
+    from pyembed.python_embedding import pyembed_tools
+
 def read_tmp_ascii(filename):
-    """
-    Arguments:
-        filename (string): temporary file created by write_tmp_point.py or write_tmp_mpr.py
-
-    Returns:
-        (list of lists): point or mpr data
-    """
-    f = open(filename, 'r')
-    lines = f.readlines()
-    f.close()
-
-    global ascii_data
-    ascii_data = [eval(line.strip('\n')) for line in lines]
-    
+    global ascii_data   # defined at python_handler.cc (tmp_list_name)
+    ascii_data = pyembed_tools.read_tmp_ascii(filename)
     return ascii_data
 
 if __name__ == '__main__':

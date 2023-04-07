@@ -1,6 +1,7 @@
-import pandas as pd
 import os
 import sys
+from met.mprbase import mpr_data
+
 
 ########################################################################
 
@@ -21,10 +22,7 @@ try:
     print("Input File:\t" + repr(input_file))
 
     # Read MPR lines, skipping the header row and first column.
-    mpr_data = pd.read_csv(input_file, header=None,
-                           delim_whitespace=True, keep_default_na=False,
-                           skiprows=1, usecols=range(1,37),
-                           dtype=str).values.tolist()
+    mpr_data = mpr_data.read_mpr(input_file)
     print("Data Length:\t" + repr(len(mpr_data)))
     print("Data Type:\t" + repr(type(mpr_data)))
 except NameError:

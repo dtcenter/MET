@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 '''
 Created on Nov 10, 2021
 
@@ -9,56 +8,51 @@ Created on Nov 10, 2021
   "def read_data(self, args)" which fills the array variables at __init__().
 - The args can be 1) single string argument, 2) the list of arguments,
   or 3) the dictionary of arguments.
-- A python objects, met_point_data, must set:
+- Either "point_data" or "met_point_data" python object (variable) must set:
+  + "point_data" is from 11 column text input
+  + "met_point_data" is array of neaders and observation data.
   + "point_obs_data" is an optional to use custom python EXE.
      It's a python instance which processes the point observation data
 - The customized script is expected to include following codes:
 
-    # prepare arguments for the customized script
-    args = {'input', sys.argv[1]}   # or args = []
-    point_obs_data = custom_reader()
-    point_obs_data.read_data(args)
-    met_point_data = point_obs_data.get_point_data()
+    + Note: csv_point_obs is an example of met_point_data, not point_data
+
+    + Example of "point_data": see met_point_tools.read_text_point_obs()
+
+def read_custom_data(data_filename):
+   # Implemente here
+   return the array of 11 column data
+
+# prepare arguments for the customized script
+data_filename = sys.arg[1]
+point_data = read_custom_data(data_filename)
+
+
+    + Example of "met_point_data": see csv_point_obs
+
+from met.point import met_point_obs
+
+class custom_reader(met_point_obs):
+
+    def read_data(data_filename):
+        # Implemente here
+
+# prepare arguments for the customized script
+data_filename = sys.argv[1]
+point_obs_data = custom_reader()
+point_obs_data.read_data(data_filename)
+met_point_data = point_obs_data.get_point_data()
 
 '''
 
 import os
 from abc import ABC, abstractmethod
+
 import numpy as np
+import netCDF4 as nc
 import pandas as pd
 
 COUNT_SHOW = 30
-
-def get_prompt():
-    return "  python:"
-
-def met_is_python_prefix(user_cmd):
-    return user_cmd.startswith(base_met_point_obs.python_prefix)
-
-########################################################################
-
-# Read the input file as the first argument
-def read_ascii_point_obs(input_file, header=None,
-             delim_whitespace=True, keep_default_na=False):
-    # Read and format the input 11-column observations:
-    #   (1)  string:  Message_Type
-    #   (2)  string:  Station_ID
-    #   (3)  string:  Valid_Time(YYYYMMDD_HHMMSS)
-    #   (4)  numeric: Lat(Deg North)
-    #   (5)  numeric: Lon(Deg East)
-    #   (6)  numeric: Elevation(msl)
-    #   (7)  string:  Var_Name(or GRIB_Code)
-    #   (8)  numeric: Level
-    #   (9)  numeric: Height(msl or agl)
-    #   (10) string:  QC_String
-    #   (11) numeric: Observation_Value
-    ascii_point_data = pd.read_csv(input_file, header=header,
-                                   delim_whitespace=delim_whitespace,
-                                   keep_default_na=keep_default_na,
-                                   names=['typ', 'sid', 'vld', 'lat', 'lon', 'elv', 'var', 'lvl', 'hgt', 'qc', 'obs'],
-                                   dtype={'typ':'str', 'sid':'str', 'vld':'str', 'var':'str', 'qc':'str'}).values.tolist()
-    return ascii_point_data
-
 
 class base_met_point_obs(object):
     '''
@@ -305,12 +299,16 @@ class base_met_point_obs(object):
             self.hdr_inst_typ = po_array
 
     @staticmethod
+    def get_prompt():
+        return "  python:"
+
+    @staticmethod
     def error_msg(msg):
-        print(f'{get_prompt()} {base_met_point_obs.ERROR_P} {msg}')
+        print(f'{base_met_point_obs.get_prompt()} {base_met_point_obs.ERROR_P} {msg}')
 
     @staticmethod
     def info_msg(msg):
-        print(f'{get_prompt()} {base_met_point_obs.INFO_P} {msg}')
+        print(f'{base_met_point_obs.get_prompt()} {base_met_point_obs.INFO_P} {msg}')
 
     @staticmethod
     def get_python_script(arg_value):
@@ -385,7 +383,7 @@ class base_met_point_obs(object):
         print(' === MET point data by python embedding ===')
 
 
-class csv_point_obs(ABC, base_met_point_obs):
+class csv_point_obs(base_met_point_obs):
 
     def __init__(self, point_data):
         self.point_data = point_data
@@ -626,13 +624,51 @@ class met_point_obs(ABC, base_met_point_obs):
         '''
         pass
 
+
+class met_point_tools():
+
+    @staticmethod
+    def convert_point_data(point_data, check_all_records=False, input_type='csv'):
+        convert_point_data(point_data, check_all_records, input_type)
+
     @staticmethod
     def get_prompt():
-        return get_prompt()
+        return "  python:"
+
+    @staticmethod
+    def get_nc_point_obs():
+        return nc_point_obs()
+
+    @staticmethod
+    def get_sample_point_obs():
+        return sample_met_point_obs()
 
     @staticmethod
     def is_python_prefix(user_cmd):
         return user_cmd.startswith(base_met_point_obs.python_prefix)
+
+    @staticmethod
+    # Read the input file which is 11 column text file as the first argument
+    def read_text_point_obs(input_file, header=None,
+                            delim_whitespace=True, keep_default_na=False):
+        # Read and format the input 11-column observations:
+        #   (1)  string:  Message_Type
+        #   (2)  string:  Station_ID
+        #   (3)  string:  Valid_Time(YYYYMMDD_HHMMSS)
+        #   (4)  numeric: Lat(Deg North)
+        #   (5)  numeric: Lon(Deg East)
+        #   (6)  numeric: Elevation(msl)
+        #   (7)  string:  Var_Name(or GRIB_Code)
+        #   (8)  numeric: Level
+        #   (9)  numeric: Height(msl or agl)
+        #   (10) string:  QC_String
+        #   (11) numeric: Observation_Value
+        ascii_point_data = pd.read_csv(input_file, header=header,
+                                       delim_whitespace=delim_whitespace,
+                                       keep_default_na=keep_default_na,
+                                       names=['typ', 'sid', 'vld', 'lat', 'lon', 'elv', 'var', 'lvl', 'hgt', 'qc', 'obs'],
+                                       dtype={'typ':'str', 'sid':'str', 'vld':'str', 'var':'str', 'qc':'str'}).values.tolist()
+        return ascii_point_data
 
 
 # Note: caller should import netCDF4
@@ -929,7 +965,7 @@ def main_nc(argv):
         point_obs_data = nc_point_obs()
         point_obs_data.read_data(point_obs_data.get_nc_filename(netcdf_filename))
         met_point_data = point_obs_data.save_ncfile(tmp_nc_name)
-        print(f'{get_prompt()} saved met_point_data to {tmp_nc_name}')
+        print(f'{base_met_point_obs.get_prompt()} saved met_point_data to {tmp_nc_name}')
         met_point_data['met_point_data'] = point_obs_data
     
         if DO_PRINT_DATA or ARG_PRINT_DATA == argv[-1]:

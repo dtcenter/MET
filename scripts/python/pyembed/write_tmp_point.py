@@ -8,41 +8,14 @@
 #
 ########################################################################
 
-import os
 import sys
-import importlib.util
 
-
-def write_tmp_ascii(filename, point_data):
-    with open(filename, 'w') as f:
-        for line in point_data:
-            f.write(str(line) + '\n')
+try:
+    from python_embedding import pyembed_tools
+except:
+    from pyembed.python_embedding import pyembed_tools
 
 if __name__ == '__main__':
-    print("Python Script:\t"  + repr(sys.argv[0]))
-    print("User Command:\t"   + repr(' '.join(sys.argv[2:])))
-    print("Temporary File:\t" + repr(sys.argv[1]))
-
     tmp_filename = sys.argv[1]
-    pyembed_module_name = sys.argv[2]
-    sys.argv = sys.argv[2:]
-
-    # add share/met/python directory to system path to find met_point_obs
-    sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__),
-                                             os.pardir, 'python')))
-
-    # append user script dir to system path
-    pyembed_dir, pyembed_file = os.path.split(pyembed_module_name)
-    if pyembed_dir:
-        sys.path.insert(0, pyembed_dir)
-
-    if not pyembed_module_name.endswith('.py'):
-        pyembed_module_name += '.py'
-
-    user_base = os.path.basename(pyembed_module_name).replace('.py','')
-
-    spec = importlib.util.spec_from_file_location(user_base, pyembed_module_name)
-    met_in = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(met_in)
-
-    write_tmp_ascii(tmp_filename, met_in.point_data)
+    met_in = pyembed_tools.call_python(sys.argv)
+    pyembed_tools.write_tmp_ascii(tmp_filename, met_in.point_data)
