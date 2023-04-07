@@ -486,11 +486,12 @@ class TCStatJobRIRW : public TCStatJob {
 
       void add_map(std::map<ConcatString,RIRWMapData,cs_cmp>&);
 
-      void do_output    (std::ostream &);
-      void do_ctc_output(std::ostream &);
-      void do_cts_output(std::ostream &);
-      void do_mpr_output(std::ostream &);
-
+      void do_output     (std::ostream &);
+      void do_ctc_output (std::ostream &);
+      void do_cts_output (std::ostream &);
+      void do_mpr_output (std::ostream &);
+      void do_stat_output(std::ostream &);
+      
       // Store the case information
       StringArray ByColumn;
 
