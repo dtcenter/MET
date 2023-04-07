@@ -259,7 +259,7 @@ The ASCII2NC tool supports the "-format python" option. With this option, point 
 .. code-block:: none
 
                 ascii2nc -format python \
-                "MET_BASE/python/read_ascii_point.py sample_ascii_obs.txt" \
+                "MET_BASE/python/examples/read_ascii_point.py sample_ascii_obs.txt" \
                 sample_ascii_obs_python.nc
 
 The Point2Grid, Plot-Point-Obs, Ensemble-Stat, and Point-Stat tools also process point observations. They support Python embedding of point observations directly on the command line by replacing the input MET NetCDF point observation file name with the Python command to be run. The Python command must begin with the prefix 'PYTHON_NUMPY=' and be followed by the path to the User's Python script and any arguments. The full command should be enclosed in single quotes to prevent embedded whitespace from causing parsing errors. An example of this is shown below:
@@ -267,14 +267,14 @@ The Point2Grid, Plot-Point-Obs, Ensemble-Stat, and Point-Stat tools also process
 .. code-block:: none
 
                 plot_point_obs \
-                "PYTHON_NUMPY=MET_BASE/python/read_ascii_point.py sample_ascii_obs.txt" \
+                "PYTHON_NUMPY=MET_BASE/python/examples/read_ascii_point.py sample_ascii_obs.txt" \
                 output_image.ps
 
 Both of the above examples use the **read_ascii_point.py** sample script which is included with the MET code. It reads ASCII data in MET's 11-column point observation format and stores it in a Pandas DataFrame to be read by the MET tools using Python embedding for point data. The **read_ascii_point.py** sample script can be found in:
 
-• MET installation directory in *MET_BASE/python*.
+• MET installation directory in *MET_BASE/python/examples*.
 
-• `MET GitHub repository <https://github.com/dtcenter/MET>`_ in *met/scripts/python*.
+• `MET GitHub repository <https://github.com/dtcenter/MET>`_ in *met/scripts/python/examples*.
 
 .. _pyembed-mpr-data:
 
@@ -285,6 +285,6 @@ The Stat-Analysis tool supports the "-lookin python" option. With this option, m
 
 The **read_ascii_mpr.py** sample script can be found in:
 
-• MET installation directory in *MET_BASE/python*.
+• MET installation directory in *MET_BASE/python/examples*.
 
-• `MET GitHub repository <https://github.com/dtcenter/MET>`_ in *met/scripts/python*.
+• `MET GitHub repository <https://github.com/dtcenter/MET>`_ in *met/scripts/python/examples*.

@@ -323,7 +323,7 @@ The example below uses Python embedding.
 .. code-block:: none
 
   stat_analysis \
-  -lookin python MET_BASE/python/read_ascii_mpr.py point_stat_mpr.txt \
+  -lookin python MET_BASE/python/examples/read_ascii_mpr.py point_stat_mpr.txt \
   -job aggregate_stat -line_type MPR -out_line_type CNT \
   -by FCST_VAR,FCST_LEV
 
