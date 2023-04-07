@@ -8,7 +8,10 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+#include <iostream>
+#include <vector>
 
+#include "observation.h"
 #include "vx_python3_utils.h"
 #include "python_pointdata.h"
 #include "pointdata_from_array.h"
@@ -27,21 +30,119 @@ extern GlobalPython GP;   //  this needs external linkage
 
 static const char * user_ppath            = 0;
 
-static const char write_tmp_nc         [] = "MET_BASE/wrappers/write_tmp_point_nc.py";
+static const char write_tmp_nc         [] = "MET_BASE/python/pyembed/write_tmp_point_nc.py";
 
-static const char read_tmp_nc          [] = "read_tmp_point_nc";   //  NO ".py" suffix
+static const char read_tmp_nc          [] = "pyembed.read_tmp_point_nc";   //  NO ".py" suffix
 
 ////////////////////////////////////////////////////////////////////////
 
 
 static bool tmp_nc_point_obs(const char * script_name, int user_script_argc,
-                             char ** user_script_argv, MetPointDataPython &met_pd_out);
+                             char ** user_script_argv, MetPointDataPython &met_pd_out,
+                             MaskFilters *filters);
 
 static bool straight_python_point_data(const char * script_name,
                                       int script_argc, char ** script_argv,
-                                      const bool use_xarray, MetPointDataPython &met_pd_out);
+                                      MetPointDataPython &met_pd_out,
+                                      MaskFilters *filters);
+
+bool process_point_data(PyObject *module_obj, MetPointDataPython &met_pd_out);
+bool process_point_data_list(PyObject *python_obj, MetPointDataPython &met_pd_out,
+                             MaskFilters *filters);
 
 ////////////////////////////////////////////////////////////////////////
+
+void check_header_data(MetPointHeader *header_data, const char *caller) {
+
+   if (header_data->typ_idx_array.n() == 0) {
+      mlog << Error << "\n" << caller
+           << "The hdr_typ is empty. Please check if python input is processed properly\n\n";
+      exit (1);
+   }
+   if (header_data->sid_idx_array.n() == 0) {
+      mlog << Error << "\n" << caller
+           << "The hdr_sid is empty. Please check if python input is processed properly\n\n";
+      exit (1);
+   }
+   if (header_data->vld_idx_array.n() == 0) {
+      mlog << Error << "\n" << caller
+           << "The hdr_vld is empty. Please check if python input is processed properly\n\n";
+      exit (1);
+   }
+   if (header_data->lat_array.n() == 0) {
+      mlog << Error << "\n" << caller
+           << "The hdr_lat is empty. Please check if python input is processed properly\n\n";
+      exit (1);
+   }
+   if (header_data->lon_array.n() == 0) {
+      mlog << Error << "\n" << caller
+           << "The hdr_lon is empty. Please check if python input is processed properly\n\n";
+      exit (1);
+   }
+   if (header_data->elv_array.n() == 0) {
+      mlog << Error << "\n" << caller
+           << "The hdr_elv is empty. Please check if python input is processed properly\n\n";
+      exit (1);
+   }
+
+   if (header_data->typ_array.n() == 0) {
+      mlog << Error << "\n" << caller
+           << "The hdr_typ_table is empty. Please check if python input is processed properly\n\n";
+      exit (1);
+   }
+   if (header_data->sid_array.n() == 0) {
+      mlog << Error << "\n" << caller
+           << "The hdr_sid_table is empty. Please check if python input is processed properly\n\n";
+      exit (1);
+   }
+   if (header_data->vld_array.n() == 0) {
+      mlog << Error << "\n" << caller
+           << "The hdr_vld_table is empty. Please check if python input is processed properly\n\n";
+      exit (1);
+   }
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void check_obs_data(MetPointObsData *obs_data, bool use_var_id, const char *caller) {
+
+   if (obs_data->qty_names.n() == 0) {
+      mlog << Error << "\n" << caller
+           << "The obs_qty_table is empty. Please check if python input is processed properly\n\n";
+      exit (1);
+   }
+   if (use_var_id && obs_data->var_names.n() == 0) {
+      mlog << Error << "\n" << caller
+           << "The obs_var_table is empty. Please check if python input is processed properly\n\n";
+      exit (1);
+   }
+
+}
+
+////////////////////////////////////////////////////////////////////////
+
+
+PyObject *get_python_object(PyObject *module_obj, const char *python_var_name)
+{
+
+   //
+   //   get the namespace for the module (as a dictionary)
+   //
+
+   PyObject *module_dict_obj = PyModule_GetDict (module_obj);
+
+   //
+   //  get handles to the objects of interest from the module_dict
+   //
+
+   PyObject *python_met_point_data = PyDict_GetItemString (module_dict_obj, python_var_name);
+
+   return python_met_point_data;
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
 
 static void set_str_array_from_python(PyObject *python_data, const char *python_key, StringArray *out) {
    const char *method_name = "set_met_array_from_python(StringArray *) -> ";
@@ -63,7 +164,7 @@ static void set_str_array_from_python(PyObject *python_data, const char *python_
 
 
 bool python_point_data(const char * script_name, int script_argc, char ** script_argv,
-                       const bool use_xarray, MetPointDataPython &met_pd_out)
+                       MetPointDataPython &met_pd_out, MaskFilters *filters)
 
 {
 
@@ -71,16 +172,15 @@ bool status = false;
 
 if ( user_ppath == 0 ) user_ppath = getenv(user_python_path_env);
 
-if ( user_ppath != 0 ) {
-   //  do_tmp_nc = true;
+if ( user_ppath != 0 ) {    //  do_tmp_nc = true;
 
    status = tmp_nc_point_obs(script_name, script_argc, script_argv,
-                             met_pd_out);
+                             met_pd_out, filters);
 }
 else {
 
    status = straight_python_point_data(script_name, script_argc, script_argv,
-                                       use_xarray, met_pd_out);
+                                       met_pd_out, filters);
 }
 
 return ( status );
@@ -89,28 +189,20 @@ return ( status );
 
 ////////////////////////////////////////////////////////////////////////
 
-bool process_python_point_data(PyObject *module_obj, MetPointDataPython &met_pd_out)
+bool process_point_data(PyObject *python_met_point_data,
+                        MetPointDataPython &met_pd_out)
+
 {
 
 int int_value;
-PyObject *module_dict_obj = 0;
 PyObject *python_value    = 0;
-PyObject *python_met_point_data = 0;
 ConcatString cs, user_dir, user_base;
-const char *method_name = "process_python_point_data -> ";
-const char *method_name_s = "process_python_point_data()";
-
-   //
-   //   get the namespace for the module (as a dictionary)
-   //
-
-module_dict_obj = PyModule_GetDict (module_obj);
+const char *method_name = "process_point_data -> ";
+const char *method_name_s = "process_point_data()";
 
    //
    //  get handles to the objects of interest from the module_dict
    //
-
-python_met_point_data = PyDict_GetItemString (module_dict_obj, python_key_point_data);
 
 python_value = PyDict_GetItemString (python_met_point_data, python_use_var_id);
 
@@ -142,8 +234,7 @@ met_pd_out.allocate(int_value);
 MetPointObsData *obs_data = met_pd_out.get_point_obs_data();
 MetPointHeader *header_data = met_pd_out.get_header_data();
 
-
-      //  look up the data array variable name from the dictionary
+   //  look up the data array variable name from the dictionary
 
    set_array_from_python(python_met_point_data, numpy_array_hdr_typ, &header_data->typ_idx_array);
    set_array_from_python(python_met_point_data, numpy_array_hdr_sid, &header_data->sid_idx_array);
@@ -151,58 +242,16 @@ MetPointHeader *header_data = met_pd_out.get_header_data();
    set_array_from_python(python_met_point_data, numpy_array_hdr_lat, &header_data->lat_array);
    set_array_from_python(python_met_point_data, numpy_array_hdr_lon, &header_data->lon_array);
    set_array_from_python(python_met_point_data, numpy_array_hdr_elv, &header_data->elv_array);
-   if (header_data->typ_idx_array.n() == 0) {
-      mlog << Error << "\n" << method_name
-           << "The hdr_typ is empty. Please check if python input is processed properly\n\n";
-      exit (1);
-   }
-   if (header_data->sid_idx_array.n() == 0) {
-      mlog << Error << "\n" << method_name
-           << "The hdr_sid is empty. Please check if python input is processed properly\n\n";
-      exit (1);
-   }
-   if (header_data->vld_idx_array.n() == 0) {
-      mlog << Error << "\n" << method_name
-           << "The hdr_vld is empty. Please check if python input is processed properly\n\n";
-      exit (1);
-   }
-   if (header_data->lat_array.n() == 0) {
-      mlog << Error << "\n" << method_name
-           << "The hdr_lat is empty. Please check if python input is processed properly\n\n";
-      exit (1);
-   }
-   if (header_data->lon_array.n() == 0) {
-      mlog << Error << "\n" << method_name
-           << "The hdr_lon is empty. Please check if python input is processed properly\n\n";
-      exit (1);
-   }
-   if (header_data->elv_array.n() == 0) {
-      mlog << Error << "\n" << method_name
-           << "The hdr_elv is empty. Please check if python input is processed properly\n\n";
-      exit (1);
-   }
 
    set_str_array_from_python(python_met_point_data, numpy_array_hdr_typ_table, &header_data->typ_array);
    set_str_array_from_python(python_met_point_data, numpy_array_hdr_sid_table, &header_data->sid_array);
    set_str_array_from_python(python_met_point_data, numpy_array_hdr_vld_table, &header_data->vld_array);
-   if (header_data->typ_array.n() == 0) {
-      mlog << Error << "\n" << method_name
-           << "The hdr_typ_table is empty. Please check if python input is processed properly\n\n";
-      exit (1);
-   }
-   if (header_data->sid_array.n() == 0) {
-      mlog << Error << "\n" << method_name
-           << "The hdr_sid_table is empty. Please check if python input is processed properly\n\n";
-      exit (1);
-   }
-   if (header_data->vld_array.n() == 0) {
-      mlog << Error << "\n" << method_name
-           << "The hdr_vld_table is empty. Please check if python input is processed properly\n\n";
-      exit (1);
-   }
+
    set_array_from_python(python_met_point_data, numpy_array_prpt_typ_table, &header_data->prpt_typ_array, false);
    set_array_from_python(python_met_point_data, numpy_array_irpt_typ_table, &header_data->irpt_typ_array, false);
    set_array_from_python(python_met_point_data, numpy_array_inst_typ_table, &header_data->inst_typ_array, false);
+
+   check_header_data(header_data, method_name);
 
    set_array_from_python(python_met_point_data, numpy_array_obs_qty, obs_data->obs_qids);
    set_array_from_python(python_met_point_data, numpy_array_obs_hid, obs_data->obs_hids);
@@ -213,18 +262,13 @@ MetPointHeader *header_data = met_pd_out.get_header_data();
 
    set_str_array_from_python(python_met_point_data, numpy_array_obs_qty_table, &obs_data->qty_names);
    set_str_array_from_python(python_met_point_data, numpy_array_obs_var_table, &obs_data->var_names);
-   if (obs_data->qty_names.n() == 0) {
-      mlog << Error << "\n" << method_name
-           << "The obs_qty_table is empty. Please check if python input is processed properly\n\n";
-      exit (1);
-   }
-   if (use_var_id && obs_data->var_names.n() == 0) {
-      mlog << Error << "\n" << method_name
-           << "The obs_var_table is empty. Please check if python input is processed properly\n\n";
-      exit (1);
-   }
 
-   if(mlog.verbosity_level()>=point_data_debug_level) print_met_data(obs_data, header_data, method_name_s);
+   check_obs_data(obs_data, use_var_id, method_name);
+
+   if(mlog.verbosity_level()>=point_data_debug_level) {
+      print_met_data(met_pd_out.get_point_obs_data(),
+                     met_pd_out.get_header_data(), method_name_s);
+   }
 
    //
    //  done
@@ -237,19 +281,170 @@ return ( true );
 
 ////////////////////////////////////////////////////////////////////////
 
+bool process_point_data_list(PyObject *python_point_data, MetPointDataPython &met_pd_out,
+                             MaskFilters *filters)
+{
+
+   bool use_var_id;
+   Observation obs;
+   time_t vld_time;
+   int hid, vid, qid, sid, typ_idx, vld_idx;
+   double lat, lon, elv, hgt, level, obs_value;
+   double prev_lat, prev_lon, prev_elv, prev_vld, prev_typ, prev_sid;
+   Python3_List list(python_point_data);
+   const char *method_name = "process_point_data_list -> ";
+   const char *method_name_s = "process_point_data_list()";
+
+   int obs_cnt = list.size();
+   if (obs_cnt == 0) {
+      mlog << Error << "\n" << method_name
+           << "The point observation data is empty. Please check if python input is processed properly\n\n";
+      exit (1);
+   }
+
+   //
+   //  initialize use_var_id to false
+   //
+
+   use_var_id = false;
+   hid = -1;   // starts from -1 to be 0 for the first header
+   prev_lat = prev_lon = prev_elv = bad_data_double;
+   prev_vld = prev_typ = prev_sid = bad_data_double;
+
+   met_pd_out.allocate(obs_cnt);
+   MetPointHeader *header_data = met_pd_out.get_header_data();
+   MetPointObsData *obs_data = met_pd_out.get_point_obs_data();
+
+   for (int j=0; j<obs_cnt; ++j)  {
+      std::string str_data;
+      PyObject *py_value = list[j];
+      if ( ! PyList_Check(py_value) )  {
+         mlog << Error << "\n" << method_name
+              << "non-list object found in main list!\n\n";
+         exit ( 1 );
+      }
+
+      obs.set(py_value);
+      lat = obs.getLatitude();
+      lon = obs.getLongitude();
+      elv = obs.getElevation();
+      if(filters) {
+         if (filters->is_filtered(lat, lon)) continue;
+         if (filters->is_filtered_sid(obs.getStationId().c_str())) continue;
+         if (filters->is_filtered_typ(obs.getHeaderType().c_str())) continue;
+      }
+
+      // get message type index
+      str_data = obs.getHeaderType();
+      if ( !header_data->typ_array.has(str_data, typ_idx) )  {
+         header_data->typ_array.add(str_data);
+         header_data->typ_array.has(str_data, typ_idx);
+      }
+
+      // get station ID index
+      str_data = obs.getStationId();
+      if ( !header_data->sid_array.has(str_data, sid) )  {
+         header_data->sid_array.add(str_data);
+         header_data->sid_array.has(str_data, sid);
+      }
+
+      // get valid time index
+      vld_time = obs.getValidTime();
+      if ( !header_data->vld_num_array.has(vld_time, vld_idx) )  {
+         header_data->vld_num_array.add(vld_time);
+         header_data->vld_num_array.has(vld_time, vld_idx);
+      }
+
+      if (!is_eq(prev_lat, lat) || !is_eq(prev_lon, lon) || !is_eq(prev_elv, elv)
+          || !is_eq(prev_sid, sid) || !is_eq(prev_typ, typ_idx)
+          || !is_eq(prev_vld, vld_idx)) {
+         header_data->lat_array.add(lat);
+         header_data->lon_array.add(lon);
+         header_data->elv_array.add(elv);
+         header_data->sid_idx_array.add(sid);
+         header_data->typ_idx_array.add(typ_idx);
+         header_data->vld_idx_array.add(vld_idx);
+         header_data->vld_array.add(obs.getValidTimeString());
+
+         prev_lat = lat;
+         prev_lon = lon;
+         prev_elv = elv;
+         prev_sid = sid;
+         prev_typ = typ_idx;
+         prev_vld = vld_idx;
+         hid++;
+      }
+      obs_data->obs_hids[j] = hid;
+
+      // get the observation variable code
+      str_data = obs.getVarName();
+      if ( use_var_id || !is_number(str_data.c_str()) )  {
+         use_var_id = true;
+         // update the list of variable names
+         if ( !obs_data->var_names.has(str_data, vid) )  {
+            obs_data->var_names.add(str_data);
+            obs_data->var_names.has(str_data, vid);
+         }
+      }
+      else {
+         vid = atoi(obs.getVarName().c_str());
+      }
+      obs_data->obs_ids[j] = vid;
+      obs.setVarCode(vid);
+
+      // get the quality flag index
+      str_data = obs.getQualityFlag();
+      if ( !obs_data->qty_names.has(str_data, qid) )  {
+         obs_data->qty_names.add(str_data);
+         obs_data->qty_names.has(str_data, qid);
+      }
+      obs_data->obs_qids[j] = qid;
+      obs_data->obs_lvls[j] = obs.getPressureLevel();
+      obs_data->obs_hgts[j] = obs.getHeight();
+      obs_data->obs_vals[j] = obs.getValue();
+
+   }   //  for j
+
+   met_pd_out.set_use_var_id(use_var_id);
+   mlog << Debug(9) << method_name << "use_var_id: \"" << use_var_id
+        << "\" from python.  is_using_var_id(): " << met_pd_out.is_using_var_id() << "\n";
+
+   if (hid <= 0) {
+      mlog << Error << "\n" << method_name
+           << "The header is empty. Please check the python script and input\n\n";
+      exit (1);
+   }
+   met_pd_out.set_hdr_cnt(hid);
+
+   check_obs_data(obs_data, use_var_id, method_name);
+   check_header_data(header_data, method_name);
+
+   if(mlog.verbosity_level()>=point_data_debug_level) {
+      print_met_data(met_pd_out.get_point_obs_data(),
+                     met_pd_out.get_header_data(), method_name_s);
+   }
+
+   //
+   //  done
+   //
+
+   return ( true );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
 
 bool straight_python_point_data(const char * script_name, int script_argc, char ** script_argv,
-                                const bool use_xarray, MetPointDataPython &met_pd_out)
+                                MetPointDataPython &met_pd_out, MaskFilters *filters)
 {
 
 int int_value;
 PyObject *module_obj      = 0;
-PyObject *module_dict_obj = 0;
 PyObject *python_value    = 0;
-PyObject *python_met_point_data = 0;
 ConcatString cs, user_dir, user_base;
 const char *method_name = "straight_python_point_data -> ";
-const char *method_name_s = "straight_python_point_data()";
 
 
 cs        = script_name;
@@ -349,9 +544,17 @@ if ( ! module_obj )  {
 
 }
 
+bool result = false;
+PyObject *met_point_data = get_python_object(module_obj, python_key_point_data);
+if ( met_point_data ) {
+   result = process_point_data(met_point_data, met_pd_out);
+}
+else {
+   PyObject *point_data = get_python_object(module_obj, python_key_point_data_list);
+   result = process_point_data_list(point_data, met_pd_out, filters);
+}
 
-return process_python_point_data(module_obj, met_pd_out);
-
+return result;
 }
 
 
@@ -359,7 +562,8 @@ return process_python_point_data(module_obj, met_pd_out);
 
 
 bool tmp_nc_point_obs(const char * user_script_name, int user_script_argc,
-                      char ** user_script_argv, MetPointDataPython &met_pd_out)
+                      char ** user_script_argv, MetPointDataPython &met_pd_out,
+                      MaskFilters *filters)
 
 {
 
@@ -402,6 +606,10 @@ command << cs_erase
         << replace_path(python_dir)
         << "\")";
 run_python_string(command.text());
+mlog << Debug(0) << method_name << " -> added python path "
+     << python_dir << ") to python interpreter\n";
+
+//setenv(env_PYTHONPATH, python_dir.c_str(),1);
 
 mlog << Debug(3) << "Running user-specified python instance (MET_PYTHON_EXE=" << user_ppath
      << ") to run user's python script (" << user_script_name << ").\n";
@@ -509,8 +717,14 @@ if ( ! module_obj )  {
    //
 
 
-process_python_point_data(module_obj, met_pd_out);
-
+PyObject *met_point_data = get_python_object(module_obj, python_key_point_data);
+if ( met_point_data ) {
+   process_point_data(met_point_data, met_pd_out);
+}
+else {
+   PyObject *point_data = get_python_object(module_obj, python_key_point_data_list);
+   process_point_data_list(point_data, met_pd_out, filters);
+}
 
    //
    //  cleanup
