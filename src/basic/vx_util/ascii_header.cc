@@ -525,7 +525,7 @@ void parse_mctc_fi_oj(const char *str, int &i, int &j) {
    // Parse Fi_Oj strings
    i = atoi(ptr);
 
-   if((ptr = strrchr(str, '_')) != NULL) {
+   if((ptr = strrchr(str, '_')) != nullptr) {
       ptr += 2;
       j = atoi(ptr);
    }

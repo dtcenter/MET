@@ -308,8 +308,6 @@ mlog << Error << "\nPiecewiseLinear::operator()(double) -> error in \""
 
 exit ( 1 );
 
-return ( -100 );   //  just to satisfy the compiler
-
 }
 
 

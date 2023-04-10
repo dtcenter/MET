@@ -445,8 +445,6 @@ mlog << Error << "\nSemiLatLonGrid::shift_right(int) -> "
 
 exit ( 1 );
 
-return;
-
 }
 
 

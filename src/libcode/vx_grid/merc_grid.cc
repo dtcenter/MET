@@ -595,8 +595,6 @@ mlog << Error << "\nMercatorGrid::shift_right(int) -> "
 
 exit ( 1 );
 
-return;
-
 }
 
 

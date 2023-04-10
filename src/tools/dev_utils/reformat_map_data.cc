@@ -80,8 +80,6 @@ cerr << "\n\n   usage:  " << program_name << " input_filename output_filename\n\
 
 exit ( 1 );
 
-return;
-
 }
 
 
