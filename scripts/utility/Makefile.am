@@ -26,7 +26,8 @@
 pythonutilitydir = $(pkgdatadir)/utility
 
 pythonutility_DATA = \
-	print_pointnc2ascii.py
+	print_pointnc2ascii.py \
+	build_ndbc_stations_from_web.py
 
 EXTRA_DIST = ${pythonutility_DATA}
 

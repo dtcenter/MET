@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -568,6 +568,21 @@ void VarInfo::set_dict(Dictionary &dict) {
    SetAttrIsProb =
       parse_set_attr_flag(dict, conf_key_is_prob);
 
+   // At most one wind attribute flag can be set
+   n = 0;
+   if(SetAttrIsUWind         == 1) n++;
+   if(SetAttrIsVWind         == 1) n++;
+   if(SetAttrIsWindSpeed     == 1) n++;
+   if(SetAttrIsWindDirection == 1) n++;
+   if(n > 1) {
+      mlog << Error << "\nVarInfo::set_dict() -> "
+           << "At most one wind attribute flag ("
+           << conf_key_is_u_wind << ", " << conf_key_is_v_wind << ", "
+           << conf_key_is_wind_speed << ", " << conf_key_is_wind_direction
+           << ") can be set to true for each field.\n\n";
+      exit(1);
+   }
+
    return;
 }
 
@@ -586,7 +601,7 @@ void VarInfo::set_level_info_grib(Dictionary & dict){
 
       //  parse the level string components
       int num_mat = 0;
-      char** mat = NULL;
+      char** mat = nullptr;
       const char* pat_mag = "([ALPRZ])([0-9\\.]+)(\\-[0-9\\.]+)?";
       if( 3 > (num_mat = regex_apply(pat_mag, 4, field_level.text(), mat)) ){
          mlog << Error << "\nVarInfo::set_level_info_grib() - failed to parse level string '"
@@ -790,22 +805,21 @@ int parse_set_attr_flag(Dictionary &dict, const char *key) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-
-////////////////////////////////////////////////////////////////////////
 //
 //  Code for class EnsVarInfo
 //
-////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
 EnsVarInfo::EnsVarInfo() {
-   ctrl_info = NULL;
+   ctrl_info = nullptr;
 }
 
-////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
 EnsVarInfo::~EnsVarInfo() {
    clear();
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 
 EnsVarInfo::EnsVarInfo(const EnsVarInfo &f) {
@@ -815,7 +829,7 @@ EnsVarInfo::EnsVarInfo(const EnsVarInfo &f) {
    assign(f);
 }
 
-////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
 void EnsVarInfo::clear() {
    vector<InputInfo>::const_iterator it;
@@ -841,25 +855,25 @@ void EnsVarInfo::assign(const EnsVarInfo &v) {
    return;
 }
 
-////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
 void EnsVarInfo::add_input(InputInfo input) {
    inputs.push_back(input);
 }
 
-////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
 int EnsVarInfo::inputs_n() {
    return inputs.size();
 }
 
-////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
 void EnsVarInfo::set_ctrl(VarInfo * ctrl) {
    ctrl_info = ctrl;
 }
 
-////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
 VarInfo * EnsVarInfo::get_ctrl(int index) {
    if(ctrl_info) {
@@ -868,7 +882,7 @@ VarInfo * EnsVarInfo::get_ctrl(int index) {
    return inputs[index].var_info;
 }
 
-////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
 VarInfo * EnsVarInfo::get_var_info(int index) {
    if(inputs[index].var_info) {
@@ -877,26 +891,26 @@ VarInfo * EnsVarInfo::get_var_info(int index) {
    return inputs[0].var_info;
 }
 
-////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
 ConcatString EnsVarInfo::get_file(int index) {
    int file_index = inputs[index].file_index;
    return (*inputs[index].file_list)[file_index];
 }
 
-////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
 int EnsVarInfo::get_file_index(int index) {
    return inputs[index].file_index;
 }
 
-////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
 ConcatString EnsVarInfo::get_ens_member_id(int index) {
    return inputs[index].ens_member_id;
 }
 
-////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
 ConcatString raw_magic_str(Dictionary i_edict, GrdFileType file_type) {
    ConcatString magic_str;
@@ -916,6 +930,17 @@ ConcatString raw_magic_str(Dictionary i_edict, GrdFileType file_type) {
 
    return magic_str;
 
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool is_req_level_match(const ConcatString &s1, const ConcatString &s2) {
+   bool match = true;
+
+   // No match if either is non-empty and they are not equal
+   if((s1.nonempty() || s2.nonempty()) && !(s1 == s2)) match = false;
+
+   return(match);
 }
 
 ////////////////////////////////////////////////////////////////////////

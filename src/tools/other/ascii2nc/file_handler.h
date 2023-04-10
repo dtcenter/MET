@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -109,6 +109,7 @@ protected:
   vector< Observation > _observations;
   bool  use_var_id;
   StringArray obs_names;
+  StringArray obs_units;
 
   bool do_monitor;
   int start_time, end_time;

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -235,8 +235,6 @@ mlog << Error
 
 exit ( 1 );
 
-return ( * this );
-
 }
 
 
@@ -325,8 +323,6 @@ if ( (n_read = ::read(fd, buf, shp_file_header_bytes)) != shp_file_header_bytes 
         << "\n\n  ShpFile::open(const char * path) -> trouble reading file header from shp file \""
         << path << "\"\n\n";
 
-   // exit ( 1 );
-
    close();
 
    return ( false );
@@ -358,12 +354,8 @@ if ( ! is_open() )  {
 
    exit ( 1 );
 
-   // return ( false );
-
 }
 
-
-// if ( ! is_open() )  return ( -1 );
 
 const int pos = ::lseek(fd, 0, SEEK_CUR);
 
@@ -398,8 +390,6 @@ if ( ! is_open() )  {
 
    exit ( 1 );
 
-   // return ( false );
-
 }
 
 
@@ -431,8 +421,6 @@ if ( ! is_open() )  {
         << "\n\n  ShpFile::read() -> no file open!\n\n";
 
    exit ( 1 );
-
-   // return ( false );
 
 }
 

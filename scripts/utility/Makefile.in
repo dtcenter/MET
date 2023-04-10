@@ -221,6 +221,7 @@ MET_HDFLIB = @MET_HDFLIB@
 MET_NETCDF = @MET_NETCDF@
 MET_NETCDFINC = @MET_NETCDFINC@
 MET_NETCDFLIB = @MET_NETCDFLIB@
+MET_PYTHON_BIN_EXE = @MET_PYTHON_BIN_EXE@
 MET_PYTHON_CC = @MET_PYTHON_CC@
 MET_PYTHON_LD = @MET_PYTHON_LD@
 MKDIR_P = @MKDIR_P@
@@ -297,7 +298,8 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 pythonutilitydir = $(pkgdatadir)/utility
 pythonutility_DATA = \
-	print_pointnc2ascii.py
+	print_pointnc2ascii.py \
+	build_ndbc_stations_from_web.py
 
 EXTRA_DIST = ${pythonutility_DATA}
 MAINTAINERCLEANFILES = Makefile.in

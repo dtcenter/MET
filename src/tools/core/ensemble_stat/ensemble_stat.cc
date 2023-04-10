@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -1292,7 +1292,7 @@ void process_grid_vx() {
                   conf_info.obtype.c_str());
 
                // If match was found and includes a value range setting,
-               // reset to NULL and lookup separately for grid point
+               // reset to nullptr and lookup separately for grid point
                if(oerr_ptr) {
                   if(oerr_ptr->val_range.n() == 0) {
                      mlog << Debug(3)

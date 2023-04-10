@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -198,8 +198,8 @@ static const StereographicData ncep_st_grids [] = {
       //
 
    { "G028", 'S', -60.0,  20.826, -145.0,   0.0,  0.0,   80.0, 381.0,   ncep_earth_radius_km,   65,   65 },
-   { "G172", 'S', -60.0, -36.866, -139.806, 0.0,  0.0, -100.0,  12.7,   ncep_earth_radius_km,  690,  710 },
-   { "G220", 'S', -60.0, -36.866, -139.806, 0.0,  0.0, -100.0,  25.4,   ncep_earth_radius_km,  345,  355 },
+   { "G172", 'S', -60.0, -36.899, -139.806, 0.0,  0.0,   80.0,  12.7,   ncep_earth_radius_km,  690,  710 },
+   { "G220", 'S', -60.0, -36.899, -139.806, 0.0,  0.0,   80.0,  25.4,   ncep_earth_radius_km,  345,  355 },
    { "G224", 'S', -60.0,  20.826, -120.0,   0.0,  0.0,  105.0, 381.0,   ncep_earth_radius_km,   65,   65 },
 
 };

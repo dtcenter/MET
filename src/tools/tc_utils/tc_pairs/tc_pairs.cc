@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -36,6 +36,7 @@
 //   012    07/06/22  Howard Soh      METplus-Internal #19 Rename main to met_main
 //   013    09/28/22  Prestopnik      MET #2227 Remove namespace std from header files
 //   014    10/06/22  Halley Gotway   MET #392 Incorporate diagnostics
+//   015    02/20/23  Seth Linden     MET #2429 Added option to prevent output of consensus track members
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -544,7 +545,7 @@ void get_atcf_files(const StringArray &path,
    for(i=0; i<path.n(); i++) {
       cur_path.clear();
       cur_path.add(path[i]);
-      cur_files = get_filenames(cur_path, NULL, atcf_suffix);
+      cur_files = get_filenames(cur_path, nullptr, atcf_suffix);
 
       for(j=0; j<cur_files.n(); j++) {
          files.add(cur_files[j]);
@@ -811,19 +812,30 @@ bool is_keeper(const ATCFLineBase * line) {
 
 void filter_tracks(TrackInfoArray &tracks) {
    int i, j;
-   int n_name, n_vld, n_mask_init, n_mask_vld, n_req_lead;
+   int n_name, n_vld, n_mask_init, n_mask_vld, n_req_lead, n_members;
    bool status;
    TrackInfoArray t = tracks;
 
    // Initialize
    tracks.clear();
-   n_name = n_vld = n_mask_init = n_mask_vld = n_req_lead = 0;
+   n_name = n_vld = n_mask_init = n_mask_vld = n_req_lead = n_members = 0;
 
    // Loop through the tracks and determine which should be retained
    // The is_keeper() function has already filtered by model, storm id,
    // basin, cyclone, and timing information.
    for(i=0; i<t.n(); i++) {
 
+      // Check if we should skip output for certain consensus members
+      // The StringArray conf_info.SkipConsensusMembers contains the members to skip
+      if(conf_info.SkipConsensusMembers.n() > 0 &&
+         conf_info.SkipConsensusMembers.has(t[i].technique())) {
+         mlog << Debug(4)
+              << "Discarding track " << i+1 << " since it is listed in SkipConsensusMembers: "
+              << t[i].technique() << "\n";
+         n_members++;
+         continue;
+      }
+      
       // Check storm name
       if(conf_info.StormName.n() > 0 &&
          !conf_info.StormName.has(t[i].storm_name())) {
@@ -922,6 +934,7 @@ void filter_tracks(TrackInfoArray &tracks) {
    mlog << Debug(3)
         << "Total tracks read                = " << t.n()       << "\n"
         << "Total tracks kept                = " << tracks.n()  << "\n"
+        << "Rejected for skip members        = " << n_members   << "\n"
         << "Rejected for storm name          = " << n_name      << "\n"
         << "Rejected for valid time          = " << n_vld       << "\n"
         << "Rejected for required lead times = " << n_req_lead  << "\n"
@@ -1022,7 +1035,7 @@ void process_diags(TrackInfoArray &tracks) {
    for(i=0; i<diag_source.n(); i++) {
 
       // Process the current diagnostic source
-      cur_files = get_filenames(diag_path[i], NULL, atcf_suffix);
+      cur_files = get_filenames(diag_path[i], nullptr, atcf_suffix);
 
       mlog << Debug(2)
            << "Processing " << cur_files.n() << " "

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -70,8 +70,8 @@ void PairDataPoint::init_from_scratch() {
 
    seeps_mpr.clear();
    seeps.clear();
+   seeps_climo = nullptr;
    clear();
-   seeps_climo = get_seeps_climo();
 
    return;
 }
@@ -101,7 +101,7 @@ void PairDataPoint::erase() {
    f_na.erase();
    for (int idx=0; idx<seeps_mpr.size(); idx++) {
       if (seeps_mpr[idx]) delete seeps_mpr[idx];
-      seeps_mpr[idx] = NULL;
+      seeps_mpr[idx] = nullptr;
    }
 
    return;
@@ -114,7 +114,7 @@ void PairDataPoint::extend(int n) {
    PairBase::extend(n);
 
    f_na.extend(n);
-   for (int idx=seeps_mpr.size(); idx<n; idx++) seeps_mpr.push_back(NULL);
+   for (int idx=seeps_mpr.size(); idx<n; idx++) seeps_mpr.push_back(nullptr);
 
    return;
 }
@@ -173,15 +173,23 @@ bool PairDataPoint::add_point_pair(const char *sid, double lat, double lon,
                      cmn, csd, wgt)) return(false);
 
    f_na.add(f);
-   seeps_mpr.push_back((SeepsScore *)NULL);
+   seeps_mpr.push_back((SeepsScore *)nullptr);
 
    return(true);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
+void PairDataPoint::load_seeps_climo() {
+   if (nullptr == seeps_climo) seeps_climo = get_seeps_climo();
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void PairDataPoint::set_seeps_thresh(const SingleThresh &p1_thresh) {
-   seeps_climo->set_p1_thresh(p1_thresh);
+   if (nullptr != seeps_climo) seeps_climo->set_p1_thresh(p1_thresh);
+   else mlog << Warning << "\nPairDataPoint::set_seeps_thresh() ignored t1_threshold."
+             << " Load SEEPS climo first\n\n";
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -198,7 +206,7 @@ void PairDataPoint::set_seeps_score(SeepsScore *seeps, int index) {
          else {
             if (seeps_mpr[index]) {
                delete seeps_mpr[index];
-               seeps_mpr[index] = NULL;
+               seeps_mpr[index] = nullptr;
             }
          }
       }
@@ -242,7 +250,7 @@ bool PairDataPoint::add_grid_pair(double f, double o,
    add_grid_obs(o, cmn, csd, wgt);
 
    f_na.add(f);
-   seeps_mpr.push_back(NULL);
+   seeps_mpr.push_back(nullptr);
 
    return(true);
 }
@@ -291,7 +299,7 @@ SeepsScore *PairDataPoint::compute_seeps(const char *sid, double f,
    int month, day, year, hour, minute, second;
 
    int sid_no = atoi(sid);
-   if (sid_no) {
+   if (sid_no && nullptr != seeps_climo) {
       unix_to_mdyhms(ut, month, day, year, hour, minute, second);
       seeps = seeps_climo->get_seeps_score(sid_no, f, o, month, hour);
       if (mlog.verbosity_level() >= seeps_debug_level
@@ -1466,6 +1474,18 @@ void VxPairDataPoint::set_obs_perc_value(int percentile) {
    }
 
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void VxPairDataPoint::load_seeps_climo() {
+   for(int i=0; i < n_msg_typ; i++){
+      for(int j=0; j < n_mask; j++){
+         for(int k=0; k < n_interp; k++){
+            pd[i][j][k].load_seeps_climo();
+         }
+      }
+   }
 }
 
 ////////////////////////////////////////////////////////////////////////

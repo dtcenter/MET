@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -87,8 +87,6 @@ ModePsFile::ModePsFile(const ModePsFile &)
 
 {
 
-// mpsf_init_from_scratch();
-
 mlog << Error << "\n\n  ModePsFile::ModePsFile(const ModePsFile &) -> shoule never be called!\n\n";
 
 exit ( 1 );
@@ -103,15 +101,9 @@ ModePsFile & ModePsFile::operator=(const ModePsFile &)
 
 {
 
-// if ( this == &m )  return ( * this );
-//
-// assign(m);
-
 mlog << Error << "\n\n  ModePsFile::operator=(const ModePsFile &) -> should never be called!\n\n";
 
 exit ( 1 );
-
-return ( * this );
 
 }
 

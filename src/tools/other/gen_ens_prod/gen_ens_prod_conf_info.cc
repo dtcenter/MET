@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -217,9 +217,9 @@ void GenEnsProdConfInfo::process_config(GrdFileType etype, StringArray * ens_fil
          ens_info->add_input(input_info);
 
          // Add InputInfo to ens info list for each ensemble file provided
-         // set var_info to NULL to note first VarInfo should be used
+         // set var_info to nullptr to note first VarInfo should be used
          for(int k=1; k<n_ens_files; k++) {
-            input_info.var_info = NULL;
+            input_info.var_info = nullptr;
             input_info.file_index = k;
             input_info.file_list = ens_files;
             input_info.ens_member_id = ens_member_ids[j];

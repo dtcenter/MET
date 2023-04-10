@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -157,6 +157,13 @@ void VarInfoPython::set_dict(Dictionary & dict) {
    //
 
    ReqName = dict.lookup_string(conf_key_name, true);
+
+   //
+   //  the "level" entry is optional but is used when pairing U/V verification
+   //  tasks and is stored in LevelInfo::ReqName
+   //
+
+   Level.set_req_name(dict.lookup_string(conf_key_level, false, false).c_str());
 
    //
    //  hard-code the magic string as PYTHON

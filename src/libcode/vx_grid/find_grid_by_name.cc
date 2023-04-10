@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -485,6 +485,12 @@ if ( !west_longitude_positive )  {
    sdata.lon_orient *= -1.0;
 
 }
+
+sdata.eccentricity = 0.;
+sdata.false_east = 0.;
+sdata.false_north = 0.;
+sdata.scale_factor = 1.0;
+sdata.dy_km = sdata.d_km;
 
 ToGrid = new Grid ( sdata );
 

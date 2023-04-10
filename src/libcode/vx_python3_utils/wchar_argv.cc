@@ -2,7 +2,7 @@
 
 
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -71,8 +71,6 @@ mlog << Error << "\nWchar_Argv::Wchar_Argv(const Wchar_Argv &) -> "
 
 exit ( 1 );
 
-return;
-
 }
 
 
@@ -87,8 +85,6 @@ mlog << Error << "\nWchar_Argv::operator=(const Wchar_Argv &) -> "
      << "should never be called!n\n";
 
 exit ( 1 );
-
-return ( * this );
 
 }
 

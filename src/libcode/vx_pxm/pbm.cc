@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -171,8 +171,6 @@ if ( (r < 0) || (r >= Nrows) || (c < 0) || (c >= Ncols) )  {
 
    exit ( 1 );
 
-   // return ( 0 );
-
 }
 
 int j, n;
@@ -246,8 +244,6 @@ if ( (r < 0) || (r >= Nrows) || (c < 0) || (c >= Ncols) )  {
    mlog << Error << "\nPbm::putrc() -> range check error!\n\n";
 
    exit ( 1 );
-
-   // return;
 
 }
 
@@ -647,9 +643,6 @@ mlog << Error << "\nPbm::rotate(int) -> not yet implemented ... sorry\n\n";
 
 exit ( 1 );
 
-
-return;
-
 }
 
 
@@ -664,9 +657,6 @@ void Pbm::autocrop()
 mlog << Error << "\nPbm::autocrop() -> not yet implemented ... sorry\n\n";
 
 exit ( 1 );
-
-
-return;
 
 }
 

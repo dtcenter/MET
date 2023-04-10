@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -78,10 +78,6 @@ mlog << Error << "\nMetGrib1DataFile::MetGrib1DataFile(const MetGrib1DataFile &)
 
 exit ( 1 );
 
-// grib1_init_from_scratch();
-//
-// assign(f);
-
 }
 
 
@@ -96,12 +92,6 @@ mlog << Error << "\nMetGrib1DataFile::operator=(const MetGrib1DataFile &) -> "
      << "should never be called!\n\n";
 
 exit ( 1 );
-
-// if ( this == &f )  return ( * this );
-//
-// assign(f);
-
-return ( * this );
 
 }
 
@@ -159,8 +149,6 @@ if ( ! (GF->open(_filename)) )  {
 
    mlog << Error << "\nMetGrib1DataFile::open(const char *) -> "
         << "unable to open grib1 file \"" << _filename << "\"\n\n";
-
-   // exit ( 1 );
 
    close();
 
@@ -343,8 +331,6 @@ if ( !GF )  {
    mlog << Error << "\nMetGrib1DataFile::read_record(const VarInfoGrib &) -> "
         << "no grib file open!\n\n";
 
-   // exit ( 1 );
-
    return ( -1 );
 
 }
@@ -362,8 +348,6 @@ for (j=0; j<(GF->n_records()); ++j)  {
    if ( ! read_record(j) )  {
 
       mlog << Error << "\nMetGrib1DataFile::read_record(const VarInfoGrib &) -> trouble reading record!\n\n";
-
-      // exit ( 1 );
 
       return ( -1 );
 
@@ -403,8 +387,6 @@ if ( j_match >= 0 )  {
 
       mlog << Error << "\nMetGrib1DataFile::read_record(const VarInfoGrib &) -> "
            << "trouble reading record!\n\n";
-
-      // exit ( 1 );
 
       return ( -1 );
 

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -103,7 +103,7 @@ protected:
   
   // Get the observation valid time from the given observation line
 
-  time_t _getValidTime(const DataLine &data_line) const;
+  time_t _getValidTime(const DataLine &data_line, int date_offset) const;
   
   // Read the observations from the given file and add them to the
   // _observations vector.

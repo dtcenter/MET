@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -122,7 +122,7 @@ void TimeArray::init_from_scratch()
 
 {
 
-e = (unixtime*) NULL;
+e = (unixtime*) nullptr;
 
 clear();
 
@@ -138,7 +138,7 @@ void TimeArray::clear()
 
 {
 
-if ( e )  { delete [] e;  e = (unixtime *) NULL; }
+if ( e )  { delete [] e;  e = (unixtime *) nullptr; }
 
 Nelements = Nalloc = 0;
 
@@ -218,7 +218,7 @@ if ( ! exact )  {
 
 }
 
-unixtime * u = (unixtime *) NULL;
+unixtime * u = (unixtime *) nullptr;
 
 u = new unixtime [n];
 
@@ -243,11 +243,11 @@ if ( e )  {
 
    }
 
-   delete [] e;  e = (unixtime *) NULL;
+   delete [] e;  e = (unixtime *) nullptr;
 
 }
 
-e = u; u = (unixtime *) NULL;
+e = u; u = (unixtime *) nullptr;
 
 Nalloc = n;
 

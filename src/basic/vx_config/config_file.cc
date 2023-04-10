@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -332,7 +332,7 @@ Filename.add(bison_input_filename);
 
 configdebug = (Debug ? 1 : 0);
 
-if ( (configin = met_fopen(bison_input_filename, "r")) == NULL )  {
+if ( (configin = met_fopen(bison_input_filename, "r")) == nullptr )  {
 
    mlog << Error << "\nMetConfig::read(const char *) -> "
         << "unable to open input file \"" << bison_input_filename << "\"\n\n";

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -99,12 +99,14 @@ Ny = data.ny;
 Name = data.name;
 
 Lon_orient = data.lon_orient;
+Data = data;
 
    //
    //  calculate Alpha
    //
 
 Alpha = (1.0 + H*sind(data.scale_lat))*((data.r_km)/(data.d_km));
+
 
    //
    //  Calculate Bx, By
@@ -118,8 +120,6 @@ theta0 = H*(Lon_orient - data.lon_pin);
 
 Bx = data.x_pin - Alpha*r0*H*sind(theta0);
 By = data.y_pin + Alpha*r0*H*cosd(theta0);
-
-Data = data;
 
    //
    //  Done
@@ -193,15 +193,26 @@ const double H = ( IsNorthHemisphere ? 1.0 : -1.0 );
 
 reduce(lon);
 
-r = st_func(lat, is_north());
+if(is_eq(Data.eccentricity, 0.0)) {
 
-theta = H*(Lon_orient - lon);
+   r = st_func(lat, is_north());
 
-x = Bx + Alpha*r*H*sind(theta);
+   theta = H*(Lon_orient - lon);
 
-y = By - Alpha*r*H*cosd(theta);
+   x = Bx + Alpha*r*H*sind(theta);
 
-return;
+   y = By - Alpha*r*H*cosd(theta);
+}
+else {
+   double delta_sign;
+   st_latlon_to_xy_func(lat, -lon, x, y, Data.scale_factor, (Data.lon_orient*-1.0),
+                        (Data.r_km*m_per_km), Data.false_east, Data.false_north,
+                        Data.eccentricity, IsNorthHemisphere);
+   delta_sign = ((Data.d_km > 0) ? 1.0 : -1.0 );
+   x = delta_sign * ((x / (fabs(Data.d_km)*m_per_km)) - Data.x_pin);    // meters to index
+   delta_sign = ((Data.dy_km > 0) ? 1.0 : -1.0 );
+   y = delta_sign * ((y / (fabs(Data.dy_km)*m_per_km)) - Data.y_pin);   // meters to index
+}
 
 }
 
@@ -217,19 +228,28 @@ double r, theta;
 
 const double H = ( IsNorthHemisphere ? 1.0 : -1.0 );
 
-x = (x - Bx)/Alpha;
-y = (y - By)/Alpha;
+if(is_eq(Data.eccentricity, 0.0)) {
+   x = (x - Bx)/Alpha;
+   y = (y - By)/Alpha;
 
-r = sqrt( x*x + y*y );
+   r = sqrt( x*x + y*y );
 
-lat = st_inv_func(r, is_north());
+   lat = st_inv_func(r, is_north());
 
-if ( fabs(r) < 1.0e-5 )  theta = 0.0;
-else                     theta = atan2d(H*x, -H*y);   //  NOT atan2d(y, x);
+   if ( fabs(r) < 1.0e-5 )  theta = 0.0;
+   else                     theta = atan2d(H*x, -H*y);   //  NOT atan2d(y, x);
 
-if ( is_south() )  theta = -theta;
+   if ( is_south() )  theta = -theta;
 
-lon = Lon_orient - theta;
+   lon = Lon_orient - theta;
+}
+else {
+   double x1 = (Data.x_pin + x) * (Data.d_km*m_per_km);     // index to meters
+   double y1 = (Data.y_pin + y) * (Data.dy_km*m_per_km);    // index to meters
+   st_xy_to_latlon_func(x1, y1, lat, lon, Data.scale_factor, (Data.r_km*m_per_km),
+                        (-1.0*Data.lon_orient), Data.false_east, Data.false_north,
+                        Data.eccentricity, IsNorthHemisphere);
+}
 
 reduce(lon);
 
@@ -558,8 +578,6 @@ mlog << Error << "\nStereographicGrid::shift_right(int) -> "
 
 exit ( 1 );
 
-return;
-
 }
 
 
@@ -590,7 +608,7 @@ return ( p );
 ////////////////////////////////////////////////////////////////////////
 
 
-double st_func(double lat, bool is_north_hemisphere)
+double st_func(double lat, bool is_north_hemisphere, double eccentricity)
 
 {
 
@@ -599,6 +617,9 @@ double r;
 if ( is_north_hemisphere )  r = tand(45.0 - 0.5*lat);
 else                        r = tand(45.0 + 0.5*lat);
 
+if (!is_eq(eccentricity, 0.)) {
+   r *= pow(((1 + eccentricity*sind(lat)) / (1 - eccentricity*sind(lat))),(eccentricity/2));
+}
 return ( r );
 
 }
@@ -635,6 +656,128 @@ if ( is_north_hemisphere )  a = -1.0/(1.0 + sind(lat));
 else                        a =  1.0/(1.0 - sind(lat));
 
 return ( a );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+// lat/lon to meters
+
+
+bool st_latlon_to_xy_func(double lat, double lon, double &x_m, double &y_m,
+                          double scale_factor, double scale_lat, double semi_major_axis,
+                          double false_east, double false_north,
+                          double e, bool is_north_hemisphere)
+{
+
+   if (e >= 0.1) {
+      mlog << Error << "\nst_latlon_to_xy_func() -> "
+           << "eccentricity (" << e << ") should be less than 0.1 for earth\n\n";
+      exit( 1 );
+   }
+   else {
+      const double lat_rad = lat * rad_per_deg;
+      const double lon_rad = lon * rad_per_deg;
+      const double lat_sin = sin(lat_rad);
+      const double lonO_rad = scale_lat * rad_per_deg;
+      const double H = (is_north_hemisphere? 1.0 : -1.0 );
+      double t = tan(M_PI/4 - H*lat_rad/2) * pow((1 + e*lat_sin)/(1 - e*lat_sin), e/2);
+      double rho = (2 * semi_major_axis * scale_factor * t)
+                    / sqrt(pow(1+e,1+e) * pow(1-e,1-e));
+      // meters in polar stereographics, not index
+      x_m = false_east + rho*sin(lon_rad - lonO_rad);
+      y_m = false_north - H*rho*cos(lon_rad - lonO_rad);
+   }
+
+   return true;
+}
+
+////////////////////////////////////////////////////////////////////////
+// meters to lat/lon
+
+
+bool st_xy_to_latlon_func(double x_m, double y_m, double &lat, double &lon,
+                          double scale_factor, double semi_major_axis,
+                          double proj_vertical_lon, double false_east, double false_north,
+                          double eccentricity, bool is_north_hemisphere)
+{
+bool result = true;
+if (eccentricity >= 0.1) {
+   mlog << Error << "\nst_xy_to_latlon_func() -> "
+        << "eccentricity (" << eccentricity << ") should be less than 0.1 for earth\n\n";
+   exit( 1 );
+}
+else {
+   double chi;
+   double x_diff = x_m - false_east;
+   double y_diff = y_m - false_north;
+   double lonO_rad = proj_vertical_lon * rad_per_deg;
+   double r_rho = sqrt(x_diff*x_diff + y_diff*y_diff);
+   double t   = r_rho * sqrt(pow((1+eccentricity),(1+eccentricity)) * pow((1-eccentricity),(1-eccentricity)))
+                / (2*semi_major_axis*scale_factor);
+   if (is_north_hemisphere) chi = M_PI/2 - 2 * atan(t);
+   else chi = 2 * atan(t) - M_PI/2;
+
+   lat = chi + (eccentricity*eccentricity/2 + 5*pow(eccentricity,4)/24
+         + pow(eccentricity,6)/12 + 13*pow(eccentricity,8)/360*sin(2 * chi)
+         + (7*pow(eccentricity,4)/48 + 29*pow(eccentricity,6)/240 + 811*pow(eccentricity,8)/11520)*sin(4*chi)
+         + (7*pow(eccentricity,6)/120 + 81*pow(eccentricity,8)/1120)*sin(6*chi)
+         + (4279*pow(eccentricity,8)/161280)*sin(8*chi));
+
+   if (x_m == false_east) lon = lonO_rad;
+   else if (is_north_hemisphere) lon = lonO_rad + atan2(x_diff,-y_diff);
+   else lon = lonO_rad + atan2(x_diff,y_diff);
+
+   lat /= rad_per_deg;
+   lon /= rad_per_deg;
+   reduce(lon);
+
+}
+return result;
+
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+double st_eccentricity_func(double semi_major_axis, double semi_minor_axis,
+                            double inverse_flattening)
+{
+
+double c;
+double eccentricity = bad_data_double;
+
+if (is_eq(semi_minor_axis, bad_data_double)) {
+   semi_minor_axis = semi_major_axis - semi_major_axis/inverse_flattening;
+}
+eccentricity = sqrt(semi_major_axis*semi_major_axis - semi_minor_axis*semi_minor_axis) / semi_major_axis;
+
+return ( eccentricity );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+double st_sf_func(double standard_parallel, double eccentricity, bool is_north_hemisphere)
+{
+
+double scale_factor;
+double tF, mF, temp1, temp2;
+double sp_rad = standard_parallel * rad_per_deg;
+double lat_sin = sin(sp_rad);
+double lat_cos = cos(sp_rad);
+
+temp1 = eccentricity * lat_sin;
+temp2 = pow((1 + temp1)/(1 - temp1), eccentricity/2);
+if (is_north_hemisphere) tF = tan(M_PI/4 - sp_rad/2) * temp2;
+else tF = tan(M_PI/4 + sp_rad/2) / temp2;
+mF = lat_cos / sqrt(1 - eccentricity*eccentricity * lat_sin*lat_sin);
+scale_factor = mF * sqrt(pow((1+eccentricity),(1+eccentricity)) * pow((1-eccentricity),(1-eccentricity))) / (2 * tF);
+
+return ( scale_factor );
 
 }
 
@@ -755,7 +898,6 @@ Grid create_aligned_st(double lat_center,   double lon_center,
 {
 
 Grid g_new;
-// double alpha;
 double r_center, r_previous;
 double Qx, Qy;
 double L;
@@ -790,8 +932,6 @@ data.ny = ny;
    //
    //  calculate orientation longitude
    //
-
-// alpha = stereographic_alpha(data.scale_lat, data.r_km, data.d_km);
 
 r_center   = st_func(lat_center,   is_north);
 r_previous = st_func(lat_previous, is_north);

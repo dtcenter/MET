@@ -24,8 +24,8 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-static const char *MET_ENV_SEEPS_CLIMO_NAME      = "MET_SEEPS_POINT_CLIMO_NAME";
-static const char *MET_ENV_SEEPS_CLIMO_GRID_NAME = "MET_SEEPS_GRID_CLIMO_NAME";
+static const char *MET_ENV_SEEPS_POINT_CLIMO_NAME = "MET_SEEPS_POINT_CLIMO_NAME";
+static const char *MET_ENV_SEEPS_GRID_CLIMO_NAME  = "MET_SEEPS_GRID_CLIMO_NAME";
 
 static const char *dim_name_nstn      = "nstn";
 
@@ -177,7 +177,7 @@ class SeepsClimo : public SeepsClimoBase {
       SeepsClimo();
      ~SeepsClimo();
 
-      void clear() override;
+      void clear();
       SeepsRecord *get_record(int sid, int month, int hour);
       double get_score(int sid, double p_fcst, double p_obs, int month, int hour);
       SeepsScore *get_seeps_score(int sid, double p_fcst, double p_obs, int month, int hour);
@@ -221,7 +221,7 @@ class SeepsClimoGrid : public SeepsClimoBase {
       SeepsClimoGrid(int month, int hour);
      ~SeepsClimoGrid();
 
-      void clear() override;
+      void clear();
       SeepsScore *get_record(int ix, int iy, double p_fcst, double p_obs);
       double get_score(int offset, int obs_cat, int fcst_cat);
       double get_score(int ix, int iy, double p_fcst, double p_obs);

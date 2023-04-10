@@ -60,12 +60,16 @@ rank_corr_flag      = FALSE;
 //
 fcst = {
    field = [ { name = "${FCST_COMMAND}"; },
-             { name = "${OBS_COMMAND}";  } ];
+             { name = "${OBS_COMMAND}";  },
+             { name = "${FCST_COMMAND}"; set_attr_name = "FCST_UWIND"; level = "Surface"; is_u_wind = TRUE; },
+             { name = "${OBS_COMMAND}";  set_attr_name = "OBS_VWIND";  level = "Surface"; is_v_wind = TRUE; } ];
 }
 
 obs = {
    field = [ { name = "${OBS_COMMAND}";  },
-             { name = "${FCST_COMMAND}"; } ];
+             { name = "${FCST_COMMAND}"; },
+             { name = "${OBS_COMMAND}";  set_attr_name = "OBS_UWIND";  level = "Surface"; is_u_wind = TRUE; },
+             { name = "${FCST_COMMAND}"; set_attr_name = "FCST_VWIND"; level = "Surface"; is_v_wind = TRUE; } ];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -173,7 +177,7 @@ output_flag = {
    cnt    = NONE;
    sl1l2  = STAT;
    sal1l2 = NONE;
-   vl1l2  = NONE;
+   vl1l2  = STAT;
    val1l2 = NONE;
    vcnt   = NONE;
    pct    = NONE;
@@ -216,6 +220,6 @@ seeps_p1_thresh = NA;
 grid_weight_flag = NONE;
 tmp_dir          = "/tmp";
 output_prefix    = "python";
-version          = "V11.0.0";
+version          = "V11.1.0";
 
 ////////////////////////////////////////////////////////////////////////////////

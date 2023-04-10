@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -165,15 +165,12 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
    msg_typ_group_map = parse_conf_message_type_group_map(&conf);
 
    // Conf: message_type_group_map(SURFACE)
-   if(msg_typ_group_map.count((string)surface_msg_typ_group_str) == 0) {
-      mlog << Error << "\nEnsembleStatConfInfo::process_config() -> "
-           << "\"" << conf_key_message_type_group_map
-           << "\" must contain an entry for \""
-           << surface_msg_typ_group_str << "\".\n\n";
-      exit(1);
+   ConcatString cs = surface_msg_typ_group_str;
+   if(msg_typ_group_map.count(cs) > 0) {
+      msg_typ_sfc = msg_typ_group_map[cs];
    }
    else {
-     msg_typ_sfc = msg_typ_group_map[(string)surface_msg_typ_group_str];
+      msg_typ_sfc.parse_css(default_msg_typ_group_surface);
    }
 
    // Conf: ens_member_ids
@@ -669,10 +666,10 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
       vx_pd.fcst_info->add_input(input_info);
 
       // Add InputInfo to fcst info list for each ensemble file provided
-      // set var_info to NULL to note first VarInfo should be used
+      // set var_info to nullptr to note first VarInfo should be used
       int last_member_index = ens_files->n() - (use_ctrl ? 1 : 0);
       for(j=1; j<last_member_index; j++) {
-         input_info.var_info = NULL;
+         input_info.var_info = nullptr;
          input_info.file_index = j;
          input_info.file_list = ens_files;
          vx_pd.fcst_info->add_input(input_info);

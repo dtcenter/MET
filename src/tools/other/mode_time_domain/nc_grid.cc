@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -191,6 +191,11 @@ data.r_km = string_att_as_double(f, "r_km");
 data.nx = string_att_as_int(f, "nx");
 data.ny = string_att_as_int(f, "ny");
 
+data.eccentricity = 0.;
+data.false_east = 0.;
+data.false_north = 0.;
+data.scale_factor = 1.0;
+data.dy_km = data.d_km;
 
    //
    //  done

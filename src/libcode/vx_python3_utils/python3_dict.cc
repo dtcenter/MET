@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -89,8 +89,6 @@ mlog << Error << "\nPython3_Dict::Python3_Dict(const Python3_Dict &) -> "
 
 exit ( 1 );
 
-return;
-
 }
 
 
@@ -105,8 +103,6 @@ mlog << Error << "\nPython3_Dict(const Python3_Dict &) -> "
      << "should never be called!\n\n";
 
 exit ( 1 );
-
-return ( * this );
 
 }
 
@@ -610,13 +606,6 @@ mlog << Error << "\nPython3_Dict::dump_dict_value() -> "
      << "can't determine type for dict value!\n\n";
 
 exit ( 1 );
-
-
-   //
-   //  done
-   //
-
-return;
 
 }
 

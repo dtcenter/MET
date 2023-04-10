@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -185,7 +185,7 @@ if ( !directory )  {
 
 }
 
-while ( (entry = readdir(directory)) != NULL )  {
+while ( (entry = readdir(directory)) != nullptr )  {
 
    if ( strcmp(entry->d_name, "." ) == 0 )  continue;
    if ( strcmp(entry->d_name, "..") == 0 )  continue;

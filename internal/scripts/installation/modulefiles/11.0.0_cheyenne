@@ -22,3 +22,6 @@ prepend-path PATH $base/bin:/glade/p/ral/jntp/MET/MET_releases/11.0.0/external_l
 
 setenv METversion V$ver
 
+# setenv MET_BUFRLIB /glade/p/ral/jntp/MET/MET_releases/11.0.0/external_libs/libs
+# setenv MET_GRIB2C /glade/p/ral/jntp/MET/MET_releases/11.0.0/external_libs
+# setenv MET_GSL /glade/p/ral/jntp/MET/MET_releases/11.0.0/external_libs

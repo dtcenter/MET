@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -445,6 +445,10 @@ int met_main(int argc, char *argv[]) {
          process_pbfile(i);
       }
 
+      mlog << Debug(2)
+           << "\nTotal Observations retained or derived\t= " << n_total_obs << "\n";
+
+
       if (do_summary) {
          TimeSummaryInfo summaryInfo = conf_info.getSummaryInfo();
          summary_obs->summarizeObs(summaryInfo);
@@ -645,7 +649,7 @@ void get_variable_info(const char* tbl_filename) {
    static const char *method_name = "  get_variable_info()";
 
    FILE * fp;
-   char * line = NULL;
+   char * line = nullptr;
    size_t len = 1024;
    ssize_t read;
 
@@ -659,14 +663,14 @@ void get_variable_info(const char* tbl_filename) {
 
    fp = fopen(tbl_filename, "r");
    ConcatString input_data;
-   if (fp != NULL) {
+   if (fp != nullptr) {
       char var_name[BUFR_NAME_LEN+1];
       char var_desc[max(BUFR_DESCRIPTION_LEN,BUFR_SEQUENCE_LEN)+1];
       char var_unit_str[BUFR_UNIT_LEN+1];
       bool find_mnemonic = false;
 
       line = (char *)malloc(len * sizeof(char));
-      if( line == NULL) {
+      if( line == nullptr) {
          mlog << Error << "\n" << method_name << " -> "
               << "Unable to allocate buffer\n\n";
          exit(1);
@@ -674,8 +678,8 @@ void get_variable_info(const char* tbl_filename) {
       // Processing section 1
       int var_count1 = 0;
       while ((read = getline(&line, &len, fp)) != -1) {
-         if (NULL != strstr(line,"--------")) continue;
-         if (NULL != strstr(line,"MNEMONIC")) {
+         if (nullptr != strstr(line,"--------")) continue;
+         if (nullptr != strstr(line,"MNEMONIC")) {
             if (find_mnemonic) break;
             find_mnemonic = true;
             continue;
@@ -709,8 +713,8 @@ void get_variable_info(const char* tbl_filename) {
 
       // Skip  section 2
       while ((read = getline(&line, &len, fp)) != -1) {
-         if (NULL != strstr(line,"MNEMONIC")) break;
-         if (NULL == strstr(line,"EVENT")) continue;
+         if (nullptr != strstr(line,"MNEMONIC")) break;
+         if (nullptr == strstr(line,"EVENT")) continue;
 
          m_strncpy(var_name, (line+BUFR_NAME_START), BUFR_NAME_LEN,
                    method_name, "var_name2", true);
@@ -719,7 +723,7 @@ void get_variable_info(const char* tbl_filename) {
             if (' ' != var_name[idx] ) break;
             var_name[idx] = '\0';
          }
-         //if (NULL == strstr(var_name,"EVENT")) continue;
+         //if (nullptr == strstr(var_name,"EVENT")) continue;
 
          m_strncpy(var_desc, (line+BUFR_SEQUENCE_START), BUFR_SEQUENCE_LEN,
                    method_name, "var_desc2", true);
@@ -750,7 +754,7 @@ void get_variable_info(const char* tbl_filename) {
             var_name[idx] = '\0';
          }
 
-         if (NULL != strstr(line,"CCITT IA5")) {
+         if (nullptr != strstr(line,"CCITT IA5")) {
             ascii_vars.add(var_name);
             m_strncpy(var_unit_str, "CCITT IA5", sizeof(var_unit_str),
                       method_name, "var_unit_str1", true);
@@ -878,7 +882,7 @@ void process_pbfile(int i_pb) {
 
    // Build the temporary block file name
    blk_prefix << conf_info.tmp_dir << "/" << "tmp_pb2nc_blk";
-   blk_file = make_temp_file_name(blk_prefix.c_str(), NULL);
+   blk_file = make_temp_file_name(blk_prefix.c_str(), nullptr);
 
    mlog << Debug(1) << "Blocking Bufr file to:\t" << blk_file << "\n";
 
@@ -948,8 +952,8 @@ void process_pbfile(int i_pb) {
    }
 
    // Initialize counts
-   n_derived_obs = 0;
-   i_ret   = n_file_obs = i_msg      = 0;
+   n_derived_obs = n_file_obs = 0;
+   i_ret   = i_msg      = 0;
    rej_typ = rej_sid    = rej_vld    = rej_grid = rej_poly = 0;
    rej_elv = rej_pb_rpt = rej_in_rpt = rej_itp  = rej_nobs = 0;
 
@@ -1345,8 +1349,10 @@ void process_pbfile(int i_pb) {
          }
       }
 
+      // Initialize for CAPE and PBL
       if (cal_cape || cal_mlcape) {
          cape_level = 0;
+         cape_qm = bad_data_float;
       }
 
       do_pbl = cal_pbl && 0 == strcmp("ADPUPA", hdr_typ);
@@ -1356,6 +1362,7 @@ void process_pbfile(int i_pb) {
 
       // Search through the vertical levels
       for(lv=0, n_hdr_obs = 0; lv<buf_nlev; lv++) {
+
          // If the observation vertical level is not within the
          // specified valid range, continue to the next vertical
          // level
@@ -1505,12 +1512,15 @@ void process_pbfile(int i_pb) {
                      if (cape_level < MAX_CAPE_LEVEL) cape_data_temp[cape_level] = obs_arr[4];
                      cape_member_cnt++;
                   }
-                  if (is_cape_input && (cape_level == 0)) {
+
+                  // Track the maximum quality mark for CAPE components
+                  if (is_cape_input && (is_bad_data(cape_qm) || quality_mark > cape_qm)) {
                      cape_qm = quality_mark;
                   }
                }
 
-               if (do_pbl && (pbl_level == 0)) {
+               // Track the maximum quality mark for PBL components
+               if (do_pbl && (is_bad_data(pbl_qm) || quality_mark > pbl_qm)) {
                   pbl_qm = quality_mark;
                }
             }
@@ -1575,7 +1585,6 @@ void process_pbfile(int i_pb) {
                         OBS_BUFFER_SIZE);
 
                   // Increment the current and total observations counts
-                  n_file_obs++;
                   n_total_obs++;
                   n_derived_obs++;
 
@@ -1908,6 +1917,7 @@ void process_pbfile(int i_pb) {
             pqtzuv_list.clear();
             pqtzuv_map_tq.clear();
             pqtzuv_map_uv.clear();
+            pbl_qm = bad_data_float;
          }
          //is_same_header = false;
          prev_hdr_vld_ut = hdr_vld_ut;
@@ -1978,7 +1988,7 @@ void process_pbfile(int i_pb) {
    if(mlog.verbosity_level() > 0) cout << "\n" << flush;
 
    mlog << Debug(2)
-        << "Total Messages processed\t\t= " << npbmsg << "\n"
+        << "Messages processed\t\t\t= " << npbmsg << "\n"
         << "Rejected based on message type\t\t= "
         << rej_typ << "\n"
         << "Rejected based on station id\t\t= "
@@ -1999,9 +2009,9 @@ void process_pbfile(int i_pb) {
         << rej_itp << "\n"
         << "Rejected based on zero observations\t= "
         << rej_nobs << "\n"
-        << "Total Messages retained\t\t= "
+        << "Messages retained\t\t\t= "
         << i_msg << "\n"
-        << "Total observations retained or derived\t= "
+        << "Observations retained or derived\t= "
         << (n_file_obs + n_derived_obs) << "\n";
 
    if (cal_cape) {
@@ -2066,11 +2076,10 @@ void process_pbfile(int i_pb) {
               << "Saved the derived variables only. No " << (is_prepbufr ? "PrepBufr" : "Bufr")
               << " messages retained from file: "
               << pbfile[i_pb] << "\n";
-      else
-         mlog << Warning << "\n" << method_name
-              << "No " << (is_prepbufr ? "PrepBufr" : "Bufr")
-              << " messages retained from file: "
-              << pbfile[i_pb] << "\n\n";
+      else mlog << Warning << "\n" << method_name
+                << "No " << (is_prepbufr ? "PrepBufr" : "Bufr")
+                << " messages retained from file: "
+                << pbfile[i_pb] << "\n\n";
    }
 
    return;
@@ -2104,7 +2113,7 @@ void process_pbfile_metadata(int i_pb) {
    blk_prefix  << conf_info.tmp_dir << "/" << "tmp_pb2nc_meta_blk";
    blk_prefix2 << conf_info.tmp_dir << "/" << "tmp_pb2nc_tbl_blk";
 
-   blk_file = make_temp_file_name(blk_prefix2.c_str(), NULL);
+   blk_file = make_temp_file_name(blk_prefix2.c_str(), nullptr);
 
    mlog << Debug(3) << "   Blocking Bufr file (metadata) to:\t" << blk_file << "\n";
 
@@ -2120,7 +2129,7 @@ void process_pbfile_metadata(int i_pb) {
    // Assume that the input PrepBufr file is unblocked.
    // Block the PrepBufr file and open it for reading.
    unit = dump_unit + i_pb;
-   blk_file = make_temp_file_name(blk_prefix.c_str(), NULL);
+   blk_file = make_temp_file_name(blk_prefix.c_str(), nullptr);
    pblock(file_name.c_str(), blk_file.c_str(), block);
    if (unit > MAX_FORTRAN_FILE_ID || unit < MIN_FORTRAN_FILE_ID) {
       mlog << Error << "\n" << method_name << " -> "

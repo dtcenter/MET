@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -74,6 +74,7 @@ void TCPairsConfInfo::clear() {
    Basin.clear();
    Cyclone.clear();
    StormName.clear();
+   SkipConsensusMembers.clear();
    InitBeg = InitEnd = (unixtime) 0;
    InitInc.clear();
    InitExc.clear();
@@ -240,11 +241,20 @@ void TCPairsConfInfo::process_config() {
    // Loop over the consensus entries
    for(i=0; i<NConsensus; i++) {
 
-      // Conf: Consensus: name, members, required, min_req
+      // Conf: Consensus: name, members, required, min_req, write_members
       Consensus[i].Name     = (*dict)[i]->dict_value()->lookup_string(conf_key_name);
       Consensus[i].Members  = (*dict)[i]->dict_value()->lookup_string_array(conf_key_members);
       Consensus[i].Required = (*dict)[i]->dict_value()->lookup_num_array(conf_key_required);
       Consensus[i].MinReq   = (*dict)[i]->dict_value()->lookup_int(conf_key_min_req);
+
+      // If write_members is missing, print warning message rather than error
+      Consensus[i].WriteMembers = (*dict)[i]->dict_value()->lookup_bool(conf_key_write_members, false);
+      if(!(*dict)[i]->dict_value()->last_lookup_status()) {
+         mlog << Warning 
+              << "\nTCPairsConfInfo::process_config() -> "
+              << "\"consensus.write_members\" is missing. Using default value of true.\n\n";
+         Consensus[i].WriteMembers = true;
+      }
 
       // If required is empty, default to 0
       if(Consensus[i].Required.n_elements() == 0) {
@@ -259,6 +269,11 @@ void TCPairsConfInfo::process_config() {
               << "\"consensus.required\" must either be empty "
               << "or the same length as \"consensus.members\".\n\n";
          exit(1);
+      }
+
+      // If WriteMembers is false, save the Members to skip output for
+      if(!Consensus[i].WriteMembers) {
+         SkipConsensusMembers.add(Consensus[i].Members);
       }
    }
 

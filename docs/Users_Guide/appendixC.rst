@@ -382,6 +382,29 @@ For cost / loss ratio above the base rate, the ECLV is defined as:
 
 .. math:: \text{ECLV } = \frac{(cl \ast (h + f)) + m - b}{b \ast (cl - 1)}.
 
+Stable Equitable Error in Probability Space (SEEPS)
+---------------------------------------------------
+
+Included in SEEPS output :numref:`table_PS_format_info_SEEPS` and SEEPS_MPR output :numref:`table_PS_format_info_SEEPS_MPR`
+
+The SEEPS scoring matrix (equation 15 from :ref:`Rodwell et al, 2010 <Rodwell-2010>`) is:
+
+.. math:: \{S^{S}_{vf}\} = \frac{1}{2}
+          \begin{Bmatrix}
+             0 & \frac{1}{1-p_1} & \frac{1}{p_3} + \frac{1}{1-p_1}\\
+             \frac{1}{p_1} & 0 & \frac{1}{p_3}\\
+             \frac{1}{p_1} + \frac{1}{1-p_3} & \frac{1}{1-p_3} & 0
+          \end{Bmatrix}
+
+In addition, Rodwell et al (2011) note that SEEPS can be written as the mean of two 2-category scores that individually assess the dry/light and light/heavy thresholds (:ref:`Rodwell et al., 2011 <Rodwell-2011>`). Each of these scores is like 1 – HK, but written as:
+
+.. math:: \frac{n_{01}}{\text{Expected n}_{.1}} + \frac{n_{10}}{\text{Expected n}_{.0}}
+
+
+where the word expected refers to the mean value deduced from the climatology, rather than the sample mean.
+
+SEEPS scores are expected to lie between 0 and 1, with a perfect forecast having a value of 0. Individual values can be much larger than 1. Results can be presented as a skill score by using the value of 1 – SEEPS.
+
 MET verification measures for continuous variables
 ==================================================
 
@@ -742,7 +765,7 @@ where the weights are applied at each grid location, with values assigned accord
 
 .. only:: latex
 
-  .. math::  
+  .. math::
 
     \text{S1\_OG} = \frac{\text{EGBAR}}{\text{OGBAR}}
 
@@ -750,9 +773,10 @@ where the weights are applied at each grid location, with values assigned accord
 
 .. only:: html
 
-  .. math::  
+  .. math::
+
     \text{S1_OG} = \frac{\text{EGBAR}}{\text{OGBAR}}
-    
+
     \text{FGOG_RATIO} = \frac{\text{FGBAR}}{\text{OGBAR}}
 
 
@@ -966,7 +990,7 @@ Let :math:`\text{J}` be the number of categories, then both the forecast, :math:
 :math:`F_m = \sum_{j=1}^m (f_j)` and :math:`O_m = \sum_{j=1}^m (o_j), m = 1,…,J`.
 
 
-To clarify, :math:`F_1 = f_1` is the first component of :math:`F_m`, :math:`F_2 = f_1+f_2`, etc., and :math:`F_J = 1`.  Similarly, if :math:`o_j = 1` and :math:`i < j`, then :math:`O_i = 0` and when :math:`i≥j`, :math:`O_i = 1`, and of course, :math:`O_J = 1`.  Finally, the RPS is defined to be:
+To clarify, :math:`F_1 = f_1` is the first component of :math:`F_m`, :math:`F_2 = f_1+f_2`, etc., and :math:`F_J = 1`.  Similarly, if :math:`o_j = 1` and :math:`i < j`, then :math:`O_i = 0` and when :math:`i >= j`, :math:`O_i = 1`, and of course, :math:`O_J = 1`.  Finally, the RPS is defined to be:
 
 .. math:: \text{RPS} = \sum_{m=1}^J (F_m - O_m)^2 = \sum_{m=1}^J BS_m,
 
@@ -995,11 +1019,23 @@ The score can be interpreted as a continuous version of the mean absolute error 
 
 To calculate crps_emp_fair (bias adjusted, empirical ensemble CRPS) for each individual observation with m ensemble members:
 
-.. math:: \text{crps_emp_fair}_i = \text{crps_emp}_i - \frac{1}{2*m} *  \frac{1}{m*(m-1)} \sum_{i \ne j}|f_{i} - f_{j}|
+.. only:: latex
+
+  .. math:: \text{crps\_emp\_fair}_i = \text{crps\_emp}_i - \frac{1}{2*m} *  \frac{1}{m*(m-1)} \sum_{i \neq j}|f_{i} - f_{j}|
+
+.. only:: html
+
+  .. math:: \text{crps_emp_fair}_i = \text{crps_emp}_i - \frac{1}{2*m} *  \frac{1}{m*(m-1)} \sum_{i \neq j}|f_{i} - f_{j}|
 
 The overall CRPS_EMP_FAIR is calculated as the average of the individual measures. In equation form:
 
-.. math:: \text{CRPS_EMP_FAIR} = \text{average(crps_emp_fair) } = \frac{1}{N} \sum_{i=1}^N \text{crps_emp_fair}_i
+.. only:: latex
+
+  .. math:: \text{CRPS\_EMP\_FAIR} = \text{average(crps\_emp\_fair) } = \frac{1}{N} \sum_{i=1}^N \text{crps\_emp\_fair}_i
+
+.. only:: html
+
+  .. math:: \text{CRPS_EMP_FAIR} = \text{average(crps_emp_fair) } = \frac{1}{N} \sum_{i=1}^N \text{crps_emp_fair}_i
 
 Ensemble Mean Absolute Difference
 ---------------------------------
@@ -1008,11 +1044,23 @@ Called "SPREAD_MD" in ECNT output :numref:`table_ES_header_info_es_out_ECNT`
 
 The ensemble mean absolute difference is an alternative measure of ensemble spread. It is computed for each individual observation (denoted by a lowercase spread_md) with m ensemble members:
 
-.. math:: \text{spread_md}_i = \frac{1}{m*(m-1)} \sum_{i \ne j}|f_{i} - f_{j}|
+.. only:: latex
+
+  .. math:: \text{spread\_md}_i = \frac{1}{m*(m-1)} \sum_{i \neq j}|f_{i} - f_{j}|
+
+.. only:: html
+
+  .. math:: \text{spread_md}_i = \frac{1}{m*(m-1)} \sum_{i \neq j}|f_{i} - f_{j}|
 
 The overall SPREAD_MD is calculated as the average of the individual measures. In equation form:
 
-.. math:: \text{SPREAD_MD} = \text{average(spread_md) } = \frac{1}{N} \sum_{i=1}^N \text{spread_md}_i
+.. only:: latex
+
+  .. math:: \text{SPREAD\_MD} = \text{average(spread\_md) } = \frac{1}{N} \sum_{i=1}^N \text{spread\_md}_i
+
+.. only:: html
+
+  .. math:: \text{SPREAD_MD} = \text{average(spread_md) } = \frac{1}{N} \sum_{i=1}^N \text{spread_md}_i
 
 A perfect forecast would have ensemble mean absolute difference = 0.
           
@@ -1034,7 +1082,13 @@ Called "BIAS_RATIO" in ECNT output :numref:`table_ES_header_info_es_out_ECNT`
 
 The bias ratio (BIAS_RATIO) is computed when verifying an ensemble against gridded analyses or point observations. It is defined as the mean error (ME) of ensemble member values greater than or equal to the observation value to which they are matched divided by the absolute value of the mean error (ME) of ensemble member values less than the observation values.
 
-.. math:: \text{BIAS_RATIO} = \frac{ \text{ME}_{f >= o} }{ |\text{ME}_{f < o}| }
+.. only:: latex
+
+  .. math:: \text{BIAS\_RATIO} = \frac{ \text{ME}_{f >= o} }{ |\text{ME}_{f < o}| }
+
+.. only:: html
+
+  .. math:: \text{BIAS_RATIO} = \frac{ \text{ME}_{f >= o} }{ |\text{ME}_{f < o}| }
 
 A perfect forecast has ME = 0. Since BIAS_RATIO is computed as the high bias (ME_GE_OBS) divide by the absolute value of the low bias (ME_LT_OBS), a perfect forecast has BIAS_RATIO = 0/0, which is undefined. In practice, the high and low bias values are unlikely to be 0.
 
@@ -1047,7 +1101,7 @@ Called "IGN" in ECNT output :numref:`table_ES_header_info_es_out_ECNT`
 
 The ignorance score (IGN) is the negative logarithm of a predictive probability density function (:ref:`Gneiting et al., 2004 <Gneiting-2004>`). In MET, the IGN is calculated based on a normal approximation to the forecast distribution (i.e. a normal pdf is fit to the forecast values). This approximation may not be valid, especially for discontinuous forecasts like precipitation, and also for very skewed forecasts. For a single normal distribution **N** with parameters :math:`\mu \text{ and } \sigma`, the ignorance score is
 
-.. math:: \text{ign} (N( \mu, \sigma),y) = \frac{1}{2} \ln (2 \pi \sigma^2 ) + \frac{(y - \mu)^2}{\sigma^2}.
+.. math:: \text{ign} (N( \mu, \sigma),y) = \frac{1}{2} \ln (2 \pi \sigma^2 ) + \frac{(y - \mu)^2}{2\sigma^2}.
 
 Accumulation of the ignorance score for many forecasts is via the average of individual ignorance scores. This average ignorance score is the value output by the MET software. Like many error statistics, the IGN is negatively oriented, so smaller numbers indicate better forecasts.
 

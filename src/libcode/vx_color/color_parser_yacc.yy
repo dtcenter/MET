@@ -729,8 +729,6 @@ cout.flush();
 
 exit ( 1 );
 
-return;
-
 }
 
 

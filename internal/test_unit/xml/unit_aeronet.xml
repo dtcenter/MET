@@ -51,6 +51,18 @@
     </output>
   </test>
 
+  <test name="ascii2nc_AERONET_v3_concat">
+    <exec>&MET_BIN;/ascii2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/aeronet/20221202.v3.lev15.txt \
+      &OUTPUT_DIR;/aeronet/20221202.v3.lev15.nc \
+      -v 1 -format aeronetv3
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/aeronet/20221202.v3.lev15.nc</point_nc>
+    </output>
+  </test>
+
   <test name="ascii2nc_AERONET_vld_thresh">
     <exec>&MET_BIN;/ascii2nc</exec>
     <env>

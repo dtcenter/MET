@@ -1,0 +1,25 @@
+#%Module######################################################################
+##
+##      Model Evaluation Tools
+##
+proc ModulesHelp { } {
+  puts stderr "Sets up the paths and environment variables to use the Model Evaluation Tools v11.0.0
+     *** For help see the official MET webpage at http://www.dtcenter.org/met/users ***"
+}
+
+# If they exist, remove ncdump and ncgen from /work2/06612/tg859120/frontera/MET/11.0.0/external_libs/bin
+
+module unload python3
+module load intel/19.1.1
+module load hdf5/1.12.0
+module load netcdf/4.7.4
+
+set base /work2/06612/tg859120/frontera/MET/11.0.0
+set ver  11.0.0
+set share $base/share/met
+set lib_base $base
+
+prepend-path PATH $base/bin:/work2/06612/tg859120/frontera/miniconda/miniconda3/envs/metplus_v5.0_py3.8/bin
+
+setenv METversion V$ver
+setenv MET_ROOT $base

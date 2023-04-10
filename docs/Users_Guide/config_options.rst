@@ -240,6 +240,7 @@ Referencing that environment variable inside a MET configuration file:
 In addition to supporting user-specified environment variables within configuration
 files, the environment variables listed below have special meaning if set at runtime.
 
+.. _met_airnow_stations:
 
 MET_AIRNOW_STATIONS
 ^^^^^^^^^^^^^^^^^^^
@@ -249,7 +250,17 @@ will override the default file. If set, it should be the full path to the file.
 The default table can be found in the installed
 *share/met/table_files/airnow_monitoring_site_locations_v2.dat*. This file contains
 ascii column data that allows lookups of latitude, longitude, and elevation for all
-airnow stations based on stationId and/or AqSid.
+AirNow stations based on stationId and/or AqSid.
+
+Additional information and updated site locations can be found at the
+`EPA AirNow website <https://www.airnow.gov>`_. While some monitoring stations are
+permanent, others are temporary, and theirs locations can change. When running the
+ascii2nc tool with the `-format airnowhourly` option, users should
+`download <https://test.airnowtech.org/>`_ the `Monitoring_Site_Locations_V2.dat` data file
+data file corresponding to the date being processed and set the MET_AIRNOW_STATIONS
+envrionment variable to define its location.
+
+.. _met_ndbc_stations:
 
 MET_NDBC_STATIONS
 ^^^^^^^^^^^^^^^^^
@@ -260,6 +271,33 @@ The default table can be found in the installed
 *share/met/table_files/ndbc_stations.xml*. This file contains
 XML content for all stations that allows lookups of latitude, longitude,
 and, in some cases, elevation for all stations based on stationId.
+
+This set of stations comes from 2 online sources: the
+`active stations website <https://www.ndbc.noaa.gov/activestations.xml>`_
+and the `complete stations website <https://www.airnow.gov>`_.
+As these lists can change as a function of time, a script can be run to pull
+down the contents of both websites and merge any changes with the existing stations
+file content, creating an updated stations file locally.
+The MET_NDBC_STATIONS environment variable can be then set to refer to this newer
+stations file.  Also, the MET development team will periodically
+run this script and update *share/met/table_files/ndbc_stations.xml*.
+
+To run this utility:
+
+.. code-block:: none
+
+  build_ndbc_stations_from_web.py <-d> <-p> <-o OUTPUT_FILE>
+
+  Usage: build_ndbc_stations_from_web.py [options]
+  Options:
+    -h, --help            show this help message and exit
+    -d, --diagnostic      Rerun using downlaoded files, skipping download step (optional, default: False)
+    -p, --prune           Prune files that are no longer online (optional, default: False)
+    -o OUT_FILE, --out=OUT_FILE
+                          Save the text into the named file (optional, default: merged.txt)
+
+NOTE: The downloaded files are written to a subdirectory ndbc_temp_data which
+can be deleted once the final output file is created.
 
 MET_BASE
 ^^^^^^^^
@@ -514,8 +552,9 @@ containing a "key" string and "val" string. This defines a mapping of
 message type group names to a comma-separated list of values. This map is
 defined in the config files for PB2NC, Point-Stat, or Ensemble-Stat. Modify
 this map to define sets of message types that should be processed together as
-a group. The "SURFACE" entry must be present to define message types for
-which surface verification logic should be applied.
+a group. The "SURFACE" entry defines message types for which surface verification
+logic should be applied. If not defined, the default values listed below are
+used.
 
 .. code-block:: none
 		
@@ -681,14 +720,16 @@ using the following entries:
   smoothing. The default is 120. Ignored if not Gaussian method.
 
 * The "gaussian_dx" and "gaussian_radius" settings must be in the same
-  units, such as kilometers or degress.  Their ratio
+  units, such as kilometers or degress. Their ratio
   (sigma = gaussian_radius / gaussian_dx) determines the Guassian weighting
   function.
 
 * The "convert", "censor_thresh", and "censor_val" entries are described
-  below.  When specified, these operations are applied to the output of the
-  regridding step.  The conversion operation is applied first, followed by
-  the censoring operation.
+  below. When specified, these operations are applied to the output of the
+  regridding step. The conversion operation is applied first, followed by
+  the censoring operation. Note that these operations are limited in scope.
+  They are only applied if defined within the regrid dictionary itself.
+  Settings defined at higher levels of config file context are not applied. 
 
 .. code-block:: none
 		
@@ -1716,12 +1757,12 @@ This dictionary may include the following entries:
 * The "shape" entry may be set to SQUARE or CIRCLE to specify the shape
   of the smoothing area.
 
-* The "type" entry is an array of dictionaries, each specifying an
-  interpolation method. Interpolation is performed over a N by N box
-  centered on each point, where N is the width specified. Each of these
+* The "type" entry is an array of dictionaries, each specifying one or more
+  interpolation methods and widths. Interpolation is performed over an N by N
+  box centered on each point, where N is the width specified. Each of these
   dictionaries must include:
 
-  * The "width" entry is an integer which specifies the size of the
+  * The "width" entry is an array of integers to specify the size of the
     interpolation area. The area is either a square or circle containing
     the observation point. The width value specifies the width of the
     square or diameter of the circle. A width value of 1 is interpreted
@@ -1734,7 +1775,7 @@ This dictionary may include the following entries:
     grid point closest to the observation point. For grid-to-grid
     comparisons (i.e. Grid-Stat), the width must be odd.
 
-  * The "method" entry specifies the interpolation procedure to be
+  * The "method" entry is an array of interpolation procedures to be
     applied to the points in the box:
     
     * MIN         for the minimum value
@@ -1779,6 +1820,9 @@ This dictionary may include the following entries:
     only valid smoothing methods are MIN, MAX, MEDIAN, UW_MEAN, and
     GAUSSIAN, and MAXGAUSS.
 
+  * If multiple "method" and "width" options are specified, all possible
+    permutations of their values are applied.
+
 .. code-block:: none
 		
   interp = {
@@ -1788,8 +1832,8 @@ This dictionary may include the following entries:
   
      type = [
         {
-           method = UW_MEAN;
-           width  = 1;
+           method = [ NEAREST ];
+           width  = [ 1 ];
         }
      ];
   }
@@ -1797,20 +1841,20 @@ This dictionary may include the following entries:
 land_mask
 ^^^^^^^^^
      
-The "land_mask" dictionary defines the land/sea mask field which is used
-when verifying at the surface. For point observations whose message type
-appears in the "LANDSF" entry of the "message_type_group_map" setting,
-only use forecast grid points where land = TRUE. For point observations
-whose message type appears in the "WATERSF" entry of the
-"message_type_group_map" setting, only use forecast grid points where
-land = FALSE. The "flag" entry enables/disables this logic. If the
-"file_name" entry is left empty, then the land/sea is assumed to exist in
-the input forecast file. Otherwise, the specified file(s) are searched for
-the data specified in the "field" entry. The "regrid" settings specify how
-this field should be regridded to the verification domain. Lastly, the
-"thresh" entry is the threshold which defines land (threshold is true) and
-water (threshold is false).
-land_mask.flag may be set separately in each "obs.field" entry.
+The "land_mask" dictionary defines the land/sea mask field used when
+verifying at the surface. The "flag" entry enables/disables this logic.
+When enabled, the "message_type_group_map" dictionary must contain entries
+for "LANDSF" and "WATERSF". For point observations whose message type
+appears in the "LANDSF" entry, only use forecast grid points where land =
+TRUE. For point observations whose message type appears in the "WATERSF"
+entry, only use forecast grid points where land = FALSE. If the "file_name"
+entry is left empty, the land/sea is assumed to exist in the input forecast
+file. Otherwise, the specified file(s) are searched for the data specified
+in the "field" entry. The "regrid" settings specify how this field should be
+regridded to the verification domain. Lastly, the "thresh" entry is the
+threshold which defines land (threshold is true) and water (threshold is false).
+
+The "land_mask.flag" entry may be set separately in each "obs.field" entry.
 
 .. code-block:: none
 		
@@ -1825,21 +1869,21 @@ land_mask.flag may be set separately in each "obs.field" entry.
 topo_mask
 ^^^^^^^^^
      
-The "topo_mask" dictionary defines the model topography field which is used
-when verifying at the surface. This logic is applied to point observations
-whose message type appears in the "SURFACE" entry of the
-"message_type_group_map" setting. Only use point observations where the
-topo - station elevation difference meets the "use_obs_thresh" threshold
+The "topo_mask" dictionary defines the model topography field used when
+verifying at the surface. The flag entry enables/disables this logic.
+When enabled, the "message_type_group_map" dictionary must contain an entry
+for "SURFACE". This logic is applied to point observations whose message type
+appears in the "SURFACE" entry. Only use point observations where the
+topo minus station elevation difference meets the "use_obs_thresh" threshold
 entry. For the observations kept, when interpolating forecast data to the
-observation location, only use forecast grid points where the topo - station
-difference meets the "interp_fcst_thresh" threshold entry. The flag entry
-enables/disables this logic. If the "file_name" is left empty, then the
-topography data is assumed to exist in the input forecast file. Otherwise,
-the specified file(s) are searched for the data specified in the "field"
+observation location, only use forecast grid points where the topo minus station
+difference meets the "interp_fcst_thresh" threshold entry.  If the "file_name"
+is left empty, the topography data is assumed to exist in the input forecast file.
+Otherwise, the specified file(s) are searched for the data specified in the "field"
 entry. The "regrid" settings specify how this field should be regridded to
 the verification domain.
 
-topo_mask.flag may be set separately in each "obs.field" entry.
+The "topo_mask.flag" entry may be set separately in each "obs.field" entry.
 
 .. code-block:: none
 		

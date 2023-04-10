@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -18,6 +18,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 // Released versions of MET
+static const char met_version_11_1_0[] = "V11.1.0";
 static const char met_version_11_0_0[] = "V11.0.0";
 static const char met_version_10_1_0[] = "V10.1.0";
 static const char met_version_10_0_0[] = "V10.0.0";
@@ -41,7 +42,7 @@ static const char met_version_1_1[]    = "V1.1";
 
 ////////////////////////////////////////////////////////////////////////
 
-static const char * const met_version    = met_version_11_0_0;
+static const char * const met_version    = met_version_11_1_0;
 static const char default_met_data_dir[] = "MET_BASE";
 static const char txt_file_ext[]         = ".txt";
 static const char stat_file_ext[]        = ".stat";
@@ -80,6 +81,11 @@ static const int n_vld_msg_typ =
 static const char surface_msg_typ_group_str [] = "SURFACE"; // Surface message type group
 static const char landsf_msg_typ_group_str  [] = "LANDSF";  // Surface land message type group
 static const char watersf_msg_typ_group_str [] = "WATERSF"; // Surface water message type group
+
+// Default message type group values
+static const char default_msg_typ_group_surface [] = "ADPSFC,SFCSHP,MSONET";
+static const char default_msg_typ_group_landsf  [] = "ADPSFC,MSONET";
+static const char default_msg_typ_group_watersf [] = "SFCSHP";
 
 // Commonly used regular expressions
 static const char yyyymmdd_hhmmss_reg_exp[] =
