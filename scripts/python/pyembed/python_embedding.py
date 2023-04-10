@@ -18,7 +18,7 @@
 
 import os
 import sys
-import importlib
+from importlib import util as import_util
 
 class pyembed_tools():
 
@@ -78,8 +78,8 @@ class pyembed_tools():
 
         user_base = os.path.basename(pyembed_module_name).replace('.py','')
 
-        spec = importlib.util.spec_from_file_location(user_base, pyembed_module_name)
-        met_in = importlib.util.module_from_spec(spec)
+        spec = import_util.spec_from_file_location(user_base, pyembed_module_name)
+        met_in = import_util.module_from_spec(spec)
         spec.loader.exec_module(met_in)
         return met_in
 
