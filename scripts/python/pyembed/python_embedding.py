@@ -18,7 +18,7 @@
 
 import os
 import sys
-import importlib.util
+import importlib
 
 class pyembed_tools():
 
