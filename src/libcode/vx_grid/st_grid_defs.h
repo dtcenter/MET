@@ -47,7 +47,7 @@ struct StereographicData {
    double scale_factor;
    double dy_km;
 
-   void dump();
+   void dump() const;
 };
 
 
