@@ -108,32 +108,31 @@ The **attrs** dictionary must contain the following information:
      - description
      - data type
    * - valid
-     - init
-     - lead
-     - accum
-     - name
-     - long_name
-     - level
-     - units
-     - grid
-   * - valid time
-     - initialization time
-     - forecast lead
-     - accumulation interval
-     - variable name
-     - variable long name
-     - vertical level
-     - variable units
-     - grid informatiomn
-   * - string (YYYYMMDD_HHMMSS)
+     - valid time
      - string (YYYYMMDD_HHMMSS)
+   * - init
+     - initialization time
+     - string (YYYYMMDD_HHMMSS)
+   * - lead
+     - forecast lead
      - string (HHMMSS)
+   * - accum
+     - accumulation interval
      - string (HHMMSS)
+   * - name
+     - variable name
      - string
+   * - long_name
+     - variable long name
      - string
+   * - level
+     - variable level
      - string
+   * - units
+     - variable units
      - string
-     - string
+   * - grid
+     - grid information
      - string or dict
 
 .. note::
@@ -267,10 +266,10 @@ Finally, an example **attrs** dictionary is shown below:
   
   }
 
-Example Commands for 2D Gridded Dataplanes
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Running Python Embedding for 2D Gridded Dataplanes
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-It remains to discuss command lines and config files. Two methods for specifying the Python command and input file name are supported. 
+Two methods for specifying the Python command and input file name are supported. 
 
 **Python Embedding Option 1:**
 
