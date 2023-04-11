@@ -34,9 +34,9 @@ In addition to using **\-\-enable-python** with **configure** as mentioned above
 
 • Set **MET_PYTHON_BIN_EXE** to the full path of the desired Python executable.
 
-• On the command line, run "**python3-config --cflags**". Set the value of **MET_PYTHON_CC** to the output of that command.
+• On the command line, run "**python3-config \-\-cflags**". Set the value of **MET_PYTHON_CC** to the output of that command.
 
-• Again on the command line, run "**python3-config --ldflags**". Set the value of **MET_PYTHON_LD** to the output of that command.
+• Again on the command line, run "**python3-config \-\-ldflags**". Set the value of **MET_PYTHON_LD** to the output of that command.
 
 Make sure that these are set as environment variables or that you have included them on the command line prior to running **configure**.
 
@@ -310,6 +310,9 @@ On the command line for any of the MET tools, specify the path to the input grid
     'name="scripts/python/examples/read_ascii_numpy.py MET_PYTHON_INPUT_ARG FCST"; \
      file_type=PYTHON_NUMPY;' \
     -title "Python enabled plot_data_plane"
+
+Examples of Python Embedding for 2D Gridded Dataplanes
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. _pyembed-point-obs-data:
 
