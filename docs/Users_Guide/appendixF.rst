@@ -7,20 +7,26 @@ Appendix F Python Embedding
 Introduction
 ============
 
-MET includes the ability to embed Python to a limited degree. Users may use Python scripts and whatever associated Python packages they wish in order to prepare 2D gridded data fields, point observations, and matched pairs as input to the MET tools. We fully expect that this degree of embedding will increase in the future. In addition, plans are in place to extend Python with MET in upcoming releases, allowing users to invoke MET tools directly from their Python script. While MET version 8.0 was built on Python 2.x, MET versions 9.0 and beyond are built on Python 3.6+.
+MET includes the ability to embed Python to a limited degree. Users may use their own Python scripts and whatever associated Python packages they wish in order to prepare 2D gridded data fields, point observations, and matched pairs as input to the MET tools. We fully expect that this degree of embedding will increase in the future. In addition, plans are in place to extend Python with MET in upcoming releases, allowing users to invoke MET tools directly from their Python script. While MET version 8.0 was built on Python 2.x, MET versions 9.0 and beyond are built on Python 3.6+.
 
 .. _compiling_python_support:
 
-Compiling Python Support
-========================
+Compiling MET for Python Embedding
+==================================
 
-In order to use Python embedding, the user's local Python installation must have the C-language Python header files and libraries. Sometimes when Python is installed locally, these header files and libraries are deleted at the end of the installation process, leaving only the binary executable and run-time shared object files. But the Python header files and libraries must be present to compile support in MET for Python embedding. Assuming the requisite Python files are present, and that Python embedding is enabled when building MET (which is done by passing the **--enable-python** option to the **configure** command line), the MET C++ code will use these in the compilation process to link directly to the Python libraries.
+In order to use Python embedding, a local Python installation must be available when compiling the MET software with the following requirements:
 
-The local Python installation must also support a minimum set of required packages. The MET build includes some python wrapper scripts to facilitate the passing of data in memory as well as the reading and writing of temporary files. The packages required by those wrapper scripts are **sys, os, argparse, importlib, numpy and netCDF4**. While most of these are standard packages and readily available, numpy and netCDF4 may not be. Users are advised to confirm their availability prior to compiling MET with python embedding support.
+1. C-language Python header files and libraries
 
-In addition to the **configure** option mentioned above, three variables, **MET_PYTHON_BIN_EXE**, **MET_PYTHON_CC**, and **MET_PYTHON_LD**, must also be set for the configuration process. These may either be set as environment variables or as command line options to **configure**. These constants are passed as compiler command line options when building MET to enable the compiler to find the requisite Python executable, header files, and libraries in the user's local filesystem. Fortunately, Python provides a way to set these variables properly. This frees the user from the necessity of having any expert knowledge of the compiling and linking process. Along with the **Python** executable, there should be another executable called **python3-config**, whose output can be used to set these environment variables as follows:
+2. **NumPy** Python package
 
-• Set **MET_PYTHON_BIN_EXE** to the full path of the desired python executable.
+3. **netCDF4** Python package
+
+Users should be aware that in some cases, the C-language Python header files and libraries may be deleted at the end of the Python installation process and they may need to confirm their availability prior to compiling MET. Once the user has confirmed the above requirements are satisfied, they can compile the MET software for Python embedding by passing the **\-\-enable-python** opotion to the **configure** script on the command line. This will link the MET C++ code directly to the Python libraries. The **NumPy** and **netCDF4** Python packages are required by Python scripts included with the MET software that facilitate the passing of data in memory and the reading and writing of temporary files with Python embedding is used.
+
+In addition to using **\-\-enable-python** with **configure** as mentioned above, the following environment variables must also be set prior to executing **configure**: **MET_PYTHON_BIN_EXE**, **MET_PYTHON_CC**, and **MET_PYTHON_LD**. These may either be set as environment variables or as command line options to **configure**. These environment variables are used when building MET to enable the compiler to find the requisite Python executable, header files, and libraries in the user's local filesystem. Fortunately, Python provides a way to set these variables properly. This frees the user from the necessity of having any expert knowledge of the compiling and linking process. Along with the **Python** executable in the users local Python installation, there should be another executable called **python3-config**, whose output can be used to set these environment variables as follows:
+
+• Set **MET_PYTHON_BIN_EXE** to the full path of the desired Python executable.
 
 • On the command line, run "**python3-config --cflags**". Set the value of **MET_PYTHON_CC** to the output of that command.
 
