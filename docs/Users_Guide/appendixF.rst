@@ -16,15 +16,17 @@ Compiling MET for Python Embedding
 
 In order to use Python embedding, a local Python installation must be available when compiling the MET software with the following requirements:
 
-1. C-language Python header files and libraries
+1. Python version 3.8.6+
 
-2. **NumPy** Python package
+2. C-language Python header files and libraries
 
-3. **netCDF4** Python package
+3. **NumPy** Python package
 
-4. **Pandas** Python package
+4. **netCDF4** Python package
 
-5. **Xarray** Python package
+5. **Pandas** Python package
+
+6. **Xarray** Python package
 
 Users should be aware that in some cases, the C-language Python header files and libraries may be deleted at the end of the Python installation process and they may need to confirm their availability prior to compiling MET. Once the user has confirmed the above requirements are satisfied, they can compile the MET software for Python embedding by passing the **\-\-enable-python** opotion to the **configure** script on the command line. This will link the MET C++ code directly to the Python libraries. The **NumPy** and **netCDF4** Python packages are required by Python scripts included with the MET software that facilitate the passing of data in memory and the reading and writing of temporary files with Python embedding is used.
 
@@ -91,7 +93,7 @@ Currently, MET supports two different types of Python objects for two-dimensiona
 
 3. The data inside the **met_data** variable must be **double precision floating point** type
 
-4. A Python dictionary named **attrs** must be defined in the user's script and contain the :ref:`required attributes<_pyembed-2d-attrs>`
+4. A Python dictionary named **attrs** must be defined in the user's script and contain the :ref:`required attributes<pyembed-2d-attrs>`
 
 .. _pyembed-2d-attrs:
 
