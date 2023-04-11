@@ -48,8 +48,7 @@ class TCDiagDomainInfo {
       // Diagnostic scripts to be run
       StringArray diag_script;
 
-      // Corresponding NetCDF dimensions
-      netCDF::NcDim track_dim;
+      // NetCDF dimensions
       netCDF::NcDim range_dim;
       netCDF::NcDim azimuth_dim;
 

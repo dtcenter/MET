@@ -52,6 +52,29 @@ lead       = [];
 ////////////////////////////////////////////////////////////////////////////////
 
 //
+// Domain-specific cylindrical coordinate transformation and diagnostics scripts
+//
+domain_info = [
+   {
+      domain         = "parent";
+      n_range        = 150;
+      n_azimuth      = 8;
+      delta_range_km = 10.0;
+      diag_script    = [ "MET_BASE/python/tc_diag/compute_all_diagnostics.py",
+                         "MET_BASE/python/tc_diag/compute_custom_diagnostics.py" ];
+   },
+   {
+      domain         = "nest";
+      n_range        = 100;
+      n_azimuth      = 8;
+      delta_range_km = 10.0;
+      diag_script    = [ "MET_BASE/python/tc_diag/compute_sst_diagnostics.py" ];
+   }
+];
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
 // Data censoring and conversion
 // May be set separately in each diag_data "field" entry
 //
@@ -92,29 +115,6 @@ data = {
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// Domain-specific cylindrical coordinate transformation and diagnostics scripts
-//
-domain_info = [
-   {
-      domain         = "parent";
-      n_range        = 150;
-      n_azimuth      = 8;
-      delta_range_km = 10.0;
-      diag_script    = [ "MET_BASE/python/tc_diag/compute_all_diagnostics.py",
-                         "MET_BASE/python/tc_diag/compute_custom_diagnostics.py" ];
-   },
-   {
-      domain         = "nest";
-      n_range        = 100;
-      n_azimuth      = 8;
-      delta_range_km = 10.0;
-      diag_script    = [ "MET_BASE/python/tc_diag/compute_sst_diagnostics.py" ];
-   }
-];
-
-////////////////////////////////////////////////////////////////////////////////
-
-//
 // Regridding options
 //
 regrid = {
@@ -138,21 +138,11 @@ radial_velocity_long_field_name = "Radial Velocity";
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// NetCDF output file
+// Flags to control output files
 //
-nc_diag_flag = {
-   track       = TRUE;
-   diag        = TRUE;
-   grid_latlon = TRUE;
-   grid_raw    = TRUE;
-   cyl_latlon  = TRUE;
-   cyl_raw     = TRUE;
-}
-
-//
-// ASCII CIRA Diagnositc output file
-//
-cira_diag_flag = TRUE;
+nc_cyl_coord_flag = TRUE;
+nc_diag_flag      = TRUE;
+cira_diag_flag    = TRUE;
 
 ////////////////////////////////////////////////////////////////////////////////
 

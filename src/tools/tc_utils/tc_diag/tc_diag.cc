@@ -61,14 +61,19 @@ static void process_track_files(const StringArray&, const StringArray&, TrackInf
 static void process_track_points(const TrackInfoArray &);
 static void process_fields(const TrackPoint &);
 static bool is_keeper(const ATCFLineBase *);
+
 static void set_deck(const StringArray&);
 static void set_atcf_source(const StringArray&, StringArray&, StringArray&);
 static void set_data(const StringArray&);
 static void set_config(const StringArray&);
 static void set_outdir(const StringArray&);
-static void setup_nc_file(const TrackInfo &);
+
+static void setup_out_files(const TrackInfoArray &);
+static void setup_nc_file(const TrackInfo &, const char *, NcFile *);
 static ConcatString build_tmpfile_name(const TrackInfo &, const char *);
 static ConcatString build_outfile_name(const TrackInfo &, const char *);
+static void write_out_files();
+
 static void compute_lat_lon(TcrmwGrid&, double*, double*);
 
 ////////////////////////////////////////////////////////////////////////
@@ -88,6 +93,11 @@ static void compute_lat_lon(TcrmwGrid&, double*, double*);
 // the raw data PRIOR TO the cyl coordinate transformation. Wondering if we
 // need options to support the cyl coordinate transformation?
 
+// Storm motion computation (from 4/7/23):
+//   - Include the full track in each temporary NetCDF file
+//   - For each track point, write the vmax and mslp as a single value for that time.
+//   - Write the full array of (lat, lon) points for the entire track for simplicity.
+
 int met_main(int argc, char *argv[]) {
 
    // Process command line arguments
@@ -97,8 +107,14 @@ int met_main(int argc, char *argv[]) {
    TrackInfoArray tracks;
    process_tracks(tracks);
 
+   // Setup output files for each track
+   setup_out_files(tracks);
+
    // Process the gridded data
    process_track_points(tracks);
+
+   // Write output files
+   write_out_files();
 
 
 /* JHG work here
@@ -420,7 +436,7 @@ void process_track_files(const StringArray& files,
 
 ////////////////////////////////////////////////////////////////////////
 //
-// Check if the ATCFLineBase should be kept.
+// Check if the ATCFLineBase should be kept
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -579,9 +595,90 @@ void set_outdir(const StringArray& a) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void setup_nc_file(const TrackInfo &track) {
+void setup_out_files(const TrackInfoArray &tracks) {
+   OutFileInfo info;
+
+   // Write output files separately for each track
+   for(int i=0; i<tracks.n(); i++) {
+
+      // Initialize
+      info.clear();
+
+      // Store pointer to the TrackInfo
+      info.track = tracks[i];
+
+      // NetCDF cylindrical coordinates
+      if(conf_info.nc_cyl_coord_flag) {
+         info.nc_cyl_coord_file = build_outfile_name(info.track, "_cyl.nc");
+         setup_nc_file(info.track, info.nc_cyl_coord_file.c_str(), info.nc_cyl_coord_out);
+      }
+
+      // NetCDF diagnostics output
+      if(conf_info.nc_diag_flag) {
+         info.nc_diag_file = build_outfile_name(info.track, "_diag.nc");
+         setup_nc_file(info.track, info.nc_diag_file.c_str(), info.nc_diag_out);
+      }
+
+      // CIRA diagnostics output
+      if(conf_info.cira_diag_flag) {
+         info.cira_diag_file = build_outfile_name(info.track, "_diag.txt");
+         info.cira_diag_out = new ofstream;
+         info.cira_diag_out->open(info.cira_diag_file);
+
+         if(!(*info.cira_diag_out)) {
+            mlog << Error << "\nsetup_out_files()-> "
+                 << "can't open the output file \"" << info.cira_diag_file
+                 << "\" for writing!\n\n";
+            exit(1);
+         }
+
+         // Fixed width
+         info.cira_diag_out->setf(ios::fixed);
+
+         // List the output file
+         mlog << Debug(1) << "Writing output file: " << info.cira_diag_file << "\n";
+
+      }
+
+      // Store out file info for each track
+      out_info.push_back(info);
+
+   } // end for i
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void setup_nc_file(const TrackInfo &track, const char *out_file, NcFile *nc_out) {
+
+   // Open the output NetCDF file
+   nc_out = open_ncfile(out_file, true);
+
+   if(IS_INVALID_NC_P(nc_out)) {
+      mlog << Error << "\nsetup_nc_file() -> "
+           << "trouble opening output NetCDF file "
+           << out_file << "\n\n";
+      exit(1);
+   }
+
+   // List the output file
+   mlog << Debug(1) << "Writing output file: " << out_file << "\n";
+
+   // Track point dimension
+   NcDim track_point_dim = add_dim(nc_out, "track_point", track.n_points());
+
+   // Write the track
+   write_tc_track(nc_out, track_point_dim, track);
+
+   return;
+}
+
+/* JHG work here to write (lat, lon) of each track point
+   What about also writing all the ATCF lines?
+
    VarInfo* var_info = (VarInfo*) 0;
-/* JHG
+
    // Build the output file name
    nc_out_file = build_outfile_name(track, out_dir, fcst_hour, domain, ".nc");
 
@@ -622,10 +719,10 @@ void setup_nc_file(const TrackInfo &track) {
       di->range_dim   = add_dim(nc_out, rng_cs.c_str(), (long) di->data.range_n);
       di->azimuth_dim = add_dim(nc_out, azi_cs.c_str(), (long) di->data.azimuth_n);
    }
-*/
+
    return;
 }
-
+*/
 /* JHG, gotta do this stuff later
    // Define range and azimuth dimensions
    def_tc_range_azimuth(nc_out, range_dim, azimuth_dim, tcrmw_grid,
@@ -664,21 +761,19 @@ void setup_nc_file(const TrackInfo &track) {
 */
 
 ////////////////////////////////////////////////////////////////////////
-//
-// Build the output temp file name using the program name,
-// track/timing information and the domain name
-//
-////////////////////////////////////////////////////////////////////////
 
 ConcatString build_tmpfile_name(const TrackInfo &track,
                                 const TrackPoint &point,
                                 const char *domain) {
    ConcatString cs;
 
+   // Build the temp file name with the program name,
+   // track/timing information, and domain name
+
    cs << conf_info.tmp_dir
       << "/tmp_" << program_name
-      << "_"     << track.technique()
       << "_"     << track.storm_id()
+      << "_"     << track.technique()
       << "_"     << unix_to_yyyymmddhh(track.init())
       << "_f"    << point.lead() / sec_per_hour
       << "_"     << domain;
@@ -699,8 +794,9 @@ ConcatString build_outfile_name(const TrackInfo &track,
    if(conf_info.output_prefix.nonempty())
       cs << "_" << conf_info.output_prefix;
 
-   // Append the model, storm ID, and initialization time
+   // Append the storm ID, model, and initialization time
    cs << "_" << track.storm_id()
+      << "_" << track.technique()
       << "_" << unix_to_yyyymmddhh(track.init());
 
    // Append the suffix
@@ -708,6 +804,16 @@ ConcatString build_outfile_name(const TrackInfo &track,
 
    return(cs);
 }
+
+////////////////////////////////////////////////////////////////////////
+
+void write_out_files() {
+
+   for(int i=0; i<out_info.size(); i++) out_info[i].clear();
+
+   return;
+}
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -770,7 +876,7 @@ void process_track_points(const TrackInfoArray& tracks) {
 
          // JHG work here
          // compute_diagnostics(...);
-         cout << "JHG track " << j << " of " << tracks.n() << "\n";
+         mlog << Debug(3) << "JHG track " << j << " of " << tracks.n() << "\n";
 
       } // end for j
    } // end for i
@@ -917,5 +1023,79 @@ void process_fields(const TrackPoint& point) {
 
 
 */
+
+////////////////////////////////////////////////////////////////////////
+//
+//  Code for class OutFileInfo
+//
+////////////////////////////////////////////////////////////////////////
+
+OutFileInfo::OutFileInfo() {
+   init_from_scratch();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+OutFileInfo::~OutFileInfo() {
+   clear();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void OutFileInfo::init_from_scratch() {
+
+   // Initialize output file stream pointers
+   nc_cyl_coord_out = (NcFile *) 0;
+   nc_diag_out      = (NcFile *) 0;
+   cira_diag_out    = (ofstream *) 0;
+
+   clear();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void OutFileInfo::clear() {
+
+   track.clear();
+
+   // Write NetCDF cylindrical coordinates file
+   if(nc_cyl_coord_out) {
+
+      // Close the output file
+      nc_cyl_coord_out->close();
+      delete nc_cyl_coord_out;
+      nc_cyl_coord_out = (NcFile *) 0;
+   }
+   nc_cyl_coord_file.clear();
+
+   // Write NetCDF diagnostics file
+   if(nc_diag_out) {
+
+      // Close the output file
+      nc_diag_out->close();
+      delete nc_diag_out;
+      nc_diag_out = (NcFile *) 0;
+
+   }
+   nc_diag_file.clear();
+
+   // Write CIRA diagnostics files
+   if(cira_diag_out) {
+
+      // Write the output
+      // JHG segfault *cira_diag_out << cira_diag_at;
+
+      // Close the output file
+      cira_diag_out->close();
+      delete cira_diag_out;
+      cira_diag_out = (ofstream *) 0;
+   }
+   cira_diag_file.clear();
+   cira_diag_at.clear();
+
+   return;
+}
 
 ////////////////////////////////////////////////////////////////////////

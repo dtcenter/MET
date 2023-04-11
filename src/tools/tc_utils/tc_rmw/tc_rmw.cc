@@ -282,7 +282,8 @@ void process_tracks(TrackInfoArray& tracks) {
 
     process_track_files(files, files_model_suffix, tracks);
 
-    write_tc_tracks(nc_out, track_point_dim, tracks);
+    write_tc_track(nc_out, track_point_dim, tracks[0]);
+    write_tc_rmw  (nc_out, track_point_dim, tracks[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////

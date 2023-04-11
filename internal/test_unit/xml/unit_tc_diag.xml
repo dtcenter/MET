@@ -26,7 +26,7 @@
           &MET_BIN;/tc_diag</exec>
     <param> \
       -deck &DATA_DIR;/adeck/aal092022_OFCL_SHIP_AVNO.dat \
-      -data &OUTPUT_DIR;/tc_diag/gfs_2022092400_file_list \
+      -data parent &OUTPUT_DIR;/tc_diag/gfs_2022092400_file_list \
       -config &CONFIG_DIR;/TCDiagConfig_ian \
       -outdir &OUTPUT_DIR;/tc_diag/IAN_OFCL_2022092400 \
       -v 2

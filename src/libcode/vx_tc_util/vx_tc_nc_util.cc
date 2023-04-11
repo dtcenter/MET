@@ -17,11 +17,10 @@ using namespace netCDF;
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_tc_tracks(NcFile* nc_out,
+void write_tc_track(NcFile* nc_out,
     const NcDim& track_point_dim,
-    const TrackInfoArray& tracks) {
+    const TrackInfo& track) {
 
-    TrackInfo track = tracks[0];
     StringArray track_lines = track.track_lines();
 
     NcDim track_line_dim = add_dim(nc_out, "track_line", track_lines.n());
@@ -39,27 +38,20 @@ void write_tc_tracks(NcFile* nc_out,
     add_att(&track_lon_var, "long_name", "Track Point Longitude");
     add_att(&track_lon_var, "units", "degrees_north");
     add_att(&track_lon_var, "standard_name", "longitude_track");
-    NcVar track_mrd_var = nc_out->addVar(
-        "RMW", ncDouble, track_point_dim);
-    add_att(&track_mrd_var, "long_name", "Radius of Maximum Winds");
-    add_att(&track_mrd_var, "units", "nautical_miles");
-    add_att(&track_mrd_var, "standard_name", "radius_max_wind");
 
     double* track_lat_data = new double[track.n_points()];
     double* track_lon_data = new double[track.n_points()];
-    double* track_mrd_data = new double[track.n_points()];
 
     for(int i = 0; i < track.n_points(); i++) {
-        mlog << Debug(4) << track[i].serialize() << "\n";
+        mlog << Debug(5) << track[i].serialize() << "\n";
         track_lat_data[i] = track[i].lat();
         track_lon_data[i] = track[i].lon();
-        track_mrd_data[i] = track[i].mrd();
     }
 
     vector<size_t> offsets;
     vector<size_t> counts;
 
-    mlog << Debug(2) << "Writing " << track_lines.n() << " track lines.\n";
+    mlog << Debug(3) << "Writing " << track_lines.n() << " track lines.\n";
 
     for(int i = 0; i < track_lines.n(); i++) {
         offsets.clear();
@@ -67,7 +59,7 @@ void write_tc_tracks(NcFile* nc_out,
         counts.clear();
         counts.push_back(1);
         string line = track_lines[i];
-        mlog << Debug(3) << line << "\n";
+        mlog << Debug(4) << line << "\n";
         const char* str = line.c_str();
         track_lines_var.putVar(offsets, counts, &str);
     }
@@ -80,14 +72,42 @@ void write_tc_tracks(NcFile* nc_out,
 
     track_lat_var.putVar(offsets, counts, track_lat_data);
     track_lon_var.putVar(offsets, counts, track_lon_data);
-    track_mrd_var.putVar(offsets, counts, track_mrd_data);
 
     delete[] track_lat_data;
     delete[] track_lon_data;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_tc_rmw(NcFile* nc_out,
+    const NcDim& track_point_dim,
+    const TrackInfo& track) {
+
+    NcVar track_mrd_var = nc_out->addVar(
+        "RMW", ncDouble, track_point_dim);
+    add_att(&track_mrd_var, "long_name", "Radius of Maximum Winds");
+    add_att(&track_mrd_var, "units", "nautical_miles");
+    add_att(&track_mrd_var, "standard_name", "radius_max_wind");
+
+    double* track_mrd_data = new double[track.n_points()];
+
+    for(int i = 0; i < track.n_points(); i++) {
+        track_mrd_data[i] = track[i].mrd();
+    }
+
+    vector<size_t> offsets;
+    offsets.push_back(0);
+
+    vector<size_t> counts;
+    counts.push_back(track.n_points());
+
+    track_mrd_var.putVar(offsets, counts, track_mrd_data);
+
     delete[] track_mrd_data;
 }
 
 ////////////////////////////////////////////////////////////////////////
+
 
 set<string> get_pressure_level_strings(
     map<string, vector<string> > variable_levels) {

@@ -23,8 +23,11 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-extern void write_tc_tracks(netCDF::NcFile*,
-    const netCDF::NcDim&, const TrackInfoArray&);
+extern void write_tc_track(netCDF::NcFile*,
+    const netCDF::NcDim&, const TrackInfo&);
+
+extern void write_tc_rmw(netCDF::NcFile*,
+    const netCDF::NcDim&, const TrackInfo&);
 
 extern std::set<std::string> get_pressure_level_strings(
     std::map<std::string, std::vector<std::string> >);

@@ -91,9 +91,40 @@ static ConcatString out_prefix;
 //
 ////////////////////////////////////////////////////////////////////////
 
-// Output NetCDF files
-static StringArray nc_diag_files;
-static std::vector<NcFile *> nc_diag_out;
+class OutFileInfo {
+
+   private:
+
+      void init_from_scratch();
+
+   public:
+
+      OutFileInfo();
+      ~OutFileInfo();
+
+      //////////////////////////////////////////////////////////////////
+
+      // Track information
+      TrackInfo track;
+      netCDF::NcDim track_dim;
+
+      // NetCDF Cylindrical Coordinates output
+      ConcatString    nc_cyl_coord_file;
+      netCDF::NcFile *nc_cyl_coord_out;
+
+      // NetCDF Diagnostics output
+      ConcatString    nc_diag_file;
+      netCDF::NcFile *nc_diag_out;
+
+      // CIRA Diagnostics output
+      ConcatString   cira_diag_file;
+      std::ofstream *cira_diag_out;
+      AsciiTable     cira_diag_at;
+
+      void clear();
+};
+
+static std::vector<OutFileInfo> out_info;
 
 ////////////////////////////////////////////////////////////////////////
 //
