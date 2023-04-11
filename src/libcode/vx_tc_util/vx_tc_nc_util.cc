@@ -51,7 +51,9 @@ void write_tc_track(NcFile* nc_out,
     vector<size_t> offsets;
     vector<size_t> counts;
 
-    mlog << Debug(3) << "Writing " << track_lines.n() << " track lines.\n";
+    mlog << Debug(3) << "Writing " << track.n_points()
+         << " track points from " << track_lines.n()
+         << " track lines.\n";
 
     for(int i = 0; i < track_lines.n(); i++) {
         offsets.clear();
