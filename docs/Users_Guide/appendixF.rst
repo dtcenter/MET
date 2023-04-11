@@ -56,10 +56,25 @@ Setting this environment variable triggers slightly different processing logic i
 
 With this approach, users are able to execute Python scripts using their own custom Python installations.
 
+.. _pyembed-data-structures:
+
+Data Structures Supported by Python Embedding
+=============================================
+
+Python embedding with MET tools offers support for three different types of data structures:
+
+1. Two-dimensional (2D) gridded dataplanes
+
+2. Point data conforming to the :ref:`MET 11-column format<_table_reformat-point_ascii2nc_format>`
+
+3. Matched-pair data conforming to the :ref:`MET MPR Line Type<_table_PS_format_info_MPR>`
+
+Details for each of these data structures are provided below.
+
 .. _pyembed-2d-data:
 
-Python Embedding for 2D data
-============================
+Python Embedding for 2D gridded dataplanes
+------------------------------------------
 
 We now describe how to write Python scripts so that the MET tools may extract 2D gridded data fields from them. Currently, MET offers two ways to interact with Python scripts: by using NumPy N-dimensional arrays (ndarrays) or by using Xarray DataArrays. The interface to be used (NumPy or Xarray) is specified on the command line (more on this later). The user's scripts can use any Python libraries that are supported by the local Python installation, or any personal or institutional libraries or code that are desired in order to implement the Python script, so long as the data has been loaded into either a NumPy ndarray or an Xarray DataArray by the end of the script. This offers advantages when using data file formats that MET does not directly support. If there is Python code to read the data format, the user can use those tools to read the data, and then copy the data into a NumPy ndarray or an Xarray DataArray. MET can then ingest the data via the Python script. Note that whether a NumPy ndarray or an Xarray DataArray is used, the data should be stored as double precision floating point numbers. Using different data types, such as integers or single precision floating point numbers, will lead to unexpected results in MET.
 
