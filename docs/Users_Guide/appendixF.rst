@@ -80,55 +80,69 @@ All sample commands and directories listed below are relative to the top level o
 
 .. _pyembed-2d-data:
 
-Python Embedding for 2D gridded dataplanes
+Python Embedding for 2D Gridded Dataplanes
 ------------------------------------------
 
-We now describe how to write Python scripts so that the MET tools may extract 2D gridded data fields from them. Currently, MET offers two ways to interact with Python scripts: by using NumPy N-dimensional arrays (ndarrays) or by using Xarray DataArrays. The interface to be used (NumPy or Xarray) is specified on the command line (more on this later). The user's scripts can use any Python libraries that are supported by the local Python installation, or any personal or institutional libraries or code that are desired in order to implement the Python script, so long as the data has been loaded into either a NumPy ndarray or an Xarray DataArray by the end of the script. This offers advantages when using data file formats that MET does not directly support. If there is Python code to read the data format, the user can use those tools to read the data, and then copy the data into a NumPy ndarray or an Xarray DataArray. MET can then ingest the data via the Python script. Note that whether a NumPy ndarray or an Xarray DataArray is used, the data should be stored as double precision floating point numbers. Using different data types, such as integers or single precision floating point numbers, will lead to unexpected results in MET.
+Currently, MET supports two different types of Python objects for two-dimensional gridded dataplanes: NumPy N-dimensional arrays (ndarrays) and Xarray DataArrays. The keyword **PYTHON_NUMPY** is used on the command line when using ndarrays, and **PYTHON_XARRAY** when using Xarray DataArrays. Example commands are included below. General requirements for Python embedding with two-dimensional gridded dataplanes are as follows:
 
-**Using NumPy N-dimensional Arrays**
+1. The data must be stored in a variable with the name **met_data**
 
-The data must be loaded into a 2D NumPy ndarray named **met_data**. In addition there must be a Python dictionary named **attrs** which contains metadata such as timestamps, grid projection and other information. Here is an example **attrs** dictionary:
+2. The **met_data** variable must be of type **Xarray DataArray** or **NumPy N-D Array**
 
-.. code-block:: none
+3. The data inside the **met_data** variable must be **double precision floating point** type
 
-  attrs = {
-  
-     'valid':     '20050807_120000',
-     'init':      '20050807_000000',
-     'lead':      '120000',
-     'accum':     '120000',
-  
-     'name':      'Foo',
-     'long_name': 'FooBar',
-     'level':     'Surface',
-     'units':     'None',
- 
-     # Define 'grid' as a string or a dictionary
- 
-     'grid': {
-        'type': 'Lambert Conformal',
-        'hemisphere': 'N',
-        'name': 'FooGrid',
-        'scale_lat_1': 25.0,
-        'scale_lat_2': 25.0,
-        'lat_pin': 12.19,
-        'lon_pin': -135.459,
-        'x_pin': 0.0,
-        'y_pin': 0.0,
-        'lon_orient': -95.0,
-        'd_km': 40.635,
-        'r_km': 6371.2,
-        'nx': 185,
-        'ny': 129,
-      }
-  
-  }
+4. A Python dictionary named **attrs** must be defined in the user's script and contain the :ref:`required attributes<_pyembed-2d-attrs>`
 
-In the **attrs** dictionary, valid time, initialization time, lead time and accumulation time (if any) must be indicated by strings. Valid and initialization times must be given in YYYYMMDD[_HH[MMSS]] format, and lead and accumulation times must be given in HH[MMSS] format, where the square brackets indicate optional elements. The dictionary must also include strings for the name, long_name, level, and units to describe the data. The rest of the **attrs** dictionary gives the grid size and projection information in the same format that is used in the netCDF files written out by the MET tools. Those entries are also listed below. Note that the **grid** entry in the **attrs** dictionary can either be defined as a string or as a dictionary itself.
+.. _pyembed-2d_attrs:
 
-If specified as a string, **grid** can be defined as follows:
+Required Attributes for 2D Gridded Dataplanes
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-• As a named grid:
+The **attrs** dictionary must contain the following information:
+
+.. list-table:: attrs
+   :widths: 10 10 10
+   :header-rows: 1
+
+   * - key
+     - description
+     - data type
+   * - valid
+     - init
+     - lead
+     - accum
+     - name
+     - long_name
+     - level
+     - units
+     - grid
+   * - valid time
+     - initialization time
+     - forecast lead
+     - accumulation interval
+     - variable name
+     - variable long name
+     - vertical level
+     - variable units
+     - grid informatiomn
+   * - string (YYYYMMDD_HHMMSS)
+     - string (YYYYMMDD_HHMMSS)
+     - string (HHMMSS)
+     - string (HHMMSS)
+     - string
+     - string
+     - string
+     - string
+     - string
+     - string or dict
+
+.. note::
+   Often times Xarray DataArray objects come with their own set of attributes available as a property. To avoid conflict with the required attributes
+   for MET, it is advised to strip these attributes and rely on the **attrs** dictionary defined in your script.
+
+The grid entry in the **attrs** dictionary must contain the grid size and projection information in the same format that is used in the netCDF files written out by the MET tools. The value of this item in the dictionary can either be a string, or another dictionary. Examples of the **grid** entry defined as a string are:
+
+• Using a named grid supported by MET:
 
 .. code-block:: none
 
@@ -146,7 +160,7 @@ If specified as a string, **grid** can be defined as follows:
 
   'grid': '/path/to/sample_data.grib'
 
-When specified as a dictionary, the contents of the **grid** dictionary vary based on the grid **type** string. The entries for the supported grid types are described below:
+When specified as a dictionary, the contents of the **grid** entry vary based upon the grid **type**. The required elements for supported grid types are:
 
 • **Lambert Conformal** grid dictionary entries:
 
@@ -216,19 +230,45 @@ When specified as a dictionary, the contents of the **grid** dictionary vary bas
 
 Additional information about supported grids can be found in :ref:`appendixB`.
 
-**Using Xarray DataArrays**
+Finally, an example **attrs** dictionary is shown below:
 
-To use Xarray DataArrays, a similar procedure to the NumPy case is followed. The Xarray DataArray can be represented as a NumPy N-dimensional array (ndarray) via the **values** property of the DataArray, and an **attrs** property that contains a dictionary of attributes. The user must name the Xarray DataArray to be **met_data**. When one of the MET tools runs the Python script, it will look for an Xarray DataArray named **met_data**, and will retrieve the data and metadata from the **values** and **attrs** properties, respectively, of the Xarray DataArray. The Xarray DataArray **attrs** dictionary is populated in the same way as for the NumPy interface (please see :ref:`pyembed-2d-data` for requirements of each entry in the **attrs** dictionary). The **values** NumPy ndarray property of the Xarray DataArray is also populated in the same way as the NumPy case.
+.. code-block:: none
 
-.. note::
-   Currently, MET does not support Xarray Dataset structures. If you have a Dataset in Xarray, you can create a DataArray of a single variable using:
+  attrs = {
+  
+     'valid':     '20050807_120000',
+     'init':      '20050807_000000',
+     'lead':      '120000',
+     'accum':     '120000',
+  
+     'name':      'Foo',
+     'long_name': 'FooBar',
+     'level':     'Surface',
+     'units':     'None',
+ 
+     # Define 'grid' as a string or a dictionary
+ 
+     'grid': {
+        'type': 'Lambert Conformal',
+        'hemisphere': 'N',
+        'name': 'FooGrid',
+        'scale_lat_1': 25.0,
+        'scale_lat_2': 25.0,
+        'lat_pin': 12.19,
+        'lon_pin': -135.459,
+        'x_pin': 0.0,
+        'y_pin': 0.0,
+        'lon_orient': -95.0,
+        'd_km': 40.635,
+        'r_km': 6371.2,
+        'nx': 185,
+        'ny': 129,
+      }
+  
+  }
 
-   met_data = xr.DataArray(ds.varname,attrs=ds.attrs)
-
-   | ds = your Dataset name
-   | varname = variable name in the Dataset you'd like to use in MET
-
-__________________
+Example Commands for 2D Gridded Dataplanes
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 It remains to discuss command lines and config files. Two methods for specifying the Python command and input file name are supported. 
 
