@@ -209,7 +209,7 @@ The following environment variables should also be set:
     MET_PYTHON_CC='-I/usr/include/python3.6'
     MET_PYTHON_LD='-L/usr/lib/python3.6/config-x86_64-linux-gnu -lpython3.6m'
 
-  Note that this version of Python must include support for a minimum set of required pacakges. For more information about Python support in MET, including the list of required packages, please refer to :numref:`Appendix F, Section %s <appendixF>`.
+  Note that this version of Python must include support for a minimum set of required packages. For more information about Python support in MET, including the list of required packages, please refer to :numref:`Appendix F, Section %s <appendixF>`.
 
 
 * If compiling MODIS-Regrid and/or lidar2nc, set $MET_HDF to point to the main HDF4 directory, or set $MET_HDFINC to point to the directory with the HDF4 include files and set $MET_HDFLIB to point to the directory with the HDF4 library files. Also, set $MET_HDFEOS to point to the main HDF EOS directory, or set $MET_HDFEOSINC to point to the directory with the HDF EOS include files and set $MET_HDFEOSLIB to point to the directory with the HDF EOS library files.
