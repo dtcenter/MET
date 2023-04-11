@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -14,6 +14,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 #include <iostream>
+#include <vector>
 
 #include "vx_config.h"
 #include "vx_data2d.h"
@@ -89,6 +90,8 @@ class ModeConfInfo {
 
       ConcatString  fcst_multivar_logic;
       ConcatString   obs_multivar_logic;
+      std::vector<bool>   multivar_intensity;
+      
 
       void get_multivar_programs();
 

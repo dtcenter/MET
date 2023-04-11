@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -23,6 +23,13 @@ using namespace std;
 
 #include "vx_data2d_factory.h"
 #include "vx_log.h"
+
+typedef CRC_Array<bool>                      BoolArray;
+static BoolArray lookup_bool_array      (const char * name,
+					 Dictionary *dict,
+                                         bool error_out = default_dictionary_error_out,
+                                         bool print_warning = default_dictionary_print_warning,
+                                         bool search_parent = default_dictionary_search_parent);
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -959,8 +966,12 @@ dict = conf.lookup_dictionary(conf_key_obs);
 
 if ( dict->lookup(conf_key_multivar_logic) )   obs_multivar_logic = dict->lookup_string(conf_key_multivar_logic);
 
-
-
+multivar_intensity.clear();
+BoolArray ba = lookup_bool_array("multivar_intensity_flag", dict);
+ba.dump(cout);
+for (int i=0; i<ba.n(); ++i) {
+  multivar_intensity.push_back((ba[i] == 1 ? true:false));
+}
 return;
 
 }
@@ -1054,5 +1065,20 @@ return;
 
 ////////////////////////////////////////////////////////////////////////
 
+////////////////////////////////////////////////////////////////////////
 
 
+BoolArray lookup_bool_array(const char * name,
+			    Dictionary *dict,
+			    bool error_out,
+			    bool print_warning,
+			    bool search_parent)
+
+{
+
+BoolArray array;
+NumArray num_array = dict->lookup_num_array(name, error_out, print_warning, search_parent);
+for (int i=0; i<num_array.n_elements(); i++)
+  array.add( num_array[i]);
+return ( array );
+}

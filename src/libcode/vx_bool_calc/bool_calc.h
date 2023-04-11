@@ -41,7 +41,8 @@ class BoolCalc {
 
       void dump_program(ostream &) const;
 
-
+      // check that all the args from 1 to expectedNargs are found
+      bool check_args(int expectedNargs) const;
 
       int Max_depth;  //   maximum stack depth needed to run the program
 
