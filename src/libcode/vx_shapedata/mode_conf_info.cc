@@ -28,8 +28,8 @@ typedef CRC_Array<bool>                      BoolArray;
 static BoolArray lookup_bool_array      (const char * name,
 					 Dictionary *dict,
                                          bool error_out = default_dictionary_error_out,
-                                         bool print_warning = default_dictionary_print_warning,
-                                         bool search_parent = default_dictionary_search_parent);
+                                         bool print_warning = default_dictionary_print_warning);
+
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -1071,13 +1071,12 @@ return;
 BoolArray lookup_bool_array(const char * name,
 			    Dictionary *dict,
 			    bool error_out,
-			    bool print_warning,
-			    bool search_parent)
+			    bool print_warning)
 
 {
 
 BoolArray array;
-NumArray num_array = dict->lookup_num_array(name, error_out, print_warning, search_parent);
+NumArray num_array = dict->lookup_num_array(name, error_out, print_warning);
 for (int i=0; i<num_array.n_elements(); i++)
   array.add( num_array[i]);
 return ( array );

@@ -195,7 +195,7 @@ o_calc.set(config.obs_multivar_logic.text());
 if (!f_calc.check_args(n_files)) {
   exit ( 1 );
 }
-if (!_calc.check_args(n_files)) {
+if (!o_calc.check_args(n_files)) {
   exit ( 1 );
 }
 
