@@ -228,7 +228,6 @@ class TCStatJob {
       void close_dump_file();
 
       void open_stat_file();
-      void setup_stat_file(int n_row, int n);
       void close_stat_file();
       
       void dump_pair(const TrackPairInfo &, std::ofstream *);
@@ -489,6 +488,8 @@ class TCStatJobRIRW : public TCStatJob {
 
       void add_map(std::map<ConcatString,RIRWMapData,cs_cmp>&);
 
+      void setup_stat_file(int n_row, int n);
+   
       void do_output     (std::ostream &);
       void do_ctc_output (std::ostream &);
       void do_cts_output (std::ostream &);
