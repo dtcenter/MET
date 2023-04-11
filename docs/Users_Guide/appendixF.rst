@@ -215,7 +215,7 @@ Listed below is an example of running the Plot-Data-Plane tool to call a Python 
 .. code-block:: none
 
   plot_data_plane PYTHON_NUMPY fcst.ps \
-    'name="scripts/python/read_ascii_numpy.py data/python/fcst.txt FCST";' \
+    'name="scripts/python/examples/read_ascii_numpy.py data/python/fcst.txt FCST";' \
     -title "Python enabled plot_data_plane"
     
 The first argument for the Plot-Data-Plane tool is the gridded data file to be read. When calling a NumPy Python script, set this to the constant string PYTHON_NUMPY. The second argument is the name of the output PostScript file to be written. The third argument is a string describing the data to be plotted. When calling a Python script, set **name** to the Python script to be run along with command line arguments. Lastly, the **-title** option is used to add a title to the plot. Note that any print statements included in the Python script will be printed to the screen. The above example results in the following log messages.
@@ -245,7 +245,7 @@ The Ensemble-Stat, Series-Analysis, and MTD tools support the use of file lists 
 .. code-block:: none
 		
   plot_data_plane data/python/fcst.txt fcst.ps \
-    'name="scripts/python/read_ascii_numpy.py MET_PYTHON_INPUT_ARG FCST"; \
+    'name="scripts/python/examples/read_ascii_numpy.py MET_PYTHON_INPUT_ARG FCST"; \
      file_type=PYTHON_NUMPY;' \
     -title "Python enabled plot_data_plane"
 
@@ -287,4 +287,4 @@ The **read_ascii_mpr.py** sample script can be found in:
 
 • MET installation directory in *MET_BASE/python/examples*.
 
-• `MET GitHub repository <https://github.com/dtcenter/MET>`_ in *met/scripts/python/examples*.
+• `MET GitHub repository <https://github.com/dtcenter/MET>`_ in *MET/scripts/python/examples*.
