@@ -273,7 +273,7 @@ The Ensemble-Stat, Series-Analysis, and MTD tools support the use of file lists 
 .. _pyembed-point-obs-data:
 
 Python Embedding for Point Observations
-=======================================
+---------------------------------------
 
 The ASCII2NC tool supports the "-format python" option. With this option, point observations may be passed as input. An example of this is shown below:
 
@@ -300,7 +300,7 @@ Both of the above examples use the **read_ascii_point.py** sample script which i
 .. _pyembed-mpr-data:
 
 Python Embedding for MPR data
-=============================
+-----------------------------
 
 The Stat-Analysis tool supports the "-lookin python" option. With this option, matched pair (MPR) data may be passed as input. An example of this is provided in :numref:`StA-pyembed`. That example uses the **read_ascii_mpr.py** sample script which is included with the MET code. It reads MPR data and stores it in a Pandas dataframe to be read by the Stat-Analysis tool with Python.
 
