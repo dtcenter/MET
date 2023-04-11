@@ -102,7 +102,7 @@ Required Attributes for 2D Gridded Dataplanes
 
 The **attrs** dictionary must contain the following information:
 
-.. list-table:: attrs
+.. list-table:: 2D Dataplane Attributes
    :widths: 5 5 10
    :header-rows: 1
 
