@@ -35,26 +35,26 @@ In addition to using **\-\-enable-python** with **configure** as mentioned above
 Make sure that these are set as environment variables or that you have included them on the command line prior to running **configure**.
 
 
-MET_PYTHON_EXE
-==============
+Controlling Which Python MET uses with MET_PYTHON_EXE
+=====================================================
 
-When Python embedding support is compiled, MET instantiates the Python interpreter directly. However, for users of highly configurable Conda environments, the Python instance set at compilation time may not be sufficient. Users may want to switch between Conda environments for which different packages are available. MET version 9.0 has been enhanced to address this need.
+When MET is compiled with Python embedding support, MET uses the Python executable in that Python installation by default when Python embedding is used. However, for users of highly configurable Python environments, the Python instance set at compilation time may not be sufficient. Users may want to use an alternate Python installation if they need additional packages not available in the Python installation used when compiling MET. In MET versions 9.0+, users have the ability to use a different Python executable when running MET than the version used when compiling MET by setting the environment variable **MET_PYTHON_EXE**.
 
-The types of Python embedding supported in MET are described below. In all cases, by default, the compiled Python instance is used to execute the Python script. If the packages that script imports are not available for the compiled Python instance, users will encounter a runtime error. In the event of a runtime error, users are advised to set the **MET_PYTHON_EXE** environment variable and rerun. This environment variable should be set to the full path to the version of Python you would like to use. See an example below.
+If a user's Python script requires packages that are not available in the Python installation used when compiling the MET software, they will encounter a runtime error when using MET. In this instance, the user will need to change the Python MET is using to a different installation with the required packages for their script. It is the responsibility of the user to manage this Python installation, and one popular approach is to use a custom Anaconda (Conda) Python environment. Once the Python installation meeting the user's requirements is available, the user can force MET to use it by setting the **MET_PYTHON_EXE** environment variable to the full path of the Python executable in that installation. For example:
 
 .. code-block:: none
 
   export MET_PYTHON_EXE=/usr/local/python3/bin/python3
 
-Setting this environment variable triggers slightly different processing logic in MET. Rather than executing the user-specified script with compiled Python instance directly, MET does the following:
+Setting this environment variable triggers slightly different processing logic in MET than when MET uses the Python installation that was used when compiling MET. When using the Python installation that was used when compiling MET, Python is called directly and data are passed in memory from Python to the MET tools. When the user sets **MET_PYTHON_EXE**, MET does the following:
 
 1. Wrap the user's Python script and arguments with a wrapper script (write_tmp_mpr.py, write_tmp_point.py, or write_tmp_dataplane.py) and specify the name of a temporary file to be written.
 
 2. Use a system call to the **MET_PYTHON_EXE** Python instance to execute these commands and write the resulting data objects to a temporary ASCII or NetCDF file.
 
-3. Use the compiled Python instance to run a wrapper script (read_tmp_ascii.py or read_tmp_dataplane.py) to read data from that temporary file.
+3. Use the Python instance that MET was compiled with to run a wrapper script (read_tmp_ascii.py or read_tmp_dataplane.py) to read data from that temporary file.
 
-With this approach, users should be able to execute Python scripts in their own custom environments.
+With this approach, users are able to execute Python scripts using their own custom Python installations.
 
 .. _pyembed-2d-data:
 
