@@ -22,6 +22,10 @@ In order to use Python embedding, a local Python installation must be available 
 
 3. **netCDF4** Python package
 
+4. **Pandas** Python package
+
+5. **Xarray** Python package
+
 Users should be aware that in some cases, the C-language Python header files and libraries may be deleted at the end of the Python installation process and they may need to confirm their availability prior to compiling MET. Once the user has confirmed the above requirements are satisfied, they can compile the MET software for Python embedding by passing the **\-\-enable-python** opotion to the **configure** script on the command line. This will link the MET C++ code directly to the Python libraries. The **NumPy** and **netCDF4** Python packages are required by Python scripts included with the MET software that facilitate the passing of data in memory and the reading and writing of temporary files with Python embedding is used.
 
 In addition to using **\-\-enable-python** with **configure** as mentioned above, the following environment variables must also be set prior to executing **configure**: **MET_PYTHON_BIN_EXE**, **MET_PYTHON_CC**, and **MET_PYTHON_LD**. These may either be set as environment variables or as command line options to **configure**. These environment variables are used when building MET to enable the compiler to find the requisite Python executable, header files, and libraries in the user's local filesystem. Fortunately, Python provides a way to set these variables properly. This frees the user from the necessity of having any expert knowledge of the compiling and linking process. Along with the **Python** executable in the users local Python installation, there should be another executable called **python3-config**, whose output can be used to set these environment variables as follows:
@@ -70,6 +74,9 @@ Python embedding with MET tools offers support for three different types of data
 3. Matched-pair data conforming to the :ref:`MET MPR Line Type<_table_PS_format_info_MPR>`
 
 Details for each of these data structures are provided below.
+
+.. note::
+All sample commands listed below were generated at the top level of the MET source code directory.
 
 .. _pyembed-2d-data:
 
