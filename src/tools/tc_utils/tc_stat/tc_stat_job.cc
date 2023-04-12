@@ -3803,9 +3803,8 @@ void TCStatJobRIRW::do_stat_output(ostream &out) {
    //n_row = 1 + (int) RIRWMap.size();
    //n_col = 1;
    
-   //setup_stat_file(n_row, n_col);
-
-   setup_stat_file(1, 6);
+   setup_stat_file(n_row, n_col);
+   //setup_stat_file(1, 6);
    
    // Will need some shc settings here
    shc.set_desc(na_str);
