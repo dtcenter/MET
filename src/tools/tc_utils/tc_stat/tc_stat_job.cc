@@ -3390,6 +3390,8 @@ void TCStatJobRIRW::do_ctc_output(ostream &out) {
    int i, r, c;
    AsciiTable out_at;
 
+   cout << "In do_ctc_output rows ((int) RIRWMap.size() + 1) = " << (int) RIRWMap.size() + 1 << " ByColumn.n() = " << ByColumn.n() << " n_ctc_columns = " << n_ctc_columns << " cols: " << 9 + ByColumn.n() + n_ctc_columns << endl;
+   
    // Format the output table
    out_at.set_size((int) RIRWMap.size() + 1,
                    9 + ByColumn.n() + n_ctc_columns);
@@ -3398,10 +3400,6 @@ void TCStatJobRIRW::do_ctc_output(ostream &out) {
    // Initialize row and column indices
    r = c = 0;
 
-   // testing
-   if(StatOut)
-      cout << "YES, -out_stat option invoked" << endl;
-   
    // Write the header row
    out_at.set_entry(r, c++, "COL_NAME:");
 
@@ -3467,7 +3465,7 @@ void TCStatJobRIRW::do_cts_output(ostream &out) {
    StringArray sa;
    int i, r, c;
    AsciiTable out_at;
-
+   
    // Format the output table
    out_at.set_size((int) RIRWMap.size() + 1,
                    9 + ByColumn.n() + n_cts_columns);
@@ -3741,8 +3739,7 @@ void TCStatJobRIRW::setup_stat_file(int n_row, int n) {
       int need_rows = max(stat_at.nrows(), stat_row + n_row);
       int need_cols = max(stat_at.ncols(), n_col);
       
-      if(need_rows > stat_at.nrows() || need_cols > stat_at.ncols()) {
-         
+      if(need_rows > stat_at.nrows() || need_cols > stat_at.ncols()) {         
          //
          // Resize the STAT table
          //
@@ -3768,21 +3765,51 @@ void TCStatJobRIRW::do_stat_output(ostream &out) {
    ConcatString cs;
    
    //
-   // JHG... need to define TCStatJob::setup_stat_file() similar to STATAnalysisJob::setup_stat_file(...)
-   // Also add 'AsciiTable stat_at' and 'int stat_row' to the TCStatJob base class.
+   // Setup the output table
    //
 
-   // from stat_analysis
-   // job.setup_stat_file(n_row, n_pnt);
-
-   n_row = 1 + (int) RIRWMap.size();
-   n_col = 1;
+   cout << "RIRWMap.size() = " << (int) RIRWMap.size() << " ByColumn.n() = " << ByColumn.n() << endl;
    
-   setup_stat_file(n_row, n_col);
+   n_row = 1 + (int) RIRWMap.size();
+   n_col = 1 + ByColumn.n();
+   
+   if(OutLineType.has(stat_ctc_str))
+   {
+      cout << "In do_stat_output, Doing CTC" << endl;
+      n_col += n_ctc_columns;
+   }
+   else if(OutLineType.has(stat_cts_str))
+   {
+      cout << "In do_stat_output, Doing CTS" << endl;
+      n_col += n_cts_columns;
+   }
+
+   cout << "n_row = " << n_row << " n_col = " << n_col << endl;
+   
+   // Likely don't need these below (these are for -out, output)
+   //
+   // This from stat_analysis
+   //write_job_aggr_hdr(job, n_row, n_col, at);
+   //
+   // This is from do_ctc_output above
+   //write_header_row(ctc_columns, n_ctc_columns, 0, out_at, r, c);
+   //
+   // Write the output header row
+   //
+   //c = 1 + ByColumn.n();
+   //     if(lt == stat_ctc)    write_header_row(ctc_columns,    n_ctc_columns,    0, at, 0, c);
+   //else if(lt == stat_cts)    write_header_row(cts_columns,    n_cts_columns,    0, at, 0, c);
+      
+   //n_row = 1 + (int) RIRWMap.size();
+   //n_col = 1;
+   
+   //setup_stat_file(n_row, n_col);
+
+   setup_stat_file(1, 6);
    
    // Will need some shc settings here
-   //shc.set_desc(na_str);
-   //shc.fcst_var("RIRW");
+   shc.set_desc(na_str);
+   shc.set_fcst_var("RIRW");
 
    mlog << Debug(2) << "Computing output for "
         << (int) RIRWMap.size() << " case(s).\n";
