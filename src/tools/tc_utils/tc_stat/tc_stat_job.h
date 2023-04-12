@@ -488,7 +488,7 @@ class TCStatJobRIRW : public TCStatJob {
 
       void add_map(std::map<ConcatString,RIRWMapData,cs_cmp>&);
 
-      void setup_stat_file(int n_row, int n);
+      void setup_stat_file(int n_row);
    
       void do_output     (std::ostream &);
       void do_ctc_output (std::ostream &);

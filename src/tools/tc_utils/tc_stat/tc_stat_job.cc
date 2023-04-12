@@ -3171,8 +3171,11 @@ void TCStatJobRIRW::do_job(const StringArray &file_list,
 
    // New changes
    // Create new function do_stat_outut
-   if(StatOut) do_stat_output(*StatOut);
-   
+   if(StatOut) {
+      do_stat_output(*StatOut);
+      close_stat_file();
+   }
+
    return;
 }
 
@@ -3645,7 +3648,7 @@ void TCStatJobRIRW::do_mpr_output(ostream &out) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCStatJobRIRW::setup_stat_file(int n_row, int n) {
+void TCStatJobRIRW::setup_stat_file(int n_row) {
    STATLineType cur_lt, out_lt;
    StringArray out_sa;
    int i, c, n_col;
@@ -3762,52 +3765,10 @@ void TCStatJobRIRW::setup_stat_file(int n_row, int n) {
 
 void TCStatJobRIRW::do_stat_output(ostream &out) {
    map<ConcatString,RIRWMapData,cs_cmp>::iterator it;
-   int n_row, n_col, n_pnt, r, c;
    StatHdrColumns shc;
-   AsciiTable stat_at;
-   ConcatString cs;
+   int r, c;
    
-   //
-   // Setup the output table
-   //
-
-   cout << "RIRWMap.size() = " << (int) RIRWMap.size() << " ByColumn.n() = " << ByColumn.n() << endl;
-   
-   n_row = 1 + (int) RIRWMap.size();
-   n_col = 1 + ByColumn.n();
-   
-   if(OutLineType.has(stat_ctc_str))
-   {
-      cout << "In do_stat_output, Doing CTC" << endl;
-      n_col += n_ctc_columns;
-   }
-   else if(OutLineType.has(stat_cts_str))
-   {
-      cout << "In do_stat_output, Doing CTS" << endl;
-      n_col += n_cts_columns;
-   }
-
-   cout << "n_row = " << n_row << " n_col = " << n_col << endl;
-   
-   // Likely don't need these below (these are for -out, output)
-   //
-   // This from stat_analysis
-   //write_job_aggr_hdr(job, n_row, n_col, at);
-   //
-   // This is from do_ctc_output above
-   //write_header_row(ctc_columns, n_ctc_columns, 0, out_at, r, c);
-   //
-   // Write the output header row
-   //
-   //c = 1 + ByColumn.n();
-   //     if(lt == stat_ctc)    write_header_row(ctc_columns,    n_ctc_columns,    0, at, 0, c);
-   //else if(lt == stat_cts)    write_header_row(cts_columns,    n_cts_columns,    0, at, 0, c);
-      
-   //n_row = 1 + (int) RIRWMap.size();
-   //n_col = 1;
-   
-   setup_stat_file(n_row, n_col);
-   //setup_stat_file(1, 6);
+   setup_stat_file(1 + (int) RIRWMap.size());
    
    // Will need some shc settings here
    shc.set_desc(na_str);
@@ -3819,7 +3780,7 @@ void TCStatJobRIRW::do_stat_output(ostream &out) {
    //
    // Loop through the map
    //
-   //for(it = RIRWMap.begin(), r=1; it != RIRWMap.end(); it++) {
+   for(it = RIRWMap.begin(), r=1; it != RIRWMap.end(); it++) {
 
       //
       // Write the output STAT header columns
@@ -3836,59 +3797,52 @@ void TCStatJobRIRW::do_stat_output(ostream &out) {
       // Could set shc to blank string (na) for now?
       
       //shc.set_???(na_str);
-
       
-      
-      // move the setting of alpha down into the logic for each line type
-      /*
-      if(OutLineType.has(stat_ctc_str)) shc.set_alpha(job.out_alpha);
-         write_header_cols(shc, job.stat_at, job.stat_row);
-         }*/
+      write_header_cols(shc, stat_at, stat_row);
 
       //write_header_cols(shc, stat_at, stat_row);
-      
       
       //
       // Initialize
       //
-      //c = 0;
+      c = 0;
 
       //
       // CTC output line
       //
-      //if(OutLineType.has(stat_ctc_str)) {
-      //   shc.set_alpha(na_str);
-      //   write_ctc_cols(it->second.Info, stat_at,
-      //                  stat_row++, n_header_columns);
-      //}
+      if(OutLineType.has(stat_ctc_str)) {
+         shc.set_alpha(bad_data_double);
+         write_ctc_cols(it->second.Info, stat_at,
+                        stat_row++, n_header_columns);
+      }
       
       //
       // CTS output line
       //
-      //if(OutLineType.has(stat_cts_str)) {
+      if(OutLineType.has(stat_cts_str)) {
 
          //
          // Store the alpha information in the CTSInfo object
          //
-         //it->second.Info.allocate_n_alpha(1);
-         //it->second.Info.alpha[0] = job.out_alpha; // JHG, not sure if out_alpha is configurable right now?
-         //shc.set_alpha(job.out_alpha);
+         it->second.Info.allocate_n_alpha(1);
+         it->second.Info.alpha[0] = 0.05; // job.out_alpha; // JHG, not sure if out_alpha is configurable right now?
+         shc.set_alpha(0.05);
          
          //
          // Compute the stats and confidence intervals for this
          // CTSInfo object
-         //
-         //it->second.Info.compute_stats();
-         //it->second.Info.compute_ci();
+         
+         it->second.Info.compute_stats();
+         it->second.Info.compute_ci();
 
          //
          // Write the data line
          //
-         //write_cts_cols(it->second.Info, 0, stat_at,
-         //               stat_row++, n_header_columns);
-     //}
-   //} // end for it
-   
+         write_cts_cols(it->second.Info, 0, stat_at,
+                        stat_row++, n_header_columns);
+     }
+   } // end for it
+  
    return;
 }
 
