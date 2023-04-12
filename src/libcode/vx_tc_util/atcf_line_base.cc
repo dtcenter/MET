@@ -280,7 +280,7 @@ ConcatString ATCFLineBase::technique() const {
    else                     cs = get_item(TechniqueOffset);
 
    // Replace instances of AVN with GFS
-   if(strstr(cs.c_str(), "AVN") != NULL) {
+   if(strstr(cs.c_str(), "AVN") != nullptr) {
       if(print_avn_to_gfs_message) {
          mlog << Debug(1)
               << "When reading ATCF track data, all instances of "

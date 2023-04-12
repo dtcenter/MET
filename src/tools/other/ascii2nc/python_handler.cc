@@ -136,9 +136,6 @@ mlog << Error << "\nbool PythonHandler::_readObservations(LineDataFile &) -> "
 
 exit ( 1 );
 
-
-return ( false );
-
 }
 
 

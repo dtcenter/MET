@@ -649,9 +649,6 @@ mlog << Error << "\nLineDataFile::operator=(const LineDataFile &) -> "
 
 exit ( 1 );
 
-
-return ( * this );
-
 }
 
 

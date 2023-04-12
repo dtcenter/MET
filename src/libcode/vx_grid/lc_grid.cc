@@ -661,8 +661,6 @@ mlog << Error << "\nLambertGrid::shift_right(int) -> "
 
 exit ( 1 );
 
-return;
-
 }
 
 

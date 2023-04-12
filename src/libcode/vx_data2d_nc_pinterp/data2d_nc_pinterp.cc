@@ -58,8 +58,6 @@ MetNcPinterpDataFile & MetNcPinterpDataFile::operator=(const MetNcPinterpDataFil
    mlog << Error << "\nMetNcPinterpDataFile::operator=(const MetNcPinterpDataFile &) -> "
         << "should never be called!\n\n";
    exit(1);
-
-   return(*this);
 }
 
 ////////////////////////////////////////////////////////////////////////

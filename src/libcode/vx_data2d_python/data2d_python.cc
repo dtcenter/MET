@@ -85,8 +85,6 @@ mlog << Error << "\nMetPythonDataFile::operator=(const MetPythonDataFile &) -> "
 
 exit ( 1 );
 
-return ( * this );
-
 }
 
 

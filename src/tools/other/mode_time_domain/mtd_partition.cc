@@ -667,8 +667,6 @@ if ( (nclass_1 < 0) || (nclass_2 < 0) )  {
 
    exit ( 1 );
 
-   return;
-
 }
 
 merge_classes(nclass_1, nclass_2);

@@ -81,8 +81,6 @@ mlog << Error << "\nPython3_List::Python3_List(const Python3_List &) -> "
 
 exit ( 1 );
 
-return;
-
 }
 
 
@@ -97,8 +95,6 @@ mlog << Error << "\nPython3_List(const Python3_List &) -> "
      << "should never be called!\n\n";
 
 exit ( 1 );
-
-return ( * this );
 
 }
 

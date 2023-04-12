@@ -147,8 +147,6 @@ DiagFile & DiagFile::operator=(const DiagFile &) {
    mlog << Error << "\nDiagFile::operator=(const DiagFile &) -> "
         << "should never be called!\n\n";
    exit(1);
-
-   return(*this);
 }
 
 ////////////////////////////////////////////////////////////////////////

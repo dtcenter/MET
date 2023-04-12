@@ -34,7 +34,7 @@ void parse_row_col(const char *col_name, int &r, int &c) {
    // Parse Fi_Oj strings
    r = atoi(++col_name);
 
-   if((ptr = strrchr(col_name, '_')) != NULL) c = atoi(++ptr);
+   if((ptr = strrchr(col_name, '_')) != nullptr) c = atoi(++ptr);
    else {
       mlog << Error << "\nparse_row_col() -> "
            << "unexpected column name specified: \""

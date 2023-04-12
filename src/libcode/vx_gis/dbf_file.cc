@@ -720,8 +720,6 @@ mlog << Error << "\nDbfFile::operator=(const DbfFile &) -> "
 
 exit ( 1 );
 
-return ( * this );
-
 }
 
 

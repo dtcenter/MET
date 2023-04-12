@@ -727,9 +727,6 @@ mlog << Error << "\nvoid Ppm::autocrop() -> not yet implemented\n\n";
 
 exit ( 1 );
 
-
-return;
-
 }
 
 

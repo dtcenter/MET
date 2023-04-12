@@ -96,7 +96,7 @@ void NcCfFile::init_from_scratch()
   _ncFile = (NcFile *) 0;
   _dims = (NcDim **) 0;
   Var = (NcVarInfo *) 0;
-  _time_var_info = (NcVarInfo *)NULL;
+  _time_var_info = (NcVarInfo *)nullptr;
 
   _xDim = (NcDim *)0; 
   _yDim = (NcDim *)0;
@@ -265,7 +265,7 @@ bool NcCfFile::open(const char * filepath)
     }
   }   //  for j
 
-  if (NULL == _time_var_info) {
+  if (nullptr == _time_var_info) {
     for (int j=0; j<Nvars; ++j)  {
       if (is_nc_unit_time(Var[j].units_att.c_str())) {
         valid_time_var = Var[j].var;
@@ -986,7 +986,7 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
     if (a[j] == vx_data2d_star)
     {
       ++count;
-      if ( var == NULL || ((j != var->x_slot) && (j != var->y_slot)) )
+      if ( var == nullptr || ((j != var->x_slot) && (j != var->y_slot)) )
       {
         mlog << Error << "\n" << method_name
              << "star found in bad slot\n\n";
@@ -1005,7 +1005,7 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
   //  check slots - additional logic to satisfy Fortify Null Dereference
  int x_slot_tmp = 0;
  int y_slot_tmp = 0;
-  if (var == NULL || var->x_slot < 0 || var->y_slot < 0)
+  if (var == nullptr || var->x_slot < 0 || var->y_slot < 0)
   {
     mlog << Error << "\n" << method_name
          << "bad x|y|z slot\n\n";

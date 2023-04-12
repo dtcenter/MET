@@ -456,7 +456,7 @@ void process_search_dirs() {
    //
    // Get the list of stat files in the search directories
    //
-   files = get_filenames(search_dirs, NULL, stat_file_ext);
+   files = get_filenames(search_dirs, nullptr, stat_file_ext);
 
    n = files.n_elements();
 
@@ -876,7 +876,7 @@ void open_temps()
    // Build the temp file name
    //
    tmp_file << tmp_dir << "/" << "tmp_stat_analysis";
-   tmp_path = make_temp_file_name(tmp_file.c_str(), NULL);
+   tmp_path = make_temp_file_name(tmp_file.c_str(), nullptr);
 
    //
    // Open the temp file

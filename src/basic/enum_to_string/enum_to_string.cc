@@ -137,7 +137,7 @@ header_filename = argv[1];
 
 yydebug = debug;
 
-if ( (yyin = met_fopen(header_filename, "r")) == NULL )  {
+if ( (yyin = met_fopen(header_filename, "r")) == nullptr )  {
 
    cerr << "\n\n  unable to open input file \"" << header_filename << "\"\n\n";
 
@@ -385,8 +385,6 @@ if ( debug )  {
 }
 
 exit ( 1 );
-
-return;
 
 }
 

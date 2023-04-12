@@ -112,7 +112,7 @@ const char * get_short_name(const char * path)
 
 {
 
-const char * short_name = (const char *) NULL;
+const char * short_name = (const char *) nullptr;
 
 if ( path ) {
    int j;
@@ -138,7 +138,7 @@ return ( short_name );
 void append_char(char *str, const char c)
 
 {
-   char *ptr = (char *) NULL;
+   char *ptr = (char *) nullptr;
 
    //
    // If the specified characater does not already exist at the
@@ -164,7 +164,7 @@ void append_char(char *str, const char c)
 void strip_char(char *str, const char c)
 
 {
-   char *ptr = (char *) NULL;
+   char *ptr = (char *) nullptr;
 
    //
    // If the specified character exists at the end of the string,
@@ -187,8 +187,8 @@ int num_tokens(const char *test_str, const char *separator)
 
 {
    int n = 0;
-   char *temp_str = (char *) NULL;
-   char *c = (char *) NULL;
+   char *temp_str = (char *) nullptr;
+   char *c = (char *) nullptr;
    const char *method_name = "num_tokens() -> ";
 
    //
@@ -221,12 +221,12 @@ int num_tokens(const char *test_str, const char *separator)
          // Parse remaining tokens
          //
          //
-         while((c = strtok(0, separator)) != NULL) n++;
+         while((c = strtok(0, separator)) != nullptr) n++;
       }
 
    }
 
-   if(temp_str) { delete [] temp_str; temp_str = (char *) NULL; }
+   if(temp_str) { delete [] temp_str; temp_str = (char *) nullptr; }
 
    return(n);
 }
@@ -300,15 +300,15 @@ int regex_apply(const char* pat, int num_mat, const char* str, char** &mat)
             m_strncpy(mat[i], str_dat.substr(pmatch[i].rm_so, mat_len).data(),
                       mat_len, method_name, "mat[i]");
          }
-         mat[num_act] = NULL;
+         mat[num_act] = nullptr;
 
       }
    } else {
-      mat = NULL;
+      mat = nullptr;
    }
 
    regfree(re);
-   if( re ) { delete re; re = NULL; }
+   if( re ) { delete re; re = nullptr; }
    return num_act;
 }
 
@@ -317,9 +317,9 @@ int regex_apply(const char* pat, int num_mat, const char* str, char** &mat)
 void regex_clean(char** &mat)
 {
    if( !mat ) return;
-   for(int i=0; mat[i] != NULL; i++) delete [] mat[i];
+   for(int i=0; mat[i] != nullptr; i++) delete [] mat[i];
    delete [] mat;
-   mat = NULL;
+   mat = nullptr;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -383,9 +383,9 @@ ConcatString str_trim(const ConcatString str){
 
 int parse_thresh_index(const char *col_name) {
    int i = 0;
-   const char *ptr = (const char *) NULL;
+   const char *ptr = (const char *) nullptr;
 
-   if((ptr = strrchr(col_name, '_')) != NULL) i = atoi(++ptr);
+   if((ptr = strrchr(col_name, '_')) != nullptr) i = atoi(++ptr);
    else {
       mlog << Error << "\nparse_thresh_index() -> "
            << "unexpected column name specified: \""
