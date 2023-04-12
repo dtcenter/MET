@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -20,6 +20,7 @@ using namespace std;
 #include <string.h>
 #include <cstdio>
 #include <cmath>
+#include <vector>
 
 #include "contable.h"
 
@@ -255,15 +256,13 @@ out << prefix << "\n";
 int n, m, k;
 int w, h;
 int r_table, c_table;
-int * col_width = (int *) 0;
-char * table = (char *) 0;
 const int hpad = 2;
 const int vpad = 1;
 const char v_sep      = '|';
 const char h_sep      = '-';
 const char corner_sep = '+';
 
-col_width = new int[Ncols];
+std::vector<int> col_width(Ncols);
 
 for (c=0; c<Ncols; ++c)  {
 
@@ -297,18 +296,7 @@ for (c=0; c<Ncols; ++c)  w += col_width[c];
 
 h = (2*vpad + 2)*Nrows + 1;
 
-table = new char [w*h];
-
-if ( !table )  {
-
-   mlog << Error << "\nContingencyTable::dump() -> "
-        << "memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
-
-memset(table, ' ', w*h);
+std::vector<char> table(w*h, ' ');
 
    //
    //  top, bottom
@@ -452,10 +440,6 @@ for (r_table=0; r_table<h; ++r_table)  {
    //
 
 out.flush();
-
-if ( table )  { delete [] table;  table = (char *) 0; }
-
-if ( col_width )  { delete [] col_width;  col_width = (int *) 0; }
 
 return;
 
@@ -1665,8 +1649,6 @@ mlog << Error << "\nTTContingencyTable::set_size(int) -> "
 
 exit ( 1 );
 
-return;
-
 }
 
 
@@ -1681,8 +1663,6 @@ mlog << Error << "\nTTContingencyTable::set_size(int, int) -> "
      << "2 x 2 tables cannot be resized!\n\n";
 
 exit ( 1 );
-
-return;
 
 }
 

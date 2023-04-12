@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -310,7 +310,7 @@ void get_atcf_files(const StringArray& source,
     for(int i = 0; i < source.n(); i++) {
         cur_source.clear();
         cur_source.add(source[i]);
-        cur_files = get_filenames(cur_source, NULL, atcf_suffix);
+        cur_files = get_filenames(cur_source, nullptr, atcf_suffix);
 
         for(int j = 0; j < cur_files.n(); j++) {
             files.add(cur_files[j]);

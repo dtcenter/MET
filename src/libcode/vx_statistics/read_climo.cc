@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -299,6 +299,26 @@ DataPlaneArray climo_time_interp(const DataPlaneArray &dpa, int day_ts,
       }
       // For exactly 2 fields, do a simple time interpolation.
       else if(it->second.n() == 2) {
+
+         // If the valid time falls outside the climo times, shift them.
+         if(vld_ut < min(dpa[it->second[0]].valid(), dpa[it->second[1]].valid()) ||
+            vld_ut > max(dpa[it->second[0]].valid(), dpa[it->second[1]].valid())) {
+
+            unixtime ut1 = dpa[it->second[0]].valid();
+            unixtime ut2 = dpa[it->second[1]].valid();
+
+            int shift_sec = day_of_year_diff(min(ut1, ut2), vld_ut) * sec_per_day;
+
+            mlog << Debug(3)
+                 << "Shifting climatology times " << shift_sec / sec_per_day
+                 << " day(s) from " << unix_to_yyyymmdd_hhmmss(ut1)
+                 << " to " << unix_to_yyyymmdd_hhmmss(ut1 + shift_sec)
+                 << " and " << unix_to_yyyymmdd_hhmmss(ut2)
+                 << " to " << unix_to_yyyymmdd_hhmmss(ut2 + shift_sec) << ".\n";
+            dpa[it->second[0]].set_valid(ut1 + shift_sec);
+            dpa[it->second[1]].set_valid(ut2 + shift_sec);
+         }
+
          mlog << Debug(3)
               << "Interpolating climatology fields at "
               << unix_to_yyyymmdd_hhmmss(dpa[it->second[0]].valid())

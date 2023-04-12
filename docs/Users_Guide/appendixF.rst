@@ -9,6 +9,8 @@ Introduction
 
 MET includes the ability to embed Python to a limited degree. Users may use Python scripts and whatever associated Python packages they wish in order to prepare 2D gridded data fields, point observations, and matched pairs as input to the MET tools. We fully expect that this degree of embedding will increase in the future. In addition, plans are in place to extend Python with MET in upcoming releases, allowing users to invoke MET tools directly from their Python script. While MET version 8.0 was built on Python 2.x, MET versions 9.0 and beyond are built on Python 3.6+.
 
+.. _compiling_python_support:
+
 Compiling Python Support
 ========================
 
@@ -260,7 +262,7 @@ The ASCII2NC tool supports the "-format python" option. With this option, point 
                 "MET_BASE/python/read_ascii_point.py sample_ascii_obs.txt" \
                 sample_ascii_obs_python.nc
 
-The Point2Grid, Plot-Point-Obs, Ensemble-Stat, and Point-Stat tools also process point observations. They support POython embedding of point observations directly on the command line by replacing the input MET NetCDF point observation file name with the Python command to be run. The Python command must begin with the prefix 'PYTHON_NUMPY=' and be followed by the path to the User's Python script and any arguments. The full command should be enclosed in single quotes to prevent embedded whitespace from causing parsing errors. An example of this is shown below:
+The Point2Grid, Plot-Point-Obs, Ensemble-Stat, and Point-Stat tools also process point observations. They support Python embedding of point observations directly on the command line by replacing the input MET NetCDF point observation file name with the Python command to be run. The Python command must begin with the prefix 'PYTHON_NUMPY=' and be followed by the path to the User's Python script and any arguments. The full command should be enclosed in single quotes to prevent embedded whitespace from causing parsing errors. An example of this is shown below:
 
 .. code-block:: none
 

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -73,7 +73,7 @@ int met_main(int argc, char *argv[]) {
    pb_file << argv[1];
 
    // Build the temporary block file name
-   blk_file = make_temp_file_name("/tmp/tmp_pbtime_blk", NULL);
+   blk_file = make_temp_file_name("/tmp/tmp_pbtime_blk", nullptr);
 
    // Block the PrepBufr file and open it for reading.
    pblock(pb_file.c_str(), blk_file.c_str(), block);

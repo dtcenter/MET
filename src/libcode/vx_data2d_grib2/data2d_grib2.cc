@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -77,8 +77,6 @@ MetGrib2DataFile & MetGrib2DataFile::operator=(const MetGrib2DataFile &) {
    mlog << Error << "\nMetGrib2DataFile::operator=(const MetGrib2DataFile &) -> "
         << "should never be called!\n\n";
    exit(1);
-
-   return(*this);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -104,7 +102,7 @@ void MetGrib2DataFile::close() {
 
 bool MetGrib2DataFile::open(const char * _filename) {
    Filename = _filename;
-   if( NULL == (FileGrib2 = met_fopen(Filename.c_str(), "r")) ){
+   if( nullptr == (FileGrib2 = met_fopen(Filename.c_str(), "r")) ){
       mlog << Error << "\nMetGrib2DataFile::open() -> "
            << "unable to open input GRIB2 file " << _filename << "\n\n";
       exit(1);
@@ -1172,6 +1170,11 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld) {
       data.r_km         = r_km;
       data.nx           = gfld->igdtmpl[7];
       data.ny           = gfld->igdtmpl[8];
+      data.eccentricity = 0.;
+      data.false_east = 0.;
+      data.false_north = 0.;
+      data.scale_factor = 1.0;
+      data.dy_km = data.d_km;
 
       //  check for dx != dy
       if( !is_eq((double)gfld->igdtmpl[14] / 1000000.0,

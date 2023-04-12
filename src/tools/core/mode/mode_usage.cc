@@ -51,8 +51,6 @@ multivar_usage();
 
 exit ( 1 );
 
-return;
-
 }
 
 

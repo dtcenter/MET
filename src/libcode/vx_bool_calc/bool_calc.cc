@@ -222,7 +222,6 @@ for (j=0; j<((int) P.size()); ++j)  {
               << "bad token in program ... \n\n";
          tok.dump(cerr, 1);
          exit ( 1 );
-         break;
 
    }   //  switch
 

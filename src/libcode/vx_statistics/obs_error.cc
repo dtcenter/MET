@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -756,7 +756,7 @@ DataPlane add_obs_error_inc(const gsl_rng *r, FieldType t,
          // Current observation value
          obs_v = obs_dp.get(x, y);
 
-         // For a NULL pointer, do a table lookup
+         // For a nullptr pointer, do a table lookup
          e = (in_e ? in_e :
               obs_error_table.lookup(var_name, obtype, obs_v));
 
@@ -836,7 +836,7 @@ DataPlane add_obs_error_bc(const gsl_rng *r, FieldType t,
    for(x=0; x<out_dp.nx(); x++) {
       for(y=0; y<out_dp.ny(); y++) {
 
-         // For a NULL pointer, do a table lookup
+         // For a nullptr pointer, do a table lookup
          e = (in_e ? in_e :
               obs_error_table.lookup(var_name, obtype,
                                      obs_dp.get(x,y)));

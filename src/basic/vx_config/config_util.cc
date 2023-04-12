@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -1299,14 +1299,18 @@ RegridInfo parse_conf_regrid(Dictionary *dict, bool error_out) {
    info.gaussian.trunc_factor = (is_bad_data(conf_value) ? default_trunc_factor : conf_value);
    if (info.method == InterpMthd_Gaussian || info.method == InterpMthd_MaxGauss) info.gaussian.compute();
 
+   // MET#2437 Do not search the higher levels of config file context for convert,
+   //          censor_thresh, and censor_val. They must be specified within the
+   //          regrid dictionary itself.
+
    // Conf: convert
-   info.convert_fx.set(regrid_dict->lookup(conf_key_convert));
+   info.convert_fx.set(regrid_dict->lookup(conf_key_convert, false));
 
    // Conf: censor_thresh
-   info.censor_thresh = regrid_dict->lookup_thresh_array(conf_key_censor_thresh, false);
+   info.censor_thresh = regrid_dict->lookup_thresh_array(conf_key_censor_thresh, false, true, false);
 
    // Conf: censor_val
-   info.censor_val = regrid_dict->lookup_num_array(conf_key_censor_val, false);
+   info.censor_val = regrid_dict->lookup_num_array(conf_key_censor_val, false, true, false);
 
    // Validate the settings
    info.validate();
@@ -2027,7 +2031,7 @@ int parse_conf_percentile(Dictionary *dict) {
 ///////////////////////////////////////////////////////////////////////////////
 
 ConcatString parse_conf_tmp_dir(Dictionary *dict) {
-   DIR* odir = NULL;
+   DIR* odir = nullptr;
    ConcatString tmp_dir_path;
 
    if(!get_env("MET_TMP_DIR", tmp_dir_path)) {
@@ -2041,7 +2045,7 @@ ConcatString parse_conf_tmp_dir(Dictionary *dict) {
    }
 
    // Make sure that it exists
-   if((odir = met_opendir(tmp_dir_path.c_str())) == NULL) {
+   if((odir = met_opendir(tmp_dir_path.c_str())) == nullptr) {
       mlog << Error << "\nparse_conf_tmp_dir() -> "
            << "Cannot access the \"" << conf_key_tmp_dir << "\" directory: "
            << tmp_dir_path << "\n\n";

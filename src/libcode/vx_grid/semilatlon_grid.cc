@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -173,7 +173,7 @@ IsLatLon = false;
 Nx = 0;
 Ny = 0;
 
-memset(&Data, 0, sizeof(Data));
+Data.clear();
 
 return;
 
@@ -444,8 +444,6 @@ mlog << Error << "\nSemiLatLonGrid::shift_right(int) -> "
      << "shifting is not allowed for non-global grids\n\n";
 
 exit ( 1 );
-
-return;
 
 }
 

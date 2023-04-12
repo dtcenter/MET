@@ -272,9 +272,10 @@ The default table can be found in the installed
 XML content for all stations that allows lookups of latitude, longitude,
 and, in some cases, elevation for all stations based on stationId.
 
-This set of stations comes from 2 online sources
-`The active stations website <https://www.ndbc.noaa.gov/activestations.xml>`_
-and `The complete stations website <https://www.airnow.gov>`_.
+This set of stations comes from 2 online sources: the
+`active stations website <https://www.ndbc.noaa.gov/activestations.xml>`_
+and the `complete stations website <https://www.airnow.gov>`_.
+
 As these lists can change as a function of time, a script can be run to pull
 down the contents of both websites and merge any changes with the existing stations
 file content, creating an updated stations file locally.
@@ -284,25 +285,23 @@ run this script and update *share/met/table_files/ndbc_stations.xml*.
 
 To run this utility:
 
-build_ndbc_stations_from_web.py <-d> <-p> <-o OUTPUT_FILE>
-Usage: build_ndbc_stations_from_web.py [options]
-Options:
-  -h, --help            show this help message and exit
-  -d, --diagnostic      Rerun using downlaoded files, skipping download step
-                        (optional, default: False)
-  -p, --prune           Prune files that are no longer online (optional,
-                        default:False)
-  -o OUT_FILE, --out=OUT_FILE
-                         Save the text into the named file (default:
-                        merged.txt )
+.. code-block:: none
+
+  build_ndbc_stations_from_web.py <-d> <-p> <-o OUTPUT_FILE>
+
+  Usage: build_ndbc_stations_from_web.py [options]
+  Options:
+    -h, --help            show this help message and exit
+    -d, --diagnostic      Rerun using downlaoded files, skipping download step (optional, default: False)
+    -p, --prune           Prune files that are no longer online (optional, default: False)
+    -o OUT_FILE, --out=OUT_FILE
+                          Save the text into the named file (optional, default: merged.txt)
 
 NOTE: The downloaded files are written to a subdirectory ndbc_temp_data which
 can be deleted once the final output file is created.
 
-
 MET_BASE
 ^^^^^^^^
-
 The MET_BASE variable is defined in the code at compilation time as the path
 to the MET shared data. These are things like the default configuration files,
 common polygons and color scales. MET_BASE may be used in the MET configuration
@@ -721,14 +720,16 @@ using the following entries:
   smoothing. The default is 120. Ignored if not Gaussian method.
 
 * The "gaussian_dx" and "gaussian_radius" settings must be in the same
-  units, such as kilometers or degress.  Their ratio
+  units, such as kilometers or degress. Their ratio
   (sigma = gaussian_radius / gaussian_dx) determines the Guassian weighting
   function.
 
 * The "convert", "censor_thresh", and "censor_val" entries are described
-  below.  When specified, these operations are applied to the output of the
-  regridding step.  The conversion operation is applied first, followed by
-  the censoring operation.
+  below. When specified, these operations are applied to the output of the
+  regridding step. The conversion operation is applied first, followed by
+  the censoring operation. Note that these operations are limited in scope.
+  They are only applied if defined within the regrid dictionary itself.
+  Settings defined at higher levels of config file context are not applied. 
 
 .. code-block:: none
 		
@@ -1346,9 +1347,8 @@ of several entires defining the climatology file names and fields to be used.
 
 * The "hour_interval" entry is an integer specifying the spacing in hours of
   the climatology data for each day. This should be set between 0 and 24,
-  with 6 and 12 being common choices. For example, use 6 for climatology data
-  with 4 times per day, such as 00Z, 06Z, 12Z, and 18Z. Use "NA" if the timing
-  of the climatology data should not be checked.
+  with 6 and 12 being common choices. Use "NA" if the timing of the
+  climatology data should not be checked.
 
 * The "day_interval" and "hour_interval" entries replace the deprecated
   entries "match_month", "match_day", and "time_step".
@@ -1757,12 +1757,12 @@ This dictionary may include the following entries:
 * The "shape" entry may be set to SQUARE or CIRCLE to specify the shape
   of the smoothing area.
 
-* The "type" entry is an array of dictionaries, each specifying an
-  interpolation method. Interpolation is performed over a N by N box
-  centered on each point, where N is the width specified. Each of these
+* The "type" entry is an array of dictionaries, each specifying one or more
+  interpolation methods and widths. Interpolation is performed over an N by N
+  box centered on each point, where N is the width specified. Each of these
   dictionaries must include:
 
-  * The "width" entry is an integer which specifies the size of the
+  * The "width" entry is an array of integers to specify the size of the
     interpolation area. The area is either a square or circle containing
     the observation point. The width value specifies the width of the
     square or diameter of the circle. A width value of 1 is interpreted
@@ -1775,7 +1775,7 @@ This dictionary may include the following entries:
     grid point closest to the observation point. For grid-to-grid
     comparisons (i.e. Grid-Stat), the width must be odd.
 
-  * The "method" entry specifies the interpolation procedure to be
+  * The "method" entry is an array of interpolation procedures to be
     applied to the points in the box:
     
     * MIN         for the minimum value
@@ -1820,6 +1820,9 @@ This dictionary may include the following entries:
     only valid smoothing methods are MIN, MAX, MEDIAN, UW_MEAN, and
     GAUSSIAN, and MAXGAUSS.
 
+  * If multiple "method" and "width" options are specified, all possible
+    permutations of their values are applied.
+
 .. code-block:: none
 		
   interp = {
@@ -1829,8 +1832,8 @@ This dictionary may include the following entries:
   
      type = [
         {
-           method = UW_MEAN;
-           width  = 1;
+           method = [ NEAREST ];
+           width  = [ 1 ];
         }
      ];
   }

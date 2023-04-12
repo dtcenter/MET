@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -46,7 +46,7 @@ class GridTemplate {
       // Methods for iterating through the template within the grid centered
       // on the given point.  To use these methods, first call getFirstInGrid()
       // to get the first point.  Then call getNextInGrid() to get all remaining
-      // points until a (GridPoint *)NULL is returned.  Any time getFirstInGrid()
+      // points until a (GridPoint *) nullptr is returned.  Any time getFirstInGrid()
       // is called, the iteration will be cleared and will start over again.
       //
       // base_x and base_y give the coordinates of the point around which the

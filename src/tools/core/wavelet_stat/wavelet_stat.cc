@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -1521,19 +1521,19 @@ void write_nc_raw(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
    // Store the forecast, observation, and difference fields
    for(i=0; i<n; i++) {
 
-      if ( nc_info.do_raw && fcst_data != NULL && obs_data != NULL)  {
+      if ( nc_info.do_raw && fcst_data != nullptr && obs_data != nullptr)  {
 
          // Set the forecast data
-         if(fdata == NULL || is_bad_data(fdata[i])) fcst_data[i] = bad_data_float;
+         if(fdata == nullptr || is_bad_data(fdata[i])) fcst_data[i] = bad_data_float;
          else                      fcst_data[i] = (float) fdata[i];
 
          // Set the observation data
-         if(odata == NULL || is_bad_data(odata[i])) obs_data[i]  = bad_data_float;
+         if(odata == nullptr || is_bad_data(odata[i])) obs_data[i]  = bad_data_float;
          else                      obs_data[i]  = (float) odata[i];
 
       }
 
-      if ( nc_info.do_diff && fdata != NULL && odata != NULL && diff_data != NULL)  {
+      if ( nc_info.do_diff && fdata != nullptr && odata != nullptr && diff_data != nullptr)  {
          // Set the difference data
          if(is_bad_data(fdata[i]) ||
             is_bad_data(odata[i]))
@@ -1767,19 +1767,19 @@ void write_nc_wav(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
    // Store the forecast, observation, and difference fields
    for(i=0; i<n; i++) {
 
-      if ( nc_info.do_raw && fcst_data != NULL && obs_data != NULL)  {
+      if ( nc_info.do_raw && fcst_data != nullptr && obs_data != nullptr)  {
 
          // Set the forecast data
-         if(fdata == NULL || is_bad_data(fdata[i])) fcst_data[i] = bad_data_float;
+         if(fdata == nullptr || is_bad_data(fdata[i])) fcst_data[i] = bad_data_float;
          else                      fcst_data[i] = (float) fdata[i];
 
          // Set the observation data
-         if(odata == NULL || is_bad_data(odata[i])) obs_data[i]  = bad_data_float;
+         if(odata == nullptr || is_bad_data(odata[i])) obs_data[i]  = bad_data_float;
          else                      obs_data[i]  = (float) odata[i];
 
       }
 
-      if ( nc_info.do_diff && fdata != NULL && odata != NULL && diff_data != NULL)  {
+      if ( nc_info.do_diff && fdata != nullptr && odata != nullptr && diff_data != nullptr)  {
 
          // Set the difference data
          if(is_bad_data(fdata[i]) ||

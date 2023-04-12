@@ -221,7 +221,7 @@ seeps_p1_thresh = NA;
 rank_corr_flag = FALSE;
 tmp_dir        = "/tmp";
 output_prefix  = "";
-version        = "V11.0.0";
+version        = "V11.1.0";
 
 ////////////////////////////////////////////////////////////////////////////////
 

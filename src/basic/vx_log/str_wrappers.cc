@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -66,7 +66,7 @@ char *m_strcpy2(const char *from_str, const char *method_name, const char *extra
    }
    else {
       mlog << Error << "\n" << method_name 
-           << " Do not copy the string because a from_string is NULL. " 
+           << " Do not copy the string because a from_string is nullptr. " 
            << (extra_msg == 0 ? "" : extra_msg) << "\n\n";
    }
 
@@ -79,12 +79,12 @@ void m_strncpy(char *to_str, const char *from_str, const int buf_len,
                const char *method_name, const char *extra_msg, bool truncate) {
    if (!from_str){
       mlog << Warning << "\n" << method_name 
-           << " Do not copy the string because a from_string is NULL. " 
+           << " Do not copy the string because a from_string is nullptr. " 
            << (extra_msg == 0 ? "" : extra_msg) << "\n\n";
    }
    else if (!to_str){
       mlog << Warning << "\n" << method_name 
-           << " Do not copy the string because a to_string is NULL. " 
+           << " Do not copy the string because a to_string is nullptr. " 
            << (extra_msg == 0 ? "" : extra_msg) << "\n\n";
    }
    else {   // (from_str && to_str)
@@ -131,7 +131,7 @@ bool m_replace_char(char *str_buf, char from_ch, char to_ch, bool all_instances)
 ////////////////////////////////////////////////////////////////////////
 
 void m_rstrip(char *str_buf, int buf_len, bool find_white_ch) {
-   // Make sure it's NULL terminated
+   // Make sure it's nullptr terminated
    if (buf_len >= 0) str_buf[buf_len] = '\0';
    // Change the trailing blank space to a null
    int str_len = m_strlen(str_buf);

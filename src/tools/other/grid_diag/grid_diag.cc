@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -505,7 +505,7 @@ void setup_nc_file(void) {
 
    // Add global attributes
    write_netcdf_global(nc_out, out_file.c_str(), program_name,
-                       NULL, NULL, conf_info.desc.c_str());
+                       nullptr, nullptr, conf_info.desc.c_str());
    add_att(nc_out, "mask_grid", (conf_info.mask_grid_name.nonempty() ?
                                  (string)conf_info.mask_grid_name :
                                  na_str));

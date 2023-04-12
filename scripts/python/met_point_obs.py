@@ -1,21 +1,25 @@
-
+#!/usr/bin/env python3
 '''
 Created on Nov 10, 2021
 
 @author: hsoh
 
 - This is the base class and the customized script should extend the met_point_obs.
-- The customized script (for example "custom_reader") must implement "def read_data(self, args)"
-  which fills the array (python list or numpy array) variables at __init__().
-- The args can be 1) single string argument, 2) the list of arguments, and 3) the dictionary of arguments.
-- The variable "met_point_data" must be set for MET tools
+- The customized script (for example "custom_reader") must implement
+  "def read_data(self, args)" which fills the array variables at __init__().
+- The args can be 1) single string argument, 2) the list of arguments,
+  or 3) the dictionary of arguments.
+- A python objects, met_point_data, must set:
+  + "point_obs_data" is an optional to use custom python EXE.
+     It's a python instance which processes the point observation data
 - The customized script is expected to include following codes:
 
     # prepare arguments for the customized script
     args = {'input', sys.argv[1]}   # or args = []
     point_obs_data = custom_reader()
-    point_obs_data.read_data()
+    point_obs_data.read_data(args)
     met_point_data = point_obs_data.get_point_data()
+
 '''
 
 import os
@@ -24,22 +28,29 @@ import numpy as np
 
 COUNT_SHOW = 30
 
-MET_PYTHON_OBS_ARGS = "MET_POINT_PYTHON_ARGS"
+def get_prompt():
+    return "  python:"
+
+def met_is_python_prefix(user_cmd):
+    return user_cmd.startswith(base_met_point_obs.python_prefix)
 
 
 class base_met_point_obs(object):
     '''
     classdocs
     '''
-    ERROR_P = " ==ERROR_PYTHON=="
-    INFO_P  = " ==INFO_PYTHON=="
+    ERROR_P = " ==PYTHON_ERROR=="
+    INFO_P  = " ==PYTHON_INFO=="
 
-    python_prefix = 'PYTHON_POINT_RAW'
+    python_prefix = 'PYTHON_POINT_USER'
+
+    FILL_VALUE = -9999.
 
     def __init__(self, use_var_id=True):
         '''
         Constructor
         '''
+        self.count_info = ""
         self.input_name = None
         self.ignore_input_file = False
         self.use_var_id = use_var_id    # True if variable index, False if GRIB code
@@ -74,6 +85,8 @@ class base_met_point_obs(object):
         self.obs_val = []  # (nobs) float
         self.obs_qty_table = []  # (nobs_qty, mxstr) string
         self.obs_var_table = []  # (nobs_var, mxstr2) string, required if self.use_var_id is True
+        self.obs_var_unit  = []  # (nobs_var, mxstr2) string, optional if self.use_var_id is True
+        self.obs_var_desc  = []  # (nobs_var, mxstr3) string, optional if self.use_var_id is True
 
         # Optional variables for PREPBUFR, not supported yet
         self.hdr_prpt_typ  = [] # optional
@@ -98,17 +111,12 @@ class base_met_point_obs(object):
             self.add_error_msg("{v} is empty (float)".format(v=var_name))
         elif isinstance(local_var, list):
             if isinstance(local_var[0], str) and not self.is_number(local_var[0]):
-                self.add_error_msg("Not supported data type ({v} string) for {n}[0] (int or float only)".format(
+                self.add_error_msg("Not supported data type: {n}[0]={v}, string type, not a number (int or float only)".format(
                         n=var_name, v=local_var[0]))
-            elif 0 <= str(type(local_var[0])).find('numpy'):
-                self.log_info("Recommend using numpy instead of python list for {v} ({t}) to avoid side effect".format(
-                        v=var_name, t=type(local_var[0])))
-            elif not isinstance(local_var[0], (int, float)):
-                # self.add_error_msg("Not supported data type ({t}) for {v}[0] (int or float only)".format(
-                #         v=var_name, t=local_var[0].type))
+            elif 0 > str(type(local_var[0])).find('numpy') and not isinstance(local_var[0], (int, float)):
                 self.add_error_msg("Not supported data type ({t}) for {v}[0] (int or float only)".format(
                         v=var_name, t=type(local_var[0])))
-        elif not isinstance(local_var, np.ndarray):
+        elif not self.is_numpy_array(local_var):
             self.add_error_msg("Not supported data type ({t}) for {v} (list and numpy.ndarray)".format(
                     v=var_name, t=type(local_var)))
 
@@ -117,15 +125,12 @@ class base_met_point_obs(object):
             self.add_error_msg("{v} is empty (int)".format(v=var_name))
         elif isinstance(local_var, list):
             if isinstance(local_var[0], str) and not self.is_number(local_var[0]):
-                self.add_error_msg("Not supported data type ({v} string) for {n}[0] (int or float only)".format(
+                self.add_error_msg("Not supported data type: {n}[0]={v}, string type, not a number (int only)".format(
                         n=var_name, v=local_var[0]))
-            elif 0 <= str(type(local_var[0])).find('numpy'):
-                self.log_info("Recommend using numpy instead of python list for {v} ({t}) to avoid side effect".format(
-                        v=var_name, t=type(local_var[0])))
-            elif not isinstance(local_var[0], int):
+            elif 0 > str(type(local_var[0])).find('numpy') and not isinstance(local_var[0], int):
                 self.add_error_msg("Not supported data type ({t}) for {v}[0] (int only)".format(
                         v=var_name, t=type(local_var[0])))
-        elif not isinstance(local_var, np.ndarray):
+        elif not self.is_numpy_array(local_var):
             self.add_error_msg("Not supported data type ({t}) for {v} (list and numpy.ndarray)".format(
                     v=var_name, t=type(local_var)))
 
@@ -160,6 +165,15 @@ class base_met_point_obs(object):
             if self.use_var_id:
                 self.check_data_member_string(self.obs_var_table,'obs_var_table')
 
+    def convert_to_numpy(self, value_list):
+        return np.array(value_list)
+
+    def dump(self):
+        base_met_point_obs.print_point_data(self.get_point_data())
+
+    def get_count_string(self):
+        return f' nobs={self.nobs} nhdr={self.nhdr} ntyp={self.nhdr_typ} nsid={self.nhdr_sid} nvld={self.nhdr_vld} nqty={self.nobs_qty} nvar={self.nobs_var}'
+
     def get_point_data(self):
         if self.nhdr <= 0:
             self.nhdr = len(self.hdr_lat)
@@ -178,33 +192,108 @@ class base_met_point_obs(object):
         if self.nobs_var <= 0:
             self.nobs_var = len(self.obs_var_table)
         self.check_point_data()
-        return self.__dict__
 
-    def get_type(self, value):
-        return 'string' if isinstance('str') else type(value)
+        if not self.is_numpy_array(self.hdr_typ):
+            self.hdr_typ = self.convert_to_numpy(self.hdr_typ)
+        if not self.is_numpy_array(self.hdr_sid):
+            self.hdr_sid = self.convert_to_numpy(self.hdr_sid)
+        if not self.is_numpy_array(self.hdr_vld):
+            self.hdr_vld = self.convert_to_numpy(self.hdr_vld)
+        if not self.is_numpy_array(self.hdr_lat):
+            self.hdr_lat = self.convert_to_numpy(self.hdr_lat)
+        if not self.is_numpy_array(self.hdr_lon):
+            self.hdr_lon = self.convert_to_numpy(self.hdr_lon)
+        if not self.is_numpy_array(self.hdr_elv):
+            self.hdr_elv = self.convert_to_numpy(self.hdr_elv)
+
+        if not self.is_numpy_array(self.obs_qty):
+            self.obs_qty = self.convert_to_numpy(self.obs_qty)
+        if not self.is_numpy_array(self.obs_hid):
+            self.obs_hid = self.convert_to_numpy(self.obs_hid)
+        if not self.is_numpy_array(self.obs_vid):
+            self.obs_vid = self.convert_to_numpy(self.obs_vid)
+        if not self.is_numpy_array(self.obs_lvl):
+            self.obs_lvl = self.convert_to_numpy(self.obs_lvl)
+        if not self.is_numpy_array(self.obs_hgt):
+            self.obs_hgt = self.convert_to_numpy(self.obs_hgt)
+        if not self.is_numpy_array(self.obs_val):
+            self.obs_val = self.convert_to_numpy(self.obs_val)
+
+        self.count_info = self.get_count_string()
+        self.met_point_data = self
+        return self.__dict__
 
     def is_number(self, num_str):
         return num_str.replace('-','1').replace('+','2').replace('.','3').isdigit()
 
+    def is_numpy_array(self, var):
+        return isinstance(var, np.ndarray)
+
     def log_error_msg(self, err_msg):
-        print('{p} {m}'.format(p=self.ERROR_P, m=err_msg))
+        base_met_point_obs.error_msg(err_msg)
 
     def log_error(self, err_msgs):
         print(self.ERROR_P)
         for err_line in err_msgs.split('\n'):
-            print('{p} {m}'.format(p=self.ERROR_P, m=err_line))
+            self.log_error_msg(err_line)
         print(self.ERROR_P)
 
     def log_info(self, info_msg):
-        print('{p} {m}'.format(p=self.INFO_P, m=info_msg))
+        base_met_point_obs.info_msg(info_msg)
+
+    def put_data(self, point_obs_dict):
+        self.use_var_id = point_obs_dict['use_var_id']
+        self.hdr_typ = point_obs_dict['hdr_typ']
+        self.hdr_sid = point_obs_dict['hdr_sid']
+        self.hdr_vld = point_obs_dict['hdr_vld']
+        self.hdr_lat = point_obs_dict['hdr_lat']
+        self.hdr_lon = point_obs_dict['hdr_lon']
+        self.hdr_elv = point_obs_dict['hdr_elv']
+        self.hdr_typ_table = point_obs_dict['hdr_typ_table']
+        self.hdr_sid_table = point_obs_dict['hdr_sid_table']
+        self.hdr_vld_table = point_obs_dict['hdr_vld_table']
+
+        #Observation data
+        self.obs_qty = point_obs_dict['obs_qty']
+        self.obs_hid = point_obs_dict['obs_hid']
+        self.obs_lvl = point_obs_dict['obs_lvl']
+        self.obs_hgt = point_obs_dict['obs_hgt']
+        self.obs_val = point_obs_dict['obs_val']
+        self.obs_vid = point_obs_dict['obs_vid']
+        self.obs_var_table = point_obs_dict['obs_var_table']
+        self.obs_qty_table = point_obs_dict['obs_qty_table']
+        po_array = point_obs_dict.get('obs_unit', None)
+        if po_array is not None:
+            self.obs_var_unit = po_array
+        po_array = point_obs_dict.get('obs_desc', None)
+        if po_array is not None:
+            self.obs_var_desc = po_array
+
+        po_array = point_obs_dict.get('hdr_prpt_typ', None)
+        if po_array is not None:
+            self.hdr_prpt_typ = po_array
+        po_array = point_obs_dict.get('hdr_irpt_typ', None)
+        if po_array is not None:
+            self.hdr_irpt_typ = po_array
+        po_array = point_obs_dict.get('hdr_inst_typ', None)
+        if po_array is not None:
+            self.hdr_inst_typ = po_array
 
     @staticmethod
-    def is_python_script(arg_value):
-        return arg_value.startswith(met_point_obs.python_prefix)
+    def error_msg(msg):
+        print(f'{get_prompt()} {base_met_point_obs.ERROR_P} {msg}')
+
+    @staticmethod
+    def info_msg(msg):
+        print(f'{get_prompt()} {base_met_point_obs.INFO_P} {msg}')
 
     @staticmethod
     def get_python_script(arg_value):
         return arg_value[len(met_point_obs.python_prefix)+1:]
+
+    @staticmethod
+    def is_python_script(arg_value):
+        return arg_value.startswith(met_point_obs.python_prefix)
 
     @staticmethod
     def print_data(key, data_array, show_count=COUNT_SHOW):
@@ -274,22 +363,18 @@ class base_met_point_obs(object):
 class csv_point_obs(ABC, base_met_point_obs):
 
     def __init__(self, point_data):
+        self.point_data = point_data
         super(csv_point_obs, self).__init__()
 
-        hdr_cnt = obs_cnt = len(point_data)
-        self.point_data = point_data
-        self.nhdr = self.nobs = obs_cnt
-        self.nhdr_typ = self.nhdr_sid = self.nhdr_vld = hdr_cnt
-        self.nobs_qty = self.nobs_var = obs_cnt
-        self.input_file = None
-        self.ignore_input_file = True
-
+        self.obs_cnt = obs_cnt = len(point_data)
         self.obs_qty = [ 0 for _ in range(0, obs_cnt) ]  # (nobs_qty) integer, index of self.obs_qty_table
         self.obs_hid = [ 0 for _ in range(0, obs_cnt) ]  # (nobs) integer
         self.obs_vid = [ 0 for _ in range(0, obs_cnt) ]  # (nobs) integer, veriable index from self.obs_var_table or GRIB code
-        self.obs_lvl = [ nc_tools.FILL_VALUE for _ in range(0, obs_cnt) ]  # (nobs) float
-        self.obs_hgt = [ nc_tools.FILL_VALUE for _ in range(0, obs_cnt) ]  # (nobs) float
-        self.obs_val = [ nc_tools.FILL_VALUE for _ in range(0, obs_cnt) ]  # (nobs) float
+        self.obs_lvl = [ self.FILL_VALUE for _ in range(0, obs_cnt) ]  # (nobs) float
+        self.obs_hgt = [ self.FILL_VALUE for _ in range(0, obs_cnt) ]  # (nobs) float
+        self.obs_val = [ self.FILL_VALUE for _ in range(0, obs_cnt) ]  # (nobs) float
+
+        self.convert_point_data()
 
     def check_csv_record(self, csv_point_data, index):
         error_msgs = []
@@ -362,35 +447,36 @@ class csv_point_obs(ABC, base_met_point_obs):
         hdr_vld_map = {}
         obs_var_map = {}
         obs_qty_map = {}
+        self.use_var_id = not self.is_grib_code()
 
         index = 0
-        # Build map
-        # names=['typ', 'sid', 'vld', 'lat', 'lon', 'elv', 'var', 'lvl', 'hgt', 'qc', 'obs']
-        for csv_point_data in self.point_data:
-            hdr_typ_str = csv_point_data[0]
+        #names=['typ', 'sid', 'vld', 'lat', 'lon', 'elv', 'var', 'lvl', 'hgt', 'qc', 'obs']
+        for csv_point_record in self.point_data:
+            # Build header map.
+            hdr_typ_str = csv_point_record[0]
             hdr_typ_idx = hdr_typ_map.get(hdr_typ_str,-1)
             if hdr_typ_idx < 0:
                 hdr_typ_idx = hdr_typ_cnt
                 hdr_typ_map[hdr_typ_str] = hdr_typ_idx
                 hdr_typ_cnt += 1
 
-            hdr_sid_str = csv_point_data[1]
+            hdr_sid_str = csv_point_record[1]
             hdr_sid_idx = hdr_sid_map.get(hdr_sid_str,-1)
             if hdr_sid_idx < 0:
                 hdr_sid_idx = hdr_sid_cnt
                 hdr_sid_map[hdr_sid_str] = hdr_sid_idx
                 hdr_sid_cnt += 1
 
-            hdr_vld_str = csv_point_data[2]
+            hdr_vld_str = csv_point_record[2]
             hdr_vld_idx = hdr_vld_map.get(hdr_vld_str,-1)
             if hdr_vld_idx < 0:
                 hdr_vld_idx = hdr_vld_cnt
                 hdr_vld_map[hdr_vld_str] = hdr_vld_idx
                 hdr_vld_cnt += 1
 
-            lat = csv_point_data[3]
-            lon = csv_point_data[4]
-            elv = self.get_num_value(csv_point_data[5] )
+            lat = csv_point_record[3]
+            lon = csv_point_record[4]
+            elv = self.get_num_value(csv_point_record[5] )
             hdr_key = (hdr_typ_idx,hdr_sid_idx,hdr_vld_idx,lat,lon,elv)
             hdr_idx = hdr_map.get(hdr_key,-1)
             if hdr_idx < 0:
@@ -398,7 +484,7 @@ class csv_point_obs(ABC, base_met_point_obs):
                 hdr_map[hdr_key] = hdr_idx
                 hdr_cnt += 1
             
-            var_id_str = csv_point_data[6] 
+            var_id_str = csv_point_record[6]
             if self.use_var_id:
                 var_id = obs_var_map.get(var_id_str,-1)
                 if var_id < 0:
@@ -408,7 +494,7 @@ class csv_point_obs(ABC, base_met_point_obs):
             else:
                 var_id = int(var_id_str)
 
-            qc_str = csv_point_data[9] 
+            qc_str = csv_point_record[9]
             qc_id = obs_qty_map.get(qc_str,-1)
             if qc_id < 0:
                 qc_id = qc_cnt
@@ -418,9 +504,9 @@ class csv_point_obs(ABC, base_met_point_obs):
             # names=['typ', 'sid', 'vld', 'lat', 'lon', 'elv', 'var', 'lvl', 'hgt', 'qc', 'obs']
             self.obs_vid[index] = var_id
             self.obs_hid[index] = hdr_idx
-            self.obs_lvl[index] = self.get_num_value(csv_point_data[7])
-            self.obs_hgt[index] = self.get_num_value(csv_point_data[8])
-            self.obs_val[index] = self.get_num_value(csv_point_data[10])
+            self.obs_lvl[index] = self.get_num_value(csv_point_record[7])
+            self.obs_hgt[index] = self.get_num_value(csv_point_record[8])
+            self.obs_val[index] = self.get_num_value(csv_point_record[10])
             self.obs_qty[index]  = qc_id
 
             index += 1
@@ -436,9 +522,9 @@ class csv_point_obs(ABC, base_met_point_obs):
         self.hdr_typ = [ 0 for _ in range(0, hdr_cnt) ]
         self.hdr_sid = [ 0 for _ in range(0, hdr_cnt) ]
         self.hdr_vld = [ 0 for _ in range(0, hdr_cnt) ]
-        self.hdr_lat = [ nc_tools.FILL_VALUE for _ in range(0, hdr_cnt) ]
-        self.hdr_lon = [ nc_tools.FILL_VALUE for _ in range(0, hdr_cnt) ]
-        self.hdr_elv = [ nc_tools.FILL_VALUE for _ in range(0, hdr_cnt) ]
+        self.hdr_lat = [ self.FILL_VALUE for _ in range(0, hdr_cnt) ]
+        self.hdr_lon = [ self.FILL_VALUE for _ in range(0, hdr_cnt) ]
+        self.hdr_elv = [ self.FILL_VALUE for _ in range(0, hdr_cnt) ]
         for key, idx in hdr_map.items():
             self.hdr_typ[idx] = key[0]
             self.hdr_sid[idx] = key[1]
@@ -463,16 +549,15 @@ class csv_point_obs(ABC, base_met_point_obs):
         for key, idx in obs_var_map.items():
             self.obs_var_table[idx] = key
 
-        return self.get_point_data()
-
     def get_num_value(self, column_value):
         num_value = column_value
         if isinstance(column_value, str):
-            if column_value.lower() == 'na':
-                num_value = nc_tools.FILL_VALUE
-            elif self.is_number(column_value):
+            if self.is_number(column_value):
                 num_value = float(column_value)
-            num_value = nc_tools.FILL_VALUE
+            else:
+                num_value = self.FILL_VALUE
+                if column_value.lower() != 'na' and column_value.lower() != 'n/a':
+                    self.log_info(f'{column_value} is not a number, converted to the missing value')
         return num_value
 
     def is_grib_code(self):
@@ -488,13 +573,15 @@ class csv_point_obs(ABC, base_met_point_obs):
     def is_num_string(self, column_value):
         is_string = isinstance(column_value, str)
         if is_string:
-            is_num = True if self.is_number(column_value) or column_value.lower() == 'na' else False
+            is_num = True if self.is_number(column_value) or column_value.lower() == 'na' or column_value.lower() == 'n/a' else False
         else:
             is_num = True
         return is_string, is_num
 
 
 class met_point_obs(ABC, base_met_point_obs):
+
+    MET_ENV_RUN = 'MET_FORCE_TO_RUN'
 
     @abstractmethod
     def read_data(self, args):
@@ -514,31 +601,13 @@ class met_point_obs(ABC, base_met_point_obs):
         '''
         pass
 
-
-# Note: caller should import netCDF4
-# the argements nc_group(dataset) and nc_var should not be None
-class nc_tools():
-
-    FILL_VALUE = -9999.
-    met_missing = -99999999.
+    @staticmethod
+    def get_prompt():
+        return get_prompt()
 
     @staticmethod
-    def get_num_array(nc_group, var_name):
-        nc_var = nc_group.variables.get(var_name, None)
-        #return [] if nc_var is None else nc_var[:].filled(nc_var._FillValue if '_FillValue' in nc_var.ncattrs() else nc_tools.met_missing) 
-        return [] if nc_var is None else nc_var[:]
-
-    @staticmethod
-    def get_ncbyte_array_to_str(nc_var):
-        nc_str_data = nc_var[:]
-        if nc_var.datatype.name == 'bytes8':
-            nc_str_data = [ str(s.compressed(),"utf-8") for s in nc_var[:] ]
-        return nc_str_data
-
-    @staticmethod
-    def get_string_array(nc_group, var_name):
-        nc_var = nc_group.variables.get(var_name, None)
-        return [] if nc_var is None else nc_tools.get_ncbyte_array_to_str(nc_var)
+    def is_python_prefix(user_cmd):
+        return user_cmd.startswith(base_met_point_obs.python_prefix)
 
 
 # This is a sample drived class
@@ -568,12 +637,15 @@ class sample_met_point_obs(met_point_obs):
         self.obs_var_table = [ "TMP", "RH" ]
         self.obs_qty_table = [ "NA" ]
 
-def convert_point_data(point_data, check_all_records=False):
-    _csv_point_data = csv_point_obs(point_data)
-    if _csv_point_data.is_grib_code():
-        _csv_point_data.use_var_id = False
-    _csv_point_data.check_csv_point_data(check_all_records)
-    return _csv_point_data.convert_point_data()
+def convert_point_data(point_data, check_all_records=False, input_type='csv'):
+    tmp_point_data = {}
+    if 'csv' == input_type:
+        csv_point_data = csv_point_obs(point_data)
+        csv_point_data.check_csv_point_data(check_all_records)
+        tmp_point_data = csv_point_data.get_point_data()
+    else:
+        base_met_point_obs.error_msg('Not supported input type: {input_type}')
+    return tmp_point_data
 
 def main():
     args = {}   # or args = []

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -277,7 +277,7 @@ void ThreshArray::parse_thresh_str(const char *thresh_str) {
 
       lp = line;
       
-      while((c = strtok(lp, delim)) != NULL ) {
+      while((c = strtok(lp, delim)) != nullptr ) {
       
          add(c);
       

@@ -1282,11 +1282,11 @@ if ( info.all_false() )  return;
 
             //
             // Get raw values and object ID's for each grid box
-            // Extra NULL checks to satisfy Fortify
+            // Extra nullptr checks to satisfy Fortify
 
          if ( info.do_raw &&
-	        fcst_raw_data != NULL && obs_raw_data != NULL &&
-	        engine.fcst_raw != NULL && engine.obs_raw != NULL  )  {
+	        fcst_raw_data != nullptr && obs_raw_data != nullptr &&
+	        engine.fcst_raw != nullptr && engine.obs_raw != nullptr  )  {
 
              fcst_raw_data[n] = engine.fcst_raw->data (x, y);
              obs_raw_data[n] = engine.obs_raw->data  (x, y);
@@ -1294,10 +1294,10 @@ if ( info.all_false() )  return;
          }
 
          if(engine.fcst_split->is_nonzero(x, y) ) {
-	   if ( info.do_object_raw && fcst_obj_raw_data != NULL && engine.fcst_raw != NULL ) {
+	   if ( info.do_object_raw && fcst_obj_raw_data != nullptr && engine.fcst_raw != nullptr ) {
 	     fcst_obj_raw_data[n] = engine.fcst_raw->data(x, y);
 	   }
-           if ( info.do_object_id && fcst_obj_data != NULL && engine.fcst_split != NULL ) {
+           if ( info.do_object_id && fcst_obj_data != nullptr && engine.fcst_split != nullptr ) {
              fcst_obj_data[n] = nint(engine.fcst_split->data(x, y));
 	     if (find(fcstValues.begin(), fcstValues.end(), fcst_obj_data[n]) == fcstValues.end())
 	       {
@@ -1307,19 +1307,19 @@ if ( info.all_false() )  return;
            }
          }
          else {
-            if ( info.do_object_raw && fcst_obj_raw_data != NULL ) {
+            if ( info.do_object_raw && fcst_obj_raw_data != nullptr ) {
 	      fcst_obj_raw_data[n] = bad_data_float;
 	    }
-            if ( info.do_object_id && fcst_obj_data != NULL ) {
+            if ( info.do_object_id && fcst_obj_data != nullptr ) {
 	      fcst_obj_data[n] = bad_data_int;
 	    }
          }
 
          if(engine.obs_split->is_nonzero(x, y) ) {
-	   if ( info.do_object_raw && obs_obj_raw_data != NULL ) {
+	   if ( info.do_object_raw && obs_obj_raw_data != nullptr ) {
 	     obs_obj_raw_data[n] = engine.obs_raw->data(x, y);
 	   }
-	   if ( info.do_object_id && obs_obj_data != NULL ) {
+	   if ( info.do_object_id && obs_obj_data != nullptr ) {
 	     obs_obj_data[n] = nint(engine.obs_split->data(x, y));
 	     if (find(obsValues.begin(), obsValues.end(), obs_obj_data[n]) == obsValues.end())
 	       {
@@ -1329,10 +1329,10 @@ if ( info.all_false() )  return;
 	   }
          }
          else {
-	   if ( info.do_object_raw && obs_obj_raw_data != NULL) {
+	   if ( info.do_object_raw && obs_obj_raw_data != nullptr) {
 	     obs_obj_raw_data[n] = bad_data_float;
 	   }
-           if ( info.do_object_id && obs_obj_data != NULL ) {
+           if ( info.do_object_id && obs_obj_data != nullptr ) {
 	     obs_obj_data[n] = bad_data_int;
 	   }
          }
@@ -1341,7 +1341,7 @@ if ( info.all_false() )  return;
             // Get cluster object ID's for each grid box
             //
 
-         if ( info.do_cluster_id && fcst_clus_data != NULL && obs_clus_data != NULL)  {
+         if ( info.do_cluster_id && fcst_clus_data != nullptr && obs_clus_data != nullptr)  {
 
                // Write the index of the cluster object
             if ( engine.fcst_clus_split->data(x, y) > 0 ) {

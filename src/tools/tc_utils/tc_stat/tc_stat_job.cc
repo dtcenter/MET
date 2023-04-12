@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -2591,7 +2591,7 @@ void TCStatJobSummary::compute_fsp(NumArray &total, NumArray &best,
 
       // Check if FSP should be computed for this column
       s = to_upper(Column[i]);
-      if(strstr(s.c_str(), "-") == NULL && strstr(s.c_str(), "ERR") == NULL) {
+      if(strstr(s.c_str(), "-") == nullptr && strstr(s.c_str(), "ERR") == nullptr) {
          mlog << Debug(4)
               << "Skipping frequency of superior performance for "
               << "column \"" << Column[i] << "\" since it is not an "

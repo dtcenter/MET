@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -345,10 +345,10 @@ void compute_cts_stats_ci_bca(const gsl_rng *rng_ptr,
    //
    for(i=0; i<n_cts; i++) {
       prefix << cs_erase << tmp_dir << "/tmp_cts_i_" << i;
-      cts_i_file[i] = make_temp_file_name(prefix.c_str(), NULL);
+      cts_i_file[i] = make_temp_file_name(prefix.c_str(), nullptr);
 
       prefix << cs_erase << tmp_dir << "/tmp_cts_r_" << i;
-      cts_r_file[i] = make_temp_file_name(prefix.c_str(), NULL);
+      cts_r_file[i] = make_temp_file_name(prefix.c_str(), nullptr);
    }
 
    //
@@ -790,10 +790,10 @@ void compute_mcts_stats_ci_bca(const gsl_rng *rng_ptr,
    // Build the temp file names
    //
    prefix << cs_erase << tmp_dir << "/tmp_mcts_i";
-   mcts_i_file = make_temp_file_name(prefix.c_str(), NULL);
+   mcts_i_file = make_temp_file_name(prefix.c_str(), nullptr);
 
    prefix << cs_erase << tmp_dir << "/tmp_mcts_r";
-   mcts_r_file = make_temp_file_name(prefix.c_str(), NULL);
+   mcts_r_file = make_temp_file_name(prefix.c_str(), nullptr);
 
    //
    // Enclose computations in a try block to catch any errors and
@@ -1002,10 +1002,10 @@ void compute_cnt_stats_ci_bca(const gsl_rng *rng_ptr,
    // Build the temp file names
    //
    prefix << cs_erase << tmp_dir << "/tmp_cnt_i";
-   cnt_i_file = make_temp_file_name(prefix.c_str(), NULL);
+   cnt_i_file = make_temp_file_name(prefix.c_str(), nullptr);
 
    prefix << cs_erase << tmp_dir << "/tmp_cnt_r";
-   cnt_r_file = make_temp_file_name(prefix.c_str(), NULL);
+   cnt_r_file = make_temp_file_name(prefix.c_str(), nullptr);
 
    //
    // Enclose computations in a try block to catch any errors and
@@ -1483,7 +1483,7 @@ void compute_cts_stats_ci_perc(const gsl_rng *rng_ptr,
    //
    for(i=0; i<n_cts; i++) {
       prefix << cs_erase << tmp_dir << "/tmp_cts_r_" << i;
-      cts_r_file[i] = make_temp_file_name(prefix.c_str(), NULL);
+      cts_r_file[i] = make_temp_file_name(prefix.c_str(), nullptr);
    }
 
    //
@@ -1879,7 +1879,7 @@ void compute_mcts_stats_ci_perc(const gsl_rng *rng_ptr,
    // Build the temp file names
    //
    prefix << cs_erase << tmp_dir << "/tmp_mcts_r";
-   mcts_r_file = make_temp_file_name(prefix.c_str(), NULL);
+   mcts_r_file = make_temp_file_name(prefix.c_str(), nullptr);
 
    //
    // Enclose computations in a try block to catch any errors and
@@ -2068,7 +2068,7 @@ void compute_cnt_stats_ci_perc(const gsl_rng *rng_ptr,
    // Build the temp file names
    //
    prefix << cs_erase << tmp_dir << "/tmp_cnt_r";
-   cnt_r_file = make_temp_file_name(prefix.c_str(), NULL);
+   cnt_r_file = make_temp_file_name(prefix.c_str(), nullptr);
 
    //
    // Enclose computations in a try block to catch any errors and
@@ -2499,10 +2499,10 @@ void compute_nbrcts_stats_ci_bca(const gsl_rng *rng_ptr,
    //
    for(i=0; i<n_nbrcts; i++) {
       prefix << cs_erase << tmp_dir << "/tmp_nbrcts_i_" << i;
-      nbrcts_i_file[i] = make_temp_file_name(prefix.c_str(), NULL);
+      nbrcts_i_file[i] = make_temp_file_name(prefix.c_str(), nullptr);
 
       prefix << cs_erase << tmp_dir << "/tmp_nbrcts_r_" << i;
-      nbrcts_r_file[i] = make_temp_file_name(prefix.c_str(), NULL);
+      nbrcts_r_file[i] = make_temp_file_name(prefix.c_str(), nullptr);
    }
 
    //
@@ -2917,10 +2917,10 @@ void compute_nbrcnt_stats_ci_bca(const gsl_rng *rng_ptr,
    // Build the temp file names
    //
    prefix << cs_erase << tmp_dir << "/tmp_nbrcnt_i";
-   nbrcnt_i_file = make_temp_file_name(prefix.c_str(), NULL);
+   nbrcnt_i_file = make_temp_file_name(prefix.c_str(), nullptr);
 
    prefix << cs_erase << tmp_dir << "/tmp_nbrcnt_r";
-   nbrcnt_r_file = make_temp_file_name(prefix.c_str(), NULL);
+   nbrcnt_r_file = make_temp_file_name(prefix.c_str(), nullptr);
 
    //
    // Enclose computations in a try block to catch any errors and
@@ -3149,7 +3149,7 @@ void compute_nbrcts_stats_ci_perc(const gsl_rng *rng_ptr,
    //
    for(i=0; i<n_nbrcts; i++) {
       prefix << cs_erase << tmp_dir << "/tmp_nbrcts_r_" << i;
-      nbrcts_r_file[i] = make_temp_file_name(prefix.c_str(), NULL);
+      nbrcts_r_file[i] = make_temp_file_name(prefix.c_str(), nullptr);
    }
 
    //
@@ -3521,7 +3521,7 @@ void compute_nbrcnt_stats_ci_perc(const gsl_rng *rng_ptr,
    // Build the temp file names
    //
    prefix << cs_erase << tmp_dir << "/tmp_nbrcnt_r";
-   nbrcnt_r_file = make_temp_file_name(prefix.c_str(), NULL);
+   nbrcnt_r_file = make_temp_file_name(prefix.c_str(), nullptr);
 
    //
    // Enclose computations in a try block to catch any errors and

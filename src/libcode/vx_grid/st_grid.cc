@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -30,11 +30,6 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
-
-// static double     st_func (double lat, bool is_north_hemisphere);
-// static double st_der_func (double lat, bool is_north_hemisphere);
-// 
-// static double st_inv_func (double r, bool is_north_hemisphere);
 
 static void reduce(double & angle);
 
@@ -594,8 +589,6 @@ mlog << Error << "\nStereographicGrid::shift_right(int) -> "
 
 exit ( 1 );
 
-return;
-
 }
 
 
@@ -881,34 +874,6 @@ set(data);
 
 ////////////////////////////////////////////////////////////////////////
 
-/*
-Grid::Grid(const StereoType2Data & data)
-
-{
-
-init_from_scratch();
-
-set(data);
-
-}
-*/
-
-////////////////////////////////////////////////////////////////////////
-
-/*
-Grid::Grid(const StereoType3Data & data)
-
-{
-
-init_from_scratch();
-
-set(data);
-
-}
-*/
-
-////////////////////////////////////////////////////////////////////////
-
 
 void Grid::set(const StereographicData & data)
 
@@ -934,54 +899,6 @@ return;
 
 ////////////////////////////////////////////////////////////////////////
 
-/*
-void Grid::set(const StereoType2Data & data)
-
-{
-
-clear();
-
-rep = new StereographicGrid (data);
-
-if ( !rep )  {
-
-   mlog << Error << "\nGrid::set(const StereoType2Data &) -> memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
-
-return;
-
-}
-*/
-
-////////////////////////////////////////////////////////////////////////
-
-/*
-void Grid::set(const StereoType3Data & data)
-
-{
-
-clear();
-
-rep = new StereographicGrid (data);
-
-if ( !rep )  {
-
-   mlog << Error << "\nGrid::set(const StereoType3Data &) -> memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
-
-return;
-
-}
-*/
-
-////////////////////////////////////////////////////////////////////////
-
 
 Grid create_aligned_st(double lat_center,   double lon_center, 
                        double lat_previous, double lon_previous,
@@ -991,7 +908,6 @@ Grid create_aligned_st(double lat_center,   double lon_center,
 {
 
 Grid g_new;
-// double alpha;
 double r_center, r_previous;
 double Qx, Qy;
 double L;
@@ -1026,8 +942,6 @@ data.ny = ny;
    //
    //  calculate orientation longitude
    //
-
-// alpha = stereographic_alpha(data.scale_lat, data.r_km, data.d_km);
 
 r_center   = st_func(lat_center,   is_north);
 r_previous = st_func(lat_previous, is_north);

@@ -15,7 +15,12 @@ using namespace std;
 #include "vx_math.h"
 
 #include "python3_util.h"
+#include "global_python.h"
 
+
+////////////////////////////////////////////////////////////////////////
+
+GlobalPython GP;   //  this needs external linkage
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -29,7 +34,7 @@ size_t len = 0;
 FILE * f   = 0;
 
 
-if ( (f = open_memstream(&buf, &len)) == NULL )  {
+if ( (f = open_memstream(&buf, &len)) == nullptr )  {
 
    mlog << Error << "\noperator<<(ostream &, PyObject *) -> "
         << "unable to open memory stream\n\n";

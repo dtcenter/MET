@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -289,7 +289,7 @@ class EnsVarInfo {
       void set_ctrl(VarInfo *);
       VarInfo * get_ctrl(int);
 
-      // Get VarInfo from first InputInfo if requested VarInfo is NULL
+      // Get VarInfo from first InputInfo if requested VarInfo is nullptr 
       VarInfo * get_var_info(int index=0);
       ConcatString get_file(int index=0);
       int get_file_index(int index=0);

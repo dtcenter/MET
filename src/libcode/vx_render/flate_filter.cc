@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -59,9 +59,9 @@ if ( !inbuf || !outbuf || !s )  {
 
 memset(s, 0, sizeof(*s));
 
-s->zalloc = Z_NULL;
-s->zfree  = Z_NULL;
-s->opaque = Z_NULL;
+s->zalloc = NULL;
+s->zfree  = NULL;
+s->opaque = NULL;
 
 if ( deflateInit(s, Z_BEST_COMPRESSION) != Z_OK )  {
 

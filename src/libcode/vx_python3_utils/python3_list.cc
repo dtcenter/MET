@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -81,8 +81,6 @@ mlog << Error << "\nPython3_List::Python3_List(const Python3_List &) -> "
 
 exit ( 1 );
 
-return;
-
 }
 
 
@@ -97,8 +95,6 @@ mlog << Error << "\nPython3_List(const Python3_List &) -> "
      << "should never be called!\n\n";
 
 exit ( 1 );
-
-return ( * this );
 
 }
 

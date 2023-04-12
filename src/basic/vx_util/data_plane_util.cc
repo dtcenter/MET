@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -208,7 +208,7 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
         int width, GridTemplateFactory::GridTemplates shape,
         bool wrap_lon, SingleThresh t,
         const DataPlane *cmn, const DataPlane *csd, double vld_t) {
-   GridPoint *gp = NULL;
+   GridPoint *gp = nullptr;
    int x, y;
    int n_vld = 0;
    int n_thr = 0;
@@ -286,7 +286,7 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
 
               // Sum all the points
               for(gp  = gt->getFirstInGrid(x, y, dp.nx(), dp.ny());
-                  gp != NULL;
+                  gp != nullptr;
                   gp  = gt->getNextInGrid()) {
                  if(is_bad_data(v = dp.get(gp->x, gp->y))) continue;
                  n_vld++;
@@ -300,7 +300,7 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
 
               // Subtract points from the the bottom edge
               for(gp  = gt->getFirstInBotEdge();
-                  gp != NULL;
+                  gp != nullptr;
                   gp  = gt->getNextInBotEdge()) {
                  if(is_bad_data(v = dp.get(gp->x, gp->y))) continue;
                  n_vld--;
@@ -314,7 +314,7 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
 
               // Add points from the the top edge
               for(gp  = gt->getFirstInTopEdge();
-                  gp != NULL;
+                  gp != nullptr;
                   gp  = gt->getNextInTopEdge()) {
                  if(is_bad_data(v = dp.get(gp->x, gp->y))) continue;
                  n_vld++;

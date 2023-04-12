@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -447,6 +447,12 @@ get_global_att(ncfile, string("nx"), data.nx);
    // Number of points in the y-direction
 get_global_att(ncfile, string("ny"), data.ny);
 
+data.eccentricity = 0.;
+data.false_east = 0.;
+data.false_north = 0.;
+data.scale_factor = 1.0;
+data.dy_km = data.d_km;
+
 data.dump();
 
    //
@@ -642,6 +648,12 @@ get_global_att(ncfile, string("nx"), data.nx);
 
    // Number of points in the y-direction
 get_global_att(ncfile, string("ny"), data.ny);
+
+data.eccentricity = 0.;
+data.false_east = 0.;
+data.false_north = 0.;
+data.scale_factor = 1.0;
+data.dy_km = data.d_km;
 
 data.dump();
 

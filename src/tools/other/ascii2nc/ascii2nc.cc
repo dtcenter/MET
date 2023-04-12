@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -345,8 +345,6 @@ FileHandler *create_file_handler(const ASCIIFormat format, const ConcatString &a
         return(determine_ascii_format(ascii_filename));
       }
    }
-
-   return(0);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -470,8 +468,6 @@ FileHandler *determine_ascii_format(const ConcatString &ascii_filename) {
    f_in.close();
 
    exit(1);
-
-   return(0);
 }
 
 ////////////////////////////////////////////////////////////////////////

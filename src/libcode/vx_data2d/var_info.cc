@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -601,7 +601,7 @@ void VarInfo::set_level_info_grib(Dictionary & dict){
 
       //  parse the level string components
       int num_mat = 0;
-      char** mat = NULL;
+      char** mat = nullptr;
       const char* pat_mag = "([ALPRZ])([0-9\\.]+)(\\-[0-9\\.]+)?";
       if( 3 > (num_mat = regex_apply(pat_mag, 4, field_level.text(), mat)) ){
          mlog << Error << "\nVarInfo::set_level_info_grib() - failed to parse level string '"
@@ -811,7 +811,7 @@ int parse_set_attr_flag(Dictionary &dict, const char *key) {
 ///////////////////////////////////////////////////////////////////////////////
 
 EnsVarInfo::EnsVarInfo() {
-   ctrl_info = NULL;
+   ctrl_info = nullptr;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
