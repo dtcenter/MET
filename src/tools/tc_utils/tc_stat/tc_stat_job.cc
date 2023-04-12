@@ -237,6 +237,7 @@ void TCStatJob::clear() {
    StatFile.clear();
    close_stat_file();
    StatOut = (ofstream *) 0;
+   stat_row = 0;
 
    // Set to default values
    WaterOnly       = default_water_only;
@@ -1168,6 +1169,8 @@ void TCStatJob::close_dump_file() {
 void TCStatJob::open_stat_file() {
 
    close_stat_file();
+
+   stat_row = 0;
 
    if(StatFile.empty()) return;
 
