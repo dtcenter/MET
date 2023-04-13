@@ -105,6 +105,7 @@ class VarInfo
       virtual GrdFileType  file_type() const = 0;
 
       ConcatString magic_str()      const;
+      ConcatString magic_time_str() const;
       ConcatString req_name()       const;
       ConcatString name()           const;
       ConcatString units()          const;
@@ -126,7 +127,6 @@ class VarInfo
       unixtime     init()           const;
       unixtime     valid()          const;
       int          lead()           const;
-      ConcatString time_str()       const;
 
       ThreshArray  censor_thresh()  const;
       NumArray     censor_val()     const;

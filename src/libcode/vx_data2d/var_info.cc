@@ -242,6 +242,27 @@ void VarInfo::dump(ostream &out) const {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+ConcatString VarInfo::magic_time_str() const {
+   ConcatString cs(MagicStr);
+
+   // Report timing information when specified
+   if(Init != 0) {
+      cs << ", InitTime = " << unix_to_yyyymmdd_hhmmss(Init);
+   }
+
+   if(Valid != 0) {
+      cs << ", ValidTime = " << unix_to_yyyymmdd_hhmmss(Valid);
+   }
+
+   if(!is_bad_data(Lead)) {
+      cs << ", LeadTime = " << sec_to_hhmmss(Lead);
+   }
+
+   return(cs);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 void VarInfo::set_req_name(const char *str) {
    ReqName = str;
    return;
@@ -430,27 +451,6 @@ void VarInfo::set_magic(const ConcatString &nstr, const ConcatString &lstr) {
    }
 
    return;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-ConcatString VarInfo::time_str() const {
-   ConcatString time_cs;
-
-   // Report timing information when specified
-   if(Init != 0) {
-      time_cs << "Init = " << unix_to_yyyymmdd_hhmmss(Init) << " ";
-   }
-
-   if(Valid != 0) {
-      time_cs << "Valid = " << unix_to_yyyymmdd_hhmmss(Valid) << " ";
-   }
-
-   if(!is_bad_data(Lead)) {
-      time_cs << "Lead = " << sec_to_hhmmss(Lead) << " ";
-   }
-
-   return(time_cs);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
