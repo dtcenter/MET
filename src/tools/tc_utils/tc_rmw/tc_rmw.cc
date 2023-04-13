@@ -696,10 +696,10 @@ void process_fields(const TrackInfoArray& tracks) {
             // Update the variable info with the valid time of the track point
             data_info = conf_info.data_info[i_var];
 
-	    string sname = data_info->name_attr().string();
-	    string slevel = data_info->level_attr().string();
+            string sname = data_info->name_attr().string();
+            string slevel = data_info->level_attr().string();
 
-	    data_info->set_valid(valid_time);
+            data_info->set_valid(valid_time);
 
             // Find data for this track point
             get_series_entry(i_point, data_info, data_files, ftype, data_dp,
