@@ -126,6 +126,7 @@ class VarInfo
       unixtime     init()           const;
       unixtime     valid()          const;
       int          lead()           const;
+      ConcatString time_str()       const;
 
       ThreshArray  censor_thresh()  const;
       NumArray     censor_val()     const;

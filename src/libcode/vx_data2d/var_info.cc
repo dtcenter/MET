@@ -434,6 +434,27 @@ void VarInfo::set_magic(const ConcatString &nstr, const ConcatString &lstr) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+ConcatString VarInfo::time_str() const {
+   ConcatString time_cs;
+
+   // Report timing information when specified
+   if(Init != 0) {
+      time_cs << "Init = " << unix_to_yyyymmdd_hhmmss(Init) << " ";
+   }
+
+   if(Valid != 0) {
+      time_cs << "Valid = " << unix_to_yyyymmdd_hhmmss(Valid) << " ";
+   }
+
+   if(!is_bad_data(Lead)) {
+      time_cs << "Lead = " << sec_to_hhmmss(Lead) << " ";
+   }
+
+   return(time_cs);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 ConcatString VarInfo::magic_str_attr() const {
    ConcatString mstr(name_attr());
    ConcatString lstr(level_attr());
