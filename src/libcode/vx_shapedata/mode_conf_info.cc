@@ -966,13 +966,14 @@ dict = conf.lookup_dictionary(conf_key_obs);
 if ( dict->lookup(conf_key_multivar_logic) )   obs_multivar_logic = dict->lookup_string(conf_key_multivar_logic);
 
 multivar_intensity.clear();
-BoolArray ba = lookup_bool_array("multivar_intensity_flag", dict);
-ba.dump(cout);
-for (int i=0; i<ba.n(); ++i) {
-  multivar_intensity.push_back((ba[i] == 1 ? true:false));
+if ( dict->lookup("multivar_intensity_flag")) {
+  BoolArray ba = lookup_bool_array("multivar_intensity_flag", dict);
+  //ba.dump(cout);
+  for (int i=0; i<ba.n(); ++i) {
+    multivar_intensity.push_back((ba[i] == 1 ? true:false));
+  }
 }
 return;
-
 }
 
 

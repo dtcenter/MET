@@ -96,6 +96,19 @@ static void set_outdir    (const StringArray &);
 static void set_logfile   (const StringArray &);
 static void set_verbosity (const StringArray &);
 
+static void multivar_consistency_checks(StringArray &fcst_filenames, StringArray &obs_filenames,
+					BoolCalc &f_calc, BoolCalc &o_calc, int &n_files);
+
+static ConcatString set_multivar_dir(int j);
+
+static MultiVarData *process_multivar_data(int j, const string &fcst_filename,
+					   const string &obs_filename,
+					   const ConcatString &dir);
+
+static void process_masked_multivar_data(int j, const BoolPlane &f_result, const BoolPlane &o_result,
+					 int nx, int ny, const ConcatString &dir,
+					 MultiVarData &mvd);
+
 static void mask_data(int nx, int ny, const BoolPlane &mask, DataPlane &data);
 
 static void read_config(const string & filename);
@@ -118,238 +131,56 @@ const int Argc = Argv.n();
 
 if ( Argc < 4 )  multivar_usage();
 
-int j;
+int j, n_files;
 StringArray fcst_filenames;
 StringArray  obs_filenames;
-ConcatString dir;
-
+BoolCalc f_calc, o_calc ;
 
 process_command_line(Argv);
 
-
 read_config(config_file);
 
-if ( config.fcst_multivar_logic.empty() )  {
-
-   mlog << Error << "\n" << program_name
-        << ": fcst multivar logic not specified!\n\n";
-
-   exit ( 1 );
-
-}
-
-
-if ( config.obs_multivar_logic.empty() )  {
-
-   mlog << Error << "\n" << program_name
-        << ": obs multivar logic not specified!\n\n";
-
-   exit ( 1 );
-
-}
-
-  //
-  //  make sure the multivar logic programs are in the config file
-  //
-
-fcst_filenames = parse_ascii_file_list(fcst_fof.c_str());
- obs_filenames = parse_ascii_file_list(obs_fof.c_str());
-
-if ( fcst_filenames.n() != obs_filenames.n() )  {
-
-   mlog << Error << "\n" << program_name
-        << ": number of fcst and obs files should be the same!\n\n";
-
-   exit ( 1 );
-
-}
-
-const int n_files = fcst_filenames.n();
-StringArray nc_files;
- 
-//ConcatString mode_args;
+multivar_consistency_checks(fcst_filenames, obs_filenames, f_calc, o_calc, n_files);
 
 mlog << Debug(2) << "\n" << sep << "\n";
-
-   //
-   //  check for no inputs
-   //
-
-if ( n_files == 0 )  {
-
-   mlog << Error << "\n" << program_name
-        << ": no input forecast files to process!\n\n";
-
-   exit ( 1 );
-
-}
-
-   //
-   // create the BoolCalc objects now and check that the logic is in
-   // range and the right length before proceeding
- 
-
-BoolCalc f_calc, o_calc ;
-f_calc.set(config.fcst_multivar_logic.text());
-o_calc.set(config.obs_multivar_logic.text());
-if (!f_calc.check_args(n_files)) {
-  exit ( 1 );
-}
-if (!o_calc.check_args(n_files)) {
-  exit ( 1 );
-}
-
-   //
-   // check that the multivar_intensity vector is the right length
-   //
-if ((int)config.multivar_intensity.size() != n_files) {
-  mlog << Error << "\nmultivar_frontend() -> "
-       << "wrong size multivar_intensity array, wanted "
-       << n_files << " got " << config.multivar_intensity.size() << "\n\n";
-  exit ( 1 );
- }
 
    //
    //  do the individual mode runs
    //
 
- vector<MultiVarData *> mvd;
+vector<MultiVarData *> mvd;
+StringArray nc_files;
 
 for (j=0; j<n_files; ++j)  {
 
-  ConcatString command;
-  StringArray a, mode_argv;
-  int status;
-  char junk [256];
    mlog << Debug(2) 
         << "\n starting mode run " << (j + 1) << " of " << n_files
         << "\n" << sep << "\n";
-
-      //
-      //  test to see of the output directory for this
-      //    mode runs exists, and if not, create it
-      //
-
-   dir.clear();
-
-   if ( outdir.length() > 0 )  dir << outdir << '/';
-
-   snprintf(junk, sizeof(junk), "%02d", j);
-
-   dir << junk;
-
-   if ( ! directory_exists(dir.c_str()) )  {
-
-      mlog << Debug(2)
-           << program_name << ": creating output directory \""
-           << dir << "\"\n\n";
-
-      status = mkdir(dir.c_str(), dir_creation_mode);       
-
-      if ( status < 0 )  {
-
-         mlog << Error << "\n" << program_name
-              << ": unable to create output directory \""
-              << dir << "\"\n\n";
-
-         exit ( 1 );
-
-      }
-
-   }
-
-      //
-      //  build the command for running mode
-      //
-
-   mode_argv.clear();
-
-   mode_argv.add(mode_path);
-   mode_argv.add(fcst_filenames[j]);
-   mode_argv.add(obs_filenames[j]);
-   mode_argv.add(config_file);
-
-   command << cs_erase
-           << mode_path         << ' '
-           << fcst_filenames[j] << ' '
-           <<  obs_filenames[j] << ' '
-           << config_file;
-
-   mode_argv.add("-v");
-   snprintf(junk, sizeof(junk), "%d", mlog.verbosity_level());
-   mode_argv.add(junk);
-
-   mode_argv.add("-outdir");
-   mode_argv.add(dir);
-
-   command << " -v " << mlog.verbosity_level();
-
-   command << " -outdir " << dir;
-
-   mode_argv.add("-field_index");
-   snprintf(junk, sizeof(junk), "%d", j);
-   mode_argv.add(junk);
-
-   command << " -field_index " << j;
-
-      //
-      //  run mode
-      //
-
-   mlog << Debug(1) << "Running mode command: \"" << command << "\"\n\n";
-
-   
-
-   //run_command(command);
-   // [TODO] MET #1238: run MODE in memory instead of via system calls.
-   // (void) mode_frontend(mode_argv);
-
-   ModeFrontEnd *frontend = new ModeFrontEnd;
-   status = frontend->run(mode_argv);
-   MultiVarData *mvdi = frontend->get_multivar_data();
+   ConcatString dir = set_multivar_dir(j);
+   MultiVarData *mvdi = process_multivar_data(j, fcst_filenames[j], obs_filenames[j], dir);
    mvd.push_back(mvdi);
-   
-   // int nx = frontend->get_fcst_obj_nx();
-   // int ny = frontend->get_fcst_obj_ny();
-   // int *fcst_obj_data = frontend->get_fcst_obj_data();
-   // int *obs_obj_data = frontend->get_obs_obj_data();
-   // float *fcst_raw_data = frontend->get_fcst_raw_data();
-   // float *obs_raw_data = frontend->get_obs_raw_data();
-   // mode_fcst_objects.push_back(fcst_obj_data);
-   // mode_fcst_raw_data.push_back(fcst_raw_data);
-   // mode_obs_objects.push_back(obs_obj_data);
-   // mode_obs_raw_data.push_back(obs_raw_data);
-   // mode_nx.push_back(nx);
-   // mode_ny.push_back(ny);
-
-   delete frontend;
    mlog << Debug(2) << "\n finished mode run " << (j + 1) << " of " << n_files
         << "\n" << sep << "\n";
-
-   a = get_filenames_from_dir(dir.text(), "mode_", ".nc");
-
+   StringArray a = get_filenames_from_dir(dir.text(), "mode_", ".nc");
    nc_files.add(a);
 
 }   //  for j
 
-mlog << Debug(2) << "\n finished with individual mode runs "
-     << "\n" << sep << "\n";
+mlog << Debug(2) << "\n finished with individual mode runs " << "\n" << sep << "\n";
+nc_files.dump(cout, 0);
 
 BoolPlane * f_plane = new BoolPlane [n_files];
 BoolPlane * o_plane = new BoolPlane [n_files];
 BoolPlane f_result, o_result;
-Pgm image;
 
    //
-   //  load the objects from the mode output files
+   //  set the BoolPlane objects using the mvd content
    //
-nc_files.dump(cout, 0);
-
 
 for (j=0; j<n_files; ++j)  {
 
   //objects_from_netcdf(nc_files[j].c_str(), do_clusters, f_plane[j], o_plane[j]);  
-  objects_from_arrays(nc_files[j].c_str(), do_clusters, mvd[j]->fcst_obj_data, mvd[j]->obs_obj_data, mvd[j]->nx, mvd[j]->ny, f_plane[j], o_plane[j]);  
+  objects_from_arrays(do_clusters, mvd[j]->fcst_obj_data, mvd[j]->obs_obj_data, mvd[j]->nx, mvd[j]->ny, f_plane[j], o_plane[j]);  
 
 }
 
@@ -367,111 +198,37 @@ o_result.set_size(nx, ny);
 combine_boolplanes(f_plane, n_files, f_calc, f_result);
 combine_boolplanes(o_plane, n_files, o_calc, o_result);
 
-   // Filter the data to within the superobjects only
+   //
+   // Filter the data to within the superobjects only and do statistics by invoking mode algorithm again
+   //
+ 
 for (j=0; j<n_files; ++j) {
-  // see if this one is getting stats or not
+
   if (!config.multivar_intensity[j]) {
-    printf("SKIPPING field for intensities..%d\n", j);
+    mlog << Debug(2) << "\n SKIPPING field " << j << " for masked intensities \n";
     continue;
   }
-  mask_data(nx, ny, f_result, mvd[j]->Fcst_sd->data);
-  mask_data(nx, ny, o_result, mvd[j]->Obs_sd->data);
-  ConcatString command;
-  StringArray a, mode_argv;
-  int status;
-  char junk [256];
+
   mlog << Debug(2) 
        << "\n starting filtered data mode run " << (j + 1) << " of " << n_files
        << "\n" << sep << "\n";
 
-    //
-    //  test to see of the output directory for this
-    //    mode runs exists, and if not, create it
-    //
+  // same here as above, overwriting contents written to previously 
+  ConcatString dir = set_multivar_dir(j);
 
-  dir.clear();
-
-  if ( outdir.length() > 0 )  dir << outdir << '/';
-
-  snprintf(junk, sizeof(junk), "%02d", j);
-
-  dir << junk;
-
-  if ( ! directory_exists(dir.c_str()) )  {
-
-    mlog << Debug(2)
-	 << program_name << ": creating output directory \""
-	 << dir << "\"\n\n";
-
-    status = mkdir(dir.c_str(), dir_creation_mode);       
-
-    if ( status < 0 )  {
-
-      mlog << Error << "\n" << program_name
-	   << ": unable to create output directory \""
-	   << dir << "\"\n\n";
-
-      exit ( 1 );
-
-    }
-  }
-    //
-    //  build the command for running mode again
-    //
-  mode_argv.clear();
-
-  mode_argv.add(mode_path);
-  mode_argv.add(fcst_filenames[j]);
-  mode_argv.add(obs_filenames[j]);
-  mode_argv.add(config_file);
-
-  command << cs_erase
-	  << mode_path         << ' '
-	  << fcst_filenames[j] << ' '
-	  <<  obs_filenames[j] << ' '
-	  << config_file;
-
-  mode_argv.add("-v");
-  snprintf(junk, sizeof(junk), "%d", mlog.verbosity_level());
-  mode_argv.add(junk);
-
-  mode_argv.add("-outdir");
-  mode_argv.add(dir);
-
-  command << " -v " << mlog.verbosity_level();
-
-  command << " -outdir " << dir;
-
-  mode_argv.add("-field_index");
-  snprintf(junk, sizeof(junk), "%d", j);
-  mode_argv.add(junk);
-
-  command << " -field_index " << j;
-
-  //
-  //  run mode
-  //
-
-  mlog << Debug(1) << "Running filtered mode command: \"" << command << "\"\n\n";
-
-   
-
-  //run_command(command);
-  // [TODO] MET #1238: run MODE in memory instead of via system calls.
-  // (void) mode_frontend(mode_argv);
-
-  ModeFrontEnd *frontend = new ModeFrontEnd;
-  status = frontend->run(mode_argv, *mvd[j]);
+  process_masked_multivar_data(j, f_result, o_result, nx, ny, dir, *mvd[j]);
+  delete mvd[j];
+  mvd[j] = 0;
  }
  
+mlog << Debug(2) << "\n finished with individual masked mode runs " << "\n" << sep << "\n";
+
    //
    //  write the superobject output files
    //
 
 MetNcFile met;   //  mostly to get grid
 ConcatString path;
-
-
 path = nc_files[0];
 
 if ( ! met.open(path.text()) )  {
@@ -494,10 +251,6 @@ write_output_nc_file( obs_file.text(), met, o_result);
    //
    //  done
    //
-for (size_t i=0; i<mvd.size(); ++i) {
-  delete mvd[i];
- }
-
 return ( 0 );
 
 }
@@ -633,7 +386,228 @@ return;
 
 }
 
+////////////////////////////////////////////////////////////////////////
 
+void multivar_consistency_checks(StringArray &fcst_filenames, StringArray &obs_filenames,
+				 BoolCalc &f_calc, BoolCalc &o_calc, int &n_files)
+{
+
+  //
+  //  make sure the multivar logic programs are in the config file
+  //
+
+if ( config.fcst_multivar_logic.empty() )  {
+
+   mlog << Error << "\n" << program_name
+        << ": fcst multivar logic not specified!\n\n";
+   exit ( 1 );
+
+}
+
+if ( config.obs_multivar_logic.empty() )  {
+
+   mlog << Error << "\n" << program_name
+        << ": obs multivar logic not specified!\n\n";
+   exit ( 1 );
+
+}
+
+  //
+  // make sure there are the same number of obs and fcst files
+  //
+
+fcst_filenames = parse_ascii_file_list(fcst_fof.c_str());
+obs_filenames = parse_ascii_file_list(obs_fof.c_str());
+
+if ( fcst_filenames.n() != obs_filenames.n() )  {
+
+   mlog << Error << "\n" << program_name
+        << ": number of fcst and obs files should be the same!\n\n";
+   exit ( 1 );
+
+}
+
+   //
+   //  check for multivar being actually multi.
+   //
+
+n_files = fcst_filenames.n();
+if ( n_files < 2 )  {
+
+   mlog << Error << "\n" << program_name
+        << ": want at least 2 input forecast files in multivar mode, got " << n_files << "\n\n";
+   exit ( 1 );
+
+}
+   //
+   // create the BoolCalc objects and check that the logic is in range and the right length
+   //
+
+f_calc.set(config.fcst_multivar_logic.text());
+o_calc.set(config.obs_multivar_logic.text());
+
+if (!f_calc.check_args(n_files)) {
+  exit ( 1 );
+}
+
+if (!o_calc.check_args(n_files)) {
+  exit ( 1 );
+}
+
+   //
+   // check that the multivar_intensity vector is the right length.
+   // If empty set to the default of all FALSE
+   //
+
+int num_multivar = (int)config.multivar_intensity.size();
+if (num_multivar == n_files) {
+  return;
+}
+
+if (num_multivar == 0) {
+
+  mlog << Warning << "\nmultivar_frontend() -> "
+       << "empty multivar intensity array, setting to all FALSE \n\n";
+
+  for (int i=0; i<n_files; ++i) {
+    config.multivar_intensity.push_back(false);
+  }
+
+} else {
+
+  mlog << Error << "\n" << program_name 
+       << ": wrong size multivar_intensity array, wanted "
+       << n_files << " got " << config.multivar_intensity.size() << "\n\n";
+  exit ( 1 );
+}
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ConcatString set_multivar_dir(int j)
+{
+ConcatString dir;
+int status;
+char junk [256];
+
+    //
+    //  test to see of the output directory for this
+    //    mode runs exists, and if not, create it
+    //
+
+dir.clear();
+if ( outdir.length() > 0 )  dir << outdir << '/';
+snprintf(junk, sizeof(junk), "%02d", j);
+dir << junk;
+
+if ( ! directory_exists(dir.c_str()) )  {
+
+   mlog << Debug(2)
+        << program_name << ": creating output directory \""
+        << dir << "\"\n\n";
+
+   status = mkdir(dir.c_str(), dir_creation_mode);       
+
+   if ( status < 0 )  {
+
+      mlog << Error << "\n" << program_name
+           << ": unable to create output directory \""
+           << dir << "\"\n\n";
+
+      exit ( 1 );
+   }
+}
+return dir;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+MultiVarData *process_multivar_data(int j, const string &fcst_filename, const string &obs_filename,
+				    const ConcatString &dir)
+{
+ConcatString command;
+StringArray a, mode_argv;
+
+   //
+   //  build the command for running mode
+   //
+
+mode_argv.clear();
+mode_argv.add(mode_path);
+mode_argv.add(fcst_filename);
+mode_argv.add(obs_filename);
+mode_argv.add(config_file);
+
+command << cs_erase
+        << mode_path         << ' '
+        << fcst_filename << ' '
+        <<  obs_filename << ' '
+        << config_file;
+
+mode_argv.add("-v");
+char junk [256];
+snprintf(junk, sizeof(junk), "%d", mlog.verbosity_level());
+mode_argv.add(junk);
+
+mode_argv.add("-outdir");
+mode_argv.add(dir);
+
+command << " -v " << mlog.verbosity_level();
+
+command << " -outdir " << dir;
+
+mode_argv.add("-field_index");
+snprintf(junk, sizeof(junk), "%d", j);
+mode_argv.add(junk);
+
+command << " -field_index " << j;
+
+   //
+   //  run mode (sort of)
+   //
+
+mlog << Debug(1) << "Running mode command: \"" << command << "\"\n\n";
+ModeFrontEnd *frontend = new ModeFrontEnd;
+// clean up this status thing, not used
+int status = frontend->run(mode_argv);
+MultiVarData *mvdi = frontend->get_multivar_data();
+delete frontend;
+return mvdi;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void process_masked_multivar_data(int j, const BoolPlane &f_result,
+				  const BoolPlane &o_result, int nx, int ny,
+				  const ConcatString &dir, MultiVarData &mvd)
+{
+  
+  mask_data(nx, ny, f_result, mvd.Fcst_sd->data);
+  mask_data(nx, ny, o_result, mvd.Obs_sd->data);
+
+
+  StringArray mode_argv;
+  char junk [256];
+
+    //
+    //  build the command for running mode again, sort of mode
+    //
+  mode_argv.clear();
+  mode_argv.add(mode_path);
+  mode_argv.add(config_file);
+  mode_argv.add("-v");
+  snprintf(junk, sizeof(junk), "%d", mlog.verbosity_level());
+  mode_argv.add(junk);
+  mode_argv.add("-outdir");
+  mode_argv.add(dir);
+
+  mlog << Debug(1) << "Running filtered mode \n\n";
+
+  ModeFrontEnd *frontend = new ModeFrontEnd;
+  int status = frontend->run(mode_argv, mvd);
+  delete frontend;
+}
+ 
 ////////////////////////////////////////////////////////////////////////
 
 

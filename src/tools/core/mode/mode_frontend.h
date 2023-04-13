@@ -45,6 +45,8 @@ class ModeFrontEnd {
   MultiVarData *get_multivar_data();
 
   void process_command_line(const StringArray &);
+  void process_command_line_final(const StringArray & argv,
+				  const MultiVarData &mvd);
   static void set_config_merge_file (const StringArray &);
   static void set_outdir            (const StringArray &);
   static void set_logfile           (const StringArray &);

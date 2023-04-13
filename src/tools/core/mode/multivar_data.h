@@ -36,7 +36,9 @@ class MultiVarData {
     obs_raw_data(0),
     nx(0), ny(0),
     Fcst_sd(0), Obs_sd(0),
-    grid(0)
+    grid(0),
+    ftype(FileType_None),
+    otype(FileType_None)
     {}
       
     inline ~MultiVarData() {
@@ -57,6 +59,8 @@ class MultiVarData {
      ShapeData *Fcst_sd;
      ShapeData *Obs_sd;
      Grid *grid;
+     GrdFileType ftype;
+     GrdFileType otype;
      
   /* int get_fcst_obj_nx(); */
   /* int get_fcst_obj_ny(); */

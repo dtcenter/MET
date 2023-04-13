@@ -77,6 +77,7 @@ class ModeExecutive {
       void clear();
 
       void init();
+      void init_final(const MultiVarData &mvd);
 
       int n_conv_radii   () const;
       int n_conv_threshs () const;
@@ -112,6 +113,8 @@ class ModeExecutive {
       double data_min, data_max;
 
       ShapeData Fcst_sd, Obs_sd;
+
+      GrdFileType ftype, otype;
 
       void clear_internal_r_index();
       void setup_fcst_obs_data();

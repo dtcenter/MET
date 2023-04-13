@@ -144,7 +144,6 @@ void ModeExecutive::init()
 
 {
 
-GrdFileType ftype, otype;
 Met2dDataFileFactory mtddf_factory;
 
 R_index = T_index = 0;
@@ -208,6 +207,79 @@ return;
 
 }
 
+///////////////////////////////////////////////////////////////////////
+
+
+void ModeExecutive::init_final(const MultiVarData &mvd)
+
+{
+
+GrdFileType ftype, otype;
+//Met2dDataFileFactory mtddf_factory;
+
+R_index = T_index = 0;
+
+   // Create the default config file name
+   default_config_file = replace_path(default_config_filename);
+
+   // If the merge config file was not set, use the match config file
+   if(merge_config_file.length() == 0)
+        merge_config_file = match_config_file;
+
+   // List the config files
+   mlog << Debug(1)
+        << "Default Config File: " << default_config_file << "\n"
+        << "Match Config File: "   << match_config_file   << "\n"
+        << "Merge Config File: "   << merge_config_file   << "\n";
+
+   // Read the config files
+   engine.conf_info.read_config(default_config_file.c_str(), match_config_file.c_str());
+
+   // Get the forecast and observation file types from config, if present
+   ftype = parse_conf_file_type(engine.conf_info.conf.lookup_dictionary(conf_key_fcst));
+   otype = parse_conf_file_type(engine.conf_info.conf.lookup_dictionary(conf_key_obs));
+
+
+   // Read observation file
+   // if(!(obs_mtddf = mtddf_factory.new_met_2d_data_file(obs_file.c_str(), otype))) {
+   //    mlog << Error << "\nTrouble reading observation file \""
+   //         << obs_file << "\"\n\n";
+   //    exit(1);
+   // }
+
+
+   // Read forecast file
+   // if(!(fcst_mtddf = mtddf_factory.new_met_2d_data_file(fcst_file.c_str(), ftype))) {
+   //    mlog << Error << "\nTrouble reading forecast file \""
+   //         << fcst_file << "\"\n\n";
+   //    exit(1);
+   // }
+
+   // Store the input data file types
+   // ftype = fcst_mtddf->file_type();
+   // otype = obs_mtddf->file_type();
+
+   ftype = mvd.ftype;
+   otype = mvd.otype;
+
+   // Process the configuration
+   engine.conf_info.process_config(ftype, otype);
+
+   // const int shift = engine.conf_info.shift_right;
+
+   // fcst_mtddf->set_shift_right(shift);
+   //  obs_mtddf->set_shift_right(shift);
+
+   // List the input files
+   // mlog << Debug(1)
+   //      << "Forecast File: "    << fcst_file << "\n"
+   //      << "Observation File: " << obs_file  << "\n";
+
+   engine.conf_info.nc_info.compress_level = engine.conf_info.get_compression_level();
+
+return;
+
+}
 
 ///////////////////////////////////////////////////////////////////////
 
@@ -1022,6 +1094,8 @@ MultiVarData *ModeExecutive::get_multivar_data()
   mvd->Fcst_sd = new ShapeData(Fcst_sd);
   mvd->Obs_sd = new ShapeData(Obs_sd);
   mvd->grid = new Grid(grid);
+  mvd->ftype = ftype;
+  mvd->otype = otype;
   return mvd;
 }
 
@@ -1271,9 +1345,6 @@ if ( info.all_false() )  return;
 
    }
 
-   vector<int> fcstValues, obsValues;
-   vector<int> fcstCValues, obsCValues;
-
    for(x=0; x<grid.nx(); x++) {
 
       for(y=0; y<grid.ny(); y++) {
@@ -1299,11 +1370,6 @@ if ( info.all_false() )  return;
 	   }
            if ( info.do_object_id && fcst_obj_data != nullptr && engine.fcst_split != nullptr ) {
              fcst_obj_data[n] = nint(engine.fcst_split->data(x, y));
-	     if (find(fcstValues.begin(), fcstValues.end(), fcst_obj_data[n]) == fcstValues.end())
-	       {
-		 printf("FcstValue=%d\n", fcst_obj_data[n]);
-		 fcstValues.push_back(fcst_obj_data[n]);
-	       }
            }
          }
          else {
@@ -1321,11 +1387,6 @@ if ( info.all_false() )  return;
 	   }
 	   if ( info.do_object_id && obs_obj_data != nullptr ) {
 	     obs_obj_data[n] = nint(engine.obs_split->data(x, y));
-	     if (find(obsValues.begin(), obsValues.end(), obs_obj_data[n]) == obsValues.end())
-	       {
-		 printf("ObsValue=%d\n", obs_obj_data[n]);
-		 obsValues.push_back(obs_obj_data[n]);
-	       }
 	   }
          }
          else {

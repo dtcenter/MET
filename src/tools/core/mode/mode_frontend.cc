@@ -64,7 +64,7 @@ if ( mode_exec ) {
 int ModeFrontEnd::run(const StringArray & Argv)
 
 {
-  Argv.dump(cout, 0);
+  // Argv.dump(cout, 0);
 
 
    //
@@ -117,7 +117,7 @@ return (0);
 
 int ModeFrontEnd::run(const StringArray & Argv, const MultiVarData &mvd)
 {
-  Argv.dump(cout, 0);
+//Argv.dump(cout, 0);
 
 
    //
@@ -127,9 +127,9 @@ if ( mode_exec )  { delete mode_exec;  mode_exec = 0; }
 
 mode_exec = new ModeExecutive;
 compress_level = -1;
-field_index = -1;
+//field_index = -1;
 
-process_command_line(Argv);
+process_command_line_final(Argv, mvd);
 
 
    //
@@ -138,7 +138,7 @@ process_command_line(Argv);
 
 ModeConfInfo & conf = mode_exec->engine.conf_info;
 
-if ( field_index >= 0 )  conf.set_field_index(field_index);
+//if ( field_index >= 0 )  conf.set_field_index(field_index);
 
  mode_exec->setup_fcst_obs_data(mvd);
 
@@ -312,6 +312,56 @@ void ModeFrontEnd::process_command_line(const StringArray & argv)
    mode_exec->match_config_file = cline[2];
 
    mode_exec->init();
+
+   return;
+
+}
+
+void ModeFrontEnd::process_command_line_final(const StringArray & argv,
+					      const MultiVarData &mvd)
+{
+
+   CommandLine cline;
+   ConcatString s;
+   const int argc = argv.n();
+
+
+   // Set the default output directory
+   mode_exec->out_dir = replace_path(default_out_dir);
+
+   // Check for zero arguments
+   if(argc == 1) singlevar_usage();  // wrong, need something else
+
+   // Parse the command line into tokens
+   cline.set(argv);
+
+   // Set the usage function
+   cline.set_usage(singlevar_usage);  // wrong, need something else
+
+   // Add the options function calls
+   cline.add(set_config_merge_file, "-config_merge", 1);
+   cline.add(set_outdir,            "-outdir",       1);
+   cline.add(set_logfile,           "-log",          1);
+   cline.add(set_verbosity,         "-v",            1);
+   cline.add(set_compress,          "-compress",     1);
+
+      //
+      //  add for mode multivar ... undocumented
+      //
+   //cline.add(set_field_index, "-field_index", 1);
+
+   // Parse the command line
+   cline.parse();
+
+   // Check for error. There should be 1 argument left:
+   // config filename
+   if(cline.n() != 1) singlevar_usage();  // wrong need something else
+
+   // Store the input forecast and observation file names, placeholders
+   mode_exec->fcst_file         = "not set";
+   mode_exec->obs_file          = "not set";
+   mode_exec->match_config_file = cline[0];
+   mode_exec->init_final(mvd);
 
    return;
 

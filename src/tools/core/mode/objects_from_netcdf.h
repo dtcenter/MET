@@ -29,7 +29,7 @@
 
 
 ////////////////////////////////////////////////////////////////////////
-extern void  objects_from_arrays(const char *netcf_filename, bool do_clusters,
+extern void  objects_from_arrays(bool do_clusters,
 				 int *fcst_objects, int *obs_objects, int nx, int ny,
 				 BoolPlane & fcst_out, 
 				 BoolPlane & obs_out);
