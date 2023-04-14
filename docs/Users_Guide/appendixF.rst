@@ -48,8 +48,9 @@ When MET is compiled with Python embedding support, MET uses the Python executab
 If a user's Python script requires packages that are not available in the Python installation used when compiling the MET software, they will encounter a runtime error when using MET. In this instance, the user will need to change the Python MET is using to a different installation with the required packages for their script. It is the responsibility of the user to manage this Python installation, and one popular approach is to use a custom Anaconda (Conda) Python environment. Once the Python installation meeting the user's requirements is available, the user can force MET to use it by setting the **MET_PYTHON_EXE** environment variable to the full path of the Python executable in that installation. For example:
 
 .. code-block:: none
+   :caption: Setting MET_PYTHON_EXE
 
-  export MET_PYTHON_EXE=/usr/local/python3/bin/python3
+   export MET_PYTHON_EXE=/usr/local/python3/bin/python3
 
 Setting this environment variable triggers slightly different processing logic in MET than when MET uses the Python installation that was used when compiling MET. When using the Python installation that was used when compiling MET, Python is called directly and data are passed in memory from Python to the MET tools. When the user sets **MET_PYTHON_EXE**, MET does the following:
 
@@ -150,20 +151,23 @@ The grid entry in the **attrs** dictionary must contain the grid size and projec
 • Using a named grid supported by MET:
 
 .. code-block:: none
+   :caption: Named Grid
 
-  'grid': 'G212'
+   'grid': 'G212'
 
 • As a grid specification string, as described in :ref:`appendixB`:
 
 .. code-block:: none
+   :caption: Grid Specification String
 
-  'grid': 'lambert 185 129 12.19 -133.459 -95 40.635 6371.2 25 25 N'
+   'grid': 'lambert 185 129 12.19 -133.459 -95 40.635 6371.2 25 25 N'
 
 • As the path to an existing gridded data file:
 
 .. code-block:: none
+   :caption: Grid From File
 
-  'grid': '/path/to/sample_data.grib'
+   'grid': '/path/to/sample_data.grib'
 
 When specified as a dictionary, the contents of the **grid** entry vary based upon the grid **type**. The required elements for supported grid types are:
 
@@ -238,39 +242,39 @@ Additional information about supported grids can be found in :ref:`appendixB`.
 Finally, an example **attrs** dictionary is shown below:
 
 .. code-block:: none
+   :caption: Sample Attrs Dictionary
 
-  attrs = {
-  
-     'valid':     '20050807_120000',
-     'init':      '20050807_000000',
-     'lead':      '120000',
-     'accum':     '120000',
-  
-     'name':      'Foo',
-     'long_name': 'FooBar',
-     'level':     'Surface',
-     'units':     'None',
+   attrs = {
+      
+      'valid':     '20050807_120000',
+      'init':      '20050807_000000',
+      'lead':      '120000',
+      'accum':     '120000',
+
+      'name':      'Foo',
+      'long_name': 'FooBar',
+      'level':     'Surface',
+      'units':     'None',
  
-     # Define 'grid' as a string or a dictionary
+      # Define 'grid' as a string or a dictionary
  
-     'grid': {
-        'type': 'Lambert Conformal',
-        'hemisphere': 'N',
-        'name': 'FooGrid',
-        'scale_lat_1': 25.0,
-        'scale_lat_2': 25.0,
-        'lat_pin': 12.19,
-        'lon_pin': -135.459,
-        'x_pin': 0.0,
-        'y_pin': 0.0,
-        'lon_orient': -95.0,
-        'd_km': 40.635,
-        'r_km': 6371.2,
-        'nx': 185,
-        'ny': 129,
-      }
-  
-  }
+      'grid': {
+         'type': 'Lambert Conformal',
+         'hemisphere': 'N',
+         'name': 'FooGrid',
+         'scale_lat_1': 25.0,
+         'scale_lat_2': 25.0,
+         'lat_pin': 12.19,
+         'lon_pin': -135.459,
+         'x_pin': 0.0,
+         'y_pin': 0.0,
+         'lon_orient': -95.0,
+         'd_km': 40.635,
+         'r_km': 6371.2,
+         'nx': 185,
+         'ny': 129,
+       }
+   }
 
 Running Python Embedding for 2D Gridded Dataplanes
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -280,26 +284,27 @@ On the command line for any of the MET tools which will be obtaining its data fr
 Listed below is an example of running the Plot-Data-Plane tool to call a Python script for data that is included with the MET release tarball. Assuming the MET executables are in your path, this example may be run from the top-level MET source code directory:
 
 .. code-block:: none
+   :caption: plot_data_plane Python Embedding
 
-  plot_data_plane PYTHON_NUMPY fcst.ps \
-    'name="scripts/python/examples/read_ascii_numpy.py data/python/fcst.txt FCST";' \
-    -title "Python enabled plot_data_plane"
+   plot_data_plane PYTHON_NUMPY fcst.ps \
+   'name="scripts/python/examples/read_ascii_numpy.py data/python/fcst.txt FCST";' \
+   -title "Python enabled plot_data_plane"
     
 The first argument for the Plot-Data-Plane tool is the gridded data file to be read. When calling Python script that has a two-dimensional gridded dataplane stored in a NumPy N-D array object, set this to the constant string **PYTHON_NUMPY**. The second argument is the name of the output PostScript file to be written. The third argument is a string describing the data to be plotted. When calling a Python script, set **name** to the full path of the Python script to be run along with any command line arguments for that script. Lastly, the **-title** option is used to add a title to the plot. Note that any print statements included in the Python script will be printed to the screen. The above example results in the following log messages:
 
 .. code-block:: none
 		
-  DEBUG 1: Opening data file: PYTHON_NUMPY
-  Input File: 'data/python/fcst.txt'
-  Data Name : 'FCST'
-  Data Shape: (129, 185)
-  Data Type:  dtype('float64')
-  Attributes: {'name': 'FCST',  'long_name': 'FCST_word',
-               'level': 'Surface', 'units': 'None',
-               'init': '20050807_000000', 'valid': '20050807_120000',
-               'lead': '120000',  'accum': '120000'
-               'grid': {...} } 
-  DEBUG 1: Creating postscript file: fcst.ps
+   DEBUG 1: Opening data file: PYTHON_NUMPY
+   Input File: 'data/python/fcst.txt'
+   Data Name : 'FCST'
+   Data Shape: (129, 185)
+   Data Type:  dtype('float64')
+   Attributes: {'name': 'FCST',  'long_name': 'FCST_word',
+                'level': 'Surface', 'units': 'None',
+                'init': '20050807_000000', 'valid': '20050807_120000',
+                'lead': '120000',  'accum': '120000'
+                'grid': {...} } 
+   DEBUG 1: Creating postscript file: fcst.ps
 
 Special Case for Ensemble-Stat, Series-Analysis, and MTD
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -309,11 +314,12 @@ Since Ensemble-Stat, Series-Analysis, and MTD read multiple input files, a diffe
 On the command line for any of the MET tools, specify the path to the input gridded data file(s) as the usage statement for the tool indicates. Do **not** substitute in **PYTHON_NUMPY** or **PYTHON_XARRAY** on the command line for this case. Instead, in the config file dictionary set the **file_type** entry to either **PYTHON_NUMPY** or **PYTHON_XARRAY** to activate Python embedding in MET. Then, in the **name** entry of the config file dictionaries for the forecast or observation data, list the full path to the Python script to be run followed by any command line arguments for that script. However, in the Python command, replace the name of the input gridded data file with the constant string **MET_PYTHON_INPUT_ARG**. When looping over multiple input files, the MET tools will replace that constant **MET_PYTHON_INPUT_ARG** with the path to the file currently being processed. The example plot_data_plane command listed below yields the same result as the example shown above, but using the approach for this special case:
 
 .. code-block:: none
-		
-  plot_data_plane data/python/fcst.txt fcst.ps \
-    'name="scripts/python/examples/read_ascii_numpy.py MET_PYTHON_INPUT_ARG FCST"; \
-     file_type=PYTHON_NUMPY;' \
-    -title "Python enabled plot_data_plane"
+   :caption: plot_data_plane Python Embedding using MET_PYTHON_INPUT_ARG		
+
+   plot_data_plane data/python/fcst.txt fcst.ps \
+   name="scripts/python/examples/read_ascii_numpy.py MET_PYTHON_INPUT_ARG FCST"; \
+   file_type=PYTHON_NUMPY;' \
+   -title "Python enabled plot_data_plane"
 
 Examples of Python Embedding for 2D Gridded Dataplanes
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -321,12 +327,12 @@ Examples of Python Embedding for 2D Gridded Dataplanes
 **GridStat with Python embedding for forecast and observations**
 
 .. code-block:: none
-   :caption: GridStat Command
+   :caption: GridStat Command with Dual Python Embedding
 
    grid_stat 'PYTHON_NUMPY' 'PYTHON_NUMPY' GridStat_config -outdir /path/to/output
 
 .. code-block:: none
-   :caption: GridStat Config
+   :caption: GridStat Config with Dual Python Embedding
 
    fcst = {
       field = [
@@ -343,10 +349,6 @@ Examples of Python Embedding for 2D Gridded Dataplanes
          }
       ];
     }
-
-1. TODO: MET commands
-2. TODO: Python Scripts
-3. TODO: Scripts and stuff from the DTC webpage?
 
 .. _pyembed-point-obs-data:
 
@@ -424,19 +426,20 @@ Running Python Embedding for Point Observations
 The Point2Grid, Plot-Point-Obs, Ensemble-Stat, and Point-Stat tools support Python embedding for point observations. Python embedding for these tools can be invoked directly on the command line by replacing the input MET NetCDF point observation file name with the **full path** to the Python script and any arguments. The Python command must begin with the prefix **PYTHON_NUMPY=**. The full command should be enclosed in quotes to prevent embedded whitespace from causing parsing errors. An example of this is shown below for Plot-Point-Obs:
 
 .. code-block:: none
+   :caption: plot_point_obs with Python Embedding
 
-                plot_point_obs \
-                "PYTHON_NUMPY=python/examples/read_ascii_point.py data/sample_obs/ascii/sample_ascii_obs.txt" \
-                output_image.ps
+   plot_point_obs \
+   "PYTHON_NUMPY=python/examples/read_ascii_point.py data/sample_obs/ascii/sample_ascii_obs.txt" \
+   output_image.ps
 
 The ASCII2NC tool also supports Python embedding, however invoking it varies slightly from other MET tools. For ASCII2NC, Python embedding is used by providing the "-format python" option on the command line. With this option, point observations may be passed as input. An example of this is shown below:
 
 .. code-block:: none
+   :caption: ascii2nc with Python Embedding
 
-                ascii2nc -format python \
-                "python/examples/read_ascii_point.py data/sample_obs/ascii/sample_ascii_obs.txt" \
-                sample_ascii_obs_python.nc
-
+   ascii2nc -format python \
+   "python/examples/read_ascii_point.py data/sample_obs/ascii/sample_ascii_obs.txt" \
+   sample_ascii_obs_python.nc
 
 Both of the above examples use the **read_ascii_point.py** example script which is included with the MET code. It reads ASCII data in MET's 11-column point observation format and stores it in a Pandas DataFrame to be read by the MET tools using Python embedding for point data. The **read_ascii_point.py** example script can be found in:
 
@@ -447,20 +450,94 @@ Both of the above examples use the **read_ascii_point.py** example script which 
 Examples of Python Embedding for Point Observations
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-TODO: Add some more examples here?
+**PointStat with Python embedding for forecast and observations**
+
+.. code-block:: none
+   :caption: PointStat Command with Dual Python Embedding
+
+   point_stat 'PYTHON_NUMPY' 'PYTHON_NUMPY' PointStat_config -outdir /path/to/output
+
+.. code-block:: none
+   :caption: PointStat Config with Dual Python Embedding
+
+   fcst = {
+      field = [
+         {
+           name = "/path/to/fcst/python/script.py python_arg1 python_arg2";
+         }
+      ];
+    }
+
+    obs = {
+      field = [
+         {
+           name = "/path/to/obs/python/script.py python_arg1 python_arg2";
+         }
+      ];
+    }
 
 .. _pyembed-mpr-data:
 
-Python Embedding for MPR data
+Python Embedding for MPR Data
 -----------------------------
 
-The Stat-Analysis tool supports the "-lookin python" option. With this option, matched pair (MPR) data may be passed as input. An example of this is provided in :numref:`StA-pyembed`. That example uses the **read_ascii_mpr.py** sample script which is included with the MET code. It reads MPR data and stores it in a Pandas dataframe to be read by the Stat-Analysis tool with Python.
+The MET Stat-Analysis tool also supports Python embedding. By using the command line option **-lookin python**, Stat-Analysis can read matched pair (MPR) data formatted in the MET MPR line-type format via Python.
+
+.. note::
+
+   This functionality assumes you are passing only the MPR line type information, and not other statistical line types. Sometimes users configure MET tools to write the MPR line type to the STAT file (along with all other line types). The example below will not work for those files, but rather only files from MET tools containing just the MPR line type information, or optionally, data in another format that the user adapts to the MPR line type format.
+
+Python Script Requirements for MPR Data
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+1. The data must be stored in a variable with the name **mpr_data**
+
+2. The **mpr_data** variable must be a Python list representation of a NumPy N-D Array created from a Pandas DataFrame
+
+3. The **met_data** variable must have data in **exactly** 36 columns, corresponding to the summation of the :ref:`common STAT output<table_PS_header_info_point-stat_out>` and the :ref:`MPR line type output<table_PS_format_info_MPR>`.
+
+If a user does not have an existing MPR line type file created by the MET tools, they will need to map their data into the 36 columns expected by Stat-Analysis for the MPR line type data. If a user already has MPR line type files, the most direct way for a user to read MPR line type data is to model their Python script after the sample **read_ascii_mpr.py** script. Sample code is included here for convenience:
+
+.. code-block:: Python
+   :caption: Reading MPR line types with Pandas
+
+   # Open the MPR line type file
+   mpr_dataframe = pd.read_csv(input_mpr_file,\
+                               header=None,\
+                               delim_whitespace=True,\
+                               keep_default_na=False,\
+                               skiprows=1,\
+                               usecols=range(1,36),\
+                               dtype=str)
+
+   # Convert to the variable MET expects
+   met_data = mpr_dataframe.values.tolist()
+
+Running Python Embedding for MPR Data
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Stat-Analysis can be run using the **-lookin python** command line option:
+
+.. code-block:: none
+   :caption: Stat-Analysis with Python Embedding of MPR Data
+   
+   stat_analysis \
+   -lookin python MET_BASE/python/examples/read_ascii_mpr.py point_stat_mpr.txt \
+   -job aggregate_stat -line_type MPR -out_line_type CNT \
+   -by FCST_VAR,FCST_LEV
+
+In this example, rather than passing the MPR output lines from Point-Stat directly into Stat-Analysis (which is the typical approach), the **read_ascii_mpr.py** Python embedding script reads that file and passes the data to Stat-Analysis. The aggregate_stat job is defined on the command line and CNT statistics are derived from the MPR input data. Separate CNT statistics are computed for each unique combination of FCST_VAR and FCST_LEV present in the input.
 
 The **read_ascii_mpr.py** sample script can be found in:
 
 • MET installation directory in *scripts/python/examples*.
 
 • `MET GitHub repository <https://github.com/dtcenter/MET>`_ in *MET/scripts/python/examples*.
+
+Examples of Python Embedding for MPR Data
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+TODO: Is there another example that might be useful here? Probably not I suppose.
 
 MET Python Module
 =================
