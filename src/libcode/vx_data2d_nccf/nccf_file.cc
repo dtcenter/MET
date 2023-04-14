@@ -902,7 +902,7 @@ double NcCfFile::getData(NcVar * var, const LongArray & a) const
   double missing_value = get_var_missing_value(var);
   get_var_fill_value(var, fill_value);
 
-  status = get_nc_data(var, &d, (long *)a);
+  status = get_nc_data(var, &d, a);
 
   if (!status)
   {
@@ -1049,11 +1049,11 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
   double *d = new double[plane_size];
 
   size_t dim_size;
-  long offsets[dim_count];
-  long lengths[dim_count];
+  LongArray offsets;
+  LongArray lengths;
   for (int k=0; k<dim_count; k++) {
-    offsets[k] = (a[k] == vx_data2d_star) ? 0 : a[k];
-    lengths[k] = 1;
+    offsets.add((a[k] == vx_data2d_star) ? 0 : a[k]);
+    lengths.add(1);
     dim_size = v->getDim(k).getSize();
     if (dim_size < offsets[k]) {
       mlog << Error << "\n" << method_name
@@ -3202,9 +3202,11 @@ LatLonData NcCfFile::get_data_from_lat_lon_vars(NcVar *lat_var, NcVar *lon_var,
   bool lat_first = false;
   if (two_dim_coord) {
     lat_first = (lat_counts == get_dim_size(lat_var, 0));
-    long cur[2], length[2];
-    cur[0] = cur[1] = 0;
-    length[0] = length[1] = 1;
+    LongArray cur, length;  // {0,0}, {1,1}
+    cur.add(0);
+    cur.add(0);
+    length.add(1);
+    length.add(1);
     if (lat_first) length[0] = lat_counts;
     else length[1] = lat_counts;
     get_nc_data(lat_var,lat_values, length, cur);
