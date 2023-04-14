@@ -11,6 +11,7 @@ class dataplane():
    ##
 
    #@staticmethod
+   # Python dictionary items:
    #      'name': data name
    # 'long_name': descriptive name
    #     'valid': valid time (format = 'yyyymmdd_hhmmss')
@@ -24,7 +25,7 @@ class dataplane():
    #              - a gridded data file name
    #              - MET specific grid string, "lambert 185 129 12.19 -133.459 -95 40.635 6371.2 25 25 N"
    #              - a dictionary for the grid information
-   def create_header_attrs(data_name, valid_time, init_time, lead_time,
+   def set_dataplane_attrs(data_name, valid_time, init_time, lead_time,
                            accum_time, v_level, units, grid_info, long_name=None):
       hdr_attrs = {
 
@@ -34,7 +35,7 @@ class dataplane():
          'accum': accum_time,
 
          'name':      data_name,
-         'long_name': long_name if long_name is not None and long_name != "" else data_name + '_word',
+         'long_name': long_name if long_name is not None and long_name != "" else data_name + '_long',
          'level':     v_level,
          'units':     units,
 

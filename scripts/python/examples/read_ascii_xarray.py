@@ -37,8 +37,8 @@ except NameError:
    ##  create the metadata dictionary
    ##
 
-# attrs is a dictionary which contains header data for the dataplane.
-# attrs should have 9 members with string type data:
+# attrs is a dictionary which contains attributes describing the dataplane.
+# attrs should have 9 items, each of data type string:
 #      'name': data name
 # 'long_name': descriptive name
 #     'valid': valid time (format = 'yyyymmdd_hhmmss')
@@ -85,7 +85,7 @@ grid_lambert_conformal = {
 }
 
 long_name = data_name + "_word"
-attrs = dataplane.create_header_attrs(data_name, valid_time, init_time,
+attrs = dataplane.set_dataplane_attrs(data_name, valid_time, init_time,
                                       lead_time, accum_time, v_level, units,
                                       grid_lambert_conformal)
 
