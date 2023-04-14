@@ -318,6 +318,32 @@ On the command line for any of the MET tools, specify the path to the input grid
 Examples of Python Embedding for 2D Gridded Dataplanes
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+**GridStat with Python embedding for forecast and observations**
+
+.. code-block:: none
+   :caption: GridStat Command
+
+   grid_stat 'PYTHON_NUMPY' 'PYTHON_NUMPY' GridStat_config -outdir /path/to/output
+
+.. code-block:: none
+   :caption: GridStat Config
+
+   fcst = {
+      field = [
+         {
+           name = "/path/to/fcst/python/script.py python_arg1 python_arg2";
+         }
+      ];
+    }
+
+    obs = {
+      field = [
+         {
+           name = "/path/to/obs/python/script.py python_arg1 python_arg2";
+         }
+      ];
+    }
+
 1. TBD: MET commands
 2. TBD: Python Scripts
 3. TBD: Scripts and stuff from the DTC webpage?
