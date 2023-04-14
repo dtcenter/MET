@@ -2967,6 +2967,8 @@ void TCStatJobRIRW::clear() {
    for(i=0; i<4; i++) DumpFileCTC[i].clear();
    close_dump_file();
 
+   close_stat_file();
+   
    // Set to default values
    OutAlpha = default_tc_alpha;
    OutLineType.clear();
@@ -3166,15 +3168,22 @@ void TCStatJobRIRW::do_job(const StringArray &file_list,
    close_dump_file();
 
    // Process the RI/RW job output
-   if(JobOut) do_output(*JobOut);
-   else       do_output(cout);
 
-   // New changes
-   // Create new function do_stat_outut
-   if(StatOut) {
+   if(StatOut)
       do_stat_output(*StatOut);
-      close_stat_file();
-   }
+   else if(JobOut)
+      do_output(*JobOut);
+   else
+      do_output(cout);
+
+   // Close the stat file
+   close_stat_file();
+   
+   // New changes
+   //if(StatOut) {
+   //   do_stat_output(*StatOut);
+   //   close_stat_file();
+   //}
 
    return;
 }
@@ -3676,7 +3685,6 @@ void TCStatJobRIRW::setup_stat_file(int n_row) {
       switch(cur_lt) {
          case stat_ctc:    c = n_ctc_columns;          break;
          case stat_cts:    c = n_cts_columns;          break;
-         case stat_mpr:    c = n_mpr_columns;          break;   
          default:
          mlog << Error << "\nSTATAnalysisJob::setup_stat_file() -> "
               << "unexpected stat line type \"" << statlinetype_to_string(cur_lt)
@@ -3718,7 +3726,6 @@ void TCStatJobRIRW::setup_stat_file(int n_row) {
       switch(out_lt) {
          case stat_ctc:    write_header_row       (ctc_columns, n_ctc_columns, 1,           stat_at, 0, 0); break;
          case stat_cts:    write_header_row       (cts_columns, n_cts_columns, 1,           stat_at, 0, 0); break;
-         case stat_mpr:    write_header_row       (mpr_columns, n_mpr_columns, 1,           stat_at, 0, 0); break;
          // Write only header columns for unspecified line type
          case no_stat_line_type:
             write_header_row       ((const char **) 0, 0, 1,                 stat_at, 0, 0); break;
