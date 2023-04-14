@@ -407,10 +407,7 @@ To provide the data that MET expects for point observations, the user is encoura
      - numeric
      - Observation Value
 
-Creating the MET 11-column variable from a Pandas DataFrame
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-To create the required object for MET, use the **.values** property of the Pandas DataFrame and the **.tolist()** method of the NumPy N-D Array. For example:
+To create the variable for MET, use the **.values** property of the Pandas DataFrame and the **.tolist()** method of the NumPy N-D Array. For example:
 
 .. code-block:: Python
    :caption: Convert Pandas DataFrame to MET variable
