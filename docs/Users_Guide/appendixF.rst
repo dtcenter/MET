@@ -441,7 +441,6 @@ The ASCII2NC tool also supports Python embedding, however invoking it varies sli
    "python/examples/read_ascii_point.py data/sample_obs/ascii/sample_ascii_obs.txt" \
    sample_ascii_obs_python.nc
 
-
 Both of the above examples use the **read_ascii_point.py** example script which is included with the MET code. It reads ASCII data in MET's 11-column point observation format and stores it in a Pandas DataFrame to be read by the MET tools using Python embedding for point data. The **read_ascii_point.py** example script can be found in:
 
 • MET installation directory in *scripts/python/examples*.
@@ -479,16 +478,66 @@ Examples of Python Embedding for Point Observations
 
 .. _pyembed-mpr-data:
 
-Python Embedding for MPR data
+Python Embedding for MPR Data
 -----------------------------
 
-The Stat-Analysis tool supports the "-lookin python" option. With this option, matched pair (MPR) data may be passed as input. An example of this is provided in :numref:`StA-pyembed`. That example uses the **read_ascii_mpr.py** sample script which is included with the MET code. It reads MPR data and stores it in a Pandas dataframe to be read by the Stat-Analysis tool with Python.
+The MET Stat-Analysis tool also supports Python embedding. By using the command line option **-lookin python**, Stat-Analysis can read matched pair (MPR) data formatted in the MET MPR line-type format via Python.
+
+.. note::
+
+   This functionality assumes you are passing only the MPR line type information, and not other statistical line types. Sometimes users configure MET tools to write the MPR line type to the STAT file (along with all other line types). The example below will not work for those files, but rather only files from MET tools containing just the MPR line type information, or optionally, data in another format that the user adapts to the MPR line type format.
+
+Python Script Requirements for MPR Data
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+1. The data must be stored in a variable with the name **mpr_data**
+
+2. The **mpr_data** variable must be a Python list representation of a NumPy N-D Array created from a Pandas DataFrame
+
+3. The **met_data** variable must have data in **exactly** 36 columns, corresponding to the summation of the :ref:`_table_PS_header_info_point-stat_out<common STAT output` and the :ref:`_table_PS_format_info_MPR<MPR line type output>`.
+
+If a user does not have an existing MPR line type file created by the MET tools, they will need to map their data into the 36 columns expected by Stat-Analysis for the MPR line type data. If a user already has MPR line type files, the most direct way for a user to read MPR line type data is to model their Python script after the sample **read_ascii_mpr.py** script. Sample code is included here for convenience:
+
+.. code-block:: Python
+   :caption: Reading MPR line types with Pandas
+
+   # Open the MPR line type file
+   mpr_dataframe = pd.read_csv(input_mpr_file,\
+                               header=None,\
+                               delim_whitespace=True,\
+                               keep_default_na=False,\
+                               skiprows=1,\
+                               usecols=range(1,36),\
+                               dtype=str)
+
+   # Convert to the variable MET expects
+   met_data = mpr_dataframe.values.tolist()
+
+Running Python Embedding for MPR Data
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Stat-Analysis can be run using the **-lookin python** command line option:
+
+.. code-block:: none
+   :caption: Stat-Analysis with Python Embedding of MPR Data
+   
+   stat_analysis \
+   -lookin python MET_BASE/python/examples/read_ascii_mpr.py point_stat_mpr.txt \
+   -job aggregate_stat -line_type MPR -out_line_type CNT \
+   -by FCST_VAR,FCST_LEV
+
+In this example, rather than passing the MPR output lines from Point-Stat directly into Stat-Analysis (which is the typical approach), the **read_ascii_mpr.py** Python embedding script reads that file and passes the data to Stat-Analysis. The aggregate_stat job is defined on the command line and CNT statistics are derived from the MPR input data. Separate CNT statistics are computed for each unique combination of FCST_VAR and FCST_LEV present in the input.
 
 The **read_ascii_mpr.py** sample script can be found in:
 
 • MET installation directory in *scripts/python/examples*.
 
 • `MET GitHub repository <https://github.com/dtcenter/MET>`_ in *MET/scripts/python/examples*.
+
+Examples of Python Embedding for MPR Data
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+TODO: Is there another example that might be useful here? Probably not I suppose.
 
 MET Python Module
 =================
