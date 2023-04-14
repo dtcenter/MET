@@ -125,131 +125,131 @@ int multivar_frontend(const StringArray & Argv)
 
 {
 
-const int Argc = Argv.n();
+   const int Argc = Argv.n();
 
-if ( Argc < 4 )  multivar_usage();
+   if ( Argc < 4 )  multivar_usage();
 
-int j, n_files;
-StringArray fcst_filenames;
-StringArray  obs_filenames;
-BoolCalc f_calc, o_calc ;
+   int j, n_files;
+   StringArray fcst_filenames;
+   StringArray  obs_filenames;
+   BoolCalc f_calc, o_calc ;
 
-process_command_line(Argv);
+   process_command_line(Argv);
 
-read_config(config_file);
+   read_config(config_file);
 
-multivar_consistency_checks(fcst_filenames, obs_filenames, f_calc, o_calc, n_files);
+   multivar_consistency_checks(fcst_filenames, obs_filenames, f_calc, o_calc, n_files);
 
-mlog << Debug(2) << "\n" << sep << "\n";
+   mlog << Debug(2) << "\n" << sep << "\n";
 
    //
    //  do the individual mode runs
    //
 
-vector<MultiVarData *> mvd;
-StringArray nc_files;
+   vector<MultiVarData *> mvd;
+   StringArray nc_files;
 
-for (j=0; j<n_files; ++j)  {
+   for (j=0; j<n_files; ++j)  {
 
-   mlog << Debug(2) 
-        << "\n starting mode run " << (j + 1) << " of " << n_files
-        << "\n" << sep << "\n";
-   ConcatString dir = set_multivar_dir(j);
-   MultiVarData *mvdi = process_multivar_data(j, fcst_filenames[j], obs_filenames[j], dir);
-   mvd.push_back(mvdi);
-   mlog << Debug(2) << "\n finished mode run " << (j + 1) << " of " << n_files
-        << "\n" << sep << "\n";
-   StringArray a = get_filenames_from_dir(dir.text(), "mode_", ".nc");
-   nc_files.add(a);
+      mlog << Debug(2) 
+           << "\n starting mode run " << (j + 1) << " of " << n_files
+           << "\n" << sep << "\n";
+      ConcatString dir = set_multivar_dir(j);
+      MultiVarData *mvdi = process_multivar_data(j, fcst_filenames[j], obs_filenames[j], dir);
+      mvd.push_back(mvdi);
+      mlog << Debug(2) << "\n finished mode run " << (j + 1) << " of " << n_files
+           << "\n" << sep << "\n";
+      StringArray a = get_filenames_from_dir(dir.text(), "mode_", ".nc");
+      nc_files.add(a);
 
-}   //  for j
+   }   //  for j
 
-mlog << Debug(2) << "\n finished with individual mode runs " << "\n" << sep << "\n";
-nc_files.dump(cout, 0);
+   mlog << Debug(2) << "\n finished with individual mode runs " << "\n" << sep << "\n";
+   nc_files.dump(cout, 0);
 
    //
    //  set the BoolPlane values using the mvd content
    //
 
-BoolPlane * f_plane = new BoolPlane [n_files];
-BoolPlane * o_plane = new BoolPlane [n_files];
+   BoolPlane * f_plane = new BoolPlane [n_files];
+   BoolPlane * o_plane = new BoolPlane [n_files];
 
-for (j=0; j<n_files; ++j)  {
+   for (j=0; j<n_files; ++j)  {
 
-  //objects_from_netcdf(nc_files[j].c_str(), do_clusters, f_plane[j], o_plane[j]);  
-  objects_from_arrays(do_clusters, mvd[j]->fcst_obj_data, mvd[j]->obs_obj_data, mvd[j]->nx, mvd[j]->ny, f_plane[j], o_plane[j]);  
+      //objects_from_netcdf(nc_files[j].c_str(), do_clusters, f_plane[j], o_plane[j]);  
+      objects_from_arrays(do_clusters, mvd[j]->fcst_obj_data, mvd[j]->obs_obj_data, mvd[j]->nx, mvd[j]->ny, f_plane[j], o_plane[j]);  
 
-}
+   }
 
    //
    //  combine the objects into super-objects
    //
 
-const int nx = f_plane[0].nx();
-const int ny = f_plane[0].ny();
-BoolPlane f_result, o_result;
+   const int nx = f_plane[0].nx();
+   const int ny = f_plane[0].ny();
+   BoolPlane f_result, o_result;
 
-f_result.set_size(nx, ny);
-o_result.set_size(nx, ny);
+   f_result.set_size(nx, ny);
+   o_result.set_size(nx, ny);
 
-combine_boolplanes(f_plane, n_files, f_calc, f_result);
-combine_boolplanes(o_plane, n_files, o_calc, o_result);
+   combine_boolplanes(f_plane, n_files, f_calc, f_result);
+   combine_boolplanes(o_plane, n_files, o_calc, o_result);
 
    //
    // Filter the data to within the superobjects only and do statistics by invoking mode algorithm again
    // on the masked data
    //
  
-for (j=0; j<n_files; ++j) {
+   for (j=0; j<n_files; ++j) {
 
-  if (!config.multivar_intensity[j]) {
-    mlog << Debug(2) << "\n SKIPPING field " << j << " for masked intensities \n";
-    continue;
-  }
+      if (!config.multivar_intensity[j]) {
+         mlog << Debug(2) << "\n SKIPPING field " << j << " for masked intensities \n";
+         continue;
+      }
 
-  mlog << Debug(2) 
-       << "\n starting masked data mode run " << (j + 1) << " of " << n_files
-       << "\n" << sep << "\n";
+      mlog << Debug(2) 
+           << "\n starting masked data mode run " << (j + 1) << " of " << n_files
+           << "\n" << sep << "\n";
 
-  // same here as above, overwriting contents written to previously 
-  ConcatString dir = set_multivar_dir(j);
+      // same here as above, overwriting contents written to previously 
+      ConcatString dir = set_multivar_dir(j);
 
-  process_masked_multivar_data(j, f_result, o_result, nx, ny, dir, *mvd[j]);
-  delete mvd[j];
-  mvd[j] = 0;
- }
+      process_masked_multivar_data(j, f_result, o_result, nx, ny, dir, *mvd[j]);
+      delete mvd[j];
+      mvd[j] = 0;
+   }
  
-mlog << Debug(2) << "\n finished with individual masked mode runs " << "\n" << sep << "\n";
+   mlog << Debug(2) << "\n finished with individual masked mode runs " << "\n" << sep << "\n";
 
    //
    //  write the superobject output files
    //
 
-MetNcFile met;   //  mostly to get grid
-ConcatString path;
-path = nc_files[0];
+   MetNcFile met;   //  mostly to get grid
+   ConcatString path;
+   path = nc_files[0];
 
-if ( ! met.open(path.text()) )  {
+   if ( ! met.open(path.text()) )  {
 
-   mlog << Error << "\n" << program_name
-        << ": unable to open mode output file \""
-        << path << "\"\n\n";
+      mlog << Error << "\n" << program_name
+           << ": unable to open mode output file \""
+           << path << "\"\n\n";
 
-   exit ( 1 );
+      exit ( 1 );
 
-}
+   }
 
-ConcatString fcst_file, obs_file;
-fcst_file << outdir << "/" << fcst_super_nc_filename;
- obs_file << outdir << "/" <<  obs_super_nc_filename;
+   ConcatString fcst_file, obs_file;
+   fcst_file << outdir << "/" << fcst_super_nc_filename;
+   obs_file << outdir << "/" <<  obs_super_nc_filename;
 
-write_output_nc_file(fcst_file.text(), met, f_result);
-write_output_nc_file( obs_file.text(), met, o_result);
+   write_output_nc_file(fcst_file.text(), met, f_result);
+   write_output_nc_file( obs_file.text(), met, o_result);
 
    //
    //  done
    //
-return ( 0 );
+   return ( 0 );
 
 }
 
@@ -261,9 +261,9 @@ void set_outdir(const StringArray & a)
 
 {
 
-outdir = a[0];
+   outdir = a[0];
 
-return;
+   return;
 
 }
 
@@ -275,13 +275,13 @@ void set_logfile(const StringArray & a)
 
 {
 
-ConcatString filename;
+   ConcatString filename;
 
-filename = a[0];
+   filename = a[0];
 
-mlog.open_log_file(filename);
+   mlog.open_log_file(filename);
 
-return;
+   return;
 
 }
 
@@ -293,9 +293,9 @@ void set_verbosity (const StringArray & a)
 
 {
 
-mlog.set_verbosity_level(atoi(a[0].c_str()));
+   mlog.set_verbosity_level(atoi(a[0].c_str()));
 
-return;
+   return;
 
 }
 
@@ -307,13 +307,13 @@ void read_config(const string & filename)
 
 {
 
-ConcatString path;
+   ConcatString path;
 
-path = replace_path(mode_default_config);
+   path = replace_path(mode_default_config);
 
-config.read_config(path.c_str(), filename.c_str());
+   config.read_config(path.c_str(), filename.c_str());
 
-return;
+   return;
 
 }
 
@@ -325,19 +325,19 @@ void process_command_line(const StringArray & argv)
 
 {
 
-CommandLine cline;
+   CommandLine cline;
 
-mode_path = argv[0];
+   mode_path = argv[0];
 
-cline.set(argv);
+   cline.set(argv);
 
-cline.set_usage(multivar_usage);
+   cline.set_usage(multivar_usage);
 
-cline.add(set_outdir,    "-outdir", 1);
-cline.add(set_logfile,   "-log",    1);
-cline.add(set_verbosity, "-v",      1);
+   cline.add(set_outdir,    "-outdir", 1);
+   cline.add(set_logfile,   "-log",    1);
+   cline.add(set_verbosity, "-v",      1);
 
-cline.parse();
+   cline.parse();
 
    //
    //  should be 3 arguments left
@@ -345,11 +345,11 @@ cline.parse();
 
 
    fcst_fof = cline[0];
-    obs_fof = cline[1];
-config_file = cline[2];
+   obs_fof = cline[1];
+   config_file = cline[2];
 
 
-return;
+   return;
 
 }
 
@@ -359,132 +359,132 @@ void multivar_consistency_checks(StringArray &fcst_filenames, StringArray &obs_f
                                  BoolCalc &f_calc, BoolCalc &o_calc, int &n_files)
 {
 
-  //
-  //  make sure the multivar logic programs are in the config file
-  //
+   //
+   //  make sure the multivar logic programs are in the config file
+   //
 
-if ( config.fcst_multivar_logic.empty() )  {
+   if ( config.fcst_multivar_logic.empty() )  {
 
-   mlog << Error << "\n" << program_name
-        << ": fcst multivar logic not specified!\n\n";
-   exit ( 1 );
+      mlog << Error << "\n" << program_name
+           << ": fcst multivar logic not specified!\n\n";
+      exit ( 1 );
 
-}
+   }
 
-if ( config.obs_multivar_logic.empty() )  {
+   if ( config.obs_multivar_logic.empty() )  {
 
-   mlog << Error << "\n" << program_name
-        << ": obs multivar logic not specified!\n\n";
-   exit ( 1 );
+      mlog << Error << "\n" << program_name
+           << ": obs multivar logic not specified!\n\n";
+      exit ( 1 );
 
-}
+   }
 
-  //
-  // make sure there are the same number of obs and fcst files
-  //
+   //
+   // make sure there are the same number of obs and fcst files
+   //
 
-fcst_filenames = parse_ascii_file_list(fcst_fof.c_str());
-obs_filenames = parse_ascii_file_list(obs_fof.c_str());
+   fcst_filenames = parse_ascii_file_list(fcst_fof.c_str());
+   obs_filenames = parse_ascii_file_list(obs_fof.c_str());
 
-if ( fcst_filenames.n() != obs_filenames.n() )  {
+   if ( fcst_filenames.n() != obs_filenames.n() )  {
 
-   mlog << Error << "\n" << program_name
-        << ": number of fcst and obs files should be the same!\n\n";
-   exit ( 1 );
+      mlog << Error << "\n" << program_name
+           << ": number of fcst and obs files should be the same!\n\n";
+      exit ( 1 );
 
-}
+   }
 
    //
    //  check for multivar being actually multi.
    //
 
-n_files = fcst_filenames.n();
-if ( n_files < 2 )  {
+   n_files = fcst_filenames.n();
+   if ( n_files < 2 )  {
 
-   mlog << Error << "\n" << program_name
-        << ": want at least 2 input forecast files in multivar mode, got " << n_files << "\n\n";
-   exit ( 1 );
+      mlog << Error << "\n" << program_name
+           << ": want at least 2 input forecast files in multivar mode, got " << n_files << "\n\n";
+      exit ( 1 );
 
-}
+   }
    //
    // set values in the f_calc and o_calc objects, check that the logic is in range and the right length
    //
 
-f_calc.set(config.fcst_multivar_logic.text());
-o_calc.set(config.obs_multivar_logic.text());
+   f_calc.set(config.fcst_multivar_logic.text());
+   o_calc.set(config.obs_multivar_logic.text());
 
-if (!f_calc.check_args(n_files)) {
-  exit ( 1 );
-}
+   if (!f_calc.check_args(n_files)) {
+      exit ( 1 );
+   }
 
-if (!o_calc.check_args(n_files)) {
-  exit ( 1 );
-}
+   if (!o_calc.check_args(n_files)) {
+      exit ( 1 );
+   }
 
    //
    // check that the multivar_intensity vector is the right length.
    // If empty set to the default of all FALSE
    //
 
-int num_multivar = (int)config.multivar_intensity.size();
-if (num_multivar == n_files) {
-  return;
-}
+   int num_multivar = (int)config.multivar_intensity.size();
+   if (num_multivar == n_files) {
+      return;
+   }
 
-if (num_multivar == 0) {
+   if (num_multivar == 0) {
 
-  mlog << Warning << "\nmultivar_frontend() -> "
-       << "empty multivar intensity array, setting to all FALSE \n\n";
+      mlog << Warning << "\nmultivar_frontend() -> "
+           << "empty multivar intensity array, setting to all FALSE \n\n";
 
-  for (int i=0; i<n_files; ++i) {
-    config.multivar_intensity.push_back(false);
-  }
+      for (int i=0; i<n_files; ++i) {
+         config.multivar_intensity.push_back(false);
+      }
 
-} else {
+   } else {
 
-  mlog << Error << "\n" << program_name 
-       << ": wrong size multivar_intensity array, wanted "
-       << n_files << " got " << config.multivar_intensity.size() << "\n\n";
-  exit ( 1 );
-}
+      mlog << Error << "\n" << program_name 
+           << ": wrong size multivar_intensity array, wanted "
+           << n_files << " got " << config.multivar_intensity.size() << "\n\n";
+      exit ( 1 );
+   }
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 ConcatString set_multivar_dir(int j)
 {
-ConcatString dir;
-int status;
-char junk [256];
+   ConcatString dir;
+   int status;
+   char junk [256];
 
    //
    //  test to see of the output directory for this
    //    mode runs exists, and if not, create it
    //
 
-dir.clear();
-if ( outdir.length() > 0 )  dir << outdir << '/';
-snprintf(junk, sizeof(junk), "%02d", j);
-dir << junk;
+   dir.clear();
+   if ( outdir.length() > 0 )  dir << outdir << '/';
+   snprintf(junk, sizeof(junk), "%02d", j);
+   dir << junk;
 
-if ( ! directory_exists(dir.c_str()) )  {
+   if ( ! directory_exists(dir.c_str()) )  {
 
-   mlog << Debug(2)
-        << program_name << ": creating output directory \""
-        << dir << "\"\n\n";
-
-   status = mkdir(dir.c_str(), dir_creation_mode);       
-
-   if ( status < 0 )  {
-
-      mlog << Error << "\n" << program_name
-           << ": unable to create output directory \""
+      mlog << Debug(2)
+           << program_name << ": creating output directory \""
            << dir << "\"\n\n";
 
-      exit ( 1 );
+      status = mkdir(dir.c_str(), dir_creation_mode);       
+
+      if ( status < 0 )  {
+
+         mlog << Error << "\n" << program_name
+              << ": unable to create output directory \""
+              << dir << "\"\n\n";
+
+         exit ( 1 );
+      }
    }
-}
-return dir;
+   return dir;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -492,53 +492,53 @@ return dir;
 MultiVarData *process_multivar_data(int j, const string &fcst_filename, const string &obs_filename,
                                     const ConcatString &dir)
 {
-ConcatString command;
-StringArray a, mode_argv;
+   ConcatString command;
+   StringArray a, mode_argv;
 
    //
    //  build the command for running mode
    //
 
-mode_argv.clear();
-mode_argv.add(mode_path);
-mode_argv.add(fcst_filename);
-mode_argv.add(obs_filename);
-mode_argv.add(config_file);
+   mode_argv.clear();
+   mode_argv.add(mode_path);
+   mode_argv.add(fcst_filename);
+   mode_argv.add(obs_filename);
+   mode_argv.add(config_file);
 
-command << cs_erase
-        << mode_path     << ' '
-        << fcst_filename << ' '
-        << obs_filename  << ' '
-        << config_file;
+   command << cs_erase
+           << mode_path     << ' '
+           << fcst_filename << ' '
+           << obs_filename  << ' '
+           << config_file;
 
-mode_argv.add("-v");
-char junk [256];
-snprintf(junk, sizeof(junk), "%d", mlog.verbosity_level());
-mode_argv.add(junk);
+   mode_argv.add("-v");
+   char junk [256];
+   snprintf(junk, sizeof(junk), "%d", mlog.verbosity_level());
+   mode_argv.add(junk);
 
-mode_argv.add("-outdir");
-mode_argv.add(dir);
+   mode_argv.add("-outdir");
+   mode_argv.add(dir);
 
-command << " -v " << mlog.verbosity_level();
-command << " -outdir " << dir;
+   command << " -v " << mlog.verbosity_level();
+   command << " -outdir " << dir;
 
-mode_argv.add("-field_index");
-snprintf(junk, sizeof(junk), "%d", j);
-mode_argv.add(junk);
+   mode_argv.add("-field_index");
+   snprintf(junk, sizeof(junk), "%d", j);
+   mode_argv.add(junk);
 
-command << " -field_index " << j;
+   command << " -field_index " << j;
 
    //
    //  run mode (sort of)
    //
 
-mlog << Debug(1) << "Running mode command: \"" << command << "\"\n\n";
-ModeFrontEnd *frontend = new ModeFrontEnd;
+   mlog << Debug(1) << "Running mode command: \"" << command << "\"\n\n";
+   ModeFrontEnd *frontend = new ModeFrontEnd;
 
-int status = frontend->run(mode_argv);
-MultiVarData *mvdi = frontend->get_multivar_data();
-delete frontend;
-return mvdi;
+   int status = frontend->run(mode_argv);
+   MultiVarData *mvdi = frontend->get_multivar_data();
+   delete frontend;
+   return mvdi;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -548,30 +548,30 @@ void process_masked_multivar_data(int j, const BoolPlane &f_result,
                                   const ConcatString &dir, MultiVarData &mvd)
 {
   
-mask_data(nx, ny, f_result, mvd.Fcst_sd->data);
-mask_data(nx, ny, o_result, mvd.Obs_sd->data);
+   mask_data(nx, ny, f_result, mvd.Fcst_sd->data);
+   mask_data(nx, ny, o_result, mvd.Obs_sd->data);
 
 
-StringArray mode_argv;
-char junk [256];
+   StringArray mode_argv;
+   char junk [256];
 
    //
    //  build the command for running mode again, sort of mode
    //
-mode_argv.clear();
-mode_argv.add(mode_path);
-mode_argv.add(config_file);
-mode_argv.add("-v");
-snprintf(junk, sizeof(junk), "%d", mlog.verbosity_level());
-mode_argv.add(junk);
-mode_argv.add("-outdir");
-mode_argv.add(dir);
+   mode_argv.clear();
+   mode_argv.add(mode_path);
+   mode_argv.add(config_file);
+   mode_argv.add("-v");
+   snprintf(junk, sizeof(junk), "%d", mlog.verbosity_level());
+   mode_argv.add(junk);
+   mode_argv.add("-outdir");
+   mode_argv.add(dir);
 
-mlog << Debug(1) << "Running filtered mode \n\n";
+   mlog << Debug(1) << "Running filtered mode \n\n";
 
-ModeFrontEnd *frontend = new ModeFrontEnd;
-int status = frontend->run(mode_argv, mvd);
-delete frontend;
+   ModeFrontEnd *frontend = new ModeFrontEnd;
+   int status = frontend->run(mode_argv, mvd);
+   delete frontend;
 }
  
 ////////////////////////////////////////////////////////////////////////
@@ -581,73 +581,73 @@ void write_output_nc_file(const char * path, const MetNcFile & met, const BoolPl
 
 {
 
-NcFile nc;
-int x, y, n;
-float * data = 0;
-const Grid & grid = met.grid;
+   NcFile nc;
+   int x, y, n;
+   float * data = 0;
+   const Grid & grid = met.grid;
 
-mlog << Debug(1)
-     << "Creating NetCDF Output file: " << path << "\n";
+   mlog << Debug(1)
+        << "Creating NetCDF Output file: " << path << "\n";
 
-nc.open(string(path), NcFile::replace, NcFile::classic);
+   nc.open(string(path), NcFile::replace, NcFile::classic);
 
    //  load the data
 
-data = new float [(grid.nx())*(grid.ny())];
+   data = new float [(grid.nx())*(grid.ny())];
 
-NcDim lat_dim;
-NcDim lon_dim;
-NcVar var;
-const int nx = grid.nx();
-const int ny = grid.ny();
-vector<NcDim> vdim(2);
+   NcDim lat_dim;
+   NcDim lon_dim;
+   NcVar var;
+   const int nx = grid.nx();
+   const int ny = grid.ny();
+   vector<NcDim> vdim(2);
 
 
-for (x=0; x<nx; ++x)  {
+   for (x=0; x<nx; ++x)  {
 
-   for (y=0; y<ny; ++y)  {
+      for (y=0; y<ny; ++y)  {
 
-      n = y*nx + x;   //  should we just assume this ordering?
+         n = y*nx + x;   //  should we just assume this ordering?
 
-      if ( bp(x, y) )  data[n] =  on_value;
-      else             data[n] = off_value;
+         if ( bp(x, y) )  data[n] =  on_value;
+         else             data[n] = off_value;
+
+      }   //  for x
 
    }   //  for x
-
-}   //  for x
 
    //
    //  add global attributes and projection information
    //
 
-write_netcdf_global(&nc, path, program_name);
+   write_netcdf_global(&nc, path, program_name);
 
    //
    //  add dimensions and write projection info
    //
 
-write_netcdf_proj(&nc, grid, lat_dim, lon_dim);
+   write_netcdf_proj(&nc, grid, lat_dim, lon_dim);
 
    //
    //  variable
    //
 
-vdim[0] = lat_dim;
-vdim[1] = lon_dim;
+   vdim[0] = lat_dim;
+   vdim[1] = lon_dim;
 
-var = nc.addVar(string(super_object_var_name), ncFloat, vdim);
+   var = nc.addVar(string(super_object_var_name), ncFloat, vdim);
 
-var.putVar(data);
+   var.putVar(data);
 
    //
    //  done
    //
 
-nc.close();
+   nc.close();
 
-if ( data )  { delete [] data;  data = 0; }
+   if ( data )  { delete [] data;  data = 0; }
 
-return;
+   return;
 
 }
 
@@ -656,21 +656,21 @@ return;
 void mask_data(int nx, int ny, const BoolPlane &bp, DataPlane &data)
 {
 
-if (nx != data.nx() || ny != data.ny()) {
-  printf("ERROR dimensions don't match %d %d    %d %d\n",
-  nx, ny, data.nx(), data.ny());
-  return;
-}
+   if (nx != data.nx() || ny != data.ny()) {
+      printf("ERROR dimensions don't match %d %d    %d %d\n",
+             nx, ny, data.nx(), data.ny());
+      return;
+   }
   
-for (int x=0; x<nx; ++x)  {
+   for (int x=0; x<nx; ++x)  {
 
-   for (int y=0; y<ny; ++y)  {
+      for (int y=0; y<ny; ++y)  {
 
-      if ( bp(x, y) == false) {
-        data.set(bad_data_float, x, y);;
+         if ( bp(x, y) == false) {
+            data.set(bad_data_float, x, y);;
+         }
       }
    }
-}
 
 
 }

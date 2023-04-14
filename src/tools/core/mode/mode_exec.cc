@@ -49,9 +49,9 @@ static void nc_add_string(NcFile *, const char * text, const char * var_name, co
 ///////////////////////////////////////////////////////////////////////
 
 
-   //
-   //  Code for class ModeExecutive
-   //
+//
+//  Code for class ModeExecutive
+//
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -61,7 +61,7 @@ ModeExecutive::ModeExecutive()
 
 {
 
-init_from_scratch();
+   init_from_scratch();
 
 }
 
@@ -73,7 +73,7 @@ ModeExecutive::~ModeExecutive()
 
 {
 
-clear();
+   clear();
 
 }
 
@@ -85,12 +85,12 @@ void ModeExecutive::init_from_scratch()
 
 {
 
-fcst_mtddf = (Met2dDataFile *) 0;
- obs_mtddf = (Met2dDataFile *) 0;
+   fcst_mtddf = (Met2dDataFile *) 0;
+   obs_mtddf = (Met2dDataFile *) 0;
 
-clear();
+   clear();
 
-return;
+   return;
 
 }
 
@@ -102,37 +102,37 @@ void ModeExecutive::clear()
 
 {
 
-default_config_file.clear();
-match_config_file.clear();
-merge_config_file.clear();
+   default_config_file.clear();
+   match_config_file.clear();
+   merge_config_file.clear();
 
-fcst_file.clear();
-obs_file.clear();
+   fcst_file.clear();
+   obs_file.clear();
 
-if ( fcst_mtddf )  { delete fcst_mtddf;  fcst_mtddf = (Met2dDataFile *) 0; }
-if (  obs_mtddf )  { delete  obs_mtddf;   obs_mtddf = (Met2dDataFile *) 0; }
+   if ( fcst_mtddf )  { delete fcst_mtddf;  fcst_mtddf = (Met2dDataFile *) 0; }
+   if (  obs_mtddf )  { delete  obs_mtddf;   obs_mtddf = (Met2dDataFile *) 0; }
 
-for (int j=0; j<n_cts; ++j)  cts[j].zero_out();
+   for (int j=0; j<n_cts; ++j)  cts[j].zero_out();
 
-engine.clear_features();
-engine.clear_colors();
+   engine.clear_features();
+   engine.clear_colors();
 
-grid.clear();
+   grid.clear();
 
-xy_bb.clear();
+   xy_bb.clear();
 
-out_dir.clear();
+   out_dir.clear();
 
-data_min = data_max = 0.0;
+   data_min = data_max = 0.0;
 
-R_index = T_index = 0;
+   R_index = T_index = 0;
 
 
    //
    //  done
    //
 
-return;
+   return;
 
 }
 
@@ -144,16 +144,16 @@ void ModeExecutive::init()
 
 {
 
-Met2dDataFileFactory mtddf_factory;
+   Met2dDataFileFactory mtddf_factory;
 
-R_index = T_index = 0;
+   R_index = T_index = 0;
 
    // Create the default config file name
    default_config_file = replace_path(default_config_filename);
 
    // If the merge config file was not set, use the match config file
    if(merge_config_file.length() == 0)
-        merge_config_file = match_config_file;
+      merge_config_file = match_config_file;
 
    // List the config files
    mlog << Debug(1)
@@ -194,7 +194,7 @@ R_index = T_index = 0;
    const int shift = engine.conf_info.shift_right;
 
    fcst_mtddf->set_shift_right(shift);
-    obs_mtddf->set_shift_right(shift);
+   obs_mtddf->set_shift_right(shift);
 
    // List the input files
    mlog << Debug(1)
@@ -203,7 +203,7 @@ R_index = T_index = 0;
 
    engine.conf_info.nc_info.compress_level = engine.conf_info.get_compression_level();
 
-return;
+   return;
 
 }
 
@@ -214,17 +214,17 @@ void ModeExecutive::init_final(const MultiVarData &mvd)
 
 {
 
-GrdFileType ftype, otype;
-//Met2dDataFileFactory mtddf_factory;
+   GrdFileType ftype, otype;
+   //Met2dDataFileFactory mtddf_factory;
 
-R_index = T_index = 0;
+   R_index = T_index = 0;
 
    // Create the default config file name
    default_config_file = replace_path(default_config_filename);
 
    // If the merge config file was not set, use the match config file
    if(merge_config_file.length() == 0)
-        merge_config_file = match_config_file;
+      merge_config_file = match_config_file;
 
    // List the config files
    mlog << Debug(1)
@@ -277,7 +277,7 @@ R_index = T_index = 0;
 
    engine.conf_info.nc_info.compress_level = engine.conf_info.get_compression_level();
 
-return;
+   return;
 
 }
 
@@ -292,9 +292,9 @@ void ModeExecutive::setup_fcst_obs_data()
    double fmin, omin, fmax, omax;
 
    Fcst_sd.clear();
-    Obs_sd.clear();
+   Obs_sd.clear();
 
-      // Read the gridded data from the input forecast file
+   // Read the gridded data from the input forecast file
 
    if ( !(fcst_mtddf->data_plane(*(engine.conf_info.Fcst->var_info), Fcst_sd.data)) )  {
 
@@ -316,16 +316,16 @@ void ModeExecutive::setup_fcst_obs_data()
       exit(1);
    }
 
-      // Determine the verification grid
+   // Determine the verification grid
 
    grid = parse_vx_grid(engine.conf_info.Fcst->var_info->regrid(),
                         &(fcst_mtddf->grid()), &(obs_mtddf->grid()));
 
-      // Store the grid
+   // Store the grid
 
    engine.set_grid(&grid);
 
-      // Regrid, if necessary
+   // Regrid, if necessary
 
    if ( !(fcst_mtddf->grid() == grid) )  {
       mlog << Debug(1)
@@ -335,7 +335,7 @@ void ModeExecutive::setup_fcst_obs_data()
                                 engine.conf_info.Fcst->var_info->regrid());
    }
 
-      // Regrid, if necessary
+   // Regrid, if necessary
 
    if ( !(obs_mtddf->grid() == grid) )  {
       mlog << Debug(1)
@@ -345,15 +345,15 @@ void ModeExecutive::setup_fcst_obs_data()
                                engine.conf_info.Obs->var_info->regrid());
    }
 
-      // Rescale probabilites from [0, 100] to [0, 1]
+   // Rescale probabilites from [0, 100] to [0, 1]
 
    if ( engine.conf_info.Fcst->var_info->p_flag() ) rescale_probability(Fcst_sd.data);
 
-      // Rescale probabilites from [0, 100] to [0, 1]
+   // Rescale probabilites from [0, 100] to [0, 1]
 
    if ( engine.conf_info.Obs->var_info->p_flag() ) rescale_probability(Obs_sd.data);
 
-      // Print a warning if the valid times do not match
+   // Print a warning if the valid times do not match
 
    if(Fcst_sd.data.valid() != Obs_sd.data.valid()) {
 
@@ -365,7 +365,7 @@ void ModeExecutive::setup_fcst_obs_data()
            << engine.conf_info.Obs->var_info->magic_str() << ".\n\n";
    }
 
-      // Print a warning if the accumulation intervals do not match
+   // Print a warning if the accumulation intervals do not match
 
    if(engine.conf_info.Fcst->var_info->level().type() == LevelType_Accum &&
       engine.conf_info.Obs->var_info->level().type()  == LevelType_Accum &&
@@ -389,23 +389,23 @@ void ModeExecutive::setup_fcst_obs_data()
         << engine.conf_info.Obs->var_info->level_attr()
         << "\n";
 
-      // Mask out the missing data between fields
+   // Mask out the missing data between fields
 
    if(engine.conf_info.mask_missing_flag == FieldType_Fcst ||
       engine.conf_info.mask_missing_flag == FieldType_Both)
       mask_bad_data(Fcst_sd.data, Obs_sd.data);
 
-      // Mask out the missing data between fields
+   // Mask out the missing data between fields
 
    if(engine.conf_info.mask_missing_flag == FieldType_Obs ||
       engine.conf_info.mask_missing_flag == FieldType_Both)
       mask_bad_data(Obs_sd.data, Fcst_sd.data);
 
-      // Parse the grid and/or polyline masks from the configuration
+   // Parse the grid and/or polyline masks from the configuration
 
    process_masks(Fcst_sd, Obs_sd);
 
-      // Compute the min and max data values across both raw fields
+   // Compute the min and max data values across both raw fields
 
    Fcst_sd.data.data_range(fmin, fmax);
    Obs_sd.data.data_range(omin, omax);
@@ -417,7 +417,7 @@ void ModeExecutive::setup_fcst_obs_data()
    else if(!is_bad_data(fmax) &&  is_bad_data(omax)) data_max = fmax;
    else if( is_bad_data(fmax) && !is_bad_data(omax)) data_max = omax;
 
-      // Process percentile thresholds
+   // Process percentile thresholds
 
    engine.conf_info.set_perc_thresh(Fcst_sd.data, Obs_sd.data);
 
@@ -425,7 +425,7 @@ void ModeExecutive::setup_fcst_obs_data()
    //  done
    //
 
-return;
+   return;
 
 }
 
@@ -447,7 +447,7 @@ void ModeExecutive::setup_fcst_obs_data(const MultiVarData &mvd)
 #ifdef NOTFORTHIS
    // copy the raw data from mvd into the Fcst_sd and Obs_sd objects locally
    
-      // Read the gridded data from the input forecast file
+   // Read the gridded data from the input forecast file
 
    if ( !(fcst_mtddf->data_plane(*(engine.conf_info.Fcst->var_info), Fcst_sd.data)) )  {
 
@@ -469,18 +469,18 @@ void ModeExecutive::setup_fcst_obs_data(const MultiVarData &mvd)
       exit(1);
    }
 
-      // Determine the verification grid
+   // Determine the verification grid
 
    grid = parse_vx_grid(engine.conf_info.Fcst->var_info->regrid(),
                         &(fcst_mtddf->grid()), &(obs_mtddf->grid()));
 #endif
 
-      // Store the grid
+   // Store the grid
 
    engine.set_grid(&grid);
 
 #ifdef NOTFORTHIS
-      // Regrid, if necessary
+   // Regrid, if necessary
 
    if ( !(fcst_mtddf->grid() == grid) )  {
       mlog << Debug(1)
@@ -490,7 +490,7 @@ void ModeExecutive::setup_fcst_obs_data(const MultiVarData &mvd)
                                 engine.conf_info.Fcst->var_info->regrid());
    }
 
-      // Regrid, if necessary
+   // Regrid, if necessary
 
    if ( !(obs_mtddf->grid() == grid) )  {
       mlog << Debug(1)
@@ -500,16 +500,16 @@ void ModeExecutive::setup_fcst_obs_data(const MultiVarData &mvd)
                                engine.conf_info.Obs->var_info->regrid());
    }
 
-      // Rescale probabilites from [0, 100] to [0, 1]
+   // Rescale probabilites from [0, 100] to [0, 1]
 
    if ( engine.conf_info.Fcst->var_info->p_flag() ) rescale_probability(Fcst_sd.data);
 
-      // Rescale probabilites from [0, 100] to [0, 1]
+   // Rescale probabilites from [0, 100] to [0, 1]
 
    if ( engine.conf_info.Obs->var_info->p_flag() ) rescale_probability(Obs_sd.data);
 
 #endif
-      // Print a warning if the valid times do not match
+   // Print a warning if the valid times do not match
 
    if(Fcst_sd.data.valid() != Obs_sd.data.valid()) {
 
@@ -521,7 +521,7 @@ void ModeExecutive::setup_fcst_obs_data(const MultiVarData &mvd)
            << engine.conf_info.Obs->var_info->magic_str() << ".\n\n";
    }
 
-      // Print a warning if the accumulation intervals do not match
+   // Print a warning if the accumulation intervals do not match
 
    if(engine.conf_info.Fcst->var_info->level().type() == LevelType_Accum &&
       engine.conf_info.Obs->var_info->level().type()  == LevelType_Accum &&
@@ -547,24 +547,24 @@ void ModeExecutive::setup_fcst_obs_data(const MultiVarData &mvd)
 
 #ifdef NOTFORTHIS
 
-      // Mask out the missing data between fields
+   // Mask out the missing data between fields
 
    if(engine.conf_info.mask_missing_flag == FieldType_Fcst ||
       engine.conf_info.mask_missing_flag == FieldType_Both)
       mask_bad_data(Fcst_sd.data, Obs_sd.data);
 
-      // Mask out the missing data between fields
+   // Mask out the missing data between fields
 
    if(engine.conf_info.mask_missing_flag == FieldType_Obs ||
       engine.conf_info.mask_missing_flag == FieldType_Both)
       mask_bad_data(Obs_sd.data, Fcst_sd.data);
 
-      // Parse the grid and/or polyline masks from the configuration
+   // Parse the grid and/or polyline masks from the configuration
 
    process_masks(Fcst_sd, Obs_sd);
 #endif
    
-      // Compute the min and max data values across both raw fields
+   // Compute the min and max data values across both raw fields
 
    Fcst_sd.data.data_range(fmin, fmax);
    Obs_sd.data.data_range(omin, omax);
@@ -576,7 +576,7 @@ void ModeExecutive::setup_fcst_obs_data(const MultiVarData &mvd)
    else if(!is_bad_data(fmax) &&  is_bad_data(omax)) data_max = fmax;
    else if( is_bad_data(fmax) && !is_bad_data(omax)) data_max = omax;
 
-      // Process percentile thresholds
+   // Process percentile thresholds
 
    engine.conf_info.set_perc_thresh(Fcst_sd.data, Obs_sd.data);
 
@@ -584,7 +584,7 @@ void ModeExecutive::setup_fcst_obs_data(const MultiVarData &mvd)
    //  done
    //
 
-return;
+   return;
 
 }
   
@@ -596,54 +596,54 @@ void ModeExecutive::do_conv_thresh(const int r_index, const int t_index)
 
 {
 
-ModeConfInfo & conf = engine.conf_info;
+   ModeConfInfo & conf = engine.conf_info;
 
-R_index = r_index;
-T_index = t_index;
+   R_index = r_index;
+   T_index = t_index;
 
-conf.set_conv_radius_by_index  (R_index);
-conf.set_conv_thresh_by_index  (T_index);
+   conf.set_conv_radius_by_index  (R_index);
+   conf.set_conv_thresh_by_index  (T_index);
 
-if ( conf.Fcst->need_merge_thresh () )  conf.set_fcst_merge_thresh_by_index (T_index);
-if ( conf.Obs->need_merge_thresh  () )  conf.set_obs_merge_thresh_by_index  (T_index);
+   if ( conf.Fcst->need_merge_thresh () )  conf.set_fcst_merge_thresh_by_index (T_index);
+   if ( conf.Obs->need_merge_thresh  () )  conf.set_obs_merge_thresh_by_index  (T_index);
 
    //
    //  Set up the engine with these raw fields
    //
 
-mlog << Debug(2)
-     << "Identifying objects in the forecast and observation fields...\n";
+   mlog << Debug(2)
+        << "Identifying objects in the forecast and observation fields...\n";
 
-if ( r_index != local_r_index )  {   //  need to do convolution
+   if ( r_index != local_r_index )  {   //  need to do convolution
 
-   engine.set(Fcst_sd, Obs_sd);
+      engine.set(Fcst_sd, Obs_sd);
 
-} else {   //  don't need to do convolution
+   } else {   //  don't need to do convolution
 
-   engine.set_no_conv(Fcst_sd, Obs_sd);
+      engine.set_no_conv(Fcst_sd, Obs_sd);
 
-}
+   }
 
    //
    //  Compute the contingency table statistics for the fields, if needed
    //
 
-if ( conf.ct_stats_flag )  compute_ct_stats();
+   if ( conf.ct_stats_flag )  compute_ct_stats();
 
 
    //
    //  done
    //
 
-local_r_index = r_index;
+   local_r_index = r_index;
 
-return;
+   return;
 
 }
 
 void ModeExecutive::clear_internal_r_index()
 {
-  local_r_index = -1;
+   local_r_index = -1;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -688,7 +688,7 @@ void ModeExecutive::do_match_merge()
 
    engine.do_matching();
 
-return;
+   return;
 
 }
 
@@ -757,15 +757,15 @@ void ModeExecutive::process_output()
 
    // Create output stats files and plots
 
-write_obj_stats();
+   write_obj_stats();
 
-if ( engine.conf_info.ct_stats_flag )  write_ct_stats();
+   if ( engine.conf_info.ct_stats_flag )  write_ct_stats();
 
-write_obj_netcdf(engine.conf_info.nc_info);
+   write_obj_netcdf(engine.conf_info.nc_info);
 
-if ( engine.conf_info.ps_plot_flag )   plot_engine();
+   if ( engine.conf_info.ps_plot_flag )   plot_engine();
 
-return;
+   return;
 
 }
 
@@ -826,23 +826,23 @@ void ModeExecutive::plot_engine()
 
 {
 
-ModePsFile plot;
-ConcatString ps_file;
+   ModePsFile plot;
+   ConcatString ps_file;
 
-plot.set(engine, grid, data_min, data_max);
+   plot.set(engine, grid, data_min, data_max);
 
-build_outfile_name(".ps", ps_file);
+   build_outfile_name(".ps", ps_file);
 
-//
-// List the image file as it is being created
-//
-mlog << Debug(1) << "Creating postscript file: " << ps_file << "\n";
+   //
+   // List the image file as it is being created
+   //
+   mlog << Debug(1) << "Creating postscript file: " << ps_file << "\n";
 
-plot.open(ps_file.c_str());
+   plot.open(ps_file.c_str());
 
-plot.make_plot();
+   plot.make_plot();
 
-return;
+   return;
 
 }
 
@@ -859,26 +859,26 @@ void ModeExecutive::build_outfile_prefix(ConcatString &str)
 
    // Append the output directory and program name
 
-str << cs_erase
-    << out_dir << "/" << program_name;
+   str << cs_erase
+       << out_dir << "/" << program_name;
 
    // Append the output prefix, if defined
 
-if(engine.conf_info.output_prefix.nonempty())
-   str << "_" << engine.conf_info.output_prefix;
+   if(engine.conf_info.output_prefix.nonempty())
+      str << "_" << engine.conf_info.output_prefix;
 
    // Append the timing information
 
-str << "_"
-    << sec_to_hhmmss(engine.fcst_raw->data.lead())            << "L_"
-    << unix_to_yyyymmdd_hhmmss(engine.fcst_raw->data.valid()) << "V_"
-    << sec_to_hhmmss(engine.fcst_raw->data.accum())           << "A";
+   str << "_"
+       << sec_to_hhmmss(engine.fcst_raw->data.lead())            << "L_"
+       << unix_to_yyyymmdd_hhmmss(engine.fcst_raw->data.valid()) << "V_"
+       << sec_to_hhmmss(engine.fcst_raw->data.accum())           << "A";
 
    //
    //  done
    //
 
-return;
+   return;
 
 }
 
@@ -890,13 +890,13 @@ void ModeExecutive::build_simple_outfile_name(const char *suffix, ConcatString &
 
 {
 
-build_outfile_prefix(str);
+   build_outfile_prefix(str);
 
    // Append the suffix
 
-str << suffix;
+   str << suffix;
 
-return;
+   return;
 
 }
 
@@ -908,32 +908,32 @@ void ModeExecutive::build_outfile_name(const char *suffix, ConcatString &str)
 
 {
 
-if ( engine.conf_info.n_runs() == 1 )  {
+   if ( engine.conf_info.n_runs() == 1 )  {
 
-   build_simple_outfile_name(suffix, str);
+      build_simple_outfile_name(suffix, str);
 
-   return;
+      return;
 
-}
+   }
 
 
-build_outfile_prefix(str);
+   build_outfile_prefix(str);
 
    //
    //  append the radius and threshold indices
    //
 
-char junk[256];
+   char junk[256];
 
-snprintf(junk, sizeof(junk), "R%d_T%d", R_index + 1, T_index + 1);
+   snprintf(junk, sizeof(junk), "R%d_T%d", R_index + 1, T_index + 1);
 
-str << '_' << junk;
+   str << '_' << junk;
 
    // Append the suffix
 
-str << suffix;
+   str << suffix;
 
-return;
+   return;
 
 }
 
@@ -1052,51 +1052,51 @@ void ModeExecutive::write_obj_stats()
 
 MultiVarData *ModeExecutive::get_multivar_data()
 {
-  MultiVarData *mvd = new MultiVarData();
-  mvd->nx = grid.nx();
-  mvd->ny = grid.ny();
-  mvd->fcst_obj_data = new int [grid.nx()*grid.ny()];
-  for (int x=0; x<grid.nx(); ++x) {
-    for (int y=0; y<grid.ny(); ++y) {
-      int n = DefaultTO.two_to_one(grid.nx(), grid.ny(), x, y);
-      if (engine.fcst_split->is_nonzero(x,y) ) {
-        mvd->fcst_obj_data[n] = nint(engine.fcst_split->data(x, y));
-      } else {
-        mvd->fcst_obj_data[n] = bad_data_int;
+   MultiVarData *mvd = new MultiVarData();
+   mvd->nx = grid.nx();
+   mvd->ny = grid.ny();
+   mvd->fcst_obj_data = new int [grid.nx()*grid.ny()];
+   for (int x=0; x<grid.nx(); ++x) {
+      for (int y=0; y<grid.ny(); ++y) {
+         int n = DefaultTO.two_to_one(grid.nx(), grid.ny(), x, y);
+         if (engine.fcst_split->is_nonzero(x,y) ) {
+            mvd->fcst_obj_data[n] = nint(engine.fcst_split->data(x, y));
+         } else {
+            mvd->fcst_obj_data[n] = bad_data_int;
+         }
       }
-    }
-  }
-  mvd->fcst_raw_data = new float   [grid.nx()*grid.ny()];
-  for (int x=0; x<grid.nx(); ++x) {
-    for (int y=0; y<grid.ny(); ++y) {
-      int n = DefaultTO.two_to_one(grid.nx(), grid.ny(), x, y);
-      mvd->fcst_raw_data[n] = engine.fcst_raw->data(x, y);
-    }
-  }
-  mvd->obs_raw_data = new float   [grid.nx()*grid.ny()];
-  for (int x=0; x<grid.nx(); ++x) {
-    for (int y=0; y<grid.ny(); ++y) {
-      int n = DefaultTO.two_to_one(grid.nx(), grid.ny(), x, y);
-      mvd->obs_raw_data[n] = engine.obs_raw->data(x, y);
-    }
-  }
-  mvd->obs_obj_data = new int   [grid.nx()*grid.ny()];
-  for (int x=0; x<grid.nx(); ++x) {
-    for (int y=0; y<grid.ny(); ++y) {
-      int n = DefaultTO.two_to_one(grid.nx(), grid.ny(), x, y);
-      if (engine.obs_split->is_nonzero(x,y) ) {
-        mvd->obs_obj_data[n] = nint(engine.obs_split->data(x, y));
-      } else {
-        mvd->obs_obj_data[n] = bad_data_int;
+   }
+   mvd->fcst_raw_data = new float   [grid.nx()*grid.ny()];
+   for (int x=0; x<grid.nx(); ++x) {
+      for (int y=0; y<grid.ny(); ++y) {
+         int n = DefaultTO.two_to_one(grid.nx(), grid.ny(), x, y);
+         mvd->fcst_raw_data[n] = engine.fcst_raw->data(x, y);
       }
-    }
-  }
-  mvd->Fcst_sd = new ShapeData(Fcst_sd);
-  mvd->Obs_sd = new ShapeData(Obs_sd);
-  mvd->grid = new Grid(grid);
-  mvd->ftype = ftype;
-  mvd->otype = otype;
-  return mvd;
+   }
+   mvd->obs_raw_data = new float   [grid.nx()*grid.ny()];
+   for (int x=0; x<grid.nx(); ++x) {
+      for (int y=0; y<grid.ny(); ++y) {
+         int n = DefaultTO.two_to_one(grid.nx(), grid.ny(), x, y);
+         mvd->obs_raw_data[n] = engine.obs_raw->data(x, y);
+      }
+   }
+   mvd->obs_obj_data = new int   [grid.nx()*grid.ny()];
+   for (int x=0; x<grid.nx(); ++x) {
+      for (int y=0; y<grid.ny(); ++y) {
+         int n = DefaultTO.two_to_one(grid.nx(), grid.ny(), x, y);
+         if (engine.obs_split->is_nonzero(x,y) ) {
+            mvd->obs_obj_data[n] = nint(engine.obs_split->data(x, y));
+         } else {
+            mvd->obs_obj_data[n] = bad_data_int;
+         }
+      }
+   }
+   mvd->Fcst_sd = new ShapeData(Fcst_sd);
+   mvd->Obs_sd = new ShapeData(Obs_sd);
+   mvd->grid = new Grid(grid);
+   mvd->ftype = ftype;
+   mvd->otype = otype;
+   return mvd;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -1106,7 +1106,7 @@ void ModeExecutive::write_obj_netcdf(const ModeNcOutInfo & info)
 
 {
 
-if ( info.all_false() )  return;
+   if ( info.all_false() )  return;
 
    int n, x, y;
    ConcatString out_file;
@@ -1181,7 +1181,7 @@ if ( info.all_false() )  return;
    write_netcdf_proj(f_out, grid, lat_dim, lon_dim);
 
    fcst_thresh_dim = add_dim(f_out, "fcst_thresh_length", fcst_thresh.length());
-    obs_thresh_dim = add_dim(f_out,  "obs_thresh_length",  obs_thresh.length());
+   obs_thresh_dim = add_dim(f_out,  "obs_thresh_length",  obs_thresh.length());
 
    // Add the lat/lon variables
    if ( info.do_latlon )  write_netcdf_latlon(f_out, &lat_dim, &lon_dim, grid);
@@ -1232,40 +1232,40 @@ if ( info.all_false() )  return;
    }
 
    fcst_radius_var = add_var(f_out, (string)"fcst_conv_radius", ncInt, deflate_level);
-    obs_radius_var = add_var(f_out, (string) "obs_conv_radius", ncInt, deflate_level);
+   obs_radius_var = add_var(f_out, (string) "obs_conv_radius", ncInt, deflate_level);
 
    fcst_thresh_var = add_var(f_out, "fcst_conv_threshold", ncChar, fcst_thresh_dim, deflate_level);
-    obs_thresh_var = add_var(f_out,  "obs_conv_threshold", ncChar,  obs_thresh_dim, deflate_level);
+   obs_thresh_var = add_var(f_out,  "obs_conv_threshold", ncChar,  obs_thresh_dim, deflate_level);
 
    //
    //  write the radius and threshold values
    //
 
    if ( !put_nc_data(&fcst_radius_var, &engine.conf_info.Fcst->conv_radius)
-       || !put_nc_data(&obs_radius_var, &engine.conf_info.Obs->conv_radius) )  {
+        || !put_nc_data(&obs_radius_var, &engine.conf_info.Obs->conv_radius) )  {
 
-         mlog << Error
-              << "write_obj_netcdf() -> "
-              << "error writing fcst/obs convolution radii\n\n";
+      mlog << Error
+           << "write_obj_netcdf() -> "
+           << "error writing fcst/obs convolution radii\n\n";
 
-         exit(1);
+      exit(1);
 
    }
 
    if (    ! put_nc_data(&fcst_thresh_var, fcst_thresh.c_str())
-        || ! put_nc_data(& obs_thresh_var, obs_thresh.c_str()) )  {
+           || ! put_nc_data(& obs_thresh_var, obs_thresh.c_str()) )  {
 
-         mlog << Error
-              << "write_obj_netcdf() -> "
-              << "error writing fcst/obs thresholds\n\n";
+      mlog << Error
+           << "write_obj_netcdf() -> "
+           << "error writing fcst/obs thresholds\n\n";
 
-         exit(1);
+      exit(1);
 
    }
 
-      //
-      //  fcst and obs values for variable, level and units
-      //
+   //
+   //  fcst and obs values for variable, level and units
+   //
 
    nc_add_string(f_out, engine.conf_info.Fcst->var_info->name_attr().c_str(),  "fcst_variable", "fcst_variable_length");
    nc_add_string(f_out, engine.conf_info.Obs->var_info->name_attr().c_str(),    "obs_variable",  "obs_variable_length");
@@ -1351,81 +1351,81 @@ if ( info.all_false() )  return;
 
          n = DefaultTO.two_to_one(grid.nx(), grid.ny(), x, y);
 
-            //
-            // Get raw values and object ID's for each grid box
-            // Extra nullptr checks to satisfy Fortify
+         //
+         // Get raw values and object ID's for each grid box
+         // Extra nullptr checks to satisfy Fortify
 
          if ( info.do_raw &&
               fcst_raw_data != nullptr && obs_raw_data != nullptr &&
               engine.fcst_raw != nullptr && engine.obs_raw != nullptr  )  {
 
-           fcst_raw_data[n] = engine.fcst_raw->data (x, y);
-           obs_raw_data[n] = engine.obs_raw->data  (x, y);
+            fcst_raw_data[n] = engine.fcst_raw->data (x, y);
+            obs_raw_data[n] = engine.obs_raw->data  (x, y);
 
          }
 
          if(engine.fcst_split->is_nonzero(x, y) ) {
-           if ( info.do_object_raw && fcst_obj_raw_data != nullptr && engine.fcst_raw != nullptr ) {
-             fcst_obj_raw_data[n] = engine.fcst_raw->data(x, y);
-           }
-           if ( info.do_object_id && fcst_obj_data != nullptr && engine.fcst_split != nullptr ) {
-             fcst_obj_data[n] = nint(engine.fcst_split->data(x, y));
-           }
+            if ( info.do_object_raw && fcst_obj_raw_data != nullptr && engine.fcst_raw != nullptr ) {
+               fcst_obj_raw_data[n] = engine.fcst_raw->data(x, y);
+            }
+            if ( info.do_object_id && fcst_obj_data != nullptr && engine.fcst_split != nullptr ) {
+               fcst_obj_data[n] = nint(engine.fcst_split->data(x, y));
+            }
          }
          else {
             if ( info.do_object_raw && fcst_obj_raw_data != nullptr ) {
-              fcst_obj_raw_data[n] = bad_data_float;
+               fcst_obj_raw_data[n] = bad_data_float;
             }
             if ( info.do_object_id && fcst_obj_data != nullptr ) {
-              fcst_obj_data[n] = bad_data_int;
+               fcst_obj_data[n] = bad_data_int;
             }
          }
 
          if(engine.obs_split->is_nonzero(x, y) ) {
-           if ( info.do_object_raw && obs_obj_raw_data != nullptr ) {
-             obs_obj_raw_data[n] = engine.obs_raw->data(x, y);
-           }
-           if ( info.do_object_id && obs_obj_data != nullptr ) {
-             obs_obj_data[n] = nint(engine.obs_split->data(x, y));
-           }
+            if ( info.do_object_raw && obs_obj_raw_data != nullptr ) {
+               obs_obj_raw_data[n] = engine.obs_raw->data(x, y);
+            }
+            if ( info.do_object_id && obs_obj_data != nullptr ) {
+               obs_obj_data[n] = nint(engine.obs_split->data(x, y));
+            }
          }
          else {
-           if ( info.do_object_raw && obs_obj_raw_data != nullptr) {
-             obs_obj_raw_data[n] = bad_data_float;
-           }
-           if ( info.do_object_id && obs_obj_data != nullptr ) {
-             obs_obj_data[n] = bad_data_int;
-           }
+            if ( info.do_object_raw && obs_obj_raw_data != nullptr) {
+               obs_obj_raw_data[n] = bad_data_float;
+            }
+            if ( info.do_object_id && obs_obj_data != nullptr ) {
+               obs_obj_data[n] = bad_data_int;
+            }
          }
 
-            //
-            // Get cluster object ID's for each grid box
-            //
+         //
+         // Get cluster object ID's for each grid box
+         //
 
          if ( info.do_cluster_id && fcst_clus_data != nullptr && obs_clus_data != nullptr)  {
 
-               // Write the index of the cluster object
+            // Write the index of the cluster object
             if ( engine.fcst_clus_split->data(x, y) > 0 ) {
                fcst_clus_data[n] = nint(engine.fcst_clus_split->data(x, y));
             }
-               // Write a value of 0 for unmatched simple objects
+            // Write a value of 0 for unmatched simple objects
             else if(engine.fcst_split->data(x, y) > 0) {
                fcst_clus_data[n] = unmatched_id;
             }
-               // Otherwise, write bad data
+            // Otherwise, write bad data
             else {
                fcst_clus_data[n] = bad_data_int;
             }
 
-               // Write the index of the cluster object
+            // Write the index of the cluster object
             if(engine.obs_clus_split->data(x, y) > 0) {
                obs_clus_data[n] = nint(engine.obs_clus_split->data(x, y));
             }
-               // Write a value of 0 for unmatched simple objects
+            // Write a value of 0 for unmatched simple objects
             else if(engine.obs_split->data(x, y) > 0) {
                obs_clus_data[n] = unmatched_id;
             }
-               // Otherwise, write bad data
+            // Otherwise, write bad data
             else {
                obs_clus_data[n] = bad_data_int;
             }
@@ -1464,9 +1464,9 @@ if ( info.all_false() )  return;
 
    }
 
-      //
-      // Write the forecast and observation object ID variables
-      //
+   //
+   // Write the forecast and observation object ID variables
+   //
 
    if ( info.do_object_id )  {
 
@@ -1480,9 +1480,9 @@ if ( info.all_false() )  return;
 
    }
 
-      //
-      // Write the forecast and observation cluster object ID variables
-      //
+   //
+   // Write the forecast and observation cluster object ID variables
+   //
 
    if ( info.do_cluster_id )  {
 
@@ -1510,9 +1510,9 @@ if ( info.all_false() )  return;
    if (obs_obj_data)       { delete [] obs_obj_data;       obs_obj_data      = (int *) 0; }
    if (obs_clus_data)      { delete [] obs_clus_data;      obs_clus_data     = (int *) 0; }
 
-      //
-      // Write out the values of the vertices of the polylines.
-      //
+   //
+   // Write out the values of the vertices of the polylines.
+   //
 
    if ( info.do_polylines ) write_poly_netcdf(f_out);
 
@@ -1623,56 +1623,56 @@ void ModeExecutive::write_poly_netcdf(NcFile *f_out, ObjPolyType poly_type)
    // and set up strings
    switch(poly_type) {
 
-      case FcstSimpBdyPoly:
-         n_poly     = engine.n_fcst;
-         field_name = "fcst";
-         field_long = "Forecast";
-         poly_name  = "simp_bdy";
-         poly_long  = "Simple Boundary";
-         break;
+   case FcstSimpBdyPoly:
+      n_poly     = engine.n_fcst;
+      field_name = "fcst";
+      field_long = "Forecast";
+      poly_name  = "simp_bdy";
+      poly_long  = "Simple Boundary";
+      break;
 
-      case ObsSimpBdyPoly:
-         n_poly     = engine.n_obs;
-         field_name = "obs";
-         field_long = "Observation";
-         poly_name  = "simp_bdy";
-         poly_long  = "Simple Boundary";
-         break;
+   case ObsSimpBdyPoly:
+      n_poly     = engine.n_obs;
+      field_name = "obs";
+      field_long = "Observation";
+      poly_name  = "simp_bdy";
+      poly_long  = "Simple Boundary";
+      break;
 
-      case FcstSimpHullPoly:
-         n_poly     = engine.n_fcst;
-         field_name = "fcst";
-         field_long = "Forecast";
-         poly_name  = "simp_hull";
-         poly_long  = "Simple Convex Hull";
-         break;
+   case FcstSimpHullPoly:
+      n_poly     = engine.n_fcst;
+      field_name = "fcst";
+      field_long = "Forecast";
+      poly_name  = "simp_hull";
+      poly_long  = "Simple Convex Hull";
+      break;
 
-      case ObsSimpHullPoly:
-         n_poly     = engine.n_obs;
-         field_name = "obs";
-         field_long = "Observation";
-         poly_name  = "simp_hull";
-         poly_long  = "Simple Convex Hull";
-         break;
+   case ObsSimpHullPoly:
+      n_poly     = engine.n_obs;
+      field_name = "obs";
+      field_long = "Observation";
+      poly_name  = "simp_hull";
+      poly_long  = "Simple Convex Hull";
+      break;
 
-      case FcstClusHullPoly:
-         n_poly     = engine.n_clus;
-         field_name = "fcst";
-         field_long = "Forecast";
-         poly_name  = "clus_hull";
-         poly_long  = "Cluster Convex Hull";
-         break;
+   case FcstClusHullPoly:
+      n_poly     = engine.n_clus;
+      field_name = "fcst";
+      field_long = "Forecast";
+      poly_name  = "clus_hull";
+      poly_long  = "Cluster Convex Hull";
+      break;
 
-      case ObsClusHullPoly:
-         n_poly     = engine.n_clus;
-         field_name = "obs";
-         field_long = "Observation";
-         poly_name  = "clus_hull";
-         poly_long  = "Cluster Convex Hull";
-         break;
+   case ObsClusHullPoly:
+      n_poly     = engine.n_clus;
+      field_name = "obs";
+      field_long = "Observation";
+      poly_name  = "clus_hull";
+      poly_long  = "Cluster Convex Hull";
+      break;
 
-      default:
-         return;
+   default:
+      return;
    }
 
    // Setup dimension name strings
@@ -1707,32 +1707,32 @@ void ModeExecutive::write_poly_netcdf(NcFile *f_out, ObjPolyType poly_type)
 
       switch(poly_type) {
 
-         case FcstSimpBdyPoly:
-            poly[i] = &engine.fcst_single[i].boundary[0];
-            break;
+      case FcstSimpBdyPoly:
+         poly[i] = &engine.fcst_single[i].boundary[0];
+         break;
 
-         case ObsSimpBdyPoly:
-            poly[i] = &engine.obs_single[i].boundary[0];
-            break;
+      case ObsSimpBdyPoly:
+         poly[i] = &engine.obs_single[i].boundary[0];
+         break;
 
-         case FcstSimpHullPoly:
-            poly[i] = &engine.fcst_single[i].convex_hull;
-            break;
+      case FcstSimpHullPoly:
+         poly[i] = &engine.fcst_single[i].convex_hull;
+         break;
 
-         case ObsSimpHullPoly:
-            poly[i] = &engine.obs_single[i].convex_hull;
-            break;
+      case ObsSimpHullPoly:
+         poly[i] = &engine.obs_single[i].convex_hull;
+         break;
 
-         case FcstClusHullPoly:
-            poly[i] = &engine.fcst_cluster[i].convex_hull;
-            break;
+      case FcstClusHullPoly:
+         poly[i] = &engine.fcst_cluster[i].convex_hull;
+         break;
 
-         case ObsClusHullPoly:
-            poly[i] = &engine.obs_cluster[i].convex_hull;
-            break;
+      case ObsClusHullPoly:
+         poly[i] = &engine.obs_cluster[i].convex_hull;
+         break;
 
-         default:
-            break;
+      default:
+         break;
       }
    }
 
@@ -1896,7 +1896,7 @@ void ModeExecutive::write_ct_stats()
    cts_at.set_size(3, i);                        // Set table size
    justify_mode_cols(cts_at);                    // Justify columns
    cts_at.set_precision(                         // Set the precision
-      engine.conf_info.conf.output_precision());
+                        engine.conf_info.conf.output_precision());
    cts_at.set_bad_data_value(bad_data_double);   // Set the bad data value
    cts_at.set_bad_data_str(na_str);              // Set the bad data string
    cts_at.set_delete_trailing_blank_rows(1);     // No trailing blank rows
@@ -1912,7 +1912,7 @@ void ModeExecutive::write_ct_stats()
    // Write out the MODE contingecy table header columns
    //
    for(i=0; i<n_mode_cts_columns; i++) {
-     cts_at.set_entry(0, i + n_mode_hdr_columns, (string)mode_cts_columns[i]);
+      cts_at.set_entry(0, i + n_mode_hdr_columns, (string)mode_cts_columns[i]);
    }
 
    //
@@ -2010,9 +2010,9 @@ void ModeExecutive::write_ct_stats()
 ///////////////////////////////////////////////////////////////////////
 
 
-   //
-   //  Code for misc functions
-   //
+//
+//  Code for misc functions
+//
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -2050,7 +2050,7 @@ void nc_add_string(NcFile * f, const char * text, const char * var_name, const c
    //  done
    //
 
-return;
+   return;
 
 }
 

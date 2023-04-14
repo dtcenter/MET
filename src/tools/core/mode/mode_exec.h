@@ -65,94 +65,84 @@ enum ObjPolyType {
 
 class ModeExecutive {
 
-   private:
+ private:
 
-      void init_from_scratch();
+   void init_from_scratch();
 
-   public:
+ public:
 
-      ModeExecutive();
-     ~ModeExecutive();
+   ModeExecutive();
+   ~ModeExecutive();
 
-      void clear();
+   void clear();
 
-      void init();
-      void init_final(const MultiVarData &mvd);
+   void init();
+   void init_final(const MultiVarData &mvd);
 
-      int n_conv_radii   () const;
-      int n_conv_threshs () const;
+   int n_conv_radii   () const;
+   int n_conv_threshs () const;
 
-      int n_runs() const;
+   int n_runs() const;
 
-      int R_index;   //  indices into the convolution radius and threshold arrays
-      int T_index;   //    for the current run
+   int R_index;   //  indices into the convolution radius and threshold arrays
+   int T_index;   //    for the current run
 
-         //
-         // Input configuration files
-         //
+   //
+   // Input configuration files
+   //
 
-      ConcatString default_config_file;
-      ConcatString match_config_file;
-      ConcatString merge_config_file;
+   ConcatString default_config_file;
+   ConcatString match_config_file;
+   ConcatString merge_config_file;
 
-         //
-         // Input files
-         //
+   //
+   // Input files
+   //
 
-      ConcatString fcst_file;
-      ConcatString obs_file;
-      Met2dDataFile * fcst_mtddf;
-      Met2dDataFile * obs_mtddf;
+   ConcatString fcst_file;
+   ConcatString obs_file;
+   Met2dDataFile * fcst_mtddf;
+   Met2dDataFile * obs_mtddf;
 
-      TTContingencyTable cts[n_cts];
+   TTContingencyTable cts[n_cts];
 
-      ModeFuzzyEngine engine;
-      Grid grid;
-      Box xy_bb;
-      ConcatString out_dir;
-      double data_min, data_max;
+   ModeFuzzyEngine engine;
+   Grid grid;
+   Box xy_bb;
+   ConcatString out_dir;
+   double data_min, data_max;
 
-      ShapeData Fcst_sd, Obs_sd;
+   ShapeData Fcst_sd, Obs_sd;
 
-      GrdFileType ftype, otype;
+   GrdFileType ftype, otype;
 
-      void clear_internal_r_index();
-      void setup_fcst_obs_data();
-      void setup_fcst_obs_data(const MultiVarData &mvd);
-      void do_conv_thresh(const int r_index, const int t_index);
-      void do_match_merge();
+   void clear_internal_r_index();
+   void setup_fcst_obs_data();
+   void setup_fcst_obs_data(const MultiVarData &mvd);
+   void do_conv_thresh(const int r_index, const int t_index);
+   void do_match_merge();
 
-      void process_masks(ShapeData &, ShapeData &);
-      void process_output();
+   void process_masks(ShapeData &, ShapeData &);
+   void process_output();
 
   
-      // owned by caller
-      MultiVarData *get_multivar_data();
+   // owned by caller
+   MultiVarData *get_multivar_data();
 
-      // int get_fcst_obj_nx();
-      // int get_fcst_obj_ny();
-      // int *get_fcst_obj_data();
-      // float *get_fcst_raw_data();
+   void plot_engine();
 
-      // int get_obs_obj_nx();
-      // int get_obs_obj_ny();
-      // int *get_obs_obj_data();
-      // float *get_obs_raw_data();
+   void compute_ct_stats();
 
-      void plot_engine();
+   void build_outfile_prefix (ConcatString &);
 
-      void compute_ct_stats();
+   void build_simple_outfile_name  (const char *, ConcatString &);
+   void build_outfile_name         (const char *, ConcatString &);
 
-      void build_outfile_prefix (ConcatString &);
-
-      void build_simple_outfile_name  (const char *, ConcatString &);
-      void build_outfile_name         (const char *, ConcatString &);
-
-      void write_obj_stats();
-      void write_obj_netcdf(const ModeNcOutInfo &);
-      void write_poly_netcdf(netCDF::NcFile *);
-      void write_poly_netcdf(netCDF::NcFile *, const ObjPolyType);
-      void write_ct_stats();
+   void write_obj_stats();
+   void write_obj_netcdf(const ModeNcOutInfo &);
+   void write_poly_netcdf(netCDF::NcFile *);
+   void write_poly_netcdf(netCDF::NcFile *, const ObjPolyType);
+   void write_ct_stats();
 
 };
 

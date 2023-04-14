@@ -25,9 +25,9 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-   //
-   //  grabs the objects from a MODE output netcdf file
-   //
+//
+//  grabs the objects from a MODE output netcdf file
+//
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -43,9 +43,9 @@ extern void combine_boolplanes(const BoolPlane * array, const int n_planes,
 ////////////////////////////////////////////////////////////////////////
 
 
-   //
-   //  useful mainly for debugging
-   //
+//
+//  useful mainly for debugging
+//
 
 
 extern void boolplane_to_pgm(const BoolPlane & in, Pgm & out);

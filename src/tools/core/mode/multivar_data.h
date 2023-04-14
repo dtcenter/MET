@@ -23,23 +23,23 @@
 
 class MultiVarData {
 
-   private:
+ private:
 
-   public:
+ public:
 
-  inline MultiVarData() :
-    fcst_obj_data(0),
-    obs_obj_data(0),
-    fcst_raw_data(0),
-    obs_raw_data(0),
-    nx(0), ny(0),
-    Fcst_sd(0), Obs_sd(0),
-    grid(0),
-    ftype(FileType_None),
-    otype(FileType_None)
-    {}
+   inline MultiVarData() :
+   fcst_obj_data(0),
+      obs_obj_data(0),
+      fcst_raw_data(0),
+      obs_raw_data(0),
+      nx(0), ny(0),
+      Fcst_sd(0), Obs_sd(0),
+      grid(0),
+      ftype(FileType_None),
+      otype(FileType_None)
+      {}
       
-    inline ~MultiVarData() {
+   inline ~MultiVarData() {
       if (fcst_obj_data) delete [] fcst_obj_data;
       if (obs_obj_data) delete [] obs_obj_data;
       if (fcst_raw_data) delete [] fcst_raw_data;
@@ -47,18 +47,18 @@ class MultiVarData {
       if (Fcst_sd) delete Fcst_sd;
       if (Obs_sd) delete Obs_sd;
       if (grid) delete grid;
-    }      
+   }      
 
-     int *fcst_obj_data;
-     int *obs_obj_data;
-     float *fcst_raw_data;
-     float *obs_raw_data;
-     int nx, ny;
-     ShapeData *Fcst_sd;
-     ShapeData *Obs_sd;
-     Grid *grid;
-     GrdFileType ftype;
-     GrdFileType otype;
+   int *fcst_obj_data;
+   int *obs_obj_data;
+   float *fcst_raw_data;
+   float *obs_raw_data;
+   int nx, ny;
+   ShapeData *Fcst_sd;
+   ShapeData *Obs_sd;
+   Grid *grid;
+   GrdFileType ftype;
+   GrdFileType otype;
      
 };
 

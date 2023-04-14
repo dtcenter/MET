@@ -49,141 +49,141 @@ enum EngineType {
 
 class ModePsFile : public PSfile {
 
-   private:
+ private:
 
-      ModePsFile(const ModePsFile &);
-      ModePsFile & operator=(const ModePsFile &);
+   ModePsFile(const ModePsFile &);
+   ModePsFile & operator=(const ModePsFile &);
 
-   protected:
+ protected:
 
-      void mpsf_init_from_scratch();
+   void mpsf_init_from_scratch();
 
-      void mpsf_assign(const ModePsFile &);
-
-
-      void set_xy_box();
-
-      void set_postscript_dims();
-
-      void set_view(double y_ll, double y_ur, double x_cen);
+   void mpsf_assign(const ModePsFile &);
 
 
-      void plot_engine            (ModeFuzzyEngine &, EngineType, const char * title);
-      void plot_threshold_merging (ModeFuzzyEngine &, const char * title , bool fcst);
+   void set_xy_box();
 
-      void do_page_1       (ModeFuzzyEngine &, EngineType, const char * title);
-      void do_page_1_FOEng (ModeFuzzyEngine &, EngineType, const char * title);
-      void do_page_1_other (ModeFuzzyEngine &, EngineType, const char * title);
+   void set_postscript_dims();
 
-      void do_fcst_enlarge_page (ModeFuzzyEngine &, EngineType, const char * title);
-      void do_obs_enlarge_page  (ModeFuzzyEngine &, EngineType, const char * title);
-      void do_overlap_page      (ModeFuzzyEngine &, EngineType, const char * title);
-      void do_cluster_page      (ModeFuzzyEngine &, EngineType, const char * title);
-
-      void draw_boundaries(ModeFuzzyEngine &, bool fcst);
-      void draw_boundaries(ShapeData &, int n_shapes);
-
-      void draw_polyline(Polyline &, const Color &, bool latlon);
-
-      void draw_convex_hulls(ModeFuzzyEngine & eng, bool fcst, bool id_flag);
-
-      void plot_simple_ids(ModeFuzzyEngine &, bool fcst);
-
-      void render_ppm(ModeFuzzyEngine &, EngineType, const ShapeData &, bool fcst, int split);
-
-      void draw_colorbar(bool);
-
-      void draw_map(MetConfig *);
-
-      void wct0(double x, double y, const char *);
-      void wct5(double x, double y, const char *);
+   void set_view(double y_ll, double y_ur, double x_cen);
 
 
-      ModeFuzzyEngine  * Engine;     //  not allocated
-      ModeConfInfo     * ConfInfo;   //  not allocated
-      const Grid       * grid;       //  not allocated
+   void plot_engine            (ModeFuzzyEngine &, EngineType, const char * title);
+   void plot_threshold_merging (ModeFuzzyEngine &, const char * title , bool fcst);
 
-      ConcatString MetDataDir;
+   void do_page_1       (ModeFuzzyEngine &, EngineType, const char * title);
+   void do_page_1_FOEng (ModeFuzzyEngine &, EngineType, const char * title);
+   void do_page_1_other (ModeFuzzyEngine &, EngineType, const char * title);
 
-      ConcatString FcstString;
-      ConcatString  ObsString;
+   void do_fcst_enlarge_page (ModeFuzzyEngine &, EngineType, const char * title);
+   void do_obs_enlarge_page  (ModeFuzzyEngine &, EngineType, const char * title);
+   void do_overlap_page      (ModeFuzzyEngine &, EngineType, const char * title);
+   void do_cluster_page      (ModeFuzzyEngine &, EngineType, const char * title);
 
-      ConcatString FcstShortString;
-      ConcatString  ObsShortString;
+   void draw_boundaries(ModeFuzzyEngine &, bool fcst);
+   void draw_boundaries(ShapeData &, int n_shapes);
 
-      ColorTable   FcstRawCtable;
-      ColorTable   ObsRawCtable;
+   void draw_polyline(Polyline &, const Color &, bool latlon);
 
-      Color FcstFillColor;
-      Color  ObsFillColor;
+   void draw_convex_hulls(ModeFuzzyEngine & eng, bool fcst, bool id_flag);
 
-      double PageWidth;
-      double PageHeight;
+   void plot_simple_ids(ModeFuzzyEngine &, bool fcst);
 
-      double Hmargin;
-      double Vmargin;
+   void render_ppm(ModeFuzzyEngine &, EngineType, const ShapeData &, bool fcst, int split);
 
-      double TextSep;
+   void draw_colorbar(bool);
 
-      double text_y;
+   void draw_map(MetConfig *);
 
-      double DataMin;
-      double DataMax;
-
-      double Htab_1;
-      double Htab_2;
-      double Htab_3;
-
-      double Vtab_1;
-      double Vtab_2;
-      double Vtab_3;
-
-      double SmallPlotHeight;
-      double LargePlotHeight;
-
-      Box LargePane;
-      Box SmallPane;
-
-      Box XY_box;
-      Box View_box;
-
-   public:
-
-      ModePsFile();
-      ModePsFile(const char *);
-     ~ModePsFile();
-
-         //
-         //  set stuff
-         //
-
-      void set (ModeFuzzyEngine &, const Grid &, double data_min, double data_max);
-
-         //
-         //  get stuff
-         //
+   void wct0(double x, double y, const char *);
+   void wct5(double x, double y, const char *);
 
 
-         //
-         //  do stuff
-         //
+   ModeFuzzyEngine  * Engine;     //  not allocated
+   ModeConfInfo     * ConfInfo;   //  not allocated
+   const Grid       * grid;       //  not allocated
 
-      void make_plot();
+   ConcatString MetDataDir;
 
-      using PSfile::outline_box;
+   ConcatString FcstString;
+   ConcatString  ObsString;
 
-      void outline_box (const Box &, const double linewidth);
-      void outline_view();
-      void fill_box    (const Box &, const Color &);
+   ConcatString FcstShortString;
+   ConcatString  ObsShortString;
+
+   ColorTable   FcstRawCtable;
+   ColorTable   ObsRawCtable;
+
+   Color FcstFillColor;
+   Color  ObsFillColor;
+
+   double PageWidth;
+   double PageHeight;
+
+   double Hmargin;
+   double Vmargin;
+
+   double TextSep;
+
+   double text_y;
+
+   double DataMin;
+   double DataMax;
+
+   double Htab_1;
+   double Htab_2;
+   double Htab_3;
+
+   double Vtab_1;
+   double Vtab_2;
+   double Vtab_3;
+
+   double SmallPlotHeight;
+   double LargePlotHeight;
+
+   Box LargePane;
+   Box SmallPane;
+
+   Box XY_box;
+   Box View_box;
+
+ public:
+
+   ModePsFile();
+   ModePsFile(const char *);
+   ~ModePsFile();
+
+   //
+   //  set stuff
+   //
+
+   void set (ModeFuzzyEngine &, const Grid &, double data_min, double data_max);
+
+   //
+   //  get stuff
+   //
 
 
-      void gridxy_to_pagexy(double x_grid, double y_grid, double & x_page, double & y_page) const;
+   //
+   //  do stuff
+   //
 
-      void set_color(const Color &);
+   void make_plot();
 
-      void choose_font(int, double);   //  uses MetDataDir
+   using PSfile::outline_box;
 
-      void nextline();
+   void outline_box (const Box &, const double linewidth);
+   void outline_view();
+   void fill_box    (const Box &, const Color &);
+
+
+   void gridxy_to_pagexy(double x_grid, double y_grid, double & x_page, double & y_page) const;
+
+   void set_color(const Color &);
+
+   void choose_font(int, double);   //  uses MetDataDir
+
+   void nextline();
 
 
 };
