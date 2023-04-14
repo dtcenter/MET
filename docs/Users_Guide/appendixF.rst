@@ -16,7 +16,7 @@ Compiling MET for Python Embedding
 
 In order to use Python embedding, a local Python installation must be available when compiling the MET software with the following requirements:
 
-1. Python version 3.8.6+
+1. Python version 3.10.4+
 
 2. C-language Python header files and libraries
 
@@ -40,8 +40,8 @@ In addition to using **\-\-enable-python** with **configure** as mentioned above
 
 Make sure that these are set as environment variables or that you have included them on the command line prior to running **configure**.
 
-Controlling Which Python MET uses with MET_PYTHON_EXE
-=====================================================
+Controlling Which Python MET uses When Running
+==============================================
 
 When MET is compiled with Python embedding support, MET uses the Python executable in that Python installation by default when Python embedding is used. However, for users of highly configurable Python environments, the Python instance set at compilation time may not be sufficient. Users may want to use an alternate Python installation if they need additional packages not available in the Python installation used when compiling MET. In MET versions 9.0+, users have the ability to use a different Python executable when running MET than the version used when compiling MET by setting the environment variable **MET_PYTHON_EXE**.
 
@@ -85,7 +85,10 @@ Details for each of these data structures are provided below.
 Python Embedding for 2D Gridded Dataplanes
 ------------------------------------------
 
-Currently, MET supports two different types of Python objects for two-dimensional gridded dataplanes: NumPy N-dimensional arrays (ndarrays) and Xarray DataArrays. The keyword **PYTHON_NUMPY** is used on the command line when using ndarrays, and **PYTHON_XARRAY** when using Xarray DataArrays. Example commands are included below. General requirements for Python embedding with two-dimensional gridded dataplanes are as follows:
+Currently, MET supports two different types of Python objects for two-dimensional gridded dataplanes: NumPy N-dimensional arrays (ndarrays) and Xarray DataArrays. The keyword **PYTHON_NUMPY** is used on the command line when using ndarrays, and **PYTHON_XARRAY** when using Xarray DataArrays. Example commands are included at the end of this section. 
+
+Python Script Requirements for 2D Gridded Dataplanes
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. The data must be stored in a variable with the name **met_data**
 
@@ -272,7 +275,7 @@ Finally, an example **attrs** dictionary is shown below:
 Running Python Embedding for 2D Gridded Dataplanes
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-On the command line for any of the MET tools which will be obtaining its data from a Python script rather than directly from a data file, the user should specify either **PYTHON_NUMPY** or **PYTHON_XARRAY** wherever a (forecast or observation) data file name would normally be given. Then in the **name** entry of the config file dictionaries for the forecast or observation data, the user should list the **full path** to the Python script to be run followed by any command line arguments for that script. Note that for tools like MODE that take two data files, it is entirely possible to use the **PYTHON_NUMPY** for one file and the **PYTHON_XARRAY** for the other.
+On the command line for any of the MET tools which will be obtaining its data from a Python script rather than directly from a data file, the user should specify either **PYTHON_NUMPY** or **PYTHON_XARRAY** wherever a (forecast or observation) data file would normally be given. Then in the **name** entry of the config file dictionaries for the forecast or observation data (typically used to specify the field name from the input data file), the user should list the **full path** to the Python script to be run followed by any command line arguments for that script. Note that for tools like MODE that take two data files, it is entirely possible to use the **PYTHON_NUMPY** for one file and the **PYTHON_XARRAY** for the other.
 
 Listed below is an example of running the Plot-Data-Plane tool to call a Python script for data that is included with the MET release tarball. Assuming the MET executables are in your path, this example may be run from the top-level MET source code directory:
 
@@ -282,7 +285,7 @@ Listed below is an example of running the Plot-Data-Plane tool to call a Python 
     'name="scripts/python/examples/read_ascii_numpy.py data/python/fcst.txt FCST";' \
     -title "Python enabled plot_data_plane"
     
-The first argument for the Plot-Data-Plane tool is the gridded data file to be read. When calling Python script that has a two-dimensional gridded dataplane stored in a NumPy N-D array object, set this to the constant string PYTHON_NUMPY. The second argument is the name of the output PostScript file to be written. The third argument is a string describing the data to be plotted. When calling a Python script, set **name** to the full path of the Python script to be run along with any command line arguments for that script. Lastly, the **-title** option is used to add a title to the plot. Note that any print statements included in the Python script will be printed to the screen. The above example results in the following log messages:
+The first argument for the Plot-Data-Plane tool is the gridded data file to be read. When calling Python script that has a two-dimensional gridded dataplane stored in a NumPy N-D array object, set this to the constant string **PYTHON_NUMPY**. The second argument is the name of the output PostScript file to be written. The third argument is a string describing the data to be plotted. When calling a Python script, set **name** to the full path of the Python script to be run along with any command line arguments for that script. Lastly, the **-title** option is used to add a title to the plot. Note that any print statements included in the Python script will be printed to the screen. The above example results in the following log messages:
 
 .. code-block:: none
 		
@@ -298,9 +301,10 @@ The first argument for the Plot-Data-Plane tool is the gridded data file to be r
                'grid': {...} } 
   DEBUG 1: Creating postscript file: fcst.ps
 
-**Special Case for Ensemble-Stat, Series-Analysis, and MTD**
+Special Case for Ensemble-Stat, Series-Analysis, and MTD
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Since Ensemble-Stat, Series-Analysis, and MTD read multiple input files, a different approach to using Python embedding is required. This approach can be used in any of the MET tools, but it is required when using Python embedding with Ensemble-Stat, Series-Analysis, and MTD. The Ensemble-Stat, Series-Analysis, and MTD tools support the use of file lists on the command line, as do some other MET tools. Typically, the ASCII file list contains a list of files which actually exist on your machine and should be read as input. For Python embedding, these tools loop over the ASCII file list entries, set MET_PYTHON_INPUT_ARG to that string, and execute the Python script. This only allows a single command line argument to be passed to the Python script. However multiple arguments may be concatenated together using some delimiter, and the Python script can be defined to parse arguments using that delimiter. When file lists are constructed in this way, the entries will likely not be files which actually exist on your machine. In this case, users should place the constant string "file_list" on the first line of their ASCII file lists. This will ensure that the MET tools will parse the file list properly.
+Since Ensemble-Stat, Series-Analysis, and MTD read multiple input files, a different approach to using Python embedding is required. This approach can be used in any of the MET tools, but it is required when using Python embedding with Ensemble-Stat, Series-Analysis, and MTD. The Ensemble-Stat, Series-Analysis, and MTD tools support the use of file lists on the command line, as do some other MET tools. Typically, the ASCII file list contains a list of files which actually exist on your machine and should be read as input. For Python embedding, these tools loop over the ASCII file list entries, set **MET_PYTHON_INPUT_ARG** to that string, and execute the Python script. This only allows a single command line argument to be passed to the Python script. However multiple arguments may be concatenated together using some delimiter, and the Python script can be defined to parse arguments using that delimiter. When file lists are constructed in this way, the entries will likely not be files which actually exist on your machine. In this case, users should place the constant string "file_list" on the first line of their ASCII file lists. This will ensure that the MET tools will parse the file list properly.
 
 On the command line for any of the MET tools, specify the path to the input gridded data file(s) as the usage statement for the tool indicates. Do **not** substitute in **PYTHON_NUMPY** or **PYTHON_XARRAY** on the command line for this case. Instead, in the config file dictionary set the **file_type** entry to either **PYTHON_NUMPY** or **PYTHON_XARRAY** to activate Python embedding in MET. Then, in the **name** entry of the config file dictionaries for the forecast or observation data, list the full path to the Python script to be run followed by any command line arguments for that script. However, in the Python command, replace the name of the input gridded data file with the constant string **MET_PYTHON_INPUT_ARG**. When looping over multiple input files, the MET tools will replace that constant **MET_PYTHON_INPUT_ARG** with the path to the file currently being processed. The example plot_data_plane command listed below yields the same result as the example shown above, but using the approach for this special case:
 
@@ -313,6 +317,10 @@ On the command line for any of the MET tools, specify the path to the input grid
 
 Examples of Python Embedding for 2D Gridded Dataplanes
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+1. TBD: MET commands
+2. TBD: Python Scripts
+3. TBD: Scripts and stuff from the DTC webpage?
 
 .. _pyembed-point-obs-data:
 
