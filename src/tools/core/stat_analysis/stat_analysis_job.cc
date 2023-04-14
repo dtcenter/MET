@@ -40,7 +40,7 @@
 //   019    01/24/20  Halley Gotway   Add aggregate RPS lines.
 //   020    04/02/21  Halley Gotway   MET #1736, write output to -out or
 //                    -out_stat, but not both.
-//   021    04/12/21  Halley Gotway   MET #1735 Support multiple 
+//   021    04/12/21  Halley Gotway   MET #1735 Support multiple
 //                    -out_thresh and -out_line_type options.
 //   022    05/28/21  Halley Gotway   Add MCTS HSS_EC output.
 //   023    11/10/22  Halley Gotway   MET #2339 Add SEEPS and SEEPS_MPR
@@ -2714,6 +2714,13 @@ void write_job_aggr_seeps(STATAnalysisJob &job, STATLineType lt,
    StatHdrColumns shc;
 
    //
+   // Determine the number of rows
+   //
+   for(it = m.begin(), n = 0; it != m.end(); it++) {
+      n += it->second.ssvar_bins.size();
+   }
+
+   //
    // Setup the output table
    //
    n_row = 1 + m.size();
@@ -2737,6 +2744,7 @@ void write_job_aggr_seeps(STATAnalysisJob &job, STATLineType lt,
    //
    // Loop through the map
    //
+
    for(it = m.begin(), r=1; it != m.end(); it++) {
 
       //
@@ -2777,6 +2785,13 @@ void write_job_aggr_seeps_mpr(STATAnalysisJob &job, STATLineType lt,
    int n, n_row, n_col, r, c;
    StatHdrColumns shc;
    SeepsAggScore agg_score;
+
+   //
+   // Determine the number of rows
+   //
+   for(it = m.begin(), n = 0; it != m.end(); it++) {
+      n += it->second.ssvar_bins.size();
+   }
 
    //
    // Setup the output table
