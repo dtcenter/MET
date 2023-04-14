@@ -21,8 +21,10 @@ input_file = os.path.expandvars(sys.argv[1])
 try:
    print("Input File:\t" + repr(input_file))
 
-   # Read MPR lines by using pandas package, skipping the header row and
-   # first column. Input should be a 36 column text data.
+   # Read MPR lines by using the Pandas Python package,
+   # skipping the header row and first column.
+   # Input should be a 36 column text data matching the MPR line-type
+   # output from MET tools.
    mpr_data = mpr_data.read_mpr(input_file, col_start=1, col_last=36, skiprows=1)
    print("Data Length:\t" + repr(len(mpr_data)))
    print("Data Type:\t" + repr(type(mpr_data)))
