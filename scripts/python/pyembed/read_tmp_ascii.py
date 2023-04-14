@@ -21,21 +21,21 @@ __version__ = '1.0.0'
 import argparse
 
 try:
-    from python_embedding import pyembed_tools
+   from python_embedding import pyembed_tools
 except:
-    from pyembed.python_embedding import pyembed_tools
+   from pyembed.python_embedding import pyembed_tools
 
 def read_tmp_ascii(filename):
-    global ascii_data   # defined at python_handler.cc (tmp_list_name)
-    ascii_data = pyembed_tools.read_tmp_ascii(filename)
-    return ascii_data
+   global ascii_data   # defined at python_handler.cc (tmp_list_name)
+   ascii_data = pyembed_tools.read_tmp_ascii(filename)
+   return ascii_data
 
 if __name__ == '__main__':
-    """
-    Parse command line arguments
-    """
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--filename', type=str)
-    args = parser.parse_args()
+   """
+   Parse command line arguments
+   """
+   parser = argparse.ArgumentParser()
+   parser.add_argument('--filename', type=str)
+   args = parser.parse_args()
 
-    data = read_tmp_ascii(args.filename)
+   data = read_tmp_ascii(args.filename)

@@ -11,17 +11,17 @@
 import sys
 
 try:
-    from python_embedding import pyembed_tools
+   from python_embedding import pyembed_tools
+   pyembed_tools.add_python_path(__file__)
 except:
-    from pyembed.python_embedding import pyembed_tools
+   from pyembed.python_embedding import pyembed_tools
 
-pyembed_tools.add_python_path(__file__)
 from met.dataplane import dataplane
 
 #def write_dataplane(met_in, netcdf_filename):
 #    dataplane.write_dataplane(met_in, netcdf_filename)
 
 if __name__ == '__main__':
-    netcdf_filename = sys.argv[1]
-    met_in = pyembed_tools.call_python(sys.argv)
-    dataplane.write_dataplane(met_in, netcdf_filename)
+   netcdf_filename = sys.argv[1]
+   met_in = pyembed_tools.call_python(sys.argv)
+   dataplane.write_dataplane(met_in, netcdf_filename)
