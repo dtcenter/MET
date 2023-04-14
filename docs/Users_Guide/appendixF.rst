@@ -451,7 +451,31 @@ Both of the above examples use the **read_ascii_point.py** example script which 
 Examples of Python Embedding for Point Observations
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-TODO: Add some more examples here?
+**PointStat with Python embedding for forecast and observations**
+
+.. code-block:: none
+   :caption: PointStat Command with Dual Python Embedding
+
+   point_stat 'PYTHON_NUMPY' 'PYTHON_NUMPY' PointStat_config -outdir /path/to/output
+
+.. code-block:: none
+   :caption: PointStat Config with Dual Python Embedding
+
+   fcst = {
+      field = [
+         {
+           name = "/path/to/fcst/python/script.py python_arg1 python_arg2";
+         }
+      ];
+    }
+
+    obs = {
+      field = [
+         {
+           name = "/path/to/obs/python/script.py python_arg1 python_arg2";
+         }
+      ];
+    }
 
 .. _pyembed-mpr-data:
 
