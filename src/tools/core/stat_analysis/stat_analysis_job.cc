@@ -2713,12 +2713,7 @@ void write_job_aggr_seeps(STATAnalysisJob &job, STATLineType lt,
    int n, n_row, n_col, r, c;
    StatHdrColumns shc;
 
-   //
-   // Determine the number of rows
-   //
-   for(it = m.begin(), n = 0; it != m.end(); it++) {
-      n += it->second.ssvar_bins.size();
-   }
+   n = 0;
 
    //
    // Setup the output table
@@ -2786,12 +2781,7 @@ void write_job_aggr_seeps_mpr(STATAnalysisJob &job, STATLineType lt,
    StatHdrColumns shc;
    SeepsAggScore agg_score;
 
-   //
-   // Determine the number of rows
-   //
-   for(it = m.begin(), n = 0; it != m.end(); it++) {
-      n += it->second.ssvar_bins.size();
-   }
+   n = 0;
 
    //
    // Setup the output table
