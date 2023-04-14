@@ -47,7 +47,30 @@ valid_exc = [];
 // Subset by the valid hour and lead time.
 //
 valid_hour = [];
-lead       = [];
+lead       = [ "0", "6", "12", "18", "24" ];
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Domain-specific cylindrical coordinate transformation and diagnostics scripts
+//
+domain_info = [
+   {
+      domain         = "parent";
+      n_range        = 150;
+      n_azimuth      = 8;
+      delta_range_km = 10.0;
+      diag_script    = [ "MET_BASE/python/tc_diag/compute_all_diagnostics.py",
+                         "MET_BASE/python/tc_diag/compute_custom_diagnostics.py" ];
+   },
+   {
+      domain         = "nest";
+      n_range        = 100;
+      n_azimuth      = 8;
+      delta_range_km = 10.0;
+      diag_script    = [ "MET_BASE/python/tc_diag/compute_sst_diagnostics.py" ];
+   }
+];
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -55,28 +78,27 @@ lead       = [];
 // Data censoring and conversion
 // May be set separately in each "data.field" entry
 //
-censor_thresh = [];
-censor_val    = [];
-convert(x)    = x;
-
+// censor_thresh = [];
+// censor_val    = [];
+// convert(x)    = x;
 //
-// Range-Azimuth grid parameters
-// May be set separately in each "data.field" entry
-//
-n_range        = 100;
-n_azimuth      = 180;
-max_range_km   = 1000.0;
-delta_range_km = 10.0;
-rmw_scale      = 0.2;
 
 //
 // Data fields
 //
 data = {
+
+   // If empty, the field is processed for all domains
+   domain = [];
+
    field = [
       {
          name  = "TMP";
-         level = ["P500"];
+         level = ["P500","Z2"];
+      },
+      {
+         name  = "RH";
+         level = "P500";
       }
    ];
 }
@@ -108,18 +130,11 @@ radial_velocity_long_field_name = "Radial Velocity";
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// NetCDF output file
-// May be set separately in each "data.field" entry
+// Flags to control output files
 //
-nc_out_flag = {
-   track       = TRUE;
-   grid_latlon = TRUE;
-   grid_raw    = TRUE;
-   cyl_latlon  = TRUE;
-   cyl_raw     = TRUE;
-   diag        = TRUE;
-}
-nc_out_flag = FALSE;
+nc_rng_azi_flag = TRUE;
+nc_diag_flag    = TRUE;
+cira_diag_flag  = TRUE;
 
 ////////////////////////////////////////////////////////////////////////////////
 

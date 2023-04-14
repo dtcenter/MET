@@ -105,12 +105,12 @@ class OutFileInfo {
       //////////////////////////////////////////////////////////////////
 
       // Track information
-      TrackInfo track;
-      netCDF::NcDim track_dim;
+      const TrackInfo *trk_ptr; // not allocated
 
       // NetCDF Cylindrical Coordinates output
-      ConcatString    nc_cyl_coord_file;
-      netCDF::NcFile *nc_cyl_coord_out;
+      // Mapping of domain name to output files
+      std::map<std::string,ConcatString>     nc_rng_azi_file_map;
+      std::map<std::string,netCDF::NcFile *> nc_rng_azi_out_map;
 
       // NetCDF Diagnostics output
       ConcatString    nc_diag_file;
@@ -122,21 +122,69 @@ class OutFileInfo {
       AsciiTable     cira_diag_at;
 
       void clear();
+
+      netCDF::NcFile *setup_nc_file(const string &);
 };
 
-static std::vector<OutFileInfo> out_info;
+static std::map<std::string,OutFileInfo> out_map;
 
 ////////////////////////////////////////////////////////////////////////
 //
-// Miscellaneous Variables
+// Variables for Temp Files
 //
 ////////////////////////////////////////////////////////////////////////
 
-static Grid input_grid;
+class TmpFileInfo {
 
-// Grid coordinate arrays
-static double *lat_arr = (double *) 0;
-static double *lon_arr = (double *) 0;
+   private:
+
+      void init_from_scratch();
+
+   public:
+
+      TmpFileInfo();
+      ~TmpFileInfo();
+
+      //////////////////////////////////////////////////////////////////
+
+      // Track information
+      const TrackInfo  *trk_ptr; // not allocated
+      const TrackPoint *pnt_ptr; // not allocated
+
+      // Range azimuth grid
+      Grid grid;
+      TcrmwGrid ra_grid;
+
+      // Domain name
+      std::string domain;
+
+      // NetCDF Cylindrical Coordinates output
+      ConcatString    tmp_file;
+      netCDF::NcFile *tmp_out;
+
+      // NetCDF Dimensions
+      netCDF::NcDim trk_dim;
+      netCDF::NcDim vld_dim;
+      netCDF::NcDim rng_dim;
+      netCDF::NcDim azi_dim;
+
+      // NetCDF Variables
+      netCDF::NcVar lat_var;
+      netCDF::NcVar lon_var;
+      netCDF::NcVar vld_var;
+
+      void open(const TrackInfo *, const TrackPoint *,
+                const DomainInfo &);
+      void close();
+
+      void clear();
+
+      void setup_nc_file(const DomainInfo &);
+      void write_nc_data(const VarInfo *, const DataPlane &,
+                         const Grid &);
+};
+
+static std::map<std::string,TmpFileInfo> tmp_map;
 
 ////////////////////////////////////////////////////////////////////////
 

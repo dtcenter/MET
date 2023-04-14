@@ -24,25 +24,25 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 //
-//  Code for class TCDiagDomainInfo
+//  Code for class DomainInfo
 //
 ////////////////////////////////////////////////////////////////////////
 
-TCDiagDomainInfo::TCDiagDomainInfo() {
+DomainInfo::DomainInfo() {
 
    init_from_scratch();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-TCDiagDomainInfo::~TCDiagDomainInfo() {
+DomainInfo::~DomainInfo() {
 
    clear();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCDiagDomainInfo::init_from_scratch() {
+void DomainInfo::init_from_scratch() {
 
    clear();
 
@@ -51,7 +51,9 @@ void TCDiagDomainInfo::init_from_scratch() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCDiagDomainInfo::clear() {
+void DomainInfo::clear() {
+
+   domain.clear();
 
    data.name         = (const char *) 0;
    data.range_n      = bad_data_int;
@@ -71,13 +73,13 @@ void TCDiagDomainInfo::clear() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCDiagDomainInfo::parse_domain_info(Dictionary &dict, ConcatString &domain) {
-
-   // Conf: domain
-   domain = dict.lookup_string(conf_key_domain);
+void DomainInfo::parse_domain_info(Dictionary &dict) {
 
    // Initialize
    clear();
+
+   // Conf: domain
+   domain = dict.lookup_string(conf_key_domain);
 
    // Hard-code the name
    data.name = "TCRMW";
@@ -156,9 +158,9 @@ void TCDiagConfInfo::clear() {
    tangential_velocity_long_field_name.clear();
    radial_velocity_long_field_name.clear();
 
-   nc_cyl_coord_flag = false;
-   nc_diag_flag      = false;
-   cira_diag_flag    = false;
+   nc_rng_azi_flag = false;
+   nc_diag_flag    = false;
+   cira_diag_flag  = false;
 
    tmp_dir.clear();
    output_prefix.clear();
@@ -189,9 +191,9 @@ void TCDiagConfInfo::process_config(GrdFileType file_type,
                                     map<string,StringArray> data_files_map) {
    int i;
    StringArray sa;
-   VarInfoFactory info_factory;
    Dictionary *dict = (Dictionary *) 0;
-   map<string,TCDiagDomainInfo>::iterator it;
+   map<string,DomainInfo>::iterator it;
+   VarInfoFactory vi_factory;
 
    // Conf: version
    check_met_version(conf.lookup_string(conf_key_version).c_str());
@@ -264,10 +266,9 @@ void TCDiagConfInfo::process_config(GrdFileType file_type,
 
       // Get current dictionary
       Dictionary i_dict = parse_conf_i_vx_dict(dict, i);
-      VarInfoFactory info_factory;
 
       // Conf: field.name and field.level
-      VarInfo *vi = info_factory.new_var_info(file_type);
+      VarInfo *vi = vi_factory.new_var_info(file_type);
       vi->set_dict(i_dict);
       var_info.push_back(vi);
 
@@ -310,8 +311,8 @@ void TCDiagConfInfo::process_config(GrdFileType file_type,
    radial_velocity_long_field_name =
       conf.lookup_string(conf_key_radial_velocity_long_field_name);
 
-   // Conf: nc_cyl_coord_flag
-   nc_cyl_coord_flag = conf.lookup_bool(conf_key_nc_cyl_coord_flag);
+   // Conf: nc_rng_azi_flag
+   nc_rng_azi_flag = conf.lookup_bool(conf_key_nc_rng_azi_flag);
 
    // Conf: nc_diag_flag
    nc_diag_flag = conf.lookup_bool(conf_key_nc_diag_flag);
@@ -354,34 +355,33 @@ void TCDiagConfInfo::parse_domain_info_map(map<string,StringArray> data_files_ma
 
    // Parse each grid info object
    for(int i=0; i<dict->n_entries(); i++) {
-      ConcatString domain;
-      TCDiagDomainInfo di;
+      DomainInfo di;
 
       // Parse the current domain info
-      di.parse_domain_info(*((*dict)[i]->dict_value()), domain);
+      di.parse_domain_info(*((*dict)[i]->dict_value()));
 
       // Store the domain-specifc data files
-      if(data_files_map.count(domain) > 0) {
-         di.data_files = data_files_map[domain];
+      if(data_files_map.count(di.domain) > 0) {
+         di.data_files = data_files_map[di.domain];
       }
       else {
          mlog << Error << "\nTCDiagConfInfo::parse_domain_info_map() -> "
-              << "no \"-data " << domain << "\" command line option provided for the \""
-              << conf_key_domain_info << "." << conf_key_domain << "\" = \"" << domain
+              << "no \"-data " << di.domain << "\" command line option provided for the \""
+              << conf_key_domain_info << "." << conf_key_domain << "\" = \"" << di.domain
               << "\" config file entry!\n\n";
          exit(1);
       }
 
       // Check for duplicate entries
-      if(domain_info_map.count(domain) > 0) {
+      if(domain_info_map.count(di.domain) > 0) {
          mlog << Error << "\nTCDiagConfInfo::parse_domain_info_map() -> "
               << "multiple \"" << conf_key_domain_info
-              << "\" entries found for domain \"" << domain << "\"!\n\n";
+              << "\" entries found for domain \"" << di.domain << "\"!\n\n";
          exit(1);
       }
       // Store a new entry
       else {
-         domain_info_map[domain] = di;
+         domain_info_map[di.domain] = di;
       }
    }
 

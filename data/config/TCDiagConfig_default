@@ -78,9 +78,10 @@ domain_info = [
 // Data censoring and conversion
 // May be set separately in each diag_data "field" entry
 //
-censor_thresh = [];
-censor_val    = [];
-convert(x)    = x;
+// censor_thresh = [];
+// censor_val    = [];
+// convert(x)    = x;
+//
 
 //
 // Data fields
@@ -140,9 +141,9 @@ radial_velocity_long_field_name = "Radial Velocity";
 //
 // Flags to control output files
 //
-nc_cyl_coord_flag = TRUE;
-nc_diag_flag      = TRUE;
-cira_diag_flag    = TRUE;
+nc_rng_azi_flag = TRUE;
+nc_diag_flag    = TRUE;
+cira_diag_flag  = TRUE;
 
 ////////////////////////////////////////////////////////////////////////////////
 

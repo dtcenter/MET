@@ -1198,12 +1198,12 @@ static const char conf_key_tangential_velocity_long_field_name[] = "tangential_v
 // TC-Diag specific paramter key names
 //
 
-static const char conf_key_domain_info[]       = "domain_info";
-static const char conf_key_domain[]            = "domain";
-static const char conf_key_diag_script[]       = "diag_script";
-static const char conf_key_nc_cyl_coord_flag[] = "nc_cyl_coord_flag";
-static const char conf_key_nc_diag_flag[]      = "nc_diag_flag";
-static const char conf_key_cira_diag_flag[]    = "cira_diag_flag";
+static const char conf_key_domain_info[]     = "domain_info";
+static const char conf_key_domain[]          = "domain";
+static const char conf_key_diag_script[]     = "diag_script";
+static const char conf_key_nc_rng_azi_flag[] = "nc_rng_azi_flag";
+static const char conf_key_nc_diag_flag[]    = "nc_diag_flag";
+static const char conf_key_cira_diag_flag[]  = "cira_diag_flag";
 
 //
 // Parameter value names common to multiple tools

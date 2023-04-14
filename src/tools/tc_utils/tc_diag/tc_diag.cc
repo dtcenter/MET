@@ -56,43 +56,58 @@ static void usage();
 static void process_command_line(int, char**);static void set_file_type(const StringArray &);
 
 static void process_tracks(TrackInfoArray&);
-static void get_atcf_files(const StringArray&, const StringArray&, StringArray&, StringArray&);
-static void process_track_files(const StringArray&, const StringArray&, TrackInfoArray&);
+static void get_atcf_files(const StringArray&,
+                           const StringArray&,
+                           StringArray&,
+                           StringArray&);
+static void process_track_files(const StringArray&,
+                                const StringArray&,
+                                TrackInfoArray&);
 static void process_track_points(const TrackInfoArray &);
-static void process_fields(const TrackPoint &);
+static void process_fields(const TrackInfoArray &,
+                           unixtime, int,
+                           const string &,
+                           const DomainInfo &);
 static bool is_keeper(const ATCFLineBase *);
 
 static void set_deck(const StringArray&);
-static void set_atcf_source(const StringArray&, StringArray&, StringArray&);
+static void set_atcf_source(const StringArray&,
+                            StringArray&,
+                            StringArray&);
 static void set_data(const StringArray&);
 static void set_config(const StringArray&);
 static void set_outdir(const StringArray&);
 
 static void setup_out_files(const TrackInfoArray &);
-static void setup_nc_file(const TrackInfo &, const char *, NcFile *);
-static ConcatString build_tmpfile_name(const TrackInfo &, const char *);
-static ConcatString build_outfile_name(const TrackInfo &, const char *);
-static void write_out_files();
+static ConcatString get_out_key(const TrackInfo &);
+static ConcatString get_tmp_key(const TrackInfo &,
+                                const TrackPoint &,
+                                const string &);
+
+static ConcatString build_tmp_file_name(const TrackInfo *,
+                                        const TrackPoint *,
+                                        const string &);
+static ConcatString build_out_file_name(const TrackInfo *,
+                                        const char *);
+static void close_out_files();
 
 static void compute_lat_lon(TcrmwGrid&, double*, double*);
 
 ////////////////////////////////////////////////////////////////////////
 
-// JHG see: https://github.com/dtcenter/MET/issues/2168#issuecomment-1347477566
-// JHG tcrmw output dimensions should be changed:
-// FROM:	double TMP(range, azimuth, pressure, track_point) ;
-// TO:  	double TMP(track_point, pressure, range, azimuth) ; the last 2 are the "gridded dimensions"
-// JHG, parallelize the processing of VALID TIMES. For each one, process all the data for all the track points
-// Propose that we have TC-Diag write:
-// - 1 ASCII CIRA diag file per track (unless that's turned off)
-// - 1 NetCDF diag file per track (unless that's turned off)
-// - 1 Gridded NetCDF file per track with the raw and/or cyl coordinate data used to compute diagnostics (unless that's turned off) - Should we combine with above?
+// JHG, things to do as of 4/14/2023:
+// - Change order of dimensions
+//   from: double TMP_P500(range, azimuth, time) ;
+//     to: double TMP_P500(time, pressure, range, azimuth) ;
+//   https://github.com/dtcenter/MET/issues/2168#issuecomment-1347477566
+// - Parellelize the processing of valid times
+// - Add NetCDF variable attributes
+// - Write 3D variables to NetCDF output file
+// - Write variable names track_lat/track_lon/grid_lat/grid_lon
+// - Call the diagnostic scripts on these temp NC files
+// - Stitch together the temp files into an output file
 //
-// JHG note that "regrid" appears in the TC-Diag and TC-RMW config files
-// I think it currently only applies to the raw data, meaning we can regrid
-// the raw data PRIOR TO the cyl coordinate transformation. Wondering if we
-// need options to support the cyl coordinate transformation?
-
+// Add back in the "regrid" dictionary to control how regridding to cyl coord is done?
 // Storm motion computation (from 4/7/23):
 //   - Include the full track in each temporary NetCDF file
 //   - For each track point, write the vmax and mslp as a single value for that time.
@@ -113,24 +128,8 @@ int met_main(int argc, char *argv[]) {
    // Process the gridded data
    process_track_points(tracks);
 
-   // Write output files
-   write_out_files();
-
-
-/* JHG work here
-
-   // JHG, not yet ready to write the tracks to the output
-   // if(nc_out) write_tc_tracks(nc_out, track_point_dim, tracks);
-
-   // Setup NetCDF output
-   if(!conf_info.nc_diag_info.all_false()) setup_nc_file(tracks[0]);
-
-   // List the output file
-   if(nc_out) {
-      mlog << Debug(1) << "Writing output file: "
-           << nc_out_file << "\n";
-   }
-*/
+   // Close the output files
+   close_out_files();
 
    return(0);
 }
@@ -311,8 +310,8 @@ void process_tracks(TrackInfoArray& tracks) {
       mlog << Error << "\nprocess_tracks() -> "
            << "set the \"init_inc\" config option to select one of the "
            << init_ta.n() << " track initialization times between "
-           << unix_to_yyyymmdd_hhmmss(init_ta.min()) << " and "
-           << unix_to_yyyymmdd_hhmmss(init_ta.max()) << ".\n\n";
+           << unix_to_yyyymmddhh(init_ta.min()) << " and "
+           << unix_to_yyyymmddhh(init_ta.max()) << ".\n\n";
       exit(1);
    }
 
@@ -476,7 +475,7 @@ bool is_keeper(const ATCFLineBase * line) {
    else if(conf_info.init_inc != (unixtime) 0 &&
          conf_info.init_inc != line->warning_time()) {
      cs << "init_inc " << unix_to_yyyymmddhh(line->warning_time())
-       << " != " << unix_to_yyyymmdd_hhmmss(conf_info.init_inc);
+       << " != " << unix_to_yyyymmddhh(conf_info.init_inc);
      keep = false;
    }
 
@@ -596,53 +595,78 @@ void set_outdir(const StringArray& a) {
 ////////////////////////////////////////////////////////////////////////
 
 void setup_out_files(const TrackInfoArray &tracks) {
-   OutFileInfo info;
+   OutFileInfo out_info;
 
-   // Write output files separately for each track
+   // Setup output files for each track
    for(int i=0; i<tracks.n(); i++) {
 
-      // Initialize
-      info.clear();
+      // Build the map key
+      ConcatString key = get_out_key(tracks[i]);
 
-      // Store pointer to the TrackInfo
-      info.track = tracks[i];
+      // Check for duplicates
+      if(out_map.count(key) > 0) {
+         mlog << Error << "\nsetup_out_files()-> "
+              << "found multiple tracks for key \""
+              << key << "\"!\n\n";
+         exit(1);
+      }
+
+      // Add new map entry
+      out_map[key] = out_info;
+
+      mlog << Debug(3) << "Preparing output files for "
+           << key << " track.\n";
+
+      // Store the track
+      out_map[key].trk_ptr = &tracks[i];
 
       // NetCDF cylindrical coordinates
-      if(conf_info.nc_cyl_coord_flag) {
-         info.nc_cyl_coord_file = build_outfile_name(info.track, "_cyl.nc");
-         setup_nc_file(info.track, info.nc_cyl_coord_file.c_str(), info.nc_cyl_coord_out);
+      if(conf_info.nc_rng_azi_flag) {
+
+         // One output file per track and domain
+         map<std::string,DomainInfo>::iterator it;
+         for(it  = conf_info.domain_info_map.begin();
+             it != conf_info.domain_info_map.end();
+             it++) {
+
+            // Build output file name
+            ConcatString suffix_cs, file_name;
+            suffix_cs << "_cyl_grid_" << it->first << ".nc";
+            file_name = build_out_file_name(out_map[key].trk_ptr,
+                                            suffix_cs.c_str());
+
+            out_map[key].nc_rng_azi_file_map[it->first] = file_name;
+            out_map[key].nc_rng_azi_out_map[it->first] =
+               out_map[key].setup_nc_file(file_name);
+         }
       }
 
       // NetCDF diagnostics output
       if(conf_info.nc_diag_flag) {
-         info.nc_diag_file = build_outfile_name(info.track, "_diag.nc");
-         setup_nc_file(info.track, info.nc_diag_file.c_str(), info.nc_diag_out);
+         out_map[key].nc_diag_file =
+            build_out_file_name(out_map[key].trk_ptr, "_diag.nc");
+         out_map[key].nc_diag_out =
+            out_map[key].setup_nc_file(out_map[key].nc_diag_file);
       }
 
       // CIRA diagnostics output
       if(conf_info.cira_diag_flag) {
-         info.cira_diag_file = build_outfile_name(info.track, "_diag.txt");
-         info.cira_diag_out = new ofstream;
-         info.cira_diag_out->open(info.cira_diag_file);
+         out_map[key].cira_diag_file =
+            build_out_file_name(out_map[key].trk_ptr, "_diag.txt");
+         out_map[key].cira_diag_out = new ofstream;
+         out_map[key].cira_diag_out->open(out_map[key].cira_diag_file);
 
-         if(!(*info.cira_diag_out)) {
+         if(!(*out_map[key].cira_diag_out)) {
             mlog << Error << "\nsetup_out_files()-> "
-                 << "can't open the output file \"" << info.cira_diag_file
+                 << "can't open the output file \""
+                 << out_map[key].cira_diag_file
                  << "\" for writing!\n\n";
             exit(1);
          }
 
          // Fixed width
-         info.cira_diag_out->setf(ios::fixed);
-
-         // List the output file
-         mlog << Debug(1) << "Writing output file: " << info.cira_diag_file << "\n";
-
+         out_map[key].cira_diag_out->setf(ios::fixed);
       }
-
-      // Store out file info for each track
-      out_info.push_back(info);
-
    } // end for i
 
    return;
@@ -650,154 +674,65 @@ void setup_out_files(const TrackInfoArray &tracks) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void setup_nc_file(const TrackInfo &track, const char *out_file, NcFile *nc_out) {
+ConcatString get_out_key(const TrackInfo &track) {
+   ConcatString cs;
 
-   // Open the output NetCDF file
-   nc_out = open_ncfile(out_file, true);
+   cs << track.storm_id() << "_"
+      << track.technique() << "_"
+      << unix_to_yyyymmddhh(track.init());
 
-   if(IS_INVALID_NC_P(nc_out)) {
-      mlog << Error << "\nsetup_nc_file() -> "
-           << "trouble opening output NetCDF file "
-           << out_file << "\n\n";
-      exit(1);
-   }
-
-   // List the output file
-   mlog << Debug(1) << "Writing output file: " << out_file << "\n";
-
-   // Track point dimension
-   NcDim track_point_dim = add_dim(nc_out, "track_point", track.n_points());
-
-   // Write the track
-   write_tc_track(nc_out, track_point_dim, track);
-
-   return;
+   return(cs);
 }
-
-/* JHG work here to write (lat, lon) of each track point
-   What about also writing all the ATCF lines?
-
-   VarInfo* var_info = (VarInfo*) 0;
-
-   // Build the output file name
-   nc_out_file = build_outfile_name(track, out_dir, fcst_hour, domain, ".nc");
-
-   // Create NetCDF file
-   nc_out = open_ncfile(nc_out_file.c_str(), true);
-
-   if(IS_INVALID_NC_P(nc_out)) {
-      mlog << Error << "\nsetup_nc_file() -> "
-           << "trouble opening output NetCDF file "
-           << nc_out_file << "\n\n";
-      exit(1);
-   }
-
-   // Track point dimension
-   track_point_dim = add_dim(nc_out, "track_point", NC_UNLIMITED);
-
-   // Loop over the domain definitions
-   map<std::string,TCDiagDomainInfo>::iterator it;
-   for(it  = conf_info.domain_info_map.begin();
-       it != conf_info.domain_info_map.end();
-       it++) {
-
-      TCDiagDomainInfo *di = &(it->second);
-
-      mlog << Debug(4) << "Writing cylindrical coordinates grid for domain \""
-           << it->first << "\" with range = " << di->data.range_n
-           << " and azimuth = " << di->data.azimuth_n << ".\n";
-
-      // Define dimension names
-      ConcatString rng_cs("range");
-      ConcatString azi_cs("azimuth");
-      if(conf_info.domain_info_map.size() > 1) {
-         rng_cs << "_" << it->first;
-         azi_cs << "_" << it->first;
-      }
-
-      // Define dimensions
-      di->range_dim   = add_dim(nc_out, rng_cs.c_str(), (long) di->data.range_n);
-      di->azimuth_dim = add_dim(nc_out, azi_cs.c_str(), (long) di->data.azimuth_n);
-   }
-
-   return;
-}
-*/
-/* JHG, gotta do this stuff later
-   // Define range and azimuth dimensions
-   def_tc_range_azimuth(nc_out, range_dim, azimuth_dim, tcrmw_grid,
-      conf_info.rmw_scale);
-
-   // Define latitude and longitude arrays
-   def_tc_lat_lon_time(nc_out, range_dim, azimuth_dim,
-      track_point_dim, lat_arr_var, lon_arr_var, valid_time_var);
-
-   // Find all variable levels, long names, and units
-   for(int i_var=0; i_var<conf_info.get_n_data(); i_var++) {
-
-      // Get VarInfo
-      var_info = conf_info.data_opt[i_var].var_info;
-      mlog << Debug(4) << "Processing field: " << var_info->magic_str() << "\n";
-      string fname = var_info->name_attr();
-      variable_levels[fname].push_back(var_info->level_attr());
-      variable_long_names[fname] = var_info->long_name_attr();
-      variable_units[fname] = var_info->units_attr();
-   }
-
-   // Define pressure levels
-   pressure_level_strings = get_pressure_level_strings(variable_levels);
-   pressure_levels = get_pressure_levels(pressure_level_strings);
-   pressure_level_indices = get_pressure_level_indices(pressure_level_strings, pressure_levels);
-   pressure_dim = add_dim(nc_out, "pressure", pressure_levels.size());
-   def_tc_pressure(nc_out, pressure_dim, pressure_levels);
-
-   def_tc_variables(nc_out,
-       variable_levels, variable_long_names, variable_units,
-       range_dim, azimuth_dim, pressure_dim, track_point_dim,
-       data_3d_vars);
-
-   return;
-}
-*/
 
 ////////////////////////////////////////////////////////////////////////
 
-ConcatString build_tmpfile_name(const TrackInfo &track,
-                                const TrackPoint &point,
-                                const char *domain) {
+ConcatString get_tmp_key(const TrackInfo &track,
+                         const TrackPoint &point,
+                         const string &domain) {
+   ConcatString cs;
+
+   cs << track.storm_id() << "_"
+      << track.technique() << "_"
+      << unix_to_yyyymmddhh(track.init()) << "_f"
+      << point.lead() /sec_per_hour << "_"
+      << domain;
+
+   return(cs);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ConcatString build_tmp_file_name(const TrackInfo *trk_ptr,
+                                 const TrackPoint *pnt_ptr,
+                                 const string &domain) {
    ConcatString cs;
 
    // Build the temp file name with the program name,
    // track/timing information, and domain name
 
    cs << conf_info.tmp_dir
-      << "/tmp_" << program_name
-      << "_"     << track.storm_id()
-      << "_"     << track.technique()
-      << "_"     << unix_to_yyyymmddhh(track.init())
-      << "_f"    << point.lead() / sec_per_hour
-      << "_"     << domain;
+      << "/tmp_" << program_name << "_"
+      << get_tmp_key(*trk_ptr, *pnt_ptr, domain);
 
    return(make_temp_file_name(cs.text(), ".nc"));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-ConcatString build_outfile_name(const TrackInfo &track,
-                                const char *suffix) {
+ConcatString build_out_file_name(const TrackInfo *trk_ptr,
+                                 const char *suffix) {
    ConcatString cs;
 
    // Build the output file name
    cs << out_dir << "/" << program_name;
 
    // Append the output prefix, if defined
-   if(conf_info.output_prefix.nonempty())
+   if(conf_info.output_prefix.nonempty()) {
       cs << "_" << conf_info.output_prefix;
+   }
 
-   // Append the storm ID, model, and initialization time
-   cs << "_" << track.storm_id()
-      << "_" << track.technique()
-      << "_" << unix_to_yyyymmddhh(track.init());
+   // Append the track information
+   cs << "_" << get_out_key(*trk_ptr);
 
    // Append the suffix
    cs << suffix;
@@ -807,9 +742,13 @@ ConcatString build_outfile_name(const TrackInfo &track,
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_out_files() {
+void close_out_files() {
 
-   for(int i=0; i<out_info.size(); i++) out_info[i].clear();
+   // Write output files for each track
+   map<std::string,OutFileInfo>::iterator it;
+   for(it = out_map.begin(); it != out_map.end(); it++) {
+      it->second.clear();
+   }
 
    return;
 }
@@ -817,17 +756,17 @@ void write_out_files() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void compute_lat_lon(TcrmwGrid& tcrmw_grid,
+void compute_lat_lon(TcrmwGrid& ra_grid,
                      double *lat_arr, double *lon_arr) {
 
    // Compute lat and lon coordinate arrays
-   for(int ir=0; ir<tcrmw_grid.range_n(); ir++) {
-      for(int ia=0; ia<tcrmw_grid.azimuth_n(); ia++) {
+   for(int ir=0; ir<ra_grid.range_n(); ir++) {
+      for(int ia=0; ia<ra_grid.azimuth_n(); ia++) {
          double lat, lon;
-         int i = ir * tcrmw_grid.azimuth_n() + ia;
-         tcrmw_grid.range_azi_to_latlon(
-            ir * tcrmw_grid.range_delta_km(),
-            ia * tcrmw_grid.azimuth_delta_deg(),
+         int i = ir * ra_grid.azimuth_n() + ia;
+         ra_grid.range_azi_to_latlon(
+            ir * ra_grid.range_delta_km(),
+            ia * ra_grid.azimuth_delta_deg(),
             lat, lon);
          lat_arr[i] =   lat;
          lon_arr[i] = - lon; // degrees east to west
@@ -840,189 +779,147 @@ void compute_lat_lon(TcrmwGrid& tcrmw_grid,
 ////////////////////////////////////////////////////////////////////////
 
 void process_track_points(const TrackInfoArray& tracks) {
-   int i, j, n_pts;
+   int i, j, i_pnt, n_pts;
+   TmpFileInfo tmp_info;
 
    // Build list of unique valid times
    TimeArray valid_ta;
    for(i=0,n_pts=0; i<tracks.n(); i++) {
       n_pts += tracks[i].n_points();
       for(j=0; j<tracks[i].n_points(); j++) {
-         if(!valid_ta.has(tracks[i][j].valid())) valid_ta.add(tracks[i][j].valid());
+         if(!valid_ta.has(tracks[i][j].valid())) {
+            valid_ta.add(tracks[i][j].valid());
+         }
       }
    }
 
    // Sort the valid times
    valid_ta.sort_array();
 
-   mlog << Debug(2) << "Processing " << tracks.n() << " tracks consisting of "
-        << n_pts << " points over " << valid_ta.n() << " valid times.\n";
+   mlog << Debug(2) << "Processing " << tracks.n()
+        << " tracks consisting of " << n_pts
+        << " points over " << valid_ta.n()
+        << " valid times.\n";
 
    // Parallel: Loop over the unique valid times
    for(i=0; i<valid_ta.n(); i++) {
 
-      mlog << Debug(3) << "Processing track points for "
-           << unix_to_yyyymmdd_hhmmss(valid_ta[i]) << ".\n";
+      mlog << Debug(3) << "Processing the "
+           << unix_to_yyyymmddhh(valid_ta[i]) << " valid time.\n";
 
-      // Read ALL the gridded data for this valid time for ALL domains
-      // JHG process_fields(valid_ta[i], tracks);
-      // store it as a map of domain to DataPlaneArray?
+      // Parellel: Loop over the domains to be processed
+      map<string,DomainInfo>::iterator dom_it;
+      for(dom_it  = conf_info.domain_info_map.begin();
+          dom_it != conf_info.domain_info_map.end();
+          dom_it++) {
 
-      // Parallel: Process the current valid time for all the tracks
-      for(j=0; j<tracks.n(); j++) {
+         mlog << Debug(3) << "Processing the "
+              << dom_it->first << " domain.\n";
 
-         // Parallel: Loop over domain info, do coordinate transformation, and run diagnostic scripts
+         // Setup a temp file for this valid time in each track
+         for(j=0; j<tracks.n(); j++) {
 
+            // Find the track point for this valid time
+            if((i_pnt = tracks[j].valid_index(valid_ta[i])) < 0) continue;
 
+            // Build the map key
+            ConcatString tmp_key = get_tmp_key(tracks[j],
+                                               tracks[j][i_pnt],
+                                               dom_it->first);
 
-         // JHG work here
-         // compute_diagnostics(...);
-         mlog << Debug(3) << "JHG track " << j << " of " << tracks.n() << "\n";
+            // Check for duplicates
+            if(tmp_map.count(tmp_key) > 0) {
+               mlog << Error << "\nprocess_track_points()-> "
+                    << "found multiple temp file entries for key \""
+                    << tmp_key << "\"!\n\n";
+               exit(1);
+            }
 
-      } // end for j
-   } // end for i
-/*
+            // Add new map entry
+            tmp_map[tmp_key] = tmp_info;
 
-Need a data structure to map TrackInfo objects to data sources:
+            // Setup a temp file for the current point
+            tmp_map[tmp_key].open(&tracks[j],
+                                  &tracks[j][i_pnt],
+                                  dom_it->second);
 
-struct TrackDataInfo
-{
-   TrackInfo *track_ptr;
-   vector<string> domains;
-   vector<StringArray *> data_files;
-};
+         } // end for j
 
-// Array of structs that
-vector<TrackDataInfo> track_data_info;
+         // Process the gridded data for the current time
+         process_fields(tracks, valid_ta[i], i,
+                        dom_it->first, dom_it->second);
 
-John Halley Gotway, 2 min
-I've been thinking more about this and realize that the logic gets tricky pretty quickly. For 5 active storms, we'd have 5 nests and 5 tracks to process. But there's currently no logic that'd connect "domain = d01" with a particular storm_id... so no obvious way of connecting the model data to the track to which it corresponds.
-
-John Halley Gotway, Now
-I could either require that the domain name be set to the storm id (or something that connects it to the track data)... or I could do it automatically, making sure that the track point being processed actually falls INSIDE the nest. Only drawback is whether it's conceivable for the track points of 2 storms to exist inside the same nest.
-*/
-
-/* JHG
-   // Loop over track points
-   for(int i=0; i<track.n_points(); i++) {
-
-      mlog << Debug(3) << "[" << i+1 << " of "
-           << track.n_points()  << "] Processing track point valid at "
-           << unix_to_yyyymmdd_hhmmss(track[i].valid())
-           << " with center (lat, lon) = (" << track[i].lat() << ", "
-           << track[i].lon() << ").\n";
-
-      // Process the fields for this track point
-      process_fields(track[i]);
-
+      } // end for dom_it
    } // end for i
 
-   // JHG here's where we'd make calls to python scripts to compute diagnostics!
-*/
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_fields(const TrackPoint& point) {
+void process_fields(const TrackInfoArray &tracks,
+                    unixtime vld_ut, int i_vld,
+                    const string &domain,
+                    const DomainInfo &di) {
+   int i, j, i_pnt;
    DataPlane data_dp;
-/* JHG this has moved up
-   // Loop over the fields to be processed
-   for(int i_var=0; i_var<conf_info.domain_info_map.size(); i_var++) {
+   Grid grid;
+   VarInfoFactory vi_factory;
+   VarInfo *vi = (VarInfo *) 0;
+   StringArray tmp_key_sa;
 
-      // Update the variable info with the valid time of the track point
-      VarInfo *var_info = conf_info.data_opt[i_var].var_info;
+   // Loop over the VarInfo fields to be processed
+   for(i=0; i<di.var_info_ptr.size(); i++) {
 
-      // Store pointer to the grid info
-      TCRMWGridInfo *gi = conf_info.data_opt[i_var].grid_info;
+      // Make a local VarInfo copy to store the valid time
+      vi = vi_factory.new_copy(di.var_info_ptr[i]);
+      vi->set_valid(vld_ut);
 
-      // Define latitude and longitude arrays
-      int nra = gi->data.range_n * gi->data.azimuth_n;
-      double *lat_arr = new double[nra];
-      double *lon_arr = new double[nra];
+      // Find data for this track point
+      get_series_entry(i_vld, vi,
+                       di.data_files, file_type,
+                       data_dp, grid);
 
-      // Set grid center
-      gi->data.lat_center =      point.lat();
-      gi->data.lon_center = -1.0*point.lon(); // degrees east to west
+      // Do coordinate transformation for each track point
+      for(j=0; j<tracks.n(); j++) {
 
-      // RMW is same as mrd()
-      gi->data.range_max_km = gi->rmw_scale * point.mrd() *
-                              tc_km_per_nautical_miles * gi->data.range_n;
+         // Find the track point for this valid time
+         if((i_pnt = tracks[j].valid_index(vld_ut)) < 0) continue;
 
-      // Instantiate the grid
-      TcrmwGrid tcrmw_grid(gi->data);
+         // Build the map keys
+         ConcatString out_key = get_out_key(tracks[j]);
+         ConcatString tmp_key = get_tmp_key(tracks[j],
+                                            tracks[j][i_pnt],
+                                            domain);
 
-      // Compute lat and lon coordinate arrays
-      compute_lat_lon(tcrmw_grid, lat_arr, lon_arr);
+         // Store the temp keys
+         if(!tmp_key_sa.has(tmp_key)) tmp_key_sa.add(tmp_key);
 
-      // JHG, write to nc?
+         // Compute and write the cylindrical coordinate data
+         tmp_map[tmp_key].write_nc_data(vi, data_dp, grid);
 
-      // Clean up
-      if(lat_arr) { delete[] lat_arr; lat_arr = (double *) 0; }
-      if(lon_arr) { delete[] lon_arr; lon_arr = (double *) 0; }
+      } // end for j
 
-   } // end for i_var
-*/
+      // Deallocate memory
+      delete vi;
+      vi = (VarInfo *) 0;
+
+   } // end for i
+
+   // Process the temp files
+   for(i=0; i<tmp_key_sa.n(); i++) {
+
+      // Close temp file
+      tmp_map[tmp_key_sa[i]].close();
+
+      // JHG TODO run python diagnostic scripts here
+
+      // Delete temp file
+      tmp_map[tmp_key_sa[i]].clear();
+   }
+
    return;
 }
-/* JHG keep working here
-      //
-      //
-
-
-
-
-
-      // Write NetCDF output
-      if(nc_out) {
-
-         // Write coordinate arrays
-         write_tc_data(nc_out, tcrmw_grid, i_point, lat_arr_var, lat_arr);
-         write_tc_data(nc_out, tcrmw_grid, i_point, lon_arr_var, lon_arr);
-
-         // Write valid time
-         write_tc_valid_time(nc_out, i_point, valid_time_var, valid_yyyymmddhh);
-      }
-
-      for(int i_var=0; i_var<conf_info.get_n_data(); i_var++) {
-
-         // Update the variable info with the valid time of the track point
-         var_info = conf_info.data_opt[i_var].var_info;
-
-         var_info->set_valid(valid_time);
-
-         // Find data for this track point
-         get_series_entry(i_point, var_info, data_files, file_type,
-                          data_dp, input_grid);
-
-         // Check data range
-         double data_min, data_max;
-         data_dp.data_range(data_min, data_max);
-         mlog << Debug(4) << "data_min:" << data_min << "\n";
-         mlog << Debug(4) << "data_max:" << data_max << "\n";
-
-         // Regrid data
-         data_dp = met_regrid(data_dp, input_grid, output_grid, var_info->regrid());
-         data_dp.data_range(data_min, data_max);
-         mlog << Debug(4) << "data_min:" << data_min << "\n";
-         mlog << Debug(4) << "data_max:" << data_max << "\n";
-
-         // Write NetCDF output
-         if(nc_out) {
-
-            if(variable_levels[var_info->name_attr()].size() > 1) {
-               write_tc_pressure_level_data(nc_out, tcrmw_grid,
-                  pressure_level_indices, var_info->level_attr(),
-                  i_point, data_3d_vars[var_info->name_attr()], data_dp.data());
-            }
-            else {
-               write_tc_data_rev(nc_out, tcrmw_grid, i_point,
-                  data_3d_vars[var_info->name_attr()], data_dp.data());
-            }
-         }
-      } // end for i_var
-
-
-*/
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -1044,10 +941,12 @@ OutFileInfo::~OutFileInfo() {
 
 void OutFileInfo::init_from_scratch() {
 
+   // Initialize track pointer
+   trk_ptr = (TrackInfo *) 0;
+
    // Initialize output file stream pointers
-   nc_cyl_coord_out = (NcFile *) 0;
-   nc_diag_out      = (NcFile *) 0;
-   cira_diag_out    = (ofstream *) 0;
+   nc_diag_out   = (NcFile *) 0;
+   cira_diag_out = (ofstream *) 0;
 
    clear();
 
@@ -1058,20 +957,40 @@ void OutFileInfo::init_from_scratch() {
 
 void OutFileInfo::clear() {
 
-   track.clear();
+   trk_ptr = (TrackInfo *) 0;
 
    // Write NetCDF cylindrical coordinates file
-   if(nc_cyl_coord_out) {
+   if(nc_rng_azi_out_map.size() > 0) {
 
-      // Close the output file
-      nc_cyl_coord_out->close();
-      delete nc_cyl_coord_out;
-      nc_cyl_coord_out = (NcFile *) 0;
+// JHG: note that we will NOT want output files for all domains, only the ones that apply
+
+      map<string,NcFile *>::iterator it;
+      for(it  = nc_rng_azi_out_map.begin();
+          it != nc_rng_azi_out_map.end();
+          it++) {
+
+         mlog << Debug(1) << "Writing output file: "
+              << nc_rng_azi_file_map[it->first] << "\n";
+
+         // Close the output file
+         it->second->close();
+         delete it->second;
+         it->second = (NcFile *) 0;
+
+         // Clear the file name
+         nc_rng_azi_file_map[it->first].clear();
+      }
+
+      // Empty the maps
+      nc_rng_azi_file_map.clear();
+      nc_rng_azi_out_map.clear();
    }
-   nc_cyl_coord_file.clear();
 
    // Write NetCDF diagnostics file
    if(nc_diag_out) {
+
+      mlog << Debug(1) << "Writing output file: "
+           << nc_diag_file << "\n";
 
       // Close the output file
       nc_diag_out->close();
@@ -1084,8 +1003,11 @@ void OutFileInfo::clear() {
    // Write CIRA diagnostics files
    if(cira_diag_out) {
 
+      mlog << Debug(1) << "Writing output file: "
+           << cira_diag_file << "\n";
+
       // Write the output
-      // JHG segfault *cira_diag_out << cira_diag_at;
+      *cira_diag_out << cira_diag_at;
 
       // Close the output file
       cira_diag_out->close();
@@ -1094,6 +1016,231 @@ void OutFileInfo::clear() {
    }
    cira_diag_file.clear();
    cira_diag_at.clear();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+NcFile *OutFileInfo::setup_nc_file(const string &out_file) {
+
+   if(!trk_ptr) return(nullptr);
+
+   // Open the output NetCDF file
+   NcFile *nc_out = open_ncfile(out_file.c_str(), true);
+
+   if(IS_INVALID_NC_P(nc_out)) {
+      mlog << Error << "\nOutFileInfo::setup_nc_file() -> "
+           << "trouble opening output NetCDF file "
+           << out_file << "\n\n";
+      exit(1);
+   }
+
+   // Track and valid time dimensions
+   NcDim trk_dim =
+      add_dim(nc_out, "track_point", trk_ptr->n_points());
+   NcDim vld_dim =
+      add_dim(nc_out, "time", trk_ptr->n_points());
+
+
+   // Write the track
+   write_tc_track(nc_out, trk_dim, *trk_ptr);
+
+   return(nc_out);
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+//  Code for class TmpFileInfo
+//
+////////////////////////////////////////////////////////////////////////
+
+TmpFileInfo::TmpFileInfo() {
+   init_from_scratch();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+TmpFileInfo::~TmpFileInfo() {
+   clear();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TmpFileInfo::init_from_scratch() {
+
+   // Initialize pointers
+   trk_ptr = (TrackInfo *) 0;
+   pnt_ptr = (TrackPoint *) 0;
+   tmp_out = (NcFile *) 0;
+
+   clear();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TmpFileInfo::open(const TrackInfo *t_ptr,
+                       const TrackPoint *p_ptr,
+                       const DomainInfo &di) {
+
+   // Set pointers
+   trk_ptr = t_ptr;
+   pnt_ptr = p_ptr;
+   domain    = di.domain;
+
+   // Open the temp file
+   tmp_file = build_tmp_file_name(trk_ptr, pnt_ptr, domain);
+
+   mlog << Debug(3) << "Creating temp file: " << tmp_file << "\n";
+
+   setup_nc_file(di);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TmpFileInfo::close() {
+
+   // Write NetCDF temp file
+   if(tmp_out) {
+
+      mlog << Debug(3) << "Writing temp file: "
+           << tmp_file << "\n";
+
+      // Close the output file
+      tmp_out->close();
+      delete tmp_out;
+      tmp_out = (NcFile *) 0;
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TmpFileInfo::clear() {
+
+   close();
+
+   trk_ptr = (TrackInfo *) 0;
+   pnt_ptr = (TrackPoint *) 0;
+
+   grid.clear();
+   ra_grid.clear();
+
+   domain.clear();
+
+   // Delete the temp file
+   // JHG if(tmp_file.nonempty()) remove_temp_file(tmp_file);
+
+   tmp_file.clear();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TmpFileInfo::setup_nc_file(const DomainInfo &di) {
+
+   // Open the output NetCDF file
+   tmp_out = open_ncfile(tmp_file.c_str(), true);
+
+   if(IS_INVALID_NC_P(tmp_out)) {
+      mlog << Error << "\nTmpFileInfo::setup_nc_file() -> "
+           << "trouble opening output NetCDF file "
+           << tmp_file << "\n\n";
+      exit(1);
+   }
+
+   // Define latitude and longitude arrays
+   TcrmwData d = di.data;
+   int nra = d.range_n * d.azimuth_n;
+   double *lat_arr = new double[nra];
+   double *lon_arr = new double[nra];
+
+   // Set grid center
+   d.lat_center   =      pnt_ptr->lat();
+   d.lon_center   = -1.0*pnt_ptr->lon(); // degrees east to west
+   d.range_max_km = di.delta_range_km * d.range_n;
+
+   // Instantiate the grid
+   grid.set(d);
+   ra_grid.set_from_data(d);
+
+   mlog << Debug(3) << "Defining cylindrical coordinates for (Lat, Lon) = ("
+        << pnt_ptr->lat() << ", " << pnt_ptr->lon()
+        << "), Range = " << ra_grid.range_n()
+        << ", Azimuth = " << ra_grid.azimuth_n() << "\n";
+
+   // Define dimensions
+   rng_dim = add_dim(tmp_out, "range", (long) ra_grid.range_n());
+   azi_dim = add_dim(tmp_out, "azimuth", (long) ra_grid.azimuth_n());
+   trk_dim = add_dim(tmp_out, "track_point", trk_ptr->n_points());
+   vld_dim = add_dim(tmp_out, "time", 1);
+
+   // Define range and azimuth dimensions
+   def_tc_range_azimuth(tmp_out, rng_dim, azi_dim,
+                        ra_grid, 1.0);
+
+   // Define latitude and longitude arrays
+   def_tc_lat_lon_time(tmp_out,
+                       rng_dim, azi_dim, vld_dim,
+                       lat_var, lon_var, vld_var);
+
+   // Write the track
+   write_tc_track(tmp_out, trk_dim, *trk_ptr);
+
+   // Compute lat and lon coordinate arrays
+   compute_lat_lon(ra_grid, lat_arr, lon_arr);
+
+   // Write coordinate arrays
+   write_tc_data(tmp_out, ra_grid, 0, lat_var, lat_arr);
+   write_tc_data(tmp_out, ra_grid, 0, lon_var, lon_arr);
+
+   // Write valid time
+   write_tc_valid_time(tmp_out, 0, vld_var, pnt_ptr->valid());
+
+   // Clean up
+   if(lat_arr) { delete[] lat_arr; lat_arr = (double *) 0; }
+   if(lon_arr) { delete[] lon_arr; lon_arr = (double *) 0; }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TmpFileInfo::write_nc_data(const VarInfo *vi, const DataPlane &dp_in,
+                                const Grid &grid_in) {
+   DataPlane dp_out;
+   RegridInfo ri;
+
+   // Use default regridding options
+   ri.method     = InterpMthd_Nearest;
+   ri.width      = 1;
+   ri.vld_thresh = 1.0;
+   ri.shape      = GridTemplateFactory::GridTemplate_Square;
+
+   // Do the cylindrical coordinate transformation
+   dp_out = met_regrid(dp_in, grid_in, grid, ri);
+
+   // Setup dimensions
+   vector<NcDim> dims;
+   dims.push_back(rng_dim);
+   dims.push_back(azi_dim);
+   dims.push_back(vld_dim);
+
+   // Create output variable
+   ConcatString var_name;
+   var_name << vi->name_attr() << "_" << vi->level_attr();
+   NcVar cur_var = tmp_out->addVar(var_name, ncDouble, dims);
+
+   // JHG need to add variable attributes
+
+   // Write the data
+   write_tc_data_rev(tmp_out, ra_grid, 0, cur_var, dp_out.data());
 
    return;
 }

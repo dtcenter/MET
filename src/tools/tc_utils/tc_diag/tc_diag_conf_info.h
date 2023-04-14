@@ -24,7 +24,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-class TCDiagDomainInfo {
+class DomainInfo {
 
    private:
 
@@ -32,8 +32,11 @@ class TCDiagDomainInfo {
 
    public:
 
-      TCDiagDomainInfo();
-      ~TCDiagDomainInfo();
+      DomainInfo();
+      ~DomainInfo();
+
+      // Domain name
+      string domain;
 
       // TcrmwData structure for creating a TcrmwGrid object
       TcrmwData data;
@@ -48,22 +51,19 @@ class TCDiagDomainInfo {
       // Diagnostic scripts to be run
       StringArray diag_script;
 
-      // NetCDF dimensions
-      netCDF::NcDim range_dim;
-      netCDF::NcDim azimuth_dim;
-
       //////////////////////////////////////////////////////////////////
 
       void clear();
 
-      void parse_domain_info(Dictionary &, ConcatString &);
+      void parse_domain_info(Dictionary &);
+      void set_data_files(const StringArray &);
 
       int get_n_data() const;
 };
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int TCDiagDomainInfo::get_n_data() const { return var_info_ptr.size(); }
+inline int DomainInfo::get_n_data() const { return var_info_ptr.size(); }
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -97,8 +97,8 @@ class TCDiagConfInfo {
       // Vector of VarInfo objects from data.field (allocated)
       std::vector<VarInfo *> var_info;
 
-      // Mapping of domain name to TCDiagDomainInfo
-      std::map<std::string,TCDiagDomainInfo> domain_info_map;
+      // Mapping of domain name to DomainInfo
+      std::map<std::string,DomainInfo> domain_info_map;
 
       // Wind conversion information
       bool compute_tangential_and_radial_winds;
@@ -116,7 +116,7 @@ class TCDiagConfInfo {
       ConcatString output_prefix;
 
       // Output file options
-      bool nc_cyl_coord_flag;
+      bool nc_rng_azi_flag;
       bool nc_diag_flag;
       bool cira_diag_flag;
 
