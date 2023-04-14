@@ -344,24 +344,84 @@ Examples of Python Embedding for 2D Gridded Dataplanes
       ];
     }
 
-1. TBD: MET commands
-2. TBD: Python Scripts
-3. TBD: Scripts and stuff from the DTC webpage?
+1. TODO: MET commands
+2. TODO: Python Scripts
+3. TODO: Scripts and stuff from the DTC webpage?
 
 .. _pyembed-point-obs-data:
 
 Python Embedding for Point Observations
 ---------------------------------------
 
-The ASCII2NC tool supports the "-format python" option. With this option, point observations may be passed as input. An example of this is shown below:
+MET also supports point observation data supplied in the :ref:`MET 11-column format<table_reformat-point_ascii2nc_format>`.
 
-.. code-block:: none
+Python Script Requirements for Point Observations
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-                ascii2nc -format python \
-                "python/examples/read_ascii_point.py data/sample_obs/ascii/sample_ascii_obs.txt" \
-                sample_ascii_obs_python.nc
+1. The data must be stored in a variable with the name **point_data**
 
-The Point2Grid, Plot-Point-Obs, Ensemble-Stat, and Point-Stat tools also process point observations. They support Python embedding of point observations directly on the command line by replacing the input MET NetCDF point observation file name with the Python command to be run. The Python command must begin with the prefix 'PYTHON_NUMPY=' and be followed by the path to the User's Python script and any arguments. The full command should be enclosed in single quotes to prevent embedded whitespace from causing parsing errors. An example of this is shown below:
+2. The **point_data** variable must be a Python list representation of a NumPy N-D Array created from a Pandas DataFrame
+
+3. The **point_data** variable must have data in each of the 11 columns required for the MET tools even if it is NA
+
+To provide the data that MET expects for point observations, the user is encouraged when designing their Python script to consider how to map their observations into the MET 11-column format. Then, the user can populate their observations into a Pandas DataFrame with the following column names and dtypes:
+
+.. list-table:: Point Observation DataFrame Columns and Dtypes
+   :widths: 5 5 10
+   :header-rows: 1
+
+   * - column name
+     - data type (dtype)
+     - description
+   * - typ
+     - string
+     - Message Type
+   * - sid
+     - string
+     - Station ID
+   * - vld
+     - string
+     - Valid Time (YYYYMMDD_HHMMSS)
+   * - lat
+     - numeric
+     - Latitude (Degrees North)
+   * - lon 
+     - numeric
+     - Longitude (Degrees East)
+   * - elv
+     - numeric
+     - Elevation (MSL)
+   * - var
+     - string
+     - Variable name (or GRIB code)
+   * - lvl
+     - numeric
+     - Level
+   * - hgt
+     - numeric
+     - Height (MSL or AGL)
+   * - qc
+     - string
+     - QC string
+   * - obs
+     - numeric
+     - Observation Value
+
+To create the variable for MET, use the **.values** property of the Pandas DataFrame and the **.tolist()** method of the NumPy N-D Array. For example:
+
+.. code-block:: Python
+   :caption: Convert Pandas DataFrame to MET variable
+
+   # Pandas DataFrame
+   my_dataframe = pd.DataFrame()
+
+   # Convert to MET variable
+   point_data = my_dataframe.values.tolist()
+
+Running Python Embedding for Point Observations
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The Point2Grid, Plot-Point-Obs, Ensemble-Stat, and Point-Stat tools support Python embedding for point observations. Python embedding for these tools can be invoked directly on the command line by replacing the input MET NetCDF point observation file name with the **full path** to the Python script and any arguments. The Python command must begin with the prefix **PYTHON_NUMPY=**. The full command should be enclosed in quotes to prevent embedded whitespace from causing parsing errors. An example of this is shown below for Plot-Point-Obs:
 
 .. code-block:: none
 
@@ -369,11 +429,25 @@ The Point2Grid, Plot-Point-Obs, Ensemble-Stat, and Point-Stat tools also process
                 "PYTHON_NUMPY=python/examples/read_ascii_point.py data/sample_obs/ascii/sample_ascii_obs.txt" \
                 output_image.ps
 
-Both of the above examples use the **read_ascii_point.py** sample script which is included with the MET code. It reads ASCII data in MET's 11-column point observation format and stores it in a Pandas DataFrame to be read by the MET tools using Python embedding for point data. The **read_ascii_point.py** sample script can be found in:
+The ASCII2NC tool also supports Python embedding, however invoking it varies slightly from other MET tools. For ASCII2NC, Python embedding is used by providing the "-format python" option on the command line. With this option, point observations may be passed as input. An example of this is shown below:
+
+.. code-block:: none
+
+                ascii2nc -format python \
+                "python/examples/read_ascii_point.py data/sample_obs/ascii/sample_ascii_obs.txt" \
+                sample_ascii_obs_python.nc
+
+
+Both of the above examples use the **read_ascii_point.py** example script which is included with the MET code. It reads ASCII data in MET's 11-column point observation format and stores it in a Pandas DataFrame to be read by the MET tools using Python embedding for point data. The **read_ascii_point.py** example script can be found in:
 
 • MET installation directory in *scripts/python/examples*.
 
 • `MET GitHub repository <https://github.com/dtcenter/MET>`_ in *scripts/python/examples*.
+
+Examples of Python Embedding for Point Observations
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+TODO: Add some more examples here?
 
 .. _pyembed-mpr-data:
 
@@ -387,3 +461,13 @@ The **read_ascii_mpr.py** sample script can be found in:
 • MET installation directory in *scripts/python/examples*.
 
 • `MET GitHub repository <https://github.com/dtcenter/MET>`_ in *MET/scripts/python/examples*.
+
+MET Python Module
+=================
+
+TODO: Maybe document some of the base classes and functions here?
+
+I think the most important is:
+met.dataplane.set_dataplane_attrs()
+
+Maybe add others later on.
