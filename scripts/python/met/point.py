@@ -441,7 +441,7 @@ class csv_point_obs(base_met_point_obs):
          error_msgs.append("{i}-th data: obs_value: only NA is accepted as string".format(i=index))
       return error_msgs
 
-  def check_csv_point_data(self, all_records=False):
+   def check_csv_point_data(self, all_records=False):
       if 0 == len(self.point_data):
          self.add_error_msg("No data!")
       elif all_records:
@@ -572,7 +572,7 @@ class csv_point_obs(base_met_point_obs):
       for key, idx in obs_var_map.items():
          self.obs_var_table[idx] = key
 
-  def get_num_value(self, column_value):
+   def get_num_value(self, column_value):
       num_value = column_value
       if isinstance(column_value, str):
          if self.is_number(column_value):
@@ -583,7 +583,7 @@ class csv_point_obs(base_met_point_obs):
                self.log_info(f'{column_value} is not a number, converted to the missing value')
       return num_value
 
-  def is_grib_code(self):
+   def is_grib_code(self):
       grib_code = True
       for _point_data in self.point_data:
          if isinstance(_point_data[6], int):
@@ -593,7 +593,7 @@ class csv_point_obs(base_met_point_obs):
             break;
       return grib_code
 
-  def is_num_string(self, column_value):
+   def is_num_string(self, column_value):
       is_string = isinstance(column_value, str)
       if is_string:
          is_num = True if self.is_number(column_value) or column_value.lower() == 'na' or column_value.lower() == 'n/a' else False
