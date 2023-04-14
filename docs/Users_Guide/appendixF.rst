@@ -494,7 +494,7 @@ Python Script Requirements for MPR Data
 
 2. The **mpr_data** variable must be a Python list representation of a NumPy N-D Array created from a Pandas DataFrame
 
-3. The **met_data** variable must have data in **exactly** 36 columns, corresponding to the summation of the :ref:`_table_PS_header_info_point-stat_out<common STAT output>` and the :ref:`_table_PS_format_info_MPR<MPR line type output>`.
+3. The **met_data** variable must have data in **exactly** 36 columns, corresponding to the summation of the :ref:`common STAT output<table_PS_header_info_point-stat_out>` and the :ref:`MPR line type output<table_PS_format_info_MPR>`.
 
 If a user does not have an existing MPR line type file created by the MET tools, they will need to map their data into the 36 columns expected by Stat-Analysis for the MPR line type data. If a user already has MPR line type files, the most direct way for a user to read MPR line type data is to model their Python script after the sample **read_ascii_mpr.py** script. Sample code is included here for convenience:
 
