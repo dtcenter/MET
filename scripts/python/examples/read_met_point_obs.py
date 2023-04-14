@@ -29,11 +29,11 @@ DO_PRINT_DATA = ARG_PRINT_DATA == sys.argv[-1]
 start_time = datetime.now()
 
 point_obs_data = None
-input_name = sys.argv[1]
+input_name = sys.argv[1] if len(sys.argv) > 1 else None
 prompt = met_point_tools.get_prompt()
 if len(sys.argv) == 1 or ARG_PRINT_DATA == input_name:
    # This is an example of creating a sample data
-   point_obs_data = met_point_tools.get_sample_met_point_obs()
+   point_obs_data = met_point_tools.get_sample_point_obs()
    point_obs_data.read_data([])
 elif met_point_tools.is_python_prefix(input_name):
    # This is an example of calling a python script for ascii2nc
