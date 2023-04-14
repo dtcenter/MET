@@ -1060,9 +1060,9 @@ MultiVarData *ModeExecutive::get_multivar_data()
     for (int y=0; y<grid.ny(); ++y) {
       int n = DefaultTO.two_to_one(grid.nx(), grid.ny(), x, y);
       if (engine.fcst_split->is_nonzero(x,y) ) {
-	mvd->fcst_obj_data[n] = nint(engine.fcst_split->data(x, y));
+        mvd->fcst_obj_data[n] = nint(engine.fcst_split->data(x, y));
       } else {
-	mvd->fcst_obj_data[n] = bad_data_int;
+        mvd->fcst_obj_data[n] = bad_data_int;
       }
     }
   }
@@ -1085,9 +1085,9 @@ MultiVarData *ModeExecutive::get_multivar_data()
     for (int y=0; y<grid.ny(); ++y) {
       int n = DefaultTO.two_to_one(grid.nx(), grid.ny(), x, y);
       if (engine.obs_split->is_nonzero(x,y) ) {
-	mvd->obs_obj_data[n] = nint(engine.obs_split->data(x, y));
+        mvd->obs_obj_data[n] = nint(engine.obs_split->data(x, y));
       } else {
-	mvd->obs_obj_data[n] = bad_data_int;
+        mvd->obs_obj_data[n] = bad_data_int;
       }
     }
   }
@@ -1356,46 +1356,46 @@ if ( info.all_false() )  return;
             // Extra nullptr checks to satisfy Fortify
 
          if ( info.do_raw &&
-	        fcst_raw_data != nullptr && obs_raw_data != nullptr &&
-	        engine.fcst_raw != nullptr && engine.obs_raw != nullptr  )  {
+              fcst_raw_data != nullptr && obs_raw_data != nullptr &&
+              engine.fcst_raw != nullptr && engine.obs_raw != nullptr  )  {
 
-             fcst_raw_data[n] = engine.fcst_raw->data (x, y);
-             obs_raw_data[n] = engine.obs_raw->data  (x, y);
+           fcst_raw_data[n] = engine.fcst_raw->data (x, y);
+           obs_raw_data[n] = engine.obs_raw->data  (x, y);
 
          }
 
          if(engine.fcst_split->is_nonzero(x, y) ) {
-	   if ( info.do_object_raw && fcst_obj_raw_data != nullptr && engine.fcst_raw != nullptr ) {
-	     fcst_obj_raw_data[n] = engine.fcst_raw->data(x, y);
-	   }
+           if ( info.do_object_raw && fcst_obj_raw_data != nullptr && engine.fcst_raw != nullptr ) {
+             fcst_obj_raw_data[n] = engine.fcst_raw->data(x, y);
+           }
            if ( info.do_object_id && fcst_obj_data != nullptr && engine.fcst_split != nullptr ) {
              fcst_obj_data[n] = nint(engine.fcst_split->data(x, y));
            }
          }
          else {
             if ( info.do_object_raw && fcst_obj_raw_data != nullptr ) {
-	      fcst_obj_raw_data[n] = bad_data_float;
-	    }
+              fcst_obj_raw_data[n] = bad_data_float;
+            }
             if ( info.do_object_id && fcst_obj_data != nullptr ) {
-	      fcst_obj_data[n] = bad_data_int;
-	    }
+              fcst_obj_data[n] = bad_data_int;
+            }
          }
 
          if(engine.obs_split->is_nonzero(x, y) ) {
-	   if ( info.do_object_raw && obs_obj_raw_data != nullptr ) {
-	     obs_obj_raw_data[n] = engine.obs_raw->data(x, y);
-	   }
-	   if ( info.do_object_id && obs_obj_data != nullptr ) {
-	     obs_obj_data[n] = nint(engine.obs_split->data(x, y));
-	   }
+           if ( info.do_object_raw && obs_obj_raw_data != nullptr ) {
+             obs_obj_raw_data[n] = engine.obs_raw->data(x, y);
+           }
+           if ( info.do_object_id && obs_obj_data != nullptr ) {
+             obs_obj_data[n] = nint(engine.obs_split->data(x, y));
+           }
          }
          else {
-	   if ( info.do_object_raw && obs_obj_raw_data != nullptr) {
-	     obs_obj_raw_data[n] = bad_data_float;
-	   }
+           if ( info.do_object_raw && obs_obj_raw_data != nullptr) {
+             obs_obj_raw_data[n] = bad_data_float;
+           }
            if ( info.do_object_id && obs_obj_data != nullptr ) {
-	     obs_obj_data[n] = bad_data_int;
-	   }
+             obs_obj_data[n] = bad_data_int;
+           }
          }
 
             //

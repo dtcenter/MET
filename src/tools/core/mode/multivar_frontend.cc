@@ -97,23 +97,21 @@ static void set_logfile   (const StringArray &);
 static void set_verbosity (const StringArray &);
 
 static void multivar_consistency_checks(StringArray &fcst_filenames, StringArray &obs_filenames,
-					BoolCalc &f_calc, BoolCalc &o_calc, int &n_files);
+                                        BoolCalc &f_calc, BoolCalc &o_calc, int &n_files);
 
 static ConcatString set_multivar_dir(int j);
 
 static MultiVarData *process_multivar_data(int j, const string &fcst_filename,
-					   const string &obs_filename,
-					   const ConcatString &dir);
+                                           const string &obs_filename,
+                                           const ConcatString &dir);
 
 static void process_masked_multivar_data(int j, const BoolPlane &f_result, const BoolPlane &o_result,
-					 int nx, int ny, const ConcatString &dir,
-					 MultiVarData &mvd);
+                                         int nx, int ny, const ConcatString &dir,
+                                         MultiVarData &mvd);
 
 static void mask_data(int nx, int ny, const BoolPlane &mask, DataPlane &data);
 
 static void read_config(const string & filename);
-
-static void run_command(const ConcatString & command);
 
 static void process_command_line(const StringArray &);
 
@@ -169,13 +167,12 @@ for (j=0; j<n_files; ++j)  {
 mlog << Debug(2) << "\n finished with individual mode runs " << "\n" << sep << "\n";
 nc_files.dump(cout, 0);
 
+   //
+   //  set the BoolPlane values using the mvd content
+   //
+
 BoolPlane * f_plane = new BoolPlane [n_files];
 BoolPlane * o_plane = new BoolPlane [n_files];
-BoolPlane f_result, o_result;
-
-   //
-   //  set the BoolPlane objects using the mvd content
-   //
 
 for (j=0; j<n_files; ++j)  {
 
@@ -190,7 +187,7 @@ for (j=0; j<n_files; ++j)  {
 
 const int nx = f_plane[0].nx();
 const int ny = f_plane[0].ny();
-
+BoolPlane f_result, o_result;
 
 f_result.set_size(nx, ny);
 o_result.set_size(nx, ny);
@@ -200,6 +197,7 @@ combine_boolplanes(o_plane, n_files, o_calc, o_result);
 
    //
    // Filter the data to within the superobjects only and do statistics by invoking mode algorithm again
+   // on the masked data
    //
  
 for (j=0; j<n_files; ++j) {
@@ -210,7 +208,7 @@ for (j=0; j<n_files; ++j) {
   }
 
   mlog << Debug(2) 
-       << "\n starting filtered data mode run " << (j + 1) << " of " << n_files
+       << "\n starting masked data mode run " << (j + 1) << " of " << n_files
        << "\n" << sep << "\n";
 
   // same here as above, overwriting contents written to previously 
@@ -305,37 +303,6 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-   //
-   //  might want to replace this with a fork/exec
-   //
-
-
-void run_command(const ConcatString & command)
-
-{
-
-int status;
-
- printf("%s\n", command.text());
-status = system(command.text());
-
-if ( status )  {
-
-   mlog << Error << "\n" << program_name << ": "
-        << "command \"" << command << "\" failed!\n\n";
-
-   exit ( 1 );
-
-}
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 void read_config(const string & filename)
 
 {
@@ -389,7 +356,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 void multivar_consistency_checks(StringArray &fcst_filenames, StringArray &obs_filenames,
-				 BoolCalc &f_calc, BoolCalc &o_calc, int &n_files)
+                                 BoolCalc &f_calc, BoolCalc &o_calc, int &n_files)
 {
 
   //
@@ -440,7 +407,7 @@ if ( n_files < 2 )  {
 
 }
    //
-   // create the BoolCalc objects and check that the logic is in range and the right length
+   // set values in the f_calc and o_calc objects, check that the logic is in range and the right length
    //
 
 f_calc.set(config.fcst_multivar_logic.text());
@@ -490,10 +457,10 @@ ConcatString dir;
 int status;
 char junk [256];
 
-    //
-    //  test to see of the output directory for this
-    //    mode runs exists, and if not, create it
-    //
+   //
+   //  test to see of the output directory for this
+   //    mode runs exists, and if not, create it
+   //
 
 dir.clear();
 if ( outdir.length() > 0 )  dir << outdir << '/';
@@ -523,7 +490,7 @@ return dir;
 ////////////////////////////////////////////////////////////////////////
 
 MultiVarData *process_multivar_data(int j, const string &fcst_filename, const string &obs_filename,
-				    const ConcatString &dir)
+                                    const ConcatString &dir)
 {
 ConcatString command;
 StringArray a, mode_argv;
@@ -539,9 +506,9 @@ mode_argv.add(obs_filename);
 mode_argv.add(config_file);
 
 command << cs_erase
-        << mode_path         << ' '
+        << mode_path     << ' '
         << fcst_filename << ' '
-        <<  obs_filename << ' '
+        << obs_filename  << ' '
         << config_file;
 
 mode_argv.add("-v");
@@ -553,7 +520,6 @@ mode_argv.add("-outdir");
 mode_argv.add(dir);
 
 command << " -v " << mlog.verbosity_level();
-
 command << " -outdir " << dir;
 
 mode_argv.add("-field_index");
@@ -568,7 +534,7 @@ command << " -field_index " << j;
 
 mlog << Debug(1) << "Running mode command: \"" << command << "\"\n\n";
 ModeFrontEnd *frontend = new ModeFrontEnd;
-// clean up this status thing, not used
+
 int status = frontend->run(mode_argv);
 MultiVarData *mvdi = frontend->get_multivar_data();
 delete frontend;
@@ -578,34 +544,34 @@ return mvdi;
 ////////////////////////////////////////////////////////////////////////
 
 void process_masked_multivar_data(int j, const BoolPlane &f_result,
-				  const BoolPlane &o_result, int nx, int ny,
-				  const ConcatString &dir, MultiVarData &mvd)
+                                  const BoolPlane &o_result, int nx, int ny,
+                                  const ConcatString &dir, MultiVarData &mvd)
 {
   
-  mask_data(nx, ny, f_result, mvd.Fcst_sd->data);
-  mask_data(nx, ny, o_result, mvd.Obs_sd->data);
+mask_data(nx, ny, f_result, mvd.Fcst_sd->data);
+mask_data(nx, ny, o_result, mvd.Obs_sd->data);
 
 
-  StringArray mode_argv;
-  char junk [256];
+StringArray mode_argv;
+char junk [256];
 
-    //
-    //  build the command for running mode again, sort of mode
-    //
-  mode_argv.clear();
-  mode_argv.add(mode_path);
-  mode_argv.add(config_file);
-  mode_argv.add("-v");
-  snprintf(junk, sizeof(junk), "%d", mlog.verbosity_level());
-  mode_argv.add(junk);
-  mode_argv.add("-outdir");
-  mode_argv.add(dir);
+   //
+   //  build the command for running mode again, sort of mode
+   //
+mode_argv.clear();
+mode_argv.add(mode_path);
+mode_argv.add(config_file);
+mode_argv.add("-v");
+snprintf(junk, sizeof(junk), "%d", mlog.verbosity_level());
+mode_argv.add(junk);
+mode_argv.add("-outdir");
+mode_argv.add(dir);
 
-  mlog << Debug(1) << "Running filtered mode \n\n";
+mlog << Debug(1) << "Running filtered mode \n\n";
 
-  ModeFrontEnd *frontend = new ModeFrontEnd;
-  int status = frontend->run(mode_argv, mvd);
-  delete frontend;
+ModeFrontEnd *frontend = new ModeFrontEnd;
+int status = frontend->run(mode_argv, mvd);
+delete frontend;
 }
  
 ////////////////////////////////////////////////////////////////////////
@@ -689,6 +655,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 void mask_data(int nx, int ny, const BoolPlane &bp, DataPlane &data)
 {
+
 if (nx != data.nx() || ny != data.ny()) {
   printf("ERROR dimensions don't match %d %d    %d %d\n",
   nx, ny, data.nx(), data.ny());
@@ -700,12 +667,10 @@ for (int x=0; x<nx; ++x)  {
    for (int y=0; y<ny; ++y)  {
 
       if ( bp(x, y) == false) {
-	data.set(bad_data_float, x, y);;
+        data.set(bad_data_float, x, y);;
       }
-
-   }   //  for x
-
-}   //  for x
+   }
+}
 
 
 }

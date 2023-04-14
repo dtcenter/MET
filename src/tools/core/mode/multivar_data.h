@@ -25,8 +25,6 @@ class MultiVarData {
 
    private:
 
-     //void init_from_scratch();
-     
    public:
 
   inline MultiVarData() :
@@ -62,16 +60,6 @@ class MultiVarData {
      GrdFileType ftype;
      GrdFileType otype;
      
-  /* int get_fcst_obj_nx(); */
-  /* int get_fcst_obj_ny(); */
-  /* int *get_fcst_obj_data(); */
-  /* float *get_fcst_raw_data(); */
-  /* int get_obs_obj_nx(); */
-  /* int get_obs_obj_ny(); */
-  /* int *get_obs_obj_data(); */
-  /* float *get_obs_raw_data(); */
-
-
 };
 
 

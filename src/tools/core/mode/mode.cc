@@ -178,40 +178,8 @@ if ( config.is_multivar() && !has_field_index )  {
 
    ModeFrontEnd *frontend = new ModeFrontEnd;
    status = frontend->run(Argv);
-   // int nx = frontend->get_fcst_obj_nx();
-   // int ny = frontend->get_fcst_obj_ny();
-   // int *fcst_obj_data = frontend->get_fcst_obj_data();
-   // int *obs_obj_data = frontend->get_obs_obj_data();
-   // vector<int> fcstValues, obsValues;
-   // vector<int> fcstCValues, obsCValues;
-   // for(int x=0; x<nx; x++) {
-
-   //   for(int y=0; y<ny; y++) {
-
-   // 	int n = DefaultTO.two_to_one(nx, ny, x, y);
-   // 	if (find(fcstValues.begin(), fcstValues.end(), fcst_obj_data[n]) == fcstValues.end())
-   // 	  {
-   // 	    printf("FcstValueTop=%d\n", fcst_obj_data[n]);
-   // 	    fcstValues.push_back(fcst_obj_data[n]);
-   // 	  }
-   //    }
-   // }
-   // for(int x=0; x<nx; x++) {
-
-   //   for(int y=0; y<ny; y++) {
-
-   // 	int n = DefaultTO.two_to_one(nx, ny, x, y);
-   // 	if (find(obsValues.begin(), obsValues.end(), obs_obj_data[n]) == obsValues.end())
-   // 	  {
-   // 	    printf("ObsValueTop=%d\n", obs_obj_data[n]);
-   // 	    obsValues.push_back(obs_obj_data[n]);
-   // 	  }
-   //    }
-   // }
 
    if ( frontend )  { delete frontend;  frontend = 0; }
-   // delete [] fcst_obj_data;
-   // delete [] obs_obj_data;
 }
 
    //

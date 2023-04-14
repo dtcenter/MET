@@ -23,10 +23,10 @@ using namespace std;
 
 #include "vx_data2d_factory.h"
 #include "vx_log.h"
+#include "var_info_nccf.h"
 
-typedef CRC_Array<bool>                      BoolArray;
 static BoolArray lookup_bool_array      (const char * name,
-					 Dictionary *dict,
+                                         Dictionary *dict,
                                          bool error_out = default_dictionary_error_out,
                                          bool print_warning = default_dictionary_print_warning);
 
@@ -1069,9 +1069,9 @@ return;
 
 
 BoolArray lookup_bool_array(const char * name,
-			    Dictionary *dict,
-			    bool error_out,
-			    bool print_warning)
+                            Dictionary *dict,
+                            bool error_out,
+                            bool print_warning)
 
 {
 

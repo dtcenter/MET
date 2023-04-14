@@ -25,36 +25,31 @@ class ModeFrontEnd {
 
    private:
 
-     //void init_from_scratch();
-
    public:
 
-      ModeFrontEnd();
+     ModeFrontEnd();
      ~ModeFrontEnd();
+
+     string default_out_dir;
+
      int run(const StringArray & Argv);
      int run(const StringArray & Argv, const MultiVarData &mvd);
 
-  //ModeExecutive * mode_exec;
-  string default_out_dir;
-  //int compress_level;
-  // int field_index;
+     void do_quilt    ();
+     void do_straight ();
 
-  void do_quilt    ();
-  void do_straight ();
+     MultiVarData *get_multivar_data();
 
-  MultiVarData *get_multivar_data();
+     void process_command_line(const StringArray &);
+     void process_command_line_final(const StringArray & argv,
+                                     const MultiVarData &mvd);
 
-  void process_command_line(const StringArray &);
-  void process_command_line_final(const StringArray & argv,
-				  const MultiVarData &mvd);
-  static void set_config_merge_file (const StringArray &);
-  static void set_outdir            (const StringArray &);
-  static void set_logfile           (const StringArray &);
-  static void set_verbosity         (const StringArray &);
-  static void set_compress          (const StringArray &);
-  static void set_field_index       (const StringArray &);   //  undocumented
-
-
+     static void set_config_merge_file (const StringArray &);
+     static void set_outdir            (const StringArray &);
+     static void set_logfile           (const StringArray &);
+     static void set_verbosity         (const StringArray &);
+     static void set_compress          (const StringArray &);
+     static void set_field_index       (const StringArray &);   //  undocumented
 
 };
 
