@@ -141,7 +141,9 @@ N_nodes = N*N;
 
 TheGraph = new FO_Node [N_nodes];
 
-memcpy(TheGraph, g.TheGraph, N_nodes*sizeof(FO_Node));
+for (int idx=0; idx<N_nodes; idx++) {
+   TheGraph[idx] = g.TheGraph[idx];
+}
 
    //
    //  done
