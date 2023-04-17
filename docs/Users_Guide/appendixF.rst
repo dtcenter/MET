@@ -7,7 +7,7 @@ Appendix F Python Embedding
 Introduction
 ============
 
-MET includes the ability to embed Python to a limited degree. Users may use their own Python scripts and whatever associated Python packages they wish in order to prepare 2D gridded data fields, point observations, and matched pairs as input to the MET tools. We fully expect that this degree of embedding will increase in the future. In addition, plans are in place to extend Python with MET in upcoming releases, allowing users to invoke MET tools directly from their Python script. While MET version 8.0 was built on Python 2.x, MET versions 9.0 and beyond are built on Python 3.6+.
+MET includes the ability to embed Python to a limited degree. Users may use their own Python scripts and any associated Python packages they wish in order to prepare 2D gridded data fields, point observations, and matched pairs as input to the MET tools. We fully expect that this degree of embedding will increase in the future. In addition, plans are in place to extend Python with MET in upcoming releases, allowing users to invoke MET tools directly from their Python script. While MET version 8.0 was built on Python 2.x, MET versions 9.0 and beyond are built on Python 3.6+.
 
 .. _compiling_python_support:
 
@@ -28,7 +28,7 @@ In order to use Python embedding, a local Python installation must be available 
 
 6. **Xarray** Python package
 
-Users should be aware that in some cases, the C-language Python header files and libraries may be deleted at the end of the Python installation process and they may need to confirm their availability prior to compiling MET. Once the user has confirmed the above requirements are satisfied, they can compile the MET software for Python embedding by passing the **\-\-enable-python** opotion to the **configure** script on the command line. This will link the MET C++ code directly to the Python libraries. The **NumPy** and **netCDF4** Python packages are required by Python scripts included with the MET software that facilitate the passing of data in memory and the reading and writing of temporary files with Python embedding is used.
+Users should be aware that in some cases, the C-language Python header files and libraries may be deleted at the end of the Python installation process, and they may need to confirm their availability prior to compiling MET. Once the user has confirmed the above requirements are satisfied, they can compile the MET software for Python embedding by passing the **\-\-enable-python** opotion to the **configure** script on the command line. This will link the MET C++ code directly to the Python libraries. The **NumPy** and **netCDF4** Python packages are required by Python scripts included with the MET software that facilitate the passing of data in memory and the reading and writing of temporary files with Python embedding is used.
 
 In addition to using **\-\-enable-python** with **configure** as mentioned above, the following environment variables must also be set prior to executing **configure**: **MET_PYTHON_BIN_EXE**, **MET_PYTHON_CC**, and **MET_PYTHON_LD**. These may either be set as environment variables or as command line options to **configure**. These environment variables are used when building MET to enable the compiler to find the requisite Python executable, header files, and libraries in the user's local filesystem. Fortunately, Python provides a way to set these variables properly. This frees the user from the necessity of having any expert knowledge of the compiling and linking process. Along with the **Python** executable in the users local Python installation, there should be another executable called **python3-config**, whose output can be used to set these environment variables as follows:
 
@@ -40,7 +40,7 @@ In addition to using **\-\-enable-python** with **configure** as mentioned above
 
 Make sure that these are set as environment variables or that you have included them on the command line prior to running **configure**.
 
-Controlling Which Python MET uses When Running
+Controlling Which Python MET Uses When Running
 ==============================================
 
 When MET is compiled with Python embedding support, MET uses the Python executable in that Python installation by default when Python embedding is used. However, for users of highly configurable Python environments, the Python instance set at compilation time may not be sufficient. Users may want to use an alternate Python installation if they need additional packages not available in the Python installation used when compiling MET. In MET versions 9.0+, users have the ability to use a different Python executable when running MET than the version used when compiling MET by setting the environment variable **MET_PYTHON_EXE**.
@@ -324,7 +324,7 @@ On the command line for any of the MET tools, specify the path to the input grid
 Examples of Python Embedding for 2D Gridded Dataplanes
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-**GridStat with Python embedding for forecast and observations**
+**Grid-Stat with Python embedding for forecast and observations**
 
 .. code-block:: none
    :caption: GridStat Command with Dual Python Embedding
@@ -450,7 +450,7 @@ Both of the above examples use the **read_ascii_point.py** example script which 
 Examples of Python Embedding for Point Observations
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-**PointStat with Python embedding for forecast and observations**
+**Point-Stat with Python embedding for forecast and observations**
 
 .. code-block:: none
    :caption: PointStat Command with Dual Python Embedding
@@ -537,14 +537,5 @@ The **read_ascii_mpr.py** sample script can be found in:
 Examples of Python Embedding for MPR Data
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-TODO: Is there another example that might be useful here? Probably not I suppose.
+TODO: Is there another example that might be useful here? Probably not I suppose, since it's a command-line based functionality.
 
-MET Python Module
-=================
-
-TODO: Maybe document some of the base classes and functions here?
-
-I think the most important is:
-met.dataplane.set_dataplane_attrs()
-
-Maybe add others later on.
