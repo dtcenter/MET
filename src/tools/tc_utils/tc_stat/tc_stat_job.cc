@@ -3168,7 +3168,6 @@ void TCStatJobRIRW::do_job(const StringArray &file_list,
    close_dump_file();
 
    // Process the RI/RW job output
-
    if(StatOut)
       do_stat_output(*StatOut);
    else if(JobOut)
@@ -3177,14 +3176,9 @@ void TCStatJobRIRW::do_job(const StringArray &file_list,
       do_output(cout);
 
    // Close the stat file
-   close_stat_file();
+   if(StatOut)
+      close_stat_file();
    
-   // New changes
-   //if(StatOut) {
-   //   do_stat_output(*StatOut);
-   //   close_stat_file();
-   //}
-
    return;
 }
 
@@ -3797,9 +3791,8 @@ void TCStatJobRIRW::do_stat_output(ostream &out) {
       // Will need other shc settings here
 
       // from stat_analysis
-      //shc = it->second.hdr.get_shc(it->first, job.by_column,
-      //job.hdr_name, job.hdr_value, lt);
-
+      //shc = it->second.hdr.get_shc(it->first, job.by_column, job.hdr_name, job.hdr_value, lt);
+      
       // From 04/06/23
       // Could set shc to blank string (na) for now?
       
@@ -3819,8 +3812,7 @@ void TCStatJobRIRW::do_stat_output(ostream &out) {
       //
       if(OutLineType.has(stat_ctc_str)) {
          shc.set_alpha(bad_data_double);
-         write_ctc_cols(it->second.Info, stat_at,
-                        stat_row++, n_header_columns);
+         write_ctc_cols(it->second.Info, stat_at, stat_row++, n_header_columns);
       }
       
       //
@@ -3845,11 +3837,13 @@ void TCStatJobRIRW::do_stat_output(ostream &out) {
          //
          // Write the data line
          //
-         write_cts_cols(it->second.Info, 0, stat_at,
-                        stat_row++, n_header_columns);
-     }
+         write_cts_cols(it->second.Info, 0, stat_at, stat_row++, n_header_columns);
+      }
    } // end for it
-  
+   
+   // Write the table
+   out << stat_at << "\n" << flush;
+   
    return;
 }
 
