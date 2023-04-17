@@ -547,3 +547,16 @@ The **read_ascii_mpr.py** sample script can be found in:
 
 • `MET GitHub repository <https://github.com/dtcenter/MET>`_ in *MET/scripts/python/examples*.
 
+MET Python Package
+==================
+
+MET comes with a Python package that provides core functionality for the Python embedding capability. In rare cases, advanced users may find the classes and functions included with this Python package useful.
+
+To utilize the MET Python package **standalone** when NOT using it with Python embedding, users must add the following to their **PYTHONPATH** environment variable:
+
+.. code-block::
+   :caption: MET Python Module PYTHONPATH
+
+   export PYTHONPATH={MET_INSTALL_DIR}/share/met/python
+
+where {MET_INSTALL_DIR} is the top level directory where MET is installed, for example **/usr/local/met**.
