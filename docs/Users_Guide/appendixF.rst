@@ -38,7 +38,20 @@ In addition to using **\-\-enable-python** with **configure** as mentioned above
 
 • Again on the command line, run "**python3-config \-\-ldflags**". Set the value of **MET_PYTHON_LD** to the output of that command.
 
-Make sure that these are set as environment variables or that you have included them on the command line prior to running **configure**.
+Make sure that these are set as environment variables or that you have included them on the command line prior to running **configure**
+
+If a user attempts to invoke Python embedding with a version of MET that was not compiled with Python, MET will return an ERROR:
+
+.. code-block:: none
+   :caption: MET Errors Without Python Enabled
+
+   ERROR  : Met2dDataFileFactory::new_met_2d_data_file() -> Support for Python has not been compiled!
+   ERROR  : To run Python scripts, recompile with the --enable-python option.
+
+   - or -
+
+   ERROR  : process_point_obs() -> Support for Python has not been compiled!
+   ERROR  : To run Python scripts, recompile with the --enable-python option.
 
 Controlling Which Python MET Uses When Running
 ==============================================
