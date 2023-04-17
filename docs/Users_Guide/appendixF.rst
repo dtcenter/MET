@@ -36,7 +36,7 @@ In addition to using **\-\-enable-python** with **configure** as mentioned above
 
 • On the command line, run "**python3-config \-\-cflags**". Set the value of **MET_PYTHON_CC** to the output of that command.
 
-• Again on the command line, run "**python3-config \-\-ldflags**". Set the value of **MET_PYTHON_LD** to the output of that command.
+• Again on the command line, run "**python3-config \-\-ldflags \-\-embed**". Set the value of **MET_PYTHON_LD** to the output of that command.
 
 Make sure that these are set as environment variables or that you have included them on the command line prior to running **configure**
 
