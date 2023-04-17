@@ -535,7 +535,7 @@ Stat-Analysis can be run using the **-lookin python** command line option:
    :caption: Stat-Analysis with Python Embedding of MPR Data
    
    stat_analysis \
-   -lookin python MET_BASE/python/examples/read_ascii_mpr.py point_stat_mpr.txt \
+   -lookin python scripts/python/examples/read_ascii_mpr.py point_stat_mpr.txt \
    -job aggregate_stat -line_type MPR -out_line_type CNT \
    -by FCST_VAR,FCST_LEV
 
