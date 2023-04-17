@@ -442,7 +442,7 @@ The Point2Grid, Plot-Point-Obs, Ensemble-Stat, and Point-Stat tools support Pyth
    :caption: plot_point_obs with Python Embedding
 
    plot_point_obs \
-   "PYTHON_NUMPY=python/examples/read_ascii_point.py data/sample_obs/ascii/sample_ascii_obs.txt" \
+   "PYTHON_NUMPY=scripts/python/examples/read_ascii_point.py data/sample_obs/ascii/sample_ascii_obs.txt" \
    output_image.ps
 
 The ASCII2NC tool also supports Python embedding, however invoking it varies slightly from other MET tools. For ASCII2NC, Python embedding is used by providing the "-format python" option on the command line. With this option, point observations may be passed as input. An example of this is shown below:
@@ -451,7 +451,7 @@ The ASCII2NC tool also supports Python embedding, however invoking it varies sli
    :caption: ascii2nc with Python Embedding
 
    ascii2nc -format python \
-   "python/examples/read_ascii_point.py data/sample_obs/ascii/sample_ascii_obs.txt" \
+   "scripts/python/examples/read_ascii_point.py data/sample_obs/ascii/sample_ascii_obs.txt" \
    sample_ascii_obs_python.nc
 
 Both of the above examples use the **read_ascii_point.py** example script which is included with the MET code. It reads ASCII data in MET's 11-column point observation format and stores it in a Pandas DataFrame to be read by the MET tools using Python embedding for point data. The **read_ascii_point.py** example script can be found in:
