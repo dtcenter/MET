@@ -90,7 +90,6 @@ return;
 
 void write_netcdf_latlon(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
                          const Grid &grid) {
-
    // Write 1-dimensional arrays for lat/lon grids
    if(grid.info().ll != 0) {
       write_netcdf_latlon_1d(f_out, lat_dim, lon_dim, grid);

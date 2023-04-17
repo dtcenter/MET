@@ -27,16 +27,18 @@ class ModeFrontEnd {
 
  public:
 
+   typedef enum {SINGLE_VAR, MULTIVAR_PASS1, MULTIVAR_PASS2} Processing_t;
+
    ModeFrontEnd();
    ~ModeFrontEnd();
 
    string default_out_dir;
 
-   int run(const StringArray & Argv);
+   int run(const StringArray & Argv, Processing_t ptype=SINGLE_VAR);
    int run(const StringArray & Argv, const MultiVarData &mvd);
 
-   void do_quilt    ();
-   void do_straight ();
+   void do_quilt    (Processing_t ptype);
+   void do_straight (Processing_t ptype);
 
    MultiVarData *get_multivar_data();
 

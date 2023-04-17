@@ -63,7 +63,7 @@ ModeFrontEnd::~ModeFrontEnd()
 
 ///////////////////////////////////////////////////////////////////////
 
-int ModeFrontEnd::run(const StringArray & Argv)
+int ModeFrontEnd::run(const StringArray & Argv, Processing_t ptype)
 
 {
 
@@ -96,11 +96,11 @@ int ModeFrontEnd::run(const StringArray & Argv)
    //
    if ( conf.quilt )  {
 
-      do_quilt();
+      do_quilt(ptype);
 
    } else {
 
-      do_straight();
+      do_straight(ptype);
 
    }
 
@@ -147,11 +147,11 @@ int ModeFrontEnd::run(const StringArray & Argv, const MultiVarData &mvd)
 
    if ( conf.quilt )  {
 
-      do_quilt();
+      do_quilt(MULTIVAR_PASS2);
 
    } else {
 
-      do_straight();
+      do_straight(MULTIVAR_PASS2);
 
    }
 
@@ -168,7 +168,7 @@ int ModeFrontEnd::run(const StringArray & Argv, const MultiVarData &mvd)
 ///////////////////////////////////////////////////////////////////////
 
 
-void ModeFrontEnd::do_straight()
+void ModeFrontEnd::do_straight(Processing_t ptype)
 
 {
 
@@ -188,6 +188,17 @@ void ModeFrontEnd::do_straight()
 
    }
 
+   if (NCT > 1 && ptype != SINGLE_VAR) {
+      mlog << Error
+           << "\n\n  "
+           << program_name
+           << ": multiple convolution radii and thresholds not implemented in multivar mode\n\n";
+
+         exit ( 1 );
+   }
+      
+      
+
    int index;
 
    mode_exec->clear_internal_r_index();
@@ -198,8 +209,9 @@ void ModeFrontEnd::do_straight()
 
       mode_exec->do_match_merge();
 
-      mode_exec->process_output();
-
+      if (ptype == SINGLE_VAR || ptype == MULTIVAR_PASS2) {
+         mode_exec->process_output();
+      }
    }
 
    mode_exec->clear_internal_r_index();
@@ -216,7 +228,7 @@ void ModeFrontEnd::do_straight()
 ///////////////////////////////////////////////////////////////////////
 
 
-void ModeFrontEnd::do_quilt()
+void ModeFrontEnd::do_quilt(Processing_t ptype)
 
 {
 
@@ -233,10 +245,10 @@ void ModeFrontEnd::do_quilt()
 
          mode_exec->do_match_merge();
 
-         mode_exec->process_output();
-
+         if (ptype == SINGLE_VAR || ptype == MULTIVAR_PASS2) {
+            mode_exec->process_output();
+         }
       }
-
    }
 
    mode_exec->clear_internal_r_index();

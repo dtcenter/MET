@@ -95,6 +95,7 @@ class ModeConfInfo {
 
       void get_multivar_programs();
 
+      bool multivar_not_implemented() const;
 
    /////////////////////////////////////////////////////////////////////
 

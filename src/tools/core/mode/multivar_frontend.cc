@@ -535,7 +535,7 @@ MultiVarData *process_multivar_data(int j, const string &fcst_filename, const st
    mlog << Debug(1) << "Running mode command: \"" << command << "\"\n\n";
    ModeFrontEnd *frontend = new ModeFrontEnd;
 
-   int status = frontend->run(mode_argv);
+   int status = frontend->run(mode_argv, ModeFrontEnd::MULTIVAR_PASS1);
    MultiVarData *mvdi = frontend->get_multivar_data();
    delete frontend;
    return mvdi;

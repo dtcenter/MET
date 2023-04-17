@@ -976,6 +976,19 @@ if ( dict->lookup("multivar_intensity_flag")) {
 return;
 }
 
+////////////////////////////////////////////////////////////////////////
+
+
+bool ModeConfInfo::multivar_not_implemented() const
+{
+   if (quilt) {
+      mlog << Error
+           << "\n\n  ModeConfInfo::multivar_not_implemented "
+           << ": quilting not yet implemented for multivar mode\n\n";
+      return true;
+   }
+   return false;
+}
 
 ////////////////////////////////////////////////////////////////////////
 
