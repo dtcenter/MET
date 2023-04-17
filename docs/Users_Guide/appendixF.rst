@@ -28,7 +28,7 @@ In order to use Python embedding, a local Python installation must be available 
 
 6. **Xarray** Python package
 
-Users should be aware that in some cases, the C-language Python header files and libraries may be deleted at the end of the Python installation process, and they may need to confirm their availability prior to compiling MET. Once the user has confirmed the above requirements are satisfied, they can compile the MET software for Python embedding by passing the **\-\-enable-python** opotion to the **configure** script on the command line. This will link the MET C++ code directly to the Python libraries. The **NumPy** and **netCDF4** Python packages are required by Python scripts included with the MET software that facilitate the passing of data in memory and the reading and writing of temporary files with Python embedding is used.
+Users should be aware that in some cases, the C-language Python header files and libraries may be deleted at the end of the Python installation process, and they may need to confirm their availability prior to compiling MET. Once the user has confirmed the above requirements are satisfied, they can compile the MET software for Python embedding by passing the **\-\-enable-python** option to the **configure** script on the command line. This will link the MET C++ code directly to the Python libraries. The **NumPy** and **netCDF4** Python packages are required by the Python scripts included with the MET software that facilitate the passing of data in memory and the reading and writing of temporary files when Python embedding is used.
 
 In addition to using **\-\-enable-python** with **configure** as mentioned above, the following environment variables must also be set prior to executing **configure**: **MET_PYTHON_BIN_EXE**, **MET_PYTHON_CC**, and **MET_PYTHON_LD**. These may either be set as environment variables or as command line options to **configure**. These environment variables are used when building MET to enable the compiler to find the requisite Python executable, header files, and libraries in the user's local filesystem. Fortunately, Python provides a way to set these variables properly. This frees the user from the necessity of having any expert knowledge of the compiling and linking process. Along with the **Python** executable in the users local Python installation, there should be another executable called **python3-config**, whose output can be used to set these environment variables as follows:
 
@@ -36,7 +36,7 @@ In addition to using **\-\-enable-python** with **configure** as mentioned above
 
 • On the command line, run "**python3-config \-\-cflags**". Set the value of **MET_PYTHON_CC** to the output of that command.
 
-• Again on the command line, run "**python3-config \-\-ldflags**". Set the value of **MET_PYTHON_LD** to the output of that command.
+• Again on the command line, run "**python3-config \-\-ldflags \-\-embed**". Set the value of **MET_PYTHON_LD** to the output of that command.
 
 Make sure that these are set as environment variables or that you have included them on the command line prior to running **configure**
 
