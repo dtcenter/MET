@@ -547,8 +547,3 @@ The **read_ascii_mpr.py** sample script can be found in:
 
 • `MET GitHub repository <https://github.com/dtcenter/MET>`_ in *MET/scripts/python/examples*.
 
-Examples of Python Embedding for MPR Data
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-TODO: Is there another example that might be useful here? Probably not I suppose, since it's a command-line based functionality.
-
