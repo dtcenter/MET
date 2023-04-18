@@ -603,10 +603,17 @@ void NetcdfObsVars::read_header_data(MetPointHeader &hdr_data) {
    float *hdr_lon_block    = new float[buf_size];
    float *hdr_elv_block    = new float[buf_size];
 
-   long offsets[2] = { 0, 0 };
-   long lengths[2] = { 1, 1 };
-   long offsets_1D[1] = { 0 };
-   long lengths_1D[1] = { 1 };
+   LongArray offsets;       // = { 0, 0 };
+   LongArray lengths;       // = { 1, 1 };
+   LongArray offsets_1D;    // = { 0 };
+   LongArray lengths_1D;    // = { 1 };
+
+   offsets.add(0);
+   offsets.add(0);
+   lengths.add(1);
+   lengths.add(1);
+   offsets_1D.add(0);
+   lengths_1D.add(1);
 
    for(int i_start=0; i_start<nhdr_count; i_start+=buf_size) {
       buf_size = ((nhdr_count-i_start) > NC_BUFFER_SIZE_32K)
@@ -821,10 +828,14 @@ void NetcdfObsVars::read_header_data(MetPointHeader &hdr_data) {
 bool NetcdfObsVars::read_obs_data(int buf_size, int offset,
       int qty_len, float *obs_arr, int *qty_idx_arr, char *obs_qty_buf) {
    bool result = true;
-   long offsets[2] = { offset, 0 };
-   long lengths[2] = { buf_size, 1 };
+   LongArray offsets;   // = { offset, 0 };
+   LongArray lengths;   // = { buf_size, 1 };
    const char *method_name = "read_obs_data() -> ";
 
+   offsets.add(offset);
+   offsets.add(0);
+   lengths.add(buf_size);
+   lengths.add(1);
    if (IS_VALID_NC(obs_arr_var)) {
       // Read the current observation message
       lengths[1] = OBS_ARRAY_LEN;
@@ -921,8 +932,8 @@ void NetcdfObsVars::read_pb_hdr_data(MetPointHeader &hdr_data) {
       return;
    }
 
-   long offsets[1] = { 0 };
-   long lengths[1] = { 1 };
+   LongArray offsets;   // = { 0 };
+   LongArray lengths;   // = { 1 };
    bool has_hdr_prpt_typ_var = !IS_INVALID_NC(hdr_prpt_typ_var);
    bool has_hdr_irpt_typ_var = !IS_INVALID_NC(hdr_irpt_typ_var);
    bool has_hdr_inst_typ_var = !IS_INVALID_NC(hdr_inst_typ_var);
@@ -930,6 +941,9 @@ void NetcdfObsVars::read_pb_hdr_data(MetPointHeader &hdr_data) {
    if (has_hdr_prpt_typ_var) hdr_data.prpt_typ_array.extend(pb_hdr_count);
    if (has_hdr_irpt_typ_var) hdr_data.irpt_typ_array.extend(pb_hdr_count);
    if (has_hdr_inst_typ_var) hdr_data.inst_typ_array.extend(pb_hdr_count);
+
+   offsets.add(0);
+   lengths.add(1);
 
    // Read PB report type
    int buf_size = ((pb_hdr_count > NC_BUFFER_SIZE_32K)

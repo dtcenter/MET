@@ -210,11 +210,11 @@ if ( Nelements > 0 )  {
 
 }
 
-delete [] W;  W = 0;
+delete [] W;  W = nullptr;
 
-delete [] F;  F = 0;
+delete [] F;  F = nullptr;
 
-delete [] A;  A = 0;
+delete [] A;  A = nullptr;
 
 W = ww;
 
@@ -222,11 +222,11 @@ F = ff;
 
 A = aa;
 
-ww = 0;
+ww = nullptr;
 
-ff = 0;
+ff = nullptr;
 
-aa = 0;
+aa = nullptr;
 
    //
    //  done
