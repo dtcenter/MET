@@ -23,6 +23,7 @@
 
 #include "num_array.h"
 #include "int_array.h"
+#include "bool_array.h"
 #include "threshold.h"
 #include "thresh_array.h"
 #include "vx_cal.h"
@@ -266,6 +267,12 @@ class Dictionary {
                                           bool error_out = default_dictionary_error_out,
                                           bool print_warning = default_dictionary_print_warning,
                                           bool search_parent = default_dictionary_search_parent);
+
+      BoolArray    lookup_bool_array     (const char * name,
+                                          bool error_out = default_dictionary_error_out,
+                                          bool print_warning = default_dictionary_print_warning,
+                                          bool search_parent = default_dictionary_search_parent);
+
       int          lookup_int            (const char * name,
                                           bool error_out = default_dictionary_error_out,
                                           bool print_warning = default_dictionary_print_warning,

@@ -17,6 +17,7 @@
 #include "gsl_randist.h"
 #include "config_gaussian.h"
 #include "config_funcs.h"
+#include "interp_mthd.h"
 
 ////////////////////////////////////////////////////////////////////////
 

@@ -207,9 +207,9 @@ void ModeFrontEnd::do_straight(Processing_t ptype)
 
       mode_exec->do_conv_thresh(index, index);
 
-      mode_exec->do_match_merge();
-
       if (ptype == SINGLE_VAR || ptype == MULTIVAR_PASS2) {
+
+         mode_exec->do_match_merge();
          mode_exec->process_output();
       }
    }
@@ -231,6 +231,13 @@ void ModeFrontEnd::do_straight(Processing_t ptype)
 void ModeFrontEnd::do_quilt(Processing_t ptype)
 
 {
+   if (ptype == MULTIVAR_PASS1 || ptype == MULTIVAR_PASS2) {
+      mlog << Error
+           << program_name << ": quilting not yet implemented for multivar mode \n\n";
+
+      exit ( 1 );
+   }
+      
 
    int t_index, r_index;   //  indices into the convolution threshold and radius arrays
 

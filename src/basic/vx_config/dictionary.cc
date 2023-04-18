@@ -1523,6 +1523,21 @@ return ( Entry->b_value() );
 
 }
 
+////////////////////////////////////////////////////////////////////////
+BoolArray Dictionary::lookup_bool_array(const char * name,
+                                        bool error_out,
+                                        bool print_warning,
+                                        bool search_parent) 
+{
+BoolArray array;
+NumArray num_array = lookup_num_array(name, error_out, print_warning);
+
+for (int i=0; i<num_array.n_elements(); i++)
+   array.add( num_array[i] == 1 ? true:false);
+
+return ( array );
+
+}
 
 ////////////////////////////////////////////////////////////////////////
 

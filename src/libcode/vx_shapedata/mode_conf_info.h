@@ -90,7 +90,7 @@ class ModeConfInfo {
 
       ConcatString  fcst_multivar_logic;
       ConcatString   obs_multivar_logic;
-      std::vector<bool>   multivar_intensity;
+      BoolArray multivar_intensity;
       
 
       void get_multivar_programs();

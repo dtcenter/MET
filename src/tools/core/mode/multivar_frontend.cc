@@ -109,7 +109,7 @@ static void process_masked_multivar_data(int j, const BoolPlane &f_result, const
                                          int nx, int ny, const ConcatString &dir,
                                          MultiVarData &mvd);
 
-static void mask_data(int nx, int ny, const BoolPlane &mask, DataPlane &data);
+static void mask_data(const string &name, int nx, int ny, const BoolPlane &mask, DataPlane &data);
 
 static void read_config(const string & filename);
 
@@ -165,7 +165,7 @@ int multivar_frontend(const StringArray & Argv)
    }   //  for j
 
    mlog << Debug(2) << "\n finished with individual mode runs " << "\n" << sep << "\n";
-   nc_files.dump(cout, 0);
+   //nc_files.dump(cout, 0);
 
    //
    //  set the BoolPlane values using the mvd content
@@ -426,7 +426,7 @@ void multivar_consistency_checks(StringArray &fcst_filenames, StringArray &obs_f
    // If empty set to the default of all FALSE
    //
 
-   int num_multivar = (int)config.multivar_intensity.size();
+   int num_multivar = (int)config.multivar_intensity.n();
    if (num_multivar == n_files) {
       return;
    }
@@ -437,14 +437,14 @@ void multivar_consistency_checks(StringArray &fcst_filenames, StringArray &obs_f
            << "empty multivar intensity array, setting to all FALSE \n\n";
 
       for (int i=0; i<n_files; ++i) {
-         config.multivar_intensity.push_back(false);
+         config.multivar_intensity.add(false);
       }
 
    } else {
 
       mlog << Error << "\n" << program_name 
            << ": wrong size multivar_intensity array, wanted "
-           << n_files << " got " << config.multivar_intensity.size() << "\n\n";
+           << n_files << " got " << num_multivar << "\n\n";
       exit ( 1 );
    }
 }
@@ -548,8 +548,8 @@ void process_masked_multivar_data(int j, const BoolPlane &f_result,
                                   const ConcatString &dir, MultiVarData &mvd)
 {
   
-   mask_data(nx, ny, f_result, mvd.Fcst_sd->data);
-   mask_data(nx, ny, o_result, mvd.Obs_sd->data);
+   mask_data("Fcst", nx, ny, f_result, mvd.Fcst_sd->data);
+   mask_data("Obs", nx, ny, o_result, mvd.Obs_sd->data);
 
 
    StringArray mode_argv;
@@ -653,25 +653,32 @@ void write_output_nc_file(const char * path, const MetNcFile & met, const BoolPl
 
 
 ////////////////////////////////////////////////////////////////////////
-void mask_data(int nx, int ny, const BoolPlane &bp, DataPlane &data)
+void mask_data(const string &name, int nx, int ny, const BoolPlane &bp, DataPlane &data)
 {
 
    if (nx != data.nx() || ny != data.ny()) {
-      printf("ERROR dimensions don't match %d %d    %d %d\n",
-             nx, ny, data.nx(), data.ny());
-      return;
+      mlog << Error << "\n" << program_name  << ":" << name
+           << " :dimensions don't match " << nx << " " <<  ny 
+           << "    " << data.nx() << " " << data.ny() << "\n\n";
+
+      exit( 1 );
    }
-  
+
+   int nmasked=0, nkeep=0;
+   
    for (int x=0; x<nx; ++x)  {
 
       for (int y=0; y<ny; ++y)  {
 
          if ( bp(x, y) == false) {
             data.set(bad_data_float, x, y);;
+            nmasked ++;
+         } else {
+            nkeep ++;
          }
       }
    }
-
-
+   
+   mlog << Debug(1) << name << " superobject masking " << nkeep << " of " << nkeep + nmasked << " data values remain unmasked\n";
 }
 
