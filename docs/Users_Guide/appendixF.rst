@@ -524,7 +524,7 @@ If a user does not have an existing MPR line type file created by the MET tools,
                                dtype=str)
 
    # Convert to the variable MET expects
-   met_data = mpr_dataframe.values.tolist()
+   mpr_data = mpr_dataframe.values.tolist()
 
 Running Python Embedding for MPR Data
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
