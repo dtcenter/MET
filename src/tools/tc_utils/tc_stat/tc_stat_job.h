@@ -74,6 +74,9 @@ struct SummaryMapData {
 struct RIRWMapData {
    CTSInfo     Info;
    StringArray Hdr;
+   StringArray Desc;
+   NumArray    Lead;
+   TimeArray   Valid;
 };
 
 ////////////////////////////////////////////////////////////////////////

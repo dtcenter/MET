@@ -3767,14 +3767,48 @@ void TCStatJobRIRW::setup_stat_file(int n_row) {
 void TCStatJobRIRW::do_stat_output(ostream &out) {
    map<ConcatString,RIRWMapData,cs_cmp>::iterator it;
    StatHdrColumns shc;
+   ConcatString cs;
    int r, c;
    
    setup_stat_file(1 + (int) RIRWMap.size());
    
-   // Will need some shc settings here
+   //
+   // Setup stat header columns
+   //
    shc.set_desc(na_str);
-   shc.set_fcst_var("RIRW");
 
+   // If not EXACT, then append "_MAX" (RIRW_24_MAX vs RIRW_24)... Ask Kathryn Newman about writing RIRW_24 vs RIRW_24_EXACT?
+   cs << cs_erase << "RIRW_" << sec_to_timestring(RIRWTimeADeck);
+   shc.set_fcst_var(cs);
+
+   cs << cs_erase << "RIRW_" << sec_to_timestring(RIRWTimeBDeck);
+   shc.set_obs_var(cs);
+
+   shc.set_fcst_thresh(RIRWThreshADeck);
+   shc.set_obs_thresh(RIRWThreshBDeck);
+   
+   //shc.set_vx_mask(...); // only is masking was specified for the job
+
+   // Made changes to tc_stat_job.h, from struct RIRWMapData
+   // if(!Valid.has(cur_valid)) Valid.add(cur_valid);
+   //Valid.min() Valid.max();
+   
+   //FCST_LEAD ... keep track of the maximum LEAD time encountered in the input
+   //FCST_VALID_BEG = OBS_VALID_BEG = minimum VALID time encountered
+   //FCST_VALID_END = OBS_VALID_END = maximum VALID time encountered
+   //OBS_LEAD = NA
+
+   // Missing info:
+   // - EXACT or MAXIMUM delta
+   // - Matching time window (e.g. +/- 12 hours)
+
+   //
+   // Set the following to NA
+   //
+   // COV_THRESH, INTERP_MTHD, INTERP_PNTS,
+   // OBTYPE, FCST_UNITS, OBS_UNITS (or m/s since that's the wind speed units)
+   //
+   
    mlog << Debug(2) << "Computing output for "
         << (int) RIRWMap.size() << " case(s).\n";
 
@@ -3786,21 +3820,6 @@ void TCStatJobRIRW::do_stat_output(ostream &out) {
       //
       // Write the output STAT header columns
       //
-      // TODO: actually populate the header columns in the shc object
-      // shc = ...;
-      // Will need other shc settings here
-
-      // from stat_analysis
-      //shc = it->second.hdr.get_shc(it->first, job.by_column, job.hdr_name, job.hdr_value, lt);
-      
-      // From 04/06/23
-      // Could set shc to blank string (na) for now?
-      
-      //shc.set_???(na_str);
-      
-      write_header_cols(shc, stat_at, stat_row);
-
-      //write_header_cols(shc, stat_at, stat_row);
       
       //
       // Initialize
@@ -3812,6 +3831,8 @@ void TCStatJobRIRW::do_stat_output(ostream &out) {
       //
       if(OutLineType.has(stat_ctc_str)) {
          shc.set_alpha(bad_data_double);
+         shc.set_line_type(stat_ctc_str);
+         write_header_cols(shc, stat_at, stat_row);
          write_ctc_cols(it->second.Info, stat_at, stat_row++, n_header_columns);
       }
       
@@ -3837,6 +3858,8 @@ void TCStatJobRIRW::do_stat_output(ostream &out) {
          //
          // Write the data line
          //
+         shc.set_line_type(stat_cts_str);
+         write_header_cols(shc, stat_at, stat_row);
          write_cts_cols(it->second.Info, 0, stat_at, stat_row++, n_header_columns);
       }
    } // end for it
