@@ -33,6 +33,10 @@ using namespace std;
 #include <netcdf>
 using namespace netCDF;
 
+#ifdef _OPENMP
+  #include "omp.h"
+#endif
+
 #include "main.h"
 #include "tc_diag.h"
 
@@ -106,6 +110,9 @@ static void compute_lat_lon(TcrmwGrid&, double*, double*);
 // - Write variable names track_lat/track_lon/grid_lat/grid_lon
 // - Call the diagnostic scripts on these temp NC files
 // - Stitch together the temp files into an output file
+// - Do the ACTUAL list of variables from Robert
+// - Fix the azimuth computations (DONE BUT NOT COMMITTED)
+// - Check if the azimuths are computed the way Robert says they should be
 //
 // Add back in the "regrid" dictionary to control how regridding to cyl coord is done?
 // Storm motion computation (from 4/7/23):
@@ -798,16 +805,20 @@ void process_track_points(const TrackInfoArray& tracks) {
 
    mlog << Debug(2) << "Processing " << tracks.n()
         << " tracks consisting of " << n_pts
-        << " points over " << valid_ta.n()
-        << " valid times.\n";
+        << " points with " << valid_ta.n()
+        << " unqiue valid times from "
+        << unix_to_yyyymmddhh(valid_ta.min())
+        << " to " << unix_to_yyyymmddhh(valid_ta.max())
+        << ".\n";
 
-   // Parallel: Loop over the unique valid times
+   // Loop over the unique valid times
    for(i=0; i<valid_ta.n(); i++) {
 
       mlog << Debug(3) << "Processing the "
-           << unix_to_yyyymmddhh(valid_ta[i]) << " valid time.\n";
+           << unix_to_yyyymmddhh(valid_ta[i])
+           << " valid time.\n";
 
-      // Parellel: Loop over the domains to be processed
+      // Loop over the domains to be processed
       map<string,DomainInfo>::iterator dom_it;
       for(dom_it  = conf_info.domain_info_map.begin();
           dom_it != conf_info.domain_info_map.end();
@@ -851,7 +862,15 @@ void process_track_points(const TrackInfoArray& tracks) {
 
       } // end for dom_it
    } // end for i
+/* JHG
+#pragma omp parallel default(none)                      \
+   shared(valid_ta, mlog, conf_info, tracks, tmp_map)   \
+   shared(Error)                                        \
+   private(i, j, i_pnt, tmp_info)
+   {
 
+   } // End of omp parallel
+*/
    return;
 }
 
