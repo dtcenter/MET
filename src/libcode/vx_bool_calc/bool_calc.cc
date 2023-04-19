@@ -249,6 +249,22 @@ return ( result );
 
 ////////////////////////////////////////////////////////////////////////
 
+bool BoolCalc::has_union() const
+{
+
+Program & P = *program;
+
+for (int j=0; j<((int) P.size()); ++j)  {
+
+   Token tok = P[j];
+
+   if (tok.type == tok_union) {
+      return true;
+   }
+}
+return false;
+
+}
 
 
-
+////////////////////////////////////////////////////////////////////////

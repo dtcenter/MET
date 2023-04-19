@@ -107,7 +107,7 @@ static MultiVarData *process_multivar_data(int j, const string &fcst_filename,
 
 static void process_masked_multivar_data(int j, const BoolPlane &f_result, const BoolPlane &o_result,
                                          int nx, int ny, const ConcatString &dir,
-                                         MultiVarData &mvd);
+                                         MultiVarData &mvd, bool has_union);
 
 static void mask_data(const string &name, int nx, int ny, const BoolPlane &mask, DataPlane &data);
 
@@ -139,6 +139,8 @@ int multivar_frontend(const StringArray & Argv)
    read_config(config_file);
 
    multivar_consistency_checks(fcst_filenames, obs_filenames, f_calc, o_calc, n_files);
+
+   bool has_union = f_calc.has_union() || o_calc.has_union();
 
    mlog << Debug(2) << "\n" << sep << "\n";
 
@@ -214,7 +216,7 @@ int multivar_frontend(const StringArray & Argv)
       // same here as above, overwriting contents written to previously 
       ConcatString dir = set_multivar_dir(j);
 
-      process_masked_multivar_data(j, f_result, o_result, nx, ny, dir, *mvd[j]);
+      process_masked_multivar_data(j, f_result, o_result, nx, ny, dir, *mvd[j], has_union);
       delete mvd[j];
       mvd[j] = 0;
    }
@@ -463,9 +465,13 @@ ConcatString set_multivar_dir(int j)
    //
 
    dir.clear();
+#ifdef OLDWAY
    if ( outdir.length() > 0 )  dir << outdir << '/';
    snprintf(junk, sizeof(junk), "%02d", j);
    dir << junk;
+#else
+   if ( outdir.length() > 0 )  dir << outdir;
+#endif
 
    if ( ! directory_exists(dir.c_str()) )  {
 
@@ -545,7 +551,8 @@ MultiVarData *process_multivar_data(int j, const string &fcst_filename, const st
 
 void process_masked_multivar_data(int j, const BoolPlane &f_result,
                                   const BoolPlane &o_result, int nx, int ny,
-                                  const ConcatString &dir, MultiVarData &mvd)
+                                  const ConcatString &dir, MultiVarData &mvd,
+                                  bool has_union)
 {
   
    mask_data("Fcst", nx, ny, f_result, mvd.Fcst_sd->data);
@@ -566,11 +573,14 @@ void process_masked_multivar_data(int j, const BoolPlane &f_result,
    mode_argv.add(junk);
    mode_argv.add("-outdir");
    mode_argv.add(dir);
+   mode_argv.add("-field_index");
+   snprintf(junk, sizeof(junk), "%d", j);
+   mode_argv.add(junk);
 
    mlog << Debug(1) << "Running filtered mode \n\n";
 
    ModeFrontEnd *frontend = new ModeFrontEnd;
-   int status = frontend->run(mode_argv, mvd);
+   int status = frontend->run(mode_argv, mvd, has_union);
    delete frontend;
 }
  

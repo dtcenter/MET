@@ -54,6 +54,8 @@ class BoolCalc {
 
       bool run(const vector<bool>);
 
+     // return true if one of the operations is a union (or)
+     bool has_union() const; 
 
 };
 

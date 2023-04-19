@@ -39,6 +39,8 @@ static const char * default_config_filename = "MET_BASE/config/MODEConfig_defaul
 // took this out of the do_conv_thresh() method 
 static int local_r_index = -1;
 
+static string fcst_magic_string = "";
+static string obs_magic_string = "";
 
 ///////////////////////////////////////////////////////////////////////
 
@@ -754,6 +756,13 @@ void ModeExecutive::process_masks(ShapeData & fcst_sd, ShapeData & obs_sd)
 void ModeExecutive::process_output()
 
 {
+   // get the magic strings
+   fcst_magic_string = engine.conf_info.Fcst->var_info->magic_str().c_str();
+   obs_magic_string = engine.conf_info.Obs->var_info->magic_str().c_str();
+
+   // replace forward slashes with underscores to prevent new directories
+   replace(fcst_magic_string.begin(), fcst_magic_string.end(), '/', '_');   
+   replace(obs_magic_string.begin(), obs_magic_string.end(), '/', '_');   
 
    // Create output stats files and plots
 
@@ -860,7 +869,8 @@ void ModeExecutive::build_outfile_prefix(ConcatString &str)
    // Append the output directory and program name
 
    str << cs_erase
-       << out_dir << "/" << program_name;
+       << out_dir << "/" << program_name << "_Fcst_" << fcst_magic_string
+       << "_Obs_" << obs_magic_string;
 
    // Append the output prefix, if defined
 
@@ -911,7 +921,7 @@ void ModeExecutive::build_outfile_name(const char *suffix, ConcatString &str)
    if ( engine.conf_info.n_runs() == 1 )  {
 
       build_simple_outfile_name(suffix, str);
-
+      
       return;
 
    }

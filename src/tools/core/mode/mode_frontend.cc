@@ -117,7 +117,8 @@ int ModeFrontEnd::run(const StringArray & Argv, Processing_t ptype)
 
 ///////////////////////////////////////////////////////////////////////
 
-int ModeFrontEnd::run(const StringArray & Argv, const MultiVarData &mvd)
+int ModeFrontEnd::run(const StringArray & Argv, const MultiVarData &mvd,
+                      bool has_union)
 {
    if ( mode_exec )  { delete mode_exec;  mode_exec = 0; }
 
@@ -134,8 +135,14 @@ int ModeFrontEnd::run(const StringArray & Argv, const MultiVarData &mvd)
    process_command_line_final(Argv, mvd);
    ModeConfInfo & conf = mode_exec->engine.conf_info;
    if (compress_level >= 0) conf.nc_info.set_compress_level(compress_level);
-   //if ( field_index >= 0 )  conf.set_field_index(field_index);
-
+   if ( field_index >= 0 )  conf.set_field_index(field_index);
+   if (has_union && (conf.Fcst->merge_flag == MergeType_Thresh ||
+                     conf.Obs->merge_flag == MergeType_Thresh)) {
+      mlog << Warning << "\nModeFrontEnd::run() -> "
+           << "Logic includes union '||' along with  'merge_flag=THRESH' "
+           << ". This can lead to bad results\n\n";
+   }
+       
    //
    // set up data access using inputs
    //
@@ -395,7 +402,7 @@ void ModeFrontEnd::process_command_line_final(const StringArray & argv,
    //
    //  add for mode multivar ... undocumented
    //
-   //cline.add(set_field_index, "-field_index", 1);
+   cline.add(set_field_index, "-field_index", 1);
 
    //
    // Parse the command line
