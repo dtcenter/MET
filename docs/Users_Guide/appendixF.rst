@@ -342,7 +342,8 @@ In the event the user requires command line arguments to their Python script, th
 .. code-block::
    :caption: Gen-Ens-Prod Command Line with Python Args
    
-   gen_ens_proce ens1.nc,arg1,arg2 ens2.nc,arg1,arg2 ens3.nc,arg1,arg2 ens4.nc,arg1,arg2 -out ens_prod.nc -config GenEnsProd_config
+   gen_ens_proce ens1.nc,arg1,arg2 ens2.nc,arg1,arg2 ens3.nc,arg1,arg2 ens4.nc,arg1,arg2 \
+   -out ens_prod.nc -config GenEnsProd_config
 
 In this case, the user's Python script will receive "ens1.nc,arg1,arg2" as a single command line argument for each execution of the Python script (i.e. 1 time per file). The user must parse this argument inside their Python script to obtain **arg1** and **arg2** as separate arguments. The list of input files and optionally, any command line arguments can be written to a single file called **file_list** that is substituted for the file names and command line arguments. For example:
 
