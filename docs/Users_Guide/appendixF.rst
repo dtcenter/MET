@@ -322,17 +322,44 @@ The first argument for the Plot-Data-Plane tool is the gridded data file to be r
 Special Case for Ensemble-Stat, Series-Analysis, and MTD
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Since Ensemble-Stat, Series-Analysis, and MTD read multiple input files, a different approach to using Python embedding is required. This approach can be used in any of the MET tools, but it is required when using Python embedding with Ensemble-Stat, Series-Analysis, and MTD. The Ensemble-Stat, Series-Analysis, and MTD tools support the use of file lists on the command line, as do some other MET tools. Typically, the ASCII file list contains a list of files which actually exist on your machine and should be read as input. For Python embedding, these tools loop over the ASCII file list entries, set **MET_PYTHON_INPUT_ARG** to that string, and execute the Python script. This only allows a single command line argument to be passed to the Python script. However multiple arguments may be concatenated together using some delimiter, and the Python script can be defined to parse arguments using that delimiter. When file lists are constructed in this way, the entries will likely not be files which actually exist on your machine. In this case, users should place the constant string "file_list" on the first line of their ASCII file lists. This will ensure that the MET tools will parse the file list properly.
+The Ensemble-Stat, Series-Analysis, MTD and Gen-Ens-Prod tools all have the ability to read multiple input files. Because of this feature, a different approach to Python embedding is required. A typical use of these tools is to provide a list of files on the command line. For example:
 
-On the command line for any of the MET tools, specify the path to the input gridded data file(s) as the usage statement for the tool indicates. Do **not** substitute in **PYTHON_NUMPY** or **PYTHON_XARRAY** on the command line for this case. Instead, in the config file dictionary set the **file_type** entry to either **PYTHON_NUMPY** or **PYTHON_XARRAY** to activate Python embedding in MET. Then, in the **name** entry of the config file dictionaries for the forecast or observation data, list the full path to the Python script to be run followed by any command line arguments for that script. However, in the Python command, replace the name of the input gridded data file with the constant string **MET_PYTHON_INPUT_ARG**. When looping over multiple input files, the MET tools will replace that constant **MET_PYTHON_INPUT_ARG** with the path to the file currently being processed. The example plot_data_plane command listed below yields the same result as the example shown above, but using the approach for this special case:
+.. code-block::
+   :caption: Gen-Ens-Prod Command Line
 
-.. code-block:: none
-   :caption: plot_data_plane Python Embedding using MET_PYTHON_INPUT_ARG		
+   gen_ens_prod ens1.nc ens2.nc ens3.nc ens4.nc -out ens_prod.nc -config GenEnsProd_config
 
-   plot_data_plane data/python/fcst.txt fcst.ps \
-   name="scripts/python/examples/read_ascii_numpy.py MET_PYTHON_INPUT_ARG FCST"; \
-   file_type=PYTHON_NUMPY;' \
-   -title "Python enabled plot_data_plane"
+In this case, a user is passing 4 ensemble members to Gen-Ens-Prod to be evaluated, and each member is in a separate file. If a user wishes to use Python embedding to process the ensemble input files, then the same exact command is used however special modifications inside the GenEnsProd_config file are needed. In the config file dictionary, the user must set the **file_type** entry to either **PYTHON_NUMPY** or **PYTHON_XARRAY** to activate the Python embedding for these tools. Then, in the **name** entry of the config file dictionaries for the forecast or observation data, the user must list the **full path** to the Python script to be run. However, in the Python command, replace the name of the input gridded data file to the Python script with the constant string **MET_PYTHON_INPUT_ARG**. When looping over all of the input files, the MET tools will replace that constant **MET_PYTHON_INPUT_ARG** with the path to the input file currently being processed and optionally, any command line arguments for the Python script. Here is what this looks like in the GenEnsProd_config file for the above example:
+
+.. code-block::
+   :caption: Gen-Ens-Prod MET_PYTHON_INPUT_ARG Config
+
+   file_type = PYTHON_NUMPY;
+   field = [ { name = "gen_ens_prod_pyembed.py MET_PYTHON_INPUT_ARG"; } ];
+
+In the event the user requires command line arguments to their Python script, they must be included alongside the file names separated by a delimiter. For example, the above Gen-Ens-Prod command with command line arguments for Python would look like:
+
+.. code-block::
+   :caption: Gen-Ens-Prod Command Line with Python Args
+   
+   gen_ens_proce ens1.nc,arg1,arg2 ens2.nc,arg1,arg2 ens3.nc,arg1,arg2 ens4.nc,arg1,arg2 -out ens_prod.nc -config GenEnsProd_config
+
+In this case, the user's Python script will receive "ens1.nc,arg1,arg2" as a single command line argument for each execution of the Python script (i.e. 1 time per file). The user must parse this argument inside their Python script to obtain **arg1** and **arg2** as separate arguments. The list of input files and optionally, any command line arguments can be written to a single file called **file_list** that is substituted for the file names and command line arguments. For example:
+
+.. code-block::
+   :caption: Gen-Ens-Prod File List
+
+   echo "ens1.nc,arg1,arg2 ens2.nc,arg1,arg2 ens3.nc,arg1,arg2 ens4.nc,arg1,arg2" > file_list
+   gen_ens_prod file_list -out ens_prod.nc -config GenEnsProd_config
+
+Finally, the above tools do not require data files to be present on a local disk. If the user wishes, their Python script can obtain data from other sources based upon only the command line arguments to their Python script. For example:
+
+.. code-block::
+   :caption: Gen-Ens-Prod Python Args Only
+
+   gen_ens_prod 20230101,0 20230102,0 20230103,0 -out ens_prod.nc -confg GenEnsProd_config
+
+In the above command, each of the arguments "20230101,0", "20230102,0", and "20230103,0" are provided to the user's Python script in separate calls. Then, inside the Python script these arguments are used to construct a filename or query to a data server or other mechanism to return the desired data and format it the way MET expects inside the Python script, prior to calling Gen-Ens-Prod.
 
 Examples of Python Embedding for 2D Gridded Dataplanes
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
