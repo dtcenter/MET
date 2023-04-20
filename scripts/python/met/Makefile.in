@@ -90,7 +90,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-subdir = scripts/utility
+subdir = scripts/python/met
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -146,8 +146,8 @@ am__uninstall_files_from_dir = { \
     || { echo " ( cd '$$dir' && rm -f" $$files ")"; \
          $(am__cd) "$$dir" && rm -f $$files; }; \
   }
-am__installdirs = "$(DESTDIR)$(pythonutilitydir)"
-DATA = $(pythonutility_DATA)
+am__installdirs = "$(DESTDIR)$(pythonmetscriptsdir)"
+DATA = $(pythonmetscripts_DATA)
 am__tagged_files = $(HEADERS) $(SOURCES) $(TAGS_FILES) $(LISP)
 am__DIST_COMMON = $(srcdir)/Makefile.in
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -296,12 +296,13 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-pythonutilitydir = $(pkgdatadir)/utility
-pythonutility_DATA = \
-	print_pointnc2ascii.py \
-	build_ndbc_stations_from_web.py
+pythonmetscriptsdir = $(pkgdatadir)/python/met
+pythonmetscripts_DATA = \
+	dataplane.py \
+	mprbase.py \
+	point.py
 
-EXTRA_DIST = ${pythonutility_DATA}
+EXTRA_DIST = ${pythonmetscripts_DATA}
 MAINTAINERCLEANFILES = Makefile.in
 all: all-am
 
@@ -315,9 +316,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign scripts/utility/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign scripts/python/met/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign scripts/utility/Makefile
+	  $(AUTOMAKE) --foreign scripts/python/met/Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
 	  *config.status*) \
@@ -335,27 +336,27 @@ $(top_srcdir)/configure:  $(am__configure_deps)
 $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(am__aclocal_m4_deps):
-install-pythonutilityDATA: $(pythonutility_DATA)
+install-pythonmetscriptsDATA: $(pythonmetscripts_DATA)
 	@$(NORMAL_INSTALL)
-	@list='$(pythonutility_DATA)'; test -n "$(pythonutilitydir)" || list=; \
+	@list='$(pythonmetscripts_DATA)'; test -n "$(pythonmetscriptsdir)" || list=; \
 	if test -n "$$list"; then \
-	  echo " $(MKDIR_P) '$(DESTDIR)$(pythonutilitydir)'"; \
-	  $(MKDIR_P) "$(DESTDIR)$(pythonutilitydir)" || exit 1; \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(pythonmetscriptsdir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(pythonmetscriptsdir)" || exit 1; \
 	fi; \
 	for p in $$list; do \
 	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
 	  echo "$$d$$p"; \
 	done | $(am__base_list) | \
 	while read files; do \
-	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(pythonutilitydir)'"; \
-	  $(INSTALL_DATA) $$files "$(DESTDIR)$(pythonutilitydir)" || exit $$?; \
+	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(pythonmetscriptsdir)'"; \
+	  $(INSTALL_DATA) $$files "$(DESTDIR)$(pythonmetscriptsdir)" || exit $$?; \
 	done
 
-uninstall-pythonutilityDATA:
+uninstall-pythonmetscriptsDATA:
 	@$(NORMAL_UNINSTALL)
-	@list='$(pythonutility_DATA)'; test -n "$(pythonutilitydir)" || list=; \
+	@list='$(pythonmetscripts_DATA)'; test -n "$(pythonmetscriptsdir)" || list=; \
 	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
-	dir='$(DESTDIR)$(pythonutilitydir)'; $(am__uninstall_files_from_dir)
+	dir='$(DESTDIR)$(pythonmetscriptsdir)'; $(am__uninstall_files_from_dir)
 tags TAGS:
 
 ctags CTAGS:
@@ -400,7 +401,7 @@ check-am: all-am
 check: check-am
 all-am: Makefile $(DATA)
 installdirs:
-	for dir in "$(DESTDIR)$(pythonutilitydir)"; do \
+	for dir in "$(DESTDIR)$(pythonmetscriptsdir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
 install: install-am
@@ -454,7 +455,7 @@ info: info-am
 
 info-am:
 
-install-data-am: install-pythonutilityDATA
+install-data-am: install-pythonmetscriptsDATA
 
 install-dvi: install-dvi-am
 
@@ -498,7 +499,7 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-pythonutilityDATA
+uninstall-am: uninstall-pythonmetscriptsDATA
 
 .MAKE: install-am install-strip
 
@@ -508,11 +509,11 @@ uninstall-am: uninstall-pythonutilityDATA
 	install-data-am install-dvi install-dvi-am install-exec \
 	install-exec-am install-html install-html-am install-info \
 	install-info-am install-man install-pdf install-pdf-am \
-	install-ps install-ps-am install-pythonutilityDATA \
+	install-ps install-ps-am install-pythonmetscriptsDATA \
 	install-strip installcheck installcheck-am installdirs \
 	maintainer-clean maintainer-clean-generic mostlyclean \
 	mostlyclean-generic pdf pdf-am ps ps-am tags-am uninstall \
-	uninstall-am uninstall-pythonutilityDATA
+	uninstall-am uninstall-pythonmetscriptsDATA
 
 .PRECIOUS: Makefile
 

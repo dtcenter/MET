@@ -16,25 +16,21 @@
 ## Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 ## MA 02110-1301, USA.
 
-SUBDIRS = \
-	climo \
-	colortables \
-	config \
-	map \
-	poly \
-	ps \
-	table_files \
-	tc_data
+SUBDIRS =
 
-topdir = $(pkgdatadir)
+pyembeddir = $(pkgdatadir)/python/pyembed
 
-top_DATA = \
-	version.txt
+pyembed_DATA = \
+     python_embedding.py \
+     read_tmp_dataplane.py \
+     read_tmp_ascii.py \
+     read_tmp_point_nc.py \
+     set_python_env.py \
+     write_tmp_dataplane.py \
+     write_tmp_point.py \
+     write_tmp_point_nc.py \
+     write_tmp_mpr.py
 
-EXTRA_DIST = ${top_DATA} \
-	sample_fcst \
-	sample_obs \
-	python \
-	copyright_notice.txt
+EXTRA_DIST = ${pyembed_DATA}
 
-MAINTAINERCLEANFILES 	= Makefile.in
+MAINTAINERCLEANFILES 	= Makefile.in 

@@ -108,6 +108,7 @@ am__v_AR_1 =
 libvx_pointdata_python_a_AR = $(AR) $(ARFLAGS)
 libvx_pointdata_python_a_LIBADD =
 am_libvx_pointdata_python_a_OBJECTS =  \
+	libvx_pointdata_python_a-mask_filters.$(OBJEXT) \
 	libvx_pointdata_python_a-pointdata_python.$(OBJEXT) \
 	libvx_pointdata_python_a-pointdata_from_array.$(OBJEXT) \
 	libvx_pointdata_python_a-python_pointdata.$(OBJEXT)
@@ -129,6 +130,7 @@ DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__maybe_remake_depfiles = depfiles
 am__depfiles_remade =  \
+	./$(DEPDIR)/libvx_pointdata_python_a-mask_filters.Po \
 	./$(DEPDIR)/libvx_pointdata_python_a-pointdata_from_array.Po \
 	./$(DEPDIR)/libvx_pointdata_python_a-pointdata_python.Po \
 	./$(DEPDIR)/libvx_pointdata_python_a-python_pointdata.Po
@@ -340,6 +342,7 @@ MAINTAINERCLEANFILES = Makefile.in
 # The library
 noinst_LIBRARIES = libvx_pointdata_python.a
 libvx_pointdata_python_a_SOURCES = \
+              mask_filters.h mask_filters.cc \
               pointdata_python.h pointdata_python.cc \
               pointdata_from_array.h pointdata_from_array.cc pointdata_from_array.hpp \
               python_pointdata.h python_pointdata.cc python_pointdata.hpp
@@ -393,6 +396,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_pointdata_python_a-mask_filters.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_pointdata_python_a-pointdata_from_array.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_pointdata_python_a-pointdata_python.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_pointdata_python_a-python_pointdata.Po@am__quote@ # am--include-marker
@@ -416,6 +420,20 @@ am--depfiles: $(am__depfiles_remade)
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXXCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
+
+libvx_pointdata_python_a-mask_filters.o: mask_filters.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_pointdata_python_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_pointdata_python_a-mask_filters.o -MD -MP -MF $(DEPDIR)/libvx_pointdata_python_a-mask_filters.Tpo -c -o libvx_pointdata_python_a-mask_filters.o `test -f 'mask_filters.cc' || echo '$(srcdir)/'`mask_filters.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvx_pointdata_python_a-mask_filters.Tpo $(DEPDIR)/libvx_pointdata_python_a-mask_filters.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mask_filters.cc' object='libvx_pointdata_python_a-mask_filters.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_pointdata_python_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_pointdata_python_a-mask_filters.o `test -f 'mask_filters.cc' || echo '$(srcdir)/'`mask_filters.cc
+
+libvx_pointdata_python_a-mask_filters.obj: mask_filters.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_pointdata_python_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_pointdata_python_a-mask_filters.obj -MD -MP -MF $(DEPDIR)/libvx_pointdata_python_a-mask_filters.Tpo -c -o libvx_pointdata_python_a-mask_filters.obj `if test -f 'mask_filters.cc'; then $(CYGPATH_W) 'mask_filters.cc'; else $(CYGPATH_W) '$(srcdir)/mask_filters.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvx_pointdata_python_a-mask_filters.Tpo $(DEPDIR)/libvx_pointdata_python_a-mask_filters.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mask_filters.cc' object='libvx_pointdata_python_a-mask_filters.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_pointdata_python_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_pointdata_python_a-mask_filters.obj `if test -f 'mask_filters.cc'; then $(CYGPATH_W) 'mask_filters.cc'; else $(CYGPATH_W) '$(srcdir)/mask_filters.cc'; fi`
 
 libvx_pointdata_python_a-pointdata_python.o: pointdata_python.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_pointdata_python_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_pointdata_python_a-pointdata_python.o -MD -MP -MF $(DEPDIR)/libvx_pointdata_python_a-pointdata_python.Tpo -c -o libvx_pointdata_python_a-pointdata_python.o `test -f 'pointdata_python.cc' || echo '$(srcdir)/'`pointdata_python.cc
@@ -584,7 +602,8 @@ clean: clean-am
 clean-am: clean-generic clean-noinstLIBRARIES mostlyclean-am
 
 distclean: distclean-am
-		-rm -f ./$(DEPDIR)/libvx_pointdata_python_a-pointdata_from_array.Po
+		-rm -f ./$(DEPDIR)/libvx_pointdata_python_a-mask_filters.Po
+	-rm -f ./$(DEPDIR)/libvx_pointdata_python_a-pointdata_from_array.Po
 	-rm -f ./$(DEPDIR)/libvx_pointdata_python_a-pointdata_python.Po
 	-rm -f ./$(DEPDIR)/libvx_pointdata_python_a-python_pointdata.Po
 	-rm -f Makefile
@@ -632,7 +651,8 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-		-rm -f ./$(DEPDIR)/libvx_pointdata_python_a-pointdata_from_array.Po
+		-rm -f ./$(DEPDIR)/libvx_pointdata_python_a-mask_filters.Po
+	-rm -f ./$(DEPDIR)/libvx_pointdata_python_a-pointdata_from_array.Po
 	-rm -f ./$(DEPDIR)/libvx_pointdata_python_a-pointdata_python.Po
 	-rm -f ./$(DEPDIR)/libvx_pointdata_python_a-python_pointdata.Po
 	-rm -f Makefile

@@ -23,7 +23,7 @@
 ## scriptsrootdir = $(prefix)/share/scripts
 ## pythonutilitydir = ${scriptsrootdir}/utility
 
-pythonutilitydir = $(pkgdatadir)/utility
+pythonutilitydir = $(pkgdatadir)/python/utility
 
 pythonutility_DATA = \
 	print_pointnc2ascii.py \

@@ -9,7 +9,7 @@ Introduction
 
 The Stat-Analysis tool ties together results from the Point-Stat, Grid-Stat, Ensemble-Stat, Wavelet-Stat, and TC-Gen tools by providing summary statistical information and a way to filter their STAT output files. It processes the STAT output created by the other MET tools in a variety of ways which are described in this section.
 
-MET version 9.0 adds support for the passing matched pair data (MPR) into Stat-Analysis using a Python script with the "-lookin python ..." option. An example of running Stat-Analysis with Python embedding is shown in :numref:`stat_analysis-usage`.
+MET version 9.0 adds support for the passing matched pair data (MPR) into Stat-Analysis using a Python script with the "-lookin python ..." option. An example of running Stat-Analysis with Python embedding can be found in :numref:`Appendix F, Section %s <appendixF>`.
 
 Scientific and statistical aspects
 ==================================
@@ -287,7 +287,7 @@ In the usage statement for the Stat-Analysis tool, some additional terminology i
 Required arguments for stat_analysis
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. The **-lookin path** specifies the name of a directory to be searched recursively for STAT files (ending in ".stat") or any explicit file name with any suffix (such as "_ctc.txt") to be read. This option may be used multiple times to specify multiple directories and/or files to be read. If "-lookin python" is used, it must be followed by a Python embedding script and any command line arguments it takes. Python embedding can be used to pass matched pair (MPR) lines as input to Stat-Analysis.
+1. The **-lookin path** specifies the name of a directory to be searched recursively for STAT files (ending in ".stat") or any explicit file name with any suffix (such as "_ctc.txt") to be read. This option may be used multiple times to specify multiple directories and/or files to be read. If "-lookin python" is used, it must be followed by a Python embedding script and any command line arguments it takes. Python embedding can be used to pass **only**  matched pair (MPR) lines as input to Stat-Analysis.
 
 2. Either a configuration file must be specified with the **-config** option, or a **JOB COMMAND LINE** must be denoted. The **JOB COMMAND LINE** is described in :numref:`stat_analysis-configuration-file`
 
@@ -312,22 +312,6 @@ An example of the stat_analysis calling sequence is shown below.
   -config STATAnalysisConfig
 
 In this example, the Stat-Analysis tool will search for valid STAT lines located in the *../out/point_stat* directory that meet the options specified in the configuration file, *config/STATAnalysisConfig*.
-
-.. _StA-pyembed:
-
-Python Embedding for Matched Pairs
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-The example below uses Python embedding.
-
-.. code-block:: none
-
-  stat_analysis \
-  -lookin python MET_BASE/python/read_ascii_mpr.py point_stat_mpr.txt \
-  -job aggregate_stat -line_type MPR -out_line_type CNT \
-  -by FCST_VAR,FCST_LEV
-
-In this example, rather than passing the MPR output lines from Point-Stat directly into Stat-Analysis (which is the typical approach), the read_ascii_mpr.py Python embedding script reads that file and passes the data to Stat-Analysis. The aggregate_stat job is defined on the command line and CNT statistics are derived from the MPR input data. Separate CNT statistics are computed for each unique combination of FCST_VAR and FCST_LEV present in the input. Please refer to :numref:`Appendix F, Section %s <appendixF>` for more details about Python embedding in MET.
 
 .. _stat_analysis-configuration-file:
 

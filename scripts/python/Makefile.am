@@ -18,6 +18,11 @@
 
 # SUBDIRS = include
 
+SUBDIRS = \
+	examples \
+	met \
+	pyembed \
+	utility
 
 ## Example of how to Install outside of $(pkgdatadir)
 ## scriptsrootdir = $(prefix)/share/scripts
@@ -25,17 +30,10 @@
 
 pythonscriptsdir = $(pkgdatadir)/python
 
-pythonscripts_DATA = \
-	met_point_obs.py \
-	met_point_obs_nc.py \
-	read_ascii_numpy.py \
-	read_ascii_numpy_grid.py \
-	read_ascii_xarray.py \
-	read_ascii_point.py \
-	read_ascii_mpr.py \
-	read_met_point_obs.py \
-	derive_WRF_semilatlon.py
-
-EXTRA_DIST = ${pythonscripts_DATA}
+#EXTRA_DIST = ${top_DATA} \
+#	sample_fcst \
+#	sample_obs \
+#	python \
+#	copyright_notice.txt
 
 MAINTAINERCLEANFILES 	= Makefile.in

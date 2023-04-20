@@ -16,25 +16,24 @@
 ## Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 ## MA 02110-1301, USA.
 
-SUBDIRS = \
-	climo \
-	colortables \
-	config \
-	map \
-	poly \
-	ps \
-	table_files \
-	tc_data
+# SUBDIRS = include
 
-topdir = $(pkgdatadir)
 
-top_DATA = \
-	version.txt
+## Example of how to Install outside of $(pkgdatadir)
+## scriptsrootdir = $(prefix)/share/scripts
+## pythonscriptsdir = ${scriptsrootdir}/python
 
-EXTRA_DIST = ${top_DATA} \
-	sample_fcst \
-	sample_obs \
-	python \
-	copyright_notice.txt
+pythonexamplesdir = $(pkgdatadir)/python/examples
+
+pythonexamples_DATA = \
+	derive_WRF_semilatlon.py \
+	read_ascii_mpr.py \
+	read_ascii_numpy_grid.py \
+	read_ascii_numpy.py \
+	read_ascii_point.py \
+	read_ascii_xarray.py \
+	read_met_point_obs.py
+
+EXTRA_DIST = ${pythonexamples_DATA}
 
 MAINTAINERCLEANFILES 	= Makefile.in
