@@ -3313,7 +3313,12 @@ void TCStatJobRIRW::process_pair(TrackPairInfo &pair) {
           << bprv << sep << bcur << sep << bdlt << sep
           << (is_bad_data(b) ? na_str : bool_to_string(b)) << sep
           << cat;
+      
       cur_map[key].Hdr.add(cur);
+      cur_map[key].Init.add(pair.tcmpr_line(i)->init());
+      cur_map[key].Lead.add(pair.tcmpr_line(i)->lead());
+      cur_map[key].Valid.add(pair.tcmpr_line(i)->valid());
+      
    } // end for i
 
    // Add the current map
@@ -3368,7 +3373,11 @@ void TCStatJobRIRW::add_map(map<ConcatString,RIRWMapData,cs_cmp>&m) {
          RIRWMap[it->first].Info.cts.set_fn_on(
             RIRWMap[it->first].Info.cts.fn_on() +
             it->second.Info.cts.fn_on());
+
          RIRWMap[it->first].Hdr.add(it->second.Hdr);
+         RIRWMap[it->first].Init.add(it->second.Init);
+         RIRWMap[it->first].Lead.add(it->second.Lead);
+         RIRWMap[it->first].Valid.add(it->second.Valid);
       }
    } // end for it
 
@@ -3399,8 +3408,6 @@ void TCStatJobRIRW::do_ctc_output(ostream &out) {
    int i, r, c;
    AsciiTable out_at;
 
-   cout << "In do_ctc_output rows ((int) RIRWMap.size() + 1) = " << (int) RIRWMap.size() + 1 << " ByColumn.n() = " << ByColumn.n() << " n_ctc_columns = " << n_ctc_columns << " cols: " << 9 + ByColumn.n() + n_ctc_columns << endl;
-   
    // Format the output table
    out_at.set_size((int) RIRWMap.size() + 1,
                    9 + ByColumn.n() + n_ctc_columns);
@@ -3767,16 +3774,36 @@ void TCStatJobRIRW::setup_stat_file(int n_row) {
 void TCStatJobRIRW::do_stat_output(ostream &out) {
    map<ConcatString,RIRWMapData,cs_cmp>::iterator it;
    StatHdrColumns shc;
+   StringArray sa;
    ConcatString cs;
-   int r, c;
+   TimeArray Valid;
+   unixtime fcst_valid_beg, fcst_valid_end;
+   int fcst_lead;
+   int i, j, r, c;
    
    setup_stat_file(1 + (int) RIRWMap.size());
    
    //
    // Setup stat header columns
    //
-   shc.set_desc(na_str);
 
+   // Set description if the -desc option was invoked, otherwise set to na_str
+   /*
+   if(Desc.n() > 0) {
+      cs << cs_erase;
+      for(i = 0; i<Desc.n(); i++){
+         if(i < Desc.n()-1)
+            cs << Desc[i] << "_";
+         else
+            cs << Desc[i];
+      }   
+      cout << "Desc cs = " << cs << endl;
+      shc.set_desc(cs.c_str());
+   }
+   */
+   
+   shc.set_desc(na_str);
+   
    // If not EXACT, then append "_MAX" (RIRW_24_MAX vs RIRW_24)... Ask Kathryn Newman about writing RIRW_24 vs RIRW_24_EXACT?
    cs << cs_erase << "RIRW_" << sec_to_timestring(RIRWTimeADeck);
    shc.set_fcst_var(cs);
@@ -3792,6 +3819,8 @@ void TCStatJobRIRW::do_stat_output(ostream &out) {
    // Made changes to tc_stat_job.h, from struct RIRWMapData
    // if(!Valid.has(cur_valid)) Valid.add(cur_valid);
    //Valid.min() Valid.max();
+   
+   //fcst_valid_beg = RIRWMap.Valid.min();
    
    //FCST_LEAD ... keep track of the maximum LEAD time encountered in the input
    //FCST_VALID_BEG = OBS_VALID_BEG = minimum VALID time encountered
@@ -3817,6 +3846,34 @@ void TCStatJobRIRW::do_stat_output(ostream &out) {
    //
    for(it = RIRWMap.begin(), r=1; it != RIRWMap.end(); it++) {
 
+
+      //for(i=0; i<it->second.Hdr.n(); i++,r++) {
+      //cout << "In do_stat_output: it->second.Hdr[" << i << "] = " << it->second.Hdr[i] << endl;
+      //cs = it->second.Hdr[i];
+      //sa = cs.split(":");
+      //for(j=0; j<sa.n(); j++) {
+      //cout << "sa[" << j << "] = " << sa[j] << endl;
+      //}
+      //}
+      
+      cout << "it->second.Valid.n() = " << it->second.Valid.n() << endl;
+      
+      // Set shc lead-time and valid-time variables
+      fcst_lead = it->second.Lead.max();
+      fcst_valid_beg = it->second.Valid.min();
+      fcst_valid_end = it->second.Valid.max();
+      cout << "fcst_valid_beg = " << fcst_valid_beg << " fcst_valid_end = " << fcst_valid_end << endl;
+
+      shc.set_fcst_lead_sec(fcst_lead);
+      shc.set_fcst_valid_beg(fcst_valid_beg);
+      shc.set_fcst_valid_end(fcst_valid_end);
+      shc.set_obs_valid_beg(fcst_valid_beg);
+      shc.set_obs_valid_end(fcst_valid_end);
+
+      //for(i=0; i<it->second.Valid.n(); i++,r++) {
+      //cout << "In do_stat_output: it->second.Valid[" << i << "] = " << it->second.Valid[i] << endl;
+      //}
+      
       //
       // Write the output STAT header columns
       //

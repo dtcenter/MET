@@ -75,6 +75,7 @@ struct RIRWMapData {
    CTSInfo     Info;
    StringArray Hdr;
    StringArray Desc;
+   TimeArray   Init;
    NumArray    Lead;
    TimeArray   Valid;
 };
