@@ -753,17 +753,25 @@ void ModeExecutive::process_masks(ShapeData & fcst_sd, ShapeData & obs_sd)
 
 ///////////////////////////////////////////////////////////////////////
 
-void ModeExecutive::process_output()
+void ModeExecutive::process_output(bool isMultivar)
 
 {
-   // get the magic strings
-   fcst_magic_string = engine.conf_info.Fcst->var_info->magic_str().c_str();
-   obs_magic_string = engine.conf_info.Obs->var_info->magic_str().c_str();
+   isMultivarOutput = isMultivar;
+   
+   if (isMultivar) {
+      // get the magic strings
+      fcst_magic_string = engine.conf_info.Fcst->var_info->magic_str().c_str();
+      obs_magic_string = engine.conf_info.Obs->var_info->magic_str().c_str();
 
-   // replace forward slashes with underscores to prevent new directories
-   replace(fcst_magic_string.begin(), fcst_magic_string.end(), '/', '_');   
-   replace(obs_magic_string.begin(), obs_magic_string.end(), '/', '_');   
-
+      // replace forward slashes with underscores to prevent new directories
+      replace(fcst_magic_string.begin(), fcst_magic_string.end(), '/', '_');   
+      replace(obs_magic_string.begin(), obs_magic_string.end(), '/', '_');   
+   } else {
+      // just in case make these empty
+      fcst_magic_string = "";
+      obs_magic_string = "";
+   }
+   
    // Create output stats files and plots
 
    write_obj_stats();
@@ -868,10 +876,14 @@ void ModeExecutive::build_outfile_prefix(ConcatString &str)
 
    // Append the output directory and program name
 
-   str << cs_erase
-       << out_dir << "/" << program_name << "_Fcst_" << fcst_magic_string
-       << "_Obs_" << obs_magic_string;
-
+   if (isMultivarOutput) {
+      str << cs_erase << out_dir << "/" << program_name
+          << "_Fcst_" << fcst_magic_string
+          << "_Obs_" << obs_magic_string;
+   } else {
+      str << cs_erase << out_dir << "/" << program_name;
+   }      
+   
    // Append the output prefix, if defined
 
    if(engine.conf_info.output_prefix.nonempty())

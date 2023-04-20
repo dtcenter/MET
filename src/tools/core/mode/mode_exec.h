@@ -116,6 +116,8 @@ class ModeExecutive {
 
    GrdFileType ftype, otype;
 
+   bool isMultivarOutput;
+
    void clear_internal_r_index();
    void setup_fcst_obs_data();
    void setup_fcst_obs_data(const MultiVarData &mvd);
@@ -123,7 +125,7 @@ class ModeExecutive {
    void do_match_merge();
 
    void process_masks(ShapeData &, ShapeData &);
-   void process_output();
+   void process_output(bool isMultivar);
 
   
    // owned by caller

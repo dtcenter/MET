@@ -217,7 +217,7 @@ void ModeFrontEnd::do_straight(Processing_t ptype)
       if (ptype == SINGLE_VAR || ptype == MULTIVAR_PASS2) {
 
          mode_exec->do_match_merge();
-         mode_exec->process_output();
+         mode_exec->process_output(ptype == MULTIVAR_PASS2);
       }
    }
 
@@ -260,7 +260,7 @@ void ModeFrontEnd::do_quilt(Processing_t ptype)
          mode_exec->do_match_merge();
 
          if (ptype == SINGLE_VAR || ptype == MULTIVAR_PASS2) {
-            mode_exec->process_output();
+            mode_exec->process_output(ptype == MULTIVAR_PASS2);
          }
       }
    }

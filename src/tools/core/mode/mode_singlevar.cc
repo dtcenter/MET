@@ -159,7 +159,7 @@ for (index=0; index<NCT; ++index)  {
 
    mode_exec.do_match_merge();
 
-   mode_exec.process_output();
+   mode_exec.process_output(false);
 
 }
 
@@ -191,7 +191,7 @@ for (r_index=0; r_index<(mode_exec.n_conv_radii()); ++r_index)  {
 
       mode_exec.do_match_merge();
 
-      mode_exec.process_output();
+      mode_exec.process_output(false);
 
    }
 
