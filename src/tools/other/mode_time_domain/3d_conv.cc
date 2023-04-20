@@ -548,9 +548,11 @@ for (y=0; y<ny; ++y)  {
 
       status = is_bad_data(value);
 
-      *(d+offset) = (float) value;
+      if (offset < (nx * ny)) { // kludge for SonarQube findings
+         *(d+offset) = (float) value;
 
-      *(ok+offset) = ! status;
+         *(ok+offset) = ! status;
+      }
 
       offset++;
 
