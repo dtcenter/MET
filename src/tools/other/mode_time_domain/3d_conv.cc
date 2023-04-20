@@ -529,6 +529,7 @@ void get_data_plane(const MtdFloatFile & mtd, const int t, double * data_plane, 
 {
 
 int x, y;
+int offset = 0;
 double * d = data_plane;
 bool * ok = ok_plane;
 double value;
@@ -547,9 +548,13 @@ for (y=0; y<ny; ++y)  {
 
       status = is_bad_data(value);
 
-      *d++ = (float) value;
+      if (offset < (nx * ny)) { // kludge for SonarQube findings
+         *(d+offset) = (float) value;
 
-      *ok++ = ! status;
+         *(ok+offset) = ! status;
+      }
+
+      offset++;
 
    }
 
