@@ -548,11 +548,9 @@ for (y=0; y<ny; ++y)  {
 
       status = is_bad_data(value);
 
-      if (offset < (nx * ny)) {
-         *(d+offset) = (float) value;
+      *(d+offset) = (float) value;
 
-         *(ok+offset) = ! status;
-      }
+      *(ok+offset) = ! status;
 
       offset++;
 
