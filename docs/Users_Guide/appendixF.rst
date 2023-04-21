@@ -496,7 +496,7 @@ Examples of Python Embedding for Point Observations
 .. code-block:: none
    :caption: PointStat Command with Dual Python Embedding
 
-   point_stat 'PYTHON_NUMPY' 'PYTHON_NUMPY' PointStat_config -outdir /path/to/output
+   point_stat 'PYTHON_NUMPY' 'PYTHON_NUMPY=/path/to/obs/python/script.py python_arg1 python_arg2' PointStat_config -outdir /path/to/output
 
 .. code-block:: none
    :caption: PointStat Config with Dual Python Embedding
@@ -505,14 +505,6 @@ Examples of Python Embedding for Point Observations
       field = [
          {
            name = "/path/to/fcst/python/script.py python_arg1 python_arg2";
-         }
-      ];
-    }
-
-    obs = {
-      field = [
-         {
-           name = "/path/to/obs/python/script.py python_arg1 python_arg2";
          }
       ];
     }
