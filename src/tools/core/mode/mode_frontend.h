@@ -27,10 +27,12 @@ class ModeFrontEnd {
 
  public:
 
+   // the 3 different situations for the front end
    typedef enum {SINGLE_VAR, MULTIVAR_PASS1, MULTIVAR_PASS2} Processing_t;
 
    ModeFrontEnd();
    ~ModeFrontEnd();
+
 
    string default_out_dir;
 
@@ -43,8 +45,10 @@ class ModeFrontEnd {
    MultiVarData *get_multivar_data();
 
    void process_command_line(const StringArray &);
-   void process_command_line_final(const StringArray & argv,
-                                   const MultiVarData &mvd);
+   void process_command_line_multivar_pass2(const StringArray & argv,
+                                            const MultiVarData &mvd);
+
+   static string stype(Processing_t t);
 
    static void set_config_merge_file (const StringArray &);
    static void set_outdir            (const StringArray &);

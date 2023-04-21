@@ -67,7 +67,9 @@ int ModeFrontEnd::run(const StringArray & Argv, Processing_t ptype)
 
 {
 
-   // Argv.dump(cout, 0);
+   mlog << Debug(1) << "Running mode front end " << stype(ptype) << "\n";
+   Argv.dump(cout, 0);
+   
    if ( mode_exec )  { delete mode_exec;  mode_exec = 0; }
    mode_exec = new ModeExecutive;
    compress_level = -1;
@@ -120,19 +122,20 @@ int ModeFrontEnd::run(const StringArray & Argv, Processing_t ptype)
 int ModeFrontEnd::run(const StringArray & Argv, const MultiVarData &mvd,
                       bool has_union)
 {
+   mlog << Debug(1) << "Running mode front end " << stype(MULTIVAR_PASS2) << "\n";
+   Argv.dump(cout, 0);
+
    if ( mode_exec )  { delete mode_exec;  mode_exec = 0; }
 
    mode_exec = new ModeExecutive;
    compress_level = -1;
    field_index = -1;
 
-   //Argv.dump(cout, 0);
-
    //
    // Process the command line arguments
    //
 
-   process_command_line_final(Argv, mvd);
+   process_command_line_multivar_pass2(Argv, mvd);
    ModeConfInfo & conf = mode_exec->engine.conf_info;
    if (compress_level >= 0) conf.nc_info.set_compress_level(compress_level);
    if ( field_index >= 0 )  conf.set_field_index(field_index);
@@ -357,8 +360,8 @@ void ModeFrontEnd::process_command_line(const StringArray & argv)
 
 ///////////////////////////////////////////////////////////////////////
 
-void ModeFrontEnd::process_command_line_final(const StringArray & argv,
-                                              const MultiVarData &mvd)
+void ModeFrontEnd::process_command_line_multivar_pass2(const StringArray & argv,
+                                                       const MultiVarData &mvd)
 {
 
    CommandLine cline;
@@ -424,11 +427,32 @@ void ModeFrontEnd::process_command_line_final(const StringArray & argv,
    mode_exec->fcst_file         = "not set";
    mode_exec->obs_file          = "not set";
    mode_exec->match_config_file = cline[0];
-   mode_exec->init_final(mvd);
+   mode_exec->init_multivar_pass2(mvd);
 
    return;
 
 }
+
+///////////////////////////////////////////////////////////////////////
+
+string ModeFrontEnd::stype(Processing_t t)
+{
+   string s;
+   switch (t) {
+   case MULTIVAR_PASS1:
+      s = "Multivar Pass 1";
+      break;
+   case MULTIVAR_PASS2:
+      s = "Multivar Pass 2";
+      break;
+   case SINGLE_VAR:
+   default:
+      s = "SingleVar";
+      break;
+   }
+   return s;
+}
+
 
 ///////////////////////////////////////////////////////////////////////
 

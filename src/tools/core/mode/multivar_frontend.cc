@@ -99,15 +99,15 @@ static void set_verbosity (const StringArray &);
 static void multivar_consistency_checks(StringArray &fcst_filenames, StringArray &obs_filenames,
                                         BoolCalc &f_calc, BoolCalc &o_calc, int &n_files);
 
-static ConcatString set_multivar_dir(int j);
+static ConcatString set_multivar_dir();
 
-static MultiVarData *process_multivar_data(int j, const string &fcst_filename,
-                                           const string &obs_filename,
-                                           const ConcatString &dir);
+static MultiVarData *first_pass(int j, const string &fcst_filename,
+                                const string &obs_filename,
+                                const ConcatString &dir);
 
-static void process_masked_multivar_data(int j, const BoolPlane &f_result, const BoolPlane &o_result,
-                                         int nx, int ny, const ConcatString &dir,
-                                         MultiVarData &mvd, bool has_union);
+static void second_pass(int j, const BoolPlane &f_result, const BoolPlane &o_result,
+                        int nx, int ny, const ConcatString &dir,
+                        MultiVarData &mvd, bool has_union);
 
 static void mask_data(const string &name, int nx, int ny, const BoolPlane &mask, DataPlane &data);
 
@@ -144,30 +144,25 @@ int multivar_frontend(const StringArray & Argv)
 
    mlog << Debug(2) << "\n" << sep << "\n";
 
+   ConcatString dir = set_multivar_dir();
+
    //
    //  do the individual mode runs
    //
 
    vector<MultiVarData *> mvd;
-   StringArray nc_files;
 
    for (j=0; j<n_files; ++j)  {
 
       mlog << Debug(2) 
            << "\n starting mode run " << (j + 1) << " of " << n_files
            << "\n" << sep << "\n";
-      ConcatString dir = set_multivar_dir(j);
-      MultiVarData *mvdi = process_multivar_data(j, fcst_filenames[j], obs_filenames[j], dir);
+      MultiVarData *mvdi = first_pass(j, fcst_filenames[j], obs_filenames[j], dir);
       mvd.push_back(mvdi);
-      mlog << Debug(2) << "\n finished mode run " << (j + 1) << " of " << n_files
-           << "\n" << sep << "\n";
-      StringArray a = get_filenames_from_dir(dir.text(), "mode_", ".nc");
-      nc_files.add(a);
 
    }   //  for j
 
    mlog << Debug(2) << "\n finished with individual mode runs " << "\n" << sep << "\n";
-   //nc_files.dump(cout, 0);
 
    //
    //  set the BoolPlane values using the mvd content
@@ -179,7 +174,8 @@ int multivar_frontend(const StringArray & Argv)
    for (j=0; j<n_files; ++j)  {
 
       //objects_from_netcdf(nc_files[j].c_str(), do_clusters, f_plane[j], o_plane[j]);  
-      objects_from_arrays(do_clusters, mvd[j]->fcst_obj_data, mvd[j]->obs_obj_data, mvd[j]->nx, mvd[j]->ny, f_plane[j], o_plane[j]);  
+      objects_from_arrays(do_clusters, mvd[j]->fcst_obj_data, mvd[j]->obs_obj_data,
+                          mvd[j]->nx, mvd[j]->ny, f_plane[j], o_plane[j]);  
 
    }
 
@@ -213,10 +209,8 @@ int multivar_frontend(const StringArray & Argv)
            << "\n starting masked data mode run " << (j + 1) << " of " << n_files
            << "\n" << sep << "\n";
 
-      // same here as above, overwriting contents written to previously 
-      ConcatString dir = set_multivar_dir(j);
+      second_pass(j, f_result, o_result, nx, ny, dir, *mvd[j], has_union);
 
-      process_masked_multivar_data(j, f_result, o_result, nx, ny, dir, *mvd[j], has_union);
       delete mvd[j];
       mvd[j] = 0;
    }
@@ -227,27 +221,38 @@ int multivar_frontend(const StringArray & Argv)
    //  write the superobject output files
    //
 
-   MetNcFile met;   //  mostly to get grid
-   ConcatString path;
-   path = nc_files[0];
+   //
+   // get all the nc file names that were created in pass2
+   //
+   StringArray nc_files = get_filenames_from_dir(dir.text(), "mode_", ".nc");
+   if (nc_files.n() < 1) {
 
-   if ( ! met.open(path.text()) )  {
+      mlog << Warning << "\n" << program_name
+           << ": no netcdf files 'mode_*.nc' were created in \"" << dir
+           << "\"  No superobject netcdf output\n\n";
 
-      mlog << Error << "\n" << program_name
-           << ": unable to open mode output file \""
-           << path << "\"\n\n";
+   } else {
+      
+      ConcatString path = nc_files[0];
+      MetNcFile met;   //  mostly to get grid
+      if ( ! met.open(path.text()) )  {
 
-      exit ( 1 );
+         mlog << Warning << "\n" << program_name
+              << ": unable to open mode output file \""
+              << path << "\"  No superobject netcdf output\n\n";
 
+      } else {
+         
+         ConcatString fcst_file, obs_file;
+         fcst_file << outdir << "/" << fcst_super_nc_filename;
+         obs_file << outdir << "/" <<  obs_super_nc_filename;
+
+         write_output_nc_file(fcst_file.text(), met, f_result);
+         write_output_nc_file( obs_file.text(), met, o_result);
+      }
    }
 
-   ConcatString fcst_file, obs_file;
-   fcst_file << outdir << "/" << fcst_super_nc_filename;
-   obs_file << outdir << "/" <<  obs_super_nc_filename;
-
-   write_output_nc_file(fcst_file.text(), met, f_result);
-   write_output_nc_file( obs_file.text(), met, o_result);
-
+   
    //
    //  done
    //
@@ -368,7 +373,7 @@ void multivar_consistency_checks(StringArray &fcst_filenames, StringArray &obs_f
    if ( config.fcst_multivar_logic.empty() )  {
 
       mlog << Error << "\n" << program_name
-           << ": fcst multivar logic not specified!\n\n";
+           << ": fcst multivar logic not specified in multivar mode!\n\n";
       exit ( 1 );
 
    }
@@ -376,7 +381,7 @@ void multivar_consistency_checks(StringArray &fcst_filenames, StringArray &obs_f
    if ( config.obs_multivar_logic.empty() )  {
 
       mlog << Error << "\n" << program_name
-           << ": obs multivar logic not specified!\n\n";
+           << ": obs multivar logic not specified in multivar mode!\n\n";
       exit ( 1 );
 
    }
@@ -391,7 +396,7 @@ void multivar_consistency_checks(StringArray &fcst_filenames, StringArray &obs_f
    if ( fcst_filenames.n() != obs_filenames.n() )  {
 
       mlog << Error << "\n" << program_name
-           << ": number of fcst and obs files should be the same!\n\n";
+           << ": number of fcst and obs files should be the same in multivar mode!\n\n";
       exit ( 1 );
 
    }
@@ -408,6 +413,7 @@ void multivar_consistency_checks(StringArray &fcst_filenames, StringArray &obs_f
       exit ( 1 );
 
    }
+
    //
    // set values in the f_calc and o_calc objects, check that the logic is in range and the right length
    //
@@ -453,25 +459,19 @@ void multivar_consistency_checks(StringArray &fcst_filenames, StringArray &obs_f
 
 ////////////////////////////////////////////////////////////////////////
 
-ConcatString set_multivar_dir(int j)
+ConcatString set_multivar_dir()
 {
    ConcatString dir;
    int status;
-   char junk [256];
+
+   dir.clear();
+   // no longer want number subdirectories
+   if ( outdir.length() > 0 )  dir << outdir;
 
    //
    //  test to see of the output directory for this
    //    mode runs exists, and if not, create it
    //
-
-   dir.clear();
-#ifdef OLDWAY
-   if ( outdir.length() > 0 )  dir << outdir << '/';
-   snprintf(junk, sizeof(junk), "%02d", j);
-   dir << junk;
-#else
-   if ( outdir.length() > 0 )  dir << outdir;
-#endif
 
    if ( ! directory_exists(dir.c_str()) )  {
 
@@ -495,8 +495,9 @@ ConcatString set_multivar_dir(int j)
 
 ////////////////////////////////////////////////////////////////////////
 
-MultiVarData *process_multivar_data(int j, const string &fcst_filename, const string &obs_filename,
-                                    const ConcatString &dir)
+MultiVarData *first_pass(int j, const string &fcst_filename,
+                         const string &obs_filename,
+                         const ConcatString &dir)
 {
    ConcatString command;
    StringArray a, mode_argv;
@@ -535,10 +536,10 @@ MultiVarData *process_multivar_data(int j, const string &fcst_filename, const st
    command << " -field_index " << j;
 
    //
-   //  run mode (sort of)
+   //  run the pass1 portions of mode
    //
 
-   mlog << Debug(1) << "Running mode command: \"" << command << "\"\n\n";
+   mlog << Debug(3) << "Running mode command: \"" << command << "\"\n\n";
    ModeFrontEnd *frontend = new ModeFrontEnd;
 
    int status = frontend->run(mode_argv, ModeFrontEnd::MULTIVAR_PASS1);
@@ -549,10 +550,10 @@ MultiVarData *process_multivar_data(int j, const string &fcst_filename, const st
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_masked_multivar_data(int j, const BoolPlane &f_result,
-                                  const BoolPlane &o_result, int nx, int ny,
-                                  const ConcatString &dir, MultiVarData &mvd,
-                                  bool has_union)
+void second_pass(int j, const BoolPlane &f_result,
+                 const BoolPlane &o_result, int nx, int ny,
+                 const ConcatString &dir, MultiVarData &mvd,
+                 bool has_union)
 {
   
    mask_data("Fcst", nx, ny, f_result, mvd.Fcst_sd->data);
@@ -689,6 +690,8 @@ void mask_data(const string &name, int nx, int ny, const BoolPlane &bp, DataPlan
       }
    }
    
-   mlog << Debug(1) << name << " superobject masking " << nkeep << " of " << nkeep + nmasked << " data values remain unmasked\n";
+   mlog << Debug(1) << name << " superobject masking.."
+        << (double)nkeep/(double)(nmasked+nkeep)*100.0
+        << " percent of the data inside a superobject\n\n";
 }
 

@@ -13,8 +13,6 @@ include ${top_srcdir}/Make-include
 bin_PROGRAMS    = mode
 mode_SOURCES = mode_usage.cc \
 	mode_frontend.cc \
-	mode_multivar.cc \
-	mode_singlevar.cc \
 	multivar_frontend.cc \
 	mode.cc \
 	combine_boolplanes.cc \

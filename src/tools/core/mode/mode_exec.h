@@ -77,7 +77,7 @@ class ModeExecutive {
    void clear();
 
    void init();
-   void init_final(const MultiVarData &mvd);
+   void init_multivar_pass2(const MultiVarData &mvd);
 
    int n_conv_radii   () const;
    int n_conv_threshs () const;

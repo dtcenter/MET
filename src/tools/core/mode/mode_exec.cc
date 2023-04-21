@@ -212,12 +212,11 @@ void ModeExecutive::init()
 ///////////////////////////////////////////////////////////////////////
 
 
-void ModeExecutive::init_final(const MultiVarData &mvd)
+void ModeExecutive::init_multivar_pass2(const MultiVarData &mvd)
 
 {
 
    GrdFileType ftype, otype;
-   //Met2dDataFileFactory mtddf_factory;
 
    R_index = T_index = 0;
 
@@ -241,41 +240,17 @@ void ModeExecutive::init_final(const MultiVarData &mvd)
    ftype = parse_conf_file_type(engine.conf_info.conf.lookup_dictionary(conf_key_fcst));
    otype = parse_conf_file_type(engine.conf_info.conf.lookup_dictionary(conf_key_obs));
 
-
-   // Read observation file
-   // if(!(obs_mtddf = mtddf_factory.new_met_2d_data_file(obs_file.c_str(), otype))) {
-   //    mlog << Error << "\nTrouble reading observation file \""
-   //         << obs_file << "\"\n\n";
-   //    exit(1);
-   // }
-
-
-   // Read forecast file
-   // if(!(fcst_mtddf = mtddf_factory.new_met_2d_data_file(fcst_file.c_str(), ftype))) {
-   //    mlog << Error << "\nTrouble reading forecast file \""
-   //         << fcst_file << "\"\n\n";
-   //    exit(1);
-   // }
-
-   // Store the input data file types
-   // ftype = fcst_mtddf->file_type();
-   // otype = obs_mtddf->file_type();
-
+   // actually use these instead, the config ones are not set for this second pass
    ftype = mvd.ftype;
    otype = mvd.otype;
 
    // Process the configuration
    engine.conf_info.process_config(ftype, otype);
 
+   // NOTE: do not do shifting, should have been done in the first pass
    // const int shift = engine.conf_info.shift_right;
-
    // fcst_mtddf->set_shift_right(shift);
    //  obs_mtddf->set_shift_right(shift);
-
-   // List the input files
-   // mlog << Debug(1)
-   //      << "Forecast File: "    << fcst_file << "\n"
-   //      << "Observation File: " << obs_file  << "\n";
 
    engine.conf_info.nc_info.compress_level = engine.conf_info.get_compression_level();
 
@@ -437,7 +412,6 @@ void ModeExecutive::setup_fcst_obs_data(const MultiVarData &mvd)
 
 {
 
-   // ShapeData fcst_sd, obs_sd;
    double fmin, omin, fmax, omax;
 
    // Fcst_sd.clear();
@@ -446,73 +420,19 @@ void ModeExecutive::setup_fcst_obs_data(const MultiVarData &mvd)
    Obs_sd = *(mvd.Obs_sd);
    grid = *(mvd.grid);
 
-#ifdef NOTFORTHIS
-   // copy the raw data from mvd into the Fcst_sd and Obs_sd objects locally
-   
-   // Read the gridded data from the input forecast file
-
-   if ( !(fcst_mtddf->data_plane(*(engine.conf_info.Fcst->var_info), Fcst_sd.data)) )  {
-
-      mlog << Error << "\nsetup_fcst_obs_data() -> "
-           << "can't get forecast data \""
-           << engine.conf_info.Fcst->var_info->magic_str()
-           << "\" from file \"" << fcst_file << "\"\n\n";
-      exit(1);
-   }
-
-   // Read the gridded data from the input observation file
-
-   if ( !(obs_mtddf->data_plane(*(engine.conf_info.Obs->var_info), Obs_sd.data)) )  {
-
-      mlog << Error << "\nsetup_fcst_obs_data() -> "
-           << "can't get observation data \""
-           << engine.conf_info.Obs->var_info->magic_str()
-           << "\" from file \"" << obs_file << "\"\n\n";
-      exit(1);
-   }
-
-   // Determine the verification grid
-
-   grid = parse_vx_grid(engine.conf_info.Fcst->var_info->regrid(),
-                        &(fcst_mtddf->grid()), &(obs_mtddf->grid()));
-#endif
+   // do not need to read any data, it is stored in the mvd input
+   // the verification grid was created in the first pass, so we have that as well
 
    // Store the grid
 
    engine.set_grid(&grid);
 
-#ifdef NOTFORTHIS
-   // Regrid, if necessary
+   // regridding of inputs is not needed in the second pass, as regridded data outputs
+   // are stored to input mvd
 
-   if ( !(fcst_mtddf->grid() == grid) )  {
-      mlog << Debug(1)
-           << "Regridding forecast " << engine.conf_info.Fcst->var_info->magic_str()
-           << " to the verification grid.\n";
-      Fcst_sd.data = met_regrid(Fcst_sd.data, fcst_mtddf->grid(), grid,
-                                engine.conf_info.Fcst->var_info->regrid());
-   }
+   // Rescale probabilites from [0, 100] to [0, 1] also not neede in the second pass
 
-   // Regrid, if necessary
-
-   if ( !(obs_mtddf->grid() == grid) )  {
-      mlog << Debug(1)
-           << "Regridding observation " << engine.conf_info.Obs->var_info->magic_str()
-           << " to the verification grid.\n";
-      Obs_sd.data = met_regrid(Obs_sd.data, obs_mtddf->grid(), grid,
-                               engine.conf_info.Obs->var_info->regrid());
-   }
-
-   // Rescale probabilites from [0, 100] to [0, 1]
-
-   if ( engine.conf_info.Fcst->var_info->p_flag() ) rescale_probability(Fcst_sd.data);
-
-   // Rescale probabilites from [0, 100] to [0, 1]
-
-   if ( engine.conf_info.Obs->var_info->p_flag() ) rescale_probability(Obs_sd.data);
-
-#endif
    // Print a warning if the valid times do not match
-
    if(Fcst_sd.data.valid() != Obs_sd.data.valid()) {
 
       mlog << Warning << "\nsetup_fcst_obs_data() -> "
@@ -524,7 +444,6 @@ void ModeExecutive::setup_fcst_obs_data(const MultiVarData &mvd)
    }
 
    // Print a warning if the accumulation intervals do not match
-
    if(engine.conf_info.Fcst->var_info->level().type() == LevelType_Accum &&
       engine.conf_info.Obs->var_info->level().type()  == LevelType_Accum &&
       Fcst_sd.data.accum()                       != Obs_sd.data.accum()) {
@@ -547,26 +466,11 @@ void ModeExecutive::setup_fcst_obs_data(const MultiVarData &mvd)
         << engine.conf_info.Obs->var_info->level_attr()
         << "\n";
 
-#ifdef NOTFORTHIS
-
-   // Mask out the missing data between fields
-
-   if(engine.conf_info.mask_missing_flag == FieldType_Fcst ||
-      engine.conf_info.mask_missing_flag == FieldType_Both)
-      mask_bad_data(Fcst_sd.data, Obs_sd.data);
-
-   // Mask out the missing data between fields
-
-   if(engine.conf_info.mask_missing_flag == FieldType_Obs ||
-      engine.conf_info.mask_missing_flag == FieldType_Both)
-      mask_bad_data(Obs_sd.data, Fcst_sd.data);
-
-   // Parse the grid and/or polyline masks from the configuration
-
-   process_masks(Fcst_sd, Obs_sd);
-#endif
+   // masking of inputs not needed, as it was done in the first pass
+   // and stored to Fcst_sd and Obs_sd
    
    // Compute the min and max data values across both raw fields
+   // do this in the 2nd pass as data has now been masked to within superobjects
 
    Fcst_sd.data.data_range(fmin, fmax);
    Obs_sd.data.data_range(omin, omax);
@@ -579,7 +483,7 @@ void ModeExecutive::setup_fcst_obs_data(const MultiVarData &mvd)
    else if( is_bad_data(fmax) && !is_bad_data(omax)) data_max = omax;
 
    // Process percentile thresholds
-
+   // do this in the second pass using masked Fcst_sd and Obs_sd
    engine.conf_info.set_perc_thresh(Fcst_sd.data, Obs_sd.data);
 
    //
@@ -642,6 +546,8 @@ void ModeExecutive::do_conv_thresh(const int r_index, const int t_index)
    return;
 
 }
+
+///////////////////////////////////////////////////////////////////////
 
 void ModeExecutive::clear_internal_r_index()
 {
@@ -756,20 +662,27 @@ void ModeExecutive::process_masks(ShapeData & fcst_sd, ShapeData & obs_sd)
 void ModeExecutive::process_output(bool isMultivar)
 
 {
+   // store to class member so don't have to pass it around
    isMultivarOutput = isMultivar;
    
    if (isMultivar) {
-      // get the magic strings
+
+      // get the magic strings, which will be used in file naming
+      
       fcst_magic_string = engine.conf_info.Fcst->var_info->magic_str().c_str();
       obs_magic_string = engine.conf_info.Obs->var_info->magic_str().c_str();
 
       // replace forward slashes with underscores to prevent new directories
+
       replace(fcst_magic_string.begin(), fcst_magic_string.end(), '/', '_');   
       replace(obs_magic_string.begin(), obs_magic_string.end(), '/', '_');   
+
    } else {
+
       // just in case make these empty
       fcst_magic_string = "";
       obs_magic_string = "";
+
    }
    
    // Create output stats files and plots
@@ -871,16 +784,21 @@ void ModeExecutive::build_outfile_prefix(ConcatString &str)
 {
 
    //
-   // Create leading part of output file name
+   // Create leading part of output file name including out_dir
    //
 
-   // Append the output directory and program name
 
    if (isMultivarOutput) {
+
+      // Append the program name and magic strings
+
       str << cs_erase << out_dir << "/" << program_name
           << "_Fcst_" << fcst_magic_string
           << "_Obs_" << obs_magic_string;
    } else {
+
+      // Append the program name
+
       str << cs_erase << out_dir << "/" << program_name;
    }      
    
@@ -1071,6 +989,9 @@ void ModeExecutive::write_obj_stats()
 
    return;
 }
+
+//////////////////////////////////////////////////////////////////////
+
 
 MultiVarData *ModeExecutive::get_multivar_data()
 {
