@@ -587,7 +587,7 @@ if (env_pythonpath) {
    python_path.add(':');
 }
 python_path.add(replace_path(met_python_path));
-mlog << Debug(0) << method_name << " -> added python path "
+mlog << Debug(1) << method_name << " -> added python path ("
      << replace_path(met_python_path) << ") to " << env_PYTHONPATH << "\n";
 
 setenv(env_PYTHONPATH, python_path.c_str(),1);
