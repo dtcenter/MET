@@ -437,14 +437,10 @@ if [ $COMPILE_G2CLIB -eq 1 ]; then
   rm -rf ${LIB_DIR}/g2clib/g2clib*
   tar -xf ${TAR_DIR}/g2clib*.tar -C ${LIB_DIR}/g2clib
   cd ${LIB_DIR}/g2clib/g2clib*
-  # JHG Switch sed commands from using single quotes to double-quotes since
-  #     the latter supports variable expansion.
-  # JHG sed -i 's|INC=.*|INC=-I${LIB_DIR}/include -I${LIB_DIR}/include/jasper|g' makefile
+  # Sed commands use double-quotes to support variable expansion.
   sed -i "s|INC=.*|INC=-I${LIB_DIR}/include -I${LIB_DIR}/include/jasper|g" makefile
 
-  # allow other compilers besides gcc
-  # JHG sed -i 's/CC=gcc/CC=${CC_COMPILER}/g' makefile
-  # JHG NOTE THAT I CHANGED FROM / to | as the separator
+  # Allow other compilers besides gcc
   sed -i "s|CC=gcc|CC=${CC}|g" makefile
 
   # remove -D__64BIT__ flag because compiling with it has
@@ -452,7 +448,6 @@ if [ $COMPILE_G2CLIB -eq 1 ]; then
   # This flag was removed in g2clib 1.6.4
   # so this can be removed if the version is updated
   sed -i 's/-D__64BIT__//g' makefile
-  # JHG export CC_COMPILER=${CC}
   echo "cd `pwd`"
   # g2clib appears to compile but causes failure compiling MET if -j argument is used
   # so exclude it from this call
