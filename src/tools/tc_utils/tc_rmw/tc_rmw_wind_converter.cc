@@ -36,25 +36,25 @@ static void wind_ne_to_ra(const TcrmwGrid&,
 
 void TCRMW_WindConverter::_free_winds_arrays(void)
 {
-  if (_windR != NULL) {
+  if (_windR != nullptr) {
     delete [] _windR;
-    _windR = NULL;
+    _windR = nullptr;
   }
-  if (_windT != NULL) {
+  if (_windT != nullptr) {
     delete [] _windT;
-    _windT = NULL;
+    _windT = nullptr;
   }
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 TCRMW_WindConverter::TCRMW_WindConverter(void) :
-  _windR(NULL),
-  _windT(NULL),
+  _windR(nullptr),
+  _windT(nullptr),
   _foundUInInput(false),
   _foundVInInput(false),
   _unitsU("Unknown"),
-  _conf(NULL),
+  _conf(nullptr),
   _computeWinds(false) {
 }
 

@@ -16,20 +16,19 @@
 ## Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 ## MA 02110-1301, USA.
 
-SUBDIRS =
+# SUBDIRS = include
 
-wrappersdir = $(pkgdatadir)/wrappers
+## Example of how to Install outside of $(pkgdatadir)
+## scriptsrootdir = $(prefix)/share/scripts
+## pythonscriptsdir = ${scriptsrootdir}/python
 
-wrappers_DATA = \
-     set_python_env.py \
-     read_tmp_dataplane.py \
-     read_tmp_ascii.py \
-     read_tmp_point_nc.py \
-     write_tmp_dataplane.py \
-     write_tmp_point.py \
-     write_tmp_point_nc.py \
-     write_tmp_mpr.py
+pythonmetscriptsdir = $(pkgdatadir)/python/met
 
-EXTRA_DIST = ${wrappers_DATA}
+pythonmetscripts_DATA = \
+	dataplane.py \
+	mprbase.py \
+	point.py
 
-MAINTAINERCLEANFILES 	= Makefile.in 
+EXTRA_DIST = ${pythonmetscripts_DATA}
+
+MAINTAINERCLEANFILES 	= Makefile.in

@@ -421,8 +421,6 @@ Logger & Logger::operator=(const Logger & l)
    cerr << "\n\n  operator=(const Logger & l) -> This function should never be called\n\n";
    exit (1);
 
-   return (*this);  // left in to keep the compiler quiet
-
 }
 
 

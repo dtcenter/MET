@@ -570,11 +570,11 @@ void process_ioda_file(int i_pb) {
    float *obs_hght_arr = new float[nlocs];
    float *hdr_time_arr = new float[nlocs];
    char *hdr_vld_block = new char[nlocs*ndatetime];
-   char *hdr_msg_types = NULL;
-   char *hdr_station_ids = NULL;
-   char **hdr_vld_block2 = NULL;
-   char **hdr_msg_types2 = NULL;
-   char **hdr_station_ids2 = NULL;
+   char *hdr_msg_types = nullptr;
+   char *hdr_station_ids = nullptr;
+   char **hdr_vld_block2 = nullptr;
+   char **hdr_msg_types2 = nullptr;
+   char **hdr_station_ids2 = nullptr;
    vector<int *> v_qc_data;
    vector<float *> v_obs_data;
 
@@ -791,7 +791,7 @@ void process_ioda_file(int i_pb) {
       }
 
       if(has_msg_type) {
-         if (NULL != hdr_msg_types2) {
+         if (nullptr != hdr_msg_types2) {
             m_strncpy(hdr_typ, hdr_msg_types2[i_read], nstring, method_name_s, "hdr_typ2");
          }
          else {
@@ -823,7 +823,7 @@ void process_ioda_file(int i_pb) {
 
       if(has_station_id) {
          char tmp_sid[nstring+1];
-         if (NULL != hdr_station_ids2) {
+         if (nullptr != hdr_station_ids2) {
             m_strncpy(tmp_sid, hdr_station_ids2[i_read], nstring, method_name_s, "tmp_sid2");
          }
          else {
@@ -1012,15 +1012,15 @@ void process_ioda_file(int i_pb) {
    delete [] obs_hght_arr;
    if (hdr_msg_types) delete [] hdr_msg_types;
    if (hdr_station_ids) delete [] hdr_station_ids;
-   if (NULL != hdr_msg_types2) {
+   if (nullptr != hdr_msg_types2) {
       for (int i=0; i<nlocs; i++ ) delete hdr_msg_types2[i];
       delete [] hdr_msg_types2;
    }
-   if (NULL != hdr_station_ids2) {
+   if (nullptr != hdr_station_ids2) {
       for (int i=0; i<nlocs; i++ ) delete hdr_station_ids2[i];
       delete [] hdr_station_ids2;
    }
-   if (NULL != hdr_vld_block2) {
+   if (nullptr != hdr_vld_block2) {
       for (int i=0; i<nlocs; i++ ) delete hdr_vld_block2[i];
       delete [] hdr_vld_block2;
    }

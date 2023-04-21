@@ -113,8 +113,6 @@ mlog << Error
 
 exit ( 1 );
 
-return ( * this );
-
 }
 
 

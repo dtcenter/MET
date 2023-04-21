@@ -33,12 +33,6 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-//static double     lc_func(double lat, double Cone, const bool is_north);
-
-
-////////////////////////////////////////////////////////////////////////
-
-
    //
    //  Code for class GoesImagerGrid
    //
@@ -398,8 +392,6 @@ mlog << Error << "\nGoesImagerGrid::shift_right(int) -> "
      << "shifting is not implemented\n\n";
 
 exit ( 1 );
-
-return;
 
 }
 

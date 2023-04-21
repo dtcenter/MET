@@ -123,7 +123,7 @@ MetPythonDataFile * p = 0;
          exit(1);
 
       case FileType_None:
-         // For FileType_None, silently return a NULL pointer
+         // For FileType_None, silently return a nullptr pointer
          mtddf = (Met2dDataFile *) 0;
          break;
 
