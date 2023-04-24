@@ -12,6 +12,7 @@ include ${top_srcdir}/Make-include
 
 noinst_LIBRARIES = libvx_pointdata_python.a
 libvx_pointdata_python_a_SOURCES = \
+              mask_filters.h mask_filters.cc \
               pointdata_python.h pointdata_python.cc \
               pointdata_from_array.h pointdata_from_array.cc pointdata_from_array.hpp \
               python_pointdata.h python_pointdata.cc python_pointdata.hpp

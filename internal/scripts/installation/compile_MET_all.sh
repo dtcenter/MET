@@ -118,8 +118,15 @@ if [ ! -e $TAR_DIR ]; then
   exit 1
 fi
 
-# Update library linker path
-export LD_LIBRARY_PATH=${TEST_BASE}/external_libs/lib${MET_PYTHON:+:$MET_PYTHON/lib}${MET_NETCDF:+:$MET_NETCDF/lib}${MET_HDF5:+:$MET_HDF5/lib}${MET_BUFRLIB:+:$MET_BUFRLIB}${MET_GRIB2CLIB:+:$MET_GRIB2CLIB}${LIB_JASPER:+:$LIB_JASPER}${LIB_LIBPNG:+:$LIB_LIBPNG}${LIB_Z:+:$LIB_Z}${MET_GSL:+:$MET_GSL/lib}${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
+# If MET_PYTHON_LIB is not set in the environment file, set it to the
+# lib directory so it can be use to install MET with Python Embedding
+# support
+if [[ -z "$MET_PYTHON_LIB" ]]; then
+  MET_PYTHON_LIB=${MET_PYTHON}/lib
+fi
+
+
+# Print library linker path
 echo "LD_LIBRARY_PATH = ${LD_LIBRARY_PATH}"
 
 # if LIB_Z is not set in the environment file, set it to the
@@ -430,17 +437,17 @@ if [ $COMPILE_G2CLIB -eq 1 ]; then
   rm -rf ${LIB_DIR}/g2clib/g2clib*
   tar -xf ${TAR_DIR}/g2clib*.tar -C ${LIB_DIR}/g2clib
   cd ${LIB_DIR}/g2clib/g2clib*
-  sed -i 's|INC=.*|INC=-I${LIB_DIR}/include -I${LIB_DIR}/include/jasper|g' makefile
+  # Sed commands use double-quotes to support variable expansion.
+  sed -i "s|INC=.*|INC=-I${LIB_DIR}/include -I${LIB_DIR}/include/jasper|g" makefile
 
-  # allow other compilers besides gcc
-  sed -i 's/CC=gcc/CC=${CC_COMPILER}/g' makefile
+  # Allow other compilers besides gcc
+  sed -i "s|CC=gcc|CC=${CC}|g" makefile
 
   # remove -D__64BIT__ flag because compiling with it has
   # shown issues with GRIB/GRIB2 files that are over 2GB in size
   # This flag was removed in g2clib 1.6.4
   # so this can be removed if the version is updated
   sed -i 's/-D__64BIT__//g' makefile
-  export CC_COMPILER=${CC}
   echo "cd `pwd`"
   # g2clib appears to compile but causes failure compiling MET if -j argument is used
   # so exclude it from this call
@@ -449,6 +456,7 @@ if [ $COMPILE_G2CLIB -eq 1 ]; then
   cp libg2c*.a ${LIB_DIR}/lib/libgrib2c.a
   cp *.h ${LIB_DIR}/include/.
 fi
+
 
 # Compile HDF
 # Depends on jpeg
@@ -628,7 +636,7 @@ export LDFLAGS="-Wl,--disable-new-dtags"
 # https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html
 # ${parameter:+word}
 # If parameter is null or unset, nothing is substituted, otherwise the expansion of word is substituted.
-export LDFLAGS="${LDFLAGS} -Wl,-rpath,${LIB_DIR}/lib${ADDTL_DIR:+:$ADDTL_DIR}${LIB_DIR}/lib${MET_NETCDF:+:$MET_NETCDF/lib}${MET_HDF5:+:$MET_HDF5/lib}${MET_BUFRLIB:+:$MET_BUFRLIB}${MET_GRIB2CLIB:+:$MET_GRIB2CLIB}${MET_PYTHON:+:$MET_PYTHON/lib}${MET_GSL:+:$MET_GSL/lib}"
+export LDFLAGS="${LDFLAGS} -Wl,-rpath,${LIB_DIR}/lib${ADDTL_DIR:+:$ADDTL_DIR}${LIB_DIR}/lib${MET_NETCDF:+:$MET_NETCDF/lib}${MET_HDF5:+:$MET_HDF5/lib}${MET_BUFRLIB:+:$MET_BUFRLIB}${MET_GRIB2CLIB:+:$MET_GRIB2CLIB}${MET_PYTHON_LIB:+:$MET_PYTHON_LIB}${MET_GSL:+:$MET_GSL/lib}"
 export LDFLAGS="${LDFLAGS} -Wl,-rpath,${LIB_JASPER:+$LIB_JASPER}${LIB_LIBPNG:+:$LIB_PNG}${LIB_Z:+$LIB_Z}"
 export LDFLAGS="${LDFLAGS} ${LIB_JASPER:+-L$LIB_JASPER} ${LIB_LIBPNG:+-L$LIB_LIBPNG} ${MET_HDF5:+-L$MET_HDF5/lib} ${ADDTL_DIR:+-L$ADDTL_DIR}"
 export LIBS="${LIBS} -lhdf5_hl -lhdf5 -lz"

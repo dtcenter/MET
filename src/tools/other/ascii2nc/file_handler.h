@@ -25,6 +25,7 @@
 #include <netcdf>
 
 #include "mask_poly.h"
+#include "mask_filters.h"
 #include "vx_grid.h"
 #include "vx_config.h"
 #include "vx_util.h"
@@ -92,15 +93,7 @@ protected:
   int _hdrNum;
   int _obsNum;
 
-  int _gridMaskNum;
-  int _areaMaskNum;
-  int _polyMaskNum;
-  int _sidMaskNum;
-
-  Grid        *_gridMask;
-  MaskPlane   *_areaMask;
-  MaskPoly    *_polyMask;
-  StringArray *_sidMask;
+  MaskFilters filters;
 
   map<ConcatString, ConcatString> _messageTypeMap;
 
@@ -149,20 +142,14 @@ protected:
 
   void _closeNetcdf();
   bool _openNetcdf(const string &nc_filename);
-//  bool _writeHdrInfo(const ConcatString &hdr_typ,
-//                     const ConcatString &hdr_sid,
-//                     const time_t hdr_vld,
-//                     double lat, double lon, double elv);
-//  bool _writeObsInfo(int gc, float prs, float hgt, float obs,
-//                     const ConcatString &qty);
   void debug_print_observations(vector< Observation >, string);
 };
 
 inline void FileHandler::setCompressionLevel(int compressoion_level) { deflate_level = compressoion_level; }
-inline void FileHandler::setGridMask(Grid        &g) { _gridMask = &g; }
-inline void FileHandler::setAreaMask(MaskPlane   &a) { _areaMask = &a; }
-inline void FileHandler::setPolyMask(MaskPoly    &p) { _polyMask = &p; }
-inline void FileHandler::setSIDMask (StringArray &s) { _sidMask  = &s; }
+inline void FileHandler::setGridMask(Grid        &g) { filters.set_grid_mask(&g); }
+inline void FileHandler::setAreaMask(MaskPlane   &a) { filters.set_area_mask(&a); }
+inline void FileHandler::setPolyMask(MaskPoly    &p) { filters.set_poly_mask(&p); }
+inline void FileHandler::setSIDMask (StringArray &s) { filters.set_sid_mask(&s); }
 inline void FileHandler::setMessageTypeMap(map<ConcatString, ConcatString> m) {
    _messageTypeMap = m;
 }

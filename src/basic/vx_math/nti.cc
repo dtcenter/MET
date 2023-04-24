@@ -150,7 +150,8 @@ y = ca2;
    //  reduce x and y as much as possible
    //
 
-n = (y*L_over_b - x*L_over_a)/( L_over_a*L_over_a + L_over_b*L_over_b );
+n = (0 == L_over_a && 0 == L_over_b) ?
+     0 : (y*L_over_b - x*L_over_a)/( L_over_a*L_over_a + L_over_b*L_over_b );
 
 x += n*L_over_a;
 y -= n*L_over_b;

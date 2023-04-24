@@ -467,7 +467,7 @@ void Mtd_Partition::extend(int n)
 
 if ( n <= Nalloc )  return;
 
-EquivalenceClass ** u = (EquivalenceClass **) 0;
+EquivalenceClass ** u = (EquivalenceClass **) nullptr;
 
 n = mtd_partition_alloc_inc*((n + mtd_partition_alloc_inc - 1)/mtd_partition_alloc_inc);
 
@@ -479,7 +479,7 @@ if ( C )  {
 
    memcpy(u, C, Nelements*(sizeof(EquivalenceClass *)));
 
-   delete [] C;  C = (EquivalenceClass **) 0;
+   delete [] C;  C = (EquivalenceClass **) nullptr;
 
 }
 

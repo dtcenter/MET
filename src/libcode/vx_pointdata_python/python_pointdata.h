@@ -16,6 +16,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include "mask_filters.h"
 #include "met_point_data.h"
 
 
@@ -29,6 +30,7 @@ extern "C" {
 ////////////////////////////////////////////////////////////////////////
 
 static const char python_key_point_data     [] = "met_point_data";
+static const char python_key_point_data_list[] = "point_data";
 
 static const char python_key_nhdr           [] = "nhdr";
 //static const char python_key_npbhdr         [] = "npbhdr";
@@ -62,8 +64,10 @@ static const int point_data_debug_level = 10;
 ////////////////////////////////////////////////////////////////////////
 
 
-extern bool python_point_data(const char * script_name, int script_argc, char ** script_argv,
-                              const bool use_xarray, MetPointDataPython &met_pd_out);
+extern bool python_point_data(const char * script_name, int script_argc,
+                              char ** script_argv, MetPointDataPython &met_pd_out,
+                              MaskFilters *filters);
+
 //extern bool python_point_data(const char *python_command, const bool use_xarray,
 //                              MetPointData & po_out);
 extern void print_met_data(MetPointObsData *obs_data, MetPointHeader *header_data,
