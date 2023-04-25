@@ -71,7 +71,7 @@ An equivalent command using python embedding for point observations is shown bel
 
 .. code-block:: none
 
-  plot_point_obs 'PYTHON_NUMPY=MET_BASE/python/read_met_point_obs.py sample_pb.nc' sample_data.ps
+  plot_point_obs 'PYTHON_NUMPY=MET_BASE/python/examples/read_met_point_obs.py sample_pb.nc' sample_data.ps
 
 Please see section :numref:`pyembed-point-obs-data` for more details about Python embedding in MET.
 

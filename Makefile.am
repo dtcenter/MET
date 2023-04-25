@@ -18,7 +18,7 @@
 
 ACLOCAL_AMFLAGS		= -I m4
 
-SUBDIRS 		= data src scripts/Rscripts scripts/python scripts/utility
+SUBDIRS 		= data src scripts/Rscripts scripts/python
 
 if ENABLE_DEVELOPMENT
   SUBDIRS += internal/test_util

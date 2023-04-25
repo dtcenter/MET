@@ -9,6 +9,29 @@ When applicable, release notes are followed by the GitHub issue number which des
 enhancement, or new feature (`MET GitHub issues <https://github.com/dtcenter/MET/issues>`_).
 Important issues are listed **in bold** for emphasis.
 
+MET Version 11.1.0-beta2 release notes (20230423)
+-------------------------------------------------
+
+  .. dropdown:: Documentation
+
+     * Improve documentation on Python Embedding for point observations (`#2303 <https://github.com/dtcenter/MET/issues/2303>`_).
+     * Create dropdown menus for Appendix A (`#2460 <https://github.com/dtcenter/MET/issues/2460>`_).
+     * Clarify MET Compile Time Python requirements (`#2490 <https://github.com/dtcenter/MET/issues/2490>`_).
+
+  .. dropdown:: Enhancements
+
+     * Enhance the MET point processing tools to read the Python 'point_data' variable instead of just 'met_point_data' (`#2285 <https://github.com/dtcenter/MET/issues/2285>`_).
+     * SonarQube: Further reduce bugs for MET-11.1.0-beta2 (`#2474 <https://github.com/dtcenter/MET/issues/2474>`_).
+     * SonarQube: Replace all instances of NULL with nullptr (`#2504 <https://github.com/dtcenter/MET/issues/2504>`_).
+     * SonarQube: Remove code that will never be executed (`#2506 <https://github.com/dtcenter/MET/issues/2506>`_).
+
+  .. dropdown:: Bugfixes
+
+     * Bugfix: Correct the branch name for the SonarQube scanning nightly (`#2401 <https://github.com/dtcenter/MET/issues/2401>`_).
+     * Bugfix: Fix support for the YYYYMMDD format in NetCDF level timestrings (`#2482 <https://github.com/dtcenter/MET/issues/2482>`_).
+     * Bugfix: AERONET the lat/lon is not changed with different station ID (`#2493 <https://github.com/dtcenter/MET/issues/2493>`_).
+     * Bugfix: dtype in Python embedding example script and appendixF correction (`#2518 <https://github.com/dtcenter/MET/issues/2518>`_).
+
 MET Version 11.1.0-beta1 release notes (20230228)
 -------------------------------------------------
 

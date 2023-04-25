@@ -836,8 +836,8 @@ void SeepsClimoGrid::read_seeps_scores(ConcatString filename) {
       s31_buf = new double[nx*ny];
       s32_buf = new double[nx*ny];
 
-      long curs[3] = { month-1, 0, 0 };
-      long dims[3] = { 1, ny, nx };
+      LongArray curs;   // = { month-1, 0, 0 };
+      LongArray dims;   // = { 1, ny, nx };
       NcVar var_p1_00  = get_nc_var(nc_file, var_name_p1_00);
       NcVar var_p2_00  = get_nc_var(nc_file, var_name_p2_00);
       NcVar var_t1_00  = get_nc_var(nc_file, var_name_t1_00);
@@ -848,6 +848,13 @@ void SeepsClimoGrid::read_seeps_scores(ConcatString filename) {
       NcVar var_s23_00 = get_nc_var(nc_file, var_name_s23_00);
       NcVar var_s31_00 = get_nc_var(nc_file, var_name_s31_00);
       NcVar var_s32_00 = get_nc_var(nc_file, var_name_s32_00);
+
+      curs.add(month-1);
+      curs.add(0);
+      curs.add(0);
+      dims.add(1);
+      dims.add(ny);
+      dims.add(nx);
 
       if (IS_INVALID_NC(var_p1_00) || !get_nc_data(&var_p1_00, p1_buf, dims, curs)) {
          mlog << Error << "\n" << method_name

@@ -413,7 +413,7 @@ double fill_value;
 double missing_value = get_var_missing_value(var);
 get_var_fill_value(var, fill_value);
 
-status = get_nc_data(var, &d, (long *)a);
+status = get_nc_data(var, &d, a);
 
 if ( !status )  {
 
@@ -579,10 +579,10 @@ plane.set_size(Nx, Ny);
    clock_t clock_time;
    double nc_time;
 
-   long dim[dimCount], cur[dimCount];
+   LongArray dim, cur;
    for (int index=0; index<dimCount; index++) {
-      dim[index] = 1;
-      cur[index] = (b[index] == vx_data2d_star) ? 0 : b[index];
+      dim.add(1);
+      cur.add((b[index] == vx_data2d_star) ? 0 : b[index]);
    }
    dim[x_slot] = Nx;
    dim[y_slot] = Ny;
