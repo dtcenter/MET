@@ -158,6 +158,8 @@ void TCDiagConfInfo::clear() {
    tangential_velocity_long_field_name.clear();
    radial_velocity_long_field_name.clear();
 
+   vortex_removal_flag = false;
+
    nc_rng_azi_flag = false;
    nc_diag_flag    = false;
    cira_diag_flag  = false;
@@ -310,6 +312,10 @@ void TCDiagConfInfo::process_config(GrdFileType file_type,
    // Conf: radial_velocity_long_field_name
    radial_velocity_long_field_name =
       conf.lookup_string(conf_key_radial_velocity_long_field_name);
+
+   // Conf: vortex_removal
+   vortex_removal_flag =
+      conf.lookup_bool(conf_key_vortex_removal);
 
    // Conf: nc_rng_azi_flag
    nc_rng_azi_flag = conf.lookup_bool(conf_key_nc_rng_azi_flag);

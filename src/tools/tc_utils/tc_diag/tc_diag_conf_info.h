@@ -109,6 +109,9 @@ class TCDiagConfInfo {
       ConcatString tangential_velocity_long_field_name;
       ConcatString radial_velocity_long_field_name;
 
+      // Vortext removal settings
+      bool vortex_removal_flag;
+
       // Directory for temporary files
       ConcatString tmp_dir;
 

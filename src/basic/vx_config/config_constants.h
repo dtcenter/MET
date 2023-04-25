@@ -1193,6 +1193,7 @@ static const char conf_key_radial_velocity_field_name[] = "radial_velocity_field
 static const char conf_key_tangential_velocity_field_name[] = "tangential_velocity_field_name";
 static const char conf_key_radial_velocity_long_field_name[] = "radial_velocity_long_field_name";
 static const char conf_key_tangential_velocity_long_field_name[] = "tangential_velocity_long_field_name";
+static const char conf_key_vortex_removal[] = "vortex_removal";
 
 //
 // TC-Diag specific paramter key names
