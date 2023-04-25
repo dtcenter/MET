@@ -24,6 +24,20 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 //
+//  Code for struct DataOptInfo
+//
+////////////////////////////////////////////////////////////////////////
+
+void DataOptInfo::clear() {
+
+   tech_ids.clear();
+   data_files.clear();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
 //  Code for class DomainInfo
 //
 ////////////////////////////////////////////////////////////////////////
@@ -53,6 +67,7 @@ void DomainInfo::init_from_scratch() {
 
 void DomainInfo::clear() {
 
+   tech_ids.clear();
    domain.clear();
 
    data.name         = (const char *) 0;
@@ -77,6 +92,8 @@ void DomainInfo::parse_domain_info(Dictionary &dict) {
 
    // Initialize
    clear();
+
+   // Note: tech_ids are specified on the command line
 
    // Conf: domain
    domain = dict.lookup_string(conf_key_domain);
@@ -190,7 +207,7 @@ void TCDiagConfInfo::read_config(const char *default_file_name,
 ////////////////////////////////////////////////////////////////////////
 
 void TCDiagConfInfo::process_config(GrdFileType file_type,
-                                    map<string,StringArray> data_files_map) {
+                                    map<string,DataOptInfo> dmap) {
    int i;
    StringArray sa;
    Dictionary *dict = (Dictionary *) 0;
@@ -244,7 +261,7 @@ void TCDiagConfInfo::process_config(GrdFileType file_type,
    }
 
    // Conf: domain_info
-   parse_domain_info_map(data_files_map);
+   parse_domain_info_map(dmap);
 
    // Conf: data.field
    dict = conf.lookup_array(conf_key_data_field);
@@ -346,7 +363,7 @@ void TCDiagConfInfo::process_config(GrdFileType file_type,
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCDiagConfInfo::parse_domain_info_map(map<string,StringArray> data_files_map) {
+void TCDiagConfInfo::parse_domain_info_map(map<string,DataOptInfo> dmap) {
    Dictionary *dict = (Dictionary *) 0;
 
    // Conf: domain_info
@@ -367,8 +384,9 @@ void TCDiagConfInfo::parse_domain_info_map(map<string,StringArray> data_files_ma
       di.parse_domain_info(*((*dict)[i]->dict_value()));
 
       // Store the domain-specifc data files
-      if(data_files_map.count(di.domain) > 0) {
-         di.data_files = data_files_map[di.domain];
+      if(dmap.count(di.domain) > 0) {
+         di.tech_ids   = dmap[di.domain].tech_ids;
+         di.data_files = parse_file_list(dmap[di.domain].data_files);
       }
       else {
          mlog << Error << "\nTCDiagConfInfo::parse_domain_info_map() -> "
@@ -392,8 +410,8 @@ void TCDiagConfInfo::parse_domain_info_map(map<string,StringArray> data_files_ma
    }
 
    // Make sure all -data domains appear in the config file
-   map<string,StringArray>::iterator it;
-   for(it = data_files_map.begin(); it != data_files_map.end(); it++) {
+   map<string,DataOptInfo>::iterator it;
+   for(it = dmap.begin(); it != dmap.end(); it++) {
       if(domain_info_map.count(it->first) == 0) {
          mlog << Error << "\nTCDiagConfInfo::parse_domain_info_map() -> "
               << "no \"" << conf_key_domain_info << "." << conf_key_domain << "\" = \""

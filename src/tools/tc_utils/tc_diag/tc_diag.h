@@ -75,7 +75,7 @@ static const char* default_out_prefix = "";
 ////////////////////////////////////////////////////////////////////////
 
 // Input files
-static std::map<std::string,StringArray> data_files_map;
+static std::map<std::string,DataOptInfo> data_opt_map;
 static StringArray    deck_source, deck_model_suffix;
 static ConcatString   config_file;
 static TCDiagConfInfo conf_info;

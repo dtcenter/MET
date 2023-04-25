@@ -24,6 +24,17 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+// Struct for the -data command line options
+struct DataOptInfo {
+
+   StringArray tech_ids;   // ATCF Tech ID(s) corresponding to this data source
+   StringArray data_files; // Gridded data file(s)
+
+   void clear();
+};
+
+////////////////////////////////////////////////////////////////////////
+
 class DomainInfo {
 
    private:
@@ -34,6 +45,9 @@ class DomainInfo {
 
       DomainInfo();
       ~DomainInfo();
+
+      // Tech ID's
+      StringArray tech_ids;
 
       // Domain name
       string domain;
@@ -129,9 +143,9 @@ class TCDiagConfInfo {
 
       void read_config(const char *, const char *);
       void process_config(GrdFileType,
-                          std::map<std::string,StringArray>);
+                          std::map<std::string,DataOptInfo>);
 
-      void parse_domain_info_map(std::map<std::string,StringArray>);
+      void parse_domain_info_map(std::map<std::string,DataOptInfo>);
 
       int get_n_domain() const;
 };

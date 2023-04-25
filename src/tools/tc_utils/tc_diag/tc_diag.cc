@@ -119,6 +119,8 @@ static void compute_lat_lon(TcrmwGrid&, double*, double*);
 //   - Include the full track in each temporary NetCDF file
 //   - For each track point, write the vmax and mslp as a single value for that time.
 //   - Write the full array of (lat, lon) points for the entire track for simplicity.
+// JHG print a WARNING message if the Diag Track differs from the Tech Id for the data files
+//     AND vortex removal has not been requested
 
 int met_main(int argc, char *argv[]) {
 
@@ -154,18 +156,19 @@ void usage() {
    cout << "\n*** Model Evaluation Tools (MET" << met_version
         << ") ***\n\n"
         << "Usage: " << program_name << "\n"
-        << "\t-data domain [ file_1 ... file_n | data_file_list ]\n"
+        << "\t-data tech_ids domain [ file_1 ... file_n | data_file_list ]\n"
         << "\t-deck file\n"
         << "\t-config file\n"
         << "\t[-outdir path]\n"
         << "\t[-log file]\n"
         << "\t[-v level]\n\n"
 
-        << "\twhere\t\"-data domain [ file_1 ... file_n | data_file_list ]\"\n"
+        << "\twhere\t\"-data tech_ids domain [ file_1 ... file_n | data_file_list ]\"\n"
 
-        << "\t\t\tSpecifies a domain name followed by the gridded data files\n"
+        << "\t\t\tSpecifies a comma-separated list of one or more ATCF tech ID's\n"
+        << "\t\t\tand a domain name, followed by the gridded data files\n"
         << "\t\t\tor an ASCII file containing a list of files to be used.\n"
-        << "\t\t\tSpecify \"-data\" once for each \"domain\" data source (required).\n"
+        << "\t\t\tSpecify \"-data\" once for each data source (required).\n"
 
         << "\t\t\"-deck source\" is the ATCF format data source "
         << "(required).\n"
@@ -217,8 +220,8 @@ void process_command_line(int argc, char **argv) {
    cline.parse();
 
    // Check for required arguments
-   if(data_files_map.size() == 0 ||
-      deck_source.n()       == 0 ||
+   if(data_opt_map.size() == 0 ||
+      deck_source.n()     == 0 ||
       config_file.empty()) {
       mlog << Error << "\nThe \"-data\", \"-deck\", and \"-config\" "
            << "command line arguments are required!\n\n";
@@ -233,13 +236,6 @@ void process_command_line(int argc, char **argv) {
         << "Config File Default: " << default_config_file << "\n"
         << "Config File User: " << config_file << "\n";
 
-   // Parse the data file lists
-   map<string,StringArray>::iterator it;
-   for(it = data_files_map.begin(); it != data_files_map.end(); it++) {
-      data_files = parse_file_list(it->second);
-      data_files_map[it->first] = data_files;
-   }
-
    // Read config files
    conf_info.read_config(default_config_file.c_str(), config_file.c_str());
 
@@ -247,7 +243,7 @@ void process_command_line(int argc, char **argv) {
    set_file_type(data_files);
 
    // Process the configuration
-   conf_info.process_config(file_type, data_files_map);
+   conf_info.process_config(file_type, data_opt_map);
 
    return;
 }
@@ -566,24 +562,29 @@ void set_atcf_source(const StringArray& a,
 
 void set_data(const StringArray& a) {
 
-   // Check for enough arguments
-   if(a.n() < 2) {
+   // Check for enough arguments (e.g. -data AVNO,AEMN parent gfs_file_list)
+   if(a.n() < 3) {
       mlog << Error << "\nset_data() -> "
-           << "each \"-data\" command line option must specify a domain name "
+           << "each \"-data\" command line option must specify a comma-separated list "
+           << "of one or more ATCF tech ID's and a domain name, "
            << "followed by the corresponding data files.\n\n";
       usage();
    }
 
-   // First argument is the domain name
-   string domain = a[0];
+   // First argument is a comma-separated list of tech ID's
+   StringArray tech_id;
+   tech_id.parse_css(a[0]);
+
+   // Second argument is the domain name
+   string domain = a[1];
 
    // Remaining arguments are the data files
    StringArray sa;
-   for(int i=1; i<a.n(); i++) sa.add(a[i]);
+   for(int i=2; i<a.n(); i++) sa.add(a[i]);
 
    // Update the data file map
-   if(data_files_map.count(domain) == 0) data_files_map[domain] = sa;
-   else                                  data_files_map[domain].add(sa);
+   if(data_opt_map.count(domain) == 0) data_opt_map[domain].data_files = sa;
+   else                                data_opt_map[domain].data_files.add(sa);
 
 }
 
@@ -810,15 +811,17 @@ void process_track_points(const TrackInfoArray& tracks) {
         << unix_to_yyyymmddhh(valid_ta.min())
         << " to " << unix_to_yyyymmddhh(valid_ta.max())
         << ".\n";
-
-   // Loop over the unique valid times
+/* JHG
+#pragma omp parallel default(none)                      \
+   shared(valid_ta, mlog, conf_info, tracks, tmp_map)   \
+   shared(Error)                                        \
+   private(i, j, i_pnt, tmp_info)
+   {
+*/
+   // Parallel: Loop over the unique valid times
    for(i=0; i<valid_ta.n(); i++) {
 
-      mlog << Debug(3) << "Processing the "
-           << unix_to_yyyymmddhh(valid_ta[i])
-           << " valid time.\n";
-
-      // Loop over the domains to be processed
+      // Parallel: Loop over the domains to be processed
       map<string,DomainInfo>::iterator dom_it;
       for(dom_it  = conf_info.domain_info_map.begin();
           dom_it != conf_info.domain_info_map.end();
@@ -862,15 +865,8 @@ void process_track_points(const TrackInfoArray& tracks) {
 
       } // end for dom_it
    } // end for i
-/* JHG
-#pragma omp parallel default(none)                      \
-   shared(valid_ta, mlog, conf_info, tracks, tmp_map)   \
-   shared(Error)                                        \
-   private(i, j, i_pnt, tmp_info)
-   {
+// JHG } // End of omp parallel
 
-   } // End of omp parallel
-*/
    return;
 }
 
