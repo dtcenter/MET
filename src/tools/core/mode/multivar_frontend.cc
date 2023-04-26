@@ -496,7 +496,7 @@ ConcatString set_multivar_dir()
            << program_name << ": creating output directory \""
            << dir << "\"\n\n";
 
-      status = _mkdir(dir.c_str(), dir_creation_mode);       
+      status = _mkdir(dir.c_str());
 
       if ( status < 0 )  {
 
