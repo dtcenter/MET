@@ -832,7 +832,7 @@ void MtdIntFile::fatten()
 int x, y, n;
 const int nxy = Nx*Ny;
 int * u = new int [nxy];
-int * a = 0;
+int * a = nullptr;
 
 a = u;
 
@@ -899,7 +899,9 @@ for (y = 0; y<(Ny - 2); ++y)  {
 
    for (x=0; x<(Nx - 2); ++x)  {
 
-      if ( *a )  {
+      if (n >= (nxy-1)) break;  // For SonarQube findinds
+
+      if (n >=0 &&  *a )  {
 
          Data[n + 1]      = 1;   //  (x + 1, y)
          Data[n + Nx]     = 1;   //  (x, y + 1)
@@ -1719,10 +1721,13 @@ s.set_to_zeroes();
 
 int * in  =   Data;
 int * out = s.Data;
+int out_size = s.nxyt();
 
 v = 0;
 
 for (j=0; j<n3; ++j)  {
+
+   if (j >= out_size) break;    // For SonarQube findinds
 
    if ( yesno[*in] )  { *out = 1;  ++v; }
 
