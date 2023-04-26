@@ -85,12 +85,13 @@ static void setup_netcdf_out(int nhdr);
 
 static bool get_filtered_nc_data(NcVar var, float *data, const long dim,
                                  const long cur, const char *var_name, bool required=true);
+// Added data_len for SonarQube
 static bool get_filtered_nc_data_2d(NcVar var, int *data, const LongArray &dim,
                                     const LongArray &cur, const char *var_name,
-                                    bool count_bad=false);
+                                    int data_len=0, bool count_bad=false);
 static bool get_filtered_nc_data_2d(NcVar var, float *data, const LongArray &dim,
                                     const LongArray &cur, const char *var_name,
-                                    bool count_bad=false);
+                                    int data_len=0, bool count_bad=false);
 
 static void check_quality_control_flag(int &value, const char qty, const char *var_name);
 static void check_quality_control_flag(float &value, const char qty, const char *var_name);
@@ -459,12 +460,12 @@ static bool get_filtered_nc_data(NcVar var, float *data,
 
 static bool get_filtered_nc_data_2d(NcVar var, int *data, const LongArray &dim,
                                     const LongArray &cur, const char *var_name,
-                                    bool count_bad) {
+                                    int data_len, bool count_bad) {
 
    bool status = false;
-   int data_len = dim[0] * dim[1];
    const char *method_name = "get_filtered_nc_data_2d(int) ";
 
+   if (data_len <= 0) data_len = dim[0] * dim[1];
    for (int offset=0; offset<data_len; offset++) {
       data[offset] = bad_data_int;
    }
@@ -503,12 +504,12 @@ static bool get_filtered_nc_data_2d(NcVar var, int *data, const LongArray &dim,
 
 static bool get_filtered_nc_data_2d(NcVar var, float *data, const LongArray &dim,
                                     const LongArray &cur, const char *var_name,
-                                    bool count_bad) {
+                                    int data_len, bool count_bad) {
 
    bool status = false;
-   int data_len = dim[0] * dim[1];
    const char *method_name = "get_filtered_nc_data_2d(float) ";
 
+   if (data_len <= 0) data_len = dim[0] * dim[1];
    for (int offset=0; offset<data_len; offset++) {
       data[offset] = bad_data_float;
    }
@@ -2135,8 +2136,8 @@ void process_madis_profiler(NcFile *&f_in) {
       if (IS_VALID_NC(in_vComponentQty_var)) get_nc_data(&in_vComponentQty_var, (char *)vComponentQty_arr, dim, cur);
       else memset(vComponentQty_arr, 0, data_cnt*sizeof(char));
 
-      get_filtered_nc_data_2d(in_uComponent_var, (float *)uComponent_arr, dim, cur, "uComponent");
-      get_filtered_nc_data_2d(in_vComponent_var, (float *)vComponent_arr, dim, cur, "vComponent");
+      get_filtered_nc_data_2d(in_uComponent_var, (float *)uComponent_arr, dim, cur, "uComponent", data_cnt);
+      get_filtered_nc_data_2d(in_vComponent_var, (float *)vComponent_arr, dim, cur, "vComponent", data_cnt);
 
       for (int i_idx=0; i_idx<buf_size; i_idx++) {
 
@@ -3354,13 +3355,14 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
       cur[0] = i_hdr_s;
       dim[0] = buf_size;
       dim[1] = maxLevels;
+      data_cnt = buf_size * maxLevels;
+
       get_nc_data(&in_hdr_vld_var, tmp_dbl_arr, dim, cur);
       get_nc_data(&in_hdr_lat_var, (float *)hdr_lat_arr, dim, cur);
       get_nc_data(&in_hdr_lon_var, (float *)hdr_lon_arr, dim, cur);
-      get_filtered_nc_data_2d(in_hdr_elv_var, (float *)hdr_elv_arr, dim, cur, "elevation");
+      get_filtered_nc_data_2d(in_hdr_elv_var, (float *)hdr_elv_arr, dim, cur, "elevation", data_cnt);
 
 
-      data_cnt = buf_size * maxLevels;
       if (IS_VALID_NC(in_temperatureQty_var)) get_nc_data(&in_temperatureQty_var, (char *)&temperatureQty_arr, dim, cur);
       else memset(temperatureQty_arr, 0, data_cnt*sizeof(char));
       if (IS_VALID_NC(in_dewpointQty_var))    get_nc_data(&in_dewpointQty_var, (char *)&dewpointQty_arr, dim, cur);
@@ -3372,11 +3374,11 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
       if (IS_VALID_NC(in_altitudeQty_var))    get_nc_data(&in_altitudeQty_var, (char *)&altitudeQty_arr, dim, cur);
       else memset(altitudeQty_arr, 0, data_cnt*sizeof(char));
 
-      get_filtered_nc_data_2d(in_hdr_tob_var,     (int *)&obsTimeOfDay_arr,  dim, cur, "obsTimeOfDay");
-      get_filtered_nc_data_2d(in_temperature_var, (float *)&temperature_arr, dim, cur, "temperature");
-      get_filtered_nc_data_2d(in_dewpoint_var,    (float *)&dewpoint_arr,    dim, cur, "dewpoint");
-      get_filtered_nc_data_2d(in_windDir_var,     (float *)&windDir_arr,     dim, cur, "windDir");
-      get_filtered_nc_data_2d(in_windSpeed_var,   (float *)&windSpeed_arr,   dim, cur, "windSpeed");
+      get_filtered_nc_data_2d(in_hdr_tob_var,     (int *)&obsTimeOfDay_arr,  dim, cur, "obsTimeOfDay", data_cnt);
+      get_filtered_nc_data_2d(in_temperature_var, (float *)&temperature_arr, dim, cur, "temperature", data_cnt);
+      get_filtered_nc_data_2d(in_dewpoint_var,    (float *)&dewpoint_arr,    dim, cur, "dewpoint", data_cnt);
+      get_filtered_nc_data_2d(in_windDir_var,     (float *)&windDir_arr,     dim, cur, "windDir", data_cnt);
+      get_filtered_nc_data_2d(in_windSpeed_var,   (float *)&windSpeed_arr,   dim, cur, "windSpeed", data_cnt);
 
       dim[1] = hdr_sid_len;
       get_nc_data(&in_hdr_sid_var, (char *)hdr_sid_arr, dim, cur);
