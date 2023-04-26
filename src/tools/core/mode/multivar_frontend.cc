@@ -22,6 +22,7 @@ static const int dir_creation_mode = 0755;
 static const float  on_value = (float) 100.0;
 static const float off_value = (float)   0.0;
 
+static int  _mkdir(const char *dir);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -110,6 +111,7 @@ static void second_pass(int j, const BoolPlane &f_result, const BoolPlane &o_res
                         MultiVarData &mvd, bool has_union);
 
 static void mask_data(const string &name, int nx, int ny, const BoolPlane &mask, DataPlane &data);
+static void mask_data_to_yesno(const string &name, int nx, int ny, const BoolPlane &bp, DataPlane &data);
 
 static void read_config(const string & filename);
 
@@ -193,6 +195,8 @@ int multivar_frontend(const StringArray & Argv)
    combine_boolplanes(f_plane, n_files, f_calc, f_result);
    combine_boolplanes(o_plane, n_files, o_calc, o_result);
 
+   bool superobj_mode = true;
+
    //
    // Filter the data to within the superobjects only and do statistics by invoking mode algorithm again
    // on the masked data
@@ -205,6 +209,8 @@ int multivar_frontend(const StringArray & Argv)
          continue;
       }
 
+      superobj_mode = false;
+
       mlog << Debug(2) 
            << "\n starting masked data mode run " << (j + 1) << " of " << n_files
            << "\n" << sep << "\n";
@@ -216,6 +222,17 @@ int multivar_frontend(const StringArray & Argv)
    }
  
    mlog << Debug(2) << "\n finished with individual masked mode runs " << "\n" << sep << "\n";
+
+   //
+   //  write the superobject output files
+   //
+   if (!superobj_mode) {
+
+      // all done, no superobject mode run
+      return 0;
+
+   }
+   
 
    //
    //  write the superobject output files
@@ -479,7 +496,7 @@ ConcatString set_multivar_dir()
            << program_name << ": creating output directory \""
            << dir << "\"\n\n";
 
-      status = mkdir(dir.c_str(), dir_creation_mode);       
+      status = _mkdir(dir.c_str(), dir_creation_mode);       
 
       if ( status < 0 )  {
 
@@ -695,3 +712,57 @@ void mask_data(const string &name, int nx, int ny, const BoolPlane &bp, DataPlan
         << " percent of the data inside a superobject\n\n";
 }
 
+////////////////////////////////////////////////////////////////////////
+
+void mask_data_to_yesno(const string &name, int nx, int ny, const BoolPlane &bp, DataPlane &data)
+{
+
+   if (nx != data.nx() || ny != data.ny()) {
+      mlog << Error << "\n" << program_name  << ":" << name
+           << " :dimensions don't match " << nx << " " <<  ny 
+           << "    " << data.nx() << " " << data.ny() << "\n\n";
+
+      exit( 1 );
+   }
+
+   for (int x=0; x<nx; ++x)  {
+
+      for (int y=0; y<ny; ++y)  {
+
+         if ( bp(x, y) == false) {
+            data.set(bad_data_float, x, y);;
+         } else {
+            data.set(1.0, x, y);;
+         }
+      }
+   }
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+int _mkdir(const char *dir)
+{
+   char tmp[256];
+   char *p = NULL;
+   size_t len;
+
+   snprintf(tmp, sizeof(tmp),"%s",dir);
+   len = strlen(tmp);
+   if (tmp[len - 1] == '/')
+      tmp[len - 1] = 0;
+   for (p = tmp + 1; *p; p++)
+      if (*p == '/') {
+         *p = 0;
+         string s = tmp;
+         if (s != ".") {
+            if (mkdir(tmp, dir_creation_mode) < 0) {
+               printf("ERROR making %s\n", tmp);
+               return -1;
+            }
+         }
+         *p = '/';
+      }
+
+   return (mkdir(tmp, dir_creation_mode));
+}
