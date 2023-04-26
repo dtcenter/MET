@@ -30,8 +30,6 @@ typedef PiecewiseLinear * PWL;
 
 typedef double PairAtt3D::* Argument;
 
-typedef CRC_Array<double> DoubleArray;
-
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -47,7 +45,7 @@ class InterestCalculator {
       void extend(int);
 
 
-      DoubleArray W;
+      double * W;     //  allocated
 
       PWL * F;        //  array is allocated, elements are not
 

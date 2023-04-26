@@ -98,7 +98,7 @@ void InterestCalculator::init_from_scratch()
 
 {
 
-W.clear();
+W = 0;
 
 F = 0;
 
@@ -119,7 +119,7 @@ void InterestCalculator::clear()
 
 {
 
-W.clear();
+if ( W )  { delete [] W;  W = 0; }
 
 if ( F )  { delete [] F;  F = 0; }
 
@@ -145,15 +145,15 @@ clear();
 
 if ( i.Nelements == 0 )  return;
 
-W.clear();
-
 extend(i.Nelements);
 
 Nelements = i.Nelements;
 
-W.add(i.W);
+int j;
 
-for (int j=0; j<Nelements; ++j)  {
+for (j=0; j<Nelements; ++j)  {
+
+   W[j] = i.W[j];
 
    F[j] = i.F[j];
 
@@ -182,12 +182,13 @@ N = (N + ic_alloc_inc - 1)/ic_alloc_inc;
 N *= ic_alloc_inc;
 
 int j;
-
-W.extend(N);
+double   * ww = new double   [N];
 PWL      * ff = new PWL      [N];
 Argument * aa = new Argument [N];
 
 for (j=0; j<N; ++j)  {
+
+   ww[j] = 0;
 
    ff[j] = 0;
 
@@ -199,6 +200,8 @@ if ( Nelements > 0 )  {
 
    for (j=0; j<Nelements; ++j)  {
 
+      ww[j] = W[j];
+
       ff[j] = F[j];
 
       aa[j] = A[j];
@@ -207,13 +210,19 @@ if ( Nelements > 0 )  {
 
 }
 
+delete [] W;  W = nullptr;
+
 delete [] F;  F = nullptr;
 
 delete [] A;  A = nullptr;
 
+W = ww;
+
 F = ff;
 
 A = aa;
+
+ww = nullptr;
 
 ff = nullptr;
 
@@ -250,7 +259,7 @@ if ( _weight < 0.0 )  {
 
 extend(Nelements + 1);
 
-W.add(_weight);
+W[Nelements] = _weight;
 
 F[Nelements] = _func;
 
