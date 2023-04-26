@@ -47,7 +47,7 @@ extern void def_tc_pressure(netCDF::NcFile*,
 extern void def_tc_range_azimuth(netCDF::NcFile*,
     const netCDF::NcDim&, const netCDF::NcDim&, const TcrmwGrid&, double);
 
-extern void def_tc_lat_lon_time(netCDF::NcFile*,
+extern void def_tc_time_lat_lon(netCDF::NcFile*,
     const netCDF::NcDim&, const netCDF::NcDim&, const netCDF::NcDim&,
     netCDF::NcVar&, netCDF::NcVar&, netCDF::NcVar&);
 
