@@ -3194,6 +3194,8 @@ void TCStatJobRIRW::process_pair(TrackPairInfo &pair) {
    int bcur, bprv, bdlt;
    const char *sep = ":";
 
+   string prev_desc;
+   
    // Initialize the map
    cur_map.clear();
 
@@ -3313,6 +3315,28 @@ void TCStatJobRIRW::process_pair(TrackPairInfo &pair) {
           << bprv << sep << bcur << sep << bdlt << sep
           << (is_bad_data(b) ? na_str : bool_to_string(b)) << sep
           << cat;
+
+      
+      //cout << "key = " << key << endl;
+      //cout << "Hdr = " << cur << endl;
+      //cout << "pair.tcmpr_line(i)->desc() = " << pair.tcmpr_line(i)->desc() << endl;
+      
+      //string this_desc = pair.tcmpr_line(i)->desc();
+      //cout << "this_desc = " << this_desc << "CHECK" << endl;
+
+      //if(this_desc != prev_desc)
+      //{
+      //cout << "Found unique desc: " << this_desc << endl;
+      //prev_desc = this_desc;
+      //}
+
+      // Save unique description strings
+      //if(!cur_map[key].Desc.has(this_desc))
+      if(!cur_map[key].Desc.has(pair.tcmpr_line(i)->desc()))
+      {
+         //cout << "Found unique desc: " << pair.tcmpr_line(i)->desc() << endl << endl;
+         cur_map[key].Desc.add(pair.tcmpr_line(i)->desc());
+      }
       
       cur_map[key].Hdr.add(cur);
       cur_map[key].Init.add(pair.tcmpr_line(i)->init());
@@ -3375,6 +3399,7 @@ void TCStatJobRIRW::add_map(map<ConcatString,RIRWMapData,cs_cmp>&m) {
             it->second.Info.cts.fn_on());
 
          RIRWMap[it->first].Hdr.add(it->second.Hdr);
+         RIRWMap[it->first].Desc.add(it->second.Desc);
          RIRWMap[it->first].Init.add(it->second.Init);
          RIRWMap[it->first].Lead.add(it->second.Lead);
          RIRWMap[it->first].Valid.add(it->second.Valid);
@@ -3787,22 +3812,37 @@ void TCStatJobRIRW::do_stat_output(ostream &out) {
    // Setup stat header columns
    //
 
-   // Set description if the -desc option was invoked, otherwise set to na_str
-   /*
-   if(Desc.n() > 0) {
-      cs << cs_erase;
-      for(i = 0; i<Desc.n(); i++){
-         if(i < Desc.n()-1)
-            cs << Desc[i] << "_";
-         else
-            cs << Desc[i];
-      }   
-      cout << "Desc cs = " << cs << endl;
-      shc.set_desc(cs.c_str());
+   // Parse line descriptions
+   string prev_desc = "";
+   for(it = RIRWMap.begin(); it != RIRWMap.end(); it++) {
+      cout << "it->second.Desc.n() = " << it->second.Desc.n() << endl;
+
+      if(it->second.Desc.n() > 0) {
+         cs << cs_erase;
+         for(i=0; i<it->second.Desc.n(); i++) {
+            //cout << "it->second.Desc[" << i << "] = " << it->second.Desc[i] << endl;
+
+            string curr_desc = it->second.Desc[i];
+
+            if(curr_desc != prev_desc) {
+
+               cout << "Found unique desc: " << it->second.Desc[i] << endl;
+               
+               if(i < it->second.Desc.n()-1)
+                  cs << (it->second.Desc[i]).c_str() << "_";
+               else
+                  cs << (it->second.Desc[i]).c_str();
+
+               prev_desc = curr_desc; 
+            }
+               
+         }
+         cout << "do_stat_output description cs = " << cs << endl;
+         shc.set_desc(cs.c_str());  
+      }
+      else 
+         shc.set_desc(na_str);
    }
-   */
-   
-   shc.set_desc(na_str);
    
    // If not EXACT, then append "_MAX" (RIRW_24_MAX vs RIRW_24)... Ask Kathryn Newman about writing RIRW_24 vs RIRW_24_EXACT?
    cs << cs_erase << "RIRW_" << sec_to_timestring(RIRWTimeADeck);
@@ -3816,15 +3856,6 @@ void TCStatJobRIRW::do_stat_output(ostream &out) {
    
    //shc.set_vx_mask(...); // only is masking was specified for the job
 
-   // Made changes to tc_stat_job.h, from struct RIRWMapData
-   // if(!Valid.has(cur_valid)) Valid.add(cur_valid);
-   //Valid.min() Valid.max();
-   
-   //fcst_valid_beg = RIRWMap.Valid.min();
-   
-   //FCST_LEAD ... keep track of the maximum LEAD time encountered in the input
-   //FCST_VALID_BEG = OBS_VALID_BEG = minimum VALID time encountered
-   //FCST_VALID_END = OBS_VALID_END = maximum VALID time encountered
    //OBS_LEAD = NA
 
    // Missing info:
