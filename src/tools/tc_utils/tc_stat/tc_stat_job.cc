@@ -3853,6 +3853,15 @@ void TCStatJobRIRW::do_stat_output(ostream &out) {
 
    shc.set_fcst_thresh(RIRWThreshADeck);
    shc.set_obs_thresh(RIRWThreshBDeck);
+
+   if(OutValidMaskName.nonempty()) {
+      cout << "OutValidMaskName nonempty: " << OutValidMaskName << endl;
+      shc.set_mask(OutValidMaskName.c_str());
+   }
+   else {
+      cout << "OutValidMaskName is empty" << endl;
+      shc.set_mask(na_str);
+   }
    
    //shc.set_vx_mask(...); // only is masking was specified for the job
 
