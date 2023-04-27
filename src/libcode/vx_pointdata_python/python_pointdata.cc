@@ -414,7 +414,7 @@ bool process_point_data_list(PyObject *python_point_data, MetPointDataPython &me
            << "The header is empty. Please check the python script and input\n\n";
       exit (1);
    }
-   met_pd_out.set_hdr_cnt(hid + 1);
+   met_pd_out.set_hdr_cnt(hid);
 
    check_obs_data(obs_data, use_var_id, method_name);
    check_header_data(header_data, method_name);
