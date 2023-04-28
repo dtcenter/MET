@@ -19,6 +19,7 @@ on:
       - '.github/labels/**'
       - '**/README.md'
       - '**/LICENSE.md'
+      
   pull_request:
     types: [opened, reopened, synchronize]
     branches:
@@ -31,6 +32,7 @@ on:
       - '.github/labels/**'
       - '**/README.md'
       - '**/LICENSE.md'
+      
   workflow_dispatch:
     inputs:
       force_tests:
