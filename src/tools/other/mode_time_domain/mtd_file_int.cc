@@ -899,7 +899,7 @@ for (y = 0; y<(Ny - 2); ++y)  {
 
    for (x=0; x<(Nx - 2); ++x)  {
 
-      if (n >= (nxy-1)) break;  // For SonarQube findinds
+      if (n >= (nxy-1)) break;  // For SonarQube findings
 
       if (n >=0 &&  *a )  {
 
@@ -1727,7 +1727,7 @@ v = 0;
 
 for (j=0; j<n3; ++j)  {
 
-   if (j >= out_size) break;    // For SonarQube findinds
+   if (j >= out_size) break;    // For SonarQube findings
 
    if ( yesno[*in] )  { *out = 1;  ++v; }
 
