@@ -14,7 +14,11 @@ on:
       - 'bugfix_**'
     paths-ignore:
       - 'docs/**'
-
+      - '.github/pull_request_template.md'
+      - '.github/ISSUE_TEMPLATE/**'
+      - '.github/labels/**'
+      - '**/README.md'
+      - '**/LICENSE.md'
   pull_request:
     types: [opened, reopened, synchronize]
     branches:
