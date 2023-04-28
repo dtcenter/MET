@@ -121,7 +121,7 @@ class ModeExecutive {
    void clear_internal_r_index();
    void setup_fcst_obs_data();
    void setup_fcst_obs_data(const MultiVarData &mvd);
-   void do_conv_thresh(const int r_index, const int t_index);
+   void do_conv_thresh(const int r_index, const int t_index, bool isMultivarPass2=false);
    void do_match_merge();
 
    void process_masks(ShapeData &, ShapeData &);

@@ -215,7 +215,7 @@ void ModeFrontEnd::do_straight(Processing_t ptype)
 
    for (index=0; index<NCT; ++index)  {
 
-      mode_exec->do_conv_thresh(index, index);
+      mode_exec->do_conv_thresh(index, index, ptype == MULTIVAR_PASS2);
 
       if (ptype == SINGLE_VAR || ptype == MULTIVAR_PASS2) {
 

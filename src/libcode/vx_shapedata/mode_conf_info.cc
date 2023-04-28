@@ -824,12 +824,28 @@ if ( (k < 0) || (k >= Fcst->conv_radius_array.n_elements()) )  {
 }
 
 Fcst->conv_radius = Fcst->conv_radius_array[k];
- Obs->conv_radius =  Obs->conv_radius_array[k];
+Obs->conv_radius =  Obs->conv_radius_array[k];
 
 return;
 
 }
 
+////////////////////////////////////////////////////////////////////////
+
+
+void ModeConfInfo::set_conv_thresh(SingleThresh s)
+{
+Fcst->conv_thresh = s;
+Obs->conv_thresh =  s;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void ModeConfInfo::set_conv_radius(int r)
+{
+Fcst->conv_radius = r;
+Obs->conv_radius = r;
+}
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -973,15 +989,39 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool ModeConfInfo::multivar_not_implemented() const
+void ModeConfInfo::check_multivar_not_implemented() const
 {
+   bool status = false;
    if (quilt) {
       mlog << Error
            << "\n\n  ModeConfInfo::multivar_not_implemented "
            << ": quilting not yet implemented for multivar mode\n\n";
-      return true;
+      status = true;
    }
-   return false;
+   if (multivar_intensities_all_false()) {
+      mlog << Error
+           << "\n\n  ModeConfInfo::multivar_not_implemented "
+           << ": multivar_intensity flags all FALSE not yet implemented for multivar mode\n\n";
+      status = true;
+   }
+   if (status) {
+      mlog << Error
+           << "\n\n  met_main() Some features not yet implemented in multivar mode\n\n";
+      exit ( 1 );
+   }
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+bool ModeConfInfo::multivar_intensities_all_false() const
+{
+   for (int i=0; i<multivar_intensity.n(); ++i) {
+      if (multivar_intensity[i]) {
+         return false;
+      }
+   }
+   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////

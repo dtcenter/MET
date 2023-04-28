@@ -160,6 +160,29 @@ int multivar_frontend(const StringArray & Argv)
            << "\n starting mode run " << (j + 1) << " of " << n_files
            << "\n" << sep << "\n";
       MultiVarData *mvdi = first_pass(j, fcst_filenames[j], obs_filenames[j], dir);
+      if (j > 0) {
+         bool err = false;
+         if (mvd[0]->ftype != mvdi->ftype) {
+            err = true;
+            mlog << Error << "\n" << program_name
+                 << ": forecast inputs of different file types not supported "
+                 << "Input 0:" << grdfiletype_to_string(mvd[0]->ftype).c_str()
+                 << "Input " << j << ":" << grdfiletype_to_string(mvdi->ftype).c_str()
+                 << "\n\n";
+         }
+         
+         if (mvd[0]->otype != mvdi->otype) {
+            err = true;
+            mlog << Error << "\n" << program_name
+                 << ": obs inputs of different file types not supported "
+                 << "Input 0:" << grdfiletype_to_string(mvd[0]->otype).c_str()
+                 << "Input " << j << ":" << grdfiletype_to_string(mvdi->otype).c_str()
+                 << "\n\n";
+         }
+         if (err) {
+            exit ( 1 );
+         }
+      }
       mvd.push_back(mvdi);
 
    }   //  for j
@@ -458,6 +481,10 @@ void multivar_consistency_checks(StringArray &fcst_filenames, StringArray &obs_f
 
    if (num_multivar == 0) {
 
+      // note this will not happen until the method
+      // ModeConfInfo::check_multivar_not_immplemented() allows 'all false'
+      // right now error exit before you get to here.
+      
       mlog << Warning << "\nmultivar_frontend() -> "
            << "empty multivar intensity array, setting to all FALSE \n\n";
 
@@ -472,6 +499,7 @@ void multivar_consistency_checks(StringArray &fcst_filenames, StringArray &obs_f
            << n_files << " got " << num_multivar << "\n\n";
       exit ( 1 );
    }
+
 }
 
 ////////////////////////////////////////////////////////////////////////

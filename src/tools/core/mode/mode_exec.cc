@@ -498,7 +498,8 @@ void ModeExecutive::setup_fcst_obs_data(const MultiVarData &mvd)
 ///////////////////////////////////////////////////////////////////////
 
 
-void ModeExecutive::do_conv_thresh(const int r_index, const int t_index)
+void ModeExecutive::do_conv_thresh(const int r_index, const int t_index,
+                                   bool isMultivarPass2)
 
 {
 
@@ -507,8 +508,14 @@ void ModeExecutive::do_conv_thresh(const int r_index, const int t_index)
    R_index = r_index;
    T_index = t_index;
 
-   conf.set_conv_radius_by_index  (R_index);
-   conf.set_conv_thresh_by_index  (T_index);
+   if (isMultivarPass2) {
+      SingleThresh s("ne-9999");
+      conf.set_conv_thresh(s);
+      conf.set_conv_radius(0.0);
+   } else {
+      conf.set_conv_radius_by_index  (R_index);
+      conf.set_conv_thresh_by_index  (T_index);
+   }
 
    if ( conf.Fcst->need_merge_thresh () )  conf.set_fcst_merge_thresh_by_index (T_index);
    if ( conf.Obs->need_merge_thresh  () )  conf.set_obs_merge_thresh_by_index  (T_index);

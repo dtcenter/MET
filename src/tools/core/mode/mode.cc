@@ -172,12 +172,8 @@ int met_main(int argc, char * argv [])
 
    if ( config.is_multivar() && !has_field_index )  {
 
-      if (config.multivar_not_implemented()) {
-
-         mlog << Error
-              << "\n\n  met_main() Some features not yet implemented in multivar mode\n\n";
-         exit ( 1 );
-      }
+      // exit inside this method if something is not implemented
+      config.check_multivar_not_implemented();
 
       status = multivar_frontend(Argv);
 

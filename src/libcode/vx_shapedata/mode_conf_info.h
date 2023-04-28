@@ -95,7 +95,8 @@ class ModeConfInfo {
 
       void get_multivar_programs();
 
-      bool multivar_not_implemented() const;
+      void check_multivar_not_implemented() const;
+      bool multivar_intensities_all_false() const;
 
    /////////////////////////////////////////////////////////////////////
 
@@ -217,6 +218,8 @@ class ModeConfInfo {
 
       void set_conv_radius_by_index  (int);
       void set_conv_thresh_by_index  (int);
+      void set_conv_thresh(SingleThresh);
+      void set_conv_radius(int);
 
       int n_conv_threshs  () const;
       int n_conv_radii    () const;
