@@ -22,7 +22,11 @@ on:
       - 'main_v**'
     paths-ignore:
       - 'docs/**'
-
+      - '.github/pull_request_template.md'
+      - '.github/ISSUE_TEMPLATE/**'
+      - '.github/labels/**'
+      - '**/README.md'
+      - '**/LICENSE.md'
   workflow_dispatch:
     inputs:
       force_tests:
