@@ -35,7 +35,8 @@ on:
       - 'build_components/**'
       - 'manage_externals/**'
       - '**/README.md'
-      - '**/LICENSE.md'      
+      - '**/LICENSE.md'    
+      
   workflow_dispatch:
     inputs:
       force_tests:
