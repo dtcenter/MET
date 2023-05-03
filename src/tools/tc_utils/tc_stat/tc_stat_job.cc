@@ -3338,6 +3338,9 @@ void TCStatJobRIRW::process_pair(TrackPairInfo &pair) {
          cur_map[key].Desc.add(pair.tcmpr_line(i)->desc());
       }
       
+      // Could save valid_mask, like description
+      //cout << "pair.tcmpr_line(i)->valid_mask() = " << pair.tcmpr_line(i)->valid_mask() << endl;
+      
       cur_map[key].Hdr.add(cur);
       cur_map[key].Init.add(pair.tcmpr_line(i)->init());
       cur_map[key].Lead.add(pair.tcmpr_line(i)->lead());
@@ -3843,17 +3846,34 @@ void TCStatJobRIRW::do_stat_output(ostream &out) {
       else 
          shc.set_desc(na_str);
    }
+
+   // Missing info:
+   // - EXACT or MAXIMUM delta
+   // - Matching time window (e.g. +/- 12 hours)
+
+   cout << "RIRWExactADeck = " << RIRWExactADeck << " RIRWExactBDeck = " << RIRWExactBDeck << endl;
    
    // If not EXACT, then append "_MAX" (RIRW_24_MAX vs RIRW_24)... Ask Kathryn Newman about writing RIRW_24 vs RIRW_24_EXACT?
-   cs << cs_erase << "RIRW_" << sec_to_timestring(RIRWTimeADeck);
+   if(!RIRWExactADeck)
+      cs << cs_erase << "RIRW_" << sec_to_timestring(RIRWTimeADeck) << "_MAX";
+   else
+      cs << cs_erase << "RIRW_" << sec_to_timestring(RIRWTimeADeck);
+   
    shc.set_fcst_var(cs);
+   
+   if(!RIRWExactBDeck)
+      cs << cs_erase << "RIRW_" << sec_to_timestring(RIRWTimeBDeck) << "_MAX";
+   else
+      cs << cs_erase << "RIRW_" << sec_to_timestring(RIRWTimeBDeck);
 
-   cs << cs_erase << "RIRW_" << sec_to_timestring(RIRWTimeBDeck);
    shc.set_obs_var(cs);
-
+   
+   // Set fcst and obs thresholds
    shc.set_fcst_thresh(RIRWThreshADeck);
    shc.set_obs_thresh(RIRWThreshBDeck);
-
+   
+   // Set masking description
+   // Does not look like -valid_mask, or init_mask is applied to RIRW, likel need to get this from input lines, like the description
    if(OutValidMaskName.nonempty()) {
       cout << "OutValidMaskName nonempty: " << OutValidMaskName << endl;
       shc.set_mask(OutValidMaskName.c_str());
@@ -3862,15 +3882,11 @@ void TCStatJobRIRW::do_stat_output(ostream &out) {
       cout << "OutValidMaskName is empty" << endl;
       shc.set_mask(na_str);
    }
+
+   // Model? could use AMODEL or BMODEL
    
-   //shc.set_vx_mask(...); // only is masking was specified for the job
-
    //OBS_LEAD = NA
-
-   // Missing info:
-   // - EXACT or MAXIMUM delta
-   // - Matching time window (e.g. +/- 12 hours)
-
+   
    //
    // Set the following to NA
    //
