@@ -3194,8 +3194,6 @@ void TCStatJobRIRW::process_pair(TrackPairInfo &pair) {
    int bcur, bprv, bdlt;
    const char *sep = ":";
 
-   string prev_desc;
-   
    // Initialize the map
    cur_map.clear();
 
@@ -3330,17 +3328,27 @@ void TCStatJobRIRW::process_pair(TrackPairInfo &pair) {
       //prev_desc = this_desc;
       //}
 
-      // Save unique description strings
-      //if(!cur_map[key].Desc.has(this_desc))
-      if(!cur_map[key].Desc.has(pair.tcmpr_line(i)->desc()))
-      {
-         //cout << "Found unique desc: " << pair.tcmpr_line(i)->desc() << endl << endl;
+      // Track unique header column strings 
+      if(!cur_map[key].AModel.has(pair.tcmpr_line(i)->amodel())) {
+         cur_map[key].AModel.add(pair.tcmpr_line(i)->amodel());
+      }
+      if(!cur_map[key].BModel.has(pair.tcmpr_line(i)->bmodel())) {
+         cur_map[key].BModel.add(pair.tcmpr_line(i)->bmodel());
+      }
+      if(!cur_map[key].Desc.has(pair.tcmpr_line(i)->desc())) {
          cur_map[key].Desc.add(pair.tcmpr_line(i)->desc());
       }
-      
-      // Could save valid_mask, like description
-      //cout << "pair.tcmpr_line(i)->valid_mask() = " << pair.tcmpr_line(i)->valid_mask() << endl;
-      
+      if(!cur_map[key].Basin.has(pair.tcmpr_line(i)->basin())) {
+         cur_map[key].Basin.add(pair.tcmpr_line(i)->basin());
+      }
+      if(!cur_map[key].InitMask.has(pair.tcmpr_line(i)->init_mask())) {
+         cur_map[key].InitMask.add(pair.tcmpr_line(i)->init_mask());
+      }
+      if(!cur_map[key].ValidMask.has(pair.tcmpr_line(i)->valid_mask())) {
+         cur_map[key].ValidMask.add(pair.tcmpr_line(i)->valid_mask());
+      }
+     
+      // Track timing information 
       cur_map[key].Hdr.add(cur);
       cur_map[key].Init.add(pair.tcmpr_line(i)->init());
       cur_map[key].Lead.add(pair.tcmpr_line(i)->lead());
@@ -3402,7 +3410,12 @@ void TCStatJobRIRW::add_map(map<ConcatString,RIRWMapData,cs_cmp>&m) {
             it->second.Info.cts.fn_on());
 
          RIRWMap[it->first].Hdr.add_uniq(it->second.Hdr);
+         RIRWMap[it->first].AModel.add_uniq(it->second.AModel);
+         RIRWMap[it->first].BModel.add_uniq(it->second.BModel);
          RIRWMap[it->first].Desc.add_uniq(it->second.Desc);
+         RIRWMap[it->first].Basin.add_uniq(it->second.Basin);
+         RIRWMap[it->first].InitMask.add_uniq(it->second.InitMask);
+         RIRWMap[it->first].ValidMask.add_uniq(it->second.ValidMask);
          RIRWMap[it->first].Init.add(it->second.Init);
          RIRWMap[it->first].Lead.add(it->second.Lead);
          RIRWMap[it->first].Valid.add(it->second.Valid);
@@ -3805,8 +3818,8 @@ void TCStatJobRIRW::do_stat_output(ostream &out) {
    StringArray sa;
    ConcatString cs;
    TimeArray Valid;
-   unixtime fcst_valid_beg, fcst_valid_end;
-   int fcst_lead;
+   unixtime valid_beg, valid_end;
+   int lead_time;
    int i, j, r, c;
    
    setup_stat_file(1 + (int) RIRWMap.size());
@@ -3814,38 +3827,6 @@ void TCStatJobRIRW::do_stat_output(ostream &out) {
    //
    // Setup stat header columns
    //
-
-   // Parse line descriptions
-   string prev_desc = "";
-   for(it = RIRWMap.begin(); it != RIRWMap.end(); it++) {
-      cout << "it->second.Desc.n() = " << it->second.Desc.n() << endl;
-
-      if(it->second.Desc.n() > 0) {
-         cs << cs_erase;
-         for(i=0; i<it->second.Desc.n(); i++) {
-            //cout << "it->second.Desc[" << i << "] = " << it->second.Desc[i] << endl;
-
-            string curr_desc = it->second.Desc[i];
-
-            if(curr_desc != prev_desc) {
-
-               cout << "Found unique desc: " << it->second.Desc[i] << endl;
-               
-               if(i < it->second.Desc.n()-1)
-                  cs << (it->second.Desc[i]).c_str() << "_";
-               else
-                  cs << (it->second.Desc[i]).c_str();
-
-               prev_desc = curr_desc; 
-            }
-               
-         }
-         cout << "do_stat_output description cs = " << cs << endl;
-         shc.set_desc(cs.c_str());  
-      }
-      else 
-         shc.set_desc(na_str);
-   }
 
    // Missing info:
    // - EXACT or MAXIMUM delta
@@ -3872,24 +3853,8 @@ void TCStatJobRIRW::do_stat_output(ostream &out) {
    shc.set_fcst_thresh(RIRWThreshADeck);
    shc.set_obs_thresh(RIRWThreshBDeck);
    
-   // Set masking description
-   // Does not look like -valid_mask, or init_mask is applied to RIRW, likel need to get this from input lines, like the description
-   if(OutValidMaskName.nonempty()) {
-      cout << "OutValidMaskName nonempty: " << OutValidMaskName << endl;
-      shc.set_mask(OutValidMaskName.c_str());
-   }
-   else {
-      cout << "OutValidMaskName is empty" << endl;
-      shc.set_mask(na_str);
-   }
-
-   // Model? could use AMODEL or BMODEL
-   
-   //OBS_LEAD = NA
-   
    //
    // Set the following to NA
-   //
    // COV_THRESH, INTERP_MTHD, INTERP_PNTS,
    // OBTYPE, FCST_UNITS, OBS_UNITS (or m/s since that's the wind speed units)
    //
@@ -3912,24 +3877,53 @@ void TCStatJobRIRW::do_stat_output(ostream &out) {
       //}
       //}
       
-      cout << "it->second.Valid.n() = " << it->second.Valid.n() << endl;
-      
+      // Set the output MODEL column
+      shc.set_model(write_css(it->second.AModel).c_str());
+ 
+      // Set the output OBTYPE column
+      shc.set_obtype(write_css(it->second.BModel).c_str());
+
+      // Set the output VX_MASK column
+      cs << cs_erase;
+
+      // Add -out_init_mask name, if specified
+      if(OutInitMaskName.nonempty()) {
+         cs << OutInitMaskName;
+      }
+      // Add -out_valid_mask name, if specified
+      if(OutValidMaskName.nonempty()) {
+         if(cs.nonempty()) cs << ",";
+         cs << OutValidMaskName;
+      }
+      // If neither are specified, use input mask and/or basin names
+      if(cs.empty()) {
+         StringArray sa;
+	 sa.add_uniq(it->second.InitMask);
+	 sa.add_uniq(it->second.ValidMask);
+	
+	 // Use the basin names instead
+	 if(sa.n() == 1 && sa[0] == na_str) {
+            sa.clear();
+	    sa.add_uniq(it->second.Basin);
+	 }
+	 cs = write_css(sa);
+      }
+
+      // Set shc mask name
+      shc.set_mask(cs.c_str());
+
       // Set shc lead-time and valid-time variables
-      fcst_lead = it->second.Lead.max();
-      fcst_valid_beg = it->second.Valid.min();
-      fcst_valid_end = it->second.Valid.max();
-      cout << "fcst_valid_beg = " << fcst_valid_beg << " fcst_valid_end = " << fcst_valid_end << endl;
+      lead_time = it->second.Lead.max();
+      valid_beg = it->second.Valid.min();
+      valid_end = it->second.Valid.max();
 
-      shc.set_fcst_lead_sec(fcst_lead);
-      shc.set_fcst_valid_beg(fcst_valid_beg);
-      shc.set_fcst_valid_end(fcst_valid_end);
-      shc.set_obs_valid_beg(fcst_valid_beg);
-      shc.set_obs_valid_end(fcst_valid_end);
+      shc.set_fcst_lead_sec(lead_time);
+      shc.set_fcst_valid_beg(valid_beg);
+      shc.set_fcst_valid_end(valid_end);
+      shc.set_obs_lead_sec(bad_data_int);
+      shc.set_obs_valid_beg(valid_beg);
+      shc.set_obs_valid_end(valid_end);
 
-      //for(i=0; i<it->second.Valid.n(); i++,r++) {
-      //cout << "In do_stat_output: it->second.Valid[" << i << "] = " << it->second.Valid[i] << endl;
-      //}
-      
       //
       // Write the output STAT header columns
       //

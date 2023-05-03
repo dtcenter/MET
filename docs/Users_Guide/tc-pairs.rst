@@ -452,7 +452,7 @@ TC-Pairs produces output in TCST format. The default output file name can be ove
     - Valid time masking grid applied
   * - 14
     - LINE_TYPE
-    - Output line type (TCMPR or PROBRIRW)
+    - Output line types described below
 
 .. _TCMPR Line Type:
 
