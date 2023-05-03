@@ -30,6 +30,7 @@
 //   012    05/05/22  Halley Gotway   MET #2152 Add -type poly_xy.
 //   013    07/06/22  Howard Soh      METplus-Internal #19 Rename main to met_main
 //   014    09/28/22  Prestopnik      MET #2227 Remove namespace std and netCDF from header files
+//   015    05/03/23  Halley Gotway   MET #1060 Support multiple shapes
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -152,11 +153,10 @@ void process_command_line(int argc, char **argv) {
    // Check for the mask type (from -type string)
    if(mask_type == MaskType_None) {
      mlog << Error << "\n" << program_name << " -> "
-	  << "the -type command line requirement must be set to a specific masking type!\n"
+          << "the -type command line requirement must be set to a specific masking type!\n"
           << "\t\t   \"poly\", \"box\", \"circle\", \"track\", \"grid\", "
-	  << "\"data\", \"solar_alt\", \"solar_azi\", \"lat\", \"lon\" "
-	  << "or \"shape\""
-          << "\n\n";
+          << "\"data\", \"solar_alt\", \"solar_azi\", \"lat\", \"lon\" "
+          << "or \"shape\"" << "\n\n";
      exit(1);
    }
    
@@ -236,11 +236,20 @@ void process_mask_file(DataPlane &dp) {
    // Process the mask from a shapefile
    else if(mask_type == MaskType_Shape) {
 
-      get_shapefile_outline(shape);
+      get_shapefile_records();
+
+      int n_pts;
+      vector<ShpPolyRecord>::const_iterator it;
+      for(it  = shape_recs.begin(), n_pts=0;
+          it != shape_recs.end(); ++it) {
+         n_pts += it->n_points;
+      }
 
       mlog << Debug(2)
            << "Parsed Shape Mask:\t" << mask_filename
-           << " containing " << shape.n_points << " points\n";
+           << " with " << shape_recs.size()
+           << " shape(s) containing a total of "
+           << n_pts << " points\n";
    }
 
    // For solar masking, check for a date/time string
@@ -515,14 +524,22 @@ bool get_gen_vx_mask_config_str(MetNcMetDataFile *mnmdf_ptr,
 
 ////////////////////////////////////////////////////////////////////////
 
-void get_shapefile_outline(ShpPolyRecord & cur_shape) {
+void get_shapefile_records() {
    const char * const shape_filename = mask_filename.c_str();
    ShpFile f;
-   ShpPolyRecord & pr = cur_shape;
+   ShpPolyRecord pr;
+
+   // Check the number of requested shapes
+   if(shape_numbers.n() == 0) {
+      mlog << Error << "\nget_shapefile_records() -> "
+           << "at least one shape number must be specified using "
+           << "the \"-shapeno\" command line option!\n\n";
+      exit(1);
+   }
 
    // Open shapefile
    if(!(f.open(shape_filename))) {
-      mlog << Error << "\nget_shapefile_outline() -> "
+      mlog << Error << "\nget_shapefile_records() -> "
            << "unable to open shape file \"" << shape_filename
            << "\"\n\n";
       exit(1);
@@ -530,27 +547,37 @@ void get_shapefile_outline(ShpPolyRecord & cur_shape) {
 
    // Make sure it's a polygon file, and not some other type
    if(f.shape_type() != shape_type_polygon) {
-      mlog << Error << "\nget_shapefile_outline() -> "
+      mlog << Error << "\nget_shapefile_records() -> "
            << "shape file \"" << shape_filename
            << "\" is not a polygon file\n\n";
       exit(1);
    }
 
-   // Skip through un-needed records
-   for(int i=0; i<shape_number; i++) {
+   // Get the maximum shape number
+   int max_shape_number = nint(shape_numbers.max());
+
+   // Loop through and store the specified records
+   for(int i=0; i<=max_shape_number; i++) {
+
+      // Check for end of file
       if(f.at_eof()) break;
+
+      // Read the current record
       f >> pr;
+
+      // Store requested records
+      if(shape_numbers.has(i)) {
+         pr.toggle_longitudes();
+         shape_recs.push_back(pr);
+      }
    }
 
+   // Check for end of file
    if(f.at_eof()) {
-      mlog << Error << "\nget_shapefile_outline() -> "
-           << "hit eof before reading specified record\n\n";
+      mlog << Error << "\nget_shapefile_records() -> "
+           << "hit eof before reading all specified record(s)\n\n";
       exit(1);
    }
-
-   // Get the target record
-   f >> pr;
-   pr.toggle_longitudes();
 
    return;
 }
@@ -1121,15 +1148,30 @@ void apply_shape_mask(DataPlane & dp) {
    int x, y, n_in;
    bool status = false;
 
-   // Load the shape
-   GridClosedPolyArray p;
-   p.set(shape, grid);
+   // Load the shapes
+   GridClosedPolyArray poly;
+   vector<GridClosedPolyArray> poly_list;
+   vector<ShpPolyRecord>::const_iterator rec_it;
+   for(rec_it  = shape_recs.begin();
+       rec_it != shape_recs.end(); ++rec_it) {
+      poly.set(*rec_it, grid);
+      poly_list.push_back(poly);
+   }
 
    // Check grid points
    for(x=0,n_in=0; x<(grid.nx()); x++) {
       for(y=0; y<(grid.ny()); y++) {
 
-         status = p.is_inside(x, y);
+         vector<GridClosedPolyArray>::const_iterator poly_it;
+         for(poly_it  = poly_list.begin();
+             poly_it != poly_list.end(); ++poly_it) {
+
+            // Check if point is inside
+            status = poly_it->is_inside(x, y);
+
+            // Break after the first match
+            if(status) break;
+         }
 
          // Check the complement
          if(complement) status = !status;
@@ -1483,8 +1525,8 @@ void usage() {
         << "units.\n"
 
         << "\t\t\"-shapeno n\" (optional).\n"
-        << "\t\t   For \"shape\" masking, specify the shape number "
-        << "(0-based) to be used.\n"
+        << "\t\t   For \"shape\" masking, specify the shape number(s) "
+        << "(0-based) to be used as a comma-separated list.\n"
 
         << "\t\t\"-value n\" overrides the default output mask data "
         << "value (" << default_mask_val << ") (optional).\n"
@@ -1597,13 +1639,20 @@ void set_compress(const StringArray & a) {
 ////////////////////////////////////////////////////////////////////////
 
 void set_shapeno(const StringArray & a) {
+   NumArray cur_na;
 
-   shape_number = atoi(a[0].c_str());
+   cur_na.add_css(a[0].c_str());
 
-   if(shape_number < 0) {
-      mlog << Error << "\n" << program_name << " -> "
-           << "bad shapeno ... " << shape_number << "\n\n";
-      exit(1);
+   // Check and add each unique shape number
+   for(int i=0; i<cur_na.n(); i++) {
+      if(cur_na[i] < 0) {
+         mlog << Error << "\n" << program_name << " -> "
+              << "bad shapeno ... " << cur_na[i] << "\n\n";
+         exit(1);
+      }
+      else if(!shape_numbers.has(cur_na[i])) {
+         shape_numbers.add(cur_na[i]);
+      }
    }
 
    return;
