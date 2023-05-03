@@ -3401,8 +3401,8 @@ void TCStatJobRIRW::add_map(map<ConcatString,RIRWMapData,cs_cmp>&m) {
             RIRWMap[it->first].Info.cts.fn_on() +
             it->second.Info.cts.fn_on());
 
-         RIRWMap[it->first].Hdr.add(it->second.Hdr);
-         RIRWMap[it->first].Desc.add(it->second.Desc);
+         RIRWMap[it->first].Hdr.add_uniq(it->second.Hdr);
+         RIRWMap[it->first].Desc.add_uniq(it->second.Desc);
          RIRWMap[it->first].Init.add(it->second.Init);
          RIRWMap[it->first].Lead.add(it->second.Lead);
          RIRWMap[it->first].Valid.add(it->second.Valid);

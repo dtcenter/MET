@@ -62,6 +62,8 @@ class StringArray {
       
       void add(const StringArray &);
 
+      void add_uniq(const StringArray &);
+
       void add_css(const std::string);
 
       void set(const std::string);
