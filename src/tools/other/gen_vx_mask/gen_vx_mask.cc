@@ -61,6 +61,7 @@ using namespace netCDF;
 #include "vx_nc_util.h"
 #include "data2d_nc_met.h"
 #include "solar.h"
+#include "dbf_file.h"
 #include "shp_file.h"
 #include "grid_closed_poly.h"
 
@@ -136,6 +137,7 @@ void process_command_line(int argc, char **argv) {
    cline.add(set_name,         "-name",         1);
    cline.add(set_compress,     "-compress",     1);
    cline.add(set_shapeno,      "-shapeno",      1);
+   cline.add(set_shape_str,    "-shape_str",    2);
 
    cline.allow_numbers();
 
@@ -236,6 +238,10 @@ void process_mask_file(DataPlane &dp) {
    // Process the mask from a shapefile
    else if(mask_type == MaskType_Shape) {
 
+      // If -shape_str was specified, find the matching records
+      if(shape_str_map.size() > 0) get_shapefile_strings();
+
+      // Get the records specified by -shapeno and -shape_str
       get_shapefile_records();
 
       int n_pts;
@@ -247,7 +253,7 @@ void process_mask_file(DataPlane &dp) {
 
       mlog << Debug(2)
            << "Parsed Shape Mask:\t" << mask_filename
-           << " with " << shape_recs.size()
+           << " using " << shape_recs.size()
            << " shape(s) containing a total of "
            << n_pts << " points\n";
    }
@@ -524,6 +530,56 @@ bool get_gen_vx_mask_config_str(MetNcMetDataFile *mnmdf_ptr,
 
 ////////////////////////////////////////////////////////////////////////
 
+void get_shapefile_strings() {
+   DbfFile f;
+   StringArray rec_names;
+   StringArray rec_values;
+
+   // Get the corresponding dbf file name
+   ConcatString dbf_filename = mask_filename;
+   dbf_filename.replace(".shp", ".dbf");
+
+   mlog << Debug(3) << "Reading shape database file: "
+        << dbf_filename << "\n";
+
+   // Open the database file
+   if(!(f.open(dbf_filename.c_str()))) {
+      mlog << Error << "\nget_shapefile_strings() -> "
+           << "unable to open database file \"" << dbf_filename
+           << "\"\n\n";
+      exit(1);
+   }
+
+   // Get the subrecord names
+   rec_names = f.subrecord_names();
+   cout << "JHG n_rec = " << f.header()->n_records << "\n";
+   cout << "JHG rec_names.n() = " << rec_names.n() << "\n";
+   rec_names.dump(cout);
+
+   // Check each record
+   for(int i=0; i<f.header()->n_records; i++) {
+
+      cout << "JHG1\n";
+      rec_values = f.subrecord_values(i);
+
+      cout << "JHG2\n";
+      cout << "JHG[" << i << "] rec_values.n() = " << rec_values.n() << "\n";
+
+      // Add matching records to the list
+      if(is_shapefile_match(rec_names, rec_values)) {
+         mlog << Debug(4) << "Record " << i << " is a shapefile match.\n";
+         if(!shape_numbers.has(i)) shape_numbers.add(i);
+      }
+   }
+
+   // Close the database file
+   f.close();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void get_shapefile_records() {
    const char * const shape_filename = mask_filename.c_str();
    ShpFile f;
@@ -567,6 +623,9 @@ void get_shapefile_records() {
 
       // Store requested records
       if(shape_numbers.has(i)) {
+         mlog << Debug(3)
+              << "Using shape number " << i << " with "
+              << pr.n_points << " points.\n";
          pr.toggle_longitudes();
          shape_recs.push_back(pr);
       }
@@ -580,6 +639,42 @@ void get_shapefile_records() {
    }
 
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool is_shapefile_match(const StringArray &names, const StringArray &values) {
+   bool match = true;
+   int i;
+
+   // Check each map entry
+   static std::map<string,StringArray> shape_str_map;
+   map<string,StringArray>::const_iterator it;
+   for(it  = shape_str_map.begin();
+       it != shape_str_map.end(); ++it) {
+
+      // The user-specified name must exist in the shapefile
+      if(!names.has(it->first, i)) {
+         mlog << Warning << "\nis_shapefile_match() -> "
+              << "the \"-shape_str " << it->first
+              << "\" name does not appear in the shapefile.\n"
+              << "Run the \"gis_dump_dbf\" utility to see a list "
+              << "of valid names.\n\n";
+         match = false;
+         break;
+      }
+
+      // The corresponding value must match
+      if(!it->second.has(values[i])) {
+         mlog << Debug(4) << "Shapefile \"" << it->first << "\" value ("
+              << values[i] << ") was not requested (" << write_css(it->second)
+              << ")\n";
+         match = false;
+         break;
+      }
+   }
+
+   return(match);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1457,6 +1552,7 @@ void usage() {
         << "\t[-height n]\n"
         << "\t[-width n]\n"
         << "\t[-shapeno n]\n"
+        << "\t[-shape_str n]\n"
         << "\t[-value n]\n"
         << "\t[-name string]\n"
         << "\t[-log file]\n"
@@ -1525,8 +1621,13 @@ void usage() {
         << "units.\n"
 
         << "\t\t\"-shapeno n\" (optional).\n"
-        << "\t\t   For \"shape\" masking, specify the shape number(s) "
-        << "(0-based) to be used as a comma-separated list.\n"
+        << "\t\t   For \"shape\" masking, specify the integer shape "
+        << "number(s) (0-based) to be used as a comma-separated list.\n"
+
+        << "\t\t\"-shape_str name string(s)\" (optional).\n"
+        << "\t\t   For \"shape\" masking, specify the shape(s) with "
+        << "a named attribute followed by a comma-separated list of "
+        << "matching strings.\n"
 
         << "\t\t\"-value n\" overrides the default output mask data "
         << "value (" << default_mask_val << ") (optional).\n"
@@ -1653,6 +1754,26 @@ void set_shapeno(const StringArray & a) {
       else if(!shape_numbers.has(cur_na[i])) {
          shape_numbers.add(cur_na[i]);
       }
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_shape_str(const StringArray & a) {
+   StringArray sa;
+
+   // Comma-separated list of matching strings
+   sa.parse_css(a[1]);
+
+   // Append options to existing entry
+   if(shape_str_map.count(a[0]) > 0) {
+      shape_str_map[a[0]].add(sa);
+   }
+   // Or add a new entry
+   else {
+      shape_str_map[a[0]] = sa;
    }
 
    return;

@@ -106,6 +106,7 @@ static double mask_val = default_mask_val;
 static ConcatString mask_name;
 static unixtime solar_ut = (unixtime) 0;
 
+static std::map<string,StringArray> shape_str_map;
 static NumArray shape_numbers;
 static std::vector<ShpPolyRecord> shape_recs;
 
@@ -129,7 +130,9 @@ static void      get_data_plane(const ConcatString &file_name,
                     DataPlane &dp, Grid &dp_grid);
 static bool      get_gen_vx_mask_config_str(MetNcMetDataFile *,
                     ConcatString &);
+static void      get_shapefile_strings();
 static void      get_shapefile_records();
+static bool      is_shapefile_match(const StringArray &, const StringArray &);
 static void      apply_poly_mask(DataPlane &dp);
 static void      apply_poly_xy_mask(DataPlane &dp);
 static void      apply_shape_mask(DataPlane &dp);
@@ -158,6 +161,7 @@ static void      set_value(const StringArray &);
 static void      set_name(const StringArray &);
 static void      set_compress(const StringArray &);
 static void      set_shapeno(const StringArray &);
+static void      set_shape_str(const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
