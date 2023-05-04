@@ -3314,20 +3314,6 @@ void TCStatJobRIRW::process_pair(TrackPairInfo &pair) {
           << (is_bad_data(b) ? na_str : bool_to_string(b)) << sep
           << cat;
 
-      
-      //cout << "key = " << key << endl;
-      //cout << "Hdr = " << cur << endl;
-      //cout << "pair.tcmpr_line(i)->desc() = " << pair.tcmpr_line(i)->desc() << endl;
-      
-      //string this_desc = pair.tcmpr_line(i)->desc();
-      //cout << "this_desc = " << this_desc << "CHECK" << endl;
-
-      //if(this_desc != prev_desc)
-      //{
-      //cout << "Found unique desc: " << this_desc << endl;
-      //prev_desc = this_desc;
-      //}
-
       // Track unique header column strings 
       if(!cur_map[key].AModel.has(pair.tcmpr_line(i)->amodel())) {
          cur_map[key].AModel.add(pair.tcmpr_line(i)->amodel());
@@ -3730,7 +3716,8 @@ void TCStatJobRIRW::setup_stat_file(int n_row) {
          default:
          mlog << Error << "\nSTATAnalysisJob::setup_stat_file() -> "
               << "unexpected stat line type \"" << statlinetype_to_string(cur_lt)
-              << "\"!\n\n";
+              << "\"!\n"
+              << "The line type \"" << statlinetype_to_string(cur_lt) << "\" is not supported when -out_stat is requested.\n\n";
          exit(1);
       }
       if(c > n_col) n_col = c;
@@ -3821,27 +3808,23 @@ void TCStatJobRIRW::do_stat_output(ostream &out) {
    unixtime valid_beg, valid_end;
    int lead_time;
    int i, j, r, c;
-   
+
+   // Setup -out_stat file
    setup_stat_file(1 + (int) RIRWMap.size());
    
    //
    // Setup stat header columns
    //
-
-   // Missing info:
-   // - EXACT or MAXIMUM delta
-   // - Matching time window (e.g. +/- 12 hours)
-
-   cout << "RIRWExactADeck = " << RIRWExactADeck << " RIRWExactBDeck = " << RIRWExactBDeck << endl;
    
-   // If not EXACT, then append "_MAX" (RIRW_24_MAX vs RIRW_24)... Ask Kathryn Newman about writing RIRW_24 vs RIRW_24_EXACT?
+   // Set the output FCST_VAR column
    if(!RIRWExactADeck)
       cs << cs_erase << "RIRW_" << sec_to_timestring(RIRWTimeADeck) << "_MAX";
    else
       cs << cs_erase << "RIRW_" << sec_to_timestring(RIRWTimeADeck);
    
    shc.set_fcst_var(cs);
-   
+
+   // Set the output OBS_VAR column
    if(!RIRWExactBDeck)
       cs << cs_erase << "RIRW_" << sec_to_timestring(RIRWTimeBDeck) << "_MAX";
    else
@@ -3849,15 +3832,9 @@ void TCStatJobRIRW::do_stat_output(ostream &out) {
 
    shc.set_obs_var(cs);
    
-   // Set fcst and obs thresholds
+   // Set the output FCST_THRESH and OBS_THRESH columns
    shc.set_fcst_thresh(RIRWThreshADeck);
    shc.set_obs_thresh(RIRWThreshBDeck);
-   
-   //
-   // Set the following to NA
-   // COV_THRESH, INTERP_MTHD, INTERP_PNTS,
-   // OBTYPE, FCST_UNITS, OBS_UNITS (or m/s since that's the wind speed units)
-   //
    
    mlog << Debug(2) << "Computing output for "
         << (int) RIRWMap.size() << " case(s).\n";
@@ -3867,16 +3844,6 @@ void TCStatJobRIRW::do_stat_output(ostream &out) {
    //
    for(it = RIRWMap.begin(), r=1; it != RIRWMap.end(); it++) {
 
-
-      //for(i=0; i<it->second.Hdr.n(); i++,r++) {
-      //cout << "In do_stat_output: it->second.Hdr[" << i << "] = " << it->second.Hdr[i] << endl;
-      //cs = it->second.Hdr[i];
-      //sa = cs.split(":");
-      //for(j=0; j<sa.n(); j++) {
-      //cout << "sa[" << j << "] = " << sa[j] << endl;
-      //}
-      //}
-      
       // Set the output MODEL column
       shc.set_model(write_css(it->second.AModel).c_str());
  
@@ -3952,8 +3919,8 @@ void TCStatJobRIRW::do_stat_output(ostream &out) {
          // Store the alpha information in the CTSInfo object
          //
          it->second.Info.allocate_n_alpha(1);
-         it->second.Info.alpha[0] = 0.05; // job.out_alpha; // JHG, not sure if out_alpha is configurable right now?
-         shc.set_alpha(0.05);
+         it->second.Info.alpha[0] = OutAlpha;
+         shc.set_alpha(OutAlpha);
          
          //
          // Compute the stats and confidence intervals for this
