@@ -552,21 +552,14 @@ void get_shapefile_strings() {
 
    // Get the subrecord names
    rec_names = f.subrecord_names();
-   cout << "JHG n_rec = " << f.header()->n_records << "\n";
-   cout << "JHG rec_names.n() = " << rec_names.n() << "\n";
-   rec_names.dump(cout);
 
    // Check each record
    for(int i=0; i<f.header()->n_records; i++) {
 
-      cout << "JHG1\n";
       rec_values = f.subrecord_values(i);
 
-      cout << "JHG2\n";
-      cout << "JHG[" << i << "] rec_values.n() = " << rec_values.n() << "\n";
-
       // Add matching records to the list
-      if(is_shapefile_match(rec_names, rec_values)) {
+      if(is_shapefile_match(i, rec_names, rec_values)) {
          mlog << Debug(4) << "Record " << i << " is a shapefile match.\n";
          if(!shape_numbers.has(i)) shape_numbers.add(i);
       }
@@ -589,7 +582,7 @@ void get_shapefile_records() {
    if(shape_numbers.n() == 0) {
       mlog << Error << "\nget_shapefile_records() -> "
            << "at least one shape number must be specified using "
-           << "the \"-shapeno\" command line option!\n\n";
+           << "the \"-shapeno\" or \"-shape_str\" command line options!\n\n";
       exit(1);
    }
 
@@ -643,21 +636,20 @@ void get_shapefile_records() {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool is_shapefile_match(const StringArray &names, const StringArray &values) {
+bool is_shapefile_match(const int i_shape, const StringArray &names, const StringArray &values) {
    bool match = true;
-   int i;
+   int i_match;
 
    // Check each map entry
-   static std::map<string,StringArray> shape_str_map;
    map<string,StringArray>::const_iterator it;
    for(it  = shape_str_map.begin();
-       it != shape_str_map.end(); ++it) {
+       it != shape_str_map.end(); it++) {
 
       // The user-specified name must exist in the shapefile
-      if(!names.has(it->first, i)) {
+      if(!names.has(it->first, i_match)) {
          mlog << Warning << "\nis_shapefile_match() -> "
               << "the \"-shape_str " << it->first
-              << "\" name does not appear in the shapefile.\n"
+              << "\" name does not appear in the shapefile. "
               << "Run the \"gis_dump_dbf\" utility to see a list "
               << "of valid names.\n\n";
          match = false;
@@ -665,13 +657,21 @@ bool is_shapefile_match(const StringArray &names, const StringArray &values) {
       }
 
       // The corresponding value must match
-      if(!it->second.has(values[i])) {
-         mlog << Debug(4) << "Shapefile \"" << it->first << "\" value ("
-              << values[i] << ") was not requested (" << write_css(it->second)
+      if(!it->second.reg_exp_match(values[i_match].c_str())) {
+         mlog << Debug(4) << "Shape number " << i_shape << " \""
+              << it->first << "\" value (" << values[i_match]
+              << ") does not match (" << write_css(it->second)
               << ")\n";
          match = false;
          break;
       }
+      else {
+         mlog << Debug(3) << "Shape number " << i_shape << " \""
+              << it->first << "\" value (" << values[i_match]
+              << ") MATCHES (" << write_css(it->second)
+              << ")\n";
+      }
+
    }
 
    return(match);

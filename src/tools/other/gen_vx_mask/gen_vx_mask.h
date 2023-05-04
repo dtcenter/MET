@@ -132,7 +132,7 @@ static bool      get_gen_vx_mask_config_str(MetNcMetDataFile *,
                     ConcatString &);
 static void      get_shapefile_strings();
 static void      get_shapefile_records();
-static bool      is_shapefile_match(const StringArray &, const StringArray &);
+static bool      is_shapefile_match(const int i, const StringArray &, const StringArray &);
 static void      apply_poly_mask(DataPlane &dp);
 static void      apply_poly_xy_mask(DataPlane &dp);
 static void      apply_shape_mask(DataPlane &dp);
