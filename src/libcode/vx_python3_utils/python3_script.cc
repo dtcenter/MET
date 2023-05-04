@@ -26,7 +26,7 @@ using namespace std;
 
 static const char sq = '\'';   //  single quote
 
-static const char read_tmp_ascii_py [] = "MET_BASE/wrappers/read_tmp_ascii.py";
+static const char read_tmp_ascii_py [] = "MET_BASE/python/pyembed/read_tmp_ascii.py";
 
 
 ////////////////////////////////////////////////////////////////////////

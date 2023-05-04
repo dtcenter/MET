@@ -18,6 +18,7 @@ using namespace std;
 
 #include "vx_log.h"
 #include "vx_math.h"
+#include "python_line.h"
 
 #include "vx_python3_utils.h"
 #include "python_handler.h"
@@ -25,10 +26,7 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
-
-static const char set_python_env_wrapper [] = "set_python_env";
-
-static const char write_tmp_ascii_wrapper[] = "MET_BASE/wrappers/write_tmp_point.py";
+static const char write_tmp_ascii_wrapper[] = "MET_BASE/python/pyembed/write_tmp_point.py";
 
 static const char list_name              [] = "point_data";
 
@@ -244,9 +242,7 @@ bool PythonHandler::do_straight()
 
 {
 
-ConcatString command, path, user_base;
-
-path = set_python_env_wrapper;
+ConcatString command, user_base;
 
 mlog << Debug(3)
      << "Running user's python script ("
@@ -260,7 +256,7 @@ user_base.chomp(".py");
    //  start up the python interpreter
    //
 
-Python3_Script script(path.text());
+Python3_Script *script = get_python3_script();
 
    //
    //  set up a "new" sys.argv list
@@ -268,7 +264,7 @@ Python3_Script script(path.text());
    //     the user's script
    //
 
-script.reset_argv(user_script_filename.text(), user_script_args);
+script->reset_argv(user_script_filename.text(), user_script_args);
 
    //
    //  import the user's script as a module
@@ -377,20 +373,16 @@ if ( status )  {
 
 }
 
-ConcatString wrapper;
-
-wrapper = set_python_env_wrapper;
-
-Python3_Script script(wrapper.text());
+Python3_Script *script = get_python3_script();
 
 mlog << Debug(4) << "Reading temporary Python ascii observation file: "
      << tmp_ascii_path << "\n";
 
-script.import_read_tmp_ascii_py();
+script->import_read_tmp_ascii_py();
 
-PyObject * dobj = script.read_tmp_ascii(tmp_ascii_path.text());
+PyObject * dobj = script->read_tmp_ascii(tmp_ascii_path.text());
 
-PyObject * obj = script.lookup_ascii(tmp_list_name);
+PyObject * obj = script->lookup_ascii(tmp_list_name);
 
 if ( ! PyList_Check(obj) )  {
 

@@ -31,7 +31,7 @@
     <param> \
       PYTHON_NUMPY \
       &OUTPUT_DIR;/python/letter_numpy_grid_name.ps \
-      'name = "&MET_BASE;/python/read_ascii_numpy_grid.py &DATA_DIR_PYTHON;/letter.txt LETTER";' \
+      'name = "&MET_BASE;/python/examples/read_ascii_numpy_grid.py &DATA_DIR_PYTHON;/letter.txt LETTER";' \
       -plot_range 0.0 255.0 \
       -title "Grid Name: 'G212'" \
       -v 1
@@ -53,7 +53,7 @@
     <param> \
       PYTHON_NUMPY \
       &OUTPUT_DIR;/python/letter_numpy_grid_string.ps \
-      'name = "&MET_BASE;/python/read_ascii_numpy_grid.py &DATA_DIR_PYTHON;/letter.txt LETTER";' \
+      'name = "&MET_BASE;/python/examples/read_ascii_numpy_grid.py &DATA_DIR_PYTHON;/letter.txt LETTER";' \
       -plot_range 0.0 255.0 \
       -title "Grid String: 'lambert 185 129 12.19 -133.459 -95 40.635 6371.2 25 25 N'" \
       -v 1
@@ -74,7 +74,7 @@
     <param> \
       PYTHON_NUMPY \
       &OUTPUT_DIR;/python/letter_numpy_grid_data_file.ps \
-      'name = "&MET_BASE;/python/read_ascii_numpy_grid.py &DATA_DIR_PYTHON;/letter.txt LETTER";' \
+      'name = "&MET_BASE;/python/examples/read_ascii_numpy_grid.py &DATA_DIR_PYTHON;/letter.txt LETTER";' \
       -plot_range 0.0 255.0 \
       -title "Gridded Data File: 'wrfprs_ruc13_12.tm00_G212'" \
       -v 1
@@ -90,7 +90,7 @@
     <param> \
       PYTHON_NUMPY \
       &OUTPUT_DIR;/python/letter_numpy.ps \
-      'name = "&MET_BASE;/python/read_ascii_numpy.py &DATA_DIR_PYTHON;/letter.txt LETTER";' \
+      'name = "&MET_BASE;/python/examples/read_ascii_numpy.py &DATA_DIR_PYTHON;/letter.txt LETTER";' \
       -plot_range 0.0 255.0 \
       -title "Python enabled numpy plot_data_plane" \
       -v 1
@@ -105,7 +105,7 @@
     <param> \
       PYTHON_XARRAY \
       &OUTPUT_DIR;/python/letter_xarray.ps \
-      'name = "&MET_BASE;/python/read_ascii_xarray.py &DATA_DIR_PYTHON;/letter.txt LETTER";' \
+      'name = "&MET_BASE;/python/examples/read_ascii_xarray.py &DATA_DIR_PYTHON;/letter.txt LETTER";' \
       -plot_range 0.0 255.0 \
       -title "Python enabled xarray plot_data_plane" \
       -v 1
@@ -120,7 +120,7 @@
     <param> \
       &DATA_DIR_PYTHON;/letter.txt \
       &OUTPUT_DIR;/python/letter_file_type.ps \
-      'name = "&MET_BASE;/python/read_ascii_numpy.py MET_PYTHON_INPUT_ARG LETTER"; file_type=PYTHON_NUMPY;' \
+      'name = "&MET_BASE;/python/examples/read_ascii_numpy.py MET_PYTHON_INPUT_ARG LETTER"; file_type=PYTHON_NUMPY;' \
       -plot_range 0.0 255.0 \
       -title "Python enabled plot_data_plane using file_type option" \
       -v 1
@@ -133,7 +133,7 @@
   <test name="python_numpy_mode_mixed">
     <exec>&MET_BIN;/mode</exec>
     <env>
-      <pair><name>OBS_COMMAND</name> <value>&MET_BASE;/python/read_ascii_numpy.py &DATA_DIR_PYTHON;/obs.txt OBS</value></pair>
+      <pair><name>OBS_COMMAND</name> <value>&MET_BASE;/python/examples/read_ascii_numpy.py &DATA_DIR_PYTHON;/obs.txt OBS</value></pair>
     </env>
     <param> \
       &OUTPUT_DIR;/pcp_combine/arw-tom-gep0_2012040912_F030_APCP06.nc \
@@ -152,8 +152,8 @@
   <test name="python_numpy_mode">
     <exec>&MET_BIN;/mode</exec>
     <env>
-      <pair><name>FCST_COMMAND</name> <value>&MET_BASE;/python/read_ascii_numpy.py &DATA_DIR_PYTHON;/fcst.txt FCST</value></pair>
-      <pair><name>OBS_COMMAND</name>  <value>&MET_BASE;/python/read_ascii_numpy.py &DATA_DIR_PYTHON;/obs.txt OBS</value></pair>
+      <pair><name>FCST_COMMAND</name> <value>&MET_BASE;/python/examples/read_ascii_numpy.py &DATA_DIR_PYTHON;/fcst.txt FCST</value></pair>
+      <pair><name>OBS_COMMAND</name>  <value>&MET_BASE;/python/examples/read_ascii_numpy.py &DATA_DIR_PYTHON;/obs.txt OBS</value></pair>
     </env>
     <param> \
       PYTHON_NUMPY \
@@ -172,7 +172,7 @@
   <test name="python_numpy_grid_stat_mixed">
     <exec>&MET_BIN;/grid_stat</exec>
     <env>
-      <pair><name>OBS_COMMAND</name>  <value>&MET_BASE;/python/read_ascii_numpy.py &DATA_DIR_PYTHON;/obs.txt OBS</value></pair>
+      <pair><name>OBS_COMMAND</name>  <value>&MET_BASE;/python/examples/read_ascii_numpy.py &DATA_DIR_PYTHON;/obs.txt OBS</value></pair>
     </env>
     <param> \
       &DATA_DIR_MODEL;/grib1/nam_st4/nam_2012040900_F012_gSt4.grib \
@@ -189,8 +189,8 @@
   <test name="python_numpy_grid_stat">
     <exec>&MET_BIN;/grid_stat</exec>
     <env>
-      <pair><name>FCST_COMMAND</name> <value>&MET_BASE;/python/read_ascii_numpy.py &DATA_DIR_PYTHON;/fcst.txt FCST</value></pair>
-      <pair><name>OBS_COMMAND</name>  <value>&MET_BASE;/python/read_ascii_numpy.py &DATA_DIR_PYTHON;/obs.txt OBS</value></pair>
+      <pair><name>FCST_COMMAND</name> <value>&MET_BASE;/python/examples/read_ascii_numpy.py &DATA_DIR_PYTHON;/fcst.txt FCST</value></pair>
+      <pair><name>OBS_COMMAND</name>  <value>&MET_BASE;/python/examples/read_ascii_numpy.py &DATA_DIR_PYTHON;/obs.txt OBS</value></pair>
     </env>
     <param> \
       PYTHON_NUMPY \
@@ -206,8 +206,8 @@
   <test name="python_numpy_point_stat">
     <exec>&MET_BIN;/point_stat</exec>
     <env>
-      <pair><name>FCST_COMMAND</name> <value>&MET_BASE;/python/read_ascii_numpy.py &DATA_DIR_PYTHON;/fcst.txt FCST</value></pair>
-      <pair><name>OBS_COMMAND</name>  <value>&MET_BASE;/python/read_ascii_numpy.py &DATA_DIR_PYTHON;/obs.txt OBS</value></pair>
+      <pair><name>FCST_COMMAND</name> <value>&MET_BASE;/python/examples/read_ascii_numpy.py &DATA_DIR_PYTHON;/fcst.txt FCST</value></pair>
+      <pair><name>OBS_COMMAND</name>  <value>&MET_BASE;/python/examples/read_ascii_numpy.py &DATA_DIR_PYTHON;/obs.txt OBS</value></pair>
     </env>
     <param> \
       PYTHON_NUMPY \
@@ -224,8 +224,8 @@
   <test name="python_numpy_wavelet_stat">
     <exec>&MET_BIN;/wavelet_stat</exec>
     <env>
-      <pair><name>FCST_COMMAND</name> <value>&MET_BASE;/python/read_ascii_numpy.py &DATA_DIR_PYTHON;/fcst.txt FCST</value></pair>
-      <pair><name>OBS_COMMAND</name>  <value>&MET_BASE;/python/read_ascii_numpy.py &DATA_DIR_PYTHON;/obs.txt OBS</value></pair>
+      <pair><name>FCST_COMMAND</name> <value>&MET_BASE;/python/examples/read_ascii_numpy.py &DATA_DIR_PYTHON;/fcst.txt FCST</value></pair>
+      <pair><name>OBS_COMMAND</name>  <value>&MET_BASE;/python/examples/read_ascii_numpy.py &DATA_DIR_PYTHON;/obs.txt OBS</value></pair>
     </env>
     <param> \
       PYTHON_NUMPY \
@@ -244,7 +244,7 @@
   <test name="python_numpy_wavelet_stat_mixed">
     <exec>&MET_BIN;/wavelet_stat</exec>
     <env>
-      <pair><name>FCST_COMMAND</name> <value>&MET_BASE;/python/read_ascii_numpy.py &DATA_DIR_PYTHON;/fcst.txt FCST</value></pair>
+      <pair><name>FCST_COMMAND</name> <value>&MET_BASE;/python/examples/read_ascii_numpy.py &DATA_DIR_PYTHON;/fcst.txt FCST</value></pair>
     </env>
     <param> \
       PYTHON_NUMPY \
@@ -266,7 +266,7 @@
       PYTHON_NUMPY \
       G130 \
       &OUTPUT_DIR;/python/regrid_data_plane.nc \
-      -field 'name="&MET_BASE;/python/read_ascii_numpy.py &DATA_DIR_PYTHON;/fcst.txt FCST";' \
+      -field 'name="&MET_BASE;/python/examples/read_ascii_numpy.py &DATA_DIR_PYTHON;/fcst.txt FCST";' \
       -v 1
     </param>
     <output>
@@ -279,7 +279,7 @@
     <param> \
       PYTHON_NUMPY \
       &OUTPUT_DIR;/python/shift_data_plane.nc \
-      'name="&MET_BASE;/python/read_ascii_numpy.py &DATA_DIR_PYTHON;/fcst.txt FCST";' \
+      'name="&MET_BASE;/python/examples/read_ascii_numpy.py &DATA_DIR_PYTHON;/fcst.txt FCST";' \
       -from 30 -110 -to 35 -115 \
       -v 1
     </param>
@@ -293,7 +293,7 @@
     <param> \
       &DATA_DIR_PYTHON;/fcst.txt \
       &OUTPUT_DIR;/python/shift_data_plane_input_arg.nc \
-      'name="&MET_BASE;/python/read_ascii_numpy.py MET_PYTHON_INPUT_ARG FCST"; file_type=PYTHON_NUMPY;' \
+      'name="&MET_BASE;/python/examples/read_ascii_numpy.py MET_PYTHON_INPUT_ARG FCST"; file_type=PYTHON_NUMPY;' \
       -from 30 -110 -to 35 -115 \
       -v 1
     </param>
@@ -305,8 +305,8 @@
   <test name="python_numpy_series_analysis">
     <exec>&MET_BIN;/series_analysis</exec>
     <env>
-      <pair><name>FCST_COMMAND</name> <value>&MET_BASE;/python/read_ascii_numpy.py MET_PYTHON_INPUT_ARG FCST</value></pair>
-      <pair><name>OBS_COMMAND</name>  <value>&MET_BASE;/python/read_ascii_numpy.py MET_PYTHON_INPUT_ARG OBS</value></pair>
+      <pair><name>FCST_COMMAND</name> <value>&MET_BASE;/python/examples/read_ascii_numpy.py MET_PYTHON_INPUT_ARG FCST</value></pair>
+      <pair><name>OBS_COMMAND</name>  <value>&MET_BASE;/python/examples/read_ascii_numpy.py MET_PYTHON_INPUT_ARG OBS</value></pair>
     </env>
     <param> \
       -fcst &DATA_DIR_PYTHON;/fcst.txt &DATA_DIR_PYTHON;/fcst.txt \
@@ -324,8 +324,8 @@
   <test name="python_numpy_mtd">
     <exec>&MET_BIN;/mtd</exec>
     <env>
-      <pair><name>FCST_COMMAND</name>  <value>&MET_BASE;/python/read_ascii_numpy.py MET_PYTHON_INPUT_ARG FCST</value></pair>
-      <pair><name>OBS_COMMAND</name>   <value>&MET_BASE;/python/read_ascii_numpy.py MET_PYTHON_INPUT_ARG OBS</value></pair>
+      <pair><name>FCST_COMMAND</name>  <value>&MET_BASE;/python/examples/read_ascii_numpy.py MET_PYTHON_INPUT_ARG FCST</value></pair>
+      <pair><name>OBS_COMMAND</name>   <value>&MET_BASE;/python/examples/read_ascii_numpy.py MET_PYTHON_INPUT_ARG OBS</value></pair>
       <pair><name>OUTPUT_PREFIX</name> <value>PYTHON</value></pair>
     </env>
     <param> \
@@ -348,8 +348,8 @@
   <test name="python_numpy_ensemble_stat">
     <exec>&MET_BIN;/ensemble_stat</exec>
     <env>
-      <pair><name>FCST_COMMAND</name>  <value>&MET_BASE;/python/read_ascii_numpy.py MET_PYTHON_INPUT_ARG FCST</value></pair>
-      <pair><name>OBS_COMMAND</name>   <value>&MET_BASE;/python/read_ascii_numpy.py MET_PYTHON_INPUT_ARG OBS</value></pair>
+      <pair><name>FCST_COMMAND</name>  <value>&MET_BASE;/python/examples/read_ascii_numpy.py MET_PYTHON_INPUT_ARG FCST</value></pair>
+      <pair><name>OBS_COMMAND</name>   <value>&MET_BASE;/python/examples/read_ascii_numpy.py MET_PYTHON_INPUT_ARG OBS</value></pair>
       <pair><name>OUTPUT_PREFIX</name> <value>PYTHON</value></pair>
     </env>
     <param> \
@@ -369,7 +369,7 @@
   <test name="python_ascii2nc">
     <exec>&MET_BIN;/ascii2nc</exec>
     <param> \
-      "&MET_BASE;/python/read_ascii_point.py &MET_DATA;/sample_obs/ascii/sample_ascii_obs.txt" \
+      "&MET_BASE;/python/examples/read_ascii_point.py &MET_DATA;/sample_obs/ascii/sample_ascii_obs.txt" \
       &OUTPUT_DIR;/python/ascii2nc_python.nc \
       -format python
     </param>
@@ -382,7 +382,7 @@
   <test name="python_ascii2nc_varname">
     <exec>&MET_BIN;/ascii2nc</exec>
     <param> \
-      "&MET_BASE;/python/read_ascii_point.py &MET_DATA;/sample_obs/ascii/sample_ascii_obs_varname.txt" \
+      "&MET_BASE;/python/examples/read_ascii_point.py &MET_DATA;/sample_obs/ascii/sample_ascii_obs_varname.txt" \
       &OUTPUT_DIR;/python/ascii2nc_python_varname.nc \
       -format python
     </param>
@@ -395,7 +395,7 @@
   <test name="python_stat_analysis">
     <exec>&MET_BIN;/stat_analysis</exec>
     <param> \
-      -lookin python &MET_BASE;/python/read_ascii_mpr.py &OUTPUT_DIR;/python/point_stat_120000L_20050807_120000V.stat \
+      -lookin python &MET_BASE;/python/examples/read_ascii_mpr.py &OUTPUT_DIR;/python/point_stat_120000L_20050807_120000V.stat \
       -job aggregate_stat -line_type MPR -out_line_type sl1l2 -by FCST_VAR \
       -out_stat &OUTPUT_DIR;/python/stat_analysis_python_AGGR_MPR_to_SL1L2.stat
     </param>
@@ -415,7 +415,7 @@
     <param> \
       PYTHON_NUMPY \
       &OUTPUT_DIR;/python/letter_numpy_grid_name_user_python.ps \
-      'name = "&MET_BASE;/python/read_ascii_numpy_grid.py &DATA_DIR_PYTHON;/letter.txt LETTER";' \
+      'name = "&MET_BASE;/python/examples/read_ascii_numpy_grid.py &DATA_DIR_PYTHON;/letter.txt LETTER";' \
       -plot_range 0.0 255.0 \
       -title "Grid Name: 'G212'" \
       -v 1
@@ -433,7 +433,7 @@
        <pair><name>MET_PYTHON_EXE</name> <value>&MET_PYTHON_EXE;</value></pair>
     </env>
     <param> \
-      "&MET_BASE;/python/read_ascii_point.py &MET_DATA;/sample_obs/ascii/sample_ascii_obs.txt" \
+      "&MET_BASE;/python/examples/read_ascii_point.py &MET_DATA;/sample_obs/ascii/sample_ascii_obs.txt" \
       &OUTPUT_DIR;/python/ascii2nc_user_python.nc \
       -format python
     </param>
@@ -453,7 +453,7 @@
     <param> \
       PYTHON_NUMPY \
       &OUTPUT_DIR;/python/letter_user_python.ps \
-      'name = "&MET_BASE;/python/read_ascii_numpy.py &DATA_DIR_PYTHON;/letter.txt LETTER";' \
+      'name = "&MET_BASE;/python/examples/read_ascii_numpy.py &DATA_DIR_PYTHON;/letter.txt LETTER";' \
       -plot_range 0.0 255.0 \
       -title "Python enabled plot_data_plane" \
       -v 1
@@ -471,7 +471,7 @@
        <pair><name>MET_PYTHON_EXE</name> <value>&MET_PYTHON_EXE;</value></pair>
     </env>
     <param> \
-      -lookin python &MET_BASE;/python/read_ascii_mpr.py &OUTPUT_DIR;/python/point_stat_120000L_20050807_120000V.stat \
+      -lookin python &MET_BASE;/python/examples/read_ascii_mpr.py &OUTPUT_DIR;/python/point_stat_120000L_20050807_120000V.stat \
       -job aggregate_stat -line_type MPR -out_line_type sl1l2 -by FCST_VAR \
       -out_stat &OUTPUT_DIR;/python/stat_analysis_user_python_AGGR_MPR_to_SL1L2.stat
     </param>
@@ -483,7 +483,7 @@
   <test name="python_point2grid_pb2nc_TMP">
     <exec>&MET_BIN;/point2grid</exec>
     <param> \
-      'PYTHON_NUMPY=&MET_BASE;/python/read_met_point_obs.py &OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.nc' \
+      'PYTHON_NUMPY=&MET_BASE;/python/examples/read_met_point_obs.py &OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.nc' \
       G212 \
       &OUTPUT_DIR;/python/pb2nc_TMP.nc \
       -field 'name="TMP"; level="*"; valid_time="20120409_120000"; censor_thresh=[ &lt;0 ]; censor_val=[0];' \
@@ -502,7 +502,7 @@
       <pair><name>MET_PYTHON_EXE</name> <value>&MET_PYTHON_EXE;</value></pair>
     </env>
     <param> \
-      'PYTHON_NUMPY=&MET_BASE;/python/read_met_point_obs.py &OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.nc' \
+      'PYTHON_NUMPY=&MET_BASE;/python/examples/read_met_point_obs.py &OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.nc' \
       G212 \
       &OUTPUT_DIR;/python/pb2nc_TMP_user_python.nc \
       -field 'name="TMP"; level="*"; valid_time="20120409_120000"; censor_thresh=[ &lt;0 ]; censor_val=[0];' \
@@ -520,7 +520,7 @@
       <pair><name>TO_GRID</name> <value>NONE</value></pair>
     </env>
     <param> \
-      'PYTHON_NUMPY=&MET_BASE;/python/read_ascii_point.py &MET_DATA;/sample_obs/ascii/precip24_2010010112.ascii' \
+      'PYTHON_NUMPY=&MET_BASE;/python/examples/read_ascii_point.py &MET_DATA;/sample_obs/ascii/precip24_2010010112.ascii' \
       &OUTPUT_DIR;/python/precip24_2010010112.ps \
       -config &CONFIG_DIR;/PlotPointObsConfig \
       -plot_grid &DATA_DIR_MODEL;/grib2/nam/nam_2012040900_F012.grib2 \
@@ -538,9 +538,9 @@
       <pair><name>TO_GRID</name> <value>NONE</value></pair>
     </env>
     <param> \
-      'PYTHON_NUMPY=&MET_BASE;/python/read_met_point_obs.py &OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.nc' \
+      'PYTHON_NUMPY=&MET_BASE;/python/examples/read_met_point_obs.py &OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.nc' \
       &OUTPUT_DIR;/python/nam_and_ndas.20120409.t12z.prepbufr_CONFIG.ps \
-      -point_obs 'PYTHON_NUMPY=&MET_BASE;/python/read_met_point_obs.py &OUTPUT_DIR;/ascii2nc/trmm_2012040912_3hr.nc' \
+      -point_obs 'PYTHON_NUMPY=&MET_BASE;/python/examples/read_met_point_obs.py &OUTPUT_DIR;/ascii2nc/trmm_2012040912_3hr.nc' \
       -plot_grid &DATA_DIR_MODEL;/grib2/nam/nam_2012040900_F012.grib2 \
       -config &CONFIG_DIR;/PlotPointObsConfig \
       -title "NAM 2012040900 F12 vs NDAS 500mb RH and TRMM 3h > 0" \
@@ -570,7 +570,7 @@
       &OUTPUT_DIR;/python/ensemble_stat/input_file_list \
       &CONFIG_DIR;/EnsembleStatConfig \
       -grid_obs &DATA_DIR_OBS;/laps/laps_2012041012_F000.grib \
-      -point_obs 'PYTHON_NUMPY=&MET_BASE;/python/read_met_point_obs.py &OUTPUT_DIR;/ascii2nc/gauge_2012041012_24hr.nc' \
+      -point_obs 'PYTHON_NUMPY=&MET_BASE;/python/examples/read_met_point_obs.py &OUTPUT_DIR;/ascii2nc/gauge_2012041012_24hr.nc' \
       -outdir &OUTPUT_DIR;/python/ensemble_stat -v 1
     </param>
     <output>
@@ -595,7 +595,7 @@
     </env>
     <param> \
       &DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F012.grib \
-      'PYTHON_NUMPY=&MET_BASE;/python/read_met_point_obs.py &OUTPUT_DIR;/pb2nc/gdas1.20120409.t12z.prepbufr.nc' \
+      'PYTHON_NUMPY=&MET_BASE;/python/examples/read_met_point_obs.py &OUTPUT_DIR;/pb2nc/gdas1.20120409.t12z.prepbufr.nc' \
       &CONFIG_DIR;/PointStatConfig_WINDS \
       -outdir &OUTPUT_DIR;/python -v 1
     </param>
@@ -609,7 +609,7 @@
     <param> \
     PYTHON_NUMPY \
     &OUTPUT_DIR;/python/wrfout_d01_2008-08-08_12_00_00_PLEV_ZONAL_MEAN.ps \
-    'name="&MET_BASE;/python/derive_WRF_semilatlon.py &DATA_DIR_MODEL;/p_interp/wrfout_d01_2008-08-08_12:00:00_PLEV TT lat";' \
+    'name="&MET_BASE;/python/examples/derive_WRF_semilatlon.py &DATA_DIR_MODEL;/p_interp/wrfout_d01_2008-08-08_12:00:00_PLEV TT lat";' \
     -title "WRF Zonal Mean" \
     -v 1
     </param>
@@ -622,7 +622,7 @@
     <exec>&MET_BIN;/pcp_combine</exec>
     <param> \
     -add PYTHON_NUMPY \
-    'name="&MET_BASE;/python/derive_WRF_semilatlon.py &DATA_DIR_MODEL;/p_interp/wrfout_d01_2008-08-08_12:00:00_PLEV TT lon";' \
+    'name="&MET_BASE;/python/examples/derive_WRF_semilatlon.py &DATA_DIR_MODEL;/p_interp/wrfout_d01_2008-08-08_12:00:00_PLEV TT lon";' \
     &OUTPUT_DIR;/python/wrfout_d01_2008-08-08_12_00_00_PLEV_MERIDIONAL_MEAN.nc \
     -name "TT_MERIDIONAL_MEAN" -v 1
     </param>

@@ -669,8 +669,15 @@ var = get_nc_var(&f, data_field_name);
 //
 //}
 
-long offsets[3] = {0,0,0};
-long lengths[3] = {Nt, Ny, Nx};
+LongArray offsets;  // {0,0,0};
+LongArray lengths;  // {Nt, Ny, Nx};
+
+offsets.add(0);
+offsets.add(0);
+offsets.add(0);
+lengths.add(Nt);
+lengths.add(Ny);
+lengths.add(Nx);
 
 //if ( ! get_nc_data(&var, Data, (long *){Nt, Ny, Nx}, (long *){0,0,0}) )  {
 if ( ! get_nc_data(&var, Data, lengths, offsets) )  {
@@ -775,8 +782,15 @@ data_var = get_nc_var(&f, data_field_name);
 //
 //}
 
-long offsets[3] = {0,0,0};
-long lengths[3] = {Nt, Ny, Nx};
+LongArray offsets;  // {0,0,0};
+LongArray lengths;  // {Nt, Ny, Nx};
+
+offsets.add(0);
+offsets.add(0);
+offsets.add(0);
+lengths.add(Nt);
+lengths.add(Ny);
+lengths.add(Nx);
 
 //if ( ! get_nc_data(&data_var, Data, (long *){Nt, Ny, Nx}, (long *){0,0,0}) )  {
 if ( ! get_nc_data(&data_var, Data, lengths, offsets) )  {

@@ -305,7 +305,7 @@ bool get_nc_data_(netCDF::NcVar *var, T *data, const T met_missing) {
 ////////////////////////////////////////////////////////////////////////
 
 template <typename T>
-bool get_nc_data_(netCDF::NcVar *var, T *data, T bad_data, const long *dims, const long *curs) {
+bool get_nc_data_(netCDF::NcVar *var, T *data, T bad_data, const LongArray &dims, const LongArray &curs) {
    bool return_status = false;
    const char *method_name = "get_nc_data_(T, *dims, *curs) ";
 
@@ -313,9 +313,16 @@ bool get_nc_data_(netCDF::NcVar *var, T *data, T bad_data, const long *dims, con
       std::vector<size_t> start;
       std::vector<size_t> count;
 
+      int idx =0;
       int data_size = 1;
       int dimC = get_dim_count(var);
-      for (int idx = 0 ; idx < dimC; idx++) {
+      int dim_cnt = dims.n_elements();
+      int off_cnt = curs.n_elements();
+      int in_cnt = (dim_cnt > off_cnt) ? off_cnt : dim_cnt;
+
+      // madis2nc shares the same dims & curs for 1D, 2D and 3D
+      if (in_cnt > dimC) in_cnt = dimC;
+      for (idx = 0 ; idx < in_cnt; idx++) {
          int dim_size = get_dim_size(var, idx);
          if ((curs[idx]+dims[idx]) > dim_size) {
             netCDF::NcDim nc_dim = get_nc_dim(var, idx);
@@ -330,6 +337,12 @@ bool get_nc_data_(netCDF::NcVar *var, T *data, T bad_data, const long *dims, con
          start.push_back((size_t)curs[idx]);
          count.push_back((size_t)dims[idx]);
          data_size *= dims[idx];
+      }
+      for (; idx < dimC; idx++) {
+         int dim_size = get_dim_size(var, idx);
+         start.push_back((size_t)0);
+         count.push_back((size_t)dim_size);
+         data_size *= dim_size;
       }
 
       for (int idx1=0; idx1<data_size; idx1++) {
@@ -418,16 +431,17 @@ bool get_nc_data_(netCDF::NcVar *var, T *data, T met_missing, const long dim, co
 // read a single data
 
 template <typename T>
-bool get_nc_data_(netCDF::NcVar *var, T *data, T bad_data, const long *curs) {
+bool get_nc_data_(netCDF::NcVar *var, T *data, T bad_data, const LongArray &curs) {
    bool return_status = false;
    const char *method_name = "get_nc_data_(*curs) ";
 
    if (IS_VALID_NC_P(var)) {
 
       int dimC = get_dim_count(var);
-      long dims[dimC];
+
+      LongArray dims;
       for (int idx = 0 ; idx < dimC; idx++) {
-          dims[idx] = 1;
+         dims.add(1);
       }
 
       // Retrieve the NetCDF value from the NetCDF variable.
@@ -520,7 +534,7 @@ void copy_nc_data_t(netCDF::NcVar *var, float *data, const T *packed_data,
               << " - " << max_value << "]\n";
       }
    }
-   mlog << Debug(7) << method_name << "took " 
+   mlog << Debug(7) << method_name << "took "
         << (clock()-start_clock)/double(CLOCKS_PER_SEC) << " seconds\n";
    return;
 }
