@@ -64,7 +64,7 @@ class Python3_Script {
 
       ConcatString filename() const;
 
-      PyObject * module();
+      PyObject * get_module();
       PyObject * dict();
       PyObject * module_ascii();
       PyObject * dict_ascii();
@@ -92,7 +92,7 @@ class Python3_Script {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline PyObject * Python3_Script::module() { return ( Module ); }
+inline PyObject * Python3_Script::get_module() { return ( Module ); }
 
 inline PyObject * Python3_Script::dict() { return ( Dict ); }
 

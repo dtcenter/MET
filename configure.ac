@@ -1086,6 +1086,9 @@ AM_CONDITIONAL([ENABLE_DEVELOPMENT], [test -n "$MET_DEVELOPMENT"])
 
 CPPFLAGS=$CPPFLAGS' -DMET_BASE="\"$(pkgdatadir)\""'
 
+# Add -std=c++11 to CXXFLAGS                                                                                                                                                 
+CXXFLAGS=$CXXFLAGS' -std=c++11'
+
 # Define other variables for the makefiles
 
 AC_SUBST(FC_LIBS, [-lgfortran])
