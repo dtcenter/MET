@@ -9,8 +9,10 @@ When applicable, release notes are followed by the GitHub issue number which des
 enhancement, or new feature (`MET GitHub issues <https://github.com/dtcenter/MET/issues>`_).
 Important issues are listed **in bold** for emphasis.
 
-MET Version 11.1.0-beta2 release notes (20230428)
+MET Version 11.1.0-beta2 release notes (20230505)
 -------------------------------------------------
+
+**Note** that the 11.1.0-beta2 release was originally created on 20230423 but was recreated on 20230428 and 20230505 to include critical bugfixes.
 
   .. dropdown:: Documentation
 
@@ -32,6 +34,7 @@ MET Version 11.1.0-beta2 release notes (20230428)
      * Bugfix: AERONET the lat/lon is not changed with different station ID (`#2493 <https://github.com/dtcenter/MET/issues/2493>`_).
      * Bugfix: dtype in Python embedding example script and appendixF correction (`#2518 <https://github.com/dtcenter/MET/issues/2518>`_).
      * Bugfix: write_tmp_dataplane uses fill_value unrecognized by MET (`#2525 <https://github.com/dtcenter/MET/issues/2525>`_).
+     * Bugfix: Resolve compilation problems due to need for -std=c++11 (`#2531 <https://github.com/dtcenter/MET/issues/2531>`_).
 
 MET Version 11.1.0-beta1 release notes (20230228)
 -------------------------------------------------
