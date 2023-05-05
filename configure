@@ -6051,6 +6051,9 @@ fi
 
 CPPFLAGS=$CPPFLAGS' -DMET_BASE="\"$(pkgdatadir)\""'
 
+# Add -std=c++11 to CXXFLAGS
+CXXFLAGS=$CXXFLAGS' -std=c++11'
+
 # Define other variables for the makefiles
 
 FC_LIBS=-lgfortran
