@@ -539,7 +539,7 @@ void get_shapefile_strings() {
    ConcatString dbf_filename = mask_filename;
    dbf_filename.replace(".shp", ".dbf");
 
-   mlog << Debug(3) << "Reading shape database file: "
+   mlog << Debug(3) << "Shape dBASE file:\t"
         << dbf_filename << "\n";
 
    // Open the database file
@@ -550,17 +550,40 @@ void get_shapefile_strings() {
       exit(1);
    }
 
-   // Get the subrecord names
+   // Get the subrecord names, ignoring case
    rec_names = f.subrecord_names();
+   rec_names.set_ignore_case(true);
+
+   // Print the subrecord names
+   mlog << Debug(4) << "Filtering shapes using "
+        << shape_str_map.size() << " of the " << rec_names.n()
+        << " available attributes (" << write_css(rec_names)
+        << ").\n";
+
+   // Check that the attributes requested actually exist
+   map<string,StringArray>::const_iterator it;
+   for(it  = shape_str_map.begin();
+       it != shape_str_map.end(); it++) {
+
+      if(!rec_names.has(it->first)) {
+         mlog << Warning << "\nget_shapefile_strings() -> "
+              << "the \"-shape_str\" name \"" << it->first
+              << "\" is not in the list of " << rec_names.n()
+              << " shapefile attributes and will be ignored:\n"
+              << write_css(rec_names) << "\n\n";
+      }
+   }
 
    // Check each record
    for(int i=0; i<f.header()->n_records; i++) {
 
+      // Get the values for the current record
       rec_values = f.subrecord_values(i);
 
       // Add matching records to the list
-      if(is_shapefile_match(i, rec_names, rec_values)) {
-         mlog << Debug(4) << "Record " << i << " is a shapefile match.\n";
+      if(is_shape_str_match(i, rec_names, rec_values)) {
+         mlog << Debug(4) << "Shape number " << i
+              << " is a shapefile match.\n";
          if(!shape_numbers.has(i)) shape_numbers.add(i);
       }
    }
@@ -636,7 +659,7 @@ void get_shapefile_records() {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool is_shapefile_match(const int i_shape, const StringArray &names, const StringArray &values) {
+bool is_shape_str_match(const int i_shape, const StringArray &names, const StringArray &values) {
    bool match = true;
    int i_match;
 
@@ -645,19 +668,11 @@ bool is_shapefile_match(const int i_shape, const StringArray &names, const Strin
    for(it  = shape_str_map.begin();
        it != shape_str_map.end(); it++) {
 
-      // The user-specified name must exist in the shapefile
-      if(!names.has(it->first, i_match)) {
-         mlog << Warning << "\nis_shapefile_match() -> "
-              << "the \"-shape_str " << it->first
-              << "\" name does not appear in the shapefile. "
-              << "Run the \"gis_dump_dbf\" utility to see a list "
-              << "of valid names.\n\n";
-         match = false;
-         break;
-      }
+      // Ignore names that do not exist in the shapefile
+      if(!names.has(it->first, i_match)) continue;
 
       // The corresponding value must match
-      if(!it->second.reg_exp_match(values[i_match].c_str())) {
+      if(!it->second.has(values[i_match].c_str())) {
          mlog << Debug(4) << "Shape number " << i_shape << " \""
               << it->first << "\" value (" << values[i_match]
               << ") does not match (" << write_css(it->second)
@@ -668,7 +683,7 @@ bool is_shapefile_match(const int i_shape, const StringArray &names, const Strin
       else {
          mlog << Debug(3) << "Shape number " << i_shape << " \""
               << it->first << "\" value (" << values[i_match]
-              << ") MATCHES (" << write_css(it->second)
+              << ") matches (" << write_css(it->second)
               << ")\n";
       }
 
@@ -1552,7 +1567,7 @@ void usage() {
         << "\t[-height n]\n"
         << "\t[-width n]\n"
         << "\t[-shapeno n]\n"
-        << "\t[-shape_str n]\n"
+        << "\t[-shape_str name string]\n"
         << "\t[-value n]\n"
         << "\t[-name string]\n"
         << "\t[-log file]\n"
@@ -1604,7 +1619,6 @@ void usage() {
         << "to combine the \"input_field\" data with the current mask "
         << "(optional).\n"
 
-
         << "\t\t\"-thresh string\" defines the threshold to be applied "
         << "(optional).\n"
         << "\t\t   For \"circle\" and \"track\" masking, threshold the "
@@ -1624,10 +1638,11 @@ void usage() {
         << "\t\t   For \"shape\" masking, specify the integer shape "
         << "number(s) (0-based) to be used as a comma-separated list.\n"
 
-        << "\t\t\"-shape_str name string(s)\" (optional).\n"
-        << "\t\t   For \"shape\" masking, specify the shape(s) with "
-        << "a named attribute followed by a comma-separated list of "
-        << "matching strings.\n"
+        << "\t\t\"-shape_str name string\" (optional).\n"
+        << "\t\t   For \"shape\" masking, specify the shape(s) to be used "
+        << "as a named attribute followed by a comma-separated list of "
+        << "matching strings. If used multiple times, only shapes matching "
+        << "all named attributes will be used.\n"
 
         << "\t\t\"-value n\" overrides the default output mask data "
         << "value (" << default_mask_val << ") (optional).\n"
@@ -1764,8 +1779,9 @@ void set_shapeno(const StringArray & a) {
 void set_shape_str(const StringArray & a) {
    StringArray sa;
 
-   // Comma-separated list of matching strings
+   // Comma-separated list of matching strings, ignoring case
    sa.parse_css(a[1]);
+   sa.set_ignore_case(true);
 
    // Append options to existing entry
    if(shape_str_map.count(a[0]) > 0) {
