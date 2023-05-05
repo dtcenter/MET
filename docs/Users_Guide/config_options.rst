@@ -1541,6 +1541,8 @@ Point-Stat and Ensemble-Stat, the reference time is the forecast valid time.
      end =  5400;
   }
 
+.. _config_options-mask:
+
 mask
 ^^^^
      
@@ -1566,21 +1568,32 @@ in the following ways:
   NetCDF output of the Gen-Vx-Mask tool.
 
   * An ASCII file containing a lat/lon polygon.
-    Latitude in degrees north and longitude in degrees east.
-    The first and last polygon points are connected.
-    For example, "MET_BASE/poly/EAST.poly" which consists of n points:
-    "poly_name lat1 lon1 lat2 lon2... latn lonn"
 
-    Several masking polygons used by NCEP are predefined in the
-    installed *share/met/poly* directory. Creating a new polygon is as
-    simple as creating a text file with a name for the polygon followed
-    by the lat/lon points which define its boundary. Adding a new masking
-    polygon requires no code changes and no recompiling. Internally, the
-    lat/lon polygon points are converted into x/y values in the grid. The
-    lat/lon values for the observation points are also converted into x/y
-    grid coordinates. The computations performed to check whether the
-    observation point falls within the polygon defined is done in x/y
-    grid space.
+    * The file must contain a name for the region followed by the latitude
+      (degrees north) and longitude (degrees east) for each vertex of the boundary.
+      The values are separated by whitespace (e.g. spaces or newlines), and the
+      first and last polygon points are connected.
+      The general form is "poly_name lat1 lon1 lat2 lon2... latn lonn".
+      Here is an example of a rectangle consisting of 4 points:
+
+      .. code-block:: none
+
+        RECTANGLE
+        25  -120
+        55  -120
+        55   -70
+        25   -70
+
+      Several masking polygons used by NCEP are predefined in the
+      installed *share/met/poly* directory. Creating a new polygon is as
+      simple as creating a text file with a name for the polygon followed
+      by the lat/lon points which define its boundary. Adding a new masking
+      polygon requires no code changes and no recompiling. Internally, the
+      lat/lon polygon points are converted into x/y values in the grid. The
+      lat/lon values for the observation points are also converted into x/y
+      grid coordinates. The computations performed to check whether the
+      observation point falls within the polygon defined is done in x/y
+      grid space.
 
   * The NetCDF output of the gen_vx_mask tool.
 
@@ -1591,7 +1604,7 @@ in the following ways:
     applied, any grid point where the resulting field is 0, the mask is
     turned off. Any grid point where it is non-zero, the mask is turned
     on.
-    For example,  "sample.grib {name = \"TMP\"; level = \"Z2\";} >273"
+    For example, "sample.grib {name = \"TMP\"; level = \"Z2\";} >273"
 
 * The "sid" entry is an array of strings which define groups of
   observation station ID's over which to compute statistics. Each entry
