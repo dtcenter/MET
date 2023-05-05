@@ -57,7 +57,7 @@ Rapid Intensification/Weakening
 
 The TC-Stat tool can be used to read TCMPR lines and compare the occurrence of rapid intensification (i.e. increase in intensity) or weakening (i.e. decrease in intensity) between the adeck and bdeck. The rapid intensification or weakening is defined by the change of maximum wind speed (i.e. **AMAX_WIND** and **BMAX_WIND** columns) over a specified amount of time. Accurately forecasting large changes in intensity is a challenging problem and this job helps quantify a model's ability to do so.
 
-Users may specify several job command options to configure the behavior of this job. Using these configurable options, the TC-Stat tool analyzes paired tracks and for each track point (i.e. each TCMPR line) determines whether rapid intensification or weakening occurred. For each point in time, it uses the forecast and BEST track event occurrence to populate a 2x2 contingency table. The job may be configured to require that forecast and BEST track events occur at exactly the same time to be considered a hit. Alternatively, the job may be configured to define a hit as long as the forecast and BEST track events occurred within a configurable time window. Using this relaxed matching criteria false alarms may be considered hits and misses may be considered correct negatives as long as the adeck and bdeck events were close enough in time. Each rirw job applies a single intensity change threshold. Therefore, assessing a model's performance with rapid intensification and weakening requires that two separate jobs be run.
+Users may specify several job command options to configure the behavior of this job. Using these configurable options, the TC-Stat tool analyzes paired tracks and for each track point (i.e. each TCMPR line) determines whether rapid intensification or weakening occurred. For each point in time, it uses the forecast and BEST track event occurrence to populate a 2x2 contingency table. The job may be configured to require that forecast and BEST track events occur at exactly the same time to be considered a hit. Alternatively, the job may be configured to define a hit as long as the forecast and BEST track events occurred within a configurable time window. Using this relaxed matching criteria false alarms may be considered hits and misses may be considered correct negatives as long as the adeck and bdeck events were close enough in time. Each rirw job applies a single intensity change threshold. Therefore, assessing a model's performance with rapid intensification and weakening requires that two separate jobs be run. The -out_stat option can be called for a rirw job in order to output the 24 Common STAT header columns along with the contingency table statistics.
 
 Probability of Rapid Intensification
 ------------------------------------
@@ -383,6 +383,7 @@ _________________________
   e.g.: -job filter  -line_type TCMPR  -amodel HWFI   -dump_row ./tc_filter_job.tcst
         -job summary -line_type TCMPR  -column TK_ERR -dump_row ./tc_summary_job.tcst
         -job rirw    -line_type TCMPR  -rirw_time 24 -rirw_exact false -rirw_thresh ge20
+        -job rirw    -line_type TCMPR  -rirw_time 24 -rirw_exact false -rirw_thresh ge20 -out_stat ./tc_rirw.stat 
         -job probrirw -line_type PROBRIRW -column_thresh RI_WINDOW ==24 \
                       -probrirw_thresh 30 -probrirw_prob_thresh ==0.25
 
@@ -469,6 +470,8 @@ The RIRW job produces contingency table counts and statistics defined by identif
 • The **-out_line_type** option defines the output data that should be written. This job can write contingency table counts (CTC), contingency table statistics (CTS), and RIRW matched pairs (MPR). The default is CTC and CTS, but the MPR output provides a great amount of detail.
 
 Users may also specify the **-out_alpha** option to define the alpha value for the confidence intervals in the CTS output line type. In addition, the **-by column_name** option is a convenient way of running the same job across multiple stratifications of data. For example, **-by AMODEL** runs the same job for each unique AMODEL name in the data.
+
+Users may also specify the **-out_stat** option in order to output the 24 Common STAT header columns along with the contingency table statistics (for the CTC and CTS output line types). The 24 Common STAT header columns will be written to an output file along with CTC and/or CTS output columns.
 
 **Job: PROBRIRW**
 
