@@ -143,7 +143,7 @@ void InterestCalculator::assign(const InterestCalculator & i)
 
 clear();
 
-if ( i.Nelements == 0 )  return;
+if ( i.Nelements <= 0 )  return;
 
 extend(i.Nelements);
 
@@ -256,6 +256,7 @@ if ( _weight < 0.0 )  {
 
 }
 
+if (Nelements < 0) Nelements = 0;   // SonarQube findings
 
 extend(Nelements + 1);
 
