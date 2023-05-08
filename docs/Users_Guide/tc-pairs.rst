@@ -420,25 +420,25 @@ TC-Pairs produces output in TCST format. The default output file name can be ove
   * - 3
     - BMODEL
     - User provided text string designating model name
-  * - 4 
+  * - 4
     - DESC
     - User provided description text string
-  * - 5 
+  * - 5
     - STORM_ID
     - BBCCYYYY designation of storm
-  * - 6 
+  * - 6
     - BASIN
     - Basin (BB in STORM_ID)
-  * - 7 
+  * - 7
     - CYCLONE
     - Cyclone number (CC in STORM_ID)
-  * - 8 
+  * - 8
     - STORM_NAME
     - Name of Storm
-  * - 9 
+  * - 9
     - INIT
     - Initialization time of forecast in YYYYMMDD_HHMMSS format.
-  * - 10 
+  * - 10
     - LEAD
     - Forecast lead time in HHMMSS format.
   * - 11
