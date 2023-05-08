@@ -34,7 +34,7 @@ MET Version 11.1.0-beta2 release notes (20230505)
      * Bugfix: AERONET the lat/lon is not changed with different station ID (`#2493 <https://github.com/dtcenter/MET/issues/2493>`_).
      * Bugfix: dtype in Python embedding example script and appendixF correction (`#2518 <https://github.com/dtcenter/MET/issues/2518>`_).
      * Bugfix: write_tmp_dataplane uses fill_value unrecognized by MET (`#2525 <https://github.com/dtcenter/MET/issues/2525>`_).
-     * Bugfix: Resolve compilation problems due to need for -std=c++11 (`#2531 <https://github.com/dtcenter/MET/issues/2531>`_).
+     * **Bugfix: Resolve compilation problems due to need for -std=c++11 (`#2531 <https://github.com/dtcenter/MET/issues/2531>`_).**
 
 MET Version 11.1.0-beta1 release notes (20230228)
 -------------------------------------------------
