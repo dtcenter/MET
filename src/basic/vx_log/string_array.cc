@@ -267,6 +267,30 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+void StringArray::add_uniq(const std::string text)
+
+{
+
+   //
+   // Only store unique strings
+   //
+
+if(!has(text)) {
+
+   s.push_back(text);
+
+   Sorted = false;
+
+}
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void StringArray::add(const StringArray & a)
 
 {
@@ -291,12 +315,18 @@ void StringArray::add_uniq(const StringArray & a)
 
 if ( a.n() == 0 )  return;
 
+   //
+   // Only store unique strings
+   //
+
 for(int i=0; i<a.n(); i++) {
 
-   // Only store unique strings
    if(!has(a[i])) {
+
       s.push_back(a[i]);
+
       Sorted = false;
+
    }
 }
 

@@ -238,7 +238,7 @@ class TCStatJob {
 
       void open_stat_file();
       void close_stat_file();
-      
+
       void dump_pair(const TrackPairInfo &, std::ofstream *);
       void dump_line(const TCStatLine &,    std::ofstream *);
 

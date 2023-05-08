@@ -729,7 +729,7 @@ bool TCStatJob::is_keeper_line(const TCStatLine &line,
    else if(Desc.n() > 0 &&
      !Desc.has(line.desc()))            { keep = false; n.RejDesc++;      }
    else if(StormId.n() > 0 &&
-   !has_storm_id(StormId, (string)line.basin(), (string)line.cyclone(), line.init()))
+     !has_storm_id(StormId, (string)line.basin(), (string)line.cyclone(), line.init()))
                                         { keep = false; n.RejStormId++;   }
    else if(Basin.n() > 0 &&
      !Basin.has(line.basin()))          { keep = false; n.RejBasin++;     }
@@ -2161,7 +2161,7 @@ void TCStatJobSummary::do_job(const StringArray &file_list,
    // Process the filter output
    if(JobOut) do_output(*JobOut);
    else       do_output(cout);
-   
+
    return;
 }
 
@@ -3315,24 +3315,12 @@ void TCStatJobRIRW::process_pair(TrackPairInfo &pair) {
           << cat;
 
       // Track unique header column strings 
-      if(!cur_map[key].AModel.has(pair.tcmpr_line(i)->amodel())) {
-         cur_map[key].AModel.add(pair.tcmpr_line(i)->amodel());
-      }
-      if(!cur_map[key].BModel.has(pair.tcmpr_line(i)->bmodel())) {
-         cur_map[key].BModel.add(pair.tcmpr_line(i)->bmodel());
-      }
-      if(!cur_map[key].Desc.has(pair.tcmpr_line(i)->desc())) {
-         cur_map[key].Desc.add(pair.tcmpr_line(i)->desc());
-      }
-      if(!cur_map[key].Basin.has(pair.tcmpr_line(i)->basin())) {
-         cur_map[key].Basin.add(pair.tcmpr_line(i)->basin());
-      }
-      if(!cur_map[key].InitMask.has(pair.tcmpr_line(i)->init_mask())) {
-         cur_map[key].InitMask.add(pair.tcmpr_line(i)->init_mask());
-      }
-      if(!cur_map[key].ValidMask.has(pair.tcmpr_line(i)->valid_mask())) {
-         cur_map[key].ValidMask.add(pair.tcmpr_line(i)->valid_mask());
-      }
+      cur_map[key].AModel.add_uniq(pair.tcmpr_line(i)->amodel());
+      cur_map[key].BModel.add_uniq(pair.tcmpr_line(i)->bmodel());
+      cur_map[key].Desc.add_uniq(pair.tcmpr_line(i)->desc());
+      cur_map[key].Basin.add_uniq(pair.tcmpr_line(i)->basin());
+      cur_map[key].InitMask.add_uniq(pair.tcmpr_line(i)->init_mask());
+      cur_map[key].ValidMask.add_uniq(pair.tcmpr_line(i)->valid_mask());
      
       // Track timing information 
       cur_map[key].Hdr.add(cur);
@@ -3461,7 +3449,7 @@ void TCStatJobRIRW::do_ctc_output(ostream &out) {
       out_at.set_entry(r, c++, ByColumn[i]);
    }
 
-   // Write the header columns   
+   // Write the header columns
    write_header_row(ctc_columns, n_ctc_columns, 0, out_at, r, c);
 
    // Loop over the map entries and populate the output table
@@ -3717,7 +3705,8 @@ void TCStatJobRIRW::setup_stat_file(int n_row) {
          mlog << Error << "\nSTATAnalysisJob::setup_stat_file() -> "
               << "unexpected stat line type \"" << statlinetype_to_string(cur_lt)
               << "\"!\n"
-              << "The line type \"" << statlinetype_to_string(cur_lt) << "\" is not supported when -out_stat is requested.\n\n";
+              << "The line type \"" << statlinetype_to_string(cur_lt)
+              << "\" is not supported when -out_stat is requested.\n\n";
          exit(1);
       }
       if(c > n_col) n_col = c;
@@ -3753,11 +3742,18 @@ void TCStatJobRIRW::setup_stat_file(int n_row) {
       // Write the STAT header row
       //
       switch(out_lt) {
-         case stat_ctc:    write_header_row       (ctc_columns, n_ctc_columns, 1,           stat_at, 0, 0); break;
-         case stat_cts:    write_header_row       (cts_columns, n_cts_columns, 1,           stat_at, 0, 0); break;
+         case stat_ctc:
+            write_header_row(ctc_columns, n_ctc_columns, 1, stat_at, 0, 0);
+            break;
+
+         case stat_cts:
+            write_header_row(cts_columns, n_cts_columns, 1, stat_at, 0, 0);
+            break;
+
          // Write only header columns for unspecified line type
          case no_stat_line_type:
-            write_header_row       ((const char **) 0, 0, 1,                 stat_at, 0, 0); break;
+            write_header_row((const char **) 0, 0, 1, stat_at, 0, 0);
+            break;
           
          default:
             mlog << Error << "\nSTATAnalysisJob::setup_stat_file() -> "
@@ -3817,19 +3813,13 @@ void TCStatJobRIRW::do_stat_output(ostream &out) {
    //
    
    // Set the output FCST_VAR column
-   if(!RIRWExactADeck)
-      cs << cs_erase << "RIRW_" << sec_to_timestring(RIRWTimeADeck) << "_MAX";
-   else
-      cs << cs_erase << "RIRW_" << sec_to_timestring(RIRWTimeADeck);
-   
+   cs << cs_erase << "RIRW_" << sec_to_timestring(RIRWTimeADeck)
+      << (!RIRWExactADeck ? "_MAX" : "");
    shc.set_fcst_var(cs);
 
    // Set the output OBS_VAR column
-   if(!RIRWExactBDeck)
-      cs << cs_erase << "RIRW_" << sec_to_timestring(RIRWTimeBDeck) << "_MAX";
-   else
-      cs << cs_erase << "RIRW_" << sec_to_timestring(RIRWTimeBDeck);
-
+   cs << cs_erase << "RIRW_" << sec_to_timestring(RIRWTimeBDeck)
+      << (!RIRWExactBDeck ? "_MAX" : "");
    shc.set_obs_var(cs);
    
    // Set the output FCST_THRESH and OBS_THRESH columns
@@ -3865,15 +3855,15 @@ void TCStatJobRIRW::do_stat_output(ostream &out) {
       // If neither are specified, use input mask and/or basin names
       if(cs.empty()) {
          StringArray sa;
-	 sa.add_uniq(it->second.InitMask);
-	 sa.add_uniq(it->second.ValidMask);
+         sa.add_uniq(it->second.InitMask);
+         sa.add_uniq(it->second.ValidMask);
 	
-	 // Use the basin names instead
-	 if(sa.n() == 1 && sa[0] == na_str) {
+         // Use the basin names instead
+         if(sa.n() == 1 && sa[0] == na_str) {
             sa.clear();
-	    sa.add_uniq(it->second.Basin);
-	 }
-	 cs = write_css(sa);
+            sa.add_uniq(it->second.Basin);
+         }
+         cs = write_css(sa);
       }
 
       // Set shc mask name
@@ -3925,6 +3915,7 @@ void TCStatJobRIRW::do_stat_output(ostream &out) {
          //
          // Compute the stats and confidence intervals for this
          // CTSInfo object
+         //
          
          it->second.Info.compute_stats();
          it->second.Info.compute_ci();
