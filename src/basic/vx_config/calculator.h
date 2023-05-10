@@ -68,7 +68,7 @@ class Calculator : public NumberStack {
       //  do stuff
       //
 
-   void run(const IcodeVector &, const Number * local_vars = 0);
+   void run(const IcodeVector &, const Number * local_vars = nullptr);
 
    void store(DictionaryEntry &);
 
