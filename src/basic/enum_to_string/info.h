@@ -25,7 +25,7 @@ static const int enuminfo_alloc_increment = 100;
 
 class EnumInfo {
 
-      friend ostream & operator<<(ostream &, const EnumInfo &);
+      friend std::ostream & operator<<(std::ostream &, const EnumInfo &);
 
    private:
 
