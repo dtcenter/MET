@@ -47,7 +47,7 @@ Required arguments for gen_vx_mask
 
 2. The **mask_file** argument defines the masking information, see below.
 
-• For "poly", "poly_xy", "box", "circle", and "track" masking, specify an ASCII Lat/Lon file (see :ref:`Types_of_masking_gen_vx_mask` for details on how to construct the ASCII Lat/Lon file).
+• For "poly", "poly_xy", "box", "circle", and "track" masking, specify an ASCII Lat/Lon file. Refer to :ref:`Types_of_masking_gen_vx_mask` for details on how to construct the ASCII Lat/Lon file for each type of mask.
 
 • For "grid" and "data" masking, specify a gridded data file.
 
