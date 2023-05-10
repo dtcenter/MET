@@ -172,13 +172,14 @@ void parse_command_line(int &argc, char **argv)
 
 if ( argc == 1 )  { usage();  exit ( 1 ); }
 
+int j;
 int found;
 
 do {
 
    found = 0;
 
-   for (int j=1; j<argc; ++j)  {
+   for (j=1; j<argc; ++j)  {
 
       if ( argv[j][0] == '-' )  { found = 1;  break; }
 
