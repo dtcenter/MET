@@ -21,6 +21,7 @@
 //   004    08/30/21  Halley Gotway   MET #1891 fix input and mask fields.
 //   005    05/05/22  Halley Gotway   MET #2152 Add -type poly_xy.
 //   006    09/29/22  Prestopnik      MET #2227 Remove namespace std from header files
+//   007    05/03/23  Halley Gotway   MET #1060 Support multiple shapes
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -105,9 +106,9 @@ static double mask_val = default_mask_val;
 static ConcatString mask_name;
 static unixtime solar_ut = (unixtime) 0;
 
-static ShpPolyRecord shape;
-
-static int shape_number = 0;
+static std::map<string,StringArray> shape_str_map;
+static NumArray shape_numbers;
+static std::vector<ShpPolyRecord> shape_recs;
 
 // Masking polyline
 static MaskPoly poly_mask;
@@ -129,7 +130,10 @@ static void      get_data_plane(const ConcatString &file_name,
                     DataPlane &dp, Grid &dp_grid);
 static bool      get_gen_vx_mask_config_str(MetNcMetDataFile *,
                     ConcatString &);
-static void      get_shapefile_outline(ShpPolyRecord &shape);
+static void      get_shapefile_strings();
+static void      get_shapefile_records();
+static bool      is_shape_str_match(const int i,
+                    const StringArray &, const StringArray &);
 static void      apply_poly_mask(DataPlane &dp);
 static void      apply_poly_xy_mask(DataPlane &dp);
 static void      apply_shape_mask(DataPlane &dp);
@@ -158,6 +162,7 @@ static void      set_value(const StringArray &);
 static void      set_name(const StringArray &);
 static void      set_compress(const StringArray &);
 static void      set_shapeno(const StringArray &);
+static void      set_shape_str(const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 

@@ -1541,6 +1541,8 @@ Point-Stat and Ensemble-Stat, the reference time is the forecast valid time.
      end =  5400;
   }
 
+.. _config_options-mask:
+
 mask
 ^^^^
      
@@ -1562,14 +1564,26 @@ in the following ways:
 
 * The "poly" entry contains a comma-separated list of files that define
   verification masking regions. These masking regions may be specified in
-  two ways: as a lat/lon polygon or using a gridded data file such as the
-  NetCDF output of the Gen-Vx-Mask tool.
+  two ways: in an ASCII file containing lat/lon points defining the mask polygon,
+  or using a gridded data file such as the NetCDF output of the Gen-Vx-Mask tool.
+  Some details for each of these options are described below:
 
-  * An ASCII file containing a lat/lon polygon.
-    Latitude in degrees north and longitude in degrees east.
-    The first and last polygon points are connected.
-    For example, "MET_BASE/poly/EAST.poly" which consists of n points:
-    "poly_name lat1 lon1 lat2 lon2... latn lonn"
+  * If providing an ASCII file containing the lat/lon points defining the mask
+    polygon, the file must contain a name for the region followed by the latitude
+    (degrees north) and longitude (degrees east) for each vertex of the polygon.
+    The values are separated by whitespace (e.g. spaces or newlines), and the
+    first and last polygon points are connected.
+    The general form is "poly_name lat1 lon1 lat2 lon2... latn lonn".
+    Here is an example of a rectangle consisting of 4 points:
+
+    .. code-block:: none
+       :caption: ASCII Rectangle Polygon Mask
+
+       RECTANGLE
+       25  -120
+       55  -120
+       55   -70
+       25   -70
 
     Several masking polygons used by NCEP are predefined in the
     installed *share/met/poly* directory. Creating a new polygon is as
@@ -1582,7 +1596,8 @@ in the following ways:
     observation point falls within the polygon defined is done in x/y
     grid space.
 
-  * The NetCDF output of the gen_vx_mask tool.
+  * The NetCDF output of the gen_vx_mask tool. Please see :numref:`masking`
+    for more details.
 
   * Any gridded data file that MET can read may be used to define a
     verification masking region. Users must specify a description of the
@@ -1591,7 +1606,7 @@ in the following ways:
     applied, any grid point where the resulting field is 0, the mask is
     turned off. Any grid point where it is non-zero, the mask is turned
     on.
-    For example,  "sample.grib {name = \"TMP\"; level = \"Z2\";} >273"
+    For example, "sample.grib {name = \"TMP\"; level = \"Z2\";} >273"
 
 * The "sid" entry is an array of strings which define groups of
   observation station ID's over which to compute statistics. Each entry

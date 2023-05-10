@@ -31,22 +31,23 @@ The usage statement for the Gen-Vx-Mask tool is shown below:
          [-height n]
          [-width n]
          [-shapeno n]
+         [-shape_str name string]
          [-value n]
          [-name string]
          [-log file]
          [-v level]
          [-compress level]
 
-gen_vx_mask has four required arguments and can take optional ones. Note, -type string (masking type) was previously optional but is now required.
+gen_vx_mask has four required arguments and can take optional ones. Note that **-type string** (masking type) was previously optional but is now required.
 
 Required arguments for gen_vx_mask
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. The **input_file** argument is a gridded data file which specifies the grid definition for the domain over which the masking bitmap is to be defined. If output from gen_vx_mask, automatically read mask data as the **input_field**.
+1. The **input_grid** argument is a named grid, the path to a gridded data file, or an explicit grid specification string (see :numref:`App_B-grid_specification_strings`) which defines the grid for which a mask is to be defined. If set to a gen_vx_mask output file, automatically read mask data as the **input_field**.
 
 2. The **mask_file** argument defines the masking information, see below.
 
-• For "poly", "poly_xy", "box", "circle", and "track" masking, specify an ASCII Lat/Lon file.
+• For "poly", "poly_xy", "box", "circle", and "track" masking, specify an ASCII Lat/Lon file. Refer to :ref:`Types_of_masking_gen_vx_mask` for details on how to construct the ASCII Lat/Lon file for each type of mask.
 
 • For "grid" and "data" masking, specify a gridded data file.
 
@@ -58,7 +59,7 @@ Required arguments for gen_vx_mask
 
 3. The **out_file** argument is the output NetCDF mask file to be written.
 
-4. The **-type string** is required to set the masking type. The application will give an error message and exit if "-type string" is not specified on the command line. See description of supported types below.
+4. The **-type string** is required to set the masking type. The application will give an error message and exit if "-type string" is not specified on the command line. See the description of supported types below.
    
 Optional arguments for gen_vx_mask
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -83,18 +84,24 @@ Optional arguments for gen_vx_mask
 
 10. The **-height n** and **-width n** options set the size in grid units for "box" masking.
 
-11. The **-shapeno n** option is only used for shapefile masking. (See description of shapefile masking below).
+11. The **-shapeno n** option is only used for shapefile masking. See the description of shapefile masking below.
 
-12. The **-value n** option can be used to override the default output mask data value (1).
+12. The **-shape_str name string** option is only used for shapefile masking. See the description of shapefile masking below.
 
-13. The **-name string** option can be used to specify the output variable name for the mask.
+13. The **-value n** option can be used to override the default output mask data value (1).
 
-14. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file. 
+14. The **-name string** option can be used to specify the output variable name for the mask.
 
-15. The **-v level** option indicates the desired level of verbosity. The value of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity will increase the amount of logging.
+15. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file.
 
-16. The **-compress level** option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of "level" will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
+16. The **-v level** option indicates the desired level of verbosity. The value of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity will increase the amount of logging.
 
+17. The **-compress level** option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of "level" will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
+
+.. _Types_of_masking_gen_vx_mask:
+
+Types of masking available in gen_vx_mask
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 The Gen-Vx-Mask tool supports the following types of masking region definition selected using the **-type** command line option:
 
 1. Polyline (**poly**) masking reads an input ASCII file containing Lat/Lon locations, connects the first and last points, and selects grid points whose Lat/Lon location falls inside that polyline in Lat/Lon space. This option is useful when defining geographic subregions of a domain.
@@ -115,7 +122,11 @@ The Gen-Vx-Mask tool supports the following types of masking region definition s
 
 9. Latitude (**lat**) and longitude (**lon**) masking computes the latitude and longitude value at each grid point. This logic only requires the definition of the grid, specified by the **input_file**. Technically, the **mask_file** is not needed, but a value must be specified for the command line to parse correctly. Users are advised to simply repeat the **input_file** setting twice. If the **-thresh** command line option is not used, the raw latitude or longitude values for each grid point will be written to the output. This option is useful when defining latitude or longitude bands over which to compute statistics.
 
-10. Shapefile (**shape**) masking uses a closed polygon taken from an ESRI shapefile to define the masking region. Gen-Vx-Mask reads the shapefile with the ".shp" suffix and extracts the latitude and longitudes of the vertices. The other types of shapefiles (index file, suffix ".shx", and dBASE file, suffix ".dbf") are not currently used. The shapefile must consist of closed polygons rather than polylines, points, or any of the other data types that shapefiles support. Shapefiles usually contain more than one polygon, and the **-shape n** command line option enables the user to select one polygon from the shapefile. The integer **n** tells which shape number to use from the shapefile. Note that this value is zero-based, so that the first polygon in the shapefile is polygon number 0, the second polygon in the shapefile is polygon number 1, etc. For the user's convenience, some utilities that perform human-readable screen dumps of shapefile contents are provided. The gis_dump_shp, gis_dump_shx and gis_dump_dbf tools enable the user to examine the contents of her shapefiles. As an example, if the user knows the name of the particular polygon but not the number of the polygon in the shapefile, the user can use the gis_dump_dbf utility to examine the names of the polygons in the shapefile. The information written to the screen will display the corresponding polygon number.
+10. Shapefile (**shape**) masking uses closed polygons taken from an ESRI shapefile to define the masking region. Gen-Vx-Mask reads the shapefile with the ".shp" suffix and extracts the latitude and longitudes of the vertices. The shapefile must consist of closed polygons rather than polylines, points, or any of the other data types that shapefiles support. When the **-shape_str** command line option is used, Gen-Vx-Mask also reads metadata from the corresponding dBASE file with the ".dbf" suffix.
+
+    Shapefiles usually contain more than one polygon, and the user must select which of these shapes should be used. The **-shapeno n** and **-shape_str name string** command line options enable the user to select one or more polygons from the shapefile. For **-shape n**, **n** is a comma-separated list of integer shape indices to be used. Note that these values are zero-based. So the first polygon in the shapefile is shape number 0, the second polygon in the shapefile is shape number 1, etc. For example, **-shapeno 0,1,2** uses the first three shapes in the shapefile. When multiple shapes are specified, the mask is defined as their union. So all grid points falling inside at least one of the specified shapes are included in the mask.
+
+    For the user's convenience, some utilities that perform human-readable screen dumps of shapefile contents are provided with MET. The **gis_dump_shp**, **gis_dump_shx**, and **gis_dump_dbf** tools enable the user to examine the contents of these shapefiles. In particular, the **gis_dump_dbf** tool prints the name and values of the metadata for each record. The **-shape_str** command line option filters the shapes using the attributes listed in the **gis_dump_dbf** output, and requires two arguments. The **name** argument is set to any valid shapefile attribute, and the **string** argument is a comma-separated list of values to be matched. An example of using **-shape_str** is **-shape_str CONTINENT Europe**, which will match all "CONTINENT" attribues that have the string "Europe" in them. Strings that contain embedded whitespace should be enclosed in single quotes. Also note that case insensitive matching is used. For example, when using a global country outline shapefile, **-shape_str NAME 'united kingdom,united states of america'** matches the "NAME" attributes that have both "United Kingdom" and "United States of America" in them. If **-shape_str** is used multiple times, only shapes matching all the named attributes will be used. For example, **-shape_str CONTINENT Europe -shape_str NAME Spain,Portugal** will only match shapes where the "CONTINENT" attrinute contains "Europe "and the "NAME" attribute contains "Spain" or "Portugal". If a user wishes, they can combine both the **-shape_str** and **-shapeno** options. In this case, the union of all matches from the shapefile will be used.
 
 The polyline, polyline XY, box, circle, and track masking methods all read an ASCII file containing Lat/Lon locations. Those files must contain a string, which defines the name of the masking region, followed by a series of whitespace-separated latitude (degrees north) and longitude (degree east) values.
 
