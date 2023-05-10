@@ -10,8 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -26,6 +24,9 @@ using namespace std;
 
 #include "dictionary.h"
 #include "configobjecttype_to_string.h"
+
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -93,11 +94,11 @@ DictionaryEntry & DictionaryEntry::operator=(const DictionaryEntry & entry)
 
 {
 
-if ( this == &entry )  return ( * this );
+if ( this == &entry )  return *this;
 
 assign(entry);
 
-return ( * this );
+return *this;
 
 }
 
@@ -109,15 +110,15 @@ void DictionaryEntry::init_from_scratch()
 
 {
 
-Text = (ConcatString *) 0;
+Text = (ConcatString *) nullptr;
 
-Dict = (Dictionary *) 0;
+Dict = (Dictionary *) nullptr;
 
-Thresh = (SingleThresh *) 0;
+Thresh = (SingleThresh *) nullptr;
 
-PWL = (PiecewiseLinear *) 0;
+PWL = (PiecewiseLinear *) nullptr;
 
-v = (IcodeVector *) 0;
+v = (IcodeVector *) nullptr;
 
 Nargs = 0;
 
@@ -141,15 +142,15 @@ Ival = 0;
 Dval = 0.0;
 Bval = false;
 
-if ( Text )  { delete Text;  Text = (ConcatString *) 0; }
+if ( Text )  { delete Text;  Text = (ConcatString *) nullptr; }
 
-if ( Dict )  { delete Dict;  Dict = (Dictionary *) 0; }
+if ( Dict )  { delete Dict;  Dict = (Dictionary *) nullptr; }
 
-if ( Thresh )  { delete Thresh;  Thresh = (SingleThresh *) 0; }
+if ( Thresh )  { delete Thresh;  Thresh = (SingleThresh *) nullptr; }
 
-if ( PWL )  { delete PWL;  PWL = (PiecewiseLinear *) 0; }
+if ( PWL )  { delete PWL;  PWL = (PiecewiseLinear *) nullptr; }
 
-if ( v )  { delete v;  v = (IcodeVector *) 0; }
+if ( v )  { delete v;  v = (IcodeVector *) nullptr; }
 
 Nargs = 0;
 
@@ -710,7 +711,7 @@ if ( Type != IntegerType )  {
 }
 
 
-return ( Ival );
+return Ival;
 
 }
 
@@ -732,7 +733,7 @@ if ( Type != FloatType )  {
 }
 
 
-return ( Dval );
+return Dval;
 
 }
 
@@ -754,7 +755,7 @@ if ( Type != BooleanType )  {
 }
 
 
-return ( Bval );
+return Bval;
 
 }
 
@@ -785,7 +786,7 @@ const ConcatString DictionaryEntry::string_value() const
 
    }
 
-   return ( sub_text );
+   return sub_text;
 
 }
 
@@ -807,7 +808,7 @@ if ( Type != DictionaryType )  {
 }
 
 
-return ( Dict );
+return Dict;
 
 }
 
@@ -829,7 +830,7 @@ if ( Type != ArrayType )  {
 }
 
 
-return ( Dict );
+return Dict;
 
 }
 
@@ -851,7 +852,7 @@ if ( Type != ThresholdType )  {
 }
 
 
-return ( Thresh );
+return Thresh;
 
 }
 
@@ -873,7 +874,7 @@ if ( Type != PwlFunctionType )  {
 }
 
 
-return ( PWL );
+return PWL;
 
 }
 
@@ -931,11 +932,11 @@ Dictionary & Dictionary::operator=(const Dictionary & d)
 
 {
 
-if ( this == &d )  return ( * this );
+if ( this == &d )  return *this;
 
 assign(d);
 
-return ( * this );
+return *this;
 
 }
 
@@ -947,9 +948,9 @@ void Dictionary::init_from_scratch()
 
 {
 
-e = (DictionaryEntry **) 0;
+e = (DictionaryEntry **) nullptr;
 
-Parent = (Dictionary *) 0;
+Parent = (Dictionary *) nullptr;
 
 
 Nentries = 0;
@@ -972,15 +973,13 @@ void Dictionary::clear()
 
 if ( e )  {
 
-   int j;
+   for (int j=0; j<Nalloc; ++j)  {
 
-   for (j=0; j<Nalloc; ++j)  {
-
-      if ( e[j] )  { delete e[j];  e[j] = (DictionaryEntry *) 0; }
+      if ( e[j] )  { delete e[j];  e[j] = (DictionaryEntry *) nullptr; }
 
    }
 
-   delete [] e;  e = (DictionaryEntry **) 0;
+   delete [] e;  e = (DictionaryEntry **) nullptr;
 
 }
 
@@ -990,7 +989,7 @@ Nalloc = 0;
 
 IsArray = false;
 
-Parent = (Dictionary *) 0;
+Parent = (Dictionary *) nullptr;
 
 LastLookupStatus = false;
 
@@ -1057,9 +1056,7 @@ out << prefix << "Parent   = " << (void *) Parent << "\n";
 
 out << prefix << "IsArray  = " << bool_to_string(IsArray) << "\n";
 
-int j;
-
-for (j=0; j<Nentries; ++j)  {
+for (int j=0; j<Nentries; ++j)  {
 
    out << prefix << "Dictionary Entry[" << j << "] ...\n";
 
@@ -1085,9 +1082,7 @@ void Dictionary::dump_config_format(ostream & out, int depth) const
 
 {
 
-int j;
-
-for (j=0; j<Nentries; ++j)  {
+for (int j=0; j<Nentries; ++j)  {
 
    e[j]->dump_config_format(out, depth + 1);
 
@@ -1116,21 +1111,21 @@ if ( Nalloc >= n )  return;
 n = dictionary_alloc_inc*((n + dictionary_alloc_inc - 1)/dictionary_alloc_inc);
 
 int j;
-DictionaryEntry ** u = (DictionaryEntry **) 0;
+DictionaryEntry ** u = (DictionaryEntry **) nullptr;
 
 u = new DictionaryEntry * [n];
 
-for (j=0; j<n; ++j)  u[j] = (DictionaryEntry *) 0;
+for (j=0; j<n; ++j)  u[j] = (DictionaryEntry *) nullptr;
 
 if ( e )  {
 
    for (j=0; j<Nentries; ++j)  u[j] = e[j];
 
-   delete [] e;  e = (DictionaryEntry **) 0;
+   delete [] e;  e = (DictionaryEntry **) nullptr;
 
 }
 
-e = u;   u = (DictionaryEntry **) 0;
+e = u;   u = (DictionaryEntry **) nullptr;
 
 Nalloc = n;
 
@@ -1218,9 +1213,7 @@ void Dictionary::store(const Dictionary & d)
 
 {
 
-int j;
-
-for (j=0; j<(d.n_entries()); ++j)  {
+for (int j=0; j<(d.n_entries()); ++j)  {
 
    store( *(d[j]) );
 
@@ -1253,7 +1246,7 @@ if ( (n < 0) || (n >= Nentries) )  {
 
 }
 
-return ( e[n] );
+return e[n];
 
 }
 
@@ -1270,13 +1263,13 @@ if ( Nentries == 0 )  {
 
    LastLookupStatus = false;
 
-   return ( (const DictionaryEntry *) 0 );
+   return (const DictionaryEntry *) nullptr;
 }
 
 int j;
 StringArray scope;
 ConcatString Name = name;
-const DictionaryEntry * E = (const DictionaryEntry *) 0;
+const DictionaryEntry * E = (const DictionaryEntry *) nullptr;
 Dictionary * D = this;
 
 
@@ -1300,14 +1293,14 @@ for (j=0; j<(scope.n_elements() - 1); ++j)  {
 
       LastLookupStatus = false;
 
-      return ( (const DictionaryEntry *) 0 );
+      return (const DictionaryEntry *) nullptr;
    }
 
    if ( ! E->is_dictionary() )  {
 
       LastLookupStatus = false;
 
-      return ( (const DictionaryEntry *) 0 );
+      return (const DictionaryEntry *) nullptr;
    }
 
    D = E->dict_value();
@@ -1326,7 +1319,7 @@ if ( E )  {
 
    LastLookupStatus = (E != 0);
 
-   return ( E );
+   return E;
 }
 
    //
@@ -1345,9 +1338,9 @@ if ( search_parent )  {
    //  done
    //
 
-LastLookupStatus = (E != 0);
+LastLookupStatus = (E != nullptr);
 
-return ( E );
+return E;
 
 }
 
@@ -1363,18 +1356,16 @@ if ( Nentries == 0 )  {
 
    LastLookupStatus = false;
 
-   return ( (const DictionaryEntry *) 0 );
+   return (const DictionaryEntry *) nullptr;
 }
 
-int j;
-
-for (j=0; j<Nentries; ++j)  {
+for (int j=0; j<Nentries; ++j)  {
 
    if ( e[j]->Name == name )  {
 
       LastLookupStatus = (e[j] != 0);
 
-      return ( e[j] );
+      return e[j];
    }
 
 }
@@ -1383,7 +1374,7 @@ for (j=0; j<Nentries; ++j)  {
    //  try parent
    //
 
-const DictionaryEntry * E = (const DictionaryEntry *) 0;
+const DictionaryEntry * E = (const DictionaryEntry *) nullptr;
 
 if ( search_parent )  {
 
@@ -1394,9 +1385,9 @@ if ( search_parent )  {
    //  done
    //
 
-LastLookupStatus = (E != 0);
+LastLookupStatus = (E != nullptr);
 
-return ( E );
+return E;
 
 }
 
@@ -1432,14 +1423,13 @@ void Dictionary::patch_parents()
 
 {
 
-int j;
-Dictionary * d = (Dictionary *) 0;
+Dictionary * d = (Dictionary *) nullptr;
 ConfigObjectType t = no_config_object_type;
 
 
-for (j=0; j<Nentries; ++j)  {
+for (int j=0; j<Nentries; ++j)  {
 
-   d = (Dictionary *) 0;
+   d = (Dictionary *) nullptr;
 
    t = e[j]->type();
 
@@ -1519,7 +1509,7 @@ if ( !Entry || !is_correct_type )  {
 
 }
 
-return ( Entry->b_value() );
+return Entry->b_value();
 
 }
 
@@ -1564,11 +1554,11 @@ if ( !Entry || !is_correct_type )  {
 
    }
 
-   return ( bad_data_int );
+   return bad_data_int;
 
 }
 
-return ( Entry->i_value() );
+return Entry->i_value();
 
 }
 
@@ -1596,7 +1586,7 @@ if ( Entry )  {
     if ( Entry->type() == ThresholdType &&
          Entry->thresh_value()->get_type() == thresh_na )  {
 
-       return ( bad_data_double );
+       return bad_data_double;
 
     }
 }
@@ -1630,7 +1620,7 @@ if ( !Entry || !is_correct_type )  {
 
    }
 
-   return ( bad_data_double );
+   return bad_data_double;
 
 }
 
@@ -1641,7 +1631,7 @@ if ( !Entry || !is_correct_type )  {
      if ( Entry->type() == FloatType   )  v = Entry->d_value();
 else if ( Entry->type() == IntegerType )  v = (double) Entry->i_value();
 
-return ( v );
+return v;
 
 }
 
@@ -1657,7 +1647,7 @@ NumArray Dictionary::lookup_num_array(const char * name,
 {
 
 const DictionaryEntry * Entry = lookup(name, search_parent);
-const Dictionary * Dict = (const Dictionary *) 0;
+const Dictionary * Dict = (const Dictionary *) nullptr;
 ConfigObjectType Type = no_config_object_type;
 bool is_correct_type = false;
 NumArray array;
@@ -1693,7 +1683,7 @@ if ( !Entry || !is_correct_type )  {
 
    }
 
-   return ( array );
+   return array;
 
 }
 
@@ -1705,7 +1695,7 @@ if ( Entry->type() == IntegerType )  {
 
    array.add( Entry->i_value() );
 
-   return ( array );
+   return array;
 
 }
 
@@ -1717,7 +1707,7 @@ if ( Entry->type() == FloatType )  {
 
    array.add( Entry->d_value() );
 
-   return ( array );
+   return array;
 
 }
 
@@ -1729,7 +1719,7 @@ if ( Entry->type() == BooleanType )  {
 
    array.add( Entry->b_value() );
 
-   return ( array );
+   return array;
 
 }
 
@@ -1766,7 +1756,7 @@ for (int i=0; i<Dict->n_entries(); i++)  {
 
 }
 
-return ( array );
+return array;
 
 }
 
@@ -1787,7 +1777,7 @@ NumArray num_array = lookup_num_array(name, error_out, print_warning, search_par
 for (int i=0; i<num_array.n_elements(); i++)
    array.add( nint(num_array[i]) );
 
-return ( array );
+return array;
 
 }
 
@@ -1834,11 +1824,11 @@ if ( !Entry || !is_correct_type )  {
 
    ConcatString s;
 
-   return ( s );
+   return s;
 
 }
 
-return ( Entry->string_value() );
+return Entry->string_value();
 
 }
 
@@ -1887,7 +1877,7 @@ if ( !Entry || !is_correct_type )  {
 
    }
 
-   return ( array );
+   return array;
 
 }
 
@@ -1899,7 +1889,7 @@ if ( Entry->type() == StringType )  {
 
    array.add( Entry->string_value() );
 
-   return ( array );
+   return array;
 
 }
 
@@ -1938,7 +1928,7 @@ for (int i=0; i<Dict->n_entries(); i++)  {
 
 }
 
-return ( array );
+return array;
 
 }
 
@@ -1988,11 +1978,11 @@ if ( !Entry || !is_correct_type )  {
 
    SingleThresh s;
 
-   return ( s );
+   return s;
 
 }
 
-return ( *(Entry->thresh_value()) );
+return *(Entry->thresh_value());
 
 }
 
@@ -2043,7 +2033,7 @@ if ( !Entry || !is_correct_type )  {
 
    }
 
-   return ( array );
+   return array;
 
 }
 
@@ -2055,7 +2045,7 @@ if ( Entry->type() == ThresholdType )  {
 
    array.add( *(Entry->thresh_value()) );
 
-   return ( array );
+   return array;
 
 }
 
@@ -2095,7 +2085,7 @@ for (int i=0; i<Dict->n_entries(); i++)  {
 
 }
 
-return ( array );
+return array;
 
 }
 
@@ -2142,11 +2132,11 @@ if ( !Entry || !is_correct_type )  {
 
    }
 
-   return ( (Dictionary *) 0 );
+   return (Dictionary *) nullptr;
 
 }
 
-return ( Entry->dict_value() );
+return Entry->dict_value();
 
 }
 
@@ -2191,11 +2181,11 @@ if ( !Entry || !is_correct_type )  {
 
    }
 
-   return ( (Dictionary *) 0 );
+   return (Dictionary *) nullptr;
 
 }
 
-return ( Entry->array_value() );
+return Entry->array_value();
 
 }
 
@@ -2217,11 +2207,11 @@ int Dictionary::lookup_seconds(const char * name,
 ConcatString cs = lookup_string(name, false, true, search_parent);
 
 if ( LastLookupStatus )  {
-   if ( cs.empty() )  return ( bad_data_int );
-   else               return ( timestring_to_sec( cs.c_str() ) );
+   if ( cs.empty() )  return bad_data_int;
+   else               return timestring_to_sec( cs.c_str() );
 }
 
-return ( lookup_int(name, error_out, print_warning, search_parent) );
+return lookup_int(name, error_out, print_warning, search_parent);
 
 }
 
@@ -2239,11 +2229,9 @@ IntArray Dictionary::lookup_seconds_array(const char * name,
 StringArray sa = lookup_string_array(name, error_out, print_warning, search_parent);
 IntArray ia;
 
-int j;
+for (int j=0; j<sa.n_elements(); ++j)  ia.add( timestring_to_sec( sa[j].c_str() ));
 
- for (j=0; j<sa.n_elements(); ++j)  ia.add( timestring_to_sec( sa[j].c_str() ));
-
-return ( ia );
+return ia;
 
 }
 
@@ -2259,8 +2247,8 @@ unixtime Dictionary::lookup_unixtime(const char * name,
 
 ConcatString cs = lookup_string(name, error_out, print_warning, search_parent);
 
-if ( cs.empty() )  return ( (unixtime) 0 );
-else               return ( timestring_to_unix( cs.c_str() ) );
+if ( cs.empty() )  return (unixtime) nullptr;
+else               return timestring_to_unix( cs.c_str() );
 
 }
 
@@ -2277,11 +2265,9 @@ TimeArray Dictionary::lookup_unixtime_array(const char * name,
 StringArray sa = lookup_string_array(name, error_out, print_warning, search_parent);
 TimeArray ta;
 
-int j;
+for (int j=0; j<sa.n_elements(); ++j)  ta.add( timestring_to_unix( sa[j].c_str() ));
 
- for (j=0; j<sa.n_elements(); ++j)  ta.add( timestring_to_unix( sa[j].c_str() ));
-
-return ( ta );
+return ta;
 
 }
 
@@ -2327,11 +2313,11 @@ if ( !Entry || !is_correct_type )  {
 
    }
 
-   return ( (PiecewiseLinear *) 0 );
+   return (PiecewiseLinear *) nullptr;
 
 }
 
-return ( Entry->pwl_value() );
+return Entry->pwl_value();
 
 }
 
@@ -2437,7 +2423,7 @@ int j;
 
 for (j=0; j<max_dictionary_depth; ++j)  {
 
-   D[j] = (Dictionary *) 0;
+   D[j] = (Dictionary *) nullptr;
 
 }
 
@@ -2459,7 +2445,7 @@ int j;
 
 for (j=1; j<max_dictionary_depth; ++j)  {   //  j starts at one, here
 
-   if ( D[j] )  { delete D[j];  D[j] = (Dictionary *) 0; }
+   if ( D[j] )  { delete D[j];  D[j] = (Dictionary *) nullptr; }
 
 }
 
@@ -2509,9 +2495,7 @@ Indent prefix(depth);
 
 out << prefix << "Nelements = " << Nelements << '\n';
 
-int j;
-
-for (j=0; j<Nelements; ++j)  {
+for (int j=0; j<Nelements; ++j)  {
 
    out << prefix << "Stack Element [" << j << "] ...\n";
 
@@ -2538,10 +2522,9 @@ void DictionaryStack::dump_config_format(ostream & out, int depth) const
 
 {
 
-int j;
 const ConcatString s = config_prefix(depth);
 
-for (j=0; j<Nelements; ++j)  {
+for (int j=0; j<Nelements; ++j)  {
 
    out << s << "Stack Element " << j << "...\n\n";
 
@@ -2611,7 +2594,7 @@ if ( Nelements == 0 )  {
 
 }
 
-return ( D[Nelements - 1]->is_array() );
+return D[Nelements - 1]->is_array();
 
 }
 
@@ -2625,7 +2608,7 @@ const Dictionary * DictionaryStack::top() const
 
 if ( Nelements == 0 )  return ( (const Dictionary *) 0 );
 
-return ( D[Nelements - 1] );
+return D[Nelements - 1];
 
 }
 
@@ -2647,7 +2630,7 @@ if ( Nelements <= 1 )  {
 
 }
 
-delete D[Nelements - 1];   D[Nelements - 1] = (Dictionary *) 0;
+delete D[Nelements - 1];   D[Nelements - 1] = (Dictionary *) nullptr;
 
 --Nelements;
 
@@ -2717,7 +2700,7 @@ entry.set_dict (name, *(D[Nelements - 1]));
 
 D[Nelements - 2]->store(entry);
 
-delete D[Nelements - 1];  D[Nelements - 1] = (Dictionary *) 0;
+delete D[Nelements - 1];  D[Nelements - 1] = (Dictionary *) nullptr;
 
 --Nelements;
 
@@ -2757,7 +2740,7 @@ E.set_name(name);
 
 D[Nelements - 2]->store(E);
 
-delete D[Nelements - 1];  D[Nelements - 1] = (Dictionary *) 0;
+delete D[Nelements - 1];  D[Nelements - 1] = (Dictionary *) nullptr;
 
 --Nelements;
 
@@ -2789,16 +2772,16 @@ const DictionaryEntry * DictionaryStack::lookup(const std::string name) const
 
 {
 
-if ( Nelements == 0 )  return ( (const DictionaryEntry *) 0 );
+if ( Nelements == 0 )  return (const DictionaryEntry *) nullptr;
 
 int j;
-const DictionaryEntry * E = (const DictionaryEntry *) 0;
+const DictionaryEntry * E = (const DictionaryEntry *) nullptr;
 
 for (j=(Nelements - 1); j>=0; --j)  {
 
    E = D[j]->lookup(name);
 
-   if ( E )  return ( E );
+   if ( E )  return E;
 
 }
 
@@ -2806,7 +2789,7 @@ for (j=(Nelements - 1); j>=0; --j)  {
    //  nope
    //
 
-return ( (const DictionaryEntry *) 0 );
+return (const DictionaryEntry *) nullptr;
 
 }
 
@@ -2830,7 +2813,7 @@ ConcatString config_prefix(int depth)
 int j;
 ConcatString s;
 
-if ( depth == 0 )   { s << ' ';  return ( s ); }
+if ( depth == 0 )   { s << ' ';  return s; }
 
 for (j=0; j<depth; ++j)  {
 
@@ -2838,7 +2821,7 @@ for (j=0; j<depth; ++j)  {
 
 }
 
-return ( s );
+return s;
 
 }
 
