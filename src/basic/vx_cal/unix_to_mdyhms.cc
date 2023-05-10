@@ -11,9 +11,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
-
 #include <iostream>
 #include <unistd.h>
 #include <string.h>
@@ -21,6 +18,9 @@ using namespace std;
 #include <cmath>
 
 #include "vx_cal.h"
+
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -131,7 +131,13 @@ void unix_to_mdyhms(unixtime u, int & month, int & day, int & year, int & hour, 
 
 {
 
-unixtime i, j, n, l, d, m, y;
+unixtime i;
+unixtime j;
+unixtime n;
+unixtime l;
+unixtime d;
+unixtime m;
+unixtime y;
 
 
 n = u/86400;
