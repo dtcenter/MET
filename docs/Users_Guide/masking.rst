@@ -47,7 +47,7 @@ Required arguments for gen_vx_mask
 
 2. The **mask_file** argument defines the masking information, see below.
 
-• For "poly", "poly_xy", "box", "circle", and "track" masking, specify an ASCII Lat/Lon file (see :ref:`Types of masking available in gen_vx_mask` for details on how to construct the ASCII Lat/Lon file).
+• For "poly", "poly_xy", "box", "circle", and "track" masking, specify an ASCII Lat/Lon file (see :ref:`Types_of_masking_gen_vx_mask` for details on how to construct the ASCII Lat/Lon file).
 
 • For "grid" and "data" masking, specify a gridded data file.
 
@@ -97,6 +97,8 @@ Optional arguments for gen_vx_mask
 16. The **-v level** option indicates the desired level of verbosity. The value of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity will increase the amount of logging.
 
 17. The **-compress level** option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of "level" will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
+
+.. _Types_of_masking_gen_vx_mask:
 
 Types of masking available in gen_vx_mask
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
