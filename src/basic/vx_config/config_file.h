@@ -90,9 +90,9 @@ class MetConfig : public Dictionary {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline StringArray MetConfig::filename() const { return ( Filename ); }
+inline StringArray MetConfig::filename() const { return Filename; }
 
-inline bool MetConfig::debug() const { return ( Debug ); }
+inline bool MetConfig::debug() const { return Debug; }
 
 
 ////////////////////////////////////////////////////////////////////////
