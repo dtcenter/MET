@@ -1567,33 +1567,33 @@ in the following ways:
   two ways: as a lat/lon polygon or using a gridded data file such as the
   NetCDF output of the Gen-Vx-Mask tool.
 
-  * An ASCII file containing a lat/lon polygon.
+* An ASCII file containing a lat/lon polygon.
 
-    * The file must contain a name for the region followed by the latitude
-      (degrees north) and longitude (degrees east) for each vertex of the boundary.
-      The values are separated by whitespace (e.g. spaces or newlines), and the
-      first and last polygon points are connected.
-      The general form is "poly_name lat1 lon1 lat2 lon2... latn lonn".
-      Here is an example of a rectangle consisting of 4 points:
+  * The file must contain a name for the region followed by the latitude
+    (degrees north) and longitude (degrees east) for each vertex of the boundary.
+    The values are separated by whitespace (e.g. spaces or newlines), and the
+    first and last polygon points are connected.
+    The general form is "poly_name lat1 lon1 lat2 lon2... latn lonn".
+    Here is an example of a rectangle consisting of 4 points:
 
-      .. code-block:: none
+    .. code-block:: none
 
-        RECTANGLE
-        25  -120
-        55  -120
-        55   -70
-        25   -70
+       RECTANGLE
+       25  -120
+       55  -120
+       55   -70
+       25   -70
 
-      Several masking polygons used by NCEP are predefined in the
-      installed *share/met/poly* directory. Creating a new polygon is as
-      simple as creating a text file with a name for the polygon followed
-      by the lat/lon points which define its boundary. Adding a new masking
-      polygon requires no code changes and no recompiling. Internally, the
-      lat/lon polygon points are converted into x/y values in the grid. The
-      lat/lon values for the observation points are also converted into x/y
-      grid coordinates. The computations performed to check whether the
-      observation point falls within the polygon defined is done in x/y
-      grid space.
+    Several masking polygons used by NCEP are predefined in the
+    installed *share/met/poly* directory. Creating a new polygon is as
+    simple as creating a text file with a name for the polygon followed
+    by the lat/lon points which define its boundary. Adding a new masking
+    polygon requires no code changes and no recompiling. Internally, the
+    lat/lon polygon points are converted into x/y values in the grid. The
+    lat/lon values for the observation points are also converted into x/y
+    grid coordinates. The computations performed to check whether the
+    observation point falls within the polygon defined is done in x/y
+    grid space.
 
   * The NetCDF output of the gen_vx_mask tool.
 
