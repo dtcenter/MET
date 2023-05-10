@@ -54,7 +54,7 @@ struct RadParams {
 
    RadParams();
 
-   void dump(ostream &) const;
+   void dump(std::ostream &) const;
 
 };
 
@@ -76,7 +76,7 @@ struct ChannelParams {
 
    ChannelParams();
 
-   void dump(ostream &) const;
+   void dump(std::ostream &) const;
 
 };
 

@@ -112,7 +112,7 @@ class WwmcaRegridder {
 
       void clear();
 
-      void dump(ostream &, int = 0) const;
+      void dump(std::ostream &, int = 0) const;
 
       void set_cp_nh_file(const char *);
       void set_cp_sh_file(const char *);

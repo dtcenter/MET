@@ -90,7 +90,7 @@ class Token {
 
       void clear();
 
-      void dump(ostream &, int = 0) const;
+      void dump(std::ostream &, int = 0) const;
 
 
       TokenType type;
@@ -142,7 +142,7 @@ class Token {
 ////////////////////////////////////////////////////////////////////////
 
 
-extern ostream & operator<<(ostream &, const Token &);
+extern std::ostream & operator<<(std::ostream &, const Token &);
 
 
 ////////////////////////////////////////////////////////////////////////

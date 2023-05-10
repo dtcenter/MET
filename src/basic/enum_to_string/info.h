@@ -106,7 +106,7 @@ inline const char * EnumInfo::header() const { return ( Header ); }
 ////////////////////////////////////////////////////////////////////////
 
 
-extern ostream & operator<<(ostream &, const EnumInfo &);
+extern std::ostream & operator<<(std::ostream &, const EnumInfo &);
 
 
 ////////////////////////////////////////////////////////////////////////
