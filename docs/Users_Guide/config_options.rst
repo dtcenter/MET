@@ -1564,13 +1564,13 @@ in the following ways:
 
 * The "poly" entry contains a comma-separated list of files that define
   verification masking regions. These masking regions may be specified in
-  two ways: as a lat/lon polygon or using a gridded data file such as the
-  NetCDF output of the Gen-Vx-Mask tool.
+  two ways: in an ASCII file containing lat/lon points defining the mask polygon,
+  or using a gridded data file such as the NetCDF output of the Gen-Vx-Mask tool.
+  Some details for each of these options are described below:
 
-* An ASCII file containing a lat/lon polygon.
-
-  * The file must contain a name for the region followed by the latitude
-    (degrees north) and longitude (degrees east) for each vertex of the boundary.
+  * If providing an ASCII file containing the lat/lon points defining the mask
+    polygon, the file must contain a name for the region followed by the latitude
+    (degrees north) and longitude (degrees east) for each vertex of the polygon.
     The values are separated by whitespace (e.g. spaces or newlines), and the
     first and last polygon points are connected.
     The general form is "poly_name lat1 lon1 lat2 lon2... latn lonn".
@@ -1595,16 +1595,17 @@ in the following ways:
     observation point falls within the polygon defined is done in x/y
     grid space.
 
-* The NetCDF output of the gen_vx_mask tool.
+  * The NetCDF output of the gen_vx_mask tool. Please see :numref:`masking`
+    for more details.
 
-* Any gridded data file that MET can read may be used to define a
-  verification masking region. Users must specify a description of the
-  field to be used from the input file and, optionally, may specify a
-  threshold to be applied to that field. Once this threshold is
-  applied, any grid point where the resulting field is 0, the mask is
-  turned off. Any grid point where it is non-zero, the mask is turned
-  on.
-  For example, "sample.grib {name = \"TMP\"; level = \"Z2\";} >273"
+  * Any gridded data file that MET can read may be used to define a
+    verification masking region. Users must specify a description of the
+    field to be used from the input file and, optionally, may specify a
+    threshold to be applied to that field. Once this threshold is
+    applied, any grid point where the resulting field is 0, the mask is
+    turned off. Any grid point where it is non-zero, the mask is turned
+    on.
+    For example, "sample.grib {name = \"TMP\"; level = \"Z2\";} >273"
 
 * The "sid" entry is an array of strings which define groups of
   observation station ID's over which to compute statistics. Each entry
