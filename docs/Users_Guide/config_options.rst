@@ -1577,6 +1577,7 @@ in the following ways:
     Here is an example of a rectangle consisting of 4 points:
 
     .. code-block:: none
+       :caption: ASCII Rectangle Polygon Mask
 
        RECTANGLE
        25  -120
