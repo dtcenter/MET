@@ -16,8 +16,6 @@ static const int debug = 0;
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 
@@ -33,6 +31,9 @@ using namespace std;
 
 #include "vx_log.h"
 #include "enum_to_string.h"
+
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -157,7 +158,7 @@ if ( parse_status != 0 )  {
 
 }
 
-return ( 0 );
+return 0;
 
 }
 
@@ -171,13 +172,13 @@ void parse_command_line(int &argc, char **argv)
 
 if ( argc == 1 )  { usage();  exit ( 1 ); }
 
-int j, found;
+int found;
 
 do {
 
    found = 0;
 
-   for (j=1; j<argc; ++j)  {
+   for (int j=1; j<argc; ++j)  {
 
       if ( argv[j][0] == '-' )  { found = 1;  break; }
 
@@ -217,9 +218,7 @@ void shift_down(int &argc, char **argv, int pos, int shift)
 
 {
 
-int j;
-
-for (j=pos; j<(argc - shift); ++j)  argv[j] = argv[j + shift];
+for (int j=pos; j<(argc - shift); ++j)  argv[j] = argv[j + shift];
 
 argc -= shift;
 
@@ -396,7 +395,7 @@ int yywrap()
 
 {
 
-return ( 1 );
+return 1;
 
 }
 

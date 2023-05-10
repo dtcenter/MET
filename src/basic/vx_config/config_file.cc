@@ -10,8 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <fstream>
 #include <unistd.h>
@@ -28,6 +26,9 @@ using namespace std;
 
 #include "config_file.h"
 #include "config_constants.h"
+
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -256,7 +257,7 @@ ConcatString MetConfig::get_tmp_dir()
       else                    tmp_dir = default_tmp_dir;
    }
 
-   return ( tmp_dir );
+   return tmp_dir;
 }
 
 
@@ -276,7 +277,7 @@ int MetConfig::nc_compression()
       if ( !LastLookupStatus )  n = default_nc_compression;
    }
 
-   return ( n );
+   return n;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -289,7 +290,7 @@ int n = lookup_int(conf_key_output_precision, false);
 
 if ( !LastLookupStatus )  n = default_precision;
 
-return ( n );
+return n;
 
 }
 
@@ -318,7 +319,7 @@ temp_filename = make_temp_file_name(temp_filename.c_str(), 0);
  
 recursive_envs(name, temp_filename.c_str());
 
-bison_input_filename = (const char *) temp_filename.c_str();
+bison_input_filename = temp_filename.c_str();
 
 dict_stack = &DS;
 
@@ -348,13 +349,13 @@ parse_status = configparse();
 if ( configin )  {
 
    fclose(configin);
-   configin = (FILE *) 0;
+   configin = (FILE *) nullptr;
 
 }
 
 if ( parse_status != 0 )  {
 
-   return ( false );
+   return false;
 
 }
 
@@ -380,9 +381,9 @@ if ( DS.n_elements() != 1 )  {
 
 patch_parents();
 
-bison_input_filename = (const char *) 0;
+bison_input_filename = (const char *) nullptr;
 
-dict_stack = (DictionaryStack *) 0;
+dict_stack = (DictionaryStack *) nullptr;
 
 LineNumber = 1;
 
@@ -394,7 +395,7 @@ set_exit_on_warning();
 
 unlink(temp_filename.c_str());
 
-return ( true );
+return true;
 
 }
 
@@ -424,7 +425,7 @@ ofstream out;
 ConcatString temp_filename = get_tmp_dir();
 
 temp_filename << "/" << "met_config";
-temp_filename = make_temp_file_name(temp_filename.c_str(), 0);
+temp_filename = make_temp_file_name(temp_filename.c_str(), nullptr);
  
 out.open(temp_filename.c_str());
 
@@ -446,7 +447,7 @@ bool status = read(temp_filename.c_str());
 
 remove_temp_file(temp_filename);
 
-return ( status );
+return status;
 
 }
 
@@ -458,13 +459,13 @@ const DictionaryEntry * MetConfig::lookup(const char * name)
 
 {
 
-const DictionaryEntry * _e = (const DictionaryEntry *) 0;
+const DictionaryEntry * _e = (const DictionaryEntry *) nullptr;
 
 _e = Dictionary::lookup(name);
 
-LastLookupStatus = (_e != 0);
+LastLookupStatus = (_e != nullptr);
 
-return ( _e );
+return _e;
 
 }
 
@@ -476,7 +477,7 @@ const DictionaryEntry * MetConfig::lookup(const char * name, const ConfigObjectT
 
 {
 
-const DictionaryEntry * _e = (const DictionaryEntry *) 0;
+const DictionaryEntry * _e = (const DictionaryEntry *) nullptr;
 
 _e = Dictionary::lookup(name);
 
@@ -484,11 +485,11 @@ if ( !_e || (_e->type() != expected_type) )  {
 
    LastLookupStatus = false;
 
-   _e = 0;
+   _e = nullptr;
 
 }
 
-return ( _e );
+return _e;
 
 }
 
@@ -574,7 +575,8 @@ bool replace_env(string & line)
 
 {
 
-size_t pos1, pos2;
+size_t pos1;
+size_t pos2;
 string out;
 
    //
@@ -593,7 +595,7 @@ if ( (pos1 = line.find("//")) != string::npos )  {
 
 pos1 = line.find("${");
 
-if ( pos1 == string::npos )  return ( false );
+if ( pos1 == string::npos )  return false;
 
    //
    //  replace the environment variable
@@ -609,7 +611,7 @@ if ( (pos2 = line.find('}', pos1)) == string::npos )  {
 }
 
 string env;
-char * env_value = 0;
+char * env_value = nullptr;
 
 env = line.substr(pos1 + 2, pos2 - pos1 - 2);
 
@@ -637,7 +639,7 @@ out += line.substr(pos2 + 1);
 
 line = out;
 
-return ( true );
+return true;
 
 }
 

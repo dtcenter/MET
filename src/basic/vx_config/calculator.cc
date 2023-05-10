@@ -15,8 +15,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -24,6 +22,9 @@ using namespace std;
 
 #include "calculator.h"
 #include "celltype_to_string.h"
+
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -83,14 +84,14 @@ Calculator & Calculator::operator=(const Calculator & c)
 
 {
 
-if ( this == &c )  return ( * this );
+if ( this == &c )  return *this;
 
 NumberStack::operator=(c);
 
 dict_stack = c.dict_stack;
 
 
-return ( * this );
+return *this;
 
 }
 
@@ -119,7 +120,8 @@ void Calculator::do_add()
 
 {
 
-Number a, b;
+Number a;
+Number b;
 Number result;
 
 
@@ -151,7 +153,8 @@ void Calculator::do_subtract()
 
 {
 
-Number a, b;
+Number a;
+Number b;
 Number result;
 
 
@@ -183,7 +186,8 @@ void Calculator::do_multiply()
 
 {
 
-Number a, b;
+Number a;
+Number b;
 Number result;
 
 
@@ -215,7 +219,8 @@ void Calculator::do_divide()
 
 {
 
-Number a, b;
+Number a;
+Number b;
 Number result;
 
 
@@ -266,7 +271,8 @@ void Calculator::do_power()
 
 {
 
-Number a, b;
+Number a;
+Number b;
 Number result;
 
 
@@ -418,10 +424,9 @@ void Calculator::do_builtin(int which, const Number * n)
 
 {
 
-int j;
 const BuiltinInfo & info = binfo[which];
 
-for (j=0; j<(info.n_args); ++j)  push(n[j]);
+for (int j=0; j<(info.n_args); ++j)  push(n[j]);
 
 do_builtin(which);
 
@@ -437,7 +442,8 @@ void Calculator::do_builtin_1_arg(const BuiltinInfo & info)
 
 {
 
-Number a, result;
+Number a;
+Number result;
 
 a = pop();
 
@@ -463,7 +469,8 @@ if ( (info.i1) && (a.is_int) )  {
    //  nope, do a double
    //
 
-double x, y;
+double x;
+double y;
 
 
 x = as_double(a);
@@ -491,7 +498,8 @@ void Calculator::do_builtin_2_arg(const BuiltinInfo & info)
 
 {
 
-Number a, b;
+Number a;
+Number b;
 Number result;
 
 
@@ -520,12 +528,10 @@ if ( (info.i2) && (a.is_int) && (b.is_int) )  {
    //  nope, do a double
    //
 
-double x, y, z;
+double x = as_double(a);
+double y = as_double(b);
 
-x = as_double(a);
-y = as_double(b);
-
-z = info.d2(x, y);
+double z = info.d2(x, y);
 
 set_double(result, z);
 
@@ -549,7 +555,6 @@ void Calculator::do_user_func(const DictionaryEntry * cur_e)
 
 {
 
-int j;
 Number locals [max_user_function_args];
 const int n_args = cur_e->n_args();
 
@@ -559,7 +564,7 @@ const int n_args = cur_e->n_args();
    //    we just need to pop them off and load them in to the local vars
    //
 
-for (j=0; j<n_args; ++j)  {
+for (int j=0; j<n_args; ++j)  {
 
    locals[n_args - 1 - j] = pop();
 

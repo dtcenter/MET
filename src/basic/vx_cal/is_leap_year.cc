@@ -11,9 +11,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
-
 #include <iostream>
 #include <unistd.h>
 #include <string.h>
@@ -22,6 +19,9 @@ using namespace std;
 
 #include "vx_cal.h"
 #include "vx_log.h"
+
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -34,14 +34,14 @@ int is_leap_year(int year)
 year = abs(year);
 
 
-if ( year%4   )  return ( 0 );
+if ( year%4   )  return 0;
 
-if ( year%100 )  return ( 1 );
+if ( year%100 )  return 1;
 
-if ( year%400 )  return ( 0 );
+if ( year%400 )  return 0;
 
 
-return ( 1 );
+return 1;
 
 }
 
@@ -92,12 +92,17 @@ void increase_one_month(int &year, int &month) {
 
 #define SEC_MONTH (86400*30)
 #define SEC_YEAR  (86400*30*12)
-#define DAY_EPSILON 0.00002
+static const double DAY_EPSILON = 0.00002;
 
 unixtime add_to_unixtime(unixtime base_unixtime, int sec_per_unit,
                          double time_value, bool no_leap) {
+  int month;
+  int day;
+  int year;
+  int hour;
+  int minute;
+  int second;
   unixtime ut;
-  int month, day, year, hour, minute, second;
   unixtime time_value_ut = (unixtime)time_value;
   double time_fraction = time_value - time_value_ut;
   const char *method_name = "add_to_unixtime() -->";
@@ -117,10 +122,10 @@ unixtime add_to_unixtime(unixtime base_unixtime, int sec_per_unit,
     if (sec_per_unit == SEC_YEAR) {
       year += time_value_ut;
       time_fraction *= 12;      // 12 months/year
-      month_offset = (unixtime)time_fraction;
+      month_offset = (int)time_fraction;
       time_fraction -= month_offset;
     }
-    else month_offset = time_value_ut;
+    else month_offset = (int)time_value_ut;
 
     for (int idx=0; idx<month_offset; idx++) {
       increase_one_month(year, month);
@@ -129,15 +134,13 @@ unixtime add_to_unixtime(unixtime base_unixtime, int sec_per_unit,
       if (abs(time_fraction-0.5) < DAY_EPSILON) day = 15;
       else {
         day_offset = time_fraction * 30;
-        day += (int)day_offset;
-        if (day_offset - (int)day_offset > 0.5) day++;
+        day += (int)(day_offset + 0.5);
       }
     }
     else {
       day_offset = time_fraction * 30;
       time_value_ut = (int)day_offset;
-      day += time_value_ut;
-      if (day_offset - time_value_ut > 0.5) day++;
+      day += (int)(time_value_ut + 0.5);
       if (day > 30) {
          day -= 30;
          increase_one_month(year, month);
@@ -169,8 +172,8 @@ unixtime add_to_unixtime(unixtime base_unixtime, int sec_per_unit,
     // Other cases are as floating number
     if ((1.0 - time_fraction) < TIME_EPSILON) time_value_ut += 1;
     else if (time_fraction > TIME_EPSILON) use_ut = false;
-    if (use_ut) ut = (unixtime)(base_unixtime + sec_per_unit * time_value_ut);
-    else ut = (unixtime)(base_unixtime + sec_per_unit * time_value);
+    if (use_ut) ut = base_unixtime + sec_per_unit * time_value_ut;
+    else ut = base_unixtime + (unixtime)(sec_per_unit * time_value);
   }
   else {    //  no_leap year && unit = day
     unix_to_mdyhms(base_unixtime, month, day, year, hour, minute, second);
@@ -190,8 +193,8 @@ unixtime add_to_unixtime(unixtime base_unixtime, int sec_per_unit,
     day = day_offset;
     if (day == 0) day = 1;
     ut = mdyhms_to_unix(month, day, year, hour, minute, second);
-    if (time_fraction > (1-TIME_EPSILON) ) ut += sec_per_unit;
-    else if (time_fraction > TIME_EPSILON) ut += (time_fraction * sec_per_unit);
+    if (time_fraction > (1-TIME_EPSILON) ) ut += (unixtime)sec_per_unit;
+    else if (time_fraction > TIME_EPSILON) ut += (unixtime)(time_fraction * sec_per_unit);
   }
   mlog << Debug(5) <<  method_name
        << unix_to_yyyymmdd_hhmmss(base_unixtime)

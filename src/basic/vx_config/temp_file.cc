@@ -8,8 +8,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <cstdio>
 #include <iostream>
 #include <stdlib.h>
@@ -20,6 +18,8 @@ using namespace std;
 #include "temp_file.h"
 #include "file_exists.h"
 #include "vx_log.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -59,7 +59,7 @@ ConcatString make_temp_file_name(const char *prefix, const char *suffix) {
 
    } while(file_exists(s.c_str()));
 
-   return(s);
+   return s;
 }
 
 ////////////////////////////////////////////////////////////////////////

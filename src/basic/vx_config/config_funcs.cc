@@ -14,8 +14,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -24,6 +22,9 @@ using namespace std;
 #include "config_funcs.h"
 #include "calculator.h"
 #include "configobjecttype_to_string.h"
+
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -85,11 +86,11 @@ UserFunc_1Arg & UserFunc_1Arg::operator=(const UserFunc_1Arg & f)
 
 {
 
-if ( this == &f )  return ( * this );
+if ( this == &f )  return *this;
 
 assign(f);
 
-return ( * this );
+return *this;
 
 }
 
@@ -198,7 +199,7 @@ hp.run( V, &n);
 
 n = hp.pop();
 
-return ( as_double(n) );
+return as_double(n);
 
 }
 
@@ -256,11 +257,11 @@ UserFunc_MultiArg & UserFunc_MultiArg::operator=(const UserFunc_MultiArg & f)
 
 {
 
-if ( this == &f )  return ( * this );
+if ( this == &f )  return *this;
 
 assign(f);
 
-return ( * this );
+return *this;
 
 }
 
@@ -361,7 +362,7 @@ Number UserFunc_MultiArg::operator()(const Number * n) const
 
 hp.run( V, n);
 
-return ( hp.pop() );
+return hp.pop();
 
 }
 

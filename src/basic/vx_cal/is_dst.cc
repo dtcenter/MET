@@ -11,15 +11,15 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
 #include <cmath>
 
 #include "vx_cal.h"
+
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -69,8 +69,12 @@ int is_dst(int month, int day, int year, int hour, int minute, int second)
 
 {
 
-int mjd0, ly, year_type;
-unixtime T, dst_start, dst_stop;
+int mjd0;
+int ly;
+int year_type;
+unixtime T;
+unixtime dst_start;
+unixtime dst_stop;
 
 
 ly = is_leap_year(year);
@@ -87,7 +91,7 @@ dst_start = mdyhms_to_unix(dst_info[year_type].month_start,
                            dst_info[year_type].day_start,
                            year, 2, 0, 0);
 
-if ( T < dst_start )  return ( 0 );
+if ( T < dst_start )  return 0;
 
 
 
@@ -95,11 +99,11 @@ dst_stop  = mdyhms_to_unix(dst_info[year_type].month_stop,
                            dst_info[year_type].day_stop,
                            year, 2, 0, 0);
 
-if ( T > dst_stop )  return ( 0 );
+if ( T > dst_stop )  return 0;
 
 
 
-return ( 1 );
+return 1;
 
 }
 
@@ -112,13 +116,18 @@ int is_dst(unixtime T)
 {
 
 int a;
-int month, day, year, hour, minute, second;
+int month;
+int day;
+int year;
+int hour;
+int minute;
+int second;
 
 unix_to_mdyhms(T, month, day, year, hour, minute, second);
 
 a = is_dst(month, day, year, hour, minute, second);
 
-return ( a );
+return a;
 
 }
 

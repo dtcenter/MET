@@ -14,9 +14,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -29,6 +26,9 @@ using namespace std;
 #include "dictionary.h"
 
 #include "celltype_to_string.h"
+
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -90,13 +90,13 @@ IcodeCell & IcodeCell::operator=(const IcodeCell & icc)
 
 {
 
-if ( this == &icc )  return ( * this );
+if ( this == &icc )  return *this;
 
 
 assign(icc);
 
 
-return ( * this );
+return *this;
 
 }
 
@@ -137,9 +137,9 @@ i = 0;
 
 d = 0.0;
 
-if ( name )  { delete [] name;   name = (char *) 0; }
+if ( name )  { delete [] name;   name = (char *) nullptr; }
 
-if ( text )  { delete [] text;   text = (char *) 0; }
+if ( text )  { delete [] text;   text = (char *) nullptr; }
 
 e = 0;
 
@@ -262,7 +262,7 @@ switch ( type )  {
 }   //  switch
 
 
-return ( x );
+return x;
 
 }
 
@@ -287,7 +287,7 @@ switch ( type )  {
 
 }   //  switch
 
-return ( k );
+return k;
 
 }
 
@@ -578,13 +578,13 @@ IcodeVector & IcodeVector::operator=(const IcodeVector & i)
 
 {
 
-if ( this == &i )  return ( *this );
+if ( this == &i )  return *this;
 
 
 assign(i);
 
 
-return ( *this );
+return *this;
 
 }
 
@@ -621,9 +621,7 @@ extend(i.Ncells);
 
 Ncells = i.Ncells;
 
-int j;
-
-for (j=0; j<Ncells; ++j)  {
+for (int j=0; j<Ncells; ++j)  {
 
    Cell[j] = i.Cell[j];
 
@@ -642,7 +640,7 @@ void IcodeVector::clear()
 
 {
 
-if ( Cell )  { delete [] Cell;  Cell = (IcodeCell *) 0; }
+if ( Cell )  { delete [] Cell;  Cell = (IcodeCell *) nullptr; }
 
 
 Nalloc = Ncells = 0;
@@ -663,7 +661,7 @@ void IcodeVector::extend(int n)
 if ( n <= Nalloc )  return;
 
 int k;
-IcodeCell * u = (IcodeCell *) 0;
+IcodeCell * u = (IcodeCell *) nullptr;
 
 
 k = n/icodevector_alloc_inc;
@@ -690,13 +688,13 @@ if ( Cell )  {
 
    }
 
-   delete [] Cell;   Cell = (IcodeCell *) 0;
+   delete [] Cell;   Cell = (IcodeCell *) nullptr;
 
 }
 
 Cell = u;
 
-u = (IcodeCell *) 0;
+u = (IcodeCell *) nullptr;
 
 Nalloc = n;
 
@@ -722,7 +720,7 @@ if ( (n < 0) || (n >= Ncells) )  {
 
 }
 
-return ( Cell[n] );
+return Cell[n];
 
 }
 
@@ -742,7 +740,7 @@ if ( (n < 0) || (n >= Ncells) )  {
 
 }
 
-return ( Cell[n] );
+return Cell[n];
 
 }
 
@@ -867,9 +865,9 @@ bool IcodeVector::is_mark() const
 
 {
 
-if ( Ncells != 1 )  return ( false );
+if ( Ncells != 1 )  return false;
 
-return ( Cell[0].is_mark() );
+return Cell[0].is_mark();
 
 }
 
@@ -881,9 +879,9 @@ bool IcodeVector::is_mark(int k) const
 
 {
 
-if ( Ncells != 1 )  return ( false );
+if ( Ncells != 1 )  return false;
 
-return ( Cell[0].is_mark(k) );
+return Cell[0].is_mark(k);
 
 }
 
@@ -895,9 +893,9 @@ bool IcodeVector::is_numeric() const
 
 {
 
-if ( Ncells != 1 )  return ( false );
+if ( Ncells != 1 )  return false;
 
-return ( Cell[0].is_numeric() );
+return Cell[0].is_numeric();
 
 }
 
@@ -953,13 +951,13 @@ CellStack & CellStack::operator=(const CellStack & c)
 
 {
 
-if ( this == &c )  return ( *this );
+if ( this == &c )  return *this;
 
 
 assign(c);
 
 
-return ( *this );
+return *this;
 
 }
 
@@ -1040,7 +1038,7 @@ if ( Depth <= 0 )  {
 
 }
 
-return ( cell[--Depth] );
+return cell[--Depth];
 
 }
 
@@ -1061,7 +1059,7 @@ if ( Depth <= 0 )  {
 }
 
 
-return ( cell[Depth - 1] );
+return cell[Depth - 1];
 
 }
 
@@ -1082,7 +1080,7 @@ if ( Depth <= 0 )  {
 }
 
 
-return ( cell[Depth - 1].type );
+return cell[Depth - 1].type;
 
 }
 
@@ -1118,12 +1116,11 @@ void CellStack::dump(ostream & out, int indent_depth) const
 
 {
 
-int j;
 Indent prefix(indent_depth);
 
 out << prefix << "Depth = " << Depth << '\n';
 
-for (j=(Depth - 1); j>=0; --j)  {
+for (int j=(Depth - 1); j>=0; --j)  {
 
    out << prefix << "Level = " << j << '\n';
 
@@ -1158,9 +1155,7 @@ ICVStack::ICVStack()
 
 {
 
-int j;
-
-for (j=0; j<icv_stack_size; ++j)  v[j] = (IcodeVector *) 0;
+for (int j=0; j<icv_stack_size; ++j)  v[j] = (IcodeVector *) 0;
 
 clear();
 
@@ -1186,9 +1181,7 @@ ICVStack::ICVStack(const ICVStack & s)
 
 {
 
-int j;
-
-for (j=0; j<icv_stack_size; ++j)  v[j] = (IcodeVector *) 0;
+for (int j=0; j<icv_stack_size; ++j)  v[j] = (IcodeVector *) 0;
 
 Depth = 0;
 
@@ -1203,12 +1196,12 @@ ICVStack & ICVStack::operator=(const ICVStack & s)
 
 {
 
-if ( this == &s )  return ( *this );
+if ( this == &s )  return *this;
 
 assign(s);
 
 
-return ( * this );
+return *this;
 
 }
 
@@ -1220,11 +1213,9 @@ void ICVStack::clear()
 
 {
 
-int j;
+for (int j=0; j<icv_stack_size; ++j)  {
 
-for (j=0; j<icv_stack_size; ++j)  {
-
-   if ( v[j] )  { delete v[j];  v[j] = (IcodeVector *) 0; }
+   if ( v[j] )  { delete v[j];  v[j] = (IcodeVector *) nullptr; }
 
 }
 
@@ -1336,7 +1327,7 @@ delete v[Depth - 1];   v[Depth - 1] = (IcodeVector *) 0;
 
 
 
-return ( V );
+return V;
 
 }
 
@@ -1373,7 +1364,7 @@ if ( Depth <= 0 )  {
 }
 
 
-return ( v[Depth - 1] );
+return v[Depth - 1];
 
 }
 
@@ -1385,12 +1376,12 @@ bool ICVStack::top_is_mark(int k) const
 
 {
 
-if ( Depth <= 0 )  return ( false );
+if ( Depth <= 0 )  return false;
 
 const IcodeVector & top = *(v[Depth - 1]);
 
 
-return ( top.is_mark(k) );
+return top.is_mark(k);
 
 }
 
@@ -1483,11 +1474,11 @@ ICVQueue & ICVQueue::operator=(const ICVQueue & q)
 
 {
 
-if ( this == &q )  return ( * this );
+if ( this == &q )  return *this;
 
 assign(q);
 
-return ( * this );
+return *this;
 
 }
 
@@ -1515,12 +1506,9 @@ void ICVQueue::clear()
 
 {
 
-int j;
+for (int j=0; j<icv_stack_size; ++j)  {
 
-
-for (j=0; j<icv_stack_size; ++j)  {
-
-   if ( v[j] )  { delete v[j];  v[j] = (IcodeVector *) 0; }
+   if ( v[j] )  { delete v[j];  v[j] = (IcodeVector *) nullptr; }
 
 }
 
@@ -1544,9 +1532,7 @@ if ( q.Nelements == 0 )  return;
 
 Nelements = q.Nelements;
 
-int j;
-
-for (j=0; j<Nelements; ++j)  {
+for (int j=0; j<Nelements; ++j)  {
 
    *(v[j]) = *(q.v[j]);
 
@@ -1603,9 +1589,7 @@ IcodeVector icv;
 
 icv = *(v[0]);
 
-int j;
-
-for (j=1; j<Nelements; ++j)  {
+for (int j=1; j<Nelements; ++j)  {
 
    v[j - 1] = v[j];
 
@@ -1615,7 +1599,7 @@ v[Nelements - 1] = (IcodeVector *) 0;
 
 --Nelements;
 
-return ( icv );
+return icv;
 
 }
 
@@ -1673,11 +1657,11 @@ ICVArray & ICVArray::operator=(const ICVArray & i)
 
 {
 
-if ( this == &i )  return ( * this );
+if ( this == &i )  return *this;
 
 assign(i);
 
-return ( * this );
+return *this;
 
 }
 
@@ -1703,9 +1687,7 @@ void ICVArray::clear()
 
 {
 
-int j;
-
-for (j=0; j<icv_array_size; ++j)  v[j].clear();
+for (int j=0; j<icv_array_size; ++j)  v[j].clear();
 
 Nelements = 0;
 
@@ -1723,11 +1705,9 @@ void ICVArray::assign(const ICVArray & i)
 
 clear();
 
-int j;
-
 Nelements = i.Nelements;
 
-for (j=0; j<Nelements; ++j)  v[j] = i.v[j];
+for (int j=0; j<Nelements; ++j)  v[j] = i.v[j];
 
 
 return;
@@ -1751,7 +1731,7 @@ if ( (k < 0) || (k >= Nelements) )  {
 }
 
 
-return ( v[k] );
+return v[k];
 
 }
 

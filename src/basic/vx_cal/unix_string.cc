@@ -11,9 +11,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -22,6 +19,9 @@ using namespace std;
 
 #include "vx_cal.h"
 #include "vx_log.h"
+
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -46,7 +46,7 @@ if ( j != 1 )  {
 
 }
 
-return ( t );
+return t;
 
 }
 
@@ -62,7 +62,7 @@ ConcatString junk;
 
 junk.format("%lld", t);
 
-return ( junk );
+return junk;
 
 }
 

@@ -9,9 +9,6 @@ static const bool verbose = true;
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -34,6 +31,9 @@ using namespace std;
 #include "threshold.h"     //  must be included before config.tab.h
 
 #include "config.tab.h"
+
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -209,7 +209,7 @@ while ( 1 )  {
 //  
 // cout << "\n\n" << flush;
 
-return ( t );
+return t;
 
 }
 
@@ -381,7 +381,7 @@ if ( is_id() )  { t = do_id();  return ( token(t) ); }
 
 
 
-return ( skip );
+return skip;
 
 }
 
@@ -450,16 +450,16 @@ bool char_ok(int c)
 
 const int k = char_class[c];
 
-if ( k == char_class_digit )  return ( true );
+if ( k == char_class_digit )  return true;
 
-if ( k == char_class_alpha )  return ( true );
+if ( k == char_class_alpha )  return true;
 
-if ( k == char_class_sign  )  return ( true );
+if ( k == char_class_sign  )  return true;
 
-if ( c == '.' )  return ( true );
+if ( c == '.' )  return true;
 
 
-return ( false );
+return false;
 
 }
 
@@ -473,7 +473,7 @@ bool is_int()
 
 bool status = is_int((char *) lexeme, max_id_length);
 
-return ( status );
+return status;
 
 }
 
@@ -487,7 +487,7 @@ bool is_float_v2 ()
 
 bool status = is_float_v2((char *) lexeme, max_id_length);
 
-return ( status );
+return status;
 
 }
 
@@ -499,21 +499,21 @@ bool is_id()
 
 {
 
-if ( char_class[lexeme[0]] != char_class_alpha )  return ( false );
+if ( char_class[lexeme[0]] != char_class_alpha )  return false;
 
-int j, k;
+int k;
 
-for (j=0; j<max_id_length; ++j)  {
+for (int j=0; j<max_id_length; ++j)  {
 
    if ( lexeme[j] == 0 )  break;
 
    k = char_class[lexeme[j]];
 
-   if ( (k != char_class_digit) && (k != char_class_alpha) )  return ( false );
+   if ( (k != char_class_digit) && (k != char_class_alpha) )  return false;
 
 }   //  for j
 
-return ( true );
+return true;
 
 }
 
@@ -532,7 +532,7 @@ Column += m_strlen(configtext);
 
 if ( is_lhs )  {
    m_strncpy(configlval.text, configtext, max_id_length, method_name, "configlval.text1");
-   return ( IDENTIFIER );
+   return IDENTIFIER;
 }
 
    //
@@ -545,11 +545,11 @@ if ( strcmp(configtext, "print"  ) == 0 )  { return ( PRINT ); }
    //  boolean?
    //
 
-if ( strcmp(configtext, "true"  ) == 0 )  { configlval.bval = true;   return ( BOOLEAN ); }
-if ( strcmp(configtext, "false" ) == 0 )  { configlval.bval = false;  return ( BOOLEAN ); }
+if ( strcmp(configtext, "true"  ) == 0 )  { configlval.bval = true;   return BOOLEAN; }
+if ( strcmp(configtext, "false" ) == 0 )  { configlval.bval = false;  return BOOLEAN; }
 
-if ( strcmp(configtext, "TRUE"  ) == 0 )  { configlval.bval = true;   return ( BOOLEAN ); }
-if ( strcmp(configtext, "FALSE" ) == 0 )  { configlval.bval = false;  return ( BOOLEAN ); }
+if ( strcmp(configtext, "TRUE"  ) == 0 )  { configlval.bval = true;   return BOOLEAN; }
+if ( strcmp(configtext, "FALSE" ) == 0 )  { configlval.bval = false;  return BOOLEAN; }
 
    //
    //  comparison?
@@ -567,13 +567,13 @@ for (j=0; j<n_fort_thresh_strings; ++j)  {
 
 int index;
 
-if ( (! is_lhs) && is_builtin((string)configtext, index) )  { configlval.index = index;  return ( BUILTIN ); }
+if ( (! is_lhs) && is_builtin((string)configtext, index) )  { configlval.index = index;  return BUILTIN; }
 
    //
    //  local variable ?   //  ie, in argument list
    //
 
-if ( is_function_def && ida.has(configtext, index) )  { configlval.index = index;  return ( LOCAL_VAR ); }
+if ( is_function_def && ida.has(configtext, index) )  { configlval.index = index;  return LOCAL_VAR; }
 
    //
    //  seen_before?
@@ -587,13 +587,13 @@ if ( e && (e->is_number()) && (! is_lhs) )  {
 
       set_int(configlval.nval, e->i_value());
 
-      return ( INTEGER );
+      return INTEGER;
 
    } else {
 
       set_double(configlval.nval, e->d_value());
 
-      return ( FLOAT );
+      return FLOAT;
 
    }
 
@@ -607,7 +607,7 @@ if ( e && (! is_lhs) && (e->type() == UserFunctionType) )  {
 
    configlval.entry = e;
 
-   return ( USER_FUNCTION );
+   return USER_FUNCTION;
 
 }
 
@@ -621,7 +621,7 @@ for (j=0; j<n_fort_thresh_strings; ++j)  {
 
    if (    (strncmp(configtext, fort_thresh_string[j], 2) == 0)
         && (is_number(configtext + 2, max_id_length - 2))  )
-           { configlval.cval = thresh_lt;  return ( do_fort_thresh() ); }
+           { configlval.cval = thresh_lt;  return do_fort_thresh(); }
 
 }
 
@@ -635,7 +635,7 @@ for (j=0; j<n_perc_thresh_infos; ++j)  {
 
    if (    (strncmp(configtext, perc_thresh_info[j].short_name, k) == 0)
         && (is_number(configtext + k, max_id_length - k))  )
-           { return ( do_simple_perc_thresh() ); }
+           { return do_simple_perc_thresh(); }
 
 }
 
@@ -650,7 +650,7 @@ m_strncpy(configlval.text, configtext, sizeof(configlval.text) - 1,
 
 need_number = false;
 
-return ( IDENTIFIER );
+return IDENTIFIER;
 
 }
 
@@ -669,7 +669,7 @@ configlval.nval.is_int = true;
 need_number = false;
 
 
-return ( 1 );
+return 1;
 
 }
 
@@ -688,7 +688,7 @@ configlval.nval.is_int = false;
 need_number = false;
 
 
-return ( true );
+return true;
 
 }
 
@@ -971,7 +971,7 @@ if ( have_putback() )  {
 
    c = pop_from_putback();
 
-   return ( my_put(c) );
+   return my_put(c);
 
 }
 
@@ -979,7 +979,7 @@ if ( have_putback() )  {
 
 if ( reading_env )   {
 
-   if ( env_index < (env_value.length()) )  return ( my_put((int) (env_value[env_index++])) );
+   if ( env_index < (env_value.length()) ) return my_put((int) (env_value[env_index++]));
    else {
 
       env_value.clear();
@@ -990,7 +990,7 @@ if ( reading_env )   {
 
    }
 
-   return ( nextchar() );
+   return nextchar();
 
 }   //  if reading env
 
@@ -999,7 +999,7 @@ if ( reading_env )   {
    //  not reading env
    //
 
-if ( feof(configin) )  return ( eof );
+if ( feof(configin) )  return eof;
 
 c = fgetc(configin);
 
@@ -1057,12 +1057,12 @@ if ( c == '$' )  {
 
    env_index = 0;
 
-   return ( nextchar() );
+   return nextchar();
 
 }    //  if c == '$'
 
 
-return ( my_put(c) );
+return my_put(c);
 
 }
 
@@ -1086,7 +1086,7 @@ if ( pos >= max_id_length )  {
 
 configtext[pos++] = (char) c;
 
-return ( c );
+return c;
 
 }
 
@@ -1103,7 +1103,7 @@ int token(int t)
 // else                                               cout << "(nul)\n";
 // cout.flush();
 
-return ( t );
+return t;
 
 }
 
@@ -1143,7 +1143,7 @@ else {
    //  done
    //
 
-return ( return_value );
+return return_value;
 
 }
 
@@ -1158,7 +1158,7 @@ int do_fort_thresh()
 const char *method_name = "do_fort_thresh() -> ";
 m_strncpy(configlval.text, configtext, sizeof(configlval.text), method_name);
 
-return ( FORTRAN_THRESHOLD );
+return FORTRAN_THRESHOLD;
 
 }
 
@@ -1238,7 +1238,7 @@ for (j=0; j<len; ++j)  {
 
    }   //  switch
 
-   if ( state == Error )  return ( false );
+   if ( state == Error )  return false;
 
 }   //  for j
 
@@ -1254,14 +1254,14 @@ for (j=0; j<len; ++j)  {
       //  gotta have at least one mantissa digit
       //
 
-if ( m_dig < 1 )  return ( false );
+if ( m_dig < 1 )  return false;
 
       //
       //  if there is an exponent, then there
       //   had better be some exponent digits
       //
 
-if ( has_exp && (e_dig < 1) )  return ( false );
+if ( has_exp && (e_dig < 1) )  return false;
 
       //
       //  If there is no exponent, then there has to be a
@@ -1273,7 +1273,7 @@ if ( has_exp && (e_dig < 1) )  return ( false );
       //        as floats
       //
 
-if ( !has_exp && (m_dot != 1) )  return ( false );
+if ( !has_exp && (m_dot != 1) )  return false;
 
 
    ///////////////////////////
@@ -1284,7 +1284,7 @@ if ( !has_exp && (m_dot != 1) )  return ( false );
    //  grudgingly accept
    //
 
-return ( true );
+return true;
 
 }
 
@@ -1317,7 +1317,7 @@ for (j=j_start; j<len; ++j)  {
 
    k = char_class[m];
 
-   if ( k != char_class_digit )  return ( false );
+   if ( k != char_class_digit )  return false;
 
    ++digit_count;
 
@@ -1335,11 +1335,11 @@ bool is_number  (const char * s, int len)
 
 {
 
-if ( is_int(s, len) )  return  ( true );
+if ( is_int(s, len) )  return  true;
 
-if ( is_float_v2(s, len) )  return ( true );
+if ( is_float_v2(s, len) )  return true;
 
-return ( false );
+return false;
 
 }
 
@@ -1355,7 +1355,7 @@ size_t pos1, pos2;
 const std::string & s = cs.string();
 
 
-if ( (pos1 = s.find("${", 0, 2)) == string::npos )  return ( false );
+if ( (pos1 = s.find("${", 0, 2)) == string::npos )  return false;
 
    //
    //  replace the environment variable
@@ -1407,7 +1407,7 @@ cs.clear();
 
 cs = out;
 
-return ( true );
+return true;
 
 }
 
@@ -1425,12 +1425,12 @@ for (j=0; j<n_fort_thresh_strings; ++j)  {
 
    if (    (strncmp(configtext, fort_thresh_string[j], 2) == 0)
         && (is_number(configtext + 2, max_id_length - 2))  )
-           { return ( true ); }
+           { return true; }
 
 }
 
 
-return ( false );
+return false;
 
 }
 
@@ -1454,12 +1454,12 @@ for (j=0; j<n_perc_thresh_infos; ++j)  {
 
    if (    (strncmp(configtext, perc_thresh_info[j].short_name, k) == 0)
         && (is_number(configtext + k, max_id_length - k))  )
-           { return ( do_simple_perc_thresh() ); }
+           { return do_simple_perc_thresh(); }
 
 }
 
 
-return ( false );
+return false;
 
 }
 
@@ -1504,7 +1504,7 @@ configlval.pc_info.perc_index = index;
 configlval.pc_info.value      = value;
 
 
-return ( SIMPLE_PERC_THRESH );
+return SIMPLE_PERC_THRESH;
 
 }
 

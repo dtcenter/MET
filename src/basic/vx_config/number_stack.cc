@@ -16,9 +16,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -28,6 +25,9 @@ using namespace std;
 #include "vx_util.h"
 
 #include "number_stack.h"
+
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -94,7 +94,7 @@ if ( this == &a )  return ( * this );
 
 assign(a);
 
-return ( * this );
+return *this;
 
 }
 
@@ -378,7 +378,7 @@ if ( Nelements <= 0 )  {
 
 }
 
-return ( e[Nelements - 1] );
+return e[Nelements - 1];
 
 }
 
