@@ -1595,16 +1595,16 @@ in the following ways:
     observation point falls within the polygon defined is done in x/y
     grid space.
 
-  * The NetCDF output of the gen_vx_mask tool.
+* The NetCDF output of the gen_vx_mask tool.
 
-  * Any gridded data file that MET can read may be used to define a
-    verification masking region. Users must specify a description of the
-    field to be used from the input file and, optionally, may specify a
-    threshold to be applied to that field. Once this threshold is
-    applied, any grid point where the resulting field is 0, the mask is
-    turned off. Any grid point where it is non-zero, the mask is turned
-    on.
-    For example, "sample.grib {name = \"TMP\"; level = \"Z2\";} >273"
+* Any gridded data file that MET can read may be used to define a
+  verification masking region. Users must specify a description of the
+  field to be used from the input file and, optionally, may specify a
+  threshold to be applied to that field. Once this threshold is
+  applied, any grid point where the resulting field is 0, the mask is
+  turned off. Any grid point where it is non-zero, the mask is turned
+  on.
+  For example, "sample.grib {name = \"TMP\"; level = \"Z2\";} >273"
 
 * The "sid" entry is an array of strings which define groups of
   observation station ID's over which to compute statistics. Each entry
