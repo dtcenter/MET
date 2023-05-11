@@ -33,6 +33,7 @@ static MetConfig conf_const(replace_path(config_const_filename).c_str());
 
 ///////////////////////////////////////////////////////////////////////////////
 
+
 GaussianInfo::GaussianInfo()
 : weights(nullptr)
 {
@@ -115,7 +116,9 @@ void GaussianInfo::validate() {
    }
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
+
 
 void RegridInfo::clear() {
    enable = false;
@@ -240,6 +243,26 @@ void RegridInfo::validate_point() {
       method = InterpMthd_UW_Mean;
    }
 
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+RegridInfo &RegridInfo::operator=(const RegridInfo &a) noexcept {
+   if ( this != &a ) {
+      enable = a.enable;
+      field = a.field;
+      vld_thresh = a.vld_thresh;
+      name = a.name;
+      method = a.method;
+      width = a.width;
+      gaussian = a.gaussian;
+      shape = a.shape;
+      convert_fx = a.convert_fx;
+      censor_thresh = a.censor_thresh;
+      censor_val = a.censor_val;
+      hook = a.hook;
+   }
+   return *this;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -698,6 +721,7 @@ void parse_sid_mask(const ConcatString &mask_sid_str,
 
 ///////////////////////////////////////////////////////////////////////////////
 
+
 void MaskLatLon::clear() {
    name.clear();
    lat_thresh.clear();
@@ -717,6 +741,18 @@ bool MaskLatLon::operator==(const MaskLatLon &v) const {
 
    return match;
 }
+
+///////////////////////////////////////////////////////////////////////////////
+
+MaskLatLon &MaskLatLon::operator=(const MaskLatLon &a) noexcept {
+   if ( this != &a ) {
+      name = a.name;
+      lat_thresh = a.lat_thresh;
+      lon_thresh = a.lon_thresh;
+   }
+   return *this;
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -1156,6 +1192,44 @@ map<ConcatString,UserFunc_1Arg> parse_conf_key_convert_map(
    return m;
 }
 
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+TimeSummaryInfo &TimeSummaryInfo::operator=(const TimeSummaryInfo &a) noexcept {
+   if ( this != &a ) {
+      flag = a.flag;
+      raw_data = a.raw_data;
+      beg = a.beg;
+      end = a.end;
+      step = a.step;
+      width_beg = a.width_beg;
+      width_end = a.width_end;
+      width = a.width;
+      grib_code = a.grib_code;
+      obs_var = a.obs_var;
+      type = a.type;
+      vld_thresh = a.vld_thresh;
+      vld_freq = a.vld_freq;
+   }
+   return *this;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+BootInfo & BootInfo::operator=(const BootInfo &a) noexcept {
+   if ( this != &a ) {
+     interval = a.interval;
+     rep_prop = a.rep_prop;
+     n_rep = a.n_rep;
+     rng = a.rng;
+     seed = a.seed;
+   }
+   return *this;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 void BootInfo::clear() {
@@ -1165,6 +1239,7 @@ void BootInfo::clear() {
    rng.clear();
    seed.clear();
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -1223,6 +1298,7 @@ BootInfo parse_conf_boot(Dictionary *dict) {
 
    return info;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -1408,6 +1484,22 @@ bool InterpInfo::operator==(const InterpInfo &v) const {
 
    return match;
 }
+
+///////////////////////////////////////////////////////////////////////////////
+
+InterpInfo & InterpInfo::operator=(const InterpInfo &a) noexcept {
+   if ( this != &a ) {
+      field = a.field;
+      vld_thresh = a.vld_thresh;
+      n_interp = a.n_interp;
+      method = a.method;
+      width = a.width;
+      gaussian = a.gaussian;
+      shape = a.shape;
+   }
+   return *this;
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -1630,6 +1722,20 @@ void ClimoCDFInfo::set_cdf_ta(int n_bin, bool &center) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+ClimoCDFInfo &ClimoCDFInfo::operator=(const ClimoCDFInfo &a) noexcept {
+   if ( this != &a ) {
+      flag = a.flag;
+      n_bin = a.n_bin;
+      cdf_ta = a.cdf_ta;
+      write_bins = a.write_bins;
+      direct_prob = a.direct_prob;
+   }
+   return *this;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
 ClimoCDFInfo parse_conf_climo_cdf(Dictionary *dict) {
    Dictionary *cdf_dict = (Dictionary *) nullptr;
    ClimoCDFInfo info;
@@ -1710,6 +1816,7 @@ ClimoCDFInfo parse_conf_climo_cdf(Dictionary *dict) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+
 void NbrhdInfo::clear() {
    field = FieldType_None;
    vld_thresh = bad_data_double;
@@ -1717,6 +1824,20 @@ void NbrhdInfo::clear() {
    cov_ta.clear();
    shape = GridTemplateFactory::GridTemplate_None;
 }
+
+///////////////////////////////////////////////////////////////////////////////
+
+NbrhdInfo &NbrhdInfo::operator=(const NbrhdInfo &a) noexcept {
+   if ( this != &a ) {
+      field = a.field;
+      vld_thresh = a.vld_thresh;
+      width = a.width;
+      cov_ta = a.cov_ta;
+      shape = a.shape;
+   }
+   return *this;
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -1812,6 +1933,7 @@ NbrhdInfo parse_conf_nbrhd(Dictionary *dict, const char *conf_key) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+
 void HiRAInfo::clear() {
    flag = false;
    width.clear();
@@ -1820,6 +1942,21 @@ void HiRAInfo::clear() {
    prob_cat_ta.clear();
    shape = GridTemplateFactory::GridTemplate_None;
 }
+
+///////////////////////////////////////////////////////////////////////////////
+
+HiRAInfo &HiRAInfo::operator=(const HiRAInfo &a) noexcept {
+   if ( this != &a ) {
+      flag = a.flag;
+      width = a.width;
+      vld_thresh = a.vld_thresh;
+      cov_ta = a.cov_ta;
+      prob_cat_ta = a.prob_cat_ta;
+      shape = a.shape;
+   }
+   return *this;
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -2124,6 +2261,7 @@ WaveletType parse_conf_wavelet_type(Dictionary *dict) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+
 void PlotInfo::clear() {
    flag = true; // enabled by default
    color_table.clear();
@@ -2131,6 +2269,20 @@ void PlotInfo::clear() {
    plot_max = bad_data_double;
    colorbar_flag = true; // plot colorbar by default
 }
+
+///////////////////////////////////////////////////////////////////////////////
+
+PlotInfo &PlotInfo::operator=(const PlotInfo &a) noexcept {
+   if ( this != &a ) {
+      flag = a.flag;
+      color_table = a.color_table;
+      plot_min = a.plot_min;
+      plot_max = a.plot_max;
+      colorbar_flag = a.colorbar_flag;
+   }
+   return *this;
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 
