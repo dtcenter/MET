@@ -101,6 +101,7 @@ struct derive_var_cfg {
    int var_index;
    ConcatString var_name;
    derive_var_cfg(ConcatString _var_name);
+   derive_var_cfg &operator=(const derive_var_cfg &a) noexcept;
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -409,10 +410,22 @@ static void   cleanup_hdr_typ(char *hdr_typ, bool is_prepbufr=false);
 
 ////////////////////////////////////////////////////////////////////////
 
+
 derive_var_cfg::derive_var_cfg(ConcatString _var_name) {
    var_index = bad_data_int;
    var_name = _var_name;
 }
+
+////////////////////////////////////////////////////////////////////////
+
+derive_var_cfg &derive_var_cfg::operator=(const derive_var_cfg &a) noexcept {
+   if ( this != &a ) {
+      var_index = a.var_index;
+      var_name = a.var_name;
+   }
+   return *this;
+}
+
 
 ////////////////////////////////////////////////////////////////////////
 
