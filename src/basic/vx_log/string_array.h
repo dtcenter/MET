@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -59,8 +59,12 @@ class StringArray {
       void set_ignore_case(const bool);
 
       void add(const std::string text);
-      
+
+      void add_uniq(const std::string text);
+
       void add(const StringArray &);
+
+      void add_uniq(const StringArray &);
 
       void add_css(const std::string);
 

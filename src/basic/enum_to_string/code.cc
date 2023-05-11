@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -80,7 +80,7 @@ char upper[256];
 char pound_define[256];
 char junk[256];
 int len, scope_len, max_len;
-char * len_name = (char *) NULL;
+char * len_name = (char *) nullptr;
 
 
 max_len = 0;
@@ -240,7 +240,7 @@ f << "\n\n"
 
 f.close();
 
-if ( len_name )  { delete [] len_name;  len_name = (char *) NULL; }
+if ( len_name )  { delete [] len_name;  len_name = (char *) nullptr; }
 
 return;
 
@@ -263,7 +263,7 @@ char upper[256];
 char pound_define[256];
 char junk[256];
 int len, scope_len, max_len;
-char * len_name = (char *) NULL;
+char * len_name = (char *) nullptr;
 
 max_len = 0;
 
@@ -407,7 +407,7 @@ f << "\n\n"
 
 f.close();
 
-if ( len_name )  { delete [] len_name;  len_name = (char *) NULL; }
+if ( len_name )  { delete [] len_name;  len_name = (char *) nullptr; }
 
 return;
 
@@ -962,7 +962,7 @@ void warning(ofstream & f)
 
 int j;
 
-const char * short_name = (const char *) NULL;
+const char * short_name = (const char *) nullptr;
 
    //
    //  strip the leading path from header_filename
@@ -1001,7 +1001,7 @@ void patch_name(char * len_name)
 
 int j, n;
 int pos;
-char * new_name = (char *) NULL;
+char * new_name = (char *) nullptr;
 char c;
 const char *method_name = "patch_name() -> ";
 
@@ -1042,7 +1042,7 @@ m_strcpy(len_name, new_name, method_name);
    //  done
    //
 
-if ( new_name )  { delete [] new_name;  new_name = (char *) NULL; }
+if ( new_name )  { delete [] new_name;  new_name = (char *) nullptr; }
 
 return;
 

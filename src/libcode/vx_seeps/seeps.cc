@@ -62,7 +62,7 @@ void release_seeps_climo() {
 
 SeepsClimoGrid *get_seeps_climo_grid(int month, int hour) {
    bool not_found = true;
-   SeepsClimoGrid *seeps_climo_grid = NULL;
+   SeepsClimoGrid *seeps_climo_grid = nullptr;
    for (map<int,SeepsClimoGrid *>::iterator it=seeps_climo_grid_map_00.begin();
         it!=seeps_climo_grid_map_00.end(); ++it) {
       if (it->first == month) {
@@ -276,11 +276,11 @@ SeepsClimoRecord *SeepsClimo::create_climo_record(
 ////////////////////////////////////////////////////////////////////////
 
 SeepsRecord *SeepsClimo::get_record(int sid, int month, int hour) {
-   SeepsRecord *record = NULL;
+   SeepsRecord *record = nullptr;
    const char *method_name = "SeepsClimo::get_record() -> ";
 
    if (seeps_ready) {
-      SeepsClimoRecord *climo_record = NULL;
+      SeepsClimoRecord *climo_record = nullptr;
       map<int,SeepsClimoRecord *>::iterator it;
       if (hour < 6 || hour >= 18) {
          it = seeps_score_00_map.find(sid);
@@ -290,7 +290,7 @@ SeepsRecord *SeepsClimo::get_record(int sid, int month, int hour) {
          it = seeps_score_12_map.find(sid);
          if (it != seeps_score_12_map.end()) climo_record = it->second;
       }
-      if (NULL != climo_record) {
+      if (nullptr != climo_record) {
          double p1 = climo_record->p1[month-1];
          if (seeps_p1_thresh.check(p1)) {
             record = new SeepsRecord;
@@ -362,7 +362,7 @@ double SeepsClimo::get_score(int sid, double p_fcst, double p_obs,
    double score = bad_data_double;
    SeepsRecord *record = get_record(sid, month, hour);
 
-   if (NULL != record) {
+   if (nullptr != record) {
       // Determine location in contingency table
       int ic = (p_obs>record->t1)+(p_obs>record->t2);
       int jc = (p_fcst>record->t1)+(p_fcst>record->t2);
@@ -378,10 +378,10 @@ double SeepsClimo::get_score(int sid, double p_fcst, double p_obs,
 
 SeepsScore *SeepsClimo::get_seeps_score(int sid, double p_fcst, double p_obs,
                                         int month, int hour) {
-   SeepsScore *score = NULL;
+   SeepsScore *score = nullptr;
    SeepsRecord *record = get_record(sid, month, hour);
 
-   if (NULL != record) {
+   if (nullptr != record) {
       score = new SeepsScore();
       score->p1 = record->p1;
       score->p2 = record->p2;
@@ -651,8 +651,8 @@ void SeepsClimo::read_seeps_scores(ConcatString filename) {
 SeepsClimoGrid::SeepsClimoGrid(int month, int hour) : month{month}, hour{hour}
 {
 
-   p1_buf = p2_buf = t1_buf = t2_buf = NULL;
-   s12_buf = s13_buf = s21_buf = s23_buf = s31_buf = s32_buf = NULL;
+   p1_buf = p2_buf = t1_buf = t2_buf = nullptr;
+   s12_buf = s13_buf = s21_buf = s23_buf = s31_buf = s32_buf = nullptr;
 
    ConcatString seeps_name = get_seeps_climo_filename();
    seeps_ready = file_exists(seeps_name.c_str());
@@ -678,23 +678,23 @@ SeepsClimoGrid::~SeepsClimoGrid() {
 
 void SeepsClimoGrid::clear() {
    SeepsClimoBase::clear();
-   if (NULL != p1_buf) { delete [] p1_buf; p1_buf = NULL; }
-   if (NULL != p2_buf) { delete [] p2_buf; p2_buf = NULL; }
-   if (NULL != t1_buf) { delete [] t1_buf; t1_buf = NULL; }
-   if (NULL != t2_buf) { delete [] t2_buf; t2_buf = NULL; }
-   if (NULL != s12_buf) { delete [] s12_buf; s12_buf = NULL; }
-   if (NULL != s13_buf) { delete [] s13_buf; s13_buf = NULL; }
-   if (NULL != s21_buf) { delete [] s21_buf; s21_buf = NULL; }
-   if (NULL != s23_buf) { delete [] s23_buf; s23_buf = NULL; }
-   if (NULL != s31_buf) { delete [] s31_buf; s31_buf = NULL; }
-   if (NULL != s32_buf) { delete [] s32_buf; s32_buf = NULL; }
+   if (nullptr != p1_buf) { delete [] p1_buf; p1_buf = nullptr; }
+   if (nullptr != p2_buf) { delete [] p2_buf; p2_buf = nullptr; }
+   if (nullptr != t1_buf) { delete [] t1_buf; t1_buf = nullptr; }
+   if (nullptr != t2_buf) { delete [] t2_buf; t2_buf = nullptr; }
+   if (nullptr != s12_buf) { delete [] s12_buf; s12_buf = nullptr; }
+   if (nullptr != s13_buf) { delete [] s13_buf; s13_buf = nullptr; }
+   if (nullptr != s21_buf) { delete [] s21_buf; s21_buf = nullptr; }
+   if (nullptr != s23_buf) { delete [] s23_buf; s23_buf = nullptr; }
+   if (nullptr != s31_buf) { delete [] s31_buf; s31_buf = nullptr; }
+   if (nullptr != s32_buf) { delete [] s32_buf; s32_buf = nullptr; }
 };
 
 ////////////////////////////////////////////////////////////////////////
 
 SeepsScore *SeepsClimoGrid::get_record(int ix, int iy,
                                        double p_fcst, double p_obs) {
-   SeepsScore *seeps_record = NULL;
+   SeepsScore *seeps_record = nullptr;
    const char *method_name = "SeepsClimoGrid::get_record() -> ";
    if (!is_eq(p_fcst, -9999.0) && !is_eq(p_obs, -9999.0)) {
       int offset = iy * nx + ix;
@@ -836,8 +836,8 @@ void SeepsClimoGrid::read_seeps_scores(ConcatString filename) {
       s31_buf = new double[nx*ny];
       s32_buf = new double[nx*ny];
 
-      long curs[3] = { month-1, 0, 0 };
-      long dims[3] = { 1, ny, nx };
+      LongArray curs;   // = { month-1, 0, 0 };
+      LongArray dims;   // = { 1, ny, nx };
       NcVar var_p1_00  = get_nc_var(nc_file, var_name_p1_00);
       NcVar var_p2_00  = get_nc_var(nc_file, var_name_p2_00);
       NcVar var_t1_00  = get_nc_var(nc_file, var_name_t1_00);
@@ -848,6 +848,13 @@ void SeepsClimoGrid::read_seeps_scores(ConcatString filename) {
       NcVar var_s23_00 = get_nc_var(nc_file, var_name_s23_00);
       NcVar var_s31_00 = get_nc_var(nc_file, var_name_s31_00);
       NcVar var_s32_00 = get_nc_var(nc_file, var_name_s32_00);
+
+      curs.add(month-1);
+      curs.add(0);
+      curs.add(0);
+      dims.add(1);
+      dims.add(ny);
+      dims.add(nx);
 
       if (IS_INVALID_NC(var_p1_00) || !get_nc_data(&var_p1_00, p1_buf, dims, curs)) {
          mlog << Error << "\n" << method_name

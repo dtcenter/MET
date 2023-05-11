@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -1037,12 +1037,6 @@ mlog << Error
 
 exit ( 1 );
 
-   //
-   //  done
-   //
-
-return;
-
 }
 
 
@@ -1295,7 +1289,7 @@ StringArray a;
 
 Nattributes = 0;
 
-if ( (retval = SWinqattrs(SwathId, NULL, &att_buf_size)) < 0 )  {
+if ( (retval = SWinqattrs(SwathId, nullptr, &att_buf_size)) < 0 )  {
 
    mlog << Error
         << "\n\n  CloudsatSwath::get_attributes() -> can't get attribute buffer size\n\n";
@@ -1997,8 +1991,6 @@ mlog << Error
      << "\n\n  CloudsatSwathFile::operator=(const CloudsatSwathFile &) -> should never be called!\n\n";
 
 exit ( 1 );
-
-return ( * this );
 
 }
 

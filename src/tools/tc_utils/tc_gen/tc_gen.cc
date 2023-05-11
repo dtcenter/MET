@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -523,7 +523,7 @@ void score_genesis_shape(const GenesisInfoArray &best_ga) {
 
    // Get the list of input shapefiles
    for(i=0; i<shape_source.n(); i++) {
-      shape_files.add(get_filenames(shape_source[i], NULL, gen_shp_reg_exp));
+      shape_files.add(get_filenames(shape_source[i], nullptr, gen_shp_reg_exp));
    }
 
    mlog << Debug(2)
@@ -1201,7 +1201,7 @@ void get_atcf_files(const StringArray &source,
    for(i=0; i<source.n(); i++) {
       cur_source.clear();
       cur_source.add(source[i]);
-      cur_files = get_filenames(cur_source, NULL, reg_exp);
+      cur_files = get_filenames(cur_source, nullptr, reg_exp);
 
       for(j=0; j<cur_files.n(); j++) {
          files.add(cur_files[j]);

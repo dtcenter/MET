@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -301,7 +301,7 @@ return;
 NcVarInfo *find_var_info_by_dim_name(NcVarInfo *vars, const string dim_name,
                                      const int nvars) {
    // Find the variable with the same dimension name
-   NcVarInfo *var = (NcVarInfo *)NULL;
+   NcVarInfo *var = (NcVarInfo *)nullptr;
    for (int i = 0; i < nvars; i++) {
       if (vars[i].name == dim_name) {
          var = &vars[i];

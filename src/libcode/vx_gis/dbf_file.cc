@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -720,8 +720,6 @@ mlog << Error << "\nDbfFile::operator=(const DbfFile &) -> "
 
 exit ( 1 );
 
-return ( * this );
-
 }
 
 
@@ -977,7 +975,6 @@ const size_t buf_size = 65536;
 unsigned char buf[buf_size];
 ConcatString cs;
 StringArray sa;
-int j;
 
    //
    //  check range
@@ -1021,15 +1018,14 @@ if ( n_read != bytes )  {
 
 if ( Header.record_length < buf_size)  buf[Header.record_length] = 0;
 
-std::string s = (const char *) buf+1; //  skip first byte
-
    //
-   //  parse each subrecord value
+   //  parse each subrecord value, skip first byte
    //
 
-for (j=0,pos=0; j<(Header.n_subrecs); ++j)  {
+for (int j=0,pos=1; j<(Header.n_subrecs); ++j)  {
 
-   cs = s.substr(pos, Header.subrec[j].field_length);
+   cs << cs_erase;
+   for (int k=0; k<Header.subrec[j].field_length; ++k) cs << (char) buf[pos+k];
    cs.ws_strip();
    sa.add(cs);
 

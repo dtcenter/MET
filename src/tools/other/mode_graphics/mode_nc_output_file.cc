@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -449,8 +449,14 @@ int x, y, n, k;
 
 n = 0;
 int v[Ny][Nx];
-long offsets[2] = { 0,  0};   //  NOT (x, y)!
-long lengths[2] = {Ny, Nx};
+LongArray offsets;  // { 0,  0};
+LongArray lengths;  // {Ny, Nx};   //  NOT (x, y)!
+
+offsets.add(0);
+offsets.add(0);
+lengths.add(Ny);
+lengths.add(Nx);
+
 if (get_nc_data(var, (int *)&v, lengths, offsets)) {
    for (x=0; x<Nx; ++x)  {
    
@@ -489,8 +495,13 @@ if ( (x < 0) || (x >= Nx) || (y < 0) || (y >= Ny) )  {
 
 int i[2];
 int status;
-long offsets[2] = {y, x};   //  NOT (x, y)!
-long lengths[2] = {1,1};
+LongArray offsets;  // {y, x};   //  NOT (x, y)!
+LongArray lengths;  // {1,1};
+
+offsets.add(y);
+offsets.add(x);
+lengths.add(1);
+lengths.add(1);
 
 //status = var->set_cur(y, x);
 //
@@ -537,8 +548,13 @@ if ( (x < 0) || (x >= Nx) || (y < 0) || (y >= Ny) )  {
 
 float ff[2];
 int status;
-long offsets[2] = {y, x};   //  NOT (x, y)!
-long lengths[2] = {1,1};
+LongArray offsets;  // {y, x};   //  NOT (x, y)!
+LongArray lengths;  // {1,1};
+
+offsets.add(y);
+offsets.add(x);
+lengths.add(1);
+lengths.add(1);
 
 //status = var->set_cur(y, x);   //  NOT (x, y)!
 //

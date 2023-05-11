@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -271,22 +271,25 @@ void def_tc_range_azimuth(NcFile* nc_out,
 
 ////////////////////////////////////////////////////////////////////////
 
-void def_tc_lat_lon_time(NcFile* nc_out,
-    const NcDim& range_dim, const NcDim& azimuth_dim,
-    const NcDim& track_point_dim,
-    NcVar& lat_var, NcVar& lon_var, NcVar& valid_time_var) {
+void def_tc_time_lat_lon(NcFile* nc_out,
+    const NcDim& track_point_dim, const NcDim& range_dim, const NcDim& azimuth_dim,
+    NcVar& valid_time_var, NcVar& lat_var, NcVar& lon_var) {
 
     vector<NcDim> dims;
+    dims.push_back(track_point_dim);
     dims.push_back(range_dim);
     dims.push_back(azimuth_dim);
-    dims.push_back(track_point_dim);
 
-    lat_var = nc_out->addVar("lat", ncDouble, dims);
-    lon_var = nc_out->addVar("lon", ncDouble, dims);
     valid_time_var = nc_out->addVar("valid_time", ncUint64,
         track_point_dim);
+    lat_var = nc_out->addVar("lat", ncDouble, dims);
+    lon_var = nc_out->addVar("lon", ncDouble, dims);
 
     // Set attributes
+    add_att(&valid_time_var, "long_name", "valid_time");
+    add_att(&valid_time_var, "units", "yyyymmddhh");
+    add_att(&valid_time_var, "standard_name", "valid_time");
+
     add_att(&lat_var, "long_name", "latitude");
     add_att(&lat_var, "units", "degrees_north");
     add_att(&lat_var, "standard_name", "latitude");
@@ -294,10 +297,6 @@ void def_tc_lat_lon_time(NcFile* nc_out,
     add_att(&lon_var, "long_name", "longitude");
     add_att(&lon_var, "units", "degrees_east");
     add_att(&lon_var, "standard_name", "longitude");
-
-    add_att(&valid_time_var, "long_name", "valid_time");
-    add_att(&valid_time_var, "units", "yyyymmddhh");
-    add_att(&valid_time_var, "standard_name", "valid_time");
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -324,20 +323,20 @@ void def_tc_variables(NcFile* nc_out,
     map<string, vector<string> > variable_levels,
     map<string, string> variable_long_names,
     map<string, string> variable_units,
+    const NcDim& track_point_dim, const NcDim& pressure_dim,
     const NcDim& range_dim, const NcDim& azimuth_dim,
-    const NcDim& pressure_dim, const NcDim& track_point_dim,
     map<string, NcVar>& data_vars) {
 
     vector<NcDim> dims;
+    dims.push_back(track_point_dim);
     dims.push_back(range_dim);
     dims.push_back(azimuth_dim);
-    dims.push_back(track_point_dim);
 
     vector<NcDim> dims_3d;
+    dims_3d.push_back(track_point_dim);
+    dims_3d.push_back(pressure_dim);
     dims_3d.push_back(range_dim);
     dims_3d.push_back(azimuth_dim);
-    dims_3d.push_back(pressure_dim);
-    dims_3d.push_back(track_point_dim);
 
     for (map<string, vector<string> >::iterator i = variable_levels.begin();
         i != variable_levels.end(); ++i) {
@@ -373,9 +372,9 @@ void def_tc_data(NcFile* nc_out,
     NcVar& data_var, VarInfo* data_info) {
 
     vector<NcDim> dims;
+    dims.push_back(track_point_dim);
     dims.push_back(range_dim);
     dims.push_back(azimuth_dim);
-    dims.push_back(track_point_dim);
 
     ConcatString var_name = data_info->name_attr();
     var_name.add("_");
@@ -398,10 +397,10 @@ void def_tc_data_3d(NcFile* nc_out,
     NcVar& data_var, VarInfo* data_info) {
 
     vector<NcDim> dims;
+    dims.push_back(track_point_dim);
+    dims.push_back(pressure_dim);
     dims.push_back(range_dim);
     dims.push_back(azimuth_dim);
-    dims.push_back(pressure_dim);
-    dims.push_back(track_point_dim);
 
     data_var = nc_out->addVar(
         data_info->name_attr(), ncDouble, dims);
@@ -420,8 +419,8 @@ void def_tc_azi_mean_data(NcFile* nc_out,
     NcVar& data_var, VarInfo* data_info) {
 
     vector<NcDim> dims;
-    dims.push_back(range_dim);
     dims.push_back(track_point_dim);
+    dims.push_back(range_dim);
 
     ConcatString var_name = data_info->name_attr();
     var_name.add("_");
@@ -445,14 +444,14 @@ void write_tc_data(NcFile* nc_out, const TcrmwGrid& grid,
     vector<size_t> counts;
 
     offsets.clear();
-    offsets.push_back(0);
-    offsets.push_back(0);
     offsets.push_back(i_point);
+    offsets.push_back(0);
+    offsets.push_back(0);
 
     counts.clear();
+    counts.push_back(1);
     counts.push_back(grid.range_n());
     counts.push_back(grid.azimuth_n());
-    counts.push_back(1);
 
     var.putVar(offsets, counts, data);
 }
@@ -468,14 +467,14 @@ void write_tc_data_rev(NcFile* nc_out, const TcrmwGrid& grid,
     double* data_rev;
 
     offsets.clear();
-    offsets.push_back(0);
-    offsets.push_back(0);
     offsets.push_back(i_point);
+    offsets.push_back(0);
+    offsets.push_back(0);
 
     counts.clear();
+    counts.push_back(1);
     counts.push_back(grid.range_n());
     counts.push_back(grid.azimuth_n());
-    counts.push_back(1);
 
     data_rev = new double[
         grid.range_n() * grid.azimuth_n()];
@@ -505,12 +504,12 @@ void write_tc_azi_mean_data(NcFile* nc_out, const TcrmwGrid& grid,
     double* data_azi_mean;
 
     offsets.clear();
-    offsets.push_back(0);
     offsets.push_back(i_point);
+    offsets.push_back(0);
 
     counts.clear();
-    counts.push_back(grid.range_n());
     counts.push_back(1);
+    counts.push_back(grid.range_n());
 
     data_rev = new double[
         grid.range_n() * grid.azimuth_n()];
@@ -554,26 +553,26 @@ extern void write_tc_pressure_level_data(
     int i_level = pressure_level_indices[level_str];
 
     offsets.clear();
-    offsets.push_back(0);
-    offsets.push_back(0);
     offsets.push_back(i_point);
+    offsets.push_back(0);
+    offsets.push_back(0);
 
     offsets_3d.clear();
-    offsets_3d.push_back(0);
-    offsets_3d.push_back(0);
-    offsets_3d.push_back(i_level);
     offsets_3d.push_back(i_point);
+    offsets_3d.push_back(i_level);
+    offsets_3d.push_back(0);
+    offsets_3d.push_back(0);
 
     counts.clear();
+    counts.push_back(1);
     counts.push_back(grid.range_n());
     counts.push_back(grid.azimuth_n());
-    counts.push_back(1);
 
     counts_3d.clear();
+    counts_3d.push_back(1);
+    counts_3d.push_back(1);
     counts_3d.push_back(grid.range_n());
     counts_3d.push_back(grid.azimuth_n());
-    counts_3d.push_back(1);
-    counts_3d.push_back(1);
 
     data_rev = new double[
         grid.range_n() * grid.azimuth_n()];
@@ -586,12 +585,6 @@ extern void write_tc_pressure_level_data(
         }
     }
 
-    // string label = level_str.substr(0, 1);
-    // if (label == "P") {
-    //     var.putVar(offsets_3d, counts_3d, data_rev);
-    // } else {
-    //     var.putVar(offsets, counts, data_rev);
-    // }
     var.putVar(offsets_3d, counts_3d, data_rev);
 
     delete[] data_rev;

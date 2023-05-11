@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -229,6 +229,8 @@ void EquivalenceClass::add_no_repeat(int k)
 {
 
 if ( has(k) )  return;
+
+if (Nelements < 0) Nelements = 0;
 
 extend(Nelements + 1);
 
@@ -467,7 +469,7 @@ void Mtd_Partition::extend(int n)
 
 if ( n <= Nalloc )  return;
 
-EquivalenceClass ** u = (EquivalenceClass **) 0;
+EquivalenceClass ** u = (EquivalenceClass **) nullptr;
 
 n = mtd_partition_alloc_inc*((n + mtd_partition_alloc_inc - 1)/mtd_partition_alloc_inc);
 
@@ -479,7 +481,7 @@ if ( C )  {
 
    memcpy(u, C, Nelements*(sizeof(EquivalenceClass *)));
 
-   delete [] C;  C = (EquivalenceClass **) 0;
+   delete [] C;  C = (EquivalenceClass **) nullptr;
 
 }
 
@@ -667,8 +669,6 @@ if ( (nclass_1 < 0) || (nclass_2 < 0) )  {
 
    exit ( 1 );
 
-   return;
-
 }
 
 merge_classes(nclass_1, nclass_2);
@@ -686,6 +686,8 @@ void Mtd_Partition::add_no_repeat(int k)
 {
 
 if ( has(k) )  return;
+
+if (Nelements < 0) Nelements = 0;
 
 extend(Nelements + 1);
 

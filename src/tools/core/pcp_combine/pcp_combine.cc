@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -729,7 +729,7 @@ int search_pcp_dir(const char *cur_dir, const unixtime cur_ut,
    //
    // Process each file contained in the directory.
    //
-   while((dirp = readdir(dp)) != NULL) {
+   while((dirp = readdir(dp)) != nullptr) {
 
       //
       // Ignore any hidden files.

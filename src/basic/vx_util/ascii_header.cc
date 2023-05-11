@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -525,7 +525,7 @@ void parse_mctc_fi_oj(const char *str, int &i, int &j) {
    // Parse Fi_Oj strings
    i = atoi(ptr);
 
-   if((ptr = strrchr(str, '_')) != NULL) {
+   if((ptr = strrchr(str, '_')) != nullptr) {
       ptr += 2;
       j = atoi(ptr);
    }

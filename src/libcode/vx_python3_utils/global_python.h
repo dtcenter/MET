@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -61,9 +61,9 @@ inline void GlobalPython::initialize()
 
 if ( ! is_initialized )  {
 
-   mlog << Debug(3) << "Initializing python: " << MET_PYTHON_BIN_EXE << "\n";
+   mlog << Debug(3) << "Initializing MET compile time python instance: " << MET_PYTHON_BIN_EXE << "\n";
 
-   wchar_t *python_path = Py_DecodeLocale(MET_PYTHON_BIN_EXE, NULL);
+   wchar_t *python_path = Py_DecodeLocale(MET_PYTHON_BIN_EXE, nullptr);
    Py_SetProgramName(python_path);
    Py_Initialize();
 

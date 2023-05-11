@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -198,8 +198,8 @@ void setup() {
     }
 
     mlog << Debug(2)
-         << "(n_range, n_azimuth, n_level) = ("
-         << n_range << ", " << n_azimuth << ", " << n_level << ")\n";
+         << "(n_level, n_range, n_azimuth) = ("
+         << n_level << ", " << n_range << ", " << n_azimuth << ")\n";
 
     // Get dimension coordinates
     vector<size_t> start;
@@ -255,11 +255,11 @@ void setup() {
             DataCube* data_max_2d = new DataCube();
             DataCube* data_min_2d = new DataCube();
 
-            data_count_2d->set_size(n_range, n_azimuth, 1);
-            data_mean_2d->set_size(n_range, n_azimuth, 1);
-            data_stdev_2d->set_size(n_range, n_azimuth, 1);
-            data_max_2d->set_size(n_range, n_azimuth, 1);
-            data_min_2d->set_size(n_range, n_azimuth, 1);
+            data_count_2d->set_size(1, n_range, n_azimuth);
+            data_mean_2d->set_size(1, n_range, n_azimuth);
+            data_stdev_2d->set_size(1, n_range, n_azimuth);
+            data_max_2d->set_size(1, n_range, n_azimuth);
+            data_min_2d->set_size(1, n_range, n_azimuth);
 
             data_count_2d->set_constant(0);
             data_mean_2d->set_constant(0);
@@ -281,11 +281,11 @@ void setup() {
             DataCube* data_max_3d = new DataCube();
             DataCube* data_min_3d = new DataCube();
 
-            data_count_3d->set_size(n_range, n_azimuth, n_level);
-            data_mean_3d->set_size(n_range, n_azimuth, n_level);
-            data_stdev_3d->set_size(n_range, n_azimuth, n_level);
-            data_max_3d->set_size(n_range, n_azimuth, n_level);
-            data_min_3d->set_size(n_range, n_azimuth, n_level);
+            data_count_3d->set_size(n_level, n_range, n_azimuth);
+            data_mean_3d->set_size(n_level, n_range, n_azimuth);
+            data_stdev_3d->set_size(n_level, n_range, n_azimuth);
+            data_max_3d->set_size(n_level, n_range, n_azimuth);
+            data_min_3d->set_size(n_level, n_range, n_azimuth);
 
             data_count_3d->set_constant(0);
             data_mean_3d->set_constant(0);
@@ -312,10 +312,10 @@ void process_files() {
     DataCube data_3d;
     DataCube data_3d_sq;
 
-    data_2d.set_size(n_range, n_azimuth, 1);
-    data_2d_sq.set_size(n_range, n_azimuth, 1);
-    data_3d.set_size(n_range, n_azimuth, n_level);
-    data_3d_sq.set_size(n_range, n_azimuth, n_level);
+    data_2d.set_size(1, n_range, n_azimuth);
+    data_2d_sq.set_size(1, n_range, n_azimuth);
+    data_3d.set_size(n_level, n_range, n_azimuth);
+    data_3d_sq.set_size(n_level, n_range, n_azimuth);
 
     // Set up array track point slices
     vector<size_t> start_2d;
@@ -325,17 +325,17 @@ void process_files() {
     start_2d.push_back(0);
     start_2d.push_back(0);
     start_2d.push_back(0);
+    count_2d.push_back(1);
     count_2d.push_back(n_range);
     count_2d.push_back(n_azimuth);
-    count_2d.push_back(1);
     start_3d.push_back(0);
     start_3d.push_back(0);
     start_3d.push_back(0);
     start_3d.push_back(0);
+    count_3d.push_back(1);
+    count_3d.push_back(n_level);
     count_3d.push_back(n_range);
     count_3d.push_back(n_azimuth);
-    count_3d.push_back(n_level);
-    count_3d.push_back(1);
 
     for(int i_file = 0; i_file < data_files.n_elements(); i_file++) {
         mlog << Debug(1) << "Processing "
@@ -362,7 +362,7 @@ void process_files() {
 
                 for(int i_track = 0; i_track < n_track_point; i_track++) {
                     if (data_n_dims[i_var] == 2) {
-                        start_2d[2] = (size_t) i_track;
+                        start_2d[0] = (size_t) i_track;
                         mlog << Debug(4) << data_names[i_var] << i_track << "\n";
                         var.getVar(start_2d, count_2d, data_2d.data());
 
@@ -387,7 +387,7 @@ void process_files() {
                     }
                     if (data_n_dims[i_var] == 3) {
                         mlog << Debug(4) << data_names[i_var] << i_track << "\n";
-                        start_3d[3] = (size_t) i_track;
+                        start_3d[0] = (size_t) i_track;
                         var.getVar(start_3d, count_3d, data_3d.data());
 
                         // Update partial sums
@@ -442,22 +442,22 @@ void write_stats() {
     dims_2d.push_back(azimuth_dim);
 
     vector<NcDim> dims_3d;
+    dims_3d.push_back(level_dim);
     dims_3d.push_back(range_dim);
     dims_3d.push_back(azimuth_dim);
-    dims_3d.push_back(level_dim);
 
+    NcVar level_var = nc_out->addVar(level_name, ncDouble, level_dim);
     NcVar range_var = nc_out->addVar("range", ncDouble, range_dim);
     NcVar azimuth_var = nc_out->addVar("azimuth", ncDouble, azimuth_dim);
-    NcVar level_var = nc_out->addVar(level_name, ncDouble, level_dim);
 
     vector<size_t> offset;
     vector<size_t> count_range;
     vector<size_t> count_azimuth;
     vector<size_t> count_level;
     offset.push_back(0);
+    count_level.push_back(n_level);
     count_range.push_back(n_range);
     count_azimuth.push_back(n_azimuth);
-    count_level.push_back(n_level);
 
     for (int r = 0; r < n_range; r++) {
         range_coord[r] = r;
@@ -485,9 +485,9 @@ void write_stats() {
     offset_3d.push_back(0);
     offset_3d.push_back(0);
     offset_3d.push_back(0);
+    count_3d.push_back(n_level);
     count_3d.push_back(n_range);
     count_3d.push_back(n_azimuth);
-    count_3d.push_back(n_level);
 
     for(int i_var = 0; i_var < data_names.size(); i_var++) {
         if (data_n_dims[i_var] == 2) {

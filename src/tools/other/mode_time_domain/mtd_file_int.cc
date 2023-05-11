@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -461,8 +461,15 @@ var = get_nc_var(&f, data_field_name);
 //
 //}
 
-long offsets[3] = {0,0,0};
-long lengths[3] = {Nt, Ny, Nx};
+LongArray offsets;  // {0,0,0};
+LongArray lengths;  // {Nt, Ny, Nx};
+
+offsets.add(0);
+offsets.add(0);
+offsets.add(0);
+lengths.add(Nt);
+lengths.add(Ny);
+lengths.add(Nx);
 
 //if ( ! get_nc_data(&var, Data, (long *){Nt, Ny, Nx}, (long *){0,0,0}) )  {
 if ( ! get_nc_data(&var, Data, lengths, offsets) )  {
@@ -566,8 +573,15 @@ data_var = add_var(&f, data_field_name, ncInt, nt_dim, ny_dim, nx_dim);
 
 //data_var = get_nc_var(&f, data_field_name);
 
-long offsets[3] = {0,0,0};
-long lengths[3] = {Nt, Ny, Nx};
+LongArray offsets;  // {0,0,0};
+LongArray lengths;  // {Nt, Ny, Nx};
+
+offsets.add(0);
+offsets.add(0);
+offsets.add(0);
+lengths.add(Nt);
+lengths.add(Ny);
+lengths.add(Nx);
 
 if ( ! put_nc_data(&data_var, Data, lengths, offsets) )  {
 
@@ -818,7 +832,7 @@ void MtdIntFile::fatten()
 int x, y, n;
 const int nxy = Nx*Ny;
 int * u = new int [nxy];
-int * a = 0;
+int * a = nullptr;
 
 a = u;
 
@@ -885,7 +899,9 @@ for (y = 0; y<(Ny - 2); ++y)  {
 
    for (x=0; x<(Nx - 2); ++x)  {
 
-      if ( *a )  {
+      if (n >= (nxy-1)) break;  // For SonarQube findings
+
+      if (n >=0 &&  *a )  {
 
          Data[n + 1]      = 1;   //  (x + 1, y)
          Data[n + Nx]     = 1;   //  (x, y + 1)
@@ -1705,10 +1721,13 @@ s.set_to_zeroes();
 
 int * in  =   Data;
 int * out = s.Data;
+int out_size = s.nxyt();
 
 v = 0;
 
 for (j=0; j<n3; ++j)  {
+
+   if (j >= out_size) break;    // For SonarQube findings
 
    if ( yesno[*in] )  { *out = 1;  ++v; }
 

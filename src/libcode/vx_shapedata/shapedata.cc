@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -1885,7 +1885,6 @@ int get_step_case(bool lr, bool ur, bool ul, bool ll) {
       exit(1);
    }
 
-   return(-1);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

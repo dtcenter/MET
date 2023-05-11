@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -459,7 +459,7 @@ void parse_poly_2d_data_mask(const ConcatString &mask_poly_str,
    // Open the data file
    mtddf = mtddf_factory.new_met_2d_data_file(file_name.c_str(), type);
 
-   // If data file pointer is NULL, assume a lat/lon polyline file
+   // If data file pointer is nullptr, assume a lat/lon polyline file
    if(!mtddf) {
       mlog << Error << "\nparse_poly_2d_data_mask() -> "
            << "cannot read file \"" << file_name << "\"!\n\n";

@@ -1,7 +1,7 @@
 
 
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -28,12 +28,6 @@ using namespace std;
 #include "vx_util.h"
 #include "vx_log.h"
 #include "goes_grid.h"
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-//static double     lc_func(double lat, double Cone, const bool is_north);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -399,8 +393,6 @@ mlog << Error << "\nGoesImagerGrid::shift_right(int) -> "
 
 exit ( 1 );
 
-return;
-
 }
 
 
@@ -501,13 +493,13 @@ void GoesImagerData::compute_lat_lon()
                 mlog << Error << method_name << " index=" << index
                      << "  too big than " << buf_len << "\n";
             else {
-               if (isnan(lat_rad)) lat = bad_data_float;
+	       if (std::isnan(lat_rad)) lat = bad_data_float;
                else {
                   lat = lat_rad * deg_per_rad;
                   if (lat > lat_max) {lat_max = lat; idx_lat_max = index; }
                   if (lat < lat_min) {lat_min = lat; idx_lat_min = index; }
                }
-               if (isnan(lon_rad)) lon = bad_data_float;
+	       if (std::isnan(lon_rad)) lon = bad_data_float;
                else {
                   lon = lon_of_projection_origin - (lon_rad * deg_per_rad);
                   if (lon > lon_max) {lon_max = lon; idx_lon_max = index; }

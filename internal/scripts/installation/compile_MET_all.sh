@@ -89,8 +89,23 @@ echo "MET_TARBALL = ${MET_TARBALL? "ERROR: MET_TARBALL must be set"}"
 echo "USE_MODULES = ${USE_MODULES? "ERROR: USE_MODULES must be set to TRUE if using modules or FALSE otherwise"}"
 echo ${MAKE_ARGS:+MAKE_ARGS = $MAKE_ARGS}
 
-export LIB_DIR=${TEST_BASE}/external_libs
+LIB_DIR=${TEST_BASE}/external_libs
 MET_DIR=${MET_SUBDIR}
+
+if [ -z "${BIN_DIR_PATH}" ]; then
+  if [ -z "${MET_INSTALL_DIR}" ]; then
+    BIN_DIR_PATH=${TEST_BASE}/bin
+  else
+    BIN_DIR_PATH=${MET_INSTALL_DIR}/bin
+  fi
+fi
+
+if [ -z "${MET_INSTALL_DIR}" ]; then
+  MET_INSTALL_DIR=${MET_DIR}
+else
+  LIB_DIR=${MET_INSTALL_DIR}
+fi
+
 TAR_DIR=${TEST_BASE}/tar_files
 MET_TARBALL=${TAR_DIR}/${MET_TARBALL}
 
@@ -103,8 +118,15 @@ if [ ! -e $TAR_DIR ]; then
   exit 1
 fi
 
-# Update library linker path
-export LD_LIBRARY_PATH=${TEST_BASE}/external_libs/lib${MET_PYTHON:+:$MET_PYTHON/lib}${MET_NETCDF:+:$MET_NETCDF/lib}${MET_HDF5:+:$MET_HDF5/lib}${MET_BUFRLIB:+:$MET_BUFRLIB}${MET_GRIB2CLIB:+:$MET_GRIB2CLIB}${LIB_JASPER:+:$LIB_JASPER}${LIB_LIBPNG:+:$LIB_LIBPNG}${LIB_Z:+:$LIB_Z}${MET_GSL:+:$MET_GSL/lib}${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
+# If MET_PYTHON_LIB is not set in the environment file, set it to the
+# lib directory so it can be use to install MET with Python Embedding
+# support
+if [[ -z "$MET_PYTHON_LIB" ]]; then
+  MET_PYTHON_LIB=${MET_PYTHON}/lib
+fi
+
+
+# Print library linker path
 echo "LD_LIBRARY_PATH = ${LD_LIBRARY_PATH}"
 
 # if LIB_Z is not set in the environment file, set it to the
@@ -415,13 +437,17 @@ if [ $COMPILE_G2CLIB -eq 1 ]; then
   rm -rf ${LIB_DIR}/g2clib/g2clib*
   tar -xf ${TAR_DIR}/g2clib*.tar -C ${LIB_DIR}/g2clib
   cd ${LIB_DIR}/g2clib/g2clib*
-  cat makefile | \
-    sed -r 's/INC=.*/INC=-I${LIB_DIR}\/include -I${LIB_DIR}\/include\/jasper/g' | \
-    sed 's/CC=gcc/CC=${CC_COMPILER}/g' | \
-    sed 's/-D__64BIT__//g' \
-    > makefile_new
-  mv makefile_new makefile
-  export CC_COMPILER=${CC}
+  # Sed commands use double-quotes to support variable expansion.
+  sed -i "s|INC=.*|INC=-I${LIB_DIR}/include -I${LIB_DIR}/include/jasper|g" makefile
+
+  # Allow other compilers besides gcc
+  sed -i "s|CC=gcc|CC=${CC}|g" makefile
+
+  # remove -D__64BIT__ flag because compiling with it has
+  # shown issues with GRIB/GRIB2 files that are over 2GB in size
+  # This flag was removed in g2clib 1.6.4
+  # so this can be removed if the version is updated
+  sed -i 's/-D__64BIT__//g' makefile
   echo "cd `pwd`"
   # g2clib appears to compile but causes failure compiling MET if -j argument is used
   # so exclude it from this call
@@ -430,6 +456,7 @@ if [ $COMPILE_G2CLIB -eq 1 ]; then
   cp libg2c*.a ${LIB_DIR}/lib/libgrib2c.a
   cp *.h ${LIB_DIR}/include/.
 fi
+
 
 # Compile HDF
 # Depends on jpeg
@@ -609,9 +636,9 @@ export LDFLAGS="-Wl,--disable-new-dtags"
 # https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html
 # ${parameter:+word}
 # If parameter is null or unset, nothing is substituted, otherwise the expansion of word is substituted.
-export LDFLAGS="${LDFLAGS} -Wl,-rpath,${LIB_DIR}/lib${MET_NETCDF:+:$MET_NETCDF/lib}${MET_HDF5:+:$MET_HDF5/lib}${MET_BUFRLIB:+:$MET_BUFRLIB}${MET_GRIB2CLIB:+:$MET_GRIB2CLIB}${MET_PYTHON:+:$MET_PYTHON/lib}${MET_GSL:+:$MET_GSL/lib}"
+export LDFLAGS="${LDFLAGS} -Wl,-rpath,${LIB_DIR}/lib${ADDTL_DIR:+:$ADDTL_DIR}${LIB_DIR}/lib${MET_NETCDF:+:$MET_NETCDF/lib}${MET_HDF5:+:$MET_HDF5/lib}${MET_BUFRLIB:+:$MET_BUFRLIB}${MET_GRIB2CLIB:+:$MET_GRIB2CLIB}${MET_PYTHON_LIB:+:$MET_PYTHON_LIB}${MET_GSL:+:$MET_GSL/lib}"
 export LDFLAGS="${LDFLAGS} -Wl,-rpath,${LIB_JASPER:+$LIB_JASPER}${LIB_LIBPNG:+:$LIB_PNG}${LIB_Z:+$LIB_Z}"
-export LDFLAGS="${LDFLAGS} ${LIB_JASPER:+-L$LIB_JASPER} ${LIB_LIBPNG:+-L$LIB_LIBPNG} ${MET_HDF5:+-L$MET_HDF5/lib}"
+export LDFLAGS="${LDFLAGS} ${LIB_JASPER:+-L$LIB_JASPER} ${LIB_LIBPNG:+-L$LIB_LIBPNG} ${MET_HDF5:+-L$MET_HDF5/lib} ${ADDTL_DIR:+-L$ADDTL_DIR}"
 export LIBS="${LIBS} -lhdf5_hl -lhdf5 -lz"
 export MET_FONT_DIR=${TEST_BASE}/fonts
 
@@ -628,7 +655,7 @@ if [[ $COMPILER_FAMILY == "pgi" ]]; then
   export OPT_ARGS="${OPT_ARGS} FFLAGS=-lpgf90"
 fi
 
-configure_cmd="./configure --prefix=${MET_DIR} --bindir=${BIN_DIR_PATH}"
+configure_cmd="./configure --prefix=${MET_INSTALL_DIR} --bindir=${BIN_DIR_PATH}"
 configure_cmd="${configure_cmd} BUFRLIB_NAME=${BUFRLIB_NAME}"
 configure_cmd="${configure_cmd} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2"
 if [[ ! -z ${MET_FREETYPEINC} && ! -z ${MET_FREETYPELIB} && \

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -23,7 +23,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-GlobalPython GP;   //  this needs external linkage
+extern GlobalPython GP;   //  this needs external linkage
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -31,15 +31,11 @@ GlobalPython GP;   //  this needs external linkage
 
 static const char * user_ppath            = 0;
 
-static const char write_tmp_nc         [] = "MET_BASE/wrappers/write_tmp_dataplane.py";
+static const char write_tmp_nc         [] = "MET_BASE/python/pyembed/write_tmp_dataplane.py";
 
-static const char read_tmp_nc          [] = "read_tmp_dataplane";   //  NO ".py" suffix
-
-static const char tmp_nc_base_name     [] = "tmp_met_nc";
+static const char read_tmp_nc          [] = "pyembed.read_tmp_dataplane";   //  NO ".py" suffix
 
 static const char tmp_nc_var_name      [] = "met_info";
-
-static const char tmp_nc_file_var_name [] = "tmp_nc_filename";
 
 
 ////////////////////////////////////////////////////////////////////////

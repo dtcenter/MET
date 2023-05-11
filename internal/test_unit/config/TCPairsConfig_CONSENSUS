@@ -107,42 +107,49 @@ consensus = [
                    "UE35" ];
       required = [];
       min_req  = 36;
+      write_members = FALSE;
    },
    {
       name     = "HCCA_CONS";
       members  = [ "AEMI", "GFSI", "CTCI", "DSHP", "EGRI", "EMN2", "EMXI", "HWFI", "LGEM" ];
       required = [];
       min_req  = 8;
+      write_members = TRUE;
    },
    {
       name     = "GFEX_CONS";
       members  = [ "GFSI", "EMXI" ];
       required = [];
       min_req  = 2;
+      write_members = TRUE;
    },
    {
       name     = "TVCA_CONS";
       members  = [ "GFSI", "EGRI", "HWFI", "EMHI", "CTCI", "EMNI" ];
       required = [];
       min_req  = 2;
+      write_members = TRUE;
    },
    {
       name     = "TVCX_CONS";
       members  = [ "GFSI", "EMXI", "EMXI", "HWFI", "CTCI", "EGRI" ];
       required = [   TRUE,   TRUE,  FALSE,  FALSE,  FALSE,  FALSE ];
       min_req  = 2;
+      write_members = TRUE;
    },
    {
       name     = "ICON_CONS";
       members  = [ "DSHP", "LGEM", "HWFI", "HMNI" ];
       required = [   TRUE,   TRUE,   TRUE,   TRUE ];
       min_req  = 4;
+      write_members = TRUE;
    },
    {
       name     = "IVCN_CONS";
       members  = [ "DSHP", "LGEM", "HWFI", "HMNI", "CTCI" ];
       required = [];
       min_req  = 2;
+      write_members = TRUE;
    }
 ];
 
@@ -200,4 +207,4 @@ basin_map = [
 // Indicate a version number for the contents of this configuration file.
 // The value should generally not be modified.
 //
-version = "V11.0.0";
+version = "V11.1.0";

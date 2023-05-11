@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -928,7 +928,6 @@ switch ( e2->type() )  {
       mlog << Error
            << "\n\n  ModeConfInfo::is_multivar() const -> bad object type for entry \"fcst.field\"\n\n";
       exit ( 1 );
-      break;
 
 }
 

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -183,10 +183,13 @@ bool MetNcFile::readFile(const int desired_grib_code,
   float obs_arr_block[    buf_size][obs_arr_len];
   //char obs_qty_str_block[ buf_size][strl_count];
 
-  long offsets[2] = { 0, 0 };
-  long lengths[2] = { 1, 1 };
+  LongArray offsets;    // = { 0, 0 };
+  LongArray lengths;    //  = { 1, 1 };
 
-  lengths[0] = hdr_buf_size;
+  offsets.add(0);
+  offsets.add(0);
+  lengths.add(1);
+  lengths.add(hdr_buf_size);
 
   //
   // Get the corresponding header message type

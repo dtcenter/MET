@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -536,8 +536,6 @@ mlog << Error << "\nColorTable::interp(double) const -> confused!\n\n";
 
 exit ( 1 );
 
-return ( black );
-
 }
 
 
@@ -554,7 +552,7 @@ clear();
 
 input_filename = filename;
 
-if ( (colorin = fopen(input_filename, "r")) == NULL )  {
+if ( (colorin = fopen(input_filename, "r")) == nullptr )  {
 
    colorin = (FILE *) 0;
 

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -143,10 +143,6 @@ mlog << Error << "\n\n  CgraphBase::CgraphBase(const CgraphBase &) -> should nev
 
 exit ( 1 );
 
-   // cgraph_init_from_scratch();
-   // 
-   // assign(c);
-
 }
 
 
@@ -160,13 +156,6 @@ CgraphBase & CgraphBase::operator=(const CgraphBase &)
 mlog << Error << "\n\n  operator=CgraphBase(const CgraphBase &) -> should never be called!\n\n";
 
 exit ( 1 );
-
-
-// if ( this == &c )  return ( * this );
-// 
-// assign(c);
-
-return ( * this );
 
 }
 
@@ -314,8 +303,6 @@ if ( empty (filename) )  {
    mlog << Error << "\n\n  CgraphBase::open() -> empty filename!\n\n";
 
    exit ( 1 );
-
-   // return ( false );
 
 }
 
@@ -810,7 +797,7 @@ FT_UInt previous;
 FT_Glyph_Metrics * metrics = (FT_Glyph_Metrics *) 0;
 FT_Vector k_delta;
 const bool use_kerning = DoKerning && FT_HAS_KERNING(face);
-const char * new_string = (const char *) NULL;
+const char * new_string = (const char *) nullptr;
 bool first_char = false;
 bool last_char  = false;
 double x_bearing, y_bearing, advance;
@@ -1662,10 +1649,6 @@ mlog << Error << "\n\n  Cgraph::Cgraph(const Cgraph &) -> should never be called
 
 exit ( 1 );
 
-   // cgraph2_init_from_scratch();
-   // 
-   // assign(c);
-
 }
 
 
@@ -1679,13 +1662,6 @@ Cgraph & Cgraph::operator=(const Cgraph &)
 mlog << Error << "\n\n  operator=Cgraph(const Cgraph &) -> should never be called!\n\n";
 
 exit ( 1 );
-
-
-// if ( this == &c )  return ( * this );
-// 
-// assign(c);
-
-return ( * this );
 
 }
 
@@ -2115,7 +2091,7 @@ if ( empty(in) )  {
 int j, k;
 char c0, c1;
 const int N = m_strlen(in);
-char * s = (char *) NULL;
+char * s = (char *) nullptr;
 FT_UInt fi_glyph_index = 0;
 FT_UInt fl_glyph_index = 0;
 
@@ -2161,7 +2137,7 @@ while ( j < N )  {
    //  done
    //
 
-out = s;  s = (char *) NULL;
+out = s;  s = (char *) nullptr;
 
 return;
 
@@ -2226,8 +2202,6 @@ int my_conic (const FT_Vector * control, const FT_Vector * to, void * u)
 mlog << Error << "\n\n  my_conic() -> should never be called!\n\n";
 
 exit ( 1 );
-
-return ( 0 );
 
 }
 

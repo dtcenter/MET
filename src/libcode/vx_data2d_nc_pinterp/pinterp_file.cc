@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -571,7 +571,7 @@ double d = bad_data_double;
 double missing_value = get_var_missing_value(var);
 get_var_fill_value(var, fill_value);
 
-status = get_nc_data(var, &d, (long *)a);
+status = get_nc_data(var, &d, a);
 
 if ( !status )  {
 
@@ -669,7 +669,7 @@ if ( !found )  {
    //  check x_slot and y_slot
    //
 
-if ( var == NULL || (var->x_slot < 0) || (var->y_slot < 0) )  {
+if ( var == nullptr || (var->x_slot < 0) || (var->y_slot < 0) )  {
 
    mlog << Error
         << "\nPinterpFile::data(NcVar *, const LongArray &, DataPlane &, double &) const -> "
@@ -743,12 +743,12 @@ plane.set_size(Nx, Ny);
    //
 double d[Ny];
 
-long offsets[dim_count];
-long lengths[dim_count];
+LongArray offsets;
+LongArray lengths;
 
 for (int k=0; k<dim_count; k++) {
-  offsets[k] = (a[k] == vx_data2d_star) ? 0 : a[k];
-  lengths[k] = 1;
+  offsets.add((a[k] == vx_data2d_star) ? 0 : a[k]);
+  lengths.add(1);
 }
 lengths[y_slot] = Ny;
 
@@ -804,7 +804,7 @@ bool PinterpFile::data(const char * var_name, const LongArray & a, DataPlane & p
    int time_index;
    bool found = false;
 
-   if (NULL != info) found = true;
+   if (nullptr != info) found = true;
    else found = get_nc_var_info(var_name, info);
 
    if ( !found )  return ( false );
@@ -850,7 +850,7 @@ bool PinterpFile::data(const char * var_name, const LongArray & a, DataPlane & p
 bool PinterpFile::get_nc_var_info(const char *var_name, NcVarInfo *&info) const {
    bool found = false;
 
-   if (NULL == info) {
+   if (nullptr == info) {
       for (int j=0; j<Nvars; ++j)  {
 
          if ( Var[j].name == var_name )  {

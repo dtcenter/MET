@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -152,7 +152,7 @@ for (j=(info.n_filters() - 1); j>= 0; --j)  {
 plot.file() << "\n"
             <<  ">>\n\nimage\n\n";
 
-if ( out == NULL ) { return; }
+if ( out == nullptr ) { return; }
  
 for (r=0; r<ny; ++r)  {
 

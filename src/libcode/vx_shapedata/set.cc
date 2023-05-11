@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -169,7 +169,7 @@ if ( s.n_fcst_alloc > 0 )  {
 
 }
 
-   
+
 if ( s.n_obs_alloc > 0 )   {
 
    extend_obs  (s.n_obs_alloc);
@@ -239,7 +239,7 @@ u = new int [k];
 
 if ( a )  memcpy(u, a, n_alloc*sizeof(int));
 
-for (j=n_alloc; j<k; ++j)  u[j] = 0;
+for (j=((n_alloc < 0) ? 0 : n_alloc); j<k; ++j) u[j] = 0;
 
 if ( a )  { delete [] a;  a = 0; }
 
@@ -496,7 +496,7 @@ k *= fcst_obs_set_alloc_inc;
 
 u = new FcstObsSet [k];
 
-if ( set )  { 
+if ( set )  {
 
    for (j=0; j<n_alloc; ++j)  u[j] = set[j];
 
@@ -697,21 +697,21 @@ void SetCollection::clear_empty_sets()
 {
 
 int i, j;
-   
+
 for(i=0; i<n_sets; i++) {
-   
+
    if(set[i].n_fcst == 0 || set[i].n_obs == 0) {
-      
+
       for(j=i; (j+1)<n_sets; j++) set[j] = set[j+1];
-	 
+
       n_sets--;
 
       i--;
 
-   }   //  if 
+   }   //  if
 
 }  // for i
-   
+
 return;
 
 }

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -267,6 +267,30 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+void StringArray::add_uniq(const std::string text)
+
+{
+
+   //
+   // Only store unique strings
+   //
+
+if(!has(text)) {
+
+   s.push_back(text);
+
+   Sorted = false;
+
+}
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void StringArray::add(const StringArray & a)
 
 {
@@ -276,6 +300,35 @@ if ( a.n() == 0 )  return;
 s.insert(s.end(), a.s.begin(), a.s.end());
 
 Sorted = false;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void StringArray::add_uniq(const StringArray & a)
+
+{
+
+if ( a.n() == 0 )  return;
+
+   //
+   // Only store unique strings
+   //
+
+for(int i=0; i<a.n(); i++) {
+
+   if(!has(a[i])) {
+
+      s.push_back(a[i]);
+
+      Sorted = false;
+
+   }
+}
 
 return;
 

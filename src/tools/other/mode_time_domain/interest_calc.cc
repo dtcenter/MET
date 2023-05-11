@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -143,7 +143,7 @@ void InterestCalculator::assign(const InterestCalculator & i)
 
 clear();
 
-if ( i.Nelements == 0 )  return;
+if ( i.Nelements <= 0 )  return;
 
 extend(i.Nelements);
 
@@ -210,11 +210,11 @@ if ( Nelements > 0 )  {
 
 }
 
-delete [] W;  W = 0;
+delete [] W;  W = nullptr;
 
-delete [] F;  F = 0;
+delete [] F;  F = nullptr;
 
-delete [] A;  A = 0;
+delete [] A;  A = nullptr;
 
 W = ww;
 
@@ -222,11 +222,11 @@ F = ff;
 
 A = aa;
 
-ww = 0;
+ww = nullptr;
 
-ff = 0;
+ff = nullptr;
 
-aa = 0;
+aa = nullptr;
 
    //
    //  done
@@ -256,6 +256,7 @@ if ( _weight < 0.0 )  {
 
 }
 
+if (Nelements < 0) Nelements = 0;   // SonarQube findings
 
 extend(Nelements + 1);
 

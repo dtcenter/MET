@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -149,7 +149,7 @@ void VarInfoNcMet::set_magic(const ConcatString &nstr, const ConcatString &lstr)
    set_name(nstr);
 
    // If there's no level specification, assume (*, *)
-   if(strchr(lstr.c_str(), '(') == NULL) {
+   if(strchr(lstr.c_str(), '(') == nullptr) {
       Level.set_req_name("*,*");
       Level.set_name("*,*");
       Dimension.clear();
@@ -170,17 +170,17 @@ void VarInfoNcMet::set_magic(const ConcatString &nstr, const ConcatString &lstr)
       Level.set_name(ptr);
 
       // If dimensions are specified, clear the default value
-      if(strchr(ptr, ',') != NULL) Dimension.clear();
+      if(strchr(ptr, ',') != nullptr) Dimension.clear();
 
       // Parse the dimensions
-      while((ptr2 = strtok_r(ptr, ",", &save_ptr)) != NULL) {
+      while((ptr2 = strtok_r(ptr, ",", &save_ptr)) != nullptr) {
 
          // Check for wildcards
-         if(strchr(ptr2, '*') != NULL) Dimension.add(vx_data2d_star);
+         if(strchr(ptr2, '*') != nullptr) Dimension.add(vx_data2d_star);
          else {
 
             // Check for a range of levels
-            if((ptr3 = strchr(ptr2, '-')) != NULL) {
+            if((ptr3 = strchr(ptr2, '-')) != nullptr) {
 
                // Check if a range has already been supplied
                if(Dimension.has(range_flag)) {
@@ -202,14 +202,14 @@ void VarInfoNcMet::set_magic(const ConcatString &nstr, const ConcatString &lstr)
             }
          }
 
-         // Set ptr to NULL for next call to strtok
-         ptr = NULL;
+         // Set ptr to nullptr for next call to strtok
+         ptr = nullptr;
       } // end while
 
    } // end else
 
    // Check for "/PROB" to indicate a probability forecast
-   if(strstr(MagicStr.c_str(), "/PROB") != NULL) PFlag = 1;
+   if(strstr(MagicStr.c_str(), "/PROB") != nullptr) PFlag = 1;
 
    // Set the long name
    tmp_str.format("%s(%s)", req_name().text(), Level.req_name().text());

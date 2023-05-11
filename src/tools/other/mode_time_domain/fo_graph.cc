@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -141,7 +141,9 @@ N_nodes = N*N;
 
 TheGraph = new FO_Node [N_nodes];
 
-memcpy(TheGraph, g.TheGraph, N_nodes*sizeof(FO_Node));
+for (int idx=0; idx<N_nodes; idx++) {
+   TheGraph[idx] = g.TheGraph[idx];
+}
 
    //
    //  done

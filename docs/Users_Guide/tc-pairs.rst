@@ -199,10 +199,11 @@ ____________________
         members  = [ "MOD1", "MOD2", "MOD3" ];
         required = [   true,  false, false  ];
         min_req  = 2;
+        write_members = TRUE;
      }
   ];
 
-The **consensus** field allows the user to generate a user-defined consensus forecasts from any number of models. All models used in the consensus forecast need to be included in the **model** field (first entry in **TCPairsConfig_default**). The name field is the desired consensus model name. The **members** field is a comma-separated list of model IDs that make up the members of the consensus. The **required** field is a comma-separated list of true/false values associated with each consensus member. If a member is designated as true, the member is required to be present in order for the consensus to be generated. If a member is false, the consensus will be generated regardless of whether the member is present. The length of the required array must be the same length as the members array. The **min_req** field is the number of members required in order for the consensus to be computed. The required and min_req field options are applied at each forecast lead time. If any member of the consensus has a non-valid position or intensity value, the consensus for that valid time will not be generated. If a consensus model is indicated in the configuration file there will be non-missing output for the consensus track variables in the output file (NUM_MEMBERS, TRACK_SPREAD, TRACK_STDEV, MSLP_STDEV, MAX_WIND_STDEV). See the TCMPR line type definitions below.
+The **consensus** field allows the user to generate a user-defined consensus forecasts from any number of models. All models used in the consensus forecast need to be included in the **model** field (first entry in **TCPairsConfig_default**). The name field is the desired consensus model name. The **members** field is a comma-separated list of model IDs that make up the members of the consensus. The **required** field is a comma-separated list of true/false values associated with each consensus member. If a member is designated as true, the member is required to be present in order for the consensus to be generated. If a member is false, the consensus will be generated regardless of whether the member is present. The length of the required array must be the same length as the members array. The **min_req** field is the number of members required in order for the consensus to be computed. The required and min_req field options are applied at each forecast lead time. If any member of the consensus has a non-valid position or intensity value, the consensus for that valid time will not be generated. The **write_members** field is a boolean that indicates whether or not to write output for the individual consensus members. If set to true, standard output will show up for all members. If set to false, output for the consensus members is excluded from the output, even if they are used to define other consensus tracks in the configuration file. If a consensus model is defined in the configuration file, there will be non-missing output for the consensus track variables in the output file (NUM_MEMBERS, TRACK_SPREAD, TRACK_STDEV, MSLP_STDEV, MAX_WIND_STDEV). See the TCMPR line type definitions below.
 
 ____________________
 
@@ -420,35 +421,38 @@ TC-Pairs produces output in TCST format. The default output file name can be ove
     - BMODEL
     - User provided text string designating model name
   * - 4
+    - DESC
+    - User provided description text string
+  * - 5
     - STORM_ID
     - BBCCYYYY designation of storm
-  * - 5
+  * - 6
     - BASIN
     - Basin (BB in STORM_ID)
-  * - 6
+  * - 7
     - CYCLONE
     - Cyclone number (CC in STORM_ID)
-  * - 7
+  * - 8
     - STORM_NAME
     - Name of Storm
-  * - 8
+  * - 9
     - INIT
     - Initialization time of forecast in YYYYMMDD_HHMMSS format.
-  * - 9
+  * - 10
     - LEAD
     - Forecast lead time in HHMMSS format.
-  * - 10
+  * - 11
     - VALID
     - Forecast valid time in YYYYMMDD_HHMMSS format.
-  * - 11
+  * - 12
     - INIT_MASK
     - Initialization time masking grid applied
-  * - 12
+  * - 13
     - VALID_MASK
     - Valid time masking grid applied
-  * - 13
+  * - 14
     - LINE_TYPE
-    - Output line type (TCMPR or PROBRIRW)
+    - Output line types described below
 
 .. _TCMPR Line Type:
 
@@ -462,151 +466,151 @@ TC-Pairs produces output in TCST format. The default output file name can be ove
   * - Column Number
     - Header Column Name
     - Description
-  * - 13
+  * - 14
     - TCMPR
     - Tropical Cyclone Matched Pair line type
-  * - 14
+  * - 15
     - TOTAL
     - Total number of pairs in track
-  * - 15
+  * - 16
     - INDEX
     - Index of the current track pair
-  * - 16
+  * - 17
     - LEVEL
     - Level of storm classification
-  * - 17
+  * - 18
     - WATCH_WARN
     - HU or TS watch or warning in effect
-  * - 18
+  * - 19
     - INITIALS
     - Forecaster initials
-  * - 19
+  * - 20
     - ALAT
     - Latitude position of adeck model
-  * - 20
+  * - 21
     - ALON
     - Longitude position of adeck model
-  * - 21
+  * - 22
     - BLAT
     - Latitude position of bdeck model
-  * - 22
+  * - 23
     - BLON
     - Longitude position of bdeck model
-  * - 23
+  * - 24
     - TK_ERR
     - Track error of adeck relative to bdeck (nm)
-  * - 24
+  * - 25
     - X_ERR
     - X component position error (nm)
-  * - 25
+  * - 26
     - Y_ERR
     - Y component position error (nm)
-  * - 26
+  * - 27
     - ALTK_ERR
     - Along track error (nm)
-  * - 27
+  * - 28
     - CRTK_ERR
     - Cross track error (nm)
-  * - 28
+  * - 29
     - ADLAND
     - adeck distance to land (nm)
-  * - 29
+  * - 30
     - BDLAND
     - bdeck distance to land (nm)
-  * - 30
+  * - 31
     - AMSLP
     - adeck mean sea level pressure
-  * - 31
+  * - 32
     - BMSLP
     - bdeck mean sea level pressure
-  * - 32
+  * - 33
     - AMAX_WIND
     - adeck maximum wind speed
-  * - 33
+  * - 34
     - BMAX_WIND
     - bdeck maximum wind speed
-  * - 34, 35
+  * - 35, 36
     - A/BAL_WIND_34
     - a/bdeck 34-knot radius winds in full circle
-  * - 36, 37
+  * - 37, 38
     - A/BNE_WIND_34
     - a/bdeck 34-knot radius winds in NE quadrant
-  * - 38, 39
+  * - 39, 40
     - A/BSE_WIND_34
     - a/bdeck 34-knot radius winds in SE quadrant
-  * - 40, 41
+  * - 41, 42
     - A/BSW_WIND_34
     - a/bdeck 34-knot radius winds in SW quadrant
-  * - 42, 43
+  * - 43, 44
     - A/BNW_WIND_34
     - a/bdeck 34-knot radius winds in NW quadrant
-  * - 44, 45
+  * - 45, 46
     - A/BAL_WIND_50
     - a/bdeck 50-knot radius winds in full circle
-  * - 46, 47
+  * - 47, 48
     - A/BNE_WIND_50
     - a/bdeck 50-knot radius winds in NE quadrant
-  * - 48, 49
+  * - 49, 50
     - A/BSE_WIND_50
     - a/bdeck 50-knot radius winds in SE quadrant
-  * - 50, 51
+  * - 51, 52
     - A/BSW_WIND_50
     - a/bdeck 50-knot radius winds in SW quadrant
-  * - 52, 53
+  * - 53, 54
     - A/BNW_WIND_50
     - a/bdeck 50-knot radius winds in NW quadrant
-  * - 54, 55
+  * - 55, 56
     - A/BAL_WIND_64
     - a/bdeck 64-knot radius winds in full circle
-  * - 56, 57
+  * - 57, 58
     - A/BNE_WIND_64
     - a/bdeck 64-knot radius winds in NE quadrant
-  * - 58, 59
+  * - 59, 60
     - A/BSE_WIND_64
     - a/bdeck 64-knot radius winds in SE quadrant
-  * - 60, 61
+  * - 61, 62
     - A/BSW_WIND_64
     - a/bdeck 64-knot radius winds in SW quadrant
-  * - 62, 63
+  * - 63, 64
     - A/BNW_WIND_64
     - a/bdeck 64-knot radius winds in NW quadrant
-  * - 64, 65
+  * - 65, 66
     - A/BRADP
     - pressure in millibars of the last closed isobar, 900 - 1050 mb
-  * - 66, 67
+  * - 67, 68
     - A/BRRP
     - radius of the last closed isobar in nm, 0 - 9999 nm
-  * - 68, 69
+  * - 69, 70
     - A/BMRD
     - radius of max winds, 0 - 999 nm
-  * - 70, 71
+  * - 71, 72
     - A/BGUSTS
     - gusts, 0 through 995 kts
-  * - 72, 73
+  * - 73, 74
     - A/BEYE
     - eye diameter, 0 through 999 nm
-  * - 74, 75
+  * - 75, 76
     - A/BDIR
     - storm direction in compass coordinates, 0 - 359 degrees
-  * - 76, 77
+  * - 77, 78
     - A/BSPEED
     - storm speed, 0 - 999 kts
-  * - 78, 79
+  * - 79, 80
     - A/BDEPTH
     - system depth, D-deep, M-medium, S-shallow, X-unknown
-  * - 80
+  * - 81
     - NUM_MEMBERS
     - consensus variable: number of models (or ensemble members) that were used to build the consensus track
-  * - 81
+  * - 82
     - TRACK_SPREAD
     - consensus variable: the mean of the distances from the member location to the consensus track location (nm)
-  * - 82
+  * - 83
     - TRACK_STDEV
     - consensus variable: the standard deviation of the distances from the member locations to the consensus track location (nm)
-  * - 83
+  * - 84
     - MSLP_STDEV
     - consensus variable: the standard deviation of the member's mean sea level pressure values 
-  * - 84
+  * - 85
     - MAX_WIND_STDEV
     - consensus variable: the standard deviation of the member's maximum wind speed values 
 
@@ -622,31 +626,31 @@ TC-Pairs produces output in TCST format. The default output file name can be ove
   * - Column Number
     - Header Column Name
     - Description
-  * - 13
+  * - 14
     - TCDIAG
     - Tropical Cyclone Diagnostics line type
-  * - 14
+  * - 15
     - TOTAL
     - Total number of pairs in track
-  * - 15
+  * - 16
     - INDEX
     - Index of the current track pair
-  * - 16
+  * - 17
     - DIAG_SOURCE
     - Diagnostics data source indicated by the `-diag` command line option
-  * - 17
+  * - 18
     - TRACK_SOURCE
     - ATCF ID of the track data used to define the diagnostics
-  * - 18
+  * - 19
     - FIELD_SOURCE
     - Description of gridded field data source used to define the diagnostics
-  * - 19
+  * - 20
     - N_DIAG
     - Number of storm diagnostic name and value columns to follow
-  * - 20
+  * - 21
     - DIAG_i
     - Name of the of the ith storm diagnostic (repeated)
-  * - 21
+  * - 22
     - VALUE_i
     - Value of the ith storm diagnostic (repeated)
 
@@ -662,75 +666,75 @@ TC-Pairs produces output in TCST format. The default output file name can be ove
   * - Column Number
     - Header Column Name
     - Description
-  * - 13
+  * - 14
     - PROBRIRW
     - Probability of Rapid Intensification/Weakening line type
-  * - 14
+  * - 15
     - ALAT
     - Latitude position of edeck model
-  * - 15
+  * - 16
     - ALON
     - Longitude position of edeck model
-  * - 16
+  * - 17
     - BLAT
     - Latitude position of bdeck model
-  * - 17
+  * - 18
     - BLON
     - Longitude position of bdeck model
-  * - 18
+  * - 19
     - INITIALS
     - Forecaster initials
-  * - 19
+  * - 20
     - TK_ERR
     - Track error of adeck relative to bdeck (nm)
-  * - 20
+  * - 21
     - X_ERR
     - X component position error (nm)
-  * - 21
+  * - 22
     - Y_ERR
     - Y component position error (nm)
-  * - 22
+  * - 23
     - ADLAND
     - adeck distance to land (nm)
-  * - 23
+  * - 24
     - BDLAND
     - bdeck distance to land (nm)
-  * - 24
+  * - 25
     - RI_BEG
     - Start of RI time window in HH format
-  * - 25
+  * - 26
     - RI_END
     - End of RI time window in HH format
-  * - 26
+  * - 27
     - RI_WINDOW
     - Width of RI time window in HH format
-  * - 27
+  * - 28
     - AWIND_END
     - Forecast maximum wind speed at RI end
-  * - 28
+  * - 29
     - BWIND_BEG
     - Best track maximum wind speed at RI begin
-  * - 29
+  * - 30
     - BWIND_END
     - Best track maximum wind speed at RI end
-  * - 30
+  * - 31
     - BDELTA
     - Exact Best track wind speed change in RI window
-  * - 31
+  * - 32
     - BDELTA_MAX
     - Maximum Best track wind speed change in RI window
-  * - 32
+  * - 33
     - BLEVEL_BEG
     - Best track storm classification at RI begin
-  * - 33
+  * - 34
     - BLEVEL_END
     - Best track storm classification at RI end
-  * - 34
+  * - 35
     - N_THRESH
     - Number of probability thresholds
-  * - 35
+  * - 36
     - THRESH_i
     - The ith probability threshold value (repeated)
-  * - 36
+  * - 37
     - PROB_i
     - The ith probability value (repeated)

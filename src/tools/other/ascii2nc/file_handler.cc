@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2022
+// ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -53,14 +53,6 @@ FileHandler::FileHandler(const string &program_name) :
   _nhdr(0),
   _hdrNum(0),
   _obsNum(0),
-  _gridMaskNum(0),
-  _areaMaskNum(0),
-  _polyMaskNum(0),
-  _sidMaskNum(0),
-  _gridMask(0),
-  _areaMask(0),
-  _polyMask(0),
-  _sidMask(0),
   use_var_id(false),
   do_monitor(false),
   deflate_level(DEF_DEFLATE_LEVEL),
@@ -121,11 +113,11 @@ bool FileHandler::writeNetcdfFile(const string &nc_filename)
   // List the number of rejected observations.
 
   mlog << Debug(2)
-       << "Rejected " << _gridMaskNum
+       << "Rejected " << filters.get_grid_mask_cnt()
        << " observations off the masking grid.\n"
-       << "Rejected " << _areaMaskNum + _polyMaskNum
+       << "Rejected " << filters.get_area_mask_cnt() + filters.get_poly_mask_cnt()
        << " observations outside the masking polyline.\n"
-       << "Rejected " << _sidMaskNum
+       << "Rejected " << filters.get_sid_mask_cnt()
        << " observations not matched with station ID's.\n";
 
   // Loop through the observations, counting the number of headers needed in
@@ -274,52 +266,14 @@ bool FileHandler::_addObservations(const Observation &obs)
    double grid_x, grid_y;
 
    //
-   // Apply the grid mask
+   // Apply the grid mask, the area mask, and the polyline mask
    //
-   if(_gridMask) {
-      _gridMask->latlon_to_xy(obs.getLatitude(), -1.0*obs.getLongitude(),
-                              grid_x, grid_y);
-
-      if(grid_x < 0 || grid_x >= _gridMask->nx() ||
-         grid_y < 0 || grid_y >= _gridMask->ny()) {
-         _gridMaskNum++;
-         return false;
-      }
-
-      //
-      // Apply the area mask
-      //
-      if(_areaMask) {
-         if(!_areaMask->s_is_on(nint(grid_x), nint(grid_y))) {
-            _areaMaskNum++;
-            return false;
-         }
-      }
-   }
-
-   //
-   // Apply the polyline mask
-   //
-   if(_polyMask)
-   {
-     if(!_polyMask->latlon_is_inside_dege(obs.getLatitude(), obs.getLongitude()))
-     {
-       _polyMaskNum++;
-       return false;
-     }
-   }
+   if(filters.is_filtered(obs.getLatitude(), obs.getLongitude())) return false;
 
    //
    // Apply the station ID mask
    //
-   if(_sidMask)
-   {
-     if(!_sidMask->has(obs.getStationId().c_str()))
-     {
-       _sidMaskNum++;
-       return false;
-     }
-   }
+   if(filters.is_filtered_sid(obs.getStationId().c_str())) return false;
 
    // Save obs because the obs vector is sorted after time summary
    _observations.push_back(obs);
