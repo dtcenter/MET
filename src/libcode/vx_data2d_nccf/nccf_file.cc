@@ -96,7 +96,7 @@ void NcCfFile::init_from_scratch()
   _ncFile = (NcFile *) 0;
   _dims = (NcDim **) 0;
   Var = (NcVarInfo *) 0;
-  _time_var_info = (NcVarInfo *)NULL;
+  _time_var_info = (NcVarInfo *)nullptr;
 
   _xDim = (NcDim *)0; 
   _yDim = (NcDim *)0;
@@ -265,7 +265,7 @@ bool NcCfFile::open(const char * filepath)
     }
   }   //  for j
 
-  if (NULL == _time_var_info) {
+  if (nullptr == _time_var_info) {
     for (int j=0; j<Nvars; ++j)  {
       if (is_nc_unit_time(Var[j].units_att.c_str())) {
         valid_time_var = Var[j].var;
@@ -902,7 +902,7 @@ double NcCfFile::getData(NcVar * var, const LongArray & a) const
   double missing_value = get_var_missing_value(var);
   get_var_fill_value(var, fill_value);
 
-  status = get_nc_data(var, &d, (long *)a);
+  status = get_nc_data(var, &d, a);
 
   if (!status)
   {
@@ -986,7 +986,7 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
     if (a[j] == vx_data2d_star)
     {
       ++count;
-      if ( var == NULL || ((j != var->x_slot) && (j != var->y_slot)) )
+      if ( var == nullptr || ((j != var->x_slot) && (j != var->y_slot)) )
       {
         mlog << Error << "\n" << method_name
              << "star found in bad slot\n\n";
@@ -1005,7 +1005,7 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
   //  check slots - additional logic to satisfy Fortify Null Dereference
  int x_slot_tmp = 0;
  int y_slot_tmp = 0;
-  if (var == NULL || var->x_slot < 0 || var->y_slot < 0)
+  if (var == nullptr || var->x_slot < 0 || var->y_slot < 0)
   {
     mlog << Error << "\n" << method_name
          << "bad x|y|z slot\n\n";
@@ -1049,11 +1049,11 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
   double *d = new double[plane_size];
 
   size_t dim_size;
-  long offsets[dim_count];
-  long lengths[dim_count];
+  LongArray offsets;
+  LongArray lengths;
   for (int k=0; k<dim_count; k++) {
-    offsets[k] = (a[k] == vx_data2d_star) ? 0 : a[k];
-    lengths[k] = 1;
+    offsets.add((a[k] == vx_data2d_star) ? 0 : a[k]);
+    lengths.add(1);
     dim_size = v->getDim(k).getSize();
     if (dim_size < offsets[k]) {
       mlog << Error << "\n" << method_name
@@ -3202,9 +3202,11 @@ LatLonData NcCfFile::get_data_from_lat_lon_vars(NcVar *lat_var, NcVar *lon_var,
   bool lat_first = false;
   if (two_dim_coord) {
     lat_first = (lat_counts == get_dim_size(lat_var, 0));
-    long cur[2], length[2];
-    cur[0] = cur[1] = 0;
-    length[0] = length[1] = 1;
+    LongArray cur, length;  // {0,0}, {1,1}
+    cur.add(0);
+    cur.add(0);
+    length.add(1);
+    length.add(1);
     if (lat_first) length[0] = lat_counts;
     else length[1] = lat_counts;
     get_nc_data(lat_var,lat_values, length, cur);

@@ -413,7 +413,7 @@ double fill_value;
 double missing_value = get_var_missing_value(var);
 get_var_fill_value(var, fill_value);
 
-status = get_nc_data(var, &d, (long *)a);
+status = get_nc_data(var, &d, a);
 
 if ( !status )  {
 
@@ -516,7 +516,7 @@ for (j=0; j<(a.n_elements()); ++j)  {
 
       ++count;
 
-      if ( (var == NULL) || ( (j != var->x_slot) && (j != var->y_slot) ) )  {
+      if ( (var == nullptr) || ( (j != var->x_slot) && (j != var->y_slot) ) )  {
 
          mlog << Error << "\n" << method_name << "star found in bad slot\n\n";
 
@@ -543,7 +543,7 @@ if ( count != 2 )  {
    
  int x_slot_tmp = 0;
  int y_slot_tmp = 0;
- if ( var == NULL || (var->x_slot < 0) || (var->y_slot < 0)  )  {
+ if ( var == nullptr || (var->x_slot < 0) || (var->y_slot < 0)  )  {
 
    mlog << Error << "\n" << method_name << "bad x|y|z slot\n\n";
 
@@ -579,10 +579,10 @@ plane.set_size(Nx, Ny);
    clock_t clock_time;
    double nc_time;
 
-   long dim[dimCount], cur[dimCount];
+   LongArray dim, cur;
    for (int index=0; index<dimCount; index++) {
-      dim[index] = 1;
-      cur[index] = (b[index] == vx_data2d_star) ? 0 : b[index];
+      dim.add(1);
+      cur.add((b[index] == vx_data2d_star) ? 0 : b[index]);
    }
    dim[x_slot] = Nx;
    dim[y_slot] = Ny;
@@ -634,7 +634,7 @@ bool MetNcFile::data(const char * var_name, const LongArray & a, DataPlane & pla
 
 info = find_var_name(var_name);
 
-bool found = ( NULL != info );
+bool found = ( nullptr != info );
 
 if ( !found )  return ( false );
 
@@ -663,7 +663,7 @@ NcVarInfo* MetNcFile::find_var_name(const char * var_name) const {
 
    for(int i=0; i < Nvars; i++) if( Var[i].name == var_name ) return &Var[i];
 
-   return NULL;
+   return nullptr;
 }
 
 

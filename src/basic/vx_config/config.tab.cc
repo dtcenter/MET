@@ -262,15 +262,15 @@ static void do_user_function_def();
 
 
 #line 265 "config.tab.cc" /* yacc.c:337  */
-# ifndef YY_NULLPTR
+# ifndef YY_nullptrPTR
 #  if defined __cplusplus
 #   if 201103L <= __cplusplus
-#    define YY_NULLPTR nullptr
+#    define YY_nullptrPTR nullptr
 #   else
-#    define YY_NULLPTR 0
+#    define YY_nullptrPTR 0
 #   endif
 #  else
-#   define YY_NULLPTR ((void*)0)
+#   define YY_nullptrPTR ((void*)0)
 #  endif
 # endif
 
@@ -694,7 +694,7 @@ static const char *const yytname[] =
   "dictionary_list", "string_list", "threshold_list", "threshold",
   "thresh_node", "simple_thresh", "number", "boolean_list", "opt_semi",
   "opt_comma", "expression", "$@2", "$@3", "expression_list",
-  "piecewise_linear", "point_list", "point", YY_NULLPTR
+  "piecewise_linear", "point_list", "point", YY_nullptrPTR
 };
 #endif
 
@@ -1173,11 +1173,11 @@ static int
 yysyntax_error (YYSIZE_T *yymsg_alloc, char **yymsg,
                 yytype_int16 *yyssp, int yytoken)
 {
-  YYSIZE_T yysize0 = yytnamerr (YY_NULLPTR, yytname[yytoken]);
+  YYSIZE_T yysize0 = yytnamerr (YY_nullptrPTR, yytname[yytoken]);
   YYSIZE_T yysize = yysize0;
   enum { YYERROR_VERBOSE_ARGS_MAXIMUM = 5 };
   /* Internationalized format string. */
-  const char *yyformat = YY_NULLPTR;
+  const char *yyformat = YY_nullptrPTR;
   /* Arguments of yyformat. */
   char const *yyarg[YYERROR_VERBOSE_ARGS_MAXIMUM];
   /* Number of reported tokens (one for the "unexpected", one per
@@ -1234,7 +1234,7 @@ yysyntax_error (YYSIZE_T *yymsg_alloc, char **yymsg,
                   }
                 yyarg[yycount++] = yytname[yyx];
                 {
-                  YYSIZE_T yysize1 = yysize + yytnamerr (YY_NULLPTR, yytname[yyx]);
+                  YYSIZE_T yysize1 = yysize + yytnamerr (YY_nullptrPTR, yytname[yyx]);
                   if (yysize <= yysize1 && yysize1 <= YYSTACK_ALLOC_MAXIMUM)
                     yysize = yysize1;
                   else
@@ -2268,8 +2268,6 @@ mlog << Error
 
 exit ( 1 );
 
-return;
-
 }
 
 
@@ -2320,8 +2318,6 @@ switch ( op )  {
    default:
       cerr << "\n\n  do_op() -> unrecognized op ... \"" << op << "\"\n\n";
       exit ( 1 );
-      break;
-
 
 }   //  switch
 
@@ -2371,7 +2367,6 @@ switch ( op )  {
       mlog << Error << "\ndo_integer_op() -> "
            << "bad operator ... \"" << op << "\"\n\n";
       exit ( 1 );
-      break;
 
 }
 

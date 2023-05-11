@@ -85,10 +85,13 @@ static void setup_netcdf_out(int nhdr);
 
 static bool get_filtered_nc_data(NcVar var, float *data, const long dim,
                                  const long cur, const char *var_name, bool required=true);
-static bool get_filtered_nc_data_2d(NcVar var, int *data, const long *dim,
-                                    const long *cur, const char *var_name, bool count_bad=false);
-static bool get_filtered_nc_data_2d(NcVar var, float *data, const long *dim,
-                                    const long *cur, const char *var_name, bool count_bad=false);
+// Added data_len for SonarQube
+static bool get_filtered_nc_data_2d(NcVar var, int *data, const LongArray &dim,
+                                    const LongArray &cur, const char *var_name,
+                                    int data_len=0, bool count_bad=false);
+static bool get_filtered_nc_data_2d(NcVar var, float *data, const LongArray &dim,
+                                    const LongArray &cur, const char *var_name,
+                                    int data_len=0, bool count_bad=false);
 
 static void check_quality_control_flag(int &value, const char qty, const char *var_name);
 static void check_quality_control_flag(float &value, const char qty, const char *var_name);
@@ -455,14 +458,14 @@ static bool get_filtered_nc_data(NcVar var, float *data,
 
 ////////////////////////////////////////////////////////////////////////
 
-static bool get_filtered_nc_data_2d(NcVar var, int *data, const long *dim,
-                                    const long *cur, const char *var_name,
-                                    bool count_bad) {
+static bool get_filtered_nc_data_2d(NcVar var, int *data, const LongArray &dim,
+                                    const LongArray &cur, const char *var_name,
+                                    int data_len, bool count_bad) {
 
    bool status = false;
-   int data_len = dim[0] * dim[1];
    const char *method_name = "get_filtered_nc_data_2d(int) ";
 
+   if (data_len <= 0) data_len = dim[0] * dim[1];
    for (int offset=0; offset<data_len; offset++) {
       data[offset] = bad_data_int;
    }
@@ -499,14 +502,14 @@ static bool get_filtered_nc_data_2d(NcVar var, int *data, const long *dim,
 
 ////////////////////////////////////////////////////////////////////////
 
-static bool get_filtered_nc_data_2d(NcVar var, float *data, const long *dim,
-                                    const long *cur, const char *var_name,
-                                    bool count_bad) {
+static bool get_filtered_nc_data_2d(NcVar var, float *data, const LongArray &dim,
+                                    const LongArray &cur, const char *var_name,
+                                    int data_len, bool count_bad) {
 
    bool status = false;
-   int data_len = dim[0] * dim[1];
    const char *method_name = "get_filtered_nc_data_2d(float) ";
 
+   if (data_len <= 0) data_len = dim[0] * dim[1];
    for (int offset=0; offset<data_len; offset++) {
       data[offset] = bad_data_float;
    }
@@ -882,10 +885,12 @@ void process_madis_metar(NcFile *&f_in) {
    //
    // Arrays of longs for indexing into NetCDF variables
    //
-   long *cur = new long [2];
-   long *dim = new long [2];
-   cur[0] = cur[1] = 0;
-   dim[0] = dim[1] = 1;
+   LongArray cur;   // {0,0}
+   LongArray dim;   // {1,1}
+   cur.add(0);
+   cur.add(0);
+   dim.add(1);
+   dim.add(1);
 
    int hdr_idx = 0;
    processed_count = 0;
@@ -1172,8 +1177,8 @@ void process_madis_metar(NcFile *&f_in) {
    //
    // Cleanup
    //
-   if(cur) { delete [] cur; cur = (long *) 0; }
-   if(dim) { delete [] dim; dim = (long *) 0; }
+   cur.clear();
+   dim.clear();
 
    return;
 }
@@ -1370,13 +1375,15 @@ void process_madis_raob(NcFile *&f_in) {
    //
    // Arrays of longs for indexing into NetCDF variables
    //
-   long *cur = new long [3];    // NetCDF API handles 2D or 3D
-   cur[0] = cur[1] = cur[2] = 0;
-   long *dim = new long [3];    // NetCDF API handles 2D or 3D
-   dim[0] = dim[1] = dim[2] = 1;
+   LongArray cur;    // NetCDF API checks dimension for 2D or 3D
+   LongArray dim;    // NetCDF API checks dimension for 2D or 3D
 
    int hdr_idx = 0;
    processed_count = 0;
+   cur.add(0);
+   cur.add(0);
+   dim.add(1);
+   dim.add(1);
 
    //
    // Process the header type.: For RAOB, store as ADPUPA.
@@ -1984,8 +1991,8 @@ void process_madis_raob(NcFile *&f_in) {
    //
    // Cleanup
    //
-   if(cur) { delete [] cur; cur = (long *) 0; }
-   if(dim) { delete [] dim; dim = (long *) 0; }
+   cur.clear();
+   dim.clear();
 
    return;
 }
@@ -2072,14 +2079,16 @@ void process_madis_profiler(NcFile *&f_in) {
    //
    // Arrays of longs for indexing into NetCDF variables
    //
-   long *cur = new long [3];    // NetCDF API handles 2D or 3D
-   cur[0] = cur[1] = cur[2] = 0;
-   long *dim = new long [3];    // NetCDF API handles 2D or 3D
-   dim[0] = dim[1] = dim[2] = 1;
+   LongArray cur;    // NetCDF API checks dimension for 2D or 3D
+   LongArray dim;    // NetCDF API checks dimension for 2D or 3D
 
    //int[] hdr_lat_arr = new int[BUFFER_SIZE];
    int hdr_idx = 0;
    processed_count = 0;
+   cur.add(0);
+   cur.add(0);
+   dim.add(1);
+   dim.add(1);
 
    //
    // Process the header type.
@@ -2105,13 +2114,15 @@ void process_madis_profiler(NcFile *&f_in) {
       char uComponentQty_arr[buf_size][nlvl];
       char vComponentQty_arr[buf_size][nlvl];
 
-      cur[0] = i_hdr_s;
-      dim[0] = buf_size;
+      // 1D variables
       get_nc_data(&in_hdr_vld_var, tmp_dbl_arr, buf_size, i_hdr_s);
       get_nc_data(&in_hdr_lat_var, hdr_lat_arr, buf_size, i_hdr_s);
       get_nc_data(&in_hdr_lon_var, hdr_lon_arr, buf_size, i_hdr_s);
       get_filtered_nc_data(in_hdr_elv_var,  hdr_elv_arr,  buf_size, i_hdr_s, "eleveation");
       get_filtered_nc_data(in_pressure_var, pressure_arr, buf_size, i_hdr_s, "pressure");
+
+      cur[0] = i_hdr_s;
+      dim[0] = buf_size;
 
       dim[1] = hdr_sid_len;
       get_nc_data(&in_hdr_sid_var, (char *)hdr_sid_arr, dim, cur);
@@ -2119,17 +2130,14 @@ void process_madis_profiler(NcFile *&f_in) {
       dim[1] = nlvl;
       get_nc_data(&var_levels, (float *)levels_arr, dim, cur);
 
+      int data_cnt = buf_size * nlvl;
       if (IS_VALID_NC(in_uComponentQty_var)) get_nc_data(&in_uComponentQty_var, (char *)uComponentQty_arr, dim, cur);
-      else memset(uComponentQty_arr, 0, buf_size*dim[1]*sizeof(char));
-
+      else memset(uComponentQty_arr, 0, data_cnt*sizeof(char));
       if (IS_VALID_NC(in_vComponentQty_var)) get_nc_data(&in_vComponentQty_var, (char *)vComponentQty_arr, dim, cur);
-      else memset(vComponentQty_arr, 0, buf_size*dim[1]*sizeof(char));
+      else memset(vComponentQty_arr, 0, data_cnt*sizeof(char));
 
-      get_filtered_nc_data_2d(in_uComponent_var, (float *)uComponent_arr, dim, cur, "uComponent");
-      get_filtered_nc_data_2d(in_vComponent_var, (float *)vComponent_arr, dim, cur, "vComponent");
-
-      dim[0] = 1;
-      dim[1] = 1;
+      get_filtered_nc_data_2d(in_uComponent_var, (float *)uComponent_arr, dim, cur, "uComponent", data_cnt);
+      get_filtered_nc_data_2d(in_vComponent_var, (float *)vComponent_arr, dim, cur, "vComponent", data_cnt);
 
       for (int i_idx=0; i_idx<buf_size; i_idx++) {
 
@@ -2147,12 +2155,6 @@ void process_madis_profiler(NcFile *&f_in) {
          count = 0;
          i_hdr = i_hdr_s + i_idx;
          mlog << Debug(3) << "Record Number: " << i_hdr << "\n";
-
-         //
-         // Use cur to index into the NetCDF variables.
-         //
-         cur[0] = i_hdr;
-         cur[1] = 0;
 
          //
          // Process the latitude, longitude, and elevation.
@@ -2201,11 +2203,6 @@ void process_madis_profiler(NcFile *&f_in) {
             mlog << Debug(3) << "  Level: " << i_lvl << "\n";
 
             //
-            // Use cur to index into the NetCDF variables.
-            //
-            cur[1] = i_lvl;
-
-            //
             // Set the pressure and height for this level
             //
             obs_arr[2] = pressure;
@@ -2240,8 +2237,8 @@ void process_madis_profiler(NcFile *&f_in) {
    //
    // Cleanup
    //
-   if(cur) { delete [] cur; cur = (long *) 0; }
-   if(dim) { delete [] dim; dim = (long *) 0; }
+   cur.clear();
+   dim.clear();
 
    return;
 }
@@ -2366,12 +2363,15 @@ void process_madis_maritime(NcFile *&f_in) {
    //
    // Arrays of longs for indexing into NetCDF variables
    //
-   long *cur = new long [3];    // NetCDF API handles 2D or 3D
-   cur[0] = cur[1] = cur[2] = 0;
-   long *dim = new long [3];    // NetCDF API handles 2D or 3D
-   dim[0] = dim[1] = dim[2] = 1;
+   LongArray cur;    // NetCDF API checks dimension for 2D or 3D
+   LongArray dim;    // NetCDF API checks dimension for 2D or 3D
 
    int hdr_idx = 0;
+
+   cur.add(0);
+   cur.add(0);
+   dim.add(1);
+   dim.add(1);
 
    //
    // Process the header type.
@@ -2619,8 +2619,8 @@ void process_madis_maritime(NcFile *&f_in) {
    //
    // Cleanup
    //
-   if(cur) { delete [] cur; cur = (long *) 0; }
-   if(dim) { delete [] dim; dim = (long *) 0; }
+   cur.clear();
+   dim.clear();
 
    return;
 }
@@ -2779,12 +2779,15 @@ void process_madis_mesonet(NcFile *&f_in) {
    //
    // Arrays of longs for indexing into NetCDF variables
    //
-   long *cur = new long [2];
-   cur[0] = cur[1] = 0;
-   long *dim = new long [2];
-   dim[0] = dim[1] = 1;
+   LongArray cur;
+   LongArray dim;
 
    int hdr_idx = 0;
+
+   cur.add(0);
+   cur.add(0);
+   dim.add(1);
+   dim.add(1);
 
    //
    // Encode the header type as ADPSFC for MESONET observations.
@@ -3188,8 +3191,8 @@ void process_madis_mesonet(NcFile *&f_in) {
    //
    // Cleanup
    //
-   if(cur) { delete [] cur; cur = (long *) 0; }
-   if(dim) { delete [] dim; dim = (long *) 0; }
+   cur.clear();
+   dim.clear();
 
    return;
 }
@@ -3272,10 +3275,13 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
    //
    // Arrays of longs for indexing into NetCDF variables
    //
-   long *cur = new long [2];
-   cur[0] = cur[1] = 0;
-   long *dim = new long [2];
-   dim[0] = dim[1] = 1;
+   LongArray cur;   // {0,0}
+   LongArray dim;   // {1,1}
+
+   cur.add(0);
+   cur.add(0);
+   dim.add(1);
+   dim.add(1);
 
    //
    // Get the number of levels
@@ -3296,7 +3302,6 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
    //
    // Obtain the total number of levels
    //
-   //buf_size = ((my_rec_end - rec_beg) > BUFFER_SIZE) ? BUFFER_SIZE: (my_rec_end - rec_beg);
    buf_size = (my_rec_end - rec_beg);   // read all
 
    int  levels[buf_size];
@@ -3308,8 +3313,6 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
    for(i_hdr=0; i_hdr<buf_size; i_hdr++) {
       nlvl1 += levels[i_hdr];
    }
-   cur[0] = 0;
-   dim[0] = 1;
 
    //
    // Setup the output NetCDF file
@@ -3327,6 +3330,7 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
    //
    // Loop through each record and get the header data.
    //
+   int data_cnt;
    for(i_hdr_s=rec_beg; i_hdr_s<my_rec_end; i_hdr_s+=BUFFER_SIZE) {
       buf_size = ((my_rec_end - i_hdr_s) > BUFFER_SIZE) ? BUFFER_SIZE: (my_rec_end - i_hdr_s);
 
@@ -3351,33 +3355,33 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
       cur[0] = i_hdr_s;
       dim[0] = buf_size;
       dim[1] = maxLevels;
+      data_cnt = buf_size * maxLevels;
+
       get_nc_data(&in_hdr_vld_var, tmp_dbl_arr, dim, cur);
       get_nc_data(&in_hdr_lat_var, (float *)hdr_lat_arr, dim, cur);
       get_nc_data(&in_hdr_lon_var, (float *)hdr_lon_arr, dim, cur);
-      get_filtered_nc_data_2d(in_hdr_elv_var, (float *)hdr_elv_arr, dim, cur, "elevation");
+      get_filtered_nc_data_2d(in_hdr_elv_var, (float *)hdr_elv_arr, dim, cur, "elevation", data_cnt);
+
 
       if (IS_VALID_NC(in_temperatureQty_var)) get_nc_data(&in_temperatureQty_var, (char *)&temperatureQty_arr, dim, cur);
-      else memset(temperatureQty_arr, 0, buf_size*dim[1]*sizeof(char));
+      else memset(temperatureQty_arr, 0, data_cnt*sizeof(char));
       if (IS_VALID_NC(in_dewpointQty_var))    get_nc_data(&in_dewpointQty_var, (char *)&dewpointQty_arr, dim, cur);
-      else memset(dewpointQty_arr, 0, buf_size*dim[1]*sizeof(char));
+      else memset(dewpointQty_arr, 0, data_cnt*sizeof(char));
       if (IS_VALID_NC(in_windDirQty_var))     get_nc_data(&in_windDirQty_var, (char *)&windDirQty_arr, dim, cur);
-      else memset(windDirQty_arr, 0, buf_size*dim[1]*sizeof(char));
+      else memset(windDirQty_arr, 0, data_cnt*sizeof(char));
       if (IS_VALID_NC(in_windSpeedQty_var))   get_nc_data(&in_windSpeedQty_var, (char *)&windSpeedQty_arr, dim, cur);
-      else memset(windSpeedQty_arr, 0, buf_size*dim[1]*sizeof(char));
+      else memset(windSpeedQty_arr, 0, data_cnt*sizeof(char));
       if (IS_VALID_NC(in_altitudeQty_var))    get_nc_data(&in_altitudeQty_var, (char *)&altitudeQty_arr, dim, cur);
-      else memset(altitudeQty_arr, 0, buf_size*dim[1]*sizeof(char));
+      else memset(altitudeQty_arr, 0, data_cnt*sizeof(char));
 
-      get_filtered_nc_data_2d(in_hdr_tob_var,     (int *)&obsTimeOfDay_arr,  dim, cur, "obsTimeOfDay");
-      get_filtered_nc_data_2d(in_temperature_var, (float *)&temperature_arr, dim, cur, "temperature");
-      get_filtered_nc_data_2d(in_dewpoint_var,    (float *)&dewpoint_arr,    dim, cur, "dewpoint");
-      get_filtered_nc_data_2d(in_windDir_var,     (float *)&windDir_arr,     dim, cur, "windDir");
-      get_filtered_nc_data_2d(in_windSpeed_var,   (float *)&windSpeed_arr,   dim, cur, "windSpeed");
+      get_filtered_nc_data_2d(in_hdr_tob_var,     (int *)&obsTimeOfDay_arr,  dim, cur, "obsTimeOfDay", data_cnt);
+      get_filtered_nc_data_2d(in_temperature_var, (float *)&temperature_arr, dim, cur, "temperature", data_cnt);
+      get_filtered_nc_data_2d(in_dewpoint_var,    (float *)&dewpoint_arr,    dim, cur, "dewpoint", data_cnt);
+      get_filtered_nc_data_2d(in_windDir_var,     (float *)&windDir_arr,     dim, cur, "windDir", data_cnt);
+      get_filtered_nc_data_2d(in_windSpeed_var,   (float *)&windSpeed_arr,   dim, cur, "windSpeed", data_cnt);
 
       dim[1] = hdr_sid_len;
       get_nc_data(&in_hdr_sid_var, (char *)hdr_sid_arr, dim, cur);
-
-      dim[0] = 1;
-      dim[1] = 1;
 
       //
       // Process the header type.
@@ -3389,12 +3393,6 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
       for (int i_idx=0; i_idx<buf_size; i_idx++) {
          i_hdr = i_hdr_s + i_idx;
          mlog << Debug(3) << "Record Number: " << i_hdr << "\n";
-
-         //
-         // Use cur to index into the NetCDF variables.
-         //
-         cur[0] = i_hdr;
-         cur[1] = 0;
 
          //
          // Process the station i.e. airport name.
@@ -3544,8 +3542,8 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
    //
    // Cleanup
    //
-   if(cur) { delete [] cur; cur = (long *) 0; }
-   if(dim) { delete [] dim; dim = (long *) 0; }
+   cur.clear();
+   dim.clear();
 
    return;
 }

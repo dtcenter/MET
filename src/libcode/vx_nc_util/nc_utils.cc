@@ -1278,7 +1278,7 @@ float get_float_var(NcVar * var, const int index) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_nc_data(NcVar *var, int *data, const long *curs) {
+bool get_nc_data(NcVar *var, int *data, const LongArray &curs) {
    bool return_status = get_nc_data_(var, data, bad_data_int, curs);
 
    return(return_status);
@@ -1307,7 +1307,7 @@ bool get_nc_data(NcVar *var, int *data, const long dim, const long cur) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_nc_data(NcVar *var, int *data, const long *dims, const long *curs) {
+bool get_nc_data(NcVar *var, int *data, const LongArray &dims, const LongArray &curs) {
    bool return_status = get_nc_data_(var, data, bad_data_int, dims, curs);
 
    return(return_status);
@@ -1315,7 +1315,7 @@ bool get_nc_data(NcVar *var, int *data, const long *dims, const long *curs) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_nc_data(NcVar *var, short *data, const long *curs) {
+bool get_nc_data(NcVar *var, short *data, const LongArray &curs) {
    bool return_status = get_nc_data_(var, data, (short)bad_data_int, curs);
 
    return(return_status);
@@ -1323,7 +1323,7 @@ bool get_nc_data(NcVar *var, short *data, const long *curs) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_nc_data(NcVar *var, short *data, const long *dims, const long *curs) {
+bool get_nc_data(NcVar *var, short *data, const LongArray &dims, const LongArray &curs) {
    bool return_status = get_nc_data_(var, data, (short)bad_data_int, dims, curs);
 
    return(return_status);
@@ -1421,13 +1421,13 @@ bool get_nc_data(NcVar *var, float *data) {
                      for (int idx=0; idx<cell_count; idx++) {
                         ushort_data[idx] =(unsigned short)packed_data[idx];
                      }
-                     copy_nc_data_t(var, data, ushort_data, cell_count, 
+                     copy_nc_data_t(var, data, ushort_data, cell_count,
                                     "ushort", add_offset, scale_factor,
                                     has_missing, (unsigned short)missing_value);
                      delete [] ushort_data;
                   }
                   else {
-                     copy_nc_data_t(var, data, packed_data, cell_count, 
+                     copy_nc_data_t(var, data, packed_data, cell_count,
                                     "short", add_offset, scale_factor,
                                     has_missing, missing_value);
                   }
@@ -1496,7 +1496,7 @@ bool get_nc_data(NcVar *var, float *data) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_nc_data(NcVar *var, float *data, const long *curs) {
+bool get_nc_data(NcVar *var, float *data, const LongArray &curs) {
    bool return_status = get_nc_data_(var, data, bad_data_float, curs);
 
    return(return_status);
@@ -1504,7 +1504,7 @@ bool get_nc_data(NcVar *var, float *data, const long *curs) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_nc_data(NcVar *var, float *data, const long *dims, const long *curs) {
+bool get_nc_data(NcVar *var, float *data, const LongArray &dims, const LongArray &curs) {
    bool return_status = get_nc_data_(var, data, bad_data_float, dims, curs);
 
    return(return_status);
@@ -1521,7 +1521,7 @@ bool get_nc_data(NcVar *var, float *data, const long dim, const long cur) {
 ////////////////////////////////////////////////////////////////////////
 
 bool get_nc_data(NcFile *nc, const char *var_name, double *data,
-                 const long *dims, const long *curs) {
+                 const LongArray &dims, const LongArray &curs) {
 
    //
    // Retrieve the input variables
@@ -1620,13 +1620,13 @@ bool get_nc_data(NcVar *var, double *data) {
                      for (int idx=0; idx<cell_count; idx++) {
                         ushort_data[idx] =(unsigned short)packed_data[idx];
                      }
-                     copy_nc_data_t(var, data, ushort_data, cell_count, 
+                     copy_nc_data_t(var, data, ushort_data, cell_count,
                                     "ushort", add_offset, scale_factor,
                                     has_missing, (unsigned short)missing_value);
                      delete [] ushort_data;
                   }
                   else {
-                     copy_nc_data_t(var, data, packed_data, cell_count, 
+                     copy_nc_data_t(var, data, packed_data, cell_count,
                                     "short", add_offset, scale_factor,
                                     has_missing, missing_value);
                   }
@@ -1692,7 +1692,7 @@ bool get_nc_data(NcVar *var, double *data) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_nc_data(NcVar *var, double *data, const long *curs) {
+bool get_nc_data(NcVar *var, double *data, const LongArray &curs) {
    bool return_status = get_nc_data_(var, data, bad_data_double, curs);
    return(return_status);
 }
@@ -1707,7 +1707,8 @@ bool get_nc_data(NcVar *var, double *data, const long dim, const long cur) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_nc_data(NcVar *var, double *data, const long *dims, const long *curs) {
+bool get_nc_data(NcVar *var, double *data, const LongArray &dims,
+                 const LongArray &curs) {
    bool return_status = get_nc_data_(var, data, bad_data_double, dims, curs);
 
    return(return_status);
@@ -1795,7 +1796,7 @@ bool get_nc_data(NcVar *var, unsigned short *data) {
 ////////////////////////////////////////////////////////////////////////
 
 bool get_nc_data(NcFile *nc, const char *var_name, char *data,
-                 const long *dims, const long *curs) {
+                 const LongArray &dims, const LongArray &curs) {
 
    //
    // Retrieve the input variables
@@ -1814,7 +1815,7 @@ bool get_nc_data(NcVar *var, char *data, const long dim, const long cur) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_nc_data(NcVar *var, char *data, const long *dims, const long *curs) {
+bool get_nc_data(NcVar *var, char *data, const LongArray &dims, const LongArray &curs) {
    bool return_status = get_nc_data_(var, data, bad_data_char, dims, curs);
 
    return(return_status);
@@ -1833,7 +1834,7 @@ bool get_nc_data(NcVar *var, ncbyte *data) {
 ////////////////////////////////////////////////////////////////////////
 
 bool get_nc_data(NcFile *nc, const char *var_name, ncbyte *data,
-                 const long *dims, const long *curs) {
+                 const LongArray &dims, const LongArray &curs) {
 
    //
    // Retrieve the input variables
@@ -1852,7 +1853,7 @@ bool get_nc_data(NcVar *var, ncbyte *data, const long dim, const long cur) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_nc_data(NcVar *var, ncbyte *data, const long *dims, const long *curs) {
+bool get_nc_data(NcVar *var, ncbyte *data, const LongArray &dims, const LongArray &curs) {
    bool return_status = get_nc_data_(var, data, (ncbyte)bad_data_char, dims, curs);
 
    return(return_status);
@@ -1867,7 +1868,7 @@ int get_index_at_nc_data(NcVar *var, double value, const string dim_name, bool i
    if (IS_VALID_NC_P(var)) {
       int data_size = get_data_size(var);
       double *values = new double[data_size];
-      
+
       if (get_nc_data(var, values)) {
          unixtime ut;
          int sec_per_unit;
@@ -1935,14 +1936,19 @@ bool get_nc_data_to_array(NcVar *var, StringArray *array_buf) {
               << GET_NC_NAME_P(var) << "\n\n";
       }
       else {
-         long offsets[2] = { 0, 0 };
-         long lengths[2] = { 1, 1 };
+         LongArray offsets; // { 0, 0 };
+         LongArray lengths; // { 1, 1 };
          NcDim count_dim = var->getDim(dim_count-2);
          NcDim str_dim = var->getDim(dim_count-1);
          int count = get_dim_size(&count_dim);
          int str_len = get_dim_size(&str_dim);
-         lengths[1] = str_len;
          char str_buffer[str_len+1];
+
+         offsets.add(0);
+         offsets.add(0);
+         lengths.add(1);
+         lengths.add(str_len);
+
          result = true;
          for (int idx=0; idx<count; idx++) {
             if(!get_nc_data(var, str_buffer, lengths, offsets)) {

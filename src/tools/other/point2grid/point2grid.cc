@@ -2203,10 +2203,10 @@ void get_grid_mapping(Grid fr_grid, Grid to_grid, IntArray *cellMapping,
    to_dp.set_size(to_lon_count, to_lat_count);
 
    if (data_size > 0) {
-      float  *latitudes  = (float *)NULL;
-      float  *longitudes = (float *)NULL;
-      float  *latitudes_buf  = (float *)NULL;
-      float  *longitudes_buf = (float *)NULL;
+      float  *latitudes  = (float *)nullptr;
+      float  *longitudes = (float *)nullptr;
+      float  *latitudes_buf  = (float *)nullptr;
+      float  *longitudes_buf = (float *)nullptr;
       int buff_size = data_size*sizeof(float);
       GoesImagerData grid_data;
       grid_data.reset();

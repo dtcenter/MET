@@ -99,7 +99,7 @@ GridPoint *GridTemplate::getFirstInGrid(
 ///////////////////////////////////////////////////////////////////////////////
 //
 // Get the next template grid point within the grid.
-// Returns NULL when there are no more points in the grid.
+// Returns nullptr when there are no more points in the grid.
 //
 // Returns a pointer to a static object which must NOT be deleted
 // by the calling routine.
@@ -129,7 +129,7 @@ GridPoint *GridTemplate::getNextInGrid(void) const {
       }
    } // end while
 
-   return (GridPoint *)NULL;
+   return (GridPoint *)nullptr;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -155,7 +155,7 @@ GridPoint *GridTemplate::getFirst(const int &base_x, const int &base_y,
 ///////////////////////////////////////////////////////////////////////////////
 //
 // Get the next template grid point without checking the grid bounds.
-// Returns NULL when there are no more points.
+// Returns nullptr when there are no more points.
 //
 // Returns a pointer to a static object which must NOT be deleted
 // by the calling routine.
@@ -164,7 +164,7 @@ GridPoint *GridTemplate::getFirst(const int &base_x, const int &base_y,
 
 GridPoint *GridTemplate::getNext(void) const {
 
-   GridPoint *next_point = (GridPoint *)NULL;
+   GridPoint *next_point = (GridPoint *)nullptr;
    if(_pointInGridIterator != _offsetList.end()) {
       GridOffset *offset = *_pointInGridIterator;
 
@@ -204,7 +204,7 @@ GridPoint *GridTemplate::getFirstInLftEdge(void) const {
 ///////////////////////////////////////////////////////////////////////////////
 //
 // Get the next template grid point in the first column.
-// Returns NULL when there are no more points in the first column.
+// Returns nullptr when there are no more points in the first column.
 //
 // Returns a pointer to a static object which must NOT be deleted
 // by the calling routine.
@@ -235,7 +235,7 @@ GridPoint *GridTemplate::getNextInLftEdge(void) const {
       }
    } // end while
 
-   return (GridPoint *)NULL;
+   return (GridPoint *)nullptr;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -258,7 +258,7 @@ GridPoint *GridTemplate::getFirstInTopEdge(void) const {
 ///////////////////////////////////////////////////////////////////////////////
 //
 // Get the next template grid point in the top row.
-// Returns NULL when there are no more points in the top row.
+// Returns nullptr when there are no more points in the top row.
 //
 // Returns a pointer to a static object which must NOT be deleted
 // by the calling routine.
@@ -288,7 +288,7 @@ GridPoint *GridTemplate::getNextInTopEdge(void) const {
       }
    } // end while
 
-   return (GridPoint *)NULL;
+   return (GridPoint *)nullptr;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -311,7 +311,7 @@ GridPoint *GridTemplate::getFirstInRgtEdge(void) const {
 ///////////////////////////////////////////////////////////////////////////////
 //
 // Get the next template grid point in the right column.
-// Returns NULL when there are no more points in the right column.
+// Returns nullptr when there are no more points in the right column.
 //
 // Returns a pointer to a static object which must NOT be deleted
 // by the calling routine.
@@ -341,7 +341,7 @@ GridPoint *GridTemplate::getNextInRgtEdge(void) const {
       }
    } // end while
 
-   return (GridPoint *)NULL;
+   return (GridPoint *)nullptr;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -364,7 +364,7 @@ GridPoint *GridTemplate::getFirstInBotEdge(void) const {
 ///////////////////////////////////////////////////////////////////////////////
 //
 // Get the next template grid point in the bottom row.
-// Returns NULL when there are no more points in the bottom row.
+// Returns nullptr when there are no more points in the bottom row.
 // Initialize the grid dimensions and base location.
 //
 // Returns a pointer to a static object which must NOT be deleted
@@ -395,7 +395,7 @@ GridPoint *GridTemplate::getNextInBotEdge(void) const {
       }
    } // end while
 
-   return (GridPoint *)NULL;
+   return (GridPoint *)nullptr;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

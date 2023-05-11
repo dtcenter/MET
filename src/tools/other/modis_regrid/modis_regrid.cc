@@ -256,8 +256,6 @@ cout << "\n"
 
 exit ( 1 );
 
-return;
-
 }
 
 
