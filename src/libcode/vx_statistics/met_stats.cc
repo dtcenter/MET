@@ -3233,6 +3233,24 @@ void DMAPInfo::set_options(const int _baddeley_p, const double _baddeley_max_dis
    n_full_points = _n_full_points;
 }
 
+
+////////////////////////////////////////////////////////////////////////
+
+
+SSIDXData &SSIDXData::operator=(const SSIDXData &a) noexcept {
+   if ( this != &a ) {
+      ss_index_name = a.ss_index_name;
+      fcst_model = a.fcst_model;
+      ref_model = a.ref_model;
+      init_time = a.init_time;
+      n_term = a.n_term;
+      n_vld = a.n_vld;
+      ss_index = a.ss_index;
+   }
+   return *this;
+}
+
+
 ////////////////////////////////////////////////////////////////////////
 //
 // Begin code for misc functions
