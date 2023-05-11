@@ -1105,11 +1105,10 @@ bool TableFlatFile::lookup_grib1(const char * parm_name, int table_number, int c
       msg << "):\n";
       mlog << Debug(4) << "\n" << msg;
 
-      for(vector<Grib1TableEntry>::iterator it = matches.begin();
-          it < matches.end(); it++) {
-         mlog << Debug(4) << "  parm_name: "     << (*it)->parm_name
-                          << ", table_number = " << (*it)->table_number
-                          << ", code = "         << (*it)->code << "\n";
+      for(int j=0; j<matches.size(); ++j) {
+         mlog << Debug(4) << "  parm_name: "     << matches[j].parm_name
+                          << ", table_number = " << matches[j].table_number
+                          << ", code = "         << matches[j].code << "\n";
       }
 
       mlog << Debug(4) << "Using the first match found: "
@@ -1162,19 +1161,18 @@ bool TableFlatFile::lookup_grib1(const char * parm_name, int table_number, int c
 
       ConcatString msg;
       msg << "Multiple GRIB1 table entries match lookup criteria ("
-      << "parm_name = " << parm_name;
+          << "parm_name = " << parm_name;
       if( bad_data_int != table_number ) msg << ", table_number = " << table_number;
       if( bad_data_int != code         ) msg << ", code = "         << code;
       msg << "):\n";
       mlog << Debug(4) << "\n" << msg;
 
-      for(vector<Grib1TableEntry>::iterator it = matches.begin();
-          it < matches.end(); it++) {
-         mlog << Debug(4) << "  parm_name: "     << (*it)->parm_name
-                          << ", table_number = " << (*it)->table_number
-                          << ", code = "         << (*it)->code
-                          << ", center = "       << (*it)->center
-                          << ", subcenter = "    << (*it)->subcenter << "\n";
+      for(int j=0; j<matches.size(); ++j) {
+         mlog << Debug(4) << "  parm_name: "     << matches[j].parm_name
+                          << ", table_number = " << matches[j].table_number
+                          << ", code = "         << matches[j].code
+                          << ", center = "       << matches[j].center
+                          << ", subcenter = "    << matches[j].subcenter << "\n";
       }
 
       mlog << Debug(4) << "Using the first match found: "
@@ -1313,12 +1311,11 @@ bool TableFlatFile::lookup_grib2(const char * parm_name, int a, int b, int c,
       msg << "):\n";
       mlog << Debug(4) << "\n" << msg;
 
-      for(vector<Grib2TableEntry>::iterator it = matches.begin();
-          it < matches.end(); it++) {
-         mlog << Debug(4) << "  parm_name: " << (it)->parm_name
-                          << ", index_a = "  << (it)->index_a
-                          << ", index_b = "  << (it)->index_b
-                          << ", index_c = "  << (it)->index_c << "\n";
+      for(int j=0; j<matches.size(); ++j) {
+         mlog << Debug(4) << "  parm_name: " << matches[j].parm_name
+                          << ", index_a = "  << matches[j].index_a
+                          << ", index_b = "  << matches[j].index_b
+                          << ", index_c = "  << matches[j].index_c << "\n";
       }
 
       mlog << Debug(4) << "Using the first match found: "
@@ -1380,19 +1377,18 @@ bool TableFlatFile::lookup_grib2(const char * parm_name,
       msg << "):\n";
       mlog << Debug(4) << "\n" << msg;
 
-      for(vector<Grib2TableEntry>::iterator it = matches.begin();
-          it < matches.end(); it++) {
-         mlog << Debug(4) << "  parm_name: "   << (it)->parm_name
-                          << ", index_a = "    << (it)->index_a
-                          << ", grib2_mtab = " << (it)->mtab_set
-                          << ", grib2_cntr = " << (it)->cntr
-                          << ", grib2_ltab = " << (it)->ltab
-                          << ", index_b = "    << (it)->index_b
-                          << ", index_c = "    << (it)->index_c
+      for(int j; j<matches.size(); ++j) {
+         mlog << Debug(4) << "  parm_name: "   << matches[j].parm_name
+                          << ", index_a = "    << matches[j].index_a
+                          << ", grib2_mtab = " << matches[j].mtab_set
+                          << ", grib2_cntr = " << matches[j].cntr
+                          << ", grib2_ltab = " << matches[j].ltab
+                          << ", index_b = "    << matches[j].index_b
+                          << ", index_c = "    << matches[j].index_c
                           << "\n";
       }
 
-      mlog << Debug(3) << "Using the first match found: "
+      mlog << Debug(4) << "Using the first match found: "
                        << "  parm_name: "   << e.parm_name
                        << ", index_a = "    << e.index_a
                        << ", grib2_mtab = " << e.mtab_set
@@ -1403,12 +1399,11 @@ bool TableFlatFile::lookup_grib2(const char * parm_name,
                        << "\n\n";
 
    }
->>>>>>> origin/develop
 
-   for(vector<Grib2TableEntry*>::iterator it = matches.begin();
-       it < matches.end(); it++)
-      mlog << Debug(4) << "  " << (*it)->serialize() << "\n";
-      
+   for(int j; j<matches.size(); ++j) {
+      mlog << Debug(4) << "  " << matches[j].serialize() << "\n";
+   }
+
    return (n_matches > 0);
 }
 
