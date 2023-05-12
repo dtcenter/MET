@@ -27,8 +27,7 @@ class ModeFrontEnd {
 
  public:
 
-   // the 3 different situations for the front end
-   typedef enum {SINGLE_VAR, MULTIVAR_PASS1, MULTIVAR_PASS2} Processing_t;
+   typedef enum {SINGLE_VAR, MULTIVAR_PASS1, MULTIVAR_PASS1_MERGE, MULTIVAR_PASS2} Processing_t;
 
    ModeFrontEnd();
    ~ModeFrontEnd();
@@ -37,12 +36,15 @@ class ModeFrontEnd {
    string default_out_dir;
 
    int run(const StringArray & Argv, Processing_t ptype=SINGLE_VAR);
-   int run(const StringArray & Argv, const MultiVarData &mvd, bool has_union);
+   int run(const StringArray & Argv, const MultiVarData &mvd, bool has_union,
+           ShapeData &f_merge, ShapeData &o_merge);
 
    void do_quilt    (Processing_t ptype);
    void do_straight (Processing_t ptype);
-
+   void do_straight (Processing_t ptype, const MultiVarData &mvd,
+                     ShapeData &f_merge, ShapeData &o_merge);
    MultiVarData *get_multivar_data();
+   void addMultivarMergePass1(MultiVarData *mvdi);
 
    void process_command_line(const StringArray &);
    void process_command_line_multivar_pass2(const StringArray & argv,

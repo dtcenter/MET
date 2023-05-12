@@ -53,14 +53,14 @@ static void populate_bool_plane(const int * buf, const int nx, const int ny, Boo
 ////////////////////////////////////////////////////////////////////////
 
 
-void  objects_from_arrays(bool do_clusters,
-                          int *fcst_objects, int *obs_objects, int nx, int ny,
-                          BoolPlane & fcst_out, 
-                          BoolPlane & obs_out)
-{
-   populate_bool_plane(fcst_objects, nx, ny, fcst_out);
-   populate_bool_plane(obs_objects, nx, ny, obs_out);
-}  
+// void  objects_from_arrays(bool do_clusters,
+//                           int *fcst_objects, int *obs_objects, int nx, int ny,
+//                           BoolPlane & fcst_out, 
+//                           BoolPlane & obs_out)
+// {
+//    populate_bool_plane(fcst_objects, nx, ny, fcst_out);
+//    populate_bool_plane(obs_objects, nx, ny, obs_out);
+// }  
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -157,7 +157,8 @@ void populate_bool_plane(const int * buf, const int nx, const int ny, BoolPlane 
 
    int x, y, n, k;
    bool tf;
-
+   double nyes=0.0;
+   double ntotal = (double)(nx*ny);
    bp_out.set_size(nx, ny);
 
    for (x=0; x<nx; ++x)  {
@@ -169,15 +170,14 @@ void populate_bool_plane(const int * buf, const int nx, const int ny, BoolPlane 
          k = buf[n];
 
          tf = ( k > 0 );
-
+         if (tf) ++nyes;
          bp_out.put(tf, x, y);
 
       }   //  for y
 
    }   //  for x
 
-
-
+   printf("%5.2lf percent of the data was true\n", nyes/ntotal);
 
    return;
 

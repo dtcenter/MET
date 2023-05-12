@@ -231,6 +231,9 @@ class ModeConfInfo {
       void  set_fcst_merge_thresh_by_index (int);
       void  set_obs_merge_thresh_by_index  (int);
 
+      void  set_fcst_conv_thresh_by_merge_index (int);
+      void  set_obs_conv_thresh_by_merge_index  (int);
+
 };
 
 

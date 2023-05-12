@@ -29,10 +29,10 @@
 
 
 ////////////////////////////////////////////////////////////////////////
-extern void  objects_from_arrays(bool do_clusters,
-                                 int *fcst_objects, int *obs_objects, int nx, int ny,
-                                 BoolPlane & fcst_out, 
-                                 BoolPlane & obs_out);
+/* extern void  objects_from_arrays(bool do_clusters, */
+/*                                  int *fcst_objects, int *obs_objects, int nx, int ny, */
+/*                                  BoolPlane & fcst_out,  */
+/*                                  BoolPlane & obs_out); */
 
 
 extern void objects_from_netcdf(const char * netcdf_filename, 

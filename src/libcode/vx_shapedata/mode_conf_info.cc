@@ -894,6 +894,34 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+void ModeConfInfo::set_fcst_conv_thresh_by_merge_index(int k)
+
+{
+
+Fcst->set_conv_thresh_by_merge_index(k);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void ModeConfInfo::set_obs_conv_thresh_by_merge_index(int k)
+
+{
+
+Obs->set_conv_thresh_by_merge_index(k);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void ModeConfInfo::set_obs_merge_thresh_by_index(int k)
 
 {

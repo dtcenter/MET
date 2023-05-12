@@ -34,6 +34,8 @@ void combine_boolplanes(const BoolPlane * bpa, const int n_planes,
    const int ny = bp_out.ny();
    vector<bool> v(n_planes);
    bool tf = false;
+   double nTotal = (double)(nx*ny);
+   double nTrue = 0.0;
 
 
    for (x=0; x<nx; ++x)  {
@@ -47,14 +49,14 @@ void combine_boolplanes(const BoolPlane * bpa, const int n_planes,
          }   //  for j
 
          tf = calc.run(v);
-
+         if (tf) ++ nTrue;
          bp_out.put(tf, x, y);
 
       }   //  for y
 
    }   //  for x
 
-
+   printf("Percent true = %.5lf\n", nTrue/nTotal);
 
 
 

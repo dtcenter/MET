@@ -117,19 +117,24 @@ class ModeExecutive {
    GrdFileType ftype, otype;
 
    bool isMultivarOutput;
-
+   
    void clear_internal_r_index();
    void setup_fcst_obs_data();
-   void setup_fcst_obs_data(const MultiVarData &mvd);
-   void do_conv_thresh(const int r_index, const int t_index, bool isMultivarPass2=false);
+   void setup_fcst_obs_data(const MultiVarData &mvd, bool is_merge_domain);
+   void do_conv_thresh(const int r_index, const int t_index, 
+                       bool isMultivarPass1Merge=false);
+   void do_merging();
+   void do_merging(ShapeData &f_merge, ShapeData &o_merge);
    void do_match_merge();
+   void do_match_merge(ShapeData &f_merge, ShapeData &o_merge);
 
    void process_masks(ShapeData &, ShapeData &);
-   void process_output(bool isMultivar);
+   void process_output(bool isMultivar=false);
 
   
    // owned by caller
    MultiVarData *get_multivar_data();
+   void addMultivarMergePass1(MultiVarData *mvdi);
 
    void plot_engine();
 

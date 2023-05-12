@@ -209,8 +209,14 @@ class ModeFuzzyEngine {
 
       void do_fcst_merging(const char *default_config,
                            const char *merge_config);
+      void do_fcst_merging(const char *default_config,
+                           const char *merge_config,
+                           const ShapeData &merge_data);
       void do_obs_merging(const char *default_config,
                           const char *merge_config);
+      void do_obs_merging(const char *default_config,
+                          const char *merge_config,
+                          const ShapeData &merge_data);
 
       void do_matching();
 
@@ -235,6 +241,14 @@ class ModeFuzzyEngine {
 
       void do_fcst_merge_thresh();
       void do_obs_merge_thresh();
+
+         //
+         // Perform merging of the forecast and observation fields
+         // based on an input merge shapes object
+         //
+
+      void do_fcst_merge_thresh(const ShapeData &merge_data);
+      void do_obs_merge_thresh(const ShapeData &merge_data);
 
          //
          // Perform merging of the forecast and observation fields
@@ -296,10 +310,10 @@ class ModeFuzzyEngine {
       const Grid * grid;             //  not allocated
 
       ShapeData * fcst_raw;          //  allocated
-      ShapeData * fcst_thresh;       //  allocated
-      ShapeData * fcst_conv;         //  allocated
-      ShapeData * fcst_mask;         //  allocated
-      ShapeData * fcst_split;        //  allocated
+      ShapeData * fcst_thresh;       //  allocated  thresholded raw
+      ShapeData * fcst_conv;         //  allocated  convolve of raw
+      ShapeData * fcst_mask;         //  allocated  thresholded convolved, filtered using attribute logic
+      ShapeData * fcst_split;        //  allocated split of fcst_mask.. final one
       ShapeData * fcst_clus_split;   //  allocated
 
       ShapeData * obs_raw;           //  allocated

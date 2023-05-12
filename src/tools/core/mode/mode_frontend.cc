@@ -88,7 +88,7 @@ int ModeFrontEnd::run(const StringArray & Argv, Processing_t ptype)
 
 
    //
-   // read in data
+   // read in data (Note double reads for pass 1 merge and pass 1 not desired)
    //
 
    mode_exec->setup_fcst_obs_data();
@@ -116,13 +116,14 @@ int ModeFrontEnd::run(const StringArray & Argv, Processing_t ptype)
    return (0);
 }
 
-
 ///////////////////////////////////////////////////////////////////////
 
 int ModeFrontEnd::run(const StringArray & Argv, const MultiVarData &mvd,
-                      bool has_union)
+                      bool has_union, 
+                      ShapeData &f_merge, ShapeData &o_merge)
 {
-   mlog << Debug(1) << "Running mode front end " << stype(MULTIVAR_PASS2) << "\n";
+   Processing_t ptype = MULTIVAR_PASS2;
+   mlog << Debug(1) << "Running mode front end " << stype(ptype) << "\n";
    Argv.dump(cout, 0);
 
    if ( mode_exec )  { delete mode_exec;  mode_exec = 0; }
@@ -149,7 +150,7 @@ int ModeFrontEnd::run(const StringArray & Argv, const MultiVarData &mvd,
    //
    // set up data access using inputs
    //
-   mode_exec->setup_fcst_obs_data(mvd);
+   mode_exec->setup_fcst_obs_data(mvd, ptype == MULTIVAR_PASS2);
 
    //
    // run the mode algorithm
@@ -157,11 +158,11 @@ int ModeFrontEnd::run(const StringArray & Argv, const MultiVarData &mvd,
 
    if ( conf.quilt )  {
 
-      do_quilt(MULTIVAR_PASS2);
+      do_quilt(ptype);
 
    } else {
 
-      do_straight(MULTIVAR_PASS2);
+      do_straight(ptype, mvd, f_merge, o_merge);
 
    }
 
@@ -174,6 +175,66 @@ int ModeFrontEnd::run(const StringArray & Argv, const MultiVarData &mvd,
 #endif
    return (0);
 }
+
+///////////////////////////////////////////////////////////////////////
+
+
+void ModeFrontEnd::do_straight(Processing_t ptype, const MultiVarData &mvd,
+                               ShapeData &f_merge, ShapeData &o_merge)
+
+{
+
+   const ModeConfInfo & conf = mode_exec->engine.conf_info;
+
+   const int NCT = conf.n_conv_threshs();
+   const int NCR = conf.n_conv_radii();
+
+   if ( NCT != NCR )  {
+
+      mlog << Error
+           << "\n\n  "
+           << program_name
+           << ": all convolution radius and threshold arrays must have the same number of elements!\n\n";
+
+      exit ( 1 );
+
+   }
+
+   if (NCT > 1) {
+      mlog << Error
+           << "\n\n  "
+           << program_name
+           << ": multiple convolution radii and thresholds not implemented in multivar mode\n\n";
+
+         exit ( 1 );
+   }
+      
+      
+
+   int index;
+
+   mode_exec->clear_internal_r_index();
+
+   for (index=0; index<NCT; ++index)  {
+
+      mode_exec->do_conv_thresh(index, index, ptype == MULTIVAR_PASS1_MERGE);
+
+      if (ptype == MULTIVAR_PASS2) {
+         mode_exec->do_match_merge(f_merge, o_merge);
+         mode_exec->process_output(true);
+      }
+   }
+
+   mode_exec->clear_internal_r_index();
+  
+   //
+   //  done
+   //
+
+   return;
+
+}
+
 
 ///////////////////////////////////////////////////////////////////////
 
@@ -215,12 +276,12 @@ void ModeFrontEnd::do_straight(Processing_t ptype)
 
    for (index=0; index<NCT; ++index)  {
 
-      mode_exec->do_conv_thresh(index, index, ptype == MULTIVAR_PASS2);
+      mode_exec->do_conv_thresh(index, index, ptype == MULTIVAR_PASS1_MERGE);
 
-      if (ptype == SINGLE_VAR || ptype == MULTIVAR_PASS2) {
+      if (ptype == SINGLE_VAR) {
 
          mode_exec->do_match_merge();
-         mode_exec->process_output(ptype == MULTIVAR_PASS2);
+         mode_exec->process_output(false);
       }
    }
 
@@ -241,7 +302,7 @@ void ModeFrontEnd::do_straight(Processing_t ptype)
 void ModeFrontEnd::do_quilt(Processing_t ptype)
 
 {
-   if (ptype == MULTIVAR_PASS1 || ptype == MULTIVAR_PASS2) {
+   if (ptype != SINGLE_VAR) {
       mlog << Error
            << program_name << ": quilting not yet implemented for multivar mode \n\n";
 
@@ -262,8 +323,8 @@ void ModeFrontEnd::do_quilt(Processing_t ptype)
 
          mode_exec->do_match_merge();
 
-         if (ptype == SINGLE_VAR || ptype == MULTIVAR_PASS2) {
-            mode_exec->process_output(ptype == MULTIVAR_PASS2);
+         if (ptype == SINGLE_VAR) {
+            mode_exec->process_output();
          }
       }
    }
@@ -281,6 +342,14 @@ void ModeFrontEnd::do_quilt(Processing_t ptype)
 ///////////////////////////////////////////////////////////////////////
 
 MultiVarData *ModeFrontEnd::get_multivar_data() {return mode_exec->get_multivar_data(); }
+
+
+///////////////////////////////////////////////////////////////////////
+
+void ModeFrontEnd::addMultivarMergePass1(MultiVarData *mvdi)
+{
+   return mode_exec->addMultivarMergePass1(mvdi);
+}
 
 ///////////////////////////////////////////////////////////////////////
 
@@ -441,6 +510,9 @@ string ModeFrontEnd::stype(Processing_t t)
    switch (t) {
    case MULTIVAR_PASS1:
       s = "Multivar Pass 1";
+      break;
+   case MULTIVAR_PASS1_MERGE:
+      s = "Multivar Pass 1 Merge";
       break;
    case MULTIVAR_PASS2:
       s = "Multivar Pass 2";

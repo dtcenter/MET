@@ -40,6 +40,7 @@ using namespace std;
 #include <cmath>
 
 #include <vector>
+#include <algorithm>
 
 #include <netcdf>
 
@@ -108,7 +109,8 @@ static MultiVarData *first_pass(int j, const string &fcst_filename,
 
 static void second_pass(int j, const BoolPlane &f_result, const BoolPlane &o_result,
                         int nx, int ny, const ConcatString &dir,
-                        MultiVarData &mvd, bool has_union);
+                        MultiVarData &mvd, bool has_union,
+                        ShapeData &f_merge, ShapeData &o_merge);
 
 static void mask_data(const string &name, int nx, int ny, const BoolPlane &mask, DataPlane &data);
 static void mask_data_to_yesno(const string &name, int nx, int ny, const BoolPlane &bp, DataPlane &data);
@@ -149,7 +151,8 @@ int multivar_frontend(const StringArray & Argv)
    ConcatString dir = set_multivar_dir();
 
    //
-   //  do the individual mode runs
+   // do the individual mode runs which produce everything needed to create
+   // super objects (stored in 'mvd')
    //
 
    vector<MultiVarData *> mvd;
@@ -157,31 +160,10 @@ int multivar_frontend(const StringArray & Argv)
    for (j=0; j<n_files; ++j)  {
 
       mlog << Debug(2) 
-           << "\n starting mode run " << (j + 1) << " of " << n_files
-           << "\n" << sep << "\n";
+           << "\n starting mode run " << (j + 1) << " of " << n_files << "\n" << sep << "\n";
       MultiVarData *mvdi = first_pass(j, fcst_filenames[j], obs_filenames[j], dir);
       if (j > 0) {
-         bool err = false;
-         if (mvd[0]->ftype != mvdi->ftype) {
-            err = true;
-            mlog << Error << "\n" << program_name
-                 << ": forecast inputs of different file types not supported "
-                 << "Input 0:" << grdfiletype_to_string(mvd[0]->ftype).c_str()
-                 << "Input " << j << ":" << grdfiletype_to_string(mvdi->ftype).c_str()
-                 << "\n\n";
-         }
-         
-         if (mvd[0]->otype != mvdi->otype) {
-            err = true;
-            mlog << Error << "\n" << program_name
-                 << ": obs inputs of different file types not supported "
-                 << "Input 0:" << grdfiletype_to_string(mvd[0]->otype).c_str()
-                 << "Input " << j << ":" << grdfiletype_to_string(mvdi->otype).c_str()
-                 << "\n\n";
-         }
-         if (err) {
-            exit ( 1 );
-         }
+         mvd[0]->checkFileTypeConsistency(*mvdi, j);
       }
       mvd.push_back(mvdi);
 
@@ -193,32 +175,105 @@ int multivar_frontend(const StringArray & Argv)
    //  set the BoolPlane values using the mvd content
    //
 
-   BoolPlane * f_plane = new BoolPlane [n_files];
-   BoolPlane * o_plane = new BoolPlane [n_files];
+   BoolPlane * f_simple_plane = new BoolPlane [n_files];
+   BoolPlane * o_simple_plane = new BoolPlane [n_files];
+   BoolPlane * f_merge_plane = new BoolPlane [n_files];
+   BoolPlane * o_merge_plane = new BoolPlane [n_files];
 
+   bool simple = true;
    for (j=0; j<n_files; ++j)  {
 
-      //objects_from_netcdf(nc_files[j].c_str(), do_clusters, f_plane[j], o_plane[j]);  
-      objects_from_arrays(do_clusters, mvd[j]->fcst_obj_data, mvd[j]->obs_obj_data,
-                          mvd[j]->nx, mvd[j]->ny, f_plane[j], o_plane[j]);  
+      mvd[j]->print();
 
+      mvd[j]->objects_from_arrays(do_clusters, simple, f_simple_plane[j], o_simple_plane[j]);
+      // objects_from_arrays(do_clusters, mvd[j]->_simple->_fcst_obj_data,
+      //                     mvd[j]->_simple->_obs_obj_data,
+      //                     mvd[j]->_nx, mvd[j]->_ny, f_simple_plane[j], o_simple_plane[j]);  
+
+   }
+
+   simple = false;
+   for (j=0; j<n_files; ++j)  {
+      mvd[j]->objects_from_arrays(do_clusters, simple, f_merge_plane[j], o_merge_plane[j]);
    }
 
    //
    //  combine the objects into super-objects
    //
 
-   const int nx = f_plane[0].nx();
-   const int ny = f_plane[0].ny();
-   BoolPlane f_result, o_result;
+   const int nx = f_simple_plane[0].nx();
+   const int ny = f_simple_plane[0].ny();
+   BoolPlane f_simple_result, o_simple_result, f_merge_result, o_merge_result;
 
-   f_result.set_size(nx, ny);
-   o_result.set_size(nx, ny);
+   f_simple_result.set_size(nx, ny);
+   o_simple_result.set_size(nx, ny);
+   f_merge_result.set_size(nx, ny);
+   o_merge_result.set_size(nx, ny);
 
-   combine_boolplanes(f_plane, n_files, f_calc, f_result);
-   combine_boolplanes(o_plane, n_files, o_calc, o_result);
+   combine_boolplanes(f_simple_plane, n_files, f_calc, f_simple_result);
+   combine_boolplanes(o_simple_plane, n_files, o_calc, o_simple_result);
+
+   combine_boolplanes(f_merge_plane, n_files, f_calc, f_merge_result);
+   combine_boolplanes(o_merge_plane, n_files, o_calc, o_merge_result);
+
+
+   // create a ShapeData object using something from mvd
+   double ntotal = (double)(nx*ny);
+   double ngood = 0.0;
+   ShapeData f_merge_sd = ShapeData(*(mvd[0]->_simple->_Fcst_sd));
+   for (int x=0; x<nx; ++x) {
+      for (int y=0; y<ny; ++y) {
+         if (f_merge_result.get(x, y)) {
+            ++ngood;
+            f_merge_sd.data.put(1.0, x, y);
+         } else {
+            f_merge_sd.data.put(bad_data_double, x, y);
+         }
+      }
+   }
+   printf("Total percent good = %.5lf\n", ngood/ntotal);
+   
+   int n_f_shapes;
+   ShapeData f_merge_sd_split = split(f_merge_sd, n_f_shapes);
+   vector<double> values;
+   vector<int> count;
+   for (int x=0; x<nx; ++x) {
+      for (int y=0; y<ny; ++y) {
+         double v = f_merge_sd_split.data.get(x,y);
+         vector<double>::iterator vi;
+         vi = find(values.begin(), values.end(), v);
+         if (vi == values.end()) {
+            values.push_back(v);
+            count.push_back(1);
+         } else {
+            int ii = vi - values.begin();
+            count[ii] = count[ii] + 1;
+         }
+      }
+   }
+   for (size_t i=0; i<values.size(); ++i) {
+      printf("Value:%10.5lf   count:%d\n", values[i], count[i]);
+   }
+   
+
+   ShapeData o_merge_sd = ShapeData(*(mvd[0]->_simple->_Fcst_sd));
+   for (int x=0; x<nx; ++x) {
+      for (int y=0; y<ny; ++y) {
+         if (o_merge_result.get(x, y)) {
+            o_merge_sd.data.put(1.0, x, y);
+         } else {
+            o_merge_sd.data.put(bad_data_double, x, y);
+         }
+      }
+   }
+   int n_o_shapes;
+   ShapeData o_merge_sd_split = split(o_merge_sd, n_o_shapes);
+   
+
 
    bool superobj_mode = true;
+
+
 
    //
    // Filter the data to within the superobjects only and do statistics by invoking mode algorithm again
@@ -238,7 +293,13 @@ int multivar_frontend(const StringArray & Argv)
            << "\n starting masked data mode run " << (j + 1) << " of " << n_files
            << "\n" << sep << "\n";
 
-      second_pass(j, f_result, o_result, nx, ny, dir, *mvd[j], has_union);
+      // this one creates super merge objects
+      // second_pass(j, f_merge_result, o_merge_result, nx, ny, dir, *mvd[j], has_union,
+      //             ModeFrontEnd::MULTIVAR_PASS2_MERGE);
+
+      // this is the real one
+      second_pass(j, f_simple_result, o_simple_result, nx, ny, dir, *mvd[j], has_union,
+                  f_merge_sd_split, o_merge_sd_split);
 
       delete mvd[j];
       mvd[j] = 0;
@@ -287,8 +348,8 @@ int multivar_frontend(const StringArray & Argv)
          fcst_file << outdir << "/" << fcst_super_nc_filename;
          obs_file << outdir << "/" <<  obs_super_nc_filename;
 
-         write_output_nc_file(fcst_file.text(), met, f_result);
-         write_output_nc_file( obs_file.text(), met, o_result);
+         write_output_nc_file(fcst_file.text(), met, f_simple_result);
+         write_output_nc_file( obs_file.text(), met, o_simple_result);
       }
    }
 
@@ -586,10 +647,15 @@ MultiVarData *first_pass(int j, const string &fcst_filename,
 
    mlog << Debug(3) << "Running mode command: \"" << command << "\"\n\n";
    ModeFrontEnd *frontend = new ModeFrontEnd;
-
    int status = frontend->run(mode_argv, ModeFrontEnd::MULTIVAR_PASS1);
    MultiVarData *mvdi = frontend->get_multivar_data();
    delete frontend;
+
+   frontend = new ModeFrontEnd;
+   status = frontend->run(mode_argv, ModeFrontEnd::MULTIVAR_PASS1_MERGE);
+   frontend->addMultivarMergePass1(mvdi);
+   delete frontend;
+
    return mvdi;
 }
 
@@ -598,12 +664,10 @@ MultiVarData *first_pass(int j, const string &fcst_filename,
 void second_pass(int j, const BoolPlane &f_result,
                  const BoolPlane &o_result, int nx, int ny,
                  const ConcatString &dir, MultiVarData &mvd,
-                 bool has_union)
+                 bool has_union, ShapeData &f_merge, ShapeData &o_merge)
 {
-  
-   mask_data("Fcst", nx, ny, f_result, mvd.Fcst_sd->data);
-   mask_data("Obs", nx, ny, o_result, mvd.Obs_sd->data);
-
+   mask_data("Fcst", nx, ny, f_result, mvd._simple->_Fcst_sd->data);
+   mask_data("Obs", nx, ny, o_result, mvd._simple->_Obs_sd->data);
 
    StringArray mode_argv;
    char junk [256];
@@ -626,7 +690,7 @@ void second_pass(int j, const BoolPlane &f_result,
    mlog << Debug(1) << "Running filtered mode \n\n";
 
    ModeFrontEnd *frontend = new ModeFrontEnd;
-   int status = frontend->run(mode_argv, mvd, has_union);
+   int status = frontend->run(mode_argv, mvd, has_union, f_merge, o_merge);
    delete frontend;
 }
  
