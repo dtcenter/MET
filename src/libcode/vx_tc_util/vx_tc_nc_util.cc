@@ -266,10 +266,10 @@ void def_tc_range_azimuth(NcFile* nc_out,
 
     // Range is defined as a fraction of RMW or in kilometers
     if(is_bad_data(rmw_scale)) {
-       add_att(&range_var, "units", "fraction of RMW");
+       add_att(&range_var, "units", "km");
     }
     else {
-       add_att(&range_var, "units", "km");
+       add_att(&range_var, "units", "fraction of RMW");
     }
     add_att(&range_var, "standard_name", "range");
     add_att(&range_var, "_FillValue", bad_data_double);
