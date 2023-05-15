@@ -31,6 +31,8 @@ struct DataOptInfo {
    StringArray data_files; // Gridded data file(s)
 
    void clear();
+
+   DataOptInfo & operator+=(const DataOptInfo &);
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -46,18 +48,18 @@ class DomainInfo {
       DomainInfo();
       ~DomainInfo();
 
-      // Tech ID's
+      // ATCF Tech ID's
       StringArray tech_ids;
+
+      // Domain data files
+      StringArray data_files;
 
       // Domain name
       string domain;
 
-      // TcrmwData structure for creating a TcrmwGrid object
+      // TcrmwData struct for creating a TcrmwGrid object
       TcrmwData data;
       double delta_range_km;
-
-      // Domain data files
-      StringArray data_files;
 
       // Vector of VarInfo pointers (not allocated)
       std::vector<VarInfo *> var_info_ptr;

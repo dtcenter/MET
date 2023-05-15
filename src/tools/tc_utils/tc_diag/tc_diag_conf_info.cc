@@ -37,6 +37,16 @@ void DataOptInfo::clear() {
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+DataOptInfo & DataOptInfo::operator+=(const DataOptInfo &info) {
+
+   tech_ids.add(info.tech_ids);
+   data_files.add(info.data_files);
+
+   return(*this);
+}
+
+////////////////////////////////////////////////////////////////////////
 //
 //  Code for class DomainInfo
 //
@@ -68,6 +78,7 @@ void DomainInfo::init_from_scratch() {
 void DomainInfo::clear() {
 
    tech_ids.clear();
+   data_files.clear();
    domain.clear();
 
    data.name         = (const char *) 0;
@@ -79,7 +90,6 @@ void DomainInfo::clear() {
 
    delta_range_km = bad_data_double;
 
-   data_files.clear();
    var_info_ptr.clear();
    diag_script.clear();
 
@@ -93,7 +103,8 @@ void DomainInfo::parse_domain_info(Dictionary &dict) {
    // Initialize
    clear();
 
-   // Note: tech_ids are specified on the command line
+   // Note: tech_ids and data_files are specified on the
+   //       command line rather than in the config file
 
    // Conf: domain
    domain = dict.lookup_string(conf_key_domain);
@@ -386,7 +397,7 @@ void TCDiagConfInfo::parse_domain_info_map(map<string,DataOptInfo> dmap) {
       // Store the domain-specifc data files
       if(dmap.count(di.domain) > 0) {
          di.tech_ids   = dmap[di.domain].tech_ids;
-         di.data_files = parse_file_list(dmap[di.domain].data_files);
+         di.data_files = dmap[di.domain].data_files;
       }
       else {
          mlog << Error << "\nTCDiagConfInfo::parse_domain_info_map() -> "

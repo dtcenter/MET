@@ -57,7 +57,8 @@ using namespace netCDF;
 ////////////////////////////////////////////////////////////////////////
 
 static void usage();
-static void process_command_line(int, char**);static void set_file_type(const StringArray &);
+static void process_command_line(int, char**);
+static void get_file_type();
 
 static void process_tracks(TrackInfoArray&);
 static void get_atcf_files(const StringArray&,
@@ -100,27 +101,28 @@ static void compute_lat_lon(TcrmwGrid&, double*, double*);
 ////////////////////////////////////////////////////////////////////////
 
 // JHG, things to do as of 4/14/2023:
-// - Change order of dimensions
+// - XXX Change order of dimensions - DONE
 //   from: double TMP_P500(range, azimuth, time) ;
 //     to: double TMP_P500(time, pressure, range, azimuth) ;
-//   https://github.com/dtcenter/MET/issues/2168#issuecomment-1347477566
-// - Parellelize the processing of valid times
-// - Add NetCDF variable attributes
+// - ??? Parellelize the processing of valid times - ON HOLD due to runtime errors
+// - XXX Add NetCDF variable attributes - DONE
 // - Write 3D variables to NetCDF output file
 // - Write variable names track_lat/track_lon/grid_lat/grid_lon
 // - Call the diagnostic scripts on these temp NC files
 // - Stitch together the temp files into an output file
 // - Do the ACTUAL list of variables from Robert
-// - Fix the azimuth computations (DONE BUT NOT COMMITTED)
+// - XXX Fix the azimuth computations - DONE
 // - Check if the azimuths are computed the way Robert says they should be
 //
 // Add back in the "regrid" dictionary to control how regridding to cyl coord is done?
+//
 // Storm motion computation (from 4/7/23):
-//   - Include the full track in each temporary NetCDF file
+//   - DONE - Include the full track in each temporary NetCDF file
+//   - DONE - Write the full array of (lat, lon) points for the entire track for simplicity.
 //   - For each track point, write the vmax and mslp as a single value for that time.
-//   - Write the full array of (lat, lon) points for the entire track for simplicity.
+//
 // JHG print a WARNING message if the Diag Track differs from the Tech Id for the data files
-//     AND vortex removal has not been requested
+//     AND vortex removal has not been requested. Not sure where in the logic.
 
 int met_main(int argc, char *argv[]) {
 
@@ -156,18 +158,18 @@ void usage() {
    cout << "\n*** Model Evaluation Tools (MET" << met_version
         << ") ***\n\n"
         << "Usage: " << program_name << "\n"
-        << "\t-data tech_ids domain [ file_1 ... file_n | data_file_list ]\n"
+        << "\t-data domain tech_id_list [ file_1 ... file_n | data_file_list ]\n"
         << "\t-deck file\n"
         << "\t-config file\n"
         << "\t[-outdir path]\n"
         << "\t[-log file]\n"
         << "\t[-v level]\n\n"
 
-        << "\twhere\t\"-data tech_ids domain [ file_1 ... file_n | data_file_list ]\"\n"
+        << "\twhere\t\"-data domain tech_id_list [ file_1 ... file_n | data_file_list ]\"\n"
 
-        << "\t\t\tSpecifies a comma-separated list of one or more ATCF tech ID's\n"
-        << "\t\t\tand a domain name, followed by the gridded data files\n"
-        << "\t\t\tor an ASCII file containing a list of files to be used.\n"
+        << "\t\t\tSpecifies a domain name, a comma-separated list of ATCF tech ID's, "
+        << "\t\t\tand a list of gridded data files or an ASCII file containing "
+        << "\t\t\ta list of files to be used.\n"
         << "\t\t\tSpecify \"-data\" once for each data source (required).\n"
 
         << "\t\t\"-deck source\" is the ATCF format data source "
@@ -193,7 +195,6 @@ void usage() {
 void process_command_line(int argc, char **argv) {
    CommandLine cline;
    ConcatString default_config_file;
-   StringArray data_files;
 
    // Default output directory
    out_dir = replace_path(default_out_dir);
@@ -240,7 +241,7 @@ void process_command_line(int argc, char **argv) {
    conf_info.read_config(default_config_file.c_str(), config_file.c_str());
 
    // Get data file type from input files
-   set_file_type(data_files);
+   get_file_type();
 
    // Process the configuration
    conf_info.process_config(file_type, data_opt_map);
@@ -250,10 +251,17 @@ void process_command_line(int argc, char **argv) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_file_type(const StringArray &file_list) {
+void get_file_type() {
    Met2dDataFileFactory mtddf_factory;
    Met2dDataFile *mtddf = (Met2dDataFile *) 0;
    int i;
+
+   // Build one long list of input data files
+   StringArray file_list;
+   map<string,DataOptInfo>::iterator it;
+   for(it = data_opt_map.begin(); it != data_opt_map.end(); it++) {
+      file_list.add(it->second.data_files);
+   }
 
    // Get data file type from config
    GrdFileType conf_file_type =
@@ -267,13 +275,16 @@ void set_file_type(const StringArray &file_list) {
 
    // Check for no valid files
    if(i == file_list.n()) {
-      mlog << Error << "\nTrouble reading input data files.\n\n";
+      mlog << Error << "\nget_file_type() -> "
+           << "No valid data files found.\n\n";
       exit(1);
    }
 
    // Read first valid file
-   if(!(mtddf = mtddf_factory.new_met_2d_data_file(file_list[i].c_str(), conf_file_type))) {
-       mlog << Error << "\nTrouble reading data file \""
+   if(!(mtddf = mtddf_factory.new_met_2d_data_file(
+                   file_list[i].c_str(), conf_file_type))) {
+       mlog << Error << "\nget_file_type() -> "
+            << "Trouble reading data file \""
             << file_list[i] << "\"\n\n";
        exit(1);
    }
@@ -562,30 +573,35 @@ void set_atcf_source(const StringArray& a,
 
 void set_data(const StringArray& a) {
 
-   // Check for enough arguments (e.g. -data AVNO,AEMN parent gfs_file_list)
+   // Check for enough arguments
+   // e.g. -data parent GFSO,AEMN gfs_file_list
    if(a.n() < 3) {
       mlog << Error << "\nset_data() -> "
-           << "each \"-data\" command line option must specify a comma-separated list "
-           << "of one or more ATCF tech ID's and a domain name, "
-           << "followed by the corresponding data files.\n\n";
+           << "each \"-data\" command line option must specify a domain name, "
+           << "a comma-separated list of ATCF tech ID's, and the corresponding "
+           << "gridded data files.\n\n";
       usage();
    }
 
-   // First argument is a comma-separated list of tech ID's
-   StringArray tech_id;
-   tech_id.parse_css(a[0]);
+   // Store current -data options
+   DataOptInfo info;
 
-   // Second argument is the domain name
-   string domain = a[1];
+   // First argument is the domain name
+   string domain = a[0];
 
-   // Remaining arguments are the data files
+   // Second argument is a comma-separated list of tech ID's
+   info.tech_ids.parse_css(a[1]);
+
+   // Remaining arguments are gridded data files or file lists
    StringArray sa;
    for(int i=2; i<a.n(); i++) sa.add(a[i]);
+   info.data_files = parse_file_list(sa);
 
-   // Update the data file map
-   if(data_opt_map.count(domain) == 0) data_opt_map[domain].data_files = sa;
-   else                                data_opt_map[domain].data_files.add(sa);
+   // Store the data in the map
+   if(data_opt_map.count(domain) == 0) data_opt_map[domain]  = info;
+   else                                data_opt_map[domain] += info;
 
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -764,20 +780,20 @@ void close_out_files() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void compute_lat_lon(TcrmwGrid& ra_grid,
+void compute_lat_lon(TcrmwGrid& grid,
                      double *lat_arr, double *lon_arr) {
 
    // Compute lat and lon coordinate arrays
-   for(int ir=0; ir<ra_grid.range_n(); ir++) {
-      for(int ia=0; ia<ra_grid.azimuth_n(); ia++) {
+   for(int ir=0; ir<grid.range_n(); ir++) {
+      for(int ia=0; ia<grid.azimuth_n(); ia++) {
          double lat, lon;
-         int i = ir * ra_grid.azimuth_n() + ia;
-         ra_grid.range_azi_to_latlon(
-            ir * ra_grid.range_delta_km(),
-            ia * ra_grid.azimuth_delta_deg(),
+         int i = ir * grid.azimuth_n() + ia;
+         grid.range_azi_to_latlon(
+            ir * grid.range_delta_km(),
+            ia * grid.azimuth_delta_deg(),
             lat, lon);
-         lat_arr[i] =   lat;
-         lon_arr[i] = - lon; // degrees east to west
+         lat_arr[i] =  lat;
+         lon_arr[i] = -lon; // degrees east to west
       }
    }
 
@@ -789,6 +805,7 @@ void compute_lat_lon(TcrmwGrid& ra_grid,
 void process_track_points(const TrackInfoArray& tracks) {
    int i, j, i_pnt, n_pts;
    TmpFileInfo tmp_info;
+   map<string,DomainInfo>::iterator dom_it;
 
    // Build list of unique valid times
    TimeArray valid_ta;
@@ -807,22 +824,17 @@ void process_track_points(const TrackInfoArray& tracks) {
    mlog << Debug(2) << "Processing " << tracks.n()
         << " tracks consisting of " << n_pts
         << " points with " << valid_ta.n()
-        << " unqiue valid times from "
+        << " unique valid times from "
         << unix_to_yyyymmddhh(valid_ta.min())
         << " to " << unix_to_yyyymmddhh(valid_ta.max())
         << ".\n";
-/* JHG
-#pragma omp parallel default(none)                      \
-   shared(valid_ta, mlog, conf_info, tracks, tmp_map)   \
-   shared(Error)                                        \
-   private(i, j, i_pnt, tmp_info)
-   {
-*/
-   // Parallel: Loop over the unique valid times
+
+   // Create temporary files for each TrackPoint to be processed
+
+   // Loop over the unique valid times
    for(i=0; i<valid_ta.n(); i++) {
 
-      // Parallel: Loop over the domains to be processed
-      map<string,DomainInfo>::iterator dom_it;
+      // Loop over the domains to be processed
       for(dom_it  = conf_info.domain_info_map.begin();
           dom_it != conf_info.domain_info_map.end();
           dom_it++) {
@@ -858,14 +870,41 @@ void process_track_points(const TrackInfoArray& tracks) {
                                   dom_it->second);
 
          } // end for j
-
-         // Process the gridded data for the current time
-         process_fields(tracks, valid_ta[i], i,
-                        dom_it->first, dom_it->second);
-
       } // end for dom_it
    } // end for i
-// JHG } // End of omp parallel
+
+// JHG this parellel code only works intermittently
+// sometimes it runs to completion with multiple threads
+// other times it SEGFAULTS:
+//   FATAL ERROR (SEGFAULT): Process 99687 got signal 11
+// or aborts:
+//   FATAL: Received Signal Abort. Exiting 6
+//   tc_diag(99714,0x70000b229000) malloc: *** error for object 0x7f7fd1f7d620:
+//      pointer being freed was not allocated
+
+#pragma omp parallel default(none)                      \
+   shared(mlog, conf_info, tracks, valid_ta)            \
+   private(i, dom_it)
+   {
+
+      // Parallel: Loop over the unique valid times
+#pragma omp for schedule (static)
+      for(i=0; i<valid_ta.n(); i++) {
+
+         // Parallel: Loop over the domains to be processed
+         map<string,DomainInfo>::iterator dom_it;
+         for(dom_it  = conf_info.domain_info_map.begin();
+             dom_it != conf_info.domain_info_map.end();
+             dom_it++) {
+
+            // Process the gridded data for the current
+            // domain and valid time
+            process_fields(tracks, valid_ta[i], i,
+                           dom_it->first, dom_it->second);
+
+         } // end for dom_it
+      } // end for i
+   } // End of omp parallel
 
    return;
 }
@@ -1103,7 +1142,7 @@ void TmpFileInfo::open(const TrackInfo *t_ptr,
    // Set pointers
    trk_ptr = t_ptr;
    pnt_ptr = p_ptr;
-   domain    = di.domain;
+   domain  = di.domain;
 
    // Open the temp file
    tmp_file = build_tmp_file_name(trk_ptr, pnt_ptr, domain);
@@ -1125,8 +1164,6 @@ void TmpFileInfo::close() {
       mlog << Debug(3) << "Writing temp file: "
            << tmp_file << "\n";
 
-      // Close the output file
-      tmp_out->close();
       delete tmp_out;
       tmp_out = (NcFile *) 0;
    }
@@ -1143,7 +1180,7 @@ void TmpFileInfo::clear() {
    trk_ptr = (TrackInfo *) 0;
    pnt_ptr = (TrackPoint *) 0;
 
-   grid.clear();
+   grid_out.clear();
    ra_grid.clear();
 
    domain.clear();
@@ -1182,28 +1219,31 @@ void TmpFileInfo::setup_nc_file(const DomainInfo &di) {
    d.range_max_km = di.delta_range_km * d.range_n;
 
    // Instantiate the grid
-   grid.set(d);
+   grid_out.set(d);
    ra_grid.set_from_data(d);
 
-   mlog << Debug(3) << "Defining cylindrical coordinates for (Lat, Lon) = ("
-        << pnt_ptr->lat() << ", " << pnt_ptr->lon()
-        << "), Range = " << ra_grid.range_n()
-        << ", Azimuth = " << ra_grid.azimuth_n() << "\n";
+   mlog << Debug(3)
+        << "Defining cylindrical coordinates for (Lat, Lon) = ("
+        << pnt_ptr->lat() << ", " << pnt_ptr->lon() << "), Range = "
+        << ra_grid.range_n() << " every " << ra_grid.range_delta_km()
+        << ra_grid.range_n() << " every " << ra_grid.range_delta_km()
+        << "km, Azimuth = " << ra_grid.azimuth_n() << "\n";
 
    // Define dimensions
-   rng_dim = add_dim(tmp_out, "range", (long) ra_grid.range_n());
-   azi_dim = add_dim(tmp_out, "azimuth", (long) ra_grid.azimuth_n());
    trk_dim = add_dim(tmp_out, "track_point", trk_ptr->n_points());
    vld_dim = add_dim(tmp_out, "time", 1);
+   rng_dim = add_dim(tmp_out, "range", (long) ra_grid.range_n());
+   azi_dim = add_dim(tmp_out, "azimuth", (long) ra_grid.azimuth_n());
 
    // Define range and azimuth dimensions
-   def_tc_range_azimuth(tmp_out, rng_dim, azi_dim,
-                        ra_grid, 1.0);
+   def_tc_range_azimuth(tmp_out,
+                        rng_dim, azi_dim,
+                        ra_grid, bad_data_double);
 
-   // Define latitude and longitude arrays
-   def_tc_lat_lon_time(tmp_out,
-                       rng_dim, azi_dim, vld_dim,
-                       lat_var, lon_var, vld_var);
+   // Define time, latitude, and longitude arrays
+   def_tc_time_lat_lon(tmp_out,
+                       vld_dim, rng_dim, azi_dim,
+                       vld_var, lat_var, lon_var);
 
    // Write the track
    write_tc_track(tmp_out, trk_dim, *trk_ptr);
@@ -1239,20 +1279,23 @@ void TmpFileInfo::write_nc_data(const VarInfo *vi, const DataPlane &dp_in,
    ri.shape      = GridTemplateFactory::GridTemplate_Square;
 
    // Do the cylindrical coordinate transformation
-   dp_out = met_regrid(dp_in, grid_in, grid, ri);
+   dp_out = met_regrid(dp_in, grid_in, grid_out, ri);
 
    // Setup dimensions
    vector<NcDim> dims;
+   dims.push_back(vld_dim);
    dims.push_back(rng_dim);
    dims.push_back(azi_dim);
-   dims.push_back(vld_dim);
 
    // Create output variable
    ConcatString var_name;
    var_name << vi->name_attr() << "_" << vi->level_attr();
    NcVar cur_var = tmp_out->addVar(var_name, ncDouble, dims);
 
-   // JHG need to add variable attributes
+   // Add variable attributes
+   add_att(&cur_var, long_name_att_name, vi->long_name_attr());
+   add_att(&cur_var, units_att_name, vi->units_attr());
+   add_att(&cur_var, fill_value_att_name, bad_data_double);
 
    // Write the data
    write_tc_data_rev(tmp_out, ra_grid, 0, cur_var, dp_out.data());

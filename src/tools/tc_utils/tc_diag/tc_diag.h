@@ -152,7 +152,7 @@ class TmpFileInfo {
       const TrackPoint *pnt_ptr; // not allocated
 
       // Range azimuth grid
-      Grid grid;
+      Grid      grid_out;
       TcrmwGrid ra_grid;
 
       // Domain name
