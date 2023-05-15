@@ -212,7 +212,7 @@ jobs = [
    "-job filter  -amodel AHWI  -rirw_track BDECK -rirw_thresh <=-30 -rirw_exact TRUE  -dump_row ${MET_TEST_OUTPUT}/tc_stat/ALAL2010_AHWI_rw.tcst",
    "-job rirw                  -rirw_window 00   -rirw_thresh <=-15 -out_line_type CTC,CTS,MPR",
    "-job rirw                  -rirw_window 12   -rirw_thresh <=-15 -out_line_type CTC,CTS,MPR",
-   "-job rirw                  -rirw_window 12   -rirw_thresh <=-15 -out_line_type CTC,CTS -out_stat ${MET_TEST_OUTPUT}/tc_stat/ALAL2010_rirw.stat"
+   "-job rirw                  -rirw_window 12   -rirw_thresh <=-15 -out_line_type CTC,CTS -by amodel -out_stat ${MET_TEST_OUTPUT}/tc_stat/ALAL2010_rirw.stat"
 ];
 
 //
