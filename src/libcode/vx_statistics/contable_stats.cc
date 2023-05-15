@@ -811,14 +811,11 @@ if ( Nrows != Ncols )  {
 
 const int N = total();
 
-if ( N == 0 )  {
+   //
+   //  MET #2542: return bad data for empty tables rather than erroring out
+   //
 
-   mlog << Error << "\nContingencyTable::gheidke() -> "
-        << "table empty!\n\n";
-
-   exit ( 1 );
-
-}
+if ( N == 0 ) return ( bad_data_double );
 
 const double DN = (double) N;
 int j, k, m, n;
@@ -912,14 +909,11 @@ if ( ec_value < 0.0 || ec_value >= 1.0 )  {
 
 const int N = total();
 
-if ( N == 0 )  {
+   //
+   //  MET #2542: return bad data for empty tables rather than erroring out
+   //
 
-   mlog << Error << "\nContingencyTable::gheidke_ec(double) -> "
-        << "table empty!\n\n";
-
-   exit ( 1 );
-
-}
+if ( N == 0 ) return ( bad_data_double );
 
 int j, sum;
 double num, denom, ans;
@@ -977,14 +971,11 @@ if ( Nrows != Ncols )  {
 
 const int N = total();
 
-if ( N == 0 )  {
+   //
+   //  MET #2542: return bad data for empty tables rather than erroring out
+   //
 
-   mlog << Error << "\nContingencyTable::gkuiper() -> "
-        << "table empty!\n\n";
-
-   exit ( 1 );
-
-}
+if ( N == 0 ) return ( bad_data_double );
 
 const double DN = (double) N;
 int j, k, m, n;
@@ -1077,14 +1068,11 @@ if ( Nrows != Ncols )  {
 
 const int N = total();
 
-if ( N == 0 )  {
+   //
+   //  MET #2542: return bad data for empty tables rather than erroring out
+   //
 
-   mlog << Error << "\nContingencyTable::gerrity() -> "
-        << "table empty!\n\n";
-
-   exit ( 1 );
-
-}
+if ( N == 0 ) return ( bad_data_double );
 
 int j, k, m, n;
 const double DN = (double) N;

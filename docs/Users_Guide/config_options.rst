@@ -2406,7 +2406,7 @@ are empty. Note: grib_code 11 is equivalent to obs_var "TMP".
 Settings specific to individual tools
 -------------------------------------
 
-EnsembleStatConfig_default
+GenEnsProdConfig_default
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ens
@@ -2500,6 +2500,64 @@ combination of the categorical threshold (cat_thresh), neighborhood width
         }
      ];
   }
+
+ensemble_flag
+"""""""""""""
+  
+The "ensemble_flag" entry is a dictionary of boolean value indicating
+which ensemble products should be generated:
+
+* "latlon" for a grid of the Latitude and Longitude fields
+
+* "mean" for the simple ensemble mean
+  
+* "stdev" for the ensemble standard deviation
+  
+* "minus" for the mean minus one standard deviation
+  
+* "plus" for the mean plus one standard deviation
+  
+* "min" for the ensemble minimum
+  
+* "max" for the ensemble maximum
+  
+* "range" for the range of ensemble values
+  
+* "vld_count" for the number of valid ensemble members
+  
+* "frequency" for the ensemble relative frequency meeting a threshold
+  
+* "nep" for the neighborhood ensemble probability
+  
+* "nmep" for the neighborhood maximum ensemble probability
+  
+* "rank" to write the rank for the gridded observation field to separate
+  NetCDF output file.
+  
+* "weight" to write the grid weights specified in grid_weight_flag to the
+  rank NetCDF output file.
+
+.. code-block:: none
+		
+  ensemble_flag = {
+    latlon     = TRUE;
+     mean      = TRUE;
+     stdev     = TRUE;
+     minus     = TRUE;
+     plus      = TRUE;
+     min       = TRUE;
+     max       = TRUE;
+     range     = TRUE;
+     vld_count = TRUE;
+     frequency = TRUE;
+     nep       = FALSE;
+     nmep      = FALSE;
+     rank      = TRUE;
+     weight    = FALSE;
+  }
+  
+EnsembleStatConfig_default
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 fcst, obs
 """""""""
@@ -2641,58 +2699,6 @@ levels, and range of values.
      inst_bias_offset = 0.0;     Instrument bias offset adjustment
      min              = NA;      Valid range of data
      max              = NA;
-  }
-
-ensemble_flag
-"""""""""""""
-  
-The "ensemble_flag" entry is a dictionary of boolean value indicating
-which ensemble products should be generated:
-
-* "mean" for the simple ensemble mean
-  
-* "stdev" for the ensemble standard deviation
-  
-* "minus" for the mean minus one standard deviation
-  
-* "plus" for the mean plus one standard deviation
-  
-* "min" for the ensemble minimum
-  
-* "max" for the ensemble maximum
-  
-* "range" for the range of ensemble values
-  
-* "vld_count" for the number of valid ensemble members
-  
-* "frequency" for the ensemble relative frequency meeting a threshold
-  
-* "nep" for the neighborhood ensemble probability
-  
-* "nmep" for the neighborhood maximum ensemble probability
-  
-* "rank" to write the rank for the gridded observation field to separate
-  NetCDF output file.
-  
-* "weight" to write the grid weights specified in grid_weight_flag to the
-  rank NetCDF output file.
-
-.. code-block:: none
-		
-  ensemble_flag = {
-     mean      = TRUE;
-     stdev     = TRUE;
-     minus     = TRUE;
-     plus      = TRUE;
-     min       = TRUE;
-     max       = TRUE;
-     range     = TRUE;
-     vld_count = TRUE;
-     frequency = TRUE;
-     nep       = FALSE;
-     nmep      = FALSE;
-     rank      = TRUE;
-     weight    = FALSE;
   }
 
 rng

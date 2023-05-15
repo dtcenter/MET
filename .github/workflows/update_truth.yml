@@ -1,4 +1,4 @@
-name: Create Truth Data Update Pull Request
+name: Update Truth Data
 
 on:
   workflow_dispatch:
