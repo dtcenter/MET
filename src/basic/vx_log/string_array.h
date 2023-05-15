@@ -59,8 +59,12 @@ class StringArray {
       void set_ignore_case(const bool);
 
       void add(const std::string text);
-      
+
+      void add_uniq(const std::string text);
+
       void add(const StringArray &);
+
+      void add_uniq(const StringArray &);
 
       void add_css(const std::string);
 
