@@ -263,7 +263,14 @@ void def_tc_range_azimuth(NcFile* nc_out,
 
     // Set attributes
     add_att(&range_var, "long_name", "range");
-    add_att(&range_var, "units", "fraction of RMW");
+
+    // Range is defined as a fraction of RMW or in kilometers
+    if(is_bad_data(rmw_scale)) {
+       add_att(&range_var, "units", "fraction of RMW");
+    }
+    else {
+       add_att(&range_var, "units", "km");
+    }
     add_att(&range_var, "standard_name", "range");
     add_att(&range_var, "_FillValue", bad_data_double);
 
@@ -274,7 +281,8 @@ void def_tc_range_azimuth(NcFile* nc_out,
 
     // Compute grid coordinates
     for (int i = 0; i < grid.range_n(); i++) {
-        range_data[i] = i * rmw_scale;
+        if(is_bad_data(rmw_scale)) range_data[i] = i * grid.range_delta_km();
+        else                       range_data[i] = i * rmw_scale;
     }
     for (int j = 0; j < grid.azimuth_n(); j++) {
         azimuth_data[j] = j * grid.azimuth_delta_deg();
