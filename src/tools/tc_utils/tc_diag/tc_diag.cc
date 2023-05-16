@@ -113,6 +113,7 @@ static void compute_lat_lon(TcrmwGrid&, double*, double*);
 // - Do the ACTUAL list of variables from Robert
 // - XXX Fix the azimuth computations - DONE
 // - Check if the azimuths are computed the way Robert says they should be
+// - Check the actual lat/lon locations computes. The lon's don't look correct
 //
 // Add back in the "regrid" dictionary to control how regridding to cyl coord is done?
 //
@@ -917,7 +918,7 @@ void process_fields(const TrackInfoArray &tracks,
                     const DomainInfo &di) {
    int i, j, i_pnt;
    DataPlane data_dp;
-   Grid grid;
+   Grid grid_dp;
    VarInfoFactory vi_factory;
    VarInfo *vi = (VarInfo *) 0;
    StringArray tmp_key_sa;
@@ -932,7 +933,7 @@ void process_fields(const TrackInfoArray &tracks,
       // Find data for this track point
       get_series_entry(i_vld, vi,
                        di.data_files, file_type,
-                       data_dp, grid);
+                       data_dp, grid_dp);
 
       // Do coordinate transformation for each track point
       for(j=0; j<tracks.n(); j++) {
@@ -949,8 +950,12 @@ void process_fields(const TrackInfoArray &tracks,
          // Store the temp keys
          if(!tmp_key_sa.has(tmp_key)) tmp_key_sa.add(tmp_key);
 
+         // JHG insert vortex removal logic here?
+         // It applies to each track point location.
+
+
          // Compute and write the cylindrical coordinate data
-         tmp_map[tmp_key].write_nc_data(vi, data_dp, grid);
+         tmp_map[tmp_key].write_nc_data(vi, data_dp, grid_dp);
 
       } // end for j
 
@@ -959,7 +964,7 @@ void process_fields(const TrackInfoArray &tracks,
       vi = (VarInfo *) 0;
 
    } // end for i
-
+/* JHG comment out to see if this messing up the parallel
    // Process the temp files
    for(i=0; i<tmp_key_sa.n(); i++) {
 
@@ -971,7 +976,7 @@ void process_fields(const TrackInfoArray &tracks,
       // Delete temp file
       tmp_map[tmp_key_sa[i]].clear();
    }
-
+*/
    return;
 }
 
@@ -1175,7 +1180,13 @@ void TmpFileInfo::close() {
 
 void TmpFileInfo::clear() {
 
-   close();
+   // JHG This causes this runtime error:
+   //   HDF5-DIAG: Error detected in HDF5 (1.8.18) thread 0:
+   //   #000: H5F.c line 648 in H5Fflush(): invalid file identifier
+   //   major: Invalid arguments to routine
+   //   minor: Inappropriate type
+
+   //close();
 
    trk_ptr = (TrackInfo *) 0;
    pnt_ptr = (TrackPoint *) 0;
