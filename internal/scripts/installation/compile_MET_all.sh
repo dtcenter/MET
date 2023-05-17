@@ -6,8 +6,8 @@
 #
 # This compile_MET_all.sh script expects certain environment
 # variables to be set:
-# TEST_BASE, COMPILER, MET_SUBDIR, MET_TARBALL,
-# and USE_MODULES.
+# TEST_BASE, COMPILER (or COMPILER_FAMILY and COMPILER_VERSION),
+# MET_SUBDIR, MET_TARBALL, and USE_MODULES.
 #
 # If compiling support for Python embedding, users will need to
 # set MET_PYTHON, MET_PYTHON_BIN_EXE, MET_PYTHON_CC, and MET_PYTHON_LD.
@@ -83,11 +83,15 @@ fi
 
 echo
 echo "TEST_BASE = ${TEST_BASE? "ERROR: TEST_BASE must be set"}"
-echo "COMPILER  = ${COMPILER?  "ERROR: COMPILER must be set"}"
 echo "MET_SUBDIR = ${MET_SUBDIR? "ERROR: MET_SUBDIR must be set"}"
 echo "MET_TARBALL = ${MET_TARBALL? "ERROR: MET_TARBALL must be set"}"
 echo "USE_MODULES = ${USE_MODULES? "ERROR: USE_MODULES must be set to TRUE if using modules or FALSE otherwise"}"
+if [[ -z "$COMPILER" ]] && [[ -z "$COMPILER_FAMILY" && -z "$COMPILER_VERSION" ]]; then
+   echo "ERROR: COMPILER or COMPILER_FAMILY and COMPILER_VERSION must be set"
+   exit 1
+fi
 echo ${MAKE_ARGS:+MAKE_ARGS = $MAKE_ARGS}
+
 
 LIB_DIR=${TEST_BASE}/external_libs
 MET_DIR=${MET_SUBDIR}
@@ -252,8 +256,17 @@ if [ ! -e ${LIB_DIR}/lib ]; then
 fi
 
 # Load compiler version
-COMPILER_FAMILY=` echo $COMPILER | cut -d'_' -f1`
-COMPILER_VERSION=`echo $COMPILER | cut -d'_' -f2`
+if [ -z ${COMPILER_FAMILY} ]; then
+  COMPILER_FAMILY=` echo $COMPILER | cut -d'_' -f1`
+fi
+ 
+if [ -z ${COMPILER_VERSION} ]; then
+  COMPILER_VERSION=`echo $COMPILER | cut -d'_' -f2`
+fi
+
+echo "COMPILER = $COMPILER"
+echo "COMPILER_FAMILY = $COMPILER_FAMILY"
+echo "COMPILER_VERSION = $COMPILER_VERSION"
 COMPILER_MAJOR_VERSION=`echo $COMPILER_VERSION | cut -d'.' -f1`
 
 echo
@@ -269,6 +282,12 @@ if [ ${USE_MODULES} = "TRUE" ]; then
     module load craype
     module switch craype craype-sandybridge
   fi
+fi
+
+# After loading the compiler module, strip any extra
+# characters off of "gnu" (e.g. "gnu9")
+if [[ ${COMPILER_FAMILY} == *gnu* ]]; then
+  ${COMPILER_FAMILY} = "gnu"
 fi
 
 if [ ${COMPILER_FAMILY} = "gnu" ]; then
@@ -314,8 +333,13 @@ echo
 
 if [ ${USE_MODULES} = "TRUE" ]; then
   if [ ! -z ${PYTHON_MODULE} ]; then
-    PYTHON_NAME=` echo $PYTHON_MODULE | cut -d'_' -f1`
+    PYTHON_NAME=`echo $PYTHON_MODULE | cut -d'_' -f1`
     PYTHON_VERSION_NUM=`echo $PYTHON_MODULE | cut -d'_' -f2`
+    echo "module load ${PYTHON_NAME}/${PYTHON_VERSION_NUM}"
+    echo ${PYTHON_NAME}/${PYTHON_VERSION_NUM}
+    module load ${PYTHON_NAME}/${PYTHON_VERSION_NUM}
+  # Allow the user to specify the name and version of the module to load
+  elif [[ ! -z ${PYTHON_NAME} && ! -z ${PYTHON_VERSION_NUM} ]]; then
     echo "module load ${PYTHON_NAME}/${PYTHON_VERSION_NUM}"
     echo ${PYTHON_NAME}/${PYTHON_VERSION_NUM}
     module load ${PYTHON_NAME}/${PYTHON_VERSION_NUM}
@@ -636,7 +660,7 @@ export LDFLAGS="-Wl,--disable-new-dtags"
 # https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html
 # ${parameter:+word}
 # If parameter is null or unset, nothing is substituted, otherwise the expansion of word is substituted.
-export LDFLAGS="${LDFLAGS} -Wl,-rpath,${LIB_DIR}/lib${ADDTL_DIR:+:$ADDTL_DIR}${LIB_DIR}/lib${MET_NETCDF:+:$MET_NETCDF/lib}${MET_HDF5:+:$MET_HDF5/lib}${MET_BUFRLIB:+:$MET_BUFRLIB}${MET_GRIB2CLIB:+:$MET_GRIB2CLIB}${MET_PYTHON_LIB:+:$MET_PYTHON_LIB}${MET_GSL:+:$MET_GSL/lib}"
+export LDFLAGS="${LDFLAGS} -Wl,-rpath,${LIB_DIR}/lib${MET_NETCDF:+:$MET_NETCDF/lib}${MET_HDF5:+:$MET_HDF5/lib}${MET_BUFRLIB:+:$MET_BUFRLIB}${MET_GRIB2CLIB:+:$MET_GRIB2CLIB}${MET_PYTHON_LIB:+:$MET_PYTHON_LIB}${MET_GSL:+:$MET_GSL/lib}${ADDTL_DIR:+:$ADDTL_DIR}"
 export LDFLAGS="${LDFLAGS} -Wl,-rpath,${LIB_JASPER:+$LIB_JASPER}${LIB_LIBPNG:+:$LIB_PNG}${LIB_Z:+$LIB_Z}"
 export LDFLAGS="${LDFLAGS} ${LIB_JASPER:+-L$LIB_JASPER} ${LIB_LIBPNG:+-L$LIB_LIBPNG} ${MET_HDF5:+-L$MET_HDF5/lib} ${ADDTL_DIR:+-L$ADDTL_DIR}"
 export LIBS="${LIBS} -lhdf5_hl -lhdf5 -lz"
