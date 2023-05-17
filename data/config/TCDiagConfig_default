@@ -87,7 +87,8 @@ domain_info = [
 // Pressure levels to be used, referenced below in 'data'
 //
 prs_lev = [ "P1000", "P925", "P850", "P700", "P500",
-             "P400", "P300", "P250", "P200", "P150" ];
+             "P400", "P300", "P250", "P200", "P150",
+             "P100" ];
 
 //
 // Data fields
