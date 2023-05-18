@@ -59,6 +59,8 @@ The TC-Stat tool can be used to read TCMPR lines and compare the occurrence of r
 
 Users may specify several job command options to configure the behavior of this job. Using these configurable options, the TC-Stat tool analyzes paired tracks and for each track point (i.e. each TCMPR line) determines whether rapid intensification or weakening occurred. For each point in time, it uses the forecast and BEST track event occurrence to populate a 2x2 contingency table. The job may be configured to require that forecast and BEST track events occur at exactly the same time to be considered a hit. Alternatively, the job may be configured to define a hit as long as the forecast and BEST track events occurred within a configurable time window. Using this relaxed matching criteria false alarms may be considered hits and misses may be considered correct negatives as long as the adeck and bdeck events were close enough in time. Each rirw job applies a single intensity change threshold. Therefore, assessing a model's performance with rapid intensification and weakening requires that two separate jobs be run.
 
+The RIRW job supports the **-out_stat** option to write the contingency table counts and statistics to a STAT output file.
+
 Probability of Rapid Intensification
 ------------------------------------
 
@@ -383,6 +385,7 @@ _________________________
   e.g.: -job filter  -line_type TCMPR  -amodel HWFI   -dump_row ./tc_filter_job.tcst
         -job summary -line_type TCMPR  -column TK_ERR -dump_row ./tc_summary_job.tcst
         -job rirw    -line_type TCMPR  -rirw_time 24 -rirw_exact false -rirw_thresh ge20
+        -job rirw    -line_type TCMPR  -rirw_time 24 -rirw_exact false -rirw_thresh ge20 -out_stat ./tc_rirw.stat 
         -job probrirw -line_type PROBRIRW -column_thresh RI_WINDOW ==24 \
                       -probrirw_thresh 30 -probrirw_prob_thresh ==0.25
 
@@ -469,6 +472,8 @@ The RIRW job produces contingency table counts and statistics defined by identif
 • The **-out_line_type** option defines the output data that should be written. This job can write contingency table counts (CTC), contingency table statistics (CTS), and RIRW matched pairs (MPR). The default is CTC and CTS, but the MPR output provides a great amount of detail.
 
 Users may also specify the **-out_alpha** option to define the alpha value for the confidence intervals in the CTS output line type. In addition, the **-by column_name** option is a convenient way of running the same job across multiple stratifications of data. For example, **-by AMODEL** runs the same job for each unique AMODEL name in the data.
+
+Users may also specify the **-out_stat** option to write the contingency table counts and statistics (for the CTC and CTS output line types) to an output STAT file. Information about the RIRW timing information and filtering criteria are written to the STAT header columns while the contingency table counts and/or statistics are written to the CTC and/or CTS output columns.
 
 **Job: PROBRIRW**
 

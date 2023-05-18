@@ -74,6 +74,15 @@ struct SummaryMapData {
 struct RIRWMapData {
    CTSInfo     Info;
    StringArray Hdr;
+   StringArray AModel;
+   StringArray BModel;
+   StringArray Desc;
+   StringArray Basin;
+   StringArray InitMask;
+   StringArray ValidMask;
+   TimeArray   Init;
+   NumArray    Lead;
+   TimeArray   Valid;
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -317,6 +326,8 @@ class TCStatJob {
       // Derived output statistics
       ConcatString StatFile;             // File name for output statistics
       std::ofstream    *StatOut;         // Output statistics file stream
+      AsciiTable  stat_at;               // AsciiTable for buffering output STAT data
+      int         stat_row;              // Counter for the current stat row
 
       // Polyline masking regions
       ConcatString OutInitMaskFile;
@@ -486,11 +497,14 @@ class TCStatJobRIRW : public TCStatJob {
 
       void add_map(std::map<ConcatString,RIRWMapData,cs_cmp>&);
 
-      void do_output    (std::ostream &);
-      void do_ctc_output(std::ostream &);
-      void do_cts_output(std::ostream &);
-      void do_mpr_output(std::ostream &);
-
+      void setup_stat_file(int n_row);
+   
+      void do_output     (std::ostream &);
+      void do_ctc_output (std::ostream &);
+      void do_cts_output (std::ostream &);
+      void do_mpr_output (std::ostream &);
+      void do_stat_output(std::ostream &);
+      
       // Store the case information
       StringArray ByColumn;
 

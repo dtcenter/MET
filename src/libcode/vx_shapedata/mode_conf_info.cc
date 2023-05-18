@@ -475,16 +475,16 @@ PlotInfo plot_info;
 
       // Parse the interest functions
 
-   centroid_dist_if    = dict->lookup_pwl(conf_key_centroid_dist);
-   boundary_dist_if    = dict->lookup_pwl(conf_key_boundary_dist);
-   convex_hull_dist_if = dict->lookup_pwl(conf_key_convex_hull_dist);
-   angle_diff_if       = dict->lookup_pwl(conf_key_angle_diff);
-   aspect_diff_if      = dict->lookup_pwl(conf_key_aspect_diff);
-   area_ratio_if       = dict->lookup_pwl(conf_key_area_ratio);
-   int_area_ratio_if   = dict->lookup_pwl(conf_key_int_area_ratio);
-   curvature_ratio_if  = dict->lookup_pwl(conf_key_curvature_ratio);
-   complexity_ratio_if = dict->lookup_pwl(conf_key_complexity_ratio);
-   inten_perc_ratio_if = dict->lookup_pwl(conf_key_inten_perc_ratio);
+   centroid_dist_if    = parse_interest_function(dict, conf_key_centroid_dist);
+   boundary_dist_if    = parse_interest_function(dict, conf_key_boundary_dist);
+   convex_hull_dist_if = parse_interest_function(dict, conf_key_convex_hull_dist);
+   angle_diff_if       = parse_interest_function(dict, conf_key_angle_diff);
+   aspect_diff_if      = parse_interest_function(dict, conf_key_aspect_diff);
+   area_ratio_if       = parse_interest_function(dict, conf_key_area_ratio);
+   int_area_ratio_if   = parse_interest_function(dict, conf_key_int_area_ratio);
+   curvature_ratio_if  = parse_interest_function(dict, conf_key_curvature_ratio);
+   complexity_ratio_if = parse_interest_function(dict, conf_key_complexity_ratio);
+   inten_perc_ratio_if = parse_interest_function(dict, conf_key_inten_perc_ratio);
 
       // Conf: total_interest_thresh
 
@@ -494,7 +494,7 @@ PlotInfo plot_info;
 
    if(total_interest_thresh < 0 || total_interest_thresh > 1) {
       mlog << Error << "\nModeConfInfo::process_config() -> "
-           << "total_interest_thresh (" << total_interest_thresh
+           << "\"total_interest_thresh\" (" << total_interest_thresh
            << ") must be set between 0 and 1.\n\n";
       exit(1);
    }
@@ -644,6 +644,43 @@ info_array[0].set(false, 0, dict, &conf, type, _fo);
    //
 
 return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+PiecewiseLinear * ModeConfInfo::parse_interest_function(Dictionary * dict, const char * conf_key_if)
+
+{
+
+   //
+   //  lookup piecewise linear interest function
+   //
+
+PiecewiseLinear * pwl_if = dict->lookup_pwl(conf_key_if);
+
+   //
+   //  range check the points
+   //
+
+for (int j=0; j<pwl_if->n_points(); ++j)  {
+
+   if ( pwl_if->y(j) < 0 || pwl_if->y(j) > 1 )  {
+
+      mlog << Error << "\nModeConfInfo::parse_interest_function() -> "
+           << "all \"" << conf_key_if << "\" interest function points ("
+           << pwl_if->x(j) << ", " << pwl_if->y(j)
+           << ") must be in the range of 0 and 1.\n\n";
+
+      exit(1);
+
+   }
+
+}   //  for j
+
+return ( pwl_if );
 
 }
 

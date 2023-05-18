@@ -38,9 +38,10 @@ class pyembed_tools():
         met_base_dir = os.environ.get('MET_BASE', None)
         if met_base_dir is not None:
             met_python_path = os.path.join(met_base_dir, 'python')
-            if pyembed_tools.debug:
-                print(f"{method_name} added python path {os.path.abspath(met_python_path)} from MET_BASE")
-            sys.path.append(os.path.abspath(met_python_path))
+            if os.path.exists(met_python_path):
+                if pyembed_tools.debug:
+                    print(f"{method_name} added python path {os.path.abspath(met_python_path)} from MET_BASE")
+                sys.path.append(os.path.abspath(met_python_path))
 
         # add share/met/python directory to system path
         met_python_path = os.path.join(script_dir, os.pardir, 'python')
@@ -50,8 +51,6 @@ class pyembed_tools():
             if pyembed_tools.debug:
                 print(f"{method_name} added python path {os.path.abspath(met_python_path)}")
             sys.path.append(os.path.abspath(met_python_path))
-        else:
-            print("    - {d} does not exist".format(d=met_python_path))
 
     @staticmethod
     def call_python(argv):

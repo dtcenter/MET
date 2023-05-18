@@ -410,7 +410,7 @@ _____________________
      inten_perc_ratio   = ratio_if;
   }
 
-The set of interest function entries listed above define which values are of interest for each pairwise attribute measured. The interest functions may be defined as a piecewise linear function or as an algebraic expression. A piecewise linear function is defined by specifying the corner points of its graph. An algebraic function may be defined in terms of several built-in mathematical functions. See :numref:`MODE_A-Scientific-and-statistical` for how interest values are used by the fuzzy logic engine. By default, many of these functions are defined in terms of the previously defined **grid_res** entry.
+The interest function entries listed above define which values are of interest for each pairwise attribute measured. Each interest function is defined as a piecewise linear function by specifying the corner points of its graph. The range of each function must be within **0** and **1**. Including (x, y) points with y-values outside this range results in a runtime error. See :numref:`MODE_A-Scientific-and-statistical` for how interest values are used by the fuzzy logic engine. By default, many of these functions are defined in terms of the previously defined **grid_res** entry.
 
 
 _____________________

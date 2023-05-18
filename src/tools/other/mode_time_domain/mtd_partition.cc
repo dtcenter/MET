@@ -230,6 +230,8 @@ void EquivalenceClass::add_no_repeat(int k)
 
 if ( has(k) )  return;
 
+if (Nelements < 0) Nelements = 0;
+
 extend(Nelements + 1);
 
 E[Nelements++] = k;
@@ -684,6 +686,8 @@ void Mtd_Partition::add_no_repeat(int k)
 {
 
 if ( has(k) )  return;
+
+if (Nelements < 0) Nelements = 0;
 
 extend(Nelements + 1);
 

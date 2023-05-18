@@ -25,6 +25,8 @@ The following map projections are currently supported in MET:
 
 * Semi Lat/Lon
 
+.. _App_B-grid_specification_strings:
+
 Grid Specification Strings
 ==========================
 

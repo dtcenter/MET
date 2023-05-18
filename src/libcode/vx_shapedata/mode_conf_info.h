@@ -122,6 +122,8 @@ class ModeConfInfo {
 
       void read_fields (Mode_Field_Info * &, Dictionary * dict, GrdFileType, char _fo);
 
+      PiecewiseLinear * parse_interest_function(Dictionary * dict, const char * conf_key_if);
+
          //
          //  weights
          //

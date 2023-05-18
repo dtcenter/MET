@@ -89,10 +89,10 @@ class dataplane():
       met_info['attrs'] = attrs
 
       # determine fill value
-      try:
-         fill = met_in.met_data.get_fill_value()
-      except:
-         fill = -9999.
+      #try:
+      #   fill = met_in.met_data.get_fill_value()
+      #except:
+      fill = -9999.
 
       # write NetCDF file
       ds = nc.Dataset(netcdf_filename, 'w')
