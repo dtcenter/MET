@@ -26,6 +26,12 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
+#define SEC_MONTH (86400*30)
+#define SEC_YEAR  (86400*30*12)
+static const double DAY_EPSILON = 0.00002;
+
+////////////////////////////////////////////////////////////////////////
+
 
 int is_leap_year(int year)
 
@@ -150,10 +156,6 @@ void adjuste_day_for_day_units(int &day, int &month, int &year, double time_valu
 }
 
 ////////////////////////////////////////////////////////////////////////
-
-#define SEC_MONTH (86400*30)
-#define SEC_YEAR  (86400*30*12)
-static const double DAY_EPSILON = 0.00002;
 
 unixtime add_to_unixtime(unixtime base_unixtime, int sec_per_unit,
                          double time_value, bool no_leap) {
