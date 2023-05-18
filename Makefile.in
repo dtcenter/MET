@@ -158,7 +158,7 @@ ETAGS = etags
 CTAGS = ctags
 CSCOPE = cscope
 DIST_SUBDIRS = data src scripts/Rscripts scripts/python \
-	internal/test_util
+	scripts/utility internal/test_util
 am__DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/config.h.in INSTALL \
 	compile config.guess config.sub depcomp install-sh missing \
 	ylwrap
@@ -274,7 +274,6 @@ MET_HDFLIB = @MET_HDFLIB@
 MET_NETCDF = @MET_NETCDF@
 MET_NETCDFINC = @MET_NETCDFINC@
 MET_NETCDFLIB = @MET_NETCDFLIB@
-MET_PYTHON_BIN_EXE = @MET_PYTHON_BIN_EXE@
 MET_PYTHON_CC = @MET_PYTHON_CC@
 MET_PYTHON_LD = @MET_PYTHON_LD@
 MKDIR_P = @MKDIR_P@
@@ -350,7 +349,8 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 ACLOCAL_AMFLAGS = -I m4
-SUBDIRS = data src scripts/Rscripts scripts/python $(am__append_1)
+SUBDIRS = data src scripts/Rscripts scripts/python scripts/utility \
+	$(am__append_1)
 MAINTAINERCLEANFILES = \
 	Makefile.in \
 	aclocal.m4 \
