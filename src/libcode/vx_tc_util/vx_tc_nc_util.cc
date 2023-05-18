@@ -29,14 +29,14 @@ void write_tc_track(NcFile* nc_out,
         "TrackLines", ncString, track_line_dim);
 
     NcVar track_lat_var = nc_out->addVar(
-        "Lat", ncDouble, track_point_dim);
+        "TrackLat", ncDouble, track_point_dim);
     add_att(&track_lat_var, "long_name", "Track Point Latitude");
-    add_att(&track_lat_var, "units", "degrees_east");
+    add_att(&track_lat_var, "units", "degrees_north");
     add_att(&track_lat_var, "standard_name", "latitude_track");
     NcVar track_lon_var = nc_out->addVar(
-        "Lon", ncDouble, track_point_dim);
+        "TrackLon", ncDouble, track_point_dim);
     add_att(&track_lon_var, "long_name", "Track Point Longitude");
-    add_att(&track_lon_var, "units", "degrees_north");
+    add_att(&track_lon_var, "units", "degrees_east");
     add_att(&track_lon_var, "standard_name", "longitude_track");
 
     double* track_lat_data = new double[track.n_points()];
@@ -77,6 +77,55 @@ void write_tc_track(NcFile* nc_out,
 
     delete[] track_lat_data;
     delete[] track_lon_data;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_tc_track_point(NcFile* nc_out,
+    const NcDim& valid_dim,
+    const TrackPoint& point) {
+    double v;
+
+    vector<size_t> offsets;
+    vector<size_t> counts;
+
+    offsets.push_back(0);
+    counts.push_back(1);
+
+    // Write track point values for lat, lon, vmax, and mslp
+
+    NcVar lat_var = nc_out->addVar(
+        "atcf_lat", ncDouble, valid_dim);
+    add_att(&lat_var, "long_name", "Track Point Latitude");
+    add_att(&lat_var, "units", "degrees_north");
+    add_att(&lat_var, "standard_name", "latitude_track");
+    v = point.lat();
+    lat_var.putVar(offsets, counts, &v);
+
+    NcVar lon_var = nc_out->addVar(
+        "atcf_lon", ncDouble, valid_dim);
+    add_att(&lon_var, "long_name", "Track Point Longitude");
+    add_att(&lon_var, "units", "degrees_east");
+    add_att(&lon_var, "standard_name", "longitude_track");
+    v = point.lon();
+    lon_var.putVar(offsets, counts, &v);
+
+    NcVar vmax_var = nc_out->addVar(
+        "atcf_vmax", ncDouble, valid_dim);
+    add_att(&vmax_var, "long_name", "Maximum sustained wind speed");
+    add_att(&vmax_var, "units", "kts");
+    add_att(&vmax_var, "_FillValue", bad_data_double);
+    v = point.v_max();
+    vmax_var.putVar(offsets, counts, &v);
+
+    NcVar mslp_var = nc_out->addVar(
+        "atcf_mslp", ncDouble, valid_dim);
+    add_att(&mslp_var, "long_name", "Minimum sea level pressure");
+    add_att(&mslp_var, "units", "millibars");
+    add_att(&mslp_var, "_FillValue", bad_data_double);
+    v = point.mslp();
+    mslp_var.putVar(offsets, counts, &v);
+
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -572,31 +621,27 @@ extern void write_tc_pressure_level_data(
     map<string, int> pressure_level_indices, const string& level_str,
     const int& i_point, const NcVar& var, const double* data) {
 
-    vector<size_t> offsets;
-    vector<size_t> counts;
+    write_tc_pressure_level_data(nc_out, grid, i_point,
+       pressure_level_indices[level_str], var, data);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+extern void write_tc_pressure_level_data(
+    NcFile* nc_out, const TcrmwGrid& grid,
+    const int& i_point, const int& i_level,
+    const NcVar& var, const double* data) {
 
     vector<size_t> offsets_3d;
     vector<size_t> counts_3d;
 
     double* data_rev;
 
-    int i_level = pressure_level_indices[level_str];
-
-    offsets.clear();
-    offsets.push_back(i_point);
-    offsets.push_back(0);
-    offsets.push_back(0);
-
     offsets_3d.clear();
     offsets_3d.push_back(i_point);
     offsets_3d.push_back(i_level);
     offsets_3d.push_back(0);
     offsets_3d.push_back(0);
-
-    counts.clear();
-    counts.push_back(1);
-    counts.push_back(grid.range_n());
-    counts.push_back(grid.azimuth_n());
 
     counts_3d.clear();
     counts_3d.push_back(1);
