@@ -113,8 +113,11 @@ class TCDiagConfInfo {
       // Vector of VarInfo objects from data.field (allocated)
       std::vector<VarInfo *> var_info;
 
-      // Mapping of domain name to DomainInfo
-      std::map<std::string,DomainInfo> domain_info_map;
+      // Pressure level values from the config file
+      std::set<double> pressure_levels;
+
+      // Vector of DomainInfo
+      std::vector<DomainInfo> domain_info;
 
       // Wind conversion information
       bool compute_tangential_and_radial_winds;
@@ -147,14 +150,14 @@ class TCDiagConfInfo {
       void process_config(GrdFileType,
                           std::map<std::string,DataOptInfo>);
 
-      void parse_domain_info_map(std::map<std::string,DataOptInfo>);
+      void parse_domain_info(std::map<std::string,DataOptInfo>);
 
       int get_n_domain() const;
 };
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int TCDiagConfInfo::get_n_domain() const { return domain_info_map.size(); }
+inline int TCDiagConfInfo::get_n_domain() const { return domain_info.size(); }
 
 ////////////////////////////////////////////////////////////////////////
 

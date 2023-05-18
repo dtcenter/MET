@@ -83,12 +83,6 @@ domain_info = [
 // convert(x)    = x;
 //
 
-//
-// Pressure levels to be used, referenced below in 'data'
-//
-prs_lev = [ "P1000", "P925", "P850", "P700", "P500",
-             "P400", "P300", "P250", "P200", "P150",
-             "P100" ];
 
 //
 // Data fields
@@ -98,19 +92,24 @@ data = {
    // If empty, the field is processed for all domains
    domain = [];
 
+   // Pressure levels to be used, unless overridden below
+   level = [ "P1000", "P925", "P850", "P700", "P500",
+             "P400", "P300", "P250", "P200", "P150",
+             "P100" ];
+
    field = [
-      { name = "TMP";   level = prs_lev; },
-      { name = "TMP";   level = "Z2";    },
-      { name = "TMP";   level = "Z0";    },
-      { name = "UGRD";  level = prs_lev; },
-      { name = "UGRD";  level = "Z10";   },
-      { name = "VGRD";  level = prs_lev; },
-      { name = "VGRD";  level = "Z10";   },
-      { name = "RH";    level = prs_lev; },
-      { name = "RH";    level = "Z2";    },
-      { name = "HGT";   level = prs_lev; },
-      { name = "PRMSL"; level = "Z0";    },
-      { name = "PWAT";  level = "L0";    }
+      { name = "TMP";                  },
+      { name = "UGRD";                 },
+      { name = "VGRD";                 },
+      { name = "RH";                   },
+      { name = "HGT";                  },
+      { name = "PRMSL"; level = "Z0";  },
+      { name = "PWAT";  level = "L0";  },
+      { name = "TMP";   level = "Z0";  },
+      { name = "TMP";   level = "Z2";  },
+      { name = "RH";    level = "Z2";  },
+      { name = "UGRD";  level = "Z10"; },
+      { name = "VGRD";  level = "Z10"; }
    ];
 }
 

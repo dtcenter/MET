@@ -176,7 +176,9 @@ void TCDiagConfInfo::clear() {
    }
    var_info.clear();
 
-   domain_info_map.clear();
+   pressure_levels.clear();
+
+   domain_info.clear();
 
    compute_tangential_and_radial_winds = false;
    u_wind_field_name.clear();
@@ -219,10 +221,9 @@ void TCDiagConfInfo::read_config(const char *default_file_name,
 
 void TCDiagConfInfo::process_config(GrdFileType file_type,
                                     map<string,DataOptInfo> dmap) {
-   int i;
+   int i, j;
    StringArray sa;
    Dictionary *dict = (Dictionary *) 0;
-   map<string,DomainInfo>::iterator it;
    VarInfoFactory vi_factory;
 
    // Conf: version
@@ -272,7 +273,7 @@ void TCDiagConfInfo::process_config(GrdFileType file_type,
    }
 
    // Conf: domain_info
-   parse_domain_info_map(dmap);
+   parse_domain_info(dmap);
 
    // Conf: data.field
    dict = conf.lookup_array(conf_key_data_field);
@@ -302,13 +303,25 @@ void TCDiagConfInfo::process_config(GrdFileType file_type,
       vi->set_dict(i_dict);
       var_info.push_back(vi);
 
+      // Unique list of requested pressure levels
+      if(vi->level().type() == LevelType_Pres) {
+         if(vi->level().lower() != vi->level().upper()) {
+            mlog << Error << "\nTCDiagConfInfo::process_config() -> "
+                 << "only individual pressure levels are supported, "
+                 << "not ranges (" << vi->level().req_name()
+                 << ").\n\n";
+            exit(1);
+         }
+         pressure_levels.insert(vi->level().lower());
+      }
+
       // Conf: field.domain
       sa = i_dict.lookup_string_array(conf_key_domain);
 
       // Store domain-specific VarInfo pointers
-      for(it = domain_info_map.begin(); it != domain_info_map.end(); it++) {
-         if(sa.n() == 0 || sa.has(it->first)) {
-            it->second.var_info_ptr.push_back(var_info.back());
+      for(j=0; j<domain_info.size(); j++) {
+         if(sa.n() == 0 || sa.has(domain_info[j].domain)) {
+            domain_info[j].var_info_ptr.push_back(var_info.back());
          }
       }
    }
@@ -374,21 +387,23 @@ void TCDiagConfInfo::process_config(GrdFileType file_type,
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCDiagConfInfo::parse_domain_info_map(map<string,DataOptInfo> dmap) {
+void TCDiagConfInfo::parse_domain_info(map<string,DataOptInfo> dmap) {
    Dictionary *dict = (Dictionary *) 0;
+   int i, j;
+   bool found;
 
    // Conf: domain_info
    dict = conf.lookup_array(conf_key_domain_info);
 
    if(!dict) {
-      mlog << Error << "\nTCDiagConfInfo::parse_domain_info_map() -> "
+      mlog << Error << "\nTCDiagConfInfo::parse_domain_info() -> "
            << "array lookup failed for key \"" << conf_key_domain_info
            << "\"\n\n";
       exit(1);
    }
 
    // Parse each grid info object
-   for(int i=0; i<dict->n_entries(); i++) {
+   for(i=0; i<dict->n_entries(); i++) {
       DomainInfo di;
 
       // Parse the current domain info
@@ -400,7 +415,7 @@ void TCDiagConfInfo::parse_domain_info_map(map<string,DataOptInfo> dmap) {
          di.data_files = dmap[di.domain].data_files;
       }
       else {
-         mlog << Error << "\nTCDiagConfInfo::parse_domain_info_map() -> "
+         mlog << Error << "\nTCDiagConfInfo::parse_domain_info() -> "
               << "no \"-data " << di.domain << "\" command line option provided for the \""
               << conf_key_domain_info << "." << conf_key_domain << "\" = \"" << di.domain
               << "\" config file entry!\n\n";
@@ -408,23 +423,32 @@ void TCDiagConfInfo::parse_domain_info_map(map<string,DataOptInfo> dmap) {
       }
 
       // Check for duplicate entries
-      if(domain_info_map.count(di.domain) > 0) {
-         mlog << Error << "\nTCDiagConfInfo::parse_domain_info_map() -> "
-              << "multiple \"" << conf_key_domain_info
-              << "\" entries found for domain \"" << di.domain << "\"!\n\n";
-         exit(1);
+      for(j=0; i<domain_info.size(); j++) {
+         if(di.domain == domain_info[j].domain) {
+            mlog << Error << "\nTCDiagConfInfo::parse_domain_info() -> "
+                 << "multiple \"" << conf_key_domain_info
+                 << "\" entries found for domain \"" << di.domain << "\"!\n\n";
+            exit(1);
+         }
       }
-      // Store a new entry
-      else {
-         domain_info_map[di.domain] = di;
-      }
+
+      // Store new entry
+      domain_info.push_back(di);
    }
 
    // Make sure all -data domains appear in the config file
    map<string,DataOptInfo>::iterator it;
    for(it = dmap.begin(); it != dmap.end(); it++) {
-      if(domain_info_map.count(it->first) == 0) {
-         mlog << Error << "\nTCDiagConfInfo::parse_domain_info_map() -> "
+
+      for(i=0, found=false; i<domain_info.size(); i++) {
+         if(it->first == domain_info[i].domain) {
+            found = true;
+            break;
+         }
+      } // end for i
+
+      if(!found) {
+         mlog << Error << "\nTCDiagConfInfo::parse_domain_info() -> "
               << "no \"" << conf_key_domain_info << "." << conf_key_domain << "\" = \""
               << it->first << "\" config file entry provided for the \"-data "
               << it->first << "\" command line option!\n\n";

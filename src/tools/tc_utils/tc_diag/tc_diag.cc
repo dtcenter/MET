@@ -621,9 +621,10 @@ void set_outdir(const StringArray& a) {
 
 void setup_out_files(const TrackInfoArray &tracks) {
    OutFileInfo out_info;
+   int i, j;
 
    // Setup output files for each track
-   for(int i=0; i<tracks.n(); i++) {
+   for(i=0; i<tracks.n(); i++) {
 
       // Build the map key
       ConcatString key = get_out_key(tracks[i]);
@@ -649,21 +650,20 @@ void setup_out_files(const TrackInfoArray &tracks) {
       if(conf_info.nc_rng_azi_flag) {
 
          // One output file per track and domain
-         map<std::string,DomainInfo>::iterator it;
-         for(it  = conf_info.domain_info_map.begin();
-             it != conf_info.domain_info_map.end();
-             it++) {
+         for(j=0; j<conf_info.domain_info.size(); j++) {
 
             // Build output file name
             ConcatString suffix_cs, file_name;
-            suffix_cs << "_cyl_grid_" << it->first << ".nc";
+            suffix_cs << "_cyl_grid_"
+                      << conf_info.domain_info[j].domain
+                      << ".nc";
             file_name = build_out_file_name(out_map[key].trk_ptr,
                                             suffix_cs.c_str());
 
-            out_map[key].nc_rng_azi_file_map[it->first] = file_name;
-            out_map[key].nc_rng_azi_out_map[it->first] =
+            out_map[key].nc_rng_azi_file_map[conf_info.domain_info[j].domain] = file_name;
+            out_map[key].nc_rng_azi_out_map[conf_info.domain_info[j].domain] =
                out_map[key].setup_nc_file(file_name);
-         }
+         } // end for j
       }
 
       // NetCDF diagnostics output
@@ -804,7 +804,7 @@ void compute_lat_lon(TcrmwGrid& grid,
 ////////////////////////////////////////////////////////////////////////
 
 void process_track_points(const TrackInfoArray& tracks) {
-   int i, j, i_pnt, n_pts;
+   int i, j, k, i_pnt, n_pts;
    TmpFileInfo tmp_info;
    map<string,DomainInfo>::iterator dom_it;
 
@@ -836,23 +836,21 @@ void process_track_points(const TrackInfoArray& tracks) {
    for(i=0; i<valid_ta.n(); i++) {
 
       // Loop over the domains to be processed
-      for(dom_it  = conf_info.domain_info_map.begin();
-          dom_it != conf_info.domain_info_map.end();
-          dom_it++) {
+      for(j=0; j<conf_info.domain_info.size(); j++) {
 
          mlog << Debug(3) << "Processing the "
-              << dom_it->first << " domain.\n";
+              << conf_info.domain_info[j].domain << " domain.\n";
 
          // Setup a temp file for this valid time in each track
-         for(j=0; j<tracks.n(); j++) {
+         for(k=0; k<tracks.n(); k++) {
 
             // Find the track point for this valid time
-            if((i_pnt = tracks[j].valid_index(valid_ta[i])) < 0) continue;
+            if((i_pnt = tracks[k].valid_index(valid_ta[i])) < 0) continue;
 
             // Build the map key
-            ConcatString tmp_key = get_tmp_key(tracks[j],
-                                               tracks[j][i_pnt],
-                                               dom_it->first);
+            ConcatString tmp_key = get_tmp_key(tracks[k],
+                                               tracks[k][i_pnt],
+                                               conf_info.domain_info[j].domain);
 
             // Check for duplicates
             if(tmp_map.count(tmp_key) > 0) {
@@ -866,12 +864,13 @@ void process_track_points(const TrackInfoArray& tracks) {
             tmp_map[tmp_key] = tmp_info;
 
             // Setup a temp file for the current point
-            tmp_map[tmp_key].open(&tracks[j],
-                                  &tracks[j][i_pnt],
-                                  dom_it->second);
+            tmp_map[tmp_key].open(&tracks[k],
+                                  &tracks[k][i_pnt],
+                                  conf_info.domain_info[j],
+                                  conf_info.pressure_levels);
 
-         } // end for j
-      } // end for dom_it
+         } // end for k
+      } // end for j
    } // end for i
 
 // JHG this parellel code only works intermittently
@@ -883,29 +882,28 @@ void process_track_points(const TrackInfoArray& tracks) {
 //   tc_diag(99714,0x70000b229000) malloc: *** error for object 0x7f7fd1f7d620:
 //      pointer being freed was not allocated
 
-#pragma omp parallel default(none)                      \
-   shared(mlog, conf_info, tracks, valid_ta)            \
-   private(i, dom_it)
-   {
+//#pragma omp parallel default(none)                      \
+//   shared(mlog, conf_info, tracks, valid_ta)            \
+//   private(i, dom_it)
+//   {
 
       // Parallel: Loop over the unique valid times
-#pragma omp for schedule (static)
+//#pragma omp for schedule (static)
+      #pragma omp parallel for
       for(i=0; i<valid_ta.n(); i++) {
 
          // Parallel: Loop over the domains to be processed
-         map<string,DomainInfo>::iterator dom_it;
-         for(dom_it  = conf_info.domain_info_map.begin();
-             dom_it != conf_info.domain_info_map.end();
-             dom_it++) {
+         for(j=0; j<conf_info.domain_info.size(); j++) {
 
             // Process the gridded data for the current
             // domain and valid time
             process_fields(tracks, valid_ta[i], i,
-                           dom_it->first, dom_it->second);
+                           conf_info.domain_info[j].domain,
+                           conf_info.domain_info[j]);
 
-         } // end for dom_it
+         } // end for j
       } // end for i
-   } // End of omp parallel
+//   } // End of omp parallel
 
    return;
 }
@@ -922,6 +920,10 @@ void process_fields(const TrackInfoArray &tracks,
    VarInfoFactory vi_factory;
    VarInfo *vi = (VarInfo *) 0;
    StringArray tmp_key_sa;
+
+   // JHG some vortex removal here?
+   // Read in the full set of fields required for vortex removal
+   // Add flag to configure which fields are used for vortex removal
 
    // Loop over the VarInfo fields to be processed
    for(i=0; i<di.var_info_ptr.size(); i++) {
@@ -951,8 +953,9 @@ void process_fields(const TrackInfoArray &tracks,
          if(!tmp_key_sa.has(tmp_key)) tmp_key_sa.add(tmp_key);
 
          // JHG insert vortex removal logic here?
-         // It applies to each track point location.
-
+         // Assume that it applies to each track point location independently.
+         // Need to load multiple fields for the vortex removal logic.
+         // Perhaps do 2 passes... process the vortex removal first?
 
          // Compute and write the cylindrical coordinate data
          tmp_map[tmp_key].write_nc_data(vi, data_dp, grid_dp);
@@ -1142,7 +1145,8 @@ void TmpFileInfo::init_from_scratch() {
 
 void TmpFileInfo::open(const TrackInfo *t_ptr,
                        const TrackPoint *p_ptr,
-                       const DomainInfo &di) {
+                       const DomainInfo &di,
+                       const std::set<double> &prs_lev) {
 
    // Set pointers
    trk_ptr = t_ptr;
@@ -1154,7 +1158,7 @@ void TmpFileInfo::open(const TrackInfo *t_ptr,
 
    mlog << Debug(3) << "Creating temp file: " << tmp_file << "\n";
 
-   setup_nc_file(di);
+   setup_nc_file(di, prs_lev);
 
    return;
 }
@@ -1194,6 +1198,8 @@ void TmpFileInfo::clear() {
    grid_out.clear();
    ra_grid.clear();
 
+   pressure_levels.clear();
+
    domain.clear();
 
    // Delete the temp file
@@ -1206,7 +1212,8 @@ void TmpFileInfo::clear() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void TmpFileInfo::setup_nc_file(const DomainInfo &di) {
+void TmpFileInfo::setup_nc_file(const DomainInfo &di,
+                                const std::set<double> &prs_lev) {
 
    // Open the output NetCDF file
    tmp_out = open_ncfile(tmp_file.c_str(), true);
@@ -1256,6 +1263,13 @@ void TmpFileInfo::setup_nc_file(const DomainInfo &di) {
                        vld_dim, rng_dim, azi_dim,
                        vld_var, lat_var, lon_var);
 
+   // Pressure dimension and values (same for all temp files)
+   pressure_levels = prs_lev;
+   if(pressure_levels.size() > 0) {
+      prs_dim = add_dim(tmp_out, "pressure", (long) pressure_levels.size());
+      def_tc_pressure(tmp_out, prs_dim, pressure_levels);
+   }
+
    // Write the track
    write_tc_track(tmp_out, trk_dim, *trk_ptr);
 
@@ -1268,6 +1282,9 @@ void TmpFileInfo::setup_nc_file(const DomainInfo &di) {
 
    // Write valid time
    write_tc_valid_time(tmp_out, 0, vld_var, pnt_ptr->valid());
+
+   // Write track point values
+   write_tc_track_point(tmp_out, vld_dim, *pnt_ptr);
 
    // Clean up
    if(lat_arr) { delete[] lat_arr; lat_arr = (double *) 0; }
@@ -1292,24 +1309,52 @@ void TmpFileInfo::write_nc_data(const VarInfo *vi, const DataPlane &dp_in,
    // Do the cylindrical coordinate transformation
    dp_out = met_regrid(dp_in, grid_in, grid_out, ri);
 
+   // Logic for pressure level data
+   bool is_prs = (vi->level().type() == LevelType_Pres);
+
    // Setup dimensions
    vector<NcDim> dims;
    dims.push_back(vld_dim);
+   if(is_prs) dims.push_back(prs_dim);
    dims.push_back(rng_dim);
    dims.push_back(azi_dim);
 
-   // Create output variable
+   // Create the output variable name
    ConcatString var_name;
-   var_name << vi->name_attr() << "_" << vi->level_attr();
-   NcVar cur_var = tmp_out->addVar(var_name, ncDouble, dims);
+   var_name << vi->name_attr();
+   if(!is_prs) {
+      var_name << "_" << vi->level_attr();
+   }
 
-   // Add variable attributes
-   add_att(&cur_var, long_name_att_name, vi->long_name_attr());
-   add_att(&cur_var, units_att_name, vi->units_attr());
-   add_att(&cur_var, fill_value_att_name, bad_data_double);
+   // Add new variable, if needed
+   if(!has_var(tmp_out, var_name.c_str())) {
+      NcVar new_var = tmp_out->addVar(var_name, ncDouble, dims);
+      add_att(&new_var, long_name_att_name, vi->long_name_attr());
+      add_att(&new_var, units_att_name, vi->units_attr());
+      add_att(&new_var, fill_value_att_name, bad_data_double);
+   }
 
-   // Write the data
-   write_tc_data_rev(tmp_out, ra_grid, 0, cur_var, dp_out.data());
+   // Get the current variable
+   NcVar cur_var = get_var(tmp_out, var_name.c_str());
+
+   // Write pressure level data
+   if(is_prs) {
+
+      // Find pressure level index
+      int i_level = pressure_levels.size() - 1;
+      for(set<double>::iterator it = pressure_levels.begin();
+          it != pressure_levels.end(); ++it, --i_level) {
+         if(is_eq(vi->level().lower(), *it)) break;
+      }
+
+      write_tc_pressure_level_data(tmp_out, ra_grid,
+         0, i_level, cur_var, dp_out.data());
+   }
+   // Write single level data
+   else {
+      write_tc_data_rev(tmp_out, ra_grid,
+         0, cur_var, dp_out.data());
+   }
 
    return;
 }

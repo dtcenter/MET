@@ -155,6 +155,9 @@ class TmpFileInfo {
       Grid      grid_out;
       TcrmwGrid ra_grid;
 
+      // Pressure levels
+      std::set<double> pressure_levels;
+
       // Domain name
       std::string domain;
 
@@ -167,6 +170,7 @@ class TmpFileInfo {
       netCDF::NcDim vld_dim;
       netCDF::NcDim rng_dim;
       netCDF::NcDim azi_dim;
+      netCDF::NcDim prs_dim;
 
       // NetCDF Variables
       netCDF::NcVar lat_var;
@@ -174,12 +178,15 @@ class TmpFileInfo {
       netCDF::NcVar vld_var;
 
       void open(const TrackInfo *, const TrackPoint *,
-                const DomainInfo &);
+                const DomainInfo &,
+                const std::set<double> &);
       void close();
 
       void clear();
 
-      void setup_nc_file(const DomainInfo &);
+      void setup_nc_file(const DomainInfo &,
+                         const std::set<double> &);
+
       void write_nc_data(const VarInfo *, const DataPlane &,
                          const Grid &);
 };
