@@ -32,9 +32,10 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-static void populate_bool_plane(const int * buf, const int nx, const int ny,
+static void populate_bool_plane(const string &name, const int * buf, const int nx, const int ny,
                                 BoolPlane & bp_out);
 
+static void  _debug_shape_examine(const string &name, const ShapeData &sd, int nx, int ny);
 
 
 void MultiVarData1::set_fcst_obj(ShapeData *sd)
@@ -97,26 +98,28 @@ void  MultiVarData1::objects_from_arrays(bool do_clusters,
                                         BoolPlane & fcst_out, 
                                         BoolPlane & obs_out)
 {
-   populate_bool_plane(_fcst_obj_data, _nx, _ny, fcst_out);
-   populate_bool_plane(_obs_obj_data, _nx, _ny, obs_out);
+   string name = _name + "_Fcst";
+   populate_bool_plane(name, _fcst_obj_data, _nx, _ny, fcst_out);
+   name = _name + "_Obs";
+   populate_bool_plane(name, _obs_obj_data, _nx, _ny, obs_out);
 }
 
-void MultiVarData1::print(const string &name) const
+void MultiVarData1::print(const string &fname, const string &oname) const
 {
-   printf("%s Fcst Obj:", name.c_str());
+   string n;
+   n = fname + "_" + _name + "_Fcst_Obj";
    if (_fcst_obj_data) {
-      _print_summary(_fcst_obj_data);
+      _print_summary(n, _fcst_obj_data, *_fcst_obj_sd);
    } else {
-      printf(" Empty\n");
+      mlog << Debug(1) << n << " is empty\n";
    }
-   printf("%s Obs Obj:", name.c_str());
+   n = oname + "_" + _name + "_Obs_Obj";
    if (_obs_obj_data) {
-      _print_summary(_obs_obj_data);
+      _print_summary(n, _obs_obj_data, *_obs_obj_sd);
    } else {
-      printf(" Empty\n");
+      mlog << Debug(1) << n << " is empty\n";
    }
 }           
-   
 
 
 int *MultiVarData1::_fill_int_array(ShapeData *sd)
@@ -147,7 +150,7 @@ float *MultiVarData1::_fill_float_array(ShapeData *sd)
    return ret;
 }
 
-void MultiVarData1::_print_summary(int *data) const
+void MultiVarData1::_print_summary(const string &name, int *data, const ShapeData &sd) const
 {
    vector<int> values;
    for (int i=0; i<_nx*_ny; ++i) {
@@ -157,16 +160,19 @@ void MultiVarData1::_print_summary(int *data) const
          }
       }
    }
-   printf("%d unique values:", (int)values.size());
-   for (size_t i=0; i<values.size(); ++i) {
-      printf("\n  %d", values[i]);
-   }
-   printf("\n");
+   mlog << Debug(1) << name << " has " << values.size() << " unique values\n";
+   // for (size_t i=0; i<values.size(); ++i) {
+   //    printf("\n  %d", values[i]);
+   // }
+   // printf("\n");
+   _debug_shape_examine(name, sd, _nx, _ny);
 }
 
 MultiVarData::MultiVarData() :
    _simple(0),
    _merge(0),
+   _f_name("notset"),
+   _o_name("notset"),
    _nx(0), _ny(0),
    _grid(0),
    _ftype(FileType_None),
@@ -205,16 +211,20 @@ void MultiVarData::checkFileTypeConsistency(const MultiVarData &mvdi, int j)
    }
 }
 
-void MultiVarData::init(const Grid &grid, GrdFileType ftype, GrdFileType otype)
+void MultiVarData::init(const string &fname, const string &oname,
+                        const Grid &grid, GrdFileType ftype,
+                        GrdFileType otype)
 {
    _clear();
+   _f_name = fname;
+   _o_name = oname;
    _nx = grid.nx();
    _ny = grid.ny();
    _grid = new Grid(grid);
    _ftype = ftype;
    _otype = otype;
-   _simple = new MultiVarData1(_nx, _ny);
-   _merge = new MultiVarData1(_nx, _ny);
+   _simple = new MultiVarData1(_nx, _ny, "Simple");
+   _merge = new MultiVarData1(_nx, _ny, "Merge");
 }
 
 
@@ -307,15 +317,22 @@ void  MultiVarData::objects_from_arrays(bool do_clusters,
 }  
 
 
+////////////////////////////////////////////////////////////////////////
+
+
+
 void  MultiVarData::print(void) const
 {
-   _simple->print("Simple");
-   _merge->print("Merge");
+   _simple->print(_f_name, _o_name);
+   _merge->print(_f_name, _o_name);
 }  
 
 
- void MultiVarData::_clear()
- {
+////////////////////////////////////////////////////////////////////////
+
+
+void MultiVarData::_clear()
+{
    if (_simple) {
       delete _simple;
       _simple = 0;
@@ -331,12 +348,13 @@ void  MultiVarData::print(void) const
    _nx = _ny = 0;
    _ftype = FileType_None;
    _otype = FileType_None;
- }
+}
 
 
+////////////////////////////////////////////////////////////////////////
 
 
-void populate_bool_plane(const int * buf, const int nx, const int ny, BoolPlane & bp_out)
+void populate_bool_plane(const string &name, const int * buf, const int nx, const int ny, BoolPlane & bp_out)
 
 {
 
@@ -362,9 +380,38 @@ void populate_bool_plane(const int * buf, const int nx, const int ny, BoolPlane 
 
    }   //  for x
 
-   printf("%5.2lf percent of the data was true\n", nyes/ntotal);
+   mlog << Debug(1) << " Bool plane for " << name << " has " << nyes << " true values\n";
 
    return;
 
 }
 
+
+////////////////////////////////////////////////////////////////////////
+
+
+static void  _debug_shape_examine(const string &name, const ShapeData &sd, int nx, int ny)
+{
+   vector<double> values;
+   vector<int> count;
+   for (int x=0; x<nx; ++x) {
+      for (int y=0; y<ny; ++y) {
+         double v = sd.data.get(x,y);
+         if (v == 0.0) {
+            continue;
+         }
+         vector<double>::iterator vi;
+         vi = find(values.begin(), values.end(), v);
+         if (vi == values.end()) {
+            values.push_back(v);
+            count.push_back(1);
+         } else {
+            int ii = vi - values.begin();
+            count[ii] = count[ii] + 1;
+         }
+      }
+   }
+   for (size_t i=0; i<values.size(); ++i) {
+      mlog << Debug(1) << name << " shapeid=" << values[i] << " npt=" << count[i] << "\n";
+   }
+}   

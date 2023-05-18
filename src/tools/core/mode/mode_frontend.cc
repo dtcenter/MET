@@ -68,7 +68,7 @@ int ModeFrontEnd::run(const StringArray & Argv, Processing_t ptype)
 {
 
    mlog << Debug(1) << "Running mode front end " << stype(ptype) << "\n";
-   Argv.dump(cout, 0);
+   //Argv.dump(cout, 0);
    
    if ( mode_exec )  { delete mode_exec;  mode_exec = 0; }
    mode_exec = new ModeExecutive;
@@ -124,7 +124,7 @@ int ModeFrontEnd::run(const StringArray & Argv, const MultiVarData &mvd,
 {
    Processing_t ptype = MULTIVAR_PASS2;
    mlog << Debug(1) << "Running mode front end " << stype(ptype) << "\n";
-   Argv.dump(cout, 0);
+   //Argv.dump(cout, 0);
 
    if ( mode_exec )  { delete mode_exec;  mode_exec = 0; }
 
@@ -150,7 +150,7 @@ int ModeFrontEnd::run(const StringArray & Argv, const MultiVarData &mvd,
    //
    // set up data access using inputs
    //
-   mode_exec->setup_fcst_obs_data(mvd, ptype == MULTIVAR_PASS2);
+   mode_exec->setup_fcst_obs_data(mvd);
 
    //
    // run the mode algorithm
@@ -183,6 +183,16 @@ void ModeFrontEnd::do_straight(Processing_t ptype, const MultiVarData &mvd,
                                ShapeData &f_merge, ShapeData &o_merge)
 
 {
+   if (ptype != MULTIVAR_PASS2) {
+      
+      mlog << Error
+           << "\n\n  "
+           << program_name
+           << ": called MULTIVAR_PASS2 method with "
+           << stype(ptype) << "\n\n";
+      exit ( 1 );
+
+   }
 
    const ModeConfInfo & conf = mode_exec->engine.conf_info;
 
@@ -217,12 +227,9 @@ void ModeFrontEnd::do_straight(Processing_t ptype, const MultiVarData &mvd,
 
    for (index=0; index<NCT; ++index)  {
 
-      mode_exec->do_conv_thresh(index, index, ptype == MULTIVAR_PASS1_MERGE);
-
-      if (ptype == MULTIVAR_PASS2) {
-         mode_exec->do_match_merge(f_merge, o_merge);
-         mode_exec->process_output(true);
-      }
+      mode_exec->do_conv_thresh(index, index, false);
+      mode_exec->do_match_merge(f_merge, o_merge);
+      mode_exec->process_output(true);
    }
 
    mode_exec->clear_internal_r_index();

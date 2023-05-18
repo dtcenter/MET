@@ -408,23 +408,14 @@ void ModeExecutive::setup_fcst_obs_data()
 
 ///////////////////////////////////////////////////////////////////////
 
-void ModeExecutive::setup_fcst_obs_data(const MultiVarData &mvd, bool is_merge)
+void ModeExecutive::setup_fcst_obs_data(const MultiVarData &mvd)
 
 {
    double fmin, omin, fmax, omax;
 
-   // Fcst_sd.clear();
-   //  Obs_sd.clear();
-   bool simple = !is_merge;
+   bool simple = true;
    Fcst_sd = *(mvd.fcst_shapedata_ptr(simple));
    Obs_sd = *(mvd.obs_shapedata_ptr(simple));
-   // if (is_test) {
-   //    Fcst_sd = *(mvd.Fcst_sd_merge);
-   //    Obs_sd = *(mvd.Obs_sd_merge);
-   // } else {
-   //    Fcst_sd = *(mvd.Fcst_sd_simple);
-   //    Obs_sd = *(mvd.Obs_sd_simple);
-   // }
    grid = *(mvd._grid);
 
    // do not need to read any data, it is stored in the mvd input
@@ -601,6 +592,7 @@ void ModeExecutive::do_merging()
 
 }   
 
+///////////////////////////////////////////////////////////////////////
 
 void ModeExecutive::do_merging(ShapeData &f_merge, ShapeData &o_merge)
 {
@@ -1063,7 +1055,16 @@ MultiVarData *ModeExecutive::get_multivar_data()
 {
    bool simple=true;
    MultiVarData *mvd = new MultiVarData();
-   mvd->init(grid, ftype, otype);
+
+   fcst_magic_string = engine.conf_info.Fcst->var_info->magic_str().c_str();
+   obs_magic_string = engine.conf_info.Obs->var_info->magic_str().c_str();
+
+   // replace forward slashes with underscores to prevent new directories
+
+   replace(fcst_magic_string.begin(), fcst_magic_string.end(), '/', '_');   
+   replace(obs_magic_string.begin(), obs_magic_string.end(), '/', '_');   
+
+   mvd->init(fcst_magic_string, obs_magic_string, grid, ftype, otype);
    mvd->set_fcst_obj(engine.fcst_split, simple);
    mvd->set_fcst_raw(engine.fcst_raw, simple);
    mvd->set_obs_obj(engine.obs_split, simple);
@@ -1071,52 +1072,6 @@ MultiVarData *ModeExecutive::get_multivar_data()
    mvd->set_fcst_shapedata(Fcst_sd, simple);
    mvd->set_obs_shapedata(Obs_sd, simple);
 
-   // void set_fcst_obj_simple(int nx, int ny, ShapeData *sd)
-      
-   // mvd->nx = grid.nx();
-   // mvd->ny = grid.ny();
-   // mvd->fcst_obj_data_simple = new int [grid.nx()*grid.ny()];
-   // for (int x=0; x<grid.nx(); ++x) {
-   //    for (int y=0; y<grid.ny(); ++y) {
-   //       int n = DefaultTO.two_to_one(grid.nx(), grid.ny(), x, y);
-   //       if (engine.fcst_split->is_nonzero(x,y) ) {
-   //          mvd->fcst_obj_data_simple[n] = nint(engine.fcst_split->data(x, y));
-   //       } else {
-   //          mvd->fcst_obj_data_simple[n] = bad_data_int;
-   //       }
-   //    }
-   // }
-
-   // mvd->fcst_raw_data_simple = new float   [grid.nx()*grid.ny()];
-   // for (int x=0; x<grid.nx(); ++x) {
-   //    for (int y=0; y<grid.ny(); ++y) {
-   //       int n = DefaultTO.two_to_one(grid.nx(), grid.ny(), x, y);
-   //       mvd->fcst_raw_data_simple[n] = engine.fcst_raw->data(x, y);
-   //    }
-   // }
-   // mvd->obs_raw_data_simple = new float   [grid.nx()*grid.ny()];
-   // for (int x=0; x<grid.nx(); ++x) {
-   //    for (int y=0; y<grid.ny(); ++y) {
-   //       int n = DefaultTO.two_to_one(grid.nx(), grid.ny(), x, y);
-   //       mvd->obs_raw_data_simple[n] = engine.obs_raw->data(x, y);
-   //    }
-   // }
-   // mvd->obs_obj_data_simple = new int   [grid.nx()*grid.ny()];
-   // for (int x=0; x<grid.nx(); ++x) {
-   //    for (int y=0; y<grid.ny(); ++y) {
-   //       int n = DefaultTO.two_to_one(grid.nx(), grid.ny(), x, y);
-   //       if (engine.obs_split->is_nonzero(x,y) ) {
-   //          mvd->obs_obj_data_simple[n] = nint(engine.obs_split->data(x, y));
-   //       } else {
-   //          mvd->obs_obj_data_simple[n] = bad_data_int;
-   //       }
-   //    }
-   // }
-   // mvd->Fcst_sd_simple = new ShapeData(Fcst_sd);
-   // mvd->Obs_sd_simple = new ShapeData(Obs_sd);
-   // mvd->grid = new Grid(grid);
-   // mvd->ftype = ftype;
-   // mvd->otype = otype;
    return mvd;
 }
 
@@ -1132,49 +1087,7 @@ void ModeExecutive::addMultivarMergePass1(MultiVarData *mvd)
    mvd->set_obs_raw(engine.obs_raw, simple);
    mvd->set_fcst_shapedata(Fcst_sd, simple);
    mvd->set_obs_shapedata(Obs_sd, simple);
-
-   
-   // mvd->fcst_obj_data_merge = new int [grid.nx()*grid.ny()];
-   // for (int x=0; x<grid.nx(); ++x) {
-   //    for (int y=0; y<grid.ny(); ++y) {
-   //       int n = DefaultTO.two_to_one(grid.nx(), grid.ny(), x, y);
-   //       if (engine.fcst_split->is_nonzero(x,y) ) {
-   //          mvd->fcst_obj_data_merge[n] = nint(engine.fcst_split->data(x, y));
-   //       } else {
-   //          mvd->fcst_obj_data_merge[n] = bad_data_int;
-   //       }
-   //    }
-   // }
-   // mvd->fcst_raw_data_merge = new float   [grid.nx()*grid.ny()];
-   // for (int x=0; x<grid.nx(); ++x) {
-   //    for (int y=0; y<grid.ny(); ++y) {
-   //       int n = DefaultTO.two_to_one(grid.nx(), grid.ny(), x, y);
-   //       mvd->fcst_raw_data_merge[n] = engine.fcst_raw->data(x, y);
-   //    }
-   // }
-   // mvd->obs_raw_data_merge = new float   [grid.nx()*grid.ny()];
-   // for (int x=0; x<grid.nx(); ++x) {
-   //    for (int y=0; y<grid.ny(); ++y) {
-   //       int n = DefaultTO.two_to_one(grid.nx(), grid.ny(), x, y);
-   //       mvd->obs_raw_data_merge[n] = engine.obs_raw->data(x, y);
-   //    }
-   // }
-   // mvd->obs_obj_data_merge = new int   [grid.nx()*grid.ny()];
-   // for (int x=0; x<grid.nx(); ++x) {
-   //    for (int y=0; y<grid.ny(); ++y) {
-   //       int n = DefaultTO.two_to_one(grid.nx(), grid.ny(), x, y);
-   //       if (engine.obs_split->is_nonzero(x,y) ) {
-   //          mvd->obs_obj_data_merge[n] = nint(engine.obs_split->data(x, y));
-   //       } else {
-   //          mvd->obs_obj_data_merge[n] = bad_data_int;
-   //       }
-   //    }
-   // }
-   // mvd->Fcst_sd_merge = new ShapeData(Fcst_sd);
-   // mvd->Obs_sd_merge = new ShapeData(Obs_sd);
-
 }
-
 
 ///////////////////////////////////////////////////////////////////////
 

@@ -22,8 +22,6 @@ static const int dir_creation_mode = 0755;
 static const float  on_value = (float) 100.0;
 static const float off_value = (float)   0.0;
 
-static int  _mkdir(const char *dir);
-
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -103,8 +101,7 @@ static void multivar_consistency_checks(StringArray &fcst_filenames, StringArray
 
 static ConcatString set_multivar_dir();
 
-static MultiVarData *first_pass(int j, const string &fcst_filename,
-                                const string &obs_filename,
+static MultiVarData *first_pass(int j, const string &fcst_filename, const string &obs_filename,
                                 const ConcatString &dir);
 
 static void second_pass(int j, const BoolPlane &f_result, const BoolPlane &o_result,
@@ -113,13 +110,16 @@ static void second_pass(int j, const BoolPlane &f_result, const BoolPlane &o_res
                         ShapeData &f_merge, ShapeData &o_merge);
 
 static void mask_data(const string &name, int nx, int ny, const BoolPlane &mask, DataPlane &data);
-static void mask_data_to_yesno(const string &name, int nx, int ny, const BoolPlane &bp, DataPlane &data);
 
 static void read_config(const string & filename);
 
 static void process_command_line(const StringArray &);
 
 static void write_output_nc_file(const char * path, const MetNcFile &, const BoolPlane &);
+
+static int  _mkdir(const char *dir);
+
+static void _debug_shape_examine(string &name, const ShapeData &sd, int nx, int ny);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -152,7 +152,7 @@ int multivar_frontend(const StringArray & Argv)
 
    //
    // do the individual mode runs which produce everything needed to create
-   // super objects (stored in 'mvd')
+   // super objects (stored in 'mvd') (both simple and 'merge').
    //
 
    vector<MultiVarData *> mvd;
@@ -166,6 +166,7 @@ int multivar_frontend(const StringArray & Argv)
          mvd[0]->checkFileTypeConsistency(*mvdi, j);
       }
       mvd.push_back(mvdi);
+      mvdi->print();
 
    }   //  for j
 
@@ -182,14 +183,7 @@ int multivar_frontend(const StringArray & Argv)
 
    bool simple = true;
    for (j=0; j<n_files; ++j)  {
-
-      mvd[j]->print();
-
       mvd[j]->objects_from_arrays(do_clusters, simple, f_simple_plane[j], o_simple_plane[j]);
-      // objects_from_arrays(do_clusters, mvd[j]->_simple->_fcst_obj_data,
-      //                     mvd[j]->_simple->_obs_obj_data,
-      //                     mvd[j]->_nx, mvd[j]->_ny, f_simple_plane[j], o_simple_plane[j]);  
-
    }
 
    simple = false;
@@ -210,51 +204,29 @@ int multivar_frontend(const StringArray & Argv)
    f_merge_result.set_size(nx, ny);
    o_merge_result.set_size(nx, ny);
 
-   combine_boolplanes(f_simple_plane, n_files, f_calc, f_simple_result);
-   combine_boolplanes(o_simple_plane, n_files, o_calc, o_simple_result);
+   combine_boolplanes("Fcst_Simple", f_simple_plane, n_files, f_calc, f_simple_result);
+   combine_boolplanes("Obs_Simple", o_simple_plane, n_files, o_calc, o_simple_result);
 
-   combine_boolplanes(f_merge_plane, n_files, f_calc, f_merge_result);
-   combine_boolplanes(o_merge_plane, n_files, o_calc, o_merge_result);
+   combine_boolplanes("Fcst_Merge", f_merge_plane, n_files, f_calc, f_merge_result);
+   combine_boolplanes("Obs_Merge", o_merge_plane, n_files, o_calc, o_merge_result);
 
 
-   // create a ShapeData object using something from mvd
-   double ntotal = (double)(nx*ny);
-   double ngood = 0.0;
+   // create a ShapeData object using something from mvd as a template
    ShapeData f_merge_sd = ShapeData(*(mvd[0]->_simple->_Fcst_sd));
    for (int x=0; x<nx; ++x) {
       for (int y=0; y<ny; ++y) {
          if (f_merge_result.get(x, y)) {
-            ++ngood;
             f_merge_sd.data.put(1.0, x, y);
          } else {
             f_merge_sd.data.put(bad_data_double, x, y);
          }
       }
    }
-   printf("Total percent good = %.5lf\n", ngood/ntotal);
    
    int n_f_shapes;
    ShapeData f_merge_sd_split = split(f_merge_sd, n_f_shapes);
-   vector<double> values;
-   vector<int> count;
-   for (int x=0; x<nx; ++x) {
-      for (int y=0; y<ny; ++y) {
-         double v = f_merge_sd_split.data.get(x,y);
-         vector<double>::iterator vi;
-         vi = find(values.begin(), values.end(), v);
-         if (vi == values.end()) {
-            values.push_back(v);
-            count.push_back(1);
-         } else {
-            int ii = vi - values.begin();
-            count[ii] = count[ii] + 1;
-         }
-      }
-   }
-   for (size_t i=0; i<values.size(); ++i) {
-      printf("Value:%10.5lf   count:%d\n", values[i], count[i]);
-   }
-   
+   string s = "Forecast Merge";
+   _debug_shape_examine(s, f_merge_sd_split, nx, ny);
 
    ShapeData o_merge_sd = ShapeData(*(mvd[0]->_simple->_Fcst_sd));
    for (int x=0; x<nx; ++x) {
@@ -266,14 +238,13 @@ int multivar_frontend(const StringArray & Argv)
          }
       }
    }
+
    int n_o_shapes;
    ShapeData o_merge_sd_split = split(o_merge_sd, n_o_shapes);
-   
-
+   s = "Obs Merge";
+   _debug_shape_examine(s, o_merge_sd_split, nx, ny);
 
    bool superobj_mode = true;
-
-
 
    //
    // Filter the data to within the superobjects only and do statistics by invoking mode algorithm again
@@ -800,36 +771,9 @@ void mask_data(const string &name, int nx, int ny, const BoolPlane &bp, DataPlan
    }
    
    mlog << Debug(1) << name << " superobject masking.."
-        << (double)nkeep/(double)(nmasked+nkeep)*100.0
-        << " percent of the data inside a superobject\n\n";
+        << nkeep << " points of "
+        << nmasked + nkeep << " in superobjects\n";
 }
-
-////////////////////////////////////////////////////////////////////////
-
-void mask_data_to_yesno(const string &name, int nx, int ny, const BoolPlane &bp, DataPlane &data)
-{
-
-   if (nx != data.nx() || ny != data.ny()) {
-      mlog << Error << "\n" << program_name  << ":" << name
-           << " :dimensions don't match " << nx << " " <<  ny 
-           << "    " << data.nx() << " " << data.ny() << "\n\n";
-
-      exit( 1 );
-   }
-
-   for (int x=0; x<nx; ++x)  {
-
-      for (int y=0; y<ny; ++y)  {
-
-         if ( bp(x, y) == false) {
-            data.set(bad_data_float, x, y);;
-         } else {
-            data.set(1.0, x, y);;
-         }
-      }
-   }
-}
-
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -849,7 +793,7 @@ int _mkdir(const char *dir)
          string s = tmp;
          if (s != ".") {
             if (mkdir(tmp, dir_creation_mode) < 0) {
-               printf("ERROR making %s\n", tmp);
+               mlog << Error << "\n making " << tmp << "\n";
                return -1;
             }
          }
@@ -858,3 +802,30 @@ int _mkdir(const char *dir)
 
    return (mkdir(tmp, dir_creation_mode));
 }
+
+
+void  _debug_shape_examine(string &name, const ShapeData &sd, int nx, int ny)
+{
+   vector<double> values;
+   vector<int> count;
+   for (int x=0; x<nx; ++x) {
+      for (int y=0; y<ny; ++y) {
+         double v = sd.data.get(x,y);
+         if (v <= 0) {
+            continue;
+         }
+         vector<double>::iterator vi;
+         vi = find(values.begin(), values.end(), v);
+         if (vi == values.end()) {
+            values.push_back(v);
+            count.push_back(1);
+         } else {
+            int ii = vi - values.begin();
+            count[ii] = count[ii] + 1;
+         }
+      }
+   }
+   for (size_t i=0; i<values.size(); ++i) {
+      mlog << Debug(1) << name << " shape value=" << values[i] << " count=" << count[i] << "\n";
+   }
+}   

@@ -22,7 +22,8 @@ using namespace std;
 //  assumes all the input BoolPlanes (and the output BoolPlane) are the same size
 //
 
-void combine_boolplanes(const BoolPlane * bpa, const int n_planes, 
+void combine_boolplanes(const string &name,
+                        const BoolPlane * bpa, const int n_planes, 
                         BoolCalc & calc, 
                         BoolPlane & bp_out)
 
@@ -56,9 +57,7 @@ void combine_boolplanes(const BoolPlane * bpa, const int n_planes,
 
    }   //  for x
 
-   printf("Percent true = %.5lf\n", nTrue/nTotal);
-
-
+   mlog << Debug(1) << name << " has " << nTrue << " superobject points.\n";
 
    //
    //  done

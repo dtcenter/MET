@@ -33,7 +33,8 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-extern void combine_boolplanes(const BoolPlane * array, const int n_planes, 
+extern void combine_boolplanes(const string &name,
+                               const BoolPlane * array, const int n_planes, 
                                BoolCalc & calc, 
                                BoolPlane & bp_out);
 

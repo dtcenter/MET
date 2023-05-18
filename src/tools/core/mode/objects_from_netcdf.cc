@@ -177,7 +177,7 @@ void populate_bool_plane(const int * buf, const int nx, const int ny, BoolPlane 
 
    }   //  for x
 
-   printf("%5.2lf percent of the data was true\n", nyes/ntotal);
+   mlog << Debug(1) << nyes/ntotal << " of the data was true\n";
 
    return;
 

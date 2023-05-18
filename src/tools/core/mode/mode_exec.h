@@ -120,7 +120,7 @@ class ModeExecutive {
    
    void clear_internal_r_index();
    void setup_fcst_obs_data();
-   void setup_fcst_obs_data(const MultiVarData &mvd, bool is_merge_domain);
+   void setup_fcst_obs_data(const MultiVarData &mvd);
    void do_conv_thresh(const int r_index, const int t_index, 
                        bool isMultivarPass1Merge=false);
    void do_merging();

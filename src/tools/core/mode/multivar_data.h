@@ -30,11 +30,12 @@ class MultiVarData1 {
 
    int *_fill_int_array(ShapeData *sd);
    float *_fill_float_array(ShapeData *sd);
-   void _print_summary(int *data) const;
+   void _print_summary(const string &name, int *data, const ShapeData &sd) const;
 
  public:
 
-   inline MultiVarData1(int nx, int ny) :
+   inline MultiVarData1(int nx, int ny, const string &name) :
+      _name(name),
       _fcst_obj_sd(0),
       _obs_obj_sd(0),
       _fcst_obj_data(0),
@@ -65,7 +66,9 @@ class MultiVarData1 {
    void objects_from_arrays(bool do_clusters,
                             BoolPlane & fcst_out, 
                             BoolPlane & obs_out);
-   void print(const string &name) const;
+   void print(const string &fname, const string &oname) const;
+
+   string _name;
    ShapeData *_fcst_obj_sd;
    ShapeData *_obs_obj_sd;
    int *_fcst_obj_data;
@@ -90,7 +93,8 @@ class MultiVarData {
       
    void checkFileTypeConsistency(const MultiVarData &mvdi, int j);
 
-   void init(const Grid &grid, GrdFileType ftype, GrdFileType otype);
+   void init(const string &fname, const string &oname,
+             const Grid &grid, GrdFileType ftype, GrdFileType otype);
    void set_fcst_obj(ShapeData *sd, bool simple);
    void set_fcst_raw(ShapeData *sd, bool simple);
    void set_obs_obj(ShapeData *sd, bool simple);
@@ -103,8 +107,11 @@ class MultiVarData {
                              BoolPlane & obs_out);
    void print(void) const;
 
+   
    MultiVarData1 *_simple;
    MultiVarData1 *_merge;
+   string _f_name;
+   string _o_name;
    int _nx, _ny;
    Grid *_grid;
    GrdFileType _ftype;
