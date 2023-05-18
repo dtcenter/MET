@@ -90,6 +90,67 @@ void increase_one_month(int &year, int &month) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void adjuste_day_for_month_year_units(int &day, int &month, int &year, double time_fraction) {
+  // Compute remaining days
+  bool day_adjusted = false;
+  double day_offset = 0.;
+  const char *method_name = "adjuste_day() -->";
+
+  if (day == 1) {
+    if (abs(time_fraction-0.5) < DAY_EPSILON) day = 15;
+    else {
+      day_offset = time_fraction * 30;
+      day += (int)(day_offset + 0.5);
+    }
+  }
+  else {
+    day_offset = time_fraction * 30;
+    unixtime time_value_ut = (int)day_offset;
+    day += (int)(time_value_ut + 0.5);
+    if (day > 30) {
+       day -= 30;
+       increase_one_month(year, month);
+    }
+  }
+
+  int day_org = day;
+  int max_day = monthly_days[month-1];
+  if (day > max_day) {
+    day = max_day;
+    if (month == 2 && is_leap_year(year)) day = 29;
+    day_adjusted = (day_org != day);
+  }
+
+  if (day_adjusted) {
+    mlog << Debug(2) << method_name << "adjusted day " << day_org
+         << " to " << day << " for " << year << "-" << month << "\n";
+  }
+
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void adjuste_day_for_day_units(int &day, int &month, int &year, double time_value) {
+  int day_offset = day + (int)time_value;
+  if (day_offset < 0) {
+    while (day_offset < 0) {
+      decrease_one_month(year, month);
+      day_offset += monthly_days[month-1];
+    }
+  }
+  else {
+    while (day_offset > monthly_days[month-1]) {
+      day_offset -= monthly_days[month-1];
+      increase_one_month(year, month);
+    }
+  }
+  day = day_offset;
+  if (day == 0) day = 1;
+
+}
+
+////////////////////////////////////////////////////////////////////////
+
 #define SEC_MONTH (86400*30)
 #define SEC_YEAR  (86400*30*12)
 static const double DAY_EPSILON = 0.00002;
@@ -117,6 +178,7 @@ unixtime add_to_unixtime(unixtime base_unixtime, int sec_per_unit,
 
     unix_to_mdyhms(base_unixtime, month, day, year, hour, minute, second);
 
+    // Update year and compute remaining months
     int month_offset;
     double day_offset;
     if (sec_per_unit == SEC_YEAR) {
@@ -127,42 +189,13 @@ unixtime add_to_unixtime(unixtime base_unixtime, int sec_per_unit,
     }
     else month_offset = (int)time_value_ut;
 
+    // Update month
     for (int idx=0; idx<month_offset; idx++) {
       increase_one_month(year, month);
     }
-    if (day == 1) {
-      if (abs(time_fraction-0.5) < DAY_EPSILON) day = 15;
-      else {
-        day_offset = time_fraction * 30;
-        day += (int)(day_offset + 0.5);
-      }
-    }
-    else {
-      day_offset = time_fraction * 30;
-      time_value_ut = (int)day_offset;
-      day += (int)(time_value_ut + 0.5);
-      if (day > 30) {
-         day -= 30;
-         increase_one_month(year, month);
-      }
-    }
-
-    int day_org = day;
-    bool day_adjusted = false;
-    int max_day = monthly_days[month-1];
-    if (day > max_day) {
-      day = max_day;
-      day_adjusted = true;
-      if (month == 2 && is_leap_year(year)) {
-        if (day_org == 29) day_adjusted = false;
-        day = 29;
-      }
-    }
+    // Compute remaining days
+    adjuste_day_for_month_year_units(day, month, year, time_fraction);
     ut = mdyhms_to_unix(month, day, year, hour, minute, second);
-    if (day_adjusted) {
-      mlog << Debug(2) << method_name << "adjusted day " << day_org
-           << " to " << day << " for " << year << "-" << month << "\n";
-    }
   }
   else if (!no_leap || sec_per_unit != 86400) {
     // seconds, minute, hours, and day unit with leap year
@@ -177,21 +210,7 @@ unixtime add_to_unixtime(unixtime base_unixtime, int sec_per_unit,
   }
   else {    //  no_leap year && unit = day
     unix_to_mdyhms(base_unixtime, month, day, year, hour, minute, second);
-    int day_offset = day + (int)time_value;
-    if (day_offset < 0) {
-      while (day_offset < 0) {
-        decrease_one_month(year, month);
-        day_offset += monthly_days[month-1];
-      }
-    }
-    else {
-      while (day_offset > monthly_days[month-1]) {
-        day_offset -= monthly_days[month-1];
-        increase_one_month(year, month);
-      }
-    }
-    day = day_offset;
-    if (day == 0) day = 1;
+    adjuste_day_for_day_units(day, month, year, time_value);
     ut = mdyhms_to_unix(month, day, year, hour, minute, second);
     if (time_fraction > (1-TIME_EPSILON) ) ut += (unixtime)sec_per_unit;
     else if (time_fraction > TIME_EPSILON) ut += (unixtime)(time_fraction * sec_per_unit);
