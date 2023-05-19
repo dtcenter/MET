@@ -1258,10 +1258,25 @@ void TmpFileInfo::setup_nc_file(const DomainInfo &di,
                         rng_dim, azi_dim,
                         ra_grid, bad_data_double);
 
-   // Define time, latitude, and longitude arrays
-   def_tc_time_lat_lon(tmp_out,
-                       vld_dim, rng_dim, azi_dim,
-                       vld_var, lat_var, lon_var);
+   // Write initialization time
+   write_tc_init_time(tmp_out, trk_ptr->init());
+
+   // Write valid time
+   NcVar vld_str_var, vld_ut_var;
+   def_tc_valid_time(tmp_out, vld_dim, vld_str_var, vld_ut_var);
+   write_tc_valid_time(tmp_out, 0, vld_str_var, vld_ut_var,
+                       pnt_ptr->valid());
+
+   // Write lead time
+   NcVar lead_str_var, lead_sec_var;
+   def_tc_lead_time(tmp_out, vld_dim, lead_str_var, lead_sec_var);
+   write_tc_lead_time(tmp_out, 0, lead_str_var, lead_sec_var,
+                      pnt_ptr->lead());
+
+   // Define latitude and longitude
+   NcVar lat_var, lon_var;
+   def_tc_lat_lon(tmp_out, vld_dim, rng_dim, azi_dim,
+                  lat_var, lon_var);
 
    // Pressure dimension and values (same for all temp files)
    pressure_levels = prs_lev;
@@ -1280,8 +1295,10 @@ void TmpFileInfo::setup_nc_file(const DomainInfo &di,
    write_tc_data(tmp_out, ra_grid, 0, lat_var, lat_arr);
    write_tc_data(tmp_out, ra_grid, 0, lon_var, lon_arr);
 
-   // Write valid time
-   write_tc_valid_time(tmp_out, 0, vld_var, pnt_ptr->valid());
+   // Write valid and lead times
+
+   write_tc_lead_time(tmp_out, 0, lead_str_var, lead_sec_var,
+                      pnt_ptr->lead());
 
    // Write track point values
    write_tc_track_point(tmp_out, vld_dim, *pnt_ptr);

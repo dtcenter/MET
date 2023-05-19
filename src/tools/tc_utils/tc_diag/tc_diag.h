@@ -172,11 +172,6 @@ class TmpFileInfo {
       netCDF::NcDim azi_dim;
       netCDF::NcDim prs_dim;
 
-      // NetCDF Variables
-      netCDF::NcVar lat_var;
-      netCDF::NcVar lon_var;
-      netCDF::NcVar vld_var;
-
       void open(const TrackInfo *, const TrackPoint *,
                 const DomainInfo &,
                 const std::set<double> &);
