@@ -11,6 +11,14 @@
 #
 # If compiling support for Python embedding, users will need to
 # set MET_PYTHON, MET_PYTHON_BIN_EXE, MET_PYTHON_CC, and MET_PYTHON_LD.
+# Users can directly set the python module to be loaded by setting
+# either PYTHON_MODULE or by setting PYTHON_NAME and PYTHON_VERSION:
+# - PYTHON_MODULE (only used if USE_MODULES=TRUE) - format is the name
+#   of the Python module to load followed by an underscore and then the
+#   version number (e.g. python_3.8.6, The script will then run "module
+#   load python/3.8.6")
+# - PYTHON_NAME = python (or e.g. python3, etc.)
+# - PYTHON_VERSION = 3.8.6
 #
 # For a description of these and other variables, visit the MET
 # downloads page under "Sample Script For Compiling External
