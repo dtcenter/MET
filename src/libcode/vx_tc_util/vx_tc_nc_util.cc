@@ -382,7 +382,7 @@ void def_tc_lead_time(NcFile* nc_out,
     add_att(&var_str, "standard_name", "lead_time");
 
     // Lead time, as an integer number of seconds
-    var_sec = nc_out->addVar("lead_time_ut", ncInt);
+    var_sec = nc_out->addVar("lead_time_sec", ncInt);
     add_att(&var_sec, "long_name", "Lead Time");
     add_att(&var_sec, "units", "seconds");
     add_att(&var_sec, "standard_name", "lead_time");
