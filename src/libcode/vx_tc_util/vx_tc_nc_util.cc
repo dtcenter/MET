@@ -26,16 +26,16 @@ void write_tc_track(NcFile* nc_out,
     NcDim track_line_dim = add_dim(nc_out, "track_line", track_lines.n());
 
     NcVar track_line_var = nc_out->addVar(
-        "TrackLine", ncString, track_line_dim);
+        "FullTrackLine", ncString, track_line_dim);
 
     NcVar track_lat_var = nc_out->addVar(
-        "TrackLat", ncDouble, track_point_dim);
-    add_att(&track_lat_var, "long_name", "Track Point Latitude");
+        "FullTrackLat", ncDouble, track_point_dim);
+    add_att(&track_lat_var, "long_name", "Full Track Point Latitude");
     add_att(&track_lat_var, "units", "degrees_north");
     add_att(&track_lat_var, "standard_name", "latitude_track");
     NcVar track_lon_var = nc_out->addVar(
-        "TrackLon", ncDouble, track_point_dim);
-    add_att(&track_lon_var, "long_name", "Track Point Longitude");
+        "FullTrackLon", ncDouble, track_point_dim);
+    add_att(&track_lon_var, "long_name", "Full Track Point Longitude");
     add_att(&track_lon_var, "units", "degrees_east");
     add_att(&track_lon_var, "standard_name", "longitude_track");
 
@@ -95,7 +95,7 @@ void write_tc_track_point(NcFile* nc_out,
     // Write track point values for lat, lon, vmax, and mslp
 
     NcVar lat_var = nc_out->addVar(
-        "PointLat", ncDouble, valid_dim);
+        "TrackLat", ncDouble, valid_dim);
     add_att(&lat_var, "long_name", "Track Point Latitude");
     add_att(&lat_var, "units", "degrees_north");
     add_att(&lat_var, "standard_name", "latitude_track");
@@ -103,7 +103,7 @@ void write_tc_track_point(NcFile* nc_out,
     lat_var.putVar(offsets, counts, &v);
 
     NcVar lon_var = nc_out->addVar(
-        "PointLon", ncDouble, valid_dim);
+        "TrackLon", ncDouble, valid_dim);
     add_att(&lon_var, "long_name", "Track Point Longitude");
     add_att(&lon_var, "units", "degrees_east");
     add_att(&lon_var, "standard_name", "longitude_track");
@@ -111,7 +111,7 @@ void write_tc_track_point(NcFile* nc_out,
     lon_var.putVar(offsets, counts, &v);
 
     NcVar vmax_var = nc_out->addVar(
-        "PointVMax", ncDouble, valid_dim);
+        "TrackVMax", ncDouble, valid_dim);
     add_att(&vmax_var, "long_name", "Maximum sustained wind speed");
     add_att(&vmax_var, "units", "kts");
     add_att(&vmax_var, "_FillValue", bad_data_double);
@@ -119,7 +119,7 @@ void write_tc_track_point(NcFile* nc_out,
     vmax_var.putVar(offsets, counts, &v);
 
     NcVar mslp_var = nc_out->addVar(
-        "PointMSLP", ncDouble, valid_dim);
+        "TrackMSLP", ncDouble, valid_dim);
     add_att(&mslp_var, "long_name", "Minimum sea level pressure");
     add_att(&mslp_var, "units", "millibars");
     add_att(&mslp_var, "_FillValue", bad_data_double);
@@ -350,9 +350,48 @@ void def_tc_range_azimuth(NcFile* nc_out,
 
 ////////////////////////////////////////////////////////////////////////
 
-void def_tc_time_lat_lon(NcFile* nc_out,
+void def_tc_valid_time(NcFile* nc_out,
+    const NcDim& track_point_dim,
+    NcVar& var_str, NcVar& var_ut) {
+
+    // Valid time, as a formatted string
+    var_str = nc_out->addVar("valid_time", ncString,
+        track_point_dim);
+    add_att(&var_str, "long_name", "Valid Time");
+    add_att(&var_str, "units", "YYYYMMDD_HHMMSS");
+    add_att(&var_str, "standard_name", "valid_time");
+
+    // Valid time, as a unixtime string
+    var_ut = nc_out->addVar("valid_time_ut", ncString);
+    add_att(&var_ut, "long_name", "Valid Time");
+    add_att(&var_ut, "units", "unixtime");
+    add_att(&var_ut, "standard_name", "valid_time");
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void def_tc_lead_time(NcFile* nc_out,
+    const NcDim& track_point_dim,
+    NcVar& var_str, NcVar& var_sec) {
+
+    // Lead time, as a formatted string
+    var_str = nc_out->addVar("lead_time", ncString,
+        track_point_dim);
+    add_att(&var_str, "long_name", "Lead Time");
+    add_att(&var_str, "units", "HHMMSS");
+    add_att(&var_str, "standard_name", "lead_time");
+
+    // Lead time, as an integer number of seconds
+    var_sec = nc_out->addVar("lead_time_ut", ncInt);
+    add_att(&var_sec, "long_name", "Lead Time");
+    add_att(&var_sec, "units", "seconds");
+    add_att(&var_sec, "standard_name", "lead_time");
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void def_tc_lat_lon(NcFile* nc_out,
     const NcDim& track_point_dim, const NcDim& range_dim, const NcDim& azimuth_dim,
-    NcVar& valid_time_var, NcVar& lead_time_var,
     NcVar& lat_var, NcVar& lon_var) {
 
     vector<NcDim> dims;
@@ -360,22 +399,10 @@ void def_tc_time_lat_lon(NcFile* nc_out,
     dims.push_back(range_dim);
     dims.push_back(azimuth_dim);
 
-    valid_time_var = nc_out->addVar("valid_time", ncUint64,
-        track_point_dim);
-    lead_time_var = nc_out->addVar("lead_time", ncInt,
-        track_point_dim);
     lat_var = nc_out->addVar("lat", ncDouble, dims);
     lon_var = nc_out->addVar("lon", ncDouble, dims);
 
     // Add attributes
-    add_att(&valid_time_var, "long_name", "Valid Time");
-    add_att(&valid_time_var, "units", "yyyymmddhh");
-    add_att(&valid_time_var, "standard_name", "valid_time");
-
-    add_att(&lead_time_var, "long_name", "Lead Time");
-    add_att(&lead_time_var, "units", "hours");
-    add_att(&lead_time_var, "standard_name", "lead_time");
-
     add_att(&lat_var, "long_name", "Latitude");
     add_att(&lat_var, "units", "degrees_north");
     add_att(&lat_var, "standard_name", "latitude");
@@ -388,25 +415,38 @@ void def_tc_time_lat_lon(NcFile* nc_out,
 ////////////////////////////////////////////////////////////////////////
 
 void write_tc_init_time(NcFile* nc_out,
-    const long& init_time) {
+    const unixtime& ut) {
 
-    // Define the variable
-    NcVar var = nc_out->addVar("init_time", ncUint64);
+    ConcatString cs;
+    const char* str;
 
-    // Add attributes
-    add_att(&var, "long_name", "Initialization Time");
-    add_att(&var, "units", "yyyymmddhh");
-    add_att(&var, "standard_name", "init_time");
+    // Initialization time, as a formatted string
+    NcVar var_str = nc_out->addVar("init_time", ncString);
+    add_att(&var_str, "long_name", "Initialization Time");
+    add_att(&var_str, "units", "YYYYMMDD_HHMMSS");
+    add_att(&var_str, "standard_name", "init_time");
+    unix_to_yyyymmdd_hhmmss(ut, cs);
+    str = cs.c_str();
+    var_str.putVar(&str);
 
-    // Write the value
-    var.putVar(&init_time);
+    // Initialization time, as a unixtime string
+    NcVar var_ut = nc_out->addVar("init_time_ut", ncString);
+    add_att(&var_ut, "long_name", "Initialization Time");
+    add_att(&var_ut, "units", "unixtime");
+    add_att(&var_ut, "standard_name", "init_time");
+    cs << cs_erase << ut;
+    str = cs.c_str();
+    var_ut.putVar(&str);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_tc_valid_time(NcFile* nc_out,
-    const int& i_point, const NcVar& var,
-    const long& valid_time) {
+void write_tc_valid_time(NcFile* nc_out, const int& i_point,
+    const NcVar& var_str, const NcVar& var_ut,
+    const unixtime& ut) {
+
+    ConcatString cs;
+    const char* str;
 
     vector<size_t> offsets;
     vector<size_t> counts;
@@ -417,14 +457,25 @@ void write_tc_valid_time(NcFile* nc_out,
     counts.clear();
     counts.push_back(1);
 
-    var.putVar(offsets, counts, &valid_time);
+    // Valid time, as a formatted string
+    unix_to_yyyymmdd_hhmmss(ut, cs);
+    str = cs.c_str();
+    var_str.putVar(offsets, counts, &str);
+
+    // Valid time, as a unixtime string
+    cs << cs_erase << ut;
+    str = cs.c_str();
+    var_ut.putVar(&str);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_tc_lead_time(NcFile* nc_out,
-    const int& i_point, const NcVar& var,
-    const int& lead_time) {
+void write_tc_lead_time(NcFile* nc_out, const int& i_point,
+    const NcVar& var_str, const NcVar& var_sec,
+    const int& sec) {
+
+    ConcatString cs;
+    const char* str;
 
     vector<size_t> offsets;
     vector<size_t> counts;
@@ -435,7 +486,13 @@ void write_tc_lead_time(NcFile* nc_out,
     counts.clear();
     counts.push_back(1);
 
-    var.putVar(offsets, counts, &lead_time);
+    // Lead time, as a formatted string
+    sec_to_hhmmss(sec, cs);
+    str = cs.c_str();
+    var_str.putVar(offsets, counts, &str);
+
+    // Lead time, as an integer number of seconds
+    var_sec.putVar(&sec);
 }
 
 ////////////////////////////////////////////////////////////////////////
