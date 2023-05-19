@@ -166,12 +166,12 @@ tc_rmw output file
 
 The NetCDF output file contains the following dimensions:
 
-1. *range* - the radial dimension of the range-azimuth grid
+1. *track_point* - the track points corresponding to the model output valid times
 
-2. *azimuth* - the azimuthal dimension of the range-azimuth grid
+2. *pressure* - if any pressure levels are specified in the data variable list, they will be sorted and combined into a 3D NetCDF variable, which pressure as the vertical dimension and range and azimuth as the horizontal dimensions
 
-3. *pressure* - if any pressure levels are specified in the data variable list, they will be sorted and combined into a 3D NetCDF variable, which pressure as the vertical dimension and range and azimuth as the horizontal dimensions
+3. *range* - the radial dimension of the range-azimuth grid
 
-4. *track_point* - the track points corresponding to the model output valid times
+4. *azimuth* - the azimuthal dimension of the range-azimuth grid
 
 For each data variable specified in the data variable list, a corresponding NetCDF variable will be created with the same name and units.
