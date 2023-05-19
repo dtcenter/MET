@@ -25,8 +25,8 @@ void write_tc_track(NcFile* nc_out,
 
     NcDim track_line_dim = add_dim(nc_out, "track_line", track_lines.n());
 
-    NcVar track_lines_var = nc_out->addVar(
-        "TrackLines", ncString, track_line_dim);
+    NcVar track_line_var = nc_out->addVar(
+        "TrackLine", ncString, track_line_dim);
 
     NcVar track_lat_var = nc_out->addVar(
         "TrackLat", ncDouble, track_point_dim);
@@ -63,7 +63,7 @@ void write_tc_track(NcFile* nc_out,
         string line = track_lines[i];
         mlog << Debug(4) << line << "\n";
         const char* str = line.c_str();
-        track_lines_var.putVar(offsets, counts, &str);
+        track_line_var.putVar(offsets, counts, &str);
     }
 
     offsets.clear();
@@ -95,7 +95,7 @@ void write_tc_track_point(NcFile* nc_out,
     // Write track point values for lat, lon, vmax, and mslp
 
     NcVar lat_var = nc_out->addVar(
-        "atcf_lat", ncDouble, valid_dim);
+        "PointLat", ncDouble, valid_dim);
     add_att(&lat_var, "long_name", "Track Point Latitude");
     add_att(&lat_var, "units", "degrees_north");
     add_att(&lat_var, "standard_name", "latitude_track");
@@ -103,7 +103,7 @@ void write_tc_track_point(NcFile* nc_out,
     lat_var.putVar(offsets, counts, &v);
 
     NcVar lon_var = nc_out->addVar(
-        "atcf_lon", ncDouble, valid_dim);
+        "PointLon", ncDouble, valid_dim);
     add_att(&lon_var, "long_name", "Track Point Longitude");
     add_att(&lon_var, "units", "degrees_east");
     add_att(&lon_var, "standard_name", "longitude_track");
@@ -111,7 +111,7 @@ void write_tc_track_point(NcFile* nc_out,
     lon_var.putVar(offsets, counts, &v);
 
     NcVar vmax_var = nc_out->addVar(
-        "atcf_vmax", ncDouble, valid_dim);
+        "PointVMax", ncDouble, valid_dim);
     add_att(&vmax_var, "long_name", "Maximum sustained wind speed");
     add_att(&vmax_var, "units", "kts");
     add_att(&vmax_var, "_FillValue", bad_data_double);
@@ -119,7 +119,7 @@ void write_tc_track_point(NcFile* nc_out,
     vmax_var.putVar(offsets, counts, &v);
 
     NcVar mslp_var = nc_out->addVar(
-        "atcf_mslp", ncDouble, valid_dim);
+        "PointMSLP", ncDouble, valid_dim);
     add_att(&mslp_var, "long_name", "Minimum sea level pressure");
     add_att(&mslp_var, "units", "millibars");
     add_att(&mslp_var, "_FillValue", bad_data_double);
@@ -272,7 +272,7 @@ void def_tc_pressure(NcFile* nc_out,
     // Define variable
     pressure_var = nc_out->addVar("pressure", ncDouble, pressure_dim);
 
-    // Set attributes
+    // Add attributes
     add_att(&pressure_var, "long_name", "pressure");
     add_att(&pressure_var, "units", "millibars");
     add_att(&pressure_var, "standard_name", "pressure");
@@ -310,7 +310,7 @@ void def_tc_range_azimuth(NcFile* nc_out,
     range_var = nc_out->addVar("range", ncDouble, range_dim);
     azimuth_var = nc_out->addVar("azimuth", ncDouble, azimuth_dim);
 
-    // Set attributes
+    // Add attributes
     add_att(&range_var, "long_name", "range");
 
     // Range is defined as a fraction of RMW or in kilometers
@@ -352,7 +352,8 @@ void def_tc_range_azimuth(NcFile* nc_out,
 
 void def_tc_time_lat_lon(NcFile* nc_out,
     const NcDim& track_point_dim, const NcDim& range_dim, const NcDim& azimuth_dim,
-    NcVar& valid_time_var, NcVar& lat_var, NcVar& lon_var) {
+    NcVar& valid_time_var, NcVar& lead_time_var,
+    NcVar& lat_var, NcVar& lon_var) {
 
     vector<NcDim> dims;
     dims.push_back(track_point_dim);
@@ -361,21 +362,44 @@ void def_tc_time_lat_lon(NcFile* nc_out,
 
     valid_time_var = nc_out->addVar("valid_time", ncUint64,
         track_point_dim);
+    lead_time_var = nc_out->addVar("lead_time", ncInt,
+        track_point_dim);
     lat_var = nc_out->addVar("lat", ncDouble, dims);
     lon_var = nc_out->addVar("lon", ncDouble, dims);
 
-    // Set attributes
-    add_att(&valid_time_var, "long_name", "valid_time");
+    // Add attributes
+    add_att(&valid_time_var, "long_name", "Valid Time");
     add_att(&valid_time_var, "units", "yyyymmddhh");
     add_att(&valid_time_var, "standard_name", "valid_time");
 
-    add_att(&lat_var, "long_name", "latitude");
+    add_att(&lead_time_var, "long_name", "Lead Time");
+    add_att(&lead_time_var, "units", "hours");
+    add_att(&lead_time_var, "standard_name", "lead_time");
+
+    add_att(&lat_var, "long_name", "Latitude");
     add_att(&lat_var, "units", "degrees_north");
     add_att(&lat_var, "standard_name", "latitude");
 
-    add_att(&lon_var, "long_name", "longitude");
+    add_att(&lon_var, "long_name", "Longitude");
     add_att(&lon_var, "units", "degrees_east");
     add_att(&lon_var, "standard_name", "longitude");
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_tc_init_time(NcFile* nc_out,
+    const long& init_time) {
+
+    // Define the variable
+    NcVar var = nc_out->addVar("init_time", ncUint64);
+
+    // Add attributes
+    add_att(&var, "long_name", "Initialization Time");
+    add_att(&var, "units", "yyyymmddhh");
+    add_att(&var, "standard_name", "init_time");
+
+    // Write the value
+    var.putVar(&init_time);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -394,6 +418,24 @@ void write_tc_valid_time(NcFile* nc_out,
     counts.push_back(1);
 
     var.putVar(offsets, counts, &valid_time);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_tc_lead_time(NcFile* nc_out,
+    const int& i_point, const NcVar& var,
+    const int& lead_time) {
+
+    vector<size_t> offsets;
+    vector<size_t> counts;
+
+    offsets.clear();
+    offsets.push_back(i_point);
+
+    counts.clear();
+    counts.push_back(1);
+
+    var.putVar(offsets, counts, &lead_time);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -462,7 +504,7 @@ void def_tc_data(NcFile* nc_out,
     data_var = nc_out->addVar(
         var_name, ncDouble, dims);
 
-    // Set attributes
+    // Add attributes
     add_att(&data_var, "long_name", data_info->long_name_attr());
     add_att(&data_var, "units", data_info->units_attr());
     add_att(&data_var, "_FillValue", bad_data_double);
@@ -484,7 +526,7 @@ void def_tc_data_3d(NcFile* nc_out,
     data_var = nc_out->addVar(
         data_info->name_attr(), ncDouble, dims);
 
-    // Set attributes
+    // Add attributes
     add_att(&data_var, "long_name", data_info->long_name_attr());
     add_att(&data_var, "units", data_info->units_attr());
     add_att(&data_var, "_FillValue", bad_data_double);
@@ -508,7 +550,7 @@ void def_tc_azi_mean_data(NcFile* nc_out,
 
     data_var = nc_out->addVar(var_name, ncDouble, dims);
 
-    // Set attributes
+    // Add attributes
     add_att(&data_var, "long_name", data_info->long_name_attr());
     add_att(&data_var, "units", data_info->units_attr());
     add_att(&data_var, "_FillValue", bad_data_double);

@@ -55,6 +55,10 @@ extern void def_tc_range_azimuth(netCDF::NcFile*,
 
 extern void def_tc_time_lat_lon(netCDF::NcFile*,
     const netCDF::NcDim&, const netCDF::NcDim&, const netCDF::NcDim&,
+    netCDF::NcVar&, netCDF::NcVar&, netCDF::NcVar&, netCDF::NcVar&);
+
+extern void def_tc_init_lead_time(netCDF::NcFile*,
+    const netCDF::NcDim&, const netCDF::NcDim&, const netCDF::NcDim&,
     netCDF::NcVar&, netCDF::NcVar&, netCDF::NcVar&);
 
 extern void def_tc_variables(netCDF::NcFile*,
@@ -75,8 +79,13 @@ extern void def_tc_azi_mean_data(netCDF::NcFile*,
     const netCDF::NcDim&, const netCDF::NcDim&,
     netCDF::NcVar&, VarInfo*);
 
+extern void write_tc_init_time(netCDF::NcFile*, const long&);
+
 extern void write_tc_valid_time(netCDF::NcFile*,
     const int&, const netCDF::NcVar&, const long&);
+
+extern void write_tc_lead_time(netCDF::NcFile*,
+    const int&, const netCDF::NcVar&, const int&);
 
 extern void write_tc_data(netCDF::NcFile*, const TcrmwGrid&,
     const int&, const netCDF::NcVar&, const double*);
