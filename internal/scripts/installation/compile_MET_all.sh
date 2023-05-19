@@ -287,7 +287,7 @@ fi
 # After loading the compiler module, strip any extra
 # characters off of "gnu" (e.g. "gnu9")
 if [[ ${COMPILER_FAMILY} == *gnu* ]]; then
-  ${COMPILER_FAMILY} = "gnu"
+    export COMPILER_FAMILY="gnu"
 fi
 
 if [ ${COMPILER_FAMILY} = "gnu" ]; then
