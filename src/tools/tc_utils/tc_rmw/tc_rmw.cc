@@ -588,7 +588,8 @@ void setup_nc_file() {
     // Define latitude and longitude arrays
     def_tc_time_lat_lon(nc_out,
         track_point_dim, range_dim, azimuth_dim,
-        valid_time_var, lat_arr_var, lon_arr_var);
+        valid_time_var, lead_time_var,
+        lat_arr_var, lon_arr_var);
 
     // Find all variable levels, long names, and units
     for(int i_var = 0; i_var < conf_info.get_n_data(); i_var++) {
@@ -656,6 +657,10 @@ void process_fields(const TrackInfoArray& tracks) {
     mlog << Debug(2) << "Processing 1 track consisting of "
          << track.n_points() << " points.\n";
 
+    // Write initialization time
+    long init_yyyymmddhh = unix_to_long_yyyymmddhh(track.init());
+    write_tc_init_time(nc_out, init_yyyymmddhh);
+
     // Loop over track points
     for (int i_point = 0; i_point < track.n_points(); i_point++) {
 
@@ -688,9 +693,11 @@ void process_fields(const TrackInfoArray& tracks) {
         write_tc_data(nc_out, tcrmw_grid, i_point, lat_arr_var, lat_arr);
         write_tc_data(nc_out, tcrmw_grid, i_point, lon_arr_var, lon_arr);
 
-        // Write valid time
+        // Write valid and lead times
         write_tc_valid_time(nc_out, i_point,
             valid_time_var, valid_yyyymmddhh);
+        write_tc_lead_time(nc_out, i_point,
+            lead_time_var, nint(point.lead()/sec_per_hour));
 
         for(int i_var = 0; i_var < conf_info.get_n_data(); i_var++) {
 
