@@ -350,19 +350,38 @@ void def_tc_range_azimuth(NcFile* nc_out,
 
 ////////////////////////////////////////////////////////////////////////
 
+void def_tc_init_time(NcFile* nc_out,
+    NcVar& var_str, NcVar& var_ut) {
+
+    // Initialization time, as a formatted string
+    var_str = nc_out->addVar("init_time", ncString);
+    add_att(&var_str, "long_name", "Initialization Time");
+    add_att(&var_str, "units", "YYYYMMDD_HHMMSS");
+    add_att(&var_str, "standard_name", "init_time");
+
+    // Initialization time, as a unixtime string
+    var_ut = nc_out->addVar("init_time_ut", ncString);
+    add_att(&var_ut, "long_name", "Init Time");
+    add_att(&var_ut, "units", "unixtime");
+    add_att(&var_ut, "standard_name", "init_time");
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void def_tc_valid_time(NcFile* nc_out,
     const NcDim& track_point_dim,
     NcVar& var_str, NcVar& var_ut) {
 
     // Valid time, as a formatted string
     var_str = nc_out->addVar("valid_time", ncString,
-        track_point_dim);
+                             track_point_dim);
     add_att(&var_str, "long_name", "Valid Time");
     add_att(&var_str, "units", "YYYYMMDD_HHMMSS");
     add_att(&var_str, "standard_name", "valid_time");
 
     // Valid time, as a unixtime string
-    var_ut = nc_out->addVar("valid_time_ut", ncString);
+    var_ut = nc_out->addVar("valid_time_ut", ncString,
+                            track_point_dim);
     add_att(&var_ut, "long_name", "Valid Time");
     add_att(&var_ut, "units", "unixtime");
     add_att(&var_ut, "standard_name", "valid_time");
@@ -376,13 +395,14 @@ void def_tc_lead_time(NcFile* nc_out,
 
     // Lead time, as a formatted string
     var_str = nc_out->addVar("lead_time", ncString,
-        track_point_dim);
+                             track_point_dim);
     add_att(&var_str, "long_name", "Lead Time");
     add_att(&var_str, "units", "HHMMSS");
     add_att(&var_str, "standard_name", "lead_time");
 
     // Lead time, as an integer number of seconds
-    var_sec = nc_out->addVar("lead_time_sec", ncInt);
+    var_sec = nc_out->addVar("lead_time_sec", ncInt,
+                             track_point_dim);
     add_att(&var_sec, "long_name", "Lead Time");
     add_att(&var_sec, "units", "seconds");
     add_att(&var_sec, "standard_name", "lead_time");
@@ -415,25 +435,18 @@ void def_tc_lat_lon(NcFile* nc_out,
 ////////////////////////////////////////////////////////////////////////
 
 void write_tc_init_time(NcFile* nc_out,
+    const NcVar& var_str, const NcVar& var_ut,
     const unixtime& ut) {
 
     ConcatString cs;
     const char* str;
 
     // Initialization time, as a formatted string
-    NcVar var_str = nc_out->addVar("init_time", ncString);
-    add_att(&var_str, "long_name", "Initialization Time");
-    add_att(&var_str, "units", "YYYYMMDD_HHMMSS");
-    add_att(&var_str, "standard_name", "init_time");
     unix_to_yyyymmdd_hhmmss(ut, cs);
     str = cs.c_str();
     var_str.putVar(&str);
 
     // Initialization time, as a unixtime string
-    NcVar var_ut = nc_out->addVar("init_time_ut", ncString);
-    add_att(&var_ut, "long_name", "Initialization Time");
-    add_att(&var_ut, "units", "unixtime");
-    add_att(&var_ut, "standard_name", "init_time");
     cs << cs_erase << ut;
     str = cs.c_str();
     var_ut.putVar(&str);

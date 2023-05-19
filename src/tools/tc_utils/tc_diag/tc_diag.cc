@@ -1258,16 +1258,19 @@ void TmpFileInfo::setup_nc_file(const DomainInfo &di,
                         rng_dim, azi_dim,
                         ra_grid, bad_data_double);
 
-   // Write initialization time
-   write_tc_init_time(tmp_out, trk_ptr->init());
+   // Write the track initialization time
+   NcVar init_str_var, init_ut_var;
+   def_tc_init_time(tmp_out, init_str_var, init_ut_var);
+   write_tc_init_time(tmp_out, init_str_var, init_ut_var,
+                      trk_ptr->init());
 
-   // Write valid time
+   // Write the current valid time
    NcVar vld_str_var, vld_ut_var;
    def_tc_valid_time(tmp_out, vld_dim, vld_str_var, vld_ut_var);
    write_tc_valid_time(tmp_out, 0, vld_str_var, vld_ut_var,
                        pnt_ptr->valid());
 
-   // Write lead time
+   // Write the current lead time
    NcVar lead_str_var, lead_sec_var;
    def_tc_lead_time(tmp_out, vld_dim, lead_str_var, lead_sec_var);
    write_tc_lead_time(tmp_out, 0, lead_str_var, lead_sec_var,

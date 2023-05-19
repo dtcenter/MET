@@ -53,6 +53,9 @@ extern void def_tc_pressure(netCDF::NcFile*,
 extern void def_tc_range_azimuth(netCDF::NcFile*,
     const netCDF::NcDim&, const netCDF::NcDim&, const TcrmwGrid&, double);
 
+extern void def_tc_init_time(netCDF::NcFile*,
+    netCDF::NcVar&, netCDF::NcVar&);
+
 extern void def_tc_valid_time(netCDF::NcFile*,
     const netCDF::NcDim&, netCDF::NcVar&, netCDF::NcVar&);
 
@@ -82,6 +85,7 @@ extern void def_tc_azi_mean_data(netCDF::NcFile*,
     netCDF::NcVar&, VarInfo*);
 
 extern void write_tc_init_time(netCDF::NcFile*,
+    const netCDF::NcVar&, const netCDF::NcVar&,
     const unixtime&);
 
 extern void write_tc_valid_time(netCDF::NcFile*,

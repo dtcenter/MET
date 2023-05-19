@@ -581,14 +581,21 @@ void setup_nc_file() {
     range_dim = add_dim(nc_out, "range", (long) tcrmw_grid.range_n());
     azimuth_dim = add_dim(nc_out, "azimuth", (long) tcrmw_grid.azimuth_n());
 
+    // Define init, lead, and valid time variables
+    def_tc_init_time(nc_out,
+        init_time_str_var, init_time_ut_var);
+    def_tc_valid_time(nc_out, track_point_dim,
+        valid_time_str_var, valid_time_ut_var);
+    def_tc_lead_time(nc_out, track_point_dim,
+        lead_time_str_var, lead_time_sec_var);
+
     // Define range and azimuth dimensions
     def_tc_range_azimuth(nc_out, range_dim, azimuth_dim, tcrmw_grid,
         conf_info.rmw_scale);
 
     // Define latitude and longitude arrays
-    def_tc_time_lat_lon(nc_out,
+    def_tc_lat_lon(nc_out,
         track_point_dim, range_dim, azimuth_dim,
-        valid_time_var, lead_time_var,
         lat_arr_var, lon_arr_var);
 
     // Find all variable levels, long names, and units
@@ -657,16 +664,16 @@ void process_fields(const TrackInfoArray& tracks) {
     mlog << Debug(2) << "Processing 1 track consisting of "
          << track.n_points() << " points.\n";
 
-    // Write initialization time
-    long init_yyyymmddhh = unix_to_long_yyyymmddhh(track.init());
-    write_tc_init_time(nc_out, init_yyyymmddhh);
+    // Write the track initialization time
+    write_tc_init_time(nc_out,
+        init_time_str_var, init_time_ut_var,
+        track.init());
 
     // Loop over track points
     for (int i_point = 0; i_point < track.n_points(); i_point++) {
 
         TrackPoint point = track[i_point];
         unixtime valid_time = point.valid();
-        long valid_yyyymmddhh = unix_to_long_yyyymmddhh(valid_time);
 
         mlog << Debug(3) << "[" << i_point+1 << " of "
              << track.n_points()  << "] Processing track point valid at "
@@ -695,9 +702,11 @@ void process_fields(const TrackInfoArray& tracks) {
 
         // Write valid and lead times
         write_tc_valid_time(nc_out, i_point,
-            valid_time_var, valid_yyyymmddhh);
+            valid_time_str_var, valid_time_ut_var,
+            valid_time);
         write_tc_lead_time(nc_out, i_point,
-            lead_time_var, nint(point.lead()/sec_per_hour));
+            lead_time_str_var, lead_time_sec_var,
+            point.lead());
 
         for(int i_var = 0; i_var < conf_info.get_n_data(); i_var++) {
 
