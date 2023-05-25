@@ -24,8 +24,7 @@ SUBDIRS = \
 	poly \
 	ps \
 	table_files \
-	tc_data \
-	wrappers
+	tc_data
 
 topdir = $(pkgdatadir)
 

@@ -172,7 +172,9 @@ file_name = full_path;
 
 file_name.chomp(".py");   //  remove possible ".py" suffix from script filename
 
-bool status = python_point_data(file_name.c_str(), file_argc, file_argv, use_xarray, met_data);
+MaskFilters *filters = 0;
+bool status = python_point_data(file_name.c_str(), file_argc, file_argv,
+                                met_data, filters);
 
 met_data.get_hdr_cnt();
 met_data.get_obs_cnt();

@@ -248,7 +248,7 @@ Heidke Skill Score (HSS)
 
 Called "HSS" in CTS output :numref:`table_PS_format_info_CTS` and "HSS" in MCTS output :numref:`table_PS_format_info_MCTS`
 
-HSS is a skill score based on Accuracy, where the Accuracy is corrected by the number of correct forecasts that would be expected by chance. In particular, 
+HSS is a skill score based on Accuracy, where the Accuracy is compared to the number of correct forecasts that would be expected by chance. In particular, 
 
 .. math:: \text{HSS } = \frac{n_{11} + n_{00} - C_2}{T - C_2},
 
@@ -256,17 +256,8 @@ where
 
 .. math:: C_2 = \frac{(n_{11} + n_{10}) (n_{11} + n_{01}) + (n_{01} + n_{00}) (n_{10} + n_{00})}{T}.
 
-A more general format that uses percentages is provided by Ou (:ref:`Ou, 2016 <Ou-2016>`),
-
-.. only:: latex
-
-  .. math:: \text{HSS(\%) } = 100 \ast \frac{(H - E)}{(T - E)}
-
-.. only:: html
-
-  .. math:: \text{HSS(%) } = 100 \ast \frac{(H - E)}{(T - E)}
-
-where H is the number of forecasts in the correct category and E is the expected number of forecasts by chance.
+Note that the C_2 value is calculated based on the data fields supplied by the user. Therefore, for C2 to appropriately represent a random forecast, 
+a sufficiently large sized dataset of forecasts and observations would be needed.
 
 HSS can range from minus infinity to 1. A perfect forecast would have HSS = 1.
 
@@ -275,11 +266,13 @@ Heidke Skill Score - Expected Correct (HSS_EC)
 
 Called "HSS_EC" in CTS output :numref:`table_PS_format_info_CTS` and MCTS output :numref:`table_PS_format_info_MCTS`
 
-HSS_EC is a skill score based on Accuracy, where the Accuracy is corrected by the number of correct forecasts that would be expected by chance. In particular,
+HSS_EC calculates the HSS as described above, but with a C2 value based on a set expected chance (EC) value. 
+Instead of C2 being calculated by the user’s dataset, 
 
-.. math:: \text{HSS } = \frac{n_{11} + n_{00} - C_2}{T - C_2},
+.. math:: \text{HSS } = \text{T*EC },
 
-The C_2 value is user-configurable with a default value of T divided by the number of contingency table categories.
+where EC is allowed to be prescribed by the user ranging from 0 to 1. By default the EC is set to 1 divided by the number of contingency table categories, 
+e.g. EC is set to 0.33333 for a 3 category (tercile) forecast and 0.5 for a two category (binary) forecast. 
 
 HSS_EC can range from minus infinity to 1. A perfect forecast would have HSS_EC = 1.
 

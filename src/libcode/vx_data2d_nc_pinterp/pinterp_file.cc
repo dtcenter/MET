@@ -571,7 +571,7 @@ double d = bad_data_double;
 double missing_value = get_var_missing_value(var);
 get_var_fill_value(var, fill_value);
 
-status = get_nc_data(var, &d, (long *)a);
+status = get_nc_data(var, &d, a);
 
 if ( !status )  {
 
@@ -743,12 +743,12 @@ plane.set_size(Nx, Ny);
    //
 double d[Ny];
 
-long offsets[dim_count];
-long lengths[dim_count];
+LongArray offsets;
+LongArray lengths;
 
 for (int k=0; k<dim_count; k++) {
-  offsets[k] = (a[k] == vx_data2d_star) ? 0 : a[k];
-  lengths[k] = 1;
+  offsets.add((a[k] == vx_data2d_star) ? 0 : a[k]);
+  lengths.add(1);
 }
 lengths[y_slot] = Ny;
 

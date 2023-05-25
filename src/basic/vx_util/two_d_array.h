@@ -274,7 +274,7 @@ T TwoD_Array<T>::operator()(int _x, int _y) const
 
 {
 
-return ( E[two_to_one(_x, _y)] );
+return ( get(_x, _y) );
 
 }
 
@@ -286,6 +286,11 @@ template <typename T>
 T TwoD_Array<T>::get(int _x, int _y) const
 
 {
+
+if (E == nullptr) {
+   mlog << Error << "\nTwoD_Array<T>::get(x,y) -> E is not initialized\n\n";
+   exit ( 1 );
+}
 
 return ( E[two_to_one(_x, _y)] );
 
@@ -301,7 +306,7 @@ bool TwoD_Array<T>::s_is_on(int _x, int _y) const
 
 {
 
-return ( (bool) (E[two_to_one(_x, _y)]) );
+return ( (bool) (E == nullptr) ? false : (E[two_to_one(_x, _y)]) );
 
 }
 

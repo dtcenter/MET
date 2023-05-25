@@ -31,9 +31,9 @@ extern GlobalPython GP;   //  this needs external linkage
 
 static const char * user_ppath            = 0;
 
-static const char write_tmp_nc         [] = "MET_BASE/wrappers/write_tmp_dataplane.py";
+static const char write_tmp_nc         [] = "MET_BASE/python/pyembed/write_tmp_dataplane.py";
 
-static const char read_tmp_nc          [] = "read_tmp_dataplane";   //  NO ".py" suffix
+static const char read_tmp_nc          [] = "pyembed.read_tmp_dataplane";   //  NO ".py" suffix
 
 static const char tmp_nc_var_name      [] = "met_info";
 

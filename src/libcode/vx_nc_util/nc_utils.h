@@ -263,11 +263,11 @@ extern bool get_nc_data(netCDF::NcVar *, time_t *data);
 extern bool get_nc_data(netCDF::NcVar *, ncbyte *data);
 extern bool get_nc_data(netCDF::NcVar *, unsigned short *data);
 
-extern bool get_nc_data(netCDF::NcVar *, int    *data, const long *curs);
-extern bool get_nc_data(netCDF::NcVar *, char   *data, const long *curs);
-extern bool get_nc_data(netCDF::NcVar *, short  *data, const long *curs);
-extern bool get_nc_data(netCDF::NcVar *, float  *data, const long *curs);
-extern bool get_nc_data(netCDF::NcVar *, double *data, const long *curs);
+extern bool get_nc_data(netCDF::NcVar *, int    *data, const LongArray &curs);
+extern bool get_nc_data(netCDF::NcVar *, char   *data, const LongArray &curs);
+extern bool get_nc_data(netCDF::NcVar *, short  *data, const LongArray &curs);
+extern bool get_nc_data(netCDF::NcVar *, float  *data, const LongArray &curs);
+extern bool get_nc_data(netCDF::NcVar *, double *data, const LongArray &curs);
 
 extern bool get_nc_data(netCDF::NcVar *, int    *data, const long dim, const long cur=0);
 extern bool get_nc_data(netCDF::NcVar *, char   *data, const long dim, const long cur=0);
@@ -275,12 +275,12 @@ extern bool get_nc_data(netCDF::NcVar *, float  *data, const long dim, const lon
 extern bool get_nc_data(netCDF::NcVar *, double *data, const long dim, const long cur=0);
 extern bool get_nc_data(netCDF::NcVar *, ncbyte *data, const long dim, const long cur=0);
 
-extern bool get_nc_data(netCDF::NcVar *, int    *data, const long *dims, const long *curs);
-extern bool get_nc_data(netCDF::NcVar *, char   *data, const long *dims, const long *curs);
-extern bool get_nc_data(netCDF::NcVar *, short  *data, const long *dims, const long *curs);
-extern bool get_nc_data(netCDF::NcVar *, float  *data, const long *dims, const long *curs);
-extern bool get_nc_data(netCDF::NcVar *, double *data, const long *dims, const long *curs);
-extern bool get_nc_data(netCDF::NcVar *, ncbyte *data, const long *dims, const long *curs);
+extern bool get_nc_data(netCDF::NcVar *, int    *data, const LongArray &dims, const LongArray &curs);
+extern bool get_nc_data(netCDF::NcVar *, char   *data, const LongArray &dims, const LongArray &curs);
+extern bool get_nc_data(netCDF::NcVar *, short  *data, const LongArray &dims, const LongArray &curs);
+extern bool get_nc_data(netCDF::NcVar *, float  *data, const LongArray &dims, const LongArray &curs);
+extern bool get_nc_data(netCDF::NcVar *, double *data, const LongArray &dims, const LongArray &curs);
+extern bool get_nc_data(netCDF::NcVar *, ncbyte *data, const LongArray &dims, const LongArray &curs);
 
 extern bool get_nc_data_to_array(netCDF::NcVar  *, StringArray *);
 extern bool get_nc_data_to_array(netCDF::NcFile *, const char *, StringArray *);
