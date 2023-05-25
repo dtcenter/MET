@@ -518,7 +518,7 @@
       -v 1
     </param>
     <output>
-      <ps>&OUTPUT_DIR;/plot_data_plane/ukv_agl_temperature_laea.ps</ps>
+      <ps>&OUTPUT_DIR;/plot_data_plane/ukv_agl_temperature_laea_grib2.ps</ps>
     </output>
   </test>
 

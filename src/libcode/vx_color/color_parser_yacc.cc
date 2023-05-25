@@ -196,15 +196,15 @@ static Color dcolor_to_color(const Dcolor &);
 
 
 #line 199 "color_parser_yacc.cc" /* yacc.c:337  */
-# ifndef YY_nullptrPTR
+# ifndef YY_NULLPTR
 #  if defined __cplusplus
 #   if 201103L <= __cplusplus
-#    define YY_nullptrPTR nullptr
+#    define YY_NULLPTR nullptr
 #   else
-#    define YY_nullptrPTR 0
+#    define YY_NULLPTR 0
 #   endif
 #  else
-#   define YY_nullptrPTR ((void*)0)
+#   define YY_NULLPTR ((void*)0)
 #  endif
 # endif
 
@@ -591,7 +591,7 @@ static const char *const yytname[] =
   "$end", "error", "$undefined", "ID", "COLOR_NAME", "INTEGER",
   "QUOTED_STRING", "FLOAT", "BLEND", "HSV", "GRAYVALUE", "CMYK", "'='",
   "'{'", "','", "'}'", "'('", "')'", "$accept", "statement_list",
-  "statement", "ctable_entry", "color_assignment", "color", "number", YY_nullptrPTR
+  "statement", "ctable_entry", "color_assignment", "color", "number", YY_NULLPTR
 };
 #endif
 
@@ -987,11 +987,11 @@ static int
 yysyntax_error (YYSIZE_T *yymsg_alloc, char **yymsg,
                 yytype_int16 *yyssp, int yytoken)
 {
-  YYSIZE_T yysize0 = yytnamerr (YY_nullptrPTR, yytname[yytoken]);
+  YYSIZE_T yysize0 = yytnamerr (YY_NULLPTR, yytname[yytoken]);
   YYSIZE_T yysize = yysize0;
   enum { YYERROR_VERBOSE_ARGS_MAXIMUM = 5 };
   /* Internationalized format string. */
-  const char *yyformat = YY_nullptrPTR;
+  const char *yyformat = YY_NULLPTR;
   /* Arguments of yyformat. */
   char const *yyarg[YYERROR_VERBOSE_ARGS_MAXIMUM];
   /* Number of reported tokens (one for the "unexpected", one per
@@ -1048,7 +1048,7 @@ yysyntax_error (YYSIZE_T *yymsg_alloc, char **yymsg,
                   }
                 yyarg[yycount++] = yytname[yyx];
                 {
-                  YYSIZE_T yysize1 = yysize + yytnamerr (YY_nullptrPTR, yytname[yyx]);
+                  YYSIZE_T yysize1 = yysize + yytnamerr (YY_NULLPTR, yytname[yyx]);
                   if (yysize <= yysize1 && yysize1 <= YYSTACK_ALLOC_MAXIMUM)
                     yysize = yysize1;
                   else
