@@ -36,7 +36,7 @@ static void rotated_latlon_grid_output (const GridInfo &, NcFile * ncfile);
 static void stereographic_grid_output  (const GridInfo &, NcFile * ncfile);
 static void mercator_grid_output       (const GridInfo &, NcFile * ncfile);
 static void gaussian_grid_output       (const GridInfo &, NcFile * ncfile);
-static void laea_grid_output           (const GridInfo &, NcFile * ncfile);
+// static void laea_grid_output           (const GridInfo &, NcFile * ncfile);
 static void laea_grib2_grid_output     (const GridInfo &, NcFile * ncfile);
 static void semilatlon_grid_output     (const GridInfo &, NcFile * ncfile, NcDim &, NcDim &);
 static void write_semilatlon_var       (NcFile * ncfile, const char *,
@@ -67,7 +67,7 @@ else if ( info.ll  )  latlon_grid_output          (info, ncfile);
 else if ( info.rll )  rotated_latlon_grid_output  (info, ncfile);
 else if ( info.m   )  mercator_grid_output        (info, ncfile);
 else if ( info.g   )  gaussian_grid_output        (info, ncfile);
-else if ( info.la  )  laea_grid_output            (info, ncfile);
+// else if ( info.la  )  laea_grid_output            (info, ncfile);
 else if ( info.lg  )  laea_grib2_grid_output      (info, ncfile);
 else if ( info.sl  )  semilatlon_grid_output      (info, ncfile, lat_dim, lon_dim);
 else {
@@ -646,7 +646,7 @@ return;
 
 ////////////////////////////////////////////////////////////////////////
 
-
+/*
 void laea_grid_output(const GridInfo & info, NcFile * ncfile)
 
 {
@@ -762,7 +762,7 @@ ncfile->putAtt("ny", junk);
 return;
 
 }
-
+*/
 
 ////////////////////////////////////////////////////////////////////////
 

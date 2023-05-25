@@ -47,15 +47,36 @@ class LaeaGrid : public GridRep {
 
       LaeaGrid();
      ~LaeaGrid();
-      LaeaGrid(const LaeaData &);
+      // LaeaGrid(const LaeaData &);
       LaeaGrid(const LaeaGrib2Data &);
 
       Spheroid geoid;
 
-      LaeaData Data;
-      LaeaGrib2Data Grib2Data;
+      // LaeaData Data;
+      // LaeaGrib2Data Grib2Data;
+      LaeaGrib2Data Data;
 
-      bool UseGrib2Data;
+         /////////////////////////////////////
+
+               //  from the old Laea_Data class
+
+
+               double lat_LL;        //  lower left
+               double lon_LL;
+
+               double lat_UL;        //  upper left
+               double lon_UL;
+
+               double lat_LR;        //  lower right
+               double lon_LR;
+
+               double lat_pole;
+               double lon_pole;
+
+
+         /////////////////////////////////////
+
+      // bool UseGrib2Data;
 
       double snyder_m_func(double lat) const;
 

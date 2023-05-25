@@ -68,14 +68,12 @@ clear();
 
 ////////////////////////////////////////////////////////////////////////
 
-
+/*
 LaeaGrid::LaeaGrid(const LaeaData & data)
 
 {
 
 clear();
-
-UseGrib2Data = false;
 
 memset(&Grib2Data, 0, sizeof(Grib2Data));
 Data = data;
@@ -104,7 +102,7 @@ if ( strcmp(data.geoid, "WGS_84") == 0 )  {
 calc_aff();
 
 }
-
+*/
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -115,20 +113,18 @@ LaeaGrid::LaeaGrid(const LaeaGrib2Data & grib2_data)
 
 clear();
 
-UseGrib2Data = true;
-
 memset(&Data, 0, sizeof(Data));
-Grib2Data = grib2_data;
+Data = grib2_data;
 
-Data.lat_LL = grib2_data.lat_first;
-Data.lon_LL = grib2_data.lon_first;
+lat_LL = grib2_data.lat_first;
+lon_LL = grib2_data.lon_first;
 
-Data.lat_pole = grib2_data.standard_lat;
-Data.lon_pole = grib2_data.central_lon;
+lat_pole = grib2_data.standard_lat;
+lon_pole = grib2_data.central_lon;
 
 Name = grib2_data.name;
 SpheroidName = grib2_data.spheroid_name;
-Grib2Data.spheroid_name = SpheroidName.c_str();
+Data.spheroid_name = SpheroidName.c_str();
 
 Nx = grib2_data.nx;
 Ny = grib2_data.ny;
@@ -165,7 +161,7 @@ return;
 
 ////////////////////////////////////////////////////////////////////////
 
-
+/*
 void LaeaGrid::calc_aff()
 
 {
@@ -208,7 +204,7 @@ aff.set_three_points(
 return;
 
 }
-
+*/
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -227,8 +223,19 @@ SpheroidName.clear();
 
 geoid.clear();
 
+lat_LL = 0.0;
+lon_LL = 0.0;
+
+lat_UL = 0.0;
+lon_UL = 0.0;
+
+lat_LR = 0.0;
+lon_LR = 0.0;
+
+lat_pole = 0.0;
+
 memset(&Data,      0, sizeof(Data));
-memset(&Grib2Data, 0, sizeof(Grib2Data));
+// memset(&Grib2Data, 0, sizeof(Grib2Data));
 
 return;
 
@@ -278,9 +285,9 @@ const double E6 = E2*E4;
 
 xy_to_uv(x, y, u, v);
 
-lat1    = (Data.lat_pole);
+lat1    = lat_pole;
 
-lambda0 = -(Data.lon_pole);
+lambda0 = -lon_pole;
 
 
 beta1 = geoid.beta(lat1);
@@ -641,8 +648,7 @@ GridRep * LaeaGrid::copy() const
 
 LaeaGrid * p = 0;
 
-if(UseGrib2Data)  p = new LaeaGrid (Grib2Data);
-else              p = new LaeaGrid (Data);
+p = new LaeaGrid (Data);
 
 return ( p );
 
@@ -696,8 +702,8 @@ A = geoid.a_km();
 
 lambda  = -lon;
 
-lambda0 = -(Data.lon_pole);
-lat1    =  (Data.lat_pole);
+lambda0 = -lon_pole;
+lat1    =  lat_pole;
 
 
 delta   =  lambda - lambda0;
@@ -811,7 +817,7 @@ return;
 
 ////////////////////////////////////////////////////////////////////////
 
-
+/*
 Grid::Grid(const LaeaData & data)
 
 {
@@ -821,11 +827,11 @@ init_from_scratch();
 set(data);
 
 }
-
+*/
 
 ////////////////////////////////////////////////////////////////////////
 
-
+/*
 void Grid::set(const LaeaData & data)
 
 {
@@ -846,7 +852,7 @@ if ( !rep )  {
 return;
 
 }
-
+*/
 
 ////////////////////////////////////////////////////////////////////////
 

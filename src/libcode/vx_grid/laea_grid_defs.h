@@ -16,7 +16,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-
+/*
 struct LaeaData {
 
    const char * name;    //  not allocated
@@ -40,7 +40,7 @@ struct LaeaData {
    void dump() const;
 
 };
-
+*/
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -92,7 +92,7 @@ struct LaeaGrib2Data {
    //  Laea grid definitions
    //
 
-
+/*
 static const LaeaData laea_test_data = {
 
 
@@ -116,7 +116,7 @@ static const LaeaData laea_test_data = {
    2200,        //  ny
 
 };
-
+*/
 
 static const LaeaGrib2Data laea_grib2_test_data = {  
 

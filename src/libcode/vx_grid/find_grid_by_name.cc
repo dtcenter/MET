@@ -60,7 +60,7 @@ if ( i.st )  { g.set( *(i.st) );  status = true; }
 if ( i.ll )  { g.set( *(i.ll) );  status = true; }
 if ( i.m  )  { g.set( *(i.m)  );  status = true; }
 if ( i.g  )  { g.set( *(i.g)  );  status = true; }
-if ( i.la )  { g.set( *(i.la) );  status = true; }
+// if ( i.la )  { g.set( *(i.la) );  status = true; }
 if ( i.lg )  { g.set( *(i.lg) );  status = true; }
 
 return ( status );
