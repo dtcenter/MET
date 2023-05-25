@@ -25,7 +25,7 @@
 //   008    05/02/22  Halley Gotway   MET #2148 Fix init_hour and lead misses
 //   009    07/06/22  Howard Soh      METplus-Internal #19 Rename main to met_main
 //   010    09/28/22  Prestopnik      MET #2227 Remove using namespace std and netCDF from header files
-//
+//   011    05/25/23  Halley Gotway   MET #2552 Update parsing of gtwo probability lead times
 //
 ////////////////////////////////////////////////////////////////////////
 
