@@ -1211,6 +1211,7 @@ AC_CONFIG_FILES([Makefile
                  scripts/python/met/Makefile
                  scripts/python/pyembed/Makefile
                  scripts/python/utility/Makefile
+                 scripts/python/tc_diag/Makefile
                  data/Makefile
                  data/climo/Makefile
                  data/climo/seeps/Makefile

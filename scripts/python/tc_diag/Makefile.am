@@ -18,17 +18,16 @@
 
 # SUBDIRS = include
 
-SUBDIRS = \
-	examples \
-	met \
-	pyembed \
-	utility \
-	tc_diag
 
 ## Example of how to Install outside of $(pkgdatadir)
 ## scriptsrootdir = $(prefix)/share/scripts
-## pythonscriptsdir = ${scriptsrootdir}/python
+## pythonutilitydir = ${scriptsrootdir}/utility
 
-pythonscriptsdir = $(pkgdatadir)/python
+pythontc_diagdir = $(pkgdatadir)/python/tc_diag
+
+pythontc_diag_DATA = \
+	compute_tc_diagnostics.py
+
+EXTRA_DIST = ${pythontc_diag_DATA}
 
 MAINTAINERCLEANFILES 	= Makefile.in
