@@ -102,6 +102,7 @@ CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am_tc_diag_OBJECTS = tc_diag-tc_diag.$(OBJEXT) \
+	tc_diag-python_tc_diag.$(OBJEXT) \
 	tc_diag-tc_diag_conf_info.$(OBJEXT)
 tc_diag_OBJECTS = $(am_tc_diag_OBJECTS)
 am__DEPENDENCIES_1 =
@@ -124,7 +125,8 @@ am__v_at_1 =
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__maybe_remake_depfiles = depfiles
-am__depfiles_remade = ./$(DEPDIR)/tc_diag-tc_diag.Po \
+am__depfiles_remade = ./$(DEPDIR)/tc_diag-python_tc_diag.Po \
+	./$(DEPDIR)/tc_diag-tc_diag.Po \
 	./$(DEPDIR)/tc_diag-tc_diag_conf_info.Po
 am__mv = mv -f
 AM_V_lt = $(am__v_lt_@AM_V@)
@@ -319,6 +321,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 MAINTAINERCLEANFILES = Makefile.in
 tc_diag_SOURCES = tc_diag.cc \
+	python_tc_diag.cc \
 	tc_diag_conf_info.cc
 
 tc_diag_CPPFLAGS = ${MET_CPPFLAGS}
@@ -352,6 +355,7 @@ tc_diag_LDADD = -lvx_stat_out \
 	$(FLIBS)
 
 EXTRA_DIST = tc_diag_conf_info.h \
+	python_tc_diag.h \
 	tc_diag.h
 
 all: all-am
@@ -440,6 +444,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tc_diag-python_tc_diag.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tc_diag-tc_diag.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tc_diag-tc_diag_conf_info.Po@am__quote@ # am--include-marker
 
@@ -476,6 +481,20 @@ tc_diag-tc_diag.obj: tc_diag.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='tc_diag.cc' object='tc_diag-tc_diag.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tc_diag_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o tc_diag-tc_diag.obj `if test -f 'tc_diag.cc'; then $(CYGPATH_W) 'tc_diag.cc'; else $(CYGPATH_W) '$(srcdir)/tc_diag.cc'; fi`
+
+tc_diag-python_tc_diag.o: python_tc_diag.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tc_diag_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT tc_diag-python_tc_diag.o -MD -MP -MF $(DEPDIR)/tc_diag-python_tc_diag.Tpo -c -o tc_diag-python_tc_diag.o `test -f 'python_tc_diag.cc' || echo '$(srcdir)/'`python_tc_diag.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tc_diag-python_tc_diag.Tpo $(DEPDIR)/tc_diag-python_tc_diag.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='python_tc_diag.cc' object='tc_diag-python_tc_diag.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tc_diag_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o tc_diag-python_tc_diag.o `test -f 'python_tc_diag.cc' || echo '$(srcdir)/'`python_tc_diag.cc
+
+tc_diag-python_tc_diag.obj: python_tc_diag.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tc_diag_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT tc_diag-python_tc_diag.obj -MD -MP -MF $(DEPDIR)/tc_diag-python_tc_diag.Tpo -c -o tc_diag-python_tc_diag.obj `if test -f 'python_tc_diag.cc'; then $(CYGPATH_W) 'python_tc_diag.cc'; else $(CYGPATH_W) '$(srcdir)/python_tc_diag.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tc_diag-python_tc_diag.Tpo $(DEPDIR)/tc_diag-python_tc_diag.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='python_tc_diag.cc' object='tc_diag-python_tc_diag.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tc_diag_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o tc_diag-python_tc_diag.obj `if test -f 'python_tc_diag.cc'; then $(CYGPATH_W) 'python_tc_diag.cc'; else $(CYGPATH_W) '$(srcdir)/python_tc_diag.cc'; fi`
 
 tc_diag-tc_diag_conf_info.o: tc_diag_conf_info.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tc_diag_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT tc_diag-tc_diag_conf_info.o -MD -MP -MF $(DEPDIR)/tc_diag-tc_diag_conf_info.Tpo -c -o tc_diag-tc_diag_conf_info.o `test -f 'tc_diag_conf_info.cc' || echo '$(srcdir)/'`tc_diag_conf_info.cc
@@ -619,7 +638,8 @@ clean: clean-am
 clean-am: clean-binPROGRAMS clean-generic mostlyclean-am
 
 distclean: distclean-am
-		-rm -f ./$(DEPDIR)/tc_diag-tc_diag.Po
+		-rm -f ./$(DEPDIR)/tc_diag-python_tc_diag.Po
+	-rm -f ./$(DEPDIR)/tc_diag-tc_diag.Po
 	-rm -f ./$(DEPDIR)/tc_diag-tc_diag_conf_info.Po
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
@@ -666,7 +686,8 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-		-rm -f ./$(DEPDIR)/tc_diag-tc_diag.Po
+		-rm -f ./$(DEPDIR)/tc_diag-python_tc_diag.Po
+	-rm -f ./$(DEPDIR)/tc_diag-tc_diag.Po
 	-rm -f ./$(DEPDIR)/tc_diag-tc_diag_conf_info.Po
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
