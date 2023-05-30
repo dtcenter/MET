@@ -10,8 +10,9 @@ include ${top_srcdir}/Make-include
 
 # The program
 
-bin_PROGRAMS   = tc_diag
+bin_PROGRAMS    = tc_diag
 tc_diag_SOURCES = tc_diag.cc \
+	python_tc_diag.cc \
 	tc_diag_conf_info.cc
 tc_diag_CPPFLAGS = ${MET_CPPFLAGS}
 tc_diag_LDFLAGS = ${MET_LDFLAGS}
@@ -44,4 +45,5 @@ tc_diag_LDADD = -lvx_stat_out \
 	$(FLIBS)
 
 EXTRA_DIST = tc_diag_conf_info.h \
+	python_tc_diag.h \
 	tc_diag.h

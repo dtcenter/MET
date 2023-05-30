@@ -39,6 +39,7 @@ using namespace netCDF;
 
 #include "main.h"
 #include "tc_diag.h"
+#include "python_tc_diag.h"
 
 #include "series_data.h"
 
@@ -770,7 +771,7 @@ ConcatString build_out_file_name(const TrackInfo *trk_ptr,
 void close_out_files() {
 
    // Write output files for each track
-   map<std::string,OutFileInfo>::iterator it;
+   map<string,OutFileInfo>::iterator it;
    for(it = out_map.begin(); it != out_map.end(); it++) {
       it->second.clear();
    }
@@ -967,19 +968,30 @@ void process_fields(const TrackInfoArray &tracks,
       vi = (VarInfo *) 0;
 
    } // end for i
-/* JHG comment out to see if this messing up the parallel
+
    // Process the temp files
    for(i=0; i<tmp_key_sa.n(); i++) {
 
       // Close temp file
       tmp_map[tmp_key_sa[i]].close();
 
-      // JHG TODO run python diagnostic scripts here
+      // JHG, this should be defined elsewhere
+      map<string,string> tmp_diag_map;
 
+      // Run python diagnostic scripts
+      for(j=0; j<di.diag_script.n(); j++) {
+
+         // Run the python script
+         python_tc_diag(di.diag_script[j].c_str(),
+            tmp_map[tmp_key_sa[i]].tmp_file, tmp_diag_map);
+
+      } // end for j
+
+      // JHG, keep the temp file for creation of NetCDF output
       // Delete temp file
-      tmp_map[tmp_key_sa[i]].clear();
+      // tmp_map[tmp_key_sa[i]].clear();
    }
-*/
+
    return;
 }
 
@@ -1146,7 +1158,7 @@ void TmpFileInfo::init_from_scratch() {
 void TmpFileInfo::open(const TrackInfo *t_ptr,
                        const TrackPoint *p_ptr,
                        const DomainInfo &di,
-                       const std::set<double> &prs_lev) {
+                       const set<double> &prs_lev) {
 
    // Set pointers
    trk_ptr = t_ptr;
@@ -1213,7 +1225,7 @@ void TmpFileInfo::clear() {
 ////////////////////////////////////////////////////////////////////////
 
 void TmpFileInfo::setup_nc_file(const DomainInfo &di,
-                                const std::set<double> &prs_lev) {
+                                const set<double> &prs_lev) {
 
    // Open the output NetCDF file
    tmp_out = open_ncfile(tmp_file.c_str(), true);

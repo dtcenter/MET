@@ -124,6 +124,11 @@ void DomainInfo::parse_domain_info(Dictionary &dict) {
    // Conf: diag_script
    diag_script = dict.lookup_string_array(conf_key_diag_script);
 
+   // Expand MET_BASE
+   for(int i=0; i<diag_script.n(); i++) {
+      diag_script.set(i, replace_path(diag_script[i].c_str()));
+   }
+
    return;
 }
 
