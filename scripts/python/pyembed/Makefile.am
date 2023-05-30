@@ -25,11 +25,13 @@ pyembed_DATA = \
      read_tmp_dataplane.py \
      read_tmp_ascii.py \
      read_tmp_point_nc.py \
+     read_tmp_tc_diag.py \
      set_python_env.py \
      write_tmp_dataplane.py \
      write_tmp_point.py \
      write_tmp_point_nc.py \
-     write_tmp_mpr.py
+     write_tmp_mpr.py \
+     write_tmp_tc_diag.py
 
 EXTRA_DIST = ${pyembed_DATA}
 

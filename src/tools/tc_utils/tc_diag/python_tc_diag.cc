@@ -12,6 +12,7 @@ using namespace std;
 
 #include <map>
 
+#include "vx_config.h"
 #include "vx_python3_utils.h"
 #include "vx_log.h"
 
@@ -69,12 +70,9 @@ bool python_tc_diag(const ConcatString &script_name,
 bool straight_python_tc_diag(const ConcatString &script_name,
         const ConcatString &tmp_file_name,
         map<string,string> &diag_map) {
-   PyObject * module_obj      = 0;
-   PyObject * module_dict_obj = 0;
-   PyObject * key_obj         = 0;
-   PyObject * diag_dict_obj   = 0;
+   const char *method_name = "straight_python_tc_diag()";
 
-   mlog << Debug(3) << "Running python diagnostics script ("
+   mlog << Debug(3) << "Running Python diagnostics script ("
         << script_name << " " << tmp_file_name << ").\n";
 
    // Prepare arguments
@@ -90,7 +88,7 @@ bool straight_python_tc_diag(const ConcatString &script_name,
 
    if(PyErr_Occurred()) {
       PyErr_Print();
-      mlog << Warning << "\nstraight_python_tc_diag() -> "
+      mlog << Warning << "\n" << method_name << " -> "
            << "an error occurred initializing python\n\n";
       return(false);
    }
@@ -115,7 +113,7 @@ bool straight_python_tc_diag(const ConcatString &script_name,
    ConcatString script_base = script_name.basename();
    script_base.chomp(".py");
 
-   module_obj = PyImport_ImportModule(script_base.c_str());
+   PyObject *module_obj = PyImport_ImportModule(script_base.c_str());
 
    // Reload the module, if needed
    if(do_reload) {
@@ -124,36 +122,33 @@ bool straight_python_tc_diag(const ConcatString &script_name,
 
    if(PyErr_Occurred()) {
       PyErr_Print();
-      mlog << Warning << "\nstraight_python_tc_diag() -> "
+      mlog << Warning << "\n" << method_name << " -> "
            << "an error occurred importing module \""
            << script_name << "\"\n\n";
       return(false);
    }
 
    if(!module_obj) {
-      mlog << Warning << "\nstraight_python_tc_diag() -> "
-           << "error running python script \""
+      mlog << Warning << "\n" << method_name << " -> "
+           << "error running Python script \""
            << script_name << "\"\n\n";
       return(false);
    }
 
    // Get the namespace for the module (as a dictionary)
-   module_dict_obj = PyModule_GetDict(module_obj);
+   PyObject *module_dict_obj = PyModule_GetDict(module_obj);
+   PyObject *key_obj = PyUnicode_FromString(tc_diag_dict_name);
+   PyObject *data_obj = PyDict_GetItem (module_dict_obj, key_obj);
 
-   // Get handle to the object of interest from the module_dict
-   key_obj = PyUnicode_FromString(tc_diag_dict_name);
-
-   diag_dict_obj = PyDict_GetItem (module_dict_obj, key_obj);
-
-   if(!diag_dict_obj) {
-      mlog << Warning << "\nstraight_python_tc_diag() -> "
+   if(!data_obj || !PyDict_Check(data_obj)) {
+      mlog << Warning << "\n" << method_name << " -> "
            << "trouble reading data from \""
            << script_name << "\"\n\n";
       return(false);
    }
 
    // Populate the diagnostics map
-   diag_map_from_python_dict(diag_dict_obj, diag_map);
+   diag_map_from_python_dict(data_obj, diag_map);
 
    return(true);
 }
@@ -163,195 +158,123 @@ bool straight_python_tc_diag(const ConcatString &script_name,
 bool tmp_nc_tc_diag(const ConcatString &script_name,
         const ConcatString &tmp_file_name,
         map<string,string> &diag_map) {
-/*
-// JHG work here
-int j;
-int status;
-ConcatString command;
-ConcatString path;
-ConcatString tmp_nc_path;
-const char * tmp_dir = 0;
-Wchar_Argv wa;
+   const char *method_name = "tmp_nc_tc_diag()";
+   int i, status;
+   ConcatString command;
+   ConcatString path;
+   ConcatString tmp_nc_path;
+   const char * tmp_dir = 0;
+   Wchar_Argv wa;
 
-mlog << Debug(3) << "Calling " << user_ppath
-     << " to run user's python script (" << user_script_name
-     << ").\n";
+   mlog << Debug(3) << "Calling " << user_ppath
+        << " to run Python diagnostics script ("
+        << script_name << " " << tmp_file_name << ").\n";
 
-tmp_dir = getenv ("MET_TMP_DIR");
+   // Create a temp file
+   tmp_dir = getenv ("MET_TMP_DIR");
+   if(!tmp_dir) tmp_dir = default_tmp_dir;
 
-if ( ! tmp_dir )  tmp_dir = default_tmp_dir;
-
-path << cs_erase
+   path << cs_erase
      << tmp_dir << '/'
      << tmp_nc_base_name;
 
-tmp_nc_path = make_temp_file_name(path.text(), 0);
+   tmp_nc_path = make_temp_file_name(path.text(), 0);
 
-command << cs_erase
-        << user_ppath                    << ' '    //  user's path to python
-        << replace_path(write_tmp_nc)    << ' '    //  write_tmp_nc.py
-        << tmp_nc_path                   << ' '    //  tmp_nc output filename
-        << user_script_name;                       //  user's script name
+   // Construct the system command
+   command << cs_erase
+           << user_ppath                   << ' ' // user's path to python
+           << replace_path(write_tmp_diag) << ' ' // write_tmp_diag.py
+           << tmp_nc_path                  << ' ' // tmp_nc output filename
+           << script_name                  << ' ' // python script name
+           << tmp_file_name;                      // input temp NetCDF file
 
-for (j=1; j<user_script_argc; ++j)  {   //  j starts at one, here
+   mlog << Debug(4) << "Writing temporary Python dataplane file:\n\t"
+        << command << "\n";
 
-   command << ' ' << user_script_argv[j];
+   status = system(command.text());
 
-}
+   if(status) {
+      mlog << Error << "\n" << method_name << " -> "
+           << "command \"" << command.text() << "\" failed ... status = "
+           << status << "\n\n";
+      exit(1);
+   }
 
-mlog << Debug(4) << "Writing temporary Python dataplane file:\n\t"
-     << command << "\n";
+   // Reload the module if GP has already been initialized
+   bool do_reload = GP.is_initialized;
 
-status = system(command.text());
+   GP.initialize();
 
-if ( status )  {
+   if(PyErr_Occurred()) {
+      PyErr_Print();
+      mlog << Warning << "\n" << method_name << " -> "
+           << "an error occurred initializing python\n\n";
+      return(false);
+   }
 
-   mlog << Error << "\ntmp_nc_dataplane() -> "
-        << "command \"" << command.text() << "\" failed ... status = "
-        << status << "\n\n";
+   // Prepare arguments to read input
+   StringArray arg_sa;
+   arg_sa.add(read_tmp_diag);
+   arg_sa.add(tmp_nc_path);
+   wa.set(arg_sa);
 
-   exit ( 1 );
+   PySys_SetArgv (wa.wargc(), wa.wargv());
 
-}
+   mlog << Debug(4) << "Reading temporary Python diagnostics file: "
+        << tmp_nc_path << "\n";
 
-   //
-   //  if the global python object has already been initialized,
-   //  we need to reload the module
-   //
+   // Import the python wrapper script as a module
+   path = read_tmp_diag;
+   path = path.basename();
+   path.chomp(".py");
 
-bool do_reload = GP.is_initialized;
+   PyObject * module_obj = PyImport_ImportModule(path.c_str());
 
-GP.initialize();
+   // Reload the module, if needed
+   if(do_reload) {
+      module_obj = PyImport_ReloadModule (module_obj);
+   }
 
-   //
-   //   start up the python interpreter
-   //
-
-if ( PyErr_Occurred() )  {
-
-   PyErr_Print();
-
-   mlog << Warning << "\ntmp_nc_dataplane() -> "
-        << "an error occurred initializing python\n\n";
-
-   return ( false );
-
-}
-
-   //
-   //  set the arguments
-   //
-
-StringArray a;
-
-a.add(read_tmp_nc);
-
-a.add(tmp_nc_path);
-
-wa.set(a);
-
-PySys_SetArgv (wa.wargc(), wa.wargv());
-
-mlog << Debug(4) << "Reading temporary Python dataplane file: "
-     << tmp_nc_path << "\n";
-
-   //
-   //  import the python wrapper script as a module
-   //
-
-path = get_short_name(read_tmp_nc);
-
-PyObject * module_obj = PyImport_ImportModule (path.text());
-
-   //
-   //  if needed, reload the module
-   //
-
-if ( do_reload )  {
-
-   module_obj = PyImport_ReloadModule (module_obj);
-
-}
-
-if ( PyErr_Occurred() )  {
-
-   PyErr_Print();
-
-   mlog << Warning << "\ntmp_nc_dataplane() -> "
+   if(PyErr_Occurred()) {
+      PyErr_Print();
+      mlog << Warning << "\n" << method_name << " -> "
         << "an error occurred importing module "
         << '\"' << path << "\"\n\n";
+      return(false);
+   }
 
-   return ( false );
+   if(!module_obj) {
+      mlog << Warning << "\n" << method_name << " -> "
+        << "error running Python script\n\n";
+      return(false);
+   }
 
-}
+   // Get the namespace for the module (as a dictionary)
+   PyObject *module_dict_obj = PyModule_GetDict(module_obj);
+   PyObject *key_obj = PyUnicode_FromString(tc_diag_dict_name);
+   PyObject *data_obj = PyDict_GetItem(module_dict_obj, key_obj);
 
-if ( ! module_obj )  {
+   if(!data_obj || !PyDict_Check(data_obj)) {
+      mlog << Warning << "\n" << method_name << " -> "
+           << "trouble reading data from \""
+           << script_name << "\"\n\n";
+      exit(1);
+   }
 
-   mlog << Warning << "\ntmp_nc_dataplane() -> "
-        << "error running python script\n\n";
+   // Populate the diagnostics map
+   diag_map_from_python_dict(data_obj, diag_map);
 
-   return ( false );
+   // Cleanup
+   remove_temp_file(tmp_nc_path);
 
-}
-
-   //
-   //  read the tmp_nc file
-   //
-
-   //
-   //   get the namespace for the module (as a dictionary)
-   //
-
-PyObject * module_dict_obj = PyModule_GetDict (module_obj);
-
-PyObject * key_obj = PyUnicode_FromString (tmp_nc_var_name);
-
-PyObject * data_obj = PyDict_GetItem (module_dict_obj, key_obj);
-
-if ( ! data_obj || ! PyDict_Check(data_obj) )  {
-
-   mlog << Error << "\ntmp_nc_dataplane() -> "
-        << "bad dict object\n\n";
-
-   exit ( 1 );
-
-}
-
-key_obj = PyUnicode_FromString (numpy_dict_name);
-
-PyObject * attrs_dict_obj = PyDict_GetItem (data_obj, key_obj);
-
-key_obj = PyUnicode_FromString (numpy_array_name);
-
-PyObject * numpy_array_obj = PyDict_GetItem (data_obj, key_obj);
-
-Python3_Numpy np;
-
-np.set(numpy_array_obj);
-
-dataplane_from_numpy_array(np, attrs_dict_obj, met_dp_out, met_grid_out, vinfo);
-
-   //
-   //  cleanup
-   //
-
-remove_temp_file(tmp_nc_path);
-
-   //
-   //  done
-   //
-*/
-
-   mlog << Warning << "\ntmp_nc_tc_diag() -> "
-        << "not yet implemented!\n\n";
-
-   return(false);
+   return(true);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void diag_map_from_python_dict(PyObject *diag_dict,
         map<string,string> &diag_map) {
+   const char *method_name = "diag_map_from_python_dict()";
    PyObject *key_obj = 0;
    PyObject *val_obj = 0;
    int status;
@@ -365,7 +288,7 @@ void diag_map_from_python_dict(PyObject *diag_dict,
 
       // All keys must be strings
       if(!PyUnicode_Check(key_obj)) {
-         mlog << Error << "\ndiag_map_from_python_dict() -> "
+         mlog << Error << "\n" << method_name << " -> "
               << "key is not a string!\n\n";
          exit(1);
       }
@@ -377,15 +300,15 @@ void diag_map_from_python_dict(PyObject *diag_dict,
       else if(PyLong_Check(val_obj))    val_str << (int) PyLong_AsLong(val_obj);
       else if(PyFloat_Check(val_obj))   val_str << PyFloat_AsDouble(val_obj);
       else {
-         mlog << Error << "\ndiag_map_from_python_dict() -> "
-              << "unsupported python data type for the \""
+         mlog << Error << "\n" << method_name << " -> "
+              << "unsupported Python data type for the \""
               << key_str << "\" diagnostic!\n\n";
          exit(1);
       }
 
       // Check for duplicates
       if(diag_map.count(key_str) > 0) {
-         mlog << Warning << "\ndiag_map_from_python_dict() -> "
+         mlog << Warning << "\n" << method_name << " -> "
               << "ignoring duplicate entry for TC diagnostic \""
               << key_str << "\" = \"" << val_str << "\"!\n\n";
       }
