@@ -24,8 +24,7 @@ except NameError:
 # Diagnostics dictionary
 tc_diag = {
    'Test100': 100,
-   'Test200': 200,
-   'TestStr': 'String'
+   'Test200': 200
 }
 
 print("Diagnostics:\t" + repr(tc_diag))

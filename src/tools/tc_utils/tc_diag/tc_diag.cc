@@ -631,7 +631,7 @@ void setup_out_files(const TrackInfoArray &tracks) {
       ConcatString key = get_out_key(tracks[i]);
 
       // Check for duplicates
-      if(out_map.count(key) > 0) {
+      if(out_file_map.count(key) > 0) {
          mlog << Error << "\nsetup_out_files()-> "
               << "found multiple tracks for key \""
               << key << "\"!\n\n";
@@ -639,13 +639,13 @@ void setup_out_files(const TrackInfoArray &tracks) {
       }
 
       // Add new map entry
-      out_map[key] = out_info;
+      out_file_map[key] = out_info;
 
       mlog << Debug(3) << "Preparing output files for "
            << key << " track.\n";
 
       // Store the track
-      out_map[key].trk_ptr = &tracks[i];
+      out_file_map[key].trk_ptr = &tracks[i];
 
       // NetCDF cylindrical coordinates
       if(conf_info.nc_rng_azi_flag) {
@@ -658,40 +658,36 @@ void setup_out_files(const TrackInfoArray &tracks) {
             suffix_cs << "_cyl_grid_"
                       << conf_info.domain_info[j].domain
                       << ".nc";
-            file_name = build_out_file_name(out_map[key].trk_ptr,
+            file_name = build_out_file_name(out_file_map[key].trk_ptr,
                                             suffix_cs.c_str());
-
-            out_map[key].nc_rng_azi_file_map[conf_info.domain_info[j].domain] = file_name;
-            out_map[key].nc_rng_azi_out_map[conf_info.domain_info[j].domain] =
-               out_map[key].setup_nc_file(file_name);
          } // end for j
       }
 
       // NetCDF diagnostics output
       if(conf_info.nc_diag_flag) {
-         out_map[key].nc_diag_file =
-            build_out_file_name(out_map[key].trk_ptr, "_diag.nc");
-         out_map[key].nc_diag_out =
-            out_map[key].setup_nc_file(out_map[key].nc_diag_file);
+         out_file_map[key].nc_diag_file =
+            build_out_file_name(out_file_map[key].trk_ptr, "_diag.nc");
+         out_file_map[key].nc_diag_out =
+            out_file_map[key].setup_nc_file(out_file_map[key].nc_diag_file);
       }
 
       // CIRA diagnostics output
       if(conf_info.cira_diag_flag) {
-         out_map[key].cira_diag_file =
-            build_out_file_name(out_map[key].trk_ptr, "_diag.txt");
-         out_map[key].cira_diag_out = new ofstream;
-         out_map[key].cira_diag_out->open(out_map[key].cira_diag_file);
+         out_file_map[key].cira_diag_file =
+            build_out_file_name(out_file_map[key].trk_ptr, "_diag.txt");
+         out_file_map[key].cira_diag_out = new ofstream;
+         out_file_map[key].cira_diag_out->open(out_file_map[key].cira_diag_file);
 
-         if(!(*out_map[key].cira_diag_out)) {
+         if(!(*out_file_map[key].cira_diag_out)) {
             mlog << Error << "\nsetup_out_files()-> "
                  << "can't open the output file \""
-                 << out_map[key].cira_diag_file
+                 << out_file_map[key].cira_diag_file
                  << "\" for writing!\n\n";
             exit(1);
          }
 
          // Fixed width
-         out_map[key].cira_diag_out->setf(ios::fixed);
+         out_file_map[key].cira_diag_out->setf(ios::fixed);
       }
    } // end for i
 
@@ -772,7 +768,7 @@ void close_out_files() {
 
    // Write output files for each track
    map<string,OutFileInfo>::iterator it;
-   for(it = out_map.begin(); it != out_map.end(); it++) {
+   for(it = out_file_map.begin(); it != out_file_map.end(); it++) {
       it->second.clear();
    }
 
@@ -854,7 +850,7 @@ void process_track_points(const TrackInfoArray& tracks) {
                                                conf_info.domain_info[j].domain);
 
             // Check for duplicates
-            if(tmp_map.count(tmp_key) > 0) {
+            if(tmp_file_map.count(tmp_key) > 0) {
                mlog << Error << "\nprocess_track_points()-> "
                     << "found multiple temp file entries for key \""
                     << tmp_key << "\"!\n\n";
@@ -862,13 +858,13 @@ void process_track_points(const TrackInfoArray& tracks) {
             }
 
             // Add new map entry
-            tmp_map[tmp_key] = tmp_info;
+            tmp_file_map[tmp_key] = tmp_info;
 
             // Setup a temp file for the current point
-            tmp_map[tmp_key].open(&tracks[k],
-                                  &tracks[k][i_pnt],
-                                  conf_info.domain_info[j],
-                                  conf_info.pressure_levels);
+            tmp_file_map[tmp_key].open(&tracks[k],
+                                       &tracks[k][i_pnt],
+                                       conf_info.domain_info[j],
+                                       conf_info.pressure_levels);
 
          } // end for k
       } // end for j
@@ -959,7 +955,7 @@ void process_fields(const TrackInfoArray &tracks,
          // Perhaps do 2 passes... process the vortex removal first?
 
          // Compute and write the cylindrical coordinate data
-         tmp_map[tmp_key].write_nc_data(vi, data_dp, grid_dp);
+         tmp_file_map[tmp_key].write_nc_data(vi, data_dp, grid_dp);
 
       } // end for j
 
@@ -973,23 +969,21 @@ void process_fields(const TrackInfoArray &tracks,
    for(i=0; i<tmp_key_sa.n(); i++) {
 
       // Close temp file
-      tmp_map[tmp_key_sa[i]].close();
-
-      // JHG, this should be defined elsewhere
-      map<string,string> tmp_diag_map;
+      tmp_file_map[tmp_key_sa[i]].close();
 
       // Run python diagnostic scripts
       for(j=0; j<di.diag_script.n(); j++) {
 
          // Run the python script
          python_tc_diag(di.diag_script[j].c_str(),
-            tmp_map[tmp_key_sa[i]].tmp_file, tmp_diag_map);
+            tmp_file_map[tmp_key_sa[i]].tmp_file,
+            tmp_file_map[tmp_key_sa[i]].diag_map);
 
       } // end for j
 
       // JHG, keep the temp file for creation of NetCDF output
       // Delete temp file
-      // tmp_map[tmp_key_sa[i]].clear();
+      // tmp_file_map[tmp_key_sa[i]].clear();
    }
 
    return;
@@ -1033,32 +1027,8 @@ void OutFileInfo::clear() {
 
    trk_ptr = (TrackInfo *) 0;
 
-   // Write NetCDF cylindrical coordinates file
-   if(nc_rng_azi_out_map.size() > 0) {
-
-// JHG: note that we will NOT want output files for all domains, only the ones that apply
-
-      map<string,NcFile *>::iterator it;
-      for(it  = nc_rng_azi_out_map.begin();
-          it != nc_rng_azi_out_map.end();
-          it++) {
-
-         mlog << Debug(1) << "Writing output file: "
-              << nc_rng_azi_file_map[it->first] << "\n";
-
-         // Close the output file
-         it->second->close();
-         delete it->second;
-         it->second = (NcFile *) 0;
-
-         // Clear the file name
-         nc_rng_azi_file_map[it->first].clear();
-      }
-
-      // Empty the maps
-      nc_rng_azi_file_map.clear();
-      nc_rng_azi_out_map.clear();
-   }
+   // Clear the diagnostics maps
+   // JHG lead_to_diag_map.clear();
 
    // Write NetCDF diagnostics file
    if(nc_diag_out) {
@@ -1074,7 +1044,7 @@ void OutFileInfo::clear() {
    }
    nc_diag_file.clear();
 
-   // Write CIRA diagnostics files
+   // Write CIRA diagnostics file
    if(cira_diag_out) {
 
       mlog << Debug(1) << "Writing output file: "
@@ -1311,7 +1281,6 @@ void TmpFileInfo::setup_nc_file(const DomainInfo &di,
    write_tc_data(tmp_out, ra_grid, 0, lon_var, lon_arr);
 
    // Write valid and lead times
-
    write_tc_lead_time(tmp_out, 0, lead_str_var, lead_sec_var,
                       pnt_ptr->lead());
 

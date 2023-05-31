@@ -34,21 +34,21 @@ static const char tc_diag_dict_name [] = "tc_diag";
 
 static bool straight_python_tc_diag(const ConcatString &script_name,
                const ConcatString &tmp_file_name,
-               map<string,string> &diag_map);
+               map<string,double> &diag_map);
 
 static bool tmp_nc_tc_diag(const ConcatString &script_name,
                const ConcatString &tmp_file_name,
-               map<string,string> &diag_map);
+               map<string,double> &diag_map);
 
 static void diag_map_from_python_dict(
                PyObject *diag_dict,
-               map<string,string> &diag_map);
+               map<string,double> &diag_map);
 
 ////////////////////////////////////////////////////////////////////////
 
 bool python_tc_diag(const ConcatString &script_name,
         const ConcatString &tmp_file_name,
-        map<string,string> &diag_map) {
+        map<string,double> &diag_map) {
    bool status = false;
 
    // Check for MET_PYTHON_EXE
@@ -69,7 +69,7 @@ bool python_tc_diag(const ConcatString &script_name,
 
 bool straight_python_tc_diag(const ConcatString &script_name,
         const ConcatString &tmp_file_name,
-        map<string,string> &diag_map) {
+        map<string,double> &diag_map) {
    const char *method_name = "straight_python_tc_diag()";
 
    mlog << Debug(3) << "Running Python diagnostics script ("
@@ -157,7 +157,7 @@ bool straight_python_tc_diag(const ConcatString &script_name,
 
 bool tmp_nc_tc_diag(const ConcatString &script_name,
         const ConcatString &tmp_file_name,
-        map<string,string> &diag_map) {
+        map<string,double> &diag_map) {
    const char *method_name = "tmp_nc_tc_diag()";
    int i, status;
    ConcatString command;
@@ -165,6 +165,11 @@ bool tmp_nc_tc_diag(const ConcatString &script_name,
    ConcatString tmp_nc_path;
    const char * tmp_dir = 0;
    Wchar_Argv wa;
+
+   // TODO: Implement read/write temp tc_diag python functionality
+   mlog << Error << "\n" << method_name << " -> "
+        << "not yet fully implemented ... exiting!\n\n";
+   exit(1);
 
    mlog << Debug(3) << "Calling " << user_ppath
         << " to run Python diagnostics script ("
@@ -273,11 +278,12 @@ bool tmp_nc_tc_diag(const ConcatString &script_name,
 ////////////////////////////////////////////////////////////////////////
 
 void diag_map_from_python_dict(PyObject *diag_dict,
-        map<string,string> &diag_map) {
+        map<string,double> &diag_map) {
    const char *method_name = "diag_map_from_python_dict()";
    PyObject *key_obj = 0;
    PyObject *val_obj = 0;
    int status;
+   double val;
    long pos;
 
    // Initialize
@@ -293,16 +299,18 @@ void diag_map_from_python_dict(PyObject *diag_dict,
          exit(1);
       }
 
-      // Parse key and value as strings
+      // Parse key as a string and value as a number
       string key_str = PyUnicode_AsUTF8(key_obj);
-      ConcatString val_str;
-           if(PyUnicode_Check(val_obj)) val_str << PyUnicode_AsUTF8(val_obj);
-      else if(PyLong_Check(val_obj))    val_str << (int) PyLong_AsLong(val_obj);
-      else if(PyFloat_Check(val_obj))   val_str << PyFloat_AsDouble(val_obj);
+      if(PyLong_Check(val_obj)) {
+         val = (double) PyLong_AsLong(val_obj);
+      }
+      else if(PyFloat_Check(val_obj)) {
+         val = PyFloat_AsDouble(val_obj);
+      }
       else {
          mlog << Error << "\n" << method_name << " -> "
-              << "unsupported Python data type for the \""
-              << key_str << "\" diagnostic!\n\n";
+              << "TC diagnostic \"" << key_str
+              << "\" not specified as a numeric Python data type!\n\n";
          exit(1);
       }
 
@@ -310,13 +318,13 @@ void diag_map_from_python_dict(PyObject *diag_dict,
       if(diag_map.count(key_str) > 0) {
          mlog << Warning << "\n" << method_name << " -> "
               << "ignoring duplicate entry for TC diagnostic \""
-              << key_str << "\" = \"" << val_str << "\"!\n\n";
+              << key_str << "\" = " << val << "!\n\n";
       }
       // Store key/value pair in the dictionary
       else {
          mlog << Debug(5) << "Storing TC diagnostic \""
-              << key_str << "\" = \"" << val_str << "\"\n";
-         diag_map[key_str] = val_str;
+              << key_str << "\" = " << val << "\n";
+         diag_map[key_str] = val;
       }
    } // end while
 

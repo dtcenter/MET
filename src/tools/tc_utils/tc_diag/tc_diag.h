@@ -107,10 +107,8 @@ class OutFileInfo {
       // Track information
       const TrackInfo *trk_ptr; // not allocated
 
-      // NetCDF Cylindrical Coordinates output
-      // Mapping of domain name to output files
-      std::map<std::string,ConcatString>     nc_rng_azi_file_map;
-      std::map<std::string,netCDF::NcFile *> nc_rng_azi_out_map;
+      // Mapping of lead times to diagnostic values
+      std::map<int, std::map<std::string,std::string>> lead_to_diag_map;
 
       // NetCDF Diagnostics output
       ConcatString    nc_diag_file;
@@ -126,7 +124,7 @@ class OutFileInfo {
       netCDF::NcFile *setup_nc_file(const string &);
 };
 
-static std::map<std::string,OutFileInfo> out_map;
+static std::map<std::string,OutFileInfo> out_file_map;
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -172,6 +170,9 @@ class TmpFileInfo {
       netCDF::NcDim azi_dim;
       netCDF::NcDim prs_dim;
 
+      // Mapping of diagnostic names to values
+      std::map<std::string,double> diag_map;
+
       void open(const TrackInfo *, const TrackPoint *,
                 const DomainInfo &,
                 const std::set<double> &);
@@ -186,7 +187,7 @@ class TmpFileInfo {
                          const Grid &);
 };
 
-static std::map<std::string,TmpFileInfo> tmp_map;
+static std::map<std::string,TmpFileInfo> tmp_file_map;
 
 ////////////////////////////////////////////////////////////////////////
 
