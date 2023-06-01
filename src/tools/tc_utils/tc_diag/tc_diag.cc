@@ -112,30 +112,19 @@ static void compute_lat_lon(TcrmwGrid&, double *, double *);
 
 ////////////////////////////////////////////////////////////////////////
 
-// JHG, things to do as of 4/14/2023:
-// - XXX Change order of dimensions - DONE
-//   from: double TMP_P500(range, azimuth, time) ;
-//     to: double TMP_P500(time, pressure, range, azimuth) ;
-// - ??? Parellelize the processing of valid times - ON HOLD due to runtime errors
-// - XXX Add NetCDF variable attributes - DONE
-// - Write 3D variables to NetCDF output file
-// - Write variable names track_lat/track_lon/grid_lat/grid_lon
-// - Call the diagnostic scripts on these temp NC files
-// - Stitch together the temp files into an output file
-// - Do the ACTUAL list of variables from Robert
-// - XXX Fix the azimuth computations - DONE
+// TODO, as of 6/1/2023:
+// - Write the CIRA ascii diagnostics output file format.
+// - get_var_names() returns a multimap that is sorted by the order of
+//   the variable names. This reorders the vars in the NetCDF cyl coord
+//   output. Would prefer that reordering not happen.
+// - Parellelize the processing of valid times - ON HOLD due to runtime errors
+// - Update the python scripts to actually compute the diagnostics.
 // - Check if the azimuths are computed the way Robert says they should be
-// - Check the actual lat/lon locations computes. The lon's don't look correct
-//
-// Add back in the "regrid" dictionary to control how regridding to cyl coord is done?
-//
-// Storm motion computation (from 4/7/23):
-//   - DONE - Include the full track in each temporary NetCDF file
-//   - DONE - Write the full array of (lat, lon) points for the entire track for simplicity.
-//   - For each track point, write the vmax and mslp as a single value for that time.
-//
-// JHG print a WARNING message if the Diag Track differs from the Tech Id for the data files
-//     AND vortex removal has not been requested. Not sure where in the logic.
+// - Add support for python embedding with $MET_PYTHON_EXE set
+// - Add hooks for vortex removal logic.
+//   Print a WARNING message if the Diag Track differs from the Tech Id
+//   for the data files AND vortex removal has not been requested.
+// - Add back in the "regrid" dictionary to control how regridding to cyl coord is done?
 
 int met_main(int argc, char *argv[]) {
 
@@ -1023,17 +1012,16 @@ void process_fields(const TrackInfoArray &tracks,
    // Loop over the current set of temp files
    for(i=0; i<tmp_key_sa.n(); i++) {
 
-      // Run each python diagnostic script
+      // Run the python diagnostic scripts
       for(j=0; j<di.diag_script.n(); j++) {
+
          python_tc_diag(di.diag_script[j].c_str(),
             tmp_file_map[tmp_key_sa[i]].tmp_file,
             tmp_file_map[tmp_key_sa[i]].diag_map);
-      }
 
-      // JHG, keep the temp file for creation of NetCDF output
-      // Delete temp file
-      // tmp_file_map[tmp_key_sa[i]].clear();
-   }
+      } // end for j
+
+   } // end for i
 
    return;
 }
@@ -1503,16 +1491,10 @@ void TmpFileInfo::close() {
 
 void TmpFileInfo::clear() {
 
-   // JHG This causes this runtime error:
-   //   HDF5-DIAG: Error detected in HDF5 (1.8.18) thread 0:
-   //   #000: H5F.c line 648 in H5Fflush(): invalid file identifier
-   //   major: Invalid arguments to routine
-   //   minor: Inappropriate type
-
-   // JHG close();
-
    trk_ptr = (TrackInfo *) 0;
    pnt_ptr = (TrackPoint *) 0;
+
+   diag_map.clear();
 
    grid_out.clear();
    ra_grid.clear();
@@ -1522,8 +1504,12 @@ void TmpFileInfo::clear() {
    domain.clear();
 
    // Delete the temp file
-   if(tmp_file.nonempty()) remove_temp_file(tmp_file);
+   if(tmp_out) {
 
+      remove_temp_file(tmp_file);
+
+      tmp_out = (NcFile *) 0;
+   }
    tmp_file.clear();
 
    return;
