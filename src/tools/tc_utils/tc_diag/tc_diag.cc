@@ -114,6 +114,7 @@ static void compute_lat_lon(TcrmwGrid&, double *, double *);
 
 // TODO, as of 6/1/2023:
 // - Write the CIRA ascii diagnostics output file format.
+// - Instead of reading DataPlanes one at a time, read them all at once.
 // - get_var_names() returns a multimap that is sorted by the order of
 //   the variable names. This reorders the vars in the NetCDF cyl coord
 //   output. Would prefer that reordering not happen.
@@ -877,7 +878,7 @@ void process_track_points(const TrackInfoArray& tracks) {
       // Loop over the domains to be processed
       for(j=0; j<conf_info.domain_info.size(); j++) {
 
-         mlog << Debug(2) << "Processing valid time "
+         mlog << Debug(3) << "Processing valid time "
               << unix_to_yyyymmddhh(valid_ta[i]) << " \""
               << conf_info.domain_info[j].domain
               << "\" domain.\n";
