@@ -874,14 +874,14 @@ void process_track_points(const TrackInfoArray& tracks) {
    // Loop over the unique valid times
    for(i=0; i<valid_ta.n(); i++) {
 
-      mlog << Debug(2) << "Processing valid time: "
-           << unix_to_yyyymmddhh(valid_ta[i]) << "\n";
-
       // Loop over the domains to be processed
       for(j=0; j<conf_info.domain_info.size(); j++) {
 
-         mlog << Debug(2) << "Processing domain name: "
-              << conf_info.domain_info[j].domain << "\n";
+         mlog << Debug(2) << "Processing the \""
+              << conf_info.domain_info[j].domain
+              << "\" domain for the \""
+              << unix_to_yyyymmddhh(valid_ta[i])
+              << "\" valid time.\n";
 
          // Setup a temp file for this valid time in each track
          for(k=0; k<tracks.n(); k++) {
