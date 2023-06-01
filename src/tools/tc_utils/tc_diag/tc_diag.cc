@@ -71,11 +71,16 @@ static void process_track_files(const StringArray&,
                                 TrackInfoArray&);
 static void process_track_points(const TrackInfoArray &);
 static void process_fields(const TrackInfoArray &,
-                           unixtime, int,
+                           const unixtime, int,
                            const string &,
                            const DomainInfo &);
-static bool is_keeper(const ATCFLineBase *);
+static void process_out_files(const TrackInfoArray &);
 
+static void merge_tmp_files(const vector<TmpFileInfo *>);
+static void copy_coord_vars(NcFile *to_nc, NcFile *from_nc);
+static void copy_time_vars(NcFile *to_nc, NcFile *from_nc, int);
+
+static bool is_keeper(const ATCFLineBase *);
 static void set_deck(const StringArray&);
 static void set_atcf_source(const StringArray&,
                             StringArray&,
@@ -95,9 +100,15 @@ static ConcatString build_tmp_file_name(const TrackInfo *,
                                         const string &);
 static ConcatString build_out_file_name(const TrackInfo *,
                                         const char *);
-static void close_out_files();
 
-static void compute_lat_lon(TcrmwGrid&, double*, double*);
+static void write_tc_storm(NcFile *, const char *,
+                           const char *, const char *);
+
+static void write_tc_times(NcFile *, const NcDim &,
+                           const TrackInfo *,
+                           const TrackPoint *);
+
+static void compute_lat_lon(TcrmwGrid&, double *, double *);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -141,8 +152,8 @@ int met_main(int argc, char *argv[]) {
    // Process the gridded data
    process_track_points(tracks);
 
-   // Close the output files
-   close_out_files();
+   // Process the output files
+   process_out_files(tracks);
 
    return(0);
 }
@@ -647,22 +658,6 @@ void setup_out_files(const TrackInfoArray &tracks) {
       // Store the track
       out_file_map[key].trk_ptr = &tracks[i];
 
-      // NetCDF cylindrical coordinates
-      if(conf_info.nc_rng_azi_flag) {
-
-         // One output file per track and domain
-         for(j=0; j<conf_info.domain_info.size(); j++) {
-
-            // Build output file name
-            ConcatString suffix_cs, file_name;
-            suffix_cs << "_cyl_grid_"
-                      << conf_info.domain_info[j].domain
-                      << ".nc";
-            file_name = build_out_file_name(out_file_map[key].trk_ptr,
-                                            suffix_cs.c_str());
-         } // end for j
-      }
-
       // NetCDF diagnostics output
       if(conf_info.nc_diag_flag) {
          out_file_map[key].nc_diag_file =
@@ -764,17 +759,75 @@ ConcatString build_out_file_name(const TrackInfo *trk_ptr,
 
 ////////////////////////////////////////////////////////////////////////
 
-void close_out_files() {
+void write_tc_storm(NcFile *nc_out, const char *storm_id,
+                    const char *model, const char *domain) {
 
-   // Write output files for each track
-   map<string,OutFileInfo>::iterator it;
-   for(it = out_file_map.begin(); it != out_file_map.end(); it++) {
-      it->second.clear();
+   // Add the storm id
+   if(storm_id) {
+      NcVar sid_var = nc_out->addVar("storm_id", ncString);
+      sid_var.putVar(&storm_id);
+   }
+
+   // Add the model
+   if(model) {
+      NcVar mdl_var = nc_out->addVar("model", ncString);
+      mdl_var.putVar(&model);
+   }
+
+   // Add the domain name
+   if(domain) {
+      NcVar dmn_var = nc_out->addVar("domain", ncString);
+      dmn_var.putVar(&domain);
    }
 
    return;
 }
 
+////////////////////////////////////////////////////////////////////////
+
+void write_tc_times(NcFile *nc_out, const NcDim &vld_dim,
+                    const TrackInfo *trk_ptr,
+                    const TrackPoint *pnt_ptr) {
+
+   // Check pointer
+   if(!trk_ptr) {
+      mlog << Error << "\nwrite_tc_times() -> "
+           << "null track pointer!\n\n";
+      exit(1);
+   }
+
+   NcVar init_str_var, init_ut_var;
+   NcVar vld_str_var, vld_ut_var;
+   NcVar lead_str_var, lead_sec_var;
+
+   // Define and write the track initialization time
+   def_tc_init_time(nc_out, init_str_var, init_ut_var);
+   write_tc_init_time(nc_out, init_str_var, init_ut_var,
+                      trk_ptr->init());
+
+   // Define valid and lead times
+   def_tc_valid_time(nc_out, vld_dim, vld_str_var, vld_ut_var);
+   def_tc_lead_time(nc_out, vld_dim, lead_str_var, lead_sec_var);
+
+   // Write valid and lead times for a single point
+   if(pnt_ptr) {
+      write_tc_valid_time(nc_out, 0, vld_str_var, vld_ut_var,
+                          pnt_ptr->valid());
+      write_tc_lead_time(nc_out, 0, lead_str_var, lead_sec_var,
+                         pnt_ptr->lead());
+   }
+   // Write valid and lead times for all track points
+   else {
+      for(int i_pnt=0; i_pnt<trk_ptr->n_points(); i_pnt++) {
+         write_tc_valid_time(nc_out, i_pnt, vld_str_var, vld_ut_var,
+                             (*trk_ptr)[i_pnt].valid());
+         write_tc_lead_time(nc_out, i_pnt, lead_str_var, lead_sec_var,
+                            (*trk_ptr)[i_pnt].lead());
+      }
+   }
+
+   return;
+}
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -827,16 +880,19 @@ void process_track_points(const TrackInfoArray& tracks) {
         << " to " << unix_to_yyyymmddhh(valid_ta.max())
         << ".\n";
 
-   // Create temporary files for each TrackPoint to be processed
+   // Create temporary files for each TrackPoint/Domain
 
    // Loop over the unique valid times
    for(i=0; i<valid_ta.n(); i++) {
 
+      mlog << Debug(2) << "Processing valid time: "
+           << unix_to_yyyymmddhh(valid_ta[i]) << "\n";
+
       // Loop over the domains to be processed
       for(j=0; j<conf_info.domain_info.size(); j++) {
 
-         mlog << Debug(3) << "Processing the "
-              << conf_info.domain_info[j].domain << " domain.\n";
+         mlog << Debug(2) << "Processing domain name: "
+              << conf_info.domain_info[j].domain << "\n";
 
          // Setup a temp file for this valid time in each track
          for(k=0; k<tracks.n(); k++) {
@@ -908,7 +964,7 @@ void process_track_points(const TrackInfoArray& tracks) {
 ////////////////////////////////////////////////////////////////////////
 
 void process_fields(const TrackInfoArray &tracks,
-                    unixtime vld_ut, int i_vld,
+                    const unixtime vld_ut, int i_vld,
                     const string &domain,
                     const DomainInfo &di) {
    int i, j, i_pnt;
@@ -940,13 +996,12 @@ void process_fields(const TrackInfoArray &tracks,
          // Find the track point for this valid time
          if((i_pnt = tracks[j].valid_index(vld_ut)) < 0) continue;
 
-         // Build the map keys
-         ConcatString out_key = get_out_key(tracks[j]);
+         // Build the map key
          ConcatString tmp_key = get_tmp_key(tracks[j],
                                             tracks[j][i_pnt],
                                             domain);
 
-         // Store the temp keys
+         // Store unique keys
          if(!tmp_key_sa.has(tmp_key)) tmp_key_sa.add(tmp_key);
 
          // JHG insert vortex removal logic here?
@@ -965,26 +1020,241 @@ void process_fields(const TrackInfoArray &tracks,
 
    } // end for i
 
-   // Process the temp files
+   // Loop over the current set of temp files
    for(i=0; i<tmp_key_sa.n(); i++) {
 
-      // Close temp file
-      tmp_file_map[tmp_key_sa[i]].close();
-
-      // Run python diagnostic scripts
+      // Run each python diagnostic script
       for(j=0; j<di.diag_script.n(); j++) {
-
-         // Run the python script
          python_tc_diag(di.diag_script[j].c_str(),
             tmp_file_map[tmp_key_sa[i]].tmp_file,
             tmp_file_map[tmp_key_sa[i]].diag_map);
-
-      } // end for j
+      }
 
       // JHG, keep the temp file for creation of NetCDF output
       // Delete temp file
       // tmp_file_map[tmp_key_sa[i]].clear();
    }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void process_out_files(const TrackInfoArray& tracks) {
+   const char *method_name = "process_out_files()";
+   vector<TmpFileInfo *> domain_tmp_file_list;
+
+   // Loop over tracks
+   for(int i_trk=0; i_trk<tracks.n(); i_trk++) {
+
+      // Output file key
+      ConcatString out_key = get_out_key(tracks[i_trk]);
+
+      // Error check
+      if(out_file_map.count(out_key) == 0) {
+         mlog << Error << "\n" << method_name << " -> "
+              << "no output file map entry found for key \""
+              << out_key << "\"!\n\n";
+         exit(1);
+      }
+
+      // Loop over domains
+      for(int i_dom=0; i_dom<conf_info.domain_info.size(); i_dom++) {
+
+         // Initialize list of domain-specific temp files
+         domain_tmp_file_list.clear();
+
+         // Loop over track points
+         for(int i_pnt=0; i_pnt<tracks[i_trk].n_points(); i_pnt++) {
+
+            // Temp file key
+            ConcatString tmp_key = get_tmp_key(tracks[i_trk],
+                                               tracks[i_trk][i_pnt],
+                                               conf_info.domain_info[i_dom].domain);
+
+            // Error check
+            if(tmp_file_map.count(tmp_key) == 0) {
+                mlog << Error << "\n" << method_name << " -> "
+                     << "no temporary file map entry found for key \""
+                     << tmp_key << "\"!\n\n";
+                exit(1);
+            }
+
+            // Update list of domain-specific temp files
+            domain_tmp_file_list.push_back(&tmp_file_map[tmp_key]);
+
+            // Store the diagnostics for each track point
+            out_file_map[out_key].add_diag_map(tmp_file_map[tmp_key].diag_map, i_pnt);
+
+         } // end for i_pnt
+
+         // Write NetCDF range-azimuth output
+         if(conf_info.nc_rng_azi_flag) {
+            merge_tmp_files(domain_tmp_file_list);
+         }
+
+      } // end for i_dom
+
+      // Write NetCDF diagnostics output
+      if(conf_info.nc_diag_flag) {
+         out_file_map[out_key].write_nc_diag();
+      }
+
+      // Finish the output for this track
+      out_file_map[out_key].clear();
+
+   } // end for i_trk
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void merge_tmp_files(const vector<TmpFileInfo *> tmp_files) {
+   NcFile *nc_out = (NcFile *) 0;
+
+   // Loop over temp files
+   for(int i_tmp=0; i_tmp<tmp_files.size(); i_tmp++) {
+
+      // Create the output NetCDF file
+      if(!nc_out) {
+         ConcatString suffix_cs, file_name;
+         suffix_cs << "_cyl_grid_"
+                   << tmp_files[i_tmp]->domain << ".nc";
+         file_name = build_out_file_name(
+                        tmp_files[i_tmp]->trk_ptr,
+                        suffix_cs.c_str());
+
+         mlog << Debug(1) << "Writing output file: "
+              << file_name << "\n";
+
+         nc_out = open_ncfile(file_name.c_str(), true);
+
+         if(IS_INVALID_NC_P(nc_out)) {
+            mlog << Error << "\nmerge_tmp_files() -> "
+                 << "trouble opening output NetCDF file "
+                 << file_name << "\n\n";
+            exit(1);
+         }
+
+         // Define dimension
+         NcDim vld_dim = add_dim(nc_out, "time",
+                                 tmp_files[i_tmp]->trk_ptr->n_points());
+
+         // Write track info
+         write_tc_storm(nc_out,
+                        tmp_files[i_tmp]->trk_ptr->storm_id().c_str(),
+                        tmp_files[i_tmp]->trk_ptr->technique().c_str(),
+                        nullptr);
+
+         // Write timing info for the entire track
+         write_tc_times(nc_out, vld_dim,
+                        tmp_files[i_tmp]->trk_ptr, nullptr);
+
+         // Copy coordinate variables
+         copy_coord_vars(nc_out, tmp_files[i_tmp]->tmp_out);
+
+      } // end if !nc_out
+
+      // Copy time variables
+      copy_time_vars(nc_out, tmp_files[i_tmp]->tmp_out, i_tmp);
+
+   } // end for i_tmp
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void copy_coord_vars(NcFile *to_nc, NcFile *from_nc) {
+
+   // Get the input variable names
+   StringArray var_names;
+   get_var_names(from_nc, &var_names);
+
+   // Loop over the variables
+   for(int i=0; i<var_names.n(); i++) {
+
+      // Skip non-coordinate variables
+      if(!has_dim(from_nc, var_names[i].c_str())) continue;
+
+      // Get the current coordinate variable
+      NcVar from_var = get_var(from_nc, var_names[i].c_str());
+      NcVar *to_var = copy_nc_var(to_nc, &from_var);
+   }
+
+   return;
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+void copy_time_vars(NcFile *to_nc, NcFile *from_nc, int i_time) {
+   int i, j;
+
+   // Get the input variable names
+   StringArray var_names;
+   get_var_names(from_nc, &var_names);
+
+   // Loop over the variables
+   for(i=0; i<var_names.n(); i++) {
+
+      // Current source variable
+      NcVar from_var = get_var(from_nc, var_names[i].c_str());
+
+      // Get dimensions
+      StringArray dim_names;
+      get_dim_names(&from_var, &dim_names);
+
+      // Skip time variable names and variables without the time dimension
+      if(var_names[i].find("time") != string::npos ||
+         !dim_names.has("time")) {
+         continue;
+      }
+
+      // Add new variable, if needed
+      if(!has_var(to_nc, var_names[i].c_str())) {
+         vector<NcDim> dims;
+         for(j=0; j<dim_names.n(); j++) {
+            dims.push_back(get_nc_dim(to_nc, dim_names[j]));
+         }
+         NcVar new_var = to_nc->addVar(var_names[i], ncDouble, dims);
+         copy_nc_atts(&from_var, &new_var);
+      }
+
+      // Write data for the current time
+      NcVar to_var = get_var(to_nc, var_names[i].c_str());
+
+      vector<size_t> offsets;
+      vector<size_t> counts;
+
+      int buf_size = 1;
+
+      for(j=0; j<dim_names.n(); j++) {
+         if(dim_names[j] == "time") {
+            offsets.push_back(i_time);
+            counts.push_back(1);
+         }
+         else {
+            offsets.push_back(0);
+            NcDim cur_dim = get_nc_dim(to_nc, dim_names[j]);
+            int dim_size = get_dim_size(&cur_dim);
+            buf_size *= dim_size;
+            counts.push_back(dim_size);
+         }
+      }
+
+      // Allocate buffer
+      double *buf = new double[buf_size];
+
+      // Copy the data for this time slice
+      get_nc_data(&from_var, buf);
+      to_var.putVar(offsets, counts, buf);
+
+      // Cleanup
+      if(buf) { delete[] buf; buf = (double *) 0; }
+
+   } // end for i
 
    return;
 }
@@ -1027,8 +1297,8 @@ void OutFileInfo::clear() {
 
    trk_ptr = (TrackInfo *) 0;
 
-   // Clear the diagnostics maps
-   // JHG lead_to_diag_map.clear();
+   // Clear the diagnostics map
+   diag_map.clear();
 
    // Write NetCDF diagnostics file
    if(nc_diag_out) {
@@ -1040,7 +1310,6 @@ void OutFileInfo::clear() {
       nc_diag_out->close();
       delete nc_diag_out;
       nc_diag_out = (NcFile *) 0;
-
    }
    nc_diag_file.clear();
 
@@ -1080,17 +1349,85 @@ NcFile *OutFileInfo::setup_nc_file(const string &out_file) {
       exit(1);
    }
 
-   // Track and valid time dimensions
-   NcDim trk_dim =
-      add_dim(nc_out, "track_point", trk_ptr->n_points());
-   NcDim vld_dim =
-      add_dim(nc_out, "time", trk_ptr->n_points());
+   // Define dimension
+   vld_dim = add_dim(nc_out, "time",
+                     trk_ptr->n_points());
 
+   // Write track info
+   write_tc_storm(nc_out,
+                  trk_ptr->storm_id().c_str(),
+                  trk_ptr->technique().c_str(),
+                  nullptr);
 
-   // Write the track
-   write_tc_track(nc_out, trk_dim, *trk_ptr);
+   // Write timing info for the entire track
+   write_tc_times(nc_out, vld_dim,
+                  trk_ptr, nullptr);
 
    return(nc_out);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void OutFileInfo::add_diag_map(const map<string,double> &tmp_diag_map,
+                               int i_pnt) {
+
+   // Track pointer must be set
+   if(!trk_ptr) {
+      mlog << Error << "\nOutFileInfo::add_diag_map() -> "
+           << "track pointer not set!\n\n";
+      exit(1);
+   }
+
+   // Check the range
+   if(i_pnt < 0 || i_pnt >= trk_ptr->n_points()) {
+      mlog << Error << "\nOutFileInfo::add_diag_map() -> "
+           << "track point index (" << i_pnt
+           << ") range check error!\n\n";
+      exit(1);
+   }
+
+   // Loop over the input diagnostics map
+   map<string,double>::const_iterator it;
+   for(it = tmp_diag_map.begin(); it != tmp_diag_map.end(); it++) {
+
+      // Add new diagnostics array entry, if needed
+      if(diag_map.count(it->first) == 0) {
+         NumArray empty_na;
+         empty_na.set_const(bad_data_double,
+                            trk_ptr->n_points());
+         diag_map[it->first] = empty_na;
+      }
+
+      // Store the diagnostic value for the track point
+      diag_map[it->first].set(i_pnt, it->second);
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void OutFileInfo::write_nc_diag() {
+
+   // Setup dimensions
+   vector<NcDim> dims;
+   dims.push_back(vld_dim);
+
+   vector<size_t> offsets;
+   offsets.push_back(0);
+   
+   vector<size_t> counts;
+   counts.push_back(get_dim_size(&vld_dim));
+
+   // Write the diagnostics for each lead time
+   map<string,NumArray>::iterator it;
+   for(it = diag_map.begin(); it != diag_map.end(); it++) {
+      NcVar diag_var = nc_diag_out->addVar(it->first, ncDouble, dims);
+      add_att(&diag_var, fill_value_att_name, bad_data_double);
+      diag_var.putVar(offsets, counts, it->second.buf());
+   }
+
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1172,7 +1509,7 @@ void TmpFileInfo::clear() {
    //   major: Invalid arguments to routine
    //   minor: Inappropriate type
 
-   //close();
+   // JHG close();
 
    trk_ptr = (TrackInfo *) 0;
    pnt_ptr = (TrackPoint *) 0;
@@ -1185,7 +1522,7 @@ void TmpFileInfo::clear() {
    domain.clear();
 
    // Delete the temp file
-   // JHG if(tmp_file.nonempty()) remove_temp_file(tmp_file);
+   if(tmp_file.nonempty()) remove_temp_file(tmp_file);
 
    tmp_file.clear();
 
@@ -1230,48 +1567,44 @@ void TmpFileInfo::setup_nc_file(const DomainInfo &di,
         << "km, Azimuth = " << ra_grid.azimuth_n() << "\n";
 
    // Define dimensions
-   trk_dim = add_dim(tmp_out, "track_point", trk_ptr->n_points());
+   trk_dim = add_dim(tmp_out, "track_point",
+                     trk_ptr->n_points());
    vld_dim = add_dim(tmp_out, "time", 1);
-   rng_dim = add_dim(tmp_out, "range", (long) ra_grid.range_n());
-   azi_dim = add_dim(tmp_out, "azimuth", (long) ra_grid.azimuth_n());
+   rng_dim = add_dim(tmp_out, "range",
+                     (long) ra_grid.range_n());
+   azi_dim = add_dim(tmp_out, "azimuth",
+                     (long) ra_grid.azimuth_n());
 
-   // Define range and azimuth dimensions
+   // Write track info
+   write_tc_storm(tmp_out,
+                  trk_ptr->storm_id().c_str(),
+                  trk_ptr->technique().c_str(),
+                  di.domain.c_str());
+
+   // Write timing info for this TrackPoint
+   write_tc_times(tmp_out, vld_dim, trk_ptr, pnt_ptr);
+
+   // Define range and azimuth coordinate variables
    def_tc_range_azimuth(tmp_out,
                         rng_dim, azi_dim,
                         ra_grid, bad_data_double);
 
-   // Write the track initialization time
-   NcVar init_str_var, init_ut_var;
-   def_tc_init_time(tmp_out, init_str_var, init_ut_var);
-   write_tc_init_time(tmp_out, init_str_var, init_ut_var,
-                      trk_ptr->init());
+   // Pressure dimension and values (same for all temp files)
+   pressure_levels = prs_lev;
+   if(pressure_levels.size() > 0) {
+      prs_dim = add_dim(tmp_out, "pressure",
+                        (long) pressure_levels.size());
+      def_tc_pressure(tmp_out, prs_dim, pressure_levels);
+   }
 
-   // Write the current valid time
-   NcVar vld_str_var, vld_ut_var;
-   def_tc_valid_time(tmp_out, vld_dim, vld_str_var, vld_ut_var);
-   write_tc_valid_time(tmp_out, 0, vld_str_var, vld_ut_var,
-                       pnt_ptr->valid());
-
-   // Write the current lead time
-   NcVar lead_str_var, lead_sec_var;
-   def_tc_lead_time(tmp_out, vld_dim, lead_str_var, lead_sec_var);
-   write_tc_lead_time(tmp_out, 0, lead_str_var, lead_sec_var,
-                      pnt_ptr->lead());
+   // Write the track lines and locations
+   write_tc_track_lines(tmp_out, *trk_ptr);
+   write_tc_track_lat_lon(tmp_out, trk_dim, *trk_ptr);
 
    // Define latitude and longitude
    NcVar lat_var, lon_var;
    def_tc_lat_lon(tmp_out, vld_dim, rng_dim, azi_dim,
                   lat_var, lon_var);
-
-   // Pressure dimension and values (same for all temp files)
-   pressure_levels = prs_lev;
-   if(pressure_levels.size() > 0) {
-      prs_dim = add_dim(tmp_out, "pressure", (long) pressure_levels.size());
-      def_tc_pressure(tmp_out, prs_dim, pressure_levels);
-   }
-
-   // Write the track
-   write_tc_track(tmp_out, trk_dim, *trk_ptr);
 
    // Compute lat and lon coordinate arrays
    compute_lat_lon(ra_grid, lat_arr, lon_arr);
@@ -1279,10 +1612,6 @@ void TmpFileInfo::setup_nc_file(const DomainInfo &di,
    // Write coordinate arrays
    write_tc_data(tmp_out, ra_grid, 0, lat_var, lat_arr);
    write_tc_data(tmp_out, ra_grid, 0, lon_var, lon_arr);
-
-   // Write valid and lead times
-   write_tc_lead_time(tmp_out, 0, lead_str_var, lead_sec_var,
-                      pnt_ptr->lead());
 
    // Write track point values
    write_tc_track_point(tmp_out, vld_dim, *pnt_ptr);

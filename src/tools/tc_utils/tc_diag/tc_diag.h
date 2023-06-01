@@ -107,12 +107,15 @@ class OutFileInfo {
       // Track information
       const TrackInfo *trk_ptr; // not allocated
 
-      // Mapping of lead times to diagnostic values
-      std::map<int, std::map<std::string,std::string>> lead_to_diag_map;
+      // Mapping of diagnostic names to values for each track point
+      std::map<std::string,NumArray> diag_map;
 
       // NetCDF Diagnostics output
       ConcatString    nc_diag_file;
       netCDF::NcFile *nc_diag_out;
+
+      // NetCDF Dimensions
+      netCDF::NcDim vld_dim;
 
       // CIRA Diagnostics output
       ConcatString   cira_diag_file;
@@ -122,6 +125,8 @@ class OutFileInfo {
       void clear();
 
       netCDF::NcFile *setup_nc_file(const string &);
+      void add_diag_map(const std::map<std::string,double> &, int);
+      void write_nc_diag();
 };
 
 static std::map<std::string,OutFileInfo> out_file_map;
@@ -149,6 +154,9 @@ class TmpFileInfo {
       const TrackInfo  *trk_ptr; // not allocated
       const TrackPoint *pnt_ptr; // not allocated
 
+      // Mapping of diagnostic names to values
+      std::map<std::string,double> diag_map;
+
       // Range azimuth grid
       Grid      grid_out;
       TcrmwGrid ra_grid;
@@ -169,9 +177,6 @@ class TmpFileInfo {
       netCDF::NcDim rng_dim;
       netCDF::NcDim azi_dim;
       netCDF::NcDim prs_dim;
-
-      // Mapping of diagnostic names to values
-      std::map<std::string,double> diag_map;
 
       void open(const TrackInfo *, const TrackPoint *,
                 const DomainInfo &,
