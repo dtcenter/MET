@@ -185,14 +185,6 @@ void TCDiagConfInfo::clear() {
 
    domain_info.clear();
 
-   compute_tangential_and_radial_winds = false;
-   u_wind_field_name.clear();
-   v_wind_field_name.clear();
-   tangential_velocity_field_name.clear();
-   radial_velocity_field_name.clear();
-   tangential_velocity_long_field_name.clear();
-   radial_velocity_long_field_name.clear();
-
    vortex_removal_flag = false;
 
    nc_rng_azi_flag = false;
@@ -330,34 +322,6 @@ void TCDiagConfInfo::process_config(GrdFileType file_type,
          }
       }
    }
-
-   // Conf: compute_tangential_and_radial_winds
-   compute_tangential_and_radial_winds =
-      conf.lookup_bool(conf_key_compute_tangential_and_radial_winds);
-
-   // Conf: u_wind_field_name
-   u_wind_field_name =
-      conf.lookup_string(conf_key_u_wind_field_name);
-
-   // Conf: v_wind_field_name
-   v_wind_field_name =
-      conf.lookup_string(conf_key_v_wind_field_name);
-
-   // Conf: tangential_velocity_field_name
-   tangential_velocity_field_name =
-      conf.lookup_string(conf_key_tangential_velocity_field_name);
-
-   // Conf: radial_velocity_field_name
-   radial_velocity_field_name =
-      conf.lookup_string(conf_key_radial_velocity_field_name);
-
-   // Conf: tangential_velocity_long_field_name
-   tangential_velocity_long_field_name =
-      conf.lookup_string(conf_key_tangential_velocity_long_field_name);
-
-   // Conf: radial_velocity_long_field_name
-   radial_velocity_long_field_name =
-      conf.lookup_string(conf_key_radial_velocity_long_field_name);
 
    // Conf: vortex_removal
    vortex_removal_flag =

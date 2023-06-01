@@ -119,15 +119,6 @@ class TCDiagConfInfo {
       // Vector of DomainInfo
       std::vector<DomainInfo> domain_info;
 
-      // Wind conversion information
-      bool compute_tangential_and_radial_winds;
-      ConcatString u_wind_field_name;
-      ConcatString v_wind_field_name;
-      ConcatString tangential_velocity_field_name;
-      ConcatString radial_velocity_field_name;
-      ConcatString tangential_velocity_long_field_name;
-      ConcatString radial_velocity_long_field_name;
-
       // Vortext removal settings
       bool vortex_removal_flag;
 

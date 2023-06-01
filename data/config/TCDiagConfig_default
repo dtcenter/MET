@@ -86,7 +86,6 @@ domain_info = [
 // convert(x)    = x;
 //
 
-
 //
 // Data fields
 //
@@ -127,17 +126,6 @@ regrid = {
    vld_thresh = 0.5;
    shape      = SQUARE;
 }
-
-//
-// Optionally convert u/v winds to tangential/radial winds
-//
-compute_tangential_and_radial_winds = TRUE;
-u_wind_field_name = "UGRD";
-v_wind_field_name = "VGRD";
-tangential_velocity_field_name = "VT";
-tangential_velocity_long_field_name = "Tangential Velocity";
-radial_velocity_field_name = "VR";
-radial_velocity_long_field_name = "Radial Velocity";
 
 //
 // Vortex removal flag
