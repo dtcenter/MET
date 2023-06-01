@@ -77,7 +77,8 @@ class ModeExecutive {
    void clear();
 
    void init();
-   void init_multivar_pass2(const MultiVarData &mvd);
+   void init_multivar(GrdFileType ftype, GrdFileType otype);
+
 
    int n_conv_radii   () const;
    int n_conv_threshs () const;
@@ -117,19 +118,24 @@ class ModeExecutive {
    GrdFileType ftype, otype;
 
    bool isMultivarOutput;
+   bool isMultivarSuperOutput;
    
    void clear_internal_r_index();
    void setup_fcst_obs_data();
    void setup_fcst_obs_data(const MultiVarData &mvd);
+   void setup_fcst_obs_data(ShapeData &f_super, ShapeData &o_super,
+                            const Grid &igrid);
    void do_conv_thresh(const int r_index, const int t_index, 
-                       bool isMultivarPass1Merge=false);
+                       bool isMultivarPass1Merge=false,
+                       bool isMultivarPass2=false,
+                       bool isMultivarSuper=false);
    void do_merging();
-   void do_merging(ShapeData &f_merge, ShapeData &o_merge);
+   void do_merging(ShapeData &f_merge, ShapeData &o_merge,bool isMultivarSuper=false);
    void do_match_merge();
-   void do_match_merge(ShapeData &f_merge, ShapeData &o_merge);
+   void do_match_merge(ShapeData &f_merge, ShapeData &o_merge, bool isMultivarSuper=false);
 
    void process_masks(ShapeData &, ShapeData &);
-   void process_output(bool isMultivar=false);
+   void process_output(bool isMultivar=false, bool isMultivarSuper=false);
 
   
    // owned by caller

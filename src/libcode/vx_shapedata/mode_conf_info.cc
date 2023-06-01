@@ -867,6 +867,7 @@ return;
 
 }
 
+
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -958,6 +959,34 @@ return;
 
 ////////////////////////////////////////////////////////////////////////
 
+void ModeConfInfo::set_fcst_merge_flag(MergeType t)
+{
+Fcst->merge_flag = t;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void ModeConfInfo::set_obs_merge_flag(MergeType t)
+{
+Obs->merge_flag = t;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void ModeConfInfo::set_fcst_merge_thresh(SingleThresh s)
+{
+Fcst->merge_thresh = s;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void ModeConfInfo::set_obs_merge_thresh(SingleThresh s)
+{
+Obs->merge_thresh = s;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 
 void ModeConfInfo::set_obs_merge_thresh_by_index(int k)
 
@@ -1035,16 +1064,24 @@ void ModeConfInfo::get_multivar_programs()
 Dictionary * dict = (Dictionary *) 0;
 
 fcst_multivar_logic.clear();
- obs_multivar_logic.clear();
-
+obs_multivar_logic.clear();
+fcst_multivar_name = "Super";  // default, maybe set elsewhere?
+obs_multivar_name = "Super";
+fcst_multivar_level = "Unknown";
+obs_multivar_level = "Unknown";
 
 dict = conf.lookup_dictionary(conf_key_fcst);
 
 if ( dict->lookup(conf_key_multivar_logic) )  fcst_multivar_logic = dict->lookup_string(conf_key_multivar_logic);
+if ( dict->lookup("multivar_name") )  fcst_multivar_name = dict->lookup_string("multivar_name");
+if ( dict->lookup("multivar_level") )  fcst_multivar_level = dict->lookup_string("multivar_level");
+
 
 dict = conf.lookup_dictionary(conf_key_obs);
 
 if ( dict->lookup(conf_key_multivar_logic) )   obs_multivar_logic = dict->lookup_string(conf_key_multivar_logic);
+if ( dict->lookup("multivar_name") )  obs_multivar_name = dict->lookup_string("multivar_name");
+if ( dict->lookup("multivar_level") )  obs_multivar_level = dict->lookup_string("multivar_level");
 
 multivar_intensity.clear();
 if ( dict->lookup("multivar_intensity_flag")) multivar_intensity = dict->lookup_bool_array("multivar_intensity_flag");
@@ -1063,12 +1100,12 @@ void ModeConfInfo::check_multivar_not_implemented() const
            << ": quilting not yet implemented for multivar mode\n\n";
       status = true;
    }
-   if (multivar_intensities_all_false()) {
-      mlog << Error
-           << "\n\n  ModeConfInfo::multivar_not_implemented "
-           << ": multivar_intensity flags all FALSE not yet implemented for multivar mode\n\n";
-      status = true;
-   }
+   // if (multivar_intensities_all_false()) {
+   //    mlog << Error
+   //         << "\n\n  ModeConfInfo::multivar_not_implemented "
+   //         << ": multivar_intensity flags all FALSE not yet implemented for multivar mode\n\n";
+   //    status = true;
+   // }
    if (status) {
       mlog << Error
            << "\n\n  met_main() Some features not yet implemented in multivar mode\n\n";

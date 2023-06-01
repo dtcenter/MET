@@ -109,7 +109,13 @@ static void second_pass(int j, const BoolPlane &f_result, const BoolPlane &o_res
                         MultiVarData &mvd, bool has_union,
                         ShapeData &f_merge, ShapeData &o_merge);
 
+static void third_pass(ShapeData &f_result, ShapeData &o_result,
+                       ShapeData &f_merge, ShapeData &o_merge,
+                       int nx, int ny, const ConcatString &dir,
+                       GrdFileType ftype, GrdFileType otype, const Grid &grid, bool has_union);
+
 static void mask_data(const string &name, int nx, int ny, const BoolPlane &mask, DataPlane &data);
+static void mask_data_super(const string &name, int nx, int ny, DataPlane &data);
 
 static void read_config(const string & filename);
 
@@ -211,6 +217,34 @@ int multivar_frontend(const StringArray & Argv)
    combine_boolplanes("Obs_Merge", o_merge_plane, n_files, o_calc, o_merge_result);
 
 
+   // might need this for a super pass
+   GrdFileType ftype = mvd[0]->_ftype;
+   GrdFileType otype = mvd[0]->_otype;;
+
+   // might need this for a super passs
+   Grid grid = *(mvd[0]->_grid);
+
+   ShapeData f_simple_sd = ShapeData(*(mvd[0]->_simple->_Fcst_sd));
+   for (int x=0; x<nx; ++x) {
+      for (int y=0; y<ny; ++y) {
+         if (f_simple_result.get(x, y)) {
+            f_simple_sd.data.put(1.0, x, y);
+         } else {
+            f_simple_sd.data.put(bad_data_double, x, y);
+         }
+      }
+   }
+   ShapeData o_simple_sd = ShapeData(*(mvd[0]->_simple->_Fcst_sd));
+   for (int x=0; x<nx; ++x) {
+      for (int y=0; y<ny; ++y) {
+         if (o_simple_result.get(x, y)) {
+            o_simple_sd.data.put(1.0, x, y);
+         } else {
+            o_simple_sd.data.put(bad_data_double, x, y);
+         }
+      }
+   }
+
    // create a ShapeData object using something from mvd as a template
    ShapeData f_merge_sd = ShapeData(*(mvd[0]->_simple->_Fcst_sd));
    for (int x=0; x<nx; ++x) {
@@ -290,6 +324,13 @@ int multivar_frontend(const StringArray & Argv)
    
 
    //
+   // here run one more time using superobjects as input
+   third_pass(f_simple_sd, o_simple_sd, f_merge_sd_split, o_merge_sd_split,
+              nx, ny, dir, ftype, otype, grid, has_union);
+
+#ifdef NOTDEF
+
+   //
    //  write the superobject output files
    //
 
@@ -324,6 +365,7 @@ int multivar_frontend(const StringArray & Argv)
       }
    }
 
+#endif
    
    //
    //  done
@@ -331,6 +373,7 @@ int multivar_frontend(const StringArray & Argv)
    return ( 0 );
 
 }
+
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -661,7 +704,51 @@ void second_pass(int j, const BoolPlane &f_result,
    mlog << Debug(1) << "Running filtered mode \n\n";
 
    ModeFrontEnd *frontend = new ModeFrontEnd;
-   int status = frontend->run(mode_argv, mvd, has_union, f_merge, o_merge);
+   int status = frontend->run_multivar_pass2(mode_argv, mvd, has_union, f_merge, o_merge);
+   delete frontend;
+}
+ 
+////////////////////////////////////////////////////////////////////////
+
+void third_pass(ShapeData &f_result, ShapeData &o_result,
+                ShapeData &f_merge, ShapeData &o_merge,
+                int nx, int ny, const ConcatString &dir,
+                GrdFileType ftype, GrdFileType otype, const Grid &grid,
+                bool has_union)
+{
+   // mask_data("Fcst", nx, ny, f_result, mvd._simple->_Fcst_sd->data);
+   // mask_data("Obs", nx, ny, o_result, mvd._simple->_Obs_sd->data);
+
+   StringArray mode_argv;
+   char junk [256];
+
+   //
+   //  build the command for running mode again, sort of mode
+   //
+   mode_argv.clear();
+   mode_argv.add(mode_path);
+   mode_argv.add(config_file);
+   mode_argv.add("-v");
+   snprintf(junk, sizeof(junk), "%d", mlog.verbosity_level());
+   mode_argv.add(junk);
+   mode_argv.add("-outdir");
+   mode_argv.add(dir);
+   // mode_argv.add("-field_index");
+   // snprintf(junk, sizeof(junk), "%d", j);
+   // mode_argv.add(junk);
+
+   mlog << Debug(1) << "Running superobject mode \n\n";
+
+   // set the data to 0 or missing everywhere
+   mask_data_super("FcstSimple", nx, ny, f_result.data);
+   // mask_data_super("FcstMerge", nx, ny, f_merge.data);
+   mask_data_super("ObsSimple", nx, ny, o_result.data);
+   // mask_data_super("ObsMerge", nx, ny, o_merge.data);
+   
+
+   ModeFrontEnd *frontend = new ModeFrontEnd;
+   int status = frontend->run_super(mode_argv, f_result, o_result,
+                                    f_merge, o_merge, ftype, otype, grid, has_union);
    delete frontend;
 }
  
@@ -765,6 +852,40 @@ void mask_data(const string &name, int nx, int ny, const BoolPlane &bp, DataPlan
             data.set(bad_data_float, x, y);;
             nmasked ++;
          } else {
+            nkeep ++;
+         }
+      }
+   }
+   
+   mlog << Debug(1) << name << " superobject masking.."
+        << nkeep << " points of "
+        << nmasked + nkeep << " in superobjects\n";
+}
+
+
+
+////////////////////////////////////////////////////////////////////////
+void mask_data_super(const string &name, int nx, int ny, DataPlane &data)
+{
+
+   if (nx != data.nx() || ny != data.ny()) {
+      mlog << Error << "\n" << program_name  << ":" << name
+           << " :dimensions don't match " << nx << " " <<  ny 
+           << "    " << data.nx() << " " << data.ny() << "\n\n";
+
+      exit( 1 );
+   }
+
+   int nmasked=0, nkeep=0;
+   
+   for (int x=0; x<nx; ++x)  {
+
+      for (int y=0; y<ny; ++y)  {
+
+         if(is_bad_data(data.get(x,y))) {
+            nmasked ++;
+         } else {
+            data.set(0.0, x, y);
             nkeep ++;
          }
       }

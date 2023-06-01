@@ -530,7 +530,7 @@ void ModePsFile::fill_box(const Box & b, const Color & c)
 ////////////////////////////////////////////////////////////////////////
 
 
-void ModePsFile::make_plot()
+void ModePsFile::make_plot(bool isMultivarSuper)
 
 {
 
@@ -538,11 +538,19 @@ void ModePsFile::make_plot()
    const MergeType  obs_merge_flag = ConfInfo->Obs->merge_flag;
    ConcatString s;
 
-   s << cs_erase
-     << "MODE: " << ConfInfo->Fcst->var_info->name_attr() << " at "
-     << ConfInfo->Fcst->var_info->level_attr() << " vs "
-     << ConfInfo->Obs->var_info->name_attr() << " at "
-     << ConfInfo->Obs->var_info->level_attr();
+   if (isMultivarSuper) {
+      s << cs_erase
+        << "MODE: " << ConfInfo->fcst_multivar_name.c_str() << " at "
+        << ConfInfo->fcst_multivar_level.c_str() << " vs "
+        << ConfInfo->obs_multivar_name.c_str() << " at "
+        << ConfInfo->obs_multivar_level.c_str();
+   } else {
+      s << cs_erase
+        << "MODE: " << ConfInfo->Fcst->var_info->name_attr() << " at "
+        << ConfInfo->Fcst->var_info->level_attr() << " vs "
+        << ConfInfo->Obs->var_info->name_attr() << " at "
+        << ConfInfo->Obs->var_info->level_attr();
+   }
 
    plot_engine(*Engine, FOEng, s.c_str());
 

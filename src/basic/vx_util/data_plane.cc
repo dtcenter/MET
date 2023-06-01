@@ -22,6 +22,8 @@
 
 using namespace std;
 
+#include <algorithm>
+
 #include "data_plane.h"
 
 #include "vx_log.h"
@@ -202,6 +204,63 @@ void DataPlane::dump(ostream & out, int depth) const {
    out.flush();
 
    return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void DataPlane::debug_examine(bool show_all_values) const {
+
+   vector<double> values;
+   vector<int> count;
+   int total_count = 0;
+   
+   for (int x=0; x<Nx; ++x) {
+      for (int y=0; y<Ny; ++y) {
+         double v = get(x,y);
+         if (v <= 0) {
+            continue;
+         }
+         ++total_count;
+         if (show_all_values) {
+            vector<double>::iterator vi;
+            vi = find(values.begin(), values.end(), v);
+            if (vi == values.end()) {
+               values.push_back(v);
+               count.push_back(1);
+            } else {
+               int ii = vi - values.begin();
+               count[ii] = count[ii] + 1;
+            }
+         }
+      }
+   }
+   if (show_all_values) {
+      for (size_t i=0; i<values.size(); ++i) {
+         mlog << Debug(4) << " data value=" << values[i] << " count=" << count[i] << "\n";
+      }
+   }
+   mlog << Debug(4) << "Total count = " << total_count << "\n";
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+string DataPlane::sdebug_examine() const{
+
+   int total_count = 0;
+   
+   for (int x=0; x<Nx; ++x) {
+      for (int y=0; y<Ny; ++y) {
+         double v = get(x,y);
+         if (v <= 0) {
+            continue;
+         }
+         ++total_count;
+      }
+   }
+   char buf[1000];
+   sprintf(buf, "Total count = %d", total_count);
+   string retval = buf;
+   return retval;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

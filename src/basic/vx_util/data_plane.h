@@ -13,6 +13,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+#include <string>
 #include <vector>
 
 #include "two_to_one.h"
@@ -64,6 +65,9 @@ class DataPlane {
       void erase();
 
       void dump(std::ostream &, int = 0) const;
+
+      void debug_examine(bool show_all_value=false) const;
+      std::string sdebug_examine() const;
 
          //
          // Set functions

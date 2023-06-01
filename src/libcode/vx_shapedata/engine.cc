@@ -157,6 +157,8 @@ void ModeFuzzyEngine::init_from_scratch() {
    need_obs_merge       = true;
    need_obs_clus_split  = true;
 
+   is_multivar_super    = false;
+
    need_match           = true;
 
    fcst_raw         = new ShapeData;
@@ -287,6 +289,31 @@ void ModeFuzzyEngine::set_no_conv(const ShapeData &fcst_wd, const ShapeData &obs
 
 }
 
+///////////////////////////////////////////////////////////////////////
+
+void ModeFuzzyEngine::set_only_split(const ShapeData &fcst_wd, const ShapeData &obs_wd)
+
+{
+
+   ConcatString path;
+
+   clear_features();
+   clear_colors();
+   ctable.clear();
+
+   collection.clear();
+
+   set_fcst_only_split (fcst_wd);
+   set_obs_only_split  ( obs_wd);
+
+   path = replace_path(conf_info.object_pi.color_table.c_str());
+
+   ctable.read(path.c_str());
+
+   return;
+
+}
+
 
 ///////////////////////////////////////////////////////////////////////
 
@@ -383,6 +410,68 @@ void ModeFuzzyEngine::set_obs_no_conv(const ShapeData &obs_wd) {
 }
 
 
+
+///////////////////////////////////////////////////////////////////////
+
+
+void ModeFuzzyEngine::set_fcst_only_split(const ShapeData &fcst_wd)
+
+{
+
+   *fcst_raw = fcst_wd;  // real valued
+   *fcst_conv = *fcst_raw;  // real valued
+
+   *fcst_mask = *fcst_conv;  // 1s and 0s
+   fcst_mask->set_to_1_or_0();
+   *fcst_thresh = *fcst_raw;  //1s and 0s
+   fcst_thresh->set_to_1_or_0();
+   
+   need_fcst_conv       = false;
+   need_fcst_thresh     = false;
+   need_fcst_filter     = false;
+   need_fcst_split      = true;
+   need_fcst_merge      = true;
+   need_fcst_clus_split = true;
+   need_match           = true;
+
+   // do_fcst_convolution();
+   //do_fcst_thresholding();
+   //do_fcst_filtering();
+   do_fcst_splitting();
+
+   return;
+}
+
+
+///////////////////////////////////////////////////////////////////////
+
+
+void ModeFuzzyEngine::set_obs_only_split(const ShapeData &obs_wd) {
+
+   *obs_raw = obs_wd;  // real valued
+   *obs_conv = *obs_raw; // real valued
+   *obs_mask = *obs_conv;  // 1s and 0s
+   obs_mask->set_to_1_or_0();
+   *obs_thresh = *obs_raw; // 1s and 0s
+   obs_thresh->set_to_1_or_0();
+
+   need_obs_conv       = false;
+   need_obs_thresh     = false;
+   need_obs_filter     = false;
+   need_obs_split      = true;
+   need_obs_merge      = true;
+   need_obs_clus_split = true;
+   need_match          = true;
+
+   // do_obs_convolution();
+   // do_obs_thresholding();
+   // do_obs_filtering();
+   do_obs_splitting();
+
+   return;
+}
+
+
 ///////////////////////////////////////////////////////////////////////
 
 
@@ -413,7 +502,13 @@ void ModeFuzzyEngine::do_fcst_convolution() {
    //
    // Apply a circular convolution to the raw field
    //
+
+   mlog << Debug(4) << " Before fcst convolution: " << fcst_conv->sdebug_examine() << "\n";
+      
+
    if(r > 0) fcst_conv->conv_filter_circ(2*r + 1, conf_info.Fcst->vld_thresh);
+
+   mlog << Debug(4) << " After fcst convolution: " << fcst_conv->sdebug_examine() << "\n";
 
    need_fcst_conv       = false;
    need_fcst_thresh     = true;
@@ -442,10 +537,14 @@ void ModeFuzzyEngine::do_obs_convolution() {
    mlog << Debug(3) << "Applying circular convolution of radius "
         << r << " to the observation field.\n";
 
+   mlog << Debug(4) << " Before obs convolution: " << obs_conv->sdebug_examine() << "\n";
+
    //
    // Apply a circular convolution to the raw field
    //
    if(r > 0) obs_conv->conv_filter_circ(2*r + 1, conf_info.Obs->vld_thresh);
+
+   mlog << Debug(4) << " After obs convolution: " << obs_conv->sdebug_examine() << "\n";
 
    need_obs_conv       = false;
    need_obs_thresh     = true;
@@ -470,11 +569,13 @@ void ModeFuzzyEngine::do_fcst_thresholding() {
 
    *fcst_thresh = *fcst_raw;
    fcst_thresh->threshold(conf_info.Fcst->conv_thresh);
+   mlog << Debug(4) << " After thresholding raw fcst field: " << fcst_thresh->sdebug_examine() << "\n";
 
    //
    // Threshold the convolved field
    //
    fcst_mask->threshold(conf_info.Fcst->conv_thresh);
+   mlog << Debug(4) << " After thresholding convolved fcst field: " << fcst_mask->sdebug_examine() << "\n";
 
    mlog << Debug(3) << "Applying convolution threshold "
         << conf_info.Fcst->conv_thresh.get_str()
@@ -503,11 +604,13 @@ void ModeFuzzyEngine::do_obs_thresholding() {
 
    *obs_thresh = *obs_raw;
    obs_thresh->threshold(conf_info.Obs->conv_thresh);
+   mlog << Debug(4) << " After thresholding raw obs field: " << obs_thresh->sdebug_examine() << "\n";
 
    //
    // Threshold the convolved field
    //
    obs_mask->threshold(conf_info.Obs->conv_thresh);
+   mlog << Debug(4) << " After thresholding convolved obs field: " << obs_mask->sdebug_examine() << "\n";
 
    mlog << Debug(3) << "Applying convolution threshold "
         << conf_info.Obs->conv_thresh.get_str()
@@ -542,6 +645,7 @@ void ModeFuzzyEngine::do_fcst_filtering() {
                                 fcst_raw, conf_info.Fcst->conv_thresh, grid,
                                 conf_info.Fcst->var_info->is_precipitation());
 
+      mlog << Debug(4) << " After attribute filtering of fcst field: " << fcst_mask->sdebug_examine() << "\n";
       mlog << Debug(3) << "Applying object attribute filtering"
            << " resulted in " <<  fcst_mask->n_objects()
            << " simple forecast objects.\n";
@@ -577,6 +681,7 @@ void ModeFuzzyEngine::do_obs_filtering() {
                                obs_raw, conf_info.Obs->conv_thresh, grid,
                                conf_info.Obs->var_info->is_precipitation());
 
+      mlog << Debug(4) << " After attribute filtering of obs field: " << obs_mask->sdebug_examine() << "\n";
       mlog << Debug(3) << "Applying object attribute filtering"
            << " resulted in " <<  obs_mask->n_objects()
            << " simple observation objects.\n";
@@ -604,6 +709,7 @@ void ModeFuzzyEngine::do_fcst_splitting() {
    if(!need_fcst_split) return;
 
    *fcst_split = split(*fcst_mask, n_fcst);
+   mlog << Debug(4) << " After splitting of fcst field: " << fcst_split->sdebug_examine() << "\n";
 
    need_fcst_split      = false;
    need_fcst_merge      = true;
@@ -622,6 +728,7 @@ void ModeFuzzyEngine::do_obs_splitting() {
    if(!need_obs_split) return;
 
    *obs_split = split(*obs_mask, n_obs);
+   mlog << Debug(4) << " After splitting of obs field: " << obs_split->sdebug_examine() << "\n";
 
    need_obs_split      = false;
    need_obs_merge      = true;
@@ -1450,6 +1557,7 @@ void ModeFuzzyEngine::do_fcst_merge_thresh(const ShapeData &merge_data) {
    delete [] fcst_shape;       fcst_shape = (ShapeData *) 0;
    delete [] fcst_merge_shape; fcst_merge_shape = (ShapeData *) 0;
 
+   mlog << Debug(4) << " After merging of fcst field: " << fcst_split->sdebug_examine() << "\n";
    return;
 }
 
@@ -1566,6 +1674,7 @@ void ModeFuzzyEngine::do_obs_merge_thresh(const ShapeData &merge_data) {
    delete [] obs_shape;       obs_shape = (ShapeData *) 0;
    delete [] obs_merge_shape; obs_merge_shape = (ShapeData *) 0;
 
+   mlog << Debug(4) << " After merging of obs field: " << obs_split->sdebug_examine() << "\n";
    return;
 }
 
@@ -2915,10 +3024,12 @@ double interest_percentile(ModeFuzzyEngine &eng, const double p, const int flag)
 
 ///////////////////////////////////////////////////////////////////////
 
-void write_engine_stats(ModeFuzzyEngine & eng, const Grid & grid, AsciiTable & at)
+void write_engine_stats(ModeFuzzyEngine & eng, const Grid & grid, AsciiTable & at, bool isMultivarSuper)
 
 {
 
+   eng.is_multivar_super = isMultivarSuper;
+   
    int i, j, row;
 
    //
@@ -3141,33 +3252,57 @@ void write_header_columns(ModeFuzzyEngine & eng, const Grid & grid, AsciiTable &
                 eng.conf_info.Obs->conv_thresh.get_str());
 
    // Forecast Variable Name
-   s = check_hdr_str(conf_key_fcst_var,
-                     eng.conf_info.Fcst->var_info->name_attr());
+   if (eng.is_multivar_super) {
+      s = eng.conf_info.fcst_multivar_name;
+   } else {
+      s = check_hdr_str(conf_key_fcst_var,
+                        eng.conf_info.Fcst->var_info->name_attr());
+   }
    at.set_entry(row, c++, s.text());
 
    // Forecast Variable Units
-   s = check_hdr_str(conf_key_fcst_units,
-                     eng.conf_info.Fcst->var_info->units_attr(), true);
+   if (eng.is_multivar_super) {
+      s = "NA";
+   } else {
+      s = check_hdr_str(conf_key_fcst_units,
+                        eng.conf_info.Fcst->var_info->units_attr(), true);
+   }
    at.set_entry(row, c++, s.text());
 
    // Forecast Variable Level
-   s = check_hdr_str(conf_key_fcst_lev,
+   if (eng.is_multivar_super) {
+      s = eng.conf_info.fcst_multivar_level;
+   } else {
+      s = check_hdr_str(conf_key_fcst_lev,
                      eng.conf_info.Fcst->var_info->level_attr(), true);
+   }
    at.set_entry(row, c++, s.text());
 
    // Observation Variable Name
-   s = check_hdr_str(conf_key_obs_var,
+   if (eng.is_multivar_super) {
+      s = eng.conf_info.obs_multivar_name;
+   } else {
+      s = check_hdr_str(conf_key_obs_var,
                      eng.conf_info.Obs->var_info->name_attr());
+   }
    at.set_entry(row, c++, s.text());
 
    // Observation Variable Units
-   s = check_hdr_str(conf_key_obs_units,
-                     eng.conf_info.Obs->var_info->units_attr(), true);
+   if (eng.is_multivar_super) {
+      s = "NA";
+   } else {
+      s = check_hdr_str(conf_key_obs_units,
+                        eng.conf_info.Obs->var_info->units_attr(), true);
+   }
    at.set_entry(row, c++, s.text());
 
    // Observation Variable Level
-   s = check_hdr_str(conf_key_obs_lev,
+   if (eng.is_multivar_super) {
+      s = eng.conf_info.obs_multivar_level;
+   } else {
+      s = check_hdr_str(conf_key_obs_lev,
                      eng.conf_info.Obs->var_info->level_attr(), true);
+   }
    at.set_entry(row, c++, s.text());
 
    // Observation type

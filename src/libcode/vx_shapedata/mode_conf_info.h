@@ -91,7 +91,10 @@ class ModeConfInfo {
       ConcatString  fcst_multivar_logic;
       ConcatString   obs_multivar_logic;
       BoolArray multivar_intensity;
-      
+      ConcatString fcst_multivar_name;
+      ConcatString fcst_multivar_level;
+      ConcatString obs_multivar_name;
+      ConcatString obs_multivar_level;
 
       void get_multivar_programs();
 
@@ -235,6 +238,11 @@ class ModeConfInfo {
 
       void  set_fcst_conv_thresh_by_merge_index (int);
       void  set_obs_conv_thresh_by_merge_index  (int);
+
+      void set_fcst_merge_flag(MergeType);
+      void set_obs_merge_flag(MergeType);
+      void set_fcst_merge_thresh(SingleThresh);
+      void set_obs_merge_thresh(SingleThresh);
 
 };
 

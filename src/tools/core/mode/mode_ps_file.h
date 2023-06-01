@@ -168,7 +168,7 @@ class ModePsFile : public PSfile {
    //  do stuff
    //
 
-   void make_plot();
+   void make_plot(bool isMultivarSuper=false);
 
    using PSfile::outline_box;
 

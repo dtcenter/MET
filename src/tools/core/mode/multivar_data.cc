@@ -160,7 +160,7 @@ void MultiVarData1::_print_summary(const string &name, int *data, const ShapeDat
          }
       }
    }
-   mlog << Debug(1) << name << " has " << values.size() << " unique values\n";
+   mlog << Debug(4) << name << " has " << values.size() << " unique values\n";
    // for (size_t i=0; i<values.size(); ++i) {
    //    printf("\n  %d", values[i]);
    // }
@@ -380,7 +380,7 @@ void populate_bool_plane(const string &name, const int * buf, const int nx, cons
 
    }   //  for x
 
-   mlog << Debug(1) << " Bool plane for " << name << " has " << nyes << " true values\n";
+   mlog << Debug(4) << " Bool plane for " << name << " has " << nyes << " true values\n";
 
    return;
 
@@ -412,6 +412,6 @@ static void  _debug_shape_examine(const string &name, const ShapeData &sd, int n
       }
    }
    for (size_t i=0; i<values.size(); ++i) {
-      mlog << Debug(1) << name << " shapeid=" << values[i] << " npt=" << count[i] << "\n";
+      mlog << Debug(4) << name << " shapeid=" << values[i] << " npt=" << count[i] << "\n";
    }
 }   

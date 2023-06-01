@@ -181,14 +181,17 @@ class ModeFuzzyEngine {
 
       void set_grid(const Grid *);
       void set(const ShapeData &fcst_wd, const ShapeData &obs_wd);
-
       void set_no_conv(const ShapeData &fcst_wd, const ShapeData &obs_wd);
+      void set_only_split(const ShapeData &fcst_wd, const ShapeData &obs_wd);
 
       void set_fcst (const ShapeData & fcst_wd);
       void set_obs  (const ShapeData &  obs_wd);
 
       void set_fcst_no_conv (const ShapeData & fcst_wd);
       void set_obs_no_conv  (const ShapeData &  obs_wd);
+
+      void set_fcst_only_split (const ShapeData & fcst_wd);
+      void set_obs_only_split  (const ShapeData &  obs_wd);
 
       int two_to_one(int, int) const;
 
@@ -307,14 +310,16 @@ class ModeFuzzyEngine {
       bool need_fcst_clus_split;
       bool need_obs_clus_split;
 
+      bool is_multivar_super;        // used when producing output files
+
       const Grid * grid;             //  not allocated
 
       ShapeData * fcst_raw;          //  allocated
-      ShapeData * fcst_thresh;       //  allocated  thresholded raw
-      ShapeData * fcst_conv;         //  allocated  convolve of raw
-      ShapeData * fcst_mask;         //  allocated  thresholded convolved, filtered using attribute logic
-      ShapeData * fcst_split;        //  allocated split of fcst_mask.. final one
-      ShapeData * fcst_clus_split;   //  allocated
+      ShapeData * fcst_thresh;       //  allocated  thresholded raw  (values are 1 or 0)
+      ShapeData * fcst_conv;         //  allocated  convolve of raw  
+      ShapeData * fcst_mask;         //  allocated  thresholded convolved, filtered using attribute logic (values are 1 or 0)
+      ShapeData * fcst_split;        //  allocated split of fcst_mask.. final one, numbers 1, 2, ...
+      ShapeData * fcst_clus_split;   //  allocated numbered 1 and up
 
       ShapeData * obs_raw;           //  allocated
       ShapeData * obs_thresh;        //  allocated
@@ -367,7 +372,7 @@ class ModeFuzzyEngine {
 extern double total_interest     (ModeConfInfo &, const PairFeature &, int, int, bool is_single);
 extern double interest_percentile(ModeFuzzyEngine &, const double, const int);
 
-extern void write_engine_stats   (ModeFuzzyEngine &, const Grid &, AsciiTable &);
+extern void write_engine_stats   (ModeFuzzyEngine &, const Grid &, AsciiTable &, bool isMultiVarSuper=false);
 extern void write_header_row     (ModeFuzzyEngine &, AsciiTable &, const int row);   //  row usually zero
 extern void write_header_columns (ModeFuzzyEngine &, const Grid &, AsciiTable &, const int row);
 extern void write_fcst_single    (ModeFuzzyEngine &, const int, const Grid &, AsciiTable &, const int);

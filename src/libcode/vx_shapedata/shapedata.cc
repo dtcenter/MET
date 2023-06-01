@@ -1961,6 +1961,32 @@ void ShapeData::threshold(SingleThresh t) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void ShapeData::set_to_1_or_0() 
+{
+   int j, x, y;
+   double v;
+   const int nx = data.nx();
+   const int ny = data.ny();
+
+   for(x=0; x<nx; x++) {
+      for(y=0; y<ny; y++) {
+
+         //v = data(x, y);
+         if(is_bad_data(x, y)) {
+            j = 0;
+         }
+         else {
+            j = 1;
+         }
+         data.set((double) j, x, y);
+      } // end for y
+   } // end for x
+
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 void ShapeData::threshold_attr(const map<ConcatString,ThreshArray> &attr_map,
                                const ShapeData *raw_ptr,
                                const SingleThresh &obj_thresh,

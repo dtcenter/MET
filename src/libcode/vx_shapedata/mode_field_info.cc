@@ -231,13 +231,22 @@ if ( dict->lookup(conf_key_vld_thresh) )  {
 
 }
 
-if ( dict->lookup(conf_key_merge_flag) )  {
-
-   merge_flag         = int_to_mergetype(dict->lookup_int(conf_key_merge_flag));
-
+// for the multivar case, go without parent, and error out if merge flag is
+// not set for the individual field
+if ( _multivar ) {
+   if ( dict->lookup(conf_key_merge_flag, false)) {
+      merge_flag         = int_to_mergetype(dict->lookup_int(conf_key_merge_flag));
+   } else {
+      mlog << Error << "\nMode_Field_Info::set() -> "
+           << "'merge_flag' must be explicitly set for all fields with multivariate mode\n\n";
+      exit ( 1 );
+   }
+} else {
+   if ( dict->lookup(conf_key_merge_flag, true)) {
+      merge_flag         = int_to_mergetype(dict->lookup_int(conf_key_merge_flag));
+   }
 }
-
-
+ 
 filter_attr_map    = parse_conf_filter_attr_map(dict);
 
 if ( FO == 'F' )  raw_pi = parse_conf_plot_info(conf->lookup_dictionary(conf_key_fcst_raw_plot));
