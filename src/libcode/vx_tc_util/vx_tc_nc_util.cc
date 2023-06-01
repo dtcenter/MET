@@ -17,16 +17,33 @@ using namespace netCDF;
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_tc_track(NcFile* nc_out,
-    const NcDim& track_point_dim,
+void write_tc_track_lines(NcFile* nc_out,
     const TrackInfo& track) {
 
     StringArray track_lines = track.track_lines();
 
-    NcDim track_line_dim = add_dim(nc_out, "track_line", track_lines.n());
-
+    NcDim track_line_dim = add_dim(nc_out,
+        "track_line", track_lines.n());
     NcVar track_line_var = nc_out->addVar(
-        "FullTrackLine", ncString, track_line_dim);
+        "track_line", ncString, track_line_dim);
+
+    vector<size_t> counts;
+    counts.push_back(1);
+
+    for(int i = 0; i < track_lines.n(); i++) {
+        vector<size_t> offsets;
+        offsets.push_back(i);
+        string line = track_lines[i];
+        const char* str = line.c_str();
+        track_line_var.putVar(offsets, counts, &str);
+    }
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_tc_track_lat_lon(NcFile* nc_out,
+    const NcDim& track_point_dim,
+    const TrackInfo& track) {
 
     NcVar track_lat_var = nc_out->addVar(
         "FullTrackLat", ncDouble, track_point_dim);
@@ -49,27 +66,9 @@ void write_tc_track(NcFile* nc_out,
     }
 
     vector<size_t> offsets;
-    vector<size_t> counts;
-
-    mlog << Debug(3) << "Writing " << track.n_points()
-         << " track points from " << track_lines.n()
-         << " track lines.\n";
-
-    for(int i = 0; i < track_lines.n(); i++) {
-        offsets.clear();
-        offsets.push_back(i);
-        counts.clear();
-        counts.push_back(1);
-        string line = track_lines[i];
-        mlog << Debug(4) << line << "\n";
-        const char* str = line.c_str();
-        track_line_var.putVar(offsets, counts, &str);
-    }
-
-    offsets.clear();
     offsets.push_back(0);
 
-    counts.clear();
+    vector<size_t> counts;
     counts.push_back(track.n_points());
 
     track_lat_var.putVar(offsets, counts, track_lat_data);
@@ -475,10 +474,11 @@ void write_tc_valid_time(NcFile* nc_out, const int& i_point,
     str = cs.c_str();
     var_str.putVar(offsets, counts, &str);
 
+
     // Valid time, as a unixtime string
     cs << cs_erase << ut;
     str = cs.c_str();
-    var_ut.putVar(&str);
+    var_ut.putVar(offsets, counts, &str);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -505,7 +505,7 @@ void write_tc_lead_time(NcFile* nc_out, const int& i_point,
     var_str.putVar(offsets, counts, &str);
 
     // Lead time, as an integer number of seconds
-    var_sec.putVar(&sec);
+    var_sec.putVar(offsets, counts, &sec);
 }
 
 ////////////////////////////////////////////////////////////////////////

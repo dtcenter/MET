@@ -23,7 +23,10 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-extern void write_tc_track(netCDF::NcFile*,
+extern void write_tc_track_lines(netCDF::NcFile*,
+    const TrackInfo&);
+
+extern void write_tc_track_lat_lon(netCDF::NcFile*,
     const netCDF::NcDim&, const TrackInfo&);
 
 extern void write_tc_track_point(netCDF::NcFile*,
