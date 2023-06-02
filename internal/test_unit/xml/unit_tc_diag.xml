@@ -32,7 +32,7 @@
       -v 2
     </param>
     <output>
-      <exists>&OUTPUT_DIR;/tc_diag/IAN_GFSO_2022092400/tc_diag_.nc</exists>
+      <exists>&OUTPUT_DIR;/tc_diag/IAN_GFSO_2022092400/tc_diag_AL092022_GFSO_2022092400_cyl_grid_parent.nc</exists>
     </output>
   </test>
 
