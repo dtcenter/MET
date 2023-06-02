@@ -34,6 +34,26 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
+void print_beta_warning(const char * description,
+                        const char * method_name) {
+
+   //
+   // Print standard warning message
+   //
+   ConcatString cs;
+   if(method_name) cs << method_name << " -> ";
+   if(description) cs << description << " ";
+   cs << "is provided in BETA status for MET " << met_version << ".\n";
+   cs << "Please see future MET version release notes for updates.";
+   mlog << Warning << "\n" << cs << "\n\n";
+
+   return;
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 bool match_met_version(const char * check_version) {
 
    //
