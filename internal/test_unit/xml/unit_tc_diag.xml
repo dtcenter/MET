@@ -26,13 +26,13 @@
           &MET_BIN;/tc_diag</exec>
     <param> \
       -deck &DATA_DIR;/adeck/aal092022_OFCL_SHIP_AVNO.dat \
-      -data parent &OUTPUT_DIR;/tc_diag/gfs_2022092400_file_list \
+      -data parent GFSO &OUTPUT_DIR;/tc_diag/gfs_2022092400_file_list \
       -config &CONFIG_DIR;/TCDiagConfig_ian \
-      -outdir &OUTPUT_DIR;/tc_diag/IAN_OFCL_2022092400 \
+      -outdir &OUTPUT_DIR;/tc_diag/IAN_GFSO_2022092400 \
       -v 2
     </param>
     <output>
-      <grid_nc>&OUTPUT_DIR;/tc_diag/IAN_OFCL_2022092400</grid_nc>
+      <exists>&OUTPUT_DIR;/tc_diag/IAN_GFSO_2022092400/tc_diag_.nc</exists>
     </output>
   </test>
 
