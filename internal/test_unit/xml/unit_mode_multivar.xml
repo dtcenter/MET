@@ -34,8 +34,10 @@
       -v 2
     </param>
     <output>
-      <grid_nc>&OUTPUT_DIR;/mode_multivar/f_super.nc</grid_nc>
-      <grid_nc>&OUTPUT_DIR;/mode_multivar/o_super.nc</grid_nc>
+      <grid_nc>&OUTPUT_DIR;/mode_multivar/mode_Fcst_Super_LO_Obs_Super_LO_300000L_20120410_180000V_060000A_obj.nc</grid_nc>
+      <stat>&OUTPUT_DIR;/mode_multivar/mode_Fcst_Super_LO_Obs_Super_LO_300000L_20120410_180000V_060000A_obj.txt</stat>
+      <stat>&OUTPUT_DIR;/mode_multivar/mode_Fcst_Super_LO_Obs_Super_LO_300000L_20120410_180000V_060000A_cts.txt</stat>
+      <ps>&OUTPUT_DIR;/mode_multivar/mode_Fcst_Super_LO_Obs_Super_LO_300000L_20120410_180000V_060000A.ps</ps>
     </output>
   </test>
 
