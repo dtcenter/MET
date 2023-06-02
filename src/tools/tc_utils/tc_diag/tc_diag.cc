@@ -936,7 +936,7 @@ void process_track_points(const TrackInfoArray& tracks) {
 
       // Parallel: Loop over the unique valid times
 //#pragma omp for schedule (static)
-      #pragma omp parallel for
+//#pragma omp parallel for
       for(i=0; i<valid_ta.n(); i++) {
 
          // Parallel: Loop over the domains to be processed
