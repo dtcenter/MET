@@ -13,7 +13,7 @@
 //
 // Model
 //
-model = [ "GFSO", "OFCL" ];
+model = [ "GFSO" ];
 
 //
 // Storm identifier
@@ -91,15 +91,24 @@ data = {
    // If empty, the field is processed for all domains
    domain = [];
 
+   // Pressure levels to be used, unless overridden below
+   level = [ "P1000", "P925", "P850", "P700", "P500",
+             "P400", "P300", "P250", "P200", "P150",
+             "P100" ];
+
    field = [
-      {
-         name  = "TMP";
-         level = ["P500","Z2"];
-      },
-      {
-         name  = "RH";
-         level = "P500";
-      }
+      { name = "TMP";                  },
+      { name = "UGRD";                 },
+      { name = "VGRD";                 },
+      { name = "RH";                   },
+      { name = "HGT";                  },
+      { name = "PRMSL"; level = "Z0";  },
+      { name = "PWAT";  level = "L0";  },
+      { name = "TMP";   level = "Z0";  },
+      { name = "TMP";   level = "Z2";  },
+      { name = "RH";    level = "Z2";  },
+      { name = "UGRD";  level = "Z10"; },
+      { name = "VGRD";  level = "Z10"; }
    ];
 }
 
@@ -126,13 +135,13 @@ vortex_removal = FALSE;
 // Flags to control output files
 //
 nc_rng_azi_flag = TRUE;
-nc_diag_flag    = TRUE;
-cira_diag_flag  = TRUE;
+nc_diag_flag    = FALSE;
+cira_diag_flag  = FALSE;
 
 ////////////////////////////////////////////////////////////////////////////////
 
 tmp_dir       = "/tmp";
 output_prefix = "";
-version       = "V11.0.0";
+version       = "V11.1.0";
 
 ////////////////////////////////////////////////////////////////////////////////
