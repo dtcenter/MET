@@ -175,4 +175,3 @@ tc_diag = {
    'TGRD': 9999
 }
 
-print("Diagnostics:\t" + repr(tc_diag))
