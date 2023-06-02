@@ -138,8 +138,8 @@ vortex_removal = FALSE;
 // Flags to control output files
 //
 nc_rng_azi_flag = TRUE;
-nc_diag_flag    = TRUE;
-cira_diag_flag  = TRUE;
+nc_diag_flag    = FALSE;
+cira_diag_flag  = FALSE;
 
 ////////////////////////////////////////////////////////////////////////////////
 

@@ -330,12 +330,22 @@ void TCDiagConfInfo::process_config(GrdFileType file_type,
    // Conf: nc_rng_azi_flag
    nc_rng_azi_flag = conf.lookup_bool(conf_key_nc_rng_azi_flag);
 
+   // TODO: Remove this check for MET version 12.0.0
+   if(!nc_rng_azi_flag) {
+      mlog << Warning << "\nResetting the \"" << conf_key_nc_rng_azi_flag
+           << "\" configuration option to true since it is the only "
+           << "TC-Diag output for MET " << met_version << ".\n"
+           << "Additional outputs will be added in future MET versions.\n\n";
+      nc_rng_azi_flag = true;
+   }
+
    // Conf: nc_diag_flag
    nc_diag_flag = conf.lookup_bool(conf_key_nc_diag_flag);
 
    // Conf: cira_diag_flag
    cira_diag_flag = conf.lookup_bool(conf_key_cira_diag_flag);
 
+   /* TODO: Uncomment this check for MET version 12.0.0
    // At least one should be true
    if(!nc_diag_flag && !cira_diag_flag) {
       mlog << Error << "\nTCDiagConfInfo::process_config() -> "
@@ -343,6 +353,17 @@ void TCDiagConfInfo::process_config(GrdFileType file_type,
            << conf_key_cira_diag_flag
            << "\" config entries cannot both be false.\n\n";
       exit(1);
+   }
+   */
+
+   // TODO: Remove this check for MET version 12.0.0
+   if(nc_diag_flag || cira_diag_flag) {
+      mlog << Warning << "\nResetting the \""
+           << conf_key_nc_diag_flag << "\" and \"" << conf_key_cira_diag_flag
+           << "\" configuration options to false since they are not supported"
+           << " for MET " << met_version << ".\n"
+           << "Additional outputs will be added in future MET versions.\n\n";
+      nc_diag_flag = cira_diag_flag = false;
    }
 
    // Conf: tmp_dir
