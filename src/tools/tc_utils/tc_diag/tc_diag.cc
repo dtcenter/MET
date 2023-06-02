@@ -112,22 +112,34 @@ static void compute_lat_lon(TcrmwGrid&, double *, double *);
 
 ////////////////////////////////////////////////////////////////////////
 
-// TODO, as of 6/1/2023:
-// - Write the CIRA ascii diagnostics output file format.
-// - Instead of reading DataPlanes one at a time, read them all at once.
-// - get_var_names() returns a multimap that is sorted by the order of
-//   the variable names. This reorders the vars in the NetCDF cyl coord
-//   output. Would prefer that reordering not happen.
-// - Parellelize the processing of valid times - ON HOLD due to runtime errors
-// - Update the python scripts to actually compute the diagnostics.
-// - Check if the azimuths are computed the way Robert says they should be
-// - Add support for python embedding with $MET_PYTHON_EXE set
-// - Add hooks for vortex removal logic.
-//   Print a WARNING message if the Diag Track differs from the Tech Id
-//   for the data files AND vortex removal has not been requested.
-// - Add back in the "regrid" dictionary to control how regridding to cyl coord is done?
+//
+// TODO after the MET version 11.1.0 release:
+//   - Python diagnostics:
+//     - Incorporate CIRA python diagnostics scripts.
+//     - Read resulting Xarray dataset in memory.
+//     - Write CIRA ASCII and NetCDF diagnostics output files.
+//     - Add support for $MET_PYTHON_EXE.
+//   - Input data:
+//     - Instead of reading DataPlanes one at a time,
+//       read them all at once or perhaps in groups
+//       (e.g. all pressure levels).
+//     - Parellelize the processing of valid times.
+//     - Add support for vortex removal. Print a WARNING if
+//       the Diag Track differs from the Tech Id for the data
+//       files and vortex removal has not been requested.
+//   - NetCDF cylindrical coordinates output:
+//     - get_var_names() returns a multimap that is sorted by
+//       the order of the variable names. This reorders the vars
+//       in the NetCDF cyl coord output. Would prefer that reordering
+//       not happen.
+//   - Consider adding support for the "regrid" dictionary to
+//     control cyl coord regridding step is done.
+//
 
 int met_main(int argc, char *argv[]) {
+
+   // Print beta status warning
+   print_beta_warning("The TC-Diag tool");
 
    // Process command line arguments
    process_command_line(argc, argv);
@@ -915,14 +927,7 @@ void process_track_points(const TrackInfoArray& tracks) {
       } // end for j
    } // end for i
 
-// JHG this parellel code only works intermittently
-// sometimes it runs to completion with multiple threads
-// other times it SEGFAULTS:
-//   FATAL ERROR (SEGFAULT): Process 99687 got signal 11
-// or aborts:
-//   FATAL: Received Signal Abort. Exiting 6
-//   tc_diag(99714,0x70000b229000) malloc: *** error for object 0x7f7fd1f7d620:
-//      pointer being freed was not allocated
+// TODO: Work on this parallel code
 
 //#pragma omp parallel default(none)                      \
 //   shared(mlog, conf_info, tracks, valid_ta)            \
@@ -963,7 +968,7 @@ void process_fields(const TrackInfoArray &tracks,
    VarInfo *vi = (VarInfo *) 0;
    StringArray tmp_key_sa;
 
-   // JHG some vortex removal here?
+   // TODO: Consider adding vortex removal logic here
    // Read in the full set of fields required for vortex removal
    // Add flag to configure which fields are used for vortex removal
 
@@ -993,7 +998,7 @@ void process_fields(const TrackInfoArray &tracks,
          // Store unique keys
          if(!tmp_key_sa.has(tmp_key)) tmp_key_sa.add(tmp_key);
 
-         // JHG insert vortex removal logic here?
+         // TODO: Consider adding vortex removal logic here
          // Assume that it applies to each track point location independently.
          // Need to load multiple fields for the vortex removal logic.
          // Perhaps do 2 passes... process the vortex removal first?
@@ -1124,6 +1129,9 @@ void merge_tmp_files(const vector<TmpFileInfo *> tmp_files) {
                  << file_name << "\n\n";
             exit(1);
          }
+
+         // Add global attributes
+         write_netcdf_global(nc_out, file_name.c_str(), program_name);
 
          // Define dimension
          NcDim vld_dim = add_dim(nc_out, "time",
@@ -1337,6 +1345,9 @@ NcFile *OutFileInfo::setup_nc_file(const string &out_file) {
       exit(1);
    }
 
+   // Add global attributes
+   write_netcdf_global(nc_out, out_file.c_str(), program_name);
+
    // Define dimension
    vld_dim = add_dim(nc_out, "time",
                      trk_ptr->n_points());
@@ -1529,6 +1540,9 @@ void TmpFileInfo::setup_nc_file(const DomainInfo &di,
            << tmp_file << "\n\n";
       exit(1);
    }
+
+   // Add global attributes
+   write_netcdf_global(tmp_out, tmp_file.c_str(), program_name);
 
    // Define latitude and longitude arrays
    TcrmwData d = di.data;
