@@ -649,11 +649,11 @@ MultiVarData *first_pass(int j, const string &fcst_filename,
    command << " -v " << mlog.verbosity_level();
    command << " -outdir " << dir;
 
-   mode_argv.add("-field_index");
-   snprintf(junk, sizeof(junk), "%d", j);
-   mode_argv.add(junk);
+   // mode_argv.add("-field_index");
+   // snprintf(junk, sizeof(junk), "%d", j);
+   // mode_argv.add(junk);
 
-   command << " -field_index " << j;
+   // command << " -field_index " << j;
 
    //
    //  run the pass1 portions of mode
@@ -661,12 +661,12 @@ MultiVarData *first_pass(int j, const string &fcst_filename,
 
    mlog << Debug(3) << "Running mode command: \"" << command << "\"\n\n";
    ModeFrontEnd *frontend = new ModeFrontEnd;
-   int status = frontend->run(mode_argv, ModeFrontEnd::MULTIVAR_PASS1);
+   int status = frontend->run(mode_argv, ModeFrontEnd::MULTIVAR_PASS1, j);
    MultiVarData *mvdi = frontend->get_multivar_data();
    delete frontend;
 
    frontend = new ModeFrontEnd;
-   status = frontend->run(mode_argv, ModeFrontEnd::MULTIVAR_PASS1_MERGE);
+   status = frontend->run(mode_argv, ModeFrontEnd::MULTIVAR_PASS1_MERGE, j);
    frontend->addMultivarMergePass1(mvdi);
    delete frontend;
 
@@ -697,14 +697,14 @@ void second_pass(int j, const BoolPlane &f_result,
    mode_argv.add(junk);
    mode_argv.add("-outdir");
    mode_argv.add(dir);
-   mode_argv.add("-field_index");
-   snprintf(junk, sizeof(junk), "%d", j);
-   mode_argv.add(junk);
+   // mode_argv.add("-field_index");
+   // snprintf(junk, sizeof(junk), "%d", j);
+   // mode_argv.add(junk);
 
    mlog << Debug(1) << "Running filtered mode \n\n";
 
    ModeFrontEnd *frontend = new ModeFrontEnd;
-   int status = frontend->run_multivar_pass2(mode_argv, mvd, has_union, f_merge, o_merge);
+   int status = frontend->run_multivar_pass2(mode_argv, mvd, has_union, f_merge, o_merge, j);
    delete frontend;
 }
  

@@ -127,7 +127,6 @@ int met_main(int argc, char * argv [])
    ModeConfInfo config;
    StringArray Argv;
    string s;
-   bool has_field_index = false;
    const char * user_config_filename = 0;
 
    for (j=0,n=0; j<argc; ++j)  {
@@ -160,7 +159,7 @@ int met_main(int argc, char * argv [])
 
    for (j=0; j<argc; ++j)  {
 
-      if ( strcmp(argv[j], "-field_index") == 0 )  has_field_index = true;
+      // if ( strcmp(argv[j], "-field_index") == 0 )  has_field_index = true;
 
       s = argv[j];
 
@@ -170,7 +169,7 @@ int met_main(int argc, char * argv [])
 
    config.read_config  (default_config_filename, user_config_filename);
 
-   if ( config.is_multivar() && !has_field_index )  {
+   if ( config.is_multivar() ) { // && !has_field_index )  {
 
       // exit inside this method if something is not implemented
       config.check_multivar_not_implemented();

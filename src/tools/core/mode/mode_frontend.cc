@@ -36,7 +36,7 @@ extern const char * const program_name;
 
 static ModeExecutive *mode_exec = 0;
 static int compress_level = -1;
-static int field_index = -1;
+// static int field_index = -1;
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -47,7 +47,7 @@ ModeFrontEnd::ModeFrontEnd() :
 {
    mode_exec = 0;
    compress_level = -1;
-   field_index = -1;
+   // field_index = -1;
 }  
 
 
@@ -63,7 +63,7 @@ ModeFrontEnd::~ModeFrontEnd()
 
 ///////////////////////////////////////////////////////////////////////
 
-int ModeFrontEnd::run(const StringArray & Argv, Processing_t ptype)
+int ModeFrontEnd::run(const StringArray & Argv, Processing_t ptype, int field_index)
 
 {
 
@@ -73,7 +73,7 @@ int ModeFrontEnd::run(const StringArray & Argv, Processing_t ptype)
    if ( mode_exec )  { delete mode_exec;  mode_exec = 0; }
    mode_exec = new ModeExecutive;
    compress_level = -1;
-   field_index = -1;
+   // field_index = -1;
 
 
    //
@@ -122,7 +122,7 @@ int ModeFrontEnd::run(const StringArray & Argv, Processing_t ptype)
 
 int ModeFrontEnd::run_multivar_pass2(const StringArray & Argv, const MultiVarData &mvd,
                                      bool has_union, 
-                                     ShapeData &f_merge, ShapeData &o_merge)
+                                     ShapeData &f_merge, ShapeData &o_merge, int field_index)
 {
    Processing_t ptype = MULTIVAR_PASS2;
    mlog << Debug(1) << "Running mode front end " << stype(ptype) << "\n";
@@ -132,7 +132,7 @@ int ModeFrontEnd::run_multivar_pass2(const StringArray & Argv, const MultiVarDat
 
    mode_exec = new ModeExecutive;
    compress_level = -1;
-   field_index = -1;
+   // field_index = -1;
 
    //
    // Process the command line arguments
@@ -145,7 +145,8 @@ int ModeFrontEnd::run_multivar_pass2(const StringArray & Argv, const MultiVarDat
 
    ModeConfInfo & conf = mode_exec->engine.conf_info;
    if (compress_level >= 0) conf.nc_info.set_compress_level(compress_level);
-   if ( field_index >= 0 )  conf.set_field_index(field_index);
+   //if ( field_index >= 0 )
+   conf.set_field_index(field_index);
    if (has_union && (conf.Fcst->merge_flag == MergeType_Thresh ||
                      conf.Obs->merge_flag == MergeType_Thresh)) {
       mlog << Warning << "\nModeFrontEnd::run() -> "
@@ -199,7 +200,7 @@ int ModeFrontEnd::run_super(const StringArray & Argv,
 
    mode_exec = new ModeExecutive;
    compress_level = -1;
-   field_index = -1;
+   // field_index = -1;
 
    //
    // Process the command line arguments
@@ -209,7 +210,7 @@ int ModeFrontEnd::run_super(const StringArray & Argv,
    mode_exec->init_multivar(ftype, otype);
    ModeConfInfo & conf = mode_exec->engine.conf_info;
    if (compress_level >= 0) conf.nc_info.set_compress_level(compress_level);
-   if ( field_index >= 0 )  conf.set_field_index(field_index);
+   // if ( field_index >= 0 )  conf.set_field_index(field_index);
    if (has_union && (conf.Fcst->merge_flag == MergeType_Thresh ||
                      conf.Obs->merge_flag == MergeType_Thresh)) {
       mlog << Warning << "\nModeFrontEnd::run() -> "
@@ -538,11 +539,11 @@ void ModeFrontEnd::process_command_line(const StringArray & argv, bool ismultiva
    cline.add(set_verbosity,         "-v",            1);
    cline.add(set_compress,          "-compress",     1);
 
-   //
-   //  add for mode multivar ... undocumented
-   //
+   // //
+   // //  add for mode multivar ... undocumented
+   // //
 
-   cline.add(set_field_index, "-field_index", 1);
+   // // cline.add(set_field_index, "-field_index", 1);
 
    //
    // Parse the command line
@@ -801,25 +802,25 @@ void ModeFrontEnd::set_compress(const StringArray & a)
 
 ////////////////////////////////////////////////////////////////////////
 
-void ModeFrontEnd::set_field_index(const StringArray & a)
+// void ModeFrontEnd::set_field_index(const StringArray & a)
 
-{
+// {
 
-   field_index = atoi(a[0].c_str());
+//    field_index = atoi(a[0].c_str());
 
-   if ( field_index < 0 )  {
+//    if ( field_index < 0 )  {
 
-      mlog << Error
-           << program_name << ": bad index value ... "
-           << field_index << "\n\n";
+//       mlog << Error
+//            << program_name << ": bad index value ... "
+//            << field_index << "\n\n";
 
-      exit ( 1 );
+//       exit ( 1 );
 
-   }
+//    }
 
-   return;
+//    return;
 
-}
+// }
 
 
 ////////////////////////////////////////////////////////////////////////

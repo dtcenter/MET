@@ -36,11 +36,11 @@ class ModeFrontEnd {
    string default_out_dir;
 
    // default single var mode interface, and multivar pass1 options
-   int run(const StringArray & Argv, Processing_t ptype=SINGLE_VAR);
+   int run(const StringArray & Argv, Processing_t ptype=SINGLE_VAR, int field_index=-1);
 
    // pass2 multivar interface
    int run_multivar_pass2(const StringArray & Argv, const MultiVarData &mvd, bool has_union,
-                          ShapeData &f_merge, ShapeData &o_merge);
+                          ShapeData &f_merge, ShapeData &o_merge, int field_index);
 
    // multivar superobject interface, no intensities
    int run_super(const StringArray & Argv, ShapeData &f_super, ShapeData &o_super,
@@ -75,7 +75,7 @@ class ModeFrontEnd {
    static void set_logfile           (const StringArray &);
    static void set_verbosity         (const StringArray &);
    static void set_compress          (const StringArray &);
-   static void set_field_index       (const StringArray &);   //  undocumented
+   // static void set_field_index       (const StringArray &);   //  undocumented
 
 };
 

@@ -1067,8 +1067,8 @@ fcst_multivar_logic.clear();
 obs_multivar_logic.clear();
 fcst_multivar_name = "Super";  // default, maybe set elsewhere?
 obs_multivar_name = "Super";
-fcst_multivar_level = "Unknown";
-obs_multivar_level = "Unknown";
+fcst_multivar_level = "NA";
+obs_multivar_level = "NA";
 
 dict = conf.lookup_dictionary(conf_key_fcst);
 
