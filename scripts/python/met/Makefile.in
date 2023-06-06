@@ -298,6 +298,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 pythonmetscriptsdir = $(pkgdatadir)/python/met
 pythonmetscripts_DATA = \
+	logger.py \
 	dataplane.py \
 	mprbase.py \
 	point.py
