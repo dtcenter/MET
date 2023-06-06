@@ -5,7 +5,10 @@ from met.dataplane import dataplane
 
 ###########################################
 
-print("Python Script:\t" + repr(sys.argv[0]))
+def log(msg):
+   dataplane.log_msg(msg)
+
+log("Python Script:\t" + repr(sys.argv[0]))
 
    ##
    ##  input file specified on the command line
@@ -13,23 +16,30 @@ print("Python Script:\t" + repr(sys.argv[0]))
    ##
 
 if len(sys.argv) != 3:
-    print("ERROR: read_ascii_xarray.py -> Must specify exactly one input file and a name for the data.")
-    sys.exit(1)
+   dataplane.quit("read_ascii_xarray.py -> Must specify exactly one input file and a name for the data.")
 
 # Read the input file as the first argument
 input_file = os.path.expandvars(sys.argv[1])
 data_name  = sys.argv[2]
 
 try:
-   print("Input File:\t" + repr(input_file))
-   print("Data Name:\t" + repr(data_name))
-   # read_2d_text_input() reads n by m text data and returns 2D numpy array
-   met_data = dataplane.read_2d_text_input(input_file)
-   print("Data Shape:\t" + repr(met_data.shape))
-   print("Data Type:\t" + repr(met_data.dtype))
-except NameError:
+   log("Input File:\t" + repr(input_file))
+   log("Data Name:\t" + repr(data_name))
+   if os.path.exists(input_file):
+      # read_2d_text_input() reads n by m text data and returns 2D numpy array
+      met_data = dataplane.read_2d_text_input(input_file)
+      if met_data is None:
+         dataplane.quit(f" Fail to build met_data from {input_file}")
+      else:
+         log("Data Shape:\t" + repr(met_data.shape))
+         log("Data Type:\t" + repr(met_data.dtype))
+   else:
+      dataplane.quit(f"input {input_file} does exist!!!")
+except:
    met_data = None
-   print("Can't read the input file")
+   import traceback
+   traceback.print_exc()
+   dataplane.quit(f"Unknown error with {sys.argv[0]}: ")
 
 ###########################################
 
@@ -104,6 +114,9 @@ del attrs
 
 # Delete the met_data variable, and reset it to be the Xarray object
 del met_data
+
+# Sets fill_value/min_value/max_value if it exists
+#ds.attrs['fill_value'] = 255
 
 # Create met_data and specify attrs because XR doesn't persist them.
 met_data = xr.DataArray(ds.fcst, attrs=ds.attrs)
