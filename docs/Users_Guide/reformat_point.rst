@@ -594,16 +594,19 @@ _____________________
 .. code-block:: none
 		
 		message_type_map = [
-		{ key = "FM-12 SYNOP";  val = "ADPSFC"; },
-		{ key = "FM-13 SHIP";   val = "SFCSHP"; },
-		{ key = "FM-15 METAR";  val = "ADPSFC"; },
-		{ key = "FM-18 BUOY";   val = "SFCSHP"; },
-		{ key = "FM-281 QSCAT"; val = "ASCATW"; },
-		{ key = "FM-32 PILOT";  val = "ADPUPA"; },
-		{ key = "FM-35 TEMP";   val = "ADPUPA"; },
-		{ key = "FM-88 SATOB";  val = "SATWND"; },
-		{ key = "FM-97 ACARS";  val = "AIRCFT"; }
-	];
+         { key = "FM-12 SYNOP";  val = "ADPSFC"; },
+         { key = "FM-13 SHIP";   val = "SFCSHP"; },
+         { key = "FM-15 METAR";  val = "ADPSFC"; },
+         { key = "FM-16 SPECI";  val = "ADPSFC"; },
+         { key = "FM-18 BUOY";   val = "SFCSHP"; },
+         { key = "FM-18X BUOY";  val = "SFCSHP"; },
+         { key = "FM-281 QSCAT"; val = "ASCATW"; },
+         { key = "FM-32 PILOT";  val = "ADPUPA"; },
+         { key = "FM-35 TEMP";   val = "ADPUPA"; },
+         { key = "FM-88 SATOB";  val = "SATWND"; },
+         { key = "FM-97 ACARS";  val = "AIRCFT"; },
+         { key = "FM-97 AMDAR";  val = "AIRCFT"; }
+	   ];
 
 
 This entry is an array of dictionaries, each containing a **key** string and **val** string which define a mapping of input strings to output message types. This mapping is currently only applied when converting input little_r report types to output message types.
