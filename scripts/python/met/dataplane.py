@@ -1,16 +1,62 @@
 import os
+import sys
 import numpy as np
 import netCDF4 as nc
+import xarray as xr
+
+from importlib import util as import_util
+from met.logger import logger
 
 ###########################################
 
-class dataplane():
+class dataplane(logger):
+
+   KEEP_XARRAY = True
+   class_name = "dataplane"
+
+   MET_FILL_VALUE = -9999.
+   ATTR_USER_FILL_VALUE = 'user_fill_value'
+
+   @staticmethod
+   def call_python(argv):
+       logger.log_msg(f"Python Script:\t{repr(argv[0])}")
+       if 1 == len(argv):
+          logger.quit(f"User command is missing")
+
+       logger.log_msg("User Command:\t"   + repr(' '.join(argv[1:])))
+       # argv[0] is the python wrapper script (caller)
+       # argv[1] contains the user defined python script
+       pyembed_module_name = argv[1]
+       sys.argv = argv[1:]
+       logger.log_msg(f"   sys.argv:\t{sys.argv}")
+
+       # append user script dir to system path
+       pyembed_dir, pyembed_name = os.path.split(pyembed_module_name)
+       if pyembed_dir:
+          sys.path.insert(0, pyembed_dir)
+
+       if not pyembed_module_name.endswith('.py'):
+          pyembed_module_name += '.py'
+
+       user_base = pyembed_name.replace('.py','')
+
+       spec = import_util.spec_from_file_location(user_base, pyembed_module_name)
+       met_in = import_util.module_from_spec(spec)
+       spec.loader.exec_module(met_in)
+       return met_in
+
+   @staticmethod
+   def is_integer(a_data):
+      return isinstance(a_data, int)
+
+   @staticmethod
+   def is_xarray_dataarray(a_data):
+      return isinstance(a_data, xr.DataArray)
 
    ##
    ##  create the metadata dictionary
    ##
 
-   #@staticmethod
    # Python dictionary items:
    #      'name': data name
    # 'long_name': descriptive name
@@ -25,6 +71,7 @@ class dataplane():
    #              - a gridded data file name
    #              - MET specific grid string, "lambert 185 129 12.19 -133.459 -95 40.635 6371.2 25 25 N"
    #              - a dictionary for the grid information
+   @staticmethod
    def set_dataplane_attrs(data_name, valid_time, init_time, lead_time,
                            accum_time, v_level, units, grid_info, long_name=None):
       hdr_attrs = {
@@ -44,7 +91,7 @@ class dataplane():
       }
       return hdr_attrs
 
-   #@staticmethod
+   @staticmethod
    def read_2d_text_input(input_file):
       if os.path.exists(input_file):
           met_data = np.loadtxt(input_file)
@@ -52,11 +99,16 @@ class dataplane():
           met_data = None
       return met_data
 
-   #@staticmethod
+   @staticmethod
    def read_dataplane(netcdf_filename):
       # read NetCDF file
       ds = nc.Dataset(netcdf_filename, 'r')
-      met_data = ds['met_data'][:]
+
+      dp = ds['met_data']
+      met_data = dp[:]
+      attr_name = dataplane.ATTR_USER_FILL_VALUE
+      user_fill_value = dp.getncattr(attr_name) if hasattr(dp, attr_name) else None
+
       met_attrs = {}
 
       # grid is defined as a dictionary or string
@@ -76,10 +128,13 @@ class dataplane():
 
       met_info = {}
       met_info['met_data'] = met_data
+      if user_fill_value is not None:
+         met_attrs['fill_value'] = user_fill_value
       met_info['attrs'] = met_attrs
+
       return met_info
 
-   #@staticmethod
+   @staticmethod
    def write_dataplane(met_in, netcdf_filename):
       met_info = {'met_data': met_in.met_data}
       if hasattr(met_in.met_data, 'attrs') and met_in.met_data.attrs:
@@ -88,12 +143,6 @@ class dataplane():
          attrs = met_in.attrs
       met_info['attrs'] = attrs
 
-      # determine fill value
-      #try:
-      #   fill = met_in.met_data.get_fill_value()
-      #except:
-      fill = -9999.
-
       # write NetCDF file
       ds = nc.Dataset(netcdf_filename, 'w')
 
@@ -101,13 +150,16 @@ class dataplane():
       nx, ny = met_in.met_data.shape
       ds.createDimension('x', nx)
       ds.createDimension('y', ny)
-      dp = ds.createVariable('met_data', met_in.met_data.dtype, ('x', 'y'), fill_value=fill)
+      dp = ds.createVariable('met_data', met_in.met_data.dtype, ('x', 'y'),
+                             fill_value=dataplane.MET_FILL_VALUE)
       dp[:] = met_in.met_data
 
       # append attributes
       for attr, attr_val in met_info['attrs'].items():
          if attr == 'name':
             setattr(ds, 'name_str', attr_val)
+         elif attr == 'fill_value':
+            setattr(dp, dataplane.ATTR_USER_FILL_VALUE, attr_val)
          elif type(attr_val) == dict:
             for key in attr_val:
                setattr(ds, attr + '.' + key, attr_val[key])
@@ -116,3 +168,112 @@ class dataplane():
 
       ds.close()
 
+   @staticmethod
+   def validate_met_data(met_data, fill_value=None, min_value=None, max_value=None):
+      method_name = f"{dataplane.class_name}.validate()"
+      #logger.log_msg(f"{method_name} type(met_data)= {type(met_data)}")
+      attrs = None
+      from_xarray = False
+      from_ndarray = False
+      if met_data is None:
+         logger.quit(f"{method_name} The met_data is None")
+
+      nx, ny = met_data.shape
+      met_fill_value = dataplane.MET_FILL_VALUE
+      if dataplane.is_xarray_dataarray(met_data):
+         from_xarray = True
+         attrs = met_data.attrs
+         met_data = met_data.data
+         modified_met_data = True
+      if isinstance(met_data, np.ndarray):
+         from_ndarray = True
+         met_data = np.ma.array(met_data)
+
+      if isinstance(met_data, np.ma.MaskedArray):
+         is_int_data = dataplane.is_integer(met_data[0,0]) or dataplane.is_integer(met_data[int(nx/2),int(ny/2)])
+         met_data = np.ma.masked_equal(met_data, float('nan'))
+         met_data = np.ma.masked_equal(met_data, float('inf'))
+         if fill_value is not None:
+            met_data = np.ma.masked_equal(met_data, fill_value)
+         if min_value is not None:
+            is_less = False
+            if isinstance(min_value, str):
+               if min_value[0] == '<':
+                  start_index = 1
+                  if min_value[1] == '=':
+                     start_index += 1
+                  else:
+                     is_less = True
+                  min_value = int(min_value[start_index:]) if is_int_data else float(min_value[start_index:])
+               else:
+                  min_value = int(min_value) if is_int_data else float(min_value)
+            if is_less:
+               met_data = np.ma.masked_less(met_data, min_value)
+            else:
+               met_data = np.ma.masked_less_equal(met_data, min_value)
+         if max_value is not None:
+            is_greater = False
+            if isinstance(max_value, str):
+               if max_value[0] == '>':
+                  start_index = 1
+                  if max_value[1] == '=':
+                     start_index += 1
+                  else:
+                     is_less = True
+                  max_value = int(max_value[start_index:]) if is_int_data else float(max_value[start_index:])
+               else:
+                  max_value = int(max_value) if is_int_data else float(max_value)
+            if is_greater:
+               met_data = np.ma.masked_greater(met_data, max_value)
+            else:
+               met_data = np.ma.masked_greater_equal(met_data, max_value)
+         met_data = met_data.filled(int(met_fill_value) if is_int_data else met_fill_value)
+      else:
+         logger.log_msg(f"{method_name} unknown datatype {type(met_data)}")
+
+      if dataplane.KEEP_XARRAY:
+         return xr.DataArray(met_data,attrs=attrs) if from_xarray else met_data
+      else:
+         return met_data
+
+
+def main(argv):
+   global attrs, met_data, met_info
+
+   met_in = dataplane.call_python(sys.argv)
+
+   user_fill_value = None
+   try:
+      met_info = met_in.met_info
+      attrs = met_info['attrs']
+      init_met_data = met_info['met_data']
+   except:
+      met_info = {}
+      init_met_data = met_in.met_data
+      try:     # numpy and attrs
+         attrs = met_in.attrs
+      except:  # xarray
+         attrs = init_met_data.attrs
+      met_info['attrs'] = attrs
+      if hasattr(met_in, 'user_fill_value'):
+         fill_value = met_in.user_fill_value
+      #try:
+      #   user_fill_value = met_in.user_fill_value
+      #   met_info['user_fill_value'] = user_fill_value
+      #except:
+      #   pass
+
+   fill_value = attrs.get('fill_value', None)
+   min_value = attrs.get('min_value', None)
+   max_value = attrs.get('max_value', None)
+   dataplane.log_msg('validating the dapaplane array...')
+   met_data = dataplane.validate_met_data(init_met_data, fill_value, min_value, max_value)
+   met_info['met_data'] = met_data
+
+   if os.environ.get('MET_PYTHON_DEBUG', None) is not None:
+      dataplane.log_msg('--- met_data after validating ---')
+      dataplane.log_msg(met_data)
+
+if __name__ == '__main__' or __name__ == sys.argv[0]:
+   main(sys.argv)
+   dataplane.log_msg(f'{__name__} is called')
