@@ -30,7 +30,7 @@ The following sections describe the usage statement, required arguments, and opt
 tc_diag has required arguments and can accept several optional arguments.
 
 Required arguments for tc_diag
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. The **-data file_1 ... file_n | data_file_list** options specify the gridded data files or an ASCII file containing a list of files to be used.
 
@@ -41,14 +41,14 @@ Required arguments for tc_diag
 4. The **-out** argument is the NetCDF output file to be written.
 
 Optional arguments for tc_diag
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 5. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no logfile.
 
 6. The **-v level** option indicates the desired level of verbosity. The contents of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
 
 tc_diag configuration file
--------------------------
+--------------------------
 
 The default configuration file for the TC-Diag tool named **TCDiagConfig_default** can be found in the installed *share/met/config/* directory. It is encouraged for users to copy these default files before modifying their contents. The contents of the configuration file are described in the subsections below.
 
@@ -177,7 +177,7 @@ The **radial_velocity_field_name** and **radial_velocity_long_field_name** param
 
 
 tc_diag output file
-------------------
+-------------------
 
 The NetCDF output file contains the following dimensions:
 
