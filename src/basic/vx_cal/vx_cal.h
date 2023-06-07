@@ -160,6 +160,8 @@ extern  bool is_hh(const char * text);
 ////////////////////////////////////////////////////////////////////////
 
 
+#ifndef EXCLUDE_CONST_UNIX_TO_MDYHMS
+
 extern const char * day_name[];
 
 extern const char * short_day_name[];
@@ -168,6 +170,7 @@ extern const char * month_name[];
 
 extern const char * short_month_name[];
 
+#endif
 
 ////////////////////////////////////////////////////////////////////////
 
