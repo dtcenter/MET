@@ -59,7 +59,6 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
@@ -74,7 +73,6 @@ using namespace std;
 #include <assert.h>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "main.h"
 #include "pb2nc_conf_info.h"
@@ -95,12 +93,15 @@ using namespace netCDF;
 #include "nc_point_obs_out.h"
 #include "nc_summary.h"
 
+using namespace std;
+using namespace netCDF;
+
 ////////////////////////////////////////////////////////////////////////
 
 struct derive_var_cfg {
    int var_index;
    ConcatString var_name;
-   derive_var_cfg(ConcatString _var_name);
+   explicit derive_var_cfg(ConcatString _var_name);
    derive_var_cfg &operator=(const derive_var_cfg &a) noexcept;
 };
 
@@ -115,8 +116,8 @@ static const char * default_config_filename = "MET_BASE/config/PB2NCConfig_defau
 static const char *program_name = "pb2nc";
 static const char *not_assigned = "not_assigned";
 
-static const float fill_value   = -9999.f;
-static const int missing_cycle_minute = -1;
+constexpr static float fill_value   = -9999.f;
+constexpr static int missing_cycle_minute = -1;
 
 // Constants used to interface to Fortran subroutines
 
@@ -141,39 +142,38 @@ static const int COUNT_THRESHOLD = 16;
 static const int file_unit      = 11;
 // 2nd file unit number for opening the PrepBufr file
 static const int dump_unit      = 22;
-static int msg_typ_ret[n_vld_msg_typ];
 
 // Grib codes corresponding to the variable types
-static const int var_gc[mxr8vt] = {
+const std::array<int, mxr8vt> var_gc = {
    pres_grib_code, spfh_grib_code, tmp_grib_code,
    hgt_grib_code,  ugrd_grib_code, vgrd_grib_code
 };
-static int bufr_var_code[mxr8vt];
+static std::array<int, mxr8vt> bufr_var_code;
 
 // Number of variable types which may be derived
-static const int n_derive_gc = 6;
+constexpr static int n_derive_gc = 6;
 
 // Listing of grib codes for variable types which may be derived
-static const int derive_gc[n_derive_gc] = {
+const std::array<int, n_derive_gc> derive_gc = {
    dpt_grib_code,  wdir_grib_code,
    wind_grib_code, rh_grib_code,
    mixr_grib_code, prmsl_grib_code
 };
 
 // The fortran code is hard-coded with 200 levels
-#define MAX_CAPE_VALUE 10000
-#define MAX_CAPE_LEVEL 200
-#define CAPE_INPUT_VARS 3
+constexpr int MAX_CAPE_VALUE = 10000;
+constexpr int MAX_CAPE_LEVEL = 200;
+constexpr int CAPE_INPUT_VARS = 3;
 static float cape_data_pres[MAX_CAPE_LEVEL];
 static float cape_data_temp[MAX_CAPE_LEVEL];
 static float cape_data_spfh[MAX_CAPE_LEVEL];
 static float static_dummy_200[MAX_CAPE_LEVEL];
 static float static_dummy_201[MAX_CAPE_LEVEL+1];
 
-#define ROG             287.04
-#define MAX_PBL         10000
-#define MAX_PBL_LEVEL   256
-#define PBL_DEBUG_LEVEL 8
+//#define ROG             287.04
+constexpr int MAX_PBL         = 10000;
+constexpr int MAX_PBL_LEVEL   = 256;
+constexpr int PBL_DEBUG_LEVEL = 8;
 static bool IGNORE_Q_PBL = true;
 static bool IGNORE_Z_PBL = true;
 static bool USE_LOG_INTERPOLATION = true;
@@ -207,7 +207,8 @@ static PB2NCConfInfo conf_info;
 static MetNcPointObsOut nc_point_obs;
 
 // Beginning and ending retention times
-static unixtime valid_beg_ut, valid_end_ut;
+static unixtime valid_beg_ut;
+static unixtime valid_end_ut;
 
 // Number of PrepBufr messages to process from the command line
 static int nmsg = -1;
@@ -411,9 +412,183 @@ static void   cleanup_hdr_typ(char *hdr_typ, bool is_prepbufr=false);
 ////////////////////////////////////////////////////////////////////////
 
 
-derive_var_cfg::derive_var_cfg(ConcatString _var_name) {
+void read_bufr_vars(bool is_airnow, bool is_prepbufr, int file_unit, int nlev_max_req,
+                    int obs_hid, float obs_pres, float obs_hgt,
+                    const float hdr_lat, const float hdr_lon, const float hdr_elv,
+                    const unixtime hdr_vld_ut, const char *hdr_typ,
+                    const ConcatString &hdr_sid,
+                    int &n_hdr_obs, int &n_file_obs,
+                    StringArray &variables_big_nlevels) {
+   int i_ret;
+   int buf_nlev;
+   int airnow_nlev = 0;
+   float obs_arr[OBS_ARRAY_LEN];
+   int quality_mark = bad_data_int;
+   const char *method_name = "read_bufr_vars() ->";
+
+   obs_arr[0] = obs_hid;
+   obs_arr[2] = obs_pres;
+   obs_arr[3] = obs_hgt;
+
+   if (is_airnow) {
+      int tmp_ret;
+      for (int index1=0; index1<mxr8lv; index1++) {
+        for (int index2=0; index2<mxr8pm; index2++) {
+           bufr_obs_extra[index1][index2] = bad_data_double;
+        }
+      }
+      int tmp_len = m_strlen(airnow_aux_vars);
+      readpbint_(&file_unit, &tmp_ret, &airnow_nlev, bufr_obs_extra,
+                 (char *)airnow_aux_vars, &tmp_len, &nlev_max_req);
+   }
+
+   bool isDegC;
+   bool isMgKg;
+   bool isMilliBar;
+   int var_index;
+   int n_other_file_obs  = 0;
+   int n_other_total_obs = 0;
+   int n_other_hdr_obs   = 0;
+   int var_count = bufr_obs_name_arr.n_elements();
+   for (int vIdx=0; vIdx<var_count; vIdx++) {
+      int nlev2;
+      ConcatString var_name;
+      int var_name_len;
+      var_name = bufr_obs_name_arr[vIdx];
+      var_name_len = var_name.length();
+      if (is_prepbufr &&
+            (prepbufr_vars.has(var_name, false)
+             || prepbufr_event_members.has(var_name)
+             || prepbufr_derive_vars.has(var_name))) continue;
+
+      isDegC = false;
+      isMgKg = false;
+      isMilliBar = false;
+      if (var_names.has(var_name, var_index, false)) {
+         if ("DEG C" == var_units[var_index]) {
+            isDegC = true;
+         }
+         else if ("MB" == var_units[var_index]) {
+            isMilliBar = true;
+         }
+         else if ("MG/KG" == var_units[var_index]) {
+            isMgKg = true;
+         }
+      }
+
+      readpbint_(&file_unit, &i_ret, &nlev2, bufr_obs,
+                 (char*)var_name.c_str(), &var_name_len, &nlev_max_req);
+      if (0 >= nlev2) continue;
+
+      buf_nlev = nlev2;
+      if (nlev2 > mxr8lv) {
+         buf_nlev = mxr8lv;
+         if (!variables_big_nlevels.has(var_name, false)) {
+            mlog << Warning << "\n" << method_name
+                 << "Too many vertical levels (" << nlev2
+                 << ") for " << var_name
+                 << ". Ignored the vertical levels above " << mxr8lv << ".\n\n";
+            variables_big_nlevels.add(var_name);
+         }
+      }
+      mlog << Debug(10) << "var: " << var_name << " nlev2: " << nlev2
+           << ", vIdx: " << vIdx << ", obs_data_idx: "
+           << nc_point_obs.get_obs_index() << ", nlev: " << nlev << "\n";
+      // Search through the vertical levels
+      for(int lv=0; lv<buf_nlev; lv++) {
+         // If the observation vertical level is not within the
+         // specified valid range, continue to the next vertical level
+         if((lv+1) < conf_info.beg_level) continue;
+         if((lv+1) > conf_info.end_level) break;
+
+         // If the pressure level is not valid, continue to the next level
+         if (is_prepbufr) {
+            if ((lv >= nlev) || is_eq(bufr_pres_lv[lv], fill_value)) continue;
+         }
+
+         if (bufr_obs[lv][0] > r8bfms) continue;
+         mlog << Debug(10) << " value:   bufr_obs[" << lv << "][0]: " << bufr_obs[lv][0] << "\n";
+
+         obs_arr[1] = (float)vIdx;        // BUFR variable index
+         obs_arr[4] = bufr_obs[lv][0];    // observation value
+         if(!is_eq(obs_arr[4], fill_value)) {
+            float scale_factor = 1.;
+            // Convert pressure from millibars to pascals
+            if (isMilliBar) scale_factor = pa_per_mb;
+            // Convert specific humidity from mg/kg to kg/kg
+            else if(isMgKg) scale_factor = kg_per_mg;
+            // Convert temperature from celcius to kelvin
+            else if(isDegC) scale_factor = c_to_k;
+            obs_arr[4] *= scale_factor;
+         }
+
+         if (is_airnow) {
+            if (lv < airnow_nlev) {
+               obs_arr[2]   = abs(bufr_obs_extra[lv][0] * 3600);  // hour to second
+            }
+            obs_arr[3]   = 0;                                  // AIRNOW obs at surface
+            quality_mark = bufr_obs_extra[lv][1];
+            // Convert a special number (1e+11) to NA at addObservation
+            if(conf_info.quality_mark_thresh < quality_mark) continue;
+         }
+         else {
+            // Retain the pressure in hPa for each observation record
+            obs_arr[2] = bufr_pres_lv[lv];
+            obs_arr[3] = bufr_msl_lv[lv];
+            if (is_eq(obs_arr[2], fill_value) && is_eq(obs_arr[3], fill_value) && 0 < nlev2) {
+               obs_arr[2] = lv;
+               obs_arr[3] = lv;
+            }
+         }
+
+         addObservation(obs_arr, (string)hdr_typ, (string)hdr_sid, hdr_vld_ut,
+               hdr_lat, hdr_lon, hdr_elv, quality_mark, OBS_BUFFER_SIZE);
+
+         // Increment the current and total observations counts
+         n_other_file_obs++;
+         n_other_total_obs++;
+
+         // Increment the number of obs counter for this header
+         n_other_hdr_obs++;
+      }
+   }
+   n_hdr_obs += n_other_hdr_obs;
+   n_file_obs += n_other_file_obs;
+   n_total_obs += n_other_total_obs;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void dump_pb_data(
+   int unit,
+   const ConcatString &prefix,
+   const ConcatString &blk_file,
+   const char *method_name
+) {
+   int msg_typ_ret[n_vld_msg_typ];
+   int len1 = dump_dir.length();
+   int len2 = prefix.length();
+
+   mlog << Debug(1) << "Dumping to ASCII output directory:\t"
+        << dump_dir << "\n";
+
+   for(int i=0; i<n_vld_msg_typ; i++) {
+      msg_typ_ret[i] = keep_message_type(vld_msg_typ_list[i]);
+   }
+
+   if (unit > MAX_FORTRAN_FILE_ID || unit < MIN_FORTRAN_FILE_ID) {
+      mlog << Error << "\n" << method_name
+           << "Invalid file ID [" << unit << "] between 1 and 99.\n\n";
+   }
+   dumppb_(blk_file.c_str(), &unit, dump_dir.c_str(), &len1,
+           prefix.c_str(), &len2, msg_typ_ret);
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+derive_var_cfg::derive_var_cfg(ConcatString _var_name): var_name{_var_name} {
    var_index = bad_data_int;
-   var_name = _var_name;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -475,12 +650,12 @@ int met_main(int argc, char *argv[]) {
    // Deallocate memory and clean up
    clean_up();
 
-   return(0);
+   return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-const string get_tool_name() {
+string get_tool_name() {
    return program_name;
 }
 
@@ -629,28 +804,29 @@ void process_command_line(int argc, char **argv) {
 
 ////////////////////////////////////////////////////////////////////////
 
-ConcatString save_bufr_table_to_file(const char *blk_file, int file_id) {
+ConcatString save_bufr_table_to_file(const char *blk_file, int _file_id) {
    int len;
-   ConcatString tbl_filename, tbl_prefix;
+   ConcatString tbl_filename;
+   ConcatString tbl_prefix;
 
    tbl_prefix << conf_info.tmp_dir << "/" << "tmp_pb2nc_bufr";
    tbl_filename = make_temp_file_name(tbl_prefix.c_str(), "tbl");
    len = tbl_filename.length();
-   if (file_id > MAX_FORTRAN_FILE_ID || file_id < MIN_FORTRAN_FILE_ID) {
+   if (_file_id > MAX_FORTRAN_FILE_ID || _file_id < MIN_FORTRAN_FILE_ID) {
       mlog << Error << "\nsave_bufr_table_to_file() -> "
-           << "Invalid file ID [" << file_id << "] between 1 and 99.\n\n";
+           << "Invalid file ID [" << _file_id << "] between 1 and 99.\n\n";
    }
-   openpb_(blk_file, &file_id);
-   dump_tbl_(blk_file, &file_id, tbl_filename.c_str(), &len);
-   closepb_(&file_id);
-   //close(file_id);
+   openpb_(blk_file, &_file_id);
+   dump_tbl_(blk_file, &_file_id, tbl_filename.c_str(), &len);
+   closepb_(&_file_id);
+   //close(_file_id);
    // Delete the temporary blocked file
    remove_temp_file((string)blk_file);
    return tbl_filename;
 }
 
 
-bool is_prepbufr_file(StringArray *events) {
+bool is_prepbufr_file(const StringArray *events) {
    bool is_prepbufr = events->has("P__EVENT") && events->has("Q__EVENT")
          && events->has("T__EVENT") && events->has("Z__EVENT");
    return is_prepbufr;
@@ -664,7 +840,6 @@ void get_variable_info(const char* tbl_filename) {
    FILE * fp;
    char * line = nullptr;
    size_t len = 1024;
-   ssize_t read;
 
    event_names.clear();
    event_members.clear();
@@ -690,7 +865,7 @@ void get_variable_info(const char* tbl_filename) {
       }
       // Processing section 1
       int var_count1 = 0;
-      while ((read = getline(&line, &len, fp)) != -1) {
+      while (getline(&line, &len, fp) != -1) {
          if (nullptr != strstr(line,"--------")) continue;
          if (nullptr != strstr(line,"MNEMONIC")) {
             if (find_mnemonic) break;
@@ -725,7 +900,7 @@ void get_variable_info(const char* tbl_filename) {
       }
 
       // Skip  section 2
-      while ((read = getline(&line, &len, fp)) != -1) {
+      while (getline(&line, &len, fp) != -1) {
          if (nullptr != strstr(line,"MNEMONIC")) break;
          if (nullptr == strstr(line,"EVENT")) continue;
 
@@ -736,7 +911,6 @@ void get_variable_info(const char* tbl_filename) {
             if (' ' != var_name[idx] ) break;
             var_name[idx] = '\0';
          }
-         //if (nullptr == strstr(var_name,"EVENT")) continue;
 
          m_strncpy(var_desc, (line+BUFR_SEQUENCE_START), BUFR_SEQUENCE_LEN,
                    method_name, "var_desc2", true);
@@ -755,7 +929,7 @@ void get_variable_info(const char* tbl_filename) {
       getline(&line, &len, fp);
 
       // Processing section 3
-      while ((read = getline(&line, &len, fp)) != -1) {
+      while (getline(&line, &len, fp) != -1) {
          if (' ' == line[BUFR_NAME_START]) continue;
          if ('-' == line[BUFR_NAME_START]) break;
 
@@ -790,8 +964,7 @@ void get_variable_info(const char* tbl_filename) {
       }
 
       fclose(fp);
-      if (line)
-         free(line);
+      if (line) free(line);
 
    }
    return;
@@ -905,8 +1078,6 @@ void process_pbfile(int i_pb) {
 
    // Dump the contents of the PrepBufr file to ASCII files
    if(dump_flag) {
-      mlog << Debug(1) << "Dumping to ASCII output directory:\t"
-           << dump_dir << "\n";
 
       // Check for multiple PrepBufr files
       if(pbfile.n_elements() > 1) {
@@ -917,21 +1088,11 @@ void process_pbfile(int i_pb) {
          exit(1);
       }
 
-      for(i=0; i<n_vld_msg_typ; i++) {
-         msg_typ_ret[i] = keep_message_type(vld_msg_typ_list[i]);
-      }
-
       unit = dump_unit+i_pb;
-      if (unit > MAX_FORTRAN_FILE_ID || unit < MIN_FORTRAN_FILE_ID) {
-         mlog << Error << "\n" << method_name
-              << "Invalid file ID [" << unit << "] between 1 and 99.\n\n";
-      }
       prefix = get_short_name(pbfile[i_pb].c_str());
-      len1 = dump_dir.length();
-      len2 = prefix.length();
-      dumppb_(blk_file.c_str(), &unit, dump_dir.c_str(), &len1,
-              prefix.c_str(), &len2, msg_typ_ret);
+      dump_pb_data((dump_unit+i_pb), prefix, blk_file, method_name);
    }
+
 
    // Open the blocked temp PrepBufr file for reading
    unit = file_unit + i_pb;
@@ -1621,7 +1782,7 @@ void process_pbfile(int i_pb) {
                             (IGNORE_Z_PBL || is_valid_pb_data(pqtzuv[3]));
                if (has_tq || has_uv) {
                   // Allocated memory is deleted after all observations are processed
-                  float *tmp_pqtzuv = new float [mxr8vt];
+                  auto tmp_pqtzuv = new float [mxr8vt];
 
                   for(kk=0; kk<mxr8vt; kk++) tmp_pqtzuv[kk] = pqtzuv[kk];
 
@@ -1680,9 +1841,9 @@ void process_pbfile(int i_pb) {
                cape_data_temp[cape_level] = cape_data_temp[cape_level-1];
                cape_data_spfh[cape_level] = cape_data_spfh[cape_level-1];
                for (int idx=cape_level+1; idx<MAX_CAPE_LEVEL; idx++) {
-                  cape_data_pres[idx] = r8bfms * 10;
-                  cape_data_temp[idx] = r8bfms * 10;
-                  cape_data_spfh[idx] = r8bfms * 10;
+                  cape_data_pres[idx] = (float)r8bfms * 10;
+                  cape_data_temp[idx] = (float)r8bfms * 10;
+                  cape_data_spfh[idx] = (float)r8bfms * 10;
                }
             }
 
@@ -1775,138 +1936,10 @@ void process_pbfile(int i_pb) {
          else cape_cnt_surface_msgs++;
       }
 
-      //if (do_all_vars) {
-      {
-         quality_mark = bad_data_int;
-         ConcatString quality_mark_str;
-
-         if (is_airnow) {
-            int tmp_ret, tmp_nlev, tmp_len;
-            for (int index1=0; index1<mxr8lv; index1++) {
-              for (int index2=0; index2<mxr8pm; index2++) {
-                 bufr_obs_extra[index1][index2] = bad_data_double;
-              }
-            }
-            tmp_len = m_strlen(airnow_aux_vars);
-            readpbint_(&unit, &tmp_ret, &tmp_nlev, bufr_obs_extra,
-                       (char *)airnow_aux_vars, &tmp_len, &nlev_max_req);
-         }
-         bool isDegC;
-         bool isMgKg;
-         bool isMilliBar;
-         int var_index;
-         int n_other_file_obs  = 0;
-         int n_other_total_obs = 0;
-         int n_other_hdr_obs   = 0;
-         int var_count = bufr_obs_name_arr.n_elements();
-         for (int vIdx=0; vIdx<var_count; vIdx++) {
-            int nlev2;
-            ConcatString var_name;
-            int var_name_len;
-            var_name = bufr_obs_name_arr[vIdx];
-            var_name_len = var_name.length();
-            if (is_prepbufr &&
-                  (prepbufr_vars.has(var_name, false)
-                   || prepbufr_event_members.has(var_name)
-                   || prepbufr_derive_vars.has(var_name))) continue;
-
-            isDegC = false;
-            isMgKg = false;
-            isMilliBar = false;
-            if (var_names.has(var_name, var_index, false)) {
-               if ("DEG C" == var_units[var_index]) {
-                  isDegC = true;
-               }
-               else if ("MB" == var_units[var_index]) {
-                  isMilliBar = true;
-               }
-               else if ("MG/KG" == var_units[var_index]) {
-                  isMgKg = true;
-               }
-            }
-
-            readpbint_(&unit, &i_ret, &nlev2, bufr_obs,
-                       (char*)var_name.c_str(), &var_name_len, &nlev_max_req);
-            if (0 >= nlev2) continue;
-
-            buf_nlev = nlev2;
-            if (nlev2 > mxr8lv) {
-               buf_nlev = mxr8lv;
-               if (!variables_big_nlevels.has(var_name, false)) {
-                  mlog << Warning << "\n" << method_name
-                       << "Too many vertical levels (" << nlev2
-                       << ") for " << var_name
-                       << ". Ignored the vertical levels above " << mxr8lv << ".\n\n";
-                  variables_big_nlevels.add(var_name);
-               }
-            }
-            mlog << Debug(10) << "var: " << var_name << " nlev2: " << nlev2
-                 << ", vIdx: " << vIdx << ", obs_data_idx: "
-                 << nc_point_obs.get_obs_index() << ", nlev: " << nlev << "\n";
-            // Search through the vertical levels
-            for(lv=0; lv<buf_nlev; lv++) {
-               // If the observation vertical level is not within the
-               // specified valid range, continue to the next vertical level
-               if((lv+1) < conf_info.beg_level) continue;
-               if((lv+1) > conf_info.end_level) break;
-
-               // If the pressure level is not valid, continue to the next level
-               if (is_prepbufr) {
-                  if ((lv >= nlev) || is_eq(bufr_pres_lv[lv], fill_value)) continue;
-               }
-
-               if (bufr_obs[lv][0] > r8bfms) continue;
-               mlog << Debug(10) << " value:   bufr_obs[" << lv << "][0]: " << bufr_obs[lv][0] << "\n";
-
-               obs_arr[1] = (float)vIdx;        // BUFR variable index
-               obs_arr[4] = bufr_obs[lv][0];    // observation value
-               if(!is_eq(obs_arr[4], fill_value)) {
-                  // Convert pressure from millibars to pascals
-                  if (isMilliBar) {
-                     obs_arr[4] *= pa_per_mb;
-                  }
-                  // Convert specific humidity from mg/kg to kg/kg
-                  else if(isMgKg) {
-                     obs_arr[4] *= kg_per_mg;
-                  }
-                  // Convert temperature from celcius to kelvin
-                  else if(isDegC) {
-                     obs_arr[4] += c_to_k;
-                  }
-               }
-
-               if (is_airnow) {
-                  obs_arr[2]   = abs(bufr_obs_extra[lv][0] * 3600);  // hour to second
-                  obs_arr[3]   = 0;                                  // AIRNOW obs at surface
-                  quality_mark = bufr_obs_extra[lv][1];
-                  // Convert a special number (1e+11) to NA at addObservation
-                  if(conf_info.quality_mark_thresh < quality_mark) continue;
-               }
-               else {
-                  // Retain the pressure in hPa for each observation record
-                  obs_arr[2] = bufr_pres_lv[lv];
-                  obs_arr[3] = bufr_msl_lv[lv];
-                  if (is_eq(obs_arr[2], fill_value) && is_eq(obs_arr[3], fill_value) && 0 < nlev2) {
-                     obs_arr[2] = lv;
-                     obs_arr[3] = lv;
-                  }
-               }
-
-               addObservation(obs_arr, (string)hdr_typ, (string)hdr_sid, hdr_vld_ut,
-                     hdr_lat, hdr_lon, hdr_elv, quality_mark, OBS_BUFFER_SIZE);
-
-               // Increment the current and total observations counts
-               n_other_file_obs++;
-               n_other_total_obs++;
-
-               // Increment the number of obs counter for this header
-               n_other_hdr_obs++;
-            }
-         }
-         n_hdr_obs += n_other_hdr_obs;
-         n_file_obs += n_other_file_obs;
-         n_total_obs += n_other_total_obs;
-      }
+      read_bufr_vars(is_airnow, is_prepbufr, unit, nlev_max_req,
+                    obs_arr[0], obs_arr[2], obs_arr[3], hdr_lat, hdr_lon,  hdr_elv,
+                    hdr_vld_ut, hdr_typ, hdr_sid, n_hdr_obs, n_file_obs,
+                    variables_big_nlevels);
 
       if (do_pbl) {
          pbl_level = 0;
@@ -3000,7 +3033,7 @@ int combine_tqz_and_uv(map<float, float*> pqtzuv_map_tq,
       it_tq = pqtzuv_map_tq.begin();
       it_uv = pqtzuv_map_uv.begin();
       pqtzuv_tq = (float *)it_tq->second;
-      pqtzuv_uv = (float *)it_uv->second;;
+      pqtzuv_uv = (float *)it_uv->second;
       pqtzuv_merged = new float[mxr8vt];
       tq_pres = nint(it_tq->first);
       uv_pres = nint(it_uv->first);
