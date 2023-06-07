@@ -33,7 +33,7 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-static int default_ns_alloc_inc = 100;   //  default value
+constexpr int default_ns_alloc_inc = 100;   //  default value
 
 
 
