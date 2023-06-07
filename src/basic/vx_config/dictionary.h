@@ -220,7 +220,7 @@ class Dictionary {
       Dictionary(const Dictionary &);
       Dictionary & operator=(const Dictionary &);
 
-      void clear();
+      virtual void clear();
 
       virtual void dump(std::ostream &, int = 0) const;
 
@@ -379,10 +379,10 @@ class DictionaryStack {
 
    public:
 
-      DictionaryStack(Dictionary &);
+      explicit DictionaryStack(Dictionary &);
      ~DictionaryStack();
 
-      void clear();
+      virtual void clear();
 
       void dump(std::ostream &, int = 0) const;
 
