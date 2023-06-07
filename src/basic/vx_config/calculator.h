@@ -49,7 +49,7 @@ class Calculator : public NumberStack {
    public:
 
       Calculator();
-      Calculator(int);
+      explicit Calculator(int);
      ~Calculator();
       Calculator(const Calculator &);
       Calculator & operator=(const Calculator &);

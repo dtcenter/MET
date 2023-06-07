@@ -38,7 +38,7 @@ class GridOffset
 
   GridOffset(int x_offset = 0, int y_offset = 0);
   GridOffset(const GridOffset& rhs);
-  GridOffset(const GridOffset* rhs);
+  explicit GridOffset(const GridOffset* rhs);
   
   // Destructor
 
