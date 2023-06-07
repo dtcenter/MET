@@ -315,7 +315,7 @@ DictionaryStack DS(*this);
 ConcatString temp_filename = get_tmp_dir();
  
 temp_filename << "/" << "met_config";
-temp_filename = make_temp_file_name(temp_filename.c_str(), 0);
+temp_filename = make_temp_file_name(temp_filename.c_str(), nullptr);
  
 recursive_envs(name, temp_filename.c_str());
 

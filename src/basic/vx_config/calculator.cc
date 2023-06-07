@@ -42,7 +42,7 @@ Calculator::Calculator()
 
 {
 
-dict_stack = 0;
+dict_stack = nullptr;
 
 AllocInc = 100;
 
@@ -56,7 +56,7 @@ Calculator::~Calculator()
 
 {
 
-dict_stack = 0;
+dict_stack = nullptr;
 
 }
 

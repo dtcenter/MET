@@ -918,7 +918,7 @@ NumArray parse_conf_eclv_points(Dictionary *dict) {
 ///////////////////////////////////////////////////////////////////////////////
 
 TimeSummaryInfo parse_conf_time_summary(Dictionary *dict) {
-   Dictionary *ts_dict = (Dictionary *) 0;
+   Dictionary *ts_dict = (Dictionary *) nullptr;
    TimeSummaryInfo info;
    bool is_correct_type = false;
 
@@ -1012,7 +1012,7 @@ TimeSummaryInfo parse_conf_time_summary(Dictionary *dict) {
 
 void parse_add_conf_key_value_map(
       Dictionary *dict, const char *conf_key_map_name, map<ConcatString,ConcatString> *m) {
-   Dictionary *map_dict = (Dictionary *) 0;
+   Dictionary *map_dict = (Dictionary *) nullptr;
    ConcatString key, val;
 
    if(!dict) {
@@ -1047,10 +1047,10 @@ void parse_add_conf_key_value_map(
 
 map<ConcatString,ConcatString> parse_conf_key_value_map(
       Dictionary *dict, const char *conf_key_map_name, const char *caller) {
-   Dictionary *map_dict = (Dictionary *) 0;
+   Dictionary *map_dict = (Dictionary *) nullptr;
    map<ConcatString,ConcatString> m;
    ConcatString key, val;
-   const char *method_name = (0 != caller) ? caller : "parse_conf_key_value_map() -> ";
+   const char *method_name = (nullptr != caller) ? caller : "parse_conf_key_value_map() -> ";
 
    if(!dict) {
       mlog << Error << "\n" << method_name << "empty dictionary!\n\n";
@@ -1089,7 +1089,7 @@ map<ConcatString,StringArray> parse_conf_key_values_map(
    map<ConcatString,ConcatString> cs_map;
    map<ConcatString,ConcatString>::const_iterator it;
    map<ConcatString,StringArray> sa_map;
-   const char *method_name = (0 != caller) ? caller : "parse_conf_key_values_map() -> ";
+   const char *method_name = (nullptr != caller) ? caller : "parse_conf_key_values_map() -> ";
 
    cs_map = parse_conf_key_value_map(dict, conf_key, method_name);
 
@@ -1146,7 +1146,7 @@ map<ConcatString,UserFunc_1Arg> parse_conf_key_convert_map(
    ConcatString key;
    UserFunc_1Arg fx;
    map<ConcatString,UserFunc_1Arg> m;
-   const char *method_name = (0 != caller) ? caller : "parse_conf_key_convert_map() -> ";
+   const char *method_name = (nullptr != caller) ? caller : "parse_conf_key_convert_map() -> ";
 
    if(!dict) {
       mlog << Error << "\n" << method_name << "empty dictionary!\n\n";
@@ -1303,7 +1303,7 @@ BootInfo parse_conf_boot(Dictionary *dict) {
 ///////////////////////////////////////////////////////////////////////////////
 
 RegridInfo parse_conf_regrid(Dictionary *dict, bool error_out) {
-   Dictionary *regrid_dict = (Dictionary *) 0;
+   Dictionary *regrid_dict = (Dictionary *) nullptr;
    RegridInfo info;
    int v;
 
@@ -1842,7 +1842,7 @@ NbrhdInfo &NbrhdInfo::operator=(const NbrhdInfo &a) noexcept {
 ///////////////////////////////////////////////////////////////////////////////
 
 NbrhdInfo parse_conf_nbrhd(Dictionary *dict, const char *conf_key) {
-   Dictionary *nbrhd_dict = (Dictionary *) 0;
+   Dictionary *nbrhd_dict = (Dictionary *) nullptr;
    NbrhdInfo info;
    int i;
    int v;
@@ -3289,7 +3289,7 @@ NormalizeType parse_conf_normalize(Dictionary *dict) {
 
 void python_compile_error(const char *caller) {
 
-   const char *method_name = (0 != caller) ? caller : "python_compile_error() -> ";
+   const char *method_name = (nullptr != caller) ? caller : "python_compile_error() -> ";
 
    mlog << Error << "\n" << method_name
         << "Support for Python has not been compiled!\n"

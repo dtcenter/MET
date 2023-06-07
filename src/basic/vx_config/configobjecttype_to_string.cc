@@ -39,7 +39,7 @@ ConcatString configobjecttype_to_string(const ConfigObjectType t)
 
 {
 
-const char * s = (const char *) 0;
+const char * s = (const char *) nullptr;
 
 switch ( t )  {
 

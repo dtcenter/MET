@@ -445,7 +445,7 @@ void DictionaryEntry::set_icodevector (const IcodeVector & _icv)
 
 {
 
-if ( v )  { delete v;  v = 0; }
+if ( v )  { delete v;  v = nullptr; }
 
 v = new IcodeVector;
 
@@ -668,8 +668,8 @@ Dict = new Dictionary;
    //
 
 int j;
-const DictionaryEntry * E = (const DictionaryEntry *) 0;
-Dictionary * D = (Dictionary *) 0;
+const DictionaryEntry * E = (const DictionaryEntry *) nullptr;
+Dictionary * D = (Dictionary *) nullptr;
 Dictionary & DD = *Dict;
 
 for (j=0; j<(Dict->n_entries()); ++j)  {
@@ -1317,7 +1317,7 @@ E = D->lookup_simple(stub, search_parent);
 
 if ( E )  {
 
-   LastLookupStatus = (E != 0);
+   LastLookupStatus = (E != nullptr);
 
    return E;
 }
@@ -1326,7 +1326,7 @@ if ( E )  {
    //  try parent
    //
 
-E = (const DictionaryEntry *) 0;
+E = (const DictionaryEntry *) nullptr;
 
 if ( search_parent )  {
 
@@ -1363,7 +1363,7 @@ for (int j=0; j<Nentries; ++j)  {
 
    if ( e[j]->Name == name )  {
 
-      LastLookupStatus = (e[j] != 0);
+      LastLookupStatus = (e[j] != nullptr);
 
       return e[j];
    }
@@ -1844,7 +1844,7 @@ StringArray Dictionary::lookup_string_array(const char * name,
 {
 
 const DictionaryEntry * Entry = lookup(name, search_parent);
-const Dictionary * Dict = (const Dictionary *) 0;
+const Dictionary * Dict = (const Dictionary *) nullptr;
 bool is_correct_type = false;
 StringArray array;
 
@@ -1998,7 +1998,7 @@ ThreshArray Dictionary::lookup_thresh_array(const char * name,
 {
 
 const DictionaryEntry * Entry = lookup(name, search_parent);
-const Dictionary * Dict = (const Dictionary *) 0;
+const Dictionary * Dict = (const Dictionary *) nullptr;
 bool is_correct_type = false;
 ThreshArray array;
 
@@ -2465,7 +2465,7 @@ void DictionaryStack::assign(const DictionaryStack & s)
 
 clear();
 
-if ( s.Nelements == 0 )  return;
+if ( s.Nelements == nullptr )  return;
 
 int j;
 
@@ -2606,7 +2606,7 @@ const Dictionary * DictionaryStack::top() const
 
 {
 
-if ( Nelements == 0 )  return ( (const Dictionary *) 0 );
+if ( Nelements == 0 )  return ( (const Dictionary *) nullptr );
 
 return D[Nelements - 1];
 
