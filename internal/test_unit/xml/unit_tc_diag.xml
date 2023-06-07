@@ -17,7 +17,8 @@
   <exit_on_fail>true</exit_on_fail>
 
   <test name="tc_diag_IAN">
-    <exec>echo "&DATA_DIR_MODEL;/grib2/gfs/gfs.0p25.2022092400.f000.grib2 \
+    <exec>mkdir -p &OUTPUT_DIR;/tc_diag; \
+          echo "&DATA_DIR_MODEL;/grib2/gfs/gfs.0p25.2022092400.f000.grib2 \
                 &DATA_DIR_MODEL;/grib2/gfs/gfs.0p25.2022092400.f006.grib2 \
                 &DATA_DIR_MODEL;/grib2/gfs/gfs.0p25.2022092400.f012.grib2 \
                 &DATA_DIR_MODEL;/grib2/gfs/gfs.0p25.2022092400.f018.grib2 \
