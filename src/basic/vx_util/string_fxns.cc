@@ -44,7 +44,7 @@ void print_beta_warning(const char * description,
    if(method_name) cs << method_name << " -> ";
    if(description) cs << description << " ";
    cs << "is provided in BETA status for MET " << met_version << ".\n";
-   cs << "Please see future MET version release notes for updates.";
+   cs << "Please see the release notes of future MET versions for updates.";
    mlog << Warning << "\n" << cs << "\n\n";
 
    return;

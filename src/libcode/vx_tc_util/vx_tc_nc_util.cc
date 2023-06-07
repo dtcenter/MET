@@ -25,7 +25,7 @@ void write_tc_track_lines(NcFile* nc_out,
     NcDim track_line_dim = add_dim(nc_out,
         "track_line", track_lines.n());
     NcVar track_line_var = nc_out->addVar(
-        "track_line", ncString, track_line_dim);
+        "TrackLines", ncString, track_line_dim);
 
     vector<size_t> counts;
     counts.push_back(1);

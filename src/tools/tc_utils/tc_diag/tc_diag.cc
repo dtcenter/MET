@@ -1133,15 +1133,19 @@ void merge_tmp_files(const vector<TmpFileInfo *> tmp_files) {
          // Add global attributes
          write_netcdf_global(nc_out, file_name.c_str(), program_name);
 
-         // Define dimension
-         NcDim vld_dim = add_dim(nc_out, "time",
-                                 tmp_files[i_tmp]->trk_ptr->n_points());
-
          // Write track info
          write_tc_storm(nc_out,
                         tmp_files[i_tmp]->trk_ptr->storm_id().c_str(),
                         tmp_files[i_tmp]->trk_ptr->technique().c_str(),
                         nullptr);
+
+         // Write the track lines
+         write_tc_track_lines(nc_out,
+                              *(tmp_files[i_tmp]->trk_ptr));
+
+         // Define the time dimension
+         NcDim vld_dim = add_dim(nc_out, "time",
+                                 tmp_files[i_tmp]->trk_ptr->n_points());
 
          // Write timing info for the entire track
          write_tc_times(nc_out, vld_dim,
@@ -1566,6 +1570,15 @@ void TmpFileInfo::setup_nc_file(const DomainInfo &di,
         << ra_grid.range_n() << " every " << ra_grid.range_delta_km()
         << "km, Azimuth = " << ra_grid.azimuth_n() << "\n";
 
+   // Write track info
+   write_tc_storm(tmp_out,
+                  trk_ptr->storm_id().c_str(),
+                  trk_ptr->technique().c_str(),
+                  di.domain.c_str());
+
+   // Write the track lines
+   write_tc_track_lines(tmp_out, *trk_ptr);
+
    // Define dimensions
    trk_dim = add_dim(tmp_out, "track_point",
                      trk_ptr->n_points());
@@ -1575,11 +1588,8 @@ void TmpFileInfo::setup_nc_file(const DomainInfo &di,
    azi_dim = add_dim(tmp_out, "azimuth",
                      (long) ra_grid.azimuth_n());
 
-   // Write track info
-   write_tc_storm(tmp_out,
-                  trk_ptr->storm_id().c_str(),
-                  trk_ptr->technique().c_str(),
-                  di.domain.c_str());
+   // Write the track locations
+   write_tc_track_lat_lon(tmp_out, trk_dim, *trk_ptr);
 
    // Write timing info for this TrackPoint
    write_tc_times(tmp_out, vld_dim, trk_ptr, pnt_ptr);
@@ -1596,10 +1606,6 @@ void TmpFileInfo::setup_nc_file(const DomainInfo &di,
                         (long) pressure_levels.size());
       def_tc_pressure(tmp_out, prs_dim, pressure_levels);
    }
-
-   // Write the track lines and locations
-   write_tc_track_lines(tmp_out, *trk_ptr);
-   write_tc_track_lat_lon(tmp_out, trk_dim, *trk_ptr);
 
    // Define latitude and longitude
    NcVar lat_var, lon_var;

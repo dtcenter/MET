@@ -28,11 +28,11 @@
       -deck &DATA_DIR;/adeck/aal092022_OFCL_SHIP_AVNO.dat \
       -data parent GFSO &OUTPUT_DIR;/tc_diag/gfs_2022092400_file_list \
       -config &CONFIG_DIR;/TCDiagConfig_ian \
-      -outdir &OUTPUT_DIR;/tc_diag/IAN_GFSO_2022092400 \
+      -outdir &OUTPUT_DIR;/tc_diag \
       -v 2
     </param>
     <output>
-      <exists>&OUTPUT_DIR;/tc_diag/IAN_GFSO_2022092400/tc_diag_AL092022_GFSO_2022092400_cyl_grid_parent.nc</exists>
+      <exists>&OUTPUT_DIR;/tc_diag/tc_diag_AL092022_GFSO_2022092400_cyl_grid_parent.nc</exists>
     </output>
   </test>
 
