@@ -76,7 +76,7 @@ class ModeExecutive {
 
    void clear();
 
-   void init();
+   void init(int n_files);
    void init_multivar(GrdFileType ftype, GrdFileType otype);
 
 

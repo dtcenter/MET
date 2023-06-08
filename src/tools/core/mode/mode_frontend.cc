@@ -63,7 +63,7 @@ ModeFrontEnd::~ModeFrontEnd()
 
 ///////////////////////////////////////////////////////////////////////
 
-int ModeFrontEnd::run(const StringArray & Argv, Processing_t ptype, int field_index)
+int ModeFrontEnd::run(const StringArray & Argv, Processing_t ptype, int field_index, int n_files)
 
 {
 
@@ -82,7 +82,7 @@ int ModeFrontEnd::run(const StringArray & Argv, Processing_t ptype, int field_in
 
    process_command_line(Argv, false);
 
-   mode_exec->init();
+   mode_exec->init(n_files);
 
    ModeConfInfo & conf = mode_exec->engine.conf_info;
    if ( field_index >= 0 )  conf.set_field_index(field_index);

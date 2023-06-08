@@ -142,7 +142,7 @@ void ModeExecutive::clear()
 ///////////////////////////////////////////////////////////////////////
 
 
-void ModeExecutive::init()
+void ModeExecutive::init(int n_files)
 
 {
 
@@ -192,7 +192,15 @@ void ModeExecutive::init()
 
    // Process the configuration
    engine.conf_info.process_config(ftype, otype);
+   if (engine.conf_info.n_fields() != n_files) {
+      mlog << Error << "\nNumber of input files " << n_files << " Not equal to config number of fields "
+           << engine.conf_info.n_fields() << "\n\n";
+      exit(1);
+   }
 
+   // check one again for multivar problems
+   engine.conf_info.check_multivar_not_implemented();
+   
    const int shift = engine.conf_info.shift_right;
 
    fcst_mtddf->set_shift_right(shift);
@@ -244,6 +252,9 @@ void ModeExecutive::init_multivar(GrdFileType ftype, GrdFileType otype)
 
    // Process the configuration
    engine.conf_info.process_config(l_ftype, l_otype);
+
+   // check one again for multivar problems
+   engine.conf_info.check_multivar_not_implemented();
 
    // NOTE: do not do shifting, should have been done in the first pass
    // const int shift = engine.conf_info.shift_right;
@@ -605,6 +616,10 @@ void ModeExecutive::do_conv_thresh(const int r_index, const int t_index,
       if (conf.Obs->need_merge_thresh()) {
          conf.set_obs_conv_thresh_by_merge_index  (T_index);
       }
+   } else if (isMultivarPass2) {
+      SingleThresh s("ne-9999");
+      conf.set_conv_thresh(s);
+      conf.set_conv_radius(0.0);
    // } else if (isMultivarPass2) {
    //    SingleThresh s("ne-9999");
    //    conf.set_conv_thresh(s);
@@ -630,15 +645,21 @@ void ModeExecutive::do_conv_thresh(const int r_index, const int t_index,
 
    if ( r_index != local_r_index )  {   //  need to do convolution
 
-      if (isMultivarPass2 || isMultivarSuper) {
+      if (isMultivarPass2) {
          engine.set_only_split(Fcst_sd, Obs_sd);
+      } else if (isMultivarSuper) {
+         engine.set_only_split(Fcst_sd, Obs_sd);
+         //engine.set_super(Fcst_sd, Obs_sd);
       } else {
          engine.set(Fcst_sd, Obs_sd);
       }
    } else {   //  don't need to do convolution
 
-      if (isMultivarPass2 || isMultivarSuper) {
+      if (isMultivarPass2) {
          engine.set_only_split(Fcst_sd, Obs_sd);
+      } else if (isMultivarSuper) {
+         engine.set_only_split(Fcst_sd, Obs_sd);
+         //engine.set_super(Fcst_sd, Obs_sd);
       } else {
          engine.set_no_conv(Fcst_sd, Obs_sd);
       }

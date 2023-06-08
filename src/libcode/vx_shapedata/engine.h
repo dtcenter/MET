@@ -183,6 +183,7 @@ class ModeFuzzyEngine {
       void set(const ShapeData &fcst_wd, const ShapeData &obs_wd);
       void set_no_conv(const ShapeData &fcst_wd, const ShapeData &obs_wd);
       void set_only_split(const ShapeData &fcst_wd, const ShapeData &obs_wd);
+      void set_super(const ShapeData &fcst_wd, const ShapeData &obs_wd);
 
       void set_fcst (const ShapeData & fcst_wd);
       void set_obs  (const ShapeData &  obs_wd);
@@ -192,6 +193,9 @@ class ModeFuzzyEngine {
 
       void set_fcst_only_split (const ShapeData & fcst_wd);
       void set_obs_only_split  (const ShapeData &  obs_wd);
+
+      void set_fcst_super (const ShapeData & fcst_wd);
+      void set_obs_super  (const ShapeData &  obs_wd);
 
       int two_to_one(int, int) const;
 

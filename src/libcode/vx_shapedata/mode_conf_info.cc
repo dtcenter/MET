@@ -584,9 +584,6 @@ const int N = ( (field->is_array()) ? (field->n_entries()) : 1 );
 
 info_array = new Mode_Field_Info [N];
 
-N_fields = N;
-
-
 if ( field->is_array() ) {
 
    int j, k;
@@ -601,6 +598,7 @@ if ( field->is_array() ) {
       exit ( 1 );
 
    }
+   N_fields = N;
 
    for (j=0; j<N; ++j)  {
 
@@ -633,10 +631,12 @@ if ( field->is_array() ) {
 
 }   //  if is array
 
+
    //
    //  nope, traditional mode
    //
 
+N_fields = N;
 info_array[0].set(false, 0, dict, &conf, type, _fo);
 
    //
@@ -1096,10 +1096,28 @@ void ModeConfInfo::check_multivar_not_implemented() const
    bool status = false;
    if (quilt) {
       mlog << Error
-           << "\n\n  ModeConfInfo::multivar_not_implemented "
-           << ": quilting not yet implemented for multivar mode\n\n";
+           << "\n\nModeConfInfo::multivar_not_implemented:\n"
+           << "  quilting not yet implemented for multivar mode\n";
       status = true;
    }
+   
+   for (int i=0; i<N_fields; ++i) {
+      if (fcst_array[i].merge_flag == MergeType_Both || fcst_array[i].merge_flag == MergeType_Engine) {
+         mlog << Error
+              << "\n\n  ModeConfInfo::multivar_not_implemented:\n"
+              << "  merge_flag ENGINE or BOTH not implemented for multivariate mode\n";
+         status = true;
+         break;
+      }
+      if (obs_array[i].merge_flag == MergeType_Both || obs_array[i].merge_flag == MergeType_Engine) {
+         mlog << Error
+              << "\n\nModeConfInfo::multivar_not_implemented:\n"
+              << "  merge_flag ENGINE or BOTH not implemented for multivariate mode\n";
+         status = true;
+         break;
+      }
+   }
+
    // if (multivar_intensities_all_false()) {
    //    mlog << Error
    //         << "\n\n  ModeConfInfo::multivar_not_implemented "
@@ -1108,7 +1126,7 @@ void ModeConfInfo::check_multivar_not_implemented() const
    // }
    if (status) {
       mlog << Error
-           << "\n\n  met_main() Some features not yet implemented in multivar mode\n\n";
+           << "  Some features not yet implemented in multivar mode\n\n";
       exit ( 1 );
    }
 }

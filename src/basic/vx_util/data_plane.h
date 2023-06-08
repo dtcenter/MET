@@ -59,7 +59,7 @@ class DataPlane {
       DataPlane & operator=(const DataPlane &);
       DataPlane & operator+=(const DataPlane &);
       DataPlane & operator/=(const double);
-
+      bool operator==(const DataPlane &) const;
       void clear();
 
       void erase();
@@ -119,6 +119,7 @@ class DataPlane {
       void standard_anomaly(const DataPlane &, const DataPlane &);
 
       void replace_bad_data(const double value);
+      void set_all_to_bad_data();
 
       int  two_to_one(int x, int y, bool to_north=true) const;
       void one_to_two(int n, int &x, int &y) const;

@@ -36,7 +36,7 @@ class ModeFrontEnd {
    string default_out_dir;
 
    // default single var mode interface, and multivar pass1 options
-   int run(const StringArray & Argv, Processing_t ptype=SINGLE_VAR, int field_index=-1);
+   int run(const StringArray & Argv, Processing_t ptype=SINGLE_VAR, int field_index=-1, int n_files=1);
 
    // pass2 multivar interface
    int run_multivar_pass2(const StringArray & Argv, const MultiVarData &mvd, bool has_union,

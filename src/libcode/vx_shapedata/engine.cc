@@ -314,6 +314,31 @@ void ModeFuzzyEngine::set_only_split(const ShapeData &fcst_wd, const ShapeData &
 
 }
 
+///////////////////////////////////////////////////////////////////////
+
+void ModeFuzzyEngine::set_super(const ShapeData &fcst_wd, const ShapeData &obs_wd)
+
+{
+
+   ConcatString path;
+
+   clear_features();
+   clear_colors();
+   ctable.clear();
+
+   collection.clear();
+
+   set_fcst_super (fcst_wd);
+   set_obs_super  ( obs_wd);
+
+   path = replace_path(conf_info.object_pi.color_table.c_str());
+
+   ctable.read(path.c_str());
+
+   return;
+
+}
+
 
 ///////////////////////////////////////////////////////////////////////
 
@@ -417,10 +442,8 @@ void ModeFuzzyEngine::set_obs_no_conv(const ShapeData &obs_wd) {
 void ModeFuzzyEngine::set_fcst_only_split(const ShapeData &fcst_wd)
 
 {
-
    *fcst_raw = fcst_wd;  // real valued
    *fcst_conv = *fcst_raw;  // real valued
-
    *fcst_mask = *fcst_conv;  // 1s and 0s
    fcst_mask->set_to_1_or_0();
    *fcst_thresh = *fcst_raw;  //1s and 0s
@@ -438,7 +461,6 @@ void ModeFuzzyEngine::set_fcst_only_split(const ShapeData &fcst_wd)
    //do_fcst_thresholding();
    //do_fcst_filtering();
    do_fcst_splitting();
-
    return;
 }
 
@@ -454,6 +476,71 @@ void ModeFuzzyEngine::set_obs_only_split(const ShapeData &obs_wd) {
    obs_mask->set_to_1_or_0();
    *obs_thresh = *obs_raw; // 1s and 0s
    obs_thresh->set_to_1_or_0();
+
+   need_obs_conv       = false;
+   need_obs_thresh     = false;
+   need_obs_filter     = false;
+   need_obs_split      = true;
+   need_obs_merge      = true;
+   need_obs_clus_split = true;
+   need_match          = true;
+
+   // do_obs_convolution();
+   // do_obs_thresholding();
+   // do_obs_filtering();
+   do_obs_splitting();
+
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////
+
+
+void ModeFuzzyEngine::set_fcst_super(const ShapeData &fcst_wd)
+
+{
+   *fcst_raw = fcst_wd;  // real valued
+   *fcst_conv = *fcst_raw;  // real valued
+   *fcst_mask = *fcst_conv;  // 1s and 0s
+   fcst_mask->set_to_1_or_0();
+   *fcst_thresh = *fcst_raw;  //1s and 0s
+   fcst_thresh->set_to_1_or_0();
+   
+   // set fcst_raw and fcst_conv to missing everywhere
+   fcst_raw->data.set_all_to_bad_data();
+   fcst_conv->data.set_all_to_bad_data();
+
+   need_fcst_conv       = false;
+   need_fcst_thresh     = false;
+   need_fcst_filter     = false;
+   need_fcst_split      = true;
+   need_fcst_merge      = true;
+   need_fcst_clus_split = true;
+   need_match           = true;
+
+   // do_fcst_convolution();
+   //do_fcst_thresholding();
+   //do_fcst_filtering();
+   do_fcst_splitting();
+   return;
+}
+
+
+///////////////////////////////////////////////////////////////////////
+
+
+void ModeFuzzyEngine::set_obs_super(const ShapeData &obs_wd) {
+
+   *obs_raw = obs_wd;  // real valued
+   *obs_conv = *obs_raw; // real valued
+   *obs_mask = *obs_conv;  // 1s and 0s
+   obs_mask->set_to_1_or_0();
+   *obs_thresh = *obs_raw; // 1s and 0s
+   obs_thresh->set_to_1_or_0();
+
+   // set obs_raw and obs_conv to missing everywhere
+   obs_raw->data.set_all_to_bad_data();
+   obs_conv->data.set_all_to_bad_data();
 
    need_obs_conv       = false;
    need_obs_thresh     = false;

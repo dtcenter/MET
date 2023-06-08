@@ -115,6 +115,26 @@ DataPlane & DataPlane::operator/=(const double v) {
    return(*this);
 }
 
+bool DataPlane::operator==(const DataPlane &d) const {
+
+   const char *method_name = "DataPlane::operator==(const DataPlane &) -> ";
+
+   // don't check times, only data
+   
+   // Check for matching dimensions
+   if(Nx != d.Nx || Ny != d.Ny) {
+      return false;
+   }
+
+   for(int i=0; i<Nxy; i++) {
+      if (Data[i] != d.Data[i]) {
+         return false;
+      }
+   }
+
+   return true;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 void DataPlane::init_from_scratch() {
@@ -575,6 +595,17 @@ void DataPlane::replace_bad_data(const double value) {
 
    return;
 }
+
+///////////////////////////////////////////////////////////////////////////////
+
+void DataPlane::set_all_to_bad_data() {
+
+   for(int i=0; i<Nxy; i++) {
+      Data[i] = bad_data_double;
+   }
+   return;
+
+}   
 
 ///////////////////////////////////////////////////////////////////////////////
 

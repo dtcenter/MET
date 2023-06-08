@@ -231,6 +231,8 @@ class ModeConfInfo {
 
       int n_runs() const;   //  # threshs times # radii
 
+      int n_fields() const;   // should be 1 for traditional mode, > 1 for muiltivar
+
       int get_compression_level();
 
       void  set_fcst_merge_thresh_by_index (int);
@@ -259,6 +261,8 @@ inline int ModeConfInfo::n_conv_threshs() const { return ( Fcst->conv_thresh_arr
 inline int ModeConfInfo::get_compression_level() { return conf.nc_compression(); }
 
 inline int ModeConfInfo::field_index() const { return Field_Index; }
+
+inline int ModeConfInfo::n_fields() const { return N_fields; }
 
 
 ////////////////////////////////////////////////////////////////////////

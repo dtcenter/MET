@@ -101,7 +101,8 @@ static void multivar_consistency_checks(StringArray &fcst_filenames, StringArray
 
 static ConcatString set_multivar_dir();
 
-static MultiVarData *first_pass(int j, const string &fcst_filename, const string &obs_filename,
+static MultiVarData *first_pass(int j, int n_files,
+                                const string &fcst_filename, const string &obs_filename,
                                 const ConcatString &dir);
 
 static void second_pass(int j, const BoolPlane &f_result, const BoolPlane &o_result,
@@ -167,7 +168,7 @@ int multivar_frontend(const StringArray & Argv)
 
       mlog << Debug(2) 
            << "\n starting mode run " << (j + 1) << " of " << n_files << "\n" << sep << "\n";
-      MultiVarData *mvdi = first_pass(j, fcst_filenames[j], obs_filenames[j], dir);
+      MultiVarData *mvdi = first_pass(j, n_files, fcst_filenames[j], obs_filenames[j], dir);
       if (j > 0) {
          mvd[0]->checkFileTypeConsistency(*mvdi, j);
       }
@@ -575,6 +576,9 @@ void multivar_consistency_checks(StringArray &fcst_filenames, StringArray &obs_f
       exit ( 1 );
    }
 
+   // check that fcst and obs arrays are both the same length as everything else
+   // actually don't need this as it's done inside the mode_config class
+
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -615,7 +619,7 @@ ConcatString set_multivar_dir()
 
 ////////////////////////////////////////////////////////////////////////
 
-MultiVarData *first_pass(int j, const string &fcst_filename,
+MultiVarData *first_pass(int j, int n_files, const string &fcst_filename,
                          const string &obs_filename,
                          const ConcatString &dir)
 {
@@ -661,7 +665,7 @@ MultiVarData *first_pass(int j, const string &fcst_filename,
 
    mlog << Debug(3) << "Running mode command: \"" << command << "\"\n\n";
    ModeFrontEnd *frontend = new ModeFrontEnd;
-   int status = frontend->run(mode_argv, ModeFrontEnd::MULTIVAR_PASS1, j);
+   int status = frontend->run(mode_argv, ModeFrontEnd::MULTIVAR_PASS1, j, n_files);
    MultiVarData *mvdi = frontend->get_multivar_data();
    delete frontend;
 
