@@ -200,7 +200,7 @@ void QuadInfo::set_wind(const ATCFTrackLine &l) {
                  l.radius3(), l.radius4());
 
    // MET #2532 Derive ALVal from quadrants
-   set_al_from_quad_vals();
+   if(is_bad_data(ALVal)) set_al_from_quad_vals();
 
    return;
 }
@@ -279,8 +279,7 @@ void QuadInfo::set_quad_vals(QuadrantType ref_quad,
 ////////////////////////////////////////////////////////////////////////
 //
 // MET #2532:
-//   If the full circle value is not defined, compute
-//   it as the mean of the non-zero quadrants.
+// Compute the full circle value as the mean of the non-zero quadrants.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -288,9 +287,8 @@ void QuadInfo::set_al_from_quad_vals() {
    double s = 0.0;
    int n = 0;
 
-   if(is_bad_data(ALVal) &&
-      (!is_bad_data(NEVal) || !is_bad_data(SEVal) ||
-       !is_bad_data(SWVal) || !is_bad_data(NWVal))) {
+   if(!is_bad_data(NEVal) || !is_bad_data(SEVal) ||
+      !is_bad_data(SWVal) || !is_bad_data(NWVal)) {
       if(NEVal > 0) { s += NEVal; n++; }
       if(SEVal > 0) { s += SEVal; n++; }
       if(SWVal > 0) { s += SWVal; n++; }
