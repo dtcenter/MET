@@ -10,17 +10,9 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-static const char fcst_super_nc_filename [] = "f_super.nc";
-static const char  obs_super_nc_filename [] = "o_super.nc";
-
 static const char mode_default_config [] = "MET_BASE/config/MODEConfig_default";
 
-static const char super_object_var_name [] = "super";
-
 static const int dir_creation_mode = 0755;       
-
-static const float  on_value = (float) 100.0;
-static const float off_value = (float)   0.0;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -65,18 +57,14 @@ using namespace netCDF;
 ////////////////////////////////////////////////////////////////////////
 
 
-extern int mode_frontend(const StringArray &);
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 extern const char * const program_name;
 
 
 static const char sep [] = "====================================================";
 
 static const char tab [] = "   ";
+
+// this is hardwired for the multivar case, at least for now
 
 static const bool do_clusters = false;
 
@@ -101,19 +89,20 @@ static void multivar_consistency_checks(StringArray &fcst_filenames, StringArray
 
 static ConcatString set_multivar_dir();
 
-static MultiVarData *first_pass(int j, int n_files,
-                                const string &fcst_filename, const string &obs_filename,
-                                const ConcatString &dir);
+static MultiVarData *create_simple_objects(int j, int n_files,
+                                           const string &fcst_filename, const string &obs_filename,
+                                           const ConcatString &dir);
 
-static void second_pass(int j, const BoolPlane &f_result, const BoolPlane &o_result,
-                        int nx, int ny, const ConcatString &dir,
-                        MultiVarData &mvd, bool has_union,
-                        ShapeData &f_merge, ShapeData &o_merge);
+static void create_singlevar_intensity_objects(int j, const BoolPlane &f_result,
+                                               const BoolPlane &o_result,
+                                               int nx, int ny, const ConcatString &dir,
+                                               MultiVarData &mvd, bool has_union,
+                                               ShapeData &f_merge, ShapeData &o_merge);
 
-static void third_pass(ShapeData &f_result, ShapeData &o_result,
-                       ShapeData &f_merge, ShapeData &o_merge,
-                       int nx, int ny, const ConcatString &dir,
-                       GrdFileType ftype, GrdFileType otype, const Grid &grid, bool has_union);
+static void process_superobjects(ShapeData &f_result, ShapeData &o_result,
+                                 ShapeData &f_merge, ShapeData &o_merge,
+                                 int nx, int ny, const ConcatString &dir,
+                                 GrdFileType ftype, GrdFileType otype, const Grid &grid, bool has_union);
 
 static void mask_data(const string &name, int nx, int ny, const BoolPlane &mask, DataPlane &data);
 static void mask_data_super(const string &name, int nx, int ny, DataPlane &data);
@@ -121,8 +110,6 @@ static void mask_data_super(const string &name, int nx, int ny, DataPlane &data)
 static void read_config(const string & filename);
 
 static void process_command_line(const StringArray &);
-
-static void write_output_nc_file(const char * path, const MetNcFile &, const BoolPlane &);
 
 static int  _mkdir(const char *dir);
 
@@ -168,7 +155,7 @@ int multivar_frontend(const StringArray & Argv)
 
       mlog << Debug(2) 
            << "\n starting mode run " << (j + 1) << " of " << n_files << "\n" << sep << "\n";
-      MultiVarData *mvdi = first_pass(j, n_files, fcst_filenames[j], obs_filenames[j], dir);
+      MultiVarData *mvdi = create_simple_objects(j, n_files, fcst_filenames[j], obs_filenames[j], dir);
       if (j > 0) {
          mvd[0]->checkFileTypeConsistency(*mvdi, j);
       }
@@ -218,12 +205,16 @@ int multivar_frontend(const StringArray & Argv)
    combine_boolplanes("Obs_Merge", o_merge_plane, n_files, o_calc, o_merge_result);
 
 
-   // might need this for a super pass
+   // might need this for a super object pass, so grab the values
    GrdFileType ftype = mvd[0]->_ftype;
-   GrdFileType otype = mvd[0]->_otype;;
+   GrdFileType otype = mvd[0]->_otype;
 
-   // might need this for a super passs
+   // might need this for a super passs, so store locally
    Grid grid = *(mvd[0]->_grid);
+
+
+   // create ShapeData objects using something from mvd as a template
+   // shape data with 1's or bad
 
    ShapeData f_simple_sd = ShapeData(*(mvd[0]->_simple->_Fcst_sd));
    for (int x=0; x<nx; ++x) {
@@ -246,7 +237,6 @@ int multivar_frontend(const StringArray & Argv)
       }
    }
 
-   // create a ShapeData object using something from mvd as a template
    ShapeData f_merge_sd = ShapeData(*(mvd[0]->_simple->_Fcst_sd));
    for (int x=0; x<nx; ++x) {
       for (int y=0; y<ny; ++y) {
@@ -279,11 +269,12 @@ int multivar_frontend(const StringArray & Argv)
    s = "Obs Merge";
    _debug_shape_examine(s, o_merge_sd_split, nx, ny);
 
-   bool superobj_mode = true;
+
+   bool superobj_mode = true;  // set this false if an individual input has intensity set TRUE
 
    //
    // Filter the data to within the superobjects only and do statistics by invoking mode algorithm again
-   // on the masked data
+   // on the masked data, for all inputs that have intensity=TRUE
    //
  
    for (j=0; j<n_files; ++j) {
@@ -299,13 +290,8 @@ int multivar_frontend(const StringArray & Argv)
            << "\n starting masked data mode run " << (j + 1) << " of " << n_files
            << "\n" << sep << "\n";
 
-      // this one creates super merge objects
-      // second_pass(j, f_merge_result, o_merge_result, nx, ny, dir, *mvd[j], has_union,
-      //             ModeFrontEnd::MULTIVAR_PASS2_MERGE);
-
-      // this is the real one
-      second_pass(j, f_simple_result, o_simple_result, nx, ny, dir, *mvd[j], has_union,
-                  f_merge_sd_split, o_merge_sd_split);
+      create_singlevar_intensity_objects(j, f_simple_result, o_simple_result, nx, ny, dir, *mvd[j],
+                                         has_union, f_merge_sd_split, o_merge_sd_split);
 
       delete mvd[j];
       mvd[j] = 0;
@@ -313,61 +299,19 @@ int multivar_frontend(const StringArray & Argv)
  
    mlog << Debug(2) << "\n finished with individual masked mode runs " << "\n" << sep << "\n";
 
-   //
-   //  write the superobject output files
-   //
    if (!superobj_mode) {
 
-      // all done, no superobject mode run
+      // when an individual field was processed above, no super object step
       return 0;
 
    }
    
 
-   //
    // here run one more time using superobjects as input
-   third_pass(f_simple_sd, o_simple_sd, f_merge_sd_split, o_merge_sd_split,
-              nx, ny, dir, ftype, otype, grid, has_union);
 
-#ifdef NOTDEF
+   process_superobjects(f_simple_sd, o_simple_sd, f_merge_sd_split, o_merge_sd_split,
+                        nx, ny, dir, ftype, otype, grid, has_union);
 
-   //
-   //  write the superobject output files
-   //
-
-   //
-   // get all the nc file names that were created in pass2
-   //
-   StringArray nc_files = get_filenames_from_dir(dir.text(), "mode_", ".nc");
-   if (nc_files.n() < 1) {
-
-      mlog << Warning << "\n" << program_name
-           << ": no netcdf files 'mode_*.nc' were created in \"" << dir
-           << "\"  No superobject netcdf output\n\n";
-
-   } else {
-      
-      ConcatString path = nc_files[0];
-      MetNcFile met;   //  mostly to get grid
-      if ( ! met.open(path.text()) )  {
-
-         mlog << Warning << "\n" << program_name
-              << ": unable to open mode output file \""
-              << path << "\"  No superobject netcdf output\n\n";
-
-      } else {
-         
-         ConcatString fcst_file, obs_file;
-         fcst_file << outdir << "/" << fcst_super_nc_filename;
-         obs_file << outdir << "/" <<  obs_super_nc_filename;
-
-         write_output_nc_file(fcst_file.text(), met, f_simple_result);
-         write_output_nc_file( obs_file.text(), met, o_simple_result);
-      }
-   }
-
-#endif
-   
    //
    //  done
    //
@@ -549,12 +493,7 @@ void multivar_consistency_checks(StringArray &fcst_filenames, StringArray &obs_f
    // check that the multivar_intensity vector is the right length.
    // If empty set to the default of all FALSE
    //
-
    int num_multivar = (int)config.multivar_intensity.n();
-   if (num_multivar == n_files) {
-      return;
-   }
-
    if (num_multivar == 0) {
 
       // note this will not happen until the method
@@ -568,7 +507,7 @@ void multivar_consistency_checks(StringArray &fcst_filenames, StringArray &obs_f
          config.multivar_intensity.add(false);
       }
 
-   } else {
+   } else if (num_multivar != n_files) {
 
       mlog << Error << "\n" << program_name 
            << ": wrong size multivar_intensity array, wanted "
@@ -589,7 +528,8 @@ ConcatString set_multivar_dir()
    int status;
 
    dir.clear();
-   // no longer want number subdirectories
+
+   // no longer want numbered subdirectories
    if ( outdir.length() > 0 )  dir << outdir;
 
    //
@@ -619,9 +559,9 @@ ConcatString set_multivar_dir()
 
 ////////////////////////////////////////////////////////////////////////
 
-MultiVarData *first_pass(int j, int n_files, const string &fcst_filename,
-                         const string &obs_filename,
-                         const ConcatString &dir)
+MultiVarData *create_simple_objects(int j, int n_files, const string &fcst_filename,
+                                    const string &obs_filename,
+                                    const ConcatString &dir)
 {
    ConcatString command;
    StringArray a, mode_argv;
@@ -653,14 +593,8 @@ MultiVarData *first_pass(int j, int n_files, const string &fcst_filename,
    command << " -v " << mlog.verbosity_level();
    command << " -outdir " << dir;
 
-   // mode_argv.add("-field_index");
-   // snprintf(junk, sizeof(junk), "%d", j);
-   // mode_argv.add(junk);
-
-   // command << " -field_index " << j;
-
    //
-   //  run the pass1 portions of mode
+   //  run the pass1 portions of mode, which creates simple objects
    //
 
    mlog << Debug(3) << "Running mode command: \"" << command << "\"\n\n";
@@ -669,8 +603,12 @@ MultiVarData *first_pass(int j, int n_files, const string &fcst_filename,
    MultiVarData *mvdi = frontend->get_multivar_data();
    delete frontend;
 
+   //
+   //  run the pass1 merge portions of mode, which creates merge simple objects
+   //
+
    frontend = new ModeFrontEnd;
-   status = frontend->run(mode_argv, ModeFrontEnd::MULTIVAR_PASS1_MERGE, j);
+   status = frontend->run(mode_argv, ModeFrontEnd::MULTIVAR_PASS1_MERGE, j, n_files);
    frontend->addMultivarMergePass1(mvdi);
    delete frontend;
 
@@ -679,11 +617,13 @@ MultiVarData *first_pass(int j, int n_files, const string &fcst_filename,
 
 ////////////////////////////////////////////////////////////////////////
 
-void second_pass(int j, const BoolPlane &f_result,
-                 const BoolPlane &o_result, int nx, int ny,
-                 const ConcatString &dir, MultiVarData &mvd,
-                 bool has_union, ShapeData &f_merge, ShapeData &o_merge)
+void create_singlevar_intensity_objects(int j, const BoolPlane &f_result,
+                                        const BoolPlane &o_result, int nx, int ny,
+                                        const ConcatString &dir, MultiVarData &mvd,
+                                        bool has_union, ShapeData &f_merge, ShapeData &o_merge)
 {
+   // mask the input data to be valid only inside the simple super objects
+   
    mask_data("Fcst", nx, ny, f_result, mvd._simple->_Fcst_sd->data);
    mask_data("Obs", nx, ny, o_result, mvd._simple->_Obs_sd->data);
 
@@ -691,7 +631,7 @@ void second_pass(int j, const BoolPlane &f_result,
    char junk [256];
 
    //
-   //  build the command for running mode again, sort of mode
+   //  build the command for running mode
    //
    mode_argv.clear();
    mode_argv.add(mode_path);
@@ -701,9 +641,6 @@ void second_pass(int j, const BoolPlane &f_result,
    mode_argv.add(junk);
    mode_argv.add("-outdir");
    mode_argv.add(dir);
-   // mode_argv.add("-field_index");
-   // snprintf(junk, sizeof(junk), "%d", j);
-   // mode_argv.add(junk);
 
    mlog << Debug(1) << "Running filtered mode \n\n";
 
@@ -714,20 +651,17 @@ void second_pass(int j, const BoolPlane &f_result,
  
 ////////////////////////////////////////////////////////////////////////
 
-void third_pass(ShapeData &f_result, ShapeData &o_result,
-                ShapeData &f_merge, ShapeData &o_merge,
-                int nx, int ny, const ConcatString &dir,
-                GrdFileType ftype, GrdFileType otype, const Grid &grid,
-                bool has_union)
+void process_superobjects(ShapeData &f_result, ShapeData &o_result,
+                          ShapeData &f_merge, ShapeData &o_merge,
+                          int nx, int ny, const ConcatString &dir,
+                          GrdFileType ftype, GrdFileType otype, const Grid &grid,
+                          bool has_union)
 {
-   // mask_data("Fcst", nx, ny, f_result, mvd._simple->_Fcst_sd->data);
-   // mask_data("Obs", nx, ny, o_result, mvd._simple->_Obs_sd->data);
-
    StringArray mode_argv;
    char junk [256];
 
    //
-   //  build the command for running mode again, sort of mode
+   //  build the command for running mode
    //
    mode_argv.clear();
    mode_argv.add(mode_path);
@@ -743,11 +677,10 @@ void third_pass(ShapeData &f_result, ShapeData &o_result,
 
    mlog << Debug(1) << "Running superobject mode \n\n";
 
-   // set the data to 0 or missing everywhere
+   // set the data to 0 inside superobjects and missing everywhere else
+
    mask_data_super("FcstSimple", nx, ny, f_result.data);
-   // mask_data_super("FcstMerge", nx, ny, f_merge.data);
    mask_data_super("ObsSimple", nx, ny, o_result.data);
-   // mask_data_super("ObsMerge", nx, ny, o_merge.data);
    
 
    ModeFrontEnd *frontend = new ModeFrontEnd;
@@ -758,83 +691,6 @@ void third_pass(ShapeData &f_result, ShapeData &o_result,
  
 ////////////////////////////////////////////////////////////////////////
 
-
-void write_output_nc_file(const char * path, const MetNcFile & met, const BoolPlane & bp)
-
-{
-
-   NcFile nc;
-   int x, y, n;
-   float * data = 0;
-   const Grid & grid = met.grid;
-
-   mlog << Debug(1)
-        << "Creating NetCDF Output file: " << path << "\n";
-
-   nc.open(string(path), NcFile::replace, NcFile::classic);
-
-   //  load the data
-
-   data = new float [(grid.nx())*(grid.ny())];
-
-   NcDim lat_dim;
-   NcDim lon_dim;
-   NcVar var;
-   const int nx = grid.nx();
-   const int ny = grid.ny();
-   vector<NcDim> vdim(2);
-
-
-   for (x=0; x<nx; ++x)  {
-
-      for (y=0; y<ny; ++y)  {
-
-         n = y*nx + x;   //  should we just assume this ordering?
-
-         if ( bp(x, y) )  data[n] =  on_value;
-         else             data[n] = off_value;
-
-      }   //  for x
-
-   }   //  for x
-
-   //
-   //  add global attributes and projection information
-   //
-
-   write_netcdf_global(&nc, path, program_name);
-
-   //
-   //  add dimensions and write projection info
-   //
-
-   write_netcdf_proj(&nc, grid, lat_dim, lon_dim);
-
-   //
-   //  variable
-   //
-
-   vdim[0] = lat_dim;
-   vdim[1] = lon_dim;
-
-   var = nc.addVar(string(super_object_var_name), ncFloat, vdim);
-
-   var.putVar(data);
-
-   //
-   //  done
-   //
-
-   nc.close();
-
-   if ( data )  { delete [] data;  data = 0; }
-
-   return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
 void mask_data(const string &name, int nx, int ny, const BoolPlane &bp, DataPlane &data)
 {
 
@@ -928,6 +784,7 @@ int _mkdir(const char *dir)
    return (mkdir(tmp, dir_creation_mode));
 }
 
+////////////////////////////////////////////////////////////////////////
 
 void  _debug_shape_examine(string &name, const ShapeData &sd, int nx, int ny)
 {

@@ -65,8 +65,6 @@ class ModeFrontEnd {
    void addMultivarMergePass1(MultiVarData *mvdi);
 
    void process_command_line(const StringArray &, bool is_multivar);
-   // void process_command_line_multivar_pass2(const StringArray & argv,
-   //                                          const MultiVarData &mvd);
 
    static string stype(Processing_t t);
 
@@ -75,7 +73,6 @@ class ModeFrontEnd {
    static void set_logfile           (const StringArray &);
    static void set_verbosity         (const StringArray &);
    static void set_compress          (const StringArray &);
-   // static void set_field_index       (const StringArray &);   //  undocumented
 
 };
 

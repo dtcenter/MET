@@ -36,7 +36,6 @@ extern const char * const program_name;
 
 static ModeExecutive *mode_exec = 0;
 static int compress_level = -1;
-// static int field_index = -1;
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -47,7 +46,6 @@ ModeFrontEnd::ModeFrontEnd() :
 {
    mode_exec = 0;
    compress_level = -1;
-   // field_index = -1;
 }  
 
 
@@ -73,8 +71,6 @@ int ModeFrontEnd::run(const StringArray & Argv, Processing_t ptype, int field_in
    if ( mode_exec )  { delete mode_exec;  mode_exec = 0; }
    mode_exec = new ModeExecutive;
    compress_level = -1;
-   // field_index = -1;
-
 
    //
    // Process the command line arguments
@@ -132,7 +128,6 @@ int ModeFrontEnd::run_multivar_pass2(const StringArray & Argv, const MultiVarDat
 
    mode_exec = new ModeExecutive;
    compress_level = -1;
-   // field_index = -1;
 
    //
    // Process the command line arguments
@@ -140,8 +135,6 @@ int ModeFrontEnd::run_multivar_pass2(const StringArray & Argv, const MultiVarDat
 
    process_command_line(Argv, true);
    mode_exec->init_multivar(mvd._ftype, mvd._otype);
-
-   //process_command_line_multivar_pass2(Argv, mvd);
 
    ModeConfInfo & conf = mode_exec->engine.conf_info;
    if (compress_level >= 0) conf.nc_info.set_compress_level(compress_level);
@@ -200,7 +193,6 @@ int ModeFrontEnd::run_super(const StringArray & Argv,
 
    mode_exec = new ModeExecutive;
    compress_level = -1;
-   // field_index = -1;
 
    //
    // Process the command line arguments
@@ -210,7 +202,6 @@ int ModeFrontEnd::run_super(const StringArray & Argv,
    mode_exec->init_multivar(ftype, otype);
    ModeConfInfo & conf = mode_exec->engine.conf_info;
    if (compress_level >= 0) conf.nc_info.set_compress_level(compress_level);
-   // if ( field_index >= 0 )  conf.set_field_index(field_index);
    if (has_union && (conf.Fcst->merge_flag == MergeType_Thresh ||
                      conf.Obs->merge_flag == MergeType_Thresh)) {
       mlog << Warning << "\nModeFrontEnd::run() -> "
@@ -539,12 +530,6 @@ void ModeFrontEnd::process_command_line(const StringArray & argv, bool ismultiva
    cline.add(set_verbosity,         "-v",            1);
    cline.add(set_compress,          "-compress",     1);
 
-   // //
-   // //  add for mode multivar ... undocumented
-   // //
-
-   // // cline.add(set_field_index, "-field_index", 1);
-
    //
    // Parse the command line
    //
@@ -581,158 +566,6 @@ void ModeFrontEnd::process_command_line(const StringArray & argv, bool ismultiva
 
    }
 }
-
-// ///////////////////////////////////////////////////////////////////////
-
-// void ModeFrontEnd::process_command_line(const StringArray & argv)
-// {
-
-//    // CommandLine cline;
-//    // ConcatString s;
-//    // const int argc = argv.n();
-
-//    // //
-//    // // Set the default output directory
-//    // //
-
-//    // mode_exec->out_dir = replace_path(default_out_dir);
-
-//    // //
-//    // // Check for zero arguments
-//    // //
-
-//    // if(argc == 1) singlevar_usage();
-
-//    // //
-//    // // Parse the command line into tokens
-//    // //
-
-//    // cline.set(argv);
-
-//    // //
-//    // // Set the usage function
-//    // //
-
-//    // cline.set_usage(singlevar_usage);
-
-//    // //
-//    // // Add the options function calls
-//    // //
-
-//    // cline.add(set_config_merge_file, "-config_merge", 1);
-//    // cline.add(set_outdir,            "-outdir",       1);
-//    // cline.add(set_logfile,           "-log",          1);
-//    // cline.add(set_verbosity,         "-v",            1);
-//    // cline.add(set_compress,          "-compress",     1);
-
-//    // //
-//    // //  add for mode multivar ... undocumented
-//    // //
-
-//    // cline.add(set_field_index, "-field_index", 1);
-
-//    // //
-//    // // Parse the command line
-//    // //
-
-//    // cline.parse();
-
-//    //
-//    // Check for error. There should be three arguments left:
-//    // forecast, observation, and config filenames
-//    //
-
-//    // if(cline.n() != 3) singlevar_usage();
-
-//    // //
-//    // // Store the input forecast and observation file names
-//    // //
-
-//    // mode_exec->fcst_file         = cline[0];
-//    // mode_exec->obs_file          = cline[1];
-//    // mode_exec->match_config_file = cline[2];
-
-//    mode_exec->init();
-
-//    return;
-
-// }
-
-// ///////////////////////////////////////////////////////////////////////
-
-// void ModeFrontEnd::process_command_line_multivar_pass2(const StringArray & argv,
-//                                                        const MultiVarData &mvd)
-// {
-
-//    // CommandLine cline;
-//    // ConcatString s;
-//    // const int argc = argv.n();
-
-//    // //
-//    // // Set the default output directory
-//    // //
-
-//    // mode_exec->out_dir = replace_path(default_out_dir);
-
-//    // //
-//    // // Check for zero arguments
-//    // //
-
-//    // if(argc == 1) singlevar_usage();  // wrong, need something else
-
-//    // //
-//    // // Parse the command line into tokens
-//    // //
-
-//    // cline.set(argv);
-
-//    // //
-//    // // Set the usage function
-//    // //
-
-//    // cline.set_usage(singlevar_usage);  // wrong, need something else
-
-//    // //
-//    // // Add the options function calls
-//    // //
-
-//    // cline.add(set_config_merge_file, "-config_merge", 1);
-//    // cline.add(set_outdir,            "-outdir",       1);
-//    // cline.add(set_logfile,           "-log",          1);
-//    // cline.add(set_verbosity,         "-v",            1);
-//    // cline.add(set_compress,          "-compress",     1);
-
-//    // //
-//    // //  add for mode multivar ... undocumented
-//    // //
-
-//    // cline.add(set_field_index, "-field_index", 1);
-
-//    // //
-//    // // Parse the command line
-//    // //
-
-//    // cline.parse();
-
-//    //
-//    // Check for error. There should be 1 argument left:
-//    // config filename
-//    //
-
-//    // if(cline.n() != 1) singlevar_usage();  // wrong need something else
-
-//    // //
-//    // // Store the input forecast and observation file names, placeholders
-//    // //
-
-//    // mode_exec->fcst_file         = "not set";
-//    // mode_exec->obs_file          = "not set";
-//    // mode_exec->match_config_file = cline[0];
-//    mode_exec->init_multivar_pass2(mvd);
-
-//    return;
-
-// }
 
 ///////////////////////////////////////////////////////////////////////
 
@@ -799,29 +632,6 @@ void ModeFrontEnd::set_compress(const StringArray & a)
 {
    compress_level = atoi(a[0].c_str());
 }
-
-////////////////////////////////////////////////////////////////////////
-
-// void ModeFrontEnd::set_field_index(const StringArray & a)
-
-// {
-
-//    field_index = atoi(a[0].c_str());
-
-//    if ( field_index < 0 )  {
-
-//       mlog << Error
-//            << program_name << ": bad index value ... "
-//            << field_index << "\n\n";
-
-//       exit ( 1 );
-
-//    }
-
-//    return;
-
-// }
-
 
 ////////////////////////////////////////////////////////////////////////
 

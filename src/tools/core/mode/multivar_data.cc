@@ -111,13 +111,13 @@ void MultiVarData1::print(const string &fname, const string &oname) const
    if (_fcst_obj_data) {
       _print_summary(n, _fcst_obj_data, *_fcst_obj_sd);
    } else {
-      mlog << Debug(1) << n << " is empty\n";
+      mlog << Debug(2) << n << " is empty\n";
    }
    n = oname + "_" + _name + "_Obs_Obj";
    if (_obs_obj_data) {
       _print_summary(n, _obs_obj_data, *_obs_obj_sd);
    } else {
-      mlog << Debug(1) << n << " is empty\n";
+      mlog << Debug(2) << n << " is empty\n";
    }
 }           
 
@@ -161,10 +161,6 @@ void MultiVarData1::_print_summary(const string &name, int *data, const ShapeDat
       }
    }
    mlog << Debug(4) << name << " has " << values.size() << " unique values\n";
-   // for (size_t i=0; i<values.size(); ++i) {
-   //    printf("\n  %d", values[i]);
-   // }
-   // printf("\n");
    _debug_shape_examine(name, sd, _nx, _ny);
 }
 

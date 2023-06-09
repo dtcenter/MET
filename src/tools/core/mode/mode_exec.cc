@@ -875,11 +875,11 @@ void ModeExecutive::process_output(bool isMultivar, bool isMultivarSuper)
       replace(fcst_magic_string.begin(), fcst_magic_string.end(), '/', '_');   
       replace(obs_magic_string.begin(), obs_magic_string.end(), '/', '_');   
 
-      // replace * with X as * is problematic
+      // replace * with X as * is problematic in file names
       replace(fcst_magic_string.begin(), fcst_magic_string.end(), '*', 'X');   
       replace(obs_magic_string.begin(), obs_magic_string.end(), '*', 'X');   
       
-      // replace ( and ) with - 
+      // replace ( and ) with - as parens are problematic in file names
       replace(fcst_magic_string.begin(), fcst_magic_string.end(), '(', '-');   
       replace(fcst_magic_string.begin(), fcst_magic_string.end(), ')', '-');   
       replace(obs_magic_string.begin(), obs_magic_string.end(), '(', '-');   

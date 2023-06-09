@@ -55,6 +55,7 @@
 //   018    04/08/19  Halley Gotway  Add percentile thresholds.
 //   019    04/01/19  Fillmore       Add FCST and OBS units.
 //   020    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
+//   021    06/09/23  Albo           Major changes for multivariate mode
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -159,25 +160,28 @@ int met_main(int argc, char * argv [])
 
    for (j=0; j<argc; ++j)  {
 
-      // if ( strcmp(argv[j], "-field_index") == 0 )  has_field_index = true;
-
       s = argv[j];
-
       Argv.add(s);
 
    }
 
    config.read_config  (default_config_filename, user_config_filename);
 
-   if ( config.is_multivar() ) { // && !has_field_index )  {
+   if ( config.is_multivar() ) { 
 
       // exit inside this method if something is not implemented
+
       config.check_multivar_not_implemented();
 
+      // run the multivar version of mode
+      
       status = multivar_frontend(Argv);
 
    } else {
 
+
+      // run the traditional version of mode
+      
       ModeFrontEnd *frontend = new ModeFrontEnd;
       status = frontend->run(Argv);
 

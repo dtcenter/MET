@@ -55,22 +55,22 @@
       &OUTPUT_DIR;/mode_multivar/input_fcst_file_list \
       &OUTPUT_DIR;/mode_multivar/input_obs_file_list \
       &CONFIG_DIR;/MODEConfig_multivar_fake_data_with_intensities \
-      -outdir &OUTPUT_DIR;/mode_multivar_with_intensity \
+      -outdir &OUTPUT_DIR;/mode_multivar \
       -v 2
     </param>
     <output>
-      <stat>&OUTPUT_DIR;/mode_multivar_with_intensity/mode_Fcst_ALPHA-X,X-_Obs_ALPHA-X,X-_300000L_20120410_180000V_060000A_cts.txt</stat>
-      <grid_nc>&OUTPUT_DIR;/mode_multivar_with_intensity/mode_Fcst_ALPHA-X,X-_Obs_ALPHA-X,X-_300000L_20120410_180000V_060000A_obj.nc</grid_nc>
-      <stat>&OUTPUT_DIR;/mode_multivar_with_intensity/mode_Fcst_ALPHA-X,X-_Obs_ALPHA-X,X-_300000L_20120410_180000V_060000A_obj.txt</stat>
-      <ps>&OUTPUT_DIR;/mode_multivar_with_intensity/mode_Fcst_ALPHA-X,X-_Obs_ALPHA-X,X-_300000L_20120410_180000V_060000A.ps</ps>
-      <stat>&OUTPUT_DIR;/mode_multivar_with_intensity/mode_Fcst_BETA-X,X-_Obs_BETA-X,X-_300000L_20120410_180000V_060000A_cts.txt</stat>
-      <grid_nc>&OUTPUT_DIR;/mode_multivar_with_intensity/mode_Fcst_BETA-X,X-_Obs_BETA-X,X-_300000L_20120410_180000V_060000A_obj.nc</grid_nc>
-      <stat>&OUTPUT_DIR;/mode_multivar_with_intensity/mode_Fcst_BETA-X,X-_Obs_BETA-X,X-_300000L_20120410_180000V_060000A_obj.txt</stat>
-      <ps>&OUTPUT_DIR;/mode_multivar_with_intensity/mode_Fcst_BETA-X,X-_Obs_BETA-X,X-_300000L_20120410_180000V_060000A.ps</ps>
-      <stat>&OUTPUT_DIR;/mode_multivar_with_intensity/mode_Fcst_GAMMA-X,X-_Obs_GAMMA-X,X-_300000L_20120410_180000V_060000A_cts.txt</stat>
-      <grid_nc>&OUTPUT_DIR;/mode_multivar_with_intensity/mode_Fcst_GAMMA-X,X-_Obs_GAMMA-X,X-_300000L_20120410_180000V_060000A_obj.nc</grid_nc>
-      <stat>&OUTPUT_DIR;/mode_multivar_with_intensity/mode_Fcst_GAMMA-X,X-_Obs_GAMMA-X,X-_300000L_20120410_180000V_060000A_obj.txt</stat>
-      <ps>&OUTPUT_DIR;/mode_multivar_with_intensity/mode_Fcst_GAMMA-X,X-_Obs_GAMMA-X,X-_300000L_20120410_180000V_060000A.ps</ps>
+      <stat>&OUTPUT_DIR;/mode_multivar/mode_Fcst_ALPHA-X,X-_Obs_ALPHA-X,X-_300000L_20120410_180000V_060000A_cts.txt</stat>
+      <grid_nc>&OUTPUT_DIR;/mode_multivar/mode_Fcst_ALPHA-X,X-_Obs_ALPHA-X,X-_300000L_20120410_180000V_060000A_obj.nc</grid_nc>
+      <stat>&OUTPUT_DIR;/mode_multivar/mode_Fcst_ALPHA-X,X-_Obs_ALPHA-X,X-_300000L_20120410_180000V_060000A_obj.txt</stat>
+      <ps>&OUTPUT_DIR;/mode_multivar/mode_Fcst_ALPHA-X,X-_Obs_ALPHA-X,X-_300000L_20120410_180000V_060000A.ps</ps>
+      <stat>&OUTPUT_DIR;/mode_multivar/mode_Fcst_BETA-X,X-_Obs_BETA-X,X-_300000L_20120410_180000V_060000A_cts.txt</stat>
+      <grid_nc>&OUTPUT_DIR;/mode_multivar/mode_Fcst_BETA-X,X-_Obs_BETA-X,X-_300000L_20120410_180000V_060000A_obj.nc</grid_nc>
+      <stat>&OUTPUT_DIR;/mode_multivar/mode_Fcst_BETA-X,X-_Obs_BETA-X,X-_300000L_20120410_180000V_060000A_obj.txt</stat>
+      <ps>&OUTPUT_DIR;/mode_multivar/mode_Fcst_BETA-X,X-_Obs_BETA-X,X-_300000L_20120410_180000V_060000A.ps</ps>
+      <stat>&OUTPUT_DIR;/mode_multivar/mode_Fcst_GAMMA-X,X-_Obs_GAMMA-X,X-_300000L_20120410_180000V_060000A_cts.txt</stat>
+      <grid_nc>&OUTPUT_DIR;/mode_multivar/mode_Fcst_GAMMA-X,X-_Obs_GAMMA-X,X-_300000L_20120410_180000V_060000A_obj.nc</grid_nc>
+      <stat>&OUTPUT_DIR;/mode_multivar/mode_Fcst_GAMMA-X,X-_Obs_GAMMA-X,X-_300000L_20120410_180000V_060000A_obj.txt</stat>
+      <ps>&OUTPUT_DIR;/mode_multivar/mode_Fcst_GAMMA-X,X-_Obs_GAMMA-X,X-_300000L_20120410_180000V_060000A.ps</ps>
     </output>
   </test>
 
