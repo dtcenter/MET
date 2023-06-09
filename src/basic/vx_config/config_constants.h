@@ -1196,7 +1196,7 @@ static const char conf_key_tangential_velocity_long_field_name[] = "tangential_v
 static const char conf_key_vortex_removal[] = "vortex_removal";
 
 //
-// TC-Diag specific paramter key names
+// TC-Diag specific parameter key names
 //
 
 static const char conf_key_domain_info[]     = "domain_info";

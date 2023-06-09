@@ -110,7 +110,7 @@ void DomainInfo::parse_domain_info(Dictionary &dict) {
    domain = dict.lookup_string(conf_key_domain);
 
    // Hard-code the name
-   data.name = "TCRMW";
+   data.name = "TCDIAG";
 
    // Conf: n_range
    data.range_n = dict.lookup_int(conf_key_n_range);
