@@ -25,7 +25,7 @@
 //   008    05/02/22  Halley Gotway   MET #2148 Fix init_hour and lead misses
 //   009    07/06/22  Howard Soh      METplus-Internal #19 Rename main to met_main
 //   010    09/28/22  Prestopnik      MET #2227 Remove using namespace std and netCDF from header files
-//
+//   011    05/25/23  Halley Gotway   MET #2552 Update parsing of gtwo probability lead times
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -86,7 +86,8 @@ static void   process_edecks       (const StringArray &,
                                     const StringArray &,
                                     ProbInfoArray &);
 static void   process_shapes       (const StringArray &,
-                                    GenShapeInfoArray &);
+                                    GenShapeInfoArray &,
+                                    int &);
 
 static void   get_genesis_pairs    (const TCGenVxOpt &,
                                     const ConcatString &,
@@ -516,7 +517,7 @@ void score_genesis_prob(const GenesisInfoArray &best_ga,
 ////////////////////////////////////////////////////////////////////////
 
 void score_genesis_shape(const GenesisInfoArray &best_ga) {
-   int i, j, total_probs;
+   int i, j, total_probs, max_n_prob;
    StringArray shape_files;
    GenShapeInfoArray shapes_all, shapes_subset;
    ProbGenPCTInfo probgen_pct;
@@ -530,11 +531,11 @@ void score_genesis_shape(const GenesisInfoArray &best_ga) {
         << "Processing " << shape_files.n()
         << " shapefile(s) matching the \""
         << gen_shp_reg_exp << "\" regular expression.\n";
-   process_shapes(shape_files, shapes_all);
+   process_shapes(shape_files, shapes_all, max_n_prob);
 
    // Setup output files based on the maximum number of filters
    // and lead times possible
-   setup_txt_files(conf_info.n_vx(), max_n_shape_prob, 0);
+   setup_txt_files(conf_info.n_vx(), max_n_prob, 0);
 
    // Process each verification filter
    for(i=0; i<conf_info.n_vx(); i++) {
@@ -1577,18 +1578,21 @@ void process_edecks(const StringArray &files,
 ////////////////////////////////////////////////////////////////////////
 
 void process_shapes(const StringArray &files,
-                    GenShapeInfoArray &shapes) {
-   int i, j, k, n_rec, total_probs;
+                    GenShapeInfoArray &shapes,
+                    int &max_n_prob) {
+   int i, j, k, n_rec, total_probs, lead_day;
    unixtime file_ut;
    ConcatString shp_file_name, dbf_file_name;
-   StringArray sa;
    ConcatString cs;
+   StringArray sa;
+   StringArray rec_names, rec_values;
    GenShapeInfo gsi;
    DbfFile dbf_file;
    ShpFile shp_file;
    ShpPolyRecord poly_rec;
 
    // Initialize
+   max_n_prob = 0;
    total_probs = 0;
 
    // Process each shapefile
@@ -1632,6 +1636,10 @@ void process_shapes(const StringArray &files,
       // Store the number of records
       n_rec = dbf_file.header()->n_records;
 
+      // Get the subrecord names, ignoring case
+      rec_names = dbf_file.subrecord_names();
+      rec_names.set_ignore_case(true);
+
       // Check expected shape types
       const ShapeType shape_type = (ShapeType) (shp_file.header()->shape_type);
       if(shape_type != shape_type_polygon) {
@@ -1650,7 +1658,7 @@ void process_shapes(const StringArray &files,
 
          // Check for end-of-file
          if(shp_file.at_eof()) {
-            mlog << Error << "\nrocess_shapes() -> "
+            mlog << Error << "\nprocess_shapes() -> "
                  << "hit shp file EOF before reading all records!\n\n";
             exit(1);
          }
@@ -1658,32 +1666,37 @@ void process_shapes(const StringArray &files,
          // Read the current shape and metadata
          shp_file >> poly_rec;
          poly_rec.toggle_longitudes();
-         sa = dbf_file.subrecord_values(j);
+         rec_values = dbf_file.subrecord_values(j);
 
          // Initialize GenShapeInfo
          gsi.clear();
          gsi.set_time(file_ut);
-         gsi.set_basin(string_to_basin_abbr(sa[0]).c_str());
          gsi.set_poly(poly_rec);
 
-         // Parse probabilities from the subrecord values
-         for(k=0; k<sa.n(); k++) {
+         // Store the basin
+         if(rec_names[0] != "BASIN") {
+            mlog << Error << "\nprocess_shapes() -> "
+                 << "the first field name (" << rec_names[0]
+                 << ") is not \"BASIN\", as expected.\n\n";
+            exit(1);
+         }
+         gsi.set_basin(string_to_basin_abbr(rec_values[0]).c_str());
 
-            if(check_reg_exp("[0-9]%$", sa[k].c_str())) {
+         // Parse probabilities from the subrecord names and values
+         for(k=0; k<rec_names.n(); k++) {
 
-               // Check for too many probabilities
-               if(gsi.n_prob() >= max_n_shape_prob) {
-                  mlog << Warning << "\nprocess_shapes() -> "
-                       << "unexpected number of shapefile probabilities ("
-                       << gsi.n_prob() << ") in record " << j+1
-                       << " of file \"" << dbf_file_name
-                       << "\"!\n\n";
-                  continue;
-               }
+            if(check_reg_exp("PROB[0-9]DAY$", rec_names[k].c_str())) {
+
+               // Parse the lead day from the field name
+               lead_day = stoi(rec_names[k].substr(4));
+
+               mlog << Debug(5) << "Parsed " << rec_values[0] << " basin "
+                    << lead_day << " day " << rec_values[k]
+                    << " genesis probability shape.\n";
 
                // Store the probability info
-               gsi.add_prob(shape_prob_lead_hr[gsi.n_prob()]*sec_per_hour,
-                            atoi(sa[k].c_str())/100.0);
+               gsi.add_prob(lead_day*sec_per_day,
+                            atoi(rec_values[k].c_str())/100.0);
             }
          } // end for k
 
@@ -1691,6 +1704,9 @@ void process_shapes(const StringArray &files,
          if(shapes.add(gsi, true)) {
             mlog << Debug(5) << "Add new " << gsi.serialize() << "\n";
             total_probs += gsi.n_prob();
+            if(gsi.n_prob() > max_n_prob) {
+               max_n_prob = gsi.n_prob();
+            }
          }
 
       } // end for j

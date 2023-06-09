@@ -23,8 +23,17 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-extern void write_tc_tracks(netCDF::NcFile*,
-    const netCDF::NcDim&, const TrackInfoArray&);
+extern void write_tc_track_lines(netCDF::NcFile*,
+    const TrackInfo&);
+
+extern void write_tc_track_lat_lon(netCDF::NcFile*,
+    const netCDF::NcDim&, const TrackInfo&);
+
+extern void write_tc_track_point(netCDF::NcFile*,
+    const netCDF::NcDim&, const TrackPoint&);
+
+extern void write_tc_rmw(netCDF::NcFile*,
+    const netCDF::NcDim&, const TrackInfo&);
 
 extern std::set<std::string> get_pressure_level_strings(
     std::map<std::string, std::vector<std::string> >);
@@ -47,9 +56,18 @@ extern void def_tc_pressure(netCDF::NcFile*,
 extern void def_tc_range_azimuth(netCDF::NcFile*,
     const netCDF::NcDim&, const netCDF::NcDim&, const TcrmwGrid&, double);
 
-extern void def_tc_time_lat_lon(netCDF::NcFile*,
+extern void def_tc_init_time(netCDF::NcFile*,
+    netCDF::NcVar&, netCDF::NcVar&);
+
+extern void def_tc_valid_time(netCDF::NcFile*,
+    const netCDF::NcDim&, netCDF::NcVar&, netCDF::NcVar&);
+
+extern void def_tc_lead_time(netCDF::NcFile*,
+    const netCDF::NcDim&, netCDF::NcVar&, netCDF::NcVar&);
+
+extern void def_tc_lat_lon(netCDF::NcFile*,
     const netCDF::NcDim&, const netCDF::NcDim&, const netCDF::NcDim&,
-    netCDF::NcVar&, netCDF::NcVar&, netCDF::NcVar&);
+    netCDF::NcVar&, netCDF::NcVar&);
 
 extern void def_tc_variables(netCDF::NcFile*,
     std::map<std::string, std::vector<std::string> >,
@@ -69,8 +87,19 @@ extern void def_tc_azi_mean_data(netCDF::NcFile*,
     const netCDF::NcDim&, const netCDF::NcDim&,
     netCDF::NcVar&, VarInfo*);
 
+extern void write_tc_init_time(netCDF::NcFile*,
+    const netCDF::NcVar&, const netCDF::NcVar&,
+    const unixtime&);
+
 extern void write_tc_valid_time(netCDF::NcFile*,
-    const int&, const netCDF::NcVar&, const long&);
+    const int&,
+    const netCDF::NcVar&, const netCDF::NcVar&,
+    const unixtime&);
+
+extern void write_tc_lead_time(netCDF::NcFile*,
+    const int&,
+    const netCDF::NcVar&, const netCDF::NcVar&,
+    const int&);
 
 extern void write_tc_data(netCDF::NcFile*, const TcrmwGrid&,
     const int&, const netCDF::NcVar&, const double*);
@@ -84,6 +113,9 @@ extern void write_tc_azi_mean_data(netCDF::NcFile*, const TcrmwGrid&,
 extern void write_tc_pressure_level_data(netCDF::NcFile*, const TcrmwGrid&,
     std::map<std::string, int>, const std::string&,
     const int&, const netCDF::NcVar&, const double*);
+
+extern void write_tc_pressure_level_data(netCDF::NcFile*, const TcrmwGrid&,
+    const int&, const int&, const netCDF::NcVar&, const double*);
 
 ////////////////////////////////////////////////////////////////////////
 

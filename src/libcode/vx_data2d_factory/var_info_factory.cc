@@ -136,3 +136,17 @@ VarInfo * VarInfoFactory::new_var_info(ConcatString s) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+
+VarInfo * VarInfoFactory::new_copy(const VarInfo *vi_in) {
+
+   if(!vi_in) return ( nullptr );
+
+   VarInfo *vi_copy = new_var_info(vi_in->file_type());
+
+   *vi_copy = *vi_in;
+
+   return(vi_copy);
+
+}
+
+///////////////////////////////////////////////////////////////////////////////

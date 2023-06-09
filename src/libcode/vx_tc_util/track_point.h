@@ -64,6 +64,7 @@ class QuadInfo {
       void set_wind(const ATCFTrackLine &);
       void set_seas(const ATCFTrackLine &);
       void set_quad_vals(QuadrantType, int, int, int, int);
+      void set_al_from_quad_vals();
 
       void set_intensity(int);
       void set_al_val(double);

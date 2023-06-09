@@ -532,6 +532,7 @@ TC-Pairs produces output in TCST format. The default output file name can be ove
   * - 35, 36
     - A/BAL_WIND_34
     - a/bdeck 34-knot radius winds in full circle
+      or the mean of the non-zero 34-knot wind quadrants
   * - 37, 38
     - A/BNE_WIND_34
     - a/bdeck 34-knot radius winds in NE quadrant
@@ -547,6 +548,7 @@ TC-Pairs produces output in TCST format. The default output file name can be ove
   * - 45, 46
     - A/BAL_WIND_50
     - a/bdeck 50-knot radius winds in full circle
+      or the mean of the non-zero 50-knot wind quadrants
   * - 47, 48
     - A/BNE_WIND_50
     - a/bdeck 50-knot radius winds in NE quadrant
@@ -562,6 +564,7 @@ TC-Pairs produces output in TCST format. The default output file name can be ove
   * - 55, 56
     - A/BAL_WIND_64
     - a/bdeck 64-knot radius winds in full circle
+      or the mean of the non-zero 64-knot wind quadrants
   * - 57, 58
     - A/BNE_WIND_64
     - a/bdeck 64-knot radius winds in NE quadrant

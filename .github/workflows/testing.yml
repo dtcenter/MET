@@ -167,7 +167,7 @@ jobs:
     strategy:
       matrix:
         tests:
-          - 'ascii2nc_indy pb2nc_indy tc_dland tc_pairs tc_stat plot_tc tc_rmw rmw_analysis tc_gen'
+          - 'ascii2nc_indy pb2nc_indy tc_dland tc_pairs tc_stat plot_tc tc_rmw rmw_analysis tc_diag tc_gen'
           - 'met_test_scripts mode_multivar mode_graphics mtd regrid airnow gsi_tools netcdf modis series_analysis gen_ens_prod wwmca_regrid gen_vx_mask grid_weight interp_shape grid_diag grib_tables lidar2nc shift_data_plane trmm2nc aeronet wwmca_plot ioda2nc gaussian'
       fail-fast: false
     steps:

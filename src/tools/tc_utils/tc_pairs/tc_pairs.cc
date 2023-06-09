@@ -37,6 +37,7 @@
 //   013    09/28/22  Prestopnik      MET #2227 Remove namespace std from header files
 //   014    10/06/22  Halley Gotway   MET #392 Incorporate diagnostics
 //   015    02/20/23  Seth Linden     MET #2429 Added option to prevent output of consensus track members
+//   016    06/08/23  Halley Gotway   MET #2532 Full circle winds are the mean of the non-zero quadrants
 //
 ////////////////////////////////////////////////////////////////////////
 

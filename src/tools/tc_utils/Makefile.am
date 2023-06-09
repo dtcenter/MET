@@ -24,4 +24,8 @@ SUBDIRS	= tc_dland \
 	rmw_analysis \
 	tc_stat
 
+if ENABLE_PYTHON
+  SUBDIRS += tc_diag
+endif
+
 MAINTAINERCLEANFILES 	= Makefile.in
