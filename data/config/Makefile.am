@@ -38,6 +38,7 @@ config_DATA = \
 	STATAnalysisConfig_default \
 	STATAnalysisConfig_GO_Index \
 	STATAnalysisConfig_CBS_Index \
+	TCDiagConfig_default \
 	TCPairsConfig_default \
 	TCRMWConfig_default \
 	RMWAnalysisConfig_default \

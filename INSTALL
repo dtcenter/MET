@@ -219,6 +219,7 @@ sub-directory, or the MET Online Tutorial:
    - series_analysis
    - shift_data_plane
    - stat_analysis
+   - tc_diag
    - tc_dland
    - tc_gen
    - tc_pairs
