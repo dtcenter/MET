@@ -1017,7 +1017,7 @@ return ( nr*nt );
 ////////////////////////////////////////////////////////////////////////
 
 
-bool ModeConfInfo::is_multivar()
+bool ModeConfInfo::is_multivar() 
 
 {
 
@@ -1091,8 +1091,12 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void ModeConfInfo::check_multivar_not_implemented() const
+void ModeConfInfo::check_multivar_not_implemented()
 {
+   if (!is_multivar()) {
+      return;
+   }
+
    bool status = false;
    if (quilt) {
       mlog << Error
