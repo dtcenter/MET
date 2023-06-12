@@ -169,7 +169,7 @@ class dataplane(logger):
       ds.close()
 
    @staticmethod
-   def validate_met_data(met_data, fill_value=None, min_value=None, max_value=None):
+   def validate_met_data(met_data, fill_value=None):
       method_name = f"{dataplane.class_name}.validate()"
       #logger.log_msg(f"{method_name} type(met_data)= {type(met_data)}")
       attrs = None
@@ -195,38 +195,6 @@ class dataplane(logger):
          met_data = np.ma.masked_equal(met_data, float('inf'))
          if fill_value is not None:
             met_data = np.ma.masked_equal(met_data, fill_value)
-         if min_value is not None:
-            is_less = False
-            if isinstance(min_value, str):
-               if min_value[0] == '<':
-                  start_index = 1
-                  if min_value[1] == '=':
-                     start_index += 1
-                  else:
-                     is_less = True
-                  min_value = int(min_value[start_index:]) if is_int_data else float(min_value[start_index:])
-               else:
-                  min_value = int(min_value) if is_int_data else float(min_value)
-            if is_less:
-               met_data = np.ma.masked_less(met_data, min_value)
-            else:
-               met_data = np.ma.masked_less_equal(met_data, min_value)
-         if max_value is not None:
-            is_greater = False
-            if isinstance(max_value, str):
-               if max_value[0] == '>':
-                  start_index = 1
-                  if max_value[1] == '=':
-                     start_index += 1
-                  else:
-                     is_less = True
-                  max_value = int(max_value[start_index:]) if is_int_data else float(max_value[start_index:])
-               else:
-                  max_value = int(max_value) if is_int_data else float(max_value)
-            if is_greater:
-               met_data = np.ma.masked_greater(met_data, max_value)
-            else:
-               met_data = np.ma.masked_greater_equal(met_data, max_value)
          met_data = met_data.filled(int(met_fill_value) if is_int_data else met_fill_value)
       else:
          logger.log_msg(f"{method_name} unknown datatype {type(met_data)}")

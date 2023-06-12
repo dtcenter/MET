@@ -95,5 +95,5 @@ except:
 attrs = set_dataplane_attrs()
 log("Attributes:\t" + repr(attrs))
 
-# Sets fill_value/min_value/max_value if it exists
+# Sets fill_value if it exists
 #attrs['fill_value'] = 255  # for letter.txt
