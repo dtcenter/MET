@@ -1,5 +1,3 @@
-
-
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
@@ -7,8 +5,6 @@
 // ** Research Applications Lab (RAL)
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-
-
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -29,6 +25,7 @@
 #include "merc_grid.h"
 #include "gaussian_grid.h"
 #include "tcrmw_grid.h"
+#include "laea_grid.h"
 #include "semilatlon_grid.h"
 
 #include "find_grid_by_name.h"
@@ -41,6 +38,3 @@
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-

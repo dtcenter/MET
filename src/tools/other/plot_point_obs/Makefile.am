@@ -36,6 +36,7 @@ plot_point_obs_LDADD = -lvx_statistics \
 	-lvx_afm \
 	-lvx_nav \
 	-lvx_grid \
+	-lvx_geodesy \
 	-lvx_config \
 	-lvx_gsl_prob \
 	-lvx_color \

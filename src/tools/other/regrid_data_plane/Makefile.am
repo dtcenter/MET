@@ -27,6 +27,7 @@ regrid_data_plane_LDADD = -lvx_statistics \
 	-lvx_gnomon \
 	-lvx_regrid \
 	-lvx_grid \
+	-lvx_geodesy \
 	-lvx_config \
 	-lvx_gsl_prob \
 	-lvx_cal \

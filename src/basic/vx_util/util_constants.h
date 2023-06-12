@@ -57,6 +57,7 @@ static const char mercator_proj_type       [] = "Mercator";
 static const char lambert_proj_type        [] = "Lambert Conformal";
 static const char stereographic_proj_type  [] = "Polar Stereographic";
 static const char gaussian_proj_type       [] = "Gaussian";
+static const char laea_proj_type           [] = "Lambert Azimuthal Equal Area";
 static const char semilatlon_proj_type     [] = "SemiLatLon";
 
 // String containing all valid PrepBufr message types

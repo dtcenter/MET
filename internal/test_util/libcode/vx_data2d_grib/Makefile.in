@@ -320,6 +320,7 @@ test_read_grib1_LDFLAGS = -L. ${MET_LDFLAGS}
 test_read_grib1_LDADD = -lvx_data2d_grib \
 	-lvx_data2d \
 	-lvx_grid \
+	-lvx_geodesy \
 	-lvx_config \
 	-lvx_gsl_prob \
 	-lvx_util_math \

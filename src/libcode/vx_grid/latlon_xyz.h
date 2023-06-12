@@ -1,5 +1,3 @@
-
-
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
@@ -82,5 +80,3 @@ extern void normalize(double & ax, double & ay, double & az);
 
 
 ////////////////////////////////////////////////////////////////////////
-
-

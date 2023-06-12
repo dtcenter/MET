@@ -52,6 +52,7 @@ mode_LDADD = -lvx_pxm \
 	-lvx_nc_util \
 	-lvx_regrid \
 	-lvx_grid \
+	-lvx_geodesy \
 	-lvx_config \
 	-lvx_bool_calc \
 	-lvx_cal \
