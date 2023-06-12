@@ -411,154 +411,6 @@ static void   cleanup_hdr_typ(char *hdr_typ, bool is_prepbufr=false);
 
 ////////////////////////////////////////////////////////////////////////
 
-
-void read_bufr_vars(bool is_airnow, bool is_prepbufr, int file_unit, int nlev_max_req,
-                    int obs_hid, float obs_pres, float obs_hgt,
-                    const float hdr_lat, const float hdr_lon, const float hdr_elv,
-                    const unixtime hdr_vld_ut, const char *hdr_typ,
-                    const ConcatString &hdr_sid,
-                    int &n_hdr_obs, int &n_file_obs,
-                    StringArray &variables_big_nlevels) {
-   int i_ret;
-   int buf_nlev;
-   int airnow_nlev = 0;
-   float obs_arr[OBS_ARRAY_LEN];
-   int quality_mark = bad_data_int;
-   const char *method_name = "read_bufr_vars() ->";
-
-   obs_arr[0] = obs_hid;
-   obs_arr[2] = obs_pres;
-   obs_arr[3] = obs_hgt;
-
-   if (is_airnow) {
-      int tmp_ret;
-      for (int index1=0; index1<mxr8lv; index1++) {
-        for (int index2=0; index2<mxr8pm; index2++) {
-           bufr_obs_extra[index1][index2] = bad_data_double;
-        }
-      }
-      int tmp_len = m_strlen(airnow_aux_vars);
-      readpbint_(&file_unit, &tmp_ret, &airnow_nlev, bufr_obs_extra,
-                 (char *)airnow_aux_vars, &tmp_len, &nlev_max_req);
-   }
-
-   bool isDegC;
-   bool isMgKg;
-   bool isMilliBar;
-   int var_index;
-   int n_other_file_obs  = 0;
-   int n_other_total_obs = 0;
-   int n_other_hdr_obs   = 0;
-   int var_count = bufr_obs_name_arr.n_elements();
-   for (int vIdx=0; vIdx<var_count; vIdx++) {
-      int nlev2;
-      ConcatString var_name;
-      int var_name_len;
-      var_name = bufr_obs_name_arr[vIdx];
-      var_name_len = var_name.length();
-      if (is_prepbufr &&
-            (prepbufr_vars.has(var_name, false)
-             || prepbufr_event_members.has(var_name)
-             || prepbufr_derive_vars.has(var_name))) continue;
-
-      isDegC = false;
-      isMgKg = false;
-      isMilliBar = false;
-      if (var_names.has(var_name, var_index, false)) {
-         if ("DEG C" == var_units[var_index]) {
-            isDegC = true;
-         }
-         else if ("MB" == var_units[var_index]) {
-            isMilliBar = true;
-         }
-         else if ("MG/KG" == var_units[var_index]) {
-            isMgKg = true;
-         }
-      }
-
-      readpbint_(&file_unit, &i_ret, &nlev2, bufr_obs,
-                 (char*)var_name.c_str(), &var_name_len, &nlev_max_req);
-      if (0 >= nlev2) continue;
-
-      buf_nlev = nlev2;
-      if (nlev2 > mxr8lv) {
-         buf_nlev = mxr8lv;
-         if (!variables_big_nlevels.has(var_name, false)) {
-            mlog << Warning << "\n" << method_name
-                 << "Too many vertical levels (" << nlev2
-                 << ") for " << var_name
-                 << ". Ignored the vertical levels above " << mxr8lv << ".\n\n";
-            variables_big_nlevels.add(var_name);
-         }
-      }
-      mlog << Debug(10) << "var: " << var_name << " nlev2: " << nlev2
-           << ", vIdx: " << vIdx << ", obs_data_idx: "
-           << nc_point_obs.get_obs_index() << ", nlev: " << nlev << "\n";
-      // Search through the vertical levels
-      for(int lv=0; lv<buf_nlev; lv++) {
-         // If the observation vertical level is not within the
-         // specified valid range, continue to the next vertical level
-         if((lv+1) < conf_info.beg_level) continue;
-         if((lv+1) > conf_info.end_level) break;
-
-         // If the pressure level is not valid, continue to the next level
-         if (is_prepbufr) {
-            if ((lv >= nlev) || is_eq(bufr_pres_lv[lv], fill_value)) continue;
-         }
-
-         if (bufr_obs[lv][0] > r8bfms) continue;
-         mlog << Debug(10) << " value:   bufr_obs[" << lv << "][0]: " << bufr_obs[lv][0] << "\n";
-
-         obs_arr[1] = (float)vIdx;        // BUFR variable index
-         obs_arr[4] = bufr_obs[lv][0];    // observation value
-         if(!is_eq(obs_arr[4], fill_value)) {
-            float scale_factor = 1.;
-            // Convert pressure from millibars to pascals
-            if (isMilliBar) scale_factor = pa_per_mb;
-            // Convert specific humidity from mg/kg to kg/kg
-            else if(isMgKg) scale_factor = kg_per_mg;
-            // Convert temperature from celcius to kelvin
-            else if(isDegC) scale_factor = c_to_k;
-            obs_arr[4] *= scale_factor;
-         }
-
-         if (is_airnow) {
-            if (lv < airnow_nlev) {
-               obs_arr[2]   = abs(bufr_obs_extra[lv][0] * 3600);  // hour to second
-            }
-            obs_arr[3]   = 0;                                  // AIRNOW obs at surface
-            quality_mark = bufr_obs_extra[lv][1];
-            // Convert a special number (1e+11) to NA at addObservation
-            if(conf_info.quality_mark_thresh < quality_mark) continue;
-         }
-         else {
-            // Retain the pressure in hPa for each observation record
-            obs_arr[2] = bufr_pres_lv[lv];
-            obs_arr[3] = bufr_msl_lv[lv];
-            if (is_eq(obs_arr[2], fill_value) && is_eq(obs_arr[3], fill_value) && 0 < nlev2) {
-               obs_arr[2] = lv;
-               obs_arr[3] = lv;
-            }
-         }
-
-         addObservation(obs_arr, (string)hdr_typ, (string)hdr_sid, hdr_vld_ut,
-               hdr_lat, hdr_lon, hdr_elv, quality_mark, OBS_BUFFER_SIZE);
-
-         // Increment the current and total observations counts
-         n_other_file_obs++;
-         n_other_total_obs++;
-
-         // Increment the number of obs counter for this header
-         n_other_hdr_obs++;
-      }
-   }
-   n_hdr_obs += n_other_hdr_obs;
-   n_file_obs += n_other_file_obs;
-   n_total_obs += n_other_total_obs;
-}
-
-////////////////////////////////////////////////////////////////////////
-
 void dump_pb_data(
    int unit,
    const ConcatString &prefix,
@@ -1936,10 +1788,137 @@ void process_pbfile(int i_pb) {
          else cape_cnt_surface_msgs++;
       }
 
-      read_bufr_vars(is_airnow, is_prepbufr, unit, nlev_max_req,
-                    obs_arr[0], obs_arr[2], obs_arr[3], hdr_lat, hdr_lon,  hdr_elv,
-                    hdr_vld_ut, hdr_typ, hdr_sid, n_hdr_obs, n_file_obs,
-                    variables_big_nlevels);
+      {
+         quality_mark = bad_data_int;
+         ConcatString quality_mark_str;
+
+         if (is_airnow) {
+            int tmp_ret, tmp_nlev, tmp_len;
+            for (int index1=0; index1<mxr8lv; index1++) {
+              for (int index2=0; index2<mxr8pm; index2++) {
+                 bufr_obs_extra[index1][index2] = bad_data_double;
+              }
+            }
+            tmp_len = m_strlen(airnow_aux_vars);
+            readpbint_(&unit, &tmp_ret, &tmp_nlev, bufr_obs_extra,
+                       (char *)airnow_aux_vars, &tmp_len, &nlev_max_req);
+         }
+         bool isDegC;
+         bool isMgKg;
+         bool isMilliBar;
+         int var_index;
+         int n_other_file_obs  = 0;
+         int n_other_total_obs = 0;
+         int n_other_hdr_obs   = 0;
+         int var_count = bufr_obs_name_arr.n_elements();
+         for (int vIdx=0; vIdx<var_count; vIdx++) {
+            int nlev2;
+            ConcatString var_name;
+            int var_name_len;
+            var_name = bufr_obs_name_arr[vIdx];
+            var_name_len = var_name.length();
+            if (is_prepbufr &&
+                  (prepbufr_vars.has(var_name, false)
+                   || prepbufr_event_members.has(var_name)
+                   || prepbufr_derive_vars.has(var_name))) continue;
+
+            isDegC = false;
+            isMgKg = false;
+            isMilliBar = false;
+            if (var_names.has(var_name, var_index, false)) {
+               if ("DEG C" == var_units[var_index]) {
+                  isDegC = true;
+               }
+               else if ("MB" == var_units[var_index]) {
+                  isMilliBar = true;
+               }
+               else if ("MG/KG" == var_units[var_index]) {
+                  isMgKg = true;
+               }
+            }
+
+            readpbint_(&unit, &i_ret, &nlev2, bufr_obs,
+                       (char*)var_name.c_str(), &var_name_len, &nlev_max_req);
+            if (0 >= nlev2) continue;
+
+            buf_nlev = nlev2;
+            if (nlev2 > mxr8lv) {
+               buf_nlev = mxr8lv;
+               if (!variables_big_nlevels.has(var_name, false)) {
+                  mlog << Warning << "\n" << method_name
+                       << "Too many vertical levels (" << nlev2
+                       << ") for " << var_name
+                       << ". Ignored the vertical levels above " << mxr8lv << ".\n\n";
+                  variables_big_nlevels.add(var_name);
+               }
+            }
+            mlog << Debug(10) << "var: " << var_name << " nlev2: " << nlev2
+                 << ", vIdx: " << vIdx << ", obs_data_idx: "
+                 << nc_point_obs.get_obs_index() << ", nlev: " << nlev << "\n";
+            // Search through the vertical levels
+            for(lv=0; lv<buf_nlev; lv++) {
+               // If the observation vertical level is not within the
+               // specified valid range, continue to the next vertical level
+               if((lv+1) < conf_info.beg_level) continue;
+               if((lv+1) > conf_info.end_level) break;
+
+               // If the pressure level is not valid, continue to the next level
+               if (is_prepbufr) {
+                  if ((lv >= nlev) || is_eq(bufr_pres_lv[lv], fill_value)) continue;
+               }
+
+               if (bufr_obs[lv][0] > r8bfms) continue;
+               mlog << Debug(10) << " value:   bufr_obs[" << lv << "][0]: " << bufr_obs[lv][0] << "\n";
+
+               obs_arr[1] = (float)vIdx;        // BUFR variable index
+               obs_arr[4] = bufr_obs[lv][0];    // observation value
+               if(!is_eq(obs_arr[4], fill_value)) {
+                  // Convert pressure from millibars to pascals
+                  if (isMilliBar) {
+                     obs_arr[4] *= pa_per_mb;
+                  }
+                  // Convert specific humidity from mg/kg to kg/kg
+                  else if(isMgKg) {
+                     obs_arr[4] *= kg_per_mg;
+                  }
+                  // Convert temperature from celcius to kelvin
+                  else if(isDegC) {
+                     obs_arr[4] += c_to_k;
+                  }
+               }
+
+               if (is_airnow) {
+                  obs_arr[2]   = abs(bufr_obs_extra[lv][0] * 3600);  // hour to second
+                  obs_arr[3]   = 0;                                  // AIRNOW obs at surface
+                  quality_mark = bufr_obs_extra[lv][1];
+                  // Convert a special number (1e+11) to NA at addObservation
+                  if(conf_info.quality_mark_thresh < quality_mark) continue;
+               }
+               else {
+                  // Retain the pressure in hPa for each observation record
+                  obs_arr[2] = bufr_pres_lv[lv];
+                  obs_arr[3] = bufr_msl_lv[lv];
+                  if (is_eq(obs_arr[2], fill_value) && is_eq(obs_arr[3], fill_value) && 0 < nlev2) {
+                     obs_arr[2] = lv;
+                     obs_arr[3] = lv;
+                  }
+               }
+
+               addObservation(obs_arr, (string)hdr_typ, (string)hdr_sid, hdr_vld_ut,
+                     hdr_lat, hdr_lon, hdr_elv, quality_mark, OBS_BUFFER_SIZE);
+
+               // Increment the current and total observations counts
+               n_other_file_obs++;
+               n_other_total_obs++;
+
+               // Increment the number of obs counter for this header
+               n_other_hdr_obs++;
+            }
+         }
+         n_hdr_obs += n_other_hdr_obs;
+         n_file_obs += n_other_file_obs;
+         n_total_obs += n_other_total_obs;
+      }
 
       if (do_pbl) {
          pbl_level = 0;
