@@ -16,23 +16,18 @@
 ## Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 ## MA 02110-1301, USA.
 
-SUBDIRS =
+# SUBDIRS = include
 
-pyembeddir = $(pkgdatadir)/python/pyembed
 
-pyembed_DATA = \
-     python_embedding.py \
-     read_tmp_dataplane.py \
-     read_tmp_ascii.py \
-     read_tmp_point_nc.py \
-     read_tmp_tc_diag.py \
-     set_python_env.py \
-     write_tmp_dataplane.py \
-     write_tmp_point.py \
-     write_tmp_point_nc.py \
-     write_tmp_mpr.py \
-     write_tmp_tc_diag.py
+## Example of how to Install outside of $(pkgdatadir)
+## scriptsrootdir = $(prefix)/share/scripts
+## pythonutilitydir = ${scriptsrootdir}/utility
 
-EXTRA_DIST = ${pyembed_DATA}
+pythontc_diagdir = $(pkgdatadir)/python/tc_diag
 
-MAINTAINERCLEANFILES 	= Makefile.in 
+pythontc_diag_DATA = \
+	compute_tc_diagnostics.py
+
+EXTRA_DIST = ${pythontc_diag_DATA}
+
+MAINTAINERCLEANFILES 	= Makefile.in

@@ -37,12 +37,15 @@ message_type_map = [
    { key = "FM-12 SYNOP";  val = "ADPSFC"; },
    { key = "FM-13 SHIP";   val = "SFCSHP"; },
    { key = "FM-15 METAR";  val = "ADPSFC"; },
+   { key = "FM-16 SPECI";  val = "ADPSFC"; },
    { key = "FM-18 BUOY";   val = "SFCSHP"; },
+   { key = "FM-18X BUOY";  val = "SFCSHP"; },
    { key = "FM-281 QSCAT"; val = "ASCATW"; },
    { key = "FM-32 PILOT";  val = "ADPUPA"; },
    { key = "FM-35 TEMP";   val = "ADPUPA"; },
    { key = "FM-88 SATOB";  val = "SATWND"; },
-   { key = "FM-97 ACARS";  val = "AIRCFT"; }
+   { key = "FM-97 ACARS";  val = "AIRCFT"; },
+   { key = "FM-97 AMDAR";  val = "AIRCFT"; }
 ];
 
 //

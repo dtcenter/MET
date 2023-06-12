@@ -23,22 +23,33 @@
 void get_series_entry(int i_series, VarInfo* data_info,
         const StringArray& search_files, const GrdFileType type,
         DataPlane& dp, Grid& grid) {
+   int i;
+   bool found;
 
    mlog << Debug(3)
         << "Processing series entry " << i_series + 1 << ": "
-        << data_info->magic_str() << "\n";
-
-   ConcatString filename;
-   filename = search_files[i_series];
+        << data_info->magic_time_str() << "\n";
 
    // Initialize
    dp.clear();
 
-   // Error out if requested data is not found in the i-th file
-   if(!read_single_entry(data_info, filename, type, dp, grid)) {
+   // Search for data, beginning with the i_series index
+   for(i=0,found=false; i<search_files.n(); i++) {
+
+      int i_cur = (i_series + i) % search_files.n();
+
+      found = read_single_entry(data_info, search_files[i_cur],
+                                type, dp, grid);
+
+      if(found) break;
+
+   } // end for i
+
+   // Error out if not found
+   if(!found) {
       mlog << Error << "\nget_series_entry() -> "
-           << "Could not find data for " << data_info->magic_str()
-           << " in file: " << filename << "\n\n";
+           << "Could not find data for " << data_info->magic_time_str()
+           << " in file list:\n:" << write_css(search_files) << "\n\n";
       exit(1);
    }
 

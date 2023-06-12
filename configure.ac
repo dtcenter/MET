@@ -1211,6 +1211,7 @@ AC_CONFIG_FILES([Makefile
                  scripts/python/met/Makefile
                  scripts/python/pyembed/Makefile
                  scripts/python/utility/Makefile
+                 scripts/python/tc_diag/Makefile
                  data/Makefile
                  data/climo/Makefile
                  data/climo/seeps/Makefile
@@ -1310,7 +1311,8 @@ AC_CONFIG_FILES([Makefile
                  src/tools/tc_utils/tc_stat/Makefile
                  src/tools/tc_utils/tc_gen/Makefile
                  src/tools/tc_utils/rmw_analysis/Makefile
-                 src/tools/tc_utils/tc_rmw/Makefile])
+                 src/tools/tc_utils/tc_rmw/Makefile
+                 src/tools/tc_utils/tc_diag/Makefile])
 
 if test -n "$MET_DEVELOPMENT"; then
    AC_CONFIG_FILES([src/tools/dev_utils/Makefile
