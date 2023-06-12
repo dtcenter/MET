@@ -157,7 +157,7 @@ void set_handlers() {
 
 void set_user_id() {
    met_user_id = geteuid ();
-   register struct passwd *pw;
+   struct passwd *pw;
    pw = getpwuid (met_user_id);
    if (pw) met_user_name = string(pw->pw_name);
 }
