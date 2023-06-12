@@ -59,18 +59,18 @@
       -v 2
     </param>
     <output>
-      <stat>&OUTPUT_DIR;/mode_multivar/mode_Fcst_ALPHA-X,X-_Obs_ALPHA-X,X-_300000L_20120410_180000V_060000A_cts.txt</stat>
-      <grid_nc>&OUTPUT_DIR;/mode_multivar/mode_Fcst_ALPHA-X,X-_Obs_ALPHA-X,X-_300000L_20120410_180000V_060000A_obj.nc</grid_nc>
-      <stat>&OUTPUT_DIR;/mode_multivar/mode_Fcst_ALPHA-X,X-_Obs_ALPHA-X,X-_300000L_20120410_180000V_060000A_obj.txt</stat>
-      <ps>&OUTPUT_DIR;/mode_multivar/mode_Fcst_ALPHA-X,X-_Obs_ALPHA-X,X-_300000L_20120410_180000V_060000A.ps</ps>
-      <stat>&OUTPUT_DIR;/mode_multivar/mode_Fcst_BETA-X,X-_Obs_BETA-X,X-_300000L_20120410_180000V_060000A_cts.txt</stat>
-      <grid_nc>&OUTPUT_DIR;/mode_multivar/mode_Fcst_BETA-X,X-_Obs_BETA-X,X-_300000L_20120410_180000V_060000A_obj.nc</grid_nc>
-      <stat>&OUTPUT_DIR;/mode_multivar/mode_Fcst_BETA-X,X-_Obs_BETA-X,X-_300000L_20120410_180000V_060000A_obj.txt</stat>
-      <ps>&OUTPUT_DIR;/mode_multivar/mode_Fcst_BETA-X,X-_Obs_BETA-X,X-_300000L_20120410_180000V_060000A.ps</ps>
-      <stat>&OUTPUT_DIR;/mode_multivar/mode_Fcst_GAMMA-X,X-_Obs_GAMMA-X,X-_300000L_20120410_180000V_060000A_cts.txt</stat>
-      <grid_nc>&OUTPUT_DIR;/mode_multivar/mode_Fcst_GAMMA-X,X-_Obs_GAMMA-X,X-_300000L_20120410_180000V_060000A_obj.nc</grid_nc>
-      <stat>&OUTPUT_DIR;/mode_multivar/mode_Fcst_GAMMA-X,X-_Obs_GAMMA-X,X-_300000L_20120410_180000V_060000A_obj.txt</stat>
-      <ps>&OUTPUT_DIR;/mode_multivar/mode_Fcst_GAMMA-X,X-_Obs_GAMMA-X,X-_300000L_20120410_180000V_060000A.ps</ps>
+      <stat>&OUTPUT_DIR;/mode_multivar/mode_Fcst_ALPHA_all_all_Obs_ALPHA_all_all_300000L_20120410_180000V_060000A_cts.txt</stat>
+      <grid_nc>&OUTPUT_DIR;/mode_multivar/mode_Fcst_ALPHA_all_all_Obs_ALPHA_all_all_300000L_20120410_180000V_060000A_obj.nc</grid_nc>
+      <stat>&OUTPUT_DIR;/mode_multivar/mode_Fcst_ALPHA_all_all_Obs_ALPHA_all_all_300000L_20120410_180000V_060000A_obj.txt</stat>
+      <ps>&OUTPUT_DIR;/mode_multivar/mode_Fcst_ALPHA_all_all_Obs_ALPHA_all_all_300000L_20120410_180000V_060000A.ps</ps>
+      <stat>&OUTPUT_DIR;/mode_multivar/mode_Fcst_BETA_all_all_Obs_BETA_all_all_300000L_20120410_180000V_060000A_cts.txt</stat>
+      <grid_nc>&OUTPUT_DIR;/mode_multivar/mode_Fcst_BETA_all_all_Obs_BETA_all_all_300000L_20120410_180000V_060000A_obj.nc</grid_nc>
+      <stat>&OUTPUT_DIR;/mode_multivar/mode_Fcst_BETA_all_all_Obs_BETA_all_all_300000L_20120410_180000V_060000A_obj.txt</stat>
+      <ps>&OUTPUT_DIR;/mode_multivar/mode_Fcst_BETA_all_all_Obs_BETA_all_all_300000L_20120410_180000V_060000A.ps</ps>
+      <stat>&OUTPUT_DIR;/mode_multivar/mode_Fcst_GAMMA_all_all_Obs_GAMMA_all_all_300000L_20120410_180000V_060000A_cts.txt</stat>
+      <grid_nc>&OUTPUT_DIR;/mode_multivar/mode_Fcst_GAMMA_all_all_Obs_GAMMA_all_all_300000L_20120410_180000V_060000A_obj.nc</grid_nc>
+      <stat>&OUTPUT_DIR;/mode_multivar/mode_Fcst_GAMMA_all_all_Obs_GAMMA_all_all_300000L_20120410_180000V_060000A_obj.txt</stat>
+      <ps>&OUTPUT_DIR;/mode_multivar/mode_Fcst_GAMMA_all_all_Obs_GAMMA_all_all_300000L_20120410_180000V_060000A.ps</ps>
     </output>
   </test>
 

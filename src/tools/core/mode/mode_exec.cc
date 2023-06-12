@@ -46,6 +46,7 @@ static string obs_magic_string = "";
 
 
 static void nc_add_string(NcFile *, const char * text, const char * var_name, const char * dim_name);
+static void replaceAll(std::string& str, const std::string& from, const std::string& to);
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -875,15 +876,21 @@ void ModeExecutive::process_output(bool isMultivar, bool isMultivarSuper)
       replace(fcst_magic_string.begin(), fcst_magic_string.end(), '/', '_');   
       replace(obs_magic_string.begin(), obs_magic_string.end(), '/', '_');   
 
-      // replace * with X as * is problematic in file names
-      replace(fcst_magic_string.begin(), fcst_magic_string.end(), '*', 'X');   
-      replace(obs_magic_string.begin(), obs_magic_string.end(), '*', 'X');   
+      // replace (*,*) with '_all_all_' 
+      replaceAll(fcst_magic_string, "*", "all");
+      replaceAll(obs_magic_string, "*", "all");
+      replaceAll(fcst_magic_string, ",", "_");
+      replaceAll(obs_magic_string, ",", "_");
+      replaceAll(fcst_magic_string, "(", "_");
+      replaceAll(obs_magic_string, "(", "_");
+      replaceAll(fcst_magic_string, ")", "");
+      replaceAll(obs_magic_string, ")", "");
       
-      // replace ( and ) with - as parens are problematic in file names
-      replace(fcst_magic_string.begin(), fcst_magic_string.end(), '(', '-');   
-      replace(fcst_magic_string.begin(), fcst_magic_string.end(), ')', '-');   
-      replace(obs_magic_string.begin(), obs_magic_string.end(), '(', '-');   
-      replace(obs_magic_string.begin(), obs_magic_string.end(), ')', '-');   
+      // // replace ( and ) with - as parens are problematic in file names
+      // replace(fcst_magic_string.begin(), fcst_magic_string.end(), '(', '-');   
+      // replace(fcst_magic_string.begin(), fcst_magic_string.end(), ')', '-');   
+      // replace(obs_magic_string.begin(), obs_magic_string.end(), '(', '-');   
+      // replace(obs_magic_string.begin(), obs_magic_string.end(), ')', '-');   
       
    } else if (isMultivarSuper) {
 
@@ -2212,3 +2219,14 @@ void nc_add_string(NcFile * f, const char * text, const char * var_name, const c
 
 
 ///////////////////////////////////////////////////////////////////////
+
+void replaceAll(std::string& str, const std::string& from, const std::string& to)
+{
+   if(from.empty())
+      return;
+   size_t start_pos = 0;
+   while((start_pos = str.find(from, start_pos)) != std::string::npos) {
+      str.replace(start_pos, from.length(), to);
+      start_pos += to.length(); // In case 'to' contains 'from', like replacing 'x' with 'yx'
+   }
+}
