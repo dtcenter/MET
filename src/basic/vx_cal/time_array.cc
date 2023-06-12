@@ -389,6 +389,30 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+void TimeArray::add_const(unixtime u, int n)
+
+{
+
+extend(Nelements + n);
+
+int j;
+
+for (j=0; j<n; ++j)  {
+
+   e[Nelements++] = u;
+
+}
+
+Sorted = false;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void TimeArray::add_css(const char *text)
 
 {
