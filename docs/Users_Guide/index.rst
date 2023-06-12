@@ -67,6 +67,7 @@ The National Center for Atmospheric Research (NCAR) is sponsored by NSF. The DTC
    met-tc_overview
    tc-dland
    tc-pairs
+   tc-diag
    tc-stat
    tc-gen
    tc-rmw

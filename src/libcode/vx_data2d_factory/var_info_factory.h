@@ -25,6 +25,7 @@ class VarInfoFactory
    public:
       static VarInfo *new_var_info(GrdFileType t);
       static VarInfo *new_var_info(ConcatString s);
+      static VarInfo *new_copy(const VarInfo *);
 };
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -81,11 +81,7 @@ static const char *txt_file_abbr[n_txt] = {
 // Cyclone numbers > 50 are for testing or invests
 static const int max_best_cyclone_number = 50;
 
-// 2, 5, and 7 days shapefile probabilities
-static const int max_n_shape_prob = 3;
-static const int shape_prob_lead_hr[max_n_shape_prob] = {
-   48, 120, 168
-};
+// Maximum search time for genesis shapefile matches
 static const int shape_prob_search_sec = 168*sec_per_hour;
 
 ////////////////////////////////////////////////////////////////////////
