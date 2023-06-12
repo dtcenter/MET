@@ -5,24 +5,28 @@
 // ** Research Applications Lab (RAL)
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-////////////////////////////////////////////////////////////////////////
-
-#ifndef  __VX_CONFIG_H__
-#define  __VX_CONFIG_H__
 
 ////////////////////////////////////////////////////////////////////////
 
-#include "config_constants.h"
-#include "config_file.h"
-#include "config_util.h"
-#include "config_funcs.h"
-#include "configobjecttype_to_string.h"
-#include "dictionary.h"
-#include "data_file_type.h"
-#include "threshold.h"
+#ifndef  __PYTHON_TC_DIAG__
+#define  __PYTHON_TC_DIAG__
 
 ////////////////////////////////////////////////////////////////////////
 
-#endif   //  __VX_CONFIG_H__
+extern "C" {
+
+#include "Python.h"
+
+}
+
+////////////////////////////////////////////////////////////////////////
+
+extern bool python_tc_diag(const ConcatString &script_name,
+               const ConcatString &tmp_file_name,
+               std::map<std::string,double> &diag_map);
+
+////////////////////////////////////////////////////////////////////////
+
+#endif   /*  __PYTHON_TC_DIAG__  */
 
 ////////////////////////////////////////////////////////////////////////

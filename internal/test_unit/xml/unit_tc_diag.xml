@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<!DOCTYPE met_test [
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
+  <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
+  <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
+  <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
+  <!ENTITY CONFIG_DIR     "&TEST_DIR;/config">
+  <!ENTITY DATA_DIR       "&INPUT_DIR;/tc_data">
+  <!ENTITY DATA_DIR_MODEL "&INPUT_DIR;/model_data">
+]>
+
+<!-- Requires: None -->
+
+<met_test>
+
+  <test_dir>&TEST_DIR;</test_dir>
+  <exit_on_fail>true</exit_on_fail>
+
+  <test name="tc_diag_IAN">
+    <exec>mkdir -p &OUTPUT_DIR;/tc_diag; \
+          echo "&DATA_DIR_MODEL;/grib2/gfs/gfs.0p25.2022092400.f000.grib2 \
+                &DATA_DIR_MODEL;/grib2/gfs/gfs.0p25.2022092400.f006.grib2 \
+                &DATA_DIR_MODEL;/grib2/gfs/gfs.0p25.2022092400.f012.grib2 \
+                &DATA_DIR_MODEL;/grib2/gfs/gfs.0p25.2022092400.f018.grib2 \
+                &DATA_DIR_MODEL;/grib2/gfs/gfs.0p25.2022092400.f024.grib2" \
+                > &OUTPUT_DIR;/tc_diag/gfs_2022092400_file_list; \
+          &MET_BIN;/tc_diag</exec>
+    <param> \
+      -deck &DATA_DIR;/adeck/aal092022_OFCL_SHIP_AVNO.dat \
+      -data parent GFSO &OUTPUT_DIR;/tc_diag/gfs_2022092400_file_list \
+      -config &CONFIG_DIR;/TCDiagConfig_ian \
+      -outdir &OUTPUT_DIR;/tc_diag \
+      -v 2
+    </param>
+    <output>
+      <exists>&OUTPUT_DIR;/tc_diag/tc_diag_AL092022_GFSO_2022092400_cyl_grid_parent.nc</exists>
+    </output>
+  </test>
+
+</met_test>
+
