@@ -23,13 +23,10 @@ using namespace std;
 
 #include "vx_data2d_factory.h"
 #include "vx_log.h"
-// #include "var_info_nccf.h"
 
-// static BoolArray lookup_bool_array      (const char * name,
-//                                          Dictionary *dict,
-//                                          bool error_out = default_dictionary_error_out,
-//                                          bool print_warning = default_dictionary_print_warning);
+////////////////////////////////////////////////////////////////////////
 
+static const char default_multivar_name[] = "Super";
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -572,7 +569,7 @@ const DictionaryEntry * ee = dict->lookup(conf_key_field);
 
 if ( !ee )  {
 
-   mlog << "\n\n ModeConfInfo::read_fields () -> \"field\" entry not found in dictionary!\n\n";
+   mlog << "\nModeConfInfo::read_fields () -> \"field\" entry not found in dictionary!\n\n";
 
    exit ( 1 );
 
@@ -593,7 +590,7 @@ if ( field->is_array() ) {
    if ( (N_fields > 0) && (N != N_fields) )  {
 
       mlog << Error
-           << "\n\n  ModeConfInfo::read_field_dict() -> fcst and obs dictionaries have different number of entries\n\n";
+           << "\nModeConfInfo::read_field_dict() -> fcst and obs dictionaries have different number of entries\n\n";
 
       exit ( 1 );
 
@@ -607,7 +604,7 @@ if ( field->is_array() ) {
       if ( (e->type() != DictionaryType) && (e->type() != ArrayType) )  {
 
          mlog << Error
-              << "\n\n  ModeConfInfo::read_field_dict() -> field entry # " << (j + 1) << " is not a dictionary!\n\n";
+              << "\nModeConfInfo::read_field_dict() -> field entry # " << (j + 1) << " is not a dictionary!\n\n";
 
          exit ( 1 );
 
@@ -695,7 +692,7 @@ void ModeConfInfo::set_field_index(int k)
 if ( (k < 0) || (k >= N_fields) )  {
 
    mlog << Error
-        << "\n\n  ModeConfInfo::set_field_index(int) -> range check error\n\n";
+        << "\nModeConfInfo::set_field_index(int) -> range check error\n\n";
 
    exit ( 1 );
 
@@ -1026,7 +1023,7 @@ const DictionaryEntry * e = conf.lookup("fcst");
 if ( e->type() != DictionaryType )  {
 
    mlog << Error
-        << "\n\n  ModeConfInfo::is_multivar() const -> bad object type for entry \"fcst\"\n\n";
+        << "\nModeConfInfo::is_multivar() const -> bad object type for entry \"fcst\"\n\n";
 
    exit ( 1 );
 
@@ -1043,7 +1040,7 @@ switch ( e2->type() )  {
 
    default:
       mlog << Error
-           << "\n\n  ModeConfInfo::is_multivar() const -> bad object type for entry \"fcst.field\"\n\n";
+           << "\nModeConfInfo::is_multivar() const -> bad object type for entry \"fcst.field\"\n\n";
       exit ( 1 );
 
 }
@@ -1065,26 +1062,26 @@ Dictionary * dict = (Dictionary *) 0;
 
 fcst_multivar_logic.clear();
 obs_multivar_logic.clear();
-fcst_multivar_name = "Super";  // default, maybe set elsewhere?
-obs_multivar_name = "Super";
-fcst_multivar_level = "NA";
-obs_multivar_level = "NA";
+fcst_multivar_name = default_multivar_name;
+obs_multivar_name = default_multivar_name;
+fcst_multivar_level = na_str;
+obs_multivar_level = na_str;
 
 dict = conf.lookup_dictionary(conf_key_fcst);
 
-if ( dict->lookup(conf_key_multivar_logic) )  fcst_multivar_logic = dict->lookup_string(conf_key_multivar_logic);
-if ( dict->lookup("multivar_name") )  fcst_multivar_name = dict->lookup_string("multivar_name");
-if ( dict->lookup("multivar_level") )  fcst_multivar_level = dict->lookup_string("multivar_level");
-
+if ( dict->lookup(conf_key_multivar_logic) ) fcst_multivar_logic = dict->lookup_string(conf_key_multivar_logic);
+if ( dict->lookup(conf_key_multivar_name)  ) fcst_multivar_name  = dict->lookup_string(conf_key_multivar_name);
+if ( dict->lookup(conf_key_multivar_level) ) fcst_multivar_level = dict->lookup_string(conf_key_multivar_level);
 
 dict = conf.lookup_dictionary(conf_key_obs);
 
-if ( dict->lookup(conf_key_multivar_logic) )   obs_multivar_logic = dict->lookup_string(conf_key_multivar_logic);
-if ( dict->lookup("multivar_name") )  obs_multivar_name = dict->lookup_string("multivar_name");
-if ( dict->lookup("multivar_level") )  obs_multivar_level = dict->lookup_string("multivar_level");
+if ( dict->lookup(conf_key_multivar_logic) ) obs_multivar_logic = dict->lookup_string(conf_key_multivar_logic);
+if ( dict->lookup(conf_key_multivar_name)  ) obs_multivar_name  = dict->lookup_string(conf_key_multivar_name);
+if ( dict->lookup(conf_key_multivar_level) ) obs_multivar_level = dict->lookup_string(conf_key_multivar_level);
 
 multivar_intensity.clear();
-if ( dict->lookup("multivar_intensity_flag")) multivar_intensity = dict->lookup_bool_array("multivar_intensity_flag");
+if ( dict->lookup(conf_key_multivar_intensity_flag)) multivar_intensity = dict->lookup_bool_array(conf_key_multivar_intensity_flag);
+
 return;
 }
 
@@ -1100,23 +1097,23 @@ void ModeConfInfo::check_multivar_not_implemented()
    bool status = false;
    if (quilt) {
       mlog << Error
-           << "\n\nModeConfInfo::multivar_not_implemented:\n"
-           << "  quilting not yet implemented for multivar mode\n";
+           << "\nModeConfInfo::multivar_not_implemented:\n"
+           << "  quilting not yet implemented for multivar mode\n\n";
       status = true;
    }
    
    for (int i=0; i<N_fields; ++i) {
       if (fcst_array[i].merge_flag == MergeType_Both || fcst_array[i].merge_flag == MergeType_Engine) {
          mlog << Error
-              << "\n\n  ModeConfInfo::multivar_not_implemented:\n"
-              << "  merge_flag ENGINE or BOTH not implemented for multivariate mode\n";
+              << "\nModeConfInfo::multivar_not_implemented:\n"
+              << "  merge_flag ENGINE or BOTH not implemented for multivariate mode\n\n";
          status = true;
          break;
       }
       if (obs_array[i].merge_flag == MergeType_Both || obs_array[i].merge_flag == MergeType_Engine) {
          mlog << Error
-              << "\n\nModeConfInfo::multivar_not_implemented:\n"
-              << "  merge_flag ENGINE or BOTH not implemented for multivariate mode\n";
+              << "\nModeConfInfo::multivar_not_implemented:\n"
+              << "  merge_flag ENGINE or BOTH not implemented for multivariate mode\n\n";
          status = true;
          break;
       }
@@ -1124,13 +1121,13 @@ void ModeConfInfo::check_multivar_not_implemented()
 
    // if (multivar_intensities_all_false()) {
    //    mlog << Error
-   //         << "\n\n  ModeConfInfo::multivar_not_implemented "
+   //         << "\nModeConfInfo::multivar_not_implemented "
    //         << ": multivar_intensity flags all FALSE not yet implemented for multivar mode\n\n";
    //    status = true;
    // }
    if (status) {
       mlog << Error
-           << "  Some features not yet implemented in multivar mode\n\n";
+           << "\nSome features not yet implemented in multivar mode\n\n";
       exit ( 1 );
    }
 }
@@ -1235,20 +1232,3 @@ return;
 
 
 ////////////////////////////////////////////////////////////////////////
-
-////////////////////////////////////////////////////////////////////////
-
-
-BoolArray lookup_bool_array(const char * name,
-                            Dictionary *dict,
-                            bool error_out,
-                            bool print_warning)
-
-{
-
-BoolArray array;
-NumArray num_array = dict->lookup_num_array(name, error_out, print_warning);
-for (int i=0; i<num_array.n_elements(); i++)
-  array.add( num_array[i]);
-return ( array );
-}

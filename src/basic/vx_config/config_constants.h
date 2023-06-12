@@ -694,12 +694,6 @@ static const char conf_key_is_wind_direction[]    = "is_wind_direction";
 static const char conf_key_is_prob[]              = "is_prob";
 
 //
-//  for use with mode multivar
-//
-
-static const char conf_key_multivar_logic   [] = "multivar_logic";
-
-//
 // Climatology parameter key names
 //
 static const char conf_key_climo_mean_field[]   = "climo_mean.field";
@@ -892,6 +886,15 @@ static const char conf_key_plot_valid_flag[]       = "plot_valid_flag";
 static const char conf_key_plot_gcarc_flag[]       = "plot_gcarc_flag";
 static const char conf_key_ct_stats_flag[]         = "ct_stats_flag";
 static const char conf_key_shift_right[]           = "shift_right";
+
+//
+// Multivar MODE specific parameter key names
+//
+
+static const char conf_key_multivar_logic          [] = "multivar_logic";
+static const char conf_key_multivar_name           [] = "multivar_name";
+static const char conf_key_multivar_level          [] = "multivar_level";
+static const char conf_key_multivar_intensity_flag [] = "multivar_intensity_flag";
 
 //
 //  MTD specific parameter key names
