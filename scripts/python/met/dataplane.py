@@ -232,10 +232,8 @@ def main(argv):
       #   pass
 
    fill_value = attrs.get('fill_value', None)
-   min_value = attrs.get('min_value', None)
-   max_value = attrs.get('max_value', None)
    dataplane.log_msg('validating the dapaplane array...')
-   met_data = dataplane.validate_met_data(init_met_data, fill_value, min_value, max_value)
+   met_data = dataplane.validate_met_data(init_met_data, fill_value)
    met_info['met_data'] = met_data
 
    if os.environ.get('MET_PYTHON_DEBUG', None) is not None:
