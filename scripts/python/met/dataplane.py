@@ -156,6 +156,9 @@ class dataplane(logger):
 
       # append attributes
       for attr, attr_val in met_info['attrs'].items():
+         if attr_val is None:
+            continue
+
          if attr == 'name':
             setattr(ds, 'name_str', attr_val)
          elif attr == 'fill_value':
