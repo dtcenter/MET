@@ -26,9 +26,11 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
-#define SEC_MONTH (86400*30)
-#define SEC_YEAR  (86400*30*12)
-static const double DAY_EPSILON = 0.00002;
+static constexpr int DAYS_PER_MONTH = 30;
+static constexpr int NO_OF_MONTHS   = 12;
+static constexpr double DAY_EPSILON = 0.00002;
+#define SEC_MONTH (86400*DAYS_PER_MONTH)
+#define SEC_YEAR  (86400*DAYS_PER_MONTH*NO_OF_MONTHS)
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -54,7 +56,7 @@ return 1;
 
 ////////////////////////////////////////////////////////////////////////
 
-const int monthly_days[12] = {
+const int monthly_days[NO_OF_MONTHS] = {
   31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31
 };
 
@@ -79,7 +81,7 @@ int get_days_from_mmdd(int month, int day, bool no_leap) {
 void decrease_one_month(int &year, int &month) {
   month--;
   if (month < 1) {
-    month = 12;
+    month = NO_OF_MONTHS;
     year--;
   }
 }
@@ -88,7 +90,7 @@ void decrease_one_month(int &year, int &month) {
 
 void increase_one_month(int &year, int &month) {
   month++;
-  if (month > 12) {
+  if (month > NO_OF_MONTHS) {
     month = 1;
     year++;
   }
@@ -96,27 +98,19 @@ void increase_one_month(int &year, int &month) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void adjuste_day_for_month_year_units(int &day, int &month, int &year, double time_fraction) {
-  // Compute remaining days
+void adjuste_day_for_month_year_units(int &day, int &month, int &year, double month_fraction) {
+  // Compute remaining days from the month fraction
   bool day_adjusted = false;
-  double day_offset = 0.;
-  const char *method_name = "adjuste_day() -->";
+  const double day_offset = month_fraction * DAYS_PER_MONTH;
+  const char *method_name = "adjuste_day() --> ";
 
-  if (day == 1) {
-    if (abs(time_fraction-0.5) < DAY_EPSILON) day = 15;
-    else {
-      day_offset = time_fraction * 30;
-      day += (int)(day_offset + 0.5);
-    }
+  day += (int)(day_offset + 0.5);
+  if (day == 1 && abs(month_fraction-0.5) < DAY_EPSILON) {
+    day = 15;   // half month from the first day is 15, not 16
   }
-  else {
-    day_offset = time_fraction * 30;
-    unixtime time_value_ut = (int)day_offset;
-    day += (int)(time_value_ut + 0.5);
-    if (day > 30) {
-       day -= 30;
-       increase_one_month(year, month);
-    }
+  else if (day > DAYS_PER_MONTH) {
+    day -= DAYS_PER_MONTH;
+    increase_one_month(year, month);
   }
 
   int day_org = day;
@@ -166,8 +160,8 @@ unixtime add_to_unixtime(unixtime base_unixtime, int sec_per_unit,
   int minute;
   int second;
   unixtime ut;
-  unixtime time_value_ut = (unixtime)time_value;
-  double time_fraction = time_value - time_value_ut;
+  auto time_value_ut = (unixtime)time_value;
+  double time_fraction = time_value - (double)time_value_ut;
   const char *method_name = "add_to_unixtime() -->";
 
   if (sec_per_unit == SEC_MONTH || sec_per_unit == SEC_YEAR) {
@@ -182,10 +176,9 @@ unixtime add_to_unixtime(unixtime base_unixtime, int sec_per_unit,
 
     // Update year and compute remaining months
     int month_offset;
-    double day_offset;
     if (sec_per_unit == SEC_YEAR) {
       year += time_value_ut;
-      time_fraction *= 12;      // 12 months/year
+      time_fraction *= NO_OF_MONTHS;    // 12 months/year
       month_offset = (int)time_fraction;
       time_fraction -= month_offset;
     }
@@ -217,10 +210,10 @@ unixtime add_to_unixtime(unixtime base_unixtime, int sec_per_unit,
     if (time_fraction > (1-TIME_EPSILON) ) ut += (unixtime)sec_per_unit;
     else if (time_fraction > TIME_EPSILON) ut += (unixtime)(time_fraction * sec_per_unit);
   }
-  mlog << Debug(5) <<  method_name
+  mlog << Debug(5) << method_name
        << unix_to_yyyymmdd_hhmmss(base_unixtime)
-       << " plus " << time_value << " days = "
-       << unix_to_yyyymmdd_hhmmss(ut) << "\n";
+       << " plus " << time_value << " times " << sec_per_unit
+       << " seconds = " << unix_to_yyyymmdd_hhmmss(ut) << "\n";
   
   return ut;
 }
