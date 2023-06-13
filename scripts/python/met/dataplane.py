@@ -19,7 +19,7 @@ class dataplane(logger):
 
    @staticmethod
    def call_python(argv):
-       logger.log_msg(f"Python Script:\t{repr(argv[0])}")
+       logger.log_msg(f"Module:\t{repr(argv[0])}")
        if 1 == len(argv):
           logger.quit(f"User command is missing")
 
@@ -228,14 +228,9 @@ def main(argv):
       met_info['attrs'] = attrs
       if hasattr(met_in, 'user_fill_value'):
          fill_value = met_in.user_fill_value
-      #try:
-      #   user_fill_value = met_in.user_fill_value
-      #   met_info['user_fill_value'] = user_fill_value
-      #except:
-      #   pass
 
    fill_value = attrs.get('fill_value', None)
-   dataplane.log_msg('validating the dapaplane array...')
+   dataplane.log_msg('validating the dataplane array...')
    met_data = dataplane.validate_met_data(init_met_data, fill_value)
    met_info['met_data'] = met_data
 
@@ -245,4 +240,4 @@ def main(argv):
 
 if __name__ == '__main__' or __name__ == sys.argv[0]:
    main(sys.argv)
-   dataplane.log_msg(f'{__name__} is called')
+   dataplane.log_msg(f'{__name__} complete')
