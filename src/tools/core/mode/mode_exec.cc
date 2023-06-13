@@ -617,14 +617,6 @@ void ModeExecutive::do_conv_thresh(const int r_index, const int t_index,
       if (conf.Obs->need_merge_thresh()) {
          conf.set_obs_conv_thresh_by_merge_index  (T_index);
       }
-   } else if (isMultivarPass2) {
-      SingleThresh s("ne-9999");
-      conf.set_conv_thresh(s);
-      conf.set_conv_radius(0.0);
-   // } else if (isMultivarPass2) {
-   //    SingleThresh s("ne-9999");
-   //    conf.set_conv_thresh(s);
-   //    conf.set_conv_radius(0.0);
    } else if (isMultivarSuper) {
       SingleThresh s("ne-9999");
       conf.set_conv_thresh(s);
@@ -885,12 +877,6 @@ void ModeExecutive::process_output(bool isMultivar, bool isMultivarSuper)
       replaceAll(obs_magic_string, "(", "_");
       replaceAll(fcst_magic_string, ")", "");
       replaceAll(obs_magic_string, ")", "");
-      
-      // // replace ( and ) with - as parens are problematic in file names
-      // replace(fcst_magic_string.begin(), fcst_magic_string.end(), '(', '-');   
-      // replace(fcst_magic_string.begin(), fcst_magic_string.end(), ')', '-');   
-      // replace(obs_magic_string.begin(), obs_magic_string.end(), '(', '-');   
-      // replace(obs_magic_string.begin(), obs_magic_string.end(), ')', '-');   
       
    } else if (isMultivarSuper) {
 
