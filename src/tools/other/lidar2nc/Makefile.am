@@ -42,6 +42,7 @@ lidar2nc_LDADD = -lvx_shapedata \
 	-lvx_stat_out \
 	-lvx_statistics \
 	-lvx_grid \
+	-lvx_geodesy \
 	-lvx_util_math \
 	-lvx_util \
 	-lvx_config \

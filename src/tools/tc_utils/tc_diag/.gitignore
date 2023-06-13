@@ -1,0 +1,6 @@
+tc_diag
+*.o
+*.a
+.deps
+Makefile
+*.dSYM

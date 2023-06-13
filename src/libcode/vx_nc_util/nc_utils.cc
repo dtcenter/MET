@@ -380,7 +380,6 @@ bool get_cf_conventions(const netCDF::NcFile *nc, ConcatString& conventions_valu
    return has_attr;
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 
 ConcatString get_log_msg_for_att(const NcVarAtt *att) {
@@ -734,7 +733,6 @@ bool get_global_att(const NcFile *nc, const ConcatString &att_name,
 
 ////////////////////////////////////////////////////////////////////////
 
-
 bool get_global_att(const NcFile *nc, const ConcatString& att_name,
                     int &att_val, bool error_out) {
    static const char *method_name = "\nget_global_att(int) -> ";
@@ -874,7 +872,6 @@ void add_att(NcVar *var, const string &att_name, const float att_val) {
 void add_att(NcVar *var, const string &att_name, const double att_val) {
    var->putAtt(att_name, NcType::nc_DOUBLE, att_val);
 }
-
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -2592,6 +2589,7 @@ void copy_nc_att_short(NcVar *var_to, NcVarAtt *from_att) {
    }
 }
 
+////////////////////////////////////////////////////////////////////////
 
 NcVar *copy_nc_var(NcFile *to_nc, NcVar *from_var,
       const int deflate_level, const bool all_attrs) {
@@ -2824,8 +2822,21 @@ void copy_nc_data_int(NcVar *var_from, NcVar *var_to, int data_size) {
 ////////////////////////////////////////////////////////////////////////
 
 void copy_nc_data_short(NcVar *var_from, NcVar *var_to, int data_size) {
-   const string method_name = "copy_nc_data_double";
+   //const string method_name = "copy_nc_data_double";
    short *data = new short[data_size];
+   var_from->getVar(data);
+   var_to->putVar(data);
+   //   mlog << Error << "\n" << method_name << " -> error writing the variable "
+   //        << GET_NC_NAME_P(var_to) << " to the netCDF file\n\n";
+   //   exit(1);
+   delete[] data;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void copy_nc_data_string(NcVar *var_from, NcVar *var_to, int data_size) {
+   //const string method_name = "copy_nc_data_string";
+   string *data = new string[data_size];
    var_from->getVar(data);
    var_to->putVar(data);
    //   mlog << Error << "\n" << method_name << " -> error writing the variable "
@@ -2840,24 +2851,26 @@ void copy_nc_var_data(NcVar *var_from, NcVar *var_to) {
    const string method_name = "copy_nc_var_data()";
    int data_size = get_data_size(var_from);
    int dataType = GET_NC_TYPE_ID_P(var_from);
+
    switch (dataType) {
-   case NC_DOUBLE:
-      copy_nc_data_double(var_from, var_to, data_size);
-      break;
-
-   case NC_FLOAT:
-      copy_nc_data_float(var_from, var_to, data_size);
-      break;
-   case NC_SHORT:
-      copy_nc_data_short(var_from, var_to, data_size);
-      break;
-   case NC_INT:
-      copy_nc_data_int(var_from, var_to, data_size);
-      break;
-
-   case NC_CHAR:
-      copy_nc_data_char(var_from, var_to, data_size);
-      break;
+      case NC_DOUBLE:
+         copy_nc_data_double(var_from, var_to, data_size);
+         break;
+      case NC_FLOAT:
+         copy_nc_data_float(var_from, var_to, data_size);
+         break;
+      case NC_SHORT:
+         copy_nc_data_short(var_from, var_to, data_size);
+         break;
+      case NC_INT:
+         copy_nc_data_int(var_from, var_to, data_size);
+         break;
+      case NC_CHAR:
+         copy_nc_data_char(var_from, var_to, data_size);
+         break;
+      case NC_STRING:
+         copy_nc_data_string(var_from, var_to, data_size);
+         break;
 
    default:
       mlog << Error << "\n" << method_name << " -> "

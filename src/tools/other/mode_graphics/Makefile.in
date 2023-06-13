@@ -356,6 +356,7 @@ plot_mode_field_LDADD = -lvx_config \
 	$(PYTHON_LIBS) \
 	-lvx_statistics \
 	-lvx_grid \
+	-lvx_geodesy \
 	-lvx_nc_util \
 	-lvx_ps \
 	-lvx_afm \
