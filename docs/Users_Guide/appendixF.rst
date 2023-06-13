@@ -162,7 +162,7 @@ Attributes for 2D Gridded Dataplanes
      - grid information
      - string or dict
      - required
-   * - fill_value (see :ref:`here<pyembed-fillvalue-attrs`)
+   * - fill_value (see :ref:`here<pyembed-fillvalue-attrs>`)
      - missing data value
      - int or float
      - optional
