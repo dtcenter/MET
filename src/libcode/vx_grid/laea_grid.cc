@@ -10,9 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -26,6 +23,9 @@ using namespace std;
 
 #include "laea_grid.h"
 #include "latlon_xyz.h"
+
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -366,7 +366,7 @@ sum = uv_closedpolyline_area(u, v, 4);
 
 sum *= earth_radius_km*earth_radius_km;
 
-return ( sum );
+return sum;
 
 }
 
@@ -378,7 +378,7 @@ int LaeaGrid::nx() const
 
 {
 
-return ( Nx );
+return Nx;
 
 }
 
@@ -390,7 +390,7 @@ int LaeaGrid::ny() const
 
 {
 
-return ( Ny );
+return Ny;
 
 }
 
@@ -402,7 +402,7 @@ ConcatString LaeaGrid::name() const
 
 {
 
-return ( Name );
+return Name;
 
 }
 
@@ -414,7 +414,7 @@ ConcatString LaeaGrid::spheroid_name() const
 
 {
 
-return ( SpheroidName );
+return SpheroidName;
 
 }
 
@@ -426,7 +426,7 @@ const char * LaeaGrid::projection_name() const
 
 {
 
-return ( "Polar Laea" );
+return "Polar Laea";
 
 }
 
@@ -438,13 +438,13 @@ double LaeaGrid::uv_closedpolyline_area(const double *u, const double *v, int n)
 
 {
 
-int j, k;
+int k;
 double sum;
 
 
 sum = 0.0;
 
-for (j=0; j<n; ++j)  {
+for (int j=0; j<n; ++j)  {
 
    k = (j + 1)%n;
 
@@ -454,7 +454,7 @@ for (j=0; j<n; ++j)  {
 
 sum = fabs(sum);
 
-return ( sum );
+return sum;
 
 }
 
@@ -466,10 +466,9 @@ double LaeaGrid::xy_closedpolyline_area(const double *x, const double *y, int n)
 
 {
 
-int j;
 double sum;
-double *u = (double *) 0;
-double *v = (double *) 0;
+double *u = (double *) nullptr;
+double *v = (double *) nullptr;
 
 u = new double [n];
 v = new double [n];
@@ -483,7 +482,7 @@ if ( !u || !v )  {
 
 }
 
-for (j=0; j<n; ++j)  {
+for (int j=0; j<n; ++j)  {
 
    xy_to_uv(x[j], y[j], u[j], v[j]);
 
@@ -493,10 +492,10 @@ sum = uv_closedpolyline_area(u, v, n);
 
 sum *= earth_radius_km*earth_radius_km;
 
-delete [] u;  u = (double *) 0;
-delete [] v;  v = (double *) 0;
+delete [] u;  u = (double *) nullptr;
+delete [] v;  v = (double *) nullptr;
 
-return ( sum );
+return sum;
 
 }
 
@@ -585,7 +584,7 @@ a << "SpheroidName: " << SpheroidName << sep;
    //  done
    //
 
-return ( a );
+return a;
 
 }
 
@@ -602,8 +601,6 @@ mlog << Error << "\nLaeaGrid::deserialize(const StringArray &) -> "
 
 exit ( 1 );
 
-return;
-
 }
 
 
@@ -618,7 +615,7 @@ GridInfo i;
 
 i.set(Data);
 
-return ( i );
+return i;
 
 }
 
@@ -634,7 +631,7 @@ double LaeaGrid::rot_grid_to_earth(int x, int y) const
    //  grid to earth transformation is not just a simple rotation
    //
 
-return ( 0.0 );
+return 0.0;
 
 }
 
@@ -646,11 +643,11 @@ GridRep * LaeaGrid::copy() const
 
 {
 
-LaeaGrid * p = 0;
+LaeaGrid * p = nullptr;
 
 p = new LaeaGrid (Data);
 
-return ( p );
+return p;
 
 }
 
@@ -675,7 +672,7 @@ z = C/z;
 
 
 
-return ( z );
+return z;
 
 }
 
@@ -768,11 +765,11 @@ double laea_segment_area(double u0, double v0, double u1, double v1)
 {
 
 double answer;
- 
+
 answer = 0.5*( u0*v1 - v0*u1 );
-                                                   
-return ( answer );                                 
-                                                   
+
+return answer;
+
 }
 
 
@@ -783,7 +780,7 @@ bool LaeaGrid::wrap_lon() const
 
 {
 
-return ( false );
+return false;
 
 }
 
@@ -801,8 +798,6 @@ mlog << Error << "\nLaeaGrid::shift_right(int) -> "
      << "shifting is not allowed for non-global grids\n\n";
 
 exit ( 1 );
-
-return;
 
 }
 
@@ -882,7 +877,7 @@ rep = new LaeaGrid (grib2_data);
 if ( !rep )  {
 
    mlog << Error << "\nGrid::set(const LaeaGrib2Data &) -> "
-	<< "memory allocation error\n\n";
+        << "memory allocation error\n\n";
 
    exit ( 1 );
 
