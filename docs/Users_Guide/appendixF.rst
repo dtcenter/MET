@@ -111,7 +111,7 @@ Python Script Requirements for 2D Gridded Dataplanes
 3. The data inside the **met_data** variable must be **double precision floating point** type
 
 4. A Python dictionary named **attrs** must be defined in the user's script and contain the :ref:`required attributes<pyembed-2d-attrs>` and
-   any optional attributes
+   any :ref:`optional attributes<pyembed-2d-attrs>`
 
 .. _pyembed-2d-attrs:
 
@@ -158,12 +158,12 @@ Attributes for 2D Gridded Dataplanes
      - variable units
      - string
      - required
-   * - grid (see :ref:`here<pyembed-grid-attrs>`)
-     - grid information
+   * - grid
+     - :ref:`grid information<pyembed-grid-attrs>`
      - string or dict
      - required
-   * - fill_value (see :ref:`here<pyembed-fillvalue-attrs>`)
-     - missing data value
+   * - fill_value
+     - :ref:`missing data value<pyembed-fillvalue-attrs>`
      - int or float
      - optional
 
