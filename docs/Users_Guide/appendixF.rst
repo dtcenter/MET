@@ -119,7 +119,7 @@ Attributes for 2D Gridded Dataplanes
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. list-table:: 2D Dataplane Attributes
-   :widths: 5 5 10
+   :widths: 5 5 10 5
    :header-rows: 1
 
    * - key
