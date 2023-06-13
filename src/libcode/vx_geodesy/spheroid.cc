@@ -407,6 +407,136 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+double Spheroid::q_func(double lat) const
+
+{
+
+if ( is_sphere() )  return ( 2.0*sind(lat) );
+
+
+double q, t1, t2;
+
+const double S    = sind(lat);
+const double E2   = E*E;
+const double Esp  = E*S;
+const double Esp2 = Esp*Esp;
+
+
+t1 = S/(1 - Esp2);
+
+t2 = (1 - Esp)/(1 + Esp);
+
+t2 = log(t2);
+
+t2 /= 2.0*E;
+
+q = t1 - t2;
+
+q *= 1.0 - E2;
+
+
+return ( q );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+double Spheroid::qp_direct() const
+
+{
+
+if ( is_sphere() )  return ( 2.0 );
+
+
+double Qp;
+
+
+Qp = log( (1.0 - E)/(1.0 + E) );
+
+
+Qp = 1.0 - ((1.0 - E*E)*Qp)/(2.0*E);
+
+
+return ( Qp );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+double Spheroid::rq_km() const
+
+{
+
+if ( is_sphere() )  return ( A_km );
+
+
+double r;
+const double qp = qp_direct();
+
+
+r = sqrt(0.5*qp);
+
+r *= A_km;
+
+
+return ( r );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+double Spheroid::beta(double lat) const
+
+{
+
+if ( is_sphere() )  return ( lat );
+
+
+double q, qp;
+
+
+q = q_func(lat);
+
+
+qp = qp_direct();
+
+
+return ( asind(q/qp) );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+double Spheroid::m_func(double lat) const
+
+{
+
+double m, c, s;
+
+c = cosd(lat);
+
+s = sind(lat);
+
+m = sqrt( 1.0 - E*E*s*s );
+
+m = c/m;
+
+return ( m );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
    //
    //  Code for misc functions
    //

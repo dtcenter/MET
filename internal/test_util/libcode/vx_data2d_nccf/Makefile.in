@@ -320,6 +320,7 @@ test_read_nccf_LDADD = -lvx_data2d_nccf \
 	-lvx_nc_util \
 	-lvx_data2d \
 	-lvx_grid \
+	-lvx_geodesy \
 	-lvx_config \
 	-lvx_gsl_prob \
 	-lvx_util_math \

@@ -508,6 +508,38 @@
     </output>
   </test>
 
+  <test name="plot_data_plane_LAEA_GRIB2">
+  <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/ukv/ukv_agl_temperature_1.5_12.grib2 \
+      &OUTPUT_DIR;/plot_data_plane/ukv_agl_temperature_laea_grib2.ps \
+      'name="TMP"; level="Z1.5"; lead_time="24";' \
+      -title "GRIB2 LAEA 24-hour 1.5m Temperature" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/ukv_agl_temperature_laea_grib2.ps</ps>
+    </output>
+  </test>
+
+<!-- MET #1693 removed support for CF-Compliant LAEA grids.
+     MET #2565 should restore this supoprt prior to the MET-11.1.0 release.
+
+  <test name="plot_data_plane_LAEA_NCCF">
+  <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/nccf/20221118T1200Z-PT0012H00M-temperature_at_screen_level.nc  \
+      &OUTPUT_DIR;/plot_data_plane/air_temperature_laea_nccf.ps \
+      'name="air_temperature"; level="(*,*)";' \
+      -title "NCCF LAEA Air Temperature" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/air_temperature_laea_nccf.ps</ps>
+    </output>
+  </test>
+-->
+
   <test name="plot_data_plane_NCCF_POLAR_STEREO">
     <exec>&MET_BIN;/plot_data_plane</exec>
     <param> \

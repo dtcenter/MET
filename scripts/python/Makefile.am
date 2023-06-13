@@ -22,18 +22,13 @@ SUBDIRS = \
 	examples \
 	met \
 	pyembed \
-	utility
+	utility \
+	tc_diag
 
 ## Example of how to Install outside of $(pkgdatadir)
 ## scriptsrootdir = $(prefix)/share/scripts
 ## pythonscriptsdir = ${scriptsrootdir}/python
 
 pythonscriptsdir = $(pkgdatadir)/python
-
-#EXTRA_DIST = ${top_DATA} \
-#	sample_fcst \
-#	sample_obs \
-#	python \
-#	copyright_notice.txt
 
 MAINTAINERCLEANFILES 	= Makefile.in

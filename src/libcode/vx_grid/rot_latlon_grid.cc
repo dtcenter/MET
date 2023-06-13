@@ -438,7 +438,8 @@ rep = new RotatedLatLonGrid ( rdata );
 if ( !rep )  {
 
    mlog << Error
-        << "\nGrid::set(const RotatedLatLonData &) -> memory allocation error\n\n";
+        << "\nGrid::set(const RotatedLatLonData &) -> "
+        << "memory allocation error\n\n";
 
    exit ( 1 );
 

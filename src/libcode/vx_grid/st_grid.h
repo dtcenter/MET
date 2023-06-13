@@ -1,5 +1,3 @@
-
-
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
@@ -7,8 +5,6 @@
 // ** Research Applications Lab (RAL)
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-
-
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -155,6 +151,3 @@ extern Grid create_aligned_st(double lat_center,   double lon_center,
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-

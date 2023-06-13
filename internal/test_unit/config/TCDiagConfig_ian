@@ -1,0 +1,144 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// TC-Diag configuration file.
+//
+// For additional information, please see the MET User's Guide.
+//
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Filter input track data lines.
+//
+
+//
+// Model
+//
+model = [ "GFSO" ];
+
+//
+// Storm identifier
+//
+storm_id = "AL092022";
+
+//
+// Basin
+//
+basin = "";
+
+//
+// Cyclone number
+//
+cyclone = "";
+
+//
+// Model initialization time
+//
+init_inc = "20220924_00";
+
+//
+// Subset by the valid time
+//
+valid_beg = "";
+valid_end = "";
+valid_inc = [];
+valid_exc = [];
+
+//
+// Subset by the valid hour and lead time.
+//
+valid_hour = [];
+lead       = [ "0", "6", "12", "18", "24" ];
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Python diagnostic scripts to be run
+// May be set separately in each "domain_info" entry 
+//
+diag_script = [ "MET_BASE/python/tc_diag/compute_tc_diagnostics.py" ];
+
+//
+// Domain-specific cylindrical coordinate transformation
+//
+domain_info = [
+   {
+      domain         = "parent";
+      n_range        = 150;
+      n_azimuth      = 8;
+      delta_range_km = 10.0;
+   }
+];
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Data censoring and conversion
+// May be set separately in each "data.field" entry
+//
+// censor_thresh = [];
+// censor_val    = [];
+// convert(x)    = x;
+//
+
+//
+// Data fields
+//
+data = {
+
+   // If empty, the field is processed for all domains
+   domain = [];
+
+   // Pressure levels to be used, unless overridden below
+   level = [ "P1000", "P925", "P850", "P700", "P500",
+             "P400", "P300", "P250", "P200", "P150",
+             "P100" ];
+
+   field = [
+      { name = "TMP";                  },
+      { name = "UGRD";                 },
+      { name = "VGRD";                 },
+      { name = "RH";                   },
+      { name = "HGT";                  },
+      { name = "PRMSL"; level = "Z0";  },
+      { name = "PWAT";  level = "L0";  },
+      { name = "TMP";   level = "Z0";  },
+      { name = "TMP";   level = "Z2";  },
+      { name = "RH";    level = "Z2";  },
+      { name = "UGRD";  level = "Z10"; },
+      { name = "VGRD";  level = "Z10"; }
+   ];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Regridding options
+//
+regrid = {
+   method     = NEAREST;
+   width      = 1;
+   vld_thresh = 0.5;
+   shape      = SQUARE;
+}
+
+//
+// Vortex removal flag
+//
+vortex_removal = FALSE;
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Flags to control output files
+//
+nc_rng_azi_flag = TRUE;
+nc_diag_flag    = FALSE;
+cira_diag_flag  = FALSE;
+
+////////////////////////////////////////////////////////////////////////////////
+
+tmp_dir       = "/tmp";
+output_prefix = "";
+version       = "V11.1.0";
+
+////////////////////////////////////////////////////////////////////////////////

@@ -1,5 +1,3 @@
-
-
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
@@ -7,8 +5,6 @@
 // ** Research Applications Lab (RAL)
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-
-
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -22,7 +18,10 @@
 
 
 #include "grid_base.h"
+
+
 ////////////////////////////////////////////////////////////////////////
+
 
 struct GoesImagerData {
 
@@ -60,7 +59,7 @@ struct GoesImagerData {
    double *x_values; //radian
    double *y_values; //radian
    
-   void dump();
+   void dump() const;
    void compute_lat_lon();
    void copy(const GoesImagerData *from);
    void reset();
@@ -76,6 +75,3 @@ struct GoesImagerData {
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-
