@@ -174,7 +174,7 @@ Attributes for 2D Gridded Dataplanes
 
 .. _pyembed-fillvalue-attrs:
 
-Python embedding for 2D gridded dataplanes provides support for a user-defined missing data (or fill value). By default, the MET tools will respect (and ignore) the following special values in a user's **met_data** variable::
+Python embedding for 2D gridded dataplanes provides support for a user-defined missing data (or fill value). By default, the MET tools will respect (and ignore) the following special values in a user's **met_data** variable:
 
 1. NaN
 2. Inf
