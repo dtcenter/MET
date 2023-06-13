@@ -980,4 +980,4 @@ def main_nc(argv):
 
 if __name__ == '__main__':
    main()
-   print('Done python scripot')
+   print('Done python script')
