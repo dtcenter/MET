@@ -2,7 +2,7 @@
 
 source ${GITHUB_WORKSPACE}/.github/jobs/bash_functions.sh
 
-DOCKERHUB_TAG=`get_dockerhub_tag`
+DOCKERHUB_TAG=$(get_dockerhub_tag)
 
 # skip docker push if credentials are not set
 if [ -z ${DOCKER_USERNAME+x} ] || [ -z ${DOCKER_PASSWORD+x} ]; then
