@@ -362,15 +362,19 @@ if ( PythonCommand.empty() || PythonCommand != vinfo.req_name() ) {
 
 }
 
-if ( status )  status = process_data_plane(&vinfo, Plane);
+if ( status ) {
+
+   plane = Plane;
+
+   status = process_data_plane(&vinfo, plane);
+
+}
 
 if ( !status )  return ( false );
 
    //
    //  ok
    //
-
-plane = Plane;
 
    //
    //  store the VarInfo metadata without completely overwritting it
@@ -395,6 +399,7 @@ int MetPythonDataFile::data_plane_array(VarInfo &vinfo, DataPlaneArray &plane_ar
 {
 
 bool status = true;
+DataPlane plane;
 
    //
    //  the python command is specified by VarInfo::Name
@@ -423,7 +428,13 @@ if ( PythonCommand.empty() || PythonCommand != vinfo.req_name() ) {
 
 }
 
-if ( status )  status = process_data_plane(&vinfo, Plane);
+if ( status ) {
+
+   plane = Plane;
+
+   status = process_data_plane(&vinfo, plane);
+
+}
 
 if ( !status )  return ( 0 );
 
@@ -433,7 +444,7 @@ if ( !status )  return ( 0 );
 
 plane_array.clear();
 
-plane_array.add(Plane, 0.0, 0.0);
+plane_array.add(plane, 0.0, 0.0);
 
    //
    //  store the VarInfo metadata without completely overwritting it
