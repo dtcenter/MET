@@ -191,6 +191,7 @@ unixtime add_to_unixtime(unixtime base_unixtime, int sec_per_unit,
     // Compute remaining days
     //adjuste_day_for_month_year_units(day, month, year, time_fraction);
     //ut = mdyhms_to_unix(month, day, year, hour, minute, second);
+    double day_offset;
     if (day == 1) {
       if (abs(time_fraction-0.5) < DAY_EPSILON) day = 15;
       else {
