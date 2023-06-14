@@ -9,7 +9,7 @@ When applicable, release notes are followed by the GitHub issue number which des
 enhancement, or new feature (`MET GitHub issues <https://github.com/dtcenter/MET/issues>`_).
 Important issues are listed **in bold** for emphasis.
 
-MET Version 11.1.0-rc1 release notes (20230614)
+MET Version 11.1.0-rc1 release notes (20230615)
 -----------------------------------------------
 
   .. dropdown:: Repository, build, and test
@@ -50,6 +50,7 @@ MET Version 11.1.0-rc1 release notes (20230614)
      * Bugfix: Fix the Clang compilation of MET version 11 (`#2514 <https://github.com/dtcenter/MET/issues/2514>`_).
      * Bugfix: Fix the fill value setting used in the write_tmp_dataplane internal Python embedding script (`#2525 <https://github.com/dtcenter/MET/issues/2525>`_).
      * Bugfix: Fix the TC-Stat RIRW runtime error when computing CTS statistics from an empty contingency table (`#2542 <https://github.com/dtcenter/MET/issues/2542>`_).
+     * Bugfix: Fix logic for Python embedding with data censoring and/or conversion (`#2575 <https://github.com/dtcenter/MET/issues/2575>`_).
 
 MET Version 11.1.0-beta2 release notes (20230505)
 -------------------------------------------------
