@@ -30,8 +30,5 @@ function time_command {
 # replacing slashes with underscores
 
 function get_dockerhub_tag {
-
-  tag_name=`echo ${DOCKERHUB_REPO}:${SOURCE_BRANCH} | sed 's%/%_%g'`
-
-  return $tag_name;
+  echo ${DOCKERHUB_REPO}:${SOURCE_BRANCH} | sed 's%/%_%g'
 }

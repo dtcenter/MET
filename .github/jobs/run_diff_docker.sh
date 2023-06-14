@@ -2,7 +2,7 @@
 
 source ${GITHUB_WORKSPACE}/.github/jobs/bash_functions.sh
 
-DOCKERHUB_TAG=get_dockerhub_tag
+DOCKERHUB_TAG=`get_dockerhub_tag`
 
 # Get truth output data
 ${GITHUB_WORKSPACE}/.github/jobs/get_test_truth_data.sh ${TRUTH_DATA_VERSION}

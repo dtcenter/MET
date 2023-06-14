@@ -2,7 +2,7 @@
 
 source ${GITHUB_WORKSPACE}/.github/jobs/bash_functions.sh
 
-DOCKERHUB_TAG=get_dockerhub_tag
+DOCKERHUB_TAG=`get_dockerhub_tag`
 
 DOCKERFILE_PATH=${GITHUB_WORKSPACE}/internal/scripts/docker/Dockerfile.copy
 

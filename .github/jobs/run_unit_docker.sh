@@ -2,7 +2,7 @@
 
 source ${GITHUB_WORKSPACE}/.github/jobs/bash_functions.sh
 
-DOCKERHUB_TAG=get_dockerhub_tag
+DOCKERHUB_TAG=`get_dockerhub_tag`
 
 # Pull MET Image from DockerHub
 ${GITHUB_WORKSPACE}/.github/jobs/pull_docker_image.sh ${DOCKERHUB_TAG}
