@@ -101,10 +101,10 @@ void increase_one_month(int &year, int &month) {
 void adjuste_day_for_month_year_units(int &day, int &month, int &year, double month_fraction) {
   // Compute remaining days from the month fraction
   bool day_adjusted = false;
-  const double day_offset = month_fraction * DAYS_PER_MONTH;
+  const int day_offset = (int)(month_fraction * DAYS_PER_MONTH + 0.5);
   const char *method_name = "adjuste_day() --> ";
 
-  day += (int)(day_offset + 0.5);
+  day += day_offset;
   if (day == 1 && abs(month_fraction-0.5) < DAY_EPSILON) {
     day = 15;   // half month from the first day is 15, not 16
   }
@@ -189,8 +189,43 @@ unixtime add_to_unixtime(unixtime base_unixtime, int sec_per_unit,
       increase_one_month(year, month);
     }
     // Compute remaining days
-    adjuste_day_for_month_year_units(day, month, year, time_fraction);
+    //adjuste_day_for_month_year_units(day, month, year, time_fraction);
+    //ut = mdyhms_to_unix(month, day, year, hour, minute, second);
+    if (day == 1) {
+      if (abs(time_fraction-0.5) < DAY_EPSILON) day = 15;
+      else {
+        day_offset = time_fraction * DAYS_PER_MONTH;
+        day += (int)day_offset;
+        if (day_offset - (int)day_offset > 0.5) day++;
+      }
+    }
+    else {
+      day_offset = time_fraction * DAYS_PER_MONTH;
+      time_value_ut = (int)day_offset;
+      day += time_value_ut;
+      if (day_offset - time_value_ut > 0.5) day++;
+      if (day > DAYS_PER_MONTH) {
+         day -= DAYS_PER_MONTH;
+         increase_one_month(year, month);
+      }
+    }
+
+    int day_org = day;
+    bool day_adjusted = false;
+    int max_day = monthly_days[month-1];
+    if (day > max_day) {
+      day = max_day;
+      day_adjusted = true;
+      if (month == 2 && is_leap_year(year)) {
+        if (day_org == 29) day_adjusted = false;
+        day = 29;
+      }
+    }
     ut = mdyhms_to_unix(month, day, year, hour, minute, second);
+    if (day_adjusted) {
+      mlog << Debug(2) << method_name << "adjusted day " << day_org
+           << " to " << day << " for " << year << "-" << month << "\n";
+    }
   }
   else if (!no_leap || sec_per_unit != 86400) {
     // seconds, minute, hours, and day unit with leap year
