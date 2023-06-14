@@ -16,9 +16,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -26,6 +23,9 @@ using namespace std;
 #include <cmath>
 
 #include "builtin.h"
+
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -75,54 +75,54 @@ static double  my_C_to_F    (double);
 
 const BuiltinInfo binfo[] = {
 
-   { "sin",    1, builtin_sin,     0, 0, sin, 0 },
-   { "cos",    1, builtin_cos,     0, 0, cos, 0 },
-   { "tan",    1, builtin_tan,     0, 0, tan, 0 },
+   { "sin",    1, builtin_sin,     nullptr, nullptr, sin, nullptr },
+   { "cos",    1, builtin_cos,     nullptr, nullptr, cos, nullptr },
+   { "tan",    1, builtin_tan,     nullptr, nullptr, tan, nullptr },
 
-   { "sind",   1, builtin_sind,    0, 0, sin_deg, 0 },
-   { "cosd",   1, builtin_cosd,    0, 0, cos_deg, 0 },
-   { "tand",   1, builtin_tand,    0, 0, tan_deg, 0 },
+   { "sind",   1, builtin_sind,    nullptr, nullptr, sin_deg, nullptr },
+   { "cosd",   1, builtin_cosd,    nullptr, nullptr, cos_deg, nullptr },
+   { "tand",   1, builtin_tand,    nullptr, nullptr, tan_deg, nullptr },
 
-   { "asin",   1, builtin_asin,    0, 0, asin, 0 },
-   { "acos",   1, builtin_acos,    0, 0, acos, 0 },
-   { "atan",   1, builtin_atan,    0, 0, atan, 0 },
+   { "asin",   1, builtin_asin,    nullptr, nullptr, asin, nullptr },
+   { "acos",   1, builtin_acos,    nullptr, nullptr, acos, nullptr },
+   { "atan",   1, builtin_atan,    nullptr, nullptr, atan, nullptr },
 
-   { "asind",  1, builtin_sind,    0, 0, arc_sin_deg, 0 },
-   { "acosd",  1, builtin_cosd,    0, 0, arc_cos_deg, 0 },
-   { "atand",  1, builtin_tand,    0, 0, arc_tan_deg, 0 },
+   { "asind",  1, builtin_sind,    nullptr, nullptr, arc_sin_deg, nullptr },
+   { "acosd",  1, builtin_cosd,    nullptr, nullptr, arc_cos_deg, nullptr },
+   { "atand",  1, builtin_tand,    nullptr, nullptr, arc_tan_deg, nullptr },
 
-   { "atan2",  2, builtin_atan2,   0, 0, 0, atan2 },
-   { "atan2d", 2, builtin_atan2d,  0, 0, 0, atan2_deg },
+   { "atan2",  2, builtin_atan2,   nullptr, nullptr, nullptr, atan2 },
+   { "atan2d", 2, builtin_atan2d,  nullptr, nullptr, nullptr, atan2_deg },
 
-   { "arg",    2, builtin_arg,     0, 0, 0, my_arg     },
-   { "argd",   2, builtin_argd,    0, 0, 0, my_arg_deg },
+   { "arg",    2, builtin_arg,     nullptr, nullptr, nullptr, my_arg     },
+   { "argd",   2, builtin_argd,    nullptr, nullptr, nullptr, my_arg_deg },
 
-   { "log",    1, builtin_log,     0, 0, log, 0 },
-   { "exp",    1, builtin_exp,     0, 0, exp, 0 },
+   { "log",    1, builtin_log,     nullptr, nullptr, log, nullptr },
+   { "exp",    1, builtin_exp,     nullptr, nullptr, exp, nullptr },
 
-   { "log10",  1, builtin_log10,   0, 0, log10,    0 },
-   { "exp10",  1, builtin_exp10,   0, 0, my_exp10, 0 },
+   { "log10",  1, builtin_log10,   nullptr, nullptr, log10,    nullptr },
+   { "exp10",  1, builtin_exp10,   nullptr, nullptr, my_exp10, nullptr },
 
-   { "sqrt",   1, builtin_sqrt,    0, 0, sqrt, 0 },
+   { "sqrt",   1, builtin_sqrt,    nullptr, nullptr, sqrt, nullptr },
 
-   { "abs",    1, builtin_abs,     abs, 0, fabs, 0 },
+   { "abs",    1, builtin_abs,     abs, nullptr, fabs, nullptr },
 
-   { "min",    2, builtin_min,     0, my_imin, 0, my_dmin },
-   { "max",    2, builtin_max,     0, my_imax, 0, my_dmax },
+   { "min",    2, builtin_min,     nullptr, my_imin, nullptr, my_dmin },
+   { "max",    2, builtin_max,     nullptr, my_imax, nullptr, my_dmax },
 
-   { "mod",    2, builtin_mod,     0, my_imod, 0, my_dmod },
+   { "mod",    2, builtin_mod,     nullptr, my_imod, nullptr, my_dmod },
 
-   { "floor",  1, builtin_floor,   0, 0, floor, 0 },
-   { "ceil",   1, builtin_ceil,    0, 0, ceil,  0 },
+   { "floor",  1, builtin_floor,   nullptr, nullptr, floor, nullptr },
+   { "ceil",   1, builtin_ceil,    nullptr, nullptr, ceil,  nullptr },
 
-   { "step",   1, builtin_step,    my_istep, 0, my_dstep,  0 },
+   { "step",   1, builtin_step,    my_istep, nullptr, my_dstep,  nullptr },
 
    // Functions defined in ConfigConstants
-   // { "F_to_C", 1, builtin_F_to_C,  0, 0, my_F_to_C,  0 },
-   // { "C_to_F", 1, builtin_C_to_F,  0, 0, my_C_to_F,  0 },
+   // { "F_to_C", 1, builtin_F_to_C,  nullptr, nullptr, my_F_to_C,  nullptr },
+   // { "C_to_F", 1, builtin_C_to_F,  nullptr, nullptr, my_C_to_F,  nullptr },
 
-   { "nint",   1, builtin_nint,    0, 0, 0,  0 },
-   { "sign",   1, builtin_sign,    0, 0, 0,  0 },
+   { "nint",   1, builtin_nint,    nullptr, nullptr, nullptr,  nullptr },
+   { "sign",   1, builtin_sign,    nullptr, nullptr, nullptr,  nullptr },
 
 
       //
@@ -156,7 +156,7 @@ double sin_deg(double degrees)
 
 {
 
-return ( sin(degrees*rad_per_deg) );
+return sin(degrees*rad_per_deg);
 
 }
 
@@ -168,7 +168,7 @@ double cos_deg(double degrees)
 
 {
 
-return ( cos(degrees*rad_per_deg) );
+return cos(degrees*rad_per_deg);
 
 }
 
@@ -180,7 +180,7 @@ double tan_deg(double degrees)
 
 {
 
-return ( tan(degrees*rad_per_deg) );
+return tan(degrees*rad_per_deg);
 
 }
 
@@ -192,7 +192,7 @@ double arc_sin_deg(double t)
 
 {
 
-return ( deg_per_rad*asin(t) );
+return deg_per_rad*asin(t);
 
 }
 
@@ -204,7 +204,7 @@ double arc_cos_deg(double t)
 
 {
 
-return ( deg_per_rad*acos(t) );
+return deg_per_rad*acos(t);
 
 }
 
@@ -216,7 +216,7 @@ double arc_tan_deg(double t)
 
 {
 
-return ( deg_per_rad*atan(t) );
+return deg_per_rad*atan(t);
 
 }
 
@@ -228,7 +228,7 @@ double atan2_deg(double y, double x)
 
 {
 
-return ( deg_per_rad*atan2(y, x) );
+return deg_per_rad*atan2(y, x);
 
 }
 
@@ -240,7 +240,7 @@ double my_arg(double x, double y)
 
 {
 
-return ( atan2(y, x) );
+return atan2(y, x);
 
 }
 
@@ -252,7 +252,7 @@ double my_arg_deg(double x, double y)
 
 {
 
-return ( deg_per_rad*atan2(y, x) );
+return deg_per_rad*atan2(y, x);
 
 }
 
@@ -264,7 +264,7 @@ double my_exp10(double t)
 
 {
 
-return ( pow(10.0, t) );
+return pow(10.0, t);
 
 }
 
@@ -352,7 +352,7 @@ double c;
 
 c = a - b*floor(a/b);
 
-return ( c );
+return c;
 
 }
 
@@ -373,7 +373,7 @@ a = (int) y;
 
 if ( fabs(a - y) > 0.3 )  ++a;
 
-return ( a );
+return a;
 
 }
 
@@ -385,12 +385,12 @@ int my_isign(int k)
 
 {
 
-if ( k > 0 )  return ( 1 );
+if ( k > 0 )  return 1;
 
-if ( k < 0 )  return ( -1 );
+if ( k < 0 )  return -1;
 
 
-return ( 0 );
+return 0;
 
 }
 
@@ -402,13 +402,13 @@ int my_dsign(double t)
 
 {
 
-if ( t > 0.0 )  return ( 1 );
+if ( t > 0.0 )  return 1;
 
 
-if ( t < 0.0 )  return ( -1 );
+if ( t < 0.0 )  return -1;
 
 
-return ( 0 );
+return 0;
 
 }
 
@@ -420,9 +420,9 @@ int my_istep(int i)
 
 {
 
-if ( i >= 0 )  return ( 1 );
+if ( i >= 0 )  return 1;
 
-return ( 0 );
+return 0;
 
 }
 
@@ -434,9 +434,9 @@ double my_dstep(double x)
 
 {
 
-if ( x >= 0.0 )  return ( 1.0 );
+if ( x >= 0.0 )  return 1.0;
 
-return ( 0.0 );
+return 0.0;
 
 }
 
@@ -485,18 +485,16 @@ bool is_builtin(const ConcatString text, int & index)
 
 {
 
-int j;
-
 index = -1;
 
-for (j=0; j<n_binfos; ++j)  {
+for (int j=0; j<n_binfos; ++j)  {
 
-   if ( binfo[j].name == text )  { index = j;  return ( true ); }
+   if ( binfo[j].name == text )  { index = j;  return true; }
 
 }
 
 
-return ( false );
+return false;
 
 }
 

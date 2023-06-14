@@ -37,7 +37,7 @@ class GridPoint
   // Constructors
 
   GridPoint(int x = 0, int y = 0);
-  GridPoint(GridPoint *point);
+  explicit GridPoint(GridPoint *point);
   GridPoint(GridPoint *point, GridOffset *offset);
 
   // Destructor

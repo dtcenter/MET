@@ -11,15 +11,15 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
 #include <cmath>
 
 #include "vx_cal.h"
+
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -29,7 +29,13 @@ void mjd_to_date(int mjd, int & month, int & day, int & year)
 
 {
 
-int i, j, n, l, d, m, y;
+int i;
+int j;
+int n;
+int l;
+int d;
+int m;
+int y;
 
 
 l  = mjd + 2468570;

@@ -52,7 +52,7 @@ class FO_Node {
 
       void clear();
 
-      void dump(ostream &, int) const;
+      void dump(std::ostream &, int) const;
 
          //
          //  set stuff

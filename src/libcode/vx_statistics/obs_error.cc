@@ -603,6 +603,7 @@ bool ObsErrorTable::has(const char *cur_var_name,
 //
 ////////////////////////////////////////////////////////////////////////
 
+
 void ObsErrorInfo::clear() {
    flag = false;
    entry.clear();
@@ -627,6 +628,17 @@ void ObsErrorInfo::validate() {
    }
 
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ObsErrorInfo &ObsErrorInfo::operator=(const ObsErrorInfo &a) noexcept {
+   if ( this != &a ) {
+      flag = a.flag;
+      entry = a.entry;
+      rng_ptr = (a.rng_ptr==nullptr) ? nullptr : a.rng_ptr;
+   }
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////

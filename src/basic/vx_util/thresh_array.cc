@@ -267,27 +267,23 @@ void ThreshArray::set(const SingleThresh &st) {
 ////////////////////////////////////////////////////////////////////////
 
 void ThreshArray::parse_thresh_str(const char *thresh_str) {
-   char *c    = (char *) 0;
-   char *lp   = (char *) 0;
+   char *c = (char *) nullptr;
+   char *temp_ptr = (char *) nullptr;
    const char delim [] = " ";
    const char *method_name = "ThreshArray::parse_thresh_str()";
 
    char *line = m_strcpy2(thresh_str, method_name);
    if (line) {
 
-      lp = line;
-      
-      while((c = strtok(lp, delim)) != nullptr ) {
+      while((c = strtok_r(line, delim, &temp_ptr)) != nullptr ) {
       
          add(c);
       
-         lp = (char *) 0;
       }
 
    }
 
-   if(line) { delete [] line; line = (char *) 0; }
-   lp = (char *) 0;
+   if(line) { delete [] line; line = (char *) nullptr; }
 
    return;
 }

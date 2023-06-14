@@ -835,7 +835,31 @@ EnsVarInfo::EnsVarInfo() {
    ctrl_info = nullptr;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
+
+
+InputInfo &InputInfo::operator=(const InputInfo &a) noexcept {
+   if ( this != &a ) {
+      file_index = a.file_index;
+      ens_member_id = a.ens_member_id;
+
+      var_info = (a.var_info == nullptr) ? nullptr : a.var_info;
+
+      if (file_list == nullptr) file_list = new StringArray();
+      else file_list->clear();
+      if (a.file_list != nullptr) {
+         for (int i=0; i<a.file_list->n(); i++) {
+           file_list->add((*a.file_list)[i]);
+         }
+      }
+   }
+   return *this;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
 
 EnsVarInfo::~EnsVarInfo() {
    clear();

@@ -51,30 +51,30 @@ static const STATLineType txt_file_type[n_txt] = {
 
 // Output data type names
 
-static const string genesis_name      ("GENESIS");
-static const string genesis_dev_name  ("GENESIS_DEV");
-static const string genesis_ops_name  ("GENESIS_OPS");
-static const string prob_genesis_name ("PROB_GENESIS");
-static const string genesis_shape_name("GENESIS_SHAPE");
+static const std::string genesis_name      ("GENESIS");
+static const std::string genesis_dev_name  ("GENESIS_DEV");
+static const std::string genesis_ops_name  ("GENESIS_OPS");
+static const std::string prob_genesis_name ("PROB_GENESIS");
+static const std::string genesis_shape_name("GENESIS_SHAPE");
 
 // Names for output data plane types
 
-static const string fgen_str       = "fcst_genesis";
-static const string ftrk_str       = "fcst_track";
-static const string fdev_fyoy_str  = "fcst_dev_fy_oy";
-static const string fdev_fyon_str  = "fcst_dev_fy_on";
-static const string fops_fyoy_str  = "fcst_ops_fy_oy";
-static const string fops_fyon_str  = "fcst_ops_fy_on";
-static const string bgen_str       = "best_genesis";
-static const string btrk_str       = "best_track";
-static const string bdev_fyoy_str  = "best_dev_fy_oy";
-static const string bdev_fnoy_str  = "best_dev_fy_on";
-static const string bops_fyoy_str  = "best_ops_fy_oy";
-static const string bops_fnoy_str  = "best_ops_fy_on";
+static const std::string fgen_str       = "fcst_genesis";
+static const std::string ftrk_str       = "fcst_track";
+static const std::string fdev_fyoy_str  = "fcst_dev_fy_oy";
+static const std::string fdev_fyon_str  = "fcst_dev_fy_on";
+static const std::string fops_fyoy_str  = "fcst_ops_fy_oy";
+static const std::string fops_fyon_str  = "fcst_ops_fy_on";
+static const std::string bgen_str       = "best_genesis";
+static const std::string btrk_str       = "best_track";
+static const std::string bdev_fyoy_str  = "best_dev_fy_oy";
+static const std::string bdev_fnoy_str  = "best_dev_fy_on";
+static const std::string bops_fyoy_str  = "best_ops_fy_oy";
+static const std::string bops_fnoy_str  = "best_ops_fy_on";
 
 static const int n_ncout = 12;
 
-static const string ncout_str[n_ncout] = {
+static const std::string ncout_str[n_ncout] = {
    fgen_str,      ftrk_str,      bgen_str,      btrk_str,
    fdev_fyoy_str, fdev_fyon_str, bdev_fyoy_str, bdev_fnoy_str,
    fops_fyoy_str, fops_fyon_str, bops_fyoy_str, bops_fnoy_str
@@ -163,7 +163,7 @@ class TCGenVxOpt {
       // Output file options
       ThreshArray ProbGenThresh;
       double CIAlpha;
-      map<STATLineType,STATOutputType> OutputMap;
+      std::map<STATLineType,STATOutputType> OutputMap;
       TCGenNcOutInfo NcInfo;
       SingleThresh ValidGenesisDHrThresh;
       bool BestUniqueFlag;
@@ -237,7 +237,7 @@ class TCGenConfInfo {
       Grid NcOutGrid;
 
       // Summary of output file options across all filters
-      map<STATLineType,STATOutputType> OutputMap;
+      std::map<STATLineType,STATOutputType> OutputMap;
       TCGenNcOutInfo NcInfo;
    
       // Config file version
@@ -250,7 +250,7 @@ class TCGenConfInfo {
       void read_config(const char *, const char *);
 
       void process_config();
-      void process_flags(const map<STATLineType,STATOutputType> &,
+      void process_flags(const std::map<STATLineType,STATOutputType> &,
                          const TCGenNcOutInfo &);
 
       double compute_dland(double lat, double lon);
@@ -298,11 +298,11 @@ class GenCTCInfo {
    bool BestUniqueFlag;
 
    // Number of hits per BEST track genesis event
-   map<const GenesisInfo *,int> BestDevHitMap;
-   map<const GenesisInfo *,int> BestOpsHitMap;
+   std::map<const GenesisInfo *,int> BestDevHitMap;
+   std::map<const GenesisInfo *,int> BestOpsHitMap;
 
    // Output DataPlane variables
-   map<const string,DataPlane> DpMap;
+   std::map<const std::string,DataPlane> DpMap;
 
       //////////////////////////////////////////////////////////////////
 
@@ -319,8 +319,8 @@ class GenCTCInfo {
    void add_fcst_gen(const GenesisInfo &);
    void add_best_gen(const GenesisInfo &);
 
-   void inc_pnt(double, double, const string &);
-   void inc_trk(const GenesisInfo &, const string &);
+   void inc_pnt(double, double, const std::string &);
+   void inc_trk(const GenesisInfo &, const std::string &);
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -350,14 +350,14 @@ class ProbGenPCTInfo {
    IntArray LeadTimes;
 
    // Map of lead times to PCT tables
-   map<int,PCTInfo> PCTMap;
+   std::map<int,PCTInfo> PCTMap;
 
    // Map of lead times to vectors of pair info
-   map<int,vector<const ProbGenInfo *> >  ProbGenMap;
-   map<int,vector<const GenShapeInfo *> > GenShapeMap;
-   map<int,vector<int> >                  ProbIdxMap;
-   map<int,vector<const GenesisInfo *> >  BestGenMap;
-   map<int,vector<bool> >                 BestEvtMap;
+   std::map<int,std::vector<const ProbGenInfo *> >  ProbGenMap;
+   std::map<int,std::vector<const GenShapeInfo *> > GenShapeMap;
+   std::map<int,std::vector<int> >                  ProbIdxMap;
+   std::map<int,std::vector<const GenesisInfo *> >  BestGenMap;
+   std::map<int,std::vector<bool> >                 BestEvtMap;
 
       //////////////////////////////////////////////////////////////////
 

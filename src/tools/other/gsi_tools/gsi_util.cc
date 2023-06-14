@@ -27,6 +27,91 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
+
+ConvData &ConvData::operator=(const ConvData &a) noexcept {
+   if ( this != &a ) {
+      var = a.var;
+      obtype = a.obtype;
+      sid = a.sid;
+      lat = a.lat;
+      lon = a.lon;
+      prs = a.prs;
+      elv = a.elv;
+      fcst_ut = a.fcst_ut;
+      obs_ut = a.obs_ut;
+      obs = a.obs;
+      obs_v = a.obs_v;
+      guess = a.guess;
+      guess_v = a.guess_v;
+      obs_qc = a.obs_qc;
+      hgt = a.hgt;
+      prep_use = a.prep_use;
+      anly_use = a.anly_use;
+      setup_qc = a.setup_qc;
+      err_in = a.err_in;
+      err_adj = a.err_adj;
+      err_fin = a.err_fin;
+      qc_wght = a.qc_wght;
+      n_use = a.n_use;
+   }
+   return *this;
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+RadData &RadData::operator=(const RadData &a) noexcept {
+   if ( this != &a ) {
+      var = a.var;
+      lat = a.lat;
+      lon = a.lon;
+      elv = a.elv;
+      fcst_ut = a.fcst_ut;
+      obs_ut = a.obs_ut;
+      obs = a.obs;
+      guess = a.guess;
+      obs_qc = a.obs_qc;
+      use = a.use;
+      scan_pos = a.scan_pos;
+      sat_znth = a.sat_znth;
+      sat_azmth = a.sat_azmth;
+      sun_znth = a.sun_znth;
+      sun_azmth = a.sun_azmth;
+      sun_glnt = a.sun_glnt;
+      frac_wtr = a.frac_wtr;
+      frac_lnd = a.frac_lnd;
+      frac_ice = a.frac_ice;
+      frac_snw = a.frac_snw;
+      sfc_twtr = a.sfc_twtr;
+      sfc_tlnd = a.sfc_tlnd;
+      sfc_tice = a.sfc_tice;
+      sfc_tsnw = a.sfc_tsnw;
+      tsoil = a.tsoil;
+      soilm = a.soilm;
+      land_type = a.land_type;
+      frac_veg = a.frac_veg;
+      snw_dpth = a.snw_dpth;
+      sfc_wind = a.sfc_wind;
+      frac_cld = a.frac_cld;
+      ctop_prs = a.ctop_prs;
+      tfnd = a.tfnd;
+      twarm = a.twarm;
+      tcool = a.tcool;
+      tzfnd = a.tzfnd;
+      obs_err = a.obs_err;
+      fcst_nobc = a.fcst_nobc;
+      sfc_emis = a.sfc_emis;
+      stability = a.stability;
+      prs_max_wgt = a.prs_max_wgt;
+      n_use = a.n_use;
+   }
+   return *this;
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
 ConvData parse_conv_data(const ConvRecord &r, const int i) {
    ConvData d;
 

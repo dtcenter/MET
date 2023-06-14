@@ -49,7 +49,7 @@ class Ave_Interp : public Interpolator {
 
       Interpolator * copy() const;
 
-      void dump(ostream &, int = 0) const;
+      void dump(std::ostream &, int = 0) const;
 
 };
 

@@ -246,6 +246,7 @@ struct TimeSummaryInfo {
   double      vld_thresh;  // Valid data time window threshold
   int         vld_freq;    // Expected observation frequency in seconds
                            //   used to compute the ratio of valid data.
+  TimeSummaryInfo & operator=(const TimeSummaryInfo &a) noexcept;   // SoanrQube findings
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -272,6 +273,7 @@ struct BootInfo {
    ConcatString     seed;     // RNG seed value
 
    void             clear();
+   BootInfo &       operator=(const BootInfo &a) noexcept;  // SoanrQube findings
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -292,6 +294,7 @@ struct InterpInfo {
    void        clear();
    void        validate(); // Ensure that width and method are accordant
    bool        operator==(const InterpInfo &) const;
+   InterpInfo &operator=(const InterpInfo &a) noexcept; // SoanrQube findings
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -322,6 +325,7 @@ struct RegridInfo {
    void clear();
    void validate();        // ensure that width and method are accordant
    void validate_point();  // ensure that width and method are accordant
+   RegridInfo &operator=(const RegridInfo &a) noexcept; // SoanrQube findings
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -340,6 +344,7 @@ struct ClimoCDFInfo {
    ClimoCDFInfo();
    void clear();
    void set_cdf_ta(int, bool &); // Construct equally-likely thresholds
+   ClimoCDFInfo &operator=(const ClimoCDFInfo &a) noexcept; // SoanrQube findings
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -356,6 +361,7 @@ struct NbrhdInfo {
    GridTemplateFactory::GridTemplates shape; // Neighborhood shape
 
    void        clear();
+   NbrhdInfo  &operator=(const NbrhdInfo &a) noexcept;  // SoanrQube findings
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -374,6 +380,7 @@ struct HiRAInfo {
 
    HiRAInfo();
    void clear();
+   HiRAInfo &operator=(const HiRAInfo &a) noexcept; // SoanrQube findings
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -390,6 +397,7 @@ struct PlotInfo {
    bool         colorbar_flag;    // Turn on/off plotting the colorbar
 
    void clear();
+   PlotInfo &operator=(const PlotInfo &a) noexcept;
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -405,6 +413,7 @@ struct MaskLatLon {
 
    void         clear();
    bool         operator==(const MaskLatLon &) const;
+   MaskLatLon  &operator=(const MaskLatLon &a) noexcept;
 };
 
 ////////////////////////////////////////////////////////////////////////

@@ -11,16 +11,18 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
-
 #include <iostream>
 #include <unistd.h>
 #include <string.h>
 #include <stdlib.h>
 #include <cmath>
 
+#define EXCLUDE_CONST_UNIX_TO_MDYHMS
+
 #include "vx_cal.h"
+
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -38,7 +40,7 @@ const char * day_name[] = {
    "Saturday",  //  6
    "Sunday"     //  7
 
- };
+};
 
 
 const char * short_day_name[] = {
@@ -53,7 +55,7 @@ const char * short_day_name[] = {
    "Sat",   //  6
    "Sun"    //  7
 
- };
+};
 
 const char * month_name[] = {
 
@@ -107,7 +109,8 @@ int str_len = strlen(month_str);
 char t_month_str[str_len + 1];
 
 for (int idx=0; idx<str_len; idx++) {
-   t_month_str[idx] = (idx==0) ? toupper(month_str[idx]) : tolower(month_str[idx]);
+   t_month_str[idx] = (idx==0) ? toupper((char)month_str[idx])
+                               : tolower((char)month_str[idx]);
 }
 t_month_str[str_len] = 0;
 
@@ -131,7 +134,13 @@ void unix_to_mdyhms(unixtime u, int & month, int & day, int & year, int & hour, 
 
 {
 
-unixtime i, j, n, l, d, m, y;
+unixtime i;
+unixtime j;
+unixtime n;
+unixtime l;
+unixtime d;
+unixtime m;
+unixtime y;
 
 
 n = u/86400;

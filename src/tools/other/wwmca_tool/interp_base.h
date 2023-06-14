@@ -56,7 +56,7 @@ class InterpolationValue {
 ////////////////////////////////////////////////////////////////////////
 
 
-extern ostream & operator<<(ostream &, const InterpolationValue &);
+extern std::ostream & operator<<(std::ostream &, const InterpolationValue &);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -111,7 +111,7 @@ class Interpolator {
 
       virtual Interpolator * copy() const = 0;
 
-      virtual void dump(ostream &, int = 0) const = 0;
+      virtual void dump(std::ostream &, int = 0) const = 0;
 
 };
 

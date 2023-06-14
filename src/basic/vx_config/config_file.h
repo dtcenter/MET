@@ -44,9 +44,9 @@ class MetConfig : public Dictionary {
      ~MetConfig();
       MetConfig(const MetConfig &);
       MetConfig & operator=(const MetConfig &);
-      MetConfig(const char *filename);
+      explicit MetConfig(const char *filename);
 
-      void clear();
+      void clear() override;
 
       void dump(std::ostream &, int = 0) const;
 
@@ -90,9 +90,9 @@ class MetConfig : public Dictionary {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline StringArray MetConfig::filename() const { return ( Filename ); }
+inline StringArray MetConfig::filename() const { return Filename; }
 
-inline bool MetConfig::debug() const { return ( Debug ); }
+inline bool MetConfig::debug() const { return Debug; }
 
 
 ////////////////////////////////////////////////////////////////////////

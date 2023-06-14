@@ -63,6 +63,19 @@ bool GenesisEventInfo::is_genesis(const TrackPoint &p) const {
 
 ////////////////////////////////////////////////////////////////////////
 
+GenesisEventInfo &GenesisEventInfo::operator=(const GenesisEventInfo &a) noexcept {
+   if ( this != &a ) {
+      Technique = a.Technique;
+      Category = a.Category;
+      VMaxThresh = a.VMaxThresh;
+      MSLPThresh = a.MSLPThresh;
+   }
+   return *this;
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
 GenesisEventInfo parse_conf_genesis_event_info(Dictionary *dict) {
    GenesisEventInfo info;
    StringArray sa;

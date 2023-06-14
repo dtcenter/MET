@@ -39,7 +39,7 @@ class BoolCalc {
 
       void clear();
 
-      void dump_program(ostream &) const;
+      void dump_program(std::ostream &) const;
 
 
 

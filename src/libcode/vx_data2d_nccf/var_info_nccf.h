@@ -49,7 +49,7 @@ class VarInfoNcCF : public VarInfo
       VarInfoNcCF(const VarInfoNcCF &);
       VarInfoNcCF & operator=(const VarInfoNcCF &);
 
-      void dump(ostream &) const;
+      void dump(std::ostream &) const;
       void clear();
 
       //

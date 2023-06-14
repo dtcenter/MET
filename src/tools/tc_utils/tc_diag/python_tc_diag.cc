@@ -8,8 +8,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <map>
 
 #include "vx_config.h"
@@ -19,13 +17,15 @@ using namespace std;
 #include "global_python.h"
 #include "wchar_argv.h"
 
+using namespace std;
+
 ////////////////////////////////////////////////////////////////////////
 
 extern GlobalPython GP;   //  this needs external linkage
 
 ////////////////////////////////////////////////////////////////////////
 
-static const char * user_ppath         = 0;
+static const char * user_ppath         = nullptr;
 static const char write_tmp_diag    [] = "MET_BASE/python/pyembed/write_tmp_tc_diag.py";
 static const char read_tmp_diag     [] = "pyembed.read_tmp_tc_diag";   //  NO ".py" suffix
 static const char tc_diag_dict_name [] = "tc_diag";
@@ -52,7 +52,7 @@ bool python_tc_diag(const ConcatString &script_name,
    bool status = false;
 
    // Check for MET_PYTHON_EXE
-   if ((user_ppath = getenv(user_python_path_env)) != 0 ) {
+   if ((user_ppath = getenv(user_python_path_env)) != nullptr ) {
       status = tmp_nc_tc_diag(script_name,
                   tmp_file_name, diag_map);
    }
@@ -62,7 +62,7 @@ bool python_tc_diag(const ConcatString &script_name,
                   tmp_file_name, diag_map);
    }
 
-   return(status);
+   return status;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -90,7 +90,7 @@ bool straight_python_tc_diag(const ConcatString &script_name,
       PyErr_Print();
       mlog << Warning << "\n" << method_name << " -> "
            << "an error occurred initializing python\n\n";
-      return(false);
+      return false;
    }
 
    // Set the arguments
@@ -125,14 +125,14 @@ bool straight_python_tc_diag(const ConcatString &script_name,
       mlog << Warning << "\n" << method_name << " -> "
            << "an error occurred importing module \""
            << script_name << "\"\n\n";
-      return(false);
+      return false;
    }
 
    if(!module_obj) {
       mlog << Warning << "\n" << method_name << " -> "
            << "error running Python script \""
            << script_name << "\"\n\n";
-      return(false);
+      return false;
    }
 
    // Get the namespace for the module (as a dictionary)
@@ -144,13 +144,13 @@ bool straight_python_tc_diag(const ConcatString &script_name,
       mlog << Warning << "\n" << method_name << " -> "
            << "trouble reading data from \""
            << script_name << "\"\n\n";
-      return(false);
+      return false;
    }
 
    // Populate the diagnostics map
    diag_map_from_python_dict(data_obj, diag_map);
 
-   return(true);
+   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -163,7 +163,7 @@ bool tmp_nc_tc_diag(const ConcatString &script_name,
    ConcatString command;
    ConcatString path;
    ConcatString tmp_nc_path;
-   const char * tmp_dir = 0;
+   const char * tmp_dir = nullptr;
    Wchar_Argv wa;
 
    // TODO: Implement read/write temp tc_diag python functionality
@@ -171,6 +171,7 @@ bool tmp_nc_tc_diag(const ConcatString &script_name,
         << "not yet fully implemented ... exiting!\n\n";
    exit(1);
 
+   /*
    mlog << Debug(3) << "Calling " << user_ppath
         << " to run Python diagnostics script ("
         << script_name << " " << tmp_file_name << ").\n";
@@ -214,7 +215,7 @@ bool tmp_nc_tc_diag(const ConcatString &script_name,
       PyErr_Print();
       mlog << Warning << "\n" << method_name << " -> "
            << "an error occurred initializing python\n\n";
-      return(false);
+      return false;
    }
 
    // Prepare arguments to read input
@@ -245,13 +246,13 @@ bool tmp_nc_tc_diag(const ConcatString &script_name,
       mlog << Warning << "\n" << method_name << " -> "
         << "an error occurred importing module "
         << '\"' << path << "\"\n\n";
-      return(false);
+      return false;
    }
 
    if(!module_obj) {
       mlog << Warning << "\n" << method_name << " -> "
         << "error running Python script\n\n";
-      return(false);
+      return false;
    }
 
    // Get the namespace for the module (as a dictionary)
@@ -272,7 +273,8 @@ bool tmp_nc_tc_diag(const ConcatString &script_name,
    // Cleanup
    remove_temp_file(tmp_nc_path);
 
-   return(true);
+   return true;
+   */
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -280,8 +282,8 @@ bool tmp_nc_tc_diag(const ConcatString &script_name,
 void diag_map_from_python_dict(PyObject *diag_dict,
         map<string,double> &diag_map) {
    const char *method_name = "diag_map_from_python_dict()";
-   PyObject *key_obj = 0;
-   PyObject *val_obj = 0;
+   PyObject *key_obj = nullptr;
+   PyObject *val_obj = nullptr;
    int status;
    double val;
    long pos;

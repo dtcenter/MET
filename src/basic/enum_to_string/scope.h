@@ -65,7 +65,7 @@ inline const char * ScopeStackElement::name() const { return ( Name ); }
 ////////////////////////////////////////////////////////////////////////
 
 
-extern ostream & operator<<(ostream &, const ScopeStackElement &);
+extern std::ostream & operator<<(std::ostream &, const ScopeStackElement &);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -119,7 +119,7 @@ inline int ScopeStack::n_elements() const { return ( N ); }
 ////////////////////////////////////////////////////////////////////////
 
 
-extern ostream & operator<<(ostream &, const ScopeStack &);
+extern std::ostream & operator<<(std::ostream &, const ScopeStack &);
 
 
 ////////////////////////////////////////////////////////////////////////

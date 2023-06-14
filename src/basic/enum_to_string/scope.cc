@@ -10,9 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -22,6 +19,8 @@ using namespace std;
 #include "scope.h"
 #include "str_wrappers.h"
 
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -83,7 +82,7 @@ if ( this == &e )  return ( *this );
 
 assign(e);
 
-return ( *this );
+return *this;
 
 }
 
@@ -239,7 +238,7 @@ if ( this == &ss )  return ( *this );
 
 assign(ss);
 
-return ( *this );
+return *this;
 
 }
 
@@ -313,7 +312,7 @@ if ( (pos < 0) || (pos >= N) )  {
 }
 
 
-return ( s[pos] );
+return s[pos];
 
 }
 
@@ -437,7 +436,7 @@ s << "   level = "   << (sse.level()) << "\n";
 
 s.flush();
 
-return ( s );
+return s;
 
 }
 
@@ -474,7 +473,7 @@ for (j=0; j<n; ++j)  {
 }
 
 
-return ( s );
+return s;
 
 }
 
