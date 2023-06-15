@@ -315,6 +315,7 @@ class ModeFuzzyEngine {
       bool need_obs_clus_split;
 
       bool is_multivar_super;        // used when producing output files
+      bool is_multivar_intensity;    // used when producing output files
 
       const Grid * grid;             //  not allocated
 
@@ -376,7 +377,8 @@ class ModeFuzzyEngine {
 extern double total_interest     (ModeConfInfo &, const PairFeature &, int, int, bool is_single);
 extern double interest_percentile(ModeFuzzyEngine &, const double, const int);
 
-extern void write_engine_stats   (ModeFuzzyEngine &, const Grid &, AsciiTable &, bool isMultiVarSuper=false);
+extern void write_engine_stats   (ModeFuzzyEngine &, const Grid &, AsciiTable &, bool isMultiVarSuper=false,
+                                  bool isMultivarIntensity=false);
 extern void write_header_row     (ModeFuzzyEngine &, AsciiTable &, const int row);   //  row usually zero
 extern void write_header_columns (ModeFuzzyEngine &, const Grid &, AsciiTable &, const int row);
 extern void write_fcst_single    (ModeFuzzyEngine &, const int, const Grid &, AsciiTable &, const int);

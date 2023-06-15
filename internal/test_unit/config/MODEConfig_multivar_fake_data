@@ -107,12 +107,12 @@ mask_missing_flag = NONE;
 //
 // Match objects between the forecast and observation fields
 //
-match_flag = NONE;
+match_flag = MERGE_BOTH;
 
 //
 // Maximum centroid distance for objects to be compared
 //
-max_centroid_dist = 800.0/grid_res;
+max_centroid_dist = 800.0;
 
 ////////////////////////////////////////////////////////////////////////////////
 

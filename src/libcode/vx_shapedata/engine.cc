@@ -158,6 +158,7 @@ void ModeFuzzyEngine::init_from_scratch() {
    need_obs_clus_split  = true;
 
    is_multivar_super    = false;
+   is_multivar_intensity= false;
 
    need_match           = true;
 
@@ -3111,11 +3112,13 @@ double interest_percentile(ModeFuzzyEngine &eng, const double p, const int flag)
 
 ///////////////////////////////////////////////////////////////////////
 
-void write_engine_stats(ModeFuzzyEngine & eng, const Grid & grid, AsciiTable & at, bool isMultivarSuper)
+void write_engine_stats(ModeFuzzyEngine & eng, const Grid & grid, AsciiTable & at,
+                        bool isMultivarSuper, bool isMultivarIntensity)
 
 {
 
    eng.is_multivar_super = isMultivarSuper;
+   eng.is_multivar_intensity = isMultivarIntensity;
    
    int i, j, row;
 
@@ -3341,6 +3344,11 @@ void write_header_columns(ModeFuzzyEngine & eng, const Grid & grid, AsciiTable &
    // Forecast Variable Name
    if (eng.is_multivar_super) {
       s = eng.conf_info.fcst_multivar_name;
+   } else if (eng.is_multivar_intensity) {
+      s = eng.conf_info.fcst_multivar_name;
+      s.add("_");
+      s.add(check_hdr_str(conf_key_fcst_var,
+                          eng.conf_info.Fcst->var_info->name_attr()));
    } else {
       s = check_hdr_str(conf_key_fcst_var,
                         eng.conf_info.Fcst->var_info->name_attr());
@@ -3368,6 +3376,11 @@ void write_header_columns(ModeFuzzyEngine & eng, const Grid & grid, AsciiTable &
    // Observation Variable Name
    if (eng.is_multivar_super) {
       s = eng.conf_info.obs_multivar_name;
+   } else if (eng.is_multivar_intensity) {
+      s = eng.conf_info.obs_multivar_name;
+      s.add("_");
+      s.add(check_hdr_str(conf_key_fcst_var,
+                          eng.conf_info.Obs->var_info->name_attr()));
    } else {
       s = check_hdr_str(conf_key_obs_var,
                      eng.conf_info.Obs->var_info->name_attr());

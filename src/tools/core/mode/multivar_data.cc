@@ -209,7 +209,10 @@ void MultiVarData::checkFileTypeConsistency(const MultiVarData &mvdi, int j)
 
 void MultiVarData::init(const string &fname, const string &oname,
                         const Grid &grid, GrdFileType ftype,
-                        GrdFileType otype)
+                        GrdFileType otype, 
+                        const string &funits, const string &ounits,
+                        const string &flevel, const string &olevel,
+                        double data_min, double data_max)
 {
    _clear();
    _f_name = fname;
@@ -219,6 +222,12 @@ void MultiVarData::init(const string &fname, const string &oname,
    _grid = new Grid(grid);
    _ftype = ftype;
    _otype = otype;
+   _funits = funits;
+   _ounits = ounits;
+   _flevel = flevel;
+   _olevel = olevel;
+   _data_min = data_min;
+   _data_max = data_max;
    _simple = new MultiVarData1(_nx, _ny, "Simple");
    _merge = new MultiVarData1(_nx, _ny, "Merge");
 }

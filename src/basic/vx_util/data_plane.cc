@@ -400,6 +400,23 @@ void DataPlane::set_accum(int s) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+void DataPlane::set_all(float *data, int nx, int ny) {
+   if (nx != Nx || ny != Ny) {
+      mlog << Error << "\nDataPlane::set_all() -> "
+           << "the data dimensions do not match: ("
+           << Nx << ", " << Ny << ") != ("
+           << nx << ", " << ny << ")!\n\n";
+      exit(1);
+   }
+   for (int x=0; x<nx; ++x) {
+      for (int y=0; y<ny; ++y) {
+         int index = two_to_one(x, y);
+         Data[index] = data[index];
+      }
+   }
+}
+
+///////////////////////////////////////////////////////////////////////////////
 
 bool DataPlane::is_all_bad_data() const {
    int j;

@@ -116,6 +116,8 @@ class ModeExecutive {
    ShapeData Fcst_sd, Obs_sd;
 
    GrdFileType ftype, otype;
+   string funits, ounits;
+   string flevel, olevel;
 
    bool isMultivarOutput;
    bool isMultivarSuperOutput;
@@ -135,8 +137,14 @@ class ModeExecutive {
    void do_match_merge(ShapeData &f_merge, ShapeData &o_merge, bool isMultivarSuper=false);
 
    void process_masks(ShapeData &, ShapeData &);
-   void process_output(bool isMultivar=false, bool isMultivarSuper=false);
+   void process_output(bool isMultivar=false, bool isMultivarSuper=false,
+                       const MultiVarData *mvd=NULL);
 
+   void set_raw_to_full(float *fcst_raw_data,
+                        float *obs_raw_data,
+                        int nx, int ny,
+                        double data_min, double data_max);
+      
   
    // owned by caller
    MultiVarData *get_multivar_data();

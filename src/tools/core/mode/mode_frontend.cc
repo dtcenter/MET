@@ -140,6 +140,15 @@ int ModeFrontEnd::run_multivar_pass2(const StringArray & Argv, const MultiVarDat
    if (compress_level >= 0) conf.nc_info.set_compress_level(compress_level);
    //if ( field_index >= 0 )
    conf.set_field_index(field_index);
+
+   // for multivar pass2, explicity set the level and units using stored values
+   // from pass1
+   
+   conf.Fcst->var_info->set_level_name(mvd._flevel.c_str());
+   conf.Obs->var_info->set_level_name(mvd._olevel.c_str());
+   conf.Fcst->var_info->set_units(mvd._funits.c_str());
+   conf.Obs->var_info->set_units(mvd._ounits.c_str());
+
    if (has_union && (conf.Fcst->merge_flag == MergeType_Thresh ||
                      conf.Obs->merge_flag == MergeType_Thresh)) {
       mlog << Warning << "\nModeFrontEnd::run() -> "
@@ -291,7 +300,10 @@ void ModeFrontEnd::do_straight(Processing_t ptype, const MultiVarData &mvd,
 
       mode_exec->do_conv_thresh(index, index, false, true);
       mode_exec->do_match_merge(f_merge, o_merge, ptype == MULTIVAR_SUPER);
-      mode_exec->process_output(true, false);
+
+      // here replace raw data and min/max for plotting
+
+      mode_exec->process_output(true, false, &mvd);
    }
 
    mode_exec->clear_internal_r_index();

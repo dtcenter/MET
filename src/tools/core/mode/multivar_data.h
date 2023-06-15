@@ -23,7 +23,6 @@
 #include "data_file_type.h"
 #include "two_d_array.h"
 
-
 class MultiVarData1 {
 
  private:
@@ -94,7 +93,10 @@ class MultiVarData {
    void checkFileTypeConsistency(const MultiVarData &mvdi, int j);
 
    void init(const string &fname, const string &oname,
-             const Grid &grid, GrdFileType ftype, GrdFileType otype);
+             const Grid &grid, GrdFileType ftype, GrdFileType otype,
+             const string &funits, const string &ounits,
+             const string &flevel, const string &olevel,
+             double data_min, double data_max);
    void set_fcst_obj(ShapeData *sd, bool simple);
    void set_fcst_raw(ShapeData *sd, bool simple);
    void set_obs_obj(ShapeData *sd, bool simple);
@@ -116,7 +118,9 @@ class MultiVarData {
    Grid *_grid;
    GrdFileType _ftype;
    GrdFileType _otype;
-     
+   string _funits, _ounits;
+   string _flevel, _olevel;
+   double _data_min, _data_max;
 };
 
 

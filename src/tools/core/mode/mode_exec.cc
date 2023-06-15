@@ -179,7 +179,6 @@ void ModeExecutive::init(int n_files)
       exit(1);
    }
 
-
    // Read forecast file
    if(!(fcst_mtddf = mtddf_factory.new_met_2d_data_file(fcst_file.c_str(), ftype))) {
       mlog << Error << "\nTrouble reading forecast file \""
@@ -219,7 +218,6 @@ void ModeExecutive::init(int n_files)
 }
 
 ///////////////////////////////////////////////////////////////////////
-
 
 void ModeExecutive::init_multivar(GrdFileType ftype, GrdFileType otype)
 
@@ -408,6 +406,14 @@ void ModeExecutive::setup_fcst_obs_data()
 
    engine.conf_info.set_perc_thresh(Fcst_sd.data, Obs_sd.data);
 
+   // store the input data units
+   funits = engine.conf_info.Fcst->var_info->units();
+   ounits = engine.conf_info.Obs->var_info->units();
+
+   // store the input data level
+   flevel = engine.conf_info.Fcst->var_info->level_name();
+   olevel = engine.conf_info.Obs->var_info->level_name();
+
    //
    //  done
    //
@@ -495,6 +501,14 @@ void ModeExecutive::setup_fcst_obs_data(const MultiVarData &mvd)
    // Process percentile thresholds
    // do this in the second pass using masked Fcst_sd and Obs_sd
    engine.conf_info.set_perc_thresh(Fcst_sd.data, Obs_sd.data);
+
+   // store the input data units
+   funits = engine.conf_info.Fcst->var_info->units();
+   ounits = engine.conf_info.Obs->var_info->units();
+
+   // store the input data level
+   flevel = engine.conf_info.Fcst->var_info->level_name();
+   olevel = engine.conf_info.Obs->var_info->level_name();
 
    //
    //  done
@@ -851,7 +865,21 @@ void ModeExecutive::process_masks(ShapeData & fcst_sd, ShapeData & obs_sd)
 
 ///////////////////////////////////////////////////////////////////////
 
-void ModeExecutive::process_output(bool isMultivar, bool isMultivarSuper)
+void ModeExecutive::set_raw_to_full(float *fcst_raw_data,
+                                    float *obs_raw_data,
+                                    int nx, int ny,
+                                    double idata_min, double idata_max)
+{
+   engine.fcst_raw->data.set_all(fcst_raw_data, nx, ny);
+   engine.obs_raw->data.set_all(obs_raw_data, nx, ny);
+   data_min = idata_min;
+   data_max = idata_max;
+}
+      
+///////////////////////////////////////////////////////////////////////
+
+void ModeExecutive::process_output(bool isMultivar, bool isMultivarSuper,
+                                   const MultiVarData *mvd)
 
 {
    // store to class member so don't have to pass it around
@@ -898,6 +926,18 @@ void ModeExecutive::process_output(bool isMultivar, bool isMultivarSuper)
 
    if ( engine.conf_info.ct_stats_flag )  write_ct_stats();
 
+   if (isMultivar) {
+      if (mvd) {
+         set_raw_to_full(mvd->_simple->_fcst_raw_data,
+                         mvd->_simple->_obs_raw_data,
+                         mvd->_nx, mvd->_ny,
+                         mvd->_data_min, mvd->_data_max);
+      } else {
+         mlog << Error << "\nprocess_output() -> "
+              << "no multivar data when data is expected\n\n";
+         exit(1);
+      }
+   }
    write_obj_netcdf(engine.conf_info.nc_info);
 
    if ( engine.conf_info.ps_plot_flag )   plot_engine();
@@ -1121,7 +1161,8 @@ void ModeExecutive::write_obj_stats()
    //
    // Write the output statistics to an AsciiTable object
    //
-   write_engine_stats(engine, grid, obj_at, isMultivarSuperOutput); 
+   write_engine_stats(engine, grid, obj_at, isMultivarSuperOutput,
+                      isMultivarOutput); 
 
    //
    // Write the AsciiTable object to the output file
@@ -1213,7 +1254,8 @@ MultiVarData *ModeExecutive::get_multivar_data()
    replace(fcst_magic_string.begin(), fcst_magic_string.end(), '/', '_');   
    replace(obs_magic_string.begin(), obs_magic_string.end(), '/', '_');   
 
-   mvd->init(fcst_magic_string, obs_magic_string, grid, ftype, otype);
+   mvd->init(fcst_magic_string, obs_magic_string, grid, ftype, otype,
+             funits, ounits, flevel, olevel, data_min, data_max);
    mvd->set_fcst_obj(engine.fcst_split, simple);
    mvd->set_fcst_raw(engine.fcst_raw, simple);
    mvd->set_obs_obj(engine.obs_split, simple);

@@ -85,6 +85,8 @@ class DataPlane {
       void set_lead(int);
       void set_accum(int);
 
+      void set_all(float *data, int nx, int ny);
+
          //
          // Get functions
          //
