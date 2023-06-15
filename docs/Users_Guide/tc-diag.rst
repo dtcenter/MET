@@ -1,7 +1,7 @@
 .. _tc-diag:
 
 ************
-TC-DIAG Tool
+TC-Diag Tool
 ************
 
 Introduction
