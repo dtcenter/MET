@@ -10,9 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
-
 #include <cstdio>
 #include <iostream>
 #include <unistd.h>
@@ -24,6 +21,9 @@ using namespace std;
 #include "vx_log.h"
 
 
+using namespace std;
+
+
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -31,7 +31,9 @@ void sec_to_hhmmss(int in_sec, ConcatString& str)
 
 {
 
-int hour, minute, second;
+int hour;
+int minute;
+int second;
 
 if ( in_sec == bad_data_int )  {
    str = na_str;
@@ -64,7 +66,7 @@ ConcatString str;
  
 sec_to_hhmmss(in_sec, str);
 
-return ( str );
+return str;
 
 }
 
@@ -77,7 +79,9 @@ ConcatString sec_to_hhmmss_colon(int in_sec)
 {
 
 ConcatString s;
-int hour, minute, second;
+int hour;
+int minute;
+int second;
 
 if ( in_sec == bad_data_int )  {
    s = na_str;
@@ -94,7 +98,7 @@ else  {
    }
 }
 
-return(s);
+return s;
 
 }
 
@@ -106,7 +110,10 @@ int hhmmss_to_sec(const char * text)
 
 {
 
-int i, hour, minute, second;
+int i;
+int hour;
+int minute;
+int second;
 
 i = atoi(text);
 
@@ -118,7 +125,7 @@ second = i%100;
 
 i = hms_to_sec(hour, minute, second);
 
-return ( i );
+return i;
 
 }
 
@@ -130,7 +137,12 @@ void unix_to_yyyymmdd_hhmmss(unixtime u, ConcatString& str)
 
 {
 
-int year, month, day, hour, minute, second;
+int year;
+int month;
+int day;
+int hour;
+int minute;
+int second;
 
 unix_to_mdyhms(u, month, day, year, hour, minute, second);
 
@@ -148,7 +160,12 @@ void unix_to_yyyymmdd_hhmmss(unixtime u, char * junk, size_t len)
 
 {
 
-int year, month, day, hour, minute, second;
+int year;
+int month;
+int day;
+int hour;
+int minute;
+int second;
 
 unix_to_mdyhms(u, month, day, year, hour, minute, second);
 
@@ -171,7 +188,7 @@ ConcatString str;
 
 unix_to_yyyymmdd_hhmmss(u, str);
 
-return ( str );
+return str;
 
 }
 
@@ -183,7 +200,12 @@ unixtime yyyymmdd_hhmmss_to_unix(const char * text)
 
 {
 
-int month, day, year, hour, minute, second;
+int month;
+int day;
+int year;
+int hour;
+int minute;
+int second;
 unixtime t;
 char junk[32];
 
@@ -215,7 +237,7 @@ second = atoi(junk);
 
 t = mdyhms_to_unix(month, day, year, hour, minute, second);
 
-return ( t );
+return t;
 
 }
 
@@ -227,7 +249,12 @@ unixtime yyyymmddThhmmss_to_unix(const char * text)
 
 {
 
-int month, day, year, hour, minute, second;
+int month;
+int day;
+int year;
+int hour;
+int minute;
+int second;
 unixtime t;
 char junk[32];
 
@@ -259,7 +286,7 @@ second = atoi(junk);
 
 t = mdyhms_to_unix(month, day, year, hour, minute, second);
 
-return ( t );
+return t;
 
 }
 
@@ -271,7 +298,10 @@ unixtime yyyymmdd_hh_to_unix(const char * text)
 
 {
 
-int month, day, year, hour;
+int month;
+int day;
+int year;
+int hour;
 unixtime t;
 char junk[32];
 
@@ -300,7 +330,7 @@ hour   = atoi(junk);
 
 t = mdyhms_to_unix(month, day, year, hour, 0, 0);
 
-return ( t );
+return t;
 
 }
 
@@ -312,7 +342,9 @@ unixtime yyyymmdd_to_unix(const char * text)
 
 {
 
-int month, day, year;
+int month;
+int day;
+int year;
 unixtime t;
 char junk[32];
 
@@ -332,7 +364,7 @@ day   = atoi(junk);
 
 t = mdyhms_to_unix(month, day, year, 0, 0, 0);
 
-return ( t );
+return t;
 
 }
 
@@ -344,7 +376,12 @@ void unix_to_yyyymmddhh(unixtime u, ConcatString& str)
 
 {
 
-int year, month, day, hour, minute, second;
+int month;
+int day;
+int year;
+int hour;
+int minute;
+int second;
 
 unix_to_mdyhms(u, month, day, year, hour, minute, second);
 
@@ -366,7 +403,7 @@ ConcatString str;
 
 unix_to_yyyymmddhh(u, str);
 
-return ( str );
+return str;
 
 }
 
@@ -382,7 +419,7 @@ ConcatString str;
 
 str << text << "0000";
 
- return ( yyyymmddhhmmss_to_unix(str.c_str()) );
+return yyyymmddhhmmss_to_unix(str.c_str());
 
 }
 
@@ -397,7 +434,7 @@ ConcatString str;
 
 str << text << "00";
 
- return ( yyyymmddhhmmss_to_unix(str.c_str()) );
+return yyyymmddhhmmss_to_unix(str.c_str());
 
 }
 
@@ -408,7 +445,12 @@ unixtime yyyymmddhhmmss_to_unix(const char * text)
 
 {
 
-int month, day, year, hour, minute, second;
+int month;
+int day;
+int year;
+int hour;
+int minute;
+int second;
 unixtime t;
 char junk[32];
 
@@ -439,7 +481,7 @@ second = atoi(junk);
 
 t = mdyhms_to_unix(month, day, year, hour, minute, second);
 
-return ( t );
+return t;
 
 }
 
@@ -459,11 +501,11 @@ if ( first > last )  {
 
 }
 
-int j, n;
+int n;
 
 n = last - first + 1;
 
-for (j=0; j<n; ++j)  {
+for (int j=0; j<n; ++j)  {
 
    out[j] = text[first + j];
 
@@ -483,7 +525,12 @@ void make_timestring(unixtime t, ConcatString& str)
 
 {
 
-int month, day, year, hour, minute, second;
+int month;
+int day;
+int year;
+int hour;
+int minute;
+int second;
 
 
 unix_to_mdyhms(t, month, day, year, hour, minute, second);
@@ -508,7 +555,7 @@ ConcatString str;
 
 make_timestring(u, str);
 
-return ( str );
+return str;
 
 }
 
@@ -558,7 +605,7 @@ else {
 }
 
 
-return ( t );
+return t;
 
 }
 
@@ -568,7 +615,12 @@ return ( t );
 
 time_t timestring_to_time_t(const char * text) {
 
-int month, day, year, hour, minute, second;
+int month;
+int day;
+int year;
+int hour;
+int minute;
+int second;
 
 unix_to_mdyhms(timestring_to_unix(text),
                month, day, year, hour, minute, second);
@@ -582,7 +634,7 @@ time_struct.tm_hour = hour;
 time_struct.tm_min  = minute;
 time_struct.tm_sec  = second;
 
-return ( timegm(&time_struct) );
+return timegm(&time_struct);
 }
 
 
@@ -593,13 +645,13 @@ bool is_datestring(const char * text)
 
 {
 
-return ( is_yyyymmdd_hhmmss(text) ||
-         is_yyyymmddThhmmss(text) ||
-         is_yyyymmdd_hh(text)     ||
-         is_yyyymmddhhmmss(text)  ||
-         is_yyyymmddhhmm(text)    ||
-         is_yyyymmddhh(text)      ||
-         is_yyyymmdd(text) );
+return is_yyyymmdd_hhmmss(text) ||
+       is_yyyymmddThhmmss(text) ||
+       is_yyyymmdd_hh(text)     ||
+       is_yyyymmddhhmmss(text)  ||
+       is_yyyymmddhhmm(text)    ||
+       is_yyyymmddhh(text)      ||
+       is_yyyymmdd(text);
 
 }
 
@@ -611,7 +663,7 @@ bool is_yyyymmdd(const char * text)
 
 {
 
-return ( check_reg_exp("^[0-9]\\{8\\}$", text) );
+return check_reg_exp("^[0-9]\\{8\\}$", text);
 
 }
 
@@ -623,7 +675,7 @@ bool is_yyyymmddhh(const char * text)
 
 {
 
-return ( check_reg_exp("^[0-9]\\{10\\}$", text) );
+return check_reg_exp("^[0-9]\\{10\\}$", text);
 
 }
 
@@ -635,7 +687,7 @@ bool is_yyyymmddhhmm(const char * text)
 
 {
 
-return ( check_reg_exp("^[0-9]\\{12\\}$", text) );
+return check_reg_exp("^[0-9]\\{12\\}$", text);
 
 }
 
@@ -647,7 +699,7 @@ bool is_yyyymmddhhmmss(const char * text)
 
 {
 
-return ( check_reg_exp("^[0-9]\\{14\\}$", text) );
+return check_reg_exp("^[0-9]\\{14\\}$", text);
 
 }
 
@@ -659,7 +711,7 @@ bool is_yyyymmdd_hh(const char * text)
 
 {
 
-return ( check_reg_exp("^[0-9]\\{8\\}_[0-9]\\{2\\}$", text) );
+return check_reg_exp("^[0-9]\\{8\\}_[0-9]\\{2\\}$", text);
 
 }
 
@@ -671,7 +723,7 @@ bool is_yyyymmdd_hhmmss(const char * text)
 
 {
 
-return ( check_reg_exp("^[0-9]\\{8\\}_[0-9]\\{6\\}$", text) );
+return check_reg_exp("^[0-9]\\{8\\}_[0-9]\\{6\\}$", text);
 
 }
 
@@ -683,7 +735,7 @@ bool is_yyyymmddThhmmss(const char * text)
 
 {
 
-return ( check_reg_exp("^[0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}T[0-9]\\{2\\}:[0-9]\\{2\\}:[0-9]\\{2\\}Z$", text) );
+return check_reg_exp("^[0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}T[0-9]\\{2\\}:[0-9]\\{2\\}:[0-9]\\{2\\}Z$", text);
 
 }
 
@@ -728,7 +780,7 @@ else {
 
 }
 
-return ( t );
+return t;
 
 }
 
@@ -746,7 +798,7 @@ if      ( s == bad_data_int) str = na_str;
 else if ( s % 3600 == 0 )    str = HH ( s / 3600 );
 else                         str = sec_to_hhmmss ( s );
 
-return ( str );
+return str;
 
 }
 
@@ -759,7 +811,7 @@ bool is_hhmmss(const char * text)
 {
 
 // Allow negative times and 2 to 5 digits for the number of hours
-return ( check_reg_exp("^-*[0-9]\\{6,9\\}$", text) );
+return check_reg_exp("^-*[0-9]\\{6,9\\}$", text);
 
 }
 
@@ -772,7 +824,7 @@ bool is_hh(const char * text)
 {
 
 // Allow negative times and 1 to 5 digits for the number of hours
-return ( check_reg_exp("^-*[0-9]\\{1,5\\}$", text) );
+return check_reg_exp("^-*[0-9]\\{1,5\\}$", text);
 
 }
 
@@ -788,7 +840,7 @@ ConcatString str;
 
 str.format("%02d", hours);
 
-return ( str );
+return str;
 
 }
 

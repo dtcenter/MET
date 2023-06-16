@@ -18,6 +18,7 @@ tc_dland_LDFLAGS = ${MET_LDFLAGS}
 tc_dland_LDADD = -lvx_tc_util \
 	-lvx_nc_util \
 	-lvx_grid \
+	-lvx_geodesy \
 	-lvx_gnomon \
 	-lvx_nav \
 	-lvx_log \

@@ -52,7 +52,7 @@ extern NumArray        parse_conf_eclv_points(Dictionary *dict);
 extern ClimoCDFInfo    parse_conf_climo_cdf(Dictionary *dict);
 extern TimeSummaryInfo parse_conf_time_summary(Dictionary *dict);
 extern std::map<ConcatString,ConcatString> parse_conf_key_value_map(
-                          Dictionary *dict, const char *conf_key_map_name, const char *caller=0);
+                          Dictionary *dict, const char *conf_key_map_name, const char *caller=nullptr);
 extern void            parse_add_conf_key_value_map(
                           Dictionary *dict, const char *conf_key_map_name, std::map<ConcatString,ConcatString> *m);
 extern std::map<ConcatString,ConcatString>
@@ -66,7 +66,7 @@ extern std::map<ConcatString,StringArray>
                        parse_conf_obs_to_qc_map(Dictionary *dict);
 extern std::map<ConcatString,UserFunc_1Arg>
                        parse_conf_key_convert_map(
-                          Dictionary *dict, const char *conf_key_map_name, const char *caller=0);
+                          Dictionary *dict, const char *conf_key_map_name, const char *caller=nullptr);
 extern BootInfo        parse_conf_boot(Dictionary *dict);
 extern RegridInfo      parse_conf_regrid(Dictionary *dict, bool error_out = default_dictionary_error_out);
 extern InterpInfo      parse_conf_interp(Dictionary *dict, const char *);
@@ -139,7 +139,7 @@ extern ConcatString wavelettype_to_string(WaveletType);
 
 extern int parse_conf_percentile(Dictionary *dict);
 
-extern void python_compile_error(const char *caller=0);
+extern void python_compile_error(const char *caller=nullptr);
 
 ////////////////////////////////////////////////////////////////////////
 

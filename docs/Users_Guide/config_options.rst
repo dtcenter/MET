@@ -275,6 +275,7 @@ and, in some cases, elevation for all stations based on stationId.
 This set of stations comes from 2 online sources: the
 `active stations website <https://www.ndbc.noaa.gov/activestations.xml>`_
 and the `complete stations website <https://www.airnow.gov>`_.
+
 As these lists can change as a function of time, a script can be run to pull
 down the contents of both websites and merge any changes with the existing stations
 file content, creating an updated stations file locally.
@@ -301,7 +302,6 @@ can be deleted once the final output file is created.
 
 MET_BASE
 ^^^^^^^^
-
 The MET_BASE variable is defined in the code at compilation time as the path
 to the MET shared data. These are things like the default configuration files,
 common polygons and color scales. MET_BASE may be used in the MET configuration
@@ -1541,6 +1541,8 @@ Point-Stat and Ensemble-Stat, the reference time is the forecast valid time.
      end =  5400;
   }
 
+.. _config_options-mask:
+
 mask
 ^^^^
      
@@ -1562,14 +1564,26 @@ in the following ways:
 
 * The "poly" entry contains a comma-separated list of files that define
   verification masking regions. These masking regions may be specified in
-  two ways: as a lat/lon polygon or using a gridded data file such as the
-  NetCDF output of the Gen-Vx-Mask tool.
+  two ways: in an ASCII file containing lat/lon points defining the mask polygon,
+  or using a gridded data file such as the NetCDF output of the Gen-Vx-Mask tool.
+  Some details for each of these options are described below:
 
-  * An ASCII file containing a lat/lon polygon.
-    Latitude in degrees north and longitude in degrees east.
-    The first and last polygon points are connected.
-    For example, "MET_BASE/poly/EAST.poly" which consists of n points:
-    "poly_name lat1 lon1 lat2 lon2... latn lonn"
+  * If providing an ASCII file containing the lat/lon points defining the mask
+    polygon, the file must contain a name for the region followed by the latitude
+    (degrees north) and longitude (degrees east) for each vertex of the polygon.
+    The values are separated by whitespace (e.g. spaces or newlines), and the
+    first and last polygon points are connected.
+    The general form is "poly_name lat1 lon1 lat2 lon2... latn lonn".
+    Here is an example of a rectangle consisting of 4 points:
+
+    .. code-block:: none
+       :caption: ASCII Rectangle Polygon Mask
+
+       RECTANGLE
+       25  -120
+       55  -120
+       55   -70
+       25   -70
 
     Several masking polygons used by NCEP are predefined in the
     installed *share/met/poly* directory. Creating a new polygon is as
@@ -1582,7 +1596,8 @@ in the following ways:
     observation point falls within the polygon defined is done in x/y
     grid space.
 
-  * The NetCDF output of the gen_vx_mask tool.
+  * The NetCDF output of the gen_vx_mask tool. Please see :numref:`masking`
+    for more details.
 
   * Any gridded data file that MET can read may be used to define a
     verification masking region. Users must specify a description of the
@@ -1591,7 +1606,7 @@ in the following ways:
     applied, any grid point where the resulting field is 0, the mask is
     turned off. Any grid point where it is non-zero, the mask is turned
     on.
-    For example,  "sample.grib {name = \"TMP\"; level = \"Z2\";} >273"
+    For example, "sample.grib {name = \"TMP\"; level = \"Z2\";} >273"
 
 * The "sid" entry is an array of strings which define groups of
   observation station ID's over which to compute statistics. Each entry
@@ -2391,7 +2406,7 @@ are empty. Note: grib_code 11 is equivalent to obs_var "TMP".
 Settings specific to individual tools
 -------------------------------------
 
-EnsembleStatConfig_default
+GenEnsProdConfig_default
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ens
@@ -2485,6 +2500,64 @@ combination of the categorical threshold (cat_thresh), neighborhood width
         }
      ];
   }
+
+ensemble_flag
+"""""""""""""
+  
+The "ensemble_flag" entry is a dictionary of boolean value indicating
+which ensemble products should be generated:
+
+* "latlon" for a grid of the Latitude and Longitude fields
+
+* "mean" for the simple ensemble mean
+  
+* "stdev" for the ensemble standard deviation
+  
+* "minus" for the mean minus one standard deviation
+  
+* "plus" for the mean plus one standard deviation
+  
+* "min" for the ensemble minimum
+  
+* "max" for the ensemble maximum
+  
+* "range" for the range of ensemble values
+  
+* "vld_count" for the number of valid ensemble members
+  
+* "frequency" for the ensemble relative frequency meeting a threshold
+  
+* "nep" for the neighborhood ensemble probability
+  
+* "nmep" for the neighborhood maximum ensemble probability
+  
+* "rank" to write the rank for the gridded observation field to separate
+  NetCDF output file.
+  
+* "weight" to write the grid weights specified in grid_weight_flag to the
+  rank NetCDF output file.
+
+.. code-block:: none
+		
+  ensemble_flag = {
+    latlon     = TRUE;
+     mean      = TRUE;
+     stdev     = TRUE;
+     minus     = TRUE;
+     plus      = TRUE;
+     min       = TRUE;
+     max       = TRUE;
+     range     = TRUE;
+     vld_count = TRUE;
+     frequency = TRUE;
+     nep       = FALSE;
+     nmep      = FALSE;
+     rank      = TRUE;
+     weight    = FALSE;
+  }
+  
+EnsembleStatConfig_default
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 fcst, obs
 """""""""
@@ -2626,58 +2699,6 @@ levels, and range of values.
      inst_bias_offset = 0.0;     Instrument bias offset adjustment
      min              = NA;      Valid range of data
      max              = NA;
-  }
-
-ensemble_flag
-"""""""""""""
-  
-The "ensemble_flag" entry is a dictionary of boolean value indicating
-which ensemble products should be generated:
-
-* "mean" for the simple ensemble mean
-  
-* "stdev" for the ensemble standard deviation
-  
-* "minus" for the mean minus one standard deviation
-  
-* "plus" for the mean plus one standard deviation
-  
-* "min" for the ensemble minimum
-  
-* "max" for the ensemble maximum
-  
-* "range" for the range of ensemble values
-  
-* "vld_count" for the number of valid ensemble members
-  
-* "frequency" for the ensemble relative frequency meeting a threshold
-  
-* "nep" for the neighborhood ensemble probability
-  
-* "nmep" for the neighborhood maximum ensemble probability
-  
-* "rank" to write the rank for the gridded observation field to separate
-  NetCDF output file.
-  
-* "weight" to write the grid weights specified in grid_weight_flag to the
-  rank NetCDF output file.
-
-.. code-block:: none
-		
-  ensemble_flag = {
-     mean      = TRUE;
-     stdev     = TRUE;
-     minus     = TRUE;
-     plus      = TRUE;
-     min       = TRUE;
-     max       = TRUE;
-     range     = TRUE;
-     vld_count = TRUE;
-     frequency = TRUE;
-     nep       = FALSE;
-     nmep      = FALSE;
-     rank      = TRUE;
-     weight    = FALSE;
   }
 
 rng

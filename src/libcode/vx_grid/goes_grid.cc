@@ -1,5 +1,3 @@
-
-
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
@@ -7,8 +5,6 @@
 // ** Research Applications Lab (RAL)
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-
-
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -157,35 +153,6 @@ static const string method_name = "GoesImagerGrid::xy_to_latlon()";
 
 mlog << Error << "\n" << method_name << " -> "
      << "is not implemented.\n\n";
-     
-//if ( Has_SO2 )  {
-//
-//   x -= Data.x_pin;
-//   y -= Data.y_pin;
-//
-//   so2_reverse(x, y);
-//
-//   x += Data.x_pin;
-//   y += Data.y_pin;
-//
-//}
-//
-//double r, theta;
-//const double H = ( IsNorthHemisphere ? 1.0 : -1.0 );
-//
-//x = (x - Bx)/(H*Alpha);
-//y = (y - By)/(H*Alpha);
-//
-//r = sqrt( x*x + y*y );
-//
-//lat = lc_inv_func(r, Cone, IsNorthHemisphere);
-//
-//if ( fabs(r) < 1.0e-5 )  theta = 0.0;
-//else                     theta = atan2d(x, -y);   //  NOT atan2d(y, x);
-//
-//lon = Lon_orient - theta/(H*Cone);
-//
-//reduce(lon);
 
 return;
 
@@ -198,28 +165,12 @@ double GoesImagerGrid::calc_area(int x, int y) const
 
 {
 
-  static const string method_name = "GoesImagerGrid::calc_area()";
+static const string method_name = "GoesImagerGrid::calc_area()";
 
-//double u[4], v[4];
 double sum = 0;
 
 mlog << Error << "\n" << method_name << " -> "
      << "is not implemented.\n\n";
-
-// xy_to_uv(x - 0.5, y - 0.5, u[0], v[0]);  //  lower left
-// xy_to_uv(x + 0.5, y - 0.5, u[1], v[1]);  //  lower right
-// xy_to_uv(x + 0.5, y + 0.5, u[2], v[2]);  //  upper right
-// xy_to_uv(x - 0.5, y + 0.5, u[3], v[3]);  //  upper left
-
-//xy_to_uv(x      , y      , u[0], v[0]);  //  lower left
-//xy_to_uv(x + 1.0, y      , u[1], v[1]);  //  lower right
-//xy_to_uv(x + 1.0, y + 1.0, u[2], v[2]);  //  upper right
-//xy_to_uv(x      , y + 1.0, u[3], v[3]);  //  upper left
-//
-//
-//sum = uv_closedpolyline_area(u, v, 4);
-//
-//sum *= earth_radius_km*earth_radius_km;
 
 return ( sum );
 }
@@ -312,18 +263,6 @@ a << "Projection: GoesImager" << sep;
 
 a << "Nx: " << Nx << sep;
 a << "Ny: " << Ny;
-
-//snprintf(junk, sizeof(junk), " Lat_LL: %.3f", Lat_LL);   a << junk;
-//snprintf(junk, sizeof(junk), " Lon_LL: %.3f", Lon_LL);   a << junk;
-
-//snprintf(junk, sizeof(junk), " Lon_orient: %.3f", Lon_orient);   a << junk;
-
-//snprintf(junk, sizeof(junk), " Alpha: %.3f", Alpha);   a << junk;
-
-//snprintf(junk, sizeof(junk), " Cone: %.3f", Cone);   a << junk;
-
-//snprintf(junk, sizeof(junk), " Bx: %.4f", Bx);   a << junk;
-//snprintf(junk, sizeof(junk), " By: %.4f", By);   a << junk;
 
    //
    //  done
@@ -493,13 +432,13 @@ void GoesImagerData::compute_lat_lon()
                 mlog << Error << method_name << " index=" << index
                      << "  too big than " << buf_len << "\n";
             else {
-               if (isnan(lat_rad)) lat = bad_data_float;
+	       if (std::isnan(lat_rad)) lat = bad_data_float;
                else {
                   lat = lat_rad * deg_per_rad;
                   if (lat > lat_max) {lat_max = lat; idx_lat_max = index; }
                   if (lat < lat_min) {lat_min = lat; idx_lat_min = index; }
                }
-               if (isnan(lon_rad)) lon = bad_data_float;
+	       if (std::isnan(lon_rad)) lon = bad_data_float;
                else {
                   lon = lon_of_projection_origin - (lon_rad * deg_per_rad);
                   if (lon > lon_max) {lon_max = lon; idx_lon_max = index; }
@@ -594,7 +533,7 @@ void GoesImagerData::copy(const GoesImagerData *from)
 
 ////////////////////////////////////////////////////////////////////////
 
-void GoesImagerData::dump()
+void GoesImagerData::dump() const
 {
 
 mlog << Debug(4)
@@ -737,4 +676,3 @@ if ( !rep )  {
 
 
 ////////////////////////////////////////////////////////////////////////
-

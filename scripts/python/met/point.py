@@ -674,7 +674,7 @@ class met_point_tools():
                                      delim_whitespace=delim_whitespace,
                                      keep_default_na=keep_default_na,
                                      names=['typ', 'sid', 'vld', 'lat', 'lon', 'elv', 'var', 'lvl', 'hgt', 'qc', 'obs'],
-                                     dtype={'typ':'str', 'sid':'str', 'vld':'str', 'var':'str', 'qc':'str'}).values.tolist()
+                                     dtype={'typ':'string', 'sid':'string', 'vld':'string', 'var':'string', 'qc':'string'}).values.tolist()
       return ascii_point_data
 
 # Note: caller should import netCDF4
@@ -980,4 +980,4 @@ def main_nc(argv):
 
 if __name__ == '__main__':
    main()
-   print('Done python scripot')
+   print('Done python script')

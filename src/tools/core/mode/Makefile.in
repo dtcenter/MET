@@ -102,9 +102,9 @@ CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am_mode_OBJECTS = mode-mode_usage.$(OBJEXT) \
-	mode-mode_frontend.$(OBJEXT) mode-mode_multivar.$(OBJEXT) \
-	mode-mode_singlevar.$(OBJEXT) mode-multivar_frontend.$(OBJEXT) \
-	mode-mode.$(OBJEXT) mode-combine_boolplanes.$(OBJEXT) \
+	mode-mode_frontend.$(OBJEXT) mode-multivar_data.$(OBJEXT) \
+	mode-multivar_frontend.$(OBJEXT) mode-mode.$(OBJEXT) \
+	mode-combine_boolplanes.$(OBJEXT) \
 	mode-objects_from_netcdf.$(OBJEXT) mode-mode_ps_file.$(OBJEXT) \
 	mode-plot_engine.$(OBJEXT) mode-page_1.$(OBJEXT) \
 	mode-fcst_enlarge_page.$(OBJEXT) \
@@ -135,10 +135,9 @@ am__depfiles_remade = ./$(DEPDIR)/mode-cluster_page.Po \
 	./$(DEPDIR)/mode-fcst_enlarge_page.Po ./$(DEPDIR)/mode-mode.Po \
 	./$(DEPDIR)/mode-mode_exec.Po \
 	./$(DEPDIR)/mode-mode_frontend.Po \
-	./$(DEPDIR)/mode-mode_multivar.Po \
 	./$(DEPDIR)/mode-mode_ps_file.Po \
-	./$(DEPDIR)/mode-mode_singlevar.Po \
 	./$(DEPDIR)/mode-mode_usage.Po \
+	./$(DEPDIR)/mode-multivar_data.Po \
 	./$(DEPDIR)/mode-multivar_frontend.Po \
 	./$(DEPDIR)/mode-objects_from_netcdf.Po \
 	./$(DEPDIR)/mode-obs_enlarge_page.Po \
@@ -338,8 +337,7 @@ top_srcdir = @top_srcdir@
 MAINTAINERCLEANFILES = Makefile.in
 mode_SOURCES = mode_usage.cc \
 	mode_frontend.cc \
-	mode_multivar.cc \
-	mode_singlevar.cc \
+	multivar_data.cc \
 	multivar_frontend.cc \
 	mode.cc \
 	combine_boolplanes.cc \
@@ -378,6 +376,7 @@ mode_LDADD = -lvx_pxm \
 	-lvx_nc_util \
 	-lvx_regrid \
 	-lvx_grid \
+	-lvx_geodesy \
 	-lvx_config \
 	-lvx_bool_calc \
 	-lvx_cal \
@@ -487,10 +486,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mode-mode.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mode-mode_exec.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mode-mode_frontend.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mode-mode_multivar.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mode-mode_ps_file.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mode-mode_singlevar.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mode-mode_usage.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mode-multivar_data.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mode-multivar_frontend.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mode-objects_from_netcdf.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mode-obs_enlarge_page.Po@am__quote@ # am--include-marker
@@ -546,33 +544,19 @@ mode-mode_frontend.obj: mode_frontend.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(mode_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o mode-mode_frontend.obj `if test -f 'mode_frontend.cc'; then $(CYGPATH_W) 'mode_frontend.cc'; else $(CYGPATH_W) '$(srcdir)/mode_frontend.cc'; fi`
 
-mode-mode_multivar.o: mode_multivar.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(mode_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT mode-mode_multivar.o -MD -MP -MF $(DEPDIR)/mode-mode_multivar.Tpo -c -o mode-mode_multivar.o `test -f 'mode_multivar.cc' || echo '$(srcdir)/'`mode_multivar.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/mode-mode_multivar.Tpo $(DEPDIR)/mode-mode_multivar.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mode_multivar.cc' object='mode-mode_multivar.o' libtool=no @AMDEPBACKSLASH@
+mode-multivar_data.o: multivar_data.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(mode_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT mode-multivar_data.o -MD -MP -MF $(DEPDIR)/mode-multivar_data.Tpo -c -o mode-multivar_data.o `test -f 'multivar_data.cc' || echo '$(srcdir)/'`multivar_data.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/mode-multivar_data.Tpo $(DEPDIR)/mode-multivar_data.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='multivar_data.cc' object='mode-multivar_data.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(mode_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o mode-mode_multivar.o `test -f 'mode_multivar.cc' || echo '$(srcdir)/'`mode_multivar.cc
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(mode_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o mode-multivar_data.o `test -f 'multivar_data.cc' || echo '$(srcdir)/'`multivar_data.cc
 
-mode-mode_multivar.obj: mode_multivar.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(mode_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT mode-mode_multivar.obj -MD -MP -MF $(DEPDIR)/mode-mode_multivar.Tpo -c -o mode-mode_multivar.obj `if test -f 'mode_multivar.cc'; then $(CYGPATH_W) 'mode_multivar.cc'; else $(CYGPATH_W) '$(srcdir)/mode_multivar.cc'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/mode-mode_multivar.Tpo $(DEPDIR)/mode-mode_multivar.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mode_multivar.cc' object='mode-mode_multivar.obj' libtool=no @AMDEPBACKSLASH@
+mode-multivar_data.obj: multivar_data.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(mode_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT mode-multivar_data.obj -MD -MP -MF $(DEPDIR)/mode-multivar_data.Tpo -c -o mode-multivar_data.obj `if test -f 'multivar_data.cc'; then $(CYGPATH_W) 'multivar_data.cc'; else $(CYGPATH_W) '$(srcdir)/multivar_data.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/mode-multivar_data.Tpo $(DEPDIR)/mode-multivar_data.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='multivar_data.cc' object='mode-multivar_data.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(mode_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o mode-mode_multivar.obj `if test -f 'mode_multivar.cc'; then $(CYGPATH_W) 'mode_multivar.cc'; else $(CYGPATH_W) '$(srcdir)/mode_multivar.cc'; fi`
-
-mode-mode_singlevar.o: mode_singlevar.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(mode_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT mode-mode_singlevar.o -MD -MP -MF $(DEPDIR)/mode-mode_singlevar.Tpo -c -o mode-mode_singlevar.o `test -f 'mode_singlevar.cc' || echo '$(srcdir)/'`mode_singlevar.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/mode-mode_singlevar.Tpo $(DEPDIR)/mode-mode_singlevar.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mode_singlevar.cc' object='mode-mode_singlevar.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(mode_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o mode-mode_singlevar.o `test -f 'mode_singlevar.cc' || echo '$(srcdir)/'`mode_singlevar.cc
-
-mode-mode_singlevar.obj: mode_singlevar.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(mode_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT mode-mode_singlevar.obj -MD -MP -MF $(DEPDIR)/mode-mode_singlevar.Tpo -c -o mode-mode_singlevar.obj `if test -f 'mode_singlevar.cc'; then $(CYGPATH_W) 'mode_singlevar.cc'; else $(CYGPATH_W) '$(srcdir)/mode_singlevar.cc'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/mode-mode_singlevar.Tpo $(DEPDIR)/mode-mode_singlevar.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mode_singlevar.cc' object='mode-mode_singlevar.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(mode_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o mode-mode_singlevar.obj `if test -f 'mode_singlevar.cc'; then $(CYGPATH_W) 'mode_singlevar.cc'; else $(CYGPATH_W) '$(srcdir)/mode_singlevar.cc'; fi`
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(mode_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o mode-multivar_data.obj `if test -f 'multivar_data.cc'; then $(CYGPATH_W) 'multivar_data.cc'; else $(CYGPATH_W) '$(srcdir)/multivar_data.cc'; fi`
 
 mode-multivar_frontend.o: multivar_frontend.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(mode_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT mode-multivar_frontend.o -MD -MP -MF $(DEPDIR)/mode-multivar_frontend.Tpo -c -o mode-multivar_frontend.o `test -f 'multivar_frontend.cc' || echo '$(srcdir)/'`multivar_frontend.cc
@@ -876,10 +860,9 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/mode-mode.Po
 	-rm -f ./$(DEPDIR)/mode-mode_exec.Po
 	-rm -f ./$(DEPDIR)/mode-mode_frontend.Po
-	-rm -f ./$(DEPDIR)/mode-mode_multivar.Po
 	-rm -f ./$(DEPDIR)/mode-mode_ps_file.Po
-	-rm -f ./$(DEPDIR)/mode-mode_singlevar.Po
 	-rm -f ./$(DEPDIR)/mode-mode_usage.Po
+	-rm -f ./$(DEPDIR)/mode-multivar_data.Po
 	-rm -f ./$(DEPDIR)/mode-multivar_frontend.Po
 	-rm -f ./$(DEPDIR)/mode-objects_from_netcdf.Po
 	-rm -f ./$(DEPDIR)/mode-obs_enlarge_page.Po
@@ -937,10 +920,9 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/mode-mode.Po
 	-rm -f ./$(DEPDIR)/mode-mode_exec.Po
 	-rm -f ./$(DEPDIR)/mode-mode_frontend.Po
-	-rm -f ./$(DEPDIR)/mode-mode_multivar.Po
 	-rm -f ./$(DEPDIR)/mode-mode_ps_file.Po
-	-rm -f ./$(DEPDIR)/mode-mode_singlevar.Po
 	-rm -f ./$(DEPDIR)/mode-mode_usage.Po
+	-rm -f ./$(DEPDIR)/mode-multivar_data.Po
 	-rm -f ./$(DEPDIR)/mode-multivar_frontend.Po
 	-rm -f ./$(DEPDIR)/mode-objects_from_netcdf.Po
 	-rm -f ./$(DEPDIR)/mode-obs_enlarge_page.Po

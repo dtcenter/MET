@@ -111,6 +111,7 @@ am_libvx_grid_a_OBJECTS = libvx_grid_a-earth_rotation.$(OBJEXT) \
 	libvx_grid_a-find_grid_by_name.$(OBJEXT) \
 	libvx_grid_a-grid_base.$(OBJEXT) \
 	libvx_grid_a-latlon_grid.$(OBJEXT) \
+	libvx_grid_a-laea_grid.$(OBJEXT) \
 	libvx_grid_a-lc_grid.$(OBJEXT) \
 	libvx_grid_a-merc_grid.$(OBJEXT) \
 	libvx_grid_a-gaussian_grid.$(OBJEXT) \
@@ -141,6 +142,7 @@ am__depfiles_remade = ./$(DEPDIR)/libvx_grid_a-earth_rotation.Po \
 	./$(DEPDIR)/libvx_grid_a-gaussian_grid.Po \
 	./$(DEPDIR)/libvx_grid_a-goes_grid.Po \
 	./$(DEPDIR)/libvx_grid_a-grid_base.Po \
+	./$(DEPDIR)/libvx_grid_a-laea_grid.Po \
 	./$(DEPDIR)/libvx_grid_a-latlon_grid.Po \
 	./$(DEPDIR)/libvx_grid_a-latlon_xyz.Po \
 	./$(DEPDIR)/libvx_grid_a-lc_grid.Po \
@@ -362,6 +364,8 @@ libvx_grid_a_SOURCES = \
               grid_base.cc grid_base.h \
               latlon_grid_defs.h \
               latlon_grid.cc latlon_grid.h \
+              laea_grid_defs.h \
+              laea_grid.cc laea_grid.h \
               lc_grid_defs.h \
               lc_grid.cc lc_grid.h \
               merc_grid_defs.h \
@@ -433,6 +437,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_grid_a-gaussian_grid.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_grid_a-goes_grid.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_grid_a-grid_base.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_grid_a-laea_grid.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_grid_a-latlon_grid.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_grid_a-latlon_xyz.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_grid_a-lc_grid.Po@am__quote@ # am--include-marker
@@ -517,6 +522,20 @@ libvx_grid_a-latlon_grid.obj: latlon_grid.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='latlon_grid.cc' object='libvx_grid_a-latlon_grid.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_grid_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_grid_a-latlon_grid.obj `if test -f 'latlon_grid.cc'; then $(CYGPATH_W) 'latlon_grid.cc'; else $(CYGPATH_W) '$(srcdir)/latlon_grid.cc'; fi`
+
+libvx_grid_a-laea_grid.o: laea_grid.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_grid_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_grid_a-laea_grid.o -MD -MP -MF $(DEPDIR)/libvx_grid_a-laea_grid.Tpo -c -o libvx_grid_a-laea_grid.o `test -f 'laea_grid.cc' || echo '$(srcdir)/'`laea_grid.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvx_grid_a-laea_grid.Tpo $(DEPDIR)/libvx_grid_a-laea_grid.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='laea_grid.cc' object='libvx_grid_a-laea_grid.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_grid_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_grid_a-laea_grid.o `test -f 'laea_grid.cc' || echo '$(srcdir)/'`laea_grid.cc
+
+libvx_grid_a-laea_grid.obj: laea_grid.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_grid_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_grid_a-laea_grid.obj -MD -MP -MF $(DEPDIR)/libvx_grid_a-laea_grid.Tpo -c -o libvx_grid_a-laea_grid.obj `if test -f 'laea_grid.cc'; then $(CYGPATH_W) 'laea_grid.cc'; else $(CYGPATH_W) '$(srcdir)/laea_grid.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvx_grid_a-laea_grid.Tpo $(DEPDIR)/libvx_grid_a-laea_grid.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='laea_grid.cc' object='libvx_grid_a-laea_grid.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_grid_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_grid_a-laea_grid.obj `if test -f 'laea_grid.cc'; then $(CYGPATH_W) 'laea_grid.cc'; else $(CYGPATH_W) '$(srcdir)/laea_grid.cc'; fi`
 
 libvx_grid_a-lc_grid.o: lc_grid.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_grid_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_grid_a-lc_grid.o -MD -MP -MF $(DEPDIR)/libvx_grid_a-lc_grid.Tpo -c -o libvx_grid_a-lc_grid.o `test -f 'lc_grid.cc' || echo '$(srcdir)/'`lc_grid.cc
@@ -774,6 +793,7 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/libvx_grid_a-gaussian_grid.Po
 	-rm -f ./$(DEPDIR)/libvx_grid_a-goes_grid.Po
 	-rm -f ./$(DEPDIR)/libvx_grid_a-grid_base.Po
+	-rm -f ./$(DEPDIR)/libvx_grid_a-laea_grid.Po
 	-rm -f ./$(DEPDIR)/libvx_grid_a-latlon_grid.Po
 	-rm -f ./$(DEPDIR)/libvx_grid_a-latlon_xyz.Po
 	-rm -f ./$(DEPDIR)/libvx_grid_a-lc_grid.Po
@@ -832,6 +852,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/libvx_grid_a-gaussian_grid.Po
 	-rm -f ./$(DEPDIR)/libvx_grid_a-goes_grid.Po
 	-rm -f ./$(DEPDIR)/libvx_grid_a-grid_base.Po
+	-rm -f ./$(DEPDIR)/libvx_grid_a-laea_grid.Po
 	-rm -f ./$(DEPDIR)/libvx_grid_a-latlon_grid.Po
 	-rm -f ./$(DEPDIR)/libvx_grid_a-latlon_xyz.Po
 	-rm -f ./$(DEPDIR)/libvx_grid_a-lc_grid.Po

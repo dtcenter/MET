@@ -53,6 +53,7 @@ struct ConvData {
    int hgt, prep_use, anly_use, setup_qc;
    double err_in, err_adj, err_fin, qc_wght;
    int n_use;
+   ConvData &operator=(const ConvData &a) noexcept;
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -77,6 +78,7 @@ struct RadData {
    double obs_err, fcst_nobc, sfc_emis, stability;
    double prs_max_wgt;
    int n_use;
+   RadData &operator=(const RadData &a) noexcept;
 };
 
 ////////////////////////////////////////////////////////////////////////

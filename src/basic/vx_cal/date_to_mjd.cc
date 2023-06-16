@@ -12,15 +12,15 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
 #include <cmath>
 
 #include "vx_cal.h"
+
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -30,7 +30,9 @@ int date_to_mjd(int month, int day, int year)
 
 {
 
-int g, b, answer;
+int g;
+int b;
+int answer;
 
 
 b = (month - 14)/12;
@@ -42,7 +44,7 @@ b = month - 2 - 12*b;
 answer = (1461*(g - 100))/4 + (367*b)/12 - (3*(g/100))/4 + day - 2432076;
 
 
-return ( answer );
+return answer;
 
 }
 

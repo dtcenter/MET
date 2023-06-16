@@ -111,7 +111,7 @@ class ConcatString {
 
       const std::string & string() const;
 
-      const std::string contents(const char *str = 0) const;   //  returns str or "(nul)" if the string is empty
+      const std::string contents(const char *str = nullptr) const;   //  returns str or "(nul)" if the string is empty
 
       int length() const;   //  not including trailing nul
 
@@ -146,7 +146,7 @@ class ConcatString {
 
       void chomp(const char *);   //  removes trailing suffix, if possible
 
-      operator const std::string () const;
+      operator const std::string() const;
 
       bool startswith(const char *) const;
       bool   endswith(const char *) const;
@@ -192,20 +192,20 @@ class ConcatString {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline const char * ConcatString::text()          const { return ( s ? s->c_str() : 0); }
-inline const char * ConcatString::c_str()         const { return ( s ? s->c_str() : 0); }
+inline const char * ConcatString::text()          const { return ( s ? s->c_str() : nullptr); }
+inline const char * ConcatString::c_str()         const { return ( s ? s->c_str() : nullptr); }
 inline const std::string & ConcatString::string() const { return ( *s ); }
 
-inline int          ConcatString::length()       const { return ( (int) (s->length()) ); }
+inline int          ConcatString::length()       const { return (int) (s ? s->length() : 0); }
 
-inline int          ConcatString::precision()    const { return ( Precision ); }
+inline int          ConcatString::precision()    const { return Precision; }
 
-inline const char * ConcatString::float_format() const { return ( FloatFormat ); }
+inline const char * ConcatString::float_format() const { return FloatFormat; }
 
 inline bool         ConcatString::empty()        const { return ( s ?  s->empty() : true ); }
 inline bool         ConcatString::nonempty()     const { return ( s ? !s->empty() : false ); }
 
-inline              ConcatString::operator const std::string () const { return ( s ? *s : 0 ); }
+inline              ConcatString::operator const std::string () const { return ( s ? *s : nullptr ); }
 
 
 ////////////////////////////////////////////////////////////////////////

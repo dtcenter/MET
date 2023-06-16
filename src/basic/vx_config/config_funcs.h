@@ -81,13 +81,13 @@ class UserFunc_1Arg {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline ConcatString UserFunc_1Arg::name() const { return ( Name ); }
+inline ConcatString UserFunc_1Arg::name() const { return Name; }
 
-inline int UserFunc_1Arg::n_args() const { return ( NArgs ); }
+inline int UserFunc_1Arg::n_args() const { return NArgs; }
 
 inline bool UserFunc_1Arg::is_set() const { return ( NArgs >= 0 ); };
 
-inline const IcodeVector * UserFunc_1Arg::program() const { return ( &V ); }
+inline const IcodeVector * UserFunc_1Arg::program() const { return &V; }
 
 
 ////////////////////////////////////////////////////////////////////////

@@ -15,9 +15,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -25,6 +22,9 @@ using namespace std;
 #include <cmath>
 
 #include "idstack.h"
+
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -84,11 +84,11 @@ Identifier & Identifier::operator=(const Identifier & i)
 
 {
 
-if ( this == &i )  return ( * this );
+if ( this == &i )  return *this;
 
 assign(i);
 
-return ( * this );
+return *this;
 
 }
 
@@ -220,11 +220,11 @@ IdentifierQueue & IdentifierQueue::operator=(const IdentifierQueue & iq)
 
 {
 
-if ( this == &iq )  return ( * this );
+if ( this == &iq )  return *this;
 
 assign(iq);
 
-return ( * this );
+return *this;
 
 }
 
@@ -252,9 +252,7 @@ void IdentifierQueue::clear()
 
 {
 
-int j;
-
-for (j=0; j<max_id_queue_size; ++j)  {
+for (int j=0; j<max_id_queue_size; ++j)  {
 
    if ( i[j] )  {  delete i[j];  i[j] = (Identifier *) 0; }
 
@@ -278,11 +276,9 @@ clear();
 
 if ( iq.Nelements == 0 )  return;
 
-int j;
-
 Nelements = iq.Nelements;
 
-for (j=0; j<Nelements; ++j)  {
+for (int j=0; j<Nelements; ++j)  {
 
    i[j] = new Identifier;
 
@@ -342,9 +338,7 @@ Identifier id;
 
 id = *(i[0]);
 
-int j;
-
-for (j=1; j<Nelements; ++j)  {
+for (int j=1; j<Nelements; ++j)  {
 
    i[j - 1] = i[j];
 
@@ -354,7 +348,7 @@ i[Nelements - 1] = (Identifier *) 0;
 
 --Nelements;
 
-return ( id );
+return id;
 
 }
 
@@ -414,11 +408,11 @@ IdentifierArray & IdentifierArray::operator=(const IdentifierArray & a)
 
 {
 
-if ( this == &a )  return ( * this );
+if ( this == &a )  return *this;
 
 assign(a);
 
-return ( * this );
+return *this;
 
 }
 
@@ -448,9 +442,7 @@ void IdentifierArray::clear()
 
 {
 
-int j;
-
-for (j=0; j<Nalloc; ++j)  {
+for (int j=0; j<Nalloc; ++j)  {
 
    i[j].clear();
 
@@ -472,13 +464,11 @@ void IdentifierArray::assign(const IdentifierArray & a)
 
 clear();
 
-int j;
-
 if (a.Nelements > Nalloc) extend(a.Nelements);
 
 Nelements = a.Nelements;
 
-for (j=0; j<Nelements; ++j)  i[j] = a.i[j];
+for (int j=0; j<Nelements; ++j)  i[j] = a.i[j];
 
 
 return;
@@ -495,7 +485,7 @@ void IdentifierArray::extend(int n)
 
 if ( Nalloc > n )  return;
 
-int j, k;
+int k;
 Identifier * inew = (Identifier *) 0;
 
 
@@ -515,7 +505,7 @@ if ( !inew )  {
 
 }
 
-for (j=0; j<Nelements; ++j)  inew[j] = i[j];
+for (int j=0; j<Nelements; ++j)  inew[j] = i[j];
 
 if ( i )  { delete [] i;  i = (Identifier *) 0; }
 
@@ -544,7 +534,7 @@ if ( (k < 0) || (k >= Nelements) )  {
 }
 
 
-return ( i[k] );
+return i[k];
 
 }
 
@@ -572,13 +562,12 @@ void IdentifierArray::dump(ostream & out, int indent_depth) const
 
 {
 
-int j;
 Indent prefix(indent_depth);
 
 
 out << prefix << "Nelements = " << Nelements << "\n";
 
-for (j=0; j<Nelements; ++j)  {
+for (int j=0; j<Nelements; ++j)  {
 
    out << "Element # " << j << " ...\n";
 
@@ -604,17 +593,15 @@ bool IdentifierArray::has(const char * text) const
 
 {
 
-int j;
+for (int j=0; j<Nelements; ++j)  {
 
-for (j=0; j<Nelements; ++j)  {
-
-   if ( i[j].name.compare(text) == 0 )  return ( true );
+   if ( i[j].name.compare(text) == 0 )  return true;
 
 }
 
 
 
-return ( false );
+return false;
 
 }
 
@@ -626,19 +613,17 @@ bool IdentifierArray::has(const char * text, int & index) const
 
 {
 
-int j;
-
 index = -1;
 
-for (j=0; j<Nelements; ++j)  {
+for (int j=0; j<Nelements; ++j)  {
 
-   if ( i[j].name.compare(text) == 0 )  { index = j;   return ( true ); }
+   if ( i[j].name.compare(text) == 0 )  { index = j;   return true; }
 
 }
 
 
 
-return ( false );
+return false;
 
 }
 

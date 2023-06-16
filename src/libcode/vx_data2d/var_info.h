@@ -105,6 +105,7 @@ class VarInfo
       virtual GrdFileType  file_type() const = 0;
 
       ConcatString magic_str()      const;
+      ConcatString magic_time_str() const;
       ConcatString req_name()       const;
       ConcatString name()           const;
       ConcatString units()          const;
@@ -262,6 +263,7 @@ struct InputInfo {
    int file_index;             // Index in file_list of file to read
    StringArray * file_list;    // Array of files (unallocated)
    ConcatString ens_member_id; // MET_ENS_MEMBER_ID string
+   InputInfo  &operator=(const InputInfo &a) noexcept;
 };
 
 ////////////////////////////////////////////////////////////////////////

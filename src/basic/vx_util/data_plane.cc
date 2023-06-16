@@ -22,6 +22,8 @@
 
 using namespace std;
 
+#include <algorithm>
+
 #include "data_plane.h"
 
 #include "vx_log.h"
@@ -113,6 +115,26 @@ DataPlane & DataPlane::operator/=(const double v) {
    return(*this);
 }
 
+bool DataPlane::operator==(const DataPlane &d) const {
+
+   const char *method_name = "DataPlane::operator==(const DataPlane &) -> ";
+
+   // don't check times, only data
+   
+   // Check for matching dimensions
+   if(Nx != d.Nx || Ny != d.Ny) {
+      return false;
+   }
+
+   for(int i=0; i<Nxy; i++) {
+      if (Data[i] != d.Data[i]) {
+         return false;
+      }
+   }
+
+   return true;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 void DataPlane::init_from_scratch() {
@@ -202,6 +224,63 @@ void DataPlane::dump(ostream & out, int depth) const {
    out.flush();
 
    return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void DataPlane::debug_examine(bool show_all_values) const {
+
+   vector<double> values;
+   vector<int> count;
+   int total_count = 0;
+   
+   for (int x=0; x<Nx; ++x) {
+      for (int y=0; y<Ny; ++y) {
+         double v = get(x,y);
+         if (v <= 0) {
+            continue;
+         }
+         ++total_count;
+         if (show_all_values) {
+            vector<double>::iterator vi;
+            vi = find(values.begin(), values.end(), v);
+            if (vi == values.end()) {
+               values.push_back(v);
+               count.push_back(1);
+            } else {
+               int ii = vi - values.begin();
+               count[ii] = count[ii] + 1;
+            }
+         }
+      }
+   }
+   if (show_all_values) {
+      for (size_t i=0; i<values.size(); ++i) {
+         mlog << Debug(4) << " data value=" << values[i] << " count=" << count[i] << "\n";
+      }
+   }
+   mlog << Debug(4) << "Total count = " << total_count << "\n";
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+string DataPlane::sdebug_examine() const{
+
+   int total_count = 0;
+   
+   for (int x=0; x<Nx; ++x) {
+      for (int y=0; y<Ny; ++y) {
+         double v = get(x,y);
+         if (v <= 0) {
+            continue;
+         }
+         ++total_count;
+      }
+   }
+   char buf[1000];
+   sprintf(buf, "Total count = %d", total_count);
+   string retval = buf;
+   return retval;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -318,6 +397,24 @@ void DataPlane::set_lead(int s) {
 void DataPlane::set_accum(int s) {
    AccumTime = s;
    return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void DataPlane::set_all(float *data, int nx, int ny) {
+   if (nx != Nx || ny != Ny) {
+      mlog << Error << "\nDataPlane::set_all() -> "
+           << "the data dimensions do not match: ("
+           << Nx << ", " << Ny << ") != ("
+           << nx << ", " << ny << ")!\n\n";
+      exit(1);
+   }
+   for (int x=0; x<nx; ++x) {
+      for (int y=0; y<ny; ++y) {
+         int index = two_to_one(x, y);
+         Data[index] = data[index];
+      }
+   }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -516,6 +613,17 @@ void DataPlane::replace_bad_data(const double value) {
 
    return;
 }
+
+///////////////////////////////////////////////////////////////////////////////
+
+void DataPlane::set_all_to_bad_data() {
+
+   for(int i=0; i<Nxy; i++) {
+      Data[i] = bad_data_double;
+   }
+   return;
+
+}   
 
 ///////////////////////////////////////////////////////////////////////////////
 

@@ -490,6 +490,44 @@
   </test>
 
   <!--                                                                  -->
+  <!-- SHAPE: shapefile masking using multiple shapes and metadata      -->
+  <!--        demonstrate case-insensitivity for -shape_str arguments   -->
+  <!--                                                                  -->
+
+  <test name="gen_vx_mask_SHAPE_STR">
+    <exec>&MET_BIN;/gen_vx_mask</exec>
+    <param> \
+      'latlon 360 361 -90 -130 0.5 0.5' \
+      &INPUT_DIR;/shapefile/ne_110m_admin_0_countries/ne_110m_admin_0_countries.shp \
+      &OUTPUT_DIR;/gen_vx_mask/South_America_mask.nc \
+      -type shape -shape_str Continent 'south america' \
+      -name South_America -v 2
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/gen_vx_mask/South_America_mask.nc</grid_nc>
+    </output>
+  </test>
+
+  <!--                                                                  -->
+  <!-- SHAPE: shapefile masking with multiple -shape_str options        -->
+  <!--        use gen_vx_mask output as input and with -value           -->
+  <!--                                                                  -->
+
+  <test name="gen_vx_mask_SHAPE_STR_MULTI">
+    <exec>&MET_BIN;/gen_vx_mask</exec>
+    <param> \
+      &OUTPUT_DIR;/gen_vx_mask/South_America_mask.nc \
+      &INPUT_DIR;/shapefile/ne_110m_admin_0_countries/ne_110m_admin_0_countries.shp \
+      &OUTPUT_DIR;/gen_vx_mask/South_America_Spain_Portugal_mask.nc \
+      -type shape -shape_str CONTINENT Europe -shape_str Name Spain,Portugal \
+      -name South_America_Spain_Portugal -value 2
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/gen_vx_mask/South_America_Spain_Portugal_mask.nc</grid_nc>
+    </output>
+  </test>
+
+  <!--                                                                  -->
   <!-- PYTHON: python embedding                                         -->
   <!--                                                                  -->
 

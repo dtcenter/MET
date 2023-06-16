@@ -323,6 +323,39 @@ static const int n_ncep_gaussian_grids = sizeof(ncep_gaussian_grids)/sizeof(*nce
 ////////////////////////////////////////////////////////////////////////
 
 
+   //
+   //  Lambert Azimuthal Equal Area grids
+   //
+
+
+static const LaeaGrib2Data misc_laea_grids [] = {
+
+   // { "EUMETNET", "WGS_84", 31.7462, 10.4346, 67.0228, 39.5358, 31.9877, -29.421, 55.0, -10.0, 1900, 2200 },
+
+};
+
+static const int n_misc_laea_grids = sizeof(misc_laea_grids)/sizeof(*misc_laea_grids);
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+   //
+   //  Grib2 Lambert Azimuthal Equal Area grids
+   //
+
+
+static const LaeaGrib2Data misc_laea_grib2_grids [] = {
+
+   { "UKV", "Grib template 4", 0.0, 0.5*6378.1370, 0.5*6356.752314, 44.5172, 17.1171, 54.9, 2.5, 2.0, 2.0, 1042, 970, false }
+
+};
+
+static const int n_misc_laea_grib2_grids = sizeof(misc_laea_grib2_grids)/sizeof(*misc_laea_grib2_grids);
+
+////////////////////////////////////////////////////////////////////////
+
+
 #endif   /*  __GRID_FIND_GRID_BY_NAME_H__  */
 
 

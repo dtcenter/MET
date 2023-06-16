@@ -18,6 +18,7 @@
 //   001   05/15/20  Halley Gotway   Fix data file list option logic.
 //   002   07/06/22  Howard Soh      METplus-Internal #19 Rename main to met_main
 //   003   09/28/22  Prestopnik      MET #2227 Remove namspace std and netCDF from header files
+//   004   04/26/23  Halley Gotway   MET #2523 Reorder NetCDF dimensions
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -168,7 +169,7 @@ void process_command_line(int argc, char **argv) {
     // Add function calls for arguments
     cline.add(set_data_files, "-data",   -1);
     cline.add(set_deck,       "-deck",   -1);
-    // Queitly support -adeck option for backward compatibility with met-9.0
+    // Quietly support -adeck option for backward compatibility with met-9.0
     cline.add(set_deck,       "-adeck",  -1);
     cline.add(set_config,     "-config",  1);
     cline.add(set_out,        "-out",     1);
@@ -282,7 +283,9 @@ void process_tracks(TrackInfoArray& tracks) {
 
     process_track_files(files, files_model_suffix, tracks);
 
-    write_tc_tracks(nc_out, track_point_dim, tracks);
+    write_tc_track_lines  (nc_out, tracks[0]);
+    write_tc_track_lat_lon(nc_out, track_point_dim, tracks[0]);
+    write_tc_rmw          (nc_out, track_point_dim, tracks[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -575,35 +578,44 @@ void setup_nc_file() {
          << ", Azimuth = " << tcrmw_grid.azimuth_n() << "\n";
 
     // Define dimensions
+    track_point_dim = add_dim(nc_out, "track_point", NC_UNLIMITED);
     range_dim = add_dim(nc_out, "range", (long) tcrmw_grid.range_n());
     azimuth_dim = add_dim(nc_out, "azimuth", (long) tcrmw_grid.azimuth_n());
-    track_point_dim = add_dim(nc_out, "track_point", NC_UNLIMITED);
+
+    // Define init, lead, and valid time variables
+    def_tc_init_time(nc_out,
+        init_time_str_var, init_time_ut_var);
+    def_tc_valid_time(nc_out, track_point_dim,
+        valid_time_str_var, valid_time_ut_var);
+    def_tc_lead_time(nc_out, track_point_dim,
+        lead_time_str_var, lead_time_sec_var);
 
     // Define range and azimuth dimensions
     def_tc_range_azimuth(nc_out, range_dim, azimuth_dim, tcrmw_grid,
         conf_info.rmw_scale);
 
     // Define latitude and longitude arrays
-    def_tc_lat_lon_time(nc_out, range_dim, azimuth_dim,
-        track_point_dim, lat_arr_var, lon_arr_var, valid_time_var);
+    def_tc_lat_lon(nc_out,
+        track_point_dim, range_dim, azimuth_dim,
+        lat_arr_var, lon_arr_var);
 
     // Find all variable levels, long names, and units
     for(int i_var = 0; i_var < conf_info.get_n_data(); i_var++) {
         // Get VarInfo
         data_info = conf_info.data_info[i_var];
         mlog << Debug(4) << "Processing field: " << data_info->magic_str() << "\n";
-	string fname = data_info->name_attr();
+	     string fname = data_info->name_attr();
         variable_levels[fname].push_back(data_info->level_attr());
         variable_long_names[fname] = data_info->long_name_attr();
         variable_units[fname] = data_info->units_attr();
-	wind_converter.update_input(fname, data_info->units_attr());
+	     wind_converter.update_input(fname, data_info->units_attr());
     }
 
     // Define pressure levels
     pressure_level_strings = get_pressure_level_strings(variable_levels);
     pressure_levels = get_pressure_levels(pressure_level_strings);
-    pressure_level_indices
-        = get_pressure_level_indices(pressure_level_strings, pressure_levels);
+    pressure_level_indices =
+        get_pressure_level_indices(pressure_level_strings, pressure_levels);
     pressure_dim = add_dim(nc_out, "pressure", pressure_levels.size());
     def_tc_pressure(nc_out, pressure_dim, pressure_levels);
 
@@ -611,7 +623,7 @@ void setup_nc_file() {
 
     def_tc_variables(nc_out,
         variable_levels, variable_long_names, variable_units,
-        range_dim, azimuth_dim, pressure_dim, track_point_dim,
+        track_point_dim, pressure_dim, range_dim, azimuth_dim,
         data_3d_vars);
 }
 
@@ -628,7 +640,7 @@ void compute_lat_lon(TcrmwGrid& tcrmw_grid,
             tcrmw_grid.range_azi_to_latlon(
                 ir * tcrmw_grid.range_delta_km(),
                 ia * tcrmw_grid.azimuth_delta_deg(),
-                    lat, lon);
+                lat, lon);
             lat_arr[i] = lat;
             lon_arr[i] = - lon;
         }
@@ -638,7 +650,6 @@ void compute_lat_lon(TcrmwGrid& tcrmw_grid,
 ////////////////////////////////////////////////////////////////////////
 
 void process_fields(const TrackInfoArray& tracks) {
-
     VarInfo *data_info = (VarInfo *) 0;
     DataPlane data_dp;
 
@@ -654,12 +665,16 @@ void process_fields(const TrackInfoArray& tracks) {
     mlog << Debug(2) << "Processing 1 track consisting of "
          << track.n_points() << " points.\n";
 
+    // Write the track initialization time
+    write_tc_init_time(nc_out,
+        init_time_str_var, init_time_ut_var,
+        track.init());
+
     // Loop over track points
     for (int i_point = 0; i_point < track.n_points(); i_point++) {
 
         TrackPoint point = track[i_point];
         unixtime valid_time = point.valid();
-        long valid_yyyymmddhh = unix_to_long_yyyymmddhh(valid_time);
 
         mlog << Debug(3) << "[" << i_point+1 << " of "
              << track.n_points()  << "] Processing track point valid at "
@@ -686,23 +701,26 @@ void process_fields(const TrackInfoArray& tracks) {
         write_tc_data(nc_out, tcrmw_grid, i_point, lat_arr_var, lat_arr);
         write_tc_data(nc_out, tcrmw_grid, i_point, lon_arr_var, lon_arr);
 
-        // Write valid time
+        // Write valid and lead times
         write_tc_valid_time(nc_out, i_point,
-            valid_time_var, valid_yyyymmddhh);
+            valid_time_str_var, valid_time_ut_var,
+            valid_time);
+        write_tc_lead_time(nc_out, i_point,
+            lead_time_str_var, lead_time_sec_var,
+            point.lead());
 
         for(int i_var = 0; i_var < conf_info.get_n_data(); i_var++) {
 
             // Update the variable info with the valid time of the track point
             data_info = conf_info.data_info[i_var];
 
-	    string sname = data_info->name_attr().string();
-	    string slevel = data_info->level_attr().string();
+            string sname = data_info->name_attr().string();
+            string slevel = data_info->level_attr().string();
 
-	    data_info->set_valid(valid_time);
+            data_info->set_valid(valid_time);
 
             // Find data for this track point
-            get_series_entry(i_point, data_info, data_files, ftype, data_dp,
-                             latlon_arr);
+            get_series_entry(i_point, data_info, data_files, ftype, data_dp, latlon_arr);
 
             // Check data range
             double data_min, data_max;
@@ -711,32 +729,31 @@ void process_fields(const TrackInfoArray& tracks) {
             mlog << Debug(4) << "data_max:" << data_max << "\n";
 
             // Regrid data
-            data_dp = met_regrid(data_dp,
-				 latlon_arr, grid, data_info->regrid());
-	    data_dp.data_range(data_min, data_max);
+            data_dp = met_regrid(data_dp, latlon_arr, grid, data_info->regrid());
+            data_dp.data_range(data_min, data_max);
             mlog << Debug(4) << "data_min:" << data_min << "\n";
             mlog << Debug(4) << "data_max:" << data_max << "\n";
 
-	    // if this is "U", setup everything for matching "V" and compute the radial/tangential
-	    if (wind_converter.compute_winds_if_input_is_u(i_point, sname, slevel, valid_time, data_files, ftype,
-							   latlon_arr, lat_arr, lon_arr, grid, data_dp, tcrmw_grid))
-	    {
-	      write_tc_pressure_level_data(nc_out, tcrmw_grid,
-					   pressure_level_indices, data_info->level_attr(), i_point,
-					   data_3d_vars[conf_info.radial_velocity_field_name.string()],
-					   wind_converter.get_wind_r_arr());
-	      write_tc_pressure_level_data(nc_out, tcrmw_grid,
-					   pressure_level_indices, data_info->level_attr(), i_point,
-					   data_3d_vars[conf_info.tangential_velocity_field_name.string()],
-					   wind_converter.get_wind_t_arr());
-	    }
+	         // if this is "U", setup everything for matching "V" and compute the radial/tangential
+	         if(wind_converter.compute_winds_if_input_is_u(i_point, sname, slevel, valid_time, data_files, ftype,
+                   latlon_arr, lat_arr, lon_arr, grid, data_dp, tcrmw_grid)) {
+                write_tc_pressure_level_data(nc_out, tcrmw_grid,
+                    pressure_level_indices, data_info->level_attr(), i_point,
+					     data_3d_vars[conf_info.radial_velocity_field_name.string()],
+					     wind_converter.get_wind_r_arr());
+	             write_tc_pressure_level_data(nc_out, tcrmw_grid,
+					     pressure_level_indices, data_info->level_attr(), i_point,
+					     data_3d_vars[conf_info.tangential_velocity_field_name.string()],
+					     wind_converter.get_wind_t_arr());
+            }
 	    
             // Write data
-            if (variable_levels[data_info->name_attr()].size() > 1) {
+            if(variable_levels[data_info->name_attr()].size() > 1) {
                 write_tc_pressure_level_data(nc_out, tcrmw_grid,
                     pressure_level_indices, data_info->level_attr(),
                     i_point, data_3d_vars[data_info->name_attr()], data_dp.data());
-            } else {
+            }
+            else {
                 write_tc_data_rev(nc_out, tcrmw_grid, i_point,
                     data_3d_vars[data_info->name_attr()], data_dp.data());
             }

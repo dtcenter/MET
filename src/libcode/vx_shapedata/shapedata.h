@@ -26,6 +26,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <map>
+#include <string>
 
 #include "moments.h"
 #include "vx_util.h"
@@ -105,6 +106,10 @@ class ShapeData {
       bool is_zero    (int x, int y) const;
       bool is_nonzero (int x, int y) const;
 
+      void debug_examine() const;
+      std::string sdebug_examine() const;
+
+
          //
          //  check if a point or it's neighbors are non-zero
          //
@@ -161,6 +166,7 @@ class ShapeData {
 
       int  n_objects() const;
 
+      void set_to_1_or_0() ;
       void threshold(double t);
       void threshold(SingleThresh);
       void threshold_attr(const std::map<ConcatString,ThreshArray>&,
@@ -187,6 +193,9 @@ inline bool ShapeData::is_bad_data (int x, int y) const { return (   ::is_bad_da
 
 inline bool ShapeData::is_zero    (int x, int y) const { return (   is_eq(data(x, y), 0.0) ); }
 inline bool ShapeData::is_nonzero (int x, int y) const { return ( ! is_eq(data(x, y), 0.0) ); }
+
+inline void ShapeData::debug_examine() const { data.debug_examine(); }
+inline std::string ShapeData::sdebug_examine() const { return data.sdebug_examine(); }
 
 
 ///////////////////////////////////////////////////////////////////////////////

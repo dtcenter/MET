@@ -26,8 +26,8 @@ extern void parse_row_col(const char *, int &, int &);
 
 ////////////////////////////////////////////////////////////////////////
 
-extern void open_txt_file (ofstream *&,  const char *);
-extern void close_txt_file(ofstream *&,  const char *);
+extern void open_txt_file (std::ofstream *&,  const char *);
+extern void close_txt_file(std::ofstream *&,  const char *);
 
 ////////////////////////////////////////////////////////////////////////
 

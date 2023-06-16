@@ -1596,7 +1596,7 @@ void compute_aggregated_seeps_grid(const DataPlane &fcst_dp, const DataPlane &ob
                   else count_diagonal++;
                }
                seeps_score = seeps_mpr->score;
-               if (isnan(seeps_score)) {
+               if (std::isnan(seeps_score)) {
                   nan_count++;
                   seeps_score = bad_data_double;
                }

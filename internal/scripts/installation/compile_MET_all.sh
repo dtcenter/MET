@@ -6,11 +6,19 @@
 #
 # This compile_MET_all.sh script expects certain environment
 # variables to be set:
-# TEST_BASE, COMPILER, MET_SUBDIR, MET_TARBALL,
-# and USE_MODULES.
+# TEST_BASE, COMPILER (or COMPILER_FAMILY and COMPILER_VERSION),
+# MET_SUBDIR, MET_TARBALL, and USE_MODULES.
 #
 # If compiling support for Python embedding, users will need to
 # set MET_PYTHON, MET_PYTHON_BIN_EXE, MET_PYTHON_CC, and MET_PYTHON_LD.
+# Users can directly set the python module to be loaded by setting
+# either PYTHON_MODULE or by setting PYTHON_NAME and PYTHON_VERSION:
+# - PYTHON_MODULE (only used if USE_MODULES=TRUE) - format is the name
+#   of the Python module to load followed by an underscore and then the
+#   version number (e.g. python_3.8.6, The script will then run "module
+#   load python/3.8.6")
+# - PYTHON_NAME = python (or e.g. python3, etc.)
+# - PYTHON_VERSION = 3.8.6
 #
 # For a description of these and other variables, visit the MET
 # downloads page under "Sample Script For Compiling External
@@ -83,11 +91,15 @@ fi
 
 echo
 echo "TEST_BASE = ${TEST_BASE? "ERROR: TEST_BASE must be set"}"
-echo "COMPILER  = ${COMPILER?  "ERROR: COMPILER must be set"}"
 echo "MET_SUBDIR = ${MET_SUBDIR? "ERROR: MET_SUBDIR must be set"}"
 echo "MET_TARBALL = ${MET_TARBALL? "ERROR: MET_TARBALL must be set"}"
 echo "USE_MODULES = ${USE_MODULES? "ERROR: USE_MODULES must be set to TRUE if using modules or FALSE otherwise"}"
+if [[ -z "$COMPILER" ]] && [[ -z "$COMPILER_FAMILY" && -z "$COMPILER_VERSION" ]]; then
+   echo "ERROR: COMPILER or COMPILER_FAMILY and COMPILER_VERSION must be set"
+   exit 1
+fi
 echo ${MAKE_ARGS:+MAKE_ARGS = $MAKE_ARGS}
+
 
 LIB_DIR=${TEST_BASE}/external_libs
 MET_DIR=${MET_SUBDIR}
@@ -118,8 +130,15 @@ if [ ! -e $TAR_DIR ]; then
   exit 1
 fi
 
-# Update library linker path
-export LD_LIBRARY_PATH=${TEST_BASE}/external_libs/lib${MET_PYTHON:+:$MET_PYTHON/lib}${MET_NETCDF:+:$MET_NETCDF/lib}${MET_HDF5:+:$MET_HDF5/lib}${MET_BUFRLIB:+:$MET_BUFRLIB}${MET_GRIB2CLIB:+:$MET_GRIB2CLIB}${LIB_JASPER:+:$LIB_JASPER}${LIB_LIBPNG:+:$LIB_LIBPNG}${LIB_Z:+:$LIB_Z}${MET_GSL:+:$MET_GSL/lib}${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
+# If MET_PYTHON_LIB is not set in the environment file, set it to the
+# lib directory so it can be use to install MET with Python Embedding
+# support
+if [[ -z "$MET_PYTHON_LIB" ]]; then
+  MET_PYTHON_LIB=${MET_PYTHON}/lib
+fi
+
+
+# Print library linker path
 echo "LD_LIBRARY_PATH = ${LD_LIBRARY_PATH}"
 
 # if LIB_Z is not set in the environment file, set it to the
@@ -245,8 +264,17 @@ if [ ! -e ${LIB_DIR}/lib ]; then
 fi
 
 # Load compiler version
-COMPILER_FAMILY=` echo $COMPILER | cut -d'_' -f1`
-COMPILER_VERSION=`echo $COMPILER | cut -d'_' -f2`
+if [ -z ${COMPILER_FAMILY} ]; then
+  COMPILER_FAMILY=` echo $COMPILER | cut -d'_' -f1`
+fi
+ 
+if [ -z ${COMPILER_VERSION} ]; then
+  COMPILER_VERSION=`echo $COMPILER | cut -d'_' -f2`
+fi
+
+echo "COMPILER = $COMPILER"
+echo "COMPILER_FAMILY = $COMPILER_FAMILY"
+echo "COMPILER_VERSION = $COMPILER_VERSION"
 COMPILER_MAJOR_VERSION=`echo $COMPILER_VERSION | cut -d'.' -f1`
 
 echo
@@ -262,6 +290,12 @@ if [ ${USE_MODULES} = "TRUE" ]; then
     module load craype
     module switch craype craype-sandybridge
   fi
+fi
+
+# After loading the compiler module, strip any extra
+# characters off of "gnu" (e.g. "gnu9")
+if [[ ${COMPILER_FAMILY} == *gnu* ]]; then
+    export COMPILER_FAMILY="gnu"
 fi
 
 if [ ${COMPILER_FAMILY} = "gnu" ]; then
@@ -307,8 +341,13 @@ echo
 
 if [ ${USE_MODULES} = "TRUE" ]; then
   if [ ! -z ${PYTHON_MODULE} ]; then
-    PYTHON_NAME=` echo $PYTHON_MODULE | cut -d'_' -f1`
+    PYTHON_NAME=`echo $PYTHON_MODULE | cut -d'_' -f1`
     PYTHON_VERSION_NUM=`echo $PYTHON_MODULE | cut -d'_' -f2`
+    echo "module load ${PYTHON_NAME}/${PYTHON_VERSION_NUM}"
+    echo ${PYTHON_NAME}/${PYTHON_VERSION_NUM}
+    module load ${PYTHON_NAME}/${PYTHON_VERSION_NUM}
+  # Allow the user to specify the name and version of the module to load
+  elif [[ ! -z ${PYTHON_NAME} && ! -z ${PYTHON_VERSION_NUM} ]]; then
     echo "module load ${PYTHON_NAME}/${PYTHON_VERSION_NUM}"
     echo ${PYTHON_NAME}/${PYTHON_VERSION_NUM}
     module load ${PYTHON_NAME}/${PYTHON_VERSION_NUM}
@@ -336,9 +375,9 @@ if [ $COMPILE_GSL -eq 1 ]; then
   tar -xf ${TAR_DIR}/gsl-${vrs}.tar.gz -C ${LIB_DIR}/gsl
   cd ${LIB_DIR}/gsl/gsl*
   echo "cd `pwd`"
-  run_cmd "./configure --prefix=${LIB_DIR} > configure.log 2>&1"
-  run_cmd "make ${MAKE_ARGS} > make.log 2>&1"
-  run_cmd "make ${MAKE_ARGS} install > make_install.log 2>&1"
+  run_cmd "./configure --prefix=${LIB_DIR} > gsl.configure.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} > gsl.make.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} install > gsl.make_install.log 2>&1"
 fi
 
 # Compile BUFRLIB
@@ -359,17 +398,17 @@ if [ $COMPILE_BUFRLIB -eq 1 ]; then
   # For GNU and Intel follow BUFRLIB11 instructions
   if [[ ${COMPILER_FAMILY} == "gnu" ]]; then
     if [[ ${COMPILER_MAJOR_VERSION} -ge 10 ]]; then
-      ${FC} -c -fno-second-underscore -fallow-argument-mismatch `./getdefflags_F.sh` modv*.F moda*.F `ls -1 *.F *.f | grep -v "mod[av]_"` >> make.log 2>&1
+      ${FC} -c -fno-second-underscore -fallow-argument-mismatch `./getdefflags_F.sh` modv*.F moda*.F `ls -1 *.F *.f | grep -v "mod[av]_"` >> bufr.make.log 2>&1
     elif [[ ${COMPILER_MAJOR_VERSION} -lt 10 ]]; then
-      ${FC} -c -fno-second-underscore -Wno-argument-mismatch `./getdefflags_F.sh` modv*.F moda*.F `ls -1 *.F *.f | grep -v "mod[av]_"` >> make.log 2>&1
+      ${FC} -c -fno-second-underscore -Wno-argument-mismatch `./getdefflags_F.sh` modv*.F moda*.F `ls -1 *.F *.f | grep -v "mod[av]_"` >> bufr.make.log 2>&1
     fi	
   elif [[ ${COMPILER_FAMILY} == "intel" ]] || [[ ${COMPILER_FAMILY} == "ics" ]] || [[ ${COMPILER_FAMILY} == "ips" ]] || [[ ${COMPILER_FAMILY} == "PrgEnv-intel" ]]; then
-    ${FC} -c `./getdefflags_F.sh` modv*.F moda*.F `ls -1 *.F *.f | grep -v "mod[av]_"` >> make.log 2>&1
+    ${FC} -c `./getdefflags_F.sh` modv*.F moda*.F `ls -1 *.F *.f | grep -v "mod[av]_"` >> bufr.make.log 2>&1
   elif [[ ${COMPILER_FAMILY} == "pgi" ]]; then
-    ${FC} -c -Mnosecond_underscore `./getdefflags_F.sh` modv*.F moda*.F `ls -1 *.F *.f | grep -v "mod[av]_"` >> make.log 2>&1
+    ${FC} -c -Mnosecond_underscore `./getdefflags_F.sh` modv*.F moda*.F `ls -1 *.F *.f | grep -v "mod[av]_"` >> bufr.make.log 2>&1
   fi
 
-  ar crv libbufr.a *.o >> make.log 2>&1
+  ar crv libbufr.a *.o >> bufr.make.log 2>&1
   cp *.a ${LIB_DIR}/lib/.
 fi
 
@@ -383,9 +422,9 @@ if [ $COMPILE_ZLIB -eq 1 ]; then
   tar -xzf ${TAR_DIR}/zlib*.tar.gz -C ${LIB_DIR}/zlib
   cd ${LIB_DIR}/zlib/zlib*
   echo "cd `pwd`"
-  run_cmd "./configure --prefix=${LIB_DIR} > configure.log 2>&1"
-  run_cmd "make ${MAKE_ARGS} > make.log 2>&1"
-  run_cmd "make ${MAKE_ARGS} install > make_install.log 2>&1"
+  run_cmd "./configure --prefix=${LIB_DIR} > zlib.configure.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} > zlib.make.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} install > zlib.make_install.log 2>&1"
 
   # GPM: why is this removed? Could we add a comment to
   # describe why this is needed?
@@ -402,9 +441,9 @@ if [[ $COMPILE_LIBPNG -eq 1 && $HOST != ys* ]]; then
   tar -xzf ${TAR_DIR}/libpng*.tar.gz -C ${LIB_DIR}/libpng
   cd ${LIB_DIR}/libpng/libpng*
   echo "cd `pwd`"
-  run_cmd "./configure --prefix=${LIB_DIR} LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include > configure.log 2>&1"
-  run_cmd "make ${MAKE_ARGS} > make.log 2>&1"
-  run_cmd "make ${MAKE_ARGS} install > make_install.log 2>&1"
+  run_cmd "./configure --prefix=${LIB_DIR} LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include > libpng.configure.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} > libpng.make.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} install > libpng.make_install.log 2>&1"
 fi
 
 # Compile JASPER
@@ -417,9 +456,9 @@ if [ $COMPILE_JASPER -eq 1 ]; then
   cd ${LIB_DIR}/jasper/jasper*
   export CPPFLAGS="-I${LIB_DIR}/include"
   echo "cd `pwd`"
-  run_cmd "./configure --prefix=${LIB_DIR} > configure.log 2>&1"
-  run_cmd "make ${MAKE_ARGS} > make.log 2>&1"
-  run_cmd "make ${MAKE_ARGS} install > make_install.log 2>&1"
+  run_cmd "./configure --prefix=${LIB_DIR} > jasper.configure.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} > jasper.make.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} install > jasper.make_install.log 2>&1"
 fi
 
 # Compile G2CLIB
@@ -430,25 +469,26 @@ if [ $COMPILE_G2CLIB -eq 1 ]; then
   rm -rf ${LIB_DIR}/g2clib/g2clib*
   tar -xf ${TAR_DIR}/g2clib*.tar -C ${LIB_DIR}/g2clib
   cd ${LIB_DIR}/g2clib/g2clib*
-  sed -i 's|INC=.*|INC=-I${LIB_DIR}/include -I${LIB_DIR}/include/jasper|g' makefile
+  # Sed commands use double-quotes to support variable expansion.
+  sed -i "s|INC=.*|INC=-I${LIB_DIR}/include -I${LIB_DIR}/include/jasper|g" makefile
 
-  # allow other compilers besides gcc
-  sed -i 's/CC=gcc/CC=${CC_COMPILER}/g' makefile
+  # Allow other compilers besides gcc
+  sed -i "s|CC=gcc|CC=${CC}|g" makefile
 
   # remove -D__64BIT__ flag because compiling with it has
   # shown issues with GRIB/GRIB2 files that are over 2GB in size
   # This flag was removed in g2clib 1.6.4
   # so this can be removed if the version is updated
   sed -i 's/-D__64BIT__//g' makefile
-  export CC_COMPILER=${CC}
   echo "cd `pwd`"
   # g2clib appears to compile but causes failure compiling MET if -j argument is used
   # so exclude it from this call
-  run_cmd "make > make.log 2>&1"
+  run_cmd "make > g2clib.make.log 2>&1"
 
   cp libg2c*.a ${LIB_DIR}/lib/libgrib2c.a
   cp *.h ${LIB_DIR}/include/.
 fi
+
 
 # Compile HDF
 # Depends on jpeg
@@ -463,7 +503,7 @@ if [ $COMPILE_HDF -eq 1 ]; then
   tar -xf ${TAR_DIR}/HDF4.2*.tar.gz -C ${LIB_DIR}/hdf
   cd ${LIB_DIR}/hdf/HDF*
   echo "cd `pwd`"
-  run_cmd "./configure --prefix=${LIB_DIR} --disable-netcdf --with-jpeg=${LIB_DIR} --with-zlib=${LIB_DIR} > configure.log 2>&1"
+  run_cmd "./configure --prefix=${LIB_DIR} --disable-netcdf --with-jpeg=${LIB_DIR} --with-zlib=${LIB_DIR} > hdf4.configure.log 2>&1"
   cat mfhdf/hdiff/Makefile | \
     sed 's/LIBS = -ljpeg -lz/LIBS = -ljpeg -lz -lm/g' \
     > Makefile_new
@@ -478,8 +518,8 @@ if [ $COMPILE_HDF -eq 1 ]; then
       > Makefile_new
   fi
   mv Makefile_new hdf/src/Makefile
-  run_cmd "make ${MAKE_ARGS} > make.log 2>&1"
-  run_cmd "make ${MAKE_ARGS} install > make_install.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} > hdf4.make.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} install > hdf4.make_install.log 2>&1"
 fi
 
 # Compile HDFEOS
@@ -492,9 +532,9 @@ if [ $COMPILE_HDFEOS -eq 1 ]; then
   tar -xzf ${TAR_DIR}/HDF-EOS*.tar.* -C ${LIB_DIR}/hdfeos
   cd ${LIB_DIR}/hdfeos/hdfeos
   echo "cd `pwd`"
-  run_cmd "./configure --prefix=${LIB_DIR} --with-hdf4=${LIB_DIR} --with-jpeg=${LIB_DIR} > configure.log 2>&1"
-  run_cmd "make ${MAKE_ARGS} > make.log 2>&1"
-  run_cmd "make ${MAKE_ARGS} install > make_install.log 2>&1"
+  run_cmd "./configure --prefix=${LIB_DIR} --with-hdf4=${LIB_DIR} --with-jpeg=${LIB_DIR} > hdf-eos.configure.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} > hed-eos.make.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} install > hsf-eos.make_install.log 2>&1"
 
   cp include/*.h ${LIB_DIR}/include/
 fi
@@ -509,8 +549,8 @@ if [ $COMPILE_NETCDF -eq 1 ]; then
   tar -xzf ${TAR_DIR}/hdf5*.tar.gz -C ${LIB_DIR}/hdf5
   cd ${LIB_DIR}/hdf5/hdf5*
   echo "cd `pwd`"
-  run_cmd "./configure --prefix=${LIB_DIR} --with-zlib=${LIB_Z} CFLAGS=-fPIC CXXFLAGS=-fPIC FFLAGS=-fPIC LDFLAGS=-L${LIB_DIR}/lib:${LIB_Z} CPPFLAGS=-I${LIB_DIR}/include > configure.log 2>&1"
-  run_cmd "make ${MAKE_ARGS} install > make_install.log 2>&1"
+  run_cmd "./configure --prefix=${LIB_DIR} --with-zlib=${LIB_Z} CFLAGS=-fPIC CXXFLAGS=-fPIC FFLAGS=-fPIC LDFLAGS=-L${LIB_DIR}/lib:${LIB_Z} CPPFLAGS=-I${LIB_DIR}/include > hdf5.configure.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} install > hdf5.make_install.log 2>&1"
 
   echo
   echo "Compiling NetCDF-C at `date`"
@@ -521,16 +561,16 @@ if [ $COMPILE_NETCDF -eq 1 ]; then
   export FC=''
   export F90=''
   echo "cd `pwd`"
-  run_cmd "./configure --prefix=${LIB_DIR} CFLAGS=-fPIC CXXFLAGS=-fPIC LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include > configure.log 2>&1"
-  run_cmd "make ${MAKE_ARGS} install > make_install.log 2>&1"
+  run_cmd "./configure --prefix=${LIB_DIR} CFLAGS=-fPIC CXXFLAGS=-fPIC LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include > netcdf-c.configure.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} install > netcdf-c.make_install.log 2>&1"
 
   echo
   echo "Compiling NetCDF-CXX at `date`"
   tar -xzf ${TAR_DIR}/netcdf-cxx*.tar.gz -C ${LIB_DIR}/netcdf
   cd ${LIB_DIR}/netcdf/netcdf-cxx*
   echo "cd `pwd`"
-  run_cmd "./configure --prefix=${LIB_DIR} LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include > configure.log 2>&1"
-  run_cmd "make ${MAKE_ARGS} install > make_install.log 2>&1"
+  run_cmd "./configure --prefix=${LIB_DIR} LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include > netcdf-cxx.configure.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} install > netcdf-cxx.make_install.log 2>&1"
 fi
 
 # Compile FREETYPE
@@ -542,9 +582,9 @@ if [ $COMPILE_FREETYPE -eq 1 ]; then
   tar -xzf ${TAR_DIR}/freetype*.tar.gz -C ${LIB_DIR}/freetype
   cd ${LIB_DIR}/freetype/freetype*
   echo "cd `pwd`"
-  run_cmd "./configure --prefix=${LIB_DIR} --with-png=yes > configure.log 2>&1"
-  run_cmd "make ${MAKE_ARGS} > make.log 2>&1"
-  run_cmd "make ${MAKE_ARGS} install > make_install.log 2>&1"
+  run_cmd "./configure --prefix=${LIB_DIR} --with-png=yes > freetype.configure.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} > freetype.make.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} install > freetype.make_install.log 2>&1"
 fi
 
 
@@ -560,9 +600,9 @@ if [ $COMPILE_CAIRO -eq 1 ]; then
     tar -xzf ${TAR_DIR}/pixman*.tar.gz -C ${LIB_DIR}/pixman
     cd ${LIB_DIR}/pixman/pixman*
     echo "cd `pwd`"
-    run_cmd "./configure --prefix=${LIB_DIR} > configure.log 2>&1"
-    run_cmd "make ${MAKE_ARGS} > make.log 2>&1"
-    run_cmd "make ${MAKE_ARGS} install > make_install.log 2>&1"
+    run_cmd "./configure --prefix=${LIB_DIR} > pixman.configure.log 2>&1"
+    run_cmd "make ${MAKE_ARGS} > pixman.make.log 2>&1"
+    run_cmd "make ${MAKE_ARGS} install > pixman.make_install.log 2>&1"
   fi
 
   echo
@@ -576,9 +616,9 @@ if [ $COMPILE_CAIRO -eq 1 ]; then
     export PKG_CONFIG_PATH=${LIB_DIR}/lib/pkgconfig/
   fi
   echo "cd `pwd`"
-  run_cmd "./configure --prefix=${LIB_DIR} ax_cv_c_float_words_bigendian=no LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include > configure.log 2>&1"
-  run_cmd "make ${MAKE_ARGS} > make.log 2>&1"
-  run_cmd "make ${MAKE_ARGS} install > make_install.log 2>&1"
+  run_cmd "./configure --prefix=${LIB_DIR} ax_cv_c_float_words_bigendian=no LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include > cairo.configure.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} > cairo.make.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} install > cairo.make_install.log 2>&1"
 fi
 
 # Compile MET
@@ -628,7 +668,7 @@ export LDFLAGS="-Wl,--disable-new-dtags"
 # https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html
 # ${parameter:+word}
 # If parameter is null or unset, nothing is substituted, otherwise the expansion of word is substituted.
-export LDFLAGS="${LDFLAGS} -Wl,-rpath,${LIB_DIR}/lib${ADDTL_DIR:+:$ADDTL_DIR}${LIB_DIR}/lib${MET_NETCDF:+:$MET_NETCDF/lib}${MET_HDF5:+:$MET_HDF5/lib}${MET_BUFRLIB:+:$MET_BUFRLIB}${MET_GRIB2CLIB:+:$MET_GRIB2CLIB}${MET_PYTHON:+:$MET_PYTHON/lib}${MET_GSL:+:$MET_GSL/lib}"
+export LDFLAGS="${LDFLAGS} -Wl,-rpath,${LIB_DIR}/lib${MET_NETCDF:+:$MET_NETCDF/lib}${MET_HDF5:+:$MET_HDF5/lib}${MET_BUFRLIB:+:$MET_BUFRLIB}${MET_GRIB2CLIB:+:$MET_GRIB2CLIB}${MET_PYTHON_LIB:+:$MET_PYTHON_LIB}${MET_GSL:+:$MET_GSL/lib}${ADDTL_DIR:+:$ADDTL_DIR}"
 export LDFLAGS="${LDFLAGS} -Wl,-rpath,${LIB_JASPER:+$LIB_JASPER}${LIB_LIBPNG:+:$LIB_PNG}${LIB_Z:+$LIB_Z}"
 export LDFLAGS="${LDFLAGS} ${LIB_JASPER:+-L$LIB_JASPER} ${LIB_LIBPNG:+-L$LIB_LIBPNG} ${MET_HDF5:+-L$MET_HDF5/lib} ${ADDTL_DIR:+-L$ADDTL_DIR}"
 export LIBS="${LIBS} -lhdf5_hl -lhdf5 -lz"
@@ -666,9 +706,9 @@ fi
 configure_cmd="${configure_cmd} ${OPT_ARGS}"
 
 echo "cd `pwd`"
-run_cmd "${configure_cmd} > configure.log 2>&1"
-run_cmd "make ${MAKE_ARGS} > make.log 2>&1"
-run_cmd "make ${MAKE_ARGS} install > make_install.log 2>&1"
-run_cmd "make ${MAKE_ARGS} test > make_test.log 2>&1"
+run_cmd "${configure_cmd} > met.configure.log 2>&1"
+run_cmd "make ${MAKE_ARGS} > met.make.log 2>&1"
+run_cmd "make ${MAKE_ARGS} install > met.make_install.log 2>&1"
+run_cmd "make ${MAKE_ARGS} test > met.make_test.log 2>&1"
 
 echo "Finished compiling at `date`"

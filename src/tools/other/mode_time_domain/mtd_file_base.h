@@ -103,7 +103,7 @@ class MtdFileBase {
 
       virtual void clear();
 
-      virtual void dump(ostream &, int = 0) const;
+      virtual void dump(std::ostream &, int = 0) const;
 
          //
          //  set stuff

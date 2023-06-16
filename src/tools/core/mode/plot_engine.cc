@@ -23,11 +23,11 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-   //
-   //  Flag value of 2 indicates that both fcst and obs should be enlarged
-   //  Flag value of 1 indicates that only the fcst should be enlarged
-   //  Flag value of 0 indicates that only the obs should be enlarged
-   //
+//
+//  Flag value of 2 indicates that both fcst and obs should be enlarged
+//  Flag value of 1 indicates that only the fcst should be enlarged
+//  Flag value of 0 indicates that only the obs should be enlarged
+//
 
 
 void ModePsFile::plot_engine(ModeFuzzyEngine & eng, EngineType eng_type, const char * title)
@@ -38,51 +38,51 @@ void ModePsFile::plot_engine(ModeFuzzyEngine & eng, EngineType eng_type, const c
    //  setup fcst & obs strings
    //
 
-if ( eng_type == FOEng )  { // Plot forecast versus observation
+   if ( eng_type == FOEng )  { // Plot forecast versus observation
 
-   FcstString      = "Forecast";
-   FcstShortString = "Fcst";
-   ObsString       = "Observation";
-   ObsShortString  = "Obs";
+      FcstString      = "Forecast";
+      FcstShortString = "Fcst";
+      ObsString       = "Observation";
+      ObsShortString  = "Obs";
 
-} else if ( eng_type == FFEng )  { // Plot forecast versus forecast
+   } else if ( eng_type == FFEng )  { // Plot forecast versus forecast
 
-   FcstString      = "Forecast";
-   FcstShortString = "Fcst";
-   ObsString       = "Forecast";
-   ObsShortString  = "Fcst";
+      FcstString      = "Forecast";
+      FcstShortString = "Fcst";
+      ObsString       = "Forecast";
+      ObsShortString  = "Fcst";
 
-} else if ( eng_type == OOEng )  { // Plot observation versus observation
+   } else if ( eng_type == OOEng )  { // Plot observation versus observation
 
-   FcstString      = "Observation";
-   FcstShortString = "Obs";
-   ObsString       = "Observation";
-   ObsShortString  = "Obs";
+      FcstString      = "Observation";
+      FcstShortString = "Obs";
+      ObsString       = "Observation";
+      ObsShortString  = "Obs";
 
-}
+   }
 
    //
    //  do pages
    //
 
-do_page_1(eng, eng_type, title);
+   do_page_1(eng, eng_type, title);
 
-if ( (eng_type == FOEng) || (eng_type == FFEng) )   do_fcst_enlarge_page(eng, eng_type, title);
+   if ( (eng_type == FOEng) || (eng_type == FFEng) )   do_fcst_enlarge_page(eng, eng_type, title);
 
-if ( (eng_type == FOEng) || (eng_type == OOEng) )   do_obs_enlarge_page(eng, eng_type, title);
+   if ( (eng_type == FOEng) || (eng_type == OOEng) )   do_obs_enlarge_page(eng, eng_type, title);
 
-if ( eng_type == FOEng )  {
+   if ( eng_type == FOEng )  {
 
-   do_overlap_page(eng, eng_type, title);
-   do_cluster_page(eng, eng_type, title);
+      do_overlap_page(eng, eng_type, title);
+      do_cluster_page(eng, eng_type, title);
 
-}
+   }
 
    //
    //  done
    //
 
-return;
+   return;
 
 }
 

@@ -1,8 +1,3 @@
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
@@ -259,7 +254,8 @@ double len = Ir.abs();
 
 if ( len < tol )  {
 
-   cerr << "\n\n  rotated poles too close to original poles!\n\n";
+   mlog << Error << "\nTcrmwGrid::calc_ijk() -> "
+        << "rotated poles too close to original poles!\n\n";
 
    exit ( 1 );
 
@@ -489,7 +485,8 @@ rep = new TcrmwGrid ( data );
 
 if ( !rep )  {
 
-   cerr << "\nGrid::set(const TcrmwData &) -> memory allocation error\n\n";
+   mlog << Error << "\nGrid::set(const TcrmwData &) -> "
+        << "memory allocation error\n\n";
 
    exit ( 1 );
 

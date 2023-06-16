@@ -110,9 +110,13 @@ Multi-Variate MODE
 
 Traditionally, MODE defines objects by smoothing and thresholding data from a single input field. MET version 10.1.0 extends MODE by adding the option to define objects using multiple input fields.
 
-As described in :numref:`MODE-configuration-file`, the **field** entry in the forecast and observation dictionaries define the input data to be processed. If **field** is defined as a dictionary, the traditional method for running MODE is invoked, where objects are defined using a single input field. If **field** is defined as an array of dictionaries, each specifying a different input field, then the multi-variate MODE logic is invoked and requires the **multivar_logic** configuration entry to be set. Traditional MODE is run once for each input field to define objects for that field. Note that the object definition criteria can be defined separately for each field array entry. The objects from each input field are combined into a *super* object for both the forecast and observation data.
+As described in :numref:`MODE-configuration-file`, the **field** entry in the forecast and observation dictionaries define the input data to be processed. If **field** is defined as a dictionary, the traditional method for running MODE is invoked, where objects are defined using a single input field. If **field** is defined as an array of dictionaries, each specifying a different input field, then the multi-variate MODE logic is invoked and requires the **multivar_logic** configuration entry to be set. Traditional MODE is run once for each input field to define objects for that field. Note that the object definition criteria can be defined separately for each field array entry. The objects from each input field are combined into forecast and observation data *super* objects 
 
-The **multivar_logic** configuration entry, described in :numref:`MODE-configuration-file`, defines the boolean logic for combining objects from multiple fields into a *super* object. If this configuration option is set, there must be an equal or greater number of fields defined in an array of dictionaries for it define a *super* object of more than one field. Note that the multi-variate MODE forecast and observation input fields and combination logic do not need to match. The resulting forecast and observation *super* objects are written to NetCDF output files. Users can then configure and run traditional MODE to compare the forecast super object to the observed super object.
+The **multivar_logic** and **multivar_intensity** configuration entries, described in :numref:`MODE-configuration-file`, define the boolean logic for combining objects from multiple fields into *super* objects, and then optionally computing intensities for individual input fields when the input is masked to non-missing only inside the *super* objects. If the **multivar_logic** configuration option iset, there must be the same number of fields defined in an array of dictionaries for fcst and for obs as indicated in the **multivar_logic**. Note that the multi-variate MODE forecast and observation input fields and combination logic do not need to
+match. If a particular  **multivar_intensity** value is TRUE the corresponding pair of fields (fcst and obs) are masked to non-missing inside the fcst and obs super objects, and traditional mode is run on that pair of masked inputs producing uniquely named outputs. If it is FALSE, mode is not run for that pair of inputs.
+
+If all **multivar_intensity** values are FALSE, the forecast and observation *super* objects are written to NetCDF, text, and postscript output files in the standard mode output format, but with no intensity information. 
+
 
 Practical information
 =====================
@@ -238,6 +242,32 @@ _____________________
 The **multivar_logic** entry appears only in the **MODEMultivarConfig_default** file. This option applies to running multi-variate MODE by setting **field** to an array of dictionaries to define multiple input fields. Objects are defined separately for each input field based on the configuration settings specified for each field array entry. The **multivar_logic** entry is a string which defines how objects for each field are combined into a final *super* object. The objects for each field are referred to as '#N' where N is the N-th field array entry. The '&&' and '||' strings define intersection and union logic, respectively. For example, "#1 && #2" is the intersection of the objects from the first and second fields. "(#1 && #2) || #3" is the union of that intersection with the objects from the third field.
 
 The **multivar_logic** entry is parsed separately from the **fcst** and **obs** dictionaries and can be defined differently in each.
+
+_____________________
+
+.. code-block:: none
+
+   multivar_intensity = [FALSE, TRUE, TRUE];
+
+The **multivar_intensity** entry appears only in the **MODEMultivarConfig_default** file. This option is paired with the **multivar_logic** entry, and can take on a value of TRUE or FALSE for each **field**.  In the multivar case, super objects are created using the **multivar_logic** settings. For each input for which **multivar_intensity** is TRUE, the input is masked to be non-missing only within the super objects, and traditional mode is run on that masked input.  For each input for which **multivar_intensity** is FALSE, the input is skipped over.   If all the multivar_intensity values are FALSE, traditional mode output is created for the super objects, but with no intensity information.
+
+
+_____________________
+
+.. code-block:: none
+
+   multivar_name = "Precip";
+
+The **multivar_name** entry appears only in the **MODEMultivarConfig_default** file. This option is used only when the multivar option is enabled, and only when all **multivar_intensity** flag values are FALSE. It can be thought of as an identifier for the multivariate super object.  It shows up in output files names and content.  If not set the default value is "Super".   It can be set separately for forecasts and observations, or as a common value for both.
+
+
+_____________________
+
+.. code-block:: none
+
+   multivar_level = "LO";
+
+The **multivar_level** entry appears only in the **MODEMultivarConfig_default** file. This option is used only when the multivar option is enabled, and only when all **multivar_intensity** flag values are FALSE. It is the identifier for the multivariate super object as regards level.  It shows up in output files names and content.  If not set the default value is "NA".   It can be set separately for forecasts and observations, or as a common value for both.
 
 _____________________
 
@@ -410,7 +440,7 @@ _____________________
      inten_perc_ratio   = ratio_if;
   }
 
-The set of interest function entries listed above define which values are of interest for each pairwise attribute measured. The interest functions may be defined as a piecewise linear function or as an algebraic expression. A piecewise linear function is defined by specifying the corner points of its graph. An algebraic function may be defined in terms of several built-in mathematical functions. See :numref:`MODE_A-Scientific-and-statistical` for how interest values are used by the fuzzy logic engine. By default, many of these functions are defined in terms of the previously defined **grid_res** entry.
+The interest function entries listed above define which values are of interest for each pairwise attribute measured. Each interest function is defined as a piecewise linear function by specifying the corner points of its graph. The range of each function must be within **0** and **1**. Including (x, y) points with y-values outside this range results in a runtime error. See :numref:`MODE_A-Scientific-and-statistical` for how interest values are used by the fuzzy logic engine. By default, many of these functions are defined in terms of the previously defined **grid_res** entry.
 
 
 _____________________

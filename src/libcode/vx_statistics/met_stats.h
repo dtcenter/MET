@@ -696,10 +696,13 @@ struct SSIDXData {
    TimeArray init_time;
 
    // Number of terms and number valid
-   int n_term, n_vld;
+   int n_term;
+   int n_vld;
 
    // Skill score index value
    double ss_index;
+
+   SSIDXData &operator=(const SSIDXData &a) noexcept;
 };
 
 ////////////////////////////////////////////////////////////////////////

@@ -81,11 +81,7 @@ static const char *txt_file_abbr[n_txt] = {
 // Cyclone numbers > 50 are for testing or invests
 static const int max_best_cyclone_number = 50;
 
-// 2, 5, and 7 days shapefile probabilities
-static const int max_n_shape_prob = 3;
-static const int shape_prob_lead_hr[max_n_shape_prob] = {
-   48, 120, 168
-};
+// Maximum search time for genesis shapefile matches
 static const int shape_prob_search_sec = 168*sec_per_hour;
 
 ////////////////////////////////////////////////////////////////////////
@@ -113,7 +109,7 @@ static ConcatString out_base;
 
 // Output NetCDF file
 static ConcatString out_nc_file;
-static netCDF::NcFile      *nc_out = (netCDF::NcFile *) 0;
+static netCDF::NcFile      *nc_out = (netCDF::NcFile *) nullptr;
 static netCDF::NcDim        lat_dim;
 static netCDF::NcDim        lon_dim;
 
@@ -121,16 +117,16 @@ static netCDF::NcDim        lon_dim;
 static StringArray nc_var_sa;
 
 // Output STAT file
-static ConcatString stat_file;
-static ofstream    *stat_out = (ofstream *)  0;
-static AsciiTable   stat_at;
-static int          i_stat_row;
+static ConcatString   stat_file;
+static std::ofstream *stat_out = (std::ofstream *) nullptr;
+static AsciiTable     stat_at;
+static int            i_stat_row;
 
 // Optional ASCII output files
-static ConcatString txt_file[n_txt];
-static ofstream    *txt_out[n_txt];
-static AsciiTable   txt_at[n_txt];
-static int          i_txt_row[n_txt];
+static ConcatString   txt_file[n_txt];
+static std::ofstream *txt_out[n_txt];
+static AsciiTable     txt_at[n_txt];
+static int            i_txt_row[n_txt];
 
 // Strings to be output in the STAT and optional text files
 static StatHdrColumns shc;
