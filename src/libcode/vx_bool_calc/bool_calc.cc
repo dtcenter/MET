@@ -127,41 +127,46 @@ return;
 
 }
 
+
 ////////////////////////////////////////////////////////////////////////
 
 
 bool BoolCalc::check_args(int expectedNargs) const
+
 {
-  Program & P = *program;
-  Token tok;
-  vector<int> args;
-  bool status = true;
+
+Program & P = *program;
+Token tok;
+vector<int> args;
+bool status = true;
   
-  for (size_t j=0; j<P.size(); ++j) {
-    tok = P[j];
-    if (tok.type == tok_local_var) {
+for (size_t j=0; j<P.size(); ++j) {
+   tok = P[j];
+   if (tok.type == tok_local_var) {
       int index = tok.number_1b - 1;
       if (find(args.begin(), args.end(), index) == args.end()) {
-	args.push_back(index);
+         args.push_back(index);
       }
-    }
-  }
-  if ((int)args.size() != expectedNargs) {
-    mlog << Error << "\nBoolCalc::check_args() -> "
-	 << "expect " << expectedNargs << " args, got " << args.size() << "\n\n";
-    status = false;
-  }
-  for (size_t j=0; j<args.size(); ++j) {
-    if (args[j] < 0 || args[j] >= expectedNargs) {
+   }
+}
+if ((int)args.size() != expectedNargs) {
+   mlog << Error << "\nBoolCalc::check_args() -> "
+        << "expect " << expectedNargs << " args, got " << args.size() << "\n\n";
+   status = false;
+}
+for (size_t j=0; j<args.size(); ++j) {
+   if (args[j] < 0 || args[j] >= expectedNargs) {
       mlog << Error << "\nBoolCalc::check_args() -> "
-	   << "arg out of range " << args[j] << " range is 1 to " << expectedNargs << "\n\n";
+           << "arg out of range " << args[j] << " range is 1 to " << expectedNargs << "\n\n";
       status = false;
-    }
-  }
-  if (!status) {
-    dump_program(cerr);
-  }
-  return status;
+   }
+}
+if (!status) {
+   dump_program(cerr);
+}
+
+return status;
+
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -249,7 +254,9 @@ return ( result );
 
 ////////////////////////////////////////////////////////////////////////
 
+
 bool BoolCalc::has_union() const
+
 {
 
 Program & P = *program;
@@ -262,9 +269,11 @@ for (int j=0; j<((int) P.size()); ++j)  {
       return true;
    }
 }
+
 return false;
 
 }
 
 
 ////////////////////////////////////////////////////////////////////////
+

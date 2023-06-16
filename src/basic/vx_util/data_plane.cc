@@ -400,6 +400,7 @@ void DataPlane::set_accum(int s) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+
 void DataPlane::set_all(float *data, int nx, int ny) {
    if (nx != Nx || ny != Ny) {
       mlog << Error << "\nDataPlane::set_all() -> "
