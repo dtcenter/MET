@@ -41,7 +41,8 @@ class BoolCalc {
 
       void dump_program(std::ostream &) const;
 
-
+      // check that all the args from 1 to expectedNargs are found
+      bool check_args(int expectedNargs) const;
 
       int Max_depth;  //   maximum stack depth needed to run the program
 
@@ -53,6 +54,8 @@ class BoolCalc {
 
       bool run(const vector<bool>);
 
+     // return true if one of the operations is a union (or)
+     bool has_union() const; 
 
 };
 

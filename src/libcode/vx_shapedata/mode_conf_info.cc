@@ -25,6 +25,10 @@ using namespace std;
 #include "vx_log.h"
 
 ////////////////////////////////////////////////////////////////////////
+
+static const char default_multivar_name[] = "Super";
+
+////////////////////////////////////////////////////////////////////////
 //
 //  Code for class ModeConfInfo
 //
@@ -565,7 +569,7 @@ const DictionaryEntry * ee = dict->lookup(conf_key_field);
 
 if ( !ee )  {
 
-   mlog << "\n\n ModeConfInfo::read_fields () -> \"field\" entry not found in dictionary!\n\n";
+   mlog << "\nModeConfInfo::read_fields () -> \"field\" entry not found in dictionary!\n\n";
 
    exit ( 1 );
 
@@ -577,9 +581,6 @@ const int N = ( (field->is_array()) ? (field->n_entries()) : 1 );
 
 info_array = new Mode_Field_Info [N];
 
-N_fields = N;
-
-
 if ( field->is_array() ) {
 
    int j, k;
@@ -589,11 +590,12 @@ if ( field->is_array() ) {
    if ( (N_fields > 0) && (N != N_fields) )  {
 
       mlog << Error
-           << "\n\n  ModeConfInfo::read_field_dict() -> fcst and obs dictionaries have different number of entries\n\n";
+           << "\nModeConfInfo::read_field_dict() -> fcst and obs dictionaries have different number of entries\n\n";
 
       exit ( 1 );
 
    }
+   N_fields = N;
 
    for (j=0; j<N; ++j)  {
 
@@ -602,7 +604,7 @@ if ( field->is_array() ) {
       if ( (e->type() != DictionaryType) && (e->type() != ArrayType) )  {
 
          mlog << Error
-              << "\n\n  ModeConfInfo::read_field_dict() -> field entry # " << (j + 1) << " is not a dictionary!\n\n";
+              << "\nModeConfInfo::read_field_dict() -> field entry # " << (j + 1) << " is not a dictionary!\n\n";
 
          exit ( 1 );
 
@@ -626,10 +628,12 @@ if ( field->is_array() ) {
 
 }   //  if is array
 
+
    //
    //  nope, traditional mode
    //
 
+N_fields = N;
 info_array[0].set(false, 0, dict, &conf, type, _fo);
 
    //
@@ -688,7 +692,7 @@ void ModeConfInfo::set_field_index(int k)
 if ( (k < 0) || (k >= N_fields) )  {
 
    mlog << Error
-        << "\n\n  ModeConfInfo::set_field_index(int) -> range check error\n\n";
+        << "\nModeConfInfo::set_field_index(int) -> range check error\n\n";
 
    exit ( 1 );
 
@@ -854,12 +858,29 @@ if ( (k < 0) || (k >= Fcst->conv_radius_array.n_elements()) )  {
 }
 
 Fcst->conv_radius = Fcst->conv_radius_array[k];
- Obs->conv_radius =  Obs->conv_radius_array[k];
+Obs->conv_radius =  Obs->conv_radius_array[k];
 
 return;
 
 }
 
+
+////////////////////////////////////////////////////////////////////////
+
+
+void ModeConfInfo::set_conv_thresh(SingleThresh s)
+{
+Fcst->conv_thresh = s;
+Obs->conv_thresh =  s;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void ModeConfInfo::set_conv_radius(int r)
+{
+Fcst->conv_radius = r;
+Obs->conv_radius = r;
+}
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -908,6 +929,62 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+void ModeConfInfo::set_fcst_conv_thresh_by_merge_index(int k)
+
+{
+
+Fcst->set_conv_thresh_by_merge_index(k);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void ModeConfInfo::set_obs_conv_thresh_by_merge_index(int k)
+
+{
+
+Obs->set_conv_thresh_by_merge_index(k);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+void ModeConfInfo::set_fcst_merge_flag(MergeType t)
+{
+Fcst->merge_flag = t;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void ModeConfInfo::set_obs_merge_flag(MergeType t)
+{
+Obs->merge_flag = t;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void ModeConfInfo::set_fcst_merge_thresh(SingleThresh s)
+{
+Fcst->merge_thresh = s;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void ModeConfInfo::set_obs_merge_thresh(SingleThresh s)
+{
+Obs->merge_thresh = s;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+
 void ModeConfInfo::set_obs_merge_thresh_by_index(int k)
 
 {
@@ -937,7 +1014,7 @@ return ( nr*nt );
 ////////////////////////////////////////////////////////////////////////
 
 
-bool ModeConfInfo::is_multivar()
+bool ModeConfInfo::is_multivar() 
 
 {
 
@@ -946,7 +1023,7 @@ const DictionaryEntry * e = conf.lookup("fcst");
 if ( e->type() != DictionaryType )  {
 
    mlog << Error
-        << "\n\n  ModeConfInfo::is_multivar() const -> bad object type for entry \"fcst\"\n\n";
+        << "\nModeConfInfo::is_multivar() const -> bad object type for entry \"fcst\"\n\n";
 
    exit ( 1 );
 
@@ -963,7 +1040,7 @@ switch ( e2->type() )  {
 
    default:
       mlog << Error
-           << "\n\n  ModeConfInfo::is_multivar() const -> bad object type for entry \"fcst.field\"\n\n";
+           << "\nModeConfInfo::is_multivar() const -> bad object type for entry \"fcst.field\"\n\n";
       exit ( 1 );
 
 }
@@ -984,23 +1061,89 @@ void ModeConfInfo::get_multivar_programs()
 Dictionary * dict = (Dictionary *) 0;
 
 fcst_multivar_logic.clear();
- obs_multivar_logic.clear();
-
+obs_multivar_logic.clear();
+fcst_multivar_name = default_multivar_name;
+obs_multivar_name = default_multivar_name;
+fcst_multivar_level = na_str;
+obs_multivar_level = na_str;
 
 dict = conf.lookup_dictionary(conf_key_fcst);
 
-if ( dict->lookup(conf_key_multivar_logic) )  fcst_multivar_logic = dict->lookup_string(conf_key_multivar_logic);
+if ( dict->lookup(conf_key_multivar_logic) ) fcst_multivar_logic = dict->lookup_string(conf_key_multivar_logic);
+if ( dict->lookup(conf_key_multivar_name)  ) fcst_multivar_name  = dict->lookup_string(conf_key_multivar_name);
+if ( dict->lookup(conf_key_multivar_level) ) fcst_multivar_level = dict->lookup_string(conf_key_multivar_level);
 
 dict = conf.lookup_dictionary(conf_key_obs);
 
-if ( dict->lookup(conf_key_multivar_logic) )   obs_multivar_logic = dict->lookup_string(conf_key_multivar_logic);
+if ( dict->lookup(conf_key_multivar_logic) ) obs_multivar_logic = dict->lookup_string(conf_key_multivar_logic);
+if ( dict->lookup(conf_key_multivar_name)  ) obs_multivar_name  = dict->lookup_string(conf_key_multivar_name);
+if ( dict->lookup(conf_key_multivar_level) ) obs_multivar_level = dict->lookup_string(conf_key_multivar_level);
 
-
+multivar_intensity.clear();
+if ( dict->lookup(conf_key_multivar_intensity_flag)) multivar_intensity = dict->lookup_bool_array(conf_key_multivar_intensity_flag);
 
 return;
-
 }
 
+////////////////////////////////////////////////////////////////////////
+
+
+void ModeConfInfo::check_multivar_not_implemented()
+{
+   if (!is_multivar()) {
+      return;
+   }
+
+   bool status = false;
+   if (quilt) {
+      mlog << Error
+           << "\nModeConfInfo::multivar_not_implemented:\n"
+           << "  quilting not yet implemented for multivar mode\n\n";
+      status = true;
+   }
+   
+   for (int i=0; i<N_fields; ++i) {
+      if (fcst_array[i].merge_flag == MergeType_Both || fcst_array[i].merge_flag == MergeType_Engine) {
+         mlog << Error
+              << "\nModeConfInfo::multivar_not_implemented:\n"
+              << "  merge_flag ENGINE or BOTH not implemented for multivariate mode\n\n";
+         status = true;
+         break;
+      }
+      if (obs_array[i].merge_flag == MergeType_Both || obs_array[i].merge_flag == MergeType_Engine) {
+         mlog << Error
+              << "\nModeConfInfo::multivar_not_implemented:\n"
+              << "  merge_flag ENGINE or BOTH not implemented for multivariate mode\n\n";
+         status = true;
+         break;
+      }
+   }
+
+   // if (multivar_intensities_all_false()) {
+   //    mlog << Error
+   //         << "\nModeConfInfo::multivar_not_implemented "
+   //         << ": multivar_intensity flags all FALSE not yet implemented for multivar mode\n\n";
+   //    status = true;
+   // }
+   if (status) {
+      mlog << Error
+           << "\nSome features not yet implemented in multivar mode\n\n";
+      exit ( 1 );
+   }
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+bool ModeConfInfo::multivar_intensities_all_false() const
+{
+   for (int i=0; i<multivar_intensity.n(); ++i) {
+      if (multivar_intensity[i]) {
+         return false;
+      }
+   }
+   return true;
+}
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -1089,6 +1232,3 @@ return;
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-

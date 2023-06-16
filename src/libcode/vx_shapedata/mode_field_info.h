@@ -89,6 +89,7 @@ class Mode_Field_Info {
          //  member functions
          //
 
+      void           set_conv_thresh_by_merge_index (int);
       void           set_merge_thresh_by_index (int);
       int            n_merge_threshs () const;
       bool           need_merge_thresh () const;   //  mergetype is both or thresh
