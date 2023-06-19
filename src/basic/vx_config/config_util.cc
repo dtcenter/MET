@@ -8,8 +8,6 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <sys/types.h>
 #include <dirent.h>
 #include <limits.h>
@@ -21,10 +19,12 @@ using namespace std;
 
 #include "GridTemplate.h"
 
+using namespace std;
+
 ///////////////////////////////////////////////////////////////////////////////
 
 static const double default_vld_thresh = 1.0;
-static const char conf_key_prepbufr_map_bad[] = "obs_prefbufr_map";    // for backward compatibility
+//static const char conf_key_prepbufr_map_bad[] = "obs_prefbufr_map";    // for backward compatibility
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -33,8 +33,9 @@ static MetConfig conf_const(replace_path(config_const_filename).c_str());
 
 ///////////////////////////////////////////////////////////////////////////////
 
+
 GaussianInfo::GaussianInfo()
-: weights(0)
+: weights(nullptr)
 {
    clear();
 }
@@ -45,7 +46,7 @@ void GaussianInfo::clear() {
    weight_sum = 0.0;
    if (weights) {
       delete weights;
-      weights = (double *)0;
+      weights = (double *)nullptr;
    }
    max_r = weight_cnt = 0;
    radius = dx = bad_data_double;
@@ -67,7 +68,8 @@ int GaussianInfo::compute_max_r() {
 ///////////////////////////////////////////////////////////////////////////////
 
 void GaussianInfo::compute() {
-   double weight, distance_sq;
+   double weight;
+   double distance_sq;
    const double g_sigma = radius / dx;
    const double g_sigma_sq = g_sigma * g_sigma;
    const double f_sigma_exp_divider = (2 * g_sigma_sq);
@@ -89,7 +91,7 @@ void GaussianInfo::compute() {
          distance_sq = (double)idx_x*idx_x + idx_y*idx_y;
          if (distance_sq <= max_r_sq) {
             weight_cnt++;
-            weight = exp(-(distance_sq) / f_sigma_exp_divider) / f_sigma_divider;
+            weight = exp(-distance_sq / f_sigma_exp_divider) / f_sigma_divider;
             weight_sum += weight;
          }
          weights[index++] = weight;
@@ -114,7 +116,9 @@ void GaussianInfo::validate() {
    }
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
+
 
 void RegridInfo::clear() {
    enable = false;
@@ -198,14 +202,12 @@ void RegridInfo::validate() {
    }
 
    // Check the Gaussian filter
-   if(method == InterpMthd_MaxGauss) {
-      if(gaussian.radius < gaussian.dx) {
-         mlog << Error << "\nRegridInfo::validate() -> "
-              << "The radius of influence (" << gaussian.radius
-              << ") is less than the delta distance (" << gaussian.dx
-              << ") for regridding method \"" << interpmthd_to_string(method) << "\".\n\n";
-         exit(1);
-      }
+   if(method == InterpMthd_MaxGauss && gaussian.radius < gaussian.dx) {
+      mlog << Error << "\nRegridInfo::validate() -> "
+           << "The radius of influence (" << gaussian.radius
+           << ") is less than the delta distance (" << gaussian.dx
+           << ") for regridding method \"" << interpmthd_to_string(method) << "\".\n\n";
+      exit(1);
    }
 
    // Check for equal number of censor thresholds and values
@@ -245,6 +247,26 @@ void RegridInfo::validate_point() {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+RegridInfo &RegridInfo::operator=(const RegridInfo &a) noexcept {
+   if ( this != &a ) {
+      enable = a.enable;
+      field = a.field;
+      vld_thresh = a.vld_thresh;
+      name = a.name;
+      method = a.method;
+      width = a.width;
+      gaussian = a.gaussian;
+      shape = a.shape;
+      convert_fx = a.convert_fx;
+      censor_thresh = a.censor_thresh;
+      censor_val = a.censor_val;
+      hook = a.hook;
+   }
+   return *this;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 ConcatString parse_conf_version(Dictionary *dict) {
    ConcatString s;
 
@@ -260,7 +282,7 @@ ConcatString parse_conf_version(Dictionary *dict) {
      check_met_version(s.c_str());
    }
 
-   return(s);
+   return s;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -295,13 +317,15 @@ ConcatString parse_conf_string(Dictionary *dict, const char *conf_key,
       }
    }
 
-   return(s);
+   return s;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 StringArray parse_conf_string_array(Dictionary *dict, const char *conf_key, const char *caller) {
-   StringArray sa, cur, sid_sa;
+   StringArray sa;
+   StringArray cur;
+   StringArray sid_sa;
    if(!dict) {
       mlog << Error << "\n" << caller << "empty dictionary!\n\n";
       exit(1);
@@ -342,7 +366,7 @@ GrdFileType parse_conf_file_type(Dictionary *dict) {
       }
    }
 
-   return(t);
+   return t;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -352,7 +376,7 @@ map<STATLineType,STATOutputType> parse_conf_output_flag(Dictionary *dict,
    map<STATLineType,STATOutputType> output_map;
    STATOutputType t = STATOutputType_None;
    ConcatString cs;
-   int i, v;
+   int v;
 
    if(!dict) {
       mlog << Error << "\nparse_conf_output_flag() -> "
@@ -361,7 +385,7 @@ map<STATLineType,STATOutputType> parse_conf_output_flag(Dictionary *dict,
    }
 
    // Loop over the requested line types
-   for(i=0; i<n_lty; i++) {
+   for(int i=0; i<n_lty; i++) {
 
       // Build the string
       cs << cs_erase << conf_key_output_flag << "."
@@ -396,17 +420,16 @@ map<STATLineType,STATOutputType> parse_conf_output_flag(Dictionary *dict,
       exit(1);
    }
 
-   return(output_map);
+   return output_map;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 map<STATLineType,StringArray> parse_conf_output_stats(Dictionary *dict) {
-   Dictionary *out_dict = (Dictionary *) 0;
+   Dictionary *out_dict = (Dictionary *) nullptr;
    map<STATLineType,StringArray> output_map;
    STATLineType line_type;
    StringArray sa;
-   int i;
 
    if(!dict) {
       mlog << Error << "\nparse_conf_output_stats() -> "
@@ -418,7 +441,7 @@ map<STATLineType,StringArray> parse_conf_output_stats(Dictionary *dict) {
    out_dict = dict->lookup_dictionary(conf_key_output_stats);
 
    // Loop over the output flag dictionary entries
-   for(i=0; i<out_dict->n_entries(); i++) {
+   for(int i=0; i<out_dict->n_entries(); i++) {
 
       // Get the line type for the current entry
       line_type = string_to_statlinetype((*out_dict)[i]->name().c_str());
@@ -433,7 +456,7 @@ map<STATLineType,StringArray> parse_conf_output_stats(Dictionary *dict) {
       output_map[line_type].add(sa);
    }
 
-   return(output_map);
+   return output_map;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -444,10 +467,10 @@ map<STATLineType,StringArray> parse_conf_output_stats(Dictionary *dict) {
 ///////////////////////////////////////////////////////////////////////////////
 
 int parse_conf_n_vx(Dictionary *dict) {
-   int i, total;
+   int total = 0;
    StringArray lvl;
 
-   if(!dict) return(0);
+   if(!dict) return 0;
 
    // Check that this dictionary is an array
    if(!dict->is_array()) {
@@ -457,7 +480,7 @@ int parse_conf_n_vx(Dictionary *dict) {
    }
 
    // Loop over the fields to be verified
-   for(i=0,total=0; i<dict->n_entries(); i++) {
+   for(int i=0; i<dict->n_entries(); i++) {
 
       // Get the level array, which may or may not be defined.
       // If defined, use its length.  If not, use a length of 1.
@@ -467,7 +490,7 @@ int parse_conf_n_vx(Dictionary *dict) {
       total += (lvl.n() > 0 ? lvl.n() : 1);
    }
 
-   return(total);
+   return total;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -480,7 +503,8 @@ Dictionary parse_conf_i_vx_dict(Dictionary *dict, int index) {
    Dictionary i_dict;
    DictionaryEntry entry;
    StringArray lvl;
-   int i, total, n_lvl;
+   int n_lvl;
+   int total;
 
    if(!dict) {
       mlog << Error << "\nparse_conf_i_vx_dict() -> "
@@ -496,7 +520,7 @@ Dictionary parse_conf_i_vx_dict(Dictionary *dict, int index) {
    }
 
    // Loop over the fields to be verified
-   for(i=0,total=0; i<dict->n_entries(); i++) {
+   for(int i=0,total=0; i<dict->n_entries(); i++) {
 
       // Get the level array, which may or may not be defined.
       // If defined, use its length.  If not, use a length of 1.
@@ -520,7 +544,7 @@ Dictionary parse_conf_i_vx_dict(Dictionary *dict, int index) {
       }
    } // end for i
 
-   return(i_dict);
+   return i_dict;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -542,7 +566,7 @@ StringArray parse_conf_tc_model(Dictionary *dict, bool error_out) {
       }
    }
 
-   return(sa);
+   return sa;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -559,7 +583,7 @@ StringArray parse_conf_message_type(Dictionary *dict, bool error_out) {
       exit(1);
    }
 
-   return(sa);
+   return sa;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -567,13 +591,12 @@ StringArray parse_conf_message_type(Dictionary *dict, bool error_out) {
 StringArray parse_conf_sid_list(Dictionary *dict, const char *conf_key) {
    StringArray sa, cur, sid_sa;
    ConcatString mask_name;
-   int i;
    const char *method_name = "parse_conf_sid_list() -> ";
 
    sa = parse_conf_string_array(dict, conf_key, method_name);
 
    // Parse station ID's to exclude from each entry
-   for(i=0; i<sa.n(); i++) {
+   for(int i=0; i<sa.n(); i++) {
      parse_sid_mask(string(sa[i]), cur, mask_name);
       sid_sa.add(cur);
    }
@@ -582,7 +605,7 @@ StringArray parse_conf_sid_list(Dictionary *dict, const char *conf_key) {
         << "Station ID \"" << conf_key << "\" list contains "
         << sid_sa.n() << " entries.\n";
 
-   return(sid_sa);
+   return sid_sa;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -698,6 +721,7 @@ void parse_sid_mask(const ConcatString &mask_sid_str,
 
 ///////////////////////////////////////////////////////////////////////////////
 
+
 void MaskLatLon::clear() {
    name.clear();
    lat_thresh.clear();
@@ -715,8 +739,20 @@ bool MaskLatLon::operator==(const MaskLatLon &v) const {
       match = false;
    }
 
-   return(match);
+   return match;
 }
+
+///////////////////////////////////////////////////////////////////////////////
+
+MaskLatLon &MaskLatLon::operator=(const MaskLatLon &a) noexcept {
+   if ( this != &a ) {
+      name = a.name;
+      lat_thresh = a.lat_thresh;
+      lon_thresh = a.lon_thresh;
+   }
+   return *this;
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -725,7 +761,7 @@ vector<MaskLatLon> parse_conf_llpnt_mask(Dictionary *dict) {
    Dictionary *llpnt_dict;
    vector<MaskLatLon> v;
    MaskLatLon m;
-   int i, n_entries;
+   int n_entries;
 
    if(!dict) {
       mlog << Error << "\nparse_conf_llpnt_mask() -> "
@@ -748,7 +784,7 @@ vector<MaskLatLon> parse_conf_llpnt_mask(Dictionary *dict) {
    }
 
    // Loop through the array entries
-   for(i=0; i<n_entries; i++) {
+   for(int i=0; i<n_entries; i++) {
 
       // Get the methods and widths for the current entry
       if(entry->type() == ArrayType) {
@@ -766,7 +802,7 @@ vector<MaskLatLon> parse_conf_llpnt_mask(Dictionary *dict) {
       v.push_back(m);
    }
 
-   return(v);
+   return v;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -791,7 +827,7 @@ StringArray parse_conf_obs_qty_inc(Dictionary *dict) {
       sa = parse_conf_string_array(dict, conf_key_obs_qty_inc, method_name);
    }
 
-   return(sa);
+   return sa;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -801,14 +837,13 @@ StringArray parse_conf_obs_qty_exc(Dictionary *dict) {
    
    StringArray sa = parse_conf_string_array(dict, conf_key_obs_qty_exc, method_name);
    
-   return(sa);
+   return sa;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 NumArray parse_conf_ci_alpha(Dictionary *dict) {
    NumArray na;
-   int i;
 
    if(!dict) {
       mlog << Error << "\nparse_conf_ci_alpha() -> "
@@ -827,7 +862,7 @@ NumArray parse_conf_ci_alpha(Dictionary *dict) {
    }
 
    // Check that the values for alpha are between 0 and 1
-   for(i=0; i<na.n(); i++) {
+   for(int i=0; i<na.n(); i++) {
       if(na[i] <= 0.0 || na[i] >= 1.0) {
          mlog << Error << "\nparse_conf_ci_alpha() -> "
               << "All confidence interval alpha values ("
@@ -837,7 +872,7 @@ NumArray parse_conf_ci_alpha(Dictionary *dict) {
       }
    }
 
-   return(na);
+   return na;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -877,13 +912,13 @@ NumArray parse_conf_eclv_points(Dictionary *dict) {
       }
    }
 
-   return(na);
+   return na;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 TimeSummaryInfo parse_conf_time_summary(Dictionary *dict) {
-   Dictionary *ts_dict = (Dictionary *) 0;
+   Dictionary *ts_dict = (Dictionary *) nullptr;
    TimeSummaryInfo info;
    bool is_correct_type = false;
 
@@ -970,16 +1005,15 @@ TimeSummaryInfo parse_conf_time_summary(Dictionary *dict) {
       exit(1);
    }
 
-   return(info);
+   return info;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 void parse_add_conf_key_value_map(
       Dictionary *dict, const char *conf_key_map_name, map<ConcatString,ConcatString> *m) {
-   Dictionary *map_dict = (Dictionary *) 0;
+   Dictionary *map_dict = (Dictionary *) nullptr;
    ConcatString key, val;
-   int i;
 
    if(!dict) {
       mlog << Error << "\nparse_conf_key_value_type_map() -> "
@@ -991,7 +1025,7 @@ void parse_add_conf_key_value_map(
    map_dict = dict->lookup_array(conf_key_map_name);
 
    // Loop through the array entries
-   for(i=0; i<map_dict->n_entries(); i++) {
+   for(int i=0; i<map_dict->n_entries(); i++) {
 
       // Lookup the key and value
       key = (*map_dict)[i]->dict_value()->lookup_string(conf_key_key);
@@ -1013,11 +1047,10 @@ void parse_add_conf_key_value_map(
 
 map<ConcatString,ConcatString> parse_conf_key_value_map(
       Dictionary *dict, const char *conf_key_map_name, const char *caller) {
-   Dictionary *map_dict = (Dictionary *) 0;
+   Dictionary *map_dict = (Dictionary *) nullptr;
    map<ConcatString,ConcatString> m;
    ConcatString key, val;
-   int i;
-   const char *method_name = (0 != caller) ? caller : "parse_conf_key_value_map() -> ";
+   const char *method_name = (nullptr != caller) ? caller : "parse_conf_key_value_map() -> ";
 
    if(!dict) {
       mlog << Error << "\n" << method_name << "empty dictionary!\n\n";
@@ -1028,7 +1061,7 @@ map<ConcatString,ConcatString> parse_conf_key_value_map(
    map_dict = dict->lookup_array(conf_key_map_name);
 
    // Loop through the array entries
-   for(i=0; i<map_dict->n_entries(); i++) {
+   for(int i=0; i<map_dict->n_entries(); i++) {
 
       // Lookup the key and value
       key = (*map_dict)[i]->dict_value()->lookup_string(conf_key_key);
@@ -1044,7 +1077,7 @@ map<ConcatString,ConcatString> parse_conf_key_value_map(
       m.insert(pair<ConcatString, ConcatString>(key, val));
    }
 
-   return(m);
+   return m;
 }
 
 
@@ -1056,7 +1089,7 @@ map<ConcatString,StringArray> parse_conf_key_values_map(
    map<ConcatString,ConcatString> cs_map;
    map<ConcatString,ConcatString>::const_iterator it;
    map<ConcatString,StringArray> sa_map;
-   const char *method_name = (0 != caller) ? caller : "parse_conf_key_values_map() -> ";
+   const char *method_name = (nullptr != caller) ? caller : "parse_conf_key_values_map() -> ";
 
    cs_map = parse_conf_key_value_map(dict, conf_key, method_name);
 
@@ -1108,13 +1141,12 @@ map<ConcatString,StringArray> parse_conf_obs_to_qc_map(Dictionary *dict) {
 
 map<ConcatString,UserFunc_1Arg> parse_conf_key_convert_map(
       Dictionary *dict, const char *conf_key_map_name, const char *caller) {
-   Dictionary *map_dict = (Dictionary *) 0;
-   int i, j;
+   Dictionary *map_dict = (Dictionary *) nullptr;
    StringArray sa;
    ConcatString key;
    UserFunc_1Arg fx;
    map<ConcatString,UserFunc_1Arg> m;
-   const char *method_name = (0 != caller) ? caller : "parse_conf_key_convert_map() -> ";
+   const char *method_name = (nullptr != caller) ? caller : "parse_conf_key_convert_map() -> ";
 
    if(!dict) {
       mlog << Error << "\n" << method_name << "empty dictionary!\n\n";
@@ -1125,7 +1157,7 @@ map<ConcatString,UserFunc_1Arg> parse_conf_key_convert_map(
    map_dict = dict->lookup_array(conf_key_map_name);
 
    // Loop through the array entries
-   for(i=0; i<map_dict->n_entries(); i++) {
+   for(int i=0; i<map_dict->n_entries(); i++) {
 
       // Lookup the key and convert function
       sa =   (*map_dict)[i]->dict_value()->lookup_string_array(conf_key_key);
@@ -1141,7 +1173,7 @@ map<ConcatString,UserFunc_1Arg> parse_conf_key_convert_map(
       }
 
       // Add map entry for each string
-      for(j=0; j<sa.n(); j++) {
+      for(int j=0; j<sa.n(); j++) {
 
          key = sa[j];
 
@@ -1157,7 +1189,45 @@ map<ConcatString,UserFunc_1Arg> parse_conf_key_convert_map(
       } // end for j
    } // end for i
 
-   return(m);
+   return m;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+TimeSummaryInfo &TimeSummaryInfo::operator=(const TimeSummaryInfo &a) noexcept {
+   if ( this != &a ) {
+      flag = a.flag;
+      raw_data = a.raw_data;
+      beg = a.beg;
+      end = a.end;
+      step = a.step;
+      width_beg = a.width_beg;
+      width_end = a.width_end;
+      width = a.width;
+      grib_code = a.grib_code;
+      obs_var = a.obs_var;
+      type = a.type;
+      vld_thresh = a.vld_thresh;
+      vld_freq = a.vld_freq;
+   }
+   return *this;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+BootInfo & BootInfo::operator=(const BootInfo &a) noexcept {
+   if ( this != &a ) {
+     interval = a.interval;
+     rep_prop = a.rep_prop;
+     n_rep = a.n_rep;
+     rng = a.rng;
+     seed = a.seed;
+   }
+   return *this;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1169,6 +1239,7 @@ void BootInfo::clear() {
    rng.clear();
    seed.clear();
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -1225,13 +1296,14 @@ BootInfo parse_conf_boot(Dictionary *dict) {
    // Conf: boot_seed
    info.seed = dict->lookup_string(conf_key_boot_seed);
 
-   return(info);
+   return info;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 
 RegridInfo parse_conf_regrid(Dictionary *dict, bool error_out) {
-   Dictionary *regrid_dict = (Dictionary *) 0;
+   Dictionary *regrid_dict = (Dictionary *) nullptr;
    RegridInfo info;
    int v;
 
@@ -1315,7 +1387,7 @@ RegridInfo parse_conf_regrid(Dictionary *dict, bool error_out) {
    // Validate the settings
    info.validate();
 
-   return(info);
+   return info;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1410,19 +1482,38 @@ bool InterpInfo::operator==(const InterpInfo &v) const {
       match = false;
    }
 
-   return(match);
+   return match;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
+InterpInfo & InterpInfo::operator=(const InterpInfo &a) noexcept {
+   if ( this != &a ) {
+      field = a.field;
+      vld_thresh = a.vld_thresh;
+      n_interp = a.n_interp;
+      method = a.method;
+      width = a.width;
+      gaussian = a.gaussian;
+      shape = a.shape;
+   }
+   return *this;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
 InterpInfo parse_conf_interp(Dictionary *dict, const char *conf_key) {
-   Dictionary *interp_dict = (Dictionary *) 0;
-   Dictionary *type_dict = (Dictionary *) 0;
+   Dictionary *interp_dict = (Dictionary *) nullptr;
+   Dictionary *type_dict = (Dictionary *) nullptr;
    InterpInfo info;
-   NumArray mthd_na, wdth_na;
+   NumArray mthd_na;
+   NumArray wdth_na;
    InterpMthd method;
 
-   int i, j, k, v, width, n_entries;
+   int v;
+   int width;
+   int n_entries;
    bool is_correct_type = false;
 
    if(!dict) {
@@ -1495,7 +1586,8 @@ InterpInfo parse_conf_interp(Dictionary *dict, const char *conf_key) {
    }
 
    // Loop over the interpolation type dictionary entries
-   for(i=0, info.n_interp=0; i<n_entries; i++) {
+   info.n_interp = 0;
+   for(int i=0; i<n_entries; i++) {
 
       // Get the methods and widths for the current entry
       if(type_entry->type() == ArrayType) {
@@ -1508,7 +1600,7 @@ InterpInfo parse_conf_interp(Dictionary *dict, const char *conf_key) {
       }
 
       // Loop over the methods
-      for(j=0; j<mthd_na.n(); j++) {
+      for(int j=0; j<mthd_na.n(); j++) {
 
          // Store interpolation method as a string
          method = int_to_interpmthd(mthd_na[j]);
@@ -1523,7 +1615,7 @@ InterpInfo parse_conf_interp(Dictionary *dict, const char *conf_key) {
          }
 
          // Loop over the widths
-         for(k=0; k<wdth_na.n(); k++) {
+         for(int k=0; k<wdth_na.n(); k++) {
 
             // Store the current width
             width = nint(wdth_na[k]);
@@ -1551,7 +1643,7 @@ InterpInfo parse_conf_interp(Dictionary *dict, const char *conf_key) {
 
    info.validate();
 
-   return(info);
+   return info;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1630,8 +1722,22 @@ void ClimoCDFInfo::set_cdf_ta(int n_bin, bool &center) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+ClimoCDFInfo &ClimoCDFInfo::operator=(const ClimoCDFInfo &a) noexcept {
+   if ( this != &a ) {
+      flag = a.flag;
+      n_bin = a.n_bin;
+      cdf_ta = a.cdf_ta;
+      write_bins = a.write_bins;
+      direct_prob = a.direct_prob;
+   }
+   return *this;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
 ClimoCDFInfo parse_conf_climo_cdf(Dictionary *dict) {
-   Dictionary *cdf_dict = (Dictionary *) 0;
+   Dictionary *cdf_dict = (Dictionary *) nullptr;
    ClimoCDFInfo info;
    NumArray bins;
    bool center;
@@ -1705,10 +1811,11 @@ ClimoCDFInfo parse_conf_climo_cdf(Dictionary *dict) {
    info.n_bin = info.cdf_ta.n() - 1;
    info.flag  = (info.n_bin > 1);
 
-   return(info);
+   return info;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+
 
 void NbrhdInfo::clear() {
    field = FieldType_None;
@@ -1720,10 +1827,25 @@ void NbrhdInfo::clear() {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+NbrhdInfo &NbrhdInfo::operator=(const NbrhdInfo &a) noexcept {
+   if ( this != &a ) {
+      field = a.field;
+      vld_thresh = a.vld_thresh;
+      width = a.width;
+      cov_ta = a.cov_ta;
+      shape = a.shape;
+   }
+   return *this;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
 NbrhdInfo parse_conf_nbrhd(Dictionary *dict, const char *conf_key) {
-   Dictionary *nbrhd_dict = (Dictionary *) 0;
+   Dictionary *nbrhd_dict = (Dictionary *) nullptr;
    NbrhdInfo info;
-   int i, v;
+   int i;
+   int v;
 
    if(!dict) {
       mlog << Error << "\nparse_conf_nbrhd() -> "
@@ -1806,10 +1928,11 @@ NbrhdInfo parse_conf_nbrhd(Dictionary *dict, const char *conf_key) {
       }
    }
 
-   return(info);
+   return info;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+
 
 void HiRAInfo::clear() {
    flag = false;
@@ -1822,6 +1945,21 @@ void HiRAInfo::clear() {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+HiRAInfo &HiRAInfo::operator=(const HiRAInfo &a) noexcept {
+   if ( this != &a ) {
+      flag = a.flag;
+      width = a.width;
+      vld_thresh = a.vld_thresh;
+      cov_ta = a.cov_ta;
+      prob_cat_ta = a.prob_cat_ta;
+      shape = a.shape;
+   }
+   return *this;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
 HiRAInfo::HiRAInfo() {
    clear();
 }
@@ -1829,9 +1967,9 @@ HiRAInfo::HiRAInfo() {
 ///////////////////////////////////////////////////////////////////////////////
 
 HiRAInfo parse_conf_hira(Dictionary *dict) {
-   Dictionary *hira_dict = (Dictionary *) 0;
+   Dictionary *hira_dict = (Dictionary *) nullptr;
    HiRAInfo info;
-   int i,v;
+   int v;
 
    if(!dict) {
       mlog << Error << "\nparse_conf_hira() -> "
@@ -1871,7 +2009,7 @@ HiRAInfo parse_conf_hira(Dictionary *dict) {
    }
 
    // Check for valid widths
-   for(i=0; i<info.width.n(); i++) {
+   for(int i=0; i<info.width.n(); i++) {
 
       if(info.width[i] < 1) {
          mlog << Error << "\nparse_conf_hira() -> "
@@ -1903,7 +2041,7 @@ HiRAInfo parse_conf_hira(Dictionary *dict) {
    // Conf: prob_cat_thresh
    info.prob_cat_ta = hira_dict->lookup_thresh_array(conf_key_prob_cat_thresh);
 
-   return(info);
+   return info;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1932,7 +2070,7 @@ GridWeightType parse_conf_grid_weight_flag(Dictionary *dict) {
       exit(1);
    }
 
-   return(t);
+   return t;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1966,7 +2104,7 @@ DuplicateType parse_conf_duplicate_flag(Dictionary *dict) {
       exit(1);
    }
 
-   return(t);
+   return t;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2000,7 +2138,7 @@ ObsSummary parse_conf_obs_summary(Dictionary *dict) {
       exit(1);
    }
 
-   return(t);
+   return t;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2025,7 +2163,7 @@ int parse_conf_percentile(Dictionary *dict) {
          exit(1);
    }
 
-   return(i);
+   return i;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2055,7 +2193,7 @@ ConcatString parse_conf_tmp_dir(Dictionary *dict) {
       met_closedir(odir);
    }
 
-   return(tmp_dir_path);
+   return tmp_dir_path;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2085,7 +2223,7 @@ GridDecompType parse_conf_grid_decomp_flag(Dictionary *dict) {
       exit(1);
    }
 
-   return(t);
+   return t;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2118,10 +2256,11 @@ WaveletType parse_conf_wavelet_type(Dictionary *dict) {
       exit(1);
    }
 
-   return(t);
+   return t;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+
 
 void PlotInfo::clear() {
    flag = true; // enabled by default
@@ -2130,6 +2269,20 @@ void PlotInfo::clear() {
    plot_max = bad_data_double;
    colorbar_flag = true; // plot colorbar by default
 }
+
+///////////////////////////////////////////////////////////////////////////////
+
+PlotInfo &PlotInfo::operator=(const PlotInfo &a) noexcept {
+   if ( this != &a ) {
+      flag = a.flag;
+      color_table = a.color_table;
+      plot_min = a.plot_min;
+      plot_max = a.plot_max;
+      colorbar_flag = a.colorbar_flag;
+   }
+   return *this;
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -2161,7 +2314,7 @@ PlotInfo parse_conf_plot_info(Dictionary *dict) {
    info.colorbar_flag = dict->lookup_bool(conf_key_colorbar_flag, false);
    if(!dict->last_lookup_status()) info.colorbar_flag = true;
 
-   return(info);
+   return info;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2171,8 +2324,8 @@ map<ConcatString,ThreshArray> parse_conf_filter_attr_map(
    map<ConcatString,ThreshArray> m;
    SingleThresh st;
    StringArray sa;
-   ThreshArray ta, ta_entry;
-   int i;
+   ThreshArray ta;
+   ThreshArray ta_entry;
 
    if(!dict) {
       mlog << Error << "\nparse_conf_filter_attr_map() -> "
@@ -2210,7 +2363,7 @@ map<ConcatString,ThreshArray> parse_conf_filter_attr_map(
    }
 
    // Process each array entry
-   for(i=0; i<sa.n(); i++) {
+   for(int i=0; i<sa.n(); i++) {
 
       // Add threshold to existing map entry
      if(m.count(string(sa[i])) >= 1) {
@@ -2224,7 +2377,7 @@ map<ConcatString,ThreshArray> parse_conf_filter_attr_map(
       }
    }
 
-   return(m);
+   return m;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2357,17 +2510,16 @@ InterpMthd int_to_interpmthd(int i) {
       exit(1);
    }
 
-   return(m);
+   return m;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 void check_mctc_thresh(const ThreshArray &ta) {
-   int i;
 
    // Check that the threshold values are monotonically increasing
    // and the threshold types are inequalities that remain the same
-   for(i=0; i<ta.n()-1; i++) {
+   for(int i=0; i<ta.n()-1; i++) {
 
       if(ta[i].get_value() >  ta[i+1].get_value() ||
          ta[i].get_type()  != ta[i+1].get_type()  ||
@@ -2390,7 +2542,7 @@ void check_mctc_thresh(const ThreshArray &ta) {
 ///////////////////////////////////////////////////////////////////////////////
 
 const char * statlinetype_to_string(const STATLineType t) {
-   const char *s = (const char *) 0;
+   const char *s = (const char *) nullptr;
 
    switch(t) {
       case(stat_sl1l2):        s = stat_sl1l2_str;     break;
@@ -2441,7 +2593,7 @@ const char * statlinetype_to_string(const STATLineType t) {
       default:                 s = stat_na_str;        break;
    }
 
-   return(s);
+   return s;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2505,7 +2657,7 @@ STATLineType string_to_statlinetype(const char *s) {
 
    else                                            t = no_stat_line_type;
 
-   return(t);
+   return t;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2524,7 +2676,7 @@ FieldType int_to_fieldtype(int v) {
       exit(1);
    }
 
-   return(t);
+   return t;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2545,7 +2697,7 @@ GridTemplateFactory::GridTemplates int_to_gridtemplate(int v) {
       exit(1);
    }
 
-   return(t);
+   return t;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2565,7 +2717,7 @@ ConcatString fieldtype_to_string(FieldType type) {
          exit(1);
    }
 
-   return(s);
+   return s;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2584,7 +2736,7 @@ SetLogic int_to_setlogic(int v) {
       exit(1);
    }
 
-   return(t);
+   return t;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2613,7 +2765,7 @@ SetLogic string_to_setlogic(const char *s) {
       exit(1);
    }
 
-   return(t);
+   return t;
 }
 
 
@@ -2634,7 +2786,7 @@ ConcatString setlogic_to_string(SetLogic type) {
          exit(1);
    }
 
-   return(s);
+   return s;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2654,7 +2806,7 @@ ConcatString setlogic_to_abbr(SetLogic type) {
          exit(1);
    }
 
-   return(s);
+   return s;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2674,7 +2826,7 @@ ConcatString setlogic_to_symbol(SetLogic type) {
          exit(1);
    }
 
-   return(s);
+   return s;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2695,7 +2847,7 @@ SetLogic check_setlogic(SetLogic t1, SetLogic t2) {
       exit(1);
    }
 
-   return(t);
+   return t;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2714,7 +2866,7 @@ TrackType int_to_tracktype(int v) {
       exit(1);
    }
 
-   return(t);
+   return t;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2733,7 +2885,7 @@ TrackType string_to_tracktype(const char *s) {
       exit(1);
    }
 
-   return(t);
+   return t;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2753,7 +2905,7 @@ ConcatString tracktype_to_string(TrackType type) {
          exit(1);
    }
 
-   return(s);
+   return s;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2769,7 +2921,7 @@ DiagType string_to_diagtype(const char *s) {
    else if(strcasecmp(s, ships_diag_dev_str) == 0) t = DiagType_SHIPS_Dev;
    else                                            t = DiagType_None;
 
-   return(t);
+   return t;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2790,7 +2942,7 @@ ConcatString diagtype_to_string(DiagType type) {
          exit(1);
    }
 
-   return(s);
+   return s;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2808,7 +2960,7 @@ Interp12Type int_to_interp12type(int v) {
       exit(1);
    }
 
-   return(t);
+   return t;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2826,7 +2978,7 @@ Interp12Type string_to_interp12type(const char *s) {
       exit(1);
    }
 
-   return(t);
+   return t;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2845,7 +2997,7 @@ ConcatString interp12type_to_string(Interp12Type type) {
          exit(1);
    }
 
-   return(s);
+   return s;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2864,7 +3016,7 @@ MergeType int_to_mergetype(int v) {
       exit(1);
    }
 
-   return(t);
+   return t;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2884,7 +3036,7 @@ ConcatString mergetype_to_string(MergeType type) {
          exit(1);
    }
 
-   return(s);
+   return s;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2910,7 +3062,7 @@ ConcatString obssummary_to_string(ObsSummary type, int perc_val) {
          exit(1);
    }
 
-   return(s);
+   return s;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2929,7 +3081,7 @@ MatchType int_to_matchtype(int v) {
       exit(1);
    }
 
-   return(t);
+   return t;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2949,7 +3101,7 @@ ConcatString matchtype_to_string(MatchType type) {
          exit(1);
    }
 
-   return(s);
+   return s;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2971,7 +3123,7 @@ DistType int_to_disttype(int v) {
       exit(1);
    }
 
-   return(t);
+   return t;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2993,7 +3145,7 @@ DistType string_to_disttype(const char *s) {
       exit(1);
    }
 
-   return(t);
+   return t;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -3016,7 +3168,7 @@ ConcatString disttype_to_string(DistType type) {
          exit(1);
    }
 
-   return(s);
+   return s;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -3037,7 +3189,7 @@ ConcatString dist_to_string(DistType type, const NumArray &parm) {
       s << ")";
    }
 
-   return(s);
+   return s;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -3057,7 +3209,7 @@ ConcatString griddecomptype_to_string(GridDecompType type) {
          exit(1);
    }
 
-   return(s);
+   return s;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -3080,7 +3232,7 @@ ConcatString wavelettype_to_string(WaveletType type) {
          exit(1);
    }
 
-   return(s);
+   return s;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -3126,7 +3278,7 @@ NormalizeType parse_conf_normalize(Dictionary *dict) {
       exit(1);
    }
 
-   return(t);
+   return t;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -3137,7 +3289,7 @@ NormalizeType parse_conf_normalize(Dictionary *dict) {
 
 void python_compile_error(const char *caller) {
 
-   const char *method_name = (0 != caller) ? caller : "python_compile_error() -> ";
+   const char *method_name = (nullptr != caller) ? caller : "python_compile_error() -> ";
 
    mlog << Error << "\n" << method_name
         << "Support for Python has not been compiled!\n"

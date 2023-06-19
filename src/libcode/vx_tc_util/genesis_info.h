@@ -37,6 +37,7 @@ struct GenesisEventInfo {
 
    bool                 is_genesis(const TrackPoint &) const;
    void                 clear();
+   GenesisEventInfo &operator=(const GenesisEventInfo &a) noexcept;
 };
 
 extern GenesisEventInfo parse_conf_genesis_event_info(Dictionary *dict);

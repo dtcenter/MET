@@ -17,6 +17,7 @@
 #include "gsl_randist.h"
 #include "config_gaussian.h"
 #include "config_funcs.h"
+#include "interp_mthd.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -246,6 +247,7 @@ struct TimeSummaryInfo {
   double      vld_thresh;  // Valid data time window threshold
   int         vld_freq;    // Expected observation frequency in seconds
                            //   used to compute the ratio of valid data.
+  TimeSummaryInfo & operator=(const TimeSummaryInfo &a) noexcept;   // SoanrQube findings
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -272,6 +274,7 @@ struct BootInfo {
    ConcatString     seed;     // RNG seed value
 
    void             clear();
+   BootInfo &       operator=(const BootInfo &a) noexcept;  // SoanrQube findings
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -292,6 +295,7 @@ struct InterpInfo {
    void        clear();
    void        validate(); // Ensure that width and method are accordant
    bool        operator==(const InterpInfo &) const;
+   InterpInfo &operator=(const InterpInfo &a) noexcept; // SoanrQube findings
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -322,6 +326,7 @@ struct RegridInfo {
    void clear();
    void validate();        // ensure that width and method are accordant
    void validate_point();  // ensure that width and method are accordant
+   RegridInfo &operator=(const RegridInfo &a) noexcept; // SoanrQube findings
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -340,6 +345,7 @@ struct ClimoCDFInfo {
    ClimoCDFInfo();
    void clear();
    void set_cdf_ta(int, bool &); // Construct equally-likely thresholds
+   ClimoCDFInfo &operator=(const ClimoCDFInfo &a) noexcept; // SoanrQube findings
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -356,6 +362,7 @@ struct NbrhdInfo {
    GridTemplateFactory::GridTemplates shape; // Neighborhood shape
 
    void        clear();
+   NbrhdInfo  &operator=(const NbrhdInfo &a) noexcept;  // SoanrQube findings
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -374,6 +381,7 @@ struct HiRAInfo {
 
    HiRAInfo();
    void clear();
+   HiRAInfo &operator=(const HiRAInfo &a) noexcept; // SoanrQube findings
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -390,6 +398,7 @@ struct PlotInfo {
    bool         colorbar_flag;    // Turn on/off plotting the colorbar
 
    void clear();
+   PlotInfo &operator=(const PlotInfo &a) noexcept;
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -405,6 +414,7 @@ struct MaskLatLon {
 
    void         clear();
    bool         operator==(const MaskLatLon &) const;
+   MaskLatLon  &operator=(const MaskLatLon &a) noexcept;
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -693,12 +703,6 @@ static const char conf_key_is_wind_direction[]    = "is_wind_direction";
 static const char conf_key_is_prob[]              = "is_prob";
 
 //
-//  for use with mode multivar
-//
-
-static const char conf_key_multivar_logic   [] = "multivar_logic";
-
-//
 // Climatology parameter key names
 //
 static const char conf_key_climo_mean_field[]   = "climo_mean.field";
@@ -891,6 +895,15 @@ static const char conf_key_plot_valid_flag[]       = "plot_valid_flag";
 static const char conf_key_plot_gcarc_flag[]       = "plot_gcarc_flag";
 static const char conf_key_ct_stats_flag[]         = "ct_stats_flag";
 static const char conf_key_shift_right[]           = "shift_right";
+
+//
+// Multivar MODE specific parameter key names
+//
+
+static const char conf_key_multivar_logic          [] = "multivar_logic";
+static const char conf_key_multivar_name           [] = "multivar_name";
+static const char conf_key_multivar_level          [] = "multivar_level";
+static const char conf_key_multivar_intensity_flag [] = "multivar_intensity_flag";
 
 //
 //  MTD specific parameter key names

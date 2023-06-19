@@ -1,5 +1,3 @@
-
-
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
@@ -7,8 +5,6 @@
 // ** Research Applications Lab (RAL)
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-
-
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -32,6 +28,7 @@
 #include "merc_grid_defs.h"
 #include "gaussian_grid_defs.h"
 #include "goes_grid_defs.h"
+#include "laea_grid_defs.h"
 #include "semilatlon_grid_defs.h"
 
 
@@ -73,6 +70,8 @@ class GridInfo {
       void set(const GaussianData      &);
       void set(const GoesImagerData    &);
       void set(const TcrmwData         &);
+      // void set(const LaeaData          &);
+      void set(const LaeaGrib2Data     &);
       void set(const SemiLatLonData    &);
 
       void create_grid(Grid &) const;
@@ -89,6 +88,8 @@ class GridInfo {
       const GaussianData      * g;    //  allocated
       const GoesImagerData    * gi;   //  allocated
       const TcrmwData         * tc;   //  allocated
+      // const LaeaData          * la;   //  allocated
+      const LaeaGrib2Data     * lg;   //  allocated
       const SemiLatLonData    * sl;   //  allocated
 
 };
@@ -208,6 +209,8 @@ class Grid : public GridInterface {
       Grid(const GaussianData      &);
       Grid(const GoesImagerData    &);
       Grid(const TcrmwData         &);
+      // Grid(const LaeaData          &);
+      Grid(const LaeaGrib2Data     &);
       Grid(const SemiLatLonData    &);
       virtual ~Grid();
       Grid(const Grid &);
@@ -228,6 +231,8 @@ class Grid : public GridInterface {
       void set (const GaussianData      &);
       void set (const GoesImagerData    &);
       void set (const TcrmwData         &);
+      // void set (const LaeaData          &);
+      void set (const LaeaGrib2Data     &);
       void set (const SemiLatLonData    &);
 
       void set_swap_to_north(bool swap_to_north);
@@ -288,6 +293,8 @@ extern bool is_eq(const RotatedLatLonData *, const RotatedLatLonData *);
 extern bool is_eq(const MercatorData *,      const MercatorData *);
 extern bool is_eq(const GaussianData *,      const GaussianData *);
 extern bool is_eq(const GoesImagerData *,    const GoesImagerData *);
+// extern bool is_eq(const LaeaData *,          const LaeaData *);
+extern bool is_eq(const LaeaGrib2Data *,     const LaeaGrib2Data *);
 extern bool is_eq(const SemiLatLonData *,    const SemiLatLonData *);
 
 
@@ -298,6 +305,3 @@ extern bool is_eq(const SemiLatLonData *,    const SemiLatLonData *);
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-

@@ -27,9 +27,9 @@ void ModePsFile::do_overlap_page(ModeFuzzyEngine & eng, EngineType eng_type, con
 
 {
 
-double Vtab;
-const double Htab_cen = PageWidth/2.0;
-ConcatString tmp_str;
+   double Vtab;
+   const double Htab_cen = PageWidth/2.0;
+   ConcatString tmp_str;
 
    /////////////////////////////////////////////////////////////////
    //
@@ -37,7 +37,7 @@ ConcatString tmp_str;
    //
    /////////////////////////////////////////////////////////////////
 
-inc_pagenumber();
+   inc_pagenumber();
 
    /////////////////////////////////////////////////////////////////
    //
@@ -45,19 +45,19 @@ inc_pagenumber();
    //
    /////////////////////////////////////////////////////////////////
 
-Vtab = PageHeight - 2.0*Vmargin;
-set_view(Vtab - LargePlotHeight, Vtab, Htab_cen);
+   Vtab = PageHeight - 2.0*Vmargin;
+   set_view(Vtab - LargePlotHeight, Vtab, Htab_cen);
 
-tmp_str << cs_erase << FcstString << " Objects with " << ObsString << " Outlines";
-choose_font(31, 24.0);
-write_centered_text(1, 1, Htab_cen, View_box.top() + TextSep/2.0,
-                      0.5, 0.5, tmp_str.c_str());
+   tmp_str << cs_erase << FcstString << " Objects with " << ObsString << " Outlines";
+   choose_font(31, 24.0);
+   write_centered_text(1, 1, Htab_cen, View_box.top() + TextSep/2.0,
+                       0.5, 0.5, tmp_str.c_str());
 
-comment("overlap page: fcst objects with obs boundaries");
-render_ppm(eng, eng_type, *(eng.fcst_split), 1, 1);
-outline_view();
-draw_map( &(eng.conf_info.conf) );
-draw_boundaries(eng, 0);
+   comment("overlap page: fcst objects with obs boundaries");
+   render_ppm(eng, eng_type, *(eng.fcst_split), 1, 1);
+   outline_view();
+   draw_map( &(eng.conf_info.conf) );
+   draw_boundaries(eng, 0);
 
    /////////////////////////////////////////////////////////////////
    //
@@ -65,19 +65,19 @@ draw_boundaries(eng, 0);
    //
    /////////////////////////////////////////////////////////////////
 
-Vtab = Vtab - LargePlotHeight - 2.0*Vmargin;
-set_view(Vtab - LargePlotHeight, Vtab, Htab_cen);
+   Vtab = Vtab - LargePlotHeight - 2.0*Vmargin;
+   set_view(Vtab - LargePlotHeight, Vtab, Htab_cen);
 
-tmp_str << cs_erase << ObsString << " Objects with " << FcstString << " Outlines";
-choose_font(31, 24.0);
-write_centered_text(1, 1, Htab_cen, View_box.top() + TextSep/2.0,
-                      0.5, 0.5, tmp_str.c_str());
+   tmp_str << cs_erase << ObsString << " Objects with " << FcstString << " Outlines";
+   choose_font(31, 24.0);
+   write_centered_text(1, 1, Htab_cen, View_box.top() + TextSep/2.0,
+                       0.5, 0.5, tmp_str.c_str());
 
-comment("overlap page: obs objects with fcst boundaries");
-render_ppm(eng, eng_type, *(eng.obs_split), 0, 1);
-outline_view();
-draw_map( &(eng.conf_info.conf) );
-draw_boundaries(eng, 1);
+   comment("overlap page: obs objects with fcst boundaries");
+   render_ppm(eng, eng_type, *(eng.obs_split), 0, 1);
+   outline_view();
+   draw_map( &(eng.conf_info.conf) );
+   draw_boundaries(eng, 1);
 
    /////////////////////////////////////////////////////////////////
    //
@@ -85,9 +85,9 @@ draw_boundaries(eng, 1);
    //
    /////////////////////////////////////////////////////////////////
 
-showpage();
+   showpage();
 
-return;
+   return;
 
 }
 

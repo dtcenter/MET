@@ -1065,9 +1065,10 @@ double STATAnalysisJob::get_column_double(const STATLine &L,
 ////////////////////////////////////////////////////////////////////////
 
 void STATAnalysisJob::parse_job_command(const char *jobstring) {
-   char *line = (char *) 0;
-   char *c    = (char *) 0;
-   char *lp   = (char *) 0;
+   char *line = (char *)nullptr;
+   char *c    = (char *)nullptr;
+   char *lp   = (char *)nullptr;
+   char *temp_ptr = (char *)nullptr;
    const char delim [] = " ";
    ConcatString col_name;
    StringArray col_value;
@@ -1094,7 +1095,7 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
    //
    // Parse the command line entries into a StringArray object
    //
-   while((c = strtok(lp, delim)) != nullptr) {
+   while((c = strtok_r(lp, delim, &temp_ptr)) != nullptr) {
 
       // Skip newline characters
       if(strcmp(c, "\n") == 0) continue;

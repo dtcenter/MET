@@ -208,6 +208,7 @@ int num_tokens(const char *test_str, const char *separator)
 {
    int n = 0;
    char *temp_str = (char *) nullptr;
+   char *temp_ptr = (char *) nullptr;
    char *c = (char *) nullptr;
    const char *method_name = "num_tokens() -> ";
 
@@ -228,21 +229,7 @@ int num_tokens(const char *test_str, const char *separator)
       //
       // Compute the number of tokens in the string
       //
-      //c = strtok(temp_str1.c_str(), separator);
-      c = strtok(temp_str, separator);
-
-      //
-      // Check for an empty string
-      //
-      if(c) {
-         n = 1;
-
-         //
-         // Parse remaining tokens
-         //
-         //
-         while((c = strtok(0, separator)) != nullptr) n++;
-      }
+      while((c = strtok_r(temp_str, separator, &temp_ptr)) != nullptr) n++;
 
    }
 

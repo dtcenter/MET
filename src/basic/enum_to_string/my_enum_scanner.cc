@@ -4,9 +4,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -21,6 +18,10 @@ using namespace std;
 #include "scope.h"
 
 #include "str_wrappers.h"
+
+
+using namespace std;
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -155,7 +156,7 @@ while ( 1 )  {
 //  
 // cout << "\n\n" << flush;
 
-return ( t );
+return t;
 
 }
 
@@ -266,7 +267,7 @@ if ( is_id() )  { if ( do_id() )  return ( token(ID) ); }
 
 
 
-return ( skip );
+return skip;
 
 }
 
@@ -330,7 +331,7 @@ if ( k == char_class_digit )  return ( true );
 if ( k == char_class_alpha )  return ( true );
 
 
-return ( false );
+return false;
 
 }
 
@@ -378,9 +379,9 @@ bool is_id()
 
 if ( char_class[lexeme[0]] != char_class_alpha )  return ( false );
 
-int j, k;
+int k;
 
-for (j=0; j<max_lexeme_size; ++j)  {
+for (int j=0; j<max_lexeme_size; ++j)  {
 
    if ( lexeme[j] == 0 )  break;
 
@@ -438,13 +439,13 @@ if ( enum_mode || last_was_enum || last_was_class )  {
 
    m_strncpy(yylval.name, yytext, sizeof(yylval.name), method_name);
 
-   return ( 1 );
+   return 1;
 
 }
 
 
 
-return ( 0 );
+return 0;
 
 }
 
@@ -456,13 +457,13 @@ int do_int()
 
 {
 
-if ( !enum_mode )  return ( 0 );
+if ( !enum_mode )  return 0;
 
 yylval.ival = atoi(yytext);
 
 
 
-return ( 1 );
+return 1;
 
 }
 
@@ -478,14 +479,14 @@ int do_left_curly()
 
 ++column;
 
-if ( !enum_mode )  return ( 0 );
+if ( !enum_mode )  return 0;
 
 yylval.ival = bracket_level;
 
 lexeme[0] = '{';
 
 
-return ( 1 );
+return 1;
 
 }
 
@@ -503,14 +504,14 @@ int do_right_curly()
 
 ss.clear_to_level(bracket_level);
 
-if ( !enum_mode )  return ( 0 );
+if ( !enum_mode )  return 0;
 
 yylval.ival = bracket_level + 1;
 
 lexeme[0] = '}';
 
 
-return ( 1 );
+return 1;
 
 }
 
@@ -528,13 +529,13 @@ if ( enum_mode )  {
 
    lexeme[0] = '}';
 
-   return ( 1 );
+   return 1;
 
 }
 
 
 
-return ( 0 );
+return 0;
 
 }
 
@@ -552,12 +553,12 @@ if ( enum_mode )  {
 
    lexeme[0] = '=';
 
-   return ( 1 );
+   return 1;
 
 }
 
 
-return ( 0 );
+return 0;
 
 }
 
@@ -575,12 +576,12 @@ if ( enum_mode )  {
 
    lexeme[0] = ',';
 
-   return ( 1 );
+   return 1;
 
 }
 
 
-return ( 0 );
+return 0;
 
 }
 
@@ -669,7 +670,7 @@ if ( c == '\n' )  {
 }
 
 
-return ( c );
+return c;
 
 }
 
@@ -691,7 +692,7 @@ if ( t == CLASS )  last_was_class = 1;
 if ( t == ENUM  )  last_was_enum  = 1;
 
 
-return ( t );
+return t;
 
 }
 

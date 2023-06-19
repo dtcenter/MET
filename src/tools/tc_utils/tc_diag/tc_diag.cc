@@ -182,8 +182,8 @@ void usage() {
 
         << "\twhere\t\"-data domain tech_id_list [ file_1 ... file_n | data_file_list ]\"\n"
 
-        << "\t\t\tSpecifies a domain name, a comma-separated list of ATCF tech ID's, "
-        << "\t\t\tand a list of gridded data files or an ASCII file containing "
+        << "\t\t\tSpecifies a domain name, a comma-separated list of ATCF tech ID's,\n"
+        << "\t\t\tand a list of gridded data files or an ASCII file containing\n"
         << "\t\t\ta list of files to be used.\n"
         << "\t\t\tSpecify \"-data\" once for each data source (required).\n"
 

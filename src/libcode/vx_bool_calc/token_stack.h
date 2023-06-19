@@ -47,7 +47,7 @@ class TokenStack {
 
       void clear();
 
-      void dump(ostream &, int = 0) const;
+      void dump(std::ostream &, int = 0) const;
 
       void set_alloc_inc(int = 0);   //  0 means default value (50)
 
@@ -84,7 +84,7 @@ inline bool TokenStack::nonempty() const { return ( Nelements > 0 ); }
 ////////////////////////////////////////////////////////////////////////
 
 
-extern ostream & operator<<(ostream &, const TokenStack &);
+extern std::ostream & operator<<(std::ostream &, const TokenStack &);
 
 
 ////////////////////////////////////////////////////////////////////////

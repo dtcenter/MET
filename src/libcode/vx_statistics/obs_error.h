@@ -171,6 +171,8 @@ struct ObsErrorInfo {
 
    void clear();
    void validate();
+
+   ObsErrorInfo &operator=(const ObsErrorInfo &a) noexcept;
 };
 
 ////////////////////////////////////////////////////////////////////////

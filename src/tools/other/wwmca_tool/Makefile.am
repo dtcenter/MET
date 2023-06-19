@@ -49,6 +49,7 @@ wwmca_regrid_LDADD = -lvx_pxm \
 	-lvx_nc_util \
 	-lvx_regrid \
 	-lvx_grid \
+	-lvx_geodesy \
 	-lvx_config \
 	-lvx_gsl_prob \
 	-lvx_cal \
@@ -93,6 +94,7 @@ wwmca_plot_LDADD = -lvx_pxm \
 	-lvx_nc_util \
 	-lvx_regrid \
 	-lvx_grid \
+	-lvx_geodesy \
 	-lvx_config \
 	-lvx_gsl_prob \
 	-lvx_cal \

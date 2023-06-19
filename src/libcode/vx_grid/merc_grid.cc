@@ -1,5 +1,3 @@
-
-
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
@@ -7,8 +5,6 @@
 // ** Research Applications Lab (RAL)
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-
-
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -295,12 +291,6 @@ double MercatorGrid::calc_area(int x, int y) const
 
 double u[4], v[4];
 double sum;
-
-
-// xy_to_uv(x - 0.5, y - 0.5, u[0], v[0]);  //  lower left
-// xy_to_uv(x + 0.5, y - 0.5, u[1], v[1]);  //  lower right
-// xy_to_uv(x + 0.5, y + 0.5, u[2], v[2]);  //  upper right
-// xy_to_uv(x - 0.5, y + 0.5, u[3], v[3]);  //  upper left
 
 xy_to_uv(x      , y      , u[0], v[0]);  //  lower left
 xy_to_uv(x + 1.0, y      , u[1], v[1]);  //  lower right
@@ -796,5 +786,3 @@ return;
 
 
 ////////////////////////////////////////////////////////////////////////
-
-

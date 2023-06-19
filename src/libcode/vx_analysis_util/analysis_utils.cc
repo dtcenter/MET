@@ -31,9 +31,9 @@ StringArray parse_line(const char * line)
 
 StringArray a;
 const char * delim = " ";
-char * c  = (char *) 0;
-char * lp = (char *) 0;
-char * L  = (char *) 0;
+char * c  = (char *) nullptr;
+char * L  = (char *) nullptr;
+char *temp_ptr = (char *) nullptr;
 const char *method_name = "parse_line() -> ";
    //
    //  copy the line
@@ -45,17 +45,9 @@ L = m_strcpy2(line, method_name);
    //  tokenize the line
    //
 
-lp = L;
-
-while ( 1 )  {
-
-   c = strtok(lp, delim);
-
-   if ( !c )  break;
+while((c = strtok_r(L, delim, &temp_ptr)) != nullptr) {
 
    a.add(c);
-
-   lp = (char *) 0;
 
 }
 

@@ -29,14 +29,15 @@ extern GlobalPython GP;   //  this needs external linkage
 ////////////////////////////////////////////////////////////////////////
 
 
-static const char * user_ppath            = 0;
+static const char * user_ppath            = nullptr;
 
 static const char write_tmp_nc         [] = "MET_BASE/python/pyembed/write_tmp_dataplane.py";
 
-static const char read_tmp_nc          [] = "pyembed.read_tmp_dataplane";   //  NO ".py" suffix
+static const char read_tmp_nc          [] = "MET_BASE/python/pyembed/read_tmp_dataplane.py";
 
 static const char tmp_nc_var_name      [] = "met_info";
 
+static const char validate_dataplane   [] = "met.dataplane";   // NO ".py" suffix
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -52,6 +53,21 @@ static bool tmp_nc_dataplane(const char * script_name,
                              const bool use_xarray, DataPlane & met_dp_out,
                              Grid & met_grid_out, VarInfoPython &vinfo);
 
+
+////////////////////////////////////////////////////////////////////////
+
+void release_memory(int script_argc, char ** script_argv) {
+   if ( script_argv )  {
+      for (int i=0; i<script_argc; i++ )  {
+         if ( script_argv[i] )  {
+            delete [] script_argv[i];
+            script_argv[i] = (char *) nullptr;
+         }
+      }
+      delete [] script_argv;
+      script_argv = (char **) nullptr;
+   }
+}
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -104,6 +120,7 @@ PyObject * key_obj         = 0;
 PyObject * numpy_array_obj = 0;
 PyObject * attrs_dict_obj  = 0;
 ConcatString cs, user_dir, user_base;
+const char *method_name = "straight_python_dataplane() -> ";
 
 mlog << Debug(3) << "Running user's python script ("
      << user_script_name << ").\n";
@@ -114,7 +131,18 @@ user_base = cs.basename();
 
 Wchar_Argv wa;
 
-wa.set(user_script_argc, user_script_argv);
+int script_argc = user_script_argc + 1;
+char ** script_argv = new char * [ script_argc ];
+
+char a_var_name[512+1];
+script_argv[0] = m_strcpy2(validate_dataplane, method_name, validate_dataplane);
+for (int i=0; i<user_script_argc; i++ )  {
+   snprintf(a_var_name, 512, "python_argv[%d]", i);
+   script_argv[i+1] = m_strcpy2(user_script_argv[i], method_name, a_var_name);
+}
+
+
+wa.set(script_argc, script_argv);
 
    //
    //  if the global python object has already been initialized,
@@ -133,8 +161,9 @@ if ( PyErr_Occurred() )  {
 
    PyErr_Print();
 
-   mlog << Warning << "\npython_dataplane() -> "
+   mlog << Warning << "\n" << method_name
         << "an error occurred initializing python\n\n";
+   release_memory(script_argc, script_argv);
 
    return ( false );
 
@@ -166,7 +195,8 @@ if ( user_script_argc > 0 )  {
    //  import the python script as a module
    //
 
-module_obj = PyImport_ImportModule (user_base.c_str());
+//module_obj = PyImport_ImportModule (user_base.c_str());
+module_obj = PyImport_ImportModule (validate_dataplane);
 
    //
    //  if needed, reload the module
@@ -178,11 +208,13 @@ if ( do_reload )  {
 
 }
 
+release_memory(script_argc, script_argv);
+
 if ( PyErr_Occurred() )  {
 
    PyErr_Print();
 
-   mlog << Warning << "\npython_dataplane() -> "
+   mlog << Warning << "\n" << method_name
         << "an error occurred importing module \""
         << user_script_name << "\"\n\n";
 
@@ -192,7 +224,7 @@ if ( PyErr_Occurred() )  {
 
 if ( ! module_obj )  {
 
-   mlog << Warning << "\npython_dataplane() -> "
+   mlog << Warning << "\n" << method_name
         << "error running python script \""
         << user_script_name << "\"\n\n";
 
@@ -222,7 +254,7 @@ if ( use_xarray )  {
 
    if ( ! data_array_obj )  {
 
-      mlog << Warning << "\npython_dataplane() -> "
+      mlog << Warning << "\n" << method_name
            << "trouble reading data from \""
            << user_script_name << "\"\n\n";
 
@@ -245,9 +277,14 @@ if ( use_xarray )  {
 
    if ( !numpy_array_obj || !attrs_dict_obj )  {
 
-      mlog << Warning << "\npython_dataplane() -> "
+      mlog << Warning << "\n" << method_name
            << "trouble reading data from \""
            << user_script_name << "\"\n\n";
+      if ( !numpy_array_obj ) mlog << Warning << "\n" << method_name
+                                   << numpy_array_name << " is missing\n";
+      if ( !attrs_dict_obj ) mlog << Warning << "\n" << method_name
+                                  << numpy_dict_name << " is missing\n";
+      mlog << Warning << "\n";
 
       return ( false );
    }
@@ -358,7 +395,9 @@ if ( PyErr_Occurred() )  {
 
 StringArray a;
 
-a.add(read_tmp_nc);
+a.add(validate_dataplane);
+
+a.add(replace_path(read_tmp_nc));
 
 a.add(tmp_nc_path);
 
@@ -373,7 +412,8 @@ mlog << Debug(4) << "Reading temporary Python dataplane file: "
    //  import the python wrapper script as a module
    //
 
-path = get_short_name(read_tmp_nc);
+//path = get_short_name(read_tmp_nc);
+path = get_short_name(validate_dataplane);
 
 PyObject * module_obj = PyImport_ImportModule (path.text());
 
@@ -425,7 +465,7 @@ PyObject * data_obj = PyDict_GetItem (module_dict_obj, key_obj);
 if ( ! data_obj || ! PyDict_Check(data_obj) )  {
 
    mlog << Error << "\ntmp_nc_dataplane() -> "
-        << "bad dict object\n\n";
+        << (!data_obj ? "no" : "bad") << " dict object from " << tmp_nc_var_name << "\n\n";
 
    exit ( 1 );
 

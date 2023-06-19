@@ -51,7 +51,7 @@ class MsgLevel
 
       MsgLevel();
       ~MsgLevel();
-      MsgLevel(int);
+      explicit MsgLevel(int);
       MsgLevel(const MsgLevel &);
       MsgLevel & operator=(const MsgLevel &);
 
@@ -148,7 +148,7 @@ class LoggerDebug {
 
       LoggerDebug();
       ~LoggerDebug();
-      LoggerDebug(int);
+      explicit LoggerDebug(int);
       LoggerDebug(const LoggerDebug &);
       LoggerDebug & operator=(const LoggerDebug &);
 
@@ -291,7 +291,7 @@ inline ConcatString Logger::log_filename() const { return (LogFilename); }
 
 inline int Logger::verbosity_level() const { return (VerbosityLevel); }
 
-inline bool Logger::is_open() const { return (out != 0); }
+inline bool Logger::is_open() const { return (out != nullptr); }
 
 
 //////////////////////////////////////////////////////////////////

@@ -29,8 +29,6 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <cstdio>
 #include <cstdlib>
 #include <ctype.h>
@@ -43,7 +41,6 @@ using namespace std;
 #include <unistd.h>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "main.h"
 #include "tc_gen.h"
@@ -60,6 +57,9 @@ using namespace netCDF;
 
 #include "met_file.h"
 #include "nav.h"
+
+using namespace std;
+using namespace netCDF;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -211,10 +211,10 @@ int met_main(int argc, char *argv[]) {
       mlog << Debug(1) << "Output file: " << out_nc_file << "\n";
 
       delete nc_out;
-      nc_out = (NcFile *) 0;
+      nc_out = (NcFile *) nullptr;
    }
 
-   return(0);
+   return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1051,7 +1051,7 @@ int find_genesis_match(const GenesisInfo &fcst_gi,
            << " has NO MATCH in the BEST or operational tracks.\n";
    }
 
-   return(i_best);
+   return i_best;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1138,7 +1138,7 @@ int find_probgen_match(const ProbGenInfo &prob_gi,
            << " has NO MATCH in the BEST or operational tracks.\n";
    }
 
-   return(i_best);
+   return i_best;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1181,7 +1181,7 @@ int find_genshape_match(const GenShapeInfo &gsi,
       }
    } // end for i
 
-   return(i_bga);
+   return i_bga;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1807,7 +1807,7 @@ void setup_txt_files(int n_model, int max_n_prob, int n_pair) {
          if(init_from_scratch) {
 
             // Initialize file stream
-            txt_out[i] = (ofstream *) 0;
+            txt_out[i] = (ofstream *) nullptr;
 
             // Build the file name
             txt_file[i] << out_base << "_" << txt_file_abbr[i]
@@ -2412,7 +2412,7 @@ void write_nc(GenCTCInfo &gci) {
    unixtime valid_end = (unixtime) 0;
 
    // Allocate memory
-   float *data = (float *) 0;
+   float *data = (float *) nullptr;
    int nx = gci.NcOutGrid->nx();
    int ny = gci.NcOutGrid->ny();
    data = new float [nx*ny];
@@ -2544,7 +2544,7 @@ void write_nc(GenCTCInfo &gci) {
    }
 
    // Deallocate and clean up
-   if(data) { delete [] data; data = (float *) 0; }
+   if(data) { delete [] data; data = (float *) nullptr; }
 
    return;
 }

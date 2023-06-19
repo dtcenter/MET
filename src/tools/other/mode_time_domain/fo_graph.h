@@ -97,7 +97,7 @@ class FO_Graph {
 
       void erase_edges();
 
-      void dump_as_table(ostream &) const;
+      void dump_as_table(std::ostream &) const;
       void dump_as_table(const int) const;   //  dumps to mlog with the given verbosity level
 
 

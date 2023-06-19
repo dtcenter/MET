@@ -110,54 +110,87 @@ Python Script Requirements for 2D Gridded Dataplanes
 
 3. The data inside the **met_data** variable must be **double precision floating point** type
 
-4. A Python dictionary named **attrs** must be defined in the user's script and contain the :ref:`required attributes<pyembed-2d-attrs>`
+4. A Python dictionary named **attrs** must be defined in the user's script and contain the :ref:`required attributes<pyembed-2d-attrs>` and
+   any :ref:`optional attributes<pyembed-2d-attrs>`
 
 .. _pyembed-2d-attrs:
 
-Required Attributes for 2D Gridded Dataplanes
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-The **attrs** dictionary must contain the following information:
+Attributes for 2D Gridded Dataplanes
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. list-table:: 2D Dataplane Attributes
-   :widths: 5 5 10
+   :widths: 5 5 10 5
    :header-rows: 1
 
    * - key
      - description
      - data type/format
+     - required/optional
    * - valid
      - valid time
      - string (YYYYMMDD_HHMMSS)
+     - required
    * - init
      - initialization time
      - string (YYYYMMDD_HHMMSS)
+     - required
    * - lead
      - forecast lead
      - string (HHMMSS)
+     - required
    * - accum
      - accumulation interval
      - string (HHMMSS)
+     - required
    * - name
      - variable name
      - string
+     - required
    * - long_name
      - variable long name
      - string
+     - required
    * - level
      - variable level
      - string
+     - required
    * - units
      - variable units
      - string
+     - required
    * - grid
-     - grid information
+     - :ref:`grid information<pyembed-grid-attrs>`
      - string or dict
+     - required
+   * - fill_value
+     - :ref:`missing data value<pyembed-fillvalue-attrs>`
+     - int or float
+     - optional
 
 .. note::
    
    Often times Xarray DataArray objects come with their own set of attributes available as a property. To avoid conflict with the required attributes
    for MET, it is advised to strip these attributes and rely on the **attrs** dictionary defined in your script.
+
+.. _pyembed-fillvalue-attrs:
+
+Python embedding for 2D gridded dataplanes provides support for a user-defined missing data (or fill value). By default, the MET tools will respect (and ignore) the following special values in a user's **met_data** variable:
+
+1. NaN
+2. Inf
+3. -9999
+4. -9999.
+
+If a user has a 2D dataplane with another value that should be considered a fill value by MET, then the user must use the **fill_value** attribute in the **attrs** dictionary. An example would be if a user had a 2D dataplane with missing data indicated with -99. A user can use the **fill_value** attribute in their **attrs** dictionary which will tell MET to ignore those values:
+
+.. code-block:: none
+   :caption: User Fill Value for 2D Dataplane
+   
+   'fill_value': -99
+
+Alternatively, the user can choose to replace their special values with one of the four supported values instead of setting the **fill_value** attribute. Note that only a single user-defined fill value is supported at this time.
+
+.. _pyembed-grid-attrs:
 
 The grid entry in the **attrs** dictionary must contain the grid size and projection information in the same format that is used in the netCDF files written out by the MET tools. The value of this item in the dictionary can either be a string, or another dictionary. Examples of the **grid** entry defined as a string are:
 

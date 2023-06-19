@@ -50,7 +50,7 @@ struct MtdNcOutInfo {
    void set_all_false();
    void set_all_true();
 
-   void dump(ostream &) const;
+   void dump(std::ostream &) const;
 
 };
 

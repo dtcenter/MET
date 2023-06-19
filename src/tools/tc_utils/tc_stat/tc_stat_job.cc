@@ -8,8 +8,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -28,6 +26,8 @@ using namespace std;
 #include "vx_util.h"
 #include "vx_math.h"
 #include "vx_stat_out.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -53,7 +53,7 @@ static bool         check_masks        (const MaskPoly &, const Grid &, const Ma
 ////////////////////////////////////////////////////////////////////////
 
 TCStatJob *TCStatJobFactory::new_tc_stat_job_type(const char *type_str) {
-   TCStatJob *job = (TCStatJob *) 0;
+   TCStatJob *job = (TCStatJob *) nullptr;
    TCStatJobType type = NoTCStatJobType;
 
    // Determine the TCStatJobType
@@ -86,13 +86,13 @@ TCStatJob *TCStatJobFactory::new_tc_stat_job_type(const char *type_str) {
          exit(1);
    } // end switch
 
-   return(job);
+   return job;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 TCStatJob *TCStatJobFactory::new_tc_stat_job(const char *jobstring) {
-   TCStatJob *job = (TCStatJob *) 0;
+   TCStatJob *job = (TCStatJob *) nullptr;
    StringArray a;
    ConcatString type_str = na_string;
    ConcatString err_str;
@@ -124,7 +124,7 @@ TCStatJob *TCStatJobFactory::new_tc_stat_job(const char *jobstring) {
       exit(1);
    }
 
-   return(job);
+   return job;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -158,20 +158,20 @@ TCStatJob::TCStatJob(const TCStatJob &j) {
 
 TCStatJob & TCStatJob::operator=(const TCStatJob &j) {
 
-   if(this == &j) return(*this);
+   if(this == &j) return *this;
 
    assign(j);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void TCStatJob::init_from_scratch() {
 
-   DumpOut = (ofstream *) 0;
-   JobOut  = (ofstream *) 0;
-   StatOut = (ofstream *) 0;
+   DumpOut = (ofstream *) nullptr;
+   JobOut  = (ofstream *) nullptr;
+   StatOut = (ofstream *) nullptr;
 
    // Ignore case when performing comparisons
    AModel.set_ignore_case(1);
@@ -232,11 +232,11 @@ void TCStatJob::clear() {
 
    DumpFile.clear();
    close_dump_file();
-   JobOut = (ofstream *) 0;
+   JobOut = (ofstream *) nullptr;
 
    StatFile.clear();
    close_stat_file();
-   StatOut = (ofstream *) 0;
+   StatOut = (ofstream *) nullptr;
    stat_row = 0;
 
    // Set to default values
@@ -703,7 +703,7 @@ bool TCStatJob::is_keeper_track(const TrackPairInfo &pair,
    // Update counts
    if(!keep) n.NKeep -= pair.n_points();
 
-   return(keep);
+   return keep;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -712,7 +712,7 @@ bool TCStatJob::is_keeper_line(const TCStatLine &line,
                                TCPointCounts &n) const {
 
    // Does not apply to TCDIAG lines
-   if(line.type() == TCStatLineType_TCDIAG) return(true);
+   if(line.type() == TCStatLineType_TCDIAG) return true;
 
    bool keep = true;
    double v_dbl, alat, alon, blat, blon;
@@ -870,7 +870,7 @@ bool TCStatJob::is_keeper_line(const TCStatLine &line,
    // Update counts
    if(!keep) n.NKeep -= 1;
 
-   return(keep);
+   return keep;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -887,7 +887,7 @@ double TCStatJob::get_column_double(const TCStatLine &line,
    if(strcasecmp(column.c_str(), "PROBRIRW_PROB") == 0 &&
       line.type() == TCStatLineType_ProbRIRW) {
       v = get_probrirw_value(line, ProbRIRWThresh);
-      return(v);
+      return v;
    }
 
    // Check for absolute value
@@ -924,7 +924,7 @@ double TCStatJob::get_column_double(const TCStatLine &line,
    // Apply absolute value, if requested
    if(abs_flag && !is_bad_data(v)) v = fabs(v);
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -955,7 +955,7 @@ bool TCStatJob::is_keeper_tcdiag(const StringArray &diag_name,
    // Update counts
    if(!keep) n.NKeep -= 1;
 
-   return(keep);
+   return keep;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -980,7 +980,7 @@ double TCStatJob::get_diag_double(const StringArray &diag_name,
       PrintDiagWarning.add(diag_cs);
    }
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1091,7 +1091,7 @@ StringArray TCStatJob::parse_job_command(const char *jobstring) {
       else                                           {                                                    b.add(a[i]);        }
    }
 
-   return(b);
+   return b;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1158,7 +1158,7 @@ void TCStatJob::close_dump_file() {
 
       DumpOut->close();
       delete DumpOut;
-      DumpOut = (ofstream *) 0;
+      DumpOut = (ofstream *) nullptr;
    }
 
    return;
@@ -1198,7 +1198,7 @@ void TCStatJob::close_stat_file() {
 
       StatOut->close();
       delete StatOut;
-      StatOut = (ofstream *) 0;
+      StatOut = (ofstream *) nullptr;
    }
 
    return;
@@ -1436,7 +1436,7 @@ ConcatString TCStatJob::serialize() const {
    if(StatFile.length() > 0)
       s << "-out_stat " << StatFile << " ";
 
-   return(s);
+   return s;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1447,7 +1447,6 @@ void TCStatJob::do_job(const StringArray &file_list, TCPointCounts &n) {
         << "the do_job() base class function should never be called!\n\n";
    exit(1);
 
-   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1721,11 +1720,11 @@ TCStatJobFilter::TCStatJobFilter(const TCStatJobFilter &j) {
 
 TCStatJobFilter & TCStatJobFilter::operator=(const TCStatJobFilter &j) {
 
-   if(this == &j) return(*this);
+   if(this == &j) return *this;
 
    assign(j);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1940,11 +1939,11 @@ TCStatJobSummary::TCStatJobSummary(const TCStatJobSummary &j) {
 
 TCStatJobSummary & TCStatJobSummary::operator=(const TCStatJobSummary &j) {
 
-   if(this == &j) return(*this);
+   if(this == &j) return *this;
 
    assign(j);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2033,7 +2032,7 @@ StringArray TCStatJobSummary::parse_job_command(const char *jobstring) {
       else                                     {                                               b.add(a[i]);        }
    }
 
-   return(b);
+   return b;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2099,7 +2098,7 @@ ConcatString TCStatJobSummary::serialize() const {
    // Always list the output alpha value used
    s << "-out_alpha " << OutAlpha << " ";
 
-   return(s);
+   return s;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2698,7 +2697,7 @@ TCStatJobType string_to_tcstatjobtype(const ConcatString s) {
    else if(strcasecmp(s.c_str(), TCStatJobType_ProbRIRWStr) == 0) t = TCStatJobType_ProbRIRW;
    else                                                           t = NoTCStatJobType;
 
-   return(t);
+   return t;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2714,7 +2713,7 @@ ConcatString tcstatjobtype_to_string(const TCStatJobType t) {
       default:                     s = na_str;                    break;
    }
 
-   return(ConcatString(s));
+   return ConcatString(s);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2738,7 +2737,7 @@ bool is_time_series(const TimeArray &init, const NumArray &lead,
       mlog << Debug(4)
            << "Skipping time-series computations since the array "
            << "lengths differ.\n";
-      return(false);
+      return false;
    }
 
    // Initialize time spacing
@@ -2755,21 +2754,21 @@ bool is_time_series(const TimeArray &init, const NumArray &lead,
               << "Skipping time-series computations since the "
               << "initialization time spacing changed: " << dinit
               << " != " << (init[i+1] - init[i]) << "\n";
-         return(false);
+         return false;
       }
       else if(dlead != (lead[i+1] - lead[i])) {
          mlog << Debug(4)
               << "Skipping time-series computations since the "
               << "lead time spacing changed: " << dlead
               << " != " << (lead[i+1] - lead[i]) << "\n";
-         return(false);
+         return false;
       }
       else if(dvalid != (valid[i+1] - valid[i])) {
          mlog << Debug(4)
               << "Skipping time-series computations since the "
               << "valid time spacing changed: " << dvalid
               << " != " << (valid[i+1] - valid[i]) << "\n";
-         return(false);
+         return false;
       }
    }
 
@@ -2796,7 +2795,7 @@ bool is_time_series(const TimeArray &init, const NumArray &lead,
            << sec_to_hhmmss(dsec) << "\".\n";
    }
 
-   return(!is_bad_data(dsec));
+   return !is_bad_data(dsec);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2846,7 +2845,7 @@ int compute_time_to_indep(const NumArray &val, int ds) {
    eff_size = val.n()*(n_run_abv + n_run_bel)/exp_runs;
    tind     = ds*val.n()/eff_size;
 
-   return(nint(tind));
+   return nint(tind);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2860,7 +2859,7 @@ StringArray intersection(const StringArray &s1, const StringArray &s2) {
       if(s2.has(s1[i])) s.add(s1[i]);
    }
 
-   return(s);
+   return s;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2925,11 +2924,11 @@ TCStatJobRIRW::TCStatJobRIRW(const TCStatJobRIRW &j) {
 
 TCStatJobRIRW & TCStatJobRIRW::operator=(const TCStatJobRIRW &j) {
 
-   if(this == &j) return(*this);
+   if(this == &j) return *this;
 
    assign(j);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -3024,7 +3023,7 @@ StringArray TCStatJobRIRW::parse_job_command(const char *jobstring) {
       else                                       {                                                b.add(a[i]);        }
    }
 
-   return(b);
+   return b;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -3121,7 +3120,7 @@ ConcatString TCStatJobRIRW::serialize() const {
    // Always list the output alpha value used
    s << "-out_alpha " << OutAlpha << " ";
 
-   return(s);
+   return s;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -3967,11 +3966,11 @@ TCStatJobProbRIRW::TCStatJobProbRIRW(const TCStatJobProbRIRW &j) {
 
 TCStatJobProbRIRW & TCStatJobProbRIRW::operator=(const TCStatJobProbRIRW &j) {
 
-   if(this == &j) return(*this);
+   if(this == &j) return *this;
 
    assign(j);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -4070,7 +4069,7 @@ StringArray TCStatJobProbRIRW::parse_job_command(const char *jobstring) {
       else                                               {                                                                b.add(a[i]);        }
    }
 
-   return(b);
+   return b;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -4167,7 +4166,7 @@ ConcatString TCStatJobProbRIRW::serialize() const {
    // Always list the output alpha value used
    s << "-out_alpha " << OutAlpha << " ";
 
-   return(s);
+   return s;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -4532,7 +4531,7 @@ ConcatString build_map_key(const char *prefix, const TCStatLine &l,
 
    } // end for i
 
-   return(key);
+   return key;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -4581,7 +4580,7 @@ double get_probrirw_value(const TCStatLine &line, double ProbRIRWThresh) {
    ConcatString cs;
 
    // Only valid for the PROBRIRW line type
-   if(line.type() != TCStatLineType_ProbRIRW) return(bad_data_double);
+   if(line.type() != TCStatLineType_ProbRIRW) return bad_data_double;
 
    // Get the number of threhsolds
    n = atoi(line.get_item("N_THRESH"));
@@ -4597,7 +4596,7 @@ double get_probrirw_value(const TCStatLine &line, double ProbRIRWThresh) {
       }
    }
 
-   return(p);
+   return p;
 }
 
 ////////////////////////////////////////////////////////////////////////

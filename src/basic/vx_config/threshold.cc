@@ -8,7 +8,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
 
 #include <cstdio>
 #include <iostream>
@@ -25,6 +24,9 @@ using namespace std;
 #include "vx_math.h"
 #include "vx_log.h"
 #include "is_bad_data.h"
+
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -121,7 +123,7 @@ bool Or_Node::check(double x) const
 
 {
 
-return ( check(x, bad_data_double, bad_data_double) );
+return check(x, bad_data_double, bad_data_double);
 
 }
 
@@ -135,11 +137,11 @@ bool Or_Node::check(double x, double cmn, double csd) const
 
 const bool tf_left = left_child->check(x, cmn, csd);
 
-if ( tf_left )  return ( true );
+if ( tf_left )  return true;
 
 const bool tf_right = right_child->check(x, cmn, csd);
 
-return ( tf_right );
+return tf_right;
 
 }
 
@@ -158,7 +160,7 @@ if ( right_child )  n->right_child = right_child->copy();
 
 n->threshnode_assign(this);
 
-return ( n );
+return n;
 
 }
 
@@ -189,7 +191,7 @@ if ( !is_bad_data(prob_left) && !is_bad_data(prob_right) )  {
 
 }
 
-return ( prob );
+return prob;
 
 }
 
@@ -356,7 +358,7 @@ bool And_Node::check(double x, double cmn, double csd) const
 
 const bool tf_left = left_child->check(x, cmn, csd);
 
-if ( ! tf_left )  return ( false );
+if ( ! tf_left )  return false;
 
 const bool tf_right = right_child->check(x, cmn, csd);
 
@@ -379,7 +381,7 @@ if ( right_child )  n->right_child = right_child->copy();
 
 n->threshnode_assign(this);
 
-return ( n );
+return n;
 
 }
 
@@ -428,7 +430,7 @@ if ( !is_bad_data(prob_left) && !is_bad_data(prob_right) ) {
    }
 }
 
-return ( prob );
+return prob;
 
 }
 
@@ -580,7 +582,7 @@ bool Not_Node::check(double x) const
 
 {
 
-return ( check(x, bad_data_double, bad_data_double) );
+return check(x, bad_data_double, bad_data_double);
 
 }
 
@@ -612,7 +614,7 @@ if ( child )  n->child  = child->copy();
 
 n->threshnode_assign(this);
 
-return ( n );
+return n;
 
 }
 
@@ -629,7 +631,7 @@ double prob_child = child->climo_prob();
 
 if ( !is_bad_data(prob_child) )  prob = 1.0 - prob_child;
 
-return ( prob );
+return prob;
 
 }
 
@@ -650,7 +652,7 @@ if ( !child )  {
 
 }
 
-return ( child->need_perc() );
+return child->need_perc();
 
 }
 
@@ -782,7 +784,7 @@ bool Simple_Node::check(double x) const
 
 {
 
-return ( check(x, bad_data_double, bad_data_double) );
+return check(x, bad_data_double, bad_data_double);
 
 }
 
@@ -860,7 +862,7 @@ switch ( op )  {
 
 }   //  switch
 
-return ( tf );
+return tf;
 
 }
 
@@ -884,7 +886,7 @@ n->Ptype = Ptype;
 
 n->threshnode_assign(this);
 
-return ( n );
+return n;
 
 }
 
@@ -1258,7 +1260,7 @@ if ( Ptype == perc_thresh_climo_dist )  {
    }  // switch
 }
 
-return ( prob );
+return prob;
 
 }
 
@@ -1373,7 +1375,7 @@ if ( this == &c ) return ( * this );
 
 assign(c);
 
-return ( * this );
+return *this;
 
 }
 
@@ -1715,7 +1717,7 @@ ConcatString t;
 if ( node )  t = node->s;
 else         t = na_str;
 
-return(t);
+return t;
 
 }
 
@@ -1736,7 +1738,7 @@ ConcatString t;
 if ( node )  t = node->abbr_s;
 else         t = na_str;
 
-return(t);
+return t;
 
 }
 
@@ -1798,7 +1800,7 @@ bool SingleThresh::check(double x) const
 
 {
 
-return ( check(x, bad_data_double, bad_data_double) );
+return check(x, bad_data_double, bad_data_double);
 
 }
 

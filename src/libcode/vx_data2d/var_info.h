@@ -263,6 +263,7 @@ struct InputInfo {
    int file_index;             // Index in file_list of file to read
    StringArray * file_list;    // Array of files (unallocated)
    ConcatString ens_member_id; // MET_ENS_MEMBER_ID string
+   InputInfo  &operator=(const InputInfo &a) noexcept;
 };
 
 ////////////////////////////////////////////////////////////////////////

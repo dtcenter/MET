@@ -90,7 +90,7 @@ class SingleAtt3D {
 
       void clear();
 
-      void dump(ostream &, int depth = 0) const;
+      void dump(std::ostream &, int depth = 0) const;
 
          //
          //  set stuff
@@ -306,7 +306,7 @@ class PairAtt3D {
 
       void clear();
 
-      void dump(ostream &, int depth = 0) const;
+      void dump(std::ostream &, int depth = 0) const;
 
       // SingleAtt3D Fcst;
       // SingleAtt3D Obs;
