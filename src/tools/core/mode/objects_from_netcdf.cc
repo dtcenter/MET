@@ -27,11 +27,11 @@ using namespace netCDF;
 ////////////////////////////////////////////////////////////////////////
 
 
-   //
-   //  these don't seem to be collected in any header file
-   //
-   //    that I could find
-   //
+//
+//  these don't seem to be collected in any header file
+//
+//    that I could find
+//
 
 
 static const string lat_dim_name = "lat";
@@ -53,6 +53,19 @@ static void populate_bool_plane(const int * buf, const int nx, const int ny, Boo
 ////////////////////////////////////////////////////////////////////////
 
 
+// void  objects_from_arrays(bool do_clusters,
+//                           int *fcst_objects, int *obs_objects, int nx, int ny,
+//                           BoolPlane & fcst_out, 
+//                           BoolPlane & obs_out)
+// {
+//    populate_bool_plane(fcst_objects, nx, ny, fcst_out);
+//    populate_bool_plane(obs_objects, nx, ny, obs_out);
+// }  
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void objects_from_netcdf(const char * netcdf_filename, 
                          bool do_clusters,     //  do we look at cluster objects or simple objects?
                          BoolPlane & fcst_out, 
@@ -60,77 +73,77 @@ void objects_from_netcdf(const char * netcdf_filename,
 
 {
 
-int * buf = 0;
-const string * fcst_var_name = 0;
-const string *  obs_var_name = 0;
+   int * buf = 0;
+   const string * fcst_var_name = 0;
+   const string *  obs_var_name = 0;
 
-if ( do_clusters )  {
+   if ( do_clusters )  {
 
-   fcst_var_name = &fcst_cluster_id_var_name;
-    obs_var_name = &obs_cluster_id_var_name;
+      fcst_var_name = &fcst_cluster_id_var_name;
+      obs_var_name = &obs_cluster_id_var_name;
 
-} else {
+   } else {
 
-   fcst_var_name = &fcst_simple_id_var_name;
-    obs_var_name = &obs_simple_id_var_name;
+      fcst_var_name = &fcst_simple_id_var_name;
+      obs_var_name = &obs_simple_id_var_name;
 
-}
+   }
 
 
    //
    //  open the netcdf file
    //
 
-NcFile nc((std::string) netcdf_filename, NcFile::read);
+   NcFile nc((std::string) netcdf_filename, NcFile::read);
 
    //
    //  grab the lat/lon dimensions
    //
 
-NcDim lat_dim, lon_dim;
+   NcDim lat_dim, lon_dim;
 
-lat_dim = nc.getDim(lat_dim_name);
-lon_dim = nc.getDim(lon_dim_name);
+   lat_dim = nc.getDim(lat_dim_name);
+   lon_dim = nc.getDim(lon_dim_name);
 
    //
    //  use the lat/lon dimensions to set the size of the bool planes
    //
 
-const int n_lat = (int) lat_dim.getSize();
-const int n_lon = (int) lon_dim.getSize();
-const int nx    = n_lon;
-const int ny    = n_lat;
+   const int n_lat = (int) lat_dim.getSize();
+   const int n_lon = (int) lon_dim.getSize();
+   const int nx    = n_lon;
+   const int ny    = n_lat;
 
-buf = new int [nx*ny];
+   buf = new int [nx*ny];
 
    //
    //  grab the netcdf variables
    //
 
-NcVar f_var, o_var;
+   NcVar f_var, o_var;
 
-f_var = nc.getVar(*fcst_var_name);
-o_var = nc.getVar( *obs_var_name);
+   f_var = nc.getVar(*fcst_var_name);
+   o_var = nc.getVar( *obs_var_name);
 
    //
    //  populate the bool planes
    //
 
-f_var.getVar(buf);
+   f_var.getVar(buf);
 
-populate_bool_plane(buf, nx, ny, fcst_out);
+   populate_bool_plane(buf, nx, ny, fcst_out);
 
-o_var.getVar(buf);
+   o_var.getVar(buf);
 
-populate_bool_plane(buf, nx, ny, obs_out);
+   populate_bool_plane(buf, nx, ny, obs_out);
 
    //
    //  done
    //
 
-if ( buf )  { delete [] buf;  buf = 0; }
+   if ( buf )  { delete [] buf;  buf = 0; }
 
-return;
+   return;
 
 }
 
@@ -142,31 +155,31 @@ void populate_bool_plane(const int * buf, const int nx, const int ny, BoolPlane 
 
 {
 
-int x, y, n, k;
-bool tf;
+   int x, y, n, k;
+   bool tf;
+   double nyes=0.0;
+   double ntotal = (double)(nx*ny);
+   bp_out.set_size(nx, ny);
 
-bp_out.set_size(nx, ny);
+   for (x=0; x<nx; ++x)  {
 
-for (x=0; x<nx; ++x)  {
+      for (y=0; y<ny; ++y)  {
 
-   for (y=0; y<ny; ++y)  {
+         n = y*nx + x;
 
-      n = y*nx + x;
+         k = buf[n];
 
-      k = buf[n];
+         tf = ( k > 0 );
+         if (tf) ++nyes;
+         bp_out.put(tf, x, y);
 
-      tf = ( k > 0 );
+      }   //  for y
 
-      bp_out.put(tf, x, y);
+   }   //  for x
 
-   }   //  for y
+   mlog << Debug(1) << nyes/ntotal << " of the data was true\n";
 
-}   //  for x
-
-
-
-
-return;
+   return;
 
 }
 

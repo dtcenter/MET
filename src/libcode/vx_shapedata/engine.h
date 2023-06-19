@@ -181,14 +181,21 @@ class ModeFuzzyEngine {
 
       void set_grid(const Grid *);
       void set(const ShapeData &fcst_wd, const ShapeData &obs_wd);
-
       void set_no_conv(const ShapeData &fcst_wd, const ShapeData &obs_wd);
+      void set_only_split(const ShapeData &fcst_wd, const ShapeData &obs_wd);
+      void set_super(const ShapeData &fcst_wd, const ShapeData &obs_wd);
 
       void set_fcst (const ShapeData & fcst_wd);
       void set_obs  (const ShapeData &  obs_wd);
 
       void set_fcst_no_conv (const ShapeData & fcst_wd);
       void set_obs_no_conv  (const ShapeData &  obs_wd);
+
+      void set_fcst_only_split (const ShapeData & fcst_wd);
+      void set_obs_only_split  (const ShapeData &  obs_wd);
+
+      void set_fcst_super (const ShapeData & fcst_wd);
+      void set_obs_super  (const ShapeData &  obs_wd);
 
       int two_to_one(int, int) const;
 
@@ -209,8 +216,14 @@ class ModeFuzzyEngine {
 
       void do_fcst_merging(const char *default_config,
                            const char *merge_config);
+      void do_fcst_merging(const char *default_config,
+                           const char *merge_config,
+                           const ShapeData &merge_data);
       void do_obs_merging(const char *default_config,
                           const char *merge_config);
+      void do_obs_merging(const char *default_config,
+                          const char *merge_config,
+                          const ShapeData &merge_data);
 
       void do_matching();
 
@@ -235,6 +248,14 @@ class ModeFuzzyEngine {
 
       void do_fcst_merge_thresh();
       void do_obs_merge_thresh();
+
+         //
+         // Perform merging of the forecast and observation fields
+         // based on an input merge shapes object
+         //
+
+      void do_fcst_merge_thresh(const ShapeData &merge_data);
+      void do_obs_merge_thresh(const ShapeData &merge_data);
 
          //
          // Perform merging of the forecast and observation fields
@@ -293,14 +314,17 @@ class ModeFuzzyEngine {
       bool need_fcst_clus_split;
       bool need_obs_clus_split;
 
+      bool is_multivar_super;        // used when producing output files
+      bool is_multivar_intensity;    // used when producing output files
+
       const Grid * grid;             //  not allocated
 
       ShapeData * fcst_raw;          //  allocated
-      ShapeData * fcst_thresh;       //  allocated
-      ShapeData * fcst_conv;         //  allocated
-      ShapeData * fcst_mask;         //  allocated
-      ShapeData * fcst_split;        //  allocated
-      ShapeData * fcst_clus_split;   //  allocated
+      ShapeData * fcst_thresh;       //  allocated  thresholded raw  (values are 1 or 0)
+      ShapeData * fcst_conv;         //  allocated  convolve of raw  
+      ShapeData * fcst_mask;         //  allocated  thresholded convolved, filtered using attribute logic (values are 1 or 0)
+      ShapeData * fcst_split;        //  allocated split of fcst_mask.. final one, numbers 1, 2, ...
+      ShapeData * fcst_clus_split;   //  allocated numbered 1 and up
 
       ShapeData * obs_raw;           //  allocated
       ShapeData * obs_thresh;        //  allocated
@@ -353,7 +377,8 @@ class ModeFuzzyEngine {
 extern double total_interest     (ModeConfInfo &, const PairFeature &, int, int, bool is_single);
 extern double interest_percentile(ModeFuzzyEngine &, const double, const int);
 
-extern void write_engine_stats   (ModeFuzzyEngine &, const Grid &, AsciiTable &);
+extern void write_engine_stats   (ModeFuzzyEngine &, const Grid &, AsciiTable &, bool isMultiVarSuper=false,
+                                  bool isMultivarIntensity=false);
 extern void write_header_row     (ModeFuzzyEngine &, AsciiTable &, const int row);   //  row usually zero
 extern void write_header_columns (ModeFuzzyEngine &, const Grid &, AsciiTable &, const int row);
 extern void write_fcst_single    (ModeFuzzyEngine &, const int, const Grid &, AsciiTable &, const int);

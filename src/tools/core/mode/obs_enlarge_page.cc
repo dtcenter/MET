@@ -26,8 +26,8 @@ void ModePsFile::do_obs_enlarge_page(ModeFuzzyEngine & eng, EngineType eng_type,
 
 {
 
-double Vtab;
-const double Htab_cen = PageWidth/2.0;
+   double Vtab;
+   const double Htab_cen = PageWidth/2.0;
 
    /////////////////////////////////////////////////////////////////
    //
@@ -35,11 +35,11 @@ const double Htab_cen = PageWidth/2.0;
    //
    /////////////////////////////////////////////////////////////////
 
-inc_pagenumber();
+   inc_pagenumber();
 
-choose_font(31, 24.0);
-write_centered_text(1, 1, Htab_cen, 752.0, 0.5, 0.5, title);
-write_centered_text(1, 1, Htab_cen, 722.0, 0.5, 0.5, ObsString.c_str());
+   choose_font(31, 24.0);
+   write_centered_text(1, 1, Htab_cen, 752.0, 0.5, 0.5, title);
+   write_centered_text(1, 1, Htab_cen, 722.0, 0.5, 0.5, ObsString.c_str());
 
    /////////////////////////////////////////////////////////////////
    //
@@ -47,13 +47,13 @@ write_centered_text(1, 1, Htab_cen, 722.0, 0.5, 0.5, ObsString.c_str());
    //
    /////////////////////////////////////////////////////////////////
 
-Vtab = PageHeight - 4.0*Vmargin;
-set_view(Vtab - LargePlotHeight, Vtab, Htab_cen);
-comment("obs enlarge page: obs raw");
-render_ppm(eng, eng_type, *(eng.obs_raw), 0, 0);
-outline_view();
-draw_map( &(eng.conf_info.conf) );
-draw_colorbar(false);
+   Vtab = PageHeight - 4.0*Vmargin;
+   set_view(Vtab - LargePlotHeight, Vtab, Htab_cen);
+   comment("obs enlarge page: obs raw");
+   render_ppm(eng, eng_type, *(eng.obs_raw), 0, 0);
+   outline_view();
+   draw_map( &(eng.conf_info.conf) );
+   draw_colorbar(false);
 
    /////////////////////////////////////////////////////////////////
    //
@@ -61,13 +61,13 @@ draw_colorbar(false);
    //
    /////////////////////////////////////////////////////////////////
 
-Vtab -= LargePlotHeight;
-set_view(Vtab - LargePlotHeight, Vtab, Htab_cen);
-comment("obs enlarge page: obs split");
-render_ppm(eng, eng_type, *(eng.obs_split), 0, 1);
-outline_view();
-draw_map( &(eng.conf_info.conf) );
-draw_convex_hulls(eng, 0, 0);
+   Vtab -= LargePlotHeight;
+   set_view(Vtab - LargePlotHeight, Vtab, Htab_cen);
+   comment("obs enlarge page: obs split");
+   render_ppm(eng, eng_type, *(eng.obs_split), 0, 1);
+   outline_view();
+   draw_map( &(eng.conf_info.conf) );
+   draw_convex_hulls(eng, 0, 0);
 
    /////////////////////////////////////////////////////////////////
    //
@@ -75,8 +75,8 @@ draw_convex_hulls(eng, 0, 0);
    //
    /////////////////////////////////////////////////////////////////
 
-showpage();
+   showpage();
 
-return;
+   return;
 
 }

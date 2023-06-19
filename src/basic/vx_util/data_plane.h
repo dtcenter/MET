@@ -13,6 +13,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+#include <string>
 #include <vector>
 
 #include "two_to_one.h"
@@ -58,12 +59,15 @@ class DataPlane {
       DataPlane & operator=(const DataPlane &);
       DataPlane & operator+=(const DataPlane &);
       DataPlane & operator/=(const double);
-
+      bool operator==(const DataPlane &) const;
       void clear();
 
       void erase();
 
       void dump(std::ostream &, int = 0) const;
+
+      void debug_examine(bool show_all_value=false) const;
+      std::string sdebug_examine() const;
 
          //
          // Set functions
@@ -80,6 +84,8 @@ class DataPlane {
       void set_valid(unixtime);
       void set_lead(int);
       void set_accum(int);
+
+      void set_all(float *data, int nx, int ny);
 
          //
          // Get functions
@@ -115,6 +121,7 @@ class DataPlane {
       void standard_anomaly(const DataPlane &, const DataPlane &);
 
       void replace_bad_data(const double value);
+      void set_all_to_bad_data();
 
       int  two_to_one(int x, int y, bool to_north=true) const;
       void one_to_two(int n, int &x, int &y) const;

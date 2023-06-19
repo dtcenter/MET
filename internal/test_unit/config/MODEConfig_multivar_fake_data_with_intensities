@@ -56,7 +56,7 @@ multivar_logic = "#1 && #2 && #3";
 //
 // MODE Multivar intensity logic
 //
-multivar_intensity_flag = [FALSE, FALSE, FALSE];
+multivar_intensity_flag = [TRUE, TRUE, TRUE];
 
 //
 // Forecast and observation fields to be verified
