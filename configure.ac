@@ -1337,6 +1337,7 @@ if test -n "$MET_DEVELOPMENT"; then
                     internal/test_util/libcode/vx_physics/Makefile
                     internal/test_util/libcode/vx_series_data/Makefile
                     internal/test_util/libcode/vx_solar/Makefile
+                    internal/test_util/libcode/vx_statistics/Makefile
                     internal/test_util/tools/Makefile
                     internal/test_util/tools/other/Makefile
                     internal/test_util/tools/other/mode_time_domain/Makefile])
