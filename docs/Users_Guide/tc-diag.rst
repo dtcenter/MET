@@ -16,9 +16,19 @@ Introduction
   WARNING: Please see the release notes of future MET versions for updates.
   WARNING:
 
-The TC-Diag tool computes Tropical Cyclone diagnostics using ATCF track and gridded data inputs. TC-Diag is run once for each initialization time. The user provides ATCF track data, along with track filtering criteria as needed, to select one or more tracks to be processed. The user also provides gridded model data from which diagnostics should be computed. Gridded data can be provided for multiple concurrent storms, multiple models, and/or multiple domains (i.e. parent and nest) in a single run.
+A diagnosis of the large-scale environment of tropical cyclones (TCs) is foundational for many prediction techniques, including statistical-dynamical forecast aids and techniques based on artificial intelligence. Such diagnostics can also be used by forecasters seeking to understand how a given model's forecast will pan out. Finally, TC diagnostics can be useful in verification to stratify the performance of models in different environmental regimes over a longer period of time, thereby providing useful insights on model biases or deficiencies for model developers and forecasters.
 
-TC-Diag first determines the list of valid times that appear in any one of the tracks. For each valid time, it processes all track points for that time. For each track point, it reads the gridded model fields requested in the configuration file and transforms them gridded data to a range-azimuth cyclindrical coordinates grid. For each domain, it writes the range-azimuth data to a temporary NetCDF file. TC-Diag then calls one or more Python diagnostics scripts, as specified in the configuration file, to compute tropical cyclone diagnostic values. The computed diagnostics values are retrieved from the Python script and stored in memory.
+Originally developed for the Statistical Hurricane Intensity Prediction Scheme (SHIPS), and later as a stand-alone package called 'Model Diagnostics', by the Cooperative Institute for Research in the Atmosphere (CIRA), MET now integrates these capabilities into the an extensible framework called the TC-Diag tool. This tool allows users compute diagnostics for the large-scale environment of TCs using ATCF track and gridded model data inputs. Importantly, the tool computes diagnostics along one or more user-specified tracks. The current version of the TC-Diag tool requires that the tracks and fields be self-consistent [i.e., the track should be the model's (or ensemble's) own predicted track(s)]. The reason is that the diagnostics are computed in a coordinate system centered on the model's moving model storm and the current version of the tool does not yet include vortex removal. If the track is not consistent with the underlying fields, the diagnostics output are unlikely to be useful because the model's simulated storm would contaminate the diagnostics calculations.
+
+.. note:: A future version of the tool will include the capability to remove the model's own vortex, which will allow the user to specify any arbitrary track (such as the operational center's official forecast). Until then, users are advised that the track selected must be consistent with the model's predicted track.
+
+TC-Diag is run once for each initialization time. The user provides track data (such as one or more ATCF a-deck track files), along with track filtering criteria as needed, to select one or more tracks to be processed. The user also provides gridded model data from which diagnostics should be computed. Gridded data can be provided for multiple concurrent storms, multiple models, and/or multiple domains (i.e. parent and nest) in a single run.
+
+TC-Diag first determines the list of valid times that appear in any one of the tracks. For each valid time, it processes all track points for that time. For each track point, it reads the gridded model fields requested in the configuration file and transforms the gridded data to a range-azimuth cyclindrical coordinates grid. For each domain, it writes the range-azimuth data to a temporary NetCDF file.
+
+.. note:: The current version of the tool does not yet include the capabilities described in the next three paragraphs. These additional capabilities are planned to be added in the MET v12.0.0 release later in 2023.
+
+Once the input data have been processed into the temporary NetCDF files, TC-Diag then calls one or more Python diagnostics scripts, as specified in the configuration file, to compute tropical cyclone diagnostic values. The computed diagnostics values are retrieved from the Python script and stored in memory.
 
 After processing all valid times and all corresponding track points, the computed diagnostics are written to ASCII and/or NetCDF output files. If requested in the configuration file, the temporary range-azimuth cylindrical coordinates files are combined into a single NetCDF file and written to the output for each combination of model track and domain.
 
@@ -67,9 +77,10 @@ Optional arguments for tc_diag
 tc_diag configuration file
 --------------------------
 
-The default configuration file for the TC-Diag tool named **TCDiagConfig_default** can be found in the installed *share/met/config/* directory. It is encouraged for users to copy these default files before modifying their contents. The contents of the configuration file are described in the subsections below.
+The default configuration file for the TC-Diag tool named **TCDiagConfig_default** can be found in the installed *share/met/config/* directory. Users are encouraged to copy these default files before modifying their contents. The contents of the configuration file are described in the subsections below.
 
-_______________________
+Configuring input tracks and time
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: none
 
@@ -89,7 +100,8 @@ The TC-Diag tool should be configured to filter the input track data (**-deck**)
 
 The configuration options listed above are used to filter the input track data down to those that should be processed in the current run. These options are common to multiple MET tools and are described in :numref:`config_options_tc`.
 
-_______________________
+Configuring domain information
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: none
 
@@ -122,7 +134,8 @@ The **diag_script** entry is an array of strings. Each string specifies the path
 
 .. note:: As of MET version 11.1.0, no tropical cyclone diagnostics are actually computed or written to the output.
 
-_______________________
+Configuring data censoring and conversion options
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: none
 
@@ -132,7 +145,8 @@ _______________________
 
 These data censoring and conversion options are common to multiple MET tools and are described in :numref:`config_options`. They can be specified separately in each **data.field** array entry, described below. If provided, those operations are performed after reading the gridded data but prior to conveting to the cylindrical coordinate range-azimuth grid.
 
-_______________________
+Configuring fields, levels, and domains
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: none
 
@@ -168,7 +182,8 @@ The **name** and **level** entries are common to multiple MET tools and are desc
 
 The **domain** entry is an array of strings. Each string specifies a domain name. If the **domain_info** domain name appears in this **domain** list, then this field will be read from that **domain_info** data source. If **domain** is set to an empty list, then this field will be read from all domain data sources.
 
-_______________________
+Configuring regridding options
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: none
 
@@ -178,7 +193,8 @@ These **regrid** dictionary is common to multiple MET tools and is described in 
 
 .. note:: As of MET version 11.1.0, the nearest neighbor regridding method is used rather than this configuration file option.
 
-_______________________
+Configuring vortex removal option
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: none
 
@@ -188,7 +204,8 @@ These **vortex_removal** flag entry is a boolean specifying whether or not vorte
 
 .. note:: As of MET version 11.1.0, vortex removal logic is not yet supported.
 
-_______________________
+Configuring data output options
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: none
 
@@ -200,7 +217,8 @@ These three flag entries are booleans specifying what output data types should b
 
 .. note:: As of MET version 11.1.0, **nc_rng_azi_flag** is the only supported output type. These configuration options will automatically be reset at runtime to the settings listed above.
 
-_______________________
+Configuring MET version, output prefix, and temp directory
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: none
 
