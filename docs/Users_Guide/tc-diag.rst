@@ -101,7 +101,7 @@ The TC-Diag tool should be configured to filter the input track data (**-deck**)
 The configuration options listed above are used to filter the input track data down to those that should be processed in the current run. These options are common to multiple MET tools and are described in :numref:`config_options_tc`.
 
 Configuring domain information
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: none
 
