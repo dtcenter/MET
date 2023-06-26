@@ -24,3 +24,4 @@ export EXTERNAL_LIBS=/contrib/met/11.1.0/external_libs/
 #export CFLAGS="-Wall -g"
 #export CXXFLAGS="-Wall -g -lcurl"
 export MAKE_ARGS=-j
+export CXXFLAGS="-std=c++11"

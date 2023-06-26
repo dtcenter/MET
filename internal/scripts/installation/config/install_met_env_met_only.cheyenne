@@ -12,7 +12,7 @@ export MET_PYTHON_CC=-I${MET_PYTHON}/include/python3.10
 export MET_PYTHON_LD=`${MET_PYTHON}/bin/python3-config --ldflags --embed`
 export MET_NETCDF=/glade/u/apps/ch/opt/netcdf/4.8.0/intel/2021.2/
 export MET_HDF5=/glade/u/apps/ch/opt/netcdf/4.8.0/intel/2021.2/
-export EXTERNAL_LIBS=/glade/p/ral/jntp/MET/MET_releases/11.1.0/external_libs
+export EXTERNAL_LIBS=${TEST_BASE}/external_libs
 export MET_GSL=${EXTERNAL_LIBS}
 export MET_BUFRLIB=${EXTERNAL_LIBS}
 export BUFRLIB_NAME=-lbufr
@@ -26,3 +26,5 @@ export LIB_Z=${EXTERNAL_LIBS}/lib
 export SET_D64BIT=FALSE
 ##export CFLAGS="-Wall -g"
 ##export CXXFLAGS="-Wall -g"
+export MAKE_ARGS=-j
+export CXXFLAGS="-std=c++11"
