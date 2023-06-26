@@ -28,7 +28,7 @@ struct SemiLatLonData {
    NumArray levels;
    NumArray times;
 
-   void dump();
+   void dump() const;
    void clear();
 };
 

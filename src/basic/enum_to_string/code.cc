@@ -10,9 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
-
 #include <iostream>
 #include <fstream>
 #include <unistd.h>
@@ -27,6 +24,9 @@ using namespace std;
 
 #include "str_wrappers.h"
 #include "vx_cal.h"
+
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////

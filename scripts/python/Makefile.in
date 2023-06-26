@@ -330,15 +330,10 @@ SUBDIRS = \
 	examples \
 	met \
 	pyembed \
-	utility
+	utility \
+	tc_diag
 
 pythonscriptsdir = $(pkgdatadir)/python
-
-#EXTRA_DIST = ${top_DATA} \
-#	sample_fcst \
-#	sample_obs \
-#	python \
-#	copyright_notice.txt
 MAINTAINERCLEANFILES = Makefile.in
 all: all-recursive
 

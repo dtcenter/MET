@@ -14,6 +14,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 #include <iostream>
+#include <vector>
 
 #include "vx_config.h"
 #include "vx_data2d.h"
@@ -89,9 +90,16 @@ class ModeConfInfo {
 
       ConcatString  fcst_multivar_logic;
       ConcatString   obs_multivar_logic;
+      BoolArray multivar_intensity;
+      ConcatString fcst_multivar_name;
+      ConcatString fcst_multivar_level;
+      ConcatString obs_multivar_name;
+      ConcatString obs_multivar_level;
 
       void get_multivar_programs();
 
+      void check_multivar_not_implemented();
+      bool multivar_intensities_all_false() const;
 
    /////////////////////////////////////////////////////////////////////
 
@@ -215,16 +223,28 @@ class ModeConfInfo {
 
       void set_conv_radius_by_index  (int);
       void set_conv_thresh_by_index  (int);
+      void set_conv_thresh(SingleThresh);
+      void set_conv_radius(int);
 
       int n_conv_threshs  () const;
       int n_conv_radii    () const;
 
       int n_runs() const;   //  # threshs times # radii
 
+      int n_fields() const;   // should be 1 for traditional mode, > 1 for muiltivar
+
       int get_compression_level();
 
       void  set_fcst_merge_thresh_by_index (int);
       void  set_obs_merge_thresh_by_index  (int);
+
+      void  set_fcst_conv_thresh_by_merge_index (int);
+      void  set_obs_conv_thresh_by_merge_index  (int);
+
+      void set_fcst_merge_flag(MergeType);
+      void set_obs_merge_flag(MergeType);
+      void set_fcst_merge_thresh(SingleThresh);
+      void set_obs_merge_thresh(SingleThresh);
 
 };
 
@@ -241,6 +261,8 @@ inline int ModeConfInfo::n_conv_threshs() const { return ( Fcst->conv_thresh_arr
 inline int ModeConfInfo::get_compression_level() { return conf.nc_compression(); }
 
 inline int ModeConfInfo::field_index() const { return Field_Index; }
+
+inline int ModeConfInfo::n_fields() const { return N_fields; }
 
 
 ////////////////////////////////////////////////////////////////////////

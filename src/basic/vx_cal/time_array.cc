@@ -11,8 +11,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -21,6 +19,9 @@ using namespace std;
 
 #include "vx_cal.h"
 #include "vx_log.h"
+
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -82,11 +83,11 @@ TimeArray & TimeArray::operator=(const TimeArray & a)
 
 {
 
-if ( this == &a )  return ( * this );
+if ( this == &a )  return *this;
 
 assign(a);
 
-return ( * this );
+return *this;
 
 }
 
@@ -98,11 +99,11 @@ bool TimeArray::operator==(const TimeArray & a) const
 
 {
 
-if ( Nelements != a.Nelements )  return ( false );
+if ( Nelements != a.Nelements )  return false;
 
 bool status = true;
 
-for (int j=0; j<(Nelements); ++j)  {
+for (int j=0; j<Nelements; ++j)  {
 
    if ( e[j] != a.e[j] )  {
       status = false;
@@ -110,7 +111,7 @@ for (int j=0; j<(Nelements); ++j)  {
    }
 }
 
-return ( status );
+return status;
 
 }
 
@@ -178,9 +179,7 @@ if ( a.Nelements == 0 )  return;
 
 extend(a.Nelements);
 
-int j;
-
-for (j=0; j<(a.Nelements); ++j)  {
+for (int j=0; j<(a.Nelements); ++j)  {
 
    e[j] = a.e[j];
 
@@ -231,13 +230,11 @@ if ( !u )  {
 
 }
 
-int j;
-
 memset(u, 0, n*sizeof(unixtime));
 
 if ( e )  {
 
-   for (j=0; j<Nelements; ++j)  {
+   for (int j=0; j<Nelements; ++j)  {
 
       u[j] = e[j];
 
@@ -271,9 +268,7 @@ out << prefix << "Nelements = " << Nelements << "\n";
 out << prefix << "Nalloc    = " << Nalloc    << "\n";
 out << prefix << "Sorted    = " << (Sorted ? "true" : "false") << "\n";
 
-int j;
-
-for (j=0; j<Nelements; ++j)  {
+for (int j=0; j<Nelements; ++j)  {
 
    out << prefix << "Element # " << j << " = "
        << unix_to_yyyymmdd_hhmmss(e[j]) << "\n";
@@ -307,7 +302,7 @@ if ( (n < 0) || (n >= Nelements) )  {
 
 }
 
-return ( e[n] );
+return e[n];
 
 }
 
@@ -331,15 +326,15 @@ int TimeArray::index(unixtime u) const
 
 {
 
-int j, match = -1;
+int match = -1;
 
-for (j=0; j<Nelements; ++j)  {
+for (int j=0; j<Nelements; ++j)  {
 
    if ( e[j] == u )  {  match = j;  break;  }
 
 }
 
-return ( match );
+return match;
 
 }
 
@@ -371,11 +366,33 @@ void TimeArray::add(const TimeArray & a)
 
 extend(Nelements + a.Nelements);
 
-int j;
-
-for (j=0; j<(a.Nelements); ++j)  {
+for (int j=0; j<(a.Nelements); ++j)  {
 
    e[Nelements++] = a.e[j];
+
+}
+
+Sorted = false;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void TimeArray::add_const(unixtime u, int n)
+
+{
+
+extend(Nelements + n);
+
+int j;
+
+for (j=0; j<n; ++j)  {
+
+   e[Nelements++] = u;
 
 }
 
@@ -399,9 +416,7 @@ sa.parse_css(text);
 
 extend(Nelements + sa.n_elements());
 
-int j;
-
-for (j=0; j<sa.n_elements(); j++)  {
+for (int j=0; j<sa.n_elements(); j++)  {
 
   add(timestring_to_unix(sa[j].c_str()));
 
@@ -446,16 +461,16 @@ unixtime TimeArray::min() const
 
 {
 
-int j;
 unixtime u;
 
-if(Nelements == 0)  return(bad_data_ll);
+if(Nelements == 0)  return bad_data_ll;
 
-for(j=0, u=e[0]; j<Nelements; j++) {
+u = e[0];
+for(int j=0; j<Nelements; j++) {
    if(e[j] < u) u = e[j];
 }
 
-return(u);
+return u;
 
 }
 
@@ -467,16 +482,16 @@ unixtime TimeArray::max() const
 
 {
 
-int j;
 unixtime u;
 
-if(Nelements == 0)  return(bad_data_ll);
+if(Nelements == 0)  return bad_data_ll;
 
-for(j=0, u=e[0]; j<Nelements; j++) {
+u = e[0];
+for(int j=0; j<Nelements; j++) {
    if(e[j] > u) u = e[j];
 }
 
-return(u);
+return u;
 
 }
 
@@ -490,14 +505,12 @@ ConcatString TimeArray::serialize() const
 
    ConcatString s;
 
-   if(n_elements() == 0) return(s);
-
-   int j;
+   if(n_elements() == 0) return s;
 
    s << e[0];
-   for(j=1; j<n_elements(); j++) s << " " << unix_to_yyyymmdd_hhmmss(e[j]);
+   for(int j=1; j<n_elements(); j++) s << " " << unix_to_yyyymmdd_hhmmss(e[j]);
 
-   return(s);
+   return s;
 
 }
 
@@ -531,9 +544,6 @@ void TimeArray::equal_dt(TimeArray &beg, TimeArray &end) const
 
 {
 
-int i, cur_dt, prv_dt;
-bool new_ts;
-
 // Initialize
 end.clear();
 beg.clear();
@@ -543,8 +553,12 @@ if ( Nelements == 0 )  return;
 // Use first point to begin first segment
 beg.add(e[0]);
 
-for(i=1, prv_dt=0, new_ts=true; i<Nelements; i++, prv_dt=cur_dt) {
-   cur_dt = e[i] - e[i-1];
+int cur_dt;
+int prv_dt = 0;
+bool new_ts = true;
+
+for(int i=1; i<Nelements; i++, prv_dt=cur_dt) {
+   cur_dt = (int)(e[i] - e[i-1]);
    if(new_ts) {
       prv_dt = cur_dt;
       new_ts = false;
@@ -587,7 +601,7 @@ if ( beg < 0 || beg >= Nelements ||
 // Store subset
 for(int i=beg; i<=end; i++) subset_ta.add(e[i]);
 
-return ( subset_ta );
+return subset_ta;
 
 }
 
@@ -602,12 +616,12 @@ const unixtime *a = (const unixtime *) p1;
 const unixtime *b = (const unixtime *) p2;
 
 
-if ( (*a) < (*b) )  return ( -1 );
+if ( (*a) < (*b) )  return -1;
 
-if ( (*a) > (*b) )  return (  1 );
+if ( (*a) > (*b) )  return 1;
 
 
-return ( 0 );
+return 0;
 
 }
 
@@ -627,7 +641,7 @@ for ( int i=0; i<ta.n(); ++i )  {
 
 }
 
-return(css);
+return css;
 
 }
 

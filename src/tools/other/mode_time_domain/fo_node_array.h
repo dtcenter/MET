@@ -55,7 +55,7 @@ class FO_Node_Array {
 
       void clear();
 
-      void dump(ostream &, int = 0) const;
+      void dump(std::ostream &, int = 0) const;
 
       void set_alloc_inc(int = 0);   //  0 means default value (30)
 

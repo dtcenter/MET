@@ -55,6 +55,7 @@
 //   018    04/08/19  Halley Gotway  Add percentile thresholds.
 //   019    04/01/19  Fillmore       Add FCST and OBS units.
 //   020    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
+//   021    06/09/23  Albo           Major changes for multivariate mode
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -74,6 +75,7 @@ using namespace std;
 #include "main.h"
 #include "string_array.h"
 #include "mode_usage.h"
+#include "mode_frontend.h"
 #include "mode_conf_info.h"
 
 #ifdef WITH_PYTHON
@@ -93,7 +95,7 @@ using namespace std;
 ///////////////////////////////////////////////////////////////////////
 
 
-extern int     mode_frontend(const StringArray &);
+extern int mode_frontend(const StringArray &);
 extern int multivar_frontend(const StringArray &);
 
 extern const char * const program_name;   
@@ -102,9 +104,9 @@ extern const char * const program_name;
 ///////////////////////////////////////////////////////////////////////
 
 
-   //
-   //  these need external linkage
-   //
+//
+//  these need external linkage
+//
 
 const char * const program_name = "mode";   
 
@@ -121,69 +123,76 @@ static const char default_config_filename [] = "MET_BASE/config/MODEConfig_defau
 int met_main(int argc, char * argv [])
 {
 
-int j, n;
-int status;
-ModeConfInfo config;
-StringArray Argv;
-string s;
-bool has_field_index = false;
-const char * user_config_filename = 0;
+   int j, n;
+   int status;
+   ModeConfInfo config;
+   StringArray Argv;
+   string s;
+   const char * user_config_filename = 0;
 
-for (j=0,n=0; j<argc; ++j)  {
+   for (j=0,n=0; j<argc; ++j)  {
 
-   //
-   //  all options take exactly one argument
-   //
+      //
+      //  all options take exactly one argument
+      //
 
-   if ( argv[j][0] == '-' )  j++;
-   else                      n++;
+      if ( argv[j][0] == '-' )  j++;
+      else                      n++;
 
-   //
-   //  the config file is the 4th required argv item
-   //
+      //
+      //  the config file is the 4th required argv item
+      //
 
-   if ( n == 4 )  {
+      if ( n == 4 )  {
 
-      user_config_filename = argv[j];
-      break;
+         user_config_filename = argv[j];
+         break;
+
+      }
 
    }
-
-}
 
    //
    //  check for enough required arguments
    //
 
-if ( !user_config_filename )  both_usage();
+   if ( !user_config_filename )  both_usage();
 
-for (j=0; j<argc; ++j)  {
+   for (j=0; j<argc; ++j)  {
 
-   if ( strcmp(argv[j], "-field_index") == 0 )  has_field_index = true;
+      s = argv[j];
+      Argv.add(s);
 
-   s = argv[j];
+   }
 
-   Argv.add(s);
+   config.read_config  (default_config_filename, user_config_filename);
 
-}
+   if ( config.is_multivar() ) { 
 
-config.read_config  (default_config_filename, user_config_filename);
+      // exit inside this method if something is not implemented
 
-if ( config.is_multivar() && !has_field_index )  {
+      config.check_multivar_not_implemented();
 
-   status = multivar_frontend(Argv);
+      // run the multivar version of mode
+      
+      status = multivar_frontend(Argv);
 
-} else {
+   } else {
 
-   status = mode_frontend(Argv);
 
-}
+      // run the traditional version of mode
+      
+      ModeFrontEnd *frontend = new ModeFrontEnd;
+      status = frontend->run(Argv);
+
+      if ( frontend )  { delete frontend;  frontend = 0; }
+   }
 
    //
    //  done
    //
 
-return ( status );
+   return ( status );
 
 }
 

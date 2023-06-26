@@ -242,6 +242,27 @@ void VarInfo::dump(ostream &out) const {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+ConcatString VarInfo::magic_time_str() const {
+   ConcatString cs(MagicStr);
+
+   // Report timing information when specified
+   if(Init != 0) {
+      cs << ", InitTime = " << unix_to_yyyymmdd_hhmmss(Init);
+   }
+
+   if(Valid != 0) {
+      cs << ", ValidTime = " << unix_to_yyyymmdd_hhmmss(Valid);
+   }
+
+   if(!is_bad_data(Lead)) {
+      cs << ", LeadTime = " << sec_to_hhmmss(Lead);
+   }
+
+   return(cs);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 void VarInfo::set_req_name(const char *str) {
    ReqName = str;
    return;
@@ -814,7 +835,31 @@ EnsVarInfo::EnsVarInfo() {
    ctrl_info = nullptr;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
+
+
+InputInfo &InputInfo::operator=(const InputInfo &a) noexcept {
+   if ( this != &a ) {
+      file_index = a.file_index;
+      ens_member_id = a.ens_member_id;
+
+      var_info = (a.var_info == nullptr) ? nullptr : a.var_info;
+
+      if (file_list == nullptr) file_list = new StringArray();
+      else file_list->clear();
+      if (a.file_list != nullptr) {
+         for (int i=0; i<a.file_list->n(); i++) {
+           file_list->add((*a.file_list)[i]);
+         }
+      }
+   }
+   return *this;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
 
 EnsVarInfo::~EnsVarInfo() {
    clear();

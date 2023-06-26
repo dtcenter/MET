@@ -68,6 +68,7 @@ class TimeArray {
       int  index(unixtime) const;
       void add(unixtime);
       void add(const TimeArray &);
+      void add_const(unixtime, int);
       void add_css(const char *);
 
       void set(int, unixtime);
@@ -92,8 +93,8 @@ class TimeArray {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int TimeArray::n_elements() const { return ( Nelements ); }
-inline int TimeArray::n()          const { return ( Nelements ); }
+inline int TimeArray::n_elements() const { return Nelements; }
+inline int TimeArray::n()          const { return Nelements; }
 
 
 ////////////////////////////////////////////////////////////////////////

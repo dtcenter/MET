@@ -1,8 +1,3 @@
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
@@ -74,9 +69,9 @@ class TcrmwGrid : public RotatedLatLonGrid {
       int azimuth_n () const;
 
       double range_max_km      () const;
-      double range_delta_km    () const;   //  Range_Max_km/(Range_n - 1)
+      double range_delta_km    () const;   //  Range_Max_km/Range_n
 
-      double azimuth_delta_deg () const;   //  360.0/(Azimuth_n - 1)
+      double azimuth_delta_deg () const;   //  360.0/Azimuth_n
 
       double lat_center_deg    () const;
       double lon_center_deg    () const;
@@ -122,9 +117,9 @@ inline int TcrmwGrid::azimuth_n () const { return ( Azimuth_n ); }
 
 inline double TcrmwGrid::range_max_km () const { return ( Range_max_km ); }
 
-inline double TcrmwGrid::range_delta_km () const { return ( Range_max_km/(Range_n - 1.0) ); }
+inline double TcrmwGrid::range_delta_km () const { return ( Range_max_km/Range_n ); }
 
-inline double TcrmwGrid::azimuth_delta_deg () const { return ( 360.0/(Azimuth_n - 1.0) ); }
+inline double TcrmwGrid::azimuth_delta_deg () const { return ( 360.0/Azimuth_n ); }
 
 inline double TcrmwGrid::lat_center_deg () const { return ( Lat_Center_Deg ); }
 inline double TcrmwGrid::lon_center_deg () const { return ( Lon_Center_Deg ); }
@@ -137,5 +132,3 @@ inline double TcrmwGrid::lon_center_deg () const { return ( Lon_Center_Deg ); }
 
 
 ////////////////////////////////////////////////////////////////////////
-
-

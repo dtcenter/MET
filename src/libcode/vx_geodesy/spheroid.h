@@ -45,9 +45,9 @@ class Spheroid {
 
       double E;        //  eccentricity   e = sqrt( 1.0 - (B/A)^2 )
 
-      double A_km;     // semimajor axis in kilometers
+      double A_km;     //  semimajor axis in kilometers
 
-      double B_km;     // semiminor axis in kilometers
+      double B_km;     //  semiminor axis in kilometers
 
       ConcatString Name;
 
@@ -61,7 +61,7 @@ class Spheroid {
 
       void clear();
 
-      void dump(ostream &, int depth = 0) const;
+      void dump(std::ostream &, int depth = 0) const;
 
          //
          //  set stuff
@@ -93,6 +93,19 @@ class Spheroid {
       void geographic_to_geocentric(double lat, double h_km, double & rho_km, double & phi_prime) const;
 
       void geocentric_to_geographic(double rho_km, double phi_prime, double & lat_deg, double & h_km) const;
+
+
+      double  q_func(double lat) const;    //  used in calculation of authalic latitude
+                                           //    see Snyder, page 16, Eq. 3-12
+
+      double  qp_direct() const;           //  evaluates q_func(90.0), without having to
+                                           //     evaluate the sines
+
+      double rq_km() const;                //  Snyder, page 16, Eq. 3-13
+
+      double beta(double lat) const;       //  Snyder, page 16, Eq. 3-11
+
+      double m_func(double lat) const;     //  Snyder, page 101, Eq. 14-15
 
 };
 

@@ -9,6 +9,49 @@ When applicable, release notes are followed by the GitHub issue number which des
 enhancement, or new feature (`MET GitHub issues <https://github.com/dtcenter/MET/issues>`_).
 Important issues are listed **in bold** for emphasis.
 
+MET Version 11.1.0-rc1 release notes (20230616)
+-----------------------------------------------
+
+  .. dropdown:: Repository, build, and test
+
+     * Enhance compile_MET_all.sh to allow the user to specify the compiler and Python versions to load (`#2485 <https://github.com/dtcenter/MET/issues/2485>`_).
+     * Enhance compile_MET_all.sh to include the library/app name in the log filename (`#2540 <https://github.com/dtcenter/MET/issues/2540>`_).
+
+  .. dropdown:: Documentation
+
+     * Update the documentation for the HSS and HSS_EC statistics (`#2492 <https://github.com/dtcenter/MET/issues/2492>`_).
+     * Update the documentation for the ens, NEP, and NMEP configuration options (`#2513 <https://github.com/dtcenter/MET/issues/2513>`_).
+
+  .. dropdown:: Enhancements
+
+    .. dropdown:: Common Libraries
+
+       * Add support for the Lambert Azimuthal Equal Area grids (`#1693 <https://github.com/dtcenter/MET/issues/1693>`_).
+       * Update the default ASCII2NC message_type_map configuration option for Little R input data (`#2487 <https://github.com/dtcenter/MET/issues/2487>`_).
+       * Merge older and newer MRMS GRIB2 table files (`#2508 <https://github.com/dtcenter/MET/issues/2508>`_).
+       * SonarQube: Further reduce findings for MET-11.1.0-rc1 (`#2521 <https://github.com/dtcenter/MET/issues/2521>`_).
+
+    .. dropdown:: Application Code
+
+       * **Enhance Gen-Vx-Mask shapefile masking to support multiple shapes and specify shape metadata** (`#1060 <https://github.com/dtcenter/MET/issues/1060>`_).
+       * **Enhance Multivariate MODE to generate object statistics for each input field requested by the user** (`#1283 <https://github.com/dtcenter/MET/issues/1283>`_).
+       * Enhance MODE to bound check interest_function corner points in the range 0 to 1 (`#2545 <https://github.com/dtcenter/MET/issues/2545>`_).
+
+    .. dropdown:: Tropical Cyclone Tools
+
+       * **Create an initial development version of a new TC-Diag tool to support the computation of tropical cyclone diagnostics** (`#2168 <https://github.com/dtcenter/MET/issues/2168>`_).
+       * **Enhance TC-Stat to write the RIRW job CTC/CTS output to a .stat output file** (`#2425 <https://github.com/dtcenter/MET/issues/2425>`_).
+       * **Enhance TC-Pairs to derive the full circle wind radius from the wind radius quadrants** (`#2532 <https://github.com/dtcenter/MET/issues/2532>`_).
+       * Enhance TC-RMW to reorder the dimensions of the NetCDF output to store the gridded dimensions last (`#2523 <https://github.com/dtcenter/MET/issues/2523>`_).
+       * Enhance TC-Gen to parse GTWO shapefile lead times from the data rather than assuming them to be 2, 5, and 7 days (`#2552 <https://github.com/dtcenter/MET/issues/2552>`_).
+
+  .. dropdown:: Bugfixes
+
+     * Bugfix: Fix the Clang compilation of MET version 11 (`#2514 <https://github.com/dtcenter/MET/issues/2514>`_).
+     * Bugfix: Fix the fill value setting used in the write_tmp_dataplane internal Python embedding script (`#2525 <https://github.com/dtcenter/MET/issues/2525>`_).
+     * Bugfix: Fix the TC-Stat RIRW runtime error when computing CTS statistics from an empty contingency table (`#2542 <https://github.com/dtcenter/MET/issues/2542>`_).
+     * Bugfix: Fix logic for Python embedding with data censoring and/or conversion (`#2575 <https://github.com/dtcenter/MET/issues/2575>`_).
+
 MET Version 11.1.0-beta2 release notes (20230505)
 -------------------------------------------------
 

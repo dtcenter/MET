@@ -24,12 +24,12 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
-
 #include <string.h>
 
 #include "grdfiletype_to_string.h"
+
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -64,7 +64,7 @@ switch ( t )  {
 }   //  switch
 
 
-return ( ConcatString (s) );
+return ConcatString (s);
 
 }
 
@@ -93,7 +93,7 @@ else if ( strcmp(text, "FileType_Python_Xarray" ) == 0 )   { t = FileType_Python
    //  nope
    //
 
-return ( false );
+return false;
 
 }
 

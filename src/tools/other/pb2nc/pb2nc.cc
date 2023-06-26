@@ -59,7 +59,6 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
@@ -74,7 +73,6 @@ using namespace std;
 #include <assert.h>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "main.h"
 #include "pb2nc_conf_info.h"
@@ -95,12 +93,16 @@ using namespace netCDF;
 #include "nc_point_obs_out.h"
 #include "nc_summary.h"
 
+using namespace std;
+using namespace netCDF;
+
 ////////////////////////////////////////////////////////////////////////
 
 struct derive_var_cfg {
    int var_index;
    ConcatString var_name;
-   derive_var_cfg(ConcatString _var_name);
+   explicit derive_var_cfg(ConcatString _var_name);
+   derive_var_cfg &operator=(const derive_var_cfg &a) noexcept;
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -114,8 +116,8 @@ static const char * default_config_filename = "MET_BASE/config/PB2NCConfig_defau
 static const char *program_name = "pb2nc";
 static const char *not_assigned = "not_assigned";
 
-static const float fill_value   = -9999.f;
-static const int missing_cycle_minute = -1;
+constexpr static float fill_value   = -9999.f;
+constexpr static int missing_cycle_minute = -1;
 
 // Constants used to interface to Fortran subroutines
 
@@ -140,39 +142,38 @@ static const int COUNT_THRESHOLD = 16;
 static const int file_unit      = 11;
 // 2nd file unit number for opening the PrepBufr file
 static const int dump_unit      = 22;
-static int msg_typ_ret[n_vld_msg_typ];
 
 // Grib codes corresponding to the variable types
-static const int var_gc[mxr8vt] = {
+const std::array<int, mxr8vt> var_gc = {
    pres_grib_code, spfh_grib_code, tmp_grib_code,
    hgt_grib_code,  ugrd_grib_code, vgrd_grib_code
 };
-static int bufr_var_code[mxr8vt];
+static std::array<int, mxr8vt> bufr_var_code;
 
 // Number of variable types which may be derived
-static const int n_derive_gc = 6;
+constexpr static int n_derive_gc = 6;
 
 // Listing of grib codes for variable types which may be derived
-static const int derive_gc[n_derive_gc] = {
+const std::array<int, n_derive_gc> derive_gc = {
    dpt_grib_code,  wdir_grib_code,
    wind_grib_code, rh_grib_code,
    mixr_grib_code, prmsl_grib_code
 };
 
 // The fortran code is hard-coded with 200 levels
-#define MAX_CAPE_VALUE 10000
-#define MAX_CAPE_LEVEL 200
-#define CAPE_INPUT_VARS 3
+constexpr int MAX_CAPE_VALUE = 10000;
+constexpr int MAX_CAPE_LEVEL = 200;
+constexpr int CAPE_INPUT_VARS = 3;
 static float cape_data_pres[MAX_CAPE_LEVEL];
 static float cape_data_temp[MAX_CAPE_LEVEL];
 static float cape_data_spfh[MAX_CAPE_LEVEL];
 static float static_dummy_200[MAX_CAPE_LEVEL];
 static float static_dummy_201[MAX_CAPE_LEVEL+1];
 
-#define ROG             287.04
-#define MAX_PBL         10000
-#define MAX_PBL_LEVEL   256
-#define PBL_DEBUG_LEVEL 8
+//#define ROG             287.04
+constexpr int MAX_PBL         = 10000;
+constexpr int MAX_PBL_LEVEL   = 256;
+constexpr int PBL_DEBUG_LEVEL = 8;
 static bool IGNORE_Q_PBL = true;
 static bool IGNORE_Z_PBL = true;
 static bool USE_LOG_INTERPOLATION = true;
@@ -206,7 +207,8 @@ static PB2NCConfInfo conf_info;
 static MetNcPointObsOut nc_point_obs;
 
 // Beginning and ending retention times
-static unixtime valid_beg_ut, valid_end_ut;
+static unixtime valid_beg_ut;
+static unixtime valid_end_ut;
 
 // Number of PrepBufr messages to process from the command line
 static int nmsg = -1;
@@ -409,10 +411,48 @@ static void   cleanup_hdr_typ(char *hdr_typ, bool is_prepbufr=false);
 
 ////////////////////////////////////////////////////////////////////////
 
-derive_var_cfg::derive_var_cfg(ConcatString _var_name) {
-   var_index = bad_data_int;
-   var_name = _var_name;
+void dump_pb_data(
+   int unit,
+   const ConcatString &prefix,
+   const ConcatString &blk_file,
+   const char *method_name
+) {
+   int msg_typ_ret[n_vld_msg_typ];
+   int len1 = dump_dir.length();
+   int len2 = prefix.length();
+
+   mlog << Debug(1) << "Dumping to ASCII output directory:\t"
+        << dump_dir << "\n";
+
+   for(int i=0; i<n_vld_msg_typ; i++) {
+      msg_typ_ret[i] = keep_message_type(vld_msg_typ_list[i]);
+   }
+
+   if (unit > MAX_FORTRAN_FILE_ID || unit < MIN_FORTRAN_FILE_ID) {
+      mlog << Error << "\n" << method_name
+           << "Invalid file ID [" << unit << "] between 1 and 99.\n\n";
+   }
+   dumppb_(blk_file.c_str(), &unit, dump_dir.c_str(), &len1,
+           prefix.c_str(), &len2, msg_typ_ret);
 }
+
+
+////////////////////////////////////////////////////////////////////////
+
+derive_var_cfg::derive_var_cfg(ConcatString _var_name): var_name{_var_name} {
+   var_index = bad_data_int;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+derive_var_cfg &derive_var_cfg::operator=(const derive_var_cfg &a) noexcept {
+   if ( this != &a ) {
+      var_index = a.var_index;
+      var_name = a.var_name;
+   }
+   return *this;
+}
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -462,12 +502,12 @@ int met_main(int argc, char *argv[]) {
    // Deallocate memory and clean up
    clean_up();
 
-   return(0);
+   return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-const string get_tool_name() {
+string get_tool_name() {
    return program_name;
 }
 
@@ -616,28 +656,29 @@ void process_command_line(int argc, char **argv) {
 
 ////////////////////////////////////////////////////////////////////////
 
-ConcatString save_bufr_table_to_file(const char *blk_file, int file_id) {
+ConcatString save_bufr_table_to_file(const char *blk_file, int _file_id) {
    int len;
-   ConcatString tbl_filename, tbl_prefix;
+   ConcatString tbl_filename;
+   ConcatString tbl_prefix;
 
    tbl_prefix << conf_info.tmp_dir << "/" << "tmp_pb2nc_bufr";
    tbl_filename = make_temp_file_name(tbl_prefix.c_str(), "tbl");
    len = tbl_filename.length();
-   if (file_id > MAX_FORTRAN_FILE_ID || file_id < MIN_FORTRAN_FILE_ID) {
+   if (_file_id > MAX_FORTRAN_FILE_ID || _file_id < MIN_FORTRAN_FILE_ID) {
       mlog << Error << "\nsave_bufr_table_to_file() -> "
-           << "Invalid file ID [" << file_id << "] between 1 and 99.\n\n";
+           << "Invalid file ID [" << _file_id << "] between 1 and 99.\n\n";
    }
-   openpb_(blk_file, &file_id);
-   dump_tbl_(blk_file, &file_id, tbl_filename.c_str(), &len);
-   closepb_(&file_id);
-   //close(file_id);
+   openpb_(blk_file, &_file_id);
+   dump_tbl_(blk_file, &_file_id, tbl_filename.c_str(), &len);
+   closepb_(&_file_id);
+   //close(_file_id);
    // Delete the temporary blocked file
    remove_temp_file((string)blk_file);
    return tbl_filename;
 }
 
 
-bool is_prepbufr_file(StringArray *events) {
+bool is_prepbufr_file(const StringArray *events) {
    bool is_prepbufr = events->has("P__EVENT") && events->has("Q__EVENT")
          && events->has("T__EVENT") && events->has("Z__EVENT");
    return is_prepbufr;
@@ -651,7 +692,6 @@ void get_variable_info(const char* tbl_filename) {
    FILE * fp;
    char * line = nullptr;
    size_t len = 1024;
-   ssize_t read;
 
    event_names.clear();
    event_members.clear();
@@ -677,7 +717,7 @@ void get_variable_info(const char* tbl_filename) {
       }
       // Processing section 1
       int var_count1 = 0;
-      while ((read = getline(&line, &len, fp)) != -1) {
+      while (getline(&line, &len, fp) != -1) {
          if (nullptr != strstr(line,"--------")) continue;
          if (nullptr != strstr(line,"MNEMONIC")) {
             if (find_mnemonic) break;
@@ -712,7 +752,7 @@ void get_variable_info(const char* tbl_filename) {
       }
 
       // Skip  section 2
-      while ((read = getline(&line, &len, fp)) != -1) {
+      while (getline(&line, &len, fp) != -1) {
          if (nullptr != strstr(line,"MNEMONIC")) break;
          if (nullptr == strstr(line,"EVENT")) continue;
 
@@ -723,7 +763,6 @@ void get_variable_info(const char* tbl_filename) {
             if (' ' != var_name[idx] ) break;
             var_name[idx] = '\0';
          }
-         //if (nullptr == strstr(var_name,"EVENT")) continue;
 
          m_strncpy(var_desc, (line+BUFR_SEQUENCE_START), BUFR_SEQUENCE_LEN,
                    method_name, "var_desc2", true);
@@ -742,7 +781,7 @@ void get_variable_info(const char* tbl_filename) {
       getline(&line, &len, fp);
 
       // Processing section 3
-      while ((read = getline(&line, &len, fp)) != -1) {
+      while (getline(&line, &len, fp) != -1) {
          if (' ' == line[BUFR_NAME_START]) continue;
          if ('-' == line[BUFR_NAME_START]) break;
 
@@ -777,8 +816,7 @@ void get_variable_info(const char* tbl_filename) {
       }
 
       fclose(fp);
-      if (line)
-         free(line);
+      if (line) free(line);
 
    }
    return;
@@ -892,8 +930,6 @@ void process_pbfile(int i_pb) {
 
    // Dump the contents of the PrepBufr file to ASCII files
    if(dump_flag) {
-      mlog << Debug(1) << "Dumping to ASCII output directory:\t"
-           << dump_dir << "\n";
 
       // Check for multiple PrepBufr files
       if(pbfile.n_elements() > 1) {
@@ -904,21 +940,11 @@ void process_pbfile(int i_pb) {
          exit(1);
       }
 
-      for(i=0; i<n_vld_msg_typ; i++) {
-         msg_typ_ret[i] = keep_message_type(vld_msg_typ_list[i]);
-      }
-
       unit = dump_unit+i_pb;
-      if (unit > MAX_FORTRAN_FILE_ID || unit < MIN_FORTRAN_FILE_ID) {
-         mlog << Error << "\n" << method_name
-              << "Invalid file ID [" << unit << "] between 1 and 99.\n\n";
-      }
       prefix = get_short_name(pbfile[i_pb].c_str());
-      len1 = dump_dir.length();
-      len2 = prefix.length();
-      dumppb_(blk_file.c_str(), &unit, dump_dir.c_str(), &len1,
-              prefix.c_str(), &len2, msg_typ_ret);
+      dump_pb_data((dump_unit+i_pb), prefix, blk_file, method_name);
    }
+
 
    // Open the blocked temp PrepBufr file for reading
    unit = file_unit + i_pb;
@@ -1608,7 +1634,7 @@ void process_pbfile(int i_pb) {
                             (IGNORE_Z_PBL || is_valid_pb_data(pqtzuv[3]));
                if (has_tq || has_uv) {
                   // Allocated memory is deleted after all observations are processed
-                  float *tmp_pqtzuv = new float [mxr8vt];
+                  auto tmp_pqtzuv = new float [mxr8vt];
 
                   for(kk=0; kk<mxr8vt; kk++) tmp_pqtzuv[kk] = pqtzuv[kk];
 
@@ -1667,9 +1693,9 @@ void process_pbfile(int i_pb) {
                cape_data_temp[cape_level] = cape_data_temp[cape_level-1];
                cape_data_spfh[cape_level] = cape_data_spfh[cape_level-1];
                for (int idx=cape_level+1; idx<MAX_CAPE_LEVEL; idx++) {
-                  cape_data_pres[idx] = r8bfms * 10;
-                  cape_data_temp[idx] = r8bfms * 10;
-                  cape_data_spfh[idx] = r8bfms * 10;
+                  cape_data_pres[idx] = (float)r8bfms * 10;
+                  cape_data_temp[idx] = (float)r8bfms * 10;
+                  cape_data_spfh[idx] = (float)r8bfms * 10;
                }
             }
 
@@ -1762,7 +1788,6 @@ void process_pbfile(int i_pb) {
          else cape_cnt_surface_msgs++;
       }
 
-      //if (do_all_vars) {
       {
          quality_mark = bad_data_int;
          ConcatString quality_mark_str;
@@ -2987,7 +3012,7 @@ int combine_tqz_and_uv(map<float, float*> pqtzuv_map_tq,
       it_tq = pqtzuv_map_tq.begin();
       it_uv = pqtzuv_map_uv.begin();
       pqtzuv_tq = (float *)it_tq->second;
-      pqtzuv_uv = (float *)it_uv->second;;
+      pqtzuv_uv = (float *)it_uv->second;
       pqtzuv_merged = new float[mxr8vt];
       tq_pres = nint(it_tq->first);
       uv_pres = nint(it_uv->first);

@@ -1008,8 +1008,11 @@ void process_ioda_file(int i_pb) {
    delete [] hdr_lat_arr;
    delete [] hdr_lon_arr;
    delete [] hdr_elv_arr;
+   delete [] hdr_time_arr;
+   delete [] hdr_vld_block;
    delete [] obs_pres_arr;
    delete [] obs_hght_arr;
+
    if (hdr_msg_types) delete [] hdr_msg_types;
    if (hdr_station_ids) delete [] hdr_station_ids;
    if (nullptr != hdr_msg_types2) {
@@ -1025,7 +1028,6 @@ void process_ioda_file(int i_pb) {
       delete [] hdr_vld_block2;
    }
 
-   delete [] hdr_vld_block;
    for(idx=0; idx<v_obs_data.size(); idx++ ) delete [] v_obs_data[idx];
    for(idx=0; idx<v_qc_data.size(); idx++ ) delete [] v_qc_data[idx];
    v_obs_data.clear();

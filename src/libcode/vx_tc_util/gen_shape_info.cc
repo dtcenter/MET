@@ -82,7 +82,8 @@ ConcatString GenShapeInfo::serialize() const {
            unix_to_yyyymmdd_hhmmss(IssueTime).text() : na_str) << "\""
      << ", NPoints = " << Poly.n_points
      << ", Lat = " << Poly.y_min() << " to " << Poly.y_max()
-     << ", Lon = " << Poly.x_min() << " to " << Poly.x_max();
+     << ", Lon = " << Poly.x_min() << " to " << Poly.x_max()
+     << ", NProb = " << ProbVal.n();
 
    return(s);
 

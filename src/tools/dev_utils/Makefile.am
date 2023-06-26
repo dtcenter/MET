@@ -133,6 +133,7 @@ gen_climo_bin_LDADD = -lvx_stat_out \
 	-lvx_nc_util \
 	-lvx_regrid \
 	-lvx_grid \
+	-lvx_geodesy \
 	-lvx_config \
 	-lvx_util_math \
 	-lvx_util \

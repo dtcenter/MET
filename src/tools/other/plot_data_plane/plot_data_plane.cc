@@ -73,7 +73,8 @@ static ConcatString FieldString;
 static ConcatString ColorTableName;
 static ConcatString TitleString;
 
-static double PlotRangeMin = 0.0, PlotRangeMax = 0.0;
+static double PlotRangeMin = 0.0;
+static double PlotRangeMax = 0.0;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -89,9 +90,9 @@ int met_main(int argc, char * argv[]) {
 
    program_name = get_short_name(argv[0]);
 
-   Met2dDataFile * met_ptr = (Met2dDataFile * ) 0;
+   Met2dDataFile * met_ptr = (Met2dDataFile * ) nullptr;
    Met2dDataFileFactory m_factory;
-   VarInfo * var_ptr = (VarInfo * ) 0;
+   VarInfo * var_ptr = (VarInfo * ) nullptr;
    VarInfoFactory v_factory;
    DataPlane data_plane;
    Grid grid;
@@ -205,14 +206,14 @@ int met_main(int argc, char * argv[]) {
    //
    // clean up
    //
-   if(met_ptr) { delete met_ptr;  met_ptr = 0; }
-   if(var_ptr) { delete var_ptr;  var_ptr = 0; }
+   if(met_ptr) { delete met_ptr;  met_ptr = nullptr; }
+   if(var_ptr) { delete var_ptr;  var_ptr = nullptr; }
 
    #ifdef  WITH_PYTHON
       GP.finalize();
    #endif
 
-   return(0);
+   return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////

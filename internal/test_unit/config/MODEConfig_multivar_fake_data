@@ -54,6 +54,11 @@ quilt = FALSE;
 multivar_logic = "#1 && #2 && #3";
 
 //
+// MODE Multivar intensity logic
+//
+multivar_intensity_flag = [FALSE, FALSE, FALSE];
+
+//
 // Forecast and observation fields to be verified
 //
 fcst = {
@@ -63,16 +68,19 @@ fcst = {
       {
          name  = "ALPHA";
          level = "(*,*)";
+         merge_flag = NONE;
       }, 
 
       {
          name  = "BETA";
          level = "(*,*)";
+         merge_flag = NONE;
       }, 
 
       {
          name  = "GAMMA";
          level = "(*,*)";
+         merge_flag = NONE;
       }
 
    ];
@@ -84,6 +92,8 @@ fcst = {
    filter_attr_thresh = [];
    merge_thresh       = >=3.5;
    merge_flag         = NONE;
+   multivar_name = "Super";
+   multivar_level = "LO";
 }
 obs = fcst;
 
@@ -97,12 +107,12 @@ mask_missing_flag = NONE;
 //
 // Match objects between the forecast and observation fields
 //
-match_flag = NONE;
+match_flag = MERGE_BOTH;
 
 //
 // Maximum centroid distance for objects to be compared
 //
-max_centroid_dist = 800.0/grid_res;
+max_centroid_dist = 800.0;
 
 ////////////////////////////////////////////////////////////////////////////////
 

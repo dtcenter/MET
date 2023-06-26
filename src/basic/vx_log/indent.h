@@ -45,7 +45,7 @@ class Indent {
    public:
 
       Indent();
-      Indent(int);   //  depth
+      explicit Indent(int);   //  depth
      ~Indent();
       Indent(const Indent &);
       Indent & operator=(const Indent &);

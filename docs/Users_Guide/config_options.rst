@@ -275,6 +275,7 @@ and, in some cases, elevation for all stations based on stationId.
 This set of stations comes from 2 online sources: the
 `active stations website <https://www.ndbc.noaa.gov/activestations.xml>`_
 and the `complete stations website <https://www.airnow.gov>`_.
+
 As these lists can change as a function of time, a script can be run to pull
 down the contents of both websites and merge any changes with the existing stations
 file content, creating an updated stations file locally.
@@ -301,7 +302,6 @@ can be deleted once the final output file is created.
 
 MET_BASE
 ^^^^^^^^
-
 The MET_BASE variable is defined in the code at compilation time as the path
 to the MET shared data. These are things like the default configuration files,
 common polygons and color scales. MET_BASE may be used in the MET configuration

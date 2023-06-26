@@ -62,7 +62,7 @@ class EquivalenceClass {
 
       void clear();
 
-      void dump(ostream &, int = 0) const;
+      void dump(std::ostream &, int = 0) const;
 
          //
          //  set stuff
@@ -120,7 +120,7 @@ return ( false );
 ////////////////////////////////////////////////////////////////////////
 
 
-extern ostream & operator<<(ostream &, const EquivalenceClass &);
+extern std::ostream & operator<<(std::ostream &, const EquivalenceClass &);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -160,9 +160,9 @@ class Mtd_Partition {   //  disjoint unions of equivalence classes
 
       void clear();
 
-      void dump(ostream &, int = 0) const;
+      void dump(std::ostream &, int = 0) const;
 
-      void specialized_dump(ostream &, const int Nf, const int No) const;
+      void specialized_dump(std::ostream &, const int Nf, const int No) const;
       void specialized_dump(const int, const int Nf, const int No) const;   //  dump to mlog with the given verbosity
 
          //

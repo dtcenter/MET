@@ -25,7 +25,7 @@ static const int enuminfo_alloc_increment = 100;
 
 class EnumInfo {
 
-      friend ostream & operator<<(ostream &, const EnumInfo &);
+      friend std::ostream & operator<<(std::ostream &, const EnumInfo &);
 
    private:
 
@@ -106,7 +106,7 @@ inline const char * EnumInfo::header() const { return ( Header ); }
 ////////////////////////////////////////////////////////////////////////
 
 
-extern ostream & operator<<(ostream &, const EnumInfo &);
+extern std::ostream & operator<<(std::ostream &, const EnumInfo &);
 
 
 ////////////////////////////////////////////////////////////////////////
