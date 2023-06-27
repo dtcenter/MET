@@ -8,7 +8,7 @@ export USE_MODULES=TRUE
 export MET_PYTHON=/work/noaa/ovp/miniconda/miniconda3/envs/metplus_v5.1_py3.10
 export MET_PYTHON_CC=-I${MET_PYTHON}/include/python3.10
 export MET_PYTHON_LD=-L${MET_PYTHON}/lib/python3.10/config-3.10-x86_64-linux-gnu\ -L${MET_PYTHON}/lib\ -lpython3.10\ -lcrypt\ -lpthread\ -ldl\ -lutil\ -lrt\ -lm\ -lm
-export EXTERNAL_LIBS=/apps/contrib/MET/11.1.0/external_libs
+export EXTERNAL_LIBS=${TEST_BASE}/external_libs
 export LIB_Z=${EXTERNAL_LIBS}/lib
 #export MET_GSL=${EXTERNAL_LIBS}
 #export MET_BUFRLIB=${EXTERNAL_LIBS}
@@ -24,4 +24,6 @@ export LIB_Z=${EXTERNAL_LIBS}/lib
 export MAKE_ARGS=-j
 #export CFLAGS="-Wall -g"
 #export CXXFLAGS="-Wall -g"
+export CXXFLAGS="-std=c++11"
+
 
