@@ -51,6 +51,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+
+      - name: Free disk space
+        run: .github/jobs/free_disk_space.sh
+
       - name: Set job controls
         id: job_status
         run: .github/jobs/set_job_controls.sh
