@@ -51,10 +51,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-
-      - name: Free disk space
-        run: .github/jobs/free_disk_space.sh
-
       - name: Set job controls
         id: job_status
         run: .github/jobs/set_job_controls.sh
@@ -142,6 +138,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Free disk space
+	run: .github/jobs/free_disk_space.sh
+
       - name: Run Unit Tests in Docker
         run: .github/jobs/run_unit_docker.sh
         env:
@@ -176,6 +175,9 @@ jobs:
       fail-fast: false
     steps:
       - uses: actions/checkout@v3
+
+      - name: Free disk space
+	run: .github/jobs/free_disk_space.sh
 
       - name: Run Unit Tests in Docker
         run: .github/jobs/run_unit_docker.sh
@@ -213,6 +215,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Free disk space
+	run: .github/jobs/free_disk_space.sh
+
       - name: Run Unit Tests in Docker
         run: .github/jobs/run_unit_docker.sh
         env:
@@ -246,6 +251,9 @@ jobs:
       fail-fast: false
     steps:
       - uses: actions/checkout@v3
+
+      - name: Free disk space
+	run: .github/jobs/free_disk_space.sh
 
       - name: Download ref_config_leads output from artifact
         uses: actions/download-artifact@v3
@@ -290,6 +298,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Free disk space
+	run: .github/jobs/free_disk_space.sh
+
       - name: Download 1a output from artifact
         uses: actions/download-artifact@v3
         with:
@@ -333,6 +344,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Free disk space
+	run: .github/jobs/free_disk_space.sh
+
       - name: Download 1a output from artifact
         uses: actions/download-artifact@v3
         with:
@@ -368,6 +382,9 @@ jobs:
     steps:
       - name: Download data from previous jobs
         uses: actions/download-artifact@v3
+
+      - name: Free disk space
+	run: .github/jobs/free_disk_space.sh
 
       - name: Copy test output into single directory
         run: |
@@ -406,6 +423,9 @@ jobs:
     if: ${{ needs.job_control.outputs.run_update_truth == 'true' }}
     steps:
       - uses: actions/checkout@v3
+
+      - name: Free disk space
+	run: .github/jobs/free_disk_space.sh
 
       - name: Download data from previous jobs
         uses: actions/download-artifact@v3
