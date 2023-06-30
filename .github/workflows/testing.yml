@@ -383,9 +383,6 @@ jobs:
       - name: Download data from previous jobs
         uses: actions/download-artifact@v3
 
-      - name: Free disk space
-        run: .github/jobs/free_disk_space.sh
-
       - name: Copy test output into single directory
         run: |
           mkdir ${RUNNER_WORKSPACE}/output
