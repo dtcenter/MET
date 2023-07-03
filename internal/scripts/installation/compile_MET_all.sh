@@ -214,6 +214,7 @@ fi
 COMPILER_FAMILY=` echo $COMPILER | cut -d'_' -f1`
 COMPILER_VERSION=`echo $COMPILER | cut -d'_' -f2`
 COMPILER_MAJOR_VERSION=`echo $COMPILER_VERSION | cut -d'.' -f1`
+COMPILER_MINOR_VERSION=`echo $COMPILER_VERSION | cut -d'.' -f2`
 
 echo
 echo "USE_MODULES = ${USE_MODULES}"
@@ -837,6 +838,16 @@ if [ $COMPILE_MET -eq 1 ]; then
   export MET_PYTHON_LD=${MET_PYTHON_LD}
   export MET_PYTHON_CC=${MET_PYTHON_CC}
   export LDFLAGS="-Wl,--disable-new-dtags"
+  
+  if [[ ${COMPILER_FAMILY} == "gnu" ]]; then
+    if [[ (${COMPILER_MAJOR_VERSION} -ge 12) && (${COMPILER_MINOR_VERSION} -ge 3) ]]; then
+	export LDFLAGS=""
+    fi
+  fi
+  echo "COMPILER_MAJOR_VERSION = ${COMPILER_MAJOR_VERSION}"
+  echo "COMPILER_MINOR_VERSION = ${COMPILER_MINOR_VERSION}"
+  echo "LDFLAGS = ${LDFLAGS}"
+  
   # https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html
   # ${parameter:+word}
   # If parameter is null or unset, nothing is substituted, otherwise the expansion of word is substituted.
