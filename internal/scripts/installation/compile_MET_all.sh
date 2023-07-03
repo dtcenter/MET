@@ -844,9 +844,6 @@ if [ $COMPILE_MET -eq 1 ]; then
 	export LDFLAGS=""
     fi
   fi
-  echo "COMPILER_MAJOR_VERSION = ${COMPILER_MAJOR_VERSION}"
-  echo "COMPILER_MINOR_VERSION = ${COMPILER_MINOR_VERSION}"
-  echo "LDFLAGS = ${LDFLAGS}"
   
   # https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html
   # ${parameter:+word}
