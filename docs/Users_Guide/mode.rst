@@ -112,10 +112,10 @@ Traditionally, MODE defines objects by smoothing and thresholding data from a si
 
 As described in :numref:`MODE-configuration-file`, the **field** entry in the forecast and observation dictionaries define the input data to be processed. If **field** is defined as a dictionary, the traditional method for running MODE is invoked, where objects are defined using a single input field. If **field** is defined as an array of dictionaries, each specifying a different input field, then the multi-variate MODE logic is invoked and requires the **multivar_logic** configuration entry to be set. Traditional MODE is run once for each input field to define objects for that field. Note that the object definition criteria can be defined separately for each field array entry. The objects from each input field are combined into forecast and observation data *super* objects 
 
-The **multivar_logic** and **multivar_intensity** configuration entries, described in :numref:`MODE-configuration-file`, define the boolean logic for combining objects from multiple fields into *super* objects, and then optionally computing intensities for individual input fields when the input is masked to non-missing only inside the *super* objects. If the **multivar_logic** configuration option iset, there must be the same number of fields defined in an array of dictionaries for fcst and for obs as indicated in the **multivar_logic**. Note that the multi-variate MODE forecast and observation input fields and combination logic do not need to
-match. If a particular  **multivar_intensity** value is TRUE the corresponding pair of fields (fcst and obs) are masked to non-missing inside the fcst and obs super objects, and traditional mode is run on that pair of masked inputs producing uniquely named outputs. If it is FALSE, mode is not run for that pair of inputs.
+The **multivar_logic** and **multivar_intensity_flag** configuration entries, described in :numref:`MODE-configuration-file`, define the boolean logic for combining objects from multiple fields into *super* objects, and then optionally computing intensities for individual input fields when the input is masked to non-missing only inside the *super* objects. If the **multivar_logic** configuration option iset, there must be the same number of fields defined in an array of dictionaries for fcst and for obs as indicated in the **multivar_logic**. Note that the multi-variate MODE forecast and observation input fields and combination logic do not need to
+match. If a particular  **multivar_intensity_flag** value is TRUE the corresponding pair of fields (fcst and obs) are masked to non-missing inside the fcst and obs super objects, and traditional mode is run on that pair of masked inputs producing uniquely named outputs. If it is FALSE, mode is not run for that pair of inputs.
 
-If all **multivar_intensity** values are FALSE, the forecast and observation *super* objects are written to NetCDF, text, and postscript output files in the standard mode output format, but with no intensity information. 
+If all **multivar_intensity_flag** values are FALSE, the forecast and observation *super* objects are written to NetCDF, text, and postscript output files in the standard mode output format, but with no intensity information. 
 
 
 Practical information
@@ -247,9 +247,9 @@ _____________________
 
 .. code-block:: none
 
-   multivar_intensity = [FALSE, TRUE, TRUE];
+   multivar_intensity_flag = [FALSE, TRUE, TRUE];
 
-The **multivar_intensity** entry appears only in the **MODEMultivarConfig_default** file. This option is paired with the **multivar_logic** entry, and can take on a value of TRUE or FALSE for each **field**.  In the multivar case, super objects are created using the **multivar_logic** settings. For each input for which **multivar_intensity** is TRUE, the input is masked to be non-missing only within the super objects, and traditional mode is run on that masked input.  For each input for which **multivar_intensity** is FALSE, the input is skipped over.   If all the multivar_intensity values are FALSE, traditional mode output is created for the super objects, but with no intensity information.
+The **multivar_intensity_flag** entry appears only in the **MODEMultivarConfig_default** file. This option is paired with the **multivar_logic** entry, and can take on a value of TRUE or FALSE for each **field**.  In the multivar case, super objects are created using the **multivar_logic** settings. For each input for which **multivar_intensity_flag** is TRUE, the input is masked to be non-missing only within the super objects, and traditional mode is run on that masked input.  For each input for which **multivar_intensity_flag** is FALSE, the input is skipped over.   If all the multivar_intensity_flag values are FALSE, traditional mode output is created for the super objects, but with no intensity information.
 
 
 _____________________
@@ -258,7 +258,7 @@ _____________________
 
    multivar_name = "Precip";
 
-The **multivar_name** entry appears only in the **MODEMultivarConfig_default** file. This option is used only when the multivar option is enabled, and only when all **multivar_intensity** flag values are FALSE. It can be thought of as an identifier for the multivariate super object.  It shows up in output files names and content.  If not set the default value is "Super".   It can be set separately for forecasts and observations, or as a common value for both.
+The **multivar_name** entry appears only in the **MODEMultivarConfig_default** file. This option is used only when the multivar option is enabled, and only when all **multivar_intensity_flag** values are FALSE. It can be thought of as an identifier for the multivariate super object.  It shows up in output files names and content.  If not set the default value is "Super".   It can be set separately for forecasts and observations, or as a common value for both.
 
 
 _____________________
@@ -267,7 +267,7 @@ _____________________
 
    multivar_level = "LO";
 
-The **multivar_level** entry appears only in the **MODEMultivarConfig_default** file. This option is used only when the multivar option is enabled, and only when all **multivar_intensity** flag values are FALSE. It is the identifier for the multivariate super object as regards level.  It shows up in output files names and content.  If not set the default value is "NA".   It can be set separately for forecasts and observations, or as a common value for both.
+The **multivar_level** entry appears only in the **MODEMultivarConfig_default** file. This option is used only when the multivar option is enabled, and only when all **multivar_intensity_flag** values are FALSE. It is the identifier for the multivariate super object as regards level.  It shows up in output files names and content.  If not set the default value is "NA".   It can be set separately for forecasts and observations, or as a common value for both.
 
 _____________________
 
