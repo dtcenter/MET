@@ -253,7 +253,7 @@ When the **nc_rng_azi_flag** configuration entry is set to true, a NetCDF output
 
 The NetCDF range-azimuth output is named using the following naming convention:
 
-**tc_diag_STORMID_ATCFID_YYYYMMDDHH_cyl_grid_DOMAIN.nc** where STORMID is the 2-letter basin name, 2-digit storm number, and 4-digit year, ATCFID is the track model name, YYYYMMDDHH is the track initialization time, and DOMAIN is the domain name.
+**tc_diag_STORMID_TECH_YYYYMMDDHH_cyl_grid_DOMAIN.nc** where STORMID is the 2-letter basin name, 2-digit storm number, and 4-digit year, TECH is the acronym for the objective technique, YYYYMMDDHH is the track initialization time, and DOMAIN is the domain name.
 
 The NetCDF range-azimuth file contains the dimensions and variables shown in :numref:`table_TC-Diag_Dimensions_NetCDF_range_azimuth` and :numref:`table_TC-Diag_Variables_NetCDF_range_azimuth`.
 
