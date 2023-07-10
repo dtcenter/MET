@@ -9,7 +9,7 @@ The script reads NDBC station information from two NOAA websites and merges the 
 The list contains latitude, longitude and elevation data for all known stations.
 The local list can be read by ascii2nc for processing of NDBC data inputs.
 Algorithm:
-   Read the current default ndbc_stations.xml file and create a list of default station information objects.
+   Read the current existing ndbc_stations.xml file and create a list of existing station information objects.
    Pull down active station xml file from web and create a list of active information objects.
    Write the list to an active stations text file.
    Pull down complete index list from web.
@@ -18,22 +18,22 @@ Algorithm:
    Write the list of complete station info objects to a text file.
    Save all the individual web page data that was pulled down into a subdirectory.
 
-   Compare the complete stations information to the default station information objects.
-   If a station is on the complete list but not on the default list, add it to the default list.
+   Compare the complete stations information to the existing station information objects.
+   If a station is on the complete list but not on the existing list, add it to the existing list.
    If a station is on both lists, but has different location info, change the locaiton info to that of the complete,
    (unless the complete has no meaningful lat/lon information, typically 0,0).
 
-   Compare the augmented default list to the active stations list.
-   If a station is on the active list but not on the default list, add it to the default list.
-   If a station is on both lists, but has different location info, keep the default list values
-   (unless the default has no meaningful lat/lon information, typically 0,0, then change to the active).
+   Compare the augmented existing list to the active stations list.
+   If a station is on the active list but not on the existing list, add it to the existing list.
+   If a station is on both lists, but has different location info, keep the existing list values
+   (unless the existing has no meaningful lat/lon information, typically 0,0, then change to the active).
 
    Log Warnings about discrepancies.
    Keep counts of everything.
 
-   Write the final default list a a new output.
+   Write the final existing list a a new output.
 
-   Optionally prune the default list, removing all stations that are not active or complete.
+   Optionally prune the existing list, removing all stations that are not active or complete.
 
 '''
 
@@ -44,9 +44,8 @@ import shlex
 import errno
 from subprocess import Popen, PIPE
 
-# this needs to change!
-# hardwired location of current default stations file
-DEFAULT_STATIONS_FILE = "../../data/table_files/ndbc_stations.xml"
+# default location of current existing stations file, can be changed via command line
+DEFAULT_STATIONS_FILE = "../../../data/table_files/ndbc_stations.xml"
 
 # hardwired NOAA top webpage
 TOP_WEBSITE = "https://www.ndbc.noaa.gov"
@@ -81,9 +80,10 @@ DEFAULT_OUTPUT_FILE = "merged.txt"
 MISSING = -99.9
 
 def usage():
-    print(f'Usage: BuildNdbcStationsFromWeb.py , <--diagnostic> <--out=out_filename> <--prune>')
-    print(f'          -d/--diagnostic: special mode to rerun using already downloaded files, skips all downloading if True (Downloaded files are in ./{DATA_SUBDIR}')
-    print(f'          -o/--out=out_filename: save final text into the named file (default: file name is {DEFAULT_OUTPUT_FILE})"')
+    print(f'Usage: build_ndbc_stations_from_web.py , <--diagnostic> <--out=out_filename> <--prune>')
+    print(f'          -d/--diagnostic: special mode to rerun using already downloaded files, skips all downloading if True (Downloaded files are in .{DATA_SUBDIR})')
+    print(f'          -o/--out=out_filename: save final text into the named file (default: file name is {DEFAULT_OUTPUT_FILE})')
+    print(f'          -e/--existing=existing_filename: set the existing stations file to read and merge with new info from the web (default is {DEFAULT_STATIONS_FILE})')
     print(f'          -p/--prune: Delete all stations from the local ndbc_stations file that are no longer online')
     print(f'       Note: <> indicates optional arguments')
 
@@ -93,6 +93,8 @@ def create_parser_options(parser):
     parser.add_option("-p", "--prune", dest="prune", action="store_true", default=False, help="Prune files that are no longer online (optional, default:False)")
     parser.add_option("-o", "--out", dest="out_file",
             default=DEFAULT_OUTPUT_FILE, help=" Save the text into the named file (default: " + DEFAULT_OUTPUT_FILE +" )")
+    parser.add_option("-e", "--existing", dest="existing_file",
+            default=DEFAULT_STATIONS_FILE, help=" Save the text into the named file (default: " + DEFAULT_STATIONS_FILE +" )")
     parser.add_option("-H", "--Help", dest="full_usage", action="store_true", default=False, help = " show more usage information (optional, default = False)")
     return parser.parse_args()
 
@@ -206,7 +208,7 @@ def makeOrScrub(path, debug=False):
    
 
 #----------------------------------------------
-def main(diagnostic, out_file, prune):
+def main(diagnostic, out_file, existing_file, prune):
 
   cwd = os.getcwd()
 
@@ -238,13 +240,13 @@ def main(diagnostic, out_file, prune):
     # move back to top directory
     os.chdir(cwd)
 
-  # prepare to compare to the default stations file to see what has changed
-  default_stations = parse("Default", DEFAULT_STATIONS_FILE)
-  numDefault = len(default_stations)
-  print("PARSED DEFAUILT STATIONS FILE NUM=", len(default_stations))
+  # prepare to compare to the existing stations file to see what has changed
+  existing_stations = parse("Existing", existing_file)
+  numExisting = len(existing_stations)
+  print("PARSED EXISTING STATIONS FILE NUM=", len(existing_stations))
 
   # make a copy of this as the final outputs
-  final_stations = default_stations
+  final_stations = existing_stations
   for f in final_stations:
     f.setName("Final")
   
@@ -277,24 +279,24 @@ def main(diagnostic, out_file, prune):
   numCompleteNotActive = 0
   numActiveNotComplete = 0
   
-  # compare complete stations to default stations
+  # compare complete stations to existing stations
   for complete in complete_stations:
     numComplete = numComplete + 1
     id = complete._id
-    default = matchingId(id, default_stations)
+    existing = matchingId(id, existing_stations)
     active = matchingId(id, active_stations)
     if active.empty():
       numCompleteNotActive = numCompleteNotActive + 1
-    if default.empty():
-      # station is on the complete list but not on the default list, add it
+    if existing.empty():
+      # station is on the complete list but not on the existing list, add it
       f = complete
       f.setName("Final")
       final_stations.append(f)
       numNew = numNew+1
       numNewComplete = numNewComplete + 1
     else:
-      # compare complete and default
-      if not complete.location_match(default):
+      # compare complete and existing
+      if not complete.location_match(existing):
         numConflict = numConflict + 1
         if replaceLatLonIfGood("Complete to Final", "Final", final_stations, complete):
           numConflictChanged = numConflictChanged + 1
@@ -315,18 +317,18 @@ def main(diagnostic, out_file, prune):
       numNew = numNew+1
       numNewActive = numNewActive + 1
     else:
-      # compare complete and default
+      # compare complete and existing
       if not final.location_match(active):
         numConflict = numConflict + 1
         if replaceLatLonIfListIsBad("Active to Final", "Final", final_stations, active):
           numConflictChanged = numConflictChanged + 1
   
-  # see which id's have vanished from the current default list, to be used when prune is true
+  # see which id's have vanished from the current existing list, to be used when prune is true
   numVanished = 0
   purgeIds = []
-  print("Comparing current default stations to final list")
-  for default in default_stations:
-    id = default._id
+  print("Comparing current existing stations to final list")
+  for existing in existing_stations:
+    id = existing._id
     active = matchingId(id, active_stations)
     complete = matchingId(id, complete_stations)
     if active.empty() and complete.empty():
@@ -336,8 +338,8 @@ def main(diagnostic, out_file, prune):
 
   for f in final_stations:
     id = f._id
-    default = matchingId(id, default_stations)
-    if default.empty():
+    existing = matchingId(id, existing_stations)
+    if existing.empty():
       #print("New station on web not in local table file:", id)
       numNew = numNew+1
 
@@ -363,7 +365,7 @@ def main(diagnostic, out_file, prune):
 
   print("Num complete:            ", numComplete)
   print("Num active:              ", numActive)
-  print("Num default:             ", numDefault)
+  print("Num existing:             ", numExisting)
   print("Num final:               ", nout)
   print("Num pruned:              ", nprune)
   print("Num vanished:            ", numVanished)          
@@ -497,12 +499,14 @@ def parseStationInfo(name, fname, index):
 #----------------------------------------------
 def setStationId(fname):
   stationId = ""
-  cmd = 'grep "var currentstnid" ' + fname 
+  #cmd = 'grep "var currentstnid" ' + fname 
+  cmd = 'grep "const currentstnid = " ' + fname 
   s = doCmd(cmd, True)
   if s:
     index6 = s.find("'", 0)
     index7 = s.find("'", index6+1)
     stationId = s[index6+1:index7]
+    #print("Station id parsed ", stationId)
   return stationId
 
 #----------------------------------------------
@@ -528,12 +532,14 @@ def setElev(fname):
 #----------------------------------------------
 def setLat(fname):
   lat = MISSING
-  cmd = 'grep "var currentstnlat" ' + fname
+  #cmd = 'grep "var currentstnlat" ' + fname
+  cmd = 'grep "currentstnlat = " ' + fname
   s = doCmd(cmd, True)
   if s:
-    index6 = s.find("=")
-    index7 = s.find(";")
+    index6 = s.find("'", 0)
+    index7 = s.find("'", index6+1)
     lat = float(s[index6+1:index7])
+    #print("Parsed lat=", lat)
   else:
     print("ERROR No Lat for ", fname)
   return lat
@@ -541,12 +547,13 @@ def setLat(fname):
 #----------------------------------------------
 def setLon(fname):
   lon = MISSING
-  cmd = 'grep "var currentstnlng" ' + fname
+  cmd = 'grep "currentstnlng = " ' + fname
   s = doCmd(cmd, True)
   if s:
-    index6 = s.find("=")
-    index7 = s.find(";")
+    index6 = s.find("'", 0)
+    index7 = s.find("'", index6+1)
     lon = float(s[index6+1:index7])
+    #print("Parsed lon=", lon)
   else:
     print("ERROR No Lon for ", fname)
   return lon
@@ -630,5 +637,5 @@ if __name__ == "__main__":
   if options.full_usage:
     usage()
     exit(0)
-  main(options.diagnostic, options.out_file, options.prune)
+  main(options.diagnostic, options.out_file, options.existing_file, options.prune)
 
