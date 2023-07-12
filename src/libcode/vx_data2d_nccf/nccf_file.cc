@@ -2580,6 +2580,7 @@ void NcCfFile::get_grid_mapping_rotated_latitude_longitude(const NcVar *grid_map
   data.aux_rotation = 0;
 
   grid.set(data);
+  grid.set_swap_to_north(swap_to_north);
 
   if(grid_np_lat_att) delete grid_np_lat_att;
   if(grid_np_lon_att) delete grid_np_lon_att;
