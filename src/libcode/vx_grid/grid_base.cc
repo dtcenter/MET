@@ -826,7 +826,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 bool Grid::get_swap_to_north() const {
-   return swap_to_north && (info().ll != nullptr || info().rll != nullptr);
+   return swap_to_north && (info().ll != 0 || info().rll != 0);
 }
 
 ////////////////////////////////////////////////////////////////////////
