@@ -69,31 +69,31 @@ clear();
 ////////////////////////////////////////////////////////////////////////
 
 
-LaeaGrid::LaeaGrid(const LaeaGrib2Data & grib2_data)
+LaeaGrid::LaeaGrid(const LaeaData & data)
 
 {
 
 clear();
 
 memset(&Data, 0, sizeof(Data));
-Data = grib2_data;
+Data = data;
 
-lat_LL = grib2_data.lat_first;
-lon_LL = grib2_data.lon_first;
+lat_LL = data.lat_first;
+lon_LL = data.lon_first;
 
-lat_pole = grib2_data.standard_lat;
-lon_pole = grib2_data.central_lon;
+lat_pole = data.standard_lat;
+lon_pole = data.central_lon;
 
-Name = grib2_data.name;
-SpheroidName = grib2_data.spheroid_name;
+Name = data.name;
+SpheroidName = data.spheroid_name;
 Data.spheroid_name = SpheroidName.c_str();
 
-Nx = grib2_data.nx;
-Ny = grib2_data.ny;
+Nx = data.nx;
+Ny = data.ny;
 
-geoid.set_ab(grib2_data.equatorial_radius_km, grib2_data.polar_radius_km);
+geoid.set_ab(data.equatorial_radius_km, data.polar_radius_km);
 
-geoid.set_name(grib2_data.spheroid_name);
+geoid.set_name(data.spheroid_name);
 
 double s = 1.0;
 
@@ -101,7 +101,7 @@ aff.set_mb(s, 0.0, 0.0, s, 1.0, 1.0);
 
 double xx, yy;
 
-latlon_to_xy(grib2_data.lat_first, grib2_data.lon_first, xx, yy);
+latlon_to_xy(data.lat_first, data.lon_first, xx, yy);
 aff.set_pin(xx, yy, 0.0, 0.0);
 
    //
@@ -237,12 +237,9 @@ void LaeaGrid::latlon_to_xy(double lat, double lon, double & x, double & y) cons
 
 double u, v;
 
-
 snyder_latlon_to_xy(lat, lon, u, v);
 
-
 uv_to_xy(u, v, x, y);
-
 
 return;
 
@@ -275,7 +272,6 @@ lat1    = lat_pole;
 
 lambda0 = -lon_pole;
 
-
 beta1 = geoid.beta(lat1);
 
 m1 = geoid.m_func(lat1);
@@ -292,7 +288,6 @@ rho = sqrt( uu*uu + vv*vv );   //  Eq 24-28, page 189
 
 ce = 2.0*asind(rho/(2.0*Rq));  //  Eq 24-29, page 189
 
-
 beta = asind( cosd(ce)*sind(beta1) + ((D*v)/rho)*sind(ce)*cosd(beta1) );   //  Eq 24-30, page 189
 
 s2 = sind(2.0*beta);
@@ -307,18 +302,15 @@ lon = lambda0 + atan2d(num, denom);   // Eq 24-26, page 188
 
 lon = -lon;
 
-
 t2 = E2/3.0 + (31.0*E4)/180.0 + (517.0*E6)/5040.0;
 
 t4 = (23.0*E4)/360.0 + (251.0*E6)/3780.0;
 
 t6 = (761.0*E6)/45360.0;
 
-
 cor = t2*s2 + t4*s4 + t6*s6;   //  Eq 3-18, page 189
 
 lat = beta + cor*deg_per_rad;
-
 
    //
    //  done
@@ -339,12 +331,10 @@ double LaeaGrid::calc_area(int x, int y) const
 double u[4], v[4];
 double sum;
 
-
 xy_to_uv(x - 0.5, y - 0.5, u[0], v[0]);  //  lower left
 xy_to_uv(x + 0.5, y - 0.5, u[1], v[1]);  //  lower right
 xy_to_uv(x + 0.5, y + 0.5, u[2], v[2]);  //  upper right
 xy_to_uv(x - 0.5, y + 0.5, u[3], v[3]);  //  upper left
-
 
 sum = uv_closedpolyline_area(u, v, 4);
 
@@ -410,7 +400,7 @@ const char * LaeaGrid::projection_name() const
 
 {
 
-return "Polar Laea";
+return "Laea";
 
 }
 
@@ -520,8 +510,6 @@ void LaeaGrid::dump(ostream & out, int depth) const
 {
 
 Indent prefix(depth);
-
-
 
 out << prefix << "Name         = ";
 out << prefix << "SpheroidName = ";
@@ -649,11 +637,9 @@ const double  S = sind(lat);
 const double  E = geoid.e();
 const double es = E*S;
 
-
 z = sqrt(1.0 - es*es);
 
 z = C/z;
-
 
 
 return z;
@@ -684,23 +670,17 @@ lambda  = -lon;
 lambda0 = -lon_pole;
 lat1    =  lat_pole;
 
-
 delta   =  lambda - lambda0;
-
 
 beta1 = geoid.beta(lat1);
 
 beta  = geoid.beta(lat);
 
-
 Qp = geoid.qp_direct();
 
 Rq = A*sqrt(0.5*Qp);
 
-
 m1 = snyder_m_func(lat1);
-
-
 
 B = 1.0 + sind(beta1)*sind(beta) + cosd(beta1)*cosd(beta)*cosd(delta);
 
@@ -708,22 +688,17 @@ B = sqrt(2.0/B);
 
 B = Rq*B;
 
-
 D = Rq*cosd(beta1);
 
 D = (A*m1)/D;
-
 
 x_snyder = cosd(beta)*sind(delta);
 
 x_snyder *= B*D;
 
-
-
 y_snyder = cosd(beta1)*sind(beta) - sind(beta1)*cosd(beta)*cosd(delta);
 
 y_snyder *= B/D;
-
 
 
 return;
@@ -795,13 +770,13 @@ exit ( 1 );
 ////////////////////////////////////////////////////////////////////////
 
 
-Grid::Grid(const LaeaGrib2Data & grib2_data)
+Grid::Grid(const LaeaData & data)
 
 {
 
 init_from_scratch();
 
-set(grib2_data);
+set(data);
 
 }
 
@@ -809,17 +784,17 @@ set(grib2_data);
 ////////////////////////////////////////////////////////////////////////
 
 
-void Grid::set(const LaeaGrib2Data & grib2_data)
+void Grid::set(const LaeaData & data)
 
 {
 
 clear();
 
-rep = new LaeaGrid (grib2_data);
+rep = new LaeaGrid (data);
 
 if ( !rep )  {
 
-   mlog << Error << "\nGrid::set(const LaeaGrib2Data &) -> "
+   mlog << Error << "\nGrid::set(const LaeaData &) -> "
         << "memory allocation error\n\n";
 
    exit ( 1 );

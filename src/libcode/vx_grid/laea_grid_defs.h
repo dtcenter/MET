@@ -55,7 +55,7 @@ struct LaeaNetcdfData {
    //
 
 
-struct LaeaGrib2Data {  
+struct LaeaData {  
 
    const char * name;             //  not allocated
    const char * spheroid_name;    //  not allocated
@@ -80,39 +80,6 @@ struct LaeaGrib2Data {
    bool is_sphere;                //  spherical earth, or ellipsoidal?
 
    void dump() const;
-
-};
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-static const LaeaGrib2Data laea_grib2_test_data = {  
-
-
-   "laea_grib2_test", 
-
-   "Grib template 4", 
-
-   0.0,                     //  radius_km
-
-   0.5*6378.1370,           //  equatorial_radius_km
-   0.5*6356.752314,         //       polar_radius_km
-
-   44.5172,                 //  lat_first
-   17.1171,                 //  lon_first
-
-   54.900000,               //  standard_lat
-    2.500000,               //  central_lon
-
-    2.000000,               //  dx_km
-    2.000000,               //  dy_km
-
-   1042,                    //  nx
-    970,                    //  ny
-
-   false                    //  is_sphere
-
 
 };
 

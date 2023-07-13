@@ -47,12 +47,12 @@ class LaeaGrid : public GridRep {
 
       LaeaGrid();
      ~LaeaGrid();
-      LaeaGrid(const LaeaGrib2Data &);
+      LaeaGrid(const LaeaData &);
       LaeaGrid(const LaeaNetcdfData &);
 
       Spheroid geoid;
 
-      LaeaGrib2Data Data;
+      LaeaData Data;
 
          /////////////////////////////////////
 

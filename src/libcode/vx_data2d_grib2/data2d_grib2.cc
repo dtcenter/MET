@@ -1298,16 +1298,16 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld) {
 
       ScanMode = p[16];
 
-      //  build an LaeaGrib2Data struct with the projection information
-      LaeaGrib2Data laea;
+      //  build an LaeaData struct with the projection information
+      LaeaData laea;
       laea.name           = laea_proj_type;
       laea.spheroid_name  = "Grib template";
       int earth_shape_int = p[0];
       if(earth_shape_int == 4) {
          laea.radius_km            = 0;
-	 laea.equatorial_radius_km = 0.5*6378.1370;
-	 laea.polar_radius_km      = 0.5*6356.752314;
-	 laea.is_sphere            = false;
+         laea.equatorial_radius_km = 0.5*6378.1370;
+         laea.polar_radius_km      = 0.5*6356.752314;
+         laea.is_sphere            = false;
       }
       else {
          mlog << Error << "\nMetGrib2DataFile::read_grib2_grid() -> "
@@ -1316,7 +1316,9 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld) {
       }
       laea.nx           = p[7];
       laea.ny           = p[8];
-      laea.lat_first    = (double)p[9] / 1000000.0; 
+      laea.lat_first    = (double)p[9] / 1000000.0;
+
+      // JHG
       // TODO: Suspect a bug in g2clib
       // laea.lon_first = -1.0*rescale_lon( (double)p[10] / 1000000.0 );
       //
@@ -1328,6 +1330,7 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld) {
       // BAD?   {140, 17, 0, {1,1,4,1,4,1,4,4,4,-4,4,4,4,1,4,4,1} },
       // FIX?   {140, 17, 0, {1,1,4,1,4,1,4,4,4,-4,4,-4,4,1,4,4,1} },
       cout << "TODO LAEA p[10] should be 17.1171 = "<< (double)p[10] / 1000000.0 << "\n";
+
       laea.lon_first    = 17.1171;
       laea.standard_lat = (double)p[11] / 1000000.0; 
       laea.central_lon  = -1.0*rescale_lon( (double)p[12] / 1000000.0 );

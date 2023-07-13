@@ -70,7 +70,7 @@ class GridInfo {
       void set(const GaussianData      &);
       void set(const GoesImagerData    &);
       void set(const TcrmwData         &);
-      void set(const LaeaGrib2Data     &);
+      void set(const LaeaData          &);
       void set(const SemiLatLonData    &);
 
       void create_grid(Grid &) const;
@@ -87,7 +87,7 @@ class GridInfo {
       const GaussianData      * g;    //  allocated
       const GoesImagerData    * gi;   //  allocated
       const TcrmwData         * tc;   //  allocated
-      const LaeaGrib2Data     * lg;   //  allocated
+      const LaeaData          * la;   //  allocated
       const SemiLatLonData    * sl;   //  allocated
 
 };
@@ -207,7 +207,7 @@ class Grid : public GridInterface {
       Grid(const GaussianData      &);
       Grid(const GoesImagerData    &);
       Grid(const TcrmwData         &);
-      Grid(const LaeaGrib2Data     &);
+      Grid(const LaeaData          &);
       Grid(const LaeaNetcdfData    &);
       Grid(const SemiLatLonData    &);
       virtual ~Grid();
@@ -229,7 +229,7 @@ class Grid : public GridInterface {
       void set (const GaussianData      &);
       void set (const GoesImagerData    &);
       void set (const TcrmwData         &);
-      void set (const LaeaGrib2Data     &);
+      void set (const LaeaData          &);
       void set (const LaeaNetcdfData    &);
       void set (const SemiLatLonData    &);
 
@@ -291,7 +291,7 @@ extern bool is_eq(const RotatedLatLonData *, const RotatedLatLonData *);
 extern bool is_eq(const MercatorData *,      const MercatorData *);
 extern bool is_eq(const GaussianData *,      const GaussianData *);
 extern bool is_eq(const GoesImagerData *,    const GoesImagerData *);
-extern bool is_eq(const LaeaGrib2Data *,     const LaeaGrib2Data *);
+extern bool is_eq(const LaeaData *,          const LaeaData *);
 extern bool is_eq(const SemiLatLonData *,    const SemiLatLonData *);
 
 

@@ -36,8 +36,7 @@ static void rotated_latlon_grid_output (const GridInfo &, NcFile * ncfile);
 static void stereographic_grid_output  (const GridInfo &, NcFile * ncfile);
 static void mercator_grid_output       (const GridInfo &, NcFile * ncfile);
 static void gaussian_grid_output       (const GridInfo &, NcFile * ncfile);
-// static void laea_grid_output           (const GridInfo &, NcFile * ncfile);
-static void laea_grib2_grid_output     (const GridInfo &, NcFile * ncfile);
+static void laea_grid_output           (const GridInfo &, NcFile * ncfile);
 static void semilatlon_grid_output     (const GridInfo &, NcFile * ncfile, NcDim &, NcDim &);
 static void write_semilatlon_var       (NcFile * ncfile, const char *,
                                         NcDim *, const NumArray &, const char *,
@@ -67,8 +66,7 @@ else if ( info.ll  )  latlon_grid_output          (info, ncfile);
 else if ( info.rll )  rotated_latlon_grid_output  (info, ncfile);
 else if ( info.m   )  mercator_grid_output        (info, ncfile);
 else if ( info.g   )  gaussian_grid_output        (info, ncfile);
-// else if ( info.la  )  laea_grid_output            (info, ncfile);
-else if ( info.lg  )  laea_grib2_grid_output      (info, ncfile);
+else if ( info.la  )  laea_grid_output            (info, ncfile);
 else if ( info.sl  )  semilatlon_grid_output      (info, ncfile, lat_dim, lon_dim);
 else {
 
@@ -647,15 +645,15 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void laea_grib2_grid_output(const GridInfo & info, NcFile * ncfile)
+void laea_grid_output(const GridInfo & info, NcFile * ncfile)
 
 {
 
 char junk[256];
 double t;
-const LaeaGrib2Data & data = *(info.lg);
+const LaeaData & data = *(info.la);
 
-ncfile->putAtt("Projection", "Grib2 Lambert Azimuthal Equal Area");
+ncfile->putAtt("Projection", "Lambert Azimuthal Equal Area");
 
 ncfile->putAtt("spheroid_name", data.spheroid_name);
 
