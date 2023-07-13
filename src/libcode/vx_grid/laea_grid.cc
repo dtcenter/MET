@@ -68,44 +68,6 @@ clear();
 
 ////////////////////////////////////////////////////////////////////////
 
-/*
-LaeaGrid::LaeaGrid(const LaeaData & data)
-
-{
-
-clear();
-
-memset(&Grib2Data, 0, sizeof(Grib2Data));
-Data = data;
-
-Nx = data.nx;
-Ny = data.ny;
- 
-Name = data.name;
-SpheroidName = data.geoid;
-
-if ( strcmp(data.geoid, "WGS_84") == 0 )  {
-
-   geoid.set_ab(6378.137, 6356.752);
-
-   geoid.set_name("WGS_84");
-
-} else {
-
-   mlog << Error << "\nLaeaGrid::LaeaGrid(const LaeaData &) -> "
-        << "unrecognized geoid ... \"" << data.geoid << "\"\n\n";
-
-   exit ( 1 );
-
-}
-
-calc_aff();
-
-}
-*/
-
-////////////////////////////////////////////////////////////////////////
-
 
 LaeaGrid::LaeaGrid(const LaeaGrib2Data & grib2_data)
 
@@ -133,19 +95,11 @@ geoid.set_ab(grib2_data.equatorial_radius_km, grib2_data.polar_radius_km);
 
 geoid.set_name(grib2_data.spheroid_name);
 
-// aff.set_mb(1.0, 0.0, 0.0, 1.0, 1.0, 1.0);
-// aff.set_mb(2.0, 0.0, 0.0, 2.0, 1.0, 1.0);
-
 double s = 1.0;
 
 aff.set_mb(s, 0.0, 0.0, s, 1.0, 1.0);
 
-// aff.set_mb(grib2_data.dx_km, 0.0, 0.0, grib2_data.dy_km, 1.0, 1.0);
-
 double xx, yy;
-
-// latlon_to_xy(Data.lat_pole, Data.lon_pole, xx, yy);
-// aff.set_pin(xx, yy, 0.5*(Nx - 1.0), 0.5*(Ny - 1.0));
 
 latlon_to_xy(grib2_data.lat_first, grib2_data.lon_first, xx, yy);
 aff.set_pin(xx, yy, 0.0, 0.0);
@@ -161,50 +115,83 @@ return;
 
 ////////////////////////////////////////////////////////////////////////
 
-/*
-void LaeaGrid::calc_aff()
+
+LaeaGrid::LaeaGrid(const LaeaNetcdfData & nc)
 
 {
 
-double u_LL, v_LL;
-double u_LR, v_LR;
-double u_UL, v_UL;
+double u, v, lat, lon;
+const double tol = 1.0e-5;
 
-double x_LL, y_LL;
-double x_LR, y_LR;
-double x_UL, y_UL;
+clear();
 
 
-snyder_latlon_to_xy(Data.lat_LL, Data.lon_LL, u_LL, v_LL);
-snyder_latlon_to_xy(Data.lat_LR, Data.lon_LR, u_LR, v_LR);
-snyder_latlon_to_xy(Data.lat_UL, Data.lon_UL, u_UL, v_UL);
+Data.name                 = nc.name;
 
+Data.radius_km            = 0.0;
 
-x_LL = 0.0;
-y_LL = 0.0;
+Data.is_sphere            = false;
 
-x_LR = Data.nx - 1.0;
-y_LR = 0.0;
+Data.equatorial_radius_km = nc.semi_major_axis_km;
+Data.polar_radius_km      = nc.semi_minor_axis_km;
 
-x_UL = 0.0;
-y_UL = Data.ny  - 1.0;
+Data.dx_km                = nc.dx_km;
+Data.dy_km                = nc.dy_km;
 
+Data.standard_lat         = nc.proj_origin_lat;
+Data.central_lon          = nc.proj_origin_lon;
 
-aff.set_three_points(
+Data.nx                   = nc.nx;
+Data.ny                   = nc.ny;
 
-   u_LL, v_LL, x_LL, y_LL, 
+Nx = Data.nx;
+Ny = Data.ny;
 
-   u_LR, v_LR, x_LR, y_LR, 
+Name = Data.name;
 
-   u_UL, v_UL, x_UL, y_UL
+if ( fabs((nc.semi_major_axis_km - nc.semi_minor_axis_km)/(nc.semi_major_axis_km)) < tol )  {
 
-);
+   Data.radius_km = nc.semi_major_axis_km;
 
-
-return;
+   Data.is_sphere = true;
 
 }
-*/
+
+geoid.set_ab(Data.equatorial_radius_km, Data.polar_radius_km);
+
+geoid.set_name("WGS_84");
+
+aff.set_mb(1.0/(Data.dx_km), 0.0, 0.0, 1.0/(Data.dy_km), 0.0, 0.0);
+
+latlon_to_xy(nc.proj_origin_lat, nc.proj_origin_lon, u, v);
+
+aff.set_translation(nc.x_pin - u, nc.y_pin - v);
+
+latlon_to_xy(nc.proj_origin_lat, nc.proj_origin_lon, u, v);
+
+      ////////////////////////
+
+xy_to_latlon(0.0, 0.0, lat, lon);
+
+Data.lat_first = lat;
+Data.lon_first = lon;
+
+xy_to_latlon(Nx - 1.0, 0.0, lat, lon);
+
+lat_LR = lat;
+lon_LR = lon;
+
+xy_to_latlon(0.0, Ny - 1.0, lat, lon);
+
+lat_UL = lat;
+lon_UL = lon;
+
+   //
+   //  done
+   //
+
+}
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -234,8 +221,7 @@ lon_LR = 0.0;
 
 lat_pole = 0.0;
 
-memset(&Data,      0, sizeof(Data));
-// memset(&Grib2Data, 0, sizeof(Grib2Data));
+memset(&Data, 0, sizeof(Data));
 
 return;
 
@@ -317,9 +303,7 @@ num = u*sind(ce);
 
 denom = D*rho*cosd(beta1)*cosd(ce) - D*D*v*sind(beta1)*sind(ce);
 
-
-// lon = lambda0 + atand(num/denom);   //  maybe want atan2 here?   //  Eq 24-26, page 188
-lon = lambda0 + atan2d(num, denom);   //  maybe want atan2 here?
+lon = lambda0 + atan2d(num, denom);   // Eq 24-26, page 188
 
 lon = -lon;
 
@@ -694,8 +678,6 @@ double beta1, beta;
 double m1, lambda, lambda0, lat1, delta;
 
 A = geoid.a_km();
-// A = 1.0;
-
 
 lambda  = -lon;
 
@@ -812,45 +794,6 @@ exit ( 1 );
 
 ////////////////////////////////////////////////////////////////////////
 
-/*
-Grid::Grid(const LaeaData & data)
-
-{
-
-init_from_scratch();
-
-set(data);
-
-}
-*/
-
-////////////////////////////////////////////////////////////////////////
-
-/*
-void Grid::set(const LaeaData & data)
-
-{
-
-clear();
-
-rep = new LaeaGrid (data);
-
-if ( !rep )  {
-
-   mlog << Error << "\nGrid::set(const LaeaData &) -> "
-	<< "memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
-
-return;
-
-}
-*/
-
-////////////////////////////////////////////////////////////////////////
-
 
 Grid::Grid(const LaeaGrib2Data & grib2_data)
 
@@ -877,6 +820,45 @@ rep = new LaeaGrid (grib2_data);
 if ( !rep )  {
 
    mlog << Error << "\nGrid::set(const LaeaGrib2Data &) -> "
+        << "memory allocation error\n\n";
+
+   exit ( 1 );
+
+}
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+Grid::Grid(const LaeaNetcdfData & data)
+
+{
+
+init_from_scratch();
+
+set(data);
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void Grid::set(const LaeaNetcdfData & data)
+
+{
+
+clear();
+
+rep = new LaeaGrid (data);
+
+if ( !rep )  {
+
+   mlog << Error << "\nGrid::set(const LaeaNetcdfData &) -> "
         << "memory allocation error\n\n";
 
    exit ( 1 );

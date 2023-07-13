@@ -220,30 +220,6 @@ mlog << Debug(grid_debug_level)
 
 ////////////////////////////////////////////////////////////////////////
 
-/*
-void LaeaData::dump() const
-
-{
-
-mlog << Debug(grid_debug_level)
-     << "\nLaea Grid Data:\n"
-     << "    geoid: " << geoid << "\n"
-     << "   lat_LL: " << lat_LL << "\n"
-     << "   lon_LL: " << lon_LL << "\n"
-     << "   lat_UL: " << lat_UL << "\n"
-     << "   lon_UL: " << lon_UL << "\n"
-     << "   lat_LR: " << lat_LR << "\n"
-     << "   lon_LR: " << lon_LR << "\n"
-     << " lat_pole: " << lat_pole << "\n"
-     << " lon_pole: " << lon_pole << "\n"
-     << "       nx: " << nx << "\n"
-     << "       ny: " << ny << "\n\n";
-
-}
-*/
-
-////////////////////////////////////////////////////////////////////////
-
 
 void LaeaGrib2Data::dump() const
 
@@ -377,7 +353,6 @@ rll = (const RotatedLatLonData *) 0;
 m   = (const MercatorData *)      0;
 g   = (const GaussianData *)      0;
 gi  = (const GoesImagerData *)    0;
-// la  = (const LaeaData *)          0;
 lg  = (const LaeaGrib2Data *)     0;
 tc  = (const TcrmwData *)         0;
 sl  = (const SemiLatLonData *)    0;
@@ -403,7 +378,6 @@ if ( rll )  { delete rll;  rll = (const RotatedLatLonData *) 0; };
 if ( m   )  { delete m;    m   = (const MercatorData *)      0; };
 if ( g   )  { delete g;    g   = (const GaussianData *)      0; };
 if ( gi  )  { delete gi;   gi  = (const GoesImagerData *)    0; };
-// if ( la  )  { delete la;   la  = (const LaeaData *)          0; };
 if ( lg  )  { delete lg;   lg  = (const LaeaGrib2Data *)     0; };
 if ( tc  )  { delete tc;   tc  = (const TcrmwData *)         0; };
 if ( sl  )  { delete sl;   sl  = (const SemiLatLonData *)    0; };
@@ -427,7 +401,6 @@ if ( info.rll )  set( *(info.rll) );
 if ( info.m   )  set( *(info.m)   );
 if ( info.g   )  set( *(info.g)   );
 if ( info.gi  )  set( *(info.gi)  );
-// if ( info.la  )  set( *(info.la)  );
 if ( info.lg  )  set( *(info.lg)  );
 if ( info.sl  )  set( *(info.sl)  );
 
@@ -452,7 +425,6 @@ if ( rll ) ++count;
 if ( m   ) ++count;
 if ( g   ) ++count;
 if ( gi  ) ++count;
-// if ( la  ) ++count;
 if ( lg  ) ++count;
 if ( sl  ) ++count;
 
@@ -483,7 +455,6 @@ else if ( rll )  gg.set( *rll );
 else if ( m   )  gg.set( *m   );
 else if ( g   )  gg.set( *g   );
 else if ( gi  )  gg.set( *gi  );
-// else if ( la  )  gg.set( *la  );
 else if ( lg  )  gg.set( *lg  );
 else if ( sl  )  gg.set( *sl  );
 
@@ -645,28 +616,6 @@ return;
 
 }
 
-
-////////////////////////////////////////////////////////////////////////
-
-/*
-void GridInfo::set(const LaeaData & data)
-
-{
-
-clear();
-
-LaeaData * D = (LaeaData *) 0;
-
-D = new LaeaData;
-
-memcpy(D, &data, sizeof(data));
-
-la = D;  D = (LaeaData *) 0;
-
-return;
-
-}
-*/
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -1367,7 +1316,6 @@ else if ( i1.rll && i2.rll )  return ( is_eq(i1.rll, i2.rll) );
 else if ( i1.m   && i2.m   )  return ( is_eq(i1.m,   i2.m  ) );
 else if ( i1.g   && i2.g   )  return ( is_eq(i1.g,   i2.g  ) );
 else if ( i1.gi  && i2.gi  )  return ( is_eq(i1.gi,  i2.gi ) );
-// else if ( i1.la  && i2.la  )  return ( is_eq(i1.la,  i2.la ) );
 else if ( i1.lg  && i2.lg  )  return ( is_eq(i1.lg,  i2.lg ) );
 else if ( i1.sl  && i2.sl  )  return ( is_eq(i1.sl,  i2.sl ) );
 
@@ -1572,34 +1520,6 @@ return ( status );
 
 }
 
-
-////////////////////////////////////////////////////////////////////////
-
-/*
-bool is_eq(const LaeaData * g1, const LaeaData * g2)
-
-{
-
-if ( !g1 || !g2 )  return ( false );
-
-bool status = false;
-
-if ( g1->lat_LL == g2->lat_LL &&
-     g1->lat_UL == g2->lat_UL &&
-     g1->lat_LR == g2->lat_LR &&
-     is_eq  (rescale_lon(g1->lon_LL),
-             rescale_lon(g2->lon_LL), loose_tol) &&
-     is_eq  (rescale_lon(g1->lon_UL),
-             rescale_lon(g2->lon_UL), loose_tol) &&
-     is_eq  (rescale_lon(g1->lon_LR),
-             rescale_lon(g2->lon_LR), loose_tol) &&
-     g1->nx  == g2->nx                           &&
-     g1->ny  == g2->ny )  status = true;
-
-return ( status );
-
-}
-*/
 
 ////////////////////////////////////////////////////////////////////////
 
