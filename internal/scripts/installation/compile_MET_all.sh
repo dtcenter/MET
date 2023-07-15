@@ -338,6 +338,17 @@ echo "export F77=${F77}"
 echo "export F90=${F90}"
 echo
 
+# Figure out what kind of OS this is
+unameOut="$(uname -s)"
+case "${unameOut}" in
+    Linux*)     machine=Linux;;
+    Darwin*)    machine=Mac;;
+    CYGWIN*)    machine=Cygwin;;
+    MINGW*)     machine=MinGw;;
+    *)          machine="UNKNOWN:${unameOut}"
+esac
+
+
 # Load Python module
 
 if [ ${USE_MODULES} = "TRUE" ]; then
@@ -470,17 +481,33 @@ if [ $COMPILE_G2CLIB -eq 1 ]; then
   rm -rf ${LIB_DIR}/g2clib/g2clib*
   tar -xf ${TAR_DIR}/g2clib*.tar -C ${LIB_DIR}/g2clib
   cd ${LIB_DIR}/g2clib/g2clib*
-  # Sed commands use double-quotes to support variable expansion.
-  sed -i "s|INC=.*|INC=-I${LIB_DIR}/include -I${LIB_DIR}/include/jasper|g" makefile
+  
+  if [[ $machine == "Mac" ]]; then
+    # Sed commands use double-quotes to support variable expansion.
+    sed -i '' "s|INC=.*|INC=-I${LIB_DIR}/include -I${LIB_DIR}/include/jasper|g" makefile
 
-  # Allow other compilers besides gcc
-  sed -i "s|CC=gcc|CC=${CC}|g" makefile
+    # Allow other compilers besides gcc
+    sed -i '' "s|CC=gcc|CC=${CC}|g" makefile
 
-  # remove -D__64BIT__ flag because compiling with it has
-  # shown issues with GRIB/GRIB2 files that are over 2GB in size
-  # This flag was removed in g2clib 1.6.4
-  # so this can be removed if the version is updated
-  sed -i 's/-D__64BIT__//g' makefile
+    # remove -D__64BIT__ flag because compiling with it has
+    # shown issues with GRIB/GRIB2 files that are over 2GB in size
+    # This flag was removed in g2clib 1.6.4
+    # so this can be removed if the version is updated
+    sed -i '' 's/-D__64BIT__//g' makefile
+  else
+    # Sed commands use double-quotes to support variable expansion.
+    sed -i "s|INC=.*|INC=-I${LIB_DIR}/include -I${LIB_DIR}/include/jasper|g" makefile
+
+    # Allow other compilers besides gcc
+    sed -i "s|CC=gcc|CC=${CC}|g" makefile
+
+    # remove -D__64BIT__ flag because compiling with it has
+    # shown issues with GRIB/GRIB2 files that are over 2GB in size
+    # This flag was removed in g2clib 1.6.4
+    # so this can be removed if the version is updated
+    sed -i 's/-D__64BIT__//g' makefile
+  fi
+  
   echo "cd `pwd`"
   # g2clib appears to compile but causes failure compiling MET if -j argument is used
   # so exclude it from this call
