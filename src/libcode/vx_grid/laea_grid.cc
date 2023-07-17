@@ -159,7 +159,9 @@ if ( fabs((nc.semi_major_axis_km - nc.semi_minor_axis_km)/(nc.semi_major_axis_km
 
 geoid.set_ab(Data.equatorial_radius_km, Data.polar_radius_km);
 
-geoid.set_name("WGS_84");
+Data.spheroid_name = "WGS_84";
+
+geoid.set_name(Data.spheroid_name);
 
 aff.set_mb(1.0/(Data.dx_km), 0.0, 0.0, 1.0/(Data.dy_km), 0.0, 0.0);
 
@@ -544,13 +546,28 @@ ConcatString LaeaGrid::serialize(const char *sep) const
 {
 
 ConcatString a;
+char junk[256];
 
-a << "Projection: Labmbert Azimuthal Equal Area" << sep;
+a << "Projection: Lambert Azimuthal Equal Area" << sep;
 
 a << "Nx: " << Nx << sep;
 a << "Ny: " << Ny << sep;
 
 a << "SpheroidName: " << SpheroidName << sep;
+
+snprintf(junk, sizeof(junk), "Lat_LL: %.3f", lat_LL);   a << junk << sep;
+snprintf(junk, sizeof(junk), "Lon_LL: %.3f", lon_LL);   a << junk << sep;
+
+snprintf(junk, sizeof(junk), "Lat_Pole: %.3f", lat_pole);   a << junk << sep;
+snprintf(junk, sizeof(junk), "Lon_Pole: %.3f", lon_pole);   a << junk << sep;
+
+   //
+   //  done
+   //
+
+return ( a );
+
+
 
    //
    //  done

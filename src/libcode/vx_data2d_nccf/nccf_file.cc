@@ -1478,15 +1478,273 @@ void NcCfFile::get_grid_mapping_azimuthal_equidistant(const NcVar *grid_mapping_
 
 
 ////////////////////////////////////////////////////////////////////////
-
+// TODO: no false_easting and false_northing yet
 
 void NcCfFile::get_grid_mapping_lambert_azimuthal_equal_area(const NcVar *grid_mapping_var)
 {
   static const string method_name = "NcCfFile::get_grid_mapping_lambert_azimuthal_equal_area()";
+  double x_coord_to_m_cf = 1.0;
+  double y_coord_to_m_cf = 1.0;
 
-  mlog << Error << "\n" << method_name << " -> "
-       << "Lambert azimuthal equal area grid not handled in MET.\n\n";
-  exit(1);
+  // Look for the x/y dimensions
+
+  for (int dim_num = 0; dim_num < _numDims; ++dim_num)
+  {
+    // Get the standard name for the coordinate variable
+
+    const NcVar coord_var = get_var(_ncFile, _dims[dim_num]->getName().c_str());
+    if (IS_INVALID_NC(coord_var)) continue;
+
+    const NcVarAtt *std_name_att = get_nc_att(&coord_var, (string)"standard_name");
+    if (IS_INVALID_NC_P(std_name_att)) {
+      if (std_name_att) delete std_name_att;
+      continue;
+    }
+
+    ConcatString dim_std_name;
+    if (!get_att_value_chars(std_name_att, dim_std_name)) {
+      if (std_name_att) delete std_name_att;
+      continue;
+    }
+
+    if (std_name_att) {
+       delete std_name_att;
+       std_name_att = (NcVarAtt *)0;
+    }
+
+    // See if this is an X or Y dimension
+
+    if ( dim_std_name == x_dim_key_name )
+    {
+      _xDim = _dims[dim_num];
+
+      x_dim_var_name = GET_NC_NAME_P(_xDim).c_str();
+      for (int var_num = 0; var_num < Nvars; ++var_num)
+      {
+        if ( Var[var_num].name == x_dim_var_name)
+        {
+          _xCoordVar = Var[var_num].var;
+          break;
+        }
+      }
+    }
+
+    if ( dim_std_name == y_dim_key_name)
+    {
+      _yDim = _dims[dim_num];
+
+      y_dim_var_name = GET_NC_NAME_P(_yDim).c_str();
+      for (int var_num = 0; var_num < Nvars; ++var_num)
+      {
+        if (Var[var_num].name == y_dim_var_name)
+        {
+          _yCoordVar = Var[var_num].var;
+          break;
+        }
+      }
+    }
+
+  }
+
+  if (_xDim == 0)
+  {
+    mlog << Error << "\n" << method_name << " -> "
+         << "Didn't find X dimension (projection_x_coordinate) in netCDF file.\n\n";
+    exit(1);
+  }
+
+  if (_yDim == 0)
+  {
+    mlog << Error << "\n" << method_name << " -> "
+         << "Didn't find Y dimension (projection_y_coordinate) in netCDF file.\n\n";
+    exit(1);
+  }
+
+  if (_xCoordVar == 0)
+  {
+    mlog << Error << "\n" << method_name << " -> "
+         << "Didn't find X coord variable (" << GET_NC_NAME_P(_xDim)
+         << ") in netCDF file.\n\n";
+    exit(1);
+  }
+
+  if (_yCoordVar == 0)
+  {
+    mlog << Error << "\n" << method_name << " -> "
+         << "Didn't find Y coord variable (" << GET_NC_NAME_P(_yDim)
+         << ") in netCDF file.\n\n";
+    exit(1);
+  }
+
+  if (get_data_size(_xCoordVar) != (int) GET_NC_SIZE_P(_xDim) ||
+      get_data_size(_yCoordVar) != (int) GET_NC_SIZE_P(_yDim))
+  {
+    mlog << Error << "\n" << method_name << " -> "
+         << "Coordinate variables don't match dimension sizes in netCDF file.\n\n";
+    exit(1);
+  }
+
+  // Handle coordinate variable units
+
+  ConcatString x_coord_units_name;
+  if (!get_var_units(_xCoordVar, x_coord_units_name)) {
+    mlog << Warning << "\n" << method_name << " -> "
+         << "Units not given for X coordinate variable -- "
+         << "assuming meters.\n\n";
+  }
+  else {
+    if (0 == x_coord_units_name.length()) {
+      mlog << Warning << "\n" << method_name << " -> "
+           << "Cannot extract X coordinate units from netCDF file -- "
+           << "assuming meters.\n\n";
+    }
+    else {
+           if ( x_coord_units_name == "m" ||
+                x_coord_units_name == "meter" ||
+                x_coord_units_name == "meters") x_coord_to_m_cf = 1.0;
+      else if (x_coord_units_name == "km") x_coord_to_m_cf = 1000.0;
+      else {
+        mlog << Error << "\n" << method_name << " -> "
+             << "The X coordinates must be in meters or kilometers for MET.\n\n";
+        exit(1);
+      }
+    }
+  }
+
+  ConcatString y_coord_units_name;
+  if (!get_var_units(_yCoordVar, y_coord_units_name)) {
+    mlog << Warning << "\n" << method_name << " -> "
+         << "Units not given for Y coordinate variable -- "
+         << "assuming meters.\n\n";
+  }
+  else {
+    if (0 == y_coord_units_name.length()) {
+      mlog << Warning << "\n" << method_name << " -> "
+           << "Cannot extract Y coordinate units from netCDF file -- "
+           << "assuming meters.\n\n";
+    }
+    else {
+           if ( y_coord_units_name == "m" ||
+                y_coord_units_name == "meter" ||
+                y_coord_units_name == "meters" ) y_coord_to_m_cf = 1.0;
+      else if (y_coord_units_name == "km") y_coord_to_m_cf = 1000.0;
+      else {
+        mlog << Error << "\n" << method_name << " -> "
+             << "The X coordinates must be in meters or kilometers for MET.\n\n";
+        exit(1);
+      }
+    }
+  }
+
+  // Figure out the dx/dy  and x/y pin values from the dimension variables
+
+  long x_counts = GET_NC_SIZE_P(_xDim);
+  double x_values[x_counts];
+
+  get_nc_data(_xCoordVar, x_values);
+
+  long y_counts = GET_NC_SIZE_P(_yDim);
+  double y_values[y_counts];
+
+  get_nc_data(_yCoordVar, y_values);
+
+  // Unit conversion
+
+  for (int i = 0; i<x_counts; ++i) x_values[i] *= x_coord_to_m_cf;
+  for (int i = 0; i<y_counts; ++i) y_values[i] *= y_coord_to_m_cf;
+
+  // Calculate dx and dy
+
+  double dx_m = (x_values[x_counts-1] - x_values[0]) / (x_counts - 1);
+  double dy_m = (y_values[y_counts-1] - y_values[0]) / (y_counts - 1);
+  double dx_m_a = fabs(dx_m);
+  double dy_m_a = fabs(dy_m);
+
+  // As a sanity check, make sure that the deltas are constant through the
+  // entire grid.  CF compliancy doesn't require this, but MET does.
+
+  for (int i = 1; i < (int)x_counts; ++i)
+  {
+    double curr_delta = fabs(x_values[i] - x_values[i-1]);
+    if (fabs(curr_delta - dx_m_a) > DELTA_TOLERANCE)
+    {
+      mlog << Error << "\n" << method_name << " -> "
+           << "MET can only process Lambert Azimuthal Equal Area files "
+           << "where the delta along the x-axis is constant ("
+           << curr_delta << " != " << dx_m_a << ")\n\n";
+      exit(1);
+    }
+  }
+
+  for (int i = 1; i < (int)y_counts; ++i)
+  {
+    double curr_delta = fabs(y_values[i] - y_values[i-1]);
+    if (fabs(curr_delta - dy_m_a) > DELTA_TOLERANCE)
+    {
+      mlog << Error << "\n" << method_name << " -> "
+           << "MET can only process Lambert Azimuthal Equal Area files "
+           << "where the delta along the y-axis is constant ("
+           << curr_delta << " != " << dy_m_a << ")\n\n";
+      exit(1);
+    }
+  }
+
+  // Fill in the data structure.  Remember to negate the longitude
+  // values since MET uses the mathematical coordinate system centered on
+  // the center of the earth rather than the regular map coordinate system.
+
+  LaeaNetcdfData data;
+  data.name = laea_proj_type;
+
+  // longitude_of_projection_origin (convert degrees east to west)
+
+  data.prime_meridian_lon = get_nc_var_att_double(
+    grid_mapping_var, "longitude_of_prime_meridian", false);
+
+  if(is_bad_data(data.prime_meridian_lon)) data.prime_meridian_lon =   0.0;
+  else                                     data.prime_meridian_lon *= -1.0;
+
+  // semi_major_axis (convert m to km)
+
+  data.semi_major_axis_km = get_nc_var_att_double(
+    grid_mapping_var, "semi_major_axis", false);
+
+  if(is_bad_data(data.semi_major_axis_km)) data.semi_major_axis_km = EARTH_MAJOR_AXIS_km;
+  else                                     data.semi_major_axis_km /= m_per_km;
+
+  // semi_minor_axis (convert m to km)
+
+  data.semi_minor_axis_km = get_nc_var_att_double(
+    grid_mapping_var, "semi_minor_axis", false);
+
+  if(is_bad_data(data.semi_minor_axis_km)) data.semi_minor_axis_km = EARTH_MAJOR_AXIS_km;
+  else                                     data.semi_minor_axis_km /= m_per_km;
+
+  // latitude_of_projection_origin
+
+  data.proj_origin_lat = get_nc_var_att_double(
+    grid_mapping_var, "latitude_of_projection_origin");
+
+  // longitude_of_projection_origin (convert degrees east to west)
+
+  data.proj_origin_lon = -1.0 * get_nc_var_att_double(
+    grid_mapping_var, "longitude_of_projection_origin");
+
+  // Calculate the pin indices.  The pin will be located at the grid's reference
+  // location since that's the only lat/lon location we know about.
+
+  data.x_pin = -(x_values[0] / dx_m);
+  data.y_pin = -(y_values[0] / dy_m);
+
+  data.dx_km = dx_m / m_per_km;
+  data.dy_km = dy_m / m_per_km;
+  data.nx = _xDim->getSize();
+  data.ny = _yDim->getSize();
+
+  // Instantiate grid
+
+  grid.set(data);
+  if (dy_m < 0) grid.set_swap_to_north(true);
 }
 
 
@@ -1643,7 +1901,6 @@ void NcCfFile::get_grid_mapping_lambert_conformal_conic(const NcVar *grid_mappin
          << "Units not given for X coordinate variable -- assuming meters.\n\n";
   }
   else {
-    //const char *x_coord_units_name = x_coord_units_att->getValues(att->as_string(0);
     if (0 == x_coord_units_name.length()) {
       mlog << Warning << "\n" << method_name << " -> "
            << "Cannot extract X coordinate units from netCDF file -- "
@@ -1668,7 +1925,6 @@ void NcCfFile::get_grid_mapping_lambert_conformal_conic(const NcVar *grid_mappin
          << "Units not given for Y coordinate variable -- assuming meters.\n\n";
   }
   else {
-    //const char *y_coord_units_name = y_coord_units_att->getValues(att->as_string(0);
     if (0 == y_coord_units_name.length()) {
       mlog << Warning << "\n" << method_name << " -> "
            << "Cannot extract Y coordinate units from netCDF file -- "
@@ -1692,13 +1948,11 @@ void NcCfFile::get_grid_mapping_lambert_conformal_conic(const NcVar *grid_mappin
   long x_counts = GET_NC_SIZE_P(_xDim);
   double x_values[x_counts];
 
-  //_xCoordVar->get(x_values, &x_counts);
   get_nc_data(_xCoordVar, x_values);
 
   long y_counts = GET_NC_SIZE_P(_yDim);
   double y_values[y_counts];
 
-  //_yCoordVar->get(y_values, &y_counts);
   get_nc_data(_yCoordVar, y_values);
 
   // Unit conversion

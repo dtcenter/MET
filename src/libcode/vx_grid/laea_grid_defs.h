@@ -21,7 +21,7 @@ struct LaeaNetcdfData {
 
    const char * name;
 
-   const double prime_meridian_lon;
+   double prime_meridian_lon;
 
    double semi_major_axis_km;
    double semi_minor_axis_km;
