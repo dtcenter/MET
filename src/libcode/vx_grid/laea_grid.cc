@@ -159,7 +159,7 @@ if ( fabs((nc.semi_major_axis_km - nc.semi_minor_axis_km)/(nc.semi_major_axis_km
 
 geoid.set_ab(Data.equatorial_radius_km, Data.polar_radius_km);
 
-Data.spheroid_name = "WGS_84";
+Data.spheroid_name = "Undefined";
 
 geoid.set_name(Data.spheroid_name);
 
@@ -168,8 +168,6 @@ aff.set_mb(1.0/(Data.dx_km), 0.0, 0.0, 1.0/(Data.dy_km), 0.0, 0.0);
 latlon_to_xy(nc.proj_origin_lat, nc.proj_origin_lon, u, v);
 
 aff.set_translation(nc.x_pin - u, nc.y_pin - v);
-
-latlon_to_xy(nc.proj_origin_lat, nc.proj_origin_lon, u, v);
 
       ////////////////////////
 

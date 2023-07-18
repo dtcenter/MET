@@ -1478,7 +1478,7 @@ void NcCfFile::get_grid_mapping_azimuthal_equidistant(const NcVar *grid_mapping_
 
 
 ////////////////////////////////////////////////////////////////////////
-// TODO: no false_easting and false_northing yet
+
 
 void NcCfFile::get_grid_mapping_lambert_azimuthal_equal_area(const NcVar *grid_mapping_var)
 {
@@ -1729,6 +1729,34 @@ void NcCfFile::get_grid_mapping_lambert_azimuthal_equal_area(const NcVar *grid_m
 
   data.proj_origin_lon = -1.0 * get_nc_var_att_double(
     grid_mapping_var, "longitude_of_projection_origin");
+
+  // false_easting
+
+  double false_easting = get_nc_var_att_double(
+    grid_mapping_var, "false_easting", false);
+
+  if(!is_bad_data(false_easting) && !is_eq(false_easting, 0.0))
+  {
+    mlog << Error << "\n" << method_name << " -> "
+         << "MET cannot process Lambert Azimuthal Equal Area files "
+         << "with non-zero false_easting (" << false_easting
+         << ").\n\n";
+    exit(1);
+  }
+
+  // false_northing
+
+  double false_northing = get_nc_var_att_double(
+    grid_mapping_var, "false_northing", false);
+
+  if(!is_bad_data(false_northing) && !is_eq(false_northing, 0.0))
+  {
+    mlog << Error << "\n" << method_name << " -> "
+         << "MET cannot process Lambert Azimuthal Equal Area files "
+         << "with non-zero false_northing (" << false_northing
+         << ").\n\n";
+    exit(1);
+  }
 
   // Calculate the pin indices.  The pin will be located at the grid's reference
   // location since that's the only lat/lon location we know about.
