@@ -38,6 +38,8 @@ struct LaeaNetcdfData {
    int nx;
    int ny;
 
+   void dump() const;
+
 };
 
 

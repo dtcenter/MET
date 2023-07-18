@@ -221,6 +221,31 @@ mlog << Debug(grid_debug_level)
 ////////////////////////////////////////////////////////////////////////
 
 
+void LaeaNetcdfData::dump() const
+
+{
+
+mlog << Debug(grid_debug_level)
+     << "\nLaea NetCDF Grid Data:\n"
+     << "                 name: " << name                      << "\n"
+     << "   prime_meridian_lon: " << prime_meridian_lon        << "\n"
+     << "   semi_major_axis_km: " << semi_major_axis_km        << "\n"
+     << "   semi_minor_axis_km: " << semi_minor_axis_km        << "\n"
+     << "      proj_origin_lat: " << proj_origin_lat           << "\n"
+     << "      proj_origin_lon: " << proj_origin_lon           << "\n"
+     << "                x_pin: " << x_pin                     << "\n"
+     << "                y_pin: " << y_pin                     << "\n"
+     << "                dx_km: " << dx_km                     << "\n"
+     << "                dy_km: " << dy_km                     << "\n"
+     << "                   nx: " << nx                        << "\n"
+     << "                   ny: " << ny                        << "\n\n";
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void LaeaData::dump() const
 
 {

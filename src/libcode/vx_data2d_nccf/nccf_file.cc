@@ -1741,10 +1741,13 @@ void NcCfFile::get_grid_mapping_lambert_azimuthal_equal_area(const NcVar *grid_m
   data.nx = _xDim->getSize();
   data.ny = _yDim->getSize();
 
+  data.dump();
+
   // Instantiate grid
 
   grid.set(data);
   if (dy_m < 0) grid.set_swap_to_north(true);
+
 }
 
 
@@ -2033,6 +2036,8 @@ void NcCfFile::get_grid_mapping_lambert_conformal_conic(const NcVar *grid_mappin
   data.nx = _xDim->getSize();
   data.ny = _yDim->getSize();
   data.so2_angle = 0.0;
+
+  data.dump();
 
   grid.set(data);
   if (dy_m < 0) grid.set_swap_to_north(true);
@@ -2531,6 +2536,8 @@ void NcCfFile::get_grid_mapping_polar_stereographic(const NcVar *grid_mapping_va
   data.false_east = false_east;
   data.false_north = false_north;
 
+  data.dump();
+
   grid.set(data);
 
   //Note: do not set grid.set_swap_to_north()
@@ -2832,6 +2839,8 @@ void NcCfFile::get_grid_mapping_rotated_latitude_longitude(const NcVar *grid_map
   data.Nlat = _yDim->getSize();
 
   data.aux_rotation = 0;
+
+  data.dump();
 
   grid.set(data);
   grid.set_swap_to_north(swap_to_north);
@@ -3143,6 +3152,8 @@ void NcCfFile::get_grid_mapping_geostationary(
     data.scene_id = scene_id_str;
   }
 
+  data.dump();
+
   // Note: Computing lat/lon was deferred because it took 1 minutes
 
   grid.set(data);
@@ -3425,6 +3436,8 @@ void NcCfFile::get_grid_from_lat_lon_vars(NcVar *lat_var, NcVar *lon_var,
   LatLonData data = get_data_from_lat_lon_vars(lat_var, lon_var,
                                                lat_counts, lon_counts,
                                                swap_to_north);
+
+  data.dump();
 
   grid.set(data);   // resets swap_to_north to false
   if (swap_to_north) grid.set_swap_to_north(true);
