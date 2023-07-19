@@ -125,15 +125,14 @@ const double tol = 1.0e-5;
 
 clear();
 
-
 Data.name                 = nc.name;
 
 Data.radius_km            = 0.0;
 
 Data.is_sphere            = false;
 
-Data.equatorial_radius_km = nc.semi_major_axis_km;
-Data.polar_radius_km      = nc.semi_minor_axis_km;
+Data.equatorial_radius_km = nc.semi_major_axis_km / 2.0;
+Data.polar_radius_km      = nc.semi_minor_axis_km / 2.0;
 
 Data.dx_km                = nc.dx_km;
 Data.dy_km                = nc.dy_km;
@@ -558,14 +557,6 @@ snprintf(junk, sizeof(junk), "Lon_LL: %.3f", lon_LL);   a << junk << sep;
 
 snprintf(junk, sizeof(junk), "Lat_Pole: %.3f", lat_pole);   a << junk << sep;
 snprintf(junk, sizeof(junk), "Lon_Pole: %.3f", lon_pole);   a << junk << sep;
-
-   //
-   //  done
-   //
-
-return ( a );
-
-
 
    //
    //  done
