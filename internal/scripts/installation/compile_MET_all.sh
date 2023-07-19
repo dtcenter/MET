@@ -15,10 +15,10 @@
 # either PYTHON_MODULE or by setting PYTHON_NAME and PYTHON_VERSION:
 # - PYTHON_MODULE (only used if USE_MODULES=TRUE) - format is the name
 #   of the Python module to load followed by an underscore and then the
-#   version number (e.g. python_3.8.6, The script will then run "module
-#   load python/3.8.6")
+#   version number (e.g. python_3.10.4, The script will then run "module
+#   load python/3.10.4")
 # - PYTHON_NAME = python (or e.g. python3, etc.)
-# - PYTHON_VERSION = 3.8.6
+# - PYTHON_VERSION = 3.10.4
 #
 # For a description of these and other variables, visit the MET
 # downloads page under "Sample Script For Compiling External
@@ -338,7 +338,7 @@ echo "export F77=${F77}"
 echo "export F90=${F90}"
 echo
 
-# Figure out what kind of OS this is
+# Figure out what kind of OS is being used
 unameOut="$(uname -s)"
 case "${unameOut}" in
     Linux*)     machine=Linux;;
@@ -569,7 +569,7 @@ fi
 
 # Compile NetCDF
 if [ $COMPILE_NETCDF -eq 1 ]; then
-
+  
   echo
   echo "Compiling HDF5 at `date`"
   mkdir -p ${LIB_DIR}/hdf5
@@ -577,7 +577,7 @@ if [ $COMPILE_NETCDF -eq 1 ]; then
   tar -xzf ${TAR_DIR}/hdf5*.tar.gz -C ${LIB_DIR}/hdf5
   cd ${LIB_DIR}/hdf5/hdf5*
   echo "cd `pwd`"
-  run_cmd "./configure --prefix=${LIB_DIR} --with-zlib=${LIB_Z} CFLAGS=-fPIC CXXFLAGS=-fPIC FFLAGS=-fPIC LDFLAGS=-L${LIB_DIR}/lib:${LIB_Z} CPPFLAGS=-I${LIB_DIR}/include > hdf5.configure.log 2>&1"
+  run_cmd "./configure --prefix=${LIB_DIR} --with-zlib=${LIB_Z} CFLAGS=-fPIC CXXFLAGS=-fPIC FFLAGS=-fPIC LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include > hdf5.configure.log 2>&1"
   run_cmd "make ${MAKE_ARGS} install > hdf5.make_install.log 2>&1"
 
   echo
@@ -591,13 +591,17 @@ if [ $COMPILE_NETCDF -eq 1 ]; then
   echo "cd `pwd`"
   run_cmd "./configure --prefix=${LIB_DIR} CFLAGS=-fPIC CXXFLAGS=-fPIC LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include > netcdf-c.configure.log 2>&1"
   run_cmd "make ${MAKE_ARGS} install > netcdf-c.make_install.log 2>&1"
-
+  
   echo
   echo "Compiling NetCDF-CXX at `date`"
   tar -xzf ${TAR_DIR}/netcdf-cxx*.tar.gz -C ${LIB_DIR}/netcdf
   cd ${LIB_DIR}/netcdf/netcdf-cxx*
   echo "cd `pwd`"
-  run_cmd "./configure --prefix=${LIB_DIR} LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include > netcdf-cxx.configure.log 2>&1"
+  if [[ $machine == "Mac" ]]; then 
+    run_cmd "./configure --prefix=${LIB_DIR} LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include LIBS=\"${LIBS} -lhdf5_hl -lhdf5 -lz\"> netcdf-cxx.configure.log 2>&1"
+  else
+    run_cmd "./configure --prefix=${LIB_DIR} LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include > netcdf-cxx.configure.log 2>&1"
+  fi
   run_cmd "make ${MAKE_ARGS} install > netcdf-cxx.make_install.log 2>&1"
 fi
 
@@ -694,10 +698,8 @@ export MET_PYTHON_LD
 export MET_PYTHON_CC
 export LDFLAGS="-Wl,--disable-new-dtags"
 
-if [[ ${COMPILER_FAMILY} == "gnu" ]]; then
-  if [[ (${COMPILER_MAJOR_VERSION} -ge 12) && (${COMPILER_MINOR_VERSION} -ge 3) ]]; then
-      export LDFLAGS=""
-  fi
+if [[ $machine == "Mac" ]]; then
+  export LDFLAGS=""
 fi
 
 # https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html
