@@ -145,7 +145,7 @@ static const std::string scale_factor_att_name         = "scale_factor";
 static const std::string standard_name_att_name        = "standard_name";
 static const std::string units_att_name                = "units";
 
-static const char nc_time_unit_exp[]    = "^[a-z|A-Z]* since [0-9]\\{1,4\\}-[0-9]\\{1,2\\}-[0-9]\\{1,2\\}";
+static const char nc_time_unit_exp[]    = "^[a-z|A-Z]* *since *[0-9]\\{1,4\\}-[0-9]\\{1,2\\}-[0-9]\\{1,2\\}";
 
 static const char MET_NC_Obs_ver_1_2[]  = "1.02";
 static const char MET_NC_Obs_version[]  = "1.02";

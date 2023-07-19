@@ -855,6 +855,7 @@ if [ $COMPILE_MET -eq 1 ]; then
   export MET_PYTHON_CC=${MET_PYTHON_CC}
   export LDFLAGS="-Wl,--disable-new-dtags"
 
+
   if [[ $machine == "Mac" ]]; then
     export LDFLAGS=""
   fi
