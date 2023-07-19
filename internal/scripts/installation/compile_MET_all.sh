@@ -2,7 +2,7 @@
 #
 # Compile and install MET
 # (Model Evaluation Tools)
-#================================================
+#=====================================================================
 #
 # This compile_MET_all.sh script expects certain environment
 # variables to be set:
@@ -64,7 +64,12 @@
 # MET_HDF, MET_HDFEOS, MET_FREETYPEINC, MET_FREETYPELIB,
 # MET_CAIROINC, MET_CAIROLIB.
 #
-#================================================
+# Users can add the following to their environment configuration file
+# "export MAKE_ARGS=-j" or "export MAKE_ARGS=-j ##", replacing
+# the "##" with the number of cores to specify the number of cores to run
+# simultaneously, to speed up the compilation of MET and its dependent
+# libraries.
+#============================================================================
 
 # print command, run it, then error and exit if non-zero value is returned
 function run_cmd {
