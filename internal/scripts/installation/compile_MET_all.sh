@@ -568,7 +568,7 @@ if [ $COMPILE_NETCDF -eq 1 ]; then
   tar -xzf ${TAR_DIR}/hdf5*.tar.gz -C ${LIB_DIR}/hdf5
   cd ${LIB_DIR}/hdf5/hdf5*
   echo "cd `pwd`"
-  run_cmd "./configure --prefix=${LIB_DIR} --with-zlib=${LIB_Z} CFLAGS=-fPIC CXXFLAGS=-fPIC FFLAGS=-fPIC LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include > hdf5.configure.log 2>&1"
+  run_cmd "./configure --prefix=${LIB_DIR} --with-zlib=${LIB_Z} CFLAGS=-fPIC CXXFLAGS=-fPIC FFLAGS=-fPIC LDFLAGS=-L${LIB_DIR}/lib:${LIB_Z} CPPFLAGS=-I${LIB_DIR}/include > hdf5.configure.log 2>&1"
   run_cmd "make ${MAKE_ARGS} install > hdf5.make_install.log 2>&1"
 
   echo
