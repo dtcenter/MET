@@ -15,10 +15,10 @@
 # either PYTHON_MODULE or by setting PYTHON_NAME and PYTHON_VERSION:
 # - PYTHON_MODULE (only used if USE_MODULES=TRUE) - format is the name
 #   of the Python module to load followed by an underscore and then the
-#   version number (e.g. python_3.8.6, The script will then run "module
-#   load python/3.8.6")
+#   version number (e.g. python_3.10.4, The script will then run "module
+#   load python/3.10.4")
 # - PYTHON_NAME = python (or e.g. python3, etc.)
-# - PYTHON_VERSION = 3.8.6
+# - PYTHON_VERSION = 3.10.4
 #
 # For a description of these and other variables, visit the MET
 # downloads page under "Sample Script For Compiling External
@@ -276,6 +276,7 @@ echo "COMPILER = $COMPILER"
 echo "COMPILER_FAMILY = $COMPILER_FAMILY"
 echo "COMPILER_VERSION = $COMPILER_VERSION"
 COMPILER_MAJOR_VERSION=`echo $COMPILER_VERSION | cut -d'.' -f1`
+COMPILER_MINOR_VERSION=`echo $COMPILER_VERSION | cut -d'.' -f2`
 
 echo
 echo "USE_MODULES = ${USE_MODULES}"
@@ -336,6 +337,22 @@ echo "export  FC=${FC}"
 echo "export F77=${F77}"
 echo "export F90=${F90}"
 echo
+
+# Figure out what kind of OS is being used
+unameOut="$(uname -s)"
+case "${unameOut}" in
+    Linux*)     machine=Linux;;
+    Darwin*)    machine=Mac;;
+    CYGWIN*)    machine=Cygwin;;
+    MINGW*)     machine=MinGw;;
+    *)          machine="UNKNOWN:${unameOut}"
+esac
+
+if [[ $machine == "Mac" ]]; then
+    sed_inline="sed -i ''"
+else
+    sed_inline="sed -i''"
+fi
 
 # Load Python module
 
@@ -469,17 +486,19 @@ if [ $COMPILE_G2CLIB -eq 1 ]; then
   rm -rf ${LIB_DIR}/g2clib/g2clib*
   tar -xf ${TAR_DIR}/g2clib*.tar -C ${LIB_DIR}/g2clib
   cd ${LIB_DIR}/g2clib/g2clib*
+  
   # Sed commands use double-quotes to support variable expansion.
-  sed -i "s|INC=.*|INC=-I${LIB_DIR}/include -I${LIB_DIR}/include/jasper|g" makefile
+  $sed_inline "s|INC=.*|INC=-I${LIB_DIR}/include -I${LIB_DIR}/include/jasper|g" makefile
 
   # Allow other compilers besides gcc
-  sed -i "s|CC=gcc|CC=${CC}|g" makefile
+  $sed_inline "s|CC=gcc|CC=${CC}|g" makefile
 
   # remove -D__64BIT__ flag because compiling with it has
   # shown issues with GRIB/GRIB2 files that are over 2GB in size
   # This flag was removed in g2clib 1.6.4
   # so this can be removed if the version is updated
-  sed -i 's/-D__64BIT__//g' makefile
+  $sed_inline 's/-D__64BIT__//g' makefile
+  
   echo "cd `pwd`"
   # g2clib appears to compile but causes failure compiling MET if -j argument is used
   # so exclude it from this call
@@ -541,7 +560,7 @@ fi
 
 # Compile NetCDF
 if [ $COMPILE_NETCDF -eq 1 ]; then
-
+  
   echo
   echo "Compiling HDF5 at `date`"
   mkdir -p ${LIB_DIR}/hdf5
@@ -563,13 +582,18 @@ if [ $COMPILE_NETCDF -eq 1 ]; then
   echo "cd `pwd`"
   run_cmd "./configure --prefix=${LIB_DIR} CFLAGS=-fPIC CXXFLAGS=-fPIC LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include > netcdf-c.configure.log 2>&1"
   run_cmd "make ${MAKE_ARGS} install > netcdf-c.make_install.log 2>&1"
-
+  
   echo
   echo "Compiling NetCDF-CXX at `date`"
   tar -xzf ${TAR_DIR}/netcdf-cxx*.tar.gz -C ${LIB_DIR}/netcdf
   cd ${LIB_DIR}/netcdf/netcdf-cxx*
   echo "cd `pwd`"
-  run_cmd "./configure --prefix=${LIB_DIR} LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include > netcdf-cxx.configure.log 2>&1"
+  configure_lib_args=""
+  if [[ $machine == "Mac" ]]; then
+    configure_lib_args="-lhdf5_hl -lhdf5 -lz"
+  fi
+  run_cmd "./configure --prefix=${LIB_DIR} LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include LIBS=\"${LIBS} ${configure_lib_args}\" > netcdf-cxx.configure.log 2>&1"
+
   run_cmd "make ${MAKE_ARGS} install > netcdf-cxx.make_install.log 2>&1"
 fi
 
@@ -665,6 +689,11 @@ export MET_PYTHON_BIN_EXE=${MET_PYTHON_BIN_EXE:=${MET_PYTHON}/bin/python3}
 export MET_PYTHON_LD
 export MET_PYTHON_CC
 export LDFLAGS="-Wl,--disable-new-dtags"
+
+if [[ $machine == "Mac" ]]; then
+  export LDFLAGS=""
+fi
+
 # https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html
 # ${parameter:+word}
 # If parameter is null or unset, nothing is substituted, otherwise the expansion of word is substituted.
