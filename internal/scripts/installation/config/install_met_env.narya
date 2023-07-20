@@ -7,8 +7,9 @@ export MET_PYTHON=/opt/local
 export MET_PYTHON_CC=-I${MET_PYTHON}/Library/Frameworks/Python.framework/Versions/3.10/include/python3.10
 export MET_PYTHON_LD=`python3-config --ldflags --embed`
 export SET_D64BIT=FALSE
-export CFLAGS="-Wall -g"
-export CXXFLAGS="-Wall -g"
+export MAKE_ARGS=-j
+export CXXFLAGS="-std=c++11"
+#export FFLAGS="-std=legacy"
 
 # If you've already compiled these and don't need to compile them again, set the following; 
 # Otherwise, if you do need to install these libraries, comment out the variables below

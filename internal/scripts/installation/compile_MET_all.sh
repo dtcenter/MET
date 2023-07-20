@@ -2,7 +2,7 @@
 #
 # Compile and install MET
 # (Model Evaluation Tools)
-#=====================================================================
+#================================================
 #
 # This compile_MET_all.sh script expects certain environment
 # variables to be set:
@@ -64,12 +64,7 @@
 # MET_HDF, MET_HDFEOS, MET_FREETYPEINC, MET_FREETYPELIB,
 # MET_CAIROINC, MET_CAIROLIB.
 #
-# Users can add the following to their environment configuration file
-# "export MAKE_ARGS=-j" or "export MAKE_ARGS=-j ##", replacing
-# the "##" with the number of cores to specify the number of cores to run
-# simultaneously, to speed up the compilation of MET and its dependent
-# libraries.
-#============================================================================
+#================================================
 
 # print command, run it, then error and exit if non-zero value is returned
 function run_cmd {
@@ -353,6 +348,11 @@ case "${unameOut}" in
     *)          machine="UNKNOWN:${unameOut}"
 esac
 
+if [[ $machine == "Mac" ]]; then
+    sed_inline="sed -i ''"
+else
+    sed_inline="sed -i''"
+fi
 
 # Load Python module
 
@@ -487,31 +487,17 @@ if [ $COMPILE_G2CLIB -eq 1 ]; then
   tar -xf ${TAR_DIR}/g2clib*.tar -C ${LIB_DIR}/g2clib
   cd ${LIB_DIR}/g2clib/g2clib*
   
-  if [[ $machine == "Mac" ]]; then
-    # Sed commands use double-quotes to support variable expansion.
-    sed -i '' "s|INC=.*|INC=-I${LIB_DIR}/include -I${LIB_DIR}/include/jasper|g" makefile
+  # Sed commands use double-quotes to support variable expansion.
+  $sed_inline "s|INC=.*|INC=-I${LIB_DIR}/include -I${LIB_DIR}/include/jasper|g" makefile
 
-    # Allow other compilers besides gcc
-    sed -i '' "s|CC=gcc|CC=${CC}|g" makefile
+  # Allow other compilers besides gcc
+  $sed_inline "s|CC=gcc|CC=${CC}|g" makefile
 
-    # remove -D__64BIT__ flag because compiling with it has
-    # shown issues with GRIB/GRIB2 files that are over 2GB in size
-    # This flag was removed in g2clib 1.6.4
-    # so this can be removed if the version is updated
-    sed -i '' 's/-D__64BIT__//g' makefile
-  else
-    # Sed commands use double-quotes to support variable expansion.
-    sed -i "s|INC=.*|INC=-I${LIB_DIR}/include -I${LIB_DIR}/include/jasper|g" makefile
-
-    # Allow other compilers besides gcc
-    sed -i "s|CC=gcc|CC=${CC}|g" makefile
-
-    # remove -D__64BIT__ flag because compiling with it has
-    # shown issues with GRIB/GRIB2 files that are over 2GB in size
-    # This flag was removed in g2clib 1.6.4
-    # so this can be removed if the version is updated
-    sed -i 's/-D__64BIT__//g' makefile
-  fi
+  # remove -D__64BIT__ flag because compiling with it has
+  # shown issues with GRIB/GRIB2 files that are over 2GB in size
+  # This flag was removed in g2clib 1.6.4
+  # so this can be removed if the version is updated
+  $sed_inline 's/-D__64BIT__//g' makefile
   
   echo "cd `pwd`"
   # g2clib appears to compile but causes failure compiling MET if -j argument is used
@@ -602,11 +588,12 @@ if [ $COMPILE_NETCDF -eq 1 ]; then
   tar -xzf ${TAR_DIR}/netcdf-cxx*.tar.gz -C ${LIB_DIR}/netcdf
   cd ${LIB_DIR}/netcdf/netcdf-cxx*
   echo "cd `pwd`"
-  if [[ $machine == "Mac" ]]; then 
-    run_cmd "./configure --prefix=${LIB_DIR} LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include LIBS=\"${LIBS} -lhdf5_hl -lhdf5 -lz\"> netcdf-cxx.configure.log 2>&1"
-  else
-    run_cmd "./configure --prefix=${LIB_DIR} LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include > netcdf-cxx.configure.log 2>&1"
+  configure_lib_args=""
+  if [[ $machine == "Mac" ]]; then
+    configure_lib_args="-lhdf5_hl -lhdf5 -lz"
   fi
+    run_cmd "./configure --prefix=${LIB_DIR} LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include LIBS=\"${LIBS} ${configure_lib_args}\" > netcdf-cxx.configure.log 2>&1"
+
   run_cmd "make ${MAKE_ARGS} install > netcdf-cxx.make_install.log 2>&1"
 fi
 
