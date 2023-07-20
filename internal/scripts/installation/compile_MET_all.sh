@@ -592,7 +592,7 @@ if [ $COMPILE_NETCDF -eq 1 ]; then
   if [[ $machine == "Mac" ]]; then
     configure_lib_args="-lhdf5_hl -lhdf5 -lz"
   fi
-    run_cmd "./configure --prefix=${LIB_DIR} LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include LIBS=\"${LIBS} ${configure_lib_args}\" > netcdf-cxx.configure.log 2>&1"
+  run_cmd "./configure --prefix=${LIB_DIR} LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include LIBS=\"${LIBS} ${configure_lib_args}\" > netcdf-cxx.configure.log 2>&1"
 
   run_cmd "make ${MAKE_ARGS} install > netcdf-cxx.make_install.log 2>&1"
 fi
