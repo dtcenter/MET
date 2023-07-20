@@ -1307,54 +1307,54 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld) {
       int earth_shape_int = gfld->igdtmpl[0];
       switch(earth_shape_int){
          case 0:
-	    laea.radius_km            = 6367.47;
+            laea.radius_km            = 6367.47;
             laea.equatorial_radius_km = 0;
-	    laea.polar_radius_km      = 0;
-	    laea.is_sphere            = true;
-	    break;
+            laea.polar_radius_km      = 0;
+            laea.is_sphere            = true;
+            break;
 
          case 1:
-	    laea.radius_km            = scaled2dbl(gfld->igdtmpl[1], gfld->igdtmpl[2]) / 1000.0;
+            laea.radius_km            = scaled2dbl(gfld->igdtmpl[1], gfld->igdtmpl[2]) / 1000.0;
             laea.equatorial_radius_km = 0;
-	    laea.polar_radius_km      = 0;
-	    laea.is_sphere            = true;
-	    break;
+            laea.polar_radius_km      = 0;
+            laea.is_sphere            = true;
+            break;
 
          case 2:
             laea.radius_km            = 0;
             laea.equatorial_radius_km = 6378.1600;
             laea.polar_radius_km      = 6356.7750;
             laea.is_sphere            = false;
-	    break;
-         
-	 case 3:
-	    laea.radius_km            = 0;
+            break;
+ 
+         case 3:
+            laea.radius_km            = 0;
             laea.equatorial_radius_km = scaled2dbl(gfld->igdtmpl[3], gfld->igdtmpl[4]);
-	    laea.polar_radius_km      = scaled2dbl(gfld->igdtmpl[5], gfld->igdtmpl[6]);
-	    laea.is_sphere            = false;
-	    break;
-        
-	 case 4:
+            laea.polar_radius_km      = scaled2dbl(gfld->igdtmpl[5], gfld->igdtmpl[6]);
+            laea.is_sphere            = false;
+            break;
+
+         case 4:
             laea.radius_km            = 0;
             laea.equatorial_radius_km = 6378.1370;
             laea.polar_radius_km      = 6356.752314;
             laea.is_sphere            = false;
-	    break;
-	
-	 case 6:
-	    laea.radius_km            = 6371.2290;
+            break;
+
+         case 6:
+            laea.radius_km            = 6371.2290;
             laea.equatorial_radius_km = 0;
-	    laea.polar_radius_km      = 0;
-	    laea.is_sphere            = true;
-	    break;
-	
-	 case 7:
-	    laea.radius_km            = 0;
+            laea.polar_radius_km      = 0;
+            laea.is_sphere            = true;
+            break;
+
+         case 7:
+            laea.radius_km            = 0;
             laea.equatorial_radius_km = scaled2dbl(gfld->igdtmpl[3], gfld->igdtmpl[4]) / 1000.0;
-	    laea.polar_radius_km      = scaled2dbl(gfld->igdtmpl[5], gfld->igdtmpl[6]) / 1000.0;
-	    laea.is_sphere            = false;
-	    break;
-	
+            laea.polar_radius_km      = scaled2dbl(gfld->igdtmpl[5], gfld->igdtmpl[6]) / 1000.0;
+            laea.is_sphere            = false;
+            break;
+
          default:
             mlog << Error << "\nMetGrib2DataFile::read_grib2_grid() -> "
                  << "unsupported earth shape value of " << earth_shape_int << "!\n\n";
