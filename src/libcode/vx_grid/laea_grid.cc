@@ -95,14 +95,13 @@ geoid.set_ab(data.equatorial_radius_km, data.polar_radius_km);
 
 geoid.set_name(data.spheroid_name);
 
-double s = 1.0;
-
-aff.set_mb(s, 0.0, 0.0, s, 1.0, 1.0);
+aff.set_mb(1.0/(data.dx_km), 0.0, 0.0, 1.0/(data.dy_km), 0.0, 0.0);
 
 double xx, yy;
 
 latlon_to_xy(data.lat_first, data.lon_first, xx, yy);
-aff.set_pin(xx, yy, 0.0, 0.0);
+
+aff.set_translation(-xx, -yy);
 
    //
    //  done
@@ -131,8 +130,8 @@ Data.radius_km            = 0.0;
 
 Data.is_sphere            = false;
 
-Data.equatorial_radius_km = nc.semi_major_axis_km / 2.0;
-Data.polar_radius_km      = nc.semi_minor_axis_km / 2.0;
+Data.equatorial_radius_km = nc.semi_major_axis_km;
+Data.polar_radius_km      = nc.semi_minor_axis_km;
 
 Data.dx_km                = nc.dx_km;
 Data.dy_km                = nc.dy_km;
@@ -145,6 +144,10 @@ Data.ny                   = nc.ny;
 
 Nx = Data.nx;
 Ny = Data.ny;
+
+
+lat_pole                  = nc.proj_origin_lat;
+lon_pole                  = nc.proj_origin_lon;
 
 Name = Data.name;
 
