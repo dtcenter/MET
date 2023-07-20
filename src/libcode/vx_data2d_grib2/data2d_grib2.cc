@@ -41,6 +41,7 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 double scaled2dbl(int scale_factor, int scale_value);
+int    parse_int4(g2int);
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -1294,48 +1295,101 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld) {
    //  Lambert Azimuthal Equal Area
    else if ( gfld->igdtnum == 140 )  {
 
-      const g2int * p = gfld->igdtmpl;
-
-      ScanMode = p[16];
+      ScanMode = gfld->igdtmpl[16];
 
       //  build an LaeaData struct with the projection information
       LaeaData laea;
       laea.name           = laea_proj_type;
       laea.spheroid_name  = "Grib template";
-      int earth_shape_int = p[0];
-      if(earth_shape_int == 4) {
-         laea.radius_km            = 0;
-         laea.equatorial_radius_km = 0.5*6378.1370;
-         laea.polar_radius_km      = 0.5*6356.752314;
-         laea.is_sphere            = false;
-      }
-      else {
-         mlog << Error << "\nMetGrib2DataFile::read_grib2_grid() -> "
-              << "unsupported earth shape value of " << earth_shape_int << "!\n\n";
-         exit(1);
-      }
-      laea.nx           = p[7];
-      laea.ny           = p[8];
-      laea.lat_first    = (double)p[9] / 1000000.0;
 
-      // JHG
-      // TODO: Suspect a bug in g2clib
-      // laea.lon_first = -1.0*rescale_lon( (double)p[10] / 1000000.0 );
+      //  earth shape
+      //  Reference: https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_table3-2.shtml
+      int earth_shape_int = gfld->igdtmpl[0];
+      switch(earth_shape_int){
+         case 0:
+	    laea.radius_km            = 6367.47;
+            laea.equatorial_radius_km = 0;
+	    laea.polar_radius_km      = 0;
+	    laea.is_sphere            = true;
+	    break;
+
+         case 1:
+	    laea.radius_km            = scaled2dbl(gfld->igdtmpl[1], gfld->igdtmpl[2]) / 1000.0;
+            laea.equatorial_radius_km = 0;
+	    laea.polar_radius_km      = 0;
+	    laea.is_sphere            = true;
+	    break;
+
+         case 2:
+            laea.radius_km            = 0;
+            laea.equatorial_radius_km = 6378.1600;
+            laea.polar_radius_km      = 6356.7750;
+            laea.is_sphere            = false;
+	    break;
+         
+	 case 3:
+	    laea.radius_km            = 0;
+            laea.equatorial_radius_km = scaled2dbl(gfld->igdtmpl[3], gfld->igdtmpl[4]);
+	    laea.polar_radius_km      = scaled2dbl(gfld->igdtmpl[5], gfld->igdtmpl[6]);
+	    laea.is_sphere            = false;
+	    break;
+        
+	 case 4:
+            laea.radius_km            = 0;
+            laea.equatorial_radius_km = 6378.1370;
+            laea.polar_radius_km      = 6356.752314;
+            laea.is_sphere            = false;
+	    break;
+	
+	 case 6:
+	    laea.radius_km            = 6371.2290;
+            laea.equatorial_radius_km = 0;
+	    laea.polar_radius_km      = 0;
+	    laea.is_sphere            = true;
+	    break;
+	
+	 case 7:
+	    laea.radius_km            = 0;
+            laea.equatorial_radius_km = scaled2dbl(gfld->igdtmpl[3], gfld->igdtmpl[4]) / 1000.0;
+	    laea.polar_radius_km      = scaled2dbl(gfld->igdtmpl[5], gfld->igdtmpl[6]) / 1000.0;
+	    laea.is_sphere            = false;
+	    break;
+	
+         default:
+            mlog << Error << "\nMetGrib2DataFile::read_grib2_grid() -> "
+                 << "unsupported earth shape value of " << earth_shape_int << "!\n\n";
+            exit(1);
+      }
+
       //
-      // grib_dump: longitudeOfFirstGridPointInDegrees = -17.1171;
-      // wgrib2: Lon1 2164.600777
-      //    3-43=129,5,47,201
-      // g2clib-1.6.0 grid_templates.h
-      //    3.140: Lambert Azimuthal Equal Area Projection
-      // BAD?   {140, 17, 0, {1,1,4,1,4,1,4,4,4,-4,4,4,4,1,4,4,1} },
-      // FIX?   {140, 17, 0, {1,1,4,1,4,1,4,4,4,-4,4,-4,4,1,4,4,1} },
-      cout << "TODO LAEA p[10] should be 17.1171 = "<< (double)p[10] / 1000000.0 << "\n";
+      // MET#2565:
+      //   Fix a bug when parsing laea.lon_first and laea.central_lon
+      //   in gfld->igdtmpl[10] and gfld->igdtmpl[12] for GRIB2 UKV data.
+      //   These longitudes are negative which the GRIB2C library does not
+      //   parse properly. The parse_int4() function is a workaround to
+      //   reprocesses the data as unsigned chars and check for negative
+      //   values, mimicing logic from the int4() function in wgrib2.
+      //
+      //   The grib_dump utility already handles negative longitudes well.
+      //   The wgrib2 utility does NOT when populating gfld->igdtmpl.
+      //   However, the wgrib2 -get_byte and -get_int options do work,
+      //   as shown below:
+      //      wgrib2 ukv_agl_temperature_1.5_12.grib2 \
+      //        -get_byte 3 43 4 -get_int 3 43 1 \
+      //        -get_byte 3 51 4 -get_int 3 51 1
+      //
+      //   The longitudes are correctly parsed as -17.117129 and -2.5, respectively.
+      //   1:0:3-43=129,5,47,201:3-43=-17117129:3-51=128,38,37,160:3-51=-2500000
+      //
 
-      laea.lon_first    = 17.1171;
-      laea.standard_lat = (double)p[11] / 1000000.0; 
-      laea.central_lon  = -1.0*rescale_lon( (double)p[12] / 1000000.0 );
-      laea.dx_km        = (double)p[14] / 1000000.0;
-      laea.dy_km        = (double)p[15] / 1000000.0;
+      laea.nx           = gfld->igdtmpl[7];
+      laea.ny           = gfld->igdtmpl[8];
+      laea.lat_first    = (double)gfld->igdtmpl[9] / 1000000.0;
+      laea.lon_first    = -1.0*rescale_lon( (double)parse_int4(gfld->igdtmpl[10]) / 1000000.0);
+      laea.standard_lat = (double)gfld->igdtmpl[11] / 1000000.0; 
+      laea.central_lon  = -1.0*rescale_lon( (double)parse_int4(gfld->igdtmpl[12]) / 1000000.0);
+      laea.dx_km        = (double)gfld->igdtmpl[14] / 1000000.0;
+      laea.dy_km        = (double)gfld->igdtmpl[15] / 1000000.0;
 
          //  store the grid information
 
@@ -1570,3 +1624,27 @@ double scaled2dbl(int scale_factor, int scale_value) {
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+int parse_int4(g2int i) {
+   unsigned char c[4];
+   unsigned long n = i;
+ 
+   c[0] = (n >> 24) & 0xFF;
+   c[1] = (n >> 16) & 0xFF;
+   c[2] = (n >> 8) & 0xFF;
+   c[3] = n & 0xFF;
+
+   //  convert unsigned char to signed integer
+   int i_val;
+   if(c[0] & 0x80) {
+      i_val = -(((c[0] & 0x7f) << 24) + (c[1] << 16) + (c[2] << 8) + c[3]);
+   }
+   else {
+      i_val = (c[0] << 24) + (c[1] << 16) + (c[2] << 8) + c[3];
+   }
+
+   return(i_val);
+}
+
+////////////////////////////////////////////////////////////////////////
+
