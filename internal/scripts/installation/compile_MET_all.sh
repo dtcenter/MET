@@ -64,6 +64,14 @@
 # MET_HDF, MET_HDFEOS, MET_FREETYPEINC, MET_FREETYPELIB,
 # MET_CAIROINC, MET_CAIROLIB.
 #
+# Users can speed up the compilation of MET and its dependent libraries
+# by adding the following to their environment configuration file:
+# export MAKE_ARGS=-j #
+# replacing the # with the number of cores to use (integer) or simply
+# specifying:
+# export MAKE_ARGS=-j
+# with no integer argument to start as many processes in parallel as
+# possible.
 #================================================
 
 # print command, run it, then error and exit if non-zero value is returned
