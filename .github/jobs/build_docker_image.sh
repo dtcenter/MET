@@ -17,3 +17,9 @@ if [ $? != 0 ]; then
   cat ${GITHUB_WORKSPACE}/docker_build.log
   exit 1
 fi
+
+# Copy the log directory from the image
+id=$(docker create ${DOCKERHUB_TAG})
+time_command docker cp $id:/met/logs met_logs
+mv met_logs/*.log ${GITHUB_WORKSPACE}/.
+docker rm -v $id
