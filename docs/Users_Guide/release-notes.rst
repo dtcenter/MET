@@ -9,6 +9,28 @@ When applicable, release notes are followed by the GitHub issue number which des
 enhancement, or new feature (`MET GitHub issues <https://github.com/dtcenter/MET/issues>`_).
 Important issues are listed **in bold** for emphasis.
 
+MET Version 11.1.0-rc2 release notes (20230724)
+-----------------------------------------------
+
+  .. dropdown:: Repository, build, and test
+
+     * Add free_disk_space.sh script to the MET repository (`#2597 <https://github.com/dtcenter/MET/issues/2597>`_).
+
+  .. dropdown:: Documentation
+
+     * Revise TC-Diag documentation for version 11.1.0 (`#2558 <https://github.com/dtcenter/MET/issues/2558>`_).
+
+  .. dropdown:: Enhancements
+
+     * Update NDBC locations prior to the MET-11.1.0 release (`#2511 <https://github.com/dtcenter/MET/issues/2511>`_).
+
+  .. dropdown:: Bugfixes
+
+     * Bugfix: Refine support for LAEA grids via NetCDF and GRIB2 files (`#2565 <https://github.com/dtcenter/MET/issues/2565>`_).
+     * Bugfix: Fix reading of upside-down CF-compliant NetCDF Rotated Lat/Lon data (`#2578 <https://github.com/dtcenter/MET/issues/2578>`_).
+     * Bugfix: Unknown ld Flag on Macos causes MET compilation to fail (`#2596 <https://github.com/dtcenter/MET/issues/2596>`_).
+     * Bugfix: Problem compiling MET on MacOS using GCC 12.3.0 (`#2615 <https://github.com/dtcenter/MET/issues/2615>`_).
+
 MET Version 11.1.0-rc1 release notes (20230616)
 -----------------------------------------------
 
