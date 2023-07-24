@@ -16,23 +16,24 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-/*
-struct LaeaData {
 
-   const char * name;    //  not allocated
-   const char * geoid;   //  not allocated
+struct LaeaNetcdfData {
 
-   double lat_LL;        //  lower left
-   double lon_LL;
+   const char * name;
 
-   double lat_UL;        //  upper left
-   double lon_UL;
+   double prime_meridian_lon;
 
-   double lat_LR;        //  lower right
-   double lon_LR;
+   double semi_major_axis_km;
+   double semi_minor_axis_km;
 
-   double lat_pole;
-   double lon_pole;
+   double proj_origin_lat;
+   double proj_origin_lon;
+
+   double  x_pin;
+   double  y_pin;
+
+   double dx_km;
+   double dy_km;
 
    int nx;
    int ny;
@@ -40,7 +41,7 @@ struct LaeaData {
    void dump() const;
 
 };
-*/
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -56,7 +57,7 @@ struct LaeaData {
    //
 
 
-struct LaeaGrib2Data {  
+struct LaeaData {  
 
    const char * name;             //  not allocated
    const char * spheroid_name;    //  not allocated
@@ -88,76 +89,8 @@ struct LaeaGrib2Data {
 ////////////////////////////////////////////////////////////////////////
 
 
-   //
-   //  Laea grid definitions
-   //
-
-/*
-static const LaeaData laea_test_data = {
-
-
-   "laea_test", //  name
-
-   "WGS_84",    //  geoid
-
-   31.7462,     // lat_LL   //  lower left
-   10.4346,     // lon_LL
-
-   67.0228,     // lat_UL   //  upper left
-   39.5358,     // lon_UL
-
-   31.9877,     // lat_LR   //  lower right
-   -29.421,     // lon_LR
-   
-    55.0,       // lat_pole
-   -10.0,       // lon_pole
-
-   1900,        //  nx
-   2200,        //  ny
-
-};
-*/
-
-static const LaeaGrib2Data laea_grib2_test_data = {  
-
-
-   "laea_grib2_test", 
-
-   "Grib template 4", 
-
-   0.0,                     //  radius_km
-
-   0.5*6378.1370,           //  equatorial_radius_km
-   0.5*6356.752314,         //       polar_radius_km
-
-   44.5172,                 //  lat_first
-   17.1171,                 //  lon_first
-
-   54.900000,               //  standard_lat
-    2.500000,               //  central_lon
-
-    2.000000,               //  dx_km
-    2.000000,               //  dy_km
-
-   1042,                    //  nx
-    970,                    //  ny
-
-    //    970,                    //  ny
-    //   1042,                    //  nx
-
-   false                    //  is_sphere
-
-
-};
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 #endif   /*  __LAEA_GRID_DEFINITIONS_H__  */
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
 

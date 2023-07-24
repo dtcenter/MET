@@ -88,9 +88,9 @@ jobs:
           MET_BASE_REPO: ${{ needs.job_control.outputs.met_base_repo }}
           MET_BASE_TAG: ${{ needs.job_control.outputs.met_base_tag }}
 
-      - name: Copy Docker build log into logs directory
+      - name: Copy all build log files into logs directory
         if: always()
-        run: cp ${GITHUB_WORKSPACE}/docker_build.log ${RUNNER_WORKSPACE}/logs/
+        run: cp ${GITHUB_WORKSPACE}/*.log ${RUNNER_WORKSPACE}/logs/
 
       - name: Push Docker Image
         run: .github/jobs/push_docker_image.sh

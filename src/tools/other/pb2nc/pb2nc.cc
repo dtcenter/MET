@@ -54,9 +54,10 @@
 //   015    02/10/18  Halley Gotway  Add message_type_group_map.
 //   016    07/23/18  Halley Gotway  Support masks defined by gen_vx_mask.
 //   017    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
-//   018    09/12/22  Prestopnik     MET #2227 Remove namespace std and netCDF
+//   018    09/12/22  Prestopnik, J. MET #2227 Remove namespace std and netCDF
 //                                   from header files
-//
+//   019    07/21/23  Prestopnik, J. MET #2615 Add #include <array> to compile
+//                                   successfully using gcc12
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -72,6 +73,7 @@
 #include <unistd.h>
 #include <assert.h>
 
+#include <array>
 #include <netcdf>
 
 #include "main.h"
