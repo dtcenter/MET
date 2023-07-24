@@ -522,9 +522,6 @@
     </output>
   </test>
 
-<!-- MET #1693 removed support for CF-Compliant LAEA grids.
-     MET #2565 should restore this supoprt prior to the MET-11.1.0 release.
-
   <test name="plot_data_plane_LAEA_NCCF">
   <exec>&MET_BIN;/plot_data_plane</exec>
     <param> \
@@ -538,7 +535,6 @@
       <ps>&OUTPUT_DIR;/plot_data_plane/air_temperature_laea_nccf.ps</ps>
     </output>
   </test>
--->
 
   <test name="plot_data_plane_NCCF_POLAR_STEREO">
     <exec>&MET_BIN;/plot_data_plane</exec>
