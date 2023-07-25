@@ -204,8 +204,8 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
   int var_idx, sid_idx, elv_idx, lat_idx, lon_idx, date_idx, month_idx;
   double height_from_header;
   string aot = "AOT";
-  //string angstrom = "Angstrom";
   string var_name;
+  string prev_sid, cur_sid;
   StringArray hdr_names;
   NumArray header_heights;
   IntArray header_var_index;
@@ -352,22 +352,28 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
             break;
           }
         }
-
-        // Get the stationLat
-        _stationLat = atof(data_line[lat_idx]);
-        // Get the stationLon
-        _stationLon = atof(data_line[lon_idx]);
-        // Get the stationAlt
-        if (elv_idx >= 0) _stationAlt = atof(data_line[elv_idx]);
-        else _stationAlt = bad_data_float;
-
-        mlog << Debug(7) << "\n" << method_name << "stationID: "
-             << ((sid_idx < 0) ? _stationId : data_line[sid_idx]) << " from index " << sid_idx
-             << "  lat: " << _stationLat
-             << "  lon: " << _stationLon
-             << "  elv: " << _stationAlt << " from index " << elv_idx << "\n";
+        mlog << Debug(7) << method_name << "station_idx=" << sid_idx
+             << " elv_idx=" << elv_idx << "\n";
+        first_line = false;
       }
-      first_line = false;
+    }
+
+    cur_sid = (sid_idx < 0) ? _stationId : data_line[sid_idx];
+    if (cur_sid.compare(prev_sid) != 0) {
+      prev_sid = cur_sid;
+
+      // Get the stationLat
+      if (lat_idx >= 0) _stationLat = atof(data_line[lat_idx]);
+      // Get the stationLon
+      if (lon_idx >= 0) _stationLon = atof(data_line[lon_idx]);
+      // Get the stationAlt
+      if (elv_idx >= 0) _stationAlt = atof(data_line[elv_idx]);
+      else if (format_version == 3) _stationAlt = bad_data_float;
+
+      mlog << Debug(7) << "\n" << method_name
+           << "stationID: " << cur_sid << "  lat: " << _stationLat
+           << "  lon: " << _stationLon << "  elv: " << _stationAlt
+           << "\n";
     }
     //
     // Pull the valid time from the data line
@@ -421,7 +427,7 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
       }
 
       _addObservations(Observation(header_type,
-                                   (sid_idx<0 ? _stationId : data_line[sid_idx]),
+                                   cur_sid,
                                    valid_time,
                                    _stationLat, _stationLon,
                                    _stationAlt,
@@ -439,7 +445,7 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
         double aod_at_550 = angstrom_power_interplation(aod_at_675,aod_at_440,675.,440.,dheight);
         if (!is_eq(aod_at_550, bad_data_double)) {
            _addObservations(Observation(header_type,
-                                        (sid_idx<0 ? _stationId : data_line[sid_idx]),
+                                        cur_sid,
                                         valid_time, _stationLat, _stationLon, _stationAlt,
                                         na_str, var_id, bad_data_double, dheight,
                                         aod_at_550,

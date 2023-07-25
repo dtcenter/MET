@@ -214,6 +214,7 @@ fi
 COMPILER_FAMILY=` echo $COMPILER | cut -d'_' -f1`
 COMPILER_VERSION=`echo $COMPILER | cut -d'_' -f2`
 COMPILER_MAJOR_VERSION=`echo $COMPILER_VERSION | cut -d'.' -f1`
+COMPILER_MINOR_VERSION=`echo $COMPILER_VERSION | cut -d'.' -f2`
 
 echo
 echo "USE_MODULES = ${USE_MODULES}"
@@ -313,6 +314,16 @@ echo "export  FC=${FC}"
 echo "export F77=${F77}"
 echo "export F90=${F90}"
 echo
+
+# Figure out what kind of OS is being used                                                                                                                                  
+unameOut="$(uname -s)"
+case "${unameOut}" in
+    Linux*)     machine=Linux;;
+    Darwin*)    machine=Mac;;
+    CYGWIN*)    machine=Cygwin;;
+    MINGW*)     machine=MinGw;;
+    *)          machine="UNKNOWN:${unameOut}"
+esac
 
 # Load Python module
 
@@ -631,7 +642,7 @@ if [ $COMPILE_NETCDF -eq 1 ]; then
   tar -xzf ${TAR_DIR}/hdf5*.tar.gz
   cd hdf5*
   echo "cd `pwd`"
-  echo "./configure --prefix=${LIB_DIR} --with-zlib=${LIB_Z} CFLAGS=-fPIC CXXFLAGS=-fPIC FFLAGS=-fPIC LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include > configure.log 2>&1"
+  echo "./configure --prefix=${LIB_DIR} --with-zlib=${LIB_Z} CFLAGS=-fPIC CXXFLAGS=-fPIC FFLAGS=-fPIC LDFLAGS=-L${LIB_DIR}/lib:${LIB_Z} CPPFLAGS=-I${LIB_DIR}/include > configure.log 2>&1"
   ./configure --prefix=${LIB_DIR} --with-zlib=${LIB_Z} CFLAGS=-fPIC CXXFLAGS=-fPIC FFLAGS=-fPIC LDFLAGS=-L${LIB_DIR}/lib:${LIB_Z} CPPFLAGS=-I${LIB_DIR}/include > configure.log 2>&1
   ret=$?
   if [ $ret != 0 ]; then
@@ -676,8 +687,13 @@ if [ $COMPILE_NETCDF -eq 1 ]; then
   tar -xzf ${TAR_DIR}/netcdf-cxx*.tar.gz
   cd netcdf-cxx*
   echo "cd `pwd`"
-  echo "./configure --prefix=${LIB_DIR} LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include > configure.log 2>&1"
-  ./configure --prefix=${LIB_DIR} LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include > configure.log 2>&1
+  if [[ $machine == "Mac" ]]; then
+    echo "./configure --prefix=${LIB_DIR} LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include LIBS=\"${LIBS} -lhdf5_hl -lhdf5 -lz\"> configure.log 2>&1"
+    ./configure --prefix=${LIB_DIR} LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include LIBS="${LIBS} -lhdf5_hl -lhdf5 -lz"> configure.log 2>&1
+  else
+    echo "./configure --prefix=${LIB_DIR} LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include > configure.log 2>&1"
+    ./configure --prefix=${LIB_DIR} LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include > configure.log 2>&1
+  fi
   ret=$?
   if [ $ret != 0 ]; then
     echo "configure returned with non-zero ($ret) status"
@@ -837,6 +853,12 @@ if [ $COMPILE_MET -eq 1 ]; then
   export MET_PYTHON_LD=${MET_PYTHON_LD}
   export MET_PYTHON_CC=${MET_PYTHON_CC}
   export LDFLAGS="-Wl,--disable-new-dtags"
+
+
+  if [[ $machine == "Mac" ]]; then
+    export LDFLAGS=""
+  fi
+  
   # https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html
   # ${parameter:+word}
   # If parameter is null or unset, nothing is substituted, otherwise the expansion of word is substituted.
