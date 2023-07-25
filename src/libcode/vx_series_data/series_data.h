@@ -27,10 +27,6 @@ bool get_series_entry(int, VarInfo*, const StringArray&,
                       bool print_warning=true,
                       bool search_all_files=true);
 
-bool read_single_entry(VarInfo*, const ConcatString&, const GrdFileType,
-                       DataPlane&, Grid&,
-                       bool print_warning=true);
-
 ////////////////////////////////////////////////////////////////////////
 
 #endif  // __SERIES_DATA_H__

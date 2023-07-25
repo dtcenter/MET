@@ -20,6 +20,11 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+static bool read_single_entry(VarInfo*, const ConcatString&, const GrdFileType,
+                              DataPlane&, Grid&);
+
+////////////////////////////////////////////////////////////////////////
+
 bool get_series_entry(int i_series, VarInfo* data_info,
         const StringArray& search_files, const GrdFileType type,
         DataPlane& dp, Grid& grid,
@@ -27,6 +32,9 @@ bool get_series_entry(int i_series, VarInfo* data_info,
         bool search_all_files) {
    int i;
    bool found;
+
+   // Suppress warnings, if requested
+   if(!print_warning) mlog.set_print_warning(false);
 
    mlog << Debug(3)
         << "Processing series entry " << i_series + 1 << ": "
@@ -41,7 +49,7 @@ bool get_series_entry(int i_series, VarInfo* data_info,
       int i_cur = (i_series + i) % search_files.n();
 
       found = read_single_entry(data_info, search_files[i_cur],
-                                type, dp, grid, print_warning);
+                                type, dp, grid);
 
       // Break out of the loop if data was found or not searching all files
       if(found || !search_all_files) break;
@@ -56,24 +64,24 @@ bool get_series_entry(int i_series, VarInfo* data_info,
       exit(1);
    }
 
+   // Restore warnings, if requested
+   if(!print_warning) mlog.set_print_warning(true);
+
    return(found);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool read_single_entry(VarInfo* info, const ConcatString& filename,
-        const GrdFileType type, DataPlane& dp, Grid& grid,
-        bool print_warning) {
+        const GrdFileType type, DataPlane& dp, Grid& grid) {
 
    Met2dDataFileFactory mtddf_factory;
    Met2dDataFile* mtddf = (Met2dDataFile*) 0;
 
    // Check that file exists
    if(!file_exists(filename.c_str())) {
-      if(print_warning) {
-         mlog << Warning << "\nread_single_entry() -> "
-              << "File does not exist: " << filename << "\n\n";
-      }
+      mlog << Warning << "\nread_single_entry() -> "
+           << "File does not exist: " << filename << "\n\n";
       return(false);
    }
 
@@ -81,7 +89,6 @@ bool read_single_entry(VarInfo* info, const ConcatString& filename,
    mtddf = mtddf_factory.new_met_2d_data_file(filename.c_str(), type);
 
    // Attempt to read gridded data
-   // TODO: Should we pass print_warning as an option to data_plane?
    bool found = mtddf->data_plane(*info, dp);
 
    // Store grid
