@@ -68,7 +68,6 @@ _______________________
   valid_inc = [];
   valid_exc = [];
   valid_hour = [];
-  lead = [];
 
   censor_thresh = [];
   censor_val    = [];
@@ -97,6 +96,18 @@ _______________________
   regrid = { ... }
 
 The configuration options listed above are common to many MET tools and are described in :numref:`config_options`. The name and level entries in the data dictionary define the data to be processed.  The regrid dictionary defines if and how regridding will be performed.
+
+_______________________
+
+.. code-block:: none
+
+lead = [   "0",    "6",  "12",  "18",  "24",
+          "30",   "36",  "42",  "48",  "54",
+          "60",   "66",  "72",  "78",  "84",
+          "90",   "96", "102", "108", "114",
+          "120", "126" ];
+
+By default, compute diagnostics every 6 hours out to 126 hours. Lead times are specified as strings in HH[MMSS] format. Lead times for which no track point or gridded model data exist produce a warning message and diagnostics set to a missing data value.
 
 _______________________
 
