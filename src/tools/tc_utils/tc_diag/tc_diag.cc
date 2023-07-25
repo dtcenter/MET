@@ -343,6 +343,10 @@ void process_tracks(TrackInfoArray& tracks) {
            << unix_to_yyyymmddhh(init_ta.max()) << ".\n\n";
       exit(1);
    }
+   // Store the initialization time
+   else {
+      init_ut = init_ta[0];
+   }
 
    return;
 }
@@ -611,6 +615,14 @@ void set_data(const StringArray& a) {
    StringArray sa;
    for(int i=2; i<a.n(); i++) sa.add(a[i]);
    info.data_files = parse_file_list(sa);
+
+   // Sanity check that input files exist
+   for(int i=0; i<info.data_files.n(); i++) {
+      if(!file_exists(info.data_files[i].c_str())) {
+         mlog << Warning << "\nset_data() -> "
+              << "File does not exist: " << info.data_files[i] << "\n\n";
+      }
+   }
 
    // Store the data in the map
    if(data_opt_map.count(domain) == 0) data_opt_map[domain]  = info;
@@ -966,7 +978,7 @@ void process_fields(const TrackInfoArray &tracks,
    Grid grid_dp;
    VarInfoFactory vi_factory;
    VarInfo *vi = (VarInfo *) 0;
-   StringArray tmp_key_sa;
+   StringArray tmp_key_sa, fields_missing;
 
    // TODO: Consider adding vortex removal logic here
    // Read in the full set of fields required for vortex removal
@@ -980,9 +992,18 @@ void process_fields(const TrackInfoArray &tracks,
       vi->set_valid(vld_ut);
 
       // Find data for this track point
-      get_series_entry(i_vld, vi,
+      bool status = get_series_entry(i_vld, vi,
                        di.data_files, file_type,
-                       data_dp, grid_dp);
+                       data_dp, grid_dp,
+                       false, false, false);
+
+      // Keep track of missing fields
+      if(!status) {
+         fields_missing.add(vi->magic_str());
+
+         // Store the requested valid time
+         data_dp.set_valid(vld_ut);
+      }
 
       // Do coordinate transformation for each track point
       for(j=0; j<tracks.n(); j++) {
@@ -1013,6 +1034,17 @@ void process_fields(const TrackInfoArray &tracks,
       vi = (VarInfo *) 0;
 
    } // end for i
+
+   // Log missing fields
+   if(fields_missing.n() > 0) {
+      mlog << Debug(2) << "For the "
+           << domain << " domain, "
+           << sec_to_hhmmss(vld_ut - init_ut) << " lead time, and "
+           << unix_to_yyyymmdd_hhmmss(vld_ut) << " valid time, "
+           << fields_missing.n() << " of " << di.var_info_ptr.size()
+           << " requested fields missing:\n"
+           << write_css(fields_missing) << "\n";
+   }
 
    // Loop over the current set of temp files
    for(i=0; i<tmp_key_sa.n(); i++) {
@@ -1643,7 +1675,15 @@ void TmpFileInfo::write_nc_data(const VarInfo *vi, const DataPlane &dp_in,
    ri.shape      = GridTemplateFactory::GridTemplate_Square;
 
    // Do the cylindrical coordinate transformation
-   dp_out = met_regrid(dp_in, grid_in, grid_out, ri);
+   if(dp_in.nxy() > 0) {
+      dp_out = met_regrid(dp_in, grid_in, grid_out, ri);
+   }
+   // Handle empty input fields
+   else {
+      dp_out.set_valid(dp_in.valid());
+      dp_out.set_size(ra_grid.range_n(), ra_grid.azimuth_n(),
+                      bad_data_double);
+   }
 
    // Logic for pressure level data
    bool is_prs = (vi->level().type() == LevelType_Pres);

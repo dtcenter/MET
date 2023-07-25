@@ -21,11 +21,15 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-void get_series_entry(int, VarInfo*, const StringArray&,
-                      const GrdFileType, DataPlane&, Grid&);
+bool get_series_entry(int, VarInfo*, const StringArray&,
+                      const GrdFileType, DataPlane&, Grid&,
+                      bool error_out=true,
+                      bool print_warning=true,
+                      bool search_all_files=true);
 
 bool read_single_entry(VarInfo*, const ConcatString&, const GrdFileType,
-                       DataPlane&, Grid&);
+                       DataPlane&, Grid&,
+                       bool print_warning=true);
 
 ////////////////////////////////////////////////////////////////////////
 
