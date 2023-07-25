@@ -7,7 +7,7 @@ TC-Diag Tool
 Introduction
 ============
 
-.. note:: As of MET version 11.1.0, the TC-Diag tool is still in development. Each time it is run, the warning message listed below is printed.
+.. note:: As of MET version 11.1.0, the TC-Diag tool is a beta release that lacks full functionality. The current version of the tool generates intermediate NetCDF output files of the input model’s data transformed onto an azimuth-range grid. When the full functionality of the tc_diag tool is released in MET v12.0.0, the tool will also output environmental diagnostics computed from callable Python scripts. For now, each time it is run, the warning message listed below is printed.
 
 .. code-block:: none
 
@@ -18,13 +18,13 @@ Introduction
 
 A diagnosis of the large-scale environment of tropical cyclones (TCs) is foundational for many prediction techniques, including statistical-dynamical forecast aids and techniques based on artificial intelligence. Such diagnostics can also be used by forecasters seeking to understand how a given model's forecast will pan out. Finally, TC diagnostics can be useful in verification to stratify the performance of models in different environmental regimes over a longer period of time, thereby providing useful insights on model biases or deficiencies for model developers and forecasters.
 
-Originally developed for the Statistical Hurricane Intensity Prediction Scheme (SHIPS), and later as a stand-alone package called 'Model Diagnostics', by the Cooperative Institute for Research in the Atmosphere (CIRA), MET now integrates these capabilities into the an extensible framework called the TC-Diag tool. This tool allows users compute diagnostics for the large-scale environment of TCs using ATCF track and gridded model data inputs. Importantly, the tool computes diagnostics along one or more user-specified tracks. The current version of the TC-Diag tool requires that the tracks and fields be self-consistent [i.e., the track should be the model's (or ensemble's) own predicted track(s)]. The reason is that the diagnostics are computed in a coordinate system centered on the model's moving model storm and the current version of the tool does not yet include vortex removal. If the track is not consistent with the underlying fields, the diagnostics output are unlikely to be useful because the model's simulated storm would contaminate the diagnostics calculations.
+Originally developed for the Statistical Hurricane Intensity Prediction Scheme (SHIPS), and later as a stand-alone package called 'Model Diagnostics', by the Cooperative Institute for Research in the Atmosphere (CIRA), MET now integrates these capabilities into the an extensible framework called the TC-Diag tool. This tool allows users to compute diagnostics for the large-scale environment of TCs using ATCF track and gridded model data inputs. The current version of the TC-Diag tool requires that the tracks and fields be self-consistent [i.e., the track should be the model's (or ensemble's) own predicted track(s)]. The reason is that the diagnostics are computed in a coordinate system centered on the model's moving model storm and the current version of the tool does not yet include vortex removal. If the track is not consistent with the underlying fields, the diagnostics output are unlikely to be useful because the model's simulated storm would contaminate the diagnostics calculations.
 
 .. note:: A future version of the tool will include the capability to remove the model's own vortex, which will allow the user to specify any arbitrary track (such as the operational center's official forecast). Until then, users are advised that the track selected must be consistent with the model's predicted track.
 
-TC-Diag is run once for each initialization time. The user provides track data (such as one or more ATCF a-deck track files), along with track filtering criteria as needed, to select one or more tracks to be processed. The user also provides gridded model data from which diagnostics should be computed. Gridded data can be provided for multiple concurrent storms, multiple models, and/or multiple domains (i.e. parent and nest) in a single run.
+TC-Diag is run once for each initialization time to produce diagnostics for each user-specified combination of TC tracks and model fields. The user provides track data (such as one or more ATCF a-deck track files), along with track filtering criteria as needed, to select one or more tracks to be processed. The user also provides gridded model data from which diagnostics should be computed. Gridded data can be provided for multiple concurrent storms, multiple models, and/or multiple domains (i.e. parent and nest) in a single run.
 
-TC-Diag first determines the list of valid times that appear in any one of the tracks. For each valid time, it processes all track points for that time. For each track point, it reads the gridded model fields requested in the configuration file and transforms the gridded data to a range-azimuth cyclindrical coordinates grid. For each domain, it writes the range-azimuth data to a temporary NetCDF file.
+TC-Diag first determines the list of valid times that appear in any one of the tracks. For each valid time, it processes all track points for that time. For each track point, it reads the gridded model fields requested in the configuration file and transforms the gridded data to a range-azimuth cylindrical coordinates grid. For each domain, it writes the range-azimuth data to a temporary NetCDF file.
 
 .. note:: The current version of the tool does not yet include the capabilities described in the next three paragraphs. These additional capabilities are planned to be added in the MET v12.0.0 release later in 2023.
 
@@ -130,7 +130,7 @@ The **n_azimuth** entry is an integer specifying the number of equally spaced az
 
 The **delta_range_km** entry is a floating point value specifying the spacing of the range rings in kilometers.
 
-The **diag_script** entry is an array of strings. Each string specifies the path to a Python script to be executed to compute diagnostics from the transformed cyclindrical coordinates data for this domain. While the **diag_script** entry can be specified separately for each **domain_info** array entry, specifying it once at a higher level of context, as seen above, allows the same setting to be applied to all array entries. When multiple Python diagnostics scripts are run, the union of the diagnostics computed are written to the output.
+The **diag_script** entry is an array of strings. Each string specifies the path to a Python script to be executed to compute diagnostics from the transformed cylindrical coordinates data for this domain. While the **diag_script** entry can be specified separately for each **domain_info** array entry, specifying it once at a higher level of context, as seen above, allows the same setting to be applied to all array entries. When multiple Python diagnostics scripts are run, the union of the diagnostics computed are written to the output.
 
 .. note:: As of MET version 11.1.0, no tropical cyclone diagnostics are actually computed or written to the output.
 
@@ -143,7 +143,7 @@ Configuring data censoring and conversion options
   censor_val    = [];
   convert(x)    = x;
 
-These data censoring and conversion options are common to multiple MET tools and are described in :numref:`config_options`. They can be specified separately in each **data.field** array entry, described below. If provided, those operations are performed after reading the gridded data but prior to conveting to the cylindrical coordinate range-azimuth grid.
+These data censoring and conversion options are common to multiple MET tools and are described in :numref:`config_options`. They can be specified separately in each **data.field** array entry, described below. If provided, those operations are performed after reading the gridded data but prior to converting to the cylindrical coordinate range-azimuth grid.
 
 Configuring fields, levels, and domains
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -200,7 +200,7 @@ Configuring vortex removal option
 
   vortex_removel = FALSE;
 
-These **vortex_removal** flag entry is a boolean specifying whether or not vortex removal logic should be applied.
+The **vortex_removal** flag entry is a boolean specifying whether or not vortex removal logic should be applied.
 
 .. note:: As of MET version 11.1.0, vortex removal logic is not yet supported.
 
