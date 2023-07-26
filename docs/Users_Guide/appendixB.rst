@@ -11,6 +11,8 @@ The following map projections are currently supported in MET:
 
 * Lambert Conformal Projection
 
+* Lambert Azimuthal Equal Area Projection
+
 * Polar Stereographic Projection (Northern)
 
 * Polar Stereographic Projection (Southern)
@@ -45,6 +47,8 @@ As an example of specifying a Lambert grid, suppose you have a northern hemisphe
 .. code-block:: none
         
   To grid = "lambert 614 428 12.190 -133.459 -95.0 12.19058 6367.47 25.0 N";
+
+For a Lambert Azimuthal Equal Area grid, grid specification strings are not supported.
 
 For a Polar Stereographic grid, the syntax is
 

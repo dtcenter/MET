@@ -84,7 +84,7 @@ domain_info = [
 
 //
 // Data censoring and conversion
-// May be set separately in each diag_data "field" entry
+// May be set separately in each data "field" array entry
 //
 // censor_thresh = [];
 // censor_val    = [];

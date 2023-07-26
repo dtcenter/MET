@@ -287,7 +287,7 @@ To run this utility:
 
 .. code-block:: none
 
-  build_ndbc_stations_from_web.py <-d> <-p> <-o OUTPUT_FILE>
+  build_ndbc_stations_from_web.py <-d> <-p> <-o OUTPUT_FILE> <-e EXISTING_FILE>
 
   Usage: build_ndbc_stations_from_web.py [options]
   Options:
@@ -296,6 +296,8 @@ To run this utility:
     -p, --prune           Prune files that are no longer online (optional, default: False)
     -o OUT_FILE, --out=OUT_FILE
                           Save the text into the named file (optional, default: merged.txt)
+    -e EXISTING_FILE, --existing=EXISTING_FILE
+                          Save the text into the named file (optional, default: ../../../data/table_files/ndbc_stations.xml)
 
 NOTE: The downloaded files are written to a subdirectory ndbc_temp_data which
 can be deleted once the final output file is created.

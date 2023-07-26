@@ -24,3 +24,4 @@ export LIB_Z=${EXTERNAL_LIBS}/lib
 #export CFLAGS="-Wall -g"
 #export CXXFLAGS="-Wall -g -lcurl"
 export MAKE_ARGS=-j
+export CXXFLAGS="-std=c++11"

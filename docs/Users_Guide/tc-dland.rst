@@ -1,7 +1,7 @@
 .. _tc-dland:
 
 *************
-TC-Dland Tool
+TC-DLand Tool
 *************
 
 Introduction
