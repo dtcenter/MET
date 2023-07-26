@@ -984,6 +984,8 @@ void process_fields(const TrackInfoArray &tracks,
    // Read in the full set of fields required for vortex removal
    // Add flag to configure which fields are used for vortex removal
 
+   // TODO: Add logic to support one_time_per_file_flag set to true.
+
    // Loop over the VarInfo fields to be processed
    for(i=0; i<di.var_info_ptr.size(); i++) {
 
@@ -1035,9 +1037,9 @@ void process_fields(const TrackInfoArray &tracks,
 
    } // end for i
 
-   // Log missing fields
+   // Print warning for missing fields
    if(fields_missing.n() > 0) {
-      mlog << Debug(2) << "For the "
+      mlog << Warning << "For the "
            << domain << " domain, "
            << sec_to_hhmmss(vld_ut - init_ut) << " lead time, and "
            << unix_to_yyyymmdd_hhmmss(vld_ut) << " valid time, "
@@ -1057,7 +1059,6 @@ void process_fields(const TrackInfoArray &tracks,
             tmp_file_map[tmp_key_sa[i]].diag_map);
 
       } // end for j
-
    } // end for i
 
    return;

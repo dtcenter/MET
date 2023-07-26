@@ -186,6 +186,7 @@ void TCDiagConfInfo::clear() {
    domain_info.clear();
 
    vortex_removal_flag = false;
+   one_time_per_file_flag = true;
 
    nc_rng_azi_flag = false;
    nc_diag_flag    = false;
@@ -326,6 +327,10 @@ void TCDiagConfInfo::process_config(GrdFileType file_type,
    // Conf: vortex_removal
    vortex_removal_flag =
       conf.lookup_bool(conf_key_vortex_removal);
+
+   // Conf: one_time_per_file_flag
+   one_time_per_file_flag =
+      conf.lookup_bool(conf_key_one_time_per_file_flag);
 
    // Conf: nc_rng_azi_flag
    nc_rng_azi_flag = conf.lookup_bool(conf_key_nc_rng_azi_flag);

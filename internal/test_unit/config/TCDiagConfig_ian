@@ -134,6 +134,11 @@ vortex_removal = FALSE;
 ////////////////////////////////////////////////////////////////////////////////
 
 //
+// Flag to control input files
+//
+one_time_per_file_flag = TRUE;
+
+//
 // Flags to control output files
 //
 nc_rng_azi_flag = TRUE;
