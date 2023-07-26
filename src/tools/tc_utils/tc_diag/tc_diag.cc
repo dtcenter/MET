@@ -995,7 +995,7 @@ void process_fields(const TrackInfoArray &tracks,
       bool status = get_series_entry(i_vld, vi,
                        di.data_files, file_type,
                        data_dp, grid_dp,
-                       false, false, false);
+                       false, false);
 
       // Keep track of missing fields
       if(!status) {

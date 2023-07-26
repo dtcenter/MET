@@ -28,12 +28,14 @@ static bool read_single_entry(VarInfo*, const ConcatString&, const GrdFileType,
 bool get_series_entry(int i_series, VarInfo* data_info,
         const StringArray& search_files, const GrdFileType type,
         DataPlane& dp, Grid& grid,
-        bool error_out, bool print_warning,
-        bool search_all_files) {
+        bool error_out, bool print_warning) {
    int i;
    bool found;
 
-   // Suppress warnings, if requested
+   // Save the log print warning state
+   bool save_print_warning_state = mlog.print_warning();
+
+   // Suppress log warnings, if requested
    if(!print_warning) mlog.set_print_warning(false);
 
    mlog << Debug(3)
@@ -51,8 +53,8 @@ bool get_series_entry(int i_series, VarInfo* data_info,
       found = read_single_entry(data_info, search_files[i_cur],
                                 type, dp, grid);
 
-      // Break out of the loop if data was found or not searching all files
-      if(found || !search_all_files) break;
+      // Break out of the loop if data was found
+      if(found) break;
 
    } // end for i
 
@@ -64,8 +66,8 @@ bool get_series_entry(int i_series, VarInfo* data_info,
       exit(1);
    }
 
-   // Restore warnings, if requested
-   if(!print_warning) mlog.set_print_warning(true);
+   // Restore warnings to their original state
+   mlog.set_print_warning(save_print_warning_state);
 
    return(found);
 }

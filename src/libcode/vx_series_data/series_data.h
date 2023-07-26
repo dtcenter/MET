@@ -24,8 +24,7 @@
 bool get_series_entry(int, VarInfo*, const StringArray&,
                       const GrdFileType, DataPlane&, Grid&,
                       bool error_out=true,
-                      bool print_warning=true,
-                      bool search_all_files=true);
+                      bool print_warning=true);
 
 ////////////////////////////////////////////////////////////////////////
 

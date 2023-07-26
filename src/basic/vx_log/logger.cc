@@ -500,6 +500,17 @@ void Logger::dump(ostream & dump_out, int depth) const
 //////////////////////////////////////////////////////////////////
 
 
+bool Logger::print_warning() const
+{
+
+   return (Warning.PrintWarning);
+
+}
+
+
+//////////////////////////////////////////////////////////////////
+
+
 void Logger::set_verbosity_level(const int i)
 {
       //

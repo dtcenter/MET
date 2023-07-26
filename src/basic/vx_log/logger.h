@@ -249,6 +249,8 @@ class Logger
 
       int verbosity_level() const;
 
+      bool print_warning() const;
+
       bool is_open() const;
 
          //
