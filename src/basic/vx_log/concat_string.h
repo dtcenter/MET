@@ -146,7 +146,7 @@ class ConcatString {
 
       void chomp(const char *);   //  removes trailing suffix, if possible
 
-      operator const std::string() const;
+      operator std::string() const;
 
       bool startswith(const char *) const;
       bool   endswith(const char *) const;
@@ -205,7 +205,7 @@ inline const char * ConcatString::float_format() const { return FloatFormat; }
 inline bool         ConcatString::empty()        const { return ( s ?  s->empty() : true ); }
 inline bool         ConcatString::nonempty()     const { return ( s ? !s->empty() : false ); }
 
-inline              ConcatString::operator const std::string () const { return ( s ? *s : nullptr ); }
+inline              ConcatString::operator std::string () const { return ( s ? *s : nullptr ); }
 
 
 ////////////////////////////////////////////////////////////////////////
