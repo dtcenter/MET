@@ -278,15 +278,13 @@ MET Version 11.1.0 upgrade instructions
 
 * If running TC-Pairs to generate consensus tracks, update your TC-Pairs configuration file to include the new **write_members** option (`#2429 <https://github.com/dtcenter/MET/issues/2429>`_).
 
-* If using Python embedding for point observations, and the following lines of code is in your Python script:
+* If using Python embedding for point observations, and the following lines of code are in your Python script please remove them and refactor your Python script following the instructions in the User's Guide for Python embedding for point observations (`https://met.readthedocs.io/en/main_v11.1/Users_Guide/appendixF.html#python-script-requirements-for-point-observations`):
 
-.. code:: Python
+.. code-block:: Python
  
-   from met_point_obs import convert_point_data
-   ...
-   met_point_data = convert_point_data(point_data)
-
-Please remove those lines, and refactor your Python script following the instructions in the User's Guide for Python embedding for point data: `https://met.readthedocs.io/en/main_v11.1/Users_Guide/appendixF.html#python-script-requirements-for-point-observations`.
+  from met_point_obs import convert_point_data
+  ...
+  met_point_data = convert_point_data(point_data)
 
 MET Version 11.0.0 upgrade instructions
 ---------------------------------------
