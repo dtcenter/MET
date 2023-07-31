@@ -23,13 +23,15 @@
       -lookin &OUTPUT_DIR;/tc_pairs/alal2010.tcst \
       -filter '-amodel AHWI,BCLP' \
       -outdir &OUTPUT_DIR;/plot_tc \
-      -dep 'TK_ERR,ABS(AMAX_WIND-BMAX_WIND)'
+      -dep 'TK_ERR,ABS(AMAX_WIND-BMAX_WIND)' \
+      -save_data &OUTPUT_DIR;/plot_tc/plot_tc_TCMPR_data.tcst
     </param>
     <output>
-      <exist>&OUTPUT_DIR;/plot_tc/ABS_AMAX_WIND-BMAX_WIND_boxplot.png</exist> 
-      <exist>&OUTPUT_DIR;/plot_tc/ABS_AMAX_WIND-BMAX_WIND_boxplot.log</exist> 
-      <exist>&OUTPUT_DIR;/plot_tc/TK_ERR_boxplot.png</exist> 
-      <exist>&OUTPUT_DIR;/plot_tc/TK_ERR_boxplot.log</exist> 
+      <exist>&OUTPUT_DIR;/plot_tc/ABS_AMAX_WIND-BMAX_WIND_boxplot.png</exist>
+      <exist>&OUTPUT_DIR;/plot_tc/ABS_AMAX_WIND-BMAX_WIND_boxplot.log</exist>
+      <exist>&OUTPUT_DIR;/plot_tc/TK_ERR_boxplot.png</exist>
+      <exist>&OUTPUT_DIR;/plot_tc/TK_ERR_boxplot.log</exist>
+      <stat>&OUTPUT_DIR;/plot_tc/plot_tc_TCMPR_data.tcst</stat>
     </output>
   </test>
 
