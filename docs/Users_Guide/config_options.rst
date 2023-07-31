@@ -1471,7 +1471,7 @@ all pairs into a single climatological bin.
      direct_prob = FALSE; or TRUE
   }
 
-climato_data
+climate_data
 ^^^^^^^^^^^^
       
 When specifying climatology data for probability forecasts, either supply a
@@ -1499,13 +1499,15 @@ In this way, the number of bins impacts the resolution of the climatological
 probabilities. These derived probability values are used to compute the
 climatological Brier Score and Brier Skill Score.
 
+seeps_p1_thresh
+^^^^^^^^^^^^^^^
 
 The "seeps_p1_thresh" option controls the threshold of p1 (probability of being dry) values.
+The default setting is >=0.1&&<=0.85.
 
 .. code-block:: none
-		
-  seeps_p1_thresh = >=0.1&&<=0.85;
 
+  seeps_p1_thresh = >=0.1&&<=0.85;
 
 mask_missing_flag
 ^^^^^^^^^^^^^^^^^
