@@ -1499,6 +1499,7 @@ climatological Brier Score and Brier Skill Score.
 
 
 The "seeps_p1_thresh" option controls the threshold of p1 (probability of being dry) values.
+The default setting is >=0.1&&<=0.85.
 
 .. code-block:: none
 		
