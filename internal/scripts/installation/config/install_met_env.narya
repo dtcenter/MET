@@ -1,0 +1,27 @@
+export TEST_BASE=/Volumes/d1/jpresto/projects/MET/MET_installation/11.1.0
+export COMPILER=gnu_12.3.0
+export MET_SUBDIR=${TEST_BASE}
+export MET_TARBALL=v11.1.0.tar.gz
+export USE_MODULES=FALSE
+export MET_PYTHON=/opt/local
+export MET_PYTHON_CC=-I${MET_PYTHON}/Library/Frameworks/Python.framework/Versions/3.10/include/python3.10
+export MET_PYTHON_LD=`python3-config --ldflags --embed`
+export SET_D64BIT=FALSE
+export MAKE_ARGS=-j
+export CXXFLAGS="-std=c++11"
+#export FFLAGS="-std=legacy"
+
+# If you've already compiled these and don't need to compile them again, set the following; 
+# Otherwise, if you do need to install these libraries, comment out the variables below
+export EXTERNAL_LIBS=${TEST_BASE}/external_libs
+#export MET_GRIB2CLIB=${EXTERNAL_LIBS}/lib
+#export MET_GRIB2CINC=${EXTERNAL_LIBS}/include
+#export GRIB2CLIB_NAME=-lgrib2c
+#export MET_BUFRLIB=${EXTERNAL_LIBS}/lib
+#export BUFRLIB_NAME=-lbufr
+#export MET_NETCDF=${EXTERNAL_LIBS}
+#export MET_HDF5=${EXTERNAL_LIBS}
+#export MET_GSL=${EXTERNAL_LIBS}
+#export LIB_JASPER=${EXTERNAL_LIBS}/lib
+#export LIB_LIBPNG=${EXTERNAL_LIBS}/lib
+#export LIB_Z=${EXTERNAL_LIBS}/lib
