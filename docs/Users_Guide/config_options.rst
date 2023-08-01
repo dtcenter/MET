@@ -287,7 +287,7 @@ To run this utility:
 
 .. code-block:: none
 
-  build_ndbc_stations_from_web.py <-d> <-p> <-o OUTPUT_FILE>
+  build_ndbc_stations_from_web.py <-d> <-p> <-o OUTPUT_FILE> <-e EXISTING_FILE>
 
   Usage: build_ndbc_stations_from_web.py [options]
   Options:
@@ -296,6 +296,8 @@ To run this utility:
     -p, --prune           Prune files that are no longer online (optional, default: False)
     -o OUT_FILE, --out=OUT_FILE
                           Save the text into the named file (optional, default: merged.txt)
+    -e EXISTING_FILE, --existing=EXISTING_FILE
+                          Save the text into the named file (optional, default: ../../../data/table_files/ndbc_stations.xml)
 
 NOTE: The downloaded files are written to a subdirectory ndbc_temp_data which
 can be deleted once the final output file is created.
@@ -1469,7 +1471,7 @@ all pairs into a single climatological bin.
      direct_prob = FALSE; or TRUE
   }
 
-climato_data
+climate_data
 ^^^^^^^^^^^^
       
 When specifying climatology data for probability forecasts, either supply a
@@ -1497,13 +1499,15 @@ In this way, the number of bins impacts the resolution of the climatological
 probabilities. These derived probability values are used to compute the
 climatological Brier Score and Brier Skill Score.
 
+seeps_p1_thresh
+^^^^^^^^^^^^^^^
 
 The "seeps_p1_thresh" option controls the threshold of p1 (probability of being dry) values.
+The default setting is >=0.1&&<=0.85.
 
 .. code-block:: none
-		
-  seeps_p1_thresh = >=0.1&&<=0.85;
 
+  seeps_p1_thresh = >=0.1&&<=0.85;
 
 mask_missing_flag
 ^^^^^^^^^^^^^^^^^

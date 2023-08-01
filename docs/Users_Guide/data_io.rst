@@ -307,7 +307,7 @@ The following is a summary of the input and output formats for each of the tools
 
     * **Output**: One ASCII file containing 2D object attributes, four ASCII files containing 3D object attributes, and one NetCDF file containing object indices for the gridded simple and cluster object fields.
 
-#. **TC-Dland Tool**
+#. **TC-DLand Tool**
 
     * **Input**: One or more files containing the longitude (Degrees East) and latitude (Degrees North) of all the coastlines and islands considered to be a significant landmass.
 

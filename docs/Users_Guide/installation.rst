@@ -55,7 +55,7 @@ Three external libraries are required for compiling/building MET and should be d
 
 Two additional utilities are strongly recommended for use with MET:
 
-1. The Unified Post-Processor is recommended for post-processing the raw WRF model output prior to verifying the model forecasts with MET. The Unified Post-Processor is freely available for `download <https://dtcenter.org/community-code/unified-post-processor-upp>`_. MET can read data on a standard, de-staggered grid and on pressure or regular levels in the vertical. The Unified Post-Processor outputs model data in this format from both WRF cores, the NMM and the ARW. However, the Unified Post-Processor is not strictly required as long as the user can produce gridded model output on a standard de-staggered grid on pressure or regular levels in the vertical. Two-dimensional fields (e.g., precipitation amount) are also accepted for some modules.
+1. The Unified Post-Processor is recommended for post-processing the raw WRF model output prior to verifying the model forecasts with MET. The Unified Post-Processor is freely available for `download <https://epic.noaa.gov/unified-post-processor/>`_. MET can read data on a standard, de-staggered grid and on pressure or regular levels in the vertical. The Unified Post-Processor outputs model data in this format from both WRF cores, the NMM and the ARW. However, the Unified Post-Processor is not strictly required as long as the user can produce gridded model output on a standard de-staggered grid on pressure or regular levels in the vertical. Two-dimensional fields (e.g., precipitation amount) are also accepted for some modules.
 
 2. The copygb utility is recommended for re-gridding model and observation datasets in GRIB version 1 format to a common verification grid. The copygb utility is distributed as part of the Unified Post-Processor and is available from other sources as well. While earlier versions of MET required that all gridded data be placed on a common grid, MET version 5.1 added support for automated re-gridding on the fly. After version 5.1, users have the option of running copygb to regrid their GRIB1 data ahead of time or leveraging the automated regridding capability within MET. 
 
@@ -113,7 +113,7 @@ Installation of Optional Utilities
 
 As described in the introduction to this section, two additional utilities are strongly recommended for use with MET.
 
-1. The `Unified Post-Processor <https://dtcenter.org/community-code/unified-post-processor-upp>`_ is recommended for post-processing the raw WRF model output prior to verifying the data with MET. The Unified Post-Processor may be used on WRF output from both the ARW and NMM cores.
+1. The `Unified Post-Processor <https://epic.noaa.gov/unified-post-processor/>`_ is recommended for post-processing the raw WRF model output prior to verifying the data with MET. The Unified Post-Processor may be used on WRF output from both the ARW and NMM cores.
 
 2. The copygb utility is recommended for re-gridding model and observation datasets in GRIB format to a common verification grid. The copygb utility is distributed as part of the Unified Post-Processor and is available from other sources as well. Please refer to the "Unified Post-processor" utility mentioned above for information on availability and installation.
 
