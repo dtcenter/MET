@@ -257,9 +257,9 @@ bool NcCfFile::open(const char * filepath)
       else if( "latitude" == att_value ) _latVar = Var[j].var;
       else if( "longitude" == att_value ) _lonVar = Var[j].var;
       else if( ("air_pressure" == att_value || "height" == att_value)
-               && (0 == z_var) ) z_var = Var[j].var;
+               && (nullptr==z_var && 1==get_dim_count(Var[j].var))) z_var = Var[j].var;
     }
-    if ( Var[j].name == "time" && (valid_time_var == 0)) {
+    if ( Var[j].name == "time" && (valid_time_var == nullptr)) {
       valid_time_var = Var[j].var;
       _time_var_info = &Var[j];
     }
@@ -489,6 +489,13 @@ bool NcCfFile::open(const char * filepath)
     NcVarInfo *info = find_var_by_dim_name(z_dim_name.c_str());
     if (info) z_var = info->var;
   }
+
+  mlog << Debug(5) << method_name << "coordinate variables:"
+       << " x=" << (IS_VALID_NC_P(_xCoordVar) ? GET_NC_NAME_P(_xCoordVar) : "N/A")
+       << ", y=" << (IS_VALID_NC_P(_yCoordVar) ? GET_NC_NAME_P(_yCoordVar) : "N/A")
+       << ", z=" << (IS_VALID_NC_P(z_var) ? GET_NC_NAME_P(z_var) : "N/A")
+       << ", t=" << (IS_VALID_NC_P(valid_time_var) ? GET_NC_NAME_P(valid_time_var) : "N/A")
+       << "\n";
 
   // Pull out the vertical levels
   if (IS_VALID_NC_P(z_var)) {
