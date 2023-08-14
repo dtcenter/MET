@@ -64,9 +64,18 @@ double delta;
 double p = bad_data_double;
 
 if ( n > 0 ) {
+
    index = nint(floor((n - 1)*t));
-   delta = (n-1)*t - index;
-   p = (1 - delta)*ordered_array[index] + delta*ordered_array[index+1];
+
+   // Use the last value
+   if ( index == (n - 1) ) {
+      p = ordered_array[index];
+   }
+   // Interpolate linearly between two values
+   else {
+      delta = (n - 1)*t - index;
+      p = (1 - delta)*ordered_array[index] + delta*ordered_array[index + 1];
+   }
 }
 
 return ( p );
@@ -105,9 +114,15 @@ if ( n > 0 ) {
 
    index = nint(floor((n - 1)*t));
 
-   delta = (n - 1)*t - index;
-
-   p = (1 - delta)*(ordered_array[index]) + delta*(ordered_array[index + 1]);
+   // Use the last value
+   if ( index == (n - 1) ) {
+      p = ordered_array[index];
+   }
+   // Interpolate linearly between two values
+   else {
+      delta = (n - 1)*t - index;
+      p = (1 - delta)*ordered_array[index] + delta*ordered_array[index + 1];
+   }
 
 }
 
