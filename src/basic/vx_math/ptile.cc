@@ -119,7 +119,7 @@ if ( n > 0 ) {
       p = ordered_array[index];
    }
    // Interpolate linearly between two values
-   else {
+   else if ( index >= 0 && index < (n - 1) ) {
       delta = (n - 1)*t - index;
       p = (1 - delta)*ordered_array[index] + delta*ordered_array[index + 1];
    }
