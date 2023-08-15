@@ -9,119 +9,29 @@ When applicable, release notes are followed by the GitHub issue number which des
 enhancement, or new feature (`MET GitHub issues <https://github.com/dtcenter/MET/issues>`_).
 Important issues are listed **in bold** for emphasis.
 
-MET Version 11.1.0-rc2 release notes (20230724)
------------------------------------------------
-
-  .. dropdown:: Repository, build, and test
-
-     * Add free_disk_space.sh script to the MET repository (`#2597 <https://github.com/dtcenter/MET/issues/2597>`_).
-
-  .. dropdown:: Documentation
-
-     * Revise TC-Diag documentation for version 11.1.0 (`#2558 <https://github.com/dtcenter/MET/issues/2558>`_).
-
-  .. dropdown:: Enhancements
-
-     * Update NDBC locations prior to the MET-11.1.0 release (`#2511 <https://github.com/dtcenter/MET/issues/2511>`_).
-
-  .. dropdown:: Bugfixes
-
-     * Bugfix: Refine support for LAEA grids via NetCDF and GRIB2 files (`#2565 <https://github.com/dtcenter/MET/issues/2565>`_).
-     * Bugfix: Fix reading of upside-down CF-compliant NetCDF Rotated Lat/Lon data (`#2578 <https://github.com/dtcenter/MET/issues/2578>`_).
-     * Bugfix: Unknown ld Flag on Macos causes MET compilation to fail (`#2596 <https://github.com/dtcenter/MET/issues/2596>`_).
-     * Bugfix: Problem compiling MET on MacOS using GCC 12.3.0 (`#2615 <https://github.com/dtcenter/MET/issues/2615>`_).
-
-MET Version 11.1.0-rc1 release notes (20230616)
------------------------------------------------
-
-  .. dropdown:: Repository, build, and test
-
-     * Enhance compile_MET_all.sh to allow the user to specify the compiler and Python versions to load (`#2485 <https://github.com/dtcenter/MET/issues/2485>`_).
-     * Enhance compile_MET_all.sh to include the library/app name in the log filename (`#2540 <https://github.com/dtcenter/MET/issues/2540>`_).
-
-  .. dropdown:: Documentation
-
-     * Update the documentation for the HSS and HSS_EC statistics (`#2492 <https://github.com/dtcenter/MET/issues/2492>`_).
-     * Update the documentation for the ens, NEP, and NMEP configuration options (`#2513 <https://github.com/dtcenter/MET/issues/2513>`_).
-
-  .. dropdown:: Enhancements
-
-    .. dropdown:: Common Libraries
-
-       * Add support for the Lambert Azimuthal Equal Area grids (`#1693 <https://github.com/dtcenter/MET/issues/1693>`_).
-       * Update the default ASCII2NC message_type_map configuration option for Little R input data (`#2487 <https://github.com/dtcenter/MET/issues/2487>`_).
-       * Merge older and newer MRMS GRIB2 table files (`#2508 <https://github.com/dtcenter/MET/issues/2508>`_).
-       * SonarQube: Further reduce findings for MET-11.1.0-rc1 (`#2521 <https://github.com/dtcenter/MET/issues/2521>`_).
-
-    .. dropdown:: Application Code
-
-       * **Enhance Gen-Vx-Mask shapefile masking to support multiple shapes and specify shape metadata** (`#1060 <https://github.com/dtcenter/MET/issues/1060>`_).
-       * **Enhance Multivariate MODE to generate object statistics for each input field requested by the user** (`#1283 <https://github.com/dtcenter/MET/issues/1283>`_).
-       * Enhance MODE to bound check interest_function corner points in the range 0 to 1 (`#2545 <https://github.com/dtcenter/MET/issues/2545>`_).
-
-    .. dropdown:: Tropical Cyclone Tools
-
-       * **Create an initial development version of a new TC-Diag tool to support the computation of tropical cyclone diagnostics** (`#2168 <https://github.com/dtcenter/MET/issues/2168>`_).
-       * **Enhance TC-Stat to write the RIRW job CTC/CTS output to a .stat output file** (`#2425 <https://github.com/dtcenter/MET/issues/2425>`_).
-       * **Enhance TC-Pairs to derive the full circle wind radius from the wind radius quadrants** (`#2532 <https://github.com/dtcenter/MET/issues/2532>`_).
-       * Enhance TC-RMW to reorder the dimensions of the NetCDF output to store the gridded dimensions last (`#2523 <https://github.com/dtcenter/MET/issues/2523>`_).
-       * Enhance TC-Gen to parse GTWO shapefile lead times from the data rather than assuming them to be 2, 5, and 7 days (`#2552 <https://github.com/dtcenter/MET/issues/2552>`_).
-
-  .. dropdown:: Bugfixes
-
-     * Bugfix: Fix the Clang compilation of MET version 11 (`#2514 <https://github.com/dtcenter/MET/issues/2514>`_).
-     * Bugfix: Fix the fill value setting used in the write_tmp_dataplane internal Python embedding script (`#2525 <https://github.com/dtcenter/MET/issues/2525>`_).
-     * Bugfix: Fix the TC-Stat RIRW runtime error when computing CTS statistics from an empty contingency table (`#2542 <https://github.com/dtcenter/MET/issues/2542>`_).
-     * Bugfix: Fix logic for Python embedding with data censoring and/or conversion (`#2575 <https://github.com/dtcenter/MET/issues/2575>`_).
-
-MET Version 11.1.0-beta2 release notes (20230505)
--------------------------------------------------
-
-**Note** that the 11.1.0-beta2 release was originally created on 20230423 but was recreated on 20230428 and 20230505 to include critical bugfixes.
-
-  .. dropdown:: Documentation
-
-     * Improve documentation on Python Embedding for point observations (`#2303 <https://github.com/dtcenter/MET/issues/2303>`_).
-     * Create dropdown menus for Appendix A (`#2460 <https://github.com/dtcenter/MET/issues/2460>`_).
-     * Clarify MET Compile Time Python requirements (`#2490 <https://github.com/dtcenter/MET/issues/2490>`_).
-
-  .. dropdown:: Enhancements
-
-     * Enhance the MET point processing tools to read the Python 'point_data' variable instead of just 'met_point_data' (`#2285 <https://github.com/dtcenter/MET/issues/2285>`_).
-     * SonarQube: Further reduce bugs for MET-11.1.0-beta2 (`#2474 <https://github.com/dtcenter/MET/issues/2474>`_).
-     * SonarQube: Replace all instances of NULL with nullptr (`#2504 <https://github.com/dtcenter/MET/issues/2504>`_).
-     * SonarQube: Remove code that will never be executed (`#2506 <https://github.com/dtcenter/MET/issues/2506>`_).
-
-  .. dropdown:: Bugfixes
-
-     * Bugfix: Correct the branch name for the SonarQube scanning nightly (`#2401 <https://github.com/dtcenter/MET/issues/2401>`_).
-     * Bugfix: Fix support for the YYYYMMDD format in NetCDF level timestrings (`#2482 <https://github.com/dtcenter/MET/issues/2482>`_).
-     * Bugfix: AERONET the lat/lon is not changed with different station ID (`#2493 <https://github.com/dtcenter/MET/issues/2493>`_).
-     * Bugfix: dtype in Python embedding example script and appendixF correction (`#2518 <https://github.com/dtcenter/MET/issues/2518>`_).
-     * Bugfix: write_tmp_dataplane uses fill_value unrecognized by MET (`#2525 <https://github.com/dtcenter/MET/issues/2525>`_).
-     * **Bugfix: Resolve compilation problems due to need for \-std=c++11** (`#2531 <https://github.com/dtcenter/MET/issues/2531>`_).
-
-MET Version 11.1.0-beta1 release notes (20230228)
--------------------------------------------------
+MET Version 11.1.0 release notes (20230731)
+-------------------------------------------
 
   .. dropdown:: Repository, build, and test
 
      * Add modulefiles for supported systems to the repository (`#2415 <https://github.com/dtcenter/MET/issues/2415>`_).
      * Add LICENSE.md to the repository (`#2461 <https://github.com/dtcenter/MET/issues/2461>`_).
      * Update the copyright year to 2023 and increase the version number to 11.1.0 (`#2469 <https://github.com/dtcenter/MET/issues/2469>`_).
+     * Enhance compile_MET_all.sh to allow the user to specify the compiler and Python versions to load (`#2485 <https://github.com/dtcenter/MET/issues/2485>`_).
+     * Enhance compile_MET_all.sh to include the library/app name in the log filename (`#2540 <https://github.com/dtcenter/MET/issues/2540>`_).
+     * Add free_disk_space.sh script to the MET repository (`#2597 <https://github.com/dtcenter/MET/issues/2597>`_).
 
   .. dropdown:: Documentation 
 
      * Enhance the Release Notes by adding dropdown menus (`#2146 <https://github.com/dtcenter/MET/issues/2146>`_).
+     * Improve documentation on Python Embedding for point observations (`#2303 <https://github.com/dtcenter/MET/issues/2303>`_).
+     * Create dropdown menus for Appendix A (`#2460 <https://github.com/dtcenter/MET/issues/2460>`_).
+     * Clarify MET Compile Time Python requirements (`#2490 <https://github.com/dtcenter/MET/issues/2490>`_).
+     * Update the documentation for the HSS and HSS_EC statistics (`#2492 <https://github.com/dtcenter/MET/issues/2492>`_).
+     * Update the documentation for the ens, NEP, and NMEP configuration options (`#2513 <https://github.com/dtcenter/MET/issues/2513>`_).
+     * Revise TC-Diag documentation for version 11.1.0 (`#2558 <https://github.com/dtcenter/MET/issues/2558>`_).
 
-  .. dropdown:: Enhancements 
-
-     * Convert the python list to the numpy array for the python embedding at the base class (`#2386 <https://github.com/dtcenter/MET/issues/2386>`_).
-     * Refine Python runtime environment (`#2388 <https://github.com/dtcenter/MET/issues/2388>`_).
-     * Upgrade to using Python 3.10.4 (`#2421 <https://github.com/dtcenter/MET/issues/2421>`_).
-     * **Enhance TC-Pairs to disable the output of consensus track members** (`#2429 <https://github.com/dtcenter/MET/issues/2429>`_).
-
-  .. dropdown:: Bugfixes 
+  .. dropdown:: Bugfixes
 
      * Bugfix: Fix the MET CF-Compliant NetCDF library code to Polar Stereographic data from NSIDC Sea Ice Edge NetCDF files (`#2218 <https://github.com/dtcenter/MET/issues/2218>`_).
      * Bugfix: Remove override keyword to avoid C++11 dependency (`#2380 <https://github.com/dtcenter/MET/issues/2380>`_).
@@ -130,6 +40,7 @@ MET Version 11.1.0-beta1 release notes (20230228)
      * Bugfix: Update the MET flowchart for version 11.0.0 (`#2389 <https://github.com/dtcenter/MET/issues/2389>`_).
      * Bugfix: Fix issues with the met_compile_all.sh script and associated tar files (`#2390 <https://github.com/dtcenter/MET/issues/2390>`_).
      * Bugfix: Correct definitions of NCEP grid numbers 172 and 220 (`#2399 <https://github.com/dtcenter/MET/issues/2399>`_).
+     * Bugfix: Correct the branch name for the SonarQube scanning nightly (`#2401 <https://github.com/dtcenter/MET/issues/2401>`_).
      * Bugfix: Address MET-11.0.0 SonarQube Blocker Bugs (`#2402 <https://github.com/dtcenter/MET/issues/2402>`_).
      * Bugfix: Refine fix for handling empty configuration files (`#2408 <https://github.com/dtcenter/MET/issues/2408>`_).
      * Bugfix: Fix time interpolation of monthly climatology data between December 15 and January 15 (`#2412 <https://github.com/dtcenter/MET/issues/2412>`_).
@@ -138,6 +49,56 @@ MET Version 11.1.0-beta1 release notes (20230228)
      * Bugfix: Refine the regrid dictionary's data conversion and censoring operations and fix climo time matching logic for a single monthly climo file (`#2437 <https://github.com/dtcenter/MET/issues/2437>`_).
      * Bugfix: Fix the creation of the MET User's Guide PDF (`#2449 <https://github.com/dtcenter/MET/issues/2449>`_).
      * Bugfix: Fix inconsistent ASCII2NC AIRNOW location lookup logic (`#2452 <https://github.com/dtcenter/MET/issues/2452>`_).
+     * Bugfix: Fix support for the YYYYMMDD format in NetCDF level timestrings (`#2482 <https://github.com/dtcenter/MET/issues/2482>`_).
+     * Bugfix: AERONET the lat/lon is not changed with different station ID (`#2493 <https://github.com/dtcenter/MET/issues/2493>`_).
+     * Bugfix: Fix the Clang compilation of MET version 11 (`#2514 <https://github.com/dtcenter/MET/issues/2514>`_).
+     * Bugfix: dtype in Python embedding example script and appendixF correction (`#2518 <https://github.com/dtcenter/MET/issues/2518>`_).
+     * Bugfix: Fix the fill value setting used in the write_tmp_dataplane internal Python embedding script (`#2525 <https://github.com/dtcenter/MET/issues/2525>`_).
+     * **Bugfix: Resolve compilation problems due to need for \-std=c++11** (`#2531 <https://github.com/dtcenter/MET/issues/2531>`_).
+     * Bugfix: Fix the TC-Stat RIRW runtime error when computing CTS statistics from an empty contingency table (`#2542 <https://github.com/dtcenter/MET/issues/2542>`_).\
+     * Bugfix: Refine support for LAEA grids via NetCDF and GRIB2 files (`#2565 <https://github.com/dtcenter/MET/issues/2565>`_).
+     * Bugfix: Fix logic for Python embedding with data censoring and/or conversion (`#2575 <https://github.com/dtcenter/MET/issues/2575>`_).
+     * Bugfix: Fix reading of upside-down CF-compliant NetCDF Rotated Lat/Lon data (`#2578 <https://github.com/dtcenter/MET/issues/2578>`_).
+     * Bugfix: Unknown ld Flag on Macos causes MET compilation to fail (`#2596 <https://github.com/dtcenter/MET/issues/2596>`_).
+     * Bugfix: Problem compiling MET on MacOS using GCC 12.3.0 (`#2615 <https://github.com/dtcenter/MET/issues/2615>`_).
+
+  .. dropdown:: Enhancements 
+
+    .. dropdown:: SonarQube
+
+       * SonarQube: Further reduce bugs for MET-11.1.0-beta2 (`#2474 <https://github.com/dtcenter/MET/issues/2474>`_).
+       * SonarQube: Replace all instances of NULL with nullptr (`#2504 <https://github.com/dtcenter/MET/issues/2504>`_).
+       * SonarQube: Remove code that will never be executed (`#2506 <https://github.com/dtcenter/MET/issues/2506>`_).
+       * SonarQube: Further reduce findings for MET-11.1.0-rc1 (`#2521 <https://github.com/dtcenter/MET/issues/2521>`_).
+
+    .. dropdown:: Python Embedding
+
+       * Convert the python list to the numpy array for the python embedding at the base class (`#2386 <https://github.com/dtcenter/MET/issues/2386>`_).
+       * Refine Python runtime environment (`#2388 <https://github.com/dtcenter/MET/issues/2388>`_).
+       * **Upgrade to using Python 3.10.4** (`#2421 <https://github.com/dtcenter/MET/issues/2421>`_).
+       * **Enhance the MET point processing tools to read the Python 'point_data' variable instead of just 'met_point_data'** (`#2285 <https://github.com/dtcenter/MET/issues/2285>`_).
+
+    .. dropdown:: Common Libraries
+
+       * **Add support for the Lambert Azimuthal Equal Area grids** (`#1693 <https://github.com/dtcenter/MET/issues/1693>`_).
+       * Update the default ASCII2NC message_type_map configuration option for Little R input data (`#2487 <https://github.com/dtcenter/MET/issues/2487>`_).
+       * Merge older and newer MRMS GRIB2 table files (`#2508 <https://github.com/dtcenter/MET/issues/2508>`_).
+
+    .. dropdown:: Application Code
+
+       * **Enhance Gen-Vx-Mask shapefile masking to support multiple shapes and specify shape metadata** (`#1060 <https://github.com/dtcenter/MET/issues/1060>`_).
+       * **Enhance Multivariate MODE to generate object statistics for each input field requested by the user** (`#1283 <https://github.com/dtcenter/MET/issues/1283>`_).
+       * Update NDBC locations prior to the MET-11.1.0 release (`#2511 <https://github.com/dtcenter/MET/issues/2511>`_).
+       * Enhance MODE to bound check interest_function corner points in the range 0 to 1 (`#2545 <https://github.com/dtcenter/MET/issues/2545>`_).
+
+    .. dropdown:: Tropical Cyclone Tools
+
+       * **Create an initial development version of a new TC-Diag tool to support the computation of tropical cyclone diagnostics** (`#2168 <https://github.com/dtcenter/MET/issues/2168>`_).
+       * **Enhance TC-Stat to write the RIRW job CTC/CTS output to a .stat output file** (`#2425 <https://github.com/dtcenter/MET/issues/2425>`_).
+       * **Enhance TC-Pairs to disable the output of consensus track members** (`#2429 <https://github.com/dtcenter/MET/issues/2429>`_).
+       * Enhance TC-RMW to reorder the dimensions of the NetCDF output to store the gridded dimensions last (`#2523 <https://github.com/dtcenter/MET/issues/2523>`_).
+       * **Enhance TC-Pairs to derive the full circle wind radius from the wind radius quadrants** (`#2532 <https://github.com/dtcenter/MET/issues/2532>`_).
+       * Enhance TC-Gen to parse GTWO shapefile lead times from the data rather than assuming them to be 2, 5, and 7 days (`#2552 <https://github.com/dtcenter/MET/issues/2552>`_).
 
 MET Version 11.0.0 release notes (20221209)
 -------------------------------------------
@@ -277,6 +238,14 @@ MET Version 11.1.0 upgrade instructions
 * If compiling support for PYTHON (:numref:`compiling_python_support`), in addition to $MET_PYTHON_CC and $MET_PYTHON_LD, set **$MET_PYTHON_BIN_EXE** to specify the desired python executable to be used (`#2428 <https://github.com/dtcenter/MET/issues/2428>`_).
 
 * If running TC-Pairs to generate consensus tracks, update your TC-Pairs configuration file to include the new **write_members** option (`#2429 <https://github.com/dtcenter/MET/issues/2429>`_).
+
+* If using Python embedding for point observations, and the following lines of code are in your Python script please remove them and refactor your Python script following the instructions in the `User's Guide for Python embedding for point observations <https://met.readthedocs.io/en/main_v11.1/Users_Guide/appendixF.html#python-script-requirements-for-point-observations>`_:
+
+  .. code-block:: Python
+
+    from met_point_obs import convert_point_data
+    ...
+    met_point_data = convert_point_data(point_data)
 
 MET Version 11.0.0 upgrade instructions
 ---------------------------------------
