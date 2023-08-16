@@ -63,6 +63,17 @@ int index;
 double delta; 
 double p = bad_data_double;
 
+// Range check
+if ( t < 0.0 || t > 1.0 ) {
+
+   mlog << Error << "\npercentile() -> "
+        << "requested percentile value (" << t
+        << ") must be between 0 and 1!\n\n";
+
+   exit ( 1 );
+
+}
+
 if ( n > 0 ) {
 
    index = nint(floor((n - 1)*t));
@@ -76,6 +87,7 @@ if ( n > 0 ) {
       delta = (n - 1)*t - index;
       p = (1 - delta)*ordered_array[index] + delta*ordered_array[index + 1];
    }
+
 }
 
 return ( p );
@@ -109,6 +121,17 @@ float percentile_f(const float * ordered_array, const int n, const double t)
 int index;
 float delta; 
 float p = bad_data_float;
+
+// Range check
+if ( t < 0.0 || t > 1.0 ) {
+
+   mlog << Error << "\npercentile_f() -> "
+        << "requested percentile value (" << t
+        << ") must be between 0 and 1!\n\n";
+
+   exit ( 1 );
+
+}
 
 if ( n > 0 ) {
 
