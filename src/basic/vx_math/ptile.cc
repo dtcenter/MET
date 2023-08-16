@@ -125,7 +125,7 @@ float p = bad_data_float;
 // Range check
 if ( t < 0.0 || t > 1.0 ) {
 
-   mlog << Error << "\npercentile() -> "
+   mlog << Error << "\npercentile_f() -> "
         << "requested percentile value (" << t
         << ") must be between 0 and 1!\n\n";
 
