@@ -289,4 +289,4 @@ nc_pairs_grid = "G003";
 // Indicate a version number for the contents of this configuration file.
 // The value should generally not be modified.
 //
-version = "V11.1.0";
+version = "V12.0.0";
