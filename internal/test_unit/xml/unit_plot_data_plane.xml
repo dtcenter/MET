@@ -564,4 +564,18 @@
     </output>
   </test>
 
+  <test name="plot_data_plane_NCCF_not_standard_vertical_levels">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/nccf/percentile_extract_20230729T1200Z-B20230725T0030Z-visibility_at_screen_level.nc \
+      &OUTPUT_DIR;/plot_data_plane/visibility_in_air_by_percentile.ps \
+      'name="visibility_in_air"; level="(6,*,*)";' \
+      -title "Visibility in air" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/visibility_in_air_by_percentile.ps</ps>
+    </output>
+  </test>
+
 </met_test>
