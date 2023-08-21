@@ -84,6 +84,21 @@ The next step will be to identify and download the latest MET release as a tar f
 
 .. _Install_Required-libraries-and:
 
+Environment Variables to Run Script:
+------------------------------------
+
+Before running the compilation script, there are five environment variables that are required: 
+TEST_BASE, COMPILER, MET_SUBDIR, MET_TARBALL, and USE_MODULES.  
+If compiling support for Python embedding, the script will need the following additional environment variables: MET_PYTHON, MET_PYTHON_CC, and MET_PYTHON_LD.
+
+An easy way to set these environment variables is in an environment configuration file 
+(for example, install_met_env.<machine_name>). An example environment configuration file to start 
+from (install_met_env.generic), as well as environment configuration files used on 
+HPCs at NCAR and NOAA, can be found in the MET GitHub repository in the 
+`scripts/installation/config 
+<https://github.com/dtcenter/MET/tree/main_v11.1/internal/scripts/installation/config>`_ 
+directory.
+
 Required Libraries and Optional Utilities
 =========================================
 
