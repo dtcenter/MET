@@ -75,7 +75,7 @@ Now change directories to the one that was created from expanding the tar files:
 
   cd tar_files
 
- The next step will be to identify and download the latest MET release as a tar file (e.g. v11.1.0.tar.gz) and place it in the tar_files directory. The file is available from the Recommended-Components MET section of the `METplus website <https://dtcenter.org/community-code/metplus/download>`_ or by using a wget command while in the tar_files directory:
+The next step will be to identify and download the latest MET release as a tar file (e.g. v11.1.0.tar.gz) and place it in the tar_files directory. The file is available from the Recommended-Components MET section of the `METplus website <https://dtcenter.org/community-code/metplus/download>`_ or by using a wget command while in the tar_files directory:
 
 .. code-block:: ini
 
