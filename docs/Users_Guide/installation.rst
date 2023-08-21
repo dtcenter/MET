@@ -1,42 +1,86 @@
 .. _installation:
 
-*************************************
-Software Installation/Getting Started
-*************************************
+*********************
+Software Installation
+*********************
 
 Introduction
 ============
 
-This section describes how to install the MET package. MET has been developed and tested on Linux operating systems. Support for additional platforms and compilers may be added in future releases. The MET package requires many external libraries to be available on the user's computer prior to installation. Required and recommended libraries, how to install MET, the MET directory structure, and sample cases are described in the following sections.
+This section is meant to provide guidance on installing MET. It assumes a beginner user to MET is compiling MET from scratch and will step through the installation process, including listing dependent libraries and how to install them. Installation will require an understanding of the environment and hardware that MET is being installed on as it has options that are dependent on compiler usage, modulefiles, etc.
 
-Supported Architectures
-=======================
+There are multiple supported methods for installing MET: using a provided compilation script, Docker instances, and Apptainer/Singularity instances. All of these methods will be described below. The recommended method is :ref:`compile_script_install` .
 
-The MET package was developed on Debian Linux using the GNU compilers and the Portland Group (PGI) compilers. The MET package has also been built on several other Linux distributions using the GNU, PGI, and Intel compilers. Past versions of MET have also been ported to IBM machines using the IBM compilers, but we are currently unable to support this option as the development team lacks access to an IBM machine for testing. Other machines may be added to this list in future releases as they are tested. In particular, the goal is to support those architectures supported by the WRF model itself.
+Required External Libraries To Build MET
+========================================
 
-The MET tools run on a single processor. Therefore, none of the utilities necessary for running WRF on multiple processors are necessary for running MET. Individual calls to the MET tools have relatively low computing and memory requirements. However users will likely be making many calls to the tools and passing those individual calls to several processors will accomplish the verification task more efficiently.
+MET is dependent on several external libraries to function properly. The required libraries are listed below:
 
-Programming Languages
-=====================
+* `BUFRLIB <https://emc.ncep.noaa.gov/emc/pages/infrastructure/bufrlib.php>`_ for reading PrepBufr Observation files
+* `NetCDF4 <http://www.unidata.ucar.edu/software/netcdf>`_ in C and CXX, for intermediate and output file formats
+* `HDF5 <https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.12/hdf5-1.12.2/src/hdf5-1.12.2.tar.gz>`_ is required to support NetCDF 4. HDF5 should be built with `zlib <http://www.zlib.net/>`_.
+* `GSL <http://www.gnu.org/software/gsl>`_ GNU Scientific Library Developer's Version for computing confidence intervals (use **GSL-1.11** for **PGI** compilers)
+* `GRIB2C <http://www.nco.ncep.noaa.gov/pmb/codes/GRIB2>`_ Library (with dependencies Z, PNG, JASPER), if compiling GRIB2 support.
 
-The MET package, including MET-TC, is written primarily in C/C++ in order to be compatible with an extensive verification code base in C/C++ already in existence. In addition, the object-based MODE and MODE-TD verification tools rely heavily on the object-oriented aspects of C++. Knowledge of C/C++ is not necessary to use the MET package. The MET package has been designed to be highly configurable through the use of ASCII configuration files, enabling a great deal of flexibility without the need for source code modifications.
+The following libraries are conditionally required, depending on your intended verification use and compiler language:
 
-With the release of MET-11.1.0, C++11 is now the minimum required version of the C++ programming language standard.
+* `HDF4 <http://www.hdfgroup.org/products/hdf4>`_ Library, if compiling the MODIS-Regrid or lidar2nc tool.
+* `HDF-EOS2 <http://www.hdfgroup.org/hdfeos.html>`_ Library, if compiling the MODIS-Regrid or lidar2nc tool.
+* `Cairo <http://cairographics.org/releases>`_ Library, if compiling the MODE-Graphics tool.
+* `FreeType <http://www.freetype.org/download.html>`_ Library, if compiling the MODE-Graphics tool.
+* `f2c <http://www.netlib.org/f2c>`_ Library for interfacing between Fortran and C (**Not required for most compilers**)
 
-NCEP's BUFRLIB is written entirely in Fortran. The portion of MET that handles the interface to the BUFRLIB for reading PrepBUFR point observation files is also written in Fortran.
+Users can take advantage of the :ref:`compile_script_install` to download and install all of the libraries automatically, both required and conditionally required.
 
-The MET package is intended to be a tool for the modeling community to use and adapt. As users make upgrades and improvements to the tools, they are encouraged to offer those upgrades to the broader community by offering feedback to the developers.
+Suggested External Utilities for Use With MET
+=============================================
 
-Required Compilers and Scripting Languages
-==========================================
+The following utilities have been used with success by other METplus users in their verification processes. They are not required for MET to function, but depending on the user’s intended verification needs, they may be of use:
 
-The MET package was developed and tested using the GNU g++/gfortran compilers and the Intel icc/ifort compilers. As additional compilers are successfully tested, they will be added to the list of supported platforms/compilers.
+* `Unified Post Processing System (UPP) <https://dtcenter.org/community-code/unified-post-processor-upp>`_ for preparing model data to be verified
+* `copygb utility <http://www.cpc.ncep.noaa.gov/products/wesley/copygb.html>`_ for re-gridding grib data (available with the WRF Post-Processor)
+* `Integrated Data Viewer (IDV) <http://www.unidata.ucar.edu/software/idv>`_ for displaying gridded data, including GRIB and NetCDF
+* `ncview utility <http://meteora.ucsd.edu/~pierce/ncview_home_page.html>`_ for viewing gridded NetCDF data (ex. the output of pcp_combine)
 
-The GNU make utility is used in building all executables and is therefore required.
+.. _compile_script_install:
 
-The MET package consists of a group of command line utilities that are compiled separately. The user may choose to run any subset of these utilities to employ the type of verification methods desired. New tools developed and added to the toolkit will be included as command line utilities.
+Using the compile_MET_all.sh Script for Installing MET
+======================================================
 
-In order to control the desired flow through MET, users are encouraged to run the tools via a script or consider using the `METplus package <https://dtcenter.org/community-code/metplus>`_. Some sample scripts are provided in the distribution; these examples are written in the Bourne shell. However, users are free to adapt these sample scripts to any scripting language desired.
+The compile_MET_all.sh script is designed to install MET and, if desired, all of the external library dependencies required for running the system on various platforms. There are some required environment variables that need to be set before running the script and some optional environment variables, both of which are described below. The script relies on the tar_files.tgz, which contains all of the required and optional library packages for MET but not MET itself. A separate command will be used to pull down the latest version of MET in tar.tgz format from GitHub, which the script will then install.
+
+To begin, create and change to a directory where you want to install the latest version of MET. Next, download the script, compile_MET_all.sh, and tar_files.tgz and place both of these in the new directory. These files are available either through using the hyperlinks provided, or by entering the following commands in the terminal while in the directory MET will be installed in:
+
+.. code-block:: ini
+
+  wget https://raw.githubusercontent.com/dtcenter/MET/main_v11.1/internal/scripts/installation/compile_MET_all.sh
+  wget https://dtcenter.ucar.edu/dfiles/code/METplus/MET/installation/tar_files.tgz
+
+
+The tar files will need to be extracted in the MET installation directory:
+
+.. code-block:: ini
+
+  tar -zxf tar_files.tgz
+
+To make the compilation script into an executable, change the permissions to the following:
+
+.. code-block:: ini
+
+  chmod 775 compile_MET_all.sh
+
+Now change directories to the one that was created from expanding the tar files:
+
+.. code-block:: ini
+
+  cd tar_files
+
+ The next step will be to identify and download the latest MET release as a tar file (e.g. v11.1.0.tar.gz) and place it in the tar_files directory. The file is available from the Recommended-Components MET section of the `METplus website <https://dtcenter.org/community-code/metplus/download>`_ or by using a wget command while in the tar_files directory:
+
+.. code-block:: ini
+
+  wget https://github.com/dtcenter/MET/archive/refs/tags/v11.1.0.tar.gz
+
 
 .. _Install_Required-libraries-and:
 
