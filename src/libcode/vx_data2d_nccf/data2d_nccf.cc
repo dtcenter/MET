@@ -227,15 +227,19 @@ bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
       }
       else {
         long z_cnt = (long)_file->vlevels.n();
-        if (z_cnt > 0) {
-
-          zdim_slot = idx;
+        // Checks if the data veriable has a vertical dimension
+        if (0 <= data_var->z_slot) {
           org_z_offset = dim_offset;
           long z_offset = dim_offset;
           string z_dim_name;
+
+          zdim_slot = idx;
           if (0 <= data_var->z_slot) {
              NcDim z_dim = get_nc_dim(data_var->var, data_var->z_slot);
-             if (IS_VALID_NC(z_dim)) z_dim_name = GET_NC_NAME(z_dim);
+             if (IS_VALID_NC(z_dim)) {
+                z_dim_name = GET_NC_NAME(z_dim);
+                z_cnt = get_dim_size(&z_dim);   // override the virtical level count
+             }
           }
           if (!is_offset[idx]) {
             // convert the value to index for slicing
@@ -663,12 +667,11 @@ long MetNcCFDataFile::convert_value_to_offset(double z_value, string z_dim_name)
       }
    }
 
-   if (!found && 0 < z_dim_name.length()) {
-      NcVarInfo *var_info = find_var_info_by_dim_name(_file->Var, z_dim_name, _file->Nvars);
-      if (var_info) {
-         long new_offset = get_index_at_nc_data(var_info->var, z_value, z_dim_name);
-         if (new_offset != bad_data_int) z_offset = new_offset;
-      }
+   // Overrides if the variable specific vertical dimension exists
+   NcVarInfo *var_info = find_var_info_by_dim_name(_file->Var, z_dim_name, _file->Nvars);
+   if (var_info) {
+      long new_offset = get_index_at_nc_data(var_info->var, z_value, z_dim_name);
+      z_offset = new_offset;
    }
 
    return z_offset;
