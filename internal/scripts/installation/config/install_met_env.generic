@@ -3,7 +3,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 # Required
 # Directory that is the root of the compile
-export TEST_BASE=$DIR
+export TEST_BASE=${DIR}
 
 # Required
 # Format is compiler_version (e.g. gnu_8.3.0)
@@ -28,7 +28,7 @@ export USE_MODULES=FALSE
 export MET_PYTHON=`python3-config --prefix`
 
 # Python ldflags created using python3-config
-export MET_PYTHON_LD=`python3-config --ldflags`
+export MET_PYTHON_LD=`python3-config --ldflags --embed`
 
 # Python cflags created using python3-config
 export MET_PYTHON_CC=`python3-config --cflags`
@@ -63,7 +63,3 @@ export MAKE_ARGS=-j
 # libraries have already been installed and don't need to be reinstalled, set 
 # MET_HDF, MET_HDFEOS, MET_FREETYPEINC, MET_FREETYPELIB, MET_CAIROINC,
 # and MET_CAIROLIB
-
-
-#Normally should be omitted or set to TRUE - only used if building from github repo
-export USE_MET_TAR_FILE=FALSE
