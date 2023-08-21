@@ -18,7 +18,7 @@ export MET_SUBDIR=${TEST_BASE}
 # Required
 # The name of the met tarbal usually downloaded with version from dtcenter.org and includes a version
 #  example - v11.1.0.tar.gz
-export MET_TARBALL=v11.1.0.tar.gz
+export MET_TARBALL=v12.0.0.tar.gz
 
 # Required
 # Specifiy if machine useds modules for loading software
