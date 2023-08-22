@@ -27,11 +27,11 @@ MET is dependent on several external libraries to function properly. The require
 
 The following libraries are conditionally required, depending on your intended verification use and compiler language:
 
-* `HDF4 <http://www.hdfgroup.org/products/hdf4>`_ Library, if compiling the MODIS-Regrid or lidar2nc tool.
-* `HDF-EOS2 <http://www.hdfgroup.org/hdfeos.html>`_ Library, if compiling the MODIS-Regrid or lidar2nc tool.
-* `Cairo <http://cairographics.org/releases>`_ Library, if compiling the MODE-Graphics tool.
-* `FreeType <http://www.freetype.org/download.html>`_ Library, if compiling the MODE-Graphics tool.
-* `f2c <http://www.netlib.org/f2c>`_ Library for interfacing between Fortran and C (**Not required for most compilers**)
+* `HDF4 Library <http://www.hdfgroup.org/products/hdf4>`_, if compiling the MODIS-Regrid or lidar2nc tool.
+* `HDF-EOS2 Library <http://www.hdfgroup.org/hdfeos.html>`_, if compiling the MODIS-Regrid or lidar2nc tool.
+* `Cairo Library <http://cairographics.org/releases>`_, if compiling the MODE-Graphics tool.
+* `FreeType Library <http://www.freetype.org/download.html>`_ , if compiling the MODE-Graphics tool.
+* `f2c Library <http://www.netlib.org/f2c>`_ for interfacing between Fortran and C (**Not required for most compilers**)
 
 Users can take advantage of the :ref:`compile_script_install` to download and install all of the libraries automatically, both required and conditionally required.
 
@@ -390,7 +390,7 @@ Compiling the BUFRLIB using the Intel icc and ifort compilers consists of the fo
 
 In the directions above, the static library file that is created will be named libbufr.a. MET will check for the library file named libbufr.a, however in some cases (e.g. where the BUFRLIB is already available on a system) the library file may be named differently (e.g. libbufr_v11.3.0_4_64.a). If the library is named anything other than libbufr.a, users will need to tell MET what library to link with by passing the BUFRLIB_NAME option to MET when running configure (e.g. BUFRLIB_NAME=-lbufr_v11.3.0_4_64).
 
-2. Unidata's NetCDF libraries are used by several tools within MET for writing output NetCDF files. Both `NetCDF-C and NetCDF-CXX <https://www.unidata.ucar.edu/downloads/netcdf/>`_ are required. The same family of compilers used to build NetCDF should be used when building MET. Users may also find some utilities built for NetCDF such as ncdump and ncview useful for viewing the contents of NetCDF files. Support for NetCDF version 4 requires `HDF5 <https://portal.hdfgroup.org/display/HDF5/HDF5>`_.
+2. Unidata's NetCDF libraries are used by several tools within MET for writing output NetCDF files. Both `NetCDF-C and NetCDF-CXX <https://www.unidata.ucar.edu/downloads/netcdf/>`_ are required. The same family of compilers used to build NetCDF should be used when building MET. Users may also find some utilities built for NetCDF such as ncdump and ncview useful for viewing the contents of NetCDF files. Support for `NetCDF version 4 requires HDF5 <https://portal.hdfgroup.org/display/HDF5/HDF5>`_.
 
 3. The GNU Scientific Library (GSL) is used by MET for random sampling and normal and binomial distribution computations when estimating confidence intervals. Precompiled binary packages are available for most GNU/Linux distributions and may be installed with root access. When installing GSL from a precompiled package on Debian Linux, the developer's version of GSL must be used; otherwise, use the GSL version available from the `GNU GSL website <http://www.gnu.org/software/gsl/>`_. MET requires access to the GSL source headers and library archive file at build time. 
 
