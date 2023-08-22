@@ -38,7 +38,7 @@ export MET_PYTHON_CC=`python3-config --cflags`
 # cores to use (as an integer) or to simply "-j" to use all available cores.
 export MAKE_ARGS=-j
 
-# If you've already use the script to compiled these libaries and don't need to
+# If you've already used the script to compile these libaries and don't need to
 # compile them again, please comment out the export statements with a "#" symbol
 # in front. If you have these installed in a location other than ${EXTERNAL_LIBS},
 # you can provide the appropriate path below and uncomment the line.
@@ -56,10 +56,10 @@ export MAKE_ARGS=-j
 #export MET_NETCDF=${EXTERNAL_LIBS}
 
 # The optional libraries HDF4, HDFEOS, FREETYPE, and CAIRO are used for the
-# following, not widely used tools, MODIS-Regrid, lidar2nc, and MODE Graphics.
+# following, not widely used tools: MODIS-Regrid, lidar2nc, and MODE Graphics.
 # To enable the compilation of these libraries, set the compilation flags for
 # the library (e.g. COMPILE_HDF, COMPILE_HDFEOS, COMPILE_CAIRO,
 # COMPILE_FREETYPE) to any value in the environment config file. If these
 # libraries have already been installed and don't need to be reinstalled, set 
 # MET_HDF, MET_HDFEOS, MET_FREETYPEINC, MET_FREETYPELIB, MET_CAIROINC,
-# and MET_CAIROLIB
+# and MET_CAIROLIB to their installed locations
