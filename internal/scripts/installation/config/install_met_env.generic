@@ -21,7 +21,7 @@ export MET_SUBDIR=${TEST_BASE}
 export MET_TARBALL=v12.0.0.tar.gz
 
 # Required
-# Specifiy if machine useds modules for loading software
+# Specify if machine useds modules for loading software
 export USE_MODULES=FALSE
 
 # Root directory of your python install, containing the bin, include, lib, and share directories
