@@ -12,7 +12,7 @@ This section is meant to provide guidance on installing MET. It assumes a beginn
 There are multiple supported methods for installing MET: using a provided compilation script, Docker instances, and Apptainer/Singularity instances. All of these methods will be described below. 
 The recommended method is :ref:`compile_script_install` .
 
-.. required_external_libraries_to_build_MET:
+.. _required_external_libraries_to_build_MET:
 
 Required External Libraries To Build MET
 ========================================
@@ -168,7 +168,7 @@ IF THE USER WANTS TO HAVE THE COMPILATION SCRIPT DOWNLOAD THE LIBRARY DEPENDENCI
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The **compile_MET_all.sh** script will compile and install MET and its required external 
-library dependencies required_external_libraries_to_build_MET 
+library dependencies
 :ref:`required_external_libraries_to_build_MET`, if needed. 
 Note that if these libraries are already installed somewhere on the system, 
 MET will call and use the libraries that were installed by the script. 
