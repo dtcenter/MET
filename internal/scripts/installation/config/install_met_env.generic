@@ -62,4 +62,4 @@ export MAKE_ARGS=-j
 # COMPILE_FREETYPE) to any value in the environment config file. If these
 # libraries have already been installed and don't need to be reinstalled, set 
 # MET_HDF, MET_HDFEOS, MET_FREETYPEINC, MET_FREETYPELIB, MET_CAIROINC,
-# and MET_CAIROLIB to their installed locations
+# and MET_CAIROLIB to their installed locations.
