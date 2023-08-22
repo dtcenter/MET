@@ -144,8 +144,6 @@ The NCEP verification regions that are implemented in MET as lat/lon polylines a
 
 * NPL.poly for the Northern Plains
 
-* NPO.poly for the Northern Pacific Ocean
-
 * NSA.poly for Northern South America
 
 * NWC.poly for Northern West Coast
@@ -161,8 +159,6 @@ The NCEP verification regions that are implemented in MET as lat/lon polylines a
 * SMT.poly for the Southern Mountain Region
 
 * SPL.poly for the Southern Plains
-
-* SPO.poly for the Southern Pacific Ocean
 
 * SWC.poly for the Southern West Coast
 

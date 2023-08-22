@@ -2186,6 +2186,34 @@ void ModeExecutive::write_ct_stats()
       // ODDS
       v = cts[i].odds();
       cts_at.set_entry(i+1, c++, v);
+
+      // LODDS
+      v = cts[i].lodds();
+      cts_at.set_entry(i+1, c++, v);
+
+      // ORSS
+      v = cts[i].orss();
+      cts_at.set_entry(i+1, c++, v);
+
+      // EDS
+      v = cts[i].eds();
+      cts_at.set_entry(i+1, c++, v);
+
+      // SEDS
+      v = cts[i].seds();
+      cts_at.set_entry(i+1, c++, v);
+
+      // EDI
+      v = cts[i].edi();
+      cts_at.set_entry(i+1, c++, v);
+
+      // SEDI
+      v = cts[i].sedi();
+      cts_at.set_entry(i+1, c++, v);
+
+      // BAGSS
+      v = cts[i].bagss();
+      cts_at.set_entry(i+1, c++, v);
    }
 
    //
