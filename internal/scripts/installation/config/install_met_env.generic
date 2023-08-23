@@ -38,10 +38,11 @@ export MET_PYTHON_CC=`python3-config --cflags`
 # cores to use (as an integer) or to simply "-j" to use all available cores.
 export MAKE_ARGS=-j
 
-# If you've already used the script to compile these libaries and don't need to
-# compile them again, please comment out the export statements with a "#" symbol
-# in front. If you have these installed in a location other than ${EXTERNAL_LIBS},
-# you can provide the appropriate path below and uncomment the line.
+# If users have already installed these libraries and would like to make use of
+# them, uncomment out the export statements. If those pre-existing libraries are
+# in the external_libs directory, no further edits are needed; however, users
+# that have the pre-existing libraries not in the external_libs directory will
+# need to update the paths to the appropriate location.
 #export EXTERNAL_LIBS=${TEST_BASE}/external_libs
 #export MET_GSL=${EXTERNAL_LIBS}
 #export MET_BUFRLIB=${EXTERNAL_LIBS}/lib
