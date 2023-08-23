@@ -7,6 +7,7 @@
 # tools
 #
 # last revised: 2016-09-17 for MET version 6.0
+# last revised: 2023-08-22 for MET version 12.0
 #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
@@ -38,7 +39,7 @@ my @fld_pairs = qw(N_VALID GRID_RES OBJECT_ID OBJECT_CAT CENTROID_DIST BOUNDARY_
                    CURVATURE_RATIO COMPLEXITY_RATIO PERCENTILE_INTENSITY_RATIO INTEREST);
 
 my @fld_ctss  = qw(N_VALID GRID_RES FIELD TOTAL FY_OY FY_ON FN_OY FN_ON BASER FMEAN ACC FBIAS PODY PODN POFD FAR
-                   CSI GSS HK HSS ODDS);
+                   CSI GSS HK HSS ODDS LODDS ORSS EDS SEDS EDI SEDI BAGSS);
 
 my $fmt_hdr =
       "%-8s"  . # VERSION
@@ -133,7 +134,14 @@ my $fmt_cts =
       "%12s"  . # GSS
       "%12s"  . # HK
       "%12s"  . # HSS
-      "%12s";   # ODDS
+      "%12s"  . # ODDS
+      "%12s"  . # LODDS
+      "%12s"  . # ORSS
+      "%12s"  . # EDS
+      "%12s"  . # SEDS
+      "%12s"  . # EDI
+      "%12s"  . # SEDI
+      "%12s";   # BAGSS
 
 
 if( 1 > @ARGV && 2 < @ARGV ){ die "ERROR: unexpected number of arguments\n\n" . usage() }
@@ -202,7 +210,7 @@ while(<$fh_mode_in>){
   # write a cts line
   my $fmt_val;
   if( $type eq "c" ){
-    push @outs, (" MODE_CTS ", @vals[2,3,22 .. 40]);
+    push @outs, (" MODE_CTS ", @vals[2,3,22 .. 47]);
     $fmt_val = $fmt_cts;
   }
 
@@ -307,3 +315,11 @@ close($fh_mode_in);
 # 38 - HK
 # 39 - HSS
 # 40 - ODDS
+# 41 - LODDS
+# 42 - ORSS
+# 43 - EDS
+# 44 - SEDS
+# 45 - EDI
+# 46 - SEDI
+# 47 - BAGSS
+
