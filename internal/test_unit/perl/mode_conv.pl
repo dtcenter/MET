@@ -210,6 +210,10 @@ while(<$fh_mode_in>){
   # write a cts line
   my $fmt_val;
   if( $type eq "c" ){
+    # pad with bad data, if needed
+    if( @vals < 48 ){
+      push @vals, (-9999) x (48 - @vals);
+    }
     push @outs, (" MODE_CTS ", @vals[2,3,22 .. 47]);
     $fmt_val = $fmt_cts;
   }
