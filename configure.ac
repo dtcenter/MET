@@ -16,6 +16,43 @@ CPPFLAGS="${CPPFLAGS} ${OPENMP_CFLAGS}"
 LDFLAGS="${LDFLAGS} ${OPENMP_CFLAGS}"
 
 #
+# Look for the Proj library
+#
+
+# Configure the variables.  The help text will appear if the user uses "configure --help".
+
+AC_ARG_VAR([MET_PROJ], [Where proj lib and include subdirectories are located.  If they are installed in /usr/local, you don't have to specify them.])
+AC_ARG_VAR([MET_PROJINC], [Where proj include files are located. Use if the libraries and include files are not under the same main proj directory.  If used, MET_PROJLIB must also be defined and MET_PROJ will be ignored.])
+AC_ARG_VAR([MET_PROJLIB], [Where proj libraries are located. Use if the libraries and include files are not under the same main proj directory.  If used, MET_PROJINC must also be defined and MET_PROJ will be ignored.])
+
+# Ensure that both or neither are specified.
+
+if (test -n "$MET_PROJLIB" && test -z "$MET_PROJINC") || \
+   (test -n "$MET_PROJINC" && test -z "$MET_PROJLIB"); then
+  if test -n "$MET_PROJLIB"; then
+    AC_MSG_ERROR([MET_PROJLIB environment variable set, but MET_PROJINC not set.  If one of these variables is set, then both must be set.])
+  else
+    AC_MSG_ERROR([MET_PROJINC environment variable set, but MET_PROJLIB not set.  If one of these variables is set, then both must be set.])
+  fi
+fi
+
+# If the individual locations weren't specified, then the main Proj directory
+# must be specified.  If it isn't, let the user know they need to supply one.
+
+if test -z "$MET_PROJLIB" && test -n "$MET_PROJ"; then
+   MET_PROJINC='${MET_PROJ}/include'
+   MET_PROJLIB='${MET_PROJ}/lib'
+fi
+
+# AC_SUBST command line variables.  If we get here, the Proj 
+# libraries were found so no need to check
+
+if test -n "$MET_PROJLIB"; then
+   CPPFLAGS="${CPPFLAGS} -I${MET_PROJINC}"
+   LDFLAGS="${LDFLAGS} -L${MET_PROJLIB}"
+fi
+
+#
 # Look for the NetCDF library
 #
 
@@ -44,34 +81,7 @@ if test -z "$MET_NETCDFLIB" && test -n "$MET_NETCDF"; then
    MET_NETCDFLIB='${MET_NETCDF}/lib'
 fi
 
-# We don't currently look for the NetCDF libraries in "known"
-# locations.  If we want to, this example code might be
-# helpful.
-## Not specified? Check for FTK in standard places.
-#if test -z "$FTKLIB"; then
-#  # Check for flaim tool kit as a sub-project.
-#  if test -d "$srcdir/ftk"; then
-#    AC_CONFIG_SUBDIRS([ftk])
-#    FTKINC='$(top_srcdir)/ftk/src'
-#    FTKLIB='$(top_builddir)/ftk/src'
-#  else
-#    # Check for flaim tool kit as a super-project.
-#    if test -d "$srcdir/../ftk"; then
-#      FTKINC='$(top_srcdir)/../ftk/src'
-#      FTKLIB='$(top_builddir)/../ftk/src'
-#    fi
-#  fi
-#fi
-#
-## Still empty? Check for installed flaim tool kit.
-#if test -z "$FTKLIB"; then
-#  AC_CHECK_LIB([flaimtk], [ftkFastChecksum],
-#    [AC_CHECK_HEADERS([flaimtk.h])
-#     LIBS="-lflaimtk $LIBS"],
-#    [AC_MSG_ERROR([No FLAIM Took Kit found.])])
-#fi
-
-# AC_SUBST command line variables.  If we get here, the NetCDF
+# AC_SUBST command line variables.  If we get here, the NetCDF 
 # libraries were found so no need to check
 
 if test -n "$MET_NETCDFLIB"; then
