@@ -44,6 +44,8 @@ The following libraries are conditionally required, depending on your intended v
 Users can take advantage of the :ref:`compile_script_install` to download and install all of the
 libraries automatically, both required and conditionally required.
 
+.. _suggested_external_utiliites:
+
 Suggested External Utilities
 ============================
 
@@ -345,6 +347,8 @@ Instructions for  obtaining that image are in the
 Using Apptainer
 ===============
 
+
+.. _met_directory_structure:
 
 MET Directory Structure
 =======================
