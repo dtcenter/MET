@@ -27,7 +27,7 @@ MET is dependent on several external libraries to function properly. The require
 
 The following libraries are conditionally required, depending on your intended verification use and compiler language:
 
-* `HDF4 Library <http://www.hdfgroup.org/products/hdf4>`_, if compiling the MODIS-Regrid or lidar2nc tool.
+* `HDF4 <http://www.hdfgroup.org/products/hdf4>`__, Library if compiling the MODIS-Regrid or lidar2nc tool.
 * `HDF-EOS2 Library <http://www.hdfgroup.org/hdfeos.html>`_, if compiling the MODIS-Regrid or lidar2nc tool.
 * `Cairo Library <http://cairographics.org/releases>`_, if compiling the MODE-Graphics tool.
 * `FreeType Library <http://www.freetype.org/download.html>`_ , if compiling the MODE-Graphics tool.
@@ -396,7 +396,7 @@ In the directions above, the static library file that is created will be named l
 
 4. For users wishing to compile MET with GRIB2 file support, `NCEP's GRIB2 Library <http://www.nco.ncep.noaa.gov/pmb/codes/GRIB2>`_ in C (g2clib) must be installed, along with jasperlib, libpng, and zlib. **Please note that compiling the GRIB2C library with the -D__64BIT__ option requires that MET also be configured with CFLAGS="-D__64BIT__". Compiling MET and the GRIB2C library inconsistently may result in a segmentation fault or an "out of memory" error when reading GRIB2 files.** MET looks for the GRIB2C library to be named libgrib2c.a, which may be set in the GRIB2C makefile as LIB=libgrib2c.a. However in some cases, the library file may be named differently (e.g. libg2c_v1.6.0.a). If the library is named anything other than libgrib2c.a, users will need to tell MET what library to link with by passing the GRIB2CLIB_NAME option to MET when running configure (e.g. GRIB2CLIB_NAME=-lg2c_v1.6.0).
 
-5. Users wishing to compile MODIS-regrid and/or lidar2nc will need to install both the `HDF4 <https://portal.hdfgroup.org/display/HDF4/HDF4>`_ and `HDF-EOS2 <http://hdfeos.org/>`_ libraries available from the HDF group websites linked here.
+5. Users wishing to compile MODIS-regrid and/or lidar2nc will need to install both the `HDF4 <https://portal.hdfgroup.org/display/HDF4/HDF4>`__ and `HDF-EOS2 <http://hdfeos.org/>`_ libraries available from the HDF group websites linked here.
 
 6. The MODE-Graphics utility requires `Cairo <http://cairographics.org/releases>`_ and `FreeType <http://www.freetype.org/download.html>`_. Thus, users who wish to compile this utility must install both libraries. In addition, users will need to download the `Ghostscript font data <http://sourceforge.net/projects/gs-fonts>`_ required at runtime.
 
