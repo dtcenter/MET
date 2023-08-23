@@ -163,8 +163,8 @@ is only required if **USE_MODULES** = TRUE. To set properly, list the Python mod
 followed by an underscore and version number. For example, setting PYTHON_MODULE=python_3.10.4 
 will cause the script to  run "module load python/3.10.4".
 
-REQUIRED IF COMPILING PYTHON EMBEDDING:
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+REQUIRED IF COMPILING PYTHON EMBEDDING
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **MET_PYTHON** – Format is directory path (e.g. */usr/local/python3*). This is the location
 containing the bin, include, lib, and share directories for Python.
