@@ -21,17 +21,17 @@ MET is dependent on several external libraries to function properly. The require
 
 * `BUFRLIB <https://emc.ncep.noaa.gov/emc/pages/infrastructure/bufrlib.php>`_ for reading PrepBufr Observation files
 * `NetCDF4 <http://www.unidata.ucar.edu/software/netcdf>`_ in C and CXX, for intermediate and output file formats
-* `HDF5 <https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.12/hdf5-1.12.2/src/hdf5-1.12.2.tar.gz>`_ is required to support NetCDF 4. HDF5 should be built with `zlib <http://www.zlib.net/>`_.
+* `HDF5 <https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.12/hdf5-1.12.2/src/hdf5-1.12.2.tar.gz>`__ is required to support NetCDF 4. HDF5 should be built with `zlib <http://www.zlib.net/>`_.
 * `GSL <http://www.gnu.org/software/gsl>`_ GNU Scientific Library Developer's Version for computing confidence intervals (use **GSL-1.11** for **PGI** compilers)
 * `GRIB2C <http://www.nco.ncep.noaa.gov/pmb/codes/GRIB2>`_ Library (with dependencies Z, PNG, JASPER), if compiling GRIB2 support.
 
 The following libraries are conditionally required, depending on your intended verification use and compiler language:
 
 * `HDF4 <http://www.hdfgroup.org/products/hdf4>`__, Library if compiling the MODIS-Regrid or lidar2nc tool.
-* `HDF-EOS2 Library <http://www.hdfgroup.org/hdfeos.html>`_, if compiling the MODIS-Regrid or lidar2nc tool.
-* `Cairo Library <http://cairographics.org/releases>`_, if compiling the MODE-Graphics tool.
-* `FreeType Library <http://www.freetype.org/download.html>`_ , if compiling the MODE-Graphics tool.
-* `f2c Library <http://www.netlib.org/f2c>`_ for interfacing between Fortran and C (**Not required for most compilers**)
+* `HDF-EOS2 <http://www.hdfgroup.org/hdfeos.html>`__, Library if compiling the MODIS-Regrid or lidar2nc tool.
+* `Cairo <http://cairographics.org/releases>`_, Library if compiling the MODE-Graphics tool.
+* `FreeType <http://www.freetype.org/download.html>`_ , Library if compiling the MODE-Graphics tool.
+* `f2c <http://www.netlib.org/f2c>`_ Library for interfacing between Fortran and C (**Not required for most compilers**)
 
 Users can take advantage of the :ref:`compile_script_install` to download and install all of the libraries automatically, both required and conditionally required.
 
@@ -341,7 +341,7 @@ Three external libraries are required for compiling/building MET and should be d
 
 1. NCEP's BUFRLIB is used by MET to decode point-based observation datasets in PrepBUFR format. BUFRLIB is distributed and supported by NCEP and is freely available for download from `NCEP's BUFRLIB website <https://emc.ncep.noaa.gov/emc/pages/infrastructure/bufrlib.php>`_. BUFRLIB requires C and Fortran-90 compilers that should be from the same family of compilers used when building MET.
 
-2. Several tools within MET use Unidata's NetCDF libraries for writing output NetCDF files. NetCDF libraries are distributed and supported by Unidata and are freely available for download from `Unidata's NetCDF website <http://www.unidata.ucar.edu/software/netcdf>`_. The same family of compilers used to build NetCDF should be used when building MET. MET is now compatible with the enhanced data model provided in NetCDF version 4. The support for NetCDF version 4 requires NetCDF-C, NetCDF-CXX, and HDF5, which is freely available for download on the `HDF5 webpage <https://support.hdfgroup.org/HDF5/>`_.
+2. Several tools within MET use Unidata's NetCDF libraries for writing output NetCDF files. NetCDF libraries are distributed and supported by Unidata and are freely available for download from `Unidata's NetCDF website <http://www.unidata.ucar.edu/software/netcdf>`_. The same family of compilers used to build NetCDF should be used when building MET. MET is now compatible with the enhanced data model provided in NetCDF version 4. The support for NetCDF version 4 requires NetCDF-C, NetCDF-CXX, and HDF5, which is freely available for download on `HDF5 <https://support.hdfgroup.org/HDF5/>`__.
 
 3. The GNU Scientific Library (GSL) is used by MET when computing confidence intervals. GSL is distributed and supported by the GNU Software Foundation and is freely available for download from the `GNU website <http://www.gnu.org/software/gsl>`_. 
 
@@ -390,13 +390,13 @@ Compiling the BUFRLIB using the Intel icc and ifort compilers consists of the fo
 
 In the directions above, the static library file that is created will be named libbufr.a. MET will check for the library file named libbufr.a, however in some cases (e.g. where the BUFRLIB is already available on a system) the library file may be named differently (e.g. libbufr_v11.3.0_4_64.a). If the library is named anything other than libbufr.a, users will need to tell MET what library to link with by passing the BUFRLIB_NAME option to MET when running configure (e.g. BUFRLIB_NAME=-lbufr_v11.3.0_4_64).
 
-2. Unidata's NetCDF libraries are used by several tools within MET for writing output NetCDF files. Both `NetCDF-C and NetCDF-CXX <https://www.unidata.ucar.edu/downloads/netcdf/>`_ are required. The same family of compilers used to build NetCDF should be used when building MET. Users may also find some utilities built for NetCDF such as ncdump and ncview useful for viewing the contents of NetCDF files. Support for `NetCDF version 4 requires HDF5 <https://portal.hdfgroup.org/display/HDF5/HDF5>`_.
+2. Unidata's NetCDF libraries are used by several tools within MET for writing output NetCDF files. Both `NetCDF-C and NetCDF-CXX <https://www.unidata.ucar.edu/downloads/netcdf/>`_ are required. The same family of compilers used to build NetCDF should be used when building MET. Users may also find some utilities built for NetCDF such as ncdump and ncview useful for viewing the contents of NetCDF files. Support for `NetCDF version 4 requires HDF5 <https://portal.hdfgroup.org/display/HDF5/HDF5>`__.
 
 3. The GNU Scientific Library (GSL) is used by MET for random sampling and normal and binomial distribution computations when estimating confidence intervals. Precompiled binary packages are available for most GNU/Linux distributions and may be installed with root access. When installing GSL from a precompiled package on Debian Linux, the developer's version of GSL must be used; otherwise, use the GSL version available from the `GNU GSL website <http://www.gnu.org/software/gsl/>`_. MET requires access to the GSL source headers and library archive file at build time. 
 
 4. For users wishing to compile MET with GRIB2 file support, `NCEP's GRIB2 Library <http://www.nco.ncep.noaa.gov/pmb/codes/GRIB2>`_ in C (g2clib) must be installed, along with jasperlib, libpng, and zlib. **Please note that compiling the GRIB2C library with the -D__64BIT__ option requires that MET also be configured with CFLAGS="-D__64BIT__". Compiling MET and the GRIB2C library inconsistently may result in a segmentation fault or an "out of memory" error when reading GRIB2 files.** MET looks for the GRIB2C library to be named libgrib2c.a, which may be set in the GRIB2C makefile as LIB=libgrib2c.a. However in some cases, the library file may be named differently (e.g. libg2c_v1.6.0.a). If the library is named anything other than libgrib2c.a, users will need to tell MET what library to link with by passing the GRIB2CLIB_NAME option to MET when running configure (e.g. GRIB2CLIB_NAME=-lg2c_v1.6.0).
 
-5. Users wishing to compile MODIS-regrid and/or lidar2nc will need to install both the `HDF4 <https://portal.hdfgroup.org/display/HDF4/HDF4>`__ and `HDF-EOS2 <http://hdfeos.org/>`_ libraries available from the HDF group websites linked here.
+5. Users wishing to compile MODIS-regrid and/or lidar2nc will need to install both the `HDF4 <https://portal.hdfgroup.org/display/HDF4/HDF4>`__ and `HDF-EOS2 <http://hdfeos.org/>`__ libraries available from the HDF group websites linked here.
 
 6. The MODE-Graphics utility requires `Cairo <http://cairographics.org/releases>`_ and `FreeType <http://www.freetype.org/download.html>`_. Thus, users who wish to compile this utility must install both libraries. In addition, users will need to download the `Ghostscript font data <http://sourceforge.net/projects/gs-fonts>`_ required at runtime.
 
