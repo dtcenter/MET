@@ -406,6 +406,8 @@ Then simply enter a shell within the instance that was just created using a comm
 
   singularity shell instance://met-X.Y.Z
 
+.. _met_directory_structure:
+
 MET Directory Structure
 =======================
 
