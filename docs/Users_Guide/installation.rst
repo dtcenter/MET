@@ -33,7 +33,7 @@ The required libraries are listed below:
 * `GSL <http://www.gnu.org/software/gsl>`_ GNU Scientific Library Developer's Version for computing confidence intervals (use **GSL-1.11** for **PGI** compilers)
 * `GRIB2C <http://www.nco.ncep.noaa.gov/pmb/codes/GRIB2>`_ Library (with dependencies Z, PNG, JASPER), if compiling GRIB2 support.
 
-The following libraries are conditionally required, depending on your intended verification use and compiler language:
+The following libraries are conditionally required, depending on the intended verification use and compiler language:
 
 * `HDF4 <http://www.hdfgroup.org/products/hdf4>`__ library if compiling the MODIS-Regrid or lidar2nc tool.
 * `HDF-EOS2 <http://www.hdfgroup.org/hdfeos.html>`__ library if compiling the MODIS-Regrid or lidar2nc tool.
@@ -72,17 +72,19 @@ MET itself. A separate command will be used to pull down the latest version of
 MET in .tgz (tarred and gzipped) format from GitHub, which the script will then
 install.
 
-To begin, create and change to a directory where you want to install the latest
-version of MET. Next, download the **compile_MET_all.sh** script and **tar_files.tgz**
+To begin, create and change to a directory where the latest version of MET should be
+installed. Next, download the **compile_MET_all.sh** script and **tar_files.tgz**
 and place both of these in the new directory. These files are available either
 through using the hyperlinks provided or by entering the following commands in
 the terminal while in the directory MET will be installed in:
 
 .. code-block:: ini
 
-  wget https://raw.githubusercontent.com/dtcenter/MET/main_v11.1/internal/scripts/installation/compile_MET_all.sh
+  wget https://raw.githubusercontent.com/dtcenter/MET/main_vX.Y/internal/scripts/installation/compile_MET_all.sh
   wget https://dtcenter.ucar.edu/dfiles/code/METplus/MET/installation/tar_files.tgz
 
+where the X and Y in the first wget command are replaced with the major and minor
+version of the software (e.g. change main_vX.Y to main_v12.0).
 
 The tar files will need to be extracted in the MET installation directory:
 
@@ -103,15 +105,19 @@ Now change directories to the one that was created from expanding the tar files:
   cd tar_files
 
 The next step will be to identify and download the latest MET release as a
-tar file (e.g. v11.1.0.tar.gz) and place it in the tar_files directory. The
-file is available from the **RECOMMENDED - COMPONENTS** MET section of the
+tar file (e.g. v12.0.0.tar.gz) and place it in
+the tar_files directory. The file is available from the
+**RECOMMENDED - COMPONENTS** MET section of the
 `METplus website <https://dtcenter.org/community-code/metplus/download>`_ or
 by using a wget command while in the *tar_files* directory:
 
 .. code-block:: ini
 
-  wget https://github.com/dtcenter/MET/archive/refs/tags/v11.1.0.tar.gz
+  wget https://github.com/dtcenter/MET/archive/refs/tags/vX.Y.Z.tar.gz
 
+where X, Y, and Z are replaced with the major version, minor version,
+and bugfix version, respectively (e.g. change vX.Y.X.tar.gz to
+v12.0.0.tar.gz).
 
 .. _Install_Required-libraries-and:
 
@@ -129,18 +135,18 @@ An easy way to set these environment variables is in an environment
 configuration file  (for example, install_met_env.<machine_name>). An
 example environment configuration file to start with (**install_met_env.generic**),
 as well as environment configuration files used on HPCs at NCAR and NOAA,
-can be found in the MET GitHub repository in the 
-`scripts/installation/config <https://github.com/dtcenter/MET/tree/main_v11.1/internal/scripts/installation/config>`_
-directory.
+can be found in the `MET GitHub repository <https://github.com/dtcenter/MET>`_ in the 
+*internal/scripts/installation/config* directory.
 
 Environment Variable Descriptions
 ---------------------------------
 
-REQUIRED
-^^^^^^^^
+**REQUIRED**
 
-**TEST_BASE** – Format is */d1/met/11.1.0*. This is the MET installation directory that was 
-created in the first step, and contains **compile_MET_all.sh** script, **tar_files.tgz**, 
+**TEST_BASE** – Format is */d1/met/X.Y.X*, where X, Y, and Z are replaced with the
+major version, minor version, and bugfix version, respectively (e.g. */d1/met/12.0.0*).
+This is the MET installation directory that was created in the first step,
+and contains **compile_MET_all.sh** script, **tar_files.tgz**, 
 and the *tar_files* directory from the untar command.
 
 **COMPILER** – Format is compiler_version (e.g. gnu_8.3.0). For the GNU family of compilers, 
@@ -148,11 +154,14 @@ use “gnu”; for the Intel family of compilers, use “intel”, “ics”, �
 depending on the system. In the past, support was provided for the PGI family of compilers 
 through “pgi”. However, this compiler option is no longer actively tested. 
 
-**MET_SUBDIR** – Format is */d1/met/11.1.0*. This is the location where the top-level 
-MET subdirectory will be installed and is often set equivalent to **TEST_BASE**
-(e.g. ${TEST_BASE}).
+**MET_SUBDIR** – Format is */d1/met/X.Y.X*, where X, Y, and Z are replaced with the
+major version, minor version, and bugfix version, respectively (e.g. */d1/met/12.0.0*).
+This is the location where the top-level MET subdirectory will be installed and is
+often set equivalent to **TEST_BASE** (e.g. ${TEST_BASE}).
 
-**MET_TARBALL** – Format is vX.Y.Z.tar.gz. This is the name of the downloaded MET tarball.
+**MET_TARBALL** – Format is vX.Y.Z.tar.gz, where X, Y, and Z are replaced with the
+major version, minor version, and bugfix version, respectively. This is the name of
+the downloaded MET tarball.
 
 **USE_MODULES** – Format is TRUE or FALSE. Set to FALSE if using a machine that does not use 
 modulefiles; set to TRUE if using a machine that does use modulefiles. For more information on 
@@ -163,8 +172,8 @@ is only required if **USE_MODULES** = TRUE. To set properly, list the Python mod
 followed by an underscore and version number. For example, setting PYTHON_MODULE=python_3.10.4 
 will cause the script to  run "module load python/3.10.4".
 
-REQUIRED IF COMPILING PYTHON EMBEDDING
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**REQUIRED, IF COMPILING PYTHON EMBEDDING**
 
 **MET_PYTHON** – Format is directory path (e.g. */usr/local/python3*). This is the location
 containing the bin, include, lib, and share directories for Python.
@@ -184,8 +193,8 @@ a user can provide the value in quotations
 This information may be obtained by running :code:`python3-config --ldflags --embed`; however,
 this command can, on certain systems, provide too much information.
 
-OPTIONAL:
-^^^^^^^^^
+
+**OPTIONAL**
 
 **export MAKE_ARGS=-j #** – If there is a need to install external libraries, or to attempt 
 to speed up the MET compilation process, this environmental setting can be added to the 
@@ -196,8 +205,7 @@ start as many processes in parallel as possible.
 External Library Handling in compile_MET_all.sh
 -----------------------------------------------
 
-IF THE USER WANTS TO HAVE THE COMPILATION SCRIPT DOWNLOAD THE LIBRARY DEPENDENCIES
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**HAVING THE COMPILATION SCRIPT DOWNLOAD THE LIBRARY DEPENDENCIES**
 
 The **compile_MET_all.sh** script will compile and install MET and its required external 
 library dependencies
@@ -205,8 +213,8 @@ library dependencies
 Note that if these libraries are already installed somewhere on the system, 
 MET will call and use the libraries that were installed by the script. 
 
-IF THE USER ALREADY HAS THE LIBRARY DEPENDENCIES INSTALLED
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**IF THE LIBRARY DEPENDENCIES ARE ALREADY INSTALLED**
 
 If the required external library dependencies have already been installed and don’t 
 need to be reinstalled, or if compiling MET on a machine that uses modulefiles and 
@@ -232,8 +240,8 @@ library and include files for an external library are installed in separate loca
 In this case, both environment variables must be specified and the associated 
 $MET_<lib> variable will be ignored.
 
-FINAL NOTE ON EXTERNAL LIBRARIES
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**FINAL NOTE ON EXTERNAL LIBRARIES**
 
 For users wishing to run the Plot-MODE-Field tool, the Ghostscript font data must be 
 downloaded into the **TEST_BASE** directory and set the **MET_FONT_DIR** environment variable 
@@ -274,8 +282,8 @@ Users are welcome to post any questions they might have that have not been asked
 Finally, consider one of the remaining installation methods for MET, 
 as these may prove more successful.
 
-Using Docker for Running MET
-----------------------------
+Using Docker
+============
 
 Docker is a system that seeks to eliminate some of the complexities associated with 
 downloading various software and any library dependencies it might have by allowing 
@@ -289,41 +297,45 @@ MET has numerous version images for Docker users and continues to be released as
 images at the same interval as system releases. While the advantages of Docker can 
 make it an appealing installation route for first time users, it does require 
 privileged user access that will result in an unsuccessful installation if not 
-available. You should ensure that you have high system access (e.g. admin access) 
+available. Ensure the highest system access (e.g. admin access) is available to the user
 before attempting this method.
 
 Installing Docker
 -----------------
 
-To begin, you will need to download and install the correct version of Docker 
-for your system. The 
+To begin, the user will need to download and install the correct version of Docker 
+for the system. The 
 `Docker installation webpage <https://www.docker.com/>`_ should detect what 
-system you are using to access the webpage and auto select the appropriate version. 
-If you require a different version, select the correct version from the dropdown option. 
+system is being used to access the webpage and auto select the appropriate version. 
+If the user requires a different version, select the correct version from the dropdown option. 
 Follow Docker’s instructions for a successful installation.
 
 Loading the Latest Docker Image
 -------------------------------
 
-Once you have confirmed your installation of Docker was successful, 
-all you need to run MET is to download the latest image of MET in Docker. 
-To accomplish that, use the pull command:
+Once the user has confirmed the Docker installation was successful, 
+all the user needs to do is to run MET is to download the latest
+image of MET in Docker. To accomplish that, use the pull command:
 
 .. code-block:: ini
 
   docker pull dtcenter/met
 
 which will automatically pull the latest Docker image of MET. 
-If you encounter an error, try adding the latest version number, for example:
+If the user encounters an error, try adding the latest version
+number, for example:
 
 .. code-block:: ini
 
-  docker pull dtcenter/met:11.1.0
+  docker pull dtcenter/met:X.Y.Z
+
+where X, Y, and Z are replaced with the major version, minor version, and
+bugfix version, respectively (e.g. *docker pull dtcenter/met:12.0.0*).
 
 Running the Docker version
 --------------------------
 
-All that’s left to do is launch a shell in the Docker container. 
+All that is left to do is launch a shell in the Docker container. 
 This is accomplished with the command:
 
 .. code-block:: ini
@@ -331,17 +343,22 @@ This is accomplished with the command:
   docker run -it --rm dtcenter/met /bin/bash
 
 Note that the --rm command was added to automatically remove the container created 
-from the image once you exit Docker. Simply remove this command if you’d like the 
+from the image once Docker exits. Simply remove this command for the 
 container to persist after exiting. If there is an error during this run command, 
-try adding the latest MET version number the same way you pulled the latest image of MET:
+try adding the latest MET version number the same way the latest image of MET
+was pulled:
 
 .. code-block:: ini
 
-  docker run -it --rm dtcenter/met:11.1.0 /bin/bash 
+  docker run -it --rm dtcenter/met:X.Y.Z /bin/bash 
 
-If you were successful with the Docker usage of MET, it is highly recommended to move on 
-to using the METplus wrappers of the tools, which have their own Docker image. 
-Instructions for  obtaining that image are in the 
+where X, Y, and Z are replaced with the major version, minor version,
+and bugfix version, respectively
+(e.g. *docker run -it --rm dtcenter/met:X.Y.Z /bin/bash*).
+  
+If the Docker usage of MET was successful, it is highly recommended to move on 
+to using the METplus wrappers of the tools, which has its own Docker image. 
+Instructions for obtaining that image are in the 
 `METplus Wrappers User's Guide <https://metplus.readthedocs.io/en/latest/Users_Guide/getting_started.html#metplus-in-docker>`_.
 
 Using Apptainer
