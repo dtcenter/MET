@@ -200,7 +200,7 @@ start as many processes in parallel as possible.
 External Library Handling in compile_MET_all.sh
 -----------------------------------------------
 
-**HAVING THE COMPILATION SCRIPT DOWNLOAD THE LIBRARY DEPENDENCIES**
+**Having the Compilation Script Download the Library Dependencies**
 
 The **compile_MET_all.sh** script will compile and install MET and its required external 
 library dependencies
@@ -209,7 +209,7 @@ Note that if these libraries are already installed somewhere on the system,
 MET will call and use the libraries that were installed by the script. 
 
 
-**IF THE LIBRARY DEPENDENCIES ARE ALREADY INSTALLED**
+**If the Library Dependencies Are Already Installed**
 
 If the required external library dependencies have already been installed and don’t 
 need to be reinstalled, or if compiling MET on a machine that uses modulefiles and 
@@ -235,7 +235,7 @@ library and include files for an external library are installed in separate loca
 In this case, both environment variables must be specified and the associated 
 $MET_<lib> variable will be ignored.
 
-**FINAL NOTE ON EXTERNAL LIBRARIES**
+**Final Note on External Libraries**
 
 For users wishing to run the Plot-MODE-Field tool, the Ghostscript font data must be 
 downloaded into the **TEST_BASE** directory and set the **MET_FONT_DIR** environment variable 
@@ -406,62 +406,3 @@ Then simply enter a shell within the instance that was just created using a comm
 
   singularity shell instance://met-X.Y.Z
 
-.. _met_directory_structure:
-
-MET Directory Structure
-=======================
-
-The top-level MET directory consists of Makefiles, configuration files,
-and several subdirectories. The top-level Makefile and configuration files
-control how the entire toolkit is built. 
-
-When MET has been successfully built and installed, the installation directory
-contains two subdirectories. The *bin/* directory contains executables for
-each module of MET as well as several plotting utilities. The *share/met/*
-directory contains many subdirectories with data required at runtime and a
-subdirectory of sample R scripts utilities. The *colortables/*, *map/*, and
-*ps/* subdirectories contain data used in creating PostScript plots for
-several MET tools. The *poly/* subdirectory contains predefined lat/lon
-polyline regions for use in selecting regions over which to verify. The
-polylines defined correspond to verification regions used by NCEP as described
-in :numref:`Appendix B, Section %s <appendixB>`. The *config/* directory
-contains default configuration files for the MET tools. The *python/*
-subdirectory contains python scripts. The *python/examples* subdirectory
-contains sample scripts used in Python embedding
-(:numref:`Appendix F, Section %s <appendixF>`). The *python/pyembed/*
-subdirectory contains code used in Python embedding
-(:numref:`Appendix F, Section %s <appendixF>`). The *table_files/* and
-*tc_data/* subdirectories contain GRIB table definitions and tropical
-cyclone data, respectively. The *Rscripts/* subdirectory contains a handful
-of plotting graphic utilities for MET-TC. These are the same Rscripts that
-reside under the top-level MET *scripts/Rscripts* directory, other than it
-is the installed location.
-
-The *data/* directory contains several configuration and static data files
-used by MET. The *sample_fcst/* and *sample_obs/* subdirectories contain
-sample data used by the test scripts provided in the *scripts/* directory. 
-
-The *docs/* directory contains the Sphinx documentation for MET.
-
-The *out/* directory will be populated with sample output from the test cases
-described in the next section. 
-
-The *src/* directory contains the source code for each of the tools in MET. 
-
-The *scripts/* directory contains test scripts that are run by make test after
-MET has been successfully built, and a directory of sample configuration files
-used in those tests located in the *scripts/config/* subdirectory. The output
-from the test scripts in this directory will be written to the *out/* directory.
-Users are encouraged to copy sample configuration files to another location and
-modify them for their own use.
-
-The *share/met/Rscripts* directory contains a handful of sample R scripts,
-including plot_tcmpr.R, which provides graphic utilities for MET-TC. For more
-information on the graphics capabilities, see :numref:`TC-Stat-tool-example` of
-this User's Guide.
-
-.. note::
-
-   The **-help** and **-version** command line options are available for
-   all of the MET tools. Typing the name of the tool with no command line
-   options also produces the usage statement.
