@@ -1,8 +1,8 @@
 .. _installation:
 
-*********************
-Software Installation
-*********************
+**************
+Installing MET
+**************
 
 Introduction
 ============
@@ -83,8 +83,8 @@ the terminal while in the directory MET will be installed in:
   wget https://raw.githubusercontent.com/dtcenter/MET/main_vX.Y/internal/scripts/installation/compile_MET_all.sh
   wget https://dtcenter.ucar.edu/dfiles/code/METplus/MET/installation/tar_files.tgz
 
-where the X and Y in the first wget command are replaced with the major and minor
-version of the software (e.g. change main_vX.Y to main_v12.0).
+where the X and Y in the first wget command correspond to the latest released version
+of MET.
 
 The tar files will need to be extracted in the MET installation directory:
 
@@ -115,9 +115,7 @@ by using a wget command while in the *tar_files* directory:
 
   wget https://github.com/dtcenter/MET/archive/refs/tags/vX.Y.Z.tar.gz
 
-where X, Y, and Z are replaced with the major version, minor version,
-and bugfix version, respectively (e.g. change vX.Y.X.tar.gz to
-v12.0.0.tar.gz).
+where X, Y, and Z corresponds to the latest released version of MET.
 
 .. _Install_Required-libraries-and:
 
@@ -143,10 +141,9 @@ Environment Variable Descriptions
 
 **REQUIRED**
 
-**TEST_BASE** – Format is */d1/met/X.Y.X*, where X, Y, and Z are replaced with the
-major version, minor version, and bugfix version, respectively (e.g. */d1/met/12.0.0*).
-This is the MET installation directory that was created in the first step,
-and contains **compile_MET_all.sh** script, **tar_files.tgz**, 
+**TEST_BASE** – Format is */d1/met/X.Y.X*, where X, Y, and Z corresponds to the latest
+released version of MET. This is the MET installation directory that was created in
+the first step, and contains **compile_MET_all.sh** script, **tar_files.tgz**, 
 and the *tar_files* directory from the untar command.
 
 **COMPILER** – Format is compiler_version (e.g. gnu_8.3.0). For the GNU family of compilers, 
@@ -154,14 +151,12 @@ use “gnu”; for the Intel family of compilers, use “intel”, “ics”, �
 depending on the system. In the past, support was provided for the PGI family of compilers 
 through “pgi”. However, this compiler option is no longer actively tested. 
 
-**MET_SUBDIR** – Format is */d1/met/X.Y.X*, where X, Y, and Z are replaced with the
-major version, minor version, and bugfix version, respectively (e.g. */d1/met/12.0.0*).
-This is the location where the top-level MET subdirectory will be installed and is
-often set equivalent to **TEST_BASE** (e.g. ${TEST_BASE}).
+**MET_SUBDIR** – Format is */d1/met/X.Y.X*, where X, Y, and Z corresponds to the latest
+released version of MET. This is the location where the top-level MET subdirectory will
+be installed and is often set equivalent to **TEST_BASE** (e.g. ${TEST_BASE}).
 
-**MET_TARBALL** – Format is vX.Y.Z.tar.gz, where X, Y, and Z are replaced with the
-major version, minor version, and bugfix version, respectively. This is the name of
-the downloaded MET tarball.
+**MET_TARBALL** – Format is vX.Y.Z.tar.gz, where X, Y, and Z corresponds to the latest
+released version of MET.This is the name of the downloaded MET tarball.
 
 **USE_MODULES** – Format is TRUE or FALSE. Set to FALSE if using a machine that does not use 
 modulefiles; set to TRUE if using a machine that does use modulefiles. For more information on 
@@ -240,7 +235,6 @@ library and include files for an external library are installed in separate loca
 In this case, both environment variables must be specified and the associated 
 $MET_<lib> variable will be ignored.
 
-
 **FINAL NOTE ON EXTERNAL LIBRARIES**
 
 For users wishing to run the Plot-MODE-Field tool, the Ghostscript font data must be 
@@ -313,24 +307,19 @@ Follow Docker’s instructions for a successful installation.
 Loading the Latest Docker Image
 -------------------------------
 
-Once the user has confirmed the Docker installation was successful, 
-all the user needs to do is to run MET is to download the latest
-image of MET in Docker. To accomplish that, use the pull command:
+Once you have confirmed your installation of Docker was successful, 
+all you need to run MET is to download the latest image of MET in Docker. 
+To accomplish that, use the pull command, with the latest MET version number,
+for example:
 
 .. code-block:: ini
 
-  docker pull dtcenter/met
+  docker pull dtcenter/met:X.Y.X
 
-which will automatically pull the latest Docker image of MET. 
-If the user encounters an error, try adding the latest version
-number, for example:
+where X.Y.Z corresponds to the latest released version of MET. Omitting the
+version number will result in an error due to Docker’s behavior of attempting
+to retrieve an image with the “latest” tag, which MET no longer uses. 
 
-.. code-block:: ini
-
-  docker pull dtcenter/met:X.Y.Z
-
-where X, Y, and Z are replaced with the major version, minor version, and
-bugfix version, respectively (e.g. *docker pull dtcenter/met:12.0.0*).
 
 Running the Docker version
 --------------------------
@@ -352,9 +341,7 @@ was pulled:
 
   docker run -it --rm dtcenter/met:X.Y.Z /bin/bash 
 
-where X, Y, and Z are replaced with the major version, minor version,
-and bugfix version, respectively
-(e.g. *docker run -it --rm dtcenter/met:X.Y.Z /bin/bash*).
+where X, Y, and Z corresponds to the latest released version of MET.
   
 If the Docker usage of MET was successful, it is highly recommended to move on 
 to using the METplus wrappers of the tools, which has its own Docker image. 
@@ -364,27 +351,112 @@ Instructions for obtaining that image are in the
 Using Apptainer
 ===============
 
+Similar to Docker, Apptainer (formerly Singularity) removes some of the
+complexities associated with downloading various library dependencies and
+runs inside a preset container. Apptainer is incredibly flexible and was
+designed to function on High Performance Computing (HPC) systems. It can
+utilize Container Library and Docker images, meaning users can benefit
+from the Docker images that already exist for MET. 
 
-.. _met_directory_structure:
+Perhaps the biggest benefit of using Apptainer (aside from its agnostic
+platform availability) is its nonrequirement of root permissions. This can
+be one of the only ways users operating on large-scale, shared computing
+resources can access MET. That, plus the relatively simple installation of
+Apptainer and retrieval of Docker images, should help any users experiencing
+difficulties with MET installation using previous methods achieve success.
+
+Installing Apptainer
+--------------------
+
+To begin, download and install the correct version of Apptainer for the
+intended system. The method of installing from code is outlined in
+`Apptainer’s INSTALL.md file <https://github.com/apptainer/apptainer/blob/main/INSTALL.md>`_
+on their GitHub page. If users require an alternate method to install Apptainer, the
+`Admin guide <https://apptainer.org/docs/admin/main/installation.html>`_ will
+provide further details.
+
+Loading the Latest MET Image
+----------------------------
+
+Similar to Docker, Apptainer will build the container based off of the MET image in
+a single command. To accomplish this, Apptainer’s “Swiss army knife”  :code:`build`
+command is used. Use the the latest MET version number in conjunction with :code:`build`
+to make the container:
+
+.. code_block:: ini
+
+  singularity build met-X.Y.X.sif docker://dtcenter/met:X.Y.X
+
+where X.Y.Z corresponds to the latest released version of MET.
+
+Running the MET Container
+-------------------------
+
+To run commands in the container, an instance of the container needs to be started.
+In Apptainer, this accomplished with the :code:`instance start` command. That
+command could look something like:
+
+.. code_block:: ini
+
+  singularity instance start /path/to/container/met-X.Y.X.sif met-X.Y.X
+
+Then simply enter a shell within the instance that was just created using a command similar to this example:
+
+.. code_block:: ini
+
+  singularity shell instance://met-X.Y.Z
 
 MET Directory Structure
 =======================
 
-The top-level MET directory consists of Makefiles, configuration files, and several subdirectories. The top-level Makefile and configuration files control how the entire toolkit is built. 
+The top-level MET directory consists of Makefiles, configuration files,
+and several subdirectories. The top-level Makefile and configuration files
+control how the entire toolkit is built. 
 
-When MET has been successfully built and installed, the installation directory contains two subdirectories. The *bin/* directory contains executables for each module of MET as well as several plotting utilities. The *share/met/* directory contains many subdirectories with data required at runtime and a subdirectory of sample R scripts utilities. The *colortables/*, *map/*, and *ps/* subdirectories contain data used in creating PostScript plots for several MET tools. The *poly/* subdirectory contains predefined lat/lon polyline regions for use in selecting regions over which to verify. The polylines defined correspond to verification regions used by NCEP as described in :numref:`Appendix B, Section %s <appendixB>`. The *config/* directory contains default configuration files for the MET tools. The *python/* subdirectory contains python scripts. The *python/examples* subdirectory contains sample scripts used in Python embedding (:numref:`Appendix F, Section %s <appendixF>`). The *python/pyembed/* subdirectory contains code used in Python embedding (:numref:`Appendix F, Section %s <appendixF>`). The *table_files/* and *tc_data/* subdirectories contain GRIB table definitions and tropical cyclone data, respectively. The *Rscripts/* subdirectory contains a handful of plotting graphic utilities for MET-TC. These are the same Rscripts that reside under the top-level MET *scripts/Rscripts* directory, other than it is the installed location.
+When MET has been successfully built and installed, the installation directory
+contains two subdirectories. The *bin/* directory contains executables for
+each module of MET as well as several plotting utilities. The *share/met/*
+directory contains many subdirectories with data required at runtime and a
+subdirectory of sample R scripts utilities. The *colortables/*, *map/*, and
+*ps/* subdirectories contain data used in creating PostScript plots for
+several MET tools. The *poly/* subdirectory contains predefined lat/lon
+polyline regions for use in selecting regions over which to verify. The
+polylines defined correspond to verification regions used by NCEP as described
+in :numref:`Appendix B, Section %s <appendixB>`. The *config/* directory
+contains default configuration files for the MET tools. The *python/*
+subdirectory contains python scripts. The *python/examples* subdirectory
+contains sample scripts used in Python embedding
+(:numref:`Appendix F, Section %s <appendixF>`). The *python/pyembed/*
+subdirectory contains code used in Python embedding
+(:numref:`Appendix F, Section %s <appendixF>`). The *table_files/* and
+*tc_data/* subdirectories contain GRIB table definitions and tropical
+cyclone data, respectively. The *Rscripts/* subdirectory contains a handful
+of plotting graphic utilities for MET-TC. These are the same Rscripts that
+reside under the top-level MET *scripts/Rscripts* directory, other than it
+is the installed location.
 
-The *data/* directory contains several configuration and static data files used by MET. The *sample_fcst/* and *sample_obs/* subdirectories contain sample data used by the test scripts provided in the *scripts/* directory. 
+The *data/* directory contains several configuration and static data files
+used by MET. The *sample_fcst/* and *sample_obs/* subdirectories contain
+sample data used by the test scripts provided in the *scripts/* directory. 
 
 The *docs/* directory contains the Sphinx documentation for MET.
 
-The *out/* directory will be populated with sample output from the test cases described in the next section. 
+The *out/* directory will be populated with sample output from the test cases
+described in the next section. 
 
 The *src/* directory contains the source code for each of the tools in MET. 
 
-The *scripts/* directory contains test scripts that are run by make test after MET has been successfully built, and a directory of sample configuration files used in those tests located in the *scripts/config/* subdirectory. The output from the test scripts in this directory will be written to the *out/* directory. Users are encouraged to copy sample configuration files to another location and modify them for their own use.
+The *scripts/* directory contains test scripts that are run by make test after
+MET has been successfully built, and a directory of sample configuration files
+used in those tests located in the *scripts/config/* subdirectory. The output
+from the test scripts in this directory will be written to the *out/* directory.
+Users are encouraged to copy sample configuration files to another location and
+modify them for their own use.
 
-The *share/met/Rscripts* directory contains a handful of sample R scripts, including plot_tcmpr.R, which provides graphic utilities for MET-TC. For more information on the graphics capabilities, see :numref:`TC-Stat-tool-example` of this User's Guide.
+The *share/met/Rscripts* directory contains a handful of sample R scripts,
+including plot_tcmpr.R, which provides graphic utilities for MET-TC. For more
+information on the graphics capabilities, see :numref:`TC-Stat-tool-example` of
+this User's Guide.
 
 .. note::
 
