@@ -193,6 +193,8 @@ The $MET_<lib>INC and $MET_<lib>LIB environment variables are used if the librar
 
 The following environment variables should also be set:
 
+* Set $MET_PROJ to point to the main Proj directory, or set $MET_PROJINC to point to the directory with the Proj include files and set $MET_PROJLIB to point to the directory with the Proj library files.
+
 * Set $MET_NETCDF to point to the main NetCDF directory, or set $MET_NETCDFINC to point to the directory with the NetCDF include files and set $MET_NETCDFLIB to point to the directory with the NetCDF library files. Note that the files for both NetCDF-C and NetCDF-CXX must be installed in the same include and library directories.
 
 * Set $MET_HDF5 to point to the main HDF5 directory.

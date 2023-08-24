@@ -7,6 +7,7 @@ MET_PROJ_DIR=/d1/projects/MET
 # Variables required to build MET
 export MET_DEVELOPMENT=true
 export MET_DST=/usr/local
+export MET_PROJ=${MET_DST}/proj-9.2.1
 export MET_NETCDF=${MET_DST}/netcdf-4.7.0/gcc-8.3.0
 export MET_HDF5=${MET_DST}/hdf5-1.8.21
 export MET_HDFINC=${MET_DST}/hdf4-4.2.15/include/hdf
