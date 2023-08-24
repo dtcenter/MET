@@ -731,7 +731,7 @@ fi
 # https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html
 # ${parameter:+word}
 # If parameter is null or unset, nothing is substituted, otherwise the expansion of word is substituted.
-export LDFLAGS="${LDFLAGS} -Wl,-rpath,${LIB_DIR}/lib${MET_NETCDF:+:$MET_NETCDF/lib}${MET_HDF5:+:$MET_HDF5/lib}${MET_BUFRLIB:+:$MET_BUFRLIB}${MET_GRIB2CLIB:+:$MET_GRIB2CLIB}${MET_PYTHON_LIB:+:$MET_PYTHON_LIB}${MET_GSL:+:$MET_GSL/lib}${ADDTL_DIR:+:$ADDTL_DIR}"
+export LDFLAGS="${LDFLAGS} -Wl,-rpath,${LIB_DIR}/lib${MET_PROJ:+:$MET_PROJ/lib}${LIB_DIR}/lib${MET_NETCDF:+:$MET_NETCDF/lib}${MET_HDF5:+:$MET_HDF5/lib}${MET_BUFRLIB:+:$MET_BUFRLIB}${MET_GRIB2CLIB:+:$MET_GRIB2CLIB}${MET_PYTHON_LIB:+:$MET_PYTHON_LIB}${MET_GSL:+:$MET_GSL/lib}${ADDTL_DIR:+:$ADDTL_DIR}"
 export LDFLAGS="${LDFLAGS} -Wl,-rpath,${LIB_JASPER:+$LIB_JASPER}${LIB_LIBPNG:+:$LIB_PNG}${LIB_Z:+$LIB_Z}"
 export LDFLAGS="${LDFLAGS} ${LIB_JASPER:+-L$LIB_JASPER} ${LIB_LIBPNG:+-L$LIB_LIBPNG} ${MET_HDF5:+-L$MET_HDF5/lib} ${ADDTL_DIR:+-L$ADDTL_DIR}"
 export LIBS="${LIBS} -lhdf5_hl -lhdf5 -lz"
