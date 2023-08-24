@@ -50,7 +50,7 @@ test_read_LDADD = -lvx_stat_out \
 	-lvx_math \
 	-lvx_color \
 	-lvx_log \
-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas -lvx_util
+	-lm -lproj -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas -lvx_util
 
 test_read_prob_SOURCES = test_read_prob.cc
 test_read_prob_CPPFLAGS = ${MET_CPPFLAGS}
@@ -86,5 +86,5 @@ test_read_prob_LDADD = -lvx_stat_out \
 	-lvx_math \
 	-lvx_color \
 	-lvx_log \
-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas -lvx_util
+	-lm -lproj -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas -lvx_util
 

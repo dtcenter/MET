@@ -376,7 +376,8 @@ modis_regrid_LDADD = -lvx_pxm \
 	-lGctp \
 	-ljpeg \
 	-lz \
-	-lm
+	-lm \
+	-lproj
 
 EXTRA_DIST = cloudsat_swath_file.h \
 	data_averager.h \

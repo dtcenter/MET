@@ -59,7 +59,7 @@ ascii2nc_LDADD = -lvx_stat_out \
 	-lvx_math \
 	-lvx_log \
 	$(PYTHON_LIBS) \
-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
+	-lm -lproj -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
 
 
 
