@@ -307,10 +307,10 @@ Follow Docker’s instructions for a successful installation.
 Loading the Latest Docker Image
 -------------------------------
 
-Once you have confirmed your installation of Docker was successful, 
-all you need to run MET is to download the latest image of MET in Docker. 
-To accomplish that, use the pull command, with the latest MET version number,
-for example:
+Once the user has confirmed the installation of Docker was successful, 
+all that needs to be done is to run MET is to download the latest image
+of MET in Docker. To accomplish that, use the pull command, with the
+latest MET version number, for example:
 
 .. code-block:: ini
 
