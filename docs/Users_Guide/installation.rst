@@ -383,7 +383,7 @@ a single command. To accomplish this, Apptainer’s “Swiss army knife”  :cod
 command is used. Use the the latest MET version number in conjunction with :code:`build`
 to make the container:
 
-.. code_block:: ini
+.. code-block:: ini
 
   singularity build met-X.Y.X.sif docker://dtcenter/met:X.Y.X
 
@@ -396,13 +396,13 @@ To run commands in the container, an instance of the container needs to be start
 In Apptainer, this accomplished with the :code:`instance start` command. That
 command could look something like:
 
-.. code_block:: ini
+.. code-block:: ini
 
   singularity instance start /path/to/container/met-X.Y.X.sif met-X.Y.X
 
 Then simply enter a shell within the instance that was just created using a command similar to this example:
 
-.. code_block:: ini
+.. code-block:: ini
 
   singularity shell instance://met-X.Y.Z
 
