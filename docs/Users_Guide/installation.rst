@@ -354,7 +354,7 @@ Loading the Latest MET Image
 
 Similar to Docker, Apptainer will build the container based off the MET image in a single command. To accomplish this, Apptainer’s “Swiss army knife”  :code:`build` command is used. Use the the latest MET version number in conjunction with :code:`build` to make your container:
 
-.. code_block:: ini
+.. code-block:: ini
 
   singularity build met-x.y.z.sif docker://dtcenter/met:x.y.z
 
@@ -365,13 +365,13 @@ Running the MET Container
 
 To run commands in the container, an instance of the container needs to be started. In Apptainer, this accomplished with the :code:`instance start` command. That command could look something like:
 
-.. code_block:: ini
+.. code-block:: ini
 
   singularity instance start /path/to/container/met-x.y.z.sif met-x.y.z
 
 Then simply enter a shell within the instance that was just created using a command similar to this example:
 
-.. code_block:: ini
+.. code-block:: ini
 
   singularity shell instance://met-x.y.z
 
