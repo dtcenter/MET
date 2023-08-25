@@ -141,7 +141,7 @@ Environment Variable Descriptions
 
 **REQUIRED**
 
-**TEST_BASE** – Format is */d1/met/X.Y.X*, where X, Y, and Z corresponds to the latest
+**TEST_BASE** – Format is */d1/met/X.Y.Z*, where X, Y, and Z corresponds to the latest
 released version of MET. This is the MET installation directory that was created in
 the first step, and contains **compile_MET_all.sh** script, **tar_files.tgz**, 
 and the *tar_files* directory from the untar command.
@@ -151,7 +151,7 @@ use “gnu”; for the Intel family of compilers, use “intel”, “ics”, �
 depending on the system. In the past, support was provided for the PGI family of compilers 
 through “pgi”. However, this compiler option is no longer actively tested. 
 
-**MET_SUBDIR** – Format is */d1/met/X.Y.X*, where X, Y, and Z corresponds to the latest
+**MET_SUBDIR** – Format is */d1/met/X.Y.Z*, where X, Y, and Z corresponds to the latest
 released version of MET. This is the location where the top-level MET subdirectory will
 be installed and is often set equivalent to **TEST_BASE** (e.g. ${TEST_BASE}).
 
@@ -314,7 +314,7 @@ latest MET version number, for example:
 
 .. code-block:: ini
 
-  docker pull dtcenter/met:X.Y.X
+  docker pull dtcenter/met:X.Y.Z
 
 where X.Y.Z corresponds to the latest released version of MET. Omitting the
 version number will result in an error due to Docker’s behavior of attempting
@@ -385,7 +385,7 @@ to make the container:
 
 .. code-block:: ini
 
-  singularity build met-X.Y.X.sif docker://dtcenter/met:X.Y.X
+  singularity build met-X.Y.Z.sif docker://dtcenter/met:X.Y.Z
 
 where X.Y.Z corresponds to the latest released version of MET.
 
@@ -398,7 +398,7 @@ command could look something like:
 
 .. code-block:: ini
 
-  singularity instance start /path/to/container/met-X.Y.X.sif met-X.Y.X
+  singularity instance start /path/to/container/met-X.Y.Z.sif met-X.Y.Z
 
 Then simply enter a shell within the instance that was just created using a command similar to this example:
 
