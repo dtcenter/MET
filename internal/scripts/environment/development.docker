@@ -29,7 +29,7 @@ export MET_TEST_RSCRIPT=/usr/bin/Rscript
 export MAKE_ARGS=-j
 
 export TEST_BASE=/met
-export COMPILER=gnu
+export COMPILER=gnu_12.2.0
 export MET_SUBDIR=${TEST_BASE}
 export MET_TARBALL=none
 export USE_MODULES=FALSE
