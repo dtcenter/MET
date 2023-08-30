@@ -689,6 +689,27 @@ The MODE tool creates two ASCII output files. The first ASCII file contains cont
   * - 41
     - ODDS
     - Odds Ratio
+  * - 42
+    - LODDS
+    - Logarithm of the Odds Ratio
+  * - 43
+    - ORSS
+    - Odds Ratio Skill Score
+  * - 44
+    - EDS
+    - Extreme Dependency Score
+  * - 45
+    - SEDS
+    - Symmetric Extreme Dependency Score
+  * - 46
+    - EDI
+    - Extreme Dependency Index
+  * - 47
+    - SEDI
+    - Symmetric Extremal Dependency Index
+  * - 48
+    - BAGSS
+    - Bias-Adjusted Gilbert Skill Score
 
 This first file uses the following naming convention:
 
