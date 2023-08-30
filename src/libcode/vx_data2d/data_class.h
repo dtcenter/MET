@@ -153,6 +153,11 @@ class Met2dDataFile : public Met2dData {
 
       virtual int index(VarInfo &) = 0;
 
+         //  retrieve a vector of all requested data planes
+
+      virtual int data_planes(std::vector<VarInfo*>&,
+                              std::vector<DataPlane>&) = 0;
+
          //  post-process data after reading it
 
       bool process_data_plane(VarInfo *, DataPlane &);

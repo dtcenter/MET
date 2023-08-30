@@ -231,3 +231,16 @@ int MetNcMetDataFile::index(VarInfo &vinfo) {
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+int MetNcMetDataFile::data_planes(vector<VarInfo*> &vi_list,
+                                  vector<DataPlane> &dp_list) {
+
+   // TODO implement this
+
+   mlog << Error << "\nMetNcMetDataFile::data_planes() -> "
+        << "not yet implemented!\n\n";
+   exit(1);
+
+}
+
+////////////////////////////////////////////////////////////////////////

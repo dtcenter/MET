@@ -310,3 +310,18 @@ int MetNcPinterpDataFile::data_plane_array(VarInfo &vinfo,
 int MetNcPinterpDataFile::index(VarInfo &vinfo){
    return -1;
 }
+
+////////////////////////////////////////////////////////////////////////
+
+int MetNcPinterpDataFile::data_planes(vector<VarInfo*> &vi_list,
+                                      vector<DataPlane> &dp_list) {
+
+   // TODO implement this
+
+   mlog << Error << "\nMetNcPinterpDataFile::data_planes() -> "
+        << "not yet implemented!\n\n";
+   exit(1);
+
+}
+
+////////////////////////////////////////////////////////////////////////

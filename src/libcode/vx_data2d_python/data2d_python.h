@@ -92,6 +92,9 @@ class MetPythonDataFile : public Met2dDataFile {
 
       int  index(VarInfo &);
 
+      int  data_planes(std::vector<VarInfo*>&,
+                       std::vector<DataPlane>&);
+
       bool data_plane(DataPlane &);
 
 };

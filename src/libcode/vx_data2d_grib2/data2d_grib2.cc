@@ -1612,6 +1612,19 @@ int MetGrib2DataFile::index( VarInfo &vinfo ){
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+int MetGrib2DataFile::data_planes(vector<VarInfo*> &vi_list,
+                                  vector<DataPlane> &dp_list) {
+
+   // TODO implement this
+
+   mlog << Error << "\nMetGrib2DataFile::data_planes() -> "
+        << "not yet implemented!\n\n";
+   exit(1);
+
+}
+
+////////////////////////////////////////////////////////////////////////
 //
 // Begin utility functions.
 //

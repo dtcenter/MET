@@ -15,6 +15,7 @@
 //   Mod#   Date      Name          Description
 //   ----   ----      ----          -----------
 //   000    09/27/22  Halley Gotway New
+//   001    08/17/23  Halley Gotway MET #2609 handle missing data
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -968,44 +969,71 @@ void process_track_points(const TrackInfoArray& tracks) {
 }
 
 ////////////////////////////////////////////////////////////////////////
+///
+   // TODO: Consider adding vortex removal logic here
+   // Read in the full set of fields required for vortex removal
+   // Add flag to configure which fields are used for vortex removal
 
 void process_fields(const TrackInfoArray &tracks,
                     const unixtime vld_ut, int i_vld,
                     const string &domain,
                     const DomainInfo &di) {
    int i, j, i_pnt;
-   DataPlane data_dp;
    Grid grid_dp;
    VarInfoFactory vi_factory;
    VarInfo *vi = (VarInfo *) 0;
+   vector<VarInfo *> vi_list;
+   DataPlane dp;
+   vector<DataPlane> dp_list;
    StringArray tmp_key_sa, fields_missing;
 
-   // TODO: Consider adding vortex removal logic here
-   // Read in the full set of fields required for vortex removal
-   // Add flag to configure which fields are used for vortex removal
-
-   // TODO: Add logic to support one_time_per_file_flag set to true.
-
-   // Loop over the VarInfo fields to be processed
+   // Create vector of VarInfo objects
    for(i=0; i<di.var_info_ptr.size(); i++) {
 
       // Make a local VarInfo copy to store the valid time
       vi = vi_factory.new_copy(di.var_info_ptr[i]);
       vi->set_valid(vld_ut);
+      vi_list.push_back(vi);
+   }
 
-      // Find data for this track point
-      bool status = get_series_entry(i_vld, vi,
+   // Read all data at the same time if they are all in the same file
+   if(conf_info.one_time_per_file_flag) {
+
+      // Find all entries for this track point
+      bool status = get_series_entries(i_vld, vi_list,
                        di.data_files, file_type,
-                       data_dp, grid_dp,
+                       dp_list, grid_dp,
                        false, false);
 
-      // Keep track of missing fields
-      if(!status) {
-         fields_missing.add(vi->magic_str());
+   }
+   // Otherwise, read data one at a time
+   else {
 
-         // Store the requested valid time
-         data_dp.set_valid(vld_ut);
-      }
+      // Loop over the VarInfo fields to be processed
+      for(i=0; i<vi_list.size(); i++) {
+
+         // Find single entry for this track point
+         bool status = get_series_entry(i_vld, vi_list[i],
+                          di.data_files, file_type,
+                          dp, grid_dp,
+                          false, false);
+
+         // Keep track of missing fields
+         if(!status) {
+            fields_missing.add(vi_list[i]->magic_str());
+
+            // Store the requested valid time
+            dp.set_valid(vld_ut);
+         }
+
+         // Append current DataPlane to the vector
+         dp_list.push_back(dp);
+
+      } // end for i
+   }
+
+   // Loop over the VarInfo fields to be processed
+   for(i=0; i<vi_list.size(); i++) {
 
       // Do coordinate transformation for each track point
       for(j=0; j<tracks.n(); j++) {
@@ -1027,7 +1055,7 @@ void process_fields(const TrackInfoArray &tracks,
          // Perhaps do 2 passes... process the vortex removal first?
 
          // Compute and write the cylindrical coordinate data
-         tmp_file_map[tmp_key].write_nc_data(vi, data_dp, grid_dp);
+         tmp_file_map[tmp_key].write_nc_data(vi_list[i], dp_list[i], grid_dp);
 
       } // end for j
 

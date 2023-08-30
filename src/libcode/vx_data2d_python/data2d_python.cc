@@ -507,3 +507,17 @@ return ( 0 );
 
 ////////////////////////////////////////////////////////////////////////
 
+
+int MetPythonDataFile::data_planes(vector<VarInfo*> &vi_list,
+                                   vector<DataPlane> &dp_list) {
+
+   // TODO implement this
+
+   mlog << Error << "\nMetPythonDataFile::data_planes() -> "
+        << "not yet implemented!\n\n";
+   exit(1);
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
