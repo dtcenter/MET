@@ -501,8 +501,8 @@ void process_ioda_file(int i_pb) {
    ConcatString msg_type_name = find_meta_name(conf_key_message_type, metadata_vars);
    ConcatString station_id_name = find_meta_name(conf_key_station_id, metadata_vars);
    ConcatString datetime_name = find_meta_name(conf_key_datetime, metadata_vars);
-   ConcatString lon_name = find_meta_name("latitude", metadata_vars);
-   ConcatString lat_name = find_meta_name("longitude", metadata_vars);
+   ConcatString lon_name = find_meta_name("longitude", metadata_vars);
+   ConcatString lat_name = find_meta_name("latitude", metadata_vars);
 
    bool has_msg_type = 0 < msg_type_name.length();
    bool has_station_id = 0 < station_id_name.length();
