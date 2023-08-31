@@ -25,7 +25,6 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
@@ -35,7 +34,6 @@ using namespace std;
 #include <assert.h>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "main.h"
 #include "apply_mask.h"
@@ -52,13 +50,17 @@ using namespace netCDF;
 #include "nc_point_obs_out.h"
 #include "nc_summary.h"
 
+using namespace std;
+using namespace netCDF;
+
+
 ////////////////////////////////////////////////////////////////////////
 
 //
 // Constants
 //
 
-static const char * DEF_CONFIG_NAME = "MET_BASE/config/IODA2NCConfig_default";
+static const char *DEF_CONFIG_NAME = "MET_BASE/config/IODA2NCConfig_default";
 
 static const char *program_name = "ioda2nc";
 
@@ -130,7 +132,7 @@ static vector<Observation> observations;
 //
 // Output NetCDF file, dimensions, and variables
 //
-static NcFile *f_out = (NcFile *) 0;
+static NcFile *f_out = (NcFile *) nullptr;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -164,22 +166,23 @@ static void set_valid_beg_time(const StringArray &);
 static void set_valid_end_time(const StringArray &);
 static void set_verbosity(const StringArray &);
 
-static bool check_core_data(const bool, const bool, StringArray &, StringArray &, e_ioda_format);
+static bool check_core_data(const bool, const bool,
+                            StringArray &, StringArray &, e_ioda_format);
 static bool check_missing_thresh(float value);
-static ConcatString find_meta_name(StringArray, StringArray);
+static ConcatString find_meta_name(string meta_key, StringArray available_names);
 static bool get_meta_data_float(NcFile *, StringArray &, const char *, float *,
                                 const int);
 static bool get_meta_data_strings(NcVar &, char *);
 static bool get_meta_data_strings(NcVar &, char **);
 static bool get_obs_data_float(NcFile *, const ConcatString, NcVar *,
                                float *, int *, const int, const e_ioda_format);
-static bool has_postfix(std::string const &, std::string const &);
-    
+static bool has_postfix(const std::string &, std::string const &);
+static bool is_in_metadata_map(string metadata_key, StringArray &available_list);
+
 ////////////////////////////////////////////////////////////////////////
 
 
 int met_main(int argc, char *argv[]) {
-   int i;
 
    // Initialize static variables
    initialize();
@@ -191,7 +194,7 @@ int met_main(int argc, char *argv[]) {
    open_netcdf();
 
    // Process each IODA file
-   for(i=0; i<ioda_files.n_elements(); i++) {
+   for(int i=0; i<ioda_files.n_elements(); i++) {
       //process_ioda_file_metadata(i);
       process_ioda_file(i);
    }
@@ -208,7 +211,7 @@ int met_main(int argc, char *argv[]) {
    // Deallocate memory and clean up
    clean_up();
 
-   return(0);
+   return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -338,7 +341,7 @@ void open_netcdf() {
            << "trouble opening output file: " << ncfile << "\n\n";
 
       delete f_out;
-      f_out = (NcFile *) 0;
+      f_out = (NcFile *) nullptr;
 
       exit(1);
    }
@@ -411,7 +414,7 @@ void process_ioda_file(int i_pb) {
            << "can't open input NetCDF file \"" << ioda_files[i_pb]
            << "\" for reading.\n\n";
       delete f_in;
-      f_in = (NcFile *) 0;
+      f_in = (NcFile *) nullptr;
 
       exit(1);
    }
@@ -429,19 +432,23 @@ void process_ioda_file(int i_pb) {
    file_name << ioda_files[i_pb];
 
    int nrecs = 0;
-   int nstring, nvars;
+   int nlocs = 0;
+   int nstring = 0;
+   int nvars = 0;
    StringArray dim_names;
    StringArray metadata_vars;
    StringArray obs_value_vars;
    bool error_out = true;
    e_ioda_format ioda_format = ioda_v2;
-   int nlocs = get_dim_value(f_in, "nlocs", error_out); // number of locations
+
+   get_dim_names(f_in, &dim_names);
+   ConcatString nlocs_name = find_meta_name("nlocs", dim_names);
+   if(0 < nlocs_name.length()) nlocs = get_dim_value(f_in, nlocs_name.c_str(), error_out); // number of locations
 
    nvars = bad_data_int ;
    nstring = string_data_len;
    if (! has_nc_group(f_in, obs_group_name)) ioda_format = ioda_v1;
 
-   get_dim_names(f_in, &dim_names);
    if ( ioda_format == ioda_v1 ) {
       StringArray var_names;
       get_var_names(f_in, &var_names);
@@ -458,11 +465,14 @@ void process_ioda_file(int i_pb) {
             mlog << Debug(8) << method_name << "var_name: " << var_names[idx] << "\n";
       }
 
-      if(has_dim(f_in, "nvars")) {
-         nvars = get_dim_value(f_in, "nvars", error_out); // number of variables
-         nstring = get_dim_value(f_in, "nstring", error_out);
-      
-         if(dim_names.has("nrecs")) nrecs = get_dim_value(f_in, "nrecs", false);
+      ConcatString nvars_ = find_meta_name("nvars", dim_names);
+      if(has_dim(f_in, nvars_.c_str())) {
+         nvars = get_dim_value(f_in, nvars_.c_str(), error_out); // number of variables
+         ConcatString nstring_ = find_meta_name("nstring", dim_names);
+         if(dim_names.has(nstring_)) nstring = get_dim_value(f_in, nstring_.c_str(), error_out);
+
+         ConcatString nrecs_ = find_meta_name("nrecs", dim_names);
+         if(dim_names.has(nrecs_)) nrecs = get_dim_value(f_in, nrecs_.c_str(), false);
          else {
             nrecs = nvars * nlocs;
             mlog << Debug(3) << "\n" << method_name
@@ -488,12 +498,11 @@ void process_ioda_file(int i_pb) {
          mlog << Debug(8) << method_name << "ObsValue or Derived: " << obs_value_vars[idx] << "\n";
    }
 
-   ConcatString msg_type_name = find_meta_name(metadata_vars,
-                                               conf_info.metadata_map[conf_key_message_type]);
-   ConcatString station_id_name = find_meta_name(metadata_vars,
-                                                 conf_info.metadata_map[conf_key_station_id]);
-   ConcatString datetime_name = find_meta_name(metadata_vars,
-                                               conf_info.metadata_map[conf_key_datetime]);
+   ConcatString msg_type_name = find_meta_name(conf_key_message_type, metadata_vars);
+   ConcatString station_id_name = find_meta_name(conf_key_station_id, metadata_vars);
+   ConcatString datetime_name = find_meta_name(conf_key_datetime, metadata_vars);
+   ConcatString lon_name = find_meta_name("latitude", metadata_vars);
+   ConcatString lat_name = find_meta_name("longitude", metadata_vars);
 
    bool has_msg_type = 0 < msg_type_name.length();
    bool has_station_id = 0 < station_id_name.length();
@@ -504,7 +513,7 @@ void process_ioda_file(int i_pb) {
       mlog << Error << "\n" << method_name
            << "Please check the IODA file (required dimensions or meta variables are missing).\n\n";
       delete f_in;
-      f_in = (NcFile *) 0;
+      f_in = (NcFile *) nullptr;
       exit(1);
    }
    
@@ -514,8 +523,8 @@ void process_ioda_file(int i_pb) {
    int sec_per_unit;
    int ndatetime = 1;
    bool no_leap_year = false;
-   NcVar in_hdr_lat_var = get_var(f_in, "latitude", metadata_group_name);
-   NcVar in_hdr_lon_var = get_var(f_in, "longitude", metadata_group_name);
+   NcVar in_hdr_lat_var = get_var(f_in, lat_name.c_str(), metadata_group_name);
+   NcVar in_hdr_lon_var = get_var(f_in, lon_name.c_str(), metadata_group_name);
    NcVar in_hdr_vld_var = get_var(f_in, datetime_name.c_str(), metadata_group_name);
 
    base_ut = sec_per_unit = 0;
@@ -1036,7 +1045,7 @@ void process_ioda_file(int i_pb) {
    // Close the input NetCDF file
    if(f_in) {
       delete f_in;
-      f_in = (NcFile *) 0;
+      f_in = (NcFile *) nullptr;
    }
 
    if(mlog.verbosity_level() >= debug_level_for_performance) {
@@ -1139,7 +1148,7 @@ void clean_up() {
 
    if(f_out) {
       delete f_out;
-      f_out = (NcFile *) 0;
+      f_out = (NcFile *) nullptr;
    }
 
    return;
@@ -1210,7 +1219,7 @@ bool check_core_data(const bool has_msg_type, const bool has_station_id,
    StringArray &t_core_dims = (ioda_format == ioda_v2)
                               ? core_dims : core_dims_v1;
    for(int idx=0; idx<t_core_dims.n(); idx++) {
-      if(!dim_names.has(t_core_dims[idx])) {
+      if (!is_in_metadata_map(t_core_dims[idx], dim_names)) {
          mlog << Error << "\n" << method_name << "-> "
               << "core dimension \"" << t_core_dims[idx] << "\" is missing.\n\n";
          is_netcdf_ready = false;
@@ -1219,7 +1228,7 @@ bool check_core_data(const bool has_msg_type, const bool has_station_id,
 
    if (ioda_format == ioda_v1) {
       if(has_msg_type || has_station_id) {
-         if(!dim_names.has("nstring")) {
+         if (!is_in_metadata_map("nstring", dim_names)) {
             mlog << Error << "\n" << method_name << "-> "
                  << "core dimension \"nstring\" is missing.\n\n";
             is_netcdf_ready = false;
@@ -1228,19 +1237,7 @@ bool check_core_data(const bool has_msg_type, const bool has_station_id,
    }
 
    for(int idx=0; idx<core_meta_vars.n(); idx++) {
-      bool found = metadata_vars.has(core_meta_vars[idx]);
-      if (!found) {
-         StringArray alt_names = conf_info.metadata_map[core_meta_vars[idx]];
-         if (alt_names.n() > 0) {
-            for (int idx2=0; idx2 < alt_names.n(); idx2++) {
-               if (core_meta_vars[idx] != alt_names[idx2]) {
-                  found = metadata_vars.has(alt_names[idx2]);
-                  if (found) break;
-               }
-            }
-         }
-      }
-      if(!found) {
+      if(!is_in_metadata_map(core_meta_vars[idx], metadata_vars)) {
          mlog << Error << "\n" << method_name << "-> "
               << "core variable  \"" << core_meta_vars[idx] << "\" is missing.\n\n";
          is_netcdf_ready = false;
@@ -1264,12 +1261,13 @@ bool check_missing_thresh(float value) {
 
 ////////////////////////////////////////////////////////////////////////
 
-ConcatString find_meta_name(StringArray metadata_names, StringArray config_names) {
-   ConcatString metadata_name;
-   
-   for(int idx =0; idx<config_names.n(); idx++) {
-      if(metadata_names.has(config_names[idx])) {
-         metadata_name = config_names[idx];
+ConcatString find_meta_name(string meta_key, StringArray available_names) {
+   ConcatString metadata_name = meta_key;
+   StringArray alt_names = conf_info.metadata_map[meta_key];
+
+   for(int idx =0; idx<alt_names.n(); idx++) {
+      if(available_names.has(alt_names[idx])) {
+         metadata_name = alt_names[idx];
          break;
       }
    }
@@ -1284,8 +1282,7 @@ bool get_meta_data_float(NcFile *f_in, StringArray &metadata_vars,
    bool status = false;
    static const char *method_name = "get_meta_data_float() -> ";
    
-   ConcatString metadata_name = find_meta_name(
-        metadata_vars, conf_info.metadata_map[metadata_key]);
+   ConcatString metadata_name = find_meta_name(metadata_key, metadata_vars);
 
    if(metadata_name.length() > 0) {
       NcVar meta_var = get_var(f_in, metadata_name.c_str(), metadata_group_name);
@@ -1388,12 +1385,31 @@ bool get_obs_data_float(NcFile *f_in, const ConcatString var_name,
 
 ////////////////////////////////////////////////////////////////////////
 
-bool has_postfix(std::string const &str_buf, std::string const &postfix) {
-   if(str_buf.length() >= postfix.length()) {
-      return (0 == str_buf.compare(str_buf.length() - postfix.length(), postfix.length(), postfix));
+bool has_postfix(const std::string &str_buf, std::string const &postfix) {
+   auto buf_len = str_buf.length();
+   auto postfix_len = postfix.length();
+   if(buf_len >= postfix_len) {
+      return (0 == str_buf.compare(buf_len - postfix_len, postfix_len, postfix));
    } else {
       return false;
    }
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool is_in_metadata_map(std::string metadata_key, StringArray &available_list) {
+   bool found = available_list.has(metadata_key);
+
+   if (!found) {
+      StringArray alt_names = conf_info.metadata_map[metadata_key];
+      if (alt_names.n() > 0) {
+         for (int idx=0; idx<alt_names.n(); idx++) {
+            found = available_list.has(alt_names[idx]);
+            if (found) break;
+         }
+      }
+   }
+   return found;
 }
 
 ////////////////////////////////////////////////////////////////////////
