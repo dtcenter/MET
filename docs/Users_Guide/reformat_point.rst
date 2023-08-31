@@ -975,10 +975,12 @@ _____________________
 		{ key = "station_id";   val = "station_id,report_identifier"; },
 		{ key = "pressure";     val = "air_pressure,pressure"; },
 		{ key = "height";       val = "height,height_above_mean_sea_level"; },
-		{ key = "elevation";    val = "elevation,station_elevation"; }
+		{ key = "elevation";    val = "elevation,station_elevation"; },
+		{ key = "nlocs";        val = "Location"; }
 		];
 
 This entry is an array of dictionaries, each containing a **key** string and **val** string which define a mapping of metadata for IODA data files.
+The "nlocs" is for the dimension name of the locations. The following key can be added: "nstring", "latitude" and "longitude".
 
 _____________________
 
