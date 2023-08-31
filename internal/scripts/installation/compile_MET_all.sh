@@ -556,11 +556,7 @@ if [ $COMPILE_HDF -eq 1 ]; then
   tar -xf ${TAR_DIR}/HDF4.2*.tar.gz -C ${LIB_DIR}/hdf
   cd ${LIB_DIR}/hdf/HDF*
   echo "cd `pwd`"
-  run_cmd "./configure --prefix=${LIB_DIR} --disable-netcdf --with-jpeg=${LIB_DIR} --with-zlib=${LIB_DIR} > hdf4.configure.log 2>&1"
-  cat mfhdf/hdiff/Makefile | \
-    sed 's/LIBS = -ljpeg -lz/LIBS = -ljpeg -lz -lm/g' \
-    > Makefile_new
-  mv Makefile_new mfhdf/hdiff/Makefile
+  run_cmd "./configure --prefix=${LIB_DIR} --disable-netcdf --with-jpeg=${LIB_DIR} --with-zlib=${LIB_DIR} CPPFLAGS=-I/usr/include/tirpc LIBS='-lm -ltirpc' > hdf4.configure.log 2>&1"
   if [[ ${COMPILER_MAJOR_VERSION} -ge 10 ]]; then
     cat hdf/src/Makefile | \
       sed 's/FFLAGS =  -O2/FFLAGS = -w -fallow-argument-mismatch -O2/g' \
