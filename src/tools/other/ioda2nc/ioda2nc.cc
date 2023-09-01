@@ -1262,13 +1262,15 @@ bool check_missing_thresh(float value) {
 ////////////////////////////////////////////////////////////////////////
 
 ConcatString find_meta_name(string meta_key, StringArray available_names) {
-   ConcatString metadata_name = meta_key;
-   StringArray alt_names = conf_info.metadata_map[meta_key];
-
-   for(int idx =0; idx<alt_names.n(); idx++) {
-      if(available_names.has(alt_names[idx])) {
-         metadata_name = alt_names[idx];
-         break;
+   ConcatString metadata_name;
+   if (available_names.has(meta_key)) metadata_name = meta_key;
+   else {
+      StringArray alt_names = conf_info.metadata_map[meta_key];
+      for (int idx =0; idx<alt_names.n(); idx++) {
+         if (available_names.has(alt_names[idx])) {
+            metadata_name = alt_names[idx];
+            break;
+         }
       }
    }
    return metadata_name;
