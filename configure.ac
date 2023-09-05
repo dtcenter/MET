@@ -16,159 +16,139 @@ CPPFLAGS="${CPPFLAGS} ${OPENMP_CFLAGS}"
 LDFLAGS="${LDFLAGS} ${OPENMP_CFLAGS}"
 
 #
-# Look for the Proj library
+# Look for the Proj library.
 #
 
-# Configure the variables.  The help text will appear if the user uses "configure --help".
+# Configure the variables. The help text will appear if the user uses "configure --help".
 
-AC_ARG_VAR([MET_PROJ], [Where proj lib and include subdirectories are located.  If they are installed in /usr/local, you don't have to specify them.])
-AC_ARG_VAR([MET_PROJINC], [Where proj include files are located. Use if the libraries and include files are not under the same main proj directory.  If used, MET_PROJLIB must also be defined and MET_PROJ will be ignored.])
-AC_ARG_VAR([MET_PROJLIB], [Where proj libraries are located. Use if the libraries and include files are not under the same main proj directory.  If used, MET_PROJINC must also be defined and MET_PROJ will be ignored.])
+AC_ARG_VAR([MET_PROJ], [Where proj lib and include subdirectories are located. If they are installed in /usr/local, you don't have to specify them.])
+AC_ARG_VAR([MET_PROJINC], [Where proj include files are located. Use if the libraries and include files are not under the same main proj directory. If used, MET_PROJLIB must also be defined and MET_PROJ will be ignored.])
+AC_ARG_VAR([MET_PROJLIB], [Where proj libraries are located. Use if the libraries and include files are not under the same main proj directory. If used, MET_PROJINC must also be defined and MET_PROJ will be ignored.])
 
 # Ensure that both or neither are specified.
 
-if (test -n "$MET_PROJLIB" && test -z "$MET_PROJINC") || \
-   (test -n "$MET_PROJINC" && test -z "$MET_PROJLIB"); then
-  if test -n "$MET_PROJLIB"; then
-    AC_MSG_ERROR([MET_PROJLIB environment variable set, but MET_PROJINC not set.  If one of these variables is set, then both must be set.])
-  else
-    AC_MSG_ERROR([MET_PROJINC environment variable set, but MET_PROJLIB not set.  If one of these variables is set, then both must be set.])
-  fi
+if (test -n "$MET_PROJLIB" && test -z "$MET_PROJINC"); then
+  AC_MSG_ERROR([MET_PROJLIB environment variable set, but MET_PROJINC not set. If one of these variables is set, then both must be set.])
+elif (test -n "$MET_PROJINC" && test -z "$MET_PROJLIB"); then
+  AC_MSG_ERROR([MET_PROJINC environment variable set, but MET_PROJLIB not set. If one of these variables is set, then both must be set.])
 fi
 
-# If the individual locations weren't specified, then the main Proj directory
-# must be specified.  If it isn't, let the user know they need to supply one.
+# Use the main Proj directory if individual locations were not specified.
 
-if test -z "$MET_PROJLIB" && test -n "$MET_PROJ"; then
-   MET_PROJINC='${MET_PROJ}/include'
-   MET_PROJLIB='${MET_PROJ}/lib'
+if (test -n "$MET_PROJ" && test -z "$MET_PROJLIB"); then
+  MET_PROJINC='${MET_PROJ}/include'
+  MET_PROJLIB='${MET_PROJ}/lib'
 fi
 
-# AC_SUBST command line variables.  If we get here, the Proj 
-# libraries were found so no need to check
+# AC_SUBST command line variables.
 
-if test -n "$MET_PROJLIB"; then
-   CPPFLAGS="${CPPFLAGS} -I${MET_PROJINC}"
-   LDFLAGS="${LDFLAGS} -L${MET_PROJLIB}"
+if (test -n "$MET_PROJLIB"); then
+  CPPFLAGS="${CPPFLAGS} -I${MET_PROJINC}"
+  LDFLAGS="${LDFLAGS} -L${MET_PROJLIB}"
 fi
 
 #
-# Look for the NetCDF library
+# Look for the NetCDF library.
 #
 
-# Configure the variables.  The help text will appear if the user uses "configure --help".
+# Configure the variables. The help text will appear if the user uses "configure --help".
 
-AC_ARG_VAR([MET_NETCDF], [Where netcdf lib and include subdirectories are located.  If they are installed in /usr/local, you don't have to specify them.])
-AC_ARG_VAR([MET_NETCDFINC], [Where netcdf include files are located. Use if the libraries and include files are not under the same main netcdf directory.  If used, MET_NETCDFLIB must also be defined and MET_NETCDF will be ignored.])
-AC_ARG_VAR([MET_NETCDFLIB], [Where netcdf libraries are located. Use if the libraries and include files are not under the same main netcdf directory.  If used, MET_NETCDFINC must also be defined and MET_NETCDF will be ignored.])
+AC_ARG_VAR([MET_NETCDF], [Where netcdf lib and include subdirectories are located. If they are installed in /usr/local, you don't have to specify them.])
+AC_ARG_VAR([MET_NETCDFINC], [Where netcdf include files are located. Use if the libraries and include files are not under the same main netcdf directory. If used, MET_NETCDFLIB must also be defined and MET_NETCDF will be ignored.])
+AC_ARG_VAR([MET_NETCDFLIB], [Where netcdf libraries are located. Use if the libraries and include files are not under the same main netcdf directory. If used, MET_NETCDFINC must also be defined and MET_NETCDF will be ignored.])
 
 # Ensure that both or neither are specified.
 
-if (test -n "$MET_NETCDFLIB" && test -z "$MET_NETCDFINC") || \
-   (test -n "$MET_NETCDFINC" && test -z "$MET_NETCDFLIB"); then
-  if test -n "$MET_NETCDFLIB"; then
-    AC_MSG_ERROR([MET_NETCDFLIB environment variable set, but MET_NETCDFINC not set.  If one of these variables is set, then both must be set.])
-  else
-    AC_MSG_ERROR([MET_NETCDFINC environment variable set, but MET_NETCDFLIB not set.  If one of these variables is set, then both must be set.])
-  fi
+if (test -n "$MET_NETCDFLIB" && test -z "$MET_NETCDFINC"); then
+  AC_MSG_ERROR([MET_NETCDFLIB environment variable set, but MET_NETCDFINC not set. If one of these variables is set, then both must be set.])
+elif (test -n "$MET_NETCDFINC" && test -z "$MET_NETCDFLIB"); then
+  AC_MSG_ERROR([MET_NETCDFINC environment variable set, but MET_NETCDFLIB not set. If one of these variables is set, then both must be set.])
 fi
 
-# If the individual locations weren't specified, then the main NetCDF directory
-# must be specified.  If it isn't, let the user know they need to supply one.
+# Use the main NetCDF directory if individual locations were not specified.
 
-if test -z "$MET_NETCDFLIB" && test -n "$MET_NETCDF"; then
-   MET_NETCDFINC='${MET_NETCDF}/include'
-   MET_NETCDFLIB='${MET_NETCDF}/lib'
+if (test -n "$MET_NETCDF" && test -z "$MET_NETCDFLIB"); then
+  MET_NETCDFINC='${MET_NETCDF}/include'
+  MET_NETCDFLIB='${MET_NETCDF}/lib'
 fi
 
-# AC_SUBST command line variables.  If we get here, the NetCDF 
-# libraries were found so no need to check
+# AC_SUBST command line variables.
 
-if test -n "$MET_NETCDFLIB"; then
-   CPPFLAGS="${CPPFLAGS} -I${MET_NETCDFINC}"
-   LDFLAGS="${LDFLAGS} -L${MET_NETCDFLIB}"
+if (test -n "$MET_NETCDFLIB"); then
+  CPPFLAGS="${CPPFLAGS} -I${MET_NETCDFINC}"
+  LDFLAGS="${LDFLAGS} -L${MET_NETCDFLIB}"
 fi
 
 #
-# Look for the HDF5 library
+# Look for the HDF5 library.
 #
 
-# Configure the variables.  The help text will appear if the user uses "configure --help".
+# Configure the variables. The help text will appear if the user uses "configure --help".
 
-AC_ARG_VAR([MET_HDF5], [Where hdf5 lib and include subdirectories are located.  If they are installed in /usr/local, you don't have to specify them.])
-AC_ARG_VAR([MET_HDF5INC], [Where hdf5 include files are located. Use if the libraries and include files are not under the same main hdf5 directory.  If used, MET_HDF5LIB must also be defined and MET_HDF5 will be ignored.])
-AC_ARG_VAR([MET_HDF5LIB], [Where hdf5 libraries are located. Use if the libraries and include files are not under the same main hdf5 directory.  If used, MET_HDF5INC must also be defined and MET_HDF5 will be ignored.])
+AC_ARG_VAR([MET_HDF5], [Where hdf5 lib and include subdirectories are located. If they are installed in /usr/local, you don't have to specify them.])
+AC_ARG_VAR([MET_HDF5INC], [Where hdf5 include files are located. Use if the libraries and include files are not under the same main hdf5 directory. If used, MET_HDF5LIB must also be defined and MET_HDF5 will be ignored.])
+AC_ARG_VAR([MET_HDF5LIB], [Where hdf5 libraries are located. Use if the libraries and include files are not under the same main hdf5 directory. If used, MET_HDF5INC must also be defined and MET_HDF5 will be ignored.])
 
 # Ensure that both or neither are specified.
 
-if (test -n "$MET_HDF5LIB" && test -z "$MET_HDF5INC") || \
-   (test -n "$MET_HDF5INC" && test -z "$MET_HDF5LIB"); then
-  if test -n "$MET_HDF5LIB"; then
-    AC_MSG_ERROR([MET_HDF5LIB environment variable set, but MET_HDF5INC not set.  If one of these variables is set, then both must be set.])
-  else
-    AC_MSG_ERROR([MET_HDF5INC environment variable set, but MET_HDF5LIB not set.  If one of these variables is set, then both must be set.])
-  fi
+if (test -n "$MET_HDF5LIB" && test -z "$MET_HDF5INC"); then
+  AC_MSG_ERROR([MET_HDF5LIB environment variable set, but MET_HDF5INC not set. If one of these variables is set, then both must be set.])
+elif (test -n "$MET_HDF5INC" && test -z "$MET_HDF5LIB"); then
+  AC_MSG_ERROR([MET_HDF5INC environment variable set, but MET_HDF5LIB not set. If one of these variables is set, then both must be set.])
 fi
 
-# If the individual locations weren't specified, then the main HDF5 directory
-# must be specified.  If it isn't, let the user know they need to supply one.
+# Use the main HDF5 directory if individual locations were not specified.
 
-if test -z "$MET_HDF5LIB" && test -n "$MET_HDF5"; then
-   MET_HDF5INC='${MET_HDF5}/include'
-   MET_HDF5LIB='${MET_HDF5}/lib'
+if (test -n "$MET_HDF5" && test -z "$MET_HDF5LIB"); then
+  MET_HDF5INC='${MET_HDF5}/include'
+  MET_HDF5LIB='${MET_HDF5}/lib'
 fi
 
-# AC_SUBST command line variables.  If we get here, the HDF5
-# libraries were found so no need to check
+# AC_SUBST command line variables.
 
-if test -n "$MET_HDF5LIB"; then
-   CPPFLAGS="${CPPFLAGS} -I${MET_HDF5INC}"
-   LDFLAGS="${LDFLAGS} -L${MET_HDF5LIB}"
+if (test -n "$MET_HDF5LIB"); then
+  CPPFLAGS="${CPPFLAGS} -I${MET_HDF5INC}"
+  LDFLAGS="${LDFLAGS} -L${MET_HDF5LIB}"
 fi
 
 #
 # Look for the GRIB2C library
 #
 
-# Configure the variables.  The help text will appear if the user uses "configure --help".
+# Configure the variables. The help text will appear if the user uses "configure --help".
 
-AC_ARG_VAR([MET_GRIB2C], [Where grib2c lib and include subdirectories are located.  If they are installed in /usr/local, you don't have to specify them.])
-AC_ARG_VAR([MET_GRIB2CINC], [Where grib2c include files are located. Use if the libraries and include files are not under the same main grib2c directory.  If used, MET_GRIB2CLIB must also be defined and MET_GRIB2C will be ignored.])
-AC_ARG_VAR([MET_GRIB2CLIB], [Where grib2c libraries are located. Use if the libraries and include files are not under the same main grib2c directory.  If used, MET_GRIB2CINC must also be defined and MET_GRIB2C will be ignored.])
-AC_ARG_VAR([GRIB2CLIB_NAME], [Name of grib2c library to link with. For example, -lgrib2c_v1.6.0 or -lgrib2c, etc.  If it is -lgrib2c, you don't have to specify it.])
+AC_ARG_VAR([MET_GRIB2C], [Where grib2c lib and include subdirectories are located. If they are installed in /usr/local, you don't have to specify them.])
+AC_ARG_VAR([MET_GRIB2CINC], [Where grib2c include files are located. Use if the libraries and include files are not under the same main grib2c directory. If used, MET_GRIB2CLIB must also be defined and MET_GRIB2C will be ignored.])
+AC_ARG_VAR([MET_GRIB2CLIB], [Where grib2c libraries are located. Use if the libraries and include files are not under the same main grib2c directory. If used, MET_GRIB2CINC must also be defined and MET_GRIB2C will be ignored.])
+AC_ARG_VAR([GRIB2CLIB_NAME], [Name of grib2c library to link with. For example, -lgrib2c_v1.6.0 or -lgrib2c, etc. If it is -lgrib2c, you don't have to specify it.])
 
 # Ensure that both or neither are specified.
 
-if (test -n "$MET_GRIB2CLIB" && test -z "$MET_GRIB2CINC") || \
-   (test -n "$MET_GRIB2CINC" && test -z "$MET_GRIB2CLIB"); then
-  if test -n "$MET_GRIB2CLIB"; then
-    AC_MSG_ERROR([MET_GRIB2CLIB environment variable set, but MET_GRIB2CINC not set.  If one of these variables is set, then both must be set.])
-  else
-    AC_MSG_ERROR([MET_GRIB2CINC environment variable set, but MET_GRIB2CLIB not set.  If one of these variables is set, then both must be set.])
-  fi
+if (test -n "$MET_GRIB2CLIB" && test -z "$MET_GRIB2CINC"); then
+  AC_MSG_ERROR([MET_GRIB2CLIB environment variable set, but MET_GRIB2CINC not set. If one of these variables is set, then both must be set.])
+elif (test -n "$MET_GRIB2CINC" && test -z "$MET_GRIB2CLIB"); then
+  AC_MSG_ERROR([MET_GRIB2CINC environment variable set, but MET_GRIB2CLIB not set. If one of these variables is set, then both must be set.])
 fi
 
-# If the individual locations weren't specified, then the main Grib2c directory
-# must be specified.  If it isn't, let the user know they need to supply one.
+# Use the main GRIB2C directory if individual locations were not specified.
 
-if test -z "$MET_GRIB2CLIB" && test -n "$MET_GRIB2C"; then
-   MET_GRIB2CINC='${MET_GRIB2C}/include'
-   MET_GRIB2CLIB='${MET_GRIB2C}/lib'
+if (test -n "$MET_GRIB2C" && test -z "$MET_GRIB2CLIB"); then
+  MET_GRIB2CINC='${MET_GRIB2C}/include'
+  MET_GRIB2CLIB='${MET_GRIB2C}/lib'
 fi
 
-# AC_SUBST command line variables.  If we get here, the Grib2c
-# libraries were found so no need to check
+# AC_SUBST command line variables.
 
-if test -n "$MET_GRIB2CLIB"; then
-   CPPFLAGS="${CPPFLAGS} -I${MET_GRIB2CINC}"
-   LDFLAGS="${LDFLAGS} -L${MET_GRIB2CLIB}"
+if (test -n "$MET_GRIB2CLIB"); then
+  CPPFLAGS="${CPPFLAGS} -I${MET_GRIB2CINC}"
+  LDFLAGS="${LDFLAGS} -L${MET_GRIB2CLIB}"
 fi
 
 #
-# Look for the PYTHON executable and library
+# Look for the PYTHON executable and library.
 #
 
-# Configure the variables.  The help text will appear if the user uses "configure --help".
+# Configure the variables. The help text will appear if the user uses "configure --help".
 
 AC_ARG_VAR([MET_PYTHON_BIN_EXE], [Full path to the python executable corresponding to MET_PYTHON_CC and MET_PYTHON_LD, e.g. /usr/bin/python3.])
 AC_ARG_VAR([MET_PYTHON_CC], [Where the python header files are located, e.g. -I<include dir>. Set to the output of 'python3-config --cflags'.])
@@ -179,244 +159,217 @@ AC_ARG_VAR([MET_PYTHON_LD], [Where the python library files are located, e.g. -L
 if (test -n "$MET_PYTHON_BIN_EXE" || \
     test -n "$MET_PYTHON_CC" || \
     test -n "$MET_PYTHON_LD"); then
-  if test -z "$MET_PYTHON_BIN_EXE"; then
-    AC_MSG_ERROR([MET_PYTHON_CC or MET_PYTHON_LD environment variable set, but MET_PYTHON_BIN_EXE not set.  If one of these variables is set, then all must be set.])
-  elif test -z "$MET_PYTHON_CC"; then
-    AC_MSG_ERROR([MET_PYTHON_BIN_EXE or MET_PYTHON_LD environment variable set, but MET_PYTHON_CC not set.  If one of these variables is set, then all must be set.])
-  elif test -z "$MET_PYTHON_LD"; then
-    AC_MSG_ERROR([MET_PYTHON_BIN_EXE or MET_PYTHON_CC environment variable set, but MET_PYTHON_LD not set.  If one of these variables is set, then all must be set.])
+  if (test -z "$MET_PYTHON_BIN_EXE"); then
+    AC_MSG_ERROR([MET_PYTHON_CC or MET_PYTHON_LD environment variable set, but MET_PYTHON_BIN_EXE not set. If one of these variables is set, then all must be set.])
+  elif (test -z "$MET_PYTHON_CC"); then
+    AC_MSG_ERROR([MET_PYTHON_BIN_EXE or MET_PYTHON_LD environment variable set, but MET_PYTHON_CC not set. If one of these variables is set, then all must be set.])
+  elif (test -z "$MET_PYTHON_LD"); then
+    AC_MSG_ERROR([MET_PYTHON_BIN_EXE or MET_PYTHON_CC environment variable set, but MET_PYTHON_LD not set. If one of these variables is set, then all must be set.])
   fi
 fi
 
 # Add MET_PYTHON_BIN_EXE to the CPPFLAGS
 
-if test -n "$MET_PYTHON_BIN_EXE"; then
+if (test -n "$MET_PYTHON_BIN_EXE"); then
    CPPFLAGS=$CPPFLAGS' -DMET_PYTHON_BIN_EXE="\"${MET_PYTHON_BIN_EXE}\""'
 fi
 
-if test -n "$MET_PYTHON_CC"; then
+if (test -n "$MET_PYTHON_CC"); then
    CPPFLAGS="${CPPFLAGS} -I../../basic/vx_log -I../../basic/vx_util ${MET_PYTHON_CC}"
 fi
 
-if test -n "$MET_PYTHON_LD"; then
+if (test -n "$MET_PYTHON_LD"); then
    LDFLAGS="${LDFLAGS} ${MET_PYTHON_LD}"
 fi
 
 #
-# Look for the GSL library
+# Look for the GSL library.
 #
 
-# Configure the variables.  The help text will appear if the user uses "configure --help".
+# Configure the variables. The help text will appear if the user uses "configure --help".
 
-AC_ARG_VAR([MET_GSL], [Where gsl lib and include subdirectories are located.  If they are installed in /usr/local, you don't have to specify them.])
-AC_ARG_VAR([MET_GSLINC], [Where gsl include files are located. Use if the libraries and include files are not under the same main gsl directory.  If used, MET_GSLLIB must also be defined and MET_GSL will be ignored.])
-AC_ARG_VAR([MET_GSLLIB], [Where gsl libraries are located. Use if the libraries and include files are not under the same main gsl directory.  If used, MET_GSLINC must also be defined and MET_GSL will be ignored.])
+AC_ARG_VAR([MET_GSL], [Where gsl lib and include subdirectories are located. If they are installed in /usr/local, you don't have to specify them.])
+AC_ARG_VAR([MET_GSLINC], [Where gsl include files are located. Use if the libraries and include files are not under the same main gsl directory. If used, MET_GSLLIB must also be defined and MET_GSL will be ignored.])
+AC_ARG_VAR([MET_GSLLIB], [Where gsl libraries are located. Use if the libraries and include files are not under the same main gsl directory. If used, MET_GSLINC must also be defined and MET_GSL will be ignored.])
 
 # Ensure that both or neither are specified.
 
-if (test -n "$MET_GSLLIB" && test -z "$MET_GSLINC") || \
-   (test -n "$MET_GSLINC" && test -z "$MET_GSLLIB"); then
-  if test -n "$MET_GSLLIB"; then
-    AC_MSG_ERROR([MET_GSLLIB environment variable set, but MET_GSLINC not set.  If one of these variables is set, then both must be set.])
-  else
-    AC_MSG_ERROR([MET_GSLINC environment variable set, but MET_GSLLIB not set.  If one of these variables is set, then both must be set.])
-  fi
+if (test -n "$MET_GSLLIB" && test -z "$MET_GSLINC"); then
+  AC_MSG_ERROR([MET_GSLLIB environment variable set, but MET_GSLINC not set. If one of these variables is set, then both must be set.])
+elif (test -n "$MET_GSLINC" && test -z "$MET_GSLLIB"); then
+  AC_MSG_ERROR([MET_GSLINC environment variable set, but MET_GSLLIB not set. If one of these variables is set, then both must be set.])
 fi
 
-# If the individual locations weren't specified, then the main Gsl directory
-# must be specified.  If it isn't, let the user know they need to supply one.
+# Use the main GSL directory if individual locations were not specified.
 
-if test -z "$MET_GSLLIB" && test -n "$MET_GSL"; then
-   MET_GSLINC='${MET_GSL}/include'
-   MET_GSLLIB='${MET_GSL}/lib'
+if (test -n "$MET_GSL" && test -z "$MET_GSLLIB"); then
+  MET_GSLINC='${MET_GSL}/include'
+  MET_GSLLIB='${MET_GSL}/lib'
 fi
 
-# AC_SUBST command line variables.  If we get here, the Gsl
-# libraries were found so no need to check
+# AC_SUBST command line variables.
 
-if test -n "$MET_GSLLIB"; then
-   CPPFLAGS="${CPPFLAGS} -I${MET_GSLINC}"
-   LDFLAGS="${LDFLAGS} -L${MET_GSLLIB}"
+if (test -n "$MET_GSLLIB"); then
+  CPPFLAGS="${CPPFLAGS} -I${MET_GSLINC}"
+  LDFLAGS="${LDFLAGS} -L${MET_GSLLIB}"
 fi
 
 #
-# Look for the BUFR library
+# Look for the BUFR library.
 #
 
-# Configure the variables.  The help text will appear if the user uses "configure --help".
+# Configure the variables. The help text will appear if the user uses "configure --help".
 
-AC_ARG_VAR([MET_BUFR], [Where bufr lib subdirectory is located.  If it is installed in /usr/local, you don't have to specify it.])
-AC_ARG_VAR([MET_BUFRLIB], [Where bufr libraries are located. Use if the library files are not in a bin subdirectory.  If used MET_BUFR will be ignored.])
+AC_ARG_VAR([MET_BUFR], [Where bufr lib subdirectory is located. If it is installed in /usr/local, you don't have to specify it.])
+AC_ARG_VAR([MET_BUFRLIB], [Where bufr libraries are located. Use if the library files are not in a bin subdirectory. If used MET_BUFR will be ignored.])
 
 # If the individual locations weren't specified, then the main Bufr directory
-# must be specified.  If it isn't, let the user know they need to supply one.
+# must be specified. If it isn't, let the user know they need to supply one.
 
-if test -z "$MET_BUFRLIB" && test -n "$MET_BUFR"; then
-   MET_BUFRLIB='${MET_BUFR}/lib'
+if (test -n "$MET_BUFR" && test -z "$MET_BUFRLIB"); then
+  MET_BUFRLIB='${MET_BUFR}/lib'
 fi
 
-# AC_SUBST command line variables.  If we get here, the Bufr
-# libraries were found so no need to check
+# AC_SUBST command line variables.
 
-if test -n "$MET_BUFRLIB"; then
-   LDFLAGS="${LDFLAGS} -L${MET_BUFRLIB}"
+if (test -n "$MET_BUFRLIB"); then
+  LDFLAGS="${LDFLAGS} -L${MET_BUFRLIB}"
 fi
 
-# Configure the variables.  The help text will appear if the user uses "configure --help".
+# Configure the variables. The help text will appear if the user uses "configure --help".
 
-AC_ARG_VAR([BUFRLIB_NAME], [Name of bufr library to link with. For example, -lbufr_v11.3.0_4_64 or -lbufr, etc.  If it is -lbufr, you don't have to specify it.])
+AC_ARG_VAR([BUFRLIB_NAME], [Name of bufr library to link with. For example, -lbufr_v11.3.0_4_64 or -lbufr, etc. If it is -lbufr, you don't have to specify it.])
 
 AC_SUBST([BUFRLIB_NAME])
 AM_CONDITIONAL([BUFRLIB_NAME_SET], [test ! -z "$BUFRLIB_NAME"])
 AC_MSG_NOTICE([BUFRLIB_NAME will be set])
 
-
 #
-# Look for the HDF library
+# Look for the HDF library.
 #
 
-# Configure the variables.  The help text will appear if the user uses "configure --help".
+# Configure the variables. The help text will appear if the user uses "configure --help".
 
-AC_ARG_VAR([MET_HDF], [Where hdf version 4 lib and include subdirectories are located.  If they are installed in /usr/local, you don't have to specify them. HDF version 4 is only needed if you are building the MODIS utility.])
-AC_ARG_VAR([MET_HDFINC], [Where hdf version 4 include files are located. Use if the libraries and include files are not under the same main hdf directory.  If used, MET_HDFLIB must also be defined and MET_HDF will be ignored.])
-AC_ARG_VAR([MET_HDFLIB], [Where hdf version 4 libraries are located. Use if the libraries and include files are not under the same main hdf directory.  If used, MET_HDFINC must also be defined and MET_HDF will be ignored.])
+AC_ARG_VAR([MET_HDF], [Where hdf version 4 lib and include subdirectories are located. If they are installed in /usr/local, you don't have to specify them. HDF version 4 is only needed if you are building the MODIS utility.])
+AC_ARG_VAR([MET_HDFINC], [Where hdf version 4 include files are located. Use if the libraries and include files are not under the same main hdf directory. If used, MET_HDFLIB must also be defined and MET_HDF will be ignored.])
+AC_ARG_VAR([MET_HDFLIB], [Where hdf version 4 libraries are located. Use if the libraries and include files are not under the same main hdf directory. If used, MET_HDFINC must also be defined and MET_HDF will be ignored.])
 
 # Ensure that both or neither are specified.
 
-if (test -n "$MET_HDFLIB" && test -z "$MET_HDFINC") || \
-   (test -n "$MET_HDFINC" && test -z "$MET_HDFLIB"); then
-  if test -n "$MET_HDFLIB"; then
-    AC_MSG_ERROR([MET_HDFLIB environment variable set, but MET_HDFINC not set.  If one of these variables is set, then both must be set.])
-  else
-    AC_MSG_ERROR([MET_HDFINC environment variable set, but MET_HDFLIB not set.  If one of these variables is set, then both must be set.])
-  fi
+if (test -n "$MET_HDFLIB" && test -z "$MET_HDFINC"); then
+  AC_MSG_ERROR([MET_HDFLIB environment variable set, but MET_HDFINC not set. If one of these variables is set, then both must be set.])
+elif (test -n "$MET_HDFINC" && test -z "$MET_HDFLIB"); then
+  AC_MSG_ERROR([MET_HDFINC environment variable set, but MET_HDFLIB not set. If one of these variables is set, then both must be set.])
 fi
 
-# If the individual locations weren't specified, then the main HDF directory
-# must be specified.  If it isn't, let the user know they need to supply one.
+# Use the main HDF directory if individual locations were not specified.
 
-if test -z "$MET_HDFLIB" && test -n "$MET_HDF"; then
-   MET_HDFINC='${MET_HDF}/include'
-   MET_HDFLIB='${MET_HDF}/lib'
+if (test -n "$MET_HDF" && test -z "$MET_HDFLIB"); then
+  MET_HDFINC='${MET_HDF}/include'
+  MET_HDFLIB='${MET_HDF}/lib'
 fi
 
-# AC_SUBST command line variables.  If we get here, the HDF
-# libraries were found so no need to check
+# AC_SUBST command line variables.
 
-if test -n "$MET_HDFLIB"; then
-   CPPFLAGS="${CPPFLAGS} -I${MET_HDFINC}"
-   LDFLAGS="${LDFLAGS} -L${MET_HDFLIB}"
+if (test -n "$MET_HDFLIB"); then
+  CPPFLAGS="${CPPFLAGS} -I${MET_HDFINC}"
+  LDFLAGS="${LDFLAGS} -L${MET_HDFLIB}"
 fi
 
 #
-# Look for the HDFEOS library
+# Look for the HDFEOS library.
 #
 
-# Configure the variables.  The help text will appear if the user uses "configure --help".
+# Configure the variables. The help text will appear if the user uses "configure --help".
 
-AC_ARG_VAR([MET_HDFEOS], [Where hdfeos version 2 lib and include subdirectories are located.  If they are installed in /usr/local, you don't have to specify them. HDF-EOS version 2 is only needed if you are building the MODIS utility.])
-AC_ARG_VAR([MET_HDFEOSINC], [Where hdfeos version 2 include files are located. Use if the libraries and include files are not under the same main hdfeos directory.  If used, MET_HDFEOSLIB must also be defined and MET_HDFEOS will be ignored.])
-AC_ARG_VAR([MET_HDFEOSLIB], [Where hdfeos version 2 libraries are located. Use if the libraries and include files are not under the same main hdfeos directory.  If used, MET_HDFEOSINC must also be defined and MET_HDFEOS will be ignored.])
+AC_ARG_VAR([MET_HDFEOS], [Where hdfeos version 2 lib and include subdirectories are located. If they are installed in /usr/local, you don't have to specify them. HDF-EOS version 2 is only needed if you are building the MODIS utility.])
+AC_ARG_VAR([MET_HDFEOSINC], [Where hdfeos version 2 include files are located. Use if the libraries and include files are not under the same main hdfeos directory. If used, MET_HDFEOSLIB must also be defined and MET_HDFEOS will be ignored.])
+AC_ARG_VAR([MET_HDFEOSLIB], [Where hdfeos version 2 libraries are located. Use if the libraries and include files are not under the same main hdfeos directory. If used, MET_HDFEOSINC must also be defined and MET_HDFEOS will be ignored.])
 
 # Ensure that both or neither are specified.
 
-if (test -n "$MET_HDFEOSLIB" && test -z "$MET_HDFEOSINC") || \
-   (test -n "$MET_HDFEOSINC" && test -z "$MET_HDFEOSLIB"); then
-  if test -n "$MET_HDFEOSLIB"; then
-    AC_MSG_ERROR([MET_HDFEOSLIB environment variable set, but MET_HDFEOSINC not set.  If one of these variables is set, then both must be set.])
-  else
-    AC_MSG_ERROR([MET_HDFEOSINC environment variable set, but MET_HDFEOSLIB not set.  If one of these variables is set, then both must be set.])
-  fi
+if (test -n "$MET_HDFEOSLIB" && test -z "$MET_HDFEOSINC"); then
+  AC_MSG_ERROR([MET_HDFEOSLIB environment variable set, but MET_HDFEOSINC not set. If one of these variables is set, then both must be set.])
+elif (test -n "$MET_HDFEOSINC" && test -z "$MET_HDFEOSLIB"); then
+  AC_MSG_ERROR([MET_HDFEOSINC environment variable set, but MET_HDFEOSLIB not set. If one of these variables is set, then both must be set.])
 fi
 
-# If the individual locations weren't specified, then the main HDFEOS directory
-# must be specified.  If it isn't, let the user know they need to supply one.
+# Use the main HDFEOS directory if individual locations were not specified.
 
-if test -z "$MET_HDFEOSLIB" && test -n "$MET_HDFEOS"; then
-   MET_HDFEOSINC='${MET_HDFEOS}/include'
-   MET_HDFEOSLIB='${MET_HDFEOS}/lib'
+if (test -n "$MET_HDFEOS" && test -z "$MET_HDFEOSLIB"); then
+  MET_HDFEOSINC='${MET_HDFEOS}/include'
+  MET_HDFEOSLIB='${MET_HDFEOS}/lib'
 fi
 
-# AC_SUBST command line variables.  If we get here, the HDFEOS
-# libraries were found so no need to check
+# AC_SUBST command line variables.
 
-if test -n "$MET_HDFEOSLIB"; then
-   CPPFLAGS="${CPPFLAGS} -I${MET_HDFEOSINC}"
-   LDFLAGS="${LDFLAGS} -L${MET_HDFEOSLIB}"
+if (test -n "$MET_HDFEOSLIB"); then
+  CPPFLAGS="${CPPFLAGS} -I${MET_HDFEOSINC}"
+  LDFLAGS="${LDFLAGS} -L${MET_HDFEOSLIB}"
 fi
 
 #
 # Look for the Cairo library
 #
 
-# Configure the variables.  The help text will appear if the user uses "configure --help".
+# Configure the variables. The help text will appear if the user uses "configure --help".
 
-AC_ARG_VAR([MET_CAIRO], [Where cairo lib and include subdirectories are located.  If they are installed in /usr/local, you don't have to specify them. Cairo is only needed if you are building the mode_graphics utility.])
-AC_ARG_VAR([MET_CAIROINC], [Where cairo include files are located. Use if the libraries and include files are not under the same main cairo directory.  If used, MET_CAIROLIB must also be defined and MET_CAIRO will be ignored.])
-AC_ARG_VAR([MET_CAIROLIB], [Where cairo libraries are located. Use if the libraries and include files are not under the same main cairo directory.  If used, MET_CAIROINC must also be defined and MET_CAIRO will be ignored.])
+AC_ARG_VAR([MET_CAIRO], [Where cairo lib and include subdirectories are located. If they are installed in /usr/local, you don't have to specify them. Cairo is only needed if you are building the mode_graphics utility.])
+AC_ARG_VAR([MET_CAIROINC], [Where cairo include files are located. Use if the libraries and include files are not under the same main cairo directory. If used, MET_CAIROLIB must also be defined and MET_CAIRO will be ignored.])
+AC_ARG_VAR([MET_CAIROLIB], [Where cairo libraries are located. Use if the libraries and include files are not under the same main cairo directory. If used, MET_CAIROINC must also be defined and MET_CAIRO will be ignored.])
 
 # Ensure that both or neither are specified.
 
-if (test -n "$MET_CAIROLIB" && test -z "$MET_CAIROINC") || \
-   (test -n "$MET_CAIROINC" && test -z "$MET_CAIROLIB"); then
-  if test -n "$MET_CAIROLIB"; then
-    AC_MSG_ERROR([MET_CAIROLIB environment variable set, but MET_CAIROINC not set.  If one of these variables is set, then both must be set.])
-  else
-    AC_MSG_ERROR([MET_CAIROINC environment variable set, but MET_CAIROLIB not set.  If one of these variables is set, then both must be set.])
-  fi
+if (test -n "$MET_CAIROLIB" && test -z "$MET_CAIROINC"); then
+  AC_MSG_ERROR([MET_CAIROLIB environment variable set, but MET_CAIROINC not set. If one of these variables is set, then both must be set.])
+elif (test -n "$MET_CAIROINC" && test -z "$MET_CAIROLIB"); then
+  AC_MSG_ERROR([MET_CAIROINC environment variable set, but MET_CAIROLIB not set. If one of these variables is set, then both must be set.])
 fi
 
-# If the individual locations weren't specified, then the main Cairo directory
-# must be specified.  If it isn't, let the user know they need to supply one.
+# Use the main Cairo directory if individual locations were not specified.
 
-if test -z "$MET_CAIROLIB" && test -n "$MET_CAIRO"; then
-   MET_CAIROINC='${MET_CAIRO}/include'
-   MET_CAIROLIB='${MET_CAIRO}/lib'
+if (test -n "$MET_CAIRO" && test -z "$MET_CAIROLIB"); then
+  MET_CAIROINC='${MET_CAIRO}/include'
+  MET_CAIROLIB='${MET_CAIRO}/lib'
 fi
 
-# AC_SUBST command line variables.  If we get here, the Cairo
-# libraries were found so no need to check
+# AC_SUBST command line variables.
 
-if test -n "$MET_CAIROLIB"; then
-   CPPFLAGS="${CPPFLAGS} -I${MET_CAIROINC}"
-   LDFLAGS="${LDFLAGS} -L${MET_CAIROLIB}"
+if (test -n "$MET_CAIROLIB"); then
+  CPPFLAGS="${CPPFLAGS} -I${MET_CAIROINC}"
+  LDFLAGS="${LDFLAGS} -L${MET_CAIROLIB}"
 fi
 
 #
 # Look for the Freetype library
 #
 
-# Configure the variables.  The help text will appear if the user uses "configure --help".
+# Configure the variables. The help text will appear if the user uses "configure --help".
 
-AC_ARG_VAR([MET_FREETYPE], [Where freetype lib and include subdirectories are located.  If they are installed in /usr/local, you don't have to specify them. Freetype is only needed if you are building the mode_graphics utility.])
-AC_ARG_VAR([MET_FREETYPEINC], [Where freetype include files are located. Use if the libraries and include files are not under the same main freetype directory.  If used, MET_FREETYPELIB must also be defined and MET_FREETYPE will be ignored.])
-AC_ARG_VAR([MET_FREETYPELIB], [Where freetype libraries are located. Use if the libraries and include files are not under the same main freetype directory.  If used, MET_FREETYPEINC must also be defined and MET_FREETYPE will be ignored.])
+AC_ARG_VAR([MET_FREETYPE], [Where freetype lib and include subdirectories are located. If they are installed in /usr/local, you don't have to specify them. Freetype is only needed if you are building the mode_graphics utility.])
+AC_ARG_VAR([MET_FREETYPEINC], [Where freetype include files are located. Use if the libraries and include files are not under the same main freetype directory. If used, MET_FREETYPELIB must also be defined and MET_FREETYPE will be ignored.])
+AC_ARG_VAR([MET_FREETYPELIB], [Where freetype libraries are located. Use if the libraries and include files are not under the same main freetype directory. If used, MET_FREETYPEINC must also be defined and MET_FREETYPE will be ignored.])
 
 # Ensure that both or neither are specified.
 
-if (test -n "$MET_FREETYPELIB" && test -z "$MET_FREETYPEINC") || \
-   (test -n "$MET_FREETYPEINC" && test -z "$MET_FREETYPELIB"); then
-  if test -n "$MET_FREETYPELIB"; then
-    AC_MSG_ERROR([MET_FREETYPELIB environment variable set, but MET_FREETYPEINC not set.  If one of these variables is set, then both must be set.])
-  else
-    AC_MSG_ERROR([MET_FREETYPEINC environment variable set, but MET_FREETYPELIB not set.  If one of these variables is set, then both must be set.])
-  fi
+if (test -n "$MET_FREETYPELIB" && test -z "$MET_FREETYPEINC"); then
+  AC_MSG_ERROR([MET_FREETYPELIB environment variable set, but MET_FREETYPEINC not set. If one of these variables is set, then both must be set.])
+elif (test -n "$MET_FREETYPEINC" && test -z "$MET_FREETYPELIB"); then
+  AC_MSG_ERROR([MET_FREETYPEINC environment variable set, but MET_FREETYPELIB not set. If one of these variables is set, then both must be set.])
 fi
 
-# If the individual locations weren't specified, then the main Freetype directory
-# must be specified.  If it isn't, let the user know they need to supply one.
+# Use the main Freetype directory if individual locations were not specified.
 
-if test -z "$MET_FREETYPELIB" && test -n "$MET_FREETYPE"; then
-   MET_FREETYPEINC='${MET_FREETYPE}/include'
-   MET_FREETYPELIB='${MET_FREETYPE}/lib'
+if (test -z "$MET_FREETYPELIB" && test -n "$MET_FREETYPE"); then
+  MET_FREETYPEINC='${MET_FREETYPE}/include'
+  MET_FREETYPELIB='${MET_FREETYPE}/lib'
 fi
 
-# AC_SUBST command line variables.  If we get here, the Freetype
-# libraries were found so no need to check
+# AC_SUBST command line variables.
 
-if test -n "$MET_FREETYPELIB"; then
-   CPPFLAGS="${CPPFLAGS} -I${MET_FREETYPEINC}"
-   LDFLAGS="${LDFLAGS} -L${MET_FREETYPELIB}"
+if (test -n "$MET_FREETYPELIB"); then
+  CPPFLAGS="${CPPFLAGS} -I${MET_FREETYPEINC}"
+  LDFLAGS="${LDFLAGS} -L${MET_FREETYPELIB}"
 fi
 
 #
@@ -437,10 +390,10 @@ AC_ARG_ENABLE(block4,
 AM_CONDITIONAL([ENABLE_BLOCK4], [test "x$ENABLE_BLOCK4" = "xyes"])
 
 if test "x$ENABLE_BLOCK4" = "xyes"; then
-    CPPFLAGS="${CPPFLAGS} -DBLOCK4"
-    AC_MSG_NOTICE([-DBLOCK4 will be used in the compiles])
+  CPPFLAGS="${CPPFLAGS} -DBLOCK4"
+  AC_MSG_NOTICE([-DBLOCK4 will be used in the compiles])
 else
-    AC_MSG_NOTICE([-DBLOCK4 will not be used in the compiles])
+  AC_MSG_NOTICE([-DBLOCK4 will not be used in the compiles])
 fi
 
 # static linking
@@ -458,9 +411,9 @@ AM_CONDITIONAL([ENABLE_STATIC_LINKING], [test "x$ENABLE_STATIC_LINKING" = "xyes"
 
 if test "x$ENABLE_STATIC_LINKING" = "xyes"; then
     LDFLAGS="${LDFLAGS} -static"
-    AC_MSG_NOTICE([Static linking will be used in the compiles])
+  AC_MSG_NOTICE([Static linking will be used in the compiles])
 else
-    AC_MSG_NOTICE([Dynamic linking will not be used in the compiles])
+  AC_MSG_NOTICE([Dynamic linking will not be used in the compiles])
 fi
 
 # ascii2nc
@@ -477,10 +430,10 @@ AC_ARG_ENABLE(ascii2nc,
 AM_CONDITIONAL([ENABLE_ASCII2NC], [test "x$ENABLE_ASCII2NC" = "xyes"])
 
 if test "x$ENABLE_ASCII2NC" = "xyes"; then
-    AC_DEFINE([ENABLE_ASCII2NC], [], ["build ascii2nc"])
-    AC_MSG_NOTICE([ascii2nc will be compiled])
+  AC_DEFINE([ENABLE_ASCII2NC], [], ["build ascii2nc"])
+  AC_MSG_NOTICE([ascii2nc will be compiled])
 else
-    AC_MSG_NOTICE([ascii2nc will not be compiled])
+  AC_MSG_NOTICE([ascii2nc will not be compiled])
 fi
 
 # lidar2nc
@@ -497,10 +450,10 @@ AC_ARG_ENABLE(lidar2nc,
 AM_CONDITIONAL([ENABLE_LIDAR2NC], [test "x$ENABLE_LIDAR2NC" = "xyes"])
 
 if test "x$ENABLE_LIDAR2NC" = "xyes"; then
-    AC_DEFINE([ENABLE_LIDAR2NC], [], ["build lidar2nc"])
-    AC_MSG_NOTICE([lidar2nc will be compiled])
+  AC_DEFINE([ENABLE_LIDAR2NC], [], ["build lidar2nc"])
+  AC_MSG_NOTICE([lidar2nc will be compiled])
 else
-    AC_MSG_NOTICE([lidar2nc will not be compiled])
+  AC_MSG_NOTICE([lidar2nc will not be compiled])
 fi
 
 # ensemble_stat
@@ -517,10 +470,10 @@ AC_ARG_ENABLE(ensemble_stat,
 AM_CONDITIONAL([ENABLE_ENSEMBLE_STAT], [test "x$ENABLE_ENSEMBLE_STAT" = "xyes"])
 
 if test "x$ENABLE_ENSEMBLE_STAT" = "xyes"; then
-    AC_DEFINE([ENABLE_ENSEMBLE_STAT], [], ["build ensemble_stat"])
-    AC_MSG_NOTICE([ensemble_stat will be compiled])
+  AC_DEFINE([ENABLE_ENSEMBLE_STAT], [], ["build ensemble_stat"])
+  AC_MSG_NOTICE([ensemble_stat will be compiled])
 else
-    AC_MSG_NOTICE([ensemble_stat will not be compiled])
+  AC_MSG_NOTICE([ensemble_stat will not be compiled])
 fi
 
 # gen_ens_prod
@@ -537,10 +490,10 @@ AC_ARG_ENABLE(gen_ens_prod,
 AM_CONDITIONAL([ENABLE_GEN_ENS_PROD], [test "x$ENABLE_GEN_ENS_PROD" = "xyes"])
 
 if test "x$ENABLE_GEN_ENS_PROD" = "xyes"; then
-    AC_DEFINE([ENABLE_GEN_ENS_PROD], [], ["build gen_ens_prod"])
-    AC_MSG_NOTICE([gen_ens_prod will be compiled])
+  AC_DEFINE([ENABLE_GEN_ENS_PROD], [], ["build gen_ens_prod"])
+  AC_MSG_NOTICE([gen_ens_prod will be compiled])
 else
-    AC_MSG_NOTICE([gen_ens_prod will not be compiled])
+  AC_MSG_NOTICE([gen_ens_prod will not be compiled])
 fi
 
 
@@ -558,10 +511,10 @@ AC_ARG_ENABLE(gen_vx_mask,
 AM_CONDITIONAL([ENABLE_GEN_VX_MASK], [test "x$ENABLE_GEN_VX_MASK" = "xyes"])
 
 if test "x$ENABLE_GEN_VX_MASK" = "xyes"; then
-    AC_DEFINE([ENABLE_GEN_VX_MASK], [], ["build gen_vx_mask"])
-    AC_MSG_NOTICE([gen_vx_mask will be compiled])
+  AC_DEFINE([ENABLE_GEN_VX_MASK], [], ["build gen_vx_mask"])
+  AC_MSG_NOTICE([gen_vx_mask will be compiled])
 else
-    AC_MSG_NOTICE([gen_vx_mask will not be compiled])
+  AC_MSG_NOTICE([gen_vx_mask will not be compiled])
 fi
 
 
@@ -579,10 +532,10 @@ AC_ARG_ENABLE(gis_utils,
 AM_CONDITIONAL([ENABLE_GIS_UTILS], [test "x$ENABLE_GIS_UTILS" = "xyes"])
 
 if test "x$ENABLE_GIS_UTILS" = "xyes"; then
-    AC_DEFINE([ENABLE_GIS_UTILS], [], ["build gis_utils"])
-    AC_MSG_NOTICE([gis_utils will be compiled])
+  AC_DEFINE([ENABLE_GIS_UTILS], [], ["build gis_utils"])
+  AC_MSG_NOTICE([gis_utils will be compiled])
 else
-    AC_MSG_NOTICE([gis_utils will not be compiled])
+  AC_MSG_NOTICE([gis_utils will not be compiled])
 fi
 
 
@@ -600,10 +553,10 @@ AC_ARG_ENABLE(grid_stat,
 AM_CONDITIONAL([ENABLE_GRID_STAT], [test "x$ENABLE_GRID_STAT" = "xyes"])
 
 if test "x$ENABLE_GRID_STAT" = "xyes"; then
-    AC_DEFINE([ENABLE_GRID_STAT], [], ["build grid_stat"])
-    AC_MSG_NOTICE([grid_stat will be compiled])
+  AC_DEFINE([ENABLE_GRID_STAT], [], ["build grid_stat"])
+  AC_MSG_NOTICE([grid_stat will be compiled])
 else
-    AC_MSG_NOTICE([grid_stat will not be compiled])
+  AC_MSG_NOTICE([grid_stat will not be compiled])
 fi
 
 # ioda2nc
@@ -620,10 +573,10 @@ AC_ARG_ENABLE(ioda2nc,
 AM_CONDITIONAL([ENABLE_IODA2NC], [test "x$ENABLE_IODA2NC" = "xyes"])
 
 if test "x$ENABLE_IODA2NC" = "xyes"; then
-    AC_DEFINE([ENABLE_IODA2NC], [], ["build ioda2nc"])
-    AC_MSG_NOTICE([ioda2nc will be compiled])
+  AC_DEFINE([ENABLE_IODA2NC], [], ["build ioda2nc"])
+  AC_MSG_NOTICE([ioda2nc will be compiled])
 else
-    AC_MSG_NOTICE([ioda2nc will not be compiled])
+  AC_MSG_NOTICE([ioda2nc will not be compiled])
 fi
 
 # madis2nc
@@ -640,10 +593,10 @@ AC_ARG_ENABLE(madis2nc,
 AM_CONDITIONAL([ENABLE_MADIS2NC], [test "x$ENABLE_MADIS2NC" = "xyes"])
 
 if test "x$ENABLE_MADIS2NC" = "xyes"; then
-    AC_DEFINE([ENABLE_MADIS2NC], [], ["build madis2nc"])
-    AC_MSG_NOTICE([madis2nc will be compiled])
+  AC_DEFINE([ENABLE_MADIS2NC], [], ["build madis2nc"])
+  AC_MSG_NOTICE([madis2nc will be compiled])
 else
-    AC_MSG_NOTICE([madis2nc will not be compiled])
+  AC_MSG_NOTICE([madis2nc will not be compiled])
 fi
 
 # mode
@@ -660,10 +613,10 @@ AC_ARG_ENABLE(mode,
 AM_CONDITIONAL([ENABLE_MODE], [test "x$ENABLE_MODE" = "xyes"])
 
 if test "x$ENABLE_MODE" = "xyes"; then
-    AC_DEFINE([ENABLE_MODE], [], ["build mode"])
-    AC_MSG_NOTICE([mode will be compiled])
+  AC_DEFINE([ENABLE_MODE], [], ["build mode"])
+  AC_MSG_NOTICE([mode will be compiled])
 else
-    AC_MSG_NOTICE([mode will not be compiled])
+  AC_MSG_NOTICE([mode will not be compiled])
 fi
 
 # mode_analysis
@@ -680,10 +633,10 @@ AC_ARG_ENABLE(mode_analysis,
 AM_CONDITIONAL([ENABLE_MODE_ANALYSIS], [test "x$ENABLE_MODE_ANALYSIS" = "xyes"])
 
 if test "x$ENABLE_MODE_ANALYSIS" = "xyes"; then
-    AC_DEFINE([ENABLE_MODE_ANALYSIS], [], ["build mode_analysis"])
-    AC_MSG_NOTICE([mode_analysis will be compiled])
+  AC_DEFINE([ENABLE_MODE_ANALYSIS], [], ["build mode_analysis"])
+  AC_MSG_NOTICE([mode_analysis will be compiled])
 else
-    AC_MSG_NOTICE([mode_analysis will not be compiled])
+  AC_MSG_NOTICE([mode_analysis will not be compiled])
 fi
 
 # pb2nc
@@ -700,10 +653,10 @@ AC_ARG_ENABLE(pb2nc,
 AM_CONDITIONAL([ENABLE_PB2NC], [test "x$ENABLE_PB2NC" = "xyes"])
 
 if test "x$ENABLE_PB2NC" = "xyes"; then
-    AC_DEFINE([ENABLE_PB2NC], [], ["build pb2nc"])
-    AC_MSG_NOTICE([pb2nc will be compiled])
+  AC_DEFINE([ENABLE_PB2NC], [], ["build pb2nc"])
+  AC_MSG_NOTICE([pb2nc will be compiled])
 else
-    AC_MSG_NOTICE([pb2nc will not be compiled])
+  AC_MSG_NOTICE([pb2nc will not be compiled])
 fi
 
 # pcp_combine
@@ -720,10 +673,10 @@ AC_ARG_ENABLE(pcp_combine,
 AM_CONDITIONAL([ENABLE_PCP_COMBINE], [test "x$ENABLE_PCP_COMBINE" = "xyes"])
 
 if test "x$ENABLE_PCP_COMBINE" = "xyes"; then
-    AC_DEFINE([ENABLE_PCP_COMBINE], [], ["build pcp_combine"])
-    AC_MSG_NOTICE([pcp_combine will be compiled])
+  AC_DEFINE([ENABLE_PCP_COMBINE], [], ["build pcp_combine"])
+  AC_MSG_NOTICE([pcp_combine will be compiled])
 else
-    AC_MSG_NOTICE([pcp_combine will not be compiled])
+  AC_MSG_NOTICE([pcp_combine will not be compiled])
 fi
 
 # plot_data_plane
@@ -740,10 +693,10 @@ AC_ARG_ENABLE(plot_data_plane,
 AM_CONDITIONAL([ENABLE_PLOT_DATA_PLANE], [test "x$ENABLE_PLOT_DATA_PLANE" = "xyes"])
 
 if test "x$ENABLE_PLOT_DATA_PLANE" = "xyes"; then
-    AC_DEFINE([ENABLE_PLOT_DATA_PLANE], [], ["build plot_data_plane"])
-    AC_MSG_NOTICE([plot_data_plane will be compiled])
+  AC_DEFINE([ENABLE_PLOT_DATA_PLANE], [], ["build plot_data_plane"])
+  AC_MSG_NOTICE([plot_data_plane will be compiled])
 else
-    AC_MSG_NOTICE([plot_data_plane will not be compiled])
+  AC_MSG_NOTICE([plot_data_plane will not be compiled])
 fi
 
 # regrid_data_plane
@@ -760,10 +713,10 @@ AC_ARG_ENABLE(regrid_data_plane,
 AM_CONDITIONAL([ENABLE_REGRID_DATA_PLANE], [test "x$ENABLE_REGRID_DATA_PLANE" = "xyes"])
 
 if test "x$ENABLE_REGRID_DATA_PLANE" = "xyes"; then
-    AC_DEFINE([ENABLE_REGRID_DATA_PLANE], [], ["build regrid_data_plane"])
-    AC_MSG_NOTICE([regrid_data_plane will be compiled])
+  AC_DEFINE([ENABLE_REGRID_DATA_PLANE], [], ["build regrid_data_plane"])
+  AC_MSG_NOTICE([regrid_data_plane will be compiled])
 else
-    AC_MSG_NOTICE([regrid_data_plane will not be compiled])
+  AC_MSG_NOTICE([regrid_data_plane will not be compiled])
 fi
 
 # point2grid
@@ -780,10 +733,10 @@ AC_ARG_ENABLE(point2grid,
 AM_CONDITIONAL([ENABLE_POINT2GRID], [test "x$ENABLE_POINT2GRID" = "xyes"])
 
 if test "x$ENABLE_POINT2GRID" = "xyes"; then
-    AC_DEFINE([ENABLE_POINT2GRID], [], ["build point2grid"])
-    AC_MSG_NOTICE([point2grid will be compiled])
+  AC_DEFINE([ENABLE_POINT2GRID], [], ["build point2grid"])
+  AC_MSG_NOTICE([point2grid will be compiled])
 else
-    AC_MSG_NOTICE([point2grid will not be compiled])
+  AC_MSG_NOTICE([point2grid will not be compiled])
 fi
 
 # shift_data_plane
@@ -800,10 +753,10 @@ AC_ARG_ENABLE(shift_data_plane,
 AM_CONDITIONAL([ENABLE_SHIFT_DATA_PLANE], [test "x$ENABLE_SHIFT_DATA_PLANE" = "xyes"])
 
 if test "x$ENABLE_SHIFT_DATA_PLANE" = "xyes"; then
-    AC_DEFINE([ENABLE_SHIFT_DATA_PLANE], [], ["build shift_data_plane"])
-    AC_MSG_NOTICE([shift_data_plane will be compiled])
+  AC_DEFINE([ENABLE_SHIFT_DATA_PLANE], [], ["build shift_data_plane"])
+  AC_MSG_NOTICE([shift_data_plane will be compiled])
 else
-    AC_MSG_NOTICE([shift_data_plane will not be compiled])
+  AC_MSG_NOTICE([shift_data_plane will not be compiled])
 fi
 
 # plot_point_obs
@@ -820,10 +773,10 @@ AC_ARG_ENABLE(plot_point_obs,
 AM_CONDITIONAL([ENABLE_PLOT_POINT_OBS], [test "x$ENABLE_PLOT_POINT_OBS" = "xyes"])
 
 if test "x$ENABLE_PLOT_POINT_OBS" = "xyes"; then
-    AC_DEFINE([ENABLE_PLOT_POINT_OBS], [], ["build plot_point_obs"])
-    AC_MSG_NOTICE([plot_point_obs will be compiled])
+  AC_DEFINE([ENABLE_PLOT_POINT_OBS], [], ["build plot_point_obs"])
+  AC_MSG_NOTICE([plot_point_obs will be compiled])
 else
-    AC_MSG_NOTICE([plot_point_obs will not be compiled])
+  AC_MSG_NOTICE([plot_point_obs will not be compiled])
 fi
 
 # point_stat
@@ -840,10 +793,10 @@ AC_ARG_ENABLE(point_stat,
 AM_CONDITIONAL([ENABLE_POINT_STAT], [test "x$ENABLE_POINT_STAT" = "xyes"])
 
 if test "x$ENABLE_POINT_STAT" = "xyes"; then
-    AC_DEFINE([ENABLE_POINT_STAT], [], ["build point_stat"])
-    AC_MSG_NOTICE([point_stat will be compiled])
+  AC_DEFINE([ENABLE_POINT_STAT], [], ["build point_stat"])
+  AC_MSG_NOTICE([point_stat will be compiled])
 else
-    AC_MSG_NOTICE([point_stat will not be compiled])
+  AC_MSG_NOTICE([point_stat will not be compiled])
 fi
 
 # stat_analysis
@@ -860,10 +813,10 @@ AC_ARG_ENABLE(stat_analysis,
 AM_CONDITIONAL([ENABLE_STAT_ANALYSIS], [test "x$ENABLE_STAT_ANALYSIS" = "xyes"])
 
 if test "x$ENABLE_STAT_ANALYSIS" = "xyes"; then
-    AC_DEFINE([ENABLE_STAT_ANALYSIS], [], ["build stat_analysis"])
-    AC_MSG_NOTICE([stat_analysis will be compiled])
+  AC_DEFINE([ENABLE_STAT_ANALYSIS], [], ["build stat_analysis"])
+  AC_MSG_NOTICE([stat_analysis will be compiled])
 else
-    AC_MSG_NOTICE([stat_analysis will not be compiled])
+  AC_MSG_NOTICE([stat_analysis will not be compiled])
 fi
 
 # wavelet_stat
@@ -880,10 +833,10 @@ AC_ARG_ENABLE(wavelet_stat,
 AM_CONDITIONAL([ENABLE_WAVELET_STAT], [test "x$ENABLE_WAVELET_STAT" = "xyes"])
 
 if test "x$ENABLE_WAVELET_STAT" = "xyes"; then
-    AC_DEFINE([ENABLE_WAVELET_STAT], [], ["build wavelet_stat"])
-    AC_MSG_NOTICE([wavelet_stat will be compiled])
+  AC_DEFINE([ENABLE_WAVELET_STAT], [], ["build wavelet_stat"])
+  AC_MSG_NOTICE([wavelet_stat will be compiled])
 else
-    AC_MSG_NOTICE([wavelet_stat will not be compiled])
+  AC_MSG_NOTICE([wavelet_stat will not be compiled])
 fi
 
 # series_analysis
@@ -900,10 +853,10 @@ AC_ARG_ENABLE(series_analysis,
 AM_CONDITIONAL([ENABLE_SERIES_ANALYSIS], [test "x$ENABLE_SERIES_ANALYSIS" = "xyes"])
 
 if test "x$ENABLE_SERIES_ANALYSIS" = "xyes"; then
-    AC_DEFINE([ENABLE_SERIES_ANALYSIS], [], ["build series_analysis"])
-    AC_MSG_NOTICE([series_analysis will be compiled])
+  AC_DEFINE([ENABLE_SERIES_ANALYSIS], [], ["build series_analysis"])
+  AC_MSG_NOTICE([series_analysis will be compiled])
 else
-    AC_MSG_NOTICE([series_analysis will not be compiled])
+  AC_MSG_NOTICE([series_analysis will not be compiled])
 fi
 
 # wwmca
@@ -920,10 +873,10 @@ AC_ARG_ENABLE(wwmca,
 AM_CONDITIONAL([ENABLE_WWMCA], [test "x$ENABLE_WWMCA" = "xyes"])
 
 if test "x$ENABLE_WWMCA" = "xyes"; then
-    AC_DEFINE([ENABLE_WWMCA], [], ["build wwmca"])
-    AC_MSG_NOTICE([wwmca will be compiled])
+  AC_DEFINE([ENABLE_WWMCA], [], ["build wwmca"])
+  AC_MSG_NOTICE([wwmca will be compiled])
 else
-    AC_MSG_NOTICE([wwmca will not be compiled])
+  AC_MSG_NOTICE([wwmca will not be compiled])
 fi
 
 # modis
@@ -940,10 +893,10 @@ AC_ARG_ENABLE(modis,
 AM_CONDITIONAL([ENABLE_MODIS], [test "x$ENABLE_MODIS" = "xyes"])
 
 if test "x$ENABLE_MODIS" = "xyes"; then
-    AC_DEFINE([ENABLE_MODIS], [], ["build modis"])
-    AC_MSG_NOTICE([modis will be compiled])
+  AC_DEFINE([ENABLE_MODIS], [], ["build modis"])
+  AC_MSG_NOTICE([modis will be compiled])
 else
-    AC_MSG_NOTICE([modis will not be compiled])
+  AC_MSG_NOTICE([modis will not be compiled])
 fi
 
 # mode_graphics
@@ -960,10 +913,10 @@ AC_ARG_ENABLE(mode_graphics,
 AM_CONDITIONAL([ENABLE_MODE_GRAPHICS], [test "x$ENABLE_MODE_GRAPHICS" = "xyes"])
 
 if test "x$ENABLE_MODE_GRAPHICS" = "xyes"; then
-    AC_DEFINE([ENABLE_MODE_GRAPHICS], [], ["build mode_graphics"])
-    AC_MSG_NOTICE([mode_graphics will be compiled])
+  AC_DEFINE([ENABLE_MODE_GRAPHICS], [], ["build mode_graphics"])
+  AC_MSG_NOTICE([mode_graphics will be compiled])
 else
-    AC_MSG_NOTICE([mode_graphics will not be compiled])
+  AC_MSG_NOTICE([mode_graphics will not be compiled])
 fi
 
 # mode_time_domain
@@ -980,10 +933,10 @@ AC_ARG_ENABLE(mode_time_domain,
 AM_CONDITIONAL([ENABLE_MODE_TIME_DOMAIN], [test "x$ENABLE_MODE_TIME_DOMAIN" = "xyes"])
 
 if test "x$ENABLE_MODE_TIME_DOMAIN" = "xyes"; then
-    AC_DEFINE([ENABLE_MODE_TIME_DOMAIN], [], ["build mode_time_domain"])
-    AC_MSG_NOTICE([mode_time_domain will be compiled])
+  AC_DEFINE([ENABLE_MODE_TIME_DOMAIN], [], ["build mode_time_domain"])
+  AC_MSG_NOTICE([mode_time_domain will be compiled])
 else
-    AC_MSG_NOTICE([mode_time_domain will not be compiled])
+  AC_MSG_NOTICE([mode_time_domain will not be compiled])
 fi
 
 # tc_utils
@@ -1000,10 +953,10 @@ AC_ARG_ENABLE(tc_utils,
 AM_CONDITIONAL([ENABLE_TC_UTILS], [test "x$ENABLE_TC_UTILS" = "xyes"])
 
 if test "x$ENABLE_TC_UTILS" = "xyes"; then
-    AC_DEFINE([ENABLE_TC_UTILS], [], ["build tc_utils"])
-    AC_MSG_NOTICE([tc_utils will be compiled])
+  AC_DEFINE([ENABLE_TC_UTILS], [], ["build tc_utils"])
+  AC_MSG_NOTICE([tc_utils will be compiled])
 else
-    AC_MSG_NOTICE([tc_utils will not be compiled])
+  AC_MSG_NOTICE([tc_utils will not be compiled])
 fi
 
 # gsi_tools
@@ -1020,10 +973,10 @@ AC_ARG_ENABLE(gsi_tools,
 AM_CONDITIONAL([ENABLE_GSI_TOOLS], [test "x$ENABLE_GSI_TOOLS" = "xyes"])
 
 if test "x$ENABLE_GSI_TOOLS" = "xyes"; then
-    AC_DEFINE([ENABLE_GSI_TOOLS], [], ["build gsi_tools"])
-    AC_MSG_NOTICE([gsi_tools will be compiled])
+  AC_DEFINE([ENABLE_GSI_TOOLS], [], ["build gsi_tools"])
+  AC_MSG_NOTICE([gsi_tools will be compiled])
 else
-    AC_MSG_NOTICE([gsi_tools will not be compiled])
+  AC_MSG_NOTICE([gsi_tools will not be compiled])
 fi
 
 # GRIB2
@@ -1041,18 +994,18 @@ AM_CONDITIONAL([ENABLE_GRIB2], [test "x$ENABLE_GRIB2" = "xyes"])
 AM_CONDITIONAL([GRIB2CLIB_NAME_SET], [test ! -z "$GRIB2CLIB_NAME"])
 
 if test "x$ENABLE_GRIB2" = "xyes"; then
-    AC_DEFINE([ENABLE_GRIB2], [], ["build GRIB2 utilities"])
-    AC_MSG_NOTICE([GRIB2 utilites will be compiled])
-    CPPFLAGS="${CPPFLAGS} -DWITH_GRIB2"
+  AC_DEFINE([ENABLE_GRIB2], [], ["build GRIB2 utilities"])
+  AC_MSG_NOTICE([GRIB2 utilites will be compiled])
+  CPPFLAGS="${CPPFLAGS} -DWITH_GRIB2"
     AC_SUBST([GRIB2CLIB_NAME])
-    AC_MSG_NOTICE([GRIB2CLIB_NAME will be set])
+  AC_MSG_NOTICE([GRIB2CLIB_NAME will be set])
     if test -z "$GRIB2CLIB_NAME"; then
        GRIB2_LIBS="-lvx_data2d_grib2 -lgrib2c -ljasper -lpng -lz"
     else
        GRIB2_LIBS="-lvx_data2d_grib2 ${GRIB2CLIB_NAME} -ljasper -lpng -lz"
     fi
 else
-    AC_MSG_NOTICE([GRIB2 utilities will not be compiled])
+  AC_MSG_NOTICE([GRIB2 utilities will not be compiled])
     GRIB2_LIBS=
 fi
 AC_SUBST([GRIB2_LIBS])
@@ -1071,20 +1024,15 @@ AC_ARG_ENABLE(python,
 AM_CONDITIONAL([ENABLE_PYTHON], [test "x$ENABLE_PYTHON" = "xyes"])
 
 if test "x$ENABLE_PYTHON" = "xyes"; then
-    AC_DEFINE([ENABLE_PYTHON], [], ["build python embedding"])
-    AC_MSG_NOTICE([python embedding will be compiled])
-    CPPFLAGS="${CPPFLAGS} -DWITH_PYTHON"
-    PYTHON_LIBS="-lvx_data2d_python -lvx_pointdata_python -lvx_python3_utils ${MET_PYTHON_LD}"
+  AC_DEFINE([ENABLE_PYTHON], [], ["build python embedding"])
+  AC_MSG_NOTICE([python embedding will be compiled])
+  CPPFLAGS="${CPPFLAGS} -DWITH_PYTHON"
+  PYTHON_LIBS="-lvx_data2d_python -lvx_pointdata_python -lvx_python3_utils ${MET_PYTHON_LD}"
 else
-    AC_MSG_NOTICE([python embedding will not be compiled])
-    PYTHON_LIBS=
+  AC_MSG_NOTICE([python embedding will not be compiled])
+  PYTHON_LIBS=
 fi
 AC_SUBST([PYTHON_LIBS])
-
-########################################################################
-
-
-
 
 ########################################################################
 
