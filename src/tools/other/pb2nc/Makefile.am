@@ -59,7 +59,7 @@ pb2nc_LDADD = -lvx_stat_out \
 	-lvx_cal \
 	-lvx_log \
 	$(PYTHON_LIBS) \
-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas $(BLIB_NAME) \
+	-lm -lproj -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas $(BLIB_NAME) \
 	$(FLIBS)
 
 EXTRA_DIST = readpb.prm \

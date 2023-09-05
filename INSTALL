@@ -84,6 +84,11 @@ sub-directory, or the MET Online Tutorial:
   $MET_<lib>LIB pointing to the directory with the library files.  If
   $MET_<lib>INC and $MET_<lib>LIB are defined, then $MET_<lib> is ignored.
 
+   - Set $MET_PROJ to point to the main Proj directory, or set
+     $MET_PROJINC to point to the directory with the Proj include files
+     and set $MET_PROJLIB to point to the directory with the Proj
+     library files.
+
    - Set $MET_NETCDF to point to the main NetCDF directory, or set
      $MET_NETCDFINC to point to the directory with the NetCDF include files
      and set $MET_NETCDFLIB to point to the directory with the NetCDF

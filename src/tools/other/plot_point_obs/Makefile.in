@@ -242,6 +242,9 @@ MET_HDFLIB = @MET_HDFLIB@
 MET_NETCDF = @MET_NETCDF@
 MET_NETCDFINC = @MET_NETCDFINC@
 MET_NETCDFLIB = @MET_NETCDFLIB@
+MET_PROJ = @MET_PROJ@
+MET_PROJINC = @MET_PROJINC@
+MET_PROJLIB = @MET_PROJLIB@
 MET_PYTHON_BIN_EXE = @MET_PYTHON_BIN_EXE@
 MET_PYTHON_CC = @MET_PYTHON_CC@
 MET_PYTHON_LD = @MET_PYTHON_LD@
@@ -354,7 +357,7 @@ plot_point_obs_LDADD = -lvx_statistics \
 	-lvx_cal \
 	-lvx_log \
 	$(PYTHON_LIBS) \
-	-lm -lz -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
+	-lm -lproj -lz -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
 
 EXTRA_DIST = plot_point_obs.h \
 	plot_point_obs_conf_info.h

@@ -280,6 +280,9 @@ MET_HDFLIB = @MET_HDFLIB@
 MET_NETCDF = @MET_NETCDF@
 MET_NETCDFINC = @MET_NETCDFINC@
 MET_NETCDFLIB = @MET_NETCDFLIB@
+MET_PROJ = @MET_PROJ@
+MET_PROJINC = @MET_PROJINC@
+MET_PROJLIB = @MET_PROJLIB@
 MET_PYTHON_BIN_EXE = @MET_PYTHON_BIN_EXE@
 MET_PYTHON_CC = @MET_PYTHON_CC@
 MET_PYTHON_LD = @MET_PYTHON_LD@
@@ -416,7 +419,7 @@ mtd_LDADD = -lvx_pxm \
 	-lvx_math \
 	-lvx_color \
 	-lvx_log \
-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas -lz
+	-lm -lproj -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas -lz
 
 all: all-am
 
