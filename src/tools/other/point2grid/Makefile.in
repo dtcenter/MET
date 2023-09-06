@@ -254,6 +254,9 @@ MET_HDFLIB = @MET_HDFLIB@
 MET_NETCDF = @MET_NETCDF@
 MET_NETCDFINC = @MET_NETCDFINC@
 MET_NETCDFLIB = @MET_NETCDFLIB@
+MET_PROJ = @MET_PROJ@
+MET_PROJINC = @MET_PROJINC@
+MET_PROJLIB = @MET_PROJLIB@
 MET_PYTHON_BIN_EXE = @MET_PYTHON_BIN_EXE@
 MET_PYTHON_CC = @MET_PYTHON_CC@
 MET_PYTHON_LD = @MET_PYTHON_LD@
@@ -358,7 +361,7 @@ point2grid_LDADD = -lvx_statistics \
 	-lvx_cal \
 	-lvx_log \
 	$(PYTHON_LIBS) \
-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
+	-lm -lproj -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
 
 all: all-am
 

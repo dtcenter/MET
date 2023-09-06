@@ -7,6 +7,7 @@ MET_PROJ_DIR=/d1/projects/MET
 # Variables required to build MET
 export MET_DEVELOPMENT=true
 export MET_DST=/usr/local
+export MET_PROJ=${MET_DST}/proj-9.2.1
 export MET_NETCDF=${MET_DST}/netcdf-4.7.0/gcc-8.3.0
 export MET_HDF5=${MET_DST}/hdf5-1.8.21
 export MET_HDFINC=${MET_DST}/hdf4-4.2.15/include/hdf
@@ -33,7 +34,7 @@ export CXXFLAGS=${CFLAGS}
 
 # Set LDFLAGS to include -rpath settings when compiling MET
 export LDFLAGS="-Wl,--disable-new-dtags"
-export LDFLAGS="${LDFLAGS} -Wl,-rpath,${MET_DST}/lib:${MET_HDFEOS}/lib:${MET_NETCDF}/lib:${MET_DST}/zlib-1.2.11/lib:${MET_DST}/szip-2.1.1/lib"
+export LDFLAGS="${LDFLAGS} -Wl,-rpath,${MET_DST}/lib:${MET_HDFEOS}/lib:${MET_PROJ}/lib:${MET_NETCDF}/lib:${MET_DST}/zlib-1.2.11/lib:${MET_DST}/szip-2.1.1/lib"
 export LDFLAGS="${LDFLAGS} -Wl,-rpath,${MET_HDFLIB}:${MET_HDF5}/lib:${MET_GSL}/lib:${MET_PYTHON}/lib:${MET_JASPER}/lib"
 export LDFLAGS="${LDFLAGS} -L${MET_JASPER}/lib"
 

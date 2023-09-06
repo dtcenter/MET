@@ -40,7 +40,7 @@ grid_diag_LDADD = -lvx_stat_out \
 	-lvx_color \
 	-lvx_log \
 	-lvx_gsl_prob \
-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
+	-lm -lproj -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
 
 EXTRA_DIST = grid_diag.h \
 	grid_diag_conf_info.h

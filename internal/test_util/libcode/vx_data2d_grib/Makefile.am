@@ -27,4 +27,4 @@ test_read_grib1_LDADD = -lvx_data2d_grib \
 	-lvx_color \
 	-lvx_cal \
 	-lvx_log \
-	-lgsl -lgslcblas
+	-lproj -lgsl -lgslcblas

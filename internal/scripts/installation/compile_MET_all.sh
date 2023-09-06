@@ -36,7 +36,7 @@
 #
 # The compile_MET_all.sh script will compile and install MET and its
 # external library dependencies, if needed, including:
-# GSL, BUFRLIB, GRIB2C (with dependencies Z, PNG, JASPER),
+# PROJ, GSL, BUFRLIB, GRIB2C (with dependencies Z, PNG, JASPER),
 # HDF5, NETCDF (C and CXX), HDF4 (optional for MODIS-Regrid
 # and lidar2nc), HDFEOS (optional for MODIS-Regrid and lidar2nc),
 # FREETYPE (optional for MODE Graphics), and CAIRO (optional
@@ -51,7 +51,7 @@
 # in the input environment configuration file (install_met_env.<machine_name>:
 # MET_GRIB2CLIB, MET_GRIB2CINC, GRIB2CLIB_NAME,
 # MET_BUFRLIB, BUFRLIB_NAME, MET_HDF5, MET_NETCDF,
-# MET_GSL, LIB_JASPER, LIB_PNG, LIB_Z.
+# MET_PROJ, MET_GSL, LIB_JASPER, LIB_PNG, LIB_Z.
 #
 # The optional libraries HDF4, HDFEOS, FREETYPE, and CAIRO are
 # used for the following, not widely used tools, MODIS-Regrid,
@@ -180,6 +180,12 @@ else
   COMPILE_NETCDF=0
 fi
 
+if [ -z ${MET_PROJ} ]; then
+  COMPILE_PROJ=1
+else
+  COMPILE_PROJ=0
+fi
+
 if [ -z ${MET_GSL} ]; then
   COMPILE_GSL=1
 else
@@ -239,6 +245,7 @@ if [ ! -z "${SKIP_MET}" ]; then COMPILE_MET=0; fi
 
 # skip compilation of external libraries if SKIP_LIBS is set
 if [ ! -z "${SKIP_LIBS}" ]; then
+  COMPILE_PROJ=0
   COMPILE_GSL=0
   COMPILE_BUFRLIB=0
   COMPILE_ZLIB=0
@@ -382,6 +389,25 @@ fi
 if [[ ${MET_PYTHON}/bin/python3 ]]; then
   echo "Using python version: "
   ${MET_PYTHON}/bin/python3 --version
+fi
+
+# Compile Proj
+if [ $COMPILE_PROJ -eq 1 ]; then
+
+  vrs="9.2.1";
+
+  echo
+  echo "Compiling PROJ_${vrs} at `date`"
+  mkdir -p ${LIB_DIR}/proj
+  rm -rf ${LIB_DIR}/proj/proj*
+  tar -xf ${TAR_DIR}/proj-${vrs}.tar.gz -C ${LIB_DIR}/proj
+  cd ${LIB_DIR}/proj/proj*
+  echo "cd `pwd`"
+  run_cmd "mkdir build; cd build"
+  run_cmd "cmake -DCMAKE_INSTALL_PREFIX=${LIB_DIR} .."
+  run_cmd "cmake --build ."
+  run_cmd "cmake --build . --target install"
+
 fi
 
 # Compile GSL
@@ -530,11 +556,7 @@ if [ $COMPILE_HDF -eq 1 ]; then
   tar -xf ${TAR_DIR}/HDF4.2*.tar.gz -C ${LIB_DIR}/hdf
   cd ${LIB_DIR}/hdf/HDF*
   echo "cd `pwd`"
-  run_cmd "./configure --prefix=${LIB_DIR} --disable-netcdf --with-jpeg=${LIB_DIR} --with-zlib=${LIB_DIR} > hdf4.configure.log 2>&1"
-  cat mfhdf/hdiff/Makefile | \
-    sed 's/LIBS = -ljpeg -lz/LIBS = -ljpeg -lz -lm/g' \
-    > Makefile_new
-  mv Makefile_new mfhdf/hdiff/Makefile
+  run_cmd "./configure --prefix=${LIB_DIR} --disable-netcdf --with-jpeg=${LIB_DIR} --with-zlib=${LIB_DIR} CPPFLAGS=-I/usr/include/tirpc LIBS='-lm -ltirpc' > hdf4.configure.log 2>&1"
   if [[ ${COMPILER_MAJOR_VERSION} -ge 10 ]]; then
     cat hdf/src/Makefile | \
       sed 's/FFLAGS =  -O2/FFLAGS = -w -fallow-argument-mismatch -O2/g' \
@@ -705,7 +727,7 @@ fi
 # https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html
 # ${parameter:+word}
 # If parameter is null or unset, nothing is substituted, otherwise the expansion of word is substituted.
-export LDFLAGS="${LDFLAGS} -Wl,-rpath,${LIB_DIR}/lib${MET_NETCDF:+:$MET_NETCDF/lib}${MET_HDF5:+:$MET_HDF5/lib}${MET_BUFRLIB:+:$MET_BUFRLIB}${MET_GRIB2CLIB:+:$MET_GRIB2CLIB}${MET_PYTHON_LIB:+:$MET_PYTHON_LIB}${MET_GSL:+:$MET_GSL/lib}${ADDTL_DIR:+:$ADDTL_DIR}"
+export LDFLAGS="${LDFLAGS} -Wl,-rpath,${LIB_DIR}/lib${MET_PROJ:+:$MET_PROJ/lib}${LIB_DIR}/lib${MET_NETCDF:+:$MET_NETCDF/lib}${MET_HDF5:+:$MET_HDF5/lib}${MET_BUFRLIB:+:$MET_BUFRLIB}${MET_GRIB2CLIB:+:$MET_GRIB2CLIB}${MET_PYTHON_LIB:+:$MET_PYTHON_LIB}${MET_GSL:+:$MET_GSL/lib}${ADDTL_DIR:+:$ADDTL_DIR}"
 export LDFLAGS="${LDFLAGS} -Wl,-rpath,${LIB_JASPER:+$LIB_JASPER}${LIB_LIBPNG:+:$LIB_PNG}${LIB_Z:+$LIB_Z}"
 export LDFLAGS="${LDFLAGS} ${LIB_JASPER:+-L$LIB_JASPER} ${LIB_LIBPNG:+-L$LIB_LIBPNG} ${MET_HDF5:+-L$MET_HDF5/lib} ${ADDTL_DIR:+-L$ADDTL_DIR}"
 export LIBS="${LIBS} -lhdf5_hl -lhdf5 -lz"
