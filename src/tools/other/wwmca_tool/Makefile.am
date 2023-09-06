@@ -58,7 +58,7 @@ wwmca_regrid_LDADD = -lvx_pxm \
 	-lvx_math \
 	-lvx_color \
 	-lvx_log \
-	-lm -lz -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
+	-lm -lproj -lz -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
 
 wwmca_plot_SOURCES = gridhemisphere_to_string.cc gridhemisphere_to_string.h \
 	wwmca_plot.cc \
@@ -103,7 +103,7 @@ wwmca_plot_LDADD = -lvx_pxm \
 	-lvx_math \
 	-lvx_color \
 	-lvx_log \
-	-lm -lz -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
+	-lm -lproj -lz -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
 
 # If we are in development mode, generate the "to_string" files and
 # clean them up in a "make clean".  We don't want to do either of these

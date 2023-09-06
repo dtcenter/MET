@@ -237,6 +237,9 @@ MET_HDFLIB = @MET_HDFLIB@
 MET_NETCDF = @MET_NETCDF@
 MET_NETCDFINC = @MET_NETCDFINC@
 MET_NETCDFLIB = @MET_NETCDFLIB@
+MET_PROJ = @MET_PROJ@
+MET_PROJINC = @MET_PROJINC@
+MET_PROJLIB = @MET_PROJLIB@
 MET_PYTHON_BIN_EXE = @MET_PYTHON_BIN_EXE@
 MET_PYTHON_CC = @MET_PYTHON_CC@
 MET_PYTHON_LD = @MET_PYTHON_LD@
@@ -329,7 +332,7 @@ test_read_nccf_LDADD = -lvx_data2d_nccf \
 	-lvx_color \
 	-lvx_cal \
 	-lvx_log \
-	-lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
+	-lproj -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
 
 all: all-am
 

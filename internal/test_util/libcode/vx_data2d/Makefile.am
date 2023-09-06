@@ -26,7 +26,7 @@ test_table_read_LDADD = -lvx_config \
 	-lvx_cal \
 	-lvx_math \
 	-lvx_log \
-	-lgsl -lgslcblas
+	-lproj -lgsl -lgslcblas
 
 dump_default_table_SOURCES = dump_default_table.cc
 dump_default_table_CPPFLAGS = ${MET_CPPFLAGS}
@@ -41,4 +41,4 @@ dump_default_table_LDADD = -lvx_config \
 	-lvx_cal \
 	-lvx_math \
 	-lvx_log \
-	-lgsl -lgslcblas
+	-lproj -lgsl -lgslcblas

@@ -28,5 +28,5 @@ tc_dland_LDADD = -lvx_tc_util \
 	-lvx_gsl_prob \
 	-lvx_cal \
 	-lvx_math \
-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas \
+	-lm -lproj -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas \
 	$(FLIBS)

@@ -38,4 +38,4 @@ point2grid_LDADD = -lvx_statistics \
 	-lvx_cal \
 	-lvx_log \
 	$(PYTHON_LIBS) \
-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
+	-lm -lproj -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
