@@ -54,10 +54,10 @@ class IODA2NCConfInfo {
       ThreshArray  missing_thresh;      // Fill value thresh array
       ConcatString version;             // Config file version
 
-      map<ConcatString,ConcatString> obs_name_map;
-      map<ConcatString,ConcatString> message_type_map;
-      map<ConcatString,StringArray>  metadata_map;
-      map<ConcatString,StringArray>  obs_to_qc_map;
+      std::map<ConcatString,ConcatString> obs_name_map;
+      std::map<ConcatString,ConcatString> message_type_map;
+      std::map<ConcatString,StringArray>  metadata_map;
+      std::map<ConcatString,StringArray>  obs_to_qc_map;
       StringArray                    surface_message_types;
       TimeSummaryInfo                timeSummaryInfo;
 
@@ -66,8 +66,8 @@ class IODA2NCConfInfo {
 
       void clear();
 
-      map<ConcatString,ConcatString> getObsVarMap() const {  return obs_name_map; }
-      map<ConcatString,ConcatString> getMessageTypeMap() const { return message_type_map; }
+      std::map<ConcatString,ConcatString> getObsVarMap() const { return obs_name_map; }
+      std::map<ConcatString,ConcatString> getMessageTypeMap() const { return message_type_map; }
       TimeSummaryInfo getSummaryInfo() const { return timeSummaryInfo; };
 
       void read_config(const char *, const char *);
