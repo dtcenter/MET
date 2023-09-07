@@ -829,16 +829,3 @@ int MetGrib1DataFile::index(VarInfo &vinfo){
 }
 
 ////////////////////////////////////////////////////////////////////////
-
-int MetGrib1DataFile::data_planes(vector<VarInfo*> &vi_list,
-                                  vector<DataPlane> &dp_list) {
-
-   // TODO implement this
-
-   mlog << Error << "\nMetGrib1DataFile::data_planes() -> "
-        << "not yet implemented!\n\n";
-   exit(1);
-
-}
-
-////////////////////////////////////////////////////////////////////////

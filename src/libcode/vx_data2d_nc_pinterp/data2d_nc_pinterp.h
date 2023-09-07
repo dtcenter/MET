@@ -71,11 +71,6 @@ class MetNcPinterpDataFile : public Met2dDataFile {
 
       int index(VarInfo &);
 
-         //  retrieve a vector of all requested data planes
-
-      int data_planes(std::vector<VarInfo*>&,
-                      std::vector<DataPlane>&);
-
          //
          //  do stuff
          //

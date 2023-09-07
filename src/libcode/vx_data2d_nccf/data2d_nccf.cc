@@ -605,19 +605,6 @@ int MetNcCFDataFile::index(VarInfo &vinfo){
 
 ////////////////////////////////////////////////////////////////////////
 
-int MetNcCFDataFile::data_planes(vector<VarInfo*> &vi_list,
-                                 vector<DataPlane> &dp_list) {
-
-   // TODO implement this
-
-   mlog << Error << "\nMetNcCFDataFile::data_planes() -> "
-        << "not yet implemented!\n\n";
-   exit(1);
-
-}
-
-////////////////////////////////////////////////////////////////////////
-
 long MetNcCFDataFile::convert_time_to_offset(long time_value) {
    bool found = false;
    bool found_value = false;

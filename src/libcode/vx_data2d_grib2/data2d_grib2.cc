@@ -1611,30 +1611,6 @@ int MetGrib2DataFile::index( VarInfo &vinfo ){
 }
 
 ////////////////////////////////////////////////////////////////////////
-
-int MetGrib2DataFile::data_planes(vector<VarInfo*> &vi_list,
-                                  vector<DataPlane> &dp_list) {
-   int n_valid = 0;
-   DataPlane cur_dp;
-
-   // Loop over requested VarInfo objects
-   for(int i=0; i<vi_list.size(); i++) {
-
-      // Initialize
-      cur_dp.clear();
-
-      // Read the current DataPlane
-      if(data_plane(*vi_list[i], cur_dp)) n_valid++;
-      else                                cur_dp.clear();
-
-      // Store the result
-      dp_list.push_back(cur_dp);
-   }
-
-   return(n_valid);
-}
-
-////////////////////////////////////////////////////////////////////////
 //
 // Begin utility functions.
 //
