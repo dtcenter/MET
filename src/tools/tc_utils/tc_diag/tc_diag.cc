@@ -1006,7 +1006,7 @@ void process_fields(const TrackInfoArray &tracks,
                        false, false);
 
    }
-   // Otherwise, read data one at a time
+   // Otherwise, read data one field at a time
    else {
 
       // Loop over the VarInfo fields to be processed
@@ -1018,19 +1018,28 @@ void process_fields(const TrackInfoArray &tracks,
                           dp, grid_dp,
                           false, false);
 
-         // Keep track of missing fields
-         if(!status) {
-            fields_missing.add(vi_list[i]->magic_str());
-
-            // Store the requested valid time
-            dp.set_valid(vld_ut);
-         }
+         // Store missing data as an empty field
+         if(!status) dp.clear();
 
          // Append current DataPlane to the vector
          dp_list.push_back(dp);
 
       } // end for i
    }
+
+   // Check for missing data
+   for(i=0; i<vi_list.size(); i++) {
+
+      if(dp_list[i].is_empty()) {
+
+         // List of missing fields
+         fields_missing.add(vi_list[i]->magic_str());
+
+         // Store the requested valid time
+         dp_list[i].set_valid(vld_ut);
+
+      }
+   } // end for i
 
    // Loop over the VarInfo fields to be processed
    for(i=0; i<vi_list.size(); i++) {
@@ -1060,8 +1069,10 @@ void process_fields(const TrackInfoArray &tracks,
       } // end for j
 
       // Deallocate memory
-      delete vi;
-      vi = (VarInfo *) 0;
+      if(vi_list[i]) {
+         delete vi_list[i];
+         vi_list[i] = (VarInfo *) 0;
+      }
 
    } // end for i
 
