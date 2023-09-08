@@ -10,6 +10,22 @@ enhancement, or new feature (`MET GitHub issues <https://github.com/dtcenter/MET
 Important issues are listed **in bold** for emphasis.
 
 
+MET Version 11.0.3 release notes (20230908)
+-------------------------------------------
+
+.. note::
+   Version 11.0.3 is the final planned bugfix release for MET version 11.0. Please upgrade to a
+   newer version for additional bugfixes and enhancements and see the METplus
+   `release support policy <https://metplus.readthedocs.io/en/latest/Release_Guide/index.html#release-support-policy>`_
+   for additional details.
+
+* Bugfixes:
+
+   * Bugfix: Fix the Clang compilation of MET version 11.0 (`#2514 <https://github.com/dtcenter/MET/issues/2514>`_).
+   * Bugfix: Fix logic for Python embedding with data censoring and/or conversion (`#2575 <https://github.com/dtcenter/MET/issues/2575>`_).
+   * Bugfix: Fix reading of upside-down CF-compliant NetCDF Rotated Lat/Lon data (`#2578 <https://github.com/dtcenter/MET/issues/2578>`_).
+   * Bugfix: Fix logic for computing the 100-th percentile (`#2644 <https://github.com/dtcenter/MET/issues/2644>`_).
+
 MET Version 11.0.2 release notes (20230331)
 -------------------------------------------
 
