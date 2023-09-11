@@ -121,7 +121,7 @@ static void compute_lat_lon(TcrmwGrid&, double *, double *);
 //     - Write CIRA ASCII and NetCDF diagnostics output files.
 //     - Add support for $MET_PYTHON_EXE.
 //   - Input data:
-//     - Instead of reading DataPlanes one at a time,
+//     - [DONE for #2609] Instead of reading DataPlanes one at a time,
 //       read them all at once or perhaps in groups
 //       (e.g. all pressure levels).
 //     - Parellelize the processing of valid times.
