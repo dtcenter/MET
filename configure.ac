@@ -48,6 +48,70 @@ if (test -n "$MET_PROJLIB"); then
 fi
 
 #
+# Look for the Atlas library.
+#
+
+# Configure the variables. The help text will appear if the user uses "configure --help".
+
+AC_ARG_VAR([MET_ATLAS], [Where atlas lib and include subdirectories are located. If they are installed in /usr/local, you don't have to specify them.])
+AC_ARG_VAR([MET_ATLASINC], [Where atlas include files are located. Use if the libraries and include files are not under the same main atlas directory. If used, MET_ATLASLIB must also be defined and MET_ATLAS will be ignored.])
+AC_ARG_VAR([MET_ATLASLIB], [Where atlas libraries are located. Use if the libraries and include files are not under the same main atlas directory. If used, MET_ATLASINC must also be defined and MET_ATLAS will be ignored.])
+
+# Ensure that both or neither are specified.
+
+if (test -n "$MET_ATLASLIB" && test -z "$MET_ATLASINC"); then
+  AC_MSG_ERROR([MET_ATLASLIB environment variable set, but MET_ATLASINC not set. If one of these variables is set, then both must be set.])
+elif (test -n "$MET_ATLASINC" && test -z "$MET_ATLASLIB"); then
+  AC_MSG_ERROR([MET_ATLASINC environment variable set, but MET_ATLASLIB not set. If one of these variables is set, then both must be set.])
+fi
+
+# Use the main Atlas directory if individual locations were not specified.
+
+if (test -n "$MET_ATLAS" && test -z "$MET_ATLASLIB"); then
+  MET_ATLASINC='${MET_ATLAS}/include'
+  MET_ATLASLIB='${MET_ATLAS}/lib'
+fi
+
+# AC_SUBST command line variables.
+
+if (test -n "$MET_ATLASLIB"); then
+  CPPFLAGS="${CPPFLAGS} -I${MET_ATLASINC}"
+  LDFLAGS="${LDFLAGS} -L${MET_ATLASLIB}"
+fi
+
+#
+# Look for the Eckit library.
+#
+
+# Configure the variables. The help text will appear if the user uses "configure --help".
+
+AC_ARG_VAR([MET_ECKIT], [Where eckit lib and include subdirectories are located. If they are installed in /usr/local, you don't have to specify them.])
+AC_ARG_VAR([MET_ECKITINC], [Where eckit include files are located. Use if the libraries and include files are not under the same main eckit directory. If used, MET_ECKITLIB must also be defined and MET_ECKIT will be ignored.])
+AC_ARG_VAR([MET_ECKITLIB], [Where eckit libraries are located. Use if the libraries and include files are not under the same main eckit directory. If used, MET_ECKITINC must also be defined and MET_ECKIT will be ignored.])
+
+# Ensure that both or neither are specified.
+
+if (test -n "$MET_ECKITLIB" && test -z "$MET_ECKITINC"); then
+  AC_MSG_ERROR([MET_ECKITLIB environment variable set, but MET_ECKITINC not set. If one of these variables is set, then both must be set.])
+elif (test -n "$MET_ECKITINC" && test -z "$MET_ECKITLIB"); then
+  AC_MSG_ERROR([MET_ECKITINC environment variable set, but MET_ECKITLIB not set. If one of these variables is set, then both must be set.])
+fi
+
+# Use the main Eckit directory if individual locations were not specified.
+
+if (test -n "$MET_ECKIT" && test -z "$MET_ECKITLIB"); then
+  MET_ECKITINC='${MET_ECKIT}/include'
+  MET_ECKITLIB='${MET_ECKIT}/lib'
+fi
+
+# AC_SUBST command line variables.
+
+if (test -n "$MET_ECKITLIB"); then
+  CPPFLAGS="${CPPFLAGS} -I${MET_ECKITINC}"
+  LDFLAGS="${LDFLAGS} -L${MET_ECKITLIB}"
+fi
+
+#
 # Look for the NetCDF library.
 #
 
