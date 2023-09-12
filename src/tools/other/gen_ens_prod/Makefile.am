@@ -25,10 +25,11 @@ gen_ens_prod_LDADD = -lvx_stat_out \
 	-lvx_data2d_grib $(GRIB2_LIBS) \
 	-lvx_data2d_nc_pinterp \
 	-lvx_data2d_nccf \
+	-lvx_data2d_ugrid -latlas -leckit -leckit_mpi -leckit_geometry \
 	$(PYTHON_LIBS) \
 	-lvx_data2d \
 	-lvx_nc_obs \
-        -lvx_seeps \
+	-lvx_seeps \
 	-lvx_nc_util \
 	-lvx_regrid \
 	-lvx_grid \

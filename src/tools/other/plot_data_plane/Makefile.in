@@ -215,11 +215,17 @@ LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LTLIBOBJS = @LTLIBOBJS@
 MAKEINFO = @MAKEINFO@
+MET_ATLAS = @MET_ATLAS@
+MET_ATLASINC = @MET_ATLASINC@
+MET_ATLASLIB = @MET_ATLASLIB@
 MET_BUFR = @MET_BUFR@
 MET_BUFRLIB = @MET_BUFRLIB@
 MET_CAIRO = @MET_CAIRO@
 MET_CAIROINC = @MET_CAIROINC@
 MET_CAIROLIB = @MET_CAIROLIB@
+MET_ECKIT = @MET_ECKIT@
+MET_ECKITINC = @MET_ECKITINC@
+MET_ECKITLIB = @MET_ECKITLIB@
 MET_FREETYPE = @MET_FREETYPE@
 MET_FREETYPEINC = @MET_FREETYPEINC@
 MET_FREETYPELIB = @MET_FREETYPELIB@
@@ -329,6 +335,7 @@ plot_data_plane_LDADD = -lvx_data2d_factory \
 	-lvx_data2d_nc_pinterp \
 	$(PYTHON_LIBS) \
 	-lvx_data2d_nccf \
+	-lvx_data2d_ugrid -latlas -leckit -leckit_mpi -leckit_geometry \
 	-lvx_statistics \
 	-lvx_nc_util \
 	-lvx_data2d \

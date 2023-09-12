@@ -15,8 +15,9 @@ noinst_PROGRAMS = test_grid_area
 test_grid_area_SOURCES = test_grid_area.cc
 test_grid_area_CPPFLAGS = ${MET_CPPFLAGS}
 test_grid_area_LDFLAGS = -L. ${MET_LDFLAGS}
-test_grid_area_LDADD = -lvx_grid \
-	-lvx_geodesy \
+test_grid_area_LDADD = \
+	-lvx_data2d_ugrid -latlas -leckit -leckit_mpi -leckit_geometry \
+	-lvx_grid \
 	-lvx_geodesy \
 	-lvx_nav \
 	-lvx_util_math \
