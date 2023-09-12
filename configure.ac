@@ -1268,6 +1268,7 @@ AC_CONFIG_FILES([Makefile
                  src/libcode/vx_data2d_nc_met/Makefile
                  src/libcode/vx_data2d_nc_pinterp/Makefile
                  src/libcode/vx_data2d_nccf/Makefile
+                 src/libcode/vx_data2d_ugrid/Makefile
                  src/libcode/vx_geodesy/Makefile
                  src/libcode/vx_gis/Makefile
                  src/libcode/vx_gnomon/Makefile
