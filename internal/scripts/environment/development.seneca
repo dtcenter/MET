@@ -21,6 +21,8 @@ export MET_CAIROLIB=/usr/lib/x86_64-linux-gnu
 export MET_FREETYPEINC=/usr/include/freetype2
 export MET_FREETYPELIB=/usr/lib/x86_64-linux-gnu
 export MET_JASPER=${MET_DST}/jasper-1.900.1
+export MET_ATLAS=${MET_PROJ_DIR}/MET_releases/external_libs/gnu_8.3.0/atlas
+export MET_ECKIT=${MET_PROJ_DIR}/MET_releases/external_libs/gnu_8.3.0/eckit
 
 # For Python 3 in met-9.0
 export MET_PYTHON=/usr/local/met-python3
@@ -36,6 +38,7 @@ export CXXFLAGS=${CFLAGS}
 export LDFLAGS="-Wl,--disable-new-dtags"
 export LDFLAGS="${LDFLAGS} -Wl,-rpath,${MET_DST}/lib:${MET_HDFEOS}/lib:${MET_PROJ}/lib:${MET_NETCDF}/lib:${MET_DST}/zlib-1.2.11/lib:${MET_DST}/szip-2.1.1/lib"
 export LDFLAGS="${LDFLAGS} -Wl,-rpath,${MET_HDFLIB}:${MET_HDF5}/lib:${MET_GSL}/lib:${MET_PYTHON}/lib:${MET_JASPER}/lib"
+export LDFLAGS="${LDFLAGS} -Wl,-rpath,${MET_ATLAS}/lib:${MET_ECKIT}/lib"
 export LDFLAGS="${LDFLAGS} -L${MET_JASPER}/lib"
 
 # Variables required to run MET
