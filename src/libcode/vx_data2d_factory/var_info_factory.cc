@@ -29,6 +29,7 @@ using namespace std;
 #include "var_info_nccf.h"
 #include "var_info_nc_met.h"
 #include "var_info_nc_pinterp.h"
+#include "var_info_ugrid.h"
 
 #ifdef WITH_PYTHON
    #include "var_info_python.h"
@@ -101,6 +102,10 @@ VarInfo * VarInfoFactory::new_var_info(GrdFileType type)
 
       case FileType_NcCF:
          vi = new VarInfoNcCF;
+         break;
+
+      case FileType_UGrid:
+         vi = new VarInfoUGrid;
          break;
 
       case FileType_HdfEos:

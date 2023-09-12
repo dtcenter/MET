@@ -23,6 +23,7 @@ using namespace std;
 #include "data2d_nc_met.h"
 #include "data2d_nc_pinterp.h"
 #include "data2d_nccf.h"
+#include "data2d_ugrid.h"
 
 
 #ifdef WITH_PYTHON
@@ -45,10 +46,10 @@ Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(GrdFileType type)
 
 {
 
-   Met2dDataFile *mtddf = (Met2dDataFile *) 0;
+   Met2dDataFile *mtddf = (Met2dDataFile *) nullptr;
 
 #ifdef WITH_PYTHON
-MetPythonDataFile * p = 0;
+MetPythonDataFile * p = nullptr;
 #endif
 
    //
@@ -122,9 +123,14 @@ MetPythonDataFile * p = 0;
               << grdfiletype_to_string(type) << "\"\n\n";
          exit(1);
 
+      case FileType_UGrid:
+         // For FileType_None, silently return a nullptr pointer
+         mtddf = new MetUGridDataFile;
+         break;
+
       case FileType_None:
          // For FileType_None, silently return a nullptr pointer
-         mtddf = (Met2dDataFile *) 0;
+         mtddf = (Met2dDataFile *) nullptr;
          break;
 
       default:
