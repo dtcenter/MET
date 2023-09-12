@@ -34,5 +34,6 @@ libvx_grid_a_SOURCES = \
               goes_grid.cc goes_grid.h \
               semilatlon_grid_defs.h \
               semilatlon_grid.cc semilatlon_grid.h \
+              unstructured_grid.cc unstructured_grid.h unstructured_grid_defs.h \
               vx_grid.h
 libvx_grid_a_CPPFLAGS = ${MET_CPPFLAGS}
