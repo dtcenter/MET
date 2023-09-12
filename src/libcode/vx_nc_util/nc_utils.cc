@@ -3611,7 +3611,7 @@ void parse_time_string(const char *str, unixtime &ut) {
    }
    else {
       // Tokenize the input string
-      // Parse using spaces or 'T' for timestrings such as:
+      // Parse using spaces, '_', or 'T' for timestrings such as:
       //   2016-01-28T12:00:00Z
       //   1977-08-07 12:00:00Z
       StringArray tok;
