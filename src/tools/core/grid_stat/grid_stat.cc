@@ -114,8 +114,6 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <cstdio>
 #include <cstdlib>
 #include <ctype.h>
@@ -127,8 +125,6 @@ using namespace std;
 #include <sys/types.h>
 
 #include <netcdf>
-using namespace netCDF;
-
 #include "main.h"
 #include "handle_openmp.h"
 
@@ -140,7 +136,18 @@ using namespace netCDF;
 #include "vx_log.h"
 #include "seeps.h"
 
+#include "vx_data2d_ugrid.h"
+
+using namespace std;
+using namespace netCDF;
+
+
 ////////////////////////////////////////////////////////////////////////
+
+static ConcatString ugrid_nc;
+
+////////////////////////////////////////////////////////////////////////
+
 
 static void process_command_line(int, char **);
 static void setup_first_pass    (const DataPlane &);
@@ -184,6 +191,7 @@ static void clean_up();
 static void usage();
 static void set_outdir(const StringArray &);
 static void set_compress(const StringArray &);
+static void set_ugrid_nc(const StringArray &);
 static bool read_data_plane(VarInfo* info, DataPlane& dp, Met2dDataFile* mtddf,
                             const ConcatString &filename);
 
@@ -236,6 +244,7 @@ void process_command_line(int argc, char **argv) {
    // Add the options function calls
    cline.add(set_outdir,   "-outdir",   1);
    cline.add(set_compress, "-compress", 1);
+   cline.add(set_ugrid_nc,           "-ugrid",         1);
 
    // Parse the command line
    cline.parse();
@@ -263,6 +272,7 @@ void process_command_line(int argc, char **argv) {
    // Get the forecast and observation file types from config, if present
    ftype = parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_fcst));
    otype = parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_obs));
+   if (ftype == FileType_None && 0 < ugrid_nc.length()) ftype = FileType_UGrid;
 
    // Read forecast file
    if(!(fcst_mtddf = mtddf_factory.new_met_2d_data_file(fcst_file.c_str(), ftype))) {
@@ -284,6 +294,10 @@ void process_command_line(int argc, char **argv) {
 
    // Process the configuration
    conf_info.process_config(ftype, otype);
+
+   if (FileType_UGrid == ftype) {
+      ((MetUGridDataFile *)fcst_mtddf)->open_metadata(ugrid_nc.c_str());
+   }
 
    // For python types read the first field to set the grid
    if(is_python_grdfiletype(ftype)) {
@@ -3026,6 +3040,7 @@ void usage() {
         << "\tfcst_file\n"
         << "\tobs_file\n"
         << "\tconfig_file\n"
+        << "\t[-ugrid ugrid_file]\n"
         << "\t[-outdir path]\n"
         << "\t[-log file]\n"
         << "\t[-v level]\n"
@@ -3039,6 +3054,9 @@ void usage() {
 
         << "\t\t\"config_file\" is a GridStatConfig file containing "
         << "the desired configuration settings (required).\n"
+
+        << "\t\t\"-ugrid ugrid_file\" is the metadata file for unstructured grid "
+        << " (only required for unstructured grid data).\n"
 
         << "\t\t\"-outdir path\" overrides the default output directory "
         << "(" << out_dir << ") (optional).\n"
@@ -3065,6 +3083,13 @@ void set_outdir(const StringArray & a) {
 
 void set_compress(const StringArray & a) {
    compress_level = atoi(a[0].c_str());
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_ugrid_nc(const StringArray & a)
+{
+   ugrid_nc = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////

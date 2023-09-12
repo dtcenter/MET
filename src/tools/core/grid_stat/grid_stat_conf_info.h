@@ -277,7 +277,7 @@ class GridStatConfInfo {
 
       GridStatVxOpt * vx_opt;               // Array of vx task options [n_vx] (allocated)
 
-      map<ConcatString,MaskPlane> mask_map; // Mapping of mask names to MaskPlanes
+      std::map<ConcatString,MaskPlane> mask_map; // Mapping of mask names to MaskPlanes
 
       GridWeightType grid_weight_flag;      // Grid weighting flag
       ConcatString   tmp_dir;               // Directory for temporary files

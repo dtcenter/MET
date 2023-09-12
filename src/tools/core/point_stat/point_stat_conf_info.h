@@ -134,7 +134,7 @@ class PointStatVxOpt {
       SingleThresh    seeps_p1_thresh;    // SEESP p1 threshold
 
       // Vector of MaskLatLon objects defining Lat/Lon Point masks
-      vector<MaskLatLon> mask_llpnt;
+      std::vector<MaskLatLon> mask_llpnt;
 
       StringArray     mask_name;          // Masking names
 
@@ -235,13 +235,13 @@ class PointStatConfInfo {
       SingleThresh topo_interp_fcst_thresh;
 
       // Message type groups that should be processed together
-      map<ConcatString,StringArray> msg_typ_group_map;
+      std::map<ConcatString,StringArray> msg_typ_group_map;
 
       // Mapping of mask names to DataPlanes
-      map<ConcatString,MaskPlane>   mask_area_map;
+      std::map<ConcatString,MaskPlane>   mask_area_map;
 
       // Mapping of mask names to Station ID lists
-      map<ConcatString,StringArray> mask_sid_map;
+      std::map<ConcatString,StringArray> mask_sid_map;
 
       ConcatString tmp_dir;                 // Directory for temporary files
       ConcatString output_prefix;           // String to customize output file name
