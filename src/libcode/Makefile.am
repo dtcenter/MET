@@ -22,6 +22,7 @@ SUBDIRS	= vx_grid \
 	vx_data2d_grib \
 	vx_data2d_nc_met \
 	vx_data2d_nccf \
+	vx_data2d_ugrid \
 	vx_data2d_nc_pinterp
 
 if ENABLE_PYTHON
