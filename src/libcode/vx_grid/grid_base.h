@@ -30,6 +30,7 @@
 #include "goes_grid_defs.h"
 #include "laea_grid_defs.h"
 #include "semilatlon_grid_defs.h"
+#include "unstructured_grid_defs.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -72,6 +73,7 @@ class GridInfo {
       void set(const TcrmwData         &);
       void set(const LaeaData          &);
       void set(const SemiLatLonData    &);
+      void set(const UnstructuredData  &);
 
       void create_grid(Grid &) const;
 
@@ -89,6 +91,7 @@ class GridInfo {
       const TcrmwData         * tc;   //  allocated
       const LaeaData          * la;   //  allocated
       const SemiLatLonData    * sl;   //  allocated
+      const UnstructuredData  * us;   //  allocated
 
 };
 
@@ -210,6 +213,7 @@ class Grid : public GridInterface {
       Grid(const LaeaData          &);
       Grid(const LaeaNetcdfData    &);
       Grid(const SemiLatLonData    &);
+      Grid(const UnstructuredData  &);
       virtual ~Grid();
       Grid(const Grid &);
       Grid & operator=(const Grid &);
@@ -232,6 +236,7 @@ class Grid : public GridInterface {
       void set (const LaeaData          &);
       void set (const LaeaNetcdfData    &);
       void set (const SemiLatLonData    &);
+      void set (const UnstructuredData  &);
 
       void set_swap_to_north(bool swap_to_north);
       bool get_swap_to_north() const;
@@ -274,7 +279,7 @@ class Grid : public GridInterface {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline bool Grid::is_set() const { return ( rep != 0 ); }
+inline bool Grid::is_set() const { return ( rep != nullptr ); }
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -293,6 +298,7 @@ extern bool is_eq(const GaussianData *,      const GaussianData *);
 extern bool is_eq(const GoesImagerData *,    const GoesImagerData *);
 extern bool is_eq(const LaeaData *,          const LaeaData *);
 extern bool is_eq(const SemiLatLonData *,    const SemiLatLonData *);
+extern bool is_eq(const UnstructuredData *,  const UnstructuredData *);
 
 
 ////////////////////////////////////////////////////////////////////////

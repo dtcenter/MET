@@ -34,7 +34,7 @@ static const int grid_debug_level = 4;
 ///////////////////////////////////////////////////////////////////////////////
 
 
-inline bool is_even(int k) { return ( (k%2) == 0 ); }
+inline bool is_even(int k) { return (k%2) == 0; }
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -292,13 +292,41 @@ void SemiLatLonData::clear()
 
 {
 
-name = (const char *) 0;
+name = (const char *) nullptr;
 
 lats.clear();
 lons.clear();
 levels.clear();
 times.clear();
 
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+void UnstructuredData::clear() {
+
+   name = (const char *) nullptr;
+
+   Nface = 0;
+   pointLonLat.clear();
+   if (kdtree) { delete kdtree; kdtree = nullptr; }
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void UnstructuredData::dump() const {
+
+   mlog << Debug(grid_debug_level)
+        << "\nUnstructured Grid Data:\n"
+//        << "    lats: " << lats.summarize() << "\n"
+//        << "    lons: " << lons.summarize() << "\n"
+//        << "  levels: " << levels.summarize() << "\n"
+//        << "   times: " << times.summarize() << "\n\n";
+     ;
 }
 
 
@@ -355,11 +383,9 @@ GridInfo & GridInfo::operator=(const GridInfo & info)
 
 {
 
-if ( this == &info )  return ( * this );
+if ( this != &info ) assign(info);
 
-assign(info);
-
-return ( * this );
+return *this;
 
 }
 
@@ -371,16 +397,17 @@ void GridInfo::init_from_scratch()
 
 {
 
-lc  = (const LambertData *)       0;
-st  = (const StereographicData *) 0;
-ll  = (const LatLonData *)        0;
-rll = (const RotatedLatLonData *) 0;
-m   = (const MercatorData *)      0;
-g   = (const GaussianData *)      0;
-gi  = (const GoesImagerData *)    0;
-la  = (const LaeaData *)          0;
-tc  = (const TcrmwData *)         0;
-sl  = (const SemiLatLonData *)    0;
+lc  = (const LambertData *)       nullptr;
+st  = (const StereographicData *) nullptr;
+ll  = (const LatLonData *)        nullptr;
+rll = (const RotatedLatLonData *) nullptr;
+m   = (const MercatorData *)      nullptr;
+g   = (const GaussianData *)      nullptr;
+gi  = (const GoesImagerData *)    nullptr;
+la  = (const LaeaData *)          nullptr;
+tc  = (const TcrmwData *)         nullptr;
+sl  = (const SemiLatLonData *)    nullptr;
+us  = (const UnstructuredData *)  nullptr;
 
 clear();
 
@@ -396,16 +423,17 @@ void GridInfo::clear()
 
 {
 
-if ( lc  )  { delete lc;   lc  = (const LambertData *)       0; };
-if ( st  )  { delete st;   st  = (const StereographicData *) 0; };
-if ( ll  )  { delete ll;   ll  = (const LatLonData *)        0; };
-if ( rll )  { delete rll;  rll = (const RotatedLatLonData *) 0; };
-if ( m   )  { delete m;    m   = (const MercatorData *)      0; };
-if ( g   )  { delete g;    g   = (const GaussianData *)      0; };
-if ( gi  )  { delete gi;   gi  = (const GoesImagerData *)    0; };
-if ( la  )  { delete la;   la  = (const LaeaData *)          0; };
-if ( tc  )  { delete tc;   tc  = (const TcrmwData *)         0; };
-if ( sl  )  { delete sl;   sl  = (const SemiLatLonData *)    0; };
+if ( lc  )  { delete lc;   lc  = (const LambertData *)       nullptr; };
+if ( st  )  { delete st;   st  = (const StereographicData *) nullptr; };
+if ( ll  )  { delete ll;   ll  = (const LatLonData *)        nullptr; };
+if ( rll )  { delete rll;  rll = (const RotatedLatLonData *) nullptr; };
+if ( m   )  { delete m;    m   = (const MercatorData *)      nullptr; };
+if ( g   )  { delete g;    g   = (const GaussianData *)      nullptr; };
+if ( gi  )  { delete gi;   gi  = (const GoesImagerData *)    nullptr; };
+if ( la  )  { delete la;   la  = (const LaeaData *)          nullptr; };
+if ( tc  )  { delete tc;   tc  = (const TcrmwData *)         nullptr; };
+if ( sl  )  { delete sl;   sl  = (const SemiLatLonData *)    nullptr; };
+if ( us  )  { delete us;   us  = (const UnstructuredData *)  nullptr; };
 
 return;
 
@@ -428,6 +456,7 @@ if ( info.g   )  set( *(info.g)   );
 if ( info.gi  )  set( *(info.gi)  );
 if ( info.la  )  set( *(info.la)  );
 if ( info.sl  )  set( *(info.sl)  );
+if ( info.us  )  set( *(info.us)  );
 
 return;
 
@@ -452,8 +481,9 @@ if ( g   ) ++count;
 if ( gi  ) ++count;
 if ( la  ) ++count;
 if ( sl  ) ++count;
+if ( us  ) ++count;
 
-return ( count == 1 );
+return count == 1;
 
 }
 
@@ -482,6 +512,7 @@ else if ( g   )  gg.set( *g   );
 else if ( gi  )  gg.set( *gi  );
 else if ( la  )  gg.set( *la  );
 else if ( sl  )  gg.set( *sl  );
+else if ( us  )  gg.set( *us  );
 
 return;
 
@@ -497,13 +528,13 @@ void GridInfo::set(const LambertData & data)
 
 clear();
 
-LambertData * D = (LambertData *) 0;
+LambertData * D = (LambertData *) nullptr;
 
 D = new LambertData;
 
 memcpy(D, &data, sizeof(data));
 
-lc = D;  D = (LambertData *) 0;
+lc = D;  D = (LambertData *) nullptr;
 
 return;
 
@@ -519,13 +550,13 @@ void GridInfo::set(const StereographicData & data)
 
 clear();
 
-StereographicData * D = (StereographicData *) 0;
+StereographicData * D = (StereographicData *) nullptr;
 
 D = new StereographicData;
 
 memcpy(D, &data, sizeof(data));
 
-st = D;  D = (StereographicData *) 0;
+st = D;  D = (StereographicData *) nullptr;
 
 return;
 
@@ -541,13 +572,13 @@ void GridInfo::set(const LatLonData & data)
 
 clear();
 
-LatLonData * D = (LatLonData *) 0;
+LatLonData * D = (LatLonData *) nullptr;
 
 D = new LatLonData;
 
 memcpy(D, &data, sizeof(data));
 
-ll = D;  D = (LatLonData *) 0;
+ll = D;  D = (LatLonData *) nullptr;
 
 return;
 
@@ -563,13 +594,13 @@ void GridInfo::set(const RotatedLatLonData & data)
 
 clear();
 
-RotatedLatLonData * D = (RotatedLatLonData *) 0;
+RotatedLatLonData * D = (RotatedLatLonData *) nullptr;
 
 D = new RotatedLatLonData;
 
 memcpy(D, &data, sizeof(data));
 
-rll = D;  D = (RotatedLatLonData *) 0;
+rll = D;  D = (RotatedLatLonData *) nullptr;
 
 return;
 
@@ -585,13 +616,13 @@ void GridInfo::set(const MercatorData & data)
 
 clear();
 
-MercatorData * D = (MercatorData *) 0;
+MercatorData * D = (MercatorData *) nullptr;
 
 D = new MercatorData;
 
 memcpy(D, &data, sizeof(data));
 
-m = D;  D = (MercatorData *) 0;
+m = D;  D = (MercatorData *) nullptr;
 
 return;
 
@@ -607,13 +638,13 @@ void GridInfo::set(const GaussianData & data)
 
 clear();
 
-GaussianData * D = (GaussianData *) 0;
+GaussianData * D = (GaussianData *) nullptr;
 
 D = new GaussianData;
 
 memcpy(D, &data, sizeof(data));
 
-g = D;  D = (GaussianData *) 0;
+g = D;  D = (GaussianData *) nullptr;
 
 return;
 
@@ -629,13 +660,13 @@ void GridInfo::set(const GoesImagerData & data)
 
 clear();
 
-GoesImagerData * D = (GoesImagerData *) 0;
+GoesImagerData * D = (GoesImagerData *) nullptr;
 
 D = new GoesImagerData;
 
 memcpy(D, &data, sizeof(data));
 
-gi = D;  D = (GoesImagerData *) 0;
+gi = D;  D = (GoesImagerData *) nullptr;
 
 return;
 
@@ -651,13 +682,13 @@ void GridInfo::set(const LaeaData & data)
 
 clear();
 
-LaeaData * D = (LaeaData *) 0;
+LaeaData * D = (LaeaData *) nullptr;
 
 D = new LaeaData;
 
 memcpy(D, &data, sizeof(data));
 
-la = D;  D = (LaeaData *) 0;
+la = D;  D = (LaeaData *) nullptr;
 
 return;
 
@@ -673,7 +704,7 @@ void GridInfo::set(const SemiLatLonData & data)
 
 clear();
 
-SemiLatLonData * D = (SemiLatLonData *) 0;
+SemiLatLonData * D = (SemiLatLonData *) nullptr;
 
 D = new SemiLatLonData;
 
@@ -684,9 +715,36 @@ D = new SemiLatLonData;
 
 *D = data;
 
-sl = D;  D = (SemiLatLonData *) 0;
+sl = D;  D = (SemiLatLonData *) nullptr;
 
 return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void GridInfo::set(const UnstructuredData & data)
+
+{
+
+clear();
+
+/*
+us = new UnstructuredData();
+memcpy(D, &data, sizeof(data));
+us->Nface = data.Nface;
+us->copy_data(data.pointLonLat);
+//us = new UnstructuredData(data);
+*/
+
+UnstructuredData *D = new UnstructuredData;
+
+//D->Nface = data.Nface;
+D->set_points(data.Nface, data.pointLonLat);
+us = D;
+D = (UnstructuredData *)nullptr;
 
 }
 
@@ -797,11 +855,9 @@ Grid & Grid::operator=(const Grid & g)
 
 {
 
-if ( this == &g )  return ( * this );
+if ( this != &g ) assign(g);
 
-assign(g);
-
-return ( * this );
+return *this;
 
 }
 
@@ -827,7 +883,7 @@ void Grid::init_from_scratch()
 
 {
 
-rep = (GridRep *) 0;
+rep = (GridRep *) nullptr;
 
 clear();
 
@@ -841,7 +897,7 @@ void Grid::clear()
 
 {
 
-if ( rep )  { delete rep;  rep = (GridRep *) 0; }
+if ( rep )  { delete rep;  rep = (GridRep *) nullptr; }
 set_swap_to_north(false);
 
 return;
@@ -966,7 +1022,7 @@ double Grid::calc_area(int x, int y) const
 
 if ( !rep )  return ( 0.0 );
 
-return ( rep->calc_area(x, y) );
+return rep->calc_area(x, y);
 
 }
 
@@ -980,7 +1036,7 @@ int Grid::nx() const
 
 if ( !rep )  return ( 0 );
 
-return ( rep->nx() );
+return rep->nx();
 
 }
 
@@ -994,7 +1050,7 @@ int Grid::ny() const
 
 if ( !rep )  return ( 0 );
 
-return ( rep->ny() );
+return rep->ny();
 
 }
 
@@ -1006,7 +1062,7 @@ int Grid::nxy() const
 
 {
 
-return ( nx()*ny() );
+return nx()*ny();
 
 }
 
@@ -1018,9 +1074,9 @@ double Grid::scale_km() const
 
 {
 
-if ( !rep )  return ( 0 );
+if ( !rep )  return 0;
 
-return ( rep->scale_km() );
+return rep->scale_km();
 
 }
 
@@ -1032,9 +1088,9 @@ ConcatString Grid::name() const
 
 {
 
-if ( !rep )  return ( ConcatString("(no name)") );
+if ( !rep )  return ConcatString("(no name)");
 
-return ( rep->name() );
+return rep->name();
 
 }
 
@@ -1050,7 +1106,7 @@ ConcatString s;
 
 if ( rep )  s = rep->serialize(sep);
 
-return ( s );
+return s;
 
 }
 
@@ -1071,7 +1127,7 @@ if ( !rep )  {
 
 }
 
-return ( rep->info() );
+return rep->info();
 
 }
 
@@ -1093,7 +1149,7 @@ if ( !rep )  {
 }
 
 
-return ( rep->rot_grid_to_earth(x, y) );
+return rep->rot_grid_to_earth(x, y);
 
 }
 
@@ -1114,7 +1170,7 @@ if ( !rep )  {
 
 }
 
-return ( rep->wrap_lon() );
+return rep->wrap_lon();
 
 }
 
@@ -1135,7 +1191,7 @@ if ( !rep )  {
 
 }
 
-return ( rep->shift_right(N) );
+return rep->shift_right(N);
 
 }
 
@@ -1246,7 +1302,7 @@ if ( info_new.lc )  {
 
 }
 
-return ( g_new );
+return g_new;
 
 }
 
@@ -1285,7 +1341,7 @@ iy_ll = ll_func(dy_center, ny_new);
    //  subset
    //
 
-return ( subset_ll(ix_ll, iy_ll, nx_new, ny_new) );
+return subset_ll(ix_ll, iy_ll, nx_new, ny_new);
 
 }
 
@@ -1305,10 +1361,10 @@ bool operator==(const Grid & g1, const Grid & g2)
 
 {
 
-if ( !(g1.rep) )  return ( false );
-if ( !(g2.rep) )  return ( false );
+if ( !(g1.rep) ) return false;
+if ( !(g2.rep) ) return false;
 
-return ( g1.info() == g2.info() );
+return g1.info() == g2.info();
 
 }
 
@@ -1322,7 +1378,7 @@ bool operator!=(const Grid & g1, const Grid & g2)
 
 bool status = (g1 == g2);
 
-return ( ! status );
+return ! status;
 
 }
 
@@ -1343,8 +1399,9 @@ else if ( i1.g   && i2.g   )  return ( is_eq(i1.g,   i2.g  ) );
 else if ( i1.gi  && i2.gi  )  return ( is_eq(i1.gi,  i2.gi ) );
 else if ( i1.la  && i2.la  )  return ( is_eq(i1.la,  i2.la ) );
 else if ( i1.sl  && i2.sl  )  return ( is_eq(i1.sl,  i2.sl ) );
+else if ( i1.us  && i2.us  )  return ( is_eq(i1.us,  i2.us ) );
 
-return ( false );
+return false;
 
 }
 
@@ -1356,7 +1413,7 @@ bool is_eq(const LambertData * lc1, const LambertData * lc2)
 
 {
 
-if ( !lc1 || !lc2 )  return ( false );
+if ( !lc1 || !lc2 )  return false;
 
 bool status = false;
 
@@ -1375,7 +1432,7 @@ if ( lc1->nx                == lc2->nx                      &&
      is_eq  (lc1->r_km,        lc2->r_km,        loose_tol) &&
      is_eq  (lc1->so2_angle,   lc2->so2_angle,   loose_tol) )  status = true;
 
-return ( status );
+return status;
 
 }
 
@@ -1387,7 +1444,7 @@ bool is_eq(const StereographicData * st1, const StereographicData * st2)
 
 {
 
-if ( !st1 || !st2 )  return ( false );
+if ( !st1 || !st2 )  return false;
 
 bool status = false;
 
@@ -1406,7 +1463,7 @@ if ( st1->nx               == st2->nx                    &&
      is_eq  (st1->dy_km,      st2->dy_km,     loose_tol) &&
      is_eq  (st1->r_km,       st2->r_km,      loose_tol) )  status = true;
 
-return ( status );
+return status;
 
 }
 
@@ -1418,7 +1475,7 @@ bool is_eq(const LatLonData * ll1, const LatLonData * ll2)
 
 {
 
-if ( !ll1 || !ll2 )  return ( false );
+if ( !ll1 || !ll2 )  return false;
 
 bool status = false;
 
@@ -1430,7 +1487,7 @@ if ( ll1->Nlat            == ll2->Nlat                  &&
      is_eq  (ll1->delta_lat, ll2->delta_lat, loose_tol) &&
      is_eq  (ll1->delta_lon, ll2->delta_lon, loose_tol) )  status = true;
 
-return ( status );
+return status;
 
 }
 
@@ -1442,7 +1499,7 @@ bool is_eq(const RotatedLatLonData * ll1, const RotatedLatLonData * ll2)
 
 {
 
-if ( !ll1 || !ll2 )  return ( false );
+if ( !ll1 || !ll2 ) return false;
 
 bool status = false;
 
@@ -1463,7 +1520,7 @@ if ( ll1->Nlat == ll2->Nlat &&
      is_eq  (ll1->aux_rotation,
              ll2->aux_rotation, loose_tol) )  status = true;
 
-return ( status );
+return status;
 
 }
 
@@ -1475,7 +1532,7 @@ bool is_eq(const MercatorData * m1, const MercatorData * m2)
 
 {
 
-if ( !m1 || !m2 )  return ( false );
+if ( !m1 || !m2 ) return false;
 
 bool status = false;
 
@@ -1488,7 +1545,7 @@ if ( m1->nx           == m2->nx                  &&
      is_eq  (rescale_lon(m1->lon_ur),
              rescale_lon(m2->lon_ur), loose_tol) )  status = true;
 
-return ( status );
+return status;
 
 }
 
@@ -1500,7 +1557,7 @@ bool is_eq(const GaussianData * g1, const GaussianData * g2)
 
 {
 
-if ( !g1 || !g2 )  return ( false );
+if ( !g1 || !g2 ) return false;
 
 bool status = false;
 
@@ -1509,7 +1566,7 @@ if ( is_eq  (rescale_lon(g1->lon_zero),
      g1->nx  == g2->nx                             &&
      g1->ny  == g2->ny )  status = true;
 
-return ( status );
+return status;
 
 }
 
@@ -1520,7 +1577,7 @@ return ( status );
 bool is_eq(const GoesImagerData * gi1, const GoesImagerData * gi2)
 {
 
-if ( !gi1 || !gi2 )  return ( false );
+if ( !gi1 || !gi2 ) return false;
 
 bool status = false;
 
@@ -1541,7 +1598,7 @@ if ( gi1->nx           == gi2->nx             &&
      is_eq  (gi1->dx_rad, gi2->dx_rad, loose_tol) &&
      is_eq  (gi1->dy_rad, gi2->dy_rad, loose_tol) )  status = true;
 
-return ( status );
+return status;
 
 }
 
@@ -1553,7 +1610,7 @@ bool is_eq(const LaeaData * g1, const LaeaData * g2)
 
 {
 
-if ( !g1 || !g2 )  return ( false );
+if ( !g1 || !g2 ) return false;
 
 bool status = false;
 
@@ -1572,7 +1629,7 @@ if ( g1->radius_km            == g2->radius_km &&
      g1->ny                   == g2->ny &&
      g1->is_sphere            == g2->is_sphere )  status = true;
 
-return ( status );
+return status;
 
 }
 
@@ -1584,7 +1641,7 @@ bool is_eq(const SemiLatLonData * gi1, const SemiLatLonData * gi2)
 
 {
 
-if ( !gi1 || !gi2 )  return ( false );
+if ( !gi1 || !gi2 ) return false;
 
 bool status = false;
 
@@ -1594,7 +1651,35 @@ if ( gi1->lats   == gi2->lats   &&
      gi1->times  == gi2->times )  status = true;
 
 
-return ( status );
+return status;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool is_eq(const UnstructuredData * us1, const UnstructuredData * us2)
+
+{
+
+if ( !us1 || !us2 ) return false;
+
+bool status = false;
+
+
+cout << " CORRECT ME !!! grid_base.cc: is_eq(const UnstructuredData * us1, const UnstructuredData * us2)\n";
+
+if ( us1->Nface == us2->Nface &&
+     us1->Nnode == us2->Nnode &&
+     us1->Nedge == us2->Nedge &&
+     us1->pointLonLat[0] == us2->pointLonLat[0] ) {
+     if (us1->Nface > 0 && us1->pointLonLat[us1->Nface-1] == us2->pointLonLat[us2->Nface-1]) status = true;
+}
+
+cout << " CORRECT ME !!! grid_base.cc:  is_eq(const UnstructuredData * us1, const UnstructuredData * us2) status=" << status << "\n";
+
+return status;
 
 }
 
@@ -1619,7 +1704,7 @@ if ( is_even(N) )  {
 }
 
 
-return ( LL );
+return LL;
 
 }
 
