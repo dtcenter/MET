@@ -1,0 +1,33 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// Unstructured Grid configuration file.
+//
+// For additional information, please see the MET User's Guide.
+//
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Default mapping for Metadata.
+//
+metadata_map = [
+   { key = "dim_face";  val = "nCells,nMesh2d_face"; },
+   { key = "dim_node";  val = "nVertices,nMesh2d_node"; },
+   { key = "dim_edge";  val = "nEdges,nMesh2d_edge"; },
+   { key = "dim_time";  val = "Time,time_counter"; },
+   { key = "dim_vert";  val = "nVertLevels"; },
+   { key = "cell_id";   val = "indexToCellID,"; },
+   { key = "lat_face";  val = "latCell,Mesh2d_face_y"; },
+   { key = "lon_face";  val = "lonCell,Mesh2d_face_x"; },
+   { key = "vert_face"; val = "zCell"; },
+   { key = "lat_edge";  val = "latEdge,Mesh2d_edge_y"; },
+   { key = "lon_edge";  val = "lonEdge,Mesh2d_edge_x"; },
+   { key = "lat_node";  val = "latVertex,Mesh2d_node_y"; },
+   { key = "lon_node";  val = "lonVertex,Mesh2d_node_x"; },
+   { key = "time";      val = "xtime,time_centered"; }
+];
+
+////////////////////////////////////////////////////////////////////////////////
+
+version = "V12.0.0";
+
+////////////////////////////////////////////////////////////////////////////////
