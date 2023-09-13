@@ -91,6 +91,8 @@ static ConcatString out_prefix;
 //
 ////////////////////////////////////////////////////////////////////////
 
+static unixtime init_ut = (unixtime) 0;
+
 class OutFileInfo {
 
    private:

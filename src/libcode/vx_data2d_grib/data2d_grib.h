@@ -84,10 +84,16 @@ class MetGrib1DataFile : public Met2dDataFile {
 
       int read_record( VarInfoGrib &);   //  returns match count (>=0), or -1 on error
 
+         //  retrieve the first matching data plane
+
       bool data_plane(VarInfo &, DataPlane &);
 
+         //  retrieve all matching data planes
+
       int data_plane_array(VarInfo &, DataPlaneArray &);
-      
+
+         //  retrieve the index of the first matching record
+
       int index(VarInfo &);
 
 };

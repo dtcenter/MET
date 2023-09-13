@@ -94,11 +94,20 @@ Configuring input tracks and time
   valid_inc = [];
   valid_exc = [];
   valid_hour = [];
-  lead = [];
 
 The TC-Diag tool should be configured to filter the input track data (**-deck**) down to the subset of tracks that correspond to the gridded data files provided (**-data**). The filtered tracks should contain data for only *one initialization time* but may contain tracks for multiple models.
 
 The configuration options listed above are used to filter the input track data down to those that should be processed in the current run. These options are common to multiple MET tools and are described in :numref:`config_options_tc`.
+
+.. code-block:: none
+
+  lead = [   "0",    "6",  "12",  "18",  "24",
+            "30",   "36",  "42",  "48",  "54",
+            "60",   "66",  "72",  "78",  "84",
+            "90",   "96", "102", "108", "114",
+            "120", "126" ];
+
+The **lead** entry is an array of strings specifying lead times in HH[MMSS] format. By default, diagnostics are computed every 6 hours out to 126 hours. Lead times for which no track point or gridded model data exist produce a warning message and diagnostics set to a missing data value.
 
 Configuring domain information
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -204,8 +213,16 @@ The **vortex_removal** flag entry is a boolean specifying whether or not vortex 
 
 .. note:: As of MET version 11.1.0, vortex removal logic is not yet supported.
 
-Configuring data output options
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Configuring data input and output options
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: none
+
+  one_time_per_file_flag = TRUE;
+
+The **one_time_per_file_flag** entry controls the logic for reading data from input files. This option describes how data is stored in the gridded input files specified with the **-data** command line option. Set this to true if each input file contains all of the data for a single initialization time and for a single valid time. If the input files contain data for multiple initialization or valid times, or if data for one valid time is spread across multiple files, set this to false.
+
+If true, all input fields are read efficiently from each file in a single call. If false, each field is processed separately in a less efficient manner.
 
 .. code-block:: none
 

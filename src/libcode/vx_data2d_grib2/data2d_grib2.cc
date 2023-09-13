@@ -239,8 +239,8 @@ bool MetGrib2DataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
 
 ////////////////////////////////////////////////////////////////////////
 
-int MetGrib2DataFile::data_plane_array( VarInfo &vinfo,
-                                        DataPlaneArray &plane_array ){
+int MetGrib2DataFile::data_plane_array(VarInfo &vinfo,
+                                       DataPlaneArray &plane_array) {
 
    // Initialize
    plane_array.clear();
@@ -357,10 +357,9 @@ int MetGrib2DataFile::data_plane_array( VarInfo &vinfo,
 
 ////////////////////////////////////////////////////////////////////////
 
-void MetGrib2DataFile::find_record_matches( VarInfoGrib2* vinfo,
-                                            vector<Grib2Record*> &listMatchExact,
-                                            vector<Grib2Record*> &listMatchRange
-                                          ){
+void MetGrib2DataFile::find_record_matches(VarInfoGrib2* vinfo,
+                                           vector<Grib2Record*> &listMatchExact,
+                                           vector<Grib2Record*> &listMatchRange) {
 
    const char *method_name = "MetGrib2DataFile::find_record_matches() -> ";
 
@@ -955,7 +954,7 @@ void MetGrib2DataFile::read_grib2_record_list() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void MetGrib2DataFile::read_grib2_grid( gribfield *gfld) {
+void MetGrib2DataFile::read_grib2_grid(gribfield *gfld) {
 
    double d, r_km;
    int ResCompFlag;
@@ -1416,7 +1415,7 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld) {
 ////////////////////////////////////////////////////////////////////////
 
 bool MetGrib2DataFile::read_grib2_record_data_plane(Grib2Record *rec,
-                                                     DataPlane &plane) {
+                                                    DataPlane &plane) {
 
    //  attempt to read the record
    gribfield *gfld;
