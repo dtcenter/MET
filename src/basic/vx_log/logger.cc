@@ -37,7 +37,10 @@ static const int ErrorMessageLevel     = -1;
 
 static const int WarningMessageLevel   =  0;
 
+static const bool DefaultPrintWarning = true;
+
 static const bool DefaultExitOnWarning =  false;
+
 
    //
    //  these need external linkage, do not make static or extern
@@ -217,6 +220,8 @@ LoggerWarning::LoggerWarning()
 {
    warn = WarningMessageLevel;
 
+   PrintWarning = DefaultPrintWarning;
+
    ExitOnWarning = DefaultExitOnWarning;
 
    NeedToExit = false;
@@ -246,6 +251,8 @@ LoggerWarning::LoggerWarning(const LoggerWarning & lw)
 {
    warn = lw.warn;
 
+   PrintWarning = lw.PrintWarning;
+
    ExitOnWarning = lw.ExitOnWarning;
 
    NeedToExit = lw.NeedToExit;
@@ -258,6 +265,8 @@ LoggerWarning::LoggerWarning(const LoggerWarning & lw)
 LoggerWarning & LoggerWarning::operator=(const LoggerWarning & lw)
 {
    warn = lw.warn;
+
+   PrintWarning = lw.PrintWarning;
 
    ExitOnWarning = lw.ExitOnWarning;
 
@@ -491,6 +500,17 @@ void Logger::dump(ostream & dump_out, int depth) const
 //////////////////////////////////////////////////////////////////
 
 
+bool Logger::print_warning() const
+{
+
+   return (Warning.PrintWarning);
+
+}
+
+
+//////////////////////////////////////////////////////////////////
+
+
 void Logger::set_verbosity_level(const int i)
 {
       //
@@ -509,6 +529,19 @@ void Logger::set_verbosity_level(const int i)
 //////////////////////////////////////////////////////////////////
 
 
+void Logger::set_print_warning(bool b)
+{
+      //
+      // if false, do not print warning messages
+      //
+   Warning.PrintWarning = b;
+
+}
+
+
+//////////////////////////////////////////////////////////////////
+
+
 void Logger::set_exit_on_warning(bool b)
 {
       //
@@ -517,7 +550,6 @@ void Logger::set_exit_on_warning(bool b)
    Warning.ExitOnWarning = b;
 
 }
-
 
 
 //////////////////////////////////////////////////////////////////
@@ -1604,7 +1636,10 @@ Logger & Logger::operator<<(const LoggerError e)
 
 Logger & Logger::operator<<(const LoggerWarning w)
 {  
-   (*this) << level(WarningMessageLevel);
+   if (Warning.PrintWarning)
+   {
+      (*this) << level(WarningMessageLevel);
+   }
    
    if (Warning.ExitOnWarning) Warning.NeedToExit = true;
    
