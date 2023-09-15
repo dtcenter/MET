@@ -331,7 +331,7 @@ ________________________
 
 .. code-block:: none
 
-  model          = "WRF";
+  model          = "FCST";
   desc           = "NA";
   regrid         = { ... }
   climo_mean     = { ... }

@@ -99,7 +99,7 @@ ____________________
 
 .. code-block:: none
 
-  model          = "WRF";
+  model          = "FCST";
   desc           = "NA";
   obtype         = "ANALYS";
   regrid         = { ... }

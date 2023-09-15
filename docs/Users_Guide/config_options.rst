@@ -602,7 +602,7 @@ e.g. model = "GFS";
 
 .. code-block:: none
 		
-  model = "WRF";
+  model = "FCST";
 
 desc
 ^^^^
