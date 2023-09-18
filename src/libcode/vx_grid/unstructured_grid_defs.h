@@ -39,6 +39,9 @@ struct UnstructuredData {
    int Nface;
    int Nedge;
    int Nnode;
+   double pt_distance;
+   double lat_checksum;
+   double lon_checksum;
 
    std::vector<atlas::PointLonLat> pointLonLat;
    atlas::util::IndexKDTree *kdtree;

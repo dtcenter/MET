@@ -35,7 +35,8 @@ class UnstructuredGrid : public GridRep {
 
 
       int Nx;
-      
+      //double distance;  //in meters. Set the negative distance to disbale disathce capability
+
 
       bool wrapLon;
 
@@ -46,6 +47,7 @@ class UnstructuredGrid : public GridRep {
       void clear();
 
       void set_from_data(const UnstructuredData &);
+      void set_distance(double _distance);
 
          //
          //  grid interface
