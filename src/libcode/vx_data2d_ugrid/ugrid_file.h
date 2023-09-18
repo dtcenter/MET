@@ -45,6 +45,8 @@ class UGridFile {
 
       bool open(const char *filename);
       bool open_metadata(const char *filename);
+      bool get_var_info();
+      void set_map_config_file(ConcatString filename);
 
       void close();
 
@@ -101,7 +103,7 @@ class UGridFile {
 
       bool getData(const char *, const LongArray &, DataPlane &, NcVarInfo *&) const;
 
-      NcVarInfo* find_var_name(const char * var_name) const;
+      NcVarInfo* find_by_name(const char * var_name) const;
 
    private:
 
@@ -155,7 +157,7 @@ class UGridFile {
 
       std::string find_metadata_name(std::string &key, StringArray &available_names);
       StringArray get_metadata_names(std::string &key);
-      void read_config();
+      void read_config(ConcatString config_filename);
       void read_netcdf_grid();
 
 };

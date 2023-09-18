@@ -100,6 +100,7 @@ class MetUGridDataFile : public Met2dDataFile {
 
       bool open  (const char * filename);
       bool open_metadata(const char * filename);
+      void set_map_config_file(ConcatString filename);
 
       void close ();
 

@@ -86,27 +86,6 @@ void MetUGridDataFile::ugrid_init_from_scratch() {
 }
 
 ////////////////////////////////////////////////////////////////////////
-/*
-NcVarInfo *MetUGridDataFile::find_first_data_var() {
-   NcVarInfo *first_data_var = nullptr;
-   // Store the name of the first data variable
-   for (int i = 0; i < _file->Nvars; ++i) {
-      if (is_nc_unit_time(_file->Var[i].units_att.c_str()) || 
-          is_nc_unit_longitude(_file->Var[i].units_att.c_str()) || 
-          is_nc_unit_latitude(_file->Var[i].units_att.c_str()) ||
-          _file->get_time_var_info() == &_file->Var[i]
-         ) continue;
-     
-      if (strcmp(_file->Var[i].name.c_str(), ugrid_lat_var_name) != 0 &&
-          strcmp(_file->Var[i].name.c_str(), ugrid_lon_var_name) != 0) {
-         first_data_var = &(_file->Var[i]);
-         break;
-      }
-   }
-   return first_data_var;
-}
-*/
-////////////////////////////////////////////////////////////////////////
 
 void MetUGridDataFile::close() {
 
@@ -211,7 +190,7 @@ cout << "   FIXME MetUGridDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
   LongArray dimension = vinfo_nc->dimension();
   BoolArray is_offset = vinfo_nc->is_offset();
 
-  data_var = _file->find_var_name(vinfo_nc->req_name().c_str());
+  data_var = _file->find_by_name(vinfo_nc->req_name().c_str());
 /*
   if (nullptr != data_var) {
     time_dim_slot = data_var->t_slot;
@@ -361,7 +340,7 @@ cout << "   FIXME MetUGridDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
 ////////////////////////////////////////////////////////////////////////
 
 int MetUGridDataFile::data_plane_array(VarInfo &vinfo,
-                                      DataPlaneArray &plane_array) {
+                                       DataPlaneArray &plane_array) {
    int n_rec = 0;
    DataPlane plane;
    bool status = false;
@@ -370,14 +349,6 @@ int MetUGridDataFile::data_plane_array(VarInfo &vinfo,
 
    // Initialize
    plane_array.clear();
-
-   VarInfoUGrid *vinfo_nc = (VarInfoUGrid *)&vinfo;
-   if ( vinfo_nc->req_name() == na_str ) {
-      // Store the name of the first data variable
-cout << "   FIXME MetUGridDataFile::data_plane_array()  calling find_first_data_var()\n";
-//      NcVarInfo *data_var = find_first_data_var();
-//      if (nullptr != data_var) vinfo_nc->set_req_name(data_var->name.c_str());
-   }
 
    LongArray time_offsets = collect_time_offsets(vinfo);
    if (0 < time_offsets.n_elements()) {
@@ -420,7 +391,7 @@ LongArray MetUGridDataFile::collect_time_offsets(VarInfo &vinfo) {
          = "MetUGridDataFile::collect_time_offsets(VarInfo &) -> ";
 
    LongArray time_offsets;
-   NcVarInfo *info = _file->find_var_name(vinfo_nc->req_name().c_str());
+   NcVarInfo *info = _file->find_by_name(vinfo_nc->req_name().c_str());
 
    // Check for variable not found
    if(!info) {
@@ -622,7 +593,7 @@ LongArray MetUGridDataFile::collect_time_offsets(VarInfo &vinfo) {
 
 int MetUGridDataFile::index(VarInfo &vinfo){
 
-   if( nullptr == _file->find_var_name( vinfo.name().c_str() ) ) return -1;
+   if( nullptr == _file->find_by_name( vinfo.name().c_str() ) ) return -1;
 
    if( ( vinfo.valid() != 0         && _file->ValidTime[0] != vinfo.valid() ) ||
        ( vinfo.init()  != 0         && _file->InitTime     != vinfo.init()  ) ||
@@ -702,5 +673,13 @@ long MetUGridDataFile::convert_value_to_offset(double z_value, string z_dim_name
 
    return z_offset;
 }
+
+////////////////////////////////////////////////////////////////////////
+
+
+void MetUGridDataFile::set_map_config_file(ConcatString filename) {
+   _file->set_map_config_file(filename);
+}
+
 
 ////////////////////////////////////////////////////////////////////////

@@ -2,14 +2,16 @@
 //
 // Unstructured Grid configuration file.
 //
-// For additional information, please see the MET User's Guide.
+// UGridConfig_user at the current working directory overrides the default.
+// For additional or updated information, please see the MET User's Guide.
 //
 ////////////////////////////////////////////////////////////////////////////////
 
 //
 // Default mapping for Metadata.
+// The first values are for MPAS and the second values are for LFric.
 //
-metadata_map = [
+ugrid_metadata_map = [
    { key = "dim_face";  val = "nCells,nMesh2d_face"; },
    { key = "dim_node";  val = "nVertices,nMesh2d_node"; },
    { key = "dim_edge";  val = "nEdges,nMesh2d_edge"; },

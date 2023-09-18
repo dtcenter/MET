@@ -35,7 +35,8 @@ using namespace netCDF;
 
 ////////////////////////////////////////////////////////////////////////
 
-static const char *default_config_filename =
+static const char *def_user_config = "UGridConfig_user"";
+static const char *def_config_filename =
    "MET_BASE/config/UGridConfig_default";
 
 array<string, UG_DIM_COUNT> DIM_KEYS = {
@@ -70,7 +71,6 @@ UGridFile::UGridFile()
 
 
 ////////////////////////////////////////////////////////////////////////
-
 
 UGridFile::~UGridFile()
 {
@@ -172,7 +172,9 @@ bool UGridFile::open(const char * filepath)
 
   // Close any open files and clear out the associated members
   close();
-  read_config();
+  ConcatString config_file = def_config_filename
+  if (file_exists(default_user_config.c_str())) config_file = def_user_config;
+  read_config(config_file);
 
   if (_ncFile) {
     delete _ncFile;
@@ -188,49 +190,7 @@ bool UGridFile::open(const char * filepath)
     return false;
   }
 
-  // Pull out the variables
-
-  NcDim dim;
-  int meta_count = 0;
-  int max_dim_count = 0;
-  ConcatString att_value;
-  StringArray var_names;
-
-  Nvars = get_var_names(_ncFile, &var_names);
-  for (int j=0; j<Nvars; ++j) {
-     if (metadata_names.has(var_names[j])) meta_count++;
-  }
-  Nvars -= meta_count;
-  Var = new NcVarInfo [Nvars];
-
-  StringArray meta_time_names = get_metadata_names(COORD_VAR_KEYS[0]);
-  for (int j=0; j<Nvars; ++j)  {
-    if (metadata_names.has(var_names[j]) && !meta_time_names.has(var_names[j])) continue;
-
-    //mlog << Debug(7) << method_name
-    //     << "adding data variable " << var_names[j] << "\n";
-
-    NcVar v = get_var(_ncFile, var_names[j].c_str());
-
-    Var[j].var = new NcVar(v);
-
-    Var[j].name = GET_NC_NAME(v).c_str();
-
-    int dim_count = GET_NC_DIM_COUNT(v);
-    Var[j].Ndims = dim_count;
-    if (dim_count > max_dim_count) max_dim_count = dim_count;
-
-    Var[j].Dims = new NcDim * [dim_count];
-
-    //  parse the variable attributes
-    get_att_str( Var[j], long_name_att_name, Var[j].long_name_att );
-    get_att_str( Var[j], units_att_name,     Var[j].units_att     );
-
-  }   //  for j
-
-  //  done
-
-  return true;
+  return get_var_info();
 }
 
 
@@ -579,12 +539,10 @@ std::string UGridFile::find_metadata_name(std::string &key, StringArray &availab
 ////////////////////////////////////////////////////////////////////////
 
 
-NcVarInfo* UGridFile::find_var_name(const char * var_name) const
+NcVarInfo* UGridFile::find_by_name(const char * var_name) const
 {
-  cout << "UGridFile::find_var_name() Nvars=" << Nvars << ", " << var_name << "\n";
   for (int i = 0; i < Nvars; i++)
   {
-      cout << "UGridFile::find_var_name() " << Var[i].name << " VS " << var_name << "\n";
     if (Var[i].name == var_name)
       return &Var[i];
   }
@@ -600,6 +558,8 @@ double UGridFile::getData(NcVar * var, const LongArray & a) const
   clock_t start_clock = clock();
   static const string method_name
       = "UGridFile::getData(NcVar *, const LongArray &) -> ";
+
+/*
   if (!args_ok(a))
   {
     mlog << Error << "\n" << method_name
@@ -628,6 +588,7 @@ double UGridFile::getData(NcVar * var, const LongArray & a) const
       exit ( 1 );
     }
   }
+*/
 
   bool status = false;
   double d = bad_data_double;
@@ -636,7 +597,8 @@ double UGridFile::getData(NcVar * var, const LongArray & a) const
   double missing_value = get_var_missing_value(var);
   get_var_fill_value(var, fill_value);
 
-  status = get_nc_data(var, &d, a);
+  //status = get_nc_data(var, &d, a);
+  status = get_nc_data(var, a);
 
   if (!status)
   {
@@ -665,40 +627,28 @@ bool UGridFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
   static const string method_name
       = "UGridFile::getData(NcVar *, const LongArray &, DataPlane &) const -> ";
 
-  if (!args_ok(a))
-  {
-    mlog << Error << "\n" << method_name
-         << "bad arguments:\n";
-    a.dump(cerr);
-    exit(1);
-  }
-
-  int dim_count = get_dim_count(v);
-  if (dim_count != a.n_elements())
-  {
-    mlog << Error << "\n" << method_name
-         << "needed " << (dim_count) << " arguments for variable "
-         << (GET_NC_NAME_P(v)) << ", got " << (a.n_elements()) << "\n\n";
-    exit(1);
-  }
+//  if (!args_ok(a))
+//  {
+//    mlog << Error << "\n" << method_name
+//         << "bad arguments:\n";
+//    a.dump(cerr);
+//    exit(1);
+//  }
+//
+//  int dim_count = get_dim_count(v);
+//  if (dim_count != a.n_elements())
+//  {
+//    mlog << Error << "\n" << method_name
+//         << "needed " << (dim_count) << " arguments for variable "
+//         << (GET_NC_NAME_P(v)) << ", got " << (a.n_elements()) << "\n\n";
+//    exit(1);
+//  }
 
   //  find varinfo's
 
-  bool found = false;
-  NcVarInfo *var = (NcVarInfo *)nullptr;
+  NcVarInfo *var = find_by_name(GET_NC_NAME_P(v).c_str());
 
-  for (int j = 0; j < Nvars; ++j)
-  {
-    if (Var[j].var == v)
-    {
-      found = true;
-      var = Var + j;
-      break;
-    }
-  }
-
-  if (!found)
-  {
+  if (nullptr == var) {
     mlog << Error << "\n" << method_name
          << "variable " << (GET_NC_NAME_P(v)) << " not found!\n\n";
     exit(1);
@@ -723,9 +673,6 @@ bool UGridFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
   plane.set_size(nx, ny);
 
   //  get the data
-  int    *i;
-  short  *s;
-  float  *f;
   const int plane_size = nx * ny;
   double *d = new double[plane_size];
 
@@ -760,9 +707,7 @@ bool UGridFile::getData(const char *var_name,
                         const LongArray &a, DataPlane &plane,
                         NcVarInfo *&info) const
 {
-  info = find_var_name(var_name);
-  if (info == nullptr)
-    return false;
+  info = find_by_name(var_name);
 
   bool found = getData(info->var, a, plane);
 
@@ -806,6 +751,63 @@ StringArray UGridFile::get_metadata_names(std::string &key) {
 
 ////////////////////////////////////////////////////////////////////////
 
+bool UGridFile::get_var_info() {
+
+  // Pull out the variables
+  if (Var) {
+    delete [] Var;
+    Var = (NcVarInfo *)nullptr;
+  }
+
+  NcDim dim;
+  int meta_count = 0;
+  int max_dim_count = 0;
+  ConcatString att_value;
+  StringArray var_names;
+
+  Nvars = get_var_names(_ncFile, &var_names);
+  for (int j=0; j<Nvars; ++j) {
+     if (metadata_names.has(var_names[j])) meta_count++;
+  }
+  Nvars -= meta_count;
+  if (Var) {
+    delete [] Var;
+    Var = (NcVarInfo *)nullptr;
+  }
+  Var = new NcVarInfo [Nvars];
+
+  StringArray meta_time_names = get_metadata_names(COORD_VAR_KEYS[0]);
+  for (int j=0; j<Nvars; ++j)  {
+    if (metadata_names.has(var_names[j]) && !meta_time_names.has(var_names[j])) continue;
+
+    //mlog << Debug(7) << method_name
+    //     << "adding data variable " << var_names[j] << "\n";
+
+    NcVar v = get_var(_ncFile, var_names[j].c_str());
+
+    Var[j].var = new NcVar(v);
+
+    Var[j].name = GET_NC_NAME(v).c_str();
+
+    int dim_count = GET_NC_DIM_COUNT(v);
+    Var[j].Ndims = dim_count;
+    if (dim_count > max_dim_count) max_dim_count = dim_count;
+
+    Var[j].Dims = new NcDim * [dim_count];
+
+    //  parse the variable attributes
+    get_att_str( Var[j], long_name_att_name, Var[j].long_name_att );
+    get_att_str( Var[j], units_att_name,     Var[j].units_att     );
+
+  }   //  for j
+
+  //  done
+
+  return true;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 
 int UGridFile::lead_time() const
 {
@@ -818,12 +820,12 @@ int UGridFile::lead_time() const
 ////////////////////////////////////////////////////////////////////////
 
 
-void UGridFile::read_config() {
+void UGridFile::read_config(ConcatString config_filename) {
   const char *method_name = "UGridFile::read_config()";
   MetConfig conf;
 
   // Read the default config file
-  conf.read(replace_path(default_config_filename).c_str());
+  conf.read(replace_path(config_filename).c_str());
 
   metadata_map = parse_conf_metadata_map(&conf);
   metadata_names.clear();
@@ -832,7 +834,7 @@ void UGridFile::read_config() {
     metadata_names.add(it->second);
   }
 
-  mlog << Debug(4) << method_name
+  mlog << Debug(6) << method_name
        << " map size: " << metadata_map.size() << ", dims_vars_count = " << metadata_names.n() << "\n";
 
 }
@@ -898,5 +900,18 @@ void UGridFile::read_netcdf_grid()
 
 }
 
+
+////////////////////////////////////////////////////////////////////////
+
+void UGridFile::set_map_config_file(ConcatString filename) {
+
+  if (file_exists(filename.c_str())) {
+    read_config(filename.c_str());
+    get_var_info();
+  }
+  else mlog << Warning << "\nUGridFile::set_map_config_file() The UGrid metadata mapping configuration file \""
+            << filename << " does not exist. Use the default mapping\n\n";
+
+}
 
 ////////////////////////////////////////////////////////////////////////
