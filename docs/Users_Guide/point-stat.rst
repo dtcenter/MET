@@ -911,7 +911,7 @@ The first set of header columns are common to all of the output files generated 
   * - 26
     - N_CAT
     - Dimension of the contingency table
-  * - 28
+  * - 27
     - Fi_Oj
     - Count of events in forecast category i and observation category j, with the observations incrementing first (repeated)
   * - \*
