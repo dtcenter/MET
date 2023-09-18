@@ -675,11 +675,14 @@ static const char conf_key_trunc_factor[]      = "gaussian_trunc_factor";
 static const char conf_key_eclv_points[]       = "eclv_points";
 static const char conf_key_var_name_map[]      = "var_name_map";
 static const char conf_key_metadata_map[]      = "metadata_map";
+static const char conf_key_ugrid_map_config[]  = "ugrid_map_config";
+static const char conf_key_ugrid_metadata_map[]= "ugrid_metadata_map";
 static const char conf_key_obs_to_qc_map[]     = "obs_to_qc_map";
 static const char conf_key_missing_thresh[]    = "missing_thresh";
 static const char conf_key_control_id[]        = "control_id";
 static const char conf_key_ens_member_ids[]    = "ens_member_ids";
 static const char conf_key_seeps_p1_thresh[]   = "seeps_p1_thresh";
+static const char conf_key_ugrid_metadata_file[] = "ugrid_metadata_file";
 
 //
 // Entries to override file metadata 
@@ -1229,6 +1232,7 @@ static const char conf_val_grib2         [] = "GRIB2";
 static const char conf_val_netcdf_met    [] = "NETCDF_MET";
 static const char conf_val_netcdf_pint   [] = "NETCDF_PINT";
 static const char conf_val_netcdf_nccf   [] = "NETCDF_NCCF";
+static const char conf_val_netcdf_ugrid  [] = "NETCDF_UGRID";
 static const char conf_val_python_numpy  [] = "PYTHON_NUMPY";
 static const char conf_val_python_xarray [] = "PYTHON_XARRAY";
 

@@ -356,6 +356,7 @@ GrdFileType parse_conf_file_type(Dictionary *dict) {
       else if(v == conf_const.lookup_int(conf_val_netcdf_met))    t = FileType_NcMet;
       else if(v == conf_const.lookup_int(conf_val_netcdf_pint))   t = FileType_NcPinterp;
       else if(v == conf_const.lookup_int(conf_val_netcdf_nccf))   t = FileType_NcCF;
+      else if(v == conf_const.lookup_int(conf_val_netcdf_ugrid))  t = FileType_UGrid;
       else if(v == conf_const.lookup_int(conf_val_python_numpy))  t = FileType_Python_Numpy;
       else if(v == conf_const.lookup_int(conf_val_python_xarray)) t = FileType_Python_Xarray;
       else {
@@ -1121,6 +1122,13 @@ map<ConcatString,StringArray> parse_conf_message_type_group_map(Dictionary *dict
 map<ConcatString,StringArray> parse_conf_metadata_map(Dictionary *dict) {
    const char *method_name = "parse_conf_metadata_map() -> ";
    return parse_conf_key_values_map(dict, conf_key_metadata_map, method_name);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+map<ConcatString,StringArray> parse_conf_ugrid_metadata_map(Dictionary *dict) {
+   const char *method_name = "parse_conf_ugrid_metadata_map() -> ";
+   return parse_conf_key_values_map(dict, conf_key_ugrid_metadata_map, method_name);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2257,6 +2265,38 @@ WaveletType parse_conf_wavelet_type(Dictionary *dict) {
    }
 
    return t;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+ConcatString parse_conf_ugrid_map_config(Dictionary *dict) {
+   ConcatString s;
+
+   if(!dict) {
+      mlog << Error << "\nparse_conf_ugrid_map_config() -> "
+           << "empty dictionary!\n\n";
+      exit(1);
+   }
+
+   s = dict->lookup_string(conf_key_ugrid_map_config);
+
+   return s;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+ConcatString parse_conf_ugrid_metadata_file(Dictionary *dict) {
+   ConcatString s;
+
+   if(!dict) {
+      mlog << Error << "\nparse_conf_ugrid_metadata_file() -> "
+           << "empty dictionary!\n\n";
+      exit(1);
+   }
+
+   s = dict->lookup_string(conf_key_ugrid_metadata_file);
+
+   return s;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
