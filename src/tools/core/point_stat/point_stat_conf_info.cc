@@ -71,6 +71,8 @@ void PointStatConfInfo::clear() {
    tmp_dir.clear();
    output_prefix.clear();
    version.clear();
+   ugrid_nc.clear();
+   ugrid_map_config.clear();
 
    // Deallocate memory
    if(vx_opt) { delete [] vx_opt; vx_opt = (PointStatVxOpt *) 0; }
@@ -120,6 +122,12 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
 
    // Conf: tmp_dir
    tmp_dir = parse_conf_tmp_dir(&conf);
+
+   // Conf: ugrid_nc
+   ugrid_nc = parse_conf_ugrid_metadata_file(&conf);
+
+   // Conf: ugrid_map_config
+   ugrid_map_config = parse_conf_ugrid_map_config(&conf);
 
    // Conf: output_prefix
    output_prefix = conf.lookup_string(conf_key_output_prefix);

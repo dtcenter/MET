@@ -152,7 +152,7 @@ static Met2dDataFileFactory mtddf_factory;
 static Met2dDataFile *fcst_mtddf = (Met2dDataFile *) 0;
 
 // Pointer to the random number generator to be used
-static gsl_rng *rng_ptr = (gsl_rng *) 0;
+static gsl_rng *rng_ptr = (gsl_rng *) nullptr;
 
 // Strings to be output in the STAT and optional text files
 static StatHdrColumns shc;

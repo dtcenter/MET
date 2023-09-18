@@ -142,7 +142,6 @@ using namespace netCDF;
 
 ////////////////////////////////////////////////////////////////////////
 
-static ConcatString ugrid_nc;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -179,7 +178,6 @@ static void set_ncfile(const StringArray &);
 static void set_obs_valid_beg_time(const StringArray &);
 static void set_obs_valid_end_time(const StringArray &);
 static void set_outdir(const StringArray &);
-static void set_ugrid_nc(const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -243,7 +241,6 @@ void process_command_line(int argc, char **argv) {
    cline.add(set_obs_valid_beg_time, "-obs_valid_beg", 1);
    cline.add(set_obs_valid_end_time, "-obs_valid_end", 1);
    cline.add(set_outdir,             "-outdir",        1);
-   cline.add(set_ugrid_nc,           "-ugrid",         1);
 
    // Parse the command line
    cline.parse();
@@ -284,7 +281,6 @@ void process_command_line(int argc, char **argv) {
 
    // Get the forecast file type from config, if present
    ftype = parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_fcst));
-   if (ftype == FileType_None && 0 < ugrid_nc.length()) ftype = FileType_UGrid;
 
    // Read forecast file
    if(!(fcst_mtddf = mtddf_factory.new_met_2d_data_file(fcst_file.c_str(), ftype))) {
@@ -303,7 +299,12 @@ void process_command_line(int argc, char **argv) {
    shc.set_model(conf_info.model.c_str());
 
    if (FileType_UGrid == ftype) {
-      ((MetUGridDataFile *)fcst_mtddf)->open_metadata(ugrid_nc.c_str());
+      ConcatString ugrid_nc = conf_info.ugrid_nc;
+      ConcatString map_config_file = conf_info.ugrid_map_config;
+      MetUGridDataFile *ugrid_mtddf = (MetUGridDataFile *)fcst_mtddf;
+      if (0 < map_config_file.length()) ugrid_mtddf->set_map_config_file(map_config_file);
+      if (0 == ugrid_nc.length() || ugrid_nc == "NA") ugrid_nc = fcst_file;
+      ugrid_mtddf->open_metadata(ugrid_nc.c_str());
    }
 
    // Use the first verification task to set the random number generator
@@ -2173,7 +2174,6 @@ void usage() {
         << "\t[-point_obs file]\n"
         << "\t[-obs_valid_beg time]\n"
         << "\t[-obs_valid_end time]\n"
-        << "\t[-ugrid ugrid_file]\n"
         << "\t[-outdir path]\n"
         << "\t[-log file]\n"
         << "\t[-v level]\n\n"
@@ -2198,9 +2198,6 @@ void usage() {
 
         << "\t\t\"-outdir path\" overrides the default output "
         << "directory (" << out_dir << ") (optional).\n"
-
-        << "\t\t\"-ugrid ugrid_file\" is the metadata file for unstructured grid "
-        << " (only required for unstructured grid data).\n"
 
         << "\t\t\"-log file\" outputs log messages to the specified "
         << "file (optional).\n"
@@ -2244,13 +2241,6 @@ void set_obs_valid_end_time(const StringArray & a)
 void set_outdir(const StringArray & a)
 {
    out_dir = a[0];
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_ugrid_nc(const StringArray & a)
-{
-   ugrid_nc = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////
