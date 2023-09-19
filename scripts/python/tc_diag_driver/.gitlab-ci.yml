@@ -1,0 +1,17 @@
+before_script:
+  - python --version
+  - pip install -r requirements.txt
+
+stages:
+  - test
+
+run_unit_tests:
+  stage: test
+
+  parallel:
+    matrix:
+      - version: ["3.8", "3.9", "3.10"]
+
+  image: python:${version}-slim-bullseye
+  script:
+    - python -m unittest discover -s tests -p "*test_*"

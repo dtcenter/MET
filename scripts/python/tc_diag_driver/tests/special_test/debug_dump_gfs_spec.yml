@@ -1,0 +1,66 @@
+model_name: gfs
+path_format: "/data/musgrave/METdiag/ida/gfs/{model_time:%Y%m%d%H}/{resolution}/\
+    {model_name}.{model_time:%Y%m%d%H}.pgrb2.{resolution}.f\
+    {forecast_time_hours:03d}"
+
+resolution: 0p50
+nested_grid_id: UNUSED
+levels_hPa: [1000, 850, 700, 200]
+forecast_hours: [0, 6]
+# levels_hPa: [1000, 975, 950, 925, 900, 850, 800, 750, 700, 650, 600, 550, 500, 450, 400, 350, 300, 250, 200, 150, 100, 70, 50, 30, 20, 10]
+# forecast_hours: [0, 6, 12, 18, 24, 30, 36, 42, 48, 54, 60, 66, 72, 78, 84, 90, 96, 102, 108, 114, 120, 126]
+
+# Need to specify which grib variable will be used to obtain the lon/lat
+# grid
+nav_var_name: t
+nav_var_level: 1000
+nav_var_level_type: isobaricInhPa
+nav_var_is_surface: false
+# Cylindrical grid specification
+n_radii: 150
+n_theta: 8
+radii_step_km: 10
+# ATCF file tech-ID to use to get the TC lon/lat
+atcf_tech_id: AVNO
+# The normal diagnositc output is useless here, so just ignore it.
+output_file_format: ignore-me.dat
+
+# We're going to read everything we normally would
+input_var_specs:
+    - {var_name: u, level_type: isobaricInhPa}
+    - {var_name: v, level_type: isobaricInhPa}
+    - {var_name: t, level_type: isobaricInhPa}
+    - {var_name: r, level_type: isobaricInhPa}
+    - {var_name: z, grib_name: gh, level_type: isobaricInhPa}
+    - {var_name: t_surf, grib_name: 2t, level_type: heightAboveGround, is_surface: true, level: 2}
+    - {var_name: r_surf, grib_name: 2r, level_type: heightAboveGround, is_surface: true, level: 2}
+    - {var_name: p_surf, grib_name: prmsl, level_type: meanSea, is_surface: true, level: 0}
+    - {var_name: u_surf, grib_name: 10u, level_type: heightAboveGround, is_surface: true, level: 10}
+    - {var_name: v_surf, grib_name: 10v, level_type: heightAboveGround, is_surface: true, level: 10}
+    - {var_name: tpw, grib_name: pwat, level_type: unknown, is_surface: true, select_name_only: true}
+    - {var_name: sst, grib_name: t, level_type: surface, is_surface: true, level: 0}
+
+debug_cyl_dump: &debug_cyl_dump tc_diag_driver.diag_vars.debug_cyl_grid_dump
+k_to_c: &k_to_c diag_lib.unit_conversion.kelvin_to_celsius
+# Each level is dumped to a different file, so we'll put the level in the filename.
+s_dump_fname: &s_dump_fname "tests/special_test/cyl_dumps/{grib_var_name}_{hour:03d}h_{level_hPa:04d}_dump.nc"
+# The pressure independent computations don't use levels, so we won't included it in the filename
+pi_dump_fname: &pi_dump_fname "tests/special_test/cyl_dumps/{grib_var_name}_{hour:03d}h_dump.nc"
+
+pressure_independent_computation_specs:
+    # Dumps the resampled t_surf variable after we convert the grib intput to Celsius.
+    dump_t_surf: {callable: *debug_cyl_dump, kwargs: {grib_var_name: t_surf, output_filename: *pi_dump_fname, unit_converter: *k_to_c}}
+    # Dumps the resampled r_surf variable.
+    dump_r_surf: {callable: *debug_cyl_dump, kwargs: {grib_var_name: r_surf, output_filename: *pi_dump_fname}}
+
+sounding_computation_specs: 
+    # Dumps each level of the resampled u, v variables to a separate file.
+    dump_u: {callable: *debug_cyl_dump, kwargs: {grib_var_name: u, output_filename: *s_dump_fname}}
+    dump_v: {callable: *debug_cyl_dump, kwargs: {grib_var_name: v, output_filename: *s_dump_fname}}
+
+
+# We don't care about the normal output, so this is empty.
+output_specs: []
+
+
+

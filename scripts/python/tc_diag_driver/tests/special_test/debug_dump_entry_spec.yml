@@ -1,0 +1,7 @@
+---
+model_entries:
+  - model_spec: tests/special_test/debug_dump_gfs_spec.yml
+    atcf_id: al092021
+    model_time: 2021-08-27T12:00:00
+    atcf_file: tests/special_test/aal092021.dat
+    output_dir: tests/special_test/

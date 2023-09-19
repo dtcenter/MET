@@ -1,0 +1,17 @@
+name: tc_diag_driver_deploy
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - python=3.9
+  - numpy
+  - scipy
+  - toml
+  - pyyaml
+  - pandas
+  - pip
+  - pygrib
+  - xarray
+  - pip:
+    - cira_dependencies/diag_lib-0.4.1.tar.gz
+    - cira_dependencies/atcf_tools-0.12.0.tar.gz
