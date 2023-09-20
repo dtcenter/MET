@@ -170,6 +170,9 @@ class TrackInfo {
       bool add_diag_data(DiagFile &, const StringArray &);
       void add_diag_value(int, double);
 
+      //void add_uniq_diag_name(const char *diag_name);
+      void add_uniq_diag_name(const string diag_name);
+      
       bool has(const ATCFTrackLine &) const;
 
       bool is_match(const ATCFTrackLine &);
