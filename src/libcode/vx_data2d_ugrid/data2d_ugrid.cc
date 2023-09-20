@@ -676,9 +676,14 @@ long MetUGridDataFile::convert_value_to_offset(double z_value, string z_dim_name
 
 ////////////////////////////////////////////////////////////////////////
 
+void MetUGridDataFile::set_max_distance_km(double max_distance) {
+   _file->set_max_distance_km(max_distance);
+}
 
-void MetUGridDataFile::set_map_config_file(ConcatString filename) {
-   _file->set_map_config_file(filename);
+////////////////////////////////////////////////////////////////////////
+
+void MetUGridDataFile::set_user_map_config_file(ConcatString filename) {
+   _file->set_user_map_config_file(filename);
 }
 
 

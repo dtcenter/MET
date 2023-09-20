@@ -308,11 +308,22 @@ void UnstructuredData::clear() {
 
    name = (const char *) nullptr;
 
+   Nface = Nnode = Nedge = 0;
+   max_distance_km = bad_data_double;  // disable max_distance
+
+   clear_data();
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+void UnstructuredData::clear_data() {
+
    Nface = 0;
-   //distance = -1.;  // disable distance
+   pointLonLat.clear();
    lat_checksum = lon_checksum = 0.;
 
-   pointLonLat.clear();
    if (kdtree) { delete kdtree; kdtree = nullptr; }
 
 }
@@ -325,9 +336,10 @@ void UnstructuredData::dump() const {
 
    mlog << Debug(grid_debug_level)
         << "\nUnstructured Grid Data:\n"
-        << "         Nface: " << Nface << "\n"
-        << "  lat_checksum: " << lat_checksum << "\n"
-        << "  lon_checksum: " << lon_checksum << "\n"
+        << "           Nface: " << Nface << "\n"
+        << "    lat_checksum: " << lat_checksum << "\n"
+        << "    lon_checksum: " << lon_checksum << "\n"
+        << " max_distance_km: " << max_distance_km << "\n"
         ;
 }
 
@@ -733,17 +745,11 @@ void GridInfo::set(const UnstructuredData & data)
 
 clear();
 
-/*
-us = new UnstructuredData();
-memcpy(D, &data, sizeof(data));
-us->Nface = data.Nface;
-us->copy_data(data.pointLonLat);
-//us = new UnstructuredData(data);
-*/
-
 UnstructuredData *D = new UnstructuredData;
 
-//D->Nface = data.Nface;
+D->Nedge = data.Nedge;
+D->Nnode = data.Nnode;
+D->max_distance_km = data.max_distance_km;
 D->set_points(data.Nface, data.pointLonLat);
 us = D;
 D = (UnstructuredData *)nullptr;

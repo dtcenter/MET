@@ -293,7 +293,7 @@ ConcatString parse_conf_string(Dictionary *dict, const char *conf_key,
    const char *method_name = "parse_conf_string() -> ";
 
    if(!dict) {
-      mlog << Error << "\n" << method_name << "empty dictionary!\n\n";
+      mlog << Error << "\n" << method_name << "empty dictionary! (" << conf_key <<")\n\n";
       exit(1);
    }
 
@@ -1122,13 +1122,6 @@ map<ConcatString,StringArray> parse_conf_message_type_group_map(Dictionary *dict
 map<ConcatString,StringArray> parse_conf_metadata_map(Dictionary *dict) {
    const char *method_name = "parse_conf_metadata_map() -> ";
    return parse_conf_key_values_map(dict, conf_key_metadata_map, method_name);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-map<ConcatString,StringArray> parse_conf_ugrid_metadata_map(Dictionary *dict) {
-   const char *method_name = "parse_conf_ugrid_metadata_map() -> ";
-   return parse_conf_key_values_map(dict, conf_key_ugrid_metadata_map, method_name);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2269,35 +2262,29 @@ WaveletType parse_conf_wavelet_type(Dictionary *dict) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-ConcatString parse_conf_ugrid_map_config(Dictionary *dict) {
-   ConcatString s;
-
-   if(!dict) {
-      mlog << Error << "\nparse_conf_ugrid_map_config() -> "
-           << "empty dictionary!\n\n";
-      exit(1);
-   }
-
-   s = dict->lookup_string(conf_key_ugrid_map_config);
-
-   return s;
+double parse_conf_ugrid_max_distance_km(Dictionary *dict) {
+   return dict ? dict->lookup_double(conf_key_ugrid_max_distance_km, false) : bad_data_double;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-ConcatString parse_conf_ugrid_metadata_file(Dictionary *dict) {
-   ConcatString s;
-
-   if(!dict) {
-      mlog << Error << "\nparse_conf_ugrid_metadata_file() -> "
-           << "empty dictionary!\n\n";
-      exit(1);
-   }
-
-   s = dict->lookup_string(conf_key_ugrid_metadata_file);
-
-   return s;
+ConcatString parse_conf_ugrid_coordinates_file(Dictionary *dict) {
+   return dict ? dict->lookup_string(conf_key_ugrid_coordinates_file, false) : "";
 }
+
+///////////////////////////////////////////////////////////////////////////////
+
+map<ConcatString,StringArray> parse_conf_ugrid_metadata_map(Dictionary *dict) {
+   const char *method_name = "parse_conf_ugrid_metadata_map() -> ";
+   return parse_conf_key_values_map(dict, conf_key_ugrid_metadata_map, method_name);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+ConcatString parse_conf_ugrid_user_map_config(Dictionary *dict) {
+   return dict ? dict->lookup_string(conf_key_ugrid_user_map_config, false) : "";
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 

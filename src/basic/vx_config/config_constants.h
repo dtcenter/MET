@@ -675,14 +675,15 @@ static const char conf_key_trunc_factor[]      = "gaussian_trunc_factor";
 static const char conf_key_eclv_points[]       = "eclv_points";
 static const char conf_key_var_name_map[]      = "var_name_map";
 static const char conf_key_metadata_map[]      = "metadata_map";
-static const char conf_key_ugrid_map_config[]  = "ugrid_map_config";
-static const char conf_key_ugrid_metadata_map[]= "ugrid_metadata_map";
 static const char conf_key_obs_to_qc_map[]     = "obs_to_qc_map";
 static const char conf_key_missing_thresh[]    = "missing_thresh";
 static const char conf_key_control_id[]        = "control_id";
 static const char conf_key_ens_member_ids[]    = "ens_member_ids";
 static const char conf_key_seeps_p1_thresh[]   = "seeps_p1_thresh";
-static const char conf_key_ugrid_metadata_file[] = "ugrid_metadata_file";
+static const char conf_key_ugrid_coordinates_file[] = "ugrid_coordinates_file";
+static const char conf_key_ugrid_max_distance_km[]  = "ugrid_max_distance_km";
+static const char conf_key_ugrid_metadata_map[]     = "ugrid_metadata_map";
+static const char conf_key_ugrid_user_map_config[]  = "ugrid_user_map_config";
 
 //
 // Entries to override file metadata 

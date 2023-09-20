@@ -35,7 +35,7 @@ using namespace netCDF;
 
 ////////////////////////////////////////////////////////////////////////
 
-static const char *def_user_config = "UGridConfig_user"";
+static const char *def_user_config = "UGridConfig_user";
 static const char *def_config_filename =
    "MET_BASE/config/UGridConfig_default";
 
@@ -100,6 +100,7 @@ void UGridFile::init_from_scratch()
   _lonVar = (NcVar *)nullptr;
   _xCoordVar = (NcVar *)nullptr;
   _yCoordVar = (NcVar *)nullptr;
+  max_distance_km = bad_data_double;
 
   // Close any existing file
 
@@ -172,8 +173,8 @@ bool UGridFile::open(const char * filepath)
 
   // Close any open files and clear out the associated members
   close();
-  ConcatString config_file = def_config_filename
-  if (file_exists(default_user_config.c_str())) config_file = def_user_config;
+  ConcatString config_file = file_exists(def_user_config)
+                             ? def_user_config : def_config_filename;
   read_config(config_file);
 
   if (_ncFile) {
@@ -445,13 +446,7 @@ void UGridFile::dump(ostream & out, int depth) const
   grid.dump(out, depth + 1);
 
   out << prefix << "\n";
-
   out << prefix << "Nc = " << (_ncFile ? "ok" : "(nul)") << "\n";
-
-  out << prefix << "\n";
-
-  out << prefix << "Ndims = " << _numDims << "\n";
-
   out << prefix << "\n";
 
   out << prefix << "face_dim = " << (_faceDim ? GET_NC_NAME_P(_faceDim) : "(nul)") << "\n";
@@ -528,8 +523,6 @@ std::string UGridFile::find_metadata_name(std::string &key, StringArray &availab
   for (int idx=0; idx<meta_names.n(); idx++) {
     if (available_names.has(meta_names[idx])) {
       meta_name = meta_names[idx];
-      //mlog << Debug(6) << "UGridFile::find_metadata_name --> found " << meta_name
-      //     << " for " << key << "\n";
       break;
     }
   }
@@ -558,37 +551,6 @@ double UGridFile::getData(NcVar * var, const LongArray & a) const
   clock_t start_clock = clock();
   static const string method_name
       = "UGridFile::getData(NcVar *, const LongArray &) -> ";
-
-/*
-  if (!args_ok(a))
-  {
-    mlog << Error << "\n" << method_name
-         << "bad arguments:\n";
-    a.dump(cerr);
-    exit(1);
-  }
-
-  int dim_count = get_dim_count(var);
-  if (dim_count != a.n_elements())
-  {
-    mlog << Error << "\n" << method_name
-         << "needed " << (dim_count) << " arguments for variable "
-         << (GET_NC_NAME_P(var)) << ", got " << (a.n_elements()) << "\n\n";
-    exit(1);
-  }
-
-
-  for (int k=0; k<dim_count; k++) {
-    int dim_size = var->getDim(k).getSize();
-    if (dim_size < a[k]) {
-      mlog << Error << "\n" << method_name
-           << "offset (" << a[k] << ") at " << k
-           << "th dimension (" << long(dim_size) << ") is too big for variable \""
-           << GET_NC_NAME_P(var) << "\"\n\n";
-      exit ( 1 );
-    }
-  }
-*/
 
   bool status = false;
   double d = bad_data_double;
@@ -626,23 +588,6 @@ bool UGridFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
       = "UGridFile::getData(NcVar*, LongArray&, DataPlane&) ";
   static const string method_name
       = "UGridFile::getData(NcVar *, const LongArray &, DataPlane &) const -> ";
-
-//  if (!args_ok(a))
-//  {
-//    mlog << Error << "\n" << method_name
-//         << "bad arguments:\n";
-//    a.dump(cerr);
-//    exit(1);
-//  }
-//
-//  int dim_count = get_dim_count(v);
-//  if (dim_count != a.n_elements())
-//  {
-//    mlog << Error << "\n" << method_name
-//         << "needed " << (dim_count) << " arguments for variable "
-//         << (GET_NC_NAME_P(v)) << ", got " << (a.n_elements()) << "\n\n";
-//    exit(1);
-//  }
 
   //  find varinfo's
 
@@ -780,9 +725,6 @@ bool UGridFile::get_var_info() {
   for (int j=0; j<Nvars; ++j)  {
     if (metadata_names.has(var_names[j]) && !meta_time_names.has(var_names[j])) continue;
 
-    //mlog << Debug(7) << method_name
-    //     << "adding data variable " << var_names[j] << "\n";
-
     NcVar v = get_var(_ncFile, var_names[j].c_str());
 
     Var[j].var = new NcVar(v);
@@ -882,13 +824,13 @@ void UGridFile::read_netcdf_grid()
   }
   if (get_var_units(_lonVar, units_value)) {
     if (units_value == "rad" || units_value == "radian") {
-      mlog << Debug(6) << method_name << "  convert lont (" <<units_value << ") to degree\n";
+      mlog << Debug(6) << method_name << "  convert lon (" <<units_value << ") to degree\n";
       for (int idx=0; idx<face_count; idx++) _lon[idx] /= rad_per_deg;
     }
   }
-  //for (int idx=0; idx<face_count; idx++) cout << method_name << "   lon/lat: " << _lon[idx] << ", " << _lat[idx] << "\n";
 
   grid_data.set_points(face_count, _lon, _lat);
+  grid_data.max_distance_km = max_distance_km;
 
   grid.set(grid_data);
 
@@ -903,14 +845,29 @@ void UGridFile::read_netcdf_grid()
 
 ////////////////////////////////////////////////////////////////////////
 
-void UGridFile::set_map_config_file(ConcatString filename) {
+void UGridFile::set_max_distance_km(double max_distance) {
+
+  max_distance_km = max_distance;
+  if (grid.is_set()) {
+    UnstructuredData D;
+    D.copy_from(grid.info().us);
+    D.max_distance_km = max_distance;
+    grid.set(D);
+  }
+
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void UGridFile::set_user_map_config_file(ConcatString filename) {
 
   if (file_exists(filename.c_str())) {
     read_config(filename.c_str());
     get_var_info();
   }
-  else mlog << Warning << "\nUGridFile::set_map_config_file() The UGrid metadata mapping configuration file \""
-            << filename << " does not exist. Use the default mapping\n\n";
+  else mlog << Warning << "\nUGridFile::set_user_map_config_file()"
+            << " The UGrid metadata mapping configuration file \""
+            << filename << "\" does not exist. Use the default mapping\n\n";
 
 }
 

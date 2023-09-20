@@ -227,6 +227,7 @@ void process_command_line(int argc, char **argv) {
    GrdFileType ftype, otype;
    ConcatString default_config_file;
    DataPlane dp;
+   const char *method_name = "process_command_line() -> ";
 
    // Set the default output directory
    out_dir = replace_path(default_out_dir);
@@ -294,11 +295,16 @@ void process_command_line(int argc, char **argv) {
 
    if (FileType_UGrid == ftype) {
       ConcatString ugrid_nc = conf_info.ugrid_nc;
-      ConcatString map_config_file = conf_info.ugrid_map_config;
+      ConcatString ugrid_user_map_config = conf_info.ugrid_user_map_config;
       MetUGridDataFile *ugrid_mtddf = (MetUGridDataFile *)fcst_mtddf;
-      if (0 < map_config_file.length()) ugrid_mtddf->set_map_config_file(map_config_file);
+      ugrid_mtddf->set_max_distance_km(conf_info.ugrid_max_distance_km);
+      if (0 < ugrid_user_map_config.length())
+         ugrid_mtddf->set_user_map_config_file(ugrid_user_map_config);
       if (0 == ugrid_nc.length() || ugrid_nc == "NA") ugrid_nc = fcst_file;
       ugrid_mtddf->open_metadata(ugrid_nc.c_str());
+      mlog << Debug(9) << method_name
+           << "ugrid_coordinates_nc: " << ugrid_nc
+           << "  ugrid_max_distance_km: " << conf_info.ugrid_max_distance_km << "\n";
    }
 
    // For python types read the first field to set the grid

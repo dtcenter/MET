@@ -219,10 +219,11 @@ const string get_tool_name() {
 ////////////////////////////////////////////////////////////////////////
 
 void process_command_line(int argc, char **argv) {
-   CommandLine cline;
    int i;
+   CommandLine cline;
    GrdFileType ftype;
    ConcatString default_config_file;
+   const char *method_name = "process_command_line() -> ";
 
    out_dir = ".";
 
@@ -254,7 +255,7 @@ void process_command_line(int argc, char **argv) {
       obs_valid_end_ut != (unixtime) 0 &&
       obs_valid_beg_ut > obs_valid_end_ut) {
 
-      mlog << Error << "\nprocess_command_line() -> "
+      mlog << Error << "\n" << method_name
            << "the ending time ("
            << unix_to_yyyymmdd_hhmmss(obs_valid_end_ut)
            << ") must be greater than the beginning time ("
@@ -284,7 +285,7 @@ void process_command_line(int argc, char **argv) {
 
    // Read forecast file
    if(!(fcst_mtddf = mtddf_factory.new_met_2d_data_file(fcst_file.c_str(), ftype))) {
-      mlog << Error << "\nTrouble reading forecast file \""
+      mlog << Error << "\n" << method_name << "Trouble reading forecast file \""
            << fcst_file << "\"\n\n";
       exit(1);
    }
@@ -300,11 +301,16 @@ void process_command_line(int argc, char **argv) {
 
    if (FileType_UGrid == ftype) {
       ConcatString ugrid_nc = conf_info.ugrid_nc;
-      ConcatString map_config_file = conf_info.ugrid_map_config;
+      ConcatString ugrid_user_map_config = conf_info.ugrid_user_map_config;
       MetUGridDataFile *ugrid_mtddf = (MetUGridDataFile *)fcst_mtddf;
-      if (0 < map_config_file.length()) ugrid_mtddf->set_map_config_file(map_config_file);
+      ugrid_mtddf->set_max_distance_km(conf_info.ugrid_max_distance_km);
+      if (0 < ugrid_user_map_config.length())
+         ugrid_mtddf->set_user_map_config_file(ugrid_user_map_config);
       if (0 == ugrid_nc.length() || ugrid_nc == "NA") ugrid_nc = fcst_file;
       ugrid_mtddf->open_metadata(ugrid_nc.c_str());
+      mlog << Debug(9) << method_name
+           << "ugrid_coordinate_nc: " << ugrid_nc
+           << "  ugrid_max_distance_km: " << conf_info.ugrid_max_distance_km << "\n";
    }
 
    // Use the first verification task to set the random number generator

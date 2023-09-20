@@ -96,12 +96,12 @@ void UnstructuredGrid::set_from_data(const UnstructuredData &data) {
    clear();
 
    if (data.name) Name = data.name;
-   Nx = data.Nface;;
+   Nx = data.Nface;
 
    Data.Nface = Nx;
    Data.Nedge = data.Nedge;
    Data.Nnode = data.Nnode;
-   Data.pt_distance = data.pt_distance;
+   Data.max_distance_km = data.max_distance_km;
 
    Data.set_points(Nx, data.pointLonLat);
 
@@ -109,9 +109,9 @@ void UnstructuredGrid::set_from_data(const UnstructuredData &data) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void UnstructuredGrid::set_distance(double _distance) {
+void UnstructuredGrid::set_max_distance_km(double max_distance) {
 
-   Data.pt_distance = _distance;
+   Data.max_distance_km = max_distance;
 
 }
 
@@ -124,19 +124,25 @@ void UnstructuredGrid::latlon_to_xy(double lat, double lon, double &x, double &y
 
    IndexKDTree::ValueList neighbor = Data.kdtree->closestPoints(_pointLonLat, 1);
    size_t index(neighbor[0].payload());
-   double distance(neighbor[0].distance());
+   double distance_km(neighbor[0].distance()/1000.);
+   bool is_rejected = (!is_eq(Data.max_distance_km, bad_data_double)
+                       && Data.max_distance_km > 0
+                       && Data.max_distance_km < distance_km);
 
-   x = index;
+   x = is_rejected ? -1.0 : index;
    y = 0;
 
-   PointLonLat lonlat;
-   if(distance > 180.0) atlas_geometry.xyz2lonlat(neighbor[0].point(), lonlat);
-   else lonlat.assign(neighbor[0].point()[0], neighbor[0].point()[1]);
+   //PointLonLat r_lonlat;
+   //if(_distance > 180.0) atlas_geometry.xyz2lonlat(neighbor[0].point(), r_lonlat);
+   //else r_lonlat.assign(neighbor[0].point()[0], neighbor[0].point()[1]);
 
    mlog << Debug(UGRID_DEBUG_LEVEL) << "UnstructuredGrid::latlon_to_xy() "
-        << "input=(" << lon << ", " << lat << ") ==> (" << x << ", " << y
-        << ") mapped (" << Data.pointLonLat[index].y() << ", " << Data.pointLonLat[index].y()
-        << ") distance= " << distance << "\n";
+        << "input=(" << lon << ", " << lat << ") ==> (" << x << ", " << y << ") == ("
+        << Data.pointLonLat[index].x() << ", " << Data.pointLonLat[index].y()
+        << ") distance= " << distance_km << "km, "
+        << _pointLonLat.distance(Data.pointLonLat[index])
+        << " degree, is_rejected: " << is_rejected
+        << ", max_distanc=" << Data.max_distance_km<< "\n";
 }
 
 
@@ -333,7 +339,7 @@ void Grid::set(const UnstructuredData &data) {
 
 UnstructuredData::UnstructuredData() {
    kdtree = nullptr;
-   pt_distance = -1.;  // disable distance
+   max_distance_km = bad_data_double;  // disable distance
    clear();
 }
 
@@ -349,6 +355,7 @@ void UnstructuredData::build_tree() {
 
    atlas::idx_t n = 0;
    kdtree = new IndexKDTree(atlas_geometry);
+   kdtree->reserve(Nface);
    for (int i=0; i<Nface; i++) {
       PointLonLat pointLL(pointLonLat[i].x(), pointLonLat[i].y());
       pointLL.normalise();
@@ -363,9 +370,27 @@ void UnstructuredData::build_tree() {
 
 ////////////////////////////////////////////////////////////////////////
 
+void UnstructuredData::copy_from(const UnstructuredData &us_data) {
+   set_points(us_data.Nface, us_data.pointLonLat);
+   Nedge = us_data.Nedge;
+   Nnode = us_data.Nnode;
+   max_distance_km = us_data.max_distance_km;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void UnstructuredData::copy_from(const UnstructuredData *us_data) {
+   set_points(us_data->Nface, us_data->pointLonLat);
+   Nedge = us_data->Nedge;
+   Nnode = us_data->Nnode;
+   max_distance_km = us_data->max_distance_km;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void UnstructuredData::set_points(int count, double *_lon, double *_lat) {
 
-   clear();
+   clear_data();
 
    Nface = count;
    pointLonLat.reserve(count);
@@ -384,21 +409,20 @@ void UnstructuredData::set_points(int count, double *_lon, double *_lat) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void UnstructuredData::set_points(int count, const std::vector<PointLonLat> &_pointLonLat) {
+void UnstructuredData::set_points(int count, const std::vector<PointLonLat> &ptLonLat) {
 
-   clear();
+   clear_data();
 
    Nface = count;
-   pointLonLat.reserve(Nface);
-
+   pointLonLat.reserve(count);
    for (int i=0; i<count; i++) {
-      pointLonLat[i] = {(_pointLonLat)[i].x(), (_pointLonLat)[i].y()};
+      pointLonLat[i] = {(ptLonLat)[i].x(), (ptLonLat)[i].y()};
    }
    mlog << Debug(UGRID_DEBUG_LEVEL) << "UnstructuredData::set_points(std::vector<PointLonLat> &) first: ("
         << pointLonLat[0].x() << ", " << pointLonLat[0].y() << ") and last ("
         << pointLonLat[count-1].x() << ", " << pointLonLat[count-1].y() << ") from ("
-        << _pointLonLat[0].x() << ", " << _pointLonLat[0].y() << ") and ("
-        << _pointLonLat[count-1].x() << ", " << _pointLonLat[count-1].y() << ")\n";
+        << ptLonLat[0].x() << ", " << ptLonLat[0].y() << ") and ("
+        << ptLonLat[count-1].x() << ", " << ptLonLat[count-1].y() << ")\n";
 
    build_tree();
 

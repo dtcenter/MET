@@ -39,7 +39,7 @@ struct UnstructuredData {
    int Nface;
    int Nedge;
    int Nnode;
-   double pt_distance;
+   double max_distance_km;  // This should be set after calling set_points()
    double lat_checksum;
    double lon_checksum;
 
@@ -52,7 +52,10 @@ struct UnstructuredData {
    void build_tree();
    void set_points(int count, double *_lon, double *_lat);
    void set_points(int count, const std::vector<atlas::PointLonLat> &);
+   void copy_from(const UnstructuredData *);
+   void copy_from(const UnstructuredData &);
    void clear();
+   void clear_data();
 
    void dump() const;
 };

@@ -47,7 +47,8 @@ class UnstructuredGrid : public GridRep {
       void clear();
 
       void set_from_data(const UnstructuredData &);
-      void set_distance(double _distance);
+      //void set_max_distance_deg(double max_distance);
+      void set_max_distance_km(double max_distance);
 
          //
          //  grid interface

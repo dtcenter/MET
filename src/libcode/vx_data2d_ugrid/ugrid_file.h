@@ -46,7 +46,8 @@ class UGridFile {
       bool open(const char *filename);
       bool open_metadata(const char *filename);
       bool get_var_info();
-      void set_map_config_file(ConcatString filename);
+      void set_max_distance_km(double max_distance);
+      void set_user_map_config_file(ConcatString filename);
 
       void close();
 
@@ -114,6 +115,7 @@ class UGridFile {
 
       std::map<ConcatString,StringArray> metadata_map;
       StringArray metadata_names;
+      double max_distance_km;
 
          //
          //  dimensions
