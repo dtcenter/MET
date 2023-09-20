@@ -345,14 +345,6 @@ void process_adecks(const TrackInfoArray &bdeck_tracks) {
       derive_interp12(adeck_tracks);
    }
 
-   // Derive consensus forecasts from the ADECK tracks
-   mlog << Debug(2)
-        << "Deriving " << conf_info.NConsensus
-        << " ADECK consensus model(s).\n";
-   i = derive_consensus(adeck_tracks);
-   mlog << Debug(2)
-        << "Added " << i << " ADECK consensus tracks(s).\n";
-
    // Derive lag forecasts from the ADECK tracks
    mlog << Debug(2)
         << "Deriving " << conf_info.LagTime.n()
@@ -378,6 +370,14 @@ void process_adecks(const TrackInfoArray &bdeck_tracks) {
 
    // Append diagnostic data to the tracks
    process_diags(adeck_tracks);
+
+   // Derive consensus forecasts from the ADECK tracks
+   mlog << Debug(2)
+        << "Deriving " << conf_info.NConsensus
+        << " ADECK consensus model(s).\n";
+   i = derive_consensus(adeck_tracks);
+   mlog << Debug(2)
+        << "Added " << i << " ADECK consensus tracks(s).\n";
 
    //
    // Loop through the ADECK tracks and find a matching BDECK track
