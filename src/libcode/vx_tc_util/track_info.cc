@@ -628,25 +628,6 @@ void TrackInfo::add_uniq_diag_name(const string diag_name) {
 
 ////////////////////////////////////////////////////////////////////////
 
-/*
-double TrackInfo::get_diag_value(int i_pnt, int name_ind) {
-   double diag_val; 
-
-    // Range check
-   if(i_pnt < 0 || i_pnt >= NPoints) {
-      mlog << Error << "\nTrackInfo::get_diag_value() -> "
-           << "range check error for point " << i_pnt << "\n\n";
-      exit(1);
-   }
-   
-   diag_val = Point[i_pnt].diag_val(name_ind);
-
-   return(diag_val);
-}
-*/
-
-////////////////////////////////////////////////////////////////////////
-
 bool TrackInfo::has(const ATCFTrackLine &l) const {
    return(TrackLines.has(l.get_line()));
 }
@@ -1183,8 +1164,6 @@ TrackInfo consensus(const TrackInfoArray &tracks,
       if(!is_bad_data(pavg.v_max())) pavg.set_level(wind_speed_to_cyclonelevel(pavg.v_max()));
 
       // Notes
-      // SETH, before adding this track point, loop through the list of unique diag names and compute the pmean diag value across the members
-      //NumArray consensus_diag_vals;
       // loop over the diag name and the input track points and get their mean
       //pavg.DiagVals = consensus_diag_vals;
       //
