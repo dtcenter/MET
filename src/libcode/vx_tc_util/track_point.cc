@@ -711,6 +711,16 @@ bool TrackPoint::is_match(const ATCFTrackLine &l) const {
 
 ////////////////////////////////////////////////////////////////////////
 
+void TrackPoint::clear_diag_value() {
+
+   // Clear all diagnostic values
+   DiagVal.clear();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void TrackPoint::add_diag_value(double val) {
 
    // Store the diagnostic value

@@ -1084,8 +1084,13 @@ TrackInfo consensus(const TrackInfoArray &tracks,
          
          // Increment the TrackPoint count and sums
          pcnt++;
-         if(pcnt == 1) psum  = tracks.Track[j][i_pnt];
-         else          psum += tracks.Track[j][i_pnt];
+         if(pcnt == 1) {
+            psum = tracks.Track[j][i_pnt];
+            psum.clear_diag_value();
+         }
+         else {
+            psum += tracks.Track[j][i_pnt];
+         }
 
          // Store the track point latitude, longitude v_max and mslp values         
          plon.add(tracks.Track[j][i_pnt].lon());
