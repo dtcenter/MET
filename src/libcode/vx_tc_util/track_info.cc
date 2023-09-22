@@ -979,8 +979,6 @@ TrackInfo consensus(const TrackInfoArray &tracks,
    bool skip;
    TrackInfo tavg;
    NumArray lead_list;
-
-   StringArray diag_names;
    
    // Variables for average TrackPoint
    int        pcnt;
@@ -1005,7 +1003,7 @@ TrackInfo consensus(const TrackInfoArray &tracks,
    tavg.set_technique(model.c_str());
    tavg.set_init(tracks[0].init());
    tavg.set_storm_id();
-
+  
    // Loop through the tracks and build a list of lead times
    for(i=0; i<tracks.n(); i++) {
 
@@ -1028,16 +1026,10 @@ TrackInfo consensus(const TrackInfoArray &tracks,
               << tracks[i].technique_number() << ").\n\n";
       }
 
-      cout << "tracks[" << i << "].diag_name().n() = " << tracks[i].diag_name().n() << endl;
-      
-      // Get set of diag names that appear for at least 1 member
-      // Create StringArray locally to keep track of unique diag names
+      // Get unique diag names
       // Store diag_names in tavg object
-      
       for(j=0; j<tracks[i].diag_name().n(); j++) {
-         cout << "From track_info.cc: consensus(): diag_name[" << j << "] = " << tracks[i].diag_name()[j] << endl;
-         // Test
-         diag_names.add_uniq(tracks[i].diag_name()[j]);
+         mlog << Debug(3) << "TrackInfo::consensus(). Found unique diag_name[" << j << "] = " << tracks[i].diag_name()[j] << "\n";
          tavg.add_uniq_diag_name(tracks[i].diag_name()[j]);
       }
       
@@ -1083,6 +1075,8 @@ TrackInfo consensus(const TrackInfoArray &tracks,
          }
          
          // Increment the TrackPoint count and sums
+         // Remove diagnostic values from the TrackPoint object (psum) for the consensus values
+         // Consensus diag values computed below this
          pcnt++;
          if(pcnt == 1) {
             psum = tracks.Track[j][i_pnt];
@@ -1168,19 +1162,10 @@ TrackInfo consensus(const TrackInfoArray &tracks,
       // Compute consensus CycloneLevel
       if(!is_bad_data(pavg.v_max())) pavg.set_level(wind_speed_to_cyclonelevel(pavg.v_max()));
 
-      // Notes
-      // loop over the diag name and the input track points and get their mean
-      //pavg.DiagVals = consensus_diag_vals;
-      //
-      // for the average value for each point
-      // store then in the pavg object
-      // Retrieve values by name (not by index)
-      // Once values are stored properly, they will automatically added to output
-
-      cout << "diag_names.n() = " << diag_names.n() << endl;
-
-      for (j=0; j<diag_names.n(); j++){
-         cout << "Working on calculating mean values for diag_names[" << j << "] = " << diag_names[j] << endl;
+      // Loop over the diag name and the input track points and get consensus diag value
+      // (mean value across all members that have the diag value)
+      for (j=0; j<tavg.diag_name().n(); j++){
+         mlog << Debug(3) << "TrackInfo::consensus(). Working on calculating mean values for tavg.diag_name()[" << j << "] = " << tavg.diag_name()[j] << "\n";
          
          // Store diag_vals for one diag_name across all lead-times (track points)
          NumArray diag_vals;
@@ -1205,29 +1190,23 @@ TrackInfo consensus(const TrackInfoArray &tracks,
             }
 
             // Add non-missing diag values to local NumArray 
-            if(!is_bad_data(tracks.Track[k][i_pnt].diag_val(j))) {
-               cout << "  Adding values for k: " << k << ", i_pnt: " << i_pnt << " tracks.Track[k][i_pnt].diag_val(j) = " << tracks.Track[k][i_pnt].diag_val(j) << endl;
-               diag_vals.add(tracks.Track[k][i_pnt].diag_val(j));
+            if(!is_bad_data( tracks.Track[k][i_pnt].get_diag_val(tavg.diag_name(), tavg.diag_name()[j]) )) {
+               mlog << Debug(3) <<  "  Adding values for k: " << k << ", i_pnt: " << i_pnt << " tracks.Track[k][i_pnt].get_diag_val(tavg.diag_name(), tavg.diag_name()[j]) = " << tracks.Track[k][i_pnt].get_diag_val(tavg.diag_name(), tavg.diag_name()[j]) << "\n";
+               diag_vals.add(tracks.Track[k][i_pnt].get_diag_val(tavg.diag_name(), tavg.diag_name()[j]));
             }
             
          } // end loop over ensemble of tracks (for given lead-time: i_pnt)
-
+         
          cons_diag_val = diag_vals.mean();
-         cout << "  cons_diag_val = " << cons_diag_val << endl;
+         mlog << Debug(3) << "  cons_diag_val = " << cons_diag_val << "\n";
          
          // Add the cons_diag_val to the pavg DiagVal NumArray (using add_diag_value)
          if(!is_bad_data(cons_diag_val)) {
-            cout << "Adding cons_diag_val to pavg DiagVal array" << endl;
+            mlog << Debug(3) << "  Adding cons_diag_val to pavg DiagVal array" << "\n";
             pavg.add_diag_value(cons_diag_val);
          }
          
-         // Something like
-         //  pavg.set_cons_diag_val(j, wavg);
-         //  pavg.set_cons_diag_name;
-         
       } // end loop over diag names
-
-      cout << "Adding the current track point to tavg" << endl << endl;
       
       // Add the current track point
       tavg.add(pavg);
