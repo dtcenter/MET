@@ -865,9 +865,12 @@ void UGridFile::set_user_map_config_file(ConcatString filename) {
     read_config(filename.c_str());
     get_var_info();
   }
-  else mlog << Warning << "\nUGridFile::set_user_map_config_file()"
-            << " The UGrid metadata mapping configuration file \""
-            << filename << "\" does not exist. Use the default mapping\n\n";
+  else {
+    mlog << Error << "\nUGridFile::set_user_map_config_file()"
+         << " The UGrid metadata mapping configuration file \""
+         << filename << "\" does not exist. Use the default mapping\n\n";
+    exit(1);
+  }
 
 }
 
