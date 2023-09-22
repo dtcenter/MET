@@ -196,18 +196,9 @@ while ( 1 )  {
 
    if ( t < 0 )  continue;
 
-   // cout << "next\n";
-
    if ( t > 0 )  break;
 
 }   //  while
-
-
-// cout << "\n\n   my configlex() -> returned token " << t;
-// 
-// if ( lexeme[0] )  cout << " ... \"" << lexeme << "\"   LineNumber = " << LineNumber;
-//  
-// cout << "\n\n" << flush;
 
 return t;
 
@@ -232,8 +223,6 @@ while ( 1 )  {
    c = nextchar();
 
    if ( c < 0 )  c += 256;
-
-   // cout << "c = " << c << " (" << (char) c << ") ... LineNumber = " << LineNumber << ", Column = " << Column << "\n" << flush;
 
    if ( c == eof )  break;
 
@@ -782,8 +771,6 @@ if ( (pos > 0) && (lexeme[pos - 1] == '\"') )  { lexeme[pos - 1] = (char) 0;  --
 
 while ( replace_env(s) )  {
 
-   // cout << "s = \"" << s << "\"\n\n" << flush;
-
 }
 
 if ( s.length() >= max_id_length )  {
@@ -1098,11 +1085,6 @@ int token(int t)
 
 {
 
-// cout << "token " << t << " ...  text = ";
-// if ( (configtext != 0) && (configtext[0] != 0) )   cout << '\"' << configtext << "\"\n";
-// else                                               cout << "(nul)\n";
-// cout.flush();
-
 return t;
 
 }
@@ -1114,8 +1096,6 @@ return t;
 int do_comp()
 
 {
-
-// if ( verbose )  cout << "\n\n   ... in do_comp()\n\n" << flush;
 
 int return_value = 0;
 
@@ -1393,11 +1373,6 @@ out = s.substr(0, pos1);
 out += tmp_env_value;
 
 out += s.substr(pos2 + 1);
-
-
-// cout << "\n\n   out = \"" << (out.c_str()) << "\n\n" << flush;
-
-
 
    //
    //  done

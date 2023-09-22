@@ -525,11 +525,6 @@ const DictionaryEntry * e = dict_stack->lookup(configtext);
 
 if ( e && (e->is_number()) && (! is_lhs) )  {
 
-   // cout << "=================== id = \"" << configtext << "\"    is_lhs = " << (is_lhs ? "true" : "false") << "\n";
-
-   // cout << "do_id() -> \n";
-   // e->dump(cout);
-
    if ( e->type() == IntegerType )  {
 
       set_int(configlval.nval, e->i_value());
