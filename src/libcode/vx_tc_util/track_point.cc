@@ -736,7 +736,7 @@ double TrackPoint::get_diag_val(const StringArray &diag_names, const string cur_
    int i;
    double diag_val;
    
-   if(diag_names.has(cur_diag_name, i))
+   if(diag_names.has(cur_diag_name, i) && DiagVal.n() > 0)
       diag_val = DiagVal[i];
    else
       diag_val = bad_data_double;
