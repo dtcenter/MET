@@ -730,3 +730,18 @@ void TrackPoint::add_diag_value(double val) {
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+double TrackPoint::get_diag_val(const StringArray &diag_names, const string cur_diag_name) const {
+
+   int i;
+   double diag_val;
+   
+   if(diag_names.has(cur_diag_name, i))
+      diag_val = DiagVal[i];
+   else
+      diag_val = bad_data_double;
+   
+   return(diag_val);
+}
+
+////////////////////////////////////////////////////////////////////////
