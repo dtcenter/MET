@@ -41,7 +41,7 @@ using namespace std;
 
 extern int configparse();
 
-extern FILE * configin;
+extern stringstream configbuf;
 
 extern int configdebug;
 
@@ -298,28 +298,117 @@ return n;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool MetConfig::read(const char * name)
+bool MetConfig::read(const char * filename)
 
 {
 
-if ( empty(name) )  {
+set_buffer_from_file(filename);
 
-   mlog << Error << "\nMetConfig::read(const char *) -> "
+return parse_buffer();
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool MetConfig::read_string(const char * config_string)
+
+{
+
+set_buffer_from_string(config_string);
+
+return parse_buffer();
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void MetConfig::set_buffer_from_file(const char * filename)
+
+{
+
+if ( empty(filename) )  {
+
+   mlog << Error << "\nMetConfig::set_buffer_from_file(const char *) -> "
         << "empty filename!\n\n";
 
    exit ( 1 );
 
 }
 
-DictionaryStack DS(*this);
-ConcatString temp_filename = get_tmp_dir();
- 
-temp_filename << "/" << "met_config";
-temp_filename = make_temp_file_name(temp_filename.c_str(), nullptr);
- 
-recursive_envs(name, temp_filename.c_str());
+   // Open input config file
 
-bison_input_filename = temp_filename.c_str();
+ifstream configfilein;
+
+met_open(configfilein, filename);
+
+if ( ! configfilein )  {
+
+   mlog << Error << "\nMetConfig::read(const char *) -> "
+        << "unable to open input file \"" << filename << "\"\n\n";
+
+   exit ( 1 );
+
+}
+
+   // Read contents into buffer
+
+string line;
+
+while ( getline(configfilein, line) )  {
+
+   recursive_envs(line);
+
+   configbuf << line << "\n";
+
+}
+
+   // Close the input file
+ 
+configfilein.close();
+
+bison_input_filename = filename;
+
+Filename.add(filename);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void MetConfig::set_buffer_from_string(const char * config_string)
+
+{
+
+string line(config_string);
+
+recursive_envs(line);
+
+configbuf << line << "\n";
+
+bison_input_filename = "config_string";
+
+Filename.add("config_string");
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool MetConfig::parse_buffer()
+
+{
+
+DictionaryStack DS(*this);
 
 dict_stack = &DS;
 
@@ -329,29 +418,9 @@ Column     = 1;
 
 is_lhs     = true;
 
-Filename.add(bison_input_filename);
-
 configdebug = (Debug ? 1 : 0);
 
-if ( (configin = met_fopen(bison_input_filename, "r")) == nullptr )  {
-
-   mlog << Error << "\nMetConfig::read(const char *) -> "
-        << "unable to open input file \"" << bison_input_filename << "\"\n\n";
-
-   exit ( 1 );
-
-}
-
-int parse_status;
-
-parse_status = configparse();
-
-if ( configin )  {
-
-   fclose(configin);
-   configin = (FILE *) nullptr;
-
-}
+int parse_status = configparse();
 
 if ( parse_status != 0 )  {
 
@@ -361,7 +430,7 @@ if ( parse_status != 0 )  {
 
 if ( DS.n_elements() != 1 )  {
 
-   mlog << Error << "\nMetConfig::read(const char *) -> "
+   mlog << Error << "\nMetConfig::parse_buffer(const char *) -> "
         << "should be only one dictionary left after parsing! ...("
         << DS.n_elements() << ")\n\n";
 
@@ -393,61 +462,7 @@ is_lhs     = true;
 
 set_exit_on_warning();
 
-unlink(temp_filename.c_str());
-
 return true;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-bool MetConfig::read_string(const char * s)
-
-{
-
-if ( empty(s) )  {
-
-   mlog << Error << "\nMetConfig::read_string(const char *) -> "
-        << "empty input string!\n\n";
-
-   exit ( 1 );
-
-}
-
-   //
-   //  write temporary config file
-   //  default to the current directory
-   //
-
-ofstream out;
-ConcatString temp_filename = get_tmp_dir();
-
-temp_filename << "/" << "met_config";
-temp_filename = make_temp_file_name(temp_filename.c_str(), nullptr);
- 
-out.open(temp_filename.c_str());
-
-if ( ! out )  {
-
-   mlog << Error << "\nMetConfig::read_string(const char *) -> "
-        << "unable to open temp file \"" << temp_filename << "\".\n"
-        << "Set MET_TMP_DIR to specify a temporary directory.\n\n";
-
-   exit ( 1 );
-
-}
-
-out << s << '\n';
-
-out.close();
-
-bool status = read(temp_filename.c_str());
-
-remove_temp_file(temp_filename);
-
-return status;
 
 }
 

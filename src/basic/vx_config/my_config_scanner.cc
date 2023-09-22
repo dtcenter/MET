@@ -52,7 +52,7 @@ extern int LineNumber;
 
 extern int Column;
 
-extern FILE * configin;
+extern stringstream configbuf;
 
 extern char * configtext;
 
@@ -732,7 +732,7 @@ n = 0;
 
 while ( n < max_id_length )  {
 
-   c = fgetc(configin);
+   c = configbuf.get();
 
    if ( c == EOF )  break;
 
@@ -740,7 +740,7 @@ while ( n < max_id_length )  {
 
    if ( c == '\\' )  {
 
-     c = fgetc(configin);
+     c = configbuf.get();
 
      if ( c == EOF )  break;
 
@@ -848,7 +848,7 @@ while ( 1 )  {
 
    c1 = c2;
 
-   c2 = fgetc(configin);
+   c2 = configbuf.get();
 
 }
 
@@ -873,9 +873,9 @@ reading_comment = true;
 
 while ( 1 )  {
 
-   if ( feof (configin) )  break;
+   if ( configbuf.eof() )  break;
 
-   c = fgetc(configin);
+   c = configbuf.get();
 
    if ( (c == eof) || (c == '\n') )  break;
 
@@ -999,15 +999,15 @@ if ( reading_env )   {
    //  not reading env
    //
 
-if ( feof(configin) )  return eof;
+if ( configbuf.eof() )  return eof;
 
-c = fgetc(configin);
+c = configbuf.get();
 
 if ( c == '\n' )   { ++LineNumber;  Column = 0; }
 
 if ( c == '$' )  {
 
-   cc = fgetc(configin);
+   cc = configbuf.get();
 
    ++Column;
 
@@ -1029,7 +1029,7 @@ if ( c == '$' )  {
 
    // SonarQube: to avoid side effect by || operator
    while (env_pos < max_id_length) {
-      if ((c = fgetc(configin)) == R_curly) break;
+      if ((c = configbuf.get()) == R_curly) break;
       env_name[env_pos++] = (char) c;
    }
 
