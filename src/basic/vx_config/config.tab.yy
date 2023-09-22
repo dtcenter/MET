@@ -59,7 +59,7 @@ extern "C" int        configwrap();
 
 char *            configtext;
 
-FILE *            configin;
+stringstream      configbuf;
 
 int               LineNumber            = 1;
 

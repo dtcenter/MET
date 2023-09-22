@@ -34,6 +34,12 @@ class MetConfig : public Dictionary {
 
       void assign(const MetConfig &);
 
+      void set_buffer_from_file(const char *);
+
+      void set_buffer_from_string(const char *);
+
+      bool parse_buffer();
+
       StringArray Filename;
 
       bool Debug;
@@ -78,7 +84,7 @@ class MetConfig : public Dictionary {
 
       bool read(const char * filename);
 
-      bool read_string(const char *);
+      bool read_string(const char * config_string);
 
       const DictionaryEntry * lookup(const char * name);
 
