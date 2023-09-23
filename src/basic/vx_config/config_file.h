@@ -42,6 +42,8 @@ class MetConfig : public Dictionary {
 
       StringArray Filename;
 
+      std::stringstream ConfigStream;
+
       bool Debug;
 
    public:

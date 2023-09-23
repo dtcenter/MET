@@ -41,7 +41,7 @@ using namespace std;
 
 extern int configparse();
 
-extern stringstream configbuf;
+extern stringstream * configin;
 
 extern int configdebug;
 
@@ -152,6 +152,8 @@ void MetConfig::clear()
 
 Filename.clear();
 
+ConfigStream.clear();
+
 Dictionary::clear();
 
 Debug = false;
@@ -171,6 +173,8 @@ void MetConfig::assign(const MetConfig & c)
 clear();
 
 Filename = c.Filename;
+
+ConfigStream << c.ConfigStream.str();
 
 Dictionary::assign(c);
 
@@ -354,7 +358,9 @@ if ( ! configfilein )  {
 
 }
 
-   // Read contents into buffer
+   // Initialize stream and load contents 
+
+ConfigStream.clear();
 
 string line;
 
@@ -362,7 +368,7 @@ while ( getline(configfilein, line) )  {
 
    recursive_envs(line);
 
-   configbuf << line << "\n";
+   ConfigStream << line << "\n";
 
 }
 
@@ -390,7 +396,9 @@ string line(config_string);
 
 recursive_envs(line);
 
-configbuf << line << "\n";
+ConfigStream.clear();
+
+ConfigStream << line << "\n";
 
 bison_input_filename = "config_string";
 
@@ -407,6 +415,8 @@ return;
 bool MetConfig::parse_buffer()
 
 {
+
+configin = &ConfigStream;
 
 DictionaryStack DS(*this);
 
