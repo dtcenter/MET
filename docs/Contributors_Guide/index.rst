@@ -10,6 +10,7 @@ Welcome to the Model Evaluation Tools (MET) Contributor's Guide.
 
    coding_standards
    dev_env
+   code_structure/index 
    github_workflow
    testing
    continuous_integration

@@ -533,6 +533,8 @@ override the default value set in ConfigConstants.
 		
   output_precision = 5;
 
+.. _config_tmp_dir:
+
 tmp_dir
 ^^^^^^^
       
@@ -545,6 +547,9 @@ Some tools override the temporary directory by the command line argument
 .. code-block:: none
 		
   tmp_dir = "/tmp";
+
+A description of the use of temporary files in MET can be found in the
+Contributor's Guide section :numref:`tmp_files_in_met`.
 
 message_type_group_map
 ^^^^^^^^^^^^^^^^^^^^^^
