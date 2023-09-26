@@ -1689,6 +1689,8 @@ interval.
 		
   ci_alpha = [ 0.05, 0.10 ];
 
+.. _config_boot:
+
 boot
 ^^^^
 
