@@ -31,10 +31,6 @@ abnormally, the temporary files may remain.
 PB2NC Tool
 ^^^^^^^^^^
 
-.. note::
-   The first 3 files are identical! Can we modify the logic to
-   write fewer temp files?
-
 The PB2NC tool reads input binary files in the BUFR or PrepBUFR
 format, extracts and/or derives observations from them, filters
 those observations, and writes the result to a NetCDF output file.
@@ -53,6 +49,11 @@ PB2NC creates the following temporary files when running:
   that is embedded in input files, applies Fortran blocking, and
   writes it to this temporary file for later use.
 
+.. note::
+   The first 3 files listed below are identical. They are all
+   blocked versions of the same input file. Recommend modifying the
+   logic to only block the input file once.
+
 Point2Grid Tool
 ^^^^^^^^^^^^^^^
 
@@ -67,12 +68,14 @@ directly and not recreated. If not, it is created as needed.
 Note that this temporary file is *not* deleted by the Point2Grid
 tool. Once created, it is intended to be reused in future runs.
 
+.. note::
+   Should this grid navigation file actually be written to the
+   temporary directory or should it be written to an output
+   directory instead since its intended to be reused across multiple
+   runs?
+
 Bootstrap Confidence Intervals
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. note::
-   Is it realistic to hold this data in memory instead of writing
-   to/reading from temp files?
 
 Several MET tools support the computation of bootstrap confidence
 intervals as described in the User's Guide :numref:`config_boot`
@@ -93,11 +96,13 @@ NBRCTS line type written to the output.
 Where {LINE_TYPE} is :code:`cnt`, :code:`cts`, :code:`mcts`,
 :code:`nbrcnt`, or :code:`nbrcts`.
 
+.. note::
+   Consider whether or not its realistic to hold the resampled
+   statistics all in memory. If so, that'd save a lot of time in
+   I/O.
+
 Stat-Analysis Tool
 ^^^^^^^^^^^^^^^^^^
-
-JHG, can we revise the logic to only use a temp file when multiple
-jobs are specified AND common filtering logic is specified?
 
 The Stat-Analysis tool reads ASCII output created by the MET
 statistics tools. A single job can be specified on the command line
@@ -114,6 +119,11 @@ and writes the result to a temporary file.
   to this temporary file. All of the specified jobs read data from
   this temporary file, apply any additional job-specific filtering
   criteria, and perform the requested operation.
+
+.. note::
+   Consider revising the logic to only use a temp file when actually
+   necessary, when multiple jobs are specified along with non-empty
+   common filtering logic.
 
 Python Embedding
 ^^^^^^^^^^^^^^^^
