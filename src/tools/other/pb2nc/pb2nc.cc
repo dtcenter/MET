@@ -673,12 +673,13 @@ ConcatString save_bufr_table_to_file(const char *blk_file, int _file_id) {
    openpb_(blk_file, &_file_id);
    dump_tbl_(blk_file, &_file_id, tbl_filename.c_str(), &len);
    closepb_(&_file_id);
-   //close(_file_id);
+   
    // Delete the temporary blocked file
    remove_temp_file((string)blk_file);
    return tbl_filename;
 }
 
+////////////////////////////////////////////////////////////////////////
 
 bool is_prepbufr_file(const StringArray *events) {
    bool is_prepbufr = events->has("P__EVENT") && events->has("Q__EVENT")
