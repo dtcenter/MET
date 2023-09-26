@@ -1,6 +1,6 @@
-**************
-Code Structure
-**************
+*******************
+Development Details
+*******************
 
 This chapter provides specific details about select topics within the
 MET code base. The list of topics is certainly not comprehensive.
@@ -8,4 +8,4 @@ MET code base. The list of topics is certainly not comprehensive.
 .. toctree::
    :titlesonly:
 
-   tmp_files_in_met
+   tmp_file_use

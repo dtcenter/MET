@@ -1,4 +1,6 @@
-Temporary Files in MET
+.. _tmp_file_use:
+
+Use of Temporary Files
 ======================
 
 The MET application and library code uses temporary files in several
@@ -15,6 +17,8 @@ Performance Computing policies.
 In general, MET applications delete any temporary files they create
 when they are no longer needed. However, if the application exits
 abnormally, the temporary files may remain.
+
+JHG, work here.
 
 PB2NC Tool
 ^^^^^^^^^^
