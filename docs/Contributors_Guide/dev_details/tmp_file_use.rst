@@ -40,7 +40,7 @@ PB2NC creates the following temporary files when running:
 * :code:`tmp_pb2nc_blk_{PID}`, :code:`tmp_pb2nc_meta_blk_{PID}`,
   :code:`tmp_pb2nc_tbl_blk_{PID}`
 
-  PB2NC assumes that each input binary file requires Fortran'
+  PB2NC assumes that each input binary file requires Fortran
   blocking prior to being read by the BUFRLIB library. It applies
   Fortran blocking, writes the result to this temporary file, and
   uses BUFRLIB to read its contents.
@@ -50,7 +50,7 @@ PB2NC creates the following temporary files when running:
   writes it to this temporary file for later use.
 
 .. note::
-   The first 3 files listed below are identical. They are all
+   The first 3 files listed above are identical. They are all
    blocked versions of the same input file. Recommend modifying the
    logic to only block the input file once.
 
