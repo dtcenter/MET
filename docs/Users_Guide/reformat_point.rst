@@ -108,6 +108,7 @@ ____________________
 		version    = "VN.N";
 
 The configuration options listed above are common to many MET tools and are described in :numref:`config_options`.
+The use of temporary files in PB2NC is described in :numref:`Contributor's Guide Section %s <tmp_files_pb2nc>`.
 
 _____________________
 
@@ -1082,7 +1083,7 @@ Optional arguments for point2grid
 
 Only 4 interpolation methods are applied to the field variables; MIN/MAX/MEDIAN/UW_MEAN. The GAUSSIAN method is applied to the probability variable only. Unlike regrad_data_plane, MAX method is applied to the file variable and Gaussian method to the probability variable with the MAXGAUSS method. If the probability variable is not requested, MAXGAUSS method is the same as MAX method.
     
-For the GOES-16 and GOES-17 data, the computing lat/long is time consuming. So the computed coordinate (lat/long) is saved into the NetCDF file to the environment variable MET_TMP_DIR or */tmp* if MET_TMP_DIR is not defined. The computing lat/long step can be skipped if the coordinate file is given through the environment variable MET_GEOSTATIONARY_DATA. The grid mapping to the target grid is saved to MET_TMP_DIR to save the execution time. Once this file is created, the MET_GEOSTATIONARY_DATA is ignored. The grid mapping file should be deleted manually in order to apply a new MET_GEOSTATIONARY_DATA environment variable or to re-generate the grid mapping file. An example of call point2grid to process GOES-16 AOD data is shown below:
+For the GOES-16 and GOES-17 data, the computing lat/long is time consuming. The computed coordinate (lat/long) is saved to a temporary NetCDF file, as described in :numref:`Contributor's Guide Section %s <tmp_files_point2grid>`. The computing lat/long step can be skipped if the coordinate file is given through the environment variable MET_GEOSTATIONARY_DATA. The grid mapping to the target grid is saved to MET_TMP_DIR to save the execution time. Once this file is created, the MET_GEOSTATIONARY_DATA is ignored. The grid mapping file should be deleted manually in order to apply a new MET_GEOSTATIONARY_DATA environment variable or to re-generate the grid mapping file. An example of call point2grid to process GOES-16 AOD data is shown below:
 
 .. code-block:: none
 		
