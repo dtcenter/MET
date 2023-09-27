@@ -52,7 +52,7 @@ extern int LineNumber;
 
 extern int Column;
 
-extern FILE * configin;
+extern stringstream * configin;
 
 extern char * configtext;
 
@@ -196,18 +196,9 @@ while ( 1 )  {
 
    if ( t < 0 )  continue;
 
-   // cout << "next\n";
-
    if ( t > 0 )  break;
 
 }   //  while
-
-
-// cout << "\n\n   my configlex() -> returned token " << t;
-// 
-// if ( lexeme[0] )  cout << " ... \"" << lexeme << "\"   LineNumber = " << LineNumber;
-//  
-// cout << "\n\n" << flush;
 
 return t;
 
@@ -232,8 +223,6 @@ while ( 1 )  {
    c = nextchar();
 
    if ( c < 0 )  c += 256;
-
-   // cout << "c = " << c << " (" << (char) c << ") ... LineNumber = " << LineNumber << ", Column = " << Column << "\n" << flush;
 
    if ( c == eof )  break;
 
@@ -732,7 +721,7 @@ n = 0;
 
 while ( n < max_id_length )  {
 
-   c = fgetc(configin);
+   c = configin->get();
 
    if ( c == EOF )  break;
 
@@ -740,7 +729,7 @@ while ( n < max_id_length )  {
 
    if ( c == '\\' )  {
 
-     c = fgetc(configin);
+     c = configin->get();
 
      if ( c == EOF )  break;
 
@@ -781,8 +770,6 @@ if ( (pos > 0) && (lexeme[pos - 1] == '\"') )  { lexeme[pos - 1] = (char) 0;  --
  ConcatString s = (string)(char*)lexeme;
 
 while ( replace_env(s) )  {
-
-   // cout << "s = \"" << s << "\"\n\n" << flush;
 
 }
 
@@ -848,7 +835,7 @@ while ( 1 )  {
 
    c1 = c2;
 
-   c2 = fgetc(configin);
+   c2 = configin->get();
 
 }
 
@@ -873,9 +860,9 @@ reading_comment = true;
 
 while ( 1 )  {
 
-   if ( feof (configin) )  break;
+   if ( configin->eof() )  break;
 
-   c = fgetc(configin);
+   c = configin->get();
 
    if ( (c == eof) || (c == '\n') )  break;
 
@@ -999,15 +986,15 @@ if ( reading_env )   {
    //  not reading env
    //
 
-if ( feof(configin) )  return eof;
+if ( configin->eof() )  return eof;
 
-c = fgetc(configin);
+c = configin->get();
 
 if ( c == '\n' )   { ++LineNumber;  Column = 0; }
 
 if ( c == '$' )  {
 
-   cc = fgetc(configin);
+   cc = configin->get();
 
    ++Column;
 
@@ -1029,7 +1016,7 @@ if ( c == '$' )  {
 
    // SonarQube: to avoid side effect by || operator
    while (env_pos < max_id_length) {
-      if ((c = fgetc(configin)) == R_curly) break;
+      if ((c = configin->get()) == R_curly) break;
       env_name[env_pos++] = (char) c;
    }
 
@@ -1098,11 +1085,6 @@ int token(int t)
 
 {
 
-// cout << "token " << t << " ...  text = ";
-// if ( (configtext != 0) && (configtext[0] != 0) )   cout << '\"' << configtext << "\"\n";
-// else                                               cout << "(nul)\n";
-// cout.flush();
-
 return t;
 
 }
@@ -1114,8 +1096,6 @@ return t;
 int do_comp()
 
 {
-
-// if ( verbose )  cout << "\n\n   ... in do_comp()\n\n" << flush;
 
 int return_value = 0;
 
@@ -1393,11 +1373,6 @@ out = s.substr(0, pos1);
 out += tmp_env_value;
 
 out += s.substr(pos2 + 1);
-
-
-// cout << "\n\n   out = \"" << (out.c_str()) << "\n\n" << flush;
-
-
 
    //
    //  done
