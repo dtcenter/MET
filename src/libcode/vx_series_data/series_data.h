@@ -13,6 +13,8 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+#include <vector>
+
 #include "vx_util.h"
 #include "vx_log.h"
 #include "vx_data2d.h"
@@ -21,11 +23,15 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-void get_series_entry(int, VarInfo*, const StringArray&,
-                      const GrdFileType, DataPlane&, Grid&);
+bool get_series_entry(int, VarInfo*, const StringArray&,
+                      const GrdFileType, DataPlane&, Grid&,
+                      bool error_out=true,
+                      bool print_warning=true);
 
-bool read_single_entry(VarInfo*, const ConcatString&, const GrdFileType,
-                       DataPlane&, Grid&);
+bool get_series_entries(int, std::vector<VarInfo*>&, const StringArray&,
+                        const GrdFileType, std::vector<DataPlane>&, Grid&,
+                        bool error_out=true,
+                        bool print_warning=true);
 
 ////////////////////////////////////////////////////////////////////////
 

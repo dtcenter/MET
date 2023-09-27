@@ -1,14 +1,12 @@
-module load intel/19.0.5.281
+module load intel/2022.2.1
 
-export TEST_BASE=/usw/met/11.1.0
-export COMPILER=intel_19.0.5.281
+export TEST_BASE=/usw/met/12.0.0
+export COMPILER=intel_2022.2.1
 export MET_SUBDIR=${TEST_BASE}
-export MET_TARBALL=v11.1.0.tar.gz
+export MET_TARBALL=v12.0.0.tar.gz
 export USE_MODULES=TRUE
 export MET_PYTHON=/lustre/f2/dev/esrl/Julie.Prestopnik/projects/miniconda/miniconda3/envs/metplus_v5.1_py3.10/
 export MET_PYTHON_CC=-I${MET_PYTHON}/include/python3.10
-export MET_PYTHON_LD=`python3-config --ldflags --embed`
-export EXTERNAL_LIBS=${TEST_BASE}/external_libs
+export MET_PYTHON_LD=-L${MET_PYTHON}/lib/python3.10/config-3.10-x86_64-linux-gnu\ -L${MET_PYTHON}/lib\ -lpython3.10\ -lcrypt\ -lpthread\ -ldl\ -lutil\ -lm
+export EXTERNAL_LIBS=/usw/met/12.0.0-beta1/external_libs
 export LIB_Z=${EXTERNAL_LIBS}/lib
-export MAKE_ARGS=-j
-export CXXFLAGS="-std=c++11"

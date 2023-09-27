@@ -115,6 +115,7 @@ class LoggerWarning {
 
    public:
       int warn;
+      bool PrintWarning;
       bool ExitOnWarning;
       bool NeedToExit;
 
@@ -248,6 +249,8 @@ class Logger
 
       int verbosity_level() const;
 
+      bool print_warning() const;
+
       bool is_open() const;
 
          //
@@ -255,6 +258,8 @@ class Logger
          //
 
       void set_verbosity_level(const int);
+
+      void set_print_warning(bool);
 
       void set_exit_on_warning(bool);
 
