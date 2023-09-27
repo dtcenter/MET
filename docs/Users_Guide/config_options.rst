@@ -548,8 +548,8 @@ Some tools override the temporary directory by the command line argument
 		
   tmp_dir = "/tmp";
 
-A description of the use of temporary files in MET can be found in the
-Contributor's Guide section :numref:`tmp_file_use`.
+A description of the use of temporary files in MET can be found in
+:numref:`Contributor's Guide Section %s <tmp_file_use>`.
 
 message_type_group_map
 ^^^^^^^^^^^^^^^^^^^^^^

@@ -5,8 +5,8 @@ Use of Temporary Files
 
 The MET application and library code uses temporary files in several
 places. Each specific use of temporary files is described below. The
-directory in which temporary files are stored is configurable as
-described in the User's Guide :numref:`config_tmp_dir`.
+directory in which temporary files are stored is configurable as,
+described in :numref:`User's Guide Section %s <config_tmp_dir>`.
 
 Whenever a MET application is run, the operating system assigns it a
 process identification number (PID). All temporary files created by
@@ -28,6 +28,8 @@ In general, MET applications delete any temporary files they create
 when they are no longer needed. However, if the application exits
 abnormally, the temporary files may remain.
 
+.. _tmp_files_pb2nc:
+
 PB2NC Tool
 ^^^^^^^^^^
 
@@ -46,13 +48,15 @@ PB2NC creates the following temporary files when running:
   uses BUFRLIB to read its contents.
 
 * :code:`tmp_pb2nc_bufr_{PID}_tbl`: PB2NC extracts Bufr table data
-  that is embedded in input files, applies Fortran blocking, and
-  writes it to this temporary file for later use.
+  that is embedded in input files and writes it to this temporary
+  file for later use.
 
 .. note::
    The first 3 files listed above are identical. They are all
-   blocked versions of the same input file. Recommend modifying the
-   logic to only block the input file once.
+   Fortran-blocked versions of the same input file. Recommend
+   modifying the logic to only apply Fortran blocking once.
+
+.. _tmp_files_point2grid:
 
 Point2Grid Tool
 ^^^^^^^^^^^^^^^
@@ -60,26 +64,24 @@ Point2Grid Tool
 The Point2Grid tool reads point observations from a variety of
 inputs and summarizes them on a grid. When processing GOES input
 files, a temporary NetCDF file is created to store the mapping of
-input pixel locations to output grid cells.
+input pixel locations to output grid cells unless the
+MET_GEOSTATIONARY_DATA environment variable defines an existing grid
+navigation file to be used.
 
-If that geostationary grid mapping file already exists, it is used
-directly and not recreated. If not, it is created as needed.
+If that temporary geostationary grid mapping file already exists, it
+is used directly and not recreated. If not, it is created as needed.
 
 Note that this temporary file is *not* deleted by the Point2Grid
 tool. Once created, it is intended to be reused in future runs.
 
-.. note::
-   Should this grid navigation file actually be written to the
-   temporary directory or should it be written to an output
-   directory instead since its intended to be reused across multiple
-   runs?
+.. _tmp_files_bootstrap:
 
 Bootstrap Confidence Intervals
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Several MET tools support the computation of bootstrap confidence
-intervals as described in the User's Guide :numref:`config_boot`
-and :numref:`Appendix D, Section %s <App_D-Confidence-Intervals>`.
+intervals, as described in :numref:`User's Guide Section %s <config_boot>`
+and :numref:`User's Guide Appendix D, Section %s <App_D-Confidence-Intervals>`.
 When bootstrap confidence intervals are requested, up to two
 temporary files are created for each CNT, CTS, MCTS, NBRCNT, or
 NBRCTS line type written to the output.
@@ -97,9 +99,11 @@ Where {LINE_TYPE} is :code:`cnt`, :code:`cts`, :code:`mcts`,
 :code:`nbrcnt`, or :code:`nbrcts`.
 
 .. note::
-   Consider whether or not its realistic to hold the resampled
-   statistics all in memory. If so, that'd save a lot of time in
-   I/O.
+   Consider whether or not it's realistic to hold the resampled
+   statistics in memory rather than writing them to temporary files.
+   If so, that would reduce the I/O.
+
+.. _tmp_files_stat_analysis:
 
 Stat-Analysis Tool
 ^^^^^^^^^^^^^^^^^^
@@ -125,11 +129,13 @@ and writes the result to a temporary file.
    necessary, when multiple jobs are specified along with non-empty
    common filtering logic.
 
+.. _tmp_files_python_embedding:
+
 Python Embedding
 ^^^^^^^^^^^^^^^^
 
-As described in the User's Guide
-:numref:`Appendix F, Section %s <appendixF>`, when the
+As described in
+:numref:`User's Guide Appendix F, Section %s <appendixF>`, when the
 :code:`MET_PYTHON_EXE` environment variable is set, the MET tools run
 any Python embedding commands using the specified Python executable.
 
@@ -145,18 +151,19 @@ any Python embedding commands using the specified Python executable.
 The compile-time Python instance is run to read data from these
 temporary files.
 
+.. _tmp_files_tc_diag:
+
 TC-Diag Tool
 ^^^^^^^^^^^^
 
 The TC-Diag tool requires the use of Python embedding. It processes
 one or more ATCF tracks and computes model diagnostics. For each
-track point, it converts gridded model data to cyclindrical
+track point, it converts gridded model data to cylindrical
 coordinates centered at that point, writes it to a temporary NetCDF
-file, and passes it to Python scripts to compute the model
-diagnostics.
+file, and passes it to Python scripts to compute model diagnostics.
 
 * :code:`tmp_met_nc_{PID}`: Cylindrical coordinate model data is
   written to this temporary NetCDF file for each track point
   and passed to Python scripts to compute diagnostics. If requested,
-  the temporary NetCDF files for each track point are combined into
-  a single output NetCDF cylindrical coordinates file for each track.
+  these temporary NetCDF files for each track point are combined into
+  a single NetCDF cylindrical coordinates output file for each track.
