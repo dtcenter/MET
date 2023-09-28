@@ -1,1 +1,0 @@
-python -m tc_diag_driver.driver tests/special_test/entry_spec.yml tests/land_lut/current_operational_gdland.dat

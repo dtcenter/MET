@@ -1,0 +1,45 @@
+Metadata-Version: 2.1
+Name: diag-lib
+Version: 0.4.1
+Summary: Library of routines to support TC diagnostic code.
+Home-page: https://bear.cira.colostate.edu/tc_diagnostic/diag_lib
+Author: Robert DeMaria
+Author-email: robert.demaria@colostate.edu
+License: UNKNOWN
+Platform: any
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+
+# diag_lib
+Library of routines to support TC diagnostic code.
+
+## Install
+The library can be installed with the command:
+```bash
+pip install git+ssh://git@bear.cira.colostate.edu/tc_diagnostic/diag_lib.git
+```
+
+A particular version of the library can be installed with a command such as:
+```bash
+pip install git+ssh://git@bear.cira.colostate.edu/tc_diagnostic/diag_lib.git@v0.1.0
+```
+
+## Environment
+Two environments are provided: `diag_lib_dev` in `environment_dev.yml` and 
+`diag_lib_test` in `environment_test.yml`.  These provide the environment used
+to develop the library and a minimal environment that can be used for testing.
+
+## Running Tests
+Assuming you have the `diag_lib_test` environment activated, you can use the
+command `python -m unittest discover -s tests -p "*test_*"` to run all of the
+automated tests.
+
