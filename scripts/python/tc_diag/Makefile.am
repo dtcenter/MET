@@ -26,7 +26,10 @@
 pythontc_diagdir = $(pkgdatadir)/python/tc_diag
 
 pythontc_diag_DATA = \
-	compute_tc_diagnostics.py
+	compute_tc_diag.py \
+	atcf_tools \
+	diag_lib \
+	tc_diag_driver
 
 EXTRA_DIST = ${pythontc_diag_DATA}
 
