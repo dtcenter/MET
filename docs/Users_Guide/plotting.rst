@@ -86,7 +86,6 @@ ________________________
 
 .. code-block:: none
 
-  tmp_dir        = "/tmp";
   version        = "VN.N";
 
 The configuration options listed above are common to multiple MET tools and are described in :numref:`config_options`.
