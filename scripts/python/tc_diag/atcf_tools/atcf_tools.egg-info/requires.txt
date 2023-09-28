@@ -1,4 +1,0 @@
-numpy
-toml
-pandas
-scipy
