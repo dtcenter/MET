@@ -139,9 +139,6 @@ static void compute_lat_lon(TcrmwGrid&, double *, double *);
 
 int met_main(int argc, char *argv[]) {
 
-   // Print beta status warning
-   print_beta_warning("The TC-Diag tool");
-
    // Process command line arguments
    process_command_line(argc, argv);
 

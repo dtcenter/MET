@@ -28,6 +28,7 @@ extern GlobalPython GP;   //  this needs external linkage
 static const char * user_ppath         = nullptr;
 static const char write_tmp_diag    [] = "MET_BASE/python/pyembed/write_tmp_tc_diag.py";
 static const char read_tmp_diag     [] = "pyembed.read_tmp_tc_diag";   //  NO ".py" suffix
+static const char python_tc_diag_dir[] = "MET_BASE/python/tc_diag";
 static const char tc_diag_dict_name [] = "tc_diag";
 
 ////////////////////////////////////////////////////////////////////////
@@ -98,12 +99,25 @@ bool straight_python_tc_diag(const ConcatString &script_name,
    run_python_string("import sys");
 
    ConcatString command;
+
+   // Add the tc_diag python directory to the path
+   ConcatString tc_diag_dir(replace_path(python_tc_diag_dir)); 
+
    command << cs_erase
            << "sys.path.append(\""
-           << script_name.dirname()
+           << tc_diag_dir
            << "\")";
-
    run_python_string(command.text());
+
+   // Add the directory of the script to the path, if needed
+   if(tc_diag_dir != script_name.dirname()) {
+
+      command << cs_erase
+	      << "sys.path.append(\""
+	      << script_name.dirname()
+	      << "\");";
+      run_python_string(command.text());
+   }
 
    if(arg_sa.n() > 0) {
       PySys_SetArgv(wa.wargc(), wa.wargv());

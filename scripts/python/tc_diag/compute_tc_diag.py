@@ -1,5 +1,8 @@
 import os
 import sys
+import atcf_tools
+import diag_lib
+import tc_diag_driver
 
 ###########################################
 
