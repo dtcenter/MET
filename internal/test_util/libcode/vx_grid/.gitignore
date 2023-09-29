@@ -1,4 +1,5 @@
 test_grid_area
+grid_proj_comparison
 *.o
 *.a
 .deps

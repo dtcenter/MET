@@ -27,6 +27,7 @@
 #include "tcrmw_grid.h"
 #include "laea_grid.h"
 #include "semilatlon_grid.h"
+#include "proj_grid.h"
 
 #include "find_grid_by_name.h"
 

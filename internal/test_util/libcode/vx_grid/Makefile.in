@@ -88,7 +88,8 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-noinst_PROGRAMS = test_grid_area$(EXEEXT)
+noinst_PROGRAMS = test_grid_area$(EXEEXT) \
+	grid_proj_comparison$(EXEEXT)
 subdir = internal/test_util/libcode/vx_grid
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
@@ -100,6 +101,12 @@ CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 PROGRAMS = $(noinst_PROGRAMS)
+am_grid_proj_comparison_OBJECTS =  \
+	grid_proj_comparison-grid_proj_comparison.$(OBJEXT)
+grid_proj_comparison_OBJECTS = $(am_grid_proj_comparison_OBJECTS)
+grid_proj_comparison_DEPENDENCIES =
+grid_proj_comparison_LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
+	$(grid_proj_comparison_LDFLAGS) $(LDFLAGS) -o $@
 am_test_grid_area_OBJECTS = test_grid_area-test_grid_area.$(OBJEXT)
 test_grid_area_OBJECTS = $(am_test_grid_area_OBJECTS)
 test_grid_area_DEPENDENCIES =
@@ -120,7 +127,9 @@ am__v_at_1 =
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__maybe_remake_depfiles = depfiles
-am__depfiles_remade = ./$(DEPDIR)/test_grid_area-test_grid_area.Po
+am__depfiles_remade =  \
+	./$(DEPDIR)/grid_proj_comparison-grid_proj_comparison.Po \
+	./$(DEPDIR)/test_grid_area-test_grid_area.Po
 am__mv = mv -f
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -139,8 +148,9 @@ AM_V_CXXLD = $(am__v_CXXLD_@AM_V@)
 am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
 am__v_CXXLD_0 = @echo "  CXXLD   " $@;
 am__v_CXXLD_1 = 
-SOURCES = $(test_grid_area_SOURCES)
-DIST_SOURCES = $(test_grid_area_SOURCES)
+SOURCES = $(grid_proj_comparison_SOURCES) $(test_grid_area_SOURCES)
+DIST_SOURCES = $(grid_proj_comparison_SOURCES) \
+	$(test_grid_area_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -321,6 +331,18 @@ test_grid_area_CPPFLAGS = ${MET_CPPFLAGS}
 test_grid_area_LDFLAGS = -L. ${MET_LDFLAGS}
 test_grid_area_LDADD = -lvx_grid \
 	-lvx_geodesy \
+	-lvx_nav \
+	-lvx_util_math \
+	-lvx_util \
+	-lvx_math \
+	-lvx_cal \
+	-lvx_log \
+	-lz -lm -lproj
+
+grid_proj_comparison_SOURCES = grid_proj_comparison.cc
+grid_proj_comparison_CPPFLAGS = ${MET_CPPFLAGS}
+grid_proj_comparison_LDFLAGS = -L. ${MET_LDFLAGS}
+grid_proj_comparison_LDADD = -lvx_grid \
 	-lvx_geodesy \
 	-lvx_nav \
 	-lvx_util_math \
@@ -367,6 +389,10 @@ $(am__aclocal_m4_deps):
 clean-noinstPROGRAMS:
 	-test -z "$(noinst_PROGRAMS)" || rm -f $(noinst_PROGRAMS)
 
+grid_proj_comparison$(EXEEXT): $(grid_proj_comparison_OBJECTS) $(grid_proj_comparison_DEPENDENCIES) $(EXTRA_grid_proj_comparison_DEPENDENCIES) 
+	@rm -f grid_proj_comparison$(EXEEXT)
+	$(AM_V_CXXLD)$(grid_proj_comparison_LINK) $(grid_proj_comparison_OBJECTS) $(grid_proj_comparison_LDADD) $(LIBS)
+
 test_grid_area$(EXEEXT): $(test_grid_area_OBJECTS) $(test_grid_area_DEPENDENCIES) $(EXTRA_test_grid_area_DEPENDENCIES) 
 	@rm -f test_grid_area$(EXEEXT)
 	$(AM_V_CXXLD)$(test_grid_area_LINK) $(test_grid_area_OBJECTS) $(test_grid_area_LDADD) $(LIBS)
@@ -377,6 +403,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/grid_proj_comparison-grid_proj_comparison.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_grid_area-test_grid_area.Po@am__quote@ # am--include-marker
 
 $(am__depfiles_remade):
@@ -398,6 +425,20 @@ am--depfiles: $(am__depfiles_remade)
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXXCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
+
+grid_proj_comparison-grid_proj_comparison.o: grid_proj_comparison.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(grid_proj_comparison_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT grid_proj_comparison-grid_proj_comparison.o -MD -MP -MF $(DEPDIR)/grid_proj_comparison-grid_proj_comparison.Tpo -c -o grid_proj_comparison-grid_proj_comparison.o `test -f 'grid_proj_comparison.cc' || echo '$(srcdir)/'`grid_proj_comparison.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/grid_proj_comparison-grid_proj_comparison.Tpo $(DEPDIR)/grid_proj_comparison-grid_proj_comparison.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='grid_proj_comparison.cc' object='grid_proj_comparison-grid_proj_comparison.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(grid_proj_comparison_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o grid_proj_comparison-grid_proj_comparison.o `test -f 'grid_proj_comparison.cc' || echo '$(srcdir)/'`grid_proj_comparison.cc
+
+grid_proj_comparison-grid_proj_comparison.obj: grid_proj_comparison.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(grid_proj_comparison_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT grid_proj_comparison-grid_proj_comparison.obj -MD -MP -MF $(DEPDIR)/grid_proj_comparison-grid_proj_comparison.Tpo -c -o grid_proj_comparison-grid_proj_comparison.obj `if test -f 'grid_proj_comparison.cc'; then $(CYGPATH_W) 'grid_proj_comparison.cc'; else $(CYGPATH_W) '$(srcdir)/grid_proj_comparison.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/grid_proj_comparison-grid_proj_comparison.Tpo $(DEPDIR)/grid_proj_comparison-grid_proj_comparison.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='grid_proj_comparison.cc' object='grid_proj_comparison-grid_proj_comparison.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(grid_proj_comparison_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o grid_proj_comparison-grid_proj_comparison.obj `if test -f 'grid_proj_comparison.cc'; then $(CYGPATH_W) 'grid_proj_comparison.cc'; else $(CYGPATH_W) '$(srcdir)/grid_proj_comparison.cc'; fi`
 
 test_grid_area-test_grid_area.o: test_grid_area.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_grid_area_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test_grid_area-test_grid_area.o -MD -MP -MF $(DEPDIR)/test_grid_area-test_grid_area.Tpo -c -o test_grid_area-test_grid_area.o `test -f 'test_grid_area.cc' || echo '$(srcdir)/'`test_grid_area.cc
@@ -538,7 +579,8 @@ clean: clean-am
 clean-am: clean-generic clean-noinstPROGRAMS mostlyclean-am
 
 distclean: distclean-am
-		-rm -f ./$(DEPDIR)/test_grid_area-test_grid_area.Po
+		-rm -f ./$(DEPDIR)/grid_proj_comparison-grid_proj_comparison.Po
+	-rm -f ./$(DEPDIR)/test_grid_area-test_grid_area.Po
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -584,7 +626,8 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-		-rm -f ./$(DEPDIR)/test_grid_area-test_grid_area.Po
+		-rm -f ./$(DEPDIR)/grid_proj_comparison-grid_proj_comparison.Po
+	-rm -f ./$(DEPDIR)/test_grid_area-test_grid_area.Po
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 

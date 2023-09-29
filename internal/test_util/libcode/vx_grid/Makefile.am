@@ -10,13 +10,26 @@ include ${top_srcdir}/Make-include
 
 # Test programs
 
-noinst_PROGRAMS = test_grid_area
+noinst_PROGRAMS = test_grid_area \
+	grid_proj_comparison
 
 test_grid_area_SOURCES = test_grid_area.cc
 test_grid_area_CPPFLAGS = ${MET_CPPFLAGS}
 test_grid_area_LDFLAGS = -L. ${MET_LDFLAGS}
 test_grid_area_LDADD = -lvx_grid \
 	-lvx_geodesy \
+	-lvx_nav \
+	-lvx_util_math \
+	-lvx_util \
+	-lvx_math \
+	-lvx_cal \
+	-lvx_log \
+	-lz -lm -lproj
+
+grid_proj_comparison_SOURCES = grid_proj_comparison.cc
+grid_proj_comparison_CPPFLAGS = ${MET_CPPFLAGS}
+grid_proj_comparison_LDFLAGS = -L. ${MET_LDFLAGS}
+grid_proj_comparison_LDADD = -lvx_grid \
 	-lvx_geodesy \
 	-lvx_nav \
 	-lvx_util_math \
