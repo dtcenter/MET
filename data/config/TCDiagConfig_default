@@ -60,7 +60,7 @@ lead       = [   "0",   "6",  "12",  "18",  "24",
 // Python diagnostic scripts to be run
 // May be set separately in each "domain_info" entry 
 //
-diag_script = [ "MET_BASE/python/tc_diag/compute_tc_diagnostics.py" ];
+diag_script = [ "MET_BASE/python/tc_diag/compute_tc_diag.py" ];
 
 //
 // Domain-specific cylindrical coordinate transformation
