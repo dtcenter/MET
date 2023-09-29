@@ -18,20 +18,17 @@
 
 # SUBDIRS = include
 
-SUBDIRS = \
-	atcf_tools \
-	diag_lib \
-	tc_diag_driver
-
 ## Example of how to Install outside of $(pkgdatadir)
 ## scriptsrootdir = $(prefix)/share/scripts
 ## pythonutilitydir = ${scriptsrootdir}/utility
 
-pythontcdiagdir = $(pkgdatadir)/python/tc_diag
+diaglibdir = $(pkgdatadir)/python/tc_diag/diag_lib
 
-pythontcdiag_DATA = \
-	compute_tc_diag.py
+diaglib_DATA = \
+	cylindrical_grid.py \
+	diag_var_calculations.py \
+	unit_conversion.py
 
-EXTRA_DIST = ${pythontcdiag_DATA}
+EXTRA_DIST = ${diaglib_DATA}
 
 MAINTAINERCLEANFILES 	= Makefile.in
