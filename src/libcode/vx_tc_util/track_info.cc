@@ -1196,7 +1196,6 @@ TrackInfo consensus(const TrackInfoArray &tracks,
          
          // Add the cons_diag_val to the pavg DiagVal NumArray (using add_diag_value)
          if(!is_bad_data(cons_diag_val)) {
-            mlog << Debug(3) << "  Adding cons_diag_val to pavg DiagVal array" << "\n";
             pavg.add_diag_value(cons_diag_val);
          }
          
