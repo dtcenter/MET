@@ -1187,7 +1187,6 @@ TrackInfo consensus(const TrackInfoArray &tracks,
 
             // Add non-missing diag values to local NumArray 
             if(!is_bad_data( tracks.Track[k][i_pnt].get_diag_val(tavg.diag_name(), tavg.diag_name()[j]) )) {
-               mlog << Debug(3) <<  "  Adding values for k: " << k << ", i_pnt: " << i_pnt << " tracks.Track[k][i_pnt].get_diag_val(tavg.diag_name(), tavg.diag_name()[j]) = " << tracks.Track[k][i_pnt].get_diag_val(tavg.diag_name(), tavg.diag_name()[j]) << "\n";
                diag_vals.add(tracks.Track[k][i_pnt].get_diag_val(tavg.diag_name(), tavg.diag_name()[j]));
             }
             
