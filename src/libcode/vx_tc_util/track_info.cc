@@ -1026,7 +1026,6 @@ TrackInfo consensus(const TrackInfoArray &tracks,
       // Get unique diag names
       // Store diag_names in tavg object
       for(j=0; j<tracks[i].diag_name().n(); j++) {
-         mlog << Debug(3) << "TrackInfo::consensus(). Found unique diag_name[" << j << "] = " << tracks[i].diag_name()[j] << "\n";
          tavg.add_uniq_diag_name(tracks[i].diag_name()[j]);
       }
       
