@@ -1069,7 +1069,6 @@ TrackInfo consensus(const TrackInfoArray &tracks,
             }
             continue;
          }
-         
          // Increment the TrackPoint count and sums
          // Remove diagnostic values from the TrackPoint object (psum) for the consensus values
          // Consensus diag values computed below this
