@@ -113,9 +113,9 @@ bool straight_python_tc_diag(const ConcatString &script_name,
    if(tc_diag_dir != script_name.dirname()) {
 
       command << cs_erase
-	      << "sys.path.append(\""
-	      << script_name.dirname()
-	      << "\");";
+              << "sys.path.append(\""
+              << script_name.dirname()
+              << "\");";
       run_python_string(command.text());
    }
 
