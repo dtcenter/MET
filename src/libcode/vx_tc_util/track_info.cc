@@ -1001,7 +1001,6 @@ TrackInfo consensus(const TrackInfoArray &tracks,
    tavg.set_technique(model.c_str());
    tavg.set_init(tracks[0].init());
    tavg.set_storm_id();
-  
    // Loop through the tracks and build a list of lead times
    for(i=0; i<tracks.n(); i++) {
 
