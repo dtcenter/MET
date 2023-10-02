@@ -978,7 +978,6 @@ TrackInfo consensus(const TrackInfoArray &tracks,
    bool skip;
    TrackInfo tavg;
    NumArray lead_list;
-   
    // Variables for average TrackPoint
    int        pcnt;
    TrackPoint pavg, psum;
