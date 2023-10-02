@@ -1193,7 +1193,6 @@ TrackInfo consensus(const TrackInfoArray &tracks,
          } // end loop over ensemble of tracks (for given lead-time: i_pnt)
          
          cons_diag_val = diag_vals.mean();
-         mlog << Debug(3) << "  cons_diag_val = " << cons_diag_val << "\n";
          
          // Add the cons_diag_val to the pavg DiagVal NumArray (using add_diag_value)
          if(!is_bad_data(cons_diag_val)) {
