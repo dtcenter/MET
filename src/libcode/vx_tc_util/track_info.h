@@ -169,7 +169,6 @@ class TrackInfo {
       void add_watch_warn(const ConcatString &, WatchWarnType, unixtime);
       bool add_diag_data(DiagFile &, const StringArray &);
       void add_diag_value(int, double);
-      //void add_uniq_diag_name(const string diag_name);
       void add_uniq_diag_name(const std::string);
       
       bool has(const ATCFTrackLine &) const;
