@@ -562,7 +562,6 @@ bool TrackInfo::add_diag_data(DiagFile &diag_file, const StringArray &req_diag_n
       // Store the diagnostic name
       DiagName.add(diag_file.diag_name()[i_name]);
       NumArray diag_val = diag_file.diag_val(diag_file.diag_name()[i_name]);
-      
       // Add diagnostic values to the TrackPoints
       for(i_time=0; i_time<diag_file.n_time(); i_time++) {
 
