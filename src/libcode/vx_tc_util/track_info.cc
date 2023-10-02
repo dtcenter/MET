@@ -1160,8 +1160,7 @@ TrackInfo consensus(const TrackInfoArray &tracks,
       // Loop over the diag name and the input track points and get consensus diag value
       // (mean value across all members that have the diag value)
       for (j=0; j<tavg.diag_name().n(); j++){
-         mlog << Debug(4) << "Computing consensus \"" << tavg.diag_name[j] << "\" 
- diagnostic value.\n";
+         mlog << Debug(4) << "Computing consensus \"" << tavg.diag_name()[j] << "\" diagnostic value.\n";
          
          // Store diag_vals for one diag_name across all lead-times (track points)
          NumArray diag_vals;
@@ -1191,13 +1190,11 @@ TrackInfo consensus(const TrackInfoArray &tracks,
             }
             
          } // end loop over ensemble of tracks (for given lead-time: i_pnt)
-         
+
+         // Compute cons_diag_val (the mean value)
+         // add it to the pavg DiagVal NumArray
          cons_diag_val = diag_vals.mean();
-         
-         // Add the cons_diag_val to the pavg DiagVal NumArray (using add_diag_value)
-         if(!is_bad_data(cons_diag_val)) {
-            pavg.add_diag_value(cons_diag_val);
-         }
+         pavg.add_diag_value(cons_diag_val);
          
       } // end loop over diag names
       
