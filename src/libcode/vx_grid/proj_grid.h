@@ -11,6 +11,7 @@
 
 
 #include <iostream>
+#include <memory>
 
 #include "vx_math.h"
 
@@ -19,6 +20,28 @@ extern "C" {
 #include "proj.h"
 
 }
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+struct ProjInfo {
+
+   PJ_CONTEXT * C;   //   = 0
+
+   PJ * pj;
+
+      //////////
+
+   ProjInfo() { C = 0;  pj = 0; }
+
+  ~ProjInfo() { 
+
+      if ( pj )  { proj_destroy (pj);   pj = 0; }
+
+   }
+
+};
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -33,10 +56,10 @@ class ProjGrid {
       void assign(const ProjGrid &);
 
 
-      PJ_CONTEXT * C;   //   = 0
-      PJ * pj;
+      shared_ptr<ProjInfo> info;
 
-      ConcatString Proj_Set;   //  string used to initialize pj
+
+      ConcatString Proj_Set;   //  string used to initialize PROJ
 
       Affine Aff;
 
