@@ -55,9 +55,7 @@ class ProjGrid {
 
       void assign(const ProjGrid &);
 
-
-      shared_ptr<ProjInfo> info;
-
+      std::shared_ptr<ProjInfo> info;
 
       ConcatString Proj_Set;   //  string used to initialize PROJ
 
