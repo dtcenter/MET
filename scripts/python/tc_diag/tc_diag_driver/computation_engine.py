@@ -85,16 +85,22 @@ class ComputationBatch:
 
         # Result will either be a float or a Tuple of values if a
         # computation produces multiple results at the same time.
+        result_tuple = None
         try:
             result_tuple = comp.computation(**all_args)
         except KeyboardInterrupt:
             raise
-        except:
+        except Exception as ex:
             LOGGER.info(
-                "Encountered exception while running computation: %s at hour: %d with args: %s",
-                comp, forecast_hour, call_args)
+                "Encountered exception while running computation: %s at hour: %d",
+                comp.name, forecast_hour)
             if not suppress_exceptions:
-                raise
+                msg = (f"Encountered error while running computation: "
+                                f"{comp.name} at hour: {forecast_hour}")
+                raise Exception(msg).with_traceback(ex.__traceback__)
+
+        if result_tuple is None:
+            return
 
         try:
             len(result_tuple)

@@ -46,7 +46,8 @@ def main():
 
     config = config_from_file(args.config_file, DriverConfig)
 
-    results = diag_calcs(config, args.data_file)
+    results = diag_calcs(
+        config, args.data_file, suppress_exceptions=args.suppress_exceptions)
     if args.out_dir is not None:
         _dump_results(results, args.out_dir)
 
@@ -83,6 +84,10 @@ def _get_args() -> argparse.Namespace:
         type=pathlib.Path,
         default=None,
         help="Optional directory to write results to for debugging purposes.")
+    parser.add_argument("-s", "--suppress_exceptions", action="store_true",
+                        default=False, help="If this flag is set, then "
+                        "exceptions encountered during diagnostic computations "
+                        "will be logged and then ignored.")
 
     return parser.parse_args()
 
