@@ -305,6 +305,7 @@ tcdata_DATA = \
 	basin_global_tenth_degree.nc \
 	dland_nw_hem_tenth_degree.nc \
 	dland_global_tenth_degree.nc \
+	v2023-04-07_gdland_table.dat \
 	wwpts_us.txt
 
 EXTRA_DIST = ${tcdata_DATA}
