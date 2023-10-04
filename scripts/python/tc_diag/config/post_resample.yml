@@ -1,0 +1,58 @@
+land_lut_file: /Volumes/d1/projects/MET/MET_development/MET-feature_2550_compute_diagnostics/data/tc_data/v2023-04-07_gdland_table.dat
+in_forecast_time_name: lead_time
+in_levels_name: &in_levels_name pressure
+in_radii_name: range
+in_azimuth_name: azimuth
+lon_input_name: TrackLon
+lat_input_name: TrackLat
+full_track_line_name: TrackLines
+init_time_name: init_time
+init_time_format: "%Y%m%d_%H%M%S"
+
+kwarg_lookup_func: &kwarg_lookup_func tc_diag_driver.met_diag_vars.kwarg_lookup
+input_lookup_func: &ds_input_lookup_func tc_diag_driver.met_diag_vars.dataset_lookup
+area_avg_func: &area_avg_func tc_diag_driver.met_diag_vars.area_average
+rad_tan_aavg_func: &rad_tan_aavg_func tc_diag_driver.met_diag_vars.radial_and_tangential_area_average
+div_vort_func: &div_vort_func tc_diag_driver.met_diag_vars.div_vort
+
+u_surf_name: &u_surf_name UGRD_Z10
+v_surf_name: &v_surf_name VGRD_Z10
+u_vert_name: &u_vert_name UGRD
+v_vert_name: &v_vert_name VGRD
+
+wind_min_km: &wind_min_km 0
+wind_max_km: &wind_max_km 500
+therm_min_km: &therm_min_km 200
+therm_max_km: &therm_max_km 800
+
+
+pressure_independent_computation_specs:
+  lat: {callable: *kwarg_lookup_func, kwargs: {lookup_name: lat}}
+  lon: {callable: *kwarg_lookup_func, kwargs: {lookup_name: lon}}
+  vmax: {callable: *ds_input_lookup_func, kwargs: {var_name: TrackVMax}}
+  min_slp: {callable: *ds_input_lookup_func, kwargs: {var_name: TrackMSLP}}
+  rmw: {callable: tc_diag_driver.met_diag_vars.average_rmw, kwargs: {u_surface_name: *u_surf_name, v_surface_name: *v_surf_name, radius_km: 500}}
+  t_surf: {callable: *area_avg_func, kwargs: {min_radius_km: *therm_min_km, max_radius_km: *therm_max_km, var_name: TMP_Z2}}
+  r_surf: {callable: *area_avg_func, kwargs: {min_radius_km: *therm_min_km, max_radius_km: *therm_max_km, var_name: RH_Z2}}
+  p_surf: {callable: *area_avg_func, kwargs: {min_radius_km: *therm_min_km, max_radius_km: *therm_max_km, var_name: PRMSL_Z0}}
+  u_surf: {callable: *area_avg_func, kwargs: {min_radius_km: *wind_min_km, max_radius_km: *wind_max_km, var_name: *u_surf_name}}
+  v_surf: {callable: *area_avg_func, kwargs: {min_radius_km: *wind_min_km, max_radius_km: *wind_max_km, var_name: *v_surf_name}}
+  tpw: {callable: *area_avg_func, kwargs: {min_radius_km: 0, max_radius_km: 200, var_name: PWAT_L0}}
+  sst: {callable: *area_avg_func, kwargs: {min_radius_km: 0, max_radius_km: 50, var_name: TMP_Z0}}
+  ohc: {callable: tc_diag_driver.diag_vars.always_missing, units: kJ/cm2}
+  land: {callable: tc_diag_driver.met_diag_vars.distance_to_land_lookup}
+  storm_r_theta: {callable: tc_diag_driver.met_diag_vars.storm_r_theta, output_vars: [stm_spd, stm_hdg]}
+  rad_tan_area_avg: {callable: *rad_tan_aavg_func, output_vars: [850radial, 850tang], kwargs: {u_name: *u_vert_name, v_name: *v_vert_name, level_hPa: 850, min_radius_km: 0, max_radius_km: 600}}
+  div_vort_850: {callable: *div_vort_func, output_vars: [850dvrg, 850vort], kwargs: {u_name: *u_vert_name, v_name: *v_vert_name, level_hPa: 850, radius_km: 1000}}
+  div_vort_200: {callable: *div_vort_func, output_vars: [200dvrg, 200vort], kwargs: {u_name: *u_vert_name, v_name: *v_vert_name, level_hPa: 200, radius_km: 1000}}
+
+  shear: {batch_order: 1, callable: tc_diag_driver.met_diag_vars.shear, output_vars: [shr_mag, shr_hdg], kwargs: {u_name: u, v_name: v, bottom_hPa: 850, top_hPa: 200}}
+  tgrd: {batch_order: 1, callable: tc_diag_driver.met_diag_vars.temperature_gradient, kwargs: {u_name: u, v_name: v, bottom_hPa: 850, top_hPa: 700}}
+
+
+sounding_computation_specs:
+  u: {callable: *area_avg_func, kwargs: {min_radius_km: *wind_min_km, max_radius_km: *wind_max_km, var_name: *u_vert_name, levels_dimen: *in_levels_name}}
+  v: {callable: *area_avg_func, kwargs: {min_radius_km: *wind_min_km, max_radius_km: *wind_max_km, var_name: *v_vert_name, levels_dimen: *in_levels_name}}
+  t: {callable: *area_avg_func, kwargs: {min_radius_km: *therm_min_km, max_radius_km: *therm_max_km, var_name: TMP, levels_dimen: *in_levels_name}}
+  r: {callable: *area_avg_func, kwargs: {min_radius_km: *therm_min_km, max_radius_km: *therm_max_km, var_name: RH, levels_dimen: *in_levels_name}}
+  z: {callable: *area_avg_func, kwargs: {min_radius_km: *therm_min_km, max_radius_km: *therm_max_km, var_name: HGT, levels_dimen: *in_levels_name}}
