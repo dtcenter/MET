@@ -191,7 +191,6 @@ cout << "   FIXME MetUGridDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
   BoolArray is_offset = vinfo_nc->is_offset();
 
   data_var = _file->find_by_name(vinfo_nc->req_name().c_str());
-/*
   if (nullptr != data_var) {
     time_dim_slot = data_var->t_slot;
     for (int idx=0; idx<is_offset.n(); idx++) {
@@ -265,7 +264,6 @@ cout << "   FIXME MetUGridDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
       }
     }
   }
-*/
 
   // Read the data
   NcVarInfo *info = (NcVarInfo *) 0;
