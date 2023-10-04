@@ -14,7 +14,7 @@
 //
 // Models
 //
-model = [];
+model = [ "GFSI", "EMXI" ];
 
 //
 // Description
@@ -44,9 +44,9 @@ storm_name = [];
 //
 // Model initialization time windows to include or exclude
 //
-init_beg = ${INIT_BEG};
-init_end = ${INIT_END};
-init_inc = [];
+init_beg = "";
+init_end = "";
+init_inc = [ ${INIT_INC} ];
 init_exc = [];
 
 //
@@ -91,8 +91,18 @@ interp12 = NONE;
 
 //
 // Specify how consensus forecasts should be defined
+// See NHC Consensus Definitions in Table 2:
+//    https://www.nhc.noaa.gov/modelsummary.shtml
 //
-consensus = [];
+consensus = [
+   {
+      name     = "GFEX_CONS";
+      members  = [ "GFSI", "EMXI" ];
+      required = [];
+      min_req  = 2;
+      write_members = TRUE;
+   }
+];
 
 //
 // Forecast lag times
@@ -110,7 +120,7 @@ oper_baseline = [];
 // Specify if only those track points common to both the ADECK and BDECK
 // tracks be written out.
 //
-match_points = FALSE;
+match_points = TRUE;
 
 //
 // Specify the NetCDF output of the gen_dland tool containing a gridded
@@ -134,17 +144,10 @@ watch_warn = {
 diag_info_map = [
    {
       diag_source    = "CIRA_DIAG_RT";
-      track_source   = "GFS";
-      field_source   = "GFS_0p50";
-      match_to_track = [];
+      track_source   = "TRACK_MODEL";
+      field_source   = "0p50RES";
+      match_to_track = [ ];
       diag_name      = [ ${CIRA_RT_DIAG_NAME} ];
-   },
-   {
-      diag_source    = "SHIPS_DIAG_RT";
-      track_source   = "SHIPS_TRK";
-      field_source   = "GFS_0p50";
-      match_to_track = [ "OFCL", "SHIP" ];
-      diag_name      = [ ${SHIPS_RT_DIAG_NAME} ];
    }
 ];
 
