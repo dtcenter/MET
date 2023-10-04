@@ -769,7 +769,7 @@ void UGridFile::read_config(ConcatString config_filename) {
   // Read the default config file
   conf.read(replace_path(config_filename).c_str());
 
-  metadata_map = parse_conf_metadata_map(&conf);
+  metadata_map = parse_conf_ugrid_metadata_map(&conf);
   metadata_names.clear();
   for (std::map<ConcatString,StringArray>::iterator it=metadata_map.begin();
        it!=metadata_map.end(); ++it) {
