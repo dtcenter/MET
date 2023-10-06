@@ -36,11 +36,11 @@
 #
 # The compile_MET_all.sh script will compile and install MET and its
 # external library dependencies, if needed, including:
-# PROJ, GSL, BUFRLIB, GRIB2C (with dependencies Z, PNG, JASPER),
-# HDF5, NETCDF (C and CXX), HDF4 (optional for MODIS-Regrid
-# and lidar2nc), HDFEOS (optional for MODIS-Regrid and lidar2nc),
-# FREETYPE (optional for MODE Graphics), and CAIRO (optional
-# for MODE Graphics).
+# PROJ (with dependency SQLITE >= 3.11), GSL, BUFRLIB, 
+# GRIB2C (with dependencies Z, PNG, JASPER), HDF5, NETCDF (C and CXX), 
+# HDF4 (optional for MODIS-Regrid and lidar2nc), HDFEOS (optional for
+# MODIS-Regrid and lidar2nc), FREETYPE (optional for MODE Graphics),
+# and CAIRO (optional for MODE Graphics).
 #
 # If these libraries have already been installed and don't need to be
 # reinstalled or if you are compiling on a machine that uses modulefiles
@@ -49,9 +49,9 @@
 # need to set to let MET know where the library and header files are.
 # Please supply values for the following environment variables
 # in the input environment configuration file (install_met_env.<machine_name>:
-# MET_GRIB2CLIB, MET_GRIB2CINC, GRIB2CLIB_NAME,
-# MET_BUFRLIB, BUFRLIB_NAME, MET_HDF5, MET_NETCDF,
-# MET_PROJ, MET_GSL, LIB_JASPER, LIB_PNG, LIB_Z.
+# MET_GRIB2CLIB, MET_GRIB2CINC, GRIB2CLIB_NAME, MET_BUFRLIB, BUFRLIB_NAME, 
+# MET_HDF5, MET_NETCDF, MET_PROJ, MET_GSL, LIB_JASPER, LIB_PNG, LIB_Z,
+# and SQLITE_DIR.
 #
 # The optional libraries HDF4, HDFEOS, FREETYPE, and CAIRO are
 # used for the following, not widely used tools, MODIS-Regrid,
@@ -153,6 +153,12 @@ echo "LD_LIBRARY_PATH = ${LD_LIBRARY_PATH}"
 # lib directory so it can be used to install HDF5 with zlib support
 if [[ -z "$LIB_Z" ]]; then
   LIB_Z=${LIB_DIR}/lib
+fi
+
+# if SQLITE_DIR is not set in the environment file, set it the
+# ${LIB_DIR} so it can be used to install the PROJ library
+if [[ -z "$SQLITE_DIR" ]]; then
+    SQLITE_DIR=${LIB_DIR}
 fi
 
 # Constants
@@ -394,6 +400,19 @@ fi
 # Compile Proj
 if [ $COMPILE_PROJ -eq 1 ]; then
 
+  if [[ -z "$SQLITE_DIR" ]]; then
+    echo
+    echo "Compiling SQLITE at `date`"
+    mkdir -p ${LIB_DIR}/sqlite
+    rm -rf ${LIB_DIR}/sqlite/sqlite*
+    tar -xf ${TAR_DIR}/sqlite*.tar.gz -C ${LIB_DIR}/sqlite > /dev/null 2>&1
+    cd ${LIB_DIR}/sqlite/sqlite*
+    echo "cd `pwd`"
+    run_cmd "./configure --enable-shared --prefix=${LIB_DIR} > sqlite.configure.log 2>&1"
+    run_cmd "make ${MAKE_ARGS} > sqlite.make.log 2>&1"
+    run_cmd "make ${MAKE_ARGS} install > sqlite.make_install.log 2>&1"
+  fi
+
   vrs="9.2.1";
 
   echo
@@ -403,8 +422,9 @@ if [ $COMPILE_PROJ -eq 1 ]; then
   tar -xf ${TAR_DIR}/proj-${vrs}.tar.gz -C ${LIB_DIR}/proj
   cd ${LIB_DIR}/proj/proj*
   echo "cd `pwd`"
+  export PATH=${LIB_DIR}/bin:${PATH}
   run_cmd "mkdir build; cd build"
-  run_cmd "cmake -DCMAKE_INSTALL_PREFIX=${LIB_DIR} .."
+  run_cmd "cmake -DCMAKE_INSTALL_PREFIX=${LIB_DIR} -DSQLITE3_INCLUDE_DIR=${SQLITE_DIR}/include -DSQLITE3_LIBRARY=${SQLITE_DIR}/lib/libsqlite3.so .."
   run_cmd "cmake --build ."
   run_cmd "cmake --build . --target install"
 
@@ -716,8 +736,7 @@ if [ -z ${MET_GSL} ]; then
 fi
 
 if [ -z ${MET_PROJ} ]; then
-  export MET_PROJINC=${LIB_DIR}/include
-  export MET_PROJLIB=${LIB_DIR}/lib64
+  export MET_PROJ=${LIB_DIR}
 fi
 
 export MET_PYTHON_BIN_EXE=${MET_PYTHON_BIN_EXE:=${MET_PYTHON}/bin/python3}
@@ -732,10 +751,10 @@ fi
 # https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html
 # ${parameter:+word}
 # If parameter is null or unset, nothing is substituted, otherwise the expansion of word is substituted.
-export LDFLAGS="${LDFLAGS} -Wl,-rpath,${LIB_DIR}/lib${MET_PROJ:+:$MET_PROJ/lib64}${LIB_DIR}/lib${MET_NETCDF:+:$MET_NETCDF/lib}${MET_HDF5:+:$MET_HDF5/lib}${MET_BUFRLIB:+:$MET_BUFRLIB}${MET_GRIB2CLIB:+:$MET_GRIB2CLIB}${MET_PYTHON_LIB:+:$MET_PYTHON_LIB}${MET_GSL:+:$MET_GSL/lib}${ADDTL_DIR:+:$ADDTL_DIR}"
+export LDFLAGS="${LDFLAGS} -Wl,-rpath,${LIB_DIR}/lib:${MET_PROJ:+:$MET_PROJ/lib64}${LIB_DIR}/lib${MET_NETCDF:+:$MET_NETCDF/lib}${MET_HDF5:+:$MET_HDF5/lib}${MET_BUFRLIB:+:$MET_BUFRLIB}${MET_GRIB2CLIB:+:$MET_GRIB2CLIB}${MET_PYTHON_LIB:+:$MET_PYTHON_LIB}${MET_GSL:+:$MET_GSL/lib}${ADDTL_DIR:+:$ADDTL_DIR}"
 export LDFLAGS="${LDFLAGS} -Wl,-rpath,${LIB_JASPER:+$LIB_JASPER}${LIB_LIBPNG:+:$LIB_PNG}${LIB_Z:+$LIB_Z}"
 export LDFLAGS="${LDFLAGS} ${LIB_JASPER:+-L$LIB_JASPER} ${LIB_LIBPNG:+-L$LIB_LIBPNG} ${MET_HDF5:+-L$MET_HDF5/lib} ${ADDTL_DIR:+-L$ADDTL_DIR}"
-export LIBS="${LIBS} -lhdf5_hl -lhdf5 -lz"
+export LIBS="${LIBS} -lhdf5_hl -lhdf5 -lz -ltiff"
 export MET_FONT_DIR=${TEST_BASE}/fonts
 
 if [ "${SET_D64BIT}" = "TRUE" ]; then
