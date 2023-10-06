@@ -1,180 +1,174 @@
 import os
 import sys
-import atcf_tools
-import diag_lib
-import tc_diag_driver
+import numpy as np
+from tc_diag_driver import post_resample_driver
+
+###########################################
+
+# Constants
+
+# Expected STORM DATA diagnostic names
+STORM_DATA_NAMES = (
+    "LAT", "LON", "MAXWIND", "RMW", "MIN_SLP",
+    "SHR_MAG", "SHR_HDG", "STM_SPD", "STM_HDG",
+    "SST", "OHC", "TPW", "LAND",
+    "850TANG", "850VORT", "200DVG"
+)
+
+# Expected SOUNDING DATA diagnostic names
+SOUNDING_DATA_NAMES = (
+    "T_SURF", "R_SURF", "P_SURF", "U_SURF", "V_SURF",
+    "T", "R", "Z", "U", "V"
+)
+
+# Bad data integer value
+BAD_DATA_INT = 9999
 
 ###########################################
 
 print("Python Script:\t" + repr(sys.argv[0]))
 
    ##
-   ##  input file specified on the command line
+   ## Expect exactly 3 arguments
    ##
 
-if len(sys.argv) != 2:
-    print("ERROR: compute_tc_diagnostics.py -> Must specify exactly one input file.")
+if len(sys.argv) != 4:
+    print("ERROR: compute_tc_diag.py -> Must specify a NetCDF input file, configuration file, and distance to land file.")
     sys.exit(1)
 
-# Read the input file
-input_file = os.path.expandvars(sys.argv[1])
+# Input NetCDF file
+data_filename = os.path.expandvars(sys.argv[1])
 
 try:
-   print("Input File:\t" + repr(input_file))
+   print("Data File:\t" + repr(data_filename))
 except NameError:
-   print("Can't find the input file")
+   print("Can't find the input data file")
+   sys.exit(1)
 
-# Diagnostics dictionary
-tc_diag = {
-   'MAXWIND': 9999,
-   'RMW': 9999,
-   'MIN_SLP': 9999,
-   'SHR_MAG': 9999,
-   'SHR_HDG': 9999,
-   'STM_SPD': 9999,
-   'STM_HDG': 9999,
-   'SST': 9999,
-   'OHC': 9999,
-   'TPW': 9999,
-   'LAND': 9999,
-   '850TANG': 9999,
-   '850VORT': 9999,
-   '200DVRG': 9999,
-   'T_SURF': 9999,
-   'R_SURF': 9999,
-   'P_SURF': 9999,
-   'U_SURF': 9999,
-   'V_SURF': 9999,
-   'T_1000': 9999,
-   'R_1000': 9999,
-   'Z_1000': 9999,
-   'U_1000': 9999,
-   'V_1000': 9999,
-   'T_0975': 9999,
-   'R_0975': 9999,
-   'Z_0975': 9999,
-   'U_0975': 9999,
-   'V_0975': 9999,
-   'T_0950': 9999,
-   'R_0950': 9999,
-   'Z_0950': 9999,
-   'U_0950': 9999,
-   'V_0950': 9999,
-   'T_0925': 9999,
-   'R_0925': 9999,
-   'Z_0925': 9999,
-   'U_0925': 9999,
-   'V_0925': 9999,
-   'T_0900': 9999,
-   'R_0900': 9999,
-   'Z_0900': 9999,
-   'U_0900': 9999,
-   'V_0900': 9999,
-   'T_0850': 9999,
-   'R_0850': 9999,
-   'Z_0850': 9999,
-   'U_0850': 9999,
-   'V_0850': 9999,
-   'T_0800': 9999,
-   'R_0800': 9999,
-   'Z_0800': 9999,
-   'U_0800': 9999,
-   'V_0800': 9999,
-   'T_0750': 9999,
-   'R_0750': 9999,
-   'Z_0750': 9999,
-   'U_0750': 9999,
-   'V_0750': 9999,
-   'T_0700': 9999,
-   'R_0700': 9999,
-   'Z_0700': 9999,
-   'U_0700': 9999,
-   'V_0700': 9999,
-   'T_0650': 9999,
-   'R_0650': 9999,
-   'Z_0650': 9999,
-   'U_0650': 9999,
-   'V_0650': 9999,
-   'T_0600': 9999,
-   'R_0600': 9999,
-   'Z_0600': 9999,
-   'U_0600': 9999,
-   'V_0600': 9999,
-   'T_0550': 9999,
-   'R_0550': 9999,
-   'Z_0550': 9999,
-   'U_0550': 9999,
-   'V_0550': 9999,
-   'T_0500': 9999,
-   'R_0500': 9999,
-   'Z_0500': 9999,
-   'U_0500': 9999,
-   'V_0500': 9999,
-   'T_0450': 9999,
-   'R_0450': 9999,
-   'Z_0450': 9999,
-   'U_0450': 9999,
-   'V_0450': 9999,
-   'T_0400': 9999,
-   'R_0400': 9999,
-   'Z_0400': 9999,
-   'U_0400': 9999,
-   'V_0400': 9999,
-   'T_0350': 9999,
-   'R_0350': 9999,
-   'Z_0350': 9999,
-   'U_0350': 9999,
-   'V_0350': 9999,
-   'T_0300': 9999,
-   'R_0300': 9999,
-   'Z_0300': 9999,
-   'U_0300': 9999,
-   'V_0300': 9999,
-   'T_0250': 9999,
-   'R_0250': 9999,
-   'Z_0250': 9999,
-   'U_0250': 9999,
-   'V_0250': 9999,
-   'T_0200': 9999,
-   'R_0200': 9999,
-   'Z_0200': 9999,
-   'U_0200': 9999,
-   'V_0200': 9999,
-   'T_0150': 9999,
-   'R_0150': 9999,
-   'Z_0150': 9999,
-   'U_0150': 9999,
-   'V_0150': 9999,
-   'T_0100': 9999,
-   'R_0100': 9999,
-   'Z_0100': 9999,
-   'U_0100': 9999,
-   'V_0100': 9999,
-   'T_0070': 9999,
-   'R_0070': 9999,
-   'Z_0070': 9999,
-   'U_0070': 9999,
-   'V_0070': 9999,
-   'T_0050': 9999,
-   'R_0050': 9999,
-   'Z_0050': 9999,
-   'U_0050': 9999,
-   'V_0050': 9999,
-   'T_0030': 9999,
-   'R_0030': 9999,
-   'Z_0030': 9999,
-   'U_0030': 9999,
-   'V_0030': 9999,
-   'T_0020': 9999,
-   'R_0020': 9999,
-   'Z_0020': 9999,
-   'U_0020': 9999,
-   'V_0020': 9999,
-   'T_0010': 9999,
-   'R_0010': 9999,
-   'Z_0010': 9999,
-   'U_0010': 9999,
-   'V_0010': 9999,
-   'TGRD': 9999
-}
+# Configuration file
+config_filename = os.path.expandvars(sys.argv[2])
+try:
+   print("Configuration File:\t" + repr(config_filename))
+except NameError:
+   print("Can't find the configuration file")
+   sys.exit(1)
 
+# Distance to land file
+land_filename = os.path.expandvars(sys.argv[3])
+try:
+   print("Land File:\t" + repr(land_filename))
+except NameError:
+   print("Can't find the distance to land file")
+   sys.exit(1)
+
+# Read config file and return a DriverConfig object
+config = post_resample_driver.config_from_file(
+    config_filename, post_resample_driver.DriverConfig)
+
+# JHG, need to catch and handle exceptions here
+# Robert will update the driver code to make sure that sufficient
+# radii have been handed to the code and produce an exception if not
+
+# JHG, note that VMAX reported here should be renamed to MAXWIND for the diag output
+#    # Change VMAX to MAXWIND
+#    if name == "VMAX":
+#        name = "MAXWIND"
+
+results = post_resample_driver.diag_calcs(
+    config, data_filename, suppress_exceptions=True,
+    land_lut_override=land_filename)
+
+# Store results in STORM, SOUNDING, and CUSTOM data dictionaries
+# based on their output file location.
+storm_data    = {}
+sounding_data = {}
+custom_data   = {}
+units         = {}
+
+# Process pressure independent diagnostics
+for d in results.pressure_independent.keys():
+
+    # Diagonstic names are reported as upper-case
+    name = d.upper()
+
+    # Store units
+    if 'units' in results.pressure_independent[d].attrs:
+        units[name] = results.pressure_independent[d].attrs["units"].upper()
+
+    # Check for bad data
+    val = results.pressure_independent[d].values[0]
+    if np.isnan(val):
+        val = BAD_DATA_INT
+
+    # Store value
+    if name in STORM_DATA_NAMES:
+        storm_data[name] = val
+    elif name in SOUNDING_DATA_NAMES:
+        sounding_data[name] = val
+    else:
+        custom_data[name] = val
+
+# Process sounding diagnostics
+for d in results.soundings.keys():
+
+    # Diagonstic names are reported as upper-case
+    name = d.upper()
+
+    # Store units
+    if 'units' in results.soundings[d].attrs:
+        units[name] = results.soundings[d].attrs["units"].upper()
+
+    # Store value for each level
+    levels = results.soundings[d].coords['level_hPa']
+    for idx, prs in enumerate(levels):
+
+        # Left-pad pressure value to 4 digits
+        name_prs = name + '_' + f'{prs:04}'
+
+        # Check for bad data
+        val = results.soundings[d].values[0,idx]
+        if np.isnan(val):
+            val = BAD_DATA_INT
+
+        # Store value
+        if name in SOUNDING_DATA_NAMES:
+            sounding_data[name_prs] = val
+        else:
+            custom_data[name_prs] = val
+
+# Print dictionaries
+print(f"\nSTORM DATA ({len(storm_data)}):\n", storm_data)
+print(f"\nSOUNDING DATA ({len(sounding_data)}):\n", sounding_data)
+print(f"\nCUSTOM DATA ({len(custom_data)}):\n", custom_data)
+print(f"\nUNITS ({len(units)}):\n", units, "\n")
+
+for name in storm_data.keys():
+
+    if name in units.keys():
+        units_str = units[name]
+    else:
+        units_str = "NA"
+
+    print(f"{name} ({units_str}) {storm_data[name]}")
+
+for name in sounding_data.keys():
+
+    if name in units.keys():
+        units_str = units[name]
+    elif name.split("_")[0] in units.keys():
+        units_str = units[name.split("_")[0]]
+    else:
+        units_str = "NA"
+
+    print(f"{name} ({units_str}) {sounding_data[name]}")
+
+for name in custom_data.keys():
+
+    if name in units.keys():
+        units_str = units[name]
+    elif name.split("_")[0] in units.keys():
+        units_str = units[name.split("_")[0]]
+    else:
+        units_str = "NA"
+
+    print(f"{name} ({units_str}) {custom_data[name]}")

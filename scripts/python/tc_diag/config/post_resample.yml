@@ -1,4 +1,3 @@
-land_lut_file: /Volumes/d1/projects/MET/MET_development/MET-feature_2550_compute_diagnostics/data/tc_data/v2023-04-07_gdland_table.dat
 in_forecast_time_name: lead_time
 in_levels_name: &in_levels_name pressure
 in_radii_name: range
@@ -24,6 +23,11 @@ wind_min_km: &wind_min_km 0
 wind_max_km: &wind_max_km 500
 therm_min_km: &therm_min_km 200
 therm_max_km: &therm_max_km 800
+tpw_min_km: &tpw_min_km 0
+tpw_max_km: &tpw_max_km 200
+sst_min_km: &sst_min_km 0
+sst_max_km: &sst_max_km 50
+radii_to_validate: [*wind_min_km, *wind_max_km, *therm_min_km, *therm_max_km, *tpw_min_km, *tpw_max_km, *sst_min_km, *sst_max_km]
 
 
 pressure_independent_computation_specs:
@@ -37,8 +41,8 @@ pressure_independent_computation_specs:
   p_surf: {callable: *area_avg_func, kwargs: {min_radius_km: *therm_min_km, max_radius_km: *therm_max_km, var_name: PRMSL_Z0}}
   u_surf: {callable: *area_avg_func, kwargs: {min_radius_km: *wind_min_km, max_radius_km: *wind_max_km, var_name: *u_surf_name}}
   v_surf: {callable: *area_avg_func, kwargs: {min_radius_km: *wind_min_km, max_radius_km: *wind_max_km, var_name: *v_surf_name}}
-  tpw: {callable: *area_avg_func, kwargs: {min_radius_km: 0, max_radius_km: 200, var_name: PWAT_L0}}
-  sst: {callable: *area_avg_func, kwargs: {min_radius_km: 0, max_radius_km: 50, var_name: TMP_Z0}}
+  tpw: {callable: *area_avg_func, kwargs: {min_radius_km: *tpw_min_km, max_radius_km: *tpw_max_km, var_name: PWAT_L0}}
+  sst: {callable: *area_avg_func, kwargs: {min_radius_km: *sst_min_km, max_radius_km: *sst_max_km, var_name: TMP_Z0}}
   ohc: {callable: tc_diag_driver.diag_vars.always_missing, units: kJ/cm2}
   land: {callable: tc_diag_driver.met_diag_vars.distance_to_land_lookup}
   storm_r_theta: {callable: tc_diag_driver.met_diag_vars.storm_r_theta, output_vars: [stm_spd, stm_hdg]}
