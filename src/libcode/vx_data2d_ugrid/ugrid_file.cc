@@ -217,6 +217,8 @@ bool UGridFile::open_metadata(const char * filepath)
 
   NcDim dim;
   string meta_name;
+  string time_dim_name;
+  string vert_dim_name;
   StringArray dim_names;
   StringArray meta_names;
 
@@ -245,16 +247,16 @@ bool UGridFile::open_metadata(const char * filepath)
   }
 
   // Time dimension
-  meta_name = find_metadata_name(DIM_KEYS[3], dim_names);
-  if (0 < meta_name.length()) {
-    dim = get_nc_dim(_ncMetaFile, meta_name.c_str());
+  time_dim_name = find_metadata_name(DIM_KEYS[3], dim_names);
+  if (0 < time_dim_name.length()) {
+    dim = get_nc_dim(_ncMetaFile, time_dim_name.c_str());
     _tDim = new NcDim(dim);
   }
 
   // Vertical dimension
-  meta_name = find_metadata_name(DIM_KEYS[4], dim_names);
-  if (0 < meta_name.length()) {
-    dim = get_nc_dim(_ncMetaFile, meta_name.c_str());
+  vert_dim_name = find_metadata_name(DIM_KEYS[4], dim_names);
+  if (0 < vert_dim_name.length()) {
+    dim = get_nc_dim(_ncMetaFile, vert_dim_name.c_str());
     _virtDim = new NcDim(dim);
   }
 
@@ -411,6 +413,33 @@ bool UGridFile::open_metadata(const char * filepath)
   // to set the slots.
   // Should be called after read_netcdf_grid() is called
 
+  StringArray dimNames;
+  for (int j=0; j<Nvars; ++j) {
+
+    int dim_count = Var[j].Ndims;
+    NcVar *v = Var[j].var;
+
+    dimNames.clear();
+    get_dim_names(v, &dimNames);
+
+    for (int k=0; k<dim_count; ++k)  {
+      NcDim *dim = Var[j].Dims[k];
+      const ConcatString dim_name = dimNames[k];
+      if ((dim && dim == _tDim) || dim_name == time_dim_name) {
+         Var[j].t_slot = k;
+      }
+      else if (dim_name == vert_dim_name) {
+         Var[j].z_slot = k;
+      }
+    }
+  }   //  for j
+
+  // Find the vertical level variable from dimension name if not found
+  if (IS_INVALID_NC_P(z_var) && (0 < vert_dim_name.length())) {
+    NcVarInfo *info = find_var_by_dim_name(vert_dim_name.c_str());
+    if (info) z_var = info->var;
+  }
+
   // Pull out the vertical levels
   if (IS_VALID_NC_P(z_var)) {
 
@@ -546,6 +575,32 @@ NcVarInfo* UGridFile::find_by_name(const char * var_name) const
 ////////////////////////////////////////////////////////////////////////
 
 
+NcVarInfo* UGridFile::find_var_by_dim_name(const char *dim_name) const
+{
+  NcVarInfo *var = find_by_name(dim_name);
+  if (!var) {
+    //StringArray dimNames;
+    for (int i=0; i<Nvars; i++) {
+      if (1 == Var[i].Ndims) {
+        //dimNames.clear();
+        //get_dim_names(Var[j].var, &dimNames);
+        //if (dimNames[i] == dim_name) {
+        NcDim dim = get_nc_dim(Var[i].var, 0);
+        if (GET_NC_NAME(dim) == dim_name) {
+          var = &Var[i];
+          break;
+        }
+      }
+    }
+  }
+
+  return var;
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 double UGridFile::getData(NcVar * var, const LongArray & a) const
 {
   clock_t start_clock = clock();
@@ -587,7 +642,24 @@ bool UGridFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
   static const string method_name_short
       = "UGridFile::getData(NcVar*, LongArray&, DataPlane&) ";
   static const string method_name
-      = "UGridFile::getData(NcVar *, const LongArray &, DataPlane &) const -> ";
+      = "UGridFile::getData(NcVar *, const LongArray &, DataPlane &) -> ";
+
+  if (!args_ok(a))
+  {
+    mlog << Error << "\n" << method_name
+         << "bad arguments:\n";
+    a.dump(cerr);
+    exit(1);
+  }
+
+  int dim_count = get_dim_count(v);
+  if (dim_count != a.n_elements())
+  {
+    mlog << Error << "\n" << method_name
+         << "needed " << (dim_count) << " arguments for variable "
+         << (GET_NC_NAME_P(v)) << ", got " << (a.n_elements()) << "\n\n";
+    exit(1);
+  }
 
   //  find varinfo's
 
@@ -621,8 +693,30 @@ bool UGridFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
   const int plane_size = nx * ny;
   double *d = new double[plane_size];
 
-  //get_nc_data(v, d, lengths, offsets);
-  get_nc_data(v, d);
+  size_t dim_size;
+  LongArray offsets;
+  LongArray lengths;
+  for (int k=0; k<dim_count; k++) {
+    if (a[k] == vx_data2d_star) {
+      offsets.add(0);
+      lengths.add(plane_size);
+    }
+    else {
+      offsets.add(a[k]);
+      lengths.add(1);
+    }
+    dim_size = v->getDim(k).getSize();
+    if (dim_size < offsets[k]) {
+      mlog << Error << "\n" << method_name
+           << "offset (" << offsets[k] << ") at " << k
+           << "th dimension (" << long(dim_size) << ") is too big for variable \""
+           << GET_NC_NAME_P(v) << "\"\n\n";
+      exit ( 1 );
+    }
+  }
+
+
+  get_nc_data(v, d, lengths, offsets);
 
   int offset = 0;
   for (int x = 0; x< nx; ++x) {
@@ -638,6 +732,11 @@ bool UGridFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
   delete [] d;
 
   //  done
+  ConcatString log_message;
+  for (int idx=0; idx<a.n_elements(); idx++) {
+    log_message << " " << (a[idx] == vx_data2d_star ? "*" : std::to_string(a[idx]));
+  }
+  mlog << Debug(9) << method_name << GET_NC_NAME_P(v) << ": levels: (" << log_message << " )\n";
   mlog << Debug(6) << method_name << "took "
        << (clock()-start_clock)/double(CLOCKS_PER_SEC) << " seconds\n";
 
@@ -763,10 +862,12 @@ int UGridFile::lead_time() const
 
 
 void UGridFile::read_config(ConcatString config_filename) {
-  const char *method_name = "UGridFile::read_config()";
+  const char *method_name = "UGridFile::read_config() ";
   MetConfig conf;
 
   // Read the default config file
+  mlog << Debug(6) << method_name
+       << "configuration from " << config_filename << " (" << replace_path(config_filename) << ")\n";
   conf.read(replace_path(config_filename).c_str());
 
   metadata_map = parse_conf_ugrid_metadata_map(&conf);
@@ -777,7 +878,7 @@ void UGridFile::read_config(ConcatString config_filename) {
   }
 
   mlog << Debug(6) << method_name
-       << " map size: " << metadata_map.size() << ", dims_vars_count = " << metadata_names.n() << "\n";
+       << "map size: " << metadata_map.size() << ", dims_vars_count = " << metadata_names.n() << "\n";
 
 }
 

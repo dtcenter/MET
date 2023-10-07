@@ -36,6 +36,7 @@ class MetUGridDataFile : public Met2dDataFile {
       long convert_time_to_offset(long time_value);
       long convert_value_to_offset(double z_value, std::string z_dim_name);
       LongArray collect_time_offsets(VarInfo &vinfo);
+      LongArray collect_vertical_offsets(VarInfo &vinfo);
 
       MetUGridDataFile(const MetUGridDataFile &);
       MetUGridDataFile & operator=(const MetUGridDataFile &);
@@ -46,6 +47,7 @@ class MetUGridDataFile : public Met2dDataFile {
       
       UGridFile * _file;    //  allocated
       long _cur_time_index; // current time index to get the data plane (for array of data_plane)
+      long _cur_vert_index; // current vertical index to get the data plane (for array of data_plane)
 
    protected:
 

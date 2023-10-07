@@ -104,7 +104,9 @@ class UGridFile {
 
       bool getData(const char *, const LongArray &, DataPlane &, NcVarInfo *&) const;
 
+      netCDF::NcDim *get_vert_dim() const;
       NcVarInfo* find_by_name(const char * var_name) const;
+      NcVarInfo* find_var_by_dim_name(const char *dim_name) const;
 
    private:
 
@@ -167,6 +169,9 @@ class UGridFile {
 
 ////////////////////////////////////////////////////////////////////////
 
+inline netCDF::NcDim *UGridFile::get_vert_dim() const { return _virtDim; }
+
+////////////////////////////////////////////////////////////////////////
 
 #endif   /*  __UGRID_FILE_H__  */
 

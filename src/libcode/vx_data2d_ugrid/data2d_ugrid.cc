@@ -34,6 +34,11 @@ static const int error_code_missing_time_offsets    = 4;
 static const int error_code_empty_times             = 5;
 static const int error_code_bad_increment           = 6;
 static const int error_code_bad_offset              = 7;
+static const int error_code_no_vert_dim             = 11;
+static const int error_code_missing_vert_value      = 12;
+static const int error_code_missing_vert_values     = 13;
+static const int error_code_missing_vert_offsets    = 14;
+static const int error_code_empty_verticals         = 15;
 static const int error_code_unknown                 = 999;
 
 ////////////////////////////////////////////////////////////////////////
@@ -79,6 +84,7 @@ void MetUGridDataFile::ugrid_init_from_scratch() {
 
    _file = (UGridFile *) nullptr;
    _cur_time_index = -1;
+   _cur_vert_index = -1;
 
    close();
 
@@ -174,13 +180,12 @@ bool MetUGridDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
   plane.clear();
 
   // Check for NA in the requested name
-  if ( vinfo_nc->req_name() == na_str )
-  {
-    // Store the name of the first data variable
-cout << "   FIXME MetUGridDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)  calling find_first_data_var()\n";
-//    data_var = find_first_data_var();
-//    if (nullptr != data_var) vinfo_nc->set_req_name(data_var->name.c_str());
-  }
+  //if ( vinfo_nc->req_name() == na_str )
+  //{
+  //  // Store the name of the first data variable
+  //  data_var = find_first_data_var();
+  //  if (nullptr != data_var) vinfo_nc->set_req_name(data_var->name.c_str());
+  //}
 
   int zdim_slot = bad_data_int;
   int time_dim_slot = bad_data_int;
@@ -192,6 +197,7 @@ cout << "   FIXME MetUGridDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
 
   data_var = _file->find_by_name(vinfo_nc->req_name().c_str());
   if (nullptr != data_var) {
+    zdim_slot = data_var->z_slot;
     time_dim_slot = data_var->t_slot;
     for (int idx=0; idx<is_offset.n(); idx++) {
       long dim_offset = dimension[idx];
@@ -231,36 +237,29 @@ cout << "   FIXME MetUGridDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
         }
         dimension[time_dim_slot] = time_offset;
       }
-      else {
-        long z_cnt = (long)_file->vlevels.n();
-        if (z_cnt > 0) {
-
-          zdim_slot = idx;
-          org_z_offset = dim_offset;
-          long z_offset = dim_offset;
-          string z_dim_name;
-          if (0 <= data_var->z_slot) {
-             NcDim z_dim = get_nc_dim(data_var->var, data_var->z_slot);
-             if (IS_VALID_NC(z_dim)) z_dim_name = GET_NC_NAME(z_dim);
-          }
-          if (!is_offset[idx]) {
-            // convert the value to index for slicing
-            z_offset = convert_value_to_offset(dim_value[idx], z_dim_name);
-          }
-          if ((z_offset >= 0) && (z_offset < z_cnt))
-            dimension[idx] = long(z_offset);
-          else {
-            if (is_offset[idx])
-               mlog << Error << "\n" << method_name << "the requested vertical offset "
-                    << dim_offset << " for \"" << vinfo.req_name() << "\" variable "
-                    << "is out of range (between 0 and " << (z_cnt-1) << ").\n\n";
-            else
-               mlog << Error << "\n" << method_name << "the requested vertical value "
-                    << dim_value[idx] << " for \"" << vinfo.req_name() << "\" variable "
-                    << "does not exist (data size = " << z_cnt << ").\n\n";
-            return false;
-          }
+      else if (idx == zdim_slot) {
+        long z_cnt = (long)get_dim_size(_file->get_vert_dim());
+        org_z_offset = dim_offset;
+        long z_offset = dim_offset;
+        //if (!is_offset[idx]) {
+        //  // convert the value to index for slicing
+        //  z_offset = convert_value_to_offset(dim_value[idx], z_dim_name);
+        //}
+        if (z_offset == range_flag) z_offset = _cur_vert_index;   // from data_plane_array()
+        if ((z_offset >= 0) && (z_offset < z_cnt)) {
+          dimension[idx] = long(z_offset);
         }
+        //else {
+        //  if (is_offset[idx])
+        //     mlog << Error << "\n" << method_name << "the requested vertical offset "
+        //          << dim_offset << " for \"" << vinfo.req_name() << "\" variable "
+        //          << "is out of range (between 0 and " << (z_cnt-1) << ").\n\n";
+        //  else
+        //     mlog << Error << "\n" << method_name << "the requested vertical value "
+        //          << dim_value[idx] << " for \"" << vinfo.req_name() << "\" variable "
+        //          << "does not exist (data size = " << z_cnt << ").\n\n";
+        //  return false;
+        //}
       }
     }
   }
@@ -348,33 +347,64 @@ int MetUGridDataFile::data_plane_array(VarInfo &vinfo,
    // Initialize
    plane_array.clear();
 
-   LongArray time_offsets = collect_time_offsets(vinfo);
-   if (0 < time_offsets.n_elements()) {
-      LevelInfo level = vinfo.level();
-      long time_lower = bad_data_int;
-      long time_upper = bad_data_int;
-      if (level.type() == LevelType_Time) {
-        time_lower = level.lower();
-        time_upper = level.upper();
-      }
+   long lvl_lower = bad_data_int;
+   long lvl_upper = bad_data_int;
+   LevelInfo level = vinfo.level();
+   const int debug_level = 7;
+   if (level.type() == LevelType_Time) {
 
-      for (int idx=0; idx<time_offsets.n_elements(); idx++) {
-         _cur_time_index = time_offsets[idx];
-         if (data_plane(vinfo, plane)) {
-            plane_array.add(plane, time_lower, time_upper);
-            n_rec++;
+      LongArray time_offsets = collect_time_offsets(vinfo);
+      if (0 < time_offsets.n_elements()) {
+         lvl_lower = level.lower();
+         lvl_upper = level.upper();
+
+         for (int idx=0; idx<time_offsets.n_elements(); idx++) {
+            _cur_time_index = time_offsets[idx];
+            if (data_plane(vinfo, plane)) {
+               plane_array.add(plane, lvl_lower, lvl_upper);
+               n_rec++;
+            }
          }
-      }
 
-      int debug_level = 7;
-      if (mlog.verbosity_level() >= debug_level) {
-         for (int idx=0; idx< time_offsets.n_elements(); idx++ ) {
-            mlog << Debug(debug_level) << method_name << "time: "
-                 << unix_to_yyyymmdd_hhmmss(_file->ValidTime[time_offsets[idx]])
-                 << " from index " << time_offsets[idx] << "\n";
+         if (mlog.verbosity_level() >= debug_level) {
+            for (int idx=0; idx< time_offsets.n_elements(); idx++ ) {
+               mlog << Debug(debug_level) << method_name << "time: "
+                    << unix_to_yyyymmdd_hhmmss(_file->ValidTime[time_offsets[idx]])
+                    << " from index " << time_offsets[idx] << "\n";
+            }
          }
       }
    }
+   else if (level.type() == LevelType_Pres) {
+      LongArray vertical_offsets = collect_vertical_offsets(vinfo);
+      if (0 < vertical_offsets.n_elements()) {
+         lvl_lower = level.lower();
+         lvl_upper = level.upper();
+
+         for (int idx=0; idx<vertical_offsets.n_elements(); idx++) {
+            _cur_vert_index = vertical_offsets[idx];
+            if (data_plane(vinfo, plane)) {
+               plane_array.add(plane, lvl_lower, lvl_upper);
+               n_rec++;
+            }
+         }
+
+         //if (mlog.verbosity_level() >= debug_level) {
+         //   for (int idx=0; idx< vertical_offsets.n_elements(); idx++ ) {
+         //      mlog << Debug(debug_level) << method_name << "vertical: "
+         //           << _file->vlevels[vertical_offsets[idx]]
+         //           << " from index " << vertical_offsets[idx] << "\n";
+         //   }
+         //}
+      }
+   }
+   else {   // if (level.type() == LevelType_None) {
+      if (data_plane(vinfo, plane)) {
+         plane_array.add(plane, lvl_lower, lvl_upper);
+         n_rec++;
+      }
+   }
+
 
    return(n_rec);
 }
@@ -428,7 +458,7 @@ LongArray MetUGridDataFile::collect_time_offsets(VarInfo &vinfo) {
    }
    else if (is_time_range) {
       double time_inc = level.increment();
-      
+
       time_lower = level.lower();
       time_upper = level.upper();
       if (time_as_value) {
@@ -447,7 +477,7 @@ LongArray MetUGridDataFile::collect_time_offsets(VarInfo &vinfo) {
             }
             break;
          }
-         
+
          if (0 > next_offset) error_code = error_code_missing_time_values;
          else if (0 > time_inc) error_code = error_code_bad_increment;
          else if (0 == time_inc) {   // no increment configuration
@@ -584,6 +614,218 @@ LongArray MetUGridDataFile::collect_time_offsets(VarInfo &vinfo) {
    }
 
    return(time_offsets);
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+LongArray MetUGridDataFile::collect_vertical_offsets(VarInfo &vinfo) {
+   int n_rec = 0;
+   bool status = false;
+   VarInfoUGrid *vinfo_nc = (VarInfoUGrid *)&vinfo;
+   static const string method_name
+         = "MetUGridDataFile::collect_vertical_offsets(VarInfo &) -> ";
+
+   LongArray vertical_offsets;
+   NcVarInfo *info = _file->find_by_name(vinfo_nc->req_name().c_str());
+
+   // Check for variable not found
+   if(!info) {
+      mlog << Warning << "\n" << method_name
+           << "can't find NetCDF variable \"" << vinfo_nc->req_name()
+           << "\" in file \"" << Filename << "\".\n\n";
+      return(vertical_offsets);
+   }
+
+   int z_dim_slot = info->z_slot;
+   int z_dim_size = get_dim_size(_file->get_vert_dim());
+   if (0 < z_dim_size && z_dim_slot < 0) {
+      // The vertical dimension does not exist at the variable and the vertical
+      // variable exists. Stop vertical slicing and set the vertical offset to 0.
+      vertical_offsets.add(0);
+      return(vertical_offsets);
+   }
+
+   double z_lower = bad_data_double;
+   double z_upper = bad_data_double;
+   int error_code = error_code_no_error;
+   LevelInfo level = vinfo.level();
+   LongArray dimension = vinfo_nc->dimension();
+   bool is_vert_range = (level.type() == LevelType_Pres);
+   bool z_as_value = !level.is_offset();
+
+   long dim_offset = (z_dim_slot >= 0) ? dimension[z_dim_slot] : -1;
+   bool include_all_verticals = (dim_offset == vx_data2d_star);
+
+   z_as_value = false;  // this is not supported yet.
+   if (include_all_verticals) {
+      for (int idx=0; idx<z_dim_size; idx++) {
+         vertical_offsets.add(idx);
+      }
+   }
+   else if (is_vert_range) {
+      int idx;
+      LongArray missing_verticals;
+
+      double z_inc = level.increment();
+
+      z_lower = level.lower();
+      z_upper = level.upper();
+      if (z_as_value) {
+         int next_offset = -1;
+         // Skip vertical lower than vertical_lower
+         for (idx=0; idx<z_dim_size; idx++) {
+            if (_file->vlevels[idx] < z_lower) continue;
+            next_offset = idx;
+            if (_file->vlevels[idx] != z_lower)
+               missing_verticals.add(z_lower);
+            else {
+               mlog << Debug(9) << method_name << " found the lower vertical "
+                    << z_lower << "\n";
+               vertical_offsets.add(idx);
+               next_offset++;
+            }
+            break;
+         }
+
+         if (0 > next_offset) error_code = error_code_missing_vert_values;
+         else if (0 > z_inc) error_code = error_code_bad_increment;
+         else if (0 == z_inc) {   // no increment configuration
+            for (idx=next_offset; idx<z_dim_size; idx++) {
+               if (_file->vlevels[idx] > z_upper) break;
+               vertical_offsets.add(idx);
+               mlog << Debug(9) << method_name << " found the vertical "
+                    << _file->vlevels[idx] << "\n";
+            }
+         }
+         else {
+            long next_z;
+            next_z = z_lower + z_inc;
+            for (idx=next_offset; idx<z_dim_size; idx++) {
+               if (_file->vlevels[idx] > z_upper) break;
+               else if (_file->vlevels[idx] < next_z) continue;
+               else if (_file->vlevels[idx] == next_z) {
+                  vertical_offsets.add(idx);
+                  mlog << Debug(9) << method_name << " found the vertical "
+                       << _file->vlevels[idx] << "\n";
+                  next_z += z_inc;
+               }
+               else { // next_z < _file->vlevels[idx]
+                  while (next_z < _file->vlevels[idx]) {
+                     missing_verticals.add(next_z);
+                     next_z += z_inc;
+                  }
+                  if (_file->vlevels[idx] == next_z) {
+                     vertical_offsets.add(idx);
+                     mlog << Debug(9) << method_name << " found the vertical "
+                          << _file->vlevels[idx] << "\n";
+                     next_z += z_inc;
+                  }
+               }
+               if (next_z > z_upper) break;
+            }
+         }
+      }
+      else if (z_lower < z_dim_size) {
+         int inc_offset = (z_inc <= 0) ? 1 : z_inc;
+         int max_vert_offset = z_upper;
+         if (max_vert_offset == z_dim_size)
+            missing_verticals.add(z_dim_size);
+         else if (max_vert_offset > z_dim_size) {
+            for (idx=z_dim_size; idx<=z_upper; idx++)
+               missing_verticals.add(idx);
+            max_vert_offset = z_dim_size - 1;
+         }
+         for (idx=z_lower; idx<=max_vert_offset; idx+=inc_offset) {
+            vertical_offsets.add(idx);
+            mlog << Debug(9) << method_name << " added index " << idx << "\n";
+         }
+      }
+
+      int missing_count = missing_verticals.n_elements();
+      if (0 < missing_count) {
+         for (idx = 0; idx<missing_count; idx++) {
+            mlog << Warning << method_name << "Not exist vertical \""
+                 << missing_verticals[idx] << "\".\n";
+         }
+      }
+   }
+   else {
+      //if (z_as_value) dim_offset = convert_vert_to_offset(dim_offset);
+      if (0 <= z_dim_slot && dim_offset < z_dim_size)
+         vertical_offsets.add(dim_offset);
+      else error_code = error_code_unknown;
+   }
+
+   /*
+   int z_count = vertical_offsets.n_elements();
+   if (0 < z_count)
+      mlog << Debug(7) << method_name << " Found " << z_count
+           << (z_count==1 ? " vertical" : " verticals") << " between "
+           << _file->vlevels[0] << " and "
+           << _file->vlevels[z_dim_size-1] << "\n";
+   else {
+      mlog << Warning << method_name << "Not found vertical out of "
+           << z_dim_size << ".\n";
+      if (include_all_verticals) error_code = error_code_empty_verticals;
+      else if (is_vert_range) {
+         error_code = z_as_value ? error_code_missing_vert_values
+                                 : error_code_missing_vert_offsets;
+      }
+   }
+   */
+
+   // Handling error code
+   if (error_code > error_code_no_error) {
+      ConcatString log_msg;
+      log_msg << "variable \"" << vinfo_nc->req_name() << "\" ";
+      if (error_code == error_code_no_vert_dim) {
+         log_msg << "does not support the range of verticals because the vertical dimension is "
+                 << z_dim_size;
+      }
+      else if (error_code == error_code_missing_vert_values) {
+         log_msg << "does not have the matching vertical ranges between "
+                 << z_lower << " and " << z_upper;
+         if (0 < z_dim_size) {
+            log_msg << " from ["
+                    << std::to_string(_file->vlevels.min()) << " and "
+                    << std::to_string(_file->vlevels.max()) << "]";
+         }
+      }
+      else if (error_code == error_code_missing_vert_offsets) {
+         log_msg << "does not have the matching vertical offsets between "
+                 << nint(z_lower) << " and " << nint(z_upper);
+         if (0 < z_dim_size) {
+            log_msg << " [0 <= offset < " << z_dim_size << "]";
+         }
+      }
+      else if (error_code == error_code_empty_verticals) {
+         log_msg << "does not have the vertical values";
+      }
+      else if (error_code == error_code_bad_increment) {
+         log_msg << "was configured with bad increment";
+      }
+      else if (error_code == error_code_bad_offset) {
+         log_msg << "was configured with the bad vertical offset"
+                 << " (0 <= offset < " << z_dim_size << ")";
+      }
+      else if (error_code == error_code_missing_vert_value) {
+         long z_value = (z_as_value ? dim_offset : -1);
+         log_msg << "does not have the matching vertical "
+                 << std::to_string(z_value) << " ["
+                 << std::to_string(_file->vlevels.min()) << " and "
+                 << std::to_string(_file->vlevels.max()) << "]";
+      }
+      else {
+         log_msg.clear();
+         log_msg << "variable \"" << vinfo_nc->req_name()
+                 << "\" has unknown error (" << std::to_string(error_code) << ")";
+      }
+      mlog << Error << "\n" << method_name << log_msg << ".\n\n";
+      exit(1);
+   }
+
+   return(vertical_offsets);
 }
 
 
