@@ -155,7 +155,7 @@ if [[ -z "$LIB_Z" ]]; then
   LIB_Z=${LIB_DIR}/lib
 fi
 
-# if SQLITE_DIR is not set in the environment file, set it the
+# if SQLITE_DIR is not set in the environment file, set it to the
 # ${LIB_DIR} so it can be used to install the PROJ library
 if [[ -z "$SQLITE_DIR" ]]; then
     SQLITE_DIR=${LIB_DIR}
