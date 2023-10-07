@@ -33,32 +33,32 @@ print("Python Script:\t" + repr(sys.argv[0]))
    ##
 
 if len(sys.argv) != 4:
-    print("ERROR: compute_tc_diag.py -> Must specify a NetCDF input file, configuration file, and distance to land file.")
+    print("ERROR: compute_tc_diag.py -> Must specify a configuration file, distance to land file, and NetCDF cylindrical coordinates file.")
     sys.exit(1)
 
-# Input NetCDF file
-data_filename = os.path.expandvars(sys.argv[1])
-
-try:
-   print("Data File:\t" + repr(data_filename))
-except NameError:
-   print("Can't find the input data file")
-   sys.exit(1)
-
 # Configuration file
-config_filename = os.path.expandvars(sys.argv[2])
+config_filename = os.path.expandvars(sys.argv[1])
 try:
-   print("Configuration File:\t" + repr(config_filename))
+   print("Config File:\t" + repr(config_filename))
 except NameError:
    print("Can't find the configuration file")
    sys.exit(1)
 
 # Distance to land file
-land_filename = os.path.expandvars(sys.argv[3])
+land_filename = os.path.expandvars(sys.argv[2])
 try:
    print("Land File:\t" + repr(land_filename))
 except NameError:
    print("Can't find the distance to land file")
+   sys.exit(1)
+
+# Input NetCDF file
+data_filename = os.path.expandvars(sys.argv[3])
+
+try:
+   print("Data File:\t" + repr(data_filename))
+except NameError:
+   print("Can't find the input data file")
    sys.exit(1)
 
 # Read config file and return a DriverConfig object

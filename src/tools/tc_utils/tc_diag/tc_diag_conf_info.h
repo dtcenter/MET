@@ -55,7 +55,7 @@ class DomainInfo {
       StringArray data_files;
 
       // Domain name
-      string domain;
+      std::string domain;
 
       // TcrmwData struct for creating a TcrmwGrid object
       TcrmwData data;

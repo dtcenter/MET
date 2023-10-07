@@ -1091,8 +1091,7 @@ void process_fields(const TrackInfoArray &tracks,
       for(j=0; j<di.diag_script.n(); j++) {
 
          python_tc_diag(di.diag_script[j].c_str(),
-            tmp_file_map[tmp_key_sa[i]].tmp_file,
-            tmp_file_map[tmp_key_sa[i]].diag_map);
+            tmp_file_map[tmp_key_sa[i]]);
 
       } // end for j
    } // end for i
@@ -1146,7 +1145,7 @@ void process_out_files(const TrackInfoArray& tracks) {
             domain_tmp_file_list.push_back(&tmp_file_map[tmp_key]);
 
             // Store the diagnostics for each track point
-            out_file_map[out_key].add_diag_map(tmp_file_map[tmp_key].diag_map, i_pnt);
+            out_file_map[out_key].add_tmp_file_info(tmp_file_map[tmp_key], i_pnt);
 
          } // end for i_pnt
 
@@ -1366,8 +1365,12 @@ void OutFileInfo::clear() {
 
    trk_ptr = (TrackInfo *) 0;
 
-   // Clear the diagnostics map
-   diag_map.clear();
+   // Clear the diagnostics maps
+   diag_storm_map.clear();
+   diag_sounding_map.clear();
+   diag_custom_map.clear();
+   diag_units_map.clear();
+   pressure_levels.clear();
 
    // Write NetCDF diagnostics file
    if(nc_diag_out) {
@@ -1440,38 +1443,78 @@ NcFile *OutFileInfo::setup_nc_file(const string &out_file) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void OutFileInfo::add_diag_map(const map<string,double> &tmp_diag_map,
-                               int i_pnt) {
+void OutFileInfo::add_tmp_file_info(const TmpFileInfo &tmp_info, int i_pnt) {
 
    // Track pointer must be set
    if(!trk_ptr) {
-      mlog << Error << "\nOutFileInfo::add_diag_map() -> "
+      mlog << Error << "\nOutFileInfo::add_tmp_file_info() -> "
            << "track pointer not set!\n\n";
       exit(1);
    }
 
    // Check the range
    if(i_pnt < 0 || i_pnt >= trk_ptr->n_points()) {
-      mlog << Error << "\nOutFileInfo::add_diag_map() -> "
+      mlog << Error << "\nOutFileInfo::add_tmp_file_info() -> "
            << "track point index (" << i_pnt
            << ") range check error!\n\n";
       exit(1);
    }
 
-   // Loop over the input diagnostics map
-   map<string,double>::const_iterator it;
-   for(it = tmp_diag_map.begin(); it != tmp_diag_map.end(); it++) {
+   // Append the diagnostics data
+   add_diag_data(tmp_info.diag_storm_map, diag_storm_map, i_pnt);
+   add_diag_data(tmp_info.diag_sounding_map, diag_sounding_map, i_pnt);
+   add_diag_data(tmp_info.diag_custom_map, diag_custom_map, i_pnt);
 
-      // Add new diagnostics array entry, if needed
-      if(diag_map.count(it->first) == 0) {
+   // Update the units
+   add_diag_units(tmp_info.diag_units_map);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void OutFileInfo::add_diag_data(const map<string,double> &m_src,
+                                map<string,NumArray> &m_dst,
+                                int i_pnt) {
+
+   // Loop over the source map
+   map<string,double>::const_iterator it;
+   for(it = m_src.begin(); it != m_src.end(); it++) {
+
+      // Add new destination map entry, if needed
+      if(m_dst.count(it->first) == 0) {
          NumArray empty_na;
          empty_na.set_const(bad_data_double,
                             trk_ptr->n_points());
-         diag_map[it->first] = empty_na;
+         m_dst[it->first] = empty_na;
       }
 
       // Store the diagnostic value for the track point
-      diag_map[it->first].set(i_pnt, it->second);
+      m_dst[it->first].set(i_pnt, it->second);
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void OutFileInfo::add_diag_units(const map<string,string> &m_src) {
+
+   // Loop over the source map
+   map<string,string>::const_iterator it;
+   for(it = m_src.begin(); it != m_src.end(); it++) {
+
+      // Add new units strings
+      if(diag_units_map.count(it->first) == 0) {
+         diag_units_map[it->first] = it->second;
+      }
+      else if(diag_units_map[it->first] != it->second) {
+         mlog << Warning << "\nOutFileInfo::add_diag_units() -> "
+              << "Units for diagnostic \"" << it->first
+              << "\" have changed from \"" << diag_units_map[it->first]
+              << "\" to \"" << it->second << ".\n\n";
+         diag_units_map[it->first] = it->second;
+      }
    }
 
    return;
@@ -1493,11 +1536,14 @@ void OutFileInfo::write_nc_diag() {
 
    // Write the diagnostics for each lead time
    map<string,NumArray>::iterator it;
-   for(it = diag_map.begin(); it != diag_map.end(); it++) {
+   for(it  = diag_storm_map.begin();
+       it != diag_storm_map.end(); it++) {
       NcVar diag_var = nc_diag_out->addVar(it->first, ncDouble, dims);
       add_att(&diag_var, fill_value_att_name, bad_data_double);
       diag_var.putVar(offsets, counts, it->second.buf());
    }
+
+   // JHG, need to include handling of sounding diags, units, and pressure levels
 
    return;
 }
@@ -1578,7 +1624,12 @@ void TmpFileInfo::clear() {
    trk_ptr = (TrackInfo *) 0;
    pnt_ptr = (TrackPoint *) 0;
 
-   diag_map.clear();
+   // Clear the diagnostics maps
+   diag_storm_map.clear();
+   diag_sounding_map.clear();
+   diag_custom_map.clear();
+   diag_units_map.clear();
+   pressure_levels.clear();
 
    grid_out.clear();
    ra_grid.clear();

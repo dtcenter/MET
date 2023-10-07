@@ -87,54 +87,6 @@ static ConcatString out_prefix;
 
 ////////////////////////////////////////////////////////////////////////
 //
-// Variables for Output Files
-//
-////////////////////////////////////////////////////////////////////////
-
-static unixtime init_ut = (unixtime) 0;
-
-class OutFileInfo {
-
-   private:
-
-      void init_from_scratch();
-
-   public:
-
-      OutFileInfo();
-      ~OutFileInfo();
-
-      //////////////////////////////////////////////////////////////////
-
-      // Track information
-      const TrackInfo *trk_ptr; // not allocated
-
-      // Mapping of diagnostic names to values for each track point
-      std::map<std::string,NumArray> diag_map;
-
-      // NetCDF Diagnostics output
-      ConcatString    nc_diag_file;
-      netCDF::NcFile *nc_diag_out;
-
-      // NetCDF Dimensions
-      netCDF::NcDim vld_dim;
-
-      // CIRA Diagnostics output
-      ConcatString   cira_diag_file;
-      std::ofstream *cira_diag_out;
-      AsciiTable     cira_diag_at;
-
-      void clear();
-
-      netCDF::NcFile *setup_nc_file(const string &);
-      void add_diag_map(const std::map<std::string,double> &, int);
-      void write_nc_diag();
-};
-
-static std::map<std::string,OutFileInfo> out_file_map;
-
-////////////////////////////////////////////////////////////////////////
-//
 // Variables for Temp Files
 //
 ////////////////////////////////////////////////////////////////////////
@@ -156,15 +108,20 @@ class TmpFileInfo {
       const TrackInfo  *trk_ptr; // not allocated
       const TrackPoint *pnt_ptr; // not allocated
 
-      // Mapping of diagnostic names to values
-      std::map<std::string,double> diag_map;
+      // Mappings of diagnostic names to values
+      std::map<std::string,double> diag_storm_map;
+      std::map<std::string,double> diag_sounding_map;
+      std::map<std::string,double> diag_custom_map;
+
+      // Mapping of diagnostics names to units
+      std::map<std::string,std::string> diag_units_map;
+
+      // Set of unique pressure levels
+      std::set<double> pressure_levels;
 
       // Range azimuth grid
       Grid      grid_out;
       TcrmwGrid ra_grid;
-
-      // Pressure levels
-      std::set<double> pressure_levels;
 
       // Domain name
       std::string domain;
@@ -195,6 +152,66 @@ class TmpFileInfo {
 };
 
 static std::map<std::string,TmpFileInfo> tmp_file_map;
+
+////////////////////////////////////////////////////////////////////////
+//
+// Variables for Output Files
+//
+////////////////////////////////////////////////////////////////////////
+
+static unixtime init_ut = (unixtime) 0;
+
+class OutFileInfo {
+
+   private:
+
+      void init_from_scratch();
+      void add_diag_data(const std::map<std::string,double> &,
+                         std::map<std::string,NumArray> &, int);
+      void add_diag_units(const std::map<std::string,std::string> &);
+
+   public:
+
+      OutFileInfo();
+      ~OutFileInfo();
+
+      //////////////////////////////////////////////////////////////////
+
+      // Track information
+      const TrackInfo *trk_ptr; // not allocated
+
+      // Mappings of diagnostic names to values
+      // for each track point
+      std::map<std::string,NumArray> diag_storm_map;
+      std::map<std::string,NumArray> diag_sounding_map;
+      std::map<std::string,NumArray> diag_custom_map;
+
+      // Mapping of diagnostics names to units
+      std::map<std::string,std::string> diag_units_map;
+
+      // Set of unique pressure level values
+      std::set<double> pressure_levels;
+
+      // NetCDF Diagnostics output
+      ConcatString    nc_diag_file;
+      netCDF::NcFile *nc_diag_out;
+
+      // NetCDF Dimensions
+      netCDF::NcDim vld_dim;
+
+      // CIRA Diagnostics output
+      ConcatString   cira_diag_file;
+      std::ofstream *cira_diag_out;
+      AsciiTable     cira_diag_at;
+
+      void clear();
+
+      netCDF::NcFile *setup_nc_file(const std::string &);
+      void add_tmp_file_info(const TmpFileInfo &, int);
+      void write_nc_diag();
+};
+
+static std::map<std::string,OutFileInfo> out_file_map;
 
 ////////////////////////////////////////////////////////////////////////
 
