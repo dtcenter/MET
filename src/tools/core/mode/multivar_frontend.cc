@@ -10,7 +10,8 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-static const char mode_default_config [] = "MET_BASE/config/MODEConfig_default";
+// for multivar mode, this is the default file
+static const char mode_default_config [] = "MET_BASE/config/MODEMultivarConfig_default";
 
 static const int dir_creation_mode = 0755;       
 
