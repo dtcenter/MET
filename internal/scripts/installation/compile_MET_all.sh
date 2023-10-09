@@ -51,7 +51,7 @@
 # in the input environment configuration file (install_met_env.<machine_name>:
 # MET_GRIB2CLIB, MET_GRIB2CINC, GRIB2CLIB_NAME, MET_BUFRLIB, BUFRLIB_NAME, 
 # MET_HDF5, MET_NETCDF, MET_PROJ, MET_GSL, LIB_JASPER, LIB_PNG, LIB_Z,
-# and SQLITE_DIR.
+# SQLITE_INCLUDE_DIR, SQLITE_LIB_DIR.
 #
 # The optional libraries HDF4, HDFEOS, FREETYPE, and CAIRO are
 # used for the following, not widely used tools, MODIS-Regrid,
@@ -157,8 +157,10 @@ fi
 
 # if SQLITE_DIR is not set in the environment file, set it to the
 # ${LIB_DIR} so it can be used to install the PROJ library
-if [[ -z "$SQLITE_DIR" ]]; then
-    SQLITE_DIR=${LIB_DIR}
+if [[ -z ${SQLITE_INCLUDE_DIR} ]] && [[ -z ${SQLITE_LIB_DIR} ]];
+   COMPILE_SQLITE=1
+else
+   COMPILE_SQLITE=0       
 fi
 
 # Constants
@@ -400,7 +402,7 @@ fi
 # Compile Proj
 if [ $COMPILE_PROJ -eq 1 ]; then
 
-  if [[ -z "$SQLITE_DIR" ]]; then
+  if [ $COMPILE_SQLITE -eq 1 ]; then
     echo
     echo "Compiling SQLITE at `date`"
     mkdir -p ${LIB_DIR}/sqlite
@@ -411,6 +413,8 @@ if [ $COMPILE_PROJ -eq 1 ]; then
     run_cmd "./configure --enable-shared --prefix=${LIB_DIR} > sqlite.configure.log 2>&1"
     run_cmd "make ${MAKE_ARGS} > sqlite.make.log 2>&1"
     run_cmd "make ${MAKE_ARGS} install > sqlite.make_install.log 2>&1"
+    export SQLITE_INCLUDE_DIR=${LIB_DIR}/include
+    export SQLITE_LIB_DIR=${LIB_DIR/lib}
   fi
 
   vrs="9.2.1";
@@ -424,7 +428,7 @@ if [ $COMPILE_PROJ -eq 1 ]; then
   echo "cd `pwd`"
   export PATH=${LIB_DIR}/bin:${PATH}
   run_cmd "mkdir build; cd build"
-  run_cmd "cmake -DCMAKE_INSTALL_PREFIX=${LIB_DIR} -DSQLITE3_INCLUDE_DIR=${SQLITE_DIR}/include -DSQLITE3_LIBRARY=${SQLITE_DIR}/lib/libsqlite3.so .."
+  run_cmd "cmake -DCMAKE_INSTALL_PREFIX=${LIB_DIR} -DSQLITE3_INCLUDE_DIR=${SQLITE_INCLUDE_DIR} -DSQLITE3_LIBRARY=${SQLITE_LIB_DIR}/libsqlite3.so .."
   run_cmd "cmake --build ."
   run_cmd "cmake --build . --target install"
 
