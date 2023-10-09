@@ -414,7 +414,7 @@ if [ $COMPILE_PROJ -eq 1 ]; then
     run_cmd "make ${MAKE_ARGS} > sqlite.make.log 2>&1"
     run_cmd "make ${MAKE_ARGS} install > sqlite.make_install.log 2>&1"
     export SQLITE_INCLUDE_DIR=${LIB_DIR}/include
-    export SQLITE_LIB_DIR=${LIB_DIR/lib}
+    export SQLITE_LIB_DIR=${LIB_DIR}/lib
   fi
 
   vrs="9.2.1";
