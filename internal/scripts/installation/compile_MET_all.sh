@@ -157,7 +157,7 @@ fi
 
 # if SQLITE_DIR is not set in the environment file, set it to the
 # ${LIB_DIR} so it can be used to install the PROJ library
-if [[ -z ${SQLITE_INCLUDE_DIR} ]] && [[ -z ${SQLITE_LIB_DIR} ]];
+if [[ -z ${SQLITE_INCLUDE_DIR} ]] && [[ -z ${SQLITE_LIB_DIR} ]]; then
    COMPILE_SQLITE=1
 else
    COMPILE_SQLITE=0       
