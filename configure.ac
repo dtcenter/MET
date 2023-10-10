@@ -53,9 +53,9 @@ fi
 
 # Configure the variables. The help text will appear if the user uses "configure --help".
 
-AC_ARG_VAR([MET_ATLAS], [Where atlas lib and include subdirectories are located. If they are installed in /usr/local, you don't have to specify them.])
-AC_ARG_VAR([MET_ATLASINC], [Where atlas include files are located. Use if the libraries and include files are not under the same main atlas directory. If used, MET_ATLASLIB must also be defined and MET_ATLAS will be ignored.])
-AC_ARG_VAR([MET_ATLASLIB], [Where atlas libraries are located. Use if the libraries and include files are not under the same main atlas directory. If used, MET_ATLASINC must also be defined and MET_ATLAS will be ignored.])
+AC_ARG_VAR([MET_ATLAS], [Where Atlas lib and include subdirectories are located. If they are installed in /usr/local, you don't have to specify them.])
+AC_ARG_VAR([MET_ATLASINC], [Where Atlas include files are located. Use if the libraries and include files are not under the same main Atlas directory. If used, MET_ATLASLIB must also be defined and MET_ATLAS will be ignored.])
+AC_ARG_VAR([MET_ATLASLIB], [Where Atlas libraries are located. Use if the libraries and include files are not under the same main Atlas directory. If used, MET_ATLASINC must also be defined and MET_ATLAS will be ignored.])
 
 # Ensure that both or neither are specified.
 
@@ -73,11 +73,6 @@ if (test -n "$MET_ATLAS" && test -z "$MET_ATLASLIB"); then
 fi
 
 # AC_SUBST command line variables.
-
-if (test -n "$MET_ATLASLIB"); then
-  CPPFLAGS="${CPPFLAGS} -I${MET_ATLASINC}"
-  LDFLAGS="${LDFLAGS} -L${MET_ATLASLIB}"
-fi
 
 #
 # Look for the Eckit library.
@@ -105,11 +100,6 @@ if (test -n "$MET_ECKIT" && test -z "$MET_ECKITLIB"); then
 fi
 
 # AC_SUBST command line variables.
-
-if (test -n "$MET_ECKITLIB"); then
-  CPPFLAGS="${CPPFLAGS} -I${MET_ECKITINC}"
-  LDFLAGS="${LDFLAGS} -L${MET_ECKITLIB}"
-fi
 
 #
 # Look for the NetCDF library.
@@ -1097,6 +1087,31 @@ else
   PYTHON_LIBS=
 fi
 AC_SUBST([PYTHON_LIBS])
+
+# Unstructure grid with ECMF libraries (Atlas/ecKit)
+
+AC_ARG_ENABLE(ugrid,
+	  [AS_HELP_STRING([--enable-ugrid], [Enable unstructured grid with Atlas and eckit libraries])],
+  [case "${enableval}" in
+     yes | no ) ENABLE_UGRID="${enableval}" ;;
+     *) AC_MSG_ERROR(bad value ${enableval} for --enable-ugrid) ;;
+   esac],
+  [ENABLE_UGRID="no"]
+)
+
+AM_CONDITIONAL([ENABLE_UGRID], [test "x$ENABLE_UGRID" = "xyes"])
+
+if test "x$ENABLE_UGRID" = "xyes"; then
+  AC_DEFINE([ENABLE_UGRID], [], ["build unstructured grid with Atlas and eckit libraries"])
+  AC_MSG_NOTICE([unstructured grid will be compiled])
+  CPPFLAGS="${CPPFLAGS} -I${MET_ATLASINC} -I${MET_ECKITINC} -DWITH_UGRID"
+  LDFLAGS="${LDFLAGS} -L${MET_ATLASLIB} -L${MET_ECKITLIB} -Wl,-rpath,${MET_ATLASLIB}:${MET_ECKITLIB}"
+  UGRID_LIBS="-lvx_data2d_ugrid -latlas -leckit -leckit_mpi -leckit_geometry"
+else
+  AC_MSG_NOTICE([unstructured grid will not be compiled])
+  UGRID_LIBS=
+fi
+AC_SUBST([UGRID_LIBS])
 
 ########################################################################
 

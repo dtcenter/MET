@@ -656,6 +656,9 @@ YACC
 FC_LIBS
 ENABLE_DEVELOPMENT_FALSE
 ENABLE_DEVELOPMENT_TRUE
+UGRID_LIBS
+ENABLE_UGRID_FALSE
+ENABLE_UGRID_TRUE
 PYTHON_LIBS
 ENABLE_PYTHON_FALSE
 ENABLE_PYTHON_TRUE
@@ -888,6 +891,7 @@ enable_tc_utils
 enable_gsi_tools
 enable_grib2
 enable_python
+enable_ugrid
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1620,6 +1624,8 @@ Optional Features:
   --disable-gsi_tools     Disable compilation of gsi_tools
   --enable-grib2          Enable compilation of utilities using GRIB2
   --enable-python         Enable python embedding
+  --enable-ugrid          Enable unstructured grid with Atlas and eckit
+                          libraries
 
 Some influential environment variables:
   CC          C compiler command
@@ -1639,16 +1645,16 @@ Some influential environment variables:
               include files are not under the same main proj directory. If
               used, MET_PROJINC must also be defined and MET_PROJ will be
               ignored.
-  MET_ATLAS   Where atlas lib and include subdirectories are located. If they
+  MET_ATLAS   Where Atlas lib and include subdirectories are located. If they
               are installed in /usr/local, you don't have to specify them.
   MET_ATLASINC
-              Where atlas include files are located. Use if the libraries and
-              include files are not under the same main atlas directory. If
+              Where Atlas include files are located. Use if the libraries and
+              include files are not under the same main Atlas directory. If
               used, MET_ATLASLIB must also be defined and MET_ATLAS will be
               ignored.
   MET_ATLASLIB
-              Where atlas libraries are located. Use if the libraries and
-              include files are not under the same main atlas directory. If
+              Where Atlas libraries are located. Use if the libraries and
+              include files are not under the same main Atlas directory. If
               used, MET_ATLASINC must also be defined and MET_ATLAS will be
               ignored.
   MET_ECKIT   Where eckit lib and include subdirectories are located. If they
@@ -4624,11 +4630,6 @@ fi
 
 # AC_SUBST command line variables.
 
-if (test -n "$MET_ATLASLIB"); then
-  CPPFLAGS="${CPPFLAGS} -I${MET_ATLASINC}"
-  LDFLAGS="${LDFLAGS} -L${MET_ATLASLIB}"
-fi
-
 #
 # Look for the Eckit library.
 #
@@ -4655,11 +4656,6 @@ if (test -n "$MET_ECKIT" && test -z "$MET_ECKITLIB"); then
 fi
 
 # AC_SUBST command line variables.
-
-if (test -n "$MET_ECKITLIB"); then
-  CPPFLAGS="${CPPFLAGS} -I${MET_ECKITINC}"
-  LDFLAGS="${LDFLAGS} -L${MET_ECKITLIB}"
-fi
 
 #
 # Look for the NetCDF library.
@@ -6105,6 +6101,45 @@ else
   { $as_echo "$as_me:${as_lineno-$LINENO}: python embedding will not be compiled" >&5
 $as_echo "$as_me: python embedding will not be compiled" >&6;}
   PYTHON_LIBS=
+fi
+
+
+# Unstructure grid with ECMF libraries (Atlas/ecKit)
+
+# Check whether --enable-ugrid was given.
+if test "${enable_ugrid+set}" = set; then :
+  enableval=$enable_ugrid; case "${enableval}" in
+     yes | no ) ENABLE_UGRID="${enableval}" ;;
+     *) as_fn_error $? "bad value ${enableval} for --enable-ugrid" "$LINENO" 5 ;;
+   esac
+else
+  ENABLE_UGRID="no"
+
+fi
+
+
+ if test "x$ENABLE_UGRID" = "xyes"; then
+  ENABLE_UGRID_TRUE=
+  ENABLE_UGRID_FALSE='#'
+else
+  ENABLE_UGRID_TRUE='#'
+  ENABLE_UGRID_FALSE=
+fi
+
+
+if test "x$ENABLE_UGRID" = "xyes"; then
+
+$as_echo "#define ENABLE_UGRID /**/" >>confdefs.h
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: unstructured grid will be compiled" >&5
+$as_echo "$as_me: unstructured grid will be compiled" >&6;}
+  CPPFLAGS="${CPPFLAGS} -I${MET_ATLASINC} -I${MET_ECKITINC} -DWITH_UGRID"
+  LDFLAGS="${LDFLAGS} -L${MET_ATLASLIB} -L${MET_ECKITLIB} -Wl,-rpath,${MET_ATLASLIB}:${MET_ECKITLIB}"
+  UGRID_LIBS="-lvx_data2d_ugrid -latlas -leckit -leckit_mpi -leckit_geometry"
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: unstructured grid will not be compiled" >&5
+$as_echo "$as_me: unstructured grid will not be compiled" >&6;}
+  UGRID_LIBS=
 fi
 
 
@@ -9226,6 +9261,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${ENABLE_PYTHON_TRUE}" && test -z "${ENABLE_PYTHON_FALSE}"; then
   as_fn_error $? "conditional \"ENABLE_PYTHON\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${ENABLE_UGRID_TRUE}" && test -z "${ENABLE_UGRID_FALSE}"; then
+  as_fn_error $? "conditional \"ENABLE_UGRID\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${ENABLE_DEVELOPMENT_TRUE}" && test -z "${ENABLE_DEVELOPMENT_FALSE}"; then
