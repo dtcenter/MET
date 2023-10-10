@@ -106,7 +106,7 @@ am_shift_data_plane_OBJECTS =  \
 shift_data_plane_OBJECTS = $(am_shift_data_plane_OBJECTS)
 am__DEPENDENCIES_1 =
 shift_data_plane_DEPENDENCIES = $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 shift_data_plane_LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
 	$(shift_data_plane_LDFLAGS) $(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_@AM_V@)
@@ -270,6 +270,7 @@ RANLIB = @RANLIB@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
+UGRID_LIBS = @UGRID_LIBS@
 VERSION = @VERSION@
 YACC = @YACC@
 YFLAGS = @YFLAGS@
@@ -337,7 +338,7 @@ shift_data_plane_LDADD = -lvx_statistics \
 	-lvx_data2d_nc_pinterp \
 	$(PYTHON_LIBS) \
 	-lvx_data2d_nccf \
-	-lvx_data2d_ugrid -latlas -leckit -leckit_mpi -leckit_geometry \
+	$(UGRID_LIBS) \
 	-lvx_statistics \
 	-lvx_nc_util \
 	-lvx_data2d \

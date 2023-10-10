@@ -105,7 +105,8 @@ am_lidar2nc_OBJECTS = lidar2nc-lidar2nc.$(OBJEXT) \
 	lidar2nc-hdf_utils.$(OBJEXT) lidar2nc-calipso_5km.$(OBJEXT)
 lidar2nc_OBJECTS = $(am_lidar2nc_OBJECTS)
 am__DEPENDENCIES_1 =
-lidar2nc_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+lidar2nc_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1)
 lidar2nc_LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
 	$(lidar2nc_LDFLAGS) $(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_@AM_V@)
@@ -282,6 +283,7 @@ RANLIB = @RANLIB@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
+UGRID_LIBS = @UGRID_LIBS@
 VERSION = @VERSION@
 YACC = @YACC@
 YFLAGS = @YFLAGS@
@@ -356,7 +358,7 @@ lidar2nc_LDADD = -lvx_shapedata \
 	-lvx_data2d_nc_met \
 	$(PYTHON_LIBS) \
 	-lvx_data2d_nccf \
-	-lvx_data2d_ugrid -latlas -leckit -leckit_mpi -leckit_geometry \
+	$(UGRID_LIBS) \
 	-lvx_statistics \
 	-lvx_nc_obs \
 	-lvx_nc_util \

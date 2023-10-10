@@ -108,7 +108,7 @@ am_gsid2mpr_OBJECTS = gsid2mpr-gsi_record.$(OBJEXT) \
 gsid2mpr_OBJECTS = $(am_gsid2mpr_OBJECTS)
 am__DEPENDENCIES_1 =
 gsid2mpr_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 gsid2mpr_LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
 	$(gsid2mpr_LDFLAGS) $(LDFLAGS) -o $@
 am_gsidens2orank_OBJECTS = gsidens2orank-gsi_record.$(OBJEXT) \
@@ -119,7 +119,8 @@ am_gsidens2orank_OBJECTS = gsidens2orank-gsi_record.$(OBJEXT) \
 	gsidens2orank-rad_config.$(OBJEXT)
 gsidens2orank_OBJECTS = $(am_gsidens2orank_OBJECTS)
 gsidens2orank_DEPENDENCIES = $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1)
 gsidens2orank_LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
 	$(gsidens2orank_LDFLAGS) $(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_@AM_V@)
@@ -305,6 +306,7 @@ RANLIB = @RANLIB@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
+UGRID_LIBS = @UGRID_LIBS@
 VERSION = @VERSION@
 YACC = @YACC@
 YFLAGS = @YFLAGS@
@@ -395,7 +397,7 @@ gsid2mpr_LDADD = -lvx_stat_out \
 	$(PYTHON_LIBS) \
 	-lvx_data2d_nccf \
 	-lvx_data2d_grib $(GRIB2_LIBS) \
-	-lvx_data2d_ugrid -latlas -leckit -leckit_mpi -leckit_geometry \
+	$(UGRID_LIBS) \
 	-lvx_data2d \
 	-lvx_seeps \
 	-lvx_nc_util \
@@ -446,7 +448,7 @@ gsidens2orank_LDADD = -lvx_stat_out \
 	$(PYTHON_LIBS) \
 	-lvx_data2d_nccf \
 	-lvx_data2d_grib $(GRIB2_LIBS) \
-	-lvx_data2d_ugrid -latlas -leckit -leckit_mpi -leckit_geometry \
+	$(UGRID_LIBS) \
 	-lvx_data2d \
 	-lvx_seeps \
 	-lvx_nc_util \

@@ -110,7 +110,8 @@ am_plot_mode_field_OBJECTS =  \
 	plot_mode_field-mode_nc_output_file.$(OBJEXT)
 plot_mode_field_OBJECTS = $(am_plot_mode_field_OBJECTS)
 am__DEPENDENCIES_1 =
-plot_mode_field_DEPENDENCIES = $(am__DEPENDENCIES_1)
+plot_mode_field_DEPENDENCIES = $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1)
 plot_mode_field_LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
 	$(plot_mode_field_LDFLAGS) $(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_@AM_V@)
@@ -290,6 +291,7 @@ RANLIB = @RANLIB@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
+UGRID_LIBS = @UGRID_LIBS@
 VERSION = @VERSION@
 YACC = @YACC@
 YFLAGS = @YFLAGS@
@@ -362,7 +364,7 @@ plot_mode_field_LDADD = -lvx_config \
 	-lvx_gsl_prob \
 	-lvx_plot_util \
 	-lvx_data2d_nc_met \
-	-lvx_data2d_ugrid -latlas -leckit -leckit_mpi -leckit_geometry \
+	$(UGRID_LIBS) \
 	$(PYTHON_LIBS) \
 	-lvx_statistics \
 	-lvx_grid \

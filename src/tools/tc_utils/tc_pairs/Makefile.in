@@ -106,7 +106,7 @@ am_tc_pairs_OBJECTS = tc_pairs-tc_pairs.$(OBJEXT) acerr.$(OBJEXT) \
 tc_pairs_OBJECTS = $(am_tc_pairs_OBJECTS)
 am__DEPENDENCIES_1 =
 tc_pairs_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 tc_pairs_LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
 	$(tc_pairs_LDFLAGS) $(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_@AM_V@)
@@ -294,6 +294,7 @@ RANLIB = @RANLIB@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
+UGRID_LIBS = @UGRID_LIBS@
 VERSION = @VERSION@
 YACC = @YACC@
 YFLAGS = @YFLAGS@
@@ -370,7 +371,7 @@ tc_pairs_LDADD = -lvx_stat_out \
 	-lvx_data2d_nc_pinterp \
 	$(PYTHON_LIBS) \
 	-lvx_data2d_nccf \
-	-lvx_data2d_ugrid -latlas -leckit -leckit_mpi -leckit_geometry \
+	$(UGRID_LIBS) \
 	-lvx_statistics \
 	-lvx_data2d \
 	-lvx_nc_util \

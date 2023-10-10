@@ -106,7 +106,7 @@ am_point2grid_OBJECTS = point2grid-point2grid.$(OBJEXT) \
 point2grid_OBJECTS = $(am_point2grid_OBJECTS)
 am__DEPENDENCIES_1 =
 point2grid_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 point2grid_LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
 	$(point2grid_LDFLAGS) $(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_@AM_V@)
@@ -282,6 +282,7 @@ RANLIB = @RANLIB@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
+UGRID_LIBS = @UGRID_LIBS@
 VERSION = @VERSION@
 YACC = @YACC@
 YFLAGS = @YFLAGS@
@@ -350,7 +351,7 @@ point2grid_LDADD = -lvx_statistics \
 	-lvx_data2d_grib $(GRIB2_LIBS) \
 	-lvx_data2d_nc_pinterp \
 	-lvx_data2d_nccf \
-	-lvx_data2d_ugrid -latlas -leckit -leckit_mpi -leckit_geometry \
+	$(UGRID_LIBS) \
 	$(PYTHON_LIBS) \
 	-lvx_data2d \
 	-lvx_nc_util \

@@ -26,7 +26,7 @@ plot_mode_field_LDADD = -lvx_config \
 	-lvx_gsl_prob \
 	-lvx_plot_util \
 	-lvx_data2d_nc_met \
-	-lvx_data2d_ugrid -latlas -leckit -leckit_mpi -leckit_geometry \
+	$(UGRID_LIBS) \
 	$(PYTHON_LIBS) \
 	-lvx_statistics \
 	-lvx_grid \

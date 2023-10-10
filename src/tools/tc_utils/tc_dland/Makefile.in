@@ -105,7 +105,7 @@ am_tc_dland_OBJECTS = tc_dland-tc_dland.$(OBJEXT) \
 	tc_dland-tc_poly.$(OBJEXT)
 tc_dland_OBJECTS = $(am_tc_dland_OBJECTS)
 am__DEPENDENCIES_1 =
-tc_dland_DEPENDENCIES = $(am__DEPENDENCIES_1)
+tc_dland_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 tc_dland_LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
 	$(tc_dland_LDFLAGS) $(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_@AM_V@)
@@ -281,6 +281,7 @@ RANLIB = @RANLIB@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
+UGRID_LIBS = @UGRID_LIBS@
 VERSION = @VERSION@
 YACC = @YACC@
 YFLAGS = @YFLAGS@
@@ -344,7 +345,7 @@ tc_dland_SOURCES = tc_dland.cc \
 tc_dland_CPPFLAGS = ${MET_CPPFLAGS}
 tc_dland_LDFLAGS = ${MET_LDFLAGS}
 tc_dland_LDADD = -lvx_tc_util \
-	-lvx_data2d_ugrid -latlas -leckit -leckit_mpi -leckit_geometry \
+	$(UGRID_LIBS) \
 	-lvx_nc_util \
 	-lvx_grid \
 	-lvx_geodesy \

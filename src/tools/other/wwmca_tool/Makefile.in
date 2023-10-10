@@ -113,7 +113,8 @@ am_wwmca_plot_OBJECTS = wwmca_plot-gridhemisphere_to_string.$(OBJEXT) \
 	wwmca_plot-wwmca_ref.$(OBJEXT)
 wwmca_plot_OBJECTS = $(am_wwmca_plot_OBJECTS)
 am__DEPENDENCIES_1 =
-wwmca_plot_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+wwmca_plot_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1)
 wwmca_plot_LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
 	$(wwmca_plot_LDFLAGS) $(LDFLAGS) -o $@
 am_wwmca_regrid_OBJECTS =  \
@@ -131,7 +132,7 @@ am_wwmca_regrid_OBJECTS =  \
 	wwmca_regrid-nc_output.$(OBJEXT)
 wwmca_regrid_OBJECTS = $(am_wwmca_regrid_OBJECTS)
 wwmca_regrid_DEPENDENCIES = $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 wwmca_regrid_LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
 	$(wwmca_regrid_LDFLAGS) $(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_@AM_V@)
@@ -328,6 +329,7 @@ RANLIB = @RANLIB@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
+UGRID_LIBS = @UGRID_LIBS@
 VERSION = @VERSION@
 YACC = @YACC@
 YFLAGS = @YFLAGS@
@@ -417,7 +419,7 @@ wwmca_regrid_LDADD = -lvx_pxm \
 	-lvx_data2d_nc_pinterp \
 	$(PYTHON_LIBS) \
 	-lvx_data2d_nccf \
-	-lvx_data2d_ugrid -latlas -leckit -leckit_mpi -leckit_geometry \
+	$(UGRID_LIBS) \
 	-lvx_statistics \
 	-lvx_data2d \
 	-lvx_nc_util \
@@ -465,7 +467,7 @@ wwmca_plot_LDADD = -lvx_pxm \
 	-lvx_data2d_nc_pinterp \
 	$(PYTHON_LIBS) \
 	-lvx_data2d_nccf \
-	-lvx_data2d_ugrid -latlas -leckit -leckit_mpi -leckit_geometry \
+	$(UGRID_LIBS) \
 	-lvx_data2d \
 	-lvx_nc_util \
 	-lvx_regrid \

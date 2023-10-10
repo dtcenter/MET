@@ -106,7 +106,7 @@ am_point_stat_OBJECTS = point_stat-point_stat.$(OBJEXT) \
 point_stat_OBJECTS = $(am_point_stat_OBJECTS)
 am__DEPENDENCIES_1 =
 point_stat_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 point_stat_LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
 	$(point_stat_LDFLAGS) $(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_@AM_V@)
@@ -270,6 +270,7 @@ RANLIB = @RANLIB@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
+UGRID_LIBS = @UGRID_LIBS@
 VERSION = @VERSION@
 YACC = @YACC@
 YFLAGS = @YFLAGS@
@@ -341,7 +342,7 @@ point_stat_LDADD = -lvx_stat_out \
 	-lvx_data2d_grib $(GRIB2_LIBS) \
 	-lvx_data2d_nc_pinterp \
 	-lvx_data2d_nccf \
-	-lvx_data2d_ugrid -latlas -leckit -leckit_mpi -leckit_geometry \
+	$(UGRID_LIBS) \
 	$(PYTHON_LIBS) \
 	-lvx_data2d \
 	-lvx_nc_obs \

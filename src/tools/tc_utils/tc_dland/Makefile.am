@@ -16,7 +16,7 @@ tc_dland_SOURCES = tc_dland.cc \
 tc_dland_CPPFLAGS = ${MET_CPPFLAGS}
 tc_dland_LDFLAGS = ${MET_LDFLAGS}
 tc_dland_LDADD = -lvx_tc_util \
-	-lvx_data2d_ugrid -latlas -leckit -leckit_mpi -leckit_geometry \
+	$(UGRID_LIBS) \
 	-lvx_nc_util \
 	-lvx_grid \
 	-lvx_geodesy \

@@ -105,7 +105,8 @@ am_grid_stat_OBJECTS = grid_stat-grid_stat.$(OBJEXT) \
 	grid_stat-grid_stat_conf_info.$(OBJEXT)
 grid_stat_OBJECTS = $(am_grid_stat_OBJECTS)
 am__DEPENDENCIES_1 =
-grid_stat_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+grid_stat_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1)
 grid_stat_LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
 	$(grid_stat_LDFLAGS) $(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_@AM_V@)
@@ -269,6 +270,7 @@ RANLIB = @RANLIB@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
+UGRID_LIBS = @UGRID_LIBS@
 VERSION = @VERSION@
 YACC = @YACC@
 YFLAGS = @YFLAGS@
@@ -342,7 +344,7 @@ grid_stat_LDADD = -lvx_stat_out \
 	-lvx_data2d_nc_pinterp \
 	$(PYTHON_LIBS) \
 	-lvx_data2d_nccf \
-	-lvx_data2d_ugrid -latlas -leckit -leckit_mpi -leckit_geometry \
+	$(UGRID_LIBS) \
 	-lvx_statistics \
 	-lvx_data2d \
 	-lvx_seeps \
