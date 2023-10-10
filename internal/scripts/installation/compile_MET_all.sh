@@ -156,7 +156,6 @@ if [[ -z "$LIB_Z" ]]; then
 fi
 
 # if SQLITE is not defined in the environment file, enable its compilation
-# ${LIB_DIR} so it can be used to install the PROJ library
 if [[ -z ${SQLITE_INCLUDE_DIR} ]] && [[ -z ${SQLITE_LIB_DIR} ]]; then
    COMPILE_SQLITE=1
 else
