@@ -30,8 +30,9 @@
 #include "goes_grid_defs.h"
 #include "laea_grid_defs.h"
 #include "semilatlon_grid_defs.h"
+#ifdef WITH_UGRID
 #include "unstructured_grid_defs.h"
-
+#endif
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -73,7 +74,9 @@ class GridInfo {
       void set(const TcrmwData         &);
       void set(const LaeaData          &);
       void set(const SemiLatLonData    &);
+#ifdef WITH_UGRID
       void set(const UnstructuredData  &);
+#endif
 
       void create_grid(Grid &) const;
 
@@ -91,7 +94,9 @@ class GridInfo {
       const TcrmwData         * tc;   //  allocated
       const LaeaData          * la;   //  allocated
       const SemiLatLonData    * sl;   //  allocated
+#ifdef WITH_UGRID
       const UnstructuredData  * us;   //  allocated
+#endif
 
 };
 
@@ -213,7 +218,9 @@ class Grid : public GridInterface {
       Grid(const LaeaData          &);
       Grid(const LaeaNetcdfData    &);
       Grid(const SemiLatLonData    &);
+#ifdef WITH_UGRID
       Grid(const UnstructuredData  &);
+#endif
       virtual ~Grid();
       Grid(const Grid &);
       Grid & operator=(const Grid &);
@@ -236,7 +243,9 @@ class Grid : public GridInterface {
       void set (const LaeaData          &);
       void set (const LaeaNetcdfData    &);
       void set (const SemiLatLonData    &);
+#ifdef WITH_UGRID
       void set (const UnstructuredData  &);
+#endif
 
       void set_swap_to_north(bool swap_to_north);
       bool get_swap_to_north() const;
@@ -298,7 +307,9 @@ extern bool is_eq(const GaussianData *,      const GaussianData *);
 extern bool is_eq(const GoesImagerData *,    const GoesImagerData *);
 extern bool is_eq(const LaeaData *,          const LaeaData *);
 extern bool is_eq(const SemiLatLonData *,    const SemiLatLonData *);
+#ifdef WITH_UGRID
 extern bool is_eq(const UnstructuredData *,  const UnstructuredData *);
+#endif
 
 
 ////////////////////////////////////////////////////////////////////////

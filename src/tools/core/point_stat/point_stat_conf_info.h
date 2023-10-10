@@ -246,9 +246,11 @@ class PointStatConfInfo {
       ConcatString tmp_dir;                 // Directory for temporary files
       ConcatString output_prefix;           // String to customize output file name
       ConcatString version;                 // Config file version
+#ifdef WITH_UGRID
       ConcatString ugrid_nc;                // NetCDF for coordinate variables of unstructured grid
       ConcatString ugrid_user_map_config;   // User's configuration file which contains ugrid metadata mapping
       double ugrid_max_distance_km;         // max distance to be the closest neighbor to unstructured grid
+#endif
 
       // Summary of output file options across all verification tasks
       STATOutputType output_flag[n_txt];    // Flag for each output line type

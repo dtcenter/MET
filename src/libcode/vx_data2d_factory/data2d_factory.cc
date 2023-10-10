@@ -23,7 +23,9 @@ using namespace std;
 #include "data2d_nc_met.h"
 #include "data2d_nc_pinterp.h"
 #include "data2d_nccf.h"
+#ifdef WITH_UGRID
 #include "data2d_ugrid.h"
+#endif
 
 
 #ifdef WITH_PYTHON
@@ -47,6 +49,7 @@ Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(GrdFileType type)
 {
 
    Met2dDataFile *mtddf = (Met2dDataFile *) nullptr;
+   const char *method_name ="Met2dDataFileFactory::new_met_2d_data_file() -> ";
 
 #ifdef WITH_PYTHON
 MetPythonDataFile * p = nullptr;
@@ -67,7 +70,7 @@ MetPythonDataFile * p = nullptr;
 #ifdef WITH_GRIB2
          mtddf = new MetGrib2DataFile;
 #else
-         mlog << Error << "\nMet2dDataFileFactory::new_met_2d_data_file() -> "
+         mlog << Error << "\n" << method_name
               << "Support for GRIB2 has not been compiled!\n"
               << "To read GRIB2 files, recompile with the --enable-grib2 option.\n\n";
          exit(1);
@@ -105,28 +108,36 @@ MetPythonDataFile * p = nullptr;
       case FileType_Python_Numpy:
       case FileType_Python_Xarray:
 
-         python_compile_error("Met2dDataFileFactory::new_met_2d_data_file() -> ");
+         python_compile_error(method_name);
 
 #endif
 
       case FileType_HdfEos:
 
-         mlog << Error << "\nMet2dDataFileFactory::new_met_2d_data_file() -> "
+         mlog << Error << "\n" << method_name
               << "Support for GrdFileType = \"" << grdfiletype_to_string(type)
               << "\" not yet implemented!\n\n";
          exit(1);
 
       case FileType_Bufr:
 
-         mlog << Error << "\nMet2dDataFileFactory::new_met_2d_data_file() -> "
+         mlog << Error << "\n" << method_name
               << "cannot use this factory to read files of type \""
               << grdfiletype_to_string(type) << "\"\n\n";
          exit(1);
 
       case FileType_UGrid:
+#ifdef WITH_UGRID
          // For FileType_None, silently return a nullptr pointer
          mtddf = new MetUGridDataFile;
          break;
+#else
+         mlog << Error << "\n" << method_name
+              << "data file type \"" << grdfiletype_to_string(type)
+              << "\" is not activated. Recompile with the --enable-ugrid option"
+              << "\"\n\n";
+         exit(1);
+#endif
 
       case FileType_None:
          // For FileType_None, silently return a nullptr pointer
@@ -134,7 +145,7 @@ MetPythonDataFile * p = nullptr;
          break;
 
       default:
-         mlog << Error << "\nMet2dDataFileFactory::new_met_2d_data_file() -> "
+         mlog << Error << "\n" << method_name
               << "unsupported gridded data file type \"" << grdfiletype_to_string(type)
               << "\"\n\n";
          exit(1);

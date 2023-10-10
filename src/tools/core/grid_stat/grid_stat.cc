@@ -136,7 +136,9 @@
 #include "vx_log.h"
 #include "seeps.h"
 
+#ifdef WITH_UGRID
 #include "vx_data2d_ugrid.h"
+#endif
 
 using namespace std;
 using namespace netCDF;
@@ -293,6 +295,7 @@ void process_command_line(int argc, char **argv) {
    // Process the configuration
    conf_info.process_config(ftype, otype);
 
+#ifdef WITH_UGRID
    if (FileType_UGrid == ftype) {
       ConcatString ugrid_nc = conf_info.ugrid_nc;
       ConcatString ugrid_user_map_config = conf_info.ugrid_user_map_config;
@@ -306,6 +309,7 @@ void process_command_line(int argc, char **argv) {
            << "ugrid_coordinates_nc: " << ugrid_nc
            << "  ugrid_max_distance_km: " << conf_info.ugrid_max_distance_km << "\n";
    }
+#endif
 
    // For python types read the first field to set the grid
    if(is_python_grdfiletype(ftype)) {

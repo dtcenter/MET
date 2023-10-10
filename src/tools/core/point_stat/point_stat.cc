@@ -130,7 +130,9 @@
 #include "nc_obs_util.h"
 #include "nc_point_obs_in.h"
 
+#ifdef WITH_UGRID
 #include "vx_data2d_ugrid.h"
+#endif
 
 #ifdef WITH_PYTHON
 #include "data2d_nc_met.h"
@@ -299,6 +301,7 @@ void process_command_line(int argc, char **argv) {
    // Set the model name
    shc.set_model(conf_info.model.c_str());
 
+#ifdef WITH_UGRID
    if (FileType_UGrid == ftype) {
       ConcatString ugrid_nc = conf_info.ugrid_nc;
       ConcatString ugrid_user_map_config = conf_info.ugrid_user_map_config;
@@ -312,6 +315,7 @@ void process_command_line(int argc, char **argv) {
            << "ugrid_coordinate_nc: " << ugrid_nc
            << "  ugrid_max_distance_km: " << conf_info.ugrid_max_distance_km << "\n";
    }
+#endif
 
    // Use the first verification task to set the random number generator
    // and seed value for bootstrap confidence intervals

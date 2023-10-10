@@ -53,6 +53,7 @@ VarInfo * VarInfoFactory::new_var_info(GrdFileType type)
 {
 
    VarInfo *vi = (VarInfo *) 0;
+   const char *method_name = "VarInfoFactory::new_var_info() -> ";
 
 #ifdef WITH_PYTHON
    VarInfoPython * p = 0;
@@ -74,7 +75,7 @@ VarInfo * VarInfoFactory::new_var_info(GrdFileType type)
          vi = new VarInfoGrib2;
          break;
 #else
-         mlog << Error << "\nVarInfoFactory::new_var_info() -> "
+         mlog << Error << "\n" << method_name
               << "Support for GRIB2 has not been compiled!\n"
               << "To read GRIB2 files, recompile with the --enable-grib2 option.\n\n";
          exit(1);
@@ -97,32 +98,33 @@ VarInfo * VarInfoFactory::new_var_info(GrdFileType type)
          p = 0;
          break;
 #else
-         python_compile_error("VarInfoFactory::new_var_info() -> ");
+         python_compile_error(method_name);
 #endif
 
       case FileType_NcCF:
          vi = new VarInfoNcCF;
          break;
 
+#ifdef WITH_UGRID
       case FileType_UGrid:
          vi = new VarInfoUGrid;
          break;
+#endif
 
       case FileType_HdfEos:
-         mlog << Error << "\nVarInfoFactory::new_var_info() -> "
+         mlog << Error << "\n" << method_name
               << "Support for GrdFileType = " << grdfiletype_to_string(type)
               << " not yet implemented!\n\n";
          exit(1);
 
       default:
-         mlog << Error << "\nVarInfoFactory::new_var_info() -> "
+         mlog << Error << "\n" << method_name
               << "unsupported gridded data file type \"" << grdfiletype_to_string(type)
               << "\"\n\n";
          exit(1);
    } // end switch
 
-   mlog << Debug(4)
-        << "VarInfoFactory::new_var_info() -> "
+   mlog << Debug(4) << method_name
         << "created new VarInfo object of type \""
         << grdfiletype_to_string(type) << "\".\n";
 

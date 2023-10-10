@@ -304,6 +304,8 @@ times.clear();
 
 ////////////////////////////////////////////////////////////////////////
 
+#ifdef WITH_UGRID
+
 void UnstructuredData::clear() {
 
    name = (const char *) nullptr;
@@ -342,6 +344,8 @@ void UnstructuredData::dump() const {
         << " max_distance_km: " << max_distance_km << "\n"
         ;
 }
+
+#endif
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -421,7 +425,9 @@ gi  = (const GoesImagerData *)    nullptr;
 la  = (const LaeaData *)          nullptr;
 tc  = (const TcrmwData *)         nullptr;
 sl  = (const SemiLatLonData *)    nullptr;
+#ifdef WITH_UGRID
 us  = (const UnstructuredData *)  nullptr;
+#endif
 
 clear();
 
@@ -447,7 +453,9 @@ if ( gi  )  { delete gi;   gi  = (const GoesImagerData *)    nullptr; };
 if ( la  )  { delete la;   la  = (const LaeaData *)          nullptr; };
 if ( tc  )  { delete tc;   tc  = (const TcrmwData *)         nullptr; };
 if ( sl  )  { delete sl;   sl  = (const SemiLatLonData *)    nullptr; };
+#ifdef WITH_UGRID
 if ( us  )  { delete us;   us  = (const UnstructuredData *)  nullptr; };
+#endif
 
 return;
 
@@ -470,7 +478,9 @@ if ( info.g   )  set( *(info.g)   );
 if ( info.gi  )  set( *(info.gi)  );
 if ( info.la  )  set( *(info.la)  );
 if ( info.sl  )  set( *(info.sl)  );
+#ifdef WITH_UGRID
 if ( info.us  )  set( *(info.us)  );
+#endif
 
 return;
 
@@ -495,7 +505,9 @@ if ( g   ) ++count;
 if ( gi  ) ++count;
 if ( la  ) ++count;
 if ( sl  ) ++count;
+#ifdef WITH_UGRID
 if ( us  ) ++count;
+#endif
 
 return count == 1;
 
@@ -526,7 +538,9 @@ else if ( g   )  gg.set( *g   );
 else if ( gi  )  gg.set( *gi  );
 else if ( la  )  gg.set( *la  );
 else if ( sl  )  gg.set( *sl  );
+#ifdef WITH_UGRID
 else if ( us  )  gg.set( *us  );
+#endif
 
 return;
 
@@ -739,6 +753,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+#ifdef WITH_UGRID
 void GridInfo::set(const UnstructuredData & data)
 
 {
@@ -755,6 +770,7 @@ us = D;
 D = (UnstructuredData *)nullptr;
 
 }
+#endif
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -1407,7 +1423,9 @@ else if ( i1.g   && i2.g   )  return ( is_eq(i1.g,   i2.g  ) );
 else if ( i1.gi  && i2.gi  )  return ( is_eq(i1.gi,  i2.gi ) );
 else if ( i1.la  && i2.la  )  return ( is_eq(i1.la,  i2.la ) );
 else if ( i1.sl  && i2.sl  )  return ( is_eq(i1.sl,  i2.sl ) );
+#ifdef WITH_UGRID
 else if ( i1.us  && i2.us  )  return ( is_eq(i1.us,  i2.us ) );
+#endif
 
 return false;
 
@@ -1666,7 +1684,7 @@ return status;
 
 ////////////////////////////////////////////////////////////////////////
 
-
+#ifdef WITH_UGRID
 bool is_eq(const UnstructuredData * us1, const UnstructuredData * us2)
 
 {
@@ -1686,6 +1704,7 @@ bool is_eq(const UnstructuredData * us1, const UnstructuredData * us2)
 return status;
 
 }
+#endif
 
 
 ////////////////////////////////////////////////////////////////////////
