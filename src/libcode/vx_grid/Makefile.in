@@ -88,6 +88,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
+@ENABLE_UGRID_TRUE@am__append_1 = unstructured_grid.cc unstructured_grid.h unstructured_grid_defs.h
 subdir = src/libcode/vx_grid
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
@@ -107,6 +108,20 @@ am__v_AR_0 = @echo "  AR      " $@;
 am__v_AR_1 = 
 libvx_grid_a_AR = $(AR) $(ARFLAGS)
 libvx_grid_a_LIBADD =
+am__libvx_grid_a_SOURCES_DIST = earth_rotation.cc earth_rotation.h \
+	find_grid_by_name.cc find_grid_by_name.h grid_base.cc \
+	grid_base.h latlon_grid_defs.h latlon_grid.cc latlon_grid.h \
+	laea_grid_defs.h laea_grid.cc laea_grid.h lc_grid_defs.h \
+	lc_grid.cc lc_grid.h merc_grid_defs.h merc_grid.cc merc_grid.h \
+	gaussian_grid_defs.h gaussian_grid.cc gaussian_grid.h \
+	st_grid_defs.h st_grid.cc st_grid.h latlon_xyz.h latlon_xyz.cc \
+	rot_latlon_grid.cc rot_latlon_grid.h tcrmw_grid.cc \
+	tcrmw_grid.h goes_grid_defs.h goes_grid.cc goes_grid.h \
+	semilatlon_grid_defs.h semilatlon_grid.cc semilatlon_grid.h \
+	vx_grid.h unstructured_grid.cc unstructured_grid.h \
+	unstructured_grid_defs.h
+@ENABLE_UGRID_TRUE@am__objects_1 =  \
+@ENABLE_UGRID_TRUE@	libvx_grid_a-unstructured_grid.$(OBJEXT)
 am_libvx_grid_a_OBJECTS = libvx_grid_a-earth_rotation.$(OBJEXT) \
 	libvx_grid_a-find_grid_by_name.$(OBJEXT) \
 	libvx_grid_a-grid_base.$(OBJEXT) \
@@ -120,8 +135,7 @@ am_libvx_grid_a_OBJECTS = libvx_grid_a-earth_rotation.$(OBJEXT) \
 	libvx_grid_a-rot_latlon_grid.$(OBJEXT) \
 	libvx_grid_a-tcrmw_grid.$(OBJEXT) \
 	libvx_grid_a-goes_grid.$(OBJEXT) \
-	libvx_grid_a-semilatlon_grid.$(OBJEXT) \
-	libvx_grid_a-unstructured_grid.$(OBJEXT)
+	libvx_grid_a-semilatlon_grid.$(OBJEXT) $(am__objects_1)
 libvx_grid_a_OBJECTS = $(am_libvx_grid_a_OBJECTS)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -184,7 +198,7 @@ am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
 SOURCES = $(libvx_grid_a_SOURCES)
-DIST_SOURCES = $(libvx_grid_a_SOURCES)
+DIST_SOURCES = $(am__libvx_grid_a_SOURCES_DIST)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -309,6 +323,7 @@ RANLIB = @RANLIB@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
+UGRID_LIBS = @UGRID_LIBS@
 VERSION = @VERSION@
 YACC = @YACC@
 YFLAGS = @YFLAGS@
@@ -369,32 +384,17 @@ MAINTAINERCLEANFILES = Makefile.in
 
 # The library
 noinst_LIBRARIES = libvx_grid.a
-libvx_grid_a_SOURCES = \
-              earth_rotation.cc earth_rotation.h  \
-              find_grid_by_name.cc  find_grid_by_name.h \
-              grid_base.cc grid_base.h \
-              latlon_grid_defs.h \
-              latlon_grid.cc latlon_grid.h \
-              laea_grid_defs.h \
-              laea_grid.cc laea_grid.h \
-              lc_grid_defs.h \
-              lc_grid.cc lc_grid.h \
-              merc_grid_defs.h \
-              merc_grid.cc merc_grid.h \
-              gaussian_grid_defs.h \
-              gaussian_grid.cc gaussian_grid.h \
-              st_grid_defs.h \
-              st_grid.cc st_grid.h \
-              latlon_xyz.h latlon_xyz.cc \
-              rot_latlon_grid.cc rot_latlon_grid.h \
-              tcrmw_grid.cc tcrmw_grid.h \
-              goes_grid_defs.h \
-              goes_grid.cc goes_grid.h \
-              semilatlon_grid_defs.h \
-              semilatlon_grid.cc semilatlon_grid.h \
-              unstructured_grid.cc unstructured_grid.h unstructured_grid_defs.h \
-              vx_grid.h
-
+libvx_grid_a_SOURCES = earth_rotation.cc earth_rotation.h \
+	find_grid_by_name.cc find_grid_by_name.h grid_base.cc \
+	grid_base.h latlon_grid_defs.h latlon_grid.cc latlon_grid.h \
+	laea_grid_defs.h laea_grid.cc laea_grid.h lc_grid_defs.h \
+	lc_grid.cc lc_grid.h merc_grid_defs.h merc_grid.cc merc_grid.h \
+	gaussian_grid_defs.h gaussian_grid.cc gaussian_grid.h \
+	st_grid_defs.h st_grid.cc st_grid.h latlon_xyz.h latlon_xyz.cc \
+	rot_latlon_grid.cc rot_latlon_grid.h tcrmw_grid.cc \
+	tcrmw_grid.h goes_grid_defs.h goes_grid.cc goes_grid.h \
+	semilatlon_grid_defs.h semilatlon_grid.cc semilatlon_grid.h \
+	vx_grid.h $(am__append_1)
 libvx_grid_a_CPPFLAGS = ${MET_CPPFLAGS}
 all: all-am
 

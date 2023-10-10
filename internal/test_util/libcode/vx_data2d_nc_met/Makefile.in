@@ -103,7 +103,8 @@ PROGRAMS = $(noinst_PROGRAMS)
 am_test_read_nc_met_OBJECTS =  \
 	test_read_nc_met-test_read_nc_met.$(OBJEXT)
 test_read_nc_met_OBJECTS = $(am_test_read_nc_met_OBJECTS)
-test_read_nc_met_DEPENDENCIES =
+am__DEPENDENCIES_1 =
+test_read_nc_met_DEPENDENCIES = $(am__DEPENDENCIES_1)
 test_read_nc_met_LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
 	$(test_read_nc_met_LDFLAGS) $(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_@AM_V@)
@@ -267,6 +268,7 @@ RANLIB = @RANLIB@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
+UGRID_LIBS = @UGRID_LIBS@
 VERSION = @VERSION@
 YACC = @YACC@
 YFLAGS = @YFLAGS@
@@ -328,7 +330,7 @@ test_read_nc_met_SOURCES = test_read_nc_met.cc
 test_read_nc_met_CPPFLAGS = ${MET_CPPFLAGS}
 test_read_nc_met_LDFLAGS = -L. ${MET_LDFLAGS}
 test_read_nc_met_LDADD = -lvx_data2d_nc_met \
-	-lvx_data2d_ugrid -latlas -leckit -leckit_mpi -leckit_geometry \
+	$(UGRID_LIBS) \
 	-lvx_nc_util \
 	-lvx_data2d \
 	-lvx_grid \

@@ -103,7 +103,8 @@ PROGRAMS = $(noinst_PROGRAMS)
 am_test_read_grib1_OBJECTS =  \
 	test_read_grib1-test_read_grib1.$(OBJEXT)
 test_read_grib1_OBJECTS = $(am_test_read_grib1_OBJECTS)
-test_read_grib1_DEPENDENCIES =
+am__DEPENDENCIES_1 =
+test_read_grib1_DEPENDENCIES = $(am__DEPENDENCIES_1)
 test_read_grib1_LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
 	$(test_read_grib1_LDFLAGS) $(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_@AM_V@)
@@ -266,6 +267,7 @@ RANLIB = @RANLIB@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
+UGRID_LIBS = @UGRID_LIBS@
 VERSION = @VERSION@
 YACC = @YACC@
 YFLAGS = @YFLAGS@
@@ -327,7 +329,7 @@ test_read_grib1_SOURCES = test_read_grib1.cc
 test_read_grib1_CPPFLAGS = ${MET_CPPFLAGS}
 test_read_grib1_LDFLAGS = -L. ${MET_LDFLAGS}
 test_read_grib1_LDADD = -lvx_data2d_grib \
-	-lvx_data2d_ugrid -latlas -leckit -leckit_mpi -leckit_geometry \
+	$(UGRID_LIBS) \
 	-lvx_data2d \
 	-lvx_grid \
 	-lvx_geodesy \

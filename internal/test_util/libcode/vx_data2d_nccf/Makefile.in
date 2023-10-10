@@ -102,7 +102,8 @@ CONFIG_CLEAN_VPATH_FILES =
 PROGRAMS = $(noinst_PROGRAMS)
 am_test_read_nccf_OBJECTS = test_read_nccf-test_read_nccf.$(OBJEXT)
 test_read_nccf_OBJECTS = $(am_test_read_nccf_OBJECTS)
-test_read_nccf_DEPENDENCIES =
+am__DEPENDENCIES_1 =
+test_read_nccf_DEPENDENCIES = $(am__DEPENDENCIES_1)
 test_read_nccf_LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
 	$(test_read_nccf_LDFLAGS) $(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_@AM_V@)
@@ -265,6 +266,7 @@ RANLIB = @RANLIB@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
+UGRID_LIBS = @UGRID_LIBS@
 VERSION = @VERSION@
 YACC = @YACC@
 YFLAGS = @YFLAGS@
@@ -326,7 +328,7 @@ test_read_nccf_SOURCES = test_read_nccf.cc
 test_read_nccf_CPPFLAGS = ${MET_CPPFLAGS}
 test_read_nccf_LDFLAGS = -L. ${MET_LDFLAGS}
 test_read_nccf_LDADD = -lvx_data2d_nccf \
-	-lvx_data2d_ugrid -latlas -leckit -leckit_mpi -leckit_geometry \
+	$(UGRID_LIBS) \
 	-lvx_nc_util \
 	-lvx_data2d \
 	-lvx_grid \
