@@ -181,7 +181,7 @@ sub-directory, or the MET Online Tutorial:
 
   --enable-ugrid
       Enable compilation of unstructured grid
-      Requires $MET_ATLAS, $MET_ECKIT, and $MET_UGRID_LD
+      Requires $MET_ATLAS and $MET_ECKIT
 
   To configure MET to install all of the available tools in the "bin"
   subdirectory of your current directory, you would use the following command:
