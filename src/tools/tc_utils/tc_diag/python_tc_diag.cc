@@ -54,6 +54,7 @@ static bool parse_python_module(
 static bool parse_python_string_value_map(
                PyObject *dict,
                const char *name,
+               vector<string> &k,
                map<string,double> &m);
 
 static bool parse_python_string_string_map(
@@ -291,18 +292,21 @@ bool parse_python_module(PyObject *module_obj,
    if(status) status = parse_python_string_value_map(
                           module_dict_obj,
                           storm_data_dict_name,
+                          tmp_info.diag_storm_keys,
                           tmp_info.diag_storm_map);
 
    // Sounding data
    if(status) status = parse_python_string_value_map(
                           module_dict_obj,
                           sounding_data_dict_name,
+                          tmp_info.diag_sounding_keys,
                           tmp_info.diag_sounding_map);
 
    // Custom data
    if(status) status = parse_python_string_value_map(
                           module_dict_obj,
                           custom_data_dict_name,
+                          tmp_info.diag_custom_keys,
                           tmp_info.diag_custom_map);
 
    // Units
@@ -311,13 +315,15 @@ bool parse_python_module(PyObject *module_obj,
                           units_dict_name,
                           tmp_info.diag_units_map);
 
-   return(true);
+   return(status);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool parse_python_string_value_map(PyObject *dict,
-        const char *name, map<string,double> &m) {
+        const char *name,
+        vector<string> &k,
+        map<string,double> &m) {
 
    const char *method_name = "parse_python_string_value_map()";
 
@@ -375,11 +381,10 @@ bool parse_python_string_value_map(PyObject *dict,
       else {
          mlog << Debug(5) << "Adding to map \""
               << key_str << "\" = " << val << "\n";
+         k.push_back(key_str);
          m[key_str] = val;
       }
    } // end while
-
-   // JHG, need to include handling of sounding diags, units, and pressure levels
 
    return(true);
 }
@@ -394,7 +399,6 @@ bool parse_python_string_string_map(PyObject *dict,
    PyObject *key_obj = nullptr;
    PyObject *val_obj = nullptr;
    int status;
-   double val;
    long pos;
 
    PyObject *data_obj = PyDict_GetItem(dict,
@@ -422,19 +426,19 @@ bool parse_python_string_string_map(PyObject *dict,
 
       // Parse key and value as strings
       string key_str = PyUnicode_AsUTF8(key_obj);
-      string val_str = PyUnicode_AsUTF8(key_obj);
+      string val_str = PyUnicode_AsUTF8(val_obj);
 
       // Check for duplicates
       if(m.count(key_str) > 0) {
          mlog << Warning << "\n" << method_name << " -> "
               << "ignoring duplicate entries for \""
-              << key_str << "\" = " << val << "!\n\n";
+              << key_str << "\" = \"" << val_str << "\"!\n\n";
       }
       // Store key/value pair in the dictionary
       else {
          mlog << Debug(5) << "Adding to map \""
-              << key_str << "\" = " << val << "\n";
-         m[key_str] = val;
+              << key_str << "\" = \"" << val_str << "\"\n";
+         m[key_str] = val_str;
       }
    } // end while
 
