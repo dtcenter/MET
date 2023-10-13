@@ -108,22 +108,24 @@ for d in results.pressure_independent.keys():
     else:
         custom_data[name] = val
 
-# Process sounding diagnostics
+# Add units for sounding diagnostics
 for d in results.soundings.keys():
 
-    # Diagonstic names are reported as upper-case
-    name = d.upper()
-
-    # Store units
-    if 'units' in results.soundings[d].attrs:
-        units[name] = results.soundings[d].attrs["units"].upper()
-
-    # Store value for each level
+    # Store pressure levels
     levels = results.soundings[d].coords['level_hPa']
-    for idx, prs in enumerate(levels):
+
+    # Store units for diagnostic names, all upper-case
+    if 'units' in results.soundings[d].attrs:
+        units[d.upper()] = results.soundings[d].attrs["units"].upper()
+
+# Loop over the sounding pressure levels
+for idx, prs in enumerate(levels):
+
+    # Loop over the sounding diagnostics
+    for d in results.soundings.keys():
 
         # Left-pad pressure value to 4 digits
-        name_prs = name + '_' + f'{prs:04}'
+        name_prs = d.upper() + '_' + f'{prs:04}'
 
         # Check for bad data
         val = results.soundings[d].values[0,idx]
@@ -131,7 +133,7 @@ for d in results.soundings.keys():
             val = BAD_DATA_INT
 
         # Store value
-        if name in SOUNDING_DATA_NAMES:
+        if d.upper() in SOUNDING_DATA_NAMES:
             sounding_data[name_prs] = val
         else:
             custom_data[name_prs] = val
@@ -141,34 +143,3 @@ print(f"\nSTORM DATA ({len(storm_data)}):\n", storm_data)
 print(f"\nSOUNDING DATA ({len(sounding_data)}):\n", sounding_data)
 print(f"\nCUSTOM DATA ({len(custom_data)}):\n", custom_data)
 print(f"\nUNITS ({len(units)}):\n", units, "\n")
-
-for name in storm_data.keys():
-
-    if name in units.keys():
-        units_str = units[name]
-    else:
-        units_str = "NA"
-
-    print(f"{name} ({units_str}) {storm_data[name]}")
-
-for name in sounding_data.keys():
-
-    if name in units.keys():
-        units_str = units[name]
-    elif name.split("_")[0] in units.keys():
-        units_str = units[name.split("_")[0]]
-    else:
-        units_str = "NA"
-
-    print(f"{name} ({units_str}) {sounding_data[name]}")
-
-for name in custom_data.keys():
-
-    if name in units.keys():
-        units_str = units[name]
-    elif name.split("_")[0] in units.keys():
-        units_str = units[name.split("_")[0]]
-    else:
-        units_str = "NA"
-
-    print(f"{name} ({units_str}) {custom_data[name]}")

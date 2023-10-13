@@ -116,9 +116,11 @@ static void compute_lat_lon(TcrmwGrid&, double *, double *);
 //
 // TODO after the MET version 11.1.0 release:
 //   - Python diagnostics:
-//     - Incorporate CIRA python diagnostics scripts.
-//     - Read resulting Xarray dataset in memory.
-//     - Write CIRA ASCII and NetCDF diagnostics output files.
+//     - [DONE for #2550] Incorporate CIRA python diagnostics scripts.
+//     - [DONE for #2550] Write NetCDF diagnostics output file.
+//     - Refine NetCDF diagnostics output file based on feedback.
+//     - [DONE for #2550] Read resulting diagnostic data provided by python script.
+//     - [DONE for #2555] Write CIRA ASCII diagnostics output files.
 //     - Add support for $MET_PYTHON_EXE.
 //   - Input data:
 //     - [DONE for #2609] Instead of reading DataPlanes one at a time,
@@ -692,9 +694,6 @@ void setup_out_files(const TrackInfoArray &tracks) {
                  << "\" for writing!\n\n";
             exit(1);
          }
-
-         // Fixed width
-         out_file_map[key].cira_diag_out->setf(ios::fixed);
       }
    } // end for i
 
@@ -1075,13 +1074,13 @@ void process_fields(const TrackInfoArray &tracks,
 
    // Print warning for missing fields
    if(fields_missing.n() > 0) {
-      mlog << Warning << "For the "
+      mlog << Warning << "\nFor the "
            << domain << " domain, "
            << sec_to_hhmmss(vld_ut - init_ut) << " lead time, and "
            << unix_to_yyyymmdd_hhmmss(vld_ut) << " valid time, "
            << fields_missing.n() << " of " << di.var_info_ptr.size()
            << " requested fields missing:\n"
-           << write_css(fields_missing) << "\n";
+           << write_css(fields_missing) << "\n\n";
    }
 
    // Loop over the current set of temp files
@@ -1161,6 +1160,11 @@ void process_out_files(const TrackInfoArray& tracks) {
          out_file_map[out_key].write_nc_diag();
       }
 
+      // Write CIRA diagnostics output
+      if(conf_info.cira_diag_flag) {
+         out_file_map[out_key].write_cira_diag();
+      }
+
       // Finish the output for this track
       out_file_map[out_key].clear();
 
@@ -1186,7 +1190,7 @@ void merge_tmp_files(const vector<TmpFileInfo *> tmp_files) {
                         tmp_files[i_tmp]->trk_ptr,
                         suffix_cs.c_str());
 
-         mlog << Debug(1) << "Writing output file: "
+         mlog << Debug(1) << "Writing Cylindrical Coordinates file: "
               << file_name << "\n";
 
          nc_out = open_ncfile(file_name.c_str(), true);
@@ -1365,17 +1369,22 @@ void OutFileInfo::clear() {
 
    trk_ptr = (TrackInfo *) 0;
 
-   // Clear the diagnostics maps
+   // Clear the diagnostics keys and maps
+   diag_storm_keys.clear();
    diag_storm_map.clear();
+
+   diag_sounding_keys.clear();
    diag_sounding_map.clear();
+
+   diag_custom_keys.clear();
    diag_custom_map.clear();
+
    diag_units_map.clear();
-   pressure_levels.clear();
 
    // Write NetCDF diagnostics file
    if(nc_diag_out) {
 
-      mlog << Debug(1) << "Writing output file: "
+      mlog << Debug(1) << "Writing NetCDF Diagnostics file: "
            << nc_diag_file << "\n";
 
       // Close the output file
@@ -1388,11 +1397,8 @@ void OutFileInfo::clear() {
    // Write CIRA diagnostics file
    if(cira_diag_out) {
 
-      mlog << Debug(1) << "Writing output file: "
+      mlog << Debug(1) << "Writing CIRA Diagnostics file: "
            << cira_diag_file << "\n";
-
-      // Write the output
-      *cira_diag_out << cira_diag_at;
 
       // Close the output file
       cira_diag_out->close();
@@ -1400,7 +1406,6 @@ void OutFileInfo::clear() {
       cira_diag_out = (ofstream *) 0;
    }
    cira_diag_file.clear();
-   cira_diag_at.clear();
 
    return;
 }
@@ -1461,9 +1466,12 @@ void OutFileInfo::add_tmp_file_info(const TmpFileInfo &tmp_info, int i_pnt) {
    }
 
    // Append the diagnostics data
-   add_diag_data(tmp_info.diag_storm_map, diag_storm_map, i_pnt);
-   add_diag_data(tmp_info.diag_sounding_map, diag_sounding_map, i_pnt);
-   add_diag_data(tmp_info.diag_custom_map, diag_custom_map, i_pnt);
+   add_diag_data(tmp_info.diag_storm_keys, tmp_info.diag_storm_map,
+                 diag_storm_keys, diag_storm_map, i_pnt);
+   add_diag_data(tmp_info.diag_sounding_keys, tmp_info.diag_sounding_map,
+                 diag_sounding_keys, diag_sounding_map, i_pnt);
+   add_diag_data(tmp_info.diag_custom_keys, tmp_info.diag_custom_map,
+                 diag_custom_keys, diag_custom_map, i_pnt);
 
    // Update the units
    add_diag_units(tmp_info.diag_units_map);
@@ -1473,24 +1481,30 @@ void OutFileInfo::add_tmp_file_info(const TmpFileInfo &tmp_info, int i_pnt) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void OutFileInfo::add_diag_data(const map<string,double> &m_src,
+void OutFileInfo::add_diag_data(const vector<string> &k_src,
+                                const map<string,double> &m_src,
+                                vector<string> &k_dst,
                                 map<string,NumArray> &m_dst,
                                 int i_pnt) {
 
-   // Loop over the source map
-   map<string,double>::const_iterator it;
-   for(it = m_src.begin(); it != m_src.end(); it++) {
+   bool add_keys = (k_dst.size() == 0);
+
+   // Loop over the source keys
+   for(auto it = k_src.begin(); it != k_src.end(); it++) {
+
+      // Store this key
+      if(add_keys) k_dst.push_back(*it);
 
       // Add new destination map entry, if needed
-      if(m_dst.count(it->first) == 0) {
+      if(m_dst.count(*it) == 0) {
          NumArray empty_na;
-         empty_na.set_const(bad_data_double,
+         empty_na.set_const(diag_bad_data_double,
                             trk_ptr->n_points());
-         m_dst[it->first] = empty_na;
+         m_dst[*it] = empty_na;
       }
 
       // Store the diagnostic value for the track point
-      m_dst[it->first].set(i_pnt, it->second);
+      m_dst[*it].set(i_pnt, m_src.at(*it));
    }
 
    return;
@@ -1501,8 +1515,7 @@ void OutFileInfo::add_diag_data(const map<string,double> &m_src,
 void OutFileInfo::add_diag_units(const map<string,string> &m_src) {
 
    // Loop over the source map
-   map<string,string>::const_iterator it;
-   for(it = m_src.begin(); it != m_src.end(); it++) {
+   for(auto it = m_src.begin(); it != m_src.end(); it++) {
 
       // Add new units strings
       if(diag_units_map.count(it->first) == 0) {
@@ -1523,6 +1536,103 @@ void OutFileInfo::add_diag_units(const map<string,string> &m_src) {
 ////////////////////////////////////////////////////////////////////////
 
 void OutFileInfo::write_nc_diag() {
+   StringArray prs_diag;
+   NumArray prs_lev;
+   int i, j, k;
+
+   // Write storm diagnostics
+   for(auto it = diag_storm_keys.begin();
+       it != diag_storm_keys.end(); it++) {
+      write_nc_diag_vals(*it, diag_storm_map.at(*it));
+   }
+
+   // Write custom diagnostics
+   for(auto it = diag_custom_keys.begin();
+       it != diag_custom_keys.end(); it++) {
+      write_nc_diag_vals(*it, diag_custom_map.at(*it));
+   }
+
+   // Process and write sounding diagnostics
+   for(auto it = diag_sounding_keys.begin();
+       it != diag_sounding_keys.end(); it++) {
+
+      // Parse diagnostic names and pressure levels (e.g. U_0850)
+      string s = *it;
+      size_t found = s.find_last_of("_");
+
+      // Store unique diagnostic name and pressure levels
+      if(found != string::npos && is_number(s.substr(found+1).c_str())) {
+         string n = s.substr(0,found);
+         double p = stof(s.substr(found+1));
+         if(!prs_diag.has(n)) prs_diag.add(n);
+         if(!prs_lev.has(p))  prs_lev.add(p);
+      }
+      else {
+         write_nc_diag_vals(*it, diag_sounding_map.at(*it));
+      }
+   }
+
+   // Sort the pressure levels
+   prs_lev.sort_array(false);
+
+   // Define the pressure dimension and coordinate variable
+   if(prs_lev.n() > 0) {
+      set<double> prs_set;
+      for(i=0; i<prs_lev.n(); i++) prs_set.insert(prs_lev[i]);
+      prs_dim = add_dim(nc_diag_out, "pressure",
+                        (long) prs_set.size());
+      def_tc_pressure(nc_diag_out, prs_dim, prs_set);
+   }
+
+   // Allocate space
+   int n_prs_data = vld_dim.getSize() * prs_dim.getSize();
+   float *prs_data = new float [n_prs_data];
+   ConcatString diag_name;
+
+   // Loop over the pressure diagnostic names
+   for(i=0; i<prs_diag.n(); i++) {
+
+      // Initialize
+      for(j=0; j<n_prs_data; j++) {
+         prs_data[j] = diag_bad_data_double;
+      }
+
+      // Store values for each pressure level
+      for(j=0; j<prs_lev.n(); j++) {
+
+         // Reconstruct diagnostic name
+         diag_name.format("%s_%04d",
+            prs_diag[i].c_str(), nint(prs_lev[j]));
+
+         // Store diagnostic values for this name
+         if(diag_sounding_map.count(diag_name) > 0) {
+            NumArray d = diag_sounding_map[diag_name];
+            for(k=0; k<d.n(); k++) {
+               int n = DefaultTO.two_to_one(
+                          prs_dim.getSize(),
+                          vld_dim.getSize(),
+                          j, k);
+               prs_data[n] = d[k];
+            }
+         }
+
+      } // end for j
+
+      // Write the data
+      write_nc_diag_prs_vals(prs_diag[i], prs_data);
+
+   } // end for i
+
+   // Clean up
+   if(prs_data) { delete [] prs_data; prs_data = (float *) 0; }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void OutFileInfo::write_nc_diag_vals(const string &name,
+                                     NumArray &vals) {
 
    // Setup dimensions
    vector<NcDim> dims;
@@ -1530,22 +1640,252 @@ void OutFileInfo::write_nc_diag() {
 
    vector<size_t> offsets;
    offsets.push_back(0);
-   
+
    vector<size_t> counts;
    counts.push_back(get_dim_size(&vld_dim));
 
-   // Write the diagnostics for each lead time
-   map<string,NumArray>::iterator it;
-   for(it  = diag_storm_map.begin();
-       it != diag_storm_map.end(); it++) {
-      NcVar diag_var = nc_diag_out->addVar(it->first, ncDouble, dims);
-      add_att(&diag_var, fill_value_att_name, bad_data_double);
-      diag_var.putVar(offsets, counts, it->second.buf());
-   }
-
-   // JHG, need to include handling of sounding diags, units, and pressure levels
+   NcVar diag_var = nc_diag_out->addVar(name, ncDouble, dims);
+   string units_str = (diag_units_map.count(name) > 0 ?
+                       diag_units_map[name] : na_str);
+   add_att(&diag_var, units_att_name, units_str);
+   add_att(&diag_var, fill_value_att_name, diag_bad_data_double);
+   diag_var.putVar(offsets, counts, vals.buf());
 
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void OutFileInfo::write_nc_diag_prs_vals(const string &name,
+                                         const float *vals) {
+
+   // Setup dimensions
+   vector<NcDim> dims;
+   dims.push_back(vld_dim);
+   dims.push_back(prs_dim);
+
+   vector<size_t> offsets;
+   offsets.push_back(0);
+   offsets.push_back(0);
+
+   vector<size_t> counts;
+   counts.push_back(get_dim_size(&vld_dim));
+   counts.push_back(get_dim_size(&prs_dim));
+
+   NcVar diag_var = nc_diag_out->addVar(name, ncDouble, dims);
+   string units_str = (diag_units_map.count(name) > 0 ?
+                       diag_units_map[name] : na_str);
+   add_att(&diag_var, units_att_name, units_str);
+   add_att(&diag_var, fill_value_att_name, diag_bad_data_double);
+   diag_var.putVar(offsets, counts, vals);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void OutFileInfo::write_cira_diag() {
+   ConcatString line;
+   int i;
+
+   if(!cira_diag_out) return;
+
+   // Write file header
+   ConcatString bbnn;
+   bbnn << trk_ptr->basin() << trk_ptr->cyclone();
+
+   *cira_diag_out << string( 15, ' ')
+                  << "*   " << trk_ptr->technique() << "  "
+                  << unix_to_yyyymmddhh(trk_ptr->init()) << "   *\n"
+                  << string( 15, ' ')
+                  << "*   " << bbnn << "  "
+                  << bbnn << "         *\n";
+
+   // Write section header
+   write_cira_diag_section_header("STORM DATA");
+
+   // Determine most common lead time delta in hours
+   NumArray dhr;
+   for(i=1; i<trk_ptr->n_points(); i++) {
+      dhr.add(((*trk_ptr)[i].lead() - (*trk_ptr)[i-1].lead()) / sec_per_hour);
+   }
+
+   // Write NTIME line
+   line.format("NTIME %03d   DELTAT %03d\n",
+               trk_ptr->n_points(),
+               nint(dhr.mode()));
+   *cira_diag_out << line;
+
+   // Write storm diagnostics
+   write_cira_diag_vals(diag_storm_keys, diag_storm_map, true);
+
+   // Write section header
+   write_cira_diag_section_header("SOUNDING DATA");
+
+   // Build list if sounding levels
+   StringArray levs;
+   for(auto it = diag_sounding_keys.begin();
+       it != diag_sounding_keys.end(); it++) {
+      size_t found = it->find_last_of("_");
+      if(found != string::npos) levs.add_uniq(it->substr(found+1));
+   }
+
+   // Write NLEV line
+   line.format("NLEV %03d ", levs.n());
+   *cira_diag_out << line << levs.serialize() << "\n";
+
+   // Write sounding diagnostics
+   write_cira_diag_vals(diag_sounding_keys, diag_sounding_map, true);
+
+   // Write section header
+   write_cira_diag_section_header("CUSTOM DATA");
+
+   // Write NVAR line
+   line.format("NVAR %03d\n", levs.n(), diag_custom_keys.size());
+   *cira_diag_out << line;
+
+   // Write custom diagnostics
+   write_cira_diag_vals(diag_custom_keys, diag_custom_map, false);
+
+   // Write section header
+   write_cira_diag_section_header("COMMENTS");
+
+   // TODO: add comments section
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void OutFileInfo::write_cira_diag_section_header(const char *hdr_str) {
+
+   if(!cira_diag_out) return;
+
+   // Right-pad out to 149 characters with '-'
+   int pad = max(6, 68 - int(strlen(hdr_str)));
+
+   string line;
+   line.append( 16, ' ');
+   line.append( 54, '-');
+   line.append(  5, ' ');
+   line.append(hdr_str);
+   line.append(  5, ' ');
+   line.append(pad, '-');
+
+   *cira_diag_out << "\n" << line << "\n\n";
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void OutFileInfo::write_cira_diag_vals(vector<string> &k,
+                                       map<string,NumArray> &m,
+                                       bool write_time) {
+
+   if(!cira_diag_out) return;
+
+   // Store lead time information
+   if(write_time) {
+      NumArray times;
+      for(int i=0; i<trk_ptr->n_points(); i++) {
+         times.add((*trk_ptr)[i].lead() / sec_per_hour);
+      }
+      m["TIME"] = times;
+      k.insert(k.begin(), "TIME");
+      diag_units_map["TIME"] = "HR";
+   }
+
+   // Variables write AsciiTable output
+   ConcatString cs;
+   AsciiTable at;
+   int n_row = m.size();
+   int n_col = bad_data_int;
+   int r, c;
+
+   // Write diagnostics
+   vector<string>::iterator it;
+   for(it = k.begin(),r = 0; it != k.end(); it++,r++) {
+
+      // Setup the AsciiTable if needed
+      if(is_bad_data(n_col)) {
+         n_col = 2 + m.at(*it).n();
+         at.set_size(n_row, n_col);
+
+         // Justify columns
+         at.set_column_just(0, LeftJust);
+         at.set_column_just(1, LeftJust);
+         for(c=2; c<n_col; c++) {
+            at.set_column_just(c, RightJust);
+         }
+         at.set_align_decimal_points(false);
+      }
+
+      // Initialize column counter
+      c = 0;
+
+      // Diagnostic name
+      at.set_entry(r, c++, *it);
+
+      // Units
+      cs << cs_erase << "("
+         << get_diag_units(*it) << ")";
+      at.set_entry(r, c++, cs);
+
+      // Diagnostic values
+      for(int i=0; i<m.at(*it).n(); i++) {
+
+         // Initialize
+         cs << cs_erase;
+
+         // Round LAT to tenths of a degree
+         if(*it == "LAT") {
+            cs.format("%5.1f", m.at(*it)[i]);
+         }
+         // Rescale LON to (0, 360) and round to tenths of a degree
+         else if(*it == "LON") {
+            cs.format("%5.1f", rescale_deg(m.at(*it)[i], 0.0, 360.0));
+         }
+         // Round everything else to the nearest ßinteger
+         else {
+            cs.format("%5i", nint(m.at(*it)[i]));
+         }
+
+         at.set_entry(r, c++, cs);
+      }
+   }
+
+   // Write AsciiTable to the output stream
+   *cira_diag_out << at;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+string OutFileInfo::get_diag_units(const string &s) {
+   string units;
+
+   // Units for the full diagnostic name
+   if(diag_units_map.count(s) > 0) {
+      units = diag_units_map[s];
+   }
+   // Units for sounding (e.g. U_0850)
+   else {
+      size_t found = s.find_last_of("_");
+      if(found != string::npos && is_number(s.substr(found+1).c_str())) {
+         if(diag_units_map.count(s.substr(0,found)) > 0) {
+            units = diag_units_map[s.substr(0,found)];
+         }
+      }
+   }
+
+   // Units not found
+   if(units.length() == 0) {
+      units = na_str;
+   }
+
+   return(units);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1624,17 +1964,21 @@ void TmpFileInfo::clear() {
    trk_ptr = (TrackInfo *) 0;
    pnt_ptr = (TrackPoint *) 0;
 
-   // Clear the diagnostics maps
+   // Clear the diagnostics keys and maps
+   diag_storm_keys.clear();
    diag_storm_map.clear();
+
+   diag_sounding_keys.clear();
    diag_sounding_map.clear();
+
+   diag_custom_keys.clear();
    diag_custom_map.clear();
+
    diag_units_map.clear();
    pressure_levels.clear();
 
    grid_out.clear();
    ra_grid.clear();
-
-   pressure_levels.clear();
 
    domain.clear();
 

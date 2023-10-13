@@ -68,6 +68,9 @@ static const char* default_out_dir = ".";
 // Default output prefix
 static const char* default_out_prefix = "";
 
+// Diagnostics bad data value
+static const double diag_bad_data_double = 9999.0;
+
 ////////////////////////////////////////////////////////////////////////
 //
 // Variables for Command Line Arguments
@@ -107,6 +110,11 @@ class TmpFileInfo {
       // Track information
       const TrackInfo  *trk_ptr; // not allocated
       const TrackPoint *pnt_ptr; // not allocated
+
+      // Vector of diagnostic names to track insertion order
+      std::vector<std::string> diag_storm_keys;
+      std::vector<std::string> diag_sounding_keys;
+      std::vector<std::string> diag_custom_keys;
 
       // Mappings of diagnostic names to values
       std::map<std::string,double> diag_storm_map;
@@ -166,7 +174,9 @@ class OutFileInfo {
    private:
 
       void init_from_scratch();
-      void add_diag_data(const std::map<std::string,double> &,
+      void add_diag_data(const std::vector<std::string> &,
+                         const std::map<std::string,double> &,
+                         std::vector<std::string> &,
                          std::map<std::string,NumArray> &, int);
       void add_diag_units(const std::map<std::string,std::string> &);
 
@@ -180,6 +190,11 @@ class OutFileInfo {
       // Track information
       const TrackInfo *trk_ptr; // not allocated
 
+      // Vector of diagnostic names to track insertion order
+      std::vector<std::string> diag_storm_keys;
+      std::vector<std::string> diag_sounding_keys;
+      std::vector<std::string> diag_custom_keys;
+
       // Mappings of diagnostic names to values
       // for each track point
       std::map<std::string,NumArray> diag_storm_map;
@@ -189,26 +204,32 @@ class OutFileInfo {
       // Mapping of diagnostics names to units
       std::map<std::string,std::string> diag_units_map;
 
-      // Set of unique pressure level values
-      std::set<double> pressure_levels;
-
       // NetCDF Diagnostics output
       ConcatString    nc_diag_file;
       netCDF::NcFile *nc_diag_out;
 
       // NetCDF Dimensions
       netCDF::NcDim vld_dim;
+      netCDF::NcDim prs_dim;
 
       // CIRA Diagnostics output
       ConcatString   cira_diag_file;
       std::ofstream *cira_diag_out;
-      AsciiTable     cira_diag_at;
 
       void clear();
 
       netCDF::NcFile *setup_nc_file(const std::string &);
       void add_tmp_file_info(const TmpFileInfo &, int);
       void write_nc_diag();
+      void write_nc_diag_vals(const std::string &, NumArray &);
+      void write_nc_diag_prs_vals(const std::string &, const float *);
+
+      void write_cira_diag();
+      void write_cira_diag_section_header(const char *);
+      void write_cira_diag_vals(std::vector<std::string> &,
+              std::map<std::string,NumArray> &, bool);
+
+      std::string get_diag_units(const std::string &);
 };
 
 static std::map<std::string,OutFileInfo> out_file_map;
