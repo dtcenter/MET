@@ -240,17 +240,17 @@ void TCPairsConfInfo::process_config() {
    for(i=0; i<NConsensus; i++) {
 
       // Conf: Consensus: name, members, required (error if missing)
-      Consensus[i].Name     = (*dict)[i]->dict_value()->lookup_string(conf_key_name);
-      Consensus[i].Members  = (*dict)[i]->dict_value()->lookup_string_array(conf_key_members);
-      Consensus[i].Required = (*dict)[i]->dict_value()->lookup_bool_array(conf_key_required);
+      Consensus[i].Name         = (*dict)[i]->dict_value()->lookup_string(conf_key_name);
+      Consensus[i].Members      = (*dict)[i]->dict_value()->lookup_string_array(conf_key_members);
+      Consensus[i].ConsRequired = (*dict)[i]->dict_value()->lookup_bool_array(conf_key_required);
 
-      // If Required is empty, default to false.
-      if(Consensus[i].Required.n() == 0) {
+      // If ConsRequired is empty, default to false.
+      if(Consensus[i].ConsRequired.n() == 0) {
          for(j=0; j<Consensus[i].Members.n(); j++) {
-            Consensus[i].Required.add(false);
+            Consensus[i].ConsRequired.add(false);
          }
       }
-      else if(Consensus[i].Required.n() !=
+      else if(Consensus[i].ConsRequired.n() !=
               Consensus[i].Members.n()) {
          mlog << Error << "\nTCPairsConfInfo::process_config() -> "
               << "\"consensus." << conf_key_required
@@ -260,7 +260,7 @@ void TCPairsConfInfo::process_config() {
       }
 
       // Conf: Consensus: min_req (error if missing)
-      Consensus[i].MinReq = (*dict)[i]->dict_value()->lookup_int(conf_key_min_req);
+      Consensus[i].MinConsReq = (*dict)[i]->dict_value()->lookup_int(conf_key_min_req);
 
       // Conf: Consensus: diag_required (warn if missing)
       Consensus[i].DiagRequired = (*dict)[i]->dict_value()->lookup_bool_array(conf_key_diag_required, false);
