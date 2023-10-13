@@ -20,6 +20,7 @@
 
 #include <iostream>
 #include <ostream>
+#include <string>
 #include <vector>
 #include <algorithm>
 
@@ -73,6 +74,8 @@ class StringArray {
       void set(int i, const std::string);
 
       void insert(int i, const char *);
+
+      std::string serialize() const;
 
       int n_elements() const;
       int n() const;   //  same thing
