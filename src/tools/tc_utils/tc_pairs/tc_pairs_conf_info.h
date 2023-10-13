@@ -27,8 +27,10 @@
 struct ConsensusInfo {
    ConcatString Name;
    StringArray  Members;
-   NumArray     Required;
+   BoolArray    Required;
    int          MinReq;
+   BoolArray    DiagRequired;
+   int          MinDiagReq;
    bool         WriteMembers;
 };
 

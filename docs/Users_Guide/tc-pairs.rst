@@ -7,7 +7,8 @@ TC-Pairs Tool
 Introduction
 ============
 
-The TC-Pairs tool provides verification for tropical cyclone forecasts in ATCF file format. It matches an ATCF format tropical cyclone (TC) forecast with a second ATCF format reference TC dataset (most commonly the Best Track analysis). The TC-Pairs tool processes both track and intensity adeck data and probabilistic edeck data. The adeck matched pairs contain position errors, as well as wind, sea level pressure, and distance to land values for each TC dataset. The edeck matched pairs contain probabilistic forecast values and the verifying observation values. The pair generation can be subset based on user-defined filtering criteria. Practical aspects of the TC-Pairs tool are described in :numref:`TC-Pairs_Practical-information`. 
+The TC-Pairs tool provides verification for tropical cyclone forecasts in ATCF file format. It matches an ATCF format tropical cyclone (TC) forecast with a second ATCF format reference TC dataset (most commonly the Best Track analysis). The TC-Pairs tool processes both track and intensity adeck data and probabilistic edeck data. The adeck matched pairs contain position errors, as well as wind, sea level pressure, and distance to land values for each TC dataset. The edeck matched pairs contain probabilistic forecast values and the verifying observation values. The pair generation can be subset based on user-defined filtering criteria. Practical aspects of the TC-Pairs tool are described in :numref:`TC-Pairs_Practical-information`.
+The TC-Pairs tool provides verification for tropical cyclone forecasts in ATCF file format. It matches an ATCF format tropical cyclone (TC) forecast with a second ATCF format reference TC dataset (most commonly the Best Track analysis). The TC-Pairs tool processes both track and intensity adeck data and probabilistic edeck data. The adeck matched pairs contain position errors, as well as wind, sea level pressure, and distance to land values for each TC dataset. The edeck matched pairs contain probabilistic forecast values and the verifying observation values. The pair generation can be subset based on user-defined filtering criteria. Practical aspects of the TC-Pairs tool are described in :numref:`TC-Pairs_Practical-information`.
 
 Scientific and statistical aspects
 ==================================
@@ -163,7 +164,7 @@ ____________________
 
   model = [ "DSHP", "LGEM", "HWRF" ];
 
-The **model** variable contains a list of comma-separated models to be used. Each model is identified with an ATCF TECH ID (normally four unique characters). This model identifier should match the model column in the ATCF format input file. An empty list indicates that all models in the input file(s) will be processed. Note that when reading ATCF track data, all instances of the string AVN are automatically replaced with GFS.
+The **model** variable contains a list of comma-separated models to be used. Each model is identified with an ATCF TECH ID (normally four unique characters). This model identifier should match the model column in the ATCF format input file. An empty list indicates that all models in the input file(s) will be processed. Note that when reading ATCF track data, all instances of the string **AVN** are automatically replaced with **GFS**.
 
 ____________________
 
@@ -195,15 +196,26 @@ ____________________
 
   consensus = [
      {
-        name     = "CON1";
-        members  = [ "MOD1", "MOD2", "MOD3" ];
-        required = [   true,  false, false  ];
-        min_req  = 2;
+        name          = "CON1";
+        members       = [ "MOD1", "MOD2", "MOD3" ];
+        required      = [   true,  false, false  ];
+        min_req       = 2;
+        diag_required = [   false, false, false  ];
+        min_diag_req  = 0;
         write_members = TRUE;
      }
   ];
 
-The **consensus** field allows the user to generate a user-defined consensus forecasts from any number of models. All models used in the consensus forecast need to be included in the **model** field (first entry in **TCPairsConfig_default**). The name field is the desired consensus model name. The **members** field is a comma-separated list of model IDs that make up the members of the consensus. The **required** field is a comma-separated list of true/false values associated with each consensus member. If a member is designated as true, the member is required to be present in order for the consensus to be generated. If a member is false, the consensus will be generated regardless of whether the member is present. The length of the required array must be the same length as the members array. The **min_req** field is the number of members required in order for the consensus to be computed. The required and min_req field options are applied at each forecast lead time. If any member of the consensus has a non-valid position or intensity value, the consensus for that valid time will not be generated. The **write_members** field is a boolean that indicates whether or not to write output for the individual consensus members. If set to true, standard output will show up for all members. If set to false, output for the consensus members is excluded from the output, even if they are used to define other consensus tracks in the configuration file. If a consensus model is defined in the configuration file, there will be non-missing output for the consensus track variables in the output file (NUM_MEMBERS, TRACK_SPREAD, TRACK_STDEV, MSLP_STDEV, MAX_WIND_STDEV). See the TCMPR line type definitions below.
+The **consensus** array allows users to derive consensus forecasts from any number of models. A consensus forecast is computed as the average intensity and location of the members which comprise it. TC-Pairs attempts to derive consensus forecasts for each unique storm ID and initialization time found in the input track data. Each array entry is a dictionary which defines the consensus name, membership, and requirements:
+
+- The **name** field is a string defining the consensus model name to be written.
+- The **members** field is a comma-separated array of model ID stings which define the members of the consensus.
+- The **required** field is a comma-separated array of true/false values associated with each consensus member. If a member is designated as true, that member must be present in order for the consensus to be generated. If a member is false, the consensus will be generated regardless of whether or not the member is present. The required array can either be empty or have the same length as the members array. If empty, it defaults to all false.
+- The **min_req** field is the number of members required in order for the consensus to be computed. The **required** and **min_req** field options are applied at each forecast lead time. If any member of the consensus has a non-valid position or intensity value, the consensus for that valid time will not be generated.
+- Tropical cyclone diagnostics, if provided on the command line, are included in the computation of consensus tracks. The consensus diagnostics are computed as the mean of the diagnostics for the members. The **diag_required** and **min_diag_req** entries apply the same logic described above, but to the computation of each consensus diagnostic value rather than the consensus track location and intensity. If **diag_required** is missing or an empty list, it defaults to all false. If **min_diag_req** is missing, it default to 0.
+- The **write_members** field is a boolean that indicates whether or not to write track output for the individual consensus members. If set to true, standard output will show up for all members. If set to false, output for the consensus members is excluded from the output, even if they are used to define other consensus tracks in the configuration file.
+
+Users should take care to avoid filtering out track data for the consensus members with the **model** field, described above. Either set **model** to an empty list to process all input track data or include all of the consensus members in the **model** list. Use the **write_members** field, not the **model** field, to suppress track output for consensus members.
 
 ____________________
 

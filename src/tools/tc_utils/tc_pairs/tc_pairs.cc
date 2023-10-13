@@ -44,6 +44,8 @@
 //                    winds as the mean of the non-zero quadrants
 //   017    10/05/23  Seth Linden     MET #2476 Include diagnostics in
 //                    consensus track output
+//   018    10/13/23  Halley Gotway   MET #2699 Add diag_required and
+//                    min_diag_req config options
 //
 ////////////////////////////////////////////////////////////////////////
 

@@ -96,10 +96,12 @@ interp12 = NONE;
 //
 consensus = [
    {
-      name     = "GFEX_CONS";
-      members  = [ "GFSI", "EMXI" ];
-      required = [];
-      min_req  = 2;
+      name          = "GFEX_CONS";
+      members       = [ "GFSI", "EMXI" ];
+      required      = [];
+      min_req       = 2;
+      diag_required = [];
+      diag_min_req  = 2;
       write_members = TRUE;
    }
 ];
