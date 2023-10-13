@@ -711,12 +711,37 @@ bool TrackPoint::is_match(const ATCFTrackLine &l) const {
 
 ////////////////////////////////////////////////////////////////////////
 
+void TrackPoint::clear_diag_value() {
+
+   // Clear all diagnostic values
+   DiagVal.clear();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void TrackPoint::add_diag_value(double val) {
 
    // Store the diagnostic value
    DiagVal.add(val);
 
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double TrackPoint::get_diag_val(const StringArray &diag_names, const string cur_diag_name) const {
+
+   int i;
+   double diag_val;
+   
+   if(diag_names.has(cur_diag_name, i) && DiagVal.n() > 0)
+      diag_val = DiagVal[i];
+   else
+      diag_val = bad_data_double;
+   
+   return(diag_val);
 }
 
 ////////////////////////////////////////////////////////////////////////

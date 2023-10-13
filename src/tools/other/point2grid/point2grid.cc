@@ -2783,8 +2783,8 @@ void usage() {
         << "\t[-v level]\n"
         << "\t[-compress level]\n\n"
 
-        << "\twhere\t\"input_filename\" is the gridded data file to be "
-        << "read (required).\n"
+        << "\twhere\t\"input_filename\" is the input NetCDF point observation "
+        << "file to be read (required).\n"
 
         << "\t\t\"to_grid\" defines the output grid as a named grid, the "
         << "path to a gridded data file, or an explicit grid "

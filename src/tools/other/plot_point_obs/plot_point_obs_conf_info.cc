@@ -368,7 +368,6 @@ void PlotPointObsConfInfo::clear() {
    point_opts.clear();
    do_colorbar = false;
 
-   tmp_dir.clear();
    version.clear();
 
    // Delete allocated memory
@@ -423,9 +422,6 @@ void PlotPointObsConfInfo::process_config(
 
    // Conf: version
    version = parse_conf_version(&conf);
-
-   // Conf: tmp_dir
-   tmp_dir = parse_conf_tmp_dir(&conf);
 
    // Conf: grid_data
    dict = conf.lookup_dictionary(conf_key_grid_data);
