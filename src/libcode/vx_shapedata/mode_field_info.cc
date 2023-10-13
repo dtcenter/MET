@@ -254,12 +254,17 @@ if ( _multivar ) {
                                                         default_dictionary_print_warning,
                                                         false);
       } else {
+         // get the parent's merge_thresh, just to have something.  Error out if the merge_flag is not none
+         // becAuse that is inconsistent
+         merge_thresh_array = dict->lookup_thresh_array(conf_key_merge_thresh);
+
          if (merge_flag != MergeType_None) {
             mlog << Error << "\nMode_Field_Info::set() -> "
                  << "Field:" << name << ". "
                  << " When 'merge_flag' is explicitly set, 'merge_thresh' must be explicitly set for multivariate mode\n\n";
             exit ( 1 );
          }
+         
       } 
    } else {
       // individual entry does not have a merge_flag, try parent
