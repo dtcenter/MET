@@ -562,7 +562,6 @@ bool TrackInfo::add_diag_data(DiagFile &diag_file, const StringArray &req_diag_n
       // Store the diagnostic name
       DiagName.add(diag_file.diag_name()[i_name]);
       NumArray diag_val = diag_file.diag_val(diag_file.diag_name()[i_name]);
-
       // Add diagnostic values to the TrackPoints
       for(i_time=0; i_time<diag_file.n_time(); i_time++) {
 
@@ -612,6 +611,16 @@ void TrackInfo::add_diag_value(int i_pnt, double val) {
    }
 
    Point[i_pnt].add_diag_value(val);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TrackInfo::add_uniq_diag_name(const string diag_name) {
+
+   // Store the diagnostic name
+   DiagName.add_uniq(diag_name);
 
    return;
 }
@@ -965,11 +974,10 @@ int TrackInfoArray::add_diag_data(DiagFile &diag_file, const StringArray &diag_n
 TrackInfo consensus(const TrackInfoArray &tracks,
                     const ConcatString &model, int req,
                     const StringArray &req_list) {
-   int i, j, i_pnt;
+   int i, j, k, i_pnt;
    bool skip;
    TrackInfo tavg;
    NumArray lead_list;
-
    // Variables for average TrackPoint
    int        pcnt;
    TrackPoint pavg, psum;
@@ -993,7 +1001,6 @@ TrackInfo consensus(const TrackInfoArray &tracks,
    tavg.set_technique(model.c_str());
    tavg.set_init(tracks[0].init());
    tavg.set_storm_id();
-
    // Loop through the tracks and build a list of lead times
    for(i=0; i<tracks.n(); i++) {
 
@@ -1016,6 +1023,12 @@ TrackInfo consensus(const TrackInfoArray &tracks,
               << tracks[i].technique_number() << ").\n\n";
       }
 
+      // Get unique diag names
+      // Store diag_names in tavg object
+      for(j=0; j<tracks[i].diag_name().n(); j++) {
+         tavg.add_uniq_diag_name(tracks[i].diag_name()[j]);
+      }
+      
       // Loop through the points for the lead times
       for(j=0; j<tracks[i].n_points(); j++) {
 
@@ -1056,11 +1069,17 @@ TrackInfo consensus(const TrackInfoArray &tracks,
             }
             continue;
          }
-
          // Increment the TrackPoint count and sums
+         // Remove diagnostic values from the TrackPoint object (psum) for the consensus values
+         // Consensus diag values computed below this
          pcnt++;
-         if(pcnt == 1) psum  = tracks.Track[j][i_pnt];
-         else          psum += tracks.Track[j][i_pnt];
+         if(pcnt == 1) {
+            psum = tracks.Track[j][i_pnt];
+            psum.clear_diag_value();
+         }
+         else {
+            psum += tracks.Track[j][i_pnt];
+         }
 
          // Store the track point latitude, longitude v_max and mslp values         
          plon.add(tracks.Track[j][i_pnt].lon());
@@ -1138,6 +1157,47 @@ TrackInfo consensus(const TrackInfoArray &tracks,
       // Compute consensus CycloneLevel
       if(!is_bad_data(pavg.v_max())) pavg.set_level(wind_speed_to_cyclonelevel(pavg.v_max()));
 
+      // Loop over the diag name and the input track points and get consensus diag value
+      // (mean value across all members that have the diag value)
+      for (j=0; j<tavg.diag_name().n(); j++){
+         mlog << Debug(4) << "Computing consensus \"" << tavg.diag_name()[j] << "\" diagnostic value.\n";
+         
+         // Store diag_vals for one diag_name across all lead-times (track points)
+         NumArray diag_vals;
+         double cons_diag_val;
+
+         // Initializ diag_vals array for this diag name
+         diag_vals.clear();
+
+         // Loop through the tracks to get average diagnostic values
+         for(k=0; k<tracks.n(); k++) {
+
+            // Get the index of the TrackPoint for this lead time
+            i_pnt = tracks.Track[k].lead_index(nint(lead_list[i]));
+
+            // Check for missing TrackPoint in a required member
+            if(i_pnt < 0) {
+               if(req_list.has(tracks.Track[k].technique())) {
+                  skip = true;
+                  break;
+               }
+               continue;
+            }
+
+            // Add non-missing diag values to local NumArray 
+            if(!is_bad_data( tracks.Track[k][i_pnt].get_diag_val(tavg.diag_name(), tavg.diag_name()[j]) )) {
+               diag_vals.add(tracks.Track[k][i_pnt].get_diag_val(tavg.diag_name(), tavg.diag_name()[j]));
+            }
+            
+         } // end loop over ensemble of tracks (for given lead-time: i_pnt)
+
+         // Compute cons_diag_val (the mean value)
+         // add it to the pavg DiagVal NumArray
+         cons_diag_val = diag_vals.mean();
+         pavg.add_diag_value(cons_diag_val);
+         
+      } // end loop over diag names
+      
       // Add the current track point
       tavg.add(pavg);
    }

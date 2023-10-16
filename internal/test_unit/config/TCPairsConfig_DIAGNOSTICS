@@ -136,7 +136,7 @@ diag_info_map = [
       diag_source    = "CIRA_DIAG_RT";
       track_source   = "GFS";
       field_source   = "GFS_0p50";
-      match_to_track = [ "GFS" ];
+      match_to_track = [];
       diag_name      = [ ${CIRA_RT_DIAG_NAME} ];
    },
    {
