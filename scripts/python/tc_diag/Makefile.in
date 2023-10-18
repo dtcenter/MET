@@ -361,6 +361,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 SUBDIRS = \
 	atcf_tools \
+	config \
 	diag_lib \
 	tc_diag_driver
 
