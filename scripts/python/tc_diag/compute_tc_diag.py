@@ -125,7 +125,7 @@ for idx, prs in enumerate(levels):
     for d in results.soundings.keys():
 
         # Left-pad pressure value to 4 digits
-        name_prs = d.upper() + '_' + f'{prs:04}'
+        name_prs = d.upper() + '_' + f'{prs.data:04}'
 
         # Check for bad data
         val = results.soundings[d].values[0,idx]
