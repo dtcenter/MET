@@ -20,6 +20,7 @@
 
 SUBDIRS = \
 	atcf_tools \
+	config \
 	diag_lib \
 	tc_diag_driver
 
