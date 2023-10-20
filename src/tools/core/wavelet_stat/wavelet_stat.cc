@@ -412,7 +412,7 @@ void process_scores() {
       mlog << Debug(2) << "Observation field: ";
       fill_bad_data(obs_dp_fill,  obs_fill);
 
-      // Pad the fields out to the nearest power of two if requsted
+      // Pad the fields out to the nearest power of two if requested
       if(conf_info.grid_decomp_flag == GridDecompType_Pad) {
          mlog << Debug(2) << "Padding the fields out to the nearest integer "
               << "power of two.\n";

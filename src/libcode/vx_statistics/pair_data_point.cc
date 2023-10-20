@@ -1119,7 +1119,7 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
    }
 
    // For pressure levels, check if the observation pressure level
-   // falls in the requsted range.
+   // falls in the requested range.
    if(obs_info->level().type() == LevelType_Pres) {
 
       if(obs_lvl < obs_info->level().lower() ||

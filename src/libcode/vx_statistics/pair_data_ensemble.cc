@@ -1498,7 +1498,7 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
         y < 0 || y >= gr.ny()) return;
 
    // For pressure levels, check if the observation pressure level
-   // falls in the requsted range.
+   // falls in the requested range.
    if(obs_info_grib->level().type() == LevelType_Pres) {
 
       if(obs_lvl < obs_info_grib->level().lower() ||
