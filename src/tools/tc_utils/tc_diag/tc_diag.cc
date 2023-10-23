@@ -415,7 +415,7 @@ void process_track_files(const StringArray& files,
        // Open current file
        if(!f.open(files[i].c_str())) {
           mlog << Error << "\nprocess_track_files() -> "
-              << "unable to open file \"" << files[i] << "\"\n\n";
+               << "unable to open file \"" << files[i] << "\"\n\n";
           exit(1);
        }
 
@@ -459,8 +459,8 @@ void process_track_files(const StringArray& files,
    // Check for no matching tracks
    if(tracks.n() == 0) {
        mlog << Error << "\nprocess_track_files() -> "
-           << "no tracks retained! Adjust the config file "
-           << "filtering options to select a single track.\n\n";
+            << "no tracks retained! Adjust the config file "
+            << "filtering options to select a single track.\n\n";
        exit(1);
    }
 
@@ -673,29 +673,14 @@ void setup_out_files(const TrackInfoArray &tracks) {
       // Store the track
       out_file_map[key].trk_ptr = &tracks[i];
 
-      // NetCDF diagnostics output
-      if(conf_info.nc_diag_flag) {
-         out_file_map[key].nc_diag_file =
-            build_out_file_name(out_file_map[key].trk_ptr, na_str, nc_diag_suffix);
-         out_file_map[key].nc_diag_out =
-            out_file_map[key].setup_nc_file(out_file_map[key].nc_diag_file);
-      }
+      // NetCDF diagnostics output file name
+      out_file_map[key].nc_diag_file =
+         build_out_file_name(out_file_map[key].trk_ptr, na_str, nc_diag_suffix);
 
-      // CIRA diagnostics output
-      if(conf_info.cira_diag_flag) {
-         out_file_map[key].cira_diag_file =
-            build_out_file_name(out_file_map[key].trk_ptr, na_str, cira_diag_suffix);
-         out_file_map[key].cira_diag_out = new ofstream;
-         out_file_map[key].cira_diag_out->open(out_file_map[key].cira_diag_file);
+      // CIRA diagnostics output file name
+      out_file_map[key].cira_diag_file =
+         build_out_file_name(out_file_map[key].trk_ptr, na_str, cira_diag_suffix);
 
-         if(!(*out_file_map[key].cira_diag_out)) {
-            mlog << Error << "\nsetup_out_files()-> "
-                 << "can't open the output file \""
-                 << out_file_map[key].cira_diag_file
-                 << "\" for writing!\n\n";
-            exit(1);
-         }
-      }
    } // end for i
 
    return;
@@ -1166,6 +1151,22 @@ void process_out_files(const TrackInfoArray& tracks) {
               << out_key << "\"!\n\n";
          exit(1);
       }
+      else {
+
+         // Error out for no output
+         if(out_file_map[out_key].n_diag() == 0) {
+            mlog << Error << "\n" << method_name << " -> "
+                 << "no diagnostics computed for key \""
+                 << out_key << "\"!\n\n";
+            exit(1);
+         }
+
+         // Log the number of diagnostics
+         mlog << Debug(3) << "For case \"" << out_key << "\", computed "
+              << out_file_map[out_key].diag_storm_keys.size() << " storm, "
+              << out_file_map[out_key].diag_sounding_keys.size() << " sounding, and "
+              << out_file_map[out_key].diag_custom_keys.size() << " custom diagnostics.\n"; 
+      }
 
       // Loop over domains
       for(int i_dom=0; i_dom<conf_info.domain_info.size(); i_dom++) {
@@ -1588,6 +1589,9 @@ void OutFileInfo::write_nc_diag() {
    NumArray prs_lev;
    int i, j, k;
 
+   // Setup the output NetCDF file
+   nc_diag_out = setup_nc_file(nc_diag_file);
+
    // Write storm diagnostics
    for(auto it = diag_storm_keys.begin();
        it != diag_storm_keys.end(); it++) {
@@ -1623,14 +1627,15 @@ void OutFileInfo::write_nc_diag() {
    // Sort the pressure levels
    prs_lev.sort_array(false);
 
+   // No pressure level data found
+   if(prs_lev.n() == 0) return;
+
    // Define the pressure dimension and coordinate variable
-   if(prs_lev.n() > 0) {
-      set<double> prs_set;
-      for(i=0; i<prs_lev.n(); i++) prs_set.insert(prs_lev[i]);
-      prs_dim = add_dim(nc_diag_out, "pressure",
-                        (long) prs_set.size());
-      def_tc_pressure(nc_diag_out, prs_dim, prs_set);
-   }
+   set<double> prs_set;
+   for(i=0; i<prs_lev.n(); i++) prs_set.insert(prs_lev[i]);
+   prs_dim = add_dim(nc_diag_out, "pressure",
+                     (long) prs_set.size());
+   def_tc_pressure(nc_diag_out, prs_dim, prs_set);
 
    // Allocate space
    int n_prs_data = vld_dim.getSize() * prs_dim.getSize();
@@ -1736,7 +1741,16 @@ void OutFileInfo::write_cira_diag() {
    ConcatString line;
    int i;
 
-   if(!cira_diag_out) return;
+   // Create output file stream
+   cira_diag_out = new ofstream;
+   cira_diag_out->open(cira_diag_file);
+
+   if(!cira_diag_out) {
+      mlog << Error << "\nOutFileInfo::write_cira_diag() -> "
+           << "can't open the output file \""
+           << cira_diag_file << "\" for writing!\n\n";
+      exit(1);
+   }
 
    // Write file header
    ConcatString bbnn;

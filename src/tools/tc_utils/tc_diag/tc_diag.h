@@ -235,7 +235,15 @@ class OutFileInfo {
               std::map<std::string,NumArray> &, bool);
 
       std::string get_diag_units(const std::string &);
+
+      int n_diag() const;
 };
+
+////////////////////////////////////////////////////////////////////////
+
+inline int OutFileInfo::n_diag() const { return(diag_storm_keys.size()    +
+                                                diag_sounding_keys.size() +
+                                                diag_custom_keys.size()); }
 
 static std::map<std::string,OutFileInfo> out_file_map;
 
