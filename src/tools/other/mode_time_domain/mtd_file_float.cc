@@ -101,7 +101,7 @@ void MtdFloatFile::float_init_from_scratch()
 
 {
 
-Data = 0;
+Data = nullptr;
 
 clear();
 
@@ -119,7 +119,7 @@ void MtdFloatFile::clear()
 
 MtdFileBase::clear();
 
-if ( Data )  { delete [] Data;  Data = 0; }
+if ( Data )  { delete [] Data;  Data = nullptr; }
 
 DataMin = DataMax = 0;
 
@@ -218,7 +218,7 @@ void MtdFloatFile::set_size(int _nx, int _ny, int _nt)
 {
 
 
-if ( Data )  { delete [] Data;  Data = 0; }
+if ( Data )  { delete [] Data;  Data = nullptr; }
 
 int j;
 const int n3 = _nx*_ny*_nt;
@@ -1011,18 +1011,6 @@ for (x=0; x<Nx; ++x)  {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
    //
    //  done
    //
@@ -1041,21 +1029,21 @@ void MtdFloatFile::regrid(const Grid & to_grid, const RegridInfo & info)
 
 if ( to_grid == (*G) )  return;
 
-int t;
 MtdFloatFile old = *this;
 DataPlane from_plane, to_plane;
 
 from_plane.set_size(old.nx(), old.ny());
   to_plane.set_size(old.nx(), old.ny());
 
-delete [] Data;  Data = 0;
+delete [] Data;  Data = nullptr;
 
 Nx = to_grid.nx();
 Ny = to_grid.ny();
 
 Data = new float [Nx*Ny*Nt];
+for (int t=0; t<Nx*Ny*Nt; ++t) Data[t] = bad_data_float;
 
-for (t=0; t<(old.nt()); ++t)  {
+for (int t=0; t<old.nt(); ++t)  {
 
    old.get_data_plane(t, from_plane);
 

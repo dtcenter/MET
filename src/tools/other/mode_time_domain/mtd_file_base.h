@@ -88,7 +88,7 @@ class MtdFileBase {
 
       int DeltaT;   //  seconds, useful for constant time increments
 
-      vector<unixtime> ActualValidTimes; // useful for uneven time increments
+      std::vector<unixtime> ActualValidTimes; // useful for uneven time increments
 
       IntArray Lead_Times;
 
@@ -117,7 +117,7 @@ class MtdFileBase {
 
       void set_delta_t          (int);   //  seconds
 
-      void init_actual_valid_times(const vector<unixtime> &validTimes);
+      void init_actual_valid_times(const std::vector<unixtime> &validTimes);
 
       void set_lead_time(int index, int value);
 

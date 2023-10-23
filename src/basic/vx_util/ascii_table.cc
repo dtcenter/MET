@@ -1567,7 +1567,6 @@ switch ( just )  {
    default:
       mlog << Error << "\njustified_item() -> bad justification value\n\n";
       exit ( 1 );
-      break;
 
 }   //  switch
 
