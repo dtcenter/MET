@@ -33,6 +33,14 @@ BAD_DATA_INT = 9999
 
 ###########################################
 
+# Define output dictionaries as global
+storm_data    = {}
+sounding_data = {}
+custom_data   = {}
+units         = {}
+
+###########################################
+
 def main():
 
     # Handle arguments
@@ -67,12 +75,6 @@ def main():
     except:
         print("Error computing diagnostics with command (", ' '.join(sys.argv), ")", sep="")
         sys.exit(1)
-
-    # Store results in STORM, SOUNDING, and CUSTOM dictionaries
-    storm_data    = {}
-    sounding_data = {}
-    custom_data   = {}
-    units         = {}
 
     # Process pressure independent diagnostics
     for d in results.pressure_independent.keys():
@@ -165,6 +167,6 @@ def _get_args() -> argparse.Namespace:
 
     return parser.parse_args()
 
-if __name__ == "__main__":
-    main()
+# Always run the main function
+main()
 
