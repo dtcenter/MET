@@ -654,32 +654,32 @@ void setup_out_files(const TrackInfoArray &tracks) {
    for(i=0; i<tracks.n(); i++) {
 
       // Build the map key
-      ConcatString key = get_out_key(tracks[i]);
+      ConcatString out_key = get_out_key(tracks[i]);
 
       // Check for duplicates
-      if(out_file_map.count(key) > 0) {
+      if(out_file_map.count(out_key) > 0) {
          mlog << Error << "\nsetup_out_files()-> "
               << "found multiple tracks for key \""
-              << key << "\"!\n\n";
+              << out_key << "\"!\n\n";
          exit(1);
       }
 
       // Add new map entry
-      out_file_map[key] = out_info;
+      out_file_map[out_key] = out_info;
 
       mlog << Debug(3) << "Preparing output files for "
-           << key << " track.\n";
+           << out_key << " track.\n";
 
       // Store the track
-      out_file_map[key].trk_ptr = &tracks[i];
+      out_file_map[out_key].trk_ptr = &tracks[i];
 
       // NetCDF diagnostics output file name
-      out_file_map[key].nc_diag_file =
-         build_out_file_name(out_file_map[key].trk_ptr, na_str, nc_diag_suffix);
+      out_file_map[out_key].nc_diag_file =
+         build_out_file_name(out_file_map[out_key].trk_ptr, na_str, nc_diag_suffix);
 
       // CIRA diagnostics output file name
-      out_file_map[key].cira_diag_file =
-         build_out_file_name(out_file_map[key].trk_ptr, na_str, cira_diag_suffix);
+      out_file_map[out_key].cira_diag_file =
+         build_out_file_name(out_file_map[out_key].trk_ptr, na_str, cira_diag_suffix);
 
    } // end for i
 
@@ -1151,22 +1151,6 @@ void process_out_files(const TrackInfoArray& tracks) {
               << out_key << "\"!\n\n";
          exit(1);
       }
-      else {
-
-         // Error out for no output
-         if(out_file_map[out_key].n_diag() == 0) {
-            mlog << Error << "\n" << method_name << " -> "
-                 << "no diagnostics computed for key \""
-                 << out_key << "\"!\n\n";
-            exit(1);
-         }
-
-         // Log the number of diagnostics
-         mlog << Debug(3) << "For case \"" << out_key << "\", computed "
-              << out_file_map[out_key].diag_storm_keys.size() << " storm, "
-              << out_file_map[out_key].diag_sounding_keys.size() << " sounding, and "
-              << out_file_map[out_key].diag_custom_keys.size() << " custom diagnostics.\n"; 
-      }
 
       // Loop over domains
       for(int i_dom=0; i_dom<conf_info.domain_info.size(); i_dom++) {
@@ -1204,6 +1188,20 @@ void process_out_files(const TrackInfoArray& tracks) {
          }
 
       } // end for i_dom
+
+      // Error out for no output
+      if(out_file_map[out_key].n_diag() == 0) {
+         mlog << Error << "\n" << method_name << " -> "
+              << "no diagnostics computed for key \""
+              << out_key << "\"!\n\n";
+         exit(1);
+      }
+
+      // Log the number of diagnostics
+      mlog << Debug(3) << "For case \"" << out_key << "\", computed "
+           << out_file_map[out_key].diag_storm_keys.size() << " storm, "
+           << out_file_map[out_key].diag_sounding_keys.size() << " sounding, and "
+           << out_file_map[out_key].diag_custom_keys.size() << " custom diagnostics.\n"; 
 
       // Write NetCDF diagnostics output
       if(conf_info.nc_diag_flag) {
