@@ -188,12 +188,13 @@ void TCDiagConfInfo::clear() {
    vortex_removal_flag = false;
    one_time_per_file_flag = true;
 
-   nc_rng_azi_flag = false;
-   nc_diag_flag    = false;
-   cira_diag_flag  = false;
+   output_base_format.clear();
+
+   nc_cyl_grid_flag = false;
+   nc_diag_flag     = false;
+   cira_diag_flag   = false;
 
    tmp_dir.clear();
-   output_prefix.clear();
 
    return;
 }
@@ -332,8 +333,11 @@ void TCDiagConfInfo::process_config(GrdFileType file_type,
    one_time_per_file_flag =
       conf.lookup_bool(conf_key_one_time_per_file_flag);
 
-   // Conf: nc_rng_azi_flag
-   nc_rng_azi_flag = conf.lookup_bool(conf_key_nc_rng_azi_flag);
+   // Conf: output_base_format
+   output_base_format = conf.lookup_string(conf_key_output_base_format);
+
+   // Conf: nc_cyl_grid_flag
+   nc_cyl_grid_flag = conf.lookup_bool(conf_key_nc_cyl_grid_flag);
 
    // Conf: nc_diag_flag
    nc_diag_flag = conf.lookup_bool(conf_key_nc_diag_flag);
@@ -342,9 +346,9 @@ void TCDiagConfInfo::process_config(GrdFileType file_type,
    cira_diag_flag = conf.lookup_bool(conf_key_cira_diag_flag);
 
    // At least one output type must be requested
-   if(!nc_rng_azi_flag && !nc_diag_flag && !cira_diag_flag) {
+   if(!nc_cyl_grid_flag && !nc_diag_flag && !cira_diag_flag) {
       mlog << Error << "\nTCDiagConfInfo::process_config() -> "
-           << "the \"" << conf_key_nc_rng_azi_flag
+           << "the \"" << conf_key_nc_cyl_grid_flag
            << "\", \"" << conf_key_nc_diag_flag
            << "\", and \"" << conf_key_cira_diag_flag
            << "\" config entries cannot all be false.\n\n";
@@ -353,9 +357,6 @@ void TCDiagConfInfo::process_config(GrdFileType file_type,
 
    // Conf: tmp_dir
    tmp_dir = parse_conf_tmp_dir(&conf);
-
-   // Conf: output_prefix
-   output_prefix = conf.lookup_string(conf_key_output_prefix);
 
    return;
 }

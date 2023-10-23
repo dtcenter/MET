@@ -100,6 +100,7 @@ static ConcatString build_tmp_file_name(const TrackInfo *,
                                         const TrackPoint *,
                                         const string &);
 static ConcatString build_out_file_name(const TrackInfo *,
+                                        const char *,
                                         const char *);
 
 static void write_tc_storm(NcFile *, const char *,
@@ -675,7 +676,7 @@ void setup_out_files(const TrackInfoArray &tracks) {
       // NetCDF diagnostics output
       if(conf_info.nc_diag_flag) {
          out_file_map[key].nc_diag_file =
-            build_out_file_name(out_file_map[key].trk_ptr, "_diag.nc");
+            build_out_file_name(out_file_map[key].trk_ptr, na_str, nc_diag_suffix);
          out_file_map[key].nc_diag_out =
             out_file_map[key].setup_nc_file(out_file_map[key].nc_diag_file);
       }
@@ -683,7 +684,7 @@ void setup_out_files(const TrackInfoArray &tracks) {
       // CIRA diagnostics output
       if(conf_info.cira_diag_flag) {
          out_file_map[key].cira_diag_file =
-            build_out_file_name(out_file_map[key].trk_ptr, "_diag.txt");
+            build_out_file_name(out_file_map[key].trk_ptr, na_str, cira_diag_suffix);
          out_file_map[key].cira_diag_out = new ofstream;
          out_file_map[key].cira_diag_out->open(out_file_map[key].cira_diag_file);
 
@@ -748,22 +749,70 @@ ConcatString build_tmp_file_name(const TrackInfo *trk_ptr,
 ////////////////////////////////////////////////////////////////////////
 
 ConcatString build_out_file_name(const TrackInfo *trk_ptr,
+                                 const char *domain,
                                  const char *suffix) {
    ConcatString cs;
 
    // Build the output file name
-   cs << out_dir << "/" << program_name;
+   cs << out_dir << "/" << conf_info.output_base_format << suffix;
 
-   // Append the output prefix, if defined
-   if(conf_info.output_prefix.nonempty()) {
-      cs << "_" << conf_info.output_prefix;
-   }
+   // Store supported format options
+   map<string,string> opts;
+   opts["{domain}"]           = domain;
+   opts["{storm_id}"]         = trk_ptr->storm_id();
+   opts["{basin}"]            = trk_ptr->basin();
+   opts["{cyclone}"]          = trk_ptr->cyclone();
+   opts["{storm_name}"]       = trk_ptr->storm_name();
+   opts["{technique_number}"] = trk_ptr->technique_number();
+   opts["{technique}"]        = trk_ptr->technique();
+   opts["{init_ymdh}"]        = unix_to_yyyymmddhh(trk_ptr->init());
+   opts["{init_ymd_hms}"]     = unix_to_yyyymmdd_hhmmss(trk_ptr->init());
+   opts["{init_hour}"]        = trk_ptr->init_hour();
 
-   // Append the track information
-   cs << "_" << get_out_key(*trk_ptr);
+   // Update the path
+   string key, val;
+   size_t beg_pos, end_pos;
+   while((beg_pos = cs.string().find('{')) != string::npos) {
 
-   // Append the suffix
-   cs << suffix;
+      // Find closing }
+      if((end_pos = cs.string().find('}', beg_pos)) == string::npos) {
+         mlog << Error << "\nbuild_out_file_name() -> "
+              << "Missing closing '}' character in the "
+              << conf_key_output_base_format
+              << " configuration setting \""
+              << conf_info.output_base_format << "\"!\n\n";
+         exit(1);
+      }
+
+      // Store the key
+      key = cs.string().substr(beg_pos, end_pos - beg_pos + 1);
+
+      // Check that the key is defined
+      if(opts.count(key) == 0) {
+         mlog << Error << "\nbuild_out_file_name() -> "
+              << "unsupported \"" << key << "\" entry found in the "
+              << conf_key_output_base_format
+              << " configuration setting \""
+              << conf_info.output_base_format << "\"!\n\n";
+         exit(1);
+      }
+      else if(opts[key].empty()) {
+         mlog << Warning << "\nbuild_out_file_name() -> "
+              << "\"" << key << "\" entry in the "
+              << conf_key_output_base_format
+              << " configuration setting \""
+              << conf_info.output_base_format
+              << "\" is an empty string!\n\n";
+         val = na_str;
+      }
+      else {
+         val = opts[key];
+      }
+
+      // Update the path
+      cs.replace(key.c_str(), to_lower(val).c_str());
+
+   } // end while
 
    return(cs);
 }
@@ -1148,8 +1197,8 @@ void process_out_files(const TrackInfoArray& tracks) {
 
          } // end for i_pnt
 
-         // Write NetCDF range-azimuth output
-         if(conf_info.nc_rng_azi_flag) {
+         // Write NetCDF cylindrical coordinates grid output
+         if(conf_info.nc_cyl_grid_flag) {
             merge_tmp_files(domain_tmp_file_list);
          }
 
@@ -1183,12 +1232,11 @@ void merge_tmp_files(const vector<TmpFileInfo *> tmp_files) {
 
       // Create the output NetCDF file
       if(!nc_out) {
-         ConcatString suffix_cs, file_name;
-         suffix_cs << "_cyl_grid_"
-                   << tmp_files[i_tmp]->domain << ".nc";
+         ConcatString file_name;
          file_name = build_out_file_name(
                         tmp_files[i_tmp]->trk_ptr,
-                        suffix_cs.c_str());
+                        tmp_files[i_tmp]->domain.c_str(),
+                        nc_cyl_grid_suffix);
 
          mlog << Debug(1) << "Writing Cylindrical Coordinates file: "
               << file_name << "\n";

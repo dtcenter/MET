@@ -125,14 +125,14 @@ class TCDiagConfInfo {
       // One time per file settings
       bool one_time_per_file_flag;
 
+      // String to specify the base output file naming convention
+      ConcatString output_base_format;
+
       // Directory for temporary files
       ConcatString tmp_dir;
 
-      // String to customize output file name
-      ConcatString output_prefix;
-
       // Output file options
-      bool nc_rng_azi_flag;
+      bool nc_cyl_grid_flag;
       bool nc_diag_flag;
       bool cira_diag_flag;
 
