@@ -137,14 +137,18 @@ one_time_per_file_flag = TRUE;
 //
 // Flags to control output files
 //
-nc_rng_azi_flag = TRUE;
-nc_diag_flag    = TRUE;
-cira_diag_flag  = TRUE;
+nc_cyl_grid_flag = TRUE; // ends with "_cyl_grid_{domain}.nc"
+nc_diag_flag     = TRUE; // ends with "_diag.nc"
+cira_diag_flag   = TRUE; // ends with "_diag.dat"
+
+//
+// Output base file naming convention
+//
+output_base_format = "s{storm_id}_{technique}_doper_{init_ymdh}";
 
 ////////////////////////////////////////////////////////////////////////////////
 
-tmp_dir       = "/tmp";
-output_prefix = "";
-version       = "V12.0.0";
+tmp_dir = "/tmp";
+version = "V12.0.0";
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -288,6 +288,12 @@ bool parse_python_module(PyObject *module_obj,
    // Get the namespace for the module (as a dictionary)
    PyObject *module_dict_obj = PyModule_GetDict(module_obj);
 
+   if(!module_dict_obj || !PyDict_Check(module_dict_obj)) {
+      mlog << Warning << "\n" << method_name << " -> "
+           << "python module is not a dictionary.\n\n";
+      return(false);
+   }
+
    // Storm data
    if(status) status = parse_python_string_value_map(
                           module_dict_obj,
@@ -327,14 +333,13 @@ bool parse_python_string_value_map(PyObject *dict,
 
    const char *method_name = "parse_python_string_value_map()";
 
-   PyObject *key_obj = nullptr;
    PyObject *val_obj = nullptr;
    int status;
    double val;
    long pos;
 
-   PyObject *data_obj = PyDict_GetItem(dict,
-                           PyUnicode_FromString(name));
+   PyObject *key_obj  = PyUnicode_FromString(name);
+   PyObject *data_obj = PyDict_GetItem(dict, key_obj);
 
    if(!data_obj || !PyDict_Check(data_obj)) {
       mlog << Warning << "\n" << method_name << " -> "

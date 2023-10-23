@@ -65,6 +65,11 @@ static const char* default_config_filename =
 // Default output directory
 static const char* default_out_dir = ".";
 
+// Output file suffix names
+static const char* nc_cyl_grid_suffix = "_cyl_grid_{domain}.nc";
+static const char* nc_diag_suffix     = "_diag.nc";
+static const char* cira_diag_suffix   = "_diag.dat";
+
 // Default output prefix
 static const char* default_out_prefix = "";
 

@@ -226,21 +226,28 @@ If true, all input fields are read efficiently from each file in a single call. 
 
 .. code-block:: none
 
-  nc_rng_azi_flag = TRUE;
-  nc_diag_flag    = FALSE;
-  cira_diag_flag  = FALSE;
+  output_base_format = "s{storm_id}_{model}_doper_{init_time}";
 
-These three flag entries are booleans specifying what output data types should be written. The **nc_rng_azi_flag** entry controls the writing of a NetCDF file containing the cylindrical coordinate range-azimuth data used to compute the diagnostics. The **nc_diag_file** entry controls the writing of the computed diagnostics to a NetCDF file. The **cira_diag_flage** entry controls the writing of the computed diagnostics to a formatted ASCII output file. At least one of these flags must be set to true.
 
-.. note:: As of MET version 11.1.0, **nc_rng_azi_flag** is the only supported output type. These configuration options will automatically be reset at runtime to the settings listed above.
 
-Configuring MET version, output prefix, and temp directory
+.. code-block:: none
+
+  nc_cyl_grid_flag = TRUE; // ends with "_cyl_grid_{domain}.nc"
+  nc_diag_flag     = TRUE; // ends with "_diag.nc"
+  cira_diag_flag   = TRUE; // ends with "_diag.dat"
+
+These three flag entries are booleans specifying what output data types should be written. At least one of these flags must be set to true.
+
+  - The **nc_cyl_grid_flag** entry controls the writing of a NetCDF file containing the cylindrical coordinate range-azimuth data used to compute the diagnostics. These files are written with a `_cyl_grid_{domain}.nc` suffix, where `{domain}` is the domain name specified in the configuration file.
+  - The **nc_diag_file** entry controls the writing of the computed diagnostics to a NetCDF file. These files are written with a `_diag.nc` suffix.
+  - The **cira_diag_flage** entry controls the writing of the computed diagnostics to a formatted ASCII output file. These files are written with a `_diag.dat` suffix.
+
+Configuring MET version and temp directory
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: none
 
   tmp_dir       = "/tmp";
-  output_prefix = "";
   version       = "V11.1.0";
 
 These options are common to multiple MET tools and are described in :numref:`config_options`.
