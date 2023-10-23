@@ -334,12 +334,13 @@ bool parse_python_string_value_map(PyObject *dict,
    const char *method_name = "parse_python_string_value_map()";
 
    PyObject *val_obj = nullptr;
+   PyObject *key_obj = nullptr;
    int status;
    double val;
    long pos;
 
-   PyObject *key_obj  = PyUnicode_FromString(name);
-   PyObject *data_obj = PyDict_GetItem(dict, key_obj);
+   PyObject *data_obj = PyDict_GetItem(dict,
+		           PyUnicode_FromString(name));
 
    if(!data_obj || !PyDict_Check(data_obj)) {
       mlog << Warning << "\n" << method_name << " -> "
