@@ -4,8 +4,8 @@ import datetime as dt
 import inspect
 import io
 import pathlib
-from typing import Any, Dict, List, Optional, Tuple
 import sys
+from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -40,12 +40,19 @@ class DriverConfig:
     radii_to_validate: List[float]
     """List of radii to check against the min/max radii found in the file."""
 
+    comment_dict: Dict[str, Any]
+    comment_format: str
+
     land_lut_file: Optional[pathlib.Path] = None
     """Land LUT file can be provided in config or as a calling arg to diag_calcs"""
 
     def __post_init__(self):
         if self.land_lut_file is not None:
             self.land_lut_file = pathlib.Path(self.land_lut_file)
+
+    @property
+    def comment(self) -> str:
+        return self.comment_format.format(**self.comment_dict)
 
 
 def main():
@@ -109,7 +116,12 @@ def _get_args() -> argparse.Namespace:
 def populate_missing_results(
     config: DriverConfig, forecast_hour: int, levels_hPa: List[int]
 ) -> fcresults.ForecastHourResults:
-    _batches, results = _prep_diag_calculations(config, forecast_hour, levels_hPa)
+    _batches, results = _prep_diag_calculations(
+        config.pressure_independent_computation_specs,
+        config.sounding_computation_specs,
+        forecast_hour,
+        levels_hPa,
+    )
     return results
 
 
@@ -138,7 +150,12 @@ def diag_calcs(
     lon = input_data[config.lon_input_name][0]
     lat = input_data[config.lat_input_name][0]
 
-    batches, results = _prep_diag_calculations(config, forecast_hour, levels_hPa)
+    batches, results = _prep_diag_calculations(
+        config.pressure_independent_computation_specs,
+        config.sounding_computation_specs,
+        forecast_hour,
+        levels_hPa,
+    )
 
     call_args = {
         "input_data": input_data,
@@ -177,12 +194,13 @@ def _get_land_lut_filename(
 
 
 def _prep_diag_calculations(
-    config: DriverConfig, forecast_hour: int, levels_hPa: List[int]
+    pressure_independent_computation_specs: List[ce.DiagComputation],
+    sounding_computation_specs: List[ce.DiagComputation],
+    forecast_hour: int,
+    levels_hPa: List[int],
 ) -> Tuple[List[ce.ComputationBatch], fcresults.ForecastHourResults]:
-    pi_comps = ce.diag_computations_from_entry(
-        config.pressure_independent_computation_specs
-    )
-    snd_comps = ce.diag_computations_from_entry(config.sounding_computation_specs)
+    pi_comps = ce.diag_computations_from_entry(pressure_independent_computation_specs)
+    snd_comps = ce.diag_computations_from_entry(sounding_computation_specs)
 
     pi_result_names, snd_result_names = ce.get_all_result_names(pi_comps, snd_comps)
     results = fcresults.ForecastHourResults(

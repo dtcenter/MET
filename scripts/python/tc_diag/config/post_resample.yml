@@ -1,3 +1,4 @@
+land_lut_file: tests/post_resample_test/input_data/v2023-04-07_gdland_table.dat
 in_forecast_time_name: lead_time
 in_levels_name: &in_levels_name pressure
 in_radii_name: range
@@ -27,36 +28,135 @@ tpw_min_km: &tpw_min_km 0
 tpw_max_km: &tpw_max_km 200
 sst_min_km: &sst_min_km 0
 sst_max_km: &sst_max_km 50
-radii_to_validate: [*wind_min_km, *wind_max_km, *therm_min_km, *therm_max_km, *tpw_min_km, *tpw_max_km, *sst_min_km, *sst_max_km]
+rmw_min_km: &rmw_min_km 0
+rmw_max_km: &rmw_max_km 500
+rad_tan_min_km: &rad_tan_min_km 0
+rad_tan_max_km: &rad_tan_max_km 600
+div_vort_min_km: &div_vort_min_km 0
+div_vort_max_km: &div_vort_max_km 1000
+radii_to_validate: [
+  *wind_min_km, *wind_max_km, *therm_min_km, *therm_max_km, *tpw_min_km, 
+  *tpw_max_km, *sst_min_km, *sst_max_km, *rmw_min_km, *rmw_max_km, 
+  *rad_tan_min_km, *rad_tan_max_km, *div_vort_min_km, *div_vort_max_km]
 
 
 pressure_independent_computation_specs:
-  lat: {callable: *kwarg_lookup_func, kwargs: {lookup_name: lat}}
-  lon: {callable: *kwarg_lookup_func, kwargs: {lookup_name: lon}}
-  vmax: {callable: *ds_input_lookup_func, kwargs: {var_name: TrackVMax}}
-  min_slp: {callable: *ds_input_lookup_func, kwargs: {var_name: TrackMSLP}}
-  rmw: {callable: tc_diag_driver.met_diag_vars.average_rmw, kwargs: {u_surface_name: *u_surf_name, v_surface_name: *v_surf_name, radius_km: 500}}
-  t_surf: {callable: *area_avg_func, kwargs: {min_radius_km: *therm_min_km, max_radius_km: *therm_max_km, var_name: TMP_Z2}}
-  r_surf: {callable: *area_avg_func, kwargs: {min_radius_km: *therm_min_km, max_radius_km: *therm_max_km, var_name: RH_Z2}}
-  p_surf: {callable: *area_avg_func, kwargs: {min_radius_km: *therm_min_km, max_radius_km: *therm_max_km, var_name: PRMSL_Z0}}
-  u_surf: {callable: *area_avg_func, kwargs: {min_radius_km: *wind_min_km, max_radius_km: *wind_max_km, var_name: *u_surf_name}}
-  v_surf: {callable: *area_avg_func, kwargs: {min_radius_km: *wind_min_km, max_radius_km: *wind_max_km, var_name: *v_surf_name}}
-  tpw: {callable: *area_avg_func, kwargs: {min_radius_km: *tpw_min_km, max_radius_km: *tpw_max_km, var_name: PWAT_L0}}
-  sst: {callable: *area_avg_func, kwargs: {min_radius_km: *sst_min_km, max_radius_km: *sst_max_km, var_name: TMP_Z0}}
-  ohc: {callable: tc_diag_driver.diag_vars.always_missing, units: kJ/cm2}
-  land: {callable: tc_diag_driver.met_diag_vars.distance_to_land_lookup}
-  storm_r_theta: {callable: tc_diag_driver.met_diag_vars.storm_r_theta, output_vars: [stm_spd, stm_hdg]}
-  rad_tan_area_avg: {callable: *rad_tan_aavg_func, output_vars: [850radial, 850tang], kwargs: {u_name: *u_vert_name, v_name: *v_vert_name, level_hPa: 850, min_radius_km: 0, max_radius_km: 600}}
-  div_vort_850: {callable: *div_vort_func, output_vars: [850dvrg, 850vort], kwargs: {u_name: *u_vert_name, v_name: *v_vert_name, level_hPa: 850, radius_km: 1000}}
-  div_vort_200: {callable: *div_vort_func, output_vars: [200dvrg, 200vort], kwargs: {u_name: *u_vert_name, v_name: *v_vert_name, level_hPa: 200, radius_km: 1000}}
+  LAT: {callable: *kwarg_lookup_func, kwargs: {lookup_name: lat}, units: DEG}
+  LON: {callable: *kwarg_lookup_func, kwargs: {lookup_name: lon}, units: DEG}
+  MAXWIND: {callable: *ds_input_lookup_func, kwargs: {var_name: TrackVMax}, units: KT}
+  MIN_SLP: {callable: *ds_input_lookup_func, kwargs: {var_name: TrackMSLP}, units: MB}
+  RMW:
+    callable: tc_diag_driver.met_diag_vars.average_rmw
+    kwargs: {u_surface_name: *u_surf_name, v_surface_name: *v_surf_name, radius_km: *rmw_max_km}
+    units: KM
+  T_SURF: 
+    callable: *area_avg_func 
+    kwargs: {min_radius_km: *therm_min_km, max_radius_km: *therm_max_km, var_name: TMP_Z2}
+    unit_converters: tc_diag_driver.met_post_process.k_to_10c
+    units: 10C
+  R_SURF: 
+    callable: *area_avg_func
+    kwargs: {min_radius_km: *therm_min_km, max_radius_km: *therm_max_km, var_name: RH_Z2}
+    units: "%"
+  P_SURF:
+    callable: *area_avg_func
+    kwargs: {min_radius_km: *therm_min_km, max_radius_km: *therm_max_km, var_name: PRMSL_Z0}
+    unit_converters: tc_diag_driver.met_post_process.pa_to_mb
+    units: MB
+  U_SURF:
+    callable: *area_avg_func
+    kwargs: {min_radius_km: *wind_min_km, max_radius_km: *wind_max_km, var_name: *u_surf_name}
+    unit_converters: tc_diag_driver.met_post_process.mps_to_10kt
+    units: 10KT
+  V_SURF:
+    callable: *area_avg_func
+    kwargs: {min_radius_km: *wind_min_km, max_radius_km: *wind_max_km, var_name: *v_surf_name}
+    unit_converters: tc_diag_driver.met_post_process.mps_to_10kt
+    units: 10KT
+  TPW:
+    callable: *area_avg_func
+    kwargs: {min_radius_km: *tpw_min_km, max_radius_km: *tpw_max_km, var_name: PWAT_L0}
+    units: MM
+  SST:
+    callable: *area_avg_func
+    kwargs: {min_radius_km: *sst_min_km, max_radius_km: *sst_max_km, var_name: TMP_Z0}
+    unit_converters: tc_diag_driver.met_post_process.k_to_10c
+    units: 10C
+  OHC: {callable: tc_diag_driver.diag_vars.always_missing, units: KJ/CM2}
+  LAND: {callable: tc_diag_driver.met_diag_vars.distance_to_land_lookup, units: KM}
+  storm_r_theta: 
+    callable: tc_diag_driver.met_diag_vars.storm_r_theta 
+    output_vars: [STM_SPD, STM_HDG]
+    units: [KT, DEG]
+  rad_tan_area_avg:
+    callable: *rad_tan_aavg_func 
+    output_vars: [850RADIAL, 850TANG] 
+    kwargs: {
+      u_name: *u_vert_name, v_name: *v_vert_name, level_hPa: 850, 
+      min_radius_km: *rad_tan_min_km, max_radius_km: *rad_tan_max_km}
+    unit_converters: [pass, tc_diag_driver.met_post_process.scale10] 
+    units: [RADIANS, 10M/S]
+  div_vort_850:
+    callable: *div_vort_func 
+    output_vars: [850DVG, 850VORT] 
+    kwargs: {u_name: *u_vert_name, v_name: *v_vert_name, level_hPa: 850, radius_km: *div_vort_max_km}
+  div_vort_200: 
+    callable: *div_vort_func
+    output_vars: [200DVG, 200VORT] 
+    kwargs: {u_name: *u_vert_name, v_name: *v_vert_name, level_hPa: 200, radius_km: *div_vort_max_km}
 
-  shear: {batch_order: 1, callable: tc_diag_driver.met_diag_vars.shear, output_vars: [shr_mag, shr_hdg], kwargs: {u_name: u, v_name: v, bottom_hPa: 850, top_hPa: 200}}
-  tgrd: {batch_order: 1, callable: tc_diag_driver.met_diag_vars.temperature_gradient, kwargs: {u_name: u, v_name: v, bottom_hPa: 850, top_hPa: 700}}
 
+  shear: 
+    batch_order: 1
+    callable: tc_diag_driver.met_diag_vars.shear 
+    output_vars: [SHR_MAG, SHR_HDG] 
+    kwargs: {u_name: u, v_name: v, bottom_hPa: 850, top_hPa: 200}
+    unit_converters: [tc_diag_driver.met_post_process.mps_to_kt, pass]
+    units: [KT, DEG]
+  TGRD:
+    batch_order: 1
+    callable: tc_diag_driver.met_diag_vars.temperature_gradient
+    kwargs: {u_name: u, v_name: v, bottom_hPa: 850, top_hPa: 700}
+    units: "10^7C/M"
 
 sounding_computation_specs:
-  u: {callable: *area_avg_func, kwargs: {min_radius_km: *wind_min_km, max_radius_km: *wind_max_km, var_name: *u_vert_name, levels_dimen: *in_levels_name}}
-  v: {callable: *area_avg_func, kwargs: {min_radius_km: *wind_min_km, max_radius_km: *wind_max_km, var_name: *v_vert_name, levels_dimen: *in_levels_name}}
-  t: {callable: *area_avg_func, kwargs: {min_radius_km: *therm_min_km, max_radius_km: *therm_max_km, var_name: TMP, levels_dimen: *in_levels_name}}
-  r: {callable: *area_avg_func, kwargs: {min_radius_km: *therm_min_km, max_radius_km: *therm_max_km, var_name: RH, levels_dimen: *in_levels_name}}
-  z: {callable: *area_avg_func, kwargs: {min_radius_km: *therm_min_km, max_radius_km: *therm_max_km, var_name: HGT, levels_dimen: *in_levels_name}}
+  U: 
+    callable: *area_avg_func
+    kwargs: {min_radius_km: *wind_min_km, max_radius_km: *wind_max_km, var_name: *u_vert_name, levels_dimen: *in_levels_name}
+    unit_converters: tc_diag_driver.met_post_process.mps_to_10kt
+    units: 10KT
+  V: 
+    callable: *area_avg_func
+    kwargs: {min_radius_km: *wind_min_km, max_radius_km: *wind_max_km, var_name: *v_vert_name, levels_dimen: *in_levels_name}
+    unit_converters: tc_diag_driver.met_post_process.mps_to_10kt
+    units: 10KT
+  T:
+    callable: *area_avg_func
+    kwargs: {min_radius_km: *therm_min_km, max_radius_km: *therm_max_km, var_name: TMP, levels_dimen: *in_levels_name}
+    unit_converters: tc_diag_driver.met_post_process.k_to_10c
+    units: 10C
+  R:
+    callable: *area_avg_func
+    kwargs: {min_radius_km: *therm_min_km, max_radius_km: *therm_max_km, var_name: RH, levels_dimen: *in_levels_name}
+    units: "%"
+  Z:
+    callable: *area_avg_func
+    kwargs: {min_radius_km: *therm_min_km, max_radius_km: *therm_max_km, var_name: HGT, levels_dimen: *in_levels_name}
+
+comment_dict: {
+  sst_min: *sst_min_km, sst_max: *sst_max_km, rmw_min: *rmw_min_km, 
+  rmw_max: *rmw_max_km, wind_min: *wind_min_km, wind_max: *wind_max_km, 
+  div_vort_min: *div_vort_min_km, div_vort_max: *div_vort_max_km, 
+  rad_tan_min: *rad_tan_min_km, rad_tan_max: *rad_tan_max_km,
+  therm_min: *therm_min_km, therm_max: *therm_max_km, 
+  tpw_min: *tpw_min_km, tpw_max: *tpw_max_km}
+comment_format: |
+  ------------------------------------------------------     COMMENTS     ------------------------------------------------------------
+
+  *   SST, OHC averaged from {sst_min}-{sst_max} km around storm center [x10 C, kJ/cm2]   *
+  *   RMW within {rmw_min}-{rmw_max} km around storm center [km]   *
+  *   U, V, SHR averaged from {wind_min}-{wind_max} km around storm center [x10 kt, x10 kt, kt]   *
+  *   850VORT, 200DVRG averaged from {div_vort_min}-{div_vort_max} km around storm center [x10^7 /s, x10^7 /s]   *
+  *   850TANG averaged from {rad_tan_min}-{rad_tan_max} km around storm center [x10 m/s]   *
+  *   T, R, Z, P averaged from {therm_min}-{therm_max} km around storm center [x10 C, %, dm, mb]   *
+  *   TPW averaged from {tpw_min}-{tpw_max} km around storm center [mm]   *
