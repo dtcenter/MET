@@ -36,6 +36,7 @@ static const char storm_data_dict_name    [] = "storm_data";
 static const char sounding_data_dict_name [] = "sounding_data";
 static const char custom_data_dict_name   [] = "custom_data";
 static const char units_dict_name         [] = "units";
+static const char comments_item_name      [] = "comments";
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -61,6 +62,11 @@ static bool parse_python_string_string_map(
                PyObject *dict,
                const char *name,
                map<string,string> &m);
+
+static bool parse_python_string(
+               PyObject *dict,
+               const char *name,
+               string &s);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -321,6 +327,21 @@ bool parse_python_module(PyObject *module_obj,
                           units_dict_name,
                           tmp_info.diag_units_map);
 
+   // Comments
+   string str;
+   if(status) status = parse_python_string(module_dict_obj,
+                          comments_item_name, str);
+
+   ConcatString cs(str);
+   StringArray sa = cs.split("\n");
+
+   // Skip COMMENTS title line
+   for(int i=0; i<sa.n(); i++) {
+      if(sa[i].find("COMMENTS") == string::npos) {
+         tmp_info.comment_lines.add(sa[i]);
+      }
+   }
+
    return(status);
 }
 
@@ -447,6 +468,29 @@ bool parse_python_string_string_map(PyObject *dict,
          m[key_str] = val_str;
       }
    } // end while
+
+   return(true);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool parse_python_string(PyObject *dict,
+        const char *name, string &s) {
+
+   const char *method_name = "parse_python_string()";
+
+   PyObject *data_obj = PyDict_GetItem(dict,
+                           PyUnicode_FromString(name));
+
+   if(!data_obj || !PyUnicode_Check(data_obj)) {
+      mlog << Warning << "\n" << method_name << " -> "
+           << "trouble parsing the \"" << name
+           << "\" python string.\n\n";
+      return(false);
+   }
+
+   // Store the string
+   s = PyUnicode_AsUTF8(data_obj);
 
    return(true);
 }

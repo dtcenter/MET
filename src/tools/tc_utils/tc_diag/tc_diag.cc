@@ -1428,6 +1428,7 @@ void OutFileInfo::clear() {
    diag_custom_map.clear();
 
    diag_units_map.clear();
+   comment_lines.clear();
 
    // Write NetCDF diagnostics file
    if(nc_diag_out) {
@@ -1524,6 +1525,9 @@ void OutFileInfo::add_tmp_file_info(const TmpFileInfo &tmp_info, int i_pnt) {
    // Update the units
    add_diag_units(tmp_info.diag_units_map);
 
+   // Store the comments
+   set_diag_comments(tmp_info.comment_lines);
+
    return;
 }
 
@@ -1576,6 +1580,26 @@ void OutFileInfo::add_diag_units(const map<string,string> &m_src) {
               << "\" to \"" << it->second << ".\n\n";
          diag_units_map[it->first] = it->second;
       }
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void OutFileInfo::set_diag_comments(const StringArray &sa) {
+
+   // Set the comments, if needed
+   if(comment_lines.n() == 0) {
+      comment_lines = sa;
+   }
+   // Print a warning if they change
+   else if(!(comment_lines == sa)) {
+      mlog << Warning << "\nOutFileInfo::set_diag_comments() -> "
+           << "Comments have changed from:\n"
+           << comment_lines.serialize()
+           << "\nto:\n" << sa.serialize() << "\n";
+      comment_lines = sa;
    }
 
    return;
@@ -1811,7 +1835,11 @@ void OutFileInfo::write_cira_diag() {
    // Write section header
    write_cira_diag_section_header("COMMENTS");
 
-   // TODO: add comments section
+   // Write comment lines with leading spaces
+   for(i=0; i<comment_lines.n(); i++) {
+      *cira_diag_out << string( 15, ' ')
+                     << comment_lines[i] << "\n";
+   }
 
    return;
 }
@@ -2036,6 +2064,7 @@ void TmpFileInfo::clear() {
    diag_custom_map.clear();
 
    diag_units_map.clear();
+   comment_lines.clear();
    pressure_levels.clear();
 
    grid_out.clear();

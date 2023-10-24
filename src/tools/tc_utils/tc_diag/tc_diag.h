@@ -129,6 +129,9 @@ class TmpFileInfo {
       // Mapping of diagnostics names to units
       std::map<std::string,std::string> diag_units_map;
 
+      // Array of comment lines
+      StringArray comment_lines;
+
       // Set of unique pressure levels
       std::set<double> pressure_levels;
 
@@ -184,6 +187,7 @@ class OutFileInfo {
                          std::vector<std::string> &,
                          std::map<std::string,NumArray> &, int);
       void add_diag_units(const std::map<std::string,std::string> &);
+      void set_diag_comments(const StringArray &);
 
    public:
 
@@ -208,6 +212,9 @@ class OutFileInfo {
 
       // Mapping of diagnostics names to units
       std::map<std::string,std::string> diag_units_map;
+
+      // Array of comment lines
+      StringArray comment_lines;
 
       // NetCDF Diagnostics output
       ConcatString    nc_diag_file;

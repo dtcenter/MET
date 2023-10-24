@@ -33,7 +33,7 @@ BAD_DATA_INT = 9999
 
 ###########################################
 
-# Define output dictionaries as global
+# Define global output dictionaries
 storm_data    = {}
 sounding_data = {}
 custom_data   = {}
@@ -62,6 +62,9 @@ def main():
                  config_filename,
                  post_resample_driver.DriverConfig)
 
+    # Store global configuration comments
+    global comments
+    comments = config.comment
 
     # JHG, need to catch and handle exceptions here
     # Robert will update the driver code to make sure that sufficient
@@ -136,7 +139,8 @@ def main():
         print(f"\nSTORM DATA ({len(storm_data)}) =", storm_data)
         print(f"\nSOUNDING DATA ({len(sounding_data)}) =", sounding_data)
         print(f"\nCUSTOM DATA ({len(custom_data)}) =", custom_data)
-        print(f"\nUNITS ({len(units)}) =", units, "\n")
+        print(f"\nUNITS ({len(units)}) =", units)
+        print(f"\nCOMMENTS:\n", comments, "\n")
 
 def _get_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
