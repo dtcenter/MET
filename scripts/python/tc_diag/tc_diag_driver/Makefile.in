@@ -306,6 +306,7 @@ tcdiagdriver_DATA = \
 	driver.py \
 	grib.py \
 	met_diag_vars.py \
+	met_post_process.py \
 	model_files.py \
 	output.py \
 	post_resample_driver.py \
