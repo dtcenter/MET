@@ -7,15 +7,6 @@ TC-Diag Tool
 Introduction
 ============
 
-.. note:: As of MET version 11.1.0, the TC-Diag tool is a beta release that lacks full functionality. The current version of the tool generates intermediate NetCDF output files of the input model’s data transformed onto an azimuth-range grid. When the full functionality of the tc_diag tool is released in MET v12.0.0, the tool will also output environmental diagnostics computed from callable Python scripts. For now, each time it is run, the warning message listed below is printed.
-
-.. code-block:: none
-
-  WARNING:
-  WARNING: The TC-Diag tool is provided in BETA status for MET V11.1.0.
-  WARNING: Please see the release notes of future MET versions for updates.
-  WARNING:
-
 A diagnosis of the large-scale environment of tropical cyclones (TCs) is foundational for many prediction techniques, including statistical-dynamical forecast aids and techniques based on artificial intelligence. Such diagnostics can also be used by forecasters seeking to understand how a given model's forecast will pan out. Finally, TC diagnostics can be useful in verification to stratify the performance of models in different environmental regimes over a longer period of time, thereby providing useful insights on model biases or deficiencies for model developers and forecasters.
 
 Originally developed for the Statistical Hurricane Intensity Prediction Scheme (SHIPS), and later as a stand-alone package called 'Model Diagnostics', by the Cooperative Institute for Research in the Atmosphere (CIRA), MET now integrates these capabilities into the an extensible framework called the TC-Diag tool. This tool allows users to compute diagnostics for the large-scale environment of TCs using ATCF track and gridded model data inputs. The current version of the TC-Diag tool requires that the tracks and fields be self-consistent [i.e., the track should be the model's (or ensemble's) own predicted track(s)]. The reason is that the diagnostics are computed in a coordinate system centered on the model's moving model storm and the current version of the tool does not yet include vortex removal. If the track is not consistent with the underlying fields, the diagnostics output are unlikely to be useful because the model's simulated storm would contaminate the diagnostics calculations.
@@ -114,20 +105,22 @@ Configuring domain information
 
 .. code-block:: none
 
-  diag_script = [ "MET_BASE/python/tc_diag/compute_tc_diagnostics.py" ];
-
   domain_info = [
      {
         domain         = "parent";
         n_range        = 150;
         n_azimuth      = 8;
         delta_range_km = 10.0;
-     },
+        diag_script    = [ "MET_BASE/python/tc_diag/compute_tc_diag.py MET_BASE/python/tc_diag/config/post_resample.yml MET_BASE/tc_data/v2023-04-07_gdland_table.dat" ];
+        override_diags = [];
+   },
      {
         domain         = "nest";
         n_range        = 150;
         n_azimuth      = 8;
         delta_range_km = 2.0;
+        diag_script    = [ "MET_BASE/python/tc_diag/compute_tc_diag.py MET_BASE/python/tc_diag/config/post_resample_nest.yml MET_BASE/tc_data/v2023-04-07_gdland_table.dat" ];
+        override_diags = [ "RMW", "SST" ];
      }
   ];
 
@@ -139,9 +132,11 @@ The **n_azimuth** entry is an integer specifying the number of equally spaced az
 
 The **delta_range_km** entry is a floating point value specifying the spacing of the range rings in kilometers.
 
-The **diag_script** entry is an array of strings. Each string specifies the path to a Python script to be executed to compute diagnostics from the transformed cylindrical coordinates data for this domain. While the **diag_script** entry can be specified separately for each **domain_info** array entry, specifying it once at a higher level of context, as seen above, allows the same setting to be applied to all array entries. When multiple Python diagnostics scripts are run, the union of the diagnostics computed are written to the output.
+The **diag_script** entry is an array of strings. Each string specifies the path to a Python script to be executed to compute diagnostics from the transformed cylindrical coordinates data for this domain. When multiple Python diagnostics scripts are run, the union of the diagnostics computed are written to the output.
 
-.. note:: As of MET version 11.1.0, no tropical cyclone diagnostics are actually computed or written to the output.
+The **override_diags** entry is an array of strings. Each string specifies the name of diagnostic value to be used for that domain. If set to an empty list, all diagnostics computed by the Python scripts in **diag_script** for that domain will be used. If non-empty, only the specific diagnostics listed will be used.
+
+In the default configuration, seen above, the same Python script is run for both the *parent* and *nest* domains, each using a different configuration file. For the *parent* domain, all computed diagnostics are used since **override_diags** is empty. For the *nest* domain, only the specific diagnostics listed in **override_diags** are used to override the *parent* values. In general, diagnostics computed earlier in the list of **domain_info** entries can be overridden by diagnostics computed later in the list.
 
 Configuring data censoring and conversion options
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -256,8 +251,6 @@ tc_diag output
 --------------
 
 The TC-Diag tool writes up to three output data types, as specified by flags in the configuration file. Each time TC-Diag is run it processes track data for a single initialization time. The actual number of output files varies depending on the number of model tracks provided.
-
-.. note:: As of MET version 11.1.0, **nc_rng_azi_flag** is the only supported output type.
 
 **CIRA Diagnostics Output**
 

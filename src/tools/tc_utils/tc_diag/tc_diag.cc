@@ -142,7 +142,13 @@ static void compute_lat_lon(TcrmwGrid&, double *, double *);
 //   - Double-check units, names, and spacing of output
 //   - Refine NetCDF diagnostics output file based on feedback.
 //   - Add support for $MET_PYTHON_EXE.
-//
+//   - Enhance the Python code to define long names for diagnostics and add them to the NetCDF output. Just like the units dict, it'd be a long_name dictionary.
+//   - Fix the order of the diags returned by the compute_diag.py script.
+//   - For each NetCDF diag, add an attribute to specify the domain from which the diag is defined (e.g. domain = "parent")
+//   - Add new NetCDF variable with variable attributes to define each domain:
+//     parent: (set to 1)
+//     - n_range: 150, n_azimuth: 8, delta_range: 10.0, script: "MET_BASE/python/tc_diag/compute_tc_diag.py MET_BASE/python/tc_diag/config/post_resample.yml MET_BASE/tc_data/v2023-04-07_gdland_table.dat"
+//   - Make diag_script NOT be an array. Instead a single string is sufficient and makes the logic a little cleaner.
 
 int met_main(int argc, char *argv[]) {
 
