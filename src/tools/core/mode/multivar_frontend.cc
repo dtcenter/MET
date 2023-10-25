@@ -69,6 +69,8 @@ static const char tab [] = "   ";
 
 static const bool do_clusters = false;
 
+static string default_out_dir = ".";
+
 static ModeConfInfo config;
 
 static string   mode_path;
@@ -395,6 +397,12 @@ void process_command_line(const StringArray & argv)
 
    CommandLine cline;
 
+   //
+   // Set the default output directory
+   //
+
+   outdir = replace_path(default_out_dir);
+
    mode_path = argv[0];
 
    cline.set(argv);
@@ -672,9 +680,6 @@ void process_superobjects(ShapeData &f_result, ShapeData &o_result,
    mode_argv.add(junk);
    mode_argv.add("-outdir");
    mode_argv.add(dir);
-   // mode_argv.add("-field_index");
-   // snprintf(junk, sizeof(junk), "%d", j);
-   // mode_argv.add(junk);
 
    mlog << Debug(1) << "Running superobject mode \n\n";
 

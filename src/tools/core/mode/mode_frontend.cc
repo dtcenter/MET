@@ -37,7 +37,6 @@ extern const char * const program_name;
 static ModeExecutive *mode_exec = 0;
 static int compress_level = -1;
 
-
 ///////////////////////////////////////////////////////////////////////
 
 

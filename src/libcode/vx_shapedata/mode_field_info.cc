@@ -255,7 +255,7 @@ if ( _multivar ) {
                                                         false);
       } else {
          // get the parent's merge_thresh, just to have something.  Error out if the merge_flag is not none
-         // becAuse that is inconsistent
+         // because that is inconsistent
          merge_thresh_array = dict->lookup_thresh_array(conf_key_merge_thresh);
 
          if (merge_flag != MergeType_None) {
@@ -297,7 +297,7 @@ if ( _multivar ) {
          }
       }
    }
- } else {
+} else {
    if ( dict->lookup(conf_key_merge_flag, true)) {
       merge_flag         = int_to_mergetype(dict->lookup_int(conf_key_merge_flag));
    }
