@@ -1,5 +1,7 @@
+module load gnu/9.2.0
 module load intel/2022.1.2
 module load cmake/3.26.4
+
 export PATH=/scratch1/BMC/dtc/miniconda/miniconda3/envs/metplus_v5.1_py3.10/bin:${PATH}
 export TEST_BASE=/contrib/met/12.0.0
 export COMPILER=intel_2022.1.2
@@ -10,6 +12,7 @@ export MET_PYTHON=/scratch1/BMC/dtc/miniconda/miniconda3/envs/metplus_v5.1_py3.1
 export MET_PYTHON_CC=-I${MET_PYTHON}/include/python3.10
 export MET_PYTHON_LD=`python3-config --ldflags --embed`
 export SET_D64BIT=FALSE
+export ADDTL_DIR=/usr/lib64
 export EXTERNAL_LIBS=/contrib/met/12.0.0/external_libs/
 #export MET_PROJ=${EXTERNAL_LIBS}
 #export MET_NETCDF=${EXTERNAL_LIBS}
@@ -23,6 +26,8 @@ export EXTERNAL_LIBS=/contrib/met/12.0.0/external_libs/
 #export LIB_JASPER=${EXTERNAL_LIBS}/lib
 #export LIB_LIBPNG=${EXTERNAL_LIBS}/lib
 #export LIB_Z=${EXTERNAL_LIBS}/lib
+#export SQLITE_INCLUDE_DIR=${EXTERNAL_LIBS}/include
+#export SQLITE_LIB_DIR=${EXTERNAL_LIBS}/lib
 #export CFLAGS="-Wall -g"
 #export CXXFLAGS="-Wall -g -lcurl"
 export MAKE_ARGS=-j

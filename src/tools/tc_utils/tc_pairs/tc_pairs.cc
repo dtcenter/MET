@@ -33,11 +33,17 @@
 //                    that contain all required lead times.
 //   011    07/27/18  Halley Gotway   Support masks defined by
 //                    the gen_vx_mask tool.
-//   012    07/06/22  Howard Soh      METplus-Internal #19 Rename main to met_main
-//   013    09/28/22  Prestopnik      MET #2227 Remove namespace std from header files
+//   012    07/06/22  Howard Soh      METplus-Internal #19 Rename main
+//                    to met_main
+//   013    09/28/22  Prestopnik      MET #2227 Remove namespace std
+//                    from header files
 //   014    10/06/22  Halley Gotway   MET #392 Incorporate diagnostics
-//   015    02/20/23  Seth Linden     MET #2429 Added option to prevent output of consensus track members
-//   016    06/08/23  Halley Gotway   MET #2532 Full circle winds are the mean of the non-zero quadrants
+//   015    02/20/23  Seth Linden     MET #2429 Add option to suppress
+//                    the output of consensus track members
+//   016    06/08/23  Halley Gotway   MET #2532 Compute full circle
+//                    winds as the mean of the non-zero quadrants
+//   017    10/05/23  Seth Linden     MET #2476 Include diagnostics in
+//                    consensus track output
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -345,14 +351,6 @@ void process_adecks(const TrackInfoArray &bdeck_tracks) {
       derive_interp12(adeck_tracks);
    }
 
-   // Derive consensus forecasts from the ADECK tracks
-   mlog << Debug(2)
-        << "Deriving " << conf_info.NConsensus
-        << " ADECK consensus model(s).\n";
-   i = derive_consensus(adeck_tracks);
-   mlog << Debug(2)
-        << "Added " << i << " ADECK consensus tracks(s).\n";
-
    // Derive lag forecasts from the ADECK tracks
    mlog << Debug(2)
         << "Deriving " << conf_info.LagTime.n()
@@ -370,14 +368,22 @@ void process_adecks(const TrackInfoArray &bdeck_tracks) {
    mlog << Debug(2)
         << "Added " << i << " CLIPER/SHIFOR baseline track(s).\n";
 
+   // Append diagnostic data to the tracks
+   process_diags(adeck_tracks);
+
+   // Derive consensus forecasts from the ADECK tracks
+   mlog << Debug(2)
+        << "Deriving " << conf_info.NConsensus
+        << " ADECK consensus model(s).\n";
+   i = derive_consensus(adeck_tracks);
+   mlog << Debug(2)
+        << "Added " << i << " ADECK consensus tracks(s).\n";
+
    // Filter the ADECK tracks using the config file information
    mlog << Debug(2)
         << "Filtering " << adeck_tracks.n()
         << " ADECK tracks based on config file settings.\n";
    filter_tracks(adeck_tracks);
-
-   // Append diagnostic data to the tracks
-   process_diags(adeck_tracks);
 
    //
    // Loop through the ADECK tracks and find a matching BDECK track
