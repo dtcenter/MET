@@ -416,7 +416,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-string StringArray::serialize() const
+string StringArray::serialize(const char *sep) const
 
 {
 
@@ -424,7 +424,7 @@ string StringArray::serialize() const
 
    for(auto it = s.begin();  it != s.end(); it++) {
       all_s.append(*it);
-      if((it+1) != s.end()) all_s.append(" ");
+      if((it+1) != s.end()) all_s.append(sep);
    }
 
    return(all_s);

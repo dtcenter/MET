@@ -75,7 +75,7 @@ class StringArray {
 
       void insert(int i, const char *);
 
-      std::string serialize() const;
+      std::string serialize(const char *sep=" ") const;
 
       int n_elements() const;
       int n() const;   //  same thing
