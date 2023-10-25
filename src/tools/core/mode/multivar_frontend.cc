@@ -10,7 +10,8 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-static const char mode_default_config [] = "MET_BASE/config/MODEConfig_default";
+// for multivar mode, this is the default file
+static const char mode_default_config [] = "MET_BASE/config/MODEMultivarConfig_default";
 
 static const int dir_creation_mode = 0755;       
 
@@ -67,6 +68,8 @@ static const char tab [] = "   ";
 // this is hardwired for the multivar case, at least for now
 
 static const bool do_clusters = false;
+
+static string default_out_dir = ".";
 
 static ModeConfInfo config;
 
@@ -394,6 +397,12 @@ void process_command_line(const StringArray & argv)
 
    CommandLine cline;
 
+   //
+   // Set the default output directory
+   //
+
+   outdir = replace_path(default_out_dir);
+
    mode_path = argv[0];
 
    cline.set(argv);
@@ -671,9 +680,6 @@ void process_superobjects(ShapeData &f_result, ShapeData &o_result,
    mode_argv.add(junk);
    mode_argv.add("-outdir");
    mode_argv.add(dir);
-   // mode_argv.add("-field_index");
-   // snprintf(junk, sizeof(junk), "%d", j);
-   // mode_argv.add(junk);
 
    mlog << Debug(1) << "Running superobject mode \n\n";
 
