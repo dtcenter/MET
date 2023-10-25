@@ -67,6 +67,9 @@ class DomainInfo {
       // Diagnostic scripts to be run
       StringArray diag_script;
 
+      // Diagnostics to be used for this domain
+      StringArray override_diags;
+
       //////////////////////////////////////////////////////////////////
 
       void clear();

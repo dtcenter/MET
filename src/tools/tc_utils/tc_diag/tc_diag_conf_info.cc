@@ -92,6 +92,7 @@ void DomainInfo::clear() {
 
    var_info_ptr.clear();
    diag_script.clear();
+   override_diags.clear();
 
    return;
 }
@@ -121,6 +122,11 @@ void DomainInfo::parse_domain_info(Dictionary &dict) {
    // Conf: delta_range
    delta_range_km = dict.lookup_double(conf_key_delta_range);
 
+   // TODO: Should diag script really be an array or just a single entry?
+   // Do we actually see a need for calling multiple python scripts for each
+   // domain? If so, we may want to specify the override_diags separately for
+   // each script. Practically speaking, I don't think that's needed.
+
    // Conf: diag_script
    diag_script = dict.lookup_string_array(conf_key_diag_script);
 
@@ -128,6 +134,9 @@ void DomainInfo::parse_domain_info(Dictionary &dict) {
    for(int i=0; i<diag_script.n(); i++) {
       diag_script.set(i, replace_path(diag_script[i].c_str()));
    }
+
+   // Conf: override_diags
+   override_diags = dict.lookup_string_array(conf_key_override_diags);
 
    return;
 }

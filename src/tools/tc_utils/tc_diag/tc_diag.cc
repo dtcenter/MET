@@ -120,10 +120,10 @@ static void compute_lat_lon(TcrmwGrid&, double *, double *);
 //   - Python diagnostics:
 //     - [DONE for #2550] Incorporate CIRA python diagnostics scripts.
 //     - [DONE for #2550] Write NetCDF diagnostics output file.
-//     - Refine NetCDF diagnostics output file based on feedback.
 //     - [DONE for #2550] Read resulting diagnostic data provided by python script.
 //     - [DONE for #2555] Write CIRA ASCII diagnostics output files.
-//     - Add support for $MET_PYTHON_EXE.
+//     - [DONE for #2550] Add comments to NetCDF output.
+//     - [DONE for #2550] Use override_diags to have nest items override parent.
 //   - Input data:
 //     - [DONE for #2609] Instead of reading DataPlanes one at a time,
 //       read them all at once or perhaps in groups
@@ -139,6 +139,9 @@ static void compute_lat_lon(TcrmwGrid&, double *, double *);
 //       not happen.
 //   - Consider adding support for the "regrid" dictionary to
 //     control cyl coord regridding step is done.
+//   - Double-check units, names, and spacing of output
+//   - Refine NetCDF diagnostics output file based on feedback.
+//   - Add support for $MET_PYTHON_EXE.
 //
 
 int met_main(int argc, char *argv[]) {
@@ -1000,10 +1003,10 @@ void process_track_points(const TrackInfoArray& tracks) {
 }
 
 ////////////////////////////////////////////////////////////////////////
-///
-   // TODO: Consider adding vortex removal logic here
-   // Read in the full set of fields required for vortex removal
-   // Add flag to configure which fields are used for vortex removal
+
+// TODO: Consider adding vortex removal logic here
+// Read in the full set of fields required for vortex removal
+// Add flag to configure which fields are used for vortex removal
 
 void process_fields(const TrackInfoArray &tracks,
                     const unixtime vld_ut, int i_vld,
@@ -1179,7 +1182,9 @@ void process_out_files(const TrackInfoArray& tracks) {
             domain_tmp_file_list.push_back(&tmp_file_map[tmp_key]);
 
             // Store the diagnostics for each track point
-            out_file_map[out_key].add_tmp_file_info(tmp_file_map[tmp_key], i_pnt);
+            out_file_map[out_key].add_tmp_file_info(tmp_file_map[tmp_key],
+                                                    conf_info.domain_info[i_dom].override_diags,
+                                                    i_pnt);
 
          } // end for i_pnt
 
@@ -1497,7 +1502,9 @@ NcFile *OutFileInfo::setup_nc_file(const string &out_file) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void OutFileInfo::add_tmp_file_info(const TmpFileInfo &tmp_info, int i_pnt) {
+void OutFileInfo::add_tmp_file_info(const TmpFileInfo &tmp_info,
+                                    const StringArray &diag_list,
+                                    int i_pnt) {
 
    // Track pointer must be set
    if(!trk_ptr) {
@@ -1514,13 +1521,24 @@ void OutFileInfo::add_tmp_file_info(const TmpFileInfo &tmp_info, int i_pnt) {
       exit(1);
    }
 
+   ConcatString cs;
+   if(diag_list.n() == 0) cs << "all diagnostics";
+   else                   cs << diag_list.n() << " diagnostics ("
+                             << diag_list.serialize(", ") << ")";
+
+   mlog << Debug(4) << "Using " << cs << " computed from temp file: "
+        << tmp_info.tmp_file << "\n";
+
    // Append the diagnostics data
    add_diag_data(tmp_info.diag_storm_keys, tmp_info.diag_storm_map,
-                 diag_storm_keys, diag_storm_map, i_pnt);
+                 diag_storm_keys, diag_storm_map,
+                 diag_list, i_pnt);
    add_diag_data(tmp_info.diag_sounding_keys, tmp_info.diag_sounding_map,
-                 diag_sounding_keys, diag_sounding_map, i_pnt);
+                 diag_sounding_keys, diag_sounding_map,
+                 diag_list, i_pnt);
    add_diag_data(tmp_info.diag_custom_keys, tmp_info.diag_custom_map,
-                 diag_custom_keys, diag_custom_map, i_pnt);
+                 diag_custom_keys, diag_custom_map,
+                 diag_list, i_pnt);
 
    // Update the units
    add_diag_units(tmp_info.diag_units_map);
@@ -1537,12 +1555,16 @@ void OutFileInfo::add_diag_data(const vector<string> &k_src,
                                 const map<string,double> &m_src,
                                 vector<string> &k_dst,
                                 map<string,NumArray> &m_dst,
+                                const StringArray &diag_list,
                                 int i_pnt) {
 
    bool add_keys = (k_dst.size() == 0);
 
    // Loop over the source keys
    for(auto it = k_src.begin(); it != k_src.end(); it++) {
+
+      // Check whether this diagnostic value was requested
+      if(diag_list.n() > 0 && !diag_list.has(*it)) continue;
 
       // Store this key
       if(add_keys) k_dst.push_back(*it);
@@ -1614,6 +1636,9 @@ void OutFileInfo::write_nc_diag() {
 
    // Setup the output NetCDF file
    nc_diag_out = setup_nc_file(nc_diag_file);
+
+   // Add comments global attribute
+   nc_diag_out->putAtt("Comments", comment_lines.serialize("\n"));
 
    // Write storm diagnostics
    for(auto it = diag_storm_keys.begin();

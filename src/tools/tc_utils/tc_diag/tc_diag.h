@@ -185,7 +185,8 @@ class OutFileInfo {
       void add_diag_data(const std::vector<std::string> &,
                          const std::map<std::string,double> &,
                          std::vector<std::string> &,
-                         std::map<std::string,NumArray> &, int);
+                         std::map<std::string,NumArray> &,
+                         const StringArray &, int);
       void add_diag_units(const std::map<std::string,std::string> &);
       void set_diag_comments(const StringArray &);
 
@@ -231,7 +232,7 @@ class OutFileInfo {
       void clear();
 
       netCDF::NcFile *setup_nc_file(const std::string &);
-      void add_tmp_file_info(const TmpFileInfo &, int);
+      void add_tmp_file_info(const TmpFileInfo &, const StringArray &, int);
       void write_nc_diag();
       void write_nc_diag_vals(const std::string &, NumArray &);
       void write_nc_diag_prs_vals(const std::string &, const float *);
