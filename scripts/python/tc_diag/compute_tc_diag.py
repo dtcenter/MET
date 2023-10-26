@@ -10,23 +10,23 @@ from tc_diag_driver import post_resample_driver
 # Constants
 
 # Expected STORM DATA diagnostic names
-STORM_DATA_NAMES = (
+STORM_DATA_NAMES = [
     "LAT", "LON", "MAXWIND", "RMW", "MIN_SLP",
     "SHR_MAG", "SHR_HDG", "STM_SPD", "STM_HDG",
     "SST", "OHC", "TPW", "LAND",
     "850TANG", "850VORT", "200DVG"
-)
+]
 
 # Expected SOUNDING DATA diagnostic names
-SOUNDING_DATA_NAMES = (
+SOUNDING_DATA_NAMES = [
     "T_SURF", "R_SURF", "P_SURF", "U_SURF", "V_SURF",
     "T", "R", "Z", "U", "V"
-)
+]
 
 # Diagnostic names to be skipped
-SKIP_DATA_NAMES = (
+SKIP_DATA_NAMES = [
     "850RADIAL", "850DVG", "200VORT"
-)
+]
 
 # Bad data integer value
 BAD_DATA_INT = 9999
@@ -66,10 +66,6 @@ def main():
     global comments
     comments = config.comment
 
-    # JHG, need to catch and handle exceptions here
-    # Robert will update the driver code to make sure that sufficient
-    # radii have been handed to the code and produce an exception if not
-
     # Call drive to calculate the diagnostics
     try:
         results = post_resample_driver.diag_calcs(
@@ -79,15 +75,21 @@ def main():
         print("Error computing diagnostics with command (", ' '.join(sys.argv), ")", sep="")
         sys.exit(1)
 
-    # Process pressure independent diagnostics
-    for d in results.pressure_independent.keys():
+    # Process storm data diagnostics in the expected order
+    for d in STORM_DATA_NAMES + list(results.pressure_independent.keys()):
 
-        # Diagonstic names are reported as upper-case
-        name = d.upper()
+        # Skip diagnostics:
+        # - That were not computed.
+        # - Are in the skip list.
+        # - Have already been processed.
+        if ((d not in results.pressure_independent.keys()) or
+            (d in SKIP_DATA_NAMES + list(storm_data.keys()) +
+                  list(sounding_data.keys()) + list(custom_data.keys()))):
+            continue
 
-        # Store units
+        # Store units as upper-case
         if 'units' in results.pressure_independent[d].attrs:
-            units[name] = results.pressure_independent[d].attrs["units"].upper()
+            units[d] = results.pressure_independent[d].attrs["units"].upper()
 
         # Check for bad data
         val = results.pressure_independent[d].values[0]
@@ -95,14 +97,12 @@ def main():
             val = BAD_DATA_INT
 
         # Store value
-        if name in SKIP_DATA_NAMES:
-            continue
-        elif name in STORM_DATA_NAMES:
-            storm_data[name] = val
-        elif name in SOUNDING_DATA_NAMES:
-            sounding_data[name] = val
+        if d in STORM_DATA_NAMES:
+            storm_data[d] = val
+        elif d in SOUNDING_DATA_NAMES:
+            sounding_data[d] = val
         else:
-            custom_data[name] = val
+            custom_data[d] = val
 
     # Add units for sounding diagnostics
     for d in results.soundings.keys():
@@ -110,18 +110,27 @@ def main():
         # Store pressure levels
         levels = results.soundings[d].coords['level_hPa']
 
-        # Store units for diagnostic names, all upper-case
+        # Store units as upper-case
         if 'units' in results.soundings[d].attrs:
-            units[d.upper()] = results.soundings[d].attrs["units"].upper()
+            units[d] = results.soundings[d].attrs["units"].upper()
 
     # Loop over the sounding pressure levels
     for idx, prs in enumerate(levels):
 
-        # Loop over the sounding diagnostics
-        for d in results.soundings.keys():
+        # Process sounding diagnostics in the expected order
+        for d in SOUNDING_DATA_NAMES + list(results.soundings.keys()):
 
             # Left-pad pressure value to 4 digits
-            name_prs = d.upper() + '_' + f'{prs.data:04}'
+            d_prs = d + '_' + f'{prs.data:04}'
+
+            # Skip diagnostics:
+            # - That were not computed.
+            # - Are in the skip list.
+            # - Have already been processed.
+            if ((d not in results.soundings.keys()) or
+                (d_prs in SKIP_DATA_NAMES + list(storm_data.keys()) +
+                          list(sounding_data.keys()) + list(custom_data.keys()))):
+                continue
 
             # Check for bad data
             val = results.soundings[d].values[0,idx]
@@ -129,10 +138,10 @@ def main():
                 val = BAD_DATA_INT
 
             # Store value
-            if d.upper() in SOUNDING_DATA_NAMES:
-                sounding_data[name_prs] = val
+            if d in SOUNDING_DATA_NAMES:
+                sounding_data[d_prs] = val
             else:
-                custom_data[name_prs] = val
+                custom_data[d_prs] = val
 
     # Print verbose dictionary contents
     if args.verbose:
