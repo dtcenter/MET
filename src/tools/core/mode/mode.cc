@@ -115,6 +115,7 @@ const char * const program_name = "mode";
 
 
 static const char default_config_filename [] = "MET_BASE/config/MODEConfig_default";
+static const char default_multivar_config_filename [] = "MET_BASE/config/MODEMultivarConfig_default";
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -168,6 +169,12 @@ int met_main(int argc, char * argv [])
    config.read_config  (default_config_filename, user_config_filename);
 
    if ( config.is_multivar() ) { 
+
+
+      // read again, this time with the mvmode defaults, which are slightly different
+
+      config.clear();
+      config.read_config(default_multivar_config_filename, user_config_filename);
 
       // exit inside this method if something is not implemented
 

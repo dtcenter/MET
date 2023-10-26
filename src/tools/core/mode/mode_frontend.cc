@@ -37,7 +37,6 @@ extern const char * const program_name;
 static ModeExecutive *mode_exec = 0;
 static int compress_level = -1;
 
-
 ///////////////////////////////////////////////////////////////////////
 
 
@@ -78,7 +77,7 @@ int ModeFrontEnd::run(const StringArray & Argv, Processing_t ptype, int field_in
 
    process_command_line(Argv, false);
 
-   mode_exec->init(n_files);
+   mode_exec->init(n_files, ptype != SINGLE_VAR);
 
    ModeConfInfo & conf = mode_exec->engine.conf_info;
    if ( field_index >= 0 )  conf.set_field_index(field_index);
