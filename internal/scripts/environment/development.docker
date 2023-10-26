@@ -40,3 +40,6 @@ export COMPILE_HDF=1
 export COMPILE_HDFEOS=1
 export COMPILE_FREETYPE=1
 export COMPILE_CAIRO=1
+
+export SQLITE_INCLUDE_DIR=/usr/include
+export SQLITE_LIB_DIR=/usr/lib/x86_64-linux-gnu
