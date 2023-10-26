@@ -89,7 +89,7 @@ fcst = {
    filter_attr_thresh = [];
    merge_thresh       = >=3.5;
    merge_flag         = NONE;
-   multivar_name = "ALPHA_BETA_GAMMA";
+   multivar_name = "Super";
    multivar_level = "LO";
 }
 obs = fcst;
