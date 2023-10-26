@@ -98,11 +98,11 @@ pressure_independent_computation_specs:
     units: [RADIANS, 10M/S]
   div_vort_850:
     callable: *div_vort_func 
-    output_vars: [850DVG, 850VORT] 
+    output_vars: [850DVRG, 850VORT] 
     kwargs: {u_name: *u_vert_name, v_name: *v_vert_name, level_hPa: 850, radius_km: *div_vort_max_km}
   div_vort_200: 
     callable: *div_vort_func
-    output_vars: [200DVG, 200VORT] 
+    output_vars: [200DVRG, 200VORT] 
     kwargs: {u_name: *u_vert_name, v_name: *v_vert_name, level_hPa: 200, radius_km: *div_vort_max_km}
 
 
