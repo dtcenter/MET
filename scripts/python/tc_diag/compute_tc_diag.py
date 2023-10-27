@@ -31,6 +31,37 @@ SKIP_DATA_NAMES = [
 # Bad data integer value
 BAD_DATA_INT = 9999
 
+# Long diagnostics name descriptions
+long_name = {
+    "LAT"     : "Latitude",
+    "LON"     : "Longitude",
+    "MAXWIND" : "Maximum Wind Speed",
+    "RMW"     : "Radius of Maximum Winds",
+    "MIN_SLP" : "Minimum Sea Level Pressure",
+    "SHR_MAG" : "Shear Magnitude",
+    "SHR_HDG" : "Shear Heading",
+    "STM_SPD" : "Storm Speed",
+    "STM_HDG" : "Storm Heading",
+    "SST"     : "Sea Surface Temperature",
+    "OHC"     : "Ocean Heat Content",
+    "TPW"     : "Total Precipitable Water",
+    "LAND"    : "Distance to Land",
+    "850TANG" : "850 Millibar Tangential Wind",
+    "850VORT" : "850 Millibar Vorticity",
+    "200DVRG" : "200 Millibar Divergence",
+    "T_SURF"  : "Surface Temperature",
+    "R_SURF"  : "Surface Humidity",
+    "P_SURF"  : "Surface Pressure",
+    "U_SURF"  : "Surface U-Component of Wind",
+    "V_SURF"  : "Surface V-Component of Wind",
+    "T"       : "Temperature",
+    "R"       : "Humidity",
+    "Z"       : "Height",
+    "U"       : "U-Component of Wind",
+    "V"       : "V-Component of Wind",
+    "TGRD"    : "Temperature Gradient"
+}
+
 ###########################################
 
 # Define global output dictionaries
@@ -149,6 +180,7 @@ def main():
         print(f"\nSOUNDING DATA ({len(sounding_data)}) =", sounding_data)
         print(f"\nCUSTOM DATA ({len(custom_data)}) =", custom_data)
         print(f"\nUNITS ({len(units)}) =", units)
+        print(f"\nLONG_NAME ({len(long_name)}) =", long_name)
         print(f"\nCOMMENTS:\n", comments, "\n")
 
 def _get_args() -> argparse.Namespace:

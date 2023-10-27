@@ -124,6 +124,13 @@ static void compute_lat_lon(TcrmwGrid&, double *, double *);
 //     - [DONE for #2555] Write CIRA ASCII diagnostics output files.
 //     - [DONE for #2550] Add comments to NetCDF output.
 //     - [DONE for #2550] Use override_diags to have nest items override parent.
+//     - [DONE for #2550] Fix the order of the diags returned by the
+//       compute_diag.py script to match existing.
+//     - [DONE for #2550] Enhance the Python code to define long names
+//       for diagnostics and add them to the NetCDF output.
+//     - [DONE for #2550] Double-check units, names, and spacing of output.
+//     - [DONE for #2550] Add NetCDF variable attribute to specify the domain
+//       from which each diag is defined (e.g. domain = "parent")
 //   - Input data:
 //     - [DONE for #2609] Instead of reading DataPlanes one at a time,
 //       read them all at once or perhaps in groups
@@ -139,16 +146,13 @@ static void compute_lat_lon(TcrmwGrid&, double *, double *);
 //       not happen.
 //   - Consider adding support for the "regrid" dictionary to
 //     control cyl coord regridding step is done.
-//   - Double-check units, names, and spacing of output
 //   - Refine NetCDF diagnostics output file based on feedback.
 //   - Add support for $MET_PYTHON_EXE.
-//   - Enhance the Python code to define long names for diagnostics and add them to the NetCDF output. Just like the units dict, it'd be a long_name dictionary.
-//   - Fix the order of the diags returned by the compute_diag.py script.
-//   - For each NetCDF diag, add an attribute to specify the domain from which the diag is defined (e.g. domain = "parent")
 //   - Add new NetCDF variable with variable attributes to define each domain:
 //     parent: (set to 1)
 //     - n_range: 150, n_azimuth: 8, delta_range: 10.0, script: "MET_BASE/python/tc_diag/compute_tc_diag.py MET_BASE/python/tc_diag/config/post_resample.yml MET_BASE/tc_data/v2023-04-07_gdland_table.dat"
 //   - Make diag_script NOT be an array. Instead a single string is sufficient and makes the logic a little cleaner.
+//   - Update tc_diag_driver code to use `200DVRG` instead of `200DVG`.
 
 int met_main(int argc, char *argv[]) {
 
@@ -1439,6 +1443,9 @@ void OutFileInfo::clear() {
    diag_custom_map.clear();
 
    diag_units_map.clear();
+   diag_long_name_map.clear();
+   diag_domain_map.clear();
+
    comment_lines.clear();
 
    // Write NetCDF diagnostics file
@@ -1538,16 +1545,19 @@ void OutFileInfo::add_tmp_file_info(const TmpFileInfo &tmp_info,
    // Append the diagnostics data
    add_diag_data(tmp_info.diag_storm_keys, tmp_info.diag_storm_map,
                  diag_storm_keys, diag_storm_map,
-                 diag_list, i_pnt);
+                 diag_list, tmp_info.domain, i_pnt);
    add_diag_data(tmp_info.diag_sounding_keys, tmp_info.diag_sounding_map,
                  diag_sounding_keys, diag_sounding_map,
-                 diag_list, i_pnt);
+                 diag_list, tmp_info.domain, i_pnt);
    add_diag_data(tmp_info.diag_custom_keys, tmp_info.diag_custom_map,
                  diag_custom_keys, diag_custom_map,
-                 diag_list, i_pnt);
+                 diag_list, tmp_info.domain, i_pnt);
 
-   // Update the units
-   add_diag_units(tmp_info.diag_units_map);
+   // Update the metadata
+   add_diag_meta(tmp_info.diag_units_map,
+                 diag_units_map);
+   add_diag_meta(tmp_info.diag_long_name_map,
+                 diag_long_name_map);
 
    // Store the comments
    set_diag_comments(tmp_info.comment_lines);
@@ -1562,6 +1572,7 @@ void OutFileInfo::add_diag_data(const vector<string> &k_src,
                                 vector<string> &k_dst,
                                 map<string,NumArray> &m_dst,
                                 const StringArray &diag_list,
+                                const string &domain,
                                 int i_pnt) {
 
    bool add_keys = (k_dst.size() == 0);
@@ -1585,6 +1596,15 @@ void OutFileInfo::add_diag_data(const vector<string> &k_src,
 
       // Store the diagnostic value for the track point
       m_dst[*it].set(i_pnt, m_src.at(*it));
+
+      // Store the domain for this diagnostic
+      diag_domain_map[*it] = domain;
+
+      // Store the domain for soundings too
+      size_t found = (*it).find_last_of("_");
+      if(found != string::npos && is_number((*it).substr(found+1).c_str())) {
+         diag_domain_map[(*it).substr(0,found)] = domain;
+      }
    }
 
    return;
@@ -1592,21 +1612,22 @@ void OutFileInfo::add_diag_data(const vector<string> &k_src,
 
 ////////////////////////////////////////////////////////////////////////
 
-void OutFileInfo::add_diag_units(const map<string,string> &m_src) {
+void OutFileInfo::add_diag_meta(const map<string,string> &m_src,
+                                map<string,string> &m_dst) {
 
    // Loop over the source map
    for(auto it = m_src.begin(); it != m_src.end(); it++) {
 
       // Add new units strings
-      if(diag_units_map.count(it->first) == 0) {
-         diag_units_map[it->first] = it->second;
+      if(m_dst.count(it->first) == 0) {
+         m_dst[it->first] = it->second;
       }
-      else if(diag_units_map[it->first] != it->second) {
-         mlog << Warning << "\nOutFileInfo::add_diag_units() -> "
-              << "Units for diagnostic \"" << it->first
-              << "\" have changed from \"" << diag_units_map[it->first]
+      else if(m_dst[it->first] != it->second) {
+         mlog << Warning << "\nOutFileInfo::add_diag_meta() -> "
+              << "Metadata for diagnostic \"" << it->first
+              << "\" has changed from \"" << m_dst[it->first]
               << "\" to \"" << it->second << ".\n\n";
-         diag_units_map[it->first] = it->second;
+         m_dst[it->first] = it->second;
       }
    }
 
@@ -1751,11 +1772,22 @@ void OutFileInfo::write_nc_diag_vals(const string &name,
    vector<size_t> counts;
    counts.push_back(get_dim_size(&vld_dim));
 
+   // Define new variable
    NcVar diag_var = nc_diag_out->addVar(name, ncDouble, dims);
-   string units_str = (diag_units_map.count(name) > 0 ?
-                       diag_units_map[name] : na_str);
-   add_att(&diag_var, units_att_name, units_str);
-   add_att(&diag_var, fill_value_att_name, diag_bad_data_double);
+
+   // Add variable attributes
+   add_att(&diag_var, long_name_att_name,
+           (diag_long_name_map.count(name) > 0 ?
+            diag_long_name_map[name] : na_str));
+   add_att(&diag_var, units_att_name,
+           get_diag_units(name));
+   add_att(&diag_var, conf_key_domain,
+           (diag_domain_map.count(name) > 0 ?
+            diag_domain_map[name] : na_str));
+   add_att(&diag_var, fill_value_att_name,
+           diag_bad_data_double);
+
+   // Write variable values
    diag_var.putVar(offsets, counts, vals.buf());
 
    return;
@@ -1779,11 +1811,22 @@ void OutFileInfo::write_nc_diag_prs_vals(const string &name,
    counts.push_back(get_dim_size(&vld_dim));
    counts.push_back(get_dim_size(&prs_dim));
 
+   // Add variable attributes
    NcVar diag_var = nc_diag_out->addVar(name, ncDouble, dims);
-   string units_str = (diag_units_map.count(name) > 0 ?
-                       diag_units_map[name] : na_str);
-   add_att(&diag_var, units_att_name, units_str);
-   add_att(&diag_var, fill_value_att_name, diag_bad_data_double);
+
+   // Add variable attributes
+   add_att(&diag_var, long_name_att_name,
+           (diag_long_name_map.count(name) > 0 ?
+            diag_long_name_map[name] : na_str));
+   add_att(&diag_var, units_att_name,
+           get_diag_units(name));
+   add_att(&diag_var, conf_key_domain,
+           (diag_domain_map.count(name) > 0 ?
+            diag_domain_map[name] : na_str));
+   add_att(&diag_var, fill_value_att_name,
+           diag_bad_data_double);
+
+   // Write variable values
    diag_var.putVar(offsets, counts, vals);
 
    return;
@@ -2095,6 +2138,9 @@ void TmpFileInfo::clear() {
    diag_custom_map.clear();
 
    diag_units_map.clear();
+   diag_long_name_map.clear();
+   diag_domain_map.clear();
+
    comment_lines.clear();
    pressure_levels.clear();
 

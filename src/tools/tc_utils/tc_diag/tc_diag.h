@@ -126,8 +126,11 @@ class TmpFileInfo {
       std::map<std::string,double> diag_sounding_map;
       std::map<std::string,double> diag_custom_map;
 
-      // Mapping of diagnostics names to units
+      // Mappings of diagnostics names to units, long names,
+      // and source domains
       std::map<std::string,std::string> diag_units_map;
+      std::map<std::string,std::string> diag_long_name_map;
+      std::map<std::string,std::string> diag_domain_map;
 
       // Array of comment lines
       StringArray comment_lines;
@@ -186,8 +189,10 @@ class OutFileInfo {
                          const std::map<std::string,double> &,
                          std::vector<std::string> &,
                          std::map<std::string,NumArray> &,
-                         const StringArray &, int);
-      void add_diag_units(const std::map<std::string,std::string> &);
+                         const StringArray &, const std::string &,
+                         int);
+      void add_diag_meta(const std::map<std::string,std::string> &,
+                         std::map<std::string,std::string> &);
       void set_diag_comments(const StringArray &);
 
    public:
@@ -211,8 +216,11 @@ class OutFileInfo {
       std::map<std::string,NumArray> diag_sounding_map;
       std::map<std::string,NumArray> diag_custom_map;
 
-      // Mapping of diagnostics names to units
+      // Mappings of diagnostics names to units, long names,
+      // and source domains
       std::map<std::string,std::string> diag_units_map;
+      std::map<std::string,std::string> diag_long_name_map;
+      std::map<std::string,std::string> diag_domain_map;
 
       // Array of comment lines
       StringArray comment_lines;

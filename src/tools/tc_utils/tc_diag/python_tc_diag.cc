@@ -36,6 +36,7 @@ static const char storm_data_dict_name    [] = "storm_data";
 static const char sounding_data_dict_name [] = "sounding_data";
 static const char custom_data_dict_name   [] = "custom_data";
 static const char units_dict_name         [] = "units";
+static const char long_name_dict_name     [] = "long_name";
 static const char comments_item_name      [] = "comments";
 
 ////////////////////////////////////////////////////////////////////////
@@ -326,6 +327,12 @@ bool parse_python_module(PyObject *module_obj,
                           module_dict_obj,
                           units_dict_name,
                           tmp_info.diag_units_map);
+
+   // Long names
+   if(status) status = parse_python_string_string_map(
+                          module_dict_obj,
+                          long_name_dict_name,
+                          tmp_info.diag_long_name_map);
 
    // Comments
    string str;
