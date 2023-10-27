@@ -130,7 +130,14 @@ static void compute_lat_lon(TcrmwGrid&, double *, double *);
 //       for diagnostics and add them to the NetCDF output.
 //     - [DONE for #2550] Double-check units, names, and spacing of output.
 //     - [DONE for #2550] Add NetCDF variable attribute to specify the domain
-//       from which each diag is defined (e.g. domain = "parent")
+//       from which each diag is defined (e.g. domain = "parent").
+//     - [DONE for #2550] Decided to leave diag_script as an array rather than
+//       as a string. Users may want to keep the standard diags in place and
+//       use a seperate script to do new things.
+//     - [DONE for #2550] Add new parent_domain NetCDF variable with attributes
+//       defining the range/azimuth grid.
+//     - [DONE for #2550] Support regrid option for each data field entry
+//       (e.g. regrid temp using bilin and tpw using budget).
 //   - Input data:
 //     - [DONE for #2609] Instead of reading DataPlanes one at a time,
 //       read them all at once or perhaps in groups
@@ -139,20 +146,8 @@ static void compute_lat_lon(TcrmwGrid&, double *, double *);
 //     - Add support for vortex removal. Print a WARNING if
 //       the Diag Track differs from the Tech Id for the data
 //       files and vortex removal has not been requested.
-//   - NetCDF cylindrical coordinates output:
-//     - get_var_names() returns a multimap that is sorted by
-//       the order of the variable names. This reorders the vars
-//       in the NetCDF cyl coord output. Would prefer that reordering
-//       not happen.
-//   - Consider adding support for the "regrid" dictionary to
-//     control cyl coord regridding step is done.
-//   - Refine NetCDF diagnostics output file based on feedback.
 //   - Add support for $MET_PYTHON_EXE.
-//   - Add new NetCDF variable with variable attributes to define each domain:
-//     parent: (set to 1)
-//     - n_range: 150, n_azimuth: 8, delta_range: 10.0, script: "MET_BASE/python/tc_diag/compute_tc_diag.py MET_BASE/python/tc_diag/config/post_resample.yml MET_BASE/tc_data/v2023-04-07_gdland_table.dat"
-//   - Make diag_script NOT be an array. Instead a single string is sufficient and makes the logic a little cleaner.
-//   - Update tc_diag_driver code to use `200DVRG` instead of `200DVG`.
+//   - Add documentation for cira and netcdf diag outputs.
 
 int met_main(int argc, char *argv[]) {
 
@@ -1667,16 +1662,16 @@ void OutFileInfo::write_nc_diag() {
    // Add comments global attribute
    nc_diag_out->putAtt("Comments", comment_lines.serialize("\n"));
 
+   // Write domain info
+   for(auto it=conf_info.domain_info.begin();
+       it != conf_info.domain_info.end(); it++) {
+      write_nc_domain_info(*it);
+   }
+
    // Write storm diagnostics
    for(auto it = diag_storm_keys.begin();
        it != diag_storm_keys.end(); it++) {
       write_nc_diag_vals(*it, diag_storm_map.at(*it));
-   }
-
-   // Write custom diagnostics
-   for(auto it = diag_custom_keys.begin();
-       it != diag_custom_keys.end(); it++) {
-      write_nc_diag_vals(*it, diag_custom_map.at(*it));
    }
 
    // Process and write sounding diagnostics
@@ -1751,8 +1746,48 @@ void OutFileInfo::write_nc_diag() {
 
    } // end for i
 
+   // Write custom diagnostics
+   for(auto it = diag_custom_keys.begin();
+       it != diag_custom_keys.end(); it++) {
+      write_nc_diag_vals(*it, diag_custom_map.at(*it));
+   }
+
    // Clean up
    if(prs_data) { delete [] prs_data; prs_data = (float *) 0; }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void OutFileInfo::write_nc_domain_info(const DomainInfo &di) {
+
+   // No dimensions
+   vector<NcDim> dims;
+
+   vector<size_t> offsets;
+   offsets.push_back(0);
+
+   vector<size_t> counts;
+   counts.push_back(1);
+
+   ConcatString name(di.domain);
+   name << "_domain";
+
+   // Define new variable
+   NcVar di_var = nc_diag_out->addVar(name, ncInt, dims);
+
+   // Add variable attributes
+   add_att(&di_var, conf_key_n_range,
+           di.data.range_n);
+   add_att(&di_var, conf_key_n_azimuth,
+           di.data.azimuth_n);
+   add_att(&di_var, conf_key_delta_range,
+           di.delta_range_km);
+
+   // Write variable values
+   int vals[1] = { 1 };
+   di_var.putVar(offsets, counts, &vals);
 
    return;
 }
@@ -2265,13 +2300,12 @@ void TmpFileInfo::setup_nc_file(const DomainInfo &di,
 void TmpFileInfo::write_nc_data(const VarInfo *vi, const DataPlane &dp_in,
                                 const Grid &grid_in) {
    DataPlane dp_out;
-   RegridInfo ri;
+   RegridInfo ri = vi->regrid();
 
-   // Use default regridding options
-   ri.method     = InterpMthd_Nearest;
-   ri.width      = 1;
-   ri.vld_thresh = 1.0;
-   ri.shape      = GridTemplateFactory::GridTemplate_Square;
+   mlog << Debug(4) << "Regridding \"" << vi->magic_str()
+        << "\" to the \"" << domain << "\" domain using the "
+        << interpmthd_to_string(ri.method) << "(" << ri.width
+        << ") interpolation method.\n";
 
    // Do the cylindrical coordinate transformation
    if(dp_in.nxy() > 0) {

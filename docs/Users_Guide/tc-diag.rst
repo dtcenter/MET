@@ -85,6 +85,8 @@ Configuring input tracks and time
   valid_inc = [];
   valid_exc = [];
   valid_hour = [];
+  tmp_dir = "/tmp";
+  version = "VN.N";
 
 The TC-Diag tool should be configured to filter the input track data (**-deck**) down to the subset of tracks that correspond to the gridded data files provided (**-data**). The filtered tracks should contain data for only *one initialization time* but may contain tracks for multiple models.
 
@@ -149,6 +151,20 @@ Configuring data censoring and conversion options
 
 These data censoring and conversion options are common to multiple MET tools and are described in :numref:`config_options`. They can be specified separately in each **data.field** array entry, described below. If provided, those operations are performed after reading the gridded data but prior to converting to the cylindrical coordinate range-azimuth grid.
 
+Configuring regridding options
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: none
+
+  regrid = {
+     method     = NEAREST;
+     width      = 1;
+     vld_thresh = 0.5;
+     shape      = SQUARE;
+  }
+
+The **regrid** dictionary is common to multiple MET tools and is described in :numref:`config_options`. It can be specified separately in each **data.field** array entry, described below. The default setting uses nearest neighbor interpolation for all fields.
+
 Configuring fields, levels, and domains
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -186,17 +202,6 @@ The **name** and **level** entries are common to multiple MET tools and are desc
 
 The **domain** entry is an array of strings. Each string specifies a domain name. If the **domain_info** domain name appears in this **domain** list, then this field will be read from that **domain_info** data source. If **domain** is set to an empty list, then this field will be read from all domain data sources.
 
-Configuring regridding options
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. code-block:: none
-
-  regrid = { ... }
-
-These **regrid** dictionary is common to multiple MET tools and is described in :numref:`config_options`. These regridding options control the transformation to cylindrical coordinates.
-
-.. note:: As of MET version 11.1.0, the nearest neighbor regridding method is used rather than this configuration file option.
-
 Configuring vortex removal option
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -221,31 +226,21 @@ If true, all input fields are read efficiently from each file in a single call. 
 
 .. code-block:: none
 
-  output_base_format = "s{storm_id}_{model}_doper_{init_time}";
-
-
-
-.. code-block:: none
-
   nc_cyl_grid_flag = TRUE; // ends with "_cyl_grid_{domain}.nc"
   nc_diag_flag     = TRUE; // ends with "_diag.nc"
   cira_diag_flag   = TRUE; // ends with "_diag.dat"
 
 These three flag entries are booleans specifying what output data types should be written. At least one of these flags must be set to true.
 
-  - The **nc_cyl_grid_flag** entry controls the writing of a NetCDF file containing the cylindrical coordinate range-azimuth data used to compute the diagnostics. These files are written with a `_cyl_grid_{domain}.nc` suffix, where `{domain}` is the domain name specified in the configuration file.
-  - The **nc_diag_file** entry controls the writing of the computed diagnostics to a NetCDF file. These files are written with a `_diag.nc` suffix.
-  - The **cira_diag_flage** entry controls the writing of the computed diagnostics to a formatted ASCII output file. These files are written with a `_diag.dat` suffix.
-
-Configuring MET version and temp directory
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  - The **nc_cyl_grid_flag** entry controls the writing of a NetCDF file containing the cylindrical coordinate range-azimuth data used to compute the diagnostics. These files are written with a `_cyl_grid_{domain}.nc` suffix, where `{domain}` is the domain name specified in the configuration file. One output file is written for each combination of model track and domain.
+  - The **nc_diag_file** entry controls the writing of the computed diagnostics to a NetCDF file. These files are written with a `_diag.nc` suffix. One output file is written for each model track processed.
+  - The **cira_diag_flage** entry controls the writing of the computed diagnostics to a formatted ASCII output file. These files are written with a `_diag.dat` suffix. One output file is written for each model track processed.
 
 .. code-block:: none
 
-  tmp_dir       = "/tmp";
-  version       = "V11.1.0";
+  output_base_format = "s{storm_id}_{model}_doper_{init_time}";
 
-These options are common to multiple MET tools and are described in :numref:`config_options`.
+The **output_base_format** entry is a string that defines the naming convention that should be used when writing the output files described above. The following keywords are supported and will be replaced with values from the corresponding track: {storm_id}, {basin}, {cyclone}, {storm_name}, {technique_number}, {technique}, {init_ymdh}, {init_ymd_hms}, {init_hour}.
 
 tc_diag output
 --------------
@@ -256,13 +251,13 @@ The TC-Diag tool writes up to three output data types, as specified by flags in 
 
 When the **cira_diag_flag** configuration entry is set to true, an ASCII CIRA diagnostics output file is written for each model track provided.
 
-Details will be provided when support for this output type is added.
+TODO: Details will be provided when support for this output type is added.
 
 **NetCDF Diagnostics Output**
 
 When the **nc_diag_flag** configuration entry is set to true, a NetCDF output file containing the computed diagnostics is written for each model track provided.
 
-Details will be provided when support for this output type is added.
+TODO: Details will be provided when support for this output type is added.
 
 **NetCDF Range-Azimuth Output**
 

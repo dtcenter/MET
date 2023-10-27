@@ -57,11 +57,6 @@ lead       = [   "0",   "6",  "12",  "18",  "24",
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// Python diagnostic scripts to be run
-// May be set separately in each "domain_info" entry 
-//
-
-//
 // Domain-specific cylindrical coordinate transformation
 //
 domain_info = [
@@ -89,10 +84,20 @@ domain_info = [
 // Data censoring and conversion
 // May be set separately in each data "field" array entry
 //
-// censor_thresh = [];
-// censor_val    = [];
-// convert(x)    = x;
+censor_thresh = [];
+censor_val    = [];
+convert(x)    = x;
+
 //
+// Cylindrical coordinate transformation regridding options
+// May be set separately in each data "field" array entry
+//
+regrid = {
+   method     = NEAREST;
+   width      = 1;
+   vld_thresh = 0.5;
+   shape      = SQUARE;
+}
 
 //
 // Data fields
@@ -124,16 +129,6 @@ data = {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-
-//
-// Regridding options
-//
-regrid = {
-   method     = NEAREST;
-   width      = 1;
-   vld_thresh = 0.5;
-   shape      = SQUARE;
-}
 
 //
 // Vortex removal flag

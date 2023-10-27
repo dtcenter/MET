@@ -242,6 +242,7 @@ class OutFileInfo {
       netCDF::NcFile *setup_nc_file(const std::string &);
       void add_tmp_file_info(const TmpFileInfo &, const StringArray &, int);
       void write_nc_diag();
+      void write_nc_domain_info(const DomainInfo &);
       void write_nc_diag_vals(const std::string &, NumArray &);
       void write_nc_diag_prs_vals(const std::string &, const float *);
 
