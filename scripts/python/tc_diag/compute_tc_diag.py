@@ -31,8 +31,8 @@ SKIP_DATA_NAMES = [
 # Bad data integer value
 BAD_DATA_INT = 9999
 
-# Long diagnostics name descriptions
-long_name = {
+# Diagnostics name descriptions
+LONG_NAME = {
     "LAT"     : "Latitude",
     "LON"     : "Longitude",
     "MAXWIND" : "Maximum Wind Speed",
@@ -46,9 +46,9 @@ long_name = {
     "OHC"     : "Ocean Heat Content",
     "TPW"     : "Total Precipitable Water",
     "LAND"    : "Distance to Land",
-    "850TANG" : "850 Millibar Tangential Wind",
-    "850VORT" : "850 Millibar Vorticity",
-    "200DVRG" : "200 Millibar Divergence",
+    "850TANG" : "850 MB Tangential Wind",
+    "850VORT" : "850 MB Vorticity",
+    "200DVRG" : "200 MB Divergence",
     "T_SURF"  : "Surface Temperature",
     "R_SURF"  : "Surface Humidity",
     "P_SURF"  : "Surface Pressure",
@@ -69,6 +69,7 @@ storm_data    = {}
 sounding_data = {}
 custom_data   = {}
 units         = {}
+long_name     = LONG_NAME
 
 ###########################################
 
