@@ -8,20 +8,20 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <string.h>
 #include <cstring>
 #include <sys/stat.h>
 
 #include <netcdf>
-using namespace netCDF;
-using namespace netCDF::exceptions;
 
 #include "vx_log.h"
 #include "nc_utils.h"
 #include "util_constants.h"
 #include "vx_cal.h"
+
+using namespace std;
+using namespace netCDF;
+using namespace netCDF::exceptions;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -172,7 +172,7 @@ bool get_att_value_chars(const NcAtt *att, ConcatString &value) {
             att->getValues(att_value);
             value = att_value;
          }
-         catch (exceptions::NcChar ex) {
+         catch (exceptions::NcChar &ex) {
             value = "";
             // Handle netCDF::exceptions::NcChar:  NetCDF: Attempt to convert between text & numbers
             mlog << Warning << "\n" << method_name
@@ -188,7 +188,7 @@ bool get_att_value_chars(const NcAtt *att, ConcatString &value) {
             att->getValues(att_value);
             value = att_value;
          }
-         catch (exceptions::NcChar ex) {
+         catch (exceptions::NcChar &ex) {
             int num_elements_sub = 8096;
             int num_elements = att->getAttLength();;
             char *att_value[num_elements];
@@ -199,7 +199,7 @@ bool get_att_value_chars(const NcAtt *att, ConcatString &value) {
                att->getValues(att_value);
                value = att_value[0];
             }
-            catch (exceptions::NcException ex) {
+            catch (exceptions::NcException &ex) {
                mlog << Warning << "\n" << method_name
                     << "Exception: " << ex.what() << "\n"
                     << "Fail to read " << GET_NC_NAME_P(att) << " attribute ("

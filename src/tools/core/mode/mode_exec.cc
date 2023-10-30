@@ -35,6 +35,7 @@ static const char * cts_str[n_cts] = {"RAW", "OBJECT"};
 static const char program_name [] = "mode";
 
 static const char * default_config_filename = "MET_BASE/config/MODEConfig_default";
+static const char * default_multivar_config_filename = "MET_BASE/config/MODEMultivarConfig_default";
 
 // took this out of the do_conv_thresh() method 
 static int local_r_index = -1;
@@ -143,7 +144,7 @@ void ModeExecutive::clear()
 ///////////////////////////////////////////////////////////////////////
 
 
-void ModeExecutive::init(int n_files)
+void ModeExecutive::init(int n_files, bool isMultivar)
 
 {
 
@@ -152,7 +153,11 @@ void ModeExecutive::init(int n_files)
    R_index = T_index = 0;
 
    // Create the default config file name
-   default_config_file = replace_path(default_config_filename);
+   if (isMultivar) {
+      default_config_file = replace_path(default_multivar_config_filename);
+   } else {
+      default_config_file = replace_path(default_config_filename);
+   }
 
    // If the merge config file was not set, use the match config file
    if(merge_config_file.length() == 0)
@@ -226,7 +231,7 @@ void ModeExecutive::init_multivar(GrdFileType ftype, GrdFileType otype)
    R_index = T_index = 0;
 
    // Create the default config file name
-   default_config_file = replace_path(default_config_filename);
+   default_config_file = replace_path(default_multivar_config_filename);
 
    // If the merge config file was not set, use the match config file
    if(merge_config_file.length() == 0)

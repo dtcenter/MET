@@ -24,7 +24,7 @@ Originally developed for the Statistical Hurricane Intensity Prediction Scheme (
 
 TC-Diag is run once for each initialization time to produce diagnostics for each user-specified combination of TC tracks and model fields. The user provides track data (such as one or more ATCF a-deck track files), along with track filtering criteria as needed, to select one or more tracks to be processed. The user also provides gridded model data from which diagnostics should be computed. Gridded data can be provided for multiple concurrent storms, multiple models, and/or multiple domains (i.e. parent and nest) in a single run.
 
-TC-Diag first determines the list of valid times that appear in any one of the tracks. For each valid time, it processes all track points for that time. For each track point, it reads the gridded model fields requested in the configuration file and transforms the gridded data to a range-azimuth cylindrical coordinates grid. For each domain, it writes the range-azimuth data to a temporary NetCDF file.
+TC-Diag first determines the list of valid times that appear in any one of the tracks. For each valid time, it processes all track points for that time. For each track point, it reads the gridded model fields requested in the configuration file and transforms the gridded data to a range-azimuth cylindrical coordinates grid. For each domain, it writes the range-azimuth data to a temporary NetCDF file, as described in :numref:`Contributor's Guide Section %s <tmp_files_tc_diag>`.
 
 .. note:: The current version of the tool does not yet include the capabilities described in the next three paragraphs. These additional capabilities are planned to be added in the MET v12.0.0 release later in 2023.
 
@@ -94,11 +94,20 @@ Configuring input tracks and time
   valid_inc = [];
   valid_exc = [];
   valid_hour = [];
-  lead = [];
 
 The TC-Diag tool should be configured to filter the input track data (**-deck**) down to the subset of tracks that correspond to the gridded data files provided (**-data**). The filtered tracks should contain data for only *one initialization time* but may contain tracks for multiple models.
 
 The configuration options listed above are used to filter the input track data down to those that should be processed in the current run. These options are common to multiple MET tools and are described in :numref:`config_options_tc`.
+
+.. code-block:: none
+
+  lead = [   "0",    "6",  "12",  "18",  "24",
+            "30",   "36",  "42",  "48",  "54",
+            "60",   "66",  "72",  "78",  "84",
+            "90",   "96", "102", "108", "114",
+            "120", "126" ];
+
+The **lead** entry is an array of strings specifying lead times in HH[MMSS] format. By default, diagnostics are computed every 6 hours out to 126 hours. Lead times for which no track point or gridded model data exist produce a warning message and diagnostics set to a missing data value.
 
 Configuring domain information
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -204,8 +213,16 @@ The **vortex_removal** flag entry is a boolean specifying whether or not vortex 
 
 .. note:: As of MET version 11.1.0, vortex removal logic is not yet supported.
 
-Configuring data output options
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Configuring data input and output options
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: none
+
+  one_time_per_file_flag = TRUE;
+
+The **one_time_per_file_flag** entry controls the logic for reading data from input files. This option describes how data is stored in the gridded input files specified with the **-data** command line option. Set this to true if each input file contains all of the data for a single initialization time and for a single valid time. If the input files contain data for multiple initialization or valid times, or if data for one valid time is spread across multiple files, set this to false.
+
+If true, all input fields are read efficiently from each file in a single call. If false, each field is processed separately in a less efficient manner.
 
 .. code-block:: none
 

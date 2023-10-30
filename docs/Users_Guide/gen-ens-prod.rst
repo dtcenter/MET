@@ -96,7 +96,7 @@ ____________________
 
 .. code-block:: none
 
-  model          = "WRF";
+  model          = "FCST";
   desc           = "NA";
   regrid         = { ... }
   censor_thresh  = [];

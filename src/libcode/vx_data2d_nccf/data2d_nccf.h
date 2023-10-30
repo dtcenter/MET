@@ -92,7 +92,6 @@ class MetNcCFDataFile : public Met2dDataFile {
 
       int index(VarInfo &);
 
-
       //
       //  do stuff
       //

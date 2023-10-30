@@ -134,7 +134,7 @@ extern "C" int        configwrap();
 
 char *            configtext;
 
-FILE *            configin;
+stringstream *    configin;
 
 int               LineNumber            = 1;
 

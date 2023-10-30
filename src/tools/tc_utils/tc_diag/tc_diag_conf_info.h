@@ -119,8 +119,11 @@ class TCDiagConfInfo {
       // Vector of DomainInfo
       std::vector<DomainInfo> domain_info;
 
-      // Vortext removal settings
+      // Vortex removal settings
       bool vortex_removal_flag;
+
+      // One time per file settings
+      bool one_time_per_file_flag;
 
       // Directory for temporary files
       ConcatString tmp_dir;

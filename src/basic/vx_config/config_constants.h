@@ -1210,18 +1210,19 @@ static const char conf_key_radial_velocity_field_name[] = "radial_velocity_field
 static const char conf_key_tangential_velocity_field_name[] = "tangential_velocity_field_name";
 static const char conf_key_radial_velocity_long_field_name[] = "radial_velocity_long_field_name";
 static const char conf_key_tangential_velocity_long_field_name[] = "tangential_velocity_long_field_name";
-static const char conf_key_vortex_removal[] = "vortex_removal";
 
 //
 // TC-Diag specific parameter key names
 //
 
-static const char conf_key_domain_info[]     = "domain_info";
-static const char conf_key_domain[]          = "domain";
-static const char conf_key_diag_script[]     = "diag_script";
-static const char conf_key_nc_rng_azi_flag[] = "nc_rng_azi_flag";
-static const char conf_key_nc_diag_flag[]    = "nc_diag_flag";
-static const char conf_key_cira_diag_flag[]  = "cira_diag_flag";
+static const char conf_key_domain_info[]            = "domain_info";
+static const char conf_key_domain[]                 = "domain";
+static const char conf_key_diag_script[]            = "diag_script";
+static const char conf_key_vortex_removal[]         = "vortex_removal";
+static const char conf_key_one_time_per_file_flag[] = "one_time_per_file_flag";
+static const char conf_key_nc_rng_azi_flag[]        = "nc_rng_azi_flag";
+static const char conf_key_nc_diag_flag[]           = "nc_diag_flag";
+static const char conf_key_cira_diag_flag[]         = "cira_diag_flag";
 
 //
 // Parameter value names common to multiple tools

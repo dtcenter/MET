@@ -1,7 +1,7 @@
 module use /apps/ops/para/libs/modulefiles/compiler/intel/19.1.3.304/
 module load intel python/3.10.4
 module use /apps/dev/modulefiles/
-module load ve/evs/1.0
+module load ve/evs/2.0
 module load netcdf/4.7.4
 module load hdf5/1.10.6
 module load bufr/11.5.0
@@ -10,12 +10,13 @@ module load jasper/2.0.25
 module load libpng/1.6.37
 module load gsl/2.7
 module load g2c/1.6.4
+module load proj/7.1.0
 
-export TEST_BASE=/apps/sw_review/emc/MET/11.1.0
+export TEST_BASE=/apps/sw_review/emc/MET/12.0.0
 export LIB_DIR=${TEST_BASE}/external_libs
 export COMPILER=intel_19.1.3.304
 export MET_SUBDIR=${TEST_BASE}
-export MET_TARBALL=v11.1.0.tar.gz
+export MET_TARBALL=v12.0.0.tar.gz
 export USE_MODULES=TRUE
 export ADDTL_DIR=/apps/spack/gettext/0.21/intel/19.1.3.304/at2kdo4edvuhyzrt5g6zhwrdb7bdui4s/lib64
 export PYTHON_MODULE=python_3.10.4
@@ -29,6 +30,7 @@ export MET_BUFRLIB=/apps/ops/prod/libs/intel/19.1.3.304/bufr/11.5.0/lib64
 export MET_GRIB2CLIB=/apps/ops/prod/libs/intel/19.1.3.304/g2c/1.6.4/lib64
 export MET_GRIB2CINC=/apps/ops/prod/libs/intel/19.1.3.304/g2c/1.6.4/include
 export MET_GSL=/apps/spack/gsl/2.7/intel/19.1.3.304/xks7dxbowrdxhjck5zxc4rompopocevb
+export MET_PROJ=/apps/spack/proj/7.1.0/intel/19.1.3.304/cjbmc7tacv5qcfatslqmcrzo5kb4raaq/
 export BUFRLIB_NAME=-lbufr_4
 export GRIB2CLIB_NAME=-lg2c
 export LIB_JASPER=/apps/spack/jasper/2.0.25/intel/19.1.3.304/sjib74krrorkyczqpqah4tvewmlnqdx4/lib64
