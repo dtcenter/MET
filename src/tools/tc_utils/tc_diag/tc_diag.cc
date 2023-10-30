@@ -979,39 +979,26 @@ void process_track_points(const TrackInfoArray& tracks) {
       } // end for j
    } // end for i
 
-// TODO: Work on this parallel code
+   // TODO: Parallelize the processing of valid times
 
-//#pragma omp parallel default(none)                      \
-//   shared(mlog, conf_info, tracks, valid_ta)            \
-//   private(i, dom_it)
-//   {
+   for(i=0; i<valid_ta.n(); i++) {
 
-      // Parallel: Loop over the unique valid times
-//#pragma omp for schedule (static)
-//#pragma omp parallel for
-      for(i=0; i<valid_ta.n(); i++) {
+      // Loop over the domains to be processed
+      for(j=0; j<conf_info.domain_info.size(); j++) {
 
-         // Parallel: Loop over the domains to be processed
-         for(j=0; j<conf_info.domain_info.size(); j++) {
+         // Process the gridded data for the current
+         // domain and valid time
+         process_fields(tracks, valid_ta[i], i,
+                        conf_info.domain_info[j].domain,
+                        conf_info.domain_info[j]);
 
-            // Process the gridded data for the current
-            // domain and valid time
-            process_fields(tracks, valid_ta[i], i,
-                           conf_info.domain_info[j].domain,
-                           conf_info.domain_info[j]);
-
-         } // end for j
-      } // end for i
-//   } // End of omp parallel
+      } // end for j
+   } // end for i
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
-
-// TODO: Consider adding vortex removal logic here
-// Read in the full set of fields required for vortex removal
-// Add flag to configure which fields are used for vortex removal
 
 void process_fields(const TrackInfoArray &tracks,
                     const unixtime vld_ut, int i_vld,

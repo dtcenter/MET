@@ -28,10 +28,11 @@ extern GlobalPython GP;   //  this needs external linkage
 ////////////////////////////////////////////////////////////////////////
 
 static const char * user_ppath         = nullptr;
-static const char write_tmp_diag    [] = "MET_BASE/python/pyembed/write_tmp_tc_diag.py";
-static const char read_tmp_diag     [] = "pyembed.read_tmp_tc_diag";   //  NO ".py" suffix
+static const char write_tmp_nc      [] = "MET_BASE/python/pyembed/write_tmp_tc_diag.py";
+static const char read_tmp_nc       [] = "pyembed.read_tmp_tc_diag";   //  NO ".py" suffix
 static const char python_tc_diag_dir[] = "MET_BASE/python/tc_diag";
 
+static const char diag_data_dict_name     [] = "diag_data";
 static const char storm_data_dict_name    [] = "storm_data";
 static const char sounding_data_dict_name [] = "sounding_data";
 static const char custom_data_dict_name   [] = "custom_data";
@@ -91,9 +92,10 @@ bool python_tc_diag(const ConcatString &script_name,
 
 bool straight_python_tc_diag(const ConcatString &diag_script,
         TmpFileInfo &tmp_info) {
-   const char *method_name = "straight_python_tc_diag()";
+   const char *method_name = "straight_python_tc_diag() -> ";
 
-   mlog << Debug(3) << "Running Python diagnostics script ("
+   mlog << Debug(3) << "Running MET compile time python instance ("
+        << MET_PYTHON_BIN_EXE << ") to run Python diagnostics script ("
         << diag_script << " " << tmp_info.tmp_file << ").\n";
 
    // Prepare arguments
@@ -109,7 +111,7 @@ bool straight_python_tc_diag(const ConcatString &diag_script,
 
    if(PyErr_Occurred()) {
       PyErr_Print();
-      mlog << Warning << "\n" << method_name << " -> "
+      mlog << Warning << "\n" << method_name
            << "an error occurred initializing python\n\n";
       return false;
    }
@@ -157,14 +159,14 @@ bool straight_python_tc_diag(const ConcatString &diag_script,
 
    if(PyErr_Occurred()) {
       PyErr_Print();
-      mlog << Warning << "\n" << method_name << " -> "
+      mlog << Warning << "\n" << method_name
            << "an error occurred importing module \""
            << diag_script << "\"\n\n";
       return false;
    }
 
    if(!module_obj) {
-      mlog << Warning << "\n" << method_name << " -> "
+      mlog << Warning << "\n" << method_name
            << "error running Python script \""
            << diag_script << "\"\n\n";
       return false;
@@ -178,7 +180,7 @@ bool straight_python_tc_diag(const ConcatString &diag_script,
 
 bool tmp_nc_tc_diag(const ConcatString &diag_script,
         TmpFileInfo &tmp_info) {
-   const char *method_name = "tmp_nc_tc_diag()";
+   const char *method_name = "tmp_nc_tc_diag() -> ";
    int i, status;
    ConcatString command;
    ConcatString path;
@@ -186,158 +188,172 @@ bool tmp_nc_tc_diag(const ConcatString &diag_script,
    const char * tmp_dir = nullptr;
    Wchar_Argv wa;
 
-   // TODO: Implement read/write temp tc_diag python functionality
-   mlog << Error << "\n" << method_name << " -> "
-        << "not yet fully implemented ... exiting!\n\n";
-   exit(1);
+   // If the global python object has already been initialized,
+   // we need to reload the module
+   bool do_reload = GP.is_initialized;
 
-   /*
-   mlog << Debug(3) << "Calling " << user_ppath
-        << " to run Python diagnostics script ("
-        << diag_script << " " << tmp_file_name << ").\n";
+   GP.initialize();
+
+   // Start up the python interpreter
+   if(PyErr_Occurred()) {
+      PyErr_Print();
+      mlog << Warning << "\n" << method_name
+           << "an error occurred initializing python\n\n";
+      return(false);
+   }
+
+   run_python_string("import sys");
+   command << cs_erase
+           << "sys.path.append(\""
+           << replace_path(python_dir)
+           << "\")";
+   run_python_string(command.text());
+   mlog << Debug(1) << method_name << "added python path ("
+        << python_dir << ") to python interpreter\n";
+
+   mlog << Debug(3) << "Running user-specified python instance (MET_PYTHON_EXE="
+        << user_ppath << ") to run Python diagnostics script ("
+        << diag_script << " " << tmp_info.tmp_file << ").\n";
 
    // Create a temp file
    tmp_dir = getenv ("MET_TMP_DIR");
    if(!tmp_dir) tmp_dir = default_tmp_dir;
 
    path << cs_erase
-     << tmp_dir << '/'
-     << tmp_nc_base_name;
+        << tmp_dir << '/'
+        << tmp_nc_base_name;
 
    tmp_nc_path = make_temp_file_name(path.text(), 0);
 
    // Construct the system command
    command << cs_erase
-           << user_ppath                   << ' ' // user's path to python
-           << replace_path(write_tmp_diag) << ' ' // write_tmp_diag.py
-           << tmp_nc_path                  << ' ' // tmp_nc output filename
-           << diag_script                  << ' ' // python script name
-           << tmp_file_name;                      // input temp NetCDF file
+           << user_ppath                 << ' ' // user's path to python
+           << replace_path(write_tmp_nc) << ' ' // write_tmp_tc_diag.py
+           << tmp_nc_path                << ' ' // tmp_nc output filename
+           << diag_script                << ' ' // python diagnostics script
+           << tmp_info.tmp_file;                // cylindrical coordinates tmp nc filename
 
-   mlog << Debug(4) << "Writing temporary Python dataplane file:\n\t"
+   mlog << Debug(4) << "Writing temporary Python diagnostics file:\n\t"
         << command << "\n";
 
    status = system(command.text());
 
    if(status) {
-      mlog << Error << "\n" << method_name << " -> "
+      mlog << Error << "\n" << method_name
            << "command \"" << command.text() << "\" failed ... status = "
            << status << "\n\n";
       exit(1);
    }
 
-   // Reload the module if GP has already been initialized
-   bool do_reload = GP.is_initialized;
+   // Set the arguments
+   StringArray a;
+   a.add(read_tmp_nc);
+   a.add(tmp_nc_path);
+   wa.set(a);
 
-   GP.initialize();
+   PySys_SetArgv(wa.wargc(), wa.wargv());
 
-   if(PyErr_Occurred()) {
-      PyErr_Print();
-      mlog << Warning << "\n" << method_name << " -> "
-           << "an error occurred initializing python\n\n";
-      return false;
-   }
-
-   // Prepare arguments to read input
-   StringArray arg_sa;
-   arg_sa.add(read_tmp_diag);
-   arg_sa.add(tmp_nc_path);
-   wa.set(arg_sa);
-
-   PySys_SetArgv (wa.wargc(), wa.wargv());
-
-   mlog << Debug(4) << "Reading temporary Python diagnostics file: "
+   mlog << Debug(4) << "Reading temporary Python TC-Diag data file: "
         << tmp_nc_path << "\n";
 
    // Import the python wrapper script as a module
-   path = read_tmp_diag;
-   path = path.basename();
-   path.chomp(".py");
+   path = get_short_name(read_tmp_nc);
+   PyObject * module_obj = PyImport_ImportModule (path.text());
 
-   PyObject * module_obj = PyImport_ImportModule(path.c_str());
-
-   // Reload the module, if needed
+   // If needed, reload the module
    if(do_reload) {
       module_obj = PyImport_ReloadModule (module_obj);
    }
 
    if(PyErr_Occurred()) {
       PyErr_Print();
-      mlog << Warning << "\n" << method_name << " -> "
-        << "an error occurred importing module "
-        << '\"' << path << "\"\n\n";
-      return false;
+      mlog << Warning << "\n" << method_name
+           << "an error occurred importing module "
+           << '\"' << path << "\"\n\n";
+      return(false);
    }
 
    if(!module_obj) {
-      mlog << Warning << "\n" << method_name << " -> "
-        << "error running Python script\n\n";
-      return false;
+      mlog << Warning << "\n" << method_name
+           << "error running python script\n\n";
+      return(false);
    }
 
    // Parse the diagnostics from python
-   bool status = parse_python_module(module_obj, tmp_info);
+   status = parse_python_module(module_obj, tmp_info);
 
    // Cleanup
    remove_temp_file(tmp_nc_path);
 
    return(status);
-   */
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool parse_python_module(PyObject *module_obj,
         TmpFileInfo &tmp_info) {
-   const char *method_name = "parse_python_module()";
+   const char *method_name = "parse_python_module() -> ";
    bool status = true;
 
    // Get the namespace for the module (as a dictionary)
    PyObject *module_dict_obj = PyModule_GetDict(module_obj);
 
    if(!module_dict_obj || !PyDict_Check(module_dict_obj)) {
-      mlog << Warning << "\n" << method_name << " -> "
+      mlog << Warning << "\n" << method_name
            << "python module is not a dictionary.\n\n";
+      return(false);
+   }
+
+   // Get the diag_data item
+   PyObject *data_obj = PyDict_GetItem(module_dict_obj,
+		           PyUnicode_FromString(diag_data_dict_name));
+
+   if(!data_obj || !PyDict_Check(data_obj)) {
+      mlog << Warning << "\n" << method_name
+           << "trouble parsing the \"" << diag_data_dict_name
+           << "\" python dictionary.\n\n";
       return(false);
    }
 
    // Storm data
    if(status) status = parse_python_string_value_map(
-                          module_dict_obj,
+                          data_obj,
                           storm_data_dict_name,
                           tmp_info.diag_storm_keys,
                           tmp_info.diag_storm_map);
 
    // Sounding data
    if(status) status = parse_python_string_value_map(
-                          module_dict_obj,
+                          data_obj,
                           sounding_data_dict_name,
                           tmp_info.diag_sounding_keys,
                           tmp_info.diag_sounding_map);
 
    // Custom data
    if(status) status = parse_python_string_value_map(
-                          module_dict_obj,
+                          data_obj,
                           custom_data_dict_name,
                           tmp_info.diag_custom_keys,
                           tmp_info.diag_custom_map);
 
    // Units
    if(status) status = parse_python_string_string_map(
-                          module_dict_obj,
+                          data_obj,
                           units_dict_name,
                           tmp_info.diag_units_map);
 
    // Long names
    if(status) status = parse_python_string_string_map(
-                          module_dict_obj,
+                          data_obj,
                           long_name_dict_name,
                           tmp_info.diag_long_name_map);
 
    // Comments
    string str;
-   if(status) status = parse_python_string(module_dict_obj,
-                          comments_item_name, str);
+   if(status) status = parse_python_string(
+                          data_obj,
+                          comments_item_name,
+                          str);
 
    ConcatString cs(str);
    StringArray sa = cs.split("\n");
@@ -359,7 +375,7 @@ bool parse_python_string_value_map(PyObject *dict,
         vector<string> &k,
         map<string,double> &m) {
 
-   const char *method_name = "parse_python_string_value_map()";
+   const char *method_name = "parse_python_string_value_map() -> ";
 
    PyObject *val_obj = nullptr;
    PyObject *key_obj = nullptr;
@@ -371,7 +387,7 @@ bool parse_python_string_value_map(PyObject *dict,
 		           PyUnicode_FromString(name));
 
    if(!data_obj || !PyDict_Check(data_obj)) {
-      mlog << Warning << "\n" << method_name << " -> "
+      mlog << Warning << "\n" << method_name
            << "trouble parsing the \"" << name
            << "\" python dictionary.\n\n";
       return(false);
@@ -385,7 +401,7 @@ bool parse_python_string_value_map(PyObject *dict,
 
       // All keys must be strings
       if(!PyUnicode_Check(key_obj)) {
-         mlog << Error << "\n" << method_name << " -> "
+         mlog << Error << "\n" << method_name
               << "key is not a string!\n\n";
          exit(1);
       }
@@ -399,7 +415,7 @@ bool parse_python_string_value_map(PyObject *dict,
          val = PyFloat_AsDouble(val_obj);
       }
       else {
-         mlog << Error << "\n" << method_name << " -> "
+         mlog << Error << "\n" << method_name
               << "value for \"" << key_str
               << "\" is not a numeric python data type!\n\n";
          exit(1);
@@ -407,7 +423,7 @@ bool parse_python_string_value_map(PyObject *dict,
 
       // Check for duplicates
       if(m.count(key_str) > 0) {
-         mlog << Warning << "\n" << method_name << " -> "
+         mlog << Warning << "\n" << method_name
               << "ignoring duplicate entries for \""
               << key_str << "\" = " << val << "!\n\n";
       }
@@ -428,7 +444,7 @@ bool parse_python_string_value_map(PyObject *dict,
 bool parse_python_string_string_map(PyObject *dict,
         const char *name, map<string,string> &m) {
 
-   const char *method_name = "parse_python_string_string_map()";
+   const char *method_name = "parse_python_string_string_map() -> ";
 
    PyObject *key_obj = nullptr;
    PyObject *val_obj = nullptr;
@@ -439,7 +455,7 @@ bool parse_python_string_string_map(PyObject *dict,
                            PyUnicode_FromString(name));
 
    if(!data_obj || !PyDict_Check(data_obj)) {
-      mlog << Warning << "\n" << method_name << " -> "
+      mlog << Warning << "\n" << method_name
            << "trouble parsing the \"" << name
            << "\" python dictionary.\n\n";
       return(false);
@@ -453,7 +469,7 @@ bool parse_python_string_string_map(PyObject *dict,
 
       // All keys and values must be strings
       if(!PyUnicode_Check(key_obj) || !PyUnicode_Check(val_obj)) {
-         mlog << Error << "\n" << method_name << " -> "
+         mlog << Error << "\n" << method_name
               << "key or value is not a string!\n\n";
          exit(1);
       }
@@ -464,7 +480,7 @@ bool parse_python_string_string_map(PyObject *dict,
 
       // Check for duplicates
       if(m.count(key_str) > 0) {
-         mlog << Warning << "\n" << method_name << " -> "
+         mlog << Warning << "\n" << method_name
               << "ignoring duplicate entries for \""
               << key_str << "\" = \"" << val_str << "\"!\n\n";
       }
@@ -484,13 +500,13 @@ bool parse_python_string_string_map(PyObject *dict,
 bool parse_python_string(PyObject *dict,
         const char *name, string &s) {
 
-   const char *method_name = "parse_python_string()";
+   const char *method_name = "parse_python_string() -> ";
 
    PyObject *data_obj = PyDict_GetItem(dict,
                            PyUnicode_FromString(name));
 
    if(!data_obj || !PyUnicode_Check(data_obj)) {
-      mlog << Warning << "\n" << method_name << " -> "
+      mlog << Warning << "\n" << method_name
            << "trouble parsing the \"" << name
            << "\" python string.\n\n";
       return(false);
