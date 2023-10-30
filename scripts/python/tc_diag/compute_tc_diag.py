@@ -64,12 +64,15 @@ LONG_NAME = {
 
 ###########################################
 
-# Define global output dictionaries
-storm_data    = {}
-sounding_data = {}
-custom_data   = {}
-units         = {}
-long_name     = LONG_NAME
+# Define global output diag_data dictionary
+diag_data = {
+    "storm_data"    : {},
+    "sounding_data" : {},
+    "custom_data"   : {},
+    "units"         : {},
+    "long_name"     : LONG_NAME,
+    "comments"      : ""
+}
 
 ###########################################
 
@@ -95,8 +98,7 @@ def main():
                  post_resample_driver.DriverConfig)
 
     # Store global configuration comments
-    global comments
-    comments = config.comment
+    diag_data["comments"] = config.comment
 
     # Call drive to calculate the diagnostics
     try:
@@ -115,13 +117,15 @@ def main():
         # - Are in the skip list.
         # - Have already been processed.
         if ((d not in results.pressure_independent.keys()) or
-            (d in SKIP_DATA_NAMES + list(storm_data.keys()) +
-                  list(sounding_data.keys()) + list(custom_data.keys()))):
+            (d in SKIP_DATA_NAMES +
+                  list(diag_data["storm_data"].keys()) +
+                  list(diag_data["sounding_data"].keys()) +
+                  list(diag_data["custom_data"].keys()))):
             continue
 
         # Store units as upper-case
         if 'units' in results.pressure_independent[d].attrs:
-            units[d] = results.pressure_independent[d].attrs["units"].upper()
+            diag_data["units"][d] = results.pressure_independent[d].attrs["units"].upper()
 
         # Check for bad data
         val = results.pressure_independent[d].values[0]
@@ -130,11 +134,11 @@ def main():
 
         # Store value
         if d in STORM_DATA_NAMES:
-            storm_data[d] = val
+            diag_data["storm_data"][d] = val
         elif d in SOUNDING_DATA_NAMES:
-            sounding_data[d] = val
+            diag_data["sounding_data"][d] = val
         else:
-            custom_data[d] = val
+            diag_data["custom_data"][d] = val
 
     # Add units for sounding diagnostics
     for d in results.soundings.keys():
@@ -144,7 +148,7 @@ def main():
 
         # Store units as upper-case
         if 'units' in results.soundings[d].attrs:
-            units[d] = results.soundings[d].attrs["units"].upper()
+            diag_data["units"][d] = results.soundings[d].attrs["units"].upper()
 
     # Loop over the sounding pressure levels
     for idx, prs in enumerate(levels):
@@ -160,8 +164,10 @@ def main():
             # - Are in the skip list.
             # - Have already been processed.
             if ((d not in results.soundings.keys()) or
-                (d_prs in SKIP_DATA_NAMES + list(storm_data.keys()) +
-                          list(sounding_data.keys()) + list(custom_data.keys()))):
+                (d_prs in SKIP_DATA_NAMES +
+                          list(diag_data["storm_data"].keys()) +
+                          list(diag_data["sounding_data"].keys()) +
+                          list(diag_data["custom_data"].keys()))):
                 continue
 
             # Check for bad data
@@ -171,18 +177,13 @@ def main():
 
             # Store value
             if d in SOUNDING_DATA_NAMES:
-                sounding_data[d_prs] = val
+                diag_data["sounding_data"][d_prs] = val
             else:
-                custom_data[d_prs] = val
+                diag_data["custom_data"][d_prs] = val
 
     # Print verbose dictionary contents
     if args.verbose:
-        print(f"\nSTORM DATA ({len(storm_data)}) =", storm_data)
-        print(f"\nSOUNDING DATA ({len(sounding_data)}) =", sounding_data)
-        print(f"\nCUSTOM DATA ({len(custom_data)}) =", custom_data)
-        print(f"\nUNITS ({len(units)}) =", units)
-        print(f"\nLONG_NAME ({len(long_name)}) =", long_name)
-        print(f"\nCOMMENTS:\n", comments, "\n")
+        print(f"\nDiagnostics Data:\n", diag_data)
 
 def _get_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
