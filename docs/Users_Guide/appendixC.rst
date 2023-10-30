@@ -7,7 +7,7 @@ Appendix C Verification Measures
 This appendix provides specific information about the many verification statistics and measures that are computed by MET. These measures are categorized into measures for categorical (dichotomous) variables; measures for continuous variables; measures for probabilistic forecasts and measures for neighborhood methods. While the continuous, categorical, and probabilistic statistics are computed by both the Point-Stat and Grid-Stat tools, the neighborhood verification measures are only provided by the Grid-Stat tool.
 
 
-Which statistics are the same, but with different names?
+Which Statistics are the Same, but with Different Names?
 ========================================================
 
 .. list-table:: Statistics in MET and other names they have been published under.
@@ -52,7 +52,7 @@ Which statistics are the same, but with different names?
 
 .. _categorical variables:
 
-MET verification measures for categorical (dichotomous) variables
+MET Verification Measures for Categorical (Dichotomous) Variables
 =================================================================
 
 
@@ -99,7 +99,7 @@ TOTAL
 
 The total number of forecast-observation pairs, **T**.
 
-Base rate
+Base Rate
 ---------
 
 Called "O_RATE" in FHO output :numref:`table_PS_format_info_FHO`
@@ -108,7 +108,7 @@ Called "BASER" in CTS output :numref:`table_PS_format_info_CTS`
 
 The base rate is defined as :math:`\bar{o} = \frac{n_{11} + n_{01}}{T} = \frac{n_{.1}}{T}.` This value is also known as the sample climatology, and is the relative frequency of occurrence of the event (i.e., o = 1). The base rate is equivalent to the "O" value produced by the NCEP Verification System.
 
-Mean forecast
+Mean Forecast
 -------------
 
 Called "F_RATE" in FHO output :numref:`table_PS_format_info_FHO`
@@ -398,14 +398,14 @@ where the word expected refers to the mean value deduced from the climatology, r
 
 SEEPS scores are expected to lie between 0 and 1, with a perfect forecast having a value of 0. Individual values can be much larger than 1. Results can be presented as a skill score by using the value of 1 – SEEPS.
 
-MET verification measures for continuous variables
+MET Verification Measures for Continuous Variables
 ==================================================
 
 For continuous variables, many verification measures are based on the forecast error (i.e., **f - o**). However, it also is of interest to investigate characteristics of the forecasts, and the observations, as well as their relationship. These concepts are consistent with the general framework for verification outlined by :ref:`Murphy and Winkler, (1987) <Murphy-1987>`. The statistics produced by MET for continuous forecasts represent this philosophy of verification, which focuses on a variety of aspects of performance rather than a single measure.
 
 The verification measures currently evaluated by the Point-Stat tool are defined and described in the subsections below. In these definitions, **f** represents the forecasts, **o** represents the observation, and **n** is the number of forecast-observation pairs.
 
-Mean forecast
+Mean Forecast
 -------------
 
 Called "FBAR" in CNT output :numref:`table_PS_format_info_CNT`
@@ -414,7 +414,7 @@ Called "FBAR" in SL1L2 output :numref:`table_PS_format_info_SL1L2`
 
 The sample mean forecast, FBAR, is defined as :math:`\bar{f} = \frac{1}{n} \sum_{i=1}^{n} f_i`.
 
-Mean observation
+Mean Observation
 ----------------
 
 Called "OBAR" in CNT output :numref:`table_PS_format_info_CNT`
@@ -423,7 +423,7 @@ Called "OBAR" in SL1L2 output :numref:`table_PS_format_info_SL1L2`
 
 The sample mean observation is defined as :math:`\bar{o} = \frac{1}{n} \sum_{i=1}^{n} o_i`.
 
-Forecast standard deviation
+Forecast Standard Deviation
 ---------------------------
 
 Called "FSTDEV" in CNT output :numref:`table_PS_format_info_CNT`
@@ -434,7 +434,7 @@ The sample variance of the forecasts is defined as
 
 The forecast standard deviation is defined as :math:`s_f = \sqrt{s_f^2}`.
 
-Observation standard deviation
+Observation Standard Deviation
 ------------------------------
 
 Called "OSTDEV" in CNT output :numref:`table_PS_format_info_CNT`
@@ -456,7 +456,7 @@ The Pearson correlation coefficient, **r**, measures the strength of linear asso
 
 **r** can range between -1 and 1; a value of 1 indicates perfect correlation and a value of -1 indicates perfect negative correlation. A value of 0 indicates that the forecasts and observations are not correlated. 
 
-Spearman rank correlation coefficient :math:`(\rho_{s})`
+Spearman Rank Correlation Coefficient :math:`(\rho_{s})`
 --------------------------------------------------------
 
 Called "SP_CORR" in CNT :numref:`table_PS_format_info_CNT`
@@ -955,7 +955,7 @@ A ROC curve shows how well the forecast discriminates between two outcomes, so i
 	    
 	    Example of ROC Curve
 
-Area Under the ROC curve (AUC)
+Area Under the ROC Curve (AUC)
 ------------------------------
 
 Called "ROC_AUC" in PSTD output :numref:`table_PS_format_info_PSTD`
@@ -968,7 +968,7 @@ The area under the curve can be estimated in a variety of ways. In MET, the simp
 
 .. _App_C-ensemble:
 
-MET verification measures for ensemble forecasts
+MET Verification Measures for Ensemble Forecasts
 ================================================
 
 RPS
@@ -1125,7 +1125,7 @@ The ensemble spread for a single observation is the standard deviation of the en
 
 Note that prior to met-9.0.1, the ensemble spread of a spatial masking region was computed as the average of the spread values within that region. This algorithm was corrected in met-9.0.1 to average the ensemble variance values prior to computing the square root.
 
-MET verification measures for neighborhood methods
+MET Verification Measures for Neighborhood Methods
 ==================================================
 
 The results of the neighborhood verification approaches that are included in the Grid-Stat tool are summarized using a variety of measures. These measures include the Fractions Skill Score (FSS) and the Fractions Brier Score (FBS). MET also computes traditional contingency table statistics for each combination of threshold and neighborhood window size.
@@ -1210,7 +1210,7 @@ The overall proportion of grid points with observed events to total grid points 
 
 .. _App_C-distance_maps:
 
-MET verification measures for distance map methods
+MET Verification Measures for Distance Map Methods
 ==================================================
 
 The distance map statistics include Baddeley's :math:`\Delta` Metric, a statistic which is a true mathematical metric. The definition of a mathematical metric is included below.
@@ -1245,7 +1245,7 @@ In terms of distance maps, Baddeley's :math:`\Delta` is the :math:`L_{p}` norm o
 
 The range for BADDELEY and HAUSDORFF is 0 to infinity, with a score of 0 indicating a perfect forecast.
 
-Mean-error Distance
+Mean-Error Distance
 -------------------
 
 Called "MED_FO", "MED_OF", "MED_MIN", "MED_MAX", and "MED_MEAN" in the DMAP output :numref:`table_GS_format_info_DMAP`

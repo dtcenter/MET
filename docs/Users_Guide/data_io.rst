@@ -126,7 +126,7 @@ MET gets the valid time from the time variable and the "forecast_reference_time"
       "degreeE",
       "degreesE"
 
-Performance with NetCDF input data
+Performance with NetCDF Input Data
 ----------------------------------
 
 There is no limitation on the NetCDF file size. The size of the data variables matters more than the file size. The NetCDF API loads the metadata first upon opening the NetCDF file. It's similar for accessing data variables. There are two API calls: getting the metadata and getting the actual data. The memory is allocated and consumed at the second API call (getting the actual data).
@@ -135,14 +135,14 @@ The dimensions of the data variables matter. MET requests the NetCDF data needs 
 
 .. _Intermediate data formats:
 
-Intermediate data formats
+Intermediate Data Formats
 =========================
 
 MET uses NetCDF as an intermediate file format. The MET tools which write gridded output files write to a common gridded NetCDF file format. The MET tools which write point output files write to a common point observation NetCDF file format.
 
 .. _Output data formats:
 
-Output data formats
+Output Data Formats
 ===================
 
 The MET package currently produces output in the following basic file formats: STAT files, ASCII files, NetCDF files, PostScript plots, and png plots from the Plot-Mode-Field utility.
@@ -163,7 +163,7 @@ Users can use the optional plotting utilities Plot-Data-Plane, Plot-Point-Obs, a
 
 .. _Data format summary:
 
-Data format summary
+Data Format Summary
 ===================
 
 The following is a summary of the input and output formats for each of the tools currently in MET. The output listed is the maximum number of possible output files. Generally, the type of output files generated can be controlled by the configuration files and/or the command line options:
