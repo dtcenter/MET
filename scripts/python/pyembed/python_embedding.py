@@ -105,6 +105,13 @@ class pyembed_tools():
             for line in met_data:
                 f.write(str(line) + '\n')
 
+    @staticmethod
+    def write_tmp_diag(filename, met_data):
+        # TODO: implement this
+
+    @staticmethod
+    def read_tmp_diag(filename):
+        # TODO: implement this
 
 if __name__ == '__main__':
     argv_org = sys.argv[:]      # save original sys.argv

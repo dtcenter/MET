@@ -1,9 +1,8 @@
 ########################################################################
 #
-#    Adapted from a script provided by George McCabe
-#    Adapted by Randy Bullock
+#    Runs python diagnostics script and writes a temporary file.
 #
-#    usage:  /path/to/python write_tmp_mpr.py \
+#    usage:  /path/to/python write_tmp_diag.py \
 #            tmp_output_filename <user_python_script>.py <args>
 #
 ########################################################################
@@ -18,4 +17,4 @@ except:
 if __name__ == '__main__':
    tmp_filename = sys.argv[1]
    met_in = pyembed_tools.call_python(sys.argv)
-   pyembed_tools.write_tmp_ascii(tmp_filename, met_in.mpr_data)
+   pyembed_tools.write_tmp_diag(tmp_filename, met_in.diag_data)
