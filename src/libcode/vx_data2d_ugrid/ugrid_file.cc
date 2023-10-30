@@ -600,6 +600,19 @@ NcVarInfo* UGridFile::find_var_by_dim_name(const char *dim_name) const
 
 ////////////////////////////////////////////////////////////////////////
 
+bool UGridFile::find_nc_vinfo_list(const char *var_name,
+                                   std::vector<NcVarInfo *> &vinfo_list) const
+{
+  vinfo_list.clear();
+  for (int i = 0; i < Nvars; i++) {
+    if (Var[i].name.startswith(var_name)) vinfo_list.push_back(&Var[i]);
+  }
+  return vinfo_list.size() > 0;
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
 
 double UGridFile::getData(NcVar * var, const LongArray & a) const
 {

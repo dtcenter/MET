@@ -107,6 +107,8 @@ class UGridFile {
       netCDF::NcDim *get_vert_dim() const;
       NcVarInfo* find_by_name(const char * var_name) const;
       NcVarInfo* find_var_by_dim_name(const char *dim_name) const;
+      bool find_nc_vinfo_list(const char *var_name, std::vector<NcVarInfo *> &vinfo_list) const;
+
 
    private:
 
