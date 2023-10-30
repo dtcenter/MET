@@ -168,170 +168,160 @@ void MetUGridDataFile::dump(ostream & out, int depth) const {
 
 bool MetUGridDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
 {
-  // Not sure why we do this
-
-  NcVarInfo *data_var = (NcVarInfo *)nullptr;
-  VarInfoUGrid *vinfo_nc = (VarInfoUGrid *)&vinfo;
-  static const string method_name
+   bool status = false;
+   NcVarInfo *data_var = (NcVarInfo *)nullptr;
+   VarInfoUGrid *vinfo_nc = (VarInfoUGrid *)&vinfo;
+   const long time_cnt = (long)_file->ValidTime.n();
+   static const string method_name
       = "MetUGridDataFile::data_plane(VarInfo &, DataPlane &) -> ";
 
-  // Initialize the data plane
+   // Initialize the data plane
 
-  plane.clear();
+   plane.clear();
 
-  // Check for NA in the requested name
-  //if ( vinfo_nc->req_name() == na_str )
-  //{
-  //  // Store the name of the first data variable
-  //  data_var = find_first_data_var();
-  //  if (nullptr != data_var) vinfo_nc->set_req_name(data_var->name.c_str());
-  //}
-
-  int zdim_slot = bad_data_int;
-  int time_dim_slot = bad_data_int;
-  long org_time_offset = bad_data_int;
-  long org_z_offset = bad_data_int;
-  NumArray dim_value = vinfo_nc->dim_value();
-  LongArray dimension = vinfo_nc->dimension();
-  BoolArray is_offset = vinfo_nc->is_offset();
-
-  data_var = _file->find_by_name(vinfo_nc->req_name().c_str());
-  if (nullptr != data_var) {
-    zdim_slot = data_var->z_slot;
-    time_dim_slot = data_var->t_slot;
-    for (int idx=0; idx<is_offset.n(); idx++) {
-      long dim_offset = dimension[idx];
-      if (dim_offset == vx_data2d_star) continue;
-      if (idx == time_dim_slot) {
-        long time_cnt = (long)_file->ValidTime.n();
-        long time_threshold_cnt = 10000000;
-        org_time_offset = dim_offset;
-        long time_offset = org_time_offset;
-        if (time_offset == range_flag) time_offset = _cur_time_index;   // from data_plane_array()
-        else if (!is_offset[idx]) {
-          long time_value = dim_value[idx];
-          time_offset = convert_time_to_offset(time_value);
-          if ((0 > time_offset) || (time_offset >= time_cnt)) {
-             if (time_value > time_threshold_cnt)  // from time string (yyyymmdd_hh)
-                mlog << Warning << "\n" << method_name << "the requested time "
-                     << unix_to_yyyymmdd_hhmmss(time_value) << " for \""
-                     << vinfo.req_name() << "\" variable does not exist ("
-                     << unix_to_yyyymmdd_hhmmss(_file->ValidTime[0]) << " and "
-                     << unix_to_yyyymmdd_hhmmss(_file->ValidTime[time_cnt-1]) << ").\n\n";
-             else
-                mlog << Warning << "\n" << method_name << "the requested time value "
-                     << time_value << " for \"" << vinfo.req_name() << "\" variable "
-                     << "is out of range (between 0 and " << (time_cnt-1) << ").\n\n";
-
-             return false;
-          }
-        }
-        else if ((0 > time_offset) || (time_offset >= time_cnt)) {
-          time_offset = convert_time_to_offset(time_offset);
-        }
-        if ((0 > time_offset) || (time_offset >= time_cnt)) {
-          mlog << Error << "\n" << method_name << "the requested time offset "
-               << time_offset << " for \"" << vinfo.req_name() << "\" variable "
-               << "is out of range (between 0 and " << (time_cnt-1) << ").\n\n";
-          return false;
-        }
-        dimension[time_dim_slot] = time_offset;
+   data_var = _file->find_by_name(vinfo_nc->req_name().c_str());
+   if (nullptr != data_var) {
+      int zdim_slot = data_var->z_slot;
+      int time_dim_slot = data_var->t_slot;
+      NumArray dim_value = vinfo_nc->dim_value();
+      LongArray dimension(vinfo_nc->dimension());
+      BoolArray is_offset(vinfo_nc->is_offset());
+      for (int idx=0; idx<is_offset.n(); idx++) {
+         long dim_offset = dimension[idx];
+         if (dim_offset == vx_data2d_star) continue;
+         if (idx == time_dim_slot) {
+            long time_offset = dim_offset;
+            if (time_offset == range_flag) time_offset = _cur_time_index;   // from data_plane_array()
+            else if (!is_offset[idx]) {
+               time_offset = get_time_offset(dim_value[idx], time_cnt,
+                                             vinfo.req_name().c_str(), method_name);
+            }
+            else if ((0 > time_offset) || (time_offset >= time_cnt)) {
+               time_offset = convert_time_to_offset(time_offset);
+            }
+            if ((0 > time_offset) || (time_offset >= time_cnt)) {
+              mlog << Error << "\n" << method_name << "the requested time offset "
+                   << time_offset << " for \"" << vinfo.req_name() << "\" variable "
+                   << "is out of range (between 0 and " << (time_cnt-1) << ").\n\n";
+              return false;
+            }
+            dimension[time_dim_slot] = time_offset;
+         }
+         else if (idx == zdim_slot) {
+            const long z_cnt = (long)get_dim_size(_file->get_vert_dim());
+            long z_offset = dim_offset;
+            if (z_offset == range_flag) z_offset = _cur_vert_index;   // from data_plane_array()
+            //else if (!is_offset[idx]) {
+            //  // convert the value to index for slicing
+            //  z_offset = convert_value_to_offset(dim_value[idx], z_dim_name);
+            //}
+            if ((z_offset >= 0) && (z_offset < z_cnt)) {
+              dimension[idx] = long(z_offset);
+            }
+            //else {
+            //  if (is_offset[idx])
+            //     mlog << Error << "\n" << method_name << "the requested vertical offset "
+            //          << dim_offset << " for \"" << vinfo.req_name() << "\" variable "
+            //          << "is out of range (between 0 and " << (z_cnt-1) << ").\n\n";
+            //  else
+            //     mlog << Error << "\n" << method_name << "the requested vertical value "
+            //          << dim_value[idx] << " for \"" << vinfo.req_name() << "\" variable "
+            //          << "does not exist (data size = " << z_cnt << ").\n\n";
+            //  return false;
+            //}
+         }
       }
-      else if (idx == zdim_slot) {
-        long z_cnt = (long)get_dim_size(_file->get_vert_dim());
-        org_z_offset = dim_offset;
-        long z_offset = dim_offset;
-        //if (!is_offset[idx]) {
-        //  // convert the value to index for slicing
-        //  z_offset = convert_value_to_offset(dim_value[idx], z_dim_name);
-        //}
-        if (z_offset == range_flag) z_offset = _cur_vert_index;   // from data_plane_array()
-        if ((z_offset >= 0) && (z_offset < z_cnt)) {
-          dimension[idx] = long(z_offset);
-        }
-        //else {
-        //  if (is_offset[idx])
-        //     mlog << Error << "\n" << method_name << "the requested vertical offset "
-        //          << dim_offset << " for \"" << vinfo.req_name() << "\" variable "
-        //          << "is out of range (between 0 and " << (z_cnt-1) << ").\n\n";
-        //  else
-        //     mlog << Error << "\n" << method_name << "the requested vertical value "
-        //          << dim_value[idx] << " for \"" << vinfo.req_name() << "\" variable "
-        //          << "does not exist (data size = " << z_cnt << ").\n\n";
-        //  return false;
-        //}
+      // Read the data
+      status = read_data_plane(vinfo.req_name(), vinfo, plane, dimension);
+   }
+
+   return status;
+}
+
+
+////////////////////////////////////////////////////////////////////////
+// Find the actual variable from the requested variuable name.
+// The requested variable name is the prefix of the actual variable name.
+//
+
+bool MetUGridDataFile::data_plane(VarInfo &vinfo, DataPlane &plane, NcVarInfo *data_var)
+{
+   // Not sure why we do this
+   bool status = false;
+   const long time_cnt = (long)_file->ValidTime.n();
+   VarInfoUGrid *vinfo_nc = (VarInfoUGrid *)&vinfo;
+   static const string method_name
+         = "MetUGridDataFile::data_plane(VarInfo &, DataPlane &, NcVarInfo *) -> ";
+
+   // Initialize the data plane
+
+   plane.clear();
+
+   int zdim_slot = bad_data_int;
+   int time_dim_slot = bad_data_int;
+//   long org_time_offset = bad_data_int;
+//   long org_z_offset = bad_data_int;
+   NumArray dim_value = vinfo_nc->dim_value();
+   LongArray dimension(vinfo_nc->dimension());
+   BoolArray is_offset(vinfo_nc->is_offset());
+
+   if (nullptr != data_var) {
+      zdim_slot = data_var->z_slot;
+      time_dim_slot = data_var->t_slot;
+
+      // Adjust didmension and is_offset
+      int dim_size = dimension.n_elements();
+      if (0 == dimension.n_elements()) {
+         for (int idx=0; idx<data_var->Ndims; idx++) {
+            long offset = 0;
+            if (zdim_slot == idx &&_cur_vert_index >= 0) offset = _cur_vert_index;
+            dimension.add(offset);
+            is_offset.add(true);
+         }
       }
-    }
-  }
+      for (int idx=0; idx<is_offset.n(); idx++) {
+         long dim_offset = dimension[idx];
+         if (dim_offset == vx_data2d_star) {
+            if (idx == time_dim_slot || idx == zdim_slot) dimension[idx] = 0;  // force offset to 0
+            continue;
+         }
+         if (idx == time_dim_slot) {
+            long time_offset = dim_offset;
+            if (time_offset == range_flag) time_offset = _cur_time_index;   // from data_plane_array()
+            else if (!is_offset[idx]) {
+               time_offset = get_time_offset(dim_value[idx], time_cnt,
+                                             vinfo.req_name().c_str(), method_name);
+            }
+            else if ((0 > time_offset) || (time_offset >= time_cnt)) {
+               time_offset = convert_time_to_offset(time_offset);
+            }
+            if ((0 > time_offset) || (time_offset >= time_cnt)) {
+               mlog << Error << "\n" << method_name << "the requested time offset "
+                    << time_offset << " for \"" << vinfo.req_name() << "\" variable "
+                    << "is out of range (between 0 and " << (time_cnt-1) << ").\n\n";
+               return false;
+            }
+            dimension[time_dim_slot] = time_offset;
+         }
+         else if (idx == zdim_slot) {
+            long z_cnt = (long)get_dim_size(_file->get_vert_dim());
+            long z_offset = dim_offset;
+            if (z_offset == range_flag) z_offset = _cur_vert_index;   // from data_plane_array()
+            //else if (!is_offset[idx]) {
+            //  // convert the value to index for slicing
+            //  z_offset = convert_value_to_offset(dim_value[idx], z_dim_name);
+            //}
+            if ((z_offset >= 0) && (z_offset < z_cnt)) {
+              dimension[idx] = long(z_offset);
+            }
+         }
+      }
 
-  // Read the data
-  NcVarInfo *info = (NcVarInfo *) 0;
+      // Read the data
+      status = read_data_plane(data_var->name, vinfo, plane, dimension);
+   }
 
-  bool status = _file->getData(vinfo_nc->req_name().c_str(),
-                               dimension,
-                               plane, info);
-
-  if (org_time_offset != bad_data_int && 0 <= time_dim_slot)
-    dimension[time_dim_slot] = org_time_offset;
-  if (org_z_offset != bad_data_int && 0 <= zdim_slot)
-    dimension[zdim_slot] = org_z_offset;
-
-  // Check that the times match those requested
-
-  if (status)
-  {
-    // Check that the valid time matches the request
-
-    if (vinfo.valid() > 0 && vinfo.valid() != plane.valid())
-    {
-      // Compute time strings
-
-      ConcatString req_time_str  = unix_to_yyyymmdd_hhmmss(vinfo.valid());
-      ConcatString data_time_str = unix_to_yyyymmdd_hhmmss(plane.valid());
-
-      mlog << Warning << "\n" << method_name
-           << "for \"" << vinfo.req_name() << "\" variable, the valid "
-           << "time does not match the requested valid time: ("
-           << data_time_str << " != " << req_time_str << ")\n\n";
-      status = false;
-    }
-
-    // Check that the lead time matches the request
-
-    if (vinfo.lead() > 0 && vinfo.lead() != plane.lead())
-    {
-      // Compute time strings
-
-      ConcatString req_time_str  = sec_to_hhmmss(vinfo.lead());
-      ConcatString data_time_str = sec_to_hhmmss(plane.lead());
-
-      mlog << Warning << "\n" << method_name
-           << "for \"" << vinfo.req_name() << "\" variable, the lead "
-           << "time does not match the requested lead time: ("
-           << data_time_str << " != " << req_time_str << ")\n\n";
-      status = false;
-    }
-
-    status = process_data_plane(&vinfo, plane);
-
-    // Set the VarInfo object's name, long_name, level, and units strings
-
-    if (info->name_att.length() > 0)
-      vinfo.set_name(info->name_att);
-    else
-      vinfo.set_name(info->name);
-
-    if (info->long_name_att.length() > 0)
-      vinfo.set_long_name(info->long_name_att.c_str());
-
-    if (info->level_att.length() > 0)
-      vinfo.set_level_name(info->level_att.c_str());
-
-    if (info->units_att.length() > 0)
-      vinfo.set_units(info->units_att.c_str());
-  }
-
-  return status;
+   return status;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -347,17 +337,19 @@ int MetUGridDataFile::data_plane_array(VarInfo &vinfo,
    // Initialize
    plane_array.clear();
 
-   long lvl_lower = bad_data_int;
-   long lvl_upper = bad_data_int;
    LevelInfo level = vinfo.level();
+   long lvl_lower = level.lower();
+   long lvl_upper = level.upper();
    const int debug_level = 7;
+   ConcatString req_name = vinfo.req_name();
+   NcVarInfo *data_vinfo  = _file->find_by_name(req_name.c_str());
    if (level.type() == LevelType_Time) {
-
+      mlog << Error << "\n" << method_name
+           << "LevelType_Time for unstructured grid is not enabled\n\n";
+      exit(1);
+      /* Not enabled
       LongArray time_offsets = collect_time_offsets(vinfo);
       if (0 < time_offsets.n_elements()) {
-         lvl_lower = level.lower();
-         lvl_upper = level.upper();
-
          for (int idx=0; idx<time_offsets.n_elements(); idx++) {
             _cur_time_index = time_offsets[idx];
             if (data_plane(vinfo, plane)) {
@@ -374,39 +366,62 @@ int MetUGridDataFile::data_plane_array(VarInfo &vinfo,
             }
          }
       }
+      */
    }
    else if (level.type() == LevelType_Pres) {
-      LongArray vertical_offsets = collect_vertical_offsets(vinfo);
-      if (0 < vertical_offsets.n_elements()) {
-         lvl_lower = level.lower();
-         lvl_upper = level.upper();
-
-         for (int idx=0; idx<vertical_offsets.n_elements(); idx++) {
-            _cur_vert_index = vertical_offsets[idx];
-            if (data_plane(vinfo, plane)) {
+      if (nullptr == data_vinfo) {
+         vector<NcVarInfo *> vinfo_list;
+         if (_file->find_nc_vinfo_list(req_name.c_str(), vinfo_list)) {
+            for (int idx=0; idx<vinfo_list.size(); idx++) {
+               int vlevel = extract_vlevels(req_name, vinfo_list[idx]->name.c_str());
+               if (vlevel >= lvl_lower && vlevel <= lvl_upper) {
+                  vinfo.set_req_name(vinfo_list[idx]->name.c_str());
+                  if (data_plane(vinfo, plane, vinfo_list[idx])) {
+                     plane_array.add(plane, lvl_lower, lvl_upper);
+                     n_rec++;
+                  }
+                  mlog << Debug(5) << method_name
+                       << "Found range match for VarInfo \"" << req_name
+                       << " (" << vinfo_list[idx]->name << ")\"\n";
+               }
+            }
+         }
+         else {
+            mlog << Error << "\n" << method_name
+                 << "Can not find variables which begin with \"" << req_name
+                 << "\"\n\n";
+            exit(1);
+         }
+      }
+      else {
+          // NOT SUPPORTED???
+      }
+   }
+   else {   // if (level.type() == LevelType_None) {
+      if (lvl_lower != lvl_upper && nullptr != data_vinfo) {
+         int tmp_lower = lvl_lower;
+         int tmp_upper = lvl_upper;
+         int z_offset = bad_data_int;
+         if (data_vinfo->z_slot >= 0) {
+            int zdim_size = get_dim_size(data_vinfo->var, data_vinfo->z_slot);
+            if (tmp_lower >= zdim_size) tmp_lower = zdim_size - 1;
+            if (tmp_upper >= zdim_size) tmp_upper = zdim_size - 1;
+         }
+         for (int idx=tmp_lower; idx<=tmp_upper; idx++) {
+            _cur_vert_index = idx;
+            if (data_plane(vinfo, plane, data_vinfo)) {
                plane_array.add(plane, lvl_lower, lvl_upper);
                n_rec++;
             }
          }
-
-         //if (mlog.verbosity_level() >= debug_level) {
-         //   for (int idx=0; idx< vertical_offsets.n_elements(); idx++ ) {
-         //      mlog << Debug(debug_level) << method_name << "vertical: "
-         //           << _file->vlevels[vertical_offsets[idx]]
-         //           << " from index " << vertical_offsets[idx] << "\n";
-         //   }
-         //}
       }
-   }
-   else {   // if (level.type() == LevelType_None) {
-      if (data_plane(vinfo, plane)) {
+      else if (data_plane(vinfo, plane)) {
          plane_array.add(plane, lvl_lower, lvl_upper);
          n_rec++;
       }
    }
 
-
-   return(n_rec);
+   return n_rec;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -619,6 +634,7 @@ LongArray MetUGridDataFile::collect_time_offsets(VarInfo &vinfo) {
 
 ////////////////////////////////////////////////////////////////////////
 
+/*
 LongArray MetUGridDataFile::collect_vertical_offsets(VarInfo &vinfo) {
    int n_rec = 0;
    bool status = false;
@@ -757,23 +773,21 @@ LongArray MetUGridDataFile::collect_vertical_offsets(VarInfo &vinfo) {
       else error_code = error_code_unknown;
    }
 
-   /*
-   int z_count = vertical_offsets.n_elements();
-   if (0 < z_count)
-      mlog << Debug(7) << method_name << " Found " << z_count
-           << (z_count==1 ? " vertical" : " verticals") << " between "
-           << _file->vlevels[0] << " and "
-           << _file->vlevels[z_dim_size-1] << "\n";
-   else {
-      mlog << Warning << method_name << "Not found vertical out of "
-           << z_dim_size << ".\n";
-      if (include_all_verticals) error_code = error_code_empty_verticals;
-      else if (is_vert_range) {
-         error_code = z_as_value ? error_code_missing_vert_values
-                                 : error_code_missing_vert_offsets;
-      }
-   }
-   */
+//   int z_count = vertical_offsets.n_elements();
+//   if (0 < z_count)
+//      mlog << Debug(7) << method_name << " Found " << z_count
+//           << (z_count==1 ? " vertical" : " verticals") << " between "
+//           << _file->vlevels[0] << " and "
+//           << _file->vlevels[z_dim_size-1] << "\n";
+//   else {
+//      mlog << Warning << method_name << "Not found vertical out of "
+//           << z_dim_size << ".\n";
+//      if (include_all_verticals) error_code = error_code_empty_verticals;
+//      else if (is_vert_range) {
+//         error_code = z_as_value ? error_code_missing_vert_values
+//                                 : error_code_missing_vert_offsets;
+//      }
+//   }
 
    // Handling error code
    if (error_code > error_code_no_error) {
@@ -827,21 +841,7 @@ LongArray MetUGridDataFile::collect_vertical_offsets(VarInfo &vinfo) {
 
    return(vertical_offsets);
 }
-
-
-////////////////////////////////////////////////////////////////////////
-
-int MetUGridDataFile::index(VarInfo &vinfo){
-
-   if( nullptr == _file->find_by_name( vinfo.name().c_str() ) ) return -1;
-
-   if( ( vinfo.valid() != 0         && _file->ValidTime[0] != vinfo.valid() ) ||
-       ( vinfo.init()  != 0         && _file->InitTime     != vinfo.init()  ) ||
-       ( !is_bad_data(vinfo.lead()) && _file->lead_time()  != vinfo.lead()  ) )
-      return -1;
-
-   return 0;
-}
+*/
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -888,6 +888,7 @@ long MetUGridDataFile::convert_time_to_offset(long time_value) {
 
 ////////////////////////////////////////////////////////////////////////
 
+/*
 long MetUGridDataFile::convert_value_to_offset(double z_value, string z_dim_name) {
    bool found = false;
    long z_offset = bad_data_int;
@@ -912,6 +913,137 @@ long MetUGridDataFile::convert_value_to_offset(double z_value, string z_dim_name
    }
 
    return z_offset;
+}
+*/
+
+////////////////////////////////////////////////////////////////////////
+
+int MetUGridDataFile::extract_vlevels(ConcatString var_name_base, const char *var_name) {
+   int num_mat = 0;
+   char** mat = nullptr;
+   int vlevel = bad_data_int;
+   ConcatString name_pattern;
+
+   name_pattern.erase();
+   name_pattern << "(" << var_name_base << "[ _])([0-9]+)(.*)";
+   num_mat = regex_apply(name_pattern.c_str(), 4, var_name, mat);
+   if (2 < num_mat) vlevel = atoi(mat[2]);
+
+   return vlevel;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+
+long MetUGridDataFile::get_time_offset(long time_value, const long time_cnt,
+                                       const char *var_name, const string caller) {
+   const long time_threshold_cnt = 10000000;
+   long time_offset = convert_time_to_offset(time_value);
+   if ((0 > time_offset) || (time_offset >= time_cnt)) {
+      if (time_value > time_threshold_cnt)  // from time string (yyyymmdd_hh)
+         mlog << Warning << "\n" << caller << "the requested time "
+              << unix_to_yyyymmdd_hhmmss(time_value) << " for \""
+              << var_name << "\" variable does not exist ("
+              << unix_to_yyyymmdd_hhmmss(_file->ValidTime[0]) << " and "
+              << unix_to_yyyymmdd_hhmmss(_file->ValidTime[time_cnt-1]) << ").\n\n";
+      else
+         mlog << Warning << "\n" << caller << "the requested time value "
+              << time_value << " for \"" << var_name << "\" variable "
+              << "is out of range (between 0 and " << (time_cnt-1) << ").\n\n";
+      time_offset = -1;
+   }
+   return time_offset;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int MetUGridDataFile::index(VarInfo &vinfo){
+
+   if( nullptr == _file->find_by_name( vinfo.name().c_str() ) ) return -1;
+
+   if( ( vinfo.valid() != 0         && _file->ValidTime[0] != vinfo.valid() ) ||
+       ( vinfo.init()  != 0         && _file->InitTime     != vinfo.init()  ) ||
+       ( !is_bad_data(vinfo.lead()) && _file->lead_time()  != vinfo.lead()  ) )
+      return -1;
+
+   return 0;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool MetUGridDataFile::read_data_plane(ConcatString var_name, VarInfo &vinfo,
+                                       DataPlane &plane, LongArray &dimension) {
+  static const string method_name
+      = "MetUGridDataFile::read_data_plane() -> ";
+
+  // Read the data
+  NcVarInfo *info = (NcVarInfo *) nullptr;
+
+  bool status = _file->getData(var_name.c_str(),
+                               dimension,
+                               plane, info);
+
+  //if (org_time_offset != bad_data_int && 0 <= time_dim_slot)
+  //  dimension[time_dim_slot] = org_time_offset;
+  //if (org_z_offset != bad_data_int && 0 <= zdim_slot)
+  //  dimension[zdim_slot] = org_z_offset;
+
+  // Check that the times match those requested
+
+  if (status)
+  {
+    // Check that the valid time matches the request
+
+    if (vinfo.valid() > 0 && vinfo.valid() != plane.valid())
+    {
+      // Compute time strings
+
+      ConcatString req_time_str  = unix_to_yyyymmdd_hhmmss(vinfo.valid());
+      ConcatString data_time_str = unix_to_yyyymmdd_hhmmss(plane.valid());
+
+      mlog << Warning << "\n" << method_name
+           << "for \"" << vinfo.req_name() << "\" variable, the valid "
+           << "time does not match the requested valid time: ("
+           << data_time_str << " != " << req_time_str << ")\n\n";
+      status = false;
+    }
+
+    // Check that the lead time matches the request
+
+    if (vinfo.lead() > 0 && vinfo.lead() != plane.lead())
+    {
+      // Compute time strings
+
+      ConcatString req_time_str  = sec_to_hhmmss(vinfo.lead());
+      ConcatString data_time_str = sec_to_hhmmss(plane.lead());
+
+      mlog << Warning << "\n" << method_name
+           << "for \"" << vinfo.req_name() << "\" variable, the lead "
+           << "time does not match the requested lead time: ("
+           << data_time_str << " != " << req_time_str << ")\n\n";
+      status = false;
+    }
+
+    status = process_data_plane(&vinfo, plane);
+
+    // Set the VarInfo object's name, long_name, level, and units strings
+
+    if (info->name_att.length() > 0)
+      vinfo.set_name(info->name_att);
+    else
+      vinfo.set_name(info->name);
+
+    if (info->long_name_att.length() > 0)
+      vinfo.set_long_name(info->long_name_att.c_str());
+
+    if (info->level_att.length() > 0)
+      vinfo.set_level_name(info->level_att.c_str());
+
+    if (info->units_att.length() > 0)
+      vinfo.set_units(info->units_att.c_str());
+  }
+
+  return status;
 }
 
 ////////////////////////////////////////////////////////////////////////

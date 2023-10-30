@@ -34,9 +34,11 @@ class MetUGridDataFile : public Met2dDataFile {
       void ugrid_init_from_scratch();
       //NcVarInfo *find_first_data_var();
       long convert_time_to_offset(long time_value);
-      long convert_value_to_offset(double z_value, std::string z_dim_name);
+      //long convert_value_to_offset(double z_value, std::string z_dim_name);
       LongArray collect_time_offsets(VarInfo &vinfo);
-      LongArray collect_vertical_offsets(VarInfo &vinfo);
+      //LongArray collect_vertical_offsets(VarInfo &vinfo);
+      long get_time_offset(long time_value, const long time_cnt,
+                           const char *var_name, const std::string caller);
 
       MetUGridDataFile(const MetUGridDataFile &);
       MetUGridDataFile & operator=(const MetUGridDataFile &);
@@ -86,6 +88,7 @@ class MetUGridDataFile : public Met2dDataFile {
       //  retrieve the first matching data plane
 
       bool data_plane(VarInfo &, DataPlane &);
+      bool data_plane(VarInfo &, DataPlane &, NcVarInfo *);
 
       //  retrieve all matching data planes
 
@@ -93,8 +96,12 @@ class MetUGridDataFile : public Met2dDataFile {
 
       //  retrieve the index of the first matching record
 
+      int extract_vlevels(ConcatString var_name_base, const char *var_name);
+
       int index(VarInfo &);
 
+      bool read_data_plane(ConcatString var_name, VarInfo &vinfo,
+                           DataPlane &plane, LongArray &dimension);
 
       //
       //  do stuff
