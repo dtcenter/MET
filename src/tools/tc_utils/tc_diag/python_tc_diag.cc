@@ -28,8 +28,8 @@ extern GlobalPython GP;   //  this needs external linkage
 ////////////////////////////////////////////////////////////////////////
 
 static const char * user_ppath         = nullptr;
-static const char write_tmp_nc      [] = "MET_BASE/python/pyembed/write_tmp_tc_diag.py";
-static const char read_tmp_nc       [] = "pyembed.read_tmp_tc_diag";   //  NO ".py" suffix
+static const char write_tmp_nc      [] = "MET_BASE/python/pyembed/write_tmp_diag.py";
+static const char read_tmp_nc       [] = "pyembed.read_tmp_diag";   //  NO ".py" suffix
 static const char python_tc_diag_dir[] = "MET_BASE/python/tc_diag";
 
 static const char diag_data_dict_name     [] = "diag_data";
