@@ -218,8 +218,8 @@ void VarInfoUGrid::set_magic(const ConcatString &nstr, const ConcatString &lstr)
                   Level.set_lower(as_offset ? atoi(ptr2) : atof(ptr2));
                   Level.set_upper(as_offset ? atoi(ptr3) : atof(ptr3));
 
-                  // Assume pressure level type for a range of levels
-                  Level.set_type(LevelType_Pres);
+                  // Assume None type (offset instead of pressure level) for a range of levels
+                  Level.set_type(LevelType_None);   // like Ldd-dd
                   Level.set_is_offset(as_offset);
                }
             }
@@ -336,11 +336,18 @@ void VarInfoUGrid::set_magic(const ConcatString &nstr, const ConcatString &lstr)
 
 void VarInfoUGrid::set_dict(Dictionary &dict){
 
+   char lvl_type = ' ';
+   ConcatString cfg_name = dict.lookup_string("name");
+   ConcatString cfg_level = dict.lookup_string("level");
+
    VarInfo::set_dict(dict);
 
-   set_magic(dict.lookup_string("name"),
-             dict.lookup_string("level"));
-   set_req_name(dict.lookup_string("name").c_str());
+   if (cfg_level.length() > 0) lvl_type = cfg_level.char_at(0);
+   if (lvl_type == 'A' || lvl_type == 'Z' || lvl_type == 'P' ||
+       lvl_type == 'R' || lvl_type == 'L') set_level_info_grib(dict);
+   else set_magic(cfg_name, cfg_level);
+
+   set_req_name(cfg_name.c_str());
 
    return;
 }
