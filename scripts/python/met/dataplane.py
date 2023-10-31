@@ -180,32 +180,33 @@ class dataplane(logger):
       from_ndarray = False
       if met_data is None:
          logger.quit(f"{method_name} The met_data is None")
-
-      nx, ny = met_data.shape
-      met_fill_value = dataplane.MET_FILL_VALUE
-      if dataplane.is_xarray_dataarray(met_data):
-         from_xarray = True
-         attrs = met_data.attrs
-         met_data = met_data.data
-         modified_met_data = True
-      if isinstance(met_data, np.ndarray):
-         from_ndarray = True
-         met_data = np.ma.array(met_data)
-
-      if isinstance(met_data, np.ma.MaskedArray):
-         is_int_data = dataplane.is_integer(met_data[0,0]) or dataplane.is_integer(met_data[int(nx/2),int(ny/2)])
-         met_data = np.ma.masked_equal(met_data, float('nan'))
-         met_data = np.ma.masked_equal(met_data, float('inf'))
-         if fill_value is not None:
-            met_data = np.ma.masked_equal(met_data, fill_value)
-         met_data = met_data.filled(int(met_fill_value) if is_int_data else met_fill_value)
       else:
-         logger.log_msg(f"{method_name} unknown datatype {type(met_data)}")
+         nx, ny = met_data.shape
 
-      if dataplane.KEEP_XARRAY:
-         return xr.DataArray(met_data,attrs=attrs) if from_xarray else met_data
-      else:
-         return met_data
+         met_fill_value = dataplane.MET_FILL_VALUE
+         if dataplane.is_xarray_dataarray(met_data):
+            from_xarray = True
+            attrs = met_data.attrs
+            met_data = met_data.data
+            modified_met_data = True
+         if isinstance(met_data, np.ndarray):
+            from_ndarray = True
+            met_data = np.ma.array(met_data)
+
+         if isinstance(met_data, np.ma.MaskedArray):
+            is_int_data = dataplane.is_integer(met_data[0,0]) or dataplane.is_integer(met_data[int(nx/2),int(ny/2)])
+            met_data = np.ma.masked_equal(met_data, float('nan'))
+            met_data = np.ma.masked_equal(met_data, float('inf'))
+            if fill_value is not None:
+               met_data = np.ma.masked_equal(met_data, fill_value)
+            met_data = met_data.filled(int(met_fill_value) if is_int_data else met_fill_value)
+         else:
+            logger.log_msg(f"{method_name} unknown datatype {type(met_data)}")
+
+         if dataplane.KEEP_XARRAY:
+            return xr.DataArray(met_data,attrs=attrs) if from_xarray else met_data
+         else:
+            return met_data
 
 
 def main(argv):

@@ -80,8 +80,6 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <cstdio>
 #include <cstdlib>
 #include <ctype.h>
@@ -94,7 +92,6 @@ using namespace std;
 #include <unistd.h>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "main.h"
 #include "vx_log.h"
@@ -106,6 +103,9 @@ using namespace netCDF;
 #include "vx_util.h"
 #include "vx_cal.h"
 #include "vx_math.h"
+
+using namespace std;
+using namespace netCDF;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -133,7 +133,7 @@ static StringArray  req_out_var_name;
 static int          i_out_var = 0;
 static int          n_out_var;
 static MetConfig    config;
-static VarInfo *    var_info = (VarInfo *) 0;
+static VarInfo *    var_info = (VarInfo *) nullptr;
 static double       vld_thresh = 1.0;
 static int          compress_level = -1;
 
@@ -151,7 +151,7 @@ static StringArray  field_list;
 static StringArray  derive_list;
 
 // Output NetCDF file
-NcFile *nc_out = (NcFile *) 0;
+NcFile *nc_out = (NcFile *) nullptr;
 NcDim   lat_dim;
 NcDim   lon_dim;
 
@@ -217,7 +217,7 @@ int met_main(int argc, char *argv[]) {
       // Reinitialize for the current loop.
       //
       field_string = req_field_list[i];
-      if(var_info) { delete var_info; var_info = (VarInfo *) 0; }
+      if(var_info) { delete var_info; var_info = (VarInfo *) nullptr; }
 
       //
       // Reset when reading multiple fields from the same input files.
@@ -241,7 +241,7 @@ int met_main(int argc, char *argv[]) {
    //
    close_nc();
 
-   return(0);
+   return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -561,9 +561,9 @@ void sum_data_files(Grid & grid, DataPlane & plane) {
    DataPlane part;
    double v_sum, v_part;
    Grid cur_grid;
-   unixtime     * pcp_times = (unixtime *) 0;
-   int          * pcp_recs  = (int *) 0;
-   ConcatString * pcp_files = (ConcatString *) 0;
+   unixtime     * pcp_times = (unixtime *) nullptr;
+   int          * pcp_recs  = (int *) nullptr;
+   ConcatString * pcp_files = (ConcatString *) nullptr;
 
    //
    // Compute the number of forecast precipitation files to be found,
@@ -596,6 +596,7 @@ void sum_data_files(Grid & grid, DataPlane & plane) {
       //
       // Search in each directory for the current file time.
       //
+      if (0 == pcp_dir.n_elements()) pcp_recs[i] = -1;
       for(j=0; j<pcp_dir.n_elements(); j++) {
 
          pcp_recs[i] = search_pcp_dir(pcp_dir[j].c_str(), pcp_times[i],
@@ -695,9 +696,9 @@ void sum_data_files(Grid & grid, DataPlane & plane) {
    //
    // Deallocate any memory that was allocated above.
    //
-   if(pcp_files) { delete [] pcp_files; pcp_files = (ConcatString *) 0; }
-   if(pcp_times) { delete [] pcp_times; pcp_times = (unixtime *) 0; }
-   if(pcp_recs ) { delete [] pcp_recs;  pcp_recs  = (int *) 0; }
+   if(pcp_files) { delete [] pcp_files; pcp_files = (ConcatString *) nullptr; }
+   if(pcp_times) { delete [] pcp_times; pcp_times = (unixtime *) nullptr; }
+   if(pcp_recs ) { delete [] pcp_recs;  pcp_recs  = (int *) nullptr; }
 
    return;
 }
@@ -707,8 +708,8 @@ void sum_data_files(Grid & grid, DataPlane & plane) {
 int search_pcp_dir(const char *cur_dir, const unixtime cur_ut,
                    ConcatString & cur_file) {
    int i_rec;
-   struct dirent *dirp = (struct dirent *) 0;
-   DIR *dp = (DIR *) 0;
+   struct dirent *dirp = (struct dirent *) nullptr;
+   DIR *dp = (DIR *) nullptr;
 
    //
    // Find the files matching the specified regular expression with
@@ -748,9 +749,9 @@ int search_pcp_dir(const char *cur_dir, const unixtime cur_ut,
          cur_file << cs_erase << cur_dir << '/' << dirp->d_name;
 
          Met2dDataFileFactory factory;
-         Met2dDataFile * mtddf = (Met2dDataFile *) 0;
+         Met2dDataFile * mtddf = (Met2dDataFile *) nullptr;
          VarInfoFactory var_fac;
-         VarInfo * cur_var = (VarInfo *) 0;
+         VarInfo * cur_var = (VarInfo *) nullptr;
 
          //
          // Create a data file object.
@@ -767,7 +768,7 @@ int search_pcp_dir(const char *cur_dir, const unixtime cur_ut,
          //
          cur_var = var_fac.new_var_info(mtddf->file_type());
          if(!cur_var) {
-            delete mtddf;  mtddf = 0;
+            delete mtddf;  mtddf = nullptr;
             mlog << Warning << "search_pcp_dir() -> "
                  << "unable to determine filetype of \"" << cur_file
                  << "\"\n";
@@ -796,8 +797,8 @@ int search_pcp_dir(const char *cur_dir, const unixtime cur_ut,
          //
          // Cleanup.
          //
-         if(mtddf)   { delete mtddf;   mtddf   = (Met2dDataFile *) 0; }
-         if(cur_var) { delete cur_var; cur_var = (VarInfo *)       0; }
+         if(mtddf)   { delete mtddf;   mtddf   = (Met2dDataFile *) nullptr; }
+         if(cur_var) { delete cur_var; cur_var = (VarInfo *)       nullptr; }
 
          //  check for a valid match
          if( -1 != i_rec ) { met_closedir(dp);  break; }
@@ -1168,7 +1169,7 @@ void get_field(const char *filename, const char *cur_field,
                const unixtime get_init_ut, const unixtime get_valid_ut,
                Grid & grid, DataPlane & plane) {
    Met2dDataFileFactory factory;
-   Met2dDataFile *mtddf = (Met2dDataFile *) 0;
+   Met2dDataFile *mtddf = (Met2dDataFile *) nullptr;
    GrdFileType ftype;
    VarInfoFactory var_fac;
    VarInfo *cur_var;
@@ -1244,10 +1245,10 @@ void get_field(const char *filename, const char *cur_field,
    //
    // Cleanup.
    //
-   if(mtddf)   { delete mtddf;   mtddf   = (Met2dDataFile *) 0; }
-   if(cur_var) { delete cur_var; cur_var = (VarInfo *)       0; }
+   if(mtddf)   { delete mtddf;   mtddf   = (Met2dDataFile *) nullptr; }
+   if(cur_var) { delete cur_var; cur_var = (VarInfo *)       nullptr; }
 
-   // if ( var )  { delete var;  var = 0; }
+   // if ( var )  { delete var;  var = nullptr; }
 
    return;
 
@@ -1270,7 +1271,7 @@ void open_nc(const Grid &grid) {
            << "trouble opening output file " << out_filename
            << "\n\n";
       delete nc_out;
-      nc_out = (NcFile *) 0;
+      nc_out = (NcFile *) nullptr;
       exit(1);
    }
 
@@ -1452,8 +1453,8 @@ void close_nc() {
    //
    // Clean up.
    //
-   if(nc_out)    { delete nc_out;   nc_out   = (NcFile *)  0; }
-   if(var_info ) { delete var_info; var_info = (VarInfo *) 0; }
+   if(nc_out)    { delete nc_out;   nc_out   = (NcFile *)  nullptr; }
+   if(var_info ) { delete var_info; var_info = (VarInfo *) nullptr; }
 
    return;
 }

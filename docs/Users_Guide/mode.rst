@@ -197,6 +197,8 @@ mode configuration file
 
 The default configuration file for the MODE tool, **MODEConfig_default**, can be found in the installed *share/met/config* directory. Another version of the configuration file is provided in *scripts/config*. We encourage users to make a copy of the configuration files prior to modifying their contents. Descriptions of **MODEConfig_default** and the required variables for any MODE configuration file are also provided below. While the configuration file contains many entries, most users will only need to change a few for their use. Specific options are described in the following subsections.
 
+A second default configuration file for the multivar MODE option, **MODEMultivarConfig_default**, is also found in the installed *share/met/config* directory. We encourage users to make a copy of this default configuration file when setting up a multivar configuration prior to modifying content. The two default config files **MODEConfig_default** and **MODEMultivarConfig_default** are similar, with **MODEMultivarConfig_default** having example multivar specific content. 
+
 Note that environment variables may be used when editing configuration files, as described in the :numref:`config_env_vars`.
 
 _____________________
@@ -324,7 +326,7 @@ The **merge_flag** entry controls what type of merging techniques will be applie
 
 • **BOTH** indicates that both techniques should be used. 
 
-By default, the double thresholding merging technique is applied.
+By default, the double thresholding **THRESH** merging technique is applied in single variable mode.  The merging defaults to **NONE** with multivariate mode.
 
 _____________________
 
