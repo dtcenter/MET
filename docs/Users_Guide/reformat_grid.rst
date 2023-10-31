@@ -6,7 +6,7 @@ Re-Formatting of Gridded Fields
 
 Several MET tools exist for the purpose of reformatting gridded fields, and they are described in this section. These tools are represented by the reformatting column of MET flowchart depicted in :numref:`overview-figure`.
 
-Pcp-Combine tool
+Pcp-Combine Tool
 ================
 
 This section describes the Pcp-Combine tool which summarizes data across multiple input gridded data files and writes the results to a single NetCDF output file. It is often used to modify precipitation accumulation intervals in the forecast and/or observation datasets to make them comparable. However it can also be used to derive summary fields, such as daily min/max temperature or average precipitation rate.
@@ -23,7 +23,7 @@ The Pcp-Combine tool supports four types of commands ("sum", "add", "subtract", 
 
 By default, the Pcp-Combine tool processes data for **APCP**, the GRIB string for accumulated precipitation. When requesting data using time strings (i.e. [HH]MMSS), Pcp-Combine searches for accumulated precipitation for that accumulation interval. Alternatively, use the "-field" option to process fields other than **APCP** or for non-GRIB files. The "-field" option may be used multiple times to process multiple fields in a single run. Since the Pcp-Combine tool does not support automated regridding, all input data must be on the same grid. In general the input files should have the same initialization time unless the user has indicated that it should ignore the initialization time for the "sum" command. The "subtract" command produces a warning when the input initialization times differ or the subtraction results in a negative accumulation interval.
 
-pcp_combine usage
+pcp_combine Usage
 -----------------
 
 The usage statement for the Pcp-Combine tool is shown below:
@@ -65,14 +65,14 @@ The add, subtract, and derive commands all require that the input files be expli
          file_1 ... file_n |
          input_file_list
 
-Required arguments for the pcp_combine
+Required Arguments for the pcp_combine
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. The Pcp-Combine tool must be run with exactly one run command (-sum, -add, -subtract, or -derive) with the corresponding additional arguments.
 
 2. The **out_file** argument indicates the name for the NetCDF file to be written.
 
-Optional arguments for pcp_combine
+Optional Arguments for pcp_combine
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 3. The **-field string** option defines the data to be extracted from the input files. Use this option when processing fields other than **APCP** or non-GRIB files. It can be used multiple times and output will be created for each. In general, the field string should include the **name** and **level** of the requested data and be enclosed in single quotes. It is processed as an inline configuration file and may also include data filtering, censoring, and conversion options. For example, use **-field ‘name=”ACPCP”; level=”A6”; convert(x)=x/25.4;’** to read 6-hourly accumulated convective precipitation from a GRIB file and convert from millimeters to inches. 
@@ -87,7 +87,7 @@ Optional arguments for pcp_combine
 
 8. The **-compress level** option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of "level" will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
 
-Required arguments for the pcp_combine sum command
+Required Arguments for the pcp_combine Sum Command
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. The **init_time** argument, provided in YYYYMMDD[_HH[MMSS]] format, indicates the initialization time for model data to be summed. Only files found with this initialization time will be processed. If combining observation files, Stage II or Stage IV data for example, the initialization time is not applicable. Providing a string of all zeros (00000000_000000) indicates that all files, regardless of initialization time should be processed.
@@ -98,19 +98,19 @@ Required arguments for the pcp_combine sum command
 
 4. The **out_accum** argument, in HH[MMSS] format, indicates the desired total accumulation period to be summed.
 
-Optional arguments for pcp_combine sum command
+Optional Arguments for pcp_combine Sum Command
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 5. The **-pcpdir path** option indicates the directories in which the input files reside. The contents of "**path**" will override the default setting. This option may be used multiple times and can accept multiple arguments, supporting the use of wildcards.
 
 6. The **-pcprx reg_exp** option indicates the regular expression to be used in matching files in the search directories specified. The contents of "reg_exp" will override the default setting that matches all file names. If the search directories contain a large number of files, the user may specify that only a subset of those files be processed using a regular expression which will speed up the run time.
 
-Required arguments for the pcp_combine derive command
+Required Arguments for the pcp_combine Derive Command
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. The "derive" run command must be followed by **stat_list** which is a comma-separated list of summary fields to be computed. The **stat_list** may be set to sum, min, max, range, mean, stdev, and vld_count for the sum, minimum, maximum, range (max-min), average, standard deviation, and valid data count fields, respectively.
 
-Input files for pcp_combine add, subtract, and derive commands
+Input Files for pcp_combine Add, Subtract, and Derive Commands
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The input files for the add, subtract, and derive command can be specified in one of 3 ways:
@@ -169,7 +169,7 @@ This command would grab the first level of the TT variable from a pinterp NetCDF
 
 The Pcp-Combine tool will subtract the 36 hour precipitation accumulations in the file 2022043018_36.grib2 (a 36hr forecast initialized at 2022-04-30 18Z) from the 48 hour accumulations in the file 2022043018_48.grib2 (a 48hr forecast from the same model cycle). This will produce the 12 hour accumulation amounts for the period in between the 36 and 48 hour forecasts. It will write out a single NetCDF file containing that 12 hours of accumulation.
 
-pcp_combine output
+pcp_combine Output
 ------------------
 
 The output NetCDF files contain the requested accumulation intervals as well as information about the grid on which the data lie. That grid projection information will be parsed out and used by the MET statistics tools in subsequent steps. One may use NetCDF utilities such as ncdump or ncview to view the contents of the output file. Alternatively, the MET Plot-Data-Plane tool described in :numref:`plot_data_plane-usage` may be run to create a PostScript image of the data.
@@ -212,12 +212,12 @@ Each NetCDF file generated by the Pcp-Combine tool contains the dimensions and v
 
 .. _regrid-data-plane:      
 
-Regrid-Data-Plane tool
+Regrid-Data-Plane Tool
 ======================
 
 This section contains a description of running the Regrid-Data-Plane tool. This tool may be run to read data from any gridded file MET supports, interpolate to a user-specified grid, and writes the field(s) out in NetCDF format. The user may specify the method of interpolation used for regridding as well as which fields to regrid. This tool is particularly useful when dealing with GRIB2 and NetCDF input files that need to be regridded. For GRIB1 files, it has also been tested for compatibility with the copygb regridding utility mentioned in :numref:`Installation-of-optional`.
 
-regrid_data_plane usage
+regrid_data_plane Usage
 -----------------------
 
 The usage statement for the regrid_data_plane utility is shown below:
@@ -240,7 +240,7 @@ The usage statement for the regrid_data_plane utility is shown below:
          [-v level]
          [-compress level]
 
-Required arguments for regrid_data_plane
+Required Arguments for regrid_data_plane
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. The **input_filename** is the gridded data file to be read.
@@ -251,7 +251,7 @@ Required arguments for regrid_data_plane
 
 4. The **-field string** may be used multiple times to define the field(s) to be regridded.
 
-Optional arguments for regrid_data_plane
+Optional Arguments for regrid_data_plane
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 5. The **-method type** option overrides the default regridding method. Default is NEAREST.
@@ -291,17 +291,17 @@ For more details on setting the **to_grid, -method, -width,** and **-vld_thresh*
 
 In this example, the Regrid-Data-Plane tool will regrid data from the **input.grb** file to the grid on which the first record of the **togrid.grb** file resides using Bilinear Interpolation with a width of 2 and write the output in NetCDF format to a file named **regridded.nc**. The variables in **regridded.nc** will include 6-hour accumulated precipitation, 2m temperature, 10m U and V components of the wind, and the 500mb geopotential height.
 
-Automated regridding within tools
+Automated Regridding within Tools
 ---------------------------------
 
 While the Regrid-Data-Plane tool is useful as a stand-alone tool, the capability is also included to automatically **regrid** one or both fields in most of the MET tools that handle gridded data. See the regrid entry in :numref:`Configuration File Details` for a description of the configuration file entries that control automated regridding.
 
-Shift-Data-Plane tool
+Shift-Data-Plane Tool
 =====================
 
 The Shift-Data-Plane tool performs a rigid shift of the entire grid based on user-defined specifications and writes the field(s) out in NetCDF format. This tool was originally designed to account for track error when comparing fields associated with tropical cyclones. The user specifies the latitude and longitude of the source and destination points to define the shift. Both points must fall within the domain and are used to define the X and Y direction grid unit shift. The shift is then applied to all grid points. The user may specify the method of interpolation and the field to be shifted. The effects of topography and land/water masks are ignored. 
 
-shift_data_plane usage
+shift_data_plane Usage
 ----------------------
 
 The usage statement for the shift_data_plane utility is shown below:
@@ -323,7 +323,7 @@ The usage statement for the shift_data_plane utility is shown below:
 
 shift_data_plane has five required arguments and can also take optional ones. 
 
-Required arguments for shift_data_plane
+Required Arguments for shift_data_plane
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. The **input_filename** is the gridded data file to be read.
@@ -336,7 +336,7 @@ Required arguments for shift_data_plane
 
 5. The **-to lat lon** specifies the ending location within the domain to define the shift. Lat is deg N, Lon is deg E.
 
-Optional arguments for shift_data_plane
+Optional Arguments for shift_data_plane
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 6. The **-method type** overrides the default regridding method. Default is NEAREST.
@@ -365,12 +365,12 @@ For more details on setting the **-method** and **-width** options, see the **re
 
 In this example, the Shift-Data-Plane tool reads 12-hour accumulated precipitation from the **nam.grb** file, applies a rigid shift defined by (38.6272, -90.1978) to (40.1717, -105.1092) and writes the output in NetCDF format to a file named **nam_shift_APCP_12.nc**. These **-from** and **-to** locations result in a grid shift of -108.30 units in the x-direction and 16.67 units in the y-direction.
 
-MODIS regrid tool
+MODIS regrid Tool
 =================
 
 This section contains a description of running the MODIS regrid tool. This tool may be run to create a NetCDF file for use in other MET tools from `MODIS level 2 cloud product from NASA. <https://ladsweb.modaps.eosdis.nasa.gov>`_
 
-modis_regrid usage
+modis_regrid Usage
 ------------------
 
 The usage statement for the modis_regrid utility is shown below:
@@ -390,7 +390,7 @@ The usage statement for the modis_regrid utility is shown below:
 
 modis_regrid has some required arguments and can also take optional ones. 
 
-Required arguments for modis_regrid
+Required Arguments for modis_regrid
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. The **-data_file path** argument specifies the data files used to get the grid information.
@@ -407,7 +407,7 @@ Required arguments for modis_regrid
 
 7. The **modis_file** argument is the name of the MODIS input file.
 
-Optional arguments for modis_regrid
+Optional Arguments for modis_regrid
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 8. The **-units text** option specifies the units string in the global attributes section of the output file.
@@ -442,7 +442,7 @@ There are two WWMCA tools available. The WWMCA-Plot tool makes a PostScript plot
 
 The WWMCA tools attempt to parse timing and hemisphere information from the file names. They tokenize the filename using underscores (_) and dots (.) and examine each element which need be in no particular order. A string of 10 or more numbers is interpreted as the valid time in YYYYMMDDHH[MMSS] format. The string NH indicates the northern hemisphere while SH indicates the southern hemisphere. While WWMCA data is an analysis and has no forecast lead time, other datasets following this format may. Therefore, a string of 1 to 4 numbers is interpreted as the forecast lead time in hours. While parsing the filename provides default values for this timing information, they can be overridden by explicitly setting their values in the WWMCA-Regrid configuration file.
 
-wwmca_plot usage
+wwmca_plot Usage
 ----------------
 
 The usage statement for the WWMCA-Plot tool is shown below:
@@ -458,12 +458,12 @@ The usage statement for the WWMCA-Plot tool is shown below:
 
 wmmca_plot has some required arguments and can also take optional ones. 
 
-Required arguments for wwmca_plot
+Required Arguments for wwmca_plot
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. The **wwmca_cloud_pct_file_list** argument represents one or more WWMCA cloud percent files given on the command line. As with any command given to a UNIX shell, the user can use meta-characters as a shorthand way to specify many filenames. For each input file specified, one output PostScript plot will be created.
 
-Optional arguments for wwmca_plot
+Optional Arguments for wwmca_plot
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 2. The **-outdir path** option specifies the directory where the output PostScript plots will be placed. If not specified, then the plots will be put in the current (working) directory.
@@ -478,7 +478,7 @@ Optional arguments for wwmca_plot
 	    
    Example output of WWMCA-Plot tool.
 
-wwmca_regrid usage
+wwmca_regrid Usage
 ------------------
 
 The usage statement for the WWMCA-Regrid tool is shown below:
@@ -496,7 +496,7 @@ The usage statement for the WWMCA-Regrid tool is shown below:
 
 wmmca_regrid has some required arguments and can also take optional ones.
 
-Required arguments for wwmca_regrid
+Required Arguments for wwmca_regrid
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. The **-out filename** argument specifies the name of the output netCDF file.
@@ -507,7 +507,7 @@ Required arguments for wwmca_regrid
 
 4. The **-sh filename [pt_filename]** argument specifies the southern hemisphere WWMCA binary file and, optionally, may be followed by a binary pixel age file. This switch is required if the output grid includes any portion of the southern hemisphere.
 
-Optional arguments for wwmca_regrid
+Optional Arguments for wwmca_regrid
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 5. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file. 
@@ -518,7 +518,7 @@ Optional arguments for wwmca_regrid
 
 In any regridding problem, there are two grids involved: the "From" grid, which is the grid the input data are on, and the "To" grid, which is the grid the data are to be moved onto. In **WWMCA-Regrid** the "From" grid is pre-defined by the hemisphere of the WWMCA binary files being processed. The "To" grid and corresponding regridding logic are specified using the **regrid** section of the configuration file. If the "To" grid is entirely confined to one hemisphere, then only the WWMCA data file for that hemisphere needs to be given. If the "To" grid or the interpolation box used straddles the equator, the data files for both hemispheres need to be given. Once the "To" grid is specified in the config file, the WWMCA-Regrid tool will know which input data files it needs and will complain if it is not given the right ones.
 
-wwmca_regrid configuration file
+wwmca_regrid Configuration File
 -------------------------------
 
 The default configuration file for the WWMCA-Regrid tool named **WWMCARegridConfig_default** can be found in the installed *share/met/config* directory. We encourage users to make a copy of this file prior to modifying its contents. The contents of the configuration file are described in the subsections below.

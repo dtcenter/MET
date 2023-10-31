@@ -11,7 +11,7 @@ The TC-Stat tool ties together results from the TC-Pairs tool by providing summa
 
 .. _Statistical-aspects:
 
-Statistical aspects
+Statistical Aspects
 ===================
 
 Filter TCST lines
@@ -21,7 +21,7 @@ The TC-Stat tool can be used to simply filter specific lines of the TCST file ba
 
 Filtering options are outlined below in :numref:`tc_stat-configuration-file` (configuration file). If multiple filtering options are listed, the job will be performed on their intersection.
 
-Summary statistics for columns
+Summary Statistics for Columns
 ------------------------------
 
 The TC-Stat tool can be used to produce summary information for a single column of data. After the user specifies the specific column of interest, and any other relevant search criteria, summary information is produced from values in that column of data. The summary statistics produced are listed in :numref:`table_columnar_output_summary_tc_stat`.
@@ -70,12 +70,12 @@ Users may specify several job command options to configure the behavior of this 
 
 .. _Practical-information-1:
 
-Practical information
+Practical Information
 =====================
 
 The following sections describe the usage statement, required arguments, and optional arguments for tc_stat.
 
-tc_stat usage
+tc_stat Usage
 -------------
 
 The usage statement for tc_stat is shown below:
@@ -93,14 +93,14 @@ TC-Stat has one required argument and accepts optional ones.
 
 The usage statement for the TC-Stat tool includes the "job" term, which refers to the set of tasks to be performed after applying user-specified filtering options. The filtering options are used to pare down the TC-Pairs output to only those lines that are desired for the analysis. The job and its filters together comprise a "job command line". The "job command line" may be specified either on the command line to run a single analysis job or within the configuration file to run multiple analysis jobs at the same time. If jobs are specified in both the configuration file and the command line, only the jobs indicated in the configuration file will be run. The various jobs are described in :numref:`table_columnar_output_summary_tc_stat` and the filtering options are described in :numref:`tc_stat-configuration-file`.
 
-Required arguments for tc_stat
+Required Arguments for tc_stat
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. The **-lookin source** argument indicates the location of the input TCST files generated from tc_pairs. This argument can be used one or more times to specify the name of a TCST file or top-level directory containing TCST files to be processed. Multiple tcst files may be specified by using a wild card (\*).
 
 2. Either a configuration file must be specified with the **-config** option, or a **JOB COMMAND LINE** must be denoted. The **JOB COMMAND LINE** options are described in :numref:`tc_stat-configuration-file`.
 
-Optional arguments for tc_stat
+Optional Arguments for tc_stat
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 3. The **-out file** argument indicates the desired name of the TCST format output file.
@@ -121,7 +121,7 @@ In this example, the TC-Stat tool uses any TCST file (output from tc_pairs) in t
 
 .. _tc_stat-configuration-file:
 
-tc_stat configuration file
+tc_stat Configuration File
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The default configuration file for the **TC-Stat** tool named **TCStatConfig_default** can be found in the installed *share/met/config* directory. Like the other configuration files described in this document, it is recommended that users make a copy of these files prior to modifying their contents.
@@ -391,7 +391,7 @@ _________________________
 
 .. _tc_stat-output:
 
-tc_stat output
+tc_stat Output
 --------------
 
 The output generated from the TC-Stat tool contains statistics produced by the analysis. Additionally, it includes information about the analysis job that produced the output for each line. The output can be redirected to an output file using the **-out** option. The format of output from each tc_stat job command is listed below.
