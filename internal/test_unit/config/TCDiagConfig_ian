@@ -73,14 +73,6 @@ domain_info = [
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// Data censoring and conversion
-// May be set separately in each data "field" array entry
-//
-censor_thresh = [];
-censor_val    = [];
-convert(x)    = x;
-
-//
 // Cylindrical coordinate transformation regridding options
 // May be set separately in each data "field" array entry
 //
@@ -93,6 +85,8 @@ regrid = {
 
 //
 // Data fields
+// censor_thresh, censor_val, and convert(x) may be set separately
+// in each data "field" array entry
 //
 data = {
 

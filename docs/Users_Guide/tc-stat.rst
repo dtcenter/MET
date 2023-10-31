@@ -374,7 +374,7 @@ _________________________
 
   jobs = [];
 
-The user may specify one or more analysis jobs to be performed on the TCST lines that remain after applying the filtering parameters listed above. Each entry in the joblist contains the task and additional filtering options for a single analysis to be performed. There are three types of jobs available including *filter, summary, and rirw.* Please refer to :numref:`config_options` for details on how to call each job. The format for an analysis job is as follows:
+The user may specify one or more analysis jobs to be performed on the TCST lines that remain after applying the filtering parameters listed above. Each entry in the joblist contains the task and additional filtering options for a single analysis to be performed. The available job types include *filter*, *summary*, *rirw*, and *probrirw*. Please refer to :numref:`config_options` for details on how to call each job. The format for an analysis job is as follows:
 
 _________________________
 

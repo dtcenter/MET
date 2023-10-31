@@ -149,7 +149,7 @@ Configuring data censoring and conversion options
   censor_val    = [];
   convert(x)    = x;
 
-These data censoring and conversion options are common to multiple MET tools and are described in :numref:`config_options`. They can be specified separately in each **data.field** array entry, described below. If provided, those operations are performed after reading the gridded data but prior to converting to the cylindrical coordinate range-azimuth grid.
+These data censoring and conversion options are common to multiple MET tools and are described in :numref:`config_options`. They do not actually appear in the default configuration file but can be specified separately in each **data.field** array entry, described below. If provided, those operations are performed after reading the gridded data but prior to converting to the cylindrical coordinate range-azimuth grid.
 
 Configuring regridding options
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
