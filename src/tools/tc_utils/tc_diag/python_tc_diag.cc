@@ -27,11 +27,11 @@ extern GlobalPython GP;   //  this needs external linkage
 
 ////////////////////////////////////////////////////////////////////////
 
-static const char * user_ppath         = nullptr;
-static const char write_tmp_nc      [] = "MET_BASE/python/pyembed/write_tmp_diag.py";
-static const char read_tmp_nc       [] = "pyembed.read_tmp_diag";   //  NO ".py" suffix
-static const char python_tc_diag_dir[] = "MET_BASE/python/tc_diag";
-
+static const char * user_ppath               = nullptr;
+static const char write_tmp_diag          [] = "MET_BASE/python/pyembed/write_tmp_diag.py";
+static const char read_tmp_diag           [] = "pyembed.read_tmp_diag";   //  NO ".py" suffix
+static const char python_tc_diag_dir      [] = "MET_BASE/python/tc_diag";
+static const char tmp_diag_base_name      [] = "tmp_diag_data";
 static const char diag_data_dict_name     [] = "diag_data";
 static const char storm_data_dict_name    [] = "storm_data";
 static const char sounding_data_dict_name [] = "sounding_data";
@@ -46,11 +46,11 @@ static bool straight_python_tc_diag(
                const ConcatString &script_name,
                TmpFileInfo &tmp_info);
 
-static bool tmp_nc_tc_diag(
+static bool user_python_tc_diag(
                const ConcatString &script_name,
                TmpFileInfo &tmp_info);
 
-static bool parse_python_module(
+static bool parse_python_diag_data(
                PyObject *diag_dict,
                TmpFileInfo &tmp_info);
 
@@ -78,7 +78,7 @@ bool python_tc_diag(const ConcatString &script_name,
 
    // Check for MET_PYTHON_EXE
    if ((user_ppath = getenv(user_python_path_env)) != nullptr ) {
-      status = tmp_nc_tc_diag(script_name, tmp_info);
+      status = user_python_tc_diag(script_name, tmp_info);
    }
    // Use compiled python instance
    else {
@@ -173,20 +173,54 @@ bool straight_python_tc_diag(const ConcatString &diag_script,
    }
 
    // Parse the diagnostics from python
-   return(parse_python_module(module_obj, tmp_info));
+   return(parse_python_diag_data(module_obj, tmp_info));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool tmp_nc_tc_diag(const ConcatString &diag_script,
+bool user_python_tc_diag(const ConcatString &diag_script,
         TmpFileInfo &tmp_info) {
-   const char *method_name = "tmp_nc_tc_diag() -> ";
+   const char *method_name = "user_python_tc_diag() -> ";
    int i, status;
    ConcatString command;
    ConcatString path;
-   ConcatString tmp_nc_path;
+   ConcatString tmp_file_name;
    const char * tmp_dir = nullptr;
    Wchar_Argv wa;
+
+   mlog << Debug(3) << "Running user-specified python instance (MET_PYTHON_EXE="
+        << user_ppath << ") to run Python diagnostics script ("
+        << diag_script << " " << tmp_info.tmp_file << ").\n";
+
+   // Create a temp file
+   tmp_dir = getenv ("MET_TMP_DIR");
+   if(!tmp_dir) tmp_dir = default_tmp_dir;
+
+   path << cs_erase
+        << tmp_dir << '/'
+        << tmp_diag_base_name;
+
+   tmp_file_name = make_temp_file_name(path.text(), 0);
+
+   // Construct the system command
+   command << cs_erase
+           << user_ppath                   << ' ' // user's path to python
+           << replace_path(write_tmp_diag) << ' ' // write_tmp_diag.py
+           << tmp_file_name                << ' ' // tmp output filename
+           << diag_script                  << ' ' // python diagnostics script
+           << tmp_info.tmp_file;                  // cylindrical coordinates tmp nc filename
+
+   mlog << Debug(4) << "Writing temporary Python diagnostics file:\n\t"
+        << command << "\n";
+
+   status = system(command.text());
+
+   if(status) {
+      mlog << Error << "\n" << method_name
+           << "command \"" << command.text() << "\" failed ... status = "
+           << status << "\n\n";
+      exit(1);
+   }
 
    // If the global python object has already been initialized,
    // we need to reload the module
@@ -208,56 +242,22 @@ bool tmp_nc_tc_diag(const ConcatString &diag_script,
            << replace_path(python_dir)
            << "\")";
    run_python_string(command.text());
-   mlog << Debug(1) << method_name << "added python path ("
-        << python_dir << ") to python interpreter\n";
-
-   mlog << Debug(3) << "Running user-specified python instance (MET_PYTHON_EXE="
-        << user_ppath << ") to run Python diagnostics script ("
-        << diag_script << " " << tmp_info.tmp_file << ").\n";
-
-   // Create a temp file
-   tmp_dir = getenv ("MET_TMP_DIR");
-   if(!tmp_dir) tmp_dir = default_tmp_dir;
-
-   path << cs_erase
-        << tmp_dir << '/'
-        << tmp_nc_base_name;
-
-   tmp_nc_path = make_temp_file_name(path.text(), 0);
-
-   // Construct the system command
-   command << cs_erase
-           << user_ppath                 << ' ' // user's path to python
-           << replace_path(write_tmp_nc) << ' ' // write_tmp_tc_diag.py
-           << tmp_nc_path                << ' ' // tmp_nc output filename
-           << diag_script                << ' ' // python diagnostics script
-           << tmp_info.tmp_file;                // cylindrical coordinates tmp nc filename
-
-   mlog << Debug(4) << "Writing temporary Python diagnostics file:\n\t"
-        << command << "\n";
-
-   status = system(command.text());
-
-   if(status) {
-      mlog << Error << "\n" << method_name
-           << "command \"" << command.text() << "\" failed ... status = "
-           << status << "\n\n";
-      exit(1);
-   }
+   mlog << Debug(3) << method_name << "added python path ("
+        << replace_path(python_dir) << ") to python interpreter\n";
 
    // Set the arguments
    StringArray a;
-   a.add(read_tmp_nc);
-   a.add(tmp_nc_path);
+   a.add(read_tmp_diag);
+   a.add(tmp_file_name);
    wa.set(a);
 
    PySys_SetArgv(wa.wargc(), wa.wargv());
 
-   mlog << Debug(4) << "Reading temporary Python TC-Diag data file: "
-        << tmp_nc_path << "\n";
+   mlog << Debug(4) << "Reading temporary Python diagnostics data file: "
+        << tmp_file_name << "\n";
 
    // Import the python wrapper script as a module
-   path = get_short_name(read_tmp_nc);
+   path = get_short_name(read_tmp_diag);
    PyObject * module_obj = PyImport_ImportModule (path.text());
 
    // If needed, reload the module
@@ -269,7 +269,7 @@ bool tmp_nc_tc_diag(const ConcatString &diag_script,
       PyErr_Print();
       mlog << Warning << "\n" << method_name
            << "an error occurred importing module "
-           << '\"' << path << "\"\n\n";
+           << "\"" << path << "\"\n\n";
       return(false);
    }
 
@@ -280,19 +280,19 @@ bool tmp_nc_tc_diag(const ConcatString &diag_script,
    }
 
    // Parse the diagnostics from python
-   status = parse_python_module(module_obj, tmp_info);
+   status = parse_python_diag_data(module_obj, tmp_info);
 
    // Cleanup
-   remove_temp_file(tmp_nc_path);
+   remove_temp_file(tmp_file_name);
 
    return(status);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool parse_python_module(PyObject *module_obj,
+bool parse_python_diag_data(PyObject *module_obj,
         TmpFileInfo &tmp_info) {
-   const char *method_name = "parse_python_module() -> ";
+   const char *method_name = "parse_python_diag_data() -> ";
    bool status = true;
 
    // Get the namespace for the module (as a dictionary)
