@@ -1075,7 +1075,9 @@ NumArray NumArray::subset(const NumArray &keep) const
    // Check bounds
    if ( keep.n_elements() != n_elements() )  {
       mlog << Error << "\nNumArray::subset(const NumArray &) -> "
-           << "the number of elements do not match\n\n";
+           << "the number of elements do not match ("
+           << keep.n_elements() << " keep flags != "
+           << n_elements() << " array elements)\n\n";
       exit ( 1 );
    }
    
@@ -1156,7 +1158,9 @@ double NumArray::wmean(const NumArray &wgt) const
 
    if ( wgt.n_elements() != n_elements() )  {
       mlog << Error << "\nNumArray::wmean(const NumArray &) -> "
-           << "the number of elements do not match\n\n";
+           << "the number of elements do not match ("
+           << wgt.n_elements() << " weights != "
+           << n_elements() << " array elements)\n\n";
       exit ( 1 );
    }
 
