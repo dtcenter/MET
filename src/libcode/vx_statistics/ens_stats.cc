@@ -187,7 +187,9 @@ void ECNTInfo::clear() {
 
    n_ge_obs   = n_lt_obs   = 0;
    me_ge_obs  = me_lt_obs  = bias_ratio  = bad_data_double;
-   
+
+   ign_oerr_convolved = ign_oerr_corrected = dawid_sebastiani = bad_data_double;
+
    return;
 }
 
@@ -227,6 +229,10 @@ void ECNTInfo::assign(const ECNTInfo &c) {
    me_ge_obs        = c.me_ge_obs;
    me_lt_obs        = c.me_lt_obs;
    bias_ratio       = c.bias_ratio;
+
+   ign_oerr_convolved = c.ign_oerr_convolved;
+   ign_oerr_corrected = c.ign_oerr_corrected;
+   dawid_sebastiani   = c.dawid_sebastiani;
 
    return;
 }
@@ -369,6 +375,11 @@ void ECNTInfo::set(const PairDataEnsemble &pd) {
 
    // Compute bias ratio
    bias_ratio = compute_bias_ratio(me_ge_obs, me_lt_obs);
+
+   // Compute log scores with observational uncertainty
+   ign_oerr_convolved = pd.ign_oerr_convolved_na.wmean(pd.wgt_na);
+   ign_oerr_corrected = pd.ign_oerr_corrected_na.wmean(pd.wgt_na);
+   dawid_sebastiani   = pd.dawid_sebastiani_na.wmean(pd.wgt_na);
 
    return;
 }

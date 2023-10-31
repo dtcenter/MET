@@ -87,6 +87,12 @@ class ECNTInfo {
       double me_ge_obs, me_lt_obs;
       double bias_ratio;
 
+      // Log scores that incorporate observational uncertainty
+      // as advised in Ferro (2017)
+      double ign_oerr_convolved;
+      double ign_oerr_corrected;
+      double dawid_sebastiani;
+
       // Compute statistics
       void set(const PairDataEnsemble &);
 

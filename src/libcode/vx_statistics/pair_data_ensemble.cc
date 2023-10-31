@@ -113,6 +113,10 @@ void PairDataEnsemble::clear() {
    n_lt_obs_na.clear();
    me_lt_obs_na.clear();
 
+   ign_oerr_convolved_na.clear();
+   ign_oerr_corrected_na.clear();
+   dawid_sebastiani_na.clear();
+
    n_ens = 0;
    n_pair = 0;
    ctrl_index = bad_data_int;
@@ -183,6 +187,9 @@ void PairDataEnsemble::extend(int n) {
    me_ge_obs_na.extend       (n);
    n_lt_obs_na.extend        (n);
    me_lt_obs_na.extend       (n);
+   ign_oerr_convolved_na.extend(n);
+   ign_oerr_corrected_na.extend(n);
+   dawid_sebastiani_na.extend(n);
    skip_ba.extend            (n);
    var_na.extend             (n);
    var_oerr_na.extend        (n);
@@ -453,6 +460,9 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
          me_ge_obs_na.add(bad_data_double);
          n_lt_obs_na.add(bad_data_double);
          me_lt_obs_na.add(bad_data_double);
+         ign_oerr_convolved_na.add(bad_data_double);
+         ign_oerr_corrected_na.add(bad_data_double);
+         dawid_sebastiani_na.add(bad_data_double);
       }
       // Otherwise, compute scores
       else {
@@ -537,6 +547,11 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
          me_ge_obs_na.add(me_ge_obs);
          n_lt_obs_na.add(n_lt_obs);
          me_lt_obs_na.add(me_lt_obs);
+
+         // TODO: Need to actually compute stats here
+         ign_oerr_convolved_na.add(bad_data_double);
+         ign_oerr_corrected_na.add(bad_data_double);
+         dawid_sebastiani_na.add(bad_data_double);
       }
    } // end for i
 
@@ -892,6 +907,9 @@ PairDataEnsemble PairDataEnsemble::subset_pairs_obs_thresh(const SingleThresh &o
       pd.me_ge_obs_na.add(me_ge_obs_na[i]);
       pd.n_lt_obs_na.add(n_lt_obs_na[i]);
       pd.me_lt_obs_na.add(me_lt_obs_na[i]);
+      pd.ign_oerr_convolved_na.add(ign_oerr_convolved_na[i]);
+      pd.ign_oerr_corrected_na.add(ign_oerr_corrected_na[i]);
+      pd.dawid_sebastiani_na.add(dawid_sebastiani_na[i]);
       pd.skip_ba.add(false);
       pd.var_na.add(var_na[i]);
       pd.var_oerr_na.add(var_oerr_na[i]);

@@ -94,6 +94,10 @@ class PairDataEnsemble : public PairBase {
       NumArray   n_lt_obs_na;     // Number of ensemble members < obs [n_obs]
       NumArray   me_lt_obs_na;    // Mean error of ensemble members < obs [n_obs]
 
+      NumArray   ign_oerr_convolved_na; // Error convolved log score [n_obs]
+      NumArray   ign_oerr_corrected_na; // Error corrected log score [n_obs]
+      NumArray   dawid_sebastiani_na;   // Dawid Sebastiani score [n_obs]
+
       int        n_ens;           // Number of ensemble members
       int        n_pair;          // Number of valid pairs, n_obs - sum(skip_ba)
       int        ctrl_index;      // Index of the control member
