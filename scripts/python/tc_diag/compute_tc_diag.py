@@ -14,7 +14,7 @@ STORM_DATA_NAMES = [
     "LAT", "LON", "MAXWIND", "RMW", "MIN_SLP",
     "SHR_MAG", "SHR_HDG", "STM_SPD", "STM_HDG",
     "SST", "OHC", "TPW", "LAND",
-    "850TANG", "850VORT", "200DVG"
+    "850TANG", "850VORT", "200DVRG"
 ]
 
 # Expected SOUNDING DATA diagnostic names
@@ -25,7 +25,7 @@ SOUNDING_DATA_NAMES = [
 
 # Diagnostic names to be skipped
 SKIP_DATA_NAMES = [
-    "850RADIAL", "850DVG", "200VORT"
+    "850RADIAL", "850DVRG", "200VORT"
 ]
 
 # Bad data integer value
