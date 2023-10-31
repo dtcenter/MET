@@ -8,9 +8,10 @@
 #   The target python object is saved as a temporary file by user defined python.
 #   And the python binaries (complied with MET) reads the temporary file and
 #   builds the python object for MET.
-#   The temporary file can be any form with matching write/read scripts.
+#   The temporary file can be any type with matching write/read scripts.
 #   - NetCDF for gridded data and point observation data.
-#   - text file (ASCII data) (MPR, point observation).
+#   - NetCDF for Tropical Cyclone diagnostics.
+#   - Text file (ASCII data) (MPR, point observation).
 #
 #   NOTE: sys.argv is changed by calling call_embedded_python
 #
@@ -18,6 +19,7 @@
 
 import os
 import sys
+import json
 from importlib import util as import_util
 
 class pyembed_tools():
@@ -106,12 +108,12 @@ class pyembed_tools():
                 f.write(str(line) + '\n')
 
     @staticmethod
-    def write_tmp_diag(filename, met_data):
-        # TODO: implement this
+    def write_tmp_diag(filename, diag_data):
+       json.dump(diag_data, open(filename,'w'))
 
     @staticmethod
     def read_tmp_diag(filename):
-        # TODO: implement this
+       return json.load(open(filename))
 
 if __name__ == '__main__':
     argv_org = sys.argv[:]      # save original sys.argv

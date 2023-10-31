@@ -1,6 +1,7 @@
 ########################################################################
 #
-#    Runs python diagnostics script and writes a temporary file.
+#    Runs a tropical cyclone diagnostics python script and writes a
+#    temporary file.
 #
 #    usage:  /path/to/python write_tmp_diag.py \
 #            tmp_output_filename <user_python_script>.py <args>
