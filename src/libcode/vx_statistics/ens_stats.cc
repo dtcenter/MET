@@ -185,10 +185,10 @@ void ECNTInfo::clear() {
    me_oerr          = mae_oerr   = rmse_oerr   = spread_oerr   = bad_data_double;
    spread_plus_oerr = bad_data_double;
 
+   ign_oerr_cnv = ign_oerr_cor = dawid_seb = bad_data_double;
+
    n_ge_obs   = n_lt_obs   = 0;
    me_ge_obs  = me_lt_obs  = bias_ratio  = bad_data_double;
-
-   ign_oerr_convolved = ign_oerr_corrected = dawid_sebastiani = bad_data_double;
 
    return;
 }
@@ -224,15 +224,15 @@ void ECNTInfo::assign(const ECNTInfo &c) {
    spread_oerr      = c.spread_oerr;
    spread_plus_oerr = c.spread_plus_oerr;
 
+   ign_oerr_cnv     = c.ign_oerr_cnv;
+   ign_oerr_cor     = c.ign_oerr_cor;
+   dawid_seb        = c.dawid_seb;
+
    n_ge_obs         = c.n_ge_obs;
    n_lt_obs         = c.n_lt_obs;
    me_ge_obs        = c.me_ge_obs;
    me_lt_obs        = c.me_lt_obs;
    bias_ratio       = c.bias_ratio;
-
-   ign_oerr_convolved = c.ign_oerr_convolved;
-   ign_oerr_corrected = c.ign_oerr_corrected;
-   dawid_sebastiani   = c.dawid_sebastiani;
 
    return;
 }
@@ -367,6 +367,11 @@ void ECNTInfo::set(const PairDataEnsemble &pd) {
    // Compute the square root of the average variance plus oerr
    spread_plus_oerr = square_root(pd.var_plus_oerr_na.wmean(pd.wgt_na));
 
+   // Compute log scores with observational uncertainty
+   ign_oerr_cnv = pd.ign_oerr_cnv_na.wmean(pd.wgt_na);
+   ign_oerr_cor = pd.ign_oerr_cor_na.wmean(pd.wgt_na);
+   dawid_seb    = pd.dawid_seb_na.wmean(pd.wgt_na);
+
    // Compute bias ratio terms 
    n_ge_obs  = nint(pd.n_ge_obs_na.sum());
    me_ge_obs = pd.me_ge_obs_na.wmean(pd.n_ge_obs_na);
@@ -375,11 +380,6 @@ void ECNTInfo::set(const PairDataEnsemble &pd) {
 
    // Compute bias ratio
    bias_ratio = compute_bias_ratio(me_ge_obs, me_lt_obs);
-
-   // Compute log scores with observational uncertainty
-   ign_oerr_convolved = pd.ign_oerr_convolved_na.wmean(pd.wgt_na);
-   ign_oerr_corrected = pd.ign_oerr_corrected_na.wmean(pd.wgt_na);
-   dawid_sebastiani   = pd.dawid_sebastiani_na.wmean(pd.wgt_na);
 
    return;
 }

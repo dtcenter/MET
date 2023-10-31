@@ -389,9 +389,9 @@ void parse_ecnt_line(STATLine &l, ECNTData &e_data) {
    e_data.n_lt_obs   = atoi(l.get_item("N_LT_OBS"));
    e_data.me_lt_obs  = atof(l.get_item("ME_LT_OBS"));
 
-   e_data.ign_oerr_convolved = atof(l.get_item("IGN_OERR_CONVOLVED"));
-   e_data.ign_oerr_corrected = atof(l.get_item("IGN_OERR_CORRECTED"));
-   e_data.dawid_sebastiani   = atof(l.get_item("DAWID_SEBASTIANI"));
+   e_data.ign_oerr_cnv = atof(l.get_item("IGN_OERR_CONVOLVED"));
+   e_data.ign_oerr_cor = atof(l.get_item("IGN_OERR_CORRECTED"));
+   e_data.dawid_seb    = atof(l.get_item("DAWID_SEBASTIANI"));
 
    return;
 }

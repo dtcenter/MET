@@ -4310,13 +4310,13 @@ void write_ecnt_cols(const ECNTInfo &ecnt_info,
       ecnt_info.me_lt_obs);
 
    at.set_entry(r, c+25,  // Ignorance Score, observation error convolved
-      ecnt_info.ign_oerr_convolved);
+      ecnt_info.ign_oerr_cnv);
 
    at.set_entry(r, c+26,  // Ignorance Score, observation error corrected
-      ecnt_info.ign_oerr_corrected);
+      ecnt_info.ign_oerr_cor);
 
    at.set_entry(r, c+27,  // Dawid-Sebastiani
-      ecnt_info.dawid_sebastiani);
+      ecnt_info.dawid_seb);
 
    return;
 }

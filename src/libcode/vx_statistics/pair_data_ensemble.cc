@@ -108,14 +108,14 @@ void PairDataEnsemble::clear() {
    ign_na.clear();
    pit_na.clear();
 
+   ign_oerr_cnv_na.clear();
+   ign_oerr_cor_na.clear();
+   dawid_seb_na.clear();
+
    n_ge_obs_na.clear();
    me_ge_obs_na.clear();
    n_lt_obs_na.clear();
    me_lt_obs_na.clear();
-
-   ign_oerr_convolved_na.clear();
-   ign_oerr_corrected_na.clear();
-   dawid_sebastiani_na.clear();
 
    n_ens = 0;
    n_pair = 0;
@@ -183,13 +183,13 @@ void PairDataEnsemble::extend(int n) {
    crpscl_gaus_na.extend     (n);
    ign_na.extend             (n);
    pit_na.extend             (n);
+   ign_oerr_cnv_na.extend    (n);
+   ign_oerr_cor_na.extend    (n);
+   dawid_seb_na.extend       (n);
    n_ge_obs_na.extend        (n);
    me_ge_obs_na.extend       (n);
    n_lt_obs_na.extend        (n);
    me_lt_obs_na.extend       (n);
-   ign_oerr_convolved_na.extend(n);
-   ign_oerr_corrected_na.extend(n);
-   dawid_sebastiani_na.extend(n);
    skip_ba.extend            (n);
    var_na.extend             (n);
    var_oerr_na.extend        (n);
@@ -242,14 +242,20 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
    // PairDataEnsemble
    v_na             = pd.v_na;
    r_na             = pd.r_na;
+
    crps_emp_na      = pd.crps_emp_na;
    crps_emp_fair_na = pd.crps_emp_fair_na;
    spread_md_na     = pd.spread_md_na;
    crpscl_emp_na    = pd.crpscl_emp_na;
    crps_gaus_na     = pd.crps_gaus_na;
    crpscl_gaus_na   = pd.crpscl_gaus_na;
+
    ign_na           = pd.ign_na;
    pit_na           = pd.pit_na;
+
+   ign_oerr_cnv_na  = pd.ign_oerr_convolved_na;
+   ign_oerr_cor_na  = pd.ign_oerr_cnv_na;
+   dawid_seb_na     = pd.dawid_seb_na;
 
    n_ge_obs_na    = pd.n_ge_obs_na;
    me_ge_obs_na   = pd.me_ge_obs_na;
@@ -456,13 +462,13 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
          crpscl_gaus_na.add(bad_data_double);
          ign_na.add(bad_data_double);
          pit_na.add(bad_data_double);
+         ign_oerr_cnv_na.add(bad_data_double);
+         ign_oerr_cor_na.add(bad_data_double);
+         dawid_seb_na.add(bad_data_double);
          n_ge_obs_na.add(bad_data_double);
          me_ge_obs_na.add(bad_data_double);
          n_lt_obs_na.add(bad_data_double);
          me_lt_obs_na.add(bad_data_double);
-         ign_oerr_convolved_na.add(bad_data_double);
-         ign_oerr_corrected_na.add(bad_data_double);
-         dawid_sebastiani_na.add(bad_data_double);
       }
       // Otherwise, compute scores
       else {
@@ -542,16 +548,16 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
                                   n_ge_obs, me_ge_obs,
                                   n_lt_obs, me_lt_obs);
 
+         // TODO: Need to actually compute stats here
+         ign_oerr_cnv_na.add(bad_data_double);
+         ign_oerr_cor_na.add(bad_data_double);
+         dawid_seb_na.add(bad_data_double);
+
          // Store the Bias Ratio terms 
          n_ge_obs_na.add(n_ge_obs);
          me_ge_obs_na.add(me_ge_obs);
          n_lt_obs_na.add(n_lt_obs);
          me_lt_obs_na.add(me_lt_obs);
-
-         // TODO: Need to actually compute stats here
-         ign_oerr_convolved_na.add(bad_data_double);
-         ign_oerr_corrected_na.add(bad_data_double);
-         dawid_sebastiani_na.add(bad_data_double);
       }
    } // end for i
 
@@ -880,7 +886,9 @@ PairDataEnsemble PairDataEnsemble::subset_pairs_obs_thresh(const SingleThresh &o
       // Include in subset:
       //   wgt_na, o_na, cmn_na, csd_na, v_na, r_na,
       //   crps_emp_na, crps_emp_fair_na, spread_md_na, crpscl_emp_na, crps_gaus_na, crpscl_gaus_na,
-      //   ign_na, pit_na, n_gt_obs_na, me_gt_obs_na, n_lt_obs_na, me_lt_obs_na,
+      //   ign_na, pit_na,
+      //   ign_oerr_cnv, ign_oerr_cor, dawid_seb,
+      //   n_gt_obs_na, me_gt_obs_na, n_lt_obs_na, me_lt_obs_na,
       //   var_na, var_oerr_na, var_plus_oerr_na,
       //   mn_na, mn_oerr_na, e_na
       //
@@ -903,13 +911,13 @@ PairDataEnsemble PairDataEnsemble::subset_pairs_obs_thresh(const SingleThresh &o
       pd.crpscl_gaus_na.add(crpscl_gaus_na[i]);
       pd.ign_na.add(ign_na[i]);
       pd.pit_na.add(pit_na[i]);
+      pd.ign_oerr_cnv_na.add(ign_oerr_cnv_na[i]);
+      pd.ign_oerr_cor_na.add(ign_oerr_cor_na[i]);
+      pd.dawid_seb_na.add(dawid_seb_na[i]);
       pd.n_ge_obs_na.add(n_ge_obs_na[i]);
       pd.me_ge_obs_na.add(me_ge_obs_na[i]);
       pd.n_lt_obs_na.add(n_lt_obs_na[i]);
       pd.me_lt_obs_na.add(me_lt_obs_na[i]);
-      pd.ign_oerr_convolved_na.add(ign_oerr_convolved_na[i]);
-      pd.ign_oerr_corrected_na.add(ign_oerr_corrected_na[i]);
-      pd.dawid_sebastiani_na.add(dawid_sebastiani_na[i]);
       pd.skip_ba.add(false);
       pd.var_na.add(var_na[i]);
       pd.var_oerr_na.add(var_oerr_na[i]);

@@ -89,14 +89,14 @@ class PairDataEnsemble : public PairBase {
       NumArray   ign_na;          // Ignorance Score [n_obs]
       NumArray   pit_na;          // Probability Integral Transform [n_obs]
 
+      NumArray   ign_oerr_cnv_na; // Error convolved log score [n_obs]
+      NumArray   ign_oerr_cor_na; // Error corrected log score [n_obs]
+      NumArray   dawid_seb_na;    // Dawid Sebastiani score [n_obs]
+
       NumArray   n_ge_obs_na;     // Number of ensemble memebers >= obs [n_obs]
       NumArray   me_ge_obs_na;    // Mean error of ensemble members >= obs [n_obs]
       NumArray   n_lt_obs_na;     // Number of ensemble members < obs [n_obs]
       NumArray   me_lt_obs_na;    // Mean error of ensemble members < obs [n_obs]
-
-      NumArray   ign_oerr_convolved_na; // Error convolved log score [n_obs]
-      NumArray   ign_oerr_corrected_na; // Error corrected log score [n_obs]
-      NumArray   dawid_sebastiani_na;   // Dawid Sebastiani score [n_obs]
 
       int        n_ens;           // Number of ensemble members
       int        n_pair;          // Number of valid pairs, n_obs - sum(skip_ba)
