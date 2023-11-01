@@ -253,8 +253,8 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
    ign_na           = pd.ign_na;
    pit_na           = pd.pit_na;
 
-   ign_oerr_cnv_na  = pd.ign_oerr_convolved_na;
-   ign_oerr_cor_na  = pd.ign_oerr_cnv_na;
+   ign_oerr_cnv_na  = pd.ign_oerr_cnv_na;
+   ign_oerr_cor_na  = pd.ign_oerr_cor_na;
    dawid_seb_na     = pd.dawid_seb_na;
 
    n_ge_obs_na    = pd.n_ge_obs_na;
