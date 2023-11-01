@@ -181,58 +181,29 @@ bool MetUGridDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
 
    data_var = _file->find_by_name(vinfo_nc->req_name().c_str());
    if (nullptr != data_var) {
-      int zdim_slot = data_var->z_slot;
-      int time_dim_slot = data_var->t_slot;
-      NumArray dim_value = vinfo_nc->dim_value();
-      LongArray dimension(vinfo_nc->dimension());
-      BoolArray is_offset(vinfo_nc->is_offset());
-      for (int idx=0; idx<is_offset.n(); idx++) {
-         long dim_offset = dimension[idx];
-         if (dim_offset == vx_data2d_star) continue;
-         if (idx == time_dim_slot) {
-            long time_offset = dim_offset;
-            if (time_offset == range_flag) time_offset = _cur_time_index;   // from data_plane_array()
-            else if (!is_offset[idx]) {
-               time_offset = get_time_offset(dim_value[idx], time_cnt,
-                                             vinfo.req_name().c_str(), method_name);
+      // Read the data
+      status = data_plane(vinfo, plane, data_var);
+   }
+   else {
+      LevelInfo level = vinfo.level();
+      long lvl_lower = level.lower();
+      long lvl_upper = level.upper();
+      vector<NcVarInfo *> vinfo_list;
+      if (_file->find_nc_vinfo_list(vinfo_nc->req_name().c_str(), vinfo_list)) {
+         for (int idx=0; idx<vinfo_list.size(); idx++) {
+            int vlevel = extract_vlevels(vinfo_nc->req_name(), vinfo_list[idx]->name.c_str());
+            if (vlevel >= lvl_lower && vlevel <= lvl_upper) {
+               vinfo.set_req_name(vinfo_list[idx]->name.c_str());
+               status = data_plane(vinfo, plane, vinfo_list[idx]);
+               if (status) {
+                  mlog << Debug(5) << method_name
+                       << "Found range match for VarInfo \"" << vinfo_nc->req_name()
+                       << " (" << vinfo_list[idx]->name << ")\"\n";
+                  break;
+               }
             }
-            else if ((0 > time_offset) || (time_offset >= time_cnt)) {
-               time_offset = convert_time_to_offset(time_offset);
-            }
-            if ((0 > time_offset) || (time_offset >= time_cnt)) {
-              mlog << Error << "\n" << method_name << "the requested time offset "
-                   << time_offset << " for \"" << vinfo.req_name() << "\" variable "
-                   << "is out of range (between 0 and " << (time_cnt-1) << ").\n\n";
-              return false;
-            }
-            dimension[time_dim_slot] = time_offset;
-         }
-         else if (idx == zdim_slot) {
-            const long z_cnt = (long)get_dim_size(_file->get_vert_dim());
-            long z_offset = dim_offset;
-            if (z_offset == range_flag) z_offset = _cur_vert_index;   // from data_plane_array()
-            //else if (!is_offset[idx]) {
-            //  // convert the value to index for slicing
-            //  z_offset = convert_value_to_offset(dim_value[idx], z_dim_name);
-            //}
-            if ((z_offset >= 0) && (z_offset < z_cnt)) {
-              dimension[idx] = long(z_offset);
-            }
-            //else {
-            //  if (is_offset[idx])
-            //     mlog << Error << "\n" << method_name << "the requested vertical offset "
-            //          << dim_offset << " for \"" << vinfo.req_name() << "\" variable "
-            //          << "is out of range (between 0 and " << (z_cnt-1) << ").\n\n";
-            //  else
-            //     mlog << Error << "\n" << method_name << "the requested vertical value "
-            //          << dim_value[idx] << " for \"" << vinfo.req_name() << "\" variable "
-            //          << "does not exist (data size = " << z_cnt << ").\n\n";
-            //  return false;
-            //}
          }
       }
-      // Read the data
-      status = read_data_plane(vinfo.req_name(), vinfo, plane, dimension);
    }
 
    return status;
@@ -259,8 +230,6 @@ bool MetUGridDataFile::data_plane(VarInfo &vinfo, DataPlane &plane, NcVarInfo *d
 
    int zdim_slot = bad_data_int;
    int time_dim_slot = bad_data_int;
-//   long org_time_offset = bad_data_int;
-//   long org_z_offset = bad_data_int;
    NumArray dim_value = vinfo_nc->dim_value();
    LongArray dimension(vinfo_nc->dimension());
    BoolArray is_offset(vinfo_nc->is_offset());
@@ -269,7 +238,7 @@ bool MetUGridDataFile::data_plane(VarInfo &vinfo, DataPlane &plane, NcVarInfo *d
       zdim_slot = data_var->z_slot;
       time_dim_slot = data_var->t_slot;
 
-      // Adjust didmension and is_offset
+      // Adjust dimension and is_offset
       int dim_size = dimension.n_elements();
       if (0 == dimension.n_elements()) {
          for (int idx=0; idx<data_var->Ndims; idx++) {
