@@ -143,8 +143,6 @@ class UGridFile {
 
       netCDF::NcVar *_latVar;
       netCDF::NcVar *_lonVar;
-      netCDF::NcVar *_xCoordVar;
-      netCDF::NcVar *_yCoordVar;
       NcVarInfo *_time_var_info;
 
       int face_count;

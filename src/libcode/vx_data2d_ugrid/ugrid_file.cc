@@ -98,8 +98,6 @@ void UGridFile::init_from_scratch()
   _tDim = (NcDim *)nullptr;
   _latVar = (NcVar *)nullptr;
   _lonVar = (NcVar *)nullptr;
-  _xCoordVar = (NcVar *)nullptr;
-  _yCoordVar = (NcVar *)nullptr;
   max_distance_km = bad_data_double;
 
   // Close any existing file
@@ -266,8 +264,21 @@ bool UGridFile::open_metadata(const char * filepath)
   NcVar *z_var = (NcVar *)nullptr;
   NcVar *valid_time_var = (NcVar *)nullptr;
 
-  get_var_names(_ncMetaFile, &var_names);
+  StringArray time_names = get_metadata_names(COORD_VAR_KEYS[0]);
+  StringArray lat_names = get_metadata_names(COORD_VAR_KEYS[1]);
+  StringArray lon_names = get_metadata_names(COORD_VAR_KEYS[2]);
+  StringArray z_names = get_metadata_names(COORD_VAR_KEYS[3]);
+  for (int j=0; j<Nvars; ++j) {
+    if (time_names.has(Var[j].name)) {
+      valid_time_var = Var[j].var;
+      _time_var_info = &Var[j];
+    }
+    else if (lat_names.has(Var[j].name)) _latVar = Var[j].var;
+    else if (lon_names.has(Var[j].name)) _lonVar = Var[j].var;
+    else if (z_names.has(Var[j].name)) z_var = Var[j].var;
+  }
 
+  get_var_names(_ncMetaFile, &var_names);
   for (int j=0; j<COORD_VAR_KEYS.size(); j++) {
     meta_name = find_metadata_name(COORD_VAR_KEYS[j], var_names);
     if (0 < meta_name.length()) {
@@ -286,44 +297,30 @@ bool UGridFile::open_metadata(const char * filepath)
       get_att_str( MetaVar[j], long_name_att_name, MetaVar[j].long_name_att );
       get_att_str( MetaVar[j], units_att_name,     MetaVar[j].units_att     );
 
-      if (0 == j) {
+      if (0 == j && nullptr == _time_var_info) {
         valid_time_var = MetaVar[j].var;
         _time_var_info = &MetaVar[j];
       }
-      else if (1== j) {
-        _latVar = MetaVar[j].var;
-      }
-      else if (2 == j) {
-        _lonVar = MetaVar[j].var;
-      }
-      else if (3 == j) {
-        z_var = MetaVar[j].var;
-      }
+      else if (1 == j && nullptr == _latVar) _latVar = MetaVar[j].var;
+      else if (2 == j && nullptr == _lonVar) _lonVar = MetaVar[j].var;
+      else if (3 == j && nullptr == _latVar) z_var = MetaVar[j].var;
     }
 
   }   //  for j
 
-  StringArray meta_time_names = get_metadata_names(COORD_VAR_KEYS[0]);
-  for (int j=0; j<Nvars; ++j)  {
-    if (meta_time_names.has(Var[j].name)) {
-      valid_time_var = Var[j].var;
-      _time_var_info = &Var[j];
-      break;
-    }
-  }
 
   // Pull out the valid and init times
-  ConcatString units;
   if (IS_INVALID_NC_P(valid_time_var)) {
-
     mlog << Debug(4) << method_name
          << "could not extract valid time from the "
-         << "time variable.\n";
+         << "time variable from " << filepath << "\n";
 
     ValidTime.add(ut);
   }
   else {
     // Store the dimension for the time variable as the time dimension
+    ConcatString units;
+    bool use_bounds_var = false;
     int time_dim_count = get_dim_count(valid_time_var);
     if (time_dim_count == 1 || time_dim_count == 2) {
        NcDim tDim = get_nc_dim(valid_time_var, 0);
@@ -346,8 +343,6 @@ bool UGridFile::open_metadata(const char * filepath)
          parse_cf_time_string(units.c_str(), ut, sec_per_unit);
       }
     }
-
-    bool use_bounds_var = false;
 
     // Determine the number of times present.
     int n_times = IS_VALID_NC_P(_tDim) ? get_dim_size(_tDim)
@@ -823,24 +818,12 @@ bool UGridFile::get_var_info() {
   StringArray var_names;
 
   Nvars = get_var_names(_ncFile, &var_names);
-  for (int j=0; j<Nvars; ++j) {
-     if (metadata_names.has(var_names[j])) meta_count++;
-  }
-  Nvars -= meta_count;
-  if (Var) {
-    delete [] Var;
-    Var = (NcVarInfo *)nullptr;
-  }
   Var = new NcVarInfo [Nvars];
 
-  StringArray meta_time_names = get_metadata_names(COORD_VAR_KEYS[0]);
   for (int j=0; j<Nvars; ++j)  {
-    if (metadata_names.has(var_names[j]) && !meta_time_names.has(var_names[j])) continue;
-
     NcVar v = get_var(_ncFile, var_names[j].c_str());
 
     Var[j].var = new NcVar(v);
-
     Var[j].name = GET_NC_NAME(v).c_str();
 
     int dim_count = GET_NC_DIM_COUNT(v);
