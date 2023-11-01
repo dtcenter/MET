@@ -115,49 +115,6 @@ static void compute_lat_lon(TcrmwGrid&, double *, double *);
 
 ////////////////////////////////////////////////////////////////////////
 
-//
-// TODO after the MET version 11.1.0 release:
-//   - Done:
-//     - [DONE for #2609] Instead of reading DataPlanes one at a time,
-//       read them all at once or perhaps in groups
-//       (e.g. all pressure levels).
-//     - [DONE for #2550] Incorporate CIRA python diagnostics scripts.
-//     - [DONE for #2550] Write NetCDF diagnostics output file.
-//     - [DONE for #2550] Read resulting diagnostic data provided by python script.
-//     - [DONE for #2555] Write CIRA ASCII diagnostics output files.
-//     - [DONE for #2550] Add comments to NetCDF output.
-//     - [DONE for #2550] Use override_diags to have nest items override parent.
-//     - [DONE for #2550] Fix the order of the diags returned by the
-//       compute_diag.py script to match existing.
-//     - [DONE for #2550] Enhance the Python code to define long names
-//       for diagnostics and add them to the NetCDF output.
-//     - [DONE for #2550] Double-check units, names, and spacing of output.
-//     - [DONE for #2550] Add NetCDF variable attribute to specify the domain
-//       from which each diag is defined (e.g. domain = "parent").
-//     - [DONE for #2550] Decided to leave diag_script as an array rather than
-//       as a string. Users may want to keep the standard diags in place and
-//       use a seperate script to do new things.
-//     - [DONE for #2550] Add new parent_domain NetCDF variable with attributes
-//       defining the range/azimuth grid.
-//     - [DONE for #2550] Support regrid option for each data field entry
-//       (e.g. regrid temp using bilin and tpw using budget).
-//     - [DONE for #2550] Add support for $MET_PYTHON_EXE.
-//   - TODO List:
-//     - Parellelize the processing of valid times. Simple OpenMP does not work.
-//       Global python instance is a problem.
-//     - Add support for vortex removal. Print a WARNING if
-//       the Diag Track differs from the Tech Id for the data
-//       files and vortex removal has not been requested.
-//     - Update documentation:
-//       - Describe cira and netcdf diag outputs.
-//       - Update Appendix F with TC-Diag python embedding info.
-//     - Update unit_tc_diag.xml to run a realistic parent + nest example
-//       with and without MET_PYTHON_EXE set.
-//     - Investigate why the computed diagnsotics DO NOT MATCH.
-//   - Questions:
-//     - Should the default regridding method (nearest) vary by input
-//       variable (e.g. bilin for TEMP, budget for TPW)?
-
 int met_main(int argc, char *argv[]) {
 
    // Process command line arguments
