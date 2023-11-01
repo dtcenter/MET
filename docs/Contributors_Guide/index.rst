@@ -1,6 +1,6 @@
-===================
+###################
 Contributor's Guide
-===================
+###################
 
 Welcome to the Model Evaluation Tools (MET) Contributor's Guide. 
 
