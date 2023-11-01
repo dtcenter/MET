@@ -142,6 +142,8 @@ sounding_computation_specs:
   Z:
     callable: *area_avg_func
     kwargs: {min_radius_km: *therm_min_km, max_radius_km: *therm_max_km, var_name: HGT, levels_dimen: *in_levels_name}
+    unit_converters: tc_diag_driver.met_post_process.m_to_dm
+    units: DM
 
 comment_dict: {
   sst_min: *sst_min_km, sst_max: *sst_max_km, rmw_min: *rmw_min_km, 
