@@ -529,9 +529,8 @@ void ShapeData::conv_filter_circ(int diameter, double vld_thresh) {
       exit(1);
    }
 
-#pragma omp parallel default(none)       \
-   shared(mlog, data, conv_dp, diameter) \
-   shared(vld_thresh, bad_data_double)   \
+#pragma omp parallel default(none)                   \
+   shared(mlog, data, conv_dp, diameter, vld_thresh) \
    private(x, y, n_vld, v, v_sum, gp)
    {
 
