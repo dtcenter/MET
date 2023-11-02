@@ -15,8 +15,9 @@
 //
 //   Mod#   Date      Name           Description
 //   ----   ----      ----           -----------
-//   000    11-05-31  Halley Gotway  Adapated from wrfdata.cc.
-//   001    14-05-29  Halley Gotway  Add ShapeData::n_objects()
+//   000    05/31/11  Halley Gotway  Adapated from wrfdata.cc
+//   001    05/29/14  Halley Gotway  Add ShapeData::n_objects()
+//   002    11/02/23  Halley Gotway  MET #2724 add OpenMP to convolution
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -513,159 +514,109 @@ double ShapeData::get_attr(const ConcatString &attr_name,
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void ShapeData::conv_filter_circ(int diameter, double vld_thresh) {
+   const char *method_name = "ShapeData::conv_filter_circ() -> ";
+   GridPoint *gp = nullptr;
+   int x, y, n_vld;
+   double v, v_sum;
+   DataPlane conv_dp;
 
-void ShapeData::conv_filter_circ(int diameter, double vld_thresh)
-
-{
-
-int x, y, xx, yy, u, v;
-int dn, fn, nn;
-int vpr, upr;
-int count, bd_count;
-double center, cur, sum;
-double dx, dy, dist;
-double vld_ratio;
-const int nx = data.nx();
-const int ny = data.ny();
-bool * f = (bool *) 0;
-bool center_bad = false;
-DataPlane in_data = data;
-const bool vld_thresh_one = is_eq(vld_thresh, 1.0);
-
-
-if ( (diameter%2 == 0) || (diameter < 3) )  {
-
-   mlog << Error << "\nShapeData::conv_filter_circ() -> "
-        << "diameter must be odd and >= 3 ... diameter = "
-        << diameter << "\n\n";
-
-   exit(1);
-
-}
-
-const int radius = (diameter - 1)/2;
-
-const vector<double> * in  = &(in_data.Data);
-      vector<double> * out = &(data.Data);
-
-f = new bool [diameter*diameter];
-
-   //
-   //  set up the filter
-   //
-
-for (y=0; y<diameter; ++y)  {
-
-   dy = y - radius;
-
-   for (x=0; x<diameter; ++x)  {
-
-      dx = x - radius;
-
-      dist = sqrt( dx*dx + dy*dy );
-
-      fn = STANDARD_XY_YO_N(diameter, x, y) ;
-
-      f[fn] = (dist <= radius);
-
+   // Check the diameter
+   if(diameter%2 == 0 || diameter < 3) {
+      mlog << Error << "\n" << method_name
+           << "diameter must be odd and >= 3 ... diameter = "
+           << diameter << "\n\n";
+      exit(1);
    }
 
-}
+#pragma omp parallel default(none)       \
+   shared(mlog, data, conv_dp, diameter) \
+   shared(vld_thresh, bad_data_double)   \
+   private(x, y, n_vld, v, v_sum, gp)
+   {
 
-   //
-   //  do the convolution
-   //
+      // Build the grid template with shape circle and wrap_lon false
+      GridTemplateFactory gtf;
+      GridTemplate* gt = gtf.buildGT(GridTemplateFactory::GridTemplate_Circle,
+                                     diameter, false);
 
-dn = -1;
-
-for(y=0; y<ny; y++) {
-
-   for(x=0; x<nx; x++) {
-
-      ++dn;
-
-         //
-         // If the bad data threshold is set to zero and the center of the
-         // convolution radius contains bad data, set the convolved value to
-         // bad data and continue.
-         //
-
-      center = (*in)[dn];
-
-      center_bad = ::is_bad_data(center);
-
-      if ( center_bad && vld_thresh_one ) { (*out)[dn] = bad_data_double;  continue; }
-
-      sum      = 0.0;
-      count    = 0;
-      bd_count = 0;
-
-      for (v=-radius; v<=radius; ++v) {
-
-         yy = y + v;
-
-         if ( (yy < 0) || (yy >= ny) )  continue;
-
-         vpr = v + radius;
-
-         for(u=-radius; u<=radius; ++u) {
-
-            xx = x + u;
-
-            if ( (xx < 0) || (xx >= nx) )  continue;
-
-            upr = u + radius;
-
-            fn = STANDARD_XY_YO_N(diameter, upr, vpr);
-
-            if ( !(f[fn]) )  continue;
-
-            nn = STANDARD_XY_YO_N(nx, xx, yy) ;
-
-            cur = (*in)[nn];
-
-            if( ::is_bad_data(cur) ) { bd_count++;  continue; }
-
-            sum += cur;
-
-            count++;
-
-         } // for v
-
-      } // for u
-
-         //
-         //  If the center of the convolution contains bad data and the ratio
-         //  of bad data in the convolution area is too high, set the convoled
-         //  value to bad data.
-         //
-
-      if ( count == 0 )  sum = bad_data_double;
-      else {
-
-         vld_ratio = ((double) count)/(bd_count + count);
-
-         if ( center_bad && (vld_ratio < vld_thresh) )  sum = bad_data_double;
-         else                                           sum /= count;
-
+#pragma omp single
+      {
+         // Initialize the convolved field to bad data
+         conv_dp = data;
+         conv_dp.set_constant(bad_data_double);
       }
 
-      (*out)[dn] = sum;
+      // Compute the convolved values
+#pragma omp for schedule (static)
+      for(x=0; x<data.nx(); x++) {
+         for(y=0; y<data.ny(); y++) {
 
-   } // for y
+            // For a new column, reset the grid template and counts
+            if(y == 0) {
 
-} // for x
+               // Initialize count and sum
+               n_vld = 0;
+               v_sum = 0.0;
 
-   //
-   //  done
-   //
+               // Sum all the points
+               for(gp  = gt->getFirstInGrid(x, y, data.nx(), data.ny());
+                   gp != nullptr;
+                   gp  = gt->getNextInGrid()) {
+                  v = data.get(gp->x, gp->y);
+                  if(::is_bad_data(v)) continue;
+                  n_vld += 1;
+                  v_sum += v;
+               }
+            }
+            // Subtract off the bottom edge, shift up, and add the top
+            else {
 
-if ( f )  { delete [] f;   f = (bool *) 0; }
+               // Subtract points from the the bottom edge
+               for(gp  = gt->getFirstInBotEdge();
+                   gp != nullptr;
+                   gp  = gt->getNextInBotEdge()) {
+                  v = data.get(gp->x, gp->y);
+                  if(::is_bad_data(v)) continue;
+                  n_vld -= 1;
+                  v_sum -= v;
+               }
 
-return;
+               // Increment Y
+               gt->incBaseY(1);
 
+               // Add points from the the top edge
+               for(gp  = gt->getFirstInTopEdge();
+                   gp != nullptr;
+                   gp  = gt->getNextInTopEdge()) {
+                  v = data.get(gp->x, gp->y);
+                  if(::is_bad_data(v)) continue;
+                  n_vld += 1;
+                  v_sum += v;
+               }
+            }
+
+            // Check for enough valid data and compute the mean value
+            if((double)(n_vld)/gt->size() >= vld_thresh && n_vld != 0) {
+               conv_dp.set((double) v_sum/n_vld, x, y);
+            }
+
+         } // end for y
+
+         // Increment X
+         if(x < (data.nx() - 1)) gt->incBaseX(1);
+
+      } // end for x
+
+      delete gt;
+
+   } // End of omp parallel
+
+   // Save the result
+   data = conv_dp;
+
+   return;
 }
-
 
 ////////////////////////////////////////////////////////////////////////
 
