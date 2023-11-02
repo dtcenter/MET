@@ -1,7 +1,8 @@
 .. _tmp_file_use:
 
+**********************
 Use of Temporary Files
-======================
+**********************
 
 The MET application and library code uses temporary files in several
 places. Each specific use of temporary files is described below. The
@@ -31,7 +32,7 @@ abnormally, the temporary files may remain.
 .. _tmp_files_pb2nc:
 
 PB2NC Tool
-^^^^^^^^^^
+==========
 
 The PB2NC tool reads input binary files in the BUFR or PrepBUFR
 format, extracts and/or derives observations from them, filters
@@ -59,7 +60,7 @@ PB2NC creates the following temporary files when running:
 .. _tmp_files_point2grid:
 
 Point2Grid Tool
-^^^^^^^^^^^^^^^
+===============
 
 The Point2Grid tool reads point observations from a variety of
 inputs and summarizes them on a grid. When processing GOES input
@@ -77,7 +78,7 @@ tool. Once created, it is intended to be reused in future runs.
 .. _tmp_files_bootstrap:
 
 Bootstrap Confidence Intervals
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==============================
 
 Several MET tools support the computation of bootstrap confidence
 intervals, as described in :numref:`User's Guide Section %s <config_boot>`
@@ -106,7 +107,7 @@ Where {LINE_TYPE} is :code:`cnt`, :code:`cts`, :code:`mcts`,
 .. _tmp_files_stat_analysis:
 
 Stat-Analysis Tool
-^^^^^^^^^^^^^^^^^^
+==================
 
 The Stat-Analysis tool reads ASCII output created by the MET
 statistics tools. A single job can be specified on the command line
@@ -132,7 +133,7 @@ and writes the result to a temporary file.
 .. _tmp_files_python_embedding:
 
 Python Embedding
-^^^^^^^^^^^^^^^^
+================
 
 As described in
 :numref:`User's Guide Appendix F, Section %s <appendixF>`, when the
@@ -154,7 +155,7 @@ temporary files.
 .. _tmp_files_tc_diag:
 
 TC-Diag Tool
-^^^^^^^^^^^^
+============
 
 The TC-Diag tool requires the use of Python embedding. It processes
 one or more ATCF tracks and computes model diagnostics. For each
