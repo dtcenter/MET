@@ -517,7 +517,7 @@ double ShapeData::get_attr(const ConcatString &attr_name,
 void ShapeData::conv_filter_circ(int diameter, double vld_thresh) {
    const char *method_name = "ShapeData::conv_filter_circ() -> ";
    GridPoint *gp = nullptr;
-   int x, y, n_vld;
+   int x, y, count, n_vld;
    double v, v_sum;
    DataPlane conv_dp;
 
@@ -531,7 +531,7 @@ void ShapeData::conv_filter_circ(int diameter, double vld_thresh) {
 
 #pragma omp parallel default(none)                   \
    shared(mlog, data, conv_dp, diameter, vld_thresh) \
-   private(x, y, n_vld, v, v_sum, gp)
+   private(x, y, count, n_vld, v, v_sum, gp)
    {
 
       // Build the grid template with shape circle and wrap_lon false
@@ -554,7 +554,8 @@ void ShapeData::conv_filter_circ(int diameter, double vld_thresh) {
             // For a new column, reset the grid template and counts
             if(y == 0) {
 
-               // Initialize count and sum
+               // Initialize counts and sum
+	       count = 0;
                n_vld = 0;
                v_sum = 0.0;
 
@@ -563,6 +564,7 @@ void ShapeData::conv_filter_circ(int diameter, double vld_thresh) {
                    gp != nullptr;
                    gp  = gt->getNextInGrid()) {
                   v = data.get(gp->x, gp->y);
+		  count += 1;
                   if(::is_bad_data(v)) continue;
                   n_vld += 1;
                   v_sum += v;
@@ -576,6 +578,7 @@ void ShapeData::conv_filter_circ(int diameter, double vld_thresh) {
                    gp != nullptr;
                    gp  = gt->getNextInBotEdge()) {
                   v = data.get(gp->x, gp->y);
+		  count -= 1;
                   if(::is_bad_data(v)) continue;
                   n_vld -= 1;
                   v_sum -= v;
@@ -589,16 +592,21 @@ void ShapeData::conv_filter_circ(int diameter, double vld_thresh) {
                    gp != nullptr;
                    gp  = gt->getNextInTopEdge()) {
                   v = data.get(gp->x, gp->y);
+		  count += 1;
                   if(::is_bad_data(v)) continue;
                   n_vld += 1;
                   v_sum += v;
                }
             }
 
-            // Check for enough valid data and compute the mean value
-            if((double)(n_vld)/gt->size() >= vld_thresh && n_vld != 0) {
-               conv_dp.set((double) v_sum/n_vld, x, y);
-            }
+            //  If the center of the convolution contains bad data and the ratio
+            //  of bad data in the convolution area is too high, set the convoled
+            //  value to bad data.
+            if(count == 0 || n_vld == 0)                v = bad_data_double;
+            else if(::is_bad_data(data.get(x, y)) &&
+	            (double)(n_vld)/count < vld_thresh) v = bad_data_double;
+            else                                        v = (double) v_sum/n_vld;
+            conv_dp.set(v, x, y);
 
          } // end for y
 
