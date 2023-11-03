@@ -8,7 +8,7 @@ Data must often be preprocessed prior to using it for verification. Several MET 
 
 .. _Input data formats:
 
-Input data formats
+Input Data Formats
 ==================
 
 The MET package can handle multiple gridded input data formats: GRIB version 1, GRIB version 2, and NetCDF files following the Climate and Forecast (CF) conventions, containing WRF output post-processed using wrf_interp, or produced by the MET tools themselves. MET supports standard NCEP, USAF, UKMet Office and ECMWF GRIB tables along with custom, user-defined GRIB tables and the extended PDS including ensemble member metadata. See :numref:`Configuration File Details` for more information. Point observation files may be supplied in either PrepBUFR, ASCII, or MADIS format. Note that MET does not require the Unified Post-Processor to be used, but does require that the input GRIB data be on a standard, de-staggered grid on pressure or regular levels in the vertical. While the Grid-Stat, Wavelet-Stat, MODE, and MTD tools can be run on a gridded field at virtually any level, the Point-Stat tool can only be used to verify forecasts at the surface or on pressure or height levels. MET does not interpolate between native model vertical levels.

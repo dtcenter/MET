@@ -2415,7 +2415,7 @@ are empty. Note: grib_code 11 is equivalent to obs_var "TMP".
     vld_thresh = 0.0;
   }
 
-Settings specific to individual tools
+Settings Specific to Individual Tools
 =====================================
 
 GenEnsProdConfig_default
@@ -4279,7 +4279,7 @@ to_grid
 
 Please see the description of the "to_grid" entry in the "regrid" dictionary above.
 
-NetCDF output information
+NetCDF Output Information
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Supply the NetCDF output information.  For example:

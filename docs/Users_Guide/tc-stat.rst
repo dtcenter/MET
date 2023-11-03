@@ -14,7 +14,7 @@ The TC-Stat tool ties together results from the TC-Pairs tool by providing summa
 Statistical Aspects
 ===================
 
-Filter TCST lines
+Filter TCST Lines
 -----------------
 
 The TC-Stat tool can be used to simply filter specific lines of the TCST file based on user-defined filtering criteria. All of the TCST lines that are retained from one or more files are written out to a single output file. The output file is also in TCST format.
