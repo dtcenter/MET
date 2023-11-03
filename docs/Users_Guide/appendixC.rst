@@ -182,7 +182,7 @@ POFD is defined as
 
 It is the proportion of non-events that were forecast to be events. POFD is also often called the False Alarm Rate. POFD ranges from 0 to 1; a perfect forecast would have POFD = 0.
 
-Probability of Detection of the non-event (PODn)
+Probability of Detection of the Non-Event (PODn)
 ------------------------------------------------
 
 Called "PODN" in CTS output :numref:`table_PS_format_info_CTS`
@@ -510,7 +510,7 @@ Called "MBIAS" in CNT output :numref:`table_PS_format_info_CNT`
 
 Multiplicative bias is simply the ratio of the means of the forecasts and the observations: :math:`\text{MBIAS} = \bar{f} / \bar{o}`
 
-Mean-squared Error (MSE)
+Mean-Squared Error (MSE)
 ------------------------
 
 Called "MSE" in CNT output :numref:`table_PS_format_info_CNT`
