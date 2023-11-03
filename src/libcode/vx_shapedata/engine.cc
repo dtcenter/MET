@@ -1272,7 +1272,8 @@ void ModeFuzzyEngine::do_fcst_merge_thresh() {
    int n_fcst_merge, intersection;
    int count, first_k;
    ShapeData fcst_merge_mask, fcst_merge_split;
-   // TODO: work here
+
+   // TODO: reimplement this function to avoid allocating these ShapeData objects
    ShapeData * fcst_shape = (ShapeData *) 0;
    ShapeData * fcst_merge_shape = (ShapeData *) 0;
 
@@ -1396,7 +1397,8 @@ void ModeFuzzyEngine::do_obs_merge_thresh() {
    int n_obs_merge, intersection;
    int count, first_k;
    ShapeData obs_merge_mask, obs_merge_split;
-   // TODO: work here
+
+   // TODO: reimplement this function to avoid allocating these ShapeData objects
    ShapeData * obs_shape = (ShapeData *) 0;
    ShapeData * obs_merge_shape = (ShapeData *) 0;
 
@@ -1514,7 +1516,8 @@ void ModeFuzzyEngine::do_fcst_merge_thresh(const ShapeData &merge_data) {
    int count, first_k;
    //ShapeData fcst_merge_mask;
    ShapeData fcst_merge_split;
-   // TODO: work here
+
+   // TODO: reimplement this function to avoid allocating these ShapeData objects
    ShapeData * fcst_shape = (ShapeData *) 0;
    ShapeData * fcst_merge_shape = (ShapeData *) 0;
 
@@ -1746,6 +1749,7 @@ void ModeFuzzyEngine::do_obs_merge_thresh(const ShapeData &merge_data) {
    delete [] obs_merge_shape; obs_merge_shape = (ShapeData *) 0;
 
    mlog << Debug(4) << " After merging of obs field: " << obs_split->sdebug_examine() << "\n";
+
    return;
 }
 
@@ -2498,8 +2502,7 @@ void ModeFuzzyEngine::do_obs_clus_splitting() {
 
 void ModeFuzzyEngine::do_cluster_features() {
    int j;
-   ShapeData * fcst_clus_shape = (ShapeData *) 0;
-   ShapeData * obs_clus_shape  = (ShapeData *) 0;
+   ShapeData cur_shape;
 
    if(need_fcst_clus_split) do_fcst_clus_splitting();
    if(need_obs_clus_split)  do_obs_clus_splitting();
@@ -2509,16 +2512,6 @@ void ModeFuzzyEngine::do_cluster_features() {
    //
    n_clus = collection.n_sets;
 
-   fcst_clus_shape = new ShapeData [n_clus];
-   obs_clus_shape  = new ShapeData [n_clus];
-
-   if(!fcst_clus_shape || !obs_clus_shape) {
-
-      mlog << Error << "\nModeFuzzyEngine::do_cluster_features() -> "
-           << "memory allocation error\n\n";
-      exit(1);
-   }
-
    //
    // Do the single features for clusters
    //
@@ -2526,16 +2519,16 @@ void ModeFuzzyEngine::do_cluster_features() {
     obs_cluster.set_size(n_clus);
 
    for(j=0; j<n_clus; j++) {
-      fcst_clus_shape[j] = select(*fcst_clus_split, j+1);
+      cur_shape = select(*fcst_clus_split, j+1);
       fcst_cluster[j].set(*fcst_raw, *fcst_thresh,
-                          *fcst_clus_split, fcst_clus_shape[j],
+                          *fcst_clus_split, cur_shape,
                           conf_info.inten_perc_value,
                           conf_info.Fcst->var_info->is_precipitation());
       fcst_cluster[j].object_number = j+1;
 
-      obs_clus_shape[j] = select(*obs_clus_split, j+1);
+      cur_shape = select(*obs_clus_split, j+1);
       obs_cluster[j].set(*obs_raw, *obs_thresh,
-                         *obs_clus_split, obs_clus_shape[j],
+                         *obs_clus_split, cur_shape,
                          conf_info.inten_perc_value,
                          conf_info.Obs->var_info->is_precipitation());
       obs_cluster[j].object_number = j+1;
@@ -2569,9 +2562,6 @@ void ModeFuzzyEngine::do_cluster_features() {
    //
    // Done
    //
-
-   delete [] fcst_clus_shape; fcst_clus_shape = (ShapeData *) 0;
-   delete [] obs_clus_shape;  obs_clus_shape  = (ShapeData *) 0;
 
    return;
 }
