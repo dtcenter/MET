@@ -40,7 +40,7 @@ LONG_NAME = {
     "MIN_SLP" : "Minimum Sea Level Pressure",
     "SHR_MAG" : "Shear Magnitude",
     "SHR_HDG" : "Shear Heading",
-    "STM_SPD" : "Storm Speed",
+    "STM_SPD" : "Storm Translation Speed",
     "STM_HDG" : "Storm Heading",
     "SST"     : "Sea Surface Temperature",
     "OHC"     : "Ocean Heat Content",
