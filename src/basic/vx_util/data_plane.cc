@@ -23,6 +23,7 @@
 using namespace std;
 
 #include <algorithm>
+#include <map>
 
 #include "data_plane.h"
 
@@ -230,57 +231,54 @@ void DataPlane::dump(ostream & out, int depth) const {
 
 void DataPlane::debug_examine(bool show_all_values) const {
 
-   vector<double> values;
-   vector<int> count;
+   // Nothing to print if verbosity level is below 4
+   if(mlog.verbosity_level() < 4) return;
+
+   map<double,int> value_count_map;
    int total_count = 0;
-   
-   for (int x=0; x<Nx; ++x) {
-      for (int y=0; y<Ny; ++y) {
-         double v = get(x,y);
-         if (v <= 0) {
-            continue;
+
+   for(int i=0; i<Data.size(); i++) {
+
+      // Count positive values
+      if(Data[i] > 0) total_count++;
+
+      if (show_all_values) {
+
+         // Add a new map entry
+         if(value_count_map.count(Data[i]) == 0) {
+            value_count_map[Data[i]] = 0;
          }
-         ++total_count;
-         if (show_all_values) {
-            vector<double>::iterator vi;
-            vi = find(values.begin(), values.end(), v);
-            if (vi == values.end()) {
-               values.push_back(v);
-               count.push_back(1);
-            } else {
-               int ii = vi - values.begin();
-               count[ii] = count[ii] + 1;
-            }
-         }
+
+         // Increment count
+         value_count_map[Data[i]] += 1;
       }
    }
-   if (show_all_values) {
-      for (size_t i=0; i<values.size(); ++i) {
-         mlog << Debug(4) << " data value=" << values[i] << " count=" << count[i] << "\n";
+
+   if(show_all_values) {
+      for(auto it  = value_count_map.begin();
+               it != value_count_map.end(); it++) {
+         mlog << Debug(4) << " data value=" << it->first
+              << " count=" << it->second << "\n";
       }
    }
+
    mlog << Debug(4) << "Total count = " << total_count << "\n";
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 string DataPlane::sdebug_examine() const{
-
+   ConcatString cs;
    int total_count = 0;
-   
-   for (int x=0; x<Nx; ++x) {
-      for (int y=0; y<Ny; ++y) {
-         double v = get(x,y);
-         if (v <= 0) {
-            continue;
-         }
-         ++total_count;
-      }
+
+   // Count positive values
+   for(int i=0; i<Data.size(); i++) {
+      if(Data[i] > 0) total_count++;
    }
-   char buf[1000];
-   sprintf(buf, "Total count = %d", total_count);
-   string retval = buf;
-   return retval;
+
+   cs << "Total count = " << total_count;
+
+   return cs;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
