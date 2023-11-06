@@ -262,21 +262,24 @@ void DataPlane::debug_examine(bool show_all_values) const {
       }
    }
 
-   mlog << Debug(4) << "Total count = " << total_count << "\n";
+   mlog << Debug(4) << "Total count > 0 = " << total_count
+        << " of " << Data.size() << "\n";
+
+   return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 string DataPlane::sdebug_examine() const{
    ConcatString cs;
-   int total_count = 0;
+   int n = 0;
 
    // Count positive values
-   for(int i=0; i<Data.size(); i++) {
-      if(Data[i] > 0) total_count++;
+   for(auto it = Data.begin(); it != Data.end(); it++) {
+      if(*it > 0) n++;
    }
 
-   cs << "Total count = " << total_count;
+   cs << "Total count > 0 = " << n << " of " << (int) Data.size();
 
    return cs;
 }
