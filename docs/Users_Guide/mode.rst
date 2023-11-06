@@ -253,15 +253,13 @@ _____________________
 
 The **multivar_intensity_flag** entry appears only in the **MODEMultivarConfig_default** file. This option is paired with the **multivar_logic** entry, and can take on a value of TRUE or FALSE for each **field**.  In the multivar case, super objects are created using the **multivar_logic** settings. For each input for which **multivar_intensity_flag** is TRUE, the input is masked to be non-missing only within the super objects, and traditional mode is run on that masked input.  For each input for which **multivar_intensity_flag** is FALSE, the input is skipped over.   If all the multivar_intensity_flag values are FALSE, traditional mode output is created for the super objects, but with no intensity information.
 
-
 _____________________
 
 .. code-block:: none
 
-   multivar_name = "Precip";
+   multivar_name = "Super";
 
-The **multivar_name** entry appears only in the **MODEMultivarConfig_default** file. This option is used only when the multivar option is enabled, and only when all **multivar_intensity_flag** values are FALSE. It can be thought of as an identifier for the multivariate super object.  It shows up in output files names and content.  If not set the default value is "Super".   It can be set separately for forecasts and observations, or as a common value for both.
-
+The **multivar_name** entry appears only in the **MODEMultivarConfig_default** file. This option is used only when the multivar option is enabled, and only when all **multivar_intensity_flag** values are FALSE. It can be thought of as an identifier for the multivariate super object.  It shows up in output files names and content.  It can be set separately for forecasts and observations or as a common value for both.
 
 _____________________
 
