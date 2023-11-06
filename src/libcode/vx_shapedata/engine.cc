@@ -592,13 +592,17 @@ void ModeFuzzyEngine::do_fcst_convolution() {
    // Apply a circular convolution to the raw field
    //
 
-   mlog << Debug(4) << " Before fcst convolution: "
-        << fcst_conv->sdebug_examine() << "\n";
+   if(mlog.verbosity_level() >= 4) {
+      mlog << Debug(4) << " Before fcst convolution: "
+           << fcst_conv->sdebug_examine() << "\n";
+   }
 
    if(r > 0) fcst_conv->conv_filter_circ(2*r + 1, conf_info.Fcst->vld_thresh);
 
-   mlog << Debug(4) << " After fcst convolution: "
-        << fcst_conv->sdebug_examine() << "\n";
+   if(mlog.verbosity_level() >= 4) {
+      mlog << Debug(4) << " After fcst convolution: "
+           << fcst_conv->sdebug_examine() << "\n";
+   }
 
    need_fcst_conv       = false;
    need_fcst_thresh     = true;
@@ -627,16 +631,20 @@ void ModeFuzzyEngine::do_obs_convolution() {
    mlog << Debug(3) << "Applying circular convolution of radius "
         << r << " to the observation field.\n";
 
-   mlog << Debug(4) << " Before obs convolution: "
-        << obs_conv->sdebug_examine() << "\n";
+   if(mlog.verbosity_level() >= 4) {
+      mlog << Debug(4) << " Before obs convolution: "
+           << obs_conv->sdebug_examine() << "\n";
+   }
 
    //
    // Apply a circular convolution to the raw field
    //
    if(r > 0) obs_conv->conv_filter_circ(2*r + 1, conf_info.Obs->vld_thresh);
 
-   mlog << Debug(4) << " After obs convolution: "
-        << obs_conv->sdebug_examine() << "\n";
+   if(mlog.verbosity_level() >= 4) {
+      mlog << Debug(4) << " After obs convolution: "
+           << obs_conv->sdebug_examine() << "\n";
+   }
 
    need_obs_conv       = false;
    need_obs_thresh     = true;
@@ -662,16 +670,20 @@ void ModeFuzzyEngine::do_fcst_thresholding() {
    *fcst_thresh = *fcst_raw;
    fcst_thresh->threshold(conf_info.Fcst->conv_thresh);
 
-   mlog << Debug(4) << " After thresholding raw fcst field: "
-        << fcst_thresh->sdebug_examine() << "\n";
+   if(mlog.verbosity_level() >= 4) {
+      mlog << Debug(4) << " After thresholding raw fcst field: "
+           << fcst_thresh->sdebug_examine() << "\n";
+   }
 
    //
    // Threshold the convolved field
    //
    fcst_mask->threshold(conf_info.Fcst->conv_thresh);
 
-   mlog << Debug(4) << " After thresholding convolved fcst field: "
-        << fcst_mask->sdebug_examine() << "\n";
+   if(mlog.verbosity_level() >= 4) {
+      mlog << Debug(4) << " After thresholding convolved fcst field: "
+           << fcst_mask->sdebug_examine() << "\n";
+   }
 
    mlog << Debug(3) << "Applying convolution threshold "
         << conf_info.Fcst->conv_thresh.get_str()
@@ -701,16 +713,20 @@ void ModeFuzzyEngine::do_obs_thresholding() {
    *obs_thresh = *obs_raw;
    obs_thresh->threshold(conf_info.Obs->conv_thresh);
 
-   mlog << Debug(4) << " After thresholding raw obs field: "
-        << obs_thresh->sdebug_examine() << "\n";
+   if(mlog.verbosity_level() >= 4) {
+      mlog << Debug(4) << " After thresholding raw obs field: "
+           << obs_thresh->sdebug_examine() << "\n";
+   }
 
    //
    // Threshold the convolved field
    //
    obs_mask->threshold(conf_info.Obs->conv_thresh);
 
-   mlog << Debug(4) << " After thresholding convolved obs field: "
-        << obs_mask->sdebug_examine() << "\n";
+   if(mlog.verbosity_level() >= 4) {
+      mlog << Debug(4) << " After thresholding convolved obs field: "
+           << obs_mask->sdebug_examine() << "\n";
+   }
 
    mlog << Debug(3) << "Applying convolution threshold "
         << conf_info.Obs->conv_thresh.get_str()
@@ -745,8 +761,10 @@ void ModeFuzzyEngine::do_fcst_filtering() {
                                 fcst_raw, conf_info.Fcst->conv_thresh, grid,
                                 conf_info.Fcst->var_info->is_precipitation());
 
-      mlog << Debug(4) << " After attribute filtering of fcst field: "
-           << fcst_mask->sdebug_examine() << "\n";
+      if(mlog.verbosity_level() >= 4) {
+         mlog << Debug(4) << " After attribute filtering of fcst field: "
+              << fcst_mask->sdebug_examine() << "\n";
+      }
 
       mlog << Debug(3) << "Applying object attribute filtering"
            << " resulted in " <<  fcst_mask->n_objects()
@@ -783,8 +801,10 @@ void ModeFuzzyEngine::do_obs_filtering() {
                                obs_raw, conf_info.Obs->conv_thresh, grid,
                                conf_info.Obs->var_info->is_precipitation());
 
-      mlog << Debug(4) << " After attribute filtering of obs field: "
-           << obs_mask->sdebug_examine() << "\n";
+      if(mlog.verbosity_level() >= 4) {
+         mlog << Debug(4) << " After attribute filtering of obs field: "
+              << obs_mask->sdebug_examine() << "\n";
+      }
 
       mlog << Debug(3) << "Applying object attribute filtering"
            << " resulted in " <<  obs_mask->n_objects()
@@ -814,8 +834,10 @@ void ModeFuzzyEngine::do_fcst_splitting() {
 
    *fcst_split = split(*fcst_mask, n_fcst);
 
-   mlog << Debug(4) << " After splitting of fcst field: "
-        << fcst_split->sdebug_examine() << "\n";
+   if(mlog.verbosity_level() >= 4) {
+      mlog << Debug(4) << " After splitting of fcst field: "
+           << fcst_split->sdebug_examine() << "\n";
+   }
 
    need_fcst_split      = false;
    need_fcst_merge      = true;
@@ -835,8 +857,10 @@ void ModeFuzzyEngine::do_obs_splitting() {
 
    *obs_split = split(*obs_mask, n_obs);
 
-   mlog << Debug(4) << " After splitting of obs field: "
-        << obs_split->sdebug_examine() << "\n";
+   if(mlog.verbosity_level() >= 4) {
+      mlog << Debug(4) << " After splitting of obs field: "
+           << obs_split->sdebug_examine() << "\n";
+   }
 
    need_obs_split      = false;
    need_obs_merge      = true;
@@ -1544,8 +1568,10 @@ void ModeFuzzyEngine::do_fcst_merge_thresh(const ShapeData &merge_data) {
 
    } // end for mid
 
-   mlog << Debug(4) << " After merging of fcst field: "
-        << fcst_split->sdebug_examine() << "\n";
+   if(mlog.verbosity_level() >= 4) {
+      mlog << Debug(4) << " After merging of fcst field: "
+           << fcst_split->sdebug_examine() << "\n";
+   }
 
    return;
 }
@@ -1633,8 +1659,10 @@ void ModeFuzzyEngine::do_obs_merge_thresh(const ShapeData &merge_data) {
 
    } // end for mid
 
-   mlog << Debug(4) << " After merging of obs field: "
-        << obs_split->sdebug_examine() << "\n";
+   if(mlog.verbosity_level() >= 4) {
+      mlog << Debug(4) << " After merging of obs field: "
+           << obs_split->sdebug_examine() << "\n";
+   }
 
    return;
 }
