@@ -148,6 +148,6 @@ To cite this documentation in publications, please refer to the MET User's Guide
    Contributors_Guide/index
 
 Index
------
+=====
 
 * :ref:`genindex`
