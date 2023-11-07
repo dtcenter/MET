@@ -944,21 +944,28 @@ void UGridFile::set_dataset(ConcatString _dataset_name, bool do_override) {
 
   const char *ugrid_config_name = nullptr;
 
+  if (0 == _dataset_name.length()) {
+    mlog << Error << "\nUGridFile::set_dataset()"
+         << " The \"" << conf_key_ugrid_dataset
+         << "\" is not defined at the configuration file.\n\n";
+    exit(1);
+  }
   dataset_name = _dataset_name;
   ConcatString dataset_config(def_config_prefix);
   dataset_config.add(dataset_name);
-  ugrid_config_name = replace_path(dataset_config.c_str()).c_str();
-  if (!file_exists(ugrid_config_name)) {
+  if (!file_exists(dataset_config.c_str())) {
     dataset_config = def_config_prefix2;
     dataset_config.add(dataset_name);
-    ugrid_config_name = replace_path(dataset_config.c_str()).c_str();
+    dataset_config = replace_path(dataset_config.c_str());
   }
+  ugrid_config_name = dataset_config.c_str();
   if (file_exists(ugrid_config_name)) {
     read_config(ugrid_config_name, do_override);
   }
   else {
     mlog << Error << "\nUGridFile::set_dataset()"
-         << " The UGrid dataset \"" << dataset_name << "\" is not supported.\n\n";
+         << " The UGrid dataset \"" << dataset_name << "\" is not supported. Please add \""
+         << ugrid_config_name << "\".\n\n";
     exit(1);
   }
 
