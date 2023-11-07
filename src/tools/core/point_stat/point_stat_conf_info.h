@@ -248,7 +248,8 @@ class PointStatConfInfo {
       ConcatString version;                 // Config file version
 #ifdef WITH_UGRID
       ConcatString ugrid_nc;                // NetCDF for coordinate variables of unstructured grid
-      ConcatString ugrid_user_map_config;   // User's configuration file which contains ugrid metadata mapping
+      ConcatString ugrid_dataset;           // UGRid dataset name (mpas, lfric etc)
+      ConcatString ugrid_map_config;        // User's configuration file which contains ugrid metadata mapping
       double ugrid_max_distance_km;         // max distance to be the closest neighbor to unstructured grid
 #endif
 
@@ -260,6 +261,8 @@ class PointStatConfInfo {
       void clear();
 
       void read_config(const char *, const char *);
+      void read_configs(StringArray user_file_names);
+
       void process_config(GrdFileType);
       void process_grib_codes();
       void process_flags();

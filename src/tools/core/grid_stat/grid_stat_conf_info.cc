@@ -69,7 +69,8 @@ void GridStatConfInfo::clear() {
    version.clear();
 #ifdef WITH_UGRID
    ugrid_nc.clear();
-   ugrid_user_map_config.clear();
+   ugrid_dataset.clear();
+   ugrid_map_config.clear();
    ugrid_max_distance_km = bad_data_double;
 #endif
 
@@ -108,6 +109,21 @@ void GridStatConfInfo::read_config(const char *default_file_name,
 
 ////////////////////////////////////////////////////////////////////////
 
+void GridStatConfInfo::read_configs(StringArray user_file_names) {
+
+   const char *file_name;
+   for (int i=0; i<user_file_names.n_elements(); i++) {
+      file_name = replace_path(user_file_names[i].c_str()).c_str();
+      if (file_exists(file_name)) conf.read(file_name);
+      else mlog << Warning << "\nGridStatConfInfo::read_configs(StringArray) -> "
+                << "The configuration file \"" << user_file_names[i]<< "\" does not exist.\n\n";
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void GridStatConfInfo::process_config(GrdFileType ftype,
                                       GrdFileType otype) {
    int i, j, n_fvx, n_ovx;
@@ -137,11 +153,14 @@ void GridStatConfInfo::process_config(GrdFileType ftype,
    tmp_dir = parse_conf_tmp_dir(&conf);
 
 #ifdef WITH_UGRID
+   // Conf: ugrid_dataset
+   ugrid_map_config = parse_conf_ugrid_dataset(&conf);
+
    // Conf: ugrid_nc
    ugrid_nc = parse_conf_ugrid_coordinates_file(&conf);
 
-   // Conf: ugrid_user_map_config
-   ugrid_user_map_config = parse_conf_ugrid_user_map_config(&conf);
+   // Conf: ugrid_map_config
+   ugrid_map_config = parse_conf_ugrid_map_config(&conf);
 
    // Conf: ugrid_max_distance_km
    ugrid_max_distance_km = parse_conf_ugrid_max_distance_km(&conf);

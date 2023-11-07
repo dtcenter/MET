@@ -175,6 +175,7 @@ static void finish_txt_files();
 static void clean_up();
 
 static void usage();
+static void set_config(const StringArray &);
 static void set_point_obs(const StringArray &);
 static void set_ncfile(const StringArray &);
 static void set_obs_valid_beg_time(const StringArray &);
@@ -239,6 +240,7 @@ void process_command_line(int argc, char **argv) {
    cline.set_usage(usage);
 
    // Add the options function calls
+   cline.add(set_config,             "-config",        1);
    cline.add(set_point_obs,          "-point_obs",     1);
    cline.add(set_ncfile,             "-ncfile",        1);
    cline.add(set_obs_valid_beg_time, "-obs_valid_beg", 1);
@@ -281,6 +283,7 @@ void process_command_line(int argc, char **argv) {
 
    // Read the config files
    conf_info.read_config(default_config_file.c_str(), config_file.c_str());
+   conf_info.read_configs(config_files);
 
    // Get the forecast file type from config, if present
    ftype = parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_fcst));
@@ -304,11 +307,14 @@ void process_command_line(int argc, char **argv) {
 #ifdef WITH_UGRID
    if (FileType_UGrid == ftype) {
       ConcatString ugrid_nc = conf_info.ugrid_nc;
-      ConcatString ugrid_user_map_config = conf_info.ugrid_user_map_config;
+      ConcatString ugrid_dataset = conf_info.ugrid_dataset;
+      ConcatString ugrid_map_config = conf_info.ugrid_map_config;
       MetUGridDataFile *ugrid_mtddf = (MetUGridDataFile *)fcst_mtddf;
       ugrid_mtddf->set_max_distance_km(conf_info.ugrid_max_distance_km);
-      if (0 < ugrid_user_map_config.length())
-         ugrid_mtddf->set_user_map_config_file(ugrid_user_map_config);
+      if (0 < ugrid_dataset.length())
+         ugrid_mtddf->set_dataset(ugrid_dataset);
+      if (0 < ugrid_map_config.length())
+         ugrid_mtddf->set_map_config_file(ugrid_map_config);
       if (0 == ugrid_nc.length() || ugrid_nc == "NA") ugrid_nc = fcst_file;
       ugrid_mtddf->open_metadata(ugrid_nc.c_str());
       mlog << Debug(9) << method_name
@@ -2181,6 +2187,7 @@ void usage() {
         << "\tfcst_file\n"
         << "\tobs_file\n"
         << "\tconfig_file\n"
+        << "\t[-config config_file]\n"
         << "\t[-point_obs file]\n"
         << "\t[-obs_valid_beg time]\n"
         << "\t[-obs_valid_end time]\n"
@@ -2196,6 +2203,9 @@ void usage() {
 
         << "\t\t\"config_file\" is a PointStatConfig file containing "
         << "the desired configuration settings (required).\n"
+
+        << "\t\t\"-config config_file\" specifies additional PointStatConfig file containing "
+        << "the configuration settings for unstructured grid (optional).\n"
 
         << "\t\t\"-point_obs file\" specifies additional NetCDF point "
         << "observation files to be used (optional).\n"
@@ -2216,6 +2226,13 @@ void usage() {
         << mlog.verbosity_level() << ") (optional).\n\n" << flush;
 
    exit (1);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_config(const StringArray & a)
+{
+   config_files.add(a[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////
