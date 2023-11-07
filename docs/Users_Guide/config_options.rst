@@ -459,12 +459,20 @@ Regions of parallelized code are:
 
   * :code:`fractional_coverage (data_plane_util.cc)`
 
+    * Called by `gen_ens_prod` to compute NMEP outputs.
+    * Called by `grid_stat` when applying neighborhood verification methods.
+
+  * :code:`ShapeData::conv_filter_circ() (shapedata.cc)`
+
+    * Called by `mode` to apply a convolution smoothing operation when
+      defining objects.
+
 Only the following top-level executables can presently benefit from OpenMP
 parallelization:
 
   * :code:`grid_stat`
-  * :code:`ensemble_stat`
   * :code:`grid_ens_prod`
+  * :code:`mode`
 
 **Thread Binding**    
 
@@ -474,7 +482,7 @@ guarantees that threads remain evenly distributed across the available cores.
 Otherwise, the operating system may migrate threads between cores during a run.
 
 OpenMP provides some environment variables to handle this: :code:`OMP_PLACES`
-and  :code:`OMP_PROC_BIND`.  We anticipate that the effect of setting only
+and :code:`OMP_PROC_BIND`.  We anticipate that the effect of setting only
 :code:`OMP_PROC_BIND=true` would be neutral-to-positive.
 
 However, there are sometimes compiler-specific environment variables. Instead,
