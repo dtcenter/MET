@@ -48,7 +48,8 @@ config_DATA = \
 	WWMCARegridConfig_default \
 	PlotModeFieldConfig_default \
 	Point2GridConfig_default \
-	UGridConfig_default \
+	UGridConfig_lfric \
+	UGridConfig_mpas \
 	PlotPointObsConfig_default
 
 EXTRA_DIST = ${config_DATA}
