@@ -28,6 +28,8 @@ ugrid_metadata_map = [
    { key = "time";      val = "xtime,time_centered"; }
 ];
 
+ugrid_max_distance_km = 30;
+
 ////////////////////////////////////////////////////////////////////////////////
 
 version = "V12.0.0";
