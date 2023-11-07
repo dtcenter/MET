@@ -15,9 +15,9 @@
 //
 //  Mod#   Date      Name           Description
 //  ----   ----      ----           -----------
-//  000    04-15-05  Halley Gotway
-//
-//  001    01-10-12  Bullock        Ported to new repository
+//  000    04/15/05  Halley Gotway
+//  001    01/10/12  Bullock        Ported to new repository
+//  002    11/02/23  Halley Gotway  MET #2724 improve efficiency
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -407,7 +407,6 @@ void PairFeature::set(const SingleFeature &fcst,
    Fcst = &fcst;
    Obs  = &obs;
 
-   int x, y;
    int fcst_on, obs_on;
    double dx, dy;
    double a1, a2;
@@ -461,25 +460,21 @@ void PairFeature::set(const SingleFeature &fcst,
    area_ratio    = min( (Obs->area)/(Fcst->area),
                         (Fcst->area)/(Obs->area) );
 
-
    //
    // Intersection, union, and symmetric diff areas
    //
    intersection_area = union_area = 0.0;
    symmetric_diff = 0.0;
-   int nx = Fcst->Split->data.nx();
-   int ny = Fcst->Split->data.ny();
-   for(x=0; x<nx; ++x) {
-      for(y=0; y<ny; ++y) {
+   int nxy = Fcst->Split->data.nxy();
+   for(i=0; i<nxy; ++i) {
 
-         fcst_on = (nint(Fcst->Split->data(x, y)) == Fcst->object_number ? 1 : 0);
-         obs_on  = (nint( Obs->Split->data(x, y)) ==  Obs->object_number ? 1 : 0);
+      fcst_on = (nint(Fcst->Split->data.data()[i]) == Fcst->object_number ? 1 : 0);
+      obs_on  = (nint( Obs->Split->data.data()[i]) ==  Obs->object_number ? 1 : 0);
 
-         if(fcst_on && obs_on) intersection_area++;
-         if(fcst_on || obs_on) union_area++;
-         if((fcst_on && !obs_on) ||
-            (!fcst_on && obs_on)) symmetric_diff++;
-      }
+      if(   fcst_on &&  obs_on)   intersection_area++;
+      if(   fcst_on ||  obs_on)   union_area++;
+      if( ( fcst_on && !obs_on) ||
+          (!fcst_on &&  obs_on) ) symmetric_diff++;
    }
 
    //

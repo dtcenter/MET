@@ -555,7 +555,7 @@ void ShapeData::conv_filter_circ(int diameter, double vld_thresh) {
             if(y == 0) {
 
                // Initialize counts and sum
-	       count = 0;
+               count = 0;
                n_vld = 0;
                v_sum = 0.0;
 
@@ -564,7 +564,7 @@ void ShapeData::conv_filter_circ(int diameter, double vld_thresh) {
                    gp != nullptr;
                    gp  = gt->getNextInGrid()) {
                   v = data.get(gp->x, gp->y);
-		  count += 1;
+                  count += 1;
                   if(::is_bad_data(v)) continue;
                   n_vld += 1;
                   v_sum += v;
@@ -578,7 +578,7 @@ void ShapeData::conv_filter_circ(int diameter, double vld_thresh) {
                    gp != nullptr;
                    gp  = gt->getNextInBotEdge()) {
                   v = data.get(gp->x, gp->y);
-		  count -= 1;
+                  count -= 1;
                   if(::is_bad_data(v)) continue;
                   n_vld -= 1;
                   v_sum -= v;
@@ -592,7 +592,7 @@ void ShapeData::conv_filter_circ(int diameter, double vld_thresh) {
                    gp != nullptr;
                    gp  = gt->getNextInTopEdge()) {
                   v = data.get(gp->x, gp->y);
-		  count += 1;
+                  count += 1;
                   if(::is_bad_data(v)) continue;
                   n_vld += 1;
                   v_sum += v;
@@ -604,7 +604,7 @@ void ShapeData::conv_filter_circ(int diameter, double vld_thresh) {
             //  value to bad data.
             if(count == 0 || n_vld == 0)                v = bad_data_double;
             else if(::is_bad_data(data.get(x, y)) &&
-	            (double)(n_vld)/count < vld_thresh) v = bad_data_double;
+                    (double)(n_vld)/count < vld_thresh) v = bad_data_double;
             else                                        v = (double) v_sum/n_vld;
             conv_dp.set(v, x, y);
 
