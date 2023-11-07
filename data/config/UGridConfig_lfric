@@ -1,0 +1,37 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// Unstructured Grid configuration file.
+//
+// UGridConfig_user at the current working directory overrides the default.
+// For additional or updated information, please see the MET User's Guide.
+//
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Default mapping for Metadata.
+// The first values are for MPAS and the second values are for LFric.
+//
+ugrid_metadata_map = [
+   { key = "dim_face";  val = "nMesh2d_face"; },
+   { key = "dim_node";  val = "nMesh2d_node"; },
+   { key = "dim_edge";  val = "nMesh2d_edge"; },
+   { key = "dim_time";  val = "time_counter"; },
+   { key = "dim_vert";  val = "nVertLevels"; },
+   { key = "cell_id";   val = "indexToCellID"; },
+   { key = "lat_face";  val = "Mesh2d_face_y"; },
+   { key = "lon_face";  val = "Mesh2d_face_x"; },
+   { key = "vert_face"; val = "zCell"; },
+   { key = "lat_edge";  val = "Mesh2d_edge_y"; },
+   { key = "lon_edge";  val = "Mesh2d_edge_x"; },
+   { key = "lat_node";  val = "Mesh2d_node_y"; },
+   { key = "lon_node";  val = "Mesh2d_node_x"; },
+   { key = "time";      val = "time_centered"; }
+];
+
+ugrid_max_distance_km = 30;
+
+////////////////////////////////////////////////////////////////////////////////
+
+version = "V12.0.0";
+
+////////////////////////////////////////////////////////////////////////////////
