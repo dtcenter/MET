@@ -36,8 +36,8 @@ using namespace netCDF;
 ////////////////////////////////////////////////////////////////////////
 
 static const char *def_user_config = "UGridConfig_user";
-static const char *def_config_filename =
-   "MET_BASE/config/UGridConfig_default";
+static const char *def_config_prefix = "UGridConfig_";
+static const char *def_config_prefix2 = "MET_BASE/config/UGridConfig_";
 
 array<string, UG_DIM_COUNT> DIM_KEYS = {
       "dim_face", "dim_node", "dim_edge", "dim_time", "dim_vert"
@@ -98,6 +98,7 @@ void UGridFile::init_from_scratch()
   _tDim = (NcDim *)nullptr;
   _latVar = (NcVar *)nullptr;
   _lonVar = (NcVar *)nullptr;
+  metadata_map.clear();
   max_distance_km = bad_data_double;
 
   // Close any existing file
@@ -168,13 +169,8 @@ bool UGridFile::open(const char * filepath)
 {
   const char *method_name = "UGridFile::open() -> ";
 
-
   // Close any open files and clear out the associated members
   close();
-  ConcatString config_file = file_exists(def_user_config)
-                             ? def_user_config : def_config_filename;
-  read_config(config_file);
-
   if (_ncFile) {
     delete _ncFile;
     _ncFile = (NcFile *) nullptr;
@@ -201,9 +197,6 @@ bool UGridFile::open_metadata(const char * filepath)
   unixtime ut;
   int sec_per_unit;
   const char *method_name = "UGridFile::open_metadata() -> ";
-
-  // FIXME: Commented out with NetCDF4 enabling
-  // NcError err(NcError::silent_nonfatal);
 
   // Open the file
   _ncMetaFile = open_ncfile(filepath);
@@ -857,7 +850,7 @@ int UGridFile::lead_time() const
 ////////////////////////////////////////////////////////////////////////
 
 
-void UGridFile::read_config(ConcatString config_filename) {
+void UGridFile::read_config(ConcatString config_filename, bool do_override) {
   const char *method_name = "UGridFile::read_config() ";
   MetConfig conf;
 
@@ -866,15 +859,20 @@ void UGridFile::read_config(ConcatString config_filename) {
        << "configuration from " << config_filename << " (" << replace_path(config_filename) << ")\n";
   conf.read(replace_path(config_filename).c_str());
 
-  metadata_map = parse_conf_ugrid_metadata_map(&conf);
-  metadata_names.clear();
-  for (std::map<ConcatString,StringArray>::iterator it=metadata_map.begin();
-       it!=metadata_map.end(); ++it) {
-    metadata_names.add(it->second);
+  if (do_override || bad_data_double == max_distance_km) {
+    max_distance_km = parse_conf_ugrid_max_distance_km(&conf);
   }
+  if (do_override || 0 == metadata_map.size()) {
+    metadata_map = parse_conf_ugrid_metadata_map(&conf);
+    metadata_names.clear();
+    for (std::map<ConcatString,StringArray>::iterator it=metadata_map.begin();
+         it!=metadata_map.end(); ++it) {
+      metadata_names.add(it->second);
+    }
 
-  mlog << Debug(6) << method_name
-       << "map size: " << metadata_map.size() << ", dims_vars_count = " << metadata_names.n() << "\n";
+    mlog << Debug(6) << method_name
+         << "map size: " << metadata_map.size() << ", dims_vars_count = " << metadata_names.n() << "\n";
+  }
 
 }
 
@@ -942,6 +940,49 @@ void UGridFile::read_netcdf_grid()
 
 ////////////////////////////////////////////////////////////////////////
 
+void UGridFile::set_dataset(ConcatString _dataset_name, bool do_override) {
+
+  const char *ugrid_config_name = nullptr;
+
+  dataset_name = _dataset_name;
+  ConcatString dataset_config(def_config_prefix);
+  dataset_config.add(dataset_name);
+  ugrid_config_name = replace_path(dataset_config.c_str()).c_str();
+  if (!file_exists(ugrid_config_name)) {
+    dataset_config = def_config_prefix2;
+    dataset_config.add(dataset_name);
+    ugrid_config_name = replace_path(dataset_config.c_str()).c_str();
+  }
+  if (file_exists(ugrid_config_name)) {
+    read_config(ugrid_config_name, do_override);
+  }
+  else {
+    mlog << Error << "\nUGridFile::set_dataset()"
+         << " The UGrid dataset \"" << dataset_name << "\" is not supported.\n\n";
+    exit(1);
+  }
+
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void UGridFile::set_map_config_file(ConcatString filename) {
+
+  if (file_exists(filename.c_str())) {
+    read_config(filename.c_str());
+    get_var_info();
+  }
+  else {
+    mlog << Error << "\nUGridFile::set_map_config_file()"
+         << " The UGrid metadata mapping configuration file \""
+         << filename << "\" does not exist.\n\n";
+    exit(1);
+  }
+
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void UGridFile::set_max_distance_km(double max_distance) {
 
   max_distance_km = max_distance;
@@ -950,23 +991,6 @@ void UGridFile::set_max_distance_km(double max_distance) {
     D.copy_from(grid.info().us);
     D.max_distance_km = max_distance;
     grid.set(D);
-  }
-
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void UGridFile::set_user_map_config_file(ConcatString filename) {
-
-  if (file_exists(filename.c_str())) {
-    read_config(filename.c_str());
-    get_var_info();
-  }
-  else {
-    mlog << Error << "\nUGridFile::set_user_map_config_file()"
-         << " The UGrid metadata mapping configuration file \""
-         << filename << "\" does not exist.\n\n";
-    exit(1);
   }
 
 }

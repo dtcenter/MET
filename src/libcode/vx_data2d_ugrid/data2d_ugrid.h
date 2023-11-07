@@ -109,8 +109,9 @@ class MetUGridDataFile : public Met2dDataFile {
 
       bool open  (const char * filename);
       bool open_metadata(const char * filename);
+      void set_dataset(ConcatString dataset_name);
+      void set_map_config_file(ConcatString filename);
       void set_max_distance_km(double max_distance);
-      void set_user_map_config_file(ConcatString filename);
 
       void close ();
 

@@ -46,8 +46,9 @@ class UGridFile {
       bool open(const char *filename);
       bool open_metadata(const char *filename);
       bool get_var_info();
+      void set_dataset(ConcatString _dataset_name, bool do_override=false);
+      void set_map_config_file(ConcatString filename);
       void set_max_distance_km(double max_distance);
-      void set_user_map_config_file(ConcatString filename);
 
       void close();
 
@@ -119,8 +120,8 @@ class UGridFile {
 
       std::map<ConcatString,StringArray> metadata_map;
       StringArray metadata_names;
+      ConcatString dataset_name;
       double max_distance_km;
-
          //
          //  dimensions
          //
@@ -161,7 +162,7 @@ class UGridFile {
 
       std::string find_metadata_name(std::string &key, StringArray &available_names);
       StringArray get_metadata_names(std::string &key);
-      void read_config(ConcatString config_filename);
+      void read_config(ConcatString config_filename, bool do_override=true);
       void read_netcdf_grid();
 
 };

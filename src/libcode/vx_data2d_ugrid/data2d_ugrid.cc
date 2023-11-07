@@ -1017,14 +1017,20 @@ bool MetUGridDataFile::read_data_plane(ConcatString var_name, VarInfo &vinfo,
 
 ////////////////////////////////////////////////////////////////////////
 
+void MetUGridDataFile::set_dataset(ConcatString dataset_name) {
+   _file->set_dataset(dataset_name);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void MetUGridDataFile::set_max_distance_km(double max_distance) {
    _file->set_max_distance_km(max_distance);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void MetUGridDataFile::set_user_map_config_file(ConcatString filename) {
-   _file->set_user_map_config_file(filename);
+void MetUGridDataFile::set_map_config_file(ConcatString filename) {
+   _file->set_map_config_file(filename);
 }
 
 
