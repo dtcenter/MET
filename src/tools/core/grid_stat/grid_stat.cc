@@ -304,8 +304,7 @@ void process_command_line(int argc, char **argv) {
       ConcatString ugrid_map_config = conf_info.ugrid_map_config;
       MetUGridDataFile *ugrid_mtddf = (MetUGridDataFile *)fcst_mtddf;
       ugrid_mtddf->set_max_distance_km(conf_info.ugrid_max_distance_km);
-      if (0 < ugrid_dataset.length())
-         ugrid_mtddf->set_dataset(ugrid_dataset);
+      if (0 < ugrid_dataset.length()) ugrid_mtddf->set_dataset(ugrid_dataset);
       if (0 < ugrid_map_config.length())
          ugrid_mtddf->set_map_config_file(ugrid_map_config);
       if (0 == ugrid_nc.length() || ugrid_nc == "NA") ugrid_nc = fcst_file;
@@ -320,8 +319,7 @@ void process_command_line(int argc, char **argv) {
       ConcatString ugrid_map_config = conf_info.ugrid_map_config;
       MetUGridDataFile *ugrid_mtddf = (MetUGridDataFile *)obs_mtddf;
       ugrid_mtddf->set_max_distance_km(conf_info.ugrid_max_distance_km);
-      if (0 < ugrid_dataset.length())
-         ugrid_mtddf->set_dataset(ugrid_dataset);
+      if (0 < ugrid_dataset.length()) ugrid_mtddf->set_dataset(ugrid_dataset);
       if (0 < ugrid_map_config.length())
          ugrid_mtddf->set_map_config_file(ugrid_map_config);
       if (0 == ugrid_nc.length() || ugrid_nc == "NA") ugrid_nc = fcst_file;
@@ -432,7 +430,7 @@ void setup_txt_files(unixtime valid_ut, int lead_sec) {
    max_col += n_header_columns + 1;
 
    // Initialize file stream
-   stat_out = (ofstream *) 0;
+   stat_out = (ofstream *) nullptr;
 
    // Build the file name
    stat_file << base_name << stat_file_ext;
@@ -464,7 +462,7 @@ void setup_txt_files(unixtime valid_ut, int lead_sec) {
       if(conf_info.output_flag[i] == STATOutputType_Both) {
 
          // Initialize file stream
-         txt_out[i] = (ofstream *) 0;
+         txt_out[i] = (ofstream *) nullptr;
 
          // Build the file name
          txt_file[i] << base_name << "_" << txt_file_abbr[i]
@@ -683,11 +681,11 @@ void process_scores() {
 
    DataPlane seeps_dp, seeps_dp_fcat, seeps_dp_ocat;
 
-   CTSInfo    *cts_info    = (CTSInfo *) 0;
+   CTSInfo    *cts_info    = (CTSInfo *) nullptr;
    MCTSInfo    mcts_info;
-   VL1L2Info  *vl1l2_info  = (VL1L2Info *) 0;
+   VL1L2Info  *vl1l2_info  = (VL1L2Info *) nullptr;
    NBRCNTInfo  nbrcnt_info;
-   NBRCTSInfo *nbrcts_info = (NBRCTSInfo *) 0;
+   NBRCTSInfo *nbrcts_info = (NBRCTSInfo *) nullptr;
    GRADInfo    grad_info;
    DMAPInfo    dmap_info;
 
@@ -1905,9 +1903,9 @@ void process_scores() {
    mlog << Debug(2) << "\n" << sep_str << "\n\n";
 
    // Deallocate memory
-   if(cts_info)    { delete [] cts_info;    cts_info    = (CTSInfo *)    0; }
-   if(vl1l2_info)  { delete [] vl1l2_info;  vl1l2_info  = (VL1L2Info *)  0; }
-   if(nbrcts_info) { delete [] nbrcts_info; nbrcts_info = (NBRCTSInfo *) 0; }
+   if(cts_info)    { delete [] cts_info;    cts_info    = (CTSInfo *)    nullptr; }
+   if(vl1l2_info)  { delete [] vl1l2_info;  vl1l2_info  = (VL1L2Info *)  nullptr; }
+   if(nbrcts_info) { delete [] nbrcts_info; nbrcts_info = (NBRCTSInfo *) nullptr; }
 
    return;
 }
@@ -2043,8 +2041,8 @@ void do_mcts(MCTSInfo &mcts_info, int i_vx,
 void do_cnt_sl1l2(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
    int i, j, k, n_bin;
    PairDataPoint pd_thr, pd;
-   SL1L2Info *sl1l2_info = (SL1L2Info *) 0;
-   CNTInfo   *cnt_info   = (CNTInfo *)   0;
+   SL1L2Info *sl1l2_info = (SL1L2Info *) nullptr;
+   CNTInfo   *cnt_info   = (CNTInfo *)   nullptr;
 
    mlog << Debug(2)
         << "Computing Scalar Partial Sums and Continuous Statistics.\n";
@@ -2222,8 +2220,8 @@ void do_cnt_sl1l2(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
    } // end for i (fcnt_ta)
 
    // Dealloate memory
-   if(sl1l2_info) { delete [] sl1l2_info; sl1l2_info = (SL1L2Info *) 0; }
-   if(cnt_info)   { delete [] cnt_info;   cnt_info   = (CNTInfo *)   0; }
+   if(sl1l2_info) { delete [] sl1l2_info; sl1l2_info = (SL1L2Info *) nullptr; }
+   if(cnt_info)   { delete [] cnt_info;   cnt_info   = (CNTInfo *)   nullptr; }
 
    return;
 }
@@ -2277,7 +2275,7 @@ void do_vl1l2(VL1L2Info *&v_info, int i_vx,
 void do_pct(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
    int i, j, k, n_bin;
    PairDataPoint pd;
-   PCTInfo *pct_info = (PCTInfo *) 0;
+   PCTInfo *pct_info = (PCTInfo *) nullptr;
 
    mlog << Debug(2)
         << "Computing Probabilistic Statistics.\n";
@@ -2387,7 +2385,7 @@ void do_pct(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
    } // end for i (ocnt_ta)
 
    // Dealloate memory
-   if(pct_info) { delete [] pct_info; pct_info = (PCTInfo *) 0; }
+   if(pct_info) { delete [] pct_info; pct_info = (PCTInfo *) nullptr; }
 
    return;
 }
@@ -2819,7 +2817,7 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
    } // end for i
 
    // Deallocate and clean up
-   if(data) { delete [] data; data = (float *) 0; }
+   if(data) { delete [] data; data = (float *) nullptr; }
 
    return;
 }
@@ -2854,8 +2852,8 @@ void write_nbrhd_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
    // Store the apply_mask option
    apply_mask = conf_info.vx_opt[i_vx].nc_info.do_apply_mask;
 
-   float *fcst_data = (float *) 0;
-   float *obs_data  = (float *) 0;
+   float *fcst_data = (float *) nullptr;
+   float *obs_data  = (float *) nullptr;
 
    NcVar fcst_var;
    NcVar obs_var;
@@ -2988,8 +2986,8 @@ void write_nbrhd_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
    }
 
    // Deallocate and clean up
-   if(fcst_data) { delete [] fcst_data; fcst_data = (float *) 0; }
-   if(obs_data)  { delete [] obs_data;  obs_data  = (float *) 0; }
+   if(fcst_data) { delete [] fcst_data; fcst_data = (float *) nullptr; }
+   if(obs_data)  { delete [] obs_data;  obs_data  = (float *) nullptr; }
 
    return;
 }
@@ -3053,8 +3051,8 @@ void clean_up() {
    }
 
    // Deallocate memory for data files
-   if(fcst_mtddf) { delete fcst_mtddf; fcst_mtddf = (Met2dDataFile *) 0; }
-   if(obs_mtddf)  { delete obs_mtddf;  obs_mtddf  = (Met2dDataFile *) 0; }
+   if(fcst_mtddf) { delete fcst_mtddf; fcst_mtddf = (Met2dDataFile *) nullptr; }
+   if(obs_mtddf)  { delete obs_mtddf;  obs_mtddf  = (Met2dDataFile *) nullptr; }
 
    // Deallocate memory for the random number generator
    rng_free(rng_ptr);

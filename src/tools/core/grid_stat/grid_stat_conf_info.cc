@@ -47,7 +47,7 @@ GridStatConfInfo::~GridStatConfInfo() {
 void GridStatConfInfo::init_from_scratch() {
 
    // Initialize pointers
-   vx_opt = (GridStatVxOpt *) 0;
+   vx_opt = (GridStatVxOpt *) nullptr;
 
    clear();
 
@@ -82,7 +82,7 @@ void GridStatConfInfo::clear() {
    output_nc_flag = false;
 
    // Deallocate memory
-   if(vx_opt) { delete [] vx_opt; vx_opt = (GridStatVxOpt *) 0; }
+   if(vx_opt) { delete [] vx_opt; vx_opt = (GridStatVxOpt *) nullptr; }
 
    // Reset counts
    n_vx = 0;
@@ -127,8 +127,8 @@ void GridStatConfInfo::read_configs(StringArray user_file_names) {
 void GridStatConfInfo::process_config(GrdFileType ftype,
                                       GrdFileType otype) {
    int i, j, n_fvx, n_ovx;
-   Dictionary *fdict = (Dictionary *) 0;
-   Dictionary *odict = (Dictionary *) 0;
+   Dictionary *fdict = (Dictionary *) nullptr;
+   Dictionary *odict = (Dictionary *) nullptr;
    Dictionary i_fdict, i_odict;
 
    // Dump the contents of the config file
@@ -154,7 +154,7 @@ void GridStatConfInfo::process_config(GrdFileType ftype,
 
 #ifdef WITH_UGRID
    // Conf: ugrid_dataset
-   ugrid_map_config = parse_conf_ugrid_dataset(&conf);
+   ugrid_dataset = parse_conf_ugrid_dataset(&conf);
 
    // Conf: ugrid_nc
    ugrid_nc = parse_conf_ugrid_coordinates_file(&conf);
@@ -298,18 +298,17 @@ void GridStatConfInfo::process_config(GrdFileType ftype,
 ////////////////////////////////////////////////////////////////////////
 
 void GridStatConfInfo::process_flags() {
-   int i, j;
 
    // Initialize
-   for(i=0; i<n_txt; i++) output_flag[i] = STATOutputType_None;
+   for(int i=0; i<n_txt; i++) output_flag[i] = STATOutputType_None;
    nc_info.set_all_false();
    output_ascii_flag = false;
 
    // Loop over the verification tasks
-   for(i=0; i<n_vx; i++) {
+   for(int i=0; i<n_vx; i++) {
 
       // Summary of output_flag settings
-      for(j=0; j<n_txt; j++) {
+      for(int j=0; j<n_txt; j++) {
          if(vx_opt[i].output_flag[j] == STATOutputType_Both) {
             output_flag[j] = STATOutputType_Both;
             output_ascii_flag = true;
@@ -360,7 +359,6 @@ void GridStatConfInfo::process_flags() {
 ////////////////////////////////////////////////////////////////////////
 
 void GridStatConfInfo::process_masks(const Grid &grid) {
-   int i, j;
    MaskPlane mp;
    ConcatString name;
 
@@ -375,13 +373,13 @@ void GridStatConfInfo::process_masks(const Grid &grid) {
    mask_map.clear();
 
    // Process the masks for each vx task
-   for(i=0; i<n_vx; i++) {
+   for(int i=0; i<n_vx; i++) {
 
       // Initialize
       vx_opt[i].mask_name.clear();
 
       // Parse the masking grids
-      for(j=0; j<vx_opt[i].mask_grid.n_elements(); j++) {
+      for(int j=0; j<vx_opt[i].mask_grid.n_elements(); j++) {
 
          // Process new grid masks
          if(grid_map.count(vx_opt[i].mask_grid[j]) == 0) {
@@ -399,7 +397,7 @@ void GridStatConfInfo::process_masks(const Grid &grid) {
       } // end for j
 
       // Parse the masking polylines
-      for(j=0; j<vx_opt[i].mask_poly.n_elements(); j++) {
+      for(int j=0; j<vx_opt[i].mask_poly.n_elements(); j++) {
 
          // Process new poly mask
          if(poly_map.count(vx_opt[i].mask_poly[j]) == 0) {
@@ -436,10 +434,10 @@ void GridStatConfInfo::process_masks(const Grid &grid) {
 ////////////////////////////////////////////////////////////////////////
 
 int GridStatConfInfo::n_txt_row(int i_txt_row) const {
-   int i, n;
+   int n;
 
    // Loop over the tasks and sum the line counts for this line type
-   for(i=0, n=0; i<n_vx; i++) n += vx_opt[i].n_txt_row(i_txt_row);
+   for(int i=0, n=0; i<n_vx; i++) n += vx_opt[i].n_txt_row(i_txt_row);
 
    return(n);
 }
@@ -447,10 +445,10 @@ int GridStatConfInfo::n_txt_row(int i_txt_row) const {
 ////////////////////////////////////////////////////////////////////////
 
 int GridStatConfInfo::n_stat_row() const {
-   int i, n;
+   int n;
 
    // Loop over the line types and sum the line counts
-   for(i=0, n=0; i<n_txt; i++) n += n_txt_row(i);
+   for(int i=0, n=0; i<n_txt; i++) n += n_txt_row(i);
 
    return(n);
 }
@@ -458,9 +456,9 @@ int GridStatConfInfo::n_stat_row() const {
 ////////////////////////////////////////////////////////////////////////
 
 int GridStatConfInfo::get_max_n_cat_thresh() const {
-   int i, n;
+   int n;
 
-   for(i=0,n=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_cat_thresh());
+   for(int i=0,n=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_cat_thresh());
 
    return(n);
 }
@@ -468,9 +466,9 @@ int GridStatConfInfo::get_max_n_cat_thresh() const {
 ////////////////////////////////////////////////////////////////////////
 
 int GridStatConfInfo::get_max_n_cnt_thresh() const {
-   int i, n;
+   int n;
 
-   for(i=0,n=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_cnt_thresh());
+   for(int i=0,n=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_cnt_thresh());
 
    return(n);
 }
@@ -478,9 +476,9 @@ int GridStatConfInfo::get_max_n_cnt_thresh() const {
 ////////////////////////////////////////////////////////////////////////
 
 int GridStatConfInfo::get_max_n_wind_thresh() const {
-   int i, n;
+   int n;
 
-   for(i=0,n=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_wind_thresh());
+   for(int i=0,n=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_wind_thresh());
 
    return(n);
 }
@@ -488,9 +486,9 @@ int GridStatConfInfo::get_max_n_wind_thresh() const {
 ////////////////////////////////////////////////////////////////////////
 
 int GridStatConfInfo::get_max_n_fprob_thresh() const {
-   int i, n;
+   int n;
 
-   for(i=0,n=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_fprob_thresh());
+   for(int i=0,n=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_fprob_thresh());
 
    return(n);
 }
@@ -498,9 +496,9 @@ int GridStatConfInfo::get_max_n_fprob_thresh() const {
 ////////////////////////////////////////////////////////////////////////
 
 int GridStatConfInfo::get_max_n_oprob_thresh() const {
-   int i, n;
+   int n;
 
-   for(i=0,n=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_oprob_thresh());
+   for(int i=0,n=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_oprob_thresh());
 
    return(n);
 }
@@ -508,9 +506,9 @@ int GridStatConfInfo::get_max_n_oprob_thresh() const {
 ////////////////////////////////////////////////////////////////////////
 
 int GridStatConfInfo::get_max_n_eclv_points() const {
-   int i, n;
+   int n;
 
-   for(i=0,n=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_eclv_points());
+   for(int i=0,n=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_eclv_points());
 
    return(n);
 }
@@ -518,9 +516,9 @@ int GridStatConfInfo::get_max_n_eclv_points() const {
 ////////////////////////////////////////////////////////////////////////
 
 int GridStatConfInfo::get_max_n_cov_thresh() const {
-   int i, n;
+   int n;
 
-   for(i=0,n=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_cov_thresh());
+   for(int i=0,n=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_cov_thresh());
 
    return(n);
 }
@@ -548,8 +546,8 @@ GridStatVxOpt::~GridStatVxOpt() {
 void GridStatVxOpt::init_from_scratch() {
 
    // Initialize pointers
-   fcst_info   = (VarInfo *)    0;
-   obs_info    = (VarInfo *)    0;
+   fcst_info   = (VarInfo *)    nullptr;
+   obs_info    = (VarInfo *)    nullptr;
 
    clear();
 
@@ -617,8 +615,8 @@ void GridStatVxOpt::clear() {
    nc_info.clear();
 
    // Deallocate memory
-   if(fcst_info) { delete fcst_info; fcst_info = (VarInfo *) 0; }
-   if(obs_info)  { delete obs_info;  obs_info  = (VarInfo *) 0; }
+   if(fcst_info) { delete fcst_info; fcst_info = (VarInfo *) nullptr; }
+   if(obs_info)  { delete obs_info;  obs_info  = (VarInfo *) nullptr; }
 
    return;
 }
@@ -917,7 +915,7 @@ void GridStatVxOpt::process_config(
 ////////////////////////////////////////////////////////////////////////
 
 void GridStatVxOpt::parse_nc_info(Dictionary &odict) {
-   const DictionaryEntry * e = (const DictionaryEntry *) 0;
+   const DictionaryEntry * e = (const DictionaryEntry *) nullptr;
 
    e = odict.lookup(conf_key_nc_pairs_flag);
 
@@ -1051,7 +1049,7 @@ int GridStatVxOpt::n_txt_row(int i_txt_row) const {
    }
 
    // Check if this output line type is requested
-   if(output_flag[i_txt_row] == STATOutputType_None) return(0);
+   if(output_flag[i_txt_row] == STATOutputType_None) return 0;
 
    bool prob_flag = fcst_info->is_prob();
    bool vect_flag = (fcst_info->is_u_wind() && obs_info->is_u_wind());
@@ -1219,42 +1217,37 @@ int GridStatVxOpt::n_txt_row(int i_txt_row) const {
          exit(1);
    }
 
-   return(n);
+   return n;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 int GridStatVxOpt::get_n_cnt_thresh() const {
-   return((!fcst_info || fcst_info->is_prob()) ?
-          0 : fcnt_ta.n_elements());
+   return (!fcst_info || fcst_info->is_prob()) ? 0 : fcnt_ta.n_elements();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 int GridStatVxOpt::get_n_cat_thresh() const {
-   return((!fcst_info || fcst_info->is_prob()) ?
-          0 : fcat_ta.n_elements());
+   return (!fcst_info || fcst_info->is_prob()) ? 0 : fcat_ta.n_elements();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 int GridStatVxOpt::get_n_wind_thresh() const {
-   return((!fcst_info || fcst_info->is_prob()) ?
-          0 : fwind_ta.n_elements());
+   return (!fcst_info || fcst_info->is_prob()) ? 0 : fwind_ta.n_elements();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 int GridStatVxOpt::get_n_fprob_thresh() const {
-   return((!fcst_info || !fcst_info->is_prob()) ?
-          0 : fcat_ta.n_elements());
+   return (!fcst_info || !fcst_info->is_prob()) ? 0 : fcat_ta.n_elements();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 int GridStatVxOpt::get_n_oprob_thresh() const {
-   return((!fcst_info || !fcst_info->is_prob()) ?
-          0 : ocat_ta.n_elements());
+   return (!fcst_info || !fcst_info->is_prob()) ? 0 : ocat_ta.n_elements();
 }
 
 
