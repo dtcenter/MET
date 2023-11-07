@@ -85,9 +85,10 @@ extern void            parse_conf_range_int(Dictionary *dict, int &beg, int &end
 extern void            parse_conf_range_double(Dictionary *dict, double &beg, double &end);
 extern StringArray     parse_conf_ens_member_ids(Dictionary *dict);
 extern NormalizeType   parse_conf_normalize(Dictionary *dict);
-extern double          parse_conf_ugrid_max_distance_km(Dictionary *dict);
-extern ConcatString    parse_conf_ugrid_user_map_config(Dictionary *dict);
 extern ConcatString    parse_conf_ugrid_coordinates_file(Dictionary *dict);
+extern ConcatString    parse_conf_ugrid_dataset(Dictionary *dict);
+extern ConcatString    parse_conf_ugrid_map_config(Dictionary *dict);
+extern double          parse_conf_ugrid_max_distance_km(Dictionary *dict);
 extern std::map<ConcatString,StringArray> parse_conf_ugrid_metadata_map(Dictionary *dict);
 
 extern void         check_mask_names(const StringArray &);

@@ -2260,6 +2260,20 @@ WaveletType parse_conf_wavelet_type(Dictionary *dict) {
    return t;
 }
 
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+ConcatString parse_conf_ugrid_coordinates_file(Dictionary *dict) {
+   return dict ? dict->lookup_string(conf_key_ugrid_coordinates_file, false) : "";
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+ConcatString parse_conf_ugrid_dataset(Dictionary *dict) {
+   return dict ? dict->lookup_string(conf_key_ugrid_dataset, false) : "";
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 double parse_conf_ugrid_max_distance_km(Dictionary *dict) {
@@ -2268,8 +2282,8 @@ double parse_conf_ugrid_max_distance_km(Dictionary *dict) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-ConcatString parse_conf_ugrid_coordinates_file(Dictionary *dict) {
-   return dict ? dict->lookup_string(conf_key_ugrid_coordinates_file, false) : "";
+ConcatString parse_conf_ugrid_map_config(Dictionary *dict) {
+   return dict ? dict->lookup_string(conf_key_ugrid_map_config, false) : "";
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2277,12 +2291,6 @@ ConcatString parse_conf_ugrid_coordinates_file(Dictionary *dict) {
 map<ConcatString,StringArray> parse_conf_ugrid_metadata_map(Dictionary *dict) {
    const char *method_name = "parse_conf_ugrid_metadata_map() -> ";
    return parse_conf_key_values_map(dict, conf_key_ugrid_metadata_map, method_name);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-ConcatString parse_conf_ugrid_user_map_config(Dictionary *dict) {
-   return dict ? dict->lookup_string(conf_key_ugrid_user_map_config, false) : "";
 }
 
 
