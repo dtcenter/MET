@@ -1661,7 +1661,6 @@ void ModeFuzzyEngine::do_obs_merge_thresh(const ShapeData &merge_data) {
    // Calculate the composite object sets
    //
    for(mid=1; mid<=n_obs_merge; mid++) {
-
       // Ignore merge objects containing a single simple object
       if(mrg_to_obj_map[mid].size() <= 1) continue;
 
