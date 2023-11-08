@@ -434,10 +434,10 @@ void GridStatConfInfo::process_masks(const Grid &grid) {
 ////////////////////////////////////////////////////////////////////////
 
 int GridStatConfInfo::n_txt_row(int i_txt_row) const {
-   int n;
+   int n = 0;
 
    // Loop over the tasks and sum the line counts for this line type
-   for(int i=0, n=0; i<n_vx; i++) n += vx_opt[i].n_txt_row(i_txt_row);
+   for(int i=0; i<n_vx; i++) n += vx_opt[i].n_txt_row(i_txt_row);
 
    return(n);
 }
@@ -445,10 +445,10 @@ int GridStatConfInfo::n_txt_row(int i_txt_row) const {
 ////////////////////////////////////////////////////////////////////////
 
 int GridStatConfInfo::n_stat_row() const {
-   int n;
+   int n = 0;
 
    // Loop over the line types and sum the line counts
-   for(int i=0, n=0; i<n_txt; i++) n += n_txt_row(i);
+   for(int i=0; i<n_txt; i++) n += n_txt_row(i);
 
    return(n);
 }
@@ -456,9 +456,9 @@ int GridStatConfInfo::n_stat_row() const {
 ////////////////////////////////////////////////////////////////////////
 
 int GridStatConfInfo::get_max_n_cat_thresh() const {
-   int n;
+   int n = 0;
 
-   for(int i=0,n=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_cat_thresh());
+   for(int i=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_cat_thresh());
 
    return(n);
 }
@@ -466,9 +466,9 @@ int GridStatConfInfo::get_max_n_cat_thresh() const {
 ////////////////////////////////////////////////////////////////////////
 
 int GridStatConfInfo::get_max_n_cnt_thresh() const {
-   int n;
+   int n = 0;
 
-   for(int i=0,n=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_cnt_thresh());
+   for(int i=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_cnt_thresh());
 
    return(n);
 }
@@ -476,9 +476,9 @@ int GridStatConfInfo::get_max_n_cnt_thresh() const {
 ////////////////////////////////////////////////////////////////////////
 
 int GridStatConfInfo::get_max_n_wind_thresh() const {
-   int n;
+   int n = 0;
 
-   for(int i=0,n=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_wind_thresh());
+   for(int i=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_wind_thresh());
 
    return(n);
 }
@@ -486,9 +486,9 @@ int GridStatConfInfo::get_max_n_wind_thresh() const {
 ////////////////////////////////////////////////////////////////////////
 
 int GridStatConfInfo::get_max_n_fprob_thresh() const {
-   int n;
+   int n = 0;
 
-   for(int i=0,n=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_fprob_thresh());
+   for(int i=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_fprob_thresh());
 
    return(n);
 }
@@ -496,9 +496,9 @@ int GridStatConfInfo::get_max_n_fprob_thresh() const {
 ////////////////////////////////////////////////////////////////////////
 
 int GridStatConfInfo::get_max_n_oprob_thresh() const {
-   int n;
+   int n = 0;
 
-   for(int i=0,n=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_oprob_thresh());
+   for(int i=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_oprob_thresh());
 
    return(n);
 }
@@ -506,9 +506,9 @@ int GridStatConfInfo::get_max_n_oprob_thresh() const {
 ////////////////////////////////////////////////////////////////////////
 
 int GridStatConfInfo::get_max_n_eclv_points() const {
-   int n;
+   int n = 0;
 
-   for(int i=0,n=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_eclv_points());
+   for(int i=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_eclv_points());
 
    return(n);
 }
@@ -518,7 +518,7 @@ int GridStatConfInfo::get_max_n_eclv_points() const {
 int GridStatConfInfo::get_max_n_cov_thresh() const {
    int n;
 
-   for(int i=0,n=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_cov_thresh());
+   for(int i=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_cov_thresh());
 
    return(n);
 }
