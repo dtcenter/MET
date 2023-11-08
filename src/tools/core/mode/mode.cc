@@ -56,6 +56,7 @@
 //   019    04/01/19  Fillmore       Add FCST and OBS units.
 //   020    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
 //   021    06/09/23  Albo           Major changes for multivariate mode
+//   022    11/02/23  Halley Gotway  MET #2724 add OpenMP to convolution
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -73,6 +74,7 @@ using namespace std;
 #include <sys/types.h>
 
 #include "main.h"
+#include "handle_openmp.h"
 #include "string_array.h"
 #include "mode_usage.h"
 #include "mode_frontend.h"
@@ -130,6 +132,9 @@ int met_main(int argc, char * argv [])
    StringArray Argv;
    string s;
    const char * user_config_filename = 0;
+
+   // Set up OpenMP (if enabled)
+   init_openmp();
 
    for (j=0,n=0; j<argc; ++j)  {
 
@@ -190,7 +195,7 @@ int met_main(int argc, char * argv [])
       // run the traditional version of mode
       
       ModeFrontEnd *frontend = new ModeFrontEnd;
-      status = frontend->run(Argv);
+      status = frontend->run_traditional(Argv);
 
       if ( frontend )  { delete frontend;  frontend = 0; }
    }

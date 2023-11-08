@@ -353,7 +353,7 @@ void Mode_Field_Info::set_merge_thresh_by_index (int k)
 
 if ( (k < 0) || (k >= merge_thresh_array.n_elements()) )  {
 
-   mlog << Error << "\nMode_Field_Info::set_fcst_merge_thresh_by_index(int) -> "
+   mlog << Error << "\nMode_Field_Info::set_merge_thresh_by_index(int) -> "
         << "range check error\n\n";
 
    exit ( 1 );

@@ -38,84 +38,49 @@ static void populate_bool_plane(const string &name, const int * buf, const int n
 static void  _debug_shape_examine(const string &name, const ShapeData &sd, int nx, int ny);
 
 
-void MultiVarData1::set_fcst_obj(ShapeData *sd)
+void MultiVarData1::set_obj(ShapeData *sd)
 {
-   if (_fcst_obj_sd) {
-      delete _fcst_obj_sd;
+   if (_obj_sd) {
+      delete _obj_sd;
    }
-   _fcst_obj_sd = new ShapeData(*sd);
+   _obj_sd = new ShapeData(*sd);
 
-   if (_fcst_obj_data) {
-      delete _fcst_obj_data;
+   if (_obj_data) {
+      delete _obj_data;
    }
-   _fcst_obj_data = _fill_int_array(sd);
+   _obj_data = _fill_int_array(sd);
 }
 
-void MultiVarData1::set_fcst_raw(ShapeData *sd)
+void MultiVarData1::set_raw(ShapeData *sd)
 {
-   if (_fcst_raw_data) {
-      delete _fcst_raw_data;
+   if (_raw_data) {
+      delete _raw_data;
    }
-   _fcst_raw_data = _fill_float_array(sd);
-   
+   _raw_data = _fill_float_array(sd);
 }
 
-void MultiVarData1::set_obs_obj(ShapeData *sd)
+void MultiVarData1::set_shapedata(const ShapeData &sd)
 {
-   if (_obs_obj_sd) {
-      delete _obs_obj_sd;
-   }
-   _obs_obj_sd = new ShapeData(*sd);
-
-   if (_obs_obj_data) {
-      delete _obs_obj_data;
-   }
-   _obs_obj_data = _fill_int_array(sd);
-}
-
-void MultiVarData1::set_obs_raw(ShapeData *sd)
-{
-   if (_obs_raw_data) {
-      delete _obs_raw_data;
-   }
-   _obs_raw_data = _fill_float_array(sd);
-   
-}
-
-void MultiVarData1::set_fcst_shapedata(const ShapeData &sd)
-{
-   if (_Fcst_sd) delete _Fcst_sd;
-   _Fcst_sd = new ShapeData(sd);
-}
-
-void MultiVarData1::set_obs_shapedata(const ShapeData &sd)
-{
-   if (_Obs_sd) delete _Obs_sd;
-   _Obs_sd = new ShapeData(sd);
+   if (_sd) delete _sd;
+   _sd = new ShapeData(sd);
 }
 
 void  MultiVarData1::objects_from_arrays(bool do_clusters,
-                                        BoolPlane & fcst_out, 
-                                        BoolPlane & obs_out)
+                                         BoolPlane & out)
 {
-   string name = _name + "_Fcst";
-   populate_bool_plane(name, _fcst_obj_data, _nx, _ny, fcst_out);
-   name = _name + "_Obs";
-   populate_bool_plane(name, _obs_obj_data, _nx, _ny, obs_out);
+   string name = _name + "_" + sprintModeDataType(_dataType);
+   populate_bool_plane(name, _obj_data, _nx, _ny, out);
+   // name = _name + "_Obs";
+   // populate_bool_plane(name, _obs_obj_data, _nx, _ny, obs_out);
 }
 
-void MultiVarData1::print(const string &fname, const string &oname) const
+void MultiVarData1::print(const string &name) const
 {
    string n;
-   n = fname + "_" + _name + "_Fcst_Obj";
-   if (_fcst_obj_data) {
-      _print_summary(n, _fcst_obj_data, *_fcst_obj_sd);
-   } else {
-      mlog << Debug(2) << n << " is empty\n";
-   }
-   n = oname + "_" + _name + "_Obs_Obj";
-   if (_obs_obj_data) {
-      _print_summary(n, _obs_obj_data, *_obs_obj_sd);
+   // might want a _Fcst_Obj kind of thing
+   n = name + "_" + _name + "_" + sprintModeDataType(_dataType) + "_Obj";
+   if (_obj_data) {
+      _print_summary(n, _obj_data, *_obj_sd);
    } else {
       mlog << Debug(2) << n << " is empty\n";
    }
@@ -165,17 +130,15 @@ void MultiVarData1::_print_summary(const string &name, int *data, const ShapeDat
 }
 
 MultiVarData::MultiVarData() :
+   _dataType(ModeDataType_MvMode_Both),
    _simple(0),
    _merge(0),
-   _f_name("notset"),
-   _o_name("notset"),
+   _name("notset"),
    _nx(0), _ny(0),
    _grid(0),
-   _ftype(FileType_None),
-   _otype(FileType_None)
+   _type(FileType_None)
 {
 }   
-
 
 MultiVarData::~MultiVarData() 
 {
@@ -185,124 +148,73 @@ MultiVarData::~MultiVarData()
 void MultiVarData::checkFileTypeConsistency(const MultiVarData &mvdi, int j)
 {
    bool err = false;
-   if (_ftype != mvdi._ftype) {
-      err = true;
+   if (_type != mvdi._type) {
       mlog << Error << "\n" 
-           << ": forecast inputs of different file types not supported "
-           << "Input 0:" << grdfiletype_to_string(_ftype).c_str()
-           << "Input " << j << ":" << grdfiletype_to_string(mvdi._ftype).c_str()
+           << ": inputs of different file types not supported "
+           << "Input 0:" << grdfiletype_to_string(_type).c_str()
+           << "Input " << j << ":" << grdfiletype_to_string(mvdi._type).c_str()
            << "\n\n";
-   }
-         
-   if (_otype != mvdi._otype) {
-      err = true;
-      mlog << Error << "\n" 
-           << ": obs inputs of different file types not supported "
-           << "Input 0:" << grdfiletype_to_string(_otype).c_str()
-           << "Input " << j << ":" << grdfiletype_to_string(mvdi._otype).c_str()
-           << "\n\n";
-   }
-   if (err) {
       exit ( 1 );
    }
 }
 
-void MultiVarData::init(const string &fname, const string &oname,
-                        const Grid &grid, GrdFileType ftype,
-                        GrdFileType otype, 
-                        const string &funits, const string &ounits,
-                        const string &flevel, const string &olevel,
-                        double data_min, double data_max)
+void MultiVarData::init(ModeDataType dataType,
+                         const string &name, 
+                         const Grid &grid, GrdFileType type,
+                         const string &units,
+                         const string &level,
+                         double data_min, double data_max)
 {
    _clear();
-   _f_name = fname;
-   _o_name = oname;
+
+   _dataType = dataType;
+   _name = name;
    _nx = grid.nx();
    _ny = grid.ny();
    _grid = new Grid(grid);
-   _ftype = ftype;
-   _otype = otype;
-   _funits = funits;
-   _ounits = ounits;
-   _flevel = flevel;
-   _olevel = olevel;
+   _type = type;
+   _units = units;
+   _level = level;
    _data_min = data_min;
    _data_max = data_max;
-   _simple = new MultiVarData1(_nx, _ny, "Simple");
-   _merge = new MultiVarData1(_nx, _ny, "Merge");
+   _simple = new MultiVarData1(_nx, _ny, "Simple", _dataType);
+   _merge = new MultiVarData1(_nx, _ny, "Merge", _dataType);
 }
 
-
-void MultiVarData::set_fcst_obj(ShapeData *sd, bool simple)
+void MultiVarData::set_obj(ShapeData *sd, bool simple)
 {
    if (simple) {
-      _simple->set_fcst_obj(sd);
+      _simple->set_obj(sd);
    }
    else {
-      _merge->set_fcst_obj(sd);
+      _merge->set_obj(sd);
    }
 }
       
-void MultiVarData::set_fcst_raw(ShapeData *sd, bool simple)
+void MultiVarData::set_raw(ShapeData *sd, bool simple)
 {
    if (simple) {
-      _simple->set_fcst_raw(sd);
+      _simple->set_raw(sd);
    } else {
-      _merge->set_fcst_raw(sd);
+      _merge->set_raw(sd);
    }
 }
       
-void MultiVarData::set_obs_obj(ShapeData *sd, bool simple)
+void MultiVarData::set_shapedata(const ShapeData &sd, bool simple)
 {
    if (simple) {
-      _simple->set_obs_obj(sd);
+      _simple->set_shapedata(sd);
    } else {
-      _merge->set_obs_obj(sd);
-   }
-}
-      
-void MultiVarData::set_obs_raw(ShapeData *sd, bool simple)
-{
-   if (simple) {
-      _simple->set_obs_raw(sd);
-   } else {
-      _merge->set_obs_raw(sd);
-   }
-}
-      
-void MultiVarData::set_fcst_shapedata(const ShapeData &sd, bool simple)
-{
-   if (simple) {
-      _simple->set_fcst_shapedata(sd);
-   } else {
-      _merge->set_fcst_shapedata(sd);
+      _merge->set_shapedata(sd);
    }
 }
 
-void MultiVarData::set_obs_shapedata(const ShapeData &sd, bool simple)
+const ShapeData *MultiVarData::shapedata_ptr(bool simple) const
 {
    if (simple) {
-      _simple->set_obs_shapedata(sd);
+      return _simple->_sd;
    } else {
-      _merge->set_obs_shapedata(sd);
-   }
-}
-
-const ShapeData *MultiVarData::fcst_shapedata_ptr(bool simple) const
-{
-   if (simple) {
-      return _simple->_Fcst_sd;
-   } else {
-      return _merge->_Fcst_sd;
-   }
-}
-
-const ShapeData *MultiVarData::obs_shapedata_ptr(bool simple) const
-{
-   if (simple) {
-      return _simple->_Obs_sd;
-   } else {
-      return _merge->_Obs_sd;
+      return _merge->_sd;
    }
 }
 
@@ -310,14 +222,13 @@ const ShapeData *MultiVarData::obs_shapedata_ptr(bool simple) const
 
 
 void  MultiVarData::objects_from_arrays(bool do_clusters,
-                                        bool simple,
-                                        BoolPlane & fcst_out, 
-                                        BoolPlane & obs_out)
+                                         bool simple,
+                                         BoolPlane & out)
 {
    if (simple) {
-      _simple->objects_from_arrays(do_clusters, fcst_out, obs_out);
+      _simple->objects_from_arrays(do_clusters, out);
    } else {
-      _merge->objects_from_arrays(do_clusters, fcst_out, obs_out);
+      _merge->objects_from_arrays(do_clusters, out);
    }
 }  
 
@@ -325,11 +236,10 @@ void  MultiVarData::objects_from_arrays(bool do_clusters,
 ////////////////////////////////////////////////////////////////////////
 
 
-
 void  MultiVarData::print(void) const
 {
-   _simple->print(_f_name, _o_name);
-   _merge->print(_f_name, _o_name);
+   _simple->print(_name);
+   _merge->print(_name);
 }  
 
 
@@ -351,8 +261,7 @@ void MultiVarData::_clear()
       _grid = 0;
    }
    _nx = _ny = 0;
-   _ftype = FileType_None;
-   _otype = FileType_None;
+   _type = FileType_None;
 }
 
 

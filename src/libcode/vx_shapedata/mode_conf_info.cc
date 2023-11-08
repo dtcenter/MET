@@ -57,9 +57,11 @@ void ModeConfInfo::init_from_scratch()
 
 {
 
-   N_fields = 0;
+   N_fields_f = 0;
+   N_fields_o = 0;
 
-   Field_Index = 0;
+   Field_Index_f = 0;
+   Field_Index_o = 0;
 
    fcst_array = 0;
     obs_array = 0;
@@ -90,10 +92,11 @@ void ModeConfInfo::clear()
 
    grid_res = bad_data_double;
 
-   Field_Index = 0;
+   Field_Index_f = 0;
+   Field_Index_o = 0;
 
    fcst_multivar_logic.clear();
-    obs_multivar_logic.clear();
+   obs_multivar_logic.clear();
 
    match_flag = MatchType_None;
 
@@ -159,7 +162,12 @@ void ModeConfInfo::clear()
    Fcst = 0;
     Obs = 0;
 
-   N_fields = 0;
+   // so traditional mode will have the right value
+   data_type = ModeDataType_Traditional; 
+
+   // N_fields = 0;
+   N_fields_f = 0;
+   N_fields_o = 0;
 
    return;
 
@@ -192,16 +200,11 @@ void ModeConfInfo::read_config(const char * default_file_name, const char * user
 ////////////////////////////////////////////////////////////////////////
 
 
-void ModeConfInfo::process_config(GrdFileType ftype, GrdFileType otype)
+void ModeConfInfo::process_config(GrdFileType ftype, GrdFileType otype,
+                                  ModeDataType dt)
 
 {
-
-int j, k, n;
-// VarInfoFactory info_factory;
-Dictionary * fcst_dict = (Dictionary *) 0;
-Dictionary * obs_dict  = (Dictionary *) 0;
-Dictionary * dict      = (Dictionary *) 0;
-PlotInfo plot_info;
+   Dictionary * dict      = (Dictionary *) 0;
 
       // Dump the contents of the config file
 
@@ -210,6 +213,8 @@ PlotInfo plot_info;
       // Initialize
 
    clear();
+
+   set_data_type(dt);
 
       // Conf: version
 
@@ -235,135 +240,6 @@ PlotInfo plot_info;
 
    quilt = conf.lookup_bool(conf_key_quilt);
 
-      // Conf: fcst and obs
-
-   fcst_dict = conf.lookup_dictionary(conf_key_fcst);
-   obs_dict  = conf.lookup_dictionary(conf_key_obs);
-
-   read_fields (fcst_array, fcst_dict, ftype, 'F');   //  the order is important here
-   read_fields ( obs_array,  obs_dict, otype, 'O');   //  the order is important here
-
-   Fcst = fcst_array;    //  + 0
-    Obs =  obs_array;    //  + 0
-
-      // Dump the contents of the VarInfo objects
-
-   if(mlog.verbosity_level() >= 5)  {
-      for (j=0; j<N_fields; ++j)  {
-         mlog << Debug(5)
-              << "Parsed forecast field:\n";
-         fcst_array[j].var_info->dump(cout);
-         mlog << Debug(5)
-              << "Parsed observation field:\n";
-         obs_array[j].var_info->dump(cout);
-      }   //  for j
-   }
-
-      // No support for wind direction
-
-   for (j=0; j<N_fields; ++j)  {
-      if(fcst_array[j].var_info->is_wind_direction() || obs_array[j].var_info->is_wind_direction())  {
-         mlog << Error << "\nModeConfInfo::process_config() -> "
-              << "the wind direction field may not be verified "
-              << "using MODE.\n\n";
-         exit(1);
-      }
-   }
-
-   for (j=0; j<N_fields; ++j)  {
-
-      if ( fcst_array[j].conv_radius_array.n_elements() != obs_array[j].conv_radius_array.n_elements() )  {
-
-         mlog << Error << "\nModeConfInfo::process_config() -> "
-              << "fcst and obs convolution radius arrays need to be the same size\n\n";
-
-         exit ( 1 );
-
-      }
-
-   }
-
-      // Check that fcst_conv_radius and obs_conv_radius are non-negative
-
-   for (j=0; j<N_fields; ++j)  {
-
-      n = fcst_array[j].conv_radius_array.n_elements();   //  same as obs_conv_radius_array.n_elements()
-
-      for (k=0; k<n; ++k)  {
-
-         if(fcst_array[j].conv_radius_array[k] < 0 || obs_array[j].conv_radius_array[k] < 0) {
-
-            mlog << Error << "\nModeConfInfo::process_config() -> "
-                 << "fcst_conv_radius (" << fcst_array[j].conv_radius_array[k]
-                 << ") and obs_conv_radius (" << obs_array[j].conv_radius_array[k]
-                 << ") must be non-negative\n\n";
-
-            exit(1);
-
-         }
-
-      }   //  for k
-
-   }   //  for j
-
-
-   for (j=0; j<N_fields; ++j)  {
-
-      if ( fcst_array[j].conv_radius_array.n_elements() == 1 )  fcst_array[j].conv_radius = fcst_array[j].conv_radius_array[0];
-      if (  obs_array[j].conv_radius_array.n_elements() == 1 )   obs_array[j].conv_radius =  obs_array[j].conv_radius_array[0];
-
-   }
-
-   for (j=0; j<N_fields; ++j)  {
-
-      if ( fcst_array[j].conv_thresh_array.n_elements() != obs_array[j].conv_thresh_array.n_elements() )  {
-
-         mlog << Error << "\nModeConfInfo::process_config() -> "
-              << "fcst and obs convolution threshold arrays need to be the same size\n\n";
-
-         exit ( 1 );
-
-      }
-
-   }
-
-   for (j=0; j<N_fields; ++j)  {
-
-      if ( fcst_array[j].conv_thresh_array.n_elements() == 1 )  fcst_array[j].conv_thresh = fcst_array[j].conv_thresh_array[0];
-      if (  obs_array[j].conv_thresh_array.n_elements() == 1 )   obs_array[j].conv_thresh =  obs_array[j].conv_thresh_array[0];
-
-   }
-
-   for (j=0; j<N_fields; ++j)  {
-
-      if ( fcst_array[j].need_merge_thresh() && (fcst_array[j].merge_thresh_array.n_elements() != fcst_array[j].conv_thresh_array.n_elements()) )  {
-
-         mlog << Error << "\nModeConfInfo::process_config() -> "
-              << "fcst conv thresh and fcst merge thresh arrays need to be the same size\n\n";
-
-         exit ( 1 );
-
-      }
-
-
-      if ( obs_array[j].need_merge_thresh() && (obs_array[j].merge_thresh_array.n_elements() != obs_array[j].conv_thresh_array.n_elements()) )  {
-
-         mlog << Error << "\nModeConfInfo::process_config() -> "
-              << "obs conv thresh and obs merge thresh arrays need to be the same size\n\n";
-
-         exit ( 1 );
-
-      }
-
-   }   //  for j
-
-   for (j=0; j<N_fields; ++j)  {
-
-      if ( fcst_array[j].merge_thresh_array.n_elements() == 1 )  fcst_array[j].merge_thresh = fcst_array[j].merge_thresh_array[0];
-      if (  obs_array[j].merge_thresh_array.n_elements() == 1 )   obs_array[j].merge_thresh =  obs_array[j].merge_thresh_array[0];
-
-   }
-
       // Conf: mask_missing_flag
 
    mask_missing_flag = int_to_fieldtype(conf.lookup_int(conf_key_mask_missing_flag));
@@ -371,25 +247,6 @@ PlotInfo plot_info;
       // Conf: match_flag
 
    match_flag = int_to_matchtype(conf.lookup_int(conf_key_match_flag));
-
-      // Check that match_flag is set between 0 and 3
-
-   for (j=0; j<N_fields; ++j)  {
-
-      if(match_flag == MatchType_None &&
-         (fcst_array[j].merge_flag != MergeType_None || obs_array[j].merge_flag  != MergeType_None) ) {
-         mlog << Warning 
-              << "\nModeConfInfo::process_config() -> "
-              << "When matching is disabled (match_flag = "
-              << matchtype_to_string(match_flag)
-              << ") but merging is requested (fcst_merge_flag = "
-              << mergetype_to_string(fcst_array[j].merge_flag)
-              << ", obs_merge_flag = "
-              << mergetype_to_string(obs_array[j].merge_flag)
-              << ") any merging information will be discarded.\n\n";
-      }
-
-   }
 
       // Conf: max_centroid_dist
 
@@ -414,7 +271,6 @@ PlotInfo plot_info;
    mask_poly_flag = int_to_fieldtype(conf.lookup_int(conf_key_mask_poly_flag));
 
       // Conf: weight
-
    dict = conf.lookup_dictionary(conf_key_weight);
 
       // Parse the weights
@@ -513,14 +369,6 @@ PlotInfo plot_info;
 
    met_data_dir = replace_path(conf.lookup_string(conf_key_met_data_dir).c_str());
 
-      // Conf: fcst_raw_plot
-
-   fcst_array->raw_pi = parse_conf_plot_info(conf.lookup_dictionary(conf_key_fcst_raw_plot));
-
-      // Conf: obs_raw_plot
-
-    obs_array->raw_pi = parse_conf_plot_info(conf.lookup_dictionary(conf_key_obs_raw_plot));
-
       // Conf: object_plot
 
    object_pi = parse_conf_plot_info(conf.lookup_dictionary(conf_key_object_plot));
@@ -549,14 +397,277 @@ PlotInfo plot_info;
 
    output_prefix = conf.lookup_string(conf_key_output_prefix);
 
+   if (data_type == ModeDataType_MvMode_Fcst) {
+
+      process_config_fcst(ftype);
+
+   } else if (data_type == ModeDataType_MvMode_Obs) {
+
+      process_config_obs(otype);
+
+   } else {
+
+      process_config_both(ftype, otype);
+   }
+}
+
+////////////////////////////////////////////////////////////////////////
+
+
+void ModeConfInfo::process_config_both(GrdFileType ftype, GrdFileType otype)
+{
+   int j, k, n;
+
+      // VarInfoFactory info_factory;
+
+   Dictionary * fcst_dict = (Dictionary *) 0;
+   Dictionary * obs_dict  = (Dictionary *) 0;
+   //Dictionary * dict      = (Dictionary *) 0;
+   //PlotInfo plot_info;
+
+      // Conf: fcst and obs
+
+   fcst_dict = conf.lookup_dictionary(conf_key_fcst);
+   obs_dict  = conf.lookup_dictionary(conf_key_obs);
+
       // Conf: shift_right
 
-    shift_right = fcst_dict->lookup_int(conf_key_shift_right);
+   shift_right = fcst_dict->lookup_int(conf_key_shift_right);
+
+
+   read_fields (fcst_array, fcst_dict, ftype, 'F');   //  the order is important here
+   read_fields ( obs_array,  obs_dict, otype, 'O');   //  the order is important here
+   Fcst = fcst_array;    //  + 0
+   Obs =  obs_array;    //  + 0
+
+      // Dump the contents of the VarInfo objects
+
+   if(mlog.verbosity_level() >= 5)  {
+      for (j=0; j<N_fields_f; ++j)  {
+         mlog << Debug(5)
+              << "Parsed forecast field:\n";
+         fcst_array[j].var_info->dump(cout);
+      }
+      for (j=0; j<N_fields_o; ++j) {
+         mlog << Debug(5)
+              << "Parsed observation field:\n";
+         obs_array[j].var_info->dump(cout);
+      }   //  for j
+   }
+
+   for (j=0; j<N_fields_f; ++j)  {
+      evaluate_fcst_settings(j);
+   }
+
+   for (j=0; j<N_fields_o; ++j)  {
+      evaluate_obs_settings(j);
+   }
+
+   if (data_type == ModeDataType_Traditional) {
+
+      for (j=0; j<N_fields_f; ++j)  {
+         if ( fcst_array[j].conv_radius_array.n_elements() != obs_array[j].conv_radius_array.n_elements() )  {
+            mlog << Error << "\nModeConfInfo::process_config_both() -> "
+                 << "fcst and obs convolution radius arrays need to be the same size for traditional mode\n\n";
+            exit ( 1 );
+         }
+         if ( fcst_array[j].conv_thresh_array.n_elements() != obs_array[j].conv_thresh_array.n_elements() )  {
+
+            mlog << Error << "\nModeConfInfo::process_config_both() -> "
+                 << "fcst and obs convolution threshold arrays need to be the same size\n\n";
+            exit ( 1 );
+         }
+      }
+   }
+
+      // Conf: fcst_raw_plot
+
+   fcst_array->raw_pi = parse_conf_plot_info(conf.lookup_dictionary(conf_key_fcst_raw_plot));
+
+      // Conf: obs_raw_plot
+
+    obs_array->raw_pi = parse_conf_plot_info(conf.lookup_dictionary(conf_key_obs_raw_plot));
+
+    return;
+
+}
+
+////////////////////////////////////////////////////////////////////////
+
+
+void ModeConfInfo::process_config_fcst(GrdFileType ftype)
+{
+   int j, k, n;
+
+   Dictionary * fcst_dict = (Dictionary *) 0;
+
+   fcst_dict = conf.lookup_dictionary(conf_key_fcst);
+   shift_right = fcst_dict->lookup_int(conf_key_shift_right);
+
+   read_fields (fcst_array, fcst_dict, ftype, 'F');   //  the order is important here
+   Fcst = fcst_array;    //  + 0
+
+
+      // Dump the contents of the VarInfo objects
+
+   if(mlog.verbosity_level() >= 5)  {
+      for (j=0; j<N_fields_f; ++j)  {
+         mlog << Debug(5)
+              << "Parsed forecast field:\n";
+         fcst_array[j].var_info->dump(cout);
+      }   //  for j
+   }
+
+   for (j=0; j<N_fields_f; ++j)  {
+      evaluate_fcst_settings(j);
+   }
+   
+   fcst_array->raw_pi = parse_conf_plot_info(conf.lookup_dictionary(conf_key_fcst_raw_plot));
 
    return;
 
 }
 
+////////////////////////////////////////////////////////////////////////
+
+
+void ModeConfInfo::process_config_obs(GrdFileType otype)
+{
+   int j, k, n;
+
+   Dictionary * obs_dict  = (Dictionary *) 0;
+
+   obs_dict  = conf.lookup_dictionary(conf_key_obs);
+   shift_right = obs_dict->lookup_int(conf_key_shift_right);
+
+   read_fields ( obs_array,  obs_dict, otype, 'O');   //  the order is important here
+   Obs =  obs_array;    //  + 0
+
+
+      // Dump the contents of the VarInfo objects
+
+   if(mlog.verbosity_level() >= 5)  {
+      for (j=0; j<N_fields_o; ++j)  {
+         mlog << Debug(5)
+              << "Parsed observation field:\n";
+         obs_array[j].var_info->dump(cout);
+      }   //  for j
+   }
+
+   for (j=0; j<N_fields_o; ++j)  {
+      evaluate_obs_settings(j);
+   }
+   
+   obs_array->raw_pi = parse_conf_plot_info(conf.lookup_dictionary(conf_key_obs_raw_plot));
+
+   return;
+
+}
+
+////////////////////////////////////////////////////////////////////////
+
+
+void ModeConfInfo::evaluate_fcst_settings(int j)
+{
+   // No support for wind direction
+   if(fcst_array[j].var_info->is_wind_direction()) {
+      mlog << Error << "\nModeConfInfo::evaluate_fcst_settings(" << j << ") -> "
+           << "the wind direction field may not be verified "
+           << "using MODE.\n\n";
+      exit(1);
+   }
+
+   // Check that fcst_conv_radius values are non-negative
+   int n = fcst_array[j].conv_radius_array.n_elements();
+
+   for (int k=0; k<n; ++k)  {
+
+      if(fcst_array[j].conv_radius_array[k] < 0) {
+
+         mlog << Error << "\nModeConfInfo::evaluate_fcst_settings(" << j << ") -> "
+              << "fcst_conv_radius (" << fcst_array[j].conv_radius_array[k]
+              << ") must be non-negative\n\n";
+
+         exit(1);
+
+      }
+
+   }   //  for k
+
+   if ( fcst_array[j].conv_radius_array.n_elements() == 1 )  fcst_array[j].conv_radius = fcst_array[j].conv_radius_array[0];
+   if ( fcst_array[j].conv_thresh_array.n_elements() == 1 )  fcst_array[j].conv_thresh = fcst_array[j].conv_thresh_array[0];
+   if ( fcst_array[j].need_merge_thresh() && (fcst_array[j].merge_thresh_array.n_elements() != fcst_array[j].conv_thresh_array.n_elements()) )  {
+
+      mlog << Error << "\nModeConfInfo::evaluate_fcst_settings(" << j << ") -> "
+           << "fcst conv thresh and fcst merge thresh arrays need to be the same size\n\n";
+
+      exit ( 1 );
+   }
+      
+   if ( fcst_array[j].merge_thresh_array.n_elements() == 1 )  fcst_array[j].merge_thresh = fcst_array[j].merge_thresh_array[0];
+
+   if(match_flag == MatchType_None && fcst_array[j].merge_flag != MergeType_None) { 
+      mlog << Warning << "\nModeConfInfo::evaluate_fcst_settings(" << j << ") -> "
+           << "When matching is disabled (match_flag = "
+           << matchtype_to_string(match_flag)
+           << ") but merging is requested (fcst_merge_flag = "
+           << mergetype_to_string(fcst_array[j].merge_flag)
+           << ") any merging information will be discarded.\n\n";
+   }
+}
+   
+
+////////////////////////////////////////////////////////////////////////
+
+
+void ModeConfInfo::evaluate_obs_settings(int j)
+{      
+   // No support for wind direction
+   if(obs_array[j].var_info->is_wind_direction())  {
+      mlog << Error << "\nModeConfInfo::evaluate_obs_settings(" << j << ") -> "
+           << "the wind direction field may not be verified "
+           << "using MODE.\n\n";
+      exit(1);
+   }
+
+   // Check that obs_conv_radius values are non-negative
+   int n = obs_array[j].conv_radius_array.n_elements(); 
+   for (int k=0; k<n; ++k)  {
+
+      if(obs_array[j].conv_radius_array[k] < 0) {
+
+         mlog << Error << "\nModeConfInfo::evaluate_obs_settings(" << j << ") -> "
+              << "obs_conv_radius (" << obs_array[j].conv_radius_array[k]
+              << ") must be non-negative\n\n";
+
+         exit(1);
+      }
+   }   //  for k
+
+   if (  obs_array[j].conv_radius_array.n_elements() == 1 )   obs_array[j].conv_radius =  obs_array[j].conv_radius_array[0];
+   if (  obs_array[j].conv_thresh_array.n_elements() == 1 )   obs_array[j].conv_thresh =  obs_array[j].conv_thresh_array[0];
+
+   if ( obs_array[j].need_merge_thresh() && (obs_array[j].merge_thresh_array.n_elements() != obs_array[j].conv_thresh_array.n_elements()) )  {
+
+      mlog << Error << "\nModeConfInfo::evaluate_obs_settings(" << j << ") -> "
+           << "obs conv thresh and obs merge thresh arrays need to be the same size\n\n";
+
+      exit ( 1 );
+
+   }
+
+   if (  obs_array[j].merge_thresh_array.n_elements() == 1 )   obs_array[j].merge_thresh =  obs_array[j].merge_thresh_array[0];
+
+   // Check that match_flag is set between 0 and 3
+   if(match_flag == MatchType_None && obs_array[j].merge_flag  != MergeType_None) {
+      mlog << Warning << "\nModeConfInfo::evaluate_obs_settings(" << j << ") -> "
+           << "When matching is disabled (match_flag = "
+           << matchtype_to_string(match_flag)
+           << ") but merging is requested (obs_merge_flag = "
+           << mergetype_to_string(obs_array[j].merge_flag)
+           << ") any merging information will be discarded.\n\n";
+   }
+}
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -587,16 +698,21 @@ if ( field->is_array() ) {
    const DictionaryEntry * e = 0;
    const Dictionary & D = *field;
 
-   if ( (N_fields > 0) && (N != N_fields) )  {
+   if (data_type == ModeDataType_Traditional) {
+      // traditional mode, extra test
+      if ( (N_fields_f > 0) && (N != N_fields_f) )  {
+         mlog << Error
+              << "\nModeConfInfo::read_field_dict() -> fcst and obs dictionaries have different number of entries in traditional mode\n\n";
+         exit ( 1 );
 
-      mlog << Error
-           << "\nModeConfInfo::read_field_dict() -> fcst and obs dictionaries have different number of entries\n\n";
-
-      exit ( 1 );
-
+      }
    }
-   N_fields = N;
-
+   
+   if (_fo == 'F')  {
+      N_fields_f = N;
+   } else {
+      N_fields_o = N;
+   }
    for (j=0; j<N; ++j)  {
 
       e = D[j];
@@ -633,7 +749,8 @@ if ( field->is_array() ) {
    //  nope, traditional mode
    //
 
-N_fields = N;
+N_fields_f = N;
+N_fields_o = N;
 info_array[0].set(false, 0, dict, &conf, type, _fo);
 
    //
@@ -688,8 +805,41 @@ return ( pwl_if );
 void ModeConfInfo::set_field_index(int k)
 
 {
+   if (data_type == ModeDataType_MvMode_Obs) {
+      if ( (k < 0) || (k >= N_fields_o) ) {
+         mlog << Error
+              << "\nModeConfInfo::set_field_index(int) -> range check error\n\n";
+         exit ( 1 );
+      }
+      Field_Index_o = k;
+      Field_Index_f = -1;
+      Obs =  obs_array + k;
+   }
+   else if (data_type == ModeDataType_MvMode_Fcst) {
+      if ( (k < 0) || (k >= N_fields_f) ) {
+         mlog << Error
+              << "\nModeConfInfo::set_field_index(int) -> range check error\n\n";
+         exit ( 1 );
+      }
+      Field_Index_f = k;
+      Field_Index_o = -1;
+      Fcst =  fcst_array + k;
+   } else {
+      // set obs and fcst index values the same
+      set_field_index(k, k);
+   }      
+   return;
+}
 
-if ( (k < 0) || (k >= N_fields) )  {
+
+////////////////////////////////////////////////////////////////////////
+
+
+void ModeConfInfo::set_field_index(int f_index, int o_index)
+
+{
+if ( (f_index < 0) || (f_index >= N_fields_f) || (o_index < 0) ||
+     (o_index >= N_fields_o))  {
 
    mlog << Error
         << "\nModeConfInfo::set_field_index(int) -> range check error\n\n";
@@ -698,11 +848,15 @@ if ( (k < 0) || (k >= N_fields) )  {
 
 }
 
-Field_Index = k;
+Field_Index_f = f_index;
+Field_Index_o = o_index;
 
-Fcst = fcst_array + k;
- Obs =  obs_array + k;
-
+if (data_type != ModeDataType_MvMode_Fcst) {
+   Obs =  obs_array + o_index;
+}
+if (data_type != ModeDataType_MvMode_Obs) {
+   Fcst = fcst_array + f_index;
+}
 return;
 
 }
@@ -762,6 +916,83 @@ void ModeConfInfo::set_perc_thresh(const DataPlane &f_dp,
                                       &(Obs->merge_thresh_array));
 
    return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void ModeConfInfo::set_perc_thresh(const DataPlane &dp)
+{
+   //
+   // Compute percentiles for forecast or observation thresholds.
+   //
+
+   if (data_type == ModeDataType_MvMode_Obs) {
+      if( !(Obs->conv_thresh_array.need_perc()  ) &&
+          !(Obs->merge_thresh_array.need_perc() ) ) {
+         return;
+      } else {
+         mlog << Warning
+              << "\nModeConfInfo::set_perc_thresh() -> "
+              << " percentage thresholds not implemented for multivar mode when creating simple observation objects, ignore the configured settings\n\n";
+         return;
+      }
+   } else if (data_type == ModeDataType_MvMode_Fcst) {
+
+      if( !(Fcst->conv_thresh_array.need_perc()  ) &&
+          !(Fcst->merge_thresh_array.need_perc() ) ) return;
+      else {
+         mlog << Warning
+              << "\nModeConfInfo::set_perc_thresh() -> "
+              << " percentage thresholds not implemented for multivar mode when creating simple forecast objects, ignore the configured settings\n\n";
+         return;
+      }
+   } else {
+      mlog << Warning 
+           << "\nModeConfInfo::set_perc_thresh() -> "
+           << "Logic error wrong method called expect obs only or fcst only, got "
+           << sprintModeDataType(data_type) << "\n'n";
+      return;
+   }
+
+
+
+   // //
+   // // Sort the input arrays
+   // //
+   // NumArray sort;
+   // int nxy = dp.nx() * dp.ny();
+
+   // sort.extend(nxy);
+   // sort.extend(nxy);
+
+   // for(int i=0; i<nxy; i++) {
+   //    if(!is_bad_data(dp.data()[i])) sort.add(dp.data()[i]);
+   // }
+
+   // sort.sort_array();
+
+   // //
+   // // Compute percentiles
+   // //
+   // if (data_type == ModeDataType_Obs) {
+   //   Obs->conv_thresh_array.set_perc(&fsort, &osort, (NumArray *) 0,
+   //                                   &(Fcst->conv_thresh_array),
+   //                                    &(Obs->conv_thresh_array));
+   //   Obs->merge_thresh_array.set_perc(&fsort, &osort, (NumArray *) 0,
+   //                                    &(Fcst->merge_thresh_array),
+   //                                    &(Obs->merge_thresh_array));
+   // } else { // already checked above that this is Fcst data
+   //  Fcst->conv_thresh_array.set_perc(&fsort, &osort, (NumArray *) 0,
+   //                                   &(Fcst->conv_thresh_array),
+   //                                    &(Obs->conv_thresh_array));
+   //  Fcst->merge_thresh_array.set_perc(&fsort, &osort, (NumArray *) 0,
+   //                                    &(Fcst->merge_thresh_array),
+   //                                    &(Obs->merge_thresh_array));
+   // }
+   // return;
 
 }
 
@@ -837,31 +1068,29 @@ return;
 
 ////////////////////////////////////////////////////////////////////////
 
-
 void ModeConfInfo::set_conv_radius_by_index(int k)
 
 {
-
-   //
-   //  we already know that the fcst and obs radius arrays have
-   //    the same number of elements
-   //
-
-if ( (k < 0) || (k >= Fcst->conv_radius_array.n_elements()) )  {
-
-   mlog << Error 
-        << "\nModeConfInfo::set_conv_radius_by_index(int) -> "
-        << "range check error\n\n";
-
-   exit ( 1 );
-
-}
-
-Fcst->conv_radius = Fcst->conv_radius_array[k];
-Obs->conv_radius =  Obs->conv_radius_array[k];
-
-return;
-
+   if (data_type != ModeDataType_MvMode_Obs) {
+      if ( (k < 0) || (k >= Fcst->conv_radius_array.n_elements()) )  {
+         mlog << Error 
+              << "\nModeConfInfo::set_conv_radius_by_index(int) -> "
+              << "range check error\n\n";
+         exit ( 1 );
+      }
+      Fcst->conv_radius =  Fcst->conv_radius_array[k];
+   }
+   if (data_type != ModeDataType_MvMode_Fcst) {
+      if ( (k < 0) || (k >= Obs->conv_radius_array.n_elements()) )  {
+         
+         mlog << Error 
+              << "\nModeConfInfo::set_conv_radius_by_index(int) -> "
+              << "range check error\n\n";
+         exit ( 1 );
+      }
+      Obs->conv_radius = Obs->conv_radius_array[k];
+   }
+   return;
 }
 
 
@@ -870,47 +1099,65 @@ return;
 
 void ModeConfInfo::set_conv_thresh(SingleThresh s)
 {
-Fcst->conv_thresh = s;
-Obs->conv_thresh =  s;
+   if (data_type != ModeDataType_MvMode_Obs) {
+      Fcst->conv_thresh = s;
+   }
+   if (data_type != ModeDataType_MvMode_Fcst) {
+      Obs->conv_thresh =  s;
+   }
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void ModeConfInfo::set_conv_radius(int r)
 {
-Fcst->conv_radius = r;
-Obs->conv_radius = r;
+   if (data_type != ModeDataType_MvMode_Obs) {
+      Fcst->conv_radius = r;
+   }
+   if (data_type != ModeDataType_MvMode_Fcst) {
+      Obs->conv_radius = r;
+   }
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-
 void ModeConfInfo::set_conv_thresh_by_index(int k)
 
 {
-
-   //
-   //  we already know that the fcst and obs threshold arrays have
-   //    the same number of elements
-   //
-
-if ( (k < 0) || (k >= Fcst->conv_thresh_array.n_elements()) )  {
-
-   mlog << Error 
-        << "\nModeConfInfo::set_conv_thresh_by_index(int) -> "
-        << "range check error\n\n";
-
-   exit ( 1 );
-
+   if (data_type != ModeDataType_MvMode_Fcst) {
+      if ( (k < 0) || (k >= Obs->conv_thresh_array.n_elements()) )  {
+         mlog << Error 
+              << "\nModeConfInfo::set_conv_thresh_by_index(int) -> "
+              << "range check error\n\n";
+         exit ( 1 );
+      }
+      Obs->conv_thresh =  Obs->conv_thresh_array[k];
+   }
+   if (data_type != ModeDataType_MvMode_Obs) {
+      if ( (k < 0) || (k >= Fcst->conv_thresh_array.n_elements()) )  {
+         
+         mlog << Error 
+              << "\nModeConfInfo::set_conv_thresh_by_index(int) -> "
+              << "range check error\n\n";
+         exit ( 1 );
+      }
+      Fcst->conv_thresh = Fcst->conv_thresh_array[k];
+   }
+   return;
 }
 
-Fcst->conv_thresh = Fcst->conv_thresh_array[k];
- Obs->conv_thresh =  Obs->conv_thresh_array[k];
 
-return;
+////////////////////////////////////////////////////////////////////////
 
-}
-
+void ModeConfInfo::set_merge_thresh_by_index(int k)
+{
+   if (data_type != ModeDataType_MvMode_Fcst) {
+      if ( Obs->need_merge_thresh  () )  set_obs_merge_thresh_by_index  (k);
+   }
+   if (data_type != ModeDataType_MvMode_Obs) {
+         if ( Fcst->need_merge_thresh () )  set_fcst_merge_thresh_by_index (k);
+   }
+}   
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -918,13 +1165,33 @@ return;
 void ModeConfInfo::set_fcst_merge_thresh_by_index(int k)
 
 {
-
-Fcst->set_merge_thresh_by_index(k);
-
-return;
+   if (data_type == ModeDataType_MvMode_Obs)
+   {
+      mlog << Error 
+           << "\nModeConfInfo::set_fcst_merge_thresh_by_index(int) -> "
+              << "set for obs data not fcst\n\n";
+      exit (1);
+   }
+   Fcst->set_merge_thresh_by_index(k);
+   return;
 
 }
 
+
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void ModeConfInfo::set_conv_thresh_by_merge_index(int k)
+{
+   if (data_type != ModeDataType_MvMode_Fcst) {
+      if (Obs->need_merge_thresh()) set_obs_conv_thresh_by_merge_index (k);
+   }
+   if (data_type != ModeDataType_MvMode_Obs) {
+      if (Fcst->need_merge_thresh()) set_fcst_conv_thresh_by_merge_index (k);
+   }
+}
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -932,10 +1199,16 @@ return;
 void ModeConfInfo::set_fcst_conv_thresh_by_merge_index(int k)
 
 {
+   if (data_type == ModeDataType_MvMode_Obs)
+   {
+      mlog << Error 
+           << "\nModeConfInfo::set_fcst_conv_thresh_by_index(int) -> "
+              << "set for obs data not fcst\n\n";
+      exit (1);
+   }
+   Fcst->set_conv_thresh_by_merge_index(k);
 
-Fcst->set_conv_thresh_by_merge_index(k);
-
-return;
+   return;
 
 }
 
@@ -946,10 +1219,15 @@ return;
 void ModeConfInfo::set_obs_conv_thresh_by_merge_index(int k)
 
 {
-
-Obs->set_conv_thresh_by_merge_index(k);
-
-return;
+   if (data_type == ModeDataType_MvMode_Fcst)
+   {
+      mlog << Error 
+           << "\nModeConfInfo::set_obs_conv_thresh_by_merge_index(int) -> "
+              << "set for fcst data not obs\n\n";
+      exit (1);
+   }
+   Obs->set_conv_thresh_by_merge_index(k);
+   return;
 
 }
 
@@ -958,28 +1236,56 @@ return;
 
 void ModeConfInfo::set_fcst_merge_flag(MergeType t)
 {
-Fcst->merge_flag = t;
+   if (data_type == ModeDataType_MvMode_Obs)
+   {
+      mlog << Error 
+           << "\nModeConfInfo::set_fcst_merge_flag(int) -> "
+              << "set for obs data not fcst\n\n";
+      exit (1);
+   }
+   Fcst->merge_flag = t;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void ModeConfInfo::set_obs_merge_flag(MergeType t)
 {
-Obs->merge_flag = t;
+   if (data_type == ModeDataType_MvMode_Fcst)
+   {
+      mlog << Error 
+           << "\nModeConfInfo::set_obs_merge_flag(int) -> "
+              << "set for fcst data not obs\n\n";
+      exit (1);
+   }
+   Obs->merge_flag = t;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void ModeConfInfo::set_fcst_merge_thresh(SingleThresh s)
 {
-Fcst->merge_thresh = s;
+   if (data_type == ModeDataType_MvMode_Obs)
+   {
+      mlog << Error 
+           << "\nModeConfInfo::set_fcst_merge_thresh(int) -> "
+              << "set for obs data not fcst\n\n";
+      exit (1);
+   }
+   Fcst->merge_thresh = s;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void ModeConfInfo::set_obs_merge_thresh(SingleThresh s)
 {
-Obs->merge_thresh = s;
+   if (data_type == ModeDataType_MvMode_Fcst)
+   {
+      mlog << Error 
+           << "\nModeConfInfo::set_obs_merge_thresh(int) -> "
+              << "set for fcst data not obs\n\n";
+      exit (1);
+   }
+   Obs->merge_thresh = s;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -988,13 +1294,25 @@ Obs->merge_thresh = s;
 void ModeConfInfo::set_obs_merge_thresh_by_index(int k)
 
 {
+   if (data_type == ModeDataType_MvMode_Fcst)
+   {
+      mlog << Error 
+           << "\nModeConfInfo::set_obs_merge_thresh_by_index(int) -> "
+              << "set for fcst data not obs\n\n";
+      exit (1);
+   }
 
-Obs->set_merge_thresh_by_index(k);
-
-return;
-
+   Obs->set_merge_thresh_by_index(k);
+   return;
 }
 
+////////////////////////////////////////////////////////////////////////
+
+
+void ModeConfInfo::set_data_type(ModeDataType type)
+{
+   data_type = type;
+}
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -1062,25 +1380,33 @@ Dictionary * dict = (Dictionary *) 0;
 
 fcst_multivar_logic.clear();
 obs_multivar_logic.clear();
+fcst_multivar_compare_index.clear();
+obs_multivar_compare_index.clear();
 fcst_multivar_name = default_multivar_name;
 obs_multivar_name = default_multivar_name;
 fcst_multivar_level = na_str;
 obs_multivar_level = na_str;
 
+// these have to be outside the fcst and obs dictionaries
+
+if ( conf.lookup(conf_key_fcst_multivar_compare_index)) fcst_multivar_compare_index = conf.lookup_int_array(conf_key_fcst_multivar_compare_index);
+if ( conf.lookup(conf_key_obs_multivar_compare_index)) obs_multivar_compare_index = conf.lookup_int_array(conf_key_obs_multivar_compare_index);
+
+
 dict = conf.lookup_dictionary(conf_key_fcst);
 
 if ( dict->lookup(conf_key_multivar_logic) ) fcst_multivar_logic = dict->lookup_string(conf_key_multivar_logic);
+//if ( dict->lookup(conf_key_fcst_multivar_compare_index)) fcst_multivar_compare_index = dict->lookup_int_array(conf_key_fcst_multivar_compare_index);
 if ( dict->lookup(conf_key_multivar_name)  ) fcst_multivar_name  = dict->lookup_string(conf_key_multivar_name);
 if ( dict->lookup(conf_key_multivar_level) ) fcst_multivar_level = dict->lookup_string(conf_key_multivar_level);
 
 dict = conf.lookup_dictionary(conf_key_obs);
 
 if ( dict->lookup(conf_key_multivar_logic) ) obs_multivar_logic = dict->lookup_string(conf_key_multivar_logic);
+//if ( dict->lookup(conf_key_obs_multivar_compare_index)) obs_multivar_compare_index = dict->lookup_int_array(conf_key_obs_multivar_compare_index);
 if ( dict->lookup(conf_key_multivar_name)  ) obs_multivar_name  = dict->lookup_string(conf_key_multivar_name);
 if ( dict->lookup(conf_key_multivar_level) ) obs_multivar_level = dict->lookup_string(conf_key_multivar_level);
 
-multivar_intensity.clear();
-if ( dict->lookup(conf_key_multivar_intensity_flag)) multivar_intensity = dict->lookup_bool_array(conf_key_multivar_intensity_flag);
 
 return;
 }
@@ -1102,29 +1428,30 @@ void ModeConfInfo::check_multivar_not_implemented()
       status = true;
    }
    
-   for (int i=0; i<N_fields; ++i) {
-      if (fcst_array[i].merge_flag == MergeType_Both || fcst_array[i].merge_flag == MergeType_Engine) {
-         mlog << Error
-              << "\nModeConfInfo::multivar_not_implemented:\n"
-              << "  merge_flag ENGINE or BOTH not implemented for multivariate mode\n\n";
-         status = true;
-         break;
+   for (int i=0; i<N_fields_f; ++i) {
+      if (data_type != ModeDataType_MvMode_Obs) {
+         if (fcst_array[i].merge_flag == MergeType_Both || fcst_array[i].merge_flag == MergeType_Engine)
+         {
+            mlog << Error
+                 << "\nModeConfInfo::multivar_not_implemented:\n"
+                 << "  merge_flag ENGINE or BOTH not implemented for multivariate mode\n\n";
+            status = true;
+            break;
+         }
       }
-      if (obs_array[i].merge_flag == MergeType_Both || obs_array[i].merge_flag == MergeType_Engine) {
-         mlog << Error
-              << "\nModeConfInfo::multivar_not_implemented:\n"
-              << "  merge_flag ENGINE or BOTH not implemented for multivariate mode\n\n";
-         status = true;
-         break;
+   }
+   for (int i=0; i<N_fields_o; ++i) {
+      if (data_type != ModeDataType_MvMode_Fcst) {
+         if (obs_array[i].merge_flag == MergeType_Both || obs_array[i].merge_flag == MergeType_Engine) {
+            mlog << Error
+                 << "\nModeConfInfo::multivar_not_implemented:\n"
+                 << "  merge_flag ENGINE or BOTH not implemented for multivariate mode\n\n";
+            status = true;
+            break;
+         }
       }
    }
 
-   // if (multivar_intensities_all_false()) {
-   //    mlog << Error
-   //         << "\nModeConfInfo::multivar_not_implemented "
-   //         << ": multivar_intensity flags all FALSE not yet implemented for multivar mode\n\n";
-   //    status = true;
-   // }
    if (status) {
       mlog << Error
            << "\nSome features not yet implemented in multivar mode\n\n";
@@ -1133,19 +1460,7 @@ void ModeConfInfo::check_multivar_not_implemented()
 }
 
 
-////////////////////////////////////////////////////////////////////////
-
-bool ModeConfInfo::multivar_intensities_all_false() const
-{
-   for (int i=0; i<multivar_intensity.n(); ++i) {
-      if (multivar_intensity[i]) {
-         return false;
-      }
-   }
-   return true;
-}
-
-////////////////////////////////////////////////////////////////////////
+// ////////////////////////////////////////////////////////////////////////
 
 
    //
