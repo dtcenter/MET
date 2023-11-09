@@ -1240,7 +1240,7 @@ double get_nc_time(NcVar * var, const int index) {
                  << GET_NC_NAME_P(var) << "\".\n\n";
             exit(1);
       }
-      if (tmp_buf) delete tmp_buf;
+      if (tmp_buf) delete tmp_buf[];
    }
 
    return(k);
