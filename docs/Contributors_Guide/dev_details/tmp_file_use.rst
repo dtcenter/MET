@@ -132,7 +132,7 @@ and writes the result to a temporary file.
 .. _tmp_files_python_embedding:
 
 Python Embedding
-================
+^^^^^^^^^^^^^^^^
 
 As described in
 :numref:`User's Guide Appendix F, Section %s <appendixF>`, when the
