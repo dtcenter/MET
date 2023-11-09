@@ -194,7 +194,7 @@ bool UGridFile::open(const char * filepath)
 
 bool UGridFile::open_metadata(const char * filepath)
 {
-  unixtime ut;
+  unixtime ut = 0;
   int sec_per_unit;
   const char *method_name = "UGridFile::open_metadata() -> ";
 
