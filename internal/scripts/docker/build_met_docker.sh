@@ -22,7 +22,7 @@ fi
 
 LOG_FILE=/met/logs/MET-${MET_GIT_NAME}_make_install.log
 echo "Compiling MET ${MET_GIT_NAME} and writing log file ${LOG_FILE}"
-make ${MAKE_ARGS} install > ${LOG_FILE}
+make ${MAKE_ARGS} install > ${LOG_FILE} 2>&1
 if [ $? != 0 ]; then
   cat ${LOG_FILE}
   exit 1
