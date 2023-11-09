@@ -21,10 +21,10 @@ The spatial scale components are obtained usually by applying a single band spat
 
 The Intensity-Scale technique evaluates the forecast skill as a function of the intensity values and of the spatial scale of the error. The scale components are obtained by applying a two dimensional Haar wavelet filter. Note that wavelets, because of their locality, are suitable for representing discontinuous fields characterized by few sparse non-zero features, such as precipitation. Moreover, the technique is based on a categorical approach, which is a robust and resistant approach, suitable for non-normally distributed variables, such as precipitation. The intensity-scale technique was specifically designed to cope with the difficult characteristics of precipitation fields, and for the verification of spatial precipitation forecasts. However, the intensity-scale technique can also be applied to verify other variables, such as cloud fraction. 
 
-Scientific and statistical aspects
+Scientific and Statistical Aspects
 ==================================
 
-The method
+The Method
 ----------
 
 :ref:`Casati et al. (2004) <Casati-2004>` applied the Intensity-Scale verification to preprocessed and re-calibrated (unbiased) data. The preprocessing was aimed to mainly normalize the data, and defined categorical thresholds so that each categorical bin had a similar sample size. The recalibration was performed to eliminate the forecast bias. Preprocessing and recalibration are not strictly necessary for the application of the Intensity-Scale technique. The MET Intensity-Scale Tool does not perform either, and applies the Intensity-Scale approach to biased forecasts, for categorical thresholds defined by the user.
@@ -126,7 +126,7 @@ Note that the energy squared of the observation binary field is identical to the
 
 
 
-The spatial domain constraints
+The Spatial Domain Constraints
 ------------------------------
 
 The Intensity-Scale technique is constrained by the fact that orthogonal wavelets (discrete wavelet transforms) are usually performed dyadic domains, square domains of :math:`\mathbf{2^n} **x** :math:`\mathbf{2^n} grid-points. The Wavelet-Stat tool handles this issue based on settings in the configuration file by defining tiles of dimensions :math:`\mathbf{2^n} **x** :math:`\mathbf{2^n} over the input domain in the following ways:
@@ -137,19 +137,19 @@ The Intensity-Scale technique is constrained by the fact that orthogonal wavelet
 
 3. Padding: If the domain size is only slightly smaller than :math:`\mathbf{2^n} **x** :math:`\mathbf{2^n}, for certain variables (e.g. precipitation), it is advisable to expand the domain out to :math:`\mathbf{2^n} **x** :math:`\mathbf{2^n} grid-points by adding extra rows and/or columns of fill data. For precipitation variables, a fill value of zero is used. For continuous variables, such as temperature, the fill value is defined as the mean of the valid data in the rest of the field. A drawback to the padding method is the introduction of artificial data into the original field. Padding should only be used when a very small number of rows and/or columns need to be added.
 
-Aggregation of statistics on multiple cases
+Aggregation of Statistics on Multiple Cases
 -------------------------------------------
 
 The Stat-Analysis tool aggregates the intensity scale technique results. Since the results are scale-dependent, it is sensible to aggregate results from multiple model runs (e.g. daily runs for a season) on the same spatial domain, so that the scale components for each singular case will be the same number, and the domain, if not a square domain of :math:`\mathbf{2^n} **x** :math:`\mathbf{2^n} grid-points, will be treated in the same fashion. Similarly, the intensity thresholds for each run should all be the same. 
 
 The MSE and forecast and observation squared energy for each scale and thresholds are aggregated simply with a weighted average, where weights are proportional to the number of grid-points used in each single run to evaluate the statistics. If the same domain is always used (and it should) the weights result all the same, and the weighted averaging is a simple mean. For each threshold, the aggregated Br is equal to the aggregated squared energy of the binary observation field, and the aggregated FBI is obtained as the ratio of the aggregated squared energies of the forecast and observation binary fields. From aggregated Br and FBI, the MSErandom for the aggregated runs can be evaluated using the same formula as for the single run. Finally, the Intensity-Scale Skill Score is evaluated by using the aggregated statistics within the same formula used for the single case.
 
-Practical information
+Practical Information
 =====================
 
 The following sections describe the usage statement, required arguments and optional arguments for the Stat-Analysis tool.
 
-wavelet_stat usage
+wavelet_stat Usage
 ------------------
 
 The usage statement for the Wavelet-Stat tool is shown below:
@@ -167,7 +167,7 @@ The usage statement for the Wavelet-Stat tool is shown below:
 
 wavelet_stat has three required arguments and accepts several optional ones. 
 
-Required arguments for wavelet_stat
+Required Arguments for wavelet_stat
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. The **fcst_file** argument is the gridded file containing the model data to be verified.
@@ -176,7 +176,7 @@ Required arguments for wavelet_stat
 
 3. The **config_file** argument is the configuration file to be used. The contents of the configuration file are discussed below.
 
-Optional arguments for wavelet_stat
+Optional Arguments for wavelet_stat
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 4. The **-outdir path** indicates the directory where output files should be written.
@@ -200,7 +200,7 @@ In the example, the Wavelet-Stat tool will verify the model data in the **sample
 
 .. _wavelet_stat-configuration-file:
 
-wavelet_stat configuration file
+wavelet_stat Configuration File
 -------------------------------
 
 The default configuration file for the Wavelet-Stat tool, **WaveletStatConfig_default**, can be found in the installed *share/met/config* directory. Another version of the configuration file is provided in *scripts/config*. We recommend that users make a copy of the default (or other) configuration file prior to modifying it. The contents are described in more detail below.
@@ -313,7 +313,7 @@ The nc_pairs_flag is described in :numref:`grid_stat-configuration-file`
 
 .. _wavelet_stat-output:
 
-wavelet_stat output
+wavelet_stat Output
 -------------------
 
 wavelet_stat produces output in STAT and, optionally, ASCII and NetCDF and PostScript formats. The ASCII output duplicates the STAT output but has the data organized by line type. While the Wavelet-Stat tool currently only outputs one STAT line type, additional line types may be added in future releases. The output files are written to the default output directory or the directory specified by the -outdir command line option. 
