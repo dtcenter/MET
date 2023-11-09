@@ -512,7 +512,7 @@ double ShapeData::get_attr(const ConcatString &attr_name,
 void ShapeData::conv_filter_circ(int diameter, double vld_thresh) {
    const char *method_name = "ShapeData::conv_filter_circ() -> ";
    GridPoint *gp = nullptr;
-   int count, n_vld;
+   int x, y, count, n_vld;
    double v, v_sum;
    DataPlane conv_dp;
 
@@ -627,7 +627,7 @@ Polyline ShapeData::convex_hull_new() const
 
 {
 
-int k;
+int j, k;
 int n_in, n_out;
 Polyline hull_poly;
 IntPoint * in = new IntPoint [2*(data.ny() + 1)];
@@ -669,7 +669,7 @@ ihull(in, n_in, out, n_out);
 
 hull_poly.extend_points(n_out);
 
-for (int j=0; j<n_out; ++j)  {
+for (j=0; j<n_out; ++j)  {
 
    hull_poly.add_point(out[j].x, out[j].y);
 
@@ -983,7 +983,7 @@ Polyline ShapeData::single_boundary_offset(bool all_points, int clockwise,
       mlog << Debug(1) << "\n\nShapeData::single_boundary_offset() const -> "
            << "no points found in object\n\n";
 
-      return boundary);
+      return boundary;
    }
 
    //
@@ -2042,7 +2042,7 @@ void ShapeData::threshold_intensity(const ShapeData *sd_ptr, int perc, SingleThr
    int i, n, x, y, v_int, n_obj_inten;
    ShapeData s;
    double *obj_inten = (double *) nullptr;
-   double *obj_inten_sum;
+   double obj_inten_sum;
    const int nx = data.nx();
    const int ny = data.ny();
 
