@@ -59,7 +59,7 @@ PB2NC creates the following temporary files when running:
 .. _tmp_files_point2grid:
 
 Point2Grid Tool
-===============
+^^^^^^^^^^^^^^^
 
 The Point2Grid tool reads point observations from a variety of
 inputs and summarizes them on a grid. When processing GOES input
