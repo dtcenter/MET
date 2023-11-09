@@ -1,7 +1,7 @@
 .. _tmp_file_use:
 
 Use of Temporary Files
-**********************
+======================
 
 The MET application and library code uses temporary files in several
 places. Each specific use of temporary files is described below. The
