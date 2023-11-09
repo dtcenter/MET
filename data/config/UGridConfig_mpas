@@ -1,31 +1,30 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// Unstructured Grid configuration file.
+// Unstructured grid configuration file.
 //
-// UGridConfig_user at the current working directory overrides the default.
+// UGridConfig_mpas at the current working directory overrides the settings here.
 // For additional or updated information, please see the MET User's Guide.
 //
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// Default mapping for Metadata.
-// The first values are for MPAS and the second values are for LFric.
+// Dimensions and variables mapping for MPAS dataset
 //
 ugrid_metadata_map = [
-   { key = "dim_face";  val = "nCells,nMesh2d_face"; },
-   { key = "dim_node";  val = "nVertices,nMesh2d_node"; },
-   { key = "dim_edge";  val = "nEdges,nMesh2d_edge"; },
-   { key = "dim_time";  val = "Time,time_counter"; },
+   { key = "dim_face";  val = "nCells; },
+   { key = "dim_node";  val = "nVertices"; },
+   { key = "dim_edge";  val = "nEdges"; },
+   { key = "dim_time";  val = "Time"; },
    { key = "dim_vert";  val = "nVertLevels"; },
-   { key = "cell_id";   val = "indexToCellID,"; },
-   { key = "lat_face";  val = "latCell,Mesh2d_face_y"; },
-   { key = "lon_face";  val = "lonCell,Mesh2d_face_x"; },
+   { key = "cell_id";   val = "indexToCellID"; },
+   { key = "lat_face";  val = "latCell"; },
+   { key = "lon_face";  val = "lonCell"; },
    { key = "vert_face"; val = "zCell"; },
-   { key = "lat_edge";  val = "latEdge,Mesh2d_edge_y"; },
-   { key = "lon_edge";  val = "lonEdge,Mesh2d_edge_x"; },
-   { key = "lat_node";  val = "latVertex,Mesh2d_node_y"; },
-   { key = "lon_node";  val = "lonVertex,Mesh2d_node_x"; },
-   { key = "time";      val = "xtime,time_centered"; }
+   { key = "lat_edge";  val = "latEdge"; },
+   { key = "lon_edge";  val = "lonEdge"; },
+   { key = "lat_node";  val = "latVertex"; },
+   { key = "lon_node";  val = "lonVertex"; },
+   { key = "time";      val = "xtime"; }
 ];
 
 ugrid_max_distance_km = 30;
