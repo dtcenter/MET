@@ -77,7 +77,7 @@ tool. Once created, it is intended to be reused in future runs.
 .. _tmp_files_bootstrap:
 
 Bootstrap Confidence Intervals
-==============================
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Several MET tools support the computation of bootstrap confidence
 intervals, as described in :numref:`User's Guide Section %s <config_boot>`
