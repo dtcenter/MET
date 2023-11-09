@@ -31,7 +31,7 @@ abnormally, the temporary files may remain.
 .. _tmp_files_pb2nc:
 
 PB2NC Tool
-==========
+^^^^^^^^^^
 
 The PB2NC tool reads input binary files in the BUFR or PrepBUFR
 format, extracts and/or derives observations from them, filters
