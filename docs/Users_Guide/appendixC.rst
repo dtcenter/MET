@@ -7,7 +7,7 @@ Appendix C Verification Measures
 This appendix provides specific information about the many verification statistics and measures that are computed by MET. These measures are categorized into measures for categorical (dichotomous) variables; measures for continuous variables; measures for probabilistic forecasts and measures for neighborhood methods. While the continuous, categorical, and probabilistic statistics are computed by both the Point-Stat and Grid-Stat tools, the neighborhood verification measures are only provided by the Grid-Stat tool.
 
 
-Which Statistics are the Same, but with Different Names?
+Which statistics are the same, but with different names?
 ========================================================
 
 .. list-table:: Statistics in MET and other names they have been published under.
