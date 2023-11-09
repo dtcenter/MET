@@ -154,7 +154,7 @@ temporary files.
 .. _tmp_files_tc_diag:
 
 TC-Diag Tool
-============
+^^^^^^^^^^^^
 
 The TC-Diag tool requires the use of Python embedding. It processes
 one or more ATCF tracks and computes model diagnostics. For each
