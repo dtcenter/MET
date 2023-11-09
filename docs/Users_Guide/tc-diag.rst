@@ -36,10 +36,10 @@ The default Python diagnostics scripts included with the MET release provide the
 
 .. _tc-diag_practical_info:
 
-Practical information
+Practical Information
 =====================
 
-tc_diag usage
+tc_diag Usage
 -------------
 
 The following sections describe the usage statement, required arguments, and optional arguments for tc_diag.
@@ -56,7 +56,7 @@ The following sections describe the usage statement, required arguments, and opt
 
 tc_diag has required arguments and can accept several optional arguments.
 
-Required arguments for tc_diag
+Required Arguments for tc_diag
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. The **-data domain tech_id_list [ file_1 ... file_n | data_file_list ]** option specifies a domain name, a comma-separated list of ATCF tech ID's, and a list of gridded data files or an ASCII file containing a list of files to be used. Specify **-data** one for each gridded data source.
@@ -65,7 +65,7 @@ Required arguments for tc_diag
 
 3. The **-config file** option is the TCDiagConfig file to be used. The contents of the configuration file are discussed below.
 
-Optional arguments for tc_diag
+Optional Arguments for tc_diag
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 4. The **-outdir path** option overrides the default output directory (current working directory) with the output directory path provided.
@@ -74,12 +74,12 @@ Optional arguments for tc_diag
 
 6. The **-v level** option indicates the desired level of verbosity. The contents of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
 
-tc_diag configuration file
+tc_diag Configuration File
 --------------------------
 
 The default configuration file for the TC-Diag tool named **TCDiagConfig_default** can be found in the installed *share/met/config/* directory. Users are encouraged to copy these default files before modifying their contents. The contents of the configuration file are described in the subsections below.
 
-Configuring input tracks and time
+Configuring Input Tracks and Time
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: none
@@ -109,7 +109,7 @@ The configuration options listed above are used to filter the input track data d
 
 The **lead** entry is an array of strings specifying lead times in HH[MMSS] format. By default, diagnostics are computed every 6 hours out to 126 hours. Lead times for which no track point or gridded model data exist produce a warning message and diagnostics set to a missing data value.
 
-Configuring domain information
+Configuring Domain Information
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: none
@@ -143,7 +143,7 @@ The **diag_script** entry is an array of strings. Each string specifies the path
 
 .. note:: As of MET version 11.1.0, no tropical cyclone diagnostics are actually computed or written to the output.
 
-Configuring data censoring and conversion options
+Configuring Data Censoring and Conversion Options
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: none
@@ -154,7 +154,7 @@ Configuring data censoring and conversion options
 
 These data censoring and conversion options are common to multiple MET tools and are described in :numref:`config_options`. They can be specified separately in each **data.field** array entry, described below. If provided, those operations are performed after reading the gridded data but prior to converting to the cylindrical coordinate range-azimuth grid.
 
-Configuring fields, levels, and domains
+Configuring Fields, Levels, and Domains
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: none
@@ -191,7 +191,7 @@ The **name** and **level** entries are common to multiple MET tools and are desc
 
 The **domain** entry is an array of strings. Each string specifies a domain name. If the **domain_info** domain name appears in this **domain** list, then this field will be read from that **domain_info** data source. If **domain** is set to an empty list, then this field will be read from all domain data sources.
 
-Configuring regridding options
+Configuring Regridding Options
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: none
@@ -202,7 +202,7 @@ These **regrid** dictionary is common to multiple MET tools and is described in 
 
 .. note:: As of MET version 11.1.0, the nearest neighbor regridding method is used rather than this configuration file option.
 
-Configuring vortex removal option
+Configuring Vortex Removal Option
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: none
@@ -213,7 +213,7 @@ The **vortex_removal** flag entry is a boolean specifying whether or not vortex 
 
 .. note:: As of MET version 11.1.0, vortex removal logic is not yet supported.
 
-Configuring data input and output options
+Configuring Data Input and Output Options
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: none
@@ -234,7 +234,7 @@ These three flag entries are booleans specifying what output data types should b
 
 .. note:: As of MET version 11.1.0, **nc_rng_azi_flag** is the only supported output type. These configuration options will automatically be reset at runtime to the settings listed above.
 
-Configuring MET version, output prefix, and temp directory
+Configuring MET Version, Output Prefix, and Temp Directory
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: none
@@ -245,7 +245,7 @@ Configuring MET version, output prefix, and temp directory
 
 These options are common to multiple MET tools and are described in :numref:`config_options`.
 
-tc_diag output
+tc_diag Output
 --------------
 
 The TC-Diag tool writes up to three output data types, as specified by flags in the configuration file. Each time TC-Diag is run it processes track data for a single initialization time. The actual number of output files varies depending on the number of model tracks provided.
