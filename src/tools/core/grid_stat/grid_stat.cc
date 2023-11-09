@@ -297,38 +297,39 @@ void process_command_line(int argc, char **argv) {
    // Process the configuration
    conf_info.process_config(ftype, otype);
 
+   if (FileType_UGrid == ftype || FileType_UGrid == otype) {
 #ifdef WITH_UGRID
-   if (FileType_UGrid == ftype) {
       ConcatString ugrid_nc = conf_info.ugrid_nc;
       ConcatString ugrid_dataset = conf_info.ugrid_dataset;
       ConcatString ugrid_map_config = conf_info.ugrid_map_config;
-      MetUGridDataFile *ugrid_mtddf = (MetUGridDataFile *)fcst_mtddf;
-      ugrid_mtddf->set_max_distance_km(conf_info.ugrid_max_distance_km);
-      if (0 < ugrid_dataset.length()) ugrid_mtddf->set_dataset(ugrid_dataset);
-      if (0 < ugrid_map_config.length())
-         ugrid_mtddf->set_map_config_file(ugrid_map_config);
-      if (0 == ugrid_nc.length() || ugrid_nc == "NA") ugrid_nc = fcst_file;
-      ugrid_mtddf->open_metadata(ugrid_nc.c_str());
-      mlog << Debug(9) << method_name
-           << "FCST: ugrid_coordinates_nc: " << ugrid_nc
-           << "  ugrid_max_distance_km: " << conf_info.ugrid_max_distance_km << "\n";
-   }
-   if (FileType_UGrid == otype) {
-      ConcatString ugrid_nc = conf_info.ugrid_nc;
-      ConcatString ugrid_dataset = conf_info.ugrid_dataset;
-      ConcatString ugrid_map_config = conf_info.ugrid_map_config;
-      MetUGridDataFile *ugrid_mtddf = (MetUGridDataFile *)obs_mtddf;
-      ugrid_mtddf->set_max_distance_km(conf_info.ugrid_max_distance_km);
-      if (0 < ugrid_dataset.length()) ugrid_mtddf->set_dataset(ugrid_dataset);
-      if (0 < ugrid_map_config.length())
-         ugrid_mtddf->set_map_config_file(ugrid_map_config);
-      if (0 == ugrid_nc.length() || ugrid_nc == "NA") ugrid_nc = fcst_file;
-      ugrid_mtddf->open_metadata(ugrid_nc.c_str());
-      mlog << Debug(9) << method_name
-           << "OBS: ugrid_coordinates_nc: " << ugrid_nc
-           << "  ugrid_max_distance_km: " << conf_info.ugrid_max_distance_km << "\n";
-   }
+      if (FileType_UGrid == ftype) {
+         MetUGridDataFile *ugrid_mtddf = (MetUGridDataFile *)fcst_mtddf;
+         ugrid_mtddf->set_max_distance_km(conf_info.ugrid_max_distance_km);
+         if (0 < ugrid_dataset.length()) ugrid_mtddf->set_dataset(ugrid_dataset);
+         if (0 < ugrid_map_config.length())
+            ugrid_mtddf->set_map_config_file(ugrid_map_config);
+         if (0 == ugrid_nc.length() || ugrid_nc == "NA") ugrid_nc = fcst_file;
+         ugrid_mtddf->open_metadata(ugrid_nc.c_str());
+         mlog << Debug(9) << method_name
+              << "FCST: ugrid_coordinates_nc: " << ugrid_nc
+              << "  ugrid_max_distance_km: " << conf_info.ugrid_max_distance_km << "\n";
+      }
+      if (FileType_UGrid == otype) {
+         MetUGridDataFile *ugrid_mtddf = (MetUGridDataFile *)obs_mtddf;
+         ugrid_mtddf->set_max_distance_km(conf_info.ugrid_max_distance_km);
+         if (0 < ugrid_dataset.length()) ugrid_mtddf->set_dataset(ugrid_dataset);
+         if (0 < ugrid_map_config.length())
+            ugrid_mtddf->set_map_config_file(ugrid_map_config);
+         if (0 == ugrid_nc.length() || ugrid_nc == "NA") ugrid_nc = fcst_file;
+         ugrid_mtddf->open_metadata(ugrid_nc.c_str());
+         mlog << Debug(9) << method_name
+              << "OBS: ugrid_coordinates_nc: " << ugrid_nc
+              << "  ugrid_max_distance_km: " << conf_info.ugrid_max_distance_km << "\n";
+      }
+#else
+      ugrid_compile_error(method_name);
 #endif
+   }
 
    // For python types read the first field to set the grid
    if(is_python_grdfiletype(ftype)) {

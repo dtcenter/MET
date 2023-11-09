@@ -304,8 +304,8 @@ void process_command_line(int argc, char **argv) {
    // Set the model name
    shc.set_model(conf_info.model.c_str());
 
-#ifdef WITH_UGRID
    if (FileType_UGrid == ftype) {
+#ifdef WITH_UGRID
       ConcatString ugrid_nc = conf_info.ugrid_nc;
       ConcatString ugrid_dataset = conf_info.ugrid_dataset;
       ConcatString ugrid_map_config = conf_info.ugrid_map_config;
@@ -319,8 +319,10 @@ void process_command_line(int argc, char **argv) {
       mlog << Debug(9) << method_name
            << "ugrid_coordinate_nc: " << ugrid_nc
            << "  ugrid_max_distance_km: " << conf_info.ugrid_max_distance_km << "\n";
-   }
+#else
+      ugrid_compile_error(method_name);
 #endif
+   }
 
    // Use the first verification task to set the random number generator
    // and seed value for bootstrap confidence intervals

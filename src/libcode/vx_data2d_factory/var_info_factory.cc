@@ -52,11 +52,11 @@ VarInfo * VarInfoFactory::new_var_info(GrdFileType type)
 
 {
 
-   VarInfo *vi = (VarInfo *) 0;
+   VarInfo *vi = (VarInfo *) nullptr;
    const char *method_name = "VarInfoFactory::new_var_info() -> ";
 
 #ifdef WITH_PYTHON
-   VarInfoPython * p = 0;
+   VarInfoPython * p = nullptr;
 #endif
 
    //
@@ -95,7 +95,7 @@ VarInfo * VarInfoFactory::new_var_info(GrdFileType type)
          p = new VarInfoPython;
          p->set_file_type(type);
          vi = p;
-         p = 0;
+         p = nullptr;
          break;
 #else
          python_compile_error(method_name);
@@ -105,10 +105,12 @@ VarInfo * VarInfoFactory::new_var_info(GrdFileType type)
          vi = new VarInfoNcCF;
          break;
 
-#ifdef WITH_UGRID
       case FileType_UGrid:
+#ifdef WITH_UGRID
          vi = new VarInfoUGrid;
          break;
+#else
+         ugrid_compile_error(method_name);
 #endif
 
       case FileType_HdfEos:

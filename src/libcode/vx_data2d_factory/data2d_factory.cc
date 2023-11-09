@@ -130,14 +130,10 @@ MetPythonDataFile * p = nullptr;
 #ifdef WITH_UGRID
          // For FileType_None, silently return a nullptr pointer
          mtddf = new MetUGridDataFile;
-         break;
 #else
-         mlog << Error << "\n" << method_name
-              << "data file type \"" << grdfiletype_to_string(type)
-              << "\" is not activated. Recompile with the --enable-ugrid option"
-              << "\"\n\n";
-         exit(1);
+         ugrid_compile_error(method_name);
 #endif
+         break;
 
       case FileType_None:
          // For FileType_None, silently return a nullptr pointer
