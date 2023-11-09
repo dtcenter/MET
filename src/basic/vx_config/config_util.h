@@ -145,6 +145,7 @@ extern ConcatString wavelettype_to_string(WaveletType);
 extern int parse_conf_percentile(Dictionary *dict);
 
 extern void python_compile_error(const char *caller=nullptr);
+extern void ugrid_compile_error(const char *caller=nullptr);
 
 ////////////////////////////////////////////////////////////////////////
 

@@ -3334,3 +3334,16 @@ void python_compile_error(const char *caller) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+
+void ugrid_compile_error(const char *caller) {
+
+   const char *method_name = (nullptr != caller) ? caller : "ugrid_compile_error() -> ";
+
+   mlog << Error << "\n" << method_name
+        << "Support for the unstructured grid has not been compiled!\n"
+        << "To use the filetype NETCDF_UGRID (unstructured grid), recompile with the --enable-ugrid option.\n\n";
+
+   exit(1);
+}
+
+///////////////////////////////////////////////////////////////////////////////
