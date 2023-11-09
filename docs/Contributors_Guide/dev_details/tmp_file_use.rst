@@ -1,6 +1,5 @@
 .. _tmp_file_use:
 
-**********************
 Use of Temporary Files
 **********************
 
