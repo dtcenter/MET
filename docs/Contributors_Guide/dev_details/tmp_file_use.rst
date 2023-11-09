@@ -106,7 +106,7 @@ Where {LINE_TYPE} is :code:`cnt`, :code:`cts`, :code:`mcts`,
 .. _tmp_files_stat_analysis:
 
 Stat-Analysis Tool
-==================
+^^^^^^^^^^^^^^^^^^
 
 The Stat-Analysis tool reads ASCII output created by the MET
 statistics tools. A single job can be specified on the command line
