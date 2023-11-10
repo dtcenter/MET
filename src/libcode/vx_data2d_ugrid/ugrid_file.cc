@@ -850,8 +850,10 @@ int UGridFile::lead_time() const
 ////////////////////////////////////////////////////////////////////////
 
 
-void UGridFile::read_config(ConcatString config_filename, bool do_override) {
+void UGridFile::read_config(ConcatString config_filename) {
   const char *method_name = "UGridFile::read_config() ";
+  double conf_value;
+  ConcatString conf_value_s;
   MetConfig conf;
 
   // Read the default config file
@@ -859,20 +861,20 @@ void UGridFile::read_config(ConcatString config_filename, bool do_override) {
        << "configuration from " << config_filename << " (" << replace_path(config_filename) << ")\n";
   conf.read(replace_path(config_filename).c_str());
 
-  if (do_override || bad_data_double == max_distance_km) {
-    max_distance_km = parse_conf_ugrid_max_distance_km(&conf);
-  }
-  if (do_override || 0 == metadata_map.size()) {
-    metadata_map = parse_conf_ugrid_metadata_map(&conf);
-    metadata_names.clear();
-    for (std::map<ConcatString,StringArray>::iterator it=metadata_map.begin();
-         it!=metadata_map.end(); ++it) {
-      metadata_names.add(it->second);
-    }
+  conf_value = parse_conf_ugrid_max_distance_km(&conf);
+  if (!is_eq(conf_value, bad_data_double)) max_distance_km = conf_value;
+  conf_value_s = parse_conf_ugrid_coordinates_file(&conf);
+  if (0 < conf_value_s.length()) coordinate_file = conf_value_s;
+  parse_add_conf_ugrid_metadata_map(&conf, &metadata_map);
 
-    mlog << Debug(6) << method_name
-         << "map size: " << metadata_map.size() << ", dims_vars_count = " << metadata_names.n() << "\n";
+  metadata_names.clear();
+  for (std::map<ConcatString,StringArray>::iterator it=metadata_map.begin();
+       it!=metadata_map.end(); ++it) {
+    metadata_names.add(it->second);
   }
+
+  mlog << Debug(6) << method_name
+       << "map size: " << metadata_map.size() << ", dims_vars_count = " << metadata_names.n() << "\n";
 
 }
 
@@ -940,7 +942,7 @@ void UGridFile::read_netcdf_grid()
 
 ////////////////////////////////////////////////////////////////////////
 
-void UGridFile::set_dataset(ConcatString _dataset_name, bool do_override) {
+void UGridFile::set_dataset(ConcatString _dataset_name) {
 
   const char *ugrid_config_name = nullptr;
 
@@ -960,7 +962,7 @@ void UGridFile::set_dataset(ConcatString _dataset_name, bool do_override) {
   }
   ugrid_config_name = dataset_config.c_str();
   if (file_exists(ugrid_config_name)) {
-    read_config(ugrid_config_name, do_override);
+    read_config(ugrid_config_name);
   }
   else {
     mlog << Error << "\nUGridFile::set_dataset()"

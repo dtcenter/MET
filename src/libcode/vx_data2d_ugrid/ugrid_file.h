@@ -46,7 +46,9 @@ class UGridFile {
       bool open(const char *filename);
       bool open_metadata(const char *filename);
       bool get_var_info();
-      void set_dataset(ConcatString _dataset_name, bool do_override=false);
+
+      ConcatString coordinate_nc();
+      void set_dataset(ConcatString _dataset_name);
       void set_map_config_file(ConcatString filename);
       void set_max_distance_km(double max_distance);
 
@@ -118,9 +120,10 @@ class UGridFile {
       netCDF::NcFile * _ncFile;      //  allocated
       netCDF::NcFile * _ncMetaFile;  //  allocated
 
-      std::map<ConcatString,StringArray> metadata_map;
-      StringArray metadata_names;
       ConcatString dataset_name;
+      ConcatString coordinate_file;
+      StringArray metadata_names;
+      std::map<ConcatString,StringArray> metadata_map;
       double max_distance_km;
          //
          //  dimensions
@@ -162,7 +165,7 @@ class UGridFile {
 
       std::string find_metadata_name(std::string &key, StringArray &available_names);
       StringArray get_metadata_names(std::string &key);
-      void read_config(ConcatString config_filename, bool do_override=true);
+      void read_config(ConcatString config_filename);
       void read_netcdf_grid();
 
 };
@@ -171,6 +174,7 @@ class UGridFile {
 ////////////////////////////////////////////////////////////////////////
 
 inline netCDF::NcDim *UGridFile::get_vert_dim() const { return _virtDim; }
+inline ConcatString UGridFile::coordinate_nc() { return coordinate_file; }
 
 ////////////////////////////////////////////////////////////////////////
 
