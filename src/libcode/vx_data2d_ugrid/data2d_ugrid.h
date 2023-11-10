@@ -62,7 +62,7 @@ class MetUGridDataFile : public Met2dDataFile {
 
       virtual int nx() const
       {
-         if (_file == 0)
+         if (_file == nullptr)
             return 0;
     
          return _file->getNx();
@@ -109,9 +109,9 @@ class MetUGridDataFile : public Met2dDataFile {
 
       bool open  (const char * filename);
       bool open_metadata(const char * filename);
-      void set_dataset(ConcatString dataset_name);
-      void set_map_config_file(ConcatString filename);
-      void set_max_distance_km(double max_distance);
+      ConcatString coordinate_file() const;
+      void set_ugrid_configs(ConcatString dataset_name, double max_distance_km,
+                             ConcatString map_config_filename);
 
       void close ();
 
@@ -123,7 +123,8 @@ class MetUGridDataFile : public Met2dDataFile {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline GrdFileType MetUGridDataFile::file_type () const { return ( FileType_UGrid ); }
+inline GrdFileType MetUGridDataFile::file_type () const { return FileType_UGrid; }
+inline ConcatString MetUGridDataFile::coordinate_file() const { return _file->coordinate_nc(); }
 
 
 ////////////////////////////////////////////////////////////////////////

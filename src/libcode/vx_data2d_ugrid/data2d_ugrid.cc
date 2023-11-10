@@ -942,95 +942,91 @@ int MetUGridDataFile::index(VarInfo &vinfo){
 
 bool MetUGridDataFile::read_data_plane(ConcatString var_name, VarInfo &vinfo,
                                        DataPlane &plane, LongArray &dimension) {
-  static const string method_name
+   static const string method_name
       = "MetUGridDataFile::read_data_plane() -> ";
 
-  // Read the data
-  NcVarInfo *info = (NcVarInfo *) nullptr;
+   // Read the data
+   NcVarInfo *info = (NcVarInfo *) nullptr;
 
-  bool status = _file->getData(var_name.c_str(),
-                               dimension,
-                               plane, info);
+   bool status = _file->getData(var_name.c_str(),
+                                dimension,
+                                plane, info);
 
-  //if (org_time_offset != bad_data_int && 0 <= time_dim_slot)
-  //  dimension[time_dim_slot] = org_time_offset;
-  //if (org_z_offset != bad_data_int && 0 <= zdim_slot)
-  //  dimension[zdim_slot] = org_z_offset;
+   //if (org_time_offset != bad_data_int && 0 <= time_dim_slot)
+   //  dimension[time_dim_slot] = org_time_offset;
+   //if (org_z_offset != bad_data_int && 0 <= zdim_slot)
+   //  dimension[zdim_slot] = org_z_offset;
 
-  // Check that the times match those requested
+   // Check that the times match those requested
 
-  if (status)
-  {
-    // Check that the valid time matches the request
+   if (status)
+   {
+      // Check that the valid time matches the request
 
-    if (vinfo.valid() > 0 && vinfo.valid() != plane.valid())
-    {
-      // Compute time strings
+      if (vinfo.valid() > 0 && vinfo.valid() != plane.valid())
+      {
+         // Compute time strings
 
-      ConcatString req_time_str  = unix_to_yyyymmdd_hhmmss(vinfo.valid());
-      ConcatString data_time_str = unix_to_yyyymmdd_hhmmss(plane.valid());
+         ConcatString req_time_str  = unix_to_yyyymmdd_hhmmss(vinfo.valid());
+         ConcatString data_time_str = unix_to_yyyymmdd_hhmmss(plane.valid());
 
-      mlog << Warning << "\n" << method_name
-           << "for \"" << vinfo.req_name() << "\" variable, the valid "
-           << "time does not match the requested valid time: ("
-           << data_time_str << " != " << req_time_str << ")\n\n";
-      status = false;
-    }
+         mlog << Warning << "\n" << method_name
+              << "for \"" << vinfo.req_name() << "\" variable, the valid "
+              << "time does not match the requested valid time: ("
+              << data_time_str << " != " << req_time_str << ")\n\n";
+         status = false;
+      }
 
-    // Check that the lead time matches the request
+      // Check that the lead time matches the request
 
-    if (vinfo.lead() > 0 && vinfo.lead() != plane.lead())
-    {
-      // Compute time strings
+      if (vinfo.lead() > 0 && vinfo.lead() != plane.lead())
+      {
+         // Compute time strings
 
-      ConcatString req_time_str  = sec_to_hhmmss(vinfo.lead());
-      ConcatString data_time_str = sec_to_hhmmss(plane.lead());
+         ConcatString req_time_str  = sec_to_hhmmss(vinfo.lead());
+         ConcatString data_time_str = sec_to_hhmmss(plane.lead());
 
-      mlog << Warning << "\n" << method_name
-           << "for \"" << vinfo.req_name() << "\" variable, the lead "
-           << "time does not match the requested lead time: ("
-           << data_time_str << " != " << req_time_str << ")\n\n";
-      status = false;
-    }
+         mlog << Warning << "\n" << method_name
+              << "for \"" << vinfo.req_name() << "\" variable, the lead "
+              << "time does not match the requested lead time: ("
+              << data_time_str << " != " << req_time_str << ")\n\n";
+         status = false;
+      }
 
-    status = process_data_plane(&vinfo, plane);
+      status = process_data_plane(&vinfo, plane);
 
-    // Set the VarInfo object's name, long_name, level, and units strings
+      // Set the VarInfo object's name, long_name, level, and units strings
 
-    if (info->name_att.length() > 0)
-      vinfo.set_name(info->name_att);
-    else
-      vinfo.set_name(info->name);
+      if (info->name_att.length() > 0)
+         vinfo.set_name(info->name_att);
+      else
+         vinfo.set_name(info->name);
 
-    if (info->long_name_att.length() > 0)
-      vinfo.set_long_name(info->long_name_att.c_str());
+      if (info->long_name_att.length() > 0)
+         vinfo.set_long_name(info->long_name_att.c_str());
 
-    if (info->level_att.length() > 0)
-      vinfo.set_level_name(info->level_att.c_str());
+      if (info->level_att.length() > 0)
+         vinfo.set_level_name(info->level_att.c_str());
 
-    if (info->units_att.length() > 0)
-      vinfo.set_units(info->units_att.c_str());
-  }
+      if (info->units_att.length() > 0)
+         vinfo.set_units(info->units_att.c_str());
+   }
 
-  return status;
+   return status;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void MetUGridDataFile::set_dataset(ConcatString dataset_name) {
+void MetUGridDataFile::set_ugrid_configs(ConcatString dataset_name,
+                                         double max_distance_km,
+                                         ConcatString map_config_filename) {
    _file->set_dataset(dataset_name);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void MetUGridDataFile::set_max_distance_km(double max_distance) {
-   _file->set_max_distance_km(max_distance);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void MetUGridDataFile::set_map_config_file(ConcatString filename) {
-   _file->set_map_config_file(filename);
+   if (0 < map_config_filename.length()) {
+      _file->set_map_config_file(map_config_filename);
+   }
+   if (!is_eq(bad_data_double, max_distance_km)) {
+      _file->set_max_distance_km(max_distance_km);
+   }
 }
 
 
