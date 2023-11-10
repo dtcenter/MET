@@ -11,7 +11,7 @@
 // Dimensions and variables mapping for MPAS dataset
 //
 ugrid_metadata_map = [
-   { key = "dim_face";  val = "nCells; },
+   { key = "dim_face";  val = "nCells"; },
    { key = "dim_node";  val = "nVertices"; },
    { key = "dim_edge";  val = "nEdges"; },
    { key = "dim_time";  val = "Time"; },
