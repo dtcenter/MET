@@ -136,7 +136,8 @@ void UnstructuredGrid::latlon_to_xy(double lat, double lon, double &x, double &y
    //if(_distance > 180.0) atlas_geometry.xyz2lonlat(neighbor[0].point(), r_lonlat);
    //else r_lonlat.assign(neighbor[0].point()[0], neighbor[0].point()[1]);
 
-   mlog << Debug(UGRID_DEBUG_LEVEL) << "UnstructuredGrid::latlon_to_xy() "
+   if(mlog.verbosity_level() >= UGRID_DEBUG_LEVEL) mlog
+        << Debug(UGRID_DEBUG_LEVEL) << "UnstructuredGrid::latlon_to_xy() "
         << "input=(" << lon << ", " << lat << ") ==> (" << x << ", " << y << ") == ("
         << Data.pointLonLat[index].x() << ", " << Data.pointLonLat[index].y()
         << ") distance= " << distance_km << "km, "
@@ -154,7 +155,8 @@ void UnstructuredGrid::xy_to_latlon(double x, double y, double &lat, double &lon
    lat = Data.pointLonLat[x].y();
    lon = Data.pointLonLat[x].x();
 
-   mlog << Debug(UGRID_DEBUG_LEVEL) << "UnstructuredGrid::xy_to_latlon() "
+   if(mlog.verbosity_level() >= UGRID_DEBUG_LEVEL) mlog
+        << Debug(UGRID_DEBUG_LEVEL) << "UnstructuredGrid::xy_to_latlon() "
         << "(" << x << ", " << y << ") ==> (" << lon << ", " << lat << ").\n";
 
 }
@@ -397,7 +399,8 @@ void UnstructuredData::set_points(int count, double *_lon, double *_lat) {
    for (int i=0; i<count; i++) {
       pointLonLat[i] = {_lon[i], _lat[i]};
    }
-   mlog << Debug(UGRID_DEBUG_LEVEL) << "UnstructuredData::set_points(int, double *, double *) first ("
+   if(mlog.verbosity_level() >= UGRID_DEBUG_LEVEL) mlog
+        << Debug(UGRID_DEBUG_LEVEL) << "UnstructuredData::set_points(int, double *, double *) first ("
         << pointLonLat[0].x() << ", " << pointLonLat[0].y() << ") and last ("
         << pointLonLat[count-1].x() << ", " << pointLonLat[count-1].y() << ") from ("
         << _lon[0] << ", " << _lat[0] << ") and ("
@@ -418,7 +421,8 @@ void UnstructuredData::set_points(int count, const std::vector<PointLonLat> &ptL
    for (int i=0; i<count; i++) {
       pointLonLat[i] = {(ptLonLat)[i].x(), (ptLonLat)[i].y()};
    }
-   mlog << Debug(UGRID_DEBUG_LEVEL) << "UnstructuredData::set_points(std::vector<PointLonLat> &) first: ("
+   if(mlog.verbosity_level() >= UGRID_DEBUG_LEVEL) mlog
+        << Debug(UGRID_DEBUG_LEVEL) << "UnstructuredData::set_points(std::vector<PointLonLat> &) first: ("
         << pointLonLat[0].x() << ", " << pointLonLat[0].y() << ") and last ("
         << pointLonLat[count-1].x() << ", " << pointLonLat[count-1].y() << ") from ("
         << ptLonLat[0].x() << ", " << ptLonLat[0].y() << ") and ("
