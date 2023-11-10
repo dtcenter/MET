@@ -306,19 +306,28 @@ void process_command_line(int argc, char **argv) {
 
    if (FileType_UGrid == ftype) {
 #ifdef WITH_UGRID
-      ConcatString ugrid_nc = conf_info.ugrid_nc;
       ConcatString ugrid_dataset = conf_info.ugrid_dataset;
-      ConcatString ugrid_map_config = conf_info.ugrid_map_config;
-      MetUGridDataFile *ugrid_mtddf = (MetUGridDataFile *)fcst_mtddf;
-      ugrid_mtddf->set_max_distance_km(conf_info.ugrid_max_distance_km);
-      if (0 < ugrid_dataset.length()) ugrid_mtddf->set_dataset(ugrid_dataset);
-      if (0 < ugrid_map_config.length())
-         ugrid_mtddf->set_map_config_file(ugrid_map_config);
-      if (0 == ugrid_nc.length() || ugrid_nc == "NA") ugrid_nc = fcst_file;
-      ugrid_mtddf->open_metadata(ugrid_nc.c_str());
-      mlog << Debug(9) << method_name
-           << "ugrid_coordinate_nc: " << ugrid_nc
-           << "  ugrid_max_distance_km: " << conf_info.ugrid_max_distance_km << "\n";
+      if (0 < ugrid_dataset.length()) {
+         double max_distance_km = conf_info.ugrid_max_distance_km;
+         ConcatString ugrid_nc = conf_info.ugrid_nc;
+         ConcatString ugrid_map_config_filename = conf_info.ugrid_map_config;
+         MetUGridDataFile *ugrid_mtddf = (MetUGridDataFile *)fcst_mtddf;
+
+         ugrid_mtddf->set_ugrid_configs(ugrid_dataset, max_distance_km,
+                                        ugrid_map_config_filename);
+         if (0 == ugrid_nc.length() || ugrid_nc == "NA") {
+            ConcatString coordinate_file = ugrid_mtddf->coordinate_file();
+            ugrid_nc = (0 < coordinate_file.length()) ? coordinate_file : fcst_file;
+         }
+         ugrid_mtddf->open_metadata(ugrid_nc.c_str());
+         mlog << Debug(9) << method_name
+              << "ugrid_coordinate_nc: " << ugrid_nc
+              << "  ugrid_max_distance_km: " << conf_info.ugrid_max_distance_km << "\n";
+      }
+      else {
+         mlog << Error << "\n" << method_name
+              << conf_key_ugrid_dataset << " is not defined at the configuration file.\n\n";
+      }
 #else
       ugrid_compile_error(method_name);
 #endif
