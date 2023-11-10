@@ -1010,20 +1010,19 @@ TimeSummaryInfo parse_conf_time_summary(Dictionary *dict) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// Conf: map_name: message_type_map, obs_var_map, etc
 
 void parse_add_conf_key_value_map(
       Dictionary *dict, const char *conf_key_map_name, map<ConcatString,ConcatString> *m) {
-   Dictionary *map_dict = (Dictionary *) nullptr;
-   ConcatString key, val;
 
    if(!dict) {
-      mlog << Error << "\nparse_conf_key_value_type_map() -> "
+      mlog << Error << "\nparse_add_conf_key_value_map() -> "
            << "empty dictionary!\n\n";
       exit(1);
    }
 
-   // Conf: map_name: message_type_map, obs)var_map, etc
-   map_dict = dict->lookup_array(conf_key_map_name);
+   ConcatString key, val;
+   Dictionary *map_dict = dict->lookup_array(conf_key_map_name);
 
    // Loop through the array entries
    for(int i=0; i<map_dict->n_entries(); i++) {
@@ -1039,6 +1038,32 @@ void parse_add_conf_key_value_map(
          // Add entry to the map
          m->insert(pair<ConcatString, ConcatString>(key, val));
       }
+   }
+
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Conf: map_name: ugrid_metadata_maps
+
+void parse_add_conf_key_values_map(
+      Dictionary *dict, const char *conf_key_map_name,
+      map<ConcatString,StringArray> *sa_map, const char *caller) {
+   const char *method_name = (nullptr != caller) ? caller : "parse_conf_key_values_map() -> ";
+
+   if(!dict) {
+      mlog << Error << "\n" << method_name
+           << "empty dictionary!\n\n";
+      exit(1);
+   }
+
+   StringArray sa;
+   map<ConcatString,ConcatString> cs_map = parse_conf_key_value_map(dict, conf_key_map_name, method_name);
+
+   // Loop through the array entries and convert input comma-separated strings to StringArray
+   for(map<ConcatString,ConcatString>::const_iterator it=cs_map.begin(); it!= cs_map.end(); it++) {
+      sa.parse_css(it->second);
+      (*sa_map)[it->first] = sa;
    }
 
    return;
@@ -2288,9 +2313,9 @@ ConcatString parse_conf_ugrid_map_config(Dictionary *dict) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-map<ConcatString,StringArray> parse_conf_ugrid_metadata_map(Dictionary *dict) {
-   const char *method_name = "parse_conf_ugrid_metadata_map() -> ";
-   return parse_conf_key_values_map(dict, conf_key_ugrid_metadata_map, method_name);
+void parse_add_conf_ugrid_metadata_map(Dictionary *dict, map<ConcatString,StringArray> *m) {
+   parse_add_conf_key_values_map(dict, conf_key_ugrid_metadata_map, m,
+                                 "parse_add_conf_ugrid_metadata_map");
 }
 
 
