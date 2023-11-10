@@ -3220,7 +3220,7 @@ float compute_pbl(map<float, float*> pqtzuv_map_tq,
                     << pqtzuv_merged_array.size() << "\n";
          }
       }
-      for (int i; i<pqtzuv_merged_array.size(); i++) delete pqtzuv_merged_array[i];
+      for (int i=0; i<pqtzuv_merged_array.size(); i++) delete pqtzuv_merged_array[i];
       pqtzuv_merged_array.clear();
    }
    return hpbl;

@@ -12,12 +12,12 @@ When MET reads GSI diagnostic files, the innovation (O-B; generated prior to the
 
 MET includes two tools for processing GSI diagnostic files. The GSID2MPR tool reformats individual GSI diagnostic files into the MET matched pair (MPR) format, similar to the output of the Point-Stat tool. The GSIDENS2ORANK tool processes an ensemble of GSI diagnostic files and reformats them into the MET observation rank (ORANK) line type, similar to the output of the Ensemble-Stat tool. The output of both tools may be passed to the Stat-Analysis tool to compute a wide variety of continuous, categorical, and ensemble statistics.
 
-GSID2MPR tool
+GSID2MPR Tool
 =============
 
 This section describes how to run the GSID2MPR tool. The GSID2MPR tool reformats one or more GSI diagnostic files into an ASCII matched pair (MPR) format, similar to the MPR output of the Point-Stat tool. The output MPR data may be passed to the Stat-Analysis tool to compute a wide variety of continuous or categorical statistics.
 
-gsid2mpr usage
+gsid2mpr Usage
 --------------
 
 The usage statement for the GSID2MPR tool is shown below:
@@ -37,12 +37,12 @@ The usage statement for the GSID2MPR tool is shown below:
 
 gsid2mpr has one required argument and accepts several optional ones.
 
-Required arguments for gsid2mpr
+Required Arguments for gsid2mpr
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. The **gsi_file_1 [gsi_file2 ... gsi_file_n]** argument indicates the GSI diagnostic files (conventional or radiance) to be reformatted.
    
-Optional arguments for gsid2mpr
+Optional Arguments for gsid2mpr
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 2. The **-swap** option switches the endianness when reading the input binary files.
@@ -71,7 +71,7 @@ An example of the gsid2mpr calling sequence is shown below:
 
 In this example, the GSID2MPR tool will process a single input file named **diag_conv_ges.mem001** file, set the output **MODEL** header column to **GSI_MEM001**, and write output to the **out** directory. The output file is named the same as the input file but a **.stat** suffix is added to indicate its format.
 
-gsid2mpr output
+gsid2mpr Output
 ---------------
 
 The GSID2MPR tool performs a simple reformatting step and thus requires no configuration file. It can read both conventional and radiance binary GSI diagnostic files. Support for additional GSI diagnostic file type may be added in future releases. Conventional files are determined by the presence of the string **conv** in the filename. Files that are not conventional are assumed to contain radiance data. Multiple files of either type may be passed in a single call to the GSID2MPR tool. For each input file, an output file will be generated containing the corresponding matched pair data.
@@ -243,12 +243,12 @@ An example of the Stat-Analysis calling sequence is shown below:
 
 In this example, the Stat-Analysis tool will read MPR lines from the input file named **diag_conv_ges.mem001.stat**, retain only those lines where the **FCST_VAR** column indicates temperature (**t**) and where the **ANLY_USE** column has a value of 1.0, and derive continuous statistics.
 
-GSIDENS2ORANK tool
+GSIDENS2ORANK Tool
 ==================
 
 This section describes how to run the GSIDENS2ORANK tool. The GSIDENS2ORANK tool processes an ensemble of GSI diagnostic files and reformats them into the MET observation rank (ORANK) line type, similar to the output of the Ensemble-Stat tool. The ORANK line type contains ensemble matched pair information and is analogous to the MPR line type for a deterministic model. The output ORANK data may be passed to the Stat-Analysis tool to compute ensemble statistics.
 
-gsidens2orank usage
+gsidens2orank Usage
 -------------------
 
 The usage statement for the GSIDENS2ORANK tool is shown below:
@@ -268,7 +268,7 @@ The usage statement for the GSIDENS2ORANK tool is shown below:
 
 gsidens2orank has three required arguments and accepts several optional ones.
 
-Required arguments for gsidens2orank
+Required Arguments for gsidens2orank
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. The **ens_file_1 ... ens_file_n** argument is a list of ensemble binary GSI diagnostic files to be reformatted.
@@ -277,7 +277,7 @@ Required arguments for gsidens2orank
 
 3. The **-out path** argument specifies the name of the output **.stat** file.
 
-Optional arguments for gsidens2orank
+Optional Arguments for gsidens2orank
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 4. The **-ens_mean path** option is the ensemble mean binary GSI diagnostic file.
@@ -306,7 +306,7 @@ An example of the gsidens2orank calling sequence is shown below:
 
 In this example, the GSIDENS2ORANK tool will process all of the ensemble members whose file name **matches diag_conv_ges.mem\*,** write output to the file named **diag_conv_ges_ens_mean_orank.txt**, and populate the output **ENS_MEAN** column with the values found in the **diag_conv_ges.ensmean** file rather than computing the ensemble mean values from the ensemble members on the fly.
 
-gsidens2orank output
+gsidens2orank Output
 --------------------
 
 The GSIDENS2ORANK tool performs a simple reformatting step and thus requires no configuration file. The multiple files passed to it are interpreted as members of the same ensemble. Therefore, each call to the tool processes exactly one ensemble. All input ensemble GSI diagnostic files must be of the same type. Mixing conventional and radiance files together will result in a runtime error. The GSIDENS2ORANK tool processes each ensemble member and keeps track of the observations it encounters. It constructs a list of the ensemble values corresponding to each observation and writes an output ORANK line listing the observation value, its rank, and all the ensemble values. The random number generator is used by the GSIDENS2ORANK tool to randomly assign a rank value in the case of ties.

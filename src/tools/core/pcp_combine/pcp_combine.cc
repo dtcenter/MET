@@ -586,6 +586,8 @@ void sum_data_files(Grid & grid, DataPlane & plane) {
    //
    for(i=0; i<n_files; i++) {
       pcp_times[i] = valid_time - i*in_accum;
+      pcp_recs[i] = -1;
+      pcp_files[i] = "";
    }
 
    //
@@ -596,7 +598,6 @@ void sum_data_files(Grid & grid, DataPlane & plane) {
       //
       // Search in each directory for the current file time.
       //
-      if (0 == pcp_dir.n_elements()) pcp_recs[i] = -1;
       for(j=0; j<pcp_dir.n_elements(); j++) {
 
          pcp_recs[i] = search_pcp_dir(pcp_dir[j].c_str(), pcp_times[i],
