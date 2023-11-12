@@ -1449,7 +1449,7 @@ void compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps) {
       seeps_mprs.push_back(seeps_mpr);
    }
    if (count > 0) {
-      double *density_vector;
+      vector<double> density_vector;
       double pvf[SEEPS_MATRIX_SIZE];
       double weighted_score, weight_sum, weight[count];
 
@@ -1457,41 +1457,48 @@ void compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps) {
       seeps->mean_fcst = fcst_sum / count;
       seeps->mean_obs = obs_sum / count;
       seeps->score = score_sum / count;
-      density_vector = compute_seeps_density_vector(pd, seeps);
 
       weighted_score = 0.;
       for (int i=0; i<SEEPS_MATRIX_SIZE; i++) pvf[i] = 0.;
-      if (density_vector != nullptr) {
-         //IDL: w = 1/d
-         weight_sum = 0.;
-         for (int i=0; i<count; i++) {
-            if (is_eq(density_vector[i], 0)) weight[i] = 0;
-            else {
-               weight[i] = 1 / density_vector[i];
-               weight_sum += weight[i];
-            }
-         }
-         if (!is_eq(weight_sum, 0)) {
-            //IDL: w = w/sum(w)
-            for (int i=0; i<count; i++) weight[i] /= weight_sum;
 
-            //IDL: for i=0l, n-1l do begin
-            for (int i=0; i<seeps_mprs.size(); i++) {
-               seeps_mpr = seeps_mprs[i];
-               //IDL: s = s + c(4+cat(i) * w{i)
-               if (i < count) {
-                  weighted_score += seeps_mpr->score * weight[i];
-                  //IDL: svf(cat{i)) = svf(cat{i)) + c(4+cat(i) * w{i)
-                  //IDL: pvf(cat{i)) = pvf(cat{i)) + w{i)
-                  pvf[seeps_mpr->s_idx] += weight[i];
-               }
-               else mlog << Debug(1) << method_name
-                         << "the length of density vector (" << count << ") is less than MPR.\n";
-            }
-         }
+      compute_seeps_density_vector(pd, seeps, density_vector);
+      int density_cnt = density_vector.size();
+      if(density_cnt > count) density_cnt = count;
 
-         if (density_vector != nullptr) delete [] density_vector;
+      //IDL: w = 1/d
+      weight_sum = 0.;
+      for (int i=0; i<count; i++) weight[i] = 0;
+      for (int i=0; i<density_cnt; i++) {
+         if (!is_eq(density_vector[i], 0)) {
+            weight[i] = 1 / density_vector[i];
+            weight_sum += weight[i];
+         }
       }
+      if (!is_eq(weight_sum, 0)) {
+         //IDL: w = w/sum(w)
+         for (int i=0; i<count; i++) weight[i] /= weight_sum;
+
+         //IDL: for i=0l, n-1l do begin
+         for (int i=0; i<seeps_mprs.size(); i++) {
+            seeps_mpr = seeps_mprs[i];
+            //IDL: s = s + c(4+cat(i) * w{i)
+            if (i < density_cnt) {
+               weighted_score += seeps_mpr->score * weight[i];
+               //IDL: svf(cat{i)) = svf(cat{i)) + c(4+cat(i) * w{i)
+               //IDL: pvf(cat{i)) = pvf(cat{i)) + w{i)
+               pvf[seeps_mpr->s_idx] += weight[i];
+            }
+            else {
+               mlog << Debug(1) << method_name
+                    << "the length of density vector (" << density_cnt
+                    << ") is less than SEEPS MPR (" << seeps_mprs.size() << ").\n";
+               break;
+            }
+         }
+      }
+
+      density_vector.clear();
+
       seeps_mprs.clear();
 
       // The weight for s12 to s32 should come from climo file, but not available yet
@@ -1707,7 +1714,7 @@ void compute_aggregated_seeps_grid(const DataPlane &fcst_dp, const DataPlane &ob
 // ; PV-WAVE prints: 2.00000      4.00000
 ////////////////////////////////////////////////////////////////////////
 
-double *compute_seeps_density_vector(const PairDataPoint *pd, SeepsAggScore *seeps) {
+void compute_seeps_density_vector(const PairDataPoint *pd, SeepsAggScore *seeps, vector<double> &density_vector) {
    int seeps_idx;
    SeepsScore *seeps_mpr;
    int seeps_cnt = seeps->n_obs;
@@ -1725,12 +1732,11 @@ double *compute_seeps_density_vector(const PairDataPoint *pd, SeepsAggScore *see
    if (seeps_cnt == 0) {
       mlog << Debug(1) << method_name
            << "no SEEPS_MPR available.\n";
-      return nullptr;
+      return;
    }
 
    // Get lat/lon & convert them to radian and get sin/cos values
    seeps_idx = 0;
-   double *density_vector = new double[seeps_cnt];
    for(int i=0; i<pd->n_obs; i++) {
       if (i >= pd->seeps_mpr.size()) break;
       seeps_mpr = pd->seeps_mpr[i];
@@ -1752,10 +1758,9 @@ double *compute_seeps_density_vector(const PairDataPoint *pd, SeepsAggScore *see
    // Initialize
    v_count = 0;
    if (seeps_idx < seeps_cnt) seeps_cnt = seeps_idx;
-   for(int i=0; i<seeps_cnt; i++) {
-      density_vector[i] = 0.;
-   }
+   density_vector.reserve(seeps_cnt);
    for(int j=0; j<seeps_cnt; j++) {
+      density_vector.push_back(0.);
       for(int i=0; i<seeps_cnt; i++) {
          // Make n by n matrix: clat_m = clat#transpose(clat), slat_m = slat#transpose(slat) by IDL
          clat_m[i][j] = clat[i] * clat[j];
@@ -1793,7 +1798,7 @@ double *compute_seeps_density_vector(const PairDataPoint *pd, SeepsAggScore *see
            << " density_vector[" << (seeps_cnt-1) << "]=" << density_vector[seeps_cnt-1] << "\n";
    }
 
-   return density_vector;
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////

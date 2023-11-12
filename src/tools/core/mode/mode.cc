@@ -56,6 +56,7 @@
 //   019    04/01/19  Fillmore       Add FCST and OBS units.
 //   020    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
 //   021    06/09/23  Albo           Major changes for multivariate mode
+//   022    11/02/23  Halley Gotway  MET #2724 add OpenMP to convolution
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -73,6 +74,7 @@ using namespace std;
 #include <sys/types.h>
 
 #include "main.h"
+#include "handle_openmp.h"
 #include "string_array.h"
 #include "mode_usage.h"
 #include "mode_frontend.h"
@@ -115,6 +117,7 @@ const char * const program_name = "mode";
 
 
 static const char default_config_filename [] = "MET_BASE/config/MODEConfig_default";
+static const char default_multivar_config_filename [] = "MET_BASE/config/MODEMultivarConfig_default";
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -129,6 +132,9 @@ int met_main(int argc, char * argv [])
    StringArray Argv;
    string s;
    const char * user_config_filename = 0;
+
+   // Set up OpenMP (if enabled)
+   init_openmp();
 
    for (j=0,n=0; j<argc; ++j)  {
 
@@ -168,6 +174,12 @@ int met_main(int argc, char * argv [])
    config.read_config  (default_config_filename, user_config_filename);
 
    if ( config.is_multivar() ) { 
+
+
+      // read again, this time with the mvmode defaults, which are slightly different
+
+      config.clear();
+      config.read_config(default_multivar_config_filename, user_config_filename);
 
       // exit inside this method if something is not implemented
 

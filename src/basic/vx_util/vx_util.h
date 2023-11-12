@@ -37,6 +37,7 @@
 #include "fix_float.h"
 #include "get_filenames.h"
 #include "grib_constants.h"
+#include "GridTemplate.h"
 #include "int_array.h"
 #include "interp_mthd.h"
 #include "interp_util.h"

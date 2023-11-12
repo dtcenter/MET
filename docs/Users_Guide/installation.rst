@@ -145,7 +145,7 @@ Building the MET Package
 
 Building the MET package consists of three main steps: (1) install the required libraries, (2) configure the environment variables, and (3) configure and execute the build. Users can follow the instructions below or use a sample installation script.  Users can find the script and its instructions under on the `Downloads <https://dtcenter.org/community-code/model-evaluation-tools-met/download>`_ page of the MET website.
 
-Get the MET source code
+Get the MET Source Code
 -----------------------
 
 The MET source code is available for download from the public `MET GitHub repository <https://github.com/dtcenter/MET>`_.

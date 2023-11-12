@@ -8,20 +8,20 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <string.h>
 #include <cstring>
 #include <sys/stat.h>
 
 #include <netcdf>
-using namespace netCDF;
-using namespace netCDF::exceptions;
 
 #include "vx_log.h"
 #include "nc_utils.h"
 #include "util_constants.h"
 #include "vx_cal.h"
+
+using namespace std;
+using namespace netCDF;
+using namespace netCDF::exceptions;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -172,7 +172,7 @@ bool get_att_value_chars(const NcAtt *att, ConcatString &value) {
             att->getValues(att_value);
             value = att_value;
          }
-         catch (exceptions::NcChar ex) {
+         catch (exceptions::NcChar &ex) {
             value = "";
             // Handle netCDF::exceptions::NcChar:  NetCDF: Attempt to convert between text & numbers
             mlog << Warning << "\n" << method_name
@@ -188,7 +188,7 @@ bool get_att_value_chars(const NcAtt *att, ConcatString &value) {
             att->getValues(att_value);
             value = att_value;
          }
-         catch (exceptions::NcChar ex) {
+         catch (exceptions::NcChar &ex) {
             int num_elements_sub = 8096;
             int num_elements = att->getAttLength();;
             char *att_value[num_elements];
@@ -199,7 +199,7 @@ bool get_att_value_chars(const NcAtt *att, ConcatString &value) {
                att->getValues(att_value);
                value = att_value[0];
             }
-            catch (exceptions::NcException ex) {
+            catch (exceptions::NcException &ex) {
                mlog << Warning << "\n" << method_name
                     << "Exception: " << ex.what() << "\n"
                     << "Fail to read " << GET_NC_NAME_P(att) << " attribute ("
@@ -1373,15 +1373,18 @@ bool get_nc_data(NcVar *var, float *data) {
             case NcType::nc_DOUBLE:
                {
                   double *packed_data = new double[cell_count];
+                  for (int idx=0; idx<cell_count; idx++) packed_data[idx] = bad_data_double;
 
                   get_nc_data_t(var, packed_data);
 
+                  double a_data;
                   double fill_value;
                   bool has_fill_value = get_var_fill_value(var, fill_value);
                   for (int idx=0; idx<cell_count; idx++) {
-                     if(has_fill_value && is_eq(data[idx], fill_value))
+                     a_data = packed_data[idx];
+                     if(has_fill_value && is_eq(a_data, fill_value))
                         data[idx] = bad_data_float;
-                     else data[idx] = (float)packed_data[idx];
+                     else data[idx] = (float)a_data;
                   }
                   delete [] packed_data;
                }
@@ -1389,6 +1392,7 @@ bool get_nc_data(NcVar *var, float *data) {
             case NcType::nc_INT64:
                {
                   long long *packed_data = new long long[cell_count];
+                  for (int idx=0; idx<cell_count; idx++) packed_data[idx] = (long long)bad_data_int;
 
                   var->getVar(packed_data);
                   copy_nc_data_(var, data, packed_data, cell_count,

@@ -11,21 +11,21 @@ Users may wish to summarize multiple ASCII files produced by MODE across many ca
 
 .. _MODE_A-Scientific-and-statistical:
 
-Scientific and statistical aspects
+Scientific and Statistical Aspects
 ==================================
 
 The MODE-Analysis tool operates in two modes, called "summary" and "bycase". In summary mode, the user specifies on the command line the MODE output columns of interest as well as filtering criteria that determine which input lines should be used. For example, a user may be interested in forecast object areas, but only if the object was matched, and only if the object centroid is inside a particular region. The summary statistics generated for each specified column of data are the minimum, maximum, mean, standard deviation, and the 10th, 25th, 50th, 75th and 90th percentiles. In addition, the user may specify a "dump'" file: the individual MODE lines used to produce the statistics will be written to this file. This option provides the user with a filtering capability. The dump file will consist only of lines that match the specified criteria.
 
 The other option for operating the analysis tool is "bycase". Given initial and final values for forecast lead time, the tool will output, for each valid time in the interval, the matched area, unmatched area, and the number of forecast and observed objects that were matched or unmatched. For the areas, the user can specify forecast or observed objects, and also simple or cluster objects. A dump file may also be specified in this mode.
 
-Practical information
+Practical Information
 =====================
 
 The MODE-Analysis tool reads lines from MODE ASCII output files and applies filtering and computes basic statistics on the object attribute values. For each job type, filter parameters can be set to determine which MODE output lines are used. The following sections describe the mode_analysis usage statement, required arguments, and optional arguments.
 
 .. _mode_analysis-usage:
 
-mode_analysis usage
+mode_analysis Usage
 -------------------
 
 The usage statement for the MODE-Analysis tool is shown below:
@@ -46,7 +46,7 @@ The usage statement for the MODE-Analysis tool is shown below:
 
 The MODE-Analysis tool has two required arguments and can accept several optional arguments.
 
-Required arguments for mode_analysis:
+Required Arguments for mode_analysis:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. The **-lookin path** specifies the name of a specific STAT file (any file ending in .stat) or the name of a directory where the Stat-Analysis tool will search for STAT files. This option may be used multiple times to specify multiple locations.
@@ -57,12 +57,12 @@ Specifying **-summary** will produce summary statistics for the MODE output colu
 
 Specifying **-bycase** will produce a table of metrics for each case undergoing analysis. Any columns specified are ignored for this option.
 
-Optional arguments for mode_analysis
+Optional Arguments for mode_analysis
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 3. The mode_analysis options are described in the following section. These are divided into sub-sections describing the analysis options and mode line options.
 
-Analysis options
+Analysis Options
 ^^^^^^^^^^^^^^^^
 
 The general analysis options described below provide a way for the user to indicate configuration files to be used, where to write lines used to perform the analysis, and over which fields to generate statistics.
@@ -137,7 +137,7 @@ This toggle indicates whether matched or unmatched object lines should be used.
 
 
 
-Multiple-set string options
+Multiple-Set String Options
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The following options set various string attributes. They can be set multiple times on the command line but must be separated by spaces. Each of these options must be indicated as a string. String values that include spaces may be used by enclosing the string in quotation marks.
@@ -189,7 +189,7 @@ These options indicate vertical levels for forecast and observed fields to be us
 
 ____________________
 
-Multiple-set integer options
+Multiple-Set Integer Options
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The following options set various integer attributes. They can be set multiple times on the command line but must be separated by spaces. Each of the following options may only be indicated as an integer.
@@ -225,7 +225,7 @@ These options indicate the convolution radius used for forecast or observed obje
 
 _____________________
 
-Integer max/min options
+Integer Max/Min Options
 ^^^^^^^^^^^^^^^^^^^^^^^
 
 These options set limits on various integer attributes. Leaving a maximum value unset means no upper limit is imposed on the value of the attribute. The option works similarly for minimum values. 
@@ -288,7 +288,7 @@ ____________________
 These options refer to the minimum/maximum values for symmetric difference for objects to be used in the analysis.
 
 
-Date/time max/min options
+Date/Time Max/Min Options
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
 These options set limits on various date/time attributes. The values can be specified in one of three ways: 
@@ -324,7 +324,7 @@ These two options indicate minimum/maximum values for forecast and observation i
 
 _____________________
 
-Floating-point max/min options
+Floating-Point Max/Min Options
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Setting limits on various floating-point attributes. One may specify these as integers (i.e., without a decimal point), if desired. The following pairs of options indicate minimum and maximum values for each MODE attribute that can be described as a floating-point number. Please refer to :numref:`MODE-output` for a description of these attributes as needed.
@@ -562,7 +562,7 @@ ____________________
   -interest_max value
 
 
-Miscellaneous options
+Miscellaneous Options
 ^^^^^^^^^^^^^^^^^^^^^
 
 These options are used to indicate parameters that did not fall into any of the previous categories.
@@ -587,14 +587,14 @@ This option prints the usage message.
 
 .. _mode_analysis-configuration-file:
 
-mode_analysis configuration file
+mode_analysis Configuration File
 --------------------------------
 
 To use the MODE-Analysis tool, the user must un-comment the options in the configuration file to apply them and comment out unwanted options. The options in the configuration file for the MODE-Analysis tools are the same as the MODE command line options described in :numref:`mode_analysis-usage`.
 
 The parameters that are set in the configuration file either add to or override parameters that are set on the command line. For the "set string" and "set integer type" options enclosed in brackets, the values specified in the configuration file are added to any values set on the command line. For the "toggle" and "min/max type" options, the values specified in the configuration file override those set on the command line.
 
-mode_analysis output
+mode_analysis Output
 --------------------
 
 The output of the MODE-Analysis tool is a self-describing tabular format written to standard output. The length and contents of the table vary depending on whether **-summary** or **-bycase** is selected. The contents also change for **-summary** depending on the number of columns specified by the user.

@@ -99,8 +99,6 @@ using namespace netCDF;
 #include "nc_obs_util.h"
 #include "nc_point_obs_in.h"
 
-#include "handle_openmp.h"
-
 #ifdef WITH_PYTHON
 #include "data2d_nc_met.h"
 #include "pointdata_python.h"
@@ -176,9 +174,6 @@ static void set_compress(const StringArray &);
 ////////////////////////////////////////////////////////////////////////
 
 int met_main(int argc, char *argv[]) {
-
-   // Set up OpenMP (if enabled)
-   init_openmp();
 
    // Process the command line arguments
    process_command_line(argc, argv);
