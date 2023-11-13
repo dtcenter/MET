@@ -1284,7 +1284,8 @@ int derive_consensus(TrackInfoArray &tracks) {
    } // end for i
 
    mlog << Debug(3)
-        << "Building consensus track(s) for " << case_list.n()
+        << "Building " << conf_info.NConsensus
+        << " consensus track(s) for " << case_list.n()
         << " cases.\n";
 
    // Loop through the cases and process each consensus model

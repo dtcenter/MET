@@ -1005,6 +1005,11 @@ TrackInfo consensus(const TrackInfoArray &tracks,
    tavg.set_init(tracks[0].init());
    tavg.set_storm_id();
 
+   // Diagnostic information
+   tavg.set_diag_source(tracks[0].diag_source());
+   tavg.set_track_source(tracks[0].track_source().c_str());
+   tavg.set_field_source(tracks[0].field_source().c_str());
+
    // Loop through the tracks and build a list of lead times
    for(i=0; i<tracks.n(); i++) {
 
@@ -1025,6 +1030,15 @@ TrackInfo consensus(const TrackInfoArray &tracks,
               << "the technique number has changed ("
               << tavg.technique_number() << "!="
               << tracks[i].technique_number() << ").\n\n";
+      }
+
+      // Warning if the diagnostic data source changes
+      if(tavg.diag_source() != tracks[i].diag_source()) {
+         mlog << Warning
+              << "\nTrackInfoArray::consensus() -> "
+              << "the diagnostic type has changed ("
+              << diagtype_to_string(tavg.diag_source()) << "!="
+              << diagtype_to_string(tracks[i].diag_source()) << ").\n\n";
       }
 
       // Store unique diag_names in tavg object, unless they're all skipped
@@ -1175,9 +1189,6 @@ TrackInfo consensus(const TrackInfoArray &tracks,
       // Loop over the diag name and the input track points and
       // compute the mean across all members with the diag value
       for(j=0; j<tavg.diag_name().n(); j++) {
-
-         mlog << Debug(4) << "Computing consensus \""
-              << tavg.diag_name()[j] << "\" diagnostic value.\n";
          
          // Store diag_vals for one diag_name across all track points
          NumArray diag_vals;
