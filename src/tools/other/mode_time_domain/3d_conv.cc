@@ -18,8 +18,6 @@ static const bool do_ppms = false;
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -29,7 +27,6 @@ using namespace std;
 #include <cmath>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "vx_cal.h"
 #include "vx_util.h"
@@ -38,14 +35,17 @@ using namespace netCDF;
 #include "mtd_file.h"
 #include "mtd_nc_defs.h"
 
+using namespace std;
+using namespace netCDF;
+
 
 ////////////////////////////////////////////////////////////////////////
 
 
 static int spatial_conv_radius = -1;
 
-static double *     sum_plane_buf = 0;
-static bool   *  ok_sum_plane_buf = 0;
+static double *     sum_plane_buf = nullptr;
+static bool   *  ok_sum_plane_buf = nullptr;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -66,11 +66,11 @@ struct DataHandle {
 
    {
 
-      int j, k;
+      int k;
 
       k = 0;
 
-      for (j=0; j<time_radius; ++j)  {
+      for (int j=0; j<time_radius; ++j)  {
 
          if ( plane_loaded[j] )   ++k;
 
@@ -105,17 +105,17 @@ struct DataHandle {
 
       t = -1;
 
-          data_plane = 0;
+          data_plane = nullptr;
 
-           sum_plane = 0;
+           sum_plane = nullptr;
 
-            ok_plane = 0;
+            ok_plane = nullptr;
 
-        ok_sum_plane = 0;
+        ok_sum_plane = nullptr;
 
-        plane_loaded = 0;
+        plane_loaded = nullptr;
 
-        plane_time   = 0;
+        plane_time   = nullptr;
 
    }
 
@@ -133,21 +133,21 @@ struct DataHandle {
 
       for (j=0; j<time_radius; ++j)  {
 
-         if (   data_plane[j] )  { delete []   data_plane[j];    data_plane[j] = 0; }
-         if (    sum_plane[j] )  { delete []    sum_plane[j];     sum_plane[j] = 0; }
-         if (     ok_plane[j] )  { delete []     ok_plane[j];      ok_plane[j] = 0; }
-         if ( ok_sum_plane[j] )  { delete [] ok_sum_plane[j];  ok_sum_plane[j] = 0; }
+         if (   data_plane[j] )  { delete []   data_plane[j];    data_plane[j] = nullptr; }
+         if (    sum_plane[j] )  { delete []    sum_plane[j];     sum_plane[j] = nullptr; }
+         if (     ok_plane[j] )  { delete []     ok_plane[j];      ok_plane[j] = nullptr; }
+         if ( ok_sum_plane[j] )  { delete [] ok_sum_plane[j];  ok_sum_plane[j] = nullptr; }
 
       }
 
-      delete []   data_plane;    data_plane = 0;
-      delete []    sum_plane;     sum_plane = 0;
-      delete []     ok_plane;      ok_plane = 0;
-      delete [] ok_sum_plane;  ok_sum_plane = 0;
+      delete []   data_plane;    data_plane = nullptr;
+      delete []    sum_plane;     sum_plane = nullptr;
+      delete []     ok_plane;      ok_plane = nullptr;
+      delete [] ok_sum_plane;  ok_sum_plane = nullptr;
 
-      delete [] plane_loaded;  plane_loaded = 0;
+      delete [] plane_loaded;  plane_loaded = nullptr;
 
-      delete [] plane_time;    plane_time   = 0;
+      delete [] plane_time;    plane_time   = nullptr;
 
       return;
 
@@ -231,13 +231,13 @@ int n_good;
 double value;
 MtdFloatFile out;
 double min_conv_value, max_conv_value;
-double * conv_data = (double *) 0;
+double * conv_data = (double *) nullptr;
 DataHandle handle;
 unixtime time_start, time_stop;
 
 const int time_radius = time_end - time_beg + 1;
 
-double * p = 0;
+double * p = nullptr;
 double * ss [time_radius];
 bool   * ok [time_radius];
 
@@ -258,13 +258,15 @@ spatial_conv_radius = spatial_R;
 
 
 const int Nxy = Nx*Ny;
+const int Nxyz = Nx*Ny*Nt;
 
    sum_plane_buf = new double [Nxy];
 ok_sum_plane_buf = new bool   [Nxy];
 
 handle.set_size(Nx, Ny, time_radius);
 
-conv_data = new double [Nx*Ny*Nt];
+conv_data = new double [Nxyz];
+for (k=0; k<Nxyz; k++) conv_data[k] = bad_data_double;
 
 if ( !conv_data )  {
 
@@ -315,15 +317,18 @@ for (t=0; t<Nt; ++t)  {
       // 
       // }
 
-      n_good = 0;
+      bool has_good_data = false;
 
       for (k=0; k<time_radius; ++k)  {
 
-         if ( handle.plane_loaded[k] && *(ok[k]) )  ++n_good;
+         if ( handle.plane_loaded[k] && *(ok[k]) ) {
+            has_good_data = true;
+            break;
+         }
 
       }
 
-      if ( n_good == 0 )  value = bad_data_double;
+      if ( !has_good_data ) value = bad_data_double;
       else {
 
          value = 0.0;
@@ -331,17 +336,17 @@ for (t=0; t<Nt; ++t)  {
          n_good = 0;
 
          for (k=0; k<time_radius; ++k)  {
-
             if ( handle.plane_loaded[k] && *(ok[k]) )  { value += (*ss[k]);  ++n_good; }
-
          }
 
-         value /= n_good;
+         if (n_good >0) {
+            value /= n_good;
 
-         value *= scale;
+            value *= scale;
 
-         if ( value < min_conv_value )  min_conv_value = value;
-         if ( value > max_conv_value )  max_conv_value = value;
+            if ( value < min_conv_value )  min_conv_value = value;
+            if ( value > max_conv_value )  max_conv_value = value;
+         }
 
       }
 
@@ -429,10 +434,10 @@ for (x=0; x<Nx; ++x)  {
    //  done
    //
 
-if ( conv_data )  { delete [] conv_data;  conv_data = (double *) 0; }
+if ( conv_data )  { delete [] conv_data;  conv_data = (double *) nullptr; }
 
-if (    sum_plane_buf )  { delete []    sum_plane_buf;     sum_plane_buf = 0; }
-if ( ok_sum_plane_buf )  { delete [] ok_sum_plane_buf;  ok_sum_plane_buf = 0; }
+if (    sum_plane_buf )  { delete []    sum_plane_buf;     sum_plane_buf = nullptr; }
+if ( ok_sum_plane_buf )  { delete [] ok_sum_plane_buf;  ok_sum_plane_buf = nullptr; }
 
 return ( out );
 
@@ -594,12 +599,12 @@ char junk[256];
 double value, value_front, value_back;
 bool   ok, ok_front, ok_back;
 double moving_sum;
-bool * b                 = 0;
-const bool * ok_back_p   = 0;
-const bool * ok_front_p  = 0;
-const bool * ok_in_p     = 0;
-      bool * ok_out_p    = 0;
-      bool * ok_put_p    = 0;
+bool * b                 = nullptr;
+const bool * ok_back_p   = nullptr;
+const bool * ok_front_p  = nullptr;
+const bool * ok_in_p     = nullptr;
+      bool * ok_out_p    = nullptr;
+      bool * ok_put_p    = nullptr;
 const int two_r        = 2*spatial_conv_radius;
 const int two_r_plus_1 = 2*spatial_conv_radius + 1;
 const int nxy          = nx*ny;
@@ -607,11 +612,11 @@ const int x_min        = spatial_conv_radius;
 const int y_min        = spatial_conv_radius;
 const int x_max        = nx - 1 - spatial_conv_radius;
 const int y_max        = ny - 1 - spatial_conv_radius;
-const double * data_front_p   = 0;
-const double * data_back_p    = 0;
-const double * data_in_p      = 0;
-      double * data_out_p     = 0;
-      double * data_put_p     = 0;
+const double * data_front_p   = nullptr;
+const double * data_back_p    = nullptr;
+const double * data_in_p      = nullptr;
+      double * data_out_p     = nullptr;
+      double * data_put_p     = nullptr;
 
 
 // mlog << Debug(5) << "in calc_sum_plane\n";
@@ -911,9 +916,7 @@ void set_false_plane(bool * b, const int n)
 
 {
 
-int j;
-
-for (j=0; j<n; ++j)  b[j] = false;
+for (int j=0; j<n; ++j)  b[j] = false;
 
 
 return;
@@ -1018,7 +1021,7 @@ void ok_handle_ppm(const bool * ok_plane, const int nx, const int ny, const char
 
 {
 
-int x, y, n;
+int n;
 Ppm image;
 bool tf = false;
 Color c;
@@ -1028,9 +1031,9 @@ const Color black (  0,   0,   0);
 
 image.set_size_xy(nx, ny);
 
-for (x=0; x<nx; ++x)  {
+for (int x=0; x<nx; ++x)  {
 
-   for (y=0; y<ny; ++y)  {
+   for (int y=0; y<ny; ++y)  {
 
       n = y*nx + x;
 

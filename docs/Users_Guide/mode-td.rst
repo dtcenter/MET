@@ -28,7 +28,7 @@ At first glance, the addition of a third dimension would seem to entail no diffi
 
 In this section, we will assume that the reader has a basic familiarity with traditional MODE, its internal operation, (convolution thresholding, fuzzy logic matching and merging) and its output. We will not review these things here. Instead, we will point out differences in MTD from the way traditional MODE does things when they come up. This release is a beta version of MTD, intended mostly to encourage users to experiment with it and give us feedback and suggestions to be used in a more robust MTD release in the future.
 
-Scientific and statistical aspects
+Scientific and Statistical Aspects
 ==================================
 
 Attributes
@@ -177,17 +177,17 @@ To summarize: Any forecast simple objects that find themselves in the same equiv
    Match & Merge Example
 
 
-Practical information
+Practical Information
 =====================
 
-MTD input
+MTD Input
 ---------
 
 The formats for two-dimensional data files used as input to MTD are the same ones supported by most of the MET tools. Generally speaking, if MODE can use a forecast or observation data file as input, then that file can also be used by MTD. The only difference is that while MODE takes only one forecast and one observed data file as input, MTD takes a series of files.
 
 As shown in the next section, filenames for each time used must be given. Thus, for example, if MTD is being used for verification over a period of 24 hours, and the data file valid times are separated by one hour, then a total of 48 filenames must be specified on the MTD command line - 24 filenames for the forecast files, and 24 for the observation files. Further, the filenames must be given in order of increasing valid time. Many users will prefer to write scripts to automate this, rather than type in a lengthy command line by hand.
 
-MTD usage
+MTD Usage
 ---------
 
 The usage statement for the MODE-TD tool is listed below: The command line switches may be given in any order.
@@ -205,7 +205,7 @@ The usage statement for the MODE-TD tool is listed below: The command line switc
 
 The MODE-TD tool has three required arguments and can accept several optional arguments.
 
-Required arguments for mtd
+Required Arguments for mtd
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. **-fcst file\_list** gives a list of forecast 2D data files to be processed by MTD. The files should have equally-spaced intervals of valid time. 
@@ -214,7 +214,7 @@ Required arguments for mtd
 
 3. **-config config\_file** gives the path to a local configuration file that is specific to this particular run of MTD. The default MTD configuration file will be read first, followed by this one. Thus, only configuration options that are different from the default settings need be specified. Options set in this file will override any corresponding options set in the default configuration file. 
 
-Optional arguments for mtd
+Optional Arguments for mtd
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 4. **-single file\_list** may be used instead of **-fcst** and **-obs** to define objects in a single field.
@@ -237,7 +237,7 @@ An example of the mtd calling sequence is listed below:
 
 In this example, the MODE-TD tool will read in a list of forecast GRIB files in the fcst_files directory and similarly spaced observation GRIB files in the obs_files directory. It uses a configuration file called **MTDConfig_default** and writes the output to the *out_dir/mtd* directory. 
 
-MTD configuration file
+MTD Configuration File
 ----------------------
 
 The default configuration file for the MODE tool, **MODEConfig_default**, can be found in the installed *share/met/config* directory. Another version of the configuration file is provided in *scripts/config*. We encourage users to make a copy of the configuration files prior to modifying their contents.Most of the entries in the MTD configuration file should be familiar from the corresponding file for MODE. This initial beta release of MTD does not offer all the tunable options that MODE has accumulated over the years, however. In this section, we will not bother to repeat explanations of config file details that are exactly the same as those in MODE; we will only explain those elements that are different from MODE, and those that are unique to MTD.
@@ -351,7 +351,7 @@ ______________________
 
 The **txt_output** dictionary also contains a collection of boolean flags, in this case controlling the output of ASCII attribute files. The **attributes_2d** flag controls the output of the 2D object attributes for constant-time slices of 3D objects, while the **attributes_3d** flag controls the output of single and pair 3D spacetime object attributes.
 
-mtd output
+mtd Output
 ----------
 
 MTD creates several output files after each run in ASCII and NetCDF formats. There are text files giving 2D and 3D attributes of spacetime objects and information on matches and merges, as well as a NetCDF file giving the objects themselves, in case any further or specialized analysis of the objects needs to be done.

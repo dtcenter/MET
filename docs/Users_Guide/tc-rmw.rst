@@ -9,10 +9,10 @@ Introduction
 
 The TC-RMW tool regrids tropical cyclone model data onto a moving range-azimuth grid centered on points along the storm track provided in ATCF format, most likely the adeck generated from the file. The radial grid spacing may be set as a factor of the radius of maximum winds (RMW). If wind fields are specified in the configuration file the radial and tangential wind components will be computed. Any regridding method available in MET can be used to interpolate data on the model output grid to the specified range-azimuth grid. The regridding will be done separately on each vertical level. The model data files must coincide with track points in a user provided ATCF formatted track file.
 
-Practical information
+Practical Information
 =====================
 
-tc_rmw usage
+tc_rmw Usage
 ------------
 
 The following sections describe the usage statement, required arguments, and optional arguments for tc_rmw.
@@ -29,7 +29,7 @@ The following sections describe the usage statement, required arguments, and opt
 
 tc_rmw has required arguments and can accept several optional arguments.
 
-Required arguments for tc_rmw
+Required Arguments for tc_rmw
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. The **-data file_1 ... file_n | data_file_list** options specify the gridded data files or an ASCII file containing a list of files to be used.
@@ -40,14 +40,14 @@ Required arguments for tc_rmw
 
 4. The **-out** argument is the NetCDF output file to be written.
 
-Optional arguments for tc_rmw
+Optional Arguments for tc_rmw
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 5. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no logfile.
 
 6. The **-v level** option indicates the desired level of verbosity. The contents of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
 
-tc_rmw configuration file
+tc_rmw Configuration File
 -------------------------
 
 The default configuration file for the TC-RMW tool named **TCRMWConfig_default** can be found in the installed *share/met/config/* directory. It is encouraged for users to copy these default files before modifying their contents. The contents of the configuration file are described in the subsections below.
@@ -161,7 +161,7 @@ _______________________
 The **radial_velocity_field_name** and **radial_velocity_long_field_name** parameters define the field names to give the output radial velocity grid in the netCDF output file. The parameters are used only if **compute_radial_and_radial_winds** is set to TRUE.
 
 
-tc_rmw output file
+tc_rmw Output File
 ------------------
 
 The NetCDF output file contains the following dimensions:

@@ -4,7 +4,7 @@
 Overview of MET
 ***************
 
-Purpose and organization of the User's Guide
+Purpose and Organization of the User's Guide
 ============================================
 
 The goal of this User's Guide is to provide basic information for users of the Model Evaluation Tools (MET) to enable them to apply MET to their datasets and evaluation studies. MET was originally designed for application to the post-processed output of the `Weather Research and Forecasting (WRF) <https://www.mmm.ucar.edu/weather-research-and-forecasting-model>`_ model. However, MET may also be used for the evaluation of forecasts from other models or applications, including the `Unified Forecast System (UFS) <http://www.ufscommunity.org>`_, and the `System for Integrated Modeling of the Atmosphere (SIMA) <https://wiki.ucar.edu/display/SIMA/>`_ if certain file format definitions (described in this document) are followed.
@@ -22,7 +22,7 @@ The MET package is available to DTC staff, visitors, and collaborators, as well 
 
 .. _MET-goals:
 
-MET goals and design philosophy
+MET Goals and Design Philosophy
 ===============================
 
 The primary goal of MET development is to provide a state-of-the-art verification package to the NWP community. By "state-of-the-art" we mean that MET will incorporate newly developed and advanced verification methodologies, including new methods for diagnostic and spatial verification and new techniques provided by the verification and modeling communities. MET also utilizes and replicates the capabilities of existing systems for verification of NWP forecasts. For example, the MET package replicates existing National Center for Environmental Prediction (NCEP) operational verification capabilities (e.g., I/O, methods, statistics, data types). MET development will take into account the needs of the NWP community - including operational centers and the research and development community. Some of the MET capabilities include traditional verification approaches for standard surface and upper air variables (e.g., Equitable Threat Score, Mean Squared Error), confidence intervals for verification measures, and spatial forecast verification methods. In the future, MET will include additional state-of-the-art and new methodologies.
@@ -31,7 +31,7 @@ The MET package has been designed to be modular and adaptable. For example, indi
 
 The MET code and documentation is maintained by the DTC in Boulder, Colorado. The MET package is freely available to the modeling, verification, and operational communities, including universities, governments, the private sector, and operational modeling and prediction centers.
 
-MET components
+MET Components
 ==============
 
 The major components of the MET package are represented in :numref:`overview-figure`. The main stages represented are input, reformatting, plotting, intermediate output, statistical analyses, and output and aggregation/analysis. Each of these stages is described further in later sections. For example, the input and output formats are discussed in :numref:`data_io` as well as in the sections associated with each of the statistics modules. MET input files are represented on the far left.
@@ -70,12 +70,12 @@ Tropical cyclone forecasts and observations are quite different than numerical m
 
 The following sections of this MET User's Guide contain usage statements for each tool, which may be viewed if you type the name of the tool. Alternatively, the user can also type the name of the tool followed by **-help** to obtain the usage statement. Each tool also has a **-version** command line option associated with it so that the user can determine what version of the tool they are using.
 
-Future development plans
+Future Development Plans
 ========================
 
 MET is an evolving verification software package. New capabilities are planned in controlled, successive version releases. Bug fixes and user-identified problems will be addressed as they are found and posted to the known issues section of the `MET User Support web page <https://dtcenter.org/community-code/model-evaluation-tools-met/user-support>`_. Plans are also in place to incorporate many new capabilities and options in future releases of MET. Please refer to the issues listed in the `MET GitHub repository <https://github.com/dtcenter/MET/issues>`_ to see our development priorities for upcoming releases.
 
-Code support
+Code Support
 ============
 
 MET support is provided through the `METplus GitHub Discussions Forum <https://github.com/dtcenter/METplus/discussions>`_. We will endeavor to respond to requests for help in a timely fashion. In addition, information about MET and tools that can be used with MET are provided on the `MET web page <https://dtcenter.org/community-code/model-evaluation-tools-met>`_.

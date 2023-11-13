@@ -105,7 +105,7 @@ static const char * cnt_columns [] = {
    "RMSFA",            "RMSFA_BCL",            "RMSFA_BCU",
    "RMSOA",            "RMSOA_BCL",            "RMSOA_BCU",
    "ANOM_CORR_UNCNTR", "ANOM_CORR_UNCNTR_BCL", "ANOM_CORR_UNCNTR_BCU",
-   "SI",               "SI_BCL",               "SI_BCL" 
+   "SI",               "SI_BCL",               "SI_BCU" 
 };
 
 static const char * sl1l2_columns [] = {

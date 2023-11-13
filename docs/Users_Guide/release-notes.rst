@@ -9,7 +9,7 @@ When applicable, release notes are followed by the GitHub issue number which des
 enhancement, or new feature (`MET GitHub issues <https://github.com/dtcenter/MET/issues>`_).
 Important issues are listed **in bold** for emphasis.
 
-MET Version 12.0.0-beta1 release notes (20230915)
+MET Version 12.0.0-beta1 Release Notes (20230915)
 -------------------------------------------------
 
   .. dropdown:: Repository, build, and test
@@ -37,7 +37,7 @@ MET Version 12.0.0-beta1 release notes (20230915)
 MET Upgrade Instructions
 ========================
 
-MET Version 12.0.0 upgrade instructions
+MET Version 12.0.0 Upgrade Instructions
 ---------------------------------------
 
 * MET Version 12.0.0 introduces three new required dependencies:
