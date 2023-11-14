@@ -291,7 +291,7 @@ void process_command_line(int argc, char **argv) {
    // Read forecast file
    if(!(fcst_mtddf = mtddf_factory.new_met_2d_data_file(fcst_file.c_str(), ftype))) {
       mlog << Error << "\n" << method_name << "Trouble reading forecast file \""
-           << fcst_file << "\"\n\n";
+           << fcst_file << "\". Override the FileType with \"file_type = FileType_<type>;\"\n\n";
       exit(1);
    }
 
@@ -604,7 +604,6 @@ void process_fcst_climo_files() {
       // Read the gridded data from the input forecast file
       n_fcst = fcst_mtddf->data_plane_array(
                   *conf_info.vx_opt[i].vx_pd.fcst_info, fcst_dpa);
-
       mlog << Debug(2)
            << "\n" << sep_str << "\n\n"
            << "Reading data for "

@@ -279,14 +279,14 @@ void process_command_line(int argc, char **argv) {
    // Read forecast file
    if(!(fcst_mtddf = mtddf_factory.new_met_2d_data_file(fcst_file.c_str(), ftype))) {
       mlog << Error << "\nTrouble reading forecast file \""
-           << fcst_file << "\"\n\n";
+           << fcst_file << "\". Override the FileType with \"file_type = FileType_<type>;\"\n\n";
       exit(1);
    }
 
    // Read observation file
    if(!(obs_mtddf = mtddf_factory.new_met_2d_data_file(obs_file.c_str(), otype))) {
       mlog << Error << "\nTrouble reading observation file \""
-           << obs_file << "\"\n\n";
+           << obs_file << "\". Override the FileType with \"file_type = FileType_<type>;\"\n\n";
       exit(1);
    }
 
