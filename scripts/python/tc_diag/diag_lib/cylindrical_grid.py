@@ -1,11 +1,14 @@
 import abc
 import sys
+import warnings
 from typing import Tuple
 
 import numpy as np
 
-# Comment out unused scipy dependency
-# from scipy import interpolate
+try:
+    from scipy import interpolate
+except ImportError:
+    warnings.warn("Scipy not installed, some functionality in cylindrical_grid module may not be available.")
 
 KM_PER_DEGREE = 111.1
 
@@ -44,27 +47,26 @@ def convert_grid_to_tc_centric_km(
     return x_km, y_km
 
 
-# Comment out unused scipy dependency
-#def interpolate_to_cyl_grid(cyl_x_km: np.ndarray, cyl_y_km: np.ndarray,
-#                            x_km: np.ndarray, y_km: np.ndarray,
-#                            data: np.ndarray) -> np.ndarray:
-#    flat_x = x_km.flatten()
-#    flat_y = y_km.flatten()
-#    flat_cyl_x = cyl_x_km.flatten()
-#    flat_cyl_y = cyl_y_km.flatten()
-#    flat_data = data.flatten()
-#    flat_x.shape = (flat_x.shape[0], 1)
-#    flat_y.shape = (flat_y.shape[0], 1)
-#    flat_cyl_x.shape = (flat_cyl_x.shape[0], 1)
-#    flat_cyl_y.shape = (flat_cyl_y.shape[0], 1)
-#    flat_data.shape = (flat_data.shape[0], 1)
-#
-#    lerp = interpolate.LinearNDInterpolator(np.hstack((flat_x, flat_y)),
-#                                            flat_data)
-#    pts = np.hstack((flat_cyl_x, flat_cyl_y))
-#    new_data = lerp(pts)
-#    new_data.shape = cyl_x_km.shape
-#    return new_data
+def interpolate_to_cyl_grid(cyl_x_km: np.ndarray, cyl_y_km: np.ndarray,
+                            x_km: np.ndarray, y_km: np.ndarray,
+                            data: np.ndarray) -> np.ndarray:
+    flat_x = x_km.flatten()
+    flat_y = y_km.flatten()
+    flat_cyl_x = cyl_x_km.flatten()
+    flat_cyl_y = cyl_y_km.flatten()
+    flat_data = data.flatten()
+    flat_x.shape = (flat_x.shape[0], 1)
+    flat_y.shape = (flat_y.shape[0], 1)
+    flat_cyl_x.shape = (flat_cyl_x.shape[0], 1)
+    flat_cyl_y.shape = (flat_cyl_y.shape[0], 1)
+    flat_data.shape = (flat_data.shape[0], 1)
+
+    lerp = interpolate.LinearNDInterpolator(np.hstack((flat_x, flat_y)),
+                                            flat_data)
+    pts = np.hstack((flat_cyl_x, flat_cyl_y))
+    new_data = lerp(pts)
+    new_data.shape = cyl_x_km.shape
+    return new_data
 
 
 def azimuthal_average(cyl_data: np.ndarray, axis=1) -> np.ndarray:
@@ -84,17 +86,16 @@ class CylindricalGridInterpolator(metaclass=abc.ABCMeta):
         pass
 
 
-# Comment out unused scipy dependency
-# class ScipyLinearNDInterpolator(CylindricalGridInterpolator):
-#    def __init__(self, n_radii: int, n_theta: int, radii_step_km: float,
-#                 tc_center_lon: float, tc_center_lat: float,
-#                 src_lons: np.ndarray, src_lats: np.ndarray) -> None:
-#        super().__init__(n_radii, n_theta, radii_step_km, tc_center_lon,
-#                         tc_center_lat, src_lons, src_lats)
-#
-#    def __call__(self, data: np.ndarray) -> np.ndarray:
-#        return interpolate_to_cyl_grid(self.cyl_x_km, self.cyl_y_km, self.x_km,
-#                                       self.y_km, data)
+class ScipyLinearNDInterpolator(CylindricalGridInterpolator):
+    def __init__(self, n_radii: int, n_theta: int, radii_step_km: float,
+                 tc_center_lon: float, tc_center_lat: float,
+                 src_lons: np.ndarray, src_lats: np.ndarray) -> None:
+        super().__init__(n_radii, n_theta, radii_step_km, tc_center_lon,
+                         tc_center_lat, src_lons, src_lats)
+
+    def __call__(self, data: np.ndarray) -> np.ndarray:
+        return interpolate_to_cyl_grid(self.cyl_x_km, self.cyl_y_km, self.x_km,
+                                       self.y_km, data)
 
 
 class BilinearInterpolator(CylindricalGridInterpolator):
