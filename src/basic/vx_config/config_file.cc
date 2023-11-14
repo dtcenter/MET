@@ -352,7 +352,7 @@ met_open(configfilein, filename);
 if ( ! configfilein )  {
 
    mlog << Error << "\nMetConfig::read(const char *) -> "
-        << "unable to open input file \"" << filename << "\"\n\n";
+        << "unable to open input file \"" << filename << "\". Please specify \"file_type = FileType_<type>;\" at the configration file\n\n";
 
    exit ( 1 );
 
