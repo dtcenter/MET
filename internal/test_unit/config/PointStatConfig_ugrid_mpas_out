@@ -46,10 +46,8 @@ fcst = {
    obs_quality_inc  = [];
    obs_quality_exc  = [];
 
-   file_type = NETCDF_UGRID;
    field = [
-      { name = "theta";  level = "(0,*,2-4)";  message_type = "ADPSFC"; }
-//      { name = "theta";  level = "L4-6";  message_type = "ADPSFC"; }
+      { name = "theta";  level = "L2-4";  message_type = "ADPSFC"; }
    ];
 
 }
@@ -70,7 +68,7 @@ obs = {
 
 climo_mean = obs;
 climo_mean = {
-   file_name = [ ${CLIMO_FILE} ];
+   file_name = [];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -127,10 +125,10 @@ output_flag = {
    mctc   = NONE;
    mcts   = NONE;
    cnt    = BOTH;
-   sl1l2  = BOTH;
-   sal1l2 = BOTH;
-   vl1l2  = BOTH;
-   val1l2 = BOTH;
+   sl1l2  = NONE;
+   sal1l2 = NONE;
+   vl1l2  = NONE;
+   val1l2 = NONE;
    vcnt   = BOTH;
    pct    = NONE;
    pstd   = NONE;

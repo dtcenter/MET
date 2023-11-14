@@ -59,7 +59,6 @@ rank_corr_flag      = FALSE;
 // Forecast and observation fields to be verified
 //
 fcst = {
-   file_type = NETCDF_UGRID;
 
    level = [ "P925" ];
 
@@ -68,7 +67,6 @@ fcst = {
    ];
 }
 obs = {
-   file_type = NETCDF_UGRID;
 
    level = [ "L3" ];
 

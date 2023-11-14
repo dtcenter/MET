@@ -28,7 +28,7 @@ obtype = "GFS-ANL";
 // Verification grid
 //
 regrid = {
-   to_grid    = "${CLIMO_MEAN_FILE}";
+   to_grid    = OBS;
    method     = BILIN;
    width      = 2;
    vld_thresh = 0.5;
@@ -59,7 +59,6 @@ rank_corr_flag      = FALSE;
 // Forecast and observation fields to be verified
 //
 fcst = {
-   file_type = NETCDF_UGRID;
 
    level = [ "P500" ];
 
@@ -84,7 +83,7 @@ obs = {
 climo_mean = obs;
 climo_mean = {
 
-   file_name = [ "${CLIMO_MEAN_FILE}" ];
+   file_name = [];
 
    regrid = {
       method     = NEAREST;
