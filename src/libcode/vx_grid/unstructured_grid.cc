@@ -142,8 +142,7 @@ void UnstructuredGrid::latlon_to_xy(double lat, double lon, double &x, double &y
         << Data.pointLonLat[index].x() << ", " << Data.pointLonLat[index].y()
         << ") distance= " << distance_km << "km, "
         << _pointLonLat.distance(Data.pointLonLat[index])
-        << " degree, is_rejected: " << is_rejected
-        << ", max_distanc=" << Data.max_distance_km<< "\n";
+        << " degree" << (is_rejected ? ", rejected" : " ") << "\n";
 }
 
 
