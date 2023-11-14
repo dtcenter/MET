@@ -23,7 +23,6 @@
   <test name="grid_stat_ugrid_mpas_out_to_grid">
     <exec>&MET_BIN;/grid_stat</exec>
     <env>
-      <pair><name>CLIMO_MEAN_FILE</name> <value>&DATA_DIR_CLIMO;/NCEP_2.5deg/pgba_mean.19590415</value></pair>
       <pair><name>OUTPUT_PREFIX</name>   <value>UGRID_MPAS_OUT_TO_GRID</value></pair>
     </env>
     <param> \
@@ -69,7 +68,6 @@
       <pair><name>END_DS</name>         <value>1800</value></pair>
       <pair><name>OUTPUT_PREFIX</name>  <value>UGRID_MPAS_DIAG_TEMP</value></pair>
       <pair><name>CONFIG_DIR</name>     <value>&CONFIG_DIR;</value></pair>
-      <pair><name>CLIMO_FILE</name>     <value>"&DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F012_gNam.grib"</value></pair>
     </env>
     <param> \
       &DATA_DIR_UGRID;/mpas/diag.2012-04-09_12.00.00_reduced.nc \
@@ -83,8 +81,6 @@
       <stat>&OUTPUT_DIR;/point_stat_ugrid/point_stat_UGRID_MPAS_DIAG_TEMP_000000L_20120409_120000V_ctc.txt</stat>
       <stat>&OUTPUT_DIR;/point_stat_ugrid/point_stat_UGRID_MPAS_DIAG_TEMP_000000L_20120409_120000V_cts.txt</stat>
       <stat>&OUTPUT_DIR;/point_stat_ugrid/point_stat_UGRID_MPAS_DIAG_TEMP_000000L_20120409_120000V_cnt.txt</stat>
-      <stat>&OUTPUT_DIR;/point_stat_ugrid/point_stat_UGRID_MPAS_DIAG_TEMP_000000L_20120409_120000V_sl1l2.txt</stat>
-      <stat>&OUTPUT_DIR;/point_stat_ugrid/point_stat_UGRID_MPAS_DIAG_TEMP_000000L_20120409_120000V_sal1l2.txt</stat>
       <stat>&OUTPUT_DIR;/point_stat_ugrid/point_stat_UGRID_MPAS_DIAG_TEMP_000000L_20120409_120000V_eclv.txt</stat>
       <stat>&OUTPUT_DIR;/point_stat_ugrid/point_stat_UGRID_MPAS_DIAG_TEMP_000000L_20120409_120000V_mpr.txt</stat>
     </output>
@@ -97,7 +93,6 @@
       <pair><name>END_DS</name>         <value>1800</value></pair>
       <pair><name>OUTPUT_PREFIX</name>  <value>UGRID_MPAS_OUT_TEMP</value></pair>
       <pair><name>CONFIG_DIR</name>     <value>&CONFIG_DIR;</value></pair>
-      <pair><name>CLIMO_FILE</name>     <value>"&DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F012_gNam.grib"</value></pair>
     </env>
     <param> \
       &DATA_DIR_UGRID;/mpas/mpasout.2012-04-09_12.00.00_reduced.nc \
@@ -111,8 +106,6 @@
       <stat>&OUTPUT_DIR;/point_stat_ugrid/point_stat_UGRID_MPAS_OUT_TEMP_000000L_20120409_120000V_ctc.txt</stat>
       <stat>&OUTPUT_DIR;/point_stat_ugrid/point_stat_UGRID_MPAS_OUT_TEMP_000000L_20120409_120000V_cts.txt</stat>
       <stat>&OUTPUT_DIR;/point_stat_ugrid/point_stat_UGRID_MPAS_OUT_TEMP_000000L_20120409_120000V_cnt.txt</stat>
-      <stat>&OUTPUT_DIR;/point_stat_ugrid/point_stat_UGRID_MPAS_OUT_TEMP_000000L_20120409_120000V_sl1l2.txt</stat>
-      <stat>&OUTPUT_DIR;/point_stat_ugrid/point_stat_UGRID_MPAS_OUT_TEMP_000000L_20120409_120000V_sal1l2.txt</stat>
       <stat>&OUTPUT_DIR;/point_stat_ugrid/point_stat_UGRID_MPAS_OUT_TEMP_000000L_20120409_120000V_eclv.txt</stat>
       <stat>&OUTPUT_DIR;/point_stat_ugrid/point_stat_UGRID_MPAS_OUT_TEMP_000000L_20120409_120000V_mpr.txt</stat>
     </output>
