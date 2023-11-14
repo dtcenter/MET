@@ -169,10 +169,10 @@ void VarInfoUGrid::set_magic(const ConcatString &nstr, const ConcatString &lstr)
 
    // If there's no level specification, assume (*, *)
    if(strchr(lstr.c_str(), '(') == nullptr) {
-      Level.set_req_name("*,*");
-      Level.set_name("*,*");
+      Level.set_req_name("0,*");
+      Level.set_name("0,*");
       clear_dimension();
-      add_dimension(vx_data2d_star);
+      add_dimension(0);
       add_dimension(vx_data2d_star);
    }
    else {
@@ -344,8 +344,12 @@ void VarInfoUGrid::set_dict(Dictionary &dict){
 
    if (cfg_level.length() > 0) lvl_type = cfg_level.char_at(0);
    if (lvl_type == 'A' || lvl_type == 'Z' || lvl_type == 'P' ||
-       lvl_type == 'R' || lvl_type == 'L') set_level_info_grib(dict);
+       lvl_type == 'R' || lvl_type == 'L') {
+      set_level_info_grib(dict);
+      VarInfo::set_magic(cfg_name, cfg_level);
+   }
    else set_magic(cfg_name, cfg_level);
+
 
    set_req_name(cfg_name.c_str());
 
