@@ -694,18 +694,21 @@ bool UGridFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
   const int plane_size = nx * ny;
   double *d = new double[plane_size];
 
+  int length;
   size_t dim_size;
   LongArray offsets;
   LongArray lengths;
   for (int k=0; k<dim_count; k++) {
+    length = 1;
     if (a[k] == vx_data2d_star) {
       offsets.add(0);
-      lengths.add(plane_size);
+      length = plane_size;
     }
     else {
       offsets.add(a[k]);
-      lengths.add(1);
+      if (k != var->t_slot && k != var->z_slot) length = plane_size - a[k];
     }
+    lengths.add(length);
     dim_size = v->getDim(k).getSize();
     if (dim_size < offsets[k]) {
       mlog << Error << "\n" << method_name
@@ -716,14 +719,21 @@ bool UGridFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
     }
   }
 
-
   get_nc_data(v, d, lengths, offsets);
 
   int offset = 0;
+  double min_value, max_value;
+
+  min_value = 10e10;
+  max_value = -min_value;
   for (int x = 0; x< nx; ++x) {
     double value = d[x];
     if( is_eq(value, missing_value) || is_eq(value, fill_value) ) {
-       value = bad_data_double;
+      value = bad_data_double;
+    }
+    else {
+      if (min_value > value) min_value = value;
+      if (max_value < value) max_value = value;
     }
 
     plane.set(value, x, 0);
@@ -737,9 +747,10 @@ bool UGridFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
   for (int idx=0; idx<a.n_elements(); idx++) {
     log_message << " " << (a[idx] == vx_data2d_star ? "*" : std::to_string(a[idx]));
   }
-  mlog << Debug(9) << method_name << GET_NC_NAME_P(v) << ": levels: (" << log_message << " )\n";
   mlog << Debug(6) << method_name << "took "
-       << (clock()-start_clock)/double(CLOCKS_PER_SEC) << " seconds\n";
+       << (clock()-start_clock)/double(CLOCKS_PER_SEC) << " seconds. "
+       << GET_NC_NAME_P(v) << ": levels: (" << log_message << " )"
+       << " min=" << min_value << ", max_value=" << max_value<< "\n";
 
   return true;
 }
