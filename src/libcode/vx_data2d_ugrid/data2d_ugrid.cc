@@ -170,7 +170,6 @@ bool MetUGridDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
 {
    bool status = false;
    NcVarInfo *data_var = (NcVarInfo *)nullptr;
-   VarInfoUGrid *vinfo_nc = (VarInfoUGrid *)&vinfo;
    const long time_cnt = (long)_file->ValidTime.n();
    static const string method_name
       = "MetUGridDataFile::data_plane(VarInfo &, DataPlane &) -> ";
@@ -179,7 +178,8 @@ bool MetUGridDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
 
    plane.clear();
 
-   data_var = _file->find_by_name(vinfo_nc->req_name().c_str());
+   ConcatString req_name = vinfo.req_name();
+   data_var = _file->find_by_name(req_name.c_str());
    if (nullptr != data_var) {
       // Read the data
       status = data_plane(vinfo, plane, data_var);
@@ -189,20 +189,21 @@ bool MetUGridDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
       long lvl_lower = level.lower();
       long lvl_upper = level.upper();
       vector<NcVarInfo *> vinfo_list;
-      if (_file->find_nc_vinfo_list(vinfo_nc->req_name().c_str(), vinfo_list)) {
+      if (_file->find_nc_vinfo_list(req_name.c_str(), vinfo_list)) {
          for (int idx=0; idx<vinfo_list.size(); idx++) {
-            int vlevel = extract_vlevels(vinfo_nc->req_name(), vinfo_list[idx]->name.c_str());
+            int vlevel = extract_vlevels(req_name, vinfo_list[idx]->name.c_str());
             if (vlevel >= lvl_lower && vlevel <= lvl_upper) {
                vinfo.set_req_name(vinfo_list[idx]->name.c_str());
                status = data_plane(vinfo, plane, vinfo_list[idx]);
                if (status) {
                   mlog << Debug(5) << method_name
-                       << "Found range match for VarInfo \"" << vinfo_nc->req_name()
+                       << "Found range match for VarInfo \"" << req_name
                        << " (" << vinfo_list[idx]->name << ")\"\n";
                   break;
                }
             }
          }
+         vinfo.set_name(req_name.c_str());  // restore the name
       }
    }
 
@@ -244,6 +245,7 @@ bool MetUGridDataFile::data_plane(VarInfo &vinfo, DataPlane &plane, NcVarInfo *d
          for (int idx=0; idx<data_var->Ndims; idx++) {
             long offset = 0;
             if (zdim_slot == idx &&_cur_vert_index >= 0) offset = _cur_vert_index;
+            else if (time_dim_slot != idx) offset = vx_data2d_star;
             dimension.add(offset);
             is_offset.add(true);
          }
@@ -354,6 +356,7 @@ int MetUGridDataFile::data_plane_array(VarInfo &vinfo,
                        << " (" << vinfo_list[idx]->name << ")\"\n";
                }
             }
+            vinfo.set_name(req_name.c_str());
          }
          else {
             mlog << Error << "\n" << method_name
