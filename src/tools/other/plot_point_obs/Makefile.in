@@ -107,6 +107,8 @@ plot_point_obs_OBJECTS = $(am_plot_point_obs_OBJECTS)
 am__DEPENDENCIES_1 =
 plot_point_obs_DEPENDENCIES = $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1)
 plot_point_obs_LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
 	$(plot_point_obs_LDFLAGS) $(LDFLAGS) -o $@
@@ -201,7 +203,8 @@ FC_LIBS = @FC_LIBS@
 FFLAGS = @FFLAGS@
 FLIBS = @FLIBS@
 GRIB2CLIB_NAME = @GRIB2CLIB_NAME@
-GRIB2_LIBS = @GRIB2_LIBS@
+GRIB2_DEP_LIBS = @GRIB2_DEP_LIBS@
+GRIB2_MET_LIBS = @GRIB2_MET_LIBS@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
@@ -264,12 +267,14 @@ PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
-PYTHON_LIBS = @PYTHON_LIBS@
+PYTHON_DEP_LIBS = @PYTHON_DEP_LIBS@
+PYTHON_MET_LIBS = @PYTHON_MET_LIBS@
 RANLIB = @RANLIB@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
-UGRID_LIBS = @UGRID_LIBS@
+UGRID_DEP_LIBS = @UGRID_DEP_LIBS@
+UGRID_MET_LIBS = @UGRID_MET_LIBS@
 VERSION = @VERSION@
 YACC = @YACC@
 YFLAGS = @YFLAGS@
@@ -335,11 +340,11 @@ plot_point_obs_LDFLAGS = ${MET_LDFLAGS}
 plot_point_obs_LDADD = -lvx_statistics \
 	-lvx_data2d_factory \
 	-lvx_data2d_nc_met \
-	-lvx_data2d_grib $(GRIB2_LIBS) \
+	-lvx_data2d_grib $(GRIB2_MET_LIBS) $(GRIB2_DEP_LIBS) \
 	-lvx_data2d_nc_pinterp \
 	-lvx_data2d_nccf \
-	$(UGRID_LIBS) \
-	$(PYTHON_LIBS) \
+	$(UGRID_MET_LIBS) $(UGRID_DEP_LIBS) \
+	$(PYTHON_MET_LIBS) $(PYTHON_DEP_LIBS) \
 	-lvx_data2d \
 	-lvx_nc_util \
 	-lvx_statistics \
@@ -363,7 +368,7 @@ plot_point_obs_LDADD = -lvx_statistics \
 	-lvx_math \
 	-lvx_cal \
 	-lvx_log \
-	$(PYTHON_LIBS) \
+	$(PYTHON_MET_LIBS) $(PYTHON_DEP_LIBS) \
 	-lm -lproj -lz -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
 
 EXTRA_DIST = plot_point_obs.h \

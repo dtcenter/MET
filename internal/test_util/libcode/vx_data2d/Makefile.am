@@ -34,7 +34,7 @@ dump_default_table_LDFLAGS = -L. ${MET_LDFLAGS}
 dump_default_table_LDADD = -lvx_config \
 	-lvx_gsl_prob \
 	-lvx_log \
-	$(UGRID_LIBS) \
+	$(UGRID_MET_LIBS) $(UGRID_DEP_LIBS) \
 	-lvx_data2d \
 	-lvx_grid \
 	-lvx_geodesy \

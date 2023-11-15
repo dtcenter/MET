@@ -16,7 +16,7 @@ test_grid_area_SOURCES = test_grid_area.cc
 test_grid_area_CPPFLAGS = ${MET_CPPFLAGS}
 test_grid_area_LDFLAGS = -L. ${MET_LDFLAGS}
 test_grid_area_LDADD = \
-	$(UGRID_LIBS) \
+	$(UGRID_MET_LIBS) $(UGRID_DEP_LIBS) \
 	-lvx_grid \
 	-lvx_geodesy \
 	-lvx_nav \

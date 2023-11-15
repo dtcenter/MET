@@ -21,11 +21,11 @@ point_stat_LDADD = -lvx_stat_out \
 	-lvx_analysis_util \
 	-lvx_data2d_factory \
 	-lvx_data2d_nc_met \
-	-lvx_data2d_grib $(GRIB2_LIBS) \
+	-lvx_data2d_grib $(GRIB2_MET_LIBS) $(GRIB2_DEP_LIBS) \
 	-lvx_data2d_nc_pinterp \
 	-lvx_data2d_nccf \
-	$(UGRID_LIBS) \
-	$(PYTHON_LIBS) \
+	$(UGRID_MET_LIBS) $(UGRID_DEP_LIBS) \
+	$(PYTHON_MET_LIBS) $(PYTHON_DEP_LIBS) \
 	-lvx_data2d \
 	-lvx_nc_obs \
 	-lvx_seeps \
@@ -42,7 +42,7 @@ point_stat_LDADD = -lvx_stat_out \
 	-lvx_math \
 	-lvx_cal \
 	-lvx_log \
-	$(PYTHON_LIBS) \
+	$(PYTHON_MET_LIBS) $(PYTHON_DEP_LIBS) \
 	-lm -lproj -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
 
 EXTRA_DIST = point_stat.h \

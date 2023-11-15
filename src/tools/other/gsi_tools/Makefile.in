@@ -108,6 +108,8 @@ am_gsid2mpr_OBJECTS = gsid2mpr-gsi_record.$(OBJEXT) \
 gsid2mpr_OBJECTS = $(am_gsid2mpr_OBJECTS)
 am__DEPENDENCIES_1 =
 gsid2mpr_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 gsid2mpr_LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
 	$(gsid2mpr_LDFLAGS) $(LDFLAGS) -o $@
@@ -119,6 +121,8 @@ am_gsidens2orank_OBJECTS = gsidens2orank-gsi_record.$(OBJEXT) \
 	gsidens2orank-rad_config.$(OBJEXT)
 gsidens2orank_OBJECTS = $(am_gsidens2orank_OBJECTS)
 gsidens2orank_DEPENDENCIES = $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1)
 gsidens2orank_LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
@@ -236,7 +240,8 @@ FC_LIBS = @FC_LIBS@
 FFLAGS = @FFLAGS@
 FLIBS = @FLIBS@
 GRIB2CLIB_NAME = @GRIB2CLIB_NAME@
-GRIB2_LIBS = @GRIB2_LIBS@
+GRIB2_DEP_LIBS = @GRIB2_DEP_LIBS@
+GRIB2_MET_LIBS = @GRIB2_MET_LIBS@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
@@ -299,12 +304,14 @@ PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
-PYTHON_LIBS = @PYTHON_LIBS@
+PYTHON_DEP_LIBS = @PYTHON_DEP_LIBS@
+PYTHON_MET_LIBS = @PYTHON_MET_LIBS@
 RANLIB = @RANLIB@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
-UGRID_LIBS = @UGRID_LIBS@
+UGRID_DEP_LIBS = @UGRID_DEP_LIBS@
+UGRID_MET_LIBS = @UGRID_MET_LIBS@
 VERSION = @VERSION@
 YACC = @YACC@
 YFLAGS = @YFLAGS@
@@ -387,15 +394,15 @@ gsid2mpr_LDADD = -lvx_stat_out \
 	-lvx_analysis_util \
 	-lvx_shapedata \
 	-lvx_util \
-	$(PYTHON_LIBS) \
+	$(PYTHON_MET_LIBS) $(PYTHON_DEP_LIBS) \
 	-lvx_statistics \
 	-lvx_data2d_factory \
 	-lvx_data2d_nc_met \
 	-lvx_data2d_nc_pinterp \
-	$(PYTHON_LIBS) \
+	$(PYTHON_MET_LIBS) $(PYTHON_DEP_LIBS) \
 	-lvx_data2d_nccf \
-	-lvx_data2d_grib $(GRIB2_LIBS) \
-	$(UGRID_LIBS) \
+	-lvx_data2d_grib $(GRIB2_MET_LIBS) $(GRIB2_DEP_LIBS) \
+	$(UGRID_MET_LIBS) $(UGRID_DEP_LIBS) \
 	-lvx_data2d \
 	-lvx_seeps \
 	-lvx_nc_util \
@@ -438,15 +445,15 @@ gsidens2orank_LDADD = -lvx_stat_out \
 	-lvx_analysis_util \
 	-lvx_shapedata \
 	-lvx_util \
-	$(PYTHON_LIBS) \
+	$(PYTHON_MET_LIBS) $(PYTHON_DEP_LIBS) \
 	-lvx_statistics \
 	-lvx_data2d_factory \
 	-lvx_data2d_nc_met \
 	-lvx_data2d_nc_pinterp \
-	$(PYTHON_LIBS) \
+	$(PYTHON_MET_LIBS) $(PYTHON_DEP_LIBS) \
 	-lvx_data2d_nccf \
-	-lvx_data2d_grib $(GRIB2_LIBS) \
-	$(UGRID_LIBS) \
+	-lvx_data2d_grib $(GRIB2_MET_LIBS) $(GRIB2_DEP_LIBS) \
+	$(UGRID_MET_LIBS) $(UGRID_DEP_LIBS) \
 	-lvx_data2d \
 	-lvx_seeps \
 	-lvx_nc_util \

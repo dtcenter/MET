@@ -24,9 +24,9 @@ lidar2nc_LDADD = -lvx_shapedata \
 	-lvx_analysis_util \
 	-lvx_data2d_factory \
 	-lvx_data2d_nc_met \
-	$(PYTHON_LIBS) \
+	$(PYTHON_MET_LIBS) $(PYTHON_DEP_LIBS) \
 	-lvx_data2d_nccf \
-	$(UGRID_LIBS) \
+	$(UGRID_MET_LIBS) $(UGRID_DEP_LIBS) \
 	-lvx_statistics \
 	-lvx_nc_obs \
 	-lvx_nc_util \
@@ -52,7 +52,7 @@ lidar2nc_LDADD = -lvx_shapedata \
 	-lvx_cal \
 	-lvx_log \
 	-lvx_util \
-	$(PYTHON_LIBS) \
+	$(PYTHON_MET_LIBS) $(PYTHON_DEP_LIBS) \
 	-lvx_summary \
 	-lmfhdf -ldf -ljpeg \
 	-lm -lproj -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas -lz

@@ -16,7 +16,7 @@ test_read_nc_met_SOURCES = test_read_nc_met.cc
 test_read_nc_met_CPPFLAGS = ${MET_CPPFLAGS}
 test_read_nc_met_LDFLAGS = -L. ${MET_LDFLAGS}
 test_read_nc_met_LDADD = -lvx_data2d_nc_met \
-	$(UGRID_LIBS) \
+	$(UGRID_MET_LIBS) $(UGRID_DEP_LIBS) \
 	-lvx_nc_util \
 	-lvx_data2d \
 	-lvx_grid \

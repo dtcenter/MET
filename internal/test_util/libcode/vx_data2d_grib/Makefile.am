@@ -16,7 +16,7 @@ test_read_grib1_SOURCES = test_read_grib1.cc
 test_read_grib1_CPPFLAGS = ${MET_CPPFLAGS}
 test_read_grib1_LDFLAGS = -L. ${MET_LDFLAGS}
 test_read_grib1_LDADD = -lvx_data2d_grib \
-	$(UGRID_LIBS) \
+	$(UGRID_MET_LIBS) $(UGRID_DEP_LIBS) \
 	-lvx_data2d \
 	-lvx_grid \
 	-lvx_geodesy \
