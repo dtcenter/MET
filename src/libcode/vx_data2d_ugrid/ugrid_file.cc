@@ -221,6 +221,14 @@ bool UGridFile::open_metadata(const char * filepath)
     dim = get_nc_dim(_ncMetaFile, meta_name.c_str());
     face_count = get_dim_size(&dim);
     _faceDim = new NcDim(dim);
+    NcDim face_dim = get_nc_dim(_ncFile, meta_name.c_str());
+    int data_face_count = get_dim_size(&face_dim);
+    if (face_count != data_face_count) {
+      mlog << Error << "\n" << method_name
+           << meta_name << " dimension is different: data file = "
+           << data_face_count << ", metadata file = " << face_count << "\n\n";
+      exit(1);
+    }
   }
 
   // Node (vertex) dimension
@@ -926,13 +934,13 @@ void UGridFile::read_netcdf_grid()
 
   if (get_var_units(_latVar, units_value)) {
     if (units_value == "rad" || units_value == "radian") {
-      mlog << Debug(6) << method_name << "  convert lat (" <<units_value << ") to degree\n";
+      mlog << Debug(6) << method_name << "convert  " << units_value << " to degree for lat\n";
       for (int idx=0; idx<face_count; idx++) _lat[idx] /= rad_per_deg;
     }
   }
   if (get_var_units(_lonVar, units_value)) {
     if (units_value == "rad" || units_value == "radian") {
-      mlog << Debug(6) << method_name << "  convert lon (" <<units_value << ") to degree\n";
+      mlog << Debug(6) << method_name << "  convert " << units_value << " to degree for lon\n";
       for (int idx=0; idx<face_count; idx++) _lon[idx] /= rad_per_deg;
     }
   }
