@@ -125,11 +125,9 @@ void UnstructuredGrid::latlon_to_xy(double lat, double lon, double &x, double &y
    IndexKDTree::ValueList neighbor = Data.kdtree->closestPoints(_pointLonLat, 1);
    size_t index(neighbor[0].payload());
    double distance_km(neighbor[0].distance()/1000.);
-   bool is_rejected = (!is_eq(Data.max_distance_km, bad_data_double)
-                       && Data.max_distance_km > 0
-                       && Data.max_distance_km < distance_km);
+   bool in_distance = Data.is_in_distance(distance_km);
 
-   x = is_rejected ? -1.0 : index;
+   x = in_distance ? index : -1.0;
    y = 0;
 
    //PointLonLat r_lonlat;
@@ -142,7 +140,7 @@ void UnstructuredGrid::latlon_to_xy(double lat, double lon, double &x, double &y
         << Data.pointLonLat[index].x() << ", " << Data.pointLonLat[index].y()
         << ") distance= " << distance_km << "km, "
         << _pointLonLat.distance(Data.pointLonLat[index])
-        << " degree" << (is_rejected ? ", rejected" : " ") << "\n";
+        << " degree" << (in_distance ? " " : ", rejected") << "\n";
 }
 
 
@@ -385,6 +383,17 @@ void UnstructuredData::copy_from(const UnstructuredData *us_data) {
    Nedge = us_data->Nedge;
    Nnode = us_data->Nnode;
    max_distance_km = us_data->max_distance_km;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool UnstructuredData::is_in_distance(double distance_km) const {
+   bool in_distance = is_eq(max_distance_km, bad_data_double)
+                      || (max_distance_km <= 0)
+                      || (max_distance_km >= distance_km);
+   //if (!in_distance) rejectedCount++;
+   //totalCount++;
+   return in_distance;
 }
 
 ////////////////////////////////////////////////////////////////////////

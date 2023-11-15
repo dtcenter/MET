@@ -50,6 +50,7 @@ struct UnstructuredData {
    ~UnstructuredData();
 
    void build_tree();
+   bool is_in_distance(double distance_km) const;
    void set_points(int count, double *_lon, double *_lat);
    void set_points(int count, const std::vector<atlas::PointLonLat> &);
    void copy_from(const UnstructuredData *);

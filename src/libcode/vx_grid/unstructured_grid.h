@@ -35,8 +35,6 @@ class UnstructuredGrid : public GridRep {
 
 
       int Nx;
-      //double distance;  //in meters. Set the negative distance to disbale disathce capability
-
 
       bool wrapLon;
 
