@@ -104,7 +104,7 @@ class EnsembleStatVxOpt {
       StringArray    mask_sid;           // Masking station ID's
 
       // Vector of MaskLatLon objects defining Lat/Lon Point masks
-      vector<MaskLatLon> mask_llpnt;
+      std::vector<MaskLatLon> mask_llpnt;
 
       StringArray    mask_name;          // Masking region names
       StringArray    mask_name_area;     // Masking area (grid + poly) region names
@@ -219,14 +219,14 @@ class EnsembleStatConfInfo {
       double               vld_data_thresh; // Required ratio of valid data for each point
 
       // Message type groups that should be processed together
-      map<ConcatString,StringArray> msg_typ_group_map;
-      StringArray                   msg_typ_sfc;
+      std::map<ConcatString,StringArray> msg_typ_group_map;
+      StringArray                        msg_typ_sfc;
 
       // Mapping of mask names to MaskPlanes
-      map<ConcatString,MaskPlane>   mask_area_map;
+      std::map<ConcatString,MaskPlane>   mask_area_map;
 
       // Mapping of mask names to Station ID lists
-      map<ConcatString,StringArray> mask_sid_map;
+      std::map<ConcatString,StringArray> mask_sid_map;
 
       gsl_rng *rng_ptr;                     // GSL random number generator (allocated)
 
@@ -269,9 +269,9 @@ class EnsembleStatConfInfo {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int EnsembleStatConfInfo::get_n_vx()             const { return(n_vx);                  }
-inline int EnsembleStatConfInfo::get_max_hira_size()    const { return(max_hira_size);         }
-inline int EnsembleStatConfInfo::get_compression_level()      { return(conf.nc_compression()); }
+inline int EnsembleStatConfInfo::get_n_vx()             const { return n_vx;                  }
+inline int EnsembleStatConfInfo::get_max_hira_size()    const { return max_hira_size;         }
+inline int EnsembleStatConfInfo::get_compression_level()      { return conf.nc_compression(); }
 
 ////////////////////////////////////////////////////////////////////////
 
