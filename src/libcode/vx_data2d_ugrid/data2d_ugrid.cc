@@ -241,8 +241,17 @@ bool MetUGridDataFile::data_plane(VarInfo &vinfo, DataPlane &plane, NcVarInfo *d
 
       // Adjust dimension and is_offset
       int dim_size = dimension.n_elements();
-      if (0 == dimension.n_elements()) {
+      if (0 == dim_size) {
          for (int idx=0; idx<data_var->Ndims; idx++) {
+            long offset = 0;
+            if (zdim_slot == idx &&_cur_vert_index >= 0) offset = _cur_vert_index;
+            else if (time_dim_slot != idx) offset = vx_data2d_star;
+            dimension.add(offset);
+            is_offset.add(true);
+         }
+      }
+      else if (dim_size < data_var->Ndims) {
+         for (int idx=dim_size; idx<data_var->Ndims; idx++) {
             long offset = 0;
             if (zdim_slot == idx &&_cur_vert_index >= 0) offset = _cur_vert_index;
             else if (time_dim_slot != idx) offset = vx_data2d_star;

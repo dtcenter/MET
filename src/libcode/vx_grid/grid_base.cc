@@ -310,7 +310,6 @@ void UnstructuredData::clear() {
 
    name = (const char *) nullptr;
 
-   Nface = Nnode = Nedge = 0;
    max_distance_km = bad_data_double;  // disable max_distance
 
    clear_data();
@@ -322,7 +321,7 @@ void UnstructuredData::clear() {
 
 void UnstructuredData::clear_data() {
 
-   Nface = 0;
+   Nface = Nnode = Nedge = 0;
    pointLonLat.clear();
    lat_checksum = lon_checksum = 0.;
 

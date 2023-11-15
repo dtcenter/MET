@@ -168,7 +168,7 @@ void VarInfoUGrid::set_magic(const ConcatString &nstr, const ConcatString &lstr)
    set_name(nstr);
 
    // If there's no level specification, assume (*, *)
-   if(strchr(lstr.c_str(), '(') == nullptr) {
+   if(0 == lstr.length() || strchr(lstr.c_str(), '(') == nullptr) {
       Level.set_req_name("0,*");
       Level.set_name("0,*");
       clear_dimension();
@@ -339,6 +339,7 @@ void VarInfoUGrid::set_dict(Dictionary &dict){
    char lvl_type = ' ';
    ConcatString cfg_name = dict.lookup_string("name");
    ConcatString cfg_level = dict.lookup_string("level");
+   const char * method_name = "VarInfoUGrid::set_dict() -> ";
 
    VarInfo::set_dict(dict);
 
@@ -350,6 +351,11 @@ void VarInfoUGrid::set_dict(Dictionary &dict){
    }
    else set_magic(cfg_name, cfg_level);
 
+   if (Level.lower() != Level.upper()) {
+      mlog << Warning << "\n" << method_name
+           << "Recommend to select the single vertical level for UGrid instead of multiple levels ("
+           << cfg_level  << ")\n\n";
+   }
 
    set_req_name(cfg_name.c_str());
 
