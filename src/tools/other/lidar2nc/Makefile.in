@@ -107,7 +107,7 @@ lidar2nc_OBJECTS = $(am_lidar2nc_OBJECTS)
 am__DEPENDENCIES_1 =
 lidar2nc_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_1)
 lidar2nc_LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
 	$(lidar2nc_LDFLAGS) $(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_@AM_V@)
@@ -358,9 +358,9 @@ lidar2nc_LDADD = -lvx_shapedata \
 	-lvx_analysis_util \
 	-lvx_data2d_factory \
 	-lvx_data2d_nc_met \
-	$(PYTHON_MET_LIBS) $(PYTHON_DEP_LIBS) \
 	-lvx_data2d_nccf \
-	$(UGRID_MET_LIBS) $(UGRID_DEP_LIBS) \
+	$(UGRID_MET_LIBS) \
+	$(PYTHON_MET_LIBS) \
 	-lvx_statistics \
 	-lvx_nc_obs \
 	-lvx_nc_util \
@@ -380,13 +380,14 @@ lidar2nc_LDADD = -lvx_shapedata \
 	-lvx_geodesy \
 	-lvx_util_math \
 	-lvx_util \
+	$(PYTHON_MET_LIBS) \
 	-lvx_config \
 	-lvx_gsl_prob \
 	-lvx_math \
 	-lvx_cal \
 	-lvx_log \
 	-lvx_util \
-	$(PYTHON_MET_LIBS) $(PYTHON_DEP_LIBS) \
+	$(UGRID_DEP_LIBS) $(PYTHON_DEP_LIBS) \
 	-lvx_summary \
 	-lmfhdf -ldf -ljpeg \
 	-lm -lproj -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas -lz

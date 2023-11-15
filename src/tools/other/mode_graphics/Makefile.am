@@ -26,8 +26,8 @@ plot_mode_field_LDADD = -lvx_config \
 	-lvx_gsl_prob \
 	-lvx_plot_util \
 	-lvx_data2d_nc_met \
-	$(UGRID_MET_LIBS) $(UGRID_DEP_LIBS) \
-	$(PYTHON_MET_LIBS) $(PYTHON_DEP_LIBS) \
+	$(UGRID_MET_LIBS) \
+	$(PYTHON_MET_LIBS) \
 	-lvx_statistics \
 	-lvx_grid \
 	-lvx_geodesy \
@@ -43,7 +43,9 @@ plot_mode_field_LDADD = -lvx_config \
 	-lvx_config \
 	-lvx_cal \
 	-lvx_math \
-	-lcairo -lfreetype -lm -lproj -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas -lz
+	$(UGRID_DEP_LIBS) $(PYTHON_DEP_LIBS) \
+	-lcairo -lfreetype \
+	-lm -lproj -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas -lz
 
 # If we are in development mode, generate the "to_string" files and
 # clean them up in a "make clean".  We don't want to do either of these

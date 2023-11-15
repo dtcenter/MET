@@ -18,12 +18,13 @@ gen_vx_mask_LDFLAGS = ${MET_LDFLAGS}
 gen_vx_mask_LDADD = -lvx_shapedata \
 	-lvx_analysis_util \
 	-lvx_data2d_factory \
-	-lvx_data2d_nccf \
-	-lvx_data2d_grib $(GRIB2_MET_LIBS) $(GRIB2_DEP_LIBS) \
 	-lvx_data2d_nc_met \
+	-lvx_data2d_grib \
+	$(GRIB2_MET_LIBS) \
 	-lvx_data2d_nc_pinterp \
-	$(UGRID_MET_LIBS) $(UGRID_DEP_LIBS) \
-	$(PYTHON_MET_LIBS) $(PYTHON_DEP_LIBS) \
+	-lvx_data2d_nccf \
+	$(UGRID_MET_LIBS) \
+	$(PYTHON_MET_LIBS) \
 	-lvx_statistics \
 	-lvx_gis  \
 	-lvx_nc_util \
@@ -51,6 +52,7 @@ gen_vx_mask_LDADD = -lvx_shapedata \
 	-lvx_solar \
 	-lvx_cal \
 	-lvx_log \
+	$(GRIB2_DEP_LIBS) $(UGRID_DEP_LIBS) $(PYTHON_DEP_LIBS) \
 	-lm -lproj -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
 
 EXTRA_DIST = gen_vx_mask.h

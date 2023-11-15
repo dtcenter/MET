@@ -109,7 +109,6 @@ gsid2mpr_OBJECTS = $(am_gsid2mpr_OBJECTS)
 am__DEPENDENCIES_1 =
 gsid2mpr_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 gsid2mpr_LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
 	$(gsid2mpr_LDFLAGS) $(LDFLAGS) -o $@
@@ -121,7 +120,6 @@ am_gsidens2orank_OBJECTS = gsidens2orank-gsi_record.$(OBJEXT) \
 	gsidens2orank-rad_config.$(OBJEXT)
 gsidens2orank_OBJECTS = $(am_gsidens2orank_OBJECTS)
 gsidens2orank_DEPENDENCIES = $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1)
@@ -394,15 +392,15 @@ gsid2mpr_LDADD = -lvx_stat_out \
 	-lvx_analysis_util \
 	-lvx_shapedata \
 	-lvx_util \
-	$(PYTHON_MET_LIBS) $(PYTHON_DEP_LIBS) \
-	-lvx_statistics \
 	-lvx_data2d_factory \
 	-lvx_data2d_nc_met \
+	-lvx_data2d_grib \
+	$(GRIB2_MET_LIBS) \
 	-lvx_data2d_nc_pinterp \
-	$(PYTHON_MET_LIBS) $(PYTHON_DEP_LIBS) \
 	-lvx_data2d_nccf \
-	-lvx_data2d_grib $(GRIB2_MET_LIBS) $(GRIB2_DEP_LIBS) \
-	$(UGRID_MET_LIBS) $(UGRID_DEP_LIBS) \
+	$(UGRID_MET_LIBS) \
+	$(PYTHON_MET_LIBS) \
+	-lvx_statistics \
 	-lvx_data2d \
 	-lvx_seeps \
 	-lvx_nc_util \
@@ -418,6 +416,7 @@ gsid2mpr_LDADD = -lvx_stat_out \
 	-lvx_math \
 	-lvx_color \
 	-lvx_log \
+	$(GRIB2_DEP_LIBS) $(UGRID_DEP_LIBS) $(PYTHON_DEP_LIBS) \
 	-lm -lproj -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas -lvx_util
 
 gsidens2orank_SOURCES = gsidens2orank.h \
@@ -445,15 +444,15 @@ gsidens2orank_LDADD = -lvx_stat_out \
 	-lvx_analysis_util \
 	-lvx_shapedata \
 	-lvx_util \
-	$(PYTHON_MET_LIBS) $(PYTHON_DEP_LIBS) \
-	-lvx_statistics \
 	-lvx_data2d_factory \
 	-lvx_data2d_nc_met \
+	-lvx_data2d_grib \
+	$(GRIB2_MET_LIBS) \
 	-lvx_data2d_nc_pinterp \
-	$(PYTHON_MET_LIBS) $(PYTHON_DEP_LIBS) \
 	-lvx_data2d_nccf \
-	-lvx_data2d_grib $(GRIB2_MET_LIBS) $(GRIB2_DEP_LIBS) \
-	$(UGRID_MET_LIBS) $(UGRID_DEP_LIBS) \
+	$(UGRID_MET_LIBS) \
+	$(PYTHON_MET_LIBS) \
+	-lvx_statistics \
 	-lvx_data2d \
 	-lvx_seeps \
 	-lvx_nc_util \
@@ -469,6 +468,7 @@ gsidens2orank_LDADD = -lvx_stat_out \
 	-lvx_math \
 	-lvx_color \
 	-lvx_log \
+	$(GRIB2_DEP_LIBS) $(UGRID_DEP_LIBS) $(PYTHON_DEP_LIBS) \
 	-lm -lproj -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas -lvx_util
 
 all: all-am
