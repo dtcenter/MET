@@ -43,6 +43,7 @@ static const int  netcdf_magic_len = m_strlen(netcdf_magic);
 static const string nccf_att_value  = "CF-";
 static const string nccf_att_value2 = "CF ";
 static const string nccf_att_value3 = "COARDS";
+static const string mpas_att_value = "MPAS";
 static const string ugrid_att_value = "UGRID";
 
 static const string ncmet_att_version    = "MET_version";
@@ -184,21 +185,18 @@ bool is_ugrid_file(const char * filename)
 
       if (!IS_INVALID_NC_P(nc_file)) {
          // Get the global attribute
-         // Check Conventions attrribute (Conventions= "UGRID")
+         // Check Conventions attrribute (Conventions= "UGRID" or "MPAS")
          if (get_cf_conventions(nc_file, att_val)) {
             status = (0 == att_val.compare(0, ugrid_att_value.length(),
-                                           ugrid_att_value));
+                                           ugrid_att_value)
+                   || 0 == att_val.compare(0, mpas_att_value.length(),
+                                           mpas_att_value));
          }
          if (!status) {
             status = get_global_att(nc_file, mesh_spec_att_name, att_val); // for MPAS
-            //if (!status) {
-            //   // Check the attribute value for the target string
-            //   status = (strstr(att_val.c_str(), ncpinterp_att_value));
-            //}
          }
       }
-
-      delete nc_file;
+      if (nullptr != nc_file) delete nc_file;
 
    }catch(...) {
    }
