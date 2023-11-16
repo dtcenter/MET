@@ -47,7 +47,7 @@ fcst = {
    obs_quality_exc  = [];
 
    field = [
-      { name = "temperature";  level = "P1000-500";  message_type = "ADPSFC"; }
+      { name = "temperature";  level = "P925";  message_type = "ADPSFC"; }
    ];
 
 }

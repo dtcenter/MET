@@ -47,7 +47,7 @@ fcst = {
    obs_quality_exc  = [];
 
    field = [
-      { name = "theta";  level = "L2-4";  message_type = "ADPSFC"; }
+      { name = "theta";  level = "L2";  message_type = "ADPSFC"; }
    ];
 
 }
