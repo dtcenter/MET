@@ -226,7 +226,7 @@ bool UGridFile::open_metadata(const char * filepath)
     if (face_count != data_face_count) {
       mlog << Error << "\n" << method_name
            << meta_name << " dimension is different: data file = "
-           << data_face_count << ", metadata file = " << face_count << "\n\n";
+           << data_face_count << ", coordinates file = " << face_count << "\n\n";
       exit(1);
     }
   }
