@@ -294,6 +294,7 @@ jobs:
           - 'grid_stat stat_analysis_gs'
           - 'wavelet_stat stat_analysis_ws'
           - 'ensemble_stat stat_analysis_es'
+          - 'ugrid'
       fail-fast: false
     steps:
       - uses: actions/checkout@v3

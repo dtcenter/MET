@@ -679,13 +679,16 @@ YACC
 FC_LIBS
 ENABLE_DEVELOPMENT_FALSE
 ENABLE_DEVELOPMENT_TRUE
-UGRID_LIBS
+UGRID_DEP_LIBS
+UGRID_MET_LIBS
 ENABLE_UGRID_FALSE
 ENABLE_UGRID_TRUE
-PYTHON_LIBS
+PYTHON_DEP_LIBS
+PYTHON_MET_LIBS
 ENABLE_PYTHON_FALSE
 ENABLE_PYTHON_TRUE
-GRIB2_LIBS
+GRIB2_DEP_LIBS
+GRIB2_MET_LIBS
 GRIB2CLIB_NAME_SET_FALSE
 GRIB2CLIB_NAME_SET_TRUE
 ENABLE_GRIB2_FALSE
@@ -6823,15 +6826,19 @@ printf "%s\n" "$as_me: GRIB2 utilites will be compiled" >&6;}
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: GRIB2CLIB_NAME will be set" >&5
 printf "%s\n" "$as_me: GRIB2CLIB_NAME will be set" >&6;}
     if test -z "$GRIB2CLIB_NAME"; then
-       GRIB2_LIBS="-lvx_data2d_grib2 -lgrib2c -ljasper -lpng -lz"
+       GRIB2_MET_LIBS="-lvx_data2d_grib2"
+       GRIB2_DEP_LIBS="-lgrib2c -ljasper -lpng -lz"
     else
-       GRIB2_LIBS="-lvx_data2d_grib2 ${GRIB2CLIB_NAME} -ljasper -lpng -lz"
+       GRIB2_MET_LIBS="-lvx_data2d_grib2"
+       GRIB2_DEP_LIBS="${GRIB2CLIB_NAME} -ljasper -lpng -lz"
     fi
 else
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: GRIB2 utilities will not be compiled" >&5
 printf "%s\n" "$as_me: GRIB2 utilities will not be compiled" >&6;}
-    GRIB2_LIBS=
+    GRIB2_MET_LIBS=
+    GRIB2_DEP_LIBS=
 fi
+
 
 
 # Python
@@ -6865,12 +6872,15 @@ printf "%s\n" "#define ENABLE_PYTHON /**/" >>confdefs.h
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: python embedding will be compiled" >&5
 printf "%s\n" "$as_me: python embedding will be compiled" >&6;}
   CPPFLAGS="${CPPFLAGS} -DWITH_PYTHON"
-  PYTHON_LIBS="-lvx_data2d_python -lvx_pointdata_python -lvx_python3_utils ${MET_PYTHON_LD}"
+  PYTHON_MET_LIBS="-lvx_data2d_python -lvx_pointdata_python -lvx_python3_utils"
+  PYTHON_DEP_LIBS="${MET_PYTHON_LD}"
 else
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: python embedding will not be compiled" >&5
 printf "%s\n" "$as_me: python embedding will not be compiled" >&6;}
-  PYTHON_LIBS=
+  PYTHON_MET_LIBS=
+  PYTHON_DEP_LIBS=
 fi
+
 
 
 # Unstructure grid with ECMF libraries (Atlas/ecKit)
@@ -6905,12 +6915,15 @@ printf "%s\n" "#define ENABLE_UGRID /**/" >>confdefs.h
 printf "%s\n" "$as_me: unstructured grid will be compiled" >&6;}
   CPPFLAGS="${CPPFLAGS} -I${MET_ATLASINC} -I${MET_ECKITINC} -DWITH_UGRID"
   LDFLAGS="${LDFLAGS} -L${MET_ATLASLIB} -L${MET_ECKITLIB} -Wl,-rpath,${MET_ATLASLIB}:${MET_ECKITLIB}"
-  UGRID_LIBS="-lvx_data2d_ugrid -latlas -leckit -leckit_mpi -leckit_geometry"
+  UGRID_MET_LIBS="-lvx_data2d_ugrid"
+  UGRID_DEP_LIBS="-latlas -leckit -leckit_mpi -leckit_geometry"
 else
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: unstructured grid will not be compiled" >&5
 printf "%s\n" "$as_me: unstructured grid will not be compiled" >&6;}
-  UGRID_LIBS=
+  UGRID_MET_LIBS=
+  UGRID_DEP_LIBS=
 fi
+
 
 
 ########################################################################

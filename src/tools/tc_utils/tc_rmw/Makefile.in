@@ -107,7 +107,9 @@ am_tc_rmw_OBJECTS = tc_rmw-tc_rmw.$(OBJEXT) \
 tc_rmw_OBJECTS = $(am_tc_rmw_OBJECTS)
 am__DEPENDENCIES_1 =
 tc_rmw_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1)
 tc_rmw_LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(tc_rmw_LDFLAGS) \
 	$(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_@AM_V@)
@@ -202,7 +204,8 @@ FC_LIBS = @FC_LIBS@
 FFLAGS = @FFLAGS@
 FLIBS = @FLIBS@
 GRIB2CLIB_NAME = @GRIB2CLIB_NAME@
-GRIB2_LIBS = @GRIB2_LIBS@
+GRIB2_DEP_LIBS = @GRIB2_DEP_LIBS@
+GRIB2_MET_LIBS = @GRIB2_MET_LIBS@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
@@ -265,12 +268,14 @@ PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
-PYTHON_LIBS = @PYTHON_LIBS@
+PYTHON_DEP_LIBS = @PYTHON_DEP_LIBS@
+PYTHON_MET_LIBS = @PYTHON_MET_LIBS@
 RANLIB = @RANLIB@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
-UGRID_LIBS = @UGRID_LIBS@
+UGRID_DEP_LIBS = @UGRID_DEP_LIBS@
+UGRID_MET_LIBS = @UGRID_MET_LIBS@
 VERSION = @VERSION@
 YACC = @YACC@
 YFLAGS = @YFLAGS@
@@ -341,11 +346,12 @@ tc_rmw_LDADD = -lvx_stat_out \
 	-lvx_tc_util \
 	-lvx_data2d_factory \
 	-lvx_data2d_nc_met \
-	-lvx_data2d_grib $(GRIB2_LIBS) \
+	-lvx_data2d_grib \
+	$(GRIB2_MET_LIBS) \
 	-lvx_data2d_nc_pinterp \
-	$(PYTHON_LIBS) \
 	-lvx_data2d_nccf \
-	$(UGRID_LIBS) \
+	$(UGRID_MET_LIBS) \
+	$(PYTHON_MET_LIBS) \
 	-lvx_statistics \
 	-lvx_data2d \
 	-lvx_nc_util \
@@ -361,6 +367,7 @@ tc_rmw_LDADD = -lvx_stat_out \
 	-lvx_math \
 	-lvx_color \
 	-lvx_log \
+	$(GRIB2_DEP_LIBS) $(UGRID_DEP_LIBS) $(PYTHON_DEP_LIBS) \
 	-lm -lproj -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas \
 	$(FLIBS)
 

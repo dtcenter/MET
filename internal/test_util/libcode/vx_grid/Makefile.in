@@ -103,7 +103,8 @@ PROGRAMS = $(noinst_PROGRAMS)
 am_test_grid_area_OBJECTS = test_grid_area-test_grid_area.$(OBJEXT)
 test_grid_area_OBJECTS = $(am_test_grid_area_OBJECTS)
 am__DEPENDENCIES_1 =
-test_grid_area_DEPENDENCIES = $(am__DEPENDENCIES_1)
+test_grid_area_DEPENDENCIES = $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1)
 test_grid_area_LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
 	$(test_grid_area_LDFLAGS) $(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_@AM_V@)
@@ -196,7 +197,8 @@ FC_LIBS = @FC_LIBS@
 FFLAGS = @FFLAGS@
 FLIBS = @FLIBS@
 GRIB2CLIB_NAME = @GRIB2CLIB_NAME@
-GRIB2_LIBS = @GRIB2_LIBS@
+GRIB2_DEP_LIBS = @GRIB2_DEP_LIBS@
+GRIB2_MET_LIBS = @GRIB2_MET_LIBS@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
@@ -259,12 +261,14 @@ PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
-PYTHON_LIBS = @PYTHON_LIBS@
+PYTHON_DEP_LIBS = @PYTHON_DEP_LIBS@
+PYTHON_MET_LIBS = @PYTHON_MET_LIBS@
 RANLIB = @RANLIB@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
-UGRID_LIBS = @UGRID_LIBS@
+UGRID_DEP_LIBS = @UGRID_DEP_LIBS@
+UGRID_MET_LIBS = @UGRID_MET_LIBS@
 VERSION = @VERSION@
 YACC = @YACC@
 YFLAGS = @YFLAGS@
@@ -326,7 +330,7 @@ test_grid_area_SOURCES = test_grid_area.cc
 test_grid_area_CPPFLAGS = ${MET_CPPFLAGS}
 test_grid_area_LDFLAGS = -L. ${MET_LDFLAGS}
 test_grid_area_LDADD = \
-	$(UGRID_LIBS) \
+	$(UGRID_MET_LIBS) \
 	-lvx_grid \
 	-lvx_geodesy \
 	-lvx_nav \
@@ -335,6 +339,7 @@ test_grid_area_LDADD = \
 	-lvx_math \
 	-lvx_cal \
 	-lvx_log \
+	$(UGRID_DEP_LIBS) \
 	-lz -lm -lproj
 
 all: all-am

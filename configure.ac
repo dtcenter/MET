@@ -1054,15 +1054,19 @@ if test "x$ENABLE_GRIB2" = "xyes"; then
     AC_SUBST([GRIB2CLIB_NAME])
   AC_MSG_NOTICE([GRIB2CLIB_NAME will be set])
     if test -z "$GRIB2CLIB_NAME"; then
-       GRIB2_LIBS="-lvx_data2d_grib2 -lgrib2c -ljasper -lpng -lz"
+       GRIB2_MET_LIBS="-lvx_data2d_grib2"
+       GRIB2_DEP_LIBS="-lgrib2c -ljasper -lpng -lz"
     else
-       GRIB2_LIBS="-lvx_data2d_grib2 ${GRIB2CLIB_NAME} -ljasper -lpng -lz"
+       GRIB2_MET_LIBS="-lvx_data2d_grib2"
+       GRIB2_DEP_LIBS="${GRIB2CLIB_NAME} -ljasper -lpng -lz"
     fi
 else
   AC_MSG_NOTICE([GRIB2 utilities will not be compiled])
-    GRIB2_LIBS=
+    GRIB2_MET_LIBS=
+    GRIB2_DEP_LIBS=
 fi
-AC_SUBST([GRIB2_LIBS])
+AC_SUBST([GRIB2_MET_LIBS])
+AC_SUBST([GRIB2_DEP_LIBS])
 
 # Python
 
@@ -1081,12 +1085,15 @@ if test "x$ENABLE_PYTHON" = "xyes"; then
   AC_DEFINE([ENABLE_PYTHON], [], ["build python embedding"])
   AC_MSG_NOTICE([python embedding will be compiled])
   CPPFLAGS="${CPPFLAGS} -DWITH_PYTHON"
-  PYTHON_LIBS="-lvx_data2d_python -lvx_pointdata_python -lvx_python3_utils ${MET_PYTHON_LD}"
+  PYTHON_MET_LIBS="-lvx_data2d_python -lvx_pointdata_python -lvx_python3_utils"
+  PYTHON_DEP_LIBS="${MET_PYTHON_LD}"
 else
   AC_MSG_NOTICE([python embedding will not be compiled])
-  PYTHON_LIBS=
+  PYTHON_MET_LIBS=
+  PYTHON_DEP_LIBS=
 fi
-AC_SUBST([PYTHON_LIBS])
+AC_SUBST([PYTHON_MET_LIBS])
+AC_SUBST([PYTHON_DEP_LIBS])
 
 # Unstructure grid with ECMF libraries (Atlas/ecKit)
 
@@ -1106,12 +1113,15 @@ if test "x$ENABLE_UGRID" = "xyes"; then
   AC_MSG_NOTICE([unstructured grid will be compiled])
   CPPFLAGS="${CPPFLAGS} -I${MET_ATLASINC} -I${MET_ECKITINC} -DWITH_UGRID"
   LDFLAGS="${LDFLAGS} -L${MET_ATLASLIB} -L${MET_ECKITLIB} -Wl,-rpath,${MET_ATLASLIB}:${MET_ECKITLIB}"
-  UGRID_LIBS="-lvx_data2d_ugrid -latlas -leckit -leckit_mpi -leckit_geometry"
+  UGRID_MET_LIBS="-lvx_data2d_ugrid"
+  UGRID_DEP_LIBS="-latlas -leckit -leckit_mpi -leckit_geometry"
 else
   AC_MSG_NOTICE([unstructured grid will not be compiled])
-  UGRID_LIBS=
+  UGRID_MET_LIBS=
+  UGRID_DEP_LIBS=
 fi
-AC_SUBST([UGRID_LIBS])
+AC_SUBST([UGRID_MET_LIBS])
+AC_SUBST([UGRID_DEP_LIBS])
 
 ########################################################################
 
