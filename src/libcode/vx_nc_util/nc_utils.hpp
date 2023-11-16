@@ -73,7 +73,7 @@ bool get_att_num_value_(const netCDF::NcAtt *att, T &att_val, int matching_type)
             att_val = atoi(att_value.c_str());
       }
    }
-   return(status);
+   return status;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -100,7 +100,7 @@ bool get_nc_att_value_(const netCDF::NcVar *var, const ConcatString &att_name,
    }
    if (att) delete att;
 
-   return(status);
+   return status;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -122,7 +122,7 @@ bool get_nc_att_value_(const netCDF::NcVarAtt *att, T &att_val, bool exit_on_err
       if (exit_on_error) exit(1);
    }
 
-   return(status);
+   return status;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -153,7 +153,7 @@ bool get_global_att_value_(const netCDF::NcFile *nc, const ConcatString& att_nam
    // Check error_out status
    if (error_out && !status) exit(1);
 
-   return(status);
+   return status;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -174,7 +174,7 @@ bool get_var_att_num_(const netCDF::NcVar *var, const ConcatString &att_name,
    }
    if (att) delete att;
 
-   return(status);
+   return status;
 }
 
 ////////////////////////////////////////////////////////////////////////
