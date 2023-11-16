@@ -702,7 +702,8 @@ if ( field->is_array() ) {
       // traditional mode, extra test
       if ( (N_fields_f > 0) && (N != N_fields_f) )  {
          mlog << Error
-              << "\nModeConfInfo::read_field_dict() -> fcst and obs dictionaries have different number of entries in traditional mode\n\n";
+              << "\nModeConfInfo::read_fields() -> fcst and obs dictionaries have different number of entries in traditional mode"
+              << ", not allowed\n\n";
          exit ( 1 );
 
       }
@@ -720,7 +721,7 @@ if ( field->is_array() ) {
       if ( (e->type() != DictionaryType) && (e->type() != ArrayType) )  {
 
          mlog << Error
-              << "\nModeConfInfo::read_field_dict() -> field entry # " << (j + 1) << " is not a dictionary!\n\n";
+              << "\nModeConfInfo::read_fields() -> field entry # " << (j + 1) << " is not a dictionary!\n\n";
 
          exit ( 1 );
 
@@ -916,39 +917,21 @@ void ModeConfInfo::set_perc_thresh(const DataPlane &f_dp,
                                       &(Obs->merge_thresh_array));
 
    return;
-
 }
 
-
 ////////////////////////////////////////////////////////////////////////
-
 
 void ModeConfInfo::set_perc_thresh(const DataPlane &dp)
 {
    //
    // Compute percentiles for forecast or observation thresholds.
    //
-
+   Mode_Field_Info *F;
+   
    if (data_type == ModeDataType_MvMode_Obs) {
-      if( !(Obs->conv_thresh_array.need_perc()  ) &&
-          !(Obs->merge_thresh_array.need_perc() ) ) {
-         return;
-      } else {
-         mlog << Warning
-              << "\nModeConfInfo::set_perc_thresh() -> "
-              << " percentage thresholds not implemented for multivar mode when creating simple observation objects, ignore the configured settings\n\n";
-         return;
-      }
+      F = Obs;
    } else if (data_type == ModeDataType_MvMode_Fcst) {
-
-      if( !(Fcst->conv_thresh_array.need_perc()  ) &&
-          !(Fcst->merge_thresh_array.need_perc() ) ) return;
-      else {
-         mlog << Warning
-              << "\nModeConfInfo::set_perc_thresh() -> "
-              << " percentage thresholds not implemented for multivar mode when creating simple forecast objects, ignore the configured settings\n\n";
-         return;
-      }
+      F = Fcst;
    } else {
       mlog << Warning 
            << "\nModeConfInfo::set_perc_thresh() -> "
@@ -956,46 +939,37 @@ void ModeConfInfo::set_perc_thresh(const DataPlane &dp)
            << sprintModeDataType(data_type) << "\n'n";
       return;
    }
+   if( !(F->conv_thresh_array.need_perc()  ) &&
+       !(F->merge_thresh_array.need_perc() ) ) {
+      return;
+   }
 
+   //
+   // Sort the input array
+   //
+   NumArray sort;
+   int nxy = dp.nx() * dp.ny();
 
+   sort.extend(nxy);
 
-   // //
-   // // Sort the input arrays
-   // //
-   // NumArray sort;
-   // int nxy = dp.nx() * dp.ny();
+   for(int i=0; i<nxy; i++) {
+      if(!is_bad_data(dp.data()[i])) sort.add(dp.data()[i]);
+   }
 
-   // sort.extend(nxy);
-   // sort.extend(nxy);
+   sort.sort_array();
 
-   // for(int i=0; i<nxy; i++) {
-   //    if(!is_bad_data(dp.data()[i])) sort.add(dp.data()[i]);
-   // }
-
-   // sort.sort_array();
-
-   // //
-   // // Compute percentiles
-   // //
-   // if (data_type == ModeDataType_Obs) {
-   //   Obs->conv_thresh_array.set_perc(&fsort, &osort, (NumArray *) 0,
-   //                                   &(Fcst->conv_thresh_array),
-   //                                    &(Obs->conv_thresh_array));
-   //   Obs->merge_thresh_array.set_perc(&fsort, &osort, (NumArray *) 0,
-   //                                    &(Fcst->merge_thresh_array),
-   //                                    &(Obs->merge_thresh_array));
-   // } else { // already checked above that this is Fcst data
-   //  Fcst->conv_thresh_array.set_perc(&fsort, &osort, (NumArray *) 0,
-   //                                   &(Fcst->conv_thresh_array),
-   //                                    &(Obs->conv_thresh_array));
-   //  Fcst->merge_thresh_array.set_perc(&fsort, &osort, (NumArray *) 0,
-   //                                    &(Fcst->merge_thresh_array),
-   //                                    &(Obs->merge_thresh_array));
-   // }
-   // return;
+   //
+   // Compute percentiles by hacking in the same input as if its two
+   //
+   F->conv_thresh_array.set_perc(&sort, &sort, (NumArray *) 0,
+                                 &(F->conv_thresh_array),
+                                 &(F->conv_thresh_array));
+   F->merge_thresh_array.set_perc(&sort, &sort, (NumArray *) 0,
+                                  &(F->merge_thresh_array),
+                                  &(F->merge_thresh_array));
+   return;
 
 }
-
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -1169,7 +1143,7 @@ void ModeConfInfo::set_fcst_merge_thresh_by_index(int k)
    {
       mlog << Error 
            << "\nModeConfInfo::set_fcst_merge_thresh_by_index(int) -> "
-              << "set for obs data not fcst\n\n";
+              << "software is set for obs data not fcst\n\n";
       exit (1);
    }
    Fcst->set_merge_thresh_by_index(k);
@@ -1202,8 +1176,8 @@ void ModeConfInfo::set_fcst_conv_thresh_by_merge_index(int k)
    if (data_type == ModeDataType_MvMode_Obs)
    {
       mlog << Error 
-           << "\nModeConfInfo::set_fcst_conv_thresh_by_index(int) -> "
-              << "set for obs data not fcst\n\n";
+           << "\nModeConfInfo::set_fcst_conv_thresh_by_merge_index(int) -> "
+              << "software is set for obs data not fcst\n\n";
       exit (1);
    }
    Fcst->set_conv_thresh_by_merge_index(k);
@@ -1223,7 +1197,7 @@ void ModeConfInfo::set_obs_conv_thresh_by_merge_index(int k)
    {
       mlog << Error 
            << "\nModeConfInfo::set_obs_conv_thresh_by_merge_index(int) -> "
-              << "set for fcst data not obs\n\n";
+              << "software is set for fcst data not obs\n\n";
       exit (1);
    }
    Obs->set_conv_thresh_by_merge_index(k);
@@ -1240,7 +1214,7 @@ void ModeConfInfo::set_fcst_merge_flag(MergeType t)
    {
       mlog << Error 
            << "\nModeConfInfo::set_fcst_merge_flag(int) -> "
-              << "set for obs data not fcst\n\n";
+              << "software is set for obs data not fcst\n\n";
       exit (1);
    }
    Fcst->merge_flag = t;
@@ -1254,7 +1228,7 @@ void ModeConfInfo::set_obs_merge_flag(MergeType t)
    {
       mlog << Error 
            << "\nModeConfInfo::set_obs_merge_flag(int) -> "
-              << "set for fcst data not obs\n\n";
+              << "software is set for fcst data not obs\n\n";
       exit (1);
    }
    Obs->merge_flag = t;
@@ -1268,7 +1242,7 @@ void ModeConfInfo::set_fcst_merge_thresh(SingleThresh s)
    {
       mlog << Error 
            << "\nModeConfInfo::set_fcst_merge_thresh(int) -> "
-              << "set for obs data not fcst\n\n";
+              << "software is set for obs data not fcst\n\n";
       exit (1);
    }
    Fcst->merge_thresh = s;
@@ -1282,7 +1256,7 @@ void ModeConfInfo::set_obs_merge_thresh(SingleThresh s)
    {
       mlog << Error 
            << "\nModeConfInfo::set_obs_merge_thresh(int) -> "
-              << "set for fcst data not obs\n\n";
+              << "software is set for fcst data not obs\n\n";
       exit (1);
    }
    Obs->merge_thresh = s;
@@ -1298,7 +1272,7 @@ void ModeConfInfo::set_obs_merge_thresh_by_index(int k)
    {
       mlog << Error 
            << "\nModeConfInfo::set_obs_merge_thresh_by_index(int) -> "
-              << "set for fcst data not obs\n\n";
+              << "software is set for fcst data not obs\n\n";
       exit (1);
    }
 
@@ -1387,23 +1361,22 @@ obs_multivar_name = default_multivar_name;
 fcst_multivar_level = na_str;
 obs_multivar_level = na_str;
 
-// these have to be outside the fcst and obs dictionaries
-
+// this has to be outside the fcst and obs dictionaries
 if ( conf.lookup(conf_key_fcst_multivar_compare_index)) fcst_multivar_compare_index = conf.lookup_int_array(conf_key_fcst_multivar_compare_index);
+
+// this has to be outside the fcst and obs dictionaries
 if ( conf.lookup(conf_key_obs_multivar_compare_index)) obs_multivar_compare_index = conf.lookup_int_array(conf_key_obs_multivar_compare_index);
 
 
 dict = conf.lookup_dictionary(conf_key_fcst);
 
 if ( dict->lookup(conf_key_multivar_logic) ) fcst_multivar_logic = dict->lookup_string(conf_key_multivar_logic);
-//if ( dict->lookup(conf_key_fcst_multivar_compare_index)) fcst_multivar_compare_index = dict->lookup_int_array(conf_key_fcst_multivar_compare_index);
 if ( dict->lookup(conf_key_multivar_name)  ) fcst_multivar_name  = dict->lookup_string(conf_key_multivar_name);
 if ( dict->lookup(conf_key_multivar_level) ) fcst_multivar_level = dict->lookup_string(conf_key_multivar_level);
 
 dict = conf.lookup_dictionary(conf_key_obs);
 
 if ( dict->lookup(conf_key_multivar_logic) ) obs_multivar_logic = dict->lookup_string(conf_key_multivar_logic);
-//if ( dict->lookup(conf_key_obs_multivar_compare_index)) obs_multivar_compare_index = dict->lookup_int_array(conf_key_obs_multivar_compare_index);
 if ( dict->lookup(conf_key_multivar_name)  ) obs_multivar_name  = dict->lookup_string(conf_key_multivar_name);
 if ( dict->lookup(conf_key_multivar_level) ) obs_multivar_level = dict->lookup_string(conf_key_multivar_level);
 
@@ -1423,7 +1396,7 @@ void ModeConfInfo::check_multivar_not_implemented()
    bool status = false;
    if (quilt) {
       mlog << Error
-           << "\nModeConfInfo::multivar_not_implemented:\n"
+           << "\nModeConfInfo::check_multivar_not_implemented():\n"
            << "  quilting not yet implemented for multivar mode\n\n";
       status = true;
    }
@@ -1433,7 +1406,7 @@ void ModeConfInfo::check_multivar_not_implemented()
          if (fcst_array[i].merge_flag == MergeType_Both || fcst_array[i].merge_flag == MergeType_Engine)
          {
             mlog << Error
-                 << "\nModeConfInfo::multivar_not_implemented:\n"
+                 << "\nModeConfInfo::check_multivar_not_implemented():\n"
                  << "  merge_flag ENGINE or BOTH not implemented for multivariate mode\n\n";
             status = true;
             break;
@@ -1444,7 +1417,7 @@ void ModeConfInfo::check_multivar_not_implemented()
       if (data_type != ModeDataType_MvMode_Fcst) {
          if (obs_array[i].merge_flag == MergeType_Both || obs_array[i].merge_flag == MergeType_Engine) {
             mlog << Error
-                 << "\nModeConfInfo::multivar_not_implemented:\n"
+                 << "\nModeConfInfo::check_multivar_not_implemented():\n"
                  << "  merge_flag ENGINE or BOTH not implemented for multivariate mode\n\n";
             status = true;
             break;
@@ -1454,11 +1427,61 @@ void ModeConfInfo::check_multivar_not_implemented()
 
    if (status) {
       mlog << Error
+           << "\nModeConfInfo::check_multivar_not_implemented:\n"
            << "\nSome features not yet implemented in multivar mode\n\n";
       exit ( 1 );
    }
 }
 
+
+////////////////////////////////////////////////////////////////////////
+
+void ModeConfInfo::check_multivar_perc_thresh(bool isSimple, bool isSimpleMerge) const
+{
+   if (isSimple) {
+      if (data_type == ModeDataType_MvMode_Fcst) {
+         for (int j=0; j< Fcst->conv_thresh_array.n(); ++j) {
+            if (Fcst->conv_thresh_array[j].get_ptype() == perc_thresh_sample_obs) {
+               mlog << Warning
+                    << "\nModeConfInfo::check_multivar_perc_thresh:\n"
+                    << "  Thresholding with 'SOP' in a forecast input not well defined for multivariate mode simple object creation\n"
+                    << "  'SFP' will be used as a replacement\n\n";
+            }
+         }
+      } else if (data_type == ModeDataType_MvMode_Obs) {
+         for (int j=0; j< Obs->conv_thresh_array.n(); ++j) {
+            if (Obs->conv_thresh_array[j].get_ptype() == perc_thresh_sample_fcst) {
+               mlog << Warning
+                    << "\nModeConfInfo::check_multivar_perc_thresh:\n"
+                    << "  Thresholding with 'SFP' in an obs input not well defined for multivariate mode simple object creation\n"
+                    << "  'SOP' will be used as a replacement\n\n";
+            }
+         }
+      }
+   }
+
+   if (isSimpleMerge) {
+      if (data_type == ModeDataType_MvMode_Fcst) {
+         for (int j=0; j< Fcst->merge_thresh_array.n(); ++j) {
+            if (Fcst->merge_thresh_array[j].get_ptype() == perc_thresh_sample_obs) {
+               mlog << Warning
+                    << "\nModeConfInfo::check_multivar_perc_thresh:\n"
+                    << "  Thresholding with 'SOP' in a forecast input not well defined for multivariate mode simple object creation\n"
+                    << "  'SFP' will be used as a replacement\n\n";
+            }
+         }
+      } else if (data_type == ModeDataType_MvMode_Obs) {
+         for (int j=0; j< Obs->merge_thresh_array.n(); ++j) {
+            if (Obs->merge_thresh_array[j].get_ptype() == perc_thresh_sample_fcst) {
+               mlog << Warning
+                    << "\nModeConfInfo::check_multivar_perc_thresh():\n"
+                    << "  Thresholding with 'SFP' in an obs input not well defined for multivariate mode simple object creation\n"
+                    << "  'SOP' will be used as a replacement\n\n";
+            }
+         }
+      }
+   }
+}
 
 // ////////////////////////////////////////////////////////////////////////
 

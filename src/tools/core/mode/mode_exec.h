@@ -84,6 +84,7 @@ class ModeExecutive {
    void init_multivar_verif_grid();
    void init_multivar_simple(int n_files, ModeDataType dtype);
    void init_multivar_intensities(GrdFileType ftype, GrdFileType otype);
+   void check_multivar_perc_thresh_settings();
 
 
    int n_conv_radii   () const;

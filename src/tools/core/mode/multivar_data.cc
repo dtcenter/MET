@@ -65,6 +65,16 @@ void MultiVarData1::set_shapedata(const ShapeData &sd)
    _sd = new ShapeData(sd);
 }
 
+void MultiVarData1::set_conv_thresh_array(const ThreshArray &t)
+{
+   _convThreshArray = t;
+}
+
+void MultiVarData1::set_merge_thresh_array(const ThreshArray &t)
+{
+   _mergeThreshArray = t;
+}
+
 void  MultiVarData1::objects_from_arrays(bool do_clusters,
                                          BoolPlane & out)
 {
@@ -149,8 +159,8 @@ void MultiVarData::checkFileTypeConsistency(const MultiVarData &mvdi, int j)
 {
    bool err = false;
    if (_type != mvdi._type) {
-      mlog << Error << "\n" 
-           << ": inputs of different file types not supported "
+      mlog << Error << "MultivarData::checkFileTypeConsistgency() -> " 
+           << "inputs of different file types not supported "
            << "Input 0:" << grdfiletype_to_string(_type).c_str()
            << "Input " << j << ":" << grdfiletype_to_string(mvdi._type).c_str()
            << "\n\n";
@@ -206,6 +216,24 @@ void MultiVarData::set_shapedata(const ShapeData &sd, bool simple)
       _simple->set_shapedata(sd);
    } else {
       _merge->set_shapedata(sd);
+   }
+}
+
+void MultiVarData::set_conv_thresh_array(const ThreshArray &t, bool simple)
+{
+   if (simple) {
+      _simple->set_conv_thresh_array(t);
+   } else {
+      _merge->set_conv_thresh_array(t);
+   }
+}
+
+void MultiVarData::set_merge_thresh_array(const ThreshArray &t, bool simple)
+{
+   if (simple) {
+      _simple->set_merge_thresh_array(t);
+   } else {
+      _merge->set_merge_thresh_array(t);
    }
 }
 

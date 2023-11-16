@@ -1597,7 +1597,7 @@ void ModeFuzzyEngine::do_fcst_merge_thresh(const ShapeData &merge_data) {
 ///////////////////////////////////////////////////////////////////////
 
 void ModeFuzzyEngine::do_obs_merge_thresh(const ShapeData &merge_data) {
-   const char *method_name = "ModeFuzzyEngine::do_fcst_merge_thresh() -> ";
+   const char *method_name = "ModeFuzzyEngine::do_obs_merge_thresh() -> ";
    int j, mid, oid;
    int n_obs_merge;
    ShapeData obs_merge_split;
@@ -3964,7 +3964,7 @@ void calc_fcst_clus_ch_mask(const ModeFuzzyEngine &eng, ShapeData &mask) {
    Box bb;
 
    if(eng.need_fcst_clus_split) {
-      mlog << Error << "\ncalc_fcst_clus_ch_mask -> "
+      mlog << Error << "\ncalc_fcst_clus_ch_mask() -> "
            << "should not be called with need_fcst_clus_split set to true\n\n";
 
       exit(1);
@@ -4027,7 +4027,7 @@ void calc_obs_clus_ch_mask(const ModeFuzzyEngine &eng, ShapeData &mask) {
    Box bb;
 
    if(eng.need_obs_clus_split) {
-      mlog << Error << "\ncalc_obs_clus_ch_mask -> "
+      mlog << Error << "\ncalc_obs_clus_ch_mask() -> "
            << "should not be called with need_obs_clus_split set to true\n\n";
       exit(1);
    }

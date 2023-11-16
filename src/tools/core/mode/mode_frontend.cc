@@ -114,6 +114,8 @@ int ModeFrontEnd::create_multivar_simple_objects(const StringArray & Argv, ModeD
    if ( field_index >= 0 )  conf.set_field_index(field_index);
    if (compress_level >= 0) conf.nc_info.set_compress_level(compress_level);
 
+   // need to do this after setting field index above
+   mode_exec->check_multivar_perc_thresh_settings();
 
    //
    // read in data (Note multiple reads of data)
@@ -168,6 +170,9 @@ int ModeFrontEnd::create_multivar_merge_objects(const StringArray & Argv, ModeDa
    ModeConfInfo & conf = mode_exec->engine.conf_info;
    if ( field_index >= 0 )  conf.set_field_index(field_index);
    if (compress_level >= 0) conf.nc_info.set_compress_level(compress_level);
+
+   // need to do this after setting field index above
+   mode_exec->check_multivar_perc_thresh_settings();
 
 
    //
@@ -282,14 +287,14 @@ int ModeFrontEnd::multivar_intensity_comparisons(const StringArray & Argv, const
    conf.Fcst->var_info->set_level_name(mvdf._level.c_str());
    conf.Fcst->var_info->set_units(mvdf._units.c_str());
    if (has_union_f && conf.Fcst->merge_flag == MergeType_Thresh) {
-      mlog << Warning << "\nModeFrontEnd::run() -> "
+      mlog << Warning << "\nModeFrontEnd::multivar_intensity_comparisons() -> "
            << "Logic includes union '||' along with  'merge_flag=THRESH' "
            << ". This can lead to bad results\n\n";
    }
    conf.Obs->var_info->set_level_name(mvdo._level.c_str());
    conf.Obs->var_info->set_units(mvdo._units.c_str());
    if (has_union_o && conf.Obs->merge_flag == MergeType_Thresh) {
-      mlog << Warning << "\nModeFrontEnd::run() -> "
+      mlog << Warning << "\nModeFrontEnd::multivar_intensity_comparisons() -> "
            << "Logic includes union '||' along with  'merge_flag=THRESH' "
            << ". This can lead to bad results\n\n";
    }
@@ -345,7 +350,7 @@ int ModeFrontEnd::run_super(const StringArray & Argv,
    if (compress_level >= 0) conf.nc_info.set_compress_level(compress_level);
    if (has_union && (conf.Fcst->merge_flag == MergeType_Thresh ||
                      conf.Obs->merge_flag == MergeType_Thresh)) {
-      mlog << Warning << "\nModeFrontEnd::run() -> "
+      mlog << Warning << "\nModeFrontEnd::run_super() -> "
            << "Logic includes union '||' along with  'merge_flag=THRESH' "
            << ". This can lead to bad results\n\n";
    }
@@ -485,9 +490,7 @@ void ModeFrontEnd::do_quilt()
 
 {
    if (ptype != ModeExecutive::TRADITIONAL) {
-      mlog << Error
-           << program_name << ": quilting not yet implemented for multivar mode \n\n";
-
+      mlog << Error << "\nModeFrontend::do_quilt() -> quilting not yet implemented for multivar mode \n\n";
       exit ( 1 );
    }
       
@@ -523,7 +526,10 @@ void ModeFrontEnd::do_quilt()
 
 ///////////////////////////////////////////////////////////////////////
 
-MultiVarData *ModeFrontEnd::get_multivar_data(ModeDataType dtype) {return mode_exec->get_multivar_data(dtype); }
+MultiVarData *ModeFrontEnd::get_multivar_data(ModeDataType dtype)
+{
+   return mode_exec->get_multivar_data(dtype);
+}
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -558,22 +564,19 @@ void ModeFrontEnd::do_straight_init(int &NCT, int &NCR) const
 
    if ( NCT != NCR )  {
 
-      mlog << Error
-           << "\n\n  "
-           << program_name
-           << ": all convolution radius and threshold arrays must have the same number of elements!\n\n";
+      mlog << Error << "\nModeFrontEnd::do_straight_init() ->"
+           << "all convolution radius and threshold arrays must have the same number of elements\n\n";
 
       exit ( 1 );
 
    }
 
    if (NCT > 1 && ptype != ModeExecutive::TRADITIONAL) {
-      mlog << Error
-           << "\n\n  "
-           << program_name
+
+      mlog << Error << "\nModeFrontEnd::do_straight_init() ->"
            << ": multiple convolution radii and thresholds not implemented in multivar mode\n\n";
 
-         exit ( 1 );
+      exit ( 1 );
    }
 }
 
@@ -657,6 +660,9 @@ void ModeFrontEnd::process_command_line(const StringArray & argv, bool ismultiva
    }
 }
 
+      
+///////////////////////////////////////////////////////////////////////
+
 void ModeFrontEnd::process_command_line_for_simple_objects(const StringArray &argv, ModeDataType dtype)
 {
    CommandLine cline;
@@ -722,7 +728,6 @@ void ModeFrontEnd::process_command_line_for_simple_objects(const StringArray &ar
    mode_exec->match_config_file = cline[1];
 }
 
-///////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////
 
 void ModeFrontEnd::set_config_merge_file(const StringArray & a)

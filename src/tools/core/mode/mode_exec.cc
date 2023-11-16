@@ -306,7 +306,8 @@ void ModeExecutive::init_multivar_simple(int n_files, ModeDataType dtype)
       ftype = fcst_mtddf->file_type();
    }
    else {
-      mlog << Error << "\nmultivar simple object creation requires obs or forecast mode, got "
+      mlog << Error << "\nModeExecutive::init_multivar_simple()->"
+           << "simple object creation requires obs or forecast mode, got "
            << sprintModeDataType(dtype) << "\n\n";
       exit(1);
    }      
@@ -319,12 +320,14 @@ void ModeExecutive::init_multivar_simple(int n_files, ModeDataType dtype)
    } else if (dtype == ModeDataType_MvMode_Fcst) {
       nf = engine.conf_info.n_fields_f();
    } else {
-      mlog << Error << "\nmultivar simple object creation requires obs or forecast mode, got "
+      mlog << Error << "\nModeExecutive::init_multivar_simple()->"
+           << "simple object creation requires obs or forecast mode, got "
            << sprintModeDataType(dtype) << "\n\n";
       exit(1);
    }      
    if (nf != n_files) {
-      mlog << Error << "\nNumber of input files " << n_files << " Not equal to config number of fields "
+      mlog << Error << "\nModeExecutive::init_multivar_simple()->"
+           << "Number of input files " << n_files << " Not equal to config number of fields "
            << nf << "\n\n";
       exit(1);
    }
@@ -398,6 +401,15 @@ void ModeExecutive::init_multivar_intensities(GrdFileType ftype, GrdFileType oty
 
 }
 
+
+///////////////////////////////////////////////////////////////////////
+
+void ModeExecutive::check_multivar_perc_thresh_settings()
+{
+   engine.conf_info.check_multivar_perc_thresh(ptype == ModeExecutive::MULTIVAR_SIMPLE,
+                                               ptype == ModeExecutive::MULTIVAR_SIMPLE_MERGE);
+}
+
 ///////////////////////////////////////////////////////////////////////
 
 
@@ -415,7 +427,7 @@ void ModeExecutive::setup_fcst_obs_data_traditional()
 
    if ( !(fcst_mtddf->data_plane(*(engine.conf_info.Fcst->var_info), Fcst_sd.data)) )  {
 
-      mlog << Error << "\nsetup_fcst_obs_data() -> "
+      mlog << Error << "\nModeExecutive::setup_fcst_obs_data_traditional() -> "
            << "can't get forecast data \""
            << engine.conf_info.Fcst->var_info->magic_str()
            << "\" from file \"" << fcst_file << "\"\n\n";
@@ -426,7 +438,7 @@ void ModeExecutive::setup_fcst_obs_data_traditional()
 
    if ( !(obs_mtddf->data_plane(*(engine.conf_info.Obs->var_info), Obs_sd.data)) )  {
 
-      mlog << Error << "\nsetup_fcst_obs_data() -> "
+      mlog << Error << "\nModeExecutive::setup_fcst_obs_data_traditional() -> "
            << "can't get observation data \""
            << engine.conf_info.Obs->var_info->magic_str()
            << "\" from file \"" << obs_file << "\"\n\n";
@@ -474,7 +486,7 @@ void ModeExecutive::setup_fcst_obs_data_traditional()
 
    if(Fcst_sd.data.valid() != Obs_sd.data.valid()) {
 
-      mlog << Warning << "\nsetup_fcst_obs_data() -> "
+      mlog << Warning << "\nModeExecutive::setup_fcst_obs_data_traditional() -> "
            << "Forecast and observation valid times do not match "
            << unix_to_yyyymmdd_hhmmss(Fcst_sd.data.valid()) << " != "
            << unix_to_yyyymmdd_hhmmss(Obs_sd.data.valid()) << " for "
@@ -488,7 +500,7 @@ void ModeExecutive::setup_fcst_obs_data_traditional()
       engine.conf_info.Obs->var_info->level().type()  == LevelType_Accum &&
       Fcst_sd.data.accum()                       != Obs_sd.data.accum()) {
 
-      mlog << Warning << "\nsetup_fcst_obs_data() -> "
+      mlog << Warning << "\nModeExecutive::setup_fcst_obs_data_traditional() -> "
            << "Forecast and observation accumulation times do not match "
            << sec_to_hhmmss(Fcst_sd.data.valid()) << " != "
            << sec_to_hhmmss(Obs_sd.data.valid()) << " for "
@@ -571,7 +583,7 @@ void ModeExecutive::setup_verification_grid()
 
    if ( !(fcst_mtddf->data_plane(*(engine.conf_info.Fcst->var_info), Fcst_sd.data)) )  {
 
-      mlog << Error << "\nsetup_fcst_obs_data() -> "
+      mlog << Error << "\nModeExecutive::setup_verification_grid() -> "
            << "can't get forecast data \""
            << engine.conf_info.Fcst->var_info->magic_str()
            << "\" from file \"" << fcst_file << "\"\n\n";
@@ -582,7 +594,7 @@ void ModeExecutive::setup_verification_grid()
 
    if ( !(obs_mtddf->data_plane(*(engine.conf_info.Obs->var_info), Obs_sd.data)) )  {
 
-      mlog << Error << "\nsetup_fcst_obs_data() -> "
+      mlog << Error << "\nModeExecutive::setup_verification_grid() -> "
            << "can't get observation data \""
            << engine.conf_info.Obs->var_info->magic_str()
            << "\" from file \"" << obs_file << "\"\n\n";
@@ -612,7 +624,7 @@ void ModeExecutive::setup_fcst_data(const Grid &verification_grid)
    // Read the gridded data from the input forecast file
    if ( !(fcst_mtddf->data_plane(*(engine.conf_info.Fcst->var_info), Fcst_sd.data)) )  {
 
-      mlog << Error << "\nsetup_fcst_data() -> "
+      mlog << Error << "\nModeExecutive::setup_fcst_data() -> "
            << "can't get forecast data \""
            << engine.conf_info.Fcst->var_info->magic_str()
            << "\" from file \"" << fcst_file << "\"\n\n";
@@ -691,7 +703,7 @@ void ModeExecutive::setup_obs_data(const Grid &verification_grid)
 
    if ( !(obs_mtddf->data_plane(*(engine.conf_info.Obs->var_info), Obs_sd.data)) )  {
 
-      mlog << Error << "\nsetup_fcst_obs_data() -> "
+      mlog << Error << "\nModeExecutive::setup_obs_data() -> "
            << "can't get observation data \""
            << engine.conf_info.Obs->var_info->magic_str()
            << "\" from file \"" << obs_file << "\"\n\n";
@@ -783,7 +795,7 @@ void ModeExecutive::setup_fcst_obs_data_multivar_intensities(const MultiVarData 
    // Print a warning if the valid times do not match
    if(Fcst_sd.data.valid() != Obs_sd.data.valid()) {
 
-       mlog << Warning << "\nsetup_fcst_obs_data() -> "
+       mlog << Warning << "\nModeExecutive::setup_fcst_obs_data_multivar_intensities() -> "
             << "Forecast and observation valid times do not match "
             << unix_to_yyyymmdd_hhmmss(Fcst_sd.data.valid()) << " != "
             << unix_to_yyyymmdd_hhmmss(Obs_sd.data.valid()) << " for "
@@ -796,7 +808,7 @@ void ModeExecutive::setup_fcst_obs_data_multivar_intensities(const MultiVarData 
       engine.conf_info.Obs->var_info->level().type()  == LevelType_Accum &&
       Fcst_sd.data.accum()                       != Obs_sd.data.accum()) {
 
-      mlog << Warning << "\nsetup_fcst_obs_data() -> "
+       mlog << Warning << "\nModeExecutive::setup_fcst_obs_data_multivar_intensities() -> "
            << "Forecast and observation accumulation times do not match "
            << sec_to_hhmmss(Fcst_sd.data.valid()) << " != "
            << sec_to_hhmmss(Obs_sd.data.valid()) << " for "
@@ -821,7 +833,16 @@ void ModeExecutive::setup_fcst_obs_data_multivar_intensities(const MultiVarData 
    ounits = engine.conf_info.Obs->var_info->units();
    olevel = engine.conf_info.Obs->var_info->level_name();
    
-   engine.conf_info.set_perc_thresh(Fcst_sd.data, Obs_sd.data);
+   // in case perc thresh was done, retrieve the values created in the
+   // first pass, which have been stored in mvdo and mvdf
+   engine.conf_info.Obs->conv_thresh_array = mvdo._merge->_convThreshArray;
+   engine.conf_info.Obs->merge_thresh_array = mvdo._merge->_mergeThreshArray;
+   engine.conf_info.Fcst->conv_thresh_array = mvdf._merge->_convThreshArray;
+   engine.conf_info.Fcst->merge_thresh_array = mvdf._merge->_mergeThreshArray;
+
+   // This doesn't work with perc_thresh, it uses values restricted to within
+   // superobjects, which gives different thresholds, so we do the above instead.
+   //engine.conf_info.set_perc_thresh(Fcst_sd.data, Obs_sd.data);
 
    // masking of inputs not needed, as it was done in the first pass
    // and stored to Fcst_sd and Obs_sd
@@ -873,7 +894,7 @@ void ModeExecutive::setup_fcst_obs_data_multivar_super(ShapeData &f_super, Shape
    // Print a warning if the valid times do not match
    if(Fcst_sd.data.valid() != Obs_sd.data.valid()) {
 
-      mlog << Warning << "\nsetup_fcst_obs_data() -> "
+      mlog << Warning << "\nModeExecutive::setup_fcst_obs_data_multivar_super() -> "
            << "Forecast and observation valid times do not match "
            << unix_to_yyyymmdd_hhmmss(Fcst_sd.data.valid()) << " != "
            << unix_to_yyyymmdd_hhmmss(Obs_sd.data.valid()) << " for "
@@ -886,7 +907,7 @@ void ModeExecutive::setup_fcst_obs_data_multivar_super(ShapeData &f_super, Shape
       engine.conf_info.Obs->var_info->level().type()  == LevelType_Accum &&
       Fcst_sd.data.accum()                       != Obs_sd.data.accum()) {
 
-      mlog << Warning << "\nsetup_fcst_obs_data() -> "
+      mlog << Warning << "\nModeExecutive::setup_fcst_obs_data_multivar_super() -> "
            << "Forecast and observation accumulation times do not match "
            << sec_to_hhmmss(Fcst_sd.data.valid()) << " != "
            << sec_to_hhmmss(Obs_sd.data.valid()) << " for "
@@ -920,9 +941,9 @@ void ModeExecutive::setup_fcst_obs_data_multivar_super(ShapeData &f_super, Shape
    else if(!is_bad_data(fmax) &&  is_bad_data(omax)) data_max = fmax;
    else if( is_bad_data(fmax) && !is_bad_data(omax)) data_max = omax;
 
-   // Process percentile thresholds
+   // Process percentile thresholds...Not applicable for this pass
    // do this in the second pass using masked Fcst_sd and Obs_sd
-   engine.conf_info.set_perc_thresh(Fcst_sd.data, Obs_sd.data);
+   // engine.conf_info.set_perc_thresh(Fcst_sd.data, Obs_sd.data);
 
    //
    //  done
@@ -984,30 +1005,6 @@ void ModeExecutive::do_conv_thresh(const int r_index, const int t_index)
          engine.set_only_split(Fcst_sd, Obs_sd);
       } else {// MULTIVAR_SIMPLE, MULTIVAR_SIMPLE_MERGE, TRADITIONAL
          engine.set(Fcst_sd, Obs_sd);
-      // if (ptype == MULTIVAR_INTENSITY) {
-      //    if (conf.data_type == ModeDataType_MvMode_Fcst) {
-      //       engine.set_fcst_only_split(Fcst_sd);
-      //    } else if (conf.data_type == ModeDataType_MvMode_Obs) {
-      //       engine.set_obs_only_split(Obs_sd);
-      //    } else {
-      //       engine.set_only_split(Fcst_sd, Obs_sd);
-      //    }
-      // } else if (ptype == MULTIVAR_SUPER) {
-      //    engine.set_only_split(Fcst_sd, Obs_sd);
-      // } else if (ptype == MULTIVAR_SIMPLE || ptype == MULTIVAR_SIMPLE_MERGE) {
-      //    if (conf.data_type == ModeDataType_MvMode_Obs) {
-      //       engine.set_obs(Obs_sd);
-      //    } else if (conf.data_type == ModeDataType_MvMode_Fcst) {
-      //       engine.set_fcst(Fcst_sd);
-      //    } else {
-      //       mlog << Error << "\ndo_conv_thresh() -> "
-      //         << "multivar simple object convolution requires obs or forecast input, got "
-      //         << sprintModeDataType(conf.data_type) << "\n\n";
-      //       exit(1);
-      //    }
-      // } else {         
-      //    engine.set(Fcst_sd, Obs_sd);
-      // }
       }
    } else {   //  don't need to do convolution
 
@@ -1016,32 +1013,6 @@ void ModeExecutive::do_conv_thresh(const int r_index, const int t_index)
       } else {// MULTIVAR_SIMPLE, MULTIVAR_SIMPLE_MERGE, TRADITIONAL
          engine.set_no_conv(Fcst_sd, Obs_sd);
       }
-         
-      // if (ptype == MULTIVAR_INTENSITY) {
-      //    if (conf.data_type == ModeDataType_MvMode_Fcst) {
-      //       engine.set_fcst_only_split(Fcst_sd);
-      //    } else if (conf.data_type == ModeDataType_MvMode_Obs) {
-      //       engine.set_obs_only_split(Obs_sd);
-      //    } else {
-      //       engine.set_only_split(Fcst_sd, Obs_sd);
-      //    }
-      // } else if (ptype == MULTIVAR_SUPER) {
-      //    engine.set_only_split(Fcst_sd, Obs_sd);
-      //    //engine.set_super(Fcst_sd, Obs_sd);
-      // } else if (ptype == MULTIVAR_SIMPLE || ptype == MULTIVAR_SIMPLE_MERGE) {
-      //    if (conf.data_type == ModeDataType_MvMode_Obs) {
-      //       engine.set_obs_no_conv(Obs_sd);
-      //    } else if (conf.data_type == ModeDataType_MvMode_Fcst) {
-      //       engine.set_fcst_no_conv(Fcst_sd);
-      //    } else {
-      //       mlog << Error << "\ndo_conv_thresh() -> "
-      //         << "multivar simple object convolution requires obs or forecast input, got "
-      //         << sprintModeDataType(conf.data_type) << "\n\n";
-      //       exit(1);
-      //    }
-      // } else {
-      //    engine.set_no_conv(Fcst_sd, Obs_sd);
-      // }
    }
 
    //
@@ -1116,8 +1087,8 @@ void ModeExecutive::do_merging(ShapeData &f_merge, ShapeData &o_merge)
       conf.set_obs_merge_thresh(s);
    } else {
       if (ptype != MULTIVAR_INTENSITY) {
-         mlog << Error << "\ndo_merging() -> "
-              << "wrong method for processing type\n\n";
+         mlog << Error << "\nModeExecutive::do_merging(shapedata, shapedata) -> "
+              << "wrong method for processing type " << stype(ptype) << "\n\n";
          exit(1);
       }
    }
@@ -1417,8 +1388,8 @@ void ModeExecutive::process_output(const MultiVarData *mvdf,
                          mvdf->_nx, mvdf->_ny,
                          data_min, data_max);
       } else {
-         mlog << Error << "\nprocess_output() -> "
-              << "no multivar data when data is expected\n\n";
+         mlog << Error << "\nModeExecutive::process_output() -> "
+              << "no multivar data when multivar data is expected\n\n";
          exit(1);
       }
    }
@@ -1630,7 +1601,7 @@ void ModeExecutive::write_obj_stats()
    out.open(stat_file.c_str());
 
    if(!out) {
-      mlog << Error << "\nwrite_obj_stats() -> "
+      mlog << Error << "\nModeExecutive::write_obj_stats() -> "
            << "unable to open stats output file \""
            << stat_file << "\"\n\n";
       exit(1);
@@ -1665,7 +1636,7 @@ void ModeExecutive::write_obj_stats()
       out.open(stat_file.c_str());
 
       if(!out) {
-         mlog << Error << "\nwrite_obj_stats() -> "
+         mlog << Error << "\nModeExecutive::write_obj_stats() -> "
               << "unable to open stats output file \""
               << stat_file << "\"\n\n";
          exit(1);
@@ -1697,7 +1668,7 @@ void ModeExecutive::write_obj_stats()
       out.open(stat_file.c_str());
 
       if(!out) {
-         mlog << Error << "\nwrite_obj_stats() -> "
+         mlog << Error << "\nModeExecutive::write_obj_stats() -> "
               << "unable to open stats output file \""
               << stat_file << "\"\n\n";
          exit(1);
@@ -1723,37 +1694,6 @@ void ModeExecutive::write_obj_stats()
 }
 
 //////////////////////////////////////////////////////////////////////
-#ifdef NOTANYMORE
-
-
-MultiVarData *ModeExecutive::get_multivar_data()
-{
-   bool simple=true;
-   MultiVarData *mvd = new MultiVarData();
-
-   fcst_magic_string = engine.conf_info.Fcst->var_info->magic_str().c_str();
-   obs_magic_string = engine.conf_info.Obs->var_info->magic_str().c_str();
-
-   // replace forward slashes with underscores to prevent new directories
-
-   replace(fcst_magic_string.begin(), fcst_magic_string.end(), '/', '_');   
-   replace(obs_magic_string.begin(), obs_magic_string.end(), '/', '_');   
-
-   mvd->init(fcst_magic_string, obs_magic_string, grid, ftype, otype,
-             funits, ounits, flevel, olevel, data_min, data_max);
-   mvd->set_fcst_obj(engine.fcst_split, simple);
-   mvd->set_fcst_raw(engine.fcst_raw, simple);
-   mvd->set_obs_obj(engine.obs_split, simple);
-   mvd->set_obs_raw(engine.obs_raw, simple);
-   mvd->set_fcst_shapedata(Fcst_sd, simple);
-   mvd->set_obs_shapedata(Obs_sd, simple);
-
-   return mvd;
-}
-#endif
-
-//////////////////////////////////////////////////////////////////////
-
 
 MultiVarData *ModeExecutive::get_multivar_data(ModeDataType dtype)
 {
@@ -1770,6 +1710,8 @@ MultiVarData *ModeExecutive::get_multivar_data(ModeDataType dtype)
       mvd->set_obj(engine.obs_split, simple);
       mvd->set_raw(engine.obs_raw, simple);
       mvd->set_shapedata(Obs_sd, simple);
+      mvd->set_conv_thresh_array(engine.conf_info.Obs->conv_thresh_array, simple);
+      mvd->set_merge_thresh_array(engine.conf_info.Obs->merge_thresh_array, simple);
       break;
    case ModeDataType_MvMode_Fcst:
       fcst_magic_string = engine.conf_info.Fcst->var_info->magic_str().c_str();
@@ -1779,9 +1721,12 @@ MultiVarData *ModeExecutive::get_multivar_data(ModeDataType dtype)
       mvd->set_obj(engine.fcst_split, simple);
       mvd->set_raw(engine.fcst_raw, simple);
       mvd->set_shapedata(Fcst_sd, simple);
+      mvd->set_conv_thresh_array(engine.conf_info.Fcst->conv_thresh_array, simple);
+      mvd->set_merge_thresh_array(engine.conf_info.Fcst->merge_thresh_array, simple);
       break;
    default:
-      mlog << Error << "\nget_multivar_data() -> not a single variable data type\n\n";
+      mlog << Error << "\nModeExecutive::get_multivar_data() -> wrong data type "
+           << sprintModeDataType(dtype) << "\n\n";
       exit(1);
    }
    return mvd;
@@ -1799,14 +1744,19 @@ void ModeExecutive::add_multivar_merge_data(MultiVarData *mvd, ModeDataType dtyp
       mvd->set_obj(engine.obs_split, simple);
       mvd->set_raw(engine.obs_raw, simple);
       mvd->set_shapedata(Obs_sd, simple);
+      mvd->set_conv_thresh_array(engine.conf_info.Obs->conv_thresh_array, simple);
+      mvd->set_merge_thresh_array(engine.conf_info.Obs->merge_thresh_array, simple);
       break;
    case ModeDataType_MvMode_Fcst:
       mvd->set_obj(engine.fcst_split, simple);
       mvd->set_raw(engine.fcst_raw, simple);
       mvd->set_shapedata(Fcst_sd, simple);
+      mvd->set_conv_thresh_array(engine.conf_info.Fcst->conv_thresh_array, simple);
+      mvd->set_merge_thresh_array(engine.conf_info.Fcst->merge_thresh_array, simple);
       break;
    default:
-      mlog << Error << "\nadd_multivar_merge_data() -> not a single variable data type\n\n";
+      mlog << Error << "\nModeExecutive::add_multivar_merge_data() -> wrong data type "
+           << sprintModeDataType(dtype) << "\n\n";
       exit(1);
    }
 }
@@ -1875,7 +1825,7 @@ void ModeExecutive::write_obj_netcdf(const ModeNcOutInfo & info)
    f_out = open_ncfile(out_file.c_str(), true);
 
    if(IS_INVALID_NC_P(f_out)) {
-      mlog << Error << "\nwrite_obj_netcdf() -> trouble opening output file "
+      mlog << Error << "\nModeExecutive::write_obj_netcdf() -> trouble opening output file "
            << out_file << "\n\n";
       delete f_out;
       f_out = (NcFile *) 0;
@@ -1956,8 +1906,7 @@ void ModeExecutive::write_obj_netcdf(const ModeNcOutInfo & info)
    if ( !put_nc_data(&fcst_radius_var, &engine.conf_info.Fcst->conv_radius)
         || !put_nc_data(&obs_radius_var, &engine.conf_info.Obs->conv_radius) )  {
 
-      mlog << Error
-           << "write_obj_netcdf() -> "
+      mlog << Error << "\nModeExecutive::write_obj_netcdf() -> "
            << "error writing fcst/obs convolution radii\n\n";
 
       exit(1);
@@ -1967,8 +1916,7 @@ void ModeExecutive::write_obj_netcdf(const ModeNcOutInfo & info)
    if (    ! put_nc_data(&fcst_thresh_var, fcst_thresh.c_str())
            || ! put_nc_data(& obs_thresh_var, obs_thresh.c_str()) )  {
 
-      mlog << Error
-           << "write_obj_netcdf() -> "
+      mlog << Error << "\nModeExecutive::write_obj_netcdf() -> "
            << "error writing fcst/obs thresholds\n\n";
 
       exit(1);
@@ -2167,7 +2115,7 @@ void ModeExecutive::write_obj_netcdf(const ModeNcOutInfo & info)
       if( !put_nc_data_with_dims(&fcst_raw_var, &fcst_raw_data[0], grid.ny(), grid.nx()) ||
           !put_nc_data_with_dims(&obs_raw_var, &obs_raw_data[0], grid.ny(), grid.nx()) ) {
 
-         mlog << Error << "\nwrite_obj_netcdf() -> "
+         mlog << Error << "\nModeExecutive::write_obj_netcdf() -> "
               << "error with the fcst_raw_var->put or obs_raw_var->put\n\n";
          exit(1);
       }
@@ -2179,7 +2127,7 @@ void ModeExecutive::write_obj_netcdf(const ModeNcOutInfo & info)
       if( !put_nc_data_with_dims(&fcst_obj_raw_var, &fcst_obj_raw_data[0], grid.ny(), grid.nx()) ||
           !put_nc_data_with_dims(&obs_obj_raw_var, &obs_obj_raw_data[0], grid.ny(), grid.nx()) ) {
 
-         mlog << Error << "\nwrite_obj_netcdf() -> "
+         mlog << Error << "\nModeExecutive::write_obj_netcdf() -> "
               << "error with the fcst_obj_raw_var->put or obs_obj_raw_var->put\n\n";
          exit(1);
       }
@@ -2195,7 +2143,7 @@ void ModeExecutive::write_obj_netcdf(const ModeNcOutInfo & info)
       if( !put_nc_data_with_dims(&fcst_obj_var, &fcst_obj_data[0], grid.ny(), grid.nx()) ||
           !put_nc_data_with_dims(&obs_obj_var, &obs_obj_data[0], grid.ny(), grid.nx()) ) {
 
-         mlog << Error << "\nwrite_obj_netcdf() -> "
+         mlog << Error << "\nModeExecutive::write_obj_netcdf() -> "
               << "error with the fcst_obj_var->put or obs_obj_var->put\n\n";
          exit(1);
       }
@@ -2211,7 +2159,7 @@ void ModeExecutive::write_obj_netcdf(const ModeNcOutInfo & info)
       if( !put_nc_data_with_dims(&fcst_clus_var, &fcst_clus_data[0], grid.ny(), grid.nx()) ||
           !put_nc_data_with_dims(&obs_clus_var, &obs_clus_data[0], grid.ny(), grid.nx()) ) {
 
-         mlog << Error << "\nwrite_obj_netcdf() -> "
+         mlog << Error << "\nModeExecutive::write_obj_netcdf() -> "
               << "error with the fcst_clus_var->put or obs_clus_var->put\n\n";
          exit(1);
       }
@@ -2272,7 +2220,7 @@ void ModeExecutive::write_poly_netcdf(NcFile * f_out)
        !put_nc_data(&n_obs_simp_var, &engine.n_obs)   ||
        !put_nc_data(&n_clus_var, &engine.n_clus) ) {
 
-      mlog << Error << "\nwrite_obj_netcdf() -> "
+      mlog << Error << "\nModeExecutive::write_poly_netcdf() -> "
            << "error with the n_fcst_simp_var->put, "
            << "n_obs_simp_var->put, or n_clus_var->put\n\n";
       exit(1);
@@ -2531,7 +2479,7 @@ void ModeExecutive::write_poly_netcdf(NcFile *f_out, ObjPolyType poly_type)
    if( !put_nc_data_with_dims(&obj_poly_start_var, &poly_start[0], n_poly) ||
        !put_nc_data_with_dims(&obj_poly_npts_var, &poly_npts[0], n_poly) ) {
 
-      mlog << Error << "\nwrite_poly_netcdf() -> "
+      mlog << Error << "\nModeExecutive::write_poly_netcdf() -> "
            << "error with " << start_var_name << "->put or "
            << npts_var_name << "->put\n\n";
       exit(1);
@@ -2543,7 +2491,7 @@ void ModeExecutive::write_poly_netcdf(NcFile *f_out, ObjPolyType poly_type)
    if( !put_nc_data_with_dims(&poly_lat_var, &poly_lat[0], n_pts) ||
        !put_nc_data_with_dims(&poly_lon_var, &poly_lon[0], n_pts) ) {
 
-      mlog << Error << "\nwrite_poly_netcdf() -> "
+      mlog << Error << "\nModeExecutive::write_poly_netcdf() -> "
            << "error with " << lat_var_name << "->put or "
            << lon_var_name << "->put\n\n";
       exit(1);
@@ -2555,7 +2503,7 @@ void ModeExecutive::write_poly_netcdf(NcFile *f_out, ObjPolyType poly_type)
    if( !put_nc_data_with_dims(&poly_x_var, &poly_x[0], n_pts) ||
        !put_nc_data_with_dims(&poly_y_var, &poly_y[0], n_pts) ) {
 
-      mlog << Error << "\nwrite_poly_netcdf() -> "
+      mlog << Error << "\nModeExecutive::write_poly_netcdf() -> "
            << "error with " << x_var_name << "->put or"
            << y_var_name << "->put\n\n";
       exit(1);
@@ -2598,7 +2546,7 @@ void ModeExecutive::write_ct_stats()
    out.open(stat_file.c_str());
 
    if(!out) {
-      mlog << Error << "\nwrite_ct_stats() -> "
+      mlog << Error << "\nModeExecutive::write_ct_stats() -> "
            << "unable to open stats output file \""
            << stat_file << "\"\n\n";
       exit(1);
@@ -2757,6 +2705,8 @@ void ModeExecutive::write_ct_stats()
    return;
 }
 
+///////////////////////////////////////////////////////////////////////
+
 void ModeExecutive::conf_read(const string &default_config_filename)
 {
    
@@ -2776,6 +2726,8 @@ void ModeExecutive::conf_read(const string &default_config_filename)
    // Read the config files
    engine.conf_info.read_config(default_config_file.c_str(), match_config_file.c_str());
 }
+
+///////////////////////////////////////////////////////////////////////
 
 string ModeExecutive::stype(Processing_t t)
 {

@@ -35,14 +35,16 @@ class MultiVarData1 {
  public:
 
    inline MultiVarData1(int nx, int ny, const string &name,
-                         ModeDataType dataType) :
+                        ModeDataType dataType) :
       _dataType(dataType),
       _name(name),
       _obj_sd(0),
       _obj_data(0),
       _raw_data(0),
       _sd(0),
-      _nx(nx), _ny(ny)
+      _nx(nx), _ny(ny),
+      _convThreshArray(),
+      _mergeThreshArray()
       {}
       
    inline ~MultiVarData1() {
@@ -55,6 +57,8 @@ class MultiVarData1 {
    void set_obj(ShapeData *sd);
    void set_raw(ShapeData *sd);
    void set_shapedata(const ShapeData &sd);
+   void set_conv_thresh_array(const ThreshArray &t);
+   void set_merge_thresh_array(const ThreshArray &t);
    void objects_from_arrays(bool do_clusters,
                             BoolPlane & out);
    void print(const string &name) const;
@@ -66,6 +70,8 @@ class MultiVarData1 {
    float *_raw_data;
    ShapeData *_sd;
    int _nx, _ny;
+   ThreshArray _convThreshArray;
+   ThreshArray _mergeThreshArray;
 };
 
 class MultiVarData {
@@ -91,6 +97,8 @@ class MultiVarData {
    void set_obj(ShapeData *sd, bool simple);
    void set_raw(ShapeData *sd, bool simple);
    void set_shapedata(const ShapeData &sd, bool simple);
+   void set_conv_thresh_array(const ThreshArray &t, bool simple);
+   void set_merge_thresh_array(const ThreshArray &t, bool simple);
    const ShapeData *shapedata_ptr(bool simple) const;
    void  objects_from_arrays(bool do_clusters, bool simple, BoolPlane & out);
    void print(void) const;

@@ -200,7 +200,7 @@ gft = type;
 if ( dict->lookup(conf_key_raw_thresh) )  {
 
    mlog << Error 
-        << "\nMode_Field_Info::process_config() -> "
+        << "\nMode_Field_Info::set() -> "
         << "the \"" << conf_key_raw_thresh << "\" entry is deprecated in MET "
         << met_version << "!  Use \"" << conf_key_censor_thresh << "\" and \""
         << conf_key_censor_val << "\" instead.\n\n";

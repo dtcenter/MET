@@ -380,23 +380,22 @@ void multivar_consistency_checks(StringArray &fcst_filenames, StringArray &obs_f
                                  BoolCalc &f_calc, BoolCalc &o_calc, int &n_fcst_files,
                                  int &n_obs_files)
 {
-
    //
    //  make sure the multivar logic programs are in the config file
    //
 
    if ( config.fcst_multivar_logic.empty() )  {
 
-      mlog << Error << "\n" << program_name
-           << ": fcst multivar logic not specified in multivar mode!\n\n";
+      mlog << Error << "\nmultivar_consistency_checks() ->"
+           << "fcst multivar logic not specified in multivar mode!\n\n";
       exit ( 1 );
 
    }
 
    if ( config.obs_multivar_logic.empty() )  {
 
-      mlog << Error << "\n" << program_name
-           << ": obs multivar logic not specified in multivar mode!\n\n";
+      mlog << Error << "\nmultivar_consistency_checks() ->"
+           << "obs multivar logic not specified in multivar mode!\n\n";
       exit ( 1 );
 
    }
@@ -412,8 +411,8 @@ void multivar_consistency_checks(StringArray &fcst_filenames, StringArray &obs_f
    //
    if ( n_fcst_files < 2 && n_obs_files < 2) {
 
-      mlog << Error << "\n" << program_name
-           << ": want at least 2 input files for fcst or obs in multivar mode, neither had 2 or more\n\n";
+      mlog << Error << "\nmultivar_consistency_checks() ->"
+           << "Want at least 2 input files for fcst or obs in multivar mode, neither had 2 or more\n\n";
       exit ( 1 );
    }
 
@@ -434,7 +433,7 @@ void multivar_consistency_checks(StringArray &fcst_filenames, StringArray &obs_f
 
 
    if (config.fcst_multivar_compare_index.n() != config.obs_multivar_compare_index.n()) {
-      mlog << Error << "\n" << program_name
+      mlog << Error << "\nmultivar_consistency_checks() ->"
            << " Need equal number of multivar_compare_index entries for obs and fcst\n\n";
       exit(1);
    }
@@ -445,13 +444,13 @@ void multivar_consistency_checks(StringArray &fcst_filenames, StringArray &obs_f
       int findex = config.fcst_multivar_compare_index[k];
       int oindex = config.obs_multivar_compare_index[k];
       if (findex <= 0 || findex > n_fcst_files) {
-         mlog << Error << "\n" << program_name
+         mlog << Error << "\nmultivar_consistency_checks() ->"
               << " forecast index " << findex
               << " out of range, " << conf_key_fcst_multivar_compare_index << " array\n";
          badIndex = true;
       }
       if (oindex <= 0 || oindex > n_obs_files) {
-         mlog << Error << "\n" << program_name
+         mlog << Error << "\nmultivar_consistency_checks() ->"
               << " obs index " << oindex
               << " out of range, " << conf_key_obs_multivar_compare_index << " array\n";
          badIndex = true;
@@ -490,8 +489,8 @@ ConcatString set_multivar_dir()
 
       if ( status < 0 )  {
 
-         mlog << Error << "\n" << program_name
-              << ": unable to create output directory \""
+         mlog << Error << "\nset_multivar_dir() ->"
+              << " unable to create output directory \""
               << dir << "\"\n\n";
 
          exit ( 1 );
@@ -796,7 +795,7 @@ void mask_data(const string &name, int nx, int ny, const BoolPlane &bp, DataPlan
 {
 
    if (nx != data.nx() || ny != data.ny()) {
-      mlog << Error << "\n" << program_name  << ":" << name
+      mlog << Error << "\nmask_data() -> " << name 
            << " :dimensions don't match " << nx << " " <<  ny 
            << "    " << data.nx() << " " << data.ny() << "\n\n";
 
@@ -830,7 +829,7 @@ void mask_data_super(const string &name, int nx, int ny, DataPlane &data)
 {
 
    if (nx != data.nx() || ny != data.ny()) {
-      mlog << Error << "\n" << program_name  << ":" << name
+      mlog << Error << "\nmask_data_super() -> " << name 
            << " :dimensions don't match " << nx << " " <<  ny 
            << "    " << data.nx() << " " << data.ny() << "\n\n";
 
@@ -875,7 +874,7 @@ int _mkdir(const char *dir)
          string s = tmp;
          if (s != ".") {
             if (mkdir(tmp, dir_creation_mode) < 0) {
-               mlog << Error << "\n making " << tmp << "\n";
+               mlog << Error << "\n_mkdir() -> Error making " << tmp << "\n";
                return -1;
             }
          }
