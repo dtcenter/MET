@@ -411,10 +411,13 @@ case "${unameOut}" in
     *)          machine="UNKNOWN:${unameOut}"
 esac
 
+# change sed command and extension for dynamic library files
 if [[ $machine == "Mac" ]]; then
     sed_inline="sed -i ''"
+    dynamic_lib_ext="dylib"
 else
     sed_inline="sed -i''"
+    dynamic_lib_ext="so"
 fi
 
 # Load Python module
@@ -468,11 +471,15 @@ if [ $COMPILE_PROJ -eq 1 ]; then
   echo "cd `pwd`"
   export PATH=${LIB_DIR}/bin:${PATH}
   run_cmd "mkdir build; cd build"
-  if [[ -z "$LIB_TIFF" ]]; then
-      run_cmd "cmake -DCMAKE_INSTALL_PREFIX=${LIB_DIR} -DSQLITE3_INCLUDE_DIR=${SQLITE_INCLUDE_DIR} -DSQLITE3_LIBRARY=${SQLITE_LIB_DIR}/libsqlite3.so .."
-  else
-      run_cmd "cmake -DCMAKE_INSTALL_PREFIX=${LIB_DIR} -DSQLITE3_INCLUDE_DIR=${SQLITE_INCLUDE_DIR} -DSQLITE3_LIBRARY=${SQLITE_LIB_DIR}/libsqlite3.so -DTIFF_LIBRARY_RELEASE=${LIB_TIFF} .."
+
+  tiff_arg=""
+  # add tiff library argument if necessary
+  if [[ ! -z "$LIB_TIFF" ]]; then
+      tiff_arg+="-DTIFF_LIBRARY_RELEASE=${LIB_TIFF}"
   fi
+
+  cmd="cmake -DCMAKE_INSTALL_PREFIX=${LIB_DIR} -DSQLITE3_INCLUDE_DIR=${SQLITE_INCLUDE_DIR} -DSQLITE3_LIBRARY=${SQLITE_LIB_DIR}/libsqlite3.${dynamic_lib_ext} ${tiff_arg} .."
+  run_cmd ${cmd}
   run_cmd "cmake --build ."
   run_cmd "cmake --build . --target install"
 
