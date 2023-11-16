@@ -516,7 +516,7 @@ int GridStatConfInfo::get_max_n_eclv_points() const {
 ////////////////////////////////////////////////////////////////////////
 
 int GridStatConfInfo::get_max_n_cov_thresh() const {
-   int n;
+   int n = 0;
 
    for(int i=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_cov_thresh());
 
