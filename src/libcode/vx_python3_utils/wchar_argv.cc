@@ -113,9 +113,9 @@ void Wchar_Argv::clear()
 
 {
 
-if ( W_Argv )  { delete [] W_Argv;  W_Argv = 0; }
+if ( W_Argv )  { delete [] W_Argv;  W_Argv = nullptr; }
 
-if ( W_Buf )  { delete [] W_Buf;  W_Buf = 0; }
+if ( W_Buf )  { delete [] W_Buf;  W_Buf = nullptr; }
 
 Argc = 0;
 
@@ -134,8 +134,8 @@ void Wchar_Argv::set(const StringArray & a)
 
 int j, k, N;
 int len;
-char * s = 0;
-char ** av = 0;
+char * s = nullptr;
+char ** av = nullptr;
 ConcatString c;
 const char *method_name = "Wchar_Argv::set() -> ";
 
@@ -178,9 +178,9 @@ set(a.n(), av);
    //  done
    //
 
-if ( s )  { delete [] s;  s = 0; }
+if ( s )  { delete [] s;  s = nullptr; }
 
-if ( av )  { delete [] av;  av = 0; }
+if ( av )  { delete [] av;  av = nullptr; }
 
 return;
 
@@ -198,7 +198,7 @@ clear();
 
 int j, k;
 int argv_len;
-int * len = 0;
+int * len = nullptr;
 
 
 Argc = _argc;
@@ -214,9 +214,9 @@ argv_len = 0;
 
 for (j=0; j<_argc; ++j)  {
 
-   len[j] = m_strlen(_argv[j]);   //  we're using the len array here because
-                                //  we don't want to call m_strlen more than 
-                                //  once on each argv value
+   //  we're using the len array here because we don't want to call
+   //  m_strlen more than once on each argv value
+   len[j] = (nullptr == _argv[j]) ? 1 : m_strlen(_argv[j]);
 
    argv_len += len[j];
 
@@ -285,7 +285,7 @@ for (j=0; j<Argc; ++j)  {
    //  done
    //
 
-if ( len )  { delete [] len;  len = 0; }
+if ( len )  { delete [] len;  len = nullptr; }
 
 return;
 
