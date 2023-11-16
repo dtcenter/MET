@@ -352,9 +352,10 @@ void VarInfoUGrid::set_dict(Dictionary &dict){
    else set_magic(cfg_name, cfg_level);
 
    if (Level.lower() != Level.upper()) {
-      mlog << Warning << "\n" << method_name
-           << "Recommend to select the single vertical level for UGrid instead of multiple levels ("
-           << cfg_level  << ")\n\n";
+      mlog << Error << "\n" << method_name
+           << "Multiple vertical levels ("
+           << cfg_level  << ") for UGrid are not supported\n\n";
+      exit(1);
    }
 
    set_req_name(cfg_name.c_str());
