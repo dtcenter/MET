@@ -1373,15 +1373,18 @@ bool get_nc_data(NcVar *var, float *data) {
             case NcType::nc_DOUBLE:
                {
                   double *packed_data = new double[cell_count];
+                  for (int idx=0; idx<cell_count; idx++) packed_data[idx] = bad_data_double;
 
                   get_nc_data_t(var, packed_data);
 
+                  double a_data;
                   double fill_value;
                   bool has_fill_value = get_var_fill_value(var, fill_value);
                   for (int idx=0; idx<cell_count; idx++) {
-                     if(has_fill_value && is_eq(data[idx], fill_value))
+                     a_data = packed_data[idx];
+                     if(has_fill_value && is_eq(a_data, fill_value))
                         data[idx] = bad_data_float;
-                     else data[idx] = (float)packed_data[idx];
+                     else data[idx] = (float)a_data;
                   }
                   delete [] packed_data;
                }
@@ -1389,6 +1392,7 @@ bool get_nc_data(NcVar *var, float *data) {
             case NcType::nc_INT64:
                {
                   long long *packed_data = new long long[cell_count];
+                  for (int idx=0; idx<cell_count; idx++) packed_data[idx] = (long long)bad_data_int;
 
                   var->getVar(packed_data);
                   copy_nc_data_(var, data, packed_data, cell_count,

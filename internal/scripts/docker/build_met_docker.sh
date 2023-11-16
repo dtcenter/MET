@@ -10,7 +10,7 @@ LOG_FILE=/met/logs/MET-${MET_GIT_NAME}_configure.log
 echo "Running bootstrap for MET ${MET_GIT_NAME} and writing log file ${LOG_FILE}"
 ./bootstrap > ${LOG_FILE} 2>&1
 echo "Configuring MET ${MET_GIT_NAME} and appending to log file ${LOG_FILE}"
-./configure --enable-grib2 --enable-mode_graphics --enable-modis --enable-lidar2nc --enable-python CPPFLAGS="-I/usr/local/include -I/usr/local/include/freetype2 -I/usr/local/include/cairo" LIBS="-ltirpc" >> ${LOG_FILE} 2>&1
+./configure BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2 --enable-mode_graphics --enable-modis --enable-lidar2nc --enable-python CPPFLAGS="-I/usr/local/include -I/usr/local/include/freetype2 -I/usr/local/include/cairo" LIBS="-ltirpc" >> ${LOG_FILE} 2>&1
 if [ $? != 0 ]; then
   cat ${LOG_FILE}
   exit 1
