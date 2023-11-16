@@ -214,9 +214,9 @@ argv_len = 0;
 
 for (j=0; j<_argc; ++j)  {
 
-   //  we're using the len array here because we don't want to call
-   //  m_strlen more than once on each argv value
-   len[j] = (nullptr == _argv[j]) ? 1 : m_strlen(_argv[j]);
+   len[j] = m_strlen(_argv[j]);   //  we're using the len array here because
+                                //  we don't want to call m_strlen more than 
+                                //  once on each argv value
 
    argv_len += len[j];
 
