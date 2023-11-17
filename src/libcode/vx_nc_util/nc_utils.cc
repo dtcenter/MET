@@ -1177,15 +1177,20 @@ double get_nc_time(NcVar * var, const int index) {
          exit(1);
       }
 
-      start.push_back(index);
-      count.push_back(1);
-
       int vi;
       short vs;
       float vf;
       ncbyte vb;
       long long vl;
+      unixtime ref_ut;
+      int buf_len = 512;
+      char *tmp_buf = new char[512];
       int dataType = GET_NC_TYPE_ID_P(var);
+
+      start.push_back(index);
+      count.push_back(1);
+      tmp_buf[0] = 0;
+
       switch (dataType) {
          case NC_DOUBLE:
             var->getVar(start, count, &k);
@@ -1201,6 +1206,17 @@ double get_nc_time(NcVar * var, const int index) {
          case NC_BYTE:
             var->getVar(start, count, &vb);
             k = (double)vb;
+            break;
+         case NC_CHAR:
+            if (2 == get_dim_count(var)) {
+               buf_len = get_dim_size(var, 1);
+               start.push_back(0);
+               count.push_back(buf_len);
+            }
+            for (int i=0; i<buf_len; i++) tmp_buf[i] = 0;
+            var->getVar(start, count, tmp_buf);
+            parse_time_string(tmp_buf, ref_ut);
+            k = ref_ut;
             break;
          case NC_INT:
             var->getVar(start, count, &vi);
@@ -1224,6 +1240,7 @@ double get_nc_time(NcVar * var, const int index) {
                  << GET_NC_NAME_P(var) << "\".\n\n";
             exit(1);
       }
+      if (tmp_buf) delete [] tmp_buf;
    }
 
    return k;
@@ -3589,6 +3606,48 @@ void parse_cf_time_string(const char *str, unixtime &ref_ut,
         << "parsed NetCDF CF convention time unit string \"" << str
         << "\"\n\t\t as a reference time of " << unix_to_yyyymmdd_hhmmss(ref_ut)
         << " and " << sec_per_unit << " second(s) per time step.\n";
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void parse_time_string(const char *str, unixtime &ut) {
+   static const char *method_name = "parse_time_string() -> ";
+
+   // Initialize
+   ut = 0;
+
+   // Check for expected time string format:
+   //   [seconds|minutes|hours|days] since YYYY-MM-DD HH:MM:SS
+   if(!check_reg_exp(nc_time_unit_ymd_exp, str)) {
+      mlog << Warning << "\n" << method_name
+           << "unexpected NetCDF CF convention time unit \""
+           << str << "\"\n\n";
+      return;
+   }
+   else {
+      // Tokenize the input string
+      // Parse using spaces, '_', or 'T' for timestrings such as:
+      //   2016-01-28T12:00:00Z
+      //   1977-08-07 12:00:00Z
+      StringArray tok;
+      tok.parse_delim(str, " _T");
+      // Parse the reference time
+      StringArray ymd, hms;
+      ymd.parse_delim(tok[0], "-");
+      if(tok.n_elements() > 1) hms.parse_delim(tok[1], ":");
+      else                     hms.parse_delim("00:00:00", ":");
+      ut = mdyhms_to_unix(atoi(ymd[1].c_str()), atoi(ymd[2].c_str()),
+                              atoi(ymd[0].c_str()), atoi(hms[0].c_str()),
+                              hms.n_elements() > 1 ? atoi(hms[1].c_str()) : 0,
+                              hms.n_elements() > 2 ? atoi(hms[2].c_str()) : 0);
+   }
+
+   mlog << Debug(4) << method_name
+        << "parsed NetCDF time string \"" << str
+        << "\" as " << ut <<  " seconds (" << unix_to_yyyymmdd_hhmmss(ut)
+        << ").\n";
 
    return;
 }

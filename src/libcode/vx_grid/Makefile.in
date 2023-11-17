@@ -88,6 +88,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
+@ENABLE_UGRID_TRUE@am__append_1 = unstructured_grid.cc unstructured_grid.h unstructured_grid_defs.h
 subdir = src/libcode/vx_grid
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
@@ -107,6 +108,20 @@ am__v_AR_0 = @echo "  AR      " $@;
 am__v_AR_1 = 
 libvx_grid_a_AR = $(AR) $(ARFLAGS)
 libvx_grid_a_LIBADD =
+am__libvx_grid_a_SOURCES_DIST = earth_rotation.cc earth_rotation.h \
+	find_grid_by_name.cc find_grid_by_name.h grid_base.cc \
+	grid_base.h latlon_grid_defs.h latlon_grid.cc latlon_grid.h \
+	laea_grid_defs.h laea_grid.cc laea_grid.h lc_grid_defs.h \
+	lc_grid.cc lc_grid.h merc_grid_defs.h merc_grid.cc merc_grid.h \
+	gaussian_grid_defs.h gaussian_grid.cc gaussian_grid.h \
+	st_grid_defs.h st_grid.cc st_grid.h latlon_xyz.h latlon_xyz.cc \
+	rot_latlon_grid.cc rot_latlon_grid.h tcrmw_grid.cc \
+	tcrmw_grid.h goes_grid_defs.h goes_grid.cc goes_grid.h \
+	semilatlon_grid_defs.h semilatlon_grid.cc semilatlon_grid.h \
+	vx_grid.h unstructured_grid.cc unstructured_grid.h \
+	unstructured_grid_defs.h
+@ENABLE_UGRID_TRUE@am__objects_1 =  \
+@ENABLE_UGRID_TRUE@	libvx_grid_a-unstructured_grid.$(OBJEXT)
 am_libvx_grid_a_OBJECTS = libvx_grid_a-earth_rotation.$(OBJEXT) \
 	libvx_grid_a-find_grid_by_name.$(OBJEXT) \
 	libvx_grid_a-grid_base.$(OBJEXT) \
@@ -120,7 +135,7 @@ am_libvx_grid_a_OBJECTS = libvx_grid_a-earth_rotation.$(OBJEXT) \
 	libvx_grid_a-rot_latlon_grid.$(OBJEXT) \
 	libvx_grid_a-tcrmw_grid.$(OBJEXT) \
 	libvx_grid_a-goes_grid.$(OBJEXT) \
-	libvx_grid_a-semilatlon_grid.$(OBJEXT)
+	libvx_grid_a-semilatlon_grid.$(OBJEXT) $(am__objects_1)
 libvx_grid_a_OBJECTS = $(am_libvx_grid_a_OBJECTS)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -150,7 +165,8 @@ am__depfiles_remade = ./$(DEPDIR)/libvx_grid_a-earth_rotation.Po \
 	./$(DEPDIR)/libvx_grid_a-rot_latlon_grid.Po \
 	./$(DEPDIR)/libvx_grid_a-semilatlon_grid.Po \
 	./$(DEPDIR)/libvx_grid_a-st_grid.Po \
-	./$(DEPDIR)/libvx_grid_a-tcrmw_grid.Po
+	./$(DEPDIR)/libvx_grid_a-tcrmw_grid.Po \
+	./$(DEPDIR)/libvx_grid_a-unstructured_grid.Po
 am__mv = mv -f
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -182,7 +198,7 @@ am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
 SOURCES = $(libvx_grid_a_SOURCES)
-DIST_SOURCES = $(libvx_grid_a_SOURCES)
+DIST_SOURCES = $(am__libvx_grid_a_SOURCES_DIST)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -239,7 +255,8 @@ FFLAGS = @FFLAGS@
 FLIBS = @FLIBS@
 GREP = @GREP@
 GRIB2CLIB_NAME = @GRIB2CLIB_NAME@
-GRIB2_LIBS = @GRIB2_LIBS@
+GRIB2_DEP_LIBS = @GRIB2_DEP_LIBS@
+GRIB2_MET_LIBS = @GRIB2_MET_LIBS@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
@@ -253,11 +270,17 @@ LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LTLIBOBJS = @LTLIBOBJS@
 MAKEINFO = @MAKEINFO@
+MET_ATLAS = @MET_ATLAS@
+MET_ATLASINC = @MET_ATLASINC@
+MET_ATLASLIB = @MET_ATLASLIB@
 MET_BUFR = @MET_BUFR@
 MET_BUFRLIB = @MET_BUFRLIB@
 MET_CAIRO = @MET_CAIRO@
 MET_CAIROINC = @MET_CAIROINC@
 MET_CAIROLIB = @MET_CAIROLIB@
+MET_ECKIT = @MET_ECKIT@
+MET_ECKITINC = @MET_ECKITINC@
+MET_ECKITLIB = @MET_ECKITLIB@
 MET_FREETYPE = @MET_FREETYPE@
 MET_FREETYPEINC = @MET_FREETYPEINC@
 MET_FREETYPELIB = @MET_FREETYPELIB@
@@ -296,11 +319,14 @@ PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
-PYTHON_LIBS = @PYTHON_LIBS@
+PYTHON_DEP_LIBS = @PYTHON_DEP_LIBS@
+PYTHON_MET_LIBS = @PYTHON_MET_LIBS@
 RANLIB = @RANLIB@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
+UGRID_DEP_LIBS = @UGRID_DEP_LIBS@
+UGRID_MET_LIBS = @UGRID_MET_LIBS@
 VERSION = @VERSION@
 YACC = @YACC@
 YFLAGS = @YFLAGS@
@@ -361,31 +387,17 @@ MAINTAINERCLEANFILES = Makefile.in
 
 # The library
 noinst_LIBRARIES = libvx_grid.a
-libvx_grid_a_SOURCES = \
-              earth_rotation.cc earth_rotation.h  \
-              find_grid_by_name.cc  find_grid_by_name.h \
-              grid_base.cc grid_base.h \
-              latlon_grid_defs.h \
-              latlon_grid.cc latlon_grid.h \
-              laea_grid_defs.h \
-              laea_grid.cc laea_grid.h \
-              lc_grid_defs.h \
-              lc_grid.cc lc_grid.h \
-              merc_grid_defs.h \
-              merc_grid.cc merc_grid.h \
-              gaussian_grid_defs.h \
-              gaussian_grid.cc gaussian_grid.h \
-              st_grid_defs.h \
-              st_grid.cc st_grid.h \
-              latlon_xyz.h latlon_xyz.cc \
-              rot_latlon_grid.cc rot_latlon_grid.h \
-              tcrmw_grid.cc tcrmw_grid.h \
-              goes_grid_defs.h \
-              goes_grid.cc goes_grid.h \
-              semilatlon_grid_defs.h \
-              semilatlon_grid.cc semilatlon_grid.h \
-              vx_grid.h
-
+libvx_grid_a_SOURCES = earth_rotation.cc earth_rotation.h \
+	find_grid_by_name.cc find_grid_by_name.h grid_base.cc \
+	grid_base.h latlon_grid_defs.h latlon_grid.cc latlon_grid.h \
+	laea_grid_defs.h laea_grid.cc laea_grid.h lc_grid_defs.h \
+	lc_grid.cc lc_grid.h merc_grid_defs.h merc_grid.cc merc_grid.h \
+	gaussian_grid_defs.h gaussian_grid.cc gaussian_grid.h \
+	st_grid_defs.h st_grid.cc st_grid.h latlon_xyz.h latlon_xyz.cc \
+	rot_latlon_grid.cc rot_latlon_grid.h tcrmw_grid.cc \
+	tcrmw_grid.h goes_grid_defs.h goes_grid.cc goes_grid.h \
+	semilatlon_grid_defs.h semilatlon_grid.cc semilatlon_grid.h \
+	vx_grid.h $(am__append_1)
 libvx_grid_a_CPPFLAGS = ${MET_CPPFLAGS}
 all: all-am
 
@@ -449,6 +461,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_grid_a-semilatlon_grid.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_grid_a-st_grid.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_grid_a-tcrmw_grid.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_grid_a-unstructured_grid.Po@am__quote@ # am--include-marker
 
 $(am__depfiles_remade):
 	@$(MKDIR_P) $(@D)
@@ -666,6 +679,20 @@ libvx_grid_a-semilatlon_grid.obj: semilatlon_grid.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_grid_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_grid_a-semilatlon_grid.obj `if test -f 'semilatlon_grid.cc'; then $(CYGPATH_W) 'semilatlon_grid.cc'; else $(CYGPATH_W) '$(srcdir)/semilatlon_grid.cc'; fi`
 
+libvx_grid_a-unstructured_grid.o: unstructured_grid.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_grid_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_grid_a-unstructured_grid.o -MD -MP -MF $(DEPDIR)/libvx_grid_a-unstructured_grid.Tpo -c -o libvx_grid_a-unstructured_grid.o `test -f 'unstructured_grid.cc' || echo '$(srcdir)/'`unstructured_grid.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvx_grid_a-unstructured_grid.Tpo $(DEPDIR)/libvx_grid_a-unstructured_grid.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='unstructured_grid.cc' object='libvx_grid_a-unstructured_grid.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_grid_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_grid_a-unstructured_grid.o `test -f 'unstructured_grid.cc' || echo '$(srcdir)/'`unstructured_grid.cc
+
+libvx_grid_a-unstructured_grid.obj: unstructured_grid.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_grid_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_grid_a-unstructured_grid.obj -MD -MP -MF $(DEPDIR)/libvx_grid_a-unstructured_grid.Tpo -c -o libvx_grid_a-unstructured_grid.obj `if test -f 'unstructured_grid.cc'; then $(CYGPATH_W) 'unstructured_grid.cc'; else $(CYGPATH_W) '$(srcdir)/unstructured_grid.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvx_grid_a-unstructured_grid.Tpo $(DEPDIR)/libvx_grid_a-unstructured_grid.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='unstructured_grid.cc' object='libvx_grid_a-unstructured_grid.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_grid_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_grid_a-unstructured_grid.obj `if test -f 'unstructured_grid.cc'; then $(CYGPATH_W) 'unstructured_grid.cc'; else $(CYGPATH_W) '$(srcdir)/unstructured_grid.cc'; fi`
+
 ID: $(am__tagged_files)
 	$(am__define_uniq_tagged_files); mkid -fID $$unique
 tags: tags-am
@@ -805,6 +832,7 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/libvx_grid_a-semilatlon_grid.Po
 	-rm -f ./$(DEPDIR)/libvx_grid_a-st_grid.Po
 	-rm -f ./$(DEPDIR)/libvx_grid_a-tcrmw_grid.Po
+	-rm -f ./$(DEPDIR)/libvx_grid_a-unstructured_grid.Po
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -864,6 +892,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/libvx_grid_a-semilatlon_grid.Po
 	-rm -f ./$(DEPDIR)/libvx_grid_a-st_grid.Po
 	-rm -f ./$(DEPDIR)/libvx_grid_a-tcrmw_grid.Po
+	-rm -f ./$(DEPDIR)/libvx_grid_a-unstructured_grid.Po
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 

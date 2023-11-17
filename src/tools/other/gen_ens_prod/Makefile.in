@@ -106,7 +106,9 @@ am_gen_ens_prod_OBJECTS = gen_ens_prod-gen_ens_prod.$(OBJEXT) \
 gen_ens_prod_OBJECTS = $(am_gen_ens_prod_OBJECTS)
 am__DEPENDENCIES_1 =
 gen_ens_prod_DEPENDENCIES = $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1)
 gen_ens_prod_LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
 	$(gen_ens_prod_LDFLAGS) $(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_@AM_V@)
@@ -202,7 +204,8 @@ FFLAGS = @FFLAGS@
 FLIBS = @FLIBS@
 GREP = @GREP@
 GRIB2CLIB_NAME = @GRIB2CLIB_NAME@
-GRIB2_LIBS = @GRIB2_LIBS@
+GRIB2_DEP_LIBS = @GRIB2_DEP_LIBS@
+GRIB2_MET_LIBS = @GRIB2_MET_LIBS@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
@@ -216,11 +219,17 @@ LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LTLIBOBJS = @LTLIBOBJS@
 MAKEINFO = @MAKEINFO@
+MET_ATLAS = @MET_ATLAS@
+MET_ATLASINC = @MET_ATLASINC@
+MET_ATLASLIB = @MET_ATLASLIB@
 MET_BUFR = @MET_BUFR@
 MET_BUFRLIB = @MET_BUFRLIB@
 MET_CAIRO = @MET_CAIRO@
 MET_CAIROINC = @MET_CAIROINC@
 MET_CAIROLIB = @MET_CAIROLIB@
+MET_ECKIT = @MET_ECKIT@
+MET_ECKITINC = @MET_ECKITINC@
+MET_ECKITLIB = @MET_ECKITLIB@
 MET_FREETYPE = @MET_FREETYPE@
 MET_FREETYPEINC = @MET_FREETYPEINC@
 MET_FREETYPELIB = @MET_FREETYPELIB@
@@ -259,11 +268,14 @@ PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
-PYTHON_LIBS = @PYTHON_LIBS@
+PYTHON_DEP_LIBS = @PYTHON_DEP_LIBS@
+PYTHON_MET_LIBS = @PYTHON_MET_LIBS@
 RANLIB = @RANLIB@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
+UGRID_DEP_LIBS = @UGRID_DEP_LIBS@
+UGRID_MET_LIBS = @UGRID_MET_LIBS@
 VERSION = @VERSION@
 YACC = @YACC@
 YFLAGS = @YFLAGS@
@@ -333,13 +345,15 @@ gen_ens_prod_LDADD = -lvx_stat_out \
 	-lvx_analysis_util \
 	-lvx_data2d_factory \
 	-lvx_data2d_nc_met \
-	-lvx_data2d_grib $(GRIB2_LIBS) \
+	-lvx_data2d_grib \
+	$(GRIB2_MET_LIBS) \
 	-lvx_data2d_nc_pinterp \
 	-lvx_data2d_nccf \
-	$(PYTHON_LIBS) \
+	$(UGRID_MET_LIBS) \
+	$(PYTHON_MET_LIBS) \
 	-lvx_data2d \
 	-lvx_nc_obs \
-        -lvx_seeps \
+	-lvx_seeps \
 	-lvx_nc_util \
 	-lvx_regrid \
 	-lvx_grid \
@@ -352,7 +366,7 @@ gen_ens_prod_LDADD = -lvx_stat_out \
 	-lvx_math \
 	-lvx_cal \
 	-lvx_log \
-	$(PYTHON_LIBS) \
+	$(GRIB2_DEP_LIBS) $(UGRID_DEP_LIBS) $(PYTHON_DEP_LIBS) \
 	-lm -lproj -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
 
 EXTRA_DIST = gen_ens_prod.h \

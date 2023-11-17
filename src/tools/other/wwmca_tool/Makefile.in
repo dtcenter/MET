@@ -113,7 +113,9 @@ am_wwmca_plot_OBJECTS = wwmca_plot-gridhemisphere_to_string.$(OBJEXT) \
 	wwmca_plot-wwmca_ref.$(OBJEXT)
 wwmca_plot_OBJECTS = $(am_wwmca_plot_OBJECTS)
 am__DEPENDENCIES_1 =
-wwmca_plot_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+wwmca_plot_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 wwmca_plot_LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
 	$(wwmca_plot_LDFLAGS) $(LDFLAGS) -o $@
 am_wwmca_regrid_OBJECTS =  \
@@ -131,6 +133,8 @@ am_wwmca_regrid_OBJECTS =  \
 	wwmca_regrid-nc_output.$(OBJEXT)
 wwmca_regrid_OBJECTS = $(am_wwmca_regrid_OBJECTS)
 wwmca_regrid_DEPENDENCIES = $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1)
 wwmca_regrid_LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
 	$(wwmca_regrid_LDFLAGS) $(LDFLAGS) -o $@
@@ -260,7 +264,8 @@ FFLAGS = @FFLAGS@
 FLIBS = @FLIBS@
 GREP = @GREP@
 GRIB2CLIB_NAME = @GRIB2CLIB_NAME@
-GRIB2_LIBS = @GRIB2_LIBS@
+GRIB2_DEP_LIBS = @GRIB2_DEP_LIBS@
+GRIB2_MET_LIBS = @GRIB2_MET_LIBS@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
@@ -274,11 +279,17 @@ LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LTLIBOBJS = @LTLIBOBJS@
 MAKEINFO = @MAKEINFO@
+MET_ATLAS = @MET_ATLAS@
+MET_ATLASINC = @MET_ATLASINC@
+MET_ATLASLIB = @MET_ATLASLIB@
 MET_BUFR = @MET_BUFR@
 MET_BUFRLIB = @MET_BUFRLIB@
 MET_CAIRO = @MET_CAIRO@
 MET_CAIROINC = @MET_CAIROINC@
 MET_CAIROLIB = @MET_CAIROLIB@
+MET_ECKIT = @MET_ECKIT@
+MET_ECKITINC = @MET_ECKITINC@
+MET_ECKITLIB = @MET_ECKITLIB@
 MET_FREETYPE = @MET_FREETYPE@
 MET_FREETYPEINC = @MET_FREETYPEINC@
 MET_FREETYPELIB = @MET_FREETYPELIB@
@@ -317,11 +328,14 @@ PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
-PYTHON_LIBS = @PYTHON_LIBS@
+PYTHON_DEP_LIBS = @PYTHON_DEP_LIBS@
+PYTHON_MET_LIBS = @PYTHON_MET_LIBS@
 RANLIB = @RANLIB@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
+UGRID_DEP_LIBS = @UGRID_DEP_LIBS@
+UGRID_MET_LIBS = @UGRID_MET_LIBS@
 VERSION = @VERSION@
 YACC = @YACC@
 YFLAGS = @YFLAGS@
@@ -407,10 +421,12 @@ wwmca_regrid_LDADD = -lvx_pxm \
 	-lvx_analysis_util \
 	-lvx_data2d_factory \
 	-lvx_data2d_nc_met \
-	-lvx_data2d_grib $(GRIB2_LIBS) \
+	-lvx_data2d_grib \
+	$(GRIB2_MET_LIBS) \
 	-lvx_data2d_nc_pinterp \
-	$(PYTHON_LIBS) \
 	-lvx_data2d_nccf \
+	$(UGRID_MET_LIBS) \
+	$(PYTHON_MET_LIBS) \
 	-lvx_statistics \
 	-lvx_data2d \
 	-lvx_nc_util \
@@ -425,6 +441,7 @@ wwmca_regrid_LDADD = -lvx_pxm \
 	-lvx_math \
 	-lvx_color \
 	-lvx_log \
+	$(GRIB2_DEP_LIBS) $(UGRID_DEP_LIBS) $(PYTHON_DEP_LIBS) \
 	-lm -lproj -lz -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
 
 wwmca_plot_SOURCES = gridhemisphere_to_string.cc gridhemisphere_to_string.h \
@@ -454,10 +471,12 @@ wwmca_plot_LDADD = -lvx_pxm \
 	-lvx_analysis_util \
 	-lvx_data2d_factory \
 	-lvx_data2d_nc_met \
-	-lvx_data2d_grib $(GRIB2_LIBS) \
+	-lvx_data2d_grib \
+	$(GRIB2_MET_LIBS) \
 	-lvx_data2d_nc_pinterp \
-	$(PYTHON_LIBS) \
 	-lvx_data2d_nccf \
+	$(UGRID_MET_LIBS) \
+	$(PYTHON_MET_LIBS) \
 	-lvx_data2d \
 	-lvx_nc_util \
 	-lvx_regrid \
@@ -471,6 +490,7 @@ wwmca_plot_LDADD = -lvx_pxm \
 	-lvx_math \
 	-lvx_color \
 	-lvx_log \
+	$(GRIB2_DEP_LIBS) $(UGRID_DEP_LIBS) $(PYTHON_DEP_LIBS) \
 	-lm -lproj -lz -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
 
 all: all-am

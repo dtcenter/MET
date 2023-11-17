@@ -30,9 +30,12 @@ if ENABLE_PYTHON
   SUBDIRS += vx_pointdata_python
 endif
 
-
 if ENABLE_GRIB2
   SUBDIRS += vx_data2d_grib2
+endif
+
+if ENABLE_UGRID
+  SUBDIRS += vx_data2d_ugrid
 endif
 
 SUBDIRS += vx_data2d_factory \

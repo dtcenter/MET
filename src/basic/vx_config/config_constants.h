@@ -680,6 +680,11 @@ static const char conf_key_missing_thresh[]    = "missing_thresh";
 static const char conf_key_control_id[]        = "control_id";
 static const char conf_key_ens_member_ids[]    = "ens_member_ids";
 static const char conf_key_seeps_p1_thresh[]   = "seeps_p1_thresh";
+static const char conf_key_ugrid_coordinates_file[] = "ugrid_coordinates_file";
+static const char conf_key_ugrid_dataset[]          = "ugrid_dataset";
+static const char conf_key_ugrid_map_config[]       = "ugrid_map_config";
+static const char conf_key_ugrid_max_distance_km[]  = "ugrid_max_distance_km";
+static const char conf_key_ugrid_metadata_map[]     = "ugrid_metadata_map";
 
 //
 // Entries to override file metadata 
@@ -1232,6 +1237,7 @@ static const char conf_val_grib2         [] = "GRIB2";
 static const char conf_val_netcdf_met    [] = "NETCDF_MET";
 static const char conf_val_netcdf_pint   [] = "NETCDF_PINT";
 static const char conf_val_netcdf_nccf   [] = "NETCDF_NCCF";
+static const char conf_val_netcdf_ugrid  [] = "NETCDF_UGRID";
 static const char conf_val_python_numpy  [] = "PYTHON_NUMPY";
 static const char conf_val_python_xarray [] = "PYTHON_XARRAY";
 

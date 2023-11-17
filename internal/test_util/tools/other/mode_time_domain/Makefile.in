@@ -127,6 +127,8 @@ test_velocity_DEPENDENCIES = ${top_builddir}/src/tools/other/mode_time_domain/mt
 	${top_builddir}/src/tools/other/mode_time_domain/mtd-mtd_txt_output.o \
 	${top_builddir}/src/tools/other/mode_time_domain/mtd-nc_grid.o \
 	${top_builddir}/src/tools/other/mode_time_domain/mtd-nc_utils_local.o \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 test_velocity_LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
 	$(test_velocity_LDFLAGS) $(LDFLAGS) -o $@
@@ -222,7 +224,8 @@ FFLAGS = @FFLAGS@
 FLIBS = @FLIBS@
 GREP = @GREP@
 GRIB2CLIB_NAME = @GRIB2CLIB_NAME@
-GRIB2_LIBS = @GRIB2_LIBS@
+GRIB2_DEP_LIBS = @GRIB2_DEP_LIBS@
+GRIB2_MET_LIBS = @GRIB2_MET_LIBS@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
@@ -236,11 +239,17 @@ LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LTLIBOBJS = @LTLIBOBJS@
 MAKEINFO = @MAKEINFO@
+MET_ATLAS = @MET_ATLAS@
+MET_ATLASINC = @MET_ATLASINC@
+MET_ATLASLIB = @MET_ATLASLIB@
 MET_BUFR = @MET_BUFR@
 MET_BUFRLIB = @MET_BUFRLIB@
 MET_CAIRO = @MET_CAIRO@
 MET_CAIROINC = @MET_CAIROINC@
 MET_CAIROLIB = @MET_CAIROLIB@
+MET_ECKIT = @MET_ECKIT@
+MET_ECKITINC = @MET_ECKITINC@
+MET_ECKITLIB = @MET_ECKITLIB@
 MET_FREETYPE = @MET_FREETYPE@
 MET_FREETYPEINC = @MET_FREETYPEINC@
 MET_FREETYPELIB = @MET_FREETYPELIB@
@@ -279,11 +288,14 @@ PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
-PYTHON_LIBS = @PYTHON_LIBS@
+PYTHON_DEP_LIBS = @PYTHON_DEP_LIBS@
+PYTHON_MET_LIBS = @PYTHON_MET_LIBS@
 RANLIB = @RANLIB@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
+UGRID_DEP_LIBS = @UGRID_DEP_LIBS@
+UGRID_MET_LIBS = @UGRID_MET_LIBS@
 VERSION = @VERSION@
 YACC = @YACC@
 YFLAGS = @YFLAGS@
@@ -382,11 +394,13 @@ test_velocity_LDADD = \
 	-lvx_analysis_util \
 	-lvx_data2d_factory \
 	-lvx_data2d_nc_met \
-	-lvx_data2d_grib $(GRIB2_LIBS) \
+	-lvx_data2d_grib \
+	$(GRIB2_MET_LIBS) \
 	-lvx_data2d_nc_pinterp \
-	$(PYTHON_LIBS) \
-	-lvx_statistics \
 	-lvx_data2d_nccf \
+	$(UGRID_MET_LIBS) \
+	$(PYTHON_MET_LIBS) \
+	-lvx_statistics \
 	-lvx_data2d \
 	-lvx_nc_util \
 	-lvx_regrid \
@@ -400,6 +414,7 @@ test_velocity_LDADD = \
 	-lvx_math \
 	-lvx_color \
 	-lvx_log \
+	$(GRIB2_DEP_LIBS) $(UGRID_DEP_LIBS) $(PYTHON_DEP_LIBS) \
 	-lm -lproj -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas -lz
 
 all: all-am
