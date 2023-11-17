@@ -231,8 +231,11 @@ inline StringArray          TrackInfo::track_lines()      const { return(TrackLi
 
 class TrackInfoArray {
 
-   friend TrackInfo consensus(const TrackInfoArray &, const ConcatString &,
-                              int, const StringArray &);
+   friend TrackInfo consensus(const TrackInfoArray &,
+                              const ConcatString &,
+                              const StringArray &, const int,
+                              const StringArray &, const int,
+                              const bool);
 
    private:
 

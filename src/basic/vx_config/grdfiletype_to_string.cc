@@ -24,12 +24,12 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+using namespace std;
+
+
 #include <string.h>
 
 #include "grdfiletype_to_string.h"
-
-
-using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -56,6 +56,7 @@ switch ( t )  {
    case FileType_Python_Numpy:     s = "FileType_Python_Numpy";     break;
 
    case FileType_Python_Xarray:    s = "FileType_Python_Xarray";    break;
+   case FileType_UGrid:            s = "FileType_UGrid";            break;
 
    default:
       s = "(bad value)";
@@ -64,7 +65,7 @@ switch ( t )  {
 }   //  switch
 
 
-return ConcatString (s);
+return ( ConcatString (s) );
 
 }
 
@@ -89,11 +90,12 @@ else if ( strcmp(text, "FileType_Bufr"          ) == 0 )   { t = FileType_Bufr; 
 else if ( strcmp(text, "FileType_Python_Numpy"  ) == 0 )   { t = FileType_Python_Numpy;     return ( true ); }
 
 else if ( strcmp(text, "FileType_Python_Xarray" ) == 0 )   { t = FileType_Python_Xarray;    return ( true ); }
+else if ( strcmp(text, "FileType_UGrid"         ) == 0 )   { t = FileType_UGrid;            return ( true ); }
    //
    //  nope
    //
 
-return false;
+return ( false );
 
 }
 

@@ -73,8 +73,6 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <cstdio>
 #include <cstdlib>
 #include <ctype.h>
@@ -86,7 +84,6 @@ using namespace std;
 #include <sys/types.h>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "main.h"
 #include "ensemble_stat.h"
@@ -103,6 +100,9 @@ using namespace netCDF;
 #include "data2d_nc_met.h"
 #include "pointdata_python.h"
 #endif
+
+using namespace std;
+using namespace netCDF;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -203,8 +203,9 @@ void process_command_line(int argc, char **argv) {
    int i;
    CommandLine cline;
    ConcatString default_config_file;
-   Met2dDataFile *ens_mtddf = (Met2dDataFile *) 0;
-   Met2dDataFile *obs_mtddf = (Met2dDataFile *) 0;
+   Met2dDataFile *ens_mtddf = (Met2dDataFile *) nullptr;
+   Met2dDataFile *obs_mtddf = (Met2dDataFile *) nullptr;
+   const char *method_name = "process_command_line() -> ";
 
    // Set default output directory
    out_dir = ".";
@@ -273,7 +274,7 @@ void process_command_line(int argc, char **argv) {
          n_ens_files = atoi(cline[0].c_str());
 
          if(n_ens_files <= 0) {
-            mlog << Error << "\nprocess_command_line() -> "
+            mlog << Error << "\n" << method_name
                  << "the number of ensemble member files must be >= 1 ("
                  << n_ens_files << ")\n\n";
             exit(1);
@@ -294,7 +295,7 @@ void process_command_line(int argc, char **argv) {
 
    // Check for at least one valid input ensemble file
    if(n_ens_files == 0) {
-      mlog << Error << "\nprocess_command_line() -> "
+      mlog << Error << "\n" << method_name
            << "no valid input ensemble member files specified!\n\n";
       exit(1);
    }
@@ -303,14 +304,14 @@ void process_command_line(int argc, char **argv) {
    if(ctrl_file.nonempty()) {
 
       if(n_ens_files == 1 && !ens_file_list.has(ctrl_file)) {
-         mlog << Error << "\nprocess_command_line() -> "
+         mlog << Error << "\n" << method_name
               << "when reading all ensemble members from the same file, "
               << "the control member must be in that file as well: "
               << ctrl_file << "\n\n";
          exit(1);
       }
       else if(n_ens_files > 1 && ens_file_list.has(ctrl_file)) {
-         mlog << Error << "\nprocess_command_line() -> "
+         mlog << Error << "\n" << method_name
               << "the ensemble control file should not appear in the list "
               << "of ensemble member files: " << ctrl_file << "\n\n";
          exit(1);
@@ -332,7 +333,7 @@ void process_command_line(int argc, char **argv) {
       obs_valid_end_ut != (unixtime) 0 &&
       obs_valid_beg_ut > obs_valid_end_ut) {
 
-      mlog << Error << "\nprocess_command_line() -> "
+      mlog << Error << "\n" << method_name
            << "the ending time ("
            << unix_to_yyyymmdd_hhmmss(obs_valid_end_ut)
            << ") must be greater than the beginning time ("
@@ -357,10 +358,16 @@ void process_command_line(int argc, char **argv) {
 
    // Get the ensemble file type from config, if present
    etype = parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_fcst));
+   if(FileType_UGrid == etype) {
+      mlog << Error << "\n" << program_name << " -> filetype "
+           << grdfiletype_to_string(etype) << " from the configuration is not supported\n\n";
+
+      exit(1);
+   }
 
    // Read the first input ensemble file
    if(!(ens_mtddf = mtddf_factory.new_met_2d_data_file(ens_file_list[0].c_str(), etype))) {
-      mlog << Error << "\nprocess_command_line() -> "
+      mlog << Error << "\n" << method_name
            << "trouble reading ensemble file \""
            << ens_file_list[0] << "\"\n\n";
       exit(1);
@@ -368,10 +375,18 @@ void process_command_line(int argc, char **argv) {
 
    // Store the input ensemble file type
    etype = ens_mtddf->file_type();
+   if(FileType_UGrid == etype) {
+      mlog << Error << "\n" << program_name << " -> The filetype "
+           << grdfiletype_to_string(etype) << " (" << ens_file_list[0]
+           << ") is not supported\n\n";
+
+      exit(1);
+   }
+
 
    // Observation files are required
    if(!grid_obs_flag && !point_obs_flag) {
-      mlog << Error << "\nprocess_command_line() -> "
+      mlog << Error << "\n" << method_name
            << "the \"-grid_obs\" or \"-point_obs\" command line option "
            << "must be used at least once.\n\n";
       exit(1);
@@ -388,10 +403,16 @@ void process_command_line(int argc, char **argv) {
 
       // Get the observation file type from config, if present
       otype = parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_obs));
+      if(FileType_UGrid == otype) {
+         mlog << Error << "\n" << program_name << " -> filetype "
+              << grdfiletype_to_string(otype) << " from the configuration is not supported\n\n";
+      
+         exit(1);
+      }
 
       // Read the first gridded observation file
       if(!(obs_mtddf = mtddf_factory.new_met_2d_data_file(grid_obs_file_list[0].c_str(), otype))) {
-         mlog << Error << "\nprocess_command_line() -> "
+         mlog << Error << "\n" << method_name
               << "trouble reading gridded observation file \""
               << grid_obs_file_list[0] << "\"\n\n";
          exit(1);
@@ -399,6 +420,13 @@ void process_command_line(int argc, char **argv) {
 
       // Store the gridded observation file type
       otype = obs_mtddf->file_type();
+      if(FileType_UGrid == otype) {
+         mlog << Error << "\n" << program_name << " -> The filetype "
+              << grdfiletype_to_string(etype) << " (" << grid_obs_file_list[0]
+              << ") is not supported\n\n";
+      
+         exit(1);
+      }
    }
 
    // Process the configuration
@@ -424,7 +452,7 @@ void process_command_line(int argc, char **argv) {
 
    // List the input gridded observations files
    if(grid_obs_file_list.n() > 0) {
-      mlog << Debug(1) << "Gridded Observation Files["
+      mlog << Debug(1) << method_name << "Gridded Observation Files["
            << grid_obs_file_list.n() << "]:\n" ;
       for(i=0; i<grid_obs_file_list.n(); i++) {
          mlog << "   " << grid_obs_file_list[i] << "\n" ;
@@ -433,7 +461,7 @@ void process_command_line(int argc, char **argv) {
 
    // List the input point observations files
    if(point_obs_file_list.n() > 0) {
-      mlog << Debug(1) << "Point Observation Files["
+      mlog << Debug(1) << method_name << "Point Observation Files["
            << point_obs_file_list.n() << "]:\n" ;
       for(i=0; i<point_obs_file_list.n(); i++) {
          mlog << "   " << point_obs_file_list[i] << "\n" ;
@@ -445,7 +473,7 @@ void process_command_line(int argc, char **argv) {
 
       if(!file_exists(ens_file_list[i].c_str()) &&
          !is_python_grdfiletype(etype)) {
-         mlog << Warning << "\nprocess_command_line() -> "
+         mlog << Warning << "\n" << method_name
               << "can't open input ensemble file: "
               << ens_file_list[i] << "\n\n";
          ens_file_vld.add(0);
@@ -458,7 +486,7 @@ void process_command_line(int argc, char **argv) {
    // User-specified ensemble mean file
    if(ens_mean_file.nonempty()) {
       if(!file_exists(ens_mean_file.c_str())) {
-         mlog << Warning << "\nprocess_command_line() -> "
+         mlog << Warning << "\n" << method_name
               << "can't open input ensemble mean file: "
               << ens_mean_file << "\n\n";
          ens_mean_file = "";
@@ -467,14 +495,14 @@ void process_command_line(int argc, char **argv) {
 
    // User-specified ensemble control file
    if(conf_info.control_id.nonempty() && ctrl_file.empty()) {
-      mlog << Warning << "\nprocess_command_line() -> "
+      mlog << Warning << "\n" << method_name
            << "control_id is set in the config file but "
            << "control file is not provided with -ctrl argument\n\n";
    }
 
    // Deallocate memory for data files
-   if(ens_mtddf) { delete ens_mtddf; ens_mtddf = (Met2dDataFile *) 0; }
-   if(obs_mtddf) { delete obs_mtddf; obs_mtddf = (Met2dDataFile *) 0; }
+   if(ens_mtddf) { delete ens_mtddf; ens_mtddf = (Met2dDataFile *) nullptr; }
+   if(obs_mtddf) { delete obs_mtddf; obs_mtddf = (Met2dDataFile *) nullptr; }
 
    return;
 }
@@ -499,7 +527,7 @@ void process_grid(const Grid &fcst_grid) {
       }
 
       DataPlane dp;
-      Met2dDataFile *mtddf = (Met2dDataFile *) 0;
+      Met2dDataFile *mtddf = (Met2dDataFile *) nullptr;
       if(!(mtddf = mtddf_factory.new_met_2d_data_file(
                                  grid_obs_file_list[0].c_str(), otype))) {
          mlog << Error << "\nprocess_grid() -> "
@@ -520,7 +548,7 @@ void process_grid(const Grid &fcst_grid) {
       // Store the observation grid
       obs_grid = mtddf->grid();
 
-      if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) 0; }
+      if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) nullptr; }
    }
    else {
       obs_grid = fcst_grid;
@@ -651,7 +679,7 @@ bool get_data_plane(const char *infile, GrdFileType ftype,
    } // end if found
 
    // Deallocate the data file pointer, if necessary
-   if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) 0; }
+   if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) nullptr; }
 
    return(found);
 }
@@ -663,7 +691,7 @@ bool get_data_plane_array(const char *infile, GrdFileType ftype,
                           bool do_regrid) {
    int n, i;
    bool found;
-   Met2dDataFile *mtddf = (Met2dDataFile *) 0;
+   Met2dDataFile *mtddf = (Met2dDataFile *) nullptr;
 
    // Read the current ensemble file
    if(!(mtddf = mtddf_factory.new_met_2d_data_file(infile, ftype))) {
@@ -711,7 +739,7 @@ bool get_data_plane_array(const char *infile, GrdFileType ftype,
    } // end if found
 
    // Deallocate the data file pointer, if necessary
-   if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) 0; }
+   if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) nullptr; }
 
    return(found);
 }
@@ -1208,12 +1236,12 @@ void process_grid_vx() {
    int i, j, k, n_miss, i_file;
    bool found;
    MaskPlane  mask_mp;
-   DataPlane *fcst_dp = (DataPlane *) 0;
-   DataPlane *fraw_dp = (DataPlane *) 0;
+   DataPlane *fcst_dp = (DataPlane *) nullptr;
+   DataPlane *fraw_dp = (DataPlane *) nullptr;
    DataPlane  obs_dp, oraw_dp;
    DataPlane emn_dp, cmn_dp, csd_dp;
    PairDataEnsemble pd_all, pd;
-   ObsErrorEntry *oerr_ptr = (ObsErrorEntry *) 0;
+   ObsErrorEntry *oerr_ptr = (ObsErrorEntry *) nullptr;
    VarInfo * var_info;
    ConcatString fcst_file;
 
@@ -1572,12 +1600,12 @@ void process_grid_vx() {
    } // end for i
 
    // Delete allocated DataPlane objects
-   if(fcst_dp) { delete [] fcst_dp; fcst_dp = (DataPlane *) 0; }
-   if(fraw_dp) { delete [] fraw_dp; fraw_dp = (DataPlane *) 0; }
+   if(fcst_dp) { delete [] fcst_dp; fcst_dp = (DataPlane *) nullptr; }
+   if(fraw_dp) { delete [] fraw_dp; fraw_dp = (DataPlane *) nullptr; }
 
    // Close the output NetCDF file
    if(nc_out) {
-      delete nc_out; nc_out = (NcFile *) 0;
+      delete nc_out; nc_out = (NcFile *) nullptr;
    }
 
    return;
@@ -1593,7 +1621,7 @@ void process_grid_scores(int i_vx,
         ObsErrorEntry *oerr_ptr,  PairDataEnsemble &pd) {
    int i, j, x, y, n_miss;
    double cmn, csd;
-   ObsErrorEntry *e = (ObsErrorEntry *) 0;
+   ObsErrorEntry *e = (ObsErrorEntry *) nullptr;
 
    // Allocate memory in one big chunk based on grid size
    pd.extend(nxy);
@@ -1632,7 +1660,7 @@ void process_grid_scores(int i_vx,
                    conf_info.obtype.c_str(), oraw_dp(x,y));
          }
          else {
-            e = (ObsErrorEntry *) 0;
+            e = (ObsErrorEntry *) nullptr;
          }
 
          // Store the observation error entry pointer
@@ -2178,7 +2206,7 @@ void do_pct_cat_thresh(const EnsembleStatVxOpt &vx_opt,
                        const PairDataEnsemble &pd_ens) {
    int i, i_thr, i_bin, i_obs, i_ens;
    int n_vld, n_evt, n_bin;
-   PCTInfo *pct_info = (PCTInfo *) 0;
+   PCTInfo *pct_info = (PCTInfo *) nullptr;
    PairDataPoint pd_pnt, pd;
    ConcatString fcst_var_cs, cs;
 
@@ -2276,7 +2304,7 @@ void do_pct_cat_thresh(const EnsembleStatVxOpt &vx_opt,
    shc.set_fcst_var(fcst_var_cs);
 
    // Dealloate memory
-   if(pct_info) { delete [] pct_info; pct_info = (PCTInfo *) 0; }
+   if(pct_info) { delete [] pct_info; pct_info = (PCTInfo *) nullptr; }
 
    return;
 }
@@ -2287,7 +2315,7 @@ void do_pct_cdp_thresh(const EnsembleStatVxOpt &vx_opt,
                        const PairDataEnsemble &pd_ens) {
    int i, i_thr, i_bin, i_obs, i_ens;
    int n_vld, n_evt, n_bin;
-   PCTInfo *pct_info = (PCTInfo *) 0;
+   PCTInfo *pct_info = (PCTInfo *) nullptr;
    PairDataPoint pd_pnt, pd;
    ThreshArray cdp_thresh;
 
@@ -2361,7 +2389,7 @@ void do_pct_cdp_thresh(const EnsembleStatVxOpt &vx_opt,
    write_pct_info(vx_opt, pct_info, n_bin, true);
 
    // Dealloate memory
-   if(pct_info) { delete [] pct_info; pct_info = (PCTInfo *) 0; }
+   if(pct_info) { delete [] pct_info; pct_info = (PCTInfo *) nullptr; }
 
    return;
 }
@@ -2456,11 +2484,11 @@ void write_orank_nc(PairDataEnsemble &pd, DataPlane &dp,
    int i, n;
 
    // Arrays for storing observation rank data
-   float *obs_v    = (float *) 0;
-   int   *obs_rank = (int *)   0;
-   float *obs_pit  = (float *) 0;
-   int   *ens_vld  = (int *)   0;
-   float *ens_mean = (float *) 0;
+   float *obs_v    = (float *) nullptr;
+   int   *obs_rank = (int *)   nullptr;
+   float *obs_pit  = (float *) nullptr;
+   int   *ens_vld  = (int *)   nullptr;
+   float *ens_mean = (float *) nullptr;
 
    // Allocate memory for storing ensemble data
    obs_v    = new float [nxy];
@@ -2529,11 +2557,11 @@ void write_orank_nc(PairDataEnsemble &pd, DataPlane &dp,
    }
 
    // Deallocate and clean up
-   if(obs_v)    { delete [] obs_v;    obs_v    = (float *) 0; }
-   if(obs_rank) { delete [] obs_rank; obs_rank = (int   *) 0; }
-   if(obs_pit)  { delete [] obs_pit;  obs_pit  = (float *) 0; }
-   if(ens_vld)  { delete [] ens_vld;  ens_vld  = (int   *) 0; }
-   if(ens_mean) { delete [] ens_mean; ens_mean = (float *) 0; }
+   if(obs_v)    { delete [] obs_v;    obs_v    = (float *) nullptr; }
+   if(obs_rank) { delete [] obs_rank; obs_rank = (int   *) nullptr; }
+   if(obs_pit)  { delete [] obs_pit;  obs_pit  = (float *) nullptr; }
+   if(ens_vld)  { delete [] ens_vld;  ens_vld  = (int   *) nullptr; }
+   if(ens_mean) { delete [] ens_mean; ens_mean = (float *) nullptr; }
 
    return;
 }

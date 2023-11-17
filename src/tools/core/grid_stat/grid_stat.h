@@ -113,6 +113,7 @@ static ConcatString obs_file;
 
 // Input Config file
 static ConcatString     config_file;
+static StringArray      config_files;
 static GridStatConfInfo conf_info;
 
 // Optional arguments
