@@ -101,6 +101,7 @@ else if ( is_ncpinterp_file (filename) ) data_type = FileType_NcPinterp;
 else if ( is_nccf_file      (filename) ) data_type = FileType_NcCF;
 else if ( is_ncmet_file     (filename) ) data_type = FileType_NcMet;
 else if ( is_bufr_file      (filename) ) data_type = FileType_Bufr;
+else if ( is_ugrid_file     (filename) ) data_type = FileType_UGrid;
 else                                     data_type = FileType_None;
 
    //
@@ -118,8 +119,8 @@ if ( suffix_type != FileType_None && suffix_type != data_type )  {
 }
 
 
-if ( suffix_type != FileType_None )  return ( suffix_type );
-else                                 return ( data_type   );
+if ( suffix_type != FileType_None )  return suffix_type;
+else                                 return data_type  ;
 
 }
 

@@ -143,6 +143,12 @@ int met_main(int argc, char * argv[]) {
       exit(1);
    }
 
+   if (FileType_UGrid == met_ptr->file_type()) {
+      mlog << Error << "\n" << program_name << " -> filetype "
+           << grdfiletype_to_string(met_ptr->file_type()) << " is not supported\n\n";
+      exit(1);
+   }
+
    var_ptr = v_factory.new_var_info(met_ptr->file_type());
 
    if(!var_ptr) {

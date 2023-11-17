@@ -296,6 +296,11 @@ void process_command_line(int argc, char **argv) {
    //
    cline.parse();
 
+   // Initialize
+   in_accum = 1;
+   out_accum = 0;
+   init_time = valid_time = (unixtime) 0;
+
    //
    // Process the specific command arguments.
    //

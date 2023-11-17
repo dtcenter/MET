@@ -14,7 +14,7 @@
 //
 // Models
 //
-model = [ "GFSI", "EMXI" ];
+model = [ "GFSO", "HWRF", "HMON" ];
 
 //
 // Description
@@ -96,10 +96,12 @@ interp12 = NONE;
 //
 consensus = [
    {
-      name     = "GFEX_CONS";
-      members  = [ "GFSI", "EMXI" ];
-      required = [];
-      min_req  = 2;
+      name          = "GFSO_HWRF_HMON_CONS";
+      members       = [ "GFSO", "HWRF", "HMON" ];
+      required      = [];
+      min_req       = 2;
+      diag_required = [ TRUE, FALSE, FALSE ];
+      diag_min_req  = 2;
       write_members = TRUE;
    }
 ];

@@ -169,17 +169,17 @@ void TCPairsConfInfo::process_config() {
 
    // Conf: InitInc
    sa = Conf.lookup_string_array(conf_key_init_inc);
-   for(i=0; i<sa.n_elements(); i++)
+   for(i=0; i<sa.n(); i++)
       InitInc.add(timestring_to_unix(sa[i].c_str()));
 
    // Conf: InitExc
    sa = Conf.lookup_string_array(conf_key_init_exc);
-   for(i=0; i<sa.n_elements(); i++)
+   for(i=0; i<sa.n(); i++)
       InitExc.add(timestring_to_unix(sa[i].c_str()));
 
    // Conf: InitHour
    sa = Conf.lookup_string_array(conf_key_init_hour);
-   for(i=0; i<sa.n_elements(); i++)
+   for(i=0; i<sa.n(); i++)
       InitHour.add(timestring_to_sec(sa[i].c_str()));
 
    // Conf: ValidBeg, ValidEnd
@@ -188,30 +188,29 @@ void TCPairsConfInfo::process_config() {
 
    // Conf: ValidInc
    sa = Conf.lookup_string_array(conf_key_valid_inc);
-   for(i=0; i<sa.n_elements(); i++)
+   for(i=0; i<sa.n(); i++)
       ValidInc.add(timestring_to_unix(sa[i].c_str()));
 
    // Conf: ValidExc
    sa = Conf.lookup_string_array(conf_key_valid_exc);
-   for(i=0; i<sa.n_elements(); i++)
+   for(i=0; i<sa.n(); i++)
       ValidExc.add(timestring_to_unix(sa[i].c_str()));
 
    // Conf: WriteValid
    sa = Conf.lookup_string_array(conf_key_write_valid);
-   for(i=0; i<sa.n_elements(); i++)
+   for(i=0; i<sa.n(); i++)
       WriteValid.add(timestring_to_unix(sa[i].c_str()));
 
    // Conf: LeadReq
    sa = Conf.lookup_string_array(conf_key_lead_req);
-   for(i=0; i<sa.n_elements(); i++){
+   for(i=0; i<sa.n(); i++){
       LeadReq.add(timestring_to_sec(sa[i].c_str()));
    }
 
    // Conf: InitMask
    if(nonempty(Conf.lookup_string(conf_key_init_mask).c_str())) {
       poly_file = replace_path(Conf.lookup_string(conf_key_init_mask));
-      mlog << Debug(2)
-           << "Init Points Masking File: " << poly_file << "\n";
+      mlog << Debug(2) << "Init Points Masking File: " << poly_file << "\n";
       parse_poly_mask(poly_file, InitPolyMask, InitGridMask,
                       InitAreaMask, InitMaskName);
    }
@@ -219,8 +218,7 @@ void TCPairsConfInfo::process_config() {
    // Conf: ValidMask
    if(nonempty(Conf.lookup_string(conf_key_valid_mask).c_str())) {
       poly_file = replace_path(Conf.lookup_string(conf_key_valid_mask));
-      mlog << Debug(2)
-           << "Valid Point Masking File: " << poly_file << "\n";
+      mlog << Debug(2) << "Valid Point Masking File: " << poly_file << "\n";
       parse_poly_mask(poly_file, ValidPolyMask, ValidGridMask,
                       ValidAreaMask, ValidMaskName);
    }
@@ -241,37 +239,71 @@ void TCPairsConfInfo::process_config() {
    // Loop over the consensus entries
    for(i=0; i<NConsensus; i++) {
 
-      // Conf: Consensus: name, members, required, min_req, write_members
-      Consensus[i].Name     = (*dict)[i]->dict_value()->lookup_string(conf_key_name);
-      Consensus[i].Members  = (*dict)[i]->dict_value()->lookup_string_array(conf_key_members);
-      Consensus[i].Required = (*dict)[i]->dict_value()->lookup_num_array(conf_key_required);
-      Consensus[i].MinReq   = (*dict)[i]->dict_value()->lookup_int(conf_key_min_req);
+      // Conf: Consensus: name, members, required (error if missing)
+      Consensus[i].Name         = (*dict)[i]->dict_value()->lookup_string(conf_key_name);
+      Consensus[i].Members      = (*dict)[i]->dict_value()->lookup_string_array(conf_key_members);
+      Consensus[i].ConsRequired = (*dict)[i]->dict_value()->lookup_bool_array(conf_key_required);
 
-      // If write_members is missing, print warning message rather than error
-      Consensus[i].WriteMembers = (*dict)[i]->dict_value()->lookup_bool(conf_key_write_members, false);
-      if(!(*dict)[i]->dict_value()->last_lookup_status()) {
-         mlog << Warning 
-              << "\nTCPairsConfInfo::process_config() -> "
-              << "\"consensus.write_members\" is missing. Using default value of true.\n\n";
-         Consensus[i].WriteMembers = true;
-      }
-
-      // If required is empty, default to 0
-      if(Consensus[i].Required.n_elements() == 0) {
-         for(j=0; j<Consensus[i].Members.n_elements(); j++) {
-            Consensus[i].Required.add(0);
+      // If ConsRequired is empty, default to false.
+      if(Consensus[i].ConsRequired.n() == 0) {
+         for(j=0; j<Consensus[i].Members.n(); j++) {
+            Consensus[i].ConsRequired.add(false);
          }
       }
-      else if(Consensus[i].Required.n_elements() !=
-              Consensus[i].Members.n_elements()) {
-         mlog << Error
-              << "\nTCPairsConfInfo::process_config() -> "
-              << "\"consensus.required\" must either be empty "
-              << "or the same length as \"consensus.members\".\n\n";
+      else if(Consensus[i].ConsRequired.n() !=
+              Consensus[i].Members.n()) {
+         mlog << Error << "\nTCPairsConfInfo::process_config() -> "
+              << "\"consensus." << conf_key_required
+              << "\" must either be empty or the same length as \"consensus."
+              << conf_key_members << "\".\n\n";
          exit(1);
       }
 
-      // If WriteMembers is false, save the Members to skip output for
+      // Conf: Consensus: min_req (error if missing)
+      Consensus[i].MinConsReq = (*dict)[i]->dict_value()->lookup_int(conf_key_min_req);
+
+      // Conf: Consensus: diag_required (warn if missing)
+      Consensus[i].DiagRequired = (*dict)[i]->dict_value()->lookup_bool_array(conf_key_diag_required, false);
+      if(!(*dict)[i]->dict_value()->last_lookup_status()) {
+         mlog << Warning << "\nTCPairsConfInfo::process_config() -> "
+              << "\"consensus." << conf_key_diag_required
+              << "\" is missing. Using default values of false.\n\n";
+      }
+
+      // If DiagRequired is empty, default to false.
+      if(Consensus[i].DiagRequired.n() == 0) {
+         for(j=0; j<Consensus[i].Members.n(); j++) {
+            Consensus[i].DiagRequired.add(false);
+         }
+      }
+      else if(Consensus[i].DiagRequired.n() !=
+              Consensus[i].Members.n()) {
+         mlog << Error << "\nTCPairsConfInfo::process_config() -> "
+              << "\"consensus." << conf_key_diag_required
+              << "\" must either be empty or the same length as \"consensus."
+              << conf_key_members << "\".\n\n";
+         exit(1);
+      }
+
+      // Conf: Consensus: min_diag_req (warn if missing)
+      Consensus[i].MinDiagReq = (*dict)[i]->dict_value()->lookup_int(conf_key_min_diag_req, false);
+      if(!(*dict)[i]->dict_value()->last_lookup_status()) {
+         mlog << Warning << "\nTCPairsConfInfo::process_config() -> "
+              << "\"consensus." << conf_key_min_diag_req
+              << "\" is missing. Using default value of 0.\n\n";
+         Consensus[i].MinDiagReq = 0;
+      }
+
+      // Conf: Consensus: write_members (warn if missing)
+      Consensus[i].WriteMembers = (*dict)[i]->dict_value()->lookup_bool(conf_key_write_members, false);
+      if(!(*dict)[i]->dict_value()->last_lookup_status()) {
+         mlog << Warning << "\nTCPairsConfInfo::process_config() -> "
+              << "\"consensus." << conf_key_write_members
+              << "\" is missing. Using default value of true.\n\n";
+         Consensus[i].WriteMembers = true;
+      }
+
+      // If WriteMembers is false, add the Members to the skip output list
       if(!Consensus[i].WriteMembers) {
          SkipConsensusMembers.add(Consensus[i].Members);
       }
@@ -279,8 +311,9 @@ void TCPairsConfInfo::process_config() {
 
    // Conf: LagTime
    sa = Conf.lookup_string_array(conf_key_lag_time);
-   for(i=0; i<sa.n_elements(); i++)
+   for(i=0; i<sa.n(); i++) {
       LagTime.add(timestring_to_sec(sa[i].c_str()));
+   }
 
    // Conf: BestTechnique
    BestTechnique = Conf.lookup_string_array(conf_key_best_technique);
@@ -290,11 +323,11 @@ void TCPairsConfInfo::process_config() {
    BestBaseline = Conf.lookup_string_array(conf_key_best_baseline);
 
    if(BestTechnique.n() > 1 && BestBaseline.n() > 0) {
-      mlog << Warning
-           << "\nTCPairsConfInfo::process_config() -> "
-           << "deriving \"best_baseline\" models from multiple "
-           << "\"best_technique\" models may cause the baseline "
-           << "technique names to be used multiple times.\n\n";
+      mlog << Warning << "\nTCPairsConfInfo::process_config() -> "
+           << "deriving \"" << conf_key_best_baseline
+           << "\" models from multiple \"" << conf_key_best_technique
+           << "\" models may cause the baseline technique names "
+           << "to be used multiple times.\n\n";
    }
 
    // Conf: OperTechnique
@@ -305,11 +338,11 @@ void TCPairsConfInfo::process_config() {
    OperBaseline = Conf.lookup_string_array(conf_key_oper_baseline);
 
    if(OperTechnique.n() > 1 && OperBaseline.n() > 0) {
-      mlog << Warning
-           << "\nTCPairsConfInfo::process_config() -> "
-           << "deriving \"oper_baseline\" models from multiple "
-           << "\"oper_technique\" models may cause the baseline "
-           << "technique names to be used multiple times.\n\n";
+      mlog << Warning << "\nTCPairsConfInfo::process_config() -> "
+           << "deriving \"" << conf_key_oper_baseline
+           << "\" models from multiple \"" << conf_key_oper_technique
+           << "\" models may cause the baseline technique names "
+           << "ßto be used multiple times.\n\n";
    }
 
    // Conf: AnlyTrack

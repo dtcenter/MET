@@ -39,6 +39,7 @@
 #include "vx_plot_util.h"
 
 #include "mode_ps_file.h"
+#include "mode_data_type.h"
 #include "multivar_data.h"
 
 ////////////////////////////////////////////////////////////////////////
@@ -71,13 +72,19 @@ class ModeExecutive {
 
  public:
 
-   ModeExecutive();
+   // the various mode algorithm settings
+   typedef enum {TRADITIONAL, MULTIVAR_SIMPLE, MULTIVAR_SIMPLE_MERGE, MULTIVAR_INTENSITY, MULTIVAR_SUPER} Processing_t;
+
+   ModeExecutive(Processing_t p=TRADITIONAL);
    ~ModeExecutive();
 
    void clear();
 
-   void init(int n_files, bool isMultivar);
-   void init_multivar(GrdFileType ftype, GrdFileType otype);
+   void init_traditional(int n_files);
+   void init_multivar_verif_grid();
+   void init_multivar_simple(int n_files, ModeDataType dtype);
+   void init_multivar_intensities(GrdFileType ftype, GrdFileType otype);
+   void check_multivar_perc_thresh_settings();
 
 
    int n_conv_radii   () const;
@@ -86,7 +93,7 @@ class ModeExecutive {
    int n_runs() const;
 
    int R_index;   //  indices into the convolution radius and threshold arrays
-   int T_index;   //    for the current run
+   int T_index;   //  for the current run
 
    //
    // Input configuration files
@@ -108,7 +115,10 @@ class ModeExecutive {
    TTContingencyTable cts[n_cts];
 
    ModeFuzzyEngine engine;
+
+   // verification grid
    Grid grid;
+
    Box xy_bb;
    ConcatString out_dir;
    double data_min, data_max;
@@ -122,23 +132,26 @@ class ModeExecutive {
    bool isMultivarOutput;
    bool isMultivarSuperOutput;
    
+   Processing_t ptype;
+   
    void clear_internal_r_index();
-   void setup_fcst_obs_data();
-   void setup_fcst_obs_data(const MultiVarData &mvd);
-   void setup_fcst_obs_data(ShapeData &f_super, ShapeData &o_super,
-                            const Grid &igrid);
-   void do_conv_thresh(const int r_index, const int t_index, 
-                       bool isMultivarPass1Merge=false,
-                       bool isMultivarPass2=false,
-                       bool isMultivarSuper=false);
+   void setup_verification_grid();
+   void setup_fcst_obs_data_traditional();
+   void setup_fcst_data(const Grid &verification_grid);
+   void setup_obs_data(const Grid &verification_grid);
+   void setup_fcst_obs_data_multivar_intensities(const MultiVarData &mvdf, const MultiVarData &mvdo);
+   void setup_fcst_obs_data_multivar_super(ShapeData &f_super, ShapeData &o_super, const Grid &igrid);
+   void do_conv_thresh(const int r_index, const int t_index);
    void do_merging();
-   void do_merging(ShapeData &f_merge, ShapeData &o_merge,bool isMultivarSuper=false);
+   void do_merging(ShapeData &f_merge, ShapeData &o_merge);
    void do_match_merge();
-   void do_match_merge(ShapeData &f_merge, ShapeData &o_merge, bool isMultivarSuper=false);
+   void do_match_merge(ShapeData &f_merge, ShapeData &o_merge);
 
    void process_masks(ShapeData &, ShapeData &);
-   void process_output(bool isMultivar=false, bool isMultivarSuper=false,
-                       const MultiVarData *mvd=NULL);
+   void process_fcst_masks(ShapeData &);
+   void process_obs_masks(ShapeData &);
+   void process_output(const MultiVarData *mvdf=NULL,
+                       const MultiVarData *mvdo=NULL);
 
    void set_raw_to_full(float *fcst_raw_data,
                         float *obs_raw_data,
@@ -147,8 +160,8 @@ class ModeExecutive {
       
   
    // owned by caller
-   MultiVarData *get_multivar_data();
-   void addMultivarMergePass1(MultiVarData *mvdi);
+   MultiVarData *get_multivar_data(ModeDataType dtype);
+   void add_multivar_merge_data(MultiVarData *mvdi, ModeDataType dtype);
 
    void plot_engine();
 
@@ -164,6 +177,9 @@ class ModeExecutive {
    void write_poly_netcdf(netCDF::NcFile *);
    void write_poly_netcdf(netCDF::NcFile *, const ObjPolyType);
    void write_ct_stats();
+
+   void conf_read(const string &default_config_filename);
+   static string stype(Processing_t t);
 
 };
 

@@ -190,6 +190,8 @@ void ModeFuzzyEngine::init_from_scratch() {
 
    clear_features();
 
+   data_type = ModeDataType_Traditional;
+ 
    return;
 }
 
@@ -245,21 +247,26 @@ void ModeFuzzyEngine::clear_colors() {
 void ModeFuzzyEngine::set(const ShapeData &fcst_wd, const ShapeData &obs_wd)
 
 {
+   if (data_type == ModeDataType_MvMode_Fcst) {
+      set_fcst(fcst_wd);
+   } else if (data_type == ModeDataType_MvMode_Obs) {
+      set_obs(obs_wd);
+   } else {
+      ConcatString path;
 
-   ConcatString path;
+      clear_features();
+      clear_colors();
+      ctable.clear();
 
-   clear_features();
-   clear_colors();
-   ctable.clear();
+      collection.clear();
 
-   collection.clear();
+      set_fcst(fcst_wd);
+      set_obs(obs_wd);
 
-   set_fcst(fcst_wd);
-   set_obs(obs_wd);
+      path = replace_path(conf_info.object_pi.color_table.c_str());
 
-   path = replace_path(conf_info.object_pi.color_table.c_str());
-
-   ctable.read(path.c_str());
+      ctable.read(path.c_str());
+   }
 
    return;
 
@@ -271,21 +278,26 @@ void ModeFuzzyEngine::set(const ShapeData &fcst_wd, const ShapeData &obs_wd)
 void ModeFuzzyEngine::set_no_conv(const ShapeData &fcst_wd, const ShapeData &obs_wd)
 
 {
+   if (data_type == ModeDataType_MvMode_Fcst) {
+      set_fcst_no_conv(fcst_wd);
+   } else if (data_type == ModeDataType_MvMode_Obs) {
+      set_obs_no_conv  ( obs_wd);
+   } else {      
+      ConcatString path;
 
-   ConcatString path;
+      clear_features();
+      clear_colors();
+      ctable.clear();
 
-   clear_features();
-   clear_colors();
-   ctable.clear();
+      collection.clear();
 
-   collection.clear();
+      set_fcst_no_conv (fcst_wd);
+      set_obs_no_conv  ( obs_wd);
 
-   set_fcst_no_conv (fcst_wd);
-   set_obs_no_conv  ( obs_wd);
+      path = replace_path(conf_info.object_pi.color_table.c_str());
 
-   path = replace_path(conf_info.object_pi.color_table.c_str());
-
-   ctable.read(path.c_str());
+      ctable.read(path.c_str());
+   }
 
    return;
 
@@ -297,21 +309,27 @@ void ModeFuzzyEngine::set_only_split(const ShapeData &fcst_wd, const ShapeData &
 
 {
 
-   ConcatString path;
+   if (data_type == ModeDataType_MvMode_Fcst) {
+      set_fcst_only_split (fcst_wd);
+   } else if (data_type == ModeDataType_MvMode_Obs) {
+      set_obs_only_split  ( obs_wd);
+   } else {
+      ConcatString path;
 
-   clear_features();
-   clear_colors();
-   ctable.clear();
+      clear_features();
+      clear_colors();
+      ctable.clear();
 
-   collection.clear();
+      collection.clear();
 
-   set_fcst_only_split (fcst_wd);
-   set_obs_only_split  ( obs_wd);
+      set_fcst_only_split (fcst_wd);
+      set_obs_only_split  ( obs_wd);
 
-   path = replace_path(conf_info.object_pi.color_table.c_str());
+      path = replace_path(conf_info.object_pi.color_table.c_str());
 
-   ctable.read(path.c_str());
-
+      ctable.read(path.c_str());
+   }
+   
    return;
 
 }
@@ -1579,7 +1597,7 @@ void ModeFuzzyEngine::do_fcst_merge_thresh(const ShapeData &merge_data) {
 ///////////////////////////////////////////////////////////////////////
 
 void ModeFuzzyEngine::do_obs_merge_thresh(const ShapeData &merge_data) {
-   const char *method_name = "ModeFuzzyEngine::do_fcst_merge_thresh() -> ";
+   const char *method_name = "ModeFuzzyEngine::do_obs_merge_thresh() -> ";
    int j, mid, oid;
    int n_obs_merge;
    ShapeData obs_merge_split;
@@ -1643,7 +1661,6 @@ void ModeFuzzyEngine::do_obs_merge_thresh(const ShapeData &merge_data) {
    // Calculate the composite object sets
    //
    for(mid=1; mid<=n_obs_merge; mid++) {
-
       // Ignore merge objects containing a single simple object
       if(mrg_to_obj_map[mid].size() <= 1) continue;
 
@@ -2478,6 +2495,14 @@ void ModeFuzzyEngine::do_cluster_features() {
    //
 
    return;
+}
+
+///////////////////////////////////////////////////////////////////////
+
+void ModeFuzzyEngine::set_data_type(ModeDataType type)
+{
+   data_type = type;
+   conf_info.set_data_type(type);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -3939,7 +3964,7 @@ void calc_fcst_clus_ch_mask(const ModeFuzzyEngine &eng, ShapeData &mask) {
    Box bb;
 
    if(eng.need_fcst_clus_split) {
-      mlog << Error << "\ncalc_fcst_clus_ch_mask -> "
+      mlog << Error << "\ncalc_fcst_clus_ch_mask() -> "
            << "should not be called with need_fcst_clus_split set to true\n\n";
 
       exit(1);
@@ -4002,7 +4027,7 @@ void calc_obs_clus_ch_mask(const ModeFuzzyEngine &eng, ShapeData &mask) {
    Box bb;
 
    if(eng.need_obs_clus_split) {
-      mlog << Error << "\ncalc_obs_clus_ch_mask -> "
+      mlog << Error << "\ncalc_obs_clus_ch_mask() -> "
            << "should not be called with need_obs_clus_split set to true\n\n";
       exit(1);
    }

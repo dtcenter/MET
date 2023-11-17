@@ -48,6 +48,60 @@ if (test -n "$MET_PROJLIB"); then
 fi
 
 #
+# Look for the Atlas library.
+#
+
+# Configure the variables. The help text will appear if the user uses "configure --help".
+
+AC_ARG_VAR([MET_ATLAS], [Where Atlas lib and include subdirectories are located. If they are installed in /usr/local, you don't have to specify them.])
+AC_ARG_VAR([MET_ATLASINC], [Where Atlas include files are located. Use if the libraries and include files are not under the same main Atlas directory. If used, MET_ATLASLIB must also be defined and MET_ATLAS will be ignored.])
+AC_ARG_VAR([MET_ATLASLIB], [Where Atlas libraries are located. Use if the libraries and include files are not under the same main Atlas directory. If used, MET_ATLASINC must also be defined and MET_ATLAS will be ignored.])
+
+# Ensure that both or neither are specified.
+
+if (test -n "$MET_ATLASLIB" && test -z "$MET_ATLASINC"); then
+  AC_MSG_ERROR([MET_ATLASLIB environment variable set, but MET_ATLASINC not set. If one of these variables is set, then both must be set.])
+elif (test -n "$MET_ATLASINC" && test -z "$MET_ATLASLIB"); then
+  AC_MSG_ERROR([MET_ATLASINC environment variable set, but MET_ATLASLIB not set. If one of these variables is set, then both must be set.])
+fi
+
+# Use the main Atlas directory if individual locations were not specified.
+
+if (test -n "$MET_ATLAS" && test -z "$MET_ATLASLIB"); then
+  MET_ATLASINC='${MET_ATLAS}/include'
+  MET_ATLASLIB='${MET_ATLAS}/lib'
+fi
+
+# AC_SUBST command line variables.
+
+#
+# Look for the Eckit library.
+#
+
+# Configure the variables. The help text will appear if the user uses "configure --help".
+
+AC_ARG_VAR([MET_ECKIT], [Where eckit lib and include subdirectories are located. If they are installed in /usr/local, you don't have to specify them.])
+AC_ARG_VAR([MET_ECKITINC], [Where eckit include files are located. Use if the libraries and include files are not under the same main eckit directory. If used, MET_ECKITLIB must also be defined and MET_ECKIT will be ignored.])
+AC_ARG_VAR([MET_ECKITLIB], [Where eckit libraries are located. Use if the libraries and include files are not under the same main eckit directory. If used, MET_ECKITINC must also be defined and MET_ECKIT will be ignored.])
+
+# Ensure that both or neither are specified.
+
+if (test -n "$MET_ECKITLIB" && test -z "$MET_ECKITINC"); then
+  AC_MSG_ERROR([MET_ECKITLIB environment variable set, but MET_ECKITINC not set. If one of these variables is set, then both must be set.])
+elif (test -n "$MET_ECKITINC" && test -z "$MET_ECKITLIB"); then
+  AC_MSG_ERROR([MET_ECKITINC environment variable set, but MET_ECKITLIB not set. If one of these variables is set, then both must be set.])
+fi
+
+# Use the main Eckit directory if individual locations were not specified.
+
+if (test -n "$MET_ECKIT" && test -z "$MET_ECKITLIB"); then
+  MET_ECKITINC='${MET_ECKIT}/include'
+  MET_ECKITLIB='${MET_ECKIT}/lib'
+fi
+
+# AC_SUBST command line variables.
+
+#
 # Look for the NetCDF library.
 #
 
@@ -1000,15 +1054,19 @@ if test "x$ENABLE_GRIB2" = "xyes"; then
     AC_SUBST([GRIB2CLIB_NAME])
   AC_MSG_NOTICE([GRIB2CLIB_NAME will be set])
     if test -z "$GRIB2CLIB_NAME"; then
-       GRIB2_LIBS="-lvx_data2d_grib2 -lgrib2c -ljasper -lpng -lz"
+       GRIB2_MET_LIBS="-lvx_data2d_grib2"
+       GRIB2_DEP_LIBS="-lgrib2c -ljasper -lpng -lz"
     else
-       GRIB2_LIBS="-lvx_data2d_grib2 ${GRIB2CLIB_NAME} -ljasper -lpng -lz"
+       GRIB2_MET_LIBS="-lvx_data2d_grib2"
+       GRIB2_DEP_LIBS="${GRIB2CLIB_NAME} -ljasper -lpng -lz"
     fi
 else
   AC_MSG_NOTICE([GRIB2 utilities will not be compiled])
-    GRIB2_LIBS=
+    GRIB2_MET_LIBS=
+    GRIB2_DEP_LIBS=
 fi
-AC_SUBST([GRIB2_LIBS])
+AC_SUBST([GRIB2_MET_LIBS])
+AC_SUBST([GRIB2_DEP_LIBS])
 
 # Python
 
@@ -1027,12 +1085,43 @@ if test "x$ENABLE_PYTHON" = "xyes"; then
   AC_DEFINE([ENABLE_PYTHON], [], ["build python embedding"])
   AC_MSG_NOTICE([python embedding will be compiled])
   CPPFLAGS="${CPPFLAGS} -DWITH_PYTHON"
-  PYTHON_LIBS="-lvx_data2d_python -lvx_pointdata_python -lvx_python3_utils ${MET_PYTHON_LD}"
+  PYTHON_MET_LIBS="-lvx_data2d_python -lvx_pointdata_python -lvx_python3_utils"
+  PYTHON_DEP_LIBS="${MET_PYTHON_LD}"
 else
   AC_MSG_NOTICE([python embedding will not be compiled])
-  PYTHON_LIBS=
+  PYTHON_MET_LIBS=
+  PYTHON_DEP_LIBS=
 fi
-AC_SUBST([PYTHON_LIBS])
+AC_SUBST([PYTHON_MET_LIBS])
+AC_SUBST([PYTHON_DEP_LIBS])
+
+# Unstructure grid with ECMF libraries (Atlas/ecKit)
+
+AC_ARG_ENABLE(ugrid,
+	  [AS_HELP_STRING([--enable-ugrid], [Enable unstructured grid with Atlas and eckit libraries])],
+  [case "${enableval}" in
+     yes | no ) ENABLE_UGRID="${enableval}" ;;
+     *) AC_MSG_ERROR(bad value ${enableval} for --enable-ugrid) ;;
+   esac],
+  [ENABLE_UGRID="no"]
+)
+
+AM_CONDITIONAL([ENABLE_UGRID], [test "x$ENABLE_UGRID" = "xyes"])
+
+if test "x$ENABLE_UGRID" = "xyes"; then
+  AC_DEFINE([ENABLE_UGRID], [], ["build unstructured grid with Atlas and eckit libraries"])
+  AC_MSG_NOTICE([unstructured grid will be compiled])
+  CPPFLAGS="${CPPFLAGS} -I${MET_ATLASINC} -I${MET_ECKITINC} -DWITH_UGRID"
+  LDFLAGS="${LDFLAGS} -L${MET_ATLASLIB} -L${MET_ECKITLIB} -Wl,-rpath,${MET_ATLASLIB}:${MET_ECKITLIB}"
+  UGRID_MET_LIBS="-lvx_data2d_ugrid"
+  UGRID_DEP_LIBS="-latlas -leckit -leckit_mpi -leckit_geometry"
+else
+  AC_MSG_NOTICE([unstructured grid will not be compiled])
+  UGRID_MET_LIBS=
+  UGRID_DEP_LIBS=
+fi
+AC_SUBST([UGRID_MET_LIBS])
+AC_SUBST([UGRID_DEP_LIBS])
 
 ########################################################################
 
@@ -1170,6 +1259,10 @@ AC_CONFIG_FILES([Makefile
                  scripts/python/pyembed/Makefile
                  scripts/python/utility/Makefile
                  scripts/python/tc_diag/Makefile
+                 scripts/python/tc_diag/atcf_tools/Makefile
+                 scripts/python/tc_diag/config/Makefile
+                 scripts/python/tc_diag/diag_lib/Makefile
+                 scripts/python/tc_diag/tc_diag_driver/Makefile
                  data/Makefile
                  data/climo/Makefile
                  data/climo/seeps/Makefile
@@ -1204,6 +1297,7 @@ AC_CONFIG_FILES([Makefile
                  src/libcode/vx_data2d_nc_met/Makefile
                  src/libcode/vx_data2d_nc_pinterp/Makefile
                  src/libcode/vx_data2d_nccf/Makefile
+                 src/libcode/vx_data2d_ugrid/Makefile
                  src/libcode/vx_geodesy/Makefile
                  src/libcode/vx_gis/Makefile
                  src/libcode/vx_gnomon/Makefile

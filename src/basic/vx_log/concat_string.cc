@@ -567,7 +567,8 @@ void ConcatString::replace(const char * target, const char * replacement,
 
    if (::is_empty(target) || ::is_empty(replacement) ) {
       mlog << Error << "\nConcatString::replace(const char * target, const char * replacement, bool check_env) -> "
-           << "target and/or replacement string is empty\n\n";
+           << "target (" << target << ") and/or replacement ("
+           << replacement << ") string is empty\n\n";
       exit ( 1 );
    }
 

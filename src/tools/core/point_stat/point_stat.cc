@@ -106,8 +106,6 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <cstdio>
 #include <cstdlib>
 #include <ctype.h>
@@ -119,7 +117,6 @@ using namespace std;
 #include <unistd.h>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "main.h"
 #include "point_stat.h"
@@ -133,13 +130,19 @@ using namespace netCDF;
 #include "nc_obs_util.h"
 #include "nc_point_obs_in.h"
 
+#ifdef WITH_UGRID
+#include "vx_data2d_ugrid.h"
+#endif
+
 #ifdef WITH_PYTHON
 #include "data2d_nc_met.h"
 #include "pointdata_python.h"
 #endif
 
-////////////////////////////////////////////////////////////////////////
+using namespace std;
+using namespace netCDF;
 
+////////////////////////////////////////////////////////////////////////
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -172,6 +175,7 @@ static void finish_txt_files();
 static void clean_up();
 
 static void usage();
+static void set_config(const StringArray &);
 static void set_point_obs(const StringArray &);
 static void set_ncfile(const StringArray &);
 static void set_obs_valid_beg_time(const StringArray &);
@@ -206,7 +210,7 @@ int met_main(int argc, char *argv[]) {
    // Close the text files and deallocate memory
    clean_up();
 
-   return(0);
+   return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -218,10 +222,11 @@ const string get_tool_name() {
 ////////////////////////////////////////////////////////////////////////
 
 void process_command_line(int argc, char **argv) {
-   CommandLine cline;
    int i;
+   CommandLine cline;
    GrdFileType ftype;
    ConcatString default_config_file;
+   const char *method_name = "process_command_line() -> ";
 
    out_dir = ".";
 
@@ -235,6 +240,7 @@ void process_command_line(int argc, char **argv) {
    cline.set_usage(usage);
 
    // Add the options function calls
+   cline.add(set_config,             "-config",        1);
    cline.add(set_point_obs,          "-point_obs",     1);
    cline.add(set_ncfile,             "-ncfile",        1);
    cline.add(set_obs_valid_beg_time, "-obs_valid_beg", 1);
@@ -253,7 +259,7 @@ void process_command_line(int argc, char **argv) {
       obs_valid_end_ut != (unixtime) 0 &&
       obs_valid_beg_ut > obs_valid_end_ut) {
 
-      mlog << Error << "\nprocess_command_line() -> "
+      mlog << Error << "\n" << method_name
            << "the ending time ("
            << unix_to_yyyymmdd_hhmmss(obs_valid_end_ut)
            << ") must be greater than the beginning time ("
@@ -277,14 +283,15 @@ void process_command_line(int argc, char **argv) {
 
    // Read the config files
    conf_info.read_config(default_config_file.c_str(), config_file.c_str());
+   conf_info.read_configs(config_files);
 
    // Get the forecast file type from config, if present
    ftype = parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_fcst));
 
    // Read forecast file
    if(!(fcst_mtddf = mtddf_factory.new_met_2d_data_file(fcst_file.c_str(), ftype))) {
-      mlog << Error << "\nTrouble reading forecast file \""
-           << fcst_file << "\"\n\n";
+      mlog << Error << "\n" << method_name << "Trouble reading forecast file \""
+           << fcst_file << "\". Override the FileType with \"file_type = FileType_<type>;\"\n\n";
       exit(1);
    }
 
@@ -296,6 +303,35 @@ void process_command_line(int argc, char **argv) {
 
    // Set the model name
    shc.set_model(conf_info.model.c_str());
+
+   if (FileType_UGrid == ftype) {
+#ifdef WITH_UGRID
+      ConcatString ugrid_dataset = conf_info.ugrid_dataset;
+      if (0 < ugrid_dataset.length()) {
+         double max_distance_km = conf_info.ugrid_max_distance_km;
+         ConcatString ugrid_nc = conf_info.ugrid_nc;
+         ConcatString ugrid_map_config_filename = conf_info.ugrid_map_config;
+         MetUGridDataFile *ugrid_mtddf = (MetUGridDataFile *)fcst_mtddf;
+
+         ugrid_mtddf->set_ugrid_configs(ugrid_dataset, max_distance_km,
+                                        ugrid_map_config_filename);
+         if (0 == ugrid_nc.length() || ugrid_nc == "NA") {
+            ConcatString coordinate_file = ugrid_mtddf->coordinate_file();
+            ugrid_nc = (0 < coordinate_file.length()) ? coordinate_file : fcst_file;
+         }
+         ugrid_mtddf->open_metadata(ugrid_nc.c_str());
+         mlog << Debug(9) << method_name
+              << "ugrid_coordinate_nc: " << ugrid_nc
+              << "  ugrid_max_distance_km: " << conf_info.ugrid_max_distance_km << "\n";
+      }
+      else {
+         mlog << Error << "\n" << method_name
+              << conf_key_ugrid_dataset << " is not defined at the configuration file.\n\n";
+      }
+#else
+      ugrid_compile_error(method_name);
+#endif
+   }
 
    // Use the first verification task to set the random number generator
    // and seed value for bootstrap confidence intervals
@@ -345,7 +381,7 @@ void setup_first_pass(const DataPlane &dp, const Grid &data_grid) {
 ////////////////////////////////////////////////////////////////////////
 
 void setup_txt_files() {
-   int i, j;
+   int j;
    int max_col, max_prob_col, max_mctc_col, max_orank_col;
    int n_prob, n_cat, n_eclv, n_ens;
    ConcatString base_name;
@@ -404,7 +440,7 @@ void setup_txt_files() {
    /////////////////////////////////////////////////////////////////////
 
    // Loop through output file type
-   for(i=0; i<n_txt; i++) {
+   for(int i=0; i<n_txt; i++) {
 
       // Only set it up if requested in the config file
       if(conf_info.output_flag[i] == STATOutputType_Both) {
@@ -556,19 +592,18 @@ void build_outfile_name(unixtime valid_ut, int lead_sec,
 ////////////////////////////////////////////////////////////////////////
 
 void process_fcst_climo_files() {
-   int i, j;
+   int j;
    int n_fcst;
    DataPlaneArray fcst_dpa, cmn_dpa, csd_dpa;
    unixtime file_ut, beg_ut, end_ut;
 
    // Loop through each of the fields to be verified and extract
    // the forecast and climatological fields for verification
-   for(i=0; i<conf_info.get_n_vx(); i++) {
+   for(int i=0; i<conf_info.get_n_vx(); i++) {
 
       // Read the gridded data from the input forecast file
       n_fcst = fcst_mtddf->data_plane_array(
                   *conf_info.vx_opt[i].vx_pd.fcst_info, fcst_dpa);
-
       mlog << Debug(2)
            << "\n" << sep_str << "\n\n"
            << "Reading data for "
@@ -676,7 +711,7 @@ void process_obs_file(int i_nc) {
    ConcatString hdr_vld_str;
    ConcatString obs_qty_str;
    unixtime hdr_ut;
-   NcFile *obs_in = (NcFile *) 0;
+   NcFile *obs_in = (NcFile *) nullptr;
    const char *method_name = "process_obs_file() -> ";
 
    // Set flags for vectors
@@ -691,7 +726,7 @@ void process_obs_file(int i_nc) {
    bool use_arr_vars = false;
    bool use_python = false;
    MetNcPointObsIn nc_point_obs;
-   MetPointData *met_point_obs = 0;
+   MetPointData *met_point_obs = nullptr;
 
    // Check for python format
    string python_command = obs_file[i_nc];
@@ -777,7 +812,7 @@ void process_obs_file(int i_nc) {
 #endif
          status = nc_point_obs.read_obs_data(block_size, i_block_start_idx,
                                             (float *)obs_arr_block,
-                                            obs_qty_idx_block, (char *)0);
+                                            obs_qty_idx_block, (char *)nullptr);
       if (!status) exit(1);
 
       int hdr_idx;
@@ -897,10 +932,10 @@ void process_scores() {
    ConcatString cs;
 
    // Initialize pointers
-   PairDataPoint *pd_ptr     = (PairDataPoint *) 0;
-   CTSInfo       *cts_info   = (CTSInfo *)       0;
+   PairDataPoint *pd_ptr     = (PairDataPoint *) nullptr;
+   CTSInfo       *cts_info   = (CTSInfo *)       nullptr;
    MCTSInfo       mcts_info;
-   VL1L2Info     *vl1l2_info = (VL1L2Info *)     0;
+   VL1L2Info     *vl1l2_info = (VL1L2Info *)     nullptr;
 
    mlog << Debug(2)
         << "\n" << sep_str << "\n\n";
@@ -1293,8 +1328,8 @@ void process_scores() {
    } // end for i
 
    // Deallocate memory
-   if(cts_info)   { delete [] cts_info;   cts_info   = (CTSInfo *)   0; }
-   if(vl1l2_info) { delete [] vl1l2_info; vl1l2_info = (VL1L2Info *) 0; }
+   if(cts_info)   { delete [] cts_info;   cts_info   = (CTSInfo *)   nullptr; }
+   if(vl1l2_info) { delete [] vl1l2_info; vl1l2_info = (VL1L2Info *) nullptr; }
 
    return;
 }
@@ -1408,8 +1443,8 @@ void do_mcts(MCTSInfo &mcts_info, int i_vx, const PairDataPoint *pd_ptr) {
 void do_cnt_sl1l2(const PointStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
    int i, j, k, n_bin;
    PairDataPoint pd_thr, pd;
-   SL1L2Info *sl1l2_info = (SL1L2Info *) 0;
-   CNTInfo   *cnt_info   = (CNTInfo *)   0;
+   SL1L2Info *sl1l2_info = (SL1L2Info *) nullptr;
+   CNTInfo   *cnt_info   = (CNTInfo *)   nullptr;
 
    mlog << Debug(2)
         << "Computing Scalar Partial Sums and Continuous Statistics.\n";
@@ -1586,8 +1621,8 @@ void do_cnt_sl1l2(const PointStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
    } // end for i (fcnt_ta)
 
    // Dealloate memory
-   if(sl1l2_info) { delete [] sl1l2_info; sl1l2_info = (SL1L2Info *) 0; }
-   if(cnt_info)   { delete [] cnt_info;   cnt_info   = (CNTInfo *)   0;  }
+   if(sl1l2_info) { delete [] sl1l2_info; sl1l2_info = (SL1L2Info *) nullptr; }
+   if(cnt_info)   { delete [] cnt_info;   cnt_info   = (CNTInfo *)   nullptr;  }
 
    return;
 }
@@ -1642,7 +1677,7 @@ void do_vl1l2(VL1L2Info *&v_info, int i_vx,
 void do_pct(const PointStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
    int i, j, k, n_bin;
    PairDataPoint pd;
-   PCTInfo *pct_info = (PCTInfo *) 0;
+   PCTInfo *pct_info = (PCTInfo *) nullptr;
 
    mlog << Debug(2)
         << "Computing Probabilistic Statistics.\n";
@@ -1752,7 +1787,7 @@ void do_pct(const PointStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
    } // end for i (ocnt_ta)
 
    // Dealloate memory
-   if(pct_info) { delete [] pct_info; pct_info = (PCTInfo *) 0; }
+   if(pct_info) { delete [] pct_info; pct_info = (PCTInfo *) nullptr; }
 
    return;
 }
@@ -1843,7 +1878,7 @@ void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
 
       // Check for zero matched pairs
       if(hira_pd.o_na.n() == 0) {
-         if(gt) { delete gt; gt = 0; }
+         if(gt) { delete gt; gt = nullptr; }
          continue;
       }
 
@@ -1910,7 +1945,7 @@ void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
                  << "\"" << conf_key_prob_cat_thresh << "\" thresholds are "
                  << "defined in the \"" << conf_key_hira
                  << "\" dictionary.\n";
-            if(gt) { delete gt; gt = 0; }
+            if(gt) { delete gt; gt = nullptr; }
             break;
          }
 
@@ -1923,7 +1958,7 @@ void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
                        txt_at[i_rps], i_txt_row[i_rps]);
       } // end if RPS
 
-      if(gt) { delete gt; gt = 0; }
+      if(gt) { delete gt; gt = nullptr; }
 
    } // end for i
 
@@ -2142,7 +2177,7 @@ void clean_up() {
    finish_txt_files();
 
    // Deallocate memory for data files
-   if(fcst_mtddf) { delete fcst_mtddf; fcst_mtddf = (Met2dDataFile *) 0; }
+   if(fcst_mtddf) { delete fcst_mtddf; fcst_mtddf = (Met2dDataFile *) nullptr; }
 
    // Deallocate memory for the random number generator
    rng_free(rng_ptr);
@@ -2161,6 +2196,7 @@ void usage() {
         << "\tfcst_file\n"
         << "\tobs_file\n"
         << "\tconfig_file\n"
+        << "\t[-config config_file]\n"
         << "\t[-point_obs file]\n"
         << "\t[-obs_valid_beg time]\n"
         << "\t[-obs_valid_end time]\n"
@@ -2176,6 +2212,9 @@ void usage() {
 
         << "\t\t\"config_file\" is a PointStatConfig file containing "
         << "the desired configuration settings (required).\n"
+
+        << "\t\t\"-config config_file\" specifies additional PointStatConfig file containing "
+        << "the configuration settings for unstructured grid (optional).\n"
 
         << "\t\t\"-point_obs file\" specifies additional NetCDF point "
         << "observation files to be used (optional).\n"
@@ -2196,6 +2235,13 @@ void usage() {
         << mlog.verbosity_level() << ") (optional).\n\n" << flush;
 
    exit (1);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_config(const StringArray & a)
+{
+   config_files.add(a[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2234,3 +2280,4 @@ void set_outdir(const StringArray & a)
 }
 
 ////////////////////////////////////////////////////////////////////////
+

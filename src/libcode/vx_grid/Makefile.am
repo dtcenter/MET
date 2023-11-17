@@ -35,4 +35,10 @@ libvx_grid_a_SOURCES = \
               semilatlon_grid_defs.h \
               semilatlon_grid.cc semilatlon_grid.h \
               vx_grid.h
+
+if ENABLE_UGRID
+  libvx_grid_a_SOURCES += unstructured_grid.cc unstructured_grid.h unstructured_grid_defs.h
+endif
+
+
 libvx_grid_a_CPPFLAGS = ${MET_CPPFLAGS}

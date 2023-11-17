@@ -12,6 +12,7 @@
 
 
 using namespace std;
+using namespace std;
 
 #include <iostream>
 #include <unistd.h>
@@ -572,13 +573,14 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void NumArray::sort_array()
+void NumArray::sort_array(bool increasing)
 
 {
 
    if ( !Sorted )  {
 
-      sort(e.begin(), e.end());
+      if ( increasing ) sort(e.begin(), e.end());
+      else              sort(e.rbegin(), e.rend());
 
    }
    
