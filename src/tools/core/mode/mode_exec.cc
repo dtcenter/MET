@@ -673,11 +673,11 @@ void ModeExecutive::setup_fcst_data(const Grid &verification_grid)
 
    // store the input data units
    funits = engine.conf_info.Fcst->var_info->units();
-   ounits = "Not set";
+   ounits = na_str;
 
    // store the input data level
    flevel = engine.conf_info.Fcst->var_info->level_name();
-   olevel = "Not set";
+   olevel = na_str;
 
    //
    //  done
@@ -751,11 +751,11 @@ void ModeExecutive::setup_obs_data(const Grid &verification_grid)
    engine.conf_info.set_perc_thresh(Obs_sd.data);
 
    // store the input data units
-   funits = "Not set";
+   funits = na_str;
    ounits = engine.conf_info.Obs->var_info->units();
 
    // store the input data level
-   flevel = "Not set";
+   flevel = na_str;
    olevel = engine.conf_info.Obs->var_info->level_name();
 
    //
