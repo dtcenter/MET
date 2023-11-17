@@ -93,7 +93,7 @@ class ModeConfInfo {
 
       bool is_multivar();
 
-      ConcatStringfcst_multivar_logic;
+      ConcatString fcst_multivar_logic;
       ConcatString obs_multivar_logic;
       IntArray     fcst_multivar_compare_index;
       IntArray     obs_multivar_compare_index;
