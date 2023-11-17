@@ -37,7 +37,7 @@ MET Version 12.0.0-beta2 Release Notes (20231117)
      * Enhance TC-Pairs to include storm diagnostics in consensus track output (`#2476 <https://github.com/dtcenter/MET/issues/2476>`_).
      * Refine TC-Pairs consensus diagnostics configuration options (`#2699 <https://github.com/dtcenter/MET/issues/2699>`_).
      * **Enhance TC-Diag to actually compute and write diagnostics** (`#2550 <https://github.com/dtcenter/MET/issues/2550>`_).
-     * **Enhance MODE to use OpenMP for efficient computation of the convolution step** (`#2724 <https://github.com/dtcenter/MET/issues/2724>`_).
+     * **Enhance MODE to use OpenMP to make the convolution step faster** (`#2724 <https://github.com/dtcenter/MET/issues/2724>`_).
      * Enhance Multivariate MODE to change the default "merge_flag" setting to NONE (`#2708 <https://github.com/dtcenter/MET/issues/2708>`_).
      * **Enhance Multivariate MODE to support differing numbers of forecast and observation input fields** (`#2706 <https://github.com/dtcenter/MET/issues/2706>`_).
      * Fix the SonarQube findings for MET v12.0 (`#2673 <https://github.com/dtcenter/MET/issues/2673>`_).
