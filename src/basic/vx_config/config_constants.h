@@ -908,7 +908,8 @@ static const char conf_key_shift_right[]           = "shift_right";
 static const char conf_key_multivar_logic          [] = "multivar_logic";
 static const char conf_key_multivar_name           [] = "multivar_name";
 static const char conf_key_multivar_level          [] = "multivar_level";
-static const char conf_key_multivar_intensity_flag [] = "multivar_intensity_flag";
+static const char conf_key_fcst_multivar_compare_index [] = "multivar_intensity_compare_fcst";
+static const char conf_key_obs_multivar_compare_index [] = "multivar_intensity_compare_obs";
 
 //
 //  MTD specific parameter key names

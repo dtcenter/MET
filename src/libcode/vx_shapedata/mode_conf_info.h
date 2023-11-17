@@ -24,6 +24,7 @@
 #include "vx_math.h"
 
 #include "mode_field_info.h"
+#include "mode_data_type.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -68,11 +69,10 @@ class ModeConfInfo {
 
       void init_from_scratch();
 
-      int Field_Index;
-
-      int N_fields;    //  = 1 for traditional MODE
-                       //  > 1 for multivar MODE
-                       //  should always be at least 1
+      int Field_Index_f;  // for traditional mode expect Field_index_f/_o to be the same
+      int Field_Index_o;
+      int N_fields_f;     // for traditional mode expect N_fields_f/_o to be the same
+      int N_fields_o;
 
    public:
 
@@ -82,15 +82,21 @@ class ModeConfInfo {
 
       void clear();
 
+      // sets both obs and fcst field indices if traditional mode, or mvmode 'both'
       void set_field_index(int);
 
-      int field_index() const;
+      // must be multivar mode if the two indices are not the same
+      void set_field_index(int fcst_index, int obs_index);
+
+      int field_index_f() const;
+      int field_index_o() const;
 
       bool is_multivar();
 
-      ConcatString  fcst_multivar_logic;
-      ConcatString   obs_multivar_logic;
-      BoolArray multivar_intensity;
+      ConcatStringfcst_multivar_logic;
+      ConcatString obs_multivar_logic;
+      IntArray     fcst_multivar_compare_index;
+      IntArray     obs_multivar_compare_index;
       ConcatString fcst_multivar_name;
       ConcatString fcst_multivar_level;
       ConcatString obs_multivar_name;
@@ -99,7 +105,8 @@ class ModeConfInfo {
       void get_multivar_programs();
 
       void check_multivar_not_implemented();
-      bool multivar_intensities_all_false() const;
+
+      void check_multivar_perc_thresh(bool isSimple, bool isSimpleMerge) const;
 
    /////////////////////////////////////////////////////////////////////
 
@@ -109,6 +116,12 @@ class ModeConfInfo {
 
       Mode_Field_Info * Fcst;         //  points to current field, not allocated
       Mode_Field_Info *  Obs;         //  points to current field, not allocated
+
+
+      // to allow single data (fcst or obs) or fcst/obs pairs,
+      // and to distinguish traditional mode from mvmode
+
+      ModeDataType data_type;        
 
 
    /////////////////////////////////////////////////////////////////////
@@ -121,7 +134,8 @@ class ModeConfInfo {
       MetConfig conf;                          // MODE configuration object
 
       void read_config    (const char * default_filename, const char * user_filename);
-      void process_config (GrdFileType ftype, GrdFileType otype);
+
+      void process_config (GrdFileType ftype, GrdFileType otype, ModeDataType dt=ModeDataType_Traditional);
 
       void read_fields (Mode_Field_Info * &, Dictionary * dict, GrdFileType, char _fo);
 
@@ -218,11 +232,15 @@ class ModeConfInfo {
          //
 
       void set_perc_thresh(const DataPlane &, const DataPlane &);
+      void set_perc_thresh(const DataPlane &);
 
       void parse_nc_info  ();
 
+      // might need addtional methods here for pass2 multivariate, if/when we allow more than 1 radius
       void set_conv_radius_by_index  (int);
+      // might need addtional methods here for pass2 multivariate, if/when we allow more than 1 thresh
       void set_conv_thresh_by_index  (int);
+
       void set_conv_thresh(SingleThresh);
       void set_conv_radius(int);
 
@@ -231,13 +249,16 @@ class ModeConfInfo {
 
       int n_runs() const;   //  # threshs times # radii
 
-      int n_fields() const;   // should be 1 for traditional mode, > 1 for muiltivar
+      int n_fields_f() const;   // should be 1 for traditional mode, >= 1 for muiltivar
+      int n_fields_o() const;   // should be 1 for traditional mode, >= 1 for muiltivar
 
       int get_compression_level();
 
+      void set_merge_thresh_by_index(int);
       void  set_fcst_merge_thresh_by_index (int);
       void  set_obs_merge_thresh_by_index  (int);
 
+      void set_conv_thresh_by_merge_index(int);
       void  set_fcst_conv_thresh_by_merge_index (int);
       void  set_obs_conv_thresh_by_merge_index  (int);
 
@@ -246,23 +267,54 @@ class ModeConfInfo {
       void set_fcst_merge_thresh(SingleThresh);
       void set_obs_merge_thresh(SingleThresh);
 
+      void set_data_type(ModeDataType type);
+
+private:
+
+      // some private methods
+      void process_config_both(GrdFileType ftype, GrdFileType otype);
+      void process_config_fcst(GrdFileType ftype);
+      void process_config_obs(GrdFileType otype);
+      void evaluate_fcst_settings(int);
+      void evaluate_obs_settings(int);
+
 };
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int ModeConfInfo::n_conv_radii() const { return ( Fcst->conv_radius_array.n_elements() ); }   //  should be the same as
-                                                                                                     //  obs_conv_radius_array.n_elements()
+inline int ModeConfInfo::n_conv_radii() const
+{
+   // this could break down if multivar mode relaxes
+   // its limitations on number of radii (obs and fcst could be different)
+   if (data_type == ModeDataType_MvMode_Obs)
+   {
+      return ( Obs->conv_radius_array.n_elements() );
+   } else {
+      return ( Fcst->conv_radius_array.n_elements() );
+   }
+}
 
-inline int ModeConfInfo::n_conv_threshs() const { return ( Fcst->conv_thresh_array.n_elements() ); }   //  should be the same as
-                                                                                                       //  obs_conv_thresh_array.n_elements()
+inline int ModeConfInfo::n_conv_threshs() const
+{
+   // this could break down if multivar mode relaxes
+   // its limitations on number of thresh (obs and fcst could be different)
+   if (data_type == ModeDataType_MvMode_Obs)
+   {
+      return ( Obs->conv_thresh_array.n_elements() );
+   } else {
+      return ( Fcst->conv_thresh_array.n_elements() );
+   }
+}
 
 inline int ModeConfInfo::get_compression_level() { return conf.nc_compression(); }
 
-inline int ModeConfInfo::field_index() const { return Field_Index; }
+inline int ModeConfInfo::field_index_f() const { return Field_Index_f; }
+inline int ModeConfInfo::field_index_o() const { return Field_Index_o; }
 
-inline int ModeConfInfo::n_fields() const { return N_fields; }
+inline int ModeConfInfo::n_fields_f() const { return N_fields_f; }
+inline int ModeConfInfo::n_fields_o() const { return N_fields_o; }
 
 
 ////////////////////////////////////////////////////////////////////////
