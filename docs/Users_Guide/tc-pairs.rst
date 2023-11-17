@@ -7,7 +7,7 @@ TC-Pairs Tool
 Introduction
 ============
 
-The TC-Pairs tool provides verification for tropical cyclone forecasts in ATCF file format. It matches an ATCF format tropical cyclone (TC) forecast with a second ATCF format reference TC dataset (most commonly the Best Track analysis). The TC-Pairs tool processes both track and intensity adeck data and probabilistic edeck data. The adeck matched pairs contain position errors, as well as wind, sea level pressure, and distance to land values for each TC dataset. The edeck matched pairs contain probabilistic forecast values and the verifying observation values. The pair generation can be subset based on user-defined filtering criteria. Practical aspects of the TC-Pairs tool are described in :numref:`TC-Pairs_Practical-information`.
+The TC-Pairs tool provides verification for tropical cyclone forecasts in ATCF file format. It matches an ATCF format tropical cyclone (TC) forecast with a second ATCF format reference TC dataset (most commonly the Best Track analysis). The TC-Pairs tool processes both track and intensity adeck data and probabilistic edeck data. The adeck matched pairs contain position errors, as well as values for each TC dataset, including wind speed, wind radii, minimum sea level pressure, and distance to land. The edeck matched pairs contain probabilistic forecast values and the verifying observation values. The pair generation can be subset based on user-defined filtering criteria. Practical aspects of the TC-Pairs tool are described in :numref:`TC-Pairs_Practical-information`.
 
 Scientific and Statistical Aspects
 ==================================
@@ -21,7 +21,7 @@ TC diagnostics provide information about a TC's structure or its environment. Ea
 
   * Inner core diagnostics provide information about the structure of the storm near the storm center. Examples include the intensity of the storm and the radius of maximum winds.
 
-  * Large scale diagnostics provide information about quantities that characterize its environment. Examples include environmental vertical wind shear, total precipitable water, the average relative humidity, measures of convective instability, and the upper bound of intensity that a storm may be expected to achieve in its current environment. These diagnostics are typically derived from model fields as an average of the quantity of interest over either a circular area or an annulus centered on the storm center. Often, the storm center is taken to be the underlying model's storm center. In other cases, the diagnostics may be computed along some other specified track.
+  * Large scale diagnostics provide information about quantities that characterize its environment. Examples include environmental vertical wind shear, total precipitable water, relative humidity, convective instability, and the upper bound of intensity that a storm may be expected to achieve in its current environment. These diagnostics are typically derived from model fields as an average of the quantity of interest over either a circular area or an annulus centered on the storm center. Often, the storm center is taken to be the underlying model's storm center. In other cases, the diagnostics may be computed along some other specified track.
 
   * Ocean-based diagnostics provide information about the sea's thermal characteristics in the vicinity of the storm center. Examples include the sea surface temperature, ocean heat content, and the depth of warm water of a given temperature.
 
@@ -431,13 +431,13 @@ TC-Pairs produces output in TCST format. The default output file name can be ove
     - Version number
   * - 2
     - AMODEL
-    - User provided text string designating model name
+    - User-provided text string designating the forecast ATCF ID
   * - 3
     - BMODEL
-    - User provided text string designating model name
+    - User-provided text string designating the reference ATCF ID
   * - 4
     - DESC
-    - User provided description text string
+    - User-provided description text string
   * - 5
     - STORM_ID
     - BBCCYYYY designation of storm
