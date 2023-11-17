@@ -17,8 +17,6 @@ TC-Diag is run once for each initialization time to produce diagnostics for each
 
 TC-Diag first determines the list of valid times that appear in any one of the tracks. For each valid time, it processes all track points for that time. For each track point, it reads the gridded model fields requested in the configuration file and transforms the gridded data to a range-azimuth cylindrical coordinates grid. For each domain, it writes the range-azimuth data to a temporary NetCDF file, as described in :numref:`Contributor's Guide Section %s <tmp_files_tc_diag>`.
 
-.. note:: The current version of the tool does not yet include the capabilities described in the next three paragraphs. These additional capabilities are planned to be added in the MET v12.0.0 release later in 2023.
-
 Once the input data have been processed into the temporary NetCDF files, TC-Diag then calls one or more Python diagnostics scripts, as specified in the configuration file, to compute tropical cyclone diagnostic values. The computed diagnostics values are retrieved from the Python script and stored in memory.
 
 After processing all valid times and all corresponding track points, the computed diagnostics are written to ASCII and/or NetCDF output files. If requested in the configuration file, the temporary range-azimuth cylindrical coordinates files are combined into a single NetCDF file and written to the output for each combination of model track and domain.
