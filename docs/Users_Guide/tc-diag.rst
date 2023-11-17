@@ -9,7 +9,7 @@ Introduction
 
 A diagnosis of the large-scale environment of tropical cyclones (TCs) is foundational for many prediction techniques, including statistical-dynamical forecast aids and techniques based on artificial intelligence. Such diagnostics can also be used by forecasters seeking to understand how a given model's forecast will pan out. Finally, TC diagnostics can be useful in verification to stratify the performance of models in different environmental regimes over a longer period of time, thereby providing useful insights on model biases or deficiencies for model developers and forecasters.
 
-Originally developed for the Statistical Hurricane Intensity Prediction Scheme (SHIPS), and later as a stand-alone package called 'Model Diagnostics', by the Cooperative Institute for Research in the Atmosphere (CIRA), MET now integrates these capabilities into the an extensible framework called the TC-Diag tool. This tool allows users to compute diagnostics for the large-scale environment of TCs using ATCF track and gridded model data inputs. The current version of the TC-Diag tool requires that the tracks and fields be self-consistent [i.e., the track should be the model's (or ensemble's) own predicted track(s)]. The reason is that the diagnostics are computed in a coordinate system centered on the model's moving model storm and the current version of the tool does not yet include vortex removal. If the track is not consistent with the underlying fields, the diagnostics output are unlikely to be useful because the model's simulated storm would contaminate the diagnostics calculations.
+Originally developed for the Statistical Hurricane Intensity Prediction Scheme (SHIPS), and later as a stand-alone package called 'Model Diagnostics', by the Cooperative Institute for Research in the Atmosphere (CIRA), MET now integrates these capabilities into an extensible framework called the TC-Diag tool. This tool allows users to compute diagnostics for the large-scale environment of TCs using ATCF track and gridded model data inputs. The current version of the TC-Diag tool requires that the tracks and fields be self-consistent [i.e., the track should be the model's (or ensemble's) own predicted track(s)]. The reason is that the diagnostics are computed in a coordinate system centered on the model's moving model storm and the current version of the tool does not yet include vortex removal. If the track is not consistent with the underlying fields, the diagnostics output are unlikely to be useful because the model's simulated storm would contaminate the diagnostics calculations.
 
 .. note:: A future version of the tool will include the capability to remove the model's own vortex, which will allow the user to specify any arbitrary track (such as the operational center's official forecast). Until then, users are advised that the track selected must be consistent with the model's predicted track.
 
@@ -163,7 +163,7 @@ Configuring regridding options
      shape      = SQUARE;
   }
 
-The **regrid** dictionary is common to multiple MET tools and is described in :numref:`config_options`. It can be specified separately in each **data.field** array entry, described below. The default setting uses nearest neighbor interpolation for all fields.
+The **regrid** dictionary is common to multiple MET tools and is described in :numref:`config_options`. It specifies how the input data should be regridded to cylindrical coordinates prior to compute diagnostics. It can be specified separately in each **data.field** array entry, described below. The default setting uses nearest neighbor interpolation for all fields.
 
 Configuring Fields, Levels, and Domains
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -202,17 +202,6 @@ The **name** and **level** entries are common to multiple MET tools and are desc
 
 The **domain** entry is an array of strings. Each string specifies a domain name. If the **domain_info** domain name appears in this **domain** list, then this field will be read from that **domain_info** data source. If **domain** is set to an empty list, then this field will be read from all domain data sources.
 
-Configuring Regridding Options
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. code-block:: none
-
-  regrid = { ... }
-
-These **regrid** dictionary is common to multiple MET tools and is described in :numref:`config_options`. These regridding options control the transformation to cylindrical coordinates.
-
-.. note:: As of MET version 11.1.0, the nearest neighbor regridding method is used rather than this configuration file option.
-
 Configuring Vortex Removal Option
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -237,9 +226,9 @@ If true, all input fields are read efficiently from each file in a single call. 
 
 .. code-block:: none
 
-  nc_cyl_grid_flag = TRUE; // ends with "_cyl_grid_{domain}.nc"
-  nc_diag_flag     = TRUE; // ends with "_diag.nc"
-  cira_diag_flag   = TRUE; // ends with "_diag.dat"
+  nc_cyl_grid_flag = TRUE; // resulting output file ends with "_cyl_grid_{domain}.nc"
+  nc_diag_flag     = TRUE; // resulting output file ends with "_diag.nc"
+  cira_diag_flag   = TRUE; // resulting output file ends with "_diag.dat"
 
 These three flag entries are booleans specifying what output data types should be written. At least one of these flags must be set to true.
 
@@ -262,13 +251,13 @@ The TC-Diag tool writes up to three output data types, as specified by flags in 
 
 When the **cira_diag_flag** configuration entry is set to true, an ASCII CIRA diagnostics output file is written for each model track provided.
 
-TODO: Details will be provided when support for this output type is added.
+TODO: Details will be added for issue dtcenter/MET#2729.
 
 **NetCDF Diagnostics Output**
 
 When the **nc_diag_flag** configuration entry is set to true, a NetCDF output file containing the computed diagnostics is written for each model track provided.
 
-TODO: Details will be provided when support for this output type is added.
+TODO: Details will be added for issue dtcenter/MET#2729.
 
 **NetCDF Range-Azimuth Output**
 
