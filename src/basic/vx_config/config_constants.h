@@ -1222,9 +1222,11 @@ static const char conf_key_tangential_velocity_long_field_name[] = "tangential_v
 static const char conf_key_domain_info[]            = "domain_info";
 static const char conf_key_domain[]                 = "domain";
 static const char conf_key_diag_script[]            = "diag_script";
+static const char conf_key_override_diags[]         = "override_diags";
 static const char conf_key_vortex_removal[]         = "vortex_removal";
 static const char conf_key_one_time_per_file_flag[] = "one_time_per_file_flag";
-static const char conf_key_nc_rng_azi_flag[]        = "nc_rng_azi_flag";
+static const char conf_key_output_base_format[]     = "output_base_format";
+static const char conf_key_nc_cyl_grid_flag[]       = "nc_cyl_grid_flag";
 static const char conf_key_nc_diag_flag[]           = "nc_diag_flag";
 static const char conf_key_cira_diag_flag[]         = "cira_diag_flag";
 

@@ -33,7 +33,9 @@
       -v 2
     </param>
     <output>
-      <exists>&OUTPUT_DIR;/tc_diag/tc_diag_AL092022_GFSO_2022092400_cyl_grid_parent.nc</exists>
+      <exists>&OUTPUT_DIR;/tc_diag/sal092022_gfso_doper_2022092400_cyl_grid_parent.nc</exists>
+      <exists>&OUTPUT_DIR;/tc_diag/sal092022_gfso_doper_2022092400_diag.nc</exists>
+      <exists>&OUTPUT_DIR;/tc_diag/sal092022_gfso_doper_2022092400_diag.dat</exists>
     </output>
   </test>
 
