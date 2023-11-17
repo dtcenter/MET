@@ -262,6 +262,7 @@ int ModeFrontEnd::run_traditional(const StringArray & Argv)
 }
 
 ///////////////////////////////////////////////////////////////////////
+
 int ModeFrontEnd::multivar_intensity_comparisons(const StringArray & Argv, const MultiVarData &mvdf,
                                                  const MultiVarData &mvdo, bool has_union_f,
                                                  bool has_union_o, ShapeData &merge_f,
@@ -279,7 +280,6 @@ int ModeFrontEnd::multivar_intensity_comparisons(const StringArray & Argv, const
 
    ModeConfInfo & conf = mode_exec->engine.conf_info;
    if (compress_level >= 0) conf.nc_info.set_compress_level(compress_level);
-   //if ( field_index >= 0 )
    conf.set_field_index(field_index_f, field_index_o);
 
    // for multivar intensities, explicity set the level and units using stored values
@@ -545,7 +545,6 @@ void ModeFrontEnd::init(ModeExecutive::Processing_t p)
 {
    ptype = p;
    mlog << Debug(1) << "Running multivar front end for " << ModeExecutive::stype(ptype) << "\n";
-   //Argv.dump(cout, 0);
 
    if ( mode_exec )  { delete mode_exec;  mode_exec = 0; }
 

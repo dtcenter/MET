@@ -80,14 +80,11 @@ void  MultiVarData1::objects_from_arrays(bool do_clusters,
 {
    string name = _name + "_" + sprintModeDataType(_dataType);
    populate_bool_plane(name, _obj_data, _nx, _ny, out);
-   // name = _name + "_Obs";
-   // populate_bool_plane(name, _obs_obj_data, _nx, _ny, obs_out);
 }
 
 void MultiVarData1::print(const string &name) const
 {
    string n;
-   // might want a _Fcst_Obj kind of thing
    n = name + "_" + _name + "_" + sprintModeDataType(_dataType) + "_Obj";
    if (_obj_data) {
       _print_summary(n, _obj_data, *_obj_sd);
@@ -169,11 +166,11 @@ void MultiVarData::checkFileTypeConsistency(const MultiVarData &mvdi, int j)
 }
 
 void MultiVarData::init(ModeDataType dataType,
-                         const string &name, 
-                         const Grid &grid, GrdFileType type,
-                         const string &units,
-                         const string &level,
-                         double data_min, double data_max)
+                        const string &name, 
+                        const Grid &grid, GrdFileType type,
+                        const string &units,
+                        const string &level,
+                        double data_min, double data_max)
 {
    _clear();
 

@@ -418,12 +418,9 @@ void ModeConfInfo::process_config_both(GrdFileType ftype, GrdFileType otype)
 {
    int j, k, n;
 
-      // VarInfoFactory info_factory;
 
    Dictionary * fcst_dict = (Dictionary *) 0;
    Dictionary * obs_dict  = (Dictionary *) 0;
-   //Dictionary * dict      = (Dictionary *) 0;
-   //PlotInfo plot_info;
 
       // Conf: fcst and obs
 
@@ -1143,7 +1140,7 @@ void ModeConfInfo::set_fcst_merge_thresh_by_index(int k)
    {
       mlog << Error 
            << "\nModeConfInfo::set_fcst_merge_thresh_by_index(int) -> "
-              << "software is set for obs data not fcst\n\n";
+           << "software is set for obs data not fcst\n\n";
       exit (1);
    }
    Fcst->set_merge_thresh_by_index(k);
@@ -1177,7 +1174,7 @@ void ModeConfInfo::set_fcst_conv_thresh_by_merge_index(int k)
    {
       mlog << Error 
            << "\nModeConfInfo::set_fcst_conv_thresh_by_merge_index(int) -> "
-              << "software is set for obs data not fcst\n\n";
+           << "software is set for obs data not fcst\n\n";
       exit (1);
    }
    Fcst->set_conv_thresh_by_merge_index(k);
@@ -1197,7 +1194,7 @@ void ModeConfInfo::set_obs_conv_thresh_by_merge_index(int k)
    {
       mlog << Error 
            << "\nModeConfInfo::set_obs_conv_thresh_by_merge_index(int) -> "
-              << "software is set for fcst data not obs\n\n";
+           << "software is set for fcst data not obs\n\n";
       exit (1);
    }
    Obs->set_conv_thresh_by_merge_index(k);
@@ -1214,7 +1211,7 @@ void ModeConfInfo::set_fcst_merge_flag(MergeType t)
    {
       mlog << Error 
            << "\nModeConfInfo::set_fcst_merge_flag(int) -> "
-              << "software is set for obs data not fcst\n\n";
+           << "software is set for obs data not fcst\n\n";
       exit (1);
    }
    Fcst->merge_flag = t;
@@ -1228,7 +1225,7 @@ void ModeConfInfo::set_obs_merge_flag(MergeType t)
    {
       mlog << Error 
            << "\nModeConfInfo::set_obs_merge_flag(int) -> "
-              << "software is set for fcst data not obs\n\n";
+           << "software is set for fcst data not obs\n\n";
       exit (1);
    }
    Obs->merge_flag = t;
@@ -1242,7 +1239,7 @@ void ModeConfInfo::set_fcst_merge_thresh(SingleThresh s)
    {
       mlog << Error 
            << "\nModeConfInfo::set_fcst_merge_thresh(int) -> "
-              << "software is set for obs data not fcst\n\n";
+           << "software is set for obs data not fcst\n\n";
       exit (1);
    }
    Fcst->merge_thresh = s;
@@ -1256,7 +1253,7 @@ void ModeConfInfo::set_obs_merge_thresh(SingleThresh s)
    {
       mlog << Error 
            << "\nModeConfInfo::set_obs_merge_thresh(int) -> "
-              << "software is set for fcst data not obs\n\n";
+           << "software is set for fcst data not obs\n\n";
       exit (1);
    }
    Obs->merge_thresh = s;
@@ -1272,7 +1269,7 @@ void ModeConfInfo::set_obs_merge_thresh_by_index(int k)
    {
       mlog << Error 
            << "\nModeConfInfo::set_obs_merge_thresh_by_index(int) -> "
-              << "software is set for fcst data not obs\n\n";
+           << "software is set for fcst data not obs\n\n";
       exit (1);
    }
 
@@ -1428,7 +1425,7 @@ void ModeConfInfo::check_multivar_not_implemented()
    if (status) {
       mlog << Error
            << "\nModeConfInfo::check_multivar_not_implemented:\n"
-           << "\nSome features not yet implemented in multivar mode\n\n";
+           << "  Some features not yet implemented in multivar mode\n\n";
       exit ( 1 );
    }
 }
@@ -1483,7 +1480,7 @@ void ModeConfInfo::check_multivar_perc_thresh(bool isSimple, bool isSimpleMerge)
    }
 }
 
-// ////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////
 
 
    //

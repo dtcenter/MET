@@ -24,9 +24,9 @@
 
 class ModeFrontEnd {
 
- private:
+   private:
 
- public:
+   public:
 
    ModeFrontEnd();
    ~ModeFrontEnd();

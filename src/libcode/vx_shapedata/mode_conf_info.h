@@ -70,9 +70,9 @@ class ModeConfInfo {
       void init_from_scratch();
 
       int Field_Index_f;  // for traditional mode expect Field_index_f/_o to be the same
-      int Field_Index_o;  
+      int Field_Index_o;
       int N_fields_f;     // for traditional mode expect N_fields_f/_o to be the same
-      int N_fields_o;     
+      int N_fields_o;
 
    public:
 
