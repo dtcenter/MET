@@ -67,7 +67,8 @@ run_command "./configure --prefix=`pwd` \
             --enable-modis \
             --enable-mode_graphics \
             --enable-lidar2nc \
-            --enable-python"
+            --enable-python \
+            --enable-ugrid"
 
 # Compile and install the build
 run_command "make install"
