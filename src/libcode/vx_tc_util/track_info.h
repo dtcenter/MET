@@ -169,7 +169,8 @@ class TrackInfo {
       void add_watch_warn(const ConcatString &, WatchWarnType, unixtime);
       bool add_diag_data(DiagFile &, const StringArray &);
       void add_diag_value(int, double);
-
+      void add_uniq_diag_name(const std::string);
+      
       bool has(const ATCFTrackLine &) const;
 
       bool is_match(const ATCFTrackLine &);
@@ -230,8 +231,11 @@ inline StringArray          TrackInfo::track_lines()      const { return(TrackLi
 
 class TrackInfoArray {
 
-   friend TrackInfo consensus(const TrackInfoArray &, const ConcatString &,
-                              int, const StringArray &);
+   friend TrackInfo consensus(const TrackInfoArray &,
+                              const ConcatString &,
+                              const StringArray &, const int,
+                              const StringArray &, const int,
+                              const bool);
 
    private:
 

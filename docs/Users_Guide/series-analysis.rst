@@ -22,7 +22,7 @@ To define a time series of forecasts that all have the same valid time, set the 
 
 To define a series of vertical levels all contained in a single input file, set the forecast and observation fields to a list of the vertical levels to be used. Pass the tool single forecast and observation files containing the vertical level data. The tool will loop over the forecast field entries, extract that field from the input forecast file, and then search the observation file for a matching record.
 
-series_analysis usage
+series_analysis Usage
 ---------------------
 
 The usage statement for the Series-Analysis tool is shown below:
@@ -42,7 +42,7 @@ The usage statement for the Series-Analysis tool is shown below:
 
 series_analysis has four required arguments and accepts several optional ones. 
 
-Required arguments series_stat
+Required Arguments series_stat
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. The **-fcst file_1 ... file_n | fcst_file_list** options specify the gridded forecast files or ASCII files containing lists of file names to be used.
@@ -53,7 +53,7 @@ Required arguments series_stat
 
 4. The **-config file** is a Series-Analysis Configuration file containing the desired settings.
 
-Optional arguments for series_analysis
+Optional Arguments for series_analysis
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 5. To set both the forecast and observations to the same set of files, use the optional -both file_1 ... file_n | both_file_list option to the same set of files. This is useful when reading the NetCDF matched pair output of the Grid-Stat tool which contains both forecast and observation data.
@@ -78,7 +78,7 @@ An example of the series_analysis calling sequence is shown below:
 
 In this example, the Series-Analysis tool will process the list of forecast and observation files specified in the text file lists into statistics for each grid location using settings specified in the configuration file. Series-Analysis will create an output NetCDF file containing requested statistics. 
 
-series_analysis output
+series_analysis Output
 ----------------------
 
 The Series-Analysis tool produces NetCDF files containing output statistics for each grid location from the input files. The details about the output statistics available from each output line type are detailed in Chapter 5 since they are also produced by the Grid-Stat Tool. A subset of these can be produced by this tool, with the most notable exceptions being the wind vector and neighborhood statistics. Users can inventory the contents of the Series-Analysis output files using the ncdump -h command to view header information. Additionally, ncview or the Plot-Data-Plane tool can be used to visualize the output. An example of Series-Analysis output is shown in :numref:`series-analysis_Glibert_precip` below. 
@@ -89,7 +89,7 @@ The Series-Analysis tool produces NetCDF files containing output statistics for 
 
    An example of the Gilbert Skill Score for precipitation forecasts at each grid location for a month of files.
 
-series_analysis configuration file
+series_analysis Configuration File
 ----------------------------------
 The default configuration file for the Series-Analysis tool named **SeriesAnalysisConfig_default** can be found in the installed *share/met/config* directory. The contents of the configuration file are described in the subsections below.
 
@@ -99,7 +99,7 @@ ____________________
 
 .. code-block:: none
 
-  model          = "WRF";
+  model          = "FCST";
   desc           = "NA";
   obtype         = "ANALYS";
   regrid         = { ... }

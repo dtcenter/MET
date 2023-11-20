@@ -9,7 +9,7 @@
 //
 // Output model name to be written
 //
-model = "WRF";
+model = "FCST";
 
 //
 // Output description to be written
@@ -56,7 +56,9 @@ multivar_logic = "#1 && #2 && #3";
 //
 // MODE Multivar intensity logic
 //
-multivar_intensity_flag = [TRUE, TRUE, TRUE];
+multivar_intensity_compare_fcst = [ 1, 2, 3 ];
+multivar_intensity_compare_obs = [ 1, 2, 3 ];
+
 
 //
 // Forecast and observation fields to be verified

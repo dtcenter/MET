@@ -17,11 +17,9 @@ try:
 except:
    from pyembed.python_embedding import pyembed_tools
 
-
 from met.point import met_point_tools
 
 if __name__ == '__main__':
-   argv_org = sys.argv[:]
    tmp_filename = sys.argv[1]
    met_in = pyembed_tools.call_python(sys.argv)
 

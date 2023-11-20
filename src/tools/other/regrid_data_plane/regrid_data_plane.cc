@@ -290,8 +290,6 @@ void process_data_file() {
    // Build the run command string
    run_cs << "Regrid from " << fr_grid.serialize() << " to " << to_grid.serialize();
 
-   ConcatString tmp_dir = config.get_tmp_dir();
-
    // Open the output file
    open_nc(to_grid, run_cs);
 

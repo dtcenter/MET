@@ -6,7 +6,6 @@
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
-
 ///////////////////////////////////////////////////////////////////////
 
 using namespace std;
@@ -17,6 +16,8 @@ using namespace std;
 #include <stdlib.h>
 #include <string.h>
 #include <cmath>
+#include <set>
+#include <map>
 
 #include "engine.h"
 #include "mode_columns.h"
@@ -189,6 +190,8 @@ void ModeFuzzyEngine::init_from_scratch() {
 
    clear_features();
 
+   data_type = ModeDataType_Traditional;
+ 
    return;
 }
 
@@ -244,21 +247,26 @@ void ModeFuzzyEngine::clear_colors() {
 void ModeFuzzyEngine::set(const ShapeData &fcst_wd, const ShapeData &obs_wd)
 
 {
+   if (data_type == ModeDataType_MvMode_Fcst) {
+      set_fcst(fcst_wd);
+   } else if (data_type == ModeDataType_MvMode_Obs) {
+      set_obs(obs_wd);
+   } else {
+      ConcatString path;
 
-   ConcatString path;
+      clear_features();
+      clear_colors();
+      ctable.clear();
 
-   clear_features();
-   clear_colors();
-   ctable.clear();
+      collection.clear();
 
-   collection.clear();
+      set_fcst(fcst_wd);
+      set_obs(obs_wd);
 
-   set_fcst(fcst_wd);
-   set_obs(obs_wd);
+      path = replace_path(conf_info.object_pi.color_table.c_str());
 
-   path = replace_path(conf_info.object_pi.color_table.c_str());
-
-   ctable.read(path.c_str());
+      ctable.read(path.c_str());
+   }
 
    return;
 
@@ -270,21 +278,26 @@ void ModeFuzzyEngine::set(const ShapeData &fcst_wd, const ShapeData &obs_wd)
 void ModeFuzzyEngine::set_no_conv(const ShapeData &fcst_wd, const ShapeData &obs_wd)
 
 {
+   if (data_type == ModeDataType_MvMode_Fcst) {
+      set_fcst_no_conv(fcst_wd);
+   } else if (data_type == ModeDataType_MvMode_Obs) {
+      set_obs_no_conv  ( obs_wd);
+   } else {      
+      ConcatString path;
 
-   ConcatString path;
+      clear_features();
+      clear_colors();
+      ctable.clear();
 
-   clear_features();
-   clear_colors();
-   ctable.clear();
+      collection.clear();
 
-   collection.clear();
+      set_fcst_no_conv (fcst_wd);
+      set_obs_no_conv  ( obs_wd);
 
-   set_fcst_no_conv (fcst_wd);
-   set_obs_no_conv  ( obs_wd);
+      path = replace_path(conf_info.object_pi.color_table.c_str());
 
-   path = replace_path(conf_info.object_pi.color_table.c_str());
-
-   ctable.read(path.c_str());
+      ctable.read(path.c_str());
+   }
 
    return;
 
@@ -296,21 +309,27 @@ void ModeFuzzyEngine::set_only_split(const ShapeData &fcst_wd, const ShapeData &
 
 {
 
-   ConcatString path;
+   if (data_type == ModeDataType_MvMode_Fcst) {
+      set_fcst_only_split (fcst_wd);
+   } else if (data_type == ModeDataType_MvMode_Obs) {
+      set_obs_only_split  ( obs_wd);
+   } else {
+      ConcatString path;
 
-   clear_features();
-   clear_colors();
-   ctable.clear();
+      clear_features();
+      clear_colors();
+      ctable.clear();
 
-   collection.clear();
+      collection.clear();
 
-   set_fcst_only_split (fcst_wd);
-   set_obs_only_split  ( obs_wd);
+      set_fcst_only_split (fcst_wd);
+      set_obs_only_split  ( obs_wd);
 
-   path = replace_path(conf_info.object_pi.color_table.c_str());
+      path = replace_path(conf_info.object_pi.color_table.c_str());
 
-   ctable.read(path.c_str());
-
+      ctable.read(path.c_str());
+   }
+   
    return;
 
 }
@@ -591,12 +610,17 @@ void ModeFuzzyEngine::do_fcst_convolution() {
    // Apply a circular convolution to the raw field
    //
 
-   mlog << Debug(4) << " Before fcst convolution: " << fcst_conv->sdebug_examine() << "\n";
-      
+   if(mlog.verbosity_level() >= 4) {
+      mlog << Debug(4) << " Before fcst convolution: "
+           << fcst_conv->sdebug_examine() << "\n";
+   }
 
    if(r > 0) fcst_conv->conv_filter_circ(2*r + 1, conf_info.Fcst->vld_thresh);
 
-   mlog << Debug(4) << " After fcst convolution: " << fcst_conv->sdebug_examine() << "\n";
+   if(mlog.verbosity_level() >= 4) {
+      mlog << Debug(4) << " After fcst convolution: "
+           << fcst_conv->sdebug_examine() << "\n";
+   }
 
    need_fcst_conv       = false;
    need_fcst_thresh     = true;
@@ -625,14 +649,20 @@ void ModeFuzzyEngine::do_obs_convolution() {
    mlog << Debug(3) << "Applying circular convolution of radius "
         << r << " to the observation field.\n";
 
-   mlog << Debug(4) << " Before obs convolution: " << obs_conv->sdebug_examine() << "\n";
+   if(mlog.verbosity_level() >= 4) {
+      mlog << Debug(4) << " Before obs convolution: "
+           << obs_conv->sdebug_examine() << "\n";
+   }
 
    //
    // Apply a circular convolution to the raw field
    //
    if(r > 0) obs_conv->conv_filter_circ(2*r + 1, conf_info.Obs->vld_thresh);
 
-   mlog << Debug(4) << " After obs convolution: " << obs_conv->sdebug_examine() << "\n";
+   if(mlog.verbosity_level() >= 4) {
+      mlog << Debug(4) << " After obs convolution: "
+           << obs_conv->sdebug_examine() << "\n";
+   }
 
    need_obs_conv       = false;
    need_obs_thresh     = true;
@@ -657,13 +687,21 @@ void ModeFuzzyEngine::do_fcst_thresholding() {
 
    *fcst_thresh = *fcst_raw;
    fcst_thresh->threshold(conf_info.Fcst->conv_thresh);
-   mlog << Debug(4) << " After thresholding raw fcst field: " << fcst_thresh->sdebug_examine() << "\n";
+
+   if(mlog.verbosity_level() >= 4) {
+      mlog << Debug(4) << " After thresholding raw fcst field: "
+           << fcst_thresh->sdebug_examine() << "\n";
+   }
 
    //
    // Threshold the convolved field
    //
    fcst_mask->threshold(conf_info.Fcst->conv_thresh);
-   mlog << Debug(4) << " After thresholding convolved fcst field: " << fcst_mask->sdebug_examine() << "\n";
+
+   if(mlog.verbosity_level() >= 4) {
+      mlog << Debug(4) << " After thresholding convolved fcst field: "
+           << fcst_mask->sdebug_examine() << "\n";
+   }
 
    mlog << Debug(3) << "Applying convolution threshold "
         << conf_info.Fcst->conv_thresh.get_str()
@@ -692,13 +730,21 @@ void ModeFuzzyEngine::do_obs_thresholding() {
 
    *obs_thresh = *obs_raw;
    obs_thresh->threshold(conf_info.Obs->conv_thresh);
-   mlog << Debug(4) << " After thresholding raw obs field: " << obs_thresh->sdebug_examine() << "\n";
+
+   if(mlog.verbosity_level() >= 4) {
+      mlog << Debug(4) << " After thresholding raw obs field: "
+           << obs_thresh->sdebug_examine() << "\n";
+   }
 
    //
    // Threshold the convolved field
    //
    obs_mask->threshold(conf_info.Obs->conv_thresh);
-   mlog << Debug(4) << " After thresholding convolved obs field: " << obs_mask->sdebug_examine() << "\n";
+
+   if(mlog.verbosity_level() >= 4) {
+      mlog << Debug(4) << " After thresholding convolved obs field: "
+           << obs_mask->sdebug_examine() << "\n";
+   }
 
    mlog << Debug(3) << "Applying convolution threshold "
         << conf_info.Obs->conv_thresh.get_str()
@@ -733,7 +779,11 @@ void ModeFuzzyEngine::do_fcst_filtering() {
                                 fcst_raw, conf_info.Fcst->conv_thresh, grid,
                                 conf_info.Fcst->var_info->is_precipitation());
 
-      mlog << Debug(4) << " After attribute filtering of fcst field: " << fcst_mask->sdebug_examine() << "\n";
+      if(mlog.verbosity_level() >= 4) {
+         mlog << Debug(4) << " After attribute filtering of fcst field: "
+              << fcst_mask->sdebug_examine() << "\n";
+      }
+
       mlog << Debug(3) << "Applying object attribute filtering"
            << " resulted in " <<  fcst_mask->n_objects()
            << " simple forecast objects.\n";
@@ -769,7 +819,11 @@ void ModeFuzzyEngine::do_obs_filtering() {
                                obs_raw, conf_info.Obs->conv_thresh, grid,
                                conf_info.Obs->var_info->is_precipitation());
 
-      mlog << Debug(4) << " After attribute filtering of obs field: " << obs_mask->sdebug_examine() << "\n";
+      if(mlog.verbosity_level() >= 4) {
+         mlog << Debug(4) << " After attribute filtering of obs field: "
+              << obs_mask->sdebug_examine() << "\n";
+      }
+
       mlog << Debug(3) << "Applying object attribute filtering"
            << " resulted in " <<  obs_mask->n_objects()
            << " simple observation objects.\n";
@@ -797,7 +851,11 @@ void ModeFuzzyEngine::do_fcst_splitting() {
    if(!need_fcst_split) return;
 
    *fcst_split = split(*fcst_mask, n_fcst);
-   mlog << Debug(4) << " After splitting of fcst field: " << fcst_split->sdebug_examine() << "\n";
+
+   if(mlog.verbosity_level() >= 4) {
+      mlog << Debug(4) << " After splitting of fcst field: "
+           << fcst_split->sdebug_examine() << "\n";
+   }
 
    need_fcst_split      = false;
    need_fcst_merge      = true;
@@ -816,7 +874,11 @@ void ModeFuzzyEngine::do_obs_splitting() {
    if(!need_obs_split) return;
 
    *obs_split = split(*obs_mask, n_obs);
-   mlog << Debug(4) << " After splitting of obs field: " << obs_split->sdebug_examine() << "\n";
+
+   if(mlog.verbosity_level() >= 4) {
+      mlog << Debug(4) << " After splitting of obs field: "
+           << obs_split->sdebug_examine() << "\n";
+   }
 
    need_obs_split      = false;
    need_obs_merge      = true;
@@ -1033,23 +1095,12 @@ void ModeFuzzyEngine::do_matching() {
 
 void ModeFuzzyEngine::do_no_match() {
    int j, k, n;
-   ShapeData * fcst_shape = (ShapeData *) 0;
-   ShapeData * obs_shape = (ShapeData *) 0;
+   ShapeData cur_shape;
 
    do_fcst_splitting();
    do_obs_splitting();
 
    clear_colors();
-
-   fcst_shape = new ShapeData [n_fcst];
-   obs_shape  = new ShapeData [n_obs];
-
-   if(!fcst_shape || !obs_shape) {
-
-      mlog << Error << "\nModeFuzzyEngine::do_no_match() -> "
-           << "memory allocation error\n\n";
-      exit(1);
-   }
 
    //
    // Do the single features
@@ -1057,8 +1108,9 @@ void ModeFuzzyEngine::do_no_match() {
    fcst_single.set_size(n_fcst);
 
    for(j=0; j<n_fcst; j++) {
-      fcst_shape[j] = select(*fcst_split, j+1);
-      fcst_single[j].set(*fcst_raw, *fcst_thresh, fcst_shape[j],
+      cur_shape = select(*fcst_split, j+1);
+      fcst_single[j].set(*fcst_raw, *fcst_thresh,
+                         *fcst_split, cur_shape,
                          conf_info.inten_perc_value,
                          conf_info.Fcst->var_info->is_precipitation());
       fcst_single[j].object_number = j+1;
@@ -1067,8 +1119,9 @@ void ModeFuzzyEngine::do_no_match() {
    obs_single.set_size(n_obs);
 
    for(j=0; j<n_obs; j++) {
-      obs_shape[j] = select(*obs_split, j+1);
-      obs_single[j].set(*obs_raw, *obs_thresh, obs_shape[j],
+      cur_shape = select(*obs_split, j+1);
+      obs_single[j].set(*obs_raw, *obs_thresh,
+                        *obs_split, cur_shape,
                         conf_info.inten_perc_value,
                         conf_info.Obs->var_info->is_precipitation());
       obs_single[j].object_number = j+1;
@@ -1112,9 +1165,6 @@ void ModeFuzzyEngine::do_no_match() {
    // Done
    //
 
-   delete [] fcst_shape; fcst_shape = (ShapeData *) 0;
-   delete [] obs_shape;  obs_shape  = (ShapeData *) 0;
-
    return;
 }
 
@@ -1123,23 +1173,12 @@ void ModeFuzzyEngine::do_no_match() {
 void ModeFuzzyEngine::do_match_merge() {
    int j, k, n;
    InterestInfo junkinfo;
-   ShapeData * fcst_shape = (ShapeData *) 0;
-   ShapeData * obs_shape = (ShapeData *) 0;
+   ShapeData cur_shape;
 
    do_fcst_splitting();
    do_obs_splitting();
 
    clear_colors();
-
-   fcst_shape = new ShapeData [n_fcst];
-   obs_shape = new ShapeData [n_obs];
-
-   if(!fcst_shape || !obs_shape) {
-
-      mlog << Error << "\nModeFuzzyEngine::do_match_merge() -> "
-           << "memory allocation error\n\n";
-      exit(1);
-   }
 
    //
    // Do the single features
@@ -1147,8 +1186,9 @@ void ModeFuzzyEngine::do_match_merge() {
    fcst_single.set_size(n_fcst);
 
    for(j=0; j<n_fcst; j++) {
-      fcst_shape[j] = select(*fcst_split, j+1);
-      fcst_single[j].set(*fcst_raw, *fcst_thresh, fcst_shape[j],
+      cur_shape = select(*fcst_split, j+1);
+      fcst_single[j].set(*fcst_raw, *fcst_thresh,
+                         *fcst_split, cur_shape,
                          conf_info.inten_perc_value,
                          conf_info.Fcst->var_info->is_precipitation());
       fcst_single[j].object_number = j+1;
@@ -1157,8 +1197,9 @@ void ModeFuzzyEngine::do_match_merge() {
    obs_single.set_size(n_obs);
 
    for(j=0; j<n_obs; j++) {
-      obs_shape[j] = select(*obs_split, j+1);
-      obs_single[j].set(*obs_raw, *obs_thresh, obs_shape[j],
+      cur_shape = select(*obs_split, j+1);
+      obs_single[j].set(*obs_raw, *obs_thresh,
+                        *obs_split, cur_shape,
                         conf_info.inten_perc_value,
                         conf_info.Obs->var_info->is_precipitation());
       obs_single[j].object_number = j+1;
@@ -1277,9 +1318,6 @@ void ModeFuzzyEngine::do_match_merge() {
    // Done
    //
 
-   delete [] fcst_shape; fcst_shape = (ShapeData *) 0;
-   delete [] obs_shape;  obs_shape = (ShapeData *) 0;
-
    return;
 }
 
@@ -1292,12 +1330,10 @@ void ModeFuzzyEngine::do_match_merge() {
 ///////////////////////////////////////////////////////////////////////
 
 void ModeFuzzyEngine::do_fcst_merge_thresh() {
-   int j, k, x, y;
-   int n_fcst_merge, intersection;
-   int count, first_k;
+   const char *method_name = "ModeFuzzyEngine::do_fcst_merge_thresh() -> ";
+   int j, mid, oid;
+   int n_fcst_merge;
    ShapeData fcst_merge_mask, fcst_merge_split;
-   ShapeData * fcst_shape = (ShapeData *) 0;
-   ShapeData * fcst_merge_shape = (ShapeData *) 0;
 
    do_fcst_splitting();
 
@@ -1318,90 +1354,60 @@ void ModeFuzzyEngine::do_fcst_merge_thresh() {
    fcst_merge_split = split(fcst_merge_mask, n_fcst_merge);
 
    //
-   // Allocate space for all of the simple forecast shapes and
-   // forecast merge shapes
+   // Mapping of simple object id to merge object id values and vice-versa
    //
-   fcst_shape       = new ShapeData [n_fcst];
-   fcst_merge_shape = new ShapeData [n_fcst_merge];
+   map<int, std::set<int> > obj_to_mrg_map;
+   map<int, std::set<int> > mrg_to_obj_map;
+   std::set<int> empty_set;
 
-   if(!fcst_shape || !fcst_merge_shape) {
+   // Add map entries for each object
+   for(j=1; j<=n_fcst;       j++) obj_to_mrg_map[j] = empty_set;
+   for(j=1; j<=n_fcst_merge; j++) mrg_to_obj_map[j] = empty_set;
 
-      mlog << Error << "\nModeFuzzyEngine::do_fcst_merge_thresh() -> "
-           << "memory allocation error\n\n";
-      exit(1);
-   }
+   // Loop over all the data points
+   for(j=0; j<fcst_split->data.nxy(); j++) {
+
+      oid = fcst_split->data.buf()[j];
+      mid = fcst_merge_split.data.buf()[j];
+
+      // Update object id maps
+      if(oid > 0)            obj_to_mrg_map[oid].insert(mid);
+      if(oid > 0 && mid > 0) mrg_to_obj_map[mid].insert(oid);
+
+   } // end for j
 
    //
-   // Select all of the simple forecast shapes and
-   // forecast merge shapes
+   // Each simple object should be fully contained in a merge object
    //
-   for(j=0; j<n_fcst; j++) {
-      fcst_shape[j] = select(*fcst_split, j+1);
-   }
-
-   for(j=0; j<n_fcst_merge; j++) {
-      fcst_merge_shape[j] = select(fcst_merge_split, j+1);
+   for(oid=1; oid<=n_fcst; oid++) {
+      if(obj_to_mrg_map[oid].size() != 1) {
+         mlog << Warning << "\n" << method_name
+              << "No forecast threshold merging done because simple object "
+              << oid << " is not fully contained within one merge object! "
+              << "Recommend modifying the \"fcst.merge_thresh\" setting.\n\n";
+         return;
+      }
    }
 
    //
    // Calculate the composite object sets
    //
-   for(j=0; j<n_fcst_merge; j++) {
+   for(mid=1; mid<=n_fcst_merge; mid++) {
 
-      count = first_k = 0;
+      // Ignore merge objects containing a single simple object
+      if(mrg_to_obj_map[mid].size() <= 1) continue;
 
-      for(k=0; k<n_fcst; k++) {
+      // Add all simple objects into one new set
+      collection.make_room();
+      for(auto it  = mrg_to_obj_map[mid].begin();
+               it != mrg_to_obj_map[mid].end(); it++) {
+         collection.set[collection.n_sets].add_pair(*it, -1);
+      }
 
-         //
-         // Calculate intersection area
-         //
-         intersection = 0;
+      // Increment set counter
+      collection.n_sets++;
 
-         for(x=0; x<fcst_merge_mask.data.nx(); x++) {
-            for(y=0; y<fcst_merge_mask.data.ny(); y++) {
-
-               if(fcst_merge_shape[j].s_is_on(x, y) &&
-                  fcst_shape[k].s_is_on(x, y)) intersection++;
-            }
-         }
-
-         //
-         // Add to set collection only if the fcst object is
-         // completely contained in the merge object.  Meaning,
-         // intersection area >= fcst area
-         //
-
-         if(intersection >= fcst_shape[k].area()) {
-
-            collection.make_room();
-
-            //
-            // Keep track of the first embedded shape.  You only want to
-            // create a composite if there are more than 1 shapes in it.
-            //
-            if(count == 0) first_k = k+1;
-
-            else if(count == 1) {
-               collection.set[collection.n_sets].add_pair(first_k, -1);
-               collection.set[collection.n_sets].add_pair(k+1, -1);
-            }
-            else {
-               collection.set[collection.n_sets].add_pair(k+1, -1);
-            }
-
-            count++;
-         }
-      }  // end for k
-
-      if(count > 0) collection.n_sets++;
-   }  // end for j
-
-   //
-   // Done
-   //
-
-   delete [] fcst_shape;       fcst_shape = (ShapeData *) 0;
-   delete [] fcst_merge_shape; fcst_merge_shape = (ShapeData *) 0;
+   } // end for mid
 
    return;
 }
@@ -1415,12 +1421,10 @@ void ModeFuzzyEngine::do_fcst_merge_thresh() {
 ///////////////////////////////////////////////////////////////////////
 
 void ModeFuzzyEngine::do_obs_merge_thresh() {
-   int j, k, x, y;
-   int n_obs_merge, intersection;
-   int count, first_k;
+   const char *method_name = "ModeFuzzyEngine::do_obs_merge_thresh() -> ";
+   int j, mid, oid;
+   int n_obs_merge;
    ShapeData obs_merge_mask, obs_merge_split;
-   ShapeData * obs_shape = (ShapeData *) 0;
-   ShapeData * obs_merge_shape = (ShapeData *) 0;
 
    do_obs_splitting();
 
@@ -1441,328 +1445,242 @@ void ModeFuzzyEngine::do_obs_merge_thresh() {
    obs_merge_split = split(obs_merge_mask, n_obs_merge);
 
    //
-   // Allocate space for all of the simple observation shapes and
-   // observation merge shapes
+   // Mapping of simple object id to merge object id values and vice-versa
    //
-   obs_shape       = new ShapeData [n_obs];
-   obs_merge_shape = new ShapeData [n_obs_merge];
+   map<int, std::set<int> > obj_to_mrg_map;
+   map<int, std::set<int> > mrg_to_obj_map;
+   std::set<int> empty_set;
 
-   if(!obs_shape || !obs_merge_shape) {
+   // Add map entries for each object
+   for(j=1; j<=n_obs;       j++) obj_to_mrg_map[j] = empty_set;
+   for(j=1; j<=n_obs_merge; j++) mrg_to_obj_map[j] = empty_set;
 
-      mlog << Error << "\nModeFuzzyEngine::do_obs_merge_thresh() -> "
-           << "memory allocation error\n\n";
-      exit(1);
-   }
+   // Loop over all the data points
+   for(j=0; j<obs_split->data.nxy(); j++) {
+
+      oid = obs_split->data.buf()[j];
+      mid = obs_merge_split.data.buf()[j];
+
+      // Update object id maps
+      if(oid > 0)            obj_to_mrg_map[oid].insert(mid);
+      if(oid > 0 && mid > 0) mrg_to_obj_map[mid].insert(oid);
+
+   } // end for j
 
    //
-   // Select all of the simple observation shapes and
-   // simple merge shapes
+   // Each simple object should be fully contained in a merge object
    //
-   for(j=0; j<n_obs; j++) {
-      obs_shape[j] = select(*obs_split, j+1);
-   }
-
-   for(j=0; j<n_obs_merge; j++) {
-      obs_merge_shape[j] = select(obs_merge_split, j+1);
+   for(oid=1; oid<=n_obs; oid++) {
+      if(obj_to_mrg_map[oid].size() != 1) {
+         mlog << Warning << "\n" << method_name
+              << "No observation threshold merging done because simple object "
+              << oid << " is not fully contained within one merge object! "
+              << "Recommend modifying the \"obs.merge_thresh\" setting.\n\n";
+         return;
+      }
    }
 
    //
    // Calculate the composite object sets
    //
-   for(j=0; j<n_obs_merge; j++) {
+   for(mid=1; mid<=n_obs_merge; mid++) {
 
-      count = first_k = 0;
+      // Ignore merge objects containing a single simple object
+      if(mrg_to_obj_map[mid].size() <= 1) continue;
 
-      for(k=0; k<n_obs; k++) {
+      // Add all simple objects into one new set
+      collection.make_room();
+      for(auto it  = mrg_to_obj_map[mid].begin();
+               it != mrg_to_obj_map[mid].end(); it++) {
+         collection.set[collection.n_sets].add_pair(-1, *it);
+      }
 
-         //
-         // Calculate intersection area
-         //
-         intersection = 0;
+      // Increment set counter
+      collection.n_sets++;
 
-         for(x=0; x<obs_merge_mask.data.nx(); x++) {
-            for(y=0; y<obs_merge_mask.data.ny(); y++) {
-
-               if(obs_merge_shape[j].s_is_on(x, y) &&
-                  obs_shape[k].s_is_on(x, y)) intersection++;
-            }
-         }
-
-         //
-         // Add to set collection only if the obs object is
-         // completely contained in the merge object.  Meaning,
-         // intersection area >= obs area
-         //
-         if(intersection >= obs_shape[k].area()) {
-
-            collection.make_room();
-
-            //
-            // Keep track of the first embedded shape.  You only want to
-            // create a composite if there are more than 1 shapes in it.
-            //
-            if(count == 0) first_k = k+1;
-
-            else if(count == 1) {
-               collection.set[collection.n_sets].add_pair(-1, first_k);
-               collection.set[collection.n_sets].add_pair(-1, k+1);
-            }
-            else {
-               collection.set[collection.n_sets].add_pair(-1, k+1);
-            }
-
-            count++;
-         }
-      }  // end for k
-
-      if(count > 0) collection.n_sets++;
-   }  // end for j
-
-   //
-   // Done
-   //
-
-   delete [] obs_shape;       obs_shape = (ShapeData *) 0;
-   delete [] obs_merge_shape; obs_merge_shape = (ShapeData *) 0;
+   } // end for mid
 
    return;
 }
 
+///////////////////////////////////////////////////////////////////////
 
 void ModeFuzzyEngine::do_fcst_merge_thresh(const ShapeData &merge_data) {
-   int j, k, x, y;
-   int n_fcst_merge, intersection;
-   int count, first_k;
-   //ShapeData fcst_merge_mask;
+   const char *method_name = "ModeFuzzyEngine::do_fcst_merge_thresh() -> ";
+   int j, mid, oid;
+   int n_fcst_merge;
    ShapeData fcst_merge_split;
-   ShapeData * fcst_shape = (ShapeData *) 0;
-   ShapeData * fcst_merge_shape = (ShapeData *) 0;
 
    do_fcst_splitting();
 
    //
-   // Define the forecast merge field by applying the specified threshold
-   // to the convolved field
+   // Check dimensions
    //
-   fcst_merge_split = merge_data;
-   n_fcst_merge = fcst_merge_split.n_objects();
-      
-   // fcst_merge_mask = *fcst_conv;
-
-   // //
-   // // Threshold the forecast merge field
-   // //
-   // fcst_merge_mask.threshold(conf_info.Fcst->merge_thresh);
-
-   // //
-   // // Split up the forecast merge field
-   // //
-   // fcst_merge_split = split(fcst_merge_mask, n_fcst_merge);
-
-   //
-   // Allocate space for all of the simple forecast shapes and
-   // forecast merge shapes
-   //
-   fcst_shape       = new ShapeData [n_fcst];
-   fcst_merge_shape = new ShapeData [n_fcst_merge];
-
-   if(!fcst_shape || !fcst_merge_shape) {
-
-      mlog << Error << "\nModeFuzzyEngine::do_fcst_merge_thresh() -> "
-           << "memory allocation error\n\n";
+   if(fcst_split->data.nx() != merge_data.data.nx() ||
+      fcst_split->data.ny() != merge_data.data.ny()) {
+      mlog << Error << "\n" << method_name
+           << "grid dimensions do not match (" << fcst_split->data.nx() << ", "
+           << fcst_split->data.ny() << ") != (" << merge_data.data.nx() << ", "
+           << merge_data.data.ny() << ")!\n\n";
       exit(1);
    }
 
    //
-   // Select all of the simple forecast shapes and
-   // forecast merge shapes
+   // Assume that the input merge data has already been split
    //
-   for(j=0; j<n_fcst; j++) {
-      fcst_shape[j] = select(*fcst_split, j+1);
-   }
+   fcst_merge_split = merge_data;
+   n_fcst_merge = fcst_merge_split.n_objects();
 
-   for(j=0; j<n_fcst_merge; j++) {
-      fcst_merge_shape[j] = select(fcst_merge_split, j+1);
+   //
+   // Mapping of simple object id to merge object id values and vice-versa
+   //
+   map<int, std::set<int> > obj_to_mrg_map;
+   map<int, std::set<int> > mrg_to_obj_map;
+   std::set<int> empty_set;
+
+   // Add map entries for each object
+   for(j=1; j<=n_fcst;       j++) obj_to_mrg_map[j] = empty_set;
+   for(j=1; j<=n_fcst_merge; j++) mrg_to_obj_map[j] = empty_set;
+
+   // Loop over all the data points
+   for(j=0; j<fcst_split->data.nxy(); j++) {
+
+      oid = fcst_split->data.buf()[j];
+      mid = fcst_merge_split.data.buf()[j];
+
+      // Update object id maps
+      if(oid > 0)            obj_to_mrg_map[oid].insert(mid);
+      if(oid > 0 && mid > 0) mrg_to_obj_map[mid].insert(oid);
+
+   } // end for j
+
+   //
+   // Each simple object should be fully contained in a merge object
+   //
+   for(oid=1; oid<=n_fcst; oid++) {
+      if(obj_to_mrg_map[oid].size() != 1) {
+         mlog << Warning << "\n" << method_name
+              << "No forecast threshold merging done because simple object "
+              << oid << " is not fully contained within one merge object!\n\n";
+         return;
+      }
    }
 
    //
    // Calculate the composite object sets
    //
-   for(j=0; j<n_fcst_merge; j++) {
+   for(mid=1; mid<=n_fcst_merge; mid++) {
 
-      count = first_k = 0;
+      // Ignore merge objects containing a single simple object
+      if(mrg_to_obj_map[mid].size() <= 1) continue;
 
-      for(k=0; k<n_fcst; k++) {
+      // Add all simple objects into one new set
+      collection.make_room();
+      for(auto it  = mrg_to_obj_map[mid].begin();
+               it != mrg_to_obj_map[mid].end(); it++) {
+         collection.set[collection.n_sets].add_pair(*it, -1);
+      }
 
-         //
-         // Calculate intersection area
-         //
-         intersection = 0;
+      // Increment set counter
+      collection.n_sets++;
 
-         for(x=0; x<fcst_merge_split.data.nx(); x++) {
-            for(y=0; y<fcst_merge_split.data.ny(); y++) {
+   } // end for mid
 
-               if(fcst_merge_shape[j].s_is_on(x, y) &&
-                  fcst_shape[k].s_is_on(x, y)) intersection++;
-            }
-         }
+   if(mlog.verbosity_level() >= 4) {
+      mlog << Debug(4) << " After merging of fcst field: "
+           << fcst_split->sdebug_examine() << "\n";
+   }
 
-         //
-         // Add to set collection only if the fcst object is
-         // completely contained in the merge object.  Meaning,
-         // intersection area >= fcst area
-         //
-
-         if(intersection >= fcst_shape[k].area()) {
-
-            collection.make_room();
-
-            //
-            // Keep track of the first embedded shape.  You only want to
-            // create a composite if there are more than 1 shapes in it.
-            //
-            if(count == 0) first_k = k+1;
-
-            else if(count == 1) {
-               collection.set[collection.n_sets].add_pair(first_k, -1);
-               collection.set[collection.n_sets].add_pair(k+1, -1);
-            }
-            else {
-               collection.set[collection.n_sets].add_pair(k+1, -1);
-            }
-
-            count++;
-         }
-      }  // end for k
-
-      if(count > 0) collection.n_sets++;
-   }  // end for j
-
-   //
-   // Done
-   //
-
-   delete [] fcst_shape;       fcst_shape = (ShapeData *) 0;
-   delete [] fcst_merge_shape; fcst_merge_shape = (ShapeData *) 0;
-
-   mlog << Debug(4) << " After merging of fcst field: " << fcst_split->sdebug_examine() << "\n";
    return;
 }
 
+///////////////////////////////////////////////////////////////////////
+
 void ModeFuzzyEngine::do_obs_merge_thresh(const ShapeData &merge_data) {
-   int j, k, x, y;
-   int n_obs_merge, intersection;
-   int count, first_k;
-   //ShapeData obs_merge_mask;
+   const char *method_name = "ModeFuzzyEngine::do_obs_merge_thresh() -> ";
+   int j, mid, oid;
+   int n_obs_merge;
    ShapeData obs_merge_split;
-   ShapeData * obs_shape = (ShapeData *) 0;
-   ShapeData * obs_merge_shape = (ShapeData *) 0;
 
    do_obs_splitting();
 
    //
-   // Define the forecast merge field by applying the specified threshold
-   // to the convolved field
+   // Check dimensions
    //
-   // obs_merge_mask = *obs_conv;
-
-   //
-   // Threshold the forecast merge field
-   //
-   // obs_merge_mask.threshold(conf_info.Obs->merge_thresh);
-
-   //
-   // Split up the forecast merge field
-   //
-   obs_merge_split = merge_data; //split(obs_merge_mask, n_obs_merge);
-   n_obs_merge = obs_merge_split.n_objects();
-
-   //
-   // Allocate space for all of the simple observation shapes and
-   // observation merge shapes
-   //
-   obs_shape       = new ShapeData [n_obs];
-   obs_merge_shape = new ShapeData [n_obs_merge];
-
-   if(!obs_shape || !obs_merge_shape) {
-
-      mlog << Error << "\nModeFuzzyEngine::do_obs_merge_thresh() -> "
-           << "memory allocation error\n\n";
+   if(obs_split->data.nx() != merge_data.data.nx() ||
+      obs_split->data.ny() != merge_data.data.ny()) {
+      mlog << Error << "\n" << method_name
+           << "grid dimensions do not match (" << obs_split->data.nx() << ", "
+           << obs_split->data.ny() << ") != (" << merge_data.data.nx() << ", "
+           << merge_data.data.ny() << ")!\n\n";
       exit(1);
    }
 
    //
-   // Select all of the simple observation shapes and
-   // simple merge shapes
+   // Assume that the input merge data has already been split
    //
-   for(j=0; j<n_obs; j++) {
-      obs_shape[j] = select(*obs_split, j+1);
-   }
+   obs_merge_split = merge_data;
+   n_obs_merge = obs_merge_split.n_objects();
 
-   for(j=0; j<n_obs_merge; j++) {
-      obs_merge_shape[j] = select(obs_merge_split, j+1);
+   //
+   // Mapping of simple object id to merge object id values and vice-versa
+   //
+   map<int, std::set<int> > obj_to_mrg_map;
+   map<int, std::set<int> > mrg_to_obj_map;
+   std::set<int> empty_set;
+
+   // Add map entries for each object
+   for(j=1; j<=n_obs;       j++) obj_to_mrg_map[j] = empty_set;
+   for(j=1; j<=n_obs_merge; j++) mrg_to_obj_map[j] = empty_set;
+
+   // Loop over all the data points
+   for(j=0; j<obs_split->data.nxy(); j++) {
+
+      oid = obs_split->data.buf()[j];
+      mid = obs_merge_split.data.buf()[j];
+
+      // Update object id maps
+      if(oid > 0)            obj_to_mrg_map[oid].insert(mid);
+      if(oid > 0 && mid > 0) mrg_to_obj_map[mid].insert(oid);
+
+   } // end for j
+
+   //
+   // Each simple object should be fully contained in a merge object
+   //
+   for(oid=1; oid<=n_obs; oid++) {
+      if(obj_to_mrg_map[oid].size() != 1) {
+         mlog << Warning << "\n" << method_name
+              << "No observation threshold merging done because simple object "
+              << oid << " is not fully contained within one merge object!\n\n";
+         return;
+      }
    }
 
    //
    // Calculate the composite object sets
    //
-   for(j=0; j<n_obs_merge; j++) {
+   for(mid=1; mid<=n_obs_merge; mid++) {
+      // Ignore merge objects containing a single simple object
+      if(mrg_to_obj_map[mid].size() <= 1) continue;
 
-      count = first_k = 0;
+      // Add all simple objects into one new set
+      collection.make_room();
+      for(auto it  = mrg_to_obj_map[mid].begin();
+               it != mrg_to_obj_map[mid].end(); it++) {
+         collection.set[collection.n_sets].add_pair(-1, *it);
+      }
 
-      for(k=0; k<n_obs; k++) {
+      // Increment set counter
+      collection.n_sets++;
 
-         //
-         // Calculate intersection area
-         //
-         intersection = 0;
+   } // end for mid
 
-         for(x=0; x<obs_merge_split.data.nx(); x++) {
-            for(y=0; y<obs_merge_split.data.ny(); y++) {
+   if(mlog.verbosity_level() >= 4) {
+      mlog << Debug(4) << " After merging of obs field: "
+           << obs_split->sdebug_examine() << "\n";
+   }
 
-               if(obs_merge_shape[j].s_is_on(x, y) &&
-                  obs_shape[k].s_is_on(x, y)) intersection++;
-            }
-         }
-
-         //
-         // Add to set collection only if the obs object is
-         // completely contained in the merge object.  Meaning,
-         // intersection area >= obs area
-         //
-         if(intersection >= obs_shape[k].area()) {
-
-            collection.make_room();
-
-            //
-            // Keep track of the first embedded shape.  You only want to
-            // create a composite if there are more than 1 shapes in it.
-            //
-            if(count == 0) first_k = k+1;
-
-            else if(count == 1) {
-               collection.set[collection.n_sets].add_pair(-1, first_k);
-               collection.set[collection.n_sets].add_pair(-1, k+1);
-            }
-            else {
-               collection.set[collection.n_sets].add_pair(-1, k+1);
-            }
-
-            count++;
-         }
-      }  // end for k
-
-      if(count > 0) collection.n_sets++;
-   }  // end for j
-
-   //
-   // Done
-   //
-
-   delete [] obs_shape;       obs_shape = (ShapeData *) 0;
-   delete [] obs_merge_shape; obs_merge_shape = (ShapeData *) 0;
-
-   mlog << Debug(4) << " After merging of obs field: " << obs_split->sdebug_examine() << "\n";
    return;
 }
 
@@ -2114,22 +2032,12 @@ void ModeFuzzyEngine::do_obs_merge_engine(const char *default_config,
 void ModeFuzzyEngine::do_match_fcst_merge() {
    int j, k, n;
    InterestInfo junkinfo;
-   ShapeData * fcst_shape = (ShapeData *) 0;
-   ShapeData * obs_shape = (ShapeData *) 0;
+   ShapeData cur_shape;
 
    do_fcst_splitting();
    do_obs_splitting();
 
    clear_colors();
-
-   fcst_shape = new ShapeData [n_fcst];
-   obs_shape = new ShapeData [n_obs];
-
-   if(!fcst_shape || !obs_shape) {
-      mlog << Error << "\nModeFuzzyEngine::do_match_fcst_merge() -> "
-           << "memory allocation error\n\n";
-      exit(1);
-   }
 
    //
    // Do the single features
@@ -2137,8 +2045,9 @@ void ModeFuzzyEngine::do_match_fcst_merge() {
    fcst_single.set_size(n_fcst);
 
    for(j=0; j<n_fcst; j++) {
-      fcst_shape[j] = select(*fcst_split, j+1);
-      fcst_single[j].set(*fcst_raw, *fcst_thresh, fcst_shape[j],
+      cur_shape = select(*fcst_split, j+1);
+      fcst_single[j].set(*fcst_raw, *fcst_thresh,
+                         *fcst_split, cur_shape,
                          conf_info.inten_perc_value,
                          conf_info.Fcst->var_info->is_precipitation());
       fcst_single[j].object_number = j+1;
@@ -2147,8 +2056,9 @@ void ModeFuzzyEngine::do_match_fcst_merge() {
    obs_single.set_size(n_obs);
 
    for(j=0; j<n_obs; j++) {
-      obs_shape[j] = select(*obs_split, j+1);
-      obs_single[j].set(*obs_raw, *obs_thresh, obs_shape[j],
+      cur_shape = select(*obs_split, j+1);
+      obs_single[j].set(*obs_raw, *obs_thresh,
+                        *obs_split, cur_shape,
                         conf_info.inten_perc_value,
                         conf_info.Obs->var_info->is_precipitation());
       obs_single[j].object_number = j+1;
@@ -2275,9 +2185,6 @@ void ModeFuzzyEngine::do_match_fcst_merge() {
    // Done
    //
 
-   delete [] fcst_shape;  fcst_shape = (ShapeData *) 0;
-   delete [] obs_shape;   obs_shape = (ShapeData *) 0;
-
    return;
 }
 
@@ -2291,22 +2198,12 @@ void ModeFuzzyEngine::do_match_fcst_merge() {
 void ModeFuzzyEngine::do_match_only() {
    int j, k, n;
    InterestInfo junkinfo;
-   ShapeData * fcst_shape = (ShapeData *) 0;
-   ShapeData * obs_shape = (ShapeData *) 0;
+   ShapeData cur_shape;
 
    do_fcst_splitting();
    do_obs_splitting();
 
    clear_colors();
-
-   fcst_shape = new ShapeData [n_fcst];
-   obs_shape = new ShapeData [n_obs];
-
-   if(!fcst_shape || !obs_shape) {
-      mlog << Error << "\nModeFuzzyEngine::do_match_only() -> "
-           << "memory allocation error\n\n";
-      exit(1);
-   }
 
    //
    // Do the single features
@@ -2314,8 +2211,9 @@ void ModeFuzzyEngine::do_match_only() {
    fcst_single.set_size(n_fcst);
 
    for(j=0; j<n_fcst; j++) {
-      fcst_shape[j] = select(*fcst_split, j+1);
-      fcst_single[j].set(*fcst_raw, *fcst_thresh, fcst_shape[j],
+      cur_shape = select(*fcst_split, j+1);
+      fcst_single[j].set(*fcst_raw, *fcst_thresh,
+                         *fcst_split, cur_shape,
                          conf_info.inten_perc_value,
                          conf_info.Fcst->var_info->is_precipitation());
       fcst_single[j].object_number = j+1;
@@ -2324,8 +2222,9 @@ void ModeFuzzyEngine::do_match_only() {
    obs_single.set_size(n_obs);
 
    for(j=0; j<n_obs; j++) {
-      obs_shape[j] = select(*obs_split, j+1);
-      obs_single[j].set(*obs_raw, *obs_thresh, obs_shape[j],
+      cur_shape = select(*obs_split, j+1);
+      obs_single[j].set(*obs_raw, *obs_thresh,
+                        *obs_split, cur_shape,
                         conf_info.inten_perc_value,
                         conf_info.Obs->var_info->is_precipitation());
       obs_single[j].object_number = j+1;
@@ -2446,9 +2345,6 @@ void ModeFuzzyEngine::do_match_only() {
    // Done
    //
 
-   delete [] fcst_shape;   fcst_shape = (ShapeData *) 0;
-   delete [] obs_shape;    obs_shape = (ShapeData *) 0;
-
    return;
 }
 
@@ -2537,8 +2433,7 @@ void ModeFuzzyEngine::do_obs_clus_splitting() {
 
 void ModeFuzzyEngine::do_cluster_features() {
    int j;
-   ShapeData * fcst_clus_shape = (ShapeData *) 0;
-   ShapeData * obs_clus_shape  = (ShapeData *) 0;
+   ShapeData cur_shape;
 
    if(need_fcst_clus_split) do_fcst_clus_splitting();
    if(need_obs_clus_split)  do_obs_clus_splitting();
@@ -2548,16 +2443,6 @@ void ModeFuzzyEngine::do_cluster_features() {
    //
    n_clus = collection.n_sets;
 
-   fcst_clus_shape = new ShapeData [n_clus];
-   obs_clus_shape  = new ShapeData [n_clus];
-
-   if(!fcst_clus_shape || !obs_clus_shape) {
-
-      mlog << Error << "\nModeFuzzyEngine::do_cluster_features() -> "
-           << "memory allocation error\n\n";
-      exit(1);
-   }
-
    //
    // Do the single features for clusters
    //
@@ -2565,16 +2450,18 @@ void ModeFuzzyEngine::do_cluster_features() {
     obs_cluster.set_size(n_clus);
 
    for(j=0; j<n_clus; j++) {
-      fcst_clus_shape[j] = select(*fcst_clus_split, j+1);
-      fcst_cluster[j].set(*fcst_raw, *fcst_thresh, fcst_clus_shape[j],
-                       conf_info.inten_perc_value,
-                       conf_info.Fcst->var_info->is_precipitation());
+      cur_shape = select(*fcst_clus_split, j+1);
+      fcst_cluster[j].set(*fcst_raw, *fcst_thresh,
+                          *fcst_clus_split, cur_shape,
+                          conf_info.inten_perc_value,
+                          conf_info.Fcst->var_info->is_precipitation());
       fcst_cluster[j].object_number = j+1;
 
-      obs_clus_shape[j] = select(*obs_clus_split, j+1);
-      obs_cluster[j].set(*obs_raw, *obs_thresh, obs_clus_shape[j],
-                      conf_info.inten_perc_value,
-                      conf_info.Obs->var_info->is_precipitation());
+      cur_shape = select(*obs_clus_split, j+1);
+      obs_cluster[j].set(*obs_raw, *obs_thresh,
+                         *obs_clus_split, cur_shape,
+                         conf_info.inten_perc_value,
+                         conf_info.Obs->var_info->is_precipitation());
       obs_cluster[j].object_number = j+1;
    }
 
@@ -2585,7 +2472,7 @@ void ModeFuzzyEngine::do_cluster_features() {
 
    for(j=0; j<n_clus; j++) {
       pair_cluster[j].set(fcst_cluster[j], obs_cluster[j],
-                       conf_info.max_centroid_dist);
+                          conf_info.max_centroid_dist);
       pair_cluster[j].pair_number = j+1;
    }
 
@@ -2607,10 +2494,15 @@ void ModeFuzzyEngine::do_cluster_features() {
    // Done
    //
 
-   delete [] fcst_clus_shape; fcst_clus_shape = (ShapeData *) 0;
-   delete [] obs_clus_shape;  obs_clus_shape  = (ShapeData *) 0;
-
    return;
+}
+
+///////////////////////////////////////////////////////////////////////
+
+void ModeFuzzyEngine::set_data_type(ModeDataType type)
+{
+   data_type = type;
+   conf_info.set_data_type(type);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -4072,7 +3964,7 @@ void calc_fcst_clus_ch_mask(const ModeFuzzyEngine &eng, ShapeData &mask) {
    Box bb;
 
    if(eng.need_fcst_clus_split) {
-      mlog << Error << "\ncalc_fcst_clus_ch_mask -> "
+      mlog << Error << "\ncalc_fcst_clus_ch_mask() -> "
            << "should not be called with need_fcst_clus_split set to true\n\n";
 
       exit(1);
@@ -4135,7 +4027,7 @@ void calc_obs_clus_ch_mask(const ModeFuzzyEngine &eng, ShapeData &mask) {
    Box bb;
 
    if(eng.need_obs_clus_split) {
-      mlog << Error << "\ncalc_obs_clus_ch_mask -> "
+      mlog << Error << "\ncalc_obs_clus_ch_mask() -> "
            << "should not be called with need_obs_clus_split set to true\n\n";
       exit(1);
    }

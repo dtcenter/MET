@@ -84,6 +84,9 @@
 /* "build tc_utils" */
 #undef ENABLE_TC_UTILS
 
+/* "build unstructured grid with Atlas and eckit libraries" */
+#undef ENABLE_UGRID
+
 /* "build wavelet_stat" */
 #undef ENABLE_WAVELET_STAT
 

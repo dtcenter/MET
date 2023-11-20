@@ -152,7 +152,6 @@ class PlotPointObsConfInfo {
       // Options for plotting point data
       std::vector<PlotPointObsOpt> point_opts;
 
-      ConcatString tmp_dir; // Directory for temporary files
       ConcatString version; // Config file version
 
       bool do_colorbar;

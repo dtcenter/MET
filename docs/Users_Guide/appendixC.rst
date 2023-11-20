@@ -52,7 +52,7 @@ Which statistics are the same, but with different names?
 
 .. _categorical variables:
 
-MET verification measures for categorical (dichotomous) variables
+MET Verification Measures for Categorical (Dichotomous) Variables
 =================================================================
 
 
@@ -99,7 +99,7 @@ TOTAL
 
 The total number of forecast-observation pairs, **T**.
 
-Base rate
+Base Rate
 ---------
 
 Called "O_RATE" in FHO output :numref:`table_PS_format_info_FHO`
@@ -108,7 +108,7 @@ Called "BASER" in CTS output :numref:`table_PS_format_info_CTS`
 
 The base rate is defined as :math:`\bar{o} = \frac{n_{11} + n_{01}}{T} = \frac{n_{.1}}{T}.` This value is also known as the sample climatology, and is the relative frequency of occurrence of the event (i.e., o = 1). The base rate is equivalent to the "O" value produced by the NCEP Verification System.
 
-Mean forecast
+Mean Forecast
 -------------
 
 Called "F_RATE" in FHO output :numref:`table_PS_format_info_FHO`
@@ -182,7 +182,7 @@ POFD is defined as
 
 It is the proportion of non-events that were forecast to be events. POFD is also often called the False Alarm Rate. POFD ranges from 0 to 1; a perfect forecast would have POFD = 0.
 
-Probability of Detection of the non-event (PODn)
+Probability of Detection of the Non-Event (PODn)
 ------------------------------------------------
 
 Called "PODN" in CTS output :numref:`table_PS_format_info_CTS`
@@ -398,14 +398,14 @@ where the word expected refers to the mean value deduced from the climatology, r
 
 SEEPS scores are expected to lie between 0 and 1, with a perfect forecast having a value of 0. Individual values can be much larger than 1. Results can be presented as a skill score by using the value of 1 – SEEPS.
 
-MET verification measures for continuous variables
+MET Verification Measures for Continuous Variables
 ==================================================
 
 For continuous variables, many verification measures are based on the forecast error (i.e., **f - o**). However, it also is of interest to investigate characteristics of the forecasts, and the observations, as well as their relationship. These concepts are consistent with the general framework for verification outlined by :ref:`Murphy and Winkler, (1987) <Murphy-1987>`. The statistics produced by MET for continuous forecasts represent this philosophy of verification, which focuses on a variety of aspects of performance rather than a single measure.
 
 The verification measures currently evaluated by the Point-Stat tool are defined and described in the subsections below. In these definitions, **f** represents the forecasts, **o** represents the observation, and **n** is the number of forecast-observation pairs.
 
-Mean forecast
+Mean Forecast
 -------------
 
 Called "FBAR" in CNT output :numref:`table_PS_format_info_CNT`
@@ -414,7 +414,7 @@ Called "FBAR" in SL1L2 output :numref:`table_PS_format_info_SL1L2`
 
 The sample mean forecast, FBAR, is defined as :math:`\bar{f} = \frac{1}{n} \sum_{i=1}^{n} f_i`.
 
-Mean observation
+Mean Observation
 ----------------
 
 Called "OBAR" in CNT output :numref:`table_PS_format_info_CNT`
@@ -423,7 +423,7 @@ Called "OBAR" in SL1L2 output :numref:`table_PS_format_info_SL1L2`
 
 The sample mean observation is defined as :math:`\bar{o} = \frac{1}{n} \sum_{i=1}^{n} o_i`.
 
-Forecast standard deviation
+Forecast Standard Deviation
 ---------------------------
 
 Called "FSTDEV" in CNT output :numref:`table_PS_format_info_CNT`
@@ -434,7 +434,7 @@ The sample variance of the forecasts is defined as
 
 The forecast standard deviation is defined as :math:`s_f = \sqrt{s_f^2}`.
 
-Observation standard deviation
+Observation Standard Deviation
 ------------------------------
 
 Called "OSTDEV" in CNT output :numref:`table_PS_format_info_CNT`
@@ -456,7 +456,7 @@ The Pearson correlation coefficient, **r**, measures the strength of linear asso
 
 **r** can range between -1 and 1; a value of 1 indicates perfect correlation and a value of -1 indicates perfect negative correlation. A value of 0 indicates that the forecasts and observations are not correlated. 
 
-Spearman rank correlation coefficient :math:`(\rho_{s})`
+Spearman Rank Correlation Coefficient :math:`(\rho_{s})`
 --------------------------------------------------------
 
 Called "SP_CORR" in CNT :numref:`table_PS_format_info_CNT`
@@ -469,7 +469,7 @@ A simpler formulation of the Spearman-rank correlation is based on differences b
 
 Like **r**, the Spearman rank correlation coefficient ranges between -1 and 1; a value of 1 indicates perfect correlation and a value of -1 indicates perfect negative correlation. A value of 0 indicates that the forecasts and observations are not correlated. 
 
-Kendall's Tau statistic ( :math:`\tau`)
+Kendall's Tau Statistic ( :math:`\tau`)
 ---------------------------------------
 
 Called "KT_CORR" in CNT output :numref:`table_PS_format_info_CNT`
@@ -510,14 +510,14 @@ Called "MBIAS" in CNT output :numref:`table_PS_format_info_CNT`
 
 Multiplicative bias is simply the ratio of the means of the forecasts and the observations: :math:`\text{MBIAS} = \bar{f} / \bar{o}`
 
-Mean-squared error (MSE)
+Mean-Squared Error (MSE)
 ------------------------
 
 Called "MSE" in CNT output :numref:`table_PS_format_info_CNT`
 
 MSE measures the average squared error of the forecasts. Specifically, :math:`\text{MSE} = \frac{1}{n}\sum (f_{i} - o_{i})^{2}`.
 
-Root-mean-squared error (RMSE)
+Root-Mean-Squared Error (RMSE)
 ------------------------------
 
 Called "RMSE" in CNT output :numref:`table_PS_format_info_CNT`
@@ -535,7 +535,7 @@ SI is the ratio of the root mean squared error to the average observation value,
 
 Smaller values of SI indicate better agreement between the model and observations (less scatter on scatter plot).
 
-Standard deviation of the error
+Standard Deviation of the Error
 -------------------------------
 
 Called "ESTDEV" in CNT output :numref:`table_PS_format_info_CNT`
@@ -590,21 +590,21 @@ The Mean Squared Error Skill Score is one minus the ratio of the forecast MSE to
 
 .. math:: \text{MSESS} = 1 - \frac{\text{MSE}_f}{\text{MSE}_r}
 
-Root-mean-squared Forecast Anomaly
+Root-Mean-Squared Forecast Anomaly
 ----------------------------------
 
 Called "RMSFA" in CNT output :numref:`table_PS_format_info_CNT`
 
 RMSFA is the square root of the average squared forecast anomaly. Specifically, :math:`\text{RMSFA} = \sqrt{\frac{1}{n} \sum(f_{i} - c_{i})^2}`.
 
-Root-mean-squared Observation Anomaly
+Root-Mean-Squared Observation Anomaly
 -------------------------------------
 
 Called "RMSOA" in CNT output :numref:`table_PS_format_info_CNT`
 
 RMSOA is the square root of the average squared observation anomaly. Specifically, :math:`\text{RMSOA} = \sqrt{\frac{1}{n} \sum(o_{i} - c_{i})^2}`.
 
-Percentiles of the errors
+Percentiles of the Errors
 -------------------------
 
 Called "E10", "E25", "E50", "E75", "E90" in CNT output :numref:`table_PS_format_info_CNT`
@@ -636,7 +636,7 @@ The uncentered anomaly correlation coefficient (ANOM_CORR_UNCNTR) which does not
 
 Anomaly correlation can range between -1 and 1; a value of 1 indicates perfect correlation and a value of -1 indicates perfect negative correlation. A value of 0 indicates that the forecast and observed anomalies are not correlated.
 
-Partial Sums lines (SL1L2, SAL1L2, VL1L2, VAL1L2)
+Partial Sums Lines (SL1L2, SAL1L2, VL1L2, VAL1L2)
 -------------------------------------------------
 
 :numref:`table_PS_format_info_SL1L2`, :numref:`table_PS_format_info_SAL1L2`, :numref:`table_PS_format_info_VL1L2`, and :numref:`table_PS_format_info_VAL1L2`
@@ -647,7 +647,7 @@ The partial sums can be accumulated over individual cases to produce statistics 
 
 *Minimally sufficient* statistics are those that condense the data most, with no loss of information. Statistics based on L1 and L2 norms allow for good compression of information. Statistics based on other norms, such as order statistics, do not result in good compression of information. For this reason, statistics such as RMSE are often preferred to statistics such as the median absolute deviation. The partial sums are not sufficient for order statistics, such as the median or quartiles.
 
-Scalar L1 and L2 values
+Scalar L1 and L2 Values
 -----------------------
 
 Called "FBAR", "OBAR", "FOBAR", "FFBAR", and "OOBAR" in SL1L2 output :numref:`table_PS_format_info_SL1L2`
@@ -667,7 +667,7 @@ These statistics are simply the 1st and 2nd moments of the forecasts, observatio
 
 Some of the other statistics for continuous forecasts (e.g., RMSE) can be derived from these moments.
 
-Scalar anomaly L1 and L2 values
+Scalar Anomaly L1 and L2 Values
 -------------------------------
 
 Called "FABAR", "OABAR", "FOABAR", "FFABAR", "OOABAR" in SAL1L2 output :numref:`table_PS_format_info_SAL1L2`
@@ -685,7 +685,7 @@ Computation of these statistics requires a climatological value, c. These statis
 
   \text{OOABAR} = \text{Mean}[(o - c)^2] = \bar{(o - c)}^2 = \frac{1}{n} \sum_{i=1}^n (o_i - c)^2
 
-Vector L1 and L2 values
+Vector L1 and L2 Values
 -----------------------
 
 Called "UFBAR", "VFBAR", "UOBAR", "VOBAR", "UVFOBAR", "UVFFBAR", "UVOOBAR" in VL1L2 output :numref:`table_PS_format_info_VL1L2`
@@ -707,7 +707,7 @@ These statistics are the moments for wind vector values, where **u** is the E-W 
 
   \text{UVOOBAR} = \text{Mean}(u_o^2 + v_o^2) = \frac{1}{n} \sum_{i=1}^n (u_{oi}^2 + v_{oi}^2)
 
-Vector anomaly L1 and L2 values
+Vector Anomaly L1 and L2 Values
 -------------------------------
 
 Called "UFABAR", "VFABAR", "UOABAR", "VOABAR", "UVFOABAR", "UVFFABAR", "UVOOABAR" in VAL1L2 output :numref:`table_PS_format_info_VAL1L2`
@@ -730,7 +730,7 @@ These statistics require climatological values for the wind vector components, :
 
   \text{UVOOABAR} = \text{Mean}[(u_o - u_c)^2 + (v_o - v_c)^2] = \frac{1}{n} \sum_{i=1}^n ((u_{oi} - u_c)^2 + (v_{oi} - v_c)^2)
 
-Gradient values
+Gradient Values
 ---------------
 
 Called "TOTAL", "FGBAR", "OGBAR", "MGBAR", "EGBAR", "S1", "S1_OG", and "FGOG_RATIO" in GRAD output :numref:`table_GS_format_info_GRAD`
@@ -773,7 +773,7 @@ where the weights are applied at each grid location, with values assigned accord
     \text{FGOG_RATIO} = \frac{\text{FGBAR}}{\text{OGBAR}}
 
 
-MET verification measures for probabilistic forecasts
+MET Verification Measures for Probabilistic Forecasts
 =====================================================
 
 The results of the probabilistic verification methods that are included in the Point-Stat, Grid-Stat, and Stat-Analysis tools are summarized using a variety of measures. MET treats probabilistic forecasts as categorical, divided into bins by user-defined thresholds between zero and one. For the categorical measures, if a forecast probability is specified in a formula, the midpoint value of the bin is used. These measures include the Brier Score (BS) with confidence bounds (:ref:`Bradley, 2008 <Bradley-2008>`); the joint distribution, calibration-refinement, likelihood-base rate (:ref:`Wilks, 2011 <Wilks-2011>`); and receiver operating characteristic information. Using these statistics, reliability and discrimination diagrams can be produced.
@@ -843,7 +843,7 @@ A component of the Brier score. For probabilistic forecasts, uncertainty is a fu
 
 .. math:: \text{Uncertainty} = \frac{n_{.1}}{T}(1 - \frac{n_{.1}}{T})
 
-Brier score
+Brier Score
 -----------
 
 Called "BRIER" in PSTD output :numref:`table_PS_format_info_PSTD`
@@ -927,7 +927,7 @@ This is the probability of an event for each forecast category :math:`p_i` (row)
 
 .. math:: \text{Base Rate}(i) = \frac{n_{i1}}{n_{i.}} = \text{probability}(o_{i1})
 
-Reliability diagram
+Reliability Diagram
 -------------------
 
 The reliability diagram is a plot of the observed frequency of events versus the forecast probability of those events, with the range of forecast probabilities divided into categories.
@@ -940,7 +940,7 @@ The ideal forecast (i.e., one with perfect reliability) has conditional observed
 	    
 	    Example of Reliability Diagram
 
-Receiver operating characteristic
+Receiver Operating Characteristic
 ---------------------------------
 
 MET produces hit rate (POD) and false alarm rate (POFD) values for each user-specified threshold. This information can be used to create a scatter plot of POFD vs. POD. When the points are connected, the plot is generally referred to as the receiver operating characteristic (ROC) curve (also called the "relative operating characteristic" curve). See the area under the ROC curve (AUC) entry for related information.
@@ -955,7 +955,7 @@ A ROC curve shows how well the forecast discriminates between two outcomes, so i
 	    
 	    Example of ROC Curve
 
-Area Under the ROC curve (AUC)
+Area Under the ROC Curve (AUC)
 ------------------------------
 
 Called "ROC_AUC" in PSTD output :numref:`table_PS_format_info_PSTD`
@@ -968,7 +968,7 @@ The area under the curve can be estimated in a variety of ways. In MET, the simp
 
 .. _App_C-ensemble:
 
-MET verification measures for ensemble forecasts
+MET Verification Measures for Ensemble Forecasts
 ================================================
 
 RPS
@@ -1125,7 +1125,7 @@ The ensemble spread for a single observation is the standard deviation of the en
 
 Note that prior to met-9.0.1, the ensemble spread of a spatial masking region was computed as the average of the spread values within that region. This algorithm was corrected in met-9.0.1 to average the ensemble variance values prior to computing the square root.
 
-MET verification measures for neighborhood methods
+MET Verification Measures for Neighborhood Methods
 ==================================================
 
 The results of the neighborhood verification approaches that are included in the Grid-Stat tool are summarized using a variety of measures. These measures include the Fractions Skill Score (FSS) and the Fractions Brier Score (FBS). MET also computes traditional contingency table statistics for each combination of threshold and neighborhood window size.
@@ -1210,7 +1210,7 @@ The overall proportion of grid points with observed events to total grid points 
 
 .. _App_C-distance_maps:
 
-MET verification measures for distance map methods
+MET Verification Measures for Distance Map Methods
 ==================================================
 
 The distance map statistics include Baddeley's :math:`\Delta` Metric, a statistic which is a true mathematical metric. The definition of a mathematical metric is included below.
@@ -1245,7 +1245,7 @@ In terms of distance maps, Baddeley's :math:`\Delta` is the :math:`L_{p}` norm o
 
 The range for BADDELEY and HAUSDORFF is 0 to infinity, with a score of 0 indicating a perfect forecast.
 
-Mean-error Distance
+Mean-Error Distance
 -------------------
 
 Called "MED_FO", "MED_OF", "MED_MIN", "MED_MAX", and "MED_MEAN" in the DMAP output :numref:`table_GS_format_info_DMAP`

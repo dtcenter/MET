@@ -174,6 +174,8 @@ class AsciiTable {
 
       bool   ElimTrailingWhitespace;   //  default: true
 
+      bool   AlignDecimalPoints;   //  default: true
+
       bool   DecimalPointsAligned;
 
    public:
@@ -237,6 +239,7 @@ class AsciiTable {
 
       virtual void set_elim_trailing_whitespace   (bool);
 
+      virtual void set_align_decimal_points       (bool);
 
          //
          //  get stuff
@@ -313,6 +316,8 @@ class AsciiTable {
 
       virtual bool elim_trailing_whitespace() const;
 
+      virtual bool align_decimal_points() const;
+
       virtual bool decimal_points_aligned() const;
 
       virtual void underline_row(const int row, const char);
@@ -347,6 +352,8 @@ inline bool AsciiTable::comma_string() const { return ( DoCommaString ); }
 inline bool AsciiTable::delete_trailing_blank_rows() const { return ( DeleteTrailingBlankRows ); }
 
 inline bool AsciiTable::elim_trailing_whitespace() const { return ( ElimTrailingWhitespace ); }
+
+inline bool AsciiTable::align_decimal_points() const { return ( AlignDecimalPoints ); }
 
 inline bool AsciiTable::decimal_points_aligned() const { return ( DecimalPointsAligned ); }
 

@@ -9,7 +9,7 @@
 //
 // Output model name to be written
 //
-model = "WRF";
+model = "FCST";
 
 //
 // Output description to be written
@@ -261,6 +261,12 @@ nc_pairs_flag = {
    distance_map = FALSE;
    apply_mask   = TRUE;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+
+ugrid_dataset = "";
+ugrid_max_distance_km = 30;
+ugrid_coordinates_file = "";
 
 ////////////////////////////////////////////////////////////////////////////////
 

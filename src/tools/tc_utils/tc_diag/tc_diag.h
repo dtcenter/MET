@@ -65,8 +65,16 @@ static const char* default_config_filename =
 // Default output directory
 static const char* default_out_dir = ".";
 
+// Output file suffix names
+static const char* nc_cyl_grid_suffix = "_cyl_grid_{domain}.nc";
+static const char* nc_diag_suffix     = "_diag.nc";
+static const char* cira_diag_suffix   = "_diag.dat";
+
 // Default output prefix
 static const char* default_out_prefix = "";
+
+// Diagnostics bad data value
+static const double diag_bad_data_double = 9999.0;
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -84,52 +92,6 @@ static GrdFileType    file_type = FileType_None;
 // Optional arguments
 static ConcatString out_dir;
 static ConcatString out_prefix;
-
-////////////////////////////////////////////////////////////////////////
-//
-// Variables for Output Files
-//
-////////////////////////////////////////////////////////////////////////
-
-class OutFileInfo {
-
-   private:
-
-      void init_from_scratch();
-
-   public:
-
-      OutFileInfo();
-      ~OutFileInfo();
-
-      //////////////////////////////////////////////////////////////////
-
-      // Track information
-      const TrackInfo *trk_ptr; // not allocated
-
-      // Mapping of diagnostic names to values for each track point
-      std::map<std::string,NumArray> diag_map;
-
-      // NetCDF Diagnostics output
-      ConcatString    nc_diag_file;
-      netCDF::NcFile *nc_diag_out;
-
-      // NetCDF Dimensions
-      netCDF::NcDim vld_dim;
-
-      // CIRA Diagnostics output
-      ConcatString   cira_diag_file;
-      std::ofstream *cira_diag_out;
-      AsciiTable     cira_diag_at;
-
-      void clear();
-
-      netCDF::NcFile *setup_nc_file(const string &);
-      void add_diag_map(const std::map<std::string,double> &, int);
-      void write_nc_diag();
-};
-
-static std::map<std::string,OutFileInfo> out_file_map;
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -154,15 +116,31 @@ class TmpFileInfo {
       const TrackInfo  *trk_ptr; // not allocated
       const TrackPoint *pnt_ptr; // not allocated
 
-      // Mapping of diagnostic names to values
-      std::map<std::string,double> diag_map;
+      // Vector of diagnostic names to track insertion order
+      std::vector<std::string> diag_storm_keys;
+      std::vector<std::string> diag_sounding_keys;
+      std::vector<std::string> diag_custom_keys;
+
+      // Mappings of diagnostic names to values
+      std::map<std::string,double> diag_storm_map;
+      std::map<std::string,double> diag_sounding_map;
+      std::map<std::string,double> diag_custom_map;
+
+      // Mappings of diagnostics names to units, long names,
+      // and source domains
+      std::map<std::string,std::string> diag_units_map;
+      std::map<std::string,std::string> diag_long_name_map;
+      std::map<std::string,std::string> diag_domain_map;
+
+      // Array of comment lines
+      StringArray comment_lines;
+
+      // Set of unique pressure levels
+      std::set<double> pressure_levels;
 
       // Range azimuth grid
       Grid      grid_out;
       TcrmwGrid ra_grid;
-
-      // Pressure levels
-      std::set<double> pressure_levels;
 
       // Domain name
       std::string domain;
@@ -193,6 +171,98 @@ class TmpFileInfo {
 };
 
 static std::map<std::string,TmpFileInfo> tmp_file_map;
+
+////////////////////////////////////////////////////////////////////////
+//
+// Variables for Output Files
+//
+////////////////////////////////////////////////////////////////////////
+
+static unixtime init_ut = (unixtime) 0;
+
+class OutFileInfo {
+
+   private:
+
+      void init_from_scratch();
+      void add_diag_data(const std::vector<std::string> &,
+                         const std::map<std::string,double> &,
+                         std::vector<std::string> &,
+                         std::map<std::string,NumArray> &,
+                         const StringArray &, const std::string &,
+                         int);
+      void add_diag_meta(const std::map<std::string,std::string> &,
+                         std::map<std::string,std::string> &);
+      void set_diag_comments(const StringArray &);
+
+   public:
+
+      OutFileInfo();
+      ~OutFileInfo();
+
+      //////////////////////////////////////////////////////////////////
+
+      // Track information
+      const TrackInfo *trk_ptr; // not allocated
+
+      // Vector of diagnostic names to track insertion order
+      std::vector<std::string> diag_storm_keys;
+      std::vector<std::string> diag_sounding_keys;
+      std::vector<std::string> diag_custom_keys;
+
+      // Mappings of diagnostic names to values
+      // for each track point
+      std::map<std::string,NumArray> diag_storm_map;
+      std::map<std::string,NumArray> diag_sounding_map;
+      std::map<std::string,NumArray> diag_custom_map;
+
+      // Mappings of diagnostics names to units, long names,
+      // and source domains
+      std::map<std::string,std::string> diag_units_map;
+      std::map<std::string,std::string> diag_long_name_map;
+      std::map<std::string,std::string> diag_domain_map;
+
+      // Array of comment lines
+      StringArray comment_lines;
+
+      // NetCDF Diagnostics output
+      ConcatString    nc_diag_file;
+      netCDF::NcFile *nc_diag_out;
+
+      // NetCDF Dimensions
+      netCDF::NcDim vld_dim;
+      netCDF::NcDim prs_dim;
+
+      // CIRA Diagnostics output
+      ConcatString   cira_diag_file;
+      std::ofstream *cira_diag_out;
+
+      void clear();
+
+      netCDF::NcFile *setup_nc_file(const std::string &);
+      void add_tmp_file_info(const TmpFileInfo &, const StringArray &, int);
+      void write_nc_diag();
+      void write_nc_domain_info(const DomainInfo &);
+      void write_nc_diag_vals(const std::string &, NumArray &);
+      void write_nc_diag_prs_vals(const std::string &, const float *);
+
+      void write_cira_diag();
+      void write_cira_diag_section_header(const char *);
+      void write_cira_diag_vals(std::vector<std::string> &,
+              std::map<std::string,NumArray> &, bool);
+
+      std::string get_diag_units(const std::string &);
+
+      int n_diag() const;
+};
+
+////////////////////////////////////////////////////////////////////////
+
+inline int OutFileInfo::n_diag() const { return(diag_storm_keys.size()    +
+                                                diag_sounding_keys.size() +
+                                                diag_custom_keys.size()); }
+
+static std::map<std::string,OutFileInfo> out_file_map;
 
 ////////////////////////////////////////////////////////////////////////
 

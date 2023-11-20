@@ -101,7 +101,7 @@ void MtdFloatFile::float_init_from_scratch()
 
 {
 
-Data = 0;
+Data = nullptr;
 
 clear();
 
@@ -119,7 +119,7 @@ void MtdFloatFile::clear()
 
 MtdFileBase::clear();
 
-if ( Data )  { delete [] Data;  Data = 0; }
+if ( Data )  { delete [] Data;  Data = nullptr; }
 
 DataMin = DataMax = 0;
 
@@ -218,7 +218,7 @@ void MtdFloatFile::set_size(int _nx, int _ny, int _nt)
 {
 
 
-if ( Data )  { delete [] Data;  Data = 0; }
+if ( Data )  { delete [] Data;  Data = nullptr; }
 
 int j;
 const int n3 = _nx*_ny*_nt;
@@ -939,14 +939,14 @@ out.set_accum(0);
 
 int x, y, n;
 double value;
+const int data_cnt = Nx*Ny*Nt;
 
 for (x=0; x<Nx; ++x)  {
 
    for (y=0; y<Ny; ++y)  {
 
       n = mtd_three_to_one(Nx, Ny, Nt, x, y, t);
-
-      value = Data[n];
+      value = (n >= 0 && n <data_cnt) ? Data[n] : bad_data_double;
 
       if ( value == bad_data_double )  out.put(bad_data_float, x, y);
       else                             out.put((float) value,  x, y);
@@ -974,10 +974,10 @@ return;
 void MtdFloatFile::put_data_plane(const int t, const DataPlane & d)
 
 {
-
+const char *method_name = "MtdFloatFile::put_data_plane() -> ";
 if ( (t < 0) || (t >= Nt) )  {
 
-   mlog << Error << "\n\n  MtdFloatFile::put_data_plane() -> range check error on t\n\n";
+   mlog << Error << "\n\n  " << method_name << "range check error on t\n\n";
 
    exit ( 1 );
 
@@ -985,7 +985,7 @@ if ( (t < 0) || (t >= Nt) )  {
 
 if ( (d.nx() != Nx) || (d.ny() != Ny) )  {
 
-   mlog << Error << "\n\n  MtdFloatFile::put_data_plane() -> data plane is wrong size!\n\n";
+   mlog << Error << "\n\n  " << method_name << "data plane is wrong size!\n\n";
 
    exit ( 1 );
 
@@ -993,6 +993,7 @@ if ( (d.nx() != Nx) || (d.ny() != Ny) )  {
 
 int x, y, n;
 double value;
+const int data_cnt = Nx*Ny*Nt;
 
 
 for (x=0; x<Nx; ++x)  {
@@ -1000,6 +1001,11 @@ for (x=0; x<Nx; ++x)  {
    for (y=0; y<Ny; ++y)  {
 
       n = mtd_three_to_one(Nx, Ny, Nt, x, y, t);
+      if (n < 0 || n >=data_cnt) {
+         mlog << Debug(4) << method_name << "offset " << n
+              << " is out of range (" << " from " << x << ", " << y <<", " << t <<")\n";
+         continue;
+      }
 
       value = d(x, y);
 
@@ -1009,18 +1015,6 @@ for (x=0; x<Nx; ++x)  {
    }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
    //
@@ -1041,21 +1035,21 @@ void MtdFloatFile::regrid(const Grid & to_grid, const RegridInfo & info)
 
 if ( to_grid == (*G) )  return;
 
-int t;
 MtdFloatFile old = *this;
 DataPlane from_plane, to_plane;
 
 from_plane.set_size(old.nx(), old.ny());
   to_plane.set_size(old.nx(), old.ny());
 
-delete [] Data;  Data = 0;
+delete [] Data;  Data = nullptr;
 
 Nx = to_grid.nx();
 Ny = to_grid.ny();
 
 Data = new float [Nx*Ny*Nt];
+for (int t=0; t<Nx*Ny*Nt; ++t) Data[t] = bad_data_float;
 
-for (t=0; t<(old.nt()); ++t)  {
+for (int t=0; t<old.nt(); ++t)  {
 
    old.get_data_plane(t, from_plane);
 

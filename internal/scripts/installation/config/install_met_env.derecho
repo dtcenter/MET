@@ -1,0 +1,38 @@
+module load ncarenv/23.06
+module load intel-oneapi/2023.0.0
+module load cmake/3.26.3
+module load hdf5/1.12.2
+module load netcdf/4.9.2
+
+export TEST_BASE=/glade/p/ral/jntp/MET/MET_releases/12.0.0
+export COMPILER=intel-oneapi_2023.0.0
+export MET_SUBDIR=${TEST_BASE}
+export MET_TARBALL=v12.0.0.tar.gz
+export USE_MODULES=TRUE
+export MET_PYTHON=/glade/p/ral/jntp/MET/METplus/miniconda/miniconda3/envs/metplus_v5.1_py3.10
+export MET_PYTHON_CC=-I${MET_PYTHON}/include/python3.10
+export MET_PYTHON_LD=`${MET_PYTHON}/bin/python3-config --ldflags --embed`
+export MET_NETCDF=/glade/u/apps/derecho/23.06/spack/opt/spack/netcdf/4.9.2/oneapi/2023.0.0/iijr
+export MET_HDF5=/glade/u/apps/derecho/23.06/spack/opt/spack/hdf5/1.12.2/oneapi/2023.0.0/d6xa
+export ADDTL_DIR=/usr/lib64
+export EXTERNAL_LIBS=${TEST_BASE}/external_libs
+#export MET_PROJ=${EXTERNAL_LIBS}
+#export LIB_TIFF=${ADDTL_DIR}/libtiff.so.5
+export COMPILE_ECKIT=1
+export COMPILE_ATLAS=1
+#export MET_ECKIT=${EXTERNAL_LIBS}
+#export MET_ATLAS=${EXTERNAL_LIBS}
+#export MET_GSL=${EXTERNAL_LIBS}
+#export MET_BUFRLIB=${EXTERNAL_LIBS}
+#export BUFRLIB_NAME=-lbufr_4
+#export MET_GRIB2CLIB=${EXTERNAL_LIBS}/lib64
+#export MET_GRIB2CINC=${EXTERNAL_LIBS}/include
+#export GRIB2CLIB_NAME=-lg2c
+#export LIB_JASPER=${EXTERNAL_LIBS}/lib64
+#export LIB_LIBPNG=${EXTERNAL_LIBS}/lib
+#export LIB_Z=${EXTERNAL_LIBS}/lib
+export MAKE_ARGS=-j
+#export CFLAGS="-Wall -g"
+#export CXXFLAGS="-Wall -g"
+#export CXXFLAGS="-std=c++11"
+

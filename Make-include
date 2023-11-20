@@ -15,6 +15,7 @@ MET_CPPFLAGS = -I${top_builddir}/src/basic/vx_cal \
 	     -I${top_builddir}/src/libcode/vx_data2d_nc_met \
 	     -I${top_builddir}/src/libcode/vx_data2d_nc_pinterp \
 	     -I${top_builddir}/src/libcode/vx_data2d_python \
+	     -I${top_builddir}/src/libcode/vx_data2d_ugrid \
 	     -I${top_builddir}/src/libcode/vx_python3_utils \
 	     -I${top_builddir}/src/libcode/vx_geodesy \
 	     -I${top_builddir}/src/libcode/vx_gis \
@@ -61,6 +62,7 @@ MET_LDFLAGS = -L${top_builddir}/src/basic/vx_cal \
 	     -L${top_builddir}/src/libcode/vx_data2d_nc_met \
 	     -L${top_builddir}/src/libcode/vx_data2d_nc_pinterp \
 	     -L${top_builddir}/src/libcode/vx_data2d_python \
+	     -L${top_builddir}/src/libcode/vx_data2d_ugrid \
 	     -L${top_builddir}/src/libcode/vx_python3_utils \
 	     -L${top_builddir}/src/libcode/vx_geodesy \
 	     -L${top_builddir}/src/libcode/vx_gis \

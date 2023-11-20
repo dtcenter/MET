@@ -175,6 +175,8 @@ DeleteTrailingBlankRows = false;
 
 ElimTrailingWhitespace = true;
 
+AlignDecimalPoints = true;
+
 DecimalPointsAligned = false;
 
 return;
@@ -284,6 +286,8 @@ DoCommaString = a.DoCommaString;
 DeleteTrailingBlankRows = a.DeleteTrailingBlankRows;
 
 ElimTrailingWhitespace = a.ElimTrailingWhitespace;
+
+AlignDecimalPoints = a.AlignDecimalPoints;
 
 DecimalPointsAligned = a.DecimalPointsAligned;
 
@@ -781,6 +785,20 @@ void AsciiTable::set_elim_trailing_whitespace(bool tf)
 {
 
 ElimTrailingWhitespace = tf;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void AsciiTable::set_align_decimal_points(bool tf)
+
+{
+
+AlignDecimalPoints = tf;
 
 return;
 
@@ -1427,7 +1445,7 @@ ostream & operator<<(ostream & out, AsciiTable & t)
 
 {
 
-if ( !t.decimal_points_aligned() ) t.line_up_decimal_points();
+if ( t.align_decimal_points() && !t.decimal_points_aligned() ) t.line_up_decimal_points();
 
 int j, r, c, n;
 int rmax;
@@ -1567,7 +1585,6 @@ switch ( just )  {
    default:
       mlog << Error << "\njustified_item() -> bad justification value\n\n";
       exit ( 1 );
-      break;
 
 }   //  switch
 

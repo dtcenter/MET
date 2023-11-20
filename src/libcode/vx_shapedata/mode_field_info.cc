@@ -9,6 +9,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+#include <string.h>
 
 #include "vx_config.h"
 #include "vx_data2d.h"
@@ -20,6 +21,7 @@
 
 #include "mode_field_info.h"
 
+using std::string;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -198,7 +200,7 @@ gft = type;
 if ( dict->lookup(conf_key_raw_thresh) )  {
 
    mlog << Error 
-        << "\nMode_Field_Info::process_config() -> "
+        << "\nMode_Field_Info::set() -> "
         << "the \"" << conf_key_raw_thresh << "\" entry is deprecated in MET "
         << met_version << "!  Use \"" << conf_key_censor_thresh << "\" and \""
         << conf_key_censor_val << "\" instead.\n\n";
@@ -219,32 +221,87 @@ if ( dict->lookup(conf_key_conv_thresh) )  {
 
 }
 
-if ( dict->lookup(conf_key_merge_thresh) )  {
-
-   merge_thresh_array = dict->lookup_thresh_array(conf_key_merge_thresh);
-
-}
-
 if ( dict->lookup(conf_key_vld_thresh) )  {
 
    vld_thresh         = dict->lookup_double(conf_key_vld_thresh);
 
 }
 
-// for the multivar case, go without parent, and error out if merge flag is
-// not set for the individual field
+// For the multivar case, more complex logic regarding merge_flag and merge_thresh
+// If individual entry has a merge_flag, it must have a merge_thresh (unless merge_flag=NONE)
+// If individual entry has no merge_flag, check the parent and go with that flag and thresh
+// If individual entry has no merge_flag, but individual entry has a merge_thresh, it's an error
+
 if ( _multivar ) {
+   // set defaults to no merging
+   merge_thresh.clear();
+   merge_flag = MergeType_None;
+
+   // pull out the name
+   string name = var_info->name();
+   
    if ( dict->lookup(conf_key_merge_flag, false)) {
-      merge_flag         = int_to_mergetype(dict->lookup_int(conf_key_merge_flag));
+      // this individual entry has merge_flag
+      merge_flag         = int_to_mergetype(dict->lookup_int(conf_key_merge_flag,
+                                                             default_dictionary_error_out,
+                                                             default_dictionary_print_warning,
+                                                             false));
+      string merge_name = mergetype_to_string(merge_flag);
+      if (dict->lookup(conf_key_merge_thresh, false)) {
+         // the individual entry also has a merge_thresh, this is good
+         merge_thresh_array = dict->lookup_thresh_array(conf_key_merge_thresh, 
+                                                        default_dictionary_error_out,
+                                                        default_dictionary_print_warning,
+                                                        false);
+      } else {
+         // get the parent's merge_thresh, just to have something.  Error out if the merge_flag is not none
+         // because that is inconsistent
+         merge_thresh_array = dict->lookup_thresh_array(conf_key_merge_thresh);
+
+         if (merge_flag != MergeType_None) {
+            mlog << Error << "\nMode_Field_Info::set() -> "
+                 << "Field:" << name << ". "
+                 << " When 'merge_flag' is explicitly set, 'merge_thresh' must be explicitly set for multivariate mode\n\n";
+            exit ( 1 );
+         }
+         
+      } 
    } else {
-      mlog << Error << "\nMode_Field_Info::set() -> "
-           << "'merge_flag' must be explicitly set for all fields with multivariate mode\n\n";
-      exit ( 1 );
+      // individual entry does not have a merge_flag, try parent
+      if ( dict->lookup(conf_key_merge_flag, true)) {
+         // the parent does have a merge flag
+         merge_flag = int_to_mergetype(dict->lookup_int(conf_key_merge_flag));
+         string merge_name = mergetype_to_string(merge_flag);
+         if (dict->lookup(conf_key_merge_thresh, false)) {
+            // individual entry has a merge_thresh but no merge_flag, this is not good
+            mlog << Error << "\nMode_Field_Info::set() -> "
+                 << "Field:" << name << ". "
+                 << "When 'merge_flag' is not explicitly set, 'merge_thresh' cannot explicitly set for multivariate mode\n\n";
+            exit ( 1 );
+         } else {
+            // individual entry doesn't have a merge_thresh, parent has a merge_flag
+            // expect parent to have a merge_thresh
+            merge_thresh_array = dict->lookup_thresh_array(conf_key_merge_thresh);
+            if (merge_thresh_array.n() == 0 && merge_flag != MergeType_None) {
+               // parent has a merge_flag but no merge_thresh
+               mlog << Error << "\nMode_Field_Info::set() -> "
+                    << "Field:" << name << ". using parent merge_flag: " << merge_name
+                    << " Parent has no 'merge_thresh', not allowed in multivariate mode\n\n";
+               exit ( 1 );
+            } else {
+               string thresh_str = merge_thresh_array.thresh()->get_str();
+               mlog  << Debug(2) << "Field:" << name << ". Using parent merge_flag: "
+                     << merge_name << " and parent merge_thresh:" << thresh_str
+                     << "\n";
+            }
+         }
+      }
    }
 } else {
    if ( dict->lookup(conf_key_merge_flag, true)) {
       merge_flag         = int_to_mergetype(dict->lookup_int(conf_key_merge_flag));
    }
+   merge_thresh_array = dict->lookup_thresh_array(conf_key_merge_thresh);
 }
  
 filter_attr_map    = parse_conf_filter_attr_map(dict);
@@ -296,7 +353,7 @@ void Mode_Field_Info::set_merge_thresh_by_index (int k)
 
 if ( (k < 0) || (k >= merge_thresh_array.n_elements()) )  {
 
-   mlog << Error << "\nMode_Field_Info::set_fcst_merge_thresh_by_index(int) -> "
+   mlog << Error << "\nMode_Field_Info::set_merge_thresh_by_index(int) -> "
         << "range check error\n\n";
 
    exit ( 1 );

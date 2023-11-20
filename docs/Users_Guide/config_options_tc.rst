@@ -6,7 +6,7 @@ Tropical Cyclone Configuration Options
 
 See :numref:`config_options` for a description of the configuration file syntax.
 
-Configuration settings common to multiple tools
+Configuration Settings Common to Multiple Tools
 ===============================================
 
 storm_id
@@ -108,7 +108,7 @@ For example:
 valid_beg end inc exc
 ---------------------
   
-Specify a model valid time window YYYYMMDD[_HH[MMSS]] format or provide a
+Specify a model valid time window in YYYYMMDD[_HH[MMSS]] format or provide a
 list of specific valid times to include (inc) or exclude (exc). If a time
 window is specified, only tracks for which all points are contained within
 the window will be used. If valid times to include or exclude are specified,
@@ -173,7 +173,7 @@ The value should generally not be modified.
   version = "VN.N";
 
 
-Settings specific to individual tools
+Settings Specific to Individual Tools
 =====================================
 
 
@@ -1077,7 +1077,7 @@ Statistics will be generated separately for each ATCF ID.
 init_beg, init_end
 ^^^^^^^^^^^^^^^^^^
 
-Forecast and operational initialization time window
+Forecast and operational initialization time window, as strings in YYYYMMDD[_HH[MMSS]] format
 
 .. code-block:: none
 
@@ -1087,7 +1087,7 @@ Forecast and operational initialization time window
 valid_beg, valid_end
 ^^^^^^^^^^^^^^^^^^^^
 
-Forecast, BEST, and operational valid time window
+Forecast, BEST, and operational valid time window, as strings in YYYYMMDD[_HH[MMSS]] format
 
 .. code-block:: none
 		
@@ -1097,7 +1097,7 @@ Forecast, BEST, and operational valid time window
 lead
 ^^^^
 
-Forecast and operational lead times in hours
+Forecast and operational lead times, as strings in HH[MMSS] format
 
 .. code-block:: none
 
