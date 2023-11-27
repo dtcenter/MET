@@ -169,8 +169,6 @@ out << prefix << "proj_set = ";
 if ( Proj_Set.nonempty() )  out << '\"' << Proj_Set  << "\"\n";
 else                        out << "(nul)\n";
 
-
-
    //
    //  how to dump out the PROJ stuff?
    //
@@ -178,7 +176,6 @@ else                        out << "(nul)\n";
    //
 
 out << prefix << "pj = " << (info->pj)  << '\n';
-
 
    //
    //  done
@@ -214,11 +211,10 @@ if ( ! (i->pj) )  {
    ConcatString err_str = proj_errno_string(proj_errno);
 
    mlog << Error << "\nProjGrid::set_proj() -> "
-	<< "Failed to create transformation with string \""
+        << "Failed to create transformation with string \""
         << s << "\": " << err_str << "\n\n";
 
    exit ( 1 );
-
 
 }
 
@@ -303,8 +299,6 @@ lon = -deg_per_rad*(b.lp.lam);    //  note minus sign
    //  might need to do range reduction on lon here
    //
 
-
-
    //
    //  done
    //
@@ -315,9 +309,3 @@ return;
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-
-
-
-

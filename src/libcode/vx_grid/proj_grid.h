@@ -137,5 +137,3 @@ inline ConcatString ProjGrid::proj_set_string() const  { return ( Proj_Set ); }
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
