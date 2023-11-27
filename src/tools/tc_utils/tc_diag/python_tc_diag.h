@@ -19,11 +19,12 @@ extern "C" {
 
 }
 
+#include "tc_diag.h"
+
 ////////////////////////////////////////////////////////////////////////
 
 extern bool python_tc_diag(const ConcatString &script_name,
-               const ConcatString &tmp_file_name,
-               std::map<std::string,double> &diag_map);
+               TmpFileInfo &tmp_info);
 
 ////////////////////////////////////////////////////////////////////////
 

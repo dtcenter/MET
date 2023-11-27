@@ -680,6 +680,11 @@ static const char conf_key_missing_thresh[]    = "missing_thresh";
 static const char conf_key_control_id[]        = "control_id";
 static const char conf_key_ens_member_ids[]    = "ens_member_ids";
 static const char conf_key_seeps_p1_thresh[]   = "seeps_p1_thresh";
+static const char conf_key_ugrid_coordinates_file[] = "ugrid_coordinates_file";
+static const char conf_key_ugrid_dataset[]          = "ugrid_dataset";
+static const char conf_key_ugrid_map_config[]       = "ugrid_map_config";
+static const char conf_key_ugrid_max_distance_km[]  = "ugrid_max_distance_km";
+static const char conf_key_ugrid_metadata_map[]     = "ugrid_metadata_map";
 
 //
 // Entries to override file metadata 
@@ -903,7 +908,8 @@ static const char conf_key_shift_right[]           = "shift_right";
 static const char conf_key_multivar_logic          [] = "multivar_logic";
 static const char conf_key_multivar_name           [] = "multivar_name";
 static const char conf_key_multivar_level          [] = "multivar_level";
-static const char conf_key_multivar_intensity_flag [] = "multivar_intensity_flag";
+static const char conf_key_fcst_multivar_compare_index [] = "multivar_intensity_compare_fcst";
+static const char conf_key_obs_multivar_compare_index [] = "multivar_intensity_compare_obs";
 
 //
 //  MTD specific parameter key names
@@ -1099,6 +1105,8 @@ static const char conf_key_consensus[]                = "consensus";
 static const char conf_key_members[]                  = "members";
 static const char conf_key_required[]                 = "required";
 static const char conf_key_min_req[]                  = "min_req";
+static const char conf_key_diag_required[]            = "diag_required";
+static const char conf_key_min_diag_req[]             = "diag_min_req";
 static const char conf_key_write_members[]            = "write_members";
 static const char conf_key_lag_time[]                 = "lag_time";
 static const char conf_key_best_technique[]           = "best_technique";
@@ -1214,9 +1222,11 @@ static const char conf_key_tangential_velocity_long_field_name[] = "tangential_v
 static const char conf_key_domain_info[]            = "domain_info";
 static const char conf_key_domain[]                 = "domain";
 static const char conf_key_diag_script[]            = "diag_script";
+static const char conf_key_override_diags[]         = "override_diags";
 static const char conf_key_vortex_removal[]         = "vortex_removal";
 static const char conf_key_one_time_per_file_flag[] = "one_time_per_file_flag";
-static const char conf_key_nc_rng_azi_flag[]        = "nc_rng_azi_flag";
+static const char conf_key_output_base_format[]     = "output_base_format";
+static const char conf_key_nc_cyl_grid_flag[]       = "nc_cyl_grid_flag";
 static const char conf_key_nc_diag_flag[]           = "nc_diag_flag";
 static const char conf_key_cira_diag_flag[]         = "cira_diag_flag";
 
@@ -1230,6 +1240,7 @@ static const char conf_val_grib2         [] = "GRIB2";
 static const char conf_val_netcdf_met    [] = "NETCDF_MET";
 static const char conf_val_netcdf_pint   [] = "NETCDF_PINT";
 static const char conf_val_netcdf_nccf   [] = "NETCDF_NCCF";
+static const char conf_val_netcdf_ugrid  [] = "NETCDF_UGRID";
 static const char conf_val_python_numpy  [] = "PYTHON_NUMPY";
 static const char conf_val_python_xarray [] = "PYTHON_XARRAY";
 

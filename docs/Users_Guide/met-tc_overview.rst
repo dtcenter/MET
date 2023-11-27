@@ -11,14 +11,14 @@ The purpose of this User's Guide is to provide basic information to the users of
 
 The following sections provide an overview of MET-TC and its components, as well as basic information on the software build. The required input, including file format and the MET-TC are discussed followed by a description of the TC-DLand, TC-Diag, TC-Pairs, TC-Stat, TC-RMW, and RMW-Analysis tools. Each section covers the input, output and practical usage including a description of the configuration files. This is followed by a short overview of graphical utilities available within the MET-TC release.
 
-MET-TC components
+MET-TC Components
 =================
 
 The MET tools used in the verification of Tropical Cyclones are referred to as MET-TC. These tools are shown across the bottom of the flowchart in :numref:`overview-figure`. The MET-TC tools are described in more detail in later sections.
 
 Tropical cyclone forecasts and observations are quite different than numerical model forecasts, and thus they have their own set of tools. These consist of TC-DLand, TC-Diag, TC-Pairs, TC-Stat, TC-Gen, TC-RMW, and RMW-Analysis. The TC-DLand module calculates the distance to land from all locations on a specified grid. This information can be used in later modules to eliminate tropical cyclones that are over land from being included in the statistics. TC-Diag converts gridded model output into cylindrical coordinates for each storm location, calls Python scripts to compute storm-relative diagnostics, and writes ASCII output to be read by TC-Pairs. TC-Pairs matches up tropical cyclone forecasts and observations and writes all output to a file. In TC-Stat, these forecast / observation pairs are analyzed according to user preference to produce statistics. TC-Gen evaluates the performance of Tropical Cyclone genesis forecast using contingency table counts and statistics. TC-RMW performs a coordinate transformation for gridded model or analysis fields centered on the current storm location. RMW-Analysis filters and aggregates the output of TC-RMW across multiple cases.
 
-Input data format
+Input Data Format
 =================
 
 This section discusses the input and output file formats expected and produced by MET-TC. When discussing the input data, it is expected that users have run model output through vortex tracking software in order to obtain position and intensity information in Automated Tropical Cyclone Forecasting System (ATCF) file format. Best track and aids files in Automated Tropical Cyclone Forecasting System (ATCF) format (hereafter referred to as ATCF format) are necessary for model data input into the TC-Pairs tool. The ATCF format was first developed at the Naval Oceanographic and Atmospheric Research Laboratory (NRL), and is currently used for the National Hurricane Center (NHC) operations. ATCF format must be adhered to in order for the MET-TC tools to properly parse the input data.
@@ -109,7 +109,7 @@ All operational model aids and the BEST can be obtained from the `NHC ftp server
 
 If a user has gridded model output, the model data must be run through a vortex tracking algorithm in order to obtain the ATCF-formatted input that MET-TC requires. Many vortex tracking algorithms have been developed in order to obtain basic position, maximum wind, and minimum sea level pressure information from model forecasts. One vortex tracking algorithm that is supported and freely available is the `GFDL vortex tracker package. <https://dtcenter.org/community-code/gfdl-vortex-tracker>`_
 
-Output data format
+Output Data Format
 ==================
 
 The MET package produces output in four basic file formats: STAT files, ASCII files, NetCDF files, and PostScript plots. The MET-TC tool produces output in TCSTAT, which stands for Tropical Cyclone - STAT. This output format consists of tabular ASCII data that can be easily read by many analysis tools and software packages, making the output from MET-TC very versatile. Like STAT, TCSTAT is a specialized ASCII format containing one record on each line. Currently, the only line type available in MET-TC is TCMPR (Tropical Cyclone Matched Pairs). As more line types are included in future releases, all line types will be included in a single TCSTAT file. The TC-DLand, TC-Diag, TC-RMW, and RMW-Analysis tools also write NetCDF files containing a variety of output data types.

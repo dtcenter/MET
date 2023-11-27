@@ -11,29 +11,29 @@ The Grid-Stat tool functions in much the same way as the Point-Stat tool, except
 
 Scientific and statistical aspects of the Grid-Stat tool are briefly described in this section, followed by practical details regarding usage and output from the tool.
 
-Scientific and statistical aspects
+Scientific and Statistical Aspects
 ==================================
 
-Statistical measures
+Statistical Measures
 --------------------
 
 The Grid-Stat tool computes a wide variety of verification statistics. Broadly speaking, these statistics can be subdivided into three types of statistics: measures for categorical variables, measures for continuous variables, and measures for probabilistic forecasts. Further, when a climatology file is included, reference statistics for the forecasts compared to the climatology can be calculated. These categories of measures are briefly described here; specific descriptions of all measures are provided in :numref:`Appendix C, Section %s <appendixC>`. Additional information can be found in :ref:`Wilks (2011) <Wilks-2011>` and :ref:`Jolliffe and Stephenson (2012) <Jolliffe-2012>`, and on the Collaboration for Australian Weather and Climate Research Forecast Verification - `Issues, Methods and FAQ web page <http://www.cawcr.gov.au/projects/verification/verif_web_page.html>`_.
 
 In addition to these verification measures, the Grid-Stat tool also computes partial sums and other FHO statistics that are produced by the NCEP verification system. These statistics are also described in :numref:`Appendix C, Section %s <appendixC>`.
 
-Measures for categorical variables
+Measures for Categorical Variables
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Categorical verification statistics are used to evaluate forecasts that are in the form of a discrete set of categories rather than on a continuous scale. Grid-Stat computes both 2x2 and multi-category contingency tables and their associated statistics, similar to Point-Stat. See :numref:`Appendix C, Section %s <appendixC>` for more information.
 
-Measures for continuous variables
+Measures for Continuous Variables
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 For continuous variables, many verification measures are based on the forecast error (i.e., f - o). However, it also is of interest to investigate characteristics of the forecasts, and the observations, as well as their relationship. These concepts are consistent with the general framework for verification outlined by :ref:`Murphy and Winkler (1987) <Murphy-1987>`. The statistics produced by MET for continuous forecasts represent this philosophy of verification, which focuses on a variety of aspects of performance rather than a single measure. See :numref:`Appendix C, Section %s <appendixC>` for specific information.
 
 A user may wish to eliminate certain values of the forecasts from the calculation of statistics, a process referred to here as "conditional verification". For example, a user may eliminate all temperatures above freezing and then calculate the error statistics only for those forecasts of below freezing temperatures. Another common example involves verification of wind forecasts. Since wind direction is indeterminate at very low wind speeds, the user may wish to set a minimum wind speed threshold prior to calculating error statistics for wind direction. The user may specify these thresholds in the configuration file to specify the conditional verification. Thresholds can be specified using the usual Fortran conventions (<, <=, ==, !-, >=, or >) followed by a numeric value. The threshold type may also be specified using two letter abbreviations (lt, le, eq, ne, ge, gt). Further, more complex thresholds can be achieved by defining multiple thresholds and using && or || to string together event definition logic. The forecast and observation threshold can be used together according to user preference by specifying one of: UNION, INTERSECTION, or SYMDIFF (symmetric difference).
 
-Measures for probabilistic forecasts and dichotomous outcomes
+Measures for Probabilistic Forecasts and Dichotomous Outcomes
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 For probabilistic forecasts, many verification measures are based on reliability, accuracy and bias. However, it also is of interest to investigate joint and conditional distributions of the forecasts and the observations, as in :ref:`Wilks (2011) <Wilks-2011>`. See :numref:`Appendix C, Section %s <appendixC>` for specific information.
@@ -42,27 +42,27 @@ Probabilistic forecast values are assumed to have a range of either 0 to 1 or 0 
 
 Since METv6.0, when the "prob" entry is set as a dictionary to define the field of interest, setting "prob_as_scalar = TRUE" indicates that this data should be processed as regular scalars rather than probabilities.For example, this option can be used to compute traditional 2x2 contingency tables and neighborhood verification statistics for probability data. It can also be used to compare two probability fields directly.
 
-Use of a climatology field for comparative verification
+Use of a Climatology Field for Comparative Verification
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The Grid-Stat tool allows evaluation of model forecasts compared with a user-supplied climatology. Prior to calculation of statistics, the climatology must be put on the same grid as the forecasts and observations. In particular, the anomaly correlation and mean squared error skill score provide a measure of the forecast skill versus the climatology. For more details about climatological comparisons and reference forecasts, see the relevant section in the Point-Stat Chapter: :numref:`Climatology`.
 
-Use of analysis fields for verification
+Use of Analysis Fields for Verification
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The Grid-Stat tool allows evaluation of model forecasts using model analysis fields. However, users are cautioned that an analysis field is not independent of its parent model; for this reason verification of model output using an analysis field from the same model is generally not recommended and is not likely to yield meaningful information about model performance.
 
-Statistical confidence intervals
+Statistical Confidence Intervals
 --------------------------------
 
 The confidence intervals for the Grid-Stat tool are the same as those provided for the Point-Stat tool except that the scores are based on pairing grid points with grid points so that there are likely more values for each field making any assumptions based on the central limit theorem more likely to be valid. However, it should be noted that spatial (and temporal) correlations are not presently taken into account in the confidence interval calculations. Therefore, confidence intervals reported may be somewhat too narrow (e.g., :ref:`Efron, 2007 <Efron-2007>`). See :numref:`Appendix D, Section %s <appendixD>` for details regarding confidence intervals provided by MET.
 
-Grid weighting
+Grid Weighting
 --------------
 
 When computing continuous statistics on a regular large scale or global latitude-longitude grid, weighting may be applied in order to compensate for the meridian convergence toward higher latitudes. Grid square area weighting or weighting based on the cosine of the latitude are two configuration options in both point-stat and grid-stat. See :numref:`config_options` for more information.
 
-Neighborhood methods
+Neighborhood Methods
 --------------------
 
 MET also incorporates several neighborhood methods to give credit to forecasts that are close to the observations, but not necessarily exactly matched up in space. Also referred to as "fuzzy" verification methods, these methods do not just compare a single forecast at each grid point to a single observation at each grid point; they compare the forecasts and observations in a neighborhood surrounding the point of interest. With the neighborhood method, the user chooses a distance within which the forecast event can fall from the observed event and still be considered a hit. In MET this is implemented by defining a square search window around each grid point. Within the search window, the number of observed events is compared to the number of forecast events. In this way, credit is given to forecasts that are close to the observations without requiring a strict match between forecasted events and observed events at any particular grid point. The neighborhood methods allow the user to see how forecast skill varies with neighborhood size and can help determine the smallest neighborhood size that can be used to give sufficiently accurate forecasts.
@@ -73,7 +73,7 @@ The user must specify several parameters in the grid_stat configuration file to 
 
 .. _grid-stat_seeps:
 
-SEEPS scores
+SEEPS Scores
 ------------
 
 The Stable Equitable Error in Probability Space (SEEPS) was devised for monitoring global deterministic forecasts of precipitation against the WMO gauge network (:ref:`Rodwell et al., 2010 <Rodwell-2010>`; :ref:`Haiden et al., 2012 <Haiden-2012>`) and is a multi-category score which uses a climatology to account for local variations in behavior. Please see Point-Stat documentation :numref:`PS_seeps` for more details.
@@ -154,14 +154,14 @@ In some cases, a user may be interested in a much higher threshold than :math:`2
 
 Since :math:`G_\beta` is so sensitive to the choice of :math:`\beta`, which is defined relative to the number of points in the verification domain, :math:`G_\beta` is only computed for the full verification domain. :math:`G_\beta` is reported as a bad data value for any masking region subsets of the full verification domain.
 
-Practical information
+Practical Information
 =====================
 
 This section contains information about configuring and running the Grid-Stat tool. The Grid-Stat tool verifies gridded model data using gridded observations. The input gridded model and observation datasets must be in one of the MET supported file formats. The requirement of having all gridded fields using the same grid specification was removed in METv5.1. There is a regrid option in the configuration file that allows the user to define the grid upon which the scores will be computed. The gridded observation data may be a gridded analysis based on observations such as Stage II or Stage IV data for verifying accumulated precipitation, or a model analysis field may be used.
 
 The Grid-Stat tool provides the capability of verifying one or more model variables/levels using multiple thresholds for each model variable/level. The Grid-Stat tool performs no interpolation when the input model, observation, and climatology datasets must be on a common grid. MET will interpolate these files to a common grid if one is specified. The interpolation parameters may be used to perform a smoothing operation on the forecast field prior to verifying it to investigate how the scale of the forecast affects the verification statistics. The Grid-Stat tool computes a number of continuous statistics for the forecast minus observation differences, discrete statistics once the data have been thresholded, or statistics for probabilistic forecasts. All types of statistics can incorporate a climatological reference.
 
-grid_stat usage
+grid_stat Usage
 ---------------
 
 The usage statement for the Grid-Stat tool is listed below:
@@ -179,7 +179,7 @@ The usage statement for the Grid-Stat tool is listed below:
 
 grid_stat has three required arguments and accepts several optional ones.
 
-Required arguments for grid_stat
+Required Arguments for grid_stat
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. The **fcst_file** argument indicates the gridded file containing the model data to be verified.
@@ -188,7 +188,7 @@ Required arguments for grid_stat
 
 3. The **config_file** argument indicates the name of the configuration file to be used. The contents of the configuration file are discussed below.
 
-Optional arguments for grid_stat
+Optional Arguments for grid_stat
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 4. The **-outdir path** indicates the directory where output files should be written.
@@ -225,7 +225,7 @@ In the second example, the Grid-Stat tool will verify the model data in the samp
 
 .. _grid_stat-configuration-file:
 
-grid_stat configuration file
+grid_stat Configuration File
 ----------------------------
 
 The default configuration file for the Grid-Stat tool, named **GridStatConfig_default**, can be found in the installed *share/met/config* directory. Other versions of the configuration file are included in *scripts/config*. We recommend that users make a copy of the default (or other) configuration file prior to modifying it. The contents are described in more detail below.
@@ -471,7 +471,7 @@ The **nc_pairs_var_suffix** entry is similar to the **nc_pairs_var_name** entry.
 
 .. _grid_stat-output:
 
-grid_stat output
+grid_stat Output
 ----------------
 
 grid_stat produces output in STAT and, optionally, ASCII and NetCDF formats. The ASCII output duplicates the STAT output but has the data organized by line type. The output files are written to the default output directory or the directory specified by the -outdir command line option.

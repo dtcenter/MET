@@ -33,11 +33,19 @@
 //                    that contain all required lead times.
 //   011    07/27/18  Halley Gotway   Support masks defined by
 //                    the gen_vx_mask tool.
-//   012    07/06/22  Howard Soh      METplus-Internal #19 Rename main to met_main
-//   013    09/28/22  Prestopnik      MET #2227 Remove namespace std from header files
+//   012    07/06/22  Howard Soh      METplus-Internal #19 Rename main
+//                    to met_main
+//   013    09/28/22  Prestopnik      MET #2227 Remove namespace std
+//                    from header files
 //   014    10/06/22  Halley Gotway   MET #392 Incorporate diagnostics
-//   015    02/20/23  Seth Linden     MET #2429 Added option to prevent output of consensus track members
-//   016    06/08/23  Halley Gotway   MET #2532 Full circle winds are the mean of the non-zero quadrants
+//   015    02/20/23  Seth Linden     MET #2429 Add option to suppress
+//                    the output of consensus track members
+//   016    06/08/23  Halley Gotway   MET #2532 Compute full circle
+//                    winds as the mean of the non-zero quadrants
+//   017    10/05/23  Seth Linden     MET #2476 Include diagnostics in
+//                    consensus track output
+//   018    10/13/23  Halley Gotway   MET #2699 Add diag_required and
+//                    min_diag_req config options
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -345,14 +353,6 @@ void process_adecks(const TrackInfoArray &bdeck_tracks) {
       derive_interp12(adeck_tracks);
    }
 
-   // Derive consensus forecasts from the ADECK tracks
-   mlog << Debug(2)
-        << "Deriving " << conf_info.NConsensus
-        << " ADECK consensus model(s).\n";
-   i = derive_consensus(adeck_tracks);
-   mlog << Debug(2)
-        << "Added " << i << " ADECK consensus tracks(s).\n";
-
    // Derive lag forecasts from the ADECK tracks
    mlog << Debug(2)
         << "Deriving " << conf_info.LagTime.n()
@@ -370,14 +370,22 @@ void process_adecks(const TrackInfoArray &bdeck_tracks) {
    mlog << Debug(2)
         << "Added " << i << " CLIPER/SHIFOR baseline track(s).\n";
 
+   // Append diagnostic data to the tracks
+   process_diags(adeck_tracks);
+
+   // Derive consensus forecasts from the ADECK tracks
+   mlog << Debug(2)
+        << "Deriving " << conf_info.NConsensus
+        << " ADECK consensus model(s).\n";
+   i = derive_consensus(adeck_tracks);
+   mlog << Debug(2)
+        << "Added " << i << " ADECK consensus tracks(s).\n";
+
    // Filter the ADECK tracks using the config file information
    mlog << Debug(2)
         << "Filtering " << adeck_tracks.n()
         << " ADECK tracks based on config file settings.\n";
    filter_tracks(adeck_tracks);
-
-   // Append diagnostic data to the tracks
-   process_diags(adeck_tracks);
 
    //
    // Loop through the ADECK tracks and find a matching BDECK track
@@ -1248,12 +1256,13 @@ void derive_interp12(TrackInfoArray &tracks) {
 ////////////////////////////////////////////////////////////////////////
 
 int derive_consensus(TrackInfoArray &tracks) {
-   int i, j, k, l;
+   int i, j, k, l, n_diag_inputs;
    ConcatString cur_case;
-   StringArray case_list, case_cmp, req_list;
+   StringArray case_list, case_cmp;
+   StringArray req_cons_mem, req_diag_mem;
    TrackInfoArray con_tracks;
    TrackInfo new_track;
-   bool found, skip;
+   bool found, skip_cons, skip_diag;
    const char *sep = " ";
    int n_add = 0;
 
@@ -1275,7 +1284,8 @@ int derive_consensus(TrackInfoArray &tracks) {
    } // end for i
 
    mlog << Debug(3)
-        << "Building consensus track(s) for " << case_list.n()
+        << "Building " << conf_info.NConsensus
+        << " consensus track(s) for " << case_list.n()
         << " cases.\n";
 
    // Loop through the cases and process each consensus model
@@ -1291,15 +1301,22 @@ int derive_consensus(TrackInfoArray &tracks) {
          // Initialize
          con_tracks.clear();
          new_track.clear();
-         req_list.clear();
+         req_cons_mem.clear();
+         req_diag_mem.clear();
+         n_diag_inputs = 0;
 
          // Loop through the consensus members
-         for(k=0, skip=false;
+         for(k=0, skip_cons=false, skip_diag=false;
              k<conf_info.Consensus[j].Members.n(); k++) {
 
-            // Add required members to the list
-            if(conf_info.Consensus[j].Required[k]) {
-               req_list.add(conf_info.Consensus[j].Members[k]);
+            // Add members to the required consensus list
+            if(conf_info.Consensus[j].ConsRequired[k]) {
+               req_cons_mem.add(conf_info.Consensus[j].Members[k]);
+            }
+
+            // Add members to the required diagnostics list
+            if(conf_info.Consensus[j].DiagRequired[k]) {
+               req_diag_mem.add(conf_info.Consensus[j].Members[k]);
             }
 
             // Loop through the tracks looking for a match
@@ -1312,6 +1329,7 @@ int derive_consensus(TrackInfoArray &tracks) {
                   tracks[l].technique() == conf_info.Consensus[j].Members[k] &&
                   tracks[l].init()      == yyyymmdd_hhmmss_to_unix(case_cmp[2].c_str())) {
                   con_tracks.add(tracks[l]);
+                  if(tracks[l].n_diag() > 0) n_diag_inputs++;
                   found = true;
                   mlog << Debug(5)
                        << "[Case " << i+1 << "] For case \""
@@ -1330,38 +1348,64 @@ int derive_consensus(TrackInfoArray &tracks) {
                     << conf_info.Consensus[j].Members[k]
                     <<  "\" was not found.\n";
 
-               // Check if it was a required model
-               if(conf_info.Consensus[j].Required[k]) {
+               // Check if it was a required diagnostics model
+               if(conf_info.Consensus[j].DiagRequired[k]) {
                   mlog << Debug(4)
                        << "[Case " << i+1 << "] For case \"" << case_list[i]
-                       << "\" skipping consensus model \""
+                       << "\" skipping diagnostics for consensus model \""
+                       << conf_info.Consensus[j].Name
+                       << "\" since required diagnostics member \""
+                       << conf_info.Consensus[j].Members[k]
+                       <<  "\" was not found.\n";
+                     skip_diag = true;
+               }
+
+               // Check if it was a required consensus model
+               if(conf_info.Consensus[j].ConsRequired[k]) {
+                  mlog << Debug(4)
+                       << "[Case " << i+1 << "] For case \"" << case_list[i]
+                       << "\" skipping derivation of consensus model \""
                        << conf_info.Consensus[j].Name
                        << "\" since required member \""
                        << conf_info.Consensus[j].Members[k]
                        <<  "\" was not found.\n";
-                     skip = true;
+                     skip_cons = true;
                      break;
                }
             }
+
          } // end for k
 
          // If a required member was missing, continue to the next case
-         if(skip) continue;
+         if(skip_cons) continue;
 
-         // Check that the required number of tracks were found
-         if(con_tracks.n() < conf_info.Consensus[j].MinReq) {
+         // Check that the required number of diagnostics inputs were found
+         if(n_diag_inputs < conf_info.Consensus[j].MinDiagReq) {
             mlog << Debug(4)
                  << "[Case " << i+1 << "] For case \"" << case_list[i]
-                 << "\" skipping consensus model \"" << conf_info.Consensus[j].Name
+                 << "\" skipping diagnostics for consensus model \""
+                 << conf_info.Consensus[j].Name
                  << "\" since the minimum number of required members were not found ("
-                 << con_tracks.n() << " < "
-                 << conf_info.Consensus[j].MinReq << ").\n";
+                 << n_diag_inputs << " < " << conf_info.Consensus[j].MinDiagReq << ").\n";
+            skip_diag = true;
+         }
+
+         // Check that the required number of consensus tracks were found
+         if(con_tracks.n() < conf_info.Consensus[j].MinConsReq) {
+            mlog << Debug(4)
+                 << "[Case " << i+1 << "] For case \"" << case_list[i]
+                 << "\" skipping derivation of consensus model \""
+                 << conf_info.Consensus[j].Name
+                 << "\" since the minimum number of required members were not found ("
+                 << con_tracks.n() << " < " << conf_info.Consensus[j].MinConsReq << ").\n";
             continue;
          }
 
          // Derive the consensus model from the TrackInfoArray
          new_track = consensus(con_tracks, conf_info.Consensus[j].Name,
-                               conf_info.Consensus[j].MinReq, req_list);
+                               req_cons_mem, conf_info.Consensus[j].MinConsReq,
+                               req_diag_mem, conf_info.Consensus[j].MinDiagReq,
+                               skip_diag);
 
          if(mlog.verbosity_level() >= 5) {
             mlog << Debug(5)

@@ -146,6 +146,7 @@ static const std::string standard_name_att_name        = "standard_name";
 static const std::string units_att_name                = "units";
 
 static const char nc_time_unit_exp[]    = "^[a-z|A-Z]* *since *[0-9]\\{1,4\\}-[0-9]\\{1,2\\}-[0-9]\\{1,2\\}";
+static const char nc_time_unit_ymd_exp[] = "[0-9]\\{1,4\\}-[0-9]\\{1,2\\}-[0-9]\\{1,2\\}";
 
 static const char MET_NC_Obs_ver_1_2[]  = "1.02";
 static const char MET_NC_Obs_version[]  = "1.02";
@@ -385,6 +386,7 @@ extern bool is_nc_unit_latitude(const char *units);
 
 extern void parse_cf_time_string(const char *str, unixtime &ref_ut,
                                  int &sec_per_unit);
+extern void parse_time_string(const char *str, unixtime &ut);
 
 ////////////////////////////////////////////////////////////////////////
 

@@ -34,7 +34,7 @@ class MetNcCFDataFile : public Met2dDataFile {
       void nccf_init_from_scratch();
       NcVarInfo *find_first_data_var();
       long convert_time_to_offset(long time_value);
-      long convert_value_to_offset(double z_value, string z_dim_name);
+      long convert_value_to_offset(double z_value, std::string z_dim_name);
       LongArray collect_time_offsets(VarInfo &vinfo);
 
       MetNcCFDataFile(const MetNcCFDataFile &);
@@ -108,7 +108,7 @@ class MetNcCFDataFile : public Met2dDataFile {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline GrdFileType MetNcCFDataFile::file_type () const { return ( FileType_NcCF ); }
+inline GrdFileType MetNcCFDataFile::file_type () const { return FileType_NcCF; }
 
 
 ////////////////////////////////////////////////////////////////////////

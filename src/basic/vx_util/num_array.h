@@ -83,7 +83,7 @@ class NumArray {
       void inc(int, int);
       void inc(int, double);
 
-      void   sort_array();
+      void   sort_array(bool increasing=true);
       void   reorder(const NumArray &);
       int    rank_array(int &);
       double percentile_array(double);

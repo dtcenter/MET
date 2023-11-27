@@ -54,6 +54,13 @@ quilt = FALSE;
 multivar_logic = "#1 && #2 && #3";
 
 //
+// MODE Multivar intensity comparison settings
+//
+multivar_intensity_compare_fcst = [ 2, 3 ];
+multivar_intensity_compare_obs = [ 2, 3 ];
+
+
+//
 // Forecast and observation fields to be verified
 //
 fcst = {
@@ -84,6 +91,8 @@ fcst = {
    filter_attr_thresh = [];
    merge_thresh       = >=3.5;
    merge_flag         = NONE;
+   multivar_name = "Super";
+   multivar_level = "LO";
 }
 obs = fcst;
 

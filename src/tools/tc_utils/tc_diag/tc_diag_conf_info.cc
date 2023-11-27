@@ -92,6 +92,7 @@ void DomainInfo::clear() {
 
    var_info_ptr.clear();
    diag_script.clear();
+   override_diags.clear();
 
    return;
 }
@@ -128,6 +129,9 @@ void DomainInfo::parse_domain_info(Dictionary &dict) {
    for(int i=0; i<diag_script.n(); i++) {
       diag_script.set(i, replace_path(diag_script[i].c_str()));
    }
+
+   // Conf: override_diags
+   override_diags = dict.lookup_string_array(conf_key_override_diags);
 
    return;
 }
@@ -188,12 +192,13 @@ void TCDiagConfInfo::clear() {
    vortex_removal_flag = false;
    one_time_per_file_flag = true;
 
-   nc_rng_azi_flag = false;
-   nc_diag_flag    = false;
-   cira_diag_flag  = false;
+   output_base_format.clear();
+
+   nc_cyl_grid_flag = false;
+   nc_diag_flag     = false;
+   cira_diag_flag   = false;
 
    tmp_dir.clear();
-   output_prefix.clear();
 
    return;
 }
@@ -332,17 +337,11 @@ void TCDiagConfInfo::process_config(GrdFileType file_type,
    one_time_per_file_flag =
       conf.lookup_bool(conf_key_one_time_per_file_flag);
 
-   // Conf: nc_rng_azi_flag
-   nc_rng_azi_flag = conf.lookup_bool(conf_key_nc_rng_azi_flag);
+   // Conf: output_base_format
+   output_base_format = conf.lookup_string(conf_key_output_base_format);
 
-   // TODO: Remove this check for MET version 12.0.0
-   if(!nc_rng_azi_flag) {
-      mlog << Warning << "\nResetting the \"" << conf_key_nc_rng_azi_flag
-           << "\" configuration option to true since it is the only "
-           << "TC-Diag output for MET " << met_version << ".\n"
-           << "Additional outputs will be added in future MET versions.\n\n";
-      nc_rng_azi_flag = true;
-   }
+   // Conf: nc_cyl_grid_flag
+   nc_cyl_grid_flag = conf.lookup_bool(conf_key_nc_cyl_grid_flag);
 
    // Conf: nc_diag_flag
    nc_diag_flag = conf.lookup_bool(conf_key_nc_diag_flag);
@@ -350,32 +349,18 @@ void TCDiagConfInfo::process_config(GrdFileType file_type,
    // Conf: cira_diag_flag
    cira_diag_flag = conf.lookup_bool(conf_key_cira_diag_flag);
 
-   /* TODO: Uncomment this check for MET version 12.0.0
-   // At least one should be true
-   if(!nc_diag_flag && !cira_diag_flag) {
+   // At least one output type must be requested
+   if(!nc_cyl_grid_flag && !nc_diag_flag && !cira_diag_flag) {
       mlog << Error << "\nTCDiagConfInfo::process_config() -> "
-           << "the \"" << conf_key_nc_diag_flag << "\" and \""
-           << conf_key_cira_diag_flag
-           << "\" config entries cannot both be false.\n\n";
+           << "the \"" << conf_key_nc_cyl_grid_flag
+           << "\", \"" << conf_key_nc_diag_flag
+           << "\", and \"" << conf_key_cira_diag_flag
+           << "\" config entries cannot all be false.\n\n";
       exit(1);
-   }
-   */
-
-   // TODO: Remove this check for MET version 12.0.0
-   if(nc_diag_flag || cira_diag_flag) {
-      mlog << Warning << "\nResetting the \""
-           << conf_key_nc_diag_flag << "\" and \"" << conf_key_cira_diag_flag
-           << "\" configuration options to false since they are not supported"
-           << " for MET " << met_version << ".\n"
-           << "Additional outputs will be added in future MET versions.\n\n";
-      nc_diag_flag = cira_diag_flag = false;
    }
 
    // Conf: tmp_dir
    tmp_dir = parse_conf_tmp_dir(&conf);
-
-   // Conf: output_prefix
-   output_prefix = conf.lookup_string(conf_key_output_prefix);
 
    return;
 }

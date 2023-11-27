@@ -20,11 +20,11 @@ print(sys.path)
 project = 'MET'
 author = 'UCAR/NCAR, NOAA, CSU/CIRA, and CU/CIRES'
 author_list = 'Prestopnik, J., H. Soh, L. Goodrich, B. Brown, R. Bullock, J. Halley Gotway, K. Newman, J. Opatz, T. Jensen'
-version = '12.0.0-beta1'
+version = '12.0.0-beta2'
 verinfo = version
 release = f'{version}'
 release_year = '2023'
-release_date = f'{release_year}-09-15'
+release_date = f'{release_year}-11-17'
 copyright = f'{release_year}, {author}'
 
 # -- General configuration ---------------------------------------------------
@@ -32,7 +32,7 @@ copyright = f'{release_year}, {author}'
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ['sphinx.ext.autodoc','sphinx.ext.intersphinx','sphinx_design',]
+extensions = ['sphinx.ext.autodoc','sphinx.ext.intersphinx','sphinx_design','sphinx_rtd_theme',]
 
 # settings for ReadTheDocs PDF creation
 latex_engine = 'pdflatex'

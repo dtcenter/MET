@@ -36,11 +36,11 @@
 #
 # The compile_MET_all.sh script will compile and install MET and its
 # external library dependencies, if needed, including:
-# PROJ, GSL, BUFRLIB, GRIB2C (with dependencies Z, PNG, JASPER),
-# HDF5, NETCDF (C and CXX), HDF4 (optional for MODIS-Regrid
-# and lidar2nc), HDFEOS (optional for MODIS-Regrid and lidar2nc),
-# FREETYPE (optional for MODE Graphics), and CAIRO (optional
-# for MODE Graphics).
+# PROJ (with dependency SQLITE >= 3.11), GSL, BUFRLIB, 
+# GRIB2C (with dependencies Z, PNG, JASPER), HDF5, NETCDF (C and CXX), 
+# HDF4 (optional for MODIS-Regrid and lidar2nc), HDFEOS (optional for
+# MODIS-Regrid and lidar2nc), FREETYPE (optional for MODE Graphics),
+# and CAIRO (optional for MODE Graphics).
 #
 # If these libraries have already been installed and don't need to be
 # reinstalled or if you are compiling on a machine that uses modulefiles
@@ -49,20 +49,22 @@
 # need to set to let MET know where the library and header files are.
 # Please supply values for the following environment variables
 # in the input environment configuration file (install_met_env.<machine_name>:
-# MET_GRIB2CLIB, MET_GRIB2CINC, GRIB2CLIB_NAME,
-# MET_BUFRLIB, BUFRLIB_NAME, MET_HDF5, MET_NETCDF,
-# MET_PROJ, MET_GSL, LIB_JASPER, LIB_PNG, LIB_Z.
+# MET_GRIB2CLIB, MET_GRIB2CINC, GRIB2CLIB_NAME, MET_BUFRLIB, BUFRLIB_NAME, 
+# MET_HDF5, MET_NETCDF, MET_PROJ, MET_GSL, LIB_JASPER, LIB_PNG, LIB_Z,
+# SQLITE_INCLUDE_DIR, SQLITE_LIB_DIR.
 #
-# The optional libraries HDF4, HDFEOS, FREETYPE, and CAIRO are
+# The optional libraries ecKit and atlas offer support for unstructured
+# grids. The optional libraries HDF4, HDFEOS, FREETYPE, and CAIRO are
 # used for the following, not widely used tools, MODIS-Regrid,
-# lidar2nc, and MODE Graphics.  To enable building of these libraries,
-# set the compile flags for the library (e.g. COMPILE_HDF, COMPILE_HDFEOS) to
-# any value in the environment config file. If these libraries have already
-# been installed and don't need to be reinstalled, please
-# supply values for the following environment variables in the input
-# environment configuration file (install_met_env.<machine_name>):
-# MET_HDF, MET_HDFEOS, MET_FREETYPEINC, MET_FREETYPELIB,
-# MET_CAIROINC, MET_CAIROLIB.
+# lidar2nc, and MODE Graphics. To enable building of these libraries,
+# set the compile flags for the library (e.g. COMPILE_ECKIT, COMPILE_ATLAS,
+# COMPILE_HDF, COMPILE_HDFEOS) to any value in the environment config
+# file. If these libraries have already been installed and don't need
+# to be reinstalled, please supply values for the following environment
+# variables in the input environment configuration file
+# (install_met_env.<machine_name>): MET_ECKIT, MET_ATLAS, MET_HDF,
+# MET_HDFEOS, MET_FREETYPEINC, MET_FREETYPELIB, MET_CAIROINC,
+# MET_CAIROLIB.
 #
 # Users can speed up the compilation of MET and its dependent libraries
 # by adding the following to their environment configuration file:
@@ -155,6 +157,13 @@ if [[ -z "$LIB_Z" ]]; then
   LIB_Z=${LIB_DIR}/lib
 fi
 
+# if SQLITE is not defined in the environment file, enable its compilation
+if [[ -z ${SQLITE_INCLUDE_DIR} ]] && [[ -z ${SQLITE_LIB_DIR} ]]; then
+   COMPILE_SQLITE=1
+else
+   COMPILE_SQLITE=0       
+fi
+
 # Constants
 if [[ -z ${MET_GRIB2CLIB} ]] && [[ -z ${MET_GRIB2C} ]]; then
   COMPILE_ZLIB=1
@@ -192,13 +201,26 @@ else
   COMPILE_GSL=0
 fi
 
+# Only set COMPILE_ECKIT and COMPILE_ATLAS if you want to compile and enable support for unstructued grids
+if [ ! -z "${COMPILE_ECKIT}" ]; then COMPILE_ECKIT=1; else COMPILE_ECKIT=0; fi
+if [ ! -z "${COMPILE_ATLAS}" ]; then COMPILE_ATLAS=1; else COMPILE_ATLAS=0;  fi
+
+if [[ -z ${MET_ECKIT} ]] && [[ -z ${MET_ATLAS} ]]; then
+  if [[ $COMPILE_ECKIT -eq 1 && $COMPILE_ATLAS -eq 1 ]]; then
+    export MET_ECKIT=${LIB_DIR}
+    export MET_ATLAS=${LIB_DIR}
+  fi
+else
+  # Only set COMPILE_ECKIT and COMPILE_ATLAS to 1 if you have already compiled ECKIT and ATLAS,
+  # have set MET_ECKIT and MET_ATLAS in your configuration file, and want to enable
+  # unstructured grids 
+  COMPILE_ECKIT=0
+  COMPILE_ATLAS=0
+fi
+
 # Only set COMPILE_HDF and COMPILE_HDFEOS if you want to compile and enable MODIS-Regrid (not widely used)
 if [ ! -z "${COMPILE_HDF}" ]; then COMPILE_HDF=1; else COMPILE_HDF=0; fi
 if [ ! -z "${COMPILE_HDFEOS}" ]; then COMPILE_HDFEOS=1; else COMPILE_HDFEOS=0;  fi
-
-# Only set COMPILE_FREETYPE and COMPILE_CAIRO if you want to compile and enable MODE Graphics (not widely used)
-if [ ! -z "${COMPILE_FREETYPE}" ]; then COMPILE_FREETYPE=1; else COMPILE_FREETYPE=0; fi
-if [ ! -z "${COMPILE_CAIRO}" ]; then COMPILE_CAIRO=1; else COMPILE_CAIRO=0; fi
 
 if [[ -z ${MET_HDF} ]] && [[ -z ${MET_HDFEOS} ]]; then
   if [[ $COMPILE_HDF -eq 1 && $COMPILE_HDFEOS -eq 1 ]]; then
@@ -212,6 +234,11 @@ else
   COMPILE_HDF=0
   COMPILE_HDFEOS=0
 fi
+
+# Only set COMPILE_FREETYPE and COMPILE_CAIRO if you want to compile and enable MODE Graphics (not widely used) 
+if [ ! -z "${COMPILE_FREETYPE}" ]; then COMPILE_FREETYPE=1; else COMPILE_FREETYPE=0; fi
+if [ ! -z "${COMPILE_CAIRO}" ]; then COMPILE_CAIRO=1; else COMPILE_CAIRO=0; fi
+
 
 if [[ ! -z ${MET_FREETYPE} ]]; then
   echo "ERROR: MET_FREETYPEINC and MET_FREETYPELIB must be set instead of MET_FREETYPE"
@@ -252,6 +279,8 @@ if [ ! -z "${SKIP_LIBS}" ]; then
   COMPILE_LIBPNG=0
   COMPILE_JASPER=0
   COMPILE_G2CLIB=0
+  COMPILE_ECKIT=0
+  COMPILE_ATLAS=0
   COMPILE_HDF=0
   COMPILE_HDFEOS=0
   COMPILE_NETCDF=0
@@ -282,13 +311,20 @@ fi
 if [ -z ${COMPILER_FAMILY} ]; then
   COMPILER_FAMILY=` echo $COMPILER | cut -d'_' -f1`
 fi
- 
+
+# Check for "oneapi" in compiler family name
+#if echo ${COMPILER_FAMILY} | grep -E "^intel"; then
+if [[ ${COMPILER_FAMILY} == *intel* ]]; then
+  COMPILER_FAMILY_SUFFIX=` echo $COMPILER_FAMILY | cut -d'-' -f2`
+fi
+
 if [ -z ${COMPILER_VERSION} ]; then
   COMPILER_VERSION=`echo $COMPILER | cut -d'_' -f2`
 fi
 
 echo "COMPILER = $COMPILER"
 echo "COMPILER_FAMILY = $COMPILER_FAMILY"
+echo "COMPILER_FAMILY_SUFFIX = $COMPILER_FAMILY_SUFFIX"
 echo "COMPILER_VERSION = $COMPILER_VERSION"
 COMPILER_MAJOR_VERSION=`echo $COMPILER_VERSION | cut -d'.' -f1`
 COMPILER_MINOR_VERSION=`echo $COMPILER_VERSION | cut -d'.' -f2`
@@ -315,36 +351,48 @@ if [[ ${COMPILER_FAMILY} == *gnu* ]]; then
 fi
 
 if [ ${COMPILER_FAMILY} = "gnu" ]; then
-  if [ -z ${CC} ]; then CC=`which gcc`; fi
-  if [ -z ${CXX} ]; then CXX=`which g++`; fi
-  if [ -z ${FC} ]; then FC=`which gfortran`; fi
-  if [ -z ${F77} ]; then F77=`which gfortran`; fi
-  if [ -z ${F90} ]; then F90=`which gfortran`;  fi
+  if [ -z ${CC} ]; then export CC=`which gcc`; fi
+  if [ -z ${CXX} ]; then export CXX=`which g++`; fi
+  if [ -z ${FC} ]; then export FC=`which gfortran`; fi
+  if [ -z ${F77} ]; then export F77=`which gfortran`; fi
+  if [ -z ${F90} ]; then export F90=`which gfortran`;  fi
 elif [ ${COMPILER_FAMILY} = "pgi" ]; then
-  if [ -z ${CC} ]; then CC=`which pgcc`; fi
-  if [ -z ${CXX} ]; then CXX=`which pgc++`; fi
-  if [ -z ${FC} ]; then FC=`which pgf90`; fi
-  if [ -z ${F77} ]; then F77=`which pgf90`; fi
-  if [ -z ${F90} ]; then F90=`which pgf90`; fi
-elif [[ ${COMPILER_FAMILY} == "intel" ]] || \
+  if [ -z ${CC} ]; then export CC=`which pgcc`; fi
+  if [ -z ${CXX} ]; then export CXX=`which pgc++`; fi
+  if [ -z ${FC} ]; then export FC=`which pgf90`; fi
+  if [ -z ${F77} ]; then export F77=`which pgf90`; fi
+  if [ -z ${F90} ]; then export F90=`which pgf90`; fi
+elif [[ ${COMPILER_FAMILY} == *intel* && ${CC} == "icc" ]] || \
      [[ ${COMPILER_FAMILY} == "ics" ]] || \
      [[ ${COMPILER_FAMILY} == "ips" ]] || \
+     [[ ${COMPILER_FAMILY} == "intel-classic" ]] || \
      [[ ${COMPILER_FAMILY} == "PrgEnv-intel" ]]; then
-  if [ -z ${CC} ]; then CC=`which icc`; fi
-  if [ -z ${CXX} ]; then CXX=`which icc`; fi
-  if [ -z ${FC} ]; then FC=`which ifort`; fi
-  if [ -z ${F77} ]; then F77=`which ifort`; fi
-  if [ -z ${F90} ]; then F90=`which ifort`; fi
+  if [ -z ${CC} ]; then export CC=`which icc`; fi
+  if [ -z ${CXX} ]; then export CXX=`which icpc`; fi
+  if [ -z ${FC} ]; then export FC=`which ifort`; fi
+  if [ -z ${F77} ]; then export F77=`which ifort`; fi
+  if [ -z ${F90} ]; then export F90=`which ifort`; fi
+elif [[ ${COMPILER_FAMILY} == *intel* ]] && [[ ${CC} == *icx* ]]; then
+  export CXX=`which icpx`
+  export FC=`which ifx`
+  export F77=`which ifx`
+  export F90=`which ifx`
+elif [[ ${COMPILER_FAMILY_SUFFIX} == oneapi ]]; then
+  export CC=`which icx`
+  export CXX=`which icpx`
+  export FC=`which ifx`
+  export F77=`which ifx`
+  export F90=`which ifx`
 else
-  echo "ERROR: \${COMPILER} must start with gnu, intel, ics, ips, PrgEnv-intel, or pgi"
+  echo "ERROR: \${COMPILER} must start with gnu, intel, ics, ips, intel-classic, PrgEnv-intel, or pgi"
   exit
 fi
 
-export CC
-export CXX
-export FC
-export F77
-export F90
+#export CC
+#export CXX
+#export FC
+#export F77
+#export F90
 
 echo "export  CC=${CC}"
 echo "export CXX=${CXX}"
@@ -394,7 +442,22 @@ fi
 # Compile Proj
 if [ $COMPILE_PROJ -eq 1 ]; then
 
-  vrs="9.2.1";
+  if [ $COMPILE_SQLITE -eq 1 ]; then
+    echo
+    echo "Compiling SQLITE at `date`"
+    mkdir -p ${LIB_DIR}/sqlite
+    rm -rf ${LIB_DIR}/sqlite/sqlite*
+    tar -xf ${TAR_DIR}/sqlite*.tar.gz -C ${LIB_DIR}/sqlite > /dev/null 2>&1
+    cd ${LIB_DIR}/sqlite/sqlite*
+    echo "cd `pwd`"
+    run_cmd "./configure --enable-shared --prefix=${LIB_DIR} > sqlite.configure.log 2>&1"
+    run_cmd "make ${MAKE_ARGS} > sqlite.make.log 2>&1"
+    run_cmd "make ${MAKE_ARGS} install > sqlite.make_install.log 2>&1"
+    export SQLITE_INCLUDE_DIR=${LIB_DIR}/include
+    export SQLITE_LIB_DIR=${LIB_DIR}/lib
+  fi
+
+  vrs="7.1.0";
 
   echo
   echo "Compiling PROJ_${vrs} at `date`"
@@ -403,8 +466,13 @@ if [ $COMPILE_PROJ -eq 1 ]; then
   tar -xf ${TAR_DIR}/proj-${vrs}.tar.gz -C ${LIB_DIR}/proj
   cd ${LIB_DIR}/proj/proj*
   echo "cd `pwd`"
+  export PATH=${LIB_DIR}/bin:${PATH}
   run_cmd "mkdir build; cd build"
-  run_cmd "cmake -DCMAKE_INSTALL_PREFIX=${LIB_DIR} .."
+  if [[ -z "$LIB_TIFF" ]]; then
+      run_cmd "cmake -DCMAKE_INSTALL_PREFIX=${LIB_DIR} -DSQLITE3_INCLUDE_DIR=${SQLITE_INCLUDE_DIR} -DSQLITE3_LIBRARY=${SQLITE_LIB_DIR}/libsqlite3.so .."
+  else
+      run_cmd "cmake -DCMAKE_INSTALL_PREFIX=${LIB_DIR} -DSQLITE3_INCLUDE_DIR=${SQLITE_INCLUDE_DIR} -DSQLITE3_LIBRARY=${SQLITE_LIB_DIR}/libsqlite3.so -DTIFF_LIBRARY_RELEASE=${LIB_TIFF} .."
+  fi
   run_cmd "cmake --build ."
   run_cmd "cmake --build . --target install"
 
@@ -416,7 +484,7 @@ if [ $COMPILE_GSL -eq 1 ]; then
   if [ ${COMPILER_FAMILY} = "pgi" ]; then
     vrs="1.11";
   else
-    vrs="2.1";
+    vrs="2.7.1";
   fi
 
   echo
@@ -434,33 +502,23 @@ fi
 # Compile BUFRLIB
 if [ $COMPILE_BUFRLIB -eq 1 ]; then
 
-  vrs="v11.3.0";
+  vrs="v11.6.0";
 
   echo
-  echo "Compiling BUFRLIB_${vrs} at `date`"
-  mkdir -p ${LIB_DIR}/bufrlib/BUFRLIB_${vrs}
-  rm -rf ${LIB_DIR}/bufrlib/BUFRLIB_${vrs}/*
-  cd ${LIB_DIR}/bufrlib/BUFRLIB_${vrs}
+  echo "Compiling bufr_${vrs} at `date`"
+  mkdir -p ${LIB_DIR}/bufrlib
+  rm -rf ${LIB_DIR}/bufrlib/NCEPLIBS-bufr-bufr_${vrs}
+  tar -xf ${TAR_DIR}/bufr_${vrs}.tar.gz -C ${LIB_DIR}/bufrlib
+  export SOURCE_DIR=${LIB_DIR}/bufrlib/NCEPLIBS-bufr-bufr_${vrs}
+  cd $SOURCE_DIR
   echo "cd `pwd`"
-  tar -xf ${TAR_DIR}/BUFRLIB_`echo $vrs | sed 's/\./-/g'`.tar -C ${LIB_DIR}/bufrlib/BUFRLIB_${vrs}
-
-  ${CC} -c -DUNDERSCORE `./getdefflags_C.sh` *.c >> make.log 2>&1
-
-  # For GNU and Intel follow BUFRLIB11 instructions
-  if [[ ${COMPILER_FAMILY} == "gnu" ]]; then
-    if [[ ${COMPILER_MAJOR_VERSION} -ge 10 ]]; then
-      ${FC} -c -fno-second-underscore -fallow-argument-mismatch `./getdefflags_F.sh` modv*.F moda*.F `ls -1 *.F *.f | grep -v "mod[av]_"` >> bufr.make.log 2>&1
-    elif [[ ${COMPILER_MAJOR_VERSION} -lt 10 ]]; then
-      ${FC} -c -fno-second-underscore -Wno-argument-mismatch `./getdefflags_F.sh` modv*.F moda*.F `ls -1 *.F *.f | grep -v "mod[av]_"` >> bufr.make.log 2>&1
-    fi	
-  elif [[ ${COMPILER_FAMILY} == "intel" ]] || [[ ${COMPILER_FAMILY} == "ics" ]] || [[ ${COMPILER_FAMILY} == "ips" ]] || [[ ${COMPILER_FAMILY} == "PrgEnv-intel" ]]; then
-    ${FC} -c `./getdefflags_F.sh` modv*.F moda*.F `ls -1 *.F *.f | grep -v "mod[av]_"` >> bufr.make.log 2>&1
-  elif [[ ${COMPILER_FAMILY} == "pgi" ]]; then
-    ${FC} -c -Mnosecond_underscore `./getdefflags_F.sh` modv*.F moda*.F `ls -1 *.F *.f | grep -v "mod[av]_"` >> bufr.make.log 2>&1
-  fi
-
-  ar crv libbufr.a *.o >> bufr.make.log 2>&1
-  cp *.a ${LIB_DIR}/lib/.
+  run_cmd "mkdir build"
+  export BUILD_DIR=${SOURCE_DIR}/build
+  run_cmd "cmake -H${SOURCE_DIR} -B${BUILD_DIR} -DCMAKE_INSTALL_PREFIX=${LIB_DIR} -DCMAKE_BUILD_TYPE=Debug"
+  run_cmd "cd ${BUILD_DIR}"
+  run_cmd "make ${MAKE_ARGS} > bufr.make.log 2>&1"
+  run_cmd "ctest > bufr.ctest.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} install > bufr.make_install.log 2>&1"
 fi
 
 
@@ -499,49 +557,96 @@ fi
 
 # Compile JASPER
 if [ $COMPILE_JASPER -eq 1 ]; then
+
+  vrs="2.0.25";  
+    
   echo
   echo "Compiling JASPER at `date`"
   mkdir -p ${LIB_DIR}/jasper
   rm -rf ${LIB_DIR}/jasper/jasper*
-  unzip ${TAR_DIR}/jasper*.zip -d ${LIB_DIR}/jasper > /dev/null 2>&1
-  cd ${LIB_DIR}/jasper/jasper*
+  tar -xf ${TAR_DIR}/jasper-${vrs}.tar.gz -C ${LIB_DIR}/jasper
+  cd ${LIB_DIR}/jasper/jasper-version-${vrs}
   export CPPFLAGS="-I${LIB_DIR}/include"
+  export SOURCE_DIR=${LIB_DIR}/jasper/jasper-version-${vrs}
   echo "cd `pwd`"
-  run_cmd "./configure --prefix=${LIB_DIR} > jasper.configure.log 2>&1"
-  run_cmd "make ${MAKE_ARGS} > jasper.make.log 2>&1"
+  export BUILD_DIR=${LIB_DIR}/jasper/jasper-version-${vrs}/build
+  run_cmd "cmake -G \"Unix Makefiles\" -H${SOURCE_DIR} -B${BUILD_DIR} -DCMAKE_INSTALL_PREFIX=${LIB_DIR}"
+  run_cmd "cd ${BUILD_DIR}"
+  run_cmd "make clean all"
+  run_cmd "make ${MAKE_ARGS} test > jasper.make_test.log 2>&1"
   run_cmd "make ${MAKE_ARGS} install > jasper.make_install.log 2>&1"
 fi
 
 # Compile G2CLIB
 if [ $COMPILE_G2CLIB -eq 1 ]; then
+
+  vrs="1.6.4";   
+
   echo
   echo "Compiling G2CLIB at `date`"
   mkdir -p ${LIB_DIR}/g2clib
-  rm -rf ${LIB_DIR}/g2clib/g2clib*
-  tar -xf ${TAR_DIR}/g2clib*.tar -C ${LIB_DIR}/g2clib
-  cd ${LIB_DIR}/g2clib/g2clib*
-  
-  # Sed commands use double-quotes to support variable expansion.
-  $sed_inline "s|INC=.*|INC=-I${LIB_DIR}/include -I${LIB_DIR}/include/jasper|g" makefile
-
-  # Allow other compilers besides gcc
-  $sed_inline "s|CC=gcc|CC=${CC}|g" makefile
-
-  # remove -D__64BIT__ flag because compiling with it has
-  # shown issues with GRIB/GRIB2 files that are over 2GB in size
-  # This flag was removed in g2clib 1.6.4
-  # so this can be removed if the version is updated
-  $sed_inline 's/-D__64BIT__//g' makefile
-  
+  rm -rf ${LIB_DIR}/g2clib/NCEP*
+  tar -xf ${TAR_DIR}/g2clib-${vrs}.tar.gz -C ${LIB_DIR}/g2clib
+  cd ${LIB_DIR}/g2clib/NCEP*
   echo "cd `pwd`"
-  # g2clib appears to compile but causes failure compiling MET if -j argument is used
-  # so exclude it from this call
-  run_cmd "make > g2clib.make.log 2>&1"
-
-  cp libg2c*.a ${LIB_DIR}/lib/libgrib2c.a
-  cp *.h ${LIB_DIR}/include/.
+  run_cmd "mkdir build; cd build"
+  run_cmd "cmake -DCMAKE_INSTALL_PREFIX=${LIB_DIR} -DCMAKE_PREFIX_PATH=${LIB_DIR} .."
+  run_cmd "make ${MAKE_ARGS} > g2c.make.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} test > g2c.make_test.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} install > g2c.make_install.log 2>&1"
 fi
 
+# Compile ECKIT
+if  [ $COMPILE_ECKIT -eq 1 ]; then
+
+  # Need to obtain ecbuild before installing eckit
+
+  vrs="3.5.0";  
+    
+  echo  
+  echo "Compiling ECBUILD at `date`"
+  mkdir -p ${LIB_DIR}/ecbuild
+  rm -rf ${LIB_DIR}/ecbuild/ecbuild*
+  tar -xf ${TAR_DIR}/ecbuild-${vrs}.tar.gz -C ${LIB_DIR}/ecbuild
+  cd ${LIB_DIR}/ecbuild/ecbuild*
+  echo "cd `pwd`"
+  run_cmd "mkdir build; cd build"
+  run_cmd "cmake ../ -DCMAKE_INSTALL_PREFIX=${LIB_DIR}"
+  run_cmd "make ${MAKE_ARGS} install > ecbuild.make_install.log 2>&1"
+  
+  vrs="1.20.2";
+
+  echo
+  echo "Compiling ECKIT at `date`"
+  mkdir -p ${LIB_DIR}/eckit
+  rm -rf ${LIB_DIR}/eckit/eckit*
+  tar -xf ${TAR_DIR}/eckit-${vrs}.tar.gz -C ${LIB_DIR}/eckit
+  cd ${LIB_DIR}/eckit/eckit*
+  echo "cd `pwd`"
+  run_cmd "mkdir build; cd build"
+  run_cmd "cmake ../ -DCMAKE_INSTALL_PREFIX=${LIB_DIR} -DCMAKE_PREFIX_PATH=${LIB_DIR}"
+  run_cmd "make ${MAKE_ARGS} install > eckit.make_install.log 2>&1"
+
+fi
+
+# Compile ATLAS
+if [ $COMPILE_ATLAS -eq 1 ]; then
+
+  vrs="0.30.0";
+
+  echo
+  echo "Compiling ATLAS at `date`"
+  mkdir -p ${LIB_DIR}/atlas
+  rm -rf ${LIB_DIR}/atlas/atlas*
+  tar -xf ${TAR_DIR}/atlas-${vrs}.tar.gz -C ${LIB_DIR}/atlas
+  cd ${LIB_DIR}/atlas/atlas*
+  echo "cd `pwd`"
+  run_cmd "mkdir build; cd build"
+  run_cmd "cmake ../ -DCMAKE_INSTALL_PREFIX=${LIB_DIR} -DCMAKE_PREFIX_PATH=${LIB_DIR}"
+  run_cmd "make ${MAKE_ARGS} > atlas.make.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} install > atlas.make_install.log 2>&1"
+
+fi
 
 # Compile HDF
 # Depends on jpeg
@@ -694,7 +799,7 @@ cd ${MET_DIR}/MET*
 
 if [ -z ${MET_BUFRLIB} ]; then
   export MET_BUFRLIB=${LIB_DIR}/lib
-  export BUFRLIB_NAME=-lbufr
+  export BUFRLIB_NAME=-lbufr_4
 fi
 
 if [ -z ${MET_GRIB2CLIB} ]; then
@@ -703,7 +808,7 @@ if [ -z ${MET_GRIB2CLIB} ]; then
   export LIB_JASPER=${LIB_DIR}/lib
   export LIB_LIBPNG=${LIB_DIR}/lib
   export LIB_Z=${LIB_DIR}/lib
-  export GRIB2CLIB_NAME=-lgrib2c
+  export GRIB2CLIB_NAME=-lg2c
 fi
 
 if [ -z ${MET_NETCDF} ]; then
@@ -716,8 +821,7 @@ if [ -z ${MET_GSL} ]; then
 fi
 
 if [ -z ${MET_PROJ} ]; then
-  export MET_PROJINC=${LIB_DIR}/include
-  export MET_PROJLIB=${LIB_DIR}/lib64
+  export MET_PROJ=${LIB_DIR}
 fi
 
 export MET_PYTHON_BIN_EXE=${MET_PYTHON_BIN_EXE:=${MET_PYTHON}/bin/python3}
@@ -732,16 +836,12 @@ fi
 # https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html
 # ${parameter:+word}
 # If parameter is null or unset, nothing is substituted, otherwise the expansion of word is substituted.
-export LDFLAGS="${LDFLAGS} -Wl,-rpath,${LIB_DIR}/lib${MET_PROJ:+:$MET_PROJ/lib64}${LIB_DIR}/lib${MET_NETCDF:+:$MET_NETCDF/lib}${MET_HDF5:+:$MET_HDF5/lib}${MET_BUFRLIB:+:$MET_BUFRLIB}${MET_GRIB2CLIB:+:$MET_GRIB2CLIB}${MET_PYTHON_LIB:+:$MET_PYTHON_LIB}${MET_GSL:+:$MET_GSL/lib}${ADDTL_DIR:+:$ADDTL_DIR}"
+export LDFLAGS="${LDFLAGS} -Wl,-rpath,${LIB_DIR}/lib:${MET_PROJ:+:$MET_PROJ/lib64}:${LIB_DIR}/lib${MET_NETCDF:+:$MET_NETCDF/lib}${MET_HDF5:+:$MET_HDF5/lib}${MET_BUFRLIB:+:$MET_BUFRLIB}${MET_GRIB2CLIB:+:$MET_GRIB2CLIB}${MET_PYTHON_LIB:+:$MET_PYTHON_LIB}${MET_GSL:+:$MET_GSL/lib}${ADDTL_DIR:+:$ADDTL_DIR}"
 export LDFLAGS="${LDFLAGS} -Wl,-rpath,${LIB_JASPER:+$LIB_JASPER}${LIB_LIBPNG:+:$LIB_PNG}${LIB_Z:+$LIB_Z}"
 export LDFLAGS="${LDFLAGS} ${LIB_JASPER:+-L$LIB_JASPER} ${LIB_LIBPNG:+-L$LIB_LIBPNG} ${MET_HDF5:+-L$MET_HDF5/lib} ${ADDTL_DIR:+-L$ADDTL_DIR}"
-export LIBS="${LIBS} -lhdf5_hl -lhdf5 -lz"
+export LIBS="${LIBS} -lhdf5_hl -lhdf5 -lz -ltiff"
 export MET_FONT_DIR=${TEST_BASE}/fonts
 
-if [ "${SET_D64BIT}" = "TRUE" ]; then
-  export CFLAGS="-D__64BIT__"
-  export CXXFLAGS="-D__64BIT__"
-fi
 
 echo "MET Configuration settings..."
 printenv | egrep "^MET_" | sed -r 's/^/export /g'
@@ -757,6 +857,10 @@ configure_cmd="${configure_cmd} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} --enable-grib2"
 if [[ ! -z ${MET_FREETYPEINC} && ! -z ${MET_FREETYPELIB} && \
       ! -z ${MET_CAIROINC} && ! -z ${MET_CAIROLIB} ]]; then
   configure_cmd="${configure_cmd} --enable-mode_graphics"
+fi
+
+if [[ ! -z $MET_ECKIT && ! -z $MET_ATLAS ]]; then
+  configure_cmd="${configure_cmd} --enable-ugrid"
 fi
 
 if [[ ! -z $MET_HDF && ! -z $MET_HDFEOS ]]; then
