@@ -26,13 +26,14 @@ test_grid_area_LDADD = \
 	-lvx_math \
 	-lvx_cal \
 	-lvx_log \
+	$(UGRID_DEP_LIBS) \
 	-lz -lm -lproj
 
 grid_proj_comparison_SOURCES = grid_proj_comparison.cc
 grid_proj_comparison_CPPFLAGS = ${MET_CPPFLAGS}
 grid_proj_comparison_LDFLAGS = -L. ${MET_LDFLAGS}
 grid_proj_comparison_LDADD = \
-	$(UGRID_DEP_LIBS) \
+	$(UGRID_MET_LIBS) \
 	-lvx_grid \
 	-lvx_geodesy \
 	-lvx_nav \
@@ -41,4 +42,5 @@ grid_proj_comparison_LDADD = \
 	-lvx_math \
 	-lvx_cal \
 	-lvx_log \
+	$(UGRID_DEP_LIBS) \
 	-lz -lm -lproj

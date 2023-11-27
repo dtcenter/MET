@@ -105,12 +105,14 @@ am_grid_proj_comparison_OBJECTS =  \
 	grid_proj_comparison-grid_proj_comparison.$(OBJEXT)
 grid_proj_comparison_OBJECTS = $(am_grid_proj_comparison_OBJECTS)
 am__DEPENDENCIES_1 =
-grid_proj_comparison_DEPENDENCIES = $(am__DEPENDENCIES_1)
+grid_proj_comparison_DEPENDENCIES = $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1)
 grid_proj_comparison_LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
 	$(grid_proj_comparison_LDFLAGS) $(LDFLAGS) -o $@
 am_test_grid_area_OBJECTS = test_grid_area-test_grid_area.$(OBJEXT)
 test_grid_area_OBJECTS = $(am_test_grid_area_OBJECTS)
-test_grid_area_DEPENDENCIES = $(am__DEPENDENCIES_1)
+test_grid_area_DEPENDENCIES = $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1)
 test_grid_area_LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
 	$(test_grid_area_LDFLAGS) $(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_@AM_V@)
@@ -348,13 +350,14 @@ test_grid_area_LDADD = \
 	-lvx_math \
 	-lvx_cal \
 	-lvx_log \
+	$(UGRID_DEP_LIBS) \
 	-lz -lm -lproj
 
 grid_proj_comparison_SOURCES = grid_proj_comparison.cc
 grid_proj_comparison_CPPFLAGS = ${MET_CPPFLAGS}
 grid_proj_comparison_LDFLAGS = -L. ${MET_LDFLAGS}
 grid_proj_comparison_LDADD = \
-	$(UGRID_DEP_LIBS) \
+	$(UGRID_MET_LIBS) \
 	-lvx_grid \
 	-lvx_geodesy \
 	-lvx_nav \
@@ -363,6 +366,7 @@ grid_proj_comparison_LDADD = \
 	-lvx_math \
 	-lvx_cal \
 	-lvx_log \
+	$(UGRID_DEP_LIBS) \
 	-lz -lm -lproj
 
 all: all-am
