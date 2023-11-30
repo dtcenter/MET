@@ -570,7 +570,7 @@ if [ $COMPILE_JASPER -eq 1 ]; then
   export SOURCE_DIR=${LIB_DIR}/jasper/jasper-version-${vrs}
   echo "cd `pwd`"
   export BUILD_DIR=${LIB_DIR}/jasper/jasper-version-${vrs}/build
-  run_cmd "cmake -G \"Unix Makefiles\" -H${SOURCE_DIR} -B${BUILD_DIR} -DCMAKE_INSTALL_PREFIX=${LIB_DIR}"
+  run_cmd "cmake -G \"Unix Makefiles\" -H${SOURCE_DIR} -B${BUILD_DIR} -DCMAKE_INSTALL_PREFIX=${LIB_DIR} -DJAS_ENABLE_DOC=false"
   run_cmd "cd ${BUILD_DIR}"
   run_cmd "make clean all"
   run_cmd "make ${MAKE_ARGS} test > jasper.make_test.log 2>&1"
