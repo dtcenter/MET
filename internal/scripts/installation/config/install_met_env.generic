@@ -36,7 +36,9 @@ export MET_PYTHON_CC=`python3-config --cflags`
 # Use MAKE_ARGS to sped up the compilation of the external libaries and/or MET
 # MAKE_ARGS can be set "-j #" where # is replaced with the number of
 # cores to use (as an integer) or to simply "-j" to use all available cores.
-export MAKE_ARGS=-j
+# Recommend setting to "-j 5" as some users have experienced problems with
+# higher values or no # specified.
+export MAKE_ARGS="-j 5"
 
 # If users have already installed these libraries and would like to make use of
 # them, uncomment out the export statements. If those pre-existing libraries are
