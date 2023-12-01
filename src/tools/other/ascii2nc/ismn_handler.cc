@@ -21,16 +21,26 @@ using namespace std;
 const int IsmnHandler::MIN_NUM_HDR_COLS = 8;
 const int IsmnHandler::NUM_OBS_COLS = 5;
 
+// Relevant GRIB codes
+static const int PRATE_GRIB_CODE = 59;
+static const int SNOD_GRIB_CODE = 66;
+static const int SOILW_GRIB_CODE = 144;
+static const int SMS_GRIB_CODE = -1;
+static const int WEASD_GRIB_CODE = 65;
+static const int TMP_GRIB_CODE = 11;
+static const int TSOIL_GRIB_CODE = 85;
+static const int AVSFT_GRIB_CODE = 148;
+
 // Mapping of ISMN strings to output variable names
 map<string,obsVarInfo> IsmnObsVarMap = {
-   { "p",    {  59, "PRATE" } },
-   { "sd",   {  66, "SNOD"  } },
-   { "sm",   { 144, "SOILW" } },
-   { "su",   {  -1, "SMS"   } },
-   { "sweq", {  65, "WEASD" } },
-   { "ta",   {  11, "TMP"   } },
-   { "ts",   {  85, "TSOIL" } },
-   { "tsf",  { 148, "AVSFT" } }
+   { "p",    { PRATE_GRIB_CODE, "PRATE" } },
+   { "sd",   { SNOD_GRIB_CODE,  "SNOD"  } },
+   { "sm",   { SOILW_GRIB_CODE, "SOILW" } },
+   { "su",   { SMS_GRIB_CODE,   "SMS"   } },
+   { "sweq", { WEASD_GRIB_CODE, "WEASD" } },
+   { "ta",   { TMP_GRIB_CODE,   "TMP"   } },
+   { "ts",   { TSOIL_GRIB_CODE, "TSOIL" } },
+   { "tsf",  { AVSFT_GRIB_CODE, "AVSFT" } }
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -108,19 +118,19 @@ bool IsmnHandler::_readObservations(LineDataFile &ascii_file) {
       switch(_obsVarInfo._gribCode) {
 
          // Convert precip rate in second to hours
-         case 59:
+         case PRATE_GRIB_CODE:
             obs_value /= 3600;
             break;
 
          // Convert mm to m
-         case 66:
+         case SNOD_GRIB_CODE:
             obs_value /= 1000.0;
             break;
 
          // Convert C to K
-         case 11:
-         case 85:
-         case 148:
+         case TMP_GRIB_CODE:
+         case TSOIL_GRIB_CODE:
+         case AVSFT_GRIB_CODE:
             obs_value += 273.15;
             break;
 
@@ -220,7 +230,15 @@ bool IsmnHandler::_readHeaderInfo(LineDataFile &ascii_file) {
    _stationLat  = atof(dl[3]);
    _stationLon  = atof(dl[4]);
    _stationElv  = atof(dl[5]);
-   _depth       = max(atof(dl[6]), atof(dl[7]));
+
+   // Set the depth for precip as 0
+   if(_obsVarInfo._gribCode == PRATE_GRIB_CODE) {
+      _depth = 0.0;
+   }
+   // Otherwise, store the max of the depths
+   else {
+     _depth = max(atof(dl[6]), atof(dl[7]));
+   }
 
    return(true);
 }
