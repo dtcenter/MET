@@ -454,7 +454,7 @@ if [ $COMPILE_PROJ -eq 1 ]; then
     export SQLITE_LIB_DIR=${LIB_DIR}/lib
   fi
 
-  vrs="7.1.0";
+  vrs="7.1.0"
 
   echo
   echo "Compiling PROJ_${vrs} at `date`"
@@ -483,9 +483,9 @@ fi
 if [ $COMPILE_GSL -eq 1 ]; then
 
   if [ ${COMPILER_FAMILY} = "pgi" ]; then
-    vrs="1.11";
+    vrs="1.11"
   else
-    vrs="2.7.1";
+    vrs="2.7.1"
   fi
 
   echo
@@ -503,7 +503,7 @@ fi
 # Compile BUFRLIB
 if [ $COMPILE_BUFRLIB -eq 1 ]; then
 
-  vrs="v11.6.0";
+  vrs="v11.6.0"
 
   echo
   echo "Compiling bufr_${vrs} at `date`"
@@ -559,7 +559,7 @@ fi
 # Compile JASPER
 if [ $COMPILE_JASPER -eq 1 ]; then
 
-  vrs="2.0.25";  
+  vrs="2.0.25"
     
   echo
   echo "Compiling JASPER at `date`"
@@ -581,7 +581,7 @@ fi
 # Compile G2CLIB
 if [ $COMPILE_G2CLIB -eq 1 ]; then
 
-  vrs="1.6.4";   
+  vrs="1.6.4"
 
   echo
   echo "Compiling G2CLIB at `date`"
@@ -602,7 +602,7 @@ if  [ $COMPILE_ECKIT -eq 1 ]; then
 
   # Need to obtain ecbuild before installing eckit
 
-  vrs="3.5.0";  
+  vrs="3.5.0"
     
   echo  
   echo "Compiling ECBUILD at `date`"
@@ -615,7 +615,7 @@ if  [ $COMPILE_ECKIT -eq 1 ]; then
   run_cmd "cmake ../ -DCMAKE_INSTALL_PREFIX=${LIB_DIR} > $(pwd)/ecbuild.cmake.log 2>&1"
   run_cmd "make ${MAKE_ARGS} install > $(pwd)/ecbuild.make_install.log 2>&1"
   
-  vrs="1.20.2";
+  vrs="1.20.2"
 
   echo
   echo "Compiling ECKIT at `date`"
@@ -633,7 +633,7 @@ fi
 # Compile ATLAS
 if [ $COMPILE_ATLAS -eq 1 ]; then
 
-  vrs="0.30.0";
+  vrs="0.30.0"
 
   echo
   echo "Compiling ATLAS at `date`"
