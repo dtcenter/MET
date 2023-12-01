@@ -325,6 +325,10 @@ FileHandler *create_file_handler(const ASCIIFormat format, const ConcatString &a
          return((FileHandler *) handler);
       }
 
+      case ASCIIFormat_ISMN: {
+         return((FileHandler *) new IsmnHandler(program_name));
+      }
+
       case ASCIIFormat_Aeronet_v2: {
          AeronetHandler *handler = new AeronetHandler(program_name);
          handler->setFormatVersion(2);
@@ -462,9 +466,21 @@ FileHandler *determine_ascii_format(const ConcatString &ascii_filename) {
    delete ndbc_file;
 
    //
+   // See if this is an ISMN file.
+   //
+   f_in.rewind();
+   IsmnHandler *ismn_file = new IsmnHandler(program_name);
+
+   if(ismn_file->isFileType(f_in)) {
+     f_in.close();
+     return((FileHandler *) ismn_file);
+   }
+
+   delete ismn_file;
+
+   //
    // If we get here, we didn't recognize the file contents.
    //
-
    mlog << Error << "\ndetermine_ascii_format() -> "
         << "could not determine file format based on file contents\n\n";
 
@@ -506,6 +522,7 @@ void usage() {
         << AirnowHandler::getFormatStringHourlyAqObs() << "\", \""
         << AirnowHandler::getFormatStringHourly() << "\", \""
         << NdbcHandler::getFormatStringStandard() << "\", \""
+        << IsmnHandler::getFormatString() << "\", \""
         << AeronetHandler::getFormatString() << "\", \""
         << AeronetHandler::getFormatString_v2() << "\", \""
         << AeronetHandler::getFormatString_v3() << "\"";
