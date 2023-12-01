@@ -447,9 +447,9 @@ if [ $COMPILE_PROJ -eq 1 ]; then
     tar -xf ${TAR_DIR}/sqlite*.tar.gz -C ${LIB_DIR}/sqlite > /dev/null 2>&1
     cd ${LIB_DIR}/sqlite/sqlite*
     echo "cd `pwd`"
-    run_cmd "./configure --enable-shared --prefix=${LIB_DIR} > sqlite.configure.log 2>&1"
-    run_cmd "make ${MAKE_ARGS} > sqlite.make.log 2>&1"
-    run_cmd "make ${MAKE_ARGS} install > sqlite.make_install.log 2>&1"
+    run_cmd "./configure --enable-shared --prefix=${LIB_DIR} > $(pwd)/sqlite.configure.log 2>&1"
+    run_cmd "make ${MAKE_ARGS} > $(pwd)/sqlite.make.log 2>&1"
+    run_cmd "make ${MAKE_ARGS} install > $(pwd)/sqlite.make_install.log 2>&1"
     export SQLITE_INCLUDE_DIR=${LIB_DIR}/include
     export SQLITE_LIB_DIR=${LIB_DIR}/lib
   fi
@@ -495,9 +495,9 @@ if [ $COMPILE_GSL -eq 1 ]; then
   tar -xf ${TAR_DIR}/gsl-${vrs}.tar.gz -C ${LIB_DIR}/gsl
   cd ${LIB_DIR}/gsl/gsl*
   echo "cd `pwd`"
-  run_cmd "./configure --prefix=${LIB_DIR} > gsl.configure.log 2>&1"
-  run_cmd "make ${MAKE_ARGS} > gsl.make.log 2>&1"
-  run_cmd "make ${MAKE_ARGS} install > gsl.make_install.log 2>&1"
+  run_cmd "./configure --prefix=${LIB_DIR} > $(pwd)/gsl.configure.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} > $(pwd)/gsl.make.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} install > $(pwd)/gsl.make_install.log 2>&1"
 fi
 
 # Compile BUFRLIB
@@ -517,9 +517,9 @@ if [ $COMPILE_BUFRLIB -eq 1 ]; then
   export BUILD_DIR=${SOURCE_DIR}/build
   run_cmd "cmake -H${SOURCE_DIR} -B${BUILD_DIR} -DCMAKE_INSTALL_PREFIX=${LIB_DIR} -DCMAKE_BUILD_TYPE=Debug"
   run_cmd "cd ${BUILD_DIR}"
-  run_cmd "make ${MAKE_ARGS} > bufr.make.log 2>&1"
-  run_cmd "ctest > bufr.ctest.log 2>&1"
-  run_cmd "make ${MAKE_ARGS} install > bufr.make_install.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} > $(pwd)/bufr.make.log 2>&1"
+  run_cmd "ctest > $(pwd)/bufr.ctest.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} install > $(pwd)/bufr.make_install.log 2>&1"
 fi
 
 
@@ -573,9 +573,9 @@ if [ $COMPILE_JASPER -eq 1 ]; then
   export BUILD_DIR=${LIB_DIR}/jasper/jasper-version-${vrs}/build
   run_cmd "cmake -G \"Unix Makefiles\" -H${SOURCE_DIR} -B${BUILD_DIR} -DCMAKE_INSTALL_PREFIX=${LIB_DIR}"
   run_cmd "cd ${BUILD_DIR}"
-  run_cmd "make clean all"
-  run_cmd "make ${MAKE_ARGS} test > jasper.make_test.log 2>&1"
-  run_cmd "make ${MAKE_ARGS} install > jasper.make_install.log 2>&1"
+  run_cmd "make clean all > $(pwd)/jasper.make.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} test > $(pwd)/jasper.make_test.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} install > $(pwd)/jasper.make_install.log 2>&1"
 fi
 
 # Compile G2CLIB
@@ -662,7 +662,7 @@ if [ $COMPILE_HDF -eq 1 ]; then
   tar -xf ${TAR_DIR}/HDF4.2*.tar.gz -C ${LIB_DIR}/hdf
   cd ${LIB_DIR}/hdf/HDF*
   echo "cd `pwd`"
-  run_cmd "./configure --prefix=${LIB_DIR} --disable-netcdf --with-jpeg=${LIB_DIR} --with-zlib=${LIB_DIR} CPPFLAGS=-I/usr/include/tirpc LIBS='-lm -ltirpc' > hdf4.configure.log 2>&1"
+  run_cmd "./configure --prefix=${LIB_DIR} --disable-netcdf --with-jpeg=${LIB_DIR} --with-zlib=${LIB_DIR} CPPFLAGS=-I/usr/include/tirpc LIBS='-lm -ltirpc' > $(pwd)/hdf4.configure.log 2>&1"
   if [[ ${COMPILER_MAJOR_VERSION} -ge 10 ]]; then
     cat hdf/src/Makefile | \
       sed 's/FFLAGS =  -O2/FFLAGS = -w -fallow-argument-mismatch -O2/g' \
@@ -673,8 +673,8 @@ if [ $COMPILE_HDF -eq 1 ]; then
       > Makefile_new
   fi
   mv Makefile_new hdf/src/Makefile
-  run_cmd "make ${MAKE_ARGS} > hdf4.make.log 2>&1"
-  run_cmd "make ${MAKE_ARGS} install > hdf4.make_install.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} > $(pwd)/hdf4.make.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} install > $(pwd)/hdf4.make_install.log 2>&1"
 fi
 
 # Compile HDFEOS
@@ -687,9 +687,9 @@ if [ $COMPILE_HDFEOS -eq 1 ]; then
   tar -xzf ${TAR_DIR}/HDF-EOS*.tar.* -C ${LIB_DIR}/hdfeos
   cd ${LIB_DIR}/hdfeos/hdfeos
   echo "cd `pwd`"
-  run_cmd "./configure --prefix=${LIB_DIR} --with-hdf4=${LIB_DIR} --with-jpeg=${LIB_DIR} > hdf-eos.configure.log 2>&1"
-  run_cmd "make ${MAKE_ARGS} > hed-eos.make.log 2>&1"
-  run_cmd "make ${MAKE_ARGS} install > hsf-eos.make_install.log 2>&1"
+  run_cmd "./configure --prefix=${LIB_DIR} --with-hdf4=${LIB_DIR} --with-jpeg=${LIB_DIR} > $(pwd)/hdf-eos.configure.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} > $(pwd)/hed-eos.make.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} install > $(pwd)/hsf-eos.make_install.log 2>&1"
 
   cp include/*.h ${LIB_DIR}/include/
 fi
@@ -704,8 +704,8 @@ if [ $COMPILE_NETCDF -eq 1 ]; then
   tar -xzf ${TAR_DIR}/hdf5*.tar.gz -C ${LIB_DIR}/hdf5
   cd ${LIB_DIR}/hdf5/hdf5*
   echo "cd `pwd`"
-  run_cmd "./configure --prefix=${LIB_DIR} --with-zlib=${LIB_Z} CFLAGS=-fPIC CXXFLAGS=-fPIC FFLAGS=-fPIC LDFLAGS=-L${LIB_DIR}/lib:${LIB_Z} CPPFLAGS=-I${LIB_DIR}/include > hdf5.configure.log 2>&1"
-  run_cmd "make ${MAKE_ARGS} install > hdf5.make_install.log 2>&1"
+  run_cmd "./configure --prefix=${LIB_DIR} --with-zlib=${LIB_Z} CFLAGS=-fPIC CXXFLAGS=-fPIC FFLAGS=-fPIC LDFLAGS=-L${LIB_DIR}/lib:${LIB_Z} CPPFLAGS=-I${LIB_DIR}/include > $(pwd)/hdf5.configure.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} install > $(pwd)/hdf5.make_install.log 2>&1"
 
   echo
   echo "Compiling NetCDF-C at `date`"
@@ -716,8 +716,8 @@ if [ $COMPILE_NETCDF -eq 1 ]; then
   export FC=''
   export F90=''
   echo "cd `pwd`"
-  run_cmd "./configure --prefix=${LIB_DIR} CFLAGS=-fPIC CXXFLAGS=-fPIC LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include > netcdf-c.configure.log 2>&1"
-  run_cmd "make ${MAKE_ARGS} install > netcdf-c.make_install.log 2>&1"
+  run_cmd "./configure --prefix=${LIB_DIR} CFLAGS=-fPIC CXXFLAGS=-fPIC LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include > $(pwd)/netcdf-c.configure.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} install > $(pwd)/netcdf-c.make_install.log 2>&1"
   
   echo
   echo "Compiling NetCDF-CXX at `date`"
@@ -742,9 +742,9 @@ if [ $COMPILE_FREETYPE -eq 1 ]; then
   tar -xzf ${TAR_DIR}/freetype*.tar.gz -C ${LIB_DIR}/freetype
   cd ${LIB_DIR}/freetype/freetype*
   echo "cd `pwd`"
-  run_cmd "./configure --prefix=${LIB_DIR} --with-png=yes > freetype.configure.log 2>&1"
-  run_cmd "make ${MAKE_ARGS} > freetype.make.log 2>&1"
-  run_cmd "make ${MAKE_ARGS} install > freetype.make_install.log 2>&1"
+  run_cmd "./configure --prefix=${LIB_DIR} --with-png=yes > $(pwd)/freetype.configure.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} > $(pwd)/freetype.make.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} install > $(pwd)/freetype.make_install.log 2>&1"
 fi
 
 
@@ -760,9 +760,9 @@ if [ $COMPILE_CAIRO -eq 1 ]; then
     tar -xzf ${TAR_DIR}/pixman*.tar.gz -C ${LIB_DIR}/pixman
     cd ${LIB_DIR}/pixman/pixman*
     echo "cd `pwd`"
-    run_cmd "./configure --prefix=${LIB_DIR} > pixman.configure.log 2>&1"
-    run_cmd "make ${MAKE_ARGS} > pixman.make.log 2>&1"
-    run_cmd "make ${MAKE_ARGS} install > pixman.make_install.log 2>&1"
+    run_cmd "./configure --prefix=${LIB_DIR} > $(pwd)/pixman.configure.log 2>&1"
+    run_cmd "make ${MAKE_ARGS} > $(pwd)/pixman.make.log 2>&1"
+    run_cmd "make ${MAKE_ARGS} install > $(pwd)/pixman.make_install.log 2>&1"
   fi
 
   echo
@@ -776,9 +776,9 @@ if [ $COMPILE_CAIRO -eq 1 ]; then
     export PKG_CONFIG_PATH=${LIB_DIR}/lib/pkgconfig/
   fi
   echo "cd `pwd`"
-  run_cmd "./configure --prefix=${LIB_DIR} ax_cv_c_float_words_bigendian=no LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include > cairo.configure.log 2>&1"
-  run_cmd "make ${MAKE_ARGS} > cairo.make.log 2>&1"
-  run_cmd "make ${MAKE_ARGS} install > cairo.make_install.log 2>&1"
+  run_cmd "./configure --prefix=${LIB_DIR} ax_cv_c_float_words_bigendian=no LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include > $(pwd)/cairo.configure.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} > $(pwd)/cairo.make.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} install > $(pwd)/cairo.make_install.log 2>&1"
 fi
 
 # Compile MET
@@ -875,9 +875,9 @@ fi
 configure_cmd="${configure_cmd} ${OPT_ARGS}"
 
 echo "cd `pwd`"
-run_cmd "${configure_cmd} > met.configure.log 2>&1"
-run_cmd "make ${MAKE_ARGS} > met.make.log 2>&1"
-run_cmd "make ${MAKE_ARGS} install > met.make_install.log 2>&1"
-run_cmd "make ${MAKE_ARGS} test > met.make_test.log 2>&1"
+run_cmd "${configure_cmd} > $(pwd)/met.configure.log 2>&1"
+run_cmd "make ${MAKE_ARGS} > $(pwd)/met.make.log 2>&1"
+run_cmd "make ${MAKE_ARGS} install > $(pwd)/met.make_install.log 2>&1"
+run_cmd "make ${MAKE_ARGS} test > $(pwd)/met.make_test.log 2>&1"
 
 echo "Finished compiling at `date`"
