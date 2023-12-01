@@ -388,12 +388,6 @@ else
   exit
 fi
 
-#export CC
-#export CXX
-#export FC
-#export F77
-#export F90
-
 echo "export  CC=${CC}"
 echo "export CXX=${CXX}"
 echo "export  FC=${FC}"
