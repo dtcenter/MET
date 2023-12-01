@@ -471,7 +471,7 @@ if [ $COMPILE_PROJ -eq 1 ]; then
   if [[ -z "$LIB_TIFF" ]]; then
       run_cmd "cmake -DCMAKE_INSTALL_PREFIX=${LIB_DIR} -DSQLITE3_INCLUDE_DIR=${SQLITE_INCLUDE_DIR} -DSQLITE3_LIBRARY=${SQLITE_LIB_DIR}/libsqlite3.so .."
   else
-      run_cmd "cmake -DCMAKE_INSTALL_PREFIX=${LIB_DIR} -DSQLITE3_INCLUDE_DIR=${SQLITE_INCLUDE_DIR} -DSQLITE3_LIBRARY=${SQLITE_LIB_DIR}/libsqlite3.so -DTIFF_LIBRARY_RELEASE=${LIB_TIFF} .."
+      run_cmd "cmake -DCMAKE_INSTALL_PREFIX=${LIB_DIR} -DSQLITE3_INCLUDE_DIR=${SQLITE_INCLUDE_DIR} -DSQLITE3_LIBRARY=${SQLITE_LIB_DIR}/libsqlite3.so -DTIFF_LIBRARY_RELEASE=${LIB_TIFF} -DTIFF_INCLUDE_DIR=${TIFF_INCLUDE_DIR} .."
   fi
   run_cmd "cmake --build ."
   run_cmd "cmake --build . --target install"
@@ -838,7 +838,7 @@ fi
 # If parameter is null or unset, nothing is substituted, otherwise the expansion of word is substituted.
 export LDFLAGS="${LDFLAGS} -Wl,-rpath,${LIB_DIR}/lib:${MET_PROJ:+:$MET_PROJ/lib64}:${LIB_DIR}/lib${MET_NETCDF:+:$MET_NETCDF/lib}${MET_HDF5:+:$MET_HDF5/lib}${MET_BUFRLIB:+:$MET_BUFRLIB}${MET_GRIB2CLIB:+:$MET_GRIB2CLIB}${MET_PYTHON_LIB:+:$MET_PYTHON_LIB}${MET_GSL:+:$MET_GSL/lib}${ADDTL_DIR:+:$ADDTL_DIR}"
 export LDFLAGS="${LDFLAGS} -Wl,-rpath,${LIB_JASPER:+$LIB_JASPER}${LIB_LIBPNG:+:$LIB_PNG}${LIB_Z:+$LIB_Z}"
-export LDFLAGS="${LDFLAGS} ${LIB_JASPER:+-L$LIB_JASPER} ${LIB_LIBPNG:+-L$LIB_LIBPNG} ${MET_HDF5:+-L$MET_HDF5/lib} ${ADDTL_DIR:+-L$ADDTL_DIR}"
+export LDFLAGS="${LDFLAGS} ${LIB_JASPER:+-L$LIB_JASPER} ${LIB_LIBPNG:+-L$LIB_LIBPNG} ${MET_HDF5:+-L$MET_HDF5/lib} ${MET_PROJ:+-L$MET_PROJ/lib64} ${ADDTL_DIR:+-L$ADDTL_DIR}"
 export LIBS="${LIBS} -lhdf5_hl -lhdf5 -lz -ltiff"
 export MET_FONT_DIR=${TEST_BASE}/fonts
 
