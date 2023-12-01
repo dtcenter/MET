@@ -538,8 +538,7 @@ if [ $COMPILE_ZLIB -eq 1 ]; then
 
   # GPM: why is this removed? Could we add a comment to
   # describe why this is needed?
-  echo "rm ${LIB_DIR}/lib/zlib.a"
-  rm ${LIB_DIR}/lib/libz.a
+  run_cmd "rm ${LIB_DIR}/lib/libz.a"
 fi
 
 # Compile LIBPNG
