@@ -48,7 +48,8 @@
 //   019    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
 //   020    08/26/22  Dave Albo      MET #2142 Add AirNow observations
 //   021    10/03/22  Prestopnik     MET #2227 Remove using namespace std from header files
-//   022    10/07/22  Dave Albo      MET #2276 Add NDBC Buoy data
+//   022    10/07/22  Dave Albo      MET #2276 Add NDBC buoy data
+//   023    11/28/23  Halley Gotway  MET #2701 Add ISMN soil moisture data
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -86,6 +87,7 @@ using namespace std;
 #include "aeronet_handler.h"
 #include "airnow_handler.h"
 #include "ndbc_handler.h"
+#include "ismn_handler.h"
 
 #ifdef ENABLE_PYTHON
 #include "global_python.h"
@@ -113,6 +115,7 @@ enum ASCIIFormat {
    ASCIIFormat_Airnow_hourlyaqobs,
    ASCIIFormat_Airnow_hourly,
    ASCIIFormat_NDBC_standard,
+   ASCIIFormat_ISMN,
    ASCIIFormat_Aeronet_v2,
    ASCIIFormat_Aeronet_v3, 
    ASCIIFormat_Python, 
@@ -584,6 +587,9 @@ void set_format(const StringArray & a) {
    }
    else if(NdbcHandler::getFormatStringStandard() == a[0]) {
      ascii_format = ASCIIFormat_NDBC_standard;
+   }
+   else if(IsmnHandler::getFormatString() == a[0]) {
+     ascii_format = ASCIIFormat_ISMN;
    }
    else if(AeronetHandler::getFormatString() == a[0]
      || AeronetHandler::getFormatString_v2() == a[0]) {
