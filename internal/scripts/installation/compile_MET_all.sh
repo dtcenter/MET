@@ -532,9 +532,9 @@ if [ $COMPILE_ZLIB -eq 1 ]; then
   tar -xzf ${TAR_DIR}/zlib*.tar.gz -C ${LIB_DIR}/zlib
   cd ${LIB_DIR}/zlib/zlib*
   echo "cd `pwd`"
-  run_cmd "./configure --prefix=${LIB_DIR} > zlib.configure.log 2>&1"
-  run_cmd "make ${MAKE_ARGS} > zlib.make.log 2>&1"
-  run_cmd "make ${MAKE_ARGS} install > zlib.make_install.log 2>&1"
+  run_cmd "./configure --prefix=${LIB_DIR} > $(pwd)/zlib.configure.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} > $(pwd)/zlib.make.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} install > $(pwd)/zlib.make_install.log 2>&1"
 
   # GPM: why is this removed? Could we add a comment to
   # describe why this is needed?
@@ -551,9 +551,9 @@ if [[ $COMPILE_LIBPNG -eq 1 && $HOST != ys* ]]; then
   tar -xzf ${TAR_DIR}/libpng*.tar.gz -C ${LIB_DIR}/libpng
   cd ${LIB_DIR}/libpng/libpng*
   echo "cd `pwd`"
-  run_cmd "./configure --prefix=${LIB_DIR} LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include > libpng.configure.log 2>&1"
-  run_cmd "make ${MAKE_ARGS} > libpng.make.log 2>&1"
-  run_cmd "make ${MAKE_ARGS} install > libpng.make_install.log 2>&1"
+  run_cmd "./configure --prefix=${LIB_DIR} LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include > $(pwd)/libpng.configure.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} > $(pwd)/libpng.make.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} install > $(pwd)/libpng.make_install.log 2>&1"
 fi
 
 # Compile JASPER
@@ -728,9 +728,8 @@ if [ $COMPILE_NETCDF -eq 1 ]; then
   if [[ $machine == "Mac" ]]; then
     configure_lib_args="-lhdf5_hl -lhdf5 -lz"
   fi
-  run_cmd "./configure --prefix=${LIB_DIR} LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include LIBS=\"${LIBS} ${configure_lib_args}\" > netcdf-cxx.configure.log 2>&1"
-
-  run_cmd "make ${MAKE_ARGS} install > netcdf-cxx.make_install.log 2>&1"
+  run_cmd "./configure --prefix=${LIB_DIR} LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include LIBS=\"${LIBS} ${configure_lib_args}\" > $(pwd)/netcdf-cxx.configure.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} install > $(pwd)/netcdf-cxx.make_install.log 2>&1"
 fi
 
 # Compile FREETYPE
