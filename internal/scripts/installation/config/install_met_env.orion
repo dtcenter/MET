@@ -1,29 +1,34 @@
 module load intel/2020.2
+module load cmake/3.22.1
 
-export TEST_BASE=/apps/contrib/MET/11.1.0
+export TEST_BASE=/apps/contrib/MET/12.0.0-beta2
 export COMPILER=intel_2020
 export MET_SUBDIR=${TEST_BASE}/
-export MET_TARBALL=v11.1.0.tar.gz
+export MET_TARBALL=v12.0.0-beta2.tar.gz
 export USE_MODULES=TRUE
 export MET_PYTHON=/work/noaa/ovp/miniconda/miniconda3/envs/metplus_v5.1_py3.10
 export MET_PYTHON_CC=-I${MET_PYTHON}/include/python3.10
 export MET_PYTHON_LD=-L${MET_PYTHON}/lib/python3.10/config-3.10-x86_64-linux-gnu\ -L${MET_PYTHON}/lib\ -lpython3.10\ -lcrypt\ -lpthread\ -ldl\ -lutil\ -lrt\ -lm\ -lm
+#export ADDTL_DIR=/usr/lib64
+#export TIFF_INCLUDE_DIR=${ADDTL_DIR}
+#export LIB_TIFF=${ADDTL_DIR}/libtiff.so.5
 export EXTERNAL_LIBS=${TEST_BASE}/external_libs
-export LIB_Z=${EXTERNAL_LIBS}/lib
+#export SQLITE_INCLUDE_DIR=${EXTERNAL_LIBS}/include
+#export SQLITE_LIB_DIR=${EXTERNAL_LIBS}/lib
+#export MET_PROJ=${EXTERNAL_LIBS}
+#COMPILE_ATLAS=1
+#COMPILE_ECKIT=1
+#export MET_ATLAS=${EXTERNAL_LIBS}
+#export MET_ECKIT=${EXTERNAL_LIBS}
 #export MET_GSL=${EXTERNAL_LIBS}
 #export MET_BUFRLIB=${EXTERNAL_LIBS}
-#export BUFRLIB_NAME=-lbufr
+#export BUFRLIB_NAME=-lbufr_4
 #export MET_HDF5=${EXTERNAL_LIBS}
 #export MET_NETCDF=${EXTERNAL_LIBS}
 #export MET_GRIB2CLIB=${EXTERNAL_LIBS}/lib
 #export MET_GRIB2CINC=${EXTERNAL_LIBS}/include
-#export GRIB2CLIB_NAME=-lgrib2c
+#export GRIB2CLIB_NAME=-lg2c
 #export LIB_JASPER=${EXTERNAL_LIBS}/lib
 #export LIB_LIBPNG=${EXTERNAL_LIBS}/lib
-#export SET_D64BIT=FALSE
-export MAKE_ARGS=-j
-#export CFLAGS="-Wall -g"
-#export CXXFLAGS="-Wall -g"
-export CXXFLAGS="-std=c++11"
-
-
+#export LIB_Z=${EXTERNAL_LIBS}/lib
+export MAKE_ARGS="-j 5"
