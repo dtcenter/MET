@@ -472,10 +472,10 @@ if [ $COMPILE_PROJ -eq 1 ]; then
       tiff_arg+="-DTIFF_LIBRARY_RELEASE=${LIB_TIFF}"
   fi
 
-  cmd="cmake -DCMAKE_INSTALL_PREFIX=${LIB_DIR} -DSQLITE3_INCLUDE_DIR=${SQLITE_INCLUDE_DIR} -DSQLITE3_LIBRARY=${SQLITE_LIB_DIR}/libsqlite3.${dynamic_lib_ext} ${tiff_arg} .."
+  cmd="cmake -DCMAKE_INSTALL_PREFIX=${LIB_DIR} -DSQLITE3_INCLUDE_DIR=${SQLITE_INCLUDE_DIR} -DSQLITE3_LIBRARY=${SQLITE_LIB_DIR}/libsqlite3.${dynamic_lib_ext} ${tiff_arg} .. > $(pwd)/proj.cmake.log 2>&1"
   run_cmd ${cmd}
-  run_cmd "cmake --build ."
-  run_cmd "cmake --build . --target install"
+  run_cmd "cmake --build . > $(pwd)/proj.cmake_build.log 2>&1"
+  run_cmd "cmake --build . --target install > $(pwd)/proj.cmake_install.log 2>&1"
 
 fi
 
@@ -515,7 +515,7 @@ if [ $COMPILE_BUFRLIB -eq 1 ]; then
   echo "cd `pwd`"
   run_cmd "mkdir build"
   export BUILD_DIR=${SOURCE_DIR}/build
-  run_cmd "cmake -H${SOURCE_DIR} -B${BUILD_DIR} -DCMAKE_INSTALL_PREFIX=${LIB_DIR} -DCMAKE_BUILD_TYPE=Debug"
+  run_cmd "cmake -H${SOURCE_DIR} -B${BUILD_DIR} -DCMAKE_INSTALL_PREFIX=${LIB_DIR} -DCMAKE_BUILD_TYPE=Debug > $(pwd)/bufr.cmake.log 2>&1"
   run_cmd "cd ${BUILD_DIR}"
   run_cmd "make ${MAKE_ARGS} > $(pwd)/bufr.make.log 2>&1"
   run_cmd "ctest > $(pwd)/bufr.ctest.log 2>&1"
@@ -571,7 +571,7 @@ if [ $COMPILE_JASPER -eq 1 ]; then
   export SOURCE_DIR=${LIB_DIR}/jasper/jasper-version-${vrs}
   echo "cd `pwd`"
   export BUILD_DIR=${LIB_DIR}/jasper/jasper-version-${vrs}/build
-  run_cmd "cmake -G \"Unix Makefiles\" -H${SOURCE_DIR} -B${BUILD_DIR} -DCMAKE_INSTALL_PREFIX=${LIB_DIR}"
+  run_cmd "cmake -G \"Unix Makefiles\" -H${SOURCE_DIR} -B${BUILD_DIR} -DCMAKE_INSTALL_PREFIX=${LIB_DIR} > $(pwd)/jasper.cmake.log 2>&1"
   run_cmd "cd ${BUILD_DIR}"
   run_cmd "make clean all > $(pwd)/jasper.make.log 2>&1"
   run_cmd "make ${MAKE_ARGS} test > $(pwd)/jasper.make_test.log 2>&1"
@@ -591,10 +591,10 @@ if [ $COMPILE_G2CLIB -eq 1 ]; then
   cd ${LIB_DIR}/g2clib/NCEP*
   echo "cd `pwd`"
   run_cmd "mkdir build; cd build"
-  run_cmd "cmake -DCMAKE_INSTALL_PREFIX=${LIB_DIR} -DCMAKE_PREFIX_PATH=${LIB_DIR} .."
-  run_cmd "make ${MAKE_ARGS} > g2c.make.log 2>&1"
-  run_cmd "make ${MAKE_ARGS} test > g2c.make_test.log 2>&1"
-  run_cmd "make ${MAKE_ARGS} install > g2c.make_install.log 2>&1"
+  run_cmd "cmake -DCMAKE_INSTALL_PREFIX=${LIB_DIR} -DCMAKE_PREFIX_PATH=${LIB_DIR} .. > $(pwd)/g2c.cmake.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} > $(pwd)/g2c.make.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} test > $(pwd)/g2c.make_test.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} install > $(pwd)/g2c.make_install.log 2>&1"
 fi
 
 # Compile ECKIT
@@ -612,8 +612,8 @@ if  [ $COMPILE_ECKIT -eq 1 ]; then
   cd ${LIB_DIR}/ecbuild/ecbuild*
   echo "cd `pwd`"
   run_cmd "mkdir build; cd build"
-  run_cmd "cmake ../ -DCMAKE_INSTALL_PREFIX=${LIB_DIR}"
-  run_cmd "make ${MAKE_ARGS} install > ecbuild.make_install.log 2>&1"
+  run_cmd "cmake ../ -DCMAKE_INSTALL_PREFIX=${LIB_DIR} > $(pwd)/ecbuild.cmake.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} install > $(pwd)/ecbuild.make_install.log 2>&1"
   
   vrs="1.20.2";
 
@@ -625,8 +625,8 @@ if  [ $COMPILE_ECKIT -eq 1 ]; then
   cd ${LIB_DIR}/eckit/eckit*
   echo "cd `pwd`"
   run_cmd "mkdir build; cd build"
-  run_cmd "cmake ../ -DCMAKE_INSTALL_PREFIX=${LIB_DIR} -DCMAKE_PREFIX_PATH=${LIB_DIR}"
-  run_cmd "make ${MAKE_ARGS} install > eckit.make_install.log 2>&1"
+  run_cmd "cmake ../ -DCMAKE_INSTALL_PREFIX=${LIB_DIR} -DCMAKE_PREFIX_PATH=${LIB_DIR} > $(pwd)/eckit.cmake.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} install > $(pwd)/eckit.make_install.log 2>&1"
 
 fi
 
@@ -643,9 +643,9 @@ if [ $COMPILE_ATLAS -eq 1 ]; then
   cd ${LIB_DIR}/atlas/atlas*
   echo "cd `pwd`"
   run_cmd "mkdir build; cd build"
-  run_cmd "cmake ../ -DCMAKE_INSTALL_PREFIX=${LIB_DIR} -DCMAKE_PREFIX_PATH=${LIB_DIR}"
-  run_cmd "make ${MAKE_ARGS} > atlas.make.log 2>&1"
-  run_cmd "make ${MAKE_ARGS} install > atlas.make_install.log 2>&1"
+  run_cmd "cmake ../ -DCMAKE_INSTALL_PREFIX=${LIB_DIR} -DCMAKE_PREFIX_PATH=${LIB_DIR} > $(pwd)/atlas.cmake.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} > $(pwd)/atlas.make.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} install > $(pwd)/atlas.make_install.log 2>&1"
 
 fi
 
