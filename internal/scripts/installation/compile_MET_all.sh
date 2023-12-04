@@ -810,10 +810,9 @@ fi
 export MET_PYTHON_BIN_EXE=${MET_PYTHON_BIN_EXE:=${MET_PYTHON}/bin/python3}
 export MET_PYTHON_LD
 export MET_PYTHON_CC
-export LDFLAGS="-Wl,--disable-new-dtags"
 
-if [[ $machine == "Mac" ]]; then
-  export LDFLAGS=""
+if [[ $machine != "Mac" ]]; then
+  LDFLAGS="${LDFLAGS} -Wl,--disable-new-dtags"
 fi
 
 # https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html
