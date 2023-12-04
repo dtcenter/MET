@@ -195,7 +195,7 @@ int met_main(int argc, char * argv [])
       // run the traditional version of mode
       
       ModeFrontEnd *frontend = new ModeFrontEnd;
-      status = frontend->run(Argv);
+      status = frontend->run_traditional(Argv);
 
       if ( frontend )  { delete frontend;  frontend = 0; }
    }

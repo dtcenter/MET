@@ -58,6 +58,8 @@ class MetConfig : public Dictionary {
 
       void dump(std::ostream &, int = 0) const;
 
+      void debug_dump(int = 0) const;
+
          //
          //  set stuff
          //

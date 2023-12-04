@@ -54,9 +54,10 @@ quilt = FALSE;
 multivar_logic = "#1 && #2 && #3";
 
 //
-// MODE Multivar intensity logic
+// MODE Multivar intensity comparisons
 //
-multivar_intensity_flag = [FALSE, FALSE, FALSE];
+multivar_intensity_compare_fcst = [  ];
+multivar_intensity_compare_obs = [  ];
 
 //
 // Forecast and observation fields to be verified

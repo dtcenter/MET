@@ -25,6 +25,11 @@ ENV MET_GIT_URL     https://github.com/dtcenter/MET
 ENV MET_DEVELOPMENT true
 
 #
+# Update the OS, as needed.
+#
+RUN apt update
+
+#
 # Set the working directory.
 #
 WORKDIR /met
