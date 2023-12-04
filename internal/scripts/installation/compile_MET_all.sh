@@ -177,29 +177,13 @@ else
   COMPILE_G2CLIB=0
 fi
 
-if [ -z ${MET_BUFRLIB} ]; then
-  COMPILE_BUFRLIB=1
-else
-  COMPILE_BUFRLIB=0
-fi
+if [ -z ${MET_BUFRLIB} ]; then COMPILE_BUFRLIB=1; else COMPILE_BUFRLIB=0; fi
 
-if [ -z ${MET_NETCDF} ]; then
-  COMPILE_NETCDF=1
-else
-  COMPILE_NETCDF=0
-fi
+if [ -z ${MET_NETCDF} ]; then COMPILE_NETCDF=1; else COMPILE_NETCDF=0; fi
 
-if [ -z ${MET_PROJ} ]; then
-  COMPILE_PROJ=1
-else
-  COMPILE_PROJ=0
-fi
+if [ -z ${MET_PROJ} ]; then COMPILE_PROJ=1; else COMPILE_PROJ=0; fi
 
-if [ -z ${MET_GSL} ]; then
-  COMPILE_GSL=1
-else
-  COMPILE_GSL=0
-fi
+if [ -z ${MET_GSL} ]; then COMPILE_GSL=1; else COMPILE_GSL=0; fi
 
 # Only set COMPILE_ECKIT and COMPILE_ATLAS if you want to compile and enable support for unstructued grids
 if [ ! -z "${COMPILE_ECKIT}" ]; then COMPILE_ECKIT=1; else COMPILE_ECKIT=0; fi
