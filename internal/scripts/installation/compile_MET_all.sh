@@ -453,7 +453,7 @@ if [ $COMPILE_PROJ -eq 1 ]; then
   tiff_arg=""
   # add tiff library argument if necessary
   if [[ ! -z "$LIB_TIFF" ]]; then
-      tiff_arg+="-DTIFF_LIBRARY_RELEASE=${LIB_TIFF}"
+    tiff_arg+="-DTIFF_LIBRARY_RELEASE=${LIB_TIFF}/libtiff.${dynamic_lib_ext}"
   fi
 
   cmd="cmake -DCMAKE_INSTALL_PREFIX=${LIB_DIR} -DSQLITE3_INCLUDE_DIR=${SQLITE_INCLUDE_DIR} -DSQLITE3_LIBRARY=${SQLITE_LIB_DIR}/libsqlite3.${dynamic_lib_ext} ${tiff_arg} .. > $(pwd)/proj.cmake.log 2>&1"
