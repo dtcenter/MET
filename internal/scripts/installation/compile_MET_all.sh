@@ -392,9 +392,13 @@ esac
 # change sed command and extension for dynamic library files
 if [[ $machine == "Mac" ]]; then
     sed_inline="sed -i ''"
-    dynamic_lib_ext="dylib"
 else
     sed_inline="sed -i''"
+fi
+
+if [[ "$(uname -m)" == "arm64" ]]; then
+    dynamic_lib_ext="dylib"
+else
     dynamic_lib_ext="so"
 fi
 
