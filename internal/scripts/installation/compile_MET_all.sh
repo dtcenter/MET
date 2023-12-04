@@ -832,14 +832,23 @@ export LDFLAGS="${LDFLAGS} -Wl,-rpath,${LIB_DIR}/lib -L${LIB_DIR}/lib"
 
 # if variables are set, add <VALUE>/lib to rpath and -L
 for x in $MET_NETCDF $MET_HDF5 $MET_GSL; do
-    export LDFLAGS="${LDFLAGS} ${x:+-Wl,-rpath,$x/lib -L$x/lib}"
-#    #if [[ "$STR" == *"$SUB"* ]];
+    arg="${x:+-Wl,-rpath,$x/lib -L$x/lib}"
+    if [[ "$LDFLAGS" != *"$arg"* ]]; then
+	LDFLAGS+=" $arg"
+    fi
+    #export LDFLAGS="${LDFLAGS} ${x:+-Wl,-rpath,$x/lib -L$x/lib}"
 done
 
 # if variables are set, add <VALUE> to rpath and -L
 for x in $MET_BUFRLIB $MET_GRIB2CLIB $MET_PYTHON_LIB $LIB_JASPER $LIB_LIBPNG $LIB_TIFF $LIB_Z $MET_PROJLIB $ADDTL_DIR; do
-    export LDFLAGS="${LDFLAGS} ${x:+-Wl,-rpath,$x -L$x}"
+    arg="${x:+-Wl,-rpath,$x -L$x}"
+    if [[ "$LDFLAGS" != *"$arg"* ]]; then
+	LDFLAGS+=" $arg"
+    fi
+    #export LDFLAGS="${LDFLAGS} ${x:+-Wl,-rpath,$x -L$x}"
 done
+
+export LDFLAGS
 
 export LIBS="${LIBS} -lhdf5_hl -lhdf5 -lz"
 export MET_FONT_DIR=${TEST_BASE}/fonts
