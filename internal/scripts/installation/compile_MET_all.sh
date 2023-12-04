@@ -841,7 +841,7 @@ for x in $MET_BUFRLIB $MET_GRIB2CLIB $MET_PYTHON_LIB $LIB_JASPER $LIB_LIBPNG $LI
     export LDFLAGS="${LDFLAGS} ${x:+-Wl,-rpath,$x -L$x}"
 done
 
-export LIBS="${LIBS} -lhdf5_hl -lhdf5 -lz -ltiff"
+export LIBS="${LIBS} -lhdf5_hl -lhdf5 -lz"
 export MET_FONT_DIR=${TEST_BASE}/fonts
 
 
