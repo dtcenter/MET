@@ -50,7 +50,7 @@
 # Please supply values for the following environment variables
 # in the input environment configuration file (install_met_env.<machine_name>:
 # MET_GRIB2CLIB, MET_GRIB2CINC, GRIB2CLIB_NAME, MET_BUFRLIB, BUFRLIB_NAME, 
-# MET_HDF5, MET_NETCDF, MET_PROJ, MET_GSL, LIB_JASPER, LIB_PNG, LIB_Z,
+# MET_HDF5, MET_NETCDF, MET_PROJ, MET_GSL, LIB_JASPER, LIB_LIBPNG, LIB_Z,
 # SQLITE_INCLUDE_DIR, SQLITE_LIB_DIR.
 #
 # The optional libraries ecKit and atlas offer support for unstructured
