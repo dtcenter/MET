@@ -120,8 +120,15 @@ NdbcHandler::NdbcHandler(const string &program_name) :
 
 NdbcHandler::~NdbcHandler()
 {
-  mlog << Debug(1) << "Number of NDBC skipped files due to no lookup " <<  numMissingStations
-       << "\n";
+
+   // Log the non-zero number of missing stations
+   if(numMissingStations > 0) {
+      mlog << Debug(3) << "Skipped " << numMissingStations
+           << " NDBC files whose locations are not defined in \""
+           << locationsFileName << "\". Set the " << stations_env
+           << " environment variable to provide an updated "
+           << "locations file.\n";
+   }
 }
 
 
