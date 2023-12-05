@@ -51,7 +51,7 @@
 # in the input environment configuration file (install_met_env.<machine_name>:
 # MET_GRIB2CLIB, MET_GRIB2CINC, GRIB2CLIB_NAME, MET_BUFRLIB, BUFRLIB_NAME, 
 # MET_HDF5, MET_NETCDF, MET_PROJ, MET_GSL, LIB_JASPER, LIB_LIBPNG, LIB_Z,
-# SQLITE_INCLUDE_DIR, SQLITE_LIB_DIR.
+# SQLITE_INCLUDE_DIR, SQLITE_LIB_DIR, TIFF_INCLUDE_DIR, TIFF_LIB_DIR.
 #
 # The optional libraries ecKit and atlas offer support for unstructured
 # grids. The optional libraries HDF4, HDFEOS, FREETYPE, and CAIRO are
@@ -822,6 +822,7 @@ export MET_PYTHON_BIN_EXE=${MET_PYTHON_BIN_EXE:=${MET_PYTHON}/bin/python3}
 export MET_PYTHON_LD
 export MET_PYTHON_CC
 
+# add flags to user-defined LDFLAGS for MacOS
 if [[ $machine != "Mac" ]]; then
   LDFLAGS="${LDFLAGS} -Wl,--disable-new-dtags"
 fi
