@@ -455,9 +455,12 @@ if [ $COMPILE_PROJ -eq 1 ]; then
   run_cmd "mkdir build; cd build"
 
   tiff_arg=""
-  # add tiff library argument if necessary
-  if [[ ! -z "$LIB_TIFF" ]]; then
-    tiff_arg+="-DTIFF_LIBRARY_RELEASE=${LIB_TIFF}/libtiff.${dynamic_lib_ext}"
+  # add tiff library and include arguments if necessary
+  if [[ ! -z "$TIFF_LIB_DIR" ]]; then
+    tiff_arg+="-DTIFF_LIBRARY_RELEASE=${TIFF_LIB_DIR}/libtiff.${dynamic_lib_ext}"
+  fi
+  if [[ ! -z "$TIFF_INCLUDE_DIR" ]]; then
+    tiff_arg+=" -DTIFF_INCLUDE_DIR=${TIFF_INCLUDE_DIR}"
   fi
 
   cmd="cmake -DCMAKE_INSTALL_PREFIX=${LIB_DIR} -DSQLITE3_INCLUDE_DIR=${SQLITE_INCLUDE_DIR} -DSQLITE3_LIBRARY=${SQLITE_LIB_DIR}/libsqlite3.${dynamic_lib_ext} ${tiff_arg} .. > $(pwd)/proj.cmake.log 2>&1"
@@ -558,7 +561,7 @@ if [ $COMPILE_JASPER -eq 1 ]; then
   export SOURCE_DIR=${LIB_DIR}/jasper/jasper-version-${vrs}
   echo "cd `pwd`"
   export BUILD_DIR=${LIB_DIR}/jasper/jasper-version-${vrs}/build
-  run_cmd "cmake -G \"Unix Makefiles\" -H${SOURCE_DIR} -B${BUILD_DIR} -DCMAKE_INSTALL_PREFIX=${LIB_DIR} > $(pwd)/jasper.cmake.log 2>&1"
+  run_cmd "cmake -G \"Unix Makefiles\" -H${SOURCE_DIR} -B${BUILD_DIR} -DCMAKE_INSTALL_PREFIX=${LIB_DIR} -DJAS_ENABLE_DOC=false > $(pwd)/jasper.cmake.log 2>&1"
   run_cmd "cd ${BUILD_DIR}"
   run_cmd "make clean all > $(pwd)/jasper.make.log 2>&1"
   run_cmd "make ${MAKE_ARGS} test > $(pwd)/jasper.make_test.log 2>&1"
@@ -840,7 +843,7 @@ for x in $MET_NETCDF $MET_HDF5 $MET_GSL; do
 done
 
 # if variables are set, add <VALUE> to rpath and -L
-for x in $MET_BUFRLIB $MET_GRIB2CLIB $MET_PYTHON_LIB $LIB_JASPER $LIB_LIBPNG $LIB_TIFF $LIB_Z $MET_PROJLIB $ADDTL_DIR; do
+for x in $MET_BUFRLIB $MET_GRIB2CLIB $MET_PYTHON_LIB $LIB_JASPER $LIB_LIBPNG $LIB_Z $MET_PROJLIB $ADDTL_DIR; do
     arg="${x:+-Wl,-rpath,$x -L$x}"
     if [[ "$LDFLAGS" != *"$arg"* ]]; then
 	LDFLAGS+=" $arg"
