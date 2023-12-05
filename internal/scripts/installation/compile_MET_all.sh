@@ -814,10 +814,6 @@ if [ -z ${MET_PROJ} ]; then
   export MET_PROJ=${LIB_DIR}
 fi
 
-if [ -z ${MET_PROJLIB} ]; then
-  export MET_PROJLIB=${MET_PROJ}/lib64
-fi
-
 export MET_PYTHON_BIN_EXE=${MET_PYTHON_BIN_EXE:=${MET_PYTHON}/bin/python3}
 export MET_PYTHON_LD
 export MET_PYTHON_CC
@@ -832,7 +828,7 @@ fi
 # If parameter is null or unset, nothing is substituted, otherwise the expansion of word is substituted.
 
 # add LIB_DIR/lib to rpath and -L
-export LDFLAGS="${LDFLAGS} -Wl,-rpath,${LIB_DIR}/lib -L${LIB_DIR}/lib"
+LDFLAGS="${LDFLAGS} -Wl,-rpath,${LIB_DIR}/lib -L${LIB_DIR}/lib"
 
 # if variables are set, add <VALUE>/lib to rpath and -L
 for x in $MET_ATLAS $MET_BUFR $MET_CAIRO $MET_ECKIT $MET_FREETYPE $MET_GRIB2C $MET_GSL $MET_HDF $MET_HDF5 $MET_NETCDF $MET_PROJ; do
