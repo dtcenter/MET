@@ -112,7 +112,7 @@ bool IsmnHandler::_readObservations(LineDataFile &ascii_file) {
       if(valid_time == 0) return(false);
 
       // Store the observation value
-      double obs_value = atof(dl[8]);
+      double obs_value = atof(dl[2]);
 
       // Handle unit conversion
       switch(_obsVarInfo._gribCode) {
