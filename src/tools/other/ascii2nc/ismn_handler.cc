@@ -50,7 +50,9 @@ map<string,obsVarInfo> IsmnObsVarMap = {
 ////////////////////////////////////////////////////////////////////////
 
 IsmnHandler::IsmnHandler(const string &program_name) :
-  FileHandler(program_name) { }
+  FileHandler(program_name) {
+   use_var_id = true;
+}
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -68,7 +70,7 @@ bool IsmnHandler::isFileType(LineDataFile &ascii_file) const {
 
    // Initialize using the filename suffix
    bool is_file_type = check_prefix_suffix(ascii_file.short_filename(),
-                                           nullptr, ".stm");
+                           nullptr, ".stm");
 
    // Read the header line
    DataLine dl;
