@@ -235,9 +235,9 @@ bool IsmnHandler::_readHeaderInfo(LineDataFile &ascii_file) {
    if(_obsVarInfo._gribCode == PRATE_GRIB_CODE) {
       _depth = 0.0;
    }
-   // Otherwise, store the max of the depths
+   // Otherwise, store the average of the two depths
    else {
-     _depth = max(atof(dl[6]), atof(dl[7]));
+     _depth = (atof(dl[6]) + atof(dl[7]))/2.0;
    }
 
    return(true);
