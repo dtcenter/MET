@@ -95,6 +95,10 @@ bool IsmnHandler::_readObservations(LineDataFile &ascii_file) {
    // Read and save the header information
    if(!_readHeaderInfo(ascii_file)) return(false);
 
+   // Get the var_id to use
+   int var_id = bad_data_int;
+   if(!_varNames.has(_obsVarInfo._varName, var_id)) return(false);
+
    // Process the observation lines
    DataLine dl;
    while(ascii_file >> dl) {
@@ -144,7 +148,7 @@ bool IsmnHandler::_readObservations(LineDataFile &ascii_file) {
       _addObservations(Observation(
          _networkName, _stationId, valid_time,
          _stationLat, _stationLon, _stationElv,
-         dl[3], _obsVarInfo._gribCode, bad_data_double,
+         dl[3], var_id, bad_data_double,
          _depth, obs_value, _obsVarInfo._varName));
 
    } // end while
@@ -211,6 +215,9 @@ bool IsmnHandler::_readHeaderInfo(LineDataFile &ascii_file) {
 
    // Store the observation variable info
    _obsVarInfo = IsmnObsVarMap[sa[3]];
+
+   // Store the output variable name
+   _varNames.add_uniq(_obsVarInfo._varName);
 
    // Read the header line
    DataLine dl;

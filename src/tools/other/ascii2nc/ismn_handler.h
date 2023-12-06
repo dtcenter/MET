@@ -120,6 +120,9 @@ class IsmnHandler : public FileHandler {
       // Unchanging file name information
       obsVarInfo _obsVarInfo;
 
+      // Store list of unqiue output variable names
+      StringArray _varNames;
+
       // Unchanging header information
       string _networkName;
       string _stationId;
