@@ -171,8 +171,8 @@ time_t IsmnHandler::_getValidTime(const DataLine &dl) const {
    else {
 
       // Parse time components
-      time_struct.tm_year = stoi(ymd_str.substr(0, 4));
-      time_struct.tm_mon  = stoi(ymd_str.substr(5, 2));
+      time_struct.tm_year = stoi(ymd_str.substr(0, 4)) - 1900;
+      time_struct.tm_mon  = stoi(ymd_str.substr(5, 2)) - 1;
       time_struct.tm_mday = stoi(ymd_str.substr(8, 2));
       time_struct.tm_hour = stoi( hm_str.substr(0, 2));
       time_struct.tm_min  = stoi( hm_str.substr(3, 2));

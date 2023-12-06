@@ -648,7 +648,7 @@ time_t AirnowHandler::_getValidTime(const string &dateStr, const string &timeStr
   struct tm time_struct;
   memset(&time_struct, 0, sizeof(time_struct));
 
-  time_struct.tm_year = atoi(year.c_str()) -1900;
+  time_struct.tm_year = atoi(year.c_str()) - 1900;
   time_struct.tm_mon = atoi(mon.c_str()) - 1;
   time_struct.tm_mday = atoi(mday.c_str());
   time_struct.tm_hour = atoi(hour.c_str());
