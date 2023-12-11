@@ -831,15 +831,23 @@ fi
 LDFLAGS="${LDFLAGS} -Wl,-rpath,${LIB_DIR}/lib -L${LIB_DIR}/lib"
 
 # if variables are set, add <VALUE>/lib to rpath and -L
-for x in $MET_ATLAS $MET_BUFR $MET_CAIRO $MET_ECKIT $MET_FREETYPE $MET_GRIB2C $MET_GSL $MET_HDF $MET_HDF5 $MET_NETCDF $MET_PROJ; do
+for x in $MET_CAIRO $MET_FREETYPE $MET_GSL $MET_HDF $MET_HDF5 $MET_NETCDF; do
     arg="${x:+-Wl,-rpath,$x/lib -L$x/lib}"
     if [[ "$LDFLAGS" != *"$arg"* ]]; then
 	LDFLAGS+=" $arg"
     fi
 done
 
+# if variables are set, add <VALUE>/lib64 to rpath and -L
+for x in $MET_ATLAS $MET_BUFR $MET_ECKIT $MET_GRIB2C $MET_PROJ $LIB_JASPER; do
+    arg="${x:+-Wl,-rpath,$x/lib64 -L$x/lib64}"
+    if [[ "$LDFLAGS" != *"$arg"* ]]; then
+	LDFLAGS+=" $arg"
+    fi
+done
+	
 # if variables are set, add <VALUE> to rpath and -L
-for x in $MET_ATLASLIB $MET_BUFRLIB $MET_CAIROLIB $MET_ECKITLIB $MET_FREETYPELIB $MET_GRIB2CLIB $MET_GSLLIB $MET_HDF5LIB $MET_HDFLIB $MET_NETCDFLIB $MET_PROJLIB $MET_PYTHON_LIB $LIB_JASPER $LIB_LIBPNG $LIB_Z $ADDTL_DIR; do
+for x in $MET_ATLASLIB $MET_BUFRLIB $MET_CAIROLIB $MET_ECKITLIB $MET_FREETYPELIB $MET_GRIB2CLIB $MET_GSLLIB $MET_HDF5LIB $MET_HDFLIB $MET_NETCDFLIB $MET_PROJLIB $ADDTL_DIR $MET_PYTHON_LIB $LIB_JASPER $LIB_LIBPNG $LIB_Z; do
     arg="${x:+-Wl,-rpath,$x -L$x}"
     if [[ "$LDFLAGS" != *"$arg"* ]]; then
 	LDFLAGS+=" $arg"
