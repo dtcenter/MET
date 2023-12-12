@@ -1,34 +1,35 @@
 # Define the development environment for NCAR project machine seneca
-# Based on settings in /usr/local/src/met/README.snat
+# Based on settings in /nrit/ral/src/met/README.ral-it
 
 # Top-level MET project directory
 MET_PROJ_DIR=/d1/projects/MET
 
 # Variables required to build MET
 export MET_DEVELOPMENT=true
-export MET_DST=/usr/local
+export MET_DST=/nrit/ral
 export MET_PROJ=${MET_DST}/proj-9.2.1
-export MET_NETCDF=${MET_DST}/netcdf-4.7.0/gcc-8.3.0
-export MET_HDF5=${MET_DST}/hdf5-1.8.21
-export MET_HDFINC=${MET_DST}/hdf4-4.2.15/include/hdf
-export MET_HDFLIB=${MET_DST}/hdf4-4.2.15/lib
-export MET_HDFEOS=${MET_DST}/hdf-eos2-20v1
-export MET_BUFR=${MET_DST}
-export MET_GRIB2C=${MET_DST}
-export MET_GSL=${MET_PROJ_DIR}/MET_releases/external_libs/gnu_8.3.0
+export MET_NETCDF=${MET_DST}/netcdf-4.9.2/gnu-12.2.0
+export MET_HDF5=${MET_DST}/hdf5-1.14.2
+export MET_HDFINC=${MET_DST}/hdf4-4.2.16-2/include/hdf
+export MET_HDFLIB=${MET_DST}/hdf4-4.2.16-2/lib
+export MET_HDFEOS=${MET_DST}/hdf-eos2-3.0
+export MET_BUFR=${MET_DST}/nceplibs-1.4.0/bufr-12.0.1
+export MET_GRIB2C=${MET_DST}/nceplibs-1.4.0/g2c-1.6.2
+export MET_GSLINC=/usr/include
+export MET_GSLLIB=/usr/lib/x86_64-linux-gnu
 export MET_CAIROINC=/usr/include/cairo
 export MET_CAIROLIB=/usr/lib/x86_64-linux-gnu
 export MET_FREETYPEINC=/usr/include/freetype2
 export MET_FREETYPELIB=/usr/lib/x86_64-linux-gnu
-export MET_JASPER=${MET_DST}/jasper-1.900.1
-export MET_ATLAS=${MET_PROJ_DIR}/MET_releases/external_libs/gnu_8.3.0/atlas
-export MET_ECKIT=${MET_PROJ_DIR}/MET_releases/external_libs/gnu_8.3.0/eckit
+export MET_ATLAS=${MET_DST}/atlas-0.30.0
+export MET_ECKIT=${MET_DST}/eckit-1.20.2
+export JASPER=${MET_DST}/jasper-1.900.1
 
 # For Python 3 in met-9.0
-export MET_PYTHON=/usr/local/met-python3
-export MET_PYTHON_BIN_EXE=${MET_PYTHON}/bin/python3.8
-export MET_PYTHON_CC="-I${MET_PYTHON}/include/python3.8"
-export MET_PYTHON_LD="-L${MET_PYTHON}/lib -lpython3.8 -lcrypt -lpthread -ldl -lutil -lm"
+export MET_PYTHON=${MET_DST}/met-python3
+export MET_PYTHON_BIN_EXE=${MET_PYTHON}/bin/python3.10
+export MET_PYTHON_CC="-I${MET_PYTHON}/include/python3.10"
+export MET_PYTHON_LD="-L${MET_PYTHON}/lib -lpython3.10 -lcrypt -lpthread -ldl -lutil -lm"
 
 # -D__64BIT__ is required because we've compiled libgrib2c.a with that flag
 export CFLAGS="-DUNDERSCORE -fPIC -D__64BIT__ -g"
@@ -37,21 +38,21 @@ export CXXFLAGS=${CFLAGS}
 # Set LDFLAGS to include -rpath settings when compiling MET
 export LDFLAGS="-Wl,--disable-new-dtags"
 export LDFLAGS="${LDFLAGS} -Wl,-rpath,${MET_DST}/lib:${MET_HDFEOS}/lib:${MET_PROJ}/lib:${MET_NETCDF}/lib:${MET_DST}/zlib-1.2.11/lib:${MET_DST}/szip-2.1.1/lib"
-export LDFLAGS="${LDFLAGS} -Wl,-rpath,${MET_HDFLIB}:${MET_HDF5}/lib:${MET_GSL}/lib:${MET_PYTHON}/lib:${MET_JASPER}/lib"
-export LDFLAGS="${LDFLAGS} -L${MET_JASPER}/lib"
+export LDFLAGS="${LDFLAGS} -Wl,-rpath,${MET_HDFLIB}:${MET_HDF5}/lib:${MET_GSL}/lib:${MET_PYTHON}/lib:${JASPER}/lib"
+export LDFLAGS="${LDFLAGS} -L${JASPER}/lib"
 
 # Variables required to run MET
 export MET_TEST_INPUT=${MET_PROJ_DIR}/MET_test_data/unit_test
 export MET_FONT_DIR=${MET_TEST_INPUT}/fonts
 
 # Define Rscript to use a version with the ncdf4 package 1.17 or later 
-export MET_TEST_RSCRIPT=/usr/local/R-4.1.2/bin/Rscript
+export MET_TEST_RSCRIPT=/nrit/ral/R-4.3.1/bin/Rscript
 
 # This is a cron script -- create the shell environment for this job
 # - NCO is for ncdiff
 # - NetCDF is for ncdump.
-export PATH="/usr/local/nco/bin:/usr/local/netcdf/bin:\
-             /usr/local/sbin:/usr/local/bin:/usr/sbin:\
+export PATH="/nrit/ral/nco/bin:/nrit/ral/netcdf4/bin:\
+             /nrit/ral/sbin:/nrit/ral/bin:/usr/sbin:\
              /usr/bin:/sbin:/bin:/usr/bin/X11:/opt/bin:$PATH"
 
 # SonarQube
