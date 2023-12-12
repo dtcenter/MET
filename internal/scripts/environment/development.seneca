@@ -46,6 +46,9 @@ export MET_FONT_DIR=${MET_TEST_INPUT}/fonts
 # Define Rscript to use a version with the ncdf4 package 1.17 or later 
 export MET_TEST_RSCRIPT=/nrit/ral/R-4.3.1/bin/Rscript
 
+# Define runtime Python version
+export MET_TEST_MET_PYTHON_EXE=${MET_DST}/met-python3
+
 # This is a cron script -- create the shell environment for this job
 # - NCO is for ncdiff
 # - NetCDF is for ncdump.
