@@ -696,7 +696,7 @@ compareNc = function(nc1, nc2, verb, strict=0, delta=-1, comp_var=0){
 	}
 
 	# build and run the ncdiff command
-	strCmd = paste(strNcDiffExec, " -x -v time_bounds \\\n  ", nc1, " \\\n  ", nc2, " \\\n  ", strNcDiff, sep="");
+	strCmd = paste(strNcDiffExec, " -C -x -v time_bounds \\\n  ", nc1, " \\\n  ", nc2, " \\\n  ", strNcDiff, sep="");
 	if( 2 <= verb ){ cat("NCDIFF:", strCmd, "\n"); }
 	strCmdOut = system(paste(strCmd, "2>&1"), intern=T);
 
