@@ -49,7 +49,7 @@ export MET_FONT_DIR=${MET_TEST_INPUT}/fonts
 export MET_TEST_RSCRIPT=/nrit/ral/R-4.3.1/bin/Rscript
 
 # Define runtime Python version
-export MET_TEST_MET_PYTHON_EXE=${MET_DST}/met-python3
+export MET_TEST_MET_PYTHON_EXE=${MET_PYTHON_BIN_EXE}
 
 # This is a cron script -- create the shell environment for this job
 # - NCO is for ncdiff
