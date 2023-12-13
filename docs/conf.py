@@ -34,7 +34,7 @@ copyright = f'{release_year}, {author}'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 # Adding 'sphinx_panels' to use drop-down menus in appendixA. 
-extensions = ['sphinx.ext.autodoc','sphinx.ext.intersphinx','sphinx_panels',]
+extensions = ['sphinx.ext.autodoc','sphinx.ext.intersphinx','sphinx_panels','sphinx_rtd_theme',]
 
 # settings for ReadTheDocs PDF creation
 latex_engine = 'pdflatex'
