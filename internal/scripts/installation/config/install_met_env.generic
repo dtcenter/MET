@@ -46,6 +46,9 @@ export MAKE_ARGS="-j 5"
 # that have the pre-existing libraries not in the external_libs directory will
 # need to update the paths to the appropriate location.
 #export EXTERNAL_LIBS=${TEST_BASE}/external_libs
+#export MET_PROJ=${EXTERNAL_LIBS}
+#export SQLITE_INCLUDE_DIR=${EXTERNAL_LIBS}/include
+#export SQLITE_LIB_DIR=${EXTERNAL_LIBS}/lib
 #export MET_GSL=${EXTERNAL_LIBS}
 #export MET_BUFRLIB=${EXTERNAL_LIBS}/lib
 #export BUFRLIB_NAME=-lbufr_4
@@ -57,12 +60,18 @@ export MAKE_ARGS="-j 5"
 #export GRIB2CLIB_NAME=-lg2c
 #export MET_HDF5=${EXTERNAL_LIBS}
 #export MET_NETCDF=${EXTERNAL_LIBS}
+#export MET_ECKIT==${EXTERNAL_LIBS}
+#export MET_ATLAS==${EXTERNAL_LIBS}
 
-# The optional libraries HDF4, HDFEOS, FREETYPE, and CAIRO are used for the
-# following, not widely used tools: MODIS-Regrid, lidar2nc, and MODE Graphics.
-# To enable the compilation of these libraries, set the compilation flags for
-# the library (e.g. COMPILE_HDF, COMPILE_HDFEOS, COMPILE_CAIRO,
-# COMPILE_FREETYPE) to any value in the environment config file. If these
-# libraries have already been installed and don't need to be reinstalled, set 
-# MET_HDF, MET_HDFEOS, MET_FREETYPEINC, MET_FREETYPELIB, MET_CAIROINC,
-# and MET_CAIROLIB to their installed locations.
+# The optional libraries ecKit and atlas offer support for unstructured
+# grids. The optional libraries HDF4, HDFEOS, FREETYPE, and CAIRO are
+# used for the following, not widely used tools, MODIS-Regrid,
+# lidar2nc, and MODE Graphics. To enable building of these libraries,
+# set the compile flags for the library (e.g. COMPILE_ECKIT, COMPILE_ATLAS,
+# COMPILE_HDF, COMPILE_HDFEOS) to any value in the environment config
+# file. If these libraries have already been installed and don't need
+# to be reinstalled, please supply values for the following environment
+# variables in the input environment configuration file
+# (install_met_env.<machine_name>): MET_ECKIT, MET_ATLAS, MET_HDF,
+# MET_HDFEOS, MET_FREETYPEINC, MET_FREETYPELIB, MET_CAIROINC,
+# MET_CAIROLIB.
