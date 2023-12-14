@@ -1,4 +1,4 @@
-.. A_installation:
+.. _installation:
 
 ************
 Installation
