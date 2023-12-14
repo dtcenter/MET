@@ -1,8 +1,8 @@
 .. _installation:
 
-**************
-Installing MET
-**************
+************
+Installation
+************
 
 Introduction
 ============
@@ -32,17 +32,21 @@ The required libraries are listed below:
 * `HDF5 <https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.12/hdf5-1.12.2/src/hdf5-1.12.2.tar.gz>`__ is required to support NetCDF 4. HDF5 should be built with `zlib <http://www.zlib.net/>`_.
 * `GSL <http://www.gnu.org/software/gsl>`_ GNU Scientific Library Developer's Version for computing confidence intervals (use **GSL-1.11** for **PGI** compilers)
 * `GRIB2C <http://www.nco.ncep.noaa.gov/pmb/codes/GRIB2>`_ Library (with dependencies Z, PNG, JASPER), if compiling GRIB2 support.
+* `Proj <https://proj.org/>`_ Library used to instantiate grids within MET
 
 The following libraries are conditionally required, depending on the intended verification use and compiler language:
 
+* `ecKit <https://github.com/ecmwf/eckit>`_ Library, if compiling support for unstructured grids
+* `ATLAS<https://math-atlas.sourceforge.net/>`_ Library, if compiling support for unstructured grids
 * `HDF4 <http://www.hdfgroup.org/products/hdf4>`__ library if compiling the MODIS-Regrid or lidar2nc tool.
 * `HDF-EOS2 <http://www.hdfgroup.org/hdfeos.html>`__ library if compiling the MODIS-Regrid or lidar2nc tool.
 * `Cairo <http://cairographics.org/releases>`_ library if compiling the MODE-Graphics tool.
 * `FreeType <http://www.freetype.org/download.html>`_ library if compiling the MODE-Graphics tool.
 * `f2c <http://www.netlib.org/f2c>`_ library for interfacing between Fortran and C (**Not required for most compilers**)
 
-Users can take advantage of the :ref:`compile_script_install` to download and install all of the
-libraries automatically, both required and conditionally required.
+Users can take advantage of the compilation script to download and install all of the 
+libraries automatically, both required and conditionally required 
+:ref:`compile_script_install`.
 
 .. _suggested_external_utiliites:
 
@@ -73,7 +77,12 @@ MET in .tgz (tarred and gzipped) format from GitHub, which the script will then
 install.
 
 To begin, create and change to a directory where the latest version of MET should be
-installed. Next, download the **compile_MET_all.sh** script and **tar_files.tgz**
+installed. Assuming that the following guidance uses “/d1” as the parent directory, 
+a suggested format is a path to a “met” directory, followed by the version number 
+subdirectory (e.g. /d1/met/12.0.0). 
+Next, download the `**compile_MET_all.sh** <https://raw.githubusercontent.com/dtcenter/MET/main_v11.0/internal/scripts/installation/compile_MET_all.sh>`_
+script and 
+`**tar_files.tgz** <https://dtcenter.ucar.edu/dfiles/code/METplus/MET/installation/tar_files.tgz>`_
 and place both of these in the new directory. These files are available either
 through using the hyperlinks provided or by entering the following commands in
 the terminal while in the directory MET will be installed in:
