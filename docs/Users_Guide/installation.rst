@@ -113,7 +113,7 @@ Now change directories to the one that was created from expanding the tar files:
 The next step will be to identify and download the latest MET release as a
 tar file (e.g. v12.0.0.tar.gz) and place it in
 the tar_files directory. The file is available from the
-**RECOMMENDED - COMPONENTS** MET section of the
+Recommended-Components MET section of the
 `METplus website <https://dtcenter.org/community-code/metplus/download>`_ or
 by using a wget command while in the *tar_files* directory:
 
