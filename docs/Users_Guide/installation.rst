@@ -138,67 +138,69 @@ configuration file  (for example, install_met_env.<machine_name>). An
 example environment configuration file to start with (**install_met_env.generic**),
 as well as environment configuration files used on HPCs at NCAR and NOAA,
 can be found in the `MET GitHub repository <https://github.com/dtcenter/MET>`_ in the 
-*internal/scripts/installation/config* directory.
+`internal/scripts/installation/config <scripts/installation/config>` directory.
 
 Environment Variable Descriptions
 ---------------------------------
 
 **REQUIRED**
 
-**TEST_BASE** – Format is */d1/met/X.Y.Z*, where X, Y, and Z corresponds to the latest
-released version of MET. This is the MET installation directory that was created in
-the first step, and contains **compile_MET_all.sh** script, **tar_files.tgz**, 
+**TEST_BASE** – Format is */d1/met/12.0.0*. This is the MET installation directory that was created 
+ at the beginning of, :ref:`compile_script_install` and contains **compile_MET_all.sh** script, **tar_files.tgz**, 
 and the *tar_files* directory from the untar command.
 
-**COMPILER** – Format is compiler_version (e.g. gnu_8.3.0). For the GNU family of compilers, 
+**COMPILER** – Format is *compiler_version* (e.g. gnu_8.3.0). For the GNU family of compilers, 
 use “gnu”; for the Intel family of compilers, use “intel”, “ics”, “ips”, or “PrgEnv-intel”, 
-depending on the system. In the past, support was provided for the PGI family of compilers 
+depending on the system;  for the oneAPI intel compilers, ensure “oneapi” 
+is in the compiler name. In the past, support was provided for the PGI family of compilers 
 through “pgi”. However, this compiler option is no longer actively tested. 
 
-**MET_SUBDIR** – Format is */d1/met/X.Y.Z*, where X, Y, and Z corresponds to the latest
-released version of MET. This is the location where the top-level MET subdirectory will
+**MET_SUBDIR** – Format is */d1/met/12.0.0. This is the location where the top-level MET 
+subdirectory will
 be installed and is often set equivalent to **TEST_BASE** (e.g. ${TEST_BASE}).
 
-**MET_TARBALL** – Format is vX.Y.Z.tar.gz, where X, Y, and Z corresponds to the latest
-released version of MET.This is the name of the downloaded MET tarball.
+**MET_TARBALL** – Format is **v12.0.0tar.gz**. This is the name of the downloaded MET tarball.
 
 **USE_MODULES** – Format is TRUE or FALSE. Set to FALSE if using a machine that does not use 
 modulefiles; set to TRUE if using a machine that does use modulefiles. For more information on 
 modulefiles, visit the `wiki page <https://en.wikipedia.org/wiki/Environment_Modules_(software)>`_.
 
-**PYTHON_MODULE** Format is PythonModuleName_version (e.g. python_3.10.4). This environment variable 
+**PYTHON_MODULE** Format is **PythonModuleName_version** (e.g. python_3.10.4). This environment variable 
 is only required if **USE_MODULES** = TRUE. To set properly, list the Python module to load 
 followed by an underscore and version number. For example, setting PYTHON_MODULE=python_3.10.4 
 will cause the script to  run "module load python/3.10.4".
 
 
-**REQUIRED, IF COMPILING PYTHON EMBEDDING**
+.. dropdown:: REQUIRED, IF COMPILING PYTHON EMBEDDING
 
-**MET_PYTHON** – Format is directory path (e.g. */usr/local/python3*). This is the location
-containing the bin, include, lib, and share directories for Python.
+    **MET_PYTHON** – Format is directory path (e.g. */usr/local/python3*). This is the location
+    containing the bin, include, lib, and share directories for Python.
 
-**MET_PYTHON_CC** - Format is -I followed by the directory containing Python includes 
-(ex. -I/usr/local/python3/include/python3.8). This information may be obtained by 
-running :code:`python3-config --cflags`; however, this command can, on certain systems, 
-provide too much information.
+    **MET_PYTHON_CC** - Format is -I followed by the directory containing Python includes 
+    (ex. -I/usr/local/python3/include/python3.10). This information may be obtained by 
+    running :code:`python3-config --cflags`; however, this command can, on certain systems, 
+    provide too much information.
 
-**MET_PYTHON_LD** - Format is -L followed by the directory containing the Python library 
-files then a space, then -l followed by the necessary Python libraries to link to 
-(ex. -L/usr/local/python3/lib/\ -lpython3.10\ -lpthread\ -ldl\ -lutil\ -lm). 
-The backslashes are necessary in the example shown because of the spaces, which will be 
-recognized as the end of the value unless preceded by the “\” character. Alternatively, 
-a user can provide the value in quotations 
-(e.g. export MET_PYTHON_LD="-L/usr/local/python3/lib/ -lpython3.10 -lpthread -ldl -lutil -lm"). 
-This information may be obtained by running :code:`python3-config --ldflags --embed`; however,
-this command can, on certain systems, provide too much information.
+    **MET_PYTHON_LD** - Format is -L followed by the directory containing the Python library 
+    files then a space, then -l followed by the necessary Python libraries to link to 
+    (ex. -L/usr/local/python3/lib/\\ -lpython3.10\\ -lpthread\\ -ldl\\ -lutil\\ -lm). 
+    The backslashes are necessary in the example shown because of the spaces, which will be 
+    recognized as the end of the value unless preceded by the “\” character. Alternatively, 
+    a user can provide the value in quotations 
+    (e.g. export MET_PYTHON_LD="-L/usr/local/python3/lib/ -lpython3.10 -lpthread -ldl -lutil -lm"). 
+    This information may be obtained by running :code:`python3-config --ldflags --embed`; however,
+    this command can, on certain systems, provide too much information.
 
-**OPTIONAL**
+    **OPTIONAL**
 
-**export MAKE_ARGS=-j #** – If there is a need to install external libraries, or to attempt 
-to speed up the MET compilation process, this environmental setting can be added to the 
-environment configuration file. Replace the # with the number of cores to use 
-(as an integer) or simply specify :code:`export MAKE_ARGS=-j` with no integer argument to 
-start as many processes in parallel as possible. 
+    **export MAKE_ARGS=-j #** – If there is a need to install external libraries, or to attempt 
+    to speed up the MET compilation process, this environmental setting can be added to the 
+    environment configuration file. Replace the # with the number of cores to use 
+    (as an integer) or simply specify :code:`export MAKE_ARGS=-j` with no integer argument to 
+    start as many processes in parallel as possible. Note that Docker has trouble compiling 
+    without a specified value of cores to use.  The automated MET testing scripts in the 
+    Docker environment have been successful with a value of 5.
+
 
 External Library Handling in compile_MET_all.sh
 -----------------------------------------------
