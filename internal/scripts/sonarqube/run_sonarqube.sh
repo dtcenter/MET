@@ -20,7 +20,8 @@
 #=======================================================================
 
 # Constants
-GIT_REPO="https://github.com/dtcenter/MET"
+[ -z "$GIT_REPO_NAME" ] && GIT_REPO_NAME=MET
+GIT_REPO="https://github.com/dtcenter/${GIT_REPO_NAME}"
 
 function usage {
         echo
@@ -34,36 +35,35 @@ if [[ $# -lt 1 ]]; then usage; exit; fi
 
 # Check that SONARQUBE_WRAPPER_BIN is defined
 if [ -z ${SONARQUBE_WRAPPER_BIN} ]; then
-  which build-wrapper-linux-x86-64 2> /dev/null
-  if [ $? -eq 0 ]; then
-    SONARQUBE_WRAPPER_BIN=$(which build-wrapper-linux-x86-64 2> /dev/null)
-  else
-    which build-wrapper 2> /dev/null
-    if [ $? -eq 0 ]; then
-      SONARQUBE_WRAPPER_BIN=$(which build-wrapper 2> /dev/null)
-    else
+  SONAR_WRAPPER=$(which build-wrapper-linux-x86-64 2> /dev/null)
+  if [ $? -ne 0 ]; then
+    SONAR_WRAPPER=$(which build-wrapper 2> /dev/null)
+    if [ $? -ne 0 ]; then
       echo "ERROR: SONARQUBE_WRAPPER_BIN must be set"
       exit 1
     fi
   fi
+else
+  SONAR_WRAPPER=${SONARQUBE_WRAPPER_BIN}/build-wrapper-linux-x86-64
 fi
-if [ ! -e ${SONARQUBE_WRAPPER_BIN} ]; then
-  echo "ERROR: SONARQUBE_WRAPPER_BIN (${SONARQUBE_WRAPPER_BIN}) does not exist"
+if [ ! -e ${SONAR_WRAPPER} ]; then
+  echo "ERROR: ${SONAR_WRAPPER} does not exist"
   exit 1
 fi
 
 # Check that SONARQUBE_SCANNER_BIN is defined
+SCANNER_NAME=sonar-scanner
 if [ -z ${SONARQUBE_SCANNER_BIN} ]; then
-  which sonar-scanner 2> /dev/null
-  if [ $? -eq 0 ]; then
-    SONARQUBE_SCANNER_BIN=$(which sonar-scanner 2> /dev/null)
-  else
+  SONAR_SCANNER=$(which $SCANNER_NAME 2> /dev/null)
+  if [ $? -ne 0 ]; then
     echo "ERROR: SONARQUBE_SCANNER_BIN must be set"
     exit 1
   fi
+else
+  SONAR_SCANNER=${SONARQUBE_SCANNER_BIN}/$SCANNER_NAME
 fi
-if [ ! -e ${SONARQUBE_SCANNER_BIN} ]; then
-  echo "ERROR: SONARQUBE_SCANNER_BIN (${SONARQUBE_SCANNER_BIN}) does not exist"
+if [ ! -e $SONAR_SCANNER ]; then
+  echo "ERROR: SONAR_SCANNER (${SONAR_SCANNER}) does not exist"
   exit 1
 fi
 
@@ -116,7 +116,8 @@ run_command "./configure --prefix=`pwd` \
             --enable-modis \
             --enable-mode_graphics \
             --enable-lidar2nc \
-            --enable-python"
+            --enable-python \
+            --enable-ugrid"
 
 # Set the build id
 #BUILD_ID="MET-${1}"
@@ -125,23 +126,31 @@ SONAR_PROPERTIES=sonar-project.properties
 
 # Copy sonar-project.properties for Python code
 [ -e $SONAR_PROPERTIES ] && rm $SONAR_PROPERTIES
-cp -p $SCRIPT_DIR/python.sonar-project.properties $SONAR_PROPERTIES
+[ -z "$SONAR_SERVER_URL" ] && SONAR_SERVER_URL="http://localhost:9000"
+if [ -z "$SONAR_TOKEN_VALUE" ]; then
+  echo "  == ERROR == SONAR_TOKEN_VALUE is not defined"
+  exit 1
+else
+  sed -e "s|SONAR_TOKEN_VALUE|$SONAR_TOKEN_VALUE|" -e "s|SONAR_SERVER_URL|$SONAR_SERVER_URL|" $SCRIPT_DIR/python.sonar-project.properties > $SONAR_PROPERTIES
 
-# Run SonarQube scan for Python code
-run_command "${SONARQUBE_SCANNER_BIN}/sonar-scanner"
+  # Run SonarQube scan for Python code
+  run_command "$SONAR_SCANNER"
 
-# Copy sonar-project.properties for C/C++ code
-[ -e $SONAR_PROPERTIES ] && rm $SONAR_PROPERTIES
-cp -p $SCRIPT_DIR/$SONAR_PROPERTIES .
+  # Copy sonar-project.properties for C/C++ code
+  [ -e $SONAR_PROPERTIES ] && rm $SONAR_PROPERTIES
+  sed -e "s|SONAR_TOKEN_VALUE|$SONAR_TOKEN_VALUE|" -e "s|SONAR_SERVER_URL|$SONAR_SERVER_URL|" $SCRIPT_DIR/sonar-project.properties > $SONAR_PROPERTIES
 
-# Run SonarQube clean
-run_command "make clean"
+  # Run SonarQube clean
+  run_command "make clean"
 
-# Run SonarQube make
-run_command "${SONARQUBE_WRAPPER_BIN}/build-wrapper-linux-x86-64 --out-dir $SONARQUBE_OUT_DIR make"
+  # Run SonarQube make
+  run_command "$SONAR_WRAPPER --out-dir $SONARQUBE_OUT_DIR make"
 
-# Run SonarQube scan for C/C++ code
-run_command "${SONARQUBE_SCANNER_BIN}/sonar-scanner"
+  # Run SonarQube scan for C/C++ code
+  run_command "$SONAR_SCANNER"
+
+  [ -e $SONAR_PROPERTIES ] && rm $SONAR_PROPERTIES
+fi
 
 # Run SonarQube report generator to make a PDF file
 #TODAY=`date +%Y%m%d`
