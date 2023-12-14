@@ -1,6 +1,6 @@
-name: Compiling 
+name: Compilation Options
 
-# Test MET configuration options for all tags
+# Test MET configuration/compilation options for all tags
 
 on:
 
@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        enable_opts:
+        config_opts:
           - ''
           - '--enable-all'
           - '--enable-grib2'
@@ -46,7 +46,7 @@ jobs:
           SOURCE_BRANCH: ${{ needs.job_control.outputs.branch_name }}
           MET_BASE_REPO: ${{ needs.job_control.outputs.met_base_repo }}
           MET_BASE_TAG: ${{ needs.job_control.outputs.met_base_tag }}
-          MET_ENABLE_OPTS: ${{ matrix.enable_opts }}
+          MET_CONFIG_OPTS: ${{ matrix.config_opts }}
 
       - name: Copy all build log files into logs directory
         if: always()

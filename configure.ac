@@ -518,9 +518,9 @@ AC_ARG_ENABLE(lidar2nc,
   [ENABLE_LIDAR2NC="no"]
 )
 
-AM_CONDITIONAL([ENABLE_LIDAR2NC], [test "x$ENABLE_LIDAR2NC" = "xyes"])
+AM_CONDITIONAL([ENABLE_LIDAR2NC], [test "x$ENABLE_LIDAR2NC" = "xyes" || test "x$ENABLE_ALL" = "xyes"])
 
-if test "x$ENABLE_ALL" = "xyes" || test "x$ENABLE_LIDAR2NC" = "xyes"; then
+if test "x$ENABLE_LIDAR2NC" = "xyes" || test "x$ENABLE_ALL" = "xyes"; then
   AC_DEFINE([ENABLE_LIDAR2NC], [], ["build lidar2nc"])
   AC_MSG_NOTICE([lidar2nc will be compiled])
 else
@@ -961,9 +961,9 @@ AC_ARG_ENABLE(modis,
   [ENABLE_MODIS="no"]
 )
 
-AM_CONDITIONAL([ENABLE_MODIS], [test "x$ENABLE_MODIS" = "xyes"])
+AM_CONDITIONAL([ENABLE_MODIS], [test "x$ENABLE_MODIS" = "xyes" || test "x$ENABLE_ALL" = "xyes"])
 
-if test "x$ENABLE_ALL" = "xyes" || test "x$ENABLE_MODIS" = "xyes"; then
+if test "x$ENABLE_MODIS" = "xyes" || test "x$ENABLE_ALL" = "xyes"; then
   AC_DEFINE([ENABLE_MODIS], [], ["build modis"])
   AC_MSG_NOTICE([modis will be compiled])
 else
@@ -981,9 +981,9 @@ AC_ARG_ENABLE(mode_graphics,
   [ENABLE_MODE_GRAPHICS="no"]
 )
 
-AM_CONDITIONAL([ENABLE_MODE_GRAPHICS], [test "x$ENABLE_MODE_GRAPHICS" = "xyes"])
+AM_CONDITIONAL([ENABLE_MODE_GRAPHICS], [test "x$ENABLE_MODE_GRAPHICS" = "xyes" || test "x$ENABLE_ALL" = "xyes"])
 
-if test "x$ENABLE_ALL" = "xyes" || test "x$ENABLE_MODE_GRAPHICS" = "xyes"; then
+if test "x$ENABLE_MODE_GRAPHICS" = "xyes" || test "x$ENABLE_ALL" = "xyes"; then
   AC_DEFINE([ENABLE_MODE_GRAPHICS], [], ["build mode_graphics"])
   AC_MSG_NOTICE([mode_graphics will be compiled])
 else
@@ -1061,10 +1061,10 @@ AC_ARG_ENABLE(grib2,
   [ENABLE_GRIB2="no"]
 )
 
-AM_CONDITIONAL([ENABLE_GRIB2], [test "x$ENABLE_GRIB2" = "xyes"])
+AM_CONDITIONAL([ENABLE_GRIB2], [test "x$ENABLE_GRIB2" = "xyes" || test "x$ENABLE_ALL" = "xyes"])
 AM_CONDITIONAL([GRIB2CLIB_NAME_SET], [test ! -z "$GRIB2CLIB_NAME"])
 
-if test "x$ENABLE_ALL" = "xyes" || test "x$ENABLE_GRIB2" = "xyes"; then
+if test "x$ENABLE_GRIB2" = "xyes" || test "x$ENABLE_ALL" = "xyes"; then
   AC_DEFINE([ENABLE_GRIB2], [], ["build GRIB2 support"])
   AC_MSG_NOTICE([GRIB2 support will be compiled])
   CPPFLAGS="${CPPFLAGS} -DWITH_GRIB2"
@@ -1096,9 +1096,9 @@ AC_ARG_ENABLE(python,
   [ENABLE_PYTHON="no"]
 )
 
-AM_CONDITIONAL([ENABLE_PYTHON], [test "x$ENABLE_PYTHON" = "xyes"])
+AM_CONDITIONAL([ENABLE_PYTHON], [test "x$ENABLE_PYTHON" = "xyes" || test "x$ENABLE_ALL" = "xyes"])
 
-if test "x$ENABLE_ALL" = "xyes" || test "x$ENABLE_PYTHON" = "xyes"; then
+if test "x$ENABLE_PYTHON" = "xyes" || test "x$ENABLE_ALL" = "xyes"; then
   AC_DEFINE([ENABLE_PYTHON], [], ["build Python embedding support"])
   AC_MSG_NOTICE([Python embedding support will be compiled])
   CPPFLAGS="${CPPFLAGS} -DWITH_PYTHON"
@@ -1123,9 +1123,9 @@ AC_ARG_ENABLE(ugrid,
   [ENABLE_UGRID="no"]
 )
 
-AM_CONDITIONAL([ENABLE_UGRID], [test "x$ENABLE_UGRID" = "xyes"])
+AM_CONDITIONAL([ENABLE_UGRID], [test "x$ENABLE_UGRID" = "xyes" || test "x$ENABLE_ALL" = "xyes"])
 
-if test "x$ENABLE_ALL" = "xyes" || test "x$ENABLE_UGRID" = "xyes"; then
+if test "x$ENABLE_UGRID" = "xyes" || test "x$ENABLE_ALL" = "xyes"; then
   AC_DEFINE([ENABLE_UGRID], [], ["build unstructured grid support"])
   AC_MSG_NOTICE([unstructured grid support will be compiled])
   CPPFLAGS="${CPPFLAGS} -I${MET_ATLASINC} -I${MET_ECKITINC} -DWITH_UGRID"

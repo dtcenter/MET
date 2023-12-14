@@ -10,10 +10,10 @@ if [ -z ${MET_GIT_NAME+x} ]; then
   echo "Setting MET_GIT_NAME=${MET_GIT_NAME} based on the current branch."
 fi
 
-# Check whether MET_ENABLE_OPTS is defined
-if [ -z ${MET_ENABLE_OPTS+x} ]; then
-  MET_ENABLE_OPTS='--enable-all'
-  echo "Setting MET_ENABLE_OPTS=${MET_ENABLE_OPTS} to compile all available options."
+# Check whether MET_CONFIG_OPTS is defined
+if [ -z ${MET_CONFIG_OPTS+x} ]; then
+  MET_CONFIG_OPTS='--enable-all'
+  echo "Setting MET_CONFIG_OPTS=${MET_CONFIG_OPTS} to compile all available options."
 fi
 
 # Create log directory
@@ -25,7 +25,7 @@ echo "Running bootstrap for MET ${MET_GIT_NAME} and writing log file ${LOG_FILE}
 echo "Configuring MET ${MET_GIT_NAME} and appending to log file ${LOG_FILE}"
 ./configure \
   BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} \
-  ${MET_ENABLE_OPTS} \
+  ${MET_CONFIG_OPTS} \
   CPPFLAGS="-I/usr/local/include -I/usr/local/include/freetype2 -I/usr/local/include/cairo" \
   LIBS="-ltirpc" >> ${LOG_FILE} 2>&1
 if [ $? != 0 ]; then

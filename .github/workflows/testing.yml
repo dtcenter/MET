@@ -87,6 +87,7 @@ jobs:
           SOURCE_BRANCH: ${{ needs.job_control.outputs.branch_name }}
           MET_BASE_REPO: ${{ needs.job_control.outputs.met_base_repo }}
           MET_BASE_TAG: ${{ needs.job_control.outputs.met_base_tag }}
+          MET_CONFIG_OPTS: '--enable-all'
 
       - name: Copy all build log files into logs directory
         if: always()

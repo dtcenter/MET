@@ -12,7 +12,7 @@ time_command docker build -t ${DOCKERHUB_TAG} \
     --build-arg SOURCE_BRANCH \
     --build-arg MET_BASE_REPO \
     --build-arg MET_BASE_TAG \
-    --build-arg MET_ENABLE_OPTS \
+    --build-arg MET_CONFIG_OPTS \
     -f $DOCKERFILE_PATH ${GITHUB_WORKSPACE}
 if [ $? != 0 ]; then
   cat ${GITHUB_WORKSPACE}/docker_build.log

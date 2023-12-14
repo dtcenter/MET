@@ -5885,7 +5885,7 @@ else $as_nop
 fi
 
 
- if test "x$ENABLE_LIDAR2NC" = "xyes"; then
+ if test "x$ENABLE_LIDAR2NC" = "xyes" || test "x$ENABLE_ALL" = "xyes"; then
   ENABLE_LIDAR2NC_TRUE=
   ENABLE_LIDAR2NC_FALSE='#'
 else
@@ -5894,7 +5894,7 @@ else
 fi
 
 
-if test "x$ENABLE_ALL" = "xyes" || test "x$ENABLE_LIDAR2NC" = "xyes"; then
+if test "x$ENABLE_LIDAR2NC" = "xyes" || test "x$ENABLE_ALL" = "xyes"; then
 
 printf "%s\n" "#define ENABLE_LIDAR2NC /**/" >>confdefs.h
 
@@ -6658,7 +6658,7 @@ else $as_nop
 fi
 
 
- if test "x$ENABLE_MODIS" = "xyes"; then
+ if test "x$ENABLE_MODIS" = "xyes" || test "x$ENABLE_ALL" = "xyes"; then
   ENABLE_MODIS_TRUE=
   ENABLE_MODIS_FALSE='#'
 else
@@ -6667,7 +6667,7 @@ else
 fi
 
 
-if test "x$ENABLE_ALL" = "xyes" || test "x$ENABLE_MODIS" = "xyes"; then
+if test "x$ENABLE_MODIS" = "xyes" || test "x$ENABLE_ALL" = "xyes"; then
 
 printf "%s\n" "#define ENABLE_MODIS /**/" >>confdefs.h
 
@@ -6693,7 +6693,7 @@ else $as_nop
 fi
 
 
- if test "x$ENABLE_MODE_GRAPHICS" = "xyes"; then
+ if test "x$ENABLE_MODE_GRAPHICS" = "xyes" || test "x$ENABLE_ALL" = "xyes"; then
   ENABLE_MODE_GRAPHICS_TRUE=
   ENABLE_MODE_GRAPHICS_FALSE='#'
 else
@@ -6702,7 +6702,7 @@ else
 fi
 
 
-if test "x$ENABLE_ALL" = "xyes" || test "x$ENABLE_MODE_GRAPHICS" = "xyes"; then
+if test "x$ENABLE_MODE_GRAPHICS" = "xyes" || test "x$ENABLE_ALL" = "xyes"; then
 
 printf "%s\n" "#define ENABLE_MODE_GRAPHICS /**/" >>confdefs.h
 
@@ -6833,7 +6833,7 @@ else $as_nop
 fi
 
 
- if test "x$ENABLE_GRIB2" = "xyes"; then
+ if test "x$ENABLE_GRIB2" = "xyes" || test "x$ENABLE_ALL" = "xyes"; then
   ENABLE_GRIB2_TRUE=
   ENABLE_GRIB2_FALSE='#'
 else
@@ -6850,7 +6850,7 @@ else
 fi
 
 
-if test "x$ENABLE_ALL" = "xyes" || test "x$ENABLE_GRIB2" = "xyes"; then
+if test "x$ENABLE_GRIB2" = "xyes" || test "x$ENABLE_ALL" = "xyes"; then
 
 printf "%s\n" "#define ENABLE_GRIB2 /**/" >>confdefs.h
 
@@ -6891,7 +6891,7 @@ else $as_nop
 fi
 
 
- if test "x$ENABLE_PYTHON" = "xyes"; then
+ if test "x$ENABLE_PYTHON" = "xyes" || test "x$ENABLE_ALL" = "xyes"; then
   ENABLE_PYTHON_TRUE=
   ENABLE_PYTHON_FALSE='#'
 else
@@ -6900,7 +6900,7 @@ else
 fi
 
 
-if test "x$ENABLE_ALL" = "xyes" || test "x$ENABLE_PYTHON" = "xyes"; then
+if test "x$ENABLE_PYTHON" = "xyes" || test "x$ENABLE_ALL" = "xyes"; then
 
 printf "%s\n" "#define ENABLE_PYTHON /**/" >>confdefs.h
 
@@ -6933,7 +6933,7 @@ else $as_nop
 fi
 
 
- if test "x$ENABLE_UGRID" = "xyes"; then
+ if test "x$ENABLE_UGRID" = "xyes" || test "x$ENABLE_ALL" = "xyes"; then
   ENABLE_UGRID_TRUE=
   ENABLE_UGRID_FALSE='#'
 else
@@ -6942,7 +6942,7 @@ else
 fi
 
 
-if test "x$ENABLE_ALL" = "xyes" || test "x$ENABLE_UGRID" = "xyes"; then
+if test "x$ENABLE_UGRID" = "xyes" || test "x$ENABLE_ALL" = "xyes"; then
 
 printf "%s\n" "#define ENABLE_UGRID /**/" >>confdefs.h
 
