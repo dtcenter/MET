@@ -1,0 +1,62 @@
+name: Compiling 
+
+# Test MET configuration options for all tags
+
+on:
+
+  push:
+    tags:
+      - 'v**' 
+    paths-ignore:
+      - 'docs/**'
+      - '.github/pull_request_template.md'
+      - '.github/ISSUE_TEMPLATE/**'
+      - '.github/labels/**'
+      - '**/README.md'
+      - '**/LICENSE.md'
+      
+  workflow_dispatch:
+
+jobs:
+
+  compile:
+    name: Compile MET enable options
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        enable_opts:
+          - ''
+          - '--enable-all'
+          - '--enable-grib2'
+          - '--enable-python'
+          - '--enable-ugrid'
+          - '--enable-lidar2nc'
+          - '--enable-mode_graphics'
+          - '--enable-modis'
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Create directories to store output
+        run: mkdir -p ${RUNNER_WORKSPACE}/logs
+
+      - name: Compile MET in Docker
+        run: .github/jobs/build_docker_image.sh
+        env:
+          SOURCE_BRANCH: ${{ needs.job_control.outputs.branch_name }}
+          MET_BASE_REPO: ${{ needs.job_control.outputs.met_base_repo }}
+          MET_BASE_TAG: ${{ needs.job_control.outputs.met_base_tag }}
+          MET_ENABLE_OPTS: ${{ matrix.enable_opts }}
+
+      - name: Copy all build log files into logs directory
+        if: always()
+        run: cp ${GITHUB_WORKSPACE}/*.log ${RUNNER_WORKSPACE}/logs/
+
+      - name: Upload logs as artifact
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: logs
+          path: ${{ runner.workspace }}/logs
+          if-no-files-found: ignore
+
