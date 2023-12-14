@@ -37,7 +37,7 @@ The required libraries are listed below:
 The following libraries are conditionally required, depending on the intended verification use and compiler language:
 
 * `ecKit <https://github.com/ecmwf/eckit>`_ Library, if compiling support for unstructured grids
-* `ATLAS<https://math-atlas.sourceforge.net/>`_ Library, if compiling support for unstructured grids
+* `ATLAS <https://math-atlas.sourceforge.net/>`_ Library, if compiling support for unstructured grids
 * `HDF4 <http://www.hdfgroup.org/products/hdf4>`__ library if compiling the MODIS-Regrid or lidar2nc tool.
 * `HDF-EOS2 <http://www.hdfgroup.org/hdfeos.html>`__ library if compiling the MODIS-Regrid or lidar2nc tool.
 * `Cairo <http://cairographics.org/releases>`_ library if compiling the MODE-Graphics tool.
