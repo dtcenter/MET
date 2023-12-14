@@ -28,14 +28,14 @@ test_read_LDADD = -lvx_stat_out \
 	-lvx_tc_util \
 	-lvx_shapedata \
 	-lvx_util \
-	$(PYTHON_LIBS) \
+	$(PYTHON_MET_LIBS) $(PYTHON_DEP_LIBS) \
 	-lvx_statistics \
 	-lvx_data2d_factory \
 	-lvx_data2d_nc_met \
 	-lvx_data2d_nc_pinterp \
-	$(PYTHON_LIBS) \
+	$(PYTHON_MET_LIBS) $(PYTHON_DEP_LIBS) \
 	-lvx_data2d_nccf \
-	-lvx_data2d_grib $(GRIB2_LIBS) \
+	-lvx_data2d_grib $(GRIB2_MET_LIBS) $(GRIB2_DEP_LIBS) \
 	-lvx_data2d \
 	-lvx_nc_util \
 	-lvx_regrid \
@@ -50,7 +50,7 @@ test_read_LDADD = -lvx_stat_out \
 	-lvx_math \
 	-lvx_color \
 	-lvx_log \
-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas -lvx_util
+	-lm -lproj -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas -lvx_util
 
 test_read_prob_SOURCES = test_read_prob.cc
 test_read_prob_CPPFLAGS = ${MET_CPPFLAGS}
@@ -64,14 +64,14 @@ test_read_prob_LDADD = -lvx_stat_out \
 	-lvx_shapedata \
 	-lvx_util_math \
 	-lvx_util \
-	$(PYTHON_LIBS) \
+	$(PYTHON_MET_LIBS) $(PYTHON_DEP_LIBS) \
 	-lvx_statistics \
 	-lvx_data2d_factory \
 	-lvx_data2d_nc_met \
 	-lvx_data2d_nc_pinterp \
-	$(PYTHON_LIBS) \
+	$(PYTHON_MET_LIBS) $(PYTHON_DEP_LIBS) \
 	-lvx_data2d_nccf \
-	-lvx_data2d_grib $(GRIB2_LIBS) \
+	-lvx_data2d_grib $(GRIB2_MET_LIBS) $(GRIB2_DEP_LIBS) \
 	-lvx_data2d \
 	-lvx_nc_util \
 	-lvx_regrid \
@@ -86,5 +86,5 @@ test_read_prob_LDADD = -lvx_stat_out \
 	-lvx_math \
 	-lvx_color \
 	-lvx_log \
-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas -lvx_util
+	-lm -lproj -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas -lvx_util
 

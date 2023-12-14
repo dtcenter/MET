@@ -9,7 +9,7 @@
 //
 // Output model name to be written
 //
-model = "WRF";
+model = "FCST";
 
 //
 // Output description to be written
@@ -218,6 +218,6 @@ seeps_p1_thresh = NA;
 rank_corr_flag = TRUE;
 tmp_dir        = "/tmp";
 output_prefix  = "";
-version        = "V11.1.0";
+version        = "V12.0.0";
 
 ////////////////////////////////////////////////////////////////////////////////

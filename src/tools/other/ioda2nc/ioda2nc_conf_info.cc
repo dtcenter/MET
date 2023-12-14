@@ -8,8 +8,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <dirent.h>
 #include <iostream>
 #include <unistd.h>
@@ -24,6 +22,9 @@ using namespace std;
 #include "apply_mask.h"
 #include "grib_strings.h"
 #include "vx_log.h"
+
+using namespace std;
+
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -94,8 +95,8 @@ void IODA2NCConfInfo::process_config() {
    int i;
    ConcatString s, mask_name;
    StringArray sa;
-   StringArray * sid_list = 0;
-   Dictionary *dict = (Dictionary *) 0;
+   StringArray * sid_list = nullptr;
+   Dictionary *dict = (Dictionary *) nullptr;
    static const char *method_name = "IODA2NCConfInfo::process_config() -> ";
 
    // Dump the contents of the config file

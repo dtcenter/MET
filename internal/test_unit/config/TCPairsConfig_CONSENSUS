@@ -96,59 +96,73 @@ interp12 = NONE;
 //
 consensus = [
    {
-      name     = "UEMN_CONS";
-      members  = [ "UE00", "UE01", "UE02", "UE03", "UE04",
-                   "UE05", "UE06", "UE07", "UE08", "UE09",
-                   "UE10", "UE11", "UE12", "UE13", "UE14",
-                   "UE15", "UE16", "UE17", "UE18", "UE19",
-                   "UE20", "UE21", "UE22", "UE23", "UE24",
-                   "UE25", "UE26", "UE27", "UE28", "UE29",
-                   "UE30", "UE31", "UE32", "UE33", "UE34",
-                   "UE35" ];
-      required = [];
-      min_req  = 36;
+      name          = "UEMN_CONS";
+      members       = [ "UE00", "UE01", "UE02", "UE03", "UE04",
+                        "UE05", "UE06", "UE07", "UE08", "UE09",
+                        "UE10", "UE11", "UE12", "UE13", "UE14",
+                        "UE15", "UE16", "UE17", "UE18", "UE19",
+                        "UE20", "UE21", "UE22", "UE23", "UE24",
+                        "UE25", "UE26", "UE27", "UE28", "UE29",
+                        "UE30", "UE31", "UE32", "UE33", "UE34",
+                        "UE35" ];
+      required      = [];
+      min_req       = 36;
+      diag_required = [];
+      diag_min_req  = 0;
       write_members = FALSE;
    },
    {
-      name     = "HCCA_CONS";
-      members  = [ "AEMI", "GFSI", "CTCI", "DSHP", "EGRI", "EMN2", "EMXI", "HWFI", "LGEM" ];
-      required = [];
-      min_req  = 8;
+      name          = "HCCA_CONS";
+      members       = [ "AEMI", "GFSI", "CTCI", "DSHP", "EGRI", "EMN2", "EMXI", "HWFI", "LGEM" ];
+      required      = [];
+      min_req       = 8;
+      diag_required = [];
+      diag_min_req  = 0;
       write_members = TRUE;
    },
    {
-      name     = "GFEX_CONS";
-      members  = [ "GFSI", "EMXI" ];
-      required = [];
-      min_req  = 2;
+      name          = "GFEX_CONS";
+      members       = [ "GFSI", "EMXI" ];
+      required      = [];
+      min_req       = 2;
+      diag_required = [];
+      diag_min_req  = 0;
       write_members = TRUE;
    },
    {
-      name     = "TVCA_CONS";
-      members  = [ "GFSI", "EGRI", "HWFI", "EMHI", "CTCI", "EMNI" ];
-      required = [];
-      min_req  = 2;
+      name          = "TVCA_CONS";
+      members       = [ "GFSI", "EGRI", "HWFI", "EMHI", "CTCI", "EMNI" ];
+      required      = [];
+      min_req       = 2;
+      diag_required = [];
+      diag_min_req  = 0;
       write_members = TRUE;
    },
    {
-      name     = "TVCX_CONS";
-      members  = [ "GFSI", "EMXI", "EMXI", "HWFI", "CTCI", "EGRI" ];
-      required = [   TRUE,   TRUE,  FALSE,  FALSE,  FALSE,  FALSE ];
-      min_req  = 2;
+      name          = "TVCX_CONS";
+      members       = [ "GFSI", "EMXI", "EMXI", "HWFI", "CTCI", "EGRI" ];
+      required      = [   TRUE,   TRUE,  FALSE,  FALSE,  FALSE,  FALSE ];
+      min_req       = 2;
+      diag_required = [];
+      diag_min_req  = 0;
       write_members = TRUE;
    },
    {
-      name     = "ICON_CONS";
-      members  = [ "DSHP", "LGEM", "HWFI", "HMNI" ];
-      required = [   TRUE,   TRUE,   TRUE,   TRUE ];
-      min_req  = 4;
+      name          = "ICON_CONS";
+      members       = [ "DSHP", "LGEM", "HWFI", "HMNI" ];
+      required      = [   TRUE,   TRUE,   TRUE,   TRUE ];
+      min_req       = 4;
+      diag_required = [];
+      diag_min_req  = 0;
       write_members = TRUE;
    },
    {
-      name     = "IVCN_CONS";
-      members  = [ "DSHP", "LGEM", "HWFI", "HMNI", "CTCI" ];
-      required = [];
-      min_req  = 2;
+      name          = "IVCN_CONS";
+      members       = [ "DSHP", "LGEM", "HWFI", "HMNI", "CTCI" ];
+      required      = [];
+      min_req       = 2;
+      diag_required = [];
+      diag_min_req  = 0;
       write_members = TRUE;
    }
 ];
@@ -202,4 +216,4 @@ basin_map = [
 // Indicate a version number for the contents of this configuration file.
 // The value should generally not be modified.
 //
-version = "V11.1.0";
+version = "V12.0.0";

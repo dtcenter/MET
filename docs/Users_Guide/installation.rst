@@ -1,4 +1,4 @@
-.. _installation:
+.. A_installation:
 
 ************
 Installation
@@ -76,13 +76,13 @@ MET itself. A separate command will be used to pull down the latest version of
 MET in .tgz (tarred and gzipped) format from GitHub, which the script will then
 install.
 
-To begin, create and change to a directory where the latest version of MET should be
+To begin, create and change to a directory where the latest version of MET will be
 installed. Assuming that the following guidance uses “/d1” as the parent directory, 
 a suggested format is a path to a “met” directory, followed by the version number 
 subdirectory (e.g. /d1/met/12.0.0). 
 Next, download the `**compile_MET_all.sh** <https://raw.githubusercontent.com/dtcenter/MET/main_v11.0/internal/scripts/installation/compile_MET_all.sh>`_
 script and 
-`**tar_files.tgz** <https://dtcenter.ucar.edu/dfiles/code/METplus/MET/installation/tar_files.tgz>`_
+`**tar_files.tgz** <https://dtcenter.ucar.edu/dfiles/code/METplus/MET/installation/tar_files.met-base-v3.1.tgz>`_
 and place both of these in the new directory. These files are available either
 through using the hyperlinks provided or by entering the following commands in
 the terminal while in the directory MET will be installed in:
@@ -90,7 +90,7 @@ the terminal while in the directory MET will be installed in:
 .. code-block:: ini
 
   wget https://raw.githubusercontent.com/dtcenter/MET/main_vX.Y/internal/scripts/installation/compile_MET_all.sh
-  wget https://dtcenter.ucar.edu/dfiles/code/METplus/MET/installation/tar_files.tgz
+  wget https://dtcenter.ucar.edu/dfiles/code/METplus/MET/installation/tar_files.met-base-v3.1.tgz
 
 where the X and Y in the first wget command correspond to the latest released version
 of MET.
@@ -99,7 +99,7 @@ The tar files will need to be extracted in the MET installation directory:
 
 .. code-block:: ini
 
-  tar -zxf tar_files.tgz
+  tar -zxf tar_files.met-base-v3.1.tgz
 
 To make the compilation script into an executable, change the permissions to the following:
 
@@ -197,7 +197,6 @@ a user can provide the value in quotations
 This information may be obtained by running :code:`python3-config --ldflags --embed`; however,
 this command can, on certain systems, provide too much information.
 
-
 **OPTIONAL**
 
 **export MAKE_ARGS=-j #** – If there is a need to install external libraries, or to attempt 
@@ -263,8 +262,6 @@ Simply enter the following into the terminal to execute the script:
 
 To confirm that MET was installed successfully, users are encouraged to run 
 the following command to ensure the installation test scripts ran successfully:
-
-.. code-block:: ini
 
   grep -i error MET*/met.make_test.log
   

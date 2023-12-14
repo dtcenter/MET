@@ -26,17 +26,25 @@ export MET_FONT_DIR=${MET_TEST_INPUT}/fonts
 export MET_TEST_RSCRIPT=/usr/bin/Rscript
 
 # set make arguments to build using multiple jobs
-export MAKE_ARGS=-j
+export MAKE_ARGS="-j 5"
 
 export TEST_BASE=/met
-export COMPILER=gnu
+export COMPILER=gnu_12.2.0
 export MET_SUBDIR=${TEST_BASE}
 export MET_TARBALL=none
 export USE_MODULES=FALSE
 
 export MET_INSTALL_DIR=/usr/local
 
+export COMPILE_ECKIT=1
+export COMPILE_ATLAS=1
 export COMPILE_HDF=1
 export COMPILE_HDFEOS=1
 export COMPILE_FREETYPE=1
 export COMPILE_CAIRO=1
+
+export SQLITE_INCLUDE_DIR=/usr/include
+export SQLITE_LIB_DIR=/usr/lib/x86_64-linux-gnu
+
+export BUFRLIB_NAME="-lbufr_4"
+export GRIB2CLIB_NAME="-lg2c"

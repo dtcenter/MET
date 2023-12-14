@@ -22,10 +22,12 @@ grid_diag_LDADD = -lvx_stat_out \
 	-lvx_series_data \
 	-lvx_data2d_factory \
 	-lvx_data2d_nc_met \
-	-lvx_data2d_grib $(GRIB2_LIBS) \
+	-lvx_data2d_grib \
+	$(GRIB2_MET_LIBS) \
 	-lvx_data2d_nc_pinterp \
-	$(PYTHON_LIBS) \
 	-lvx_data2d_nccf \
+	$(UGRID_MET_LIBS) \
+	$(PYTHON_MET_LIBS) \
 	-lvx_statistics \
 	-lvx_data2d \
 	-lvx_nc_util \
@@ -40,7 +42,8 @@ grid_diag_LDADD = -lvx_stat_out \
 	-lvx_color \
 	-lvx_log \
 	-lvx_gsl_prob \
-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
+	$(GRIB2_DEP_LIBS) $(UGRID_DEP_LIBS) $(PYTHON_DEP_LIBS) \
+	-lm -lproj -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
 
 EXTRA_DIST = grid_diag.h \
 	grid_diag_conf_info.h

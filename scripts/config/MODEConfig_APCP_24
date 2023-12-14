@@ -9,7 +9,7 @@
 //
 // Output model name to be written
 //
-model = "WRF";
+model = "FCST";
 
 //
 // Output description to be written
@@ -246,6 +246,6 @@ shift_right = 0;   //  grid squares
 ////////////////////////////////////////////////////////////////////////////////
 
 output_prefix  = "";
-version        = "V11.1.0";
+version        = "V12.0.0";
 
 ////////////////////////////////////////////////////////////////////////////////

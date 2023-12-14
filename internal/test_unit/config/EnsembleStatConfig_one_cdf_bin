@@ -9,7 +9,7 @@
 //
 // Output model name to be written
 //
-model = "WRF";
+model = "FCST";
 
 //
 // Output description to be written
@@ -234,6 +234,6 @@ rng = {
 
 grid_weight_flag = NONE;
 output_prefix    = "${OUTPUT_PREFIX}";
-version          = "V11.1.0";
+version          = "V12.0.0";
 
 ////////////////////////////////////////////////////////////////////////////////

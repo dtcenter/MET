@@ -9,7 +9,7 @@
 //
 // Output model name to be written
 //
-model = "WRF";
+model = "FCST";
 
 //
 // Output description to be written
@@ -239,6 +239,6 @@ ct_stats_flag   = TRUE;
 ////////////////////////////////////////////////////////////////////////////////
 
 output_prefix  = "python";
-version        = "V11.1.0";
+version        = "V12.0.0";
 
 ////////////////////////////////////////////////////////////////////////////////

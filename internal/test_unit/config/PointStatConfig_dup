@@ -9,7 +9,7 @@
 //
 // Output model name to be written
 //
-model = "WRF";
+model = "FCST";
 
 //
 // Output description to be written
@@ -167,6 +167,6 @@ duplicate_flag = ${DUPLICATE_FLAG};
 rank_corr_flag = FALSE;
 tmp_dir        = "/tmp";
 output_prefix  = "${OUTPUT_PREFIX}";
-version        = "V11.1.0";
+version        = "V12.0.0";
 
 ////////////////////////////////////////////////////////////////////////////////

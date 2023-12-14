@@ -114,13 +114,13 @@ jobs:
     needs: [job_control]
     if: ${{ needs.job_control.outputs.run_unit_tests == 'true' }}
     steps:
-      - uses: dtcenter/metplus-action-data-update@v2
+      - uses: dtcenter/metplus-action-data-update@v3
         with:
           docker_name: ${{ secrets.DOCKER_USERNAME }}
           docker_pass: ${{ secrets.DOCKER_PASSWORD }}
           repo_name: ${{ github.repository }}
           data_prefix: unit_test
-          branch_name: ${{ needs.job_control.outputs.branch_name }}
+          branch_name: ${{ needs.job_control.outputs.truth_data_version }}
           docker_data_dir: /data/input/MET_test_data
           data_repo_dev: met-data-dev
 
@@ -294,6 +294,7 @@ jobs:
           - 'grid_stat stat_analysis_gs'
           - 'wavelet_stat stat_analysis_ws'
           - 'ensemble_stat stat_analysis_es'
+          - 'ugrid'
       fail-fast: false
     steps:
       - uses: actions/checkout@v3

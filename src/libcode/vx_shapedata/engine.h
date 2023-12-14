@@ -14,6 +14,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "mode_conf_info.h"
+#include "mode_data_type.h"
 
 #include "interest.h"
 #include "set.h"
@@ -284,6 +285,8 @@ class ModeFuzzyEngine {
 
       void do_cluster_features();
 
+      void set_data_type(ModeDataType type);
+
          //
          // Configuration information
          //
@@ -368,8 +371,10 @@ class ModeFuzzyEngine {
       int get_matched_obs(int)    const;
       int get_unmatched_obs(int)  const;
 
+
       SetCollection collection;
 
+      ModeDataType data_type;
 };
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -9,7 +9,7 @@
 //
 // Output model name to be written
 //
-model = "WRF";
+model = "FCST";
 
 //
 // Output description to be written
@@ -264,9 +264,15 @@ nc_pairs_flag = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+ugrid_dataset = "";
+ugrid_max_distance_km = 30;
+ugrid_coordinates_file = "";
+
+////////////////////////////////////////////////////////////////////////////////
+
 grid_weight_flag = NONE;
 tmp_dir          = "/tmp";
 output_prefix    = "";
-version          = "V11.1.0";
+version          = "V12.0.0";
 
 ////////////////////////////////////////////////////////////////////////////////

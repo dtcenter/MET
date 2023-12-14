@@ -613,8 +613,8 @@ command << cs_erase
         << replace_path(python_dir)
         << "\")";
 run_python_string(command.text());
-mlog << Debug(1) << method_name << "added python path ("
-     << python_dir << ") to python interpreter\n";
+mlog << Debug(3) << method_name << "added python path ("
+     << replace_path(python_dir) << ") to python interpreter\n";
 
 //setenv(env_PYTHONPATH, python_dir.c_str(),1);
 

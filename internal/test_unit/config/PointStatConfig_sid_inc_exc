@@ -6,7 +6,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-model = "WRF";
+model = "FCST";
 
 //
 // Output description to be written
@@ -158,6 +158,6 @@ obs_summary    = NEAREST;
 rank_corr_flag = TRUE;
 tmp_dir        = "/tmp";
 output_prefix  = "${OUTPUT_PREFIX}";
-version        = "V11.1.0";
+version        = "V12.0.0";
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 ARG MET_BASE_REPO=met-base
-ARG MET_BASE_TAG=v2.0_debian10
+ARG MET_BASE_TAG=v3.1
 
 FROM dtcenter/${MET_BASE_REPO}:${MET_BASE_TAG}
 MAINTAINER John Halley Gotway <johnhg@ucar.edu>
@@ -23,6 +23,11 @@ ENV MET_GIT_NAME    ${SOURCE_BRANCH}
 ENV MET_REPO_DIR    /met/MET-${MET_GIT_NAME}
 ENV MET_GIT_URL     https://github.com/dtcenter/MET
 ENV MET_DEVELOPMENT true
+
+#
+# Update the OS, as needed.
+#
+RUN apt update
 
 #
 # Set the working directory.

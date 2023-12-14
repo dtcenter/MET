@@ -1,0 +1,35 @@
+[MESSAGES CONTROL]
+
+# Enable the message, report, category or checker with the given id(s). You can
+# either give multiple identifier separated by comma (,) or put this option
+# multiple time.
+#enable=
+
+# Disable the message, report, category or checker with the given id(s). You
+# can either give multiple identifier separated by comma (,) or put this option
+# multiple time (only on the command line, not in the configuration file where
+# it should appear only once).
+#disable=
+disable=
+    invalid-name,
+    unspecified-encoding,
+    protected-access,
+    too-many-arguments,
+    too-many-locals,
+    missing-final-newline,
+    too-many-function-args,
+    missing-function-docstring,
+    missing-module-docstring,
+    missing-class-docstring,
+    too-few-public-methods,
+    too-many-instance-attributes,
+    bare-except,
+    logging-too-many-args,
+    fixme,
+    logging-fstring-interpolation,
+    line-too-long
+
+[TYPECHECK]
+ignored-classes=
+    pygrib,
+    pygrib._pygrib

@@ -10,19 +10,19 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
 #include <cmath>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "data2d_nccf.h"
 #include "vx_math.h"
 #include "vx_log.h"
+
+using namespace std;
+using namespace netCDF;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -352,7 +352,6 @@ int MetNcCFDataFile::data_plane_array(VarInfo &vinfo,
    LongArray time_offsets = collect_time_offsets(vinfo);
    if (0 < time_offsets.n_elements()) {
       LevelInfo level = vinfo.level();
-      VarInfoNcCF *vinfo_nc = (VarInfoNcCF *)&vinfo;
       long time_lower = bad_data_int;
       long time_upper = bad_data_int;
       if (level.type() == LevelType_Time) {

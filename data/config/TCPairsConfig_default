@@ -145,7 +145,7 @@ diag_info_map = [
       diag_source    = "CIRA_DIAG_RT";
       track_source   = "GFS";
       field_source   = "GFS_0p50";
-      match_to_track = [ "GFS" ];
+      match_to_track = [];
       diag_name      = [];
    },
    { 
@@ -214,4 +214,4 @@ basin_map = [
 // Indicate a version number for the contents of this configuration file.
 // The value should generally not be modified.
 //
-version = "V11.1.0";
+version = "V12.0.0";

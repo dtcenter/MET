@@ -9,7 +9,7 @@
 //
 // Output model name to be written
 //
-model = "WRF";
+model = "FCST";
 
 //
 // Output description to be written
@@ -219,6 +219,6 @@ seeps_p1_thresh = NA;
 grid_weight_flag = NONE;
 tmp_dir          = "/tmp";
 output_prefix    = "APCP_12";
-version          = "V11.1.0";
+version          = "V12.0.0";
 
 ////////////////////////////////////////////////////////////////////////////////

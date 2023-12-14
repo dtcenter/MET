@@ -696,7 +696,7 @@ compareNc = function(nc1, nc2, verb, strict=0, delta=-1, comp_var=0){
 	}
 
 	# build and run the ncdiff command
-	strCmd = paste(strNcDiffExec, " -x -v time_bounds \\\n  ", nc1, " \\\n  ", nc2, " \\\n  ", strNcDiff, sep="");
+	strCmd = paste(strNcDiffExec, " -C -x -v time_bounds \\\n  ", nc1, " \\\n  ", nc2, " \\\n  ", strNcDiff, sep="");
 	if( 2 <= verb ){ cat("NCDIFF:", strCmd, "\n"); }
 	strCmdOut = system(paste(strCmd, "2>&1"), intern=T);
 
@@ -856,7 +856,7 @@ compareDiff = function(file1, file2, verb=0){
 	else if( 1 <= verb ){ cat("passed diff\n"); }
 }
 
-listHeaderCols = c("VERSION", "DESC", "MODEL",
+listHeaderCols = c("VERSION", "MODEL", "DESC",
                    "FCST_LEAD", "FCST_VALID_BEG", "FCST_VALID_END",
                    "OBS_LEAD", "OBS_VALID_BEG", "OBS_VALID_END",
                    "FCST_VAR", "FCST_UNITS", "FCST_LEV",

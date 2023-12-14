@@ -1,0 +1,13 @@
+*.h5 binary
+*.nc binary
+*.pkl binary
+*.hdf5 binary
+*.sh text eol=lf
+*.bat text eol=crlf
+*.png binary
+*.gif binary
+*.tar.gz binary
+*.C04 binary
+*.zip binary
+*.xlsx binary
+*.grb binary

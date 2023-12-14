@@ -22,13 +22,15 @@ series_analysis_LDADD = -lvx_stat_out \
 	-lvx_analysis_util \
 	-lvx_data2d_factory \
 	-lvx_data2d_nc_met \
-	-lvx_data2d_grib $(GRIB2_LIBS) \
+	-lvx_data2d_grib \
+	$(GRIB2_MET_LIBS) \
 	-lvx_data2d_nc_pinterp \
-	$(PYTHON_LIBS) \
 	-lvx_data2d_nccf \
+	$(UGRID_MET_LIBS) \
+	$(PYTHON_MET_LIBS) \
 	-lvx_statistics \
 	-lvx_data2d \
-        -lvx_seeps \
+	-lvx_seeps \
 	-lvx_nc_util \
 	-lvx_regrid \
 	-lvx_grid \
@@ -41,7 +43,8 @@ series_analysis_LDADD = -lvx_stat_out \
 	-lvx_math \
 	-lvx_color \
 	-lvx_log \
-	-lm -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
+	$(GRIB2_DEP_LIBS) $(UGRID_DEP_LIBS) $(PYTHON_DEP_LIBS) \
+	-lm -lproj -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
 
 EXTRA_DIST = series_analysis.h \
 	series_analysis_conf_info.h
