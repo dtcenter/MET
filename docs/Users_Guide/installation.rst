@@ -124,7 +124,7 @@ MET Directory Structure
 
 The top-level MET directory consists of  Makefiles, configuration files, and several subdirectories. The top-level Makefile and configuration files control how the entire toolkit is built. Instructions for using these files to build MET can be found in :numref:`Install_Building-the-MET`.
 
-When MET has been successfully built and installed, the installation directory contains two subdirectories. The *bin/* directory contains executables for each module of MET as well as several plotting utilities. The *share/met/* directory contains many subdirectories with data required at runtime and a subdirectory of sample R scripts utilities. The *colortables/*, *map/*, and *ps/* subdirectories contain data used in creating PostScript plots for several MET tools. The *poly/* subdirectory contains predefined lat/lon polyline regions for use in selecting regions over which to verify. The polylines defined correspond to verification regions used by NCEP as described in :numref:`Appendix B, Section %s <appendixB>`. The *config/* directory contains default configuration files for the MET tools. The *python/* subdirectory contains python scripts. The *python/examples* subdirectory contains sample scripts used in Python embedding (:numref:`Appendix F, Section %s <appendixF>`). The *python/pyembed/* subdirectory contains code used in Python embedding (:numref:`Appendix F, Section %s <appendixF>`). The *table_files/* and *tc_data/* subdirectories contain GRIB table definitions and tropical cyclone data, respectively. The *Rscripts/* subdirectory contains a handful of plotting graphic utilities for MET-TC. These are the same Rscripts that reside under the top-level MET *scripts/Rscripts* directory, other than it is the installed location.
+When MET has been successfully built and installed, the installation directory contains two subdirectories. The *bin/* directory contains executables for each module of MET as well as several plotting utilities. The *share/met/* directory contains many subdirectories with data required at runtime and a subdirectory of sample R scripts utilities. The *colortables/*, *map/*, and *ps/* subdirectories contain data used in creating PostScript plots for several MET tools. The *poly/* subdirectory contains predefined lat/lon polyline regions for use in selecting regions over which to verify. The polylines defined correspond to verification regions used by NCEP as described in :numref:`Appendix B, Section %s <appendixB>`. The *config/* directory contains default configuration files for the MET tools. The *python/* subdirectory contains Python scripts. The *python/examples* subdirectory contains sample scripts used in Python embedding (:numref:`Appendix F, Section %s <appendixF>`). The *python/pyembed/* subdirectory contains code used in Python embedding (:numref:`Appendix F, Section %s <appendixF>`). The *table_files/* and *tc_data/* subdirectories contain GRIB table definitions and tropical cyclone data, respectively. The *Rscripts/* subdirectory contains a handful of plotting graphic utilities for MET-TC. These are the same Rscripts that reside under the top-level MET *scripts/Rscripts* directory, other than it is the installed location.
 
 The *data/* directory contains several configuration and static data files used by MET. The *sample_fcst/* and *sample_obs/* subdirectories contain sample data used by the test scripts provided in the *scripts/* directory. 
 
@@ -205,7 +205,7 @@ The following environment variables should also be set:
 
 * If compiling support for GRIB2, set $MET_GRIB2CINC and $MET_GRIB2CLIB to point to the main GRIB2C directory which contains both the include and library files. These are used instead of $MET_GRIB2C since the main GRIB2C directory does not contain include and lib subdirectories.
 
-* If compiling support for PYTHON, set $MET_PYTHON_BIN_EXE to specify the desired python executable to be used. Also set $MET_PYTHON_CC, and $MET_PYTHON_LD to specify the compiler (-I) and linker (-L) flags required for python. Set $MET_PYTHON_CC for the directory containing the "Python.h" header file. Set $MET_PYTHON_LD for the directory containing the python library file and indicate the name of that file. For example:
+* If compiling support for PYTHON, set $MET_PYTHON_BIN_EXE to specify the desired Python executable to be used. Also set $MET_PYTHON_CC, and $MET_PYTHON_LD to specify the compiler (-I) and linker (-L) flags required for Python. Set $MET_PYTHON_CC for the directory containing the "Python.h" header file. Set $MET_PYTHON_LD for the directory containing the Python library file and indicate the name of that file. For example:
 
   .. code-block:: none
 
@@ -215,24 +215,26 @@ The following environment variables should also be set:
 
   Note that this version of Python must include support for a minimum set of required packages. For more information about Python support in MET, including the list of required packages, please refer to :numref:`Appendix F, Section %s <appendixF>`.
 
+* If compiling support for unstructured grids, specify the location of the Atlas and ecKit libraries. Set $MET_ATLAS to point to the main Atlas directory, or set $MET_ATLASINC to point to the directory with the Atlas include files and set $MET_ATLASLIB to point to the directory with the Atlas library files. Set $MET_ECKIT to point to the main ecKit directory, or set $MET_ECKITINC to point to the directory with the ecKit include files and set $MET_ECKITLIB to point to the directory with the ecKit library files. 
 
 * If compiling MODIS-Regrid and/or lidar2nc, set $MET_HDF to point to the main HDF4 directory, or set $MET_HDFINC to point to the directory with the HDF4 include files and set $MET_HDFLIB to point to the directory with the HDF4 library files. Also, set $MET_HDFEOS to point to the main HDF EOS directory, or set $MET_HDFEOSINC to point to the directory with the HDF EOS include files and set $MET_HDFEOSLIB to point to the directory with the HDF EOS library files.
 
 * If compiling MODE Graphics, set $MET_CAIRO to point to the main Cairo directory, or set$MET_CAIROINC to point to the directory with the Cairo include files and set $MET_CAIROLIB to point to the directory with the Cairo library files. Also, set $MET_FREETYPE to point to the main FreeType directory, or set $MET_FREETYPEINC to point to the directory with the FreeType include files and set $MET_FREETYPELIB to point to the directory with the FreeType library files.
 
-*  When running MODE Graphics, set $MET_FONT_DIR to the directory containing font data required at runtime. A link to the tarball containing this font data can be found on the MET website.
+* When running MODE Graphics, set $MET_FONT_DIR to the directory containing font data required at runtime. A link to the tarball containing this font data can be found on the MET website.
 
-For ease of use, you should define these in your .cshrc or equivalent file.
+For ease of use, you should define these in your .cshrc, .bashrc, or equivalent file.
 
 Configure and Execute the Build
 -------------------------------
 
-Example: To configure MET to install all of the available tools in the "bin" subdirectory of your current directory, you would use the following commands:
+Example: To configure MET to install all of the available tools and options in the "bin" subdirectory of your current directory, you would use the following commands:
 
 .. code-block:: none
 
-  1. ./configure --prefix=`pwd` --enable-grib2 --enable-python \
-                 --enable-modis --enable-mode_graphics --enable-lidar2nc
+  1. Type './configure --prefix=`pwd` --enable-all'
+     Note that --enable-all is equivalent to specifying:
+       --enable-grib2 --enable-python --enable-ugrid --enable-modis --enable-mode_graphics --enable-lidar2nc
   2. Type 'make install >& make_install.log &'
   3. Type 'tail -f make_install.log' to view the execution of the make.
   4. When make is finished, type 'CTRL-C' to quit the tail.
@@ -270,6 +272,7 @@ If all tools are enabled and the build is successful, the "*<prefix>/bin*" direc
    - series_analysis
    - shift_data_plane
    - stat_analysis
+   - tc_diag
    - tc_dland
    - tc_gen
    - tc_pairs
@@ -293,15 +296,27 @@ By default, MET will install all the files in "*/usr/local/bin*". You can specif
 
 .. code-block:: none
 
+  --enable-all
+
+Enable the configuration options --enable-grib2, --enable-python, --enable-ugrid, --enable-lidar2nc, --enable-mode_graphics, and --enable-modis, described below.
+
+.. code-block:: none
+
   --enable-grib2
 
-Enable compilation of utilities using GRIB2. Requires $MET_GRIB2C.
+Enable compilation of GRIB2 support. Requires $MET_GRIB2C.
 
 .. code-block:: none
 
   --enable-python
 
-Enable compilation of python interface. Requires $MET_PYTHON_CC and $MET_PYTHON_LD.
+Enable compilation of Python support. Requires $MET_PYTHON_CC and $MET_PYTHON_LD.
+
+.. code-block:: none
+
+  --enable-ugrid
+
+Enable compilation of unstructured grid support. Requires $MET_ATLAS and $MET_ECKIT.
 
 .. code-block:: none
 
