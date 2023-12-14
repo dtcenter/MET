@@ -89,11 +89,8 @@ the terminal while in the directory MET will be installed in:
 
 .. code-block:: ini
 
-  wget https://raw.githubusercontent.com/dtcenter/MET/main_vX.Y/internal/scripts/installation/compile_MET_all.sh
+  wget https://raw.githubusercontent.com/dtcenter/MET/main_v12.0/internal/scripts/installation/compile_MET_all.sh
   wget https://dtcenter.ucar.edu/dfiles/code/METplus/MET/installation/tar_files.met-base-v3.1.tgz
-
-where the X and Y in the first wget command correspond to the latest released version
-of MET.
 
 The tar files will need to be extracted in the MET installation directory:
 
@@ -122,9 +119,7 @@ by using a wget command while in the *tar_files* directory:
 
 .. code-block:: ini
 
-  wget https://github.com/dtcenter/MET/archive/refs/tags/vX.Y.Z.tar.gz
-
-where X, Y, and Z corresponds to the latest released version of MET.
+  wget https://github.com/dtcenter/MET/archive/refs/tags/v12.0.0.tar.gz
 
 .. _Install_Required-libraries-and:
 
