@@ -4,6 +4,12 @@ name: Compilation Options
 
 on:
 
+  # Note that scheduled cron events are run on the default branch.
+  # Enable this schedule when main_v12.0 becomes the default branch.
+
+  #  schedule:
+  #  - cron: '0 7 * * 0''
+
   push:
     tags:
       - 'v**' 
