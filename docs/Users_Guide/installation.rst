@@ -128,7 +128,7 @@ Environment Variables to Run Script
 
 Before running the compilation script, there are five environment variables
 that are required: 
-**TEST_BASE**, **COMPILER**, **MET_SUBDIR**, **MET_TARBALL**, and **USE_MODULES**  
+**TEST_BASE**, **COMPILER**, **MET_SUBDIR**, **MET_TARBALL**, and **USE_MODULES**.  
 If compiling support for Python embedding, the script will need the following
 additional environment variables: **MET_PYTHON**, **MET_PYTHON_CC**, and
 **MET_PYTHON_LD**
@@ -143,32 +143,32 @@ can be found in the `MET GitHub repository <https://github.com/dtcenter/MET>`_ i
 Environment Variable Descriptions
 ---------------------------------
 
-**REQUIRED**
+.. dropdown:: REQUIRED
 
-**TEST_BASE** – Format is */d1/met/12.0.0*. This is the MET installation directory that was created 
-at the beginning of, :ref:`compile_script_install` and contains **compile_MET_all.sh** script, **tar_files.tgz**, 
-and the *tar_files* directory from the untar command.
+    **TEST_BASE** – Format is */d1/met/12.0.0*. This is the MET installation directory that was created 
+     the beginning of, :ref:`compile_script_install` and contains **compile_MET_all.sh** script, **tar_files.tgz**, 
+    and the *tar_files* directory from the untar command.
 
-**COMPILER** – Format is *compiler_version* (e.g. gnu_8.3.0). For the GNU family of compilers, 
-use “gnu”; for the Intel family of compilers, use “intel”, “ics”, “ips”, or “PrgEnv-intel”, 
-depending on the system;  for the oneAPI intel compilers, ensure “oneapi” 
-is in the compiler name. In the past, support was provided for the PGI family of compilers 
-through “pgi”. However, this compiler option is no longer actively tested. 
+    **COMPILER** – Format is *compiler_version* (e.g. gnu_8.3.0). For the GNU family of compilers, 
+    use “gnu”; for the Intel family of compilers, use “intel”, “ics”, “ips”, or “PrgEnv-intel”, 
+    depending on the system;  for the oneAPI intel compilers, ensure “oneapi” 
+    is in the compiler name. In the past, support was provided for the PGI family of compilers 
+    through “pgi”. However, this compiler option is no longer actively tested. 
 
-**MET_SUBDIR** – Format is */d1/met/12.0.0. This is the location where the top-level MET 
-subdirectory will
-be installed and is often set equivalent to **TEST_BASE** (e.g. ${TEST_BASE}).
+    **MET_SUBDIR** – Format is */d1/met/12.0.0. This is the location where the top-level MET 
+    subdirectory will
+    be installed and is often set equivalent to **TEST_BASE** (e.g. ${TEST_BASE}).
 
-**MET_TARBALL** – Format is **v12.0.0tar.gz**. This is the name of the downloaded MET tarball.
+    **MET_TARBALL** – Format is **v12.0.0tar.gz**. This is the name of the downloaded MET tarball.
 
-**USE_MODULES** – Format is TRUE or FALSE. Set to FALSE if using a machine that does not use 
-modulefiles; set to TRUE if using a machine that does use modulefiles. For more information on 
-modulefiles, visit the `wiki page <https://en.wikipedia.org/wiki/Environment_Modules_(software)>`_.
+    **USE_MODULES** – Format is TRUE or FALSE. Set to FALSE if using a machine that does not use 
+    modulefiles; set to TRUE if using a machine that does use modulefiles. For more information on 
+    modulefiles, visit the `wiki page <https://en.wikipedia.org/wiki/Environment_Modules_(software)>`_.
 
-**PYTHON_MODULE** Format is **PythonModuleName_version** (e.g. python_3.10.4). This environment variable 
-is only required if **USE_MODULES** = TRUE. To set properly, list the Python module to load 
-followed by an underscore and version number. For example, setting PYTHON_MODULE=python_3.10.4 
-will cause the script to  run "module load python/3.10.4".
+    **PYTHON_MODULE** Format is **PythonModuleName_version** (e.g. python_3.10.4). This environment variable 
+    is only required if **USE_MODULES** = TRUE. To set properly, list the Python module to load 
+    followed by an underscore and version number. For example, setting PYTHON_MODULE=python_3.10.4 
+    will cause the script to  run "module load python/3.10.4".
 
 
 .. dropdown:: REQUIRED, IF COMPILING PYTHON EMBEDDING
@@ -191,7 +191,7 @@ will cause the script to  run "module load python/3.10.4".
     This information may be obtained by running :code:`python3-config --ldflags --embed`; however,
     this command can, on certain systems, provide too much information.
 
-    **OPTIONAL**
+.. dropdown:: OPTIONAL
 
     **export MAKE_ARGS=-j #** – If there is a need to install external libraries, or to attempt 
     to speed up the MET compilation process, this environmental setting can be added to the 
