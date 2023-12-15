@@ -80,9 +80,9 @@ To begin, create and change to a directory where the latest version of MET will 
 installed. Assuming that the following guidance uses “/d1” as the parent directory, 
 a suggested format is a path to a “met” directory, followed by the version number 
 subdirectory (e.g. /d1/met/12.0.0). 
-Next, download the `**compile_MET_all.sh** <https://raw.githubusercontent.com/dtcenter/MET/main_v11.0/internal/scripts/installation/compile_MET_all.sh>`_
+Next, download the `compile_MET_all.sh <https://raw.githubusercontent.com/dtcenter/MET/main_v11.0/internal/scripts/installation/compile_MET_all.sh>`_
 script and 
-`**tar_files.tgz** <https://dtcenter.ucar.edu/dfiles/code/METplus/MET/installation/tar_files.met-base-v3.1.tgz>`_
+`tar_files.tgz <https://dtcenter.ucar.edu/dfiles/code/METplus/MET/installation/tar_files.met-base-v3.1.tgz>`_
 and place both of these in the new directory. These files are available either
 through using the hyperlinks provided or by entering the following commands in
 the terminal while in the directory MET will be installed in:
@@ -155,17 +155,17 @@ Environment Variable Descriptions
     is in the compiler name. In the past, support was provided for the PGI family of compilers 
     through “pgi”. However, this compiler option is no longer actively tested. 
 
-    **MET_SUBDIR** – Format is */d1/met/12.0.0. This is the location where the top-level MET 
+    **MET_SUBDIR** – Format is /d1/met/12.0.0. This is the location where the top-level MET 
     subdirectory will
     be installed and is often set equivalent to **TEST_BASE** (e.g. ${TEST_BASE}).
 
-    **MET_TARBALL** – Format is **v12.0.0tar.gz**. This is the name of the downloaded MET tarball.
+    **MET_TARBALL** – Format is *v12.0.0tar.gz*. This is the name of the downloaded MET tarball.
 
-    **USE_MODULES** – Format is TRUE or FALSE. Set to FALSE if using a machine that does not use 
+    **USE_MODULES** – Format is *TRUE* or *FALSE*. Set to FALSE if using a machine that does not use 
     modulefiles; set to TRUE if using a machine that does use modulefiles. For more information on 
     modulefiles, visit the `wiki page <https://en.wikipedia.org/wiki/Environment_Modules_(software)>`_.
 
-    **PYTHON_MODULE** Format is **PythonModuleName_version** (e.g. python_3.10.4). This environment variable 
+    **PYTHON_MODULE** Format is *PythonModuleName_version* (e.g. python_3.10.4). This environment variable 
     is only required if **USE_MODULES** = TRUE. To set properly, list the Python module to load 
     followed by an underscore and version number. For example, setting PYTHON_MODULE=python_3.10.4 
     will cause the script to run "module load python/3.10.4".
