@@ -1,6 +1,6 @@
 name: Compilation Options
 
-# Test MET configuration/compilation options for all tags
+# Test matrix of MET configuration/compilation options
 
 on:
 
@@ -12,20 +12,9 @@ on:
 
   push:
 
-    # NOTE: This branches entry is only for testing.
-    #       Delete prior to merging into develop.
-    branches:
-      - bugfix_2760_develop_enable_python
     tags:
-      - 'v**' 
-    paths-ignore:
-      - 'docs/**'
-      - '.github/pull_request_template.md'
-      - '.github/ISSUE_TEMPLATE/**'
-      - '.github/labels/**'
-      - '**/README.md'
-      - '**/LICENSE.md'
-      
+      - '**' 
+
   workflow_dispatch:
 
 env:
