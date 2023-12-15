@@ -205,7 +205,7 @@ Environment Variable Descriptions
 External Library Handling in compile_MET_all.sh
 -----------------------------------------------
 
-**Having the Compilation Script Download the Library Dependencies**
+**IF THE USER WANTS TO HAVE THE COMPILATION SCRIPT DOWNLOAD THE LIBRARY DEPENDENCIES**
 
 The **compile_MET_all.sh** script will compile and install MET and its required external 
 library dependencies
@@ -214,7 +214,7 @@ Note that if these libraries are already installed somewhere on the system,
 MET will call and use the libraries that were installed by the script. 
 
 
-**If the Library Dependencies Are Already Installed**
+**IF THE USER ALREADY HAS THE LIBRARY DEPENDENCIES INSTALLED**
 
 If the required external library dependencies have already been installed and don’t 
 need to be reinstalled, or if compiling MET on a machine that uses modulefiles and 
@@ -223,12 +223,12 @@ there are more environment variables that need to be set to let MET know where t
 library and header files are. The following environment variables need to be added 
 to the environment configuration file: 
 **MET_GRIB2CLIB**, **MET_GRIB2CINC**, **GRIB2CLIB_NAME**, **MET_BUFRLIB**,
-**BUFRLIB_NAME**, **MET_HDF5**, **MET_NETCDF**, **MET_GSL**, **LIB_JASPER**,
-**LIB_PNG**, **LIB_Z**. 
+**BUFRLIB_NAME**, **MET_PROJ**, **MET_HDF5**, **MET_NETCDF**, 
+**MET_GSL**, **LIB_JASPER**, **LIB_PNG**, **LIB_Z**. 
 
 Generally speaking, for each library there is a set of three environment variables to 
 describe the locations: 
-$MET_<lib>, $MET_<lib>INC and $MET_<lib>LIB.
+**$MET_<lib>**, **$MET_<lib>INC** and **$MET_<lib>LIB**.
 
 The $MET_<lib> environment variable can be used if the external library is 
 installed such that there is a main directory which has a subdirectory called 
@@ -242,9 +242,10 @@ $MET_<lib> variable will be ignored.
 
 **Final Note on External Libraries**
 
-For users wishing to run the Plot-MODE-Field tool, the Ghostscript font data must be 
-downloaded into the **TEST_BASE** directory and set the **MET_FONT_DIR** environment variable 
-in the install_met_env.<machine_name> file to point to the directory containing those fonts.
+For users wishing to run the Plot-MODE-Field tool, the Ghostscript 
+`font data <http://sourceforge.net/projects/gs-fonts>`_ must be 
+downloaded and the **MET_FONT_DIR** environment variable in the 
+**install_met_env.<machine_name>** file should point to the directory containing those fonts.
 
 Executing the compile_MET_all.sh script
 ---------------------------------------
