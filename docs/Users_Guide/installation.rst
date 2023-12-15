@@ -146,7 +146,7 @@ Environment Variable Descriptions
 .. dropdown:: REQUIRED
 
     **TEST_BASE** – Format is */d1/met/12.0.0*. This is the MET installation directory that was created 
-     the beginning of, :ref:`compile_script_install` and contains **compile_MET_all.sh** script, **tar_files.tgz**, 
+    the beginning of, :ref:`compile_script_install` and contains **compile_MET_all.sh** script, **tar_files.tgz**, 
     and the *tar_files* directory from the untar command.
 
     **COMPILER** – Format is *compiler_version* (e.g. gnu_8.3.0). For the GNU family of compilers, 
