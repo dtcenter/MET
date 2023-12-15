@@ -51,6 +51,7 @@ jobs:
   compile:
     name: Config Opts
     runs-on: ubuntu-latest
+    needs: job_control
     strategy:
       matrix:
         config_opts:
