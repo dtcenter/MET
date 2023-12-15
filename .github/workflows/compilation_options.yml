@@ -30,8 +30,26 @@ on:
 
 jobs:
 
+  job_control:
+    name: Determine which jobs to run
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set job controls
+        id: job_status
+        run: .github/jobs/set_job_controls.sh
+        env:
+          commit_msg: ${{ github.event.head_commit.message }}
+          force_tests: ${{ github.event.inputs.force_tests }}
+
+    outputs:
+      met_base_repo: ${{ steps.job_status.outputs.met_base_repo }}
+      met_base_tag: ${{ steps.job_status.outputs.met_base_tag }}
+      branch_name: ${{ steps.job_status.outputs.branch_name }}
+
   compile:
-    name: Compile MET enable options
+    name: Config Opts
     runs-on: ubuntu-latest
     strategy:
       matrix:
