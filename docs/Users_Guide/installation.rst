@@ -240,7 +240,7 @@ library and include files for an external library are installed in separate loca
 In this case, both environment variables must be specified and the associated 
 $MET_<lib> variable will be ignored.
 
-**Final Note on External Libraries**
+**FINAL NOTE ON EXTERNAL LIBRARIES**
 
 For users wishing to run the Plot-MODE-Field tool, the Ghostscript 
 `font data <http://sourceforge.net/projects/gs-fonts>`_ must be 
@@ -251,20 +251,30 @@ Executing the compile_MET_all.sh script
 ---------------------------------------
 
 With the proper files downloaded and the environment configuration file set to the 
-particular system’s needs, MET is ready for installation. 
+particular system’s needs, MET is ready for installation. The screenshot below shows the 
+contents of the installation directory followed by the tar_files subdirectory at 
+this step on the machine ‘hera’.
+
+.. image:: figure/installation_dir.png
+
 Simply enter the following into the terminal to execute the script:
 
 .. code-block:: ini
 
   ./compile_MET_all.sh install_met_env.<machine_name>
 
+The screenshot below shows the contents of the installation directory after installation:
+
+.. image:: figure/installation_dir_after.png
+
 To confirm that MET was installed successfully, users are encouraged to run 
 the following command to ensure the installation test scripts ran successfully:
 
-  grep -i error MET*/met.make_test.log
+  grep -i error MET12.0.0/met.make_test.log
   
 which should return nothing if there were no errors.
 
+If no errors are returned, the installation was successful.
 Due to the highly variable nature of hardware systems, users may encounter issues during 
 the installation process that result in MET not being installed. If this occurs please 
 first recheck that the locations of all the necessary data files and scripts is correct. 
