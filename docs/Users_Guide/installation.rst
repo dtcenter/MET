@@ -310,7 +310,7 @@ Enable compilation of GRIB2 support. Requires $MET_GRIB2C.
 
   --enable-python
 
-Enable compilation of Python support. Requires $MET_PYTHON_CC and $MET_PYTHON_LD.
+Enable compilation of Python embedding support. Requires $MET_PYTHON_CC and $MET_PYTHON_LD.
 
 .. code-block:: none
 
@@ -322,7 +322,7 @@ Enable compilation of unstructured grid support. Requires $MET_ATLAS and $MET_EC
 
   --enable-lidar2nc
   
-Enable compilation of utilities using the LIDAR2NC tool.
+Enable compilation of the LIDAR2NC tool. Requires $MET_HDF.
 
 .. code-block:: none
 
