@@ -167,8 +167,8 @@ Environment Variable Descriptions
 
     **PYTHON_MODULE** Format is **PythonModuleName_version** (e.g. python_3.10.4). This environment variable 
     is only required if **USE_MODULES** = TRUE. To set properly, list the Python module to load 
-    followed by an underscore and version number. For example, setting **PYTHON_MODULE**=python_3.10.4 
-    will cause the script to  run :code:`module load python/3.10.4`.
+    followed by an underscore and version number. For example, setting PYTHON_MODULE=python_3.10.4 
+    will cause the script to run "module load python/3.10.4".
 
 
 .. dropdown:: REQUIRED, IF COMPILING PYTHON EMBEDDING
