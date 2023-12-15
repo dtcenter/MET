@@ -405,16 +405,17 @@ bool process_point_data_list(PyObject *python_point_data, MetPointDataPython &me
 
    }   //  for j
 
-   met_pd_out.set_use_var_id(use_var_id);
-   mlog << Debug(9) << method_name << "use_var_id: \"" << use_var_id
-        << "\" from python.  is_using_var_id(): " << met_pd_out.is_using_var_id() << "\n";
-
-   if (hid <= 0) {
+   int h_cnt = hid + 1; // hid starts with -1
+   if (h_cnt < 0) {
       mlog << Error << "\n" << method_name
            << "The header is empty. Please check the python script and input\n\n";
       exit (1);
    }
-   met_pd_out.set_hdr_cnt(hid + 1);
+   met_pd_out.set_hdr_cnt(h_cnt);
+
+   met_pd_out.set_use_var_id(use_var_id);
+   mlog << Debug(9) << method_name << "use_var_id: \"" << use_var_id
+        << "\" from python.  is_using_var_id(): " << met_pd_out.is_using_var_id() << "\n";
 
    check_obs_data(obs_data, use_var_id, method_name);
    check_header_data(header_data, method_name);
