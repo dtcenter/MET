@@ -146,7 +146,7 @@ Environment Variable Descriptions
 .. dropdown:: REQUIRED
 
     **TEST_BASE** – Format is */d1/met/12.0.0*. This is the MET installation directory that was created 
-    the beginning of, :ref:`compile_script_install` and contains **compile_MET_all.sh** script, **tar_files.tgz**, 
+    the beginning of, :numref:`compile_script_install` and contains **compile_MET_all.sh** script, **tar_files.tgz**, 
     and the *tar_files* directory from the untar command.
 
     **COMPILER** – Format is *compiler_version* (e.g. gnu_8.3.0). For the GNU family of compilers, 
@@ -167,8 +167,8 @@ Environment Variable Descriptions
 
     **PYTHON_MODULE** Format is **PythonModuleName_version** (e.g. python_3.10.4). This environment variable 
     is only required if **USE_MODULES** = TRUE. To set properly, list the Python module to load 
-    followed by an underscore and version number. For example, setting PYTHON_MODULE=python_3.10.4 
-    will cause the script to  run "module load python/3.10.4".
+    followed by an underscore and version number. For example, setting **PYTHON_MODULE**=python_3.10.4 
+    will cause the script to  run :code: `module load python/3.10.4`.
 
 
 .. dropdown:: REQUIRED, IF COMPILING PYTHON EMBEDDING
