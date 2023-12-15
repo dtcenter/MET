@@ -80,9 +80,9 @@ fi
 
 # Configure the variables. The help text will appear if the user uses "configure --help".
 
-AC_ARG_VAR([MET_ECKIT], [Where eckit lib and include subdirectories are located. If they are installed in /usr/local, you don't have to specify them.])
-AC_ARG_VAR([MET_ECKITINC], [Where eckit include files are located. Use if the libraries and include files are not under the same main eckit directory. If used, MET_ECKITLIB must also be defined and MET_ECKIT will be ignored.])
-AC_ARG_VAR([MET_ECKITLIB], [Where eckit libraries are located. Use if the libraries and include files are not under the same main eckit directory. If used, MET_ECKITINC must also be defined and MET_ECKIT will be ignored.])
+AC_ARG_VAR([MET_ECKIT], [Where ecKit lib and include subdirectories are located. If they are installed in /usr/local, you don't have to specify them.])
+AC_ARG_VAR([MET_ECKITINC], [Where ecKit include files are located. Use if the libraries and include files are not under the same main ecKit directory. If used, MET_ECKITLIB must also be defined and MET_ECKIT will be ignored.])
+AC_ARG_VAR([MET_ECKITLIB], [Where ecKit libraries are located. Use if the libraries and include files are not under the same main ecKit directory. If used, MET_ECKITINC must also be defined and MET_ECKIT will be ignored.])
 
 # Ensure that both or neither are specified.
 
@@ -204,9 +204,9 @@ fi
 
 # Configure the variables. The help text will appear if the user uses "configure --help".
 
-AC_ARG_VAR([MET_PYTHON_BIN_EXE], [Full path to the python executable corresponding to MET_PYTHON_CC and MET_PYTHON_LD, e.g. /usr/bin/python3.])
-AC_ARG_VAR([MET_PYTHON_CC], [Where the python header files are located, e.g. -I<include dir>. Set to the output of 'python3-config --cflags'.])
-AC_ARG_VAR([MET_PYTHON_LD], [Where the python library files are located, e.g. -L<lib dir>, followed by the python library names, e.g. -l<library>. Set to the output of 'python3-config --ldflags'.])
+AC_ARG_VAR([MET_PYTHON_BIN_EXE], [Full path to the Python executable corresponding to MET_PYTHON_CC and MET_PYTHON_LD, e.g. /usr/bin/python3.])
+AC_ARG_VAR([MET_PYTHON_CC], [Where the Python header files are located, e.g. -I<include dir>. Set to the output of 'python3-config --cflags'.])
+AC_ARG_VAR([MET_PYTHON_LD], [Where the Python library files are located, e.g. -L<lib dir>, followed by the Python library names, e.g. -l<library>. Set to the output of 'python3-config --ldflags'.])
 
 # Ensure that all or none are specified.
 
@@ -430,6 +430,23 @@ fi
 # Process any enable flags specified by the user
 #
 
+# Enable all compilation options 
+
+AC_ARG_ENABLE(all,
+	  [AS_HELP_STRING([--enable-all], [Enable compilation options --enable-grib2 --enable-python --enable-ugrid --enable-lidar2nc --enable-modis --enable-mode_graphics])],
+  [case "${enableval}" in
+     yes | no ) ENABLE_ALL="${enableval}" ;;
+     *) AC_MSG_ERROR(bad value ${enableval} for --enable-all) ;;
+   esac],
+  [ENABLE_ALL="no"]
+)
+
+AM_CONDITIONAL([ENABLE_ALL], [test "x$ENABLE_ALL" = "xyes"])
+
+if test "x$ENABLE_ALL" = "xyes"; then
+  AC_MSG_NOTICE([all options will be compiled])
+fi
+
 # BLOCK4
 
 AC_ARG_ENABLE(block4,
@@ -496,14 +513,14 @@ AC_ARG_ENABLE(lidar2nc,
      [AS_HELP_STRING([--enable-lidar2nc], [Enable compilation of lidar2nc])],
   [case "${enableval}" in
      yes | no ) ENABLE_LIDAR2NC="${enableval}" ;;
-     *) AC_MSG_ERROR(bad value ${enableval} for --disable-lidar2nc) ;;
+     *) AC_MSG_ERROR(bad value ${enableval} for --enable-lidar2nc) ;;
    esac],
   [ENABLE_LIDAR2NC="no"]
 )
 
-AM_CONDITIONAL([ENABLE_LIDAR2NC], [test "x$ENABLE_LIDAR2NC" = "xyes"])
+AM_CONDITIONAL([ENABLE_LIDAR2NC], [test "x$ENABLE_LIDAR2NC" = "xyes" || test "x$ENABLE_ALL" = "xyes"])
 
-if test "x$ENABLE_LIDAR2NC" = "xyes"; then
+if test "x$ENABLE_LIDAR2NC" = "xyes" || test "x$ENABLE_ALL" = "xyes"; then
   AC_DEFINE([ENABLE_LIDAR2NC], [], ["build lidar2nc"])
   AC_MSG_NOTICE([lidar2nc will be compiled])
 else
@@ -939,14 +956,14 @@ AC_ARG_ENABLE(modis,
 	  [AS_HELP_STRING([--enable-modis], [Enable compilation of modis])],
   [case "${enableval}" in
      yes | no ) ENABLE_MODIS="${enableval}" ;;
-     *) AC_MSG_ERROR(bad value ${enableval} for --disable-modis) ;;
+     *) AC_MSG_ERROR(bad value ${enableval} for --enable-modis) ;;
    esac],
   [ENABLE_MODIS="no"]
 )
 
-AM_CONDITIONAL([ENABLE_MODIS], [test "x$ENABLE_MODIS" = "xyes"])
+AM_CONDITIONAL([ENABLE_MODIS], [test "x$ENABLE_MODIS" = "xyes" || test "x$ENABLE_ALL" = "xyes"])
 
-if test "x$ENABLE_MODIS" = "xyes"; then
+if test "x$ENABLE_MODIS" = "xyes" || test "x$ENABLE_ALL" = "xyes"; then
   AC_DEFINE([ENABLE_MODIS], [], ["build modis"])
   AC_MSG_NOTICE([modis will be compiled])
 else
@@ -964,9 +981,9 @@ AC_ARG_ENABLE(mode_graphics,
   [ENABLE_MODE_GRAPHICS="no"]
 )
 
-AM_CONDITIONAL([ENABLE_MODE_GRAPHICS], [test "x$ENABLE_MODE_GRAPHICS" = "xyes"])
+AM_CONDITIONAL([ENABLE_MODE_GRAPHICS], [test "x$ENABLE_MODE_GRAPHICS" = "xyes" || test "x$ENABLE_ALL" = "xyes"])
 
-if test "x$ENABLE_MODE_GRAPHICS" = "xyes"; then
+if test "x$ENABLE_MODE_GRAPHICS" = "xyes" || test "x$ENABLE_ALL" = "xyes"; then
   AC_DEFINE([ENABLE_MODE_GRAPHICS], [], ["build mode_graphics"])
   AC_MSG_NOTICE([mode_graphics will be compiled])
 else
@@ -1036,7 +1053,7 @@ fi
 # GRIB2
 
 AC_ARG_ENABLE(grib2,
-	  [AS_HELP_STRING([--enable-grib2], [Enable compilation of utilities using GRIB2])],
+	  [AS_HELP_STRING([--enable-grib2], [Enable compilation of GRIB2 support])],
   [case "${enableval}" in
      yes | no ) ENABLE_GRIB2="${enableval}" ;;
      *) AC_MSG_ERROR(bad value ${enableval} for --enable-grib2) ;;
@@ -1044,12 +1061,12 @@ AC_ARG_ENABLE(grib2,
   [ENABLE_GRIB2="no"]
 )
 
-AM_CONDITIONAL([ENABLE_GRIB2], [test "x$ENABLE_GRIB2" = "xyes"])
+AM_CONDITIONAL([ENABLE_GRIB2], [test "x$ENABLE_GRIB2" = "xyes" || test "x$ENABLE_ALL" = "xyes"])
 AM_CONDITIONAL([GRIB2CLIB_NAME_SET], [test ! -z "$GRIB2CLIB_NAME"])
 
-if test "x$ENABLE_GRIB2" = "xyes"; then
-  AC_DEFINE([ENABLE_GRIB2], [], ["build GRIB2 utilities"])
-  AC_MSG_NOTICE([GRIB2 utilites will be compiled])
+if test "x$ENABLE_GRIB2" = "xyes" || test "x$ENABLE_ALL" = "xyes"; then
+  AC_DEFINE([ENABLE_GRIB2], [], ["build GRIB2 support"])
+  AC_MSG_NOTICE([GRIB2 support will be compiled])
   CPPFLAGS="${CPPFLAGS} -DWITH_GRIB2"
     AC_SUBST([GRIB2CLIB_NAME])
   AC_MSG_NOTICE([GRIB2CLIB_NAME will be set])
@@ -1061,7 +1078,7 @@ if test "x$ENABLE_GRIB2" = "xyes"; then
        GRIB2_DEP_LIBS="${GRIB2CLIB_NAME} -ljasper -lpng -lz"
     fi
 else
-  AC_MSG_NOTICE([GRIB2 utilities will not be compiled])
+  AC_MSG_NOTICE([GRIB2 support will not be compiled])
     GRIB2_MET_LIBS=
     GRIB2_DEP_LIBS=
 fi
@@ -1071,7 +1088,7 @@ AC_SUBST([GRIB2_DEP_LIBS])
 # Python
 
 AC_ARG_ENABLE(python,
-	  [AS_HELP_STRING([--enable-python], [Enable python embedding])],
+	  [AS_HELP_STRING([--enable-python], [Enable compilation of Python embedding support])],
   [case "${enableval}" in
      yes | no ) ENABLE_PYTHON="${enableval}" ;;
      *) AC_MSG_ERROR(bad value ${enableval} for --enable-python) ;;
@@ -1079,16 +1096,16 @@ AC_ARG_ENABLE(python,
   [ENABLE_PYTHON="no"]
 )
 
-AM_CONDITIONAL([ENABLE_PYTHON], [test "x$ENABLE_PYTHON" = "xyes"])
+AM_CONDITIONAL([ENABLE_PYTHON], [test "x$ENABLE_PYTHON" = "xyes" || test "x$ENABLE_ALL" = "xyes"])
 
-if test "x$ENABLE_PYTHON" = "xyes"; then
-  AC_DEFINE([ENABLE_PYTHON], [], ["build python embedding"])
-  AC_MSG_NOTICE([python embedding will be compiled])
+if test "x$ENABLE_PYTHON" = "xyes" || test "x$ENABLE_ALL" = "xyes"; then
+  AC_DEFINE([ENABLE_PYTHON], [], ["build Python embedding support"])
+  AC_MSG_NOTICE([Python embedding support will be compiled])
   CPPFLAGS="${CPPFLAGS} -DWITH_PYTHON"
   PYTHON_MET_LIBS="-lvx_data2d_python -lvx_pointdata_python -lvx_python3_utils"
   PYTHON_DEP_LIBS="${MET_PYTHON_LD}"
 else
-  AC_MSG_NOTICE([python embedding will not be compiled])
+  AC_MSG_NOTICE([Python embedding support will not be compiled])
   PYTHON_MET_LIBS=
   PYTHON_DEP_LIBS=
 fi
@@ -1098,7 +1115,7 @@ AC_SUBST([PYTHON_DEP_LIBS])
 # Unstructure grid with ECMF libraries (Atlas/ecKit)
 
 AC_ARG_ENABLE(ugrid,
-	  [AS_HELP_STRING([--enable-ugrid], [Enable unstructured grid with Atlas and eckit libraries])],
+	  [AS_HELP_STRING([--enable-ugrid], [Enable compilation of unstructured grid support with the Atlas and ecKit libraries])],
   [case "${enableval}" in
      yes | no ) ENABLE_UGRID="${enableval}" ;;
      *) AC_MSG_ERROR(bad value ${enableval} for --enable-ugrid) ;;
@@ -1106,17 +1123,17 @@ AC_ARG_ENABLE(ugrid,
   [ENABLE_UGRID="no"]
 )
 
-AM_CONDITIONAL([ENABLE_UGRID], [test "x$ENABLE_UGRID" = "xyes"])
+AM_CONDITIONAL([ENABLE_UGRID], [test "x$ENABLE_UGRID" = "xyes" || test "x$ENABLE_ALL" = "xyes"])
 
-if test "x$ENABLE_UGRID" = "xyes"; then
-  AC_DEFINE([ENABLE_UGRID], [], ["build unstructured grid with Atlas and eckit libraries"])
-  AC_MSG_NOTICE([unstructured grid will be compiled])
+if test "x$ENABLE_UGRID" = "xyes" || test "x$ENABLE_ALL" = "xyes"; then
+  AC_DEFINE([ENABLE_UGRID], [], ["build unstructured grid support"])
+  AC_MSG_NOTICE([unstructured grid support will be compiled])
   CPPFLAGS="${CPPFLAGS} -I${MET_ATLASINC} -I${MET_ECKITINC} -DWITH_UGRID"
   LDFLAGS="${LDFLAGS} -L${MET_ATLASLIB} -L${MET_ECKITLIB} -Wl,-rpath,${MET_ATLASLIB}:${MET_ECKITLIB}"
   UGRID_MET_LIBS="-lvx_data2d_ugrid"
   UGRID_DEP_LIBS="-latlas -leckit -leckit_mpi -leckit_geometry"
 else
-  AC_MSG_NOTICE([unstructured grid will not be compiled])
+  AC_MSG_NOTICE([unstructured grid support will not be compiled])
   UGRID_MET_LIBS=
   UGRID_DEP_LIBS=
 fi
