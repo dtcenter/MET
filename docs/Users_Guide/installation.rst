@@ -463,7 +463,7 @@ be used otherwise the instance will continue to run in the background:
 
 .. code-block:: ini
 
-    singularity instance stop /path/to/container/met-|version|.sif met-|version|  
+    singularity instance stop /path/to/container/met-12.0.0.sif met-12.0.0  
 
 Now that MET is successfully installed, it is highly recommended to
 next install the METplus wrappers to take full advantage of
