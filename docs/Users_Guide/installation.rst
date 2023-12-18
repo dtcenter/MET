@@ -19,6 +19,13 @@ compilation script, Docker instances, and Apptainer/Singularity instances.
 All of these methods will be described below. The recommended method is
 :ref:`compile_script_install`.
 
+Some organizations have access to precompiled versions of MET on
+shared systems, making the need for self-installation unnecessary.
+Users should check the
+`METplus Downloads page<https://dtcenter.org/community-code/metplus/download>`_
+for the latest coordinated release’s Existing Builds page for
+existing MET installations before continuing.
+
 .. _required_external_libraries_to_build_MET:
 
 Required External Libraries
@@ -27,22 +34,39 @@ Required External Libraries
 MET is dependent on several external libraries to function properly.
 The required libraries are listed below:
 
-* `BUFRLIB <https://emc.ncep.noaa.gov/emc/pages/infrastructure/bufrlib.php>`_ for reading PrepBufr Observation files
-* `NetCDF4 <http://www.unidata.ucar.edu/software/netcdf>`_ in C and CXX, for intermediate and output file formats
-* `HDF5 <https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.12/hdf5-1.12.2/src/hdf5-1.12.2.tar.gz>`__ is required to support NetCDF 4. HDF5 should be built with `zlib <http://www.zlib.net/>`_.
-* `GSL <http://www.gnu.org/software/gsl>`_ GNU Scientific Library Developer's Version for computing confidence intervals (use **GSL-1.11** for **PGI** compilers)
-* `GRIB2C <http://www.nco.ncep.noaa.gov/pmb/codes/GRIB2>`_ Library (with dependencies Z, PNG, JASPER), if compiling GRIB2 support.
+* `BUFRLIB <https://emc.ncep.noaa.gov/emc/pages/infrastructure/bufrlib.php>`_
+  for reading PrepBufr Observation files
+* `NetCDF4 <http://www.unidata.ucar.edu/software/netcdf>`_
+  in C and CXX, for intermediate and output file formats
+* `HDF5 <https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.12/hdf5-1.12.2/src/hdf5-1.12.2.tar.gz>`__
+  is required to support NetCDF 4. HDF5 should be built with
+  `zlib <http://www.zlib.net/>`_.
+* `GSL <http://www.gnu.org/software/gsl>`_
+  GNU Scientific Library Developer's Version for computing
+  confidence intervals (use **GSL-1.11** for **PGI** compilers)
 * `Proj <https://proj.org/>`_ Library used to instantiate grids within MET
 
 The following libraries are conditionally required, depending on the intended verification use and compiler language:
 
-* `ecKit <https://github.com/ecmwf/eckit>`_ Library, if compiling support for unstructured grids
-* `ATLAS <https://math-atlas.sourceforge.net/>`_ Library, if compiling support for unstructured grids
-* `HDF4 <http://www.hdfgroup.org/products/hdf4>`__ library if compiling the MODIS-Regrid or lidar2nc tool.
-* `HDF-EOS2 <http://www.hdfgroup.org/hdfeos.html>`__ library if compiling the MODIS-Regrid or lidar2nc tool.
-* `Cairo <http://cairographics.org/releases>`_ library if compiling the MODE-Graphics tool.
-* `FreeType <http://www.freetype.org/download.html>`_ library if compiling the MODE-Graphics tool.
-* `f2c <http://www.netlib.org/f2c>`_ library for interfacing between Fortran and C (**Not required for most compilers**)
+* `GRIB2C Library <https://github.com/NOAA-EMC/NCEPLIBS-g2c>`_
+  (with dependencies Z, PNG, JASPER), if compiling GRIB2 support.
+* `Python Libraries <https://docs.python.org/3/>`_,
+  if compiling support for Python embedding.
+* `ecKit <https://github.com/ecmwf/eckit>`_
+  Library, if compiling support for unstructured grids
+* `ATLAS <https://math-atlas.sourceforge.net/>`_
+  Library, if compiling support for unstructured grids
+* `HDF4 <http://www.hdfgroup.org/products/hdf4>`__
+  library if compiling the MODIS-Regrid or lidar2nc tool.
+* `HDF-EOS2 <http://www.hdfgroup.org/hdfeos.html>`__
+  library if compiling the MODIS-Regrid or lidar2nc tool.
+* `Cairo <http://cairographics.org/releases>`_
+  library if compiling the MODE-Graphics tool.
+* `FreeType <http://www.freetype.org/download.html>`_
+  library if compiling the MODE-Graphics tool.
+* `f2c <http://www.netlib.org/f2c>`_
+  library for interfacing between Fortran and C
+  (**Not required for most compilers**)
 
 Users can take advantage of the compilation script to download and install all of the 
 libraries automatically, both required and conditionally required 
@@ -167,7 +191,8 @@ Environment Variable Descriptions
 
     **PYTHON_MODULE** Format is *PythonModuleName_version* (e.g. python_3.10.4). This environment variable 
     is only required if **USE_MODULES** = TRUE. To set properly, list the Python module to load 
-    followed by an underscore and version number. For example, setting PYTHON_MODULE=python_3.10.4 
+    followed by an underscore and version number. For example, setting
+    **PYTHON_MODULE** =python_3.10.4 
     will cause the script to run "module load python/3.10.4".
 
 
@@ -222,9 +247,15 @@ the user would like to make use of the existing dependent libraries on that mach
 there are more environment variables that need to be set to let MET know where those 
 library and header files are. The following environment variables need to be added 
 to the environment configuration file: 
-**MET_GRIB2CLIB**, **MET_GRIB2CINC**, **GRIB2CLIB_NAME**, **MET_BUFRLIB**,
-**BUFRLIB_NAME**, **MET_PROJ**, **MET_HDF5**, **MET_NETCDF**, 
-**MET_GSL**, **LIB_JASPER**, **LIB_PNG**, **LIB_Z**. 
+
+**Always Required:**
+**MET_BUFRLIB**, **BUFRLIB_NAME**, **MET_PROJ**, **MET_HDF5**, **MET_NETCDF**, 
+**MET_GSL.**
+
+**Optional, Depending on Configuration Options: MET_GRIB2CLIB, MET_GRIB2CINC,
+GRIB2CLIB_NAME, LIB_JASPER, LIB_PNG, LIB_Z, MET_ATLAS, MET_ECKIT,
+MET_HDF, MET_HDFEOS, MET_CAIRO, MET_FREETYPE, MET_PYTHON_BIN_EXE, MET_PYTHON_CC,
+MET_PYTHON_LD.**
 
 Generally speaking, for each library there is a set of three environment variables to 
 describe the locations: 
@@ -349,7 +380,7 @@ This is accomplished with the command:
 
   docker run -it --rm dtcenter/met /bin/bash
 
-Note that the --rm command was added to automatically remove the
+Note that the ""--rm"" command was added to automatically remove the
 container created 
 from the image once exiting Docker. Simply remove this command if the 
 container should persist after exiting. If there is an error
@@ -441,68 +472,4 @@ and run through the examples that only utilize the MET processes
 (METplus wrapper applications and commands will not work unless
 METplus wrappers is also installed).
 
-EXTRA MATERIAL, MAY NEED SOMEWHERE ELSE:
-
-.. _met_directory_structure:
-
-MET Directory Structure
-=======================
-
-The top-level MET directory consists of Makefiles, configuration files,
-and several subdirectories. The top-level Makefile and configuration
-files control how the entire toolkit is built.
-
-When MET has been successfully built and installed, the installation
-directory contains two subdirectories. The *bin/* directory contains
-executables for each module of MET as well as several plotting utilities.
-The *share/met/* directory contains many subdirectories with data
-required at runtime and a subdirectory of sample R scripts utilities.
-The *colortables/*, *map/*, and *ps/* subdirectories contain data used
-in creating PostScript plots for several MET tools. The *poly/*
-subdirectory contains predefined lat/lon polyline regions for use in
-selecting regions over which to verify. The polylines defined
-correspond to verification regions used by NCEP as described in
-:numref:`Appendix B, Section %s <appendixB>`.
-The *config/* directory contains default configuration files for
-the MET tools. The *python/* subdirectory contains python scripts.
-The *python/examples* subdirectory contains sample scripts used in
-Python embedding (:numref:`Appendix F, Section %s <appendixF>`).
-The *python/pyembed/* subdirectory contains code used in Python
-embedding (:numref:`Appendix F, Section %s <appendixF>`).
-The *table_files/* and *tc_data/* subdirectories contain GRIB
-table definitions and tropical cyclone data, respectively.
-The *Rscripts/* subdirectory contains a handful of plotting graphic
-utilities for MET-TC. These are the same Rscripts that reside under
-the top-level MET *scripts/Rscripts* directory, other than it is
-the installed location.
-
-The *data/* directory contains several configuration and static
-data files used by MET. The *sample_fcst/* and *sample_obs/*
-subdirectories contain sample data used by the test scripts provided
-in the *scripts/* directory.
-
-The *docs/* directory contains the Sphinx documentation for MET.
-
-The *out/* directory will be populated with sample output from the test cases described in the next section.
-
-The *src/* directory contains the source code for each of the tools in MET.
-
-The *scripts/* directory contains test scripts that are run by make
-test after MET has been successfully built, and a directory of sample
-configuration files used in those tests located in the
-*scripts/config/* subdirectory. The output from the test scripts
-in this directory will be written to the *out/* directory. Users
-are encouraged to copy sample configuration files to another location
-and modify them for their own use.
-
-The *share/met/Rscripts* directory contains a handful of sample R
-scripts, including plot_tcmpr.R, which provides graphic utilities
-for MET-TC. For more information on the graphics capabilities,
-see :numref:`TC-Stat-tool-example` of this User's Guide.
-
-.. note::
-
-   The **-help** and **-version** command line options are available for
-   all of the MET tools. Typing the name of the tool with no command line
-   options also produces the usage statement.
 
