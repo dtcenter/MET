@@ -104,7 +104,7 @@ install.
 To begin, create and change to a directory where the latest version of MET will be
 installed. Assuming that the following guidance uses “/d1” as the parent directory, 
 a suggested format is a path to a “met” directory, followed by the version number 
-subdirectory (e.g. /d1/met/12.0.0). 
+subdirectory (e.g. /d1/met/|version|). 
 Next, download the `compile_MET_all.sh <https://raw.githubusercontent.com/dtcenter/MET/main_v11.0/internal/scripts/installation/compile_MET_all.sh>`_
 script and 
 `tar_files.tgz <https://dtcenter.ucar.edu/dfiles/code/METplus/MET/installation/tar_files.met-base-v3.1.tgz>`_
@@ -170,7 +170,7 @@ Environment Variable Descriptions
 
 .. dropdown:: REQUIRED
 
-    **TEST_BASE** – Format is */d1/met/12.0.0*. This is the MET installation directory that was created 
+    **TEST_BASE** – Format is */d1/met/|version|*. This is the MET installation directory that was created 
     the beginning of, :numref:`compile_script_install` and contains **compile_MET_all.sh** script, **tar_files.tgz**, 
     and the *tar_files* directory from the untar command.
 
@@ -239,8 +239,7 @@ External Library Handling in compile_MET_all.sh
     Note that if these libraries are already installed somewhere on the system, 
     MET will call and use the libraries that were installed by the script. 
 
-
-.. dropdown::IF THE USER ALREADY HAS THE LIBRARY DEPENDENCIES INSTALLED
+.. dropdown:: IF THE USER ALREADY HAS THE LIBRARY DEPENDENCIES INSTALLED
 
     If the required external library dependencies have already been installed and don’t 
     need to be reinstalled, or if compiling MET on a machine that uses modulefiles and 
