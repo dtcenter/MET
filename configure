@@ -753,6 +753,8 @@ ENABLE_STATIC_LINKING_FALSE
 ENABLE_STATIC_LINKING_TRUE
 ENABLE_BLOCK4_FALSE
 ENABLE_BLOCK4_TRUE
+ENABLE_ALL_FALSE
+ENABLE_ALL_TRUE
 MET_FREETYPELIB
 MET_FREETYPEINC
 MET_FREETYPE
@@ -888,6 +890,7 @@ enable_option_checking
 enable_silent_rules
 enable_openmp
 enable_dependency_tracking
+enable_all
 enable_block4
 enable_static_linking
 enable_ascii2nc
@@ -1611,6 +1614,9 @@ Optional Features:
                           do not reject slow dependency extractors
   --disable-dependency-tracking
                           speeds up one-time build
+  --enable-all            Enable compilation options --enable-grib2
+                          --enable-python --enable-ugrid --enable-lidar2nc
+                          --enable-modis --enable-mode_graphics
   --disable-block4        Disable use of BLOCK4 in the compilation. Use this
                           if you have trouble using PrepBufr files.
   --enable-static_linking Enable static linking of the applications
@@ -1648,10 +1654,10 @@ Optional Features:
                           Disable compilation of mode_time_domain
   --disable-tc_utils      Disable compilation of tc_utils
   --disable-gsi_tools     Disable compilation of gsi_tools
-  --enable-grib2          Enable compilation of utilities using GRIB2
-  --enable-python         Enable python embedding
-  --enable-ugrid          Enable unstructured grid with Atlas and eckit
-                          libraries
+  --enable-grib2          Enable compilation of GRIB2 support
+  --enable-python         Enable compilation of Python embedding support
+  --enable-ugrid          Enable compilation of unstructured grid support with
+                          the Atlas and ecKit libraries
 
 Some influential environment variables:
   CC          C compiler command
@@ -1683,16 +1689,16 @@ Some influential environment variables:
               include files are not under the same main Atlas directory. If
               used, MET_ATLASINC must also be defined and MET_ATLAS will be
               ignored.
-  MET_ECKIT   Where eckit lib and include subdirectories are located. If they
+  MET_ECKIT   Where ecKit lib and include subdirectories are located. If they
               are installed in /usr/local, you don't have to specify them.
   MET_ECKITINC
-              Where eckit include files are located. Use if the libraries and
-              include files are not under the same main eckit directory. If
+              Where ecKit include files are located. Use if the libraries and
+              include files are not under the same main ecKit directory. If
               used, MET_ECKITLIB must also be defined and MET_ECKIT will be
               ignored.
   MET_ECKITLIB
-              Where eckit libraries are located. Use if the libraries and
-              include files are not under the same main eckit directory. If
+              Where ecKit libraries are located. Use if the libraries and
+              include files are not under the same main ecKit directory. If
               used, MET_ECKITINC must also be defined and MET_ECKIT will be
               ignored.
   MET_NETCDF  Where netcdf lib and include subdirectories are located. If they
@@ -1734,14 +1740,14 @@ Some influential environment variables:
               -lgrib2c_v1.6.0 or -lgrib2c, etc. If it is -lgrib2c, you don't
               have to specify it.
   MET_PYTHON_BIN_EXE
-              Full path to the python executable corresponding to
+              Full path to the Python executable corresponding to
               MET_PYTHON_CC and MET_PYTHON_LD, e.g. /usr/bin/python3.
   MET_PYTHON_CC
-              Where the python header files are located, e.g. -I<include dir>.
+              Where the Python header files are located, e.g. -I<include dir>.
               Set to the output of 'python3-config --cflags'.
   MET_PYTHON_LD
-              Where the python library files are located, e.g. -L<lib dir>,
-              followed by the python library names, e.g. -l<library>. Set to
+              Where the Python library files are located, e.g. -L<lib dir>,
+              followed by the Python library names, e.g. -l<library>. Set to
               the output of 'python3-config --ldflags'.
   MET_GSL     Where gsl lib and include subdirectories are located. If they
               are installed in /usr/local, you don't have to specify them.
@@ -5734,6 +5740,35 @@ fi
 # Process any enable flags specified by the user
 #
 
+# Enable all compilation options
+
+# Check whether --enable-all was given.
+if test ${enable_all+y}
+then :
+  enableval=$enable_all; case "${enableval}" in
+     yes | no ) ENABLE_ALL="${enableval}" ;;
+     *) as_fn_error $? "bad value ${enableval} for --enable-all" "$LINENO" 5 ;;
+   esac
+else $as_nop
+  ENABLE_ALL="no"
+
+fi
+
+
+ if test "x$ENABLE_ALL" = "xyes"; then
+  ENABLE_ALL_TRUE=
+  ENABLE_ALL_FALSE='#'
+else
+  ENABLE_ALL_TRUE='#'
+  ENABLE_ALL_FALSE=
+fi
+
+
+if test "x$ENABLE_ALL" = "xyes"; then
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: all options will be compiled" >&5
+printf "%s\n" "$as_me: all options will be compiled" >&6;}
+fi
+
 # BLOCK4
 
 # Check whether --enable-block4 was given.
@@ -5842,7 +5877,7 @@ if test ${enable_lidar2nc+y}
 then :
   enableval=$enable_lidar2nc; case "${enableval}" in
      yes | no ) ENABLE_LIDAR2NC="${enableval}" ;;
-     *) as_fn_error $? "bad value ${enableval} for --disable-lidar2nc" "$LINENO" 5 ;;
+     *) as_fn_error $? "bad value ${enableval} for --enable-lidar2nc" "$LINENO" 5 ;;
    esac
 else $as_nop
   ENABLE_LIDAR2NC="no"
@@ -5850,7 +5885,7 @@ else $as_nop
 fi
 
 
- if test "x$ENABLE_LIDAR2NC" = "xyes"; then
+ if test "x$ENABLE_LIDAR2NC" = "xyes" || test "x$ENABLE_ALL" = "xyes"; then
   ENABLE_LIDAR2NC_TRUE=
   ENABLE_LIDAR2NC_FALSE='#'
 else
@@ -5859,7 +5894,7 @@ else
 fi
 
 
-if test "x$ENABLE_LIDAR2NC" = "xyes"; then
+if test "x$ENABLE_LIDAR2NC" = "xyes" || test "x$ENABLE_ALL" = "xyes"; then
 
 printf "%s\n" "#define ENABLE_LIDAR2NC /**/" >>confdefs.h
 
@@ -6615,7 +6650,7 @@ if test ${enable_modis+y}
 then :
   enableval=$enable_modis; case "${enableval}" in
      yes | no ) ENABLE_MODIS="${enableval}" ;;
-     *) as_fn_error $? "bad value ${enableval} for --disable-modis" "$LINENO" 5 ;;
+     *) as_fn_error $? "bad value ${enableval} for --enable-modis" "$LINENO" 5 ;;
    esac
 else $as_nop
   ENABLE_MODIS="no"
@@ -6623,7 +6658,7 @@ else $as_nop
 fi
 
 
- if test "x$ENABLE_MODIS" = "xyes"; then
+ if test "x$ENABLE_MODIS" = "xyes" || test "x$ENABLE_ALL" = "xyes"; then
   ENABLE_MODIS_TRUE=
   ENABLE_MODIS_FALSE='#'
 else
@@ -6632,7 +6667,7 @@ else
 fi
 
 
-if test "x$ENABLE_MODIS" = "xyes"; then
+if test "x$ENABLE_MODIS" = "xyes" || test "x$ENABLE_ALL" = "xyes"; then
 
 printf "%s\n" "#define ENABLE_MODIS /**/" >>confdefs.h
 
@@ -6658,7 +6693,7 @@ else $as_nop
 fi
 
 
- if test "x$ENABLE_MODE_GRAPHICS" = "xyes"; then
+ if test "x$ENABLE_MODE_GRAPHICS" = "xyes" || test "x$ENABLE_ALL" = "xyes"; then
   ENABLE_MODE_GRAPHICS_TRUE=
   ENABLE_MODE_GRAPHICS_FALSE='#'
 else
@@ -6667,7 +6702,7 @@ else
 fi
 
 
-if test "x$ENABLE_MODE_GRAPHICS" = "xyes"; then
+if test "x$ENABLE_MODE_GRAPHICS" = "xyes" || test "x$ENABLE_ALL" = "xyes"; then
 
 printf "%s\n" "#define ENABLE_MODE_GRAPHICS /**/" >>confdefs.h
 
@@ -6798,7 +6833,7 @@ else $as_nop
 fi
 
 
- if test "x$ENABLE_GRIB2" = "xyes"; then
+ if test "x$ENABLE_GRIB2" = "xyes" || test "x$ENABLE_ALL" = "xyes"; then
   ENABLE_GRIB2_TRUE=
   ENABLE_GRIB2_FALSE='#'
 else
@@ -6815,12 +6850,12 @@ else
 fi
 
 
-if test "x$ENABLE_GRIB2" = "xyes"; then
+if test "x$ENABLE_GRIB2" = "xyes" || test "x$ENABLE_ALL" = "xyes"; then
 
 printf "%s\n" "#define ENABLE_GRIB2 /**/" >>confdefs.h
 
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: GRIB2 utilites will be compiled" >&5
-printf "%s\n" "$as_me: GRIB2 utilites will be compiled" >&6;}
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: GRIB2 support will be compiled" >&5
+printf "%s\n" "$as_me: GRIB2 support will be compiled" >&6;}
   CPPFLAGS="${CPPFLAGS} -DWITH_GRIB2"
 
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: GRIB2CLIB_NAME will be set" >&5
@@ -6833,8 +6868,8 @@ printf "%s\n" "$as_me: GRIB2CLIB_NAME will be set" >&6;}
        GRIB2_DEP_LIBS="${GRIB2CLIB_NAME} -ljasper -lpng -lz"
     fi
 else
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: GRIB2 utilities will not be compiled" >&5
-printf "%s\n" "$as_me: GRIB2 utilities will not be compiled" >&6;}
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: GRIB2 support will not be compiled" >&5
+printf "%s\n" "$as_me: GRIB2 support will not be compiled" >&6;}
     GRIB2_MET_LIBS=
     GRIB2_DEP_LIBS=
 fi
@@ -6856,7 +6891,7 @@ else $as_nop
 fi
 
 
- if test "x$ENABLE_PYTHON" = "xyes"; then
+ if test "x$ENABLE_PYTHON" = "xyes" || test "x$ENABLE_ALL" = "xyes"; then
   ENABLE_PYTHON_TRUE=
   ENABLE_PYTHON_FALSE='#'
 else
@@ -6865,18 +6900,18 @@ else
 fi
 
 
-if test "x$ENABLE_PYTHON" = "xyes"; then
+if test "x$ENABLE_PYTHON" = "xyes" || test "x$ENABLE_ALL" = "xyes"; then
 
 printf "%s\n" "#define ENABLE_PYTHON /**/" >>confdefs.h
 
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: python embedding will be compiled" >&5
-printf "%s\n" "$as_me: python embedding will be compiled" >&6;}
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: Python embedding support will be compiled" >&5
+printf "%s\n" "$as_me: Python embedding support will be compiled" >&6;}
   CPPFLAGS="${CPPFLAGS} -DWITH_PYTHON"
   PYTHON_MET_LIBS="-lvx_data2d_python -lvx_pointdata_python -lvx_python3_utils"
   PYTHON_DEP_LIBS="${MET_PYTHON_LD}"
 else
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: python embedding will not be compiled" >&5
-printf "%s\n" "$as_me: python embedding will not be compiled" >&6;}
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: Python embedding support will not be compiled" >&5
+printf "%s\n" "$as_me: Python embedding support will not be compiled" >&6;}
   PYTHON_MET_LIBS=
   PYTHON_DEP_LIBS=
 fi
@@ -6898,7 +6933,7 @@ else $as_nop
 fi
 
 
- if test "x$ENABLE_UGRID" = "xyes"; then
+ if test "x$ENABLE_UGRID" = "xyes" || test "x$ENABLE_ALL" = "xyes"; then
   ENABLE_UGRID_TRUE=
   ENABLE_UGRID_FALSE='#'
 else
@@ -6907,19 +6942,19 @@ else
 fi
 
 
-if test "x$ENABLE_UGRID" = "xyes"; then
+if test "x$ENABLE_UGRID" = "xyes" || test "x$ENABLE_ALL" = "xyes"; then
 
 printf "%s\n" "#define ENABLE_UGRID /**/" >>confdefs.h
 
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: unstructured grid will be compiled" >&5
-printf "%s\n" "$as_me: unstructured grid will be compiled" >&6;}
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: unstructured grid support will be compiled" >&5
+printf "%s\n" "$as_me: unstructured grid support will be compiled" >&6;}
   CPPFLAGS="${CPPFLAGS} -I${MET_ATLASINC} -I${MET_ECKITINC} -DWITH_UGRID"
   LDFLAGS="${LDFLAGS} -L${MET_ATLASLIB} -L${MET_ECKITLIB} -Wl,-rpath,${MET_ATLASLIB}:${MET_ECKITLIB}"
   UGRID_MET_LIBS="-lvx_data2d_ugrid"
   UGRID_DEP_LIBS="-latlas -leckit -leckit_mpi -leckit_geometry"
 else
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: unstructured grid will not be compiled" >&5
-printf "%s\n" "$as_me: unstructured grid will not be compiled" >&6;}
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: unstructured grid support will not be compiled" >&5
+printf "%s\n" "$as_me: unstructured grid support will not be compiled" >&6;}
   UGRID_MET_LIBS=
   UGRID_DEP_LIBS=
 fi
@@ -10232,6 +10267,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${BUFRLIB_NAME_SET_TRUE}" && test -z "${BUFRLIB_NAME_SET_FALSE}"; then
   as_fn_error $? "conditional \"BUFRLIB_NAME_SET\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${ENABLE_ALL_TRUE}" && test -z "${ENABLE_ALL_FALSE}"; then
+  as_fn_error $? "conditional \"ENABLE_ALL\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${ENABLE_BLOCK4_TRUE}" && test -z "${ENABLE_BLOCK4_FALSE}"; then
