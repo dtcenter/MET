@@ -290,8 +290,8 @@ Users are welcome to post any questions they might have that have not been asked
 Finally, consider one of the remaining installation methods for MET, 
 as these may prove more successful.
 
-Using Docker
-============
+Using Docker for Running MET
+============================
 
 Docker is a system that seeks to eliminate some of the complexities associated with 
 downloading various software and any library dependencies it might have by allowing 
@@ -305,38 +305,42 @@ MET has numerous version images for Docker users and continues to be released as
 images at the same interval as system releases. While the advantages of Docker can 
 make it an appealing installation route for first time users, it does require 
 privileged user access that will result in an unsuccessful installation if not 
-available. Ensure the highest system access (e.g. admin access) is available to the user
-before attempting this method.
+available. Please ensure the user has high system access
+(e.g. admin access) before attempting this method.
 
 Installing Docker
 -----------------
 
-To begin, the user will need to download and install the correct version of Docker 
-for the system. The 
-`Docker installation webpage <https://www.docker.com/>`_ should detect what 
-system is being used to access the webpage and auto select the appropriate version. 
-If the user requires a different version, select the correct version from the dropdown option. 
-Follow Docker’s instructions for a successful installation.
+To begin, download and install the correct version of Docker for the
+intended system.
+`The Docker installation webpage <https://www.docker.com/products/overview>`_
+should detect what
+system is accessing the webpage and auto select the appropriate
+version. If a different version is required, select the correct
+version from the dropdown option. Follow Docker’s instructions
+for a successful installation.
 
-Loading the Latest Docker Image
--------------------------------
 
-Once the user has confirmed the installation of Docker was successful, 
-all that needs to be done is to run MET is to download the latest image
-of MET in Docker. To accomplish that, use the pull command, with the
-latest MET version number, for example:
+Loading the Latest Docker Image of MET
+--------------------------------------
+
+Once the installation of Docker has been confirmed to be successful,
+all that’s needed to run MET is to download the latest image of MET
+in Docker. To accomplish that, use the pull command, with the latest
+MET version number, for example:
 
 .. code-block:: ini
 
-  docker pull dtcenter/met:X.Y.Z
+  docker pull dtcenter/met:12.0.0
 
-where X.Y.Z corresponds to the latest released version of MET. Omitting the
-version number will result in an error due to Docker’s behavior of attempting
-to retrieve an image with the “latest” tag, which MET no longer uses. 
+Omitting the
+version number will result in an error due to Docker’s behavior
+of attempting to retrieve an image with the “latest” tag, which
+MET no longer uses. 
 
 
-Running the Docker version
---------------------------
+Running the Docker version of MET
+---------------------------------
 
 All that is left to do is launch a shell in the Docker container. 
 This is accomplished with the command:
@@ -345,26 +349,26 @@ This is accomplished with the command:
 
   docker run -it --rm dtcenter/met /bin/bash
 
-Note that the --rm command was added to automatically remove the container created 
-from the image once Docker exits. Simply remove this command for the 
-container to persist after exiting. If there is an error during this run command, 
-try adding the latest MET version number the same way the latest image of MET
-was pulled:
+Note that the --rm command was added to automatically remove the
+container created 
+from the image once exiting Docker. Simply remove this command if the 
+container should persist after exiting. If there is an error
+during this run command, try adding the latest MET version number
+the same way the latest image of MET was pulled:
 
 .. code-block:: ini
 
-  docker run -it --rm dtcenter/met:X.Y.Z /bin/bash 
-
-where X, Y, and Z corresponds to the latest released version of MET.
+  docker run -it --rm dtcenter/met:12.0.0 /bin/bash 
   
-If the Docker usage of MET was successful, it is highly recommended to move on 
-to using the METplus wrappers of the tools, which has its own Docker image. 
+If the  usage MET via Docker images was successful, it is highly
+recommended to move on 
+to using the METplus wrappers of the tools, which have their own
+Docker image. 
 Instructions for obtaining that image are in the 
 `METplus Wrappers User's Guide <https://metplus.readthedocs.io/en/latest/Users_Guide/getting_started.html#metplus-in-docker>`_.
 
-
-Using Apptainer
-===============
+Using Apptainer for Running MET
+===============================
 
 Similar to Docker, Apptainer (formerly Singularity) removes some of the
 complexities associated with downloading various library dependencies and
@@ -386,38 +390,119 @@ Installing Apptainer
 To begin, download and install the correct version of Apptainer for the
 intended system. The method of installing from code is outlined in
 `Apptainer’s INSTALL.md file <https://github.com/apptainer/apptainer/blob/main/INSTALL.md>`_
-on their GitHub page. If users require an alternate method to install Apptainer, the
-`Admin guide <https://apptainer.org/docs/admin/main/installation.html>`_ will
-provide further details.
+on their GitHub page. If users require an alternate method to
+install Apptainer, the
+`Admin guide <https://apptainer.org/docs/admin/main/installation.html>`_
+will provide further details.
 
 Loading the Latest MET Image
 ----------------------------
 
-Similar to Docker, Apptainer will build the container based off of the MET image in
-a single command. To accomplish this, Apptainer’s “Swiss army knife”  :code:`build`
-command is used. Use the the latest MET version number in conjunction with :code:`build`
+Similar to Docker, Apptainer will build the container based off of the
+MET image in a single command. To accomplish this, Apptainer’s
+“Swiss army knife”  :code:`build`
+command is used. Use the the latest MET version number in
+conjunction with :code:`build`
 to make the container:
 
 .. code-block:: ini
 
-  singularity build met-X.Y.Z.sif docker://dtcenter/met:X.Y.Z
+  singularity build met-12.0.0.sif docker://dtcenter/met:12.0.0
 
-where X.Y.Z corresponds to the latest released version of MET.
 
 Running the MET Container
 -------------------------
 
-To run commands in the container, an instance of the container needs to be started.
-In Apptainer, this accomplished with the :code:`instance start` command. That
-command could look something like:
+The container is now ready for usage! Simply use the exec
+command to invoke the MET container, along with the appropriate
+MET command line usage:
 
 .. code-block:: ini
 
-  singularity instance start /path/to/container/met-X.Y.Z.sif met-X.Y.Z
+  singularity exec met-12.0.0.sif plot_data_plane /home/data/fcst_006.grb2 image_output.ps ‘name=”TMP”; level=”Z0”;’
 
-Then simply enter a shell within the instance that was just created using a command similar to this example:
+Stopping the Apptainer Instance
+-------------------------------
+
+Once work is complete within the instance, the :code:`stop`
+command can be used to end the instance. This command will need to
+be used otherwise the instance will continue to run in the background:
 
 .. code-block:: ini
 
-  singularity shell instance://met-X.Y.Z
+    singularity instance stop /path/to/container/met-12.0.0.sif met-12.0.0  
+
+Now that MET is successfully installed, it is highly recommended to
+next install the METplus wrappers to take full advantage of
+`Python integration <https://metplus.readthedocs.io/en/latest/Users_Guide/installation.html>`_.
+Users can also proceed to the
+`Tutorial <https://dtcenter.org/community-code/metplus/online-tutorial>`_
+and run through the examples that only utilize the MET processes
+(METplus wrapper applications and commands will not work unless
+METplus wrappers is also installed).
+
+EXTRA MATERIAL, MAY NEED SOMEWHERE ELSE:
+
+.. _met_directory_structure:
+
+MET Directory Structure
+=======================
+
+The top-level MET directory consists of Makefiles, configuration files,
+and several subdirectories. The top-level Makefile and configuration
+files control how the entire toolkit is built.
+
+When MET has been successfully built and installed, the installation
+directory contains two subdirectories. The *bin/* directory contains
+executables for each module of MET as well as several plotting utilities.
+The *share/met/* directory contains many subdirectories with data
+required at runtime and a subdirectory of sample R scripts utilities.
+The *colortables/*, *map/*, and *ps/* subdirectories contain data used
+in creating PostScript plots for several MET tools. The *poly/*
+subdirectory contains predefined lat/lon polyline regions for use in
+selecting regions over which to verify. The polylines defined
+correspond to verification regions used by NCEP as described in
+:numref:`Appendix B, Section %s <appendixB>`.
+The *config/* directory contains default configuration files for
+the MET tools. The *python/* subdirectory contains python scripts.
+The *python/examples* subdirectory contains sample scripts used in
+Python embedding (:numref:`Appendix F, Section %s <appendixF>`).
+The *python/pyembed/* subdirectory contains code used in Python
+embedding (:numref:`Appendix F, Section %s <appendixF>`).
+The *table_files/* and *tc_data/* subdirectories contain GRIB
+table definitions and tropical cyclone data, respectively.
+The *Rscripts/* subdirectory contains a handful of plotting graphic
+utilities for MET-TC. These are the same Rscripts that reside under
+the top-level MET *scripts/Rscripts* directory, other than it is
+the installed location.
+
+The *data/* directory contains several configuration and static
+data files used by MET. The *sample_fcst/* and *sample_obs/*
+subdirectories contain sample data used by the test scripts provided
+in the *scripts/* directory.
+
+The *docs/* directory contains the Sphinx documentation for MET.
+
+The *out/* directory will be populated with sample output from the test cases described in the next section.
+
+The *src/* directory contains the source code for each of the tools in MET.
+
+The *scripts/* directory contains test scripts that are run by make
+test after MET has been successfully built, and a directory of sample
+configuration files used in those tests located in the
+*scripts/config/* subdirectory. The output from the test scripts
+in this directory will be written to the *out/* directory. Users
+are encouraged to copy sample configuration files to another location
+and modify them for their own use.
+
+The *share/met/Rscripts* directory contains a handful of sample R
+scripts, including plot_tcmpr.R, which provides graphic utilities
+for MET-TC. For more information on the graphics capabilities,
+see :numref:`TC-Stat-tool-example` of this User's Guide.
+
+.. note::
+
+   The **-help** and **-version** command line options are available for
+   all of the MET tools. Typing the name of the tool with no command line
+   options also produces the usage statement.
 
