@@ -136,7 +136,7 @@ Now change directories to the one that was created from expanding the tar files:
   cd tar_files
 
 The next step will be to identify and download the latest MET release as a
-tar file (e.g. v12.0.0.tar.gz) and place it in
+tar file (e.g. |version|.tar.gz) and place it in
 the tar_files directory. The file is available from the
 Recommended-Components MET section of the
 `METplus website <https://dtcenter.org/community-code/metplus/download>`_ or
@@ -170,7 +170,7 @@ Environment Variable Descriptions
 
 .. dropdown:: REQUIRED
 
-    **TEST_BASE** – Format is */d1/met/|version|*. This is the MET installation directory that was created 
+    **TEST_BASE** – Format is */d1/met/12.0.0*. This is the MET installation directory that was created 
     the beginning of, :numref:`compile_script_install` and contains **compile_MET_all.sh** script, **tar_files.tgz**, 
     and the *tar_files* directory from the untar command.
 
@@ -180,7 +180,7 @@ Environment Variable Descriptions
     is in the compiler name. In the past, support was provided for the PGI family of compilers 
     through “pgi”. However, this compiler option is no longer actively tested. 
 
-    **MET_SUBDIR** – Format is /d1/met/12.0.0. This is the location where the top-level MET 
+    **MET_SUBDIR** – Format is */d1/met/12.0.0*. This is the location where the top-level MET 
     subdirectory will
     be installed and is often set equivalent to **TEST_BASE** (e.g. ${TEST_BASE}).
 
@@ -301,6 +301,8 @@ The screenshot below shows the contents of the installation directory after inst
 To confirm that MET was installed successfully, users are encouraged to run 
 the following command to ensure the installation test scripts ran successfully:
 
+.. code-block:: ini
+		
   grep -i error MET12.0.0/met.make_test.log
   
 which should return nothing if there were no errors.
@@ -461,7 +463,7 @@ be used otherwise the instance will continue to run in the background:
 
 .. code-block:: ini
 
-    singularity instance stop /path/to/container/met-12.0.0.sif met-12.0.0  
+    singularity instance stop /path/to/container/met-|version|.sif met-|version|  
 
 Now that MET is successfully installed, it is highly recommended to
 next install the METplus wrappers to take full advantage of
