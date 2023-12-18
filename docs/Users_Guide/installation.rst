@@ -22,7 +22,7 @@ All of these methods will be described below. The recommended method is
 Some organizations have access to precompiled versions of MET on
 shared systems, making the need for self-installation unnecessary.
 Users should check the
-`METplus Downloads page<https://dtcenter.org/community-code/metplus/download>`_
+`METplus Downloads page <https://dtcenter.org/community-code/metplus/download>`_
 for the latest coordinated release’s Existing Builds page for
 existing MET installations before continuing.
 
@@ -46,7 +46,8 @@ The required libraries are listed below:
   confidence intervals (use **GSL-1.11** for **PGI** compilers)
 * `Proj <https://proj.org/>`_ Library used to instantiate grids within MET
 
-The following libraries are conditionally required, depending on the intended verification use and compiler language:
+The following libraries are conditionally required, depending on the intended
+verification use and compiler language:
 
 * `GRIB2C Library <https://github.com/NOAA-EMC/NCEPLIBS-g2c>`_
   (with dependencies Z, PNG, JASPER), if compiling GRIB2 support.
@@ -380,7 +381,7 @@ This is accomplished with the command:
 
   docker run -it --rm dtcenter/met /bin/bash
 
-Note that the ""--rm"" command was added to automatically remove the
+Note that the "--rm" command was added to automatically remove the
 container created 
 from the image once exiting Docker. Simply remove this command if the 
 container should persist after exiting. If there is an error
