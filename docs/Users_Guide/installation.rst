@@ -103,8 +103,8 @@ before running the script and some optional environment variables, both of
 which are described below. The script relies on a **tar_files.tgz** file, which
 contains all of the required and optional library packages for MET but not
 MET itself. A separate command will be used to pull down the latest version of
-MET in tar.tgz (tarred and gzipped) format from GitHub, which the script
-will then install.
+MET in **tar_files.tgz** (tarred and gzipped)
+format from GitHub, which the script will then install.
 
 To begin, create and change to a directory where the latest version of MET will be
 installed. Assuming that the following guidance uses “/d1” as the parent directory, 
@@ -169,7 +169,7 @@ configuration file  (for example, **install_met_env.<machine_name>**). An
 example environment configuration file to start with (**install_met_env.generic**),
 as well as environment configuration files used on HPCs at NCAR and NOAA,
 can be found in the `MET GitHub repository <https://github.com/dtcenter/MET>`_ in the 
-`internal/scripts/installation/config <https://github.com/dtcenter/MET/tree/main_v12.0/internal/scripts/installation/config>`_
+`scripts/installation/config <https://github.com/dtcenter/MET/tree/main_v12.0/internal/scripts/installation/config>`_
 directory.
 
 Environment Variable Descriptions
