@@ -157,6 +157,13 @@ if [[ -z "$LIB_Z" ]]; then
   LIB_Z=${LIB_DIR}/lib
 fi
 
+# if TIFF is not defined in the environment file, enable its compilation                                                                                                                                                               
+if [[ -z ${TIFF_INCLUDE_DIR} ]] && [[ -z ${TIFF_LIB_DIR} ]]; then
+   COMPILE_TIFF=1
+else
+   COMPILE_TIFF=0
+fi
+
 # if SQLITE is not defined in the environment file, enable its compilation
 if [[ -z ${SQLITE_INCLUDE_DIR} ]] && [[ -z ${SQLITE_LIB_DIR} ]]; then
    COMPILE_SQLITE=1
@@ -427,6 +434,23 @@ fi
 # Compile Proj
 if [ $COMPILE_PROJ -eq 1 ]; then
 
+
+  if [ $COMPILE_TIFF -eq 1 ]; then
+    echo
+    echo "Compiling TIFF at `date`"
+    mkdir -p ${LIB_DIR}/tiff
+    rm -rf ${LIB_DIR}/tiff/tiff*
+    tar -xzf ${TAR_DIR}/tiff*.tar.gz -C ${LIB_DIR}/tiff
+    cd ${LIB_DIR}/tiff/tiff*
+    echo "cd `pwd`"
+    #run_cmd "./configure --prefix=${LIB_DIR} LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include > $(pwd)/tiff.configure.log 2>&1"
+    run_cmd "./configure --prefix=${LIB_DIR} > $(pwd)/tiff.configure.log 2>&1"
+    run_cmd "make ${MAKE_ARGS} > $(pwd)/tiff.make.log 2>&1"
+    run_cmd "make ${MAKE_ARGS} install > $(pwd)/tiff.make_install.log 2>&1"
+    export TIFF_INCLUDE_DIR=${LIB_DIR}/include
+    export TIFF_LIB_DIR=${LIB_DIR}/lib
+  fi
+
   if [ $COMPILE_SQLITE -eq 1 ]; then
     echo
     echo "Compiling SQLITE at `date`"
@@ -446,6 +470,7 @@ if [ $COMPILE_PROJ -eq 1 ]; then
 
   echo
   echo "Compiling PROJ_${vrs} at `date`"
+  echo "cmake version `cmake --version`"
   mkdir -p ${LIB_DIR}/proj
   rm -rf ${LIB_DIR}/proj/proj*
   tar -xf ${TAR_DIR}/proj-${vrs}.tar.gz -C ${LIB_DIR}/proj
@@ -829,8 +854,8 @@ fi
 # ${parameter:+word}
 # If parameter is null or unset, nothing is substituted, otherwise the expansion of word is substituted.
 
-# add LIB_DIR/lib to rpath and -L
-LDFLAGS="${LDFLAGS} -Wl,-rpath,${LIB_DIR}/lib -L${LIB_DIR}/lib"
+# add LIB_DIR/lib and LIB_DIR/lib64 to rpath and -L
+LDFLAGS="${LDFLAGS} -Wl,-rpath,${LIB_DIR}/lib -L${LIB_DIR}/lib  -Wl,-rpath,${LIB_DIR}/lib64 -L${LIB_DIR}/lib64"
 
 # if variables are set, add <VALUE>/lib to rpath and -L
 for x in $MET_CAIRO $MET_FREETYPE $MET_GSL $MET_HDF $MET_HDF5 $MET_NETCDF; do
@@ -849,7 +874,7 @@ for x in $MET_ATLAS $MET_BUFR $MET_ECKIT $MET_GRIB2C $MET_PROJ $LIB_JASPER; do
 done
 	
 # if variables are set, add <VALUE> to rpath and -L
-for x in $MET_ATLASLIB $MET_BUFRLIB $MET_CAIROLIB $MET_ECKITLIB $MET_FREETYPELIB $MET_GRIB2CLIB $MET_GSLLIB $MET_HDF5LIB $MET_HDFLIB $MET_NETCDFLIB $MET_PROJLIB $ADDTL_DIR $MET_PYTHON_LIB $LIB_JASPER $LIB_LIBPNG $LIB_Z; do
+for x in $MET_ATLASLIB $MET_BUFRLIB $MET_CAIROLIB $MET_ECKITLIB $MET_FREETYPELIB $MET_GRIB2CLIB $MET_GSLLIB $MET_HDF5LIB $MET_HDFLIB $MET_NETCDFLIB $MET_PROJLIB $MET_PYTHON_LIB $LIB_JASPER $LIB_LIBPNG $LIB_Z $ADDTL_DIR; do
     arg="${x:+-Wl,-rpath,$x -L$x}"
     if [[ "$LDFLAGS" != *"$arg"* ]]; then
 	LDFLAGS+=" $arg"
