@@ -108,9 +108,8 @@ subdirectory (e.g. /d1/met/|version|).
 Next, download the
 `compile_MET_all.sh <https://raw.githubusercontent.com/dtcenter/MET/latest/internal/scripts/installation/compile_MET_all.sh>`_
 script and 
-`tar_files.tgz <https://dtcenter.ucar.edu/dfiles/code/METplus/MET/installation/tar_files.met-base-v3.1.tgz>`_
- file and place both of these files in the new directory. These files
- are available either
+`tar_files.tgz <https://dtcenter.ucar.edu/dfiles/code/METplus/MET/installation/tar_files.met-base-v3.1.tgz>`_ file and place both of these files in the
+new directory. These files are available either
 through using the hyperlinks provided or by entering the following commands in
 the terminal while in the directory MET will be installed in:
 
