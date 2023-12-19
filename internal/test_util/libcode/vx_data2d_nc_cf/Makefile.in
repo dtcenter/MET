@@ -88,7 +88,8 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-subdir = src/libcode/vx_data2d_nc_pinterp
+noinst_PROGRAMS = test_read_nccf$(EXEEXT)
+subdir = internal/test_util/libcode/vx_data2d_nc_cf
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -98,22 +99,14 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
-LIBRARIES = $(noinst_LIBRARIES)
-AR = ar
-ARFLAGS = cru
-AM_V_AR = $(am__v_AR_@AM_V@)
-am__v_AR_ = $(am__v_AR_@AM_DEFAULT_V@)
-am__v_AR_0 = @echo "  AR      " $@;
-am__v_AR_1 = 
-libvx_data2d_nc_pinterp_a_AR = $(AR) $(ARFLAGS)
-libvx_data2d_nc_pinterp_a_LIBADD =
-am_libvx_data2d_nc_pinterp_a_OBJECTS =  \
-	libvx_data2d_nc_pinterp_a-get_pinterp_grid.$(OBJEXT) \
-	libvx_data2d_nc_pinterp_a-pinterp_file.$(OBJEXT) \
-	libvx_data2d_nc_pinterp_a-var_info_nc_pinterp.$(OBJEXT) \
-	libvx_data2d_nc_pinterp_a-data2d_nc_pinterp.$(OBJEXT)
-libvx_data2d_nc_pinterp_a_OBJECTS =  \
-	$(am_libvx_data2d_nc_pinterp_a_OBJECTS)
+PROGRAMS = $(noinst_PROGRAMS)
+am_test_read_nccf_OBJECTS = test_read_nccf-test_read_nccf.$(OBJEXT)
+test_read_nccf_OBJECTS = $(am_test_read_nccf_OBJECTS)
+am__DEPENDENCIES_1 =
+test_read_nccf_DEPENDENCIES = $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1)
+test_read_nccf_LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
+	$(test_read_nccf_LDFLAGS) $(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -129,11 +122,7 @@ am__v_at_1 =
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__maybe_remake_depfiles = depfiles
-am__depfiles_remade =  \
-	./$(DEPDIR)/libvx_data2d_nc_pinterp_a-data2d_nc_pinterp.Po \
-	./$(DEPDIR)/libvx_data2d_nc_pinterp_a-get_pinterp_grid.Po \
-	./$(DEPDIR)/libvx_data2d_nc_pinterp_a-pinterp_file.Po \
-	./$(DEPDIR)/libvx_data2d_nc_pinterp_a-var_info_nc_pinterp.Po
+am__depfiles_remade = ./$(DEPDIR)/test_read_nccf-test_read_nccf.Po
 am__mv = mv -f
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -152,20 +141,8 @@ AM_V_CXXLD = $(am__v_CXXLD_@AM_V@)
 am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
 am__v_CXXLD_0 = @echo "  CXXLD   " $@;
 am__v_CXXLD_1 = 
-COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
-	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-AM_V_CC = $(am__v_CC_@AM_V@)
-am__v_CC_ = $(am__v_CC_@AM_DEFAULT_V@)
-am__v_CC_0 = @echo "  CC      " $@;
-am__v_CC_1 = 
-CCLD = $(CC)
-LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-AM_V_CCLD = $(am__v_CCLD_@AM_V@)
-am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
-am__v_CCLD_0 = @echo "  CCLD    " $@;
-am__v_CCLD_1 = 
-SOURCES = $(libvx_data2d_nc_pinterp_a_SOURCES)
-DIST_SOURCES = $(libvx_data2d_nc_pinterp_a_SOURCES)
+SOURCES = $(test_read_nccf_SOURCES)
+DIST_SOURCES = $(test_read_nccf_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -349,17 +326,26 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 MAINTAINERCLEANFILES = Makefile.in
+test_read_nccf_SOURCES = test_read_nccf.cc
+test_read_nccf_CPPFLAGS = ${MET_CPPFLAGS}
+test_read_nccf_LDFLAGS = -L. ${MET_LDFLAGS}
+test_read_nccf_LDADD = -lvx_data2d_nc_cf \
+	$(UGRID_MET_LIBS) \
+	-lvx_nc_util \
+	-lvx_data2d \
+	-lvx_grid \
+	-lvx_geodesy \
+	-lvx_config \
+	-lvx_gsl_prob \
+	-lvx_util_math \
+	-lvx_util \
+	-lvx_math \
+	-lvx_color \
+	-lvx_cal \
+	-lvx_log \
+	$(UGRID_DEP_LIBS) \
+	-lproj -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
 
-# The library
-noinst_LIBRARIES = libvx_data2d_nc_pinterp.a
-libvx_data2d_nc_pinterp_a_SOURCES = \
-              get_pinterp_grid.cc get_pinterp_grid.h \
-              pinterp_file.cc pinterp_file.h \
-              var_info_nc_pinterp.cc var_info_nc_pinterp.h \
-              data2d_nc_pinterp.cc data2d_nc_pinterp.h \
-              vx_data2d_nc_pinterp.h
-
-libvx_data2d_nc_pinterp_a_CPPFLAGS = ${MET_CPPFLAGS}
 all: all-am
 
 .SUFFIXES:
@@ -373,9 +359,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign src/libcode/vx_data2d_nc_pinterp/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign internal/test_util/libcode/vx_data2d_nc_cf/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign src/libcode/vx_data2d_nc_pinterp/Makefile
+	  $(AUTOMAKE) --foreign internal/test_util/libcode/vx_data2d_nc_cf/Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
 	  *config.status*) \
@@ -394,13 +380,12 @@ $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(am__aclocal_m4_deps):
 
-clean-noinstLIBRARIES:
-	-test -z "$(noinst_LIBRARIES)" || rm -f $(noinst_LIBRARIES)
+clean-noinstPROGRAMS:
+	-test -z "$(noinst_PROGRAMS)" || rm -f $(noinst_PROGRAMS)
 
-libvx_data2d_nc_pinterp.a: $(libvx_data2d_nc_pinterp_a_OBJECTS) $(libvx_data2d_nc_pinterp_a_DEPENDENCIES) $(EXTRA_libvx_data2d_nc_pinterp_a_DEPENDENCIES) 
-	$(AM_V_at)-rm -f libvx_data2d_nc_pinterp.a
-	$(AM_V_AR)$(libvx_data2d_nc_pinterp_a_AR) libvx_data2d_nc_pinterp.a $(libvx_data2d_nc_pinterp_a_OBJECTS) $(libvx_data2d_nc_pinterp_a_LIBADD)
-	$(AM_V_at)$(RANLIB) libvx_data2d_nc_pinterp.a
+test_read_nccf$(EXEEXT): $(test_read_nccf_OBJECTS) $(test_read_nccf_DEPENDENCIES) $(EXTRA_test_read_nccf_DEPENDENCIES) 
+	@rm -f test_read_nccf$(EXEEXT)
+	$(AM_V_CXXLD)$(test_read_nccf_LINK) $(test_read_nccf_OBJECTS) $(test_read_nccf_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -408,10 +393,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_data2d_nc_pinterp_a-data2d_nc_pinterp.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_data2d_nc_pinterp_a-get_pinterp_grid.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_data2d_nc_pinterp_a-pinterp_file.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_data2d_nc_pinterp_a-var_info_nc_pinterp.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_read_nccf-test_read_nccf.Po@am__quote@ # am--include-marker
 
 $(am__depfiles_remade):
 	@$(MKDIR_P) $(@D)
@@ -433,61 +415,19 @@ am--depfiles: $(am__depfiles_remade)
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXXCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
 
-libvx_data2d_nc_pinterp_a-get_pinterp_grid.o: get_pinterp_grid.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_data2d_nc_pinterp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_data2d_nc_pinterp_a-get_pinterp_grid.o -MD -MP -MF $(DEPDIR)/libvx_data2d_nc_pinterp_a-get_pinterp_grid.Tpo -c -o libvx_data2d_nc_pinterp_a-get_pinterp_grid.o `test -f 'get_pinterp_grid.cc' || echo '$(srcdir)/'`get_pinterp_grid.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvx_data2d_nc_pinterp_a-get_pinterp_grid.Tpo $(DEPDIR)/libvx_data2d_nc_pinterp_a-get_pinterp_grid.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='get_pinterp_grid.cc' object='libvx_data2d_nc_pinterp_a-get_pinterp_grid.o' libtool=no @AMDEPBACKSLASH@
+test_read_nccf-test_read_nccf.o: test_read_nccf.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_read_nccf_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test_read_nccf-test_read_nccf.o -MD -MP -MF $(DEPDIR)/test_read_nccf-test_read_nccf.Tpo -c -o test_read_nccf-test_read_nccf.o `test -f 'test_read_nccf.cc' || echo '$(srcdir)/'`test_read_nccf.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/test_read_nccf-test_read_nccf.Tpo $(DEPDIR)/test_read_nccf-test_read_nccf.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='test_read_nccf.cc' object='test_read_nccf-test_read_nccf.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_data2d_nc_pinterp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_data2d_nc_pinterp_a-get_pinterp_grid.o `test -f 'get_pinterp_grid.cc' || echo '$(srcdir)/'`get_pinterp_grid.cc
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_read_nccf_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test_read_nccf-test_read_nccf.o `test -f 'test_read_nccf.cc' || echo '$(srcdir)/'`test_read_nccf.cc
 
-libvx_data2d_nc_pinterp_a-get_pinterp_grid.obj: get_pinterp_grid.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_data2d_nc_pinterp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_data2d_nc_pinterp_a-get_pinterp_grid.obj -MD -MP -MF $(DEPDIR)/libvx_data2d_nc_pinterp_a-get_pinterp_grid.Tpo -c -o libvx_data2d_nc_pinterp_a-get_pinterp_grid.obj `if test -f 'get_pinterp_grid.cc'; then $(CYGPATH_W) 'get_pinterp_grid.cc'; else $(CYGPATH_W) '$(srcdir)/get_pinterp_grid.cc'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvx_data2d_nc_pinterp_a-get_pinterp_grid.Tpo $(DEPDIR)/libvx_data2d_nc_pinterp_a-get_pinterp_grid.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='get_pinterp_grid.cc' object='libvx_data2d_nc_pinterp_a-get_pinterp_grid.obj' libtool=no @AMDEPBACKSLASH@
+test_read_nccf-test_read_nccf.obj: test_read_nccf.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_read_nccf_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test_read_nccf-test_read_nccf.obj -MD -MP -MF $(DEPDIR)/test_read_nccf-test_read_nccf.Tpo -c -o test_read_nccf-test_read_nccf.obj `if test -f 'test_read_nccf.cc'; then $(CYGPATH_W) 'test_read_nccf.cc'; else $(CYGPATH_W) '$(srcdir)/test_read_nccf.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/test_read_nccf-test_read_nccf.Tpo $(DEPDIR)/test_read_nccf-test_read_nccf.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='test_read_nccf.cc' object='test_read_nccf-test_read_nccf.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_data2d_nc_pinterp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_data2d_nc_pinterp_a-get_pinterp_grid.obj `if test -f 'get_pinterp_grid.cc'; then $(CYGPATH_W) 'get_pinterp_grid.cc'; else $(CYGPATH_W) '$(srcdir)/get_pinterp_grid.cc'; fi`
-
-libvx_data2d_nc_pinterp_a-pinterp_file.o: pinterp_file.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_data2d_nc_pinterp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_data2d_nc_pinterp_a-pinterp_file.o -MD -MP -MF $(DEPDIR)/libvx_data2d_nc_pinterp_a-pinterp_file.Tpo -c -o libvx_data2d_nc_pinterp_a-pinterp_file.o `test -f 'pinterp_file.cc' || echo '$(srcdir)/'`pinterp_file.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvx_data2d_nc_pinterp_a-pinterp_file.Tpo $(DEPDIR)/libvx_data2d_nc_pinterp_a-pinterp_file.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='pinterp_file.cc' object='libvx_data2d_nc_pinterp_a-pinterp_file.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_data2d_nc_pinterp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_data2d_nc_pinterp_a-pinterp_file.o `test -f 'pinterp_file.cc' || echo '$(srcdir)/'`pinterp_file.cc
-
-libvx_data2d_nc_pinterp_a-pinterp_file.obj: pinterp_file.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_data2d_nc_pinterp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_data2d_nc_pinterp_a-pinterp_file.obj -MD -MP -MF $(DEPDIR)/libvx_data2d_nc_pinterp_a-pinterp_file.Tpo -c -o libvx_data2d_nc_pinterp_a-pinterp_file.obj `if test -f 'pinterp_file.cc'; then $(CYGPATH_W) 'pinterp_file.cc'; else $(CYGPATH_W) '$(srcdir)/pinterp_file.cc'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvx_data2d_nc_pinterp_a-pinterp_file.Tpo $(DEPDIR)/libvx_data2d_nc_pinterp_a-pinterp_file.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='pinterp_file.cc' object='libvx_data2d_nc_pinterp_a-pinterp_file.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_data2d_nc_pinterp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_data2d_nc_pinterp_a-pinterp_file.obj `if test -f 'pinterp_file.cc'; then $(CYGPATH_W) 'pinterp_file.cc'; else $(CYGPATH_W) '$(srcdir)/pinterp_file.cc'; fi`
-
-libvx_data2d_nc_pinterp_a-var_info_nc_pinterp.o: var_info_nc_pinterp.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_data2d_nc_pinterp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_data2d_nc_pinterp_a-var_info_nc_pinterp.o -MD -MP -MF $(DEPDIR)/libvx_data2d_nc_pinterp_a-var_info_nc_pinterp.Tpo -c -o libvx_data2d_nc_pinterp_a-var_info_nc_pinterp.o `test -f 'var_info_nc_pinterp.cc' || echo '$(srcdir)/'`var_info_nc_pinterp.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvx_data2d_nc_pinterp_a-var_info_nc_pinterp.Tpo $(DEPDIR)/libvx_data2d_nc_pinterp_a-var_info_nc_pinterp.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='var_info_nc_pinterp.cc' object='libvx_data2d_nc_pinterp_a-var_info_nc_pinterp.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_data2d_nc_pinterp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_data2d_nc_pinterp_a-var_info_nc_pinterp.o `test -f 'var_info_nc_pinterp.cc' || echo '$(srcdir)/'`var_info_nc_pinterp.cc
-
-libvx_data2d_nc_pinterp_a-var_info_nc_pinterp.obj: var_info_nc_pinterp.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_data2d_nc_pinterp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_data2d_nc_pinterp_a-var_info_nc_pinterp.obj -MD -MP -MF $(DEPDIR)/libvx_data2d_nc_pinterp_a-var_info_nc_pinterp.Tpo -c -o libvx_data2d_nc_pinterp_a-var_info_nc_pinterp.obj `if test -f 'var_info_nc_pinterp.cc'; then $(CYGPATH_W) 'var_info_nc_pinterp.cc'; else $(CYGPATH_W) '$(srcdir)/var_info_nc_pinterp.cc'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvx_data2d_nc_pinterp_a-var_info_nc_pinterp.Tpo $(DEPDIR)/libvx_data2d_nc_pinterp_a-var_info_nc_pinterp.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='var_info_nc_pinterp.cc' object='libvx_data2d_nc_pinterp_a-var_info_nc_pinterp.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_data2d_nc_pinterp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_data2d_nc_pinterp_a-var_info_nc_pinterp.obj `if test -f 'var_info_nc_pinterp.cc'; then $(CYGPATH_W) 'var_info_nc_pinterp.cc'; else $(CYGPATH_W) '$(srcdir)/var_info_nc_pinterp.cc'; fi`
-
-libvx_data2d_nc_pinterp_a-data2d_nc_pinterp.o: data2d_nc_pinterp.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_data2d_nc_pinterp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_data2d_nc_pinterp_a-data2d_nc_pinterp.o -MD -MP -MF $(DEPDIR)/libvx_data2d_nc_pinterp_a-data2d_nc_pinterp.Tpo -c -o libvx_data2d_nc_pinterp_a-data2d_nc_pinterp.o `test -f 'data2d_nc_pinterp.cc' || echo '$(srcdir)/'`data2d_nc_pinterp.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvx_data2d_nc_pinterp_a-data2d_nc_pinterp.Tpo $(DEPDIR)/libvx_data2d_nc_pinterp_a-data2d_nc_pinterp.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='data2d_nc_pinterp.cc' object='libvx_data2d_nc_pinterp_a-data2d_nc_pinterp.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_data2d_nc_pinterp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_data2d_nc_pinterp_a-data2d_nc_pinterp.o `test -f 'data2d_nc_pinterp.cc' || echo '$(srcdir)/'`data2d_nc_pinterp.cc
-
-libvx_data2d_nc_pinterp_a-data2d_nc_pinterp.obj: data2d_nc_pinterp.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_data2d_nc_pinterp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_data2d_nc_pinterp_a-data2d_nc_pinterp.obj -MD -MP -MF $(DEPDIR)/libvx_data2d_nc_pinterp_a-data2d_nc_pinterp.Tpo -c -o libvx_data2d_nc_pinterp_a-data2d_nc_pinterp.obj `if test -f 'data2d_nc_pinterp.cc'; then $(CYGPATH_W) 'data2d_nc_pinterp.cc'; else $(CYGPATH_W) '$(srcdir)/data2d_nc_pinterp.cc'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvx_data2d_nc_pinterp_a-data2d_nc_pinterp.Tpo $(DEPDIR)/libvx_data2d_nc_pinterp_a-data2d_nc_pinterp.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='data2d_nc_pinterp.cc' object='libvx_data2d_nc_pinterp_a-data2d_nc_pinterp.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_data2d_nc_pinterp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_data2d_nc_pinterp_a-data2d_nc_pinterp.obj `if test -f 'data2d_nc_pinterp.cc'; then $(CYGPATH_W) 'data2d_nc_pinterp.cc'; else $(CYGPATH_W) '$(srcdir)/data2d_nc_pinterp.cc'; fi`
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_read_nccf_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test_read_nccf-test_read_nccf.obj `if test -f 'test_read_nccf.cc'; then $(CYGPATH_W) 'test_read_nccf.cc'; else $(CYGPATH_W) '$(srcdir)/test_read_nccf.cc'; fi`
 
 ID: $(am__tagged_files)
 	$(am__define_uniq_tagged_files); mkid -fID $$unique
@@ -575,7 +515,7 @@ distdir-am: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-all-am: Makefile $(LIBRARIES)
+all-am: Makefile $(PROGRAMS)
 installdirs:
 install: install-am
 install-exec: install-exec-am
@@ -610,13 +550,10 @@ maintainer-clean-generic:
 	-test -z "$(MAINTAINERCLEANFILES)" || rm -f $(MAINTAINERCLEANFILES)
 clean: clean-am
 
-clean-am: clean-generic clean-noinstLIBRARIES mostlyclean-am
+clean-am: clean-generic clean-noinstPROGRAMS mostlyclean-am
 
 distclean: distclean-am
-		-rm -f ./$(DEPDIR)/libvx_data2d_nc_pinterp_a-data2d_nc_pinterp.Po
-	-rm -f ./$(DEPDIR)/libvx_data2d_nc_pinterp_a-get_pinterp_grid.Po
-	-rm -f ./$(DEPDIR)/libvx_data2d_nc_pinterp_a-pinterp_file.Po
-	-rm -f ./$(DEPDIR)/libvx_data2d_nc_pinterp_a-var_info_nc_pinterp.Po
+		-rm -f ./$(DEPDIR)/test_read_nccf-test_read_nccf.Po
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -662,10 +599,7 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-		-rm -f ./$(DEPDIR)/libvx_data2d_nc_pinterp_a-data2d_nc_pinterp.Po
-	-rm -f ./$(DEPDIR)/libvx_data2d_nc_pinterp_a-get_pinterp_grid.Po
-	-rm -f ./$(DEPDIR)/libvx_data2d_nc_pinterp_a-pinterp_file.Po
-	-rm -f ./$(DEPDIR)/libvx_data2d_nc_pinterp_a-var_info_nc_pinterp.Po
+		-rm -f ./$(DEPDIR)/test_read_nccf-test_read_nccf.Po
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
@@ -686,7 +620,7 @@ uninstall-am:
 .MAKE: install-am install-strip
 
 .PHONY: CTAGS GTAGS TAGS all all-am am--depfiles check check-am clean \
-	clean-generic clean-noinstLIBRARIES cscopelist-am ctags \
+	clean-generic clean-noinstPROGRAMS cscopelist-am ctags \
 	ctags-am distclean distclean-compile distclean-generic \
 	distclean-tags distdir dvi dvi-am html html-am info info-am \
 	install install-am install-data install-data-am install-dvi \

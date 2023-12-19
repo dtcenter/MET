@@ -10,11 +10,11 @@ include ${top_srcdir}/Make-include
 
 # The library
 
-noinst_LIBRARIES = libvx_data2d_nccf.a
-libvx_data2d_nccf_a_SOURCES = \
+noinst_LIBRARIES = libvx_data2d_nc_cf.a
+libvx_data2d_nc_cf_a_SOURCES = \
               nccf_file.cc nccf_file.h \
               var_info_nccf.cc var_info_nccf.h \
               data2d_nccf.cc data2d_nccf.h \
-              vx_data2d_nccf.h
-libvx_data2d_nccf_a_CPPFLAGS = ${MET_CPPFLAGS}
+              vx_data2d_nc_cf.h
+libvx_data2d_nc_cf_a_CPPFLAGS = ${MET_CPPFLAGS}
 

@@ -19,7 +19,7 @@
 SUBDIRS	= vx_data2d \
 	vx_data2d_grib \
 	vx_data2d_nc_met \
-	vx_data2d_nccf \
+	vx_data2d_nc_cf \
 	vx_data2d_factory \
 	vx_geodesy \
 	vx_grid \

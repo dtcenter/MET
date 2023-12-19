@@ -32,9 +32,9 @@ test_read_LDADD = -lvx_stat_out \
 	-lvx_statistics \
 	-lvx_data2d_factory \
 	-lvx_data2d_nc_met \
-	-lvx_data2d_nc_pinterp \
+	-lvx_data2d_nc_wrf \
 	$(PYTHON_MET_LIBS) $(PYTHON_DEP_LIBS) \
-	-lvx_data2d_nccf \
+	-lvx_data2d_nc_cf \
 	-lvx_data2d_grib $(GRIB2_MET_LIBS) $(GRIB2_DEP_LIBS) \
 	-lvx_data2d \
 	-lvx_nc_util \
@@ -68,9 +68,9 @@ test_read_prob_LDADD = -lvx_stat_out \
 	-lvx_statistics \
 	-lvx_data2d_factory \
 	-lvx_data2d_nc_met \
-	-lvx_data2d_nc_pinterp \
+	-lvx_data2d_nc_wrf \
 	$(PYTHON_MET_LIBS) $(PYTHON_DEP_LIBS) \
-	-lvx_data2d_nccf \
+	-lvx_data2d_nc_cf \
 	-lvx_data2d_grib $(GRIB2_MET_LIBS) $(GRIB2_DEP_LIBS) \
 	-lvx_data2d \
 	-lvx_nc_util \

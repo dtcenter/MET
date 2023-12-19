@@ -1312,8 +1312,8 @@ AC_CONFIG_FILES([Makefile
                  src/libcode/vx_data2d_grib/Makefile
                  src/libcode/vx_data2d_grib2/Makefile
                  src/libcode/vx_data2d_nc_met/Makefile
-                 src/libcode/vx_data2d_nc_pinterp/Makefile
-                 src/libcode/vx_data2d_nccf/Makefile
+                 src/libcode/vx_data2d_nc_wrf/Makefile
+                 src/libcode/vx_data2d_nc_cf/Makefile
                  src/libcode/vx_data2d_ugrid/Makefile
                  src/libcode/vx_geodesy/Makefile
                  src/libcode/vx_gis/Makefile
@@ -1396,7 +1396,7 @@ if test -n "$MET_DEVELOPMENT"; then
                     internal/test_util/libcode/vx_data2d_factory/Makefile
                     internal/test_util/libcode/vx_data2d_grib/Makefile
                     internal/test_util/libcode/vx_data2d_nc_met/Makefile
-                    internal/test_util/libcode/vx_data2d_nccf/Makefile
+                    internal/test_util/libcode/vx_data2d_nc_cf/Makefile
                     internal/test_util/libcode/vx_geodesy/Makefile
                     internal/test_util/libcode/vx_grid/Makefile
                     internal/test_util/libcode/vx_plot_util/Makefile
