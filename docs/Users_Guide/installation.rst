@@ -81,10 +81,14 @@ Suggested External Utilities
 The following utilities have been used with success by other METplus users in their verification processes.
 They are not required for MET to function, but depending on the user’s intended verification needs, they may be of use:
 
-* `Unified Post Processing System (UPP) <https://dtcenter.org/community-code/unified-post-processor-upp>`_ for preparing model data to be verified
-* `copygb utility <http://www.cpc.ncep.noaa.gov/products/wesley/copygb.html>`_ for re-gridding GRIB version 1 data
-* `Integrated Data Viewer (IDV) <http://www.unidata.ucar.edu/software/idv>`_ for displaying gridded data, including GRIB and NetCDF
-* `ncview utility <http://meteora.ucsd.edu/~pierce/ncview_home_page.html>`_ for viewing gridded NetCDF data (e.g. the output of pcp_combine)
+* `copygb utility <http://www.cpc.ncep.noaa.gov/products/wesley/copygb.html>`_
+  for re-gridding GRIB version 1 data
+* `wgrib2 utility <https://www.cpc.ncep.noaa.gov/products/wesley/wgrib2/>`_
+  for re-gridding GRIB version 2 data  
+* `Integrated Data Viewer (IDV) <http://www.unidata.ucar.edu/software/idv>`_
+  for displaying gridded data, including GRIB and NetCDF
+* `ncview utility <http://meteora.ucsd.edu/~pierce/ncview_home_page.html>`_
+  for viewing gridded NetCDF data (e.g. the output of pcp_combine)
 
 .. _compile_script_install:
 
@@ -108,7 +112,7 @@ subdirectory (e.g. /d1/met/|version|).
 Next, download the
 `compile_MET_all.sh <https://raw.githubusercontent.com/dtcenter/MET/latest/internal/scripts/installation/compile_MET_all.sh>`_
 script and 
-`tar_files.tgz <https://dtcenter.ucar.edu/dfiles/code/METplus/MET/installation/tar_files.met-base-v3.1.tgz>`_ file and place both of these files in the
+`tar_files.tgz <https://dtcenter.ucar.edu/dfiles/code/METplus/MET/installation/tar_files.tgz>`_ file and place both of these files in the
 new directory. These files are available either
 through using the hyperlinks provided or by entering the following commands in
 the terminal while in the directory MET will be installed in:
@@ -116,13 +120,13 @@ the terminal while in the directory MET will be installed in:
 .. code-block:: ini
 
   wget https://raw.githubusercontent.com/dtcenter/MET/latest/internal/scripts/installation/compile_MET_all.sh
-  wget https://dtcenter.ucar.edu/dfiles/code/METplus/MET/installation/tar_files.met-base-v3.1.tgz
+  wget https://dtcenter.ucar.edu/dfiles/code/METplus/MET/installation/tar_files.tgz
 
 The tar files will need to be extracted in the MET installation directory:
 
 .. code-block:: ini
 
-  tar -zxf tar_files.met-base-v3.1.tgz
+  tar -zxf tar_files.tgz
 
 To make the compilation script into an executable, change the permissions to the following:
 
@@ -193,7 +197,7 @@ Environment Variable Descriptions
     modulefiles; set to TRUE if using a machine that does use modulefiles. For more information on 
     modulefiles, visit the `Wikipedia page <https://en.wikipedia.org/wiki/Environment_Modules_(software)>`_.
 
-    **PYTHON_MODULE** Format is *PythonModuleName_version* (e.g. python_3.10.4). This environment variable 
+    **PYTHON_MODULE** -  Format is *PythonModuleName_version* (e.g. python_3.10.4). This environment variable 
     is only required if **USE_MODULES** = TRUE. To set properly, list the Python module to load 
     followed by an underscore and version number. For example, setting
     **PYTHON_MODULE** =python_3.10.4 
@@ -213,14 +217,21 @@ Environment Variable Descriptions
     however, this command can, on certain systems, 
     provide too much information.
 
-    **MET_PYTHON_LD** - Format is -L followed by the directory containing the Python library 
-    files then a space, then -l followed by the necessary Python libraries to link to 
-    (ex. -L/usr/local/python3/lib/\\ -lpython3.10\\ -lpthread\\ -ldl\\ -lutil\\ -lm). 
-    The backslashes are necessary in the example shown because of the spaces, which will be 
-    recognized as the end of the value unless preceded by the “\” character. Alternatively, 
+    **MET_PYTHON_LD** - Format is -L followed by the directory containing
+    the Python library 
+    files then a space, then -l followed by the necessary Python
+    libraries to link to 
+    (ex. -L/usr/local/python3/lib/\\ -lpython3.10\\
+    -lpthread\\ -ldl\\ -lutil\\ -lm). 
+    The backslashes are necessary in the example shown because of
+    the spaces, which will be 
+    recognized as the end of the value unless preceded by the “\\”
+    character. Alternatively, 
     a user can provide the value in quotations 
-    (e.g. export MET_PYTHON_LD="-L/usr/local/python3/lib/ -lpython3.10 -lpthread -ldl -lutil -lm"). 
-    This information may be obtained by running :code:`python3-config --ldflags --embed`; however,
+    (e.g. export MET_PYTHON_LD="-L/usr/local/python3/lib/
+    -lpython3.10 -lpthread -ldl -lutil -lm"). 
+    This information may be obtained by running
+    :code:`python3-config --ldflags --embed`; however,
     this command can, on certain systems, provide too much information.
 
 .. dropdown:: OPTIONAL
@@ -260,7 +271,7 @@ External Library Handling in compile_MET_all.sh
     library and header files are. The following environment variables need to be added 
     to the environment configuration file: 
 
-    .. list-table:: Example Table
+    .. list-table:: Environment Variables Table
       :widths: auto
       :header-rows: 1
 
