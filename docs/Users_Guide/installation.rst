@@ -278,15 +278,25 @@ External Library Handling in compile_MET_all.sh
         - LIB_PNG
       * - MET_GSL
         - LIB_Z
-      * - MET_ATLAS
-      * - MET_ECKIT
+      * -  
+        - MET_ATLAS
+      * -  
+        - MET_ECKIT
+      * -  
         - MET_HDF
-      * - MET_HDFEOS
+      * -  
+        - MET_HDFEOS
+      * -  
         - MET_CAIRO
-      * - MET_FREETYPE
+      * -  
+        - MET_FREETYPE
+      * -  
         - MET_PYTHON_BIN_EXE
-      * - MET_PYTHON_CC
+      * -  
+        - MET_PYTHON_CC
+      * -  
         - MET_PYTHON_LD
+	  
 	  
     Generally speaking, for each library there is a set of three
     environment variables that can  
