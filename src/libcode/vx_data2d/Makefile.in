@@ -113,7 +113,8 @@ am_libvx_data2d_a_OBJECTS =  \
 	libvx_data2d_a-var_info.$(OBJEXT) \
 	libvx_data2d_a-data_class.$(OBJEXT) \
 	libvx_data2d_a-data2d_utils.$(OBJEXT) \
-	libvx_data2d_a-table_lookup.$(OBJEXT)
+	libvx_data2d_a-table_lookup.$(OBJEXT) \
+	libvx_data2d_a-mask_filters.$(OBJEXT)
 libvx_data2d_a_OBJECTS = $(am_libvx_data2d_a_OBJECTS)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -134,6 +135,7 @@ am__depfiles_remade = ./$(DEPDIR)/libvx_data2d_a-data2d_utils.Po \
 	./$(DEPDIR)/libvx_data2d_a-data_class.Po \
 	./$(DEPDIR)/libvx_data2d_a-level_info.Po \
 	./$(DEPDIR)/libvx_data2d_a-leveltype_to_string.Po \
+	./$(DEPDIR)/libvx_data2d_a-mask_filters.Po \
 	./$(DEPDIR)/libvx_data2d_a-table_lookup.Po \
 	./$(DEPDIR)/libvx_data2d_a-var_info.Po
 am__mv = mv -f
@@ -361,6 +363,7 @@ libvx_data2d_a_SOURCES = \
               data_class.cc data_class.h \
               data2d_utils.cc data2d_utils.h \
               table_lookup.cc table_lookup.h \
+              mask_filters.cc mask_filters.h \
               vx_data2d.h
 
 libvx_data2d_a_CPPFLAGS = ${MET_CPPFLAGS}
@@ -416,6 +419,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_data2d_a-data_class.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_data2d_a-level_info.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_data2d_a-leveltype_to_string.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_data2d_a-mask_filters.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_data2d_a-table_lookup.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_data2d_a-var_info.Po@am__quote@ # am--include-marker
 
@@ -522,6 +526,20 @@ libvx_data2d_a-table_lookup.obj: table_lookup.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='table_lookup.cc' object='libvx_data2d_a-table_lookup.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_data2d_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_data2d_a-table_lookup.obj `if test -f 'table_lookup.cc'; then $(CYGPATH_W) 'table_lookup.cc'; else $(CYGPATH_W) '$(srcdir)/table_lookup.cc'; fi`
+
+libvx_data2d_a-mask_filters.o: mask_filters.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_data2d_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_data2d_a-mask_filters.o -MD -MP -MF $(DEPDIR)/libvx_data2d_a-mask_filters.Tpo -c -o libvx_data2d_a-mask_filters.o `test -f 'mask_filters.cc' || echo '$(srcdir)/'`mask_filters.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvx_data2d_a-mask_filters.Tpo $(DEPDIR)/libvx_data2d_a-mask_filters.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mask_filters.cc' object='libvx_data2d_a-mask_filters.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_data2d_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_data2d_a-mask_filters.o `test -f 'mask_filters.cc' || echo '$(srcdir)/'`mask_filters.cc
+
+libvx_data2d_a-mask_filters.obj: mask_filters.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_data2d_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_data2d_a-mask_filters.obj -MD -MP -MF $(DEPDIR)/libvx_data2d_a-mask_filters.Tpo -c -o libvx_data2d_a-mask_filters.obj `if test -f 'mask_filters.cc'; then $(CYGPATH_W) 'mask_filters.cc'; else $(CYGPATH_W) '$(srcdir)/mask_filters.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvx_data2d_a-mask_filters.Tpo $(DEPDIR)/libvx_data2d_a-mask_filters.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mask_filters.cc' object='libvx_data2d_a-mask_filters.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_data2d_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_data2d_a-mask_filters.obj `if test -f 'mask_filters.cc'; then $(CYGPATH_W) 'mask_filters.cc'; else $(CYGPATH_W) '$(srcdir)/mask_filters.cc'; fi`
 
 ID: $(am__tagged_files)
 	$(am__define_uniq_tagged_files); mkid -fID $$unique
@@ -651,6 +669,7 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/libvx_data2d_a-data_class.Po
 	-rm -f ./$(DEPDIR)/libvx_data2d_a-level_info.Po
 	-rm -f ./$(DEPDIR)/libvx_data2d_a-leveltype_to_string.Po
+	-rm -f ./$(DEPDIR)/libvx_data2d_a-mask_filters.Po
 	-rm -f ./$(DEPDIR)/libvx_data2d_a-table_lookup.Po
 	-rm -f ./$(DEPDIR)/libvx_data2d_a-var_info.Po
 	-rm -f Makefile
@@ -702,6 +721,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/libvx_data2d_a-data_class.Po
 	-rm -f ./$(DEPDIR)/libvx_data2d_a-level_info.Po
 	-rm -f ./$(DEPDIR)/libvx_data2d_a-leveltype_to_string.Po
+	-rm -f ./$(DEPDIR)/libvx_data2d_a-mask_filters.Po
 	-rm -f ./$(DEPDIR)/libvx_data2d_a-table_lookup.Po
 	-rm -f ./$(DEPDIR)/libvx_data2d_a-var_info.Po
 	-rm -f Makefile
