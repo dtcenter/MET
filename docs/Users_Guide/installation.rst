@@ -40,7 +40,7 @@ The required libraries are listed below:
   in C and CXX, for intermediate and output file formats
 * `HDF5 <https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.12/hdf5-1.12.2/src/hdf5-1.12.2.tar.gz>`__
   is required to support NetCDF 4. HDF5 should be built with
-  `zlib <http://www.zlib.net/>`_.
+  `zlib <http://www.zlib.net/>`_
 * `GSL <http://www.gnu.org/software/gsl>`_
   GNU Scientific Library Developer's Version for computing
   confidence intervals (use **GSL-1.11** for **PGI** compilers)
@@ -50,21 +50,21 @@ The following libraries are conditionally required, depending on the intended
 verification use and compiler language:
 
 * `GRIB2C Library <https://github.com/NOAA-EMC/NCEPLIBS-g2c>`_
-  (with dependencies Z, PNG, JASPER), if compiling GRIB2 support.
+  (with dependencies Z, PNG, JASPER), if compiling GRIB2 support
 * `Python Libraries <https://docs.python.org/3/>`_,
-  if compiling support for Python embedding.
+  if compiling support for Python embedding
 * `ecKit <https://github.com/ecmwf/eckit>`_
   Library, if compiling support for unstructured grids
 * `ATLAS <https://math-atlas.sourceforge.net/>`_
   Library, if compiling support for unstructured grids
 * `HDF4 <http://www.hdfgroup.org/products/hdf4>`__
-  library if compiling the MODIS-Regrid or lidar2nc tool.
+  library if compiling the MODIS-Regrid or lidar2nc tool
 * `HDF-EOS2 <http://www.hdfgroup.org/hdfeos.html>`__
-  library if compiling the MODIS-Regrid or lidar2nc tool.
+  library if compiling the MODIS-Regrid or lidar2nc tool
 * `Cairo <http://cairographics.org/releases>`_
-  library if compiling the MODE-Graphics tool.
+  library if compiling the MODE-Graphics tool
 * `FreeType <http://www.freetype.org/download.html>`_
-  library if compiling the MODE-Graphics tool.
+  library if compiling the MODE-Graphics tool
 * `f2c <http://www.netlib.org/f2c>`_
   library for interfacing between Fortran and C
   (**Not required for most compilers**)
@@ -82,7 +82,7 @@ The following utilities have been used with success by other METplus users in th
 They are not required for MET to function, but depending on the user’s intended verification needs, they may be of use:
 
 * `Unified Post Processing System (UPP) <https://dtcenter.org/community-code/unified-post-processor-upp>`_ for preparing model data to be verified
-* `copygb utility <http://www.cpc.ncep.noaa.gov/products/wesley/copygb.html>`_ for re-gridding grib data (available with the WRF Post-Processor)
+* `copygb utility <http://www.cpc.ncep.noaa.gov/products/wesley/copygb.html>`_ for re-gridding GRIB version 1 data
 * `Integrated Data Viewer (IDV) <http://www.unidata.ucar.edu/software/idv>`_ for displaying gridded data, including GRIB and NetCDF
 * `ncview utility <http://meteora.ucsd.edu/~pierce/ncview_home_page.html>`_ for viewing gridded NetCDF data (e.g. the output of pcp_combine)
 
@@ -95,7 +95,7 @@ The **compile_MET_all.sh** script is designed to install MET and, if desired, al
 of the external library dependencies required for running the system on various
 platforms. There are some required environment variables that need to be set
 before running the script and some optional environment variables, both of
-which are described below. The script relies on the **tar_files.tgz**, which
+which are described below. The script relies on a **tar_files.tgz** file, which
 contains all of the required and optional library packages for MET but not
 MET itself. A separate command will be used to pull down the latest version of
 MET in .tgz (tarred and gzipped) format from GitHub, which the script will then
@@ -105,16 +105,18 @@ To begin, create and change to a directory where the latest version of MET will 
 installed. Assuming that the following guidance uses “/d1” as the parent directory, 
 a suggested format is a path to a “met” directory, followed by the version number 
 subdirectory (e.g. /d1/met/|version|). 
-Next, download the `compile_MET_all.sh <https://raw.githubusercontent.com/dtcenter/MET/main_v11.0/internal/scripts/installation/compile_MET_all.sh>`_
+Next, download the
+`compile_MET_all.sh <https://raw.githubusercontent.com/dtcenter/MET/latest/internal/scripts/installation/compile_MET_all.sh>`_
 script and 
 `tar_files.tgz <https://dtcenter.ucar.edu/dfiles/code/METplus/MET/installation/tar_files.met-base-v3.1.tgz>`_
-and place both of these in the new directory. These files are available either
+ file and place both of these files in the new directory. These files
+ are available either
 through using the hyperlinks provided or by entering the following commands in
 the terminal while in the directory MET will be installed in:
 
 .. code-block:: ini
 
-  wget https://raw.githubusercontent.com/dtcenter/MET/main_v12.0/internal/scripts/installation/compile_MET_all.sh
+  wget https://raw.githubusercontent.com/dtcenter/MET/latest/internal/scripts/installation/compile_MET_all.sh
   wget https://dtcenter.ucar.edu/dfiles/code/METplus/MET/installation/tar_files.met-base-v3.1.tgz
 
 The tar files will need to be extracted in the MET installation directory:
@@ -137,8 +139,8 @@ Now change directories to the one that was created from expanding the tar files:
 
 The next step will be to identify and download the latest MET release as a
 tar file (e.g. |version|.tar.gz) and place it in
-the tar_files directory. The file is available from the
-Recommended-Components MET section of the
+the *tar_files* directory. The file is available from the
+MET line under the“RECOMMENDED - COMPONENTS” section on the
 `METplus website <https://dtcenter.org/community-code/metplus/download>`_ or
 by using a wget command while in the *tar_files* directory:
 
@@ -170,8 +172,10 @@ Environment Variable Descriptions
 
 .. dropdown:: REQUIRED
 
-    **TEST_BASE** – Format is */d1/met/12.0.0*. This is the MET installation directory that was created 
-    the beginning of, :numref:`compile_script_install` and contains **compile_MET_all.sh** script, **tar_files.tgz**, 
+    **TEST_BASE** – Format is */d1/met/12.0.0*. This is the MET
+    installation directory that was created 
+    the beginning of, :numref:`compile_script_install` and contains the
+    **compile_MET_all.sh** script, **tar_files.tgz**, 
     and the *tar_files* directory from the untar command.
 
     **COMPILER** – Format is *compiler_version* (e.g. gnu_8.3.0). For the GNU family of compilers, 
@@ -188,7 +192,7 @@ Environment Variable Descriptions
 
     **USE_MODULES** – Format is *TRUE* or *FALSE*. Set to FALSE if using a machine that does not use 
     modulefiles; set to TRUE if using a machine that does use modulefiles. For more information on 
-    modulefiles, visit the `wiki page <https://en.wikipedia.org/wiki/Environment_Modules_(software)>`_.
+    modulefiles, visit the `Wikipedia page <https://en.wikipedia.org/wiki/Environment_Modules_(software)>`_.
 
     **PYTHON_MODULE** Format is *PythonModuleName_version* (e.g. python_3.10.4). This environment variable 
     is only required if **USE_MODULES** = TRUE. To set properly, list the Python module to load 
@@ -199,12 +203,15 @@ Environment Variable Descriptions
 
 .. dropdown:: REQUIRED, IF COMPILING PYTHON EMBEDDING
 
-    **MET_PYTHON** – Format is directory path (e.g. */usr/local/python3*). This is the location
+    **MET_PYTHON** – Format is directory path (e.g. */usr/local/python3*).
+    This is the location
     containing the bin, include, lib, and share directories for Python.
 
-    **MET_PYTHON_CC** - Format is -I followed by the directory containing Python includes 
-    (ex. -I/usr/local/python3/include/python3.10). This information may be obtained by 
-    running :code:`python3-config --cflags`; however, this command can, on certain systems, 
+    **MET_PYTHON_CC** - Format is -I followed by the directory containing
+    the Python include files (ex. -I/usr/local/python3/include/python3.10).
+    This information may be obtained by 
+    running :code:`python3-config --cflags`;
+    however, this command can, on certain systems, 
     provide too much information.
 
     **MET_PYTHON_LD** - Format is -L followed by the directory containing the Python library 
@@ -219,13 +226,20 @@ Environment Variable Descriptions
 
 .. dropdown:: OPTIONAL
 
-    **export MAKE_ARGS=-j #** – If there is a need to install external libraries, or to attempt 
-    to speed up the MET compilation process, this environmental setting can be added to the 
-    environment configuration file. Replace the # with the number of cores to use 
-    (as an integer) or simply specify :code:`export MAKE_ARGS=-j` with no integer argument to 
-    start as many processes in parallel as possible. Note that Docker has trouble compiling 
-    without a specified value of cores to use.  The automated MET testing scripts in the 
-    Docker environment have been successful with a value of 5.
+    **export MAKE_ARGS=-j #** – If there is a need to install external
+    libraries, or to attempt 
+    to speed up the MET compilation process, this environmental
+    setting can be added to the 
+    environment configuration file. Replace the # with the number
+    of cores to use 
+    (as an integer) or simply specify :code:`export MAKE_ARGS=-j`
+    with no integer argument to 
+    start as many processes in parallel as possible. Note that Docker
+    has trouble compiling 
+    without a specified value of cores to use.  The automated MET
+    testing scripts in the 
+    Docker environment have been successful with a value of
+    5 (ex. export MAKE_ARGS=”-j 5”).
 
 
 External Library Handling in compile_MET_all.sh
@@ -233,8 +247,7 @@ External Library Handling in compile_MET_all.sh
 
 .. dropdown:: IF THE USER WANTS TO HAVE THE COMPILATION SCRIPT DOWNLOAD THE LIBRARY DEPENDENCIES
 
-    The **compile_MET_all.sh** script will compile and install MET and its required external 
-    library dependencies
+    The **compile_MET_all.sh** script will compile and install MET and its
     :ref:`required_external_libraries_to_build_MET`, if needed. 
     Note that if these libraries are already installed somewhere on the system, 
     MET will call and use the libraries that were installed by the script. 
@@ -257,7 +270,8 @@ External Library Handling in compile_MET_all.sh
     MET_HDF, MET_HDFEOS, MET_CAIRO, MET_FREETYPE, MET_PYTHON_BIN_EXE, MET_PYTHON_CC,
     MET_PYTHON_LD.**
 
-    Generally speaking, for each library there is a set of three environment variables to 
+    Generally speaking, for each library there is a set of three
+    environment variables that can  
     describe the locations: 
     **$MET_<lib>**, **$MET_<lib>INC** and **$MET_<lib>LIB**.
 
@@ -472,6 +486,6 @@ Users can also proceed to the
 `Tutorial <https://dtcenter.org/community-code/metplus/online-tutorial>`_
 and run through the examples that only utilize the MET processes
 (METplus wrapper applications and commands will not work unless
-METplus wrappers is also installed).
+METplus wrappers are also installed).
 
 
