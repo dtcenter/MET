@@ -261,8 +261,8 @@ External Library Handling in compile_MET_all.sh
     to the environment configuration file: 
 
     .. list-table:: Example Table
-       :widths: auto
-       :header-rows: 1
+      :widths: auto
+      :header-rows: 1
 
       * - Always Required
         - Optional, Depending on Configuration Options: 
