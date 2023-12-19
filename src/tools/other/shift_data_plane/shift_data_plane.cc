@@ -313,10 +313,7 @@ void write_netcdf(const DataPlane &dp, const Grid &grid,
    // Define output variable and attributes
    cs << cs_erase << vinfo->name_attr();
    if(vinfo->level().type() != LevelType_Accum &&
-      ftype != FileType_NcMet &&
-      ftype != FileType_General_Netcdf &&
-      ftype != FileType_NcPinterp &&
-      ftype != FileType_NcCF) {
+      !is_netcdf_grdfiletype(ftype)) {
       cs << "_" << vinfo->level_attr();
    }
 

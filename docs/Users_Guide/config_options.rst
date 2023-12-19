@@ -950,6 +950,7 @@ to be verified. This dictionary may include the following entries:
        file_type = GRIB1;         GRIB version 1
        file_type = GRIB2;         GRIB version 2
        file_type = NETCDF_MET;    NetCDF created by another MET tool
+       file_type = NETCDF_WRF;    NetCDF WRF output.
        file_type = NETCDF_PINT;   NetCDF created by running the p_interp
                                   or wrf_interp utility on WRF output.
                                   May be used to read unstaggered raw WRF

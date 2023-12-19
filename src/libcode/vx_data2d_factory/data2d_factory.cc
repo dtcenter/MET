@@ -81,6 +81,7 @@ MetPythonDataFile * p = nullptr;
          mtddf = new MetNcMetDataFile;
          break;
 
+      case FileType_NcWrf:
       case FileType_NcPinterp:
          mtddf = new MetNcPinterpDataFile;
          break;
