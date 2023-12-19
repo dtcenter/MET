@@ -15,7 +15,7 @@ environment and hardware that MET is being installed on as it has options
 that are dependent on compiler usage, modulefiles, etc.
 
 There are multiple supported methods for installing MET: using a provided
-compilation script, Docker instances, and Apptainer/Singularity instances.
+compilation script, Docker instances, and Apptainer instances.
 All of these methods will be described below. The recommended method is
 :ref:`compile_script_install`.
 
@@ -95,20 +95,21 @@ They are not required for MET to function, but depending on the user’s intende
 Using the compile_MET_all.sh Script
 ===================================
 
-The **compile_MET_all.sh** script is designed to install MET and, if desired, all
+The **compile_MET_all.sh** script is designed to install MET and,
+if desired, all
 of the external library dependencies required for running the system on various
 platforms. There are some required environment variables that need to be set
 before running the script and some optional environment variables, both of
 which are described below. The script relies on a **tar_files.tgz** file, which
 contains all of the required and optional library packages for MET but not
 MET itself. A separate command will be used to pull down the latest version of
-MET in .tgz (tarred and gzipped) format from GitHub, which the script will then
-install.
+MET in tar.tgz (tarred and gzipped) format from GitHub, which the script
+will then install.
 
 To begin, create and change to a directory where the latest version of MET will be
 installed. Assuming that the following guidance uses “/d1” as the parent directory, 
 a suggested format is a path to a “met” directory, followed by the version number 
-subdirectory (e.g. /d1/met/|version|). 
+subdirectory (e.g. */d1/met/12.0.0*). 
 Next, download the
 `compile_MET_all.sh <https://raw.githubusercontent.com/dtcenter/MET/latest/internal/scripts/installation/compile_MET_all.sh>`_
 script and 
@@ -141,7 +142,7 @@ Now change directories to the one that was created from expanding the tar files:
   cd tar_files
 
 The next step will be to identify and download the latest MET release as a
-tar file (e.g. |version|.tar.gz) and place it in
+tar file (e.g. **v12.0.0.tar.gz**) and place it in
 the *tar_files* directory. The file is available from the
 MET line under the“RECOMMENDED - COMPONENTS” section on the
 `METplus website <https://dtcenter.org/community-code/metplus/download>`_ or
@@ -161,14 +162,15 @@ that are required:
 **TEST_BASE**, **COMPILER**, **MET_SUBDIR**, **MET_TARBALL**, and **USE_MODULES**.  
 If compiling support for Python embedding, the script will need the following
 additional environment variables: **MET_PYTHON**, **MET_PYTHON_CC**, and
-**MET_PYTHON_LD**
-
+**MET_PYTHON_LD**. All of these environment variables are discussed
+in further detail in the Environment Variable Descriptions section below.
 An easy way to set these environment variables is in an environment
-configuration file  (for example, install_met_env.<machine_name>). An
+configuration file  (for example, **install_met_env.<machine_name>**). An
 example environment configuration file to start with (**install_met_env.generic**),
 as well as environment configuration files used on HPCs at NCAR and NOAA,
 can be found in the `MET GitHub repository <https://github.com/dtcenter/MET>`_ in the 
-`internal/scripts/installation/config <scripts/installation/config>` directory.
+`internal/scripts/installation/config <https://github.com/dtcenter/MET/tree/main_v12.0/internal/scripts/installation/config>`_
+directory.
 
 Environment Variable Descriptions
 ---------------------------------
@@ -206,7 +208,7 @@ Environment Variable Descriptions
 
 .. dropdown:: REQUIRED, IF COMPILING PYTHON EMBEDDING
 
-    **MET_PYTHON** – Format is directory path (e.g. */usr/local/python3*).
+    **MET_PYTHON** – Format is */usr/local/python3*.
     This is the location
     containing the bin, include, lib, and share directories for Python.
 
@@ -242,7 +244,7 @@ Environment Variable Descriptions
     setting can be added to the 
     environment configuration file. Replace the # with the number
     of cores to use 
-    (as an integer) or simply specify :code:`export MAKE_ARGS=-j`
+    (as an integer) or simply specify "export MAKE_ARGS=-j"
     with no integer argument to 
     start as many processes in parallel as possible. Note that Docker
     has trouble compiling 
@@ -351,15 +353,12 @@ The screenshot below shows the contents of the installation directory after inst
 
 .. image:: figure/installation_dir_after.png
 
-To confirm that MET was installed successfully, users are encouraged to run 
-the following command to ensure the installation test scripts ran successfully:
+To confirm that MET was installed successfully, run the following command from the installation directory to check for errors in the test file:
 
 .. code-block:: ini
 		
   grep -i error MET12.0.0/met.make_test.log
   
-which should return nothing if there were no errors.
-
 If no errors are returned, the installation was successful.
 Due to the highly variable nature of hardware systems, users may encounter issues during 
 the installation process that result in MET not being installed. If this occurs please 
@@ -499,7 +498,7 @@ to make the container:
 Running the MET Container
 -------------------------
 
-The container is now ready for usage! Simply use the exec
+The container is now ready for usage! Simply use the :code:`exec`
 command to invoke the MET container, along with the appropriate
 MET command line usage:
 
