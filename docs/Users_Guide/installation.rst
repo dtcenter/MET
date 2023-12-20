@@ -273,6 +273,57 @@ External Library Handling in compile_MET_all.sh
     library and header files are. The following environment variables need to be added 
     to the environment configuration file:
 
+    +------------------------+------------------------+-----------------------+
+    | Feature                | Configuration          | Environment Variables |
+    |                        | Option                 |                       |
+    +========================+========================+=======================+
+    | Always Required        |                        | MET_BUFRLIB           |
+    +                        +                        +-----------------------+
+    |                        |                        | BUFRLIB_NAME          |
+    +                        +                        +-----------------------+
+    |                        |                        | MET_PROJ              |
+    +                        +                        +-----------------------+
+    |                        |                        | MET_HDF5              |
+    +                        +                        +-----------------------+
+    |                        |                        | MET_NETCDF            |
+    +                        +                        +-----------------------+
+    |                        |                        | MET_GSL               |
+    +------------------------+------------------------+-----------------------+
+    | Optional GRIB2         | --enable-all           | MET_GRIB2CLIB         |
+    + Support                + or                     +-----------------------+
+    |                        | --enable-grib2         | MET_GRIB2CINC         |
+    +                        +                        +-----------------------+
+    |                        |                        | GRIB2CLIB_NAME        |
+    +                        +                        +-----------------------+
+    |                        |                        | LIB_JASPER            |
+    +                        +                        +-----------------------+
+    |                        |                        | LIB_PNG               |
+    +                        +                        +-----------------------+
+    |                        |                        | LIB_Z                 |
+    +------------------------+------------------------+-----------------------+
+    | Optional Python        | --enable-all           | MET_PYTHON_BIN_EXE    |
+    + Support                + or                     +-----------------------+
+    |                        | --enable-python        | MET_PYTHON_CC         |
+    +                        +                        +-----------------------+
+    |                        |                        | MET_PYTHON_LD         |
+    +------------------------+------------------------+-----------------------+
+    | Optional Unstructured  | --enable-all           | MET_ATLAS             |
+    + Grid Support           + or                     +-----------------------+
+    |                        | --enable-ugrid         | MET_ECKIT             |
+    +------------------------+------------------------+-----------------------+
+    | Optional LIDAR2NC      | --enable-all           | MET_HDF               |
+    + Support                + or                     +                       +
+    |                        | --enable-lidar2nc      |                       |
+    +------------------------+------------------------+-----------------------+
+    | Optional MODIS         | --enable-all or        | MET_HDF               |
+    + Support                +                        +-----------------------+
+    |                        | --enable-modis         | MET_HDFEOS            |
+    +------------------------+------------------------+-----------------------+
+    | Optional MODE          | --enable-all or        | MET_HDF               |
+    + Graphics Support       +                        +-----------------------+
+    |                        | --enable-mode_graphics | MET_HDFEOS            |
+    +------------------------+------------------------+-----------------------+
+
     .. csv-table:: Environment Variables Table
        :file: environment_variables_table.csv
        :widths: 30, 30, 30
