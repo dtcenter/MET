@@ -278,44 +278,7 @@ External Library Handling in compile_MET_all.sh
        :widths: 30, 30, 30
        :header-rows: 1
 
-    .. list-table:: Environment Variables Table
-      :widths: auto
-      :header-rows: 1
-
-      * - Always Required
-        - Optional, Depending on Configuration Options: 
-      * - MET_BUFRLIB
-        - MET_GRIB2CLIB
-      * - BUFRLIB_NAME
-        - MET_GRIB2CINC
-      * - MET_PROJ
-        - GRIB2CLIB_NAME
-      * - MET_HDF5
-        - LIB_JASPER
-      * - MET_NETCDF
-        - LIB_PNG
-      * - MET_GSL
-        - LIB_Z
-      * -  
-        - MET_ATLAS
-      * -  
-        - MET_ECKIT
-      * -  
-        - MET_HDF
-      * -  
-        - MET_HDFEOS
-      * -  
-        - MET_CAIRO
-      * -  
-        - MET_FREETYPE
-      * -  
-        - MET_PYTHON_BIN_EXE
-      * -  
-        - MET_PYTHON_CC
-      * -  
-        - MET_PYTHON_LD
-	  
-	  
+  	  
     Generally speaking, for each library there is a set of three
     environment variables that can  
     describe the locations: 
