@@ -273,56 +273,65 @@ External Library Handling in compile_MET_all.sh
     library and header files are. The following environment variables need to be added 
     to the environment configuration file:
 
-    +------------------------+------------------------+-----------------------+
-    | Feature                | Configuration          | Environment Variables |
-    |                        | Option                 |                       |
-    +========================+========================+=======================+
-    | Always Required        |                        | MET_BUFRLIB           |
-    |                        |                        +-----------------------+
-    |                        |                        | BUFRLIB_NAME          |
-    |                        |                        +-----------------------+
-    |                        |                        | MET_PROJ              |
-    |                        |                        +-----------------------+
-    |                        |                        | MET_HDF5              |
-    |                        |                        +-----------------------+
-    |                        |                        | MET_NETCDF            |
-    |                        |                        +-----------------------+
-    |                        |                        | MET_GSL               |
-    +------------------------+------------------------+-----------------------+
-    | Optional GRIB2         | --enable-all           | MET_GRIB2CLIB         |
-    | Support                | or                     +-----------------------+
-    |                        | --enable-grib2         | MET_GRIB2CINC         |
-    |                        |                        +-----------------------+
-    |                        |                        | GRIB2CLIB_NAME        |
-    |                        |                        +-----------------------+
-    |                        |                        | LIB_JASPER            |
-    |                        |                        +-----------------------+
-    |                        |                        | LIB_PNG               |
-    |                        |                        +-----------------------+
-    |                        |                        | LIB_Z                 |
-    +------------------------+------------------------+-----------------------+
-    | Optional Python        | --enable-all           | MET_PYTHON_BIN_EXE    |
-    | Support                | or                     +-----------------------+
-    |                        | --enable-python        | MET_PYTHON_CC         |
-    |                        |                        +-----------------------+
-    |                        |                        | MET_PYTHON_LD         |
-    +------------------------+------------------------+-----------------------+
-    | Optional Unstructured  | --enable-all           | MET_ATLAS             |
-    | Grid Support           | or                     +-----------------------+
-    |                        | --enable-ugrid         | MET_ECKIT             |
-    +------------------------+------------------------+-----------------------+
-    | Optional LIDAR2NC      | --enable-all           | MET_HDF               |
-    | Support                | or                     |                       |
-    |                        | --enable-lidar2nc      |                       |
-    +------------------------+------------------------+-----------------------+
-    | Optional MODIS         | --enable-all or        | MET_HDF               |
-    | Support                |                        +-----------------------+
-    |                        | --enable-modis         | MET_HDFEOS            |
-    +------------------------+------------------------+-----------------------+
-    | Optional MODE          | --enable-all or        | MET_HDF               |
-    | Graphics Support       |                        +-----------------------+
-    |                        | --enable-mode_graphics | MET_HDFEOS            |
-    +------------------------+------------------------+-----------------------+
+    +-------------------+--------------------------------+------------------------------+
+    | **Feature**       | **Configuration Option**       | **Environment Variables**    |
+    +===================+================================+==============================+
+    | *Always*          |                                | MET_BUFRLIB,                 |
+    |                   |                                |                              |
+    | *Required*        |                                | BUFRLIB_NAME,                |
+    |                   |                                |                              |
+    |                   |                                | MET_PROJ,                    |
+    |                   |                                |                              |
+    |                   |                                | MET_HDF5,                    |
+    |                   |                                |                              |
+    |                   |                                | MET_NETCDF,                  |
+    |                   |                                |                              |
+    |                   |                                | MET_GSL                      |
+    +-------------------+--------------------------------+------------------------------+
+    | *Optional*        | :code:`--enable-all` or        | MET_GRIB2CLIB,               |
+    |                   |                                |                              |
+    | GRIB2             | :code:`--enable-grib2`         | MET_GRIB2CINC,               |
+    |                   |                                |                              |
+    | Support           |                                | LIB_Z,                       |
+    |                   |                                |                              |
+    |                   |                                | GRIB2CLIB_NAME,              |
+    |                   |                                |                              |
+    |                   |                                | LIB_JASPER,                  |
+    |                   |                                |                              |
+    |                   |                                | LIB_PNG,                     |
+    |                   |                                |                              |
+    |                   |                                | LIB_Z                        |
+    +-------------------+--------------------------------+------------------------------+
+    | *Optional*        | :code:`--enable-all` or        | MET_PYTHON_BIN_EXE,          |
+    |                   |                                |                              |
+    | Python            | :code:`--enable-python`        | MET_PYTHON_CC,               |
+    |                   |                                |                              |
+    | Support           |                                | MET_PYTHON_LD                |
+    +-------------------+--------------------------------+------------------------------+
+    | *Optional*        | :code:`--enable-all` or        | MET_ATLAS,                   |
+    |                   |                                |                              |
+    | Unstructured Grid | :code:`--enable-ugrid`         | MET_ECKIT                    |
+    |                   |                                |                              |
+    | Support           |                                |                              |
+    +-------------------+--------------------------------+------------------------------+
+    | *Optional*        | :code:`--enable-all` or        | MET_HDF                      |
+    |                   |                                |                              |
+    | LIDAR2NC          | :code:`--enable-lidar2nc`      |                              |
+    |                   |                                |                              |
+    | Support           |                                |                              |
+    +-------------------+--------------------------------+------------------------------+
+    | *Optional*        | :code:`--enable-all` or        | MET_HDF,                     |
+    |                   |                                |                              |
+    | MODIS             | :code:`--enable-modis`         | MET_HDFEOS                   |
+    |                   |                                |                              |
+    | Support           |                                |                              |
+    +-------------------+--------------------------------+------------------------------+
+    | *Optional*        | :code:`--enable-all` or        | MET_CAIRO,                   |
+    |                   |                                |                              |
+    | MODE Graphics     | :code:`--enable-mode_graphics` | MET_FREETYPE                 |
+    |                   |                                |                              |
+    | Support           |                                |                              |
+    +-------------------+--------------------------------+------------------------------+
   	  
     Generally speaking, for each library there is a set of three
     environment variables that can  
