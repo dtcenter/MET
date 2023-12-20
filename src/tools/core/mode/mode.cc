@@ -192,7 +192,7 @@ int met_main(int argc, char * argv [])
    } else {
 
 
-      // run the traditional version of mode
+      // run the traditional version of mode, with command line arguments as is
       
       ModeFrontEnd *frontend = new ModeFrontEnd;
       status = frontend->run_traditional(Argv);

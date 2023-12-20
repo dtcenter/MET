@@ -51,6 +51,7 @@ using namespace std;
 #include "parse_file_list.h"
 #include "mode_frontend.h"
 #include "multivar_data.h"
+#include "mode_input_data.h"
 #include "mode_data_type.h"
 
 using namespace netCDF;
@@ -67,7 +68,6 @@ static const char sep [] = "====================================================
 static const char tab [] = "   ";
 
 // this is hardwired for the multivar case, at least for now
-
 static const bool do_clusters = false;
 
 static string default_out_dir = ".";
@@ -79,6 +79,7 @@ static string    fcst_fof;
 static string     obs_fof;
 static string config_file;
 static string      outdir;
+static int compress_level = -1;
 
 static Grid verification_grid;
 
@@ -88,6 +89,11 @@ static Grid verification_grid;
 static void set_outdir    (const StringArray &);
 static void set_logfile   (const StringArray &);
 static void set_verbosity (const StringArray &);
+static void set_compress  (const StringArray &);
+
+static void read_input(const string &name, int index, ModeDataType type,
+                       GrdFileType f_t, GrdFileType other_t, int shift,
+                       vector<ModeInputData> &inputs);
 
 static void multivar_consistency_checks(StringArray &fcst_filenames, StringArray &obs_filenames,
                                         BoolCalc &f_calc, BoolCalc &o_calc, int &n_fcst_files,
@@ -95,35 +101,31 @@ static void multivar_consistency_checks(StringArray &fcst_filenames, StringArray
 
 static ConcatString set_multivar_dir();
 
-static void create_verification_grid(const string &fcst_filename,
-                                     const string &obs_filename,
-                                     const ConcatString &dir);
+static void create_verification_grid(const ModeInputData &fcst, const ModeInputData &obs);
+
 
 static MultiVarData *create_simple_objects(ModeDataType dtype, int j, int n_files,
                                            const string &filename, 
-                                           const ConcatString &dir);
+                                           const ConcatString &dir,
+                                           const ModeInputData &input);
 
-static void create_superobjects(int n_fcst_files, const vector<MultiVarData *> &mvdFcst,
-                                int n_obs_files, const vector<MultiVarData *> &mvdObs,
-                                BoolCalc &f_calc, BoolCalc &o_calc,
-                                BoolPlane &f_simple_result, BoolPlane &o_simple_result,
-                                ShapeData &f_simple_sd, ShapeData &o_simple_sd,
-                                ShapeData &f_merge_sd_split, ShapeData &o_merge_sd_split);
-
-static void create_intensity_comparisons(int findex, int oindex, const BoolPlane &f_result,
-                                         BoolPlane &o_result, 
+static void create_intensity_comparisons(int findex, int oindex,
+                                         const ModeSuperObject &fsuper,
+                                         const ModeSuperObject &osuper,
                                          const ConcatString &dir,
                                          MultiVarData &mvdf, MultiVarData &mvdo,
                                          bool has_union_f, bool has_union_o,
-                                         const string &fcst_filename, const string &obs_filename,
-                                         ShapeData &merge_f, ShapeData &merge_o);
+                                         const string &fcst_filename,
+                                         const string &obs_filename);
 
-static void process_superobjects(ShapeData &f_result, ShapeData &o_result,
-                                 ShapeData &f_merge, ShapeData &o_merge,
+static void process_superobjects(ModeSuperObject &fsuper,
+                                 ModeSuperObject &osuper,
                                  int nx, int ny, const ConcatString &dir,
-                                 GrdFileType ftype, GrdFileType otype, const Grid &grid, bool has_union);
+                                 GrdFileType ftype, GrdFileType otype, const Grid &grid,
+                                 bool has_union);
 
-static void mask_data(const string &name, int nx, int ny, const BoolPlane &mask, DataPlane &data);
+static void mask_data(const string &name, int nx, int ny, const BoolPlane &mask,
+                      DataPlane &data);
 static void mask_data_super(const string &name, int nx, int ny, DataPlane &data);
 
 static void read_config(const string & filename);
@@ -131,9 +133,6 @@ static void read_config(const string & filename);
 static void process_command_line(const StringArray &);
 
 static int  _mkdir(const char *dir);
-
-static void _debug_shape_examine(string &name, const ShapeData &sd, int nx, int ny);
-
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -151,25 +150,55 @@ int multivar_frontend(const StringArray & Argv)
    StringArray  obs_filenames;
    BoolCalc f_calc, o_calc ;
 
+   // set some logging related things here, used in all further processing
+
    process_command_line(Argv);
 
+   // read the config as fully as possible without any data reads
+   // (Initialize all the input fields)
+   
    read_config(config_file);
+
+   // check for length discrepencies.
 
    multivar_consistency_checks(fcst_filenames, obs_filenames, f_calc, o_calc,
                                n_fcst_files, n_obs_files);
-
-   bool f_has_union = f_calc.has_union();
-   bool o_has_union = o_calc.has_union();
 
    mlog << Debug(2) << "\n" << sep << "\n";
 
    ConcatString dir = set_multivar_dir();
 
+   // read in all the data
+   vector<ModeInputData> fcstInput, obsInput;
+   GrdFileType ft, ot;
+
+
+   // in the conf object, shift *can* be set independently for obs and fcst
+   int shift = config.shift_right;
+
+   for (int i=0; i<n_fcst_files; ++i) {
+      ft = config.file_type_for_field(true, i);
+      ot = parse_conf_file_type(config.conf.lookup_dictionary(conf_key_obs));
+      read_input(fcst_filenames[i], i, ModeDataType_MvMode_Fcst, ft, ot, shift,
+                 fcstInput);
+   }
+   for (int i=0; i<n_obs_files; ++i) {
+      ft = parse_conf_file_type(config.conf.lookup_dictionary(conf_key_fcst));
+      ot = config.file_type_for_field(false, i);
+      read_input(obs_filenames[i], i, ModeDataType_MvMode_Obs, ot, ft, shift,
+                 obsInput);
+   }
+   
+
+   config.check_multivar_not_implemented();
+   config.config_set_all_percentile_thresholds(fcstInput, obsInput);
+
+
    // first thing to do is to define the verification grid using the 0th
    // fcst and obs inputs
    mlog << Debug(2) << "\n creating the verification grid \n" << sep << "\n";
 
-   create_verification_grid(fcst_filenames[0], obs_filenames[0], dir);
+   create_verification_grid(fcstInput[0], obsInput[0]);
 
    //
    // do the individual mode runs which produce everything needed to create
@@ -183,7 +212,7 @@ int multivar_frontend(const StringArray & Argv)
 
       mlog << Debug(2) 
            << "\n" << sep << "\ncreating simple forecast objects from forecast " << (j + 1) << " of " << n_fcst_files << "\n" << sep << "\n";
-      MultiVarData *mvdi = create_simple_objects(ModeDataType_MvMode_Fcst, j, n_fcst_files, fcst_filenames[j], dir);
+      MultiVarData *mvdi = create_simple_objects(ModeDataType_MvMode_Fcst, j, n_fcst_files, fcst_filenames[j], dir, fcstInput[j]);
       if (j > 0) {
          mvdFcst[0]->checkFileTypeConsistency(*mvdi, j);
       }
@@ -195,7 +224,7 @@ int multivar_frontend(const StringArray & Argv)
 
       mlog << Debug(2) 
            << "\n" << sep << "\ncreating simple obs objects from obs " << (j + 1) << " of " << n_obs_files << "\n" << sep << "\n";
-      MultiVarData *mvdi = create_simple_objects(ModeDataType_MvMode_Obs, j, n_obs_files, obs_filenames[j], dir);
+      MultiVarData *mvdi = create_simple_objects(ModeDataType_MvMode_Obs, j, n_obs_files, obs_filenames[j], dir, obsInput[j]);
       if (j > 0) {
          mvdObs[0]->checkFileTypeConsistency(*mvdi, j);
       }
@@ -207,26 +236,25 @@ int multivar_frontend(const StringArray & Argv)
 
    // now create forecast and obs superobjects
    
-   BoolPlane f_simple_result, o_simple_result;
-   ShapeData f_simple_sd, o_simple_sd, f_merge_sd_split, o_merge_sd_split;
-
-   create_superobjects(n_fcst_files, mvdFcst, n_obs_files, mvdObs,
-                       f_calc, o_calc, f_simple_result, o_simple_result,
-                       f_simple_sd, o_simple_sd,
-                       f_merge_sd_split, o_merge_sd_split);
-
+   ModeSuperObject fsuper(true, n_fcst_files, do_clusters, mvdFcst, f_calc);
+   ModeSuperObject osuper(true, n_obs_files, do_clusters, mvdObs, o_calc);
+                          
    //
    // Filter the data to within the superobjects only and do statistics by invoking mode algorithm again
    // on the masked data pairs
    //
+   bool f_has_union = f_calc.has_union();
+   bool o_has_union = o_calc.has_union();
+
    for (int k=0; k<config.fcst_multivar_compare_index.n(); ++k)
    {
       int findex = config.fcst_multivar_compare_index[k] - 1;
       int oindex = config.obs_multivar_compare_index[k] - 1;
-      create_intensity_comparisons(findex, oindex, f_simple_result, o_simple_result, dir,
-                                   *mvdFcst[findex], *mvdObs[oindex], f_has_union, o_has_union,
-                                   fcst_filenames[findex], obs_filenames[oindex],
-                                   f_merge_sd_split, o_merge_sd_split);
+
+      create_intensity_comparisons(findex, oindex, fsuper, osuper,
+                                   dir, *mvdFcst[findex], *mvdObs[oindex],
+                                   f_has_union, o_has_union,
+                                   fcst_filenames[findex], obs_filenames[oindex]);
    }
 
    mlog << Debug(2) << "\n finished with multivar intensity comparisons \n" << sep << "\n";
@@ -245,8 +273,7 @@ int multivar_frontend(const StringArray & Argv)
 
       bool has_union = f_calc.has_union() || o_calc.has_union();
 
-      process_superobjects(f_simple_sd, o_simple_sd, f_merge_sd_split, o_merge_sd_split,
-                           nx, ny, dir, ftype, otype, grid, has_union);
+      process_superobjects(fsuper, osuper, nx, ny, dir, ftype, otype, grid, has_union);
    }
    
    // free up memory
@@ -314,6 +341,14 @@ void set_verbosity (const StringArray & a)
 
 }
 
+////////////////////////////////////////////////////////////////////////
+
+void set_compress(const StringArray & a)
+{
+   compress_level = atoi(a[0].c_str());
+}
+
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -327,6 +362,17 @@ void read_config(const string & filename)
    path = replace_path(mode_default_config);
 
    config.read_config(path.c_str(), filename.c_str());
+
+   // process the config except for the fields
+   config.process_config_except_fields();
+
+   // done once here, used for all data
+   // what is this, command line overrides config?  look deeper.. remove from exec
+   // except traditional mode
+   if (compress_level >= 0) config.nc_info.set_compress_level(compress_level);
+   // from within mode_exec:
+   // engine.conf_info.nc_info.compress_level = engine.conf_info.get_compression_level();
+
 
    return;
 
@@ -357,6 +403,7 @@ void process_command_line(const StringArray & argv)
    cline.add(set_outdir,    "-outdir", 1);
    cline.add(set_logfile,   "-log",    1);
    cline.add(set_verbosity, "-v",      1);
+   cline.add(set_compress, "-compress", 1);
 
    cline.parse();
 
@@ -374,6 +421,42 @@ void process_command_line(const StringArray & argv)
 
 }
 
+////////////////////////////////////////////////////////////////////////
+
+void read_input(const string &name, int index, ModeDataType type,
+                GrdFileType f_t, GrdFileType other_t, int shift,
+                vector<ModeInputData> &inputs)
+   {
+      Met2dDataFileFactory mtddf_factory;
+      Met2dDataFile *f = mtddf_factory.new_met_2d_data_file(name.c_str(), f_t);
+      if (!f) {
+         mlog << Error << "\nTrouble reading fcst file \""
+              << name << "\"\n\n";
+         exit(1);
+      }
+      Grid g = f->grid();
+      GrdFileType ft = f->file_type();
+
+      //?
+      f->set_shift_right(shift);
+
+      // update config now that we know file type (this sets Fcst to index i)
+      DataPlane dp;
+
+      if (type == ModeDataType_MvMode_Fcst) {
+         config.process_config_field(ft, other_t, type, index);
+         // need to have set the var_info!
+         f->data_plane(*(config.Fcst->var_info), dp);
+      } else {
+         config.process_config_field(other_t, ft, type, index);
+         // need to have set the var_info!
+         f->data_plane(*(config.Obs->var_info), dp);
+      }         
+      
+      inputs.push_back(ModeInputData(name, dp, g, ft));
+      delete f;
+   }
+      
 ////////////////////////////////////////////////////////////////////////
 
 void multivar_consistency_checks(StringArray &fcst_filenames, StringArray &obs_filenames,
@@ -501,92 +584,28 @@ ConcatString set_multivar_dir()
 
 ////////////////////////////////////////////////////////////////////////
 
-void create_verification_grid(const string &fcst_filename, const string &obs_filename,
-                              const ConcatString &dir)
+void create_verification_grid(const ModeInputData &fcst, 
+                              const ModeInputData &obs)
 {
-   ConcatString command;
-   StringArray a, mode_argv;
-
-   //
-   //  build the command for running mode frontend
-   //
-
-   mode_argv.clear();
-   mode_argv.add(mode_path);
-   mode_argv.add(fcst_filename);
-   mode_argv.add(obs_filename);
-   mode_argv.add(config_file);
-
-   command << cs_erase
-           << mode_path     << ' '
-           << fcst_filename << ' '
-           << obs_filename << ' '
-           << config_file;
-
-   mode_argv.add("-v");
-   char junk [256];
-   snprintf(junk, sizeof(junk), "%d", mlog.verbosity_level());
-   mode_argv.add(junk);
-
-   mode_argv.add("-outdir");
-   mode_argv.add(dir);
-
-   command << " -v " << mlog.verbosity_level();
-   command << " -outdir " << dir;
-
-   //
-   //  run the pass1 portions of mode, which creates simple objects
-   //
-
-   mlog << Debug(3) << "Running mode command: \"" << command << "\"\n\n";
    ModeFrontEnd *frontend = new ModeFrontEnd;
-   verification_grid = frontend->create_verification_grid(mode_argv);
+   verification_grid = frontend->create_verification_grid(fcst, obs,
+                                                          config_file,
+                                                          config);
    delete frontend;
-
-
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 MultiVarData *create_simple_objects(ModeDataType dtype,  int j, int n_files,
                                     const string &filename,
-                                    const ConcatString &dir)
+                                    const ConcatString &dir,
+                                    const ModeInputData &input)
 {
-   ConcatString command;
-   StringArray a, mode_argv;
-
-   //
-   //  build the command for running mode frontend
-   //
-
-   mode_argv.clear();
-   mode_argv.add(mode_path);
-   mode_argv.add(filename);
-   mode_argv.add(config_file);
-
-   command << cs_erase
-           << mode_path     << ' '
-           << filename << ' '
-           << config_file;
-
-   mode_argv.add("-v");
-   char junk [256];
-   snprintf(junk, sizeof(junk), "%d", mlog.verbosity_level());
-   mode_argv.add(junk);
-
-   mode_argv.add("-outdir");
-   mode_argv.add(dir);
-
-   command << " -v " << mlog.verbosity_level();
-   command << " -outdir " << dir;
-
-   //
-   //  create the simple objects, forecast or obs, from this input data file
-   //
-
-   mlog << Debug(3) << "Running mode command: \"" << command << "\"\n\n";
    ModeFrontEnd *frontend = new ModeFrontEnd;
-   int status = frontend->create_multivar_simple_objects(mode_argv, dtype, verification_grid, j, n_files);
+   int status =
+      frontend->create_multivar_simple_objects(config, dtype, verification_grid, input, 
+                                               filename, config_file, dir,
+                                               j, n_files);
    MultiVarData *mvdi = frontend->get_multivar_data(dtype);
    delete frontend;
 
@@ -595,7 +614,9 @@ MultiVarData *create_simple_objects(ModeDataType dtype,  int j, int n_files,
    //
 
    frontend = new ModeFrontEnd;
-   status = frontend->create_multivar_merge_objects(mode_argv, dtype, verification_grid, j, n_files);
+   status = frontend->create_multivar_merge_objects(config, dtype, verification_grid, input,
+                                                    filename, config_file, dir, 
+                                                    j, n_files);
 
    // add the merge results to the mvdi object
    frontend->add_multivar_merge_data(mvdi, dtype);
@@ -606,186 +627,60 @@ MultiVarData *create_simple_objects(ModeDataType dtype,  int j, int n_files,
 
 ////////////////////////////////////////////////////////////////////////
 
-void create_superobjects(int n_fcst_files, const vector<MultiVarData *> &mvdFcst,
-                         int n_obs_files, const vector<MultiVarData *> &mvdObs,
-                         BoolCalc &f_calc, BoolCalc &o_calc,
-                         BoolPlane &f_simple_result, BoolPlane &o_simple_result,
-                         ShapeData &f_simple_sd, ShapeData &o_simple_sd,
-                         ShapeData &f_merge_sd_split, ShapeData &o_merge_sd_split)
-{
-   //
-   //  set the BoolPlane values using the mvd content
-   //
-
-   BoolPlane * f_simple_plane = new BoolPlane [n_fcst_files];
-   BoolPlane * o_simple_plane = new BoolPlane [n_obs_files];
-   BoolPlane * f_merge_plane = new BoolPlane [n_fcst_files];
-   BoolPlane * o_merge_plane = new BoolPlane [n_obs_files];
-
-   for (int j=0; j<n_fcst_files; ++j)  {
-      mvdFcst[j]->objects_from_arrays(do_clusters, true, f_simple_plane[j]);
-      mvdFcst[j]->objects_from_arrays(do_clusters, false, f_merge_plane[j]);
-   }
-
-   for (int j=0; j<n_obs_files; ++j)  {
-      mvdObs[j]->objects_from_arrays(do_clusters, true, o_simple_plane[j]);
-      mvdObs[j]->objects_from_arrays(do_clusters, false, o_merge_plane[j]);
-   }
-
-   //
-   //  combine the objects into super-objects
-   //
-   const int nx = f_simple_plane[0].nx();
-   const int ny = f_simple_plane[0].ny();
-
-   BoolPlane f_merge_result, o_merge_result;
-   f_simple_result.set_size(nx, ny);
-   o_simple_result.set_size(nx, ny);
-   f_merge_result.set_size(nx, ny);
-   o_merge_result.set_size(nx, ny);
-
-   combine_boolplanes("Fcst_Simple", f_simple_plane, n_fcst_files, f_calc, f_simple_result);
-   combine_boolplanes("Obs_Simple", o_simple_plane, n_obs_files, o_calc, o_simple_result);
-   combine_boolplanes("Fcst_Merge", f_merge_plane, n_fcst_files, f_calc, f_merge_result);
-   combine_boolplanes("Obs_Merge", o_merge_plane, n_obs_files, o_calc, o_merge_result);
-
-
-   // create ShapeData objects using something from mvd as a template
-   // (shape data has 1's or bad)
-
-   f_simple_sd = ShapeData(*(mvdFcst[0]->_simple->_sd));
-   for (int x=0; x<nx; ++x) {
-      for (int y=0; y<ny; ++y) {
-         if (f_simple_result.get(x, y)) {
-            f_simple_sd.data.put(1.0, x, y);
-         } else {
-            f_simple_sd.data.put(bad_data_double, x, y);
-         }
-      }
-   }
-   o_simple_sd = ShapeData(*(mvdObs[0]->_simple->_sd));
-   for (int x=0; x<nx; ++x) {
-      for (int y=0; y<ny; ++y) {
-         if (o_simple_result.get(x, y)) {
-            o_simple_sd.data.put(1.0, x, y);
-         } else {
-            o_simple_sd.data.put(bad_data_double, x, y);
-         }
-      }
-   }
-
-   ShapeData f_merge_sd = ShapeData(*(mvdFcst[0]->_simple->_sd));
-   for (int x=0; x<nx; ++x) {
-      for (int y=0; y<ny; ++y) {
-         if (f_merge_result.get(x, y)) {
-            f_merge_sd.data.put(1.0, x, y);
-         } else {
-            f_merge_sd.data.put(bad_data_double, x, y);
-         }
-      }
-   }
-   
-   ShapeData o_merge_sd = ShapeData(*(mvdObs[0]->_simple->_sd));
-   for (int x=0; x<nx; ++x) {
-      for (int y=0; y<ny; ++y) {
-         if (o_merge_result.get(x, y)) {
-            o_merge_sd.data.put(1.0, x, y);
-         } else {
-            o_merge_sd.data.put(bad_data_double, x, y);
-         }
-      }
-   }
-
-   int n_f_shapes;
-   f_merge_sd_split = split(f_merge_sd, n_f_shapes);
-   string s = "Forecast Merge";
-   _debug_shape_examine(s, f_merge_sd_split, nx, ny);
-
-   int n_o_shapes;
-   o_merge_sd_split = split(o_merge_sd, n_o_shapes);
-   s = "Obs Merge";
-   _debug_shape_examine(s, o_merge_sd_split, nx, ny);
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
 void
-create_intensity_comparisons(int findex, int oindex, const BoolPlane &f_result,
-                             BoolPlane &o_result, const ConcatString &dir,
+create_intensity_comparisons(int findex, int oindex,
+                             const ModeSuperObject &fsuper,
+                             const ModeSuperObject &osuper,
+                             const ConcatString &dir,
                              MultiVarData &mvdf, MultiVarData &mvdo,
                              bool has_union_f, bool has_union_o,
-                             const string &fcst_filename, const string &obs_filename,
-                             ShapeData &merge_f, ShapeData &merge_o)
+                             const string &fcst_filename,
+                             const string &obs_filename)
 {
 
    // mask the input data to be valid only inside the simple super objects
    int nx = mvdf._nx;
    int ny = mvdf._ny;
    
-   mask_data("Fcst", nx, ny, f_result, mvdf._simple->_sd->data);
-   mask_data("Obs", nx, ny, o_result, mvdo._simple->_sd->data);
-
-   //
-   //  build the command for running mode frontend
-   //
-   StringArray mode_argv;
-   char junk [256];
-
-   mode_argv.clear();
-   mode_argv.add(mode_path);
-   mode_argv.add(fcst_filename);
-   mode_argv.add(obs_filename);
-   mode_argv.add(config_file);
-   mode_argv.add("-v");
-   snprintf(junk, sizeof(junk), "%d", mlog.verbosity_level());
-   mode_argv.add(junk);
-   mode_argv.add("-outdir");
-   mode_argv.add(dir);
+   mask_data("Fcst", nx, ny, fsuper._simple_result, mvdf._simple->_sd->data);
+   mask_data("Obs", nx, ny, osuper._simple_result, mvdo._simple->_sd->data);
 
    mlog << Debug(1) << "Running mvmode intensity comparisions \n\n";
 
    ModeFrontEnd *frontend = new ModeFrontEnd;
-   int status = frontend->multivar_intensity_comparisons(mode_argv, mvdf, mvdo, has_union_f,
-                                                         has_union_o, merge_f, merge_o, findex,
-                                                         oindex);
+   int status = frontend->multivar_intensity_comparisons(config, mvdf, mvdo, has_union_f,
+                                                         has_union_o,
+                                                         fsuper._merge_sd_split,
+                                                         osuper._merge_sd_split,
+                                                         findex,
+                                                         oindex,
+                                                         fcst_filename,
+                                                         obs_filename,
+                                                         config_file, dir);
    delete frontend;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_superobjects(ShapeData &f_result, ShapeData &o_result,
-                          ShapeData &f_merge, ShapeData &o_merge,
+void process_superobjects(ModeSuperObject &fsuper,
+                          ModeSuperObject &osuper,
                           int nx, int ny, const ConcatString &dir,
-                          GrdFileType ftype, GrdFileType otype, const Grid &grid,
-                          bool has_union)
+                          GrdFileType ftype, GrdFileType otype,
+                          const Grid &grid, bool has_union)
 {
-   StringArray mode_argv;
-   char junk [256];
-
-   //
-   //  build the command for running mode frontend
-   // 
-   mode_argv.clear();
-   mode_argv.add(mode_path);
-   mode_argv.add(config_file);
-   mode_argv.add("-v");
-   snprintf(junk, sizeof(junk), "%d", mlog.verbosity_level());
-   mode_argv.add(junk);
-   mode_argv.add("-outdir");
-   mode_argv.add(dir);
-
    mlog << Debug(1) << "Running superobject mode \n\n";
 
    // set the data to 0 inside superobjects and missing everywhere else
 
-   mask_data_super("FcstSimple", nx, ny, f_result.data);
-   mask_data_super("ObsSimple", nx, ny, o_result.data);
+   mask_data_super("FcstSimple", nx, ny, fsuper._simple_sd.data);
+   mask_data_super("ObsSimple", nx, ny, osuper._simple_sd.data);
    
 
    ModeFrontEnd *frontend = new ModeFrontEnd;
-   int status = frontend->run_super(mode_argv, f_result, o_result,
-                                    f_merge, o_merge, ftype, otype, grid, has_union);
+
+   int status = frontend->run_super(config, fsuper, osuper,
+                                    ftype, otype, grid, has_union,
+                                    config_file, dir);
    delete frontend;
 }
  
@@ -883,31 +778,3 @@ int _mkdir(const char *dir)
 
    return (mkdir(tmp, dir_creation_mode));
 }
-
-////////////////////////////////////////////////////////////////////////
-
-void  _debug_shape_examine(string &name, const ShapeData &sd, int nx, int ny)
-{
-   vector<double> values;
-   vector<int> count;
-   for (int x=0; x<nx; ++x) {
-      for (int y=0; y<ny; ++y) {
-         double v = sd.data.get(x,y);
-         if (v <= 0) {
-            continue;
-         }
-         vector<double>::iterator vi;
-         vi = find(values.begin(), values.end(), v);
-         if (vi == values.end()) {
-            values.push_back(v);
-            count.push_back(1);
-         } else {
-            int ii = vi - values.begin();
-            count[ii] = count[ii] + 1;
-         }
-      }
-   }
-   for (size_t i=0; i<values.size(); ++i) {
-      mlog << Debug(1) << name << " shape value=" << values[i] << " count=" << count[i] << "\n";
-   }
-}   

@@ -87,6 +87,38 @@ return ( * this );
 
 ////////////////////////////////////////////////////////////////////////
 
+void Mode_Field_Info::clone(const Mode_Field_Info & i)
+{
+   dict = i.dict;
+   conf = i.conf;
+   gft = i.gft;
+   FO = i.FO;
+   Multivar = i.Multivar;
+   index = i.index;
+   conv_radius = i.conv_radius;
+   vld_thresh = i.vld_thresh;
+   VarInfoFactory info_factory;
+   var_info = info_factory.new_var_info(gft);
+   if ( Multivar )  {
+      var_info->set_dict(*dict);
+   } else {
+      var_info->set_dict(*(dict->lookup_dictionary(conf_key_field)));
+   }
+   conv_radius_array = i.conv_radius_array; 
+   conv_thresh_array = i.conv_thresh_array;
+   merge_thresh_array = i.merge_thresh_array;
+   conv_thresh = i.conv_thresh;
+   merge_thresh = i.merge_thresh;
+   merge_flag = i.merge_flag;
+   raw_pi = i.raw_pi;
+   filter_attr_map = i.filter_attr_map;
+   file_type = i.file_type;
+   
+
+}
+
+////////////////////////////////////////////////////////////////////////
+
 
 void Mode_Field_Info::init_from_scratch()
 
@@ -143,6 +175,8 @@ merge_thresh.clear();
 
 merge_flag = MergeType_Engine;
 
+file_type = FileType_None;
+ 
 // raw_pi.clear();
 
 }
@@ -310,8 +344,8 @@ if ( FO == 'F' )  raw_pi = parse_conf_plot_info(conf->lookup_dictionary(conf_key
 else              raw_pi = parse_conf_plot_info(conf->lookup_dictionary(conf_key_obs_raw_plot));
 
 
-
-
+file_type = parse_conf_file_type(dict);
+ 
    //
    //  done
    //

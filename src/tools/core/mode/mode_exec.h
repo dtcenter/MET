@@ -81,10 +81,10 @@ class ModeExecutive {
    void clear();
 
    void init_traditional(int n_files);
-   void init_multivar_verif_grid();
-   void init_multivar_simple(int n_files, ModeDataType dtype);
-   void init_multivar_intensities(GrdFileType ftype, GrdFileType otype);
-   void check_multivar_perc_thresh_settings();
+   void init_multivar_verif_grid(const DataPlane &fcst,
+                                 const DataPlane &obs, const ModeConfInfo &config);
+   void init_multivar_simple(int j, int n_files, ModeDataType dtype, const ModeConfInfo &conf);
+   void init_multivar_intensities(GrdFileType ftype, GrdFileType otype, const ModeConfInfo &conf);
 
 
    int n_conv_radii   () const;
@@ -135,17 +135,20 @@ class ModeExecutive {
    Processing_t ptype;
    
    void clear_internal_r_index();
-   void setup_verification_grid();
+   void setup_verification_grid(const ModeInputData &fcst,
+                                const ModeInputData &obs);
    void setup_fcst_obs_data_traditional();
-   void setup_fcst_data(const Grid &verification_grid);
-   void setup_obs_data(const Grid &verification_grid);
-   void setup_fcst_obs_data_multivar_intensities(const MultiVarData &mvdf, const MultiVarData &mvdo);
-   void setup_fcst_obs_data_multivar_super(ShapeData &f_super, ShapeData &o_super, const Grid &igrid);
+   void setup_fcst_data(const Grid &verification_grid, const ModeInputData &input);
+   void setup_obs_data(const Grid &verification_grid, const ModeInputData &input);
+   void setup_fcst_obs_data_multivar_intensities(const MultiVarData &mvdf,
+                                                 const MultiVarData &mvdo);
+   void setup_fcst_obs_data_multivar_super(const ShapeData &f_super,
+                                           const ShapeData &o_super, const Grid &igrid);
    void do_conv_thresh(const int r_index, const int t_index);
    void do_merging();
-   void do_merging(ShapeData &f_merge, ShapeData &o_merge);
+   void do_merging(const ShapeData &f_merge, const ShapeData &o_merge);
    void do_match_merge();
-   void do_match_merge(ShapeData &f_merge, ShapeData &o_merge);
+   void do_match_merge(const ShapeData &f_merge, const ShapeData &o_merge);
 
    void process_masks(ShapeData &, ShapeData &);
    void process_fcst_masks(ShapeData &);

@@ -36,6 +36,9 @@ extern const char * const program_name;
 
 static ModeExecutive *mode_exec = 0;
 static ModeExecutive::Processing_t ptype = ModeExecutive::TRADITIONAL;
+
+// used only for traditional mode, multivar sets it into config previous
+// to the frontend creation
 static int compress_level = -1;
 
 
@@ -63,31 +66,22 @@ ModeFrontEnd::~ModeFrontEnd()
 
 ///////////////////////////////////////////////////////////////////////
 
-
-Grid ModeFrontEnd::create_verification_grid(const StringArray & Argv)
-
+Grid ModeFrontEnd::create_verification_grid(const ModeInputData &fcst,
+                                            const ModeInputData &obs,
+                                            const string &config_file,
+                                            const ModeConfInfo &config)
 {
    if ( mode_exec )  { delete mode_exec;  mode_exec = 0; }
    mode_exec = new ModeExecutive;
-   compress_level = -1;
-
-   //
-   // Process the command line arguments
-   //
-
-   process_command_line(Argv, false);
-
-   mode_exec->init_multivar_verif_grid();
+   mode_exec->out_dir = default_out_dir;
+   mode_exec->fcst_file = "None";
+   mode_exec->obs_file = "None";
+   mode_exec->match_config_file = config_file;
+   mode_exec->init_multivar_verif_grid(fcst._dataPlane, obs._dataPlane, config);
 
    ModeConfInfo & conf = mode_exec->engine.conf_info;
    conf.set_field_index(0);
-   if (compress_level >= 0) conf.nc_info.set_compress_level(compress_level);
-
-
-   //
-   // read in data (Note multiple reads of same data)
-   //
-   mode_exec->setup_verification_grid();
+   mode_exec->setup_verification_grid(fcst, obs);
    Grid g = mode_exec->grid;
    delete mode_exec;  mode_exec = 0;
    return g;
@@ -96,35 +90,38 @@ Grid ModeFrontEnd::create_verification_grid(const StringArray & Argv)
 
 ///////////////////////////////////////////////////////////////////////
 
-int ModeFrontEnd::create_multivar_simple_objects(const StringArray & Argv, ModeDataType dtype,
-                                                 const Grid &verification_grid, int field_index, int n_files)
+int
+ModeFrontEnd::create_multivar_simple_objects(
+                                             const ModeConfInfo &config,
+                                             ModeDataType dtype,
+                                             const Grid &verification_grid, 
+                                             const ModeInputData &input,
+                                             const string &filename,
+                                             const string &config_file,
+                                             const string &outdir,
+                                             int field_index, int n_files)
 
 {
    init(ModeExecutive::MULTIVAR_SIMPLE);
 
-   //
-   // Process the command line arguments
-   //
-
-   process_command_line_for_simple_objects(Argv, dtype);
-
-   mode_exec->init_multivar_simple(n_files, dtype);
+   mode_exec->out_dir = replace_path(default_out_dir);
+   if (dtype == ModeDataType_MvMode_Fcst) {
+      mode_exec->fcst_file         = filename;
+      mode_exec->obs_file          = "None";
+   } else {
+      mode_exec->obs_file         = filename;
+      mode_exec->fcst_file          = "None";
+   }
+   mode_exec->match_config_file = config_file;
+   mode_exec->out_dir = outdir;
+   mode_exec->init_multivar_simple(field_index, n_files, dtype, config);
 
    ModeConfInfo & conf = mode_exec->engine.conf_info;
-   if ( field_index >= 0 )  conf.set_field_index(field_index);
-   if (compress_level >= 0) conf.nc_info.set_compress_level(compress_level);
-
-   // need to do this after setting field index above
-   mode_exec->check_multivar_perc_thresh_settings();
-
-   //
-   // read in data (Note multiple reads of data)
-   //
 
    if (dtype == ModeDataType_MvMode_Fcst) {
-      mode_exec->setup_fcst_data(verification_grid);
+      mode_exec->setup_fcst_data(verification_grid, input);
    } else {
-      mode_exec->setup_obs_data(verification_grid);
+      mode_exec->setup_obs_data(verification_grid, input);
    }
    
    //
@@ -152,37 +149,37 @@ int ModeFrontEnd::create_multivar_simple_objects(const StringArray & Argv, ModeD
 
 ///////////////////////////////////////////////////////////////////////
 
-int ModeFrontEnd::create_multivar_merge_objects(const StringArray & Argv, ModeDataType dtype,
-                                                const Grid &verification_grid, int field_index,
-                                                int n_files)
-
+int
+ModeFrontEnd::create_multivar_merge_objects(const ModeConfInfo &config,
+                                            ModeDataType dtype,
+                                            const Grid &verification_grid,
+                                            const ModeInputData &input,
+                                            const string &filename,
+                                            const string &config_file,
+                                            const string &outdir, int field_index,
+                                            int n_files)
 {
    init(ModeExecutive::MULTIVAR_SIMPLE_MERGE);
 
-   //
-   // Process the command line arguments
-   //
+   mode_exec->out_dir = replace_path(default_out_dir);
+   if (dtype == ModeDataType_MvMode_Fcst) {
+      mode_exec->fcst_file         = filename;
+      mode_exec->obs_file          = "None";
+   } else {
+      mode_exec->obs_file         = filename;
+      mode_exec->fcst_file          = "None";
+   }
+   mode_exec->match_config_file = config_file;
+   mode_exec->out_dir = outdir;
 
-   process_command_line_for_simple_objects(Argv, dtype);
-
-   mode_exec->init_multivar_simple(n_files, dtype);
+   mode_exec->init_multivar_simple(field_index, n_files, dtype, config);
 
    ModeConfInfo & conf = mode_exec->engine.conf_info;
-   if ( field_index >= 0 )  conf.set_field_index(field_index);
-   if (compress_level >= 0) conf.nc_info.set_compress_level(compress_level);
-
-   // need to do this after setting field index above
-   mode_exec->check_multivar_perc_thresh_settings();
-
-
-   //
-   // read in data (Note multiple reads not desired)
-   //
 
    if (dtype == ModeDataType_MvMode_Fcst) {
-      mode_exec->setup_fcst_data(verification_grid);
+      mode_exec->setup_fcst_data(verification_grid, input);
    } else {
-      mode_exec->setup_obs_data(verification_grid);
+      mode_exec->setup_obs_data(verification_grid, input);
    }
    
 
@@ -263,23 +260,28 @@ int ModeFrontEnd::run_traditional(const StringArray & Argv)
 
 ///////////////////////////////////////////////////////////////////////
 
-int ModeFrontEnd::multivar_intensity_comparisons(const StringArray & Argv, const MultiVarData &mvdf,
-                                                 const MultiVarData &mvdo, bool has_union_f,
-                                                 bool has_union_o, ShapeData &merge_f,
-                                                 ShapeData &merge_o, int field_index_f, int field_index_o)
+int
+ModeFrontEnd::multivar_intensity_comparisons(const ModeConfInfo &config,
+                                             const MultiVarData &mvdf,
+                                             const MultiVarData &mvdo, bool has_union_f,
+                                             bool has_union_o, const ShapeData &merge_f,
+                                             const ShapeData &merge_o,
+                                             int field_index_f, int field_index_o,
+                                             const string &fcst_filename,
+                                             const string &obs_filename,
+                                             const string &config_file, const string &dir)
 {
    init(ModeExecutive::MULTIVAR_INTENSITY);
 
-   //
-   // Process the command line arguments
-   //
-
-   process_command_line(Argv, false);
-
-   mode_exec->init_multivar_intensities(mvdf._type, mvdo._type);
+   mode_exec->out_dir = replace_path(default_out_dir);
+   mode_exec->fcst_file = fcst_filename;
+   mode_exec->obs_file = obs_filename;
+   mode_exec->match_config_file = config_file;
+   mode_exec->out_dir = dir;
+   
+   mode_exec->init_multivar_intensities(mvdf._type, mvdo._type, config);
 
    ModeConfInfo & conf = mode_exec->engine.conf_info;
-   if (compress_level >= 0) conf.nc_info.set_compress_level(compress_level);
    conf.set_field_index(field_index_f, field_index_o);
 
    // for multivar intensities, explicity set the level and units using stored values
@@ -330,24 +332,23 @@ int ModeFrontEnd::multivar_intensity_comparisons(const StringArray & Argv, const
 
 ///////////////////////////////////////////////////////////////////////
 
-int ModeFrontEnd::run_super(const StringArray & Argv, 
-                            ShapeData &f_super, ShapeData &o_super,
-                            ShapeData &f_merge, ShapeData &o_merge,
+int ModeFrontEnd::run_super(const ModeConfInfo &config,
+                            const ModeSuperObject &fsuper,
+                            const ModeSuperObject &osuper,
                             GrdFileType ftype, GrdFileType otype, const Grid &grid,
-                            bool has_union)
+                            bool has_union, const string &config_file, const string &dir)
 {
    init(ModeExecutive::MULTIVAR_SUPER);
 
-   //
-   // Process the command line arguments
-   //
+   mode_exec->out_dir = replace_path(default_out_dir);
+   mode_exec->fcst_file         = "not set";
+   mode_exec->obs_file          = "not set";
+   mode_exec->match_config_file = config_file;
+   mode_exec->out_dir = dir;
 
-   process_command_line(Argv, true);
-
-   mode_exec->init_multivar_intensities(ftype, otype);
+   mode_exec->init_multivar_intensities(ftype, otype, config);
 
    ModeConfInfo & conf = mode_exec->engine.conf_info;
-   if (compress_level >= 0) conf.nc_info.set_compress_level(compress_level);
    if (has_union && (conf.Fcst->merge_flag == MergeType_Thresh ||
                      conf.Obs->merge_flag == MergeType_Thresh)) {
       mlog << Warning << "\nModeFrontEnd::run_super() -> "
@@ -358,7 +359,7 @@ int ModeFrontEnd::run_super(const StringArray & Argv,
    //
    // set up data access using inputs
    //
-   mode_exec->setup_fcst_obs_data_multivar_super(f_super, o_super, grid);
+   mode_exec->setup_fcst_obs_data_multivar_super(fsuper._simple_sd, osuper._simple_sd, grid);
 
    //
    // run the mode algorithm
@@ -370,7 +371,7 @@ int ModeFrontEnd::run_super(const StringArray & Argv,
 
    } else {
 
-      do_straight_multivar_super(f_merge, o_merge);
+      do_straight_multivar_super(fsuper._merge_sd_split, osuper._merge_sd_split);
 
    }
 
@@ -421,8 +422,8 @@ void ModeFrontEnd::do_straight()
 
 void ModeFrontEnd::do_straight_multivar_intensity(const MultiVarData &mvdf,
                                                   const MultiVarData &mvdo,
-                                                  ShapeData &f_merge,
-                                                  ShapeData &o_merge)
+                                                  const ShapeData &f_merge,
+                                                  const ShapeData &o_merge)
 
 {
    int NCT, NCR;
@@ -456,7 +457,8 @@ void ModeFrontEnd::do_straight_multivar_intensity(const MultiVarData &mvdf,
 ///////////////////////////////////////////////////////////////////////
 
 
-void ModeFrontEnd::do_straight_multivar_super(ShapeData &f_merge, ShapeData &o_merge)
+void ModeFrontEnd::do_straight_multivar_super(const ShapeData &f_merge,
+                                              const ShapeData &o_merge)
 
 {
    int NCT, NCR;

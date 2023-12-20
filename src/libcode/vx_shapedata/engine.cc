@@ -144,6 +144,7 @@ void ModeFuzzyEngine::init_from_scratch() {
    //
    // Reset all fcst and obs processing flags to initial state
    //
+
    need_fcst_conv       = true;
    need_fcst_thresh     = true;
    need_fcst_filter     = true;
@@ -1724,8 +1725,8 @@ void ModeFuzzyEngine::do_fcst_merge_engine(const char *default_config,
    fcst_engine->ctable = ctable;
    if(default_config && merge_config) {
       fcst_engine->conf_info.read_config(default_config, merge_config);
-      fcst_engine->conf_info.process_config(conf_info.Fcst->var_info->file_type(),
-                                            conf_info.Obs->var_info->file_type());
+      fcst_engine->conf_info.process_config_traditional(conf_info.Fcst->var_info->file_type(),
+                                                        conf_info.Obs->var_info->file_type());
       path = replace_path(fcst_engine->conf_info.object_pi.color_table.c_str());
       fcst_engine->ctable.read(path.c_str());
    }
@@ -1891,8 +1892,8 @@ void ModeFuzzyEngine::do_obs_merge_engine(const char *default_config,
    obs_engine->ctable = ctable;
    if(default_config && merge_config) {
       obs_engine->conf_info.read_config(default_config, merge_config);
-      obs_engine->conf_info.process_config(conf_info.Fcst->var_info->file_type(),
-                                           conf_info.Obs->var_info->file_type());
+      obs_engine->conf_info.process_config_traditional(conf_info.Fcst->var_info->file_type(),
+                                                       conf_info.Obs->var_info->file_type());
       path = replace_path(obs_engine->conf_info.object_pi.color_table.c_str());
       obs_engine->ctable.read(path.c_str());
    }

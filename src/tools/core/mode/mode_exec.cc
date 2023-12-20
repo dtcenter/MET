@@ -180,7 +180,7 @@ void ModeExecutive::init_traditional(int n_files)
    otype = obs_mtddf->file_type();
 
    // Process the configuration
-   engine.conf_info.process_config(ftype, otype);
+   engine.conf_info.process_config_traditional(ftype, otype);
    int nf = engine.conf_info.n_fields_f();  // same as obs for traditional mode
    if (nf != n_files) {
       mlog << Error << "\nNumber of input files " << n_files << " Not equal to config number of fields "
@@ -207,56 +207,16 @@ void ModeExecutive::init_traditional(int n_files)
 ///////////////////////////////////////////////////////////////////////
 
 
-void ModeExecutive::init_multivar_verif_grid()
-
+void ModeExecutive::init_multivar_verif_grid(const DataPlane &fcst,
+                                             const DataPlane &obs,
+                                             const ModeConfInfo &conf)
 {
 
-   Met2dDataFileFactory mtddf_factory;
-
    R_index = T_index = 0;
-
-   conf_read(default_multivar_config_filename);
-
-   // Get the forecast and observation file types from config, if present
-   ftype = parse_conf_file_type(engine.conf_info.conf.lookup_dictionary(conf_key_fcst));
-   otype = parse_conf_file_type(engine.conf_info.conf.lookup_dictionary(conf_key_obs));
-
-
-   // Read observation file
-   if(!(obs_mtddf = mtddf_factory.new_met_2d_data_file(obs_file.c_str(), otype))) {
-      mlog << Error << "\nTrouble reading observation file \""
-           << obs_file << "\"\n\n";
-      exit(1);
-   }
-
-   // Read forecast file
-   if(!(fcst_mtddf = mtddf_factory.new_met_2d_data_file(fcst_file.c_str(), ftype))) {
-      mlog << Error << "\nTrouble reading forecast file \""
-           << fcst_file << "\"\n\n";
-      exit(1);
-   }
-
-   // Store the input data file types
-   ftype = fcst_mtddf->file_type();
-   otype = obs_mtddf->file_type();
-
-   // Process the configuration
-   engine.conf_info.process_config(ftype, otype, ModeDataType_MvMode_Both);
-
-   // check one again for multivar problems
+   engine.conf_info = conf;
    engine.conf_info.check_multivar_not_implemented();
-   
-   const int shift = engine.conf_info.shift_right;
 
-   fcst_mtddf->set_shift_right(shift);
-   obs_mtddf->set_shift_right(shift);
-
-   // List the input files
-   mlog << Debug(1)
-        << "Forecast File: "    << fcst_file << "\n"
-        << "Observation File: " << obs_file  << "\n";
-
-   engine.conf_info.nc_info.compress_level = engine.conf_info.get_compression_level();
+   // engine.conf_info.nc_info.compress_level = engine.conf_info.get_compression_level();
 
    return;
 
@@ -264,103 +224,19 @@ void ModeExecutive::init_multivar_verif_grid()
 
 ///////////////////////////////////////////////////////////////////////
 
-void ModeExecutive::init_multivar_simple(int n_files, ModeDataType dtype)
+void ModeExecutive::init_multivar_simple(int j, int n_files, ModeDataType dtype,
+                                         const ModeConfInfo &conf)
 
 {
-
-   Met2dDataFileFactory mtddf_factory;
-
    R_index = T_index = 0;
-
-   conf_read(default_multivar_config_filename);
+   engine.conf_info = conf;
 
    // tell the engine which type of data it is
    engine.set_data_type(dtype);
 
-   // Get the forecast and observation file types from config, if present
-   ftype = parse_conf_file_type(engine.conf_info.conf.lookup_dictionary(conf_key_fcst));
-   otype = parse_conf_file_type(engine.conf_info.conf.lookup_dictionary(conf_key_obs));
+   engine.conf_info.set_field_index(j);
 
-
-   // Read observation file or forecast file
-   if (dtype == ModeDataType_MvMode_Obs)
-   {
-      if(!(obs_mtddf = mtddf_factory.new_met_2d_data_file(obs_file.c_str(), otype))) {
-         mlog << Error << "\nTrouble reading observation file \""
-              << obs_file << "\"\n\n";
-         exit(1);
-
-      }
-      // Store the input data file types
-      otype = obs_mtddf->file_type();
-   }
-   else if (dtype == ModeDataType_MvMode_Fcst)
-   {
-      // Read forecast file
-      if(!(fcst_mtddf = mtddf_factory.new_met_2d_data_file(fcst_file.c_str(), ftype))) {
-         mlog << Error << "\nTrouble reading forecast file \""
-              << fcst_file << "\"\n\n";
-         exit(1);
-      }
-      // Store the input data file types
-      ftype = fcst_mtddf->file_type();
-   }
-   else {
-      mlog << Error << "\nModeExecutive::init_multivar_simple()->"
-           << "simple object creation requires obs or forecast mode, got "
-           << sprintModeDataType(dtype) << "\n\n";
-      exit(1);
-   }      
-
-   // Process the configuration
-   engine.conf_info.process_config(ftype, otype, dtype);
-   int nf;
-   if (dtype == ModeDataType_MvMode_Obs) {
-      nf = engine.conf_info.n_fields_o();
-   } else if (dtype == ModeDataType_MvMode_Fcst) {
-      nf = engine.conf_info.n_fields_f();
-   } else {
-      mlog << Error << "\nModeExecutive::init_multivar_simple()->"
-           << "simple object creation requires obs or forecast mode, got "
-           << sprintModeDataType(dtype) << "\n\n";
-      exit(1);
-   }      
-   if (nf != n_files) {
-      mlog << Error << "\nModeExecutive::init_multivar_simple()->"
-           << "Number of input files " << n_files << " Not equal to config number of fields "
-           << nf << "\n\n";
-      exit(1);
-   }
-
-   // check one again for multivar problems
-   engine.conf_info.check_multivar_not_implemented();
-   
-   const int shift = engine.conf_info.shift_right;
-
-   if (dtype != ModeDataType_MvMode_Fcst) {
-      obs_mtddf->set_shift_right(shift);
-   }
-   
-   if (dtype != ModeDataType_MvMode_Obs) {
-      fcst_mtddf->set_shift_right(shift);
-   }
-
-   if (dtype == ModeDataType_MvMode_Obs) {
-      mlog << Debug(1)
-           << "Observation File: " << obs_file  << "\n";
-
-   } else if (dtype == ModeDataType_MvMode_Fcst) {
-      mlog << Debug(1)
-           << "Forecast File: " << fcst_file  << "\n";
-   }
-   else {
-      // List the input files
-      mlog << Debug(1)
-           << "Forecast File: "    << fcst_file << "\n"
-           << "Observation File: " << obs_file  << "\n";
-   }
-
-   engine.conf_info.nc_info.compress_level = engine.conf_info.get_compression_level();
+   // engine.conf_info.nc_info.compress_level = engine.conf_info.get_compression_level();
 
    return;
 
@@ -368,47 +244,26 @@ void ModeExecutive::init_multivar_simple(int n_files, ModeDataType dtype)
 
 ///////////////////////////////////////////////////////////////////////
 
-void ModeExecutive::init_multivar_intensities(GrdFileType ftype, GrdFileType otype)
+void ModeExecutive::init_multivar_intensities(GrdFileType ftype, GrdFileType otype, const ModeConfInfo &conf)
 
 {
 
    R_index = T_index = 0;
 
-   conf_read(default_multivar_config_filename);
-
-   // Get the forecast and observation file types from config, if present
-   GrdFileType l_ftype = parse_conf_file_type(engine.conf_info.conf.lookup_dictionary(conf_key_fcst));
-   GrdFileType l_otype = parse_conf_file_type(engine.conf_info.conf.lookup_dictionary(conf_key_obs));
-
-   // actually use the values passed in instead, the config ones are not set for this second pass
-   l_ftype = ftype;
-   l_otype = otype;
-
-   // Process the configuration
-   engine.conf_info.process_config(l_ftype, l_otype, ModeDataType_MvMode_Both);
+   engine.conf_info = conf;
+   
+   // tell the engine which type of data it is
+   engine.set_data_type(ModeDataType_MvMode_Both);
 
    // check one again for multivar problems
    engine.conf_info.check_multivar_not_implemented();
 
-   // NOTE: do not do shifting, should have been done in the first pass
-   // const int shift = engine.conf_info.shift_right;
-   // fcst_mtddf->set_shift_right(shift);
-   //  obs_mtddf->set_shift_right(shift);
-
-   engine.conf_info.nc_info.compress_level = engine.conf_info.get_compression_level();
+   // engine.conf_info.nc_info.compress_level = engine.conf_info.get_compression_level();
 
    return;
 
 }
 
-
-///////////////////////////////////////////////////////////////////////
-
-void ModeExecutive::check_multivar_perc_thresh_settings()
-{
-   engine.conf_info.check_multivar_perc_thresh(ptype == ModeExecutive::MULTIVAR_SIMPLE,
-                                               ptype == ModeExecutive::MULTIVAR_SIMPLE_MERGE);
-}
 
 ///////////////////////////////////////////////////////////////////////
 
@@ -569,8 +424,8 @@ void ModeExecutive::setup_fcst_obs_data_traditional()
 ///////////////////////////////////////////////////////////////////////
 
 
-void ModeExecutive::setup_verification_grid()
-
+void ModeExecutive::setup_verification_grid(const ModeInputData &fcst,
+                                            const ModeInputData &obs)
 {
 
    // ShapeData fcst_sd, obs_sd;
@@ -579,57 +434,29 @@ void ModeExecutive::setup_verification_grid()
    Fcst_sd.clear();
    Obs_sd.clear();
 
-   // Read the gridded data from the input forecast file
-
-   if ( !(fcst_mtddf->data_plane(*(engine.conf_info.Fcst->var_info), Fcst_sd.data)) )  {
-
-      mlog << Error << "\nModeExecutive::setup_verification_grid() -> "
-           << "can't get forecast data \""
-           << engine.conf_info.Fcst->var_info->magic_str()
-           << "\" from file \"" << fcst_file << "\"\n\n";
-      exit(1);
-   }
-
-   // Read the gridded data from the input observation file
-
-   if ( !(obs_mtddf->data_plane(*(engine.conf_info.Obs->var_info), Obs_sd.data)) )  {
-
-      mlog << Error << "\nModeExecutive::setup_verification_grid() -> "
-           << "can't get observation data \""
-           << engine.conf_info.Obs->var_info->magic_str()
-           << "\" from file \"" << obs_file << "\"\n\n";
-      exit(1);
-   }
+   Fcst_sd.data = fcst._dataPlane;
+   Obs_sd.data = obs._dataPlane;
 
    // Determine the verification grid
 
+   engine.conf_info.set_field_index(0);
    grid = parse_vx_grid(engine.conf_info.Fcst->var_info->regrid(),
-                        &(fcst_mtddf->grid()), &(obs_mtddf->grid()));
-
+                        &fcst._grid, &obs._grid);
    return;
 }
 
 ///////////////////////////////////////////////////////////////////////
 
 
-void ModeExecutive::setup_fcst_data(const Grid &verification_grid)
-
+void ModeExecutive::setup_fcst_data(const Grid &verification_grid,
+                                    const ModeInputData &input)
 {
 
-   // ShapeData fcst_sd, obs_sd;
    double fmin, fmax;
 
    Fcst_sd.clear();
-
-   // Read the gridded data from the input forecast file
-   if ( !(fcst_mtddf->data_plane(*(engine.conf_info.Fcst->var_info), Fcst_sd.data)) )  {
-
-      mlog << Error << "\nModeExecutive::setup_fcst_data() -> "
-           << "can't get forecast data \""
-           << engine.conf_info.Fcst->var_info->magic_str()
-           << "\" from file \"" << fcst_file << "\"\n\n";
-      exit(1);
-   }
+   ftype = input._fileType;
+   Fcst_sd.data = input._dataPlane;
 
    grid = verification_grid;
 
@@ -638,12 +465,11 @@ void ModeExecutive::setup_fcst_data(const Grid &verification_grid)
    engine.set_grid(&grid);
 
    // Regrid, if necessary
-
-   if ( !(fcst_mtddf->grid() == grid) )  {
+   if ( !(input._grid == grid) ) {
       mlog << Debug(1)
            << "Regridding forecast " << engine.conf_info.Fcst->var_info->magic_str()
            << " to the verification grid.\n";
-      Fcst_sd.data = met_regrid(Fcst_sd.data, fcst_mtddf->grid(), grid,
+      Fcst_sd.data = met_regrid(Fcst_sd.data, input._grid, grid, 
                                 engine.conf_info.Fcst->var_info->regrid());
    }
 
@@ -667,10 +493,6 @@ void ModeExecutive::setup_fcst_data(const Grid &verification_grid)
    data_min = fmin;
    data_max = fmax;
 
-   // Process percentile thresholds
-
-   engine.conf_info.set_perc_thresh(Fcst_sd.data);
-
    // store the input data units
    funits = engine.conf_info.Fcst->var_info->units();
    ounits = na_str;
@@ -690,25 +512,18 @@ void ModeExecutive::setup_fcst_data(const Grid &verification_grid)
 ///////////////////////////////////////////////////////////////////////
 
 
-void ModeExecutive::setup_obs_data(const Grid &verification_grid)
-
+void ModeExecutive::setup_obs_data(const Grid &verification_grid,
+                                   const ModeInputData &input)
 {
 
    // ShapeData fcst_sd, obs_sd;
    double omin, omax;
 
    Obs_sd.clear();
+   otype = input._fileType;
 
    // Read the gridded data from the input observation file
-
-   if ( !(obs_mtddf->data_plane(*(engine.conf_info.Obs->var_info), Obs_sd.data)) )  {
-
-      mlog << Error << "\nModeExecutive::setup_obs_data() -> "
-           << "can't get observation data \""
-           << engine.conf_info.Obs->var_info->magic_str()
-           << "\" from file \"" << obs_file << "\"\n\n";
-      exit(1);
-   }
+   Obs_sd.data = input._dataPlane;
 
    grid = verification_grid;
 
@@ -718,11 +533,11 @@ void ModeExecutive::setup_obs_data(const Grid &verification_grid)
 
    // Regrid, if necessary
 
-   if ( !(obs_mtddf->grid() == grid) )  {
+   if ( !(input._grid == grid) )  {
       mlog << Debug(1)
            << "Regridding observation " << engine.conf_info.Obs->var_info->magic_str()
            << " to the verification grid.\n";
-      Obs_sd.data = met_regrid(Obs_sd.data, obs_mtddf->grid(), grid,
+      Obs_sd.data = met_regrid(Obs_sd.data, input._grid, grid,
                                engine.conf_info.Obs->var_info->regrid());
    }
 
@@ -745,10 +560,6 @@ void ModeExecutive::setup_obs_data(const Grid &verification_grid)
    Obs_sd.data.data_range(omin, omax);
    data_min = omin;
    data_max = omax;
-
-   // Process percentile thresholds
-
-   engine.conf_info.set_perc_thresh(Obs_sd.data);
 
    // store the input data units
    funits = na_str;
@@ -780,17 +591,11 @@ void ModeExecutive::setup_fcst_obs_data_multivar_intensities(const MultiVarData 
    Obs_sd.debug_examine();
    grid = *(mvdf._grid);
 
-   // do not need to read any data, it is stored in the mvd input
-   // the verification grid was created in the first pass, so we have that as well
-
    // Store the grid
 
    engine.set_grid(&grid);
 
-   // regridding of inputs is not needed in the second pass, as regridded data outputs
-   // are stored to input mvd
-
-   // Rescale probabilites from [0, 100] to [0, 1] also not neede in the second pass
+   // Rescale probabilites from [0, 100] to [0, 1] not needed in the second pass
 
    // Print a warning if the valid times do not match
    if(Fcst_sd.data.valid() != Obs_sd.data.valid()) {
@@ -835,14 +640,11 @@ void ModeExecutive::setup_fcst_obs_data_multivar_intensities(const MultiVarData 
    
    // in case perc thresh was done, retrieve the values created in the
    // first pass, which have been stored in mvdo and mvdf
+   // NOTE: this might be removable with new design
    engine.conf_info.Obs->conv_thresh_array = mvdo._merge->_convThreshArray;
    engine.conf_info.Obs->merge_thresh_array = mvdo._merge->_mergeThreshArray;
    engine.conf_info.Fcst->conv_thresh_array = mvdf._merge->_convThreshArray;
    engine.conf_info.Fcst->merge_thresh_array = mvdf._merge->_mergeThreshArray;
-
-   // This doesn't work with perc_thresh, it uses values restricted to within
-   // superobjects, which gives different thresholds, so we do the above instead.
-   //engine.conf_info.set_perc_thresh(Fcst_sd.data, Obs_sd.data);
 
    // masking of inputs not needed, as it was done in the first pass
    // and stored to Fcst_sd and Obs_sd
@@ -867,7 +669,8 @@ void ModeExecutive::setup_fcst_obs_data_multivar_intensities(const MultiVarData 
 
 ///////////////////////////////////////////////////////////////////////
 
-void ModeExecutive::setup_fcst_obs_data_multivar_super(ShapeData &f_super, ShapeData &o_super,
+void ModeExecutive::setup_fcst_obs_data_multivar_super(const ShapeData &f_super,
+                                                       const ShapeData &o_super,
                                                        const Grid &igrid)
 {
    double fmin, omin, fmax, omax;
@@ -940,10 +743,6 @@ void ModeExecutive::setup_fcst_obs_data_multivar_super(ShapeData &f_super, Shape
    if     (!is_bad_data(fmax) && !is_bad_data(omax)) data_max = max(fmax, omax);
    else if(!is_bad_data(fmax) &&  is_bad_data(omax)) data_max = fmax;
    else if( is_bad_data(fmax) && !is_bad_data(omax)) data_max = omax;
-
-   // Process percentile thresholds...Not applicable for this pass
-   // do this in the second pass using masked Fcst_sd and Obs_sd
-   // engine.conf_info.set_perc_thresh(Fcst_sd.data, Obs_sd.data);
 
    //
    //  done
@@ -1074,7 +873,7 @@ void ModeExecutive::do_merging()
 
 ///////////////////////////////////////////////////////////////////////
 
-void ModeExecutive::do_merging(ShapeData &f_merge, ShapeData &o_merge)
+void ModeExecutive::do_merging(const ShapeData &f_merge, const ShapeData &o_merge)
 
 {
    if (ptype == MULTIVAR_SUPER) {
@@ -1127,7 +926,8 @@ void ModeExecutive::do_merging(ShapeData &f_merge, ShapeData &o_merge)
 ///////////////////////////////////////////////////////////////////////
 
 
-void ModeExecutive::do_match_merge(ShapeData &f_merge, ShapeData &o_merge)
+void ModeExecutive::do_match_merge(const ShapeData &f_merge,
+                                   const ShapeData &o_merge)
 
 {
    do_merging(f_merge, o_merge);
