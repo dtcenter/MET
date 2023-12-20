@@ -323,12 +323,6 @@ External Library Handling in compile_MET_all.sh
     | Graphics Support       |                        +-----------------------+
     |                        | --enable-mode_graphics | MET_HDFEOS            |
     +------------------------+------------------------+-----------------------+
-
-    .. csv-table:: Environment Variables Table
-       :file: environment_variables_table.csv
-       :widths: 30, 30, 30
-       :header-rows: 1
-
   	  
     Generally speaking, for each library there is a set of three
     environment variables that can  
