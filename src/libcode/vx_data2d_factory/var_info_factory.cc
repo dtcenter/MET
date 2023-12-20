@@ -26,7 +26,7 @@ using namespace std;
 #include "var_info_factory.h"
 #include "grdfiletype_to_string.h"
 #include "var_info_grib.h"
-#include "var_info_nccf.h"
+#include "var_info_nc_cf.h"
 #include "var_info_nc_met.h"
 #include "var_info_nc_pinterp.h"
 #include "var_info_ugrid.h"
