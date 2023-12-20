@@ -28,7 +28,7 @@ using namespace std;
 #include "var_info_grib.h"
 #include "var_info_nc_cf.h"
 #include "var_info_nc_met.h"
-#include "var_info_nc_pinterp.h"
+#include "var_info_nc_wrf.h"
 #include "var_info_ugrid.h"
 
 #ifdef WITH_PYTHON
@@ -87,7 +87,7 @@ VarInfo * VarInfoFactory::new_var_info(GrdFileType type)
 
       case FileType_NcWrf:
       case FileType_NcPinterp:
-         vi = new VarInfoNcPinterp;
+         vi = new VarInfoNcWrf;
          break;
 
       case FileType_Python_Numpy:

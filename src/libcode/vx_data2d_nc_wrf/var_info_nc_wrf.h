@@ -9,8 +9,8 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VAR_INFO_NC_PINTERP_H__
-#define __VAR_INFO_NC_PINTERP_H__
+#ifndef __VAR_INFO_NC_WRF_H__
+#define __VAR_INFO_NC_WRF_H__
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -179,7 +179,7 @@ static const int n_pinterp_wind_speed_names =
 
 ///////////////////////////////////////////////////////////////////////////////
 
-class VarInfoNcPinterp : public VarInfo
+class VarInfoNcWrf : public VarInfo
 {
    private:
 
@@ -192,14 +192,14 @@ class VarInfoNcPinterp : public VarInfo
       NumArray  Dim_value; // Dimension values as float for extracting 2D field
 
       void init_from_scratch();
-      void assign(const VarInfoNcPinterp &);
+      void assign(const VarInfoNcWrf &);
       void clear_dimension();
 
    public:
-      VarInfoNcPinterp();
-      ~VarInfoNcPinterp();
-      VarInfoNcPinterp(const VarInfoNcPinterp &);
-      VarInfoNcPinterp & operator=(const VarInfoNcPinterp &);
+      VarInfoNcWrf();
+      ~VarInfoNcWrf();
+      VarInfoNcWrf(const VarInfoNcWrf &);
+      VarInfoNcWrf & operator=(const VarInfoNcWrf &);
 
       void dump(std::ostream &) const;
       void clear();
@@ -242,17 +242,17 @@ class VarInfoNcPinterp : public VarInfo
 
 ///////////////////////////////////////////////////////////////////////////////
 
-inline GrdFileType       VarInfoNcPinterp::file_type()      const { return(FileType_NcPinterp);     }
-inline const LongArray & VarInfoNcPinterp::dimension()      const { return(Dimension);              }
-inline int               VarInfoNcPinterp::dimension(int i) const { return(Dimension[i]);           }
-inline int               VarInfoNcPinterp::n_dimension()    const { return(Dimension.n_elements()); }
-inline const NumArray  & VarInfoNcPinterp::dim_value()      const { return(Dim_value);             }
-inline double            VarInfoNcPinterp::dim_value(int i) const { return(Dim_value[i]);          }
-inline const BoolArray & VarInfoNcPinterp::is_offset()      const { return(Is_offset);             }
-inline bool              VarInfoNcPinterp::is_offset(int i) const { return(Is_offset[i]);          }
+inline GrdFileType       VarInfoNcWrf::file_type()      const { return(FileType_NcPinterp);     }
+inline const LongArray & VarInfoNcWrf::dimension()      const { return(Dimension);              }
+inline int               VarInfoNcWrf::dimension(int i) const { return(Dimension[i]);           }
+inline int               VarInfoNcWrf::n_dimension()    const { return(Dimension.n_elements()); }
+inline const NumArray  & VarInfoNcWrf::dim_value()      const { return(Dim_value);             }
+inline double            VarInfoNcWrf::dim_value(int i) const { return(Dim_value[i]);          }
+inline const BoolArray & VarInfoNcWrf::is_offset()      const { return(Is_offset);             }
+inline bool              VarInfoNcWrf::is_offset(int i) const { return(Is_offset[i]);          }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-#endif  // __VAR_INFO_NC_PINTERP_H__
+#endif  // __VAR_INFO_NC_WRF_H__
 
 ///////////////////////////////////////////////////////////////////////////////

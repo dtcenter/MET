@@ -27,8 +27,8 @@ using namespace netCDF;
 #include "vx_log.h"
 #include "vx_nc_util.h"
 
-#include "pinterp_file.h"
-#include "get_pinterp_grid.h"
+#include "wrf_file.h"
+#include "get_wrf_grid.h"
 
 
 ////////////////////////////////////////////////////////////////////////

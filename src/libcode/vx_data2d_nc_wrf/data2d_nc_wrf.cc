@@ -17,19 +17,19 @@ using namespace std;
 #include <stdlib.h>
 #include <cmath>
 
-#include "data2d_nc_pinterp.h"
-#include "get_pinterp_grid.h"
+#include "data2d_nc_wrf.h"
+#include "get_wrf_grid.h"
 #include "vx_nc_util.h"
 #include "vx_math.h"
 #include "vx_log.h"
 
 ////////////////////////////////////////////////////////////////////////
 //
-// Code for class MetNcPinterpDataFile
+// Code for class MetNcWrfDataFile
 //
 ////////////////////////////////////////////////////////////////////////
 
-MetNcPinterpDataFile::MetNcPinterpDataFile() {
+MetNcWrfDataFile::MetNcWrfDataFile() {
 
    nc_pinterp_init_from_scratch();
 
@@ -37,32 +37,32 @@ MetNcPinterpDataFile::MetNcPinterpDataFile() {
 
 ////////////////////////////////////////////////////////////////////////
 
-MetNcPinterpDataFile::~MetNcPinterpDataFile() {
+MetNcWrfDataFile::~MetNcWrfDataFile() {
 
    close();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-MetNcPinterpDataFile::MetNcPinterpDataFile(const MetNcPinterpDataFile &) {
+MetNcWrfDataFile::MetNcWrfDataFile(const MetNcWrfDataFile &) {
 
-   mlog << Error << "\nMetNcPinterpDataFile::MetNcPinterpDataFile(const MetNcPinterpDataFile &) -> "
+   mlog << Error << "\nMetNcWrfDataFile::MetNcWrfDataFile(const MetNcWrfDataFile &) -> "
         << "should never be called!\n\n";
    exit(1);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-MetNcPinterpDataFile & MetNcPinterpDataFile::operator=(const MetNcPinterpDataFile &) {
+MetNcWrfDataFile & MetNcWrfDataFile::operator=(const MetNcWrfDataFile &) {
 
-   mlog << Error << "\nMetNcPinterpDataFile::operator=(const MetNcPinterpDataFile &) -> "
+   mlog << Error << "\nMetNcWrfDataFile::operator=(const MetNcWrfDataFile &) -> "
         << "should never be called!\n\n";
    exit(1);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void MetNcPinterpDataFile::nc_pinterp_init_from_scratch() {
+void MetNcWrfDataFile::nc_pinterp_init_from_scratch() {
 
    PinterpNc  = (PinterpFile *) 0;
 
@@ -73,7 +73,7 @@ void MetNcPinterpDataFile::nc_pinterp_init_from_scratch() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void MetNcPinterpDataFile::close() {
+void MetNcWrfDataFile::close() {
 
    if(PinterpNc) { delete PinterpNc; PinterpNc = (PinterpFile *) 0; }
 
@@ -82,14 +82,14 @@ void MetNcPinterpDataFile::close() {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool MetNcPinterpDataFile::open(const char * _filename) {
+bool MetNcWrfDataFile::open(const char * _filename) {
 
    close();
 
    PinterpNc = new PinterpFile;
 
    if(!PinterpNc->open(_filename)) {
-      mlog << Error << "\nMetNcPinterpDataFile::open(const char *) -> "
+      mlog << Error << "\nMetNcWrfDataFile::open(const char *) -> "
            << "unable to open NetCDF file \"" << _filename << "\"\n\n";
       close();
 
@@ -111,7 +111,7 @@ bool MetNcPinterpDataFile::open(const char * _filename) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void MetNcPinterpDataFile::dump(ostream & out, int depth) const {
+void MetNcWrfDataFile::dump(ostream & out, int depth) const {
 
    if(PinterpNc) PinterpNc->dump(out, depth);
 
@@ -120,11 +120,11 @@ void MetNcPinterpDataFile::dump(ostream & out, int depth) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool MetNcPinterpDataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
+bool MetNcWrfDataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
    bool status = false;
    double pressure;
    ConcatString level_str;
-   VarInfoNcPinterp * vinfo_nc = (VarInfoNcPinterp *) &vinfo;
+   VarInfoNcWrf * vinfo_nc = (VarInfoNcWrf *) &vinfo;
    NcVarInfo *info = (NcVarInfo *) 0;
 
    // Initialize the data plane
@@ -157,7 +157,7 @@ bool MetNcPinterpDataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
       // Check that the valid time matches the request
       if(vinfo.valid() > 0 && vinfo.valid() != plane.valid()) {
 
-         mlog << Warning << "\nMetNcPinterpDataFile::data_plane() -> "
+         mlog << Warning << "\nMetNcWrfDataFile::data_plane() -> "
               << "for \"" << vinfo.req_name() << "\" variable, the valid "
               << "time does not match the requested valid time: ("
               << unix_to_yyyymmdd_hhmmss(plane.valid()) << " != "
@@ -168,7 +168,7 @@ bool MetNcPinterpDataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
       // Check that the lead time matches the request
       if(vinfo.lead() > 0 && vinfo.lead() != plane.lead()) {
 
-         mlog << Warning << "\nMetNcPinterpDataFile::data_plane() -> "
+         mlog << Warning << "\nMetNcWrfDataFile::data_plane() -> "
               << "for \"" << vinfo.req_name() << "\" variable, the lead "
               << "time does not match the requested lead time: ("
               << sec_to_hhmmss(plane.lead()) << " != "
@@ -196,13 +196,13 @@ bool MetNcPinterpDataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
 
 ////////////////////////////////////////////////////////////////////////
 
-int MetNcPinterpDataFile::data_plane_array(VarInfo &vinfo,
+int MetNcWrfDataFile::data_plane_array(VarInfo &vinfo,
                                            DataPlaneArray &plane_array) {
    int i, i_dim, n_level, status, lower, upper;
    ConcatString level_str;
    double pressure, min_level, max_level;
    bool found = false;
-   VarInfoNcPinterp *vinfo_nc = (VarInfoNcPinterp *) &vinfo;
+   VarInfoNcWrf *vinfo_nc = (VarInfoNcWrf *) &vinfo;
    LongArray dim = vinfo_nc->dimension();
    NcVarInfo *info = (NcVarInfo *) 0;
 
@@ -250,7 +250,7 @@ int MetNcPinterpDataFile::data_plane_array(VarInfo &vinfo,
          // Check that the valid time matches the request
          if(vinfo.valid() > 0 && vinfo.valid() != cur_plane.valid()) {
 
-            mlog << Warning << "\nMetNcPinterpDataFile::data_plane_array() -> "
+            mlog << Warning << "\nMetNcWrfDataFile::data_plane_array() -> "
                  << "for \"" << vinfo.req_name() << "\" variable, the valid "
                  << "time does not match the requested valid time: ("
                  << unix_to_yyyymmdd_hhmmss(cur_plane.valid()) << " != "
@@ -261,7 +261,7 @@ int MetNcPinterpDataFile::data_plane_array(VarInfo &vinfo,
          // Check that the lead time matches the request
          if(vinfo.lead() > 0 && vinfo.lead() != cur_plane.lead()) {
 
-            mlog << Warning << "\nMetNcPinterpDataFile::data_plane_array() -> "
+            mlog << Warning << "\nMetNcWrfDataFile::data_plane_array() -> "
                  << "for \"" << vinfo.req_name() << "\" variable, the lead "
                  << "time does not match the requested lead time: ("
                  << sec_to_hhmmss(cur_plane.lead()) << " != "
@@ -307,7 +307,7 @@ int MetNcPinterpDataFile::data_plane_array(VarInfo &vinfo,
 
 ////////////////////////////////////////////////////////////////////////
 
-int MetNcPinterpDataFile::index(VarInfo &vinfo){
+int MetNcWrfDataFile::index(VarInfo &vinfo){
    return -1;
 }
 

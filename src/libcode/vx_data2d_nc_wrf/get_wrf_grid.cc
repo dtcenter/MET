@@ -24,7 +24,7 @@ using namespace netCDF;
 #include "vx_math.h"
 #include "vx_nc_util.h"
 
-#include "get_pinterp_grid.h"
+#include "get_wrf_grid.h"
 
 
 ////////////////////////////////////////////////////////////////////////

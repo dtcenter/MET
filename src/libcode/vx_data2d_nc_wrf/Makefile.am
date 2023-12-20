@@ -12,9 +12,9 @@ include ${top_srcdir}/Make-include
 
 noinst_LIBRARIES = libvx_data2d_nc_wrf.a
 libvx_data2d_nc_wrf_a_SOURCES = \
-              get_pinterp_grid.cc get_pinterp_grid.h \
-              pinterp_file.cc pinterp_file.h \
-              var_info_nc_pinterp.cc var_info_nc_pinterp.h \
-              data2d_nc_pinterp.cc data2d_nc_pinterp.h \
+              get_wrf_grid.cc get_wrf_grid.h \
+              wrf_file.cc wrf_file.h \
+              var_info_nc_wrf.cc var_info_nc_wrf.h \
+              data2d_nc_wrf.cc data2d_nc_wrf.h \
               vx_data2d_nc_wrf.h
 libvx_data2d_nc_wrf_a_CPPFLAGS = ${MET_CPPFLAGS}

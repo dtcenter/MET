@@ -21,7 +21,7 @@ using namespace std;
 #include "grdfiletype_to_string.h"
 #include "data2d_grib.h"
 #include "data2d_nc_met.h"
-#include "data2d_nc_pinterp.h"
+#include "data2d_nc_wrf.h"
 #include "data2d_nc_cf.h"
 #ifdef WITH_UGRID
 #include "data2d_ugrid.h"
@@ -83,7 +83,7 @@ MetPythonDataFile * p = nullptr;
 
       case FileType_NcWrf:
       case FileType_NcPinterp:
-         mtddf = new MetNcPinterpDataFile;
+         mtddf = new MetNcWrfDataFile;
          break;
 
       case FileType_NcCF:
