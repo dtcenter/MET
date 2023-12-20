@@ -1,0 +1,35 @@
+Feature,Configuration Option,Environment Variables
+Always Required, ,MET_BUFRLIB
+,,BUFRLIB_NAME
+,,MET_PROJ
+,,MET_HDF5
+,,MET_NETCDF
+,,MET_GSL
+"Optional
+GRIB2 Support","--enable-all or
+--enable-grib2",MET_GRIB2CLIB
+,,MET_GRIB2CINC
+,,GRIB2CLIB_NAME
+,,LIB_JASPER
+,,LIB_PNG
+,,LIB_Z
+"Optional
+Python Support","--enable-all or
+--enable-python",MET_PYTHON_BIN_EXE
+,,MET_PYTHON_CC
+,,MET_PYTHON_LD
+"Optional
+Unstructured Grid Support","--enable-all or
+--enable-ugrid",MET_ATLAS
+,,MET_ECKIT
+"Optional
+LIDAR2NC Support","--enable-all or
+--enable-lidar2nc",MET_HDF
+"Optional
+MODIS Support","--enable-all or
+--enable-modis",MET_HDF
+,,MET_HDFEOS
+"Optional
+MODE Graphics Support","--enable-all or
+--enable-mode_graphics",MET_CAIRO
+,,MET_FREETYPE

@@ -271,7 +271,12 @@ External Library Handling in compile_MET_all.sh
     the user would like to make use of the existing dependent libraries on that machine, 
     there are more environment variables that need to be set to let MET know where those 
     library and header files are. The following environment variables need to be added 
-    to the environment configuration file: 
+    to the environment configuration file:
+
+    .. csv-table:: Environment Variables Table
+       :file: environment_variables_table.csv
+       :widths: 30, 30, 30
+       :header-rows: 1
 
     .. list-table:: Environment Variables Table
       :widths: auto
