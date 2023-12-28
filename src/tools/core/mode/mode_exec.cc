@@ -60,12 +60,11 @@ static void replaceAll(std::string& str, const std::string& from, const std::str
 
 ///////////////////////////////////////////////////////////////////////
 
-ModeExecutive::ModeExecutive(Processing_t p)
+ModeExecutive::ModeExecutive()//Processing_t p)
 
 {
 
    init_from_scratch();
-   ptype = p;
 
 }
 
@@ -132,8 +131,6 @@ void ModeExecutive::clear()
    R_index = T_index = 0;
 
 
-   ptype = TRADITIONAL;
-   
    //
    //  done
    //
@@ -206,24 +203,6 @@ void ModeExecutive::init_traditional(int n_files)
 
 ///////////////////////////////////////////////////////////////////////
 
-
-void ModeExecutive::init_multivar_verif_grid(const DataPlane &fcst,
-                                             const DataPlane &obs,
-                                             const ModeConfInfo &conf)
-{
-
-   R_index = T_index = 0;
-   engine.conf_info = conf;
-   engine.conf_info.check_multivar_not_implemented();
-
-   // engine.conf_info.nc_info.compress_level = engine.conf_info.get_compression_level();
-
-   return;
-
-}
-
-///////////////////////////////////////////////////////////////////////
-
 void ModeExecutive::init_multivar_simple(int j, int n_files, ModeDataType dtype,
                                          const ModeConfInfo &conf)
 
@@ -268,7 +247,7 @@ void ModeExecutive::init_multivar_intensities(GrdFileType ftype, GrdFileType oty
 ///////////////////////////////////////////////////////////////////////
 
 
-void ModeExecutive::setup_fcst_obs_data_traditional()
+void ModeExecutive::setup_traditional_fcst_obs_data()
 
 {
 
@@ -282,7 +261,7 @@ void ModeExecutive::setup_fcst_obs_data_traditional()
 
    if ( !(fcst_mtddf->data_plane(*(engine.conf_info.Fcst->var_info), Fcst_sd.data)) )  {
 
-      mlog << Error << "\nModeExecutive::setup_fcst_obs_data_traditional() -> "
+      mlog << Error << "\nModeExecutive::setup_traditionalfcst_obs_data() -> "
            << "can't get forecast data \""
            << engine.conf_info.Fcst->var_info->magic_str()
            << "\" from file \"" << fcst_file << "\"\n\n";
@@ -293,7 +272,7 @@ void ModeExecutive::setup_fcst_obs_data_traditional()
 
    if ( !(obs_mtddf->data_plane(*(engine.conf_info.Obs->var_info), Obs_sd.data)) )  {
 
-      mlog << Error << "\nModeExecutive::setup_fcst_obs_data_traditional() -> "
+      mlog << Error << "\nModeExecutive::setup_traditional_fcst_obs_data() -> "
            << "can't get observation data \""
            << engine.conf_info.Obs->var_info->magic_str()
            << "\" from file \"" << obs_file << "\"\n\n";
@@ -341,7 +320,7 @@ void ModeExecutive::setup_fcst_obs_data_traditional()
 
    if(Fcst_sd.data.valid() != Obs_sd.data.valid()) {
 
-      mlog << Warning << "\nModeExecutive::setup_fcst_obs_data_traditional() -> "
+      mlog << Warning << "\nModeExecutive::setup_traditional_fcst_obs_data() -> "
            << "Forecast and observation valid times do not match "
            << unix_to_yyyymmdd_hhmmss(Fcst_sd.data.valid()) << " != "
            << unix_to_yyyymmdd_hhmmss(Obs_sd.data.valid()) << " for "
@@ -355,7 +334,7 @@ void ModeExecutive::setup_fcst_obs_data_traditional()
       engine.conf_info.Obs->var_info->level().type()  == LevelType_Accum &&
       Fcst_sd.data.accum()                       != Obs_sd.data.accum()) {
 
-      mlog << Warning << "\nModeExecutive::setup_fcst_obs_data_traditional() -> "
+      mlog << Warning << "\nModeExecutive::setup_traditional_fcst_obs_data() -> "
            << "Forecast and observation accumulation times do not match "
            << sec_to_hhmmss(Fcst_sd.data.valid()) << " != "
            << sec_to_hhmmss(Obs_sd.data.valid()) << " for "
@@ -423,21 +402,18 @@ void ModeExecutive::setup_fcst_obs_data_traditional()
 
 ///////////////////////////////////////////////////////////////////////
 
-
 void ModeExecutive::setup_verification_grid(const ModeInputData &fcst,
-                                            const ModeInputData &obs)
+                                            const ModeInputData &obs,
+                                            const ModeConfInfo &conf)
 {
-
-   // ShapeData fcst_sd, obs_sd;
-   double fmin, omin, fmax, omax;
+   R_index = T_index = 0;
+   engine.conf_info = conf;
+   engine.conf_info.check_multivar_not_implemented();
 
    Fcst_sd.clear();
    Obs_sd.clear();
-
    Fcst_sd.data = fcst._dataPlane;
    Obs_sd.data = obs._dataPlane;
-
-   // Determine the verification grid
 
    engine.conf_info.set_field_index(0);
    grid = parse_vx_grid(engine.conf_info.Fcst->var_info->regrid(),
@@ -447,9 +423,8 @@ void ModeExecutive::setup_verification_grid(const ModeInputData &fcst,
 
 ///////////////////////////////////////////////////////////////////////
 
-
-void ModeExecutive::setup_fcst_data(const Grid &verification_grid,
-                                    const ModeInputData &input)
+void ModeExecutive::setup_multivar_fcst_data(const Grid &verification_grid,
+                                             const ModeInputData &input)
 {
 
    double fmin, fmax;
@@ -511,9 +486,8 @@ void ModeExecutive::setup_fcst_data(const Grid &verification_grid,
 
 ///////////////////////////////////////////////////////////////////////
 
-
-void ModeExecutive::setup_obs_data(const Grid &verification_grid,
-                                   const ModeInputData &input)
+void ModeExecutive::setup_multivar_obs_data(const Grid &verification_grid,
+                                            const ModeInputData &input)
 {
 
    // ShapeData fcst_sd, obs_sd;
@@ -579,7 +553,7 @@ void ModeExecutive::setup_obs_data(const Grid &verification_grid,
 
 ///////////////////////////////////////////////////////////////////////
 
-void ModeExecutive::setup_fcst_obs_data_multivar_intensities(const MultiVarData &mvdf,
+void ModeExecutive::setup_multivar_fcst_obs_data_intensities(const MultiVarData &mvdf,
                                                              const MultiVarData &mvdo)
 {
    double fmin, fmax, omin, omax;
@@ -600,7 +574,7 @@ void ModeExecutive::setup_fcst_obs_data_multivar_intensities(const MultiVarData 
    // Print a warning if the valid times do not match
    if(Fcst_sd.data.valid() != Obs_sd.data.valid()) {
 
-       mlog << Warning << "\nModeExecutive::setup_fcst_obs_data_multivar_intensities() -> "
+       mlog << Warning << "\nModeExecutive::setup_multivar_fcst_obs_data_intensities() -> "
             << "Forecast and observation valid times do not match "
             << unix_to_yyyymmdd_hhmmss(Fcst_sd.data.valid()) << " != "
             << unix_to_yyyymmdd_hhmmss(Obs_sd.data.valid()) << " for "
@@ -613,7 +587,7 @@ void ModeExecutive::setup_fcst_obs_data_multivar_intensities(const MultiVarData 
       engine.conf_info.Obs->var_info->level().type()  == LevelType_Accum &&
       Fcst_sd.data.accum()                       != Obs_sd.data.accum()) {
 
-       mlog << Warning << "\nModeExecutive::setup_fcst_obs_data_multivar_intensities() -> "
+       mlog << Warning << "\nModeExecutive::setup_multivar_fcst_obs_data_intensities() -> "
            << "Forecast and observation accumulation times do not match "
            << sec_to_hhmmss(Fcst_sd.data.valid()) << " != "
            << sec_to_hhmmss(Obs_sd.data.valid()) << " for "
@@ -669,7 +643,7 @@ void ModeExecutive::setup_fcst_obs_data_multivar_intensities(const MultiVarData 
 
 ///////////////////////////////////////////////////////////////////////
 
-void ModeExecutive::setup_fcst_obs_data_multivar_super(const ShapeData &f_super,
+void ModeExecutive::setup_multivar_fcst_obs_data_super(const ShapeData &f_super,
                                                        const ShapeData &o_super,
                                                        const Grid &igrid)
 {
@@ -697,7 +671,7 @@ void ModeExecutive::setup_fcst_obs_data_multivar_super(const ShapeData &f_super,
    // Print a warning if the valid times do not match
    if(Fcst_sd.data.valid() != Obs_sd.data.valid()) {
 
-      mlog << Warning << "\nModeExecutive::setup_fcst_obs_data_multivar_super() -> "
+      mlog << Warning << "\nModeExecutive::setup_multivar_fcst_obs_data_super() -> "
            << "Forecast and observation valid times do not match "
            << unix_to_yyyymmdd_hhmmss(Fcst_sd.data.valid()) << " != "
            << unix_to_yyyymmdd_hhmmss(Obs_sd.data.valid()) << " for "
@@ -710,7 +684,7 @@ void ModeExecutive::setup_fcst_obs_data_multivar_super(const ShapeData &f_super,
       engine.conf_info.Obs->var_info->level().type()  == LevelType_Accum &&
       Fcst_sd.data.accum()                       != Obs_sd.data.accum()) {
 
-      mlog << Warning << "\nModeExecutive::setup_fcst_obs_data_multivar_super() -> "
+      mlog << Warning << "\nModeExecutive::setup_multivar_fcst_obs_data_super() -> "
            << "Forecast and observation accumulation times do not match "
            << sec_to_hhmmss(Fcst_sd.data.valid()) << " != "
            << sec_to_hhmmss(Obs_sd.data.valid()) << " for "
@@ -756,7 +730,7 @@ void ModeExecutive::setup_fcst_obs_data_multivar_super(const ShapeData &f_super,
 ///////////////////////////////////////////////////////////////////////
 
 
-void ModeExecutive::do_conv_thresh(const int r_index, const int t_index)
+void ModeExecutive::do_conv_thresh_traditional(const int r_index, const int t_index)
 {
 
    ModeConfInfo & conf = engine.conf_info;
@@ -768,20 +742,8 @@ void ModeExecutive::do_conv_thresh(const int r_index, const int t_index)
    R_index = r_index;
    T_index = t_index;
 
-   if (ptype == MULTIVAR_SIMPLE_MERGE) {
-      conf.set_conv_thresh_by_merge_index(T_index);
-   } else if (ptype == MULTIVAR_SUPER) {
-      SingleThresh s("ne-9999");
-      conf.set_conv_thresh(s);
-      conf.set_conv_radius(0.0);
-   } else {
-      // this could break down if obs and fcst have different arrays
-      // currently not allowed in multivar mode, should work correctly
-      // for traditional mode
-      conf.set_conv_radius_by_index(R_index);
-      conf.set_conv_thresh_by_index(T_index);
-   }
-
+   conf.set_conv_radius_by_index(R_index);
+   conf.set_conv_thresh_by_index(T_index);
    conf.set_merge_thresh_by_index(T_index);
 
    //
@@ -789,44 +751,153 @@ void ModeExecutive::do_conv_thresh(const int r_index, const int t_index)
    //
 
    string what = "forecast and observation fields";
-   if (ptype == MULTIVAR_SIMPLE || ptype == MULTIVAR_SIMPLE_MERGE) {
-      if (conf.data_type == ModeDataType_MvMode_Obs) {
-         what = "observation field";
-      } else {
-         what = "forecast field";
-      }
-   }
    mlog << Debug(2) << "Identifying objects in the " << what << "...\n";
 
-   if ( r_index != local_r_index )  {   //  need to do convolution
-
-      if (ptype == MULTIVAR_INTENSITY || ptype == MULTIVAR_SUPER) {
-         engine.set_only_split(Fcst_sd, Obs_sd);
-      } else {// MULTIVAR_SIMPLE, MULTIVAR_SIMPLE_MERGE, TRADITIONAL
-         engine.set(Fcst_sd, Obs_sd);
-      }
-   } else {   //  don't need to do convolution
-
-      if (ptype == MULTIVAR_INTENSITY || ptype == MULTIVAR_SUPER) {
-         engine.set_only_split(Fcst_sd, Obs_sd);
-      } else {// MULTIVAR_SIMPLE, MULTIVAR_SIMPLE_MERGE, TRADITIONAL
-         engine.set_no_conv(Fcst_sd, Obs_sd);
-      }
+   if ( r_index != local_r_index ) {
+      //  need to do convolution
+      engine.set(Fcst_sd, Obs_sd);
+   } else {
+      //  don't need to do convolution
+      engine.set_no_conv(Fcst_sd, Obs_sd);
    }
 
    //
    //  Compute the contingency table statistics for the fields, if needed
-   // (not needed for simple or merge, only one field)
    //
-   if (ptype != MULTIVAR_SIMPLE && ptype != MULTIVAR_SIMPLE_MERGE) {
-     if ( conf.ct_stats_flag )  compute_ct_stats();
-  }
+   if ( conf.ct_stats_flag )  compute_ct_stats();
 
    //
    //  done
    //
 
    local_r_index = r_index;
+
+   return;
+
+}
+
+///////////////////////////////////////////////////////////////////////
+
+void ModeExecutive::do_conv_thresh_multivar_super()
+{
+
+   ModeConfInfo & conf = engine.conf_info;
+
+   R_index = 0;
+   T_index = 0;
+
+   SingleThresh s("ne-9999");
+   conf.set_conv_thresh(s);
+   conf.set_conv_radius(0.0);
+   conf.set_merge_thresh_by_index(T_index);
+
+   //
+   //  Set up the engine with these raw fields
+   //
+   string what = "forecast and observation fields";
+   mlog << Debug(2) << "Identifying objects in the " << what << "...\n";
+
+   engine.set_only_split(Fcst_sd, Obs_sd);
+
+   //
+   //  Compute the contingency table statistics for the fields, if needed
+   // (not needed for simple or merge, only one field)
+   //
+   if ( conf.ct_stats_flag )  compute_ct_stats();
+
+   //
+   //  done
+   //
+
+   local_r_index = 0;
+
+   return;
+
+}
+
+
+///////////////////////////////////////////////////////////////////////
+
+
+void ModeExecutive::do_conv_thresh_multivar_intensity_compare()
+{
+
+   ModeConfInfo & conf = engine.conf_info;
+
+   R_index = 0;
+   T_index = 0;
+
+   conf.set_conv_radius_by_index(R_index);
+   conf.set_conv_thresh_by_index(T_index);
+   conf.set_merge_thresh_by_index(T_index);
+
+   //
+   //  Set up the engine with these raw fields
+   //
+
+   string what = "forecast and observation fields";
+   mlog << Debug(2) << "Identifying objects in the " << what << "...\n";
+
+   engine.set_only_split(Fcst_sd, Obs_sd);
+
+   //
+   //  Compute the contingency table statistics for the fields, if needed
+   //
+   if ( conf.ct_stats_flag )  compute_ct_stats();
+
+   //
+   //  done
+   //
+
+   local_r_index = 0;
+
+   return;
+
+}
+
+///////////////////////////////////////////////////////////////////////
+
+void ModeExecutive::do_conv_thresh_multivar_simple(Processing_t p)
+{
+
+   ModeConfInfo & conf = engine.conf_info;
+
+   R_index = 0;
+   T_index = 0;
+
+   if (p == MULTIVAR_SIMPLE_MERGE) {
+      conf.set_conv_thresh_by_merge_index(T_index);
+   } else if (p == MULTIVAR_SIMPLE) {
+      conf.set_conv_radius_by_index(0);
+      conf.set_conv_thresh_by_index(0);
+   } else {
+      mlog << Error << "\nModeExecutive::do_conv_thresh_multivar_simple() -> "
+           << "Wrong processing type input " << stype(p) << "\"\n\n";
+      exit(1);
+   }         
+
+   conf.set_merge_thresh_by_index(0);
+
+   //
+   //  Set up the engine with these raw fields
+   //
+
+   string what;
+   if (conf.data_type == ModeDataType_MvMode_Obs) {
+      what = "observation field";
+   } else {
+      what = "forecast field";
+   }
+   mlog << Debug(2) << "Identifying objects in the " << what << "...\n";
+
+   engine.set(Fcst_sd, Obs_sd);
+
+   // (ct_stats not needed for simple or merge, only one field)
+   //
+   //  done
+   //
+
+   local_r_index = 0;
 
    return;
 
@@ -841,7 +912,7 @@ void ModeExecutive::clear_internal_r_index()
 
 ///////////////////////////////////////////////////////////////////////
 
-void ModeExecutive::do_merging()
+void ModeExecutive::do_merging_traditional()
 {
    mlog << Debug(2)
         << "Identified: " << engine.n_fcst << " forecast objects "
@@ -873,10 +944,11 @@ void ModeExecutive::do_merging()
 
 ///////////////////////////////////////////////////////////////////////
 
-void ModeExecutive::do_merging(const ShapeData &f_merge, const ShapeData &o_merge)
-
+void ModeExecutive::do_merging_multivar(const ShapeData &f_merge,
+                                        const ShapeData &o_merge,
+                                        Processing_t p)
 {
-   if (ptype == MULTIVAR_SUPER) {
+   if (p == MULTIVAR_SUPER) {
       // set the merge flag and merge_thresh appropriately
       ModeConfInfo & conf = engine.conf_info;
       SingleThresh s("ne-9999");
@@ -884,14 +956,11 @@ void ModeExecutive::do_merging(const ShapeData &f_merge, const ShapeData &o_merg
       conf.set_fcst_merge_thresh(s);
       conf.set_obs_merge_flag(MergeType_Thresh);
       conf.set_obs_merge_thresh(s);
-   } else {
-      if (ptype != MULTIVAR_INTENSITY) {
-         mlog << Error << "\nModeExecutive::do_merging(shapedata, shapedata) -> "
-              << "wrong method for processing type " << stype(ptype) << "\n\n";
-         exit(1);
-      }
+   } else if (p != MULTIVAR_INTENSITY) {
+      mlog << Error << "\nModeExecutive::do_merging(shapedata, shapedata, p) -> "
+           << "wrong method for processing type " << stype(p) << "\n\n";
+      exit(1);
    }
-   
 
    mlog << Debug(2)
         << "Identified: " << engine.n_fcst << " forecast objects "
@@ -926,11 +995,12 @@ void ModeExecutive::do_merging(const ShapeData &f_merge, const ShapeData &o_merg
 ///////////////////////////////////////////////////////////////////////
 
 
-void ModeExecutive::do_match_merge(const ShapeData &f_merge,
-                                   const ShapeData &o_merge)
+void ModeExecutive::do_match_merge_multivar(const ShapeData &f_merge,
+                                            const ShapeData &o_merge,
+                                            Processing_t p)
 
 {
-   do_merging(f_merge, o_merge);
+   do_merging_multivar(f_merge, o_merge, p);
 
    // Do the matching of objects between fields
 
@@ -943,10 +1013,10 @@ void ModeExecutive::do_match_merge(const ShapeData &f_merge,
 ///////////////////////////////////////////////////////////////////////
 
 
-void ModeExecutive::do_match_merge()
+void ModeExecutive::do_match_merge_traditional()
 
 {
-   do_merging();
+   do_merging_traditional();
 
    // Do the matching of objects between fields
 
@@ -1117,82 +1187,104 @@ void ModeExecutive::set_raw_to_full(float *fcst_raw_data,
       
 ///////////////////////////////////////////////////////////////////////
 
-void ModeExecutive::process_output(const MultiVarData *mvdf,
-                                   const MultiVarData *mvdo)
-
+void ModeExecutive::process_output_multivar_super()
 {
+   isMultivarOutput = false;
+   isMultivarSuperOutput = true;
 
-   // store to class member so don't have to pass it around
-   isMultivarOutput = (ptype == MULTIVAR_INTENSITY);
-   isMultivarSuperOutput = (ptype == MULTIVAR_SUPER);
-   
-   if (isMultivarOutput) {
-
-      // get the magic strings, which will be used in file naming
-      fcst_magic_string = engine.conf_info.Fcst->var_info->magic_str().c_str();
-      obs_magic_string = engine.conf_info.Obs->var_info->magic_str().c_str();
-
-      // replace forward slashes with underscores to prevent new directories
-      replace(fcst_magic_string.begin(), fcst_magic_string.end(), '/', '_');   
-      replace(obs_magic_string.begin(), obs_magic_string.end(), '/', '_');   
-
-      // replace (*,*) with '_all_all_' 
-      replaceAll(fcst_magic_string, "*", "all");
-      replaceAll(obs_magic_string, "*", "all");
-      replaceAll(fcst_magic_string, ",", "_");
-      replaceAll(obs_magic_string, ",", "_");
-      replaceAll(fcst_magic_string, "(", "_");
-      replaceAll(obs_magic_string, "(", "_");
-      replaceAll(fcst_magic_string, ")", "");
-      replaceAll(obs_magic_string, ")", "");
-      
-   } else if (isMultivarSuperOutput) {
-
-      // use the configured multivar name and level
-      fcst_magic_string = engine.conf_info.fcst_multivar_name.string() + "_" + engine.conf_info.fcst_multivar_level.string();
-      obs_magic_string = engine.conf_info.obs_multivar_name.string() + "_" + engine.conf_info.obs_multivar_level.string();
-
-   } else {
-
-      // just in case make these empty
-      fcst_magic_string = "";
-      obs_magic_string = "";
-
-   }
+   // use the configured multivar name and level
+   fcst_magic_string = engine.conf_info.fcst_multivar_name.string() + "_" + engine.conf_info.fcst_multivar_level.string();
+   obs_magic_string = engine.conf_info.obs_multivar_name.string() + "_" + engine.conf_info.obs_multivar_level.string();
    
    // Create output stats files and plots
 
    write_obj_stats();
 
    if ( engine.conf_info.ct_stats_flag )  write_ct_stats();
-
    
+   write_obj_netcdf(engine.conf_info.nc_info);
 
-   if (isMultivarOutput) {
-      if (mvdf && mvdo) {
-         double fmin = mvdf->_data_min;
-         double fmax = mvdf->_data_max;
-         double omin = mvdo->_data_min;
-         double omax = mvdo->_data_max;
-         double data_min, data_max;
-         if     (!is_bad_data(fmin) && !is_bad_data(omin)) data_min = min(fmin, omin);
-         else if(!is_bad_data(fmin) &&  is_bad_data(omin)) data_min = fmin;
-         else if( is_bad_data(fmin) && !is_bad_data(omin)) data_min = omin;
+   if ( engine.conf_info.ps_plot_flag )   plot_engine();
 
-         if     (!is_bad_data(fmax) && !is_bad_data(omax)) data_max = max(fmax, omax);
-         else if(!is_bad_data(fmax) &&  is_bad_data(omax)) data_max = fmax;
-         else if( is_bad_data(fmax) && !is_bad_data(omax)) data_max = omax;
+   return;
+
+}
+
+///////////////////////////////////////////////////////////////////////
+
+void ModeExecutive::process_output_multivar_intensity_compare(const MultiVarData *mvdf,
+                                                              const MultiVarData *mvdo)
+
+{
+   isMultivarOutput = true;
+   isMultivarSuperOutput = false;
+
+   // get the magic strings, which will be used in file naming
+   fcst_magic_string = engine.conf_info.Fcst->var_info->magic_str().c_str();
+   obs_magic_string = engine.conf_info.Obs->var_info->magic_str().c_str();
+
+   // replace forward slashes with underscores to prevent new directories
+   replace(fcst_magic_string.begin(), fcst_magic_string.end(), '/', '_');   
+   replace(obs_magic_string.begin(), obs_magic_string.end(), '/', '_');   
+
+   // replace (*,*) with '_all_all_' 
+   replaceAll(fcst_magic_string, "*", "all");
+   replaceAll(obs_magic_string, "*", "all");
+   replaceAll(fcst_magic_string, ",", "_");
+   replaceAll(obs_magic_string, ",", "_");
+   replaceAll(fcst_magic_string, "(", "_");
+   replaceAll(obs_magic_string, "(", "_");
+   replaceAll(fcst_magic_string, ")", "");
+   replaceAll(obs_magic_string, ")", "");
+      
+   // Create output stats files and plots
+
+   write_obj_stats();
+
+   if ( engine.conf_info.ct_stats_flag )  write_ct_stats();
+
+
+   double fmin = mvdf->_data_min;
+   double fmax = mvdf->_data_max;
+   double omin = mvdo->_data_min;
+   double omax = mvdo->_data_max;
+   double data_min, data_max;
+   if     (!is_bad_data(fmin) && !is_bad_data(omin)) data_min = min(fmin, omin);
+   else if(!is_bad_data(fmin) &&  is_bad_data(omin)) data_min = fmin;
+   else if( is_bad_data(fmin) && !is_bad_data(omin)) data_min = omin;
+
+   if     (!is_bad_data(fmax) && !is_bad_data(omax)) data_max = max(fmax, omax);
+   else if(!is_bad_data(fmax) &&  is_bad_data(omax)) data_max = fmax;
+   else if( is_bad_data(fmax) && !is_bad_data(omax)) data_max = omax;
          
-         set_raw_to_full(mvdf->_simple->_raw_data,
-                         mvdo->_simple->_raw_data,
-                         mvdf->_nx, mvdf->_ny,
-                         data_min, data_max);
-      } else {
-         mlog << Error << "\nModeExecutive::process_output() -> "
-              << "no multivar data when multivar data is expected\n\n";
-         exit(1);
-      }
-   }
+   set_raw_to_full(mvdf->_simple->_raw_data,mvdo->_simple->_raw_data,
+                   mvdf->_nx, mvdf->_ny, data_min, data_max);
+
+   write_obj_netcdf(engine.conf_info.nc_info);
+
+   if ( engine.conf_info.ps_plot_flag )   plot_engine();
+
+   return;
+
+}
+
+///////////////////////////////////////////////////////////////////////
+
+void ModeExecutive::process_output_traditional()
+{
+   isMultivarOutput = false;
+   isMultivarSuperOutput = false;
+
+   // just in case make these empty
+   fcst_magic_string = "";
+   obs_magic_string = "";
+
+   // Create output stats files and plots
+
+   write_obj_stats();
+
+   if ( engine.conf_info.ct_stats_flag )  write_ct_stats();
+
    write_obj_netcdf(engine.conf_info.nc_info);
 
    if ( engine.conf_info.ps_plot_flag )   plot_engine();

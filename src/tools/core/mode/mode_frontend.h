@@ -19,10 +19,6 @@
 #include <iostream>
 #include "mode_exec.h"
 #include "string_array.h"
-#include "multivar_data.h"
-#include "mode_input_data.h"
-#include "mode_data_type.h"
-#include "mode_superobject.h"
 
 class ModeFrontEnd {
 
@@ -36,75 +32,21 @@ class ModeFrontEnd {
 
    string default_out_dir;
 
-   Grid create_verification_grid(const ModeInputData &fcst,
-                                 const ModeInputData &obs,
-                                 const string &config_file,
-                                 const ModeConfInfo &config);
-
-
-   // run the multivar simple object, where there is only one input data, either forecast or obs
-   int create_multivar_simple_objects(const ModeConfInfo &conf,
-                                      ModeDataType dtype, const Grid &verification_grid,
-                                      const ModeInputData &input,
-                                      const string &filename, const string &config_file,
-                                      const string &outdir,
-                                      int field_index=-1, int n_files=1);
-
-   // run the multivar simple object merge algorithm, with one input data, either forecast or obs
-   int create_multivar_merge_objects(const ModeConfInfo &conf,
-                                     ModeDataType dtype, const Grid &verification_grid,
-                                      const ModeInputData &input,
-                                     const string &filename, const string &config_file,
-                                     const string &outdir,
-                                     int field_index=-1, int n_files=1);
 
    // run the default single var mode interface (traditional  mode)
    int run_traditional(const StringArray & Argv); 
 
-   // run the multivar intensity algorithm, where one forecast and one obs are restricted to be within superobjects
-   // and the traditional mode algorithm compares them
-   int multivar_intensity_comparisons(const ModeConfInfo &conf,
-                                      const MultiVarData &mvdf, const MultiVarData &mvdo,
-                                      bool has_union_f, bool has_union_o, const ShapeData &merge_f,
-                                      const ShapeData &merge_o, int field_index_f, int field_index_o,
-                                      const string &fcst_filename, const string &obs_filename,
-                                      const string &config_file, const string &dir);
-
-   
-   // multivar superobject interface, with no intensities
-   int run_super(const ModeConfInfo &conf,
-                 const ModeSuperObject &fsuper,
-                 const ModeSuperObject &osuper,
-                 GrdFileType ftype, GrdFileType otype, const Grid &grid, bool has_union,
-                 const string &config_file, const string &dir);
-
+   void init();
    
    // so far only implemented for traditional mode
    void do_quilt    ();
 
-   // MODE algorithm for traditional, multivar simple, or multivar merge cases
+   // MODE algorithm for traditional mode
    void do_straight ();
 
-   // MODE algorithm when doing multivar intensities
-   void do_straight_multivar_intensity (const MultiVarData &mvdf,
-                                        const MultiVarData &mvdo,
-                                        const ShapeData &mergef,
-                                        const ShapeData &mergeo);
-
-   // MODE algorithm when doing multivar super with no intensities
-   void do_straight_multivar_super (const ShapeData &f_merge,
-                                    const ShapeData &o_merge);
-
-
-   MultiVarData *get_multivar_data(ModeDataType dtype);
-
-   void add_multivar_merge_data(MultiVarData *mvdi, ModeDataType dtype);
-
-   void init(ModeExecutive::Processing_t p);
    void do_straight_init(int &NCT, int &NCR) const;
 
-   void process_command_line_for_simple_objects(const StringArray &, ModeDataType dtype);
-   void process_command_line(const StringArray &, bool is_multivar);
+   void process_command_line(const StringArray &);
 
    static void set_config_merge_file (const StringArray &);
    static void set_outdir            (const StringArray &);

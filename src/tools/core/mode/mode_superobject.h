@@ -22,6 +22,8 @@
 #include <iostream>
 #include <vector>
 
+class MultiVarData;
+
 class ModeSuperObject {
 
  private:
@@ -33,7 +35,11 @@ class ModeSuperObject {
                    BoolCalc &calc);
    inline ~ModeSuperObject() {}
 
+   void mask_data_simple(const string &name, MultiVarData &mvd) const;
+   void mask_data_super(const string &name, const MultiVarData &mvd);
+
    bool _isFcst;
+   bool _hasUnion;
    BoolPlane _simple_result;
    ShapeData _simple_sd;
    ShapeData _merge_sd_split;

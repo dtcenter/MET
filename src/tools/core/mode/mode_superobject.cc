@@ -1,5 +1,70 @@
 using namespace std;
 #include "mode_superobject.h"
+#include "multivar_data.h"
+
+////////////////////////////////////////////////////////////////////////
+static void _mask_super(const string &name, int nx, int ny, DataPlane &data)
+{
+
+   if (nx != data.nx() || ny != data.ny()) {
+      mlog << Error << "\nModeSuperObject::mask_data_super() -> " << name 
+           << " :dimensions don't match " << nx << " " <<  ny 
+           << "    " << data.nx() << " " << data.ny() << "\n\n";
+
+      exit( 1 );
+   }
+
+   int nmasked=0, nkeep=0;
+   
+   for (int x=0; x<nx; ++x)  {
+
+      for (int y=0; y<ny; ++y)  {
+
+         if(is_bad_data(data.get(x,y))) {
+            nmasked ++;
+         } else {
+            data.set(0.0, x, y);
+            nkeep ++;
+         }
+      }
+   }
+   
+   mlog << Debug(1) << name << " Superobject masking.."
+        << nkeep << " points of "
+        << nmasked + nkeep << " are in superobjects\n";
+}
+
+////////////////////////////////////////////////////////////////////////
+static void _mask(const string &name, int nx, int ny, const BoolPlane &bp,
+                  DataPlane &data)
+{
+   if (nx != data.nx() || ny != data.ny()) {
+      mlog << Error << "\nModeSuperObject::mask_data() -> " << name 
+           << " :dimensions don't match " << nx << " " <<  ny 
+           << "    " << data.nx() << " " << data.ny() << "\n\n";
+
+      exit( 1 );
+   }
+
+   int nmasked=0, nkeep=0;
+   
+   for (int x=0; x<nx; ++x)  {
+
+      for (int y=0; y<ny; ++y)  {
+
+         if ( bp(x, y) == false) {
+            data.set(bad_data_float, x, y);;
+            nmasked ++;
+         } else {
+            nkeep ++;
+         }
+      }
+   }
+   
+   mlog << Debug(1) << name << " Superobject masking.."
+        << nkeep << " points of "
+        << nmasked + nkeep << " are in superobjects\n";
+}
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -34,6 +99,8 @@ ModeSuperObject::ModeSuperObject(bool isFcst, int n_files, bool do_clusters,
                                  const vector<MultiVarData *> &mvd,
                                  BoolCalc &calc)
 {
+   _hasUnion = calc.has_union();
+   
    //
    //  set the BoolPlane values using the mvd content
    //
@@ -99,4 +166,19 @@ ModeSuperObject::ModeSuperObject(bool isFcst, int n_files, bool do_clusters,
 
    delete [] simple_plane;
    delete [] merge_plane;
+}
+
+void ModeSuperObject::mask_data_simple(const string &name, MultiVarData &mvd) const
+{
+   int nx = mvd._nx;
+   int ny = mvd._ny;
+   _mask(name, nx, ny, _simple_result, mvd._simple->_sd->data);
+}
+
+
+void ModeSuperObject::mask_data_super(const string &name, const MultiVarData &mvd)
+{
+   int nx = mvd._nx;
+   int ny = mvd._ny;
+   _mask_super(name, nx, ny, _simple_sd.data);
 }
