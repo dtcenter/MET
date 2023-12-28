@@ -74,6 +74,11 @@ fi
 
 # AC_SUBST command line variables.
 
+if (test -n "$MET_ATLASLIB"); then
+  CPPFLAGS="${CPPFLAGS} -I${MET_ATLASINC}"
+  LDFLAGS="${LDFLAGS} -L${MET_ATLASLIB}"
+fi
+
 #
 # Look for the Eckit library.
 #
@@ -101,6 +106,10 @@ fi
 
 # AC_SUBST command line variables.
 
+if (test -n "$MET_ECKITLIB"); then
+  CPPFLAGS="${CPPFLAGS} -I${MET_ECKITINC}"
+  LDFLAGS="${LDFLAGS} -L${MET_ECKITLIB}"
+fi
 #
 # Look for the NetCDF library.
 #
@@ -1128,8 +1137,7 @@ AM_CONDITIONAL([ENABLE_UGRID], [test "x$ENABLE_UGRID" = "xyes" || test "x$ENABLE
 if test "x$ENABLE_UGRID" = "xyes" || test "x$ENABLE_ALL" = "xyes"; then
   AC_DEFINE([ENABLE_UGRID], [], ["build unstructured grid support"])
   AC_MSG_NOTICE([unstructured grid support will be compiled])
-  CPPFLAGS="${CPPFLAGS} -I${MET_ATLASINC} -I${MET_ECKITINC} -DWITH_UGRID"
-  LDFLAGS="${LDFLAGS} -L${MET_ATLASLIB} -L${MET_ECKITLIB} -Wl,-rpath,${MET_ATLASLIB}:${MET_ECKITLIB}"
+  CPPFLAGS="${CPPFLAGS} -DWITH_UGRID"
   UGRID_MET_LIBS="-lvx_data2d_ugrid"
   UGRID_DEP_LIBS="-latlas -leckit -leckit_mpi -leckit_geometry"
 else

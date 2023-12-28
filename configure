@@ -5376,6 +5376,11 @@ fi
 
 # AC_SUBST command line variables.
 
+if (test -n "$MET_ATLASLIB"); then
+  CPPFLAGS="${CPPFLAGS} -I${MET_ATLASINC}"
+  LDFLAGS="${LDFLAGS} -L${MET_ATLASLIB}"
+fi
+
 #
 # Look for the Eckit library.
 #
@@ -5403,6 +5408,10 @@ fi
 
 # AC_SUBST command line variables.
 
+if (test -n "$MET_ECKITLIB"); then
+  CPPFLAGS="${CPPFLAGS} -I${MET_ECKITINC}"
+  LDFLAGS="${LDFLAGS} -L${MET_ECKITLIB}"
+fi
 #
 # Look for the NetCDF library.
 #
@@ -6948,8 +6957,7 @@ printf "%s\n" "#define ENABLE_UGRID /**/" >>confdefs.h
 
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: unstructured grid support will be compiled" >&5
 printf "%s\n" "$as_me: unstructured grid support will be compiled" >&6;}
-  CPPFLAGS="${CPPFLAGS} -I${MET_ATLASINC} -I${MET_ECKITINC} -DWITH_UGRID"
-  LDFLAGS="${LDFLAGS} -L${MET_ATLASLIB} -L${MET_ECKITLIB} -Wl,-rpath,${MET_ATLASLIB}:${MET_ECKITLIB}"
+  CPPFLAGS="${CPPFLAGS} -DWITH_UGRID"
   UGRID_MET_LIBS="-lvx_data2d_ugrid"
   UGRID_DEP_LIBS="-latlas -leckit -leckit_mpi -leckit_geometry"
 else
