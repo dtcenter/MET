@@ -155,13 +155,13 @@ Configuring regridding options
 .. code-block:: none
 
   regrid = {
-     method     = NEAREST;
-     width      = 1;
+     method     = BILIN;
+     width      = 2;
      vld_thresh = 0.5;
      shape      = SQUARE;
   }
 
-The **regrid** dictionary is common to multiple MET tools and is described in :numref:`config_options`. It specifies how the input data should be regridded to cylindrical coordinates prior to compute diagnostics. It can be specified separately in each **data.field** array entry, described below. The default setting uses nearest neighbor interpolation for all fields.
+The **regrid** dictionary is common to multiple MET tools and is described in :numref:`config_options`. It specifies how the input data should be regridded to cylindrical coordinates prior to compute diagnostics. It can be specified separately in each **data.field** array entry, described below. The default setting uses bilinear interpolation for all fields.
 
 Configuring Fields, Levels, and Domains
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
