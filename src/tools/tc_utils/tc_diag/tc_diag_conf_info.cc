@@ -359,6 +359,9 @@ void TCDiagConfInfo::process_config(GrdFileType file_type,
       exit(1);
    }
 
+   // Conf: tmp_nc_diag_flag
+   tmp_nc_diag_flag = conf.lookup_bool(conf_key_tmp_nc_diag_flag);
+
    // Conf: tmp_dir
    tmp_dir = parse_conf_tmp_dir(&conf);
 

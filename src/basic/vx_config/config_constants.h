@@ -1229,6 +1229,7 @@ static const char conf_key_output_base_format[]     = "output_base_format";
 static const char conf_key_nc_cyl_grid_flag[]       = "nc_cyl_grid_flag";
 static const char conf_key_nc_diag_flag[]           = "nc_diag_flag";
 static const char conf_key_cira_diag_flag[]         = "cira_diag_flag";
+static const char conf_key_tmp_nc_diag_flag[]       = "tmp_nc_diag_flag";
 
 //
 // Parameter value names common to multiple tools

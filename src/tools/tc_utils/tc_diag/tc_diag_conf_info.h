@@ -138,6 +138,7 @@ class TCDiagConfInfo {
       bool nc_cyl_grid_flag;
       bool nc_diag_flag;
       bool cira_diag_flag;
+      bool tmp_nc_diag_flag;
 
       //////////////////////////////////////////////////////////////////
 

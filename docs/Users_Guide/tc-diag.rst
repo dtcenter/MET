@@ -236,6 +236,14 @@ These three flag entries are booleans specifying what output data types should b
 
 .. code-block:: none
 
+  tmp_nc_diag_flag = FALSE;
+
+This flag is a boolean specifying whether the temporary NetCDF files containing the cylindrical coordinate range-azimuth data for each storm location should be retained. By default, these temporary files are deleted. If set to true for debugging purposes, they are retained.
+
+.. note:: Setting `tmp_nc_diag_flag` to true may fill up the temporary directory. It is the responsiblity of the user to monitor the temporary directory usage.
+
+.. code-block:: none
+
   output_base_format = "s{storm_id}_{model}_doper_{init_time}";
 
 The **output_base_format** entry is a string that defines the naming convention that should be used when writing the output files described above. The following keywords are supported and will be replaced with values from the corresponding track: {storm_id}, {basin}, {cyclone}, {storm_name}, {technique_number}, {technique}, {init_ymdh}, {init_ymd_hms}, {init_hour}.
