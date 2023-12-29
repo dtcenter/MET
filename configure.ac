@@ -80,7 +80,7 @@ if (test -n "$MET_ATLASLIB"); then
 fi
 
 #
-# Look for the Eckit library.
+# Look for the ecKit library.
 #
 
 # Configure the variables. The help text will appear if the user uses "configure --help".
@@ -110,6 +110,7 @@ if (test -n "$MET_ECKITLIB"); then
   CPPFLAGS="${CPPFLAGS} -I${MET_ECKITINC}"
   LDFLAGS="${LDFLAGS} -L${MET_ECKITLIB}"
 fi
+
 #
 # Look for the NetCDF library.
 #
