@@ -33,7 +33,7 @@ class MetNcWrfDataFile : public Met2dDataFile {
 
    private:
 
-      void nc_pinterp_init_from_scratch();
+      void nc_wrf_init_from_scratch();
 
       MetNcWrfDataFile(const MetNcWrfDataFile &);
       MetNcWrfDataFile & operator=(const MetNcWrfDataFile &);
@@ -42,7 +42,7 @@ class MetNcWrfDataFile : public Met2dDataFile {
          //  NetCDF file
          //
       
-      PinterpFile * PinterpNc;  //  allocated
+      WrfFile * WrfNc;  //  allocated
 
    public:
 

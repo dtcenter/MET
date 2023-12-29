@@ -66,15 +66,15 @@ static double mercator_v_to_lat(double v);
 ////////////////////////////////////////////////////////////////////////
 
 
-bool get_pinterp_grid(const char * pinterp_filename, Grid & grid)
+bool get_wrf_grid(const char * wrf_filename, Grid & grid)
 
 {
 
 bool status = false;
-NcFile nc(pinterp_filename, NcFile::read);
+NcFile nc(wrf_filename, NcFile::read);
 
 
-status = get_pinterp_grid(nc, grid);
+status = get_wrf_grid(nc, grid);
 
 
 return ( status );
@@ -85,7 +85,7 @@ return ( status );
 ////////////////////////////////////////////////////////////////////////
 
 
-bool get_pinterp_grid(NcFile & nc, Grid & grid)
+bool get_wrf_grid(netCDF::NcFile & nc, Grid & grid)
 
 {
 

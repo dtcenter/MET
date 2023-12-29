@@ -34,19 +34,19 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-class PinterpFile {
+class WrfFile {
 
    private:
 
       void init_from_scratch();
 
-      PinterpFile(const PinterpFile &);
-      PinterpFile & operator=(const PinterpFile &);
+      WrfFile(const WrfFile &);
+      WrfFile & operator=(const WrfFile &);
 
    public:
 
-      PinterpFile();
-     ~PinterpFile();
+      WrfFile();
+     ~WrfFile();
 
       bool open(const char * filename);
 

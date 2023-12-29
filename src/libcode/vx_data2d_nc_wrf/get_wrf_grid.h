@@ -29,9 +29,9 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-extern bool get_pinterp_grid(const char * pinterp_filename, Grid &);
+extern bool get_wrf_grid(const char * wrf_filename, Grid & grid);
 
-extern bool get_pinterp_grid(netCDF::NcFile &, Grid &);
+extern bool get_wrf_grid(netCDF::NcFile & nc, Grid & grid);
 
 
 ////////////////////////////////////////////////////////////////////////

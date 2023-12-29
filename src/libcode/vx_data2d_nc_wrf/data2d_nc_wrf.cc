@@ -31,7 +31,7 @@ using namespace std;
 
 MetNcWrfDataFile::MetNcWrfDataFile() {
 
-   nc_pinterp_init_from_scratch();
+    nc_wrf_init_from_scratch();
 
 }
 
@@ -62,9 +62,9 @@ MetNcWrfDataFile & MetNcWrfDataFile::operator=(const MetNcWrfDataFile &) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void MetNcWrfDataFile::nc_pinterp_init_from_scratch() {
+void MetNcWrfDataFile::nc_wrf_init_from_scratch() {
 
-   PinterpNc  = (PinterpFile *) 0;
+   WrfNc  = (WrfFile *) 0;
 
    close();
 
@@ -75,7 +75,7 @@ void MetNcWrfDataFile::nc_pinterp_init_from_scratch() {
 
 void MetNcWrfDataFile::close() {
 
-   if(PinterpNc) { delete PinterpNc; PinterpNc = (PinterpFile *) 0; }
+   if(WrfNc) { delete WrfNc; WrfNc = (WrfFile *) 0; }
 
    return;
 }
@@ -86,9 +86,9 @@ bool MetNcWrfDataFile::open(const char * _filename) {
 
    close();
 
-   PinterpNc = new PinterpFile;
+    WrfNc = new WrfFile;
 
-   if(!PinterpNc->open(_filename)) {
+   if(!WrfNc->open(_filename)) {
       mlog << Error << "\nMetNcWrfDataFile::open(const char *) -> "
            << "unable to open NetCDF file \"" << _filename << "\"\n\n";
       close();
@@ -100,7 +100,7 @@ bool MetNcWrfDataFile::open(const char * _filename) {
 
    Raw_Grid = new Grid;
 
-   (*Raw_Grid) = PinterpNc->grid;
+   (*Raw_Grid) = WrfNc->grid;
 
    Dest_Grid = new Grid;
 
@@ -113,7 +113,7 @@ bool MetNcWrfDataFile::open(const char * _filename) {
 
 void MetNcWrfDataFile::dump(ostream & out, int depth) const {
 
-   if(PinterpNc) PinterpNc->dump(out, depth);
+   if(WrfNc) WrfNc->dump(out, depth);
 
    return;
 }
@@ -131,14 +131,14 @@ bool MetNcWrfDataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
    plane.clear();
 
    // Read the data
-   PinterpNc->get_nc_var_info(vinfo_nc->req_name().c_str(), info);
+   WrfNc->get_nc_var_info(vinfo_nc->req_name().c_str(), info);
    LongArray dimension = vinfo_nc->dimension();
    int dim_count = dimension.n_elements();
    for (int k=0; k<dim_count; k++) {
       if (dimension[k] == vx_data2d_dim_by_value) {
          string dim_name = GET_NC_NAME(get_nc_dim(info->var, k));
-         NcVarInfo *var_info = find_var_info_by_dim_name(PinterpNc->Var, dim_name,
-                                                         PinterpNc->Nvars);
+         NcVarInfo *var_info = find_var_info_by_dim_name(WrfNc->Var, dim_name,
+                                                         WrfNc->Nvars);
          if (var_info) {
             long new_offset = get_index_at_nc_data(var_info->var,
                                                    vinfo_nc->dim_value(k),
@@ -148,8 +148,8 @@ bool MetNcWrfDataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
       }
    }
 
-   status = PinterpNc->data(vinfo_nc->req_name().c_str(),
-                            dimension, plane, pressure, info);
+   status = WrfNc->data(vinfo_nc->req_name().c_str(),
+                        dimension, plane, pressure, info);
 
    // Check that the times match those requested
    if(status) {
@@ -241,8 +241,8 @@ int MetNcWrfDataFile::data_plane_array(VarInfo &vinfo,
       cur_dim[i_dim] = lower + i;
 
       // Read data for the current level
-      status = PinterpNc->data(vinfo_nc->req_name().c_str(),
-                               cur_dim, cur_plane, pressure, info);
+      status = WrfNc->data(vinfo_nc->req_name().c_str(),
+                           cur_dim, cur_plane, pressure, info);
 
       // Check that the times match those requested
       if(status) {

@@ -57,9 +57,9 @@ static const char hpa_units_str        [] = "hPa";
 
 static const string start_time_att_name   = "START_DATE";
 
-static const int max_pinterp_args         = 30;
+static const int max_wrf_args         = 30;
 
-static const double pinterp_missing       = 1.0e35;
+static const double wrf_missing       = 1.0e35;
 
 static const char *accum_var_names     [] = { "ACGRDFLX", "CUPPT",
                                               "RAINC",    "RAINNC",
@@ -72,7 +72,7 @@ static const int n_accum_var_names        = sizeof(accum_var_names)/sizeof(*accu
 
 static unixtime parse_init_time(const char *);
 
-static bool is_bad_data_pinterp(double);
+static bool is_bad_data_wrf(double);
 
 static bool is_accumulation(const char *);
 
@@ -80,14 +80,14 @@ static bool is_accumulation(const char *);
 
 
    //
-   //  Code for class PinterpFile
+   //  Code for class WrfFile
    //
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-PinterpFile::PinterpFile()
+WrfFile::WrfFile()
 
 {
 
@@ -99,7 +99,7 @@ init_from_scratch();
 ////////////////////////////////////////////////////////////////////////
 
 
-PinterpFile::~PinterpFile()
+WrfFile::~WrfFile()
 
 {
 
@@ -111,7 +111,7 @@ close();
 ////////////////////////////////////////////////////////////////////////
 
 
-void PinterpFile::init_from_scratch()
+void WrfFile::init_from_scratch()
 
 {
 
@@ -133,7 +133,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void PinterpFile::close()
+void WrfFile::close()
 
 {
 
@@ -173,7 +173,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool PinterpFile::open(const char * filename)
+bool WrfFile::open(const char * filename)
 
 {
 
@@ -196,7 +196,7 @@ if ( IS_INVALID_NC_P(Nc) )  { close();  return ( false ); }
    //  grid
    //
 
-if ( ! get_pinterp_grid(*Nc, grid) )  { close();  return ( false ); }
+if ( !get_wrf_grid(*Nc, grid) )  { close();  return ( false ); }
 
    //
    //  dimensions
@@ -482,13 +482,13 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-unixtime PinterpFile::valid_time(int n) const
+unixtime WrfFile::valid_time(int n) const
 
 {
 
 if ( (n < 0) || (n >= Ntimes) )  {
 
-   mlog << Error << "\nPinterpFile::valid_time(int) const -> "
+   mlog << Error << "\nWrfFile::valid_time(int) const -> "
         << "range check error\n\n";
 
    exit ( 1 );
@@ -504,13 +504,13 @@ return ( Time [n] );
 ////////////////////////////////////////////////////////////////////////
 
 
-int PinterpFile::lead_time(int n) const
+int WrfFile::lead_time(int n) const
 
 {
 
 if ( (n < 0) || (n >= Ntimes) )  {
 
-   mlog << Error << "\nPinterpFile::lead_time(int) const -> "
+   mlog << Error << "\nWrfFile::lead_time(int) const -> "
         << "range check error\n\n";
 
    exit ( 1 );
@@ -527,14 +527,13 @@ return ( (int) dt );
 ////////////////////////////////////////////////////////////////////////
 
 
-double PinterpFile::data(NcVar * var, const LongArray & a) const
+double WrfFile::data(NcVar * var, const LongArray & a) const
 
 {
-
+const char *method_name = "WrfFile::data(NcVar *, const LongArray &) const -> ";
 if ( !args_ok(a) )  {
 
-   mlog << Error << "\nPinterpFile::data(NcVar *, const LongArray &) const -> "
-        << "bad arguments:\n";
+   mlog << Error << "\n" << method_name << "bad arguments:\n";
 
    a.dump(cerr);
 
@@ -545,7 +544,7 @@ if ( !args_ok(a) )  {
 int dim_count = var->getDimCount();
 if ( dim_count != a.n_elements() )  {
 
-   mlog << Error << "\nPinterpFile::data(NcVar *, const LongArray &) const -> "
+   mlog << Error << "\n" << method_name
         << "needed " << (dim_count) << " arguments for variable "
         << (GET_NC_NAME_P(var)) << ", got " << (a.n_elements()) << "\n\n";
 
@@ -553,9 +552,9 @@ if ( dim_count != a.n_elements() )  {
 
 }
 
-if ( dim_count >= max_pinterp_args )  {
+if (dim_count >= max_wrf_args )  {
 
-   mlog << Error << "\nPinterpFile::data(NcVar *, const LongArray &) const -> "
+   mlog << Error << "\n" << method_name
         << " too may arguments for variable \"" << (GET_NC_NAME_P(var)) << "\"\n\n";
 
    exit ( 1 );
@@ -575,8 +574,7 @@ status = get_nc_data(var, &d, a);
 
 if ( !status )  {
 
-   mlog << Error << "\nPinterpFile::data(NcVar *, const LongArray &) const -> "
-        << " bad status for var->get()\n\n";
+   mlog << Error << "\n" << method_name << " bad status for var->get()\n\n";
 
    exit ( 1 );
 }
@@ -593,14 +591,13 @@ return ( d );
 ////////////////////////////////////////////////////////////////////////
 
 
-bool PinterpFile::data(NcVar * v, const LongArray & a, DataPlane & plane, double & pressure) const
+bool WrfFile::data(NcVar * v, const LongArray & a, DataPlane & plane, double & pressure) const
 
 {
-
+const char *method_name = "WrfFile::data(NcVar *, const LongArray &, DataPlane &, double &) const -> ";
 if ( !args_ok(a) )  {
 
-   mlog << Warning << "\nPinterpFile::data(NcVar *, const LongArray &, DataPlane &, double &) const -> "
-        << "bad arguments:\n";
+   mlog << Warning << "\n" << method_name << "bad arguments:\n";
 
    a.dump(cerr);
 
@@ -612,7 +609,7 @@ string var_name = GET_NC_NAME_P(v);
 int dim_count = v->getDimCount();
 if ( dim_count != a.n_elements() )  {
 
-   mlog << Warning << "\nPinterpFile::data(NcVar *, const LongArray &, DataPlane &, double &) const -> "
+   mlog << Warning << "\n" << method_name
         << "needed " << dim_count << " arguments for variable "
         << (var_name) << ", got " << (a.n_elements()) << "\n\n";
 
@@ -620,9 +617,9 @@ if ( dim_count != a.n_elements() )  {
 
 }
 
-if ( dim_count >= max_pinterp_args )  {
+if (dim_count >= max_wrf_args )  {
 
-   mlog << Warning << "\nPinterpFile::data(NcVar *, const LongArray &, DataPlane &, double &) const -> "
+   mlog << Warning << "\n" << method_name
         << " too may arguments for variable \"" << (var_name) << "\"\n\n";
 
    return ( false );
@@ -658,7 +655,7 @@ for (j=0; j<Nvars; ++j)  {
 
 if ( !found )  {
 
-   mlog << Warning << "\nPinterpFile::data(NcVar *, const LongArray &, DataPlane &, double &) const -> "
+   mlog << Warning << "\n" << method_name
         << "variable " << (var_name) << " not found!\n\n";
 
    return ( false );
@@ -671,8 +668,7 @@ if ( !found )  {
 
 if ( var == nullptr || (var->x_slot < 0) || (var->y_slot < 0) )  {
 
-   mlog << Error
-        << "\nPinterpFile::data(NcVar *, const LongArray &, DataPlane &, double &) const -> "
+   mlog << Error << "\n" << method_name
         << "can't find needed dimensions(s) for variable \""
         << var_name << "\" ... one of the dimensions may be staggered.\n\n";
 
@@ -694,8 +690,7 @@ for (j=0; j<(a.n_elements()); ++j)  {
 
       if ( (j != var->x_slot) && (j != var->y_slot) )  {
 
-         mlog << Warning << "\nPinterpFile::data(NcVar *, const LongArray &, DataPlane &, double &) const -> "
-              << " star found in bad slot\n\n";
+         mlog << Warning << "\n" << method_name << " star found in bad slot\n\n";
 
          return ( false );
 
@@ -707,8 +702,7 @@ for (j=0; j<(a.n_elements()); ++j)  {
 
 if ( count != 2 )  {
 
-   mlog << Warning << "\nPinterpFile::data(NcVar *, const LongArray &, DataPlane &, double &) const -> "
-        << " bad star count ... " << count << "\n\n";
+   mlog << Warning << "\n" << method_name << " bad star count ... " << count << "\n\n";
 
    return ( false );
 
@@ -724,8 +718,7 @@ const int z_slot = var->z_slot;
 
 if ( (x_slot < 0) || (y_slot < 0) )  {
 
-   mlog << Warning << "\nPinterpFile::data(NcVar *, const LongArray &, DataPlane &, double &) const -> "
-        << " bad x|y slot\n\n";
+   mlog << Warning << "\n" << method_name << " bad x|y slot\n\n";
 
    return ( false );
 
@@ -762,7 +755,7 @@ for (x=0; x<Nx; ++x)  {
    for (y=0; y<Ny; ++y)  {
       value = d[y];
 
-      if ( is_bad_data_pinterp( value ) ) {
+      if (is_bad_data_wrf(value) ) {
          value = bad_data_double;
       }
 
@@ -798,8 +791,8 @@ return ( true );
 ////////////////////////////////////////////////////////////////////////
 
 
-bool PinterpFile::data(const char * var_name, const LongArray & a, DataPlane & plane,
-                       double & pressure, NcVarInfo *&info) const {
+bool WrfFile::data(const char * var_name, const LongArray & a, DataPlane & plane,
+                   double & pressure, NcVarInfo *&info) const {
 
    int time_index;
    bool found = false;
@@ -847,7 +840,7 @@ bool PinterpFile::data(const char * var_name, const LongArray & a, DataPlane & p
 
 ////////////////////////////////////////////////////////////////////////
 
-bool PinterpFile::get_nc_var_info(const char *var_name, NcVarInfo *&info) const {
+bool WrfFile::get_nc_var_info(const char *var_name, NcVarInfo *&info) const {
    bool found = false;
 
    if (nullptr == info) {
@@ -911,11 +904,11 @@ return ( t );
 ////////////////////////////////////////////////////////////////////////
 
 
-bool is_bad_data_pinterp(double v)
+bool is_bad_data_wrf(double v)
 
 {
 
-if ( v < pinterp_missing )  return ( false );
+if (v < wrf_missing )  return ( false );
 else                        return ( true  );
 
 }
