@@ -88,6 +88,10 @@ class NcVarInfo {
       int z_slot;    //   -1 if not defined
       int t_slot;    //
 
+      bool x_stag;   // if dimensions are staggered
+      bool y_stag;
+      bool z_stag;
+
 };
 
 ////////////////////////////////////////////////////////////////////////

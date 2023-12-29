@@ -35,10 +35,18 @@ using namespace netCDF;
 
 
 static const char x_dim_name           [] = "west_east";
+static const char x_dim_stag_name      [] = "west_east_stag";
+static const char x_dim_subgrid_name   [] = "west_east_subgrid";
 static const char y_dim_name           [] = "south_north";
+static const char y_dim_stag_name      [] = "south_north_stag";
+static const char y_dim_subgrid_name   [] = "south_north_subgrid";
 static const char t_dim_name           [] = "time";
 static const char z_dim_p_interp_name  [] = "num_metgrid_levels";
 static const char z_dim_wrf_interp_name[] = "vlevs";
+static const char z_dim_wrf_stag_name  [] = "bottom_top_stag";
+static const char z_dim_wrf_name       [] = "bottom_top";
+static const char z_dim_wrf_pres_name  [] = "num_press_levels_stag";
+static const char z_dim_wrf_z_name     [] = "num_z_levels_stag";
 static const string strl_dim_name         = "DateStrLen";
 
 static const char  times_var_name      [] = "Times";
@@ -51,6 +59,7 @@ static const char second_var_name      [] = "second";
 
 static const char pressure_var_p_interp_name   [] = "pressure";
 static const char pressure_var_wrf_interp_name [] = "LEV";
+static const char pressure_var_wrf_name        [] = "P_PL";
 
 static const char pa_units_str         [] = "Pa";
 static const char hpa_units_str        [] = "hPa";
@@ -147,7 +156,7 @@ Ndims = 0;
 
 DimNames.clear();
 
-Xdim = Ydim = Zdim = Tdim = (NcDim *) 0;
+Tdim = (NcDim *) 0;
 
 Nvars = 0;
 
@@ -158,6 +167,8 @@ InitTime = (unixtime) 0;
 Ntimes = 0;
 
 PressureIndex = -1;
+
+TimeInPressure = false;
 
 hPaCF = 1.0;
 
@@ -212,11 +223,6 @@ for (j=0; j<Ndims; ++j)  {
    NcDim dim = get_nc_dim(Nc, gDimNames[j]);
 
    if ( c.compare(t_dim_name) == 0 )  Ntimes = GET_NC_SIZE(dim);
-
-   if ( c.compare(x_dim_name) == 0 )            Xdim = &dim;
-   if ( c.compare(y_dim_name) == 0 )            Ydim = &dim;
-   if ( c.compare(z_dim_p_interp_name  ) == 0 ||
-        c.compare(z_dim_wrf_interp_name) == 0)  Zdim = &dim;
    if ( c.compare(t_dim_name) == 0 )            Tdim = &dim;
 
 }
@@ -320,8 +326,12 @@ InitTime = parse_init_time(att_value.c_str());
       //
 
       if ( strcasecmp(GET_NC_NAME(v).c_str(), pressure_var_p_interp_name)   == 0 ||
-           strcasecmp(GET_NC_NAME(v).c_str(), pressure_var_wrf_interp_name) == 0 ) {
+           strcasecmp(GET_NC_NAME(v).c_str(), pressure_var_wrf_interp_name) == 0 ||
+           strcasecmp(GET_NC_NAME(v).c_str(), pressure_var_wrf_name) == 0 ) {
          PressureIndex = j;
+         if( strcasecmp(GET_NC_NAME(v).c_str(), pressure_var_wrf_name) == 0 ) {
+            TimeInPressure = true;
+         }
               if ( strcasecmp(Var[j].units_att.c_str(), pa_units_str ) == 0 ) hPaCF = 0.01;
          else if ( strcasecmp(Var[j].units_att.c_str(), hpa_units_str) == 0 ) hPaCF = 1.0;
       }
@@ -329,27 +339,38 @@ InitTime = parse_init_time(att_value.c_str());
 
       dimNames.clear();
       get_dim_names(&v, &dimNames);
-
+      string c;
       for (k=0; k<(dim_count); ++k)  {
         c = to_lower(dimNames[k]);
         NcDim dim = get_nc_dim(&v, dimNames[k]);
         Var[j].Dims[k] = &dim;
 
-        if ( Var[j].Dims[k] == Xdim )  Var[j].x_slot = k;
-        if ( Var[j].Dims[k] == Ydim )  Var[j].y_slot = k;
-        if ( Var[j].Dims[k] == Zdim )  Var[j].z_slot = k;
-        if ( Var[j].Dims[k] == Tdim )  Var[j].t_slot = k;
         if ( c.compare(x_dim_name) == 0 ) {
            Var[j].x_slot = k;
         }
-        if ( c.compare(y_dim_name) == 0 ) {
+        else if ( c.compare(x_dim_stag_name) == 0 ) {
+           Var[j].x_slot = k;
+           Var[j].x_stag = true;
+        }
+        else if ( c.compare(y_dim_name) == 0 ) {
            Var[j].y_slot = k;
         }
-        if ( c.compare(z_dim_p_interp_name  ) == 0 ||
-             c.compare(z_dim_wrf_interp_name) == 0) {
+        else if ( c.compare(y_dim_stag_name) == 0 ) {
+           Var[j].y_slot = k;
+           Var[j].y_stag = true;
+        }
+        else if ( c.compare(z_dim_p_interp_name  ) == 0 ||
+                  c.compare(z_dim_wrf_interp_name) == 0 ||
+                  c.compare(z_dim_wrf_name  ) == 0) {
            Var[j].z_slot = k;
         }
-        if ( c.compare(t_dim_name) == 0 ) {
+        else if ( c.compare(z_dim_wrf_stag_name) == 0 ||
+                  c.compare(z_dim_wrf_pres_name) == 0 ||
+                  c.compare(z_dim_wrf_z_name ) == 0) {
+           Var[j].z_slot = k;
+           Var[k].z_stag = true;
+        }
+        else if ( c.compare(t_dim_name) == 0 ) {
            Var[j].t_slot = k;
         }
       }   //  for k
@@ -375,6 +396,7 @@ void WrfFile::dump(ostream & out, int depth) const
 int j, k;
 int month, day, year, hour, minute, second;
 char junk[256];
+string c;
 Indent prefix(depth);
 Indent p2(depth + 1);
 Indent p3(depth + 2);
@@ -400,10 +422,7 @@ for (j=0; j<Ndims; ++j)  {
 
 out << prefix << "\n";
 
-out << prefix << "Xdim = " << (Xdim ? GET_NC_NAME_P(Xdim) : "(nul)") << "\n";
-out << prefix << "Ydim = " << (Ydim ? GET_NC_NAME_P(Ydim) : "(nul)") << "\n";
-out << prefix << "Zdim = " << (Zdim ? GET_NC_NAME_P(Zdim) : "(nul)") << "\n";
-out << prefix << "Tdim = " << (Zdim ? GET_NC_NAME_P(Tdim) : "(nul)") << "\n";
+out << prefix << "Tdim = " << (Tdim ? GET_NC_NAME_P(Tdim) : "(nul)") << "\n";
 
 out << prefix << "\n";
 
@@ -440,12 +459,19 @@ for (j=0; j<Nvars; ++j)  {
    out << p2 << "Var # " << j << " = " << (Var[j].name) << "  (";
 
    for (k=0; k<(Var[j].Ndims); ++k)  {
-
-           if ( Var[j].Dims[k] == Xdim )  out << 'X';
-      else if ( Var[j].Dims[k] == Ydim )  out << 'Y';
-      else if ( Var[j].Dims[k] == Zdim )  out << 'Z';
-      else if ( Var[j].Dims[k] == Tdim )  out << 'T';
-      else                                out << GET_NC_NAME_P(Var[j].Dims[k]);
+      c = to_lower(DimNames[k]);
+           if ( c.compare(x_dim_name) == 0 )           out << "X";
+      else if ( c.compare(x_dim_stag_name) == 0 )      out << "X (staggered)";
+      else if ( c.compare(y_dim_name) == 0 )           out << "Y";
+      else if ( c.compare(y_dim_stag_name) == 0 )      out << "Y (staggered)";
+      else if ( c.compare(z_dim_p_interp_name) == 0 ||
+                c.compare(z_dim_wrf_interp_name) == 0 ||
+                c.compare(z_dim_wrf_name) == 0)        out << "Z";
+      else if ( c.compare(z_dim_wrf_stag_name) == 0 ||
+                c.compare(z_dim_wrf_pres_name) == 0 ||
+                c.compare(z_dim_wrf_z_name) == 0)      out << "Z (staggered)";
+      else if ( Var[j].Dims[k] == Tdim )                  out << 'T';
+      else                                                out << GET_NC_NAME_P(Var[j].Dims[k]);
 
       if ( k < Var[j].Ndims - 1)  out << ", ";
 
@@ -630,8 +656,6 @@ double value;
 bool found = false;
 NcVarInfo * var = (NcVarInfo *) 0;
 NcVarInfo * P   = (NcVarInfo *) 0;
-const int Nx = grid.nx();
-const int Ny = grid.ny();
 LongArray b = a;
 
 pressure = bad_data_double;
@@ -658,6 +682,12 @@ if ( !found )  {
    return ( false );
 
 }
+
+   //
+   // set nx and ny based on staggering of dimensions of the variable to read
+   //
+   const int Nx = var->x_stag ? grid.nx() + 1 : grid.nx();
+   const int Ny = var->y_stag ? grid.ny() + 1 : grid.ny();
 
    //
    //  check x_slot and y_slot
@@ -770,6 +800,8 @@ if ( P && z_slot > 0 )  {
 
    LongArray c;
 
+   if(TimeInPressure) c.add(a[var->t_slot]);
+   
    c.add(a[z_slot]);
 
    pressure = data(P->var, c) * hPaCF;

@@ -151,6 +151,8 @@ if ( Dims )  { delete [] Dims;  Dims = (NcDim **) 0; }
 
 x_slot = y_slot = z_slot = t_slot = -1;
 
+x_stag = y_stag = z_stag = false;
+
    //
    //  done
    //
@@ -213,9 +215,15 @@ if ( Dims )  {
 
 }
 
-out << prefix << "x_slot = " << x_slot << "\n";
-out << prefix << "y_slot = " << y_slot << "\n";
-out << prefix << "z_slot = " << z_slot << "\n";
+out << prefix << "x_slot = " << x_slot;
+if (x_stag) { out << " (staggered)"; }
+out << "\n";
+out << prefix << "y_slot = " << y_slot;
+if (y_stag) { out << " (staggered)"; }
+out << "\n";
+out << prefix << "z_slot = " << z_slot;
+if (z_stag) { out << " (staggered)"; }
+out << "\n";
 out << prefix << "t_slot = " << t_slot << "\n";
 
    //
@@ -269,6 +277,10 @@ x_slot = i.x_slot;
 y_slot = i.y_slot;
 z_slot = i.z_slot;
 t_slot = i.t_slot;
+
+x_stag = i.x_stag;
+y_stag = i.y_stag;
+z_stag = i.z_stag;
 
 if ( i.Dims )  {
 

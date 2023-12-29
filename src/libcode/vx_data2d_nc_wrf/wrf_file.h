@@ -80,9 +80,6 @@ class WrfFile {
 
       StringArray DimNames;
 
-      netCDF::NcDim * Xdim;   //  not allocated
-      netCDF::NcDim * Ydim;   //  not allocated
-      netCDF::NcDim * Zdim;   //  not allocated
       netCDF::NcDim * Tdim;   //  not allocated
 
          //
@@ -94,6 +91,7 @@ class WrfFile {
       NcVarInfo * Var;     //  allocated
 
       int PressureIndex;   //  index into Var array
+      bool TimeInPressure; // true if the pressure field has a time dimension
 
       double hPaCF;        //  pressure to hPa conversion factor
 
