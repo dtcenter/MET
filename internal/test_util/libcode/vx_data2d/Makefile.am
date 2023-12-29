@@ -11,7 +11,7 @@ include ${top_srcdir}/Make-include
 # Test programs
 
 noinst_PROGRAMS = test_table_read \
-              dump_default_table
+	dump_default_table
 
 test_table_read_SOURCES = test_table_read.cc
 test_table_read_CPPFLAGS = ${MET_CPPFLAGS}

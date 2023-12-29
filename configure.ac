@@ -1403,6 +1403,7 @@ if test -n "$MET_DEVELOPMENT"; then
                     internal/test_util/libcode/vx_ps/Makefile
                     internal/test_util/libcode/vx_tc_util/Makefile
                     internal/test_util/libcode/vx_nc_util/Makefile
+                    internal/test_util/libcode/vx_python3_utils/Makefile
                     internal/test_util/libcode/vx_physics/Makefile
                     internal/test_util/libcode/vx_series_data/Makefile
                     internal/test_util/libcode/vx_solar/Makefile
