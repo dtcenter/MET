@@ -182,13 +182,13 @@ int month, day, year, hour, minute, second, str_len;
 char time_str[max_str_len];
 string c;
 NcVar v;
-const char *method_name = "PinterpFile::open() -> ";
+const char *method_name = "WrfFile::open() -> ";
 
 close();
 
 Nc = open_ncfile(filename);
 mlog << Debug(5) << "\n" << method_name
-     << "opend  \"" << filename << "\".\n\n";
+     << "open \"" << filename << "\".\n\n";
 
 if ( IS_INVALID_NC_P(Nc) )  { close();  return ( false ); }
 
@@ -368,7 +368,7 @@ return ( true );
 ////////////////////////////////////////////////////////////////////////
 
 
-void PinterpFile::dump(ostream & out, int depth) const
+void WrfFile::dump(ostream & out, int depth) const
 
 {
 
@@ -562,9 +562,6 @@ if (dim_count >= max_wrf_args )  {
 }
 
 bool status = false;
-int i;
-short s;
-float f;
 double fill_value;
 double d = bad_data_double;
 double missing_value = get_var_missing_value(var);
@@ -815,7 +812,7 @@ bool WrfFile::data(const char * var_name, const LongArray & a, DataPlane & plane
    plane.set_lead  ( lead_time(time_index) );
 
    //
-   //  since Pinterp files only contain WRF-ARW output, it is always a
+   //  since Pinterp files only contain WRF-ARW output, it is always
    //  a runtime accumulation
    //
 
