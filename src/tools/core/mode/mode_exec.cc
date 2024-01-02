@@ -35,7 +35,6 @@ static const char * cts_str[n_cts] = {"RAW", "OBJECT"};
 static const char program_name [] = "mode";
 
 static const char * default_config_filename = "MET_BASE/config/MODEConfig_default";
-static const char * default_multivar_config_filename = "MET_BASE/config/MODEMultivarConfig_default";
 
 // took this out of the do_conv_thresh() method 
 static int local_r_index = -1;
@@ -151,7 +150,7 @@ void ModeExecutive::init_traditional(int n_files)
 
    R_index = T_index = 0;
 
-   conf_read(default_config_filename);
+   conf_read();
 
    // Get the forecast and observation file types from config, if present
    ftype = parse_conf_file_type(engine.conf_info.conf.lookup_dictionary(conf_key_fcst));
@@ -223,7 +222,7 @@ void ModeExecutive::init_multivar_simple(int j, int n_files, ModeDataType dtype,
 
 ///////////////////////////////////////////////////////////////////////
 
-void ModeExecutive::init_multivar_intensities(GrdFileType ftype, GrdFileType otype, const ModeConfInfo &conf)
+void ModeExecutive::init_multivar_intensities(const ModeConfInfo &conf)
 
 {
 
@@ -430,7 +429,6 @@ void ModeExecutive::setup_multivar_fcst_data(const Grid &verification_grid,
    double fmin, fmax;
 
    Fcst_sd.clear();
-   ftype = input._fileType;
    Fcst_sd.data = input._dataPlane;
 
    grid = verification_grid;
@@ -494,7 +492,6 @@ void ModeExecutive::setup_multivar_obs_data(const Grid &verification_grid,
    double omin, omax;
 
    Obs_sd.clear();
-   otype = input._fileType;
 
    // Read the gridded data from the input observation file
    Obs_sd.data = input._dataPlane;
@@ -973,8 +970,7 @@ void ModeExecutive::do_merging_multivar(const ShapeData &f_merge,
 
    // Do the forecast merging
 
-   engine.do_fcst_merging(default_config_file.c_str(), merge_config_file.c_str(),
-                          f_merge);
+   engine.do_fcst_merging(f_merge);
 
    mlog << Debug(2)
         << "Performing merging ("
@@ -983,8 +979,7 @@ void ModeExecutive::do_merging_multivar(const ShapeData &f_merge,
 
    // Do the observation merging
 
-   engine.do_obs_merging(default_config_file.c_str(), merge_config_file.c_str(),
-                         o_merge);
+   engine.do_obs_merging(o_merge);
 
    mlog << Debug(2)
         << "Remaining: " << engine.n_fcst << " forecast objects "
@@ -1598,7 +1593,8 @@ MultiVarData *ModeExecutive::get_multivar_data(ModeDataType dtype)
       obs_magic_string = engine.conf_info.Obs->var_info->magic_str().c_str();
       // replace forward slashes with underscores to prevent new directories
       replace(obs_magic_string.begin(), obs_magic_string.end(), '/', '_');   
-      mvd->init(dtype, obs_magic_string, grid, otype, ounits, olevel, data_min, data_max);
+      mvd->init(dtype, obs_magic_string, grid, 
+                ounits, olevel, data_min, data_max);
       mvd->set_obj(engine.obs_split, simple);
       mvd->set_raw(engine.obs_raw, simple);
       mvd->set_shapedata(Obs_sd, simple);
@@ -1609,7 +1605,8 @@ MultiVarData *ModeExecutive::get_multivar_data(ModeDataType dtype)
       fcst_magic_string = engine.conf_info.Fcst->var_info->magic_str().c_str();
       // replace forward slashes with underscores to prevent new directories
       replace(fcst_magic_string.begin(), fcst_magic_string.end(), '/', '_');   
-      mvd->init(dtype, fcst_magic_string, grid, ftype, funits, flevel, data_min, data_max);
+      mvd->init(dtype, fcst_magic_string, grid, 
+                funits, flevel, data_min, data_max);
       mvd->set_obj(engine.fcst_split, simple);
       mvd->set_raw(engine.fcst_raw, simple);
       mvd->set_shapedata(Fcst_sd, simple);
@@ -2599,7 +2596,7 @@ void ModeExecutive::write_ct_stats()
 
 ///////////////////////////////////////////////////////////////////////
 
-void ModeExecutive::conf_read(const string &default_config_filename)
+void ModeExecutive::conf_read()
 {
    
    // Create the default config file name

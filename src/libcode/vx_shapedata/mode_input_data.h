@@ -15,7 +15,6 @@
 #include <string>
 #include "data_plane.h"
 #include "grid_base.h"
-#include "data_file_type.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -26,16 +25,14 @@ class ModeInputData {
 
  public:
 
-   ModeInputData(const std::string &name, const DataPlane &dp,
-                 const Grid &g, const GrdFileType t) :
-      _name(name), _dataPlane(dp), _grid(g), _fileType(t)  {  }
+   ModeInputData(const std::string &name, const DataPlane &dp, const Grid &g) :
+      _name(name), _dataPlane(dp), _grid(g) {}
       
    ~ModeInputData() {}
 
    std::string _name;
    DataPlane _dataPlane;
    Grid _grid;
-   GrdFileType _fileType;
 };
 
 

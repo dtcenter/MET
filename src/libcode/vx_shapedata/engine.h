@@ -215,16 +215,18 @@ class ModeFuzzyEngine {
       void do_fcst_merging();
       void do_obs_merging();
 
+      // traditional version
       void do_fcst_merging(const char *default_config,
                            const char *merge_config);
-      void do_fcst_merging(const char *default_config,
-                           const char *merge_config,
-                           const ShapeData &merge_data);
+
+      // multivar version
+      void do_fcst_merging(const ShapeData &merge_data);
+
+      // traditional version
       void do_obs_merging(const char *default_config,
                           const char *merge_config);
-      void do_obs_merging(const char *default_config,
-                          const char *merge_config,
-                          const ShapeData &merge_data);
+      // multivar version
+      void do_obs_merging(const ShapeData &merge_data);
 
       void do_matching();
 

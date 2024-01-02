@@ -680,105 +680,112 @@ void ModeConfInfo::config_set_all_percentile_thresholds(const std::vector<ModeIn
                                                         const std::vector<ModeInputData> &odata)
 {
 
-   // for each forecast input, it's either not a percentile threshold, is a simple (single input) percentile,
-   // a frequency bias percentile threshold, or a climatology percentile (we don't have climatology).
-   // as a complication we have both conv_thresh and merge_thresh, so what if they are different?
-   // right now I simply go with freaquency bias as highest priority
+   // for each forecast input, it's either not a percentile threshold,
+   // is a simple (single input) percentile, is a frequency bias percentile threshold, or is a
+   // climatology percentile (we don't have climatology).
+   //
+   // As a complication we have both conv_thresh and merge_thresh, so what if they are different?
+   // right now I simply go with frequency bias as highest priority
+
+   // indices of forecast and obs inputs that have frequency bias percentile thresholding
    vector<int> fcst_freq, obs_freq;
+
+   // indices (common to forecast and obs) that require both inputs (fcst and obs)
+   // which is either frequency bias, or sample obs with a forecast input, or sample fcst
+   // with an obs input
+   vector<int> indices_with_both;
+
    for (int j=0; j<N_fields_f; ++j)
    {
-      bool need_perc=false;
-      bool need_freq=false;
       PercThreshType ptype = perctype(fcst_array[j]);
       switch (ptype)
       {
       case perc_thresh_sample_fcst:
-         need_perc = true;
+         // do this now... this might be done twice depending on obs settings that need both?
+         data_type = ModeDataType_MvMode_Fcst;
+         set_field_index(j);
+         set_perc_thresh(fdata[j]._dataPlane);
          break;
       case perc_thresh_sample_obs:
-         mlog << Warning << "\nModeConfInfo::config_set_all_percentile_thresholds\n"
-              << "  Thresholding with 'SOP' in a fcst input, 'SFP' will be used as a replacement\n\n";
-         need_perc = true;
-         ptype = perc_thresh_sample_fcst;
+         // currently expect matching index in obs and fcst, so check to make sure not both
+         if (j >= N_fields_o) {
+            mlog << Error << "\nModeConfInfo::config_set_all_percentile_thresholds\n"
+                 << " SOP Thresholding on fcst index " << j+1
+                 << " out of range of obs " << N_fields_o + 1 << "\n\n";
+            exit ( 1 );
+         }
+         // deal with this later
+         indices_with_both.push_back(j);
          break;
       case perc_thresh_freq_bias:
          // currently expect matching index in obs and fcst, so check to make sure not both
          if (j >= N_fields_o) {
             mlog << Error << "\nModeConfInfo::config_set_all_percentile_thresholds\n"
-                 << " Frequency bias Thresholding on fcst index " << j+1
+                 << " FBIAS Thresholding on fcst index " << j+1
                  << " out of range of obs " << N_fields_o + 1 << "\n\n";
             exit ( 1 );
          }
-         // save for later
+         fcst_freq.push_back(j);
+         indices_with_both.push_back(j);
          break;
       default:
          break;
       }
-
-      if (need_perc) {
-         data_type = ModeDataType_MvMode_Fcst;
-         set_field_index(j);
-         set_perc_thresh(fdata[j]._dataPlane);
-      }
-      if (need_freq) {
-         fcst_freq.push_back(j);
-      }
    }
-   
    for (int j=0; j<N_fields_o; ++j)
    {
-      bool need_perc=false;
-      bool need_freq=false;
       PercThreshType ptype = perctype(obs_array[j]);
       switch (ptype)
       {
-      case perc_thresh_sample_fcst:
-         mlog << Warning << "\nModeConfInfo::config_set_all_percentile_thresholds\n"
-              << "  Thresholding with 'SFP' in a fcst input, 'SOP' will be used as a replacement\n\n";
-         need_perc = true;
-         ptype = perc_thresh_sample_obs;
-         break;
       case perc_thresh_sample_obs:
-         need_perc = true;
+         // do this now... this might be done twice depending on obs settings that need both?
+         data_type = ModeDataType_MvMode_Obs;
+         set_field_index(j);
+         set_perc_thresh(odata[j]._dataPlane);
+         break;
+      case perc_thresh_sample_fcst:
+         // currently expect matching index in obs and fcst, so check to make sure not both
+         if (j >= N_fields_f) {
+            mlog << Error << "\nModeConfInfo::config_set_all_percentile_thresholds\n"
+                 << " SFP Thresholding on obs index " << j+1
+                 << " out of range of fcst " << N_fields_f + 1 << "\n\n";
+            exit ( 1 );
+         }
+         // deal with this later
+         if (find(indices_with_both.begin(), indices_with_both.end(), j) == indices_with_both.end()) {
+            indices_with_both.push_back(j);
+         }
          break;
       case perc_thresh_freq_bias:
          // currently expect matching index in obs and fcst, so check to make sure not both
          if (j >= N_fields_f) {
             mlog << Error << "\nModeConfInfo::config_set_all_percentile_thresholds\n"
-                 << " Frequency bias Thresholding on obs index " << j+1
+                 << " FBIAS Thresholding on obs index " << j+1
                  << " out of range of fcst " << N_fields_f + 1 << "\n\n";
             exit ( 1 );
          }
-         // save for later
+         // deal with this later
+         obs_freq.push_back(j);
+         if (find(indices_with_both.begin(), indices_with_both.end(), j) == indices_with_both.end()) {
+            indices_with_both.push_back(j);
+         }
          break;
       default:
          break;
       }
-
-      if (need_perc) {
-         data_type = ModeDataType_MvMode_Obs;
-         set_field_index(j);
-         set_perc_thresh(odata[j]._dataPlane);
-      }
-      if (need_freq) {
-         obs_freq.push_back(j);
-      }
    }
 
-   // make sure no overlap in fcst/obs frequencies
+   // make sure no overlap in fcst/obs frequencies, as that's a no no
    for (size_t i=0; i<fcst_freq.size(); ++i)
    {
       int findex = fcst_freq[i];
       if (find(obs_freq.begin(), obs_freq.end(), findex) != obs_freq.end())
       {
          mlog << Error << "\nModeConfInfo::config_set_all_percentile_thresholds\n"
-              << " Frequency bias Thresholding in fcst and obs at index " << findex+1
-              << "\n\n";
+              << " FBIAS Thresholding in both fcst and obs at index " << findex+1
+              << " not allowed\n\n";
          exit(1);
       }
-      data_type = ModeDataType_MvMode_Both;
-      set_field_index(findex, findex);
-      set_perc_thresh(fdata[findex]._dataPlane, odata[findex]._dataPlane);
    }
    for (size_t i=0; i<obs_freq.size(); ++i)
    {
@@ -786,13 +793,19 @@ void ModeConfInfo::config_set_all_percentile_thresholds(const std::vector<ModeIn
       if (find(fcst_freq.begin(), fcst_freq.end(), findex) != fcst_freq.end())
       {
          mlog << Error << "\nModeConfInfo::config_set_all_percentile_thresholds\n"
-              << " Frequency bias Thresholding in fcst and obs at index " << findex+1
-              << "\n\n";
+              << " FBIAS Thresholding in both fcst and obs at index " << findex+1
+              << " not allowed\n\n";
          exit(1);
       }
+   }
+
+   // now do all the indices with both, which come from FBIAS and SOP on forecasts
+   // and SFP on obs  
+   for (size_t i=0; i<indices_with_both.size(); ++i) {
+      int index = indices_with_both[i];
       data_type = ModeDataType_MvMode_Both;
-      set_field_index(findex, findex);
-      set_perc_thresh(fdata[findex]._dataPlane, odata[findex]._dataPlane);
+      set_field_index(index, index);
+      set_perc_thresh(fdata[index]._dataPlane, odata[index]._dataPlane);
    }
 }
 

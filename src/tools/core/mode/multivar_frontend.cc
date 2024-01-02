@@ -103,9 +103,6 @@ int MultivarFrontEnd::run(const StringArray & Argv)
       MultiVarData *mvdi = create_simple_objects(ModeDataType_MvMode_Fcst, j,
                                                  n_fcst_files, fcst_filenames[j],
                                                  fcstInput[j]);
-      if (j > 0) {
-         mvdFcst[0]->checkFileTypeConsistency(*mvdi, j);
-      }
       mvdFcst.push_back(mvdi);
       mvdi->print();
    }   //  for j
@@ -118,9 +115,6 @@ int MultivarFrontEnd::run(const StringArray & Argv)
       MultiVarData *mvdi = create_simple_objects(ModeDataType_MvMode_Obs, j,
                                                  n_obs_files, obs_filenames[j],
                                                  obsInput[j]);
-      if (j > 0) {
-         mvdObs[0]->checkFileTypeConsistency(*mvdi, j);
-      }
       mvdObs.push_back(mvdi);
       mvdi->print();
    }   //  for j
@@ -281,11 +275,11 @@ void MultivarFrontEnd::read_input(const string &name, int index, ModeDataType ty
    if (type == ModeDataType_MvMode_Fcst) {
       config.process_config_field(ft, other_t, type, index);
       f->data_plane(*(config.Fcst->var_info), dp);
-      fcstInput.push_back(ModeInputData(name, dp, g, ft));
+      fcstInput.push_back(ModeInputData(name, dp, g));
    } else {
       config.process_config_field(other_t, ft, type, index);
       f->data_plane(*(config.Obs->var_info), dp);
-      obsInput.push_back(ModeInputData(name, dp, g, ft));
+      obsInput.push_back(ModeInputData(name, dp, g));
    }         
       
    delete f;
@@ -298,10 +292,6 @@ void MultivarFrontEnd::create_verif_grid()
    mlog << Debug(2) << "\n creating the verification grid \n" << sep << "\n";
 
    _init_exec(ModeExecutive::TRADITIONAL, "None", "None");
-   // mode_exec->init_multivar_verif_grid(fcstInput[0]._dataPlane,
-   //                                     obsInput[0]._dataPlane, config);
-   // ModeConfInfo & conf = mode_exec->engine.conf_info;
-   // conf.set_field_index(0);
    mode_exec->setup_verification_grid(fcstInput[0], obsInput[0], config);
    verification_grid = mode_exec->grid;
    delete mode_exec;  mode_exec = 0;
@@ -350,7 +340,7 @@ MultivarFrontEnd::create_intensity_comparisons(int findex, int oindex,
    mlog << Debug(1) << "Running mvmode intensity comparisions \n\n";
 
    _init_exec(ModeExecutive::MULTIVAR_INTENSITY, fcst_filename, obs_filename);
-   mode_exec->init_multivar_intensities(mvdf._type, mvdo._type, config);
+   mode_exec->init_multivar_intensities(config);
 
    ModeConfInfo & conf = mode_exec->engine.conf_info;
    conf.set_field_index(findex, oindex);
@@ -400,7 +390,7 @@ void MultivarFrontEnd::process_superobjects(ModeSuperObject &fsuper,
    osuper.mask_data_super("ObsSimple", mvdo);
 
    _init_exec(ModeExecutive::MULTIVAR_SUPER, "None", "None");
-   mode_exec->init_multivar_intensities(mvdf._type, mvdo._type, config);
+   mode_exec->init_multivar_intensities(config);
 
    ModeConfInfo & conf = mode_exec->engine.conf_info;
    if ((fsuper._hasUnion || osuper._hasUnion) &&
@@ -673,7 +663,8 @@ void MultivarFrontEnd::_init_exec(ModeExecutive::Processing_t p,
    // compress_level = -1;
    mode_exec->fcst_file = ffile;
    mode_exec->obs_file = ofile;
-   mode_exec->match_config_file = config_file;
+
+   mode_exec->match_config_file = config_file; // this is never used
    mode_exec->out_dir = output_path;
 }
 

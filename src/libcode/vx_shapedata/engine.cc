@@ -965,9 +965,7 @@ void ModeFuzzyEngine::do_obs_merging(const char *default_config,
 
 ///////////////////////////////////////////////////////////////////////
 
-void ModeFuzzyEngine::do_fcst_merging(const char *default_config,
-                                      const char *merge_config,
-                                      const ShapeData &merge_data)
+void ModeFuzzyEngine::do_fcst_merging(const ShapeData &merge_data)
 {
    
    if(need_fcst_thresh) do_fcst_thresholding();
@@ -986,7 +984,7 @@ void ModeFuzzyEngine::do_fcst_merging(const char *default_config,
 
    if(conf_info.Fcst->merge_flag == MergeType_Both ||
       conf_info.Fcst->merge_flag == MergeType_Engine)
-      do_fcst_merge_engine(default_config, merge_config);
+      do_fcst_merge_engine("", "");
 
    //
    // Done
@@ -1001,14 +999,12 @@ void ModeFuzzyEngine::do_fcst_merging(const char *default_config,
 
 ///////////////////////////////////////////////////////////////////////
 
-void ModeFuzzyEngine::do_obs_merging(const char *default_config,
-                                     const char *merge_config,
-                                     const ShapeData &merge_data)
+void ModeFuzzyEngine::do_obs_merging(const ShapeData &merge_data)
 {
    if(need_obs_thresh) do_obs_thresholding();
 
    if(!need_obs_merge) return;
-
+   
    if (obs_thresh->data.nx() != merge_data.data.nx() ||
        obs_thresh->data.ny() != merge_data.data.ny()) {
       mlog << Error << "\nModeFuzzyEngine::do_obs_merging() -> "
@@ -1023,8 +1019,8 @@ void ModeFuzzyEngine::do_obs_merging(const char *default_config,
 
    if(conf_info.Obs->merge_flag == MergeType_Both ||
       conf_info.Obs->merge_flag == MergeType_Engine)
-      do_obs_merge_engine(default_config, merge_config);
-
+      do_obs_merge_engine("", "");
+   
    //
    // Done
    //

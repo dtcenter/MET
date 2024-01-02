@@ -82,55 +82,74 @@ class ModeExecutive {
 
    void init_traditional(int n_files);
    void init_multivar_simple(int j, int n_files, ModeDataType dtype, const ModeConfInfo &conf);
-   void init_multivar_intensities(GrdFileType ftype, GrdFileType otype, const ModeConfInfo &conf);
-
+   void init_multivar_intensities(const ModeConfInfo &conf);
 
    int n_conv_radii   () const;
    int n_conv_threshs () const;
-
    int n_runs() const;
 
+   // these are used only for traditional mode
    int R_index;   //  indices into the convolution radius and threshold arrays
    int T_index;   //  for the current run
 
    //
-   // Input configuration files
+   // Input configuration files, all 3 used only for traditional mode
+   // Multivar mode handles the configs outside of the exec
    //
-
+   // the hardwired default traditional mode config
    ConcatString default_config_file;
-   ConcatString match_config_file;
+
+   // set for both trad and multivar, this is the default file on the command line
+   // used only for traditional
+   ConcatString match_config_file;    
+
+   // the extra one that can be set only for traditional mode
    ConcatString merge_config_file;
 
    //
-   // Input files
+   // Input filenames, set for both multivar and trad mode
+   // but used only for trad mode
    //
-
    ConcatString fcst_file;
    ConcatString obs_file;
+
+   // set and used only for trad mode
    Met2dDataFile * fcst_mtddf;
    Met2dDataFile * obs_mtddf;
 
+   // used for both trad and multivar mode
    TTContingencyTable cts[n_cts];
 
+   // used for both trad and multivar mode
    ModeFuzzyEngine engine;
 
    // verification grid
+   // used for both trad and multivar mode, set by both
    Grid grid;
 
    Box xy_bb;
    ConcatString out_dir;
+
+   // set for both trad and multivar mode, used for plotting limits
    double data_min, data_max;
 
+   // set for trad and multivar, used in the engine mode algorithm
    ShapeData Fcst_sd, Obs_sd;
 
+   // not used by multivar
    GrdFileType ftype, otype;
+
+   // set into execs's conf varInfo object, only for multivar intensity comparisons
+   // for trad it's read in from the config
    string funits, ounits;
+
+   // set into execs's conf varInfo object, only for multivar intensity comparisons
+   // for trad it's read in from the config
    string flevel, olevel;
 
+   // used in multivar only to customize outputs correctly
    bool isMultivarOutput;
    bool isMultivarSuperOutput;
-   
-   //Processing_t ptype;
    
    void setup_verification_grid(const ModeInputData &fcst,
                                 const ModeInputData &obs,
@@ -194,7 +213,9 @@ class ModeExecutive {
    void write_poly_netcdf(netCDF::NcFile *, const ObjPolyType);
    void write_ct_stats();
 
-   void conf_read(const string &default_config_filename);
+   // traditional only, multivar reads outside of the exec
+   void conf_read();
+
    static string stype(Processing_t t);
 
 };
