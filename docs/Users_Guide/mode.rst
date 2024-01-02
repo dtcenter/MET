@@ -131,13 +131,13 @@ When setting a threshold to a percentile, some choices require both an observati
 
 * "==FBIAS" in an observation input.
   * e.g. "==FBIAS1" in an observation input to automatically de-bias the data, using a simple threshold in the matching forecast input. For example,
-      when observation input 3 has "==FBIAS1", and forecast input 3 has ">5.0", MET applies the >5.0 threshold to the forecast and then chooses an
-      observation threshold which results in a frequency bias of 1. The frequency bias can be any float value > 0.0.
+    when observation input 3 has "==FBIAS1", and forecast input 3 has ">5.0", MET applies the >5.0 threshold to the forecast and then chooses an
+    observation threshold which results in a frequency bias of 1. The frequency bias can be any float value > 0.0.
 
 * "==FBIAS" in a forecast input.
   * e.g. "==FBIAS1" in a forecast input to automatically de-bias the data, using a simple threshold in the matching observation input. For example,
-      when forecast input 2 has "==FBIAS1", and observation input 2 has ">5.0", MET applies the >5.0 threshold to the observation and then chooses a
-      forecast threshold which results in a frequency bias of 1.  The frequency bias can be any float value > 0.0.
+    when forecast input 2 has "==FBIAS1", and observation input 2 has ">5.0", MET applies the >5.0 threshold to the observation and then chooses a
+    forecast threshold which results in a frequency bias of 1.  The frequency bias can be any float value > 0.0.
 
   
 Practical Information
