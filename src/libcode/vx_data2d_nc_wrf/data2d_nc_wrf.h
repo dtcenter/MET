@@ -87,7 +87,7 @@ class MetNcWrfDataFile : public Met2dDataFile {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline GrdFileType MetNcWrfDataFile::file_type () const { return ( FileType_NcPinterp ); }
+inline GrdFileType MetNcWrfDataFile::file_type () const { return ( FileType_NcWrf ); }
 
 
 ////////////////////////////////////////////////////////////////////////
