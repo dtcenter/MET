@@ -2,7 +2,8 @@
 #!/usr/bin/python
 
 #add imports...
-import lxml     #note: developing with v 4.9.3
+#import lxml     #note: developing with v 4.9.3
+import xml.etree.ElementTree as ET
 
 # use lib "$ENV{'MET_TEST_BASE'}/lib";
 
@@ -32,7 +33,7 @@ import lxml     #note: developing with v 4.9.3
 #   or die "ERROR: parsing input options";
 
 
-def unit(mgnc, mpnc, test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, callchk=False):
+def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, callchk=False):
     """
     unit testing script
 
@@ -55,30 +56,33 @@ def unit(mgnc, mpnc, test_xml, file_log=None, cmd_only=False, noexit=False, memc
         if true, activate valgrind with callcheck
     """
 
+    # read command arguments
 
-# # parse the input test xml file parameter
-# my $test_xml = shift or usage() and exit;
+    # parse the test xml file parameter
 
-# # if command  only mode is enabled, disable logging
-# $cmd_only and $file_log = 0;
+    # # if command  only mode is enabled, disable logging
+    # $cmd_only and $file_log = 0;
 
-# # open the log file, if requested
-# open(my $fh_log, ">", $file_log) or die "ERROR: unable to open log file $file_log\n"
-#   if $file_log;
+    # # open the log file, if requested
+    # open(my $fh_log, ">", $file_log) or die "ERROR: unable to open log file $file_log\n"
+    #   if $file_log;
 
-# # initialize parser object and parse the string
-# my $parser = XML::Parser->new( Style => "Tree" );
-# my $tree = eval { $parser->parsefile( $test_xml ); };
+    
+    # parse xml file
+    test_root = ET.parse(test_xml)
 
-# # report any error that stopped parsing
-# if( $@ ){
-#   $@ =~ s/at \/.*?$//s;
-#   die "ERROR: parsing error $@\n";
-# }
+    # # report any error that stopped parsing
+    # if( $@ ){
+    #   $@ =~ s/at \/.*?$//s;
+    #   die "ERROR: parsing error $@\n";
+    # }
 
-# # parse the children of the met_test element
-# $tree->[0] eq "met_test" or die "ERROR: unexpected top-level element " . $tree->[0] . "\n";
-# my @tests = build_tests( @{ $tree->[1] } );
+    # # parse the children of the met_test element
+    # $tree->[0] eq "met_test" or die "ERROR: unexpected top-level element " . $tree->[0] . "\n";
+    # my @tests = build_tests( @{ $tree->[1] } );
+    tests = build_tests(test_root)
+
+    return tests
 
 # # determine the max length of the test names
 # my $name_wid = 12;
@@ -189,55 +193,48 @@ def unit(mgnc, mpnc, test_xml, file_log=None, cmd_only=False, noexit=False, memc
 # }
 
 
+def build_tests(test_root):
+    """
+    # #   This function assumes that the inputs are the body elements of
+    # #   a parsed XML file using XML::Parser.  The components of each test
+    # #   element are parsed and the test elements are returned as an array
+    # #   of hashes.
+    # #
+    Parameters
+    ----------
+    test_root : ElementTree element
+        parsed from XML file containing the unit test(s) to perform
 
-# #######################################################################
-# # build_tests()
-# #
-# #   This function assumes that the inputs are the body elements of
-# #   a parsed XML file using XML::Parser.  The components of each test
-# #   element are parsed and the test elements are returned as an array
-# #   of hashes.
-# #
-# #   Arguments:
-# #      xml_test = array of body elements containing test structures
-# #
-# #######################################################################
+    """
 
-# sub build_tests {
+    # read test_dir
+    test_dir = test_root.find('test_dir').text
+    #mgnc = ?
+    #mpnc = ?
 
-#   # ignore the attributes of the top-level element
-#   shift;
+    test_list = []
+    # read list of tests from test_xml
+    # for each test
+    for test_el in test_root.iter('test'):
+        test = {}
+        test['name'] = test_el.attrib['name']
+        # check that name exists or "ERROR: name attribute not found for test ", $test_idx++ . "\n";
 
-#   # parse each test
-#   my ($test_idx, @tests) = (1);
-#   while( @_ ){
+        for el in test_el:
+            if (el.tag=='exec' or el.tag=='param'):
+                test[el.tag] = el.text
+                # handle env variable in el.text
+            elif el.tag=='output':
+                # build output file array (filename by output type)
+                pass
+            elif el.tag=='env':
+                # set env variables from name/value pairs
+                pass
 
-#     # examine the next element
-#     my $elm_test = shift;
-#     $elm_test eq 'test_dir'
-#       and $mgnc = ${$_[0]}[2] . "/bin/mgnc.sh"
-#       and $mpnc = ${$_[0]}[2] . "/bin/mpnc.sh"; 
-#     $elm_test ne 'test' and shift and next;
+        #   validate test format/details
+        test_list.append(test)
 
-#     # parse the test child components
-#     my @childs = @{ shift @_ };
-
-#     # extract the test name from the attributes
-#     my %test;
-#     $test{"name"} = $childs[0]->{'name'}
-#       or die "ERROR: name attribute not found for test ", $test_idx++ . "\n";
-#     shift @childs;
-
-#     # extract the test details from the test child elements
-#     while( @childs ){
-
-#       my $test_child = shift @childs;
-#       $test_child or shift @childs and next;
-
-#       # set the exec or parm string
-#       $test_child eq "exec" || $test_child eq "param"
-#         and $test{$test_child} = repl_env($childs[0][2]) 
-#         and shift @childs and next;
+    return test_list
 
 #       # build the output file arrays
 #       if( $test_child eq "output" ){
