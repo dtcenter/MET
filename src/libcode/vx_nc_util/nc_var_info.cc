@@ -153,6 +153,8 @@ x_slot = y_slot = z_slot = t_slot = -1;
 
 x_stag = y_stag = z_stag = false;
 
+is_pressure = false;
+
    //
    //  done
    //
@@ -216,15 +218,16 @@ if ( Dims )  {
 }
 
 out << prefix << "x_slot = " << x_slot;
-if (x_stag) { out << " (staggered)"; }
+if (x_stag) out << " (staggered)";
 out << "\n";
 out << prefix << "y_slot = " << y_slot;
-if (y_stag) { out << " (staggered)"; }
+if (y_stag) out << " (staggered)";
 out << "\n";
 out << prefix << "z_slot = " << z_slot;
-if (z_stag) { out << " (staggered)"; }
+if (z_stag) out << " (staggered)";
 out << "\n";
 out << prefix << "t_slot = " << t_slot << "\n";
+out << prefix << "is_pressure = " << (is_pressure ? "true" : "false") << "\n";
 
    //
    //  done
@@ -281,6 +284,8 @@ t_slot = i.t_slot;
 x_stag = i.x_stag;
 y_stag = i.y_stag;
 z_stag = i.z_stag;
+
+is_pressure = i.is_pressure;
 
 if ( i.Dims )  {
 

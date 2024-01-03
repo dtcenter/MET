@@ -363,12 +363,18 @@ InitTime = parse_init_time(att_value.c_str());
                   c.compare(z_dim_wrf_interp_name) == 0 ||
                   c.compare(z_dim_wrf_name  ) == 0) {
            Var[j].z_slot = k;
+           if ( c.compare(z_dim_wrf_name) != 0 ) {
+              Var[j].is_pressure = true;
+           }
         }
         else if ( c.compare(z_dim_wrf_stag_name) == 0 ||
                   c.compare(z_dim_wrf_pres_name) == 0 ||
                   c.compare(z_dim_wrf_z_name ) == 0) {
            Var[j].z_slot = k;
-           Var[k].z_stag = true;
+           Var[j].z_stag = true;
+           if ( c.compare(z_dim_wrf_pres_name) == 0 ) {
+              Var[j].is_pressure = true;
+           }
         }
         else if ( c.compare(t_dim_name) == 0 ) {
            Var[j].t_slot = k;
@@ -664,8 +670,6 @@ pressure = bad_data_double;
    //  find varinfo's
    //
 
-if ( PressureIndex >= 0 )  P = Var + PressureIndex;
-
 found = false;
 
 for (j=0; j<Nvars; ++j)  {
@@ -682,6 +686,11 @@ if ( !found )  {
    return ( false );
 
 }
+
+   //
+   // get pressure only if var is on pressure levels and pressure is in file
+   //
+   if ( var->is_pressure && PressureIndex >= 0 )  P = Var + PressureIndex;
 
    //
    // set nx and ny based on staggering of dimensions of the variable to read
