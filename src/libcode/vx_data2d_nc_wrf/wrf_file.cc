@@ -792,6 +792,9 @@ for (x=0; x<Nx; ++x)  {
 
 }   //  for x
 
+// de-stagger the DataPlane if necessary
+plane.destagger(var->x_stag, var->y_stag);
+
    //
    //  get the pressure
    //
