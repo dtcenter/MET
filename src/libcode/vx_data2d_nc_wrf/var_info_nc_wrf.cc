@@ -20,6 +20,7 @@
 using namespace std;
 
 #include <map>
+#include <regex>
 #include <stdlib.h>
 #include <string.h>
 #include <strings.h>
@@ -334,6 +335,11 @@ bool VarInfoNcWrf::is_u_wind() const {
       return(SetAttrIsUWind != 0);
    }
 
+   // Check if the VarInfo name is U or U<n> where <n> is an integer
+   if( regex_match (Name.c_str(), regex("^U[0-9]+$") )) {
+      return true;
+   }
+
    //
    // Check to see if the VarInfo name matches any of expected Pinterp
    // U-component of wind variables.
@@ -352,6 +358,11 @@ bool VarInfoNcWrf::is_v_wind() const {
    //
    if(!is_bad_data(SetAttrIsVWind)) {
       return(SetAttrIsVWind != 0);
+   }
+
+   // Check if the VarInfo name is V or V<n> where <n> is an integer
+   if( regex_match (Name.c_str(), regex("^V[0-9]+$") )) {
+      return true;
    }
 
    //

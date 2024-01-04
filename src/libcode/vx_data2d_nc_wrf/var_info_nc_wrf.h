@@ -100,7 +100,9 @@ static const int n_pinterp_specific_humidity_names =
 static const char *pinterp_u_wind_names[] = {
    "UU",         // x-wind component, m s-1
    "TS_U",       // Surface wind U-component, earth-relative
-   "UZ0"         // U WIND COMPONENT AT ZNT, m s-1
+   "UZ0",        // U WIND COMPONENT AT ZNT, m s-1
+   "U_PL",      // x-wind on pressure levels from native WRF out
+   "U_ZL"      // x-wind on z levels from native WRF out
 };
 
 //
@@ -121,7 +123,9 @@ static const int n_pinterp_u_wind_names =
 static const char *pinterp_v_wind_names[] = {
    "VV",         // y-wind component, m s-1
    "TS_V",       // Surface wind V-component, earth-relative
-   "VZ0"         // V WIND COMPONENT AT ZNT, m s-1
+   "VZ0",        // V WIND COMPONENT AT ZNT, m s-1
+   "V_PL",      // y-wind on pressure levels from native WRF out
+   "V_ZL"       // y-wind on z levels from native WRF out
 };
 
 //
