@@ -77,6 +77,14 @@ VarInfoUGrid & VarInfoUGrid::operator=(const VarInfoUGrid &f) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+VarInfo *VarInfoUGrid::clone() const
+{
+   VarInfoUGrid *ret = new VarInfoUGrid(*this);
+   return (VarInfo *)ret;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 void VarInfoUGrid::init_from_scratch() {
 
    // First call the parent's initialization

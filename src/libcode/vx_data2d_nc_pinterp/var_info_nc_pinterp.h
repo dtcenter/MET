@@ -200,6 +200,8 @@ class VarInfoNcPinterp : public VarInfo
       ~VarInfoNcPinterp();
       VarInfoNcPinterp(const VarInfoNcPinterp &);
       VarInfoNcPinterp & operator=(const VarInfoNcPinterp &);
+      VarInfo *clone() const;
+
 
       void dump(std::ostream &) const;
       void clear();

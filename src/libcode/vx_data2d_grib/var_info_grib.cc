@@ -74,6 +74,14 @@ VarInfoGrib & VarInfoGrib::operator=(const VarInfoGrib &f) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+VarInfo *VarInfoGrib::clone() const
+{
+   VarInfoGrib *ret = new VarInfoGrib(*this);
+   return (VarInfo *)ret;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 
 void VarInfoGrib::init_from_scratch() {
 

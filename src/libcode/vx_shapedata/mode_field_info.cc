@@ -97,13 +97,9 @@ void Mode_Field_Info::clone(const Mode_Field_Info & i)
    index = i.index;
    conv_radius = i.conv_radius;
    vld_thresh = i.vld_thresh;
-   VarInfoFactory info_factory;
-   var_info = info_factory.new_var_info(gft);
-   if ( Multivar )  {
-      var_info->set_dict(*dict);
-   } else {
-      var_info->set_dict(*(dict->lookup_dictionary(conf_key_field)));
-   }
+
+   var_info = i.var_info->clone();
+
    conv_radius_array = i.conv_radius_array; 
    conv_thresh_array = i.conv_thresh_array;
    merge_thresh_array = i.merge_thresh_array;
@@ -113,8 +109,6 @@ void Mode_Field_Info::clone(const Mode_Field_Info & i)
    raw_pi = i.raw_pi;
    filter_attr_map = i.filter_attr_map;
    file_type = i.file_type;
-   
-
 }
 
 ////////////////////////////////////////////////////////////////////////

@@ -91,11 +91,14 @@ class VarInfo
       VarInfo(const VarInfo &);
       VarInfo & operator=(const VarInfo &);
 
+      virtual VarInfo *clone() const = 0;
+
       // Conversion function
       UserFunc_1Arg ConvertFx;
 
       void clear();
-
+      void clone_base() const;
+     
       virtual void dump(std::ostream &) const;
 
          //

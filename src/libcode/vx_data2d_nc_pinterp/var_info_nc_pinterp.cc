@@ -71,6 +71,14 @@ VarInfoNcPinterp & VarInfoNcPinterp::operator=(const VarInfoNcPinterp &f) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+VarInfo *VarInfoNcPinterp::clone() const
+{
+   VarInfoNcPinterp *ret = new VarInfoNcPinterp(*this);
+   return (VarInfo *)ret;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 void VarInfoNcPinterp::init_from_scratch() {
 
    // First call the parent's initialization
