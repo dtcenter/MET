@@ -352,12 +352,22 @@ InitTime = parse_init_time(att_value.c_str());
            Var[j].x_slot = k;
            Var[j].x_stag = true;
         }
+        else if ( c.compare(x_dim_subgrid_name) == 0 ) {
+            mlog << Error << "\n" << method_name
+                 << "X Dimension \"" << x_dim_subgrid_name << "\" is not supported.\n\n";
+            return ( false );
+        }
         else if ( c.compare(y_dim_name) == 0 ) {
            Var[j].y_slot = k;
         }
         else if ( c.compare(y_dim_stag_name) == 0 ) {
            Var[j].y_slot = k;
            Var[j].y_stag = true;
+        }
+        else if ( c.compare(y_dim_subgrid_name) == 0 ) {
+            mlog << Error << "\n" << method_name
+                 << "Y Dimension \"" << y_dim_subgrid_name << "\" is not supported.\n\n";
+            return ( false );
         }
         else if ( c.compare(z_dim_p_interp_name  ) == 0 ||
                   c.compare(z_dim_wrf_interp_name) == 0 ||
