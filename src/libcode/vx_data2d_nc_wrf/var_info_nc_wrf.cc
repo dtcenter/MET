@@ -336,7 +336,7 @@ bool VarInfoNcWrf::is_u_wind() const {
    }
 
    // Check if the VarInfo name is U or U<n> where <n> is an integer
-   if( regex_match (Name.c_str(), regex("^U[0-9]+$") )) {
+   if( regex_match (Name.c_str(), regex("^U[0-9]*$") )) {
       return true;
    }
 
@@ -361,7 +361,7 @@ bool VarInfoNcWrf::is_v_wind() const {
    }
 
    // Check if the VarInfo name is V or V<n> where <n> is an integer
-   if( regex_match (Name.c_str(), regex("^V[0-9]+$") )) {
+   if( regex_match (Name.c_str(), regex("^V[0-9]*$") )) {
       return true;
    }
 
