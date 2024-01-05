@@ -825,13 +825,11 @@ void DataPlane::destagger(bool x_stag, bool y_stag)
     double total;
     vector<double> new_data;
 
-    mlog << Debug(3) << "De-staggering dataplane\n";
-
     // set nx and weight based on which dimensions are staggered
 
     if (x_stag) {
 
-        mlog << Debug(4) << "Data is staggered in X dimension\n";
+        mlog << Debug(3) << "De-staggering dataplane in X dimension\n";
         nx_new = Nx - 1;
         weight += 2;
 
@@ -839,7 +837,7 @@ void DataPlane::destagger(bool x_stag, bool y_stag)
 
     if (y_stag) {
 
-        mlog << Debug(4) << "Data is staggered in Y dimension\n";
+        mlog << Debug(3) << "De-staggering dataplane in Y dimension\n";
         ny_new = Ny - 1;
         weight += 2;
 
