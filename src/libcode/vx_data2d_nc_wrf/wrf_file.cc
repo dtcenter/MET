@@ -345,52 +345,89 @@ InitTime = parse_init_time(att_value.c_str());
         NcDim dim = get_nc_dim(&v, dimNames[k]);
         Var[j].Dims[k] = &dim;
 
-        if ( c.compare(x_dim_name) == 0 ) {
+        // X dimension
+        if ( c.compare(x_dim_name) == 0 ||
+             c.compare(x_dim_stag_name) == 0 ||
+             c.compare(x_dim_subgrid_name) == 0) {
+
            Var[j].x_slot = k;
+
+           // track fields that need to be de-staggered in the X dimension
+           if ( c.compare(x_dim_stag_name) == 0 ) {
+
+               Var[j].x_stag = true;
+
+           }
+
+           // error if unsupported subgrid
+           if ( c.compare(x_dim_subgrid_name) == 0 ) {
+
+              mlog << Error << "\n" << method_name
+                   << "X Dimension \"" << x_dim_subgrid_name << "\" is not supported.\n\n";
+              return ( false );
+
+           }
+
         }
-        else if ( c.compare(x_dim_stag_name) == 0 ) {
-           Var[j].x_slot = k;
-           Var[j].x_stag = true;
-        }
-        else if ( c.compare(x_dim_subgrid_name) == 0 ) {
-            mlog << Error << "\n" << method_name
-                 << "X Dimension \"" << x_dim_subgrid_name << "\" is not supported.\n\n";
-            return ( false );
-        }
-        else if ( c.compare(y_dim_name) == 0 ) {
+        // Y dimension
+        else if ( c.compare(y_dim_name) == 0 ||
+                  c.compare(y_dim_stag_name) == 0 ||
+                  c.compare(y_dim_subgrid_name) == 0 ) {
+
            Var[j].y_slot = k;
+
+           // track fields that need to be de-staggered in the Y dimension
+           if ( c.compare(y_dim_stag_name) == 0 ) {
+
+              Var[j].y_stag = true;
+
+           }
+
+           // error if unsupported subgrid
+           if ( c.compare(y_dim_subgrid_name) == 0 ) {
+
+              mlog << Error << "\n" << method_name
+                   << "Y Dimension \"" << y_dim_subgrid_name << "\" is not supported.\n\n";
+              return ( false );
+
+           }
+
         }
-        else if ( c.compare(y_dim_stag_name) == 0 ) {
-           Var[j].y_slot = k;
-           Var[j].y_stag = true;
-        }
-        else if ( c.compare(y_dim_subgrid_name) == 0 ) {
-            mlog << Error << "\n" << method_name
-                 << "Y Dimension \"" << y_dim_subgrid_name << "\" is not supported.\n\n";
-            return ( false );
-        }
+        // Z dimension
         else if ( c.compare(z_dim_p_interp_name  ) == 0 ||
                   c.compare(z_dim_wrf_interp_name) == 0 ||
-                  c.compare(z_dim_wrf_name  ) == 0) {
-           Var[j].z_slot = k;
-           if ( c.compare(z_dim_wrf_name) != 0 ) {
-              Var[j].is_pressure = true;
-           }
-        }
-        else if ( c.compare(z_dim_wrf_stag_name) == 0 ||
+                  c.compare(z_dim_wrf_name  ) == 0 ||
+                  c.compare(z_dim_wrf_stag_name) == 0 ||
                   c.compare(z_dim_wrf_pres_name) == 0 ||
-                  c.compare(z_dim_wrf_z_name ) == 0) {
-           Var[j].z_slot = k;
-           Var[j].z_stag = true;
-           if ( c.compare(z_dim_wrf_pres_name) == 0 ) {
-              Var[j].is_pressure = true;
-           }
+                  c.compare(z_dim_wrf_z_name ) == 0 ) {
+
+            Var[j].z_slot = k;
+
+            // track fields that are on pressure levels
+            if ( c.compare(z_dim_p_interp_name) == 0 ||
+                 c.compare(z_dim_wrf_interp_name) == 0 ||
+                 c.compare(z_dim_wrf_pres_name) == 0 ) {
+
+                Var[j].is_pressure = true;
+
+            }
+
+            // track fields that need to be de-staggered in the Z dimension
+            if ( c.compare(z_dim_wrf_stag_name) == 0 ) {
+
+                Var[j].z_stag = true;
+
+            }
         }
+        // T dimension
         else if ( c.compare(t_dim_name) == 0 ) {
+
            Var[j].t_slot = k;
+
         }
-      }   //  for k
-   }   //  for j
+
+      }   //  for k : dim_count
+   }   //  for j : Nvars
 
 
    //
