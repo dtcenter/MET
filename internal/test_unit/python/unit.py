@@ -3,6 +3,8 @@
 
 #add imports...
 #import lxml     #note: developing with v 4.9.3
+import os
+import re
 import xml.etree.ElementTree as ET
 
 # use lib "$ENV{'MET_TEST_BASE'}/lib";
@@ -222,7 +224,7 @@ def build_tests(test_root):
 
         for el in test_el:
             if (el.tag=='exec' or el.tag=='param'):
-                test[el.tag] = el.text
+                test[el.tag] = repl_env(el.text)
                 # handle env variable in el.text
             elif el.tag=='output':
                 # build output file array (filename by output type)
@@ -303,31 +305,37 @@ def build_tests(test_root):
 #   return @tests;
 # }
 
-# #######################################################################
-# # repl_env()
-# #
-# #   This function assumes that the inputs are strings containing one or
-# #   more placeholders for environment variable values with syntax
-# #   ${ENV_NAME}.  The entire placeholder is replaced with the value of
-# #   the specified environment variable.  If no named variable exists,
-# #   repl_env() dies with error message. 
-# #
-# #   Arguments:
-# #     repl_list = array of strings containing environment value place-
-# #                 holders to be replaced
-# #
-# #######################################################################
 
-# sub repl_env {
-#   @_ or return 0;
-#   my @ret;
-#   while( @_ ){
-#     local $_ = shift;
-#     while( /\$\{(\w+)\}/ ){
-#       my $val = $ENV{$1} or die "ERROR: environment variable $1 not found\n";
-#       s/\$\{$1\}/$val/g;
-#     }
-#     push @ret, $_;
-#   }
-#   return wantarray ? @ret : $ret[0];
-# }
+def repl_env(string_with_ref):
+    """
+    Take a string with a placeholder for environment variable with syntax
+    ${ENV_NAME} and replace placeholder with corresponding value of environment
+    variable.
+
+    Parameters
+    ----------
+    string_with_ref : str
+        A string, generally path-like, that includes substring ${ENV_NAME}
+
+    Returns
+    -------
+    string_with_env : str
+        The provided string with ${ENV_NAME} replaced by corresponding environment variable
+    """
+
+    envar_ref_list = re.findall('\$\{\w+}', string_with_ref)
+    envar_ref_unique = [
+        envar_ref_list[i] for i in list(range(len(envar_ref_list))) if (
+            envar_ref_list[i] not in envar_ref_list[:i])]
+
+    if len(envar_ref_unique)>0:
+        for envar_ref in envar_ref_unique:
+            envar_name = envar_ref[2:-1]
+            envar = os.getenv(envar_name)
+            # will want to check for no envar found and log:
+            #   "ERROR: environment variable $1 not found\n"
+            string_with_ref = string_with_ref.replace(envar_ref, envar)
+
+    return string_with_ref
+
+
