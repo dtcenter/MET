@@ -198,8 +198,9 @@ bool MetGrib2DataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
    if( 1 < listMatch.size() ){
       ConcatString msg;
       for(size_t i=0; i < listMatch.size(); i++) {
-         msg << "record " << listMatch[i]->RecNum
+         msg << "  Record " << listMatch[i]->RecNum
              << " field " << listMatch[i]->FieldNum
+             << ", table 4." << listMatch[i]->PdsTmpl
              << ": ipdtmpl[" << listMatch[i]->IPDTmpl.n()
              << "] = ";
          for(int j=0; j < listMatch[i]->IPDTmpl.n(); j++) {
@@ -259,8 +260,9 @@ int MetGrib2DataFile::data_plane_array( VarInfo &vinfo,
       if( 1 < listMatchExact.size() ){
          ConcatString msg;
          for(size_t i=0; i < listMatchExact.size(); i++) {
-            msg << "record " << listMatchExact[i]->RecNum
+            msg << "  Record " << listMatchExact[i]->RecNum
                 << " field " << listMatchExact[i]->FieldNum
+                << ", table 4." << listMatchExact[i]->PdsTmpl
                 << ": ipdtmpl[" << listMatchExact[i]->IPDTmpl.n()
                 << "] = ";
             for(int j=0; j < listMatchExact[i]->IPDTmpl.n(); j++) {
