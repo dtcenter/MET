@@ -43,6 +43,10 @@ typedef struct {
    int ParmCat;
    int Parm;
    int Process;
+   int AerosolTyp;
+   int AerosolIntervalTyp;
+   double AerosolSizeLower;
+   double AerosolSizeUpper;
    int LvlTyp;
    double LvlVal1;
    double LvlVal2;
