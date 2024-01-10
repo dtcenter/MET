@@ -60,12 +60,12 @@ ConcatString variable_name = argv[2];
 
 script_name.chomp(".py");
 
-Python3_Script script(script_name);
+Python3_Script script(script_name.c_str());
 
 PyObject * var = 0;
 
 
-var = script.lookup(variable_name);
+var = script.lookup(variable_name.c_str());
 
 if ( var )  {
 
