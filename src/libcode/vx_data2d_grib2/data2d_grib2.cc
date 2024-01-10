@@ -731,11 +731,17 @@ void MetGrib2DataFile::read_grib2_record_list() {
          rec->PdsTmpl      = gfld->ipdtnum;
          rec->ParmCat      = gfld->ipdtmpl[0];
          rec->Parm         = gfld->ipdtmpl[1];
-         rec->Process      = gfld->ipdtmpl[2];
+
+         //  get the process id
+         if( gfld->ipdtnum != 46 && gfld->ipdtnum != 48 ) {
+            rec->Process   = gfld->ipdtmpl[2];
+         }
 
          //  get the level type
          if( gfld->ipdtnum == 46 ) {
             rec->LvlTyp    = gfld->ipdtmpl[15];
+         } else if( gfld->ipdtnum == 48 ) {
+            rec->LvlTyp    = gfld->ipdtmpl[20];
          } else {
             rec->LvlTyp    = gfld->ipdtmpl[9];
          }
@@ -748,10 +754,16 @@ void MetGrib2DataFile::read_grib2_record_list() {
          //  check for template number 46
          if( gfld->ipdtnum == 46 ) {
             rec->LvlVal1 = scaled2dbl(gfld->ipdtmpl[16], gfld->ipdtmpl[17]);
-            rec->LvlVal2 = rec->LvlVal1;    
-           //  check for special fixed level types (1 through 10 or 101) and set the level values to 0
-           //  Reference: https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_table4-5.shtml
-         } else if( (rec->LvlTyp >= 1 && rec->LvlTyp <= 10) || rec->LvlTyp == 101 ) {
+            rec->LvlVal2 = rec->LvlVal1;
+         }
+         //  check for template number 48
+         else if( gfld->ipdtnum == 48 ) {
+            rec->LvlVal1 = scaled2dbl(gfld->ipdtmpl[21], gfld->ipdtmpl[22]);
+            rec->LvlVal2 = rec->LvlVal1;
+         }
+         //  check for special fixed level types (1 through 10 or 101) and set the level values to 0
+         //  Reference: https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_table4-5.shtml
+         else if( (rec->LvlTyp >= 1 && rec->LvlTyp <= 10) || rec->LvlTyp == 101 ) {
             rec->LvlVal1 = 0;
             rec->LvlVal2 = 0;
          } else {
@@ -784,6 +796,14 @@ void MetGrib2DataFile::read_grib2_record_list() {
                     << "found unexpected time reference indicator of "
                     << gfld->ipdtmpl[4] << ".\n\n";
                exit(1);
+         }
+
+         //  aerosol type and size for templates 46 and 48
+         if( 46 == gfld->ipdtnum || 48 == gfld->ipdtnum ){
+            rec->AerosolTyp         = gfld->ipdtmpl[2];
+            rec->AerosolIntervalTyp = gfld->ipdtmpl[3];
+            rec->AerosolSizeLower   = scaled2dbl(gfld->ipdtmpl[4], gfld->ipdtmpl[5]);
+            rec->AerosolSizeUpper   = scaled2dbl(gfld->ipdtmpl[6], gfld->ipdtmpl[7]);
          }
 
          //  ensemble type and number for templates 1 and 11 (Table 4.6)
