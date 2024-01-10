@@ -162,8 +162,8 @@ inline int         VarInfoGrib2::perc_val()   const { return(PercVal);      }
 
 inline int         VarInfoGrib2::aerosol_type()          const { return(AerosolType);         }
 inline int         VarInfoGrib2::aerosol_interval_type() const { return(AerosolIntervalType); }
-inline double      VarInfoGrib2::aerosol_size_lower()    const { return(AerosolType);         }
-inline double      VarInfoGrib2::aerosol_size_upper()    const { return(AerosolType);         }
+inline double      VarInfoGrib2::aerosol_size_lower()    const { return(AerosolSizeLower);    }
+inline double      VarInfoGrib2::aerosol_size_upper()    const { return(AerosolSizeUpper);    }
 
 inline int         VarInfoGrib2::n_ipdtmpl()  const {
                                     return(IPDTmplIndex.n()); }
