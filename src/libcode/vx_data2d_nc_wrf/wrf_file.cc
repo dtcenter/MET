@@ -166,12 +166,6 @@ InitTime = (unixtime) 0;
 
 Ntimes = 0;
 
-PressureIndex = -1;
-
-TimeInPressure = false;
-
-hPaCF = 1.0;
-
    //
    //  done
    //
@@ -215,12 +209,11 @@ if ( !get_wrf_grid(*Nc, grid) )  { close();  return ( false ); }
 Ndims = get_dim_count(Nc);
 Dim = new NcDim*[Ndims];
 
-StringArray gDimNames;
-get_dim_names(Nc, &gDimNames);
+get_dim_names(Nc, &DimNames);
 
 for (j=0; j<Ndims; ++j)  {
-   c = to_lower(gDimNames[j]);
-   NcDim dim = get_nc_dim(Nc, gDimNames[j]);
+   c = to_lower(DimNames[j]);
+   NcDim dim = get_nc_dim(Nc, DimNames[j]);
 
    if ( c.compare(t_dim_name) == 0 )  Ntimes = GET_NC_SIZE(dim);
    if ( c.compare(t_dim_name) == 0 )            Tdim = &dim;
@@ -321,22 +314,6 @@ InitTime = parse_init_time(att_value.c_str());
       get_att_str( Var[j], description_att_name, Var[j].long_name_att );
       get_att_str( Var[j], units_att_name,       Var[j].units_att     );
 
-      //
-      //  get the pressure variable and store the hPa conversion factor
-      //
-
-      if ( strcasecmp(GET_NC_NAME(v).c_str(), pressure_var_p_interp_name)   == 0 ||
-           strcasecmp(GET_NC_NAME(v).c_str(), pressure_var_wrf_interp_name) == 0 ||
-           strcasecmp(GET_NC_NAME(v).c_str(), pressure_var_wrf_name) == 0 ) {
-         PressureIndex = j;
-         if( strcasecmp(GET_NC_NAME(v).c_str(), pressure_var_wrf_name) == 0 ) {
-            TimeInPressure = true;
-         }
-              if ( strcasecmp(Var[j].units_att.c_str(), pa_units_str ) == 0 ) hPaCF = 0.01;
-         else if ( strcasecmp(Var[j].units_att.c_str(), hpa_units_str) == 0 ) hPaCF = 1.0;
-      }
-
-
       dimNames.clear();
       get_dim_names(&v, &dimNames);
       string c;
@@ -344,87 +321,6 @@ InitTime = parse_init_time(att_value.c_str());
         c = to_lower(dimNames[k]);
         NcDim dim = get_nc_dim(&v, dimNames[k]);
         Var[j].Dims[k] = &dim;
-
-        // X dimension
-        if ( c.compare(x_dim_name) == 0 ||
-             c.compare(x_dim_stag_name) == 0 ||
-             c.compare(x_dim_subgrid_name) == 0) {
-
-           Var[j].x_slot = k;
-
-           // track fields that need to be de-staggered in the X dimension
-           if ( c.compare(x_dim_stag_name) == 0 ) {
-
-               Var[j].x_stag = true;
-
-           }
-
-           // error if unsupported subgrid
-           if ( c.compare(x_dim_subgrid_name) == 0 ) {
-
-              mlog << Error << "\n" << method_name
-                   << "X Dimension \"" << x_dim_subgrid_name << "\" is not supported.\n\n";
-              return ( false );
-
-           }
-
-        }
-        // Y dimension
-        else if ( c.compare(y_dim_name) == 0 ||
-                  c.compare(y_dim_stag_name) == 0 ||
-                  c.compare(y_dim_subgrid_name) == 0 ) {
-
-           Var[j].y_slot = k;
-
-           // track fields that need to be de-staggered in the Y dimension
-           if ( c.compare(y_dim_stag_name) == 0 ) {
-
-              Var[j].y_stag = true;
-
-           }
-
-           // error if unsupported subgrid
-           if ( c.compare(y_dim_subgrid_name) == 0 ) {
-
-              mlog << Error << "\n" << method_name
-                   << "Y Dimension \"" << y_dim_subgrid_name << "\" is not supported.\n\n";
-              return ( false );
-
-           }
-
-        }
-        // Z dimension
-        else if ( c.compare(z_dim_p_interp_name  ) == 0 ||
-                  c.compare(z_dim_wrf_interp_name) == 0 ||
-                  c.compare(z_dim_wrf_name  ) == 0 ||
-                  c.compare(z_dim_wrf_stag_name) == 0 ||
-                  c.compare(z_dim_wrf_pres_name) == 0 ||
-                  c.compare(z_dim_wrf_z_name ) == 0 ) {
-
-            Var[j].z_slot = k;
-
-            // track fields that are on pressure levels
-            if ( c.compare(z_dim_p_interp_name) == 0 ||
-                 c.compare(z_dim_wrf_interp_name) == 0 ||
-                 c.compare(z_dim_wrf_pres_name) == 0 ) {
-
-                Var[j].is_pressure = true;
-
-            }
-
-            // track fields that need to be de-staggered in the Z dimension
-            if ( c.compare(z_dim_wrf_stag_name) == 0 ) {
-
-                Var[j].z_stag = true;
-
-            }
-        }
-        // T dimension
-        else if ( c.compare(t_dim_name) == 0 ) {
-
-           Var[j].t_slot = k;
-
-        }
 
       }   //  for k : dim_count
    }   //  for j : Nvars
@@ -515,14 +411,16 @@ for (j=0; j<Nvars; ++j)  {
       c = to_lower(DimNames[k]);
            if ( c.compare(x_dim_name) == 0 )           out << "X";
       else if ( c.compare(x_dim_stag_name) == 0 )      out << "X (staggered)";
+      else if ( c.compare(x_dim_subgrid_name) == 0 )   out << "X (subgrid)";
       else if ( c.compare(y_dim_name) == 0 )           out << "Y";
       else if ( c.compare(y_dim_stag_name) == 0 )      out << "Y (staggered)";
+      else if ( c.compare(y_dim_subgrid_name) == 0 )   out << "Y (subgrid)";
       else if ( c.compare(z_dim_p_interp_name) == 0 ||
                 c.compare(z_dim_wrf_interp_name) == 0 ||
-                c.compare(z_dim_wrf_name) == 0)        out << "Z";
-      else if ( c.compare(z_dim_wrf_stag_name) == 0 ||
+                c.compare(z_dim_wrf_name) == 0 ||
                 c.compare(z_dim_wrf_pres_name) == 0 ||
-                c.compare(z_dim_wrf_z_name) == 0)      out << "Z (staggered)";
+                c.compare(z_dim_wrf_z_name) == 0 )     out << "Z";
+      else if ( c.compare(z_dim_wrf_stag_name) == 0 )  out << "Z (staggered)";
       else if ( Var[j].Dims[k] == Tdim )                  out << 'T';
       else                                                out << GET_NC_NAME_P(Var[j].Dims[k]);
 
@@ -703,7 +601,7 @@ if (dim_count >= max_wrf_args )  {
 }
 
 
-int j, count;
+int j, k, count;
 int x, y;
 double value;
 bool found = false;
@@ -734,10 +632,144 @@ if ( !found )  {
 
 }
 
-   //
-   // get pressure only if var is on pressure levels and pressure is in file
-   //
-   if ( var->is_pressure && PressureIndex >= 0 )  P = Var + PressureIndex;
+   // check dimensions
+   StringArray varDimNames;
+   get_dim_names(var->var, &varDimNames);
+   string c, z_name;
+   for (k=0; k<(var->Ndims); ++k)  {
+      c = to_lower(varDimNames[k]);
+
+      // X dimension
+      if ( c.compare(x_dim_name) == 0 ||
+           c.compare(x_dim_stag_name) == 0 ||
+           c.compare(x_dim_subgrid_name) == 0) {
+
+         var->x_slot = k;
+
+         // track fields that need to be de-staggered in the X dimension
+         if ( c.compare(x_dim_stag_name) == 0 ) {
+
+            var->x_stag = true;
+
+         }
+
+         // error if unsupported subgrid
+           if ( c.compare(x_dim_subgrid_name) == 0 ) {
+
+              mlog << Error << "\n" << method_name
+                   << "X Dimension \"" << x_dim_subgrid_name << "\" is not supported.\n\n";
+              return ( false );
+
+           }
+
+      }
+         // Y dimension
+      else if ( c.compare(y_dim_name) == 0 ||
+                c.compare(y_dim_stag_name) == 0 ||
+                c.compare(y_dim_subgrid_name) == 0 ) {
+
+         var->y_slot = k;
+
+         // track fields that need to be de-staggered in the Y dimension
+         if ( c.compare(y_dim_stag_name) == 0 ) {
+
+            var->y_stag = true;
+
+         }
+
+         // error if unsupported subgrid
+           if ( c.compare(y_dim_subgrid_name) == 0 ) {
+
+              mlog << Error << "\n" << method_name
+                   << "Y Dimension \"" << y_dim_subgrid_name << "\" is not supported.\n\n";
+              return ( false );
+
+           }
+
+      }
+         // Z dimension
+      else if ( c.compare(z_dim_p_interp_name  ) == 0 ||
+                c.compare(z_dim_wrf_interp_name) == 0 ||
+                c.compare(z_dim_wrf_name  ) == 0 ||
+                c.compare(z_dim_wrf_stag_name) == 0 ||
+                c.compare(z_dim_wrf_pres_name) == 0 ||
+                c.compare(z_dim_wrf_z_name ) == 0 ) {
+
+         var->z_slot = k;
+
+         // track fields that are on pressure levels
+         if ( c.compare(z_dim_p_interp_name) == 0 ||
+              c.compare(z_dim_wrf_interp_name) == 0 ||
+              c.compare(z_dim_wrf_pres_name) == 0 ) {
+
+            var->is_pressure = true;
+            z_name = c;
+
+         }
+
+         // track fields that need to be de-staggered in the Z dimension
+         if ( c.compare(z_dim_wrf_stag_name) == 0 ) {
+
+            var->z_stag = true;
+
+         }
+      }
+         // T dimension
+      else if ( c.compare(t_dim_name) == 0 ) {
+
+         var->t_slot = k;
+
+      }
+
+   } // end if k
+
+   bool time_in_pressure = false;
+   double pressure_unit_conversion = 1.0;
+
+   // if reading var on pressure, find pressure field that is on the same vertical (z) dimension as the var to read
+   if (var->is_pressure) {
+
+      StringArray varNames;
+      get_var_names(Nc, &varNames);
+
+      for (j = 0; j < Nvars; ++j) {
+         //
+         //  get the pressure variable and store the hPa conversion factor
+         //
+
+         if (varNames[j] == pressure_var_p_interp_name ||
+             varNames[j] == pressure_var_wrf_interp_name ||
+             varNames[j] == pressure_var_wrf_name) {
+
+            varDimNames.clear();
+            get_dim_names(Var[j].var, &varDimNames);
+
+            // check that the z dimension matches the var to read
+            found = false;
+            for(k=0; k< Var[j].Ndims; k++){
+               if(varDimNames[k] == z_name) {
+                  found = true;
+                  break;
+               }
+            }
+
+            if(!found) {
+               continue;
+            }
+
+            // set pressure field
+            P = Var + j;
+
+            if (varNames[j] == pressure_var_wrf_name) {
+
+               time_in_pressure = true;
+
+            }
+            if (strcasecmp(Var[j].units_att.c_str(), pa_units_str) == 0) pressure_unit_conversion = 0.01;
+            else if (strcasecmp(Var[j].units_att.c_str(), hpa_units_str) == 0) pressure_unit_conversion = 1.0;
+         }
+      }
+   }
 
    //
    // set nx and ny based on staggering of dimensions of the variable to read
@@ -857,13 +889,15 @@ plane.destagger(var->x_stag, var->y_stag);
 
 if ( P && z_slot > 0 )  {
 
+   mlog << Debug(3) << "Reading pressure field " << P->name << "\n";
+
    LongArray c;
 
-   if(TimeInPressure) c.add(a[var->t_slot]);
+   if(time_in_pressure) c.add(a[var->t_slot]);
    
    c.add(a[z_slot]);
 
-   pressure = data(P->var, c) * hPaCF;
+   pressure = data(P->var, c) * pressure_unit_conversion;
 
 }
 

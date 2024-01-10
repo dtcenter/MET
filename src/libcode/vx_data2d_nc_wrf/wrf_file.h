@@ -90,11 +90,6 @@ class WrfFile {
 
       NcVarInfo * Var;     //  allocated
 
-      int PressureIndex;   //  index into Var array
-      bool TimeInPressure; // true if the pressure field has a time dimension
-
-      double hPaCF;        //  pressure to hPa conversion factor
-
          //
          //  Grid
          //
