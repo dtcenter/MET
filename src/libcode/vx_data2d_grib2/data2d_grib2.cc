@@ -437,6 +437,14 @@ void MetGrib2DataFile::find_record_matches(VarInfoGrib2* vinfo,
          continue;
       }
 
+      //  test aerosol config file options
+      if( (!is_bad_data(vinfo->aerosol_type())          && vinfo->aerosol_type()          != (*it)->AerosolType )         ||
+          (!is_bad_data(vinfo->aerosol_interval_type()) && vinfo->aerosol_interval_type() != (*it)->AerosolIntervalType ) ||
+          (!is_bad_data(vinfo->aerosol_size_lower())    && vinfo->aerosol_size_lower()    != (*it)->AerosolSizeLower )    ||
+          (!is_bad_data(vinfo->aerosol_size_upper())    && vinfo->aerosol_size_upper()    != (*it)->AerosolSizeUpper ) ){
+         continue;
+      }
+
       //  test ipdtmpl array values
       if(vinfo->n_ipdtmpl() > 0) {
          int i, j;
@@ -797,14 +805,6 @@ void MetGrib2DataFile::read_grib2_record_list() {
                exit(1);
          }
 
-         //  aerosol type and size for templates 46 and 48
-         if( 46 == gfld->ipdtnum || 48 == gfld->ipdtnum ){
-            rec->AerosolTyp         = gfld->ipdtmpl[2];
-            rec->AerosolIntervalTyp = gfld->ipdtmpl[3];
-            rec->AerosolSizeLower   = scaled2dbl(gfld->ipdtmpl[4], gfld->ipdtmpl[5]);
-            rec->AerosolSizeUpper   = scaled2dbl(gfld->ipdtmpl[6], gfld->ipdtmpl[7]);
-         }
-
          //  ensemble type and number for templates 1 and 11 (Table 4.6)
          if( 1 == gfld->ipdtnum || 11 == gfld->ipdtnum ){
             rec->EnsType   = gfld->ipdtmpl[15];
@@ -825,6 +825,14 @@ void MetGrib2DataFile::read_grib2_record_list() {
          //  percentile value for templates 6 and 10
          if( 6 == gfld->ipdtnum || 10 == gfld->ipdtnum ){
             rec->PercVal = gfld->ipdtmpl[15];
+         }
+
+         //  aerosol type and size for templates 46 and 48
+         if( 46 == gfld->ipdtnum || 48 == gfld->ipdtnum ){
+            rec->AerosolType         = gfld->ipdtmpl[2];
+            rec->AerosolIntervalType = gfld->ipdtmpl[3];
+            rec->AerosolSizeLower    = scaled2dbl(gfld->ipdtmpl[4], gfld->ipdtmpl[5]);
+            rec->AerosolSizeUpper    = scaled2dbl(gfld->ipdtmpl[6], gfld->ipdtmpl[7]);
          }
 
          //  depending on the template number, determine the reference times
