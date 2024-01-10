@@ -798,14 +798,6 @@ void MetGrib2DataFile::read_grib2_record_list() {
                exit(1);
          }
 
-         //  aerosol type and size for templates 46 and 48
-         if( 46 == gfld->ipdtnum || 48 == gfld->ipdtnum ){
-            rec->AerosolTyp         = gfld->ipdtmpl[2];
-            rec->AerosolIntervalTyp = gfld->ipdtmpl[3];
-            rec->AerosolSizeLower   = scaled2dbl(gfld->ipdtmpl[4], gfld->ipdtmpl[5]);
-            rec->AerosolSizeUpper   = scaled2dbl(gfld->ipdtmpl[6], gfld->ipdtmpl[7]);
-         }
-
          //  ensemble type and number for templates 1 and 11 (Table 4.6)
          if( 1 == gfld->ipdtnum || 11 == gfld->ipdtnum ){
             rec->EnsType   = gfld->ipdtmpl[15];
@@ -826,6 +818,14 @@ void MetGrib2DataFile::read_grib2_record_list() {
          //  percentile value for templates 6 and 10
          if( 6 == gfld->ipdtnum || 10 == gfld->ipdtnum ){
             rec->PercVal = gfld->ipdtmpl[15];
+         }
+
+         //  aerosol type and size for templates 46 and 48
+         if( 46 == gfld->ipdtnum || 48 == gfld->ipdtnum ){
+            rec->AerosolType         = gfld->ipdtmpl[2];
+            rec->AerosolIntervalType = gfld->ipdtmpl[3];
+            rec->AerosolSizeLower    = scaled2dbl(gfld->ipdtmpl[4], gfld->ipdtmpl[5]);
+            rec->AerosolSizeUpper    = scaled2dbl(gfld->ipdtmpl[6], gfld->ipdtmpl[7]);
          }
 
          //  depending on the template number, determine the reference times
