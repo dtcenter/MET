@@ -326,18 +326,18 @@ NcVarInfo *find_var_info_by_dim_name(NcVarInfo *vars, const string dim_name,
       }
    }
 
+   // if dimension variable is not found, find variable that has only dim_name or dim_name and time
+   int dim_offset = 0;
    if (!var) {
-      //StringArray dim_names;
       for (int i=0; i<nvars; i++) {
-         if (1 == vars[i].Ndims) {
-            //dim_names.clear();
-            //get_dim_names(vars[i].var, &dim_names);
-            NcDim dim = get_nc_dim(vars[i].var, 0);
-            if (IS_VALID_NC(dim) && GET_NC_NAME(dim) == dim_name) {
-              var = &vars[i];
-              break;
-            }
+         if (vars[i].Ndims > 2) continue;
+         dim_offset = vars[i].Ndims == 2 ? 1 : 0;
+         NcDim dim = get_nc_dim(vars[i].var, dim_offset);
+         if (IS_VALID_NC(dim) && GET_NC_NAME(dim) == dim_name) {
+           var = &vars[i];
+           break;
          }
+
       }
    }
 
