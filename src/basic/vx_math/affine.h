@@ -16,16 +16,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-   //
-   //  This header file is part of the Verification Group's
-   //
-   //    Math Library code
-   //
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 #include <iostream>
 
 
@@ -77,7 +67,7 @@ class AffineInterface {
 
       virtual void clear() = 0;
 
-      virtual void dump(ostream &, int depth = 0) const = 0;
+      virtual void dump(std::ostream &, int depth = 0) const = 0;
 
          //
          //  set stuff
@@ -165,7 +155,7 @@ class Affine : public AffineInterface {
 
       void clear();  //  set to identity
 
-      virtual void dump(ostream &, int depth = 0) const;
+      virtual void dump(std::ostream &, int depth = 0) const;
 
          //
          //  set stuff
@@ -180,6 +170,8 @@ class Affine : public AffineInterface {
       void  set_mb  (double _m11, double _m12, double _m21, double _m22, double _b1, double _b2);
 
       void  set_m   (double _m11, double _m12, double _m21, double _m22);   //  sets TX = TY = 0.0
+
+      void  set_b   (double _b1, double _b2);
 
          //
          //  version 1
@@ -311,7 +303,7 @@ class DiagonalAffine : public AffineInterface {
 
       void clear();  //  set to identity
 
-      virtual void dump(ostream &, int depth = 0) const;
+      virtual void dump(std::ostream &, int depth = 0) const;
 
          //
          //  set stuff
@@ -475,7 +467,7 @@ class ConformalAffine : public AffineInterface {
 
       void clear();
 
-      void dump (ostream &, int depth = 0) const;
+      void dump (std::ostream &, int depth = 0) const;
 
          //
          //  set stuff
@@ -624,7 +616,7 @@ class Box {
 
       virtual void clear();
 
-      virtual void dump(ostream &, int = 0) const;
+      virtual void dump(std::ostream &, int = 0) const;
 
          //
          //  set stuff

@@ -1,8 +1,3 @@
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
@@ -26,6 +21,7 @@ using namespace std;
 #include "indent.h"
 #include "trig.h"
 #include "vx_vector.h"
+#include "vx_log.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -101,9 +97,8 @@ double t = XX*XX + YY*YY + ZZ*ZZ;
 
 if ( t == 0.0 )  {
 
-      //  cerr might not have been constructed yet
-
-   fprintf(stderr, "Vector::Vector(double XX, double YY, double ZZ, char) -> can't make unit vector from zero vector!\n\n");
+   mlog << Error << "\nVector::Vector(double XX, double YY, double ZZ, char) -> "
+        << "can't make unit vector from zero vector!\n\n";
 
    exit ( 1 );
 
@@ -261,7 +256,8 @@ double t = abs();
 
 if ( t == 0.0 )  {
 
-   cerr << "\n\n  Vector::normalize() -> can't normalize zero vector!\n\n";
+   mlog << Error << "\nVector::normalize() -> "
+        << "can't normalize zero vector!\n\n";
 
    exit ( 1 );
 
@@ -381,7 +377,8 @@ r = abs();
 
 if ( r == 0.0 )  {
 
-   cerr << "\n\n  Vector::get_altaz() -> zero vector!\n\n";
+   mlog << Error << "\nVector::get_altaz() -> "
+        << "zero vector!\n\n";
 
    exit ( 1 );
 
@@ -421,7 +418,8 @@ t = axis.abs();
 
 if ( t == 0.0 )  {
 
-   cerr << "\n\n  Vector::rotate() -> axis is the zero vector!\n\n";
+   mlog << Error << "\nVector::rotate() -> "
+        << "axis is the zero vector!\n\n";
 
    exit ( 1 );
 
@@ -542,7 +540,8 @@ void Vector::operator/=(double t)
 
 if ( t == 0.0 )  {
 
-   cerr << "\n\n  Vector::operator/=(double) -> can't divide by zero!\n\n";
+   mlog << Error << "\nVector::operator/=(double) -> "
+        << "can't divide by zero!\n\n";
 
    exit ( 1 );
 
@@ -566,7 +565,8 @@ void Vector::operator/=(int i)
 
 if ( i == 0 )  {
 
-   cerr << "\n\n  Vector::operator/=(int) -> can't divide by zero!\n\n";
+   mlog << Error << "\nVector::operator/=(int) -> "
+        << "can't divide by zero!\n\n";
 
    exit ( 1 );
 
@@ -895,7 +895,8 @@ Vector operator/(const Vector & a, double t)
 
 if ( t == 0.0 )  {
 
-   cerr << "\n\n  Vector operator/(const Vector &a, double t) -> division by zero!\n\n";
+   mlog << Error << "\nVector operator/(const Vector &a, double t) -> "
+        << "division by zero!\n\n";
 
    exit ( 1 );
 
@@ -925,7 +926,8 @@ Vector operator/(const Vector & a, int i)
 
 if ( i == 0 )  {
 
-   cerr << "\n\n  Vector operator/(const Vector &a, double t) -> division by zero!\n\n";
+   mlog << Error << "\nVector operator/(const Vector &a, double t) -> "
+        << "division by zero!\n\n";
 
    exit ( 1 );
 

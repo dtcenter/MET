@@ -236,7 +236,8 @@ calc_det();
 
 if ( fabs(Det) < 1.0e-7 )  {
 
-   cerr << "\n\n  Affine::set_mb() -> determinant nearly zero!\n\n";
+   mlog << Error << "\nAffine::set_mb() -> "
+        << "determinant nearly zero!\n\n";
 
    exit ( 1 );
 
@@ -255,6 +256,21 @@ void Affine::set_m(double _m11, double _m12, double _m21, double _m22)
 {
 
 set_mb(_m11, _m12, _m21, _m22, 0.0, 0.0);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void Affine::set_b(double _b1, double _b2)
+
+{
+
+TX  = _b1;
+TY  = _b2;
 
 return;
 
@@ -545,7 +561,8 @@ D =   x1_from*(y2_from - y3_from)
 
 if ( D == 0.0 )  {
 
-   cerr << "\n\n  Affine::set_three_points_v1() -> collinear (u, v) points!\n\n";
+   mlog << Error << "\nAffine::set_three_points_v1() -> "
+        << "collinear (u, v) points!\n\n";
 
    exit ( 1 );
 
@@ -580,7 +597,8 @@ calc_det();
 
 if ( fabs(Det) < 1.0e-7 )  {
 
-   cerr << "\n\n  Affine::set_three_points_v1() -> (x, y) points nearly collinear!\n\n";
+   mlog << Error << "\nAffine::set_three_points_v1() -> "
+        << "(x, y) points nearly collinear!\n\n";
 
    exit ( 1 );
 
@@ -814,7 +832,8 @@ calc_det();
 
 if ( fabs(Det) < 1.0e-7 )  {
 
-   cerr << "\n\n  DiagonalAffine::set_mb() -> determinant nearly zero!\n\n";
+   mlog << Error << "\nDiagonalAffine::set_mb() -> "
+        << "determinant nearly zero!\n\n";
 
    exit ( 1 );
 
@@ -1152,7 +1171,8 @@ calc_det();
 
 if ( fabs(Det) < 1.0e-7 )  {
 
-   cerr << "\n\n  DiagonalAffine::set_two_points() -> (x, y) points nearly collinear!\n\n";
+   mlog << Error << "\nDiagonalAffine::set_two_points() -> "
+        << "(x, y) points nearly collinear!\n\n";
 
    exit ( 1 );
 
@@ -1422,7 +1442,8 @@ void ConformalAffine::set_scale(double s)
 
 if ( s <= 0.0 )  {
 
-   cerr << "\n\n  ConformalAffine::set_scale(double) -> scale must be strictly positive!\n\n";
+   mlog << Error << "\nConformalAffine::set_scale(double) -> "
+        << "scale must be strictly positive!\n\n";
 
    exit ( 1 );
 
@@ -1903,7 +1924,8 @@ Top    = T;
 
 if ( width() < 0.0 )  {
 
-   cerr << "\n\n  Box::set_lrbt() -> negative width!\n\n";
+   mlog << Error << "\nBox::set_lrbt() -> "
+        << "negative width!\n\n";
 
    exit ( 1 );
 
@@ -1911,7 +1933,8 @@ if ( width() < 0.0 )  {
 
 if ( height() < 0.0 )  {
 
-   cerr << "\n\n  Box::set_lrbt() -> negative height!\n\n";
+   mlog << Error << "\nBox::set_lrbt() -> "
+        << "negative height!\n\n";
 
    exit ( 1 );
 
@@ -2023,7 +2046,8 @@ void Box::scale_from_ll(double s)
 
 if ( s <= 0.0 )  {
 
-   cerr << "\n\n  Box::scale_from_ll(double) -> scale factor must be strictly positive\n\n";
+   mlog << Error << "\nBox::scale_from_ll(double) -> "
+        << "scale factor must be strictly positive\n\n";
 
    exit ( 1 );
 
@@ -2072,7 +2096,8 @@ Bottom -= py;
 
 if ( (width() <= 0.0) || (height() <= 0.0) )  {
 
-   cerr << "\n\n  Box::pad(double, double) -> width and/or height is negative!\n\n";
+   mlog << Error << "\nBox::pad(double, double) -> "
+        << "width and/or height is negative!\n\n";
 
    exit ( 1 );
 
@@ -2092,7 +2117,8 @@ void Box::scale_from_center(double s)
 
 if ( s <= 0.0 )  {
 
-   cerr << "\n\n  Box::scale_from_center(double) -> scale factor must be strictly positive\n\n";
+   mlog << Error << "\nBox::scale_from_center(double) -> "
+        << "scale factor must be strictly positive\n\n";
 
    exit ( 1 );
 
@@ -2132,7 +2158,8 @@ void Box::scale_from_origin(double s)
 
 if ( s <= 0.0 )  {
 
-   cerr << "\n\n  Box::scale_from_origin(double) -> scale factor must be strictly positive\n\n";
+   mlog << Error << "\nBox::scale_from_origin(double) -> "
+        << "scale factor must be strictly positive\n\n";
 
    exit ( 1 );
 
@@ -2163,7 +2190,8 @@ void Box::scale_from_origin(double sx, double sy)
 
 if ( (sx <= 0.0) || (sy <= 0.0) )  {
 
-   cerr << "\n\n  Box::scale_from_origin(double, double) -> scale factor(s) must be strictly positive\n\n";
+   mlog << Error << "\nBox::scale_from_origin(double, double) -> "
+        << "scale factor(s) must be strictly positive\n\n";
 
    exit ( 1 );
 
@@ -2431,7 +2459,8 @@ void Box::set_center(const Box & b)
 
 if ( b.is_empty() )  {
 
-   cerr << "\n\n  Box::set_center(const Box &) -> given box is empty!\n\n";
+   mlog << Error << "\nBox::set_center(const Box &) -> "
+        << "given box is empty!\n\n";
 
    exit ( 1 );
 
@@ -2479,7 +2508,8 @@ double calc_aspect(double width, double height)
 
 if ( (width < 0.0) || (height < 0.0) )  {
 
-   cerr << "\n\n  calc_aspect() const -> negative box dimensions!\n\n";
+   mlog << Error << "\ncalc_aspect() const -> "
+        << "negative box dimensions!\n\n";
 
    exit ( 1 );
 
@@ -2487,7 +2517,8 @@ if ( (width < 0.0) || (height < 0.0) )  {
 
 if ( height == 0.0 )  {
 
-   cerr << "\n\n  calc_aspect() const -> zero height!\n\n";
+   mlog << Error << "\ncalc_aspect() const -> "
+        << "zero height!\n\n";
 
    exit ( 1 );
 
@@ -2677,7 +2708,8 @@ Box surround(const Box * a, int n_boxes)
 
 if ( n_boxes <= 0 )  {
 
-   cerr << "\n\n  surround(const Box * a, int n_boxes) -> bad number of boxes ... " << n_boxes << "\n\n";
+   mlog << Error << "\nsurround(const Box * a, int n_boxes) -> "
+        << "bad number of boxes ... " << n_boxes << "\n\n";
 
    exit ( 1 );
 
@@ -2737,7 +2769,8 @@ Box surround(const double * x_points, const double * y_points, const int n)
 
 if ( n < 2 )  {
 
-   cerr << "\n\n  surround(const double * x, const double * y, const int n) -> need at least 2 points!\n\n";
+   mlog << Error << "\nsurround(const double * x, const double * y, const int n) -> "
+        << "need at least 2 points!\n\n";
 
    exit ( 1 );
 
@@ -2767,7 +2800,8 @@ for (j=1; j<n; ++j)  {   //  j starts at 1, here
 
 if ( (R - L) <= 0.0 )  {
 
-   cerr << "\n\n  surround(const double * x, const double * y, const int n) -> bad box width!\n\n";
+   mlog << Error << "\nsurround(const double * x, const double * y, const int n) -> "
+        << "bad box width!\n\n";
 
    exit ( 1 );
 
@@ -2775,7 +2809,8 @@ if ( (R - L) <= 0.0 )  {
 
 if ( (T - B) <= 0.0 )  {
 
-   cerr << "\n\n  surround(const double * x, const double * y, const int n) -> bad box height!\n\n";
+   mlog << Error << "\nsurround(const double * x, const double * y, const int n) -> "
+        << "bad box height!\n\n";
 
    exit ( 1 );
 
@@ -2815,7 +2850,8 @@ switch ( g )  {
 
 
    default:
-      cerr << "\n\n  viewgravity_to_uv() -> bad gravity ... "
+      mlog << Error << "\nviewgravity_to_uv() -> "
+           << "bad gravity ... "
            << viewgravity_to_string(g) << "\n\n";
       exit ( 1 );
       break;
