@@ -1,0 +1,86 @@
+# Find the directory this script is called from
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+# Required
+# Directory that is the root of the compile
+export TEST_BASE=${DIR}
+
+# Required
+# Format is compiler_version (e.g. gnu_8.3.0)
+# Compiler options = gnu, intel, ics, ips, PrgEnv-intel, or pgi
+# Version is used for gnu in compilation of BUFRLIB and HDF5
+export COMPILER=intel-oneapi_2023.0.0
+
+# Set the values for the compilers
+export FC=ifx
+export F77=ifx
+export F90=ifx
+export CC=icx
+export CXX=icpx
+
+# Required
+# Root directory for creating/untaring met source code - usually same as TEST_BASE
+export MET_SUBDIR=${TEST_BASE}
+
+# Required
+# The name of the met tarbal usually downloaded with version from dtcenter.org and includes a version
+#  example - v12.0.0.tar.gz
+export MET_TARBALL=v12.0.0.tar.gz
+
+# Required
+# Specify if machine useds modules for loading software
+export USE_MODULES=FALSE
+
+# Root directory of your python install, containing the bin, include, lib, and share directories
+export MET_PYTHON=`python3-config --prefix`
+
+# Python ldflags created using python3-config
+export MET_PYTHON_LD=`python3-config --ldflags --embed`
+
+# Python cflags created using python3-config
+export MET_PYTHON_CC=`python3-config --cflags`
+
+# Use MAKE_ARGS to sped up the compilation of the external libaries and/or MET
+# MAKE_ARGS can be set "-j #" where # is replaced with the number of
+# cores to use (as an integer) or to simply "-j" to use all available cores.
+# Recommend setting to "-j 5" as some users have experienced problems with
+# higher values or no # specified.
+export MAKE_ARGS="-j 5"
+
+# If users have already installed these libraries and would like to make use of
+# them, uncomment out the export statements. If those pre-existing libraries are
+# in the external_libs directory, no further edits are needed; however, users
+# that have the pre-existing libraries not in the external_libs directory will
+# need to update the paths to the appropriate location.
+#export EXTERNAL_LIBS=${TEST_BASE}/external_libs
+#export MET_PROJ=${EXTERNAL_LIBS}
+#export TIFF_INCLUDE_DIR=${EXTERNAL_LIBS}/include
+#export TIFF_LIB_DIR=${EXTERNAL_LIBS}/lib
+#export SQLITE_INCLUDE_DIR=${EXTERNAL_LIBS}/include
+#export SQLITE_LIB_DIR=${EXTERNAL_LIBS}/lib
+#export MET_GSL=${EXTERNAL_LIBS}
+#export MET_BUFRLIB=${EXTERNAL_LIBS}/lib
+#export BUFRLIB_NAME=-lbufr_4
+#export LIB_JASPER=${EXTERNAL_LIBS}/lib
+#export LIB_LIBPNG=${EXTERNAL_LIBS}/lib
+#export LIB_Z=${EXTERNAL_LIBS}/lib
+#export MET_GRIB2CLIB=${EXTERNAL_LIBS}/lib
+#export MET_GRIB2CINC=${EXTERNAL_LIBS}/include
+#export GRIB2CLIB_NAME=-lg2c
+#export MET_HDF5=${EXTERNAL_LIBS}
+#export MET_NETCDF=${EXTERNAL_LIBS}
+#export MET_ECKIT==${EXTERNAL_LIBS}
+#export MET_ATLAS==${EXTERNAL_LIBS}
+
+# The optional libraries ecKit and atlas offer support for unstructured
+# grids. The optional libraries HDF4, HDFEOS, FREETYPE, and CAIRO are
+# used for the following, not widely used tools, MODIS-Regrid,
+# lidar2nc, and MODE Graphics. To enable building of these libraries,
+# set the compile flags for the library (e.g. COMPILE_ECKIT, COMPILE_ATLAS,
+# COMPILE_HDF, COMPILE_HDFEOS) to any value in the environment config
+# file. If these libraries have already been installed and don't need
+# to be reinstalled, please supply values for the following environment
+# variables in the input environment configuration file
+# (install_met_env.<machine_name>): MET_ECKIT, MET_ATLAS, MET_HDF,
+# MET_HDFEOS, MET_FREETYPEINC, MET_FREETYPELIB, MET_CAIROINC,
+# MET_CAIROLIB.
