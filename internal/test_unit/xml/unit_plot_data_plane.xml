@@ -564,4 +564,21 @@
     </output>
   </test>
 
+  <test name="plot_data_plane_GRIB2_TABLE_4.48">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/rrfs/rrfs.t00z.prslev.f036.conus_3km.MASSDEN.grib2 \
+      &OUTPUT_DIR;/plot_data_plane/RRFS_GRIB2_TABLE_4.48_MASSDEN.ps \
+      'name="MASSDEN"; level="Z8"; \
+       GRIB2_aerosol_type=62001; \
+       GRIB2_aerosol_interval_type=0; \
+       GRIB2_aerosol_size_lower=2.5e-06;' \
+       -title "Mass Density of Dry Dust up to 2.5e-06" \
+       -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/RRFS_GRIB2_TABLE_4.48_MASSDEN.ps</ps>
+    </output>
+  </test>
+
 </met_test>

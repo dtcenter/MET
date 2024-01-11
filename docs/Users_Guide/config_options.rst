@@ -1084,7 +1084,19 @@ File-format specific settings for the "field" entry:
     * The "GRIB2_perc_val" is an integer specifying the requested percentile
       value (0 to 100) to be used. This applies only to GRIB2 product
       definition templates 4.6 and 4.10.
-       
+
+    * The "GRIB2_aerosol_type" is an integer specifying the aerosol type
+      (Table 4.233). This applies only to GRIB2 product defintion templates
+      4.46 and 4.48.
+
+    * The "GRIB2_aerosol_interval_type" is an integer specifying the aerosol
+      size interval (Table 4.91). This applies only to GRIB2 product defintion
+      templates 4.46 and 4.48.
+
+    * The "GRIB2_aerosol_size_lower" and "GRIB2_aerosol_size_upper" are doubles
+      specifying the endpoints of the aerosol size interval. These applies only
+      to GRIB2 product defintion templates 4.46 and 4.48.
+
     * The "GRIB2_ipdtmpl_index" and "GRIB2_ipdtmpl_val" entries are arrays
       of integers which specify the product description template values to
       be used. The indices are 0-based. For example, use the following to

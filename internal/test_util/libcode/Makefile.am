@@ -31,4 +31,8 @@ SUBDIRS	= vx_data2d \
 	vx_physics \
 	vx_series_data
 
+if ENABLE_PYTHON
+  SUBDIRS += vx_python3_utils
+endif
+
 MAINTAINERCLEANFILES 	= Makefile.in

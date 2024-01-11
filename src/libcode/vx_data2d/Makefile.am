@@ -18,6 +18,7 @@ libvx_data2d_a_SOURCES = \
               data_class.cc data_class.h \
               data2d_utils.cc data2d_utils.h \
               table_lookup.cc table_lookup.h \
+              mask_filters.cc mask_filters.h \
               vx_data2d.h
 libvx_data2d_a_CPPFLAGS = ${MET_CPPFLAGS}
 
