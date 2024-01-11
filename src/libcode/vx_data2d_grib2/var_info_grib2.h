@@ -56,6 +56,11 @@ class VarInfoGrib2 : public VarInfo
       int StatType;   // Statistical Processing Type (Table 4.10)
       int PercVal;    // Percentile Value (Octet 35 for Templates 4.6 and 4.10)
 
+      int AerosolType;         // Aerosol Type (Table 4.46 and 4.48)
+      int AerosolIntervalType; // Aerosol Interval Type (Table 4.46 and 4.48)
+      double AerosolSizeLower; // Lower limit of Aerosol Size
+      double AerosolSizeUpper; // Upper limit of Aerosol Size
+
       IntArray IPDTmplIndex; // Index into the GRIB2 ipdtmpl array
       IntArray IPDTmplVal;   // Corresponding GRIB2 ipdtmpl value
 
@@ -90,6 +95,11 @@ class VarInfoGrib2 : public VarInfo
       int         stat_type()   const;
       int         perc_val()    const;
 
+      int         aerosol_type()          const;
+      int         aerosol_interval_type() const;
+      double      aerosol_size_lower()    const;
+      double      aerosol_size_upper()    const;
+
       int         n_ipdtmpl()        const;
       int         ipdtmpl_index(int) const;
       int         ipdtmpl_val(int)   const;
@@ -112,6 +122,10 @@ class VarInfoGrib2 : public VarInfo
       void set_der_type(int);
       void set_stat_type(int);
       void set_perc_val(int);
+      void set_aerosol_type(int);
+      void set_aerosol_interval_type(int);
+      void set_aerosol_size_lower(double);
+      void set_aerosol_size_upper(double);
       void set_ipdtmpl_index(const IntArray &);
       void set_ipdtmpl_val(const IntArray &);
 
@@ -146,6 +160,12 @@ inline int         VarInfoGrib2::ens_type()   const { return(EnsType);      }
 inline int         VarInfoGrib2::der_type()   const { return(DerType);      }
 inline int         VarInfoGrib2::stat_type()  const { return(StatType);     }
 inline int         VarInfoGrib2::perc_val()   const { return(PercVal);      }
+
+inline int         VarInfoGrib2::aerosol_type()          const { return(AerosolType);         }
+inline int         VarInfoGrib2::aerosol_interval_type() const { return(AerosolIntervalType); }
+inline double      VarInfoGrib2::aerosol_size_lower()    const { return(AerosolSizeLower);    }
+inline double      VarInfoGrib2::aerosol_size_upper()    const { return(AerosolSizeUpper);    }
+
 inline int         VarInfoGrib2::n_ipdtmpl()  const {
                                     return(IPDTmplIndex.n()); }
 inline int         VarInfoGrib2::ipdtmpl_index(int i) const {

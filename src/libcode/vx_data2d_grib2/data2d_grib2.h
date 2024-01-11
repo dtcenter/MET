@@ -62,6 +62,10 @@ typedef struct {
    int DerType;
    int StatType;
    int PercVal;
+   int AerosolType;
+   int AerosolIntervalType;
+   double AerosolSizeLower;
+   double AerosolSizeUpper;
    IntArray IPDTmpl;
 } Grib2Record;
 

@@ -159,6 +159,9 @@ class NcCfFile {
       // Read the grid information from the netCDF file and fill in the
       // grid member with that information.
 
+      void find_xy_vars(const std::string &);
+      netCDF::NcVar *find_var_by_standard_name(const char *standard_name) const;
+
       void read_netcdf_grid();
       void get_grid_from_grid_mapping(const netCDF::NcVarAtt *grid_mapping_att);
       
