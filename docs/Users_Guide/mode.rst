@@ -277,7 +277,7 @@ _____________________
 
    multivar_name = "Super";
 
-The **multivar_name** entry appears only in the **MODEMultivarConfig_default** file. This option is used only when the multivar option is enabled, and only when all **multivar_intensity_flag** values are FALSE. It can be thought of as an identifier for the multivariate super object.  It shows up in output files names and content.  It can be set separately for forecasts and observations or as a common value for both.
+The **multivar_name** entry appears only in the **MODEMultivarConfig_default** file. This option is used only when the multivar option is enabled, and only when **multivar_intensity_compare_fcst** and **multivar_intensity_compare_obs** are empty. It can be thought of as an identifier for the multivariate super object.  It shows up in output files names and content.  It can be set separately for forecasts and observations or as a common value for both.
 
 _____________________
 
@@ -285,7 +285,7 @@ _____________________
 
    multivar_level = "LO";
 
-The **multivar_level** entry appears only in the **MODEMultivarConfig_default** file. This option is used only when the multivar option is enabled, and only when all **multivar_intensity_flag** values are FALSE. It is the identifier for the multivariate super object as regards level.  It shows up in output files names and content.  If not set the default value is "NA".   It can be set separately for forecasts and observations, or as a common value for both.
+The **multivar_level** entry appears only in the **MODEMultivarConfig_default** file. This option is used only when the multivar option is enabled, and only when **multivar_intensity_compare_fcst** and **multivar_intensity_compare_obs** are empty. It is the identifier for the multivariate super object as regards level.  It shows up in output files names and content.  If not set the default value is "NA".   It can be set separately for forecasts and observations, or as a common value for both.
 
 _____________________
 
