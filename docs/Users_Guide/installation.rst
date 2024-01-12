@@ -49,9 +49,9 @@ The required libraries are listed below:
 The following libraries are conditionally required, depending on the intended
 verification use and compiler language:
 
-* `GRIB2C Library <https://github.com/NOAA-EMC/NCEPLIBS-g2c>`_
-  (with dependencies Z, PNG, JASPER), if compiling GRIB2 support
-* `Python Libraries <https://docs.python.org/3/>`_,
+* `GRIB2C <https://github.com/NOAA-EMC/NCEPLIBS-g2c>`_
+  Library (with dependencies Z, PNG, JASPER), if compiling GRIB2 support
+* `Python <https://docs.python.org/3/>`_ Libraries,
   if compiling support for Python embedding
 * `ecKit <https://github.com/ecmwf/eckit>`_
   Library, if compiling support for unstructured grids
@@ -103,7 +103,7 @@ before running the script and some optional environment variables, both of
 which are described below. The script relies on a **tar_files.tgz** file, which
 contains all of the required and optional library packages for MET but not
 MET itself. A separate command will be used to pull down the latest version of
-MET in **tar_files.tgz** (tarred and gzipped)
+MET in **tar_files.tgz** 
 format from GitHub, which the script will then install.
 
 To begin, create and change to a directory where the latest version of MET will be
@@ -144,7 +144,7 @@ Now change directories to the one that was created from expanding the tar files:
 The next step will be to identify and download the latest MET release as a
 tar file (e.g. **v12.0.0.tar.gz**) and place it in
 the *tar_files* directory. The file is available from the
-MET line under the“RECOMMENDED - COMPONENTS” section on the
+MET line under the “RECOMMENDED - COMPONENTS” section on the
 `METplus website <https://dtcenter.org/community-code/metplus/download>`_ or
 by using a wget command while in the *tar_files* directory:
 
@@ -166,7 +166,7 @@ additional environment variables: **MET_PYTHON**, **MET_PYTHON_CC**, and
 in further detail in the Environment Variable Descriptions section below.
 An easy way to set these environment variables is in an environment
 configuration file  (for example, **install_met_env.<machine_name>**). An
-example environment configuration file to start with (**install_met_env.generic**),
+example environment configuration file to start from (**install_met_env.generic_gnu**),
 as well as environment configuration files used on HPCs at NCAR and NOAA,
 can be found in the `MET GitHub repository <https://github.com/dtcenter/MET>`_ in the 
 `scripts/installation/config <https://github.com/dtcenter/MET/tree/main_v12.0/internal/scripts/installation/config>`_
@@ -184,10 +184,13 @@ Environment Variable Descriptions
     and the *tar_files* directory from the untar command.
 
     **COMPILER** – Format is *compiler_version* (e.g. gnu_8.3.0). For the GNU family of compilers, 
-    use “gnu”; for the Intel family of compilers, use “intel”, “ics”, “ips”, or “PrgEnv-intel”, 
-    depending on the system;  for the oneAPI intel compilers, ensure “oneapi” 
-    is in the compiler name. In the past, support was provided for the PGI family of compilers 
-    through “pgi”. However, this compiler option is no longer actively tested. 
+    use “gnu”; for the Intel family of compilers, use “intel”, "intel-classic", 
+    “intel-oneapi”, “ics”, “ips”, or “PrgEnv-intel”, 
+    depending on the system. If using an Intel compiler, users that have also 
+    set the **USE_MODULES** environment variable to TRUE should review the additional 
+    information below for proper configuration file setup. In the past, support was 
+    provided for the PGI family of compilers through “pgi”. However, this compiler 
+    option is no longer actively tested. 
 
     **MET_SUBDIR** – Format is */d1/met/12.0.0*. This is the location where the top-level MET 
     subdirectory will
@@ -198,6 +201,8 @@ Environment Variable Descriptions
     **USE_MODULES** – Format is *TRUE* or *FALSE*. Set to FALSE if using a machine that does not use 
     modulefiles; set to TRUE if using a machine that does use modulefiles. For more information on 
     modulefiles, visit the `Wikipedia page <https://en.wikipedia.org/wiki/Environment_Modules_(software)>`_.
+    If the **USE_MODULES** setting is set to true and the compiler is an Intel compiler, please 
+    review the additional information below for proper configuration file setup.
 
     **PYTHON_MODULE** -  Format is *PythonModuleName_version* (e.g. python_3.10.4). This environment variable 
     is only required if **USE_MODULES** = TRUE. To set properly, list the Python module to load 
