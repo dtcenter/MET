@@ -634,6 +634,11 @@ class Box {
       virtual double top    () const;
       virtual double bottom () const;
 
+      double x_ll () const;
+      double y_ll () const;
+      double x_ur () const;
+      double y_ur () const;
+
       virtual double width  () const;
       virtual double height () const;
 
@@ -708,6 +713,11 @@ inline double Box::left   () const { return ( Left   ); }
 inline double Box::right  () const { return ( Right  ); }
 inline double Box::bottom () const { return ( Bottom ); }
 inline double Box::top    () const { return ( Top    ); }
+
+inline double Box::x_ll () const { return ( Left   ); }
+inline double Box::y_ll () const { return ( Bottom ); }
+inline double Box::x_ur () const { return ( Right  ); }
+inline double Box::y_ur () const { return ( Top    ); }
 
 inline double Box::width  () const { return ( Right - Left ); }
 inline double Box::height () const { return ( Top - Bottom ); }

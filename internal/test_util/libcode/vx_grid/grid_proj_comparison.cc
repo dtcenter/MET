@@ -115,8 +115,7 @@ p.set_affine(aff);
 
 p.latlon_to_xy(data.lat_pin, data.lon_pin, xx, yy);
 
-// Commented out since Affine::set_b() is not defined
-// aff.set_b(data.x_pin - xx, data.y_pin - yy);
+aff.set_b(data.x_pin - xx, data.y_pin - yy);
 
 p.set_affine(aff);   //  again
 
