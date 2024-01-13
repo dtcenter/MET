@@ -1544,7 +1544,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void CgraphBase::concat(const GeneralAffine & aff)
+void CgraphBase::concat(const Affine & aff)
 
 {
 
@@ -1839,7 +1839,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void Cgraph::concat(const GeneralAffine & aff)
+void Cgraph::concat(const Affine & aff)
 
 {
 

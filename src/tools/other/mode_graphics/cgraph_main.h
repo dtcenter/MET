@@ -208,7 +208,7 @@ class CgraphBase : public PSfile {
       void scale     (double);
       void scale     (double, double);
 
-      void concat(const GeneralAffine &);
+      void concat(const Affine &);
 
       void device_to_user(double, double, double &, double &) const;
       void user_to_device(double, double, double &, double &) const;
@@ -337,7 +337,7 @@ class Cgraph : public CgraphBase {
       void scale     (double);
       void scale     (double, double);
 
-      void concat(const GeneralAffine &);   //  works!
+      void concat(const Affine &);   //  works!
 
       void clip(const Box &);
       void clip();
