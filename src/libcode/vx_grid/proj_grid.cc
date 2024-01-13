@@ -1,3 +1,10 @@
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+// ** Copyright UCAR (c) 1992 - 2023
+// ** University Corporation for Atmospheric Research (UCAR)
+// ** National Center for Atmospheric Research (NCAR)
+// ** Research Applications Lab (RAL)
+// ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -85,10 +92,6 @@ void ProjGrid::init_from_scratch()
 
 {
 
-// C = 0;
-// 
-// pj = 0;
-
 info = make_shared<ProjInfo>();
 
 Nx = Ny = 0;
@@ -105,7 +108,7 @@ void ProjGrid::clear()
 
 {
 
-// info.   //  ?
+info = nullptr;
 
 Aff.clear();
 
@@ -162,18 +165,12 @@ out << prefix << "(nx, ny) = (" << Nx << ", " << Ny << ")\n";
 
 out << prefix << "Affine: \n";
 
-//Aff.dump(out, depth + 1);
+Aff.dump(out, depth + 1);
 
 out << prefix << "proj_set = ";
 
 if ( Proj_Set.nonempty() )  out << '\"' << Proj_Set  << "\"\n";
 else                        out << "(nul)\n";
-
-   //
-   //  how to dump out the PROJ stuff?
-   //
-   //    for now, we'll just write out the pointer value;
-   //
 
 out << prefix << "pj = " << (info->pj)  << '\n';
 
