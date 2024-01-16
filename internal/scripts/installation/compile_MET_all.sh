@@ -868,7 +868,7 @@ done
 for x in $MET_ATLAS $MET_BUFR $MET_ECKIT $MET_GRIB2C $MET_PROJ $LIB_JASPER; do
     arg="${x:+-Wl,-rpath,$x/lib64 -L$x/lib64}"
     if [[ "$LDFLAGS" != *"$arg"* ]]; then
-	LDFLAGS+=" $arg"
+      LDFLAGS+=" $arg"
     fi
 done
 	
