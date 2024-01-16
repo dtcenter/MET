@@ -415,7 +415,7 @@ To confirm that MET was installed successfully, run the following command from t
 If no errors are returned, the installation was successful.
 Due to the highly variable nature of hardware systems, users may encounter issues during 
 the installation process that result in MET not being installed. If this occurs please 
-first recheck that the locations of all the necessary data files and scripts is correct. 
+first recheck that the location of all the necessary data files and scripts is correct. 
 Next, recheck the environment variables in the environment configuration file and 
 ensure there are no spelling errors or improperly set variables. 
 After these checks are complete, run the script again.
