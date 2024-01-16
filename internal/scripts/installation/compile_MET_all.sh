@@ -876,7 +876,7 @@ done
 for x in $MET_ATLASLIB $MET_BUFRLIB $MET_CAIROLIB $MET_ECKITLIB $MET_FREETYPELIB $MET_GRIB2CLIB $MET_GSLLIB $MET_HDF5LIB $MET_HDFLIB $MET_NETCDFLIB $MET_PROJLIB $MET_PYTHON_LIB $LIB_JASPER $LIB_LIBPNG $LIB_Z $ADDTL_DIR; do
     arg="${x:+-Wl,-rpath,$x -L$x}"
     if [[ "$LDFLAGS" != *"$arg"* ]]; then
-	LDFLAGS+=" $arg"
+      LDFLAGS+=" $arg"
     fi
 done
 
