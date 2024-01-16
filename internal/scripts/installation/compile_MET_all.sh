@@ -860,7 +860,7 @@ LDFLAGS="${LDFLAGS} -Wl,-rpath,${LIB_DIR}/lib -L${LIB_DIR}/lib  -Wl,-rpath,${LIB
 for x in $MET_CAIRO $MET_FREETYPE $MET_GSL $MET_HDF $MET_HDF5 $MET_NETCDF; do
     arg="${x:+-Wl,-rpath,$x/lib -L$x/lib}"
     if [[ "$LDFLAGS" != *"$arg"* ]]; then
-	LDFLAGS+=" $arg"
+      LDFLAGS+=" $arg"
     fi
 done
 
