@@ -59,7 +59,7 @@ verification use and compiler language:
   Library, if compiling support for unstructured grids
 * `HDF4 <http://www.hdfgroup.org/products/hdf4>`__
   library if compiling the MODIS-Regrid or lidar2nc tool
-* `HDF-EOS2 <http://www.hdfgroup.org/hdfeos.html>`__
+* `HDF-EOS2 <http://www.hdfeos.org/software/library.php#HDF-EOS2>`__
   library if compiling the MODIS-Regrid or lidar2nc tool
 * `Cairo <http://cairographics.org/releases>`_
   library if compiling the MODE-Graphics tool
@@ -111,9 +111,10 @@ installed. Assuming that the following guidance uses “/d1” as the parent dir
 a suggested format is a path to a “met” directory, followed by the version number 
 subdirectory (e.g. */d1/met/12.0.0*). 
 Next, download the
-`compile_MET_all.sh <https://raw.githubusercontent.com/dtcenter/MET/latest/internal/scripts/installation/compile_MET_all.sh>`_
+`compile_MET_all.sh <https://raw.githubusercontent.com/dtcenter/MET/main_v11.1/internal/scripts/installation/compile_MET_all.sh>`_
 script and 
-`tar_files.tgz <https://dtcenter.ucar.edu/dfiles/code/METplus/MET/installation/tar_files.tgz>`_ file and place both of these files in the
+`tar_files.tgz <https://dtcenter.ucar.edu/dfiles/code/METplus/MET/installation/tar_files.tgz>`_ 
+file and place both of these files in the
 new directory. These files are available either
 through using the hyperlinks provided or by entering the following commands in
 the terminal while in the directory MET will be installed in:
@@ -209,6 +210,32 @@ Environment Variable Descriptions
     followed by an underscore and version number. For example, setting
     **PYTHON_MODULE** =python_3.10.4 
     will cause the script to run "module load python/3.10.4".
+
+.. dropdown:: ADDITIONAL SETTINGS FOR INTEL COMPILER USERS WITH THE USE_MODULES SETTING 
+
+    It is necessary for the user to specify (in the install_met_env.<machine> config file) the 
+    following environment variables if using the Intel compilers: 
+
+    For non-oneAPI Intel compilers:
+      export FC=ifort
+      export F77=ifort
+      export F90=ifort
+      export CC=icc
+      export CXX=icpc
+
+    For oneAPI Intel compilers:
+      export FC=ifx
+      export F77=ifx
+      export F90=ifx
+      export CC=icx
+      export CXX=icpx
+
+    This is due to the machines allowing users to load a module but not setting these environment 
+    variables as expected, leading to failed installations. For user convenience, additional 
+    generic configuration files have been created that include these settings. Users with a 
+    classic Intel compiler are encouraged to use the install_met_env.generic_intel_classic 
+    configuration file, and users with a oneAPI Intel compiler should use the 
+    install_met_env.generic_intel_oneapi configuration file. 
 
 
 .. dropdown:: REQUIRED, IF COMPILING PYTHON EMBEDDING
