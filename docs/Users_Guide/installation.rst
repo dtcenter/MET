@@ -323,11 +323,9 @@ External Library Handling in compile_MET_all.sh
     +-------------------+--------------------------------+------------------------------+
     | *Optional*        | :code:`--enable-all` or        | MET_GRIB2CLIB,               |
     |                   |                                |                              |
-    | GRIB2             | :code:`--enable-grib2`         | MET_GRIB2CINC,               |
+    | GRIB2             | :code:`--enable-grib2`         | MET_GRIB2CINC,               |        
     |                   |                                |                              |
-    | Support           |                                | LIB_Z,                       |
-    |                   |                                |                              |
-    |                   |                                | GRIB2CLIB_NAME,              |
+    | Support           |                                | GRIB2CLIB_NAME,              |
     |                   |                                |                              |
     |                   |                                | LIB_JASPER,                  |
     |                   |                                |                              |
