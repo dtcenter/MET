@@ -443,7 +443,6 @@ if [ $COMPILE_PROJ -eq 1 ]; then
     tar -xzf ${TAR_DIR}/tiff*.tar.gz -C ${LIB_DIR}/tiff
     cd ${LIB_DIR}/tiff/tiff*
     echo "cd `pwd`"
-    #run_cmd "./configure --prefix=${LIB_DIR} LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include > $(pwd)/tiff.configure.log 2>&1"
     run_cmd "./configure --prefix=${LIB_DIR} > $(pwd)/tiff.configure.log 2>&1"
     run_cmd "make ${MAKE_ARGS} > $(pwd)/tiff.make.log 2>&1"
     run_cmd "make ${MAKE_ARGS} install > $(pwd)/tiff.make_install.log 2>&1"
