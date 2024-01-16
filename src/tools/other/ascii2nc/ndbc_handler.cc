@@ -120,8 +120,15 @@ NdbcHandler::NdbcHandler(const string &program_name) :
 
 NdbcHandler::~NdbcHandler()
 {
-  mlog << Debug(1) << "Number of NDBC skipped files due to no lookup " <<  numMissingStations
-       << "\n";
+
+   // Log the non-zero number of missing stations
+   if(numMissingStations > 0) {
+      mlog << Debug(3) << "Skipped " << numMissingStations
+           << " NDBC files whose locations are not defined in \""
+           << locationsFileName << "\". Set the " << stations_env
+           << " environment variable to provide an updated "
+           << "locations file.\n";
+   }
 }
 
 
@@ -362,7 +369,7 @@ time_t NdbcHandler::_getValidTime(const DataLine &data_line) const
   struct tm time_struct;
   memset(&time_struct, 0, sizeof(time_struct));
 
-  time_struct.tm_year = atoi(year.c_str()) -1900;
+  time_struct.tm_year = atoi(year.c_str()) - 1900;
   time_struct.tm_mon = atoi(month.c_str()) - 1;
   time_struct.tm_mday = atoi(day.c_str());
   time_struct.tm_hour = atoi(hour.c_str());
