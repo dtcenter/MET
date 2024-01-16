@@ -564,4 +564,88 @@
     </output>
   </test>
 
+  <test name="plot_data_plane_WRF_west_east_stag">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/wrf/wrfout_solarwind_d02_2019-08-31_12:00:00 \
+      &OUTPUT_DIR;/plot_data_plane/wrf_west_east_stag.ps \
+      'name="U"; level="(0,0,*,*)";' \
+      -title "X-wind component (staggered)" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/wrf_west_east_stag.ps</ps>
+    </output>
+  </test>
+
+  <test name="plot_data_plane_WRF_south_north_stag">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/wrf/wrfout_solarwind_d02_2019-08-31_12:00:00 \
+      &OUTPUT_DIR;/plot_data_plane/wrf_south_north_stag.ps \
+      'name="V"; level="(0,0,*,*)";' \
+      -title "Y-wind component (staggered)" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/wrf_south_north_stag.ps</ps>
+    </output>
+  </test>
+
+  <test name="plot_data_plane_WRF_num_press_levels_stag">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/wrf/wrfout_solarwind_d02_2019-08-31_12:00:00 \
+      &OUTPUT_DIR;/plot_data_plane/wrf_num_press_levels_stag.ps \
+      'name="RH_PL"; level="(0,@50000,*,*)";' \
+      -title "Relative Humidity P50000 (num_press_levels_stag)" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/wrf_num_press_levels_stag.ps</ps>
+    </output>
+  </test>
+
+  <test name="plot_data_plane_WRF_num_z_levels_stag">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/wrf/wrfout_solarwind_d02_2019-08-31_12:00:00 \
+      &OUTPUT_DIR;/plot_data_plane/wrf_num_z_levels_stag.ps \
+      'name="RH_ZL"; level="(0,0,*,*)";' \
+      -title "Relative Humidity Z-level (num_z_levels_stag)" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/wrf_num_z_levels_stag.ps</ps>
+    </output>
+  </test>
+
+  <test name="plot_data_plane_WRF_bottom_top">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/wrf/wrfout_solarwind_d02_2019-08-31_12:00:00 \
+      &OUTPUT_DIR;/plot_data_plane/wrf_bottom_top.ps \
+      'name="T"; level="(0,0,*,*)";' \
+      -title "perturbation potential temperature theta-t0 (bottom_top)" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/wrf_bottom_top.ps</ps>
+    </output>
+  </test>
+
+  <test name="plot_data_plane_WRF_bottom_top_stag">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/wrf/wrfout_solarwind_d02_2019-08-31_12:00:00 \
+      &OUTPUT_DIR;/plot_data_plane/wrf_bottom_top_stag.ps \
+      'name="PH"; level="(0,0,*,*)";' \
+      -title "perturbation geopotential (bottom_top_stag)" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/wrf_bottom_top_stag.ps</ps>
+    </output>
+  </test>
+
 </met_test>
