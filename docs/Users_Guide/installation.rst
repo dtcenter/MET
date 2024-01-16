@@ -216,22 +216,20 @@ Environment Variable Descriptions
     It is necessary for the user to specify (in the install_met_env.<machine> config file) the 
     following environment variables if using the Intel compilers: 
 
-    For non-oneAPI Intel compilers:
-      
-      | export FC=ifort
-      | export F77=ifort
-      | export F90=ifort
-      | export CC=icc
-      | export CXX=icpc
+    | For non-oneAPI Intel compilers:
+    | export FC=ifort
+    | export F77=ifort
+    | export F90=ifort
+    | export CC=icc
+    | export CXX=icpc
 
 
-    For oneAPI Intel compilers:
-     
-      | export FC=ifx
-      | export F77=ifx
-      | export F90=ifx
-      | export CC=icx
-      | export CXX=icpx
+    | For oneAPI Intel compilers:
+    | export FC=ifx
+    | export F77=ifx
+    | export F90=ifx
+    | export CC=icx
+    | export CXX=icpx
 
     This is due to the machines allowing users to load a module but not setting these environment 
     variables as expected, leading to failed installations. For user convenience, additional 
