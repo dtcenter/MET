@@ -456,6 +456,8 @@ While initial versions of the ASCII2NC tool only supported a simple 11 column AS
 
 • `National Data Buoy (NDBC) Standard Meteorlogical Data format <https://www.ndbc.noaa.gov/measdes.shtml>`_. See the :ref:`MET_NDBC_STATIONS` environment variable.
 
+• `International Soil Moisture Network (ISMN) Data format <https://ismn.bafg.de/en/>`_.
+
 • `AErosol RObotic NEtwork (AERONET) versions 2 and 3 format <http://aeronet.gsfc.nasa.gov/>`_
 
 • Python embedding of point observations, as described in :numref:`pyembed-point-obs-data`. See example below in :numref:`ascii2nc-pyembed`.
@@ -539,7 +541,7 @@ Required Arguments for ascii2nc
 Optional Arguments for ascii2nc
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-3. The **-format ASCII_format** option may be set to "met_point", "little_r", "surfrad", "wwsis", "airnowhourlyaqobs", "airnowhourly", "airnowdaily_v2", "ndbc_standard", "aeronet", "aeronetv2", "aeronetv3", or "python". If passing in ISIS data, use the "surfrad" format flag.
+3. The **-format ASCII_format** option may be set to "met_point", "little_r", "surfrad", "wwsis", "airnowhourlyaqobs", "airnowhourly", "airnowdaily_v2", "ndbc_standard", "ismn", "aeronet", "aeronetv2", "aeronetv3", or "python". If passing in ISIS data, use the "surfrad" format flag.
 
 4. The **-config file** option is the configuration file for generating time summaries.
 
