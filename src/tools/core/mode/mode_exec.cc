@@ -414,6 +414,10 @@ void ModeExecutive::setup_verification_grid(const ModeInputData &fcst,
    Fcst_sd.data = fcst._dataPlane;
    Obs_sd.data = obs._dataPlane;
 
+   // set this local conf to point to forecast 0, so that that regrid info
+   // can be accessed and it can be decided if we are to use fcst or obs
+   // input
+   engine.conf_info.set_data_type(ModeDataType_MvMode_Fcst);
    engine.conf_info.set_field_index(0);
    grid = parse_vx_grid(engine.conf_info.Fcst->var_info->regrid(),
                         &fcst._grid, &obs._grid);
