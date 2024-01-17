@@ -122,7 +122,7 @@ the terminal while in the directory MET will be installed in:
 
 .. code-block:: ini
 
-  wget https://raw.githubusercontent.com/dtcenter/MET/latest/internal/scripts/installation/compile_MET_all.sh
+  wget https://raw.githubusercontent.com/dtcenter/MET/main_v12.0/internal/scripts/installation/compile_MET_all.sh
   wget https://dtcenter.ucar.edu/dfiles/code/METplus/MET/installation/tar_files.tgz
 
 The tar files will need to be extracted in the MET installation directory:
@@ -272,7 +272,7 @@ Environment Variable Descriptions
 
 .. dropdown:: OPTIONAL
 
-    **export MAKE_ARGS=-j #** – If there is a need to install external
+    **export MAKE_ARGS="-j #"** – If there is a need to install external
     libraries, or to attempt 
     to speed up the MET compilation process, this environmental
     setting can be added to the 
