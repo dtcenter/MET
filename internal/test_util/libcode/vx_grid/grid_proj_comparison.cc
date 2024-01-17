@@ -1,7 +1,25 @@
-
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+// ** Copyright UCAR (c) 1992 - 2023
+// ** University Corporation for Atmospheric Research (UCAR)
+// ** National Center for Atmospheric Research (NCAR)
+// ** Research Applications Lab (RAL)
+// ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 ////////////////////////////////////////////////////////////////////////
-
+//
+//   Filename:   grid_proj_comparison.cc
+//
+//   Description:
+//      Locate the requested grid by name, instantiate it
+//      using the legacy grid code and the newer Proj-based
+//      grid code, and track the maximum location difference
+//      for each point in the grid.
+//
+//   Mod#   Date      Name            Description
+//   ----   ----      ----            -----------
+//
+////////////////////////////////////////////////////////////////////////
 
 using namespace std;
 
@@ -15,13 +33,23 @@ using namespace std;
 #include "vx_math.h"
 #include "vx_grid.h"
 
+////////////////////////////////////////////////////////////////////////
+
+static ConcatString program_name;
+
+static ConcatString GridName;
 
 ////////////////////////////////////////////////////////////////////////
 
+static void process_command_line(int, char **);
+static void usage();
+static void set_grid(const StringArray &);
 
-static const LambertData data = {
+////////////////////////////////////////////////////////////////////////
 
-   "adam_clark",        // name
+static const LambertData default_data = {
+
+   "LambertGrid",       // name
 
    'N',                 // hemisphere
 
@@ -30,7 +58,6 @@ static const LambertData data = {
     19.834, 120.051,    //  lat_pin, lot_pin
 
     0.0, 0.0,           //  x_pin, y_pin
-    // 5.0, 10.0,           //  x_pin, y_pin
 
     97.0,               //  lon_orient
 
@@ -42,136 +69,154 @@ static const LambertData data = {
 
 };
 
-
 ////////////////////////////////////////////////////////////////////////
 
+int met_main(int argc, char * argv[]) {
 
-int main()
-
-{
-
-const Grid g(data);
-ProjGrid p;
-Affine aff;
-ConcatString proj_params;
-double xx, yy;
-char junk[256];
-
-
-cout << "\n\n";
+   program_name = get_short_name(argv[0]);
 
    //
-   //  create the PROJ part of the transformation
+   // process the command line arguments
    //
+   process_command_line(argc, argv);
 
-   //
-   //  Note: PROJ lambert params explained at:
-   //
-   //     https://proj.org/en/9.3/operations/projections/lcc.html#lambert-conformal-conic
-   //
-
-   //   specify lambert conformal projection
-
-proj_params = "+proj=lcc";   //  lcc means lambert conformal conic
-
-   //   radius of earth
-
-sprintf(junk, "+R=%.3f", data.r_km);   //  earth radius
-
-proj_params << ' ' << junk;
-
-   //  the two secant latitudes for the lambert projection
-
-sprintf(junk, "+lat_1=%.3f +lat_2=%.3f", data.scale_lat_1, data.scale_lat_2);
-
-proj_params << ' ' << junk;
-
-   //  orientation longitude
-   //    note: PROJ calls it "Longitude of projection center"
-
-sprintf(junk, "+lon_0=%.3f", -(data.lon_orient));   //  note minus sign
-
-proj_params << ' ' << junk;
-
-   //  false easting and northing
-   //     (on second thought, we'll let the Affine class handle this)
-
-   //  ok
-
-cout << "proj_params = \"" << proj_params << "\"\n\n" << flush;
-
-p.set_proj(proj_params.c_str());
+   Grid g;
+   ProjGrid p;
 
    //
-   //  create the affine part of the transformation
+   // instantiate the grids
    //
+   if(GridName.nonempty()) {
 
-const double s = 1.0/(data.d_km);   //  scale factor
+      mlog << Debug(1) << "Reading grid named \"" << GridName << "\".\n";
 
-aff.set_mb(s, 0.0, 0.0, s, 0.0, 0.0);
+      if(!find_grid_by_name(GridName.c_str(), g)) {
+         mlog << Error << "\n" << program_name << " -> "
+              << "Legacy Grid name \"" << GridName << "\" not found!\n\n";
+         exit(1);
+      }
 
-p.set_affine(aff);
-
-
-p.latlon_to_xy(data.lat_pin, data.lon_pin, xx, yy);
-
-aff.set_b(data.x_pin - xx, data.y_pin - yy);
-
-p.set_affine(aff);   //  again
-
-   //
-   //  misc
-   //
-
-p.set_size(data.nx, data.ny);
-
-p.set_name(data.name);
-
-   //
-   //  find max error over grid
-   //
-
-int i, j;
-double er, max_er;
-double lat, lon;
-double px, py;
-
-
-max_er = 0.0;
-
-for (i=0; i<(g.nx()); ++i)  {
-
-   for (j=0; j<(g.ny()); ++j)  {
-
-      g.xy_to_latlon(i, j, lat, lon);
-
-      p.latlon_to_xy(lat, lon, px, py);
-
-      er = fabs(i - px) + fabs(j - py);
-
-      if ( er > max_er )  max_er = er;
-
+      if(!find_grid_by_name(GridName.c_str(), p))  {
+         mlog << Error << "\n" << program_name << " -> "
+              << "Proj Grid name \"" << GridName << "\" not found!\n\n";
+         exit(1);
+      }
+   }
+   else {
+      mlog << Debug(1) << "Reading default grid.\n";
+      g.set(default_data);
+      p.set(default_data);
    }
 
-}
-
-
-cout << "max error = " << max_er << "\n\n";
-
-
+   if(mlog.verbosity_level() >= 2) {
+      mlog << Debug(2) << "\nLegacy Grid Definition:\n\n";
+      g.dump(cout, 1);
+      mlog << Debug(2) << "\nProj Grid Definition:\n\n";
+      p.dump(cout, 1);
+   }
 
    //
-   //  done
+   // find max difference over grid
    //
+   double px, py, dx, dy, lat, lon, dist;
+   double max_dist = 0.0;
 
-return ( 0 );
+   for(int gx=0; gx<(g.nx()); ++gx) {
+      for(int gy=0; gy<(g.ny()); ++gy) {
 
+         g.xy_to_latlon(gx, gy, lat, lon);
+         p.latlon_to_xy(lat, lon, px, py);
+
+         dx = (double) gx - px;
+         dy = (double) gy - py;
+
+         dist = sqrt(dx*dx + dy*dy);
+
+         if(mlog.verbosity_level() >= 3) {
+            mlog << Debug(3)
+                 << "(grid_x, grid_y) = (" << gx << ", " << gy << "), "
+                 << "(lat, lon) = (" << lat << ", " << lon << "), "
+                 << "(proj_x, proj_y) = (" << px << ", " << py << "), "
+                 << "dist = " << dist << "\n";
+         }
+
+         if(dist > max_dist) max_dist = dist;
+      }
+   }
+
+   if ( !is_eq(max_dist, 0.0) ) {
+      mlog << Warning << "\nMaximum distance = " << max_dist << " > 0\n\n";
+   }
+   else {
+      mlog << Debug(1) << "Maximum distance = " << max_dist << "\n";
+   }
+
+   return(0);
 }
-
 
 ////////////////////////////////////////////////////////////////////////
 
+const string get_tool_name() {
+   return "grid_proj_comparison";
+}
 
+////////////////////////////////////////////////////////////////////////
 
+void process_command_line(int argc, char **argv) {
+   CommandLine cline;
 
+   //
+   // parse the command line into tokens
+   //
+   cline.set(argc, argv);
 
+   //
+   // set the usage function
+   //
+   cline.set_usage(usage);
+
+   //
+   // add the options function calls
+   //
+   cline.add(set_grid, "-grid", 1);
+
+   //
+   // parse the command line
+   //
+   cline.parse();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void usage() {
+
+   cout << "\n*** Model Evaluation Tools (MET" << met_version
+        << ") ***\n\n"
+
+        << "Usage: " << program_name << "\n"
+
+        << "\t[-grid name]\n"
+        << "\t[-log file]\n"
+        << "\t[-v level]\n\n"
+
+        << "\twhere\t\"-grid name\" overrides the default name of "
+        << "grid to be analyzed (optional).\n"
+
+        << "\t\t\"-log file\" outputs log messages to the specified "
+        << "file (optional).\n"
+
+        << "\t\t\"-v level\" overrides the default level of logging ("
+        << mlog.verbosity_level() << ") (optional).\n\n" << flush;
+
+   exit(1);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_grid(const StringArray &a) {
+   GridName = a[0];
+}
+
+////////////////////////////////////////////////////////////////////////
