@@ -662,5 +662,7 @@
     </param>
     <output>
       <ps>&OUTPUT_DIR;/plot_data_plane/wrf_bottom_top_stag.ps</ps>
+    </output>
+  </test>
 
 </met_test>
