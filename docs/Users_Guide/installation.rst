@@ -93,7 +93,7 @@ They are not required for MET to function, but depending on the user’s intende
 
 .. _compile_script_install:
 
-Using the compile_MET_all.sh Script
+Using the compile_MET_all.sh script
 ===================================
 
 The **compile_MET_all.sh** script is designed to install MET and,
