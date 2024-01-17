@@ -24,19 +24,19 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-static bool parse_lambert_grid(const StringArray &, Grid &);
+static bool parse_lambert_grid_string(const StringArray &, GridInfo &);
 
-static bool parse_latlon_grid(const StringArray &, Grid &);
+static bool parse_latlon_grid_string(const StringArray &, GridInfo &);
 
-static bool parse_rotlatlon_grid(const StringArray &, Grid &);
+static bool parse_rotlatlon_grid_string(const StringArray &, GridInfo &);
 
-static bool parse_stereographic_grid(const StringArray &, Grid &);
+static bool parse_stereographic_grid_string(const StringArray &, GridInfo &);
 
-static bool parse_mercator_grid(const StringArray &, Grid &);
+static bool parse_mercator_grid_string(const StringArray &, GridInfo &);
 
-static bool parse_gaussian_grid(const StringArray &, Grid &);
+static bool parse_gaussian_grid_string(const StringArray &, GridInfo &);
 
-static bool parse_laea_grid(const StringArray &, Grid &);
+static bool parse_laea_grid_string(const StringArray &, GridInfo &);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -55,12 +55,40 @@ if ( !status || !(i.ok()) )  return ( false );
 
 status = false;
 
-if ( i.lc )  { g.set( *(i.lc) );  status = true; }
-if ( i.st )  { g.set( *(i.st) );  status = true; }
-if ( i.ll )  { g.set( *(i.ll) );  status = true; }
-if ( i.m  )  { g.set( *(i.m)  );  status = true; }
-if ( i.g  )  { g.set( *(i.g)  );  status = true; }
-if ( i.la )  { g.set( *(i.la) );  status = true; }
+     if ( i.lc )  { g.set( *(i.lc) );  status = true; }
+else if ( i.st )  { g.set( *(i.st) );  status = true; }
+else if ( i.ll )  { g.set( *(i.ll) );  status = true; }
+else if ( i.m  )  { g.set( *(i.m)  );  status = true; }
+else if ( i.g  )  { g.set( *(i.g)  );  status = true; }
+else if ( i.la )  { g.set( *(i.la) );  status = true; }
+
+return ( status );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool find_grid_by_name(const char * name, ProjGrid & p)
+
+{
+
+GridInfo i;
+bool status = false;
+
+status = find_grid_by_name(name, i);
+
+if ( !status || !(i.ok()) )  return ( false );
+
+status = false;
+
+if ( i.lc )  { p.set( *(i.lc) );  status = true; }
+if ( i.st )  { p.set( *(i.st) );  status = true; }
+if ( i.ll )  { p.set( *(i.ll) );  status = true; }
+if ( i.m  )  { p.set( *(i.m)  );  status = true; }
+if ( i.g  )  { p.set( *(i.g)  );  status = true; }
+if ( i.la )  { p.set( *(i.la) );  status = true; }
 
 return ( status );
 
@@ -222,23 +250,23 @@ bool parse_grid_def(const StringArray &grid_strings, Grid & g)
 
 {
 
+GridInfo i;
 bool status = false;
 
-   //
-   //  parse supported projection types
-   //
+status = parse_grid_def(grid_strings, i);
 
-     if ( strcasecmp(grid_strings[0].c_str(), "lambert")   == 0 )  status = parse_lambert_grid(grid_strings, g);
-else if ( strcasecmp(grid_strings[0].c_str(), "latlon")    == 0 )  status = parse_latlon_grid(grid_strings, g);
-else if ( strcasecmp(grid_strings[0].c_str(), "rotlatlon") == 0 )  status = parse_rotlatlon_grid(grid_strings, g);
-else if ( strcasecmp(grid_strings[0].c_str(), "stereo")    == 0 )  status = parse_stereographic_grid(grid_strings, g);
-else if ( strcasecmp(grid_strings[0].c_str(), "mercator")  == 0 )  status = parse_mercator_grid(grid_strings, g);
-else if ( strcasecmp(grid_strings[0].c_str(), "gaussian")  == 0 )  status = parse_gaussian_grid(grid_strings, g);
-else                                                               status = false;
+if ( !status || !(i.ok()) )  return ( false );
 
    //
-   //  done
+   //  instantiate the legacy grid
    //
+
+     if ( i.lc )  { g.set( *(i.lc) );  status = true; }
+else if ( i.st )  { g.set( *(i.st) );  status = true; }
+else if ( i.ll )  { g.set( *(i.ll) );  status = true; }
+else if ( i.m  )  { g.set( *(i.m)  );  status = true; }
+else if ( i.g  )  { g.set( *(i.g)  );  status = true; }
+else if ( i.la )  { g.set( *(i.la) );  status = true; }
 
 return ( status );
 
@@ -248,11 +276,65 @@ return ( status );
 ////////////////////////////////////////////////////////////////////////
 
 
-bool parse_lambert_grid(const StringArray &grid_strings, Grid & g)
+bool parse_grid_def(const StringArray &grid_strings, ProjGrid & p)
 
 {
 
-Grid * ToGrid = (Grid *) 0;
+GridInfo i;
+bool status = false;
+
+status = parse_grid_def(grid_strings, i);
+
+if ( !status || !(i.ok()) )  return ( false );
+
+   //
+   //  instantiate the proj grid
+   //
+
+     if ( i.lc )  { p.set( *(i.lc) );  status = true; }
+else if ( i.st )  { p.set( *(i.st) );  status = true; }
+else if ( i.ll )  { p.set( *(i.ll) );  status = true; }
+else if ( i.m  )  { p.set( *(i.m)  );  status = true; }
+else if ( i.g  )  { p.set( *(i.g)  );  status = true; }
+else if ( i.la )  { p.set( *(i.la) );  status = true; }
+
+return ( status );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool parse_grid_def(const StringArray &grid_strings, GridInfo & i)
+
+{
+
+bool status = false;
+
+   //
+   //  parse supported projection types
+   //
+
+     if ( strcasecmp(grid_strings[0].c_str(), "lambert")   == 0 )  status = parse_lambert_grid_string(grid_strings, i);
+else if ( strcasecmp(grid_strings[0].c_str(), "latlon")    == 0 )  status = parse_latlon_grid_string(grid_strings, i);
+else if ( strcasecmp(grid_strings[0].c_str(), "rotlatlon") == 0 )  status = parse_rotlatlon_grid_string(grid_strings, i);
+else if ( strcasecmp(grid_strings[0].c_str(), "stereo")    == 0 )  status = parse_stereographic_grid_string(grid_strings, i);
+else if ( strcasecmp(grid_strings[0].c_str(), "mercator")  == 0 )  status = parse_mercator_grid_string(grid_strings, i);
+else if ( strcasecmp(grid_strings[0].c_str(), "gaussian")  == 0 )  status = parse_gaussian_grid_string(grid_strings, i);
+else                                                               status = false;
+
+return ( status );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool parse_lambert_grid_string(const StringArray &grid_strings, GridInfo & i)
+
+{
 
 LambertData ldata;
 
@@ -299,7 +381,7 @@ c          = grid_strings[j++].c_str();
 
 if ( m_strlen(c) != 1 )  {
 
-   mlog << Error << "\nparse_lambert_grid() -> "
+   mlog << Error << "\nparse_lambert_grid_string() -> "
         << "bad hemisphere in grid spec\n\n";
 
    exit ( 1 );
@@ -310,7 +392,7 @@ H = *c;
 
 if ( (H != 'N') && (H != 'S') )  {
 
-   mlog << Error << "\nparse_lambert_grid() -> "
+   mlog << Error << "\nparse_lambert_grid_string() -> "
         << "bad hemisphere in grid spec\n\n";
 
    exit ( 1 );
@@ -351,16 +433,11 @@ if ( !west_longitude_positive )  {
 
 }
 
-ToGrid = new Grid ( ldata );
-
-g = *ToGrid;
-
-if ( ToGrid )  { delete ToGrid; ToGrid = (Grid *) 0; }
+i.set( ldata );
 
    //
    //  done
    //
-
 
 return ( true );
 
@@ -370,11 +447,9 @@ return ( true );
 ////////////////////////////////////////////////////////////////////////
 
 
-bool parse_stereographic_grid(const StringArray &grid_strings, Grid & g)
+bool parse_stereographic_grid_string(const StringArray &grid_strings, GridInfo & i)
 
 {
-
-Grid * ToGrid = (Grid *) 0;
 
 StereographicData sdata;
 
@@ -382,7 +457,7 @@ const int N = grid_strings.n_elements();
 
 if ( N != 10 )  {
 
-   mlog << Warning << "\nparse_stereographic_grid() -> "
+   mlog << Warning << "\nparse_stereographic_grid_string() -> "
         << "polar stereographic grid spec should have 10 entries\n\n";
 
    return ( false );
@@ -420,7 +495,7 @@ c          = grid_strings[j++].c_str();
 
 if ( m_strlen(c) != 1 )  {
 
-   mlog << Error << "\nparse_stereographic_grid() -> "
+   mlog << Error << "\nparse_stereographic_grid_string() -> "
         << "bad hemisphere in grid spec\n\n";
 
    exit ( 1 );
@@ -431,7 +506,7 @@ H = *c;
 
 if ( (H != 'N') && (H != 'S') )  {
 
-   mlog << Error << "\nparse_stereographic_grid() -> "
+   mlog << Error << "\nparse_stereographic_grid_string() -> "
         << "bad hemisphere in grid spec\n\n";
 
    exit ( 1 );
@@ -475,16 +550,11 @@ sdata.false_north = 0.;
 sdata.scale_factor = 1.0;
 sdata.dy_km = sdata.d_km;
 
-ToGrid = new Grid ( sdata );
-
-g = *ToGrid;
-
-if ( ToGrid )  { delete ToGrid; ToGrid = (Grid *) 0; }
+i.set( sdata );
 
    //
    //  done
    //
-
 
 return ( true );
 
@@ -494,11 +564,9 @@ return ( true );
 ////////////////////////////////////////////////////////////////////////
 
 
-bool parse_latlon_grid(const StringArray &grid_strings, Grid & g)
+bool parse_latlon_grid_string(const StringArray &grid_strings, GridInfo & i)
 
 {
-
-Grid * ToGrid = (Grid *) 0;
 
 LatLonData ldata;
 
@@ -506,7 +574,7 @@ const int N = grid_strings.n_elements();
 
 if ( N != 7 )  {
 
-   mlog << Error << "\nparse_latlon_grid() -> "
+   mlog << Error << "\nparse_latlon_grid_string() -> "
         << "latlon grid spec should have 7 entries\n\n";
 
    exit ( 1 );
@@ -554,17 +622,11 @@ if ( !west_longitude_positive )  {
 
 }
 
-ToGrid = new Grid ( ldata );
-
-g = *ToGrid;
-
-if ( ToGrid )  { delete ToGrid; ToGrid = (Grid *) 0; }
-
+i.set( ldata );
 
    //
    //  done
    //
-
 
 return ( true );
 
@@ -574,11 +636,9 @@ return ( true );
 ////////////////////////////////////////////////////////////////////////
 
 
-bool parse_rotlatlon_grid(const StringArray &grid_strings, Grid & g)
+bool parse_rotlatlon_grid_string(const StringArray &grid_strings, GridInfo & i)
 
 {
-
-Grid * ToGrid = (Grid *) 0;
 
 RotatedLatLonData rdata;
 
@@ -586,7 +646,7 @@ const int N = grid_strings.n_elements();
 
 if ( N != 10 )  {
 
-   mlog << Error << "\nparse_rotlatlon_grid() -> "
+   mlog << Error << "\nparse_rotlatlon_grid_string() -> "
         << "rotatedlatlon grid spec should have 10 entries\n\n";
 
    exit ( 1 );
@@ -645,12 +705,7 @@ if ( !west_longitude_positive )  {
 
 }
 
-ToGrid = new Grid ( rdata );
-
-g = *ToGrid;
-
-if ( ToGrid )  { delete ToGrid; ToGrid = (Grid *) 0; }
-
+i.set( rdata );
 
    //
    //  done
@@ -665,11 +720,9 @@ return ( true );
 ////////////////////////////////////////////////////////////////////////
 
 
-bool parse_mercator_grid(const StringArray &grid_strings, Grid & g)
+bool parse_mercator_grid_string(const StringArray &grid_strings, GridInfo & i)
 
 {
-
-Grid * ToGrid = (Grid *) 0;
 
 MercatorData mdata;
 
@@ -677,7 +730,7 @@ const int N = grid_strings.n_elements();
 
 if ( N != 7 )  {
 
-   mlog << Error << "\nparse_mercator_grid() -> "
+   mlog << Error << "\nparse_mercator_grid_string() -> "
         << "mercator grid spec should have 7 entries\n\n";
 
    exit ( 1 );
@@ -727,11 +780,7 @@ if ( !west_longitude_positive )  {
 
 }
 
-ToGrid = new Grid ( mdata );
-
-g = *ToGrid;
-
-if ( ToGrid )  { delete ToGrid; ToGrid = (Grid *) 0; }
+i.set( mdata );
 
    //
    //  done
@@ -746,11 +795,9 @@ return ( true );
 ////////////////////////////////////////////////////////////////////////
 
 
-bool parse_gaussian_grid(const StringArray &grid_strings, Grid & g)
+bool parse_gaussian_grid_string(const StringArray &grid_strings, GridInfo & i)
 
 {
-
-Grid * ToGrid = (Grid *) 0;
 
 GaussianData gdata;
 
@@ -758,7 +805,7 @@ const int N = grid_strings.n_elements();
 
 if ( N != 4 )  {
 
-   mlog << Error << "\nparse_gaussian_grid() -> "
+   mlog << Error << "\nparse_gaussian_grid_string() -> "
         << "gaussian grid spec should have 4 entries\n\n";
 
    exit ( 1 );
@@ -796,11 +843,7 @@ if ( !west_longitude_positive )  {
 
 }
 
-ToGrid = new Grid ( gdata );
-
-g = *ToGrid;
-
-if ( ToGrid )  { delete ToGrid; ToGrid = (Grid *) 0; }
+i.set( gdata );
 
    //
    //  done

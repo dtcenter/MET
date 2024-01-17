@@ -39,10 +39,15 @@ static const bool west_longitude_positive = false;
 
 extern bool find_grid_by_name(const char *, Grid &);
 
+extern bool find_grid_by_name(const char *, ProjGrid &);
+
 extern bool find_grid_by_name(const char *, GridInfo &);
 
 extern bool parse_grid_def(const StringArray &, Grid &);
 
+extern bool parse_grid_def(const StringArray &, ProjGrid &);
+
+extern bool parse_grid_def(const StringArray &, GridInfo &);
 
 ////////////////////////////////////////////////////////////////////////
 
