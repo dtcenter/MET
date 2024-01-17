@@ -743,9 +743,9 @@ fi
 configure_cmd="${configure_cmd} ${OPT_ARGS}"
 
 echo "cd `pwd`"
-run_cmd "${configure_cmd} > met.configure.log 2>&1"
+run_cmd "${configure_cmd} > configure.log 2>&1"
 run_cmd "make ${MAKE_ARGS} > met.make.log 2>&1"
-run_cmd "make ${MAKE_ARGS} install > met.make_install.log 2>&1"
-run_cmd "make ${MAKE_ARGS} test > met.make_test.log 2>&1"
+run_cmd "make install > met.make_install.log 2>&1"
+run_cmd "make test > met.make_test.log 2>&1"
 
 echo "Finished compiling at `date`"
