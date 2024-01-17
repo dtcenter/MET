@@ -17,6 +17,7 @@ that are dependent on compiler usage, modulefiles, etc.
 There are multiple supported methods for installing MET: using a provided
 compilation script, Docker instances, and Apptainer instances.
 All of these methods will be described below. The recommended method is
+using the provided
 :ref:`compile_script_install`.
 
 Some organizations have access to precompiled versions of MET on
@@ -111,7 +112,7 @@ installed. Assuming that the following guidance uses “/d1” as the parent dir
 a suggested format is a path to a “met” directory, followed by the version number 
 subdirectory (e.g. */d1/met/12.0.0*). 
 Next, download the
-`compile_MET_all.sh <https://raw.githubusercontent.com/dtcenter/MET/main_v11.1/internal/scripts/installation/compile_MET_all.sh>`_
+`compile_MET_all.sh <https://raw.githubusercontent.com/dtcenter/MET/main_v12.0/internal/scripts/installation/compile_MET_all.sh>`_
 script and 
 `tar_files.tgz <https://dtcenter.ucar.edu/dfiles/code/METplus/MET/installation/tar_files.tgz>`_ 
 file and place both of these files in the
