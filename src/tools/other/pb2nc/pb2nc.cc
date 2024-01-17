@@ -117,6 +117,7 @@ static const char * default_config_filename = "MET_BASE/config/PB2NCConfig_defau
 
 static const char *program_name = "pb2nc";
 static const char *not_assigned = "not_assigned";
+static const char *tmp_pb2nc_base = "tmp_pb2nc_blk";
 
 constexpr static float fill_value   = -9999.f;
 constexpr static int missing_cycle_minute = -1;
@@ -308,7 +309,7 @@ static vector< Observation > observations;
 //
 // Output NetCDF file, dimensions, and variables
 //
-static NcFile *f_out      = (NcFile *) 0;
+static NcFile *f_out      = (NcFile *) nullptr;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -460,8 +461,6 @@ derive_var_cfg &derive_var_cfg::operator=(const derive_var_cfg &a) noexcept {
 
 
 int met_main(int argc, char *argv[]) {
-   int i;
-
    // Initialize static variables
    initialize();
 
@@ -470,7 +469,7 @@ int met_main(int argc, char *argv[]) {
 
    if (collect_metadata) {
       // Process each PrepBufr file
-      for(i=0; i<pbfile.n_elements(); i++) {
+      for(int i=0; i<pbfile.n_elements(); i++) {
          process_pbfile_metadata(i);
       }
       display_bufr_variables(tableB_vars, tableB_descs,
@@ -482,7 +481,7 @@ int met_main(int argc, char *argv[]) {
       open_netcdf();
 
       // Process each PrepBufr file
-      for(i=0; i<pbfile.n_elements(); i++) {
+      for(int i=0; i<pbfile.n_elements(); i++) {
          process_pbfile_metadata(i);
          process_pbfile(i);
       }
@@ -663,7 +662,7 @@ ConcatString save_bufr_table_to_file(const char *blk_file, int _file_id) {
    ConcatString tbl_filename;
    ConcatString tbl_prefix;
 
-   tbl_prefix << conf_info.tmp_dir << "/" << "tmp_pb2nc_bufr";
+   tbl_prefix << conf_info.tmp_dir << "/" << tmp_pb2nc_base;
    tbl_filename = make_temp_file_name(tbl_prefix.c_str(), "tbl");
    len = tbl_filename.length();
    if (_file_id > MAX_FORTRAN_FILE_ID || _file_id < MIN_FORTRAN_FILE_ID) {
@@ -673,9 +672,7 @@ ConcatString save_bufr_table_to_file(const char *blk_file, int _file_id) {
    openpb_(blk_file, &_file_id);
    dump_tbl_(blk_file, &_file_id, tbl_filename.c_str(), &len);
    closepb_(&_file_id);
-   
-   // Delete the temporary blocked file
-   remove_temp_file((string)blk_file);
+
    return tbl_filename;
 }
 
@@ -689,7 +686,7 @@ bool is_prepbufr_file(const StringArray *events) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void get_variable_info(const char* tbl_filename) {
+void get_variable_info(ConcatString blk_file, int unit) {
    static const char *method_name = "  get_variable_info()";
 
    FILE * fp;
@@ -704,8 +701,9 @@ void get_variable_info(const char* tbl_filename) {
    tableB_vars.clear();
    tableB_descs.clear();
 
-   fp = fopen(tbl_filename, "r");
-   ConcatString input_data;
+   ConcatString tbl_filename = save_bufr_table_to_file(blk_file.c_str(), unit);
+
+   fp = fopen(tbl_filename.c_str(), "r");
    if (fp != nullptr) {
       char var_name[BUFR_NAME_LEN+1];
       char var_desc[max(BUFR_DESCRIPTION_LEN,BUFR_SEQUENCE_LEN)+1];
@@ -822,6 +820,8 @@ void get_variable_info(const char* tbl_filename) {
       if (line) free(line);
 
    }
+
+   remove_temp_file(tbl_filename);
    return;
 }
 
@@ -922,7 +922,7 @@ void process_pbfile(int i_pb) {
    file_name << pbfile[i_pb];
 
    // Build the temporary block file name
-   blk_prefix << conf_info.tmp_dir << "/" << "tmp_pb2nc_blk";
+   blk_prefix << conf_info.tmp_dir << "/" << tmp_pb2nc_base;
    blk_file = make_temp_file_name(blk_prefix.c_str(), nullptr);
 
    mlog << Debug(1) << "Blocking Bufr file to:\t" << blk_file << "\n";
@@ -2125,7 +2125,7 @@ void process_pbfile_metadata(int i_pb) {
    bool check_all = do_all_vars || collect_metadata;
    char hdr_typ[max_str_len];
    StringArray tmp_bufr_obs_name_arr;
-   ConcatString file_name, blk_prefix, blk_file, blk_prefix2;
+   ConcatString file_name, blk_prefix, blk_file;
    static const char *method_name = "process_pbfile_metadata()";
 
    // Collects the BUFR variables including header variables
@@ -2138,10 +2138,9 @@ void process_pbfile_metadata(int i_pb) {
    file_name << pbfile[i_pb];
 
    // Build the temporary block file name
-   blk_prefix  << conf_info.tmp_dir << "/" << "tmp_pb2nc_meta_blk";
-   blk_prefix2 << conf_info.tmp_dir << "/" << "tmp_pb2nc_tbl_blk";
+   blk_prefix << conf_info.tmp_dir << "/" << tmp_pb2nc_base";
 
-   blk_file = make_temp_file_name(blk_prefix2.c_str(), nullptr);
+   blk_file = make_temp_file_name(blk_prefix.c_str(), nullptr);
 
    mlog << Debug(3) << "   Blocking Bufr file (metadata) to:\t" << blk_file << "\n";
 
@@ -2150,15 +2149,14 @@ void process_pbfile_metadata(int i_pb) {
    pblock(file_name.c_str(), blk_file.c_str(), block);
 
    unit = dump_unit + i_pb + file_unit;
-   ConcatString tbl_filename = save_bufr_table_to_file(blk_file.c_str(), unit);
-   get_variable_info(tbl_filename.c_str());
-   if(mlog.verbosity_level() < debug_threshold) remove_temp_file(tbl_filename);
+   if (unit > MAX_FORTRAN_FILE_ID || unit < MIN_FORTRAN_FILE_ID) {
+      mlog << Error << "\n" << method_name << " -> "
+           << "Invalid file ID [" << unit << "] between 1 and 99 for BUFR table.\n\n";
+   }
+   get_variable_info(blk_file, unit);
 
-   // Assume that the input PrepBufr file is unblocked.
-   // Block the PrepBufr file and open it for reading.
+   // The input PrepBufr file is blocked already.
    unit = dump_unit + i_pb;
-   blk_file = make_temp_file_name(blk_prefix.c_str(), nullptr);
-   pblock(file_name.c_str(), blk_file.c_str(), block);
    if (unit > MAX_FORTRAN_FILE_ID || unit < MIN_FORTRAN_FILE_ID) {
       mlog << Error << "\n" << method_name << " -> "
            << "Invalid file ID [" << unit << "] between 1 and 99.\n\n";
@@ -2168,9 +2166,6 @@ void process_pbfile_metadata(int i_pb) {
    numpbmsg_new_(blk_file.c_str(), &unit, &npbmsg);
    mlog << Debug(1) << method_name << " -> "
         << "the number of records: " << npbmsg << "\n";
-
-   // Open the blocked temp PrepBufr file for reading
-   openpb_(blk_file.c_str(), &unit);
 
    // Use the number of records requested by the user if there
    // are enough present.
@@ -2189,13 +2184,14 @@ void process_pbfile_metadata(int i_pb) {
            << "No Bufr messages to process in file: "
            << pbfile[i_pb] << "\n\n";
 
-      closepb_(&unit);
-
       // Delete the temporary blocked file
       remove_temp_file(blk_file);
 
       return;
    }
+
+   // Open the blocked temp PrepBufr file for reading
+   openpb_(blk_file.c_str(), &unit);
 
    // Initialize counts
    i_ret = i_msg = 0;
