@@ -15,8 +15,10 @@ using namespace std;
 #include <iostream>
 
 #include "vx_util.h"
+#include "vx_log.h"
 
 #include "proj_grid.h"
+#include "find_grid_by_name.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -88,6 +90,20 @@ return ( * this );
 ////////////////////////////////////////////////////////////////////////
 
 
+ProjGrid::ProjGrid(const char * _name)
+
+{
+
+init_from_scratch();
+
+set(_name);
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void ProjGrid::init_from_scratch()
 
 {
@@ -97,6 +113,104 @@ info = make_shared<ProjInfo>();
 Nx = Ny = 0;
 
 return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+ProjGrid::ProjGrid(const LambertData &data)
+
+{
+
+init_from_scratch();
+
+set(data);
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+ProjGrid::ProjGrid(const StereographicData &data)
+
+{
+
+init_from_scratch();
+
+set(data);
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+ProjGrid::ProjGrid(const LatLonData &data)
+
+{
+
+init_from_scratch();
+
+set(data);
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+ProjGrid::ProjGrid(const RotatedLatLonData &data)
+
+{
+
+init_from_scratch();
+
+set(data);
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+ProjGrid::ProjGrid(const MercatorData &data)
+
+{
+
+init_from_scratch();
+
+set(data);
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+ProjGrid::ProjGrid(const GaussianData &data)
+
+{
+
+init_from_scratch();
+
+set(data);
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+ProjGrid::ProjGrid(const LaeaData &data)
+
+{
+
+init_from_scratch();
+
+set(data);
 
 }
 
@@ -181,6 +295,175 @@ out << prefix << "pj = " << (info->pj)  << '\n';
 out.flush();
 
 return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void ProjGrid::set(const char * _name)
+
+{
+
+clear();
+
+bool status = find_grid_by_name(_name, *this);
+
+if ( !status )  {
+
+   mlog << Error << "\nProjGrid::set(const char *) -> "
+        << "grid lookup failed for name \""
+        << _name << "\"\n\n";
+
+   exit ( 1 );
+
+}
+
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void ProjGrid::set(const LambertData & data)
+
+{
+
+ConcatString cs;
+double xx, yy;
+
+Proj_Set = "+proj=lcc";   //  lcc means lambert conformal conic
+
+   //   radius of earth
+
+cs.format("+R=%.3f", data.r_km);
+
+Proj_Set << ' ' << cs;
+
+   //  the two secant latitudes for the lambert projection
+
+cs.format("+lat_1=%.3f +lat_2=%.3f", data.scale_lat_1, data.scale_lat_2);
+
+Proj_Set << ' ' << cs;
+
+   //  orientation longitude
+   //    note: PROJ calls it "Longitude of projection center"
+
+cs.format("+lon_0=%.3f", -(data.lon_orient));   //  note minus sign
+
+Proj_Set << ' ' << cs;
+
+mlog << Debug(4) << "Lambert Conformal proj parameters: " << Proj_Set << "\n";
+
+set_proj(Proj_Set.c_str());
+
+   //  create the affine part of the transformation
+
+const double s = 1.0/(data.d_km);   //  scale factor
+
+Aff.set_mb(s, 0.0, 0.0, s, 0.0, 0.0);
+
+latlon_to_xy(data.lat_pin, data.lon_pin, xx, yy);
+
+Aff.set_b(data.x_pin - xx, data.y_pin - yy);
+
+set_size(data.nx, data.ny);
+
+set_name(data.name);
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void ProjGrid::set(const StereographicData & data)
+
+{
+
+mlog << Error << "\nvoid ProjGrid::set(const StereographicData & data) -> "
+     << "not yet implemented\n\n";
+
+exit ( 1 );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void ProjGrid::set(const LatLonData & data)
+
+{
+
+mlog << Error << "\nvoid ProjGrid::set(const LatLonData & data) -> "
+     << "not yet implemented\n\n";
+
+exit ( 1 );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void ProjGrid::set(const RotatedLatLonData & data)
+
+{
+
+mlog << Error << "\nvoid ProjGrid::set(const RotatedLatLonData & data) -> "
+     << "not yet implemented\n\n";
+
+exit ( 1 );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void ProjGrid::set(const MercatorData & data)
+
+{
+
+mlog << Error << "\nvoid ProjGrid::set(const MercatorData & data) -> "
+     << "not yet implemented\n\n";
+
+exit ( 1 );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void ProjGrid::set(const GaussianData & data)
+
+{
+
+mlog << Error << "\nvoid ProjGrid::set(const GaussianData & data) -> "
+     << "not yet implemented\n\n";
+
+exit ( 1 );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void ProjGrid::set(const LaeaData & data)
+
+{
+
+mlog << Error << "\nvoid ProjGrid::set(const LaeaData & data) -> "
+     << "not yet implemented\n\n";
+
+exit ( 1 );
 
 }
 

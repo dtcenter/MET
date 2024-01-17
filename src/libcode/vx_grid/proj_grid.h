@@ -22,6 +22,13 @@
 
 #include "vx_math.h"
 
+#include "lc_grid_defs.h"
+#include "st_grid_defs.h"
+#include "latlon_grid_defs.h"
+#include "merc_grid_defs.h"
+#include "gaussian_grid_defs.h"
+#include "laea_grid_defs.h"
+
 extern "C" {
 
 #include "proj.h"
@@ -76,6 +83,14 @@ class ProjGrid {
    public:
 
       ProjGrid();
+      ProjGrid(const char *);   //  lookup by name
+      ProjGrid(const LambertData       &);
+      ProjGrid(const StereographicData &);
+      ProjGrid(const LatLonData        &);
+      ProjGrid(const RotatedLatLonData &);
+      ProjGrid(const MercatorData      &);
+      ProjGrid(const GaussianData      &);
+      ProjGrid(const LaeaData          &);
      ~ProjGrid();
       ProjGrid(const ProjGrid &);
       ProjGrid & operator=(const ProjGrid &);
@@ -84,10 +99,18 @@ class ProjGrid {
 
       void dump(std::ostream &, int = 0) const;
 
-
          //
          //  set stuff
          //
+
+      void set(const char *);   //  lookup by name
+      void set(const LambertData       &);
+      void set(const StereographicData &);
+      void set(const LatLonData        &);
+      void set(const RotatedLatLonData &);
+      void set(const MercatorData      &);
+      void set(const GaussianData      &);
+      void set(const LaeaData          &);
 
       void set_proj(const char *);   //  string used to initialize the PROJ stuff
 
@@ -103,6 +126,7 @@ class ProjGrid {
 
       int nx() const;
       int ny() const;
+      int nxy() const;
 
       const char * name() const;
 
@@ -131,6 +155,7 @@ inline void ProjGrid::set_affine(const Affine & _aff)  { Aff = _aff;  return; }
 
 inline int  ProjGrid::nx() const  { return ( Nx ); }
 inline int  ProjGrid::ny() const  { return ( Ny ); }
+inline int  ProjGrid::nxy() const { return ( Nx*Ny ); }
 
 inline const char * ProjGrid::name() const  { return ( Name.text() ); }
 
