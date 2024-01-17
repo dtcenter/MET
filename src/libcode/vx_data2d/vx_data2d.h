@@ -29,6 +29,7 @@
 #include "leveltype_to_string.h"
 #include "var_info.h"
 #include "table_lookup.h"
+#include "mask_filters.h"
 
 
 ////////////////////////////////////////////////////////////////////////

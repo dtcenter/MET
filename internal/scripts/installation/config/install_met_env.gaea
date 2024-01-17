@@ -10,3 +10,5 @@ export MET_PYTHON_CC=-I${MET_PYTHON}/include/python3.10
 export MET_PYTHON_LD=-L${MET_PYTHON}/lib/python3.10/config-3.10-x86_64-linux-gnu\ -L${MET_PYTHON}/lib\ -lpython3.10\ -lcrypt\ -lpthread\ -ldl\ -lutil\ -lm
 export EXTERNAL_LIBS=/usw/met/12.0.0-beta1/external_libs
 export LIB_Z=${EXTERNAL_LIBS}/lib
+export MAKE_ARGS=-j
+export CXXFLAGS="-std=c++11"
