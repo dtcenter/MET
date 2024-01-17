@@ -214,9 +214,8 @@ def build_tests(test_root):
     #mgnc = ?
     #mpnc = ?
 
+    # find all tests in test_xml, and create a dictionary of attributes for each test
     test_list = []
-    # read list of tests from test_xml
-    # for each test
     for test_el in test_root.iter('test'):
         test = {}
         test['name'] = test_el.attrib['name']
@@ -225,85 +224,35 @@ def build_tests(test_root):
         for el in test_el:
             if (el.tag=='exec' or el.tag=='param'):
                 test[el.tag] = repl_env(el.text)
-                # handle env variable in el.text
             elif el.tag=='output':
-                # build output file array (filename by output type)
-                pass
+                for output_el in el:
+                    test[output_el.tag] = repl_env(output_el.text)
+                    # these keys need to be renamed, e.g. point_nc --> out_pnc
+                    #           "point_nc"  : "out_pnc"
+                    #           "grid_nc"   : "out_gnc"
+                    #           "stat"      : "out_stat"
+                    #           "ps"        : "out_ps"
+                    #           "exist"     : "out exist"
+                    #           "not_exist" : "out_not_exist"
             elif el.tag=='env':
-                # set env variables from name/value pairs
-                pass
+                env_dict = {}
+                for env_el in el:
+                    env_dict[env_el.find('name').text] = env_el.find('value').text
+                    # check for missing names/values:
+#                   $pair_name or die "ERROR: env pair in test \"" . $test{"name"} . "\" " .
+#                               "missing name or value\n";                          
+
+                test['env'] = env_dict
 
         #   validate test format/details
         test_list.append(test)
+        #     # verify the structure of the test element
+        #     $test{"exec"}   or die "ERROR: test " . $test{"name"} . " missing exec element\n";
+        #     $test{"param"}  or die "ERROR: test " . $test{"name"} . " missing param element\n";
+        #     ( $test{"out_pnc"} && $test{"out_gnc"} && $test{"out_stat"} && $test{"out_ps"} && $test{"out_exist"} && $test{"out_not_exist"} ) 
+        #                     or die "ERROR: test " . $test{"name"} . " missing output element\n";
 
     return test_list
-
-#       # build the output file arrays
-#       if( $test_child eq "output" ){
-#         local @_ = @{ $childs[0] };
-#         shift and shift @childs;
-
-#         my (@out_pncs, @out_gncs, @out_stats, @out_pss, @out_exists, @out_not_exists);
-#         while( @_ ){
-#           my $out_child = shift;
-#           $out_child or shift and next;
-#           "point_nc"  eq $out_child and push @out_pncs,       repl_env($_[0][2]);
-#           "grid_nc"   eq $out_child and push @out_gncs,       repl_env($_[0][2]);
-#           "stat"      eq $out_child and push @out_stats,      repl_env($_[0][2]);   
-#           "ps"        eq $out_child and push @out_pss,        repl_env($_[0][2]);
-#           "exist"     eq $out_child and push @out_exists,     repl_env($_[0][2]);
-#           "not_exist" eq $out_child and push @out_not_exists, repl_env($_[0][2]);          
-#           shift;
-#         }
-
-#         @test{ ("out_pnc",  "out_gnc",   "out_stat",  "out_ps",  "out_exist",  "out_not_exist") } = 
-#                (\@out_pncs, \@out_gncs,  \@out_stats, \@out_pss, \@out_exists, \@out_not_exists);
-#       }
-
-#       # build the environment map
-#       elsif( $test_child eq "env" ){
-#         local @_ = @{ $childs[0] };
-#         shift and shift @childs;
-
-#         my %env;
-#         while( @_ ){
-#           my $env_child = shift;
-#           $env_child or shift and next;
-
-#           # parse the pair name and value
-#           if( "pair" eq $env_child ){
-#             my @pair_childs = @{ $_[0] };
-#             shift @pair_childs;
-#             my ($pair_name, $pair_value);
-#             while( @pair_childs ){
-#               my $pair_child = shift @pair_childs;
-#               $pair_child or shift @pair_childs and next;
-#               "name"  eq $pair_child and $pair_name  = $pair_childs[0][2];
-#               "value" eq $pair_child and $pair_value = $pair_childs[0][2];
-#             }
-#             $pair_name or die "ERROR: env pair in test \"" . $test{"name"} . "\" " .
-#                               "missing name or value\n";            
-#             $env{$pair_name} = defined($pair_value) ? $pair_value : "";
-#           }
-#           $test{"env"} = \%env;
-#         }
-#       }
-
-#     }
-
-#     # verify the structure of the test element
-#     $test{"exec"}   or die "ERROR: test " . $test{"name"} . " missing exec element\n";
-#     $test{"param"}  or die "ERROR: test " . $test{"name"} . " missing param element\n";
-#     ( $test{"out_pnc"} && $test{"out_gnc"} && $test{"out_stat"} && $test{"out_ps"} && $test{"out_exist"} && $test{"out_not_exist"} ) 
-#                     or die "ERROR: test " . $test{"name"} . " missing output element\n";
-
-#     # add the test to the list of parsed tests
-#     push @tests, \%test;
-
-#   }  # END: while( @_ )
-
-#   return @tests;
-# }
 
 
 def repl_env(string_with_ref):
