@@ -89,7 +89,8 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 @ENABLE_PYTHON_TRUE@am__append_1 = -lvx_python3_utils
-noinst_PROGRAMS = test_read$(EXEEXT) test_read_prob$(EXEEXT)
+noinst_PROGRAMS = test_read$(EXEEXT) test_read_prob$(EXEEXT) \
+	test_read_rmw$(EXEEXT)
 subdir = internal/test_util/libcode/vx_tc_util
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
@@ -117,6 +118,14 @@ test_read_prob_DEPENDENCIES = $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1)
 test_read_prob_LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
 	$(test_read_prob_LDFLAGS) $(LDFLAGS) -o $@
+am_test_read_rmw_OBJECTS = test_read_rmw-test_read_rmw.$(OBJEXT)
+test_read_rmw_OBJECTS = $(am_test_read_rmw_OBJECTS)
+test_read_rmw_DEPENDENCIES = $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1)
+test_read_rmw_LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
+	$(test_read_rmw_LDFLAGS) $(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -133,7 +142,8 @@ DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__maybe_remake_depfiles = depfiles
 am__depfiles_remade = ./$(DEPDIR)/test_read-test_read.Po \
-	./$(DEPDIR)/test_read_prob-test_read_prob.Po
+	./$(DEPDIR)/test_read_prob-test_read_prob.Po \
+	./$(DEPDIR)/test_read_rmw-test_read_rmw.Po
 am__mv = mv -f
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -152,8 +162,10 @@ AM_V_CXXLD = $(am__v_CXXLD_@AM_V@)
 am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
 am__v_CXXLD_0 = @echo "  CXXLD   " $@;
 am__v_CXXLD_1 = 
-SOURCES = $(test_read_SOURCES) $(test_read_prob_SOURCES)
-DIST_SOURCES = $(test_read_SOURCES) $(test_read_prob_SOURCES)
+SOURCES = $(test_read_SOURCES) $(test_read_prob_SOURCES) \
+	$(test_read_rmw_SOURCES)
+DIST_SOURCES = $(test_read_SOURCES) $(test_read_prob_SOURCES) \
+	$(test_read_rmw_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -408,6 +420,42 @@ test_read_prob_LDADD = -lvx_stat_out \
 	-lvx_log \
 	-lm -lproj -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas -lvx_util
 
+test_read_rmw_SOURCES = test_read_rmw.cc
+test_read_rmw_CPPFLAGS = ${MET_CPPFLAGS}
+test_read_rmw_LDFLAGS = -L. ${MET_LDFLAGS}
+test_read_rmw_LDADD = -lvx_stat_out \
+	-lvx_statistics \
+	-lvx_shapedata \
+	-lvx_gsl_prob \
+	-lvx_analysis_util \
+	-lvx_tc_util \
+	-lvx_shapedata \
+	-lvx_util_math \
+	-lvx_util \
+	$(PYTHON_MET_LIBS) $(PYTHON_DEP_LIBS) \
+	-lvx_statistics \
+	-lvx_data2d_factory \
+	-lvx_data2d_nc_met \
+	-lvx_data2d_nc_pinterp \
+	$(PYTHON_MET_LIBS) $(PYTHON_DEP_LIBS) \
+	-lvx_data2d_nccf \
+	-lvx_data2d_grib $(GRIB2_MET_LIBS) $(GRIB2_DEP_LIBS) \
+	-lvx_data2d \
+	-lvx_nc_util \
+	-lvx_regrid \
+	-lvx_grid \
+	-lvx_geodesy \
+	-lvx_config \
+	-lvx_gsl_prob \
+	-lvx_cal \
+	-lvx_nav \
+	-lvx_util_math \
+	-lvx_util \
+	-lvx_math \
+	-lvx_color \
+	-lvx_log \
+	-lm -lproj -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas -lvx_util
+
 all: all-am
 
 .SUFFIXES:
@@ -453,6 +501,10 @@ test_read_prob$(EXEEXT): $(test_read_prob_OBJECTS) $(test_read_prob_DEPENDENCIES
 	@rm -f test_read_prob$(EXEEXT)
 	$(AM_V_CXXLD)$(test_read_prob_LINK) $(test_read_prob_OBJECTS) $(test_read_prob_LDADD) $(LIBS)
 
+test_read_rmw$(EXEEXT): $(test_read_rmw_OBJECTS) $(test_read_rmw_DEPENDENCIES) $(EXTRA_test_read_rmw_DEPENDENCIES) 
+	@rm -f test_read_rmw$(EXEEXT)
+	$(AM_V_CXXLD)$(test_read_rmw_LINK) $(test_read_rmw_OBJECTS) $(test_read_rmw_LDADD) $(LIBS)
+
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
 
@@ -461,6 +513,7 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_read-test_read.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_read_prob-test_read_prob.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_read_rmw-test_read_rmw.Po@am__quote@ # am--include-marker
 
 $(am__depfiles_remade):
 	@$(MKDIR_P) $(@D)
@@ -509,6 +562,20 @@ test_read_prob-test_read_prob.obj: test_read_prob.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='test_read_prob.cc' object='test_read_prob-test_read_prob.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_read_prob_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test_read_prob-test_read_prob.obj `if test -f 'test_read_prob.cc'; then $(CYGPATH_W) 'test_read_prob.cc'; else $(CYGPATH_W) '$(srcdir)/test_read_prob.cc'; fi`
+
+test_read_rmw-test_read_rmw.o: test_read_rmw.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_read_rmw_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test_read_rmw-test_read_rmw.o -MD -MP -MF $(DEPDIR)/test_read_rmw-test_read_rmw.Tpo -c -o test_read_rmw-test_read_rmw.o `test -f 'test_read_rmw.cc' || echo '$(srcdir)/'`test_read_rmw.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/test_read_rmw-test_read_rmw.Tpo $(DEPDIR)/test_read_rmw-test_read_rmw.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='test_read_rmw.cc' object='test_read_rmw-test_read_rmw.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_read_rmw_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test_read_rmw-test_read_rmw.o `test -f 'test_read_rmw.cc' || echo '$(srcdir)/'`test_read_rmw.cc
+
+test_read_rmw-test_read_rmw.obj: test_read_rmw.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_read_rmw_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test_read_rmw-test_read_rmw.obj -MD -MP -MF $(DEPDIR)/test_read_rmw-test_read_rmw.Tpo -c -o test_read_rmw-test_read_rmw.obj `if test -f 'test_read_rmw.cc'; then $(CYGPATH_W) 'test_read_rmw.cc'; else $(CYGPATH_W) '$(srcdir)/test_read_rmw.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/test_read_rmw-test_read_rmw.Tpo $(DEPDIR)/test_read_rmw-test_read_rmw.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='test_read_rmw.cc' object='test_read_rmw-test_read_rmw.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_read_rmw_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test_read_rmw-test_read_rmw.obj `if test -f 'test_read_rmw.cc'; then $(CYGPATH_W) 'test_read_rmw.cc'; else $(CYGPATH_W) '$(srcdir)/test_read_rmw.cc'; fi`
 
 ID: $(am__tagged_files)
 	$(am__define_uniq_tagged_files); mkid -fID $$unique
@@ -636,6 +703,7 @@ clean-am: clean-generic clean-noinstPROGRAMS mostlyclean-am
 distclean: distclean-am
 		-rm -f ./$(DEPDIR)/test_read-test_read.Po
 	-rm -f ./$(DEPDIR)/test_read_prob-test_read_prob.Po
+	-rm -f ./$(DEPDIR)/test_read_rmw-test_read_rmw.Po
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -683,6 +751,7 @@ installcheck-am:
 maintainer-clean: maintainer-clean-am
 		-rm -f ./$(DEPDIR)/test_read-test_read.Po
 	-rm -f ./$(DEPDIR)/test_read_prob-test_read_prob.Po
+	-rm -f ./$(DEPDIR)/test_read_rmw-test_read_rmw.Po
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 

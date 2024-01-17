@@ -555,6 +555,7 @@ static const char conf_key_GRIB1_subcenter[]   = "GRIB1_subcenter";
 static const char conf_key_GRIB1_rec[]         = "GRIB1_rec";
 static const char conf_key_GRIB1_code[]        = "GRIB1_code";
 static const char conf_key_GRIB1_tri[]         = "GRIB1_tri";
+
 static const char conf_key_GRIB2_disc[]        = "GRIB2_disc";
 static const char conf_key_GRIB2_parm_cat[]    = "GRIB2_parm_cat";
 static const char conf_key_GRIB2_parm[]        = "GRIB2_parm";
@@ -567,6 +568,12 @@ static const char conf_key_GRIB2_ens_type[]    = "GRIB2_ens_type";
 static const char conf_key_GRIB2_der_type[]    = "GRIB2_der_type";
 static const char conf_key_GRIB2_stat_type[]   = "GRIB2_stat_type";
 static const char conf_key_GRIB2_perc_val[]    = "GRIB2_perc_val";
+
+static const char conf_key_GRIB2_aerosol_type[]          = "GRIB2_aerosol_type";
+static const char conf_key_GRIB2_aerosol_interval_type[] = "GRIB2_aerosol_interval_type";
+static const char conf_key_GRIB2_aerosol_size_lower[]    = "GRIB2_aerosol_size_lower";
+static const char conf_key_GRIB2_aerosol_size_upper[]    = "GRIB2_aerosol_size_upper";
+
 static const char conf_key_GRIB2_ipdtmpl_index[] = "GRIB2_ipdtmpl_index";
 static const char conf_key_GRIB2_ipdtmpl_val[]   = "GRIB2_ipdtmpl_val";
 static const char conf_key_level[]             = "level";

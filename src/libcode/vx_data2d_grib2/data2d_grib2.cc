@@ -437,6 +437,14 @@ void MetGrib2DataFile::find_record_matches(VarInfoGrib2* vinfo,
          continue;
       }
 
+      //  test aerosol config file options
+      if( (!is_bad_data(vinfo->aerosol_type())          && vinfo->aerosol_type()          != (*it)->AerosolType )         ||
+          (!is_bad_data(vinfo->aerosol_interval_type()) && vinfo->aerosol_interval_type() != (*it)->AerosolIntervalType ) ||
+          (!is_bad_data(vinfo->aerosol_size_lower())    && !is_eq(vinfo->aerosol_size_lower(), (*it)->AerosolSizeLower )) ||
+          (!is_bad_data(vinfo->aerosol_size_upper())    && !is_eq(vinfo->aerosol_size_upper(), (*it)->AerosolSizeUpper )) ){
+         continue;
+      }
+
       //  test ipdtmpl array values
       if(vinfo->n_ipdtmpl() > 0) {
          int i, j;

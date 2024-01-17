@@ -1,5 +1,6 @@
-test_read_prob
 test_read
+test_read_prob
+test_read_rmw
 *.o
 *.a
 .deps
