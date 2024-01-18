@@ -755,9 +755,9 @@ int search_pcp_dir(const char *cur_dir, const unixtime cur_ut,
          cur_file << cs_erase << cur_dir << '/' << dirp->d_name;
 
          Met2dDataFileFactory factory;
-         Met2dDataFile * mtddf = (Met2dDataFile *) nullptr;
+         Met2dDataFile * mtddf;
          VarInfoFactory var_fac;
-         VarInfo * cur_var = (VarInfo *) nullptr;
+         VarInfo * cur_var;
 
          //
          // Create a data file object.
@@ -1145,13 +1145,13 @@ void do_derive_command() {
          for(j=0; j<nxy; j++) {
             double s  = sum_dp.data()[j];
             double sq = sum_sq_dp.data()[j];
-            double n  = vld_dp.data()[j];
+            double nd  = vld_dp.data()[j];
             if(is_bad_data(s) || is_bad_data(sq) ||
-               is_bad_data(n) || n <= 1) {
+               is_bad_data(nd) || nd <= 1) {
                der_dp.buf()[j] = bad_data_double;
             }
             else {
-               v = (sq - s*s/n)/(n-1);
+               v = (sq - s*s/nd)/(nd-1);
                if(is_eq(v, 0.0)) v = 0.0;
                der_dp.buf()[j] = sqrt(v);
             }
