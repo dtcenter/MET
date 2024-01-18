@@ -10,8 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -23,13 +21,15 @@ using namespace std;
 #include <time.h>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "vx_math.h"
 #include "vx_cal.h"
 #include "vx_log.h"
 
 #include "nccf_file.h"
+
+using namespace std;
+using namespace netCDF;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -221,7 +221,6 @@ bool NcCfFile::open(const char * filepath)
   Nvars = get_var_names(_ncFile, &varNames);
   Var = new NcVarInfo [Nvars];
 
-  NcDim dim;
   for (int j=0; j<Nvars; ++j)  {
     NcVar v = get_var(_ncFile, varNames[j].c_str());
 
@@ -360,7 +359,6 @@ bool NcCfFile::open(const char * filepath)
       else {
         if (use_bounds_var) {
           double bounds_diff;
-          double time_fraction;
           for(int i=0; i<n_times; i++) {
             ValidTime.add(add_to_unixtime(ut, sec_per_unit, time_values[i*2+1], no_leap_year));
             raw_times.add(time_values[i*2+1]);
@@ -909,7 +907,7 @@ double NcCfFile::getData(NcVar * var, const LongArray & a) const
   double d = bad_data_double;
 
   double fill_value;
-  double missing_value = get_var_missing_value(var);
+  //double missing_value = get_var_missing_value(var);
   get_var_fill_value(var, fill_value);
 
   status = get_nc_data(var, &d, a);
@@ -1052,9 +1050,6 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
   }
 
   //  get the data
-  int    *i;
-  short  *s;
-  float  *f;
   const int plane_size = nx * ny;
   double *d = new double[plane_size];
 
@@ -1328,22 +1323,20 @@ NcVarInfo* NcCfFile::find_var_by_dim_name(const char *dim_name) const
 NcVar *NcCfFile::find_var_by_standard_name(const char *standard_name) const
 {
   NcVar *var = nullptr;
-  if (!var) {
-    ConcatString att_value;
-    for (int i=0; i<Nvars; i++) {
-      if (get_var_standard_name(Var[i].var, att_value)) {
-        if (att_value == standard_name) {
-          var = Var[i].var;
-          break;
-        }
+  ConcatString att_value;
+  for (int i=0; i<Nvars; i++) {
+    if (get_var_standard_name(Var[i].var, att_value)) {
+      if (att_value == standard_name) {
+        var = Var[i].var;
+        break;
       }
-      //if (get_var_long_name(Var[i].var, att_value) {
-      //  if (att_value == standard_name) {
-      //    var = &Var[i];
-      //    break;
-      //  }
-      //}
     }
+    //if (get_var_long_name(Var[i].var, att_value) {
+    //  if (att_value == standard_name) {
+    //    var = &Var[i];
+    //    break;
+    //  }
+    //}
   }
 
   return var;
@@ -2294,7 +2287,6 @@ void NcCfFile::get_grid_mapping_polar_stereographic(const NcVar *grid_mapping_va
   // units conversions.
 
   ConcatString x_coord_units_name;
-  const NcVarAtt *x_coord_units_att = get_nc_att(_xCoordVar, units_att_name);
   if (!get_var_units(_xCoordVar, x_coord_units_name)) {
     mlog << Warning << "\n" << method_name
          << "Units not given for X coordinate variable -- assuming meters.\n\n";
@@ -2320,7 +2312,6 @@ void NcCfFile::get_grid_mapping_polar_stereographic(const NcVar *grid_mapping_va
   }
 
   ConcatString y_coord_units_name;
-  const NcVarAtt *y_coord_units_att = get_nc_att(_yCoordVar, units_att_name);
   if (!get_var_units(_yCoordVar, y_coord_units_name)) {
     mlog << Warning << "\n" << method_name
          << "Units not given for Y coordinate variable -- assuming meters.\n\n";
