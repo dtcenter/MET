@@ -36,10 +36,10 @@ typedef unsigned char uchar;
 static const std::string C_unknown_str = std::string("unknown");
 
 #define IS_VALID_NC(ncObj)          (!ncObj.isNull())
-#define IS_VALID_NC_P(ncObjPtr)     ((ncObjPtr != 0 && !ncObjPtr->isNull()))
+#define IS_VALID_NC_P(ncObjPtr)     ((ncObjPtr != nullptr && !ncObjPtr->isNull()))
 
 #define IS_INVALID_NC(ncObj)        ncObj.isNull()
-#define IS_INVALID_NC_P(ncObjPtr)   (ncObjPtr == 0 || ncObjPtr->isNull())
+#define IS_INVALID_NC_P(ncObjPtr)   (ncObjPtr == nullptr || ncObjPtr->isNull())
 
 #define GET_NC_NAME(ncObj)          ncObj.getName()
 #define GET_NC_NAME_P(ncObjPtr)     ncObjPtr->getName()
