@@ -381,7 +381,6 @@ void setup_first_pass(const DataPlane &dp, const Grid &data_grid) {
 ////////////////////////////////////////////////////////////////////////
 
 void setup_txt_files() {
-   int j;
    int max_col, max_prob_col, max_mctc_col, max_orank_col;
    int n_prob, n_cat, n_eclv, n_ens;
    ConcatString base_name;
@@ -798,7 +797,7 @@ void process_obs_file(int i_nc) {
    float obs_arr_block[buf_size][OBS_ARRAY_LEN];
 
    // Process each observation in the file
-   int str_length, block_size;
+   int block_size;
    int prev_grib_code = bad_data_int;
    for(int i_block_start_idx=0; i_block_start_idx<obs_count; i_block_start_idx+=buf_size) {
       block_size = (obs_count - i_block_start_idx);
@@ -1816,6 +1815,11 @@ void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
       GridTemplate* gt = gtf.buildGT(conf_info.vx_opt[i_vx].hira_info.shape,
                                      conf_info.vx_opt[i_vx].hira_info.width[i],
                                      grid.wrap_lon());
+      if (nullptr == gt) {
+         mlog << Warning
+              << "\nPdo_hira_ens() Fail to get GridTemplate for " << i << "-th width.\n\n";
+         continue;
+      }
 
       // Initialize
       hira_pd.clear();
