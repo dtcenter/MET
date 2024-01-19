@@ -132,8 +132,8 @@ int met_main(int argc, char * argv[]) {
 
          dist = sqrt(dx*dx + dy*dy);
 
-         if(mlog.verbosity_level() >= 3) {
-            mlog << Debug(3)
+         if(mlog.verbosity_level() >= 5) {
+            mlog << Debug(5)
                  << "(grid_x, grid_y) = (" << gx << ", " << gy << "), "
                  << "(lat, lon) = (" << lat << ", " << lon << "), "
                  << "(proj_x, proj_y) = (" << px << ", " << py << "), "
