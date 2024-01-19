@@ -17,7 +17,7 @@
 
 #include <netcdf>
 
-#include "data2d_nccf.h"
+#include "data2d_nc_cf.h"
 #include "vx_math.h"
 #include "vx_log.h"
 

@@ -11,9 +11,9 @@ MET_CPPFLAGS = -I${top_builddir}/src/basic/vx_cal \
 	     -I${top_builddir}/src/libcode/vx_data2d_factory \
 	     -I${top_builddir}/src/libcode/vx_data2d_grib \
 	     -I${top_builddir}/src/libcode/vx_data2d_grib2 \
-	     -I${top_builddir}/src/libcode/vx_data2d_nccf \
 	     -I${top_builddir}/src/libcode/vx_data2d_nc_met \
-	     -I${top_builddir}/src/libcode/vx_data2d_nc_pinterp \
+	     -I${top_builddir}/src/libcode/vx_data2d_nc_wrf \
+	     -I${top_builddir}/src/libcode/vx_data2d_nc_cf \
 	     -I${top_builddir}/src/libcode/vx_data2d_python \
 	     -I${top_builddir}/src/libcode/vx_data2d_ugrid \
 	     -I${top_builddir}/src/libcode/vx_python3_utils \
@@ -58,9 +58,9 @@ MET_LDFLAGS = -L${top_builddir}/src/basic/vx_cal \
 	     -L${top_builddir}/src/libcode/vx_data2d_factory \
 	     -L${top_builddir}/src/libcode/vx_data2d_grib \
 	     -L${top_builddir}/src/libcode/vx_data2d_grib2 \
-	     -L${top_builddir}/src/libcode/vx_data2d_nccf \
 	     -L${top_builddir}/src/libcode/vx_data2d_nc_met \
-	     -L${top_builddir}/src/libcode/vx_data2d_nc_pinterp \
+	     -L${top_builddir}/src/libcode/vx_data2d_nc_wrf \
+	     -L${top_builddir}/src/libcode/vx_data2d_nc_cf \
 	     -L${top_builddir}/src/libcode/vx_data2d_python \
 	     -L${top_builddir}/src/libcode/vx_data2d_ugrid \
 	     -L${top_builddir}/src/libcode/vx_python3_utils \

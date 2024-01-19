@@ -15,7 +15,7 @@ noinst_PROGRAMS = test_read_nccf
 test_read_nccf_SOURCES = test_read_nccf.cc
 test_read_nccf_CPPFLAGS = ${MET_CPPFLAGS}
 test_read_nccf_LDFLAGS = -L. ${MET_LDFLAGS}
-test_read_nccf_LDADD = -lvx_data2d_nccf \
+test_read_nccf_LDADD = -lvx_data2d_nc_cf \
 	$(UGRID_MET_LIBS) \
 	-lvx_nc_util \
 	-lvx_data2d \
