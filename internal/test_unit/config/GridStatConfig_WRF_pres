@@ -9,7 +9,7 @@
 //
 // Output model name to be written
 //
-model = "FCST";
+model = "WRF";
 
 //
 // Output description to be written
