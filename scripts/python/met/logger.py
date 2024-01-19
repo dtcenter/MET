@@ -33,7 +33,11 @@ class logger():
       print(f'{logger.PROMPT} {msg}')
 
    @staticmethod
-   def quit(msg):
-      logger.error_msg([msg, "Quit..."])
-      sys.exit(1)
+   def quit(msg, do_quit=True):
+      logger.quit_msg(msg)
+      if do_quit:
+          sys.exit(1)
 
+   @staticmethod
+   def quit_msg(msg):
+      logger.error_msg([msg, "Quit..."])
