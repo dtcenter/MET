@@ -8,7 +8,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 //
-//   Filename:   var_info_nccf.cc
+//   Filename:   var_info_nc_cf.cc
 //
 //   Description:
 //
@@ -25,7 +25,7 @@ using namespace std;
 #include <strings.h>
 
 #include "var_info.h"
-#include "var_info_nccf.h"
+#include "var_info_nc_cf.h"
 
 #include "vx_math.h"
 #include "util_constants.h"

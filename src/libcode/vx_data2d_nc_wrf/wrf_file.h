@@ -14,8 +14,8 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-#ifndef  __MET_PINTERP_FILE_H__
-#define  __MET_PINTERP_FILE_H__
+#ifndef  __MET_WRF_FILE_H__
+#define  __MET_WRF_FILE_H__
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -34,19 +34,19 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-class PinterpFile {
+class WrfFile {
 
    private:
 
       void init_from_scratch();
 
-      PinterpFile(const PinterpFile &);
-      PinterpFile & operator=(const PinterpFile &);
+      WrfFile(const WrfFile &);
+      WrfFile & operator=(const WrfFile &);
 
    public:
 
-      PinterpFile();
-     ~PinterpFile();
+      WrfFile();
+     ~WrfFile();
 
       bool open(const char * filename);
 
@@ -80,9 +80,6 @@ class PinterpFile {
 
       StringArray DimNames;
 
-      netCDF::NcDim * Xdim;   //  not allocated
-      netCDF::NcDim * Ydim;   //  not allocated
-      netCDF::NcDim * Zdim;   //  not allocated
       netCDF::NcDim * Tdim;   //  not allocated
 
          //
@@ -92,10 +89,6 @@ class PinterpFile {
       int Nvars;
 
       NcVarInfo * Var;     //  allocated
-
-      int PressureIndex;   //  index into Var array
-
-      double hPaCF;        //  pressure to hPa conversion factor
 
          //
          //  Grid
@@ -121,7 +114,7 @@ class PinterpFile {
 ////////////////////////////////////////////////////////////////////////
 
 
-#endif   /*  __MET_PINTERP_FILE_H__  */
+#endif   /*  __MET_WRF_FILE_H__  */
 
 
 ////////////////////////////////////////////////////////////////////////

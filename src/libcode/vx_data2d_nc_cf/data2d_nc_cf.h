@@ -19,8 +19,8 @@
 
 #include "data_plane.h"
 #include "data_class.h"
-#include "var_info_nccf.h"
-#include "nccf_file.h"
+#include "var_info_nc_cf.h"
+#include "nc_cf_file.h"
 #include "two_to_one.h"
 
 

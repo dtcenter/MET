@@ -151,6 +151,10 @@ if ( Dims )  { delete [] Dims;  Dims = (NcDim **) 0; }
 
 x_slot = y_slot = z_slot = t_slot = -1;
 
+x_stag = y_stag = z_stag = false;
+
+is_pressure = false;
+
    //
    //  done
    //
@@ -213,10 +217,17 @@ if ( Dims )  {
 
 }
 
-out << prefix << "x_slot = " << x_slot << "\n";
-out << prefix << "y_slot = " << y_slot << "\n";
-out << prefix << "z_slot = " << z_slot << "\n";
+out << prefix << "x_slot = " << x_slot;
+if (x_stag) out << " (staggered)";
+out << "\n";
+out << prefix << "y_slot = " << y_slot;
+if (y_stag) out << " (staggered)";
+out << "\n";
+out << prefix << "z_slot = " << z_slot;
+if (z_stag) out << " (staggered)";
+out << "\n";
 out << prefix << "t_slot = " << t_slot << "\n";
+out << prefix << "is_pressure = " << (is_pressure ? "true" : "false") << "\n";
 
    //
    //  done
@@ -270,6 +281,12 @@ y_slot = i.y_slot;
 z_slot = i.z_slot;
 t_slot = i.t_slot;
 
+x_stag = i.x_stag;
+y_stag = i.y_stag;
+z_stag = i.z_stag;
+
+is_pressure = i.is_pressure;
+
 if ( i.Dims )  {
 
    Dims = new NcDim * [i.Ndims];
@@ -309,18 +326,18 @@ NcVarInfo *find_var_info_by_dim_name(NcVarInfo *vars, const string dim_name,
       }
    }
 
+   // if dimension variable is not found, find variable that has only dim_name or dim_name and time
+   int dim_offset = 0;
    if (!var) {
-      //StringArray dim_names;
       for (int i=0; i<nvars; i++) {
-         if (1 == vars[i].Ndims) {
-            //dim_names.clear();
-            //get_dim_names(vars[i].var, &dim_names);
-            NcDim dim = get_nc_dim(vars[i].var, 0);
-            if (IS_VALID_NC(dim) && GET_NC_NAME(dim) == dim_name) {
-              var = &vars[i];
-              break;
-            }
+         if (vars[i].Ndims > 2) continue;
+         dim_offset = vars[i].Ndims == 2 ? 1 : 0;
+         NcDim dim = get_nc_dim(vars[i].var, dim_offset);
+         if (IS_VALID_NC(dim) && GET_NC_NAME(dim) == dim_name) {
+           var = &vars[i];
+           break;
          }
+
       }
    }
 

@@ -8,7 +8,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 //
-//   Filename:   var_info_nc_pinterp.cc
+//   Filename:   var_info_nc_wrf.cc
 //
 //   Description:
 //
@@ -20,12 +20,13 @@
 using namespace std;
 
 #include <map>
+#include <regex>
 #include <stdlib.h>
 #include <string.h>
 #include <strings.h>
 
 #include "var_info.h"
-#include "var_info_nc_pinterp.h"
+#include "var_info_nc_wrf.h"
 
 #include "vx_math.h"
 #include "vx_util.h"
@@ -33,25 +34,25 @@ using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////
 //
-//  Code for class VarInfoNcPinterp
+//  Code for class VarInfoNcWrf
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-VarInfoNcPinterp::VarInfoNcPinterp() {
+VarInfoNcWrf::VarInfoNcWrf() {
 
    init_from_scratch();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-VarInfoNcPinterp::~VarInfoNcPinterp() {
+VarInfoNcWrf::~VarInfoNcWrf() {
 
    clear();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-VarInfoNcPinterp::VarInfoNcPinterp(const VarInfoNcPinterp &f) {
+VarInfoNcWrf::VarInfoNcWrf(const VarInfoNcWrf &f) {
 
    init_from_scratch();
 
@@ -60,7 +61,7 @@ VarInfoNcPinterp::VarInfoNcPinterp(const VarInfoNcPinterp &f) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-VarInfoNcPinterp & VarInfoNcPinterp::operator=(const VarInfoNcPinterp &f) {
+VarInfoNcWrf & VarInfoNcWrf::operator=(const VarInfoNcWrf &f) {
 
    if ( this == &f )  return ( *this );
 
@@ -71,7 +72,7 @@ VarInfoNcPinterp & VarInfoNcPinterp::operator=(const VarInfoNcPinterp &f) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void VarInfoNcPinterp::init_from_scratch() {
+void VarInfoNcWrf::init_from_scratch() {
 
    // First call the parent's initialization
    VarInfo::init_from_scratch();
@@ -82,7 +83,7 @@ void VarInfoNcPinterp::init_from_scratch() {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void VarInfoNcPinterp::assign(const VarInfoNcPinterp &v) {
+void VarInfoNcWrf::assign(const VarInfoNcWrf &v) {
    int i;
 
    // First call the parent's assign
@@ -98,7 +99,7 @@ void VarInfoNcPinterp::assign(const VarInfoNcPinterp &v) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void VarInfoNcPinterp::clear() {
+void VarInfoNcWrf::clear() {
 
    // First call the parent's clear
    VarInfo::clear();
@@ -110,10 +111,10 @@ void VarInfoNcPinterp::clear() {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void VarInfoNcPinterp::dump(ostream &out) const {
+void VarInfoNcWrf::dump(ostream &out) const {
 
    // Dump out the contents
-   out << "VarInfoNcPinterp::dump():\n"
+   out << "VarInfoNcWrf::dump():\n"
        << "  Dimension:\n";
    Dimension.dump(out);
    out << "  Is_offset:\n";
@@ -125,7 +126,7 @@ void VarInfoNcPinterp::dump(ostream &out) const {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void VarInfoNcPinterp::add_dimension(int dim, bool as_offset, double dim_value) {
+void VarInfoNcWrf::add_dimension(int dim, bool as_offset, double dim_value) {
    Dimension.add(dim);
    Is_offset.add(as_offset);
    Dim_value.add(dim_value);
@@ -133,7 +134,7 @@ void VarInfoNcPinterp::add_dimension(int dim, bool as_offset, double dim_value) 
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void VarInfoNcPinterp::clear_dimension() {
+void VarInfoNcWrf::clear_dimension() {
    Dimension.clear();
    Is_offset.clear();
    Dim_value.clear();
@@ -141,17 +142,17 @@ void VarInfoNcPinterp::clear_dimension() {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void VarInfoNcPinterp::set_dimension(int i_dim, int dim) {
+void VarInfoNcWrf::set_dimension(int i_dim, int dim) {
    Dimension[i_dim] = dim;
    return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void VarInfoNcPinterp::set_magic(const ConcatString &nstr, const ConcatString &lstr) {
+void VarInfoNcWrf::set_magic(const ConcatString &nstr, const ConcatString &lstr) {
    ConcatString tmp_str;
    char *ptr = (char *) 0, *ptr2 = (char *) 0, *ptr3 = (char *) 0, *save_ptr = (char *) 0;
-   const char *method_name = "VarInfoNcPinterp::set_magic() -> ";
+   const char *method_name = "VarInfoNcWrf::set_magic() -> ";
 
    // Store the magic string
    VarInfo::set_magic(nstr, lstr);
@@ -272,7 +273,7 @@ void VarInfoNcPinterp::set_magic(const ConcatString &nstr, const ConcatString &l
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void VarInfoNcPinterp::set_dict(Dictionary & dict) {
+void VarInfoNcWrf::set_dict(Dictionary & dict) {
 
    VarInfo::set_dict(dict);
 
@@ -285,7 +286,7 @@ void VarInfoNcPinterp::set_dict(Dictionary & dict) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-bool VarInfoNcPinterp::is_precipitation() const {
+bool VarInfoNcWrf::is_precipitation() const {
 
    //
    // Check set_attrs entry
@@ -305,7 +306,7 @@ bool VarInfoNcPinterp::is_precipitation() const {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-bool VarInfoNcPinterp::is_specific_humidity() const {
+bool VarInfoNcWrf::is_specific_humidity() const {
 
    //
    // Check set_attrs entry
@@ -325,13 +326,18 @@ bool VarInfoNcPinterp::is_specific_humidity() const {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-bool VarInfoNcPinterp::is_u_wind() const {
+bool VarInfoNcWrf::is_u_wind() const {
 
    //
    // Check set_attrs entry
    //
    if(!is_bad_data(SetAttrIsUWind)) {
       return(SetAttrIsUWind != 0);
+   }
+
+   // Check if the VarInfo name is U or U<n> where <n> is an integer
+   if( regex_match (Name.c_str(), regex("^U[0-9]*$") )) {
+      return true;
    }
 
    //
@@ -345,13 +351,18 @@ bool VarInfoNcPinterp::is_u_wind() const {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-bool VarInfoNcPinterp::is_v_wind() const {
+bool VarInfoNcWrf::is_v_wind() const {
 
    //
    // Check set_attrs entry
    //
    if(!is_bad_data(SetAttrIsVWind)) {
       return(SetAttrIsVWind != 0);
+   }
+
+   // Check if the VarInfo name is V or V<n> where <n> is an integer
+   if( regex_match (Name.c_str(), regex("^V[0-9]*$") )) {
+      return true;
    }
 
    //
@@ -365,7 +376,7 @@ bool VarInfoNcPinterp::is_v_wind() const {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-bool VarInfoNcPinterp::is_wind_speed() const {
+bool VarInfoNcWrf::is_wind_speed() const {
 
    //
    // Check set_attrs entry
@@ -385,7 +396,7 @@ bool VarInfoNcPinterp::is_wind_speed() const {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-bool VarInfoNcPinterp::is_wind_direction() const {
+bool VarInfoNcWrf::is_wind_direction() const {
 
    //
    // Check set_attrs entry
@@ -400,7 +411,7 @@ bool VarInfoNcPinterp::is_wind_direction() const {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-bool VarInfoNcPinterp::is_grid_relative() const {
+bool VarInfoNcWrf::is_grid_relative() const {
 
    //
    // Check to see if the VarInfo name matches any of expected Pinterp

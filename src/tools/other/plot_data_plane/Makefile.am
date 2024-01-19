@@ -18,8 +18,8 @@ plot_data_plane_LDADD = -lvx_data2d_factory \
 	-lvx_data2d_nc_met \
 	-lvx_data2d_grib \
 	$(GRIB2_MET_LIBS) \
-	-lvx_data2d_nc_pinterp \
-	-lvx_data2d_nccf \
+	-lvx_data2d_nc_wrf \
+	-lvx_data2d_nc_cf \
 	$(UGRID_MET_LIBS) \
 	$(PYTHON_MET_LIBS) \
 	-lvx_statistics \

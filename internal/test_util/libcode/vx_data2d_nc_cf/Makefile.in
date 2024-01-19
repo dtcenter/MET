@@ -89,7 +89,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 noinst_PROGRAMS = test_read_nccf$(EXEEXT)
-subdir = internal/test_util/libcode/vx_data2d_nccf
+subdir = internal/test_util/libcode/vx_data2d_nc_cf
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -329,7 +329,7 @@ MAINTAINERCLEANFILES = Makefile.in
 test_read_nccf_SOURCES = test_read_nccf.cc
 test_read_nccf_CPPFLAGS = ${MET_CPPFLAGS}
 test_read_nccf_LDFLAGS = -L. ${MET_LDFLAGS}
-test_read_nccf_LDADD = -lvx_data2d_nccf \
+test_read_nccf_LDADD = -lvx_data2d_nc_cf \
 	$(UGRID_MET_LIBS) \
 	-lvx_nc_util \
 	-lvx_data2d \
@@ -359,9 +359,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign internal/test_util/libcode/vx_data2d_nccf/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign internal/test_util/libcode/vx_data2d_nc_cf/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign internal/test_util/libcode/vx_data2d_nccf/Makefile
+	  $(AUTOMAKE) --foreign internal/test_util/libcode/vx_data2d_nc_cf/Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
 	  *config.status*) \

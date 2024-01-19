@@ -19,7 +19,7 @@ using namespace std;
 
 #include "vx_log.h"
 #include "data_class.h"
-#include "data2d_nccf.h"
+#include "data2d_nc_cf.h"
 
 
 ////////////////////////////////////////////////////////////////////////

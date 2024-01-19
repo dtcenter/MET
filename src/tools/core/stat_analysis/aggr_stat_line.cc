@@ -52,7 +52,7 @@ using namespace std;
 
 #include "vx_log.h"
 #include "vx_data2d_grib.h"
-#include "vx_data2d_nc_pinterp.h"
+#include "vx_data2d_nc_wrf.h"
 
 #include "aggr_stat_line.h"
 #include "parse_stat_line.h"
