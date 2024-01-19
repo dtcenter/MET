@@ -136,6 +136,8 @@ The NCEP verification regions that are implemented in MET as lat/lon polylines a
 
 * NAK.poly for Northern Alaska
 
+* NAO.poly for Northern Atlantic Ocean
+
 * NEC.poly for the Northern East Coast
 
 * NMT.poly for the Northern Mountain Region
