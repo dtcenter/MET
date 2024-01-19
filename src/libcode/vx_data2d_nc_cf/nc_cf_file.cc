@@ -29,7 +29,7 @@ using namespace netCDF;
 #include "vx_cal.h"
 #include "vx_log.h"
 
-#include "nccf_file.h"
+#include "nc_cf_file.h"
 
 
 ////////////////////////////////////////////////////////////////////////

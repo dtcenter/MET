@@ -154,7 +154,7 @@ am__define_uniq_tagged_files = \
     if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
   done | $(am__uniquify_input)`
 DIST_SUBDIRS = vx_grid vx_data2d vx_nc_util vx_data2d_grib \
-	vx_data2d_nc_met vx_data2d_nccf vx_data2d_nc_pinterp \
+	vx_data2d_nc_met vx_data2d_nc_wrf vx_data2d_nc_cf \
 	vx_python3_utils vx_data2d_python vx_pointdata_python \
 	vx_data2d_grib2 vx_data2d_ugrid vx_data2d_factory vx_gsl_prob \
 	vx_gnomon vx_geodesy vx_gis vx_nav vx_pb_util vx_afm vx_color \
@@ -348,7 +348,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 SUBDIRS = vx_grid vx_data2d vx_nc_util vx_data2d_grib vx_data2d_nc_met \
-	vx_data2d_nccf vx_data2d_nc_pinterp $(am__append_1) \
+	vx_data2d_nc_wrf vx_data2d_nc_cf $(am__append_1) \
 	$(am__append_2) $(am__append_3) vx_data2d_factory vx_gsl_prob \
 	vx_gnomon vx_geodesy vx_gis vx_nav vx_pb_util vx_afm vx_color \
 	vx_pxm vx_render vx_ps vx_plot_util vx_shapedata vx_statistics \

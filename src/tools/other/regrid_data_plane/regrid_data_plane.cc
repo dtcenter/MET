@@ -329,10 +329,7 @@ void process_data_file() {
       if(VarNameSA.n() == 0) {
          vname << cs_erase << vinfo->name_attr();
          if(vinfo->level().type() != LevelType_Accum &&
-            ftype != FileType_NcMet &&
-            ftype != FileType_General_Netcdf &&
-            ftype != FileType_NcPinterp &&
-            ftype != FileType_NcCF) {
+            !is_netcdf_grdfiletype(ftype)) {
             vname << "_" << vinfo->level_attr();
          }
       }

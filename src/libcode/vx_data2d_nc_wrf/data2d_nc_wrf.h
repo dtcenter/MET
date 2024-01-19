@@ -10,8 +10,8 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-#ifndef  __MET_VX_DATA_2D_NC_PINTERP_H__
-#define  __MET_VX_DATA_2D_NC_PINTERP_H__
+#ifndef  __MET_VX_DATA_2D_NC_WRF_H__
+#define  __MET_VX_DATA_2D_NC_WRF_H__
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -21,33 +21,33 @@
 
 #include "data_plane.h"
 #include "data_class.h"
-#include "var_info_nc_pinterp.h"
-#include "pinterp_file.h"
+#include "var_info_nc_wrf.h"
+#include "wrf_file.h"
 #include "two_to_one.h"
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-class MetNcPinterpDataFile : public Met2dDataFile {
+class MetNcWrfDataFile : public Met2dDataFile {
 
    private:
 
-      void nc_pinterp_init_from_scratch();
+      void nc_wrf_init_from_scratch();
 
-      MetNcPinterpDataFile(const MetNcPinterpDataFile &);
-      MetNcPinterpDataFile & operator=(const MetNcPinterpDataFile &);
+      MetNcWrfDataFile(const MetNcWrfDataFile &);
+      MetNcWrfDataFile & operator=(const MetNcWrfDataFile &);
 
          //
          //  NetCDF file
          //
       
-      PinterpFile * PinterpNc;  //  allocated
+      WrfFile * WrfNc;  //  allocated
 
    public:
 
-      MetNcPinterpDataFile();
-     ~MetNcPinterpDataFile();
+      MetNcWrfDataFile();
+     ~MetNcWrfDataFile();
      
          //
          //  set stuff
@@ -87,13 +87,13 @@ class MetNcPinterpDataFile : public Met2dDataFile {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline GrdFileType MetNcPinterpDataFile::file_type () const { return ( FileType_NcPinterp ); }
+inline GrdFileType MetNcWrfDataFile::file_type () const { return ( FileType_NcWrf ); }
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-#endif   /*  __MET_VX_DATA_2D_NC_PINTERP_H__  */
+#endif   /*  __MET_VX_DATA_2D_NC_WRF_H__  */
 
 
 ////////////////////////////////////////////////////////////////////////
