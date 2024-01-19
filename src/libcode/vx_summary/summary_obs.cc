@@ -10,8 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <algorithm>
 #include <iostream>
 #include <map>
@@ -28,6 +26,9 @@ using namespace std;
 #include "summary_calc_stdev.h"
 #include "summary_key.h"
 #include "summary_obs.h"
+
+using namespace std;
+
 
 ////////////////////////////////////////////////////////////////////////
 

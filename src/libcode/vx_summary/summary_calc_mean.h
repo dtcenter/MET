@@ -32,7 +32,7 @@ public:
   SummaryCalcMean();
   virtual ~SummaryCalcMean();
 
-  virtual string getType() const
+  virtual std::string getType() const
   {
     return "MEAN";
   }

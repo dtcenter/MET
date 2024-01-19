@@ -231,8 +231,6 @@ return;
 ConcatString UnstructuredGrid::serialize(const char *sep) const {
 
 ConcatString a;
-char junk[256];
-
 
 a << "Projection: UnstructuredGrid" << sep;
 

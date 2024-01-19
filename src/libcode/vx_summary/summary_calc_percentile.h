@@ -29,10 +29,10 @@ class SummaryCalcPercentile : public SummaryCalc
 
 public:
 
-  SummaryCalcPercentile(const string &type_string);
+  SummaryCalcPercentile(const std::string &type_string);
   virtual ~SummaryCalcPercentile();
 
-  virtual string getType() const
+  virtual std::string getType() const
   {
     return _type;
   }
@@ -49,7 +49,7 @@ public:
 protected:
 
   double _percentile;
-  string _type;
+  std::string _type;
   
 };
 
