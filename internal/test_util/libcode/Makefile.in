@@ -339,7 +339,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-SUBDIRS = vx_data2d vx_data2d_grib vx_data2d_nc_met vx_data2d_nccf \
+SUBDIRS = vx_data2d vx_data2d_grib vx_data2d_nc_met vx_data2d_nc_cf \
 	vx_data2d_factory vx_geodesy vx_grid vx_ps vx_solar \
 	vx_plot_util vx_tc_util vx_nc_util vx_physics vx_series_data \
 	$(am__append_1)
