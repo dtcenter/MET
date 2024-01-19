@@ -656,7 +656,7 @@
     <param> \
       &DATA_DIR_MODEL;/wrf/wrfout_solarwind_d02_2019-08-31_12:00:00 \
       &OUTPUT_DIR;/plot_data_plane/wrf_bottom_top_stag.ps \
-      'name="PH"; level="(0,0,*,*)";' \
+      'name="PH"; level="(0,22,*,*)";' \
       -title "perturbation geopotential (bottom_top_stag)" \
       -v 1
     </param>
