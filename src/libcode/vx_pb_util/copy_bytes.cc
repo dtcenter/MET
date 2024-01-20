@@ -11,8 +11,6 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -23,6 +21,8 @@ using namespace std;
 
 #include "vx_log.h"
 #include "copy_bytes.h"
+
+using namespace std;
 
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -40,15 +40,12 @@ void copy_bytes(int in, int out, int N)
 
 {
 
-int bytes, bytes_left;
-int n_read, n_written;
-
-
-bytes_left = N;
+int bytes_left = N;
 
 while ( bytes_left > 0 )  {
-
-   bytes = bytes_left;
+   int n_read;
+   int n_written;
+   int bytes = bytes_left;
 
    if ( bytes > buf_size )  bytes = buf_size;
 

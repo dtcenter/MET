@@ -133,7 +133,8 @@ class DataPlane {
 
       MaskPlane mask_plane() const;
 
-      void shift_right  (int n);
+    void shift_right  (int n);
+    void destagger (bool x_stag, bool y_stag);
 
       void put(const double, const int __x__, const int __y__);
 

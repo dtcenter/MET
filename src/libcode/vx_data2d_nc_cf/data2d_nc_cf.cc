@@ -17,7 +17,7 @@
 
 #include <netcdf>
 
-#include "data2d_nccf.h"
+#include "data2d_nc_cf.h"
 #include "vx_math.h"
 #include "vx_log.h"
 
@@ -77,7 +77,7 @@ MetNcCFDataFile & MetNcCFDataFile::operator=(const MetNcCFDataFile &) {
 
 void MetNcCFDataFile::nccf_init_from_scratch() {
 
-   _file = (NcCfFile *) 0;
+   _file = (NcCfFile *) nullptr;
    _cur_time_index = -1;
 
    close();

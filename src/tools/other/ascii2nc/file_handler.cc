@@ -10,13 +10,10 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <algorithm>
 #include <iostream>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "vx_math.h"
 #include "vx_nc_util.h"
@@ -30,6 +27,10 @@ using namespace netCDF;
 #include "summary_calc_percentile.h"
 #include "summary_calc_range.h"
 #include "summary_calc_stdev.h"
+
+using namespace std;
+using namespace netCDF;
+
 
 const float FileHandler::FILL_VALUE = -9999.f;
 
@@ -263,7 +264,6 @@ bool FileHandler::_openNetcdf(const string &nc_filename)
 
 bool FileHandler::_addObservations(const Observation &obs)
 {
-   double grid_x, grid_y;
 
    //
    // Apply the grid mask, the area mask, and the polyline mask

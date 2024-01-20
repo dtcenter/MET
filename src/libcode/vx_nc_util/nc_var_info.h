@@ -88,6 +88,12 @@ class NcVarInfo {
       int z_slot;    //   -1 if not defined
       int t_slot;    //
 
+      bool x_stag;   // are dimensions staggered
+      bool y_stag;
+      bool z_stag;
+
+      bool is_pressure; // is variable on pressure levels
+
 };
 
 ////////////////////////////////////////////////////////////////////////

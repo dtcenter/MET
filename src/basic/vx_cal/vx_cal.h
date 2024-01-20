@@ -19,9 +19,6 @@
 
 
 #include "concat_string.h"
-
-typedef long long unixtime;
-
 #include "time_array.h"
 
 

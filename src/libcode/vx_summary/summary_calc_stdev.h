@@ -32,7 +32,7 @@ public:
   SummaryCalcStdev();
   virtual ~SummaryCalcStdev();
 
-  virtual string getType() const
+  virtual std::string getType() const
   {
     return "SDEV";
   }

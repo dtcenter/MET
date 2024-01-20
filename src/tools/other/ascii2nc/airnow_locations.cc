@@ -8,8 +8,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <iostream>
 #include <string>
 #include <sstream>
@@ -21,6 +19,9 @@ using namespace std;
 #include "vx_util.h"
 
 #include "airnow_locations.h"
+
+using namespace std;
+
 
 ////////////////////////////////////////////////////////////////////////
 

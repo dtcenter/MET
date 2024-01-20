@@ -8,7 +8,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 //
-//   Filename:   var_info_nccf.cc
+//   Filename:   var_info_nc_cf.cc
 //
 //   Description:
 //
@@ -25,7 +25,7 @@ using namespace std;
 #include <strings.h>
 
 #include "var_info.h"
-#include "var_info_nccf.h"
+#include "var_info_nc_cf.h"
 
 #include "vx_math.h"
 #include "util_constants.h"
@@ -153,10 +153,6 @@ void VarInfoNcCF::add_dimension(int dim, bool as_offset, double dim_value) {
 
 void VarInfoNcCF::set_magic(const ConcatString &nstr, const ConcatString &lstr) {
    ConcatString tmp_str;
-   char *ptr = 0;
-   char *ptr2 = 0;
-   char *ptr3 = 0;
-   char *save_ptr = 0;
    const char *method_name = "VarInfoNcCF::set_magic() -> ";
 
    // Store the magic string
@@ -175,6 +171,10 @@ void VarInfoNcCF::set_magic(const ConcatString &nstr, const ConcatString &lstr) 
       add_dimension(vx_data2d_star);
    }
    else {
+      char *ptr = nullptr;
+      char *ptr2 = nullptr;
+      char *ptr3 = nullptr;
+      char *save_ptr = nullptr;
 
       // Initialize the temp string
       tmp_str = lstr;

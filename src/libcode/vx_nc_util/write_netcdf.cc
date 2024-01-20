@@ -9,7 +9,6 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 
-using namespace std;
 
 #include <cstdio>
 #include <ctime>
@@ -21,13 +20,15 @@ using namespace std;
 #include <cmath>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "vx_log.h"
 #include "vx_cal.h"
 #include "vx_util.h"
 #include "write_netcdf.h"
 #include "grid_output.h"
+
+using namespace std;
+using namespace netCDF;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -107,10 +108,13 @@ void write_netcdf_latlon(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
 void write_netcdf_latlon_1d(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
                             const Grid &grid) {
    int i;
-   double lat, lon;
-   NcVar lat_var, lon_var;
-   float *lat_data = (float *) 0;
-   float *lon_data = (float *) 0;
+   double lat;
+   double lon;
+   NcVar lat_var;
+   NcVar lon_var;
+   // Allocate space for lat/lon values
+   float *lat_data = new float [grid.ny()];
+   float *lon_data = new float [grid.nx()];
 
    // Define Variables
    lat_var = f_out->addVar("lat", ncFloat, *lat_dim);
@@ -124,10 +128,6 @@ void write_netcdf_latlon_1d(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
    add_att(&lon_var, long_name_att_name, "longitude");
    add_att(&lon_var, units_att_name, "degrees_east");
    add_att(&lon_var, standard_name_att_name, "longitude");
-
-   // Allocate space for lat/lon values
-   lat_data = new float [grid.ny()];
-   lon_data = new float [grid.nx()];
 
    // Compute latitude values
    for(i=0; i<grid.ny(); i++) {
@@ -147,8 +147,8 @@ void write_netcdf_latlon_1d(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
    // Write the lon data
    put_nc_data(&lon_var, &lon_data[0], lon_dim->getSize(), 0);
 
-   if ( lat_data )  { delete [] lat_data;  lat_data = 0; }
-   if ( lon_data )  { delete [] lon_data;  lon_data = 0; }
+   if ( lat_data )  { delete [] lat_data;  lat_data = nullptr; }
+   if ( lon_data )  { delete [] lon_data;  lon_data = nullptr; }
 
    return;
 }
@@ -160,11 +160,12 @@ void write_netcdf_latlon_2d(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
    int i, x, y;
    double lat, lon;
    NcVar lat_var, lon_var;
-   float *lat_data = (float *) 0;
-   float *lon_data = (float *) 0;
    vector<NcDim> dims;
    long  counts[2] = {grid.ny(), grid.nx()};
    long offsets[2] = {0 , 0};
+   // Allocate space for lat/lon values
+   float *lat_data = new float [grid.nx()*grid.ny()];
+   float *lon_data = new float [grid.nx()*grid.ny()];
 
    // Define Variables
    dims.push_back(*lat_dim);
@@ -180,10 +181,6 @@ void write_netcdf_latlon_2d(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
    add_att(&lon_var, long_name_att_name, "longitude");
    add_att(&lon_var, units_att_name, "degrees_east");
    add_att(&lon_var, standard_name_att_name, "longitude");
-
-   // Allocate space for lat/lon values
-   lat_data = new float [grid.nx()*grid.ny()];
-   lon_data = new float [grid.nx()*grid.ny()];
 
    // Compute lat/lon values
    for(x=0; x<grid.nx(); x++) {
@@ -204,8 +201,8 @@ void write_netcdf_latlon_2d(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
    // Write the lon data
    put_nc_data(&lon_var, &lon_data[0], counts, offsets);
 
-   if ( lat_data )  { delete [] lat_data;  lat_data = 0; }
-   if ( lon_data )  { delete [] lon_data;  lon_data = 0; }
+   if ( lat_data )  { delete [] lat_data;  lat_data = nullptr; }
+   if ( lon_data )  { delete [] lon_data;  lon_data = nullptr; }
 
    return;
 }
@@ -214,12 +211,12 @@ void write_netcdf_latlon_2d(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
 
 void write_netcdf_grid_weight(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
                               const GridWeightType t, const DataPlane &wgt_dp) {
-   int i, x, y;
-   //NcVar *wgt_var  = (NcVar *) 0;
+   int i;
    NcVar wgt_var  ;
-   float *wgt_data = (float *) 0;
    vector<NcDim> dims;
    vector<size_t> count;
+   // Allocate space for weight values
+   float *wgt_data = new float [wgt_dp.nx()*wgt_dp.ny()];
 
    // Define Variables
    dims.push_back(*lat_dim);
@@ -247,12 +244,10 @@ void write_netcdf_grid_weight(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
          break;
    }
 
-   // Allocate space for weight values
-   wgt_data = new float [wgt_dp.nx()*wgt_dp.ny()];
 
    // Store weight values
-   for(x=0; x<wgt_dp.nx(); x++) {
-      for(y=0; y<wgt_dp.ny(); y++) {
+   for(int x=0; x<wgt_dp.nx(); x++) {
+      for(int y=0; y<wgt_dp.ny(); y++) {
          i = DefaultTO.two_to_one(wgt_dp.nx(), wgt_dp.ny(), x, y);
          wgt_data[i] = (float) wgt_dp(x, y);
       }
@@ -264,7 +259,7 @@ void write_netcdf_grid_weight(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
    put_nc_data_with_dims(&wgt_var, &wgt_data[0], wgt_dp.ny(), wgt_dp.nx());
 
    // Clean up
-   if(wgt_data) { delete [] wgt_data; wgt_data = (float *) 0; }
+   if(wgt_data) { delete [] wgt_data; wgt_data = (float *) nullptr; }
 
    return;
 }

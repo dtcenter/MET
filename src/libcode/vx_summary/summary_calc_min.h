@@ -32,7 +32,7 @@ public:
   SummaryCalcMin();
   virtual ~SummaryCalcMin();
 
-  virtual string getType() const
+  virtual std::string getType() const
   {
     return "MIN";
   }

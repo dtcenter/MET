@@ -27,18 +27,26 @@ using namespace netCDF;
 #include "vx_log.h"
 #include "vx_nc_util.h"
 
-#include "pinterp_file.h"
-#include "get_pinterp_grid.h"
+#include "wrf_file.h"
+#include "get_wrf_grid.h"
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
 static const char x_dim_name           [] = "west_east";
+static const char x_dim_stag_name      [] = "west_east_stag";
+static const char x_dim_subgrid_name   [] = "west_east_subgrid";
 static const char y_dim_name           [] = "south_north";
+static const char y_dim_stag_name      [] = "south_north_stag";
+static const char y_dim_subgrid_name   [] = "south_north_subgrid";
 static const char t_dim_name           [] = "time";
 static const char z_dim_p_interp_name  [] = "num_metgrid_levels";
 static const char z_dim_wrf_interp_name[] = "vlevs";
+static const char z_dim_wrf_stag_name  [] = "bottom_top_stag";
+static const char z_dim_wrf_name       [] = "bottom_top";
+static const char z_dim_wrf_pres_name  [] = "num_press_levels_stag";
+static const char z_dim_wrf_z_name     [] = "num_z_levels_stag";
 static const string strl_dim_name         = "DateStrLen";
 
 static const char  times_var_name      [] = "Times";
@@ -51,15 +59,16 @@ static const char second_var_name      [] = "second";
 
 static const char pressure_var_p_interp_name   [] = "pressure";
 static const char pressure_var_wrf_interp_name [] = "LEV";
+static const char pressure_var_wrf_name        [] = "P_PL";
 
 static const char pa_units_str         [] = "Pa";
 static const char hpa_units_str        [] = "hPa";
 
 static const string start_time_att_name   = "START_DATE";
 
-static const int max_pinterp_args         = 30;
+static const int max_wrf_args         = 30;
 
-static const double pinterp_missing       = 1.0e35;
+static const double wrf_missing       = 1.0e35;
 
 static const char *accum_var_names     [] = { "ACGRDFLX", "CUPPT",
                                               "RAINC",    "RAINNC",
@@ -72,7 +81,7 @@ static const int n_accum_var_names        = sizeof(accum_var_names)/sizeof(*accu
 
 static unixtime parse_init_time(const char *);
 
-static bool is_bad_data_pinterp(double);
+static bool is_bad_data_wrf(double);
 
 static bool is_accumulation(const char *);
 
@@ -80,14 +89,14 @@ static bool is_accumulation(const char *);
 
 
    //
-   //  Code for class PinterpFile
+   //  Code for class WrfFile
    //
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-PinterpFile::PinterpFile()
+WrfFile::WrfFile()
 
 {
 
@@ -99,7 +108,7 @@ init_from_scratch();
 ////////////////////////////////////////////////////////////////////////
 
 
-PinterpFile::~PinterpFile()
+WrfFile::~WrfFile()
 
 {
 
@@ -111,7 +120,7 @@ close();
 ////////////////////////////////////////////////////////////////////////
 
 
-void PinterpFile::init_from_scratch()
+void WrfFile::init_from_scratch()
 
 {
 
@@ -133,7 +142,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void PinterpFile::close()
+void WrfFile::close()
 
 {
 
@@ -147,7 +156,7 @@ Ndims = 0;
 
 DimNames.clear();
 
-Xdim = Ydim = Zdim = Tdim = (NcDim *) 0;
+Tdim = (NcDim *) 0;
 
 Nvars = 0;
 
@@ -156,10 +165,6 @@ if ( Var )  { delete [] Var;  Var = (NcVarInfo *) 0; }
 InitTime = (unixtime) 0;
 
 Ntimes = 0;
-
-PressureIndex = -1;
-
-hPaCF = 1.0;
 
    //
    //  done
@@ -173,7 +178,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool PinterpFile::open(const char * filename)
+bool WrfFile::open(const char * filename)
 
 {
 
@@ -182,13 +187,13 @@ int month, day, year, hour, minute, second, str_len;
 char time_str[max_str_len];
 string c;
 NcVar v;
-const char *method_name = "PinterpFile::open() -> ";
+const char *method_name = "WrfFile::open() -> ";
 
 close();
 
 Nc = open_ncfile(filename);
 mlog << Debug(5) << "\n" << method_name
-     << "opend  \"" << filename << "\".\n\n";
+     << "open \"" << filename << "\".\n\n";
 
 if ( IS_INVALID_NC_P(Nc) )  { close();  return ( false ); }
 
@@ -196,7 +201,7 @@ if ( IS_INVALID_NC_P(Nc) )  { close();  return ( false ); }
    //  grid
    //
 
-if ( ! get_pinterp_grid(*Nc, grid) )  { close();  return ( false ); }
+if ( !get_wrf_grid(*Nc, grid) )  { close();  return ( false ); }
 
    //
    //  dimensions
@@ -204,19 +209,13 @@ if ( ! get_pinterp_grid(*Nc, grid) )  { close();  return ( false ); }
 Ndims = get_dim_count(Nc);
 Dim = new NcDim*[Ndims];
 
-StringArray gDimNames;
-get_dim_names(Nc, &gDimNames);
+get_dim_names(Nc, &DimNames);
 
 for (j=0; j<Ndims; ++j)  {
-   c = to_lower(gDimNames[j]);
-   NcDim dim = get_nc_dim(Nc, gDimNames[j]);
+   c = to_lower(DimNames[j]);
+   NcDim dim = get_nc_dim(Nc, DimNames[j]);
 
    if ( c.compare(t_dim_name) == 0 )  Ntimes = GET_NC_SIZE(dim);
-
-   if ( c.compare(x_dim_name) == 0 )            Xdim = &dim;
-   if ( c.compare(y_dim_name) == 0 )            Ydim = &dim;
-   if ( c.compare(z_dim_p_interp_name  ) == 0 ||
-        c.compare(z_dim_wrf_interp_name) == 0)  Zdim = &dim;
    if ( c.compare(t_dim_name) == 0 )            Tdim = &dim;
 
 }
@@ -315,45 +314,16 @@ InitTime = parse_init_time(att_value.c_str());
       get_att_str( Var[j], description_att_name, Var[j].long_name_att );
       get_att_str( Var[j], units_att_name,       Var[j].units_att     );
 
-      //
-      //  get the pressure variable and store the hPa conversion factor
-      //
-
-      if ( strcasecmp(GET_NC_NAME(v).c_str(), pressure_var_p_interp_name)   == 0 ||
-           strcasecmp(GET_NC_NAME(v).c_str(), pressure_var_wrf_interp_name) == 0 ) {
-         PressureIndex = j;
-              if ( strcasecmp(Var[j].units_att.c_str(), pa_units_str ) == 0 ) hPaCF = 0.01;
-         else if ( strcasecmp(Var[j].units_att.c_str(), hpa_units_str) == 0 ) hPaCF = 1.0;
-      }
-
-
       dimNames.clear();
       get_dim_names(&v, &dimNames);
-
+      string c;
       for (k=0; k<(dim_count); ++k)  {
         c = to_lower(dimNames[k]);
         NcDim dim = get_nc_dim(&v, dimNames[k]);
         Var[j].Dims[k] = &dim;
 
-        if ( Var[j].Dims[k] == Xdim )  Var[j].x_slot = k;
-        if ( Var[j].Dims[k] == Ydim )  Var[j].y_slot = k;
-        if ( Var[j].Dims[k] == Zdim )  Var[j].z_slot = k;
-        if ( Var[j].Dims[k] == Tdim )  Var[j].t_slot = k;
-        if ( c.compare(x_dim_name) == 0 ) {
-           Var[j].x_slot = k;
-        }
-        if ( c.compare(y_dim_name) == 0 ) {
-           Var[j].y_slot = k;
-        }
-        if ( c.compare(z_dim_p_interp_name  ) == 0 ||
-             c.compare(z_dim_wrf_interp_name) == 0) {
-           Var[j].z_slot = k;
-        }
-        if ( c.compare(t_dim_name) == 0 ) {
-           Var[j].t_slot = k;
-        }
-      }   //  for k
-   }   //  for j
+      }   //  for k : dim_count
+   }   //  for j : Nvars
 
 
    //
@@ -368,13 +338,14 @@ return ( true );
 ////////////////////////////////////////////////////////////////////////
 
 
-void PinterpFile::dump(ostream & out, int depth) const
+void WrfFile::dump(ostream & out, int depth) const
 
 {
 
 int j, k;
 int month, day, year, hour, minute, second;
 char junk[256];
+string c;
 Indent prefix(depth);
 Indent p2(depth + 1);
 Indent p3(depth + 2);
@@ -400,10 +371,7 @@ for (j=0; j<Ndims; ++j)  {
 
 out << prefix << "\n";
 
-out << prefix << "Xdim = " << (Xdim ? GET_NC_NAME_P(Xdim) : "(nul)") << "\n";
-out << prefix << "Ydim = " << (Ydim ? GET_NC_NAME_P(Ydim) : "(nul)") << "\n";
-out << prefix << "Zdim = " << (Zdim ? GET_NC_NAME_P(Zdim) : "(nul)") << "\n";
-out << prefix << "Tdim = " << (Zdim ? GET_NC_NAME_P(Tdim) : "(nul)") << "\n";
+out << prefix << "Tdim = " << (Tdim ? GET_NC_NAME_P(Tdim) : "(nul)") << "\n";
 
 out << prefix << "\n";
 
@@ -440,12 +408,21 @@ for (j=0; j<Nvars; ++j)  {
    out << p2 << "Var # " << j << " = " << (Var[j].name) << "  (";
 
    for (k=0; k<(Var[j].Ndims); ++k)  {
-
-           if ( Var[j].Dims[k] == Xdim )  out << 'X';
-      else if ( Var[j].Dims[k] == Ydim )  out << 'Y';
-      else if ( Var[j].Dims[k] == Zdim )  out << 'Z';
-      else if ( Var[j].Dims[k] == Tdim )  out << 'T';
-      else                                out << GET_NC_NAME_P(Var[j].Dims[k]);
+      c = to_lower(DimNames[k]);
+           if ( c.compare(x_dim_name) == 0 )           out << "X";
+      else if ( c.compare(x_dim_stag_name) == 0 )      out << "X (staggered)";
+      else if ( c.compare(x_dim_subgrid_name) == 0 )   out << "X (subgrid)";
+      else if ( c.compare(y_dim_name) == 0 )           out << "Y";
+      else if ( c.compare(y_dim_stag_name) == 0 )      out << "Y (staggered)";
+      else if ( c.compare(y_dim_subgrid_name) == 0 )   out << "Y (subgrid)";
+      else if ( c.compare(z_dim_p_interp_name) == 0 ||
+                c.compare(z_dim_wrf_interp_name) == 0 ||
+                c.compare(z_dim_wrf_name) == 0 ||
+                c.compare(z_dim_wrf_pres_name) == 0 ||
+                c.compare(z_dim_wrf_z_name) == 0 )     out << "Z";
+      else if ( c.compare(z_dim_wrf_stag_name) == 0 )  out << "Z (staggered)";
+      else if ( Var[j].Dims[k] == Tdim )                  out << 'T';
+      else                                                out << GET_NC_NAME_P(Var[j].Dims[k]);
 
       if ( k < Var[j].Ndims - 1)  out << ", ";
 
@@ -482,13 +459,13 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-unixtime PinterpFile::valid_time(int n) const
+unixtime WrfFile::valid_time(int n) const
 
 {
 
 if ( (n < 0) || (n >= Ntimes) )  {
 
-   mlog << Error << "\nPinterpFile::valid_time(int) const -> "
+   mlog << Error << "\nWrfFile::valid_time(int) const -> "
         << "range check error\n\n";
 
    exit ( 1 );
@@ -504,13 +481,13 @@ return ( Time [n] );
 ////////////////////////////////////////////////////////////////////////
 
 
-int PinterpFile::lead_time(int n) const
+int WrfFile::lead_time(int n) const
 
 {
 
 if ( (n < 0) || (n >= Ntimes) )  {
 
-   mlog << Error << "\nPinterpFile::lead_time(int) const -> "
+   mlog << Error << "\nWrfFile::lead_time(int) const -> "
         << "range check error\n\n";
 
    exit ( 1 );
@@ -527,14 +504,13 @@ return ( (int) dt );
 ////////////////////////////////////////////////////////////////////////
 
 
-double PinterpFile::data(NcVar * var, const LongArray & a) const
+double WrfFile::data(NcVar * var, const LongArray & a) const
 
 {
-
+const char *method_name = "WrfFile::data(NcVar *, const LongArray &) const -> ";
 if ( !args_ok(a) )  {
 
-   mlog << Error << "\nPinterpFile::data(NcVar *, const LongArray &) const -> "
-        << "bad arguments:\n";
+   mlog << Error << "\n" << method_name << "bad arguments:\n";
 
    a.dump(cerr);
 
@@ -545,7 +521,7 @@ if ( !args_ok(a) )  {
 int dim_count = var->getDimCount();
 if ( dim_count != a.n_elements() )  {
 
-   mlog << Error << "\nPinterpFile::data(NcVar *, const LongArray &) const -> "
+   mlog << Error << "\n" << method_name
         << "needed " << (dim_count) << " arguments for variable "
         << (GET_NC_NAME_P(var)) << ", got " << (a.n_elements()) << "\n\n";
 
@@ -553,9 +529,9 @@ if ( dim_count != a.n_elements() )  {
 
 }
 
-if ( dim_count >= max_pinterp_args )  {
+if (dim_count >= max_wrf_args )  {
 
-   mlog << Error << "\nPinterpFile::data(NcVar *, const LongArray &) const -> "
+   mlog << Error << "\n" << method_name
         << " too may arguments for variable \"" << (GET_NC_NAME_P(var)) << "\"\n\n";
 
    exit ( 1 );
@@ -563,9 +539,6 @@ if ( dim_count >= max_pinterp_args )  {
 }
 
 bool status = false;
-int i;
-short s;
-float f;
 double fill_value;
 double d = bad_data_double;
 double missing_value = get_var_missing_value(var);
@@ -575,8 +548,7 @@ status = get_nc_data(var, &d, a);
 
 if ( !status )  {
 
-   mlog << Error << "\nPinterpFile::data(NcVar *, const LongArray &) const -> "
-        << " bad status for var->get()\n\n";
+   mlog << Error << "\n" << method_name << " bad status for var->get()\n\n";
 
    exit ( 1 );
 }
@@ -593,14 +565,13 @@ return ( d );
 ////////////////////////////////////////////////////////////////////////
 
 
-bool PinterpFile::data(NcVar * v, const LongArray & a, DataPlane & plane, double & pressure) const
+bool WrfFile::data(NcVar * v, const LongArray & a, DataPlane & plane, double & pressure) const
 
 {
-
+const char *method_name = "WrfFile::data(NcVar *, const LongArray &, DataPlane &, double &) const -> ";
 if ( !args_ok(a) )  {
 
-   mlog << Warning << "\nPinterpFile::data(NcVar *, const LongArray &, DataPlane &, double &) const -> "
-        << "bad arguments:\n";
+   mlog << Warning << "\n" << method_name << "bad arguments:\n";
 
    a.dump(cerr);
 
@@ -612,7 +583,7 @@ string var_name = GET_NC_NAME_P(v);
 int dim_count = v->getDimCount();
 if ( dim_count != a.n_elements() )  {
 
-   mlog << Warning << "\nPinterpFile::data(NcVar *, const LongArray &, DataPlane &, double &) const -> "
+   mlog << Warning << "\n" << method_name
         << "needed " << dim_count << " arguments for variable "
         << (var_name) << ", got " << (a.n_elements()) << "\n\n";
 
@@ -620,9 +591,9 @@ if ( dim_count != a.n_elements() )  {
 
 }
 
-if ( dim_count >= max_pinterp_args )  {
+if (dim_count >= max_wrf_args )  {
 
-   mlog << Warning << "\nPinterpFile::data(NcVar *, const LongArray &, DataPlane &, double &) const -> "
+   mlog << Warning << "\n" << method_name
         << " too may arguments for variable \"" << (var_name) << "\"\n\n";
 
    return ( false );
@@ -630,14 +601,12 @@ if ( dim_count >= max_pinterp_args )  {
 }
 
 
-int j, count;
+int j, k, count;
 int x, y;
 double value;
 bool found = false;
 NcVarInfo * var = (NcVarInfo *) 0;
 NcVarInfo * P   = (NcVarInfo *) 0;
-const int Nx = grid.nx();
-const int Ny = grid.ny();
 LongArray b = a;
 
 pressure = bad_data_double;
@@ -645,8 +614,6 @@ pressure = bad_data_double;
    //
    //  find varinfo's
    //
-
-if ( PressureIndex >= 0 )  P = Var + PressureIndex;
 
 found = false;
 
@@ -658,12 +625,157 @@ for (j=0; j<Nvars; ++j)  {
 
 if ( !found )  {
 
-   mlog << Warning << "\nPinterpFile::data(NcVar *, const LongArray &, DataPlane &, double &) const -> "
+   mlog << Warning << "\n" << method_name
         << "variable " << (var_name) << " not found!\n\n";
 
    return ( false );
 
 }
+
+   // check dimensions
+   StringArray varDimNames;
+   get_dim_names(var->var, &varDimNames);
+   string c, z_name;
+   for (k=0; k<(var->Ndims); ++k)  {
+      c = to_lower(varDimNames[k]);
+
+      // X dimension
+      if ( c.compare(x_dim_name) == 0 ||
+           c.compare(x_dim_stag_name) == 0 ||
+           c.compare(x_dim_subgrid_name) == 0) {
+
+         var->x_slot = k;
+
+         // track fields that need to be de-staggered in the X dimension
+         if ( c.compare(x_dim_stag_name) == 0 ) {
+
+            var->x_stag = true;
+
+         }
+
+         // error if unsupported subgrid
+           if ( c.compare(x_dim_subgrid_name) == 0 ) {
+
+              mlog << Error << "\n" << method_name
+                   << "X Dimension \"" << x_dim_subgrid_name << "\" is not supported.\n\n";
+              return ( false );
+
+           }
+
+      }
+         // Y dimension
+      else if ( c.compare(y_dim_name) == 0 ||
+                c.compare(y_dim_stag_name) == 0 ||
+                c.compare(y_dim_subgrid_name) == 0 ) {
+
+         var->y_slot = k;
+
+         // track fields that need to be de-staggered in the Y dimension
+         if ( c.compare(y_dim_stag_name) == 0 ) {
+
+            var->y_stag = true;
+
+         }
+
+         // error if unsupported subgrid
+           if ( c.compare(y_dim_subgrid_name) == 0 ) {
+
+              mlog << Error << "\n" << method_name
+                   << "Y Dimension \"" << y_dim_subgrid_name << "\" is not supported.\n\n";
+              return ( false );
+
+           }
+
+      }
+         // Z dimension
+      else if ( c.compare(z_dim_p_interp_name  ) == 0 ||
+                c.compare(z_dim_wrf_interp_name) == 0 ||
+                c.compare(z_dim_wrf_name  ) == 0 ||
+                c.compare(z_dim_wrf_stag_name) == 0 ||
+                c.compare(z_dim_wrf_pres_name) == 0 ||
+                c.compare(z_dim_wrf_z_name ) == 0 ) {
+
+         var->z_slot = k;
+
+         // track fields that are on pressure levels
+         if ( c.compare(z_dim_p_interp_name) == 0 ||
+              c.compare(z_dim_wrf_interp_name) == 0 ||
+              c.compare(z_dim_wrf_pres_name) == 0 ) {
+
+            var->is_pressure = true;
+            z_name = c;
+
+         }
+
+         // track fields that need to be de-staggered in the Z dimension
+         if ( c.compare(z_dim_wrf_stag_name) == 0 ) {
+
+            var->z_stag = true;
+
+         }
+      }
+         // T dimension
+      else if ( c.compare(t_dim_name) == 0 ) {
+
+         var->t_slot = k;
+
+      }
+
+   } // end if k
+
+   bool time_in_pressure = false;
+   double pressure_unit_conversion = 1.0;
+
+   // if reading var on pressure, find pressure field that is on the same vertical (z) dimension as the var to read
+   if (var->is_pressure) {
+
+      StringArray varNames;
+      get_var_names(Nc, &varNames);
+
+      for (j = 0; j < Nvars; ++j) {
+         //
+         //  get the pressure variable and store the hPa conversion factor
+         //
+
+         if (varNames[j] == pressure_var_p_interp_name ||
+             varNames[j] == pressure_var_wrf_interp_name ||
+             varNames[j] == pressure_var_wrf_name) {
+
+            varDimNames.clear();
+            get_dim_names(Var[j].var, &varDimNames);
+
+            // check that the z dimension matches the var to read
+            found = false;
+            for(k=0; k< Var[j].Ndims; k++){
+               if(varDimNames[k] == z_name) {
+                  found = true;
+                  break;
+               }
+            }
+
+            if(!found) {
+               continue;
+            }
+
+            // set pressure field
+            P = Var + j;
+
+            if (varNames[j] == pressure_var_wrf_name) {
+
+               time_in_pressure = true;
+
+            }
+            if (strcasecmp(Var[j].units_att.c_str(), pa_units_str) == 0) pressure_unit_conversion = 0.01;
+            else if (strcasecmp(Var[j].units_att.c_str(), hpa_units_str) == 0) pressure_unit_conversion = 1.0;
+         }
+      }
+   }
+
+   //
+   // set nx and ny based on staggering of dimensions of the variable to read
+   //
+   const int Nx = var->x_stag ? grid.nx() + 1 : grid.nx();
+   const int Ny = var->y_stag ? grid.ny() + 1 : grid.ny();
 
    //
    //  check x_slot and y_slot
@@ -671,8 +783,7 @@ if ( !found )  {
 
 if ( var == nullptr || (var->x_slot < 0) || (var->y_slot < 0) )  {
 
-   mlog << Error
-        << "\nPinterpFile::data(NcVar *, const LongArray &, DataPlane &, double &) const -> "
+   mlog << Error << "\n" << method_name
         << "can't find needed dimensions(s) for variable \""
         << var_name << "\" ... one of the dimensions may be staggered.\n\n";
 
@@ -694,8 +805,7 @@ for (j=0; j<(a.n_elements()); ++j)  {
 
       if ( (j != var->x_slot) && (j != var->y_slot) )  {
 
-         mlog << Warning << "\nPinterpFile::data(NcVar *, const LongArray &, DataPlane &, double &) const -> "
-              << " star found in bad slot\n\n";
+         mlog << Warning << "\n" << method_name << " star found in bad slot\n\n";
 
          return ( false );
 
@@ -707,8 +817,7 @@ for (j=0; j<(a.n_elements()); ++j)  {
 
 if ( count != 2 )  {
 
-   mlog << Warning << "\nPinterpFile::data(NcVar *, const LongArray &, DataPlane &, double &) const -> "
-        << " bad star count ... " << count << "\n\n";
+   mlog << Warning << "\n" << method_name << " bad star count ... " << count << "\n\n";
 
    return ( false );
 
@@ -724,8 +833,7 @@ const int z_slot = var->z_slot;
 
 if ( (x_slot < 0) || (y_slot < 0) )  {
 
-   mlog << Warning << "\nPinterpFile::data(NcVar *, const LongArray &, DataPlane &, double &) const -> "
-        << " bad x|y slot\n\n";
+   mlog << Warning << "\n" << method_name << " bad x|y slot\n\n";
 
    return ( false );
 
@@ -762,7 +870,7 @@ for (x=0; x<Nx; ++x)  {
    for (y=0; y<Ny; ++y)  {
       value = d[y];
 
-      if ( is_bad_data_pinterp( value ) ) {
+      if (is_bad_data_wrf(value) ) {
          value = bad_data_double;
       }
 
@@ -772,17 +880,24 @@ for (x=0; x<Nx; ++x)  {
 
 }   //  for x
 
+// de-stagger the DataPlane if necessary
+plane.destagger(var->x_stag, var->y_stag);
+
    //
    //  get the pressure
    //
 
 if ( P && z_slot > 0 )  {
 
+   mlog << Debug(3) << "Reading pressure field " << P->name << "\n";
+
    LongArray c;
 
+   if(time_in_pressure) c.add(a[var->t_slot]);
+   
    c.add(a[z_slot]);
 
-   pressure = data(P->var, c) * hPaCF;
+   pressure = data(P->var, c) * pressure_unit_conversion;
 
 }
 
@@ -798,8 +913,8 @@ return ( true );
 ////////////////////////////////////////////////////////////////////////
 
 
-bool PinterpFile::data(const char * var_name, const LongArray & a, DataPlane & plane,
-                       double & pressure, NcVarInfo *&info) const {
+bool WrfFile::data(const char * var_name, const LongArray & a, DataPlane & plane,
+                   double & pressure, NcVarInfo *&info) const {
 
    int time_index;
    bool found = false;
@@ -822,7 +937,7 @@ bool PinterpFile::data(const char * var_name, const LongArray & a, DataPlane & p
    plane.set_lead  ( lead_time(time_index) );
 
    //
-   //  since Pinterp files only contain WRF-ARW output, it is always a
+   //  since Pinterp files only contain WRF-ARW output, it is always
    //  a runtime accumulation
    //
 
@@ -847,7 +962,7 @@ bool PinterpFile::data(const char * var_name, const LongArray & a, DataPlane & p
 
 ////////////////////////////////////////////////////////////////////////
 
-bool PinterpFile::get_nc_var_info(const char *var_name, NcVarInfo *&info) const {
+bool WrfFile::get_nc_var_info(const char *var_name, NcVarInfo *&info) const {
    bool found = false;
 
    if (nullptr == info) {
@@ -911,11 +1026,11 @@ return ( t );
 ////////////////////////////////////////////////////////////////////////
 
 
-bool is_bad_data_pinterp(double v)
+bool is_bad_data_wrf(double v)
 
 {
 
-if ( v < pinterp_missing )  return ( false );
+if (v < wrf_missing )  return ( false );
 else                        return ( true  );
 
 }
