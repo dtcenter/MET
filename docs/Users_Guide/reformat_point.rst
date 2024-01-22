@@ -94,7 +94,7 @@ In this example, the PB2NC tool will process the input **sample_pb.blk** file ap
 pb2nc Configuration File
 ------------------------
 
-The default configuration file for the PB2NC tool named **PB2NCConfig_default** can be found in the installed *share/met/config* directory. The version used for the example run in :numref:`Sample test cases` is available in *scripts/config*. It is recommended that users make a copy of configuration files prior to modifying their contents.
+The default configuration file for the PB2NC tool named **PB2NCConfig_default** can be found in the installed *share/met/config* directory. The version used for the installation test cases is available in *scripts/config*. It is recommended that users make a copy of configuration files prior to modifying their contents.
 
 Note that environment variables may be used when editing configuration files, as described in the :numref:`config_env_vars`.
 

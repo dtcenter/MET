@@ -47,6 +47,8 @@ export MAKE_ARGS="-j 5"
 # need to update the paths to the appropriate location.
 #export EXTERNAL_LIBS=${TEST_BASE}/external_libs
 #export MET_PROJ=${EXTERNAL_LIBS}
+#export TIFF_INCLUDE_DIR=${EXTERNAL_LIBS}/include
+#export TIFF_LIB_DIR=${EXTERNAL_LIBS}/lib
 #export SQLITE_INCLUDE_DIR=${EXTERNAL_LIBS}/include
 #export SQLITE_LIB_DIR=${EXTERNAL_LIBS}/lib
 #export MET_GSL=${EXTERNAL_LIBS}
