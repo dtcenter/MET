@@ -68,14 +68,13 @@ PythonHandler::PythonHandler(const char * program_name, const char * ascii_filen
 
 {
 
-int j;
 ConcatString s = ascii_filename;
 StringArray a = s.split(" ");
 
 
 user_script_filename = a[0];
 
-for (j=1; j<(a.n()); ++j)  {   //  j starts at one here, not zero
+for (int j=1; j<(a.n()); ++j)  {   //  j starts at one here, not zero
 
    user_script_args.add(a[j]);
 
@@ -117,7 +116,7 @@ bool PythonHandler::isFileType(LineDataFile &ascii_file) const
 
 {
 
-return ( false );
+return false;
 
 }
 
@@ -153,8 +152,7 @@ if ( ! PyList_Check(obj) )  {
 
 }
 
-int j;
-PyObject * a = 0;
+PyObject * a = nullptr;
 Python3_List list(obj);
 Observation obs;
 
@@ -164,7 +162,7 @@ Observation obs;
 
 use_var_id = false;
 
-for (j=0; j<(list.size()); ++j)  {
+for (int j=0; j<(list.size()); ++j)  {
 
    a = list[j];
 

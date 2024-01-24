@@ -32,7 +32,7 @@ public:
   SummaryCalcSum();
   virtual ~SummaryCalcSum();
 
-  virtual string getType() const
+  virtual std::string getType() const
   {
     return "SUM";
   }

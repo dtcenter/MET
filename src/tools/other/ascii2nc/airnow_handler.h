@@ -32,24 +32,24 @@ class AirnowHandler : public FileHandler
 
 public:
 
-  AirnowHandler(const string &program_name);
+  AirnowHandler(const std::string &program_name);
   virtual ~AirnowHandler();
 
   virtual bool isFileType(LineDataFile &ascii_file) const;
 
   void setFormatVersion(int version);
 
-  static string getFormatStringDailyV2()
+  static std::string getFormatStringDailyV2()
   {
     return "airnowdaily_v2";
   }
 
-  static string getFormatStringHourlyAqObs()
+  static std::string getFormatStringHourlyAqObs()
   {
     return "airnowhourlyaqobs";
   }
 
-  static string getFormatStringHourly()
+  static std::string getFormatStringHourly()
   {
     return "airnowhourly";
   }
@@ -82,7 +82,7 @@ protected:
 
   // Unchanging header information
 
-  string _stationId;
+  std::string _stationId;
   double _stationLat;
   double _stationLon;
   double _stationAlt;
@@ -132,7 +132,7 @@ protected:
   int so2Ptr;
   int so2UnitPtr;
 
-  string monitoringSiteFileName;
+  std::string monitoringSiteFileName;
 
   AirnowLocations locations;
 
@@ -154,43 +154,43 @@ protected:
 
   bool _determineFileType(LineDataFile &ascii_file);
 
-  void _addHourlyAqobsObs(const vector<string> &data_line, const string &header_type,
-			  const string &stationId, const time_t &valid_time,
+  void _addHourlyAqobsObs(const std::vector<std::string> &data_line, const std::string &header_type,
+			  const std::string &stationId, const time_t &valid_time,
 			  double lat, double lon, double elev,
 			  int measuredPtr, int aqiPtr, int valuePtr,
-			  int unitPtr, const string &varname);
-  void _addHourlyAqobsObs(const vector<string> &data_line, const string &header_type,
-			  const string &stationId, const time_t &valid_time,
+			  int unitPtr, const std::string &varname);
+  void _addHourlyAqobsObs(const std::vector<std::string> &data_line, const std::string &header_type,
+			  const std::string &stationId, const time_t &valid_time,
 			  double lat, double lon, double elev,
-			  int valuePtr, int unitPtr, const string &varname);
+			  int valuePtr, int unitPtr, const std::string &varname);
 
   // Get the observation valid time from the given observation line
 
-  time_t _getValidTime(const vector<string> &data_line) const;
+  time_t _getValidTime(const std::vector<std::string> &data_line) const;
   time_t _getValidTime(const DataLine &data_line) const;
-  time_t _getValidTime(const string &dateStr, const string &timeStr) const;
+  time_t _getValidTime(const std::string &dateStr, const std::string &timeStr) const;
 
 
   // Read the observations from the given file and add them to the
   // _observations vector.
 
   virtual bool _readObservations(LineDataFile &ascii_file);
-  bool _readObservationsHourlyAqobs(LineDataFile &ascii_file, int column_cnt, const string &delimiter,
-				    const string &header_type);
-  bool _readObservationsStandard(LineDataFile &ascii_file, int column_cnt, const string &delimiter,
-				 const string &header_type);
+  bool _readObservationsHourlyAqobs(LineDataFile &ascii_file, int column_cnt, const std::string &delimiter,
+				    const std::string &header_type);
+  bool _readObservationsStandard(LineDataFile &ascii_file, int column_cnt, const std::string &delimiter,
+				 const std::string &header_type);
   bool _parseObservationLineStandard(DataLine &data_line,
-				     const string &filename,
+				     const std::string &filename,
 				     int column_cnt,
-				     const string &header_type);
-  bool _parseObservationLineAqobs(const string &data_line, int column_cnt,
-				  const string &header_type, int lineNumber,
-				  const string &filename);
+				     const std::string &header_type);
+  bool _parseObservationLineAqobs(const std::string &data_line, int column_cnt,
+				  const std::string &header_type, int lineNumber,
+				  const std::string &filename);
 
   void _initializeColumnPointers();
 
-  string _extractColumn(const DataLine &data_line, int ptr) const;
-  int    _getVarIndex(const string &, const string &);
+  std::string _extractColumn(const DataLine &data_line, int ptr) const;
+  int    _getVarIndex(const std::string &, const std::string &);
 
 };
 

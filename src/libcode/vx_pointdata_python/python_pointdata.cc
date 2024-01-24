@@ -195,7 +195,7 @@ bool process_point_data(PyObject *python_met_point_data,
 {
 
 int int_value;
-PyObject *python_value    = 0;
+PyObject *python_value;
 ConcatString cs, user_dir, user_base;
 const char *method_name = "process_point_data -> ";
 const char *method_name_s = "process_point_data()";
@@ -289,7 +289,6 @@ bool process_point_data_list(PyObject *python_point_data, MetPointDataPython &me
    Observation obs;
    time_t vld_time;
    int hid, vid, qid, sid, typ_idx, vld_idx;
-   double lat, lon, elv, hgt, level, obs_value;
    double prev_lat, prev_lon, prev_elv, prev_vld, prev_typ, prev_sid;
    Python3_List list(python_point_data);
    const char *method_name = "process_point_data_list -> ";
@@ -325,9 +324,9 @@ bool process_point_data_list(PyObject *python_point_data, MetPointDataPython &me
       }
 
       obs.set(py_value);
-      lat = obs.getLatitude();
-      lon = obs.getLongitude();
-      elv = obs.getElevation();
+      double lat = obs.getLatitude();
+      double lon = obs.getLongitude();
+      double elv = obs.getElevation();
       if(filters) {
          if (filters->is_filtered(lat, lon)) continue;
          if (filters->is_filtered_sid(obs.getStationId().c_str())) continue;
@@ -405,16 +404,17 @@ bool process_point_data_list(PyObject *python_point_data, MetPointDataPython &me
 
    }   //  for j
 
-   met_pd_out.set_use_var_id(use_var_id);
-   mlog << Debug(9) << method_name << "use_var_id: \"" << use_var_id
-        << "\" from python.  is_using_var_id(): " << met_pd_out.is_using_var_id() << "\n";
-
-   if (hid <= 0) {
+   int h_cnt = hid + 1; // hid starts with -1
+   if (h_cnt < 0) {
       mlog << Error << "\n" << method_name
            << "The header is empty. Please check the python script and input\n\n";
       exit (1);
    }
-   met_pd_out.set_hdr_cnt(hid + 1);
+   met_pd_out.set_hdr_cnt(h_cnt);
+
+   met_pd_out.set_use_var_id(use_var_id);
+   mlog << Debug(9) << method_name << "use_var_id: \"" << use_var_id
+        << "\" from python.  is_using_var_id(): " << met_pd_out.is_using_var_id() << "\n";
 
    check_obs_data(obs_data, use_var_id, method_name);
    check_header_data(header_data, method_name);
@@ -441,8 +441,7 @@ bool straight_python_point_data(const char * script_name, int script_argc, char 
 {
 
 int int_value;
-PyObject *module_obj      = 0;
-PyObject *python_value    = 0;
+PyObject *module_obj;
 ConcatString cs, user_dir, user_base;
 const char *method_name = "straight_python_point_data -> ";
 
@@ -530,7 +529,7 @@ if ( PyErr_Occurred() )  {
         << "an error occurred importing module \""
         << script_name << "\"\n\n";
 
-   return ( false );
+   return false;
 
 }
 
@@ -540,7 +539,7 @@ if ( ! module_obj )  {
         << "error running python script \""
         << script_name << "\"\n\n";
 
-   return ( false );
+   return false;
 
 }
 
@@ -579,7 +578,7 @@ int status;
 ConcatString command;
 ConcatString path;
 ConcatString tmp_nc_path;
-const char * tmp_dir = 0;
+const char * tmp_dir = nullptr;
 Wchar_Argv wa;
 const char *method_name = "tmp_nc_point_obs() -> ";
 
