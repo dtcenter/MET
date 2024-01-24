@@ -27,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set job controls
         id: job_status
         run: .github/jobs/set_job_controls.sh
@@ -57,7 +57,7 @@ jobs:
           - '--enable-modis'
       fail-fast: false
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Create directories to store output
         run: mkdir -p ${RUNNER_WORKSPACE}/logs
