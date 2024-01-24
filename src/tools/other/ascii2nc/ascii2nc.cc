@@ -48,7 +48,8 @@
 //   019    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
 //   020    08/26/22  Dave Albo      MET #2142 Add AirNow observations
 //   021    10/03/22  Prestopnik     MET #2227 Remove using namespace std from header files
-//   022    10/07/22  Dave Albo      MET #2276 Add NDBC Buoy data
+//   022    10/07/22  Dave Albo      MET #2276 Add NDBC buoy data
+//   023    11/28/23  Halley Gotway  MET #2701 Add ISMN soil moisture data
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -86,6 +87,7 @@ using namespace std;
 #include "aeronet_handler.h"
 #include "airnow_handler.h"
 #include "ndbc_handler.h"
+#include "ismn_handler.h"
 
 #ifdef ENABLE_PYTHON
 #include "global_python.h"
@@ -113,6 +115,7 @@ enum ASCIIFormat {
    ASCIIFormat_Airnow_hourlyaqobs,
    ASCIIFormat_Airnow_hourly,
    ASCIIFormat_NDBC_standard,
+   ASCIIFormat_ISMN,
    ASCIIFormat_Aeronet_v2,
    ASCIIFormat_Aeronet_v3, 
    ASCIIFormat_Python, 
@@ -322,6 +325,10 @@ FileHandler *create_file_handler(const ASCIIFormat format, const ConcatString &a
          return((FileHandler *) handler);
       }
 
+      case ASCIIFormat_ISMN: {
+         return((FileHandler *) new IsmnHandler(program_name));
+      }
+
       case ASCIIFormat_Aeronet_v2: {
          AeronetHandler *handler = new AeronetHandler(program_name);
          handler->setFormatVersion(2);
@@ -459,9 +466,21 @@ FileHandler *determine_ascii_format(const ConcatString &ascii_filename) {
    delete ndbc_file;
 
    //
+   // See if this is an ISMN file.
+   //
+   f_in.rewind();
+   IsmnHandler *ismn_file = new IsmnHandler(program_name);
+
+   if(ismn_file->isFileType(f_in)) {
+     f_in.close();
+     return((FileHandler *) ismn_file);
+   }
+
+   delete ismn_file;
+
+   //
    // If we get here, we didn't recognize the file contents.
    //
-
    mlog << Error << "\ndetermine_ascii_format() -> "
         << "could not determine file format based on file contents\n\n";
 
@@ -503,6 +522,7 @@ void usage() {
         << AirnowHandler::getFormatStringHourlyAqObs() << "\", \""
         << AirnowHandler::getFormatStringHourly() << "\", \""
         << NdbcHandler::getFormatStringStandard() << "\", \""
+        << IsmnHandler::getFormatString() << "\", \""
         << AeronetHandler::getFormatString() << "\", \""
         << AeronetHandler::getFormatString_v2() << "\", \""
         << AeronetHandler::getFormatString_v3() << "\"";
@@ -584,6 +604,9 @@ void set_format(const StringArray & a) {
    }
    else if(NdbcHandler::getFormatStringStandard() == a[0]) {
      ascii_format = ASCIIFormat_NDBC_standard;
+   }
+   else if(IsmnHandler::getFormatString() == a[0]) {
+     ascii_format = ASCIIFormat_ISMN;
    }
    else if(AeronetHandler::getFormatString() == a[0]
      || AeronetHandler::getFormatString_v2() == a[0]) {

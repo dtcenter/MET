@@ -39,22 +39,16 @@ those observations, and writes the result to a NetCDF output file.
 
 PB2NC creates the following temporary files when running:
 
-* :code:`tmp_pb2nc_blk_{PID}`, :code:`tmp_pb2nc_meta_blk_{PID}`,
-  :code:`tmp_pb2nc_tbl_blk_{PID}`
+* :code:`tmp_pb2nc_blk_{PID}`
 
   PB2NC assumes that each input binary file requires Fortran
   blocking prior to being read by the BUFRLIB library. It applies
   Fortran blocking, writes the result to this temporary file, and
   uses BUFRLIB to read its contents.
 
-* :code:`tmp_pb2nc_bufr_{PID}_tbl`: PB2NC extracts Bufr table data
+* :code:`tmp_pb2nc_blk_{PID}_tbl`: PB2NC extracts Bufr table data
   that is embedded in input files and writes it to this temporary
   file for later use.
-
-.. note::
-   The first 3 files listed above are identical. They are all
-   Fortran-blocked versions of the same input file. Recommend
-   modifying the logic to only apply Fortran blocking once.
 
 .. _tmp_files_point2grid:
 

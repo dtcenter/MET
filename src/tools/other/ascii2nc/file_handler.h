@@ -10,8 +10,8 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-#ifndef  __FILEHANDLER_H__
-#define  __FILEHANDLER_H__
+#ifndef  __FILE_HANDLER_H__
+#define  __FILE_HANDLER_H__
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -47,7 +47,7 @@ class FileHandler
 
 public:
 
-  FileHandler(const string &program_name);
+  FileHandler(const std::string &program_name);
   virtual ~FileHandler();
 
   virtual bool isFileType(LineDataFile &ascii_file) const = 0;
@@ -56,10 +56,10 @@ public:
   void setAreaMask(MaskPlane   &a);
   void setPolyMask(MaskPoly    &p);
   void setSIDMask (StringArray &s);
-  void setMessageTypeMap(map<ConcatString, ConcatString> m);
+  void setMessageTypeMap(std::map<ConcatString, ConcatString> m);
 
-  virtual bool readAsciiFiles(const vector< ConcatString > &ascii_filename_list);
-  bool writeNetcdfFile(const string &nc_filename);
+  virtual bool readAsciiFiles(const std::vector< ConcatString > &ascii_filename_list);
+  bool writeNetcdfFile(const std::string &nc_filename);
 
   bool summarizeObs(const TimeSummaryInfo &summary_info);
 
@@ -81,7 +81,7 @@ protected:
   // Protected members //
   ///////////////////////
 
-  string _programName;
+  std::string _programName;
 
   // Variables for writing output NetCDF file
 
@@ -95,11 +95,11 @@ protected:
 
   MaskFilters filters;
 
-  map<ConcatString, ConcatString> _messageTypeMap;
+  std::map<ConcatString, ConcatString> _messageTypeMap;
 
   // List of observations read from the ascii files
 
-  vector< Observation > _observations;
+  std::vector< Observation > _observations;
   bool  use_var_id;
   StringArray obs_names;
   StringArray obs_units;
@@ -124,7 +124,7 @@ protected:
 
   void _countHeaders();
 
-  time_t _getValidTime(const string &time_string) const;
+  time_t _getValidTime(const std::string &time_string) const;
 
   // Read the observations from the given file.
 
@@ -141,8 +141,8 @@ protected:
   bool _writeObservations();
 
   void _closeNetcdf();
-  bool _openNetcdf(const string &nc_filename);
-  void debug_print_observations(vector< Observation >, string);
+  bool _openNetcdf(const std::string &nc_filename);
+  void debug_print_observations(std::vector< Observation >, std::string);
 };
 
 inline void FileHandler::setCompressionLevel(int compressoion_level) { deflate_level = compressoion_level; }
@@ -150,7 +150,7 @@ inline void FileHandler::setGridMask(Grid        &g) { filters.set_grid_mask(&g)
 inline void FileHandler::setAreaMask(MaskPlane   &a) { filters.set_area_mask(&a); }
 inline void FileHandler::setPolyMask(MaskPoly    &p) { filters.set_poly_mask(&p); }
 inline void FileHandler::setSIDMask (StringArray &s) { filters.set_sid_mask(&s); }
-inline void FileHandler::setMessageTypeMap(map<ConcatString, ConcatString> m) {
+inline void FileHandler::setMessageTypeMap(std::map<ConcatString, ConcatString> m) {
    _messageTypeMap = m;
 }
 
@@ -158,7 +158,7 @@ inline void FileHandler::setMessageTypeMap(map<ConcatString, ConcatString> m) {
 ////////////////////////////////////////////////////////////////////////
 
 
-#endif   /*  __FILEHANDLER_H__  */
+#endif   /*  __FILE_HANDLER_H__  */
 
 
 ////////////////////////////////////////////////////////////////////////

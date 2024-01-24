@@ -199,7 +199,16 @@
     </output>
   </test>
 
-
-
+  <test name="ascii2nc_ismn_SNOTEL">
+    <exec>&MET_BIN;/ascii2nc</exec>
+    <param> \
+    -format ismn  \
+    &DATA_DIR_OBS;/ismn/SNOTEL/*/*.stm \
+    &OUTPUT_DIR;/ascii2nc/ismn_SNOTEL_20220924_20220927.nc
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/ascii2nc/ismn_SNOTEL_20220924_20220927.nc</point_nc>
+    </output>
+  </test>
 
 </met_test>
