@@ -205,8 +205,8 @@ jobs:
           path: ${{ runner.workspace }}/logs
           if-no-files-found: ignore
 
-  unit_rc_leads:
-    name: Unit RC leads
+  unit_1c:
+    name: Unit 1c
     runs-on: ubuntu-latest
     needs: [job_control, update_input_data, compile]
     if: ${{ needs.job_control.outputs.run_unit_tests == 'true' }}
@@ -236,7 +236,7 @@ jobs:
       - name: Upload output as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: unit_rc_leads_${{ matrix.jobid }}
+          name: unit_1c_${{ matrix.jobid }}
           path: ${{ runner.workspace }}/output
 
       - name: Upload logs as artifact
@@ -247,10 +247,10 @@ jobs:
           path: ${{ runner.workspace }}/logs
           if-no-files-found: ignore
 
-  unit_rc:
-    name: Unit RC
+  unit_2c:
+    name: Unit 2c 
     runs-on: ubuntu-latest
-    needs: [job_control, unit_rc_leads]
+    needs: [job_control, unit_1c]
     if: ${{ needs.job_control.outputs.run_unit_tests == 'true' }}
     strategy:
       matrix:
@@ -268,7 +268,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: ${{ runner.workspace }}/output
-          pattern: unit_rc_leads_job*
+          pattern: unit_1c_job*
           merge-multiple: true
 
       - name: Run Unit Tests in Docker
@@ -281,14 +281,14 @@ jobs:
       - name: Upload output as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: unit_rc_${{ matrix.jobid }}
+          name: unit_2c_${{ matrix.jobid }}
           path: ${{ runner.workspace }}/output
 
       - name: Upload logs as artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: logs_unit_rc_${{ matrix.jobid }}
+          name: logs_unit_2c_${{ matrix.jobid }}
           path: ${{ runner.workspace }}/logs
           if-no-files-found: ignore
 
@@ -399,7 +399,7 @@ jobs:
   run_diffs:
     name: Check for Differences
     runs-on: ubuntu-latest
-    needs: [job_control, unit_1b, unit_2a, unit_2b, unit_rc]
+    needs: [job_control, unit_1b, unit_2a, unit_2b, unit_2c]
     if: ${{ needs.job_control.outputs.run_diff == 'true' }}
     steps:
       - name: Download data from previous jobs
@@ -451,7 +451,7 @@ jobs:
   update_truth:
     name: Update Truth Data
     runs-on: ubuntu-latest
-    needs: [job_control, unit_1b, unit_2a, unit_2b, unit_rc]
+    needs: [job_control, unit_1b, unit_2a, unit_2b, unit_2c]
     if: ${{ needs.job_control.outputs.run_update_truth == 'true' }}
     steps:
       - uses: actions/checkout@v4
