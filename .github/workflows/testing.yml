@@ -105,7 +105,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: logs
+          name: logs_compile
           path: ${{ runner.workspace }}/logs
           if-no-files-found: ignore
 
@@ -132,9 +132,11 @@ jobs:
     if: ${{ needs.job_control.outputs.run_unit_tests == 'true' }}
     strategy:
       matrix:
-        tests:
-          - 'ascii2nc'
-          - 'pb2nc madis2nc pcp_combine'
+        include:
+          - jobid: '1' 
+            tests: 'ascii2nc'
+          - jobid: '2'
+            tests: 'pb2nc madis2nc pcp_combine'
       fail-fast: false
     steps:
       - uses: actions/checkout@v4
@@ -152,14 +154,14 @@ jobs:
       - name: Upload output as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: unit_1a
+          name: unit_1a_job${{ matrix.jobid }}
           path: ${{ runner.workspace }}/output
 
       - name: Upload logs as artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: logs
+          name: logs_unit_1a_job${{ matrix.jobid }}
           path: ${{ runner.workspace }}/logs
           if-no-files-found: ignore
 
@@ -170,9 +172,11 @@ jobs:
     if: ${{ needs.job_control.outputs.run_unit_tests == 'true' }}
     strategy:
       matrix:
-        tests:
-          - 'ascii2nc_indy pb2nc_indy tc_dland tc_pairs tc_stat plot_tc tc_rmw rmw_analysis tc_diag tc_gen'
-          - 'met_test_scripts mode_multivar mode_graphics mtd regrid airnow gsi_tools netcdf modis series_analysis gen_ens_prod wwmca_regrid gen_vx_mask grid_weight interp_shape grid_diag grib_tables lidar2nc shift_data_plane trmm2nc aeronet wwmca_plot ioda2nc gaussian'
+        include:
+          - jobid: '1'
+            tests: 'ascii2nc_indy pb2nc_indy tc_dland tc_pairs tc_stat plot_tc tc_rmw rmw_analysis tc_diag tc_gen'
+          - jobid: '2'
+            tests: 'met_test_scripts mode_multivar mode_graphics mtd regrid airnow gsi_tools netcdf modis series_analysis gen_ens_prod wwmca_regrid gen_vx_mask grid_weight interp_shape grid_diag grib_tables lidar2nc shift_data_plane trmm2nc aeronet wwmca_plot ioda2nc gaussian'
       fail-fast: false
     steps:
       - uses: actions/checkout@v4
@@ -190,14 +194,14 @@ jobs:
       - name: Upload output as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: unit_1b
+          name: unit_1b_job${{ matrix.jobid }}
           path: ${{ runner.workspace }}/output
 
       - name: Upload logs as artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: logs
+          name: logs_unit_1b_job${{ matrix.jobid }}
           path: ${{ runner.workspace }}/logs
           if-no-files-found: ignore
 
@@ -208,10 +212,13 @@ jobs:
     if: ${{ needs.job_control.outputs.run_unit_tests == 'true' }}
     strategy:
       matrix:
-        tests:
-          - 'ref_config_lead_00 ref_config_lead_12'
-          - 'ref_config_lead_24 ref_config_lead_48'
-          - 'ref_config_lead_36'
+        include:
+          - jobid: '1'
+            tests: 'ref_config_lead_00 ref_config_lead_12'
+          - jobid: '2'
+            tests: 'ref_config_lead_24 ref_config_lead_48'
+          - jobid: '3'
+            tests: 'ref_config_lead_36'
       fail-fast: false
     steps:
       - uses: actions/checkout@v4
@@ -229,14 +236,14 @@ jobs:
       - name: Upload output as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: unit_rc_leads
+          name: unit_rc_leads_job${{ matrix.jobid }}
           path: ${{ runner.workspace }}/output
 
       - name: Upload logs as artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: logs
+          name: logs_rc_leads_job${{ matrix.jobid }}
           path: ${{ runner.workspace }}/logs
           if-no-files-found: ignore
 
@@ -247,8 +254,9 @@ jobs:
     if: ${{ needs.job_control.outputs.run_unit_tests == 'true' }}
     strategy:
       matrix:
-        tests:
-          - 'ref_config'
+        include:
+          - jobid: '1'
+            tests: 'ref_config'
       fail-fast: false
     steps:
       - uses: actions/checkout@v4
@@ -259,8 +267,9 @@ jobs:
       - name: Download ref_config_leads output from artifact
         uses: actions/download-artifact@v4
         with:
-          name: unit_rc_leads
           path: ${{ runner.workspace }}/output
+          pattern: unit_rc_leads_job*
+          merge-multiple: true
 
       - name: Run Unit Tests in Docker
         run: .github/jobs/run_unit_docker.sh
@@ -272,14 +281,14 @@ jobs:
       - name: Upload output as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: unit_rc
+          name: unit_rc_job${{ matrix.jobid }}
           path: ${{ runner.workspace }}/output
 
       - name: Upload logs as artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: logs
+          name: logs_unit_rc_job${{ matrix.jobid }}
           path: ${{ runner.workspace }}/logs
           if-no-files-found: ignore
 
@@ -290,12 +299,17 @@ jobs:
     if: ${{ needs.job_control.outputs.run_unit_tests == 'true' }}
     strategy:
       matrix:
-        tests:
-          - 'point_stat stat_analysis_ps'
-          - 'grid_stat stat_analysis_gs'
-          - 'wavelet_stat stat_analysis_ws'
-          - 'ensemble_stat stat_analysis_es'
-          - 'ugrid'
+        include:
+          - jobid: '1'
+            tests: 'point_stat stat_analysis_ps'
+          - jobid: '2'
+            tests: 'grid_stat stat_analysis_gs'
+          - jobid: '3'
+            tests: 'wavelet_stat stat_analysis_ws'
+          - jobid: '4'
+            tests: 'ensemble_stat stat_analysis_es'
+          - jobid: '5'
+            tests: 'ugrid'
       fail-fast: false
     steps:
       - uses: actions/checkout@v4
@@ -306,8 +320,9 @@ jobs:
       - name: Download 1a output from artifact
         uses: actions/download-artifact@v4
         with:
-          name: unit_1a
           path: ${{ runner.workspace }}/output
+          pattern: unit_1a_job*
+          merge-multiple: true
 
       - name: Run Unit Tests in Docker
         run: .github/jobs/run_unit_docker.sh
@@ -319,14 +334,14 @@ jobs:
       - name: Upload output as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: unit_2a
+          name: unit_2a_job${{ matrix.jobid }}
           path: ${{ runner.workspace }}/output
 
       - name: Upload logs as artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: logs
+          name: logs_unit_2a_job${{ matrix.jobid }}
           path: ${{ runner.workspace }}/logs
           if-no-files-found: ignore
 
@@ -337,11 +352,15 @@ jobs:
     if: ${{ needs.job_control.outputs.run_unit_tests == 'true' }}
     strategy:
       matrix:
-        tests:
-          - 'climatology_1.0deg'
-          - 'climatology_1.5deg'
-          - 'climatology_2.5deg'
-          - 'python point2grid plot_data_plane mode mode_analysis perc_thresh hira plot_point_obs quality_filter obs_summary duplicate_flag'
+        include:
+          - jobid: '1'
+            tests: 'climatology_1.0deg'
+          - jobid: '2'
+            tests: 'climatology_1.5deg'
+          - jobid: '3'
+            tests: 'climatology_2.5deg'
+          - jobid: '4'
+            tests: 'python point2grid plot_data_plane mode mode_analysis perc_thresh hira plot_point_obs quality_filter obs_summary duplicate_flag'
       fail-fast: false
     steps:
       - uses: actions/checkout@v4
@@ -352,8 +371,9 @@ jobs:
       - name: Download 1a output from artifact
         uses: actions/download-artifact@v4
         with:
-          name: unit_1a
           path: ${{ runner.workspace }}/output
+          pattern: unit_1a_job*
+          merge-multiple: true
 
       - name: Run Unit Tests in Docker
         run: .github/jobs/run_unit_docker.sh
@@ -365,14 +385,14 @@ jobs:
       - name: Upload output as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: unit_2b
+          name: unit_2b_job${{ matrix.jobid }}
           path: ${{ runner.workspace }}/output
 
       - name: Upload logs as artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: logs
+          name: logs_unit_2b_job${{ matrix.jobid }}
           path: ${{ runner.workspace }}/logs
           if-no-files-found: ignore
 
@@ -411,7 +431,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: logs
+          name: logs_diff
           path: ${{ runner.workspace }}/logs
           if-no-files-found: ignore
 
