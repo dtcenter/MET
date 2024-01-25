@@ -133,9 +133,9 @@ jobs:
     strategy:
       matrix:
         include:
-          - jobid: '1' 
+          - jobid: 'job1' 
             tests: 'ascii2nc'
-          - jobid: '2'
+          - jobid: 'job2'
             tests: 'pb2nc madis2nc pcp_combine'
       fail-fast: false
     steps:
@@ -154,14 +154,14 @@ jobs:
       - name: Upload output as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: unit_1a_job${{ matrix.jobid }}
+          name: unit_1a_${{ matrix.jobid }}
           path: ${{ runner.workspace }}/output
 
       - name: Upload logs as artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: logs_unit_1a_job${{ matrix.jobid }}
+          name: logs_unit_1a_${{ matrix.jobid }}
           path: ${{ runner.workspace }}/logs
           if-no-files-found: ignore
 
@@ -173,9 +173,9 @@ jobs:
     strategy:
       matrix:
         include:
-          - jobid: '1'
+          - jobid: 'job1'
             tests: 'ascii2nc_indy pb2nc_indy tc_dland tc_pairs tc_stat plot_tc tc_rmw rmw_analysis tc_diag tc_gen'
-          - jobid: '2'
+          - jobid: 'job2'
             tests: 'met_test_scripts mode_multivar mode_graphics mtd regrid airnow gsi_tools netcdf modis series_analysis gen_ens_prod wwmca_regrid gen_vx_mask grid_weight interp_shape grid_diag grib_tables lidar2nc shift_data_plane trmm2nc aeronet wwmca_plot ioda2nc gaussian'
       fail-fast: false
     steps:
@@ -194,14 +194,14 @@ jobs:
       - name: Upload output as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: unit_1b_job${{ matrix.jobid }}
+          name: unit_1b_${{ matrix.jobid }}
           path: ${{ runner.workspace }}/output
 
       - name: Upload logs as artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: logs_unit_1b_job${{ matrix.jobid }}
+          name: logs_unit_1b_${{ matrix.jobid }}
           path: ${{ runner.workspace }}/logs
           if-no-files-found: ignore
 
@@ -213,11 +213,11 @@ jobs:
     strategy:
       matrix:
         include:
-          - jobid: '1'
+          - jobid: 'job1'
             tests: 'ref_config_lead_00 ref_config_lead_12'
-          - jobid: '2'
+          - jobid: 'job2'
             tests: 'ref_config_lead_24 ref_config_lead_48'
-          - jobid: '3'
+          - jobid: 'job3'
             tests: 'ref_config_lead_36'
       fail-fast: false
     steps:
@@ -236,14 +236,14 @@ jobs:
       - name: Upload output as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: unit_rc_leads_job${{ matrix.jobid }}
+          name: unit_rc_leads_${{ matrix.jobid }}
           path: ${{ runner.workspace }}/output
 
       - name: Upload logs as artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: logs_rc_leads_job${{ matrix.jobid }}
+          name: logs_rc_leads_${{ matrix.jobid }}
           path: ${{ runner.workspace }}/logs
           if-no-files-found: ignore
 
@@ -255,7 +255,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - jobid: '1'
+          - jobid: 'job1'
             tests: 'ref_config'
       fail-fast: false
     steps:
@@ -281,14 +281,14 @@ jobs:
       - name: Upload output as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: unit_rc_job${{ matrix.jobid }}
+          name: unit_rc_${{ matrix.jobid }}
           path: ${{ runner.workspace }}/output
 
       - name: Upload logs as artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: logs_unit_rc_job${{ matrix.jobid }}
+          name: logs_unit_rc_${{ matrix.jobid }}
           path: ${{ runner.workspace }}/logs
           if-no-files-found: ignore
 
@@ -300,15 +300,15 @@ jobs:
     strategy:
       matrix:
         include:
-          - jobid: '1'
+          - jobid: 'job1'
             tests: 'point_stat stat_analysis_ps'
-          - jobid: '2'
+          - jobid: 'job2'
             tests: 'grid_stat stat_analysis_gs'
-          - jobid: '3'
+          - jobid: 'job3'
             tests: 'wavelet_stat stat_analysis_ws'
-          - jobid: '4'
+          - jobid: 'job4'
             tests: 'ensemble_stat stat_analysis_es'
-          - jobid: '5'
+          - jobid: 'job5'
             tests: 'ugrid'
       fail-fast: false
     steps:
@@ -334,14 +334,14 @@ jobs:
       - name: Upload output as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: unit_2a_job${{ matrix.jobid }}
+          name: unit_2a_${{ matrix.jobid }}
           path: ${{ runner.workspace }}/output
 
       - name: Upload logs as artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: logs_unit_2a_job${{ matrix.jobid }}
+          name: logs_unit_2a_${{ matrix.jobid }}
           path: ${{ runner.workspace }}/logs
           if-no-files-found: ignore
 
@@ -353,13 +353,13 @@ jobs:
     strategy:
       matrix:
         include:
-          - jobid: '1'
+          - jobid: 'job1'
             tests: 'climatology_1.0deg'
-          - jobid: '2'
+          - jobid: 'job2'
             tests: 'climatology_1.5deg'
-          - jobid: '3'
+          - jobid: 'job3'
             tests: 'climatology_2.5deg'
-          - jobid: '4'
+          - jobid: 'job4'
             tests: 'python point2grid plot_data_plane mode mode_analysis perc_thresh hira plot_point_obs quality_filter obs_summary duplicate_flag'
       fail-fast: false
     steps:
@@ -385,14 +385,14 @@ jobs:
       - name: Upload output as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: unit_2b_job${{ matrix.jobid }}
+          name: unit_2b_${{ matrix.jobid }}
           path: ${{ runner.workspace }}/output
 
       - name: Upload logs as artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: logs_unit_2b_job${{ matrix.jobid }}
+          name: logs_unit_2b_${{ matrix.jobid }}
           path: ${{ runner.workspace }}/logs
           if-no-files-found: ignore
 
@@ -434,6 +434,19 @@ jobs:
           name: logs_diff
           path: ${{ runner.workspace }}/logs
           if-no-files-found: ignore
+
+  merge_logs:
+    name: Merge Log Artifacts
+    runs-on: ubuntu-latest
+    needs: [run_diffs]
+    if: ${{ always() }}
+    steps:
+      - name: Upload merged logs as artifact
+        uses: actions/upload-artifact/merge@v4
+        with:
+          name: logs
+          pattern: logs_*
+          delete-merged: true
 
   update_truth:
     name: Update Truth Data
