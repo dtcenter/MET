@@ -1967,9 +1967,9 @@ void OutFileInfo::write_cira_diag_vals(vector<string> &k,
          n_col = 2 + m.at(*it).n();
          at.set_size(n_row, n_col);
 
-	 // Set spacing after the second column to 0
-	 // since the units column is right-padded
-	 at.set_ics(1, 0);
+         // Set spacing after the second column to 0
+         // since the units column is right-padded
+         at.set_ics(1, 0);
 
          // Justify columns
          at.set_column_just(0, LeftJust);
