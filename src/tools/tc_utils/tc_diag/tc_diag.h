@@ -76,6 +76,10 @@ static const char* default_out_prefix = "";
 // Diagnostics bad data value
 static const double diag_bad_data_double = 9999.0;
 
+// Maximum string lengths 
+static const int cira_diag_name_width  = 7;
+static const int cira_diag_units_width = 9;
+
 ////////////////////////////////////////////////////////////////////////
 //
 // Variables for Command Line Arguments
