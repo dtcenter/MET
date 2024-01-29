@@ -879,7 +879,7 @@ void do_sub_command() {
          << "The initialization times do not match ("
          << unix_to_yyyymmdd_hhmmss(plus.init()) << " != "
          << unix_to_yyyymmdd_hhmmss(minus.init())
-         << ") for subtraction. Using the first value.\n";
+         << ") for subtraction. Using the first value.";
 
       if(config.time_offset_warning(
             (int) (plus.init() - minus.init()))) {
