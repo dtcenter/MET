@@ -125,7 +125,7 @@ When setting a threshold to a percentile, some choices require both an observati
 * SFP in an observation input.
   * The matching forecast input will be used to determine the threshold.  e.g. ">SFP33.3" in the 2nd observation input means greater than 33.3-rd percentile of the 2nd forecast input will be used as the threshold for that observation input.
 
-* SOP in a forecast input
+* SOP in a forecast input.
   * The matching observation input will be used to determine the threshold. e.g. ">SOP33.3" in the 2nd forecast input means greater than 33.3-rd percentile of the 2nd observation input will be used as the threshold for that forecast input.
 
 * "==FBIAS" in an observation input.
