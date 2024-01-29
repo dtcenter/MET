@@ -122,7 +122,7 @@ When regridding to the FCST or OBS field (e.g. to_grid = FCST), the first field 
 
 When setting a threshold to a percentile, some choices require both an observation input and a forecast input.  When this is the case, it's assumed the indices match, so for example if forecast input 1 has such a percentile setting, then observation input 1 will be used to compute the percentile.  Percentiles in which this will happen are:
 
-* SFP in an observation input
+* SFP in an observation input.
   * The matching forecast input will be used to determine the threshold.  e.g. ">SFP33.3" in the 2nd observation input means greater than 33.3-rd percentile of the 2nd forecast input will be used as the threshold for that observation input.
 
 * SOP in a forecast input
