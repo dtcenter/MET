@@ -482,28 +482,37 @@ void ModeExecutive::setup_fcst_obs_data_traditional()
 
    if ( engine.conf_info.Obs->var_info->p_flag() ) rescale_probability(Obs_sd.data);
 
-   // Print a warning if the valid times do not match
+   // Check that the valid times match
 
    if(Fcst_sd.data.valid() != Obs_sd.data.valid()) {
 
-      mlog << Warning << "\nModeExecutive::setup_fcst_obs_data_traditional() -> "
-           << "Forecast and observation valid times do not match "
-           << unix_to_yyyymmdd_hhmmss(Fcst_sd.data.valid()) << " != "
-           << unix_to_yyyymmdd_hhmmss(Obs_sd.data.valid()) << " for "
-           << engine.conf_info.Fcst->var_info->magic_str() << " versus "
-           << engine.conf_info.Obs->var_info->magic_str() << ".\n\n";
+      ConcatString cs;
+      cs << "Forecast and observation valid times do not match ("
+         << unix_to_yyyymmdd_hhmmss(Fcst_sd.data.valid()) << " != "
+         << unix_to_yyyymmdd_hhmmss(Obs_sd.data.valid()) << ") for "
+         << engine.conf_info.Fcst->var_info->magic_str() << " versus "
+         << engine.conf_info.Obs->var_info->magic_str() << ".\n";
+
+      if(engine.conf_info.conf.time_offset_warning(
+           (int) (Fcst_sd.data.valid() - Obs_sd.data.valid()))) {
+         mlog << Warning << "\nModeExecutive::setup_fcst_obs_data_traditional() ->"
+              << cs << "\n\n";
+      }
+      else {
+         mlog << Debug(3) << cs << "\n";
+      }
    }
 
-   // Print a warning if the accumulation intervals do not match
+   // Check that the accumulation intervals match
 
    if(engine.conf_info.Fcst->var_info->level().type() == LevelType_Accum &&
       engine.conf_info.Obs->var_info->level().type()  == LevelType_Accum &&
-      Fcst_sd.data.accum()                       != Obs_sd.data.accum()) {
+      Fcst_sd.data.accum()                            != Obs_sd.data.accum()) {
 
       mlog << Warning << "\nModeExecutive::setup_fcst_obs_data_traditional() -> "
-           << "Forecast and observation accumulation times do not match "
-           << sec_to_hhmmss(Fcst_sd.data.valid()) << " != "
-           << sec_to_hhmmss(Obs_sd.data.valid()) << " for "
+           << "Forecast and observation accumulation times do not match ("
+           << sec_to_hhmmss(Fcst_sd.data.accum()) << " != "
+           << sec_to_hhmmss(Obs_sd.data.accum()) << ") for "
            << engine.conf_info.Fcst->var_info->magic_str() << " versus "
            << engine.conf_info.Obs->var_info->magic_str() << ".\n\n";
    }
@@ -792,26 +801,37 @@ void ModeExecutive::setup_fcst_obs_data_multivar_intensities(const MultiVarData 
 
    // Rescale probabilites from [0, 100] to [0, 1] also not neede in the second pass
 
-   // Print a warning if the valid times do not match
+   // Check that the valid times match
+
    if(Fcst_sd.data.valid() != Obs_sd.data.valid()) {
 
-       mlog << Warning << "\nModeExecutive::setup_fcst_obs_data_multivar_intensities() -> "
-            << "Forecast and observation valid times do not match "
-            << unix_to_yyyymmdd_hhmmss(Fcst_sd.data.valid()) << " != "
-            << unix_to_yyyymmdd_hhmmss(Obs_sd.data.valid()) << " for "
-            << engine.conf_info.Fcst->var_info->magic_str() << " versus "
-            << engine.conf_info.Obs->var_info->magic_str() << ".\n\n";
-    }
+      ConcatString cs;
+      cs << "Forecast and observation valid times do not match ("
+         << unix_to_yyyymmdd_hhmmss(Fcst_sd.data.valid()) << " != "
+         << unix_to_yyyymmdd_hhmmss(Obs_sd.data.valid()) << ") for "
+         << engine.conf_info.Fcst->var_info->magic_str() << " versus "
+         << engine.conf_info.Obs->var_info->magic_str() << ".\n";
 
-   // Print a warning if the accumulation intervals do not match
+      if(engine.conf_info.conf.time_offset_warning(
+           (int) (Fcst_sd.data.valid() - Obs_sd.data.valid()))) {
+         mlog << Warning << "\nModeExecutive::setup_fcst_obs_data_multivar_intensities() ->"
+              << cs << "\n\n";
+      }
+      else {
+         mlog << Debug(3) << cs << "\n";
+      }
+   }
+
+   // Check that the accumulation intervals match
+
    if(engine.conf_info.Fcst->var_info->level().type() == LevelType_Accum &&
       engine.conf_info.Obs->var_info->level().type()  == LevelType_Accum &&
-      Fcst_sd.data.accum()                       != Obs_sd.data.accum()) {
+      Fcst_sd.data.accum()                            != Obs_sd.data.accum()) {
 
        mlog << Warning << "\nModeExecutive::setup_fcst_obs_data_multivar_intensities() -> "
-           << "Forecast and observation accumulation times do not match "
-           << sec_to_hhmmss(Fcst_sd.data.valid()) << " != "
-           << sec_to_hhmmss(Obs_sd.data.valid()) << " for "
+           << "Forecast and observation accumulation times do not match ("
+           << sec_to_hhmmss(Fcst_sd.data.accum()) << " != "
+           << sec_to_hhmmss(Obs_sd.data.accum()) << ") for "
            << engine.conf_info.Fcst->var_info->magic_str() << " versus "
            << engine.conf_info.Obs->var_info->magic_str() << ".\n\n";
    }
@@ -891,26 +911,37 @@ void ModeExecutive::setup_fcst_obs_data_multivar_super(ShapeData &f_super, Shape
 
    // Rescale probabilites from [0, 100] to [0, 1] also not neede in the second pass
 
-   // Print a warning if the valid times do not match
+   // Check that the valid times match
+
    if(Fcst_sd.data.valid() != Obs_sd.data.valid()) {
 
-      mlog << Warning << "\nModeExecutive::setup_fcst_obs_data_multivar_super() -> "
-           << "Forecast and observation valid times do not match "
-           << unix_to_yyyymmdd_hhmmss(Fcst_sd.data.valid()) << " != "
-           << unix_to_yyyymmdd_hhmmss(Obs_sd.data.valid()) << " for "
-           << engine.conf_info.Fcst->var_info->magic_str() << " versus "
-           << engine.conf_info.Obs->var_info->magic_str() << ".\n\n";
+      ConcatString cs;
+      cs << "Forecast and observation valid times do not match ("
+         << unix_to_yyyymmdd_hhmmss(Fcst_sd.data.valid()) << " != "
+         << unix_to_yyyymmdd_hhmmss(Obs_sd.data.valid()) << ") for "
+         << engine.conf_info.Fcst->var_info->magic_str() << " versus "
+         << engine.conf_info.Obs->var_info->magic_str() << ".\n";
+
+      if(engine.conf_info.conf.time_offset_warning(
+           (int) (Fcst_sd.data.valid() != Obs_sd.data.valid()))) {
+         mlog << Warning << "\nModeExecutive::setup_fcst_obs_data_multivar_super() ->"
+              << cs << "\n\n";
+      }
+      else {
+         mlog << Debug(3) << cs << "\n";
+      }
    }
 
-   // Print a warning if the accumulation intervals do not match
+   // Check that the accumulation intervals match
+
    if(engine.conf_info.Fcst->var_info->level().type() == LevelType_Accum &&
       engine.conf_info.Obs->var_info->level().type()  == LevelType_Accum &&
-      Fcst_sd.data.accum()                       != Obs_sd.data.accum()) {
+      Fcst_sd.data.accum()                            != Obs_sd.data.accum()) {
 
       mlog << Warning << "\nModeExecutive::setup_fcst_obs_data_multivar_super() -> "
-           << "Forecast and observation accumulation times do not match "
-           << sec_to_hhmmss(Fcst_sd.data.valid()) << " != "
-           << sec_to_hhmmss(Obs_sd.data.valid()) << " for "
+           << "Forecast and observation accumulation times do not match ("
+           << sec_to_hhmmss(Fcst_sd.data.accum()) << " != "
+           << sec_to_hhmmss(Obs_sd.data.accum()) << ") for "
            << engine.conf_info.Fcst->var_info->magic_str() << " versus "
            << engine.conf_info.Obs->var_info->magic_str() << ".\n\n";
    }

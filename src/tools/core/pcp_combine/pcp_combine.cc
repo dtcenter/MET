@@ -77,6 +77,7 @@
 //                    the -pcpdir option.
 //   024    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
 //   025    09/29/22  Prestopnik     MET #2227 Remove namespace netCDF from header files
+//   026    01/29/24  Halley Gotway  MET #2801 Configure time difference warnings
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -869,15 +870,25 @@ void do_sub_command() {
    nc_valid_time = plus.valid();
 
    //
-   // Output initialization time
-   // Warning if init_time1 != init_time2.
+   // Check that the initialization times match
    //
    if(plus.init() != minus.init()) {
-      mlog << Warning << "\ndo_sub_command() -> "
-           << "the initialization times do not match ("
-           << unix_to_yyyymmdd_hhmmss(plus.init()) <<  " != "
-           << unix_to_yyyymmdd_hhmmss(minus.init())
-           << ") for subtraction.  Using the first value.\n\n";
+
+      ConcatString cs;
+      cs << cs_erase
+         << "The initialization times do not match ("
+         << unix_to_yyyymmdd_hhmmss(plus.init()) << " != "
+         << unix_to_yyyymmdd_hhmmss(minus.init())
+         << ") for subtraction. Using the first value.\n";
+
+      if(config.time_offset_warning(
+            (int) (plus.init() - minus.init()))) {
+         mlog << Warning << "\ndo_sub_command() -> "
+               << cs << "\n\n";
+      }
+      else {
+         mlog << Debug(3) << cs << "\n";
+      }
    }
    nc_init_time = plus.init();
 

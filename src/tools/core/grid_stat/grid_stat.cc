@@ -111,6 +111,7 @@
 //   053    12/11/21  Halley Gotway  MET #1991 Fix VCNT output.
 //   054    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
 //   055    10/03/22  Prestopnik     MET #2227 Remove using namespace netCDF from header files
+//   056    01/29/24  Halley Gotway  MET #2801 Configure time difference warnings
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -769,9 +770,9 @@ void process_scores() {
 
          mlog << Warning << "\nprocess_scores() -> "
               << "Forecast and observation accumulation times "
-              << "do not match " << sec_to_hhmmss(fcst_dp.accum())
+              << "do not match (" << sec_to_hhmmss(fcst_dp.accum())
               << " != " << sec_to_hhmmss(obs_dp.accum())
-              << " for " << conf_info.vx_opt[i].fcst_info->magic_str()
+              << ") for " << conf_info.vx_opt[i].fcst_info->magic_str()
               << " versus " << conf_info.vx_opt[i].obs_info->magic_str()
               << ".\n\n";
       }
