@@ -39,6 +39,7 @@
 //   014    07/09/21  Linden          MET #1746 Skip thresholding.
 //   015    07/06/22  Howard Soh      METplus-Internal #19 Rename main to met_main
 //   016    10/03/22  Prestopnik      MET #2227 Remove using namespace netCDF from header files
+//   017    01/29/24  Halley Gotway  MET #2801 Configure time difference warnings
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -338,24 +339,34 @@ void process_scores() {
       // Check that the valid times match
       if(fcst_dp.valid() != obs_dp.valid()) {
 
-         mlog << Warning << "\nprocess_scores() -> "
-              << "Forecast and observation valid times do not match "
-              << unix_to_yyyymmdd_hhmmss(fcst_dp.valid()) << " != " <<
-              unix_to_yyyymmdd_hhmmss(obs_dp.valid()) << " for "
-              << conf_info.fcst_info[i]->magic_str() << " versus "
-              << conf_info.obs_info[i]->magic_str() << ".\n";
+         ConcatString cs;
+         cs << cs_erase
+            << "Forecast and observation valid times do not match ("
+            << unix_to_yyyymmdd_hhmmss(fcst_dp.valid()) << " != "
+            << unix_to_yyyymmdd_hhmmss(obs_dp.valid()) << ") for "
+            << conf_info.fcst_info[i]->magic_str() << " versus "
+            << conf_info.obs_info[i]->magic_str() << ".";
+
+         if(conf_info.conf.time_offset_warning(
+               (int) (fcst_dp.valid() - obs_dp.valid()))) {
+            mlog << Warning << "\nprocess_scores() -> "
+                 << cs << "\n\n";
+         }
+         else {
+            mlog << Debug(3) << cs << "\n";
+         }
       }
 
       // Check that the accumulation intervals match
       if(conf_info.fcst_info[i]->level().type() == LevelType_Accum &&
          conf_info.obs_info[i]->level().type()  == LevelType_Accum &&
-         fcst_dp.accum()       != obs_dp.accum()) {
+         fcst_dp.accum()                        != obs_dp.accum()) {
 
          mlog << Warning << "\nprocess_scores() -> "
               << "Forecast and observation accumulation times "
-              << "do not match " << sec_to_hhmmss(fcst_dp.accum())
+              << "do not match (" << sec_to_hhmmss(fcst_dp.accum())
               << " != " << sec_to_hhmmss(obs_dp.accum())
-              << " for " << conf_info.fcst_info[i]->magic_str() << " versus "
+              << ") for " << conf_info.fcst_info[i]->magic_str() << " versus "
               << conf_info.obs_info[i]->magic_str() << ".\n";
       }
 
