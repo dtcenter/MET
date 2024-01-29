@@ -27,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set job controls
         id: job_status
         run: .github/jobs/set_job_controls.sh
@@ -46,18 +46,26 @@ jobs:
     needs: job_control
     strategy:
       matrix:
-        config_opts:
-          - ''
-          - '--enable-all'
-          - '--enable-grib2'
-          - '--enable-python'
-          - '--enable-ugrid'
-          - '--enable-lidar2nc'
-          - '--enable-mode_graphics'
-          - '--enable-modis'
+        include:
+          - jobid:  'job1'
+            config: ''
+          - jobid:  'job2'
+            config: '--enable-all'
+          - jobid:  'job3'
+            config: '--enable-grib2'
+          - jobid:  'job4'
+            config: '--enable-python'
+          - jobid:  'job5'
+            config: '--enable-ugrid'
+          - jobid:  'job6'
+            config: '--enable-lidar2nc'
+          - jobid:  'job7'
+            config: '--enable-mode_graphics'
+          - jobid:  'job8'
+            config: '--enable-modis'
       fail-fast: false
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Create directories to store output
         run: mkdir -p ${RUNNER_WORKSPACE}/logs
@@ -68,7 +76,7 @@ jobs:
           SOURCE_BRANCH: ${{ needs.job_control.outputs.branch_name }}
           MET_BASE_REPO: ${{ needs.job_control.outputs.met_base_repo }}
           MET_BASE_TAG: ${{ needs.job_control.outputs.met_base_tag }}
-          MET_CONFIG_OPTS: ${{ matrix.config_opts }}
+          MET_CONFIG_OPTS: ${{ matrix.config }}
 
       - name: Copy all build log files into logs directory
         if: always()
@@ -76,9 +84,9 @@ jobs:
 
       - name: Upload logs as artifact
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: logs
+          name: logs_${{ matrix.jobid }}
           path: ${{ runner.workspace }}/logs
           if-no-files-found: ignore
 
