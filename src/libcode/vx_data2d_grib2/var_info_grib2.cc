@@ -77,9 +77,10 @@ VarInfoGrib2 & VarInfoGrib2::operator=(const VarInfoGrib2 &f) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-VarInfo *VarInfoGrib2::clone() const
-{
+VarInfo *VarInfoGrib2::clone() const {
+
    VarInfoGrib2 *ret = new VarInfoGrib2(*this);
+
    return (VarInfo *)ret;
 }
 

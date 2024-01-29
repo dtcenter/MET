@@ -75,9 +75,10 @@ VarInfoPython & VarInfoPython::operator=(const VarInfoPython &f) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-VarInfo *VarInfoPython::clone() const
-{
+VarInfo *VarInfoPython::clone() const {
+
    VarInfoPython *ret = new VarInfoPython(*this);
+
    return (VarInfo *)ret;
 }
 

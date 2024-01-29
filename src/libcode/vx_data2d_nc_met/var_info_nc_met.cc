@@ -75,9 +75,11 @@ VarInfoNcMet & VarInfoNcMet::operator=(const VarInfoNcMet &f) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-VarInfo *VarInfoNcMet::clone() const
-{
+
+VarInfo *VarInfoNcMet::clone() const {
+
    VarInfoNcMet *ret = new VarInfoNcMet(*this);
+
    return (VarInfo *)ret;
 }
 
