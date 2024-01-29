@@ -508,6 +508,22 @@ with bad status after writing the warning message.
 		
   exit_on_warning = FALSE;
 
+time_offset_warning
+-------------------
+
+The "time_offset_warning" entry in ConfigConstants defines an allowable
+offset in seconds to silence time differences warning messages. Several
+MET tools check the timestamps of the datasets being compared and print a
+warning message if they differ. Increasing this option from its default
+value of 0 seconds enables datasets that are close in time to be compared
+without triggering a warning. If the absolute value of a non-zero time
+difference is less than or equal to this setting, a debug log message is
+written instead of a warning.
+
+.. code-block:: none
+		
+  time_offset_warning = 0;
+
 nc_compression
 --------------
 
