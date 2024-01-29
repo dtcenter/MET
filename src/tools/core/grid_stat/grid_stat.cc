@@ -745,12 +745,21 @@ void process_scores() {
       // Check that the valid times match
       if(fcst_dp.valid() != obs_dp.valid()) {
 
-         mlog << Warning << "\nprocess_scores() -> "
-              << "Forecast and observation valid times do not match "
-              << unix_to_yyyymmdd_hhmmss(fcst_dp.valid()) << " != "
-              << unix_to_yyyymmdd_hhmmss(obs_dp.valid()) << " for "
-              << conf_info.vx_opt[i].fcst_info->magic_str() << " versus "
-              << conf_info.vx_opt[i].obs_info->magic_str() << ".\n\n";
+         cs << cs_erase
+            << "Forecast and observation valid times do not match ("
+            << unix_to_yyyymmdd_hhmmss(fcst_dp.valid()) << " != "
+            << unix_to_yyyymmdd_hhmmss(obs_dp.valid()) << ") for "
+            << conf_info.vx_opt[i].fcst_info->magic_str() << " versus "
+            << conf_info.vx_opt[i].obs_info->magic_str() << ".";
+
+         if(conf_info.conf.time_offset_warning(
+               (int) (fcst_dp.valid() - obs_dp.valid()))) {
+            mlog << Warning << "\nprocess_scores() -> "
+                 << cs << "\n\n";
+         }
+         else {
+            mlog << Debug(3) << cs << "\n";
+         }
       }
 
       // Check that the accumulation intervals match

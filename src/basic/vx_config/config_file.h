@@ -78,6 +78,8 @@ class MetConfig : public Dictionary {
       
       ConcatString get_tmp_dir();
 
+      bool time_offset_warning(int);
+
       StringArray filename() const;
 
       bool debug() const;
