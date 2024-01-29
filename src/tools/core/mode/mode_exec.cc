@@ -491,7 +491,7 @@ void ModeExecutive::setup_fcst_obs_data_traditional()
          << unix_to_yyyymmdd_hhmmss(Fcst_sd.data.valid()) << " != "
          << unix_to_yyyymmdd_hhmmss(Obs_sd.data.valid()) << ") for "
          << engine.conf_info.Fcst->var_info->magic_str() << " versus "
-         << engine.conf_info.Obs->var_info->magic_str() << ".\n";
+         << engine.conf_info.Obs->var_info->magic_str() << ".";
 
       if(engine.conf_info.conf.time_offset_warning(
            (int) (Fcst_sd.data.valid() - Obs_sd.data.valid()))) {
@@ -810,7 +810,7 @@ void ModeExecutive::setup_fcst_obs_data_multivar_intensities(const MultiVarData 
          << unix_to_yyyymmdd_hhmmss(Fcst_sd.data.valid()) << " != "
          << unix_to_yyyymmdd_hhmmss(Obs_sd.data.valid()) << ") for "
          << engine.conf_info.Fcst->var_info->magic_str() << " versus "
-         << engine.conf_info.Obs->var_info->magic_str() << ".\n";
+         << engine.conf_info.Obs->var_info->magic_str() << ".";
 
       if(engine.conf_info.conf.time_offset_warning(
            (int) (Fcst_sd.data.valid() - Obs_sd.data.valid()))) {
@@ -920,7 +920,7 @@ void ModeExecutive::setup_fcst_obs_data_multivar_super(ShapeData &f_super, Shape
          << unix_to_yyyymmdd_hhmmss(Fcst_sd.data.valid()) << " != "
          << unix_to_yyyymmdd_hhmmss(Obs_sd.data.valid()) << ") for "
          << engine.conf_info.Fcst->var_info->magic_str() << " versus "
-         << engine.conf_info.Obs->var_info->magic_str() << ".\n";
+         << engine.conf_info.Obs->var_info->magic_str() << ".";
 
       if(engine.conf_info.conf.time_offset_warning(
            (int) (Fcst_sd.data.valid() != Obs_sd.data.valid()))) {
