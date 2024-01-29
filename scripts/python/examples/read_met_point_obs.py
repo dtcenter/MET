@@ -21,6 +21,7 @@ import sys
 from datetime import datetime
 
 from met.point import met_point_tools
+from met.point_nc import met_point_nc_tools
 from pyembed.python_embedding import pyembed_tools
 
 ARG_PRINT_DATA = 'show_data'
@@ -44,14 +45,15 @@ else:
    netcdf_filename = os.path.expandvars(input_name)
    args = [ netcdf_filename ]
    #args = { 'nc_name': netcdf_filename }
-   point_obs_data = met_point_tools.get_nc_point_obs()
+   point_obs_data = met_point_nc_tools.get_nc_point_obs()
    point_obs_data.read_data(point_obs_data.get_nc_filename(args))
 
 if point_obs_data is not None:
    met_point_data = point_obs_data.get_point_data() 
    met_point_data['met_point_data'] = point_obs_data
-   print("met_point_data: ", met_point_data)
-   print(met_point_data)
+   if os.getenv("MET_PYTHON_DEBUG", "") != "":
+      print("met_point_data: ", met_point_data)
+      print(met_point_data)
 
    if DO_PRINT_DATA:
       point_obs_data.dump()
