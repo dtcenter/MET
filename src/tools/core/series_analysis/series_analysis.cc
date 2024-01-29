@@ -34,6 +34,7 @@
 //   013    05/25/22  Halley Gotway  MET #2147 Add CTS HSS_EC output.
 //   014    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
 //   015    10/03/22  Presotpnik     MET #2227 Remove namespace netCDF from header files
+//   016    01/29/24  Halley Gotway  MET #2801 Configure time difference warnings
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -543,12 +544,23 @@ void get_series_data(int i_series,
    if(fcst_dp.valid() != (unixtime) 0 &&
       obs_dp.valid()  != (unixtime) 0 &&
       fcst_dp.valid() != obs_dp.valid()) {
-      mlog << Warning << "\nget_series_data() -> "
-           << "Forecast and observation valid times do not match "
-           << unix_to_yyyymmdd_hhmmss(fcst_dp.valid()) << " != "
-           << unix_to_yyyymmdd_hhmmss(obs_dp.valid()) << " for "
-           << fcst_info->magic_str() << " versus "
-           << obs_info->magic_str() << ".\n\n";
+
+      ConcatString cs;
+      cs << cs_erase
+         << "Forecast and observation valid times do not match ("
+         << unix_to_yyyymmdd_hhmmss(fcst_dp.valid()) << " != "
+         << unix_to_yyyymmdd_hhmmss(obs_dp.valid()) << ") for "
+         << fcst_info->magic_str() << " versus "
+         << obs_info->magic_str() << ".";
+
+      if(conf_info.conf.time_offset_warning(
+            (int) (fcst_dp.valid() - obs_dp.valid()))) {
+         mlog << Warning << "\nget_series_data() -> "
+              << cs << "\n\n";
+      }
+      else {
+         mlog << Debug(3) << cs << "\n";
+      }
    }
 
    return;
