@@ -302,7 +302,27 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void ProjGrid::set(const char * _name)
+void ProjGrid::set(const char * _str)
+
+{
+
+   //
+   //  check for presence of "+proj" option
+   //
+
+if(strstr(_str, "+proj") != nullptr) set_by_proj_string(_str);
+else                                 set_by_grid_name(_str);
+
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void ProjGrid::set_by_grid_name(const char * _name)
 
 {
 
@@ -312,7 +332,7 @@ bool status = find_grid_by_name(_name, *this);
 
 if ( !status )  {
 
-   mlog << Error << "\nProjGrid::set(const char *) -> "
+   mlog << Error << "\nProjGrid::set_by_grid_name(const char *) -> "
         << "grid lookup failed for name \""
         << _name << "\"\n\n";
 
@@ -329,6 +349,62 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+void ProjGrid::set_by_proj_string(const char * _str)
+
+{
+
+const char *method_name = "ProjGrid::set_by_proj_string()";
+
+clear();
+
+mlog << Error << "\n" << method_name << " -> "
+     << "not yet implemented\n\n";
+
+exit ( 1 );
+
+/* TODO: in progress
+
+ConcatString cs(_str);
+StringArray sa = cs.split(" ");
+
+for ( int i=0; i<sa.n(); i++ ) {
+
+   //
+   //  parse required options
+   //
+        if ( sa[i].substr(0, 4) == "+nx=" ) Nx = stoi(sa[i].substr(4));
+   else if ( sa[i].substr(0, 4) == "+ny=" ) Ny = stoi(sa[i].substr(4));
+   else if ( sa[i].substr(0, 1) != "+" ) {
+      mlog << Warning << "\n" << method_name << "-> "
+           << "ignoring unexpected grid proj string option \""
+           << sa[i] << "\"!\n\n";
+   }
+   //
+   //  pass through to proj
+   //
+   else {
+      Proj_Set << sa[i] << " ";
+   }
+}
+
+   //
+   //  make sure that Nx and Ny are set
+   //
+
+if ( Nx == 0 || Ny == 0 ) {
+   mlog << Error << "\n" << method_name << "-> "
+        << "grid proj string missing required +nx= and/or +ny= options:\n"
+        << _str << "\n\n";
+   exit(1);
+}
+
+return;
+*/
+}
+
+////////////////////////////////////////////////////////////////////////
+
+
 void ProjGrid::set(const LambertData & data)
 
 {
@@ -336,7 +412,10 @@ void ProjGrid::set(const LambertData & data)
 ConcatString cs;
 double xx, yy;
 
-Proj_Set = "+proj=lcc";   //  lcc means lambert conformal conic
+   //  Reference:
+   //  https://proj.org/en/9.3/operations/projections/lcc.html
+
+Proj_Set = "+proj=lcc";
 
    //   radius of earth
 
@@ -385,10 +464,61 @@ void ProjGrid::set(const StereographicData & data)
 
 {
 
-mlog << Error << "\nvoid ProjGrid::set(const StereographicData & data) -> "
-     << "not yet implemented\n\n";
+ConcatString cs;
+double a, xx, yy;
 
-exit ( 1 );
+   //  Reference:
+   //  https://proj.org/en/9.3/operations/projections/stere.html
+
+Proj_Set = "+proj=stere";
+
+   //   radius of earth
+
+cs.format("+R=%.3f", data.r_km);
+
+Proj_Set << ' ' << cs;
+
+   //  scale latitude
+
+cs.format("+lat_ts=%.3f", data.scale_lat);
+
+Proj_Set << ' ' << cs;
+
+   //  projection center
+
+if ( data.hemisphere == 'N' )  a =  90.0;
+else                           a = -90.0;
+
+cs.format("+lat_0=%.3f", a);
+
+Proj_Set << ' ' << cs;
+
+   //  orientation longitude
+   //    note: PROJ calls it "Longitude of projection center"
+
+cs.format("+lon_0=%.3f", -(data.lon_orient));   //  note minus sign
+
+Proj_Set << ' ' << cs;
+
+mlog << Debug(4) << "Polar Stereographic proj parameters: " << Proj_Set << "\n";
+
+set_proj(Proj_Set.c_str());
+
+   //
+   //  create the affine part of the transformation
+   //
+
+const double s = 1.0/(data.d_km);   //  scale factor
+
+Aff.set_mb(s, 0.0, 0.0, s, 0.0, 0.0);
+
+latlon_to_xy(data.lat_pin, data.lon_pin, xx, yy);
+
+Aff.set_b(data.x_pin - xx, data.y_pin - yy);
+
+set_size(data.nx, data.ny);
+
+set_name(data.name);
 
 }
 
@@ -437,7 +567,6 @@ exit ( 1 );
 
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -460,10 +589,64 @@ void ProjGrid::set(const LaeaData & data)
 
 {
 
-mlog << Error << "\nvoid ProjGrid::set(const LaeaData & data) -> "
-     << "not yet implemented\n\n";
+ConcatString cs;
+double xx, yy;
 
-exit ( 1 );
+   //  Reference:
+   //  https://proj.org/en/9.3/operations/projections/laea.html
+
+Proj_Set = "+proj=laea";
+
+if ( data.radius_km > 0 ) {
+
+   //  radius of earth
+
+   cs.format("+R=%.3f", data.radius_km);
+
+}
+
+else {
+
+   //  major and minor earth axes
+
+   cs.format("+a=%.3f +b=%.3f",
+             data.equatorial_radius_km,
+             data.polar_radius_km);
+
+}
+
+Proj_Set << ' ' << cs;
+
+   //  standard latitude
+
+cs.format("+lat_0=%.3f", data.standard_lat);
+
+Proj_Set << ' ' << cs;
+
+   //  central longitude
+
+cs.format("+lon_0=%.3f", -(data.central_lon));   //  note minus sign
+
+Proj_Set << ' ' << cs;
+
+mlog << Debug(4) << "Lambert Azimuthal Equal Area proj parameters: " << Proj_Set << "\n";
+
+set_proj(Proj_Set.c_str());
+
+   //  create the affine part of the transformation
+
+const double s_x = 1.0/(data.dx_km);   //  scale factor
+const double s_y = 1.0/(data.dy_km);   //  scale factor
+
+Aff.set_mb(s_x, 0.0, 0.0, s_y, 0.0, 0.0);
+
+latlon_to_xy(data.lat_first, data.lon_first, xx, yy);
+
+Aff.set_b(0 - xx, 0 - yy);
+
+set_size(data.nx, data.ny);
+
+set_name(data.name);
 
 }
 

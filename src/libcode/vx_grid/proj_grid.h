@@ -103,7 +103,10 @@ class ProjGrid {
          //  set stuff
          //
 
-      void set(const char *);   //  lookup by name
+      void set               (const char *);
+      void set_by_grid_name  (const char *);
+      void set_by_proj_string(const char *);
+
       void set(const LambertData       &);
       void set(const StereographicData &);
       void set(const LatLonData        &);
