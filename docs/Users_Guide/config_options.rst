@@ -3770,8 +3770,8 @@ Where "job_name" is set to one of the following:
 
 * "filter"
   
-  To filter out the STAT or TCMPR lines matching the job filtering
-  criteria specified below and using the optional arguments below.
+  To filter out the STAT lines matching the job filtering criteria
+  specified below and using the optional arguments below.
   The output STAT lines are written to the file specified using the
   "-dump_row" argument.
 
