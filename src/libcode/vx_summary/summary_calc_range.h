@@ -32,7 +32,7 @@ public:
   SummaryCalcRange();
   virtual ~SummaryCalcRange();
 
-  virtual string getType() const
+  virtual std::string getType() const
   {
     return "RANGE";
   }

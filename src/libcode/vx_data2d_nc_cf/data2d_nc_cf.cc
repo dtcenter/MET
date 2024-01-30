@@ -77,7 +77,7 @@ MetNcCFDataFile & MetNcCFDataFile::operator=(const MetNcCFDataFile &) {
 
 void MetNcCFDataFile::nccf_init_from_scratch() {
 
-   _file = (NcCfFile *) 0;
+   _file = (NcCfFile *) nullptr;
    _cur_time_index = -1;
 
    close();

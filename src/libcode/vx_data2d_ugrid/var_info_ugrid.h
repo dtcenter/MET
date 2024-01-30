@@ -45,6 +45,7 @@ class VarInfoUGrid : public VarInfo
       ~VarInfoUGrid();
       VarInfoUGrid(const VarInfoUGrid &);
       VarInfoUGrid & operator=(const VarInfoUGrid &);
+      VarInfo *clone() const;
 
       void dump(std::ostream &) const;
       void clear();

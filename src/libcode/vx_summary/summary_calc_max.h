@@ -32,7 +32,7 @@ public:
   SummaryCalcMax();
   virtual ~SummaryCalcMax();
 
-  virtual string getType() const
+  virtual std::string getType() const
   {
     return "MAX";
   }

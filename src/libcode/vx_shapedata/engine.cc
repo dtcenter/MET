@@ -144,6 +144,7 @@ void ModeFuzzyEngine::init_from_scratch() {
    //
    // Reset all fcst and obs processing flags to initial state
    //
+
    need_fcst_conv       = true;
    need_fcst_thresh     = true;
    need_fcst_filter     = true;
@@ -964,9 +965,7 @@ void ModeFuzzyEngine::do_obs_merging(const char *default_config,
 
 ///////////////////////////////////////////////////////////////////////
 
-void ModeFuzzyEngine::do_fcst_merging(const char *default_config,
-                                      const char *merge_config,
-                                      const ShapeData &merge_data)
+void ModeFuzzyEngine::do_fcst_merging(const ShapeData &merge_data)
 {
    
    if(need_fcst_thresh) do_fcst_thresholding();
@@ -985,7 +984,7 @@ void ModeFuzzyEngine::do_fcst_merging(const char *default_config,
 
    if(conf_info.Fcst->merge_flag == MergeType_Both ||
       conf_info.Fcst->merge_flag == MergeType_Engine)
-      do_fcst_merge_engine(default_config, merge_config);
+      do_fcst_merge_engine("", "");
 
    //
    // Done
@@ -1000,9 +999,7 @@ void ModeFuzzyEngine::do_fcst_merging(const char *default_config,
 
 ///////////////////////////////////////////////////////////////////////
 
-void ModeFuzzyEngine::do_obs_merging(const char *default_config,
-                                     const char *merge_config,
-                                     const ShapeData &merge_data)
+void ModeFuzzyEngine::do_obs_merging(const ShapeData &merge_data)
 {
    if(need_obs_thresh) do_obs_thresholding();
 
@@ -1014,7 +1011,6 @@ void ModeFuzzyEngine::do_obs_merging(const char *default_config,
            << "inconsistent array dims\n\n";
       exit(1);
    }
-   
 
    if(conf_info.Obs->merge_flag == MergeType_Both ||
       conf_info.Obs->merge_flag == MergeType_Thresh)
@@ -1022,7 +1018,7 @@ void ModeFuzzyEngine::do_obs_merging(const char *default_config,
 
    if(conf_info.Obs->merge_flag == MergeType_Both ||
       conf_info.Obs->merge_flag == MergeType_Engine)
-      do_obs_merge_engine(default_config, merge_config);
+      do_obs_merge_engine("", "");
 
    //
    // Done
@@ -1724,8 +1720,8 @@ void ModeFuzzyEngine::do_fcst_merge_engine(const char *default_config,
    fcst_engine->ctable = ctable;
    if(default_config && merge_config) {
       fcst_engine->conf_info.read_config(default_config, merge_config);
-      fcst_engine->conf_info.process_config(conf_info.Fcst->var_info->file_type(),
-                                            conf_info.Obs->var_info->file_type());
+      fcst_engine->conf_info.process_config_traditional(conf_info.Fcst->var_info->file_type(),
+                                                        conf_info.Obs->var_info->file_type());
       path = replace_path(fcst_engine->conf_info.object_pi.color_table.c_str());
       fcst_engine->ctable.read(path.c_str());
    }
@@ -1891,8 +1887,8 @@ void ModeFuzzyEngine::do_obs_merge_engine(const char *default_config,
    obs_engine->ctable = ctable;
    if(default_config && merge_config) {
       obs_engine->conf_info.read_config(default_config, merge_config);
-      obs_engine->conf_info.process_config(conf_info.Fcst->var_info->file_type(),
-                                           conf_info.Obs->var_info->file_type());
+      obs_engine->conf_info.process_config_traditional(conf_info.Fcst->var_info->file_type(),
+                                                       conf_info.Obs->var_info->file_type());
       path = replace_path(obs_engine->conf_info.object_pi.color_table.c_str());
       obs_engine->ctable.read(path.c_str());
    }
