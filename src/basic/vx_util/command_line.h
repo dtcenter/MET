@@ -171,6 +171,7 @@ class CommandLine {
       void clear();
 
       void dump(std::ostream &, int depth = 0) const;
+      ConcatString serialize() const;
 
          //
          //  set stuff
