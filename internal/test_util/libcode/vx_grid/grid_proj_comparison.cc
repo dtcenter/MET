@@ -185,6 +185,16 @@ void process_command_line(int argc, char **argv) {
    //
    cline.parse();
 
+   //
+   // check for unparsed args
+   //
+   if(cline.n() > 0) {
+      mlog << Error << "\nprocess_command_line() -> "
+           << "unrecognized arguments \"" << cline.serialize()
+           << "\"\n\n";
+      usage();
+   }
+
    return;
 }
 
