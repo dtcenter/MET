@@ -604,7 +604,7 @@ The Stat-Analysis tool supports several additional job command options which may
 This job command option is extremely useful. It can be used multiple times to specify a list of STAT header column names. When reading each input line, the Stat-Analysis tool concatenates together the entries in the specified columns and keeps track of the unique cases. It applies the logic defined for that job to each unique subset of data. For example, if your output was run over many different model names and masking regions, specify **-by MODEL,VX_MASK** to get output for each unique combination rather than having to run many very similar jobs.
 
 .. code-block:: none
-		
+
   -column_min     col_name value
   -column_max     col_name value
   -column_eq      col_name value
@@ -615,30 +615,30 @@ This job command option is extremely useful. It can be used multiple times to sp
 The column filtering options may be used when the **-line_type** has been set to a single value. These options take two arguments, the name of the data column to be used followed by a value, string, or threshold to be applied. If multiple column_min/max/eq/thresh/str options are listed, the job will be performed on their intersection. Each input line is only retained if its value meets the numeric filtering criteria defined, matches one of the strings defined by the **-column_str** option, or does not match any of the string defined by the **-column_str_exc** option. Multiple filtering strings may be listed using commas. Defining thresholds in MET is described in :numref:`config_options`.
 
 .. code-block:: none
-		
+
   -dump_row file
 
 Each analysis job is performed over a subset of the input data. Filtering the input data down to a desired subset is often an iterative process. The **-dump_row** option may be used for each job to specify the name of an output file to which the exact subset of data used for that job will be written. When initially constructing Stat-Analysis jobs, users are strongly encouraged to use the option and check its contents to ensure that the analysis was actually done over the intended subset.
 
 .. code-block:: none
-		
+
   -out_line_type name
 
 This option specifies the desired output line type(s) for the **aggregate_stat** job type.
 
 .. code-block:: none
-		
+
   -out_stat file
   -set_hdr  col_name string
 
 The Stat-Analysis tool writes its output to either the log file or the file specified using the **-out** command line option. However the **aggregate** and **aggregate_stat** jobs create STAT output lines and the standard output written lacks the full set of STAT header columns. The **-out_stat** job command option may be used for these jobs to specify the name of an output file to which full STAT output lines should be written. When the **-out_stat** job command option is used for **aggregate** and **aggregate_stat** jobs the output is sent to the **-out_stat** file instead of the log or **-out** file.
 
-Jobs will often combine output with multiple entries in the header columns. For example, a job may aggregate output with three different values in the **VX_MASK** column, such as "mask1", "mask2", and "mask3". The output **VX_MASK** column will contain the unique values encountered concatenated together with commas: "mask1,mask2,mask3". Alternatively, the **-set_hdr** option may be used to specify what should be written to the output header columns, such as "-set_hdr VX_MASK all_three_masks".
+Jobs will often combine output with multiple entries in the header columns. For example, a job may aggregate output with three different values in the **VX_MASK** column, such as "mask1", "mask2", and "mask3". The output **VX_MASK** column will contain the unique values encountered concatenated together with commas: "mask1,mask2,mask3". Alternatively, the **-set_hdr** option may be used to specify what should be written to the output header columns, such as "-set_hdr VX_MASK all_three_masks". When **-set_hdr** is specified for **filter** jobs, it controls what is written to the **-dump_row** output file.
 
 When using the "-out_stat" option to create a .stat output file and stratifying results using one or more "-by" job command options, those columns may be referenced in the "-set_hdr" option. When using multiple "-by" options, use "CASE" to reference the full case information string:
 
 .. code-block:: none
-		
+
   -job aggregate_stat -line_type MPR -out_line_type CNT -by FCST_VAR,OBS_SID \
   -set_hdr VX_MASK OBS_SID -set_hdr DESC CASE
 
@@ -662,7 +662,7 @@ When processing input MPR lines, these options may be used to define a masking g
 When processing input MPR lines, these options are used to define the forecast, observation, or both thresholds to be applied when computing statistics. For categorical output line types (FHO, CTC, CTS, MCTC, MCTS) these define the categorical thresholds. For continuous output line types (SL1L2, SAL1L2, CNT), these define the continuous filtering thresholds and **-out_cnt_logic** defines how the forecast and observed logic should be combined.
 
 .. code-block:: none
-		
+
   -out_fcst_wind_thresh thresh
   -out_obs_wind_thresh  thresh
   -out_wind_thresh      thresh
