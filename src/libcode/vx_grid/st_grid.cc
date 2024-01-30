@@ -464,11 +464,9 @@ junk.format("%.5f", By);
 fix_float(junk);
 out << prefix << "By         = " << junk << "\n";
 
-comma_string(Nx, junk);
-out << prefix << "Nx         = " << junk << "\n";
+out << prefix << "Nx         = " << Nx << "\n";
 
-comma_string(Ny, junk);
-out << prefix << "Ny         = " << junk << "\n";
+out << prefix << "Ny         = " << Ny << "\n";
 
 
    //

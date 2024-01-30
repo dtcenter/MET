@@ -523,9 +523,9 @@ out << '\n';   //  no prefix
 
 out << prefix << "Projection   = Laea\n";
 
-out << prefix << "Nx           = " << comma_string(Nx) << "\n";
+out << prefix << "Nx           = " << Nx << "\n";
 
-out << prefix << "Ny           = " << comma_string(Ny) << "\n";
+out << prefix << "Ny           = " << Ny << "\n";
 
    //
    //  done
