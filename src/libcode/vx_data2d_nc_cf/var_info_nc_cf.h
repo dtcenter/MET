@@ -45,6 +45,7 @@ class VarInfoNcCF : public VarInfo
       ~VarInfoNcCF();
       VarInfoNcCF(const VarInfoNcCF &);
       VarInfoNcCF & operator=(const VarInfoNcCF &);
+      VarInfo *clone() const;
 
       void dump(std::ostream &) const;
       void clear();

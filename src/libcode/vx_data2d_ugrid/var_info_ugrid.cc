@@ -32,7 +32,6 @@
 
 using namespace std;
 
-
 ///////////////////////////////////////////////////////////////////////////////
 
 static bool is_grib_code_abbr_match(const ConcatString &, int);
@@ -73,6 +72,15 @@ VarInfoUGrid & VarInfoUGrid::operator=(const VarInfoUGrid &f) {
    assign(f);
 
    return ( *this );
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+VarInfo *VarInfoUGrid::clone() const {
+
+   VarInfoUGrid *ret = new VarInfoUGrid(*this);
+
+   return (VarInfo *)ret;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

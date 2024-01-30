@@ -72,6 +72,7 @@ class VarInfoGrib2 : public VarInfo
       ~VarInfoGrib2();
       VarInfoGrib2(const VarInfoGrib2 &);
       VarInfoGrib2 & operator=(const VarInfoGrib2 &);
+      VarInfo *clone() const;
 
       void dump(std::ostream &) const;
       void clear();
