@@ -939,8 +939,7 @@ void process_track_points(const TrackInfoArray& tracks) {
             tmp_file_map[tmp_key].open(&tracks[k],
                                        &tracks[k][i_pnt],
                                        conf_info.domain_info[j],
-                                       conf_info.pressure_levels,
-                                       conf_info.tmp_nc_diag_flag);
+                                       conf_info.pressure_levels);
 
          } // end for k
       } // end for j
@@ -2100,11 +2099,7 @@ void TmpFileInfo::init_from_scratch() {
 void TmpFileInfo::open(const TrackInfo *t_ptr,
                        const TrackPoint *p_ptr,
                        const DomainInfo &di,
-                       const set<double> &prs_lev,
-                       const bool keep) {
-
-   // Set keep flag
-   keep_file_flag = keep;
+                       const set<double> &prs_lev) {
 
    // Set pointers
    trk_ptr = t_ptr;
@@ -2170,11 +2165,7 @@ void TmpFileInfo::clear() {
    // Delete the temp file
    if(tmp_out) {
 
-      mlog << Debug(3)
-           << (keep_file_flag ? "Retaining" : "Deleting")
-           << " temp file: " << tmp_file << "\n";
-
-      if(!keep_file_flag) remove_temp_file(tmp_file);
+      remove_temp_file(tmp_file);
 
       tmp_out = (NcFile *) 0;
    }

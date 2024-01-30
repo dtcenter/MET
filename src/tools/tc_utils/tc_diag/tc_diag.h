@@ -116,9 +116,6 @@ class TmpFileInfo {
 
       //////////////////////////////////////////////////////////////////
 
-      // Keep the temp file rather than deleting it
-      bool keep_file_flag;
-
       // Track information
       const TrackInfo  *trk_ptr; // not allocated
       const TrackPoint *pnt_ptr; // not allocated
@@ -164,8 +161,8 @@ class TmpFileInfo {
       netCDF::NcDim prs_dim;
 
       void open(const TrackInfo *, const TrackPoint *,
-                const DomainInfo &, const std::set<double> &,
-                const bool);
+                const DomainInfo &, const std::set<double> &);
+
       void close();
 
       void clear();

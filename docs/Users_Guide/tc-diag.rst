@@ -63,6 +63,14 @@ Optional Arguments for tc_diag
 
 6. The **-v level** option indicates the desired level of verbosity. The contents of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
 
+.. code-block:: none
+
+  tmp_nc_diag_flag = FALSE;
+
+This flag is a boolean specifying whether the temporary NetCDF files containing the cylindrical coordinate range-azimuth data for each storm location should be retained. By default, these temporary files are deleted. If set to true for debugging purposes, they are retained.
+
+.. note:: Setting the **MET_KEEP_TEMP_FILE** (:numref:`met_keep_temp_file`) environment variable retains the temporary NetCDF cylindrical coordinate files for development, testing, and debugging purposes.
+
 tc_diag Configuration File
 --------------------------
 
@@ -233,14 +241,6 @@ These three flag entries are booleans specifying what output data types should b
   - The **nc_cyl_grid_flag** entry controls the writing of a NetCDF file containing the cylindrical coordinate range-azimuth data used to compute the diagnostics. These files are written with a `_cyl_grid_{domain}.nc` suffix, where `{domain}` is the domain name specified in the configuration file. One output file is written for each combination of model track and domain.
   - The **nc_diag_file** entry controls the writing of the computed diagnostics to a NetCDF file. These files are written with a `_diag.nc` suffix. One output file is written for each model track processed.
   - The **cira_diag_flag** entry controls the writing of the computed diagnostics to a formatted ASCII output file. These files are written with a `_diag.dat` suffix. One output file is written for each model track processed.
-
-.. code-block:: none
-
-  tmp_nc_diag_flag = FALSE;
-
-This flag is a boolean specifying whether the temporary NetCDF files containing the cylindrical coordinate range-azimuth data for each storm location should be retained. By default, these temporary files are deleted. If set to true for debugging purposes, they are retained.
-
-.. note:: Setting `tmp_nc_diag_flag` to true may fill up the temporary directory. It is the responsiblity of the user to monitor the temporary directory usage.
 
 .. code-block:: none
 
