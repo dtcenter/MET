@@ -206,6 +206,7 @@
   <test name="python_numpy_point_stat">
     <exec>&MET_BIN;/point_stat</exec>
     <env>
+      <pair><name>MET_PYTHON_EXE</name> <value>&MET_PYTHON_EXE;</value></pair>
       <pair><name>FCST_COMMAND</name> <value>&MET_BASE;/python/examples/read_ascii_numpy.py &DATA_DIR_PYTHON;/fcst.txt FCST</value></pair>
       <pair><name>OBS_COMMAND</name>  <value>&MET_BASE;/python/examples/read_ascii_numpy.py &DATA_DIR_PYTHON;/obs.txt OBS</value></pair>
     </env>
@@ -480,21 +481,6 @@
     </output>
   </test>
 
-  <test name="python_point2grid_pb2nc_TMP">
-    <exec>&MET_BIN;/point2grid</exec>
-    <param> \
-      'PYTHON_NUMPY=&MET_BASE;/python/examples/read_met_point_obs.py &OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.nc' \
-      G212 \
-      &OUTPUT_DIR;/python/pb2nc_TMP.nc \
-      -field 'name="TMP"; level="*"; valid_time="20120409_120000"; censor_thresh=[ &lt;0 ]; censor_val=[0];' \
-      -name TEMP \
-      -v 1
-    </param>
-    <output>
-      <grid_nc>&OUTPUT_DIR;/python/pb2nc_TMP.nc</grid_nc>
-    </output>
-  </test>
-
   <!-- Invokes user-python logic to read a point obs -->
   <test name="python_point2grid_pb2nc_TMP_user_python">
     <exec>&MET_BIN;/point2grid</exec>
@@ -535,6 +521,7 @@
   <test name="python_plot_point_obs_CONFIG">
     <exec>&MET_BIN;/plot_point_obs</exec>
     <env>
+      <pair><name>MET_PYTHON_EXE</name> <value>&MET_PYTHON_EXE;</value></pair>
       <pair><name>TO_GRID</name> <value>NONE</value></pair>
     </env>
     <param> \
@@ -561,6 +548,7 @@
                 > &OUTPUT_DIR;/python/ensemble_stat/input_file_list; \
           &MET_BIN;/ensemble_stat</exec>
     <env>
+      <pair><name>MET_PYTHON_EXE</name> <value>&MET_PYTHON_EXE;</value></pair>
       <pair><name>DESC</name>           <value>NA</value></pair>
       <pair><name>OBS_ERROR_FLAG</name> <value>FALSE</value></pair>
       <pair><name>SKIP_CONST</name>     <value>FALSE</value></pair>
@@ -587,6 +575,7 @@
   <test name="python_point_stat_GRIB1_NAM_GDAS_WINDS">
     <exec>&MET_BIN;/point_stat</exec>
     <env>
+      <pair><name>MET_PYTHON_EXE</name> <value>&MET_PYTHON_EXE;</value></pair>
       <pair><name>BEG_DS</name>         <value>-1800</value></pair>
       <pair><name>END_DS</name>         <value>1800</value></pair>
       <pair><name>OUTPUT_PREFIX</name>  <value>GRIB1_NAM_GDAS_WINDS</value></pair>
@@ -605,6 +594,9 @@
   </test>
 
   <test name="python_plot_data_plane_SEMILATLON_ZONAL_MEAN">
+    <env>
+      <pair><name>MET_PYTHON_EXE</name> <value>&MET_PYTHON_EXE;</value></pair>
+    </env>
     <exec>&MET_BIN;/plot_data_plane</exec>
     <param> \
     PYTHON_NUMPY \
@@ -619,6 +611,9 @@
   </test>
 
   <test name="python_pcp_combine_SEMILATLON_MERIDIONAL_MEAN">
+    <env>
+      <pair><name>MET_PYTHON_EXE</name> <value>&MET_PYTHON_EXE;</value></pair>
+    </env>
     <exec>&MET_BIN;/pcp_combine</exec>
     <param> \
     -add PYTHON_NUMPY \
