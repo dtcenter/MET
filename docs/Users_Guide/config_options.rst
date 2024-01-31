@@ -494,6 +494,48 @@ Where code is running in a production context, it is worth being familiar with
 the binding / affinitization method on the particular system and building it
 into any relevant scripting.
 
+.. _met_keep_temp_file:
+
+MET_KEEP_TEMP_FILE
+------------------
+
+The MET_KEEP_TEMP_FILE environment variable can be set to control the runtime
+behavior of the MET tools. The MET tools write temporary files in several places
+in the application and library code. By default, those temporary files are deleted
+when they are no longer needed. However it can be useful for development, testing,
+and debugging to keep them for further inspection. Setting this environment variable
+to a value of :code:`yes` or :code:`true` instructs the MET tools to retain temporary
+files instead of deleting them.
+
+Note that doing so may fill up the temporary directory. It is the responsiblity of
+the user to monitor the temporary directory usage and remove temporary files that
+are no longer needed.
+
+When running with this option, users are advised to refer to section
+:numref:`config_tmp_dir` and write temporary files to a personal location rather than
+the default shared :code:`/tmp` directory.
+
+.. _met_python_debug:
+
+MET_PYTHON_DEBUG
+----------------
+
+The MET_PYTHON_DEBUG environment variable can be set to turn one debugging log messages
+related to Python embedding. By default, these log messages are disabled. It can be set
+to a value of :code:`all` for all log messages, :code:`dataplane` for log messages when
+reading gridded data, or :code:`point` for log messages when reading point data.
+
+.. _met_python_tmp_format:
+
+MET_PYTHON_TMP_FORMAT
+---------------------
+
+The MET_PYTHON_TMP_FORMAT environment variable defines whether temporary files for
+Python embedding should be written as NetCDF files or using JSON and NumPy serialization.
+By default, they are written as JSON (for attributes) and NumPy serialization (for data)
+to avoid NetCDF library conflicts between MET and Python. Setting this environment
+variable to :code:`netcdf` enables the use of temporary NetCDF files instead.
+
 Settings Common to Multiple Tools
 =================================
 
