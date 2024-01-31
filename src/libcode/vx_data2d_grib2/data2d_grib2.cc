@@ -773,9 +773,16 @@ void MetGrib2DataFile::read_grib2_record_list() {
                              rec->LvlVal1 );
          }
 
-         rec->RangeTyp     = (8 == gfld->ipdtnum || 12 == gfld->ipdtnum ? gfld->ipdtmpl[25] : 0);
-         rec->RangeVal     = (8 == gfld->ipdtnum || 12 == gfld->ipdtnum ? gfld->ipdtmpl[26] : 0);
-         rec->ResCompFlag  = gfld->igdtmpl[ 0 == gfld->igdtnum ? 13 : 11 ];
+         rec->RangeTyp = (8 == gfld->ipdtnum || 12 == gfld->ipdtnum ? gfld->ipdtmpl[25] : 0);
+         rec->RangeVal = (8 == gfld->ipdtnum || 12 == gfld->ipdtnum ? gfld->ipdtmpl[26] : 0);
+
+         //  resolution and component flag (Table 3.1)
+         switch( gfld->igdtnum ){
+            case 0:
+            case 1:
+            case 40:    rec->ResCompFlag = gfld->igdtmpl[13];  break;
+            default:    rec->ResCompFlag = gfld->igdtmpl[11];  break;
+         }
 
          //  initialize the forecast time information
          rec->ValidTime = -1;
@@ -1294,7 +1301,8 @@ void MetGrib2DataFile::read_grib2_grid( gribfield *gfld) {
 
       gauss.name = gaussian_proj_type;
 
-      ScanMode = p[18];
+      ScanMode    = p[18];
+      ResCompFlag = p[13];
 
          //  check that the earth is spherical, not oblate
 
