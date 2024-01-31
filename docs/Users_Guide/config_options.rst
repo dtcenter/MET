@@ -520,10 +520,11 @@ the default shared :code:`/tmp` directory.
 MET_PYTHON_DEBUG
 ----------------
 
-The MET_PYTHON_DEBUG environment variable can be set to turn one debugging log messages
-related to Python embedding. By default, these log messages are disabled. It can be set
-to a value of :code:`all` for all log messages, :code:`dataplane` for log messages when
-reading gridded data, or :code:`point` for log messages when reading point data.
+The MET_PYTHON_DEBUG environment variable can be set to enable debugging log messages
+related to Python embedding. These log messages are disabled by default. The environment
+variable cab be set to a value of :code:`all` for all log messages, :code:`dataplane`
+for log messages when reading gridded data, or :code:`point` for log messages when
+reading point data.
 
 .. _met_python_tmp_format:
 
@@ -531,8 +532,8 @@ MET_PYTHON_TMP_FORMAT
 ---------------------
 
 The MET_PYTHON_TMP_FORMAT environment variable defines whether temporary files for
-Python embedding should be written as NetCDF files or using JSON and NumPy serialization.
-By default, they are written as JSON (for attributes) and NumPy serialization (for data)
+Python embedding should be written as NetCDF files or using JSON/NumPy serialization.
+By default, they are written using JSON for attributes and NumPy serialization for data
 to avoid NetCDF library conflicts between MET and Python. Setting this environment
 variable to :code:`netcdf` enables the use of temporary NetCDF files instead.
 
