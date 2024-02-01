@@ -20,7 +20,8 @@
 #include "two_d_array.h"
 #include "bool_calc.h"
 #include "vx_pxm.h"
-
+#include <string>
+#include <vector>
 
 ////////////////////////////////////////////////////////////////////////
 

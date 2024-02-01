@@ -75,6 +75,15 @@ VarInfoPython & VarInfoPython::operator=(const VarInfoPython &f) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+VarInfo *VarInfoPython::clone() const {
+
+   VarInfoPython *ret = new VarInfoPython(*this);
+
+   return (VarInfo *)ret;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 void VarInfoPython::init_from_scratch() {
 
    // First call the parent's initialization

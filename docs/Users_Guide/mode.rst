@@ -118,6 +118,23 @@ The **multivar_intensity_compare_fcst** and **multivar_intensity_compare_obs** c
 
 When regridding to the FCST or OBS field (e.g. to_grid = FCST), the first field of the field array is used from the forecast and observation field dictionaries, respectively. All regridding is then done to that grid. Other regrid options described in :ref:`regrid` can also be used as normal.
 
+"file_type" can be set independently for each input in multivariate mode. If not set for an input, MET uses file names and file content to determine the type.
+
+When setting a threshold to a percentile, some choices require both an observation input and a forecast input.  When this is the case, it's assumed the indices match, so for example if forecast input 1 has such a percentile setting, then observation input 1 will be used to compute the percentile.  Percentiles in which this will happen are:
+
+* SFP in an observation input.
+  * The matching forecast input will be used to determine the threshold.  e.g. ">SFP33.3" in the 2nd observation input means greater than 33.3-rd percentile of the 2nd forecast input will be used as the threshold for that observation input.
+
+* SOP in a forecast input.
+  * The matching observation input will be used to determine the threshold. e.g. ">SOP33.3" in the 2nd forecast input means greater than 33.3-rd percentile of the 2nd observation input will be used as the threshold for that forecast input.
+
+* "==FBIAS" in an observation input.
+  * e.g. "==FBIAS1" in an observation input to automatically de-bias the data, using a simple threshold in the matching forecast input. For example, when observation input 3 has "==FBIAS1", and forecast input 3 has ">5.0", MET applies the >5.0 threshold to the forecast and then chooses an observation threshold which results in a frequency bias of 1. The frequency bias can be any float value > 0.0.
+
+* "==FBIAS" in a forecast input.
+  * e.g. "==FBIAS1" in a forecast input to automatically de-bias the data, using a simple threshold in the matching observation input. For example, when forecast input 2 has "==FBIAS1", and observation input 2 has ">5.0", MET applies the >5.0 threshold to the observation and then chooses a forecast threshold which results in a frequency bias of 1.  The frequency bias can be any float value > 0.0.
+
+  
 Practical Information
 =====================
 
@@ -260,7 +277,7 @@ _____________________
 
    multivar_name = "Super";
 
-The **multivar_name** entry appears only in the **MODEMultivarConfig_default** file. This option is used only when the multivar option is enabled, and only when all **multivar_intensity_flag** values are FALSE. It can be thought of as an identifier for the multivariate super object.  It shows up in output files names and content.  It can be set separately for forecasts and observations or as a common value for both.
+The **multivar_name** entry appears only in the **MODEMultivarConfig_default** file. This option is used only when the multivar option is enabled, and only when **multivar_intensity_compare_fcst** and **multivar_intensity_compare_obs** are empty. It can be thought of as an identifier for the multivariate super object.  It shows up in output files names and content.  It can be set separately for forecasts and observations or as a common value for both.
 
 _____________________
 
@@ -268,7 +285,7 @@ _____________________
 
    multivar_level = "LO";
 
-The **multivar_level** entry appears only in the **MODEMultivarConfig_default** file. This option is used only when the multivar option is enabled, and only when all **multivar_intensity_flag** values are FALSE. It is the identifier for the multivariate super object as regards level.  It shows up in output files names and content.  If not set the default value is "NA".   It can be set separately for forecasts and observations, or as a common value for both.
+The **multivar_level** entry appears only in the **MODEMultivarConfig_default** file. This option is used only when the multivar option is enabled, and only when **multivar_intensity_compare_fcst** and **multivar_intensity_compare_obs** are empty. It is the identifier for the multivariate super object as regards level.  It shows up in output files names and content.  If not set the default value is "NA".   It can be set separately for forecasts and observations, or as a common value for both.
 
 _____________________
 

@@ -544,18 +544,18 @@ if ( ! module_obj )  {
 }
 
 bool result = false;
-PyObject *met_point_data = get_python_object(module_obj, python_key_point_data);
+PyObject *met_point_data = get_python_object(module_obj, tmp_point_var_name);
 if ( met_point_data && met_point_data != &_Py_NoneStruct) {
    result = process_point_data(met_point_data, met_pd_out);
 }
 else {
-   PyObject *point_data = get_python_object(module_obj, python_key_point_data_list);
+   PyObject *point_data = get_python_object(module_obj, tmp_point_data);
    if ( point_data && point_data != &_Py_NoneStruct)
       result = process_point_data_list(point_data, met_pd_out, filters);
    else {
       mlog << Warning << "\n" << method_name
-           << "no \"" << python_key_point_data << "\" and \""
-           << python_key_point_data_list << "\" from "
+           << "no \"" << tmp_point_var_name << "\" and \""
+           << tmp_point_data << "\" from "
            << script_name << "\"\n\n";
    }
 }
@@ -627,7 +627,7 @@ if ( ! tmp_dir )  tmp_dir = default_tmp_dir;
 
 path << cs_erase
      << tmp_dir << '/'
-     << tmp_nc_base_name;
+     << tmp_py_base_name;
 
 tmp_nc_path = make_temp_file_name(path.text(), 0);
 
@@ -723,12 +723,12 @@ if ( ! module_obj )  {
    //
 
 
-PyObject *met_point_data = get_python_object(module_obj, python_key_point_data);
+PyObject *met_point_data = get_python_object(module_obj, tmp_point_var_name);
 if ( met_point_data ) {
    process_point_data(met_point_data, met_pd_out);
 }
 else {
-   PyObject *point_data = get_python_object(module_obj, python_key_point_data_list);
+   PyObject *point_data = get_python_object(module_obj, tmp_point_data);
    process_point_data_list(point_data, met_pd_out, filters);
 }
 

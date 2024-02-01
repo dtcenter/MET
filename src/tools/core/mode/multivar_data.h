@@ -85,13 +85,11 @@ class MultiVarData {
    MultiVarData();
    ~MultiVarData();
       
-   void checkFileTypeConsistency(const MultiVarData &mvdi, int j);
-
    void init(ModeDataType dataType,
              const string &name, 
-             const Grid &grid, GrdFileType type, 
+             const Grid &grid, 
              const string &units, 
-             const string &level, 
+             const string &level,
              double data_min, double data_max);
 
    void set_obj(ShapeData *sd, bool simple);
@@ -109,7 +107,6 @@ class MultiVarData {
    string _name;
    int _nx, _ny;
    Grid *_grid;
-   GrdFileType _type;
    string _units;
    string _level;
    double _data_min, _data_max;

@@ -28,6 +28,7 @@ pythonmetscripts_DATA = \
 	logger.py \
 	dataplane.py \
 	mprbase.py \
+	point_nc.py \
 	point.py
 
 EXTRA_DIST = ${pythonmetscripts_DATA}

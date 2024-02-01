@@ -76,6 +76,15 @@ VarInfoNcCF & VarInfoNcCF::operator=(const VarInfoNcCF &f) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+VarInfo *VarInfoNcCF::clone() const {
+
+   VarInfoNcCF *ret = new VarInfoNcCF(*this);
+
+   return (VarInfo *)ret;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 void VarInfoNcCF::init_from_scratch() {
 
    // First call the parent's initialization

@@ -41,6 +41,7 @@ class VarInfoNcMet : public VarInfo
       ~VarInfoNcMet();
       VarInfoNcMet(const VarInfoNcMet &);
       VarInfoNcMet & operator=(const VarInfoNcMet &);
+      virtual VarInfo *clone() const;
 
       void dump(std::ostream &) const;
       void clear();

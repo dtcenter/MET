@@ -204,6 +204,7 @@ class VarInfoNcWrf : public VarInfo
       ~VarInfoNcWrf();
       VarInfoNcWrf(const VarInfoNcWrf &);
       VarInfoNcWrf & operator=(const VarInfoNcWrf &);
+      VarInfo *clone() const;
 
       void dump(std::ostream &) const;
       void clear();

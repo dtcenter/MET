@@ -8,7 +8,7 @@
 
 import sys
 
-from met.point import met_point_tools
+from met.point import get_empty_point_obs, met_point_tools
 try:
    from python_embedding import pyembed_tools
 except:
@@ -19,8 +19,8 @@ input_filename = sys.argv[1]
 # read NetCDF file
 print('{p}  reading {f}'.format(p=met_point_tools.get_prompt(), f=input_filename))
 try:
-   point_obs_data = met_point_tools.get_nc_point_obs()
-   point_obs_data.read_data(input_filename)
+   point_obs_data = get_empty_point_obs()
+   point_obs_data.read_point_data(input_filename)
 
    met_point_data = point_obs_data.get_point_data()
    met_point_data['met_point_data'] = point_obs_data

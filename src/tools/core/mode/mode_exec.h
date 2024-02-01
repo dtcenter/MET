@@ -75,83 +75,118 @@ class ModeExecutive {
    // the various mode algorithm settings
    typedef enum {TRADITIONAL, MULTIVAR_SIMPLE, MULTIVAR_SIMPLE_MERGE, MULTIVAR_INTENSITY, MULTIVAR_SUPER} Processing_t;
 
-   ModeExecutive(Processing_t p=TRADITIONAL);
+   ModeExecutive();
    ~ModeExecutive();
 
    void clear();
 
    void init_traditional(int n_files);
-   void init_multivar_verif_grid();
-   void init_multivar_simple(int n_files, ModeDataType dtype);
-   void init_multivar_intensities(GrdFileType ftype, GrdFileType otype);
-   void check_multivar_perc_thresh_settings();
-
+   void init_multivar_simple(int j, int n_files, ModeDataType dtype, const ModeConfInfo &conf);
+   void init_multivar_intensities(const ModeConfInfo &conf);
 
    int n_conv_radii   () const;
    int n_conv_threshs () const;
-
    int n_runs() const;
 
+   // these are used only for traditional mode
    int R_index;   //  indices into the convolution radius and threshold arrays
    int T_index;   //  for the current run
 
    //
-   // Input configuration files
+   // Input configuration files, all 3 used only for traditional mode
+   // Multivar mode handles the configs outside of the exec
    //
-
+   // the hardwired default traditional mode config
    ConcatString default_config_file;
-   ConcatString match_config_file;
+
+   // set for both trad and multivar, this is the default file on the command line
+   // used only for traditional
+   ConcatString match_config_file;    
+
+   // the extra one that can be set only for traditional mode
    ConcatString merge_config_file;
 
    //
-   // Input files
+   // Input filenames, set for both multivar and trad mode
+   // but used only for trad mode
    //
-
    ConcatString fcst_file;
    ConcatString obs_file;
+
+   // set and used only for trad mode
    Met2dDataFile * fcst_mtddf;
    Met2dDataFile * obs_mtddf;
 
+   // used for both trad and multivar mode
    TTContingencyTable cts[n_cts];
 
+   // used for both trad and multivar mode
    ModeFuzzyEngine engine;
 
    // verification grid
+   // used for both trad and multivar mode, set by both
    Grid grid;
 
    Box xy_bb;
    ConcatString out_dir;
+
+   // set for both trad and multivar mode, used for plotting limits
    double data_min, data_max;
 
+   // set for trad and multivar, used in the engine mode algorithm
    ShapeData Fcst_sd, Obs_sd;
 
+   // not used by multivar
    GrdFileType ftype, otype;
+
+   // set into execs's conf varInfo object, only for multivar intensity comparisons
+   // for trad it's read in from the config
    string funits, ounits;
+
+   // set into execs's conf varInfo object, only for multivar intensity comparisons
+   // for trad it's read in from the config
    string flevel, olevel;
 
+   // used in multivar only to customize outputs correctly
    bool isMultivarOutput;
    bool isMultivarSuperOutput;
    
-   Processing_t ptype;
-   
+   void setup_verification_grid(const ModeInputData &fcst,
+                                const ModeInputData &obs,
+                                const ModeConfInfo &conf);
+
    void clear_internal_r_index();
-   void setup_verification_grid();
-   void setup_fcst_obs_data_traditional();
-   void setup_fcst_data(const Grid &verification_grid);
-   void setup_obs_data(const Grid &verification_grid);
-   void setup_fcst_obs_data_multivar_intensities(const MultiVarData &mvdf, const MultiVarData &mvdo);
-   void setup_fcst_obs_data_multivar_super(ShapeData &f_super, ShapeData &o_super, const Grid &igrid);
-   void do_conv_thresh(const int r_index, const int t_index);
-   void do_merging();
-   void do_merging(ShapeData &f_merge, ShapeData &o_merge);
-   void do_match_merge();
-   void do_match_merge(ShapeData &f_merge, ShapeData &o_merge);
+
+   void setup_traditional_fcst_obs_data();
+   void setup_multivar_fcst_data(const Grid &verification_grid, const ModeInputData &input);
+   void setup_multivar_obs_data(const Grid &verification_grid, const ModeInputData &input);
+   void setup_multivar_fcst_obs_data_intensities(const MultiVarData &mvdf,
+                                                 const MultiVarData &mvdo);
+   void setup_multivar_fcst_obs_data_super(const ShapeData &f_super,
+                                           const ShapeData &o_super,
+                                           const Grid &igrid);
+
+   void do_conv_thresh_traditional(const int r_index, const int t_index);
+   void do_conv_thresh_multivar_super();
+   void do_conv_thresh_multivar_intensity_compare();
+   void do_conv_thresh_multivar_simple(Processing_t p);
+
+   void do_merging_traditional();
+   void do_merging_multivar(const ShapeData &f_merge, const ShapeData &o_merge,
+                            Processing_t p);
+
+   void do_match_merge_traditional();
+   void do_match_merge_multivar(const ShapeData &f_merge, const ShapeData &o_merge,
+                                Processing_t p);
 
    void process_masks(ShapeData &, ShapeData &);
    void process_fcst_masks(ShapeData &);
    void process_obs_masks(ShapeData &);
-   void process_output(const MultiVarData *mvdf=NULL,
-                       const MultiVarData *mvdo=NULL);
+
+   void process_output_traditional();
+   void process_output_multivar_intensity_compare(const MultiVarData *mvdf,
+                                                  const MultiVarData *mvdo);
+   void process_output_multivar_super();
 
    void set_raw_to_full(float *fcst_raw_data,
                         float *obs_raw_data,
@@ -178,7 +213,9 @@ class ModeExecutive {
    void write_poly_netcdf(netCDF::NcFile *, const ObjPolyType);
    void write_ct_stats();
 
-   void conf_read(const string &default_config_filename);
+   // traditional only, multivar reads outside of the exec
+   void conf_read();
+
    static string stype(Processing_t t);
 
 };
