@@ -29,9 +29,6 @@ extern "C" {
 
 ////////////////////////////////////////////////////////////////////////
 
-static const char python_key_point_data     [] = "met_point_data";
-static const char python_key_point_data_list[] = "point_data";
-
 static const char python_key_nhdr           [] = "nhdr";
 //static const char python_key_npbhdr         [] = "npbhdr";
 static const char python_use_var_id         [] = "use_var_id";

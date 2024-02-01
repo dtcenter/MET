@@ -27,8 +27,11 @@ try:
    met_data = dataplane.read_2d_text_input(input_file)
    print("Data Shape:\t" + repr(met_data.shape))
    print("Data Type:\t" + repr(met_data.dtype))
-except NameError:
-   print("Can't find the input file")
+except NameError as ex:
+   print(" === ERROR from read_ascii_numpy_grid.py")
+   print(f"   Exception: {type(ex)}  {ex}")
+   print(f"   sys.argv: {sys.argv}")
+   print("   Can't find the input file")
 
 # attrs is a dictionary which contains attributes describing the dataplane.
 # attrs should have 9 items, each of data type string:

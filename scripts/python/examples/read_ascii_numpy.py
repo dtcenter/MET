@@ -5,7 +5,7 @@ from met.dataplane import dataplane
 ###########################################
 
 def log(msg):
-   dataplane.log_msg(msg)
+   dataplane.log_message(msg)
 
 def set_dataplane_attrs():
    # attrs is a dictionary which contains attributes describing the dataplane.
@@ -95,5 +95,5 @@ except:
 attrs = set_dataplane_attrs()
 log("Attributes:\t" + repr(attrs))
 
-# Sets fill_value if it exists
+# Sets fill_value if it exists at the dataplane
 #attrs['fill_value'] = 255  # for letter.txt

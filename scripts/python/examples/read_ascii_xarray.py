@@ -6,7 +6,7 @@ from met.dataplane import dataplane
 ###########################################
 
 def log(msg):
-   dataplane.log_msg(msg)
+   dataplane.log_message(msg)
 
 log("Python Script:\t" + repr(sys.argv[0]))
 
