@@ -522,7 +522,7 @@ MET_PYTHON_DEBUG
 
 The MET_PYTHON_DEBUG environment variable can be set to enable debugging log messages
 related to Python embedding. These log messages are disabled by default. The environment
-variable cab be set to a value of :code:`all` for all log messages, :code:`dataplane`
+variable can be set to a value of :code:`all` for all log messages, :code:`dataplane`
 for log messages when reading gridded data, or :code:`point` for log messages when
 reading point data.
 
