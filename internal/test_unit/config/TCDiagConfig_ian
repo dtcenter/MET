@@ -136,11 +136,6 @@ nc_diag_flag     = TRUE; // ends with "_diag.nc"
 cira_diag_flag   = TRUE; // ends with "_diag.dat"
 
 //
-// Retain temporary NetCDF diagnostic files
-//
-tmp_nc_diag_flag = FALSE;
-
-//
 // Output base file naming convention
 //
 output_base_format = "s{storm_id}_{technique}_doper_{init_ymdh}";
