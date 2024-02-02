@@ -24,12 +24,12 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
-
 #include <string.h>
 
 #include "grdfiletype_to_string.h"
+
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -39,7 +39,7 @@ ConcatString grdfiletype_to_string(const GrdFileType t)
 
 {
 
-const char * s = (const char *) 0;
+const char * s = (const char *) nullptr;
 
 switch ( t )  {
 

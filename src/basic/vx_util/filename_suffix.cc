@@ -10,8 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -23,6 +21,8 @@ using namespace std;
 #include "string_fxns.h"
 #include "filename_suffix.h"
 #include "concat_string.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////

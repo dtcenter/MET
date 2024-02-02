@@ -7,12 +7,8 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
-
 ////////////////////////////////////////////////////////////////////////
 
-
-using namespace std;
-using namespace std;
 
 #include <iostream>
 #include <unistd.h>
@@ -27,6 +23,8 @@ using namespace std;
 #include "ptile.h"
 #include "nint.h"
 #include "vx_log.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////

@@ -7,11 +7,8 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
-
 ////////////////////////////////////////////////////////////////////////
 
-
-using namespace std;
 
 #include <iostream>
 #include <fstream>
@@ -33,6 +30,8 @@ using namespace std;
 #ifdef WITH_PYTHON
 #include "python_line.h"
 #endif  /*  WITH_PYTHON  */
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////

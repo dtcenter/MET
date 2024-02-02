@@ -7,12 +7,8 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
-
-
 ////////////////////////////////////////////////////////////////////////
 
-
-using namespace std;
 
 #include <iostream>
 #include <unistd.h>
@@ -25,6 +21,8 @@ using namespace std;
 
 #include "file_exists.h"
 #include "empty_string.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////

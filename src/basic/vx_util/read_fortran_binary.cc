@@ -7,11 +7,8 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
-
 ////////////////////////////////////////////////////////////////////////
 
-
-using namespace std;
 
 #include <iostream>
 #include <unistd.h>
@@ -25,6 +22,8 @@ using namespace std;
 #include "read_fortran_binary.h"
 #include "check_endian.h"
 #include "vx_log.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////

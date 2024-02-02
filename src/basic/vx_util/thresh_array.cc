@@ -7,8 +7,6 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -18,6 +16,8 @@ using namespace std;
 #include "thresh_array.h"
 #include "vx_math.h"
 #include "vx_log.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 

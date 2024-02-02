@@ -9,8 +9,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -20,6 +18,8 @@ using namespace std;
 #include "conversions.h"
 #include "util_constants.h"
 #include "is_bad_data.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 

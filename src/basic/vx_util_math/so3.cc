@@ -1,5 +1,3 @@
-
-
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
@@ -10,8 +8,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-
-using namespace std;
 
 #include <iostream>
 #include <unistd.h>
@@ -24,6 +20,8 @@ using namespace std;
 #include "ascii_table.h"
 #include "fix_float.h"
 #include "trig.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////

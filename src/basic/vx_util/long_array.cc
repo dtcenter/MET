@@ -1,5 +1,3 @@
-
-
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2023
 // ** University Corporation for Atmospheric Research (UCAR)
@@ -9,12 +7,7 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
-
-
 ////////////////////////////////////////////////////////////////////////
-
-
-using namespace std;
 
 
 #include <iostream>
@@ -25,6 +18,9 @@ using namespace std;
 
 #include "long_array.h"
 #include "vx_log.h"
+
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
