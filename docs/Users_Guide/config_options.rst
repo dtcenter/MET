@@ -494,6 +494,49 @@ Where code is running in a production context, it is worth being familiar with
 the binding / affinitization method on the particular system and building it
 into any relevant scripting.
 
+.. _met_keep_temp_file:
+
+MET_KEEP_TEMP_FILE
+------------------
+
+The MET_KEEP_TEMP_FILE environment variable can be set to control the runtime
+behavior of the MET tools. The MET tools write temporary files in several places
+in the application and library code. By default, those temporary files are deleted
+when they are no longer needed. However it can be useful for development, testing,
+and debugging to keep them for further inspection. Setting this environment variable
+to a value of :code:`yes` or :code:`true` instructs the MET tools to retain temporary
+files instead of deleting them.
+
+Note that doing so may fill up the temporary directory. It is the responsiblity of
+the user to monitor the temporary directory usage and remove temporary files that
+are no longer needed.
+
+When running with this option, users are advised to refer to section
+:numref:`config_tmp_dir` and write temporary files to a personal location rather than
+the default shared :code:`/tmp` directory.
+
+.. _met_python_debug:
+
+MET_PYTHON_DEBUG
+----------------
+
+The MET_PYTHON_DEBUG environment variable can be set to enable debugging log messages
+related to Python embedding. These log messages are disabled by default. The environment
+variable can be set to a value of :code:`all` for all log messages, :code:`dataplane`
+for log messages when reading gridded data, or :code:`point` for log messages when
+reading point data.
+
+.. _met_python_tmp_format:
+
+MET_PYTHON_TMP_FORMAT
+---------------------
+
+The MET_PYTHON_TMP_FORMAT environment variable defines whether temporary files for
+Python embedding should be written as NetCDF files or using JSON/NumPy serialization.
+By default, they are written using JSON for attributes and NumPy serialization for data
+to avoid NetCDF library conflicts between MET and Python. Setting this environment
+variable to :code:`netcdf` enables the use of temporary NetCDF files instead.
+
 Settings Common to Multiple Tools
 =================================
 
@@ -3770,13 +3813,22 @@ Where "job_name" is set to one of the following:
 
 * "filter"
   
-  To filter out the STAT or TCMPR lines matching the job filtering
-  criteria specified below and using the optional arguments below.
+  To filter out the STAT lines matching the job filtering criteria
+  specified below and using the optional arguments below.
   The output STAT lines are written to the file specified using the
   "-dump_row" argument.
+
   Required Args: -dump_row
 
-|    
+  Optional Args:
+
+  .. code-block:: none
+
+    -set_hdr column_name value
+       May be used multiple times to override data written to the
+       output dump_row file.
+
+|
 
 * "summary"
   
@@ -3805,8 +3857,8 @@ Where "job_name" is set to one of the following:
 	   
   * Format the -column option as LINE_TYPE:COLUMN.
 
-|     
-    
+|
+
   Use the -derive job command option to automatically derive
   statistics on the fly from input contingency tables and partial
   sums.
@@ -3832,10 +3884,14 @@ Where "job_name" is set to one of the following:
 
   .. code-block:: none
 
-    -by column_name to specify case information
-    -out_alpha to override default alpha value of 0.05
-    -derive to derive statistics on the fly
-    -column_union to summarize multiple columns
+    -by column_name
+       To specify case information.
+    -out_alpha
+       To override the default alpha value.
+    -derive
+       To derive statistics on the fly.
+    -column_union
+       To summarize multiple columns.
 
 * "aggregate"
   
@@ -3852,8 +3908,8 @@ Where "job_name" is set to one of the following:
                ISC, ECNT, RPS, RHIST, PHIST, RELP, SSVAR
 	       
   Required Args: -line_type
-  
-| 
+
+|
 
 * "aggregate_stat"
   
@@ -3887,8 +3943,8 @@ Where "job_name" is set to one of the following:
   .. code-block:: none
 
     -out_thresh or -out_fcst_thresh and -out_obs_thresh
-     When -out_line_type FHO, CTC, CTS, MCTC, MCTS,
-                         PCT, PSTD, PJC, PRC
+       When -out_line_type FHO, CTC, CTS, MCTC, MCTS,
+                           PCT, PSTD, PJC, PRC
 
   Additional Optional Args for -line_type MPR:
 
@@ -3901,14 +3957,14 @@ Where "job_name" is set to one of the following:
     -out_obs_wind_thresh
     -out_wind_logic
     When -out_line_type WDIR
-	    
+
   Additional Optional Arg for:
 
   .. code-block:: none
 
     -line_type ORANK -out_line_type PHIST, SSVAR ...
     -out_bin_size
-	    
+
   Additional Optional Args for:
 
   .. code-block:: none
@@ -3917,14 +3973,14 @@ Where "job_name" is set to one of the following:
     -out_eclv_points
 
 * "ss_index"
-  
+
   The skill score index job can be configured to compute a weighted
   average of skill scores derived from a configurable set of
   variables, levels, lead times, and statistics. The skill score
   index is computed using two models, a forecast model and a
   reference model. For each statistic in the index, a skill score
   is computed as:
-  
+
   SS = 1 - (S[model]*S[model])/(S[reference]*S[reference])
 
   Where S is the statistic.
@@ -4135,17 +4191,19 @@ Where "job_name" is set to one of the following:
     "-rank_corr_flag  value"
     "-vif_flag        value"
 
-  For aggregate and aggregate_stat job types:
-
   .. code-block:: none
 
-    "-out_stat        path"   to write a .stat output file for the job
-                              including the .stat header columns. Multiple
-                              values for each header column are written as
-                              a comma-separated list.
-    "-set_hdr col_name value" may be used multiple times to explicity
-                              specify what should be written to the header
-                              columns of the output .stat file.
+    -out_stat path
+       To write a .stat output file for aggregate and aggregate_stat jobs
+       including the .stat header columns. Multiple input values for each
+       header column are written to the output as a comma-separated list
+       of unique values.
+
+    -set_hdr col_name value
+       May be used multiple times to explicity specify what should be
+       written to the header columns of the output .stat file for
+       aggregate and aggregate_stat jobs or output dump_row file
+       for filter jobs.
 
   When using the "-by" job command option, you may reference those columns
   in the "-set_hdr" job command options. For example, when computing statistics

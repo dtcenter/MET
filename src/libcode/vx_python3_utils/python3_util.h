@@ -34,11 +34,13 @@ static const char wrappers_dir         [] = "MET_BASE/wrappers";
 
 static const char python_dir           [] = "MET_BASE/python";
 
-static const char tmp_nc_base_name     [] = "tmp_met_nc";
+static const char tmp_py_base_name     [] = "tmp_met_data";
 
-static const char tmp_nc_file_var_name [] = "tmp_nc_filename";
+static const char tmp_file_var_name    [] = "tmp_py_filename";
 
-static const char tmp_nc_point_var_name[] = "met_point_data";
+static const char tmp_point_var_name   [] = "met_point_data";
+
+static const char tmp_point_data       [] = "point_data";
 
 ////////////////////////////////////////////////////////////////////////
 

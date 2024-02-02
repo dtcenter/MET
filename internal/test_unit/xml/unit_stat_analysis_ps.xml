@@ -76,6 +76,7 @@
       -job filter -line_type MPR -fcst_var TMP -fcst_lev Z2 -vx_mask DTC165 \
       -column_str     OBS_SID KDLN,KDHT,KDEN,KDLS,KDMA,KDMN,KDVT,KDEW \
       -column_str_exc OBS_SID KDLN,KDHT \
+      -set_hdr DESC FILTER_OBS_SID \
       -dump_row &OUTPUT_DIR;/stat_analysis_ps/POINT_STAT_FILTER_OBS_SID.stat \
       -v 1
     </param>

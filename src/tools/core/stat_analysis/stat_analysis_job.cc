@@ -321,7 +321,7 @@ void do_job_filter(const ConcatString &jobstring, LineDataFile &f,
 
       if(job.is_keeper(line)) {
 
-         job.dump_stat_line(line);
+         job.dump_stat_line(line, true);
 
          n_out++;
       }

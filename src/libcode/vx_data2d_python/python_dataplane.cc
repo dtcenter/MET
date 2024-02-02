@@ -31,9 +31,9 @@ extern GlobalPython GP;   //  this needs external linkage
 
 static const char * user_ppath            = nullptr;
 
-static const char write_tmp_nc         [] = "MET_BASE/python/pyembed/write_tmp_dataplane.py";
+static const char write_tmp_py         [] = "MET_BASE/python/pyembed/write_tmp_dataplane.py";
 
-static const char read_tmp_nc          [] = "MET_BASE/python/pyembed/read_tmp_dataplane.py";
+static const char read_tmp_py          [] = "MET_BASE/python/pyembed/read_tmp_dataplane.py";
 
 static const char tmp_nc_var_name      [] = "met_info";
 
@@ -48,10 +48,10 @@ static bool straight_python_dataplane(const char * script_name,
                                       Grid & met_grid_out, VarInfoPython &vinfo);
 
 
-static bool tmp_nc_dataplane(const char * script_name,
-                             int script_argc, char ** script_argv,
-                             const bool use_xarray, DataPlane & met_dp_out,
-                             Grid & met_grid_out, VarInfoPython &vinfo);
+static bool tmp_dataplane(const char * script_name,
+                          int script_argc, char ** script_argv,
+                          const bool use_xarray, DataPlane & met_dp_out,
+                          Grid & met_grid_out, VarInfoPython &vinfo);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -83,10 +83,10 @@ bool status = false;
 
 if ( (user_ppath = getenv(user_python_path_env)) != 0 )  {   //  do_tmp_nc = true;
 
-   status = tmp_nc_dataplane(user_script_name,
-                             user_script_argc, user_script_argv,
-                             use_xarray, met_dp_out,
-                             met_grid_out, vinfo);
+   status = tmp_dataplane(user_script_name,
+                          user_script_argc, user_script_argv,
+                          use_xarray, met_dp_out,
+                          met_grid_out, vinfo);
 
 } else {
 
@@ -309,10 +309,10 @@ return ( true );
 ////////////////////////////////////////////////////////////////////////
 
 
-bool tmp_nc_dataplane(const char * user_script_name,
-                      int user_script_argc, char ** user_script_argv,
-                      const bool use_xarray, DataPlane & met_dp_out,
-                      Grid & met_grid_out, VarInfoPython &vinfo)
+bool tmp_dataplane(const char * user_script_name,
+                   int user_script_argc, char ** user_script_argv,
+                   const bool use_xarray, DataPlane & met_dp_out,
+                   Grid & met_grid_out, VarInfoPython &vinfo)
 
 {
 
@@ -334,13 +334,13 @@ if ( ! tmp_dir )  tmp_dir = default_tmp_dir;
 
 path << cs_erase
      << tmp_dir << '/'
-     << tmp_nc_base_name;
+     << tmp_py_base_name;
 
 tmp_nc_path = make_temp_file_name(path.text(), 0);
 
 command << cs_erase
         << user_ppath                    << ' '    //  user's path to python
-        << replace_path(write_tmp_nc)    << ' '    //  write_tmp_nc.py
+        << replace_path(write_tmp_py)    << ' '    //  write_tmp_nc.py
         << tmp_nc_path                   << ' '    //  tmp_nc output filename
         << user_script_name;                       //  user's script name
 
@@ -397,7 +397,7 @@ StringArray a;
 
 a.add(validate_dataplane);
 
-a.add(replace_path(read_tmp_nc));
+a.add(replace_path(read_tmp_py));
 
 a.add(tmp_nc_path);
 
@@ -412,7 +412,7 @@ mlog << Debug(4) << "Reading temporary Python dataplane file: "
    //  import the python wrapper script as a module
    //
 
-//path = get_short_name(read_tmp_nc);
+//path = get_short_name(read_tmp_py);
 path = get_short_name(validate_dataplane);
 
 PyObject * module_obj = PyImport_ImportModule (path.text());
