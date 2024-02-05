@@ -17,6 +17,12 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include "string.h"
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 struct LaeaNetcdfData {
 
    const char * name;
@@ -60,7 +66,8 @@ struct LaeaNetcdfData {
 struct LaeaData {  
 
    const char * name;             //  not allocated
-   const char * spheroid_name;    //  not allocated
+
+   std::string spheroid_name;
 
    double radius_km;              //  for spherical Earth
 

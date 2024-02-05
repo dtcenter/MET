@@ -85,15 +85,15 @@ lat_pole = data.standard_lat;
 lon_pole = data.central_lon;
 
 Name = data.name;
+
 SpheroidName = data.spheroid_name;
-Data.spheroid_name = SpheroidName.c_str();
 
 Nx = data.nx;
 Ny = data.ny;
 
 geoid.set_ab(data.equatorial_radius_km, data.polar_radius_km);
 
-geoid.set_name(data.spheroid_name);
+geoid.set_name(data.spheroid_name.c_str());
 
 aff.set_mb(1.0/(data.dx_km), 0.0, 0.0, 1.0/(data.dy_km), 0.0, 0.0);
 
@@ -163,7 +163,7 @@ geoid.set_ab(Data.equatorial_radius_km, Data.polar_radius_km);
 
 Data.spheroid_name = "Undefined";
 
-geoid.set_name(Data.spheroid_name);
+geoid.set_name(Data.spheroid_name.c_str());
 
 aff.set_mb(1.0/(Data.dx_km), 0.0, 0.0, 1.0/(Data.dy_km), 0.0, 0.0);
 
@@ -514,10 +514,14 @@ void LaeaGrid::dump(ostream & out, int depth) const
 Indent prefix(depth);
 
 out << prefix << "Name         = ";
-out << prefix << "SpheroidName = ";
 
 if ( Name.length() > 0 )  out << '\"' << Name << '\"';
 else                      out << "(nul)\n";
+
+out << prefix << "SpheroidName = ";
+
+if ( SpheroidName.length() > 0 )  out << '\"' << SpheroidName << '\"';
+else                              out << "(nul)\n";
 
 out << '\n';   //  no prefix
 
