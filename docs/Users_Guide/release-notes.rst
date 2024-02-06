@@ -14,6 +14,7 @@ MET Version 12.0.0-beta3 Release Notes (20240206)
 
   .. dropdown:: Repository, build, and test
 
+     * Enhance METbaseimage to install SciPy Python package needed by the MET TC-Diag tool (`METbaseimage#20 <https://github.com/dtcenter/METbaseimage/issues/20>`_).
      * Remove the SonarQube token from the properties file (`#2757 <https://github.com/dtcenter/MET/issues/2757>`_).
      * Repository cleanup of stale code and configuration consistency (`#2776 <https://github.com/dtcenter/MET/issues/2776>`_).
      * Add new example installation configuration files for Intel compiler users (`#2785 <https://github.com/dtcenter/MET/issues/2785>`_).
