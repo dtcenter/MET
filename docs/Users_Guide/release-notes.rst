@@ -9,6 +9,35 @@ When applicable, release notes are followed by the GitHub issue number which des
 enhancement, or new feature (`MET GitHub issues <https://github.com/dtcenter/MET/issues>`_).
 Important issues are listed **in bold** for emphasis.
 
+MET Version 12.0.0-beta3 Release Notes (20240206)
+-------------------------------------------------
+
+  .. dropdown:: Repository, build, and test
+
+     * Remove the SonarQube token from the properties file (`#2757 <https://github.com/dtcenter/MET/issues/2757>`_).
+     * Repository cleanup of stale code and configuration consistency (`#2776 <https://github.com/dtcenter/MET/issues/2776>`_).
+     * Add new example installation configuration files for Intel compiler users (`#2785 <https://github.com/dtcenter/MET/issues/2785>`_).
+     * Update GitHub actions workflows to switch from node 16 to node 20 (`#2796 <https://github.com/dtcenter/MET/issues/2796>`_).
+
+  .. dropdown:: Bugfixes
+
+     * Bugfix: Fix support for NSIDC v4 Climate Data Record data on Polar Stereographic grids in CF-compliant NetCDF files (`#2652 <https://github.com/dtcenter/MET/issues/2652>`_).
+     * Bugfix: Fix Python embedding failure when providing a single point observation (`#2755 <https://github.com/dtcenter/MET/issues/2755>`_).
+     * Bugfix: Fix MET to compile without the optional `--enable-python` configuration option (`#2760 <https://github.com/dtcenter/MET/issues/2760>`_).
+     * Bugfix: Fix the parsing of level values for GRIB2 template 4.48 data (`#2782 <https://github.com/dtcenter/MET/issues/2782>`_).
+
+  .. dropdown:: Enhancements
+
+     * **Add support for native WRF output files already on pressure levels** (`#2547 <https://github.com/dtcenter/MET/issues/2547>`_).
+     * Enhance ASCII2NC to read ISMN point observations of soil moisture and temperature (`#2701 <https://github.com/dtcenter/MET/issues/2701>`_).
+     * **Major enhancements to multivariate MODE** (`#2745 <https://github.com/dtcenter/MET/issues/2745>`_).
+     * Enhance TC-Diag to use tc_diag_driver version 0.11.0 (`#2769 <https://github.com/dtcenter/MET/issues/2769>`_).
+     * Switch from writing temporary Python files in NetCDF to JSON and NumPy serialization (`#2772 <https://github.com/dtcenter/MET/issues/2772>`_).
+     * Revise the use of temporary files in PB2NC (`#2792 <https://github.com/dtcenter/MET/issues/2792>`_).
+     * Enhance MET to make warnings messages about time differences configurable (`#2801 <https://github.com/dtcenter/MET/issues/2801>`_).
+     * Enhance Stat-Analysis to apply the `-set_hdr` option to filter jobs (`#2805 <https://github.com/dtcenter/MET/issues/2805>`_).
+     * Enhance MET to parse LAEA grids from the MET NetCDF file format (`#2809 <https://github.com/dtcenter/MET/issues/2809>`_).
+
 MET Version 12.0.0-beta2 Release Notes (20231117)
 -------------------------------------------------
 
