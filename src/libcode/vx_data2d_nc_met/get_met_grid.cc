@@ -321,6 +321,8 @@ LambertData get_lambert_data(NcFile * ncfile) {
 
 LaeaData get_laea_data(NcFile * ncfile) {
 
+   const char * method_name = "get_laea_data() -> ";
+
    LaeaData data;
    ConcatString att_value;
 
@@ -329,7 +331,7 @@ LaeaData get_laea_data(NcFile * ncfile) {
 
    // Spheroid name
    get_global_att(ncfile, string("spheroid_name"), att_value);
-   data.spheroid_name = att_value;
+   m_strncpy(data.spheroid_name, att_value.c_str(), att_value.length(), method_name);
 
    // Grid spacing in km
    get_global_att(ncfile, string("radius_km"), data.radius_km);
