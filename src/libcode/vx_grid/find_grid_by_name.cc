@@ -55,12 +55,19 @@ if ( !status || !(i.ok()) )  return ( false );
 
 status = false;
 
-if ( i.lc )  { g.set( *(i.lc) );  status = true; }
-if ( i.st )  { g.set( *(i.st) );  status = true; }
-if ( i.ll )  { g.set( *(i.ll) );  status = true; }
-if ( i.m  )  { g.set( *(i.m)  );  status = true; }
-if ( i.g  )  { g.set( *(i.g)  );  status = true; }
-if ( i.la )  { g.set( *(i.la) );  status = true; }
+if ( i.lc  ) { g.set( *(i.lc)  ); status = true; }
+if ( i.st  ) { g.set( *(i.st)  ); status = true; }
+if ( i.ll  ) { g.set( *(i.ll)  ); status = true; }
+if ( i.rll ) { g.set( *(i.rll) ); status = true; }
+if ( i.m   ) { g.set( *(i.m)   ); status = true; }
+if ( i.g   ) { g.set( *(i.g)   ); status = true; }
+if ( i.gi  ) { g.set( *(i.gi)  ); status = true; }
+if ( i.la  ) { g.set( *(i.la)  ); status = true; }
+if ( i.tc  ) { g.set( *(i.tc)  ); status = true; }
+if ( i.sl  ) { g.set( *(i.sl)  ); status = true; }
+#ifdef WITH_UGRID
+if ( i.us  ) { g.set( *(i.us)  ); status = true; }
+#endif
 
 return ( status );
 

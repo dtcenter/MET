@@ -93,7 +93,8 @@ Ny = data.ny;
 
 geoid.set_ab(data.equatorial_radius_km, data.polar_radius_km);
 
-geoid.set_name(data.spheroid_name.c_str());
+string s = data.spheroid_name;
+geoid.set_name(s.c_str());
 
 aff.set_mb(1.0/(data.dx_km), 0.0, 0.0, 1.0/(data.dy_km), 0.0, 0.0);
 
@@ -118,6 +119,8 @@ return;
 LaeaGrid::LaeaGrid(const LaeaNetcdfData & nc)
 
 {
+
+const char * method_name = "LaeaGrid::LaeaGrid(const LaeaNetcdfData &) -> ";
 
 double u, v, lat, lon;
 const double tol = 1.0e-5;
@@ -161,9 +164,9 @@ if ( fabs((nc.semi_major_axis_km - nc.semi_minor_axis_km)/(nc.semi_major_axis_km
 
 geoid.set_ab(Data.equatorial_radius_km, Data.polar_radius_km);
 
-Data.spheroid_name = "Undefined";
+m_strncpy(Data.spheroid_name, "Undefined", m_strlen("Undefined"), method_name);
 
-geoid.set_name(Data.spheroid_name.c_str());
+geoid.set_name("Undefined");
 
 aff.set_mb(1.0/(Data.dx_km), 0.0, 0.0, 1.0/(Data.dy_km), 0.0, 0.0);
 
