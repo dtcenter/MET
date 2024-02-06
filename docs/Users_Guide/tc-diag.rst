@@ -63,12 +63,6 @@ Optional Arguments for tc_diag
 
 6. The **-v level** option indicates the desired level of verbosity. The contents of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
 
-.. code-block:: none
-
-  tmp_nc_diag_flag = FALSE;
-
-This flag is a boolean specifying whether the temporary NetCDF files containing the cylindrical coordinate range-azimuth data for each storm location should be retained. By default, these temporary files are deleted. If set to true for debugging purposes, they are retained.
-
 .. note:: Setting the **MET_KEEP_TEMP_FILE** (:numref:`met_keep_temp_file`) environment variable retains the temporary NetCDF cylindrical coordinate files for development, testing, and debugging purposes.
 
 tc_diag Configuration File
