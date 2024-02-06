@@ -17,6 +17,12 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include "vx_log.h"
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 struct LaeaNetcdfData {
 
    const char * name;
@@ -60,7 +66,8 @@ struct LaeaNetcdfData {
 struct LaeaData {  
 
    const char * name;             //  not allocated
-   const char * spheroid_name;    //  not allocated
+
+   char spheroid_name[max_str_len];
 
    double radius_km;              //  for spherical Earth
 

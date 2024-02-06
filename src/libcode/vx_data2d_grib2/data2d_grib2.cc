@@ -986,6 +986,8 @@ void MetGrib2DataFile::read_grib2_record_list() {
 
 void MetGrib2DataFile::read_grib2_grid(gribfield *gfld) {
 
+   const char * method_name = "MetGrib2DataFile::read_grib2_grid() -> ";
+
    double d, r_km;
    int ResCompFlag;
    char hem = 0;
@@ -1040,7 +1042,7 @@ void MetGrib2DataFile::read_grib2_grid(gribfield *gfld) {
 
       //  check for thinned lat/lon grid
       if( data.Nlon == -1 ){
-         mlog << Error << "\nMetGrib2DataFile::read_grib2_grid() -> "
+         mlog << Error << "\n" << method_name
               << "Thinned Lat/Lon grids are not supported for GRIB version 2.\n\n";
          exit(1);
       }
@@ -1329,7 +1331,7 @@ void MetGrib2DataFile::read_grib2_grid(gribfield *gfld) {
       //  build an LaeaData struct with the projection information
       LaeaData laea;
       laea.name           = laea_proj_type;
-      laea.spheroid_name  = "Grib template";
+      m_strncpy(laea.spheroid_name, "Grib template",m_strlen("Grib template"), method_name);
 
       //  earth shape
       //  Reference: https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_table3-2.shtml
@@ -1385,7 +1387,7 @@ void MetGrib2DataFile::read_grib2_grid(gribfield *gfld) {
             break;
 
          default:
-            mlog << Error << "\nMetGrib2DataFile::read_grib2_grid() -> "
+            mlog << Error << "\n" << method_name
                  << "unsupported earth shape value of " << earth_shape_int << "!\n\n";
             exit(1);
       }
@@ -1433,7 +1435,7 @@ void MetGrib2DataFile::read_grib2_grid(gribfield *gfld) {
    //  unrecognized grid
    else {
 
-      mlog << Error << "\nMetGrib2DataFile::read_grib2_grid() -> "
+      mlog << Error << "\n" << method_name
            << "found unrecognized grid definition (" << gfld->igdtnum << ")\n\n";
       exit(1);
 
