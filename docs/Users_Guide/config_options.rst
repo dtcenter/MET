@@ -3813,13 +3813,22 @@ Where "job_name" is set to one of the following:
 
 * "filter"
   
-  To filter out the STAT or TCMPR lines matching the job filtering
-  criteria specified below and using the optional arguments below.
+  To filter out the STAT lines matching the job filtering criteria
+  specified below and using the optional arguments below.
   The output STAT lines are written to the file specified using the
   "-dump_row" argument.
+
   Required Args: -dump_row
 
-|    
+  Optional Args:
+
+  .. code-block:: none
+
+    -set_hdr column_name value
+       May be used multiple times to override data written to the
+       output dump_row file.
+
+|
 
 * "summary"
   
@@ -3848,8 +3857,8 @@ Where "job_name" is set to one of the following:
 	   
   * Format the -column option as LINE_TYPE:COLUMN.
 
-|     
-    
+|
+
   Use the -derive job command option to automatically derive
   statistics on the fly from input contingency tables and partial
   sums.
@@ -3875,10 +3884,14 @@ Where "job_name" is set to one of the following:
 
   .. code-block:: none
 
-    -by column_name to specify case information
-    -out_alpha to override default alpha value of 0.05
-    -derive to derive statistics on the fly
-    -column_union to summarize multiple columns
+    -by column_name
+       To specify case information.
+    -out_alpha
+       To override the default alpha value.
+    -derive
+       To derive statistics on the fly.
+    -column_union
+       To summarize multiple columns.
 
 * "aggregate"
   
@@ -3895,8 +3908,8 @@ Where "job_name" is set to one of the following:
                ISC, ECNT, RPS, RHIST, PHIST, RELP, SSVAR
 	       
   Required Args: -line_type
-  
-| 
+
+|
 
 * "aggregate_stat"
   
@@ -3930,8 +3943,8 @@ Where "job_name" is set to one of the following:
   .. code-block:: none
 
     -out_thresh or -out_fcst_thresh and -out_obs_thresh
-     When -out_line_type FHO, CTC, CTS, MCTC, MCTS,
-                         PCT, PSTD, PJC, PRC
+       When -out_line_type FHO, CTC, CTS, MCTC, MCTS,
+                           PCT, PSTD, PJC, PRC
 
   Additional Optional Args for -line_type MPR:
 
@@ -3944,14 +3957,14 @@ Where "job_name" is set to one of the following:
     -out_obs_wind_thresh
     -out_wind_logic
     When -out_line_type WDIR
-	    
+
   Additional Optional Arg for:
 
   .. code-block:: none
 
     -line_type ORANK -out_line_type PHIST, SSVAR ...
     -out_bin_size
-	    
+
   Additional Optional Args for:
 
   .. code-block:: none
@@ -3960,14 +3973,14 @@ Where "job_name" is set to one of the following:
     -out_eclv_points
 
 * "ss_index"
-  
+
   The skill score index job can be configured to compute a weighted
   average of skill scores derived from a configurable set of
   variables, levels, lead times, and statistics. The skill score
   index is computed using two models, a forecast model and a
   reference model. For each statistic in the index, a skill score
   is computed as:
-  
+
   SS = 1 - (S[model]*S[model])/(S[reference]*S[reference])
 
   Where S is the statistic.
@@ -4178,17 +4191,19 @@ Where "job_name" is set to one of the following:
     "-rank_corr_flag  value"
     "-vif_flag        value"
 
-  For aggregate and aggregate_stat job types:
-
   .. code-block:: none
 
-    "-out_stat        path"   to write a .stat output file for the job
-                              including the .stat header columns. Multiple
-                              values for each header column are written as
-                              a comma-separated list.
-    "-set_hdr col_name value" may be used multiple times to explicity
-                              specify what should be written to the header
-                              columns of the output .stat file.
+    -out_stat path
+       To write a .stat output file for aggregate and aggregate_stat jobs
+       including the .stat header columns. Multiple input values for each
+       header column are written to the output as a comma-separated list
+       of unique values.
+
+    -set_hdr col_name value
+       May be used multiple times to explicity specify what should be
+       written to the header columns of the output .stat file for
+       aggregate and aggregate_stat jobs or output dump_row file
+       for filter jobs.
 
   When using the "-by" job command option, you may reference those columns
   in the "-set_hdr" job command options. For example, when computing statistics

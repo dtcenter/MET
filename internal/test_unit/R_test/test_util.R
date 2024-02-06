@@ -383,7 +383,10 @@ compareStatLty = function(stat1, stat2, lty, verb=0, strict=0){
 	# compare the information in the header columns
 	for(intCol in 2:21){
 		listMatch = apply(data.frame(dfV1[,intCol], dfV2[,intCol]), 1,
-				function(a){ a[1] == a[2] });
+				function(a){
+					same = (a[1] == a[2]) | (is.na(a[1]) & is.na(a[2]));
+					same[is.na(same)] = FALSE;
+					return(same); });
 		intNumDiff = sum( !listMatch[ !is.na(listMatch) ] );
 		if( 0 < intNumDiff ){
 			if( 1 <= verb ){

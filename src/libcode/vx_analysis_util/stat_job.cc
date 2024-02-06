@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -1450,14 +1450,6 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
          i+=2;
       }
       else if(jc_array[i] == "-set_hdr") {
-         n = METHdrTable.header(met_version, "STAT", na_str)->col_offset(to_upper(jc_array[i+1]).c_str());
-         if(is_bad_data(n)) {
-            mlog << Error << "\nSTATAnalysisJob::parse_job_command() -> "
-                 << "no match found for header column named: \""
-                 << to_upper((string)jc_array[i+1]) << "\"\n\n";
-            if(line) { delete [] line; line = (char *) 0; }
-            throw(1);
-         }
          hdr_name.add_css(to_upper(jc_array[i+1]));
          hdr_value.add_css(jc_array[i+2]);
          i+=2;
@@ -1649,6 +1641,28 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
       } // end if
 
    } // end for
+
+   // Validate set_hdr column names
+   if(hdr_name.n() > 0) {
+
+      string lt_str = (line_type.n() == 1 ?
+                       line_type[0] : na_str);
+
+      for(i=0; i<hdr_name.n(); i++) {
+
+         n = METHdrTable.header(met_version, "STAT", lt_str.c_str())->
+                col_offset(hdr_name[i].c_str());
+
+         if(is_bad_data(n)) {
+            mlog << Error << "\nSTATAnalysisJob::parse_job_command() -> "
+                 << "no match found for "
+                 << (line_type.n() == 1 ? line_type[0] : "header")
+                 << " column named \"" << hdr_name[i] << "\"\n\n";
+            if(line) { delete [] line; line = (char *) 0; }
+            throw(1);
+         }
+      } // end for
+   }
 
    // Expand out_eclv_points
    if(out_eclv_points.n() == 1) {
@@ -2130,7 +2144,8 @@ void STATAnalysisJob::close_stat_file() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void STATAnalysisJob::dump_stat_line(const STATLine &line) {
+void STATAnalysisJob::dump_stat_line(const STATLine &line,
+                                     bool do_set_hdr) {
    int i;
 
    //
@@ -2268,8 +2283,24 @@ void STATAnalysisJob::dump_stat_line(const STATLine &line) {
    // Store the data line
    //
    for(i=0; i<line.n_items(); i++) {
-     dump_at.set_entry(n_dump%dump_at.nrows(), i, (string)line.get_item(i));
+     dump_at.set_entry(n_dump%dump_at.nrows(), i,
+                       (string) line.get_item(i));
    }
+
+   //
+   // Apply -set_hdr options, if requested
+   //
+   if(do_set_hdr) {
+      for(i=0; i<hdr_name.n(); i++) {
+         dump_at.set_entry(n_dump%dump_at.nrows(),
+                           line.get_offset(hdr_name[i].c_str()),
+                           (string) hdr_value[i]);
+      }
+   }
+
+   //
+   // Increment the counter
+   //
    n_dump++;
 
    //

@@ -338,7 +338,7 @@ class met_base_point(met_base):
       self.obs_qty = point_array_list[11]
       
       if numpy_dump_name != tmp_filename:
-         os.remove(numpy_dump_name)
+         met_base_tools.remove_temp_file(numpy_dump_name)
 
    def write_point_data(self, tmp_filename):
       if met_base_tools.use_netcdf_format():
@@ -797,7 +797,7 @@ def convert_point_data(point_data, check_all_records=False, input_type='csv'):
       csv_point_data.check_csv_point_data(check_all_records)
       tmp_point_data = csv_point_data.get_point_data()
    else:
-      met_base.error_messageg(f'convert_point_data(() Not supported input type: {input_type}')
+      met_base.error_message(f'convert_point_data(() Not supported input type: {input_type}')
    return tmp_point_data
 
 def get_empty_point_obs():
