@@ -536,6 +536,21 @@
     </output>
   </test>
 
+  <test name="plot_data_plane_LAEA_MET_NC">
+  <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &OUTPUT_DIR;/pcp_combine/ukv_agl_temperature_1.5.nc \
+      &OUTPUT_DIR;/plot_data_plane/ukv_agl_temperature_laea_met_nc.ps \
+      'name="TMP_Z1.5"; level="(*,*)";' \
+      -title "MET NetCDF LAEA 1.5m Temperature" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/ukv_agl_temperature_laea_grib2.ps</ps>
+    </output>
+  </test>
+
+
   <test name="plot_data_plane_NCCF_POLAR_STEREO">
     <exec>&MET_BIN;/plot_data_plane</exec>
     <param> \
