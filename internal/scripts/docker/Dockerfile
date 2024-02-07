@@ -19,7 +19,7 @@ RUN if [ "x${SOURCE_BRANCH}" = "x" ]; then \
       echo "Build Argument SOURCE_BRANCH=${SOURCE_BRANCH}"; \
     fi
 
-ENV MET_GIT_NAME    $(echo ${SOURCE_BRANCH} | sed 's%/%_%g')
+ENV MET_GIT_NAME    ${SOURCE_BRANCH}
 ENV MET_REPO_DIR    /met/MET-${MET_GIT_NAME}
 ENV MET_GIT_URL     https://github.com/dtcenter/MET
 ENV MET_DEVELOPMENT true
