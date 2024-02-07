@@ -251,6 +251,21 @@ def get_result_names(computations: List[DiagComputation]) -> List[str]:
     return names
 
 
+def get_all_result_units(
+    pressure_indedpendent: List[DiagComputation], sounding: List[DiagComputation]
+) -> Tuple[List[str], List[str]]:
+    pi_var_units = get_result_units(pressure_indedpendent)
+    snd_var_units = get_result_units(sounding)
+    return pi_var_units, snd_var_units
+
+
+def get_result_units(computations: List[DiagComputation]) -> List[str]:
+    units = []
+    for c in computations:
+        units.extend(c.units)
+    return units
+
+
 def get_computation_batches(
     pressure_indedpendent: List[DiagComputation], sounding: List[DiagComputation]
 ) -> List[ComputationBatch]:

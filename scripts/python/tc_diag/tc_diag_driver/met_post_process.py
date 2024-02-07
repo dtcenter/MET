@@ -12,6 +12,10 @@ def mps_to_10kt(value: float) -> float:
     return scale10(mps_to_kt(value))
 
 
+def ten_kt_to_mps(value: float) -> float:
+    return (value / 10.0) / MPS_TO_KT
+
+
 def k_to_10c(value: float) -> float:
     return (value + KELVIN_TO_CELCIUS) * 10
 

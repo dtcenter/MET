@@ -203,8 +203,14 @@ def _prep_diag_calculations(
     snd_comps = ce.diag_computations_from_entry(sounding_computation_specs)
 
     pi_result_names, snd_result_names = ce.get_all_result_names(pi_comps, snd_comps)
+    pi_result_units, snd_result_units = ce.get_all_result_units(pi_comps, snd_comps)
     results = fcresults.ForecastHourResults(
-        [forecast_hour], levels_hPa, pi_result_names, snd_result_names
+        [forecast_hour],
+        levels_hPa,
+        pi_result_names,
+        snd_result_names,
+        pi_result_units,
+        snd_result_units,
     )
     batches = ce.get_computation_batches(pi_comps, snd_comps)
 
