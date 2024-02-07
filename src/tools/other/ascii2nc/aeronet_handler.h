@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -10,8 +10,8 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-#ifndef  __AERONETHANDLER_H__
-#define  __AERONETHANDLER_H__
+#ifndef  __AERONET_HANDLER_H__
+#define  __AERONET_HANDLER_H__
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -31,24 +31,24 @@ class AeronetHandler : public FileHandler
 
 public:
 
-  AeronetHandler(const string &program_name);
+  AeronetHandler(const std::string &program_name);
   virtual ~AeronetHandler();
 
   virtual bool isFileType(LineDataFile &ascii_file) const;
 
   void setFormatVersion(int version);
 
-  static string getFormatString()
+  static std::string getFormatString()
   {
     return "aeronet";
   }
 
-  static string getFormatString_v2()
+  static std::string getFormatString_v2()
   {
     return "aeronetv2";
   }
 
-  static string getFormatString_v3()
+  static std::string getFormatString_v3()
   {
     return "aeronetv3";
   }
@@ -69,7 +69,7 @@ public:
 
   // The header type for these observations
 
-  static const string HEADER_TYPE;
+  static const std::string HEADER_TYPE;
 
   // Grib codes for the different fields
 
@@ -83,7 +83,7 @@ protected:
 
   // Unchanging header information
 
-  string _stationId;
+  std::string _stationId;
   double _stationLat;
   double _stationLon;
   double _stationAlt;
@@ -111,13 +111,13 @@ protected:
   virtual bool _readObservations(LineDataFile &ascii_file);
 
   // Extract the height from the field name
-  double extract_height(string hdr_field);
+  double extract_height(std::string hdr_field);
   
   // Get the number of headers
   int get_header_count_v3(StringArray hdr_tokens);
   
   // Make the variable name from header (field name)
-  string make_var_name_from_header(string hdr_field);
+  std::string make_var_name_from_header(std::string hdr_field);
   
 };
 
@@ -125,7 +125,7 @@ protected:
 ////////////////////////////////////////////////////////////////////////
 
 
-#endif   /*  __AERONETHANDLER_H__  */
+#endif   /*  __AERONET_HANDLER_H__  */
 
 
 ////////////////////////////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -56,7 +56,7 @@ void WwmcaRegridder::do_output(const char * output_filename)
    int accum_time, x, y;
    float f;
    double v;
-   ConcatString s;
+   ConcatString s, cs;
    const int Nx = ToGrid->nx();
    const int Ny = ToGrid->ny();
 
@@ -129,16 +129,23 @@ void WwmcaRegridder::do_output(const char * output_filename)
    
       if ( cp_nh->valid() != (unixtime) 0 &&
            cp_nh->valid() != valid_time )  {
-   
-         mlog << Warning << "\nWwmcaRegridder::do_output(const char * output_filename) -> "
-              << "the config file valid time ("
-              << unix_to_yyyymmdd_hhmmss(valid_time)
-              << ") and data file valid time ("
-              << unix_to_yyyymmdd_hhmmss(cp_nh->valid())
-              << ") do not match, using config file time.\n\n";
-   
+
+         cs << cs_erase
+            << "the config file valid time ("
+            << unix_to_yyyymmdd_hhmmss(valid_time)
+            << ") and data file valid time ("
+            << unix_to_yyyymmdd_hhmmss(cp_nh->valid())
+            << ") do not match, using config file time.";
+
+         if(Config->time_offset_warning(
+               (int) (cp_nh->valid() != valid_time))) {
+            mlog << Warning << "\nWwmcaRegridder::do_output(const char * output_filename) -> "
+                 << cs << "\n\n";
+         }
+         else {
+            mlog << Debug(3) << cs << "\n";
+         }
       }
-   
    }
    else  {
       valid_time = cp_nh->valid();
@@ -164,16 +171,23 @@ void WwmcaRegridder::do_output(const char * output_filename)
    
       if ( cp_nh->init() != (unixtime) 0 &&
            cp_nh->init() != init_time )  {
-   
-         mlog << Warning << "\nWwmcaRegridder::do_output(const char * output_filename) -> "
-              << "the config file initialization time ("
-              << unix_to_yyyymmdd_hhmmss(init_time)
-              << ") and data file initialization time ("
-              << unix_to_yyyymmdd_hhmmss(cp_nh->init())
-              << ") do not match, using config file time.\n\n";
-   
+
+         cs << cs_erase
+            << "the config file initialization time ("
+            << unix_to_yyyymmdd_hhmmss(init_time)
+            << ") and data file initialization time ("
+            << unix_to_yyyymmdd_hhmmss(cp_nh->init())
+            << ") do not match, using config file time.";
+
+         if(Config->time_offset_warning(
+               (int) (cp_nh->init() != init_time))) {
+            mlog << Warning << "\nWwmcaRegridder::do_output(const char * output_filename) -> "
+                 << cs << "\n\n";
+         }
+         else {
+            mlog << Debug(3) << cs << "\n";
+         }
       }
-   
    }
    else  {
       init_time = cp_nh->init();

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -42,10 +42,9 @@ class Mode_Field_Info {
 
       void assign(const Mode_Field_Info &);
 
+      Dictionary * dict;   //  not allocated, based on reading the config file
 
-      Dictionary * dict;   //  not allocated
-
-      MetConfig * conf;    //  not allocated
+      MetConfig * conf;    //  not allocated, based on reading the config file
 
       GrdFileType gft;
 
@@ -59,6 +58,7 @@ class Mode_Field_Info {
      ~Mode_Field_Info();
       Mode_Field_Info(const Mode_Field_Info &);
       Mode_Field_Info & operator=(const Mode_Field_Info &);
+      void clone(const Mode_Field_Info &);
 
       void clear();
 
@@ -85,6 +85,8 @@ class Mode_Field_Info {
 
       PlotInfo       raw_pi;              // Raw forecast plotting info
 
+      GrdFileType    file_type;           // each field can have a configured file type
+   
          //
          //  member functions
          //

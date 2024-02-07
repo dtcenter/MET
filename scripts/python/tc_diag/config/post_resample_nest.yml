@@ -100,23 +100,25 @@ pressure_independent_computation_specs:
     callable: *div_vort_func 
     output_vars: [850DVRG, 850VORT] 
     kwargs: {u_name: *u_vert_name, v_name: *v_vert_name, level_hPa: 850, radius_km: *div_vort_max_km}
+    units: [/S, /S]
   div_vort_200: 
     callable: *div_vort_func
     output_vars: [200DVRG, 200VORT] 
     kwargs: {u_name: *u_vert_name, v_name: *v_vert_name, level_hPa: 200, radius_km: *div_vort_max_km}
+    units: [/S, /S]
 
 
   shear: 
     batch_order: 1
     callable: tc_diag_driver.met_diag_vars.shear 
     output_vars: [SHR_MAG, SHR_HDG] 
-    kwargs: {u_name: u, v_name: v, bottom_hPa: 850, top_hPa: 200}
+    kwargs: {u_name: U, v_name: V, bottom_hPa: 850, top_hPa: 200}
     unit_converters: [tc_diag_driver.met_post_process.mps_to_kt, pass]
     units: [KT, DEG]
   TGRD:
     batch_order: 1
     callable: tc_diag_driver.met_diag_vars.temperature_gradient
-    kwargs: {u_name: u, v_name: v, bottom_hPa: 850, top_hPa: 700}
+    kwargs: {u_name: U, v_name: V, bottom_hPa: 850, top_hPa: 700}
     units: "10^7C/M"
 
 sounding_computation_specs:

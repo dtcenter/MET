@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -1936,7 +1936,9 @@ void OutFileInfo::write_cira_diag_vals(vector<string> &k,
 
    if(!cira_diag_out) return;
 
-   // Store lead time information
+   const char *method_name = "OutFileInfo::write_cira_diag_vals()";
+
+   // Store lead time information for standard storm and sounding data sections
    if(write_time) {
       NumArray times;
       for(int i=0; i<trk_ptr->n_points(); i++) {
@@ -1949,6 +1951,7 @@ void OutFileInfo::write_cira_diag_vals(vector<string> &k,
 
    // Variables write AsciiTable output
    ConcatString cs;
+   string str;
    AsciiTable at;
    int n_row = m.size();
    int n_col = bad_data_int;
@@ -1963,6 +1966,10 @@ void OutFileInfo::write_cira_diag_vals(vector<string> &k,
          n_col = 2 + m.at(*it).n();
          at.set_size(n_row, n_col);
 
+         // Set spacing after the second column to 0
+         // since the units column is right-padded
+         at.set_ics(1, 0);
+
          // Justify columns
          at.set_column_just(0, LeftJust);
          at.set_column_just(1, LeftJust);
@@ -1976,12 +1983,30 @@ void OutFileInfo::write_cira_diag_vals(vector<string> &k,
       c = 0;
 
       // Diagnostic name
-      at.set_entry(r, c++, *it);
+      str = *it;
 
-      // Units
-      cs << cs_erase << "("
-         << get_diag_units(*it) << ")";
-      at.set_entry(r, c++, cs);
+      // Truncate or pad diagnostic names 
+      if(str.length() > cira_diag_name_width) {
+         str = (*it).substr(0, cira_diag_name_width);
+         mlog << Warning << "\n" << method_name << " -> "
+              << "long diagnostic name \"" << (*it)
+              << "\" truncated to \"" << str << "\"!\n\n";
+      }
+      str.append(cira_diag_name_width - str.length(), ' ');
+      at.set_entry(r, c++, str);
+
+      // Units string
+      str = "(" + get_diag_units(*it) + ")";
+
+      // Truncate or pad units strings
+      if(str.length() > cira_diag_units_width) {
+         str = "(" + get_diag_units(*it).substr(0, cira_diag_units_width - 2) + ")";
+         mlog << Warning << "\n" << method_name << " -> "
+              << "long diagnostic units string \"(" << get_diag_units(*it)
+              << ")\" truncated to \"" << str << "\"!\n\n";
+      }
+      str.append(cira_diag_units_width - str.length(), ' ');
+      at.set_entry(r, c++, str);
 
       // Diagnostic values
       for(int i=0; i<m.at(*it).n(); i++) {

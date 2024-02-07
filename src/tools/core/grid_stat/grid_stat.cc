@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -111,6 +111,7 @@
 //   053    12/11/21  Halley Gotway  MET #1991 Fix VCNT output.
 //   054    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
 //   055    10/03/22  Prestopnik     MET #2227 Remove using namespace netCDF from header files
+//   056    01/29/24  Halley Gotway  MET #2801 Configure time difference warnings
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -745,12 +746,21 @@ void process_scores() {
       // Check that the valid times match
       if(fcst_dp.valid() != obs_dp.valid()) {
 
-         mlog << Warning << "\nprocess_scores() -> "
-              << "Forecast and observation valid times do not match "
-              << unix_to_yyyymmdd_hhmmss(fcst_dp.valid()) << " != "
-              << unix_to_yyyymmdd_hhmmss(obs_dp.valid()) << " for "
-              << conf_info.vx_opt[i].fcst_info->magic_str() << " versus "
-              << conf_info.vx_opt[i].obs_info->magic_str() << ".\n\n";
+         cs << cs_erase
+            << "Forecast and observation valid times do not match ("
+            << unix_to_yyyymmdd_hhmmss(fcst_dp.valid()) << " != "
+            << unix_to_yyyymmdd_hhmmss(obs_dp.valid()) << ") for "
+            << conf_info.vx_opt[i].fcst_info->magic_str() << " versus "
+            << conf_info.vx_opt[i].obs_info->magic_str() << ".";
+
+         if(conf_info.conf.time_offset_warning(
+               (int) (fcst_dp.valid() - obs_dp.valid()))) {
+            mlog << Warning << "\nprocess_scores() -> "
+                 << cs << "\n\n";
+         }
+         else {
+            mlog << Debug(3) << cs << "\n";
+         }
       }
 
       // Check that the accumulation intervals match
@@ -760,9 +770,9 @@ void process_scores() {
 
          mlog << Warning << "\nprocess_scores() -> "
               << "Forecast and observation accumulation times "
-              << "do not match " << sec_to_hhmmss(fcst_dp.accum())
+              << "do not match (" << sec_to_hhmmss(fcst_dp.accum())
               << " != " << sec_to_hhmmss(obs_dp.accum())
-              << " for " << conf_info.vx_opt[i].fcst_info->magic_str()
+              << ") for " << conf_info.vx_opt[i].fcst_info->magic_str()
               << " versus " << conf_info.vx_opt[i].obs_info->magic_str()
               << ".\n\n";
       }

@@ -376,4 +376,16 @@
     </output>
   </test>
 
+  <test name="pcp_combine_LAEA_GRIB2">
+  <exec>&MET_BIN;/pcp_combine</exec>
+    <param> \
+      -add &DATA_DIR_MODEL;/grib2/ukv/ukv_agl_temperature_1.5_12.grib2 \
+      'name="TMP"; level="Z1.5"; lead_time="24";' \
+      &OUTPUT_DIR;/pcp_combine/ukv_agl_temperature_1.5.nc
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/pcp_combine/ukv_agl_temperature_1.5.nc</grid_nc>
+    </output>
+  </test>
+
 </met_test>

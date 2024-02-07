@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -8,9 +8,6 @@
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-using namespace std;
 
 
 #include <iostream>
@@ -24,6 +21,9 @@ using namespace std;
 #include "vx_util.h"
 
 #include "airnow_handler.h"
+
+using namespace std;
+
 
 static const char *AIRNOW_NA_STR = "N/A";
 static const char *airnow_stations_env = "MET_AIRNOW_STATIONS";
@@ -421,16 +421,12 @@ bool AirnowHandler::_parseObservationLineAqobs(const string &data_line,
   }
 
   // fill in expected things
-  double lat, lon, elev;
+  double elev = 0.0;
   string stationId = tokens[stationIdPtr];
-  string col;
-
-  lat = atof(tokens[latPtr].c_str());
-  lon = atof(tokens[lonPtr].c_str());
+  double lat = atof(tokens[latPtr].c_str());
+  double lon = atof(tokens[lonPtr].c_str());
   if (elevPtr >= 0) {
     elev = atof(tokens[elevPtr].c_str());
-  } else {
-    elev = 0.0;
   }
 
   _addHourlyAqobsObs(tokens, header_type, stationId, valid_time, lat, lon, elev,
@@ -496,20 +492,15 @@ void AirnowHandler::_addHourlyAqobsObs(const vector<string> &data_line, const st
                                        int measuredPtr, int aqiPtr, int valuePtr,
                                        int unitPtr, const string &varname)
 {
-  string col;
-  int status;
-  int aqi;
-  double value;
-  string units;
-
   // averging period is 1-hour
   int avgPeriodSec = 3600;
 
-  status = atoi(data_line[measuredPtr].c_str());
+  int status = atoi(data_line[measuredPtr].c_str());
   if (status == 1) {
-    aqi = atoi(data_line[aqiPtr].c_str());
+    double value;
+    int aqi = atoi(data_line[aqiPtr].c_str());
     if (doubleOrMissing(data_line[valuePtr], value)) {
-      units = data_line[unitPtr];
+      string units = data_line[unitPtr];
 
       // add the observation
       _addObservations(Observation(header_type, stationId, valid_time,
@@ -528,15 +519,13 @@ void AirnowHandler::_addHourlyAqobsObs(const vector<string> &data_line, const st
                                        double lat, double lon, double elev,
                                        int valuePtr, int unitPtr, const string &varname)
 {
-  string col;
   double value;
-  string units;
 
   // averging period is 1-hour
   int avgPeriodSec = 3600;
 
   if (doubleOrMissing(data_line[valuePtr], value)) {
-    units = data_line[unitPtr];
+    string units = data_line[unitPtr];
 
     // add the observation
     _addObservations(Observation(header_type, stationId, valid_time,
@@ -648,7 +637,7 @@ time_t AirnowHandler::_getValidTime(const string &dateStr, const string &timeStr
   struct tm time_struct;
   memset(&time_struct, 0, sizeof(time_struct));
 
-  time_struct.tm_year = atoi(year.c_str()) -1900;
+  time_struct.tm_year = atoi(year.c_str()) - 1900;
   time_struct.tm_mon = atoi(mon.c_str()) - 1;
   time_struct.tm_mday = atoi(mday.c_str());
   time_struct.tm_hour = atoi(hour.c_str());

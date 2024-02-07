@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -31,7 +31,6 @@
 #include "grib_strings.h"
 
 using namespace std;
-
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -73,6 +72,15 @@ VarInfoUGrid & VarInfoUGrid::operator=(const VarInfoUGrid &f) {
    assign(f);
 
    return ( *this );
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+VarInfo *VarInfoUGrid::clone() const {
+
+   VarInfoUGrid *ret = new VarInfoUGrid(*this);
+
+   return (VarInfo *)ret;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -154,10 +162,6 @@ void VarInfoUGrid::add_dimension(int dim, bool as_offset, double dim_value) {
 
 void VarInfoUGrid::set_magic(const ConcatString &nstr, const ConcatString &lstr) {
    ConcatString tmp_str;
-   char *ptr = 0;
-   char *ptr2 = 0;
-   char *ptr3 = 0;
-   char *save_ptr = 0;
    const char *method_name = "VarInfoUGrid::set_magic() -> ";
 
    // Store the magic string
@@ -176,6 +180,10 @@ void VarInfoUGrid::set_magic(const ConcatString &nstr, const ConcatString &lstr)
       add_dimension(vx_data2d_star);
    }
    else {
+      char *ptr = nullptr;
+      char *ptr2 = nullptr;
+      char *ptr3 = nullptr;
+      char *save_ptr = nullptr;
 
       // Initialize the temp string
       tmp_str = lstr;

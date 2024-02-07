@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -545,7 +545,6 @@ void NetcdfObsVars::read_dims_vars(NcFile *f_in) {
 ////////////////////////////////////////////////////////////////////////
 
 void NetcdfObsVars::read_header_data(MetPointHeader &hdr_data) {
-   bool is_valid_obs_nc = true;
    long nhdr_count  = get_dim_size(&hdr_dim);
    int  strl_len    = get_dim_size(&strl_dim);
    int  strl2_len   = strl_len;

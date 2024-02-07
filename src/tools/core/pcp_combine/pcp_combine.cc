@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -77,6 +77,7 @@
 //                    the -pcpdir option.
 //   024    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
 //   025    09/29/22  Prestopnik     MET #2227 Remove namespace netCDF from header files
+//   026    01/29/24  Halley Gotway  MET #2801 Configure time difference warnings
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -755,9 +756,9 @@ int search_pcp_dir(const char *cur_dir, const unixtime cur_ut,
          cur_file << cs_erase << cur_dir << '/' << dirp->d_name;
 
          Met2dDataFileFactory factory;
-         Met2dDataFile * mtddf = (Met2dDataFile *) nullptr;
+         Met2dDataFile * mtddf;
          VarInfoFactory var_fac;
-         VarInfo * cur_var = (VarInfo *) nullptr;
+         VarInfo * cur_var;
 
          //
          // Create a data file object.
@@ -869,15 +870,25 @@ void do_sub_command() {
    nc_valid_time = plus.valid();
 
    //
-   // Output initialization time
-   // Warning if init_time1 != init_time2.
+   // Check that the initialization times match
    //
    if(plus.init() != minus.init()) {
-      mlog << Warning << "\ndo_sub_command() -> "
-           << "the initialization times do not match ("
-           << unix_to_yyyymmdd_hhmmss(plus.init()) <<  " != "
-           << unix_to_yyyymmdd_hhmmss(minus.init())
-           << ") for subtraction.  Using the first value.\n\n";
+
+      ConcatString cs;
+      cs << cs_erase
+         << "The initialization times do not match ("
+         << unix_to_yyyymmdd_hhmmss(plus.init()) << " != "
+         << unix_to_yyyymmdd_hhmmss(minus.init())
+         << ") for subtraction. Using the first value.";
+
+      if(config.time_offset_warning(
+            (int) (plus.init() - minus.init()))) {
+         mlog << Warning << "\ndo_sub_command() -> "
+               << cs << "\n\n";
+      }
+      else {
+         mlog << Debug(3) << cs << "\n";
+      }
    }
    nc_init_time = plus.init();
 
@@ -1145,13 +1156,13 @@ void do_derive_command() {
          for(j=0; j<nxy; j++) {
             double s  = sum_dp.data()[j];
             double sq = sum_sq_dp.data()[j];
-            double n  = vld_dp.data()[j];
+            double nd  = vld_dp.data()[j];
             if(is_bad_data(s) || is_bad_data(sq) ||
-               is_bad_data(n) || n <= 1) {
+               is_bad_data(nd) || nd <= 1) {
                der_dp.buf()[j] = bad_data_double;
             }
             else {
-               v = (sq - s*s/n)/(n-1);
+               v = (sq - s*s/nd)/(nd-1);
                if(is_eq(v, 0.0)) v = 0.0;
                der_dp.buf()[j] = sqrt(v);
             }

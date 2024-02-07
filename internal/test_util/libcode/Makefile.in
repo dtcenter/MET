@@ -87,6 +87,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
+@ENABLE_PYTHON_TRUE@am__append_1 = vx_python3_utils
 subdir = internal/test_util/libcode
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
@@ -149,7 +150,10 @@ am__define_uniq_tagged_files = \
   unique=`for i in $$list; do \
     if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
   done | $(am__uniquify_input)`
-DIST_SUBDIRS = $(SUBDIRS)
+DIST_SUBDIRS = vx_data2d vx_data2d_grib vx_data2d_nc_met \
+	vx_data2d_nc_cf vx_data2d_factory vx_geodesy vx_grid vx_ps \
+	vx_solar vx_plot_util vx_tc_util vx_nc_util vx_physics \
+	vx_series_data vx_python3_utils
 am__DIST_COMMON = $(srcdir)/Makefile.in
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 am__relativize = \
@@ -335,21 +339,10 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-SUBDIRS = vx_data2d \
-	vx_data2d_grib \
-	vx_data2d_nc_met \
-	vx_data2d_nccf \
-	vx_data2d_factory \
-	vx_geodesy \
-	vx_grid \
-	vx_ps \
-	vx_solar \
-	vx_plot_util \
-	vx_tc_util \
-	vx_nc_util \
-	vx_physics \
-	vx_series_data
-
+SUBDIRS = vx_data2d vx_data2d_grib vx_data2d_nc_met vx_data2d_nc_cf \
+	vx_data2d_factory vx_geodesy vx_grid vx_ps vx_solar \
+	vx_plot_util vx_tc_util vx_nc_util vx_physics vx_series_data \
+	$(am__append_1)
 MAINTAINERCLEANFILES = Makefile.in
 all: all-recursive
 

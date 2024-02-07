@@ -1,0 +1,7 @@
+test_get
+test_numpy
+*.o
+*.a
+.deps
+Makefile
+*.dSYM

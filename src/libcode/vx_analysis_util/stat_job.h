@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -143,11 +143,14 @@ class STATAnalysisJob {
       void set_boot_rng (const char *);
       void set_boot_seed(const char *);
 
-      void set_perc_thresh(const NumArray &, const NumArray &, const NumArray &);
+      void set_perc_thresh(const NumArray &,
+                           const NumArray &,
+                           const NumArray &);
 
       void open_dump_row_file ();
       void close_dump_row_file();
-      void dump_stat_line     (const STATLine &);
+      void dump_stat_line(const STATLine &,
+                          bool do_set_hdr = false);
 
       void open_stat_file ();
       void setup_stat_file(int n_row, int n);

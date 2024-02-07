@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -24,7 +24,6 @@ using namespace std;
 ///////////////////////////////////////////////////////////////////////////////
 
 static const double default_vld_thresh = 1.0;
-//static const char conf_key_prepbufr_map_bad[] = "obs_prefbufr_map";    // for backward compatibility
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -354,6 +353,7 @@ GrdFileType parse_conf_file_type(Dictionary *dict) {
            if(v == conf_const.lookup_int(conf_val_grib1))         t = FileType_Gb1;
       else if(v == conf_const.lookup_int(conf_val_grib2))         t = FileType_Gb2;
       else if(v == conf_const.lookup_int(conf_val_netcdf_met))    t = FileType_NcMet;
+      else if(v == conf_const.lookup_int(conf_val_netcdf_wrf))    t = FileType_NcWrf;
       else if(v == conf_const.lookup_int(conf_val_netcdf_pint))   t = FileType_NcPinterp;
       else if(v == conf_const.lookup_int(conf_val_netcdf_nccf))   t = FileType_NcCF;
       else if(v == conf_const.lookup_int(conf_val_netcdf_ugrid))  t = FileType_UGrid;

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -70,6 +70,14 @@ void remove_temp_file(const ConcatString file_name) {
    //
    // Attempt to remove the file and print out any error message
    //
+   const char *keep_temp = getenv("MET_KEEP_TEMP_FILE");
+   if (nullptr != keep_temp
+       && (0 == strcmp(keep_temp, "true") || 0 == strcmp(keep_temp, "yes"))) {
+      mlog << Debug(2) << "The temporary file ("
+           << file_name << ") was not deleted. Please remove it manually\n\n";
+      return;
+   }
+
    if((errno = remove(file_name.c_str())) != 0) {
       mlog << Error << "\nremove_temp_file() -> "
            << "can't delete temporary file: \""

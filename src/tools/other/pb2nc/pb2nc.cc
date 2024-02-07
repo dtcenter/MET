@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -117,33 +117,34 @@ static const char * default_config_filename = "MET_BASE/config/PB2NCConfig_defau
 
 static const char *program_name = "pb2nc";
 static const char *not_assigned = "not_assigned";
+static const char *tmp_pb2nc_base = "tmp_pb2nc_blk";
 
-constexpr static float fill_value   = -9999.f;
-constexpr static int missing_cycle_minute = -1;
+constexpr float fill_value   = -9999.f;
+constexpr int missing_cycle_minute = -1;
 
 // Constants used to interface to Fortran subroutines
 
 // Missing value for BUFR data
-static const double r8bfms      = 1.0E10;
+constexpr double r8bfms      = 1.0E10;
 // Maximum number of BUFR parameters
-static const int mxr8pm         = 10;
+constexpr int mxr8pm         = 10;
 // Maximum number of BUFR levels
-static const int mxr8lv_small   = 255;
-static const int mxr8lv         = 1023;   // was 255;
+constexpr int mxr8lv_small   = 255;
+constexpr int mxr8lv         = 1023;   // was 255;
 // Maximum number of BUFR event sequences
-static const int mxr8vn         = 10;
+constexpr int mxr8vn         = 10;
 // Maximum number of BUFR variable types
-static const int mxr8vt         = 6;
+constexpr int mxr8vt         = 6;
 // Maximum length of BUFR variable name
-static const int mxr8nm         = 8;
+constexpr int mxr8nm         = 8;
 // Maximum number of BUFR variable types
 
-static const int COUNT_THRESHOLD = 16;
+constexpr int COUNT_THRESHOLD = 16;
 
 // File unit number for opening the PrepBufr file
-static const int file_unit      = 11;
+constexpr int file_unit      = 11;
 // 2nd file unit number for opening the PrepBufr file
-static const int dump_unit      = 22;
+constexpr int dump_unit      = 22;
 
 // Grib codes corresponding to the variable types
 const std::array<int, mxr8vt> var_gc = {
@@ -187,9 +188,9 @@ static float pbl_data_ugrd[MAX_PBL_LEVEL];
 static float pbl_data_vgrd[MAX_PBL_LEVEL];
 
 // PREPBUFR VIRTMP program code
-static const double virtmp_prog_code = 8.0;
-static const int MIN_FORTRAN_FILE_ID =  1;
-static const int MAX_FORTRAN_FILE_ID = 99;
+constexpr double virtmp_prog_code = 8.0;
+constexpr int MIN_FORTRAN_FILE_ID =  1;
+constexpr int MAX_FORTRAN_FILE_ID = 99;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -238,15 +239,15 @@ static double hdr[mxr8pm];
 static double evns[mxr8vt][mxr8vn][mxr8lv][mxr8pm];
 static int    nlev;
 
-static const int BUFR_NUMBER_START = 13;
-static const int BUFR_NAME_START = 2;
-static const int BUFR_NAME_LEN = 8;
-static const int BUFR_DESCRIPTION_START = 22;
-static const int BUFR_DESCRIPTION_LEN = 56;
-static const int BUFR_UNIT_START = 40;
-static const int BUFR_UNIT_LEN = 25;
-static const int BUFR_SEQUENCE_START = 13;
-static const int BUFR_SEQUENCE_LEN = 66;
+constexpr int BUFR_NUMBER_START = 13;
+constexpr int BUFR_NAME_START = 2;
+constexpr int BUFR_NAME_LEN = 8;
+constexpr int BUFR_DESCRIPTION_START = 22;
+constexpr int BUFR_DESCRIPTION_LEN = 56;
+constexpr int BUFR_UNIT_START = 40;
+constexpr int BUFR_UNIT_LEN = 25;
+constexpr int BUFR_SEQUENCE_START = 13;
+constexpr int BUFR_SEQUENCE_LEN = 66;
 
 static const char *prepbufr_p_event = "POB PQM PPC PRC PFC PAN CAT";
 static const char *prepbufr_q_event = "QOB QQM QPC QRC QFC QAN CAT";
@@ -271,7 +272,7 @@ static const char *bufr_avail_latlon_names = "XOB CLON CLONH YOB CLAT CLATH";
 static const char *derived_mlcape = "D_MLCAPE";
 static const char *derived_cape = "D_CAPE";
 static const char *derived_pbl  = "D_PBL";
-static const float MLCAPE_INTERVAL = 3000.;
+constexpr float MLCAPE_INTERVAL = 3000.;
 
 static double bufr_obs[mxr8lv][mxr8pm];
 static double bufr_obs_extra[mxr8lv][mxr8pm];
@@ -308,7 +309,7 @@ static vector< Observation > observations;
 //
 // Output NetCDF file, dimensions, and variables
 //
-static NcFile *f_out      = (NcFile *) 0;
+static NcFile *f_out      = (NcFile *) nullptr;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -460,8 +461,6 @@ derive_var_cfg &derive_var_cfg::operator=(const derive_var_cfg &a) noexcept {
 
 
 int met_main(int argc, char *argv[]) {
-   int i;
-
    // Initialize static variables
    initialize();
 
@@ -470,7 +469,7 @@ int met_main(int argc, char *argv[]) {
 
    if (collect_metadata) {
       // Process each PrepBufr file
-      for(i=0; i<pbfile.n_elements(); i++) {
+      for(int i=0; i<pbfile.n_elements(); i++) {
          process_pbfile_metadata(i);
       }
       display_bufr_variables(tableB_vars, tableB_descs,
@@ -482,7 +481,7 @@ int met_main(int argc, char *argv[]) {
       open_netcdf();
 
       // Process each PrepBufr file
-      for(i=0; i<pbfile.n_elements(); i++) {
+      for(int i=0; i<pbfile.n_elements(); i++) {
          process_pbfile_metadata(i);
          process_pbfile(i);
       }
@@ -663,7 +662,7 @@ ConcatString save_bufr_table_to_file(const char *blk_file, int _file_id) {
    ConcatString tbl_filename;
    ConcatString tbl_prefix;
 
-   tbl_prefix << conf_info.tmp_dir << "/" << "tmp_pb2nc_bufr";
+   tbl_prefix << conf_info.tmp_dir << "/" << tmp_pb2nc_base;
    tbl_filename = make_temp_file_name(tbl_prefix.c_str(), "tbl");
    len = tbl_filename.length();
    if (_file_id > MAX_FORTRAN_FILE_ID || _file_id < MIN_FORTRAN_FILE_ID) {
@@ -673,9 +672,7 @@ ConcatString save_bufr_table_to_file(const char *blk_file, int _file_id) {
    openpb_(blk_file, &_file_id);
    dump_tbl_(blk_file, &_file_id, tbl_filename.c_str(), &len);
    closepb_(&_file_id);
-   
-   // Delete the temporary blocked file
-   remove_temp_file((string)blk_file);
+
    return tbl_filename;
 }
 
@@ -689,7 +686,7 @@ bool is_prepbufr_file(const StringArray *events) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void get_variable_info(const char* tbl_filename) {
+void get_variable_info(ConcatString blk_file, int unit) {
    static const char *method_name = "  get_variable_info()";
 
    FILE * fp;
@@ -704,8 +701,9 @@ void get_variable_info(const char* tbl_filename) {
    tableB_vars.clear();
    tableB_descs.clear();
 
-   fp = fopen(tbl_filename, "r");
-   ConcatString input_data;
+   ConcatString tbl_filename = save_bufr_table_to_file(blk_file.c_str(), unit);
+
+   fp = fopen(tbl_filename.c_str(), "r");
    if (fp != nullptr) {
       char var_name[BUFR_NAME_LEN+1];
       char var_desc[max(BUFR_DESCRIPTION_LEN,BUFR_SEQUENCE_LEN)+1];
@@ -822,6 +820,8 @@ void get_variable_info(const char* tbl_filename) {
       if (line) free(line);
 
    }
+
+   remove_temp_file(tbl_filename);
    return;
 }
 
@@ -839,7 +839,7 @@ void open_netcdf() {
            << "trouble opening output file: " << ncfile << "\n\n";
 
       delete f_out;
-      f_out = (NcFile *) 0;
+      f_out = (NcFile *) nullptr;
 
       exit(1);
    }
@@ -858,21 +858,22 @@ void open_netcdf() {
 
 void process_pbfile(int i_pb) {
    int npbmsg, npbmsg_total, unit, yr, mon, day, hr, min, sec;
-   int i, i_msg, i_read, n_file_obs, i_ret, i_date, n_hdr_obs;
+   int i, i_msg, n_file_obs, i_ret, i_date, n_hdr_obs;
    int rej_typ, rej_sid, rej_vld, rej_grid, rej_poly;
    int rej_elv, rej_pb_rpt, rej_in_rpt, rej_itp, rej_nobs;
-   int lv, ev, ev_temp, kk, len1, len2;
+   int lv, ev, ev_temp, kk;
    int n_derived_obs;
 
-   double   x, y;
+   double x;
+   double y;
 
    int cycle_minute;
-   unixtime file_ut = (unixtime) 0;
+   unixtime file_ut;
    unixtime adjusted_file_ut;
    unixtime msg_ut, beg_ut, end_ut;
    unixtime min_msg_ut, max_msg_ut;
 
-   beg_ut = end_ut = (unixtime) 0;
+   file_ut = beg_ut = end_ut = (unixtime) 0;
 
    ConcatString file_name, blk_prefix, blk_file, log_message;
    ConcatString prefix;
@@ -894,7 +895,7 @@ void process_pbfile(int i_pb) {
    float    pqtzuv[mxr8vt], pqtzuv_qty[mxr8vt];
 
    const int debug_level_for_performance = 3;
-   int start_t, end_t, method_start, method_end;
+   clock_t start_t, end_t, method_start, method_end;
    start_t = end_t = method_start = method_end = clock();
 
    IntArray diff_file_times;
@@ -922,7 +923,7 @@ void process_pbfile(int i_pb) {
    file_name << pbfile[i_pb];
 
    // Build the temporary block file name
-   blk_prefix << conf_info.tmp_dir << "/" << "tmp_pb2nc_blk";
+   blk_prefix << conf_info.tmp_dir << "/" << tmp_pb2nc_base;
    blk_file = make_temp_file_name(blk_prefix.c_str(), nullptr);
 
    mlog << Debug(1) << "Blocking Bufr file to:\t" << blk_file << "\n";
@@ -1007,11 +1008,12 @@ void process_pbfile(int i_pb) {
 
    int nlev_max_req = mxr8lv;
    if (0 < conf_info.end_level && conf_info.end_level < mxr8lv) {
-      nlev_max_req = conf_info.end_level;
+      nlev_max_req = (int)conf_info.end_level;
       mlog << Debug(4) << "Request up to " << nlev_max_req << " vertical levels\n";
    }
 
-   int grib_code, bufr_var_index;
+   int grib_code;
+   int bufr_var_index;
    map<ConcatString, ConcatString> message_type_map = conf_info.getMessageTypeMap();
 
    int bin_count = nint(npbmsg/20.0);
@@ -1036,7 +1038,6 @@ void process_pbfile(int i_pb) {
    float cape_qm = bad_data_float;
 
    // To compute PBL
-   int pbl_level = 0;
    int pbl_code = -1;
    float pbl_p, pbl_h;
    float pbl_qm = bad_data_float;
@@ -1048,7 +1049,7 @@ void process_pbfile(int i_pb) {
    bool cal_mlcape = bufr_obs_name_arr.has(derived_mlcape, mlcape_code, false);
 
    bool     is_same_header;
-   unixtime prev_hdr_vld_ut = (unixtime) 0;
+   auto     prev_hdr_vld_ut = (unixtime) 0;
    char     prev_hdr_typ[max_str_len], prev_hdr_sid[max_str_len];
    double   prev_hdr_lat, prev_hdr_lon, prev_hdr_elv;
    map<float, float*> pqtzuv_map_tq;
@@ -1063,14 +1064,13 @@ void process_pbfile(int i_pb) {
    mlcape_cnt_missing_values = mlcape_cnt_zero_values = 0;
 
    if (cal_pbl) {
-      is_same_header = false;
       prev_hdr_vld_ut = -1;
       m_strncpy(prev_hdr_typ, not_assigned, m_strlen(not_assigned), method_name_s, "prev_hdr_typ");
       m_strncpy(prev_hdr_sid, not_assigned, m_strlen(not_assigned), method_name_s, "prev_hdr_sid");
    }
 
    IMM = JMM =1;
-   p1d = t1d = q1d = r8bfms * 10;
+   p1d = t1d = q1d = (float)r8bfms * 10;
    cape_h = pbl_h = 0;
    cape_p = pbl_p = bad_data_float;
 
@@ -1088,7 +1088,7 @@ void process_pbfile(int i_pb) {
    for (int idx=0; idx<OBS_ARRAY_LEN; idx++) obs_arr[idx] = 0;
 
    // Loop through the PrepBufr messages from the input file
-   for(i_read=0; i_read<npbmsg && i_ret == 0; i_read++) {
+   for(int i_read=0; i_read<npbmsg && i_ret == 0; i_read++) {
 
       if(mlog.verbosity_level() > 0) {
          if(bin_count > 0 && (i_read+1)%bin_count == 0) {
@@ -1167,7 +1167,8 @@ void process_pbfile(int i_pb) {
       }
 
       if (!is_prepbufr) {
-         int index, req_hdr_level = 1;
+         int index;
+         int req_hdr_level = 1;
          ConcatString tmp_str;
 
          //Read header (station id, lat, lon, ele, time)
@@ -1286,11 +1287,9 @@ void process_pbfile(int i_pb) {
 
          // Include the area mask rejection counts with the polyline since
          // it is specified using the mask.poly config option.
-         if(apply_area_mask) {
-            if(!conf_info.area_mask.s_is_on(nint(x), nint(y))) {
-               rej_poly++;
-               continue;
-            }
+         if(apply_area_mask && !conf_info.area_mask.s_is_on(nint(x), nint(y))) {
+            rej_poly++;
+            continue;
          }
       }
 
@@ -1385,9 +1384,6 @@ void process_pbfile(int i_pb) {
       }
 
       do_pbl = cal_pbl && 0 == strcmp("ADPUPA", hdr_typ);
-      if (do_pbl) {
-         pbl_level = 0;
-      }
 
       // Search through the vertical levels
       for(lv=0, n_hdr_obs = 0; lv<buf_nlev; lv++) {
@@ -1924,7 +1920,6 @@ void process_pbfile(int i_pb) {
       }
 
       if (do_pbl) {
-         pbl_level = 0;
          is_same_header = (prev_hdr_vld_ut == hdr_vld_ut)
                && is_eq(prev_hdr_lat, hdr_lat)
                && is_eq(prev_hdr_lon, hdr_lon)
@@ -1947,7 +1942,6 @@ void process_pbfile(int i_pb) {
             pqtzuv_map_uv.clear();
             pbl_qm = bad_data_float;
          }
-         //is_same_header = false;
          prev_hdr_vld_ut = hdr_vld_ut;
          prev_hdr_lat = hdr_lat;
          prev_hdr_lon = hdr_lon;
@@ -2117,7 +2111,7 @@ void process_pbfile(int i_pb) {
 
 void process_pbfile_metadata(int i_pb) {
    int npbmsg, unit;
-   int i, i_msg, i_read, i_ret, i_date;
+   int i, i_read, i_ret, i_date;
    int lv, var_index;
    int debug_threshold = 10;
 
@@ -2125,7 +2119,7 @@ void process_pbfile_metadata(int i_pb) {
    bool check_all = do_all_vars || collect_metadata;
    char hdr_typ[max_str_len];
    StringArray tmp_bufr_obs_name_arr;
-   ConcatString file_name, blk_prefix, blk_file, blk_prefix2;
+   ConcatString file_name, blk_prefix, blk_file;
    static const char *method_name = "process_pbfile_metadata()";
 
    // Collects the BUFR variables including header variables
@@ -2138,10 +2132,9 @@ void process_pbfile_metadata(int i_pb) {
    file_name << pbfile[i_pb];
 
    // Build the temporary block file name
-   blk_prefix  << conf_info.tmp_dir << "/" << "tmp_pb2nc_meta_blk";
-   blk_prefix2 << conf_info.tmp_dir << "/" << "tmp_pb2nc_tbl_blk";
+   blk_prefix << conf_info.tmp_dir << "/" << tmp_pb2nc_base;
 
-   blk_file = make_temp_file_name(blk_prefix2.c_str(), nullptr);
+   blk_file = make_temp_file_name(blk_prefix.c_str(), nullptr);
 
    mlog << Debug(3) << "   Blocking Bufr file (metadata) to:\t" << blk_file << "\n";
 
@@ -2150,15 +2143,14 @@ void process_pbfile_metadata(int i_pb) {
    pblock(file_name.c_str(), blk_file.c_str(), block);
 
    unit = dump_unit + i_pb + file_unit;
-   ConcatString tbl_filename = save_bufr_table_to_file(blk_file.c_str(), unit);
-   get_variable_info(tbl_filename.c_str());
-   if(mlog.verbosity_level() < debug_threshold) remove_temp_file(tbl_filename);
+   if (unit > MAX_FORTRAN_FILE_ID || unit < MIN_FORTRAN_FILE_ID) {
+      mlog << Error << "\n" << method_name << " -> "
+           << "Invalid file ID [" << unit << "] between 1 and 99 for BUFR table.\n\n";
+   }
+   get_variable_info(blk_file, unit);
 
-   // Assume that the input PrepBufr file is unblocked.
-   // Block the PrepBufr file and open it for reading.
+   // The input PrepBufr file is blocked already.
    unit = dump_unit + i_pb;
-   blk_file = make_temp_file_name(blk_prefix.c_str(), nullptr);
-   pblock(file_name.c_str(), blk_file.c_str(), block);
    if (unit > MAX_FORTRAN_FILE_ID || unit < MIN_FORTRAN_FILE_ID) {
       mlog << Error << "\n" << method_name << " -> "
            << "Invalid file ID [" << unit << "] between 1 and 99.\n\n";
@@ -2168,9 +2160,6 @@ void process_pbfile_metadata(int i_pb) {
    numpbmsg_new_(blk_file.c_str(), &unit, &npbmsg);
    mlog << Debug(1) << method_name << " -> "
         << "the number of records: " << npbmsg << "\n";
-
-   // Open the blocked temp PrepBufr file for reading
-   openpb_(blk_file.c_str(), &unit);
 
    // Use the number of records requested by the user if there
    // are enough present.
@@ -2189,16 +2178,17 @@ void process_pbfile_metadata(int i_pb) {
            << "No Bufr messages to process in file: "
            << pbfile[i_pb] << "\n\n";
 
-      closepb_(&unit);
-
       // Delete the temporary blocked file
       remove_temp_file(blk_file);
 
       return;
    }
 
+   // Open the blocked temp PrepBufr file for reading
+   openpb_(blk_file.c_str(), &unit);
+
    // Initialize counts
-   i_ret = i_msg = 0;
+   i_ret = 0;
    StringArray headers;
    StringArray tmp_hdr_array;
    headers.add(prepbufr_hdrs);

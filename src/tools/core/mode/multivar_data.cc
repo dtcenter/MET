@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -142,8 +142,7 @@ MultiVarData::MultiVarData() :
    _merge(0),
    _name("notset"),
    _nx(0), _ny(0),
-   _grid(0),
-   _type(FileType_None)
+   _grid(0)
 {
 }   
 
@@ -152,23 +151,10 @@ MultiVarData::~MultiVarData()
    _clear();
 }   
 
-void MultiVarData::checkFileTypeConsistency(const MultiVarData &mvdi, int j)
-{
-   bool err = false;
-   if (_type != mvdi._type) {
-      mlog << Error << "MultivarData::checkFileTypeConsistgency() -> " 
-           << "inputs of different file types not supported "
-           << "Input 0:" << grdfiletype_to_string(_type).c_str()
-           << "Input " << j << ":" << grdfiletype_to_string(mvdi._type).c_str()
-           << "\n\n";
-      exit ( 1 );
-   }
-}
-
 void MultiVarData::init(ModeDataType dataType,
                         const string &name, 
-                        const Grid &grid, GrdFileType type,
-                        const string &units,
+                        const Grid &grid,
+                         const string &units,
                         const string &level,
                         double data_min, double data_max)
 {
@@ -179,7 +165,6 @@ void MultiVarData::init(ModeDataType dataType,
    _nx = grid.nx();
    _ny = grid.ny();
    _grid = new Grid(grid);
-   _type = type;
    _units = units;
    _level = level;
    _data_min = data_min;
@@ -286,7 +271,6 @@ void MultiVarData::_clear()
       _grid = 0;
    }
    _nx = _ny = 0;
-   _type = FileType_None;
 }
 
 

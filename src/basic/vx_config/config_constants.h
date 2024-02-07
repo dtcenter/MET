@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -525,9 +525,11 @@ static const char config_map_data_filename[] = "MET_BASE/config/ConfigMapData";
 // Parameter key names common to multiple tools
 //
 
-static const char conf_key_exit_on_warning[]   = "exit_on_warning";
-static const char conf_key_nc_compression[]    = "nc_compression";
-static const char conf_key_output_precision[]  = "output_precision";
+static const char conf_key_exit_on_warning[]     = "exit_on_warning";
+static const char conf_key_time_offset_warning[] = "time_offset_warning";
+static const char conf_key_nc_compression[]      = "nc_compression";
+static const char conf_key_output_precision[]    = "output_precision";
+
 static const char conf_key_version[]           = "version";
 static const char conf_key_model[]             = "model";
 static const char conf_key_desc[]              = "desc";
@@ -555,6 +557,7 @@ static const char conf_key_GRIB1_subcenter[]   = "GRIB1_subcenter";
 static const char conf_key_GRIB1_rec[]         = "GRIB1_rec";
 static const char conf_key_GRIB1_code[]        = "GRIB1_code";
 static const char conf_key_GRIB1_tri[]         = "GRIB1_tri";
+
 static const char conf_key_GRIB2_disc[]        = "GRIB2_disc";
 static const char conf_key_GRIB2_parm_cat[]    = "GRIB2_parm_cat";
 static const char conf_key_GRIB2_parm[]        = "GRIB2_parm";
@@ -567,6 +570,12 @@ static const char conf_key_GRIB2_ens_type[]    = "GRIB2_ens_type";
 static const char conf_key_GRIB2_der_type[]    = "GRIB2_der_type";
 static const char conf_key_GRIB2_stat_type[]   = "GRIB2_stat_type";
 static const char conf_key_GRIB2_perc_val[]    = "GRIB2_perc_val";
+
+static const char conf_key_GRIB2_aerosol_type[]          = "GRIB2_aerosol_type";
+static const char conf_key_GRIB2_aerosol_interval_type[] = "GRIB2_aerosol_interval_type";
+static const char conf_key_GRIB2_aerosol_size_lower[]    = "GRIB2_aerosol_size_lower";
+static const char conf_key_GRIB2_aerosol_size_upper[]    = "GRIB2_aerosol_size_upper";
+
 static const char conf_key_GRIB2_ipdtmpl_index[] = "GRIB2_ipdtmpl_index";
 static const char conf_key_GRIB2_ipdtmpl_val[]   = "GRIB2_ipdtmpl_val";
 static const char conf_key_level[]             = "level";
@@ -1238,6 +1247,7 @@ static const char conf_key_cira_diag_flag[]         = "cira_diag_flag";
 static const char conf_val_grib1         [] = "GRIB1";
 static const char conf_val_grib2         [] = "GRIB2";
 static const char conf_val_netcdf_met    [] = "NETCDF_MET";
+static const char conf_val_netcdf_wrf    [] = "NETCDF_WRF";
 static const char conf_val_netcdf_pint   [] = "NETCDF_PINT";
 static const char conf_val_netcdf_nccf   [] = "NETCDF_NCCF";
 static const char conf_val_netcdf_ugrid  [] = "NETCDF_UGRID";

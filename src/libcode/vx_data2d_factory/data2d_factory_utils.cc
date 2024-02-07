@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -98,6 +98,7 @@ suffix_type = file_type_by_suffix(filename);
      if ( is_grib1_file     (filename) ) data_type = FileType_Gb1;
 else if ( is_grib2_file     (filename) ) data_type = FileType_Gb2;
 else if ( is_ncpinterp_file (filename) ) data_type = FileType_NcPinterp;
+else if ( is_ncwrf_file     (filename) ) data_type = FileType_NcWrf;
 else if ( is_nccf_file      (filename) ) data_type = FileType_NcCF;
 else if ( is_ncmet_file     (filename) ) data_type = FileType_NcMet;
 else if ( is_bufr_file      (filename) ) data_type = FileType_Bufr;

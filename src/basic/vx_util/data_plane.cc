@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -298,7 +298,7 @@ void DataPlane::set_size(int nx, int ny, double v) {
    }
 
       //
-      //  delete exisiting data, if necessary
+      //  delete existing data, if necessary
       //
 
    Nx = nx;
@@ -800,6 +800,91 @@ return;
 
 }
 
+///////////////////////////////////////////////////////////////////////////////
+
+
+void DataPlane::destagger(bool x_stag, bool y_stag)
+{
+    // don't do anything if data is not staggered in x or y dimension
+    if (!x_stag && !y_stag) return;
+
+    const char *method_name = "DataPlane::destagger(bool, bool) -> ";
+
+    if ( Data.empty() )  {
+
+        mlog << Error << "\n\n  " << method_name << " data plane is empty!\n\n";
+        exit ( 1 );
+
+    }
+
+    int nx_new = Nx;
+    int ny_new = Ny;
+    int nxy_new;
+    int weight = 0;
+    int x, y, index_new;
+    double total;
+    vector<double> new_data;
+
+    // set nx and weight based on which dimensions are staggered
+
+    if (x_stag) {
+
+        mlog << Debug(3) << "De-staggering dataplane in X dimension\n";
+        nx_new = Nx - 1;
+        weight += 2;
+
+    }
+
+    if (y_stag) {
+
+        mlog << Debug(3) << "De-staggering dataplane in Y dimension\n";
+        ny_new = Ny - 1;
+        weight += 2;
+
+    }
+
+    // allocate vector to store output data
+
+    nxy_new = nx_new * ny_new;
+    new_data.resize(nxy_new);
+
+    for (y=0; y < ny_new; y++)  {
+        for (x=0; x < nx_new; x++)  {
+
+            index_new = y*nx_new + x;
+
+            // always add data from current grid point
+            total = Data[two_to_one(x, y)];
+
+            // add data from neighboring grid points based on staggered dimension
+
+            if (x_stag) {
+                total += Data[two_to_one(x+1,y)];
+            }
+            if (y_stag) {
+                total += Data[two_to_one(x,y+1)];
+            }
+
+            // add diagonal point if staggered in both dimensions (may not occur)
+
+            if (x_stag && y_stag) {
+                total += Data[two_to_one(x+1,y+1)];
+            }
+
+            // divide the sum of the values by the weight to compute the average
+
+            new_data[index_new] = total / weight;
+
+        }
+    }
+
+    // replace data vector and size variables
+
+    Data = new_data;
+    Nx = nx_new;
+    Ny = ny_new;
+    Nxy = nxy_new;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 

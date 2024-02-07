@@ -94,7 +94,7 @@ In this example, the PB2NC tool will process the input **sample_pb.blk** file ap
 pb2nc Configuration File
 ------------------------
 
-The default configuration file for the PB2NC tool named **PB2NCConfig_default** can be found in the installed *share/met/config* directory. The version used for the example run in :numref:`Sample test cases` is available in *scripts/config*. It is recommended that users make a copy of configuration files prior to modifying their contents.
+The default configuration file for the PB2NC tool named **PB2NCConfig_default** can be found in the installed *share/met/config* directory. The version used for the installation test cases is available in *scripts/config*. It is recommended that users make a copy of configuration files prior to modifying their contents.
 
 Note that environment variables may be used when editing configuration files, as described in the :numref:`config_env_vars`.
 
@@ -456,6 +456,8 @@ While initial versions of the ASCII2NC tool only supported a simple 11 column AS
 
 • `National Data Buoy (NDBC) Standard Meteorlogical Data format <https://www.ndbc.noaa.gov/measdes.shtml>`_. See the :ref:`MET_NDBC_STATIONS` environment variable.
 
+• `International Soil Moisture Network (ISMN) Data format <https://ismn.bafg.de/en/>`_.
+
 • `AErosol RObotic NEtwork (AERONET) versions 2 and 3 format <http://aeronet.gsfc.nasa.gov/>`_
 
 • Python embedding of point observations, as described in :numref:`pyembed-point-obs-data`. See example below in :numref:`ascii2nc-pyembed`.
@@ -539,7 +541,7 @@ Required Arguments for ascii2nc
 Optional Arguments for ascii2nc
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-3. The **-format ASCII_format** option may be set to "met_point", "little_r", "surfrad", "wwsis", "airnowhourlyaqobs", "airnowhourly", "airnowdaily_v2", "ndbc_standard", "aeronet", "aeronetv2", "aeronetv3", or "python". If passing in ISIS data, use the "surfrad" format flag.
+3. The **-format ASCII_format** option may be set to "met_point", "little_r", "surfrad", "wwsis", "airnowhourlyaqobs", "airnowhourly", "airnowdaily_v2", "ndbc_standard", "ismn", "aeronet", "aeronetv2", "aeronetv3", or "python". If passing in ISIS data, use the "surfrad" format flag.
 
 4. The **-config file** option is the configuration file for generating time summaries.
 

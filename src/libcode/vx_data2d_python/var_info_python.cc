@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -71,6 +71,15 @@ VarInfoPython & VarInfoPython::operator=(const VarInfoPython &f) {
    assign(f);
 
    return ( *this );
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+VarInfo *VarInfoPython::clone() const {
+
+   VarInfoPython *ret = new VarInfoPython(*this);
+
+   return (VarInfo *)ret;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -195,7 +195,6 @@ bool UGridFile::open(const char * filepath)
 bool UGridFile::open_metadata(const char * filepath)
 {
   unixtime ut = 0;
-  int sec_per_unit;
   const char *method_name = "UGridFile::open_metadata() -> ";
 
   // Open the file
@@ -319,6 +318,8 @@ bool UGridFile::open_metadata(const char * filepath)
     ValidTime.add(ut);
   }
   else {
+    int sec_per_unit;
+
     // Store the dimension for the time variable as the time dimension
     ConcatString units;
     bool use_bounds_var = false;
@@ -374,7 +375,6 @@ bool UGridFile::open_metadata(const char * filepath)
       else {
         if (use_bounds_var) {
           double bounds_diff;
-          double time_fraction;
           for(int i=0; i<n_times; i++) {
             ValidTime.add(add_to_unixtime(ut, sec_per_unit, time_values[i*2+1], no_leap_year));
             raw_times.add(time_values[i*2+1]);
@@ -419,9 +419,9 @@ bool UGridFile::open_metadata(const char * filepath)
     get_dim_names(v, &dimNames);
 
     for (int k=0; k<dim_count; ++k)  {
-      NcDim *dim = Var[j].Dims[k];
+      NcDim *dim_p = Var[j].Dims[k];
       const ConcatString dim_name = dimNames[k];
-      if ((dim && dim == _tDim) || dim_name == time_dim_name) {
+      if ((nullptr != dim_p && dim_p == _tDim) || dim_name == time_dim_name) {
          Var[j].t_slot = k;
       }
       else if (dim_name == vert_dim_name) {
@@ -620,7 +620,6 @@ double UGridFile::getData(NcVar * var, const LongArray & a) const
   double d = bad_data_double;
 
   double fill_value;
-  double missing_value = get_var_missing_value(var);
   get_var_fill_value(var, fill_value);
 
   //status = get_nc_data(var, &d, a);
@@ -729,11 +728,8 @@ bool UGridFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
 
   get_nc_data(v, d, lengths, offsets);
 
-  int offset = 0;
-  double min_value, max_value;
-
-  min_value = 10e10;
-  max_value = -min_value;
+  double min_value = 10e10;
+  double max_value = -min_value;
   for (int x = 0; x< nx; ++x) {
     double value = d[x];
     if( is_eq(value, missing_value) || is_eq(value, fill_value) ) {
@@ -748,7 +744,7 @@ bool UGridFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
 
   }   //  for x
 
-  delete [] d;
+  if (nullptr != d) delete [] d;
 
   //  done
   ConcatString log_message;
@@ -824,7 +820,6 @@ bool UGridFile::get_var_info() {
   }
 
   NcDim dim;
-  int meta_count = 0;
   int max_dim_count = 0;
   ConcatString att_value;
   StringArray var_names;

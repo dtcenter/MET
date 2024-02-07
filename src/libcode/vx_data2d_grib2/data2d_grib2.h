@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -62,6 +62,10 @@ typedef struct {
    int DerType;
    int StatType;
    int PercVal;
+   int AerosolType;
+   int AerosolIntervalType;
+   double AerosolSizeLower;
+   double AerosolSizeUpper;
    IntArray IPDTmpl;
 } Grib2Record;
 

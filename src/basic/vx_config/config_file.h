@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -77,6 +77,8 @@ class MetConfig : public Dictionary {
       int output_precision();
       
       ConcatString get_tmp_dir();
+
+      bool time_offset_warning(int);
 
       StringArray filename() const;
 

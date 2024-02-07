@@ -28,7 +28,9 @@ ascii2nc_SOURCES = ascii2nc.cc \
 	ndbc_handler.cc ndbc_handler.h \
 	ndbc_locations.cc ndbc_locations.h \
 	airnow_locations.cc airnow_locations.h \
-	aeronet_handler.cc aeronet_handler.h $(OPT_PYTHON_SOURCES)
+	aeronet_handler.cc aeronet_handler.h \
+	ismn_handler.cc ismn_handler.h \
+	$(OPT_PYTHON_SOURCES)
 
 ascii2nc_CPPFLAGS = ${MET_CPPFLAGS} -I../../../basic/vx_log
 ascii2nc_LDFLAGS = ${MET_LDFLAGS}
@@ -40,8 +42,8 @@ ascii2nc_LDADD = -lvx_stat_out \
 	-lvx_data2d_nc_met \
 	-lvx_data2d_grib \
 	$(GRIB2_MET_LIBS) \
-	-lvx_data2d_nc_pinterp \
-	-lvx_data2d_nccf \
+	-lvx_data2d_nc_wrf \
+	-lvx_data2d_nc_cf \
 	$(UGRID_MET_LIBS) \
 	$(PYTHON_MET_LIBS) \
 	-lvx_data2d \

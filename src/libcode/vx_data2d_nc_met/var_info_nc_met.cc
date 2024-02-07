@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -72,6 +72,15 @@ VarInfoNcMet & VarInfoNcMet::operator=(const VarInfoNcMet &f) {
    assign(f);
 
    return ( *this );
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+VarInfo *VarInfoNcMet::clone() const {
+
+   VarInfoNcMet *ret = new VarInfoNcMet(*this);
+
+   return (VarInfo *)ret;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -25,6 +25,7 @@
 
 #include "mode_field_info.h"
 #include "mode_data_type.h"
+#include "mode_input_data.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -74,11 +75,16 @@ class ModeConfInfo {
       int N_fields_f;     // for traditional mode expect N_fields_f/_o to be the same
       int N_fields_o;
 
+      void assign(const ModeConfInfo &);
+
    public:
 
 
       ModeConfInfo();
      ~ModeConfInfo();
+
+      // attempt to implement this
+      ModeConfInfo & operator=(const ModeConfInfo &);
 
       void clear();
 
@@ -106,7 +112,15 @@ class ModeConfInfo {
 
       void check_multivar_not_implemented();
 
-      void check_multivar_perc_thresh(bool isSimple, bool isSimpleMerge) const;
+      // check all inputs for climatology percentiles, which are not implemented
+      // warn about forecasts and obs set backwards
+      // void check_multivar_perc_thresh(const Mode_Field_Info &f, bool isFcst) const;
+
+
+      // // return index to other input if the particular input is a frequency bias percentile
+      // // return -1 if input is not a fequency bias percentile
+      // // if input is forecast, 'other' is obs, and vice versa
+      // int frequency_bias_other_index(bool input_is_fcst, int input_index) const;
 
    /////////////////////////////////////////////////////////////////////
 
@@ -122,7 +136,7 @@ class ModeConfInfo {
       // and to distinguish traditional mode from mvmode
 
       ModeDataType data_type;        
-
+   
 
    /////////////////////////////////////////////////////////////////////
 
@@ -135,9 +149,21 @@ class ModeConfInfo {
 
       void read_config    (const char * default_filename, const char * user_filename);
 
-      void process_config (GrdFileType ftype, GrdFileType otype, ModeDataType dt=ModeDataType_Traditional);
+      void process_config_traditional(GrdFileType ftype, GrdFileType otype);
 
-      void read_fields (Mode_Field_Info * &, Dictionary * dict, GrdFileType, char _fo);
+      void process_config_except_fields();
+
+      void process_config_field (GrdFileType ftype, GrdFileType otype, ModeDataType dt, int field_index);
+
+      void config_set_all_percentile_thresholds(const std::vector<ModeInputData> &fdata,
+                                                const std::vector<ModeInputData> &odata);
+      PercThreshType perctype(const Mode_Field_Info &f) const;
+
+      // deal with zeroth field 
+      void read_fields_0 (Mode_Field_Info * &, Dictionary * dict, GrdFileType, char _fo);
+
+      // deal with non-zeroth field 
+      void read_fields_1 (Mode_Field_Info * &, Dictionary * dict, GrdFileType, char _fo, int field_index);
 
       PiecewiseLinear * parse_interest_function(Dictionary * dict, const char * conf_key_if);
 
@@ -269,12 +295,14 @@ class ModeConfInfo {
 
       void set_data_type(ModeDataType type);
 
+      GrdFileType file_type_for_field(bool isFcst, int field_index);
+
 private:
 
       // some private methods
-      void process_config_both(GrdFileType ftype, GrdFileType otype);
-      void process_config_fcst(GrdFileType ftype);
-      void process_config_obs(GrdFileType otype);
+      void process_config_both(GrdFileType ftype, GrdFileType otype, int field_index=0);
+      void process_config_fcst(GrdFileType ftype, int field_index=0);
+      void process_config_obs(GrdFileType otype, int field_index=0);
       void evaluate_fcst_settings(int);
       void evaluate_obs_settings(int);
 

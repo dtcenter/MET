@@ -85,6 +85,19 @@ def main():
     land_filename   = os.path.expandvars(args.land_file)
     data_filename   = os.path.expandvars(args.data_file)
 
+    # Validate inputs
+    if not os.path.isfile(config_filename):
+        print("Error: Input Config File (" + config_filename + ") does not exist!")
+        sys.exit(1)
+
+    if not os.path.isfile(land_filename):
+        print("Error: Input Land File (" + land_filename + ")does not exist!")
+        sys.exit(1)
+
+    if not os.path.isfile(data_filename):
+        print("Error: Input Data File (" + data_filename + ") does not exist!")
+        sys.exit(1)
+
     # Print verbose arguments
     if args.verbose:
         print("Python Script:\t" + os.path.expandvars(sys.argv[0]))

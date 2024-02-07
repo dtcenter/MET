@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -26,9 +26,9 @@ using namespace std;
 #include "var_info_factory.h"
 #include "grdfiletype_to_string.h"
 #include "var_info_grib.h"
-#include "var_info_nccf.h"
+#include "var_info_nc_cf.h"
 #include "var_info_nc_met.h"
-#include "var_info_nc_pinterp.h"
+#include "var_info_nc_wrf.h"
 #include "var_info_ugrid.h"
 
 #ifdef WITH_PYTHON
@@ -85,8 +85,9 @@ VarInfo * VarInfoFactory::new_var_info(GrdFileType type)
          vi = new VarInfoNcMet;
          break;
 
+      case FileType_NcWrf:
       case FileType_NcPinterp:
-         vi = new VarInfoNcPinterp;
+         vi = new VarInfoNcWrf;
          break;
 
       case FileType_Python_Numpy:

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -29,10 +29,10 @@ class SummaryCalcPercentile : public SummaryCalc
 
 public:
 
-  SummaryCalcPercentile(const string &type_string);
+  SummaryCalcPercentile(const std::string &type_string);
   virtual ~SummaryCalcPercentile();
 
-  virtual string getType() const
+  virtual std::string getType() const
   {
     return _type;
   }
@@ -49,7 +49,7 @@ public:
 protected:
 
   double _percentile;
-  string _type;
+  std::string _type;
   
 };
 
