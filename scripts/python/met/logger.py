@@ -18,7 +18,7 @@ class logger():
       return f'{logger.ERROR_P}: {msg}'
 
    @staticmethod
-   def error_messageg(msg):
+   def error_message(msg):
       msgs = msg if isinstance(msg, list) else [msg]
       msgs.insert(0, '')
       msgs.append('')
@@ -62,7 +62,7 @@ class met_base(logger):
       return met_base.MET_FILL_VALUE
 
    def error_msg(self, msg):
-      logger.error_messageg(msg)
+      logger.error_message(msg)
 
    def get_prompt(self):
       return met_base_tools.get_prompt()
@@ -116,7 +116,7 @@ class met_base_tools(object):
             for byte_data in ndarray_data:
                array_data.append(byte_data.decode("utf-8").rstrip())
       elif isinstance(ndarray_data, (np.ma.MaskedArray, np.ma.core.MaskedArray)):
-         array_data = np.ma.getdata(ndarray_data, subok=False).tolist()
+         array_data = ndarray_data.filled(fill_value=-9999).tolist()
       elif isinstance(ndarray_data, np.ndarray):
          array_data = ndarray_data.tolist()
       else:
@@ -126,7 +126,7 @@ class met_base_tools(object):
    @staticmethod
    def convert_to_ndarray(array_data):
       if isinstance(array_data, (np.ma.MaskedArray, np.ma.core.MaskedArray)):
-         ndarray_data = np.ma.getdata(array_data, subok=False)
+         ndarray_data = array_data.filled(fill_value=-9999)
       elif isinstance(array_data, np.ndarray):
          ndarray_data = array_data
       else:

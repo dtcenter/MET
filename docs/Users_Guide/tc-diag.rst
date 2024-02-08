@@ -63,6 +63,8 @@ Optional Arguments for tc_diag
 
 6. The **-v level** option indicates the desired level of verbosity. The contents of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
 
+.. note:: Setting the **MET_KEEP_TEMP_FILE** (:numref:`met_keep_temp_file`) environment variable retains the temporary NetCDF cylindrical coordinate files for development, testing, and debugging purposes.
+
 tc_diag Configuration File
 --------------------------
 
@@ -155,13 +157,13 @@ Configuring regridding options
 .. code-block:: none
 
   regrid = {
-     method     = NEAREST;
-     width      = 1;
+     method     = BILIN;
+     width      = 2;
      vld_thresh = 0.5;
      shape      = SQUARE;
   }
 
-The **regrid** dictionary is common to multiple MET tools and is described in :numref:`config_options`. It specifies how the input data should be regridded to cylindrical coordinates prior to compute diagnostics. It can be specified separately in each **data.field** array entry, described below. The default setting uses nearest neighbor interpolation for all fields.
+The **regrid** dictionary is common to multiple MET tools and is described in :numref:`config_options`. It specifies how the input data should be regridded to cylindrical coordinates prior to compute diagnostics. It can be specified separately in each **data.field** array entry, described below. The default setting uses bilinear interpolation for all fields.
 
 Configuring Fields, Levels, and Domains
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

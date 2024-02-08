@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -75,6 +75,10 @@ static const char* default_out_prefix = "";
 
 // Diagnostics bad data value
 static const double diag_bad_data_double = 9999.0;
+
+// Maximum string lengths 
+static const int cira_diag_name_width  = 7;
+static const int cira_diag_units_width = 9;
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -157,8 +161,8 @@ class TmpFileInfo {
       netCDF::NcDim prs_dim;
 
       void open(const TrackInfo *, const TrackPoint *,
-                const DomainInfo &,
-                const std::set<double> &);
+                const DomainInfo &, const std::set<double> &);
+
       void close();
 
       void clear();
