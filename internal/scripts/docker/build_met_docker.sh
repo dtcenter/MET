@@ -6,8 +6,8 @@ source internal/scripts/environment/development.docker
 
 # Check whether MET_GIT_NAME is defined
 if [ -z ${MET_GIT_NAME+x} ]; then
-  MET_GIT_NAME=`git name-rev --name-only HEAD`
-  echo "Setting MET_GIT_NAME=${MET_GIT_NAME} based on the current branch."
+  MET_GIT_NAME=`git name-rev --name-only HEAD | sed 's%/%_%g'`
+  echo "Setting MET_GIT_NAME=${MET_GIT_NAME} based on the current revision."
 fi
 
 # Check whether MET_CONFIG_OPTS is defined
