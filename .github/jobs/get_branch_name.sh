@@ -10,6 +10,7 @@ else
 fi
 
 branch_name=${branch_name#"refs/heads/"}
+branch_name=${branch_name#"refs/tags/"}
 
 echo "branch_name=${branch_name}" >> $GITHUB_OUTPUT
 echo branch_name: $branch_name
