@@ -35,3 +35,4 @@ prepend-path PATH $base/bin
 
 setenv METversion V$ver
 setenv MET_ROOT $base
+setenv MET_PYTHON_EXE /apps/dev/ve/evs/2.0/bin/python
