@@ -2139,6 +2139,21 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &job,
                                    it->second.pd_v.f_na[i]*it->second.pd_v.f_na[i]);
          v_info.o_speed_bar = sqrt(it->second.pd_u.o_na[i]*it->second.pd_u.o_na[i] +
                                    it->second.pd_v.o_na[i]*it->second.pd_v.o_na[i]);
+
+         double d_diff = angle_difference(
+                            it->second.pd_u.f_na[i], it->second.pd_v.f_na[i],
+                            it->second.pd_u.o_na[i], it->second.pd_v.o_na[i]);
+
+         if(is_bad_data(d_diff)) {
+            v_info.n_dir_undef = 1;
+         }
+	 else {
+            v_info.n_dir_undef = 0;
+            v_info.dir_bar     = d_diff;
+            v_info.absdir_bar  = abs(d_diff);
+            v_info.dir2_bar    = d_diff*d_diff;
+         }
+ 
          aggr.vl1l2_info += v_info;
 
          //

@@ -234,6 +234,9 @@ void parse_vl1l2_line(STATLine &l, VL1L2Info &v_info) {
    v_info.uvoo_bar    = atof(l.get_item("UVOOBAR"));
    v_info.f_speed_bar = atof(l.get_item("F_SPEED_BAR"));
    v_info.o_speed_bar = atof(l.get_item("O_SPEED_BAR"));
+   v_info.dir_bar     = atof(l.get_item("DIR_ME"));
+   v_info.absdir_bar  = atof(l.get_item("DIR_MAE"));
+   v_info.dir2_bar    = atof(l.get_item("DIR_MSE"));
 
    v_info.compute_stats();
 
@@ -256,6 +259,9 @@ void parse_val1l2_line(STATLine &l, VL1L2Info &v_info) {
    v_info.uvooa_bar    = atof(l.get_item("UVOOABAR"));
    v_info.fa_speed_bar = atof(l.get_item("FA_SPEED_BAR"));
    v_info.oa_speed_bar = atof(l.get_item("OA_SPEED_BAR"));
+   v_info.dira_bar     = atof(l.get_item("DIRA_ME"));
+   v_info.absdira_bar  = atof(l.get_item("DIRA_MAE"));
+   v_info.dira2_bar    = atof(l.get_item("DIRA_MSE"));
 
    v_info.compute_stats();
 
