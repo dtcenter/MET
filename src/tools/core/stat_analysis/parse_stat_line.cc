@@ -31,6 +31,8 @@
 //   011    01/24/20  Halley Gotway   Add RPS line type.
 //   012    11/10/22  Halley Gotway   MET #2339 Add SEEPS and SEEPS_MPR
 //                                      line types.
+//   013    02/13/24  Halley Gowtay   MET #2395 Add wind direction stats
+//                                      to VL1L2, VAL1L2, and VCNT.
 //
 ////////////////////////////////////////////////////////////////////////
 

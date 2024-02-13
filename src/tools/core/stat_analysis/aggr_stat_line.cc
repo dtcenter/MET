@@ -37,6 +37,8 @@
 //                    -out_thresh and -out_line_type options.
 //   017    11/10/22  Halley Gotway   MET #2339 Add SEEPS and SEEPS_MPR
 //                                      line types.
+//   018    02/13/24  Halley Gowtay   MET #2395 Add wind direction stats
+//                                      to VL1L2, VAL1L2, and VCNT.
 //
 ////////////////////////////////////////////////////////////////////////
 
