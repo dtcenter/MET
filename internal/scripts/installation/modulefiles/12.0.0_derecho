@@ -1,0 +1,22 @@
+#%Module######################################################################
+##
+##      Model Evaluation Tools
+##
+proc ModulesHelp { } {
+  puts stderr "Sets up the paths and environment variables to use the Model Evaluation Tools v12.0.0
+     *** For help see the official MET webpage at http://www.dtcenter.org/met/users ***"
+}
+
+# The intel compiler is required to run MET
+
+module load ncarenv/23.09
+module load intel/2023.2.1
+
+set base /glade/work/dtcrt/METplus/derecho/components/MET/installations/12.0.0-beta2
+set ver  11.1.0
+set share $base/share/met
+
+prepend-path PATH $base/bin:/glade/work/dtcrt/METplus/derecho/components/MET/installations/12.0.0-betae/external_libs/bin:/glade/work/dtcrt/METplus/derecho/miniconda/miniconda3/envs/metplus_v5.1_py3.10/bin
+
+setenv METversion V$ver
+
