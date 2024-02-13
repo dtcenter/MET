@@ -1862,8 +1862,9 @@ void VL1L2Info::compute_stats() {
       if(n_dir_undef > 0) {
          mlog << Warning << "\nVL1L2Info::compute_stats() -> "
               << "Skipping " << n_dir_undef << " of " << vcount
-              << " vector pairs for which the direction difference is undefined. "
-              << "Set the \"wind_thresh\" configuration option to exclude zero vectors.\n\n"; 
+              << " vector pairs for which the direction difference is undefined.\n"
+              << "Set the \"wind_thresh\" and \"wind_logic\" configuration options "
+              << "to exclude zero vectors.\n\n";
       }
 
       DIR_ME.v       = dir_bar;
@@ -1892,8 +1893,9 @@ void VL1L2Info::compute_stats() {
       if(n_dira_undef > 0) {
          mlog << Warning << "\nVL1L2Info::compute_stats() -> "
               << "Skipping " << n_dira_undef << " of " << vacount
-              << " anomaly vector pairs for which the direction difference is undefined. "
-              << "Set the \"wind_thresh\" configuration option to exclude zero vectors.\n\n"; 
+              << " anomaly vector pairs for which the direction difference is undefined.\n"
+              << "Set the \"wind_thresh\" and \"wind_logic\" configuration options "
+              << "to exclude zero vectors.\n\n";
       }
    }
 
