@@ -1600,7 +1600,8 @@ void VL1L2Info::set(const PairDataPoint &pd_u_all,
                     const PairDataPoint &pd_v_all) {
    int i;
    double uf, vf, uo, vo, uc, vc, wgt, wgt_sum;
-   double u_diff, v_diff, d_diff;
+   double u_diff, v_diff;
+   double d_diff, dir_wgt_sum, dira_wgt_sum;
    PairDataPoint pd_u, pd_v;
 
    // Initialize
@@ -1625,6 +1626,10 @@ void VL1L2Info::set(const PairDataPoint &pd_u_all,
 
    // Get the sum of the weights
    wgt_sum = pd_u.wgt_na.sum();
+
+   // Initialize the wind direction difference weight sums
+   // to handle missing data
+   dir_wgt_sum = dira_wgt_sum = 0.0;
 
    // Loop through the filtered pair data compute partial sums
    for(i=0; i<pd_u.f_na.n(); i++) {
@@ -1659,13 +1664,15 @@ void VL1L2Info::set(const PairDataPoint &pd_u_all,
 
       // Exclude undefined angle differences from the running sums
       d_diff = angle_difference(uf, vf, uo, vo);
+
       if(is_bad_data(d_diff)) {
          n_dir_undef  += 1;
       } 
       else {
-         dir_bar      += wgt*d_diff;
-         absdir_bar   += wgt*abs(d_diff);
-         dir2_bar     += wgt*d_diff*d_diff;
+         dir_wgt_sum  += pd_u.wgt_na[i];
+         dir_bar      += pd_u.wgt_na[i]*d_diff;
+         absdir_bar   += pd_u.wgt_na[i]*abs(d_diff);
+         dir2_bar     += pd_u.wgt_na[i]*d_diff*d_diff;
       }
 
       // VAL1L2 sums
@@ -1684,22 +1691,39 @@ void VL1L2Info::set(const PairDataPoint &pd_u_all,
          fa_speed_bar += wgt*sqrt((uf-uc)*(uf-uc) + (vf-vc)*(vf-vc));
          oa_speed_bar += wgt*sqrt((uo-uc)*(uo-uc) + (vo-vc)*(vo-vc));
 
+         // Exclude undefined angle differences from the running sums
          d_diff = angle_difference(uf-uc, vf-vc, uo-uc, vo-vc);
-	 if(is_bad_data(d_diff)) {
+
+         if(is_bad_data(d_diff)) {
             n_dira_undef += 1;
          }
          else {
-            dira_bar    += wgt*d_diff;
-            absdira_bar += wgt*abs(d_diff);
-            dira2_bar   += wgt*d_diff*d_diff;   
+            dira_wgt_sum += pd_u.wgt_na[i];
+            dira_bar     += pd_u.wgt_na[i]*d_diff;
+            absdira_bar  += pd_u.wgt_na[i]*abs(d_diff);
+            dira2_bar    += pd_u.wgt_na[i]*d_diff*d_diff;
          }
       }
 
    }  // end for i
 
+   // Normalize wind direction differences
+   if(dir_wgt_sum > 0) {
+      dir_bar     /= dir_wgt_sum;
+      absdir_bar  /= dir_wgt_sum;
+      dir2_bar    /= dir_wgt_sum;
+   }
+
+   // Normalize anomalous wind direction differences
+   if(dira_wgt_sum > 0) {
+      dira_bar    /= dira_wgt_sum;
+      absdira_bar /= dira_wgt_sum;
+      dira2_bar   /= dira_wgt_sum;
+   }
+
    if(vcount > 0) compute_stats();
 
-   // Check for 0 points
+   // Check for zero points
    if(vcount == 0) {
 
       uf_bar             = bad_data_double;
