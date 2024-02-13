@@ -3105,9 +3105,16 @@ void write_vcnt_cols(const VL1L2Info &vcnt_info, int i,
    //    SPD_ABSERR,       SPD_ABSERR_BCL,       SPD_ABSERR_BCU,
    //    DIR_ERR,          DIR_ERR_BCL,          DIR_ERR_BCU,
    //    DIR_ABSERR,       DIR_ABSERR_BCL,       DIR_ABSERR_BCU,
-   //    ANOM_CORR,        ANOM_CORR_NCL,        ANOM_CORR_NCU,       ANOM_CORR_BCL,   ANOM_CORR_BCU
-   //    ANOM_CORR_UNCNTR, ANOM_CORR_UNCNTR_BCL, ANOM_CORR_UNCNTR_BCU
+   //    ANOM_CORR,        ANOM_CORR_NCL,        ANOM_CORR_NCU,
+   //                      ANOM_CORR_BCL,        ANOM_CORR_BCU
+   //    ANOM_CORR_UNCNTR, ANOM_CORR_UNCNTR_BCL, ANOM_CORR_UNCNTR_BCU,
+   //    DIR_ME,           DIR_ME_BCL,           DIR_ME_BCU,
+   //    DIR_MAE,          DIR_MAE_BCL,          DIR_MAE_BCU,
+   //    DIR_MSE,          DIR_MSE_BCL,          DIR_MSE_BCU,
+   //    DIR_RMSE,         DIR_RMSE_BCL,         DIR_RMSE_BCU
    //
+
+   // TODO: MET #963 Compute the VCNT bootstrap CI's
 
    at.set_entry(r, c++, max(vcnt_info.vcount,          // TOTAL
                             vcnt_info.vacount));
@@ -3193,6 +3200,22 @@ void write_vcnt_cols(const VL1L2Info &vcnt_info, int i,
    at.set_entry(r, c++, vcnt_info.ANOM_CORR_UNCNTR.v); // ANOM_CORR_UNCNTR
    at.set_entry(r, c++, (string)na_str);               // ANOM_CORR_UNCNTR_BCL
    at.set_entry(r, c++, (string)na_str);               // ANOM_CORR_UNCNTR_BCU
+
+   at.set_entry(r, c++, vcnt_info.DIR_ME.v);           // DIR_ME
+   at.set_entry(r, c++, (string)na_str);               // DIR_ME_BCL
+   at.set_entry(r, c++, (string)na_str);               // DIR_ME_BCU
+
+   at.set_entry(r, c++, vcnt_info.DIR_MAE.v);          // DIR_MAE
+   at.set_entry(r, c++, (string)na_str);               // DIR_MAE_BCL
+   at.set_entry(r, c++, (string)na_str);               // DIR_MAE_BCU
+
+   at.set_entry(r, c++, vcnt_info.DIR_MSE.v);          // DIR_MSE
+   at.set_entry(r, c++, (string)na_str);               // DIR_MSE_BCL
+   at.set_entry(r, c++, (string)na_str);               // DIR_MSE_BCU
+
+   at.set_entry(r, c++, vcnt_info.DIR_RMSE.v);         // DIR_RMSE
+   at.set_entry(r, c++, (string)na_str);               // DIR_RMSE_BCL
+   at.set_entry(r, c++, (string)na_str);               // DIR_RMSE_BCU
 
    return;
 }
