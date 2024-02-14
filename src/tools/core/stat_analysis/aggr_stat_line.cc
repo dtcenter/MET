@@ -2149,7 +2149,7 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &job,
          if(is_bad_data(d_diff)) {
             v_info.n_dir_undef = 1;
          }
-	 else {
+         else {
             v_info.n_dir_undef = 0;
             v_info.dir_bar     = d_diff;
             v_info.absdir_bar  = abs(d_diff);
