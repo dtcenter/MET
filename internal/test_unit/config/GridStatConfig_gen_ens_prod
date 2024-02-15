@@ -73,7 +73,7 @@ fcst = {
 
 }
 obs = {
-// JHG add smoothers?
+
    name       = "UGRD";
    level      = "Z10";
    cat_thresh = <CDP25;
@@ -81,7 +81,14 @@ obs = {
    field = [
       { desc = "FREQ"; },
       { desc = "NEP";  },
-      { desc = "NMEP"; }
+      { desc = "NMEP";
+        interp = {
+           field      = OBS;
+           vld_thresh = 0.0;
+           shape      = CIRCLE;
+           type       = [ { method = MAX; width = 5; } ];
+        }
+      }
    ];
 }
 
@@ -243,7 +250,7 @@ output_flag = {
    vl1l2  = NONE;
    val1l2 = NONE;
    vcnt   = NONE;
-   pct    = STAT;
+   pct    = BOTH;
    pstd   = NONE;
    pjc    = NONE;
    prc    = NONE;
