@@ -1632,6 +1632,9 @@ void do_vl1l2(VL1L2Info *&v_info, int i_vx,
               const PairDataPoint *pd_u_ptr, const PairDataPoint *pd_v_ptr) {
    int i, j;
 
+   mlog << Debug(2)
+        << "Computing Vector Partial Sums and Continuous Vector Statistics.\n";
+
    //
    // Check that the number of pairs are the same
    //
