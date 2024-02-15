@@ -101,13 +101,13 @@ The configuration file language supports the following data types:
       the user has already determined to be 2.5 outside of MET.
       
     * "==FBIAS" for a user-specified frequency bias value.
-      e.g. "==FBIAS1" to automatically de-bias the data, "==FBIAS0.9" to select a low-bias threshold, or "==FBIAS1.1" to select a high-bias threshold.
-      This option must be used in
-      conjunction with a simple threshold in the other field. For example,
-      when "obs.cat_thresh = >5.0" and "fcst.cat_thresh = ==FBIAS1;",
-      MET applies the >5.0 threshold to the observations and then chooses a
-      forecast threshold which results in a frequency bias of 1.
-      The frequency bias can be any float value > 0.0.
+      e.g. "==FBIAS1" to automatically de-bias the data, "==FBIAS0.9" to
+      select a low-bias threshold, or "==FBIAS1.1" to select a high-bias
+      threshold. This option must be used in conjunction with a simple
+      threshold in the other field. For example, when "obs.cat_thresh = >5.0"
+      and "fcst.cat_thresh = ==FBIAS1;", MET applies the >5.0 threshold to
+      the observations and then chooses a forecast threshold which results in
+      a frequency bias of 1. The frequency bias can be any float value > 0.0.
       
     * "CDP" for climatological distribution percentile thresholds.
       These thresholds require that the climatological mean and standard
@@ -842,32 +842,37 @@ to be verified. This dictionary may include the following entries:
 
     When set as a boolean to TRUE, it indicates that the "fcst.field" data
     should be treated as probabilities. For example, when verifying the
-    probabilistic NetCDF output of Ensemble-Stat, one could configure the
-    Grid-Stat or Point-Stat tools as follows:
+    probabilistic NetCDF output of Gen-Ens-Prod for an ensemble of size 10,
+    one could configure the Grid-Stat or Point-Stat tools as follows:
 
     .. code-block:: none
 
       fcst = {
-         field = [ { name  = "APCP_24_A24_ENS_FREQ_gt0.0";
-                     level = "(*,*)";
-                     prob  = TRUE; } ];
+         field = [ { name       = "APCP_24_A24_ENS_FREQ_gt0.0";
+                     level      = "(*,*)";
+                     cat_thresh = ==10;
+                     prob       = TRUE; } ];
          }
 
     Setting "prob = TRUE" indicates that the "APCP_24_A24_ENS_FREQ_gt0.0"
-    data should be processed as probabilities.
+    data should be processed as probabilities. Setting "cat_thresh = ==10"
+    indicates that these probabilities are derived from an ensemble with 10
+    members and 11 probability bins should be defined, each centered on the
+    value n/10 for n = 0, 1, ... 10.
 
     When set as a dictionary, it defines the probabilistic field to be
     used. For example, when verifying GRIB files containing probabilistic
-    data,  one could configure the Grid-Stat or Point-Stat tools as
-    follows:
+    data, one could configure the Grid-Stat or Point-Stat tools as follows:
 
     .. code-block:: none
 
       fcst = {
-         field = [ { name = "PROB"; level = "A24";
-                     prob = { name = "APCP"; thresh_lo = 2.54; } },
-                   { name = "PROB"; level = "P850";
-                     prob = { name = "TMP"; thresh_hi = 273; } } ];
+         field = [ { name       = "PROB"; level = "A24";
+                     prob       = { name = "APCP"; thresh_lo = 2.54; }
+                     cat_thresh = ==0.25; },
+                   { name       = "PROB"; level = "P850";
+                     prob       = { name = "TMP"; thresh_hi = 273; }
+                     cat_thresh = ==0.1; } ];
       }
 
     The example above selects two probabilistic fields. In both, "name"
@@ -883,9 +888,34 @@ to be verified. This dictionary may include the following entries:
     with a range [0, 100], it will automatically rescale it to be [0, 1]
     before applying the probabilistic verification methods.
 
+    Probabilistic statistics in MET are derived from an Nx2 probabilistic
+    contingency table. The N-dimension is determined by the number of
+    probability bins requested. The "cat_thresh" configuration option
+    defines the number of and size of these probabibility bins. The bins
+    must include the full range of possible probability values, [0, 1].
+    Since selecting bins of equal width is common, shorthand notation is
+    provided to do so. The following options are supported.
+
+    * :code:`cat_thresh = [ ==0.25 ];` specifies an equal bin width < 1
+      and defines 4 bins between the values 0, 0.25, 0.5, 0.75, and 1.0.
+      The `==p` threshold may be set to any probability bin width greater
+      than 0 and less than 1.
+
+    * :code:`cat_thresh = [ ==10 ];` specifies an ensemble of size 10
+      and defines 11 bins between the values -0.05, 0.05, 0.15, ..., 0.95,
+      and 1.05. Note that each bin is centered on the value n/10 for n = 0
+      to 10. The `==n` threshold may be set to any integer number of ensemble
+      members greater than 1.
+
+    * :code:`cat_thresh = [ >=0, >=0.5, >=0.75, >=1.0 ];` explicitly
+      specifies the probability values and defines 3 bins of unequal width
+      between the values 0, 0.5, 0.75, and 1.0. By convention, the
+      greater-than-or-equal-to (">=" or "ge") inequality type is required.
+
   * Set "prob_as_scalar = TRUE" to override the processing of probability
     data. When the "prob" entry is set as a dictionary to define the
-    field of interest, setting "prob_as_scalar = TRUE" indicates that this
+    field of interest, settin
+g "prob_as_scalar = TRUE" indicates that this
     data should be processed as regular scalars rather than probabilities.
     For example, this option can be used to compute traditional 2x2
     contingency tables and neighborhood verification statistics for
@@ -2047,7 +2077,7 @@ This dictionary may include the following entries:
 .. code-block:: none
 
   hira = {
-      flag            = FALSE;
+     flag            = FALSE;
      width           = [ 2, 3, 4, 5 ];
      vld_thresh      = 1.0;
      cov_thresh      = [ ==0.25 ];
