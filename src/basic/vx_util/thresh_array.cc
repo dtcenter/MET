@@ -544,7 +544,7 @@ bool ThreshArray::equal_bin_width(double &width) const {
    // Check for consistent widths, ignoring the last bin
    for(int i=0; i<(Nelements-2); i++) {
       double cur_width = t[i+1].get_value() - t[i].get_value();
-      if(!is_eq(width, cur_width)) {
+      if(!is_eq(width, cur_width, loose_tol)) {
          width = bad_data_double;
          is_equal = false;
          break;
@@ -641,7 +641,7 @@ ThreshArray define_prob_bins(double beg, double end, double inc, int prec) {
 ////////////////////////////////////////////////////////////////////////
 
 ConcatString prob_thresh_to_string(const ThreshArray &ta) {
-   ConcatString s;
+   ConcatString cs;
    ThreshArray prob_ta;
    double w;
 
@@ -652,20 +652,20 @@ ConcatString prob_thresh_to_string(const ThreshArray &ta) {
       if(ta.equal_bin_width(w)) {
          if(is_eq(ta[0].get_value(), 0.0) &&
             is_eq(ta[(ta.n() - 1)].get_value(), 1.0)) {
-            s << "==" << w;
+            cs << "==" << w;
          }
          else {
-            s << "==" << nint(1/w);
+            cs << "==" << nint(1/w);
          }
-         prob_ta = string_to_prob_thresh(s.c_str());
-         if(!(ta == prob_ta)) s.clear();
+         prob_ta = string_to_prob_thresh(cs.c_str());
+         if(!(ta == prob_ta)) cs.clear();
       }
    }
 
    // Return comma-separated list of thresholds
-   if(s.length() == 0) s = ta.get_str();
+   if(cs.length() == 0) cs = ta.get_str();
 
-   return(s);
+   return(cs);
 }
 
 ////////////////////////////////////////////////////////////////////////
