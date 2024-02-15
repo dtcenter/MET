@@ -528,6 +528,33 @@ void ThreshArray::get_simple_nodes(vector <Simple_Node> &v) {
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+bool ThreshArray::equal_bin_width(double &width) const {
+
+   // Check number of elements
+   if(Nelements < 2) {
+      width = bad_data_double;
+      return(false);
+   }
+
+   // Initialize return values
+   width = t[1].get_value() - t[0].get_value();
+   bool is_equal = true;
+
+   // Check for consistent widths, ignoring the last bin
+   for(int i=0; i<(Nelements-2); i++) {
+      double cur_width = t[i+1].get_value() - t[i].get_value();
+      if(!is_eq(width, cur_width)) {
+         width = bad_data_double;
+         is_equal = false;
+         break;
+      }
+   } // end for i
+
+   return(is_equal);
+}
+
+////////////////////////////////////////////////////////////////////////
 //
 // External utility for parsing probability thresholds.
 //
@@ -535,8 +562,6 @@ void ThreshArray::get_simple_nodes(vector <Simple_Node> &v) {
 
 ThreshArray string_to_prob_thresh(const char *s) {
    ThreshArray ta;
-   double v;
-   int i;
 
    // Parse the input string as a comma-separated list
    ta.add_css(s);
@@ -545,34 +570,66 @@ ThreshArray string_to_prob_thresh(const char *s) {
    if(ta.n() == 1 && ta[0].get_type() == thresh_eq) {
 
       // Store the threshold value
-      v = ta[0].get_value();
+      double v = ta[0].get_value();
 
       // Threshold value must be between 0 and 1
-      if(v <= 0 || v >=1) {
+      // or be an integer greater than 1
+      if(v <= 0 || (v >=1  && !is_eq(nint(v), v))) {
          mlog << Error << "\nstring_to_prob_thresh() -> "
-              << "threshold value (" << v
-              << ") must be between 0 and 1.\n\n";
+              << "the threshold string (" << s
+              << ") must specify a probability bin width between 0 and 1 "
+              << "or an integer number of ensemble members.\n\n";
          exit(1);
       }
 
-      // Determine input precision
-      ConcatString cs;
-      const char *ptr = strchr(s, '.');
-      int prec = ( ptr ? m_strlen(++ptr) : 0 );
-      cs.set_precision(prec);
-
-      // Construct list of probability thresholds using the input precision
-      ta.clear();
-      for(i=0; i*v<1.0; i++) {
-         cs << cs_erase << ">=" << i*v;
-         ta.add(cs.c_str());
+      // Define probability bins from [0, 1] with equal width
+      if(v > 0 && v < 1) {
+         const char *ptr = strchr(s, '.');
+         double prec = (ptr ? m_strlen(++ptr) : 0);
+         ta = define_prob_bins(0.0, 1.0, v, prec);
       }
-      cs << cs_erase << ">=" << 1.0;
-      ta.add(cs.c_str());
+      // Define ensemble probability bins
+      else {
+         double inc = 1.0/nint(v);
+         ta = define_prob_bins(-inc/2.0, 1.0+inc/2.0, inc, bad_data_int);
+      }
    }
 
    // Check probability thresholds
    check_prob_thresh(ta);
+
+   return(ta);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ThreshArray define_prob_bins(double beg, double end, double inc, int prec) {
+   ThreshArray ta;
+   double v;
+
+   // Check inputs
+   if(beg > 0 || end < 1 || inc <= 0 ||
+      (!is_bad_data(prec) && prec < 0)) {
+      mlog << Error << "\nget_prob_bins() -> "
+           << "the probability thresholds must begin ("
+           << beg << ") <= 0 and end ("
+           << end << ") >= 1 with an increment ("
+           << inc << ") between 0 and 1 and precision ("
+           << prec << ") >= 0.\n\n";
+      exit(1);
+   }
+
+   // Set the specified precision
+   ConcatString cs;
+   if(!is_bad_data(prec)) cs.set_precision(prec);
+
+   // Construct a list of probability thresholds
+   v = beg;
+   while(v <= end) {
+      cs << cs_erase << ">=" << v;
+      ta.add(cs.c_str());
+      v += inc;
+   }
 
    return(ta);
 }
@@ -586,21 +643,27 @@ ThreshArray string_to_prob_thresh(const char *s) {
 ConcatString prob_thresh_to_string(const ThreshArray &ta) {
    ConcatString s;
    ThreshArray prob_ta;
-   bool status = true;
+   double w;
 
    // Check for probability thresholds
-   if(!check_prob_thresh(ta, false)) status = false;
+   if(check_prob_thresh(ta, false)) {
 
-   // Use the second threshold to construct a probability threshold array
-   // and check for equality
-   if(status) {
-      s << "==" << ta[1].get_value();
-      prob_ta = string_to_prob_thresh(s.c_str());
-      status = (ta == prob_ta);
+      // Check for equal bin widths
+      if(ta.equal_bin_width(w)) {
+         if(is_eq(ta[0].get_value(), 0.0) &&
+            is_eq(ta[(ta.n() - 1)].get_value(), 1.0)) {
+            s << "==" << w;
+         }
+         else {
+            s << "==" << nint(1/w);
+         }
+         prob_ta = string_to_prob_thresh(s.c_str());
+         if(!(ta == prob_ta)) s.clear();
+      }
    }
 
-   // If not an array of probabilities, return comma-separated string
-   if(!status) s = ta.get_str();
+   // Return comma-separated list of thresholds
+   if(s.length() == 0) s = ta.get_str();
 
    return(s);
 }
@@ -608,23 +671,21 @@ ConcatString prob_thresh_to_string(const ThreshArray &ta) {
 ////////////////////////////////////////////////////////////////////////
 
 bool check_prob_thresh(const ThreshArray &ta, bool error_out) {
-   int i, n;
 
-   n = ta.n();
+   const char * method_name = "check_prob_thresh() -> ";
 
-   // Check for at least 3 thresholds beginning with 0 and ending with 1.
-   if(n < 3 ||
-      !is_eq(ta[0].get_value(),   0.0) ||
-      !is_eq(ta[n-1].get_value(), 1.0)) {
+   int n = ta.n();
 
+   // Check for at least 3 thresholds that include the range [0, 1]
+   if(n < 3 || ta[0].get_value() > 0 || ta[n-1].get_value() < 1) {
       if(error_out) {
-         mlog << Error << "\ncheck_prob_thresh() -> "
-              << "When verifying a probability field, you must "
-              << "select at least 3 thresholds beginning with 0.0 "
-              << "and ending with 1.0 (current setting: "
-              << ta.get_str() << ").\n"
-              << "Consider using the ==p shorthand notation for bins "
-              << "of equal width.\n\n";
+         mlog << Error << "\n" << method_name
+              << "when verifying a probability field, you must "
+              << "select at least 3 thresholds which include the range [0, 1] "
+              << "(current setting: " << ta.get_str() << ").\n"
+              << "Consider using the \"==n\" shorthand notation to specify "
+              << "probability bins of equal width, for n < 1, or the integer "
+              << "number of ensemble members, for n > 1.\n\n";
          exit(1);
       }
       else {
@@ -632,18 +693,20 @@ bool check_prob_thresh(const ThreshArray &ta, bool error_out) {
       }
    }
 
-   for(i=0; i<n; i++) {
+   // Check each probability bin
+   for(int i=0; i<n; i++) {
 
       // Check that all threshold types are greater than or equal to
       if(ta[i].get_type() != thresh_ge) {
          if(error_out) {
-            mlog << Error << "\ncheck_prob_thresh() -> "
-                 << "When verifying a probability field, all "
+            mlog << Error << "\n" << method_name
+                 << "when verifying a probability field, all "
                  << "thresholds must be greater than or equal to, "
                  << "using \"ge\" or \">=\" (current setting: "
                  << ta.get_str() << ").\n"
-                 << "Consider using the ==p shorthand notation for bins "
-                 << "of equal width.\n\n";
+                 << "Consider using the \"==n\" shorthand notation to specify "
+                 << "probability bins of equal width, for n < 1, or the integer "
+                 << "number of ensemble members, for n > 1.\n\n";
             exit(1);
          }
          else {
@@ -651,15 +714,20 @@ bool check_prob_thresh(const ThreshArray &ta, bool error_out) {
          }
       }
 
-      // Check that all thresholds are in [0, 1].
-      if(ta[i].get_value() < 0.0 || ta[i].get_value() > 1.0) {
+      // Break out of the last loop
+      if(i+1 == n) break;
+
+      // Check that all probability bins overlap with [0, 1]
+      if((ta[i].get_value() < 0 && ta[i+1].get_value() < 0) ||
+         (ta[i].get_value() > 1 && ta[i+1].get_value() > 1)) {
          if(error_out) {
-            mlog << Error << "\ncheck_prob_thresh() -> "
-                 << "When verifying a probability field, all thresholds "
-                 << "must be between 0 and 1 (current setting: "
+            mlog << Error << "\n" << method_name
+                 << "when verifying a probability field, each probability bin "
+                 << "must overlap the range [0, 1] (current setting: "
                  << ta.get_str() << ").\n"
-                 << "Consider using the ==p shorthand notation for bins "
-                 << "of equal width.\n\n";
+                 << "Consider using the \"==n\" shorthand notation to specify "
+                 << "probability bins of equal width, for n < 1, or the integer "
+                 << "number of ensemble members, for n > 1.\n\n";
             exit(1);
          }
          else {
