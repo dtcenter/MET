@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -49,7 +49,7 @@ using namespace std;
 #include "vx_data2d_factory.h"
 #include "vx_data2d_grib.h"
 #include "vx_data2d_nc_met.h"
-#include "vx_data2d_nc_pinterp.h"
+#include "vx_data2d_nc_wrf.h"
 #include "vx_util.h"
 #include "vx_cal.h"
 #include "vx_grid.h"
@@ -140,6 +140,12 @@ int met_main(int argc, char * argv[]) {
    if(!met_ptr) {
       mlog << Error << "\n" << program_name << " -> file \""
            << InputFilename << "\" not a valid data file\n\n";
+      exit(1);
+   }
+
+   if (FileType_UGrid == met_ptr->file_type()) {
+      mlog << Error << "\n" << program_name << " -> filetype "
+           << grdfiletype_to_string(met_ptr->file_type()) << " is not supported\n\n";
       exit(1);
    }
 

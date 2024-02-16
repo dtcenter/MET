@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -56,6 +56,8 @@
 //   019    04/01/19  Fillmore       Add FCST and OBS units.
 //   020    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
 //   021    06/09/23  Albo           Major changes for multivariate mode
+//   022    11/02/23  Halley Gotway  MET #2724 add OpenMP to convolution
+//   023    12/27/23  Albo           MET #2745 more unit tests, read data one time, percentile thresholding
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -73,9 +75,11 @@ using namespace std;
 #include <sys/types.h>
 
 #include "main.h"
+#include "handle_openmp.h"
 #include "string_array.h"
 #include "mode_usage.h"
 #include "mode_frontend.h"
+#include "multivar_frontend.h"
 #include "mode_conf_info.h"
 
 #ifdef WITH_PYTHON
@@ -95,7 +99,6 @@ using namespace std;
 ///////////////////////////////////////////////////////////////////////
 
 
-extern int mode_frontend(const StringArray &);
 extern int multivar_frontend(const StringArray &);
 
 extern const char * const program_name;   
@@ -130,6 +133,9 @@ int met_main(int argc, char * argv [])
    StringArray Argv;
    string s;
    const char * user_config_filename = 0;
+
+   // Set up OpenMP (if enabled)
+   init_openmp();
 
    for (j=0,n=0; j<argc; ++j)  {
 
@@ -181,8 +187,10 @@ int met_main(int argc, char * argv [])
       config.check_multivar_not_implemented();
 
       // run the multivar version of mode
-      
-      status = multivar_frontend(Argv);
+
+      MultivarFrontEnd *frontend = new MultivarFrontEnd();
+      status = frontend->run(Argv);
+      if ( frontend )  { delete frontend;  frontend = 0; }
 
    } else {
 
@@ -190,7 +198,7 @@ int met_main(int argc, char * argv [])
       // run the traditional version of mode
       
       ModeFrontEnd *frontend = new ModeFrontEnd;
-      status = frontend->run(Argv);
+      status = frontend->run_traditional(Argv);
 
       if ( frontend )  { delete frontend;  frontend = 0; }
    }

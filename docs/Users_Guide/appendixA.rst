@@ -1684,7 +1684,7 @@ Q. Why is the grid upside down?
      but the data is packed upside down.
 
      Try using the "file_type" entry. The "file_type" entry specifies the
-     input file type (e.g. GRIB1, GRIB2, NETCDF_MET, NETCDF_PINT, NETCDF_NCCF)
+     input file type (e.g. GRIB1, GRIB2, NETCDF_MET, NETCDF_WRF, NETCDF_PINT, NETCDF_NCCF)
      rather than letting the code determine it itself. For valid file_type
      values, see "File types" in the *data/config/ConfigConstants* file. This
      entry should be defined within the "fcst" or "obs" dictionaries.
@@ -1816,7 +1816,7 @@ scripts available in the MET's *scripts/* directory show examples of how
 one might use these commands on example datasets. Here are suggestions
 on other things to check if you are having problems installing or running MET.
 
-MET won't compile
+MET Won't Compile
 -----------------
 
   .. dropdown:: Troubleshooting Help
@@ -1828,7 +1828,7 @@ MET won't compile
      * Have these libraries been compiled and installed using the same set
        of compilers used to build MET?
 
-BUFRLIB Errors during MET installation
+BUFRLIB Errors During MET Installation
 --------------------------------------
 
   .. dropdown:: Troubleshooting Help
@@ -1866,7 +1866,7 @@ BUFRLIB Errors during MET installation
      `METplus GitHub Discussions Forum <https://github.com/dtcenter/METplus/discussions>`_.
 
 
-Command line double quotes
+Command Line Double Quotes
 --------------------------
 
   .. dropdown:: Troubleshooting Help
@@ -1882,7 +1882,7 @@ Command line double quotes
 		     'G003', '/h/data/global/WXQC/data/met/nc_mdl/umm/1701150006', '- field',
 		     '\'name="HGT"; level="P500";\'', '-v', '6']
 
-Environment variable settings
+Environment Variable Settings
 -----------------------------
 
   .. dropdown:: Troubleshooting Help
@@ -1916,7 +1916,7 @@ Environment variable settings
      value should be:
      https://met.readthedocs.io/en/latest/Users_Guide/installation.html
 
-NetCDF install issues
+NetCDF Install Issues
 ---------------------
 
   .. dropdown:: Troubleshooting Help
@@ -1945,7 +1945,7 @@ NetCDF install issues
      MET_NETCDF environment variable, then run "make clean", reconfigure,
      and then run "make install" and "make test" again.
 
-Error while loading shared libraries
+Error While Loading Shared Libraries
 ------------------------------------
 
   .. dropdown:: Troubleshooting Help
@@ -1957,7 +1957,7 @@ Error while loading shared libraries
        gsl lib (for example, */home/user/MET/gsl-2.1/lib*)
        to your LD_LIBRARY_PATH.
 
-General troubleshooting
+General Troubleshooting
 -----------------------
 
   .. dropdown:: Troubleshooting Help
@@ -1971,7 +1971,7 @@ General troubleshooting
      * Try rerunning with a higher verbosity level. Increasing the verbosity
        level to 4 or 5 prints much more diagnostic information to the screen. 
 
-Where to get help
+Where to Get Help
 =================
 
 If none of the above suggestions have helped solve your problem, help
@@ -1979,7 +1979,7 @@ is available through the
 `METplus GitHub Discussions Forum <https://github.com/dtcenter/METplus/discussions>`_.
 
 
-How to contribute code
+How to Contribute Code
 ======================
 		
 If you have code you would like to contribute, we will gladly consider

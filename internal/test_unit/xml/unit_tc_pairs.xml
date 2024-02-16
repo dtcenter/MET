@@ -216,8 +216,9 @@
     <param> \
       -adeck &DATA_DIR;/adeck/aal092022.dat \
       -bdeck &DATA_DIR;/bdeck/bal092022.dat \
-      -diag CIRA_DIAG_RT &DATA_DIR;/diag/cira_diag_rt/2022/GFSI/sal092022_avni_doper_20220926*_diag.dat \
-      -diag CIRA_DIAG_RT &DATA_DIR;/diag/cira_diag_rt/2022/EMXI/sal092022_emxi_doper_20220926*_diag.dat \
+      -diag CIRA_DIAG_RT &DATA_DIR;/diag/cira_diag_rt/2022/sal092022_avno_doper_20220926*_diag.dat \
+      -diag CIRA_DIAG_RT &DATA_DIR;/diag/cira_diag_rt/2022/sal092022_hmon_doper_20220926*_diag.dat \
+      -diag CIRA_DIAG_RT &DATA_DIR;/diag/cira_diag_rt/2022/sal092022_hwrf_doper_20220926*_diag.dat \
       -config &CONFIG_DIR;/TCPairsConfig_DIAGNOSTICS_CONSENSUS \
       -out &OUTPUT_DIR;/tc_pairs/al092022_20220926_DIAGNOSTICS_CONSENSUS \
       -log &OUTPUT_DIR;/tc_pairs/tc_pairs_DIAGNOSTICS_CONSENSUS.log \

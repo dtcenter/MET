@@ -13,6 +13,7 @@ include ${top_srcdir}/Make-include
 bin_PROGRAMS    = mode
 mode_SOURCES = mode_usage.cc \
 	mode_frontend.cc \
+	mode_superobject.cc \
 	multivar_data.cc \
 	multivar_frontend.cc \
 	mode.cc \
@@ -41,13 +42,15 @@ mode_LDADD = -lvx_pxm \
 	-lvx_analysis_util \
 	-lvx_data2d_factory \
 	-lvx_data2d_nc_met \
-	-lvx_data2d_grib $(GRIB2_LIBS) \
-	-lvx_data2d_nc_pinterp \
-	$(PYTHON_LIBS) \
-	-lvx_data2d_nccf \
+	-lvx_data2d_grib \
+	$(GRIB2_MET_LIBS) \
+	-lvx_data2d_nc_wrf \
+	-lvx_data2d_nc_cf \
+	$(UGRID_MET_LIBS) \
+	$(PYTHON_MET_LIBS) \
 	-lvx_statistics \
 	-lvx_data2d \
-        -lvx_seeps \
+	-lvx_seeps \
 	-lvx_nc_util \
 	-lvx_regrid \
 	-lvx_grid \
@@ -60,6 +63,7 @@ mode_LDADD = -lvx_pxm \
 	-lvx_math \
 	-lvx_color \
 	-lvx_log \
+	$(GRIB2_DEP_LIBS) $(UGRID_DEP_LIBS) $(PYTHON_DEP_LIBS) \
 	-lm -lproj -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas -lz
 
 EXTRA_DIST = mode_exec.h \

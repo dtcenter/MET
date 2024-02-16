@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -7,8 +7,6 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 ////////////////////////////////////////////////////////////////////////
-
-using namespace std;
 
 #include <dirent.h>
 #include <iostream>
@@ -22,6 +20,9 @@ using namespace std;
 #include "vx_data2d_factory.h"
 #include "vx_data2d.h"
 #include "vx_log.h"
+
+using namespace std;
+
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -46,7 +47,7 @@ PointStatConfInfo::~PointStatConfInfo() {
 void PointStatConfInfo::init_from_scratch() {
 
    // Initialize pointers
-   vx_opt = (PointStatVxOpt *) 0;
+   vx_opt = (PointStatVxOpt *) nullptr;
 
    clear();
 
@@ -70,9 +71,14 @@ void PointStatConfInfo::clear() {
    tmp_dir.clear();
    output_prefix.clear();
    version.clear();
-
+#ifdef WITH_UGRID
+   ugrid_nc.clear();
+   ugrid_dataset.clear();
+   ugrid_map_config.clear();
+   ugrid_max_distance_km = bad_data_double;
+#endif
    // Deallocate memory
-   if(vx_opt) { delete [] vx_opt; vx_opt = (PointStatVxOpt *) 0; }
+   if(vx_opt) { delete [] vx_opt; vx_opt = (PointStatVxOpt *) nullptr; }
 
    // Set count to zero
    n_vx = 0;
@@ -99,10 +105,25 @@ void PointStatConfInfo::read_config(const char *default_file_name,
 
 ////////////////////////////////////////////////////////////////////////
 
+void PointStatConfInfo::read_configs(StringArray user_file_names) {
+
+   const char *file_name;
+   for (int i=0; i<user_file_names.n_elements(); i++) {
+      file_name = replace_path(user_file_names[i].c_str()).c_str();
+      if (file_exists(file_name)) conf.read(file_name);
+      else mlog << Warning << "\nPointStatConfInfo::read_configs(StringArray) -> "
+                << "The configuration file \"" << user_file_names[i]<< "\" does not exist.\n\n";
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void PointStatConfInfo::process_config(GrdFileType ftype) {
    int i, j, n_fvx, n_ovx;
-   Dictionary *fdict = (Dictionary *) 0;
-   Dictionary *odict = (Dictionary *) 0;
+   Dictionary *fdict = (Dictionary *) nullptr;
+   Dictionary *odict = (Dictionary *) nullptr;
    Dictionary i_fdict, i_odict;
 
    // Dump the contents of the config file
@@ -119,6 +140,20 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
 
    // Conf: tmp_dir
    tmp_dir = parse_conf_tmp_dir(&conf);
+
+#ifdef WITH_UGRID
+   // Conf: ugrid_dataset
+   ugrid_dataset = parse_conf_ugrid_dataset(&conf);
+
+   // Conf: ugrid_nc
+   ugrid_nc = parse_conf_ugrid_coordinates_file(&conf);
+
+   // Conf: ugrid_map_config
+   ugrid_map_config = parse_conf_ugrid_map_config(&conf);
+
+   // Conf: ugrid_max_distance_km
+   ugrid_max_distance_km = parse_conf_ugrid_max_distance_km(&conf);
+#endif
 
    // Conf: output_prefix
    output_prefix = conf.lookup_string(conf_key_output_prefix);
@@ -489,7 +524,7 @@ void PointStatConfInfo::process_geog(const Grid &grid,
          sfc_info.land_ptr = &land_mask;
       }
       else {
-         sfc_info.land_ptr = 0;
+         sfc_info.land_ptr = nullptr;
       }
       if(vx_opt[i].topo_flag) {
          sfc_info.topo_ptr = &topo_dp;
@@ -497,7 +532,7 @@ void PointStatConfInfo::process_geog(const Grid &grid,
          sfc_info.topo_interp_fcst_thresh = topo_interp_fcst_thresh;
       }
       else {
-         sfc_info.topo_ptr = 0;
+         sfc_info.topo_ptr = nullptr;
       }
       vx_opt[i].vx_pd.set_sfc_info(sfc_info);
    }
@@ -516,119 +551,118 @@ void PointStatConfInfo::set_vx_pd() {
 ////////////////////////////////////////////////////////////////////////
 
 int PointStatConfInfo::n_txt_row(int i_txt_row) const {
-   int i, n;
+   int n = 0;
 
    // Loop over the tasks and sum the line counts for this line type
-   for(i=0, n=0; i<n_vx; i++) n += vx_opt[i].n_txt_row(i_txt_row);
+   for(int i=0; i<n_vx; i++) n += vx_opt[i].n_txt_row(i_txt_row);
 
-   return(n);
+   return n;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 int PointStatConfInfo::n_stat_row() const {
-   int i, n;
+   int n = 0;
 
    // Loop over the line types and sum the line counts
-   for(i=0, n=0; i<n_txt; i++) n += n_txt_row(i);
+   for(int i=0; i<n_txt; i++) n += n_txt_row(i);
 
-   return(n);
+   return n;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 int PointStatConfInfo::get_max_n_cat_thresh() const {
-   int i, n;
+   int n = 0;
 
-   for(i=0,n=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_cat_thresh());
+   for(int i=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_cat_thresh());
 
-   return(n);
+   return n;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 int PointStatConfInfo::get_max_n_cnt_thresh() const {
-   int i, n;
+   int n = 0;
 
-   for(i=0,n=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_cnt_thresh());
+   for(int i=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_cnt_thresh());
 
-   return(n);
+   return n;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 int PointStatConfInfo::get_max_n_wind_thresh() const {
-   int i, n;
+   int n = 0;
 
-   for(i=0,n=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_wind_thresh());
+   for(int i=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_wind_thresh());
 
-   return(n);
+   return n;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 int PointStatConfInfo::get_max_n_fprob_thresh() const {
-   int i, n;
+   int n = 0;
 
-   for(i=0,n=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_fprob_thresh());
+   for(int i=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_fprob_thresh());
 
-   return(n);
+   return n;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 int PointStatConfInfo::get_max_n_oprob_thresh() const {
-   int i, n;
+   int n = 0;
 
-   for(i=0,n=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_oprob_thresh());
+   for(int i=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_oprob_thresh());
 
-   return(n);
+   return n;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 int PointStatConfInfo::get_max_n_eclv_points() const {
-   int i, n;
+   int n = 0;
 
-   for(i=0,n=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_eclv_points());
+   for(int i=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_eclv_points());
 
-   return(n);
+   return n;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 int PointStatConfInfo::get_max_n_hira_ens() const {
-   int i, n;
+   int n = 0;
 
-   for(i=0,n=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_hira_ens());
+   for(int i=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_hira_ens());
 
-   return(n);
+   return n;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 int PointStatConfInfo::get_max_n_hira_prob() const {
-   int i, n;
+   int n = 0;
 
-   for(i=0,n=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_hira_prob());
+   for(int i=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_hira_prob());
 
-   return(n);
+   return n;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool PointStatConfInfo::get_vflag() const {
-   int i;
    bool vflag = false;
 
    // Vector output must be requested
    if(output_flag[i_vl1l2]  == STATOutputType_None &&
       output_flag[i_val1l2] == STATOutputType_None) {
-      return(false);
+      return false;
    }
 
    // Vector components must be requested
-   for(i=0; i<n_vx; i++) {
+   for(int i=0; i<n_vx; i++) {
 
       if(!vx_opt[i].vx_pd.fcst_info || !vx_opt[i].vx_pd.obs_info) continue;
 
@@ -641,7 +675,7 @@ bool PointStatConfInfo::get_vflag() const {
       }
    }
 
-   return(vflag);
+   return vflag;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -774,14 +808,14 @@ bool PointStatVxOpt::is_uv_match(const PointStatVxOpt &v) const {
       !(obs_summary    == v.obs_summary   ) ||
       !(obs_perc       == v.obs_perc      )) match = false;
 
-   return(match);
+   return match;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void PointStatVxOpt::process_config(GrdFileType ftype,
         Dictionary &fdict, Dictionary &odict) {
-   int i, n;
+   int n;
    VarInfoFactory info_factory;
    map<STATLineType,STATOutputType>output_map;
    Dictionary *dict;
@@ -845,7 +879,7 @@ void PointStatVxOpt::process_config(GrdFileType ftype,
    output_map = parse_conf_output_flag(&odict, txt_file_type, n_txt);
 
    // Populate the output_flag array with map values
-   for(i=0; i<n_txt; i++) output_flag[i] = output_map[txt_file_type[i]];
+   for(int i=0; i<n_txt; i++) output_flag[i] = output_map[txt_file_type[i]];
 
    // Conf: beg_ds and end_ds
    dict = odict.lookup_dictionary(conf_key_obs_window);
@@ -1189,7 +1223,7 @@ int PointStatVxOpt::n_txt_row(int i_txt_row) const {
    }
 
    // Check if this output line type is requested
-   if(output_flag[i_txt_row] == STATOutputType_None) return(0);
+   if(output_flag[i_txt_row] == STATOutputType_None) return 0;
 
    bool prob_flag = vx_pd.fcst_info->is_prob();
    bool vect_flag = vx_pd.fcst_info->is_v_wind() &&
@@ -1379,55 +1413,55 @@ int PointStatVxOpt::n_txt_row(int i_txt_row) const {
               << "\n\n";
          exit(1);
    }
-   return(n);
+   return n;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 int PointStatVxOpt::get_n_cnt_thresh() const {
-   return((!vx_pd.fcst_info || vx_pd.fcst_info->is_prob()) ?
-          0 : fcnt_ta.n());
+   return (!vx_pd.fcst_info || vx_pd.fcst_info->is_prob()) ?
+          0 : fcnt_ta.n();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 int PointStatVxOpt::get_n_cat_thresh() const {
-   return((!vx_pd.fcst_info || vx_pd.fcst_info->is_prob()) ?
-          0 : fcat_ta.n());
+   return (!vx_pd.fcst_info || vx_pd.fcst_info->is_prob()) ?
+          0 : fcat_ta.n();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 int PointStatVxOpt::get_n_wind_thresh() const {
-   return((!vx_pd.fcst_info || vx_pd.fcst_info->is_prob()) ?
-          0 : fwind_ta.n());
+   return (!vx_pd.fcst_info || vx_pd.fcst_info->is_prob()) ?
+          0 : fwind_ta.n();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 int PointStatVxOpt::get_n_fprob_thresh() const {
-   return((!vx_pd.fcst_info || !vx_pd.fcst_info->is_prob()) ?
-          0 : fcat_ta.n());
+   return (!vx_pd.fcst_info || !vx_pd.fcst_info->is_prob()) ?
+          0 : fcat_ta.n();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 int PointStatVxOpt::get_n_oprob_thresh() const {
-   return((!vx_pd.fcst_info || !vx_pd.fcst_info->is_prob()) ?
-          0 : ocat_ta.n());
+   return (!vx_pd.fcst_info || !vx_pd.fcst_info->is_prob()) ?
+           0 : ocat_ta.n();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 int PointStatVxOpt::get_n_hira_ens() const {
    int n = (hira_info.flag ? hira_info.width.max() : 0);
-   return(n*n);
+   return n*n;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 int PointStatVxOpt::get_n_hira_prob() const {
-   return(hira_info.flag ? hira_info.cov_ta.n() : 0);
+   return hira_info.flag ? hira_info.cov_ta.n() : 0;
 }
 
 ////////////////////////////////////////////////////////////////////////

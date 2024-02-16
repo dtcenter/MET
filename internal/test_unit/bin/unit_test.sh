@@ -101,6 +101,8 @@ UNIT_XML="unit_ascii2nc.xml \
           unit_grid_diag.xml \
           unit_quality_filter.xml"
 
+UNIT_XML="${UNIT_XML} unit_ugrid.xml"
+
 # Run each unit test
 for CUR_XML in ${UNIT_XML}; do
 

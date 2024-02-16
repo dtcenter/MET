@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -24,7 +24,6 @@ using namespace std;
 ///////////////////////////////////////////////////////////////////////////////
 
 static const double default_vld_thresh = 1.0;
-//static const char conf_key_prepbufr_map_bad[] = "obs_prefbufr_map";    // for backward compatibility
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -293,7 +292,7 @@ ConcatString parse_conf_string(Dictionary *dict, const char *conf_key,
    const char *method_name = "parse_conf_string() -> ";
 
    if(!dict) {
-      mlog << Error << "\n" << method_name << "empty dictionary!\n\n";
+      mlog << Error << "\n" << method_name << "empty dictionary! (" << conf_key <<")\n\n";
       exit(1);
    }
 
@@ -354,8 +353,10 @@ GrdFileType parse_conf_file_type(Dictionary *dict) {
            if(v == conf_const.lookup_int(conf_val_grib1))         t = FileType_Gb1;
       else if(v == conf_const.lookup_int(conf_val_grib2))         t = FileType_Gb2;
       else if(v == conf_const.lookup_int(conf_val_netcdf_met))    t = FileType_NcMet;
+      else if(v == conf_const.lookup_int(conf_val_netcdf_wrf))    t = FileType_NcWrf;
       else if(v == conf_const.lookup_int(conf_val_netcdf_pint))   t = FileType_NcPinterp;
       else if(v == conf_const.lookup_int(conf_val_netcdf_nccf))   t = FileType_NcCF;
+      else if(v == conf_const.lookup_int(conf_val_netcdf_ugrid))  t = FileType_UGrid;
       else if(v == conf_const.lookup_int(conf_val_python_numpy))  t = FileType_Python_Numpy;
       else if(v == conf_const.lookup_int(conf_val_python_xarray)) t = FileType_Python_Xarray;
       else {
@@ -1009,20 +1010,19 @@ TimeSummaryInfo parse_conf_time_summary(Dictionary *dict) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// Conf: map_name: message_type_map, obs_var_map, etc
 
 void parse_add_conf_key_value_map(
       Dictionary *dict, const char *conf_key_map_name, map<ConcatString,ConcatString> *m) {
-   Dictionary *map_dict = (Dictionary *) nullptr;
-   ConcatString key, val;
 
    if(!dict) {
-      mlog << Error << "\nparse_conf_key_value_type_map() -> "
+      mlog << Error << "\nparse_add_conf_key_value_map() -> "
            << "empty dictionary!\n\n";
       exit(1);
    }
 
-   // Conf: map_name: message_type_map, obs)var_map, etc
-   map_dict = dict->lookup_array(conf_key_map_name);
+   ConcatString key, val;
+   Dictionary *map_dict = dict->lookup_array(conf_key_map_name);
 
    // Loop through the array entries
    for(int i=0; i<map_dict->n_entries(); i++) {
@@ -1038,6 +1038,32 @@ void parse_add_conf_key_value_map(
          // Add entry to the map
          m->insert(pair<ConcatString, ConcatString>(key, val));
       }
+   }
+
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Conf: map_name: ugrid_metadata_maps
+
+void parse_add_conf_key_values_map(
+      Dictionary *dict, const char *conf_key_map_name,
+      map<ConcatString,StringArray> *sa_map, const char *caller) {
+   const char *method_name = (nullptr != caller) ? caller : "parse_conf_key_values_map() -> ";
+
+   if(!dict) {
+      mlog << Error << "\n" << method_name
+           << "empty dictionary!\n\n";
+      exit(1);
+   }
+
+   StringArray sa;
+   map<ConcatString,ConcatString> cs_map = parse_conf_key_value_map(dict, conf_key_map_name, method_name);
+
+   // Loop through the array entries and convert input comma-separated strings to StringArray
+   for(map<ConcatString,ConcatString>::const_iterator it=cs_map.begin(); it!= cs_map.end(); it++) {
+      sa.parse_css(it->second);
+      (*sa_map)[it->first] = sa;
    }
 
    return;
@@ -2259,6 +2285,40 @@ WaveletType parse_conf_wavelet_type(Dictionary *dict) {
    return t;
 }
 
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+ConcatString parse_conf_ugrid_coordinates_file(Dictionary *dict) {
+   return dict ? dict->lookup_string(conf_key_ugrid_coordinates_file, false) : "";
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+ConcatString parse_conf_ugrid_dataset(Dictionary *dict) {
+   return dict ? dict->lookup_string(conf_key_ugrid_dataset, false) : "";
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+double parse_conf_ugrid_max_distance_km(Dictionary *dict) {
+   return dict ? dict->lookup_double(conf_key_ugrid_max_distance_km, false) : bad_data_double;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+ConcatString parse_conf_ugrid_map_config(Dictionary *dict) {
+   return dict ? dict->lookup_string(conf_key_ugrid_map_config, false) : "";
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void parse_add_conf_ugrid_metadata_map(Dictionary *dict, map<ConcatString,StringArray> *m) {
+   parse_add_conf_key_values_map(dict, conf_key_ugrid_metadata_map, m,
+                                 "parse_add_conf_ugrid_metadata_map");
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////
 
 
@@ -3294,6 +3354,19 @@ void python_compile_error(const char *caller) {
    mlog << Error << "\n" << method_name
         << "Support for Python has not been compiled!\n"
         << "To run Python scripts, recompile with the --enable-python option.\n\n";
+
+   exit(1);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void ugrid_compile_error(const char *caller) {
+
+   const char *method_name = (nullptr != caller) ? caller : "ugrid_compile_error() -> ";
+
+   mlog << Error << "\n" << method_name
+        << "Support for the unstructured grid has not been compiled!\n"
+        << "To use the filetype NETCDF_UGRID (unstructured grid), recompile with the --enable-ugrid option.\n\n";
 
    exit(1);
 }

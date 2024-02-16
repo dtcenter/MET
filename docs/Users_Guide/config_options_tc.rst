@@ -6,7 +6,7 @@ Tropical Cyclone Configuration Options
 
 See :numref:`config_options` for a description of the configuration file syntax.
 
-Configuration settings common to multiple tools
+Configuration Settings Common to Multiple Tools
 ===============================================
 
 storm_id
@@ -173,7 +173,7 @@ The value should generally not be modified.
   version = "VN.N";
 
 
-Settings specific to individual tools
+Settings Specific to Individual Tools
 =====================================
 
 

@@ -7,21 +7,21 @@ TC-Pairs Tool
 Introduction
 ============
 
-The TC-Pairs tool provides verification for tropical cyclone forecasts in ATCF file format. It matches an ATCF format tropical cyclone (TC) forecast with a second ATCF format reference TC dataset (most commonly the Best Track analysis). The TC-Pairs tool processes both track and intensity adeck data and probabilistic edeck data. The adeck matched pairs contain position errors, as well as wind, sea level pressure, and distance to land values for each TC dataset. The edeck matched pairs contain probabilistic forecast values and the verifying observation values. The pair generation can be subset based on user-defined filtering criteria. Practical aspects of the TC-Pairs tool are described in :numref:`TC-Pairs_Practical-information`. 
+The TC-Pairs tool provides verification for tropical cyclone forecasts in ATCF file format. It matches an ATCF format tropical cyclone (TC) forecast with a second ATCF format reference TC dataset (most commonly the Best Track analysis). The TC-Pairs tool processes both track and intensity adeck data and probabilistic edeck data. The adeck matched pairs contain position errors, as well as values for each TC dataset, including wind speed, wind radii, minimum sea level pressure, and distance to land. The edeck matched pairs contain probabilistic forecast values and the verifying observation values. The pair generation can be subset based on user-defined filtering criteria. Practical aspects of the TC-Pairs tool are described in :numref:`TC-Pairs_Practical-information`.
 
-Scientific and statistical aspects
+Scientific and Statistical Aspects
 ==================================
 
 .. _TC-Pairs_Diagnostics:
 
 TC Diagnostics
------------------
+--------------
 
 TC diagnostics provide information about a TC's structure or its environment. Each TC diagnostic is a single-valued measure that corresponds to some aspect of the storm itself or the surrounding large-scale environment. TC diagnostics can be derived from observational analyses, model fields, or even satellite observations. Examples include:
 
   * Inner core diagnostics provide information about the structure of the storm near the storm center. Examples include the intensity of the storm and the radius of maximum winds.
 
-  * Large scale diagnostics provide information about quantities that characterize its environment. Examples include environmental vertical wind shear, total precipitable water, the average relative humidity, measures of convective instability, and the upper bound of intensity that a storm may be expected to achieve in its current environment. These diagnostics are typically derived from model fields as an average of the quantity of interest over either a circular area or an annulus centered on the storm center. Often, the storm center is taken to be the underlying model's storm center. In other cases, the diagnostics may be computed along some other specified track.
+  * Large scale diagnostics provide information about quantities that characterize its environment. Examples include environmental vertical wind shear, total precipitable water, relative humidity, convective instability, and the upper bound of intensity that a storm may be expected to achieve in its current environment. These diagnostics are typically derived from model fields as an average of the quantity of interest over either a circular area or an annulus centered on the storm center. Often, the storm center is taken to be the underlying model's storm center. In other cases, the diagnostics may be computed along some other specified track.
 
   * Ocean-based diagnostics provide information about the sea's thermal characteristics in the vicinity of the storm center. Examples include the sea surface temperature, ocean heat content, and the depth of warm water of a given temperature.
 
@@ -50,12 +50,12 @@ A future version of MET will also allow the CIRA model diagnostics to be compute
 
 .. _TC-Pairs_Practical-information:
 
-Practical information
+Practical Information
 =====================
 
 This section describes how to configure and run the TC-Pairs tool. The TC-Pairs tool is used to match a tropical cyclone model forecast to a corresponding reference dataset. Both tropical cyclone forecast/reference data must be in ATCF format. Output from the TC-dland tool (NetCDF gridded distance file) is also a required input for the TC-Pairs tool. It is recommended to run tc_pairs on a storm-by-storm basis, rather than over multiple storms or seasons to avoid memory issues.
 
-tc_pairs usage
+tc_pairs Usage
 --------------
 
 The usage statement for tc_pairs is shown below:
@@ -73,7 +73,7 @@ The usage statement for tc_pairs is shown below:
 
 tc_pairs has required arguments and can accept several optional arguments.
 
-Required arguments for tc_pairs
+Required Arguments for tc_pairs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. The **-adeck path** argument indicates the adeck TC-Pairs acceptable format data containing tropical cyclone model forecast (output from tracker) data to be verified. Acceptable data formats are limited to the standard ATCF format and the one column modified ATCF file, generated by running the tracker in genesis mode. It specifies the name of a TC-Pairs acceptable format file or top-level directory containing TC-Pairs acceptable format files ending in ".dat" to be processed. The **-adeck** or **-edeck** option must be used at least once.
@@ -84,7 +84,7 @@ Required arguments for tc_pairs
 
 4. The **-config file** argument indicates the name of the configuration file to be used. The contents of the configuration file are discussed below.
 
-Optional arguments for tc_pairs
+Optional Arguments for tc_pairs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 5. The **-diag source path** argument indicates the TC-Pairs acceptable format data containing the tropical cyclone diagnostics dataset corresponding to the adeck tracks. The **source** can be set to CIRA_DIAG_RT or SHIPS_DIAG_RT to indicate the input diagnostics data source. The **path** argument specifies the name of a TC-Pairs acceptable format file or top-level directory containing TC-Pairs acceptable format files ending in ".dat" to be processed. Support for additional diagnostic sources will be added in future releases.
@@ -125,7 +125,7 @@ The TC-Pairs tool implements the following logic:
 
 • For each edeck/bdeck pair, write paired edeck probabilities and matching bdeck values to output PROBRIRW lines.
 
-tc_pairs configuration file
+tc_pairs Configuration File
 ---------------------------
 
 The default configuration file for the TC-Pairs tool named **TCPairsConfig_default** can be found in the installed *share/met/config/* directory. Users are encouraged to copy these default files before modifying their contents. The contents of the configuration file are described in the subsections below.
@@ -163,7 +163,7 @@ ____________________
 
   model = [ "DSHP", "LGEM", "HWRF" ];
 
-The **model** variable contains a list of comma-separated models to be used. Each model is identified with an ATCF TECH ID (normally four unique characters). This model identifier should match the model column in the ATCF format input file. An empty list indicates that all models in the input file(s) will be processed. Note that when reading ATCF track data, all instances of the string AVN are automatically replaced with GFS.
+The **model** variable contains a list of comma-separated models to be used. Each model is identified with an ATCF TECH ID (normally four unique characters). This model identifier should match the model column in the ATCF format input file. An empty list indicates that all models in the input file(s) will be processed. Note that when reading ATCF track data, all instances of the string **AVN** are automatically replaced with **GFS**.
 
 ____________________
 
@@ -195,15 +195,26 @@ ____________________
 
   consensus = [
      {
-        name     = "CON1";
-        members  = [ "MOD1", "MOD2", "MOD3" ];
-        required = [   true,  false, false  ];
-        min_req  = 2;
+        name          = "CON1";
+        members       = [ "MOD1", "MOD2", "MOD3" ];
+        required      = [   true,  false, false  ];
+        min_req       = 2;
+        diag_required = [   false, false, false  ];
+        min_diag_req  = 0;
         write_members = TRUE;
      }
   ];
 
-The **consensus** field allows the user to generate a user-defined consensus forecasts from any number of models. All models used in the consensus forecast need to be included in the **model** field (first entry in **TCPairsConfig_default**). The name field is the desired consensus model name. The **members** field is a comma-separated list of model IDs that make up the members of the consensus. The **required** field is a comma-separated list of true/false values associated with each consensus member. If a member is designated as true, the member is required to be present in order for the consensus to be generated. If a member is false, the consensus will be generated regardless of whether the member is present. The length of the required array must be the same length as the members array. The **min_req** field is the number of members required in order for the consensus to be computed. The required and min_req field options are applied at each forecast lead time. If any member of the consensus has a non-valid position or intensity value, the consensus for that valid time will not be generated. The **write_members** field is a boolean that indicates whether or not to write output for the individual consensus members. If set to true, standard output will show up for all members. If set to false, output for the consensus members is excluded from the output, even if they are used to define other consensus tracks in the configuration file. If a consensus model is defined in the configuration file, there will be non-missing output for the consensus track variables in the output file (NUM_MEMBERS, TRACK_SPREAD, TRACK_STDEV, MSLP_STDEV, MAX_WIND_STDEV). See the TCMPR line type definitions below.
+The **consensus** array allows users to derive consensus forecasts from any number of models. A consensus forecast is computed as the average intensity and location of the members which comprise it. TC-Pairs attempts to derive consensus forecasts for each unique storm ID and initialization time found in the input track data. Each array entry is a dictionary which defines the consensus name, membership, and requirements:
+
+- The **name** field is a string defining the consensus model name to be written.
+- The **members** field is a comma-separated array of model ID stings which define the members of the consensus.
+- The **required** field is a comma-separated array of true/false values associated with each consensus member. If a member is designated as true, that member must be present in order for the consensus to be generated. If a member is false, the consensus will be generated regardless of whether or not the member is present. The required array can either be empty or have the same length as the members array. If empty, it defaults to all false.
+- The **min_req** field is the number of members required in order for the consensus to be computed. The **required** and **min_req** field options are applied at each forecast lead time. If any member of the consensus has a non-valid position or intensity value, the consensus for that valid time will not be generated.
+- Tropical cyclone diagnostics, if provided on the command line, are included in the computation of consensus tracks. The consensus diagnostics are computed as the mean of the diagnostics for the members. The **diag_required** and **min_diag_req** entries apply the same logic described above, but to the computation of each consensus diagnostic value rather than the consensus track location and intensity. If **diag_required** is missing or an empty list, it defaults to all false. If **min_diag_req** is missing, it default to 0.
+- The **write_members** field is a boolean that indicates whether or not to write track output for the individual consensus members. If set to true, standard output will show up for all members. If set to false, output for the consensus members is excluded from the output, even if they are used to define other consensus tracks in the configuration file.
+
+Users should take care to avoid filtering out track data for the consensus members with the **model** field, described above. Either set **model** to an empty list to process all input track data or include all of the consensus members in the **model** list. Use the **write_members** field, not the **model** field, to suppress track output for consensus members.
 
 ____________________
 
@@ -398,7 +409,7 @@ parameter will result in missed matches.
 
 .. _tc_pairs-output:
 
-tc_pairs output
+tc_pairs Output
 ---------------
 
 TC-Pairs produces output in TCST format. The default output file name can be overwritten using the -out file argument in the usage statement. The TCST file output from TC-Pairs may be used as input into the TC-Stat tool. The header column in the TC-Pairs output is described in :numref:`TCST Header`.
@@ -420,13 +431,13 @@ TC-Pairs produces output in TCST format. The default output file name can be ove
     - Version number
   * - 2
     - AMODEL
-    - User provided text string designating model name
+    - User-provided text string designating the forecast ATCF ID
   * - 3
     - BMODEL
-    - User provided text string designating model name
+    - User-provided text string designating the reference ATCF ID
   * - 4
     - DESC
-    - User provided description text string
+    - User-provided description text string
   * - 5
     - STORM_ID
     - BBCCYYYY designation of storm

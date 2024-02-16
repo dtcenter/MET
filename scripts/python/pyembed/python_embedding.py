@@ -8,9 +8,10 @@
 #   The target python object is saved as a temporary file by user defined python.
 #   And the python binaries (complied with MET) reads the temporary file and
 #   builds the python object for MET.
-#   The temporary file can be any form with matching write/read scripts.
+#   The temporary file can be any type with matching write/read scripts.
 #   - NetCDF for gridded data and point observation data.
-#   - text file (ASCII data) (MPR, point observation).
+#   - NetCDF for Tropical Cyclone diagnostics.
+#   - Text file (ASCII data) (MPR, point observation).
 #
 #   NOTE: sys.argv is changed by calling call_embedded_python
 #
@@ -18,6 +19,8 @@
 
 import os
 import sys
+import json
+import math
 from importlib import util as import_util
 
 class pyembed_tools():
@@ -91,20 +94,50 @@ class pyembed_tools():
         Returns:
             (list of lists): point or mpr data
         """
-        f = open(filename, 'r')
-        lines = f.readlines()
-        f.close()
+        with open(filename, 'r') as f:
+            lines = f.readlines()
+            f.close()
 
-        ascii_data = [eval(line.strip('\n')) for line in lines]
+            try:
+                ascii_data = [eval(line.strip('\n')) for line in lines]
+            except:
+                try:
+                    print(f' PYTHON INFO pyembed_tools.read_tmp_ascii() nan and inf are changed to -9999 from {filename}.')
+                    ascii_data = [eval(line.strip('\n').replace("nan", "-9999").replace("inf", "-9999")) for line in lines]
+                except:
+                    # Log where the problem happens
+                    line_no = 0
+                    line_buf = ""
+                    try:
+                        for line_buf in lines:
+                            line_no += 1
+                            eval(line_buf.strip('\n').replace("nan", "-9999").replace("inf", "-9999"))
+                    except:
+                        print(f' PYTHON ERROR pyembed_tools.read_tmp_ascii() failed parsing "{line_buf}" at line {line_no}')
+                    raise
 
         return ascii_data
 
     @staticmethod
     def write_tmp_ascii(filename, met_data):
         with open(filename, 'w') as f:
+            inf_count = 0
+            nan_count = 0
             for line in met_data:
                 f.write(str(line) + '\n')
+                inf_count += line.count(math.inf)
+                nan_count += line.count(math.nan)
 
+            if 0 < (nan_count + inf_count):
+                print(f' PYTHON WARNING pyembed_tools.write_tmp_ascii() Saved {nan_count} nan and {inf_count} infinite values to "{filename}"')
+
+    @staticmethod
+    def write_tmp_diag(filename, diag_data):
+        json.dump(diag_data, open(filename,'w'))
+
+    @staticmethod
+    def read_tmp_diag(filename):
+        return json.load(open(filename))
 
 if __name__ == '__main__':
     argv_org = sys.argv[:]      # save original sys.argv

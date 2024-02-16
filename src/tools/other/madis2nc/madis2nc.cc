@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -697,12 +697,12 @@ void convert_wind_wdir_to_u_v(float wind, float wdir,
 ////////////////////////////////////////////////////////////////////////
 
 bool check_masks(double lat, double lon, const char *sid) {
-   double grid_x, grid_y;
 
    //
    // Check grid masking.
    //
    if(mask_grid.nx() > 0 || mask_grid.ny() > 0) {
+      double grid_x, grid_y;
       mask_grid.latlon_to_xy(lat, -1.0*lon, grid_x, grid_y);
       if(grid_x < 0 || grid_x >= mask_grid.nx() ||
          grid_y < 0 || grid_y >= mask_grid.ny()) {
@@ -3330,7 +3330,6 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
    //
    // Loop through each record and get the header data.
    //
-   int data_cnt;
    for(i_hdr_s=rec_beg; i_hdr_s<my_rec_end; i_hdr_s+=BUFFER_SIZE) {
       buf_size = ((my_rec_end - i_hdr_s) > BUFFER_SIZE) ? BUFFER_SIZE: (my_rec_end - i_hdr_s);
 
@@ -3355,7 +3354,7 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
       cur[0] = i_hdr_s;
       dim[0] = buf_size;
       dim[1] = maxLevels;
-      data_cnt = buf_size * maxLevels;
+      int data_cnt = buf_size * maxLevels;
 
       get_nc_data(&in_hdr_vld_var, tmp_dbl_arr, dim, cur);
       get_nc_data(&in_hdr_lat_var, (float *)hdr_lat_arr, dim, cur);

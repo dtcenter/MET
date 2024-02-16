@@ -4,13 +4,30 @@ echo "Running script to build MET in Docker"
 
 source internal/scripts/environment/development.docker
 
+# Check whether MET_GIT_NAME is defined
+if [ -z ${MET_GIT_NAME+x} ]; then
+  MET_GIT_NAME=`git name-rev --name-only HEAD | sed 's%/%_%g'`
+  echo "Setting MET_GIT_NAME=${MET_GIT_NAME} based on the current revision."
+fi
+
+# Check whether MET_CONFIG_OPTS is defined
+if [ -z ${MET_CONFIG_OPTS+x} ]; then
+  MET_CONFIG_OPTS='--enable-all'
+  echo "Setting MET_CONFIG_OPTS=${MET_CONFIG_OPTS} to compile all available options."
+fi
+
+# Create log directory
 mkdir -p /met/logs
 
 LOG_FILE=/met/logs/MET-${MET_GIT_NAME}_configure.log
 echo "Running bootstrap for MET ${MET_GIT_NAME} and writing log file ${LOG_FILE}"
 ./bootstrap > ${LOG_FILE} 2>&1
 echo "Configuring MET ${MET_GIT_NAME} and appending to log file ${LOG_FILE}"
-./configure --enable-grib2 --enable-mode_graphics --enable-modis --enable-lidar2nc --enable-python CPPFLAGS="-I/usr/local/include -I/usr/local/include/freetype2 -I/usr/local/include/cairo" LIBS="-ltirpc" >> ${LOG_FILE} 2>&1
+./configure \
+  BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} \
+  ${MET_CONFIG_OPTS} \
+  CPPFLAGS="-I/usr/local/include -I/usr/local/include/freetype2 -I/usr/local/include/cairo" \
+  LIBS="-ltirpc" >> ${LOG_FILE} 2>&1
 if [ $? != 0 ]; then
   cat ${LOG_FILE}
   exit 1
@@ -22,7 +39,7 @@ fi
 
 LOG_FILE=/met/logs/MET-${MET_GIT_NAME}_make_install.log
 echo "Compiling MET ${MET_GIT_NAME} and writing log file ${LOG_FILE}"
-make ${MAKE_ARGS} install > ${LOG_FILE}
+make ${MAKE_ARGS} install > ${LOG_FILE} 2>&1
 if [ $? != 0 ]; then
   cat ${LOG_FILE}
   exit 1

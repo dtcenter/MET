@@ -1,0 +1,274 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// MODE configuration file.
+//
+// For additional information, see the MET_BASE/config/README file.
+//
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Output model name to be written
+//
+// model =
+model = "HRRR";
+
+//
+// Output description to be written
+//
+// desc =
+
+//
+// Output observation type to be written
+//
+// obtype =
+obtype = "ANALYSIS";
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Verification grid
+//
+regrid = {to_grid = FCST;method = NEAREST;width = 1;vld_thresh = 0.5;}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+`// Approximate grid resolution (km)
+//
+// grid_res =
+// 
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Run all permutations of radius and threshold
+//
+// quilt =
+// ${METPLUS_QUILT}
+
+//
+// MODE Multivar boolean combination logic
+//
+//multivar_logic =
+//${METPLUS_MULTIVAR_LOGIC}
+multivar_logic = "#1 && #2 && #3";
+
+// keep this around to compare to older versions, the new version doesn't read this
+multivar_intensity_flag = [FALSE, TRUE, TRUE];  
+
+multivar_intensity_compare_fcst = [ 2, 3 ];
+multivar_intensity_compare_obs = [ 2, 3 ];
+
+//
+// Forecast and observation fields to be verified
+//
+fcst = {
+   //${METPLUS_FCST_FIELD}
+   field = [{ name="CSNOW"; level="L0"; conv_radius = 0; conv_thresh = ==1; file_type = GRIB2; merge_flag = NONE; },
+            { name="VIS"; level="L0"; conv_radius = 5; conv_thresh = <=804.672; merge_thresh = <=1207.008; merge_flag = THRESH; },
+            { name="WIND"; level="Z10"; conv_radius = 5; conv_thresh = >=8.9408; merge_thresh = >=6.7056; merge_flag = THRESH; }];
+
+   //${METPLUS_FCST_CENSOR_THRESH}
+   //${METPLUS_FCST_CENSOR_VAL}
+   //${METPLUS_FCST_CONV_RADIUS}
+   //${METPLUS_FCST_CONV_THRESH}
+   //${METPLUS_FCST_VLD_THRESH}
+   //${METPLUS_FCST_FILTER_ATTR_NAME}
+   filter_attr_name = ["AREA"];
+   
+   //${METPLUS_FCST_FILTER_ATTR_THRESH}
+   filter_attr_thresh = [>=25];
+   
+   //${METPLUS_FCST_MERGE_THRESH}
+   //${METPLUS_FCST_MERGE_FLAG}
+   //${METPLUS_FCST_FILE_TYPE}
+   //file_type = GRIB2;
+   multivar_name = "Snow";
+   multivar_level = "LO";
+}
+
+obs = {
+   //${METPLUS_OBS_FIELD}
+   field = [{ name="PrecipFlag"; level="L0"; conv_radius = 0; conv_thresh = ==3; file_type = GRIB2; merge_flag = NONE; },
+            { name="VIS"; level="L0"; conv_radius = 5; conv_thresh = <=804.672; merge_thresh = <=1207.008; merge_flag = THRESH; },
+	    { name="WIND"; level="Z10"; conv_radius = 5; conv_thresh = >=8.9408; merge_thresh = >=6.7056; merge_flag = THRESH; } ];
+
+   //${METPLUS_OBS_CENSOR_THRESH}
+   //${METPLUS_OBS_CENSOR_VAL}
+   //${METPLUS_OBS_CONV_RADIUS}
+   //${METPLUS_OBS_CONV_THRESH}
+   //${METPLUS_OBS_VLD_THRESH}
+
+   //${METPLUS_OBS_FILTER_ATTR_NAME}
+   filter_attr_name = ["AREA"];
+
+   //${METPLUS_OBS_FILTER_ATTR_THRESH}
+   filter_attr_thresh = [>=25];
+
+   // ${METPLUS_OBS_MERGE_THRESH}
+   // ${METPLUS_OBS_MERGE_FLAG}
+   // ${METPLUS_OBS_FILE_TYPE}
+   multivar_name = "Precip";
+   multivar_level = "LO";
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Handle missing data
+//
+// mask_missing_flag =
+// ${METPLUS_MASK_MISSING_FLAG}
+
+//
+// Match objects between the forecast and observation fields
+//
+//match_flag =
+//${METPLUS_MATCH_FLAG}
+match_flag = MERGE_BOTH;
+//
+// Maximum centroid distance for objects to be compared
+//
+//max_centroid_dist =
+//${METPLUS_MAX_CENTROID_DIST}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Verification masking regions
+//
+//mask = {
+//${METPLUS_MASK_DICT}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Fuzzy engine weights
+//
+//weight = {
+//${METPLUS_WEIGHT_DICT}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Fuzzy engine interest functions
+//
+interest_function = {
+
+   //${METPLUS_INTEREST_FUNCTION_CENTROID_DIST}
+
+   //${METPLUS_INTEREST_FUNCTION_BOUNDARY_DIST}
+
+   //${METPLUS_INTEREST_FUNCTION_CONVEX_HULL_DIST}
+
+   angle_diff = (
+      (  0.0, 1.0 )
+      ( 30.0, 1.0 )
+      ( 90.0, 0.0 )
+   );
+
+   aspect_diff = (
+      (  0.00, 1.0 )
+      (  0.10, 1.0 )
+      (  0.75, 0.0 )
+   );
+
+   corner   = 0.8;
+   ratio_if = (
+      (    0.0, 0.0 )
+      ( corner, 1.0 )
+      (    1.0, 1.0 )
+   );
+
+   area_ratio = ratio_if;
+
+   int_area_ratio = (
+      ( 0.00, 0.00 )
+      ( 0.10, 0.50 )
+      ( 0.25, 1.00 )
+      ( 1.00, 1.00 )
+   );
+
+   curvature_ratio = ratio_if;
+
+   complexity_ratio = ratio_if;
+
+   inten_perc_ratio = ratio_if;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Total interest threshold for determining matches
+//
+//total_interest_thresh =
+//${METPLUS_TOTAL_INTEREST_THRESH}
+
+//
+// Interest threshold for printing output pair information
+//
+print_interest_thresh = 0.0;
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Plotting information
+//
+met_data_dir = "MET_BASE";
+
+fcst_raw_plot = {
+   color_table      = "MET_BASE/colortables/met_default.ctable";
+   plot_min         = 0.0;
+   plot_max         = 0.0;
+}
+
+obs_raw_plot = {
+   color_table      = "MET_BASE/colortables/met_default.ctable";
+   plot_min         = 0.0;
+   plot_max         = 0.0;
+}
+
+object_plot = {
+   color_table      = "MET_BASE/colortables/mode_obj.ctable";
+}
+
+//
+// Boolean for plotting on the region of valid data within the domain
+//
+plot_valid_flag = FALSE;
+
+//
+// Plot polyline edges using great circle arcs instead of straight lines
+//
+plot_gcarc_flag = FALSE;
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// NetCDF matched pairs, PostScript, and contingency table output files
+//
+//ps_plot_flag =
+//${METPLUS_PS_PLOT_FLAG}
+
+//nc_pairs_flag = {
+//${METPLUS_NC_PAIRS_FLAG_DICT}
+
+//ct_stats_flag =
+//${METPLUS_CT_STATS_FLAG}
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+shift_right = 0;   //  grid squares
+
+////////////////////////////////////////////////////////////////////////////////
+
+//${METPLUS_OUTPUT_PREFIX}
+//version        = "V10.0";
+
+//tmp_dir = "${MET_TMP_DIR}";
+tmp_dir = "/tmp";
+
+////////////////////////////////////////////////////////////////////////////////
+
+//${METPLUS_MET_CONFIG_OVERRIDES}

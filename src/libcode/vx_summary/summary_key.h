@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -27,12 +27,12 @@ class SummaryKey
 
 public:
 
-  SummaryKey(const string &header_type,
-             const string &station_id,
+  SummaryKey(const std::string &header_type,
+             const std::string &station_id,
              const double lat, const double lon, const double elev,
              const int var_code,
              const double height_m, const double pressure_level,
-             const string &var_name = "");
+             const std::string &var_name = "");
 
   virtual ~SummaryKey();
 
@@ -41,12 +41,12 @@ public:
   // Access methods //
   ////////////////////
 
-  string getHeaderType() const
+  std::string getHeaderType() const
   {
     return _headerType;
   }
 
-  string getStationId() const
+  std::string getStationId() const
   {
     return _stationId;
   }
@@ -91,7 +91,7 @@ public:
     return _pressureLevel;
   }
 
-  string getVarName() const
+  std::string getVarName() const
   {
     return _varName;
   }
@@ -154,8 +154,8 @@ protected:
   // Protected members //
   ///////////////////////
 
-  string _headerType;
-  string _stationId;
+  std::string _headerType;
+  std::string _stationId;
   double _latitude;
   double _longitude;
   double _elevation;
@@ -163,7 +163,7 @@ protected:
   int hdrIndex;
   double _height;
   double _pressureLevel;
-  string _varName;
+  std::string _varName;
 
 };
 

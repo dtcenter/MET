@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -397,7 +397,8 @@ void StringArray::set(int i, const std::string text)
 
   if ( (i < 0) || (i >= n()) )  {
 
-   mlog << Error << "\nStringArray::set(int, const string) -> range check error\n\n";
+   mlog << Error << "\nStringArray::set(int, const string) -> "
+        << "range check error\n\n";
 
    exit ( 1 );
 
@@ -408,6 +409,25 @@ s[i] = text;
 Sorted = false;
 
 return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+string StringArray::serialize(const char *sep) const
+
+{
+
+   string all_s;
+
+   for(auto it = s.begin();  it != s.end(); it++) {
+      all_s.append(*it);
+      if((it+1) != s.end()) all_s.append(sep);
+   }
+
+   return(all_s);
 
 }
 

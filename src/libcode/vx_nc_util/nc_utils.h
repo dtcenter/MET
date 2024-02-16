@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -36,10 +36,10 @@ typedef unsigned char uchar;
 static const std::string C_unknown_str = std::string("unknown");
 
 #define IS_VALID_NC(ncObj)          (!ncObj.isNull())
-#define IS_VALID_NC_P(ncObjPtr)     ((ncObjPtr != 0 && !ncObjPtr->isNull()))
+#define IS_VALID_NC_P(ncObjPtr)     ((ncObjPtr != nullptr && !ncObjPtr->isNull()))
 
 #define IS_INVALID_NC(ncObj)        ncObj.isNull()
-#define IS_INVALID_NC_P(ncObjPtr)   (ncObjPtr == 0 || ncObjPtr->isNull())
+#define IS_INVALID_NC_P(ncObjPtr)   (ncObjPtr == nullptr || ncObjPtr->isNull())
 
 #define GET_NC_NAME(ncObj)          ncObj.getName()
 #define GET_NC_NAME_P(ncObjPtr)     ncObjPtr->getName()
@@ -146,6 +146,7 @@ static const std::string standard_name_att_name        = "standard_name";
 static const std::string units_att_name                = "units";
 
 static const char nc_time_unit_exp[]    = "^[a-z|A-Z]* *since *[0-9]\\{1,4\\}-[0-9]\\{1,2\\}-[0-9]\\{1,2\\}";
+static const char nc_time_unit_ymd_exp[] = "[0-9]\\{1,4\\}-[0-9]\\{1,2\\}-[0-9]\\{1,2\\}";
 
 static const char MET_NC_Obs_ver_1_2[]  = "1.02";
 static const char MET_NC_Obs_version[]  = "1.02";
@@ -385,6 +386,7 @@ extern bool is_nc_unit_latitude(const char *units);
 
 extern void parse_cf_time_string(const char *str, unixtime &ref_ut,
                                  int &sec_per_unit);
+extern void parse_time_string(const char *str, unixtime &ut);
 
 ////////////////////////////////////////////////////////////////////////
 

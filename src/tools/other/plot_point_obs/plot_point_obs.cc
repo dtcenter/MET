@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -45,6 +45,7 @@ using namespace std;
 #include "main.h"
 #include "plot_point_obs.h"
 
+#include "is_netcdf_file.h"
 #include "data_plane_plot.h"
 #include "vx_ps.h"
 #include "vx_pxm.h"
@@ -185,6 +186,20 @@ void process_point_obs(const char *point_obs_filename) {
    if (use_python) python_compile_error(method_name);
 #endif
    {
+      if (!file_exists(point_obs_filename)) {
+         mlog << Error << "\n" << method_name
+              << point_obs_filename << " does not exist.\n\n";
+
+         exit(1);
+      }
+
+      if(is_ugrid_file(point_obs_filename)) {
+         mlog << Error << "\n" << program_name << " -> filetype "
+              << grdfiletype_to_string(FileType_UGrid) << " is not supported\n\n";
+
+         exit(1);
+      }
+
       if(!nc_point_obs.open(point_obs_filename)) {
          nc_point_obs.close();
 

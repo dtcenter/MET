@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -111,10 +111,9 @@
 //   053    12/11/21  Halley Gotway  MET #1991 Fix VCNT output.
 //   054    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
 //   055    10/03/22  Prestopnik     MET #2227 Remove using namespace netCDF from header files
+//   056    01/29/24  Halley Gotway  MET #2801 Configure time difference warnings
 //
 ////////////////////////////////////////////////////////////////////////
-
-using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
@@ -127,8 +126,6 @@ using namespace std;
 #include <sys/types.h>
 
 #include <netcdf>
-using namespace netCDF;
-
 #include "main.h"
 #include "handle_openmp.h"
 
@@ -140,7 +137,20 @@ using namespace netCDF;
 #include "vx_log.h"
 #include "seeps.h"
 
+#ifdef WITH_UGRID
+#include "vx_data2d_ugrid.h"
+#endif
+
+using namespace std;
+using namespace netCDF;
+
+
 ////////////////////////////////////////////////////////////////////////
+
+
+
+////////////////////////////////////////////////////////////////////////
+
 
 static void process_command_line(int, char **);
 static void setup_first_pass    (const DataPlane &);
@@ -182,6 +192,7 @@ static void finish_txt_files();
 static void clean_up();
 
 static void usage();
+static void set_config(const StringArray &);
 static void set_outdir(const StringArray &);
 static void set_compress(const StringArray &);
 static bool read_data_plane(VarInfo* info, DataPlane& dp, Met2dDataFile* mtddf,
@@ -220,6 +231,7 @@ void process_command_line(int argc, char **argv) {
    GrdFileType ftype, otype;
    ConcatString default_config_file;
    DataPlane dp;
+   const char *method_name = "process_command_line() -> ";
 
    // Set the default output directory
    out_dir = replace_path(default_out_dir);
@@ -259,6 +271,7 @@ void process_command_line(int argc, char **argv) {
 
    // Read the config files
    conf_info.read_config(default_config_file.c_str(), config_file.c_str());
+   conf_info.read_configs(config_files);
 
    // Get the forecast and observation file types from config, if present
    ftype = parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_fcst));
@@ -267,14 +280,14 @@ void process_command_line(int argc, char **argv) {
    // Read forecast file
    if(!(fcst_mtddf = mtddf_factory.new_met_2d_data_file(fcst_file.c_str(), ftype))) {
       mlog << Error << "\nTrouble reading forecast file \""
-           << fcst_file << "\"\n\n";
+           << fcst_file << "\". Override the FileType with \"file_type = FileType_<type>;\"\n\n";
       exit(1);
    }
 
    // Read observation file
    if(!(obs_mtddf = mtddf_factory.new_met_2d_data_file(obs_file.c_str(), otype))) {
       mlog << Error << "\nTrouble reading observation file \""
-           << obs_file << "\"\n\n";
+           << obs_file << "\". Override the FileType with \"file_type = FileType_<type>;\"\n\n";
       exit(1);
    }
 
@@ -284,6 +297,49 @@ void process_command_line(int argc, char **argv) {
 
    // Process the configuration
    conf_info.process_config(ftype, otype);
+
+   if (FileType_UGrid == ftype || FileType_UGrid == otype) {
+#ifdef WITH_UGRID
+      ConcatString ugrid_dataset = conf_info.ugrid_dataset;
+      if (0 < ugrid_dataset.length()) {
+         double max_distance_km = conf_info.ugrid_max_distance_km;
+         ConcatString ugrid_nc = conf_info.ugrid_nc;
+         ConcatString ugrid_map_config_filename = conf_info.ugrid_map_config;
+         if (FileType_UGrid == ftype) {
+            MetUGridDataFile *ugrid_mtddf = (MetUGridDataFile *)fcst_mtddf;
+            ugrid_mtddf->set_ugrid_configs(ugrid_dataset, max_distance_km,
+                                           ugrid_map_config_filename);
+            if (0 == ugrid_nc.length() || ugrid_nc == "NA") {
+               ConcatString coordinate_file = ugrid_mtddf->coordinate_file();
+               ugrid_nc = (0 < coordinate_file.length()) ? coordinate_file : fcst_file;
+            }
+            ugrid_mtddf->open_metadata(ugrid_nc.c_str());
+            mlog << Debug(9) << method_name
+                 << "FCST: ugrid_coordinates_nc: " << ugrid_nc
+                 << "  ugrid_max_distance_km: " << conf_info.ugrid_max_distance_km << "\n";
+         }
+         if (FileType_UGrid == otype) {
+            MetUGridDataFile *ugrid_mtddf = (MetUGridDataFile *)obs_mtddf;
+            ugrid_mtddf->set_ugrid_configs(ugrid_dataset, max_distance_km,
+                                           ugrid_map_config_filename);
+            if (0 == ugrid_nc.length() || ugrid_nc == "NA") {
+               ConcatString coordinate_file = ugrid_mtddf->coordinate_file();
+               ugrid_nc = (0 < coordinate_file.length()) ? coordinate_file : fcst_file;
+            }
+            ugrid_mtddf->open_metadata(ugrid_nc.c_str());
+            mlog << Debug(9) << method_name
+                 << "OBS: ugrid_coordinates_nc: " << ugrid_nc
+                 << "  ugrid_max_distance_km: " << conf_info.ugrid_max_distance_km << "\n";
+         }
+      }
+      else {
+         mlog << Error << "\n" << method_name
+              << conf_key_ugrid_dataset << " is not defined at the configuration file.\n\n";
+      }
+#else
+      ugrid_compile_error(method_name);
+#endif
+   }
 
    // For python types read the first field to set the grid
    if(is_python_grdfiletype(ftype)) {
@@ -385,7 +441,7 @@ void setup_txt_files(unixtime valid_ut, int lead_sec) {
    max_col += n_header_columns + 1;
 
    // Initialize file stream
-   stat_out = (ofstream *) 0;
+   stat_out = (ofstream *) nullptr;
 
    // Build the file name
    stat_file << base_name << stat_file_ext;
@@ -417,7 +473,7 @@ void setup_txt_files(unixtime valid_ut, int lead_sec) {
       if(conf_info.output_flag[i] == STATOutputType_Both) {
 
          // Initialize file stream
-         txt_out[i] = (ofstream *) 0;
+         txt_out[i] = (ofstream *) nullptr;
 
          // Build the file name
          txt_file[i] << base_name << "_" << txt_file_abbr[i]
@@ -636,11 +692,11 @@ void process_scores() {
 
    DataPlane seeps_dp, seeps_dp_fcat, seeps_dp_ocat;
 
-   CTSInfo    *cts_info    = (CTSInfo *) 0;
+   CTSInfo    *cts_info    = (CTSInfo *) nullptr;
    MCTSInfo    mcts_info;
-   VL1L2Info  *vl1l2_info  = (VL1L2Info *) 0;
+   VL1L2Info  *vl1l2_info  = (VL1L2Info *) nullptr;
    NBRCNTInfo  nbrcnt_info;
-   NBRCTSInfo *nbrcts_info = (NBRCTSInfo *) 0;
+   NBRCTSInfo *nbrcts_info = (NBRCTSInfo *) nullptr;
    GRADInfo    grad_info;
    DMAPInfo    dmap_info;
 
@@ -690,12 +746,21 @@ void process_scores() {
       // Check that the valid times match
       if(fcst_dp.valid() != obs_dp.valid()) {
 
-         mlog << Warning << "\nprocess_scores() -> "
-              << "Forecast and observation valid times do not match "
-              << unix_to_yyyymmdd_hhmmss(fcst_dp.valid()) << " != "
-              << unix_to_yyyymmdd_hhmmss(obs_dp.valid()) << " for "
-              << conf_info.vx_opt[i].fcst_info->magic_str() << " versus "
-              << conf_info.vx_opt[i].obs_info->magic_str() << ".\n\n";
+         cs << cs_erase
+            << "Forecast and observation valid times do not match ("
+            << unix_to_yyyymmdd_hhmmss(fcst_dp.valid()) << " != "
+            << unix_to_yyyymmdd_hhmmss(obs_dp.valid()) << ") for "
+            << conf_info.vx_opt[i].fcst_info->magic_str() << " versus "
+            << conf_info.vx_opt[i].obs_info->magic_str() << ".";
+
+         if(conf_info.conf.time_offset_warning(
+               (int) (fcst_dp.valid() - obs_dp.valid()))) {
+            mlog << Warning << "\nprocess_scores() -> "
+                 << cs << "\n\n";
+         }
+         else {
+            mlog << Debug(3) << cs << "\n";
+         }
       }
 
       // Check that the accumulation intervals match
@@ -705,9 +770,9 @@ void process_scores() {
 
          mlog << Warning << "\nprocess_scores() -> "
               << "Forecast and observation accumulation times "
-              << "do not match " << sec_to_hhmmss(fcst_dp.accum())
+              << "do not match (" << sec_to_hhmmss(fcst_dp.accum())
               << " != " << sec_to_hhmmss(obs_dp.accum())
-              << " for " << conf_info.vx_opt[i].fcst_info->magic_str()
+              << ") for " << conf_info.vx_opt[i].fcst_info->magic_str()
               << " versus " << conf_info.vx_opt[i].obs_info->magic_str()
               << ".\n\n";
       }
@@ -1858,9 +1923,9 @@ void process_scores() {
    mlog << Debug(2) << "\n" << sep_str << "\n\n";
 
    // Deallocate memory
-   if(cts_info)    { delete [] cts_info;    cts_info    = (CTSInfo *)    0; }
-   if(vl1l2_info)  { delete [] vl1l2_info;  vl1l2_info  = (VL1L2Info *)  0; }
-   if(nbrcts_info) { delete [] nbrcts_info; nbrcts_info = (NBRCTSInfo *) 0; }
+   if(cts_info)    { delete [] cts_info;    cts_info    = (CTSInfo *)    nullptr; }
+   if(vl1l2_info)  { delete [] vl1l2_info;  vl1l2_info  = (VL1L2Info *)  nullptr; }
+   if(nbrcts_info) { delete [] nbrcts_info; nbrcts_info = (NBRCTSInfo *) nullptr; }
 
    return;
 }
@@ -1996,8 +2061,8 @@ void do_mcts(MCTSInfo &mcts_info, int i_vx,
 void do_cnt_sl1l2(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
    int i, j, k, n_bin;
    PairDataPoint pd_thr, pd;
-   SL1L2Info *sl1l2_info = (SL1L2Info *) 0;
-   CNTInfo   *cnt_info   = (CNTInfo *)   0;
+   SL1L2Info *sl1l2_info = (SL1L2Info *) nullptr;
+   CNTInfo   *cnt_info   = (CNTInfo *)   nullptr;
 
    mlog << Debug(2)
         << "Computing Scalar Partial Sums and Continuous Statistics.\n";
@@ -2175,8 +2240,8 @@ void do_cnt_sl1l2(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
    } // end for i (fcnt_ta)
 
    // Dealloate memory
-   if(sl1l2_info) { delete [] sl1l2_info; sl1l2_info = (SL1L2Info *) 0; }
-   if(cnt_info)   { delete [] cnt_info;   cnt_info   = (CNTInfo *)   0; }
+   if(sl1l2_info) { delete [] sl1l2_info; sl1l2_info = (SL1L2Info *) nullptr; }
+   if(cnt_info)   { delete [] cnt_info;   cnt_info   = (CNTInfo *)   nullptr; }
 
    return;
 }
@@ -2187,6 +2252,9 @@ void do_vl1l2(VL1L2Info *&v_info, int i_vx,
               const PairDataPoint *pd_u_ptr,
               const PairDataPoint *pd_v_ptr) {
    int i, j;
+
+   mlog << Debug(2)
+        << "Computing Vector Partial Sums and Continuous Vector Statistics.\n";
 
    // Check that the number of pairs are the same
    if(pd_u_ptr->n_obs != pd_v_ptr->n_obs) {
@@ -2230,7 +2298,7 @@ void do_vl1l2(VL1L2Info *&v_info, int i_vx,
 void do_pct(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
    int i, j, k, n_bin;
    PairDataPoint pd;
-   PCTInfo *pct_info = (PCTInfo *) 0;
+   PCTInfo *pct_info = (PCTInfo *) nullptr;
 
    mlog << Debug(2)
         << "Computing Probabilistic Statistics.\n";
@@ -2340,7 +2408,7 @@ void do_pct(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
    } // end for i (ocnt_ta)
 
    // Dealloate memory
-   if(pct_info) { delete [] pct_info; pct_info = (PCTInfo *) 0; }
+   if(pct_info) { delete [] pct_info; pct_info = (PCTInfo *) nullptr; }
 
    return;
 }
@@ -2772,7 +2840,7 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
    } // end for i
 
    // Deallocate and clean up
-   if(data) { delete [] data; data = (float *) 0; }
+   if(data) { delete [] data; data = (float *) nullptr; }
 
    return;
 }
@@ -2807,8 +2875,8 @@ void write_nbrhd_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
    // Store the apply_mask option
    apply_mask = conf_info.vx_opt[i_vx].nc_info.do_apply_mask;
 
-   float *fcst_data = (float *) 0;
-   float *obs_data  = (float *) 0;
+   float *fcst_data = (float *) nullptr;
+   float *obs_data  = (float *) nullptr;
 
    NcVar fcst_var;
    NcVar obs_var;
@@ -2941,8 +3009,8 @@ void write_nbrhd_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
    }
 
    // Deallocate and clean up
-   if(fcst_data) { delete [] fcst_data; fcst_data = (float *) 0; }
-   if(obs_data)  { delete [] obs_data;  obs_data  = (float *) 0; }
+   if(fcst_data) { delete [] fcst_data; fcst_data = (float *) nullptr; }
+   if(obs_data)  { delete [] obs_data;  obs_data  = (float *) nullptr; }
 
    return;
 }
@@ -3006,8 +3074,8 @@ void clean_up() {
    }
 
    // Deallocate memory for data files
-   if(fcst_mtddf) { delete fcst_mtddf; fcst_mtddf = (Met2dDataFile *) 0; }
-   if(obs_mtddf)  { delete obs_mtddf;  obs_mtddf  = (Met2dDataFile *) 0; }
+   if(fcst_mtddf) { delete fcst_mtddf; fcst_mtddf = (Met2dDataFile *) nullptr; }
+   if(obs_mtddf)  { delete obs_mtddf;  obs_mtddf  = (Met2dDataFile *) nullptr; }
 
    // Deallocate memory for the random number generator
    rng_free(rng_ptr);
@@ -3040,6 +3108,9 @@ void usage() {
         << "\t\t\"config_file\" is a GridStatConfig file containing "
         << "the desired configuration settings (required).\n"
 
+        << "\t\t\"-config config_file\" specifies additional PointStatConfig file containing "
+        << "the configuration settings for unstructured grid (optional).\n"
+
         << "\t\t\"-outdir path\" overrides the default output directory "
         << "(" << out_dir << ") (optional).\n"
 
@@ -3053,6 +3124,13 @@ void usage() {
         << conf_info.get_compression_level() << ") (optional).\n\n" << flush;
 
    exit(1);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_config(const StringArray & a)
+{
+   config_files.add(a[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////

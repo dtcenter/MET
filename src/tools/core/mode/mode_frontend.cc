@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -35,6 +35,9 @@ using namespace std;
 extern const char * const program_name;
 
 static ModeExecutive *mode_exec = 0;
+
+// used only for traditional mode, multivar sets it into config previous
+// to the frontend creation
 static int compress_level = -1;
 
 ///////////////////////////////////////////////////////////////////////
@@ -58,26 +61,25 @@ ModeFrontEnd::~ModeFrontEnd()
    }
 }
 
+
+
 ///////////////////////////////////////////////////////////////////////
 
-int ModeFrontEnd::run(const StringArray & Argv, Processing_t ptype, int field_index, int n_files)
+int ModeFrontEnd::run_traditional(const StringArray & Argv) 
 
 {
+   init();
 
-   mlog << Debug(1) << "Running mode front end " << stype(ptype) << "\n";
-   //Argv.dump(cout, 0);
-   
-   if ( mode_exec )  { delete mode_exec;  mode_exec = 0; }
-   mode_exec = new ModeExecutive;
-   compress_level = -1;
+   int field_index = -1;
+   int n_files = 1;
 
    //
    // Process the command line arguments
    //
 
-   process_command_line(Argv, false);
+   process_command_line(Argv);
 
-   mode_exec->init(n_files, ptype != SINGLE_VAR);
+   mode_exec->init_traditional(n_files);
 
    ModeConfInfo & conf = mode_exec->engine.conf_info;
    if ( field_index >= 0 )  conf.set_field_index(field_index);
@@ -85,154 +87,21 @@ int ModeFrontEnd::run(const StringArray & Argv, Processing_t ptype, int field_in
 
 
    //
-   // read in data (Note double reads for pass 1 merge and pass 1 not desired)
+   // read in data
    //
 
-   mode_exec->setup_fcst_obs_data();
+   mode_exec->setup_traditional_fcst_obs_data();
 
    //
    // mode algorithm
    //
    if ( conf.quilt )  {
 
-      do_quilt(ptype);
+      do_quilt();
 
    } else {
 
-      do_straight(ptype);
-
-   }
-
-   //
-   //  done
-   //
-
-#ifdef  WITH_PYTHON
-   GP.finalize();
-#endif
-   return (0);
-}
-
-///////////////////////////////////////////////////////////////////////
-
-int ModeFrontEnd::run_multivar_pass2(const StringArray & Argv, const MultiVarData &mvd,
-                                     bool has_union, 
-                                     ShapeData &f_merge, ShapeData &o_merge, int field_index)
-{
-   Processing_t ptype = MULTIVAR_PASS2;
-   mlog << Debug(1) << "Running mode front end " << stype(ptype) << "\n";
-   //Argv.dump(cout, 0);
-
-   if ( mode_exec )  { delete mode_exec;  mode_exec = 0; }
-
-   mode_exec = new ModeExecutive;
-   compress_level = -1;
-
-   //
-   // Process the command line arguments
-   //
-
-   process_command_line(Argv, true);
-   mode_exec->init_multivar(mvd._ftype, mvd._otype);
-
-   ModeConfInfo & conf = mode_exec->engine.conf_info;
-   if (compress_level >= 0) conf.nc_info.set_compress_level(compress_level);
-   //if ( field_index >= 0 )
-   conf.set_field_index(field_index);
-
-   // for multivar pass2, explicity set the level and units using stored values
-   // from pass1
-   
-   conf.Fcst->var_info->set_level_name(mvd._flevel.c_str());
-   conf.Obs->var_info->set_level_name(mvd._olevel.c_str());
-   conf.Fcst->var_info->set_units(mvd._funits.c_str());
-   conf.Obs->var_info->set_units(mvd._ounits.c_str());
-
-   if (has_union && (conf.Fcst->merge_flag == MergeType_Thresh ||
-                     conf.Obs->merge_flag == MergeType_Thresh)) {
-      mlog << Warning << "\nModeFrontEnd::run() -> "
-           << "Logic includes union '||' along with  'merge_flag=THRESH' "
-           << ". This can lead to bad results\n\n";
-   }
-       
-   //
-   // set up data access using inputs
-   //
-   mode_exec->setup_fcst_obs_data(mvd);
-
-   //
-   // run the mode algorithm
-   //
-
-   if ( conf.quilt )  {
-
-      do_quilt(ptype);
-
-   } else {
-
-      do_straight(ptype, mvd, f_merge, o_merge);
-
-   }
-
-   //
-   //  done
-   //
-
-#ifdef  WITH_PYTHON
-   GP.finalize();
-#endif
-   return (0);
-}
-
-
-///////////////////////////////////////////////////////////////////////
-
-int ModeFrontEnd::run_super(const StringArray & Argv, 
-                            ShapeData &f_super, ShapeData &o_super,
-                            ShapeData &f_merge, ShapeData &o_merge,
-                            GrdFileType ftype, GrdFileType otype, const Grid &grid,
-                            bool has_union)
-{
-   Processing_t ptype = MULTIVAR_SUPER;
-   mlog << Debug(1) << "Running mode front end " << stype(ptype) << "\n";
-   //Argv.dump(cout, 0);
-
-   if ( mode_exec )  { delete mode_exec;  mode_exec = 0; }
-
-   mode_exec = new ModeExecutive;
-   compress_level = -1;
-
-   //
-   // Process the command line arguments
-   //
-
-   process_command_line(Argv, true);
-   mode_exec->init_multivar(ftype, otype);
-   ModeConfInfo & conf = mode_exec->engine.conf_info;
-   if (compress_level >= 0) conf.nc_info.set_compress_level(compress_level);
-   if (has_union && (conf.Fcst->merge_flag == MergeType_Thresh ||
-                     conf.Obs->merge_flag == MergeType_Thresh)) {
-      mlog << Warning << "\nModeFrontEnd::run() -> "
-           << "Logic includes union '||' along with  'merge_flag=THRESH' "
-           << ". This can lead to bad results\n\n";
-   }
-       
-   //
-   // set up data access using inputs
-   //
-   mode_exec->setup_fcst_obs_data(f_super, o_super, grid);
-
-   //
-   // run the mode algorithm
-   //
-
-   if ( conf.quilt )  {
-
-      do_quilt(ptype);
-
-   } else {
-
-      do_straight(ptype, f_merge, o_merge);
+      do_straight();
 
    }
 
@@ -249,60 +118,20 @@ int ModeFrontEnd::run_super(const StringArray & Argv,
 ///////////////////////////////////////////////////////////////////////
 
 
-void ModeFrontEnd::do_straight(Processing_t ptype, const MultiVarData &mvd,
-                               ShapeData &f_merge, ShapeData &o_merge)
+void ModeFrontEnd::do_straight()
 
 {
-   if (ptype != MULTIVAR_PASS2) {
-      
-      mlog << Error
-           << "\n\n  "
-           << program_name
-           << ": called MULTIVAR_PASS2 method with "
-           << stype(ptype) << "\n\n";
-      exit ( 1 );
+   int NCT, NCR;
 
-   }
-
-   const ModeConfInfo & conf = mode_exec->engine.conf_info;
-
-   const int NCT = conf.n_conv_threshs();
-   const int NCR = conf.n_conv_radii();
-
-   if ( NCT != NCR )  {
-
-      mlog << Error
-           << "\n\n  "
-           << program_name
-           << ": all convolution radius and threshold arrays must have the same number of elements!\n\n";
-
-      exit ( 1 );
-
-   }
-
-   if (NCT > 1) {
-      mlog << Error
-           << "\n\n  "
-           << program_name
-           << ": multiple convolution radii and thresholds not implemented in multivar mode\n\n";
-
-         exit ( 1 );
-   }
-      
-      
-
-   int index;
+   do_straight_init(NCT, NCR);
 
    mode_exec->clear_internal_r_index();
 
-   for (index=0; index<NCT; ++index)  {
+   for (int index=0; index<NCT; ++index)  {
 
-      mode_exec->do_conv_thresh(index, index, false, true);
-      mode_exec->do_match_merge(f_merge, o_merge, ptype == MULTIVAR_SUPER);
-
-      // here replace raw data and min/max for plotting
-
-      mode_exec->process_output(true, false, &mvd);
+      mode_exec->do_conv_thresh_traditional(index, index);
+      mode_exec->do_match_merge_traditional();
+      mode_exec->process_output_traditional();
    }
 
    mode_exec->clear_internal_r_index();
@@ -315,149 +144,12 @@ void ModeFrontEnd::do_straight(Processing_t ptype, const MultiVarData &mvd,
 
 }
 
-
 ///////////////////////////////////////////////////////////////////////
 
 
-void ModeFrontEnd::do_straight(Processing_t ptype)
+void ModeFrontEnd::do_quilt()
 
 {
-
-   const ModeConfInfo & conf = mode_exec->engine.conf_info;
-
-   const int NCT = conf.n_conv_threshs();
-   const int NCR = conf.n_conv_radii();
-
-   if ( NCT != NCR )  {
-
-      mlog << Error
-           << "\n\n  "
-           << program_name
-           << ": all convolution radius and threshold arrays must have the same number of elements!\n\n";
-
-      exit ( 1 );
-
-   }
-
-   if (NCT > 1 && ptype != SINGLE_VAR) {
-      mlog << Error
-           << "\n\n  "
-           << program_name
-           << ": multiple convolution radii and thresholds not implemented in multivar mode\n\n";
-
-         exit ( 1 );
-   }
-      
-      
-
-   int index;
-
-   mode_exec->clear_internal_r_index();
-
-   for (index=0; index<NCT; ++index)  {
-
-      mode_exec->do_conv_thresh(index, index, ptype == MULTIVAR_PASS1_MERGE,
-                                ptype == MULTIVAR_PASS2, ptype == MULTIVAR_SUPER);
-
-      if (ptype == SINGLE_VAR) {
-
-         mode_exec->do_match_merge();
-         mode_exec->process_output(false, false);
-      }
-   }
-
-   mode_exec->clear_internal_r_index();
-  
-   //
-   //  done
-   //
-
-   return;
-
-}
-
-
-///////////////////////////////////////////////////////////////////////
-
-
-void ModeFrontEnd::do_straight(Processing_t ptype,
-                               ShapeData &f_merge, ShapeData &o_merge)
-
-{
-
-   const ModeConfInfo & conf = mode_exec->engine.conf_info;
-
-   const int NCT = conf.n_conv_threshs();
-   const int NCR = conf.n_conv_radii();
-
-   if ( NCT != NCR )  {
-
-      mlog << Error
-           << "\n\n  "
-           << program_name
-           << ": all convolution radius and threshold arrays must have the same number of elements!\n\n";
-
-      exit ( 1 );
-
-   }
-
-   if (NCT > 1 && ptype != SINGLE_VAR) {
-      mlog << Error
-           << "\n\n  "
-           << program_name
-           << ": multiple convolution radii and thresholds not implemented in multivar mode\n\n";
-
-         exit ( 1 );
-   }
-      
-      
-
-   int index;
-
-   mode_exec->clear_internal_r_index();
-
-   for (index=0; index<NCT; ++index)  {
-
-      mode_exec->do_conv_thresh(index, index, ptype == MULTIVAR_PASS1_MERGE,
-                                ptype == MULTIVAR_PASS2, ptype == MULTIVAR_SUPER);
-
-      if (ptype == SINGLE_VAR) {
-
-         mode_exec->do_match_merge();
-         mode_exec->process_output(false, false);
-      }
-
-      if (ptype == MULTIVAR_SUPER) {
-         mode_exec->do_match_merge(f_merge, o_merge, ptype == MULTIVAR_SUPER);
-         mode_exec->process_output(false, true);
-      }
-   }
-
-   mode_exec->clear_internal_r_index();
-  
-   //
-   //  done
-   //
-
-   return;
-
-}
-
-
-///////////////////////////////////////////////////////////////////////
-
-
-void ModeFrontEnd::do_quilt(Processing_t ptype)
-
-{
-   if (ptype != SINGLE_VAR) {
-      mlog << Error
-           << program_name << ": quilting not yet implemented for multivar mode \n\n";
-
-      exit ( 1 );
-   }
-      
-
    int t_index, r_index;   //  indices into the convolution threshold and radius arrays
 
 
@@ -466,14 +158,9 @@ void ModeFrontEnd::do_quilt(Processing_t ptype)
    for (r_index=0; r_index<(mode_exec->n_conv_radii()); ++r_index)  {
 
       for (t_index=0; t_index<(mode_exec->n_conv_threshs()); ++t_index)  {
-
-         mode_exec->do_conv_thresh(r_index, t_index);
-
-         mode_exec->do_match_merge();
-
-         if (ptype == SINGLE_VAR) {
-            mode_exec->process_output();
-         }
+         mode_exec->do_conv_thresh_traditional(r_index, t_index);
+         mode_exec->do_match_merge_traditional();
+         mode_exec->process_output_traditional();
       }
    }
 
@@ -489,19 +176,39 @@ void ModeFrontEnd::do_quilt(Processing_t ptype)
 
 ///////////////////////////////////////////////////////////////////////
 
-MultiVarData *ModeFrontEnd::get_multivar_data() {return mode_exec->get_multivar_data(); }
-
-
-///////////////////////////////////////////////////////////////////////
-
-void ModeFrontEnd::addMultivarMergePass1(MultiVarData *mvdi)
+void ModeFrontEnd::init()
 {
-   return mode_exec->addMultivarMergePass1(mvdi);
+   mlog << Debug(1) << "Running traditional mode front end\n";
+
+   if ( mode_exec )  { delete mode_exec;  mode_exec = 0; }
+
+   mode_exec = new ModeExecutive();//ModeExecutive::TRADITIONAL);
+   compress_level = -1;
 }
 
 ///////////////////////////////////////////////////////////////////////
 
-void ModeFrontEnd::process_command_line(const StringArray & argv, bool ismultivar)
+void ModeFrontEnd::do_straight_init(int &NCT, int &NCR) const
+{
+   const ModeConfInfo & conf = mode_exec->engine.conf_info;
+
+   NCT = conf.n_conv_threshs();
+   NCR = conf.n_conv_radii();
+
+   if ( NCT != NCR )  {
+
+      mlog << Error << "\nModeFrontEnd::do_straight_init() ->"
+           << "all convolution radius and threshold arrays must have the same number of elements\n\n";
+
+      exit ( 1 );
+
+   }
+}
+
+      
+///////////////////////////////////////////////////////////////////////
+
+void ModeFrontEnd::process_command_line(const StringArray & argv)
 {
    CommandLine cline;
    ConcatString s;
@@ -514,7 +221,7 @@ void ModeFrontEnd::process_command_line(const StringArray & argv, bool ismultiva
    mode_exec->out_dir = replace_path(default_out_dir);
 
    //
-   // Check for zero arguments (note not correct for multivar mode, want to show multivar_usage
+   // Check for zero arguments 
    //
 
    if(argc == 1) singlevar_usage();
@@ -526,7 +233,7 @@ void ModeFrontEnd::process_command_line(const StringArray & argv, bool ismultiva
    cline.set(argv);
 
    //
-   // Set the usage function NOTE wrong for multivar, want multivar_usage
+   // Set the usage function 
    //
 
    cline.set_usage(singlevar_usage);
@@ -547,63 +254,20 @@ void ModeFrontEnd::process_command_line(const StringArray & argv, bool ismultiva
 
    cline.parse();
 
-   if (ismultivar) {
-      //
-      // Check for error. There should be 1 argument left:
-      // config filename
-      //
-      if(cline.n() != 1) singlevar_usage();  // wrong need multivar usage
+   //
+   // Check for error. There should be three arguments left:
+   // forecast, observation, and config filenames
+   //
+   if(cline.n() != 3) singlevar_usage();
 
-      //
-      // Store the input forecast and observation file names, placeholders
-      //
-      mode_exec->fcst_file         = "not set";
-      mode_exec->obs_file          = "not set";
-      mode_exec->match_config_file = cline[0];
+   //
+   // Store the input forecast and observation file names
+   //
+   mode_exec->fcst_file         = cline[0];
+   mode_exec->obs_file          = cline[1];
+   mode_exec->match_config_file = cline[2];
 
-   } else {
-      //
-      // Check for error. There should be three arguments left:
-      // forecast, observation, and config filenames
-      //
-      if(cline.n() != 3) singlevar_usage();
-
-      //
-      // Store the input forecast and observation file names
-      //
-      mode_exec->fcst_file         = cline[0];
-      mode_exec->obs_file          = cline[1];
-      mode_exec->match_config_file = cline[2];
-
-   }
 }
-
-///////////////////////////////////////////////////////////////////////
-
-string ModeFrontEnd::stype(Processing_t t)
-{
-   string s;
-   switch (t) {
-   case MULTIVAR_PASS1:
-      s = "Multivar Pass 1";
-      break;
-   case MULTIVAR_PASS1_MERGE:
-      s = "Multivar Pass 1 Merge";
-      break;
-   case MULTIVAR_PASS2:
-      s = "Multivar Pass 2";
-      break;
-   case MULTIVAR_SUPER:
-      s = "Multivar Superobject Pass";
-      break;
-   case SINGLE_VAR:
-   default:
-      s = "SingleVar";
-      break;
-   }
-   return s;
-}
-
 
 ///////////////////////////////////////////////////////////////////////
 

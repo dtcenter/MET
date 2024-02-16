@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -15,8 +15,9 @@
 //
 //   Mod#   Date      Name           Description
 //   ----   ----      ----           -----------
-//   000    11-05-31  Halley Gotway  Adapated from wrfdata.cc.
-//   001    14-05-29  Halley Gotway  Add ShapeData::n_objects()
+//   000    05/31/11  Halley Gotway  Adapated from wrfdata.cc
+//   001    05/29/14  Halley Gotway  Add ShapeData::n_objects()
+//   002    11/02/23  Halley Gotway  MET #2724 add OpenMP to convolution
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -93,11 +94,11 @@ ShapeData::ShapeData(const ShapeData &f) {
 
 ShapeData & ShapeData::operator=(const ShapeData &f) {
 
-   if ( this == &f )  return ( *this );
+   if ( this == &f )  return *this;
 
    assign(f);
 
-   return(*this);
+   return *this;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -132,13 +133,11 @@ int ShapeData::x_left(int y) const {
       exit(1);
    }
 
-   int x;
-
-   for(x=0; x<data.nx(); x++) {
-      if(f_is_on(x, y)) return(x);
+   for(int x=0; x<data.nx(); x++) {
+      if(f_is_on(x, y)) return x;
    }
 
-   return(-1);
+   return -1;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -151,13 +150,11 @@ int ShapeData::x_right(int y) const {
       exit(1);
    }
 
-   int x;
-
-   for(x=(data.nx() - 1); x>=0; x--) {
-      if(f_is_on(x, y)) return(x);
+   for(int x=(data.nx() - 1); x>=0; x--) {
+      if(f_is_on(x, y)) return x;
    }
 
-   return(-1);
+   return -1;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -169,12 +166,12 @@ bool ShapeData::s_is_on(int x, int y, bool error_out) const
    // Unless error out is true, return bad status for being off the grid
 
    if(!error_out) {
-      if(x < 0 || x >= data.nx() || y < 0 || y >= data.ny()) return ( false );
+      if(x < 0 || x >= data.nx() || y < 0 || y >= data.ny()) return false;
    }
 
    // Check if the current point is non-zero
 
-   return ( data(x, y) > 0.0 );
+   return data(x, y) > 0.0;
 
 }
 
@@ -187,12 +184,12 @@ bool ShapeData::f_is_on(int x, int y) const
 
    // Check if the current point or any of of it's neighbors are non-zero
 
-   if(s_is_on(x, y))                            return ( true );
-   if((x > 0) && s_is_on(x-1, y))               return ( true );
-   if((x > 0) && (y > 0) && s_is_on(x-1, y-1))  return ( true );
-   if((y > 0) && s_is_on(x, y-1))               return ( true );
+   if(s_is_on(x, y))                            return true;
+   if((x > 0) && s_is_on(x-1, y))               return true;
+   if((x > 0) && (y > 0) && s_is_on(x-1, y-1))  return true;
+   if((y > 0) && s_is_on(x, y-1))               return true;
 
-   return(false);
+   return false;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -201,16 +198,15 @@ void ShapeData::calc_moments()
 
 {
 
-   int x, y;
    double xx, yy;
 
    mom.clear();
 
-   for(x=0; x<data.nx(); ++x) {
+   for(int x=0; x<data.nx(); ++x) {
 
       xx = ((double) x);
 
-      for(y=0; y<data.ny(); ++y) {
+      for(int y=0; y<data.ny(); ++y) {
 
          yy =((double) y);
 
@@ -252,14 +248,14 @@ void ShapeData::centroid(double &xbar, double &ybar) const {
 
 double ShapeData::angle_degrees() const {
 
-   return(mom.angle_degrees());
+   return mom.angle_degrees();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 double ShapeData::curvature(double &xcurv, double &ycurv) const {
 
-   return(mom.curvature(xcurv, ycurv));
+   return mom.curvature(xcurv, ycurv);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -268,28 +264,27 @@ double ShapeData::area() const {
 
    double x = (double) (mom.s_area);
 
-   return(x);
+   return x;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 double ShapeData::area_thresh(const ShapeData *raw_ptr,
                               const SingleThresh &obj_thresh) const {
-   int i, cur_area;
+   int cur_area = 0;
    const int Nxy = data.nx()*data.ny();
 
    // Number of points inside the object that meet the threshold criteria
-   for(i=0, cur_area=0; i<Nxy; i++) {
+   for(int i=0; i<Nxy; i++) {
       if(data.data()[i] > 0 && obj_thresh.check(raw_ptr->data.data()[i])) cur_area++;
    }
 
-   return(cur_area);
+   return cur_area;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 void ShapeData::calc_length_width(double &l, double &w) const {
-   int x, y;
    double xx, yy;
    double u, v, u_max, u_min, v_max, v_min;
    double u_extent, v_extent;
@@ -308,8 +303,8 @@ void ShapeData::calc_length_width(double &l, double &w) const {
    u_max = v_max = -1.0e30;
    u_min = v_min =  1.0e30;
 
-   for (x=0; x<data.nx(); ++x) {
-      for (y=0; y<data.ny(); ++y) {
+   for (int x=0; x<data.nx(); ++x) {
+      for (int y=0; y<data.ny(); ++y) {
 
          if(!f_is_on(x, y)) continue;
 
@@ -343,7 +338,7 @@ double ShapeData::length() const {
 
    calc_length_width(l, w);
 
-   return(l);
+   return l;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -353,7 +348,7 @@ double ShapeData::width() const {
 
    calc_length_width(l, w);
 
-   return(w);
+   return w;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -362,7 +357,7 @@ double ShapeData::complexity() const {
    int count;
    double shape;
    double hull;
-   double u;
+   double u = 0.;
    Polyline poly;
 
    count = nint(mom.s_area);
@@ -383,18 +378,19 @@ double ShapeData::complexity() const {
    // convex hull.  0 <= Complexity < 1, and complexity = 0 indicates
    // that the shape is convex.
    //
-   u = (hull - shape)/hull;
+   if (!is_eq(hull, 0.)) u = (hull - shape)/hull;
 
-   return(u);
+   return u;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 double ShapeData::intensity_percentile(const ShapeData *raw_ptr, int perc,
                                        bool precip_flag) const {
-   int i, n;
-   double * val = (double *) 0;
-   double val_sum, v;
+   int n = 0;
+   double * val = (double *) nullptr;
+   double v;
+   double val_sum = 0.0;
    const int Nxy = data.nx()*data.ny();
 
    if(perc < 0 || perc > 102) {
@@ -406,7 +402,7 @@ double ShapeData::intensity_percentile(const ShapeData *raw_ptr, int perc,
    val = new double [Nxy];
 
    // Compute the requested percentile of intensity
-   for(i=0, n=0, val_sum=0.0; i<Nxy; i++) {
+   for(int i=0; i<Nxy; i++) {
 
       // Process points for the current object
       if(data.data()[i] > 0) {
@@ -438,9 +434,9 @@ double ShapeData::intensity_percentile(const ShapeData *raw_ptr, int perc,
    }
 
    // Clean up
-   if(val) { delete [] val; val = (double *) 0; };
+   if(val) { delete [] val; val = (double *) nullptr; };
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -508,164 +504,121 @@ double ShapeData::get_attr(const ConcatString &attr_name,
       attr_val = bad_data_double;
    }
 
-   return(attr_val);
+   return attr_val;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void ShapeData::conv_filter_circ(int diameter, double vld_thresh) {
+   const char *method_name = "ShapeData::conv_filter_circ() -> ";
+   GridPoint *gp = nullptr;
+   int x, y, count, n_vld;
+   double v, v_sum;
+   DataPlane conv_dp;
 
-void ShapeData::conv_filter_circ(int diameter, double vld_thresh)
-
-{
-
-int x, y, xx, yy, u, v;
-int dn, fn, nn;
-int vpr, upr;
-int count, bd_count;
-double center, cur, sum;
-double dx, dy, dist;
-double vld_ratio;
-const int nx = data.nx();
-const int ny = data.ny();
-bool * f = (bool *) 0;
-bool center_bad = false;
-DataPlane in_data = data;
-const bool vld_thresh_one = is_eq(vld_thresh, 1.0);
-
-
-if ( (diameter%2 == 0) || (diameter < 3) )  {
-
-   mlog << Error << "\nShapeData::conv_filter_circ() -> "
-        << "diameter must be odd and >= 3 ... diameter = "
-        << diameter << "\n\n";
-
-   exit(1);
-
-}
-
-const int radius = (diameter - 1)/2;
-
-const vector<double> * in  = &(in_data.Data);
-      vector<double> * out = &(data.Data);
-
-f = new bool [diameter*diameter];
-
-   //
-   //  set up the filter
-   //
-
-for (y=0; y<diameter; ++y)  {
-
-   dy = y - radius;
-
-   for (x=0; x<diameter; ++x)  {
-
-      dx = x - radius;
-
-      dist = sqrt( dx*dx + dy*dy );
-
-      fn = STANDARD_XY_YO_N(diameter, x, y) ;
-
-      f[fn] = (dist <= radius);
-
+   // Check the diameter
+   if(diameter%2 == 0 || diameter < 3) {
+      mlog << Error << "\n" << method_name
+           << "diameter must be odd and >= 3 ... diameter = "
+           << diameter << "\n\n";
+      exit(1);
    }
 
-}
+#pragma omp parallel default(none)                   \
+   shared(mlog, data, conv_dp, diameter, vld_thresh) \
+   private(x, y, count, n_vld, v, v_sum, gp)
+   {
 
-   //
-   //  do the convolution
-   //
+      // Build the grid template with shape circle and wrap_lon false
+      GridTemplateFactory gtf;
+      GridTemplate* gt = gtf.buildGT(GridTemplateFactory::GridTemplate_Circle,
+                                     diameter, false);
 
-dn = -1;
-
-for(y=0; y<ny; y++) {
-
-   for(x=0; x<nx; x++) {
-
-      ++dn;
-
-         //
-         // If the bad data threshold is set to zero and the center of the
-         // convolution radius contains bad data, set the convolved value to
-         // bad data and continue.
-         //
-
-      center = (*in)[dn];
-
-      center_bad = ::is_bad_data(center);
-
-      if ( center_bad && vld_thresh_one ) { (*out)[dn] = bad_data_double;  continue; }
-
-      sum      = 0.0;
-      count    = 0;
-      bd_count = 0;
-
-      for (v=-radius; v<=radius; ++v) {
-
-         yy = y + v;
-
-         if ( (yy < 0) || (yy >= ny) )  continue;
-
-         vpr = v + radius;
-
-         for(u=-radius; u<=radius; ++u) {
-
-            xx = x + u;
-
-            if ( (xx < 0) || (xx >= nx) )  continue;
-
-            upr = u + radius;
-
-            fn = STANDARD_XY_YO_N(diameter, upr, vpr);
-
-            if ( !(f[fn]) )  continue;
-
-            nn = STANDARD_XY_YO_N(nx, xx, yy) ;
-
-            cur = (*in)[nn];
-
-            if( ::is_bad_data(cur) ) { bd_count++;  continue; }
-
-            sum += cur;
-
-            count++;
-
-         } // for v
-
-      } // for u
-
-         //
-         //  If the center of the convolution contains bad data and the ratio
-         //  of bad data in the convolution area is too high, set the convoled
-         //  value to bad data.
-         //
-
-      if ( count == 0 )  sum = bad_data_double;
-      else {
-
-         vld_ratio = ((double) count)/(bd_count + count);
-
-         if ( center_bad && (vld_ratio < vld_thresh) )  sum = bad_data_double;
-         else                                           sum /= count;
-
+#pragma omp single
+      {
+         // Initialize the convolved field to bad data
+         conv_dp = data;
+         conv_dp.set_constant(bad_data_double);
       }
 
-      (*out)[dn] = sum;
+      // Compute the convolved values
+#pragma omp for schedule (static)
+      for(int x=0; x<data.nx(); x++) {
+         for(int y=0; y<data.ny(); y++) {
 
-   } // for y
+            // For a new column, reset the grid template and counts
+            if(y == 0) {
 
-} // for x
+               // Initialize counts and sum
+               count = 0;
+               n_vld = 0;
+               v_sum = 0.0;
 
-   //
-   //  done
-   //
+               // Sum all the points
+               for(gp  = gt->getFirstInGrid(x, y, data.nx(), data.ny());
+                   gp != nullptr;
+                   gp  = gt->getNextInGrid()) {
+                  v = data.get(gp->x, gp->y);
+                  count += 1;
+                  if(::is_bad_data(v)) continue;
+                  n_vld += 1;
+                  v_sum += v;
+               }
+            }
+            // Subtract off the bottom edge, shift up, and add the top
+            else {
 
-if ( f )  { delete [] f;   f = (bool *) 0; }
+               // Subtract points from the the bottom edge
+               for(gp  = gt->getFirstInBotEdge();
+                   gp != nullptr;
+                   gp  = gt->getNextInBotEdge()) {
+                  v = data.get(gp->x, gp->y);
+                  count -= 1;
+                  if(::is_bad_data(v)) continue;
+                  n_vld -= 1;
+                  v_sum -= v;
+               }
 
-return;
+               // Increment Y
+               gt->incBaseY(1);
 
+               // Add points from the the top edge
+               for(gp  = gt->getFirstInTopEdge();
+                   gp != nullptr;
+                   gp  = gt->getNextInTopEdge()) {
+                  v = data.get(gp->x, gp->y);
+                  count += 1;
+                  if(::is_bad_data(v)) continue;
+                  n_vld += 1;
+                  v_sum += v;
+               }
+            }
+
+            //  If the center of the convolution contains bad data and the ratio
+            //  of bad data in the convolution area is too high, set the convoled
+            //  value to bad data.
+            if(count == 0 || n_vld == 0)                v = bad_data_double;
+            else if(::is_bad_data(data.get(x, y)) &&
+                    (double)(n_vld)/count < vld_thresh) v = bad_data_double;
+            else                                        v = (double) v_sum/n_vld;
+            conv_dp.set(v, x, y);
+
+         } // end for y
+
+         // Increment X
+         if(x < (data.nx() - 1)) gt->incBaseX(1);
+
+      } // end for x
+
+      delete gt;
+
+   } // End of omp parallel
+
+   // Save the result
+   data = conv_dp;
+
+   return;
 }
-
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -674,7 +627,7 @@ Polyline ShapeData::convex_hull_new() const
 
 {
 
-int j, k, y;
+int j, k;
 int n_in, n_out;
 Polyline hull_poly;
 IntPoint * in = new IntPoint [2*(data.ny() + 1)];
@@ -682,7 +635,7 @@ IntPoint * in = new IntPoint [2*(data.ny() + 1)];
 
 n_in = 0;
 
-for (y=0; y<(data.ny()); ++y)  {
+for (int y=0; y<(data.ny()); ++y)  {
 
    j = x_left(y);
 
@@ -727,10 +680,10 @@ for (j=0; j<n_out; ++j)  {
    //  done
    //
 
-if ( out )  { delete [] out;  out = 0; }
-if (  in )  { delete []  in;   in = 0; }
+if ( out )  { delete [] out;  out = nullptr; }
+if (  in )  { delete []  in;   in = nullptr; }
 
-return ( hull_poly );
+return hull_poly;
 
 }
 
@@ -747,7 +700,7 @@ Polyline p;
 if ( use_new )  p = convex_hull_new ();
 else            p = convex_hull_old ();
 
-return ( p );
+return p;
 
 }
 
@@ -761,7 +714,7 @@ Polyline ShapeData::convex_hull_old() const
 
    int j, k, n, y;
    int done;
-   int *Index = (int *) 0;
+   int *Index = (int *) nullptr;
    Polyline outline;
    Polyline hull;
    double e1u, e1v, e2u, e2v;
@@ -934,9 +887,9 @@ Polyline ShapeData::convex_hull_old() const
       //  done
       //
 
-   delete [] Index;   Index = (int *) 0;
+   delete [] Index;   Index = (int *) nullptr;
 
-   return(hull);
+   return hull;
 
 }
 
@@ -950,7 +903,7 @@ Polyline ShapeData::single_boundary() const {
    // and clockwise set to true
    //
 
-   return( single_boundary(false, 1) );
+   return single_boundary(false, 1);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -967,7 +920,7 @@ Polyline ShapeData::single_boundary(bool all_points, int clockwise) const {
    // and clockwise set to true
    //
 
-   return( single_boundary_offset(all_points, clockwise, 0.0) );
+   return single_boundary_offset(all_points, clockwise, 0.0);
 }
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -988,7 +941,7 @@ Polyline ShapeData::single_boundary_offset(double d) const {
    // and clockwise set to true
    //
 
-   return( single_boundary_offset(false, 1, d) );
+   return single_boundary_offset(false, 1, d);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1030,7 +983,7 @@ Polyline ShapeData::single_boundary_offset(bool all_points, int clockwise,
       mlog << Debug(1) << "\n\nShapeData::single_boundary_offset() const -> "
            << "no points found in object\n\n";
 
-      return(boundary);
+      return boundary;
    }
 
    //
@@ -1095,7 +1048,7 @@ Polyline ShapeData::single_boundary_offset(bool all_points, int clockwise,
       }
    }
 
-   return(boundary);
+   return boundary;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1196,15 +1149,15 @@ if ( (nx_new <= 0) || (ny_new <= 0) )  {
 }
 
 
-int x_old, y_old, x_new, y_new;
+int x_old, y_old;
 DataPlane old = data;
 
 
-for (x_new=0; x_new<nx_new; ++x_new)  {
+for (int x_new=0; x_new<nx_new; ++x_new)  {
 
    x_old = x_new + W;
 
-   for (y_new=0; y_new<ny_new; ++y_new)  {
+   for (int y_new=0; y_new<ny_new; ++y_new)  {
 
       y_old = y_new + W;
 
@@ -1213,13 +1166,6 @@ for (x_new=0; x_new<nx_new; ++x_new)  {
    }
 
 }
-
-
-
-
-
-
-
 
 return;
 
@@ -1277,11 +1223,11 @@ Cell & Cell::operator=(const Cell & c)
 
 {
 
-if ( this == &c )  return ( * this );
+if ( this == &c )  return *this;
 
 assign(c);
 
-return ( * this );
+return *this;
 
 }
 
@@ -1382,15 +1328,13 @@ bool Cell::has(int k) const
 
 {
 
-int j;
+for (int j=0; j<n; ++j) {
 
-for (j=0; j<n; ++j) {
-
-   if ( e[j] == k )  return ( true );
+   if ( e[j] == k )  return true;
 
 }
 
-return ( false );
+return false;
 
 }
 
@@ -1458,11 +1402,11 @@ Partition & Partition::operator=(const Partition & p)
 
 {
 
-if ( this == &p )  return ( * this );
+if ( this == &p )  return *this;
 
 assign(p);
 
-return ( * this );
+return *this;
 
 }
 
@@ -1473,7 +1417,7 @@ void Partition::init_from_scratch()
 
 {
 
-c = (Cell **) 0;
+c = (Cell **) nullptr;
 
 clear();
 
@@ -1488,17 +1432,15 @@ void Partition::clear()
 
 {
 
-int j;
-
 if ( c )  {
 
-   for (j=0; j<n_alloc; ++j)  {
+   for (int j=0; j<n_alloc; ++j)  {
 
-     if ( c[j] )  { delete c[j];  c[j] = (Cell *) 0; }
+     if ( c[j] )  { delete c[j];  c[j] = (Cell *) nullptr; }
 
    }
 
-   delete [] c;  c = (Cell **) 0;
+   delete [] c;  c = (Cell **) nullptr;
 
 }
 
@@ -1547,7 +1489,7 @@ void Partition::extend(int N)
 
 if ( N <= n_alloc )  return;
 
-Cell ** u = (Cell **) 0;
+Cell ** u = (Cell **) nullptr;
 
 N = partition_alloc_inc*((N + partition_alloc_inc - 1)/partition_alloc_inc);
 
@@ -1557,16 +1499,14 @@ memset(u, 0, N*(sizeof(Cell *)));
 
 if ( c )  {
 
-   int j;
+   for(int j=0; j<n; ++j)  u[j] = c[j];
 
-   for(j=0; j<n; ++j)  u[j] = c[j];
-
-   delete [] c;  c = (Cell **) 0;
+   delete [] c;  c = (Cell **) nullptr;
 
 }
 
 
-c = u;  u = (Cell **) 0;
+c = u;  u = (Cell **) nullptr;
 
 n_alloc = N;
 
@@ -1583,15 +1523,13 @@ bool Partition::has(int k) const
 
 {
 
-int j;
+for (int j=0; j<n; ++j) {
 
-for (j=0; j<n; ++j) {
-
-   if ( c[j]->has(k) )  return ( true );
+   if ( c[j]->has(k) )  return true;
 
 }
 
-return ( false );
+return false;
 
 }
 
@@ -1601,15 +1539,13 @@ int Partition::which_cell(int k) const
 
 {
 
-int j;
+for (int j=0; j<n; ++j) {
 
-for (j=0; j<n; ++j) {
-
-   if ( c[j]->has(k) )  return ( j );
+   if ( c[j]->has(k) )  return j;
 
 }
 
-return ( -1 );
+return -1;
 
 }
 
@@ -1619,7 +1555,7 @@ void Partition::merge_cells(int j_1, int j_2)
 
 {
 
-int k, nn;
+int nn;
 int j_min, j_max;
 
 
@@ -1651,7 +1587,7 @@ if ( j_1 < j_2 ) {
 
 nn = c[j_max]->n;
 
-for (k=0; k<nn; ++k) {
+for (int k=0; k<nn; ++k) {
 
    c[j_min]->add(c[j_max]->e[k]);
 
@@ -1745,7 +1681,7 @@ double d;
 
 d = x_1*x_2 + y_1*y_2;
 
-return ( d );
+return d;
 
 }
 
@@ -1849,31 +1785,31 @@ int get_step_case(bool lr, bool ur, bool ul, bool ll) {
    //
 
    // Lower Left
-   if(!lr && !ur && !ul && ll) return(ll_case);
+   if(!lr && !ur && !ul && ll) return ll_case;
    // Lower Right
-   else if(lr && !ur && !ul && !ll) return(lr_case);
+   else if(lr && !ur && !ul && !ll) return lr_case;
 
    //
    // Valid cases with exactly two cells on
    //
 
    // Upper Left, Lower Left
-   else if(!lr && !ur && ul && ll) return(ul_ll_case);
+   else if(!lr && !ur && ul && ll) return ul_ll_case;
    // Lower Right, Upper Right
-   else if(lr && ur && !ul && !ll) return(lr_ur_case);
+   else if(lr && ur && !ul && !ll) return lr_ur_case;
    // Lower Right, Upper Left
-   else if(lr && !ur && ul && !ll) return(lr_ul_case);
+   else if(lr && !ur && ul && !ll) return lr_ul_case;
    // Upper Right, Lower Left
-   else if(!lr && ur && !ul && ll) return(ur_ll_case);
+   else if(!lr && ur && !ul && ll) return ur_ll_case;
 
    //
    // Valid cases with exactly three cells on
    //
 
    // Upper Right, Upper Left, Lower Left
-   else if(!lr && ur && ul && ll) return(ur_ul_ll_case);
+   else if(!lr && ur && ul && ll) return ur_ul_ll_case;
    // Lower Right, Upper Right, Upper Left
-   else if(lr && ur && ul && !ll) return(lr_ur_ul_case);
+   else if(lr && ur && ul && !ll) return lr_ur_ul_case;
 
    //
    // Otherwise, combination is invalid
@@ -1892,7 +1828,6 @@ int get_step_case(bool lr, bool ur, bool ul, bool ll) {
 void apply_mask(ShapeData &f, ShapeData &mask)
 
 {
-   int x, y;
 
    if(f.data.nx() != mask.data.nx() ||
       f.data.ny() != mask.data.ny() ) {
@@ -1902,8 +1837,8 @@ void apply_mask(ShapeData &f, ShapeData &mask)
       exit(1);
    }
 
-   for(x=0; x<f.data.nx(); x++) {
-      for(y=0; y<f.data.ny(); y++) {
+   for(int x=0; x<f.data.nx(); x++) {
+      for(int y=0; y<f.data.ny(); y++) {
 
          //
          // Put bad data everywhere the mask is turned off
@@ -1926,7 +1861,7 @@ int ShapeData::n_objects() const
    // Split the field to number the shapes
    sd = split(*this, n);
 
-   return(n);
+   return n;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1963,13 +1898,13 @@ void ShapeData::threshold(SingleThresh t) {
 
 void ShapeData::set_to_1_or_0() 
 {
-   int j, x, y;
+   int j;
    double v;
    const int nx = data.nx();
    const int ny = data.ny();
 
-   for(x=0; x<nx; x++) {
-      for(y=0; y<ny; y++) {
+   for(int x=0; x<nx; x++) {
+      for(int y=0; y<ny; y++) {
 
          //v = data(x, y);
          if(is_bad_data(x, y)) {
@@ -2007,6 +1942,7 @@ void ShapeData::threshold_attr(const map<ConcatString,ThreshArray> &attr_map,
 
       // Select the current object
       sd_object = select(sd_split, i);
+      keep_object[i] = true;
 
       // Loop over attribute filter map
       for(it=attr_map.begin(); it!= attr_map.end(); it++) {
@@ -2042,7 +1978,7 @@ void ShapeData::threshold_attr(const map<ConcatString,ThreshArray> &attr_map,
    }
 
    // Clean up
-   if(keep_object) { delete [] keep_object; keep_object = (bool *) 0; }
+   if(keep_object) { delete [] keep_object; keep_object = (bool *) nullptr; }
 
    return;
 }
@@ -2091,7 +2027,7 @@ void ShapeData::threshold_area(SingleThresh t)
       } // end for y
    } // end for x
 
-   if ( area_object )  { delete [] area_object;  area_object = (double *) 0; }
+   if ( area_object )  { delete [] area_object;  area_object = (double *) nullptr; }
 
    return;
 }
@@ -2105,7 +2041,8 @@ void ShapeData::threshold_intensity(const ShapeData *sd_ptr, int perc, SingleThr
 {
    int i, n, x, y, v_int, n_obj_inten;
    ShapeData s;
-   double * obj_inten = (double *) 0, obj_inten_sum;
+   double *obj_inten = (double *) nullptr;
+   double obj_inten_sum;
    const int nx = data.nx();
    const int ny = data.ny();
 
@@ -2184,9 +2121,9 @@ void ShapeData::threshold_intensity(const ShapeData *sd_ptr, int perc, SingleThr
       } // end for y
    } // end for x
 
-   if(obj_inten) { delete [] obj_inten; obj_inten = (double *) 0; }
+   if(obj_inten) { delete [] obj_inten; obj_inten = (double *) nullptr; }
 
-if ( inten_object )  { delete [] inten_object;   inten_object = (double *) 0; }
+   if ( inten_object )  { delete [] inten_object;   inten_object = (double *) nullptr; }
 
    return;
 }
@@ -2380,7 +2317,7 @@ out.calc_moments();
    //  done
    //
 
-return ( out );
+return out;
 
 }
 
@@ -2390,7 +2327,7 @@ return ( out );
 ShapeData select(const ShapeData &id, int n)
 
 {
-   int k, x, y;
+   int k;
    int nx, ny;
    int count;
    ShapeData d = id;
@@ -2400,8 +2337,8 @@ ShapeData select(const ShapeData &id, int n)
 
    count = 0;
 
-   for(x=0; x<nx; ++x) {
-      for(y=0; y<ny; ++y) {
+   for(int x=0; x<nx; ++x) {
+      for(int y=0; y<ny; ++y) {
 
          k = nint(id.data(x, y));
 
@@ -2417,7 +2354,7 @@ ShapeData select(const ShapeData &id, int n)
    }
    d.calc_moments();
 
-   return(d);
+   return d;
 
 }
 
@@ -2426,13 +2363,12 @@ ShapeData select(const ShapeData &id, int n)
 
 
 void ShapeData::filter(SingleThresh t) {
-   int x, y;
    double v;
    const int nx = data.nx();
    const int ny = data.ny();
 
-   for (x=0; x<nx; ++x) {
-      for (y=0; y<ny; ++y) {
+   for (int x=0; x<nx; ++x) {
+      for (int y=0; y<ny; ++y) {
 
          v = data(x, y);
 
@@ -2451,7 +2387,7 @@ void ShapeData::filter(SingleThresh t) {
 
 
 int ShapeData_intersection(const ShapeData &f1, const ShapeData &f2) {
-   int x, y, intersection;
+   int intersection;
 
    //
    // Check for the same grid dimension
@@ -2465,14 +2401,14 @@ int ShapeData_intersection(const ShapeData &f1, const ShapeData &f2) {
    }
 
    intersection = 0;
-   for(x=0; x<f1.data.nx(); x++) {
-      for(y=0; y<f1.data.ny(); y++) {
+   for(int x=0; x<f1.data.nx(); x++) {
+      for(int y=0; y<f1.data.ny(); y++) {
 
          if(f1.s_is_on(x, y) && f2.s_is_on(x, y)) intersection++;
       } // end for y
    } // end for x
 
-   return(intersection);
+   return intersection;
 }
 
 

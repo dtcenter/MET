@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -258,13 +258,15 @@ spatial_conv_radius = spatial_R;
 
 
 const int Nxy = Nx*Ny;
+const int Nxyz = Nx*Ny*Nt;
 
    sum_plane_buf = new double [Nxy];
 ok_sum_plane_buf = new bool   [Nxy];
 
 handle.set_size(Nx, Ny, time_radius);
 
-conv_data = new double [Nx*Ny*Nt];
+conv_data = new double [Nxyz];
+for (k=0; k<Nxyz; k++) conv_data[k] = bad_data_double;
 
 if ( !conv_data )  {
 

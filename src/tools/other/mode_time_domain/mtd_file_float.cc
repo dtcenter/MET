@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -939,14 +939,14 @@ out.set_accum(0);
 
 int x, y, n;
 double value;
+const int data_cnt = Nx*Ny*Nt;
 
 for (x=0; x<Nx; ++x)  {
 
    for (y=0; y<Ny; ++y)  {
 
       n = mtd_three_to_one(Nx, Ny, Nt, x, y, t);
-
-      value = Data[n];
+      value = (n >= 0 && n <data_cnt) ? Data[n] : bad_data_double;
 
       if ( value == bad_data_double )  out.put(bad_data_float, x, y);
       else                             out.put((float) value,  x, y);
@@ -974,10 +974,10 @@ return;
 void MtdFloatFile::put_data_plane(const int t, const DataPlane & d)
 
 {
-
+const char *method_name = "MtdFloatFile::put_data_plane() -> ";
 if ( (t < 0) || (t >= Nt) )  {
 
-   mlog << Error << "\n\n  MtdFloatFile::put_data_plane() -> range check error on t\n\n";
+   mlog << Error << "\n\n  " << method_name << "range check error on t\n\n";
 
    exit ( 1 );
 
@@ -985,7 +985,7 @@ if ( (t < 0) || (t >= Nt) )  {
 
 if ( (d.nx() != Nx) || (d.ny() != Ny) )  {
 
-   mlog << Error << "\n\n  MtdFloatFile::put_data_plane() -> data plane is wrong size!\n\n";
+   mlog << Error << "\n\n  " << method_name << "data plane is wrong size!\n\n";
 
    exit ( 1 );
 
@@ -993,6 +993,7 @@ if ( (d.nx() != Nx) || (d.ny() != Ny) )  {
 
 int x, y, n;
 double value;
+const int data_cnt = Nx*Ny*Nt;
 
 
 for (x=0; x<Nx; ++x)  {
@@ -1000,6 +1001,11 @@ for (x=0; x<Nx; ++x)  {
    for (y=0; y<Ny; ++y)  {
 
       n = mtd_three_to_one(Nx, Ny, Nt, x, y, t);
+      if (n < 0 || n >=data_cnt) {
+         mlog << Debug(4) << method_name << "offset " << n
+              << " is out of range (" << " from " << x << ", " << y <<", " << t <<")\n";
+         continue;
+      }
 
       value = d(x, y);
 

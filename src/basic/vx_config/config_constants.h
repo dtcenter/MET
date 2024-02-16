@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -525,9 +525,11 @@ static const char config_map_data_filename[] = "MET_BASE/config/ConfigMapData";
 // Parameter key names common to multiple tools
 //
 
-static const char conf_key_exit_on_warning[]   = "exit_on_warning";
-static const char conf_key_nc_compression[]    = "nc_compression";
-static const char conf_key_output_precision[]  = "output_precision";
+static const char conf_key_exit_on_warning[]     = "exit_on_warning";
+static const char conf_key_time_offset_warning[] = "time_offset_warning";
+static const char conf_key_nc_compression[]      = "nc_compression";
+static const char conf_key_output_precision[]    = "output_precision";
+
 static const char conf_key_version[]           = "version";
 static const char conf_key_model[]             = "model";
 static const char conf_key_desc[]              = "desc";
@@ -555,6 +557,7 @@ static const char conf_key_GRIB1_subcenter[]   = "GRIB1_subcenter";
 static const char conf_key_GRIB1_rec[]         = "GRIB1_rec";
 static const char conf_key_GRIB1_code[]        = "GRIB1_code";
 static const char conf_key_GRIB1_tri[]         = "GRIB1_tri";
+
 static const char conf_key_GRIB2_disc[]        = "GRIB2_disc";
 static const char conf_key_GRIB2_parm_cat[]    = "GRIB2_parm_cat";
 static const char conf_key_GRIB2_parm[]        = "GRIB2_parm";
@@ -567,6 +570,12 @@ static const char conf_key_GRIB2_ens_type[]    = "GRIB2_ens_type";
 static const char conf_key_GRIB2_der_type[]    = "GRIB2_der_type";
 static const char conf_key_GRIB2_stat_type[]   = "GRIB2_stat_type";
 static const char conf_key_GRIB2_perc_val[]    = "GRIB2_perc_val";
+
+static const char conf_key_GRIB2_aerosol_type[]          = "GRIB2_aerosol_type";
+static const char conf_key_GRIB2_aerosol_interval_type[] = "GRIB2_aerosol_interval_type";
+static const char conf_key_GRIB2_aerosol_size_lower[]    = "GRIB2_aerosol_size_lower";
+static const char conf_key_GRIB2_aerosol_size_upper[]    = "GRIB2_aerosol_size_upper";
+
 static const char conf_key_GRIB2_ipdtmpl_index[] = "GRIB2_ipdtmpl_index";
 static const char conf_key_GRIB2_ipdtmpl_val[]   = "GRIB2_ipdtmpl_val";
 static const char conf_key_level[]             = "level";
@@ -680,6 +689,11 @@ static const char conf_key_missing_thresh[]    = "missing_thresh";
 static const char conf_key_control_id[]        = "control_id";
 static const char conf_key_ens_member_ids[]    = "ens_member_ids";
 static const char conf_key_seeps_p1_thresh[]   = "seeps_p1_thresh";
+static const char conf_key_ugrid_coordinates_file[] = "ugrid_coordinates_file";
+static const char conf_key_ugrid_dataset[]          = "ugrid_dataset";
+static const char conf_key_ugrid_map_config[]       = "ugrid_map_config";
+static const char conf_key_ugrid_max_distance_km[]  = "ugrid_max_distance_km";
+static const char conf_key_ugrid_metadata_map[]     = "ugrid_metadata_map";
 
 //
 // Entries to override file metadata 
@@ -903,7 +917,8 @@ static const char conf_key_shift_right[]           = "shift_right";
 static const char conf_key_multivar_logic          [] = "multivar_logic";
 static const char conf_key_multivar_name           [] = "multivar_name";
 static const char conf_key_multivar_level          [] = "multivar_level";
-static const char conf_key_multivar_intensity_flag [] = "multivar_intensity_flag";
+static const char conf_key_fcst_multivar_compare_index [] = "multivar_intensity_compare_fcst";
+static const char conf_key_obs_multivar_compare_index [] = "multivar_intensity_compare_obs";
 
 //
 //  MTD specific parameter key names
@@ -1099,6 +1114,8 @@ static const char conf_key_consensus[]                = "consensus";
 static const char conf_key_members[]                  = "members";
 static const char conf_key_required[]                 = "required";
 static const char conf_key_min_req[]                  = "min_req";
+static const char conf_key_diag_required[]            = "diag_required";
+static const char conf_key_min_diag_req[]             = "diag_min_req";
 static const char conf_key_write_members[]            = "write_members";
 static const char conf_key_lag_time[]                 = "lag_time";
 static const char conf_key_best_technique[]           = "best_technique";
@@ -1214,9 +1231,11 @@ static const char conf_key_tangential_velocity_long_field_name[] = "tangential_v
 static const char conf_key_domain_info[]            = "domain_info";
 static const char conf_key_domain[]                 = "domain";
 static const char conf_key_diag_script[]            = "diag_script";
+static const char conf_key_override_diags[]         = "override_diags";
 static const char conf_key_vortex_removal[]         = "vortex_removal";
 static const char conf_key_one_time_per_file_flag[] = "one_time_per_file_flag";
-static const char conf_key_nc_rng_azi_flag[]        = "nc_rng_azi_flag";
+static const char conf_key_output_base_format[]     = "output_base_format";
+static const char conf_key_nc_cyl_grid_flag[]       = "nc_cyl_grid_flag";
 static const char conf_key_nc_diag_flag[]           = "nc_diag_flag";
 static const char conf_key_cira_diag_flag[]         = "cira_diag_flag";
 
@@ -1228,8 +1247,10 @@ static const char conf_key_cira_diag_flag[]         = "cira_diag_flag";
 static const char conf_val_grib1         [] = "GRIB1";
 static const char conf_val_grib2         [] = "GRIB2";
 static const char conf_val_netcdf_met    [] = "NETCDF_MET";
+static const char conf_val_netcdf_wrf    [] = "NETCDF_WRF";
 static const char conf_val_netcdf_pint   [] = "NETCDF_PINT";
 static const char conf_val_netcdf_nccf   [] = "NETCDF_NCCF";
+static const char conf_val_netcdf_ugrid  [] = "NETCDF_UGRID";
 static const char conf_val_python_numpy  [] = "PYTHON_NUMPY";
 static const char conf_val_python_xarray [] = "PYTHON_XARRAY";
 

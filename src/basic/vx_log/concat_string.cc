@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -567,7 +567,8 @@ void ConcatString::replace(const char * target, const char * replacement,
 
    if (::is_empty(target) || ::is_empty(replacement) ) {
       mlog << Error << "\nConcatString::replace(const char * target, const char * replacement, bool check_env) -> "
-           << "target and/or replacement string is empty\n\n";
+           << "target (" << target << ") and/or replacement ("
+           << replacement << ") string is empty\n\n";
       exit ( 1 );
    }
 

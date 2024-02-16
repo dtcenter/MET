@@ -73,7 +73,7 @@ level_category = [];
 
 //
 // BUFR variable names to retain or derive.
-// If emtpy, process all available variables.
+// If empty, process all available variables.
 //
 obs_bufr_var = [ "RSTD", "RWAZ","RWND" ];
 

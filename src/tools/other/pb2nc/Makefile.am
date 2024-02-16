@@ -38,10 +38,12 @@ pb2nc_LDADD = -lvx_stat_out \
 	-lvx_analysis_util \
 	-lvx_data2d_factory \
 	-lvx_data2d_nc_met \
-	-lvx_data2d_grib $(GRIB2_LIBS) \
-	-lvx_data2d_nc_pinterp \
-	-lvx_data2d_nccf \
-	$(PYTHON_LIBS) \
+	-lvx_data2d_grib \
+	$(GRIB2_MET_LIBS) \
+	-lvx_data2d_nc_wrf \
+	-lvx_data2d_nc_cf \
+	$(UGRID_MET_LIBS) \
+	$(PYTHON_MET_LIBS) \
 	-lvx_data2d \
 	-lvx_nc_obs \
 	-lvx_nc_util \
@@ -58,7 +60,7 @@ pb2nc_LDADD = -lvx_stat_out \
 	-lvx_math \
 	-lvx_cal \
 	-lvx_log \
-	$(PYTHON_LIBS) \
+	$(GRIB2_DEP_LIBS) $(UGRID_DEP_LIBS) $(PYTHON_DEP_LIBS) \
 	-lm -lproj -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas $(BLIB_NAME) \
 	$(FLIBS)
 

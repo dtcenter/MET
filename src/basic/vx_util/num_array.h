@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -83,7 +83,7 @@ class NumArray {
       void inc(int, int);
       void inc(int, double);
 
-      void   sort_array();
+      void   sort_array(bool increasing=true);
       void   reorder(const NumArray &);
       int    rank_array(int &);
       double percentile_array(double);

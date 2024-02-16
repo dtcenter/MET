@@ -1,6 +1,6 @@
 
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -37,6 +37,7 @@
 #include "fix_float.h"
 #include "get_filenames.h"
 #include "grib_constants.h"
+#include "GridTemplate.h"
 #include "int_array.h"
 #include "interp_mthd.h"
 #include "interp_util.h"

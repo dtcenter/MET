@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -12,8 +12,8 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-#ifndef  __WWSISHANDLER_H__
-#define  __WWSISHANDLER_H__
+#ifndef  __WWSIS_HANDLER_H__
+#define  __WWSIS_HANDLER_H__
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -115,7 +115,7 @@ protected:
 ////////////////////////////////////////////////////////////////////////
 
 
-#endif   /*  __WWSISHANDLER_H__  */
+#endif   /*  __WWSIS_HANDLER_H__  */
 
 
 ////////////////////////////////////////////////////////////////////////

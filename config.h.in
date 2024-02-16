@@ -15,7 +15,7 @@
 /* "build gis_utils" */
 #undef ENABLE_GIS_UTILS
 
-/* "build GRIB2 utilities" */
+/* "build GRIB2 support" */
 #undef ENABLE_GRIB2
 
 /* "build grid_stat" */
@@ -66,7 +66,7 @@
 /* "build point_stat" */
 #undef ENABLE_POINT_STAT
 
-/* "build python embedding" */
+/* "build Python embedding support" */
 #undef ENABLE_PYTHON
 
 /* "build regrid_data_plane" */
@@ -83,6 +83,9 @@
 
 /* "build tc_utils" */
 #undef ENABLE_TC_UTILS
+
+/* "build unstructured grid support" */
+#undef ENABLE_UGRID
 
 /* "build wavelet_stat" */
 #undef ENABLE_WAVELET_STAT
@@ -143,6 +146,9 @@
 
 /* Define to 1 if you have the <stdint.h> header file. */
 #undef HAVE_STDINT_H
+
+/* Define to 1 if you have the <stdio.h> header file. */
+#undef HAVE_STDIO_H
 
 /* Define to 1 if you have the <stdlib.h> header file. */
 #undef HAVE_STDLIB_H
@@ -213,7 +219,9 @@
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
-/* Define to 1 if you have the ANSI C header files. */
+/* Define to 1 if all of the C90 standard headers exist (not just the ones
+   required in a freestanding environment). This macro is provided for
+   backward compatibility; new code need not use it. */
 #undef STDC_HEADERS
 
 /* Version number of package */

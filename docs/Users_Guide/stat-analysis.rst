@@ -11,18 +11,18 @@ The Stat-Analysis tool ties together results from the Point-Stat, Grid-Stat, Ens
 
 MET version 9.0 adds support for the passing matched pair data (MPR) into Stat-Analysis using a Python script with the "-lookin python ..." option. An example of running Stat-Analysis with Python embedding can be found in :numref:`Appendix F, Section %s <appendixF>`.
 
-Scientific and statistical aspects
+Scientific and Statistical Aspects
 ==================================
 
 The Stat-Analysis tool can perform a variety of analyses, and each type of analysis is called a "job". The job types include the ability to (i) aggregate results over a user-specified time; (ii) stratify statistics based on time of day, model initialization time, lead-time, model run identifier, output filename, or wavelet decomposition scale; and (iii) compute specific verification indices such as the GO Index [1]_
 and wind direction statistics. Future functionality may include information about time-trends and/or calculations based on climatology (e.g., anomaly correlation). This section summarizes the capabilities of the supported Stat-Analysis jobs.
 
-Filter STAT lines
+Filter STAT Lines
 -----------------
 
 The Stat-Analysis "filter" job simply filters out specific STAT lines based on user-specified search criteria. All of the STAT lines that are retained from one or many files are written to a single output file. The output file for filtered STAT lines must be specified using the **-dump_row** job command option.
 
-Summary statistics for columns
+Summary Statistics for Columns
 ------------------------------
 
 The Stat-Analysis "summary" job produces summary information for columns of data. After the user specifies the column(s) of interest and any other relevant search criteria, summary information is produced from values in those column(s) of data. The summary statistics produced are: mean, standard deviation, minimum, maximum, the 10th, 25th, 50th, 75th, and 90th percentiles, the interquartile range, the range, and both weighted and unweighted means using the logic prescribed by the World Meteorological Organization (WMO).
@@ -37,12 +37,12 @@ The **-derive** job command option can be used to perform the derivation of stat
 
 .. _StA_Aggregated-values-from:
 
-Aggregated values from multiple STAT lines
+Aggregated Values from Multiple STAT Lines
 ------------------------------------------
 
 The Stat-Analysis "aggregate" job aggregates values from multiple STAT lines of the same type. The user may specify the specific line type of interest and any other relevant search criteria. The Stat-Analysis tool then creates sums of each of the values in all lines matching the search criteria. The aggregated data are output as the same line type as the user specified. The STAT line types which may be aggregated in this way are the contingency table (FHO, CTC, PCT, MCTC, NBRCTC), partial sums (SL1L2, SAL1L2, VL1L2, and VAL1L2), and other (ISC, ECNT, RPS, RHIST, PHIST, RELP, NBRCNT, SSVAR, GRAD, and SEEPS) line types.
 
-Aggregate STAT lines and produce aggregated statistics
+Aggregate STAT Lines and Produce Aggregated Statistics
 ------------------------------------------------------
 
 The Stat-Analysis "aggregate-stat" job aggregates multiple STAT lines of the same type together and produces relevant statistics from the aggregated line. This may be done in the same manner listed above in :numref:`StA_Aggregated-values-from`. However, rather than writing out the aggregated STAT line itself, the relevant statistics generated from that aggregated line are provided in the output. Specifically, if a contingency table line type (FHO, CTC, PCT, MCTC, or NBRCTC) has been aggregated, contingency table statistics (CTS, ECLV, PSTD, MCTS, or NBRCTS) line types can be computed. If a partial sums line type (SL1L2 or SAL1L2) has been aggregated, the continuous statistics (CNT) line type can be computed. If a vector partial sums line type (VL1L2 or VAL1L2) has been aggregated, the vector continuous statistics (VCNT) line type can be computed. For ensembles, the ORANK line type can be accumulated into ECNT, RPS, RHIST, PHIST, RELP, or SSVAR output. If a SEEPS matched pair line type (SEEPS_MPR) has been aggregated, the aggregated SEEPS line type (SEEPS) can be computed. If the matched pair line type (MPR) has been aggregated, may output line types (FHO, CTC, CTS, CNT, MCTC, MCTS, SL1L2, SAL1L2, VL1L2, VCNT, WDIR, PCT, PSTD, PJC, PRC, or ECLV) can be computed. Multiple output line types may be specified for each "aggregate-stat" job, as long as each output is derivable from the input.
@@ -258,14 +258,14 @@ Once the appropriate lines have been generated for each verification time of int
 
 2. For the "AGGR_WDIR" line, the input VL1L2 lines are first aggregated into a single line of partial sums where the weight for each line is determined by the number of points it represents. From this aggregated line, the mean forecast wind direction, observation wind direction, and the associated error are computed and written out.
 
-Practical information
+Practical Information
 =====================
 
 The following sections describe the usage statement, required arguments and optional arguments for the Stat-Analysis tool.
 
 .. _stat_analysis-usage:
 
-stat_analysis usage
+stat_analysis Usage
 -------------------
 
 The usage statement for the Stat-Analysis tool is shown below:
@@ -284,14 +284,14 @@ stat_analysis has two required arguments and accepts several optional ones.
 
 In the usage statement for the Stat-Analysis tool, some additional terminology is introduced. In the Stat-Analysis tool, the term "job" refers to a set of tasks to be performed after applying user-specified options (i.e., "filters"). The filters are used to pare down a collection of output from the MET statistics tools to only those lines that are desired for the analysis. The job and its filters together comprise the "job command line". The "job command line" may be specified either on the command line to run a single analysis job or within the configuration file to run multiple analysis jobs at the same time. If jobs are specified in both the configuration file and the command line, only the jobs indicated in the configuration file will be run. The various jobs types are described in :numref:`Des_components_STAT_analysis_tool` and the filtering options are described in :numref:`stat_analysis-configuration-file`.
 
-Required arguments for stat_analysis
+Required Arguments for stat_analysis
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. The **-lookin path** specifies the name of a directory to be searched recursively for STAT files (ending in ".stat") or any explicit file name with any suffix (such as "_ctc.txt") to be read. This option may be used multiple times to specify multiple directories and/or files to be read. If "-lookin python" is used, it must be followed by a Python embedding script and any command line arguments it takes. Python embedding can be used to pass **only**  matched pair (MPR) lines as input to Stat-Analysis.
 
 2. Either a configuration file must be specified with the **-config** option, or a **JOB COMMAND LINE** must be denoted. The **JOB COMMAND LINE** is described in :numref:`stat_analysis-configuration-file`
 
-Optional arguments for stat_analysis
+Optional Arguments for stat_analysis
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 3. The **-config config_file** specifies the configuration file to be used. The contents of the configuration file are discussed below.
@@ -315,7 +315,7 @@ In this example, the Stat-Analysis tool will search for valid STAT lines located
 
 .. _stat_analysis-configuration-file:
 
-stat_analysis configuration file
+stat_analysis Configuration File
 --------------------------------
 
 The default configuration file for the Stat-Analysis tool named **STATAnalysisConfig_default** can be found in the installed *share/met/config* directory. The version used for the example run in :numref:`installation` is also available in *scripts/config*. Like the other configuration files described in this document, it is recommended that users make a copy of these files prior to modifying their contents. 
@@ -604,7 +604,7 @@ The Stat-Analysis tool supports several additional job command options which may
 This job command option is extremely useful. It can be used multiple times to specify a list of STAT header column names. When reading each input line, the Stat-Analysis tool concatenates together the entries in the specified columns and keeps track of the unique cases. It applies the logic defined for that job to each unique subset of data. For example, if your output was run over many different model names and masking regions, specify **-by MODEL,VX_MASK** to get output for each unique combination rather than having to run many very similar jobs.
 
 .. code-block:: none
-		
+
   -column_min     col_name value
   -column_max     col_name value
   -column_eq      col_name value
@@ -615,30 +615,30 @@ This job command option is extremely useful. It can be used multiple times to sp
 The column filtering options may be used when the **-line_type** has been set to a single value. These options take two arguments, the name of the data column to be used followed by a value, string, or threshold to be applied. If multiple column_min/max/eq/thresh/str options are listed, the job will be performed on their intersection. Each input line is only retained if its value meets the numeric filtering criteria defined, matches one of the strings defined by the **-column_str** option, or does not match any of the string defined by the **-column_str_exc** option. Multiple filtering strings may be listed using commas. Defining thresholds in MET is described in :numref:`config_options`.
 
 .. code-block:: none
-		
+
   -dump_row file
 
 Each analysis job is performed over a subset of the input data. Filtering the input data down to a desired subset is often an iterative process. The **-dump_row** option may be used for each job to specify the name of an output file to which the exact subset of data used for that job will be written. When initially constructing Stat-Analysis jobs, users are strongly encouraged to use the option and check its contents to ensure that the analysis was actually done over the intended subset.
 
 .. code-block:: none
-		
+
   -out_line_type name
 
 This option specifies the desired output line type(s) for the **aggregate_stat** job type.
 
 .. code-block:: none
-		
+
   -out_stat file
   -set_hdr  col_name string
 
 The Stat-Analysis tool writes its output to either the log file or the file specified using the **-out** command line option. However the **aggregate** and **aggregate_stat** jobs create STAT output lines and the standard output written lacks the full set of STAT header columns. The **-out_stat** job command option may be used for these jobs to specify the name of an output file to which full STAT output lines should be written. When the **-out_stat** job command option is used for **aggregate** and **aggregate_stat** jobs the output is sent to the **-out_stat** file instead of the log or **-out** file.
 
-Jobs will often combine output with multiple entries in the header columns. For example, a job may aggregate output with three different values in the **VX_MASK** column, such as "mask1", "mask2", and "mask3". The output **VX_MASK** column will contain the unique values encountered concatenated together with commas: "mask1,mask2,mask3". Alternatively, the **-set_hdr** option may be used to specify what should be written to the output header columns, such as "-set_hdr VX_MASK all_three_masks".
+Jobs will often combine output with multiple entries in the header columns. For example, a job may aggregate output with three different values in the **VX_MASK** column, such as "mask1", "mask2", and "mask3". The output **VX_MASK** column will contain the unique values encountered concatenated together with commas: "mask1,mask2,mask3". Alternatively, the **-set_hdr** option may be used to specify what should be written to the output header columns, such as "-set_hdr VX_MASK all_three_masks". When **-set_hdr** is specified for **filter** jobs, it controls what is written to the **-dump_row** output file.
 
 When using the "-out_stat" option to create a .stat output file and stratifying results using one or more "-by" job command options, those columns may be referenced in the "-set_hdr" option. When using multiple "-by" options, use "CASE" to reference the full case information string:
 
 .. code-block:: none
-		
+
   -job aggregate_stat -line_type MPR -out_line_type CNT -by FCST_VAR,OBS_SID \
   -set_hdr VX_MASK OBS_SID -set_hdr DESC CASE
 
@@ -662,7 +662,7 @@ When processing input MPR lines, these options may be used to define a masking g
 When processing input MPR lines, these options are used to define the forecast, observation, or both thresholds to be applied when computing statistics. For categorical output line types (FHO, CTC, CTS, MCTC, MCTS) these define the categorical thresholds. For continuous output line types (SL1L2, SAL1L2, CNT), these define the continuous filtering thresholds and **-out_cnt_logic** defines how the forecast and observed logic should be combined.
 
 .. code-block:: none
-		
+
   -out_fcst_wind_thresh thresh
   -out_obs_wind_thresh  thresh
   -out_wind_thresh      thresh
@@ -676,7 +676,7 @@ These job command options are analogous to the options listed above but apply wh
 
 When processing input ORANK lines and writing output RHIST or PHIST lines, this option defines the output histogram bin width to be used.
 
-stat-analysis tool output
+stat-analysis Tool Output
 -------------------------
 
 The output generated by the Stat-Analysis tool contains statistics produced by the analysis. It also records information about the analysis job that produced the output for each line. Generally, the output is printed to the screen. However, it can be redirected to an output file using the "**-out**" option. The format of output from each STAT job command is described below.

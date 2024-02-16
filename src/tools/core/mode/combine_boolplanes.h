@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -20,7 +20,8 @@
 #include "two_d_array.h"
 #include "bool_calc.h"
 #include "vx_pxm.h"
-
+#include <string>
+#include <vector>
 
 ////////////////////////////////////////////////////////////////////////
 

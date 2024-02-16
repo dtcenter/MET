@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -15,9 +15,9 @@
 //
 //  Mod#   Date      Name           Description
 //  ----   ----      ----           -----------
-//  000    04-15-05  Halley Gotway
-//
-//  001    01-10-12  Bullock        Ported to new repository
+//  000    04/15/05  Halley Gotway
+//  001    01/10/12  Bullock        Ported to new repository
+//  002    11/02/23  Halley Gotway  MET #2724 improve efficiency
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -128,7 +128,7 @@ void SingleFeature::clear()
 
    Raw    = (const ShapeData *) 0;
    Thresh = (const ShapeData *) 0;
-   Mask   = (const ShapeData *) 0;
+   Split  = (const ShapeData *) 0;
 
    convex_hull.clear();
 
@@ -174,7 +174,7 @@ void SingleFeature::assign(const SingleFeature & s)
 
    Raw    = s.Raw;
    Thresh = s.Thresh;
-   Mask   = s.Mask;
+   Split  = s.Split;
 
    convex_hull = s.convex_hull;
 
@@ -190,35 +190,35 @@ void SingleFeature::assign(const SingleFeature & s)
 
 ////////////////////////////////////////////////////////////////////////
 
-void SingleFeature::set(const ShapeData &raw, const ShapeData &thresh,
-                        const ShapeData &mask, const int perc,
-                        bool precip_flag)
+void SingleFeature::set(const ShapeData &raw_sd, const ShapeData &thresh_sd,
+                        const ShapeData &split_sd, const ShapeData &mask_sd,
+                        const int perc, bool precip_flag)
 
 {
 
    int i;
-   ShapeData split_wd, obj_wd;
+   ShapeData cur_split_sd, cur_obj_sd;
 
    clear();
 
-   Raw    = &raw;
-   Thresh = &thresh;
-   Mask   = &mask;
+   Raw    = &raw_sd;
+   Thresh = &thresh_sd;
+   Split  = &split_sd;
 
    //
    // Centroid
    //
-   Mask->centroid(centroid_x, centroid_y);
+   mask_sd.centroid(centroid_x, centroid_y);
 
    //
    // Axis angle
    //
-   axis_ang = Mask->angle_degrees();
+   axis_ang = mask_sd.angle_degrees();
 
    //
    // Length and Width
    //
-   Mask->calc_length_width(length, width);
+   mask_sd.calc_length_width(length, width);
 
    //
    // Aspect ratio
@@ -228,28 +228,28 @@ void SingleFeature::set(const ShapeData &raw, const ShapeData &thresh,
    //
    // Object area
    //
-   area = Mask->area();
+   area = mask_sd.area();
 
    //
    // Object threshold area: the area of the raw field inside the mask
    // area that meets the threshold criteria
    //
-   area_thresh = (double) ShapeData_intersection(*Thresh, *Mask);
+   area_thresh = (double) ShapeData_intersection(*Thresh, mask_sd);
 
    //
    // Curvature, Curvature_x, Curvature_y
    //
-   curvature = Mask->curvature(curvature_x, curvature_y);
+   curvature = mask_sd.curvature(curvature_x, curvature_y);
 
    //
    // Complexity
    //
-   complexity = Mask->complexity();
+   complexity = mask_sd.complexity();
 
    //
    // Compute the Intensity Percentiles
    //
-   get_percentiles(intensity_ptile, raw, mask, perc, precip_flag);
+   get_percentiles(intensity_ptile, raw_sd, mask_sd, perc, precip_flag);
 
    //
    // User Percentile
@@ -259,17 +259,17 @@ void SingleFeature::set(const ShapeData &raw, const ShapeData &thresh,
    //
    // Convex hull
    //
-   convex_hull = Mask->convex_hull();
+   convex_hull = mask_sd.convex_hull();
 
    //
    // Boundary:
    // Split the mask field and store the boundary for each object.
    //
-   split_wd = split(mask, n_bdy);
+   cur_split_sd = split(mask_sd, n_bdy);
    boundary = new Polyline [n_bdy];
    for(i=0; i<n_bdy; i++) {
-      obj_wd      = select(split_wd, i+1);
-      boundary[i] = obj_wd.single_boundary();
+      cur_obj_sd  = select(cur_split_sd, i+1);
+      boundary[i] = cur_obj_sd.single_boundary();
    }
 
    //
@@ -407,7 +407,6 @@ void PairFeature::set(const SingleFeature &fcst,
    Fcst = &fcst;
    Obs  = &obs;
 
-   int x, y;
    int fcst_on, obs_on;
    double dx, dy;
    double a1, a2;
@@ -461,23 +460,21 @@ void PairFeature::set(const SingleFeature &fcst,
    area_ratio    = min( (Obs->area)/(Fcst->area),
                         (Fcst->area)/(Obs->area) );
 
-
    //
    // Intersection, union, and symmetric diff areas
    //
    intersection_area = union_area = 0.0;
    symmetric_diff = 0.0;
-   for(x=0; x<(Fcst->Mask->data.nx()); ++x) {
-      for(y=0; y<(Fcst->Mask->data.ny()); ++y) {
+   int nxy = Fcst->Split->data.nxy();
+   for(i=0; i<nxy; ++i) {
 
-         fcst_on = Fcst->Mask->s_is_on(x, y);
-         obs_on  =  Obs->Mask->s_is_on(x, y);
+      fcst_on = (nint(Fcst->Split->data.data()[i]) == Fcst->object_number ? 1 : 0);
+      obs_on  = (nint( Obs->Split->data.data()[i]) ==  Obs->object_number ? 1 : 0);
 
-         if(fcst_on && obs_on) intersection_area++;
-         if(fcst_on || obs_on) union_area++;
-         if((fcst_on && !obs_on) ||
-            (!fcst_on && obs_on)) symmetric_diff++;
-      }
+      if(   fcst_on &&  obs_on)   intersection_area++;
+      if(   fcst_on ||  obs_on)   union_area++;
+      if( ( fcst_on && !obs_on) ||
+          (!fcst_on &&  obs_on) ) symmetric_diff++;
    }
 
    //

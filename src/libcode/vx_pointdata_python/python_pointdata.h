@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -28,9 +28,6 @@ extern "C" {
 
 
 ////////////////////////////////////////////////////////////////////////
-
-static const char python_key_point_data     [] = "met_point_data";
-static const char python_key_point_data_list[] = "point_data";
 
 static const char python_key_nhdr           [] = "nhdr";
 //static const char python_key_npbhdr         [] = "npbhdr";

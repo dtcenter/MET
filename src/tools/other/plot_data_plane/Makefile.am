@@ -16,10 +16,12 @@ plot_data_plane_CPPFLAGS = ${MET_CPPFLAGS}
 plot_data_plane_LDFLAGS = ${MET_LDFLAGS}
 plot_data_plane_LDADD = -lvx_data2d_factory \
 	-lvx_data2d_nc_met \
-	-lvx_data2d_grib $(GRIB2_LIBS) \
-	-lvx_data2d_nc_pinterp \
-	$(PYTHON_LIBS) \
-	-lvx_data2d_nccf \
+	-lvx_data2d_grib \
+	$(GRIB2_MET_LIBS) \
+	-lvx_data2d_nc_wrf \
+	-lvx_data2d_nc_cf \
+	$(UGRID_MET_LIBS) \
+	$(PYTHON_MET_LIBS) \
 	-lvx_statistics \
 	-lvx_nc_util \
 	-lvx_data2d \
@@ -41,4 +43,5 @@ plot_data_plane_LDADD = -lvx_data2d_factory \
 	-lvx_math \
 	-lvx_cal \
 	-lvx_log \
+	$(GRIB2_DEP_LIBS) $(UGRID_DEP_LIBS) $(PYTHON_DEP_LIBS) \
 	-lm -lz -lproj -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -175,6 +175,8 @@ DeleteTrailingBlankRows = false;
 
 ElimTrailingWhitespace = true;
 
+AlignDecimalPoints = true;
+
 DecimalPointsAligned = false;
 
 return;
@@ -284,6 +286,8 @@ DoCommaString = a.DoCommaString;
 DeleteTrailingBlankRows = a.DeleteTrailingBlankRows;
 
 ElimTrailingWhitespace = a.ElimTrailingWhitespace;
+
+AlignDecimalPoints = a.AlignDecimalPoints;
 
 DecimalPointsAligned = a.DecimalPointsAligned;
 
@@ -781,6 +785,20 @@ void AsciiTable::set_elim_trailing_whitespace(bool tf)
 {
 
 ElimTrailingWhitespace = tf;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void AsciiTable::set_align_decimal_points(bool tf)
+
+{
+
+AlignDecimalPoints = tf;
 
 return;
 
@@ -1427,7 +1445,7 @@ ostream & operator<<(ostream & out, AsciiTable & t)
 
 {
 
-if ( !t.decimal_points_aligned() ) t.line_up_decimal_points();
+if ( t.align_decimal_points() && !t.decimal_points_aligned() ) t.line_up_decimal_points();
 
 int j, r, c, n;
 int rmax;

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -87,6 +87,32 @@ return ( * this );
 
 ////////////////////////////////////////////////////////////////////////
 
+void Mode_Field_Info::clone(const Mode_Field_Info & i)
+{
+   dict = i.dict;
+   conf = i.conf;
+   gft = i.gft;
+   FO = i.FO;
+   Multivar = i.Multivar;
+   index = i.index;
+   conv_radius = i.conv_radius;
+   vld_thresh = i.vld_thresh;
+
+   var_info = i.var_info->clone();
+
+   conv_radius_array = i.conv_radius_array; 
+   conv_thresh_array = i.conv_thresh_array;
+   merge_thresh_array = i.merge_thresh_array;
+   conv_thresh = i.conv_thresh;
+   merge_thresh = i.merge_thresh;
+   merge_flag = i.merge_flag;
+   raw_pi = i.raw_pi;
+   filter_attr_map = i.filter_attr_map;
+   file_type = i.file_type;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 
 void Mode_Field_Info::init_from_scratch()
 
@@ -143,6 +169,8 @@ merge_thresh.clear();
 
 merge_flag = MergeType_Engine;
 
+file_type = FileType_None;
+ 
 // raw_pi.clear();
 
 }
@@ -200,7 +228,7 @@ gft = type;
 if ( dict->lookup(conf_key_raw_thresh) )  {
 
    mlog << Error 
-        << "\nMode_Field_Info::process_config() -> "
+        << "\nMode_Field_Info::set() -> "
         << "the \"" << conf_key_raw_thresh << "\" entry is deprecated in MET "
         << met_version << "!  Use \"" << conf_key_censor_thresh << "\" and \""
         << conf_key_censor_val << "\" instead.\n\n";
@@ -310,8 +338,8 @@ if ( FO == 'F' )  raw_pi = parse_conf_plot_info(conf->lookup_dictionary(conf_key
 else              raw_pi = parse_conf_plot_info(conf->lookup_dictionary(conf_key_obs_raw_plot));
 
 
-
-
+file_type = parse_conf_file_type(dict);
+ 
    //
    //  done
    //
@@ -353,7 +381,7 @@ void Mode_Field_Info::set_merge_thresh_by_index (int k)
 
 if ( (k < 0) || (k >= merge_thresh_array.n_elements()) )  {
 
-   mlog << Error << "\nMode_Field_Info::set_fcst_merge_thresh_by_index(int) -> "
+   mlog << Error << "\nMode_Field_Info::set_merge_thresh_by_index(int) -> "
         << "range check error\n\n";
 
    exit ( 1 );

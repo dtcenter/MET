@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -14,6 +14,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "mode_conf_info.h"
+#include "mode_data_type.h"
 
 #include "interest.h"
 #include "set.h"
@@ -214,16 +215,19 @@ class ModeFuzzyEngine {
       void do_fcst_merging();
       void do_obs_merging();
 
+      // traditional version
       void do_fcst_merging(const char *default_config,
                            const char *merge_config);
-      void do_fcst_merging(const char *default_config,
-                           const char *merge_config,
-                           const ShapeData &merge_data);
+
+      // multivar version
+      void do_fcst_merging(const ShapeData &merge_data);
+
+      // traditional version
       void do_obs_merging(const char *default_config,
                           const char *merge_config);
-      void do_obs_merging(const char *default_config,
-                          const char *merge_config,
-                          const ShapeData &merge_data);
+
+      // multivar version
+      void do_obs_merging(const ShapeData &merge_data);
 
       void do_matching();
 
@@ -283,6 +287,8 @@ class ModeFuzzyEngine {
       void do_obs_clus_splitting();
 
       void do_cluster_features();
+
+      void set_data_type(ModeDataType type);
 
          //
          // Configuration information
@@ -368,8 +374,10 @@ class ModeFuzzyEngine {
       int get_matched_obs(int)    const;
       int get_unmatched_obs(int)  const;
 
+
       SetCollection collection;
 
+      ModeDataType data_type;
 };
 
 ///////////////////////////////////////////////////////////////////////////////

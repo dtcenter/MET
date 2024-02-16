@@ -11,23 +11,23 @@ Many filtering criteria within the MET-TC tools depend on the distinction betwee
 
 While the TC-dland tool is available to be run, most users will find the precomputed distance to land files distributed with the release sufficient. Therefore, the typical user will not actually need to run this tool.
 
-Input/output format
+Input/Output Format
 ===================
 
 The input for the TC-dland tool is a file containing the longitude (degrees east) and latitude (degrees north) of all the coastlines and islands considered to be a significant landmass. The default input is to use all three land data files (**aland.dat, shland.dat, wland.dat**) found in the installed *share/met/tc_data/* directory. The use of all three files produces a global land data file. The **aland.dat** file contains the longitude and latitude distinctions used by NHC for the Atlantic and eastern North Pacific basins, the **shland.dat** contains longitude and latitude distinctions for the Southern Hemisphere (south Pacific and South Indian Ocean), and the **wland.dat** contains the remainder of the Northern Hemisphere (western North Pacific and North Indian Ocean). Users may supply their own input file in order to refine the definition of coastlines and a significant landmass.
 
-The output file from TC-dland is a NetCDF format file containing a gridded field representing the distance to the nearest coastline or island, as specified in the input file. This file is used in the TC-Pairs tool to compute the distance from land for each track point in the adeck and bdeck. As noted in :numref:`met_directory_structure`, precomputed distance to land (NetCDF output from TC-dland) files are available in the release. In the installed *share/met/tc_data* directory: 
+The output file from TC-dland is a NetCDF format file containing a gridded field representing the distance to the nearest coastline or island, as specified in the input file. This file is used in the TC-Pairs tool to compute the distance from land for each track point in the adeck and bdeck. The precomputed distance to land (NetCDF output from TC-dland) files are available in the release. In the installed *share/met/tc_data* directory: 
 
 **dland_nw_hem_tenth_degree.nc:** TC-dland output from **aland.dat** using a 1/10th degree grid
 
 **dland_global_tenth_degree.nc:** TC-dland output from all three land data files (global coverage) using a 1/10th degree grid.
 
-Practical information
+Practical Information
 =====================
 
 This section briefly describes how to run tc_dland. The default grid is set to 1/10th degree Northwest (NW) hemispheric quadrant (over North America) grid.
 
-tc_dland usage
+tc_dland Usage
 --------------
 
 .. code-block:: none
@@ -43,12 +43,12 @@ tc_dland usage
 
 **tc_dland** has one required argument and accepts several optional ones.
 
-Required arguments for tc_dland
+Required Arguments for tc_dland
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. The **out_file** argument indicates the NetCDF output file containing the computed distances to land.
 
-Optional arguments for tc_dland
+Optional Arguments for tc_dland
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 2. The **-grid spec** argument overrides the default grid (1/10th NH grid). Spec = **lat_ll lon_ll delta_lat delta_lon n_lat n_lon**

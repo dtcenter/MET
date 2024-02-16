@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -113,6 +113,7 @@ static ConcatString obs_file;
 
 // Input Config file
 static ConcatString     config_file;
+static StringArray      config_files;
 static GridStatConfInfo conf_info;
 
 // Optional arguments

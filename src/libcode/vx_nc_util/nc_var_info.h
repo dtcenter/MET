@@ -1,7 +1,7 @@
 
 
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -87,6 +87,12 @@ class NcVarInfo {
       int y_slot;    //
       int z_slot;    //   -1 if not defined
       int t_slot;    //
+
+      bool x_stag;   // are dimensions staggered
+      bool y_stag;
+      bool z_stag;
+
+      bool is_pressure; // is variable on pressure levels
 
 };
 

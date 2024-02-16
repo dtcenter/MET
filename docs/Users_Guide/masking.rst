@@ -6,12 +6,12 @@ Regional Verification using Spatial Masking
 
 Verification over a particular region or area of interest may be performed using "masking". Defining a masking region is simply selecting the desired set of grid points to be used. The Gen-Vx-Mask tool automates this process and replaces the Gen-Poly-Mask and Gen-Circle-Mask tools from previous releases. It may be run to create a bitmap verification masking region to be used by many of the statistical tools. This tool enables the user to generate a masking region once for a domain and apply it to many cases. It has been enhanced to support additional types of masking region definition (e.g. tropical-cyclone track over water only). An iterative approach may be used to define complex areas by combining multiple masking regions together.
 
-Gen-Vx-Mask tool
+Gen-Vx-Mask Tool
 ================
 
 The Gen-Vx-Mask tool may be run to create a bitmap verification masking region to be used by the MET statistics tools. This tool enables the user to generate a masking region once for a domain and apply it to many cases. While the MET statistics tools can define some masking regions on the fly using polylines, doing so can be slow, especially for complex polylines containing hundreds of vertices. Using the Gen-Vx-Mask tool to create a bitmap masking region before running the other MET tools will make them run more efficiently.
 
-gen_vx_mask usage
+gen_vx_mask Usage
 -----------------
 
 The usage statement for the Gen-Vx-Mask tool is shown below:
@@ -40,7 +40,7 @@ The usage statement for the Gen-Vx-Mask tool is shown below:
 
 gen_vx_mask has four required arguments and can take optional ones. Note that **-type string** (masking type) was previously optional but is now required.
 
-Required arguments for gen_vx_mask
+Required Arguments for gen_vx_mask
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. The **input_grid** argument is a named grid, the path to a gridded data file, or an explicit grid specification string (see :numref:`App_B-grid_specification_strings`) which defines the grid for which a mask is to be defined. If set to a gen_vx_mask output file, automatically read mask data as the **input_field**.
@@ -61,7 +61,7 @@ Required arguments for gen_vx_mask
 
 4. The **-type string** is required to set the masking type. The application will give an error message and exit if "-type string" is not specified on the command line. See the description of supported types below.
    
-Optional arguments for gen_vx_mask
+Optional Arguments for gen_vx_mask
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 5. The **-input_field string** option can be used to read existing mask data from "input_file".
@@ -100,7 +100,7 @@ Optional arguments for gen_vx_mask
 
 .. _Types_of_masking_gen_vx_mask:
 
-Types of masking available in gen_vx_mask
+Types of Masking Available in gen_vx_mask
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 The Gen-Vx-Mask tool supports the following types of masking region definition selected using the **-type** command line option:
 

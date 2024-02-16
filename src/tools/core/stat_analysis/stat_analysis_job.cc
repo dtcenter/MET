@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -321,7 +321,7 @@ void do_job_filter(const ConcatString &jobstring, LineDataFile &f,
 
       if(job.is_keeper(line)) {
 
-         job.dump_stat_line(line);
+         job.dump_stat_line(line, true);
 
          n_out++;
       }

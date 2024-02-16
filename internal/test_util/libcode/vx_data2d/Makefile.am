@@ -11,7 +11,7 @@ include ${top_srcdir}/Make-include
 # Test programs
 
 noinst_PROGRAMS = test_table_read \
-              dump_default_table
+	dump_default_table
 
 test_table_read_SOURCES = test_table_read.cc
 test_table_read_CPPFLAGS = ${MET_CPPFLAGS}
@@ -34,6 +34,7 @@ dump_default_table_LDFLAGS = -L. ${MET_LDFLAGS}
 dump_default_table_LDADD = -lvx_config \
 	-lvx_gsl_prob \
 	-lvx_log \
+	$(UGRID_MET_LIBS) \
 	-lvx_data2d \
 	-lvx_grid \
 	-lvx_geodesy \
@@ -41,4 +42,5 @@ dump_default_table_LDADD = -lvx_config \
 	-lvx_cal \
 	-lvx_math \
 	-lvx_log \
+	$(UGRID_DEP_LIBS) \
 	-lproj -lgsl -lgslcblas

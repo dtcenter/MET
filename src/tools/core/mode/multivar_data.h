@@ -1,4 +1,4 @@
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -22,6 +22,7 @@
 #include "vx_grid.h"
 #include "data_file_type.h"
 #include "two_d_array.h"
+#include "mode_data_type.h"
 
 class MultiVarData1 {
 
@@ -33,50 +34,44 @@ class MultiVarData1 {
 
  public:
 
-   inline MultiVarData1(int nx, int ny, const string &name) :
+   inline MultiVarData1(int nx, int ny, const string &name,
+                        ModeDataType dataType) :
+      _dataType(dataType),
       _name(name),
-      _fcst_obj_sd(0),
-      _obs_obj_sd(0),
-      _fcst_obj_data(0),
-      _obs_obj_data(0),
-      _fcst_raw_data(0),
-      _obs_raw_data(0),
-      _Fcst_sd(0), _Obs_sd(0),
-      _nx(nx), _ny(ny)
+      _obj_sd(0),
+      _obj_data(0),
+      _raw_data(0),
+      _sd(0),
+      _nx(nx), _ny(ny),
+      _convThreshArray(),
+      _mergeThreshArray()
       {}
       
    inline ~MultiVarData1() {
-      if (_fcst_obj_sd) delete _fcst_obj_sd;
-      if (_obs_obj_sd) delete _obs_obj_sd;
-      if (_fcst_obj_data) delete [] _fcst_obj_data;
-      if (_obs_obj_data) delete [] _obs_obj_data;
-      if (_fcst_raw_data) delete [] _fcst_raw_data;
-      if (_obs_raw_data) delete [] _obs_raw_data;
-      if (_Fcst_sd) delete _Fcst_sd;
-      if (_Obs_sd) delete _Obs_sd;
+      if (_obj_sd) delete _obj_sd;
+      if (_obj_data) delete [] _obj_data;
+      if (_raw_data) delete [] _raw_data;
+      if (_sd) delete _sd;
    }      
 
-   void set_fcst_obj(ShapeData *sd);
-   void set_fcst_raw(ShapeData *sd);
-   void set_obs_obj(ShapeData *sd);
-   void set_obs_raw(ShapeData *sd);
-   void set_fcst_shapedata(const ShapeData &sd);
-   void set_obs_shapedata(const ShapeData &sd);
+   void set_obj(ShapeData *sd);
+   void set_raw(ShapeData *sd);
+   void set_shapedata(const ShapeData &sd);
+   void set_conv_thresh_array(const ThreshArray &t);
+   void set_merge_thresh_array(const ThreshArray &t);
    void objects_from_arrays(bool do_clusters,
-                            BoolPlane & fcst_out, 
-                            BoolPlane & obs_out);
-   void print(const string &fname, const string &oname) const;
+                            BoolPlane & out);
+   void print(const string &name) const;
 
+   ModeDataType _dataType;
    string _name;
-   ShapeData *_fcst_obj_sd;
-   ShapeData *_obs_obj_sd;
-   int *_fcst_obj_data;
-   int *_obs_obj_data;
-   float *_fcst_raw_data;
-   float *_obs_raw_data;
-   ShapeData *_Fcst_sd;
-   ShapeData *_Obs_sd;
+   ShapeData *_obj_sd;
+   int *_obj_data;
+   float *_raw_data;
+   ShapeData *_sd;
    int _nx, _ny;
+   ThreshArray _convThreshArray;
+   ThreshArray _mergeThreshArray;
 };
 
 class MultiVarData {
@@ -90,39 +85,32 @@ class MultiVarData {
    MultiVarData();
    ~MultiVarData();
       
-   void checkFileTypeConsistency(const MultiVarData &mvdi, int j);
-
-   void init(const string &fname, const string &oname,
-             const Grid &grid, GrdFileType ftype, GrdFileType otype,
-             const string &funits, const string &ounits,
-             const string &flevel, const string &olevel,
+   void init(ModeDataType dataType,
+             const string &name, 
+             const Grid &grid, 
+             const string &units, 
+             const string &level,
              double data_min, double data_max);
-   void set_fcst_obj(ShapeData *sd, bool simple);
-   void set_fcst_raw(ShapeData *sd, bool simple);
-   void set_obs_obj(ShapeData *sd, bool simple);
-   void set_obs_raw(ShapeData *sd, bool simple);
-   void set_fcst_shapedata(const ShapeData &sd, bool simple);
-   void set_obs_shapedata(const ShapeData &sd, bool simple);
-   const ShapeData *fcst_shapedata_ptr(bool simple) const;
-   const ShapeData *obs_shapedata_ptr(bool simple) const;
-   void  objects_from_arrays(bool do_clusters, bool simple, BoolPlane & fcst_out, 
-                             BoolPlane & obs_out);
+
+   void set_obj(ShapeData *sd, bool simple);
+   void set_raw(ShapeData *sd, bool simple);
+   void set_shapedata(const ShapeData &sd, bool simple);
+   void set_conv_thresh_array(const ThreshArray &t, bool simple);
+   void set_merge_thresh_array(const ThreshArray &t, bool simple);
+   const ShapeData *shapedata_ptr(bool simple) const;
+   void  objects_from_arrays(bool do_clusters, bool simple, BoolPlane & out);
    void print(void) const;
 
-   
+   ModeDataType _dataType;
    MultiVarData1 *_simple;
    MultiVarData1 *_merge;
-   string _f_name;
-   string _o_name;
+   string _name;
    int _nx, _ny;
    Grid *_grid;
-   GrdFileType _ftype;
-   GrdFileType _otype;
-   string _funits, _ounits;
-   string _flevel, _olevel;
+   string _units;
+   string _level;
    double _data_min, _data_max;
 };
-
 
 #endif   /*  __MODE_FRONT_END_H__  */
 

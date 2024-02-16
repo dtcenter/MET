@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -11,6 +11,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+using namespace std;
 using namespace std;
 
 #include <iostream>
@@ -572,13 +573,14 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void NumArray::sort_array()
+void NumArray::sort_array(bool increasing)
 
 {
 
    if ( !Sorted )  {
 
-      sort(e.begin(), e.end());
+      if ( increasing ) sort(e.begin(), e.end());
+      else              sort(e.rbegin(), e.rend());
 
    }
    

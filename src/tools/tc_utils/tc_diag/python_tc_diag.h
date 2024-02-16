@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -19,11 +19,12 @@ extern "C" {
 
 }
 
+#include "tc_diag.h"
+
 ////////////////////////////////////////////////////////////////////////
 
 extern bool python_tc_diag(const ConcatString &script_name,
-               const ConcatString &tmp_file_name,
-               std::map<std::string,double> &diag_map);
+               TmpFileInfo &tmp_info);
 
 ////////////////////////////////////////////////////////////////////////
 

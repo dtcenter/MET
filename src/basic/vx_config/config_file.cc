@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -117,6 +117,20 @@ assign(c);
 
 ////////////////////////////////////////////////////////////////////////
 
+MetConfig & MetConfig::operator=(const MetConfig &s)
+{
+   if(this == &s) return(*this);
+
+   init_from_scratch();
+
+   assign(s);
+
+   return(*this);
+
+}
+
+////////////////////////////////////////////////////////////////////////
+
 
 MetConfig::MetConfig(const char * _filename)
 
@@ -188,6 +202,14 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+void MetConfig::debug_dump(int depth) const
+{
+   dump(cout, depth);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+
 void MetConfig::dump(ostream & out, int depth) const
 
 {
@@ -249,25 +271,8 @@ return;
 
 ////////////////////////////////////////////////////////////////////////
 
-
-ConcatString MetConfig::get_tmp_dir()
-{
-   ConcatString tmp_dir;
-
-   // Use the MET_TMP_DIR environment variable, if set.
-   if(!get_env("MET_TMP_DIR", tmp_dir)) {
-      const DictionaryEntry * _e = lookup(conf_key_tmp_dir);
-      if ( LastLookupStatus ) tmp_dir = _e->string_value();
-      else                    tmp_dir = default_tmp_dir;
-   }
-
-   return tmp_dir;
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
 int MetConfig::nc_compression()
+
 {
    ConcatString cs;
    int n = 0;
@@ -295,6 +300,41 @@ int n = lookup_int(conf_key_output_precision, false);
 if ( !LastLookupStatus )  n = default_precision;
 
 return n;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+ConcatString MetConfig::get_tmp_dir()
+
+{
+   ConcatString tmp_dir;
+
+   // Use the MET_TMP_DIR environment variable, if set.
+   if(!get_env("MET_TMP_DIR", tmp_dir)) {
+      const DictionaryEntry * _e = lookup(conf_key_tmp_dir);
+      if ( LastLookupStatus ) tmp_dir = _e->string_value();
+      else                    tmp_dir = default_tmp_dir;
+   }
+
+   return tmp_dir;
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool MetConfig::time_offset_warning(int offset)
+
+{
+
+int allowable_offset = lookup_int(conf_key_time_offset_warning, false);
+
+if (!LastLookupStatus )  allowable_offset = 0;
+
+return ( abs(offset) > allowable_offset );
 
 }
 
@@ -352,7 +392,7 @@ met_open(configfilein, filename);
 if ( ! configfilein )  {
 
    mlog << Error << "\nMetConfig::read(const char *) -> "
-        << "unable to open input file \"" << filename << "\"\n\n";
+        << "unable to open input file \"" << filename << "\". Please specify \"file_type = FileType_<type>;\" at the configration file\n\n";
 
    exit ( 1 );
 

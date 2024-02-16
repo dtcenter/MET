@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -231,8 +231,11 @@ inline StringArray          TrackInfo::track_lines()      const { return(TrackLi
 
 class TrackInfoArray {
 
-   friend TrackInfo consensus(const TrackInfoArray &, const ConcatString &,
-                              int, const StringArray &);
+   friend TrackInfo consensus(const TrackInfoArray &,
+                              const ConcatString &,
+                              const StringArray &, const int,
+                              const StringArray &, const int,
+                              const bool);
 
    private:
 

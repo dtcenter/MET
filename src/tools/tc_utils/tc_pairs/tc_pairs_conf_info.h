@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -27,8 +27,10 @@
 struct ConsensusInfo {
    ConcatString Name;
    StringArray  Members;
-   NumArray     Required;
-   int          MinReq;
+   BoolArray    ConsRequired;
+   int          MinConsReq;
+   BoolArray    DiagRequired;
+   int          MinDiagReq;
    bool         WriteMembers;
 };
 

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -20,6 +20,7 @@
 
 #include <iostream>
 #include <ostream>
+#include <string>
 #include <vector>
 #include <algorithm>
 
@@ -73,6 +74,8 @@ class StringArray {
       void set(int i, const std::string);
 
       void insert(int i, const char *);
+
+      std::string serialize(const char *sep=" ") const;
 
       int n_elements() const;
       int n() const;   //  same thing

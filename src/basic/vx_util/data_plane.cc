@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -23,6 +23,7 @@
 using namespace std;
 
 #include <algorithm>
+#include <map>
 
 #include "data_plane.h"
 
@@ -230,57 +231,57 @@ void DataPlane::dump(ostream & out, int depth) const {
 
 void DataPlane::debug_examine(bool show_all_values) const {
 
-   vector<double> values;
-   vector<int> count;
+   // Nothing to print if verbosity level is below 4
+   if(mlog.verbosity_level() < 4) return;
+
+   map<double,int> value_count_map;
    int total_count = 0;
-   
-   for (int x=0; x<Nx; ++x) {
-      for (int y=0; y<Ny; ++y) {
-         double v = get(x,y);
-         if (v <= 0) {
-            continue;
+
+   for(int i=0; i<Data.size(); i++) {
+
+      // Count positive values
+      if(Data[i] > 0) total_count++;
+
+      if (show_all_values) {
+
+         // Add a new map entry
+         if(value_count_map.count(Data[i]) == 0) {
+            value_count_map[Data[i]] = 0;
          }
-         ++total_count;
-         if (show_all_values) {
-            vector<double>::iterator vi;
-            vi = find(values.begin(), values.end(), v);
-            if (vi == values.end()) {
-               values.push_back(v);
-               count.push_back(1);
-            } else {
-               int ii = vi - values.begin();
-               count[ii] = count[ii] + 1;
-            }
-         }
+
+         // Increment count
+         value_count_map[Data[i]] += 1;
       }
    }
-   if (show_all_values) {
-      for (size_t i=0; i<values.size(); ++i) {
-         mlog << Debug(4) << " data value=" << values[i] << " count=" << count[i] << "\n";
+
+   if(show_all_values) {
+      for(auto it  = value_count_map.begin();
+               it != value_count_map.end(); it++) {
+         mlog << Debug(4) << " data value=" << it->first
+              << " count=" << it->second << "\n";
       }
    }
-   mlog << Debug(4) << "Total count = " << total_count << "\n";
+
+   mlog << Debug(4) << "Total count > 0 = " << total_count
+        << " of " << Data.size() << "\n";
+
+   return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 string DataPlane::sdebug_examine() const{
+   ConcatString cs;
+   int n = 0;
 
-   int total_count = 0;
-   
-   for (int x=0; x<Nx; ++x) {
-      for (int y=0; y<Ny; ++y) {
-         double v = get(x,y);
-         if (v <= 0) {
-            continue;
-         }
-         ++total_count;
-      }
+   // Count positive values
+   for(auto it = Data.begin(); it != Data.end(); it++) {
+      if(*it > 0) n++;
    }
-   char buf[1000];
-   sprintf(buf, "Total count = %d", total_count);
-   string retval = buf;
-   return retval;
+
+   cs << "Total count > 0 = " << n << " of " << (int) Data.size();
+
+   return cs;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -297,7 +298,7 @@ void DataPlane::set_size(int nx, int ny, double v) {
    }
 
       //
-      //  delete exisiting data, if necessary
+      //  delete existing data, if necessary
       //
 
    Nx = nx;
@@ -799,6 +800,91 @@ return;
 
 }
 
+///////////////////////////////////////////////////////////////////////////////
+
+
+void DataPlane::destagger(bool x_stag, bool y_stag)
+{
+    // don't do anything if data is not staggered in x or y dimension
+    if (!x_stag && !y_stag) return;
+
+    const char *method_name = "DataPlane::destagger(bool, bool) -> ";
+
+    if ( Data.empty() )  {
+
+        mlog << Error << "\n\n  " << method_name << " data plane is empty!\n\n";
+        exit ( 1 );
+
+    }
+
+    int nx_new = Nx;
+    int ny_new = Ny;
+    int nxy_new;
+    int weight = 0;
+    int x, y, index_new;
+    double total;
+    vector<double> new_data;
+
+    // set nx and weight based on which dimensions are staggered
+
+    if (x_stag) {
+
+        mlog << Debug(3) << "De-staggering dataplane in X dimension\n";
+        nx_new = Nx - 1;
+        weight += 2;
+
+    }
+
+    if (y_stag) {
+
+        mlog << Debug(3) << "De-staggering dataplane in Y dimension\n";
+        ny_new = Ny - 1;
+        weight += 2;
+
+    }
+
+    // allocate vector to store output data
+
+    nxy_new = nx_new * ny_new;
+    new_data.resize(nxy_new);
+
+    for (y=0; y < ny_new; y++)  {
+        for (x=0; x < nx_new; x++)  {
+
+            index_new = y*nx_new + x;
+
+            // always add data from current grid point
+            total = Data[two_to_one(x, y)];
+
+            // add data from neighboring grid points based on staggered dimension
+
+            if (x_stag) {
+                total += Data[two_to_one(x+1,y)];
+            }
+            if (y_stag) {
+                total += Data[two_to_one(x,y+1)];
+            }
+
+            // add diagonal point if staggered in both dimensions (may not occur)
+
+            if (x_stag && y_stag) {
+                total += Data[two_to_one(x+1,y+1)];
+            }
+
+            // divide the sum of the values by the weight to compute the average
+
+            new_data[index_new] = total / weight;
+
+        }
+    }
+
+    // replace data vector and size variables
+
+    Data = new_data;
+    Nx = nx_new;
+    Ny = ny_new;
+    Nxy = nxy_new;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 

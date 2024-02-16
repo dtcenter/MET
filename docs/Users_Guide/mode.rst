@@ -17,12 +17,12 @@ MODE may be used in a generalized way to compare any two fields. For simplicity,
 
 .. _MODE_Scientific-and-statistical:
 
-Scientific and statistical aspects
+Scientific and Statistical Aspects
 ==================================
 
 The methods used by the MODE tool to identify and match forecast and observed objects are briefly described in this section. 
 
-Resolving objects
+Resolving Objects
 -----------------
 
 The process used for resolving objects in a raw data field is called *convolution thresholding*. The raw data field is first convolved with a simple filter function as follows:
@@ -81,7 +81,7 @@ All the attributes discussed so far are defined for single objects. Once these a
 
 Several area measures are also used for pair attributes. **Union Area** is the total area that is in either one (or both) of the two objects. **Intersection Area** is the area that is inside both objects simultaneously. **Symmetric Difference** is the area inside at least one object, but not inside both.
 
-Fuzzy logic
+Fuzzy Logic
 -----------
 
 Once object attributes :math:`\alpha_1,\alpha_2,\ldots,\alpha_n` are estimated, some of them are used as input to a fuzzy logic engine that performs the matching and merging steps. **Merging** refers to grouping together objects in a single field, while **matching** refers to grouping together objects in different fields, typically the forecast and observed fields. Interest maps :math:`I_i` are applied to the individual attributes :math:`\alpha_i` to convert them into interest values, which range from zero (representing no interest) to one (high interest). For example, the default interest map for centroid difference is one for small distances, and falls to zero as the distance increases. For other attributes (*e.g.*, intersection area), low values indicate low interest, and high values indicate more interest.
@@ -98,7 +98,7 @@ This total interest value is then thresholded, and pairs of objects that have to
 
 Another merging method is available in MODE, which can be used instead of, or along with, the fuzzy logic based merging just described. Recall that the convolved field is thresholded to produce the mask field. A second (lower) threshold can be specified so that objects that are separated at the higher threshold but joined at the lower threshold are merged.
 
-Summary statistics
+Summary Statistics
 ------------------
 
 Once MODE has been run, summary statistics are written to an output file. These files contain information about all single and cluster objects and their attributes. Total interest for object pairs is also output, as are percentiles of intensity inside the objects. The output file is in a simple flat ASCII tabular format (with one header line) and thus should be easily readable by just about any programming language, scripting language, or statistics package. Refer to :numref:`MODE-output` for lists of the statistics included in the MODE output files. Example scripts will be posted on the MET website in the future.
@@ -112,20 +112,37 @@ Traditionally, MODE defines objects by smoothing and thresholding data from a si
 
 As described in :numref:`MODE-configuration-file`, the **field** entry in the forecast and observation dictionaries define the input data to be processed. If **field** is defined as a dictionary, the traditional method for running MODE is invoked, where objects are defined using a single input field. If **field** is defined as an array of dictionaries, each specifying a different input field, then the multi-variate MODE logic is invoked and requires the **multivar_logic** configuration entry to be set. Traditional MODE is run once for each input field to define objects for that field. Note that the object definition criteria can be defined separately for each field array entry. The objects from each input field are combined into forecast and observation data *super* objects 
 
-The **multivar_logic** and **multivar_intensity_flag** configuration entries, described in :numref:`MODE-configuration-file`, define the boolean logic for combining objects from multiple fields into *super* objects, and then optionally computing intensities for individual input fields when the input is masked to non-missing only inside the *super* objects. If the **multivar_logic** configuration option iset, there must be the same number of fields defined in an array of dictionaries for fcst and for obs as indicated in the **multivar_logic**. Note that the multi-variate MODE forecast and observation input fields and combination logic do not need to
-match. If a particular  **multivar_intensity_flag** value is TRUE the corresponding pair of fields (fcst and obs) are masked to non-missing inside the fcst and obs super objects, and traditional mode is run on that pair of masked inputs producing uniquely named outputs. If it is FALSE, mode is not run for that pair of inputs.
+The **multivar_logic** configuration entry, described in :numref:`MODE-configuration-file`, defines the boolean logic for combining objects from multiple fields into *super* objects. It can be defined once to apply to both the forecast and observation dictionaries if the field array lengths are the same, or defined separately within each dictionary. If defined separately within each dictionary, the field array lengths do not need to be the same for the forecast and observations. Note that the multi-variate MODE forecast and observation input fields and combination logic do not need to match.
 
-If all **multivar_intensity_flag** values are FALSE, the forecast and observation *super* objects are written to NetCDF, text, and postscript output files in the standard mode output format, but with no intensity information. 
+The **multivar_intensity_compare_fcst** and **multivar_intensity_compare_obs** configuration entries, described in :numref:`MODE-configuration-file`, define the field array indexes for which to optionally compare intensities for individual input fields when the input is masked to non-missing only inside the *super* objects and are required to be the same length. For example, if **multivar_intensity_compare_fcst = [ 1, 2 ];** and **multivar_intensity_compare_obs = [ 2, 3 ];**, then index 1 (2) of the forecast field array will be compared with index 2 (3) of the observation field array. If an intensity comparision is requested, the corresponding pair of fields (fcst and obs) are masked to non-missing inside the fcst and obs super objects, and traditional mode is run on that pair of masked inputs producing uniquely named outputs. If **multivar_intensity_compare_fcst** and **multivar_intensity_compare_obs** are empty, the forecast and observation *super* objects are written to NetCDF, text, and postscript output files in the standard mode output format, but with no intensity information.
 
+When regridding to the FCST or OBS field (e.g. to_grid = FCST), the first field of the field array is used from the forecast and observation field dictionaries, respectively. All regridding is then done to that grid. Other regrid options described in :ref:`regrid` can also be used as normal.
 
-Practical information
+"file_type" can be set independently for each input in multivariate mode. If not set for an input, MET uses file names and file content to determine the type.
+
+When setting a threshold to a percentile, some choices require both an observation input and a forecast input.  When this is the case, it's assumed the indices match, so for example if forecast input 1 has such a percentile setting, then observation input 1 will be used to compute the percentile.  Percentiles in which this will happen are:
+
+* SFP in an observation input.
+  * The matching forecast input will be used to determine the threshold.  e.g. ">SFP33.3" in the 2nd observation input means greater than 33.3-rd percentile of the 2nd forecast input will be used as the threshold for that observation input.
+
+* SOP in a forecast input.
+  * The matching observation input will be used to determine the threshold. e.g. ">SOP33.3" in the 2nd forecast input means greater than 33.3-rd percentile of the 2nd observation input will be used as the threshold for that forecast input.
+
+* "==FBIAS" in an observation input.
+  * e.g. "==FBIAS1" in an observation input to automatically de-bias the data, using a simple threshold in the matching forecast input. For example, when observation input 3 has "==FBIAS1", and forecast input 3 has ">5.0", MET applies the >5.0 threshold to the forecast and then chooses an observation threshold which results in a frequency bias of 1. The frequency bias can be any float value > 0.0.
+
+* "==FBIAS" in a forecast input.
+  * e.g. "==FBIAS1" in a forecast input to automatically de-bias the data, using a simple threshold in the matching observation input. For example, when forecast input 2 has "==FBIAS1", and observation input 2 has ">5.0", MET applies the >5.0 threshold to the observation and then chooses a forecast threshold which results in a frequency bias of 1.  The frequency bias can be any float value > 0.0.
+
+  
+Practical Information
 =====================
 
 This section contains a description of how MODE can be configured and run. The MODE tool is used to perform a features-based verification of gridded model data using gridded observations. The input gridded model and observation datasets must be in one of the MET supported gridded file formats. If the input datasets are not already on a common grid, MODE can interpolate them to a common grid. The regrid option in the configuration file enables the user to specify the grid upon which the scores will be computed. The gridded analysis data may be based on observations, such as Stage II or Stage IV data for verifying accumulated precipitation, or a model analysis field may be used. However, users are cautioned that it is generally unwise to verify model output using an analysis field produced by the same model.
 
 MODE provides the capability to select a single model variable/level from which to derive objects to be analyzed. MODE was developed and tested using accumulated precipitation. However, the code has been generalized to allow the use of any gridded model and observation field. Based on the options specified in the configuration file, MODE will define a set of simple objects in the model and observation fields. It will then compute an interest value for each pair of objects across the fields using a fuzzy engine approach. Those interest values are thresholded, and any pairs of objects above the threshold will be matched/merged. Through the configuration file, MODE offers a wide range of flexibility in how the objects are defined, processed, matched, and merged.
 
-mode usage
+mode Usage
 ----------
 
 The usage statement for the MODE tool is listed below:
@@ -144,7 +161,7 @@ The usage statement for the MODE tool is listed below:
 
 The MODE tool has three required arguments and can accept several optional arguments.
 
-Required arguments for mode
+Required Arguments for mode
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. The **fcst_file** argument indicates the gridded file containing the model field to be verified.
@@ -153,7 +170,7 @@ Required arguments for mode
 
 3. The **config_file** argument indicates the name of the configuration file to be used. The contents of the configuration file are discussed below.
 
-Optional arguments for mode
+Optional Arguments for mode
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 4. The **-config_merge merge_config_file** option indicates the name of a second configuration file to be used when performing fuzzy engine merging by comparing the model or observation field to itself. The MODE tool provides the capability of performing merging within a single field by comparing the field to itself. Interest values are computed for each object and all of its neighbors. If an object and its neighbor have an interest value above some threshold, they are merged. The **merge_config_file** controls the settings of the fuzzy engine used to perform this merging step. If a **merge_config_file** is not provided, the configuration specified by the config_file in the previous argument will be used.
@@ -192,7 +209,7 @@ In Example 2, the MODE tool will verify the model data in the sample_fcst.nc Net
 
 .. _MODE-configuration-file:
 
-mode configuration file
+mode Configuration File
 -----------------------
 
 The default configuration file for the MODE tool, **MODEConfig_default**, can be found in the installed *share/met/config* directory. Another version of the configuration file is provided in *scripts/config*. We encourage users to make a copy of the configuration files prior to modifying their contents. Descriptions of **MODEConfig_default** and the required variables for any MODE configuration file are also provided below. While the configuration file contains many entries, most users will only need to change a few for their use. Specific options are described in the following subsections.
@@ -243,25 +260,24 @@ _____________________
 
 The **multivar_logic** entry appears only in the **MODEMultivarConfig_default** file. This option applies to running multi-variate MODE by setting **field** to an array of dictionaries to define multiple input fields. Objects are defined separately for each input field based on the configuration settings specified for each field array entry. The **multivar_logic** entry is a string which defines how objects for each field are combined into a final *super* object. The objects for each field are referred to as '#N' where N is the N-th field array entry. The '&&' and '||' strings define intersection and union logic, respectively. For example, "#1 && #2" is the intersection of the objects from the first and second fields. "(#1 && #2) || #3" is the union of that intersection with the objects from the third field.
 
-The **multivar_logic** entry is parsed separately from the **fcst** and **obs** dictionaries and can be defined differently in each.
+The **multivar_logic** entry is parsed separately from the **fcst** and **obs** dictionaries and can be defined differently in each. It does not require the same number of fields in the forecast and observation arrays.
 
 _____________________
 
 .. code-block:: none
 
-   multivar_intensity_flag = [FALSE, TRUE, TRUE];
+   multivar_intensity_compare_fcst = [1,2];
+   multivar_intensity_compare_obs = [2,3];
 
-The **multivar_intensity_flag** entry appears only in the **MODEMultivarConfig_default** file. This option is paired with the **multivar_logic** entry, and can take on a value of TRUE or FALSE for each **field**.  In the multivar case, super objects are created using the **multivar_logic** settings. For each input for which **multivar_intensity_flag** is TRUE, the input is masked to be non-missing only within the super objects, and traditional mode is run on that masked input.  For each input for which **multivar_intensity_flag** is FALSE, the input is skipped over.   If all the multivar_intensity_flag values are FALSE, traditional mode output is created for the super objects, but with no intensity information.
-
+The **multivar_intensity_compare_fcst** and **multivar_intensity_compare_obs** entries appear only in the **MODEMultivarConfig_default** file. These entries define an index in the field arrays to be compared for forecast and observation intensities and must be the same length. For example, in the above example, forecast field 1 will be compared to observation field 2 for computing intensity attribute statistics. If the **multivar_intensity_compare_fcst** and **multivar_intensity_compare_obs** are empty, traditional mode output is created for the super objects, but with no intensity information. 
 
 _____________________
 
 .. code-block:: none
 
-   multivar_name = "Precip";
+   multivar_name = "Super";
 
-The **multivar_name** entry appears only in the **MODEMultivarConfig_default** file. This option is used only when the multivar option is enabled, and only when all **multivar_intensity_flag** values are FALSE. It can be thought of as an identifier for the multivariate super object.  It shows up in output files names and content.  If not set the default value is "Super".   It can be set separately for forecasts and observations, or as a common value for both.
-
+The **multivar_name** entry appears only in the **MODEMultivarConfig_default** file. This option is used only when the multivar option is enabled, and only when **multivar_intensity_compare_fcst** and **multivar_intensity_compare_obs** are empty. It can be thought of as an identifier for the multivariate super object.  It shows up in output files names and content.  It can be set separately for forecasts and observations or as a common value for both.
 
 _____________________
 
@@ -269,7 +285,7 @@ _____________________
 
    multivar_level = "LO";
 
-The **multivar_level** entry appears only in the **MODEMultivarConfig_default** file. This option is used only when the multivar option is enabled, and only when all **multivar_intensity_flag** values are FALSE. It is the identifier for the multivariate super object as regards level.  It shows up in output files names and content.  If not set the default value is "NA".   It can be set separately for forecasts and observations, or as a common value for both.
+The **multivar_level** entry appears only in the **MODEMultivarConfig_default** file. This option is used only when the multivar option is enabled, and only when **multivar_intensity_compare_fcst** and **multivar_intensity_compare_obs** are empty. It is the identifier for the multivariate super object as regards level.  It shows up in output files names and content.  If not set the default value is "NA".   It can be set separately for forecasts and observations, or as a common value for both.
 
 _____________________
 
@@ -547,7 +563,7 @@ When MODE is run on global grids, this parameter specifies how many grid squares
 
 .. _MODE-output:
 
-mode output
+mode Output
 -----------
 
 MODE produces output in ASCII, NetCDF, and PostScript formats.

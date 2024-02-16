@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -26,9 +26,10 @@ using namespace std;
 #include "var_info_factory.h"
 #include "grdfiletype_to_string.h"
 #include "var_info_grib.h"
-#include "var_info_nccf.h"
+#include "var_info_nc_cf.h"
 #include "var_info_nc_met.h"
-#include "var_info_nc_pinterp.h"
+#include "var_info_nc_wrf.h"
+#include "var_info_ugrid.h"
 
 #ifdef WITH_PYTHON
    #include "var_info_python.h"
@@ -51,10 +52,11 @@ VarInfo * VarInfoFactory::new_var_info(GrdFileType type)
 
 {
 
-   VarInfo *vi = (VarInfo *) 0;
+   VarInfo *vi = (VarInfo *) nullptr;
+   const char *method_name = "VarInfoFactory::new_var_info() -> ";
 
 #ifdef WITH_PYTHON
-   VarInfoPython * p = 0;
+   VarInfoPython * p = nullptr;
 #endif
 
    //
@@ -73,7 +75,7 @@ VarInfo * VarInfoFactory::new_var_info(GrdFileType type)
          vi = new VarInfoGrib2;
          break;
 #else
-         mlog << Error << "\nVarInfoFactory::new_var_info() -> "
+         mlog << Error << "\n" << method_name
               << "Support for GRIB2 has not been compiled!\n"
               << "To read GRIB2 files, recompile with the --enable-grib2 option.\n\n";
          exit(1);
@@ -83,8 +85,9 @@ VarInfo * VarInfoFactory::new_var_info(GrdFileType type)
          vi = new VarInfoNcMet;
          break;
 
+      case FileType_NcWrf:
       case FileType_NcPinterp:
-         vi = new VarInfoNcPinterp;
+         vi = new VarInfoNcWrf;
          break;
 
       case FileType_Python_Numpy:
@@ -93,31 +96,38 @@ VarInfo * VarInfoFactory::new_var_info(GrdFileType type)
          p = new VarInfoPython;
          p->set_file_type(type);
          vi = p;
-         p = 0;
+         p = nullptr;
          break;
 #else
-         python_compile_error("VarInfoFactory::new_var_info() -> ");
+         python_compile_error(method_name);
 #endif
 
       case FileType_NcCF:
          vi = new VarInfoNcCF;
          break;
 
+      case FileType_UGrid:
+#ifdef WITH_UGRID
+         vi = new VarInfoUGrid;
+         break;
+#else
+         ugrid_compile_error(method_name);
+#endif
+
       case FileType_HdfEos:
-         mlog << Error << "\nVarInfoFactory::new_var_info() -> "
+         mlog << Error << "\n" << method_name
               << "Support for GrdFileType = " << grdfiletype_to_string(type)
               << " not yet implemented!\n\n";
          exit(1);
 
       default:
-         mlog << Error << "\nVarInfoFactory::new_var_info() -> "
+         mlog << Error << "\n" << method_name
               << "unsupported gridded data file type \"" << grdfiletype_to_string(type)
               << "\"\n\n";
          exit(1);
    } // end switch
 
-   mlog << Debug(4)
-        << "VarInfoFactory::new_var_info() -> "
+   mlog << Debug(4) << method_name
         << "created new VarInfo object of type \""
         << grdfiletype_to_string(type) << "\".\n";
 
