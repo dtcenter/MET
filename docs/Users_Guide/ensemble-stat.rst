@@ -648,13 +648,19 @@ The format of the STAT and ASCII output of the Ensemble-Stat tool are described 
     - ME_LT_OBS
     - The Mean Error of the ensemble values less than or equal to their observations
   * - 50
-    - IGN_OERR_CONVOLVED
+    - IGN_OERR_CONV
     - TODO: Add description
   * - 51
-    - IGN_OERR_CORRECTED
+    - IGN_OERR_CORR
     - TODO: Add description
   * - 52
-    - DAWID_SEBASTIANI
+    - DS_OERR
+    - TODO: Add descripion
+  * - 53
+    - DS_ADD_OERR
+    - TODO: Add descripion
+  * - 54
+    - DS_MULT_OERR
     - TODO: Add descripion
 
 .. _table_ES_header_info_es_out_RPS:
