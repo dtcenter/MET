@@ -276,8 +276,8 @@ static const char * ecnt_columns [] = {
    "CRPSS_EMP",   "CRPS_EMP_FAIR", "SPREAD_MD",
    "MAE",         "MAE_OERR",      "BIAS_RATIO",
    "N_GE_OBS",    "ME_GE_OBS",     "N_LT_OBS",
-   "ME_LT_OBS",   "IGN_OERR_CONVOLVED", "IGN_OERR_CORRECTED",
-   "DAWID_SEBASTIANI"
+   "ME_LT_OBS",   "IGN_OERR_CONV", "IGN_OERR_CORR",
+   "DS_OERR",     "DS_ADD_OERR",   "DS_MULT_OERR"
 };
 
 static const char * rps_columns [] = {
