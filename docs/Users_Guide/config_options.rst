@@ -896,26 +896,25 @@ to be verified. This dictionary may include the following entries:
     Since selecting bins of equal width is common, shorthand notation is
     provided to do so. The following options are supported.
 
-    * :code:`cat_thresh = [ ==0.25 ];` specifies an equal bin width < 1
-      and defines 4 bins between the values 0, 0.25, 0.5, 0.75, and 1.0.
-      The `==p` threshold may be set to any probability bin width greater
-      than 0 and less than 1.
+    * :code:`cat_thresh = [ ==0.25 ];` specifies an equal probability bin
+      width of 0.25 and defines 4 bins between the values 0, 0.25, 0.5, 0.75,
+      and 1.0. The :code:`==p` threshold may be set to any probability bin
+      width greater than 0 and less than 1.
 
-    * :code:`cat_thresh = [ ==10 ];` specifies an ensemble of size 10
-      and defines 11 bins between the values -0.05, 0.05, 0.15, ..., 0.95,
-      and 1.05. Note that each bin is centered on the value n/10 for n = 0
-      to 10. The `==n` threshold may be set to any integer number of ensemble
-      members greater than 1.
+    * :code:`cat_thresh = [ ==10 ];` specifies an ensemble of size 10 and
+      defines 11 bins between the values -0.05, 0.05, 0.15, ..., 0.95, and
+      1.05. Note that each bin is centered on the value n/10 for n = 0
+      to 10. The :code:`==n` threshold may be set to any integer number of
+      ensemble members greater than 1 to define n+1 probability bins.
 
     * :code:`cat_thresh = [ >=0, >=0.5, >=0.75, >=1.0 ];` explicitly
-      specifies the probability values and defines 3 bins of unequal width
-      between the values 0, 0.5, 0.75, and 1.0. By convention, the
+      specifies the probability thresholds and defines 3 bins of unequal
+      width between the values 0, 0.5, 0.75, and 1.0. By convention, the
       greater-than-or-equal-to (">=" or "ge") inequality type is required.
 
   * Set "prob_as_scalar = TRUE" to override the processing of probability
     data. When the "prob" entry is set as a dictionary to define the
-    field of interest, settin
-g "prob_as_scalar = TRUE" indicates that this
+    field of interest, setting "prob_as_scalar = TRUE" indicates that this
     data should be processed as regular scalars rather than probabilities.
     For example, this option can be used to compute traditional 2x2
     contingency tables and neighborhood verification statistics for
