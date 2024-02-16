@@ -901,11 +901,12 @@ to be verified. This dictionary may include the following entries:
       and 1.0. The :code:`==p` threshold may be set to any probability bin
       width greater than 0 and less than 1.
 
-    * :code:`cat_thresh = [ ==10 ];` specifies an ensemble of size 10 and
-      defines 11 bins between the values -0.05, 0.05, 0.15, ..., 0.95, and
-      1.05. Note that each bin is centered on the value n/10 for n = 0
-      to 10. The :code:`==n` threshold may be set to any integer number of
-      ensemble members greater than 1 to define n+1 probability bins.
+    * :code:`cat_thresh = [ ==10 ];` specifies probability bins for an
+      ensemble of size 10 and defines 11 bins between the values -0.05, 0.05,
+      0.15, ..., 0.95, and 1.05. Note that each bin is centered on the
+      probability value n/10, for n = 0 to 10. The :code:`==n` threshold may
+      be set to any integer number of ensemble members greater than 1 to
+      define n+1 probability bins.
 
     * :code:`cat_thresh = [ >=0, >=0.5, >=0.75, >=1.0 ];` explicitly
       specifies the probability thresholds and defines 3 bins of unequal
