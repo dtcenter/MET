@@ -68,6 +68,8 @@ class ObsErrorEntry {
          //  get stuff
          //
 
+      double variance() const;
+
          //
          //  do stuff
          //

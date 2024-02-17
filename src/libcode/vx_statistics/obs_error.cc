@@ -184,6 +184,14 @@ void ObsErrorEntry::dump(ostream & out, int depth) const {
 
 ////////////////////////////////////////////////////////////////////////
 
+double ObsErrorEntry::variance() const {
+
+   // TODO: return distribution specific measure of the assume variance
+   return(bad_data_double);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 bool ObsErrorEntry::parse_line(const DataLine &dl) {
 
    // Initialize
