@@ -4275,8 +4275,8 @@ void write_ecnt_cols(const ECNTInfo &ecnt_info,
    //    CRPSS_EMP  CRPS_EMP_FAIR, SPREAD_MD,
    //    MAE,       MAE_OERR,      BIAS_RATIO,
    //    N_GE_OBS,  ME_GE_OBS,     N_LT_OBS,
-   //    ME_LT_OBS, IGN_OERR_CONVOLVED, IGN_OERR_CORRECTED,
-   //    DAWID_SEBASTIANI
+   //    ME_LT_OBS, IGN_OERR_CONV, IGN_OERR_CORR,
+   //    DS_OERR,   DS_ADD_OERR,   DS_MULT_OERR
    //
    at.set_entry(r, c+0,  // Total Number of Pairs
       ecnt_info.n_pair);
@@ -4354,13 +4354,19 @@ void write_ecnt_cols(const ECNTInfo &ecnt_info,
       ecnt_info.me_lt_obs);
 
    at.set_entry(r, c+25,  // Ignorance Score, observation error convolved
-      ecnt_info.ign_oerr_cnv);
+      ecnt_info.ign_oerr_conv);
 
    at.set_entry(r, c+26,  // Ignorance Score, observation error corrected
-      ecnt_info.ign_oerr_cor);
+      ecnt_info.ign_oerr_corr);
 
    at.set_entry(r, c+27,  // Dawid-Sebastiani
-      ecnt_info.dawid_seb);
+      ecnt_info.ds_oerr);
+
+   at.set_entry(r, c+28,  // Dawid-Sebastiani additive error
+      ecnt_info.ds_add_oerr);
+
+   at.set_entry(r, c+29,  // Dawid-Sebastiani multiplicative error
+      ecnt_info.ds_mult_oerr);
 
    return;
 }
