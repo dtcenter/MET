@@ -505,7 +505,8 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
             // Compute the Dawid Sebastiani scores
             double v_ds, v_ds_add, v_ds_mult;
             compute_dawid_sebastiani(emn_unperturbed, esd_unperturbed,
-                                     obs_biased, e->bias_offset, e->bias_scale,
+                                     obs_biased, e->variance(),
+                                     e->bias_offset, e->bias_scale,
                                      v_ds, v_ds_add, v_ds_mult);
             ds_oerr_na.add(v_ds);
             ds_add_oerr_na.add(v_ds_add);
@@ -2176,7 +2177,7 @@ double compute_bias_ratio(double me_ge_obs, double me_lt_obs) {
 
 void compute_obs_error_log_scores(double emn, double esd,
                                   double obs, double oerr_var,
-                                  double &v_conv, double &v_cor) {
+                                  double &v_conv, double &v_corr) {
 
    // Check for bad input data
    if(is_bad_data(emn) ||
@@ -2197,7 +2198,7 @@ void compute_obs_error_log_scores(double emn, double esd,
 
       // Error-corrected logarithmic scoring rule in
       // Ferro (2017, Eq 7) doi:10.1002/qj.3115
-      v_corr = log(ens_sd) +
+      v_corr = log(esd) +
                ((obs - emn) * (obs - emn) - ov2) /
                (2.0 * sigma2);
    }
@@ -2246,13 +2247,13 @@ void compute_dawid_sebastiani(double emn, double esd,
       double ov2  = oerr_var * oerr_var;
 
       eq17 = log(esd) +
-             ((obs - a - b * ens_mn) *
-              (obs - a - b * ens_mn) - ov2) /
+             ((obs - a - b * emn) *
+              (obs - a - b * emn) - ov2) /
              b2s2;
 
-      eq18 = log(ens_sd) +
-             ((obs - b * ens_mn) *
-              (obs - b * ens_mn) - obs * obs * ov2 /
+      eq18 = log(esd) +
+             ((obs - b * emn) *
+              (obs - b * emn) - obs * obs * ov2 /
               (b * b + ov2)) /
              b2s2;
    }
