@@ -2654,9 +2654,11 @@ void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &job,
          m[key].ens_pd.crps_gaus_na.add(cur.crps_gaus);
          m[key].ens_pd.crpscl_gaus_na.add(cur.crpscl_gaus);
          m[key].ens_pd.ign_na.add(cur.ign);
-         m[key].ens_pd.ign_oerr_cnv_na.add(cur.ign_oerr_cnv);
-         m[key].ens_pd.ign_oerr_cor_na.add(cur.ign_oerr_cor);
-         m[key].ens_pd.dawid_seb_na.add(cur.dawid_seb);
+         m[key].ens_pd.ign_oerr_conv_na.add(cur.ign_oerr_conv);
+         m[key].ens_pd.ign_oerr_corr_na.add(cur.ign_oerr_corr);
+         m[key].ens_pd.ds_oerr_na.add(cur.ds_oerr);
+         m[key].ens_pd.ds_add_oerr_na.add(cur.ds_add_oerr);
+         m[key].ens_pd.ds_mult_oerr_na.add(cur.ds_mult_oerr);
          m[key].ens_pd.n_ge_obs_na.add(cur.n_ge_obs);
          m[key].ens_pd.me_ge_obs_na.add(cur.me_ge_obs);
          m[key].ens_pd.n_lt_obs_na.add(cur.n_lt_obs);
@@ -3231,9 +3233,11 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &job,
          m[key].ens_pd.pit_na.add(compute_ens_pit(cur.obs, cur.ens_mean, cur.spread));
 
          // TODO: Call functions to compute these stats here
-         m[key].ens_pd.ign_oerr_cnv_na.add(bad_data_double);
-         m[key].ens_pd.ign_oerr_cor_na.add(bad_data_double);
-         m[key].ens_pd.dawid_seb_na.add(bad_data_double);
+         m[key].ens_pd.ign_oerr_conv_na.add(bad_data_double);
+         m[key].ens_pd.ign_oerr_corr_na.add(bad_data_double);
+         m[key].ens_pd.ds_oerr_na.add(bad_data_double);
+         m[key].ens_pd.ds_add_oerr_na.add(bad_data_double);
+         m[key].ens_pd.ds_mult_oerr_na.add(bad_data_double);
 
          // Store BIAS_RATIO terms
          int n_ge_obs, n_lt_obs;
