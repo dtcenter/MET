@@ -108,9 +108,11 @@ void PairDataEnsemble::clear() {
    ign_na.clear();
    pit_na.clear();
 
-   ign_oerr_cnv_na.clear();
-   ign_oerr_cor_na.clear();
-   dawid_seb_na.clear();
+   ign_oerr_conv_na.clear();
+   ign_oerr_corr_na.clear();
+   ds_oerr_na.clear();
+   ds_add_oerr_na.clear();
+   ds_mult_oerr_na.clear();
 
    n_ge_obs_na.clear();
    me_ge_obs_na.clear();
@@ -183,9 +185,11 @@ void PairDataEnsemble::extend(int n) {
    crpscl_gaus_na.extend     (n);
    ign_na.extend             (n);
    pit_na.extend             (n);
-   ign_oerr_cnv_na.extend    (n);
-   ign_oerr_cor_na.extend    (n);
-   dawid_seb_na.extend       (n);
+   ign_oerr_conv_na.extend   (n);
+   ign_oerr_corr_na.extend   (n);
+   ds_oerr_na.extend         (n);
+   ds_add_oerr_na.extend     (n);
+   ds_mult_oerr_na.extend    (n);
    n_ge_obs_na.extend        (n);
    me_ge_obs_na.extend       (n);
    n_lt_obs_na.extend        (n);
@@ -253,9 +257,11 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
    ign_na           = pd.ign_na;
    pit_na           = pd.pit_na;
 
-   ign_oerr_cnv_na  = pd.ign_oerr_cnv_na;
-   ign_oerr_cor_na  = pd.ign_oerr_cor_na;
-   dawid_seb_na     = pd.dawid_seb_na;
+   ign_oerr_conv_na = pd.ign_oerr_conv_na;
+   ign_oerr_corr_na = pd.ign_oerr_corr_na;
+   ds_oerr_na       = pd.ds_oerr_na;
+   ds_add_oerr_na   = pd.ds_add_oerr_na;
+   ds_mult_oerr_na  = pd.ds_mult_oerr_na;
 
    n_ge_obs_na    = pd.n_ge_obs_na;
    me_ge_obs_na   = pd.me_ge_obs_na;
@@ -462,9 +468,11 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
          crpscl_gaus_na.add(bad_data_double);
          ign_na.add(bad_data_double);
          pit_na.add(bad_data_double);
-         ign_oerr_cnv_na.add(bad_data_double);
-         ign_oerr_cor_na.add(bad_data_double);
-         dawid_seb_na.add(bad_data_double);
+         ign_oerr_conv_na.add(bad_data_double);
+         ign_oerr_corr_na.add(bad_data_double);
+         ds_oerr_na.add(bad_data_double);
+         ds_add_oerr_na.add(bad_data_double);
+         ds_mult_oerr_na.add(bad_data_double);
          n_ge_obs_na.add(bad_data_double);
          me_ge_obs_na.add(bad_data_double);
          n_lt_obs_na.add(bad_data_double);
@@ -477,9 +485,31 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
          var_unperturbed = compute_variance(esum_na[i], esumsq_na[i], esumn_na[i]);
          var_na.add(var_unperturbed);
 
-         // Process the observation error information.
+         // Process the observation error information
          ObsErrorEntry * e = (has_obs_error() ? obs_error_entry[i] : 0);
          if(e) {
+
+            // TODO: Compute biased observation value
+            double obs_biased      = o_na[i];
+            double emn_unperturbed = compute_mean(esum_na[i], esumn_na[i]);
+            double esd_unperturbed = compute_stdev(esum_na[i], esumsq_na[i], esumn_na[i]);
+            double v_conv, v_corr;
+
+            // Compute the observation error log scores
+            compute_obs_error_log_scores(emn_unperturbed, esd_unperturbed,
+                                         obs_biased, e->variance(),
+                                         v_conv, v_corr);
+            ign_oerr_conv_na.add(v_conv);
+            ign_oerr_corr_na.add(v_corr);
+
+            // Compute the Dawid Sebastiani scores
+            double v_ds, v_ds_add, v_ds_mult;
+            compute_dawid_sebastiani(emn_unperturbed, esd_unperturbed,
+                                     obs_biased, e->bias_offset, e->bias_scale,
+                                     v_ds, v_ds_add, v_ds_mult);
+            ds_oerr_na.add(v_ds);
+            ds_add_oerr_na.add(v_ds_add);
+            ds_mult_oerr_na.add(v_ds_mult);
 
             // Compute perturbed ensemble mean and variance
             // Exclude the control member from the variance
@@ -491,8 +521,13 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
                                  dist_var(e->dist_type,
                                           e->dist_parm[0], e->dist_parm[1]));
          }
-         // If no observation error specified, store bad data values.
+         // If no observation error specified, store bad data values
          else {
+            ign_oerr_conv_na.add(bad_data_double);
+            ign_oerr_corr_na.add(bad_data_double);
+            ds_oerr_na.add(bad_data_double);
+            ds_add_oerr_na.add(bad_data_double);
+            ds_mult_oerr_na.add(bad_data_double);
             mn_oerr_na.add(bad_data_double);
             var_oerr_na.add(bad_data_double);
             var_plus_oerr_na.add(bad_data_double);
@@ -522,8 +557,8 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
          derive_climo_vals(cdf_info_ptr, cmn_na[i], csd_na[i], cur_clm);
 
          // Store empirical CRPS stats
-         //
-         // For crps_emp use temporary, local variable so we can use it for the crps_emp_fair calculation
+         // For crps_emp use temporary, local variable so we can use it
+         // for the crps_emp_fair calculation
          double crps_emp = compute_crps_emp(o_na[i], cur_ens);
          crps_emp_na.add(crps_emp);
          crps_emp_fair_na.add(crps_emp - cur_ens.wmean_abs_diff());
@@ -547,11 +582,6 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
          compute_bias_ratio_terms(o_na[i], cur_ens,
                                   n_ge_obs, me_ge_obs,
                                   n_lt_obs, me_lt_obs);
-
-         // TODO: Need to actually compute stats here
-         ign_oerr_cnv_na.add(bad_data_double);
-         ign_oerr_cor_na.add(bad_data_double);
-         dawid_seb_na.add(bad_data_double);
 
          // Store the Bias Ratio terms 
          n_ge_obs_na.add(n_ge_obs);
@@ -887,7 +917,8 @@ PairDataEnsemble PairDataEnsemble::subset_pairs_obs_thresh(const SingleThresh &o
       //   wgt_na, o_na, cmn_na, csd_na, v_na, r_na,
       //   crps_emp_na, crps_emp_fair_na, spread_md_na, crpscl_emp_na, crps_gaus_na, crpscl_gaus_na,
       //   ign_na, pit_na,
-      //   ign_oerr_cnv, ign_oerr_cor, dawid_seb,
+      //   ign_oerr_conv, ign_oerr_corr,
+      //   ds_oerr, ds_add_oerr, ds_mult_oerr,
       //   n_gt_obs_na, me_gt_obs_na, n_lt_obs_na, me_lt_obs_na,
       //   var_na, var_oerr_na, var_plus_oerr_na,
       //   mn_na, mn_oerr_na, e_na
@@ -911,9 +942,11 @@ PairDataEnsemble PairDataEnsemble::subset_pairs_obs_thresh(const SingleThresh &o
       pd.crpscl_gaus_na.add(crpscl_gaus_na[i]);
       pd.ign_na.add(ign_na[i]);
       pd.pit_na.add(pit_na[i]);
-      pd.ign_oerr_cnv_na.add(ign_oerr_cnv_na[i]);
-      pd.ign_oerr_cor_na.add(ign_oerr_cor_na[i]);
-      pd.dawid_seb_na.add(dawid_seb_na[i]);
+      pd.ign_oerr_conv_na.add(ign_oerr_conv_na[i]);
+      pd.ign_oerr_corr_na.add(ign_oerr_corr_na[i]);
+      pd.ds_oerr_na.add(ds_oerr_na[i]);
+      pd.ds_add_oerr_na.add(ds_add_oerr_na[i]);
+      pd.ds_mult_oerr_na.add(ds_mult_oerr_na[i]);
       pd.n_ge_obs_na.add(n_ge_obs_na[i]);
       pd.me_ge_obs_na.add(me_ge_obs_na[i]);
       pd.n_lt_obs_na.add(n_lt_obs_na[i]);
@@ -1619,7 +1652,8 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
       }
    }
 
-   // Apply observation error logic bias correction, if requested
+   // Apply observation error additive and multiplicative
+   // bias correction, if requested
    if(obs_error_info->flag) {
       obs_v = add_obs_error_bc(obs_error_info->rng_ptr,
                                FieldType_Obs, oerr_ptr, obs_v);
@@ -2137,5 +2171,93 @@ double compute_bias_ratio(double me_ge_obs, double me_lt_obs) {
 
    return(v);
 }
-            
+
+////////////////////////////////////////////////////////////////////////
+
+void compute_obs_error_log_scores(double emn, double esd,
+                                  double obs, double oerr_var,
+                                  double &v_conv, double &v_cor) {
+
+   // Check for bad input data
+   if(is_bad_data(emn) ||
+      is_bad_data(esd) ||
+      is_bad_data(obs) ||
+      is_bad_data(oerr_var)) {
+      v_conv = v_corr = bad_data_double;
+   }
+   else {
+      double sigma2 = esd * esd;
+      double ov2    = oerr_var * oerr_var;
+
+      // Error-convolved logarithmic scoring rule in
+      // Ferro (2017, Eq 5) doi:10.1002/qj.3115
+      v_conv = 0.5 * log(sigma2 + ov2) +
+               (obs - emn) * (obs - emn) /
+               (2.0 * (sigma2 + ov2));
+
+      // Error-corrected logarithmic scoring rule in
+      // Ferro (2017, Eq 7) doi:10.1002/qj.3115
+      v_corr = log(ens_sd) +
+               ((obs - emn) * (obs - emn) - ov2) /
+               (2.0 * sigma2);
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void compute_dawid_sebastiani(double emn, double esd,
+                              double obs, double oerr_var,
+                              double oerr_abias, double oerr_mbias,
+                              double &eq16, double &eq17, double &eq18) {
+
+   // Compute the Dawid-Sebastiani scoring rules in
+   // Ferro (2017, Eqs 17 and 18) doi:10.1002/qj.3115
+   // Dawid and Sebastiani (1999) doi:10.1214/aos/1018031101
+   // These are the recommended scores in Ferro (2017).
+
+   // Equation 16 (no obs uncertainty)
+   if(is_bad_data(emn) ||
+      is_bad_data(esd) ||
+      is_bad_data(obs)) {
+      eq16 = bad_data_double;
+   }
+   else {
+      eq16 = log(esd) +
+             (obs - emn) * (obs - emn) /
+             (2.0 * esd * esd);
+   }
+
+   // Equations 17 and 18
+   if(is_bad_data(emn) ||
+      is_bad_data(esd) ||
+      is_bad_data(obs) ||
+      is_bad_data(oerr_var)) {
+      eq17 = eq18 = bad_data_double;
+   }
+   else {
+
+      // Default additive and multiplicative biases to 0 and 1
+      double a = (is_bad_data(oerr_abias) ? 0.0 : oerr_abias);
+      double b = (is_bad_data(oerr_mbias) ? 1.0 : oerr_mbias);
+
+      double b2s2 = 2.0 * b * b * esd * esd;
+      double ov2  = oerr_var * oerr_var;
+
+      eq17 = log(esd) +
+             ((obs - a - b * ens_mn) *
+              (obs - a - b * ens_mn) - ov2) /
+             b2s2;
+
+      eq18 = log(ens_sd) +
+             ((obs - b * ens_mn) *
+              (obs - b * ens_mn) - obs * obs * ov2 /
+              (b * b + ov2)) /
+             b2s2;
+   }
+
+   return;
+}
+
 ////////////////////////////////////////////////////////////////////////
