@@ -39,7 +39,7 @@
 //   014    07/09/21  Linden          MET #1746 Skip thresholding.
 //   015    07/06/22  Howard Soh      METplus-Internal #19 Rename main to met_main
 //   016    10/03/22  Prestopnik      MET #2227 Remove using namespace netCDF from header files
-//   017    01/29/24  Halley Gotway  MET #2801 Configure time difference warnings
+//   017    01/29/24  Halley Gotway   MET #2801 Configure time difference warnings
 //
 ////////////////////////////////////////////////////////////////////////
 

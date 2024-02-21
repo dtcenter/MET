@@ -39,6 +39,8 @@
 //                                      line types.
 //   018    02/13/24  Halley Gotway   MET #2395 Add wind direction stats
 //                                      to VL1L2, VAL1L2, and VCNT.
+//   019    02/21/24  Halley Gotway   MET #2583 Add observation error
+//                                      ECNT statistics.
 //
 ////////////////////////////////////////////////////////////////////////
 

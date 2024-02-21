@@ -28,6 +28,8 @@
 //   011    09/28/22  Prestopnik      MET #2227 Remove namespace std
 //   012    11/10/22  Halley Gotway   MET #2339 Add SEEPS and SEEPS_MPR
 //                                      line types.
+//   013    02/21/24  Halley Gotway   MET #2583 Add observation error
+//                                      ECNT statistics.
 //
 ////////////////////////////////////////////////////////////////////////
 
