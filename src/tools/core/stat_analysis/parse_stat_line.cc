@@ -397,8 +397,8 @@ void parse_ecnt_line(STATLine &l, ECNTData &e_data) {
    e_data.n_lt_obs   = atoi(l.get_item("N_LT_OBS"));
    e_data.me_lt_obs  = atof(l.get_item("ME_LT_OBS"));
 
-   e_data.ign_oerr_conv = atof(l.get_item("IGN_OERR_CONV"));
-   e_data.ign_oerr_corr = atof(l.get_item("IGN_OERR_CORR"));
+   e_data.ign_conv_oerr = atof(l.get_item("IGN_CONV_OERR"));
+   e_data.ign_corr_oerr = atof(l.get_item("IGN_CONV_OERR"));
    e_data.ds_oerr       = atof(l.get_item("DS_OERR"));
    e_data.ds_add_oerr   = atof(l.get_item("DS_ADD_OERR"));
    e_data.ds_mult_oerr  = atof(l.get_item("DS_MULT_OERR"));

@@ -89,8 +89,8 @@ class PairDataEnsemble : public PairBase {
       NumArray   ign_na;           // Ignorance Score [n_obs]
       NumArray   pit_na;           // Probability Integral Transform [n_obs]
 
-      NumArray   ign_oerr_conv_na; // Error convolved log score [n_obs]
-      NumArray   ign_oerr_corr_na; // Error corrected log score [n_obs]
+      NumArray   ign_conv_oerr_na; // Error convolved log score [n_obs]
+      NumArray   ign_corr_oerr_na; // Error corrected log score [n_obs]
       NumArray   ds_oerr_na;       // Dawid Sebastiani score [n_obs]
       NumArray   ds_add_oerr_na;   // Dawid Sebastiani additive error [n_obs]
       NumArray   ds_mult_oerr_na;  // Dawid Sebastiani multiplicative error [n_obs]

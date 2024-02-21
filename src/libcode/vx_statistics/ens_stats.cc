@@ -185,7 +185,7 @@ void ECNTInfo::clear() {
    me_oerr          = mae_oerr    = rmse_oerr  = spread_oerr = bad_data_double;
    spread_plus_oerr = bad_data_double;
 
-   ign_oerr_conv = ign_oerr_corr = bad_data_double;
+   ign_conv_oerr = ign_corr_oerr = bad_data_double;
    ds_oerr       = ds_add_oerr   = ds_mult_oerr = bad_data_double;
 
    n_ge_obs  = n_lt_obs  = 0;
@@ -225,8 +225,8 @@ void ECNTInfo::assign(const ECNTInfo &c) {
    spread_oerr      = c.spread_oerr;
    spread_plus_oerr = c.spread_plus_oerr;
 
-   ign_oerr_conv    = c.ign_oerr_conv;
-   ign_oerr_corr    = c.ign_oerr_corr;
+   ign_conv_oerr    = c.ign_conv_oerr;
+   ign_corr_oerr    = c.ign_corr_oerr;
    ds_oerr          = c.ds_oerr;
    ds_add_oerr      = c.ds_add_oerr;
    ds_mult_oerr     = c.ds_mult_oerr;
@@ -371,8 +371,8 @@ void ECNTInfo::set(const PairDataEnsemble &pd) {
    spread_plus_oerr = square_root(pd.var_plus_oerr_na.wmean(pd.wgt_na));
 
    // Compute log scores with observational uncertainty
-   ign_oerr_conv = pd.ign_oerr_conv_na.wmean(pd.wgt_na);
-   ign_oerr_corr = pd.ign_oerr_corr_na.wmean(pd.wgt_na);
+   ign_conv_oerr = pd.ign_conv_oerr_na.wmean(pd.wgt_na);
+   ign_corr_oerr = pd.ign_corr_oerr_na.wmean(pd.wgt_na);
    ds_oerr       = pd.ds_oerr_na.wmean(pd.wgt_na);
    ds_add_oerr   = pd.ds_add_oerr_na.wmean(pd.wgt_na);
    ds_mult_oerr  = pd.ds_mult_oerr_na.wmean(pd.wgt_na);

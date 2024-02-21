@@ -108,8 +108,8 @@ void PairDataEnsemble::clear() {
    ign_na.clear();
    pit_na.clear();
 
-   ign_oerr_conv_na.clear();
-   ign_oerr_corr_na.clear();
+   ign_conv_oerr_na.clear();
+   ign_corr_oerr_na.clear();
    ds_oerr_na.clear();
    ds_add_oerr_na.clear();
    ds_mult_oerr_na.clear();
@@ -185,8 +185,8 @@ void PairDataEnsemble::extend(int n) {
    crpscl_gaus_na.extend     (n);
    ign_na.extend             (n);
    pit_na.extend             (n);
-   ign_oerr_conv_na.extend   (n);
-   ign_oerr_corr_na.extend   (n);
+   ign_conv_oerr_na.extend   (n);
+   ign_corr_oerr_na.extend   (n);
    ds_oerr_na.extend         (n);
    ds_add_oerr_na.extend     (n);
    ds_mult_oerr_na.extend    (n);
@@ -257,8 +257,8 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
    ign_na           = pd.ign_na;
    pit_na           = pd.pit_na;
 
-   ign_oerr_conv_na = pd.ign_oerr_conv_na;
-   ign_oerr_corr_na = pd.ign_oerr_corr_na;
+   ign_conv_oerr_na = pd.ign_conv_oerr_na;
+   ign_corr_oerr_na = pd.ign_corr_oerr_na;
    ds_oerr_na       = pd.ds_oerr_na;
    ds_add_oerr_na   = pd.ds_add_oerr_na;
    ds_mult_oerr_na  = pd.ds_mult_oerr_na;
@@ -468,8 +468,8 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
          crpscl_gaus_na.add(bad_data_double);
          ign_na.add(bad_data_double);
          pit_na.add(bad_data_double);
-         ign_oerr_conv_na.add(bad_data_double);
-         ign_oerr_corr_na.add(bad_data_double);
+         ign_conv_oerr_na.add(bad_data_double);
+         ign_corr_oerr_na.add(bad_data_double);
          ds_oerr_na.add(bad_data_double);
          ds_add_oerr_na.add(bad_data_double);
          ds_mult_oerr_na.add(bad_data_double);
@@ -499,8 +499,8 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
             compute_obs_error_log_scores(emn_unperturbed, esd_unperturbed,
                                          obs_biased, e->variance(),
                                          v_conv, v_corr);
-            ign_oerr_conv_na.add(v_conv);
-            ign_oerr_corr_na.add(v_corr);
+            ign_conv_oerr_na.add(v_conv);
+            ign_corr_oerr_na.add(v_corr);
 
             // Compute the Dawid Sebastiani scores
             double v_ds, v_ds_add, v_ds_mult;
@@ -524,8 +524,8 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
          }
          // If no observation error specified, store bad data values
          else {
-            ign_oerr_conv_na.add(bad_data_double);
-            ign_oerr_corr_na.add(bad_data_double);
+            ign_conv_oerr_na.add(bad_data_double);
+            ign_corr_oerr_na.add(bad_data_double);
             ds_oerr_na.add(bad_data_double);
             ds_add_oerr_na.add(bad_data_double);
             ds_mult_oerr_na.add(bad_data_double);
@@ -916,9 +916,10 @@ PairDataEnsemble PairDataEnsemble::subset_pairs_obs_thresh(const SingleThresh &o
       //
       // Include in subset:
       //   wgt_na, o_na, cmn_na, csd_na, v_na, r_na,
-      //   crps_emp_na, crps_emp_fair_na, spread_md_na, crpscl_emp_na, crps_gaus_na, crpscl_gaus_na,
+      //   crps_emp_na, crps_emp_fair_na, spread_md_na,
+      //   crpscl_emp_na, crps_gaus_na, crpscl_gaus_na,
       //   ign_na, pit_na,
-      //   ign_oerr_conv, ign_oerr_corr,
+      //   ign_conv_oerr, ign_corr_oerr,
       //   ds_oerr, ds_add_oerr, ds_mult_oerr,
       //   n_gt_obs_na, me_gt_obs_na, n_lt_obs_na, me_lt_obs_na,
       //   var_na, var_oerr_na, var_plus_oerr_na,
@@ -943,8 +944,8 @@ PairDataEnsemble PairDataEnsemble::subset_pairs_obs_thresh(const SingleThresh &o
       pd.crpscl_gaus_na.add(crpscl_gaus_na[i]);
       pd.ign_na.add(ign_na[i]);
       pd.pit_na.add(pit_na[i]);
-      pd.ign_oerr_conv_na.add(ign_oerr_conv_na[i]);
-      pd.ign_oerr_corr_na.add(ign_oerr_corr_na[i]);
+      pd.ign_conv_oerr_na.add(ign_conv_oerr_na[i]);
+      pd.ign_corr_oerr_na.add(ign_corr_oerr_na[i]);
       pd.ds_oerr_na.add(ds_oerr_na[i]);
       pd.ds_add_oerr_na.add(ds_add_oerr_na[i]);
       pd.ds_mult_oerr_na.add(ds_mult_oerr_na[i]);

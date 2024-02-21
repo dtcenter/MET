@@ -84,7 +84,7 @@ class ECNTInfo {
 
       // Log scores that incorporate observational uncertainty
       // as advised in Ferro (2017)
-      double ign_oerr_conv, ign_oerr_corr;
+      double ign_conv_oerr, ign_corr_oerr;
       double ds_oerr, ds_add_oerr, ds_mult_oerr;
 
       // Bias ratio information

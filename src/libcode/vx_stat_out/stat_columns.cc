@@ -4275,7 +4275,7 @@ void write_ecnt_cols(const ECNTInfo &ecnt_info,
    //    CRPSS_EMP  CRPS_EMP_FAIR, SPREAD_MD,
    //    MAE,       MAE_OERR,      BIAS_RATIO,
    //    N_GE_OBS,  ME_GE_OBS,     N_LT_OBS,
-   //    ME_LT_OBS, IGN_OERR_CONV, IGN_OERR_CORR,
+   //    ME_LT_OBS, IGN_CONV_OERR, IGN_CORR_OERR,
    //    DS_OERR,   DS_ADD_OERR,   DS_MULT_OERR
    //
    at.set_entry(r, c+0,  // Total Number of Pairs
@@ -4354,10 +4354,10 @@ void write_ecnt_cols(const ECNTInfo &ecnt_info,
       ecnt_info.me_lt_obs);
 
    at.set_entry(r, c+25,  // Ignorance Score, observation error convolved
-      ecnt_info.ign_oerr_conv);
+      ecnt_info.ign_conv_oerr);
 
    at.set_entry(r, c+26,  // Ignorance Score, observation error corrected
-      ecnt_info.ign_oerr_corr);
+      ecnt_info.ign_corr_oerr);
 
    at.set_entry(r, c+27,  // Dawid-Sebastiani
       ecnt_info.ds_oerr);
