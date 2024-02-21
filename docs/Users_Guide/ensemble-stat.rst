@@ -66,7 +66,9 @@ The climatological distribution is also used for the RPSS. The forecast RPS stat
 Ensemble Observation Error
 --------------------------
 
-In an attempt to ameliorate the effect of observation errors on the verification of forecasts, a random perturbation approach has been implemented. A great deal of user flexibility has been built in, but the methods detailed in :ref:`Candille and Talagrand (2008) <Candille-2008>`. can be replicated using the appropriate options. The user selects a distribution for the observation error, along with parameters for that distribution. Rescaling and bias correction can also be specified prior to the perturbation. Random draws from the distribution can then be added to either, or both, of the forecast and observed fields, including ensemble members. Details about the effects of the choices on verification statistics should be considered, with many details provided in the literature (*e.g.* :ref:`Candille and Talagrand, 2008 <Candille-2008>`; :ref:`Saetra et al., 2004 <Saetra-2004>`; :ref:`Santos and Ghelli, 2012 <Santos-2012>`). Generally, perturbation makes verification statistics better when applied to ensemble members, and worse when applied to the observations themselves.
+In an attempt to ameliorate the effect of observation errors on the verification of forecasts, a random perturbation approach has been implemented. A great deal of user flexibility has been built in, but the methods detailed in :ref:`Candille and Talagrand (2008) <Candille-2008>` can be replicated using the appropriate options. Additional probabilistic measures that include observational uncertainty recommended by :ref:`Ferro, 2017 <Ferro-2017>` and :ref:`Dawid and Sebastiani, 1999 <Dawid-Sebastiani-1999>` are also provided.
+
+Observation error information can be defined directly in the Ensemble-Stat configuration file or through a more flexible observation error table lookup. The user selects a distribution for the observation error, along with parameters for that distribution. Rescaling and bias correction can also be specified prior to the perturbation. Random draws from the distribution can then be added to either, or both, of the forecast and observed fields, including ensemble members. Details about the effects of the choices on verification statistics should be considered, with many details provided in the literature (*e.g.* :ref:`Candille and Talagrand, 2008 <Candille-2008>`; :ref:`Saetra et al., 2004 <Saetra-2004>`; :ref:`Santos and Ghelli, 2012 <Santos-2012>`). Generally, perturbation makes verification statistics better when applied to ensemble members, and worse when applied to the observations themselves.
 
 Normal and uniform are common choices for the observation error distribution. The uniform distribution provides the benefit of being bounded on both sides, thus preventing the perturbation from taking on extreme values. Normal is the most common choice for observation error. However, the user should realize that with the very large samples typical in NWP, some large outliers will almost certainly be introduced with the perturbation. For variables that are bounded below by 0, and that may have inconsistent observation errors (e.g. larger errors with larger measurements), a lognormal distribution may be selected. Wind speeds and precipitation measurements are the most common of this type of NWP variable. The lognormal error perturbation prevents measurements of 0 from being perturbed, and applies larger perturbations when measurements are larger. This is often the desired behavior in these cases, but this distribution can also lead to some outliers being introduced in the perturbation step.
 
@@ -649,19 +651,19 @@ The format of the STAT and ASCII output of the Ensemble-Stat tool are described 
     - The Mean Error of the ensemble values less than or equal to their observations
   * - 50
     - IGN_CONV_OERR
-    - TODO: Add description
+    - Error-convolved logarithmic scoring rule (i.e. ignornance score) from Equation 5 of :ref:`Ferro, 2017 <Ferro-2017>`
   * - 51
     - IGN_CORR_OERR
-    - TODO: Add description
+    - Error-corrected logarithmic scoring rule (i.e. ignornance score) from Equation 7 of :ref:`Ferro, 2017 <Ferro-2017>`
   * - 52
     - DS_OERR
-    - TODO: Add descripion
+    - Scoring rule from Equation 16 of :ref:`Dawid and Sebastiani, 1999 <Dawid-Sebastiani-1999>`
   * - 53
     - DS_ADD_OERR
-    - TODO: Add descripion
+    - Additive observation error scoring rule from Equation 17 of :ref:`Dawid and Sebastiani, 1999 <Dawid-Sebastiani-1999>`
   * - 54
     - DS_MULT_OERR
-    - TODO: Add descripion
+    - Multiplicative observation error scoring rule from Equation 18 of :ref:`Dawid and Sebastiani, 1999 <Dawid-Sebastiani-1999>`
 
 .. _table_ES_header_info_es_out_RPS:
       

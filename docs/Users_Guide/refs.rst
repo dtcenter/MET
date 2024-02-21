@@ -94,29 +94,41 @@ References
 |   *the Royal Statistical Society* A147, 278-292.
 | 
 
+.. _Dawid-Sebastiani-1999:
+
+| Dawid A.P., Sebastiani P., 1999: Coherent dispersion criteria for optimal
+|   experimental design. *Ann. Stat.*, 27, 65–81. doi: 10.1214/aos/1018031101.
+|
+
 .. _Ebert-2008:
 
 | Ebert, E.E., 2008: Fuzzy verification of high-resolution gridded forecasts:
-|   a review and proposed framework. *Meteorological Applications,* 15, 51-64.
+|   a review and proposed framework. *Meteorological Applications*, 15, 51-64.
 | 
 
 .. _Eckel-2012:
 
 | Eckel, F. A., M.S. Allen, M. C. Sittel, 2012: Estimation of Ambiguity in
-|   Ensemble Forecasts. *Weather Forecasting,* 27, 50-69.
+|   Ensemble Forecasts. *Weather Forecasting*, 27, 50-69.
 |   doi: http://dx.doi.org/10.1175/WAF-D-11-00015.1
 |
 
 .. _Efron-2007:
 
 | Efron, B. 2007: Correlation and large-scale significance testing. *Journal*
-|   of the American Statistical Association,* 102(477), 93-103.
+|   of the American Statistical Association*, 102(477), 93-103.
 |
 
 .. _Epstein-1969:
 
 | Epstein, E. S., 1969: A scoring system for probability forecasts of ranked categories.
 |   *J. Appl. Meteor.*, 8, 985-987, 10.1175/1520-0450(1969)008<0985:ASSFPF>2.0.CO;2.
+|
+
+.. _Ferro-2017:
+
+| Ferro C. A. T., 2017: Measuring forecast performance in the presence of observation error.
+|   *Q. J. R. Meteorol. Soc.*, 143 (708), 2665−2676. doi: 10.1002/qj.3115.
 |
 
 .. _Gilleland-2010:
@@ -193,7 +205,7 @@ References
 
 | Knaff, J.A., M. DeMaria, C.R. Sampson, and J.M. Gross, 2003: Statistical,
 |   Five-Day Tropical Cyclone Intensity Forecasts Derived from Climatology
-|   and Persistence. *Weather and Forecasting,* Vol. 18 Issue 2, p. 80-92.
+|   and Persistence. *Weather and Forecasting*, Vol. 18 Issue 2, p. 80-92.
 | 
 
 .. _Mason-2004:

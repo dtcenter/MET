@@ -1087,6 +1087,20 @@ A perfect forecast has ME = 0. Since BIAS_RATIO is computed as the high bias (ME
 
 The range for BIAS_RATIO is 0 to infinity. A score of 1 indicates that the high and low biases are equal. A score greater than 1 indicates that the high bias is larger than the magnitude of the low bias. A score less than 1 indicates the opposite behavior.
 
+Observation Error Logarithmic Scoring Rules
+-------------------------------------------
+
+Called "IGN_CONV_OERR" and "IGN_CORR_OERR" in ECNT output :numref:`table_ES_header_info_es_out_ECNT`
+
+TODO: Eric add 2 equations and interpretation advice here
+
+Dawid-Sebastiani Scoring Rules
+------------------------------
+
+Called "DS_OERR", "DS_ADD_OERR", and "DS_MULT_OERR" in ECNT output :numref:`table_ES_header_info_es_out_ECNT`
+
+TODO: Eric add 3 equations and interpretation advice here
+
 IGN
 ---
 
