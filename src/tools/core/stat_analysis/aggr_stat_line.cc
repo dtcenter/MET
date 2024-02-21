@@ -3232,19 +3232,39 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &job,
          m[key].ens_pd.ign_na.add(compute_ens_ign(cur.obs, cur.ens_mean, cur.spread));
          m[key].ens_pd.pit_na.add(compute_ens_pit(cur.obs, cur.ens_mean, cur.spread));
 
-         // TODO: Call functions to compute these stats here
-         m[key].ens_pd.ign_conv_oerr_na.add(bad_data_double);
-         m[key].ens_pd.ign_corr_oerr_na.add(bad_data_double);
-         m[key].ens_pd.ds_oerr_na.add(bad_data_double);
-         m[key].ens_pd.ds_add_oerr_na.add(bad_data_double);
-         m[key].ens_pd.ds_mult_oerr_na.add(bad_data_double);
+         // Back out the observation error variance
+         double oerr_var = bad_data_double;
+         if(!is_bad_data(cur.spread_plus_oerr) &&
+            !is_bad_data(cur.spread)) {
+            oerr_var = square(cur.spread_plus_oerr) -
+                       square(cur.spread);
+         }
+
+         // Compute observation error log scores
+         double v_conv, v_corr;
+         compute_obs_error_log_scores(
+            cur.ens_mean, cur.spread, cur.obs, oerr_var,
+            v_conv, v_corr);
+         m[key].ens_pd.ign_conv_oerr_na.add(v_conv);
+         m[key].ens_pd.ign_corr_oerr_na.add(v_corr);
+
+         // Compute the Dawid Sebastiani scores
+         double v_ds, v_ds_add, v_ds_mult;
+         compute_dawid_sebastiani(
+            cur.ens_mean, cur.spread, cur.obs, oerr_var,
+            bad_data_double, bad_data_double,
+            v_ds, v_ds_add, v_ds_mult);
+         m[key].ens_pd.ds_oerr_na.add(v_ds);
+         m[key].ens_pd.ds_add_oerr_na.add(v_ds_add);
+         m[key].ens_pd.ds_mult_oerr_na.add(v_ds_mult);
 
          // Store BIAS_RATIO terms
          int n_ge_obs, n_lt_obs;
          double me_ge_obs, me_lt_obs;
-         compute_bias_ratio_terms(cur.obs, cur.ens_na,
-                                  n_ge_obs, me_ge_obs,
-                                  n_lt_obs, me_lt_obs);
+         compute_bias_ratio_terms(
+            cur.obs, cur.ens_na,
+            n_ge_obs, me_ge_obs,
+            n_lt_obs, me_lt_obs);
          m[key].ens_pd.n_ge_obs_na.add(n_ge_obs);
          m[key].ens_pd.me_ge_obs_na.add(me_ge_obs);
          m[key].ens_pd.n_lt_obs_na.add(n_lt_obs);

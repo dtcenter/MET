@@ -494,18 +494,18 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
             double v_conv, v_corr;
 
             // Compute the observation error log scores
-            compute_obs_error_log_scores(emn_unperturbed, esd_unperturbed,
-                                         o_na[i], e->variance(),
-                                         v_conv, v_corr);
+            compute_obs_error_log_scores(
+               emn_unperturbed, esd_unperturbed, o_na[i], e->variance(),
+               v_conv, v_corr);
             ign_conv_oerr_na.add(v_conv);
             ign_corr_oerr_na.add(v_corr);
 
             // Compute the Dawid Sebastiani scores
             double v_ds, v_ds_add, v_ds_mult;
-            compute_dawid_sebastiani(emn_unperturbed, esd_unperturbed,
-                                     o_na[i], e->variance(),
-                                     e->bias_scale, e->bias_offset,
-                                     v_ds, v_ds_add, v_ds_mult);
+            compute_dawid_sebastiani(
+               emn_unperturbed, esd_unperturbed, o_na[i], e->variance(),
+               e->bias_scale, e->bias_offset,
+               v_ds, v_ds_add, v_ds_mult);
             ds_oerr_na.add(v_ds);
             ds_add_oerr_na.add(v_ds_add);
             ds_mult_oerr_na.add(v_ds_mult);
@@ -578,9 +578,10 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
          // Compute the Bias Ratio terms 
          int n_ge_obs, n_lt_obs;
          double me_ge_obs, me_lt_obs;
-         compute_bias_ratio_terms(o_na[i], cur_ens,
-                                  n_ge_obs, me_ge_obs,
-                                  n_lt_obs, me_lt_obs);
+         compute_bias_ratio_terms(
+            o_na[i], cur_ens,
+            n_ge_obs, me_ge_obs,
+            n_lt_obs, me_lt_obs);
 
          // Store the Bias Ratio terms 
          n_ge_obs_na.add(n_ge_obs);
