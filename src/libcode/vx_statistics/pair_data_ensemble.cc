@@ -504,7 +504,7 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
             double v_ds, v_ds_add, v_ds_mult;
             compute_dawid_sebastiani(emn_unperturbed, esd_unperturbed,
                                      o_na[i], e->variance(),
-                                     e->bias_offset, e->bias_scale,
+                                     e->bias_scale, e->bias_offset,
                                      v_ds, v_ds_add, v_ds_mult);
             ds_oerr_na.add(v_ds);
             ds_add_oerr_na.add(v_ds_add);
@@ -2178,6 +2178,8 @@ void compute_obs_error_log_scores(double emn, double esd,
                                   double obs, double oerr_var,
                                   double &v_conv, double &v_corr) {
 
+   const char *method_name = "compute_obs_error_log_scores() -> ";
+
    // Check for bad input data
    if(is_bad_data(emn) ||
       is_bad_data(esd) ||
@@ -2202,6 +2204,16 @@ void compute_obs_error_log_scores(double emn, double esd,
                (2.0 * sigma2);
    }
 
+   if(mlog.verbosity_level() >= 10) {
+      mlog << Debug(10) << method_name
+           << "inputs (emn = " << emn
+           << ", esd = " << esd
+           << ", obs = " << obs
+           << ", oerr_var = " << oerr_var
+           << ") and outputs (ign_oerr_conv = " << v_conv
+           << ", ign_oerr_corr = " << v_corr << ")\n";
+   }
+
    return;
 }
 
@@ -2209,8 +2221,11 @@ void compute_obs_error_log_scores(double emn, double esd,
 
 void compute_dawid_sebastiani(double emn, double esd,
                               double obs, double oerr_var,
-                              double oerr_abias, double oerr_mbias,
-                              double &eq16, double &eq17, double &eq18) {
+                              double oerr_mbias, double oerr_abias,
+                              double &ds_oerr, double &ds_add_oerr,
+                              double &ds_mult_oerr) {
+
+   const char *method_name = "compute_dawid_sebastiani() -> ";
 
    // Compute the Dawid-Sebastiani scoring rules in
    // Ferro (2017, Eqs 17 and 18) doi:10.1002/qj.3115
@@ -2220,13 +2235,14 @@ void compute_dawid_sebastiani(double emn, double esd,
    // Equation 16 (no obs uncertainty)
    if(is_bad_data(emn) ||
       is_bad_data(esd) ||
-      is_bad_data(obs)) {
-      eq16 = bad_data_double;
+      is_bad_data(obs) ||
+      is_eq(esd, 0.0)) {
+      ds_oerr = bad_data_double;
    }
    else {
-      eq16 = log(esd) +
-             (obs - emn) * (obs - emn) /
-             (2.0 * esd * esd);
+      ds_oerr = log(esd) +
+                (obs - emn) * (obs - emn) /
+                (2.0 * esd * esd);
    }
 
    // Equations 17 and 18
@@ -2234,7 +2250,7 @@ void compute_dawid_sebastiani(double emn, double esd,
       is_bad_data(esd) ||
       is_bad_data(obs) ||
       is_bad_data(oerr_var)) {
-      eq17 = eq18 = bad_data_double;
+      ds_add_oerr = ds_mult_oerr = bad_data_double;
    }
    else {
 
@@ -2245,16 +2261,34 @@ void compute_dawid_sebastiani(double emn, double esd,
       double b2s2 = 2.0 * b * b * esd * esd;
       double ov2  = oerr_var * oerr_var;
 
-      eq17 = log(esd) +
-             ((obs - a - b * emn) *
-              (obs - a - b * emn) - ov2) /
-             b2s2;
+      if(is_eq(b2s2, 0.0)) {
+         ds_add_oerr = ds_mult_oerr = bad_data_double;
+      }
+      else {
+         ds_add_oerr = log(esd) +
+                       ((obs - a - b * emn) *
+                        (obs - a - b * emn) - ov2) /
+                       b2s2;
 
-      eq18 = log(esd) +
-             ((obs - b * emn) *
-              (obs - b * emn) - obs * obs * ov2 /
-              (b * b + ov2)) /
-             b2s2;
+         ds_mult_oerr = log(esd) +
+                        ((obs - b * emn) *
+                         (obs - b * emn) - obs * obs * ov2 /
+                         (b * b + ov2)) /
+                        b2s2;
+      }
+   }
+
+   if(mlog.verbosity_level() >= 10) {
+      mlog << Debug(10) << method_name
+           << "inputs (emn = " << emn
+           << ", esd = " << esd
+           << ", obs = " << obs
+           << ", oerr_var = " << oerr_var
+           << ", oerr_mbias = " << oerr_mbias
+           << ", oerr_abias = " << oerr_abias
+           << ") and outputs (ds_oerr = " << ds_oerr
+           << ", ds_add_oerr = " << ds_add_oerr
+           << ", ds_mult_oerr = " << ds_mult_oerr << ")\n";
    }
 
    return;
