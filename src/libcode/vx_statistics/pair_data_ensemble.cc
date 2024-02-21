@@ -489,15 +489,13 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
          ObsErrorEntry * e = (has_obs_error() ? obs_error_entry[i] : 0);
          if(e) {
 
-            // TODO: Compute biased observation value
-            double obs_biased      = o_na[i];
             double emn_unperturbed = compute_mean(esum_na[i], esumn_na[i]);
             double esd_unperturbed = compute_stdev(esum_na[i], esumsq_na[i], esumn_na[i]);
             double v_conv, v_corr;
 
             // Compute the observation error log scores
             compute_obs_error_log_scores(emn_unperturbed, esd_unperturbed,
-                                         obs_biased, e->variance(),
+                                         o_na[i], e->variance(),
                                          v_conv, v_corr);
             ign_conv_oerr_na.add(v_conv);
             ign_corr_oerr_na.add(v_corr);
@@ -505,7 +503,7 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
             // Compute the Dawid Sebastiani scores
             double v_ds, v_ds_add, v_ds_mult;
             compute_dawid_sebastiani(emn_unperturbed, esd_unperturbed,
-                                     obs_biased, e->variance(),
+                                     o_na[i], e->variance(),
                                      e->bias_offset, e->bias_scale,
                                      v_ds, v_ds_add, v_ds_mult);
             ds_oerr_na.add(v_ds);
