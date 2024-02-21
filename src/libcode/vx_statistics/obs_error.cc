@@ -185,9 +185,13 @@ void ObsErrorEntry::dump(ostream & out, int depth) const {
 ////////////////////////////////////////////////////////////////////////
 
 double ObsErrorEntry::variance() const {
+   double var = bad_data_double;
 
-   // TODO: return distribution specific measure of the assume variance
-   return(bad_data_double);
+   if(dist_type != DistType_None) {
+      var = dist_var(dist_type, dist_parm[0], dist_parm[1]);
+   }
+
+   return(var);
 }
 
 ////////////////////////////////////////////////////////////////////////
