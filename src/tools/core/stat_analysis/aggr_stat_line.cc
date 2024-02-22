@@ -2658,9 +2658,7 @@ void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &job,
          m[key].ens_pd.ign_na.add(cur.ign);
          m[key].ens_pd.ign_conv_oerr_na.add(cur.ign_conv_oerr);
          m[key].ens_pd.ign_corr_oerr_na.add(cur.ign_corr_oerr);
-         m[key].ens_pd.ds_oerr_na.add(cur.ds_oerr);
-         m[key].ens_pd.ds_add_oerr_na.add(cur.ds_add_oerr);
-         m[key].ens_pd.ds_mult_oerr_na.add(cur.ds_mult_oerr);
+         m[key].ens_pd.dss_na.add(cur.dss);
          m[key].ens_pd.n_ge_obs_na.add(cur.n_ge_obs);
          m[key].ens_pd.me_ge_obs_na.add(cur.me_ge_obs);
          m[key].ens_pd.n_lt_obs_na.add(cur.n_lt_obs);
@@ -3242,24 +3240,6 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &job,
                        square(cur.spread);
          }
 
-         // Compute observation error log scores
-         double v_conv, v_corr;
-         compute_obs_error_log_scores(
-            cur.ens_mean, cur.spread, cur.obs, oerr_var,
-            v_conv, v_corr);
-         m[key].ens_pd.ign_conv_oerr_na.add(v_conv);
-         m[key].ens_pd.ign_corr_oerr_na.add(v_corr);
-
-         // Compute the Dawid Sebastiani scores
-         double v_ds, v_ds_add, v_ds_mult;
-         compute_dawid_sebastiani(
-            cur.ens_mean, cur.spread, cur.obs, oerr_var,
-            bad_data_double, bad_data_double,
-            v_ds, v_ds_add, v_ds_mult);
-         m[key].ens_pd.ds_oerr_na.add(v_ds);
-         m[key].ens_pd.ds_add_oerr_na.add(v_ds_add);
-         m[key].ens_pd.ds_mult_oerr_na.add(v_ds_mult);
-
          // Store BIAS_RATIO terms
          int n_ge_obs, n_lt_obs;
          double me_ge_obs, me_lt_obs;
@@ -3271,6 +3251,19 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &job,
          m[key].ens_pd.me_ge_obs_na.add(me_ge_obs);
          m[key].ens_pd.n_lt_obs_na.add(n_lt_obs);
          m[key].ens_pd.me_lt_obs_na.add(me_lt_obs);
+
+         // Compute observation error log scores
+         double v_conv, v_corr;
+         compute_obs_error_log_scores(
+            cur.ens_mean, cur.spread, cur.obs, oerr_var,
+            v_conv, v_corr);
+         m[key].ens_pd.ign_conv_oerr_na.add(v_conv);
+         m[key].ens_pd.ign_corr_oerr_na.add(v_corr);
+
+         // Compute the Dawid Sebastiani score
+         m[key].ens_pd.dss_na.add(
+            compute_dawid_sebastiani(
+               cur.ens_mean, cur.spread, cur.obs));
 
          //
          // Increment the RHIST counts

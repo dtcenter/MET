@@ -93,9 +93,7 @@ class PairDataEnsemble : public PairBase {
 
       NumArray   ign_conv_oerr_na; // Error convolved log score [n_obs]
       NumArray   ign_corr_oerr_na; // Error corrected log score [n_obs]
-      NumArray   ds_oerr_na;       // Dawid Sebastiani score [n_obs]
-      NumArray   ds_add_oerr_na;   // Dawid Sebastiani additive error [n_obs]
-      NumArray   ds_mult_oerr_na;  // Dawid Sebastiani multiplicative error [n_obs]
+      NumArray   dss_na;           // Dawid Sebastiani score [n_obs]
 
       NumArray   n_ge_obs_na;      // Number of ensemble memebers >= obs [n_obs]
       NumArray   me_ge_obs_na;     // Mean error of ensemble members >= obs [n_obs]
@@ -334,9 +332,8 @@ extern double compute_bias_ratio(double, double);
 extern void   compute_obs_error_log_scores(
                  double, double, double, double,
                  double &, double &);
-extern void   compute_dawid_sebastiani(
-                 double, double, double, double, double, double,
-                 double &, double &, double &);
+extern double compute_dawid_sebastiani(
+                 double, double, double);
 
 ////////////////////////////////////////////////////////////////////////
 

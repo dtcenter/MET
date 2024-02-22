@@ -110,9 +110,7 @@ void PairDataEnsemble::clear() {
 
    ign_conv_oerr_na.clear();
    ign_corr_oerr_na.clear();
-   ds_oerr_na.clear();
-   ds_add_oerr_na.clear();
-   ds_mult_oerr_na.clear();
+   dss_na.clear();
 
    n_ge_obs_na.clear();
    me_ge_obs_na.clear();
@@ -187,9 +185,7 @@ void PairDataEnsemble::extend(int n) {
    pit_na.extend             (n);
    ign_conv_oerr_na.extend   (n);
    ign_corr_oerr_na.extend   (n);
-   ds_oerr_na.extend         (n);
-   ds_add_oerr_na.extend     (n);
-   ds_mult_oerr_na.extend    (n);
+   dss_na.extend             (n);
    n_ge_obs_na.extend        (n);
    me_ge_obs_na.extend       (n);
    n_lt_obs_na.extend        (n);
@@ -259,9 +255,7 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
 
    ign_conv_oerr_na = pd.ign_conv_oerr_na;
    ign_corr_oerr_na = pd.ign_corr_oerr_na;
-   ds_oerr_na       = pd.ds_oerr_na;
-   ds_add_oerr_na   = pd.ds_add_oerr_na;
-   ds_mult_oerr_na  = pd.ds_mult_oerr_na;
+   dss_na           = pd.dss_na;
 
    n_ge_obs_na    = pd.n_ge_obs_na;
    me_ge_obs_na   = pd.me_ge_obs_na;
@@ -470,9 +464,7 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
          pit_na.add(bad_data_double);
          ign_conv_oerr_na.add(bad_data_double);
          ign_corr_oerr_na.add(bad_data_double);
-         ds_oerr_na.add(bad_data_double);
-         ds_add_oerr_na.add(bad_data_double);
-         ds_mult_oerr_na.add(bad_data_double);
+         dss_na.add(bad_data_double);
          n_ge_obs_na.add(bad_data_double);
          me_ge_obs_na.add(bad_data_double);
          n_lt_obs_na.add(bad_data_double);
@@ -485,30 +477,26 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
          var_unperturbed = compute_variance(esum_na[i], esumsq_na[i], esumn_na[i]);
          var_na.add(var_unperturbed);
 
+         double emn_unperturbed = compute_mean(esum_na[i], esumn_na[i]);
+         double esd_unperturbed = compute_stdev(esum_na[i], esumsq_na[i], esumn_na[i]);
+
+         // Compute the Dawid Sebastiani scores
+         dss_na.add(
+            compute_dawid_sebastiani(
+               emn_unperturbed, esd_unperturbed, o_na[i]));
+
          // Process the observation error information
          ObsErrorEntry * e = (has_obs_error() ? obs_error_entry[i] : 0);
          if(e) {
 
-            double emn_unperturbed = compute_mean(esum_na[i], esumn_na[i]);
-            double esd_unperturbed = compute_stdev(esum_na[i], esumsq_na[i], esumn_na[i]);
-            double v_conv, v_corr;
-
             // Compute the observation error log scores
+            double v_conv, v_corr;
             compute_obs_error_log_scores(
-               emn_unperturbed, esd_unperturbed, o_na[i], e->variance(),
+               emn_unperturbed, esd_unperturbed,
+               o_na[i], e->variance(),
                v_conv, v_corr);
             ign_conv_oerr_na.add(v_conv);
             ign_corr_oerr_na.add(v_corr);
-
-            // Compute the Dawid Sebastiani scores
-            double v_ds, v_ds_add, v_ds_mult;
-            compute_dawid_sebastiani(
-               emn_unperturbed, esd_unperturbed, o_na[i], e->variance(),
-               e->bias_scale, e->bias_offset,
-               v_ds, v_ds_add, v_ds_mult);
-            ds_oerr_na.add(v_ds);
-            ds_add_oerr_na.add(v_ds_add);
-            ds_mult_oerr_na.add(v_ds_mult);
 
             // Compute perturbed ensemble mean and variance
             // Exclude the control member from the variance
@@ -516,17 +504,15 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
             var_oerr_na.add(cur_ens.variance(ctrl_index));
 
             // Compute the variance plus observation error variance.
-            var_plus_oerr_na.add(var_unperturbed +
-                                 dist_var(e->dist_type,
-                                          e->dist_parm[0], e->dist_parm[1]));
+            var_plus_oerr_na.add(
+               var_unperturbed +
+               dist_var(e->dist_type,
+                        e->dist_parm[0], e->dist_parm[1]));
          }
          // If no observation error specified, store bad data values
          else {
             ign_conv_oerr_na.add(bad_data_double);
             ign_corr_oerr_na.add(bad_data_double);
-            ds_oerr_na.add(bad_data_double);
-            ds_add_oerr_na.add(bad_data_double);
-            ds_mult_oerr_na.add(bad_data_double);
             mn_oerr_na.add(bad_data_double);
             var_oerr_na.add(bad_data_double);
             var_plus_oerr_na.add(bad_data_double);
@@ -918,8 +904,7 @@ PairDataEnsemble PairDataEnsemble::subset_pairs_obs_thresh(const SingleThresh &o
       //   crps_emp_na, crps_emp_fair_na, spread_md_na,
       //   crpscl_emp_na, crps_gaus_na, crpscl_gaus_na,
       //   ign_na, pit_na,
-      //   ign_conv_oerr, ign_corr_oerr,
-      //   ds_oerr, ds_add_oerr, ds_mult_oerr,
+      //   ign_conv_oerr, ign_corr_oerr, dss,
       //   n_gt_obs_na, me_gt_obs_na, n_lt_obs_na, me_lt_obs_na,
       //   var_na, var_oerr_na, var_plus_oerr_na,
       //   mn_na, mn_oerr_na, e_na
@@ -945,9 +930,7 @@ PairDataEnsemble PairDataEnsemble::subset_pairs_obs_thresh(const SingleThresh &o
       pd.pit_na.add(pit_na[i]);
       pd.ign_conv_oerr_na.add(ign_conv_oerr_na[i]);
       pd.ign_corr_oerr_na.add(ign_corr_oerr_na[i]);
-      pd.ds_oerr_na.add(ds_oerr_na[i]);
-      pd.ds_add_oerr_na.add(ds_add_oerr_na[i]);
-      pd.ds_mult_oerr_na.add(ds_mult_oerr_na[i]);
+      pd.dss_na.add(dss_na[i]);
       pd.n_ge_obs_na.add(n_ge_obs_na[i]);
       pd.me_ge_obs_na.add(me_ge_obs_na[i]);
       pd.n_lt_obs_na.add(n_lt_obs_na[i]);
@@ -2220,79 +2203,36 @@ void compute_obs_error_log_scores(double emn, double esd,
 
 ////////////////////////////////////////////////////////////////////////
 
-void compute_dawid_sebastiani(double emn, double esd,
-                              double obs, double oerr_var,
-                              double oerr_mbias, double oerr_abias,
-                              double &ds_oerr, double &ds_add_oerr,
-                              double &ds_mult_oerr) {
+double compute_dawid_sebastiani(double emn, double esd, double obs) {
 
    const char *method_name = "compute_dawid_sebastiani() -> ";
+
+   double v = bad_data_double;
 
    // Compute the Dawid-Sebastiani scoring rules in
    // Ferro (2017, Eqs 17 and 18) doi:10.1002/qj.3115
    // Dawid and Sebastiani (1999) doi:10.1214/aos/1018031101
    // These are the recommended scores in Ferro (2017).
 
-   // Equation 16 (no obs uncertainty)
-   if(is_bad_data(emn) ||
-      is_bad_data(esd) ||
-      is_bad_data(obs) ||
-      is_eq(esd, 0.0)) {
-      ds_oerr = bad_data_double;
-   }
-   else {
-      ds_oerr = log(esd) +
-                (obs - emn) * (obs - emn) /
-                (2.0 * esd * esd);
-   }
+   // Check for bad data
+   if(!is_bad_data(emn) && !is_bad_data(esd) &&
+      !is_bad_data(obs) && !is_eq(esd, 0.0)) {
 
-   // Equations 17 and 18
-   if(is_bad_data(emn) ||
-      is_bad_data(esd) ||
-      is_bad_data(obs) ||
-      is_bad_data(oerr_var)) {
-      ds_add_oerr = ds_mult_oerr = bad_data_double;
-   }
-   else {
-
-      // Default additive and multiplicative biases to 0 and 1
-      double a = (is_bad_data(oerr_abias) ? 0.0 : oerr_abias);
-      double b = (is_bad_data(oerr_mbias) ? 1.0 : oerr_mbias);
-
-      double b2s2 = 2.0 * b * b * esd * esd;
-      double ov2  = oerr_var * oerr_var;
-
-      if(is_eq(b2s2, 0.0)) {
-         ds_add_oerr = ds_mult_oerr = bad_data_double;
-      }
-      else {
-         ds_add_oerr = log(esd) +
-                       ((obs - a - b * emn) *
-                        (obs - a - b * emn) - ov2) /
-                       b2s2;
-
-         ds_mult_oerr = log(esd) +
-                        ((obs - b * emn) *
-                         (obs - b * emn) - obs * obs * ov2 /
-                         (b * b + ov2)) /
-                        b2s2;
-      }
+      // Equation 16
+      v = log(esd) +
+          (obs - emn) * (obs - emn) /
+          (2.0 * esd * esd);
    }
 
    if(mlog.verbosity_level() >= 10) {
       mlog << Debug(10) << method_name
-           << "inputs (emn = " << emn
+           << "for input emn = " << emn
            << ", esd = " << esd
            << ", obs = " << obs
-           << ", oerr_var = " << oerr_var
-           << ", oerr_mbias = " << oerr_mbias
-           << ", oerr_abias = " << oerr_abias
-           << ") and outputs (ds_oerr = " << ds_oerr
-           << ", ds_add_oerr = " << ds_add_oerr
-           << ", ds_mult_oerr = " << ds_mult_oerr << ")\n";
+           << ", output dss = " << v << "\n";
    }
 
-   return;
+   return(v);
 }
 
 ////////////////////////////////////////////////////////////////////////

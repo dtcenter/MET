@@ -1094,12 +1094,12 @@ Called "IGN_CONV_OERR" and "IGN_CORR_OERR" in ECNT output :numref:`table_ES_head
 
 TODO: Eric add 2 equations and interpretation advice here
 
-Dawid-Sebastiani Scoring Rules
-------------------------------
+Dawid-Sebastiani Scoring Rule
+-----------------------------
 
-Called "DS_OERR", "DS_ADD_OERR", and "DS_MULT_OERR" in ECNT output :numref:`table_ES_header_info_es_out_ECNT`
+Called "DSS" in ECNT output :numref:`table_ES_header_info_es_out_ECNT`
 
-TODO: Eric add 3 equations and interpretation advice here
+TODO: Eric add equation 16 and interpretation advice here
 
 IGN
 ---

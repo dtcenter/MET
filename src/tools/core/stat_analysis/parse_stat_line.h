@@ -72,10 +72,10 @@ struct ECNTData {
    double me_oerr, mae_oerr, rmse_oerr, spread_oerr;
    double spread_plus_oerr;
    double bias_ratio;
-   double ign_conv_oerr, ign_corr_oerr;
-   double ds_oerr, ds_add_oerr, ds_mult_oerr;
    int n_ge_obs, n_lt_obs;
    double me_ge_obs, me_lt_obs;
+   double ign_conv_oerr, ign_corr_oerr;
+   double dss;
 };
 
 // Ranked Histogram (RHIST) data structure

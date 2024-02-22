@@ -401,9 +401,7 @@ void parse_ecnt_line(STATLine &l, ECNTData &e_data) {
 
    e_data.ign_conv_oerr = atof(l.get_item("IGN_CONV_OERR"));
    e_data.ign_corr_oerr = atof(l.get_item("IGN_CONV_OERR"));
-   e_data.ds_oerr       = atof(l.get_item("DS_OERR"));
-   e_data.ds_add_oerr   = atof(l.get_item("DS_ADD_OERR"));
-   e_data.ds_mult_oerr  = atof(l.get_item("DS_MULT_OERR"));
+   e_data.dss           = atof(l.get_item("DSS"));
 
    return;
 }
