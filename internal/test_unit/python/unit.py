@@ -3,9 +3,11 @@
 
 #add imports...
 #import lxml     #note: developing with v 4.9.3
+from datetime import datetime as dt
 import os
 from pathlib import Path
 import re
+import subprocess
 import xml.etree.ElementTree as ET
 
 # use lib "$ENV{'MET_TEST_BASE'}/lib";
@@ -112,7 +114,7 @@ def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, ca
                 print(e)
             # calls a perl function from VxUtil.pm (in test_unit/lib) to make the directory 
             output_dir = Path(output).parent
-            output_dir.mkdir(parents=True)     #should error be raised if dir already exists? 
+            output_dir.mkdir(parents=True, exist_ok=True)     #should error be raised if dir already exists? 
 
     #   my @outputs = ( @{$test->{"out_pnc"}}, @{$test->{"out_gnc"}}, @{$test->{"out_stat"}}, @{$test->{"out_ps"}}, @{$test->{"out_exist"}}, @{$test->{"out_not_exist"}} );
     #   for my $output ( @outputs ){
@@ -141,19 +143,24 @@ def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, ca
             cmd = f"valgrind {VALGRIND_OPT_MEM} {cmd}"
         elif callchk:
             cmd = f"valgrind {VALGRIND_OPT_CALL} {cmd}"
-        
-    
 
+        
     #   # if writing a command file, print the environment and command, then loop
-    #   if( $cmd_only ){
-    #     print "export $_=\'" . $test->{"env"}{$_} . "\'\n" for sort keys %{ $test->{"env"} };
-    #     print "$cmd\n";
-    #     print "unset $_\n" for sort keys %{ $test->{"env"} };
-    #     print "\n";
-    #     next;
-    #   }
+        if cmd_only:
+            for key, val in sorted(test['env'].items()):
+                print(f"export {key}={val}")
+            print(f"{cmd}")
+            for key, val in sorted(test['env'].items()):
+                print(f"unset {key}")
+            print("\n")
     
     #   # run and time the test command
+        t_start = dt.now()
+        cmd_args = [arg for arg in cmd.split() if arg!='\\'] + ['2>&1']
+        cmd_outs = subprocess.run(cmd_args, capture_output=True)  #what should this actually contain?
+        t_elaps = dt.now() - t_start
+        # unshift @cmd_outs, "$cmd\n";
+
     #   my $t_start = [gettimeofday];
     #   my @cmd_outs = qx{$cmd 2>&1};
     #   my $t_elaps = tv_interval( $t_start );
@@ -215,7 +222,7 @@ def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, ca
     #   }
 
     # }
-    return tests
+    return tests, cmd
 
 
 def build_tests(test_root):
