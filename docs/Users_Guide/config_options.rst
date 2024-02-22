@@ -101,13 +101,13 @@ The configuration file language supports the following data types:
       the user has already determined to be 2.5 outside of MET.
       
     * "==FBIAS" for a user-specified frequency bias value.
-      e.g. "==FBIAS1" to automatically de-bias the data, "==FBIAS0.9" to select a low-bias threshold, or "==FBIAS1.1" to select a high-bias threshold.
-      This option must be used in
-      conjunction with a simple threshold in the other field. For example,
-      when "obs.cat_thresh = >5.0" and "fcst.cat_thresh = ==FBIAS1;",
-      MET applies the >5.0 threshold to the observations and then chooses a
-      forecast threshold which results in a frequency bias of 1.
-      The frequency bias can be any float value > 0.0.
+      e.g. "==FBIAS1" to automatically de-bias the data, "==FBIAS0.9" to
+      select a low-bias threshold, or "==FBIAS1.1" to select a high-bias
+      threshold. This option must be used in conjunction with a simple
+      threshold in the other field. For example, when "obs.cat_thresh = >5.0"
+      and "fcst.cat_thresh = ==FBIAS1;", MET applies the >5.0 threshold to
+      the observations and then chooses a forecast threshold which results in
+      a frequency bias of 1. The frequency bias can be any float value > 0.0.
       
     * "CDP" for climatological distribution percentile thresholds.
       These thresholds require that the climatological mean and standard
@@ -842,32 +842,37 @@ to be verified. This dictionary may include the following entries:
 
     When set as a boolean to TRUE, it indicates that the "fcst.field" data
     should be treated as probabilities. For example, when verifying the
-    probabilistic NetCDF output of Ensemble-Stat, one could configure the
-    Grid-Stat or Point-Stat tools as follows:
+    probabilistic NetCDF output of Gen-Ens-Prod for an ensemble of size 10,
+    one could configure the Grid-Stat or Point-Stat tools as follows:
 
     .. code-block:: none
 
       fcst = {
-         field = [ { name  = "APCP_24_A24_ENS_FREQ_gt0.0";
-                     level = "(*,*)";
-                     prob  = TRUE; } ];
+         field = [ { name       = "APCP_24_A24_ENS_FREQ_gt0.0";
+                     level      = "(*,*)";
+                     cat_thresh = ==10;
+                     prob       = TRUE; } ];
          }
 
     Setting "prob = TRUE" indicates that the "APCP_24_A24_ENS_FREQ_gt0.0"
-    data should be processed as probabilities.
+    data should be processed as probabilities. Setting "cat_thresh = ==10"
+    indicates that these probabilities are derived from an ensemble with 10
+    members and 11 probability bins should be defined, each centered on the
+    value n/10 for n = 0, 1, ... 10.
 
     When set as a dictionary, it defines the probabilistic field to be
     used. For example, when verifying GRIB files containing probabilistic
-    data,  one could configure the Grid-Stat or Point-Stat tools as
-    follows:
+    data, one could configure the Grid-Stat or Point-Stat tools as follows:
 
     .. code-block:: none
 
       fcst = {
-         field = [ { name = "PROB"; level = "A24";
-                     prob = { name = "APCP"; thresh_lo = 2.54; } },
-                   { name = "PROB"; level = "P850";
-                     prob = { name = "TMP"; thresh_hi = 273; } } ];
+         field = [ { name       = "PROB"; level = "A24";
+                     prob       = { name = "APCP"; thresh_lo = 2.54; }
+                     cat_thresh = ==0.25; },
+                   { name       = "PROB"; level = "P850";
+                     prob       = { name = "TMP"; thresh_hi = 273; }
+                     cat_thresh = ==0.1; } ];
       }
 
     The example above selects two probabilistic fields. In both, "name"
@@ -882,6 +887,31 @@ to be verified. This dictionary may include the following entries:
     [0, 1] or [0, 100]. However, when MET encounters a probability field
     with a range [0, 100], it will automatically rescale it to be [0, 1]
     before applying the probabilistic verification methods.
+
+    Probabilistic statistics in MET are derived from an Nx2 probabilistic
+    contingency table. The N-dimension is determined by the number of
+    probability bins requested. The "cat_thresh" configuration option
+    defines the number of and size of these probabibility bins. The bins
+    must include the full range of possible probability values, [0, 1].
+    Since selecting bins of equal width is common, shorthand notation is
+    provided to do so. The following options are supported.
+
+    * :code:`cat_thresh = [ ==0.25 ];` specifies an equal probability bin
+      width of 0.25 and defines 4 bins between the values 0, 0.25, 0.5, 0.75,
+      and 1.0. The :code:`==p` threshold may be set to any probability bin
+      width greater than 0 and less than 1.
+
+    * :code:`cat_thresh = [ ==10 ];` specifies probability bins for an
+      ensemble of size 10 and defines 11 bins between the values -0.05, 0.05,
+      0.15, ..., 0.95, and 1.05. Note that each bin is centered on the
+      probability value n/10, for n = 0 to 10. The :code:`==n` threshold may
+      be set to any integer number of ensemble members greater than 1 to
+      define n+1 probability bins.
+
+    * :code:`cat_thresh = [ >=0, >=0.5, >=0.75, >=1.0 ];` explicitly
+      specifies the probability thresholds and defines 3 bins of unequal
+      width between the values 0, 0.5, 0.75, and 1.0. By convention, the
+      greater-than-or-equal-to (">=" or "ge") inequality type is required.
 
   * Set "prob_as_scalar = TRUE" to override the processing of probability
     data. When the "prob" entry is set as a dictionary to define the
@@ -2047,7 +2077,7 @@ This dictionary may include the following entries:
 .. code-block:: none
 
   hira = {
-      flag            = FALSE;
+     flag            = FALSE;
      width           = [ 2, 3, 4, 5 ];
      vld_thresh      = 1.0;
      cov_thresh      = [ ==0.25 ];
@@ -3813,13 +3843,22 @@ Where "job_name" is set to one of the following:
 
 * "filter"
   
-  To filter out the STAT or TCMPR lines matching the job filtering
-  criteria specified below and using the optional arguments below.
+  To filter out the STAT lines matching the job filtering criteria
+  specified below and using the optional arguments below.
   The output STAT lines are written to the file specified using the
   "-dump_row" argument.
+
   Required Args: -dump_row
 
-|    
+  Optional Args:
+
+  .. code-block:: none
+
+    -set_hdr column_name value
+       May be used multiple times to override data written to the
+       output dump_row file.
+
+|
 
 * "summary"
   
@@ -3848,8 +3887,8 @@ Where "job_name" is set to one of the following:
 	   
   * Format the -column option as LINE_TYPE:COLUMN.
 
-|     
-    
+|
+
   Use the -derive job command option to automatically derive
   statistics on the fly from input contingency tables and partial
   sums.
@@ -3875,10 +3914,14 @@ Where "job_name" is set to one of the following:
 
   .. code-block:: none
 
-    -by column_name to specify case information
-    -out_alpha to override default alpha value of 0.05
-    -derive to derive statistics on the fly
-    -column_union to summarize multiple columns
+    -by column_name
+       To specify case information.
+    -out_alpha
+       To override the default alpha value.
+    -derive
+       To derive statistics on the fly.
+    -column_union
+       To summarize multiple columns.
 
 * "aggregate"
   
@@ -3895,8 +3938,8 @@ Where "job_name" is set to one of the following:
                ISC, ECNT, RPS, RHIST, PHIST, RELP, SSVAR
 	       
   Required Args: -line_type
-  
-| 
+
+|
 
 * "aggregate_stat"
   
@@ -3930,8 +3973,8 @@ Where "job_name" is set to one of the following:
   .. code-block:: none
 
     -out_thresh or -out_fcst_thresh and -out_obs_thresh
-     When -out_line_type FHO, CTC, CTS, MCTC, MCTS,
-                         PCT, PSTD, PJC, PRC
+       When -out_line_type FHO, CTC, CTS, MCTC, MCTS,
+                           PCT, PSTD, PJC, PRC
 
   Additional Optional Args for -line_type MPR:
 
@@ -3944,14 +3987,14 @@ Where "job_name" is set to one of the following:
     -out_obs_wind_thresh
     -out_wind_logic
     When -out_line_type WDIR
-	    
+
   Additional Optional Arg for:
 
   .. code-block:: none
 
     -line_type ORANK -out_line_type PHIST, SSVAR ...
     -out_bin_size
-	    
+
   Additional Optional Args for:
 
   .. code-block:: none
@@ -3960,14 +4003,14 @@ Where "job_name" is set to one of the following:
     -out_eclv_points
 
 * "ss_index"
-  
+
   The skill score index job can be configured to compute a weighted
   average of skill scores derived from a configurable set of
   variables, levels, lead times, and statistics. The skill score
   index is computed using two models, a forecast model and a
   reference model. For each statistic in the index, a skill score
   is computed as:
-  
+
   SS = 1 - (S[model]*S[model])/(S[reference]*S[reference])
 
   Where S is the statistic.
@@ -4178,17 +4221,19 @@ Where "job_name" is set to one of the following:
     "-rank_corr_flag  value"
     "-vif_flag        value"
 
-  For aggregate and aggregate_stat job types:
-
   .. code-block:: none
 
-    "-out_stat        path"   to write a .stat output file for the job
-                              including the .stat header columns. Multiple
-                              values for each header column are written as
-                              a comma-separated list.
-    "-set_hdr col_name value" may be used multiple times to explicity
-                              specify what should be written to the header
-                              columns of the output .stat file.
+    -out_stat path
+       To write a .stat output file for aggregate and aggregate_stat jobs
+       including the .stat header columns. Multiple input values for each
+       header column are written to the output as a comma-separated list
+       of unique values.
+
+    -set_hdr col_name value
+       May be used multiple times to explicity specify what should be
+       written to the header columns of the output .stat file for
+       aggregate and aggregate_stat jobs or output dump_row file
+       for filter jobs.
 
   When using the "-by" job command option, you may reference those columns
   in the "-set_hdr" job command options. For example, when computing statistics

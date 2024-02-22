@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -31,6 +31,8 @@
 //   011    01/24/20  Halley Gotway   Add RPS line type.
 //   012    11/10/22  Halley Gotway   MET #2339 Add SEEPS and SEEPS_MPR
 //                                      line types.
+//   013    02/13/24  Halley Gotway   MET #2395 Add wind direction stats
+//                                      to VL1L2, VAL1L2, and VCNT.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -234,6 +236,9 @@ void parse_vl1l2_line(STATLine &l, VL1L2Info &v_info) {
    v_info.uvoo_bar    = atof(l.get_item("UVOOBAR"));
    v_info.f_speed_bar = atof(l.get_item("F_SPEED_BAR"));
    v_info.o_speed_bar = atof(l.get_item("O_SPEED_BAR"));
+   v_info.dir_bar     = atof(l.get_item("DIR_ME"));
+   v_info.absdir_bar  = atof(l.get_item("DIR_MAE"));
+   v_info.dir2_bar    = atof(l.get_item("DIR_MSE"));
 
    v_info.compute_stats();
 
@@ -256,6 +261,9 @@ void parse_val1l2_line(STATLine &l, VL1L2Info &v_info) {
    v_info.uvooa_bar    = atof(l.get_item("UVOOABAR"));
    v_info.fa_speed_bar = atof(l.get_item("FA_SPEED_BAR"));
    v_info.oa_speed_bar = atof(l.get_item("OA_SPEED_BAR"));
+   v_info.dira_bar     = atof(l.get_item("DIRA_ME"));
+   v_info.absdira_bar  = atof(l.get_item("DIRA_MAE"));
+   v_info.dira2_bar    = atof(l.get_item("DIRA_MSE"));
 
    v_info.compute_stats();
 

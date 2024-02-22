@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -276,6 +276,10 @@ class VL1L2Info {
 
       // Number of points
       int n;
+
+      // Number of points for which the wind direction difference is undefined
+      int n_dir_undef; 
+      int n_dira_undef; 
    
       // VL1L2 Quantities
 
@@ -290,6 +294,10 @@ class VL1L2Info {
 
       double f_speed_bar;
       double o_speed_bar;
+
+      double dir_bar;    // Average direction difference in (-180, +180]
+      double absdir_bar; // Average absolute direction difference
+      double dir2_bar;   // Average squared direction difference
 
       // Vector continuous statistics derived from VL1L2 and VAL1L2 partial sums
 
@@ -322,21 +330,11 @@ class VL1L2Info {
 
       CIInfo ANOM_CORR;
       CIInfo ANOM_CORR_UNCNTR;
-
-      //
-      // Extra VL1L2 quantities
-      //
-
-      double f_bar;  //  fcst wind speed
-      double o_bar;  //   obs wind speed
-
-      double me;     //  mean error
-
-      double mse;    //  mean squared error
-
-      double rmse;   //  root mean squared error
-
-      double speed_bias;
+ 
+      CIInfo DIR_ME;
+      CIInfo DIR_MAE;
+      CIInfo DIR_MSE;
+      CIInfo DIR_RMSE;
 
       int    vcount;
 
@@ -352,6 +350,10 @@ class VL1L2Info {
 
       double fa_speed_bar;
       double oa_speed_bar;
+
+      double dira_bar;    // Average anomalous direction difference in (-180, +180]
+      double absdira_bar; // Average anomalous absolute direction difference
+      double dira2_bar;   // Average anomalous squared direction difference
 
       int    vacount;
 

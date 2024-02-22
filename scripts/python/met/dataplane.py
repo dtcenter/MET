@@ -123,6 +123,8 @@ class dataplane(met_base):
       numpy_dump_name = met_base_tools.get_numpy_filename(tmp_filename)
       met_dp_data = np.load(numpy_dump_name)
       met_info['met_data'] = met_dp_data
+      if numpy_dump_name != tmp_filename:
+         met_base_tools.remove_temp_file(numpy_dump_name)
       return met_info
 
    @staticmethod

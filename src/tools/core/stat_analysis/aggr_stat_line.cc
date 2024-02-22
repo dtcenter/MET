@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -37,6 +37,8 @@
 //                    -out_thresh and -out_line_type options.
 //   017    11/10/22  Halley Gotway   MET #2339 Add SEEPS and SEEPS_MPR
 //                                      line types.
+//   018    02/13/24  Halley Gotway   MET #2395 Add wind direction stats
+//                                      to VL1L2, VAL1L2, and VCNT.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -2139,6 +2141,21 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &job,
                                    it->second.pd_v.f_na[i]*it->second.pd_v.f_na[i]);
          v_info.o_speed_bar = sqrt(it->second.pd_u.o_na[i]*it->second.pd_u.o_na[i] +
                                    it->second.pd_v.o_na[i]*it->second.pd_v.o_na[i]);
+
+         double d_diff = angle_difference(
+                            it->second.pd_u.f_na[i], it->second.pd_v.f_na[i],
+                            it->second.pd_u.o_na[i], it->second.pd_v.o_na[i]);
+
+         if(is_bad_data(d_diff)) {
+            v_info.n_dir_undef = 1;
+         }
+         else {
+            v_info.n_dir_undef = 0;
+            v_info.dir_bar     = d_diff;
+            v_info.absdir_bar  = abs(d_diff);
+            v_info.dir2_bar    = d_diff*d_diff;
+         }
+ 
          aggr.vl1l2_info += v_info;
 
          //

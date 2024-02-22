@@ -115,6 +115,25 @@
     </output>
   </test>
 
+  <!-- Invokes Python script that reads in NUMPY text data (convert data value 0.0 to missing value) -->
+  <test name="python_numpy_plot_data_plane_missing">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <env>
+      <pair><name>MET_PYTHON_EXE</name> <value>&MET_PYTHON_EXE;</value></pair>
+    </env>
+    <param> \
+      PYTHON_NUMPY \
+      &OUTPUT_DIR;/python/letter_numpy_0_to_missing.ps \
+      'name = "&MET_BASE;/python/examples/read_ascii_numpy.py &DATA_DIR_PYTHON;/letter.txt LETTER 0.0";' \
+      -plot_range 0.0 255.0 \
+      -title "Python enabled numpy plot_data_plane" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/python/letter_numpy_0_to_missing.ps</ps>
+    </output>
+  </test>
+
   <test name="python_numpy_plot_data_plane_file_type">
     <exec>&MET_BIN;/plot_data_plane</exec>
     <param> \

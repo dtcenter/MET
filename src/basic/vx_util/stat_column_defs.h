@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -124,14 +124,16 @@ static const char * vl1l2_columns [] = {
    "TOTAL",       "UFBAR",       "VFBAR",
    "UOBAR",       "VOBAR",       "UVFOBAR",
    "UVFFBAR",     "UVOOBAR",     "F_SPEED_BAR",
-   "O_SPEED_BAR"
+   "O_SPEED_BAR", "DIR_ME",      "DIR_MAE",
+   "DIR_MSE" 
 };
 
 static const char * val1l2_columns [] = {
-   "TOTAL",       "UFABAR",      "VFABAR",
-   "UOABAR",      "VOABAR",      "UVFOABAR",
-   "UVFFABAR",    "UVOOABAR",    "FA_SPEED_BAR",
-   "OA_SPEED_BAR"
+   "TOTAL",        "UFABAR",      "VFABAR",
+   "UOABAR",       "VOABAR",      "UVFOABAR",
+   "UVFFABAR",     "UVOOABAR",    "FA_SPEED_BAR",
+   "OA_SPEED_BAR", "DIRA_ME",     "DIRA_MAE",
+   "DIRA_MSE"
 };
 
 
@@ -158,6 +160,10 @@ static const char * vcnt_columns [] = {
    "ANOM_CORR",        "ANOM_CORR_NCL",        "ANOM_CORR_NCU",
    "ANOM_CORR_BCL",    "ANOM_CORR_BCU",
    "ANOM_CORR_UNCNTR", "ANOM_CORR_UNCNTR_BCL", "ANOM_CORR_UNCNTR_BCU",
+   "DIR_ME",           "DIR_ME_BCL",           "DIR_ME_BCU",
+   "DIR_MAE",          "DIR_MAE_BCL",          "DIR_MAE_BCU",
+   "DIR_MSE",          "DIR_MSE_BCL",          "DIR_MSE_BCU",
+   "DIR_RMSE",         "DIR_RMSE_BCL",         "DIR_RMSE_BCU"
 };
 
 static const char * pct_columns [] = {

@@ -1285,6 +1285,15 @@ The first set of header columns are common to all of the output files generated 
   * - 34
     - O_SPEED_BAR
     - Mean observed wind speed
+  * - 35
+    - DIR_ME
+    - Mean wind direction difference, from -180 to 180 degrees
+  * - 36
+    - DIR_MAE
+    - Mean absolute wind direction difference
+  * - 37
+    - DIR_MSE
+    - Mean squared wind direction difference
 
 .. _table_PS_format_info_VAL1L2:
 
@@ -1331,6 +1340,15 @@ The first set of header columns are common to all of the output files generated 
   * - 34
     - OA_SPEED_BAR
     - Mean observed wind speed anomaly
+  * - 35
+    - DIRA_ME
+    - Mean wind direction anomaly difference, from -180 to 180 degrees
+  * - 36
+    - DIRA_MAE
+    - Mean absolute wind direction anomaly difference
+  * - 37
+    - DIRA_MSE
+    - Mean squared wind direction anomaly difference
 
 .. _table_PS_format_info_VCNT:
 
@@ -1410,6 +1428,18 @@ The first set of header columns are common to all of the output files generated 
   * - 85-87
     - ANOM_CORR_UNCNTR, :raw-html:`<br />` ANOM_CORR_UNCNTR_BCL, :raw-html:`<br />` ANOM_CORR_UNCNTR_BCU
     - Uncentered vector Anomaly Correlation excluding mean error including bootstrap upper and lower confidence limits
+  * - 88-90
+    - DIR_ME, :raw-html:`<br />` DIR_ME_BCL, :raw-html:`<br />` DIR_ME_BCU
+    - Mean direction difference, from -180 to 180 degrees, including bootstrap upper and lower confidence limits
+  * - 91-93
+    - DIR_MAE, :raw-html:`<br />` DIR_MAE_BCL, :raw-html:`<br />` DIR_MAE_BCU
+    - Mean absolute direction difference including bootstrap upper and lower confidence limits
+  * - 94-96
+    - DIR_MSE, :raw-html:`<br />` DIR_MSE_BCL, :raw-html:`<br />` DIR_MSE_BCU
+    - Mean squared direction difference including bootstrap upper and lower confidence limits
+  * - 97-99
+    - DIR_RMSE, :raw-html:`<br />` DIR_RMSE_BCL, :raw-html:`<br />` DIR_RMSE_BCU
+    - Root mean squared direction difference including bootstrap upper and lower confidence limits
 
 .. _table_PS_format_info_MPR:
 
