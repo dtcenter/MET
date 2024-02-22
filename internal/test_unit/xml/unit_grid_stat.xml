@@ -11,7 +11,7 @@
   <!ENTITY DATA_DIR_CLIMO "&INPUT_DIR;/climatology_data">
 ]>
 
-<!-- Requires: unit_pcp_combine.xml -->
+<!-- Requires: unit_pcp_combine.xml unit_gen_ens_prod.xml -->
 
 <met_test>
 
@@ -325,6 +325,24 @@
     <output>
       <stat>&OUTPUT_DIR;/grid_stat/grid_stat_WRF_pres_120000L_20190831_120000V.stat</stat>
       <grid_nc>&OUTPUT_DIR;/grid_stat/grid_stat_WRF_pres_120000L_20190831_120000V_pairs.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="grid_stat_GEN_ENS_PROD">
+    <exec>&MET_BIN;/grid_stat</exec>
+    <env>
+      <pair><name>OUTPUT_PREFIX</name>   <value>GEN_ENS_PROD</value></pair>
+      <pair><name>CLIMO_MEAN_FILE</name>  <value>&DATA_DIR_CLIMO;/NCEP_1.0deg/cmean_1d.19790410</value></pair>
+      <pair><name>CLIMO_STDEV_FILE</name> <value>&DATA_DIR_CLIMO;/NCEP_1.0deg/cstdv_1d.19790410</value></pair>
+    </env>
+    <param> \
+      &OUTPUT_DIR;/gen_ens_prod/gen_ens_prod_NO_CTRL_20120410_120000V.nc \
+      &DATA_DIR_MODEL;/grib1/arw-tom-gep0/arw-tom-gep0_2012040912_F024.grib \
+      &CONFIG_DIR;/GridStatConfig_gen_ens_prod \
+      -outdir &OUTPUT_DIR;/grid_stat -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/grid_stat/grid_stat_GEN_ENS_PROD_240000L_20120410_120000V.stat</stat>
     </output>
   </test>
 
