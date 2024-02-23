@@ -84,7 +84,7 @@ class ECNTInfo {
 
       // Log scores that incorporate observational uncertainty
       // and Dawid-Sebastiani score, as advised in Ferro (2017)
-      double ign_conv_oerr, ign_corr_oerr, dss;
+      double ign_conv_oerr, ign_corr_oerr, idss;
 
       // Bias ratio information
       int n_ge_obs, n_lt_obs;

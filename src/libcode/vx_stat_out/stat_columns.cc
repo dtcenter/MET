@@ -4276,7 +4276,7 @@ void write_ecnt_cols(const ECNTInfo &ecnt_info,
    //    MAE,       MAE_OERR,      BIAS_RATIO,
    //    N_GE_OBS,  ME_GE_OBS,     N_LT_OBS,
    //    ME_LT_OBS, IGN_CONV_OERR, IGN_CORR_OERR,
-   //    DSS
+   //    IDSS
    //
    at.set_entry(r, c+0,  // Total Number of Pairs
       ecnt_info.n_pair);
@@ -4359,8 +4359,8 @@ void write_ecnt_cols(const ECNTInfo &ecnt_info,
    at.set_entry(r, c+26,  // Ignorance Score, observation error corrected
       ecnt_info.ign_corr_oerr);
 
-   at.set_entry(r, c+27,  // Dawid-Sebastiani Score
-      ecnt_info.dss);
+   at.set_entry(r, c+27,  // Independent Dawid-Sebastiani Score
+      ecnt_info.idss);
 
    return;
 }

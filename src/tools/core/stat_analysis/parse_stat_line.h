@@ -75,7 +75,7 @@ struct ECNTData {
    int n_ge_obs, n_lt_obs;
    double me_ge_obs, me_lt_obs;
    double ign_conv_oerr, ign_corr_oerr;
-   double dss;
+   double idss;
 };
 
 // Ranked Histogram (RHIST) data structure

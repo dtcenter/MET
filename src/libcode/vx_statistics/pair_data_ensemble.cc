@@ -110,7 +110,7 @@ void PairDataEnsemble::clear() {
 
    ign_conv_oerr_na.clear();
    ign_corr_oerr_na.clear();
-   dss_na.clear();
+   idss_na.clear();
 
    n_ge_obs_na.clear();
    me_ge_obs_na.clear();
@@ -185,7 +185,7 @@ void PairDataEnsemble::extend(int n) {
    pit_na.extend             (n);
    ign_conv_oerr_na.extend   (n);
    ign_corr_oerr_na.extend   (n);
-   dss_na.extend             (n);
+   idss_na.extend            (n);
    n_ge_obs_na.extend        (n);
    me_ge_obs_na.extend       (n);
    n_lt_obs_na.extend        (n);
@@ -255,7 +255,7 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
 
    ign_conv_oerr_na = pd.ign_conv_oerr_na;
    ign_corr_oerr_na = pd.ign_corr_oerr_na;
-   dss_na           = pd.dss_na;
+   idss_na          = pd.idss_na;
 
    n_ge_obs_na    = pd.n_ge_obs_na;
    me_ge_obs_na   = pd.me_ge_obs_na;
@@ -464,7 +464,7 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
          pit_na.add(bad_data_double);
          ign_conv_oerr_na.add(bad_data_double);
          ign_corr_oerr_na.add(bad_data_double);
-         dss_na.add(bad_data_double);
+         idss_na.add(bad_data_double);
          n_ge_obs_na.add(bad_data_double);
          me_ge_obs_na.add(bad_data_double);
          n_lt_obs_na.add(bad_data_double);
@@ -480,9 +480,9 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
          double emn_unperturbed = compute_mean(esum_na[i], esumn_na[i]);
          double esd_unperturbed = compute_stdev(esum_na[i], esumsq_na[i], esumn_na[i]);
 
-         // Compute the Dawid Sebastiani scores
-         dss_na.add(
-            compute_dawid_sebastiani(
+         // Compute the Independent Dawid Sebastiani score
+         idss_na.add(
+            compute_ind_dawid_sebastiani(
                emn_unperturbed, esd_unperturbed, o_na[i]));
 
          // Process the observation error information
@@ -904,7 +904,7 @@ PairDataEnsemble PairDataEnsemble::subset_pairs_obs_thresh(const SingleThresh &o
       //   crps_emp_na, crps_emp_fair_na, spread_md_na,
       //   crpscl_emp_na, crps_gaus_na, crpscl_gaus_na,
       //   ign_na, pit_na,
-      //   ign_conv_oerr, ign_corr_oerr, dss,
+      //   ign_conv_oerr, ign_corr_oerr, idss,
       //   n_gt_obs_na, me_gt_obs_na, n_lt_obs_na, me_lt_obs_na,
       //   var_na, var_oerr_na, var_plus_oerr_na,
       //   mn_na, mn_oerr_na, e_na
@@ -930,7 +930,7 @@ PairDataEnsemble PairDataEnsemble::subset_pairs_obs_thresh(const SingleThresh &o
       pd.pit_na.add(pit_na[i]);
       pd.ign_conv_oerr_na.add(ign_conv_oerr_na[i]);
       pd.ign_corr_oerr_na.add(ign_corr_oerr_na[i]);
-      pd.dss_na.add(dss_na[i]);
+      pd.idss_na.add(idss_na[i]);
       pd.n_ge_obs_na.add(n_ge_obs_na[i]);
       pd.me_ge_obs_na.add(me_ge_obs_na[i]);
       pd.n_lt_obs_na.add(n_lt_obs_na[i]);
@@ -2203,9 +2203,9 @@ void compute_obs_error_log_scores(double emn, double esd,
 
 ////////////////////////////////////////////////////////////////////////
 
-double compute_dawid_sebastiani(double emn, double esd, double obs) {
+double compute_ind_dawid_sebastiani(double emn, double esd, double obs) {
 
-   const char *method_name = "compute_dawid_sebastiani() -> ";
+   const char *method_name = "compute_ind_dawid_sebastiani() -> ";
 
    double v = bad_data_double;
 
@@ -2229,7 +2229,7 @@ double compute_dawid_sebastiani(double emn, double esd, double obs) {
            << "for input emn = " << emn
            << ", esd = " << esd
            << ", obs = " << obs
-           << ", output dss = " << v << "\n";
+           << ", output idss = " << v << "\n";
    }
 
    return(v);

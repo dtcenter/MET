@@ -186,7 +186,7 @@ void ECNTInfo::clear() {
    spread_plus_oerr = bad_data_double;
 
    ign_conv_oerr = ign_corr_oerr = bad_data_double;
-   dss           = bad_data_double;
+   idss          = bad_data_double;
 
    n_ge_obs  = n_lt_obs  = 0;
    me_ge_obs = me_lt_obs = bias_ratio = bad_data_double;
@@ -227,7 +227,7 @@ void ECNTInfo::assign(const ECNTInfo &c) {
 
    ign_conv_oerr    = c.ign_conv_oerr;
    ign_corr_oerr    = c.ign_corr_oerr;
-   dss              = c.dss;
+   idss             = c.idss;
 
    n_ge_obs         = c.n_ge_obs;
    n_lt_obs         = c.n_lt_obs;
@@ -371,7 +371,7 @@ void ECNTInfo::set(const PairDataEnsemble &pd) {
    // Compute log scores with observational uncertainty
    ign_conv_oerr = pd.ign_conv_oerr_na.wmean(pd.wgt_na);
    ign_corr_oerr = pd.ign_corr_oerr_na.wmean(pd.wgt_na);
-   dss           = pd.dss_na.wmean(pd.wgt_na);
+   idss          = pd.idss_na.wmean(pd.wgt_na);
 
    // Compute bias ratio terms 
    n_ge_obs  = nint(pd.n_ge_obs_na.sum());

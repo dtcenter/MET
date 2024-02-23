@@ -656,7 +656,7 @@ The format of the STAT and ASCII output of the Ensemble-Stat tool are described 
     - IGN_CORR_OERR
     - Error-corrected logarithmic scoring rule (i.e. ignornance score) from Equation 7 of :ref:`Ferro, 2017 <Ferro-2017>`
   * - 52
-    - DSS
+    - IDSS
     - Scoring rule from Equation 16 of :ref:`Dawid and Sebastiani, 1999 <Dawid-Sebastiani-1999>`
 
 .. _table_ES_header_info_es_out_RPS:
