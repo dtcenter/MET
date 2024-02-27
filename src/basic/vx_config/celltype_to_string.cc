@@ -39,7 +39,7 @@ ConcatString celltype_to_string(const CellType t)
 
 {
 
-const char * s = (const char *) 0;
+const char * s = (const char *) nullptr;
 
 switch ( t )  {
 

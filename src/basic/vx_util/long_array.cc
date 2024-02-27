@@ -96,7 +96,7 @@ void LongArray::init_from_scratch()
 
 {
 
-e = (long *) 0;
+e = (long *) nullptr;
 
 AllocInc = 10;   //  default value
 
@@ -114,7 +114,7 @@ void LongArray::clear()
 
 {
 
-if ( e )  { delete [] e;  e = (long *) 0; }
+if ( e )  { delete [] e;  e = (long *) nullptr; }
 
 
 
@@ -164,7 +164,7 @@ if ( ! exact )  {
 }
 
 int j;
-long * u = (long *) 0;
+long * u = (long *) nullptr;
 
 u = new long [n];
 
@@ -185,11 +185,11 @@ for(j=0; j<Nelements; ++j)  {
 
 }
 
-if ( e )  { delete [] e;  e = (long *) 0; }
+if ( e )  { delete [] e;  e = (long *) nullptr; }
 
 e = u;
 
-u = (long *) 0;
+u = (long *) nullptr;
 
 Nalloc = n;
 

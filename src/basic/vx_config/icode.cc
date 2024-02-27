@@ -114,9 +114,9 @@ d = 0.0;
 
 type = no_cell_type;
 
-name = (char *) 0;
+name = (char *) nullptr;
 
-text = (char *) 0;
+text = (char *) nullptr;
 
 e = 0;
 
@@ -596,7 +596,7 @@ void IcodeVector::init_from_scratch()
 
 {
 
-Cell = (IcodeCell *) 0;
+Cell = (IcodeCell *) nullptr;
 
 Ncells = Nalloc = 0;
 
@@ -1155,7 +1155,7 @@ ICVStack::ICVStack()
 
 {
 
-for (int j=0; j<icv_stack_size; ++j)  v[j] = (IcodeVector *) 0;
+for (int j=0; j<icv_stack_size; ++j)  v[j] = (IcodeVector *) nullptr;
 
 clear();
 
@@ -1181,7 +1181,7 @@ ICVStack::ICVStack(const ICVStack & s)
 
 {
 
-for (int j=0; j<icv_stack_size; ++j)  v[j] = (IcodeVector *) 0;
+for (int j=0; j<icv_stack_size; ++j)  v[j] = (IcodeVector *) nullptr;
 
 Depth = 0;
 
@@ -1320,7 +1320,7 @@ IcodeVector V;
 
 V = *(v[Depth - 1]);
 
-delete v[Depth - 1];   v[Depth - 1] = (IcodeVector *) 0;
+delete v[Depth - 1];   v[Depth - 1] = (IcodeVector *) nullptr;
 
 --Depth;
 
@@ -1595,7 +1595,7 @@ for (int j=1; j<Nelements; ++j)  {
 
 }
 
-v[Nelements - 1] = (IcodeVector *) 0;
+v[Nelements - 1] = (IcodeVector *) nullptr;
 
 --Nelements;
 

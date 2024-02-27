@@ -65,7 +65,7 @@ ThreshArray & ThreshArray::operator=(const ThreshArray & a) {
 
 void ThreshArray::init_from_scratch() {
 
-   t = (SingleThresh *) 0;
+   t = (SingleThresh *) nullptr;
 
    clear();
 
@@ -76,7 +76,7 @@ void ThreshArray::init_from_scratch() {
 
 void ThreshArray::clear() {
 
-   if(t) { delete [] t;  t = (SingleThresh *) 0; }
+   if(t) { delete [] t;  t = (SingleThresh *) nullptr; }
 
    Nelements = Nalloc = 0;
 
@@ -134,17 +134,17 @@ void ThreshArray::extend(int n, bool exact) {
       n = k*thresharray_alloc_inc;
    }
 
-   SingleThresh *u = (SingleThresh *) 0;
+   SingleThresh *u = (SingleThresh *) nullptr;
 
    u = new SingleThresh [n];
 
    if(t) {
       for(j=0; j<Nelements; j++) u[j] = t[j];
 
-      delete [] t; t = (SingleThresh *) 0;
+      delete [] t; t = (SingleThresh *) nullptr;
    }
 
-   t = u; u = (SingleThresh *) 0;
+   t = u; u = (SingleThresh *) nullptr;
 
    Nalloc = n;
 

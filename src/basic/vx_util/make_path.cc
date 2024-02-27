@@ -65,7 +65,7 @@ if (subpath) {
    mlog << Debug(1) << "\n\n  " << method_name << "subpath = \"" << subpath << "\"\n\n";
 
    if ( m_strlen(subpath) == 0 ) {
-      if (subpath) { delete [] subpath; subpath = (char *) 0; }
+      if (subpath) { delete [] subpath; subpath = (char *) nullptr; }
       return ( 0 );
    }
 
@@ -77,7 +77,7 @@ if (subpath) {
 
 status = mkdir(path, mode);
 
-if (subpath) { delete [] subpath; subpath = (char *) 0; }
+if (subpath) { delete [] subpath; subpath = (char *) nullptr; }
 
 if ( status < 0 )   return ( 0 );
 

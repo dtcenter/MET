@@ -1303,10 +1303,10 @@ void DataPlaneArray::init_from_scratch()
 
 {
 
-Lower = (double *) 0;
-Upper = (double *) 0;
+Lower = (double *) nullptr;
+Upper = (double *) nullptr;
 
-Plane = (DataPlane **) 0;
+Plane = (DataPlane **) nullptr;
 
 Nplanes = 0;
 
@@ -1330,11 +1330,11 @@ if ( Nplanes > 0 )  {
 
    for (j=0; j<Nplanes; ++j)  {
 
-      if ( Plane[j] )  { delete Plane[j];  Plane[j] = (DataPlane *) 0; }
+      if ( Plane[j] )  { delete Plane[j];  Plane[j] = (DataPlane *) nullptr; }
 
    }
 
-   delete [] Plane;  Plane = (DataPlane **) 0;
+   delete [] Plane;  Plane = (DataPlane **) nullptr;
 
 }
 
@@ -1394,9 +1394,9 @@ void DataPlaneArray::extend(int n, bool exact)
 if ( Nalloc >= n )  return;
 
 int j, k;
-DataPlane ** p = (DataPlane **) 0;
-double * b = (double *) 0;
-double * t = (double *) 0;
+DataPlane ** p = (DataPlane **) nullptr;
+double * b = (double *) nullptr;
+double * t = (double *) nullptr;
 
 if ( ! exact )  {
 
@@ -1411,7 +1411,7 @@ t = new double      [n];
 
 for (j=0; j<n; ++j)  {
 
-   p[j] = (DataPlane *) 0;
+   p[j] = (DataPlane *) nullptr;
 
    b[j] = t[j] = 0.0;
 
@@ -1429,9 +1429,9 @@ if ( Plane )  {
 
    }   //  for j;
 
-   delete [] Plane;  Plane = (DataPlane **) 0;
-   delete [] Lower;  Lower = (double *)     0;
-   delete [] Upper;  Upper = (double *)     0;
+   delete [] Plane;  Plane = (DataPlane **) nullptr;
+   delete [] Lower;  Lower = (double *)     nullptr;
+   delete [] Upper;  Upper = (double *)     nullptr;
 }
 
 Plane = p;
@@ -1440,9 +1440,9 @@ Lower = b;
 
 Upper = t;
 
-p = (DataPlane **) 0;
-b = (double *)     0;
-t = (double *)     0;
+p = (DataPlane **) nullptr;
+b = (double *)     nullptr;
+t = (double *)     nullptr;
 
    //
    //  done
