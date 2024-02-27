@@ -414,7 +414,7 @@ void setup_txt_files() {
    max_col += n_header_columns + 1;
 
    // Initialize file stream
-   stat_out = (ofstream *) 0;
+   stat_out = (ofstream *) nullptr;
 
    // Build the file name
    stat_file << base_name << stat_file_ext;
@@ -445,7 +445,7 @@ void setup_txt_files() {
       if(conf_info.output_flag[i] == STATOutputType_Both) {
 
          // Initialize file stream
-         txt_out[i] = (ofstream *) 0;
+         txt_out[i] = (ofstream *) nullptr;
 
          // Build the file name
          txt_file[i] << base_name << "_" << txt_file_abbr[i]

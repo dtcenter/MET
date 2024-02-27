@@ -378,7 +378,7 @@ void process_grid(const Grid &fcst_grid, const Grid &obs_grid) {
 Met2dDataFile *get_mtddf(const StringArray &file_list,
                          const GrdFileType type) {
    int i;
-   Met2dDataFile *mtddf = (Met2dDataFile *) 0;
+   Met2dDataFile *mtddf = (Met2dDataFile *) nullptr;
 
    // Find the first file that actually exists
    for(i=0; i<file_list.n(); i++) {
@@ -648,7 +648,7 @@ void get_series_entry(int i_series, VarInfo *info,
 bool read_single_entry(VarInfo *info, const ConcatString &cur_file,
                        const GrdFileType type, DataPlane &dp,
                        Grid &cur_grid) {
-   Met2dDataFile *mtddf = (Met2dDataFile *) 0;
+   Met2dDataFile *mtddf = (Met2dDataFile *) nullptr;
    bool found = false;
 
    // Check that the file exists
@@ -668,7 +668,7 @@ bool read_single_entry(VarInfo *info, const ConcatString &cur_file,
    if(found) cur_grid = mtddf->grid();
 
    // Close the data file
-   delete mtddf; mtddf = (Met2dDataFile *) 0;
+   delete mtddf; mtddf = (Met2dDataFile *) nullptr;
 
    return(found);
 }
@@ -677,9 +677,9 @@ bool read_single_entry(VarInfo *info, const ConcatString &cur_file,
 
 void process_scores() {
    int i, x, y, i_read, i_series, i_point, i_fcst;
-   VarInfo *fcst_info = (VarInfo *) 0;
-   VarInfo *obs_info  = (VarInfo *) 0;
-   PairDataPoint *pd_ptr = (PairDataPoint *) 0;
+   VarInfo *fcst_info = (VarInfo *) nullptr;
+   VarInfo *obs_info  = (VarInfo *) nullptr;
+   PairDataPoint *pd_ptr = (PairDataPoint *) nullptr;
    DataPlane fcst_dp, obs_dp;
    const char *method_name = "process_scores() ";
 
@@ -878,7 +878,7 @@ void process_scores() {
    add_att(nc_out, "obs_lead_end",   (string)sec_to_hhmmss(obs_lead_end));
 
    // Clean up
-   if(pd_ptr) { delete [] pd_ptr; pd_ptr = (PairDataPoint *) 0; }
+   if(pd_ptr) { delete [] pd_ptr; pd_ptr = (PairDataPoint *) nullptr; }
 
    // Print summary counts
    mlog << Debug(2)
@@ -964,7 +964,7 @@ void do_cts(int n, const PairDataPoint *pd_ptr) {
    } // end for i
 
    // Deallocate memory
-   if(cts_info) { delete [] cts_info; cts_info = (CTSInfo *) 0; }
+   if(cts_info) { delete [] cts_info; cts_info = (CTSInfo *) nullptr; }
 
    return;
 }
@@ -2238,12 +2238,12 @@ void clean_up() {
       mlog << Debug(1) << "Output file: " << out_file << "\n";
 
       delete nc_out;
-      nc_out = (NcFile *) 0;
+      nc_out = (NcFile *) nullptr;
    }
 
    // Deallocate memory for data files
-   if(fcst_mtddf) { delete fcst_mtddf; fcst_mtddf = (Met2dDataFile *) 0; }
-   if(obs_mtddf)  { delete obs_mtddf;  obs_mtddf  = (Met2dDataFile *) 0; }
+   if(fcst_mtddf) { delete fcst_mtddf; fcst_mtddf = (Met2dDataFile *) nullptr; }
+   if(obs_mtddf)  { delete obs_mtddf;  obs_mtddf  = (Met2dDataFile *) nullptr; }
 
    // Deallocate memory for the random number generator
    rng_free(rng_ptr);
