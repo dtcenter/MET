@@ -167,6 +167,8 @@ def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, ca
     #   unshift @cmd_outs, "$cmd\n";
 
     #   # check the return status and output files
+        if not(cmd_outs.returncode):
+            pass
     #   $ret_ok = (! $?);
     #   if( $ret_ok ){
     #     $out_ok = 1;
