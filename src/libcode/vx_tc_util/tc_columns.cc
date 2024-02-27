@@ -58,7 +58,7 @@ void close_tc_txt_file(ofstream *&out, const char *file_name) {
    // Close the output file
    out->close();
    delete out;
-   out = (ofstream *) 0;
+   out = (ofstream *) nullptr;
 
    return;
 }

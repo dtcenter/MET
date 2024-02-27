@@ -55,7 +55,7 @@ void MetNcPointObs::init_from_scratch() {
    MetPointData::init_from_scratch();
 
    keep_nc = false;
-   obs_nc = (NcFile *) 0;
+   obs_nc = (NcFile *) nullptr;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -65,7 +65,7 @@ void MetNcPointObs::close() {
 
    if ( !keep_nc && obs_nc ) {
       delete obs_nc;
-      obs_nc = (NcFile *) 0;
+      obs_nc = (NcFile *) nullptr;
    }
 }
 

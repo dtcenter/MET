@@ -79,10 +79,10 @@ void ATCFLineBase::init_from_scratch() {
    set_delimiter(",");
 
    // Initialize pointers
-   BasinMap      = (map<ConcatString,ConcatString> *) 0;
-   BestTechnique = (StringArray *) 0;
-   OperTechnique = (StringArray *) 0;
-   TechSuffix    = (ConcatString *) 0;
+   BasinMap      = (map<ConcatString,ConcatString> *) nullptr;
+   BestTechnique = (StringArray *) nullptr;
+   OperTechnique = (StringArray *) nullptr;
+   TechSuffix    = (ConcatString *) nullptr;
 
    clear();
 
@@ -503,7 +503,7 @@ ATCFLineType string_to_atcflinetype(const char *s) {
 ////////////////////////////////////////////////////////////////////////
 
 ConcatString atcflinetype_to_string(const ATCFLineType t) {
-   const char *s = (const char *) 0;
+   const char *s = (const char *) nullptr;
 
    switch(t) {
       case ATCFLineType_Track:    s = "Track";    break;

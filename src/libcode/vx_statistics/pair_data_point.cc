@@ -416,18 +416,18 @@ VxPairDataPoint & VxPairDataPoint::operator=(const VxPairDataPoint &vx_pd) {
 
 void VxPairDataPoint::init_from_scratch() {
 
-   fcst_info    = (VarInfo *) 0;
-   climo_info   = (VarInfo *) 0;
-   obs_info     = (VarInfoGrib *) 0;
+   fcst_info    = (VarInfo *) nullptr;
+   climo_info   = (VarInfo *) nullptr;
+   obs_info     = (VarInfoGrib *) nullptr;
 
-   pd           = (PairDataPoint ***) 0;
-   rej_typ      = (int ***) 0;
-   rej_mask     = (int ***) 0;
-   rej_fcst     = (int ***) 0;
-   rej_cmn      = (int ***) 0;
-   rej_csd      = (int ***) 0;
-   rej_mpr      = (int ***) 0;
-   rej_dup      = (int ***) 0;
+   pd           = (PairDataPoint ***) nullptr;
+   rej_typ      = (int ***) nullptr;
+   rej_mask     = (int ***) nullptr;
+   rej_fcst     = (int ***) nullptr;
+   rej_cmn      = (int ***) nullptr;
+   rej_csd      = (int ***) nullptr;
+   rej_mpr      = (int ***) nullptr;
+   rej_dup      = (int ***) nullptr;
 
    n_msg_typ    = 0;
    n_mask       = 0;
@@ -443,9 +443,9 @@ void VxPairDataPoint::init_from_scratch() {
 void VxPairDataPoint::clear() {
    int i, j, k;
 
-   if(fcst_info)  { delete fcst_info;  fcst_info  = (VarInfo *)     0; }
-   if(climo_info) { delete climo_info; climo_info = (VarInfo *)     0; }
-   if(obs_info)   { delete obs_info;   obs_info   = (VarInfoGrib *) 0; }
+   if(fcst_info)  { delete fcst_info;  fcst_info  = (VarInfo *)     nullptr; }
+   if(climo_info) { delete climo_info; climo_info = (VarInfo *)     nullptr; }
+   if(obs_info)   { delete obs_info;   obs_info   = (VarInfoGrib *) nullptr; }
 
    desc.clear();
 
@@ -576,7 +576,7 @@ void VxPairDataPoint::set_fcst_info(VarInfo *info) {
    VarInfoFactory f;
 
    // Deallocate, if necessary
-   if(fcst_info) { delete fcst_info; fcst_info = (VarInfo *) 0; }
+   if(fcst_info) { delete fcst_info; fcst_info = (VarInfo *) nullptr; }
 
    // Perform a deep copy
    fcst_info = f.new_var_info(info->file_type());
@@ -591,7 +591,7 @@ void VxPairDataPoint::set_climo_info(VarInfo *info) {
    VarInfoFactory f;
 
    // Deallocate, if necessary
-   if(climo_info) { delete climo_info; climo_info = (VarInfo *) 0; }
+   if(climo_info) { delete climo_info; climo_info = (VarInfo *) nullptr; }
 
    // Perform a deep copy
    climo_info = f.new_var_info(info->file_type());
@@ -605,7 +605,7 @@ void VxPairDataPoint::set_climo_info(VarInfo *info) {
 void VxPairDataPoint::set_obs_info(VarInfoGrib *info) {
 
    // Deallocate, if necessary
-   if(obs_info) { delete obs_info; obs_info = (VarInfoGrib *) 0; }
+   if(obs_info) { delete obs_info; obs_info = (VarInfoGrib *) nullptr; }
 
    // Perform a deep copy
    obs_info = new VarInfoGrib;
