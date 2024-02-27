@@ -68,7 +68,7 @@ static CommandLine cline;
 static const Grid nh(wwmca_north_data);
 static const Grid sh(wwmca_south_data);
 
-static const Grid * grid = (const Grid *) 0;
+static const Grid * grid = (const Grid *) nullptr;
 
 static int Nx, Ny;
 
@@ -243,7 +243,7 @@ AFCloudPctFile f_cp;
 AFPixelTimeFile f_pt;
 ConcatString short_name;
 ConcatString output_filename;
-char * pt_filename = (char *) 0;
+char * pt_filename = (char *) nullptr;
 Pgm image;
 RenderInfo info;
 PSfile plot;
@@ -280,7 +280,7 @@ if ( !(f_pt.read(pt_filename, bad_data_char)) )  {
 
 }
 
-if (pt_filename)  { delete [] pt_filename; pt_filename = (char *) 0; }
+if (pt_filename)  { delete [] pt_filename; pt_filename = (char *) nullptr; }
 
 if ( output_directory.length() > 0 )  output_filename << output_directory << '/';
 

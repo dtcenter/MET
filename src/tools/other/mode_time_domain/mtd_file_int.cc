@@ -1314,7 +1314,7 @@ void MtdIntFile::toss_small_objects(int min_volume)
 {
 
 int j, n_new;
-int * new_to_old = (int *) 0;
+int * new_to_old = (int *) nullptr;
 
 new_to_old = new int[Nobjects];   //  probably too big, but that's ok
 
@@ -1334,7 +1334,7 @@ sift_objects(n_new, new_to_old);
    //  done
    //
 
-delete [] new_to_old;   new_to_old = (int *) 0;
+delete [] new_to_old;   new_to_old = (int *) nullptr;
 
 return;
 
@@ -1352,9 +1352,9 @@ if ( n_new == Nobjects )  return;
 
 int j, k;
 const int n3 = Nx*Ny*Nt;
-int * old_to_new = (int *) 0;
-int * new_volumes = (int *) 0;
-// double * new_intensities = (double *) 0;
+int * old_to_new = (int *) nullptr;
+int * new_volumes = (int *) nullptr;
+// double * new_intensities = (double *) nullptr;
 int * d = Data;
 
 
@@ -1431,7 +1431,7 @@ DataMax  = Nobjects;
 
 if ( n_new > 0 )  {
 
-   delete [] ObjVolume;  ObjVolume = (int *) 0;
+   delete [] ObjVolume;  ObjVolume = (int *) nullptr;
 
    ObjVolume = new_volumes;
 
@@ -1442,7 +1442,7 @@ if ( n_new > 0 )  {
    //  done
    //
 
-if ( old_to_new )  { delete [] old_to_new;   old_to_new = (int *) 0; }
+if ( old_to_new )  { delete [] old_to_new;   old_to_new = (int *) nullptr; }
 
 return;
 
@@ -1616,7 +1616,7 @@ void MtdIntFile::set_volumes(int n, const int * V)
 
 {
 
-if ( ObjVolume )  { delete [] ObjVolume;  ObjVolume = (int *) 0; }
+if ( ObjVolume )  { delete [] ObjVolume;  ObjVolume = (int *) nullptr; }
 
 int j;
 

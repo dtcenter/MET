@@ -1793,8 +1793,8 @@ void process_match(const TrackInfo &adeck, const TrackInfo &bdeck,
    double adeck_dland, bdeck_dland, e_tk, e_x, e_y, e_altk, e_crtk;
 
    TrackPairInfo pair;
-   const TrackPoint *adeck_point = (TrackPoint *) 0;
-   const TrackPoint *bdeck_point = (TrackPoint *) 0;
+   const TrackPoint *adeck_point = (TrackPoint *) nullptr;
+   const TrackPoint *bdeck_point = (TrackPoint *) nullptr;
    TrackPoint empty_point;
 
    // Initialize TrackPairInfo with the current tracks
@@ -2103,7 +2103,7 @@ void write_tracks(const TrackPairInfoArray &p) {
    TcHdrColumns tchc;
    ConcatString out_file;
    AsciiTable out_at;
-   ofstream *out = (ofstream *) 0;
+   ofstream *out = (ofstream *) nullptr;
 
    // Set the track pair output file name
    out_file << out_base << tc_stat_file_ext;
@@ -2161,7 +2161,7 @@ void write_tracks(const TrackPairInfoArray &p) {
       *out << out_at;
       out->close();
       delete out;
-      out = (ofstream *) 0;
+      out = (ofstream *) nullptr;
    }
 
    return;
@@ -2174,7 +2174,7 @@ void write_prob_rirw(const ProbRIRWPairInfoArray &p) {
    TcHdrColumns tchc;
    ConcatString out_file;
    AsciiTable out_at;
-   ofstream *out = (ofstream *) 0;
+   ofstream *out = (ofstream *) nullptr;
 
    // Set the track pair output file name
    out_file << out_base << "_PROBRIRW" << tc_stat_file_ext;
@@ -2239,7 +2239,7 @@ void write_prob_rirw(const ProbRIRWPairInfoArray &p) {
       *out << out_at;
       out->close();
       delete out;
-      out = (ofstream *) 0;
+      out = (ofstream *) nullptr;
    }
 
    return;

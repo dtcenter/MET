@@ -109,7 +109,7 @@ void AFCloudPctFile::init_from_scratch()
 
 {
 
-Buf = (unsigned char *) 0;
+Buf = (unsigned char *) nullptr;
 
 clear();
 
@@ -125,7 +125,7 @@ void AFCloudPctFile::clear()
 
 {
 
-if ( Buf )  { delete [] Buf;  Buf = (unsigned char *) 0; }
+if ( Buf )  { delete [] Buf;  Buf = (unsigned char *) nullptr; }
 
 AFDataFile::clear();
 

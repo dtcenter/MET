@@ -94,7 +94,7 @@ void FO_Node_Array::init_from_scratch()
 
 {
 
-e = (FO_Node *) 0;
+e = (FO_Node *) nullptr;
 
 AllocInc = 30;   //  default value
 
@@ -112,7 +112,7 @@ void FO_Node_Array::clear()
 
 {
 
-if ( e )  { delete [] e;  e = (FO_Node *) 0; }
+if ( e )  { delete [] e;  e = (FO_Node *) nullptr; }
 
 
 
@@ -174,11 +174,11 @@ for(j=0; j<Nelements; ++j)  {
 
 }
 
-if ( e )  { delete [] e;  e = (FO_Node *) 0; }
+if ( e )  { delete [] e;  e = (FO_Node *) nullptr; }
 
 e = u;
 
-u = (FO_Node *) 0;
+u = (FO_Node *) nullptr;
 
 Nalloc = N;
 

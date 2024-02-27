@@ -47,7 +47,7 @@ void WwmcaRegridder::do_output(const char * output_filename)
 
 {
 
-   NcFile * ncfile   = (NcFile *) 0;
+   NcFile * ncfile   = (NcFile *) nullptr;
    NcDim   lat_dim  ;
    NcDim   lon_dim  ;
    NcVar   data_var ;
@@ -233,7 +233,7 @@ void WwmcaRegridder::do_output(const char * output_filename)
    //  done
    //
 
-   if ( ncfile )  { delete ncfile;  ncfile = (NcFile *) 0; }
+   if ( ncfile )  { delete ncfile;  ncfile = (NcFile *) nullptr; }
 
    //
    //  list output file name

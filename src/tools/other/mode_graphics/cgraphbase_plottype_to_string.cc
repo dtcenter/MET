@@ -39,7 +39,7 @@ ConcatString cgraphbase_plottype_to_string(const CgraphBase::PlotType t)
 
 {
 
-const char * s = (const char *) 0;
+const char * s = (const char *) nullptr;
 
 switch ( t )  {
 

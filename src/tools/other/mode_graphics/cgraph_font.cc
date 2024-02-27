@@ -108,7 +108,7 @@ void CgFont::init_from_scratch()
 
 {
 
-afm = (Afm *) 0;
+afm = (Afm *) nullptr;
 
 face = 0;
 
@@ -147,7 +147,7 @@ ps_name.clear();
 
 orig_ps_size = scaled_ps_size = 0.0;
 
-if ( afm )  { delete afm;  afm = (Afm *) 0; }
+if ( afm )  { delete afm;  afm = (Afm *) nullptr; }
 
 ps_font_number = -1;
 

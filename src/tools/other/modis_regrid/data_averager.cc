@@ -68,7 +68,7 @@ Counts = 0;
 
 Sum = 0;
 
-DataOk = (bool *) 0;
+DataOk = (bool *) nullptr;
 
 clear();
 
