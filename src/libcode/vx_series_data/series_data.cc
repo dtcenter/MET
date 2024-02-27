@@ -83,7 +83,7 @@ bool read_single_entry(VarInfo* info, const ConcatString& filename,
         const GrdFileType type, DataPlane& dp, Grid& grid) {
 
    Met2dDataFileFactory mtddf_factory;
-   Met2dDataFile* mtddf = (Met2dDataFile*) 0;
+   Met2dDataFile* mtddf = (Met2dDataFile*) nullptr;
 
    // Check that file exists
    if(!file_exists(filename.c_str())) {
@@ -102,7 +102,7 @@ bool read_single_entry(VarInfo* info, const ConcatString& filename,
    if(found) grid = mtddf->grid();
 
    // Cleanup
-   if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) 0; }
+   if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) nullptr; }
 
    return(found);
 }
@@ -165,7 +165,7 @@ bool read_all_entries(vector<VarInfo*> &vi_list, const ConcatString &filename,
         const GrdFileType type, vector<DataPlane> &dp_list, Grid &grid) {
 
    Met2dDataFileFactory mtddf_factory;
-   Met2dDataFile* mtddf = (Met2dDataFile*) 0;
+   Met2dDataFile* mtddf = (Met2dDataFile*) nullptr;
 
    // Check that file exists
    if(!file_exists(filename.c_str())) {
@@ -184,7 +184,7 @@ bool read_all_entries(vector<VarInfo*> &vi_list, const ConcatString &filename,
    if(n_valid > 0) grid = mtddf->grid();
 
    // Cleanup
-   if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) 0; }
+   if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) nullptr; }
 
    return(n_valid > 0);
 }

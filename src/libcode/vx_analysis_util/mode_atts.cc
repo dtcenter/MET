@@ -97,7 +97,7 @@ void ModeAttributes::init_from_scratch()
 
 {
 
-poly = (MaskPoly *) 0;
+poly = (MaskPoly *) nullptr;
 
 clear();
 
@@ -408,7 +408,7 @@ interest_max_set                    = 0;
 interest_max                        = 0.0;
 
 
-if ( poly )  { delete poly;  poly =(MaskPoly *) 0; }
+if ( poly )  { delete poly;  poly =(MaskPoly *) nullptr; }
 
 return;
 
@@ -1356,7 +1356,7 @@ int ModeAttributes::is_keeper(const ModeLine & L) const
 int i;
 double x;
 unixtime t;
-const char * c = (const char *) 0;
+const char * c = (const char *) nullptr;
 
 
    //
@@ -1923,7 +1923,7 @@ void ModeAttributes::parse_command_line(StringArray & a)
 {
 
 int j;
-const char * c = (const char *) 0;
+const char * c = (const char *) nullptr;
 
 
 j = 0;

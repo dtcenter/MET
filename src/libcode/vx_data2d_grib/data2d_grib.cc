@@ -103,7 +103,7 @@ void MetGrib1DataFile::grib1_init_from_scratch()
 
 {
 
-GF = (GribFile *) 0;
+GF = (GribFile *) nullptr;
 
 Plane.clear();
 
@@ -121,7 +121,7 @@ void MetGrib1DataFile::close()
 
 {
 
-if ( GF )  { delete GF;  GF = (GribFile *) 0; }
+if ( GF )  { delete GF;  GF = (GribFile *) nullptr; }
 
 CurrentRecord.reset();
 

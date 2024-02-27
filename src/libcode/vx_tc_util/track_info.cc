@@ -62,7 +62,7 @@ TrackInfo & TrackInfo::operator=(const TrackInfo & t) {
 
 void TrackInfo::init_from_scratch() {
 
-   Point = (TrackPoint *) 0;
+   Point = (TrackPoint *) nullptr;
 
    clear();
 
@@ -106,7 +106,7 @@ void TrackInfo::clear() {
 
 void TrackInfo::clear_points() {
 
-   if(Point) { delete [] Point; Point = (TrackPoint *) 0; }
+   if(Point) { delete [] Point; Point = (TrackPoint *) nullptr; }
    NPoints = NAlloc = 0;
 
    return;
@@ -249,7 +249,7 @@ void TrackInfo::assign(const TrackInfo &t) {
 
 void TrackInfo::extend(int n, bool exact) {
    int j, k;
-   TrackPoint *new_line = (TrackPoint *) 0;
+   TrackPoint *new_line = (TrackPoint *) nullptr;
 
    // Check if enough memory is already allocated
    if(NAlloc >= n) return;
@@ -273,12 +273,12 @@ void TrackInfo::extend(int n, bool exact) {
    // Copy the array contents and delete the old one
    if(Point) {
       for(j=0; j<NPoints; j++) new_line[j] = Point[j];
-      delete [] Point;  Point = (TrackPoint *) 0;
+      delete [] Point;  Point = (TrackPoint *) nullptr;
    }
 
    // Point to the new array
    Point     = new_line;
-   new_line = (TrackPoint *) 0;
+   new_line = (TrackPoint *) nullptr;
 
    // Store the allocated length
    NAlloc = n;

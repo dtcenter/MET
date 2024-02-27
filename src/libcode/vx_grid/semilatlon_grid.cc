@@ -166,8 +166,8 @@ Lons.clear();
 Levels.clear();
 Times.clear();
 
-xDim = (NumArray *) 0;
-yDim = (NumArray *) 0;
+xDim = (NumArray *) nullptr;
+yDim = (NumArray *) nullptr;
 
 IsLatLon = false;
 Nx = 0;

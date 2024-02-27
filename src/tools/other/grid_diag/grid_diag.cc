@@ -207,7 +207,7 @@ void process_command_line(int argc, char **argv) {
       // Deallocate memory for data files
       if(data_mtddf) {
          delete data_mtddf;
-         data_mtddf = (Met2dDataFile *) 0;
+         data_mtddf = (Met2dDataFile *) nullptr;
       }
 
    } // end for i
@@ -748,8 +748,8 @@ void write_joint_histograms(void) {
 
 Met2dDataFile *get_mtddf(const StringArray &file_list,
                        const int i_field) {
-   Met2dDataFile *mtddf = (Met2dDataFile *) 0;
-   Dictionary *dict = (Dictionary *) 0;
+   Met2dDataFile *mtddf = (Met2dDataFile *) nullptr;
+   Dictionary *dict = (Dictionary *) nullptr;
    Dictionary i_dict;
    GrdFileType file_type;
    int i;
@@ -798,7 +798,7 @@ void clean_up() {
       mlog << Debug(1) << "Output file: " << out_file << "\n";
 
       delete nc_out;
-      nc_out = (NcFile *) 0;
+      nc_out = (NcFile *) nullptr;
     }
 
    return;

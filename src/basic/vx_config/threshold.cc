@@ -98,7 +98,7 @@ Or_Node::Or_Node()
 
 {
 
-left_child = right_child = 0;
+left_child = right_child = nullptr;
 
 }
 
@@ -110,8 +110,8 @@ Or_Node::~Or_Node()
 
 {
 
-if (  left_child )  { delete  left_child;   left_child = 0; }
-if ( right_child )  { delete right_child;  right_child = 0; }
+if (  left_child )  { delete  left_child;   left_child = nullptr; }
+if ( right_child )  { delete right_child;  right_child = nullptr; }
 
 }
 
@@ -319,7 +319,7 @@ And_Node::And_Node()
 
 {
 
-left_child = right_child = 0;
+left_child = right_child = nullptr;
 
 }
 
@@ -331,8 +331,8 @@ And_Node::~And_Node()
 
 {
 
-if (  left_child )  { delete  left_child;   left_child = 0; }
-if ( right_child )  { delete right_child;  right_child = 0; }
+if (  left_child )  { delete  left_child;   left_child = nullptr; }
+if ( right_child )  { delete right_child;  right_child = nullptr; }
 
 }
 
@@ -558,7 +558,7 @@ Not_Node::Not_Node()
 
 {
 
-child = 0;
+child = nullptr;
 
 }
 
@@ -570,7 +570,7 @@ Not_Node::~Not_Node()
 
 {
 
-if ( child )  { delete child;  child = 0; }
+if ( child )  { delete child;  child = nullptr; }
 
 }
 
@@ -939,7 +939,7 @@ void Simple_Node::set_perc(const NumArray *fptr, const NumArray *optr, const Num
 int i;
 double ptile, diff;
 NumArray data;
-const NumArray * ptr = 0;
+const NumArray * ptr = nullptr;
 bool fbias_fcst = false;
 
    //
@@ -1427,7 +1427,7 @@ void SingleThresh::init_from_scratch()
 
 {
 
-node = 0;
+node = nullptr;
 
 clear();
 
@@ -1443,7 +1443,7 @@ void SingleThresh::clear()
 
 {
 
-if ( node )  { delete node;  node = 0; }
+if ( node )  { delete node;  node = nullptr; }
 
 return;
 
@@ -1486,7 +1486,7 @@ a->abbr_s << thresh_abbr_str[ind] << t;
 
 node = a;
 
-a = 0;
+a = nullptr;
 
 return;
 
@@ -1527,7 +1527,7 @@ a->abbr_s << thresh_abbr_str[ind] << cs;
 
 node = a;
 
-a = 0;
+a = nullptr;
 
 return;
 
@@ -1565,7 +1565,7 @@ a->set_na();
 
 node = a;
 
-a = 0;
+a = nullptr;
 
 return;
 

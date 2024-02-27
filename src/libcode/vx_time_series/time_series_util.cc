@@ -37,7 +37,7 @@ TimeSeriesType string_to_timeseriestype(const char *s) {
 ////////////////////////////////////////////////////////////////////////
 
 const char * timeseriestype_to_string(const TimeSeriesType t) {
-   const char *s = (const char *) 0;
+   const char *s = (const char *) nullptr;
 
    switch(t) {
       case(TimeSeriesType_DyDt):  s = timeseriestype_dydt_str;  break;

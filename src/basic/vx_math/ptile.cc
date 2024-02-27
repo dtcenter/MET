@@ -215,8 +215,8 @@ if ( n <= 1 )  return(0);
 
 int i, j, ties_current, ties_total, tie_rank_start = 0, tie_rank_end;
 double tie_rank_mean;
-RankInfo *rank_info = (RankInfo *) 0;
-double *ordered_array = (double *) 0;
+RankInfo *rank_info = (RankInfo *) nullptr;
+double *ordered_array = (double *) nullptr;
 double prev_v, v;
 
 rank_info = new RankInfo [n];
@@ -296,8 +296,8 @@ if(ties_current != 0) {
    }
 }
 
-if(rank_info)     { delete [] rank_info;     rank_info = (RankInfo *) 0; }
-if(ordered_array) { delete [] ordered_array; ordered_array = (double *) 0; }
+if(rank_info)     { delete [] rank_info;     rank_info = (RankInfo *) nullptr; }
+if(ordered_array) { delete [] ordered_array; ordered_array = (double *) nullptr; }
 
 return(ties_total);
 

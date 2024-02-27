@@ -203,7 +203,7 @@ void Interpolator::init_from_scratch()
 
 {
 
-Data = (InterpolationValue *) 0;
+Data = (InterpolationValue *) nullptr;
 
 clear();
 
@@ -219,7 +219,7 @@ void Interpolator::clear()
 
 {
 
-if ( Data )  { delete [] Data;  Data = (InterpolationValue *) 0; }
+if ( Data )  { delete [] Data;  Data = (InterpolationValue *) nullptr; }
 
 Width = 0;
 

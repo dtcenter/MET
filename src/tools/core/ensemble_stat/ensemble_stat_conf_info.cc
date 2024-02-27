@@ -50,8 +50,8 @@ EnsembleStatConfInfo::~EnsembleStatConfInfo() {
 void EnsembleStatConfInfo::init_from_scratch() {
 
    // Initialize pointers
-   vx_opt   = (EnsembleStatVxOpt *) 0;
-   rng_ptr  = (gsl_rng *)           0;
+   vx_opt   = (EnsembleStatVxOpt *) nullptr;
+   rng_ptr  = (gsl_rng *)           nullptr;
 
    clear();
 
@@ -86,7 +86,7 @@ void EnsembleStatConfInfo::clear() {
    nc_info.clear();
 
    // Deallocate memory
-   if(vx_opt) { delete [] vx_opt; vx_opt = (EnsembleStatVxOpt *) 0; }
+   if(vx_opt) { delete [] vx_opt; vx_opt = (EnsembleStatVxOpt *) nullptr; }
 
    // Reset counts
    n_vx          = 0;
@@ -122,8 +122,8 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
    int i, j, n_ens_files;
    VarInfoFactory info_factory;
    map<STATLineType,STATOutputType>output_map;
-   Dictionary *fdict = (Dictionary *) 0;
-   Dictionary *odict  = (Dictionary *) 0;
+   Dictionary *fdict = (Dictionary *) nullptr;
+   Dictionary *odict  = (Dictionary *) nullptr;
    Dictionary i_fdict, i_odict;
    InterpMthd mthd;
 
@@ -869,7 +869,7 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
 ////////////////////////////////////////////////////////////////////////
 
 void EnsembleStatVxOpt::parse_nc_info(Dictionary &odict) {
-   const DictionaryEntry * e = (const DictionaryEntry *) 0;
+   const DictionaryEntry * e = (const DictionaryEntry *) nullptr;
 
    e = odict.lookup(conf_key_nc_orank_flag);
 

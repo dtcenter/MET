@@ -168,7 +168,7 @@ TCPolyArray & TCPolyArray::operator=(const TCPolyArray & a) {
 
 void TCPolyArray::init_from_scratch() {
 
-   Poly = (TCPoly *) 0;
+   Poly = (TCPoly *) nullptr;
 
    clear();
 
@@ -179,7 +179,7 @@ void TCPolyArray::init_from_scratch() {
 
 void TCPolyArray::clear() {
 
-   if(Poly) { delete [] Poly;  Poly = (TCPoly *) 0; }
+   if(Poly) { delete [] Poly;  Poly = (TCPoly *) nullptr; }
    
    NPolys = NAlloc = 0;
 
@@ -222,7 +222,7 @@ void TCPolyArray::extend(int n, bool exact) {
       n = k*tc_poly_array_alloc_inc;
    }
 
-   TCPoly * p = (TCPoly *) 0;
+   TCPoly * p = (TCPoly *) nullptr;
 
    p = new TCPoly [n];
 
@@ -234,10 +234,10 @@ void TCPolyArray::extend(int n, bool exact) {
 
    if(Poly) {
       for(i=0; i<NPolys; i++) p[i] = Poly[i];
-      delete [] Poly; Poly = (TCPoly *) 0;
+      delete [] Poly; Poly = (TCPoly *) nullptr;
    }
 
-   Poly = p; p = (TCPoly *) 0;
+   Poly = p; p = (TCPoly *) nullptr;
 
    NAlloc = n;
 

@@ -54,7 +54,7 @@ TCPairsConfInfo::~TCPairsConfInfo() {
 void TCPairsConfInfo::init_from_scratch() {
 
    // Initialize pointers
-   Consensus = (ConsensusInfo *) 0;
+   Consensus = (ConsensusInfo *) nullptr;
 
    clear();
 
@@ -66,7 +66,7 @@ void TCPairsConfInfo::init_from_scratch() {
 void TCPairsConfInfo::clear() {
 
    // Deallocate memory
-   if(Consensus) { delete [] Consensus; Consensus = (ConsensusInfo *) 0; }
+   if(Consensus) { delete [] Consensus; Consensus = (ConsensusInfo *) nullptr; }
 
    Desc.clear();
    Model.clear();
@@ -139,7 +139,7 @@ void TCPairsConfInfo::process_config() {
    int i, j;
    StringArray sa;
    ConcatString poly_file;
-   Dictionary *dict = (Dictionary *) 0;
+   Dictionary *dict = (Dictionary *) nullptr;
 
    // Conf: Version
    Version = Conf.lookup_string(conf_key_version);
@@ -395,7 +395,7 @@ void DiagInfo::clear() {
 
 void parse_conf_diag_info_map(Dictionary *dict, map<ConcatString,DiagInfo> &source_map) {
    int i;
-   Dictionary *map_dict = (Dictionary *) 0;
+   Dictionary *map_dict = (Dictionary *) nullptr;
    ConcatString diag_source;
    DiagInfo cur_info;
 
@@ -445,7 +445,7 @@ void parse_conf_diag_info_map(Dictionary *dict, map<ConcatString,DiagInfo> &sour
 void parse_conf_diag_convert_map(Dictionary *dict,
         map< ConcatString,map<ConcatString,UserFunc_1Arg> > &source_map) {
    int i, j;
-   Dictionary *map_dict = (Dictionary *) 0;
+   Dictionary *map_dict = (Dictionary *) nullptr;
    map<ConcatString,UserFunc_1Arg> cur_map;
    ConcatString diag_source, key;
    StringArray sa;

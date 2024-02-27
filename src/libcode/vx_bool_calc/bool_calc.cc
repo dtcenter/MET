@@ -53,9 +53,9 @@ void BoolCalc::init_from_scratch()
 
 {
 
-s = 0;
+s = nullptr;
 
-program = 0;
+program = nullptr;
 
 clear();
 
@@ -71,9 +71,9 @@ void BoolCalc::clear()
 
 {
 
-if ( s )  { delete s;  s = 0; }
+if ( s )  { delete s;  s = nullptr; }
 
-if ( program )  { delete program;  program = 0; }
+if ( program )  { delete program;  program = nullptr; }
 
 Max_depth = Max_local = 0;
 

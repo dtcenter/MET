@@ -347,8 +347,8 @@ double StereographicGrid::xy_closedpolyline_area(const double *x, const double *
 
 int j;
 double sum;
-double *u = (double *) 0;
-double *v = (double *) 0;
+double *u = (double *) nullptr;
+double *v = (double *) nullptr;
 
 u = new double [n];
 v = new double [n];
@@ -372,8 +372,8 @@ sum = uv_closedpolyline_area(u, v, n);
 
 sum *= earth_radius_km*earth_radius_km;
 
-delete [] u;  u = (double *) 0;
-delete [] v;  v = (double *) 0;
+delete [] u;  u = (double *) nullptr;
+delete [] v;  v = (double *) nullptr;
 
 return ( sum );
 

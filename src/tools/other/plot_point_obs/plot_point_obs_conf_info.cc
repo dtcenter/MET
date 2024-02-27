@@ -350,7 +350,7 @@ PlotPointObsConfInfo::~PlotPointObsConfInfo() {
 void PlotPointObsConfInfo::init_from_scratch() {
 
    // Initialize pointers
-   grid_data_info = (VarInfo *) 0;
+   grid_data_info = (VarInfo *) nullptr;
 
    clear();
 
@@ -405,12 +405,12 @@ void PlotPointObsConfInfo::read_config(const char *user_file_name) {
 
 void PlotPointObsConfInfo::process_config(
                               const char *plot_grid_string) {
-   Dictionary  *dict = (Dictionary *) 0;
-   Dictionary *fdict = (Dictionary *) 0;
+   Dictionary  *dict = (Dictionary *) nullptr;
+   Dictionary *fdict = (Dictionary *) nullptr;
    Dictionary i_fdict;
    StringArray sa;
    Met2dDataFileFactory m_factory;
-   Met2dDataFile *met_ptr = (Met2dDataFile *) 0;
+   Met2dDataFile *met_ptr = (Met2dDataFile *) nullptr;
    PlotPointObsOpt opt;
    int i, n_vx;
 

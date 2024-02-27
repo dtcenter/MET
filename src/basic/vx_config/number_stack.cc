@@ -106,7 +106,7 @@ void NumberStack::init_from_scratch()
 
 {
 
-e = 0;
+e = nullptr;
 
 AllocInc = default_ns_alloc_inc;
 
@@ -124,7 +124,7 @@ void NumberStack::clear(bool initialize)
 
 {
 
-if ( e )  { delete [] e;  e = 0; }
+if ( e )  { delete [] e;  e = nullptr; }
 
 
 Nelements = 0;
@@ -202,7 +202,7 @@ for(j=0; j<Nelements; ++j)  {
 
 }
 
-if ( e )  { delete [] e;  e = 0; }
+if ( e )  { delete [] e;  e = nullptr; }
 
 e = u;
 

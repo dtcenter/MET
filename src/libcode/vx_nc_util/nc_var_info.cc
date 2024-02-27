@@ -113,7 +113,7 @@ return ( * this );
 
 void NcVarInfo::init_from_scratch() {
 
-Dims = (NcDim **) 0;
+Dims = (NcDim **) nullptr;
 
 clear();
 
@@ -127,7 +127,7 @@ return;
 
 void NcVarInfo::clear() {
 
-var = (NcVar *) 0;   //  don't delete
+var = (NcVar *) nullptr;   //  don't delete
 
 name.clear();
 
@@ -147,7 +147,7 @@ AccumTime = 0;
 
 Ndims = 0;
 
-if ( Dims )  { delete [] Dims;  Dims = (NcDim **) 0; }
+if ( Dims )  { delete [] Dims;  Dims = (NcDim **) nullptr; }
 
 x_slot = y_slot = z_slot = t_slot = -1;
 

@@ -882,7 +882,7 @@ if ( standard_name_str )  add_att(&nc_var, standard_name_att_name, standard_name
 
 put_nc_data(&nc_var, &var_data[0], nc_dim->getSize(), 0);
 
-if ( var_data )  { delete [] var_data; var_data = (float *) 0; }
+if ( var_data )  { delete [] var_data; var_data = (float *) nullptr; }
 
    //
    //  done

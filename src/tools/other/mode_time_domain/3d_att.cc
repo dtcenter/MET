@@ -1249,7 +1249,7 @@ double lat, lon;
 double xbar_2d, ybar_2d, x_old, y_old;
 double dist;
 ConcatString raw_filename;
-float * values = (float *) 0;
+float * values = (float *) nullptr;
 const int   * i = 0;
 const float * r = 0;
 Mtd_3D_Moments moments;

@@ -64,11 +64,11 @@ CIInfo & CIInfo::operator=(const CIInfo &c) {
 
 void CIInfo::init_from_scratch() {
 
-   v_ncl = (double *) 0;
-   v_ncu = (double *) 0;
+   v_ncl = (double *) nullptr;
+   v_ncu = (double *) nullptr;
 
-   v_bcl = (double *) 0;
-   v_bcu = (double *) 0;
+   v_bcl = (double *) nullptr;
+   v_bcu = (double *) nullptr;
 
    clear();
 
@@ -83,11 +83,11 @@ void CIInfo::clear() {
    v   = bad_data_double;
    vif = 1.0;
 
-   if(v_ncl) { delete [] v_ncl; v_ncl = (double *) 0; }
-   if(v_ncu) { delete [] v_ncu; v_ncu = (double *) 0; }
+   if(v_ncl) { delete [] v_ncl; v_ncl = (double *) nullptr; }
+   if(v_ncu) { delete [] v_ncu; v_ncu = (double *) nullptr; }
 
-   if(v_bcl) { delete [] v_bcl; v_bcl = (double *) 0; }
-   if(v_bcu) { delete [] v_bcu; v_bcu = (double *) 0; }
+   if(v_bcl) { delete [] v_bcl; v_bcl = (double *) nullptr; }
+   if(v_bcu) { delete [] v_bcu; v_bcu = (double *) nullptr; }
 
    return;
 }
@@ -201,7 +201,7 @@ CTSInfo & CTSInfo::operator=(const CTSInfo &c) {
 
 void CTSInfo::init_from_scratch() {
 
-   alpha = (double *) 0;
+   alpha = (double *) nullptr;
 
    clear();
 
@@ -213,7 +213,7 @@ void CTSInfo::init_from_scratch() {
 void CTSInfo::clear() {
 
    n_alpha = 0;
-   if(alpha) { delete [] alpha; alpha = (double *) 0; }
+   if(alpha) { delete [] alpha; alpha = (double *) nullptr; }
 
    cts.zero_out();
    fthresh.clear();
@@ -513,7 +513,7 @@ MCTSInfo & MCTSInfo::operator=(const MCTSInfo &c) {
 
 void MCTSInfo::init_from_scratch() {
 
-   alpha = (double *) 0;
+   alpha = (double *) nullptr;
 
    clear();
 
@@ -525,7 +525,7 @@ void MCTSInfo::init_from_scratch() {
 void MCTSInfo::clear() {
 
    n_alpha = 0;
-   if(alpha) { delete [] alpha; alpha = (double *) 0; }
+   if(alpha) { delete [] alpha; alpha = (double *) nullptr; }
 
    cts.zero_out();
    fthresh.clear();
@@ -707,7 +707,7 @@ CNTInfo & CNTInfo::operator=(const CNTInfo &c) {
 
 void CNTInfo::init_from_scratch() {
 
-   alpha = (double *) 0;
+   alpha = (double *) nullptr;
 
    clear();
 
@@ -720,7 +720,7 @@ void CNTInfo::clear() {
 
    n = 0;
    n_alpha = 0;
-   if(alpha) { delete [] alpha; alpha = (double *) 0; }
+   if(alpha) { delete [] alpha; alpha = (double *) nullptr; }
 
    fthresh.clear();
    othresh.clear();
@@ -1407,7 +1407,7 @@ VL1L2Info & VL1L2Info::operator+=(const VL1L2Info &c) {
 
 void VL1L2Info::init_from_scratch() {
 
-   alpha = (double *) 0;
+   alpha = (double *) nullptr;
    
    clear();
 
@@ -1467,7 +1467,7 @@ void VL1L2Info::clear() {
    n_dir_undef = 0;
    n_dira_undef = 0;
    n_alpha = 0;
-   if(alpha) { delete [] alpha; alpha = (double *) 0; }
+   if(alpha) { delete [] alpha; alpha = (double *) nullptr; }
    
    fthresh.clear();
    othresh.clear();
@@ -2221,7 +2221,7 @@ NBRCNTInfo & NBRCNTInfo::operator+=(const NBRCNTInfo &c) {
 
 void NBRCNTInfo::init_from_scratch() {
 
-   alpha = (double *) 0;
+   alpha = (double *) nullptr;
 
    clear();
 
@@ -2233,7 +2233,7 @@ void NBRCNTInfo::init_from_scratch() {
 void NBRCNTInfo::clear() {
 
    n_alpha = 0;
-   if(alpha) { delete [] alpha; alpha = (double *) 0; }
+   if(alpha) { delete [] alpha; alpha = (double *) nullptr; }
 
    fthresh.clear();
    othresh.clear();
@@ -2365,10 +2365,10 @@ ISCInfo & ISCInfo::operator=(const ISCInfo &c) {
 
 void ISCInfo::init_from_scratch() {
 
-   mse_scale = (double *) 0;
-   isc_scale = (double *) 0;
-   fen_scale = (double *) 0;
-   oen_scale = (double *) 0;
+   mse_scale = (double *) nullptr;
+   isc_scale = (double *) nullptr;
+   fen_scale = (double *) nullptr;
+   oen_scale = (double *) nullptr;
 
    clear();
 
@@ -2394,10 +2394,10 @@ void ISCInfo::clear() {
    n_scale  = 0;
    total    = 0;
 
-   if(mse_scale) { delete [] mse_scale; mse_scale = (double *) 0; }
-   if(isc_scale) { delete [] isc_scale; isc_scale = (double *) 0; }
-   if(fen_scale) { delete [] fen_scale; fen_scale = (double *) 0; }
-   if(oen_scale) { delete [] oen_scale; oen_scale = (double *) 0; }
+   if(mse_scale) { delete [] mse_scale; mse_scale = (double *) nullptr; }
+   if(isc_scale) { delete [] isc_scale; isc_scale = (double *) nullptr; }
+   if(fen_scale) { delete [] fen_scale; fen_scale = (double *) nullptr; }
+   if(oen_scale) { delete [] oen_scale; oen_scale = (double *) nullptr; }
 
    return;
 }
@@ -2607,7 +2607,7 @@ PCTInfo & PCTInfo::operator=(const PCTInfo &c) {
 
 void PCTInfo::init_from_scratch() {
 
-   alpha = (double *) 0;
+   alpha = (double *) nullptr;
 
    clear();
 
@@ -2619,7 +2619,7 @@ void PCTInfo::init_from_scratch() {
 void PCTInfo::clear() {
 
    n_alpha = 0;
-   if(alpha) { delete [] alpha; alpha = (double *) 0; }
+   if(alpha) { delete [] alpha; alpha = (double *) nullptr; }
 
    pct.zero_out();
    climo_pct.zero_out();
@@ -3588,7 +3588,7 @@ double compute_ufss(double o_rate) {
 int compute_rank(const DataPlane &dp, DataPlane &dp_rank, double *data_rank, int &ties) {
    int x, y, n, i;
    double *data = (double *) 0, v;
-   int *data_loc = (int *) 0;
+   int *data_loc = (int *) nullptr;
 
    // Arrays to store the raw data values to be ranked, their locations,
    // and their computed ranks.  The ranks are stored as doubles since
@@ -3624,8 +3624,8 @@ int compute_rank(const DataPlane &dp, DataPlane &dp_rank, double *data_rank, int
    }
 
    // Deallocate memory
-   if(data)      { delete [] data;      data = (double *) 0;  }
-   if(data_loc)  { delete [] data_loc;  data_loc = (int *) 0; }
+   if(data)      { delete [] data;      data = (double *) nullptr;  }
+   if(data_loc)  { delete [] data_loc;  data_loc = (int *) nullptr; }
 
    return(n);
 }

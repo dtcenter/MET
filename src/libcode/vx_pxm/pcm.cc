@@ -122,7 +122,7 @@ void Pcm::clear()
 
 clear_common();
 
-if ( Colormap )  { delete [] Colormap;   Colormap = (Color *) 0; }
+if ( Colormap )  { delete [] Colormap;   Colormap = (Color *) nullptr; }
 
 Ncolors = 0;
 
@@ -142,9 +142,9 @@ void Pcm::init_from_scratch()
 // PxmBase::init_from_scratch();
 
 
-Colormap = (Color *) 0;
+Colormap = (Color *) nullptr;
 
-Name = (char *) 0;
+Name = (char *) nullptr;
 
 Ncolors = 0;
 
@@ -753,7 +753,7 @@ int row, col;
 int Nrows_new, Ncols_new, bytes;
 int row_new = 0, col_new = 0;
 int n_new, n_old;
-unsigned char *u = (unsigned char *) 0;
+unsigned char *u = (unsigned char *) nullptr;
 
 
 if ( a == 2 )  {
@@ -870,7 +870,7 @@ void Pcm::set_colormap(const Color * c, int n)
 
 {
 
-if ( Colormap )  { delete [] Colormap;  Colormap = (Color *) 0; }
+if ( Colormap )  { delete [] Colormap;  Colormap = (Color *) nullptr; }
 
 Colormap = new Color [n];
 

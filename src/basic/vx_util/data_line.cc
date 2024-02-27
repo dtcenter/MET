@@ -64,7 +64,7 @@ DataLine::~DataLine()
 
 LineNumber = N_items = N_ints = N_chars = 0;
 
-File = (LineDataFile *) 0;
+File = (LineDataFile *) nullptr;
 
 }
 
@@ -114,7 +114,7 @@ N_chars = N_ints = 0;
 
 Delimiter.assign(dataline_default_delim);
 
-File = (LineDataFile *) 0;
+File = (LineDataFile *) nullptr;
 
 IsHeader = false;
 
@@ -138,7 +138,7 @@ LineNumber = 0;
 
 N_items = 0;
 
-File = (LineDataFile *) 0;
+File = (LineDataFile *) nullptr;
 
 
 return;
@@ -659,7 +659,7 @@ void LineDataFile::init_from_scratch()
 
 {
 
-in = (ifstream *) 0;
+in = (ifstream *) nullptr;
 
 Last_Line_Number = 0;
 
@@ -732,7 +732,7 @@ if ( in )  {
 
    in->close();
 
-   delete in;  in = (ifstream *) 0;
+   delete in;  in = (ifstream *) nullptr;
 
 }
 

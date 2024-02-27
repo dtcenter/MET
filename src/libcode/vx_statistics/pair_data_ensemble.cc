@@ -73,9 +73,9 @@ PairDataEnsemble & PairDataEnsemble::operator=(const PairDataEnsemble &pd) {
 
 void PairDataEnsemble::init_from_scratch() {
 
-   e_na       = (NumArray *) 0;
+   e_na       = (NumArray *) nullptr;
    n_ens      = 0;
-   ssvar_bins = (SSVARInfo *) 0;
+   ssvar_bins = (SSVARInfo *) nullptr;
 
    clear();
 
@@ -93,7 +93,7 @@ void PairDataEnsemble::clear() {
    obs_error_flag = false;
 
    for(i=0; i<n_ens; i++) e_na[i].clear();
-   if(e_na) { delete [] e_na; e_na = (NumArray *) 0; }
+   if(e_na) { delete [] e_na; e_na = (NumArray *) nullptr; }
 
    v_na.clear();
    r_na.clear();
@@ -134,7 +134,7 @@ void PairDataEnsemble::clear() {
    mn_na.clear();
    mn_oerr_na.clear();
 
-   if(ssvar_bins) { delete [] ssvar_bins; ssvar_bins = (SSVARInfo *) 0; }
+   if(ssvar_bins) { delete [] ssvar_bins; ssvar_bins = (SSVARInfo *) nullptr; }
 
    ssvar_bin_size = bad_data_double;
    phist_bin_size = bad_data_double;
@@ -955,10 +955,10 @@ VxPairDataEnsemble & VxPairDataEnsemble::operator=(const VxPairDataEnsemble &vx_
 
 void VxPairDataEnsemble::init_from_scratch() {
 
-   fcst_info    = (EnsVarInfo *) 0;
-   climo_info   = (VarInfo *) 0;
-   obs_info     = (VarInfo *) 0;
-   pd           = (PairDataEnsemble ***) 0;
+   fcst_info    = (EnsVarInfo *) nullptr;
+   climo_info   = (VarInfo *) nullptr;
+   obs_info     = (VarInfo *) nullptr;
+   pd           = (PairDataEnsemble ***) nullptr;
 
    n_msg_typ    = 0;
    n_mask       = 0;
@@ -974,9 +974,9 @@ void VxPairDataEnsemble::init_from_scratch() {
 void VxPairDataEnsemble::clear() {
    int i, j, k;
 
-   if(fcst_info)  { delete fcst_info;  fcst_info  = (EnsVarInfo *) 0; }
-   if(climo_info) { delete climo_info; climo_info = (VarInfo *) 0; }
-   if(obs_info)   { delete obs_info;   obs_info   = (VarInfo *) 0; }
+   if(fcst_info)  { delete fcst_info;  fcst_info  = (EnsVarInfo *) nullptr; }
+   if(climo_info) { delete climo_info; climo_info = (VarInfo *) nullptr; }
+   if(obs_info)   { delete obs_info;   obs_info   = (VarInfo *) nullptr; }
 
    desc.clear();
 
@@ -992,7 +992,7 @@ void VxPairDataEnsemble::clear() {
    obs_qty_inc_filt.clear();
    obs_qty_exc_filt.clear();
    
-   obs_error_info = (ObsErrorInfo *) 0;
+   obs_error_info = (ObsErrorInfo *) nullptr;
 
    fcst_ut = (unixtime) 0;
    beg_ut  = (unixtime) 0;
@@ -1061,7 +1061,7 @@ void VxPairDataEnsemble::set_fcst_info(EnsVarInfo *info) {
    VarInfoFactory f;
 
    // Deallocate, if necessary
-   if(fcst_info) { delete fcst_info; fcst_info = (EnsVarInfo *) 0; }
+   if(fcst_info) { delete fcst_info; fcst_info = (EnsVarInfo *) nullptr; }
 
    // Perform a deep copy
    fcst_info = new EnsVarInfo(*info);
@@ -1075,7 +1075,7 @@ void VxPairDataEnsemble::set_climo_info(VarInfo *info) {
    VarInfoFactory f;
 
    // Deallocate, if necessary
-   if(climo_info) { delete climo_info; climo_info = (VarInfo *) 0; }
+   if(climo_info) { delete climo_info; climo_info = (VarInfo *) nullptr; }
 
    // Perform a deep copy
    climo_info = f.new_var_info(info->file_type());
@@ -1090,7 +1090,7 @@ void VxPairDataEnsemble::set_obs_info(VarInfo *info) {
    VarInfoFactory f;
 
    // Deallocate, if necessary
-   if(obs_info) { delete obs_info; obs_info = (VarInfo *) 0; }
+   if(obs_info) { delete obs_info; obs_info = (VarInfo *) nullptr; }
 
    // Perform a deep copy
    obs_info = f.new_var_info(info->file_type());
@@ -1439,7 +1439,7 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
    double cmn_v, csd_v, obs_v, wgt_v;
    int cmn_lvl_blw, cmn_lvl_abv;
    int csd_lvl_blw, csd_lvl_abv;
-   ObsErrorEntry *oerr_ptr = (ObsErrorEntry *) 0;
+   ObsErrorEntry *oerr_ptr = (ObsErrorEntry *) nullptr;
 
    // Check the observation VarInfo file type
    if(obs_info->file_type() != FileType_Gb1) {

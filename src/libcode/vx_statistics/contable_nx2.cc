@@ -90,7 +90,7 @@ void Nx2ContingencyTable::init_from_scratch()
 
 ContingencyTable::init_from_scratch();
 
-Thresholds = (double *) 0;
+Thresholds = (double *) nullptr;
 
 clear();
 
@@ -108,7 +108,7 @@ void Nx2ContingencyTable::clear()
 
 ContingencyTable::clear();
 
-if ( Thresholds )  { delete [] Thresholds;  Thresholds = (double *) 0; }
+if ( Thresholds )  { delete [] Thresholds;  Thresholds = (double *) nullptr; }
 
 return;
 
@@ -253,7 +253,7 @@ if ( E->empty() )  {
 
 }
 
-if ( Thresholds )  { delete [] Thresholds;  Thresholds = (double *) 0; }
+if ( Thresholds )  { delete [] Thresholds;  Thresholds = (double *) nullptr; }
 
 Thresholds = new double [Nrows + 1];
 

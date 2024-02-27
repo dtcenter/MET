@@ -152,10 +152,10 @@ void read_climo_file(const char *climo_file, GrdFileType ctype,
                      DataPlaneArray &dpa) {
 
    Met2dDataFileFactory mtddf_factory;
-   Met2dDataFile *mtddf = (Met2dDataFile *) 0;
+   Met2dDataFile *mtddf = (Met2dDataFile *) nullptr;
 
    VarInfoFactory info_factory;
-   VarInfo *info = (VarInfo *) 0;
+   VarInfo *info = (VarInfo *) nullptr;
 
    DataPlaneArray clm_dpa;
    DataPlane dp;
@@ -240,8 +240,8 @@ void read_climo_file(const char *climo_file, GrdFileType ctype,
    } // end for i
 
    // Deallocate memory
-   if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) 0; }
-   if(info)  { delete info;  info  = (VarInfo       *) 0; }
+   if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) nullptr; }
+   if(info)  { delete info;  info  = (VarInfo       *) nullptr; }
 
    return;
 }

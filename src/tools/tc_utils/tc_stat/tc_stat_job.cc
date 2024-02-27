@@ -2703,7 +2703,7 @@ TCStatJobType string_to_tcstatjobtype(const ConcatString s) {
 ////////////////////////////////////////////////////////////////////////
 
 ConcatString tcstatjobtype_to_string(const TCStatJobType t) {
-   const char *s = (const char *) 0;
+   const char *s = (const char *) nullptr;
 
    switch(t) {
       case TCStatJobType_Filter:   s = TCStatJobType_FilterStr;   break;
@@ -2936,7 +2936,7 @@ TCStatJobRIRW & TCStatJobRIRW::operator=(const TCStatJobRIRW &j) {
 void TCStatJobRIRW::init_from_scratch() {
    int i;
 
-   for(i=0; i<4; i++) DumpOutCTC[i] = (ofstream *) 0;
+   for(i=0; i<4; i++) DumpOutCTC[i] = (ofstream *) nullptr;
 
    TCStatJob::init_from_scratch();
 
@@ -3066,7 +3066,7 @@ void TCStatJobRIRW::close_dump_file() {
 
          DumpOutCTC[i]->close();
          delete DumpOutCTC[i];
-         DumpOutCTC[i] = (ofstream *) 0;
+         DumpOutCTC[i] = (ofstream *) nullptr;
       }
    }
 
@@ -3977,7 +3977,7 @@ TCStatJobProbRIRW & TCStatJobProbRIRW::operator=(const TCStatJobProbRIRW &j) {
 
 void TCStatJobProbRIRW::init_from_scratch() {
 
-   StatOut = (ofstream *) 0;
+   StatOut = (ofstream *) nullptr;
 
    TCStatJob::init_from_scratch();
 
@@ -4081,7 +4081,7 @@ void TCStatJobProbRIRW::close_dump_file() {
    if(DumpOut) {
       DumpOut->close();
       delete DumpOut;
-      DumpOut = (ofstream *) 0;
+      DumpOut = (ofstream *) nullptr;
    }
 
    // Prepare nicely formatted AsciiTable object

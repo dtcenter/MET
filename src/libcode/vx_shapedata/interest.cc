@@ -92,7 +92,7 @@ void SingleFeature::init_from_scratch()
 
 {
 
-boundary = (Polyline *) 0;
+boundary = (Polyline *) nullptr;
 
 clear();
 
@@ -126,16 +126,16 @@ void SingleFeature::clear()
    intensity_ptile.sum = 0.0;
    user_ptile          = 0.0;
 
-   Raw    = (const ShapeData *) 0;
-   Thresh = (const ShapeData *) 0;
-   Split  = (const ShapeData *) 0;
+   Raw    = (const ShapeData *) nullptr;
+   Thresh = (const ShapeData *) nullptr;
+   Split  = (const ShapeData *) nullptr;
 
    convex_hull.clear();
 
    //
    // Deallocate memory
    //
-   if(boundary) { delete [] boundary;  boundary = (Polyline *) 0; }
+   if(boundary) { delete [] boundary;  boundary = (Polyline *) nullptr; }
    n_bdy = 0;
 
    return;
@@ -358,8 +358,8 @@ void PairFeature::clear()
    complexity_ratio           = 0.0;
    percentile_intensity_ratio = 0.0;
 
-   Obs  = (const SingleFeature *) 0; // DON'T delete
-   Fcst = (const SingleFeature *) 0; // DON'T delete
+   Obs  = (const SingleFeature *) nullptr; // DON'T delete
+   Fcst = (const SingleFeature *) nullptr; // DON'T delete
 
    return;
 }
@@ -600,8 +600,8 @@ void get_percentiles(DistributionPercentiles &ptile,
 {
    int i, x, y, n_values;
    int nx, ny;
-   double *v = (double *) 0;
-   double *v_tmp = (double *) 0;
+   double *v = (double *) nullptr;
+   double *v_tmp = (double *) nullptr;
    const char *method_name = "get_percentiles() -> ";
 
    nx = raw.data.nx();
@@ -682,8 +682,8 @@ void get_percentiles(DistributionPercentiles &ptile,
    //
    // Free memory
    //
-   if(v_tmp) { delete [] v_tmp;  v_tmp = (double *) 0; }
-   if(v) { delete [] v;  v = (double *) 0; }
+   if(v_tmp) { delete [] v_tmp;  v_tmp = (double *) nullptr; }
+   if(v) { delete [] v;  v = (double *) nullptr; }
 
    //
    // Done

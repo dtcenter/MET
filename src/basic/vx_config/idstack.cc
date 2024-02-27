@@ -254,7 +254,7 @@ void IdentifierQueue::clear()
 
 for (int j=0; j<max_id_queue_size; ++j)  {
 
-   if ( i[j] )  {  delete i[j];  i[j] = (Identifier *) 0; }
+   if ( i[j] )  {  delete i[j];  i[j] = (Identifier *) nullptr; }
 
 }
 
@@ -344,7 +344,7 @@ for (int j=1; j<Nelements; ++j)  {
 
 }
 
-i[Nelements - 1] = (Identifier *) 0;
+i[Nelements - 1] = (Identifier *) nullptr;
 
 --Nelements;
 
@@ -426,7 +426,7 @@ void IdentifierArray::init_from_scratch()
 
 Nelements = Nalloc = 0;
 
-i = (Identifier *) 0;
+i = (Identifier *) nullptr;
 
 extend(1);
 
@@ -486,7 +486,7 @@ void IdentifierArray::extend(int n)
 if ( Nalloc > n )  return;
 
 int k;
-Identifier * inew = (Identifier *) 0;
+Identifier * inew = (Identifier *) nullptr;
 
 
 k = n/id_array_jump;
@@ -507,9 +507,9 @@ if ( !inew )  {
 
 for (int j=0; j<Nelements; ++j)  inew[j] = i[j];
 
-if ( i )  { delete [] i;  i = (Identifier *) 0; }
+if ( i )  { delete [] i;  i = (Identifier *) nullptr; }
 
-i = inew;  inew = (Identifier *) 0;
+i = inew;  inew = (Identifier *) nullptr;
 
 Nalloc = k;
 

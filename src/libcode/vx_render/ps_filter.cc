@@ -48,7 +48,7 @@ PSFilter::PSFilter()
 
 {
 
-next = (PSFilter *) 0;
+next = (PSFilter *) nullptr;
 
 set_decimal_places(default_decimal_places);
 
@@ -62,7 +62,7 @@ PSFilter::~PSFilter()
 
 {
 
-if ( next )  { delete next;  next = (PSFilter *) 0; }
+if ( next )  { delete next;  next = (PSFilter *) nullptr; }
 
 }
 

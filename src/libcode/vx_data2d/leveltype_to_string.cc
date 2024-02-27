@@ -39,7 +39,7 @@ ConcatString leveltype_to_string(const LevelType t)
 
 {
 
-const char * s = (const char *) 0;
+const char * s = (const char *) nullptr;
 
 switch ( t )  {
 

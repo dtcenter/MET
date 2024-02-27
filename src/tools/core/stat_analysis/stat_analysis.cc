@@ -639,7 +639,7 @@ while((*f) >> line) {
 
 f->close();
 
-if(pldf) { delete pldf; pldf = (PyLineDataFile *) 0; }
+if(pldf) { delete pldf; pldf = (PyLineDataFile *) nullptr; }
 
 return;
 

@@ -506,12 +506,12 @@ void process_scores() {
       for(j=0; j<conf_info.get_n_tile(); j++) {
          if(isc_info[j]) {
             delete [] isc_info[j];
-            isc_info[j] = (ISCInfo *) 0;
+            isc_info[j] = (ISCInfo *) nullptr;
          }
       }
       if(isc_info) {
          delete [] isc_info;
-         isc_info = (ISCInfo **) 0;
+         isc_info = (ISCInfo **) nullptr;
       }
 
    } // end for i
@@ -572,7 +572,7 @@ void setup_txt_files(unixtime valid_ut, int lead_sec) {
    /////////////////////////////////////////////////////////////////////
 
    // Initialize file stream
-   stat_out = (ofstream *) 0;
+   stat_out = (ofstream *) nullptr;
 
    // Build the file name
    stat_file << tmp_str << stat_file_ext;
@@ -601,7 +601,7 @@ void setup_txt_files(unixtime valid_ut, int lead_sec) {
 
 
       // Initialize file stream
-      isc_out   = (ofstream *) 0;
+      isc_out   = (ofstream *) nullptr;
 
       // Build the file name
       isc_file << tmp_str << "_" << isc_file_abbr << txt_file_ext;
@@ -949,10 +949,13 @@ int get_tile_tot_count() {
 
 void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
                         ISCInfo *&isc_info, int i_vx, int i_tile) {
-   double *f_dat = (double *) 0, *o_dat = (double *) 0; // Raw and thresholded binary fields
-   double *f_dwt = (double *) 0, *o_dwt = (double *) 0; // Discrete wavelet transformations
-   double *f_scl = (double *) 0, *o_scl = (double *) 0; // Binary field decomposed by scale
-   double *diff = (double *) 0;                         // Difference field
+   double *f_dat = (double *) nullptr; // Raw and thresholded binary fields
+   double *o_dat = (double *) nullptr; // Raw and thresholded binary fields
+   double *f_dwt = (double *) nullptr; // Discrete wavelet transformations
+   double *o_dwt = (double *) nullptr; // Discrete wavelet transformations
+   double *f_scl = (double *) nullptr; // Binary field decomposed by scale
+   double *o_scl = (double *) nullptr; // Binary field decomposed by scale
+   double *diff = (double *) nullptr;  // Difference field
    double mse, fen, oen, mad;
    int n, ns, n_isc;
    int bnd, row, col;
@@ -1200,13 +1203,13 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
    } // end for i
 
    // Deallocate memory
-   if(f_dat) { delete [] f_dat; f_dat = (double *) 0; }
-   if(o_dat) { delete [] o_dat; o_dat = (double *) 0; }
-   if(f_dwt) { delete [] f_dwt; f_dwt = (double *) 0; }
-   if(o_dwt) { delete [] o_dwt; o_dwt = (double *) 0; }
-   if(f_scl) { delete [] f_scl; f_scl = (double *) 0; }
-   if(o_scl) { delete [] o_scl; o_scl = (double *) 0; }
-   if(diff)  { delete [] diff;  diff  = (double *) 0; }
+   if(f_dat) { delete [] f_dat; f_dat = (double *) nullptr; }
+   if(o_dat) { delete [] o_dat; o_dat = (double *) nullptr; }
+   if(f_dwt) { delete [] f_dwt; f_dwt = (double *) nullptr; }
+   if(o_dwt) { delete [] o_dwt; o_dwt = (double *) nullptr; }
+   if(f_scl) { delete [] f_scl; f_scl = (double *) nullptr; }
+   if(o_scl) { delete [] o_scl; o_scl = (double *) nullptr; }
+   if(diff)  { delete [] diff;  diff  = (double *) nullptr; }
 
    return;
 }
@@ -1400,9 +1403,9 @@ void compute_energy(const double *arr, int n, double &en) {
 void write_nc_raw(const WaveletStatNcOutInfo & nc_info, const double *fdata, const double *odata, int n,
                   int i_vx, int i_tile) {
    int i, d;
-   float *fcst_data = (float *) 0;
-   float *obs_data  = (float *) 0;
-   float *diff_data = (float *) 0;
+   float *fcst_data = (float *) nullptr;
+   float *obs_data  = (float *) nullptr;
+   float *diff_data = (float *) nullptr;
    ConcatString fcst_var_name;
    ConcatString obs_var_name;
    ConcatString diff_var_name;
@@ -1602,9 +1605,9 @@ void write_nc_raw(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
    }
 
    // Deallocate and clean up
-   if(fcst_data) { delete [] fcst_data; fcst_data = (float *) 0; }
-   if(obs_data)  { delete [] obs_data;  obs_data  = (float *) 0; }
-   if(diff_data) { delete [] diff_data; diff_data = (float *) 0; }
+   if(fcst_data) { delete [] fcst_data; fcst_data = (float *) nullptr; }
+   if(obs_data)  { delete [] obs_data;  obs_data  = (float *) nullptr; }
+   if(diff_data) { delete [] diff_data; diff_data = (float *) nullptr; }
 
    return;
 
@@ -1616,9 +1619,9 @@ void write_nc_wav(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
                   int i_vx, int i_tile, int i_scale,
                   SingleThresh &fcst_st, SingleThresh &obs_st) {
    int i, d;
-   float *fcst_data = (float *) 0;
-   float *obs_data  = (float *) 0;
-   float *diff_data = (float *) 0;
+   float *fcst_data = (float *) nullptr;
+   float *obs_data  = (float *) nullptr;
+   float *diff_data = (float *) nullptr;
    ConcatString fcst_var_name, obs_var_name, diff_var_name;
    ConcatString fcst_thresh_str, obs_thresh_str;
    ConcatString val;
@@ -1852,9 +1855,9 @@ void write_nc_wav(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
    }
 
    // Deallocate and clean up
-   if(fcst_data) { delete [] fcst_data; fcst_data = (float *) 0; }
-   if(obs_data)  { delete [] obs_data;  obs_data  = (float *) 0; }
-   if(diff_data) { delete [] diff_data; diff_data = (float *) 0; }
+   if(fcst_data) { delete [] fcst_data; fcst_data = (float *) nullptr; }
+   if(obs_data)  { delete [] obs_data;  obs_data  = (float *) nullptr; }
+   if(diff_data) { delete [] diff_data; diff_data = (float *) nullptr; }
 
    return;
 }
@@ -1896,7 +1899,7 @@ void close_out_files() {
       mlog << Debug(1) << "Output file: " << out_nc_file << "\n";
       //nc_out->close();
       delete nc_out;
-      nc_out = (NcFile *) 0;
+      nc_out = (NcFile *) nullptr;
    }
 
    // Close the output PSfile as long as it was opened
@@ -1906,7 +1909,7 @@ void close_out_files() {
       mlog << Debug(1) << "Output file: " << out_ps_file << "\n";
       ps_out->close();
       delete ps_out;
-      ps_out = (PSfile *) 0;
+      ps_out = (PSfile *) nullptr;
    }
 
    return;
@@ -2614,7 +2617,7 @@ void draw_colorbar(PSfile *p, Box &dim, int fcst, int raw) {
    int i;
    char label[max_str_len];
    double bar_width, bar_height, x_ll, y_ll, step, v;
-   ColorTable *ct_ptr = (ColorTable *) 0;
+   ColorTable *ct_ptr = (ColorTable *) nullptr;
    Color c;
 
    //
@@ -2814,8 +2817,8 @@ void render_image(PSfile *p, const DataPlane &dp, Box &dim, int fcst) {
    int x, y, grid_x, grid_y;
    double mag;
    Color c;
-   Color *c_fill_ptr = (Color *) 0;
-   ColorTable *ct_ptr = (ColorTable *) 0;
+   Color *c_fill_ptr = (Color *) nullptr;
+   ColorTable *ct_ptr = (ColorTable *) nullptr;
 
    //
    // Set up pointers to the appropriate colortable and fill color
@@ -2904,8 +2907,8 @@ void render_tile(PSfile *p, const double *data, int n, int i_tile,
    int i, x, y;
    double mag;
    Color c;
-   Color *c_fill_ptr = (Color *) 0;
-   ColorTable *ct_ptr = (ColorTable *) 0;
+   Color *c_fill_ptr = (Color *) nullptr;
+   ColorTable *ct_ptr = (ColorTable *) nullptr;
 
    //
    // Set up pointers to the appropriate colortable and fill color

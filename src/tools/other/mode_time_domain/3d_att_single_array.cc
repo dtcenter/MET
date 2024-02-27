@@ -94,7 +94,7 @@ void SingleAtt3DArray::init_from_scratch()
 
 {
 
-e = (SingleAtt3D *) 0;
+e = (SingleAtt3D *) nullptr;
 
 AllocInc = 100;   //  default value
 
@@ -112,7 +112,7 @@ void SingleAtt3DArray::clear()
 
 {
 
-if ( e )  { delete [] e;  e = (SingleAtt3D *) 0; }
+if ( e )  { delete [] e;  e = (SingleAtt3D *) nullptr; }
 
 
 
@@ -174,11 +174,11 @@ for(j=0; j<Nelements; ++j)  {
 
 }
 
-if ( e )  { delete [] e;  e = (SingleAtt3D *) 0; }
+if ( e )  { delete [] e;  e = (SingleAtt3D *) nullptr; }
 
 e = u;
 
-u = (SingleAtt3D *) 0;
+u = (SingleAtt3D *) nullptr;
 
 Nalloc = N;
 

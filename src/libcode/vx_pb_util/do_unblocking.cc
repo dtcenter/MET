@@ -80,7 +80,7 @@ int n_read, bytes;
 int value;
 unsigned int I;
 unsigned long long L;
-unsigned char * b = (unsigned char *) 0;
+unsigned char * b = (unsigned char *) nullptr;
 
 
 switch ( padsize )  {

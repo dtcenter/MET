@@ -266,7 +266,7 @@ int str_to_grib_code(const char *c, int &pcode,
    int gc = bad_data_int;
    const int buf_len = 512;
    char tmp_str[buf_len + 1];
-   char *ptr = (char *) 0, *save_ptr = (char *) 0;
+   char *ptr = (char *) nullptr, *save_ptr = (char *) nullptr;
    const char *method_name = "str_to_grib_code() -> ";
 
    // Parse out strings of the form:
@@ -308,7 +308,7 @@ int str_to_prob_info(const char *c, double &pthresh_lo, double &pthresh_hi,
    int gc = bad_data_int, i, n_lt, n_gt;
    const int buf_len = 512;
    char tmp_str[buf_len + 1];
-   char *ptr = (char *) 0, *save_ptr = (char *) 0;
+   char *ptr = (char *) nullptr, *save_ptr = (char *) nullptr;
    SingleThresh st;
    const char *method_name = "str_to_prob_info()";
 

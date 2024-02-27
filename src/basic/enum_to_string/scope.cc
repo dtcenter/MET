@@ -38,7 +38,7 @@ ScopeStackElement::ScopeStackElement()
 
 {
 
-Name = (const char *) 0;
+Name = (const char *) nullptr;
 
 clear();
 
@@ -64,7 +64,7 @@ ScopeStackElement::ScopeStackElement(const ScopeStackElement & e)
 
 {
 
-Name = (const char *) 0;
+Name = (const char *) nullptr;
 
 assign(e);
 
@@ -116,7 +116,7 @@ void ScopeStackElement::clear()
 
 Level = 0;
 
-if ( Name )  { delete [] Name;  Name = (const char *) 0; }
+if ( Name )  { delete [] Name;  Name = (const char *) nullptr; }
 
 
 return;
@@ -131,12 +131,12 @@ void ScopeStackElement::set_name(const char * text)
 
 {
 const char *method_name = "void ScopeStackElement::set_name(const char *) -> ";
-if ( Name )  { delete [] Name;  Name = (const char *) 0; }
+if ( Name )  { delete [] Name;  Name = (const char *) nullptr; }
 
 if ( !text )  return;
 
 int k;
-char * c = (char *) 0;
+char * c = (char *) nullptr;
 
 k = m_strlen(text);
 
@@ -154,7 +154,7 @@ m_strncpy(c, text, k, method_name);
 
 c[k] = (char) 0;   //  just to make sure
 
-Name = (const char *) c;   c = (char *) 0;
+Name = (const char *) c;   c = (char *) nullptr;
 
 return;
 

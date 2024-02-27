@@ -141,7 +141,7 @@ void STATLine::clear()
 DataLine::clear();
 
 Type    = no_stat_line_type;
-HdrLine = (AsciiHeaderLine *) 0;
+HdrLine = (AsciiHeaderLine *) nullptr;
 
 return;
 

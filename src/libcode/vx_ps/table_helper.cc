@@ -100,9 +100,9 @@ void TableHelper::init_from_scratch()
 
 {
 
-ColWidth = (double *) 0;
+ColWidth = (double *) nullptr;
 
-RowHeight = (double *) 0;
+RowHeight = (double *) nullptr;
 
 clear();
 
@@ -118,11 +118,11 @@ void TableHelper::clear()
 
 {
 
-Plot = (PSfile *) 0;   //  not allocated, so don't delete
+Plot = (PSfile *) nullptr;   //  not allocated, so don't delete
 
-if ( ColWidth )  { delete [] ColWidth;  ColWidth = (double *) 0; }
+if ( ColWidth )  { delete [] ColWidth;  ColWidth = (double *) nullptr; }
 
-if ( RowHeight )  { delete [] RowHeight;  RowHeight = (double *) 0; }
+if ( RowHeight )  { delete [] RowHeight;  RowHeight = (double *) nullptr; }
 
 Xpin = Ypin = Upin = Vpin = 0.0;
 

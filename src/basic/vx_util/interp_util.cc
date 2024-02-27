@@ -33,8 +33,8 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 void SurfaceInfo::clear() {
-   land_ptr = (MaskPlane *) 0;
-   topo_ptr = (DataPlane *) 0;
+   land_ptr = (MaskPlane *) nullptr;
+   topo_ptr = (DataPlane *) nullptr;
    topo_use_obs_thresh.clear();
    topo_interp_fcst_thresh.clear();
 }
@@ -226,7 +226,7 @@ double interp_max_ll(const DataPlane &dp, int x_ll, int y_ll, int wdth, double t
 double interp_median(const DataPlane &dp, const GridTemplate &gt,
                      int x, int y, double t, const MaskPlane *mp) {
 
-   double *data = (double *) 0;
+   double *data = (double *) nullptr;
    int num_good_points = 0;
    int num_points = gt.size();
    double median_v;
@@ -270,7 +270,7 @@ double interp_median(const DataPlane &dp, const GridTemplate &gt,
 ////////////////////////////////////////////////////////////////////////
 
 double interp_median_ll(const DataPlane &dp, int x_ll, int y_ll, int wdth, double t) {
-   double *data = (double *) 0;
+   double *data = (double *) nullptr;
    int x, y, count;
    double v, median_v;
 
@@ -302,7 +302,7 @@ double interp_median_ll(const DataPlane &dp, int x_ll, int y_ll, int wdth, doubl
       median_v = percentile(data, count, 0.50);
    }
 
-   if(data) { delete [] data; data = (double *) 0; }
+   if(data) { delete [] data; data = (double *) nullptr; }
 
    return(median_v);
 }
