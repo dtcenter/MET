@@ -489,11 +489,14 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
          ObsErrorEntry * e = (has_obs_error() ? obs_error_entry[i] : 0);
          if(e) {
 
+            // Get observation error variance
+            double oerr_var = e->variance();
+
             // Compute the observation error log scores
             double v_conv, v_corr;
             compute_obs_error_log_scores(
                emn_unperturbed, esd_unperturbed,
-               o_na[i], e->variance(),
+               o_na[i], oerr_var,
                v_conv, v_corr);
             ign_conv_oerr_na.add(v_conv);
             ign_corr_oerr_na.add(v_corr);
@@ -503,11 +506,14 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
             mn_oerr_na.add(cur_ens.mean());
             var_oerr_na.add(cur_ens.variance(ctrl_index));
 
-            // Compute the variance plus observation error variance.
-            var_plus_oerr_na.add(
-               var_unperturbed +
-               dist_var(e->dist_type,
-                        e->dist_parm[0], e->dist_parm[1]));
+            // Compute the variance plus observation error variance
+            if(is_bad_data(var_unperturbed) ||
+               is_bad_data(oerr_var)) {
+               var_plus_oerr_na.add(bad_data_double);
+            }
+            else {
+               var_plus_oerr_na.add(var_unperturbed + oerr_var);
+            }
          }
          // If no observation error specified, store bad data values
          else {
