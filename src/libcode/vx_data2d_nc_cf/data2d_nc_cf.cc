@@ -110,7 +110,7 @@ NcVarInfo *MetNcCFDataFile::find_first_data_var() {
 
 void MetNcCFDataFile::close() {
 
-   if(_file) { delete _file; _file = (NcCfFile *) 0; }
+   if(_file) { delete _file; _file = (NcCfFile *) nullptr; }
 
    return;
 }
@@ -260,7 +260,7 @@ bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
   }
 
   // Read the data
-  NcVarInfo *info = (NcVarInfo *) 0;
+  NcVarInfo *info = (NcVarInfo *) nullptr;
 
   bool status = _file->getData(vinfo_nc->req_name().c_str(),
                                dimension,

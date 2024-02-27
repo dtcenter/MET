@@ -124,13 +124,13 @@ void WrfFile::init_from_scratch()
 
 {
 
-Nc = (NcFile *) 0;
+Nc = (NcFile *) nullptr;
 
-Dim = (NcDim **) 0;
+Dim = (NcDim **) nullptr;
 
-Var = (NcVarInfo *) 0;
+Var = (NcVarInfo *) nullptr;
 
-Time = (unixtime *) 0;
+Time = (unixtime *) nullptr;
 
 close();
 
@@ -146,21 +146,21 @@ void WrfFile::close()
 
 {
 
-if ( Nc )  { delete Nc;  Nc = (NcFile *) 0; }
+if ( Nc )  { delete Nc;  Nc = (NcFile *) nullptr; }
 
-if ( Dim )  { delete [] Dim;  Dim = (NcDim **) 0; }
+if ( Dim )  { delete [] Dim;  Dim = (NcDim **) nullptr; }
 
-if ( Time )  { delete [] Time;  Time = (unixtime *) 0; }
+if ( Time )  { delete [] Time;  Time = (unixtime *) nullptr; }
 
 Ndims = 0;
 
 DimNames.clear();
 
-Tdim = (NcDim *) 0;
+Tdim = (NcDim *) nullptr;
 
 Nvars = 0;
 
-if ( Var )  { delete [] Var;  Var = (NcVarInfo *) 0; }
+if ( Var )  { delete [] Var;  Var = (NcVarInfo *) nullptr; }
 
 InitTime = (unixtime) 0;
 
@@ -605,8 +605,8 @@ int j, k, count;
 int x, y;
 double value;
 bool found = false;
-NcVarInfo * var = (NcVarInfo *) 0;
-NcVarInfo * P   = (NcVarInfo *) 0;
+NcVarInfo * var = (NcVarInfo *) nullptr;
+NcVarInfo * P   = (NcVarInfo *) nullptr;
 LongArray b = a;
 
 pressure = bad_data_double;

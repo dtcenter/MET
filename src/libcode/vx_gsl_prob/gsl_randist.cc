@@ -35,7 +35,7 @@ static int get_seed();
 ////////////////////////////////////////////////////////////////////////
 
 void rng_set(gsl_rng *&r, const char *rng_name, const char *rng_seed) {
-   const gsl_rng_type * T = (const gsl_rng_type *) 0;
+   const gsl_rng_type * T = (const gsl_rng_type *) nullptr;
    int seed;
    char seed_str[256];
 
@@ -82,7 +82,7 @@ void rng_free(gsl_rng *r) {
 
    gsl_rng_free(r);
 
-   r = (gsl_rng *) 0;
+   r = (gsl_rng *) nullptr;
 
    return;
 }
@@ -104,7 +104,7 @@ void ran_shuffle(const gsl_rng *r, double *base, int n) {
 
 void ran_shuffle(const gsl_rng *r, NumArray &na) {
    int n, i;
-   double *arr = (double *) 0;
+   double *arr = (double *) nullptr;
 
    n   = na.n_elements();
    arr = new double [n];
@@ -115,7 +115,7 @@ void ran_shuffle(const gsl_rng *r, NumArray &na) {
 
    for(i=0; i<n; i++) na.set(i, arr[i]);
 
-   if(arr) { delete[] arr; arr = (double *) 0; }
+   if(arr) { delete[] arr; arr = (double *) nullptr; }
 
    return;
 }
@@ -148,7 +148,7 @@ void ran_choose(const gsl_rng *r, double *src,  int n,
 void ran_choose(const gsl_rng *r, NumArray &src_na,
                                   NumArray &dest_na, int k) {
    int n, i;
-   double *src = (double *) 0, *dest = (double *) 0;
+   double *src = (double *) 0, *dest = (double *) nullptr;
 
    n    = src_na.n_elements();
    src  = new double [n];
@@ -161,8 +161,8 @@ void ran_choose(const gsl_rng *r, NumArray &src_na,
    dest_na.clear();
    for(i=0; i<k; i++) dest_na.add(dest[i]);
 
-   if(src)  { delete[] src;  src  = (double *) 0; }
-   if(dest) { delete[] dest; dest = (double *) 0; }
+   if(src)  { delete[] src;  src  = (double *) nullptr; }
+   if(dest) { delete[] dest; dest = (double *) nullptr; }
 
    return;
 }
@@ -187,7 +187,7 @@ void ran_sample(const gsl_rng *r, double *src,  int n,
 void ran_sample(const gsl_rng *r, NumArray &src_na,
                                   NumArray &dest_na, int k) {
    int n, i;
-   double *src = (double *) 0, *dest = (double *) 0;
+   double *src = (double *) 0, *dest = (double *) nullptr;
 
    n    = src_na.n_elements();
    src  = new double [n];
@@ -201,8 +201,8 @@ void ran_sample(const gsl_rng *r, NumArray &src_na,
    dest_na.extend(k);
    for(i=0; i<k; i++) dest_na.add(dest[i]);
 
-   if(src)  { delete[] src;  src  = (double *) 0; }
-   if(dest) { delete[] dest; dest = (double *) 0; }
+   if(src)  { delete[] src;  src  = (double *) nullptr; }
+   if(dest) { delete[] dest; dest = (double *) nullptr; }
 
    return;
 }

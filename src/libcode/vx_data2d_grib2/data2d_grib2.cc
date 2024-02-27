@@ -1583,7 +1583,7 @@ long MetGrib2DataFile::read_grib2_record(long offset, g2int unpack,
    fread(cgrib, sizeof(unsigned char), lgrib, FileGrib2);
 
    if(g2_info(cgrib, listsec0, listsec1, &numfields, &numlocal)) {
-      if(cgrib) { delete [] cgrib; cgrib = (unsigned char *) 0; }
+      if(cgrib) { delete [] cgrib; cgrib = (unsigned char *) nullptr; }
       return -1;
    }
 
@@ -1591,7 +1591,7 @@ long MetGrib2DataFile::read_grib2_record(long offset, g2int unpack,
    g2_getfld(cgrib, ifld, unpack, 1, &gfld);
 
    //  cleanup
-   if(cgrib) { delete [] cgrib; cgrib = (unsigned char *) 0; }
+   if(cgrib) { delete [] cgrib; cgrib = (unsigned char *) nullptr; }
 
    //  reset to default out of memory handler
    set_new_handler(oom);

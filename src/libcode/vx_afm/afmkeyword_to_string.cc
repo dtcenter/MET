@@ -39,7 +39,7 @@ ConcatString afmkeyword_to_string(const AfmKeyword t)
 
 {
 
-const char * s = (const char *) 0;
+const char * s = (const char *) nullptr;
 
 switch ( t )  {
 

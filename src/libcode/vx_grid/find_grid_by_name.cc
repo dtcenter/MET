@@ -259,7 +259,7 @@ bool parse_lambert_grid(const StringArray &grid_strings, Grid & g)
 
 {
 
-Grid * ToGrid = (Grid *) 0;
+Grid * ToGrid = (Grid *) nullptr;
 
 LambertData ldata;
 
@@ -278,7 +278,7 @@ int j;
 int Nx, Ny;
 double lat_ll, lon_ll, lon_orient, D_km, R_km, phi_1, phi_2;
 char H;
-const char * c = (const char *) 0;
+const char * c = (const char *) nullptr;
 
 j = 1;
 
@@ -362,7 +362,7 @@ ToGrid = new Grid ( ldata );
 
 g = *ToGrid;
 
-if ( ToGrid )  { delete ToGrid; ToGrid = (Grid *) 0; }
+if ( ToGrid )  { delete ToGrid; ToGrid = (Grid *) nullptr; }
 
    //
    //  done
@@ -381,7 +381,7 @@ bool parse_stereographic_grid(const StringArray &grid_strings, Grid & g)
 
 {
 
-Grid * ToGrid = (Grid *) 0;
+Grid * ToGrid = (Grid *) nullptr;
 
 StereographicData sdata;
 
@@ -400,7 +400,7 @@ int j;
 int Nx, Ny;
 double lat_ll, lon_ll, lon_orient, D_km, R_km, lat_scale;
 char H;
-const char * c = (const char *) 0;
+const char * c = (const char *) nullptr;
 
 
 j = 1;
@@ -486,7 +486,7 @@ ToGrid = new Grid ( sdata );
 
 g = *ToGrid;
 
-if ( ToGrid )  { delete ToGrid; ToGrid = (Grid *) 0; }
+if ( ToGrid )  { delete ToGrid; ToGrid = (Grid *) nullptr; }
 
    //
    //  done
@@ -505,7 +505,7 @@ bool parse_latlon_grid(const StringArray &grid_strings, Grid & g)
 
 {
 
-Grid * ToGrid = (Grid *) 0;
+Grid * ToGrid = (Grid *) nullptr;
 
 LatLonData ldata;
 
@@ -565,7 +565,7 @@ ToGrid = new Grid ( ldata );
 
 g = *ToGrid;
 
-if ( ToGrid )  { delete ToGrid; ToGrid = (Grid *) 0; }
+if ( ToGrid )  { delete ToGrid; ToGrid = (Grid *) nullptr; }
 
 
    //
@@ -585,7 +585,7 @@ bool parse_rotlatlon_grid(const StringArray &grid_strings, Grid & g)
 
 {
 
-Grid * ToGrid = (Grid *) 0;
+Grid * ToGrid = (Grid *) nullptr;
 
 RotatedLatLonData rdata;
 
@@ -656,7 +656,7 @@ ToGrid = new Grid ( rdata );
 
 g = *ToGrid;
 
-if ( ToGrid )  { delete ToGrid; ToGrid = (Grid *) 0; }
+if ( ToGrid )  { delete ToGrid; ToGrid = (Grid *) nullptr; }
 
 
    //
@@ -676,7 +676,7 @@ bool parse_mercator_grid(const StringArray &grid_strings, Grid & g)
 
 {
 
-Grid * ToGrid = (Grid *) 0;
+Grid * ToGrid = (Grid *) nullptr;
 
 MercatorData mdata;
 
@@ -738,7 +738,7 @@ ToGrid = new Grid ( mdata );
 
 g = *ToGrid;
 
-if ( ToGrid )  { delete ToGrid; ToGrid = (Grid *) 0; }
+if ( ToGrid )  { delete ToGrid; ToGrid = (Grid *) nullptr; }
 
    //
    //  done
@@ -757,7 +757,7 @@ bool parse_gaussian_grid(const StringArray &grid_strings, Grid & g)
 
 {
 
-Grid * ToGrid = (Grid *) 0;
+Grid * ToGrid = (Grid *) nullptr;
 
 GaussianData gdata;
 
@@ -807,7 +807,7 @@ ToGrid = new Grid ( gdata );
 
 g = *ToGrid;
 
-if ( ToGrid )  { delete ToGrid; ToGrid = (Grid *) 0; }
+if ( ToGrid )  { delete ToGrid; ToGrid = (Grid *) nullptr; }
 
    //
    //  done
