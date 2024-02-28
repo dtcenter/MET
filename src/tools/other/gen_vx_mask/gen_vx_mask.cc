@@ -502,7 +502,7 @@ bool get_gen_vx_mask_config_str(MetNcMetDataFile *mnmdf_ptr,
    int i;
 
    // Check for null pointer
-   if(!mnmdf_ptr) ;
+   if(!mnmdf_ptr) return status;
 
    // Check for the MET_tool global attribute
    if(!get_global_att(mnmdf_ptr->MetNc->Nc, (string) "MET_tool", tool)) return status;
