@@ -39,7 +39,7 @@ typedef struct {
    int FieldNum;
    int Discipline;
    int PdsTmpl;
-   string ParmName;
+   std::string ParmName;
    int ParmCat;
    int Parm;
    int Process;
@@ -84,10 +84,10 @@ class MetGrib2DataFile : public Met2dDataFile {
 
       FILE *FileGrib2;
 
-      vector<Grib2Record*> RecList;
+      std::vector<Grib2Record*> RecList;
 
-      map<string,string> PairMap;
-      map<string,Grib2Record*> NameRecMap;
+      std::map<std::string,std::string> PairMap;
+      std::map<std::string,Grib2Record*> NameRecMap;
 
       int ScanMode;
 
@@ -98,8 +98,8 @@ class MetGrib2DataFile : public Met2dDataFile {
 
 
       void find_record_matches( VarInfoGrib2* vinfo,
-                                vector<Grib2Record*> &listMatchExact,
-                                vector<Grib2Record*> &listMatchRange
+                                std::vector<Grib2Record*> &listMatchExact,
+                                std::vector<Grib2Record*> &listMatchRange
                               );
 
       bool read_grib2_record_data_plane(Grib2Record *rec, DataPlane &plane);

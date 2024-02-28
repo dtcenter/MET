@@ -165,7 +165,7 @@ extern std::ostream & operator<<(std::ostream &, const Token &);
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int  Token::prec        () const { return ( out_prec ); }
+inline int  Token::prec        () const { return out_prec; }
 
 inline bool Token::is_mark     () const { return ( type == tok_mark   ); }
 inline bool Token::is_unmark   () const { return ( type == tok_unmark ); }
@@ -178,7 +178,7 @@ inline bool Token::is_operand  () const { return ( type == tok_local_var  ); }
 ////////////////////////////////////////////////////////////////////////
 
 
-typedef vector<Token> Program;
+typedef std::vector<Token> Program;
 
 
 ////////////////////////////////////////////////////////////////////////
