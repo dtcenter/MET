@@ -401,7 +401,7 @@ SEEPS scores are expected to lie between 0 and 1, with a perfect forecast having
 MET Verification Measures for Continuous Variables
 ==================================================
 
-For continuous variables, many verification measures are based on the forecast error (i.e., **f - o**). However, it also is of interest to investigate characteristics of the forecasts, and the observations, as well as their relationship. These concepts are consistent with the general framework for verification outlined by :ref:`Murphy and Winkler, (1987) <Murphy-1987>`. The statistics produced by MET for continuous forecasts represent this philosophy of verification, which focuses on a variety of aspects of performance rather than a single measure.
+For continuous variables, many verification measures are based on the forecast error (i.e., **f - o**). However, it also is of interest to investigate characteristics of the forecasts, and the observations, as well as their relationship. These concepts are consistent with the general framework for verification outlined by :ref:`Murphy and Winkler, 1987 <Murphy-1987>`. The statistics produced by MET for continuous forecasts represent this philosophy of verification, which focuses on a variety of aspects of performance rather than a single measure.
 
 The verification measures currently evaluated by the Point-Stat tool are defined and described in the subsections below. In these definitions, **f** represents the forecasts, **o** represents the observation, and **n** is the number of forecast-observation pairs.
 
@@ -894,7 +894,7 @@ Calibration
 
 Called "CALIBRATION" in PJC output :numref:`table_PS_format_info_PJC`
 
-Calibration is the conditional probability of an event given each probability forecast category (i.e. each row in the **nx2** contingency table). This set of measures is paired with refinement in the calibration-refinement factorization discussed in :ref:`Wilks, (2011) <Wilks-2011>`. A well-calibrated forecast will have calibration values that are near the forecast probability. For example, a 50% probability of precipitation should ideally have a calibration value of 0.5. If the calibration value is higher, then the probability has been underestimated, and vice versa.
+Calibration is the conditional probability of an event given each probability forecast category (i.e. each row in the **nx2** contingency table). This set of measures is paired with refinement in the calibration-refinement factorization discussed in :ref:`Wilks, 2011 <Wilks-2011>`. A well-calibrated forecast will have calibration values that are near the forecast probability. For example, a 50% probability of precipitation should ideally have a calibration value of 0.5. If the calibration value is higher, then the probability has been underestimated, and vice versa.
 
 .. math:: \text{Calibration}(i) = \frac{n_{i1}}{n_{1.}} = \text{probability}(o_1|p_i)
 
@@ -903,7 +903,7 @@ Refinement
 
 Called "REFINEMENT" in PJC output :numref:`table_PS_format_info_PJC`
 
-The relative frequency associated with each forecast probability, sometimes called the marginal distribution or row probability. This measure ignores the event outcome, and simply provides information about the frequency of forecasts for each probability category. This set of measures is paired with the calibration measures in the calibration-refinement factorization discussed by :ref:`Wilks (2011) <Wilks-2011>`.
+The relative frequency associated with each forecast probability, sometimes called the marginal distribution or row probability. This measure ignores the event outcome, and simply provides information about the frequency of forecasts for each probability category. This set of measures is paired with the calibration measures in the calibration-refinement factorization discussed by :ref:`Wilks, 2011 <Wilks-2011>`.
 
 .. math:: \text{Refinement}(i) = \frac{n_{i.}}{T} = \text{probability}(p_i)
 
@@ -912,7 +912,7 @@ Likelihood
 
 Called "LIKELIHOOD" in PJC output :numref:`table_PS_format_info_PJC`
 
-Likelihood is the conditional probability for each forecast category (row) given an event and a component of the likelihood-base rate factorization; see :ref:`Wilks (2011) <Wilks-2011>` for details. This set of measures considers the distribution of forecasts for only the cases when events occur. Thus, as the forecast probability increases, so should the likelihood. For example, 10% probability of precipitation forecasts should have a much smaller likelihood value than 90% probability of precipitation forecasts.
+Likelihood is the conditional probability for each forecast category (row) given an event and a component of the likelihood-base rate factorization; see :ref:`Wilks, 2011 <Wilks-2011>` for details. This set of measures considers the distribution of forecasts for only the cases when events occur. Thus, as the forecast probability increases, so should the likelihood. For example, 10% probability of precipitation forecasts should have a much smaller likelihood value than 90% probability of precipitation forecasts.
 
 .. math:: \text{Likelihood}(i) = \frac{n_{i1}}{n_{.1}} = \text{probability}(p_i|o_1)
 
@@ -923,7 +923,7 @@ Base Rate
 
 Called "BASER" in PJC output :numref:`table_PS_format_info_PJC`
 
-This is the probability of an event for each forecast category :math:`p_i` (row), i.e. the conditional base rate. This set of measures is paired with likelihood in the likelihood-base rate factorization, see :ref:`Wilks (2011) <Wilks-2011>` for further information. This measure is calculated for each row of the contingency table. Ideally, the event should become more frequent as the probability forecast increases.
+This is the probability of an event for each forecast category :math:`p_i` (row), i.e. the conditional base rate. This set of measures is paired with likelihood in the likelihood-base rate factorization, see :ref:`Wilks, 2011 <Wilks-2011>` for further information. This measure is calculated for each row of the contingency table. Ideally, the event should become more frequent as the probability forecast increases.
 
 .. math:: \text{Base Rate}(i) = \frac{n_{i1}}{n_{i.}} = \text{probability}(o_{i1})
 
@@ -976,18 +976,18 @@ RPS
 
 Called "RPS" in RPS output :numref:`table_ES_header_info_es_out_ECNT`
 
-While the above probabilistic verification measures utilize dichotomous observations, the Ranked Probability Score (RPS, :ref:`Epstein, 1969 <Epstein-1969>`, :ref:`Murphy, 1969 <Murphy-1969>`) is the only probabilistic verification measure for discrete multiple-category events available in MET.  It is assumed that the categories are ordinal as nominal categorical variables can be collapsed into sequences of binary predictands, which can in turn be evaluated with the above measures for dichotomous variables (:ref:`Wilks, 2011 <Wilks-2011>`). The RPS is the multi-category extension of the Brier score (:ref:`Tödter and Ahrens, 2012<Todter-2012>`), and is a proper score (:ref:`Mason, 2008<Mason-2008>`).
+While the above probabilistic verification measures utilize dichotomous observations, the Ranked Probability Score (RPS, :ref:`Epstein, 1969 <Epstein-1969>`, :ref:`Murphy, 1969 <Murphy-1969>`) is the only probabilistic verification measure for discrete multiple-category events available in MET. It is assumed that the categories are ordinal as nominal categorical variables can be collapsed into sequences of binary predictands, which can in turn be evaluated with the above measures for dichotomous variables (:ref:`Wilks, 2011 <Wilks-2011>`). The RPS is the multi-category extension of the Brier score (:ref:`Tödter and Ahrens, 2012 <Todter-2012>`), and is a proper score (:ref:`Mason, 2008 <Mason-2008>`).
 
 Let :math:`\text{J}` be the number of categories, then both the forecast, :math:`\text{f} = (f_1,…,f_J)`, and observation, :math:`\text{o} = (o_1,…,o_J)`, are length-:math:`\text{J}` vectors, where the components of :math:`\text{f}` include the probabilities forecast for each category :math:`\text{1,…,J}` and :math:`\text{o}` contains 1 in the category that is realized and zero everywhere else. The cumulative forecasts, :math:`F_m`, and observations, :math:`O_m`, are defined to be:
 
 :math:`F_m = \sum_{j=1}^m (f_j)` and :math:`O_m = \sum_{j=1}^m (o_j), m = 1,…,J`.
 
 
-To clarify, :math:`F_1 = f_1` is the first component of :math:`F_m`, :math:`F_2 = f_1+f_2`, etc., and :math:`F_J = 1`.  Similarly, if :math:`o_j = 1` and :math:`i < j`, then :math:`O_i = 0` and when :math:`i >= j`, :math:`O_i = 1`, and of course, :math:`O_J = 1`.  Finally, the RPS is defined to be:
+To clarify, :math:`F_1 = f_1` is the first component of :math:`F_m`, :math:`F_2 = f_1+f_2`, etc., and :math:`F_J = 1`. Similarly, if :math:`o_j = 1` and :math:`i < j`, then :math:`O_i = 0` and when :math:`i >= j`, :math:`O_i = 1`, and of course, :math:`O_J = 1`. Finally, the RPS is defined to be:
 
 .. math:: \text{RPS} = \sum_{m=1}^J (F_m - O_m)^2 = \sum_{m=1}^J BS_m,
 
-where :math:`BS_m` is the Brier score for the m-th category (:ref:`Tödter and Ahrens, 2012<Todter-2012>`).  Subsequently, the RPS lends itself to a decomposition into reliability, resolution and uncertainty components, noting that each component is aggregated over the different categories; these are written to the columns named "RPS_REL", "RPS_RES" and "RPS_UNC" in RPS output :numref:`table_ES_header_info_es_out_ECNT`.
+where :math:`BS_m` is the Brier score for the m-th category (:ref:`Tödter and Ahrens, 2012 <Todter-2012>`). Subsequently, the RPS lends itself to a decomposition into reliability, resolution and uncertainty components, noting that each component is aggregated over the different categories; these are written to the columns named "RPS_REL", "RPS_RES" and "RPS_UNC" in RPS output :numref:`table_ES_header_info_es_out_ECNT`.
 
 CRPS
 ----
@@ -1066,7 +1066,7 @@ The continuous ranked probability skill score (CRPSS) is similar to the MSESS an
 
 .. math:: \text{CRPSS} = 1 - \frac{\text{CRPS}_{fcst}}{ \text{CRPS}_{ref}}
 
-For the normal distribution fit (CRPSS), the reference CRPS is computed using the climatological mean and standard deviation. For the empirical distribution (CRPSS_EMP), the reference CRPS is computed by sampling from the assumed normal climatological distribution defined by the mean and standard deviation.  
+For the normal distribution fit (CRPSS), the reference CRPS is computed using the climatological mean and standard deviation. For the empirical distribution (CRPSS_EMP), the reference CRPS is computed by sampling from the assumed normal climatological distribution defined by the mean and standard deviation.
 
 Bias Ratio
 ----------
@@ -1087,13 +1087,6 @@ A perfect forecast has ME = 0. Since BIAS_RATIO is computed as the high bias (ME
 
 The range for BIAS_RATIO is 0 to infinity. A score of 1 indicates that the high and low biases are equal. A score greater than 1 indicates that the high bias is larger than the magnitude of the low bias. A score less than 1 indicates the opposite behavior.
 
-Observation Error Logarithmic Scoring Rules
--------------------------------------------
-
-Called "IGN_CONV_OERR" and "IGN_CORR_OERR" in ECNT output :numref:`table_ES_header_info_es_out_ECNT`
-
-TODO: Eric add 2 equations and interpretation advice here for dtcenter/MET#2583
-
 IGN
 ---
 
@@ -1111,6 +1104,29 @@ PIT
 Called "PIT" in ORANK output :numref:`table_ES_header_info_es_out_ORANK`
 
 The probability integral transform (PIT) is the analog of the rank histogram for a probability distribution forecast (:ref:`Dawid, 1984 <Dawid-1984>`). Its interpretation is the same as that of the verification rank histogram: Calibrated probabilistic forecasts yield PIT histograms that are flat, or uniform. Under-dispersed (not enough spread in the ensemble) forecasts have U-shaped PIT histograms while over-dispersed forecasts have bell-shaped histograms. In MET, the PIT calculation uses a normal distribution fit to the ensemble forecasts. In many cases, use of other distributions would be better.
+
+Observation Error Logarithmic Scoring Rules
+-------------------------------------------
+
+Called "IGN_CONV_OERR" and "IGN_CORR_OERR" in ECNT output :numref:`table_ES_header_info_es_out_ECNT`
+
+One approach that is used to take observation error into account in a summary measure is to add error to the forecast by a convolution with the observation model (e.g., :ref:`Anderson, 1996 <Andersen-1996>`; :ref:`Hamill, 2001 <Hamill-2001>`; :ref:`Saetra et. al., 2004 <Saetra-2004>`; :ref:`Bröcker and Smith, 2007 <Bröcker-2007>`; :ref:`Candille et al., 2007 <Candille-2007>`; :ref:`Candille and Talagrand, 2008 <Candille-2008>`; :ref:`Röpnack et al., 2013 <Röpnack-2013>`). Specifically, suppose :math:`y=x+w`, where :math:`y` is the observed value, :math:`x` is the true value, and :math:`w` is the error. Then, if :math:`f` is the density forecast for :math:`x` and :math:`\nu` is the observation model, then the implied density forecast for :math:`y` is given by the convolution:
+
+.. math:: (f*\nu)(y)=\int\nu(y|x)f(x)dx
+
+:ref:`Ferro, 2017 <Ferro-2017>` gives the error-convolved version of the ignorance scoring rule (referred to therein as the error-convolved logarithmic scoring rule), which is proper under the model where :math:`w\sim N(0,c^2)`) when the forecast for :math:`x` is :math:`N(\mu,\sigma^2)` with density function :math:`f`, by
+
+.. math:: \text{IGN_CONV_OERR} =
+          s(f,y)=\frac{1}{2}\log(\sigma^2+c^2) +
+          \frac{(y-\mu)^2}{2(\sigma^2+c^2)}
+
+Another approach to incorporation of observation uncertainty into a measure is the error-correction approach. The approach merely ensures that the scoring rule, :math:`s`, is unbiased for a scoring rule :math:`s_0` if they have the same expected value. :ref:`Ferro, 2017 <Ferro-2017>` gives the error-corrected ignorance scoring rule (which is also proposer when :math:`w\sim N(0,c^2)`) as
+
+.. math:: \text{IGN_CORR_OERR} =
+          s(f,y) = \log\sigma +
+          \frac{(y-\mu)^2-c^2}{2\sigma^2}
+
+The expected score for the error-convolved ignorance scoring rule typically differs from the expected score that would be achieved if there were no observation error. The error-corrected score, on the other hand, has the same expectation.
 
 RANK
 ----
@@ -1167,7 +1183,7 @@ The traditional contingency table statistics computed by the Grid-Stat neighborh
 
 All of these measures are defined in :numref:`categorical variables`.
 
-In addition to these standard statistics, the neighborhood analysis provides additional continuous measures, the Fractions Brier Score and the Fractions Skill Score. For reference, the Asymptotic Fractions Skill Score and Uniform Fractions Skill Score are also calculated. These measures are defined here, but are explained in much greater detail in :ref:`Ebert (2008) <Ebert-2008>` and :ref:`Roberts and Lean (2008) <Roberts-2008>`.  :ref:`Roberts and Lean (2008) <Roberts-2008>` also present an application of the methodology.
+In addition to these standard statistics, the neighborhood analysis provides additional continuous measures, the Fractions Brier Score and the Fractions Skill Score. For reference, the Asymptotic Fractions Skill Score and Uniform Fractions Skill Score are also calculated. These measures are defined here, but are explained in much greater detail in :ref:`Ebert, 2008 <Ebert-2008>` and :ref:`Roberts and Lean, 2008 <Roberts-2008>`. :ref:`Roberts and Lean, 2008 <Roberts-2008>` also present an application of the methodology.
 
 Fractions Brier Score
 ---------------------
@@ -1232,7 +1248,7 @@ A mathematical metric, :math:`m(A,B)\geq 0`, must have the following three prope
 
 The first establishes that a perfect score is zero and that the only way to obtain a perfect score is if the two sets are identical according to the metric. The second requirement ensures that the order by which the two sets are evaluated will not change the result. The third property ensures that if *C* is closer to *A* than *B* is to *A*, then :math:`m(A,C) < m(A,B)`.
 
-It has been argued in :ref:`Gilleland (2017) <Gilleland-2017>` that the second property of symmetry is not necessarily an important quality to have for a summary measure for verification purposes because lack of symmetry allows for information about false alarms and misses.
+It has been argued in :ref:`Gilleland, 2017 <Gilleland-2017>` that the second property of symmetry is not necessarily an important quality to have for a summary measure for verification purposes because lack of symmetry allows for information about false alarms and misses.
 
 The results of the distance map verification approaches that are included in the Grid-Stat tool are summarized using a variety of measures. These measures include Baddeley's :math:`\Delta` Metric, the Hausdorff Distance, the Mean-error Distance, Pratt's Figure of Merit, and Zhu's Measure. Their equations are listed below.
 

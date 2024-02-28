@@ -14,7 +14,15 @@ References
 
 | Ahijevych, D., E. Gilleland, B.G. Brown, and E.E. Ebert, 2009: Application of
 |   spatial verification methods to idealized and NWP-gridded precipitation forecasts.
-|   *Weather and Forecasting*, 24 (6), 1485 - 1497, doi: 10.1175/2009WAF2222298.1.
+|   *Weather and Forecasting*, 24 (6), 1485 - 1497.
+|   doi: https://doi.org/10.1175/2009WAF2222298.1
+|
+
+.. _Andersen-1996:
+
+| Anderson JL., 1996: A method for producing and evaluating probabilistic forecasts
+|   from ensemble model integrations. *J. Clim.* 9: 1518–1530.
+|   doi: `https://doi.org/10.1175/1520-0442(1996)009<1518:AMFPAE>2.0.CO;2 <https://doi.org/10.1175/1520-0442(1996)009\<1518:AMFPAE\>2.0.CO;2>`_
 |
 
 .. _Barker-1991:
@@ -49,11 +57,18 @@ References
 |   http://ams.confex.com/ams/pdfpapers/124856.pdf.
 |
 
+.. _Bröcker-2007:
+
+| Bröcker J, Smith LA., 2007: Scoring probabilistic forecasts: The importance
+|   of being proper. *Weather Forecasting*, 22, 382–388.
+|   doi: https://doi.org/10.1175/WAF966.1
+|
+
 .. _Buizza-1997:
 
 | Buizza, R., 1997: Potential forecast skill of ensemble prediction and spread
 |   and skill distributions of the ECMWF ensemble prediction system. *Monthly*
-|   *Weather Review*,125, 99-119.
+|   *Weather Review*, 125, 99-119.
 | 
 
 .. _Bullock-2016:
@@ -61,6 +76,14 @@ References
 | Bullock, R., T. Fowler, and B. Brown, 2016: Method for Object-Based
 |   Diagnostic Evaluation. *NCAR Technical Note* NCAR/TN-532+STR, 66 pp.
 | 
+
+.. _Candille-2007:
+
+| Candille G, Côté C, Houtekamer PL, Pellerin G, 2007: Verification of an
+|   ensemble prediction system against observations. *Mon. Weather Rev.*
+|   135: 2688-2699.
+|   doi: https://doi.org/10.1175/MWR3414.1
+|
 
 .. _Candille-2008:
 
@@ -104,7 +127,7 @@ References
 
 | Eckel, F. A., M.S. Allen, M. C. Sittel, 2012: Estimation of Ambiguity in
 |   Ensemble Forecasts. *Weather Forecasting*, 27, 50-69.
-|   doi: http://dx.doi.org/10.1175/WAF-D-11-00015.1
+|   doi: https://doi.org/10.1175/WAF-D-11-00015.1
 |
 
 .. _Efron-2007:
@@ -116,13 +139,15 @@ References
 .. _Epstein-1969:
 
 | Epstein, E. S., 1969: A scoring system for probability forecasts of ranked categories.
-|   *J. Appl. Meteor.*, 8, 985-987, 10.1175/1520-0450(1969)008<0985:ASSFPF>2.0.CO;2.
+|   *J. Appl. Meteor.*, 8, 985-987.
+|   doi: `https://doi.org/10.1175/1520-0450(1969)008<0985:ASSFPF>2.0.CO;2 <https://doi.org/10.1175/1520-0450(1969)008\<0985:ASSFPF\>2.0.CO;2>`_
 |
 
 .. _Ferro-2017:
 
 | Ferro C. A. T., 2017: Measuring forecast performance in the presence of observation error.
-|   *Q. J. R. Meteorol. Soc.*, 143 (708), 2665−2676. doi: 10.1002/qj.3115.
+|   *Q. J. R. Meteorol. Soc.*, 143 (708), 2665−2676.
+|   doi: https://doi.org/10.1002/qj.3115
 |
 
 .. _Gilleland-2010:
@@ -135,29 +160,32 @@ References
 
 | Gilleland, E., 2017: A new characterization in the spatial verification
 |   framework for false alarms, misses, and overall patterns.
-|   *Weather and Forecasting*, 32 (1), 187 - 198, doi: 10.1175/WAF-D-16-0134.1.
+|   *Weather and Forecasting*, 32 (1), 187 - 198.
+|   doi: https://doi.org/10.1175/WAF-D-16-0134.1
 |
 
 .. _Gilleland_PartI-2020:
 
 | Gilleland, E., 2020: Bootstrap methods for statistical inference.
 |   Part I: Comparative forecast verification for continuous variables.
-|   *Journal of Atmospheric and Oceanic Technology*, 37 (11), 2117 - 2134,
-|   doi: 10.1175/JTECH-D-20-0069.1.
+|   *Journal of Atmospheric and Oceanic Technology*, 37 (11), 2117 - 2134.
+|   doi: https://doi.org/10.1175/JTECH-D-20-0069.1
 |
 
 .. _Gilleland_PartII-2020:
 
 | Gilleland, E., 2020: Bootstrap methods for statistical inference.
 |   Part II: Extreme-value analysis. *Journal of Atmospheric and Oceanic*
-|   *Technology*, 37 (11), 2135 - 2144, doi: 10.1175/JTECH-D-20-0070.1.
+|   *Technology*, 37 (11), 2135 - 2144.
+|    doi: https://doi.org/10.1175/JTECH-D-20-0070.1
 |
 
 .. _Gilleland-2021:
 
 | Gilleland, E., 2021: Novel measures for summarizing high-resolution forecast
 |   performance. *Advances in Statistical Climatology, Meteorology and Oceanography*,
-|   7 (1), 13 - 34, doi: 10.5194/ascmo-7-13-2021.
+|   7 (1), 13 - 34.
+|   doi: https://doi.org/10.5194/ascmo-7-13-2021
 |
 
 .. _Gneiting-2004:
@@ -212,7 +240,8 @@ References
 .. _Mason-2008:
 
 | Mason, S. J., 2008: Understanding forecast verification statistics.
-|   *Meteor. Appl.*, 15, 31-40, doi: 10.1002/met.51.
+|   *Meteor. Appl.*, 15, 31-40.
+|   doi: https://doi.org/10.1002/met.51
 |
 
 
@@ -232,7 +261,7 @@ References
 
 | Murphy, A.H., 1969: On the ranked probability score. *Journal of Applied*
 |   *Meteorology and Climatology*, 8 (6), 988 - 989,
-|   doi: 10.1175/1520-0450(1969)008<0988:OTPS>2.0.CO;2.
+|   doi: `https://doi.org/10.1175/1520-0450(1969)008<0988:OTPS>2.0.CO;2 <https://doi.org/10.1175/1520-0450(1969)008\<0988:OTPS\>2.0.CO;2>`_
 |
 
 .. _Murphy-1987:
@@ -240,7 +269,6 @@ References
 | Murphy, A.H., and R.L. Winkler, 1987: A general framework for forecast
 |   verification. *Monthly Weather Review*, 115, 1330-1338.
 | 
-
 
 .. _North-2022:
 
@@ -279,11 +307,18 @@ References
 |   https://www.ecmwf.int/node/14595
 |
 
+.. _Röpnack-2013:
+
+| Röpnack A, Hense A, Gebhardt C, Majewski D., 2013: Bayesian model verification
+|   of NWP ensemble forecasts. *Mon. Weather Rev.* 141: 375–387.
+|   doi: https://doi.org/10.1175/MWR-D-11-00350.1
+|
+
 .. _Saetra-2004:
 
-| Saetra O., H. Hersbach, J-R Bidlot, D. Richardson, 2004: Effects of
+| Saetra Ø., H. Hersbach, J-R Bidlot, D. Richardson, 2004: Effects of
 |   observation errors on the statistics for ensemble spread and
-|   reliability. *Monthly Weather Review* 132: 1487-1501.
+|   reliability. *Monthly Weather Review*, 132: 1487-1501.
 |
 
 .. _Santos-2012:
@@ -317,7 +352,8 @@ References
 
 | Tödter, J. and B. Ahrens, 2012: Generalization of the Ignorance Score:
 |   Continuous ranked version and its decomposition. *Monthly Weather Review*,
-|   140 (6), 2005 - 2017, doi: 10.1175/MWR-D-11-00266.1.
+|   140 (6), 2005 - 2017.
+|   doi: https://doi.org/10.1175/MWR-D-11-00266.1
 |
 
 .. _Weniger-2016:
@@ -331,7 +367,8 @@ References
 
 | Wilks, D.S. 2010: Sampling distributions of the Brier score and Brier skill
 |   score under serial dependence. *Quarterly Journal of the Royal*
-|   *Meteorological Society*, 136, 2109-2118. doi:10.1002/qj.709
+|   *Meteorological Society*, 136, 2109-2118.
+|   doi: https://doi.org/10.1002/qj.709
 | 
 
 .. _Wilks-2011:
