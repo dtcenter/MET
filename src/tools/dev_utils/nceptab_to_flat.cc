@@ -99,7 +99,7 @@ for (j=0; j<(cline.n()); ++j)  {   //  j starts at one, here
    //  done
    //
 
-return ( 0 );
+return 0;
 
 }
 
@@ -252,7 +252,7 @@ m_strncpy(line2, line, sizeof(line2), method_name);
    // check to make sure it's got a double quote in it
    //
 
-if ( ! strchr(line, '\"') )  return ( false );
+if ( ! strchr(line, '\"') )  return false;
 
    //
    //  index and table number
@@ -262,7 +262,7 @@ c = strtok(s, " /*");
 
 s = (char *) 0;
 
-if ( !c )  return ( false );
+if ( !c )  return false;
 
 n = atoi(c);
 
@@ -274,7 +274,7 @@ cout << n << ' ' << table_number << ' ';
 
 c = strtok(s, " /*{\"");
 
-if ( !c )  return ( false );
+if ( !c )  return false;
 
 cout << '\"' << c << "\" ";
 
@@ -289,7 +289,7 @@ k = m_strlen(c) - 1;
 
 if ( c[k] == ' ' )  c[k] = (char) 0;
 
-if ( !c )  return ( false );
+if ( !c )  return false;
 
 cout << '\"' << c << "\" ";
 
@@ -305,7 +305,7 @@ if ( strcmp(c, "undefined") == 0 )  {
 
    c = strtok(s, "]\"");
 
-   if ( !c )  return ( false );
+   if ( !c )  return false;
 
    if ( c[0] == '}' ) cout << "\"\" ";
    else               cout << '\"' << c << "\" ";
@@ -318,7 +318,7 @@ if ( strcmp(c, "undefined") == 0 )  {
 
 cout << '\n' << flush;
 
-return ( true );
+return true;
 
 }
 

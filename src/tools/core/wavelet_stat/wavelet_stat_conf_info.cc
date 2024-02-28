@@ -670,14 +670,14 @@ int WaveletStatConfInfo::n_isc_row() {
       if(n_tile > 1) n += (n_scale + 2) * fcat_ta[i].n();
    }
 
-   return(n);
+   return n;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 int WaveletStatConfInfo::n_stat_row() {
 
-   return(n_isc_row());
+   return n_isc_row();
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -693,7 +693,7 @@ int get_pow2(double n) {
    if(fabs(nint(a) - a) > 10E-5) p = -1;
    else                          p = nint(a);
 
-   return(p);
+   return p;
 }
 
 ////////////////////////////////////////////////////////////////////////

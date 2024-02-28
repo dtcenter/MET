@@ -214,7 +214,7 @@ int met_main(int argc, char *argv[]) {
    // Close the text files and deallocate memory
    clean_up();
 
-   return(0);
+   return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -3172,7 +3172,7 @@ bool read_data_plane(VarInfo* info, DataPlane& dp, Met2dDataFile* mtddf,
    // Rescale probabilities from [0, 100] to [0, 1]
    if(info->p_flag()) rescale_probability(dp);
 
-   return(true);
+   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////

@@ -437,7 +437,7 @@ int get_line(int & fd, ConcatString & s)
    while (read(fd, buf, n_bytes_to_read) > 0)
    {
       if (buf[0] == '\n')
-         return (1);
+         return 1;
 
       s.add(buf);
 
@@ -446,7 +446,7 @@ int get_line(int & fd, ConcatString & s)
       //
       // end of file
       //
-   return (0);
+   return 0;
 
 }
 

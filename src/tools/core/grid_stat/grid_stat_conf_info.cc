@@ -439,7 +439,7 @@ int GridStatConfInfo::n_txt_row(int i_txt_row) const {
    // Loop over the tasks and sum the line counts for this line type
    for(int i=0; i<n_vx; i++) n += vx_opt[i].n_txt_row(i_txt_row);
 
-   return(n);
+   return n;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -450,7 +450,7 @@ int GridStatConfInfo::n_stat_row() const {
    // Loop over the line types and sum the line counts
    for(int i=0; i<n_txt; i++) n += n_txt_row(i);
 
-   return(n);
+   return n;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -460,7 +460,7 @@ int GridStatConfInfo::get_max_n_cat_thresh() const {
 
    for(int i=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_cat_thresh());
 
-   return(n);
+   return n;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -470,7 +470,7 @@ int GridStatConfInfo::get_max_n_cnt_thresh() const {
 
    for(int i=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_cnt_thresh());
 
-   return(n);
+   return n;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -480,7 +480,7 @@ int GridStatConfInfo::get_max_n_wind_thresh() const {
 
    for(int i=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_wind_thresh());
 
-   return(n);
+   return n;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -490,7 +490,7 @@ int GridStatConfInfo::get_max_n_fprob_thresh() const {
 
    for(int i=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_fprob_thresh());
 
-   return(n);
+   return n;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -500,7 +500,7 @@ int GridStatConfInfo::get_max_n_oprob_thresh() const {
 
    for(int i=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_oprob_thresh());
 
-   return(n);
+   return n;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -510,7 +510,7 @@ int GridStatConfInfo::get_max_n_eclv_points() const {
 
    for(int i=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_eclv_points());
 
-   return(n);
+   return n;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -520,7 +520,7 @@ int GridStatConfInfo::get_max_n_cov_thresh() const {
 
    for(int i=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_cov_thresh());
 
-   return(n);
+   return n;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1000,7 +1000,7 @@ bool GridStatVxOpt::is_uv_match(const GridStatVxOpt &v) const {
       !(mask_name   == v.mask_name  ) ||
       !(interp_info == v.interp_info)) match = false;
 
-   return(match);
+   return match;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1280,7 +1280,7 @@ bool GridStatNcOutInfo::all_false() const {
                  do_nbrhd        || do_fourier    || do_gradient ||
                  do_distance_map || do_apply_mask;
 
-   return(!status);
+   return !status;
 }
 
 ////////////////////////////////////////////////////////////////////////

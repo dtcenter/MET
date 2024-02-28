@@ -151,7 +151,7 @@ int met_main(int argc, char *argv[]) {
    // Close the text files and deallocate memory
    clean_up();
 
-   return(0);
+   return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -798,7 +798,7 @@ double get_fill_value(const DataPlane &dp, int i_vx) {
       else          fill_val = 0.0;
    }
 
-   return(fill_val);
+   return fill_val;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -942,7 +942,7 @@ int get_tile_tot_count() {
       } // end for y
    } // end for x
 
-   return(count);
+   return count;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1920,7 +1920,7 @@ double sum_array(double *d, int n) {
 
    for(i=0, sum=0.0; i<n; i++) sum += d[i];
 
-   return(sum);
+   return sum;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1931,7 +1931,7 @@ double mean_array(double *d, int n) {
 
    for(i=0, sum=0.0; i<n; i++) sum += d[i];
 
-   return(sum/n);
+   return (sum/n);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2523,7 +2523,7 @@ double compute_percentage(double num, double den) {
       percentage = num/den*100.0;
    }
 
-   return(percentage);
+   return percentage;
 }
 
 ////////////////////////////////////////////////////////////////////////

@@ -207,7 +207,7 @@ int met_main(int argc, char * argv [])
    //  done
    //
 
-   return ( status );
+   return status;
 
 }
 

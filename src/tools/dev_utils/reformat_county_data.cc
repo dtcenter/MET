@@ -56,7 +56,7 @@ reformat(input_filename, output_filename);
    //  done
    //
 
-return ( 0 );
+return 0;
 
 }
 

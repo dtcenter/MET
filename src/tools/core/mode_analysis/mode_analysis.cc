@@ -184,7 +184,7 @@ job->clear();
 if ( dumpfile )  { delete dumpfile;  dumpfile = (ofstream *) 0; }
 if ( outfile  )  { delete  outfile;   outfile = (ofstream *) 0; }
 
-return ( 0 );
+return 0;
 
 }
 

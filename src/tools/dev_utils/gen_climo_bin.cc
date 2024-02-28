@@ -129,7 +129,7 @@ int met_main(int argc, char *argv[]) {
    delete nc_out;
    nc_out = (NcFile *) 0;
 
-   return(0);
+   return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////
