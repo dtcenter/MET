@@ -137,11 +137,11 @@ Vector & Vector::operator=(const Vector &v)
 
 {
 
-if ( this == &v )  return ( * this );
+if ( this == &v )  return *this;
 
 assign(v);
 
-return ( * this );
+return *this;
 
 }
 
@@ -233,7 +233,7 @@ double Vector::abs() const
 
 {
 
-return ( sqrt( X*X + Y*Y + Z*Z ) );
+return sqrt( X*X + Y*Y + Z*Z );
 
 }
 
@@ -602,7 +602,7 @@ double t;
 
 t = a.abs();
 
-return ( t );
+return t;
 
 }
 
@@ -618,7 +618,7 @@ double t;
 
 t = a.abs_squared();
 
-return ( t );
+return t;
 
 }
 
@@ -639,7 +639,7 @@ denom = (a.abs())*(b.abs());
 
 deg = acosd(num/denom);
 
-return ( deg );
+return deg;
 
 }
 
@@ -655,7 +655,7 @@ double d;
 
 d = (a.x())*(b.x()) + (a.y())*(b.y()) + (a.z())*(b.z());
 
-return ( d );
+return d;
 
 }
 
@@ -676,7 +676,7 @@ zz = (a.x())*(b.y()) - (a.y())*(b.x());
 
 c.set_xyz(xx, yy, zz);
 
-return ( c );
+return c;
 
 }
 
@@ -692,7 +692,7 @@ double det;
 
 det = dot(cross(a, b), c);
 
-return ( det );
+return det;
 
 }
 
@@ -714,7 +714,7 @@ z =  cosd(alt);
 
 v.set_xyz(x, y, z);
 
-return ( v );
+return v;
 
 }
 
@@ -736,7 +736,7 @@ z =  0.0;
 
 v.set_xyz(x, y, z);
 
-return ( v );
+return v;
 
 }
 
@@ -758,7 +758,7 @@ z =  0.0;
 
 v.set_xyz(x, y, z);
 
-return ( v );
+return v;
 
 }
 
@@ -782,7 +782,7 @@ z = cosd(lat);
 
 v.set_xyz(x, y, z);
 
-return ( v );
+return v;
 
 }
 
@@ -801,7 +801,7 @@ bn.normalize();
 
 c = bn*dot(bn, a);
 
-return ( c );
+return c;
 
 }
 
@@ -817,7 +817,7 @@ Vector c;
 
 c = a - proj_onto(a, b);
 
-return ( c );
+return c;
 
 }
 
@@ -838,7 +838,7 @@ z = -(a.z());
 
 c.set_xyz(x, y, z);
 
-return ( c );
+return c;
 
 }
 
@@ -859,7 +859,7 @@ z = t*(a.z());
 
 b.set_xyz(x, y, z);
 
-return ( b );
+return b;
 
 }
 
@@ -881,7 +881,7 @@ z = t*(a.z());
 
 b.set_xyz(x, y, z);
 
-return ( b );
+return b;
 
 }
 
@@ -911,7 +911,7 @@ z = (a.z())/t;
 
 b.set_xyz(x, y, z);
 
-return ( b );
+return b;
 
 }
 
@@ -942,7 +942,7 @@ z = (a.z())/t;
 
 b.set_xyz(x, y, z);
 
-return ( b );
+return b;
 
 }
 
@@ -963,7 +963,7 @@ z = t*(a.z());
 
 b.set_xyz(x, y, z);
 
-return ( b );
+return b;
 
 }
 
@@ -985,7 +985,7 @@ z = t*(a.z());
 
 b.set_xyz(x, y, z);
 
-return ( b );
+return b;
 
 }
 
@@ -1005,7 +1005,7 @@ z = (a.z()) + (b.z());
 
 c.set_xyz(x, y, z);
 
-return ( c );
+return c;
 
 }
 
@@ -1026,7 +1026,7 @@ z = (a.z()) - (b.z());
 
 c.set_xyz(x, y, z);
 
-return ( c );
+return c;
 
 }
 
@@ -1042,7 +1042,7 @@ Vector v;
 
 v.set_latlon(lat, lon);
 
-return ( v );
+return v;
 
 }
 
@@ -1097,7 +1097,7 @@ snprintf(junk, sizeof(junk), "%11.8f", v.z());
 out << junk << " ]";
 
 
-return ( out );
+return out;
 
 }
 
@@ -1113,7 +1113,7 @@ Vector b = a;
 
 b.normalize();
 
-return ( b );
+return b;
 
 }
 

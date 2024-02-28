@@ -50,7 +50,7 @@ ConcatString interpmthd_to_string(const InterpMthd m) {
       default:                      out = interpmthd_none_str;        break;
    }   //  switch
 
-   return(out);
+   return out;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -81,7 +81,7 @@ InterpMthd string_to_interpmthd(const char *mthd_str) {
    else if(strcmp(mthd_str, interpmthd_hira_str)        == 0) m = InterpMthd_HiRA;
    else                                                       m = InterpMthd_None;
 
-   return(m);
+   return m;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

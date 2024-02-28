@@ -46,11 +46,11 @@ GenShapeInfo::GenShapeInfo(const GenShapeInfo &g) {
 
 GenShapeInfo & GenShapeInfo::operator=(const GenShapeInfo &g) {
 
-   if(this == &g) return(*this);
+   if(this == &g) return *this;
 
    assign(g);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -85,7 +85,7 @@ ConcatString GenShapeInfo::serialize() const {
      << ", Lon = " << Poly.x_min() << " to " << Poly.x_max()
      << ", NProb = " << ProbVal.n();
 
-   return(s);
+   return s;
 
 }
 
@@ -157,7 +157,7 @@ void GenShapeInfo::add_prob(int sec, double prob) {
 ////////////////////////////////////////////////////////////////////////
 
 const ShpPolyRecord &GenShapeInfo::poly() const {
-   return(Poly);
+   return Poly;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -175,7 +175,7 @@ double GenShapeInfo::center_lon() const {
 ////////////////////////////////////////////////////////////////////////
 
 int GenShapeInfo::n_prob() const {
-   return(ProbVal.n());
+   return ProbVal.n();
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -189,7 +189,7 @@ int GenShapeInfo::lead_sec(int i) const {
       exit(1);
    }
 
-   return(LeadSec[i]);
+   return LeadSec[i];
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -203,7 +203,7 @@ double GenShapeInfo::prob_val(int i) const {
       exit(1);
    }
 
-   return(ProbVal[i]);
+   return ProbVal[i];
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -237,11 +237,11 @@ GenShapeInfoArray::GenShapeInfoArray(const GenShapeInfoArray & t) {
 
 GenShapeInfoArray & GenShapeInfoArray::operator=(const GenShapeInfoArray & t) {
 
-   if(this == &t)  return(*this);
+   if(this == &t)  return *this;
 
    assign(t);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -315,7 +315,7 @@ const GenShapeInfo & GenShapeInfoArray::operator[](int n) const {
       exit(1);
    }
 
-   return(GenShape[n]);
+   return GenShape[n];
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -338,7 +338,7 @@ bool GenShapeInfoArray::add(const GenShapeInfo &gsi, bool check_dup) {
             if(GenShape[i].file_time() == gsi.file_time()) {
                mlog << Debug(5) << "Skip exact duplicate "
                     << gsi.serialize() << "\n";
-               return(false);
+               return false;
             }
             // Replace older duplicates with more recent file time stamps
             else if(GenShape[i].file_time() < gsi.file_time()) {
@@ -347,12 +347,12 @@ bool GenShapeInfoArray::add(const GenShapeInfo &gsi, bool check_dup) {
                     << unix_to_yyyymmdd_hhmmss(GenShape[i].file_time())
                     << "\") with newer " << gsi.serialize() << "\n";
                GenShape[i] = gsi;
-               return(false);
+               return false;
             }
             else {
                mlog << Debug(5) << "Skip older duplicate "
                     << gsi.serialize() << "\n";
-               return(false);
+               return false;
             }
          }
       }
@@ -361,7 +361,7 @@ bool GenShapeInfoArray::add(const GenShapeInfo &gsi, bool check_dup) {
    // Store the genesis shape object
    GenShape.push_back(gsi);
 
-   return(true);
+   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -369,10 +369,10 @@ bool GenShapeInfoArray::add(const GenShapeInfo &gsi, bool check_dup) {
 bool GenShapeInfoArray::has(const GenShapeInfo &gsi) const {
 
    for(int i=0; i<GenShape.size(); i++) {
-      if(gsi == GenShape[i]) return(true);
+      if(gsi == GenShape[i]) return true;
    }
 
-   return(false);
+   return false;
 }
 
 ////////////////////////////////////////////////////////////////////////

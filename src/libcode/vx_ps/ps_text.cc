@@ -89,11 +89,11 @@ VxpsTextNode & VxpsTextNode::operator=(const VxpsTextNode & n)
 
 {
 
-if ( this == &n )  return ( * this );
+if ( this == &n )  return *this;
 
 assign(n);
 
-return ( * this );
+return *this;
 
 }
 
@@ -435,7 +435,7 @@ while ( n )  {
 
 }
 
-return ( w );
+return w;
 
 }
 
@@ -447,7 +447,7 @@ double VxpsTextNode::total_left() const
 
 {
 
-return ( Left );
+return Left;
 
 }
 
@@ -477,7 +477,7 @@ while ( n->next )  {
 r += n->Right;
 
 
-return ( r );
+return r;
 
 }
 
@@ -501,7 +501,7 @@ while ( n )  {
 
 }
 
-return ( t );
+return t;
 
 }
 
@@ -525,7 +525,7 @@ while ( n )  {
 
 }
 
-return ( b );
+return b;
 
 }
 

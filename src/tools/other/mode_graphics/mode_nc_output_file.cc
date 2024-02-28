@@ -84,7 +84,7 @@ ModeNcOutputFile & ModeNcOutputFile::operator=(const ModeNcOutputFile &)
 
 {
 
-// if ( this == &m )  return ( * this );
+// if ( this == &m )  return *this;
 // 
 // assign(m);
 
@@ -183,7 +183,7 @@ if ( IS_INVALID_NC_P(f) )  {
 
    close();
 
-   return ( false );
+   return false;
 
 }
 
@@ -279,7 +279,7 @@ for (x=0; x<Nx; ++x)  {
    //  done
    //
 
-return ( true );
+return true;
 
 }
 
@@ -361,7 +361,7 @@ int n;
 
 n = count_objects(FcstObjId);
 
-return ( n );
+return n;
 
 }
 
@@ -385,7 +385,7 @@ int n;
 
 n = count_objects(ObsObjId);
 
-return ( n );
+return n;
 
 }
 
@@ -409,7 +409,7 @@ int n;
 
 n = count_objects(FcstClusId);
 
-return ( n );
+return n;
 
 }
 
@@ -433,7 +433,7 @@ int n;
 
 n = count_objects(ObsClusId);
 
-return ( n );
+return n;
 
 }
 
@@ -471,7 +471,7 @@ if (get_nc_data(var, (int *)&v, lengths, offsets)) {
    
    }
 }
-return ( n );
+return n;
 
 }
 
@@ -524,7 +524,7 @@ if ( !status )  {
 
 }
 
-return ( i[0] );
+return i[0];
 
 }
 
@@ -577,7 +577,7 @@ if ( !status )  {
 
 }
 
-return ( (double) (ff[0]) );
+return (double) (ff[0]);
 
 }
 
@@ -593,7 +593,7 @@ double z;
 
 z = get_float(FcstRaw, x, y);
 
-return ( z );
+return z;
 
 }
 
@@ -609,7 +609,7 @@ double z;
 
 z = get_float(ObsRaw, x, y);
 
-return ( z );
+return z;
 
 }
 
@@ -625,7 +625,7 @@ int k;
 
 k = get_int(FcstObjId, x, y);
 
-return ( k );
+return k;
 
 }
 
@@ -641,7 +641,7 @@ int k;
 
 k = get_int(FcstClusId, x, y);
 
-return ( k );
+return k;
 
 }
 
@@ -657,7 +657,7 @@ int k;
 
 k = get_int(ObsObjId, x, y);
 
-return ( k );
+return k;
 
 }
 
@@ -673,7 +673,7 @@ int k;
 
 k = get_int(ObsClusId, x, y);
 
-return ( k );
+return k;
 
 }
 
@@ -752,7 +752,7 @@ for (x=0; x<Nx; ++x)  {
 
 }
 
-return ( fdata );
+return fdata;
 
 }
 
@@ -768,7 +768,7 @@ DataPlane fdata;
 
 fdata = select_obj(mof_fcst_obj, n);
 
-return ( fdata );
+return fdata;
 
 }
 
@@ -784,7 +784,7 @@ DataPlane fdata;
 
 fdata = select_obj(mof_fcst_clus, n);
 
-return ( fdata );
+return fdata;
 
 }
 
@@ -800,7 +800,7 @@ DataPlane fdata;
 
 fdata = select_obj(mof_obs_obj, n);
 
-return ( fdata );
+return fdata;
 
 }
 
@@ -816,7 +816,7 @@ DataPlane fdata;
 
 fdata = select_obj(mof_obs_clus, n);
 
-return ( fdata );
+return fdata;
 
 }
 
@@ -828,7 +828,7 @@ bool ModeNcOutputFile::x_line_valid (const int x) const
 
 {
 
-if ( (x < 0) || (x >= Nx) )  return ( false );
+if ( (x < 0) || (x >= Nx) )  return false;
 
 int y;
 double v;
@@ -839,11 +839,11 @@ for (y=0; y<Ny; ++y)  {
 
    v = obs_raw(x, y);
 
-   if ( fabs(v - bad) > tol )  return ( true );
+   if ( fabs(v - bad) > tol )  return true;
 
 }
 
-return ( false );
+return false;
 
 }
 
@@ -855,7 +855,7 @@ bool ModeNcOutputFile::y_line_valid (const int y) const
 
 {
 
-if ( (y < 0) || (y >= Ny) )  return ( false );
+if ( (y < 0) || (y >= Ny) )  return false;
 
 int x;
 double v;
@@ -866,11 +866,11 @@ for (x=0; x<Nx; ++x)  {
 
    v = obs_raw(x, y);
 
-   if ( fabs(v - bad) > tol )  return ( true );
+   if ( fabs(v - bad) > tol )  return true;
 
 }
 
-return ( false );
+return false;
 
 }
 
@@ -1012,7 +1012,7 @@ ConcatString s;
 
 s = get_short_name(Filename.c_str());
 
-return ( s );
+return s;
 
 }
 

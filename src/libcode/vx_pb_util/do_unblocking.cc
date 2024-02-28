@@ -105,7 +105,7 @@ switch ( padsize )  {
 
 n_read = read(fd, b, bytes);
 
-if ( n_read == 0 )  return ( 0 );
+if ( n_read == 0 )  return 0;
 
 if ( (n_read < 0) || ((n_read > 0) && (n_read != bytes)) )  {
 
@@ -138,7 +138,7 @@ switch ( padsize )  {
    //  done
    //
 
-return ( value );
+return value;
 
 }
 

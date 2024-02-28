@@ -78,11 +78,11 @@ PairAtt3DArray & PairAtt3DArray::operator=(const PairAtt3DArray & a)
 
 {
 
-if ( this == &a )  return ( * this );
+if ( this == &a )  return *this;
 
 assign(a);
 
-return ( * this );
+return *this;
 
 }
 
@@ -292,7 +292,7 @@ if ( (N < 0) || (N >= Nelements) )  {
    exit ( 1 );
 }
 
-return ( e[N] );
+return e[N];
 
 }
 
@@ -312,7 +312,7 @@ if ( (k < 0) || (k >= Nelements) )  {
 
 }
 
-return ( e[k].fcst_obj_number() );
+return e[k].fcst_obj_number();
 
 }
 
@@ -332,7 +332,7 @@ if ( (k < 0) || (k >= Nelements) )  {
 
 }
 
-return ( e[k].obs_obj_number() );
+return e[k].obs_obj_number();
 
 }
 
@@ -352,7 +352,7 @@ if ( (k < 0) || (k >= Nelements) )  {
 
 }
 
-return ( e[k].fcst_cluster_number() );
+return e[k].fcst_cluster_number();
 
 }
 
@@ -372,7 +372,7 @@ if ( (k < 0) || (k >= Nelements) )  {
 
 }
 
-return ( e[k].obs_cluster_number() );
+return e[k].obs_cluster_number();
 
 }
 
@@ -392,7 +392,7 @@ if ( (k < 0) || (k >= Nelements) )  {
 
 }
 
-return ( e[k].total_interest() );
+return e[k].total_interest();
 
 }
 

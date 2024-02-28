@@ -235,7 +235,7 @@ double RotatedLatLonGrid::calc_area(int x, int y) const
 
 double area = LatLonGrid::calc_area(x, y);
 
-return ( area );
+return area;
 
 }
 
@@ -248,7 +248,7 @@ int RotatedLatLonGrid::nx() const
 
 {
 
-return ( Nx );
+return Nx;
 
 }
 
@@ -260,7 +260,7 @@ int RotatedLatLonGrid::ny() const
 
 {
 
-return ( Ny );
+return Ny;
 
 }
 
@@ -272,7 +272,7 @@ ConcatString RotatedLatLonGrid::name() const
 
 {
 
-return ( Name );
+return Name;
 
 }
 
@@ -330,7 +330,7 @@ snprintf(junk, sizeof(junk), "aux_rotation: %.3f", RData.aux_rotation);   a << j
    //  done
    //
 
-return ( a );
+return a;
 
 }
 
@@ -346,7 +346,7 @@ GridInfo i;
 
 i.set( RData );
 
-return ( i );
+return i;
 
 }
 
@@ -364,7 +364,7 @@ double RotatedLatLonGrid::rot_grid_to_earth(int x, int y) const
 // need to be changed when support is added for GRIB2.
 //
 
-return ( 0.0 );
+return 0.0;
 
 }
 
@@ -397,7 +397,7 @@ RotatedLatLonGrid * p = new RotatedLatLonGrid (RData);
 
 p->Name = Name;
 
-return ( p );
+return p;
 
 }
 

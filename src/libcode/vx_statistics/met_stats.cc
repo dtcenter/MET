@@ -53,11 +53,11 @@ CIInfo::CIInfo(const CIInfo &c) {
 
 CIInfo & CIInfo::operator=(const CIInfo &c) {
 
-   if(this == &c) return(*this);
+   if(this == &c) return *this;
 
    assign(c);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -190,11 +190,11 @@ CTSInfo::CTSInfo(const CTSInfo &c) {
 
 CTSInfo & CTSInfo::operator=(const CTSInfo &c) {
 
-   if(this == &c) return(*this);
+   if(this == &c) return *this;
 
    assign(c);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -470,7 +470,7 @@ double CTSInfo::get_stat(const char *stat_name) {
       v = bad_data_double;
    }
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -502,11 +502,11 @@ MCTSInfo::MCTSInfo(const MCTSInfo &c) {
 
 MCTSInfo & MCTSInfo::operator=(const MCTSInfo &c) {
 
-   if(this == &c) return(*this);
+   if(this == &c) return *this;
 
    assign(c);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -696,11 +696,11 @@ CNTInfo::CNTInfo(const CNTInfo &c) {
 
 CNTInfo & CNTInfo::operator=(const CNTInfo &c) {
 
-   if(this == &c) return(*this);
+   if(this == &c) return *this;
 
    assign(c);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1085,7 +1085,7 @@ double CNTInfo::get_stat(const char *stat_name) {
       v = bad_data_double;
    }
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1117,11 +1117,11 @@ SL1L2Info::SL1L2Info(const SL1L2Info &c) {
 
 SL1L2Info & SL1L2Info::operator=(const SL1L2Info &c) {
 
-   if(this == &c) return(*this);
+   if(this == &c) return *this;
 
    assign(c);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1165,7 +1165,7 @@ SL1L2Info & SL1L2Info::operator+=(const SL1L2Info &c) {
 
    assign(s_info);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1346,11 +1346,11 @@ VL1L2Info::VL1L2Info(const VL1L2Info &c) {
 
 VL1L2Info & VL1L2Info::operator=(const VL1L2Info &c) {
 
-   if(this == &c) return(*this);
+   if(this == &c) return *this;
 
    assign(c);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1400,7 +1400,7 @@ VL1L2Info & VL1L2Info::operator+=(const VL1L2Info &c) {
 
    assign(v_info);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2027,7 +2027,7 @@ double VL1L2Info::get_stat(const char *stat_name) {
       exit(1);
    }
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2059,11 +2059,11 @@ NBRCTSInfo::NBRCTSInfo(const NBRCTSInfo &c) {
 
 NBRCTSInfo & NBRCTSInfo::operator=(const NBRCTSInfo &c) {
 
-   if(this == &c) return(*this);
+   if(this == &c) return *this;
 
    assign(c);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2141,11 +2141,11 @@ NBRCNTInfo::NBRCNTInfo(const NBRCNTInfo &c) {
 
 NBRCNTInfo & NBRCNTInfo::operator=(const NBRCNTInfo &c) {
 
-   if(this == &c) return(*this);
+   if(this == &c) return *this;
 
    assign(c);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2214,7 +2214,7 @@ NBRCNTInfo & NBRCNTInfo::operator+=(const NBRCNTInfo &c) {
 
    assign(n_info);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2354,11 +2354,11 @@ ISCInfo::ISCInfo(const ISCInfo &c) {
 
 ISCInfo & ISCInfo::operator=(const ISCInfo &c) {
 
-   if(this == &c) return(*this);
+   if(this == &c) return *this;
 
    assign(c);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2596,11 +2596,11 @@ PCTInfo::PCTInfo(const PCTInfo &c) {
 
 PCTInfo & PCTInfo::operator=(const PCTInfo &c) {
 
-   if(this == &c) return(*this);
+   if(this == &c) return *this;
 
    assign(c);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2808,11 +2808,11 @@ GRADInfo::GRADInfo(const GRADInfo &c) {
 
 GRADInfo & GRADInfo::operator=(const GRADInfo &c) {
 
-   if(this == &c) return(*this);
+   if(this == &c) return *this;
 
    assign(c);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2841,7 +2841,7 @@ GRADInfo & GRADInfo::operator+=(const GRADInfo &c) {
 
    assign(g_info);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2897,7 +2897,7 @@ double GRADInfo::s1() const {
       v = 100.0 * egbar / mgbar;
    }
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2912,7 +2912,7 @@ double GRADInfo::s1_og() const {
       v = 100.0 * egbar / ogbar;
    }
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2927,7 +2927,7 @@ double GRADInfo::fgog_ratio() const {
       v = fgbar / ogbar;
    }
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -3023,11 +3023,11 @@ DMAPInfo::DMAPInfo(const DMAPInfo &c) {
 
 DMAPInfo & DMAPInfo::operator=(const DMAPInfo &c) {
 
-   if(this == &c) return(*this);
+   if(this == &c) return *this;
 
    assign(c);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -3124,7 +3124,7 @@ double DMAPInfo::fbias() const {
    if(oy == 0) v = bad_data_double;
    else        v = (double) fy / oy;
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -3356,7 +3356,7 @@ int parse_message_type(const char *msg_typ_str, char **&msg_typ_arr) {
    n = num_tokens(msg_typ_str, " ");
 
    // Check for no tokens in string
-   if(n == 0) return(0);
+   if(n == 0) return 0;
 
    // Allocate space for the list of tokens
    msg_typ_arr = new char * [n];
@@ -3373,7 +3373,7 @@ int parse_message_type(const char *msg_typ_str, char **&msg_typ_arr) {
       msg_typ_arr[i] = m_strcpy2(c, method_name, a_var_name);
    }
 
-   return(n);
+   return n;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -3389,7 +3389,7 @@ int parse_dbl_list(const char *dbl_str, double *&dbl_arr) {
    n = num_tokens(dbl_str, " ");
 
    // Check for no tokens in string
-   if(n == 0) return(0);
+   if(n == 0) return 0;
 
    // Allocate space for the list of tokens
    dbl_arr = new double [n];
@@ -3400,7 +3400,7 @@ int parse_dbl_list(const char *dbl_str, double *&dbl_arr) {
    // Tokenize the string and store the double values
    for(int i=0; i<n; i++) dbl_arr[i] = atof(strtok_r(tmp_str, " ", &temp_ptr));
 
-   return(n);
+   return n;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -3416,7 +3416,7 @@ int parse_int_list(const char *int_str, int *&int_arr) {
    n = num_tokens(int_str, " ");
 
    // Check for no tokens in string
-   if(n == 0) return(0);
+   if(n == 0) return 0;
 
    // Allocate space for the list of tokens
    int_arr = new int [n];
@@ -3427,7 +3427,7 @@ int parse_int_list(const char *int_str, int *&int_arr) {
    // Tokenize the string and store the integer values
    for(int i=0; i<n; i++) int_arr[i] = nint(atof(strtok_r(tmp_str, " ", &temp_ptr)));
 
-   return(n);
+   return n;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -3435,12 +3435,12 @@ int parse_int_list(const char *int_str, int *&int_arr) {
 int max_int(const int *v_int, int n) {
    int i, v_max;
 
-   if(n <= 0) return(0);
+   if(n <= 0) return 0;
 
    v_max = v_int[0];
    for(i=1; i<n; i++) if(v_int[i] > v_max) v_max = v_int[i];
 
-   return(v_max);
+   return v_max;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -3448,12 +3448,12 @@ int max_int(const int *v_int, int n) {
 int min_int(const int *v_int, int n) {
    int i, v_min;
 
-   if(n <= 0) return(0);
+   if(n <= 0) return 0;
 
    v_min = v_int[0];
    for(i=1; i<n; i++) if(v_int[i] < v_min) v_min = v_int[i];
 
-   return(v_min);
+   return v_min;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -3475,7 +3475,7 @@ double compute_variance(double sum, double sum_sq, int n) {
       else if(v < 0)         v = bad_data_double;
    }
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -3512,7 +3512,7 @@ double compute_corr(double f, double o, double ff, double oo, double fo,
       else if(c < -1) c = -1.0;
    }
 
-   return(c);
+   return c;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -3539,7 +3539,7 @@ double compute_anom_corr_uncntr(double ffa, double ooa, double foa) {
       else if(c < -1) c = -1.0;
    }
 
-   return(c);
+   return c;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -3560,7 +3560,7 @@ double compute_afss(double f_rate, double o_rate) {
       afss = num/den;
    }
 
-   return(afss);
+   return afss;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -3627,7 +3627,7 @@ int compute_rank(const DataPlane &dp, DataPlane &dp_rank, double *data_rank, int
    if(data)      { delete [] data;      data = (double *) nullptr;  }
    if(data_loc)  { delete [] data_loc;  data_loc = (int *) nullptr; }
 
-   return(n);
+   return n;
 }
 
 ////////////////////////////////////////////////////////////////////////

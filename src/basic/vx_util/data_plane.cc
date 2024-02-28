@@ -64,11 +64,11 @@ DataPlane::DataPlane(const DataPlane &d) {
 
 DataPlane & DataPlane::operator=(const DataPlane &d) {
 
-   if(this == &d) return(*this);
+   if(this == &d) return *this;
 
    assign(d);
 
-   return(*this);
+   return *this;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -93,7 +93,7 @@ DataPlane & DataPlane::operator+=(const DataPlane &d) {
       Data[i] = v;
    }
 
-   return(*this);
+   return *this;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -113,7 +113,7 @@ DataPlane & DataPlane::operator/=(const double v) {
       if(!is_bad_data(Data[i])) Data[i] /= v;
    }
 
-   return(*this);
+   return *this;
 }
 
 bool DataPlane::operator==(const DataPlane &d) const {
@@ -451,7 +451,7 @@ int DataPlane::n_good_data() const {
       if(!is_bad_data(Data[j])) n++;
    }
 
-   return(n);
+   return n;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -640,7 +640,7 @@ int DataPlane::two_to_one(int x, int y, bool to_north) const {
 
    n = (to_north ? y : (Ny-1-y))*Nx + x;    //  don't change this!  lots of downstream code depends on this!
 
-   return(n);
+   return n;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -680,15 +680,15 @@ bool DataPlane::f_is_on(int x, int y) const {
    // Return true if any corner of that box is non-zero.
    //
 
-   if( s_is_on(x, y) )                                return(true);
+   if( s_is_on(x, y) )                                return true;
 
-   if( (x > 0) && s_is_on(x - 1, y) )                 return(true);
+   if( (x > 0) && s_is_on(x - 1, y) )                 return true;
 
-   if( (x > 0) && (y > 0) && s_is_on(x - 1, y - 1) )  return(true);
+   if( (x > 0) && (y > 0) && s_is_on(x - 1, y - 1) )  return true;
 
-   if( (y > 0) && s_is_on(x, y - 1) )                 return(true);
+   if( (y > 0) && s_is_on(x, y - 1) )                 return true;
 
-   return(false);
+   return false;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -734,7 +734,7 @@ MaskPlane DataPlane::mask_plane() const {
       mp.buf()[i] = (is_bad_data(Data[i]) ? false : !is_eq(Data[i], 0.0));
    }
 
-   return(mp);
+   return mp;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -934,7 +934,7 @@ const unsigned int mnw = (Nx + 1)/2;
    //
 
 for (j=0; j<Nxy; ++j)  {
-   if (is_bad_data(Data[j])) return ( false );
+   if (is_bad_data(Data[j])) return false;
 }
 
    //
@@ -1030,7 +1030,7 @@ if ( b )  { delete [] b;  b = 0; }
 if ( xa )  { delete [] xa;  xa = 0; }
 if ( xb )  { delete [] xb;  xb = 0; }
 
-return(true);
+return true;
 
 }
 
@@ -1060,7 +1060,7 @@ const int unsigned mnw = (Nx + 1)/2;
    //
 
 for (i=0; i<Nxy; ++i)  {
-   if (is_bad_data(Data[i])) return ( false );
+   if (is_bad_data(Data[i])) return false;
 }
 
    //
@@ -1187,7 +1187,7 @@ if ( S )  { delete [] S;  S = 0; }
    //  done
    //
 
-return(true);
+return true;
 
 }
 
@@ -1247,11 +1247,11 @@ DataPlaneArray & DataPlaneArray::operator=(const DataPlaneArray & a)
 
 {
 
-if ( this == &a )  return ( * this );
+if ( this == &a )  return *this;
 
 assign(a);
 
-return ( * this );
+return *this;
 
 }
 
@@ -1284,7 +1284,7 @@ DataPlaneArray & DataPlaneArray::operator+=(const DataPlaneArray &d) {
       *Plane[i] += *d.Plane[i];
    }
 
-   return(*this);
+   return *this;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1293,7 +1293,7 @@ DataPlaneArray & DataPlaneArray::operator/=(const double v) {
 
    for(int i=0; i<Nplanes; i++) *Plane[i] /= v;
 
-   return(*this);
+   return *this;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1522,7 +1522,7 @@ if ( (p < 0) || (p >= Nplanes) )  {
 
 double value = Plane[p]->get(x, y);
 
-return ( value );
+return value;
 
 }
 

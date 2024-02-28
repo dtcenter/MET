@@ -62,11 +62,11 @@ PairDataEnsemble::PairDataEnsemble(const PairDataEnsemble &pd) {
 
 PairDataEnsemble & PairDataEnsemble::operator=(const PairDataEnsemble &pd) {
 
-   if(this == &pd) return(*this);
+   if(this == &pd) return *this;
 
    assign(pd);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -304,7 +304,7 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
 ////////////////////////////////////////////////////////////////////////
 
 bool PairDataEnsemble::has_obs_error() const {
-   return(obs_error_flag);
+   return obs_error_flag;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -830,7 +830,7 @@ void PairDataEnsemble::compute_ssvar() {
 PairDataEnsemble PairDataEnsemble::subset_pairs_obs_thresh(const SingleThresh &ot) const {
 
    // Check for no work to be done
-   if(ot.get_type() == thresh_na) return(*this);
+   if(ot.get_type() == thresh_na) return *this;
 
    int i, j;
    PairDataEnsemble pd;
@@ -912,7 +912,7 @@ PairDataEnsemble PairDataEnsemble::subset_pairs_obs_thresh(const SingleThresh &o
         << " ensemble pairs for observation filtering threshold "
         << ot.get_str() << ".\n";
 
-   return(pd);
+   return pd;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -944,11 +944,11 @@ VxPairDataEnsemble::VxPairDataEnsemble(const VxPairDataEnsemble &vx_pd) {
 
 VxPairDataEnsemble & VxPairDataEnsemble::operator=(const VxPairDataEnsemble &vx_pd) {
 
-   if(this == &vx_pd) return(*this);
+   if(this == &vx_pd) return *this;
 
    assign(vx_pd);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1843,7 +1843,7 @@ int VxPairDataEnsemble::get_n_pair() const {
       }
    }
 
-   return(n);
+   return n;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1970,7 +1970,7 @@ double compute_crps_emp(double obs, const NumArray &ens_na) {
    evals.sort_array();
 
    // Check for bad or no data
-   if(is_bad_data(obs) || evals.n() == 0) return(bad_data_double);
+   if(is_bad_data(obs) || evals.n() == 0) return bad_data_double;
 
    // Initialize
    double obs_cdf  = 0.0;
@@ -1997,7 +1997,7 @@ double compute_crps_emp(double obs, const NumArray &ens_na) {
    // Handle obs being >= all ensemble members
    if(is_eq(obs_cdf, 0.0)) integral += (obs - fcst);
 
-   return(integral);
+   return integral;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2017,7 +2017,7 @@ double compute_crps_gaus(double obs, double m, double s) {
       v = s*(z*(2.0*znorm(z) - 1) + 2.0*dnorm(z) - 1.0/sqrt(pi));
    }
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2036,7 +2036,7 @@ double compute_ens_ign(double obs, double m, double s) {
       v = 0.5*log(2.0*pi*s*s) + (obs - m)*(obs - m)/(2.0*s*s);
    }
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2055,7 +2055,7 @@ double compute_ens_pit(double obs, double m, double s) {
       v = normal_cdf(obs, m, s);
    }
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2109,7 +2109,7 @@ double compute_bias_ratio(double me_ge_obs, double me_lt_obs) {
       v = me_ge_obs / abs(me_lt_obs);
    }
 
-   return(v);
+   return v;
 }
             
 ////////////////////////////////////////////////////////////////////////

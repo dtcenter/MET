@@ -80,7 +80,7 @@ Grid parse_vx_grid(const RegridInfo info, const Grid *fgrid, const Grid *ogrid) 
    mlog << Debug(3)
         << "Grid Definition: " << vx_grid.serialize() << "\n";
 
-   return(vx_grid);
+   return vx_grid;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -125,7 +125,7 @@ Grid parse_grid_string(const char *grid_str) {
       if(met_ptr) { delete met_ptr; met_ptr = 0; }
    }
 
-   return(grid);
+   return grid;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -683,7 +683,7 @@ DataPlane parse_geog_data(Dictionary *dict, const Grid &vx_grid,
       exit(1);
    }
 
-   return(dp);
+   return dp;
 }
 
 ////////////////////////////////////////////////////////////////////////

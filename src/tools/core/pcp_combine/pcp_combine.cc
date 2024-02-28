@@ -816,7 +816,7 @@ int search_pcp_dir(const char *cur_dir, const unixtime cur_ut,
 
    if(dp) met_closedir(dp);
 
-   return(i_rec);
+   return i_rec;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1488,17 +1488,17 @@ ConcatString parse_config_str(const char *s) {
       config_str = s;
    }
 
-   return(config_str);
+   return config_str;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool is_timestring(const char * text) {
 
-   if(is_hh(text))     return(true);
-   if(is_hhmmss(text)) return(true);
+   if(is_hh(text))     return true;
+   if(is_hhmmss(text)) return true;
 
-   return(false);
+   return false;
 }
 
 ////////////////////////////////////////////////////////////////////////

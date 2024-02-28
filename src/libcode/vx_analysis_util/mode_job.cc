@@ -91,11 +91,11 @@ BasicModeAnalysisJob & BasicModeAnalysisJob::operator=(const BasicModeAnalysisJo
 
 {
 
-if ( this == &aj )  return ( * this );
+if ( this == &aj )  return *this;
 
 assign_basic_job(aj);
 
-return ( * this );
+return *this;
 
 }
 
@@ -412,11 +412,11 @@ SummaryJob & SummaryJob::operator=(const SummaryJob & job)
 
 {
 
-if ( this == &job )  return ( * this );
+if ( this == &job )  return *this;
 
 assign(job);
 
-return ( * this );
+return *this;
 
 }
 
@@ -740,11 +740,11 @@ ByCaseJob & ByCaseJob::operator=(const ByCaseJob & job)
 
 {
 
-if ( this == &job )  return ( * this );
+if ( this == &job )  return *this;
 
 assign(job);
 
-return ( * this );
+return *this;
 
 }
 

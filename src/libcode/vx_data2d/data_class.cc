@@ -199,7 +199,7 @@ if ( ! Dest_Grid )  {
 
 }
 
-return ( *Dest_Grid );
+return *Dest_Grid;
 
 }
 
@@ -220,7 +220,7 @@ if ( ! Raw_Grid )  {
 
 }
 
-return ( *Raw_Grid );
+return *Raw_Grid;
 
 }
 
@@ -344,7 +344,7 @@ for(int i=0; i<vi_list.size(); i++) {
 
 }
 
-return ( n_valid );
+return n_valid;
 
 }
 
@@ -356,7 +356,7 @@ bool Met2dDataFile::process_data_plane(VarInfo *vinfo, DataPlane &dp)
 
 {
 
-if ( ! vinfo )  return ( false );
+if ( ! vinfo )  return false;
 
    //
    // Check for no valid input data
@@ -426,7 +426,7 @@ if ( mlog.verbosity_level() >= 4 ) {
 
 }
 
-return ( true );
+return true;
 
 }
 

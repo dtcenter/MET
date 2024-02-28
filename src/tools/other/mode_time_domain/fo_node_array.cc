@@ -78,11 +78,11 @@ FO_Node_Array & FO_Node_Array::operator=(const FO_Node_Array & a)
 
 {
 
-if ( this == &a )  return ( * this );
+if ( this == &a )  return *this;
 
 assign(a);
 
-return ( * this );
+return *this;
 
 }
 
@@ -292,7 +292,7 @@ if ( (N < 0) || (N >= Nelements) )  {
    exit ( 1 );
 }
 
-return ( e[N] );
+return e[N];
 
 }
 

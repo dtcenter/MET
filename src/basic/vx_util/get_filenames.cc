@@ -84,7 +84,7 @@ for (j=0; j<N; ++j)  {
 
 }
 
-return ( a );
+return a;
 
 }
 
@@ -105,7 +105,7 @@ struct stat sbuf;
    mlog << Warning << "\nget_filenames() -> "
         << "can't stat \"" << search_dir << "\"\n\n";
 
-   return ( a );
+   return a;
 
 }
 
@@ -152,7 +152,7 @@ if ( S_ISDIR(sbuf.st_mode) )  {
    }
 }
 
-return ( a );
+return a;
 
 }
 
@@ -232,7 +232,7 @@ while ( (entry = readdir(directory)) != nullptr )  {
 
 closedir(directory);  directory = (DIR *) nullptr;
 
-return ( a );
+return a;
 
 }
 
@@ -272,7 +272,7 @@ if ( keep && suffix ) {
 
 }
 
-return(keep);
+return keep;
 
 }
 

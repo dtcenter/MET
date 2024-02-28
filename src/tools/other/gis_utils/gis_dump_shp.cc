@@ -116,7 +116,7 @@ f.header()->dump(cout, 1);
 
 cout << '\n' << flush;
 
-if ( header_only )   return ( 0 );
+if ( header_only )   return 0;
 
    //
    //  records
@@ -150,7 +150,7 @@ switch ( shape_type )  {
 
 f.close();
 
-return ( 0 );
+return 0;
 
 }
 

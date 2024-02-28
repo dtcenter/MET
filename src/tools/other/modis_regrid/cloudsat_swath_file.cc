@@ -96,11 +96,11 @@ SatDimension & SatDimension::operator=(const SatDimension & d)
 
 {
 
-if ( this == &d )  return ( * this );
+if ( this == &d )  return *this;
 
 assign(d);
 
-return ( * this );
+return *this;
 
 }
 
@@ -266,11 +266,11 @@ SatAttribute & SatAttribute::operator=(const SatAttribute & a)
 
 {
 
-if ( this == &a )  return ( * this );
+if ( this == &a )  return *this;
 
 assign(a);
 
-return ( * this );
+return *this;
 
 }
 
@@ -641,11 +641,11 @@ SwathDataField & SwathDataField::operator=(const SwathDataField & df)
 
 {
 
-if ( this == &df )  return ( * this );
+if ( this == &df )  return *this;
 
 assign(df);
 
-return ( * this );
+return *this;
 
 }
 
@@ -891,7 +891,7 @@ if ( (k < 0) || (k >= Ndimensions) )  {
 
 int m = Dimensions[k]->size();
 
-return ( m );
+return m;
 
 }
 
@@ -949,11 +949,11 @@ CloudsatSwath & CloudsatSwath::operator=(const CloudsatSwath & s)
 
 {
 
-if ( this == &s )  return ( * this );
+if ( this == &s )  return *this;
 
 assign(s);
 
-return ( * this );
+return *this;
 
 }
 
@@ -1709,7 +1709,7 @@ for (j=0; j<Ndimensions; ++j)  {
 
 }
 
-return ( d );
+return d;
 
 }
 
@@ -1783,7 +1783,7 @@ if ( SWreadfield(SwathId, (char *) "Latitude", &start, 0, &edge, buf) < 0 )  {
 
 x = (double) (F[0]);
 
-return ( x );
+return x;
 
 }
 
@@ -1829,7 +1829,7 @@ x = (double) (F[0]);
 
 x = -x;   //  west longitude postitve
 
-return ( x );
+return x;
 
 }
 
@@ -1877,7 +1877,7 @@ if ( SWreadfield(SwathId, (char *) "Height", start, 0, edge, buf) < 0 )  {
 
 x = (double) (S[0]);
 
-return ( x );
+return x;
 
 }
 
@@ -1928,7 +1928,7 @@ x = (double) (S[0]);
 
 x *= 0.001;
 
-return ( x );
+return x;
 
 }
 
@@ -2083,7 +2083,7 @@ if ( (FileId = SWopen((char *) _filename, DFACC_READ)) < 0 )  {
 
    close();
 
-   return ( false );
+   return false;
 
 }
 
@@ -2100,7 +2100,7 @@ if ( SWinqswath((char *) _filename, (char *) buf, &size) < 0 )  {
 
    close();
 
-   return ( false );
+   return false;
 
 }
 
@@ -2121,7 +2121,7 @@ for (j=0; j<Nswaths; ++j)  {
 
       close();
 
-      return ( false );
+      return false;
 
    }
 
@@ -2143,7 +2143,7 @@ for (j=0; j<Nswaths; ++j)  {
    //  done
    //
 
-return ( true );
+return true;
 
 }
 
@@ -2193,7 +2193,7 @@ ConcatString s;
 
 if ( Filename.nonempty() )  s = get_short_name(Filename.c_str());
 
-return ( s );
+return s;
 
 }
 

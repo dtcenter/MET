@@ -155,7 +155,7 @@ close();
 
 Nc = open_ncfile(filename);
 
-if ( IS_INVALID_NC_P(Nc) )  { close();  return ( false ); }
+if ( IS_INVALID_NC_P(Nc) )  { close();  return false; }
 
    //
    //  grid
@@ -280,7 +280,7 @@ for (j=0; j<Ndims; ++j)  {
    //  done
    //
 
-return ( true );
+return true;
 
 }
 
@@ -427,7 +427,7 @@ if ( !status )  {
    //  done
    //
 
-return ( d );
+return d;
 
 }
 
@@ -619,7 +619,7 @@ plane.set_size(Nx, Ny);
    //  done
    //
 
-return ( true );
+return true;
 
 }
 
@@ -636,7 +636,7 @@ info = find_var_name(var_name);
 
 bool found = ( nullptr != info );
 
-if ( !found )  return ( false );
+if ( !found )  return false;
 
 found = data(info->var, a, plane);
 
@@ -653,7 +653,7 @@ plane.set_accum ( info->AccumTime );
    //  done
    //
 
-return ( found );
+return found;
 
 }
 

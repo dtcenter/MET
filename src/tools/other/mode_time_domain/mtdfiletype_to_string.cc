@@ -57,7 +57,7 @@ switch ( t )  {
 }   //  switch
 
 
-return ( ConcatString (s) );
+return ConcatString(s);
 
 }
 
@@ -69,16 +69,16 @@ bool string_to_mtdfiletype(const char * text, MtdFileType & t)
 
 {
 
-     if ( strcmp(text, "mtd_file_raw"    ) == 0 )   { t = mtd_file_raw;       return ( true ); }
-else if ( strcmp(text, "mtd_file_conv"   ) == 0 )   { t = mtd_file_conv;      return ( true ); }
-else if ( strcmp(text, "mtd_file_mask"   ) == 0 )   { t = mtd_file_mask;      return ( true ); }
-else if ( strcmp(text, "mtd_file_object" ) == 0 )   { t = mtd_file_object;    return ( true ); }
-else if ( strcmp(text, "no_mtd_file_type") == 0 )   { t = no_mtd_file_type;   return ( true ); }
+     if ( strcmp(text, "mtd_file_raw"    ) == 0 )   { t = mtd_file_raw;       return true; }
+else if ( strcmp(text, "mtd_file_conv"   ) == 0 )   { t = mtd_file_conv;      return true; }
+else if ( strcmp(text, "mtd_file_mask"   ) == 0 )   { t = mtd_file_mask;      return true; }
+else if ( strcmp(text, "mtd_file_object" ) == 0 )   { t = mtd_file_object;    return true; }
+else if ( strcmp(text, "no_mtd_file_type") == 0 )   { t = no_mtd_file_type;   return true; }
    //
    //  nope
    //
 
-return ( false );
+return false;
 
 }
 

@@ -1333,7 +1333,7 @@ Box valid_xy_bb(const ShapeData * wd_ptr, const Grid & grid)
 
    bb.set_lrbt(L, R, B, T);
 
-   return ( bb );
+   return bb;
 
 }
 

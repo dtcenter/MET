@@ -247,7 +247,7 @@ result = s->top();
 
 s->pop();
 
-return ( result );
+return result;
 
 }
 

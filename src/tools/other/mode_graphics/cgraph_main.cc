@@ -377,7 +377,7 @@ if ( error )   {
    //  done
    //
 
-// return ( true );
+// return true;
 return;
 
 }
@@ -657,7 +657,7 @@ if ( !CurrentFont )  {
 }
 
 
-return ( CurrentFont->scaled_ps_size );
+return CurrentFont->scaled_ps_size;
 
 }
 
@@ -732,7 +732,7 @@ if ( error )  {
    //  done
    //
 
-return ( face );
+return face;
 
 }
 
@@ -1500,7 +1500,7 @@ Color c(0, 0, 0);
 
 if ( CS.depth() > 0 )  c = CS.peek();
 
-return ( c );
+return c;
 
 }
 
@@ -2164,7 +2164,7 @@ info->cgraph->moveto(x, y);
 
 info->have_path = true;
 
-return ( 0 );
+return 0;
 
 }
 
@@ -2187,7 +2187,7 @@ info->cgraph->lineto(x, y);
 
 info->have_path = true;
 
-return ( 0 );
+return 0;
 
 }
 
@@ -2230,7 +2230,7 @@ info->cgraph->curveto(x1, y1, x2, y2, x3, y3);
 
 info->have_path = true;
 
-return ( 0 );
+return 0;
 
 }
 

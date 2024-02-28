@@ -51,11 +51,11 @@ TCPoly::TCPoly(const TCPoly & p) {
 
 TCPoly & TCPoly::operator=(const TCPoly & p) {
 
-   if(this == &p) return(*this);
+   if(this == &p) return *this;
 
    assign(p);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -125,7 +125,7 @@ double TCPoly::min_dist(double lat, double lon) const {
       if(GnomonXY.is_inside(x, y)) dmin *= -1.0;
    }
 
-   return(dmin);
+   return dmin;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -157,11 +157,11 @@ TCPolyArray::TCPolyArray(const TCPolyArray & a) {
 
 TCPolyArray & TCPolyArray::operator=(const TCPolyArray & a) {
 
-   if(this == &a) return(*this);
+   if(this == &a) return *this;
 
    assign(a);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -254,7 +254,7 @@ TCPoly TCPolyArray::operator[](int n) const {
       exit(1);
    }
 
-   return(Poly[n]);
+   return Poly[n];
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -292,7 +292,7 @@ bool TCPolyArray::add_file(const char *filename) {
         << "Read " << n << " TC land regions from file: "
         << filename << "\n";
    
-   return(true);
+   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -341,7 +341,7 @@ double TCPolyArray::min_dist(double lat, double lon, int &imin) const {
       if(dcur < dmin)       { dmin = dcur; imin = i; }
    }
 
-   return(dmin);
+   return dmin;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -362,7 +362,7 @@ bool operator>>(istream & in, TCPoly & p) {
    char name[9];
 
    // Read the map region meta data
-   if(!line.read_line(in)) return (false);
+   if(!line.read_line(in)) return false;
 
    // Split up the meta data line
    a = line.split(" ");
@@ -383,7 +383,7 @@ bool operator>>(istream & in, TCPoly & p) {
 
    // Parse the lat/lon data lines
    for(i=0; i<n; i++) {
-      if(!line.read_line(in)) return (false);
+      if(!line.read_line(in)) return false;
       a = line.split(" ");
       // Convert from degrees east to west
       p.LatLon.add_point(rescale_lon(-1.0*atof(a[0].c_str())), atof(a[1].c_str()));
@@ -408,7 +408,7 @@ bool operator>>(istream & in, TCPoly & p) {
       p.GnomonXY.add_point(x, y);
    }
 
-   return(true);
+   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////

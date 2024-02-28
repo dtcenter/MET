@@ -72,20 +72,20 @@ bool string_to_tokentype(const char * text, TokenType & t)
 
 {
 
-     if ( strcmp(text, "tok_union"       ) == 0 )   { t = tok_union;          return ( true ); }
-else if ( strcmp(text, "tok_intersection") == 0 )   { t = tok_intersection;   return ( true ); }
-else if ( strcmp(text, "tok_negation"    ) == 0 )   { t = tok_negation;       return ( true ); }
-else if ( strcmp(text, "tok_local_var"   ) == 0 )   { t = tok_local_var;      return ( true ); }
-else if ( strcmp(text, "tok_mark"        ) == 0 )   { t = tok_mark;           return ( true ); }
+     if ( strcmp(text, "tok_union"       ) == 0 )   { t = tok_union;          return true; }
+else if ( strcmp(text, "tok_intersection") == 0 )   { t = tok_intersection;   return true; }
+else if ( strcmp(text, "tok_negation"    ) == 0 )   { t = tok_negation;       return true; }
+else if ( strcmp(text, "tok_local_var"   ) == 0 )   { t = tok_local_var;      return true; }
+else if ( strcmp(text, "tok_mark"        ) == 0 )   { t = tok_mark;           return true; }
 
-else if ( strcmp(text, "tok_unmark"      ) == 0 )   { t = tok_unmark;         return ( true ); }
-else if ( strcmp(text, "tok_eof"         ) == 0 )   { t = tok_eof;            return ( true ); }
-else if ( strcmp(text, "no_token_type"   ) == 0 )   { t = no_token_type;      return ( true ); }
+else if ( strcmp(text, "tok_unmark"      ) == 0 )   { t = tok_unmark;         return true; }
+else if ( strcmp(text, "tok_eof"         ) == 0 )   { t = tok_eof;            return true; }
+else if ( strcmp(text, "no_token_type"   ) == 0 )   { t = no_token_type;      return true; }
    //
    //  nope
    //
 
-return ( false );
+return false;
 
 }
 

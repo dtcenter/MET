@@ -353,7 +353,7 @@ ConcatString StatHdrColumns::get_fcst_thresh_str() const {
          cs << setlogic_to_symbol(thresh_logic);
       }
    }
-   return(cs);
+   return cs;
 }
 
 ////////////////////////////////////////////////////////////////////////

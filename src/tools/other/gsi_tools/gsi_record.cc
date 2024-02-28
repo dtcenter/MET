@@ -77,7 +77,7 @@ GsiRecord & GsiRecord::operator=(const GsiRecord & g)
 
 {
 
-if ( this == &g )  return ( * this );
+if ( this == &g )  return *this;
 
 gsi_assign(g);
 

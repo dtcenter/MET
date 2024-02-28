@@ -83,7 +83,7 @@ out.censor(info.censor_thresh, info.censor_val);
    //  done
    //
 
-return ( out );
+return out;
 
 }
 
@@ -101,7 +101,7 @@ ri.method = InterpMthd_Nearest;
 ri.width  = 1;
 ri.shape  = GridTemplateFactory::GridTemplate_Square;
 
-return ( met_regrid_generic(from_data, from_grid, to_grid, ri) );
+return met_regrid_generic(from_data, from_grid, to_grid, ri);
 
 }
 
@@ -165,7 +165,7 @@ for (xt=0; xt<(to_grid.nx()); ++xt)  {
    //  done
    //
 
-return ( to_data );
+return to_data;
 
 }
 
@@ -268,7 +268,7 @@ for (xt=0; xt<(to_grid.nx()); ++xt)  {
    //  done
    //
 
-return ( to_data );
+return to_data;
 
 }
 
@@ -296,7 +296,7 @@ if ( from_grid.nx() != to_grid.nx() || from_grid.ny() != to_grid.ny() ) {
 
 }
 
-return ( from_data );
+return from_data;
 
 }
 
@@ -358,7 +358,7 @@ for (xt=0; xt<(to_grid.nx()); ++xt)  {
 
 interp_gaussian_dp(to_data, info.gaussian, info.vld_thresh);
 
-return ( to_data );
+return to_data;
 
 }
 

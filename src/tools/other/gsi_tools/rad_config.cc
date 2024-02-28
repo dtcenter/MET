@@ -128,11 +128,11 @@ clear();
 
 const bool status = Config.read(filename);
 
-if ( ! status )  return ( status );
+if ( ! status )  return status;
 
 get_config_data();
 
-return ( status );
+return status;
 
 }
 

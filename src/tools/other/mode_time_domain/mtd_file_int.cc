@@ -95,11 +95,11 @@ MtdIntFile & MtdIntFile::operator=(const MtdIntFile & f)
 
 {
 
-if ( this == &f )  return ( * this );
+if ( this == &f )  return *this;
 
 int_assign(f);
 
-return ( * this );
+return *this;
 
 }
 
@@ -403,13 +403,13 @@ bool MtdIntFile::read(const char * _filename)
 
 NcFile f(_filename, NcFile::read);
 
-if ( IS_INVALID_NC(f) )  return ( false );
+if ( IS_INVALID_NC(f) )  return false;
 
 Filename = _filename;
 
 MtdIntFile::read(f);
 
-return ( true );
+return true;
 
 }
 
@@ -736,7 +736,7 @@ f.DataMax = fmax;
    //  done
    //
 
-return ( f );
+return f;
 
 }
 
@@ -813,7 +813,7 @@ f.set_volumes(1, &vol);
    //  done
    //
 
-return ( f );
+return f;
 
 }
 
@@ -1195,7 +1195,7 @@ n_shapes = p.n_elements();
    //  done
    //
 
-return ( q );
+return q;
 
 }
 
@@ -1276,7 +1276,7 @@ if ( (k < 0) || (k >= Nobjects) )  {
 }
 
 
-return ( ObjVolume[k] );
+return ObjVolume[k];
 
 }
 
@@ -1301,7 +1301,7 @@ int sum = 0;
 
 for (j=0; j<Nobjects; ++j)  sum += ObjVolume[j];
 
-return ( sum );
+return sum;
 
 }
 
@@ -1679,7 +1679,7 @@ V[0] = v;
 
 s.set_volumes(1, V);
 
-return ( s );
+return s;
 
 }
 
@@ -1743,7 +1743,7 @@ s.set_volumes(1, V);
 
 if ( yesno )  { delete [] yesno;  yesno = 0; }
 
-return ( s );
+return s;
 
 }
 
@@ -1767,12 +1767,12 @@ int x;
 
 for (x=0; x<Nx; ++x)  {
 
-   if ( Data[mtd_three_to_one(Nx, Ny, Nt, x, y, 0)] )  return ( x );
+   if ( Data[mtd_three_to_one(Nx, Ny, Nt, x, y, 0)] )  return x;
 
 }
 
 
-return ( -1 );
+return -1;
 
 }
 
@@ -1796,12 +1796,12 @@ int x;
 
 for (x=(Nx - 1); x>=0; --x)  {
 
-   if ( Data[mtd_three_to_one(Nx, Ny, Nt, x, y, 0)] )  return ( x );
+   if ( Data[mtd_three_to_one(Nx, Ny, Nt, x, y, 0)] )  return x;
 
 }
 
 
-return ( -1 );
+return -1;
 
 }
 
@@ -1861,7 +1861,7 @@ for (t=0; t<Nt; ++t)  {
 
 m.IsCentralized = false;
 
-return ( m );
+return m;
 
 }
 
@@ -1913,7 +1913,7 @@ for (y=0; y<Ny; ++y)  {
 
 m.IsCentralized = false;
 
-return ( m );
+return m;
 
 }
 
@@ -2037,7 +2037,7 @@ for (t=0; t<(mask.nt()); ++t)  {
    //  done
    //
 
-return ( rv );
+return rv;
 
 }
 

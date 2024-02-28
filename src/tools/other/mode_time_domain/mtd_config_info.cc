@@ -852,7 +852,7 @@ bool MtdNcOutInfo::all_false() const
 // bool status = do_latlon || do_raw || do_object_raw || do_object_id || do_cluster_id || do_polylines;
    bool status = do_latlon || do_raw ||                  do_object_id || do_cluster_id;
 
-return ( !status );
+return !status;
 
 }
 

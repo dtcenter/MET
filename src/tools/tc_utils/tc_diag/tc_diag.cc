@@ -133,7 +133,7 @@ int met_main(int argc, char *argv[]) {
    // Process the output files
    process_out_files(tracks);
 
-   return(0);
+   return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -521,7 +521,7 @@ bool is_keeper(const ATCFLineBase * line) {
    }
 
    // Return the keep status
-   return(keep);
+   return keep;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -670,7 +670,7 @@ ConcatString get_out_key(const TrackInfo &track) {
       << track.technique() << "_"
       << unix_to_yyyymmddhh(track.init());
 
-   return(cs);
+   return cs;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -686,7 +686,7 @@ ConcatString get_tmp_key(const TrackInfo &track,
       << point.lead() /sec_per_hour << "_"
       << domain;
 
-   return(cs);
+   return cs;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -703,7 +703,7 @@ ConcatString build_tmp_file_name(const TrackInfo *trk_ptr,
       << "/tmp_" << program_name << "_"
       << get_tmp_key(*trk_ptr, *pnt_ptr, domain);
 
-   return(make_temp_file_name(cs.text(), ".nc"));
+   return make_temp_file_name(cs.text(), ".nc");
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -774,7 +774,7 @@ ConcatString build_out_file_name(const TrackInfo *trk_ptr,
 
    } // end while
 
-   return(cs);
+   return cs;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1429,7 +1429,7 @@ void OutFileInfo::clear() {
 
 NcFile *OutFileInfo::setup_nc_file(const string &out_file) {
 
-   if(!trk_ptr) return(nullptr);
+   if(!trk_ptr) return nullptr;
 
    // Open the output NetCDF file
    NcFile *nc_out = open_ncfile(out_file.c_str(), true);
@@ -1458,7 +1458,7 @@ NcFile *OutFileInfo::setup_nc_file(const string &out_file) {
    write_tc_times(nc_out, vld_dim,
                   trk_ptr, nullptr);
 
-   return(nc_out);
+   return nc_out;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2061,7 +2061,7 @@ string OutFileInfo::get_diag_units(const string &s) {
       units = na_str;
    }
 
-   return(units);
+   return units;
 }
 
 ////////////////////////////////////////////////////////////////////////

@@ -72,7 +72,7 @@ while ( in.getline(line, sizeof(line)) )  {
 
 in.close();
 
-return ( 0 );
+return 0;
 
 }
 

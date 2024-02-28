@@ -176,7 +176,7 @@ int met_main(int argc, char * argv []) {
    // Write the output
    write_orank();
 
-   return(0);
+   return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -775,7 +775,7 @@ bool has_key(const ConcatString &key) {
          found_key = true;
       }
    }
-   return(found_key);
+   return found_key;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -796,7 +796,7 @@ bool has_key(const ConcatString &key, int & index) {
          }
       }
    }
-   return(found_key);
+   return found_key;
 }
 
 ////////////////////////////////////////////////////////////////////////

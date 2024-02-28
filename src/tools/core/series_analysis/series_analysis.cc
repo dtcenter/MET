@@ -135,7 +135,7 @@ int met_main(int argc, char *argv[]) {
    // Close the text files and deallocate memory
    clean_up();
 
-   return(0);
+   return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -398,7 +398,7 @@ Met2dDataFile *get_mtddf(const StringArray &file_list,
       exit(1);
    }
 
-   return(mtddf);
+   return mtddf;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -655,7 +655,7 @@ bool read_single_entry(VarInfo *info, const ConcatString &cur_file,
    if(!file_is_ok(cur_file, type)) {
       mlog << Warning << "\nread_single_entry() -> "
            << "File does not exist: " << cur_file << "\n\n";
-      return(false);
+      return false;
    }
 
    // Open the data file
@@ -670,7 +670,7 @@ bool read_single_entry(VarInfo *info, const ConcatString &cur_file,
    // Close the data file
    delete mtddf; mtddf = (Met2dDataFile *) nullptr;
 
-   return(found);
+   return found;
 }
 
 ////////////////////////////////////////////////////////////////////////

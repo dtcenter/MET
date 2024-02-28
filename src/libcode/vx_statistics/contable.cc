@@ -85,11 +85,11 @@ ContingencyTable & ContingencyTable::operator=(const ContingencyTable & t)
 
 {
 
-if ( this == &t )  return ( * this );
+if ( this == &t )  return *this;
 
 assign(t);
 
-return ( * this );
+return *this;
 
 }
 
@@ -125,7 +125,7 @@ if ( E )  {
    for ( int i=0; i<E->size(); ++i )  (*E)[i] += (*t.E)[i];
 }
 
-return ( * this );
+return *this;
 
 }
 
@@ -562,7 +562,7 @@ n = r*Ncols + c;
 
 
 
-return ( n );
+return n;
 
 }
 
@@ -615,7 +615,7 @@ int ContingencyTable::total() const
 
 const int n = Nrows*Ncols;
 
-if ( n == 0 )  return ( 0 );
+if ( n == 0 )  return 0;
 
 int j, sum;
 
@@ -625,7 +625,7 @@ for (j=0; j<n; ++j)  sum += (*E)[j];
 
 
 
-return ( sum );
+return sum;
 
 }
 
@@ -662,7 +662,7 @@ for (col=0; col<Ncols; ++col)  {
 
 
 
-return ( sum );
+return sum;
 
 }
 
@@ -699,7 +699,7 @@ for (row=0; row<Nrows; ++row)  {
 
 
 
-return ( sum );
+return sum;
 
 }
 
@@ -716,7 +716,7 @@ int n;
 n = rc_to_n(row, col);
 
 
-return ( (*E)[n] );
+return (*E)[n];
 
 }
 
@@ -730,7 +730,7 @@ int ContingencyTable::largest_entry() const
 
 int n = Nrows*Ncols;
 
-if ( n == 0 )  return ( 0 );
+if ( n == 0 )  return 0;
 
 int j, a;
 
@@ -743,7 +743,7 @@ for (j=1; j<n; ++j)  {
 }
 
 
-return ( a );
+return a;
 
 }
 
@@ -757,7 +757,7 @@ int ContingencyTable::smallest_entry() const
 
 int n = Nrows*Ncols;
 
-if ( n == 0 )  return ( 0 );
+if ( n == 0 )  return 0;
 
 int j, a;
 
@@ -770,7 +770,7 @@ for (j=1; j<n; ++j)  {
 }
 
 
-return ( a );
+return a;
 
 }
 
@@ -880,7 +880,7 @@ t.set_entry(1, 1, sum);
    //  done
    //
 
-return ( t );
+return t;
 
 }
 
@@ -936,11 +936,11 @@ TTContingencyTable & TTContingencyTable::operator=(const TTContingencyTable & t)
 
 {
 
-if ( this == &t )  return ( * this );
+if ( this == &t )  return *this;
 
 assign(t);
 
-return ( * this );
+return *this;
 
 }
 
@@ -1068,7 +1068,7 @@ int k;
 
 k = entry(FY_row, OY_col);
 
-return ( k );
+return k;
 
 }
 
@@ -1084,7 +1084,7 @@ int k;
 
 k = entry(FY_row, ON_col);
 
-return ( k );
+return k;
 
 }
 
@@ -1100,7 +1100,7 @@ int k;
 
 k = entry(FN_row, OY_col);
 
-return ( k );
+return k;
 
 }
 
@@ -1116,7 +1116,7 @@ int k;
 
 k = entry(FN_row, ON_col);
 
-return ( k );
+return k;
 
 }
 
@@ -1132,7 +1132,7 @@ int k;
 
 k = row_total(FY_row);
 
-return ( k );
+return k;
 
 }
 
@@ -1148,7 +1148,7 @@ int k;
 
 k = row_total(FN_row);
 
-return ( k );
+return k;
 
 }
 
@@ -1164,7 +1164,7 @@ int k;
 
 k = col_total(OY_col);
 
-return ( k );
+return k;
 
 }
 
@@ -1180,7 +1180,7 @@ int k;
 
 k = col_total(ON_col);
 
-return ( k );
+return k;
 
 }
 
@@ -1196,7 +1196,7 @@ int k;
 
 k = total();
 
-return ( k );
+return k;
 
 }
 
@@ -1214,12 +1214,12 @@ double num, denom;
 N = fy();
 D = n();
 
-if ( D == 0 )  return ( bad_data_double );
+if ( D == 0 )  return bad_data_double;
 
 num   = (double) N;
 denom = (double) D;
 
-return ( num/denom );
+return num/denom;
 
 }
 
@@ -1237,12 +1237,12 @@ double num, denom;
 N = fy_oy();
 D = n();
 
-if ( D == 0 )  return ( bad_data_double );
+if ( D == 0 )  return bad_data_double;
 
 num   = (double) N;
 denom = (double) D;
 
-return ( num/denom );
+return num/denom;
 
 }
 
@@ -1260,12 +1260,12 @@ double num, denom;
 N = oy();
 D = n();
 
-if ( D == 0 )  return ( bad_data_double );
+if ( D == 0 )  return bad_data_double;
 
 num   = (double) N;
 denom = (double) D;
 
-return ( num/denom );
+return num/denom;
 
 }
 
@@ -1283,12 +1283,12 @@ double num, denom;
 N = fy_oy();
 D = n();
 
-if ( D == 0 )  return ( bad_data_double );
+if ( D == 0 )  return bad_data_double;
 
 num   = (double) N;
 denom = (double) D;
 
-return ( num/denom );
+return num/denom;
 
 }
 
@@ -1306,12 +1306,12 @@ double num, denom;
 N = fy_on();
 D = n();
 
-if ( D == 0 )  return ( bad_data_double );
+if ( D == 0 )  return bad_data_double;
 
 num   = (double) N;
 denom = (double) D;
 
-return ( num/denom );
+return num/denom;
 
 }
 
@@ -1329,12 +1329,12 @@ double num, denom;
 N = fn_oy();
 D = n();
 
-if ( D == 0 )  return ( bad_data_double );
+if ( D == 0 )  return bad_data_double;
 
 num   = (double) N;
 denom = (double) D;
 
-return ( num/denom );
+return num/denom;
 
 }
 
@@ -1352,12 +1352,12 @@ double num, denom;
 N = fn_on();
 D = n();
 
-if ( D == 0 )  return ( bad_data_double );
+if ( D == 0 )  return bad_data_double;
 
 num   = (double) N;
 denom = (double) D;
 
-return ( num/denom );
+return num/denom;
 
 }
 
@@ -1375,12 +1375,12 @@ double num, denom;
 N = fy();
 D = n();
 
-if ( D == 0 )  return ( bad_data_double );
+if ( D == 0 )  return bad_data_double;
 
 num   = (double) N;
 denom = (double) D;
 
-return ( num/denom );
+return num/denom;
 
 }
 
@@ -1398,12 +1398,12 @@ double num, denom;
 N = fn();
 D = n();
 
-if ( D == 0 )  return ( bad_data_double );
+if ( D == 0 )  return bad_data_double;
 
 num   = (double) N;
 denom = (double) D;
 
-return ( num/denom );
+return num/denom;
 
 }
 
@@ -1421,12 +1421,12 @@ double num, denom;
 N = oy();
 D = n();
 
-if ( D == 0 )  return ( bad_data_double );
+if ( D == 0 )  return bad_data_double;
 
 num   = (double) N;
 denom = (double) D;
 
-return ( num/denom );
+return num/denom;
 
 }
 
@@ -1444,12 +1444,12 @@ double num, denom;
 N = on();
 D = n();
 
-if ( D == 0 )  return ( bad_data_double );
+if ( D == 0 )  return bad_data_double;
 
 num   = (double) N;
 denom = (double) D;
 
-return ( num/denom );
+return num/denom;
 
 }
 
@@ -1467,12 +1467,12 @@ double num, denom;
 N = fy_oy();
 D = fy();
 
-if ( D == 0 )  return ( bad_data_double );
+if ( D == 0 )  return bad_data_double;
 
 num   = (double) N;
 denom = (double) D;
 
-return ( num/denom );
+return num/denom;
 
 }
 
@@ -1490,12 +1490,12 @@ double num, denom;
 N = fy_on();
 D = fy();
 
-if ( D == 0 )  return ( bad_data_double );
+if ( D == 0 )  return bad_data_double;
 
 num   = (double) N;
 denom = (double) D;
 
-return ( num/denom );
+return num/denom;
 
 }
 
@@ -1513,12 +1513,12 @@ double num, denom;
 N = fn_oy();
 D = fn();
 
-if ( D == 0 )  return ( bad_data_double );
+if ( D == 0 )  return bad_data_double;
 
 num   = (double) N;
 denom = (double) D;
 
-return ( num/denom );
+return num/denom;
 
 }
 
@@ -1536,12 +1536,12 @@ double num, denom;
 N = fn_on();
 D = fn();
 
-if ( D == 0 )  return ( bad_data_double );
+if ( D == 0 )  return bad_data_double;
 
 num   = (double) N;
 denom = (double) D;
 
-return ( num/denom );
+return num/denom;
 
 }
 
@@ -1559,12 +1559,12 @@ double num, denom;
 N = fy_oy();
 D = oy();
 
-if ( D == 0 )  return ( bad_data_double );
+if ( D == 0 )  return bad_data_double;
 
 num   = (double) N;
 denom = (double) D;
 
-return ( num/denom );
+return num/denom;
 
 }
 
@@ -1582,12 +1582,12 @@ double num, denom;
 N = fy_on();
 D = on();
 
-if ( D == 0 )  return ( bad_data_double );
+if ( D == 0 )  return bad_data_double;
 
 num   = (double) N;
 denom = (double) D;
 
-return ( num/denom );
+return num/denom;
 
 }
 
@@ -1605,12 +1605,12 @@ double num, denom;
 N = fn_oy();
 D = oy();
 
-if ( D == 0 )  return ( bad_data_double );
+if ( D == 0 )  return bad_data_double;
 
 num   = (double) N;
 denom = (double) D;
 
-return ( num/denom );
+return num/denom;
 }
 
 
@@ -1627,12 +1627,12 @@ double num, denom;
 N = fn_on();
 D = on();
 
-if ( D == 0 )  return ( bad_data_double );
+if ( D == 0 )  return bad_data_double;
 
 num   = (double) N;
 denom = (double) D;
 
-return ( num/denom );
+return num/denom;
 
 }
 
@@ -1698,7 +1698,7 @@ t.set_fn_on(2680);
 t.set_name("Finley Tornado Forecasts (1884)");
 
 
-return ( t );
+return t;
 
 }
 
@@ -1726,7 +1726,7 @@ t.set_fn_on(2752);
 t.set_name("Finley Tornado Forecasts (Always No) (1884)");
 
 
-return ( t );
+return t;
 
 }
 
@@ -1743,7 +1743,7 @@ int n;
 
 n = r_table*w + c_table;
 
-return ( n );
+return n;
 
 }
 

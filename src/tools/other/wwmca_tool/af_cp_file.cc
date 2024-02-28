@@ -93,11 +93,11 @@ AFCloudPctFile & AFCloudPctFile::operator=(const AFCloudPctFile & a)
 
 {
 
-if ( this == &a )  return ( * this );
+if ( this == &a )  return *this;
 
 assign(a);
 
-return ( * this );
+return *this;
 
 }
 
@@ -177,7 +177,7 @@ if ( (fd = met_open(filename, O_RDONLY)) < 0 )  {
    mlog << Error << "\nAFCloudPctFile::read(const char *) -> "
         << "can't open file \"" << filename << "\"\n\n";
 
-   return ( false );
+   return false;
 
 }
 
@@ -192,7 +192,7 @@ if ( ::read(fd, Buf, bytes) != bytes )  {
 
    ::close(fd);
 
-   return ( false );
+   return false;
 
 }
 
@@ -204,7 +204,7 @@ Filename = get_short_name(filename);
 
 ::close(fd);
 
-return ( true );
+return true;
 
 }
 
@@ -222,7 +222,7 @@ n = two_to_one(x, y);   //  this function does range checking on x and y for us
 
 k = (int) (Buf[n]);
 
-return ( k );
+return k;
 
 }
 

@@ -92,7 +92,7 @@ bool MetNcMetDataFile::open(const char * _filename) {
            << "unable to open NetCDF file \"" << _filename << "\"\n\n";
       close();
 
-      return(false);
+      return false;
    }
 
    Filename = _filename;
@@ -105,7 +105,7 @@ bool MetNcMetDataFile::open(const char * _filename) {
 
    (*Dest_Grid) = (*Raw_Grid);
 
-   return(true);
+   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -188,7 +188,7 @@ bool MetNcMetDataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
       if(info->units_att.length()     > 0) vinfo.set_units(info->units_att.c_str());
    }
 
-   return(status);
+   return status;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -211,7 +211,7 @@ int MetNcMetDataFile::data_plane_array(VarInfo &vinfo,
       n_rec = 1;
    }
 
-   return(n_rec);
+   return n_rec;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -220,14 +220,14 @@ int MetNcMetDataFile::index(VarInfo &vinfo) {
 
    NcVarInfo *ncinfo = MetNc->find_var_name( vinfo.name().c_str() );
 
-   if( !ncinfo ) return(-1);
+   if( !ncinfo ) return -1;
 
    if( ( vinfo.valid() != 0         && ncinfo->ValidTime   != vinfo.valid() ) ||
        ( vinfo.init() != 0          && ncinfo->InitTime    != vinfo.init()  ) ||
        ( !is_bad_data(vinfo.lead()) && ncinfo->lead_time() != vinfo.lead()  ) )
-      return(-1);
+      return -1;
 
-   return(0);
+   return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////

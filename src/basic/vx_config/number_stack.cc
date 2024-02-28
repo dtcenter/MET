@@ -90,7 +90,7 @@ NumberStack & NumberStack::operator=(const NumberStack & a)
 
 {
 
-if ( this == &a )  return ( * this );
+if ( this == &a )  return *this;
 
 assign(a);
 
@@ -331,7 +331,7 @@ if ( Nelements <= 0 )  {
 
 }
 
-return ( e[--Nelements] );
+return e[--Nelements];
 
 }
 

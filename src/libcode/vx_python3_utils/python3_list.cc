@@ -182,7 +182,7 @@ if ( (n < 0) || (n >= Size) )  {
 a = PyList_GetItem(Object, n);
 
 
-return ( a );
+return a;
 
 }
 

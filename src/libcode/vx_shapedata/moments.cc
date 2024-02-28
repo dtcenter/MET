@@ -58,11 +58,11 @@ Moments::Moments(const Moments &m) {
 
 Moments & Moments::operator=(const Moments &m) {
    if ( this == &m ) {
-      return ( *this );
+      return *this;
    }
    assign(m);
 
-   return ( *this );
+   return *this;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -277,7 +277,7 @@ double Moments::angle_degrees() const {
    // Compute axis angle using 2nd order moments
    deg = 0.5*deg_per_rad*atan2(2.0*(m.sxy), m.sxx - m.syy);
 
-   return(deg);
+   return deg;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -310,7 +310,7 @@ double Moments::curvature(double &xcurv, double &ycurv) const {
    xcurv = xcenter + xbar;
    ycurv = ycenter + ybar;
 
-   return(radius);
+   return radius;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

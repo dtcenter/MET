@@ -116,7 +116,7 @@ int met_main(int argc, char *argv[]) {
    // Process the input data file
    process_data_file();
 
-   return(0);
+   return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////

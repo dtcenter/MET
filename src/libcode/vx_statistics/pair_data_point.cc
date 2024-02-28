@@ -57,11 +57,11 @@ PairDataPoint::PairDataPoint(const PairDataPoint &pd) {
 
 PairDataPoint & PairDataPoint::operator=(const PairDataPoint &pd) {
 
-   if(this == &pd) return(*this);
+   if(this == &pd) return *this;
 
    assign(pd);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -170,12 +170,12 @@ bool PairDataPoint::add_point_pair(const char *sid, double lat, double lon,
                                    double cmn, double csd, double wgt) {
 
    if(!add_point_obs(sid, lat, lon, x, y, ut, lvl, elv, o, qc,
-                     cmn, csd, wgt)) return(false);
+                     cmn, csd, wgt)) return false;
 
    f_na.add(f);
    seeps_mpr.push_back((SeepsScore *)nullptr);
 
-   return(true);
+   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -252,7 +252,7 @@ bool PairDataPoint::add_grid_pair(double f, double o,
    f_na.add(f);
    seeps_mpr.push_back(nullptr);
 
-   return(true);
+   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -285,7 +285,7 @@ bool PairDataPoint::add_grid_pair(const NumArray &f_in,   const NumArray &o_in,
    // Increment the number of pairs
    n_obs += o_in.n();
 
-   return(true);
+   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -321,7 +321,7 @@ PairDataPoint PairDataPoint::subset_pairs_cnt_thresh(
 
    // Check for no work to be done
    if(ft.get_type() == thresh_na && ot.get_type() == thresh_na) {
-      return(*this);
+      return *this;
    }
 
    int i;
@@ -373,7 +373,7 @@ PairDataPoint PairDataPoint::subset_pairs_cnt_thresh(
         << ", observation filtering threshold " << ot.get_str()
         << ", and field logic " << setlogic_to_string(type) << ".\n";
 
-   return(out_pd);
+   return out_pd;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -405,11 +405,11 @@ VxPairDataPoint::VxPairDataPoint(const VxPairDataPoint &vx_pd) {
 
 VxPairDataPoint & VxPairDataPoint::operator=(const VxPairDataPoint &vx_pd) {
 
-   if(this == &vx_pd) return(*this);
+   if(this == &vx_pd) return *this;
 
    assign(vx_pd);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1414,7 +1414,7 @@ int VxPairDataPoint::get_n_pair() const {
       }
    }
 
-   return(n);
+   return n;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1626,7 +1626,7 @@ bool check_mpr_thresh(double f, double o, double cmn, double csd,
    if(reason_ptr) reason_ptr->erase();
 
    // Check arrays
-   if(col_sa.n() == 0 || col_ta.n() == 0) return(true);
+   if(col_sa.n() == 0 || col_ta.n() == 0) return true;
 
    bool keep = true;
    bool absv = false;
@@ -1684,7 +1684,7 @@ bool check_mpr_thresh(double f, double o, double cmn, double csd,
       }
    } // end for i
 
-   return(keep);
+   return keep;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1712,7 +1712,7 @@ double get_mpr_column_value(double f, double o, double cmn, double csd,
       exit(1);
    }
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1879,7 +1879,7 @@ PairDataPoint subset_climo_cdf_bin(const PairDataPoint &pd,
                                    const ThreshArray &ta, int i_bin) {
 
    // Check for no work to be done
-   if(ta.n() == 0) return(pd);
+   if(ta.n() == 0) return pd;
 
    int i;
    PairDataPoint out_pd;
@@ -1926,7 +1926,7 @@ PairDataPoint subset_climo_cdf_bin(const PairDataPoint &pd,
         << "Using " << out_pd.n_obs << " of " << pd.n_obs
         << " pairs for climatology bin number " << i_bin+1 << ".\n";
 
-   return(out_pd);
+   return out_pd;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1956,7 +1956,7 @@ ConcatString point_obs_to_string(float *hdr_arr, const char *hdr_typ_str,
           << obs_arr[2] << " " << obs_arr[3] << " "
           << obs_qty    << " " << obs_arr[4];
 
-   return(obs_cs);
+   return obs_cs;
 }
 
 ////////////////////////////////////////////////////////////////////////

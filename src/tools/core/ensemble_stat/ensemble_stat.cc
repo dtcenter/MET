@@ -187,7 +187,7 @@ int met_main(int argc, char *argv[]) {
    // Close the text files and deallocate memory
    clean_up();
 
-   return(0);
+   return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -681,7 +681,7 @@ bool get_data_plane(const char *infile, GrdFileType ftype,
    // Deallocate the data file pointer, if necessary
    if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) nullptr; }
 
-   return(found);
+   return found;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -741,7 +741,7 @@ bool get_data_plane_array(const char *infile, GrdFileType ftype,
    // Deallocate the data file pointer, if necessary
    if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) nullptr; }
 
-   return(found);
+   return found;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1116,7 +1116,7 @@ bool process_point_ens(int i_vx, int i_ens, DataPlaneArray &fcst_dpa) {
    mlog << Debug(2) << "For " << info->magic_str()
         << " found " << fcst_dpa.n_planes() << " forecast levels.\n";
 
-   return(status);
+   return status;
 }
 
 ////////////////////////////////////////////////////////////////////////

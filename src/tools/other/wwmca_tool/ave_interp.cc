@@ -75,11 +75,11 @@ Ave_Interp & Ave_Interp::operator=(const Ave_Interp & a)
 
 {
 
-if ( this == &a )  return ( * this );
+if ( this == &a )  return *this;
 
 assign(a);
 
-return ( * this );
+return *this;
 
 }
 
@@ -139,7 +139,7 @@ Interpolator * i = (Interpolator *) nullptr;
 
 i = new Ave_Interp (*this);
 
-return ( i );
+return i;
 
 }
 
@@ -217,7 +217,7 @@ if ( (good_count > 0) && (good_count >= NgoodNeeded) )  {
    //
 
 
-return ( I );
+return I;
 
 }
 

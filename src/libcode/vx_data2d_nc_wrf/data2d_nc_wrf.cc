@@ -93,7 +93,7 @@ bool MetNcWrfDataFile::open(const char * _filename) {
            << "unable to open NetCDF file \"" << _filename << "\"\n\n";
       close();
 
-      return(false);
+      return false;
    }
 
    Filename = _filename;
@@ -106,7 +106,7 @@ bool MetNcWrfDataFile::open(const char * _filename) {
 
    (*Dest_Grid) = (*Raw_Grid);
 
-   return(true);
+   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -191,7 +191,7 @@ bool MetNcWrfDataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
       }
    }
 
-   return(status);
+   return status;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -276,7 +276,7 @@ int MetNcWrfDataFile::data_plane_array(VarInfo &vinfo,
       }
 
       // Check for bad status
-      if(!status) return(0);
+      if(!status) return 0;
 
       // Add current plane to the data plane array
       plane_array.add(cur_plane, pressure, pressure);
@@ -302,7 +302,7 @@ int MetNcWrfDataFile::data_plane_array(VarInfo &vinfo,
                                                   << "-" << nint(min_level);
    vinfo.set_level_name(level_str.c_str());
 
-   return(n_level);
+   return n_level;
 }
 
 ////////////////////////////////////////////////////////////////////////

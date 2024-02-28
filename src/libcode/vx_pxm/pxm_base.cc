@@ -178,7 +178,7 @@ int n;
 n = r*Ncols + c;
 
 
-return ( n );
+return n;
 
 }
 
@@ -214,7 +214,7 @@ const char * PxmBase::short_name() const
 
 {
 
-if ( !Name )  return ( (const char *) 0 );
+if ( !Name )  return (const char *) 0;
 
 int j;
 
@@ -246,7 +246,7 @@ if ( (n < 0) || (n >= Ncomments) )  {
 }
 
 
-return ( Comment[n] );
+return Comment[n];
 
 }
 

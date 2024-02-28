@@ -192,7 +192,7 @@ while ( 1 )  {
 
    t = next_token();
 
-   if ( t == 0 )  return ( 0 );
+   if ( t == 0 )  return 0;
 
    if ( t < 0 )  continue;
 
@@ -230,7 +230,7 @@ while ( 1 )  {
 
 }   //  while
 
-if ( c == eof )  return ( 0 );
+if ( c == eof )  return 0;
 
 clear_lexeme();
 
@@ -242,31 +242,31 @@ switch ( c )  {
       //  single character tokens
       //
 
-   case '[':  { do_single_char_token(lexeme[0]);  is_lhs = false;  dict_stack->push_array();  return ( token(lexeme[0]) ); }
-   case '{':  { do_single_char_token(lexeme[0]);  is_lhs = true;   dict_stack->push();        return ( token(lexeme[0]) ); }
+   case '[':  { do_single_char_token(lexeme[0]);  is_lhs = false;  dict_stack->push_array();  return token(lexeme[0]); }
+   case '{':  { do_single_char_token(lexeme[0]);  is_lhs = true;   dict_stack->push();        return token(lexeme[0]); }
 
-   case ']':  { do_single_char_token(lexeme[0]);  return ( token(lexeme[0]) ); }
-   case '}':  { do_single_char_token(lexeme[0]);  return ( token(lexeme[0]) ); }
+   case ']':  { do_single_char_token(lexeme[0]);  return token(lexeme[0]); }
+   case '}':  { do_single_char_token(lexeme[0]);  return token(lexeme[0]); }
 
-   case '(':  { do_single_char_token(lexeme[0]);  return ( token(lexeme[0]) ); }
-   case ')':  { do_single_char_token(lexeme[0]);  return ( token(lexeme[0]) ); }
+   case '(':  { do_single_char_token(lexeme[0]);  return token(lexeme[0]); }
+   case ')':  { do_single_char_token(lexeme[0]);  return token(lexeme[0]); }
 
-   case '+':  { do_single_char_token(lexeme[0]);  return ( token(lexeme[0]) ); }
+   case '+':  { do_single_char_token(lexeme[0]);  return token(lexeme[0]); }
 
-   case '-':  { if ( ! need_number )  { do_single_char_token(lexeme[0]);  return ( token(lexeme[0]) ); } } break;
+   case '-':  { if ( ! need_number )  { do_single_char_token(lexeme[0]);  return token(lexeme[0]); } } break;
 
-   case '*':  { do_single_char_token(lexeme[0]);  return ( token(lexeme[0]) ); }
-   case '^':  { do_single_char_token(lexeme[0]);  return ( token(lexeme[0]) ); }
+   case '*':  { do_single_char_token(lexeme[0]);  return token(lexeme[0]); }
+   case '^':  { do_single_char_token(lexeme[0]);  return token(lexeme[0]); }
 
-   // case '=':  { do_single_char_token(lexeme[0]);  return ( token(lexeme[0]) ); }
+   // case '=':  { do_single_char_token(lexeme[0]);  return token(lexeme[0]); }
 
 
-   case ';':  { do_single_char_token(lexeme[0]);  is_lhs = true;  return ( token( ';' ) ); }
-   case ',':  { do_single_char_token(lexeme[0]);  return ( token(lexeme[0]) ); }
+   case ';':  { do_single_char_token(lexeme[0]);  is_lhs = true;  return token( ';' ); }
+   case ',':  { do_single_char_token(lexeme[0]);  return token(lexeme[0]); }
 
-   case '\"': { do_quoted_string();   return ( token ( QUOTED_STRING ) ); }
+   case '\"': { do_quoted_string();   return token ( QUOTED_STRING ); }
 
-   case '\n': { ++LineNumber;  Column = 1;   return ( -1 ); }
+   case '\n': { ++LineNumber;  Column = 1;   return -1; }
 
    default:
       break;
@@ -281,27 +281,27 @@ if ( c == '/' )  {
 
    c2 = nextchar();
 
-   if ( c2 == eof )  return ( eof );
+   if ( c2 == eof )  return eof;
 
-        if ( c2 == '*' )   { do_c_comment();     return ( skip ); }
-   else if ( c2 == '/' )   { do_cpp_comment();   return ( skip ); }
+        if ( c2 == '*' )   { do_c_comment();     return skip; }
+   else if ( c2 == '/' )   { do_cpp_comment();   return skip; }
    else                    putback(c2);
 
-   return ( token('/') );
+   return token('/');
 
 }
 
 c2 = nextchar();
 
-     if ( strncmp(configtext, "<=", 2) == 0 )  { need_number = true;  return ( do_comp() ); }
-else if ( strncmp(configtext, ">=", 2) == 0 )  { need_number = true;  return ( do_comp() ); }
-else if ( strncmp(configtext, "==", 2) == 0 )  { need_number = true;  return ( do_comp() ); }
+     if ( strncmp(configtext, "<=", 2) == 0 )  { need_number = true;  return do_comp(); }
+else if ( strncmp(configtext, ">=", 2) == 0 )  { need_number = true;  return do_comp(); }
+else if ( strncmp(configtext, "==", 2) == 0 )  { need_number = true;  return do_comp(); }
 
-else if ( strncmp(configtext, "!=", 2) == 0 )  { need_number = true;  return ( do_comp() ); }
-else if ( strncmp(configtext, "NA", 2) == 0 )  return ( do_comp() );
+else if ( strncmp(configtext, "!=", 2) == 0 )  { need_number = true;  return do_comp(); }
+else if ( strncmp(configtext, "NA", 2) == 0 )  return do_comp();
 
-else if ( strncmp(configtext, "&&", 2) == 0 )  { Column += 2;  return ( LOGICAL_OP_AND ); }
-else if ( strncmp(configtext, "||", 2) == 0 )  { Column += 2;  return ( LOGICAL_OP_OR  ); }
+else if ( strncmp(configtext, "&&", 2) == 0 )  { Column += 2;  return LOGICAL_OP_AND; }
+else if ( strncmp(configtext, "||", 2) == 0 )  { Column += 2;  return LOGICAL_OP_OR ; }
 
 else {
 
@@ -310,10 +310,10 @@ else {
 }
 
 
-if ( strncmp(configtext, "<" , 1) == 0 )  { need_number = true;  return ( do_comp() ); }
-if ( strncmp(configtext, ">" , 1) == 0 )  { need_number = true;  return ( do_comp() ); }
-if ( strncmp(configtext, "=" , 1) == 0 )  return ( token( '=' ) );
-if ( strncmp(configtext, "!" , 1) == 0 )  return ( token( LOGICAL_OP_NOT ) );
+if ( strncmp(configtext, "<" , 1) == 0 )  { need_number = true;  return do_comp(); }
+if ( strncmp(configtext, ">" , 1) == 0 )  { need_number = true;  return do_comp(); }
+if ( strncmp(configtext, "=" , 1) == 0 )  return token( '=' );
+if ( strncmp(configtext, "!" , 1) == 0 )  return token( LOGICAL_OP_NOT );
 
 
 // putback(configtext[0]);
@@ -324,7 +324,7 @@ if ( strncmp(configtext, "!" , 1) == 0 )  return ( token( LOGICAL_OP_NOT ) );
 
 int k = char_class[c];
 
-if ( k == char_class_other )  return ( skip );
+if ( k == char_class_other )  return skip;
 
    //
    //  quote?
@@ -350,22 +350,22 @@ while ( pos < max_id_length )  {
 
 lexeme[max_id_length] = (char) 0;
 
-if ( pos == 0 )  return ( skip );
+if ( pos == 0 )  return skip;
 
-// if ( strncmp((char *) lexeme, "enum",  max_id_length) == 0 )  { do_enum();   return ( token(ENUM)  ); }
-// if ( strncmp((char *) lexeme, "class", max_id_length) == 0 )  { do_class();  return ( token(CLASS) ); }
+// if ( strncmp((char *) lexeme, "enum",  max_id_length) == 0 )  { do_enum();   return token(ENUM) ; }
+// if ( strncmp((char *) lexeme, "class", max_id_length) == 0 )  { do_class();  return token(CLASS); }
 
-if ( is_int() )  { if ( do_int() )  return ( token(INTEGER) ); }
+if ( is_int() )  { if ( do_int() )  return token(INTEGER); }
 
-if ( is_float_v2() )  { if ( do_float() )  return ( token(FLOAT) ); }
+if ( is_float_v2() )  { if ( do_float() )  return token(FLOAT); }
 
-if ( is_fort_thresh_no_spaces() )  { return ( do_fort_thresh() ); }
+if ( is_fort_thresh_no_spaces() )  { return do_fort_thresh(); }
 
-if ( is_simple_perc_thresh() )  { return ( do_simple_perc_thresh() ); }
+if ( is_simple_perc_thresh() )  { return do_simple_perc_thresh(); }
 
 int t;
 
-if ( is_id() )  { t = do_id();  return ( token(t) ); }
+if ( is_id() )  { t = do_id();  return token(t); }
 
 
 
@@ -528,7 +528,7 @@ if ( is_lhs )  {
    //  print?
    //
 
-if ( strcmp(configtext, "print"  ) == 0 )  { return ( PRINT ); }
+if ( strcmp(configtext, "print"  ) == 0 )  { return PRINT; }
 
    //
    //  boolean?
@@ -546,7 +546,7 @@ if ( strcmp(configtext, "FALSE" ) == 0 )  { configlval.bval = false;  return BOO
 
 for (j=0; j<n_fort_thresh_strings; ++j)  {
 
-   if ( strcmp(configtext, fort_thresh_string[j] ) == 0 )  { configlval.cval = thresh_lt;  return ( COMPARISON ); }
+   if ( strcmp(configtext, fort_thresh_string[j] ) == 0 )  { configlval.cval = thresh_lt;  return COMPARISON; }
 
 }
 
@@ -940,7 +940,7 @@ putback_chars[n_putback_chars - 1] = 0;
 
 --n_putback_chars;
 
-return ( k );
+return k;
 
 }
 

@@ -29,7 +29,7 @@ static const int print_interest_log_level = 5;
 
 ///////////////////////////////////////////////////////////////////////
 
-static inline double area_ratio_conf(double t) { return(t); }
+static inline double area_ratio_conf(double t) { return t; }
 
 ///////////////////////////////////////////////////////////////////////
 //
@@ -588,7 +588,7 @@ int ModeFuzzyEngine::two_to_one(int n_f, int n_o) const {
 
    n = n_o*n_fcst + n_f;
 
-   return(n);
+   return n;
 }
 
 
@@ -2508,11 +2508,11 @@ int ModeFuzzyEngine::get_info_index(int pair_n) const {
 
    for(i=0; i<(info_singles.n()); i++) {
 
-      if(info_singles[i].pair_number == pair_n) return(i);
+      if(info_singles[i].pair_number == pair_n) return i;
 
    }
 
-   return(-1);
+   return -1;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -2530,7 +2530,7 @@ int ModeFuzzyEngine::get_matched_fcst(int area) const {
       }
    }
 
-   return(count);
+   return count;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -2548,7 +2548,7 @@ int ModeFuzzyEngine::get_unmatched_fcst(int area) const {
       }
    }
 
-   return(count);
+   return count;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -2566,7 +2566,7 @@ int ModeFuzzyEngine::get_matched_obs(int area) const {
       }
    }
 
-   return(count);
+   return count;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -2584,7 +2584,7 @@ int ModeFuzzyEngine::get_unmatched_obs(int area) const {
       }
    }
 
-   return(count);
+   return count;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -2631,7 +2631,7 @@ double total_interest(ModeConfInfo &mc, const PairFeature &p,
               << ") > Max Centroid Distance ("
               << mc.max_centroid_dist << ")\n";
       }
-      return(total);
+      return total;
    }
 
    sum = 0.0;
@@ -2917,7 +2917,7 @@ double total_interest(ModeConfInfo &mc, const PairFeature &p,
            << "               = " << total << "\n\n";
    }
 
-   return(total);
+   return total;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -2930,7 +2930,7 @@ double interest_percentile(ModeFuzzyEngine &eng, const double p, const int flag)
 
    if(eng.conf_info.match_flag == 0 ||
       eng.n_fcst                    == 0 ||
-      eng.n_obs                     == 0) return(0.0);
+      eng.n_obs                     == 0) return 0.0;
 
    //
    // Initialize the maximum interest value for each object to zero.
@@ -2995,7 +2995,7 @@ double interest_percentile(ModeFuzzyEngine &eng, const double p, const int flag)
 
    if(v) { delete [] v; v = (double *) nullptr; }
 
-   return(ptile);
+   return ptile;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -4144,7 +4144,7 @@ double aspect_ratio_conf(double t)
 const double tm1   = t - 1.0;
 const double ratio = (tm1*tm1)/(t*t + 1.0);
 
-return( pow(ratio, 0.3) );
+return pow(ratio, 0.3);
 
 }
 

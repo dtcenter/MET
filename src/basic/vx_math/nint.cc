@@ -38,7 +38,7 @@ a = (int) y;
 
 if ( fabs(a - y) > 0.3 )  ++a;
 
-return ( a );
+return a;
 
 }
 

@@ -102,11 +102,11 @@ Pbm & Pbm::operator=(const Pbm & p)
 
 {
 
-if ( this == &p )  return ( * this );
+if ( this == &p )  return *this;
 
 assign(p);
 
-return ( * this );
+return *this;
 
 }
 
@@ -196,7 +196,7 @@ j = ( (u & mask) ? 0 : 1 );
 if ( j )   color.set_gray(255);
 else       color.set_gray(0);
 
-return ( color );
+return color;
 
 }
 
@@ -218,7 +218,7 @@ r = Nrows - 1 - y;
 
 color = getrc(r, c);
 
-return ( color );
+return color;
 
 }
 
@@ -323,7 +323,7 @@ if ( !in )  {
 
    mlog << Warning << "\n" << method_name << "unable to read image file \"" << filename << "\"\n\n";
 
-   return ( 0 );
+   return 0;
 
 }
 
@@ -345,7 +345,7 @@ if ( !in )  {
 
    clear();
 
-   return ( 0 );
+   return 0;
 
 }
 
@@ -355,7 +355,7 @@ if ( (c1 != 'P') || (c2 != '4') )  {
 
    clear();
 
-   return ( 0 );
+   return 0;
 
 }
 
@@ -396,7 +396,7 @@ if ( !(data = new unsigned char [n]) )  {
 
    clear();
 
-   return ( 0 );
+   return 0;
 
 }
 
@@ -406,7 +406,7 @@ if ( !in.read((char *) data, n) )  {
 
    clear();
 
-   return ( 0 );
+   return 0;
 
 }
 
@@ -416,7 +416,7 @@ in.close();
    //  Done
    //
 
-return ( 1 );
+return 1;
 
 }
 
@@ -442,7 +442,7 @@ if ( !out )  {
 
    mlog << Warning << "\nPbm::write() -> unable to open output file \"" << filename << "\"\n\n";
 
-   return ( 0 );
+   return 0;
 
 }
 
@@ -472,7 +472,7 @@ if ( !out )  {
 
    mlog << Warning << "\nPbm::write() -> trouble writing header\n\n";
 
-   return ( 0 );
+   return 0;
 
 }
 
@@ -488,7 +488,7 @@ if ( !out )  {
 
    mlog << Warning << "\nPbm::write() -> trouble writing data\n\n";
 
-   return ( 0 );
+   return 0;
 
 }
 
@@ -498,7 +498,7 @@ if ( !out )  {
 
 out.close();
 
-return ( 1 );
+return 1;
 
 }
 

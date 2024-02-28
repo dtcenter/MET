@@ -219,7 +219,7 @@ int met_main(int argc, char *argv[]) {
    // Process the input data file
    process_data_file();
 
-   return(0);
+   return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2740,7 +2740,7 @@ bool keep_message_type(const int mt_index) {
    keep = message_type_list.n() == 0 ||
           message_type_list.has(mt_index);
 
-   return(keep);
+   return keep;
 }
 
 ////////////////////////////////////////////////////////////////////////

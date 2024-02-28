@@ -106,11 +106,11 @@ TwoOne & TwoOne::operator=(const TwoOne & t)
 
 {
 
-if ( this == &t )  return ( * this );
+if ( this == &t )  return *this;
 
 assign(t);
 
-return ( * this );
+return *this;
 
 }
 
@@ -650,7 +650,7 @@ switch ( k )  {
    //  done
    //
 
-return ( f );
+return f;
 
 }
 
@@ -702,7 +702,7 @@ switch ( k )  {
    //  done
    //
 
-return ( f );
+return f;
 
 }
 

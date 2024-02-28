@@ -91,11 +91,11 @@ SingleAtt2DArray & SingleAtt2DArray::operator=(const SingleAtt2DArray & a)
 
 {
 
-if ( this == &a )  return ( * this );
+if ( this == &a )  return *this;
 
 assign(a);
 
-return ( * this );
+return *this;
 
 }
 
@@ -305,7 +305,7 @@ if ( (N < 0) || (N >= Nelements) )  {
    exit ( 1 );
 }
 
-return ( e[N] );
+return e[N];
 
 }
 
@@ -352,7 +352,7 @@ if ( (index < 0) || (index >= Nelements) )  {
 
 }
 
-return ( e[index].valid_time() );
+return e[index].valid_time();
 
 }
 
@@ -373,7 +373,7 @@ if ( (index < 0) || (index >= Nelements) )  {
 
 }
 
-return ( e[index].lead_time() );
+return e[index].lead_time();
 
 }
 
@@ -394,7 +394,7 @@ if ( (index < 0) || (index >= Nelements) )  {
 
 }
 
-return ( e[index].time_index() );
+return e[index].time_index();
 
 }
 

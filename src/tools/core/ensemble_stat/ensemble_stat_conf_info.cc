@@ -494,7 +494,7 @@ int EnsembleStatConfInfo::n_txt_row(int i_txt_row) const {
    // Loop over the tasks and sum the line counts for this line type
    for(i=0, n=0; i<n_vx; i++) n += vx_opt[i].n_txt_row(i_txt_row);
 
-   return(n);
+   return n;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -505,7 +505,7 @@ int EnsembleStatConfInfo::n_stat_row() const {
    // Loop over the line types and sum the line counts
    for(i=0, n=0; i<n_txt; i++) n += n_txt_row(i);
 
-   return(n);
+   return n;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -515,7 +515,7 @@ int EnsembleStatConfInfo::get_max_n_prob_cat_thresh() const {
 
    for(i=0,n=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_prob_cat_thresh());
 
-   return(n);
+   return n;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -525,7 +525,7 @@ int EnsembleStatConfInfo::get_max_n_prob_pct_thresh() const {
 
    for(i=0,n=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_prob_pct_thresh());
 
-   return(n);
+   return n;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -535,7 +535,7 @@ int EnsembleStatConfInfo::get_max_n_eclv_points() const {
 
    for(i=0,n=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_eclv_points());
 
-   return(n);
+   return n;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1064,7 +1064,7 @@ int EnsembleStatVxOpt::n_txt_row(int i_txt_row) const {
    }
 
    // Check if this output line type is requested
-   if(output_flag[i_txt_row] == STATOutputType_None) return(0);
+   if(output_flag[i_txt_row] == STATOutputType_None) return 0;
 
    // Switch on the index of the line type
    switch(i_txt_row) {
@@ -1143,7 +1143,7 @@ int EnsembleStatVxOpt::n_txt_row(int i_txt_row) const {
          exit(1);
    }
 
-   return(n);
+   return n;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1152,7 +1152,7 @@ int EnsembleStatVxOpt::get_n_prob_cat_thresh() const {
 
    // Probability categories can be defined by the prob_cat_thresh or
    // climo_cdf.bins configuration file options.
-   return(max(fcat_ta.n(), cdf_info.cdf_ta.n()));
+   return max(fcat_ta.n(), cdf_info.cdf_ta.n());
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1182,7 +1182,7 @@ bool EnsembleStatNcOutInfo::all_false() const {
                  do_rank   || do_pit  || do_vld ||
                  do_weight;
 
-   return(!status);
+   return !status;
 }
 
 ////////////////////////////////////////////////////////////////////////

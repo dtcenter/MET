@@ -344,7 +344,7 @@ bool And_Node::check(double x) const
 
 {
 
-return ( check(x, bad_data_double, bad_data_double) );
+return check(x, bad_data_double, bad_data_double);
 
 }
 
@@ -596,7 +596,7 @@ bool Not_Node::check(double x, double cmn, double csd) const
 
 const bool tf = child->check(x, cmn, csd);
 
-return ( ! tf );
+return !tf;
 
 }
 
@@ -796,7 +796,7 @@ bool Simple_Node::check(double x, double cmn, double csd) const
 
 {
 
-if ( op == thresh_na )  return ( true );
+if ( op == thresh_na )  return true;
 
 double tval;
 
@@ -1371,7 +1371,7 @@ SingleThresh & SingleThresh::operator=(const SingleThresh & c)
 
 {
 
-if ( this == &c ) return ( * this );
+if ( this == &c ) return *this;
 
 assign(c);
 
@@ -1389,9 +1389,9 @@ bool SingleThresh::operator==(const SingleThresh &st) const
 
    //  return true when both null and false when only one is null
 
-if ( !node && !(st.node) )  return ( true );
+if ( !node && !(st.node) )  return true;
 
-if ( !node || !(st.node) )  return ( false );
+if ( !node || !(st.node) )  return false;
 
    //  for complex thresholds, check the string representation
 
@@ -1644,11 +1644,11 @@ bool SingleThresh::need_perc() const
 
 if ( node )  {
 
-   return ( node->need_perc() );
+   return node->need_perc();
 
 }
 
-return ( false );
+return false;
 
 }
 

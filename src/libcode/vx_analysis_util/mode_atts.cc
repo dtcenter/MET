@@ -81,11 +81,11 @@ ModeAttributes & ModeAttributes::operator=(const ModeAttributes & a)
 
 {
 
-if ( this == &a )  return ( * this );
+if ( this == &a )  return *this;
 
 assign(a);
 
-return ( * this );
+return *this;
 
 }
 
@@ -1367,8 +1367,8 @@ if ( is_fcst_toggle_set )  {
 
    i = L.is_fcst();
 
-   if ( ( is_fcst) && ( !i ) )  return ( 0 );
-   if ( (!is_fcst) && (  i ) )  return ( 0 );
+   if ( ( is_fcst) && ( !i ) )  return 0;
+   if ( (!is_fcst) && (  i ) )  return 0;
 
 }
 
@@ -1376,8 +1376,8 @@ if ( is_single_toggle_set )  {
 
    i = L.is_single();
 
-   if ( ( is_single) && ( !i ) )  return ( 0 );
-   if ( (!is_single) && (  i ) )  return ( 0 );
+   if ( ( is_single) && ( !i ) )  return 0;
+   if ( (!is_single) && (  i ) )  return 0;
 
 }
 
@@ -1385,8 +1385,8 @@ if ( is_simple_toggle_set )  {
 
    i = L.is_simple();
 
-   if ( ( is_simple) && ( !i ) )  return ( 0 );
-   if ( (!is_simple) && (  i ) )  return ( 0 );
+   if ( ( is_simple) && ( !i ) )  return 0;
+   if ( (!is_simple) && (  i ) )  return 0;
 
 }
 
@@ -1394,8 +1394,8 @@ if ( is_matched_toggle_set )  {
 
    i = L.is_matched();
 
-   if ( ( is_matched) && ( !i ) )  return ( 0 );
-   if ( (!is_matched) && (  i ) )  return ( 0 );
+   if ( ( is_matched) && ( !i ) )  return 0;
+   if ( (!is_matched) && (  i ) )  return 0;
 
 }
 
@@ -1405,43 +1405,43 @@ if ( is_matched_toggle_set )  {
 
 c = L.model();
 
-if ( (model.n_elements() > 0) && !(model.has(c)) )  return ( 0 );
+if ( (model.n_elements() > 0) && !(model.has(c)) )  return 0;
 
 c = L.desc();
 
-if ( (desc.n_elements() > 0) && !(desc.has(c)) )  return ( 0 );
+if ( (desc.n_elements() > 0) && !(desc.has(c)) )  return 0;
 
 c = L.fcst_thr();
 
-if ( (fcst_thr.n_elements() > 0) && !(fcst_thr.has(c)) )  return ( 0 );
+if ( (fcst_thr.n_elements() > 0) && !(fcst_thr.has(c)) )  return 0;
 
 c = L.obs_thr();
 
-if ( (obs_thr.n_elements() > 0) && !(obs_thr.has(c)) )  return ( 0 );
+if ( (obs_thr.n_elements() > 0) && !(obs_thr.has(c)) )  return 0;
 
 c = L.fcst_var();
 
-if ( (fcst_var.n_elements() > 0) && !(fcst_var.has(c)) )  return ( 0 );
+if ( (fcst_var.n_elements() > 0) && !(fcst_var.has(c)) )  return 0;
 
 c = L.fcst_units();
 
-if ( (fcst_units.n_elements() > 0) && !(fcst_units.has(c)) )  return ( 0 );
+if ( (fcst_units.n_elements() > 0) && !(fcst_units.has(c)) )  return 0;
 
 c = L.fcst_lev();
 
-if ( (fcst_lev.n_elements() > 0) && !(fcst_lev.has(c)) )  return ( 0 );
+if ( (fcst_lev.n_elements() > 0) && !(fcst_lev.has(c)) )  return 0;
 
 c = L.obs_var();
 
-if ( (obs_var.n_elements() > 0) && !(obs_var.has(c)) )  return ( 0 );
+if ( (obs_var.n_elements() > 0) && !(obs_var.has(c)) )  return 0;
 
 c = L.obs_units();
 
-if ( (obs_units.n_elements() > 0) && !(obs_units.has(c)) )  return ( 0 );
+if ( (obs_units.n_elements() > 0) && !(obs_units.has(c)) )  return 0;
 
 c = L.obs_lev();
 
-if ( (obs_lev.n_elements() > 0) && !(obs_lev.has(c)) )  return ( 0 );
+if ( (obs_lev.n_elements() > 0) && !(obs_lev.has(c)) )  return 0;
 
 
    //
@@ -1450,43 +1450,43 @@ if ( (obs_lev.n_elements() > 0) && !(obs_lev.has(c)) )  return ( 0 );
 
 i = L.fcst_lead();
 
-if ( (fcst_lead.n_elements() > 0) && !(fcst_lead.has(i)) )  return ( 0 );
+if ( (fcst_lead.n_elements() > 0) && !(fcst_lead.has(i)) )  return 0;
 
 i = L.fcst_valid_hour();
 
-if ( (fcst_valid_hour.n_elements() > 0) && !(fcst_valid_hour.has(i)) )  return ( 0 );
+if ( (fcst_valid_hour.n_elements() > 0) && !(fcst_valid_hour.has(i)) )  return 0;
 
 i = L.fcst_init_hour();
 
-if ( (fcst_init_hour.n_elements() > 0) && !(fcst_init_hour.has(i)) )  return ( 0 );
+if ( (fcst_init_hour.n_elements() > 0) && !(fcst_init_hour.has(i)) )  return 0;
 
 i = L.fcst_accum();
 
-if ( (fcst_accum.n_elements() > 0) && !(fcst_accum.has(i)) )  return ( 0 );
+if ( (fcst_accum.n_elements() > 0) && !(fcst_accum.has(i)) )  return 0;
 
 i = L.obs_lead();
 
-if ( (obs_lead.n_elements() > 0) && !(obs_lead.has(i)) )  return ( 0 );
+if ( (obs_lead.n_elements() > 0) && !(obs_lead.has(i)) )  return 0;
 
 i = L.obs_valid_hour();
 
-if ( (obs_valid_hour.n_elements() > 0) && !(obs_valid_hour.has(i)) )  return ( 0 );
+if ( (obs_valid_hour.n_elements() > 0) && !(obs_valid_hour.has(i)) )  return 0;
 
 i = L.obs_init_hour();
 
-if ( (obs_init_hour.n_elements() > 0) && !(obs_init_hour.has(i)) )  return ( 0 );
+if ( (obs_init_hour.n_elements() > 0) && !(obs_init_hour.has(i)) )  return 0;
 
 i = L.obs_accum();
 
-if ( (obs_accum.n_elements() > 0) && !(obs_accum.has(i)) )  return ( 0 );
+if ( (obs_accum.n_elements() > 0) && !(obs_accum.has(i)) )  return 0;
 
 i = L.fcst_rad();
 
-if ( (fcst_rad.n_elements() > 0) && !(fcst_rad.has(i)) )  return ( 0 );
+if ( (fcst_rad.n_elements() > 0) && !(fcst_rad.has(i)) )  return 0;
 
 i = L.obs_rad();
 
-if ( (obs_rad.n_elements() > 0) && !(obs_rad.has(i)) )  return ( 0 );
+if ( (obs_rad.n_elements() > 0) && !(obs_rad.has(i)) )  return 0;
 
 
    //
@@ -1497,9 +1497,9 @@ if ( fcst_valid_min_set || fcst_valid_max_set )  {
 
    t = L.fcst_valid();
 
-   if ( fcst_valid_min_set && (t < fcst_valid_min) )   return ( 0 );
+   if ( fcst_valid_min_set && (t < fcst_valid_min) )   return 0;
 
-   if ( fcst_valid_max_set && (t > fcst_valid_max) )   return ( 0 );
+   if ( fcst_valid_max_set && (t > fcst_valid_max) )   return 0;
 
 }
 
@@ -1507,9 +1507,9 @@ if ( obs_valid_min_set || obs_valid_max_set )  {
 
    t = L.obs_valid();
 
-   if ( obs_valid_min_set && (t < obs_valid_min) )   return ( 0 );
+   if ( obs_valid_min_set && (t < obs_valid_min) )   return 0;
 
-   if ( obs_valid_max_set && (t > obs_valid_max) )   return ( 0 );
+   if ( obs_valid_max_set && (t > obs_valid_max) )   return 0;
 
 }
 
@@ -1517,9 +1517,9 @@ if ( fcst_init_min_set || fcst_init_max_set )  {
 
    t = L.fcst_init();
 
-   if ( fcst_init_min_set && (t < fcst_init_min) )   return ( 0 );
+   if ( fcst_init_min_set && (t < fcst_init_min) )   return 0;
 
-   if ( fcst_init_max_set && (t > fcst_init_max) )   return ( 0 );
+   if ( fcst_init_max_set && (t > fcst_init_max) )   return 0;
 
 }
 
@@ -1527,9 +1527,9 @@ if ( obs_init_min_set || obs_init_max_set )  {
 
    t = L.obs_init();
 
-   if ( obs_init_min_set && (t < obs_init_min) )   return ( 0 );
+   if ( obs_init_min_set && (t < obs_init_min) )   return 0;
 
-   if ( obs_init_max_set && (t > obs_init_max) )   return ( 0 );
+   if ( obs_init_max_set && (t > obs_init_max) )   return 0;
 
 }
 
@@ -1542,9 +1542,9 @@ if ( area_min_set || area_max_set )  {
 
    i = L.area();
 
-   if ( !is_bad_data( i ) && area_min_set && (i < area_min) )   return ( 0 );
+   if ( !is_bad_data( i ) && area_min_set && (i < area_min) )   return 0;
 
-   if ( !is_bad_data( i ) && area_max_set && (i > area_max) )   return ( 0 );
+   if ( !is_bad_data( i ) && area_max_set && (i > area_max) )   return 0;
 
 }
 
@@ -1552,9 +1552,9 @@ if ( area_thresh_min_set || area_thresh_max_set )  {
 
    i = L.area_thresh();
 
-   if ( !is_bad_data( i ) && area_thresh_min_set && (i < area_thresh_min) )   return ( 0 );
+   if ( !is_bad_data( i ) && area_thresh_min_set && (i < area_thresh_min) )   return 0;
 
-   if ( !is_bad_data( i ) && area_thresh_max_set && (i > area_thresh_max) )   return ( 0 );
+   if ( !is_bad_data( i ) && area_thresh_max_set && (i > area_thresh_max) )   return 0;
 
 }
 
@@ -1562,9 +1562,9 @@ if ( intersection_area_min_set || intersection_area_max_set )  {
 
    i = L.intersection_area();
 
-   if ( !is_bad_data( i ) && intersection_area_min_set && (i < intersection_area_min) )   return ( 0 );
+   if ( !is_bad_data( i ) && intersection_area_min_set && (i < intersection_area_min) )   return 0;
 
-   if ( !is_bad_data( i ) && intersection_area_max_set && (i > intersection_area_max) )   return ( 0 );
+   if ( !is_bad_data( i ) && intersection_area_max_set && (i > intersection_area_max) )   return 0;
 
 }
 
@@ -1572,9 +1572,9 @@ if ( union_area_min_set || union_area_max_set )  {
 
    i = L.union_area();
 
-   if ( !is_bad_data( i ) && union_area_min_set && (i < union_area_min) )   return ( 0 );
+   if ( !is_bad_data( i ) && union_area_min_set && (i < union_area_min) )   return 0;
 
-   if ( !is_bad_data( i ) && union_area_max_set && (i > union_area_max) )   return ( 0 );
+   if ( !is_bad_data( i ) && union_area_max_set && (i > union_area_max) )   return 0;
 
 }
 
@@ -1582,9 +1582,9 @@ if ( symmetric_diff_min_set || symmetric_diff_max_set )  {
 
    i = L.symmetric_diff();
 
-   if ( !is_bad_data( i ) && symmetric_diff_min_set && (i < symmetric_diff_min) )   return ( 0 );
+   if ( !is_bad_data( i ) && symmetric_diff_min_set && (i < symmetric_diff_min) )   return 0;
 
-   if ( !is_bad_data( i ) && symmetric_diff_max_set && (i > symmetric_diff_max) )   return ( 0 );
+   if ( !is_bad_data( i ) && symmetric_diff_max_set && (i > symmetric_diff_max) )   return 0;
 
 }
 
@@ -1597,9 +1597,9 @@ if ( centroid_x_min_set || centroid_x_max_set )  {
 
    x = L.centroid_x();
 
-   if ( !is_bad_data( x ) && centroid_x_min_set && (x < centroid_x_min) )   return ( 0 );
+   if ( !is_bad_data( x ) && centroid_x_min_set && (x < centroid_x_min) )   return 0;
 
-   if ( !is_bad_data( x ) && centroid_x_max_set && (x > centroid_x_max) )   return ( 0 );
+   if ( !is_bad_data( x ) && centroid_x_max_set && (x > centroid_x_max) )   return 0;
 
 }
 
@@ -1607,9 +1607,9 @@ if ( centroid_y_min_set || centroid_y_max_set )  {
 
    x = L.centroid_y();
 
-   if ( !is_bad_data( x ) && centroid_y_min_set && (x < centroid_y_min) )   return ( 0 );
+   if ( !is_bad_data( x ) && centroid_y_min_set && (x < centroid_y_min) )   return 0;
 
-   if ( !is_bad_data( x ) && centroid_y_max_set && (x > centroid_y_max) )   return ( 0 );
+   if ( !is_bad_data( x ) && centroid_y_max_set && (x > centroid_y_max) )   return 0;
 
 }
 
@@ -1617,9 +1617,9 @@ if ( centroid_lat_min_set || centroid_lat_max_set )  {
 
    x = L.centroid_lat();
 
-   if ( !is_bad_data( x ) && centroid_lat_min_set && (x < centroid_lat_min) )   return ( 0 );
+   if ( !is_bad_data( x ) && centroid_lat_min_set && (x < centroid_lat_min) )   return 0;
 
-   if ( !is_bad_data( x ) && centroid_lat_max_set && (x > centroid_lat_max) )   return ( 0 );
+   if ( !is_bad_data( x ) && centroid_lat_max_set && (x > centroid_lat_max) )   return 0;
 
 }
 
@@ -1627,9 +1627,9 @@ if ( centroid_lon_min_set || centroid_lon_max_set )  {
 
    x = L.centroid_lon();
 
-   if ( !is_bad_data( x ) && centroid_lon_min_set && (x < centroid_lon_min) )   return ( 0 );
+   if ( !is_bad_data( x ) && centroid_lon_min_set && (x < centroid_lon_min) )   return 0;
 
-   if ( !is_bad_data( x ) && centroid_lon_max_set && (x > centroid_lon_max) )   return ( 0 );
+   if ( !is_bad_data( x ) && centroid_lon_max_set && (x > centroid_lon_max) )   return 0;
 
 }
 
@@ -1637,9 +1637,9 @@ if ( axis_ang_min_set || axis_ang_max_set )  {
 
    x = L.axis_ang();
 
-   if ( !is_bad_data( x ) && axis_ang_min_set && (x < axis_ang_min) )   return ( 0 );
+   if ( !is_bad_data( x ) && axis_ang_min_set && (x < axis_ang_min) )   return 0;
 
-   if ( !is_bad_data( x ) && axis_ang_max_set && (x > axis_ang_max) )   return ( 0 );
+   if ( !is_bad_data( x ) && axis_ang_max_set && (x > axis_ang_max) )   return 0;
 
 }
 
@@ -1647,9 +1647,9 @@ if ( length_min_set || length_max_set )  {
 
    x = L.length();
 
-   if ( !is_bad_data( x ) && length_min_set && (x < length_min) )   return ( 0 );
+   if ( !is_bad_data( x ) && length_min_set && (x < length_min) )   return 0;
 
-   if ( !is_bad_data( x ) && length_max_set && (x > length_max) )   return ( 0 );
+   if ( !is_bad_data( x ) && length_max_set && (x > length_max) )   return 0;
 
 }
 
@@ -1657,9 +1657,9 @@ if ( width_min_set || width_max_set )  {
 
    x = L.width();
 
-   if ( !is_bad_data( x ) && width_min_set && (x < width_min) )   return ( 0 );
+   if ( !is_bad_data( x ) && width_min_set && (x < width_min) )   return 0;
 
-   if ( !is_bad_data( x ) && width_max_set && (x > width_max) )   return ( 0 );
+   if ( !is_bad_data( x ) && width_max_set && (x > width_max) )   return 0;
 
 }
 
@@ -1667,9 +1667,9 @@ if ( aspect_ratio_min_set || aspect_ratio_max_set )  {
 
    x = L.aspect_ratio();
 
-   if ( !is_bad_data( x ) && aspect_ratio_min_set && (x < aspect_ratio_min) )   return ( 0 );
+   if ( !is_bad_data( x ) && aspect_ratio_min_set && (x < aspect_ratio_min) )   return 0;
 
-   if ( !is_bad_data( x ) && aspect_ratio_max_set && (x > aspect_ratio_max) )   return ( 0 );
+   if ( !is_bad_data( x ) && aspect_ratio_max_set && (x > aspect_ratio_max) )   return 0;
 
 }
 
@@ -1677,9 +1677,9 @@ if ( curvature_min_set || curvature_max_set )  {
 
    x = L.curvature();
 
-   if ( !is_bad_data( x ) && curvature_min_set && (x < curvature_min) )   return ( 0 );
+   if ( !is_bad_data( x ) && curvature_min_set && (x < curvature_min) )   return 0;
 
-   if ( !is_bad_data( x ) && curvature_max_set && (x > curvature_max) )   return ( 0 );
+   if ( !is_bad_data( x ) && curvature_max_set && (x > curvature_max) )   return 0;
 
 }
 
@@ -1687,9 +1687,9 @@ if ( curvature_x_min_set || curvature_x_max_set )  {
 
    x = L.curvature_x();
 
-   if ( !is_bad_data( x ) && curvature_x_min_set && (x < curvature_x_min) )   return ( 0 );
+   if ( !is_bad_data( x ) && curvature_x_min_set && (x < curvature_x_min) )   return 0;
 
-   if ( !is_bad_data( x ) && curvature_x_max_set && (x > curvature_x_max) )   return ( 0 );
+   if ( !is_bad_data( x ) && curvature_x_max_set && (x > curvature_x_max) )   return 0;
 
 }
 
@@ -1697,9 +1697,9 @@ if ( curvature_y_min_set || curvature_y_max_set )  {
 
    x = L.curvature_y();
 
-   if ( !is_bad_data( x ) && curvature_y_min_set && (x < curvature_y_min) )   return ( 0 );
+   if ( !is_bad_data( x ) && curvature_y_min_set && (x < curvature_y_min) )   return 0;
 
-   if ( !is_bad_data( x ) && curvature_y_max_set && (x > curvature_y_max) )   return ( 0 );
+   if ( !is_bad_data( x ) && curvature_y_max_set && (x > curvature_y_max) )   return 0;
 
 }
 
@@ -1707,9 +1707,9 @@ if ( complexity_min_set || complexity_max_set )  {
 
    x = L.complexity();
 
-   if ( !is_bad_data( x ) && complexity_min_set && (x < complexity_min) )   return ( 0 );
+   if ( !is_bad_data( x ) && complexity_min_set && (x < complexity_min) )   return 0;
 
-   if ( !is_bad_data( x ) && complexity_max_set && (x > complexity_max) )   return ( 0 );
+   if ( !is_bad_data( x ) && complexity_max_set && (x > complexity_max) )   return 0;
 
 }
 
@@ -1717,9 +1717,9 @@ if ( intensity_10_min_set || intensity_10_max_set )  {
 
    x = L.intensity_10();
 
-   if ( !is_bad_data( x ) && intensity_10_min_set && (x < intensity_10_min) )   return ( 0 );
+   if ( !is_bad_data( x ) && intensity_10_min_set && (x < intensity_10_min) )   return 0;
 
-   if ( !is_bad_data( x ) && intensity_10_max_set && (x > intensity_10_max) )   return ( 0 );
+   if ( !is_bad_data( x ) && intensity_10_max_set && (x > intensity_10_max) )   return 0;
 
 }
 
@@ -1727,9 +1727,9 @@ if ( intensity_25_min_set || intensity_25_max_set )  {
 
    x = L.intensity_25();
 
-   if ( !is_bad_data( x ) && intensity_25_min_set && (x < intensity_25_min) )   return ( 0 );
+   if ( !is_bad_data( x ) && intensity_25_min_set && (x < intensity_25_min) )   return 0;
 
-   if ( !is_bad_data( x ) && intensity_25_max_set && (x > intensity_25_max) )   return ( 0 );
+   if ( !is_bad_data( x ) && intensity_25_max_set && (x > intensity_25_max) )   return 0;
 
 }
 
@@ -1737,9 +1737,9 @@ if ( intensity_50_min_set || intensity_50_max_set )  {
 
    x = L.intensity_50();
 
-   if ( !is_bad_data( x ) && intensity_50_min_set && (x < intensity_50_min) )   return ( 0 );
+   if ( !is_bad_data( x ) && intensity_50_min_set && (x < intensity_50_min) )   return 0;
 
-   if ( !is_bad_data( x ) && intensity_50_max_set && (x > intensity_50_max) )   return ( 0 );
+   if ( !is_bad_data( x ) && intensity_50_max_set && (x > intensity_50_max) )   return 0;
 
 }
 
@@ -1747,9 +1747,9 @@ if ( intensity_75_min_set || intensity_75_max_set )  {
 
    x = L.intensity_75();
 
-   if ( !is_bad_data( x ) && intensity_75_min_set && (x < intensity_75_min) )   return ( 0 );
+   if ( !is_bad_data( x ) && intensity_75_min_set && (x < intensity_75_min) )   return 0;
 
-   if ( !is_bad_data( x ) && intensity_75_max_set && (x > intensity_75_max) )   return ( 0 );
+   if ( !is_bad_data( x ) && intensity_75_max_set && (x > intensity_75_max) )   return 0;
 
 }
 
@@ -1757,9 +1757,9 @@ if ( intensity_90_min_set || intensity_90_max_set )  {
 
    x = L.intensity_90();
 
-   if ( !is_bad_data( x ) && intensity_90_min_set && (x < intensity_90_min) )   return ( 0 );
+   if ( !is_bad_data( x ) && intensity_90_min_set && (x < intensity_90_min) )   return 0;
 
-   if ( !is_bad_data( x ) && intensity_90_max_set && (x > intensity_90_max) )   return ( 0 );
+   if ( !is_bad_data( x ) && intensity_90_max_set && (x > intensity_90_max) )   return 0;
 
 }
 
@@ -1767,9 +1767,9 @@ if ( intensity_user_min_set || intensity_user_max_set )  {
 
    x = L.intensity_user();
 
-   if ( !is_bad_data( x ) && intensity_user_min_set && (x < intensity_user_min) )   return ( 0 );
+   if ( !is_bad_data( x ) && intensity_user_min_set && (x < intensity_user_min) )   return 0;
 
-   if ( !is_bad_data( x ) && intensity_user_max_set && (x > intensity_user_max) )   return ( 0 );
+   if ( !is_bad_data( x ) && intensity_user_max_set && (x > intensity_user_max) )   return 0;
 
 }
 
@@ -1777,9 +1777,9 @@ if ( intensity_sum_min_set || intensity_sum_max_set )  {
 
    x = L.intensity_sum();
 
-   if ( !is_bad_data( x ) && intensity_sum_min_set && (x < intensity_sum_min) )   return ( 0 );
+   if ( !is_bad_data( x ) && intensity_sum_min_set && (x < intensity_sum_min) )   return 0;
 
-   if ( !is_bad_data( x ) && intensity_sum_max_set && (x > intensity_sum_max) )   return ( 0 );
+   if ( !is_bad_data( x ) && intensity_sum_max_set && (x > intensity_sum_max) )   return 0;
 
 }
 
@@ -1787,9 +1787,9 @@ if ( centroid_dist_min_set || centroid_dist_max_set )  {
 
    x = L.centroid_dist();
 
-   if ( !is_bad_data( x ) && centroid_dist_min_set && (x < centroid_dist_min) )   return ( 0 );
+   if ( !is_bad_data( x ) && centroid_dist_min_set && (x < centroid_dist_min) )   return 0;
 
-   if ( !is_bad_data( x ) && centroid_dist_max_set && (x > centroid_dist_max) )   return ( 0 );
+   if ( !is_bad_data( x ) && centroid_dist_max_set && (x > centroid_dist_max) )   return 0;
 
 }
 
@@ -1797,9 +1797,9 @@ if ( boundary_dist_min_set || boundary_dist_max_set )  {
 
    x = L.boundary_dist();
 
-   if ( !is_bad_data( x ) && boundary_dist_min_set && (x < boundary_dist_min) )   return ( 0 );
+   if ( !is_bad_data( x ) && boundary_dist_min_set && (x < boundary_dist_min) )   return 0;
 
-   if ( !is_bad_data( x ) && boundary_dist_max_set && (x > boundary_dist_max) )   return ( 0 );
+   if ( !is_bad_data( x ) && boundary_dist_max_set && (x > boundary_dist_max) )   return 0;
 
 }
 
@@ -1807,9 +1807,9 @@ if ( convex_hull_dist_min_set || convex_hull_dist_max_set )  {
 
    x = L.convex_hull_dist();
 
-   if ( !is_bad_data( x ) && convex_hull_dist_min_set && (x < convex_hull_dist_min) )   return ( 0 );
+   if ( !is_bad_data( x ) && convex_hull_dist_min_set && (x < convex_hull_dist_min) )   return 0;
 
-   if ( !is_bad_data( x ) && convex_hull_dist_max_set && (x > convex_hull_dist_max) )   return ( 0 );
+   if ( !is_bad_data( x ) && convex_hull_dist_max_set && (x > convex_hull_dist_max) )   return 0;
 
 }
 
@@ -1817,9 +1817,9 @@ if ( angle_diff_min_set || angle_diff_max_set )  {
 
    x = L.angle_diff();
 
-   if ( !is_bad_data( x ) && angle_diff_min_set && (x < angle_diff_min) )   return ( 0 );
+   if ( !is_bad_data( x ) && angle_diff_min_set && (x < angle_diff_min) )   return 0;
 
-   if ( !is_bad_data( x ) && angle_diff_max_set && (x > angle_diff_max) )   return ( 0 );
+   if ( !is_bad_data( x ) && angle_diff_max_set && (x > angle_diff_max) )   return 0;
 
 }
 
@@ -1827,9 +1827,9 @@ if ( aspect_diff_min_set || aspect_diff_max_set )  {
 
    x = L.aspect_diff();
 
-   if ( !is_bad_data( x ) && aspect_diff_min_set && (x < aspect_diff_min) )   return ( 0 );
+   if ( !is_bad_data( x ) && aspect_diff_min_set && (x < aspect_diff_min) )   return 0;
 
-   if ( !is_bad_data( x ) && aspect_diff_max_set && (x > aspect_diff_max) )   return ( 0 );
+   if ( !is_bad_data( x ) && aspect_diff_max_set && (x > aspect_diff_max) )   return 0;
 
 }
 
@@ -1837,9 +1837,9 @@ if ( area_ratio_min_set || area_ratio_max_set )  {
 
    x = L.area_ratio();
 
-   if ( !is_bad_data( x ) && area_ratio_min_set && (x < area_ratio_min) )   return ( 0 );
+   if ( !is_bad_data( x ) && area_ratio_min_set && (x < area_ratio_min) )   return 0;
 
-   if ( !is_bad_data( x ) && area_ratio_max_set && (x > area_ratio_max) )   return ( 0 );
+   if ( !is_bad_data( x ) && area_ratio_max_set && (x > area_ratio_max) )   return 0;
 
 }
 
@@ -1847,9 +1847,9 @@ if ( intersection_over_area_min_set || intersection_over_area_max_set )  {
 
    x = L.intersection_over_area();
 
-   if ( !is_bad_data( x ) && intersection_over_area_min_set && (x < intersection_over_area_min) )   return ( 0 );
+   if ( !is_bad_data( x ) && intersection_over_area_min_set && (x < intersection_over_area_min) )   return 0;
 
-   if ( !is_bad_data( x ) && intersection_over_area_max_set && (x > intersection_over_area_max) )   return ( 0 );
+   if ( !is_bad_data( x ) && intersection_over_area_max_set && (x > intersection_over_area_max) )   return 0;
 
 }
 
@@ -1857,9 +1857,9 @@ if ( curvature_ratio_min_set || curvature_ratio_max_set )  {
 
    x = L.curvature_ratio();
 
-   if ( !is_bad_data( x ) && curvature_ratio_min_set && (x < curvature_ratio_min) )   return ( 0 );
+   if ( !is_bad_data( x ) && curvature_ratio_min_set && (x < curvature_ratio_min) )   return 0;
 
-   if ( !is_bad_data( x ) && curvature_ratio_max_set && (x > curvature_ratio_max) )   return ( 0 );
+   if ( !is_bad_data( x ) && curvature_ratio_max_set && (x > curvature_ratio_max) )   return 0;
 
 }
 
@@ -1867,9 +1867,9 @@ if ( complexity_ratio_min_set || complexity_ratio_max_set )  {
 
    x = L.complexity_ratio();
 
-   if ( !is_bad_data( x ) && complexity_ratio_min_set && (x < complexity_ratio_min) )   return ( 0 );
+   if ( !is_bad_data( x ) && complexity_ratio_min_set && (x < complexity_ratio_min) )   return 0;
 
-   if ( !is_bad_data( x ) && complexity_ratio_max_set && (x > complexity_ratio_max) )   return ( 0 );
+   if ( !is_bad_data( x ) && complexity_ratio_max_set && (x > complexity_ratio_max) )   return 0;
 
 }
 
@@ -1877,9 +1877,9 @@ if ( percentile_intensity_ratio_min_set || percentile_intensity_ratio_max_set ) 
 
    x = L.percentile_intensity_ratio();
 
-   if ( !is_bad_data( x ) && percentile_intensity_ratio_min_set && (x < percentile_intensity_ratio_min) )   return ( 0 );
+   if ( !is_bad_data( x ) && percentile_intensity_ratio_min_set && (x < percentile_intensity_ratio_min) )   return 0;
 
-   if ( !is_bad_data( x ) && percentile_intensity_ratio_max_set && (x > percentile_intensity_ratio_max) )   return ( 0 );
+   if ( !is_bad_data( x ) && percentile_intensity_ratio_max_set && (x > percentile_intensity_ratio_max) )   return 0;
 
 }
 
@@ -1887,9 +1887,9 @@ if ( interest_min_set || interest_max_set )  {
 
    x = L.interest();
 
-   if ( !is_bad_data( x ) && interest_min_set && (x < interest_min) )   return ( 0 );
+   if ( !is_bad_data( x ) && interest_min_set && (x < interest_min) )   return 0;
 
-   if ( !is_bad_data( x ) && interest_max_set && (x > interest_max) )   return ( 0 );
+   if ( !is_bad_data( x ) && interest_max_set && (x > interest_max) )   return 0;
 
 }
 
@@ -1900,7 +1900,7 @@ if ( interest_min_set || interest_max_set )  {
 
 if ( poly )  {
 
-   if ( !(poly->latlon_is_inside_dege(L.centroid_lat(), L.centroid_lon())) )  return ( 0 );
+   if ( !(poly->latlon_is_inside_dege(L.centroid_lat(), L.centroid_lon())) )  return 0;
 
 }
 
@@ -1910,7 +1910,7 @@ if ( poly )  {
    //  ok, already
    //
 
-return ( 1 );
+return 1;
 
 }
 

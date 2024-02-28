@@ -2649,7 +2649,7 @@ int get_event_index(int flag, int i_var, int i_lvl) {
       if(ev < 0) ev = 0;
    }
 
-   return(ev);
+   return ev;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2687,7 +2687,7 @@ int get_event_index_temp(int flag, int i_var, int i_lvl) {
          if(is_eq(evns[i_var][i][i_lvl][2], virtmp_prog_code)) {
 
             // Skip this observation if the reason code is 3
-            if(is_eq(evns[i_var][i][i_lvl][3], 3.0)) return(bad_data_int);
+            if(is_eq(evns[i_var][i][i_lvl][3], 3.0)) return bad_data_int;
 
             // Use the next entry in the event stack but keep searching
             ev = i+1;
@@ -2702,10 +2702,10 @@ int get_event_index_temp(int flag, int i_var, int i_lvl) {
       ev = get_event_index(flag, i_var, i_lvl);
 
       // Check for the VIRTMP program code
-      if(is_eq(evns[i_var][ev][i_lvl][2], virtmp_prog_code)) return(bad_data_int);
+      if(is_eq(evns[i_var][ev][i_lvl][2], virtmp_prog_code)) return bad_data_int;
    }
 
-   return(ev);
+   return ev;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2743,7 +2743,7 @@ bool keep_message_type(const char *mt_str) {
    keep = conf_info.message_type.n_elements() == 0 ||
           conf_info.message_type.has(mt_str, false);
 
-   return(keep);
+   return keep;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2773,7 +2773,7 @@ bool keep_valid_time(const unixtime ut,
       if(ut > max_ut) keep = false;
    }
 
-   return(keep);
+   return keep;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2884,7 +2884,7 @@ float derive_grib_code(int gc, float *pqtzuv, float *pqtzuv_qty,
          break;
    } // end switch
 
-   return(result);
+   return result;
 }
 
 ////////////////////////////////////////////////////////////////////////

@@ -64,11 +64,11 @@ STATAnalysisJob::STATAnalysisJob(const STATAnalysisJob & aj) {
 STATAnalysisJob & STATAnalysisJob::operator=(
    const STATAnalysisJob & aj) {
 
-   if(this == &aj ) return ( * this );
+   if(this == &aj ) return *this;
 
    assign(aj);
 
-   return (* this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -664,41 +664,41 @@ int STATAnalysisJob::is_keeper(const STATLine & L) const {
    // model
    //
    if(model.n() > 0) {
-      if(!(model.has(L.model()))) return(0);
+      if(!(model.has(L.model()))) return 0;
    }
 
    //
    // desc
    //
    if(desc.n() > 0) {
-      if(!(desc.has(L.desc()))) return(0);
+      if(!(desc.has(L.desc()))) return 0;
    }
 
    //
    // fcst_lead (in seconds)
    //
    if(fcst_lead.n() > 0) {
-      if(!fcst_lead.has(L.fcst_lead())) return(0);
+      if(!fcst_lead.has(L.fcst_lead())) return 0;
    }
 
    //
    // fcst_valid_beg
    //
    if((fcst_valid_beg > 0) && (L.fcst_valid_beg() < fcst_valid_beg))
-      return(0);
+      return 0;
 
    //
    // fcst_valid_end
    //
    if((fcst_valid_end > 0) && (L.fcst_valid_end() > fcst_valid_end))
-      return(0);
+      return 0;
 
    //
    // fcst_valid_inc
    //
    if(fcst_valid_inc.n() > 0) {
       if(!fcst_valid_inc.has(L.fcst_valid_beg()) ||
-         !fcst_valid_inc.has(L.fcst_valid_end())) return(0);
+         !fcst_valid_inc.has(L.fcst_valid_end())) return 0;
    }
 
    //
@@ -706,7 +706,7 @@ int STATAnalysisJob::is_keeper(const STATLine & L) const {
    //
    if(fcst_valid_exc.n() > 0) {
       if(fcst_valid_exc.has(L.fcst_valid_beg()) ||
-         fcst_valid_exc.has(L.fcst_valid_end())) return(0);
+         fcst_valid_exc.has(L.fcst_valid_end())) return 0;
    }
 
    //
@@ -716,29 +716,29 @@ int STATAnalysisJob::is_keeper(const STATLine & L) const {
    if(fcst_valid_hour.n() > 0) {
 
       // Check that fcst_valid_beg = fcst_valid_end
-      if(L.fcst_valid_beg() != L.fcst_valid_end()) return(0);
+      if(L.fcst_valid_beg() != L.fcst_valid_end()) return 0;
 
-      if(!fcst_valid_hour.has(L.fcst_valid_hour())) return(0);
+      if(!fcst_valid_hour.has(L.fcst_valid_hour())) return 0;
    }
 
    //
    // fcst_init_beg
    //
    if((fcst_init_beg > 0) && (L.fcst_init_beg() < fcst_init_beg))
-      return(0);
+      return 0;
 
    //
    // fcst_init_end
    //
    if((fcst_init_end > 0) && (L.fcst_init_end() > fcst_init_end))
-      return(0);
+      return 0;
 
    //
    // fcst_init_inc
    //
    if(fcst_init_inc.n() > 0) {
       if(!fcst_init_inc.has(L.fcst_init_beg()) ||
-         !fcst_init_inc.has(L.fcst_init_end())) return(0);
+         !fcst_init_inc.has(L.fcst_init_end())) return 0;
    }
 
    //
@@ -746,7 +746,7 @@ int STATAnalysisJob::is_keeper(const STATLine & L) const {
    //
    if(fcst_init_exc.n() > 0) {
       if(fcst_init_exc.has(L.fcst_init_beg()) ||
-         fcst_init_exc.has(L.fcst_init_end())) return(0);
+         fcst_init_exc.has(L.fcst_init_end())) return 0;
    }
 
    //
@@ -756,36 +756,36 @@ int STATAnalysisJob::is_keeper(const STATLine & L) const {
    if(fcst_init_hour.n() > 0) {
 
       // Check that fcst_init_beg = fcst_init_end
-      if(L.fcst_init_beg() != L.fcst_init_end()) return(0);
+      if(L.fcst_init_beg() != L.fcst_init_end()) return 0;
 
-      if(!fcst_init_hour.has(L.fcst_init_hour())) return(0);
+      if(!fcst_init_hour.has(L.fcst_init_hour())) return 0;
    }
 
    //
    // obs_lead (in seconds)
    //
    if(obs_lead.n() > 0) {
-      if(!obs_lead.has(L.obs_lead())) return(0);
+      if(!obs_lead.has(L.obs_lead())) return 0;
    }
 
    //
    // obs_valid_beg
    //
    if((obs_valid_beg > 0) && (L.obs_valid_beg() < obs_valid_beg))
-      return(0);
+      return 0;
 
    //
    // obs_valid_end
    //
    if((obs_valid_end > 0) && (L.obs_valid_end() > obs_valid_end))
-      return(0);
+      return 0;
 
    //
    // obs_valid_inc
    //
    if(obs_valid_inc.n() > 0) {
       if(!obs_valid_inc.has(L.obs_valid_beg()) ||
-         !obs_valid_inc.has(L.obs_valid_end())) return(0);
+         !obs_valid_inc.has(L.obs_valid_end())) return 0;
    }
 
    //
@@ -793,7 +793,7 @@ int STATAnalysisJob::is_keeper(const STATLine & L) const {
    //
    if(obs_valid_exc.n() > 0) {
       if(obs_valid_exc.has(L.obs_valid_beg()) ||
-         obs_valid_exc.has(L.obs_valid_end())) return(0);
+         obs_valid_exc.has(L.obs_valid_end())) return 0;
    }
 
    //
@@ -803,29 +803,29 @@ int STATAnalysisJob::is_keeper(const STATLine & L) const {
    if(obs_valid_hour.n() > 0) {
 
       // Check that obs_valid_beg = obs_valid_end
-      if(L.obs_valid_beg() != L.obs_valid_end()) return(0);
+      if(L.obs_valid_beg() != L.obs_valid_end()) return 0;
 
-      if(!obs_valid_hour.has(L.obs_valid_hour())) return(0);
+      if(!obs_valid_hour.has(L.obs_valid_hour())) return 0;
    }
 
    //
    // obs_init_beg
    //
    if((obs_init_beg > 0) && (L.obs_init_beg() < obs_init_beg))
-      return(0);
+      return 0;
 
    //
    // obs_init_end
    //
    if((obs_init_end > 0) && (L.obs_init_end() > obs_init_end))
-      return(0);
+      return 0;
 
    //
    // obs_init_inc
    //
    if(obs_init_inc.n() > 0) {
       if(!obs_init_inc.has(L.obs_init_beg()) ||
-         !obs_init_inc.has(L.obs_init_end())) return(0);
+         !obs_init_inc.has(L.obs_init_end())) return 0;
    }
 
    //
@@ -833,7 +833,7 @@ int STATAnalysisJob::is_keeper(const STATLine & L) const {
    //
    if(obs_init_exc.n() > 0) {
       if(obs_init_exc.has(L.obs_init_beg()) ||
-         obs_init_exc.has(L.obs_init_end())) return(0);
+         obs_init_exc.has(L.obs_init_end())) return 0;
    }
 
    //
@@ -843,120 +843,120 @@ int STATAnalysisJob::is_keeper(const STATLine & L) const {
    if(obs_init_hour.n() > 0) {
 
       // Check that obs_init_beg = obs_init_end
-      if(L.obs_init_beg() != L.obs_init_end()) return(0);
+      if(L.obs_init_beg() != L.obs_init_end()) return 0;
 
-      if(!obs_init_hour.has(L.obs_init_hour())) return(0);
+      if(!obs_init_hour.has(L.obs_init_hour())) return 0;
    }
 
    //
    // fcst_var
    //
    if(fcst_var.n() > 0) {
-      if(!(fcst_var.has(L.fcst_var()))) return(0);
+      if(!(fcst_var.has(L.fcst_var()))) return 0;
    }
 
    //
    // fcst_units
    //
    if(fcst_units.n() > 0) {
-      if(!(fcst_units.has(L.fcst_units()))) return(0);
+      if(!(fcst_units.has(L.fcst_units()))) return 0;
    }
 
    //
    // fcst_lev
    //
    if(fcst_lev.n() > 0) {
-      if(!(fcst_lev.has(L.fcst_lev()))) return(0);
+      if(!(fcst_lev.has(L.fcst_lev()))) return 0;
    }
 
    //
    // obs_var
    //
    if(obs_var.n() > 0) {
-      if(!(obs_var.has(L.obs_var()))) return(0);
+      if(!(obs_var.has(L.obs_var()))) return 0;
    }
 
    //
    // obs_units
    //
    if(obs_units.n() > 0) {
-      if(!(obs_units.has(L.obs_units()))) return(0);
+      if(!(obs_units.has(L.obs_units()))) return 0;
    }
 
    //
    // obs_lev
    //
    if(obs_lev.n() > 0) {
-      if(!(obs_lev.has(L.obs_lev()))) return(0);
+      if(!(obs_lev.has(L.obs_lev()))) return 0;
    }
 
    //
    // obtype
    //
    if(obtype.n() > 0) {
-      if(!(obtype.has(L.obtype()))) return(0);
+      if(!(obtype.has(L.obtype()))) return 0;
    }
 
    //
    // vx_mask
    //
    if(vx_mask.n() > 0) {
-      if(!(vx_mask.has(L.vx_mask()))) return(0);
+      if(!(vx_mask.has(L.vx_mask()))) return 0;
    }
 
    //
    // interp_mthd
    //
    if(interp_mthd.n() > 0) {
-      if(!(interp_mthd.has(L.interp_mthd()))) return(0);
+      if(!(interp_mthd.has(L.interp_mthd()))) return 0;
    }
 
    //
    // interp_pnts
    //
    if(interp_pnts.n() > 0) {
-      if(!interp_pnts.has(L.interp_pnts())) return(0);
+      if(!interp_pnts.has(L.interp_pnts())) return 0;
    }
 
    //
    // fcst_thresh
    //
    if(fcst_thresh.n() > 0) {
-      if(!check_thresh_column(fcst_thresh, L.fcst_thresh())) return(0);
+      if(!check_thresh_column(fcst_thresh, L.fcst_thresh())) return 0;
    }
 
    //
    // obs_thresh
    //
    if(obs_thresh.n() > 0) {
-      if(!check_thresh_column(obs_thresh, L.obs_thresh())) return(0);
+      if(!check_thresh_column(obs_thresh, L.obs_thresh())) return 0;
    }
 
    //
    // cov_thresh
    //
    if(cov_thresh.n() > 0) {
-      if(!check_thresh_column(cov_thresh, L.cov_thresh())) return(0);
+      if(!check_thresh_column(cov_thresh, L.cov_thresh())) return 0;
    }
 
    //
    // thresh_logic
    //
    if(thresh_logic != SetLogic_None &&
-      thresh_logic != L.thresh_logic()) return(0);
+      thresh_logic != L.thresh_logic()) return 0;
 
    //
    // alpha
    //
    if(alpha.n() > 0) {
-      if(!alpha.has(L.alpha())) return(0);
+      if(!alpha.has(L.alpha())) return 0;
    }
 
    //
    // line_type
    //
    if(line_type.n() > 0) {
-      if(!(line_type.has(L.line_type()))) return(0);
+      if(!(line_type.has(L.line_type()))) return 0;
    }
 
    //
@@ -973,7 +973,7 @@ int STATAnalysisJob::is_keeper(const STATLine & L) const {
       //
       // Check the column threshold
       //
-      if(!thr_it->second.check_dbl(v_dbl)) return(0);
+      if(!thr_it->second.check_dbl(v_dbl)) return 0;
    }
 
    //
@@ -985,7 +985,7 @@ int STATAnalysisJob::is_keeper(const STATLine & L) const {
       //
       // Check if the current value is in the list for the column
       //
-      if(!str_it->second.has(L.get_item(str_it->first.c_str(), false))) return(0);
+      if(!str_it->second.has(L.get_item(str_it->first.c_str(), false))) return 0;
    }
 
    //
@@ -997,7 +997,7 @@ int STATAnalysisJob::is_keeper(const STATLine & L) const {
       //
       // Check if the current value is not in the list for the column
       //
-      if(str_it->second.has(L.get_item(str_it->first.c_str(), false))) return(0);
+      if(str_it->second.has(L.get_item(str_it->first.c_str(), false))) return 0;
    }
 
    //
@@ -1009,10 +1009,10 @@ int STATAnalysisJob::is_keeper(const STATLine & L) const {
 
       if(!is_in_mask_grid(lat, lon) ||
          !is_in_mask_poly(lat, lon) ||
-         !is_in_mask_sid (L.get_item("OBS_SID"))) return(0);
+         !is_in_mask_sid (L.get_item("OBS_SID"))) return 0;
    }
 
-   return(1);
+   return 1;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1059,7 +1059,7 @@ double STATAnalysisJob::get_column_double(const STATLine &L,
    // Apply absolute value, if requested
    if(abs_flag && !is_bad_data(v)) v = fabs(v);
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1704,8 +1704,8 @@ int STATAnalysisJob::set_job_type(const char *c) {
 
    job_type = string_to_statjobtype(c);
 
-   if(job_type == no_stat_job_type) return(1);
-   else                             return(0);
+   if(job_type == no_stat_job_type) return 1;
+   else                             return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2333,7 +2333,7 @@ ConcatString STATAnalysisJob::get_case_info(const STATLine & L) const {
       key << (i == 0 ? "" : ":") << cs;
    }
 
-   return(key);
+   return key;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2871,7 +2871,7 @@ ConcatString STATAnalysisJob::get_jobstring() const {
       js << "-vif_flag " << vif_flag << " ";
    }
 
-   return(js);
+   return js;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2899,7 +2899,7 @@ int STATAnalysisJob::is_in_mask_grid(double lat, double lon) const {
       }
    }
 
-   return(true);
+   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2914,7 +2914,7 @@ int STATAnalysisJob::is_in_mask_poly(double lat, double lon) const {
       r = mask_poly.latlon_is_inside_dege(lat, lon);
    }
 
-   return(r);
+   return r;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2927,7 +2927,7 @@ int STATAnalysisJob::is_in_mask_sid(const char *sid) const {
    //
    if(mask_sid.n() > 0) r = mask_sid.has(sid);
 
-   return(r);
+   return r;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2937,7 +2937,7 @@ int STATAnalysisJob::is_in_mask_sid(const char *sid) const {
 ////////////////////////////////////////////////////////////////////////
 
 const char * statjobtype_to_string(const STATJobType t) {
-   return(statjobtype_str[t]);
+   return statjobtype_str[t];
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2974,7 +2974,7 @@ STATJobType string_to_statjobtype(const char *str) {
    else
       t = no_stat_job_type;
 
-   return(t);
+   return t;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2989,7 +2989,7 @@ ConcatString timestring(const unixtime t) {
             short_month_name[month], day, year,
             hour, minute, second);
 
-   return(s);
+   return s;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2997,15 +2997,15 @@ ConcatString timestring(const unixtime t) {
 bool check_thresh_column(const ThreshArray &list, const ThreshArray &item) {
 
    // Return true for an empty search list.
-   if(list.n() == 0) return(true);
+   if(list.n() == 0) return true;
 
    // If the item is a single threshold, search for it in the list.
    if(item.n() == 1) {
-      return(list.has(item[0]));
+      return list.has(item[0]);
    }
 
    // Otherwise, check that the list and item exactly match.
-   return(list == item);
+   return (list == item);
 }
 
 ////////////////////////////////////////////////////////////////////////

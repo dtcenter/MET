@@ -83,11 +83,11 @@ TokenStack & TokenStack::operator=(const TokenStack & a)
 
 {
 
-if ( this == &a )  return ( * this );
+if ( this == &a )  return *this;
 
 assign(a);
 
-return ( * this );
+return *this;
 
 }
 
@@ -292,7 +292,7 @@ Token _t = e[Nelements - 1];
 
 --Nelements;
 
-return ( _t );
+return _t;
 
 }
 
@@ -314,7 +314,7 @@ if ( Nelements <= 0 )  {
 
 Token _t = e[Nelements - 1];
 
-return ( _t );
+return _t;
 
 }
 
@@ -336,7 +336,7 @@ if ( Nelements <= 0 )  {
 
 int k = e[Nelements - 1].in_prec;
 
-return ( k );
+return k;
 
 }
 
@@ -358,7 +358,7 @@ if ( Nelements <= 0 )  {
 
 char c = e[Nelements - 1].value;
 
-return ( c );
+return c;
 
 }
 */
@@ -381,7 +381,7 @@ if ( Nelements <= 0 )  {
 
 bool tf = e[Nelements - 1].is_mark();
 
-return ( tf );
+return tf;
 
 }
 
@@ -403,7 +403,7 @@ ostream & operator<<(ostream & out, const TokenStack & ts)
 
 ts.dump(out);
 
-return ( out );
+return out;
 
 }
 

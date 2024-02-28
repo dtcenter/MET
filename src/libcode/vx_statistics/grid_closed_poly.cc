@@ -72,11 +72,11 @@ GridClosedPoly::GridClosedPoly(const GridClosedPoly & g) {
 
 GridClosedPoly & GridClosedPoly::operator=(const GridClosedPoly & g) {
 
-   if(this == &g) return(*this);
+   if(this == &g) return *this;
 
    gcp_assign(g);
 
-   return(*this);
+   return *this;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -133,11 +133,11 @@ int GridClosedPoly::is_inside(double u_test, double v_test) const {
    //  test bounding box
    //
 
-   if(u_test < u_min) return(0);
-   if(u_test > u_max) return(0);
+   if(u_test < u_min) return 0;
+   if(u_test > u_max) return 0;
 
-   if(v_test < v_min) return(0);
-   if(v_test > v_max) return(0);
+   if(v_test < v_min) return 0;
+   if(v_test > v_max) return 0;
 
    //
    //  test polyline
@@ -145,7 +145,7 @@ int GridClosedPoly::is_inside(double u_test, double v_test) const {
 
    const int status = Polyline::is_inside(u_test, v_test);
 
-   return(status);
+   return status;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -156,7 +156,7 @@ int GridClosedPoly::is_inside(double u_test, double v_test) const {
 
 bool GridClosedPolyArray::is_inside(double u_test, double v_test) const {
 
-   if(Nelements == 0) return(false);
+   if(Nelements == 0) return false;
 
    int j, status;
 
@@ -167,10 +167,10 @@ bool GridClosedPolyArray::is_inside(double u_test, double v_test) const {
 
       status = e[j]->is_inside(u_test, v_test);
 
-      if(status != 0) return(true);
+      if(status != 0) return true;
    }
 
-   return(false);
+   return false;
 
 }
 

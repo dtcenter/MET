@@ -40,14 +40,14 @@ for (j=0; j<n_kw_infos; ++j)  {
 
       a = kw_info[j].key;
 
-      return ( 1 );
+      return 1;
 
    }
 
 }
 
 
-return ( 0 );
+return 0;
 
 }
 

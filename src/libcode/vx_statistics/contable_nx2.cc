@@ -122,11 +122,11 @@ Nx2ContingencyTable & Nx2ContingencyTable::operator=(const Nx2ContingencyTable &
 
 {
 
-if ( this == &t )  return ( * this );
+if ( this == &t )  return *this;
 
 assign(t);
 
-return ( * this );
+return *this;
 
 }
 
@@ -160,7 +160,7 @@ int k;
 
 k = total();
 
-return ( k );
+return k;
 
 }
 
@@ -216,9 +216,9 @@ if ( !Thresholds )  {
 
 }
 
-if ( t < Thresholds[0]     && !is_eq(t, Thresholds[0]) )      return ( -1 );
+if ( t < Thresholds[0]     && !is_eq(t, Thresholds[0]) )      return -1;
 
-if ( t > Thresholds[Nrows] && !is_eq(t, Thresholds[Nrows]) )  return ( -1 );
+if ( t > Thresholds[Nrows] && !is_eq(t, Thresholds[Nrows]) )  return -1;
                                                //  Thresholds array is of size Nrows + 1, so
                                                //  the last element has index Nrows, not Nrows - 1
 
@@ -227,13 +227,13 @@ int j;
 for (j=0; j<Nrows; ++j)  {
 
    if ( ( t > Thresholds[j    ] ||  is_eq(t, Thresholds[j    ]) ) &&
-        ( t < Thresholds[j + 1] && !is_eq(t, Thresholds[j + 1]) ) )  return ( j );
+        ( t < Thresholds[j + 1] && !is_eq(t, Thresholds[j + 1]) ) )  return j;
 
 }
 
 if ( is_eq(t, Thresholds[Nrows]) ) return ( Nrows - 1 );
 
-return ( -1 );
+return -1;
 
 }
 
@@ -287,7 +287,7 @@ if ( (k < 0) || (k > Nrows) )  {   //  there are Nrows + 1 thresholds
 
 }
 
-return ( Thresholds[k] );
+return Thresholds[k];
 
 }
 
@@ -367,7 +367,7 @@ int k;
 
 k = entry(r, nx2_event_column);
 
-return ( k );
+return k;
 
 }
 
@@ -395,7 +395,7 @@ int k;
 
 k = entry(r, nx2_nonevent_column);
 
-return ( k );
+return k;
 
 }
 
@@ -414,7 +414,7 @@ double x;
 if(Ni == 0) x = bad_data_double;
 else        x = ((double) obs_count)/((double) Ni);
 
-return ( x );
+return x;
 
 }
 
@@ -433,7 +433,7 @@ double x;
 if (N == 0) x = bad_data_double;
 else        x = ((double) obs_count)/((double) N);
 
-return ( x );
+return x;
 
 }
 
@@ -458,7 +458,7 @@ double x;
 if ( use_center ) x = 0.5*(Thresholds[row] + Thresholds[row + 1]);
 else              x = Thresholds[row];
 
-return ( x );
+return x;
 
 }
 
@@ -468,7 +468,7 @@ return ( x );
 
 double Nx2ContingencyTable::baser() const {
 
-   return ( (double) event_col_total()/n() );
+   return (double) event_col_total()/n();
 }
 
 
@@ -483,7 +483,7 @@ double Nx2ContingencyTable::baser_ci(double alpha,
 
    compute_proportion_ci(v, n(), alpha, 1.0, cl, cu);
 
-   return ( v );
+   return v;
 }
 
 
@@ -527,7 +527,7 @@ for (row=0; row<Nrows; ++row)  {
 if (N == 0) sum  = bad_data_double;
 else        sum /= N;
 
-return ( sum );
+return sum;
 
 }
 
@@ -566,7 +566,7 @@ for (row=0; row<Nrows; ++row)  {
 if (N == 0) sum  = bad_data_double;
 else        sum /= N;
 
-return ( sum );
+return sum;
 
 }
 
@@ -585,7 +585,7 @@ a = obar();
 if (is_bad_data(a)) b = bad_data_double;
 else                b = a*(1.0 - a);
 
-return ( b );
+return b;
 
 }
 
@@ -615,7 +615,7 @@ else {
    bss = ( res - rel ) / unc;
 }
 
-return ( bss );
+return bss;
 
 }
 
@@ -629,7 +629,7 @@ double Nx2ContingencyTable::brier_score() const
 
 const int N = n();
 
-if ( N == 0 )  return ( bad_data_double );
+if ( N == 0 )  return bad_data_double;
 
 int j, count;
 double t, yi, sum;
@@ -675,7 +675,7 @@ for (j=0; j<Nrows; ++j)  {
 if (N == 0) sum  = bad_data_double;
 else        sum /= N;
 
-return ( sum );
+return sum;
 
 }
 
@@ -705,7 +705,7 @@ denom = num + nonevent_count_by_row(row);
 if(is_eq(denom, 0.0)) x = bad_data_double;
 else                  x = num/denom;
 
-return ( x );
+return x;
 
 }
 
@@ -737,7 +737,7 @@ x = (double) (py_o1 + py_o2);
 if (N == 0) x  = bad_data_double;
 else        x /= N;
 
-return ( x );
+return x;
 
 }
 
@@ -766,7 +766,7 @@ num   = (double) event_count_by_row(row);
 if(is_eq(denom, 0.0)) x = bad_data_double;
 else                  x = num/denom;
 
-return ( x );
+return x;
 
 }
 
@@ -795,7 +795,7 @@ num   = (double) nonevent_count_by_row(row);
 if(is_eq(denom, 0.0)) x = bad_data_double;
 else                  x = num/denom;
 
-return ( x );
+return x;
 
 }
 
@@ -850,7 +850,7 @@ tt.set_fn_on(sn);
 
    ///////////////////
 
-return ( tt );
+return tt;
 
 }
 
@@ -891,7 +891,7 @@ for(j=0, area=bad_data_double; j<Nrows; ++j)  {
 
 }
 
-return ( area );
+return area;
 
 }
 
@@ -921,7 +921,7 @@ const double Ninv = 1.0/N;
 
 // N must be > 1 so that degf > 0 in the call to gsl_cdf_tdist_Pinv()
 
-if(is_bad_data(bs = brier_score()) || N <= 1)  return ( bad_data_double );
+if(is_bad_data(bs = brier_score()) || N <= 1)  return bad_data_double;
 
 degf = N - 1.0;
 
@@ -963,7 +963,7 @@ var = ( af4 + ob*term - bs*bs )*Ninv;
 
 halfwidth = t*sqrt(var);
 
-return ( halfwidth );
+return halfwidth;
 
 }
 

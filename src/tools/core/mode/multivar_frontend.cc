@@ -153,7 +153,7 @@ int MultivarFrontEnd::run(const StringArray & Argv)
    //
    //  done
    //
-   return (0);
+   return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -626,7 +626,7 @@ int MultivarFrontEnd::_mkdir(const char *dir)
          *p = '/';
       }
 
-   return (mkdir(tmp, dir_creation_mode));
+   return mkdir(tmp, dir_creation_mode);
 }
 
 ////////////////////////////////////////////////////////////////////////

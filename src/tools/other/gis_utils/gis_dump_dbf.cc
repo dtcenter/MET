@@ -151,7 +151,7 @@ for (j=0; j<(h.n_records); ++j)  {
 
 close(fd);
 
-return ( 0 );
+return 0;
 
 }
 

@@ -102,11 +102,11 @@ TcrmwGrid & TcrmwGrid::operator=(const TcrmwGrid & tg)
 
 {
 
-if ( this == &tg )   return ( * this );
+if ( this == &tg )   return *this;
 
 assign(tg);
 
-return ( * this );
+return *this;
 
 }
 

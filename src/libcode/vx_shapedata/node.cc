@@ -63,11 +63,11 @@ Node::Node(const Node &c) {
 
 Node & Node::operator=(const Node &c) {
 
-   if(this == &c) return(*this);
+   if(this == &c) return *this;
 
    assign(c);
 
-   return(*this);
+   return *this;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -196,7 +196,7 @@ int Node::n_children() const {
       n_ptr = n_ptr->sibling;
    }
 
-   return(count);
+   return count;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -222,7 +222,7 @@ Node *Node::get_child(int n) const {
 
    for(i=0; i<n; i++) n_ptr = n_ptr->sibling;
 
-   return(n_ptr);
+   return n_ptr;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -243,7 +243,7 @@ int Node::is_closed() const {
       n_ptr = n_ptr->sibling;
    }
 
-   return(closed);
+   return closed;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -321,7 +321,7 @@ double Node::angle() const {
 
    a = 0.5*deg_per_rad*atan2( 2.0*Ixy, Ixx - Iyy );
 
-   return(a);
+   return a;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -372,7 +372,7 @@ double Node::uv_signed_area() const {
       n_ptr = n_ptr->sibling;
    }
 
-   return(sum);
+   return sum;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -404,7 +404,7 @@ int Node::is_inside(double u_test, double v_test) const {
       n_ptr = n_ptr->sibling;
    }
 
-   return(count);
+   return count;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -425,7 +425,7 @@ int Node::is_polyline_point(double u_test, double v_test) const {
       n_ptr = n_ptr->sibling;
    }
 
-   return(poly_point);
+   return poly_point;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -531,7 +531,7 @@ double node_dist(const Node &a, const Node &b) {
       } // end for i_b
    } // end for i_a
 
-   return(min_dist);
+   return min_dist;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -563,7 +563,7 @@ double node_polyline_dist(const Node &a, const Polyline &b) {
 
    } // end for i_a
 
-   return(min_dist);
+   return min_dist;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

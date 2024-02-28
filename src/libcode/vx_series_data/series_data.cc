@@ -74,7 +74,7 @@ bool get_series_entry(int i_series, VarInfo* data_info,
    // Restore warnings to their original state
    mlog.set_print_warning(save_print_warning_state);
 
-   return(found);
+   return found;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -89,7 +89,7 @@ bool read_single_entry(VarInfo* info, const ConcatString& filename,
    if(!file_exists(filename.c_str())) {
       mlog << Warning << "\nread_single_entry() -> "
            << "File does not exist: " << filename << "\n\n";
-      return(false);
+      return false;
    }
 
    // Open data file
@@ -104,7 +104,7 @@ bool read_single_entry(VarInfo* info, const ConcatString& filename,
    // Cleanup
    if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) nullptr; }
 
-   return(found);
+   return found;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -117,7 +117,7 @@ bool get_series_entries(int i_series, vector<VarInfo*> &vi_list,
    bool found;
 
    // Check for at least one field requested
-   if(vi_list.size() <= 0) return(false);
+   if(vi_list.size() <= 0) return false;
 
    // Save the log print warning state
    bool save_print_warning_state = mlog.print_warning();
@@ -156,7 +156,7 @@ bool get_series_entries(int i_series, vector<VarInfo*> &vi_list,
    // Restore warnings to their original state
    mlog.set_print_warning(save_print_warning_state);
 
-   return(found);
+   return found;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -171,7 +171,7 @@ bool read_all_entries(vector<VarInfo*> &vi_list, const ConcatString &filename,
    if(!file_exists(filename.c_str())) {
       mlog << Warning << "\nread_all_entries() -> "
            << "File does not exist: " << filename << "\n\n";
-      return(false);
+      return false;
    }
 
    // Open data file

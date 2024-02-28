@@ -99,11 +99,11 @@ AfmBBox & AfmBBox::operator=(const AfmBBox & b)
 
 {
 
-if ( this == &b )  return ( * this );
+if ( this == &b )  return *this;
 
 assign(b);
 
-return ( * this );
+return *this;
 
 }
 
@@ -237,11 +237,11 @@ LigatureInfo & LigatureInfo::operator=(const LigatureInfo & i)
 
 {
 
-if ( this == &i )  return ( * this );
+if ( this == &i )  return *this;
 
 assign(i);
 
-return ( * this );
+return *this;
 
 }
 
@@ -408,11 +408,11 @@ AfmCharMetrics & AfmCharMetrics::operator=(const AfmCharMetrics & m)
 
 {
 
-if ( this == &m )  return ( * this );
+if ( this == &m )  return *this;
 
 assign(m);
 
-return ( * this );
+return *this;
 
 }
 
@@ -606,11 +606,11 @@ PCC & PCC::operator=(const PCC & p)
 
 {
 
-if ( this == &p )  return ( * this );
+if ( this == &p )  return *this;
 
 assign(p);
 
-return ( * this );
+return *this;
 
 }
 
@@ -746,11 +746,11 @@ AfmCompositeInfo & AfmCompositeInfo::operator=(const AfmCompositeInfo & i)
 
 {
 
-if ( this == &i )  return ( * this );
+if ( this == &i )  return *this;
 
 assign(i);
 
-return ( * this );
+return *this;
 
 }
 
@@ -910,11 +910,11 @@ KPX & KPX::operator=(const KPX & p)
 
 {
 
-if ( this == &p )  return ( * this );
+if ( this == &p )  return *this;
 
 assign(p);
 
-return ( * this );
+return *this;
 
 }
 
@@ -1053,11 +1053,11 @@ Afm & Afm::operator=(const Afm & a)
 
 {
 
-if ( this == &a )  return ( * this );
+if ( this == &a )  return *this;
 
 assign(a);
 
-return ( * this );
+return *this;
 
 }
 
@@ -1448,7 +1448,7 @@ delete in;  in = (ifstream *) nullptr;
 line_number = 0;
 
 
-return ( 1 );
+return 1;
 
 }
 
@@ -2133,13 +2133,13 @@ int j;
 
 for (j=0; j<n_cms; ++j)  {
 
-   if ( cm[j].ascii_code == ascii_code )  return ( j );
+   if ( cm[j].ascii_code == ascii_code )  return j;
 
 }
 
 
 
-return ( -1 );
+return -1;
 
 }
 
@@ -2156,13 +2156,13 @@ int j;
 
 for (j=0; j<n_cms; ++j)  {
 
-   if ( strcmp(cm[j].name, name) == 0 )  return ( j );
+   if ( strcmp(cm[j].name, name) == 0 )  return j;
 
 }
 
 
 
-return ( -1 );
+return -1;
 
 }
 
@@ -2183,11 +2183,11 @@ int cm_index;
 
 cm_index = lookup_cm(ascii_code_1);
 
-if ( cm_index < 0 )  return ( 0 );
+if ( cm_index < 0 )  return 0;
 
 AfmCharMetrics & m = cm[cm_index];
 
-if ( m.n_ligatures == 0 )  return ( 0 );
+if ( m.n_ligatures == 0 )  return 0;
 
 int j, k;
 
@@ -2200,7 +2200,7 @@ for (j=0; j<(m.n_ligatures); ++j)  {
 
       lig = m.linfo[j];
 
-      return ( 1 );
+      return 1;
 
    }
 
@@ -2210,7 +2210,7 @@ for (j=0; j<(m.n_ligatures); ++j)  {
    //  nope
    //
 
-return ( 0 );
+return 0;
 
 }
 
@@ -2224,7 +2224,7 @@ int Afm::has_kern_pair(int ascii_code_1, int ascii_code_2, KPX & kp) const
 
 kp.clear();
 
-if ( n_kern_pairs == 0 )  return ( 0 );
+if ( n_kern_pairs == 0 )  return 0;
 
 if ( ascii_code_1 < 0 )  ascii_code_1 += 256;
 if ( ascii_code_2 < 0 )  ascii_code_2 += 256;
@@ -2237,7 +2237,7 @@ const char * n2 = (const char *) nullptr;
 cm_index_1 = lookup_cm(ascii_code_1);
 cm_index_2 = lookup_cm(ascii_code_2);
 
-if ( (cm_index_1 < 0) || (cm_index_2 < 0) )  return ( 0 );
+if ( (cm_index_1 < 0) || (cm_index_2 < 0) )  return 0;
 
 n1 = cm[cm_index_1].name;
 n2 = cm[cm_index_2].name;
@@ -2249,7 +2249,7 @@ for (j=0; j<n_kern_pairs; ++j)  {
 
       kp = kpx[j];
 
-      return ( 1 );
+      return 1;
 
    }
 
@@ -2259,7 +2259,7 @@ for (j=0; j<n_kern_pairs; ++j)  {
    //  nope
    //
 
-return ( 0 );
+return 0;
 
 }
 

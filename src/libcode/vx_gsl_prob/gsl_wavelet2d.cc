@@ -38,7 +38,7 @@ gsl_wavelet * wavelet_set(gsl_wavelet_type *t, int k) {
       exit(1);
    }
 
-   return(w);
+   return w;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -67,7 +67,7 @@ void wavelet_free(gsl_wavelet *w) {
 
 const char *wavelet_name(const gsl_wavelet *w) {
 
-   return(gsl_wavelet_name(w));
+   return gsl_wavelet_name(w);
 }
 
 ////////////////////////////////////////////////////////////////////////

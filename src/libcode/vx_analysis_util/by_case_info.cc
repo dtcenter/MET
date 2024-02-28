@@ -77,11 +77,11 @@ ByCaseInfo & ByCaseInfo::operator=(const ByCaseInfo & b)
 
 {
 
-if ( this == &b )  return ( * this );
+if ( this == &b )  return *this;
 
 assign(b);
 
-return ( * this );
+return *this;
 
 }
 

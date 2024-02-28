@@ -525,7 +525,7 @@ StatHdrColumns StatHdrInfo::get_shc(const ConcatString &cur_case,
    // LINE_TYPE
    shc.set_line_type(statlinetype_to_string(lt));
 
-   return(shc);
+   return shc;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -576,7 +576,7 @@ ConcatString StatHdrInfo::get_shc_str(const ConcatString &cur_case,
       shc_str = css;
    }
 
-   return(shc_str);
+   return shc_str;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -4203,7 +4203,7 @@ double compute_vif(NumArray &na) {
    // Compute the variance inflation factor
    vif = 1 + 2.0*fabs(corr) - 2.0*fabs(corr)/na.n();
 
-   return(vif);
+   return vif;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -4215,7 +4215,7 @@ bool is_precip_var_name(const ConcatString &s) {
                 has_prefix(grib_precipitation_abbr,
                            n_grib_precipitation_abbr, s.c_str());
 
-   return(match);
+   return match;
 }
 
 ////////////////////////////////////////////////////////////////////////
