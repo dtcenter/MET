@@ -78,11 +78,11 @@ SingleAtt3DArray & SingleAtt3DArray::operator=(const SingleAtt3DArray & a)
 
 {
 
-if ( this == &a )  return ( * this );
+if ( this == &a )  return *this;
 
 assign(a);
 
-return ( * this );
+return *this;
 
 }
 

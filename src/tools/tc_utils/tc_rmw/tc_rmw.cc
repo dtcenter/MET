@@ -100,7 +100,7 @@ int met_main(int argc, char *argv[]) {
     // Process gridded and track data
     process_rmw();
 
-    return(0);
+    return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -241,7 +241,7 @@ GrdFileType get_file_type(const StringArray &file_list,
     // Clean up
     if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) 0; }
 
-    return(out_ftype);
+    return out_ftype;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -486,7 +486,7 @@ bool is_keeper(const ATCFLineBase * line) {
    }
 
    // Return the keep status
-   return(keep);
+   return keep;
 }
 
 ////////////////////////////////////////////////////////////////////////

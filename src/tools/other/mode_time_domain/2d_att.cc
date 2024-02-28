@@ -90,11 +90,11 @@ SingleAtt2D & SingleAtt2D::operator=(const SingleAtt2D & a)
 
 {
 
-if ( this == &a )  return ( * this );
+if ( this == &a )  return *this;
 
 assign(a);
 
-return ( * this );
+return *this;
 
 }
 
@@ -405,7 +405,7 @@ if ( moments.N == 0 )  {
 
    // exit ( 1 );
 
-   return ( a );
+   return a;
 
 }
 
@@ -472,7 +472,7 @@ a.Ptile_User = percentile_f(values, n, (double) (a.Ptile_Value/100.0));
 
 if ( values )  { delete [] values;  values = 0; }
 
-return ( a );
+return a;
 
 }
 

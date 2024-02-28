@@ -153,7 +153,7 @@ ConvData parse_conv_data(const ConvRecord &r, const int i) {
 
    d.n_use      = 0;
 
-   return(d);
+   return d;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -223,7 +223,7 @@ RadData parse_rad_data(const RadRecord  &r, const int i,
 
    d.n_use     = 0;
 
-   return(d);
+   return d;
 }
 
 
@@ -239,7 +239,7 @@ ConcatString get_conv_key(const ConvData &d) {
        << unix_to_yyyymmdd_hhmmss(d.obs_ut) << key_sep
        << d.obs;
 
-   return(key);
+   return key;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -253,7 +253,7 @@ ConcatString get_rad_key(const RadData &d) {
        << unix_to_yyyymmdd_hhmmss(d.obs_ut) << key_sep
        << d.obs;
 
-   return(key);
+   return key;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -264,7 +264,7 @@ int key_to_integer(const char * key) {
       int_key += ((int)key[idx]) << (idx%3)*8;
       //int_key += (int)key[idx];
    }
-   return(int_key);
+   return int_key;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -285,13 +285,13 @@ bool is_micro(const char *s) {
       }
    }
 
-   return(status);
+   return status;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool is_retr(const char *s) {
-   return(false);
+   return false;
 }
 
 ////////////////////////////////////////////////////////////////////////

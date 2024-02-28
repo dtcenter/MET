@@ -152,7 +152,7 @@ process(modis_filename.c_str());
    //  done
    //
 
-return ( 0 );
+return 0;
 
 }
 

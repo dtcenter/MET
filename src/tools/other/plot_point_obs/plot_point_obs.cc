@@ -128,7 +128,7 @@ int met_main(int argc, char *argv[]) {
    // Plot the result
    create_plot();
 
-   return(0);
+   return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////

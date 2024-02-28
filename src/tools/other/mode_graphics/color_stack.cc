@@ -77,11 +77,11 @@ ColorStack & ColorStack::operator=(const ColorStack & a)
 
 {
 
-if ( this == &a )  return ( * this );
+if ( this == &a )  return *this;
 
 assign(a);
 
-return ( * this );
+return *this;
 
 }
 
@@ -307,7 +307,7 @@ Color _t = *(e[Nelements - 1]);
 
 --Nelements;
 
-return ( _t );
+return _t;
 
 }
 
@@ -329,7 +329,7 @@ if ( Nelements <= 0 )  {
 
 Color _t = *(e[Nelements - 1]);
 
-return ( _t );
+return _t;
 
 }
 

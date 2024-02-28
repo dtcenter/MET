@@ -43,7 +43,7 @@ DataOptInfo & DataOptInfo::operator+=(const DataOptInfo &info) {
    tech_ids.add(info.tech_ids);
    data_files.add(info.data_files);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////

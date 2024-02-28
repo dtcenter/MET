@@ -113,7 +113,7 @@ int met_main(int argc, char *argv[]) {
    // Process the MODE file
    process_distances();
    
-   return(0);
+   return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////

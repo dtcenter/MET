@@ -75,11 +75,11 @@ Nearest_Interp & Nearest_Interp::operator=(const Nearest_Interp & n)
 
 {
 
-if ( this == &n )  return ( * this );
+if ( this == &n )  return *this;
 
 assign(n);
 
-return ( * this );
+return *this;
 
 }
 
@@ -139,7 +139,7 @@ Interpolator * i = (Interpolator *) 0;
 
 i = new Nearest_Interp (*this);
 
-return ( i );
+return i;
 
 }
 
@@ -196,7 +196,7 @@ I = Data[n];
    //
 
 
-return ( I );
+return I;
 
 }
 

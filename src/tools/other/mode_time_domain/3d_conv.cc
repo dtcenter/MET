@@ -76,7 +76,7 @@ struct DataHandle {
 
       }
 
-      return ( k );
+      return k;
 
    }
 
@@ -439,7 +439,7 @@ if ( conv_data )  { delete [] conv_data;  conv_data = (double *) nullptr; }
 if (    sum_plane_buf )  { delete []    sum_plane_buf;     sum_plane_buf = nullptr; }
 if ( ok_sum_plane_buf )  { delete [] ok_sum_plane_buf;  ok_sum_plane_buf = nullptr; }
 
-return ( out );
+return out;
 
 }
 

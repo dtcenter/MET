@@ -94,11 +94,11 @@ EquivalenceClass & EquivalenceClass::operator=(const EquivalenceClass &c)
 
 {
 
-if ( this == &c )  return ( *this );
+if ( this == &c )  return *this;
 
 assign(c);
 
-return ( * this );
+return *this;
 
 }
 
@@ -211,12 +211,12 @@ int * e = E;
 
 for (j=0; j<Nelements; ++j, ++e)  {
 
-   if ( *e == k )  return ( true );
+   if ( *e == k )  return true;
 
 }
 
 
-return ( false );
+return false;
 
 }
 */
@@ -261,7 +261,7 @@ if ( (k < 0) || (k >= Nelements) )  {
 }
 
 
-return ( E[k] );
+return E[k];
 
 }
 
@@ -307,7 +307,7 @@ int EquivalenceClass::n_max() const
 
 {
 
-if ( Nelements == 0 )  return ( 0 );
+if ( Nelements == 0 )  return 0;
 
 int j, n;
 
@@ -319,7 +319,7 @@ for (j=1; j<Nelements; ++j)  {
 
 }
 
-return ( 0 );
+return 0;
 
 }
 
@@ -377,11 +377,11 @@ Mtd_Partition & Mtd_Partition::operator=(const Mtd_Partition &p)
 
 {
 
-if ( this == &p )  return ( * this );
+if ( this == &p )  return *this;
 
 assign(p);
 
-return ( * this );
+return *this;
 
 }
 
@@ -541,12 +541,12 @@ EquivalenceClass ** c = C;
 
 for (j=0; j<Nelements; ++j, ++c)  {
 
-   if ( (*c)->has(k) )  return ( true );
+   if ( (*c)->has(k) )  return true;
 
 }
 
 
-return ( false );
+return false;
 
 }
 */
@@ -567,7 +567,7 @@ if ( (index < 0) || (index >= Nelements) )  {
 }
 
 
-return ( C[index]->has(k) );
+return C[index]->has(k);
 
 }
 
@@ -583,12 +583,12 @@ int j;
 
 for (j=0; j<Nelements; ++j)  {
 
-   if ( C[j]->has(k) )  return ( j );
+   if ( C[j]->has(k) )  return j;
 
 }
 
 
-return ( -1 );
+return -1;
 
 }
 
@@ -718,7 +718,7 @@ if ( (k < 0) || (k >= Nelements) )  {
 }
 
 
-return ( C[k] );
+return C[k];
 
 }
 
@@ -780,7 +780,7 @@ for (j=0; j<Nelements; ++j)  {
 
 
 
-return ( out );
+return out;
 
 }
 

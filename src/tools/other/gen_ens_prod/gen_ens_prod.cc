@@ -104,7 +104,7 @@ int met_main(int argc, char *argv[]) {
    // Close output files and deallocate memory
    clean_up();
 
-   return(0);
+   return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -670,7 +670,7 @@ bool get_data_plane(const char *infile, GrdFileType ftype,
    // Deallocate the data file pointer, if necessary
    if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) 0; }
 
-   return(found);
+   return found;
 }
 
 ////////////////////////////////////////////////////////////////////////

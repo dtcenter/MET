@@ -75,11 +75,11 @@ InterpolationValue & InterpolationValue::operator=(const InterpolationValue & i)
 
 {
 
-if ( this == &i )  return ( * this );
+if ( this == &i )  return *this;
 
 assign(i);
 
-return ( * this );
+return *this;
 
 }
 
@@ -314,7 +314,7 @@ int n;
 
 n = y*Width + x;
 
-return ( n );
+return n;
 
 }
 
@@ -444,7 +444,7 @@ for (j=0; j<n; ++j)  {
 
 }
 
-return ( count );
+return count;
 
 }
 
@@ -476,7 +476,7 @@ for (j=0; j<n; ++j)  {
 
 }
 
-return ( count );
+return count;
 
 }
 
@@ -499,7 +499,7 @@ ostream & operator<<(ostream & out, const InterpolationValue & I)
 if ( I.ok )  out << (I.value);
 else         out << "(bad)";
 
-return ( out );
+return out;
 
 }
 

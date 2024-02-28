@@ -76,11 +76,11 @@ Mtd_2D_Moments & Mtd_2D_Moments::operator=(const Mtd_2D_Moments & m)
 
 {
 
-if ( this == &m )  return ( * this );
+if ( this == &m )  return *this;
 
 assign(m);
 
-return ( * this );
+return *this;
 
 }
 
@@ -234,7 +234,7 @@ rho_2 = Sxy;
 
 angle = 0.5*atan2d(rho_2, rho_1);
 
-return ( angle );
+return angle;
 
 }
 

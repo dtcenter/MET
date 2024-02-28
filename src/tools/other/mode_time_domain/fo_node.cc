@@ -76,11 +76,11 @@ FO_Node & FO_Node::operator=(const FO_Node & n)
 
 {
 
-if ( this == &n )  return ( * this );
+if ( this == &n )  return *this;
 
 assign(n);
 
-return ( * this );
+return *this;
 
 }
 

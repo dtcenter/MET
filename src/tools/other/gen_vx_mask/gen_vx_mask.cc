@@ -96,7 +96,7 @@ int met_main(int argc, char *argv[]) {
    // Write out the mask file to NetCDF
    write_netcdf(dp_out);
 
-   return(0);
+   return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -502,13 +502,13 @@ bool get_gen_vx_mask_config_str(MetNcMetDataFile *mnmdf_ptr,
    int i;
 
    // Check for null pointer
-   if(!mnmdf_ptr) return(status);
+   if(!mnmdf_ptr) ;
 
    // Check for the MET_tool global attribute
-   if(!get_global_att(mnmdf_ptr->MetNc->Nc, (string) "MET_tool", tool)) return(status);
+   if(!get_global_att(mnmdf_ptr->MetNc->Nc, (string) "MET_tool", tool)) return status;
 
    // Check for gen_vx_mask output
-   if(tool != program_name) return(status);
+   if(tool != program_name) return status;
 
    // Loop through the NetCDF variables
    for(i=0; i<mnmdf_ptr->MetNc->Nvars; i++) {
@@ -525,7 +525,7 @@ bool get_gen_vx_mask_config_str(MetNcMetDataFile *mnmdf_ptr,
       break;
    }
 
-   return(status);
+   return status;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -689,7 +689,7 @@ bool is_shape_str_match(const int i_shape, const StringArray &names, const Strin
 
    }
 
-   return(match);
+   return match;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1386,7 +1386,7 @@ DataPlane combine(const DataPlane &dp_data, const DataPlane &dp_mask,
 	   << " points inside\n";
    }
 
-   return(dp);
+   return dp;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1519,7 +1519,7 @@ MaskType string_to_masktype(const char *s) {
       exit(1);
    }
 
-   return(t);
+   return t;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1544,7 +1544,7 @@ const char * masktype_to_string(const MaskType t) {
       default:                 s = (const char *) 0; break;
    }
 
-   return(s);
+   return s;
 }
 
 ////////////////////////////////////////////////////////////////////////

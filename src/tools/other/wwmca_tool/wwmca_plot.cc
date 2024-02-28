@@ -162,7 +162,7 @@ for (j=0; j<(cline.n()); ++j)  {
    //  done
    //
 
-return ( 0 );
+return 0;
 
 }
 
@@ -472,7 +472,7 @@ k = ((gray_max - gray_min)*value)/100 + gray_min;
 
 c.set_gray(k);
 
-return ( c );
+return c;
 
 }
 
@@ -505,7 +505,7 @@ bool region_ok(const MapRegion & r, const char hemisphere)
 
 {
 
-return ( true );
+return true;
 
 }
 

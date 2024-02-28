@@ -176,7 +176,7 @@ int met_main(int argc, char *argv[]) {
    //
    clean_up();
 
-   return(0);
+   return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -673,7 +673,7 @@ MadisType get_madis_type(NcFile *&f_in) {
    else if (get_global_att(f_in, (string)"title", attr_value)) {
       if (attr_value.contents("MADIS ACARS") != "") madis_type = madis_acarsProfiles;
    }
-   return(madis_type);
+   return madis_type;
 }
 
 ////////////////////////////////////////////////////////////////////////

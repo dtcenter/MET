@@ -231,48 +231,48 @@ bool PlotPointObsOpt::add(const Observation &obs) {
 
    // message type
    if(msg_typ.n() > 0 && !msg_typ.has(obs.getHeaderType())) {
-      return(false);
+      return false;
    }
 
    // station id
    if((sid_inc.n() > 0 && !sid_inc.has(obs.getStationId())) ||
       (sid_exc.n() > 0 &&  sid_exc.has(obs.getStationId()))) {
-      return(false);
+      return false;
    }
 
    // observation variable
    if(obs_var.n() > 0 && !obs_var.has(obs.getVarName())) {
-      return(false);
+      return false;
    }
 
    // observation GRIB code
    if(obs_gc.n() > 0 && !obs_gc.has(obs.getGribCode())) {
-      return(false);
+      return false;
    }
 
    // quality control string
    if(obs_qty.n() > 0 && !obs_qty.has(obs.getQualityFlag())) {
-      return(false);
+      return false;
    }
     
    // valid time
    unixtime ut = obs.getValidTime();
    if((valid_beg > 0 && ut < valid_beg) ||
       (valid_end > 0 && ut > valid_end)) {
-      return(false);
+      return false;
    }
 
    // lat, lon
    if(!lat_thresh.check(obs.getLatitude()) ||
       !lon_thresh.check(obs.getLongitude())) {
-      return(false);
+      return false;
    }
 
    // elevation, height, pressure
    if(!elv_thresh.check(obs.getElevation()) ||
       !hgt_thresh.check(obs.getHeight()) ||
       !prs_thresh.check(obs.getPressureLevel())) {
-      return(false);
+      return false;
    }
 
    // store the current observation value
@@ -293,7 +293,7 @@ bool PlotPointObsOpt::add(const Observation &obs) {
 
    // observation value
    if(!obs_thresh.check(cur_val)) {
-      return(false);
+      return false;
    }
 
    // Store this matching point location
@@ -308,7 +308,7 @@ bool PlotPointObsOpt::add(const Observation &obs) {
    n_obs++;
    if(!has(cur_loc)) locations.push_back(cur_loc);
 
-   return(true);
+   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -324,7 +324,7 @@ bool PlotPointObsOpt::has(const LocationInfo &loc) {
       }
    }
 
-   return(match);
+   return match;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -608,7 +608,7 @@ bool PlotPointObsConfInfo::add(const Observation &obs) {
       if((match = it->add(obs))) break;
    }
 
-   return(match);
+   return match;
 }
     
 ////////////////////////////////////////////////////////////////////////

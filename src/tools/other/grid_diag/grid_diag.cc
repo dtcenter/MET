@@ -100,7 +100,7 @@ int met_main(int argc, char *argv[]) {
    // Close files and deallocate memory
    clean_up();
 
-   return(0);
+   return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -784,7 +784,7 @@ Met2dDataFile *get_mtddf(const StringArray &file_list,
       exit(1);
    }
 
-   return(mtddf);
+   return mtddf;
 }
 
 ////////////////////////////////////////////////////////////////////////

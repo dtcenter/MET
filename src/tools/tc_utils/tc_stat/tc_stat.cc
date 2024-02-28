@@ -73,7 +73,7 @@ int met_main(int argc, char *argv[]) {
    // Process the jobs in the config file
    process_jobs();
 
-   return(0);
+   return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////

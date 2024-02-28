@@ -82,11 +82,11 @@ InterestCalculator & InterestCalculator::operator=(const InterestCalculator & i)
 
 {
 
-if ( this == &i )  return ( * this );
+if ( this == &i )  return *this;
 
 assign(i);
 
-return ( * this );
+return *this;
 
 }
 
@@ -353,7 +353,7 @@ for (j=0; j<Nelements; ++j)  {
 
 sum *= Scale;
 
-return ( sum );
+return sum;
 
 }
 

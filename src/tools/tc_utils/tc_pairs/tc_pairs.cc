@@ -182,7 +182,7 @@ int met_main(int argc, char *argv[]) {
            << "Output file: " << out_files[i] << "\n";
    }
 
-   return(0);
+   return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -814,7 +814,7 @@ bool is_keeper(const ATCFLineBase * line) {
       keep = false;
 
    // Return the keep status
-   return(keep);
+   return keep;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1267,7 +1267,7 @@ int derive_consensus(TrackInfoArray &tracks) {
    int n_add = 0;
 
    // If no consensus models are defined, nothing to do
-   if(conf_info.NConsensus == 0) return(0);
+   if(conf_info.NConsensus == 0) return 0;
 
    // Loop through the tracks to build a list of cases
    for(i=0; i<tracks.n(); i++) {
@@ -1426,7 +1426,7 @@ int derive_consensus(TrackInfoArray &tracks) {
 
    } // end for i
 
-   return(n_add);
+   return n_add;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1439,7 +1439,7 @@ int derive_lag(TrackInfoArray &tracks) {
    int n_add = 0;
 
    // If no time lags are requested, nothing to do
-   if(conf_info.LagTime.n() == 0) return(0);
+   if(conf_info.LagTime.n() == 0) return 0;
 
    // Loop through the time lags to be applied
    for(i=0; i<conf_info.LagTime.n(); i++) {
@@ -1500,7 +1500,7 @@ int derive_lag(TrackInfoArray &tracks) {
 
    } // end for i
 
-   return(n_add);
+   return n_add;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1513,7 +1513,7 @@ int derive_baseline(TrackInfoArray &atracks, const TrackInfoArray &btracks) {
 
    // If no baseline models are requested, nothing to do
    if(conf_info.OperBaseline.n() == 0 &&
-      conf_info.BestBaseline.n() == 0) return(0);
+      conf_info.BestBaseline.n() == 0) return 0;
 
    mlog << Debug(3)
         << "Building CLIPER/SHIFOR operational baseline forecasts using "
@@ -1576,7 +1576,7 @@ int derive_baseline(TrackInfoArray &atracks, const TrackInfoArray &btracks) {
       } // end for j
    } // end for i
 
-   return(n_add);
+   return n_add;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1905,7 +1905,7 @@ double compute_dland(double lat, double lon) {
       y < 0 || y >= dland_grid.ny())   dist = bad_data_double;
    else                                dist = dland_dp.get(x, y);
 
-   return(dist);
+   return dist;
 }
 
 ////////////////////////////////////////////////////////////////////////

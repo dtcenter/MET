@@ -377,7 +377,7 @@ GenEnsProdNcOutInfo GenEnsProdConfInfo::parse_nc_info(Dictionary *dict) {
       cur.do_climo_cdp = d->lookup_bool(conf_key_climo_cdp_flag);
    }
 
-   return(cur);
+   return cur;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -408,7 +408,7 @@ bool GenEnsProdNcOutInfo::all_false() const {
                  do_vld    || do_freq || do_nep   || do_nmep  ||
                  do_climo  || do_climo_cdp;
 
-   return(!status);
+   return !status;
 }
 
 ////////////////////////////////////////////////////////////////////////

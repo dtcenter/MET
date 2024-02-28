@@ -114,7 +114,7 @@ int met_main(int argc, char * argv []) {
       else                          process_rad (cline[i].c_str(), output_filename.c_str());
    }
 
-   return(0);
+   return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -513,7 +513,7 @@ bool is_dup(const char *key) {
       key_array.add(key);
       obs_key_map[int_key] = key_array;
    }
-   return(dup);
+   return dup;
 }
 
 ////////////////////////////////////////////////////////////////////////

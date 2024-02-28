@@ -253,7 +253,7 @@ if ( (FileId = SWopen((char *) _filename, DFACC_READ)) < 0 )  {
 
    close();
 
-   return ( false );
+   return false;
 
 }
 
@@ -270,7 +270,7 @@ if ( SWinqswath((char *) _filename, (char *) buf, &size) < 0 )  {
 
    close();
 
-   return ( false );
+   return false;
 
 }
 
@@ -286,7 +286,7 @@ if ( n_swaths > 1 )  {
 
    close();
 
-   return ( false );
+   return false;
 
 }
 
@@ -301,7 +301,7 @@ if ( (k = SWattach(FileId, (char *) a[0].c_str())) < 0 )  {
 
    close();
 
-   return ( false );
+   return false;
 
 }
 
@@ -326,7 +326,7 @@ if ( ! dim )  {
 
    close();
 
-   return ( false );
+   return false;
 
 }
 
@@ -341,7 +341,7 @@ if ( ! dim )  {
 
    close();
 
-   return ( false );
+   return false;
 
 }
 
@@ -375,7 +375,7 @@ if ( !status || (dt < 0.0) )  {
 
    close();
 
-   return ( false );
+   return false;
 
 }
 
@@ -386,7 +386,7 @@ ScanStartTime = ut_modis_start + nint(dt);
    //  done
    //
 
-return ( true );
+return true;
 
 }
 
@@ -597,7 +597,7 @@ if ( (n0 < 0) || (n0 >= Dim0) || (n1 < 0) || (n1 >= Dim1) )  {
    mlog << Error
         << "\n\n  ModisFile::get_float_data() -> range check error ... " << n0 << ", " << n1 << "\n\n";
 
-   return ( false );
+   return false;
 
 }
 
@@ -617,7 +617,7 @@ if ( status < 0 )  {
 
    // exit ( 1 );
 
-   return ( false );
+   return false;
 
 }
 
@@ -627,7 +627,7 @@ value = d[0];
    //  done
    //
 
-return ( true );
+return true;
 
 }
 
@@ -650,7 +650,7 @@ if ( (n0 < 0) || (n0 >= Dim0) || (n1 < 0) || (n1 >= Dim1) )  {
 
    // exit ( 1 );
 
-   return ( false );
+   return false;
 
 }
 
@@ -668,7 +668,7 @@ if ( status < 0 )  {
    mlog << Error
         << "\n\n  CloudsatSwath::get_float_data(int, int) const -> bad SWreadfield status\n\n";
 
-   return ( false );
+   return false;
 
 }
 
@@ -678,7 +678,7 @@ if ( status < 0 )  {
 
 value = f[0];
 
-return ( true );
+return true;
 
 }
 
@@ -699,7 +699,7 @@ if ( (n0 < 0) || (n0 >= Dim0) || (n1 < 0) || (n1 >= Dim1) )  {
    mlog << Error
         << "\n\n  ModisFile::get_int16_data() -> range check error\n\n";
 
-   return ( false );
+   return false;
 
 }
 
@@ -719,7 +719,7 @@ if ( status < 0 )  {
 
    // exit ( 1 );
 
-   return ( false );
+   return false;
 
 }
 
@@ -729,7 +729,7 @@ if ( status < 0 )  {
 
 value = s[0];
 
-return ( true );
+return true;
 
 }
 
@@ -752,7 +752,7 @@ if ( (n0 < 0) || (n0 >= Dim0) || (n1 < 0) || (n1 >= Dim1) )  {
 
    // exit ( 1 );
 
-   return ( false );
+   return false;
 
 }
 
@@ -772,7 +772,7 @@ if ( status < 0 )  {
 
    // exit ( 1 );
 
-   return ( false );
+   return false;
 
 }
 
@@ -782,7 +782,7 @@ if ( status < 0 )  {
 
 value = c[0];
 
-return ( true );
+return true;
 
 }
 
@@ -799,7 +799,7 @@ float f[2];
 
 if (get_float_data(Latitude, n0, n1, f[0])) v = f[0];
 
-return ( v );
+return v;
 
 }
 
@@ -822,7 +822,7 @@ if (get_float_data(Longitude, n0, n1, f[0])) {
 
 }
 
-return ( v );
+return v;
 
 }
 
@@ -910,9 +910,9 @@ switch ( NumberType )  {
 
 }   //  switch
 
-if ( !status )  return ( false );
+if ( !status )  return false;
 
-if ( value == DataFillValue )  return ( false );
+if ( value == DataFillValue )  return false;
 
 value = DataScale*(value - DataOffset);
 
@@ -920,7 +920,7 @@ value = DataScale*(value - DataOffset);
    //   done
    //
 
-return ( true );
+return true;
 
 }
 
@@ -936,7 +936,7 @@ ConcatString s;
 
 if ( Filename.nonempty() )  s = get_short_name(Filename.c_str());
 
-return ( s );
+return s;
 
 }
 
@@ -948,7 +948,7 @@ CloudsatSwath * ModisFile::swath() const
 
 {
 
-return ( Swath );
+return Swath;
 
 }
 
@@ -960,7 +960,7 @@ unixtime ModisFile::scan_start_time() const
 
 {
 
-return ( ScanStartTime );
+return ScanStartTime;
 
 }
 

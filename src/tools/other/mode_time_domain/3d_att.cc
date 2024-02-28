@@ -99,11 +99,11 @@ SingleAtt3D & SingleAtt3D::operator=(const SingleAtt3D & a)
 
 {
 
-if ( this == &a )  return ( * this );
+if ( this == &a )  return *this;
 
 assign(a);
 
-return ( * this );
+return *this;
 
 }
 
@@ -436,7 +436,7 @@ double s;
 
 s = sqrt( Xvelocity*Xvelocity + Yvelocity*Yvelocity );
 
-return ( s );
+return s;
 
 }
 
@@ -452,7 +452,7 @@ int n;
 
 n = Tmax - Tmin + 1;
 
-return ( n );
+return n;
 
 }
 
@@ -745,11 +745,11 @@ PairAtt3D & PairAtt3D::operator=(const PairAtt3D & a)
 
 {
 
-if ( this == &a )  return ( * this );
+if ( this == &a )  return *this;
 
 assign(a);
 
-return ( * this );
+return *this;
 
 }
 
@@ -1398,7 +1398,7 @@ a.Ptile_User = percentile_f(values, n, (double) (a.Ptile_Value/100.0));
 
 if ( values )  { delete [] values;  values = 0; }
 
-return ( a );
+return a;
 
 }
 
@@ -1541,7 +1541,7 @@ p.set_duration_difference(t);
    //  done
    //
 
-return ( p );
+return p;
 
 }
 
@@ -1723,7 +1723,7 @@ t = num/den;
    //  done
    //
 
-return ( t );
+return t;
 
 }
 */
@@ -1763,7 +1763,7 @@ dist = gc_dist(lat1, lon1, lat2, lon2);
    //  done
    //
 
-return ( dist );
+return dist;
 
 }
 

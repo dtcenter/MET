@@ -50,7 +50,7 @@ TCGenNcOutInfo & TCGenNcOutInfo::operator+=(const TCGenNcOutInfo &t) {
    if(t.do_best_fn_oy)   do_best_fn_oy   = true;
 
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -72,7 +72,7 @@ bool TCGenNcOutInfo::all_false() const {
                  do_best_genesis || do_best_tracks ||
                  do_best_fy_oy   || do_best_fn_oy;
 
-   return(!status);
+   return !status;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -458,7 +458,7 @@ bool TCGenVxOpt::is_keeper(const GenesisInfo &gi) const {
          keep = false;
    }
 
-   if(!keep) return(keep);
+   if(!keep) return keep;
 
    // Only check intialization and lead times for forecast and
    // operational tracks.
@@ -481,7 +481,7 @@ bool TCGenVxOpt::is_keeper(const GenesisInfo &gi) const {
          keep = false;
    }
 
-   if(!keep) return(keep);
+   if(!keep) return keep;
 
    // Valid time window
    if((ValidBeg > 0 && ValidBeg > gi.valid_min()) ||
@@ -512,7 +512,7 @@ bool TCGenVxOpt::is_keeper(const GenesisInfo &gi) const {
       keep = false;
 
    // Return the keep status
-   return(keep);
+   return keep;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -568,7 +568,7 @@ bool TCGenVxOpt::is_keeper(const ProbGenInfo &gi) const {
       keep = false;
 
    // Return the keep status
-   return(keep);
+   return keep;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -622,13 +622,13 @@ bool TCGenVxOpt::is_keeper(const GenShapeInfo &gsi) const {
    // Distance to land does not apply
 
    // Return the keep status
-   return(keep);
+   return keep;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 STATOutputType TCGenVxOpt::output_map(STATLineType t) const {
-   return(OutputMap.at(t));
+   return OutputMap.at(t);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -896,7 +896,7 @@ double TCGenConfInfo::compute_dland(double lat, double lon) {
       y < 0 || y >= DLandGrid.ny())   dist = bad_data_double;
    else                               dist = DLandData.get(x, y);
 
-   return(dist);
+   return dist;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -933,13 +933,13 @@ ConcatString TCGenConfInfo::compute_basin(double lat, double lon) {
       exit(1);
    }
 
-   return(BasinAbbr[i]);
+   return BasinAbbr[i];
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 STATOutputType TCGenConfInfo::output_map(STATLineType t) const {
-   return(OutputMap.at(t));
+   return OutputMap.at(t);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -951,7 +951,7 @@ int TCGenConfInfo::get_max_n_prob_thresh() const {
       n = max(n, VxOpt[i].ProbGenThresh.n());
    }
 
-   return(n);
+   return n;
 }
 
 ////////////////////////////////////////////////////////////////////////

@@ -199,13 +199,13 @@ double DataAverager::ave(int x, int y) const
 
 const int n = two_to_one(x, y);
 
-if ( ! DataOk[n] )  return ( bad_data_float );
+if ( ! DataOk[n] )  return bad_data_float;
 
 const int c = Counts[n];
 
-if ( c == 0 )  return ( 0.0 );
+if ( c == 0 )  return 0.0;
 
-return ( (Sum[n])/c );
+return (Sum[n])/c;
 
 }
 

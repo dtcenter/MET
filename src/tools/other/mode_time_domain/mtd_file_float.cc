@@ -85,11 +85,11 @@ MtdFloatFile & MtdFloatFile::operator=(const MtdFloatFile & f)
 
 {
 
-if ( this == &f )  return ( * this );
+if ( this == &f )  return *this;
 
 float_assign(f);
 
-return ( * this );
+return *this;
 
 }
 
@@ -439,7 +439,7 @@ MtdIntFile out;
 
 threshold(T, out);
 
-return ( out );
+return out;
 
 }
 
@@ -455,7 +455,7 @@ MtdIntFile out;
 
 threshold(t, out);
 
-return ( out );
+return out;
 
 }
 
@@ -611,13 +611,13 @@ bool MtdFloatFile::read(const char * _filename)
 
 NcFile f(_filename, NcFile::read);
 
-if ( IS_INVALID_NC(f) )  return ( false );
+if ( IS_INVALID_NC(f) )  return false;
 
 Filename = _filename;
 
 MtdFloatFile::read(f);
 
-return ( true );
+return true;
 
 }
 
@@ -907,7 +907,7 @@ f.DataMax = fmax;
    //  done
    //
 
-return ( f );
+return f;
 
 }
 
