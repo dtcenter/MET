@@ -94,12 +94,6 @@ References
 |   *the Royal Statistical Society* A147, 278-292.
 | 
 
-.. _Dawid-Sebastiani-1999:
-
-| Dawid A.P., Sebastiani P., 1999: Coherent dispersion criteria for optimal
-|   experimental design. *Ann. Stat.*, 27, 65–81. doi: 10.1214/aos/1018031101.
-|
-
 .. _Ebert-2008:
 
 | Ebert, E.E., 2008: Fuzzy verification of high-resolution gridded forecasts:

@@ -1094,13 +1094,6 @@ Called "IGN_CONV_OERR" and "IGN_CORR_OERR" in ECNT output :numref:`table_ES_head
 
 TODO: Eric add 2 equations and interpretation advice here for dtcenter/MET#2583
 
-Independent Dawid-Sebastiani Scoring Rule
------------------------------------------
-
-Called "IDSS" in ECNT output :numref:`table_ES_header_info_es_out_ECNT`
-
-TODO: Eric add equation 16 and interpretation advice here for dtcenter/MET#2583
-
 IGN
 ---
 

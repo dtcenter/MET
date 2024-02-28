@@ -2658,7 +2658,6 @@ void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &job,
          m[key].ens_pd.ign_na.add(cur.ign);
          m[key].ens_pd.ign_conv_oerr_na.add(cur.ign_conv_oerr);
          m[key].ens_pd.ign_corr_oerr_na.add(cur.ign_corr_oerr);
-         m[key].ens_pd.idss_na.add(cur.idss);
          m[key].ens_pd.n_ge_obs_na.add(cur.n_ge_obs);
          m[key].ens_pd.me_ge_obs_na.add(cur.me_ge_obs);
          m[key].ens_pd.n_lt_obs_na.add(cur.n_lt_obs);
@@ -3259,11 +3258,6 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &job,
             v_conv, v_corr);
          m[key].ens_pd.ign_conv_oerr_na.add(v_conv);
          m[key].ens_pd.ign_corr_oerr_na.add(v_corr);
-
-         // Compute the Independent Dawid Sebastiani score
-         m[key].ens_pd.idss_na.add(
-            compute_ind_dawid_sebastiani(
-               cur.ens_mean, cur.spread, cur.obs));
 
          //
          // Increment the RHIST counts
