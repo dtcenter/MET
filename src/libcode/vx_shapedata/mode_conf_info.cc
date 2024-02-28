@@ -54,12 +54,12 @@ ModeConfInfo::~ModeConfInfo()
 
 ModeConfInfo & ModeConfInfo::operator=(const ModeConfInfo &s)
 {
-   if(this == &s) return(*this);
+   if(this == &s) return *this;
 
    clear();
    assign(s);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1087,7 +1087,7 @@ for (int j=0; j<pwl_if->n_points(); ++j)  {
 
 }   //  for j
 
-return ( pwl_if );
+return pwl_if;
 
 }
 
@@ -1670,7 +1670,7 @@ switch ( e2->type() )  {
 }
 
 
-return ( status );
+return status;
 
 }
 
@@ -1860,7 +1860,7 @@ bool ModeNcOutInfo::all_false() const
 
 bool status = do_latlon || do_raw || do_object_raw || do_object_id || do_cluster_id || do_polylines;
 
-return ( !status );
+return !status;
 
 }
 

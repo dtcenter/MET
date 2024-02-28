@@ -45,7 +45,7 @@ DataPlane read_climo_data_plane(Dictionary *dict, int i_vx,
    DataPlaneArray dpa;
 
    // Check for null
-   if(!dict) return(dp);
+   if(!dict) return dp;
 
    // Read array of climatology fields
    dpa = read_climo_data_plane_array(dict, i_vx, vld_ut, vx_grid);
@@ -60,7 +60,7 @@ DataPlane read_climo_data_plane(Dictionary *dict, int i_vx,
    // Store the first match found
    if(dpa.n_planes() > 0) dp = dpa[0];
 
-   return(dp);
+   return dp;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -77,7 +77,7 @@ DataPlaneArray read_climo_data_plane_array(Dictionary *dict, int i_vx,
    int i, day_ts, hour_ts;
 
    // Check for null
-   if(!dict) return(dpa);
+   if(!dict) return dpa;
 
    // Get the i-th array entry
    Dictionary i_dict = parse_conf_i_vx_dict(dict, i_vx);
@@ -86,7 +86,7 @@ DataPlaneArray read_climo_data_plane_array(Dictionary *dict, int i_vx,
    climo_files = i_dict.lookup_string_array(conf_key_file_name, false);
 
    // Check for at least one file
-   if(climo_files.n() == 0) return(dpa);
+   if(climo_files.n() == 0) return dpa;
 
    // Regrid info
    regrid_info = parse_conf_regrid(&i_dict);
@@ -140,7 +140,7 @@ DataPlaneArray read_climo_data_plane_array(Dictionary *dict, int i_vx,
    mlog << Debug(3)
         << "Found " << dpa.n_planes() << " climatology fields.\n";
 
-   return(dpa);
+   return dpa;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -400,7 +400,7 @@ DataPlaneArray climo_time_interp(const DataPlaneArray &dpa, int day_ts,
       } // end else
    } // end for it
 
-   return(interp_dpa);
+   return interp_dpa;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -439,7 +439,7 @@ DataPlane climo_hms_interp(const DataPlaneArray &dpa,
         << unix_to_yyyymmdd_hhmmss(vld_ut) << " using the "
         << interpmthd_to_string(mthd) << " interpolation method.\n";
 
-   return(valid_time_interp(dpa[i_prv], dpa[i_nxt], vld_ut, mthd));
+   return valid_time_interp(dpa[i_prv], dpa[i_nxt], vld_ut, mthd);
 }
 
 ////////////////////////////////////////////////////////////////////////

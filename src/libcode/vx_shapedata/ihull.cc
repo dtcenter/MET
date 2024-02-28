@@ -147,22 +147,22 @@ int lex_compare(const void * _a, const void * _b)
 const IntPoint & a = *((const IntPoint *) _a);
 const IntPoint & b = *((const IntPoint *) _b);
 
-if ( a.x < b.x )  return ( -1 );
-if ( a.x > b.x )  return (  1 );
+if ( a.x < b.x )  return -1;
+if ( a.x > b.x )  return 1;
 
    //
    //  now we know that a.x = b.x
    //
 
-if ( a.y < b.y )  return ( -1 );
-if ( a.y > b.y )  return (  1 );
+if ( a.y < b.y )  return -1;
+if ( a.y > b.y )  return 1;
 
 
    //
    //  done
    //
 
-return ( 0 );
+return 0;
 
 }
 

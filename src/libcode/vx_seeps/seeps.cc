@@ -121,7 +121,7 @@ void SeepsAggScore::clear() {
 SeepsAggScore & SeepsAggScore::operator+=(const SeepsAggScore &c) {
 
    // Check for degenerate case
-   if(n_obs == 0 && c.n_obs == 0) return(*this);
+   if(n_obs == 0 && c.n_obs == 0) return *this;
 
    // Compute weights
    double w1 = (double)   n_obs / (n_obs + c.n_obs);
@@ -160,7 +160,7 @@ SeepsAggScore & SeepsAggScore::operator+=(const SeepsAggScore &c) {
    score          = weighted_average(score,          w1, c.score,          w2);
    weighted_score = weighted_average(weighted_score, w1, c.weighted_score, w2);
 
-   return(*this);
+   return *this;
 }
 
 

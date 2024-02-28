@@ -86,7 +86,7 @@ void close_txt_file(ofstream *&out, const char *file_name) {
 ConcatString append_climo_bin(const ConcatString &mask_name,
                               int i_bin, int n_bin) {
 
-   if(n_bin == 1) return(mask_name);
+   if(n_bin == 1) return mask_name;
 
    // Append the climo CDF bin number.
    ConcatString cs;
@@ -94,7 +94,7 @@ ConcatString append_climo_bin(const ConcatString &mask_name,
    if(i_bin == -1) cs << "MEAN";
    else            cs << i_bin+1;
 
-   return(cs);
+   return cs;
 }
 
 ////////////////////////////////////////////////////////////////////////

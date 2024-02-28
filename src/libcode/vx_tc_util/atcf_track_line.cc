@@ -50,11 +50,11 @@ ATCFTrackLine::ATCFTrackLine(const ATCFTrackLine &l) {
 
 ATCFTrackLine & ATCFTrackLine::operator=(const ATCFTrackLine &l) {
 
-   if(this == &l) return(*this);
+   if(this == &l) return *this;
 
    assign(l);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -140,7 +140,7 @@ int ATCFTrackLine::read_line(LineDataFile * ldf) {
    status = ATCFLineBase::read_line(ldf);
 
    // Check for bad return status or blank line
-   if(!status) return(0);
+   if(!status) return 0;
 
    // Check the line type
    if(Type != ATCFLineType_Track &&
@@ -149,7 +149,7 @@ int ATCFTrackLine::read_line(LineDataFile * ldf) {
            << "\nint ATCFTrackLine::read_line(LineDataFile * ldf) -> "
            << "unexpected ATCF line type ("
            << atcflinetype_to_string(Type) << ")\n\n";
-      return(0);
+      return 0;
    }
 
    // Check for the minumum number of track line elements
@@ -162,10 +162,10 @@ int ATCFTrackLine::read_line(LineDataFile * ldf) {
            << "found fewer than the expected number of elements ("
            << n_items() << ") in ATCF track line:\n" << DataLine::get_line()
            << "\n\n";
-      return(0);
+      return 0;
    }
 
-   return(1);
+   return 1;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -269,13 +269,13 @@ int ATCFTrackLine::max_wind_radius() const {
 int ATCFTrackLine::storm_direction() const {
    if(Type == ATCFLineType_Track &&
       StormDirectionOffset < N_items) {
-      return(parse_int(get_item(StormDirectionOffset).c_str()));
+      return parse_int(get_item(StormDirectionOffset).c_str());
    }
    else if(Type == ATCFLineType_GenTrack &&
            StormDirectionOffset < N_items) {
-      return(parse_int(get_item(GenStormDirectionOffset).c_str()));
+      return parse_int(get_item(GenStormDirectionOffset).c_str());
    }
-   return(bad_data_int);
+   return bad_data_int;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -283,13 +283,13 @@ int ATCFTrackLine::storm_direction() const {
 int ATCFTrackLine::storm_speed() const {
    if(Type == ATCFLineType_Track &&
       StormSpeedOffset < N_items) {
-      return(parse_int(get_item(StormSpeedOffset).c_str()));
+      return parse_int(get_item(StormSpeedOffset).c_str());
    }
    else if(Type == ATCFLineType_GenTrack &&
            StormSpeedOffset < N_items) {
-      return(parse_int(get_item(GenStormSpeedOffset).c_str()));
+      return parse_int(get_item(GenStormSpeedOffset).c_str());
    }
-   return(bad_data_int);
+   return bad_data_int;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -309,7 +309,7 @@ bool ATCFTrackLine::warm_core() const {
            GenWarmCoreOffset < N_items) {
       return(get_item(GenWarmCoreOffset).comparecase("Y") == 0);
    }
-   return(false);
+   return false;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -514,7 +514,7 @@ WatchWarnType ww_max(const WatchWarnType t1, const WatchWarnType t2) {
            t2 == StormWarn           ) t = StormWarn;
    else                                t = NoWatchWarnType;
 
-   return(t);
+   return t;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -530,7 +530,7 @@ WatchWarnType int_to_watchwarntype(int i) {
    else if(i == 6) t = HurricaneWarn;
    else            t = NoWatchWarnType;
 
-   return(t);
+   return t;
 }
 
 
@@ -547,7 +547,7 @@ WatchWarnType string_to_watchwarntype(const char *s) {
    else if(strcasecmp(s, "HUWARN")  == 0) t = HurricaneWarn;
    else                                   t = NoWatchWarnType;
 
-   return(t);
+   return t;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -566,7 +566,7 @@ ConcatString watchwarntype_to_string(const WatchWarnType t) {
       default:                 s = na_str;    break;
    }
 
-   return(ConcatString(s));
+   return ConcatString(s);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -591,7 +591,7 @@ CycloneLevel string_to_cyclonelevel(const char *s) {
    else if(strcmp(s, "ET") == 0) l = Extrapolated;
    else /*           "XX"     */ l = NoCycloneLevel;
 
-   return(l);
+   return l;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -619,7 +619,7 @@ ConcatString cyclonelevel_to_string(const CycloneLevel t) {
       default:                    s = na_str; break;
    }
 
-   return(ConcatString(s));
+   return ConcatString(s);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -632,7 +632,7 @@ CycloneLevel wind_speed_to_cyclonelevel(int s) {
    else if(s <= 63) l = TropicalStorm;
    else             l = Hurricane;
 
-   return(l);
+   return l;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -651,7 +651,7 @@ QuadrantType string_to_quadranttype(const char *s) {
    else if(strcmp(s, "NWQ") == 0) t = NW_Quadrant;
    else                           t = NoQuadrantType;
 
-   return(t);
+   return t;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -673,7 +673,7 @@ ConcatString quadranttype_to_string(const QuadrantType t) {
       default:             s = na_str; break;
    }
 
-   return(ConcatString(s));
+   return ConcatString(s);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -692,7 +692,7 @@ SubregionCode string_to_subregioncode(const char *s) {
    else if(strcmp(s, "W") == 0) c = Western_Pacific;
    else                            c = NoSubregionCode;
 
-   return(c);
+   return c;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -714,7 +714,7 @@ ConcatString subregioncode_to_string(const SubregionCode t) {
       default:              s = na_str; break;
    }
 
-   return(ConcatString(s));
+   return ConcatString(s);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -727,7 +727,7 @@ SystemsDepth string_to_systemsdepth(const char *s) {
    else if(strcmp(s, "S") == 0) d = ShallowDepth;
    else                         d = NoSystemsDepth;
 
-   return(d);
+   return d;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -743,7 +743,7 @@ ConcatString systemsdepth_to_string(const SystemsDepth t) {
       default:             s = na_str; break;
    }
 
-   return(ConcatString(s));
+   return ConcatString(s);
 }
 
 ////////////////////////////////////////////////////////////////////////

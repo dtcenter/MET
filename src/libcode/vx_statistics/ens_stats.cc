@@ -50,11 +50,11 @@ SSVARInfo::SSVARInfo(const SSVARInfo &c) {
 
 SSVARInfo & SSVARInfo::operator=(const SSVARInfo &c) {
 
-   if(this == &c) return(*this);
+   if(this == &c) return *this;
 
    assign(c);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -88,7 +88,7 @@ SSVARInfo & SSVARInfo::operator+=(const SSVARInfo &c) {
 
    assign(ssvar_info);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -155,11 +155,11 @@ ECNTInfo::ECNTInfo(const ECNTInfo &c) {
 
 ECNTInfo & ECNTInfo::operator=(const ECNTInfo &c) {
 
-   if(this == &c) return(*this);
+   if(this == &c) return *this;
 
    assign(c);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -402,11 +402,11 @@ RPSInfo::RPSInfo(const RPSInfo &c) {
 
 RPSInfo & RPSInfo::operator=(const RPSInfo &c) {
 
-   if(this == &c) return(*this);
+   if(this == &c) return *this;
 
    assign(c);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -453,7 +453,7 @@ RPSInfo & RPSInfo::operator+=(const RPSInfo &c) {
 
    assign(r_info);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////

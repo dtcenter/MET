@@ -66,7 +66,7 @@ int DiagFile::lead(int i) const {
       exit(1);
    }
 
-   return(LeadTime[i]);
+   return LeadTime[i];
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -95,7 +95,7 @@ double DiagFile::lat(int i) const {
       exit(1);
    }
 
-   return(Lat[i]);
+   return Lat[i];
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -109,13 +109,13 @@ double DiagFile::lon(int i) const {
       exit(1);
    }
 
-   return(Lon[i]);
+   return Lon[i];
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool DiagFile::has_diag(const string &str) const {
-   return(DiagName.has(str));
+   return DiagName.has(str);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -130,7 +130,7 @@ const NumArray & DiagFile::diag_val(const string &str) const {
       exit(1);
    }
 
-   return(DiagVal[i]);
+   return DiagVal[i];
 }
 
 ////////////////////////////////////////////////////////////////////////
