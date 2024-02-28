@@ -91,7 +91,7 @@ if ( n > 0 ) {
 
 }
 
-return ( p );
+return p;
 
 }
 
@@ -150,7 +150,7 @@ if ( n > 0 ) {
 
 }
 
-return ( p );
+return p;
 
 }
 
@@ -166,12 +166,12 @@ const double *a = (const double *) p1;
 const double *b = (const double *) p2;
 
 
-if ( (*a) < (*b) )  return ( -1 );
+if ( (*a) < (*b) )  return -1;
 
-if ( (*a) > (*b) )  return (  1 );
+if ( (*a) > (*b) )  return 1;
 
 
-return ( 0 );
+return 0;
 
 }
 
@@ -187,12 +187,12 @@ const float * a = (const float *) p1;
 const float * b = (const float *) p2;
 
 
-if ( (*a) < (*b) )  return ( -1 );
+if ( (*a) < (*b) )  return -1;
 
-if ( (*a) > (*b) )  return (  1 );
+if ( (*a) > (*b) )  return 1;
 
 
-return ( 0 );
+return 0;
 
 }
 
@@ -211,7 +211,7 @@ int do_rank(const double *array, double *rank, int n)
 
 {
 
-if ( n <= 1 )  return(0);
+if ( n <= 1 )  return 0;
 
 int i, j, ties_current, ties_total, tie_rank_start = 0, tie_rank_end;
 double tie_rank_mean;
@@ -314,11 +314,11 @@ int compare_rank(const void *p1, const void *p2)
 const RankInfo a = *((RankInfo *) p1);
 const RankInfo b = *((RankInfo *) p2);
 
-if ( a.data[a.index] < b.data[b.index] )  return ( -1 );
+if ( a.data[a.index] < b.data[b.index] )  return -1;
 
-if ( a.data[a.index] > b.data[b.index] )  return (  1 );
+if ( a.data[a.index] > b.data[b.index] )  return 1;
 
-return ( 0 );
+return 0;
 
 }
 

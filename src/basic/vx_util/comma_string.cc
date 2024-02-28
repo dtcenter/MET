@@ -77,7 +77,7 @@ ConcatString str;
 
 comma_string(i, str);
 
-return ( str );
+return str;
 
 }
 

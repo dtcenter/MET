@@ -41,7 +41,7 @@ bool is_precip_grib_code(int gc) {
       gc == apcp_grib_code  || gc == ncpcp_grib_code ||
       gc == acpcp_grib_code) match = true;
 
-   return(match);
+   return match;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -63,7 +63,7 @@ bool is_precip_grib_name(const char * grib_name) {
             0 == strcmp(grib_name, ncpcp_grib_name) ||
             0 == strcmp(grib_name, acpcp_grib_name));
 
-   return(match);
+   return match;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -52,7 +52,7 @@ ConcatString normalizetype_to_string(const NormalizeType type) {
          exit(1);
    }
 
-   return(s);
+   return s;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

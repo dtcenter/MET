@@ -61,7 +61,7 @@ NumArray interp_points(const DataPlane &dp, const GridTemplate &gt, double x_dbl
       y = floor(y_dbl);
    }
 
-   return(interp_points(dp, gt, x, y));
+   return interp_points(dp, gt, x, y);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -82,7 +82,7 @@ NumArray interp_points(const DataPlane &dp, const GridTemplate &gt, int x, int y
       }
    }
 
-   return(points);
+   return points;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -151,7 +151,7 @@ double interp_min_ll(const DataPlane &dp, int x_ll, int y_ll, int wdth, double t
       min_v = bad_data_double;
    }
 
-   return(min_v);
+   return min_v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -218,7 +218,7 @@ double interp_max_ll(const DataPlane &dp, int x_ll, int y_ll, int wdth, double t
       max_v = bad_data_double;
    }
 
-   return(max_v);
+   return max_v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -304,7 +304,7 @@ double interp_median_ll(const DataPlane &dp, int x_ll, int y_ll, int wdth, doubl
 
    if(data) { delete [] data; data = (double *) 0; }
 
-   return(median_v);
+   return median_v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -377,7 +377,7 @@ double interp_uw_mean_ll(const DataPlane &dp, int x_ll, int y_ll, int wdth, doub
       uw_mean_v = sum/count;
    }
 
-   return(uw_mean_v);
+   return uw_mean_v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -438,7 +438,7 @@ double interp_dw_mean(const DataPlane &dp, const GridTemplate &gt,
       return bad_data_double;
    }
 
-   return(numerator/wght_sum);
+   return numerator/wght_sum;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -533,7 +533,7 @@ double interp_ls_fit(const DataPlane &dp, const GridTemplate &gt,
       z = bad_data_double;
    }
 
-   return(z);
+   return z;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -624,7 +624,7 @@ double interp_gaussian(const DataPlane &dp, const DataPlane &g_dp,
       gaussian_value /= weight_sum;
    }
 
-   return(gaussian_value);
+   return gaussian_value;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -692,7 +692,7 @@ double interp_geog_match(const DataPlane &dp, const GridTemplate &gt,
            << interp_x << ", " << interp_y << ").\n";
    }
 
-   return(interp_v);
+   return interp_v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -729,7 +729,7 @@ double interp_nbrhd(const DataPlane &dp, const GridTemplate &gt, int x, int y,
       return bad_data_double;
    }
 
-   return((double) count_thr/count);
+   return (double) count_thr/count;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -756,7 +756,7 @@ double interp_bilin(const DataPlane &dp, bool wrap_lon,
       if(!(*mp)(x,   y  ) ||
          !(*mp)(xp1, y  ) ||
          !(*mp)(x,   y+1) ||
-         !(*mp)(xp1, y+1)) return(bad_data_double);
+         !(*mp)(xp1, y+1)) return bad_data_double;
    }
 
    // Compute dx and dy
@@ -831,7 +831,7 @@ double interp_bilin(const DataPlane &dp, bool wrap_lon,
       }
    }
 
-   return(bilin_v);
+   return bilin_v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -849,13 +849,13 @@ double interp_xy(const DataPlane &dp, bool wrap_lon, int x, int y,
 
    // Check the optional mask
    if(mp) {
-      if(!(*mp)(x, y)) return(bad_data_double);
+      if(!(*mp)(x, y)) return bad_data_double;
    }
 
    if(x < 0 || x >= dp.nx() || y < 0 || y >= dp.ny()) v = bad_data_double;
    else                                               v = dp.get(x, y);
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -897,7 +897,7 @@ double interp_best(const DataPlane &dp, const GridTemplate &gt,
       return bad_data_double;
    }
 
-   return(min_v);
+   return min_v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1024,7 +1024,7 @@ double compute_sfc_interp(const DataPlane &dp,
    }
 
    delete gt;
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1082,7 +1082,7 @@ MaskPlane compute_sfc_mask(const GridTemplate &gt, int x, int y,
       mp.put((land_ok & topo_ok), gp->x, gp->y);
    }
 
-   return(mp);
+   return mp;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1097,9 +1097,9 @@ double compute_horz_interp(const DataPlane &dp,
                            const GridTemplateFactory::GridTemplates shape,
                            bool wrap_lon, double interp_thresh,
                            const SingleThresh *cat_thresh) {
-   return(compute_horz_interp(dp, obs_x, obs_y, obs_v, bad_data_double,
+   return compute_horz_interp(dp, obs_x, obs_y, obs_v, bad_data_double,
              bad_data_double, mthd, width, shape, wrap_lon,
-             interp_thresh, cat_thresh));
+             interp_thresh, cat_thresh);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1198,7 +1198,7 @@ double compute_horz_interp(const DataPlane &dp,
    }
 
    delete gt;
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1230,7 +1230,7 @@ double compute_vert_pinterp(double v1, double prs1,
 
    v_interp = v1 + ((v2-v1)*log(prs1/to_prs)/log(prs1/prs2));
 
-   return(v_interp);
+   return v_interp;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1266,7 +1266,7 @@ double compute_vert_zinterp(double v1, double lvl1,
    // Linearly interpolate betwen lvl_1 and lvl_2
    v_interp = v1*(1.0 - d1/(d1+d2)) + v2*(1.0 - d2/(d1+d2));
 
-   return(v_interp);
+   return v_interp;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1285,7 +1285,7 @@ DataPlane valid_time_interp(const DataPlane &in1, const DataPlane &in2,
    dp2 = (in1.valid() >  in2.valid() ? in1 : in2);
 
    // Check for matching valid times
-   if(dp1.valid() == dp2.valid()) return(dp1);
+   if(dp1.valid() == dp2.valid()) return dp1;
 
    // Range check the times
    if(dp1.valid() > to_ut || dp2.valid() < to_ut) {
@@ -1372,7 +1372,7 @@ DataPlane valid_time_interp(const DataPlane &in1, const DataPlane &in2,
       } // end for y
    } // end for x
 
-   return(dp);
+   return dp;
 }
 
 ////////////////////////////////////////////////////////////////////////

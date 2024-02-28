@@ -78,7 +78,7 @@ ScopeStackElement & ScopeStackElement::operator=(const ScopeStackElement & e)
 
 {
 
-if ( this == &e )  return ( *this );
+if ( this == &e )  return *this;
 
 assign(e);
 
@@ -234,7 +234,7 @@ ScopeStack & ScopeStack::operator=(const ScopeStack & ss)
 
 {
 
-if ( this == &ss )  return ( *this );
+if ( this == &ss )  return *this;
 
 assign(ss);
 
@@ -452,7 +452,7 @@ if ( ss.n_elements() == 0 )  {
 
    s << "   (stack empty)\n";
 
-   return ( s );
+   return s;
 
 }
 

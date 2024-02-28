@@ -80,11 +80,11 @@ LongArray & LongArray::operator=(const LongArray & a)
 
 {
 
-if ( this == &a )  return ( * this );
+if ( this == &a )  return *this;
 
 assign(a);
 
-return ( * this );
+return *this;
 
 }
 
@@ -300,11 +300,11 @@ int j;
 
 for (j=0; j<Nelements; ++j)  {
 
-   if ( e[j] == l )  return ( 1 );
+   if ( e[j] == l )  return 1;
 
 }
 
-return ( 0 );
+return 0;
 
 }
 
@@ -324,7 +324,7 @@ if ( (n < 0) || (n >= Nelements) )  {
    exit ( 1 );
 }
 
-return ( e[n] );
+return e[n];
 
 }
 

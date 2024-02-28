@@ -105,11 +105,11 @@ Legendre & Legendre::operator=(const Legendre & L)
 
 {
 
-if ( this == &L )  return ( * this );
+if ( this == &L )  return *this;
 
 assign(L);
 
-return ( * this );
+return *this;
 
 }
 
@@ -287,7 +287,7 @@ double r, w;
 
 d_and_r_root_weight(k, r, w);
 
-return ( r );
+return r;
 
 }
 
@@ -471,7 +471,7 @@ t = (4.0*K - 1.0)/(4.0*n + 2.0);
 x = (1.0 - 1.0/(8.0*n*n) + 1.0/(8.0*n*n*n))*cos(t*pi);
 
 
-return ( x );
+return x;
 
 }
 
@@ -535,7 +535,7 @@ if ( K == 1 )  {
    //  done
    //
 
-return ( x );
+return x;
 
 }
 

@@ -62,7 +62,7 @@ bool match_met_version(const char * check_version) {
    ConcatString check_major(parse_version_major(check_version));
    ConcatString met_major(parse_version_major(met_version));
 
-   return(check_major == met_major);
+   return (check_major == met_major);
 }
 
 
@@ -105,7 +105,7 @@ ConcatString parse_version(const char * version, const int ndots) {
 
    cs = s.substr(0, i);
 
-   return(cs);
+   return cs;
 }
 
 
@@ -113,7 +113,7 @@ ConcatString parse_version(const char * version, const int ndots) {
 
 
 ConcatString parse_version_major(const char * version) {
-   return(parse_version(version, 1));
+   return parse_version(version, 1);
 }
 
 
@@ -121,7 +121,7 @@ ConcatString parse_version_major(const char * version) {
 
 
 ConcatString parse_version_major_minor(const char * version) {
-   return(parse_version(version, 2));
+   return parse_version(version, 2);
 }
 
 
@@ -147,7 +147,7 @@ if ( path ) {
 
 }
 
-return ( short_name );
+return short_name;
 
 }
 
@@ -215,10 +215,10 @@ int num_tokens(const char *test_str, const char *separator)
    //
    // Check for an empty string
    //
-   if(!test_str) return(0);
+   if(!test_str) return 0;
    
    int buf_len = m_strlen(test_str);
-   if(buf_len <= 0) return(0);
+   if(buf_len <= 0) return 0;
 
    //
    // Initialize the temp string for use in tokenizing
@@ -235,7 +235,7 @@ int num_tokens(const char *test_str, const char *separator)
 
    if(temp_str) { delete [] temp_str; temp_str = (char *) nullptr; }
 
-   return(n);
+   return n;
 }
 
 
@@ -262,7 +262,7 @@ bool has_prefix(const char **prefix_list, int n_prefix,
       }
    }
 
-   return(status);
+   return status;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -333,7 +333,7 @@ void regex_clean(char** &mat)
 
 ConcatString str_replace(const char* data, const char* old, const char* repl){
    ConcatString ret;
-   if(!data) return(ret);
+   if(!data) return ret;
 
    string str = data;
    size_t pos = str.find( old );
@@ -348,7 +348,7 @@ ConcatString str_replace(const char* data, const char* old, const char* repl){
 
 ConcatString str_replace_all(const char* data, const char* old, const char* repl){
    ConcatString ret;
-   if(!data) return(ret);
+   if(!data) return ret;
 
    string str = data;
    while( string::npos != str.find(old) ) str = str_replace(str.c_str(), old, repl);
@@ -400,7 +400,7 @@ int parse_thresh_index(const char *col_name) {
       exit(1);
    }
 
-   return(i);
+   return i;
 }
 
 ////////////////////////////////////////////////////////////////////////

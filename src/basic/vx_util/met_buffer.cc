@@ -85,11 +85,11 @@ MetBuffer & MetBuffer::operator=(const MetBuffer & b)
 
 {
 
-if ( this == &b )  return ( * this );
+if ( this == &b )  return *this;
 
 mb_assign(b);
 
-return ( * this );
+return *this;
 
 }
 
@@ -282,9 +282,9 @@ n_read = ::read(fd, Buf, bytes);
 
 Nbytes = n_read;
 
-if ( n_read < 0 )  return ( -1 );
+if ( n_read < 0 )  return -1;
 
-return ( n_read );
+return n_read;
 
 }
 
@@ -306,7 +306,7 @@ n_read = ::read_fortran_binary(fd, Buf, Nalloc, RecPadSize, SwapEndian);
 
 Nbytes = n_read;
 
-return ( false );
+return false;
 
 }
 
