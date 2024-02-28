@@ -99,7 +99,7 @@ void TokenStack::init_from_scratch()
 
 {
 
-e = (Token *) 0;
+e = (Token *) nullptr;
 
 AllocInc = 50;   //  default value
 
@@ -117,7 +117,7 @@ void TokenStack::clear()
 
 {
 
-if ( e )  { delete [] e;  e = (Token *) 0; }
+if ( e )  { delete [] e;  e = (Token *) nullptr; }
 
 
 
@@ -189,11 +189,11 @@ for(j=0; j<Nelements; ++j)  {
 
 }
 
-if ( e )  { delete [] e;  e = (Token *) 0; }
+if ( e )  { delete [] e;  e = (Token *) nullptr; }
 
 e = u;
 
-u = (Token *) 0;
+u = (Token *) nullptr;
 
 Nalloc = n;
 

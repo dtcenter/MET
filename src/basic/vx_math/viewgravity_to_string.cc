@@ -39,7 +39,7 @@ ConcatString viewgravity_to_string(const ViewGravity t)
 
 {
 
-const char * s = (const char *) 0;
+const char * s = (const char *) nullptr;
 
 switch ( t )  {
 

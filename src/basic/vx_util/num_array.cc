@@ -642,9 +642,9 @@ int NumArray::rank_array(int &ties)
 
    int n_vld, i;
 
-   double *data      = (double *) 0;
-   int    *data_loc  = (int *) 0;
-   double *data_rank = (double *) 0;
+   double *data      = (double *) nullptr;
+   int    *data_loc  = (int *) nullptr;
+   double *data_rank = (double *) nullptr;
 
    //
    // Arrays to store the raw data values to be ranked, their locations,
@@ -690,9 +690,9 @@ int NumArray::rank_array(int &ties)
    //
    // Deallocate memory
    //
-   if(data)      { delete [] data;      data      = (double *) 0; }
-   if(data_loc)  { delete [] data_loc;  data_loc  = (int *) 0;    }
-   if(data_rank) { delete [] data_rank; data_rank = (double *) 0; }
+   if(data)      { delete [] data;      data      = (double *) nullptr; }
+   if(data_loc)  { delete [] data_loc;  data_loc  = (int *) nullptr;    }
+   if(data_rank) { delete [] data_rank; data_rank = (double *) nullptr; }
 
    Sorted = false;
 

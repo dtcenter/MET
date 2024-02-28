@@ -210,8 +210,8 @@ void set_quiet(const StringArray &)
 
 void process_directory(const char * dir_name)
 {
-   DIR *dir = (DIR *) 0;  // pointer to a DIR structure
-   dirent *pde = (dirent *) 0;  // pointer to a portable directory entry
+   DIR *dir = (DIR *) nullptr;  // pointer to a DIR structure
+   dirent *pde = (dirent *) nullptr;  // pointer to a portable directory entry
    ConcatString new_directory;
    ConcatString tmp_directory;
    ConcatString new_filename;

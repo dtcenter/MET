@@ -87,8 +87,8 @@ void ModeExecutive::init_from_scratch()
 
 {
 
-   fcst_mtddf = (Met2dDataFile *) 0;
-   obs_mtddf = (Met2dDataFile *) 0;
+   fcst_mtddf = (Met2dDataFile *) nullptr;
+   obs_mtddf = (Met2dDataFile *) nullptr;
 
    clear();
 
@@ -111,8 +111,8 @@ void ModeExecutive::clear()
    fcst_file.clear();
    obs_file.clear();
 
-   if ( fcst_mtddf )  { delete fcst_mtddf;  fcst_mtddf = (Met2dDataFile *) 0; }
-   if (  obs_mtddf )  { delete  obs_mtddf;   obs_mtddf = (Met2dDataFile *) 0; }
+   if ( fcst_mtddf )  { delete fcst_mtddf;  fcst_mtddf = (Met2dDataFile *) nullptr; }
+   if (  obs_mtddf )  { delete  obs_mtddf;   obs_mtddf = (Met2dDataFile *) nullptr; }
 
    for (int j=0; j<n_cts; ++j)  cts[j].zero_out();
 
@@ -1700,17 +1700,17 @@ void ModeExecutive::write_obj_netcdf(const ModeNcOutInfo & info)
    const ConcatString fcst_thresh = engine.conf_info.Fcst->conv_thresh.get_str(5);
    const ConcatString  obs_thresh = engine.conf_info.Obs->conv_thresh.get_str(5);
 
-   float *fcst_raw_data      = (float *) 0;
-   float *fcst_obj_raw_data  = (float *) 0;
-   int   *fcst_obj_data      = (int *)   0;
-   int   *fcst_clus_data     = (int *)   0;
+   float *fcst_raw_data      = (float *) nullptr;
+   float *fcst_obj_raw_data  = (float *) nullptr;
+   int   *fcst_obj_data      = (int *)   nullptr;
+   int   *fcst_clus_data     = (int *)   nullptr;
 
-   float *obs_raw_data       = (float *) 0;
-   float *obs_obj_raw_data   = (float *) 0;
-   int   *obs_obj_data       = (int *)   0;
-   int   *obs_clus_data      = (int *)   0;
+   float *obs_raw_data       = (float *) nullptr;
+   float *obs_obj_raw_data   = (float *) nullptr;
+   int   *obs_obj_data       = (int *)   nullptr;
+   int   *obs_clus_data      = (int *)   nullptr;
 
-   NcFile *f_out             = (NcFile *) 0;
+   NcFile *f_out             = (NcFile *) nullptr;
 
    NcDim  lat_dim           ;
    NcDim  lon_dim           ;
@@ -1752,7 +1752,7 @@ void ModeExecutive::write_obj_netcdf(const ModeNcOutInfo & info)
       mlog << Error << "\nModeExecutive::write_obj_netcdf() -> trouble opening output file "
            << out_file << "\n\n";
       delete f_out;
-      f_out = (NcFile *) 0;
+      f_out = (NcFile *) nullptr;
 
       exit(1);
    }
@@ -2094,15 +2094,15 @@ void ModeExecutive::write_obj_netcdf(const ModeNcOutInfo & info)
    // Delete allocated memory
    //
 
-   if (fcst_raw_data)      { delete [] fcst_raw_data;      fcst_raw_data     = (float *) 0; }
-   if (fcst_obj_raw_data)  { delete [] fcst_obj_raw_data;  fcst_obj_raw_data = (float *) 0; }
-   if (fcst_obj_data)      { delete [] fcst_obj_data;      fcst_obj_data     = (int *) 0; }
-   if (fcst_clus_data)     { delete [] fcst_clus_data;     fcst_clus_data    = (int *) 0; }
+   if (fcst_raw_data)      { delete [] fcst_raw_data;      fcst_raw_data     = (float *) nullptr; }
+   if (fcst_obj_raw_data)  { delete [] fcst_obj_raw_data;  fcst_obj_raw_data = (float *) nullptr; }
+   if (fcst_obj_data)      { delete [] fcst_obj_data;      fcst_obj_data     = (int *)   nullptr; }
+   if (fcst_clus_data)     { delete [] fcst_clus_data;     fcst_clus_data    = (int *)   nullptr; }
 
-   if (obs_raw_data)       { delete [] obs_raw_data;       obs_raw_data      = (float *) 0; }
-   if (obs_obj_raw_data)   { delete [] obs_obj_raw_data;   obs_obj_raw_data  = (float *) 0; }
-   if (obs_obj_data)       { delete [] obs_obj_data;       obs_obj_data      = (int *) 0; }
-   if (obs_clus_data)      { delete [] obs_clus_data;      obs_clus_data     = (int *) 0; }
+   if (obs_raw_data)       { delete [] obs_raw_data;       obs_raw_data      = (float *) nullptr; }
+   if (obs_obj_raw_data)   { delete [] obs_obj_raw_data;   obs_obj_raw_data  = (float *) nullptr; }
+   if (obs_obj_data)       { delete [] obs_obj_data;       obs_obj_data      = (int *)   nullptr; }
+   if (obs_clus_data)      { delete [] obs_clus_data;      obs_clus_data     = (int *)   nullptr; }
 
    //
    // Write out the values of the vertices of the polylines.
@@ -2114,7 +2114,7 @@ void ModeExecutive::write_obj_netcdf(const ModeNcOutInfo & info)
    // Close the NetCDF file
    //
    delete f_out;
-   f_out = (NcFile *) 0;
+   f_out = (NcFile *) nullptr;
 
    return;
 }
@@ -2179,14 +2179,14 @@ void ModeExecutive::write_poly_netcdf(NcFile *f_out, ObjPolyType poly_type)
    int i, j, x, y, n_pts, n_poly;
    double lat, lon;
 
-   Polyline **poly            = (Polyline **) 0;
+   Polyline **poly            = (Polyline **) nullptr;
 
-   int   *poly_start          = (int       *) 0;
-   int   *poly_npts           = (int       *) 0;
-   float *poly_lat            = (float     *) 0;
-   float *poly_lon            = (float     *) 0;
-   int   *poly_x              = (int       *) 0;
-   int   *poly_y              = (int       *) 0;
+   int   *poly_start          = (int       *) nullptr;
+   int   *poly_npts           = (int       *) nullptr;
+   float *poly_lat            = (float     *) nullptr;
+   float *poly_lon            = (float     *) nullptr;
+   int   *poly_x              = (int       *) nullptr;
+   int   *poly_y              = (int       *) nullptr;
 
    // Dimensions and variables for each object
    NcDim  obj_dim            ;
@@ -2436,13 +2436,13 @@ void ModeExecutive::write_poly_netcdf(NcFile *f_out, ObjPolyType poly_type)
    //
    // Delete allocated memory
    //
-   if(poly)       { delete [] poly;       poly       = (Polyline **) 0; }
-   if(poly_start) { delete [] poly_start; poly_start = (int       *) 0; }
-   if(poly_npts)  { delete [] poly_npts;  poly_npts  = (int       *) 0; }
-   if(poly_lat)   { delete [] poly_lat;   poly_lat   = (float     *) 0; }
-   if(poly_lon)   { delete [] poly_lon;   poly_lon   = (float     *) 0; }
-   if(poly_x)     { delete [] poly_x;     poly_x     = (int       *) 0; }
-   if(poly_y)     { delete [] poly_y;     poly_y     = (int       *) 0; }
+   if(poly)       { delete [] poly;       poly       = (Polyline **) nullptr; }
+   if(poly_start) { delete [] poly_start; poly_start = (int       *) nullptr; }
+   if(poly_npts)  { delete [] poly_npts;  poly_npts  = (int       *) nullptr; }
+   if(poly_lat)   { delete [] poly_lat;   poly_lat   = (float     *) nullptr; }
+   if(poly_lon)   { delete [] poly_lon;   poly_lon   = (float     *) nullptr; }
+   if(poly_x)     { delete [] poly_x;     poly_x     = (int       *) nullptr; }
+   if(poly_y)     { delete [] poly_y;     poly_y     = (int       *) nullptr; }
 
    return;
 }

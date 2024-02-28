@@ -63,7 +63,7 @@ GribRecord::GribRecord()
 {
 
 is  = new Section0_Header;
-pds = (unsigned char *) 0;
+pds = (unsigned char *) nullptr;
 gds = new Section2_Header;
 bms = new Section3_Header;
 bds = new Section4_Header;
@@ -102,8 +102,8 @@ word_size = 0;
 
 data_lseek_offset = record_lseek_offset = (off_t) 0;
 
-// data   = (unsigned char *) 0;
-// bitmap = (unsigned char *) 0;
+// data   = (unsigned char *) nullptr;
+// bitmap = (unsigned char *) nullptr;
 //
 //data_size = data_alloc = 0;
 //bitmap_size = bitmap_alloc = 0;
@@ -135,13 +135,13 @@ GribRecord::~GribRecord()
 
 {
 
-if (  is )  { delete  is;    is = (Section0_Header *) 0; }
-if ( pds )  { delete [] pds;   pds = (unsigned char *)   0; }
-if ( gds )  { delete gds;   gds = (Section2_Header *) 0; }
-if ( bms )  { delete bms;   bms = (Section3_Header *) 0; }
-if ( bds )  { delete bds;   bds = (Section4_Header *) 0; }
-//if ( data ) { delete data; data = (vector<unsigned char> *) 0; }
-//if ( bitmap ) { delete bitmap; bitmap = (vector<unsigned char> *) 0; }
+if (  is )  { delete  is;    is = (Section0_Header *) nullptr; }
+if ( pds )  { delete [] pds;   pds = (unsigned char *)   nullptr; }
+if ( gds )  { delete gds;   gds = (Section2_Header *) nullptr; }
+if ( bms )  { delete bms;   bms = (Section3_Header *) nullptr; }
+if ( bds )  { delete bds;   bds = (Section4_Header *) nullptr; }
+//if ( data ) { delete data; data = (vector<unsigned char> *) nullptr; }
+//if ( bitmap ) { delete bitmap; bitmap = (vector<unsigned char> *) nullptr; }
 }
 
 
@@ -316,8 +316,8 @@ uint4 GribRecord::long_data_value(int n) const
 
 int k, byte, shift;
 uint4 value, u;
-unsigned char *c1 = (unsigned char *) 0;
-const unsigned char *c2 = (unsigned char *) 0;
+unsigned char *c1 = (unsigned char *) nullptr;
+const unsigned char *c2 = (unsigned char *) nullptr;
 
 k = n*word_size;
 
@@ -522,7 +522,7 @@ fd = -1;
 
 file_start = (long) -1;
 
-name = (char *) 0;
+name = (char *) nullptr;
 
 referenceCount = n_alloc = issue = lead = 0;
 
@@ -530,9 +530,9 @@ buf_size = (size_t) 0;
 
 n_records = (unsigned int) 0;
 
-buf = (unsigned char *) 0;
+buf = (unsigned char *) nullptr;
 
-record_info = (RecordInfo *) 0;
+record_info = (RecordInfo *) nullptr;
 
 }
 
@@ -546,11 +546,11 @@ GribFileRep::~GribFileRep()
 
 if ( fd >= 0 )  { ::close(fd);  fd = -1; }
 
-if ( buf )  { delete [] buf;  buf = (unsigned char *) 0; }
+if ( buf )  { delete [] buf;  buf = (unsigned char *) nullptr; }
 
-if ( name )  { delete [] name;  name = (char *) 0; }
+if ( name )  { delete [] name;  name = (char *) nullptr; }
 
-if ( n_alloc ) { delete [] record_info;  record_info = (RecordInfo *) 0; }
+if ( n_alloc ) { delete [] record_info;  record_info = (RecordInfo *) nullptr; }
 
 
 }
@@ -565,7 +565,7 @@ void GribFileRep::record_extend(int n)
 if ( n_alloc > n )  return;
 
 int j;
-RecordInfo *r  = (RecordInfo *) 0;
+RecordInfo *r  = (RecordInfo *) nullptr;
 
 
 ++n;
@@ -600,9 +600,9 @@ for (j=n_records; j<n_alloc; ++j)  {
 
 }
 
-delete [] record_info;  record_info = (RecordInfo *) 0;
+delete [] record_info;  record_info = (RecordInfo *) nullptr;
 
-record_info = r;  r = (RecordInfo *) 0;
+record_info = r;  r = (RecordInfo *) nullptr;
 
 return;
 
@@ -616,7 +616,7 @@ void GribFileRep::realloc_buf(size_t n_bytes)
 
 {
 
-if ( buf )  { delete [] buf;  buf = 0;  buf_size = 0; }
+if ( buf )  { delete [] buf;  buf = nullptr;  buf_size = 0; }
 
 buf = new unsigned char [n_bytes];
 
@@ -650,7 +650,7 @@ GribFile::GribFile()
 
 {
 
-rep = (GribFileRep *) 0;
+rep = (GribFileRep *) nullptr;
 
 }
 
@@ -662,7 +662,7 @@ GribFile::GribFile(const char *filename)
 
 {
 
-rep = (GribFileRep *) 0;
+rep = (GribFileRep *) nullptr;
 
 open(filename);
 
@@ -1166,7 +1166,7 @@ void GribFile::index_records()
 {
 
 GribRecord *g = new GribRecord();
-Section1_Header *pds_ptr = (Section1_Header *) 0;
+Section1_Header *pds_ptr = (Section1_Header *) nullptr;
 
 rep->record_extend(1);
 

@@ -39,7 +39,7 @@ ConcatString documentmedia_to_string(const DocumentMedia t)
 
 {
 
-const char * s = (const char *) 0;
+const char * s = (const char *) nullptr;
 
 switch ( t )  {
 

@@ -2377,8 +2377,8 @@ void aggr_isc_lines(LineDataFile &ldf, STATAnalysisJob &job,
          //
          if(m.count(key) == 0) {
             aggr.isc_info.clear();
-            aggr.total_na = aggr.mse_na   = aggr.fen_na   = (NumArray *) 0;
-            aggr.oen_na   = aggr.baser_na = aggr.fbias_na = (NumArray *) 0;
+            aggr.total_na = aggr.mse_na   = aggr.fen_na   = (NumArray *) nullptr;
+            aggr.oen_na   = aggr.baser_na = aggr.fbias_na = (NumArray *) nullptr;
             aggr.hdr.clear();
             m[key] = aggr;
             mlog << Debug(3) << "[Case " << m.size()
@@ -2568,12 +2568,12 @@ void aggr_isc_lines(LineDataFile &ldf, STATAnalysisJob &job,
       //
       // Deallocate memory
       //
-      if(it->second.total_na) { delete [] it->second.total_na; it->second.total_na = (NumArray *) 0; }
-      if(it->second.mse_na  ) { delete [] it->second.mse_na;   it->second.mse_na   = (NumArray *) 0; }
-      if(it->second.fen_na  ) { delete [] it->second.fen_na;   it->second.fen_na   = (NumArray *) 0; }
-      if(it->second.oen_na  ) { delete [] it->second.oen_na;   it->second.oen_na   = (NumArray *) 0; }
-      if(it->second.baser_na) { delete [] it->second.baser_na; it->second.baser_na = (NumArray *) 0; }
-      if(it->second.fbias_na) { delete [] it->second.fbias_na; it->second.fbias_na = (NumArray *) 0; }
+      if(it->second.total_na) { delete [] it->second.total_na; it->second.total_na = (NumArray *) nullptr; }
+      if(it->second.mse_na  ) { delete [] it->second.mse_na;   it->second.mse_na   = (NumArray *) nullptr; }
+      if(it->second.fen_na  ) { delete [] it->second.fen_na;   it->second.fen_na   = (NumArray *) nullptr; }
+      if(it->second.oen_na  ) { delete [] it->second.oen_na;   it->second.oen_na   = (NumArray *) nullptr; }
+      if(it->second.baser_na) { delete [] it->second.baser_na; it->second.baser_na = (NumArray *) nullptr; }
+      if(it->second.fbias_na) { delete [] it->second.fbias_na; it->second.fbias_na = (NumArray *) nullptr; }
 
    } // end for it
 
@@ -3878,7 +3878,7 @@ void mpr_to_ctc(STATAnalysisJob &job, const AggrMPRInfo &info,
 void mpr_to_cts(STATAnalysisJob &job, const AggrMPRInfo &info,
                 int i_thresh, CTSInfo &cts_info,
                 const char *tmp_dir, gsl_rng *rng_ptr) {
-   CTSInfo *cts_info_ptr = (CTSInfo *) 0;
+   CTSInfo *cts_info_ptr = (CTSInfo *) nullptr;
 
    //
    // Initialize

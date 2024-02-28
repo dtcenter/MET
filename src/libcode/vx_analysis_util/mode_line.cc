@@ -139,7 +139,7 @@ void ModeLine::clear()
 DataLine::clear();
 
 HdrFlag = false;
-HdrLine = (AsciiHeaderLine *) 0;
+HdrLine = (AsciiHeaderLine *) nullptr;
 
 return;
 
@@ -426,7 +426,7 @@ unixtime ModeLine::fcst_init() const
 
 unixtime v, l;
 
-const char * c = (char *) 0;
+const char * c = (char *) nullptr;
 
 c = get_item("FCST_VALID");
 
@@ -528,7 +528,7 @@ unixtime ModeLine::obs_init() const
 
 unixtime v, l;
 
-const char * c = (char *) 0;
+const char * c = (char *) nullptr;
 
 c = get_item("OBS_VALID");
 
@@ -999,7 +999,7 @@ nfcst = nobs = -1;
 if ( is_single() )  return false;
 
 const char * c = object_id();
-const char * u = (const char *) 0;
+const char * u = (const char *) nullptr;
 
    //
    //  skip leading F, O, CF or CO

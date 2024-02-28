@@ -110,7 +110,7 @@ void write_pad(int fd, unsigned int value, PadSize padsize)
 int n_written, bytes;
 unsigned int I;
 unsigned long long L;
-unsigned char * b = (unsigned char *) 0;
+unsigned char * b = (unsigned char *) nullptr;
 
 
 switch ( padsize )  {

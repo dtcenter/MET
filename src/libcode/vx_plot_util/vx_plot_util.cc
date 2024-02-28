@@ -45,7 +45,7 @@ void draw_map(const Grid &gr, const Box &gr_bb, PSfile &p, const Box &dim,
    }
 
    int i;
-   Dictionary *map_dict = (Dictionary *) 0;
+   Dictionary *map_dict = (Dictionary *) nullptr;
    ConcatString file_name, line_dash;
    NumArray line_color;
    double line_width;

@@ -133,7 +133,7 @@ close();
 
 ConcatString full_path, file_name;
 int i, file_argc;
-char **file_argv = (char **) 0; // allocated
+char **file_argv = (char **) nullptr; // allocated
 StringArray sa;
 const char *method_name = "MetPythonPointDataFile::open() ";
 

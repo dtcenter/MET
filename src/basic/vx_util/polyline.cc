@@ -40,7 +40,7 @@ using namespace std;
 ///////////////////////////////////////////////////////////////////////////////
 
 Polyline::Polyline() {
-   u = v = (double *) 0;
+   u = v = (double *) nullptr;
 
    clear();
 }
@@ -55,7 +55,7 @@ Polyline::~Polyline() {
 ///////////////////////////////////////////////////////////////////////////////
 
 Polyline::Polyline(const Polyline &c) {
-   u = v = (double *) 0;
+   u = v = (double *) nullptr;
 
    assign(c);
 }
@@ -75,8 +75,8 @@ Polyline & Polyline::operator=(const Polyline &c) {
 
 void Polyline::clear() {
 
-   if(u)    { delete [] u;    u = (double *) 0; }
-   if(v)    { delete [] v;    v = (double *) 0; }
+   if(u)    { delete [] u;    u = (double *) nullptr; }
+   if(v)    { delete [] v;    v = (double *) nullptr; }
 
    n_points = n_alloc = 0;
 
@@ -203,8 +203,8 @@ void Polyline::extend_points(int n) {
    }
 
    int i;
-   double *uu = (double *) 0;
-   double *vv = (double *) 0;
+   double *uu = (double *) nullptr;
+   double *vv = (double *) nullptr;
 
    uu = new double [n];
    vv = new double [n];
@@ -222,13 +222,13 @@ void Polyline::extend_points(int n) {
       vv[i] = v[i];
    }
 
-   delete [] u; u = (double *) 0;
-   delete [] v; v = (double *) 0;
+   delete [] u; u = (double *) nullptr;
+   delete [] v; v = (double *) nullptr;
 
    u = uu;
    v = vv;
 
-   uu = vv = (double *) 0;
+   uu = vv = (double *) nullptr;
 
    return;
 }

@@ -38,9 +38,9 @@ using namespace std;
 
 Node::Node() {
 
-   child = (Node *) 0;
+   child = (Node *) nullptr;
 
-   sibling = (Node *) 0;
+   sibling = (Node *) nullptr;
 
    clear();
 }
@@ -76,12 +76,12 @@ void Node::clear() {
 
    if(child) {
       child->clear();
-      delete child;  child = (Node *) 0;
+      delete child;  child = (Node *) nullptr;
    }
 
    if(sibling) {
       sibling->clear();
-      delete sibling;  sibling = (Node *) 0;
+      delete sibling;  sibling = (Node *) nullptr;
    }
 
    p.clear();
@@ -127,7 +127,7 @@ void Node::assign_tree(const Node *n_ptr) {
 ///////////////////////////////////////////////////////////////////////////////
 
 void Node::add_child(const Polyline * poly) {
-   Node *n_ptr = (Node *) 0;
+   Node *n_ptr = (Node *) nullptr;
 
    // Check for first child
    if(child == nullptr) {
@@ -183,7 +183,7 @@ void Node::add_child(const Polyline * poly) {
 
 int Node::n_children() const {
    int count;
-   Node *n_ptr = (Node *) 0;
+   Node *n_ptr = (Node *) nullptr;
 
    count = 0;
 
@@ -207,7 +207,7 @@ int Node::n_children() const {
 
 Node *Node::get_child(int n) const {
    int children_count, i;
-   Node *n_ptr = (Node *) 0;
+   Node *n_ptr = (Node *) nullptr;
 
    if( n >= (children_count = n_children()) ) {
 
@@ -229,7 +229,7 @@ Node *Node::get_child(int n) const {
 
 int Node::is_closed() const {
    int closed;
-   Node *n_ptr = (Node *) 0;
+   Node *n_ptr = (Node *) nullptr;
 
    // Check if the current polyline is closed
    closed = p.is_closed();
@@ -269,7 +269,7 @@ void Node::centroid(double &ubar, double &vbar) const {
 ///////////////////////////////////////////////////////////////////////////////
 
 void Node::translate(double du, double dv) {
-   Node *n_ptr = (Node *) 0;
+   Node *n_ptr = (Node *) nullptr;
 
    // Translate each point of the current polyline
    p.translate(du, dv);
@@ -339,7 +339,7 @@ void Node::rotate(double deg) {
 ///////////////////////////////////////////////////////////////////////////////
 
 void Node::rotate(double deg, double ubar, double vbar) {
-   Node *n_ptr = (Node *) 0;
+   Node *n_ptr = (Node *) nullptr;
 
    p.rotate(deg, ubar, vbar);
 
@@ -359,7 +359,7 @@ void Node::rotate(double deg, double ubar, double vbar) {
 
 double Node::uv_signed_area() const {
    double sum;
-   Node *n_ptr = (Node *) 0;
+   Node *n_ptr = (Node *) nullptr;
 
    sum = p.uv_signed_area();
 
@@ -379,7 +379,7 @@ double Node::uv_signed_area() const {
 
 int Node::is_inside(double u_test, double v_test) const {
    int count;
-   Node *n_ptr = (Node *) 0;
+   Node *n_ptr = (Node *) nullptr;
 
    if(p.is_inside(u_test, v_test)) {
 
@@ -411,7 +411,7 @@ int Node::is_inside(double u_test, double v_test) const {
 
 int Node::is_polyline_point(double u_test, double v_test) const {
    int poly_point;
-   Node *n_ptr = (Node *) 0;
+   Node *n_ptr = (Node *) nullptr;
 
    poly_point = p.is_polyline_point(u_test, v_test);
 
@@ -431,7 +431,7 @@ int Node::is_polyline_point(double u_test, double v_test) const {
 ///////////////////////////////////////////////////////////////////////////////
 
 void Node::bounding_box(Box &bb) const {
-   Node *n_ptr = (Node *) 0;
+   Node *n_ptr = (Node *) nullptr;
 
    p.bounding_box(bb);
 
@@ -455,7 +455,7 @@ void Node::bounding_box(Box &bb) const {
 ///////////////////////////////////////////////////////////////////////////////
 
 void Node::sum_first_moments(double &sum_x, double &sum_y) const {
-   Node *n_ptr = (Node *) 0;
+   Node *n_ptr = (Node *) nullptr;
 
    p.sum_first_moments(sum_x, sum_y);
 
@@ -475,7 +475,7 @@ void Node::sum_first_moments(double &sum_x, double &sum_y) const {
 
 void Node::sum_second_moments(double x_bar, double y_bar,
                               double &Ixx, double &Ixy, double &Iyy) const {
-   Node *n_ptr = (Node *) 0;
+   Node *n_ptr = (Node *) nullptr;
 
    p.sum_second_moments(x_bar, y_bar, Ixx, Ixy, Iyy);
 
@@ -500,7 +500,8 @@ void Node::sum_second_moments(double x_bar, double y_bar,
 double node_dist(const Node &a, const Node &b) {
    double min_dist, dist;
    int i_a, i_b, num_a, num_b;
-   Node *a_ptr = (Node *) 0, *b_ptr = (Node *) 0;
+   Node *a_ptr = (Node *) nullptr;
+   Node *b_ptr = (Node *) nullptr;
 
    num_a = a.n_children();
    num_b = b.n_children();
@@ -538,7 +539,7 @@ double node_dist(const Node &a, const Node &b) {
 double node_polyline_dist(const Node &a, const Polyline &b) {
    double min_dist, dist;
    int i_a, num_a;
-   Node *a_ptr = (Node *) 0;
+   Node *a_ptr = (Node *) nullptr;
 
    num_a = a.n_children();
 

@@ -159,7 +159,7 @@ PSfile::~PSfile()
 
 close();
 
-delete afm;  afm = (Afm *) 0;
+delete afm;  afm = (Afm *) nullptr;
 
 }
 
@@ -171,7 +171,7 @@ void PSfile::init_from_scratch()
 
 {
 
-File = (ofstream *) 0;
+File = (ofstream *) nullptr;
 
 psout.ignore_columns = true;
 
@@ -399,7 +399,7 @@ if ( File )  {
 
    File->close();
 
-   delete File;   File = (ofstream *) 0;
+   delete File;   File = (ofstream *) nullptr;
 
 }
 
@@ -572,7 +572,7 @@ const double scale = 0.001*font_size;
 double x_cur, y_cur;
 double dx, dy;
 VxpsTextNode node;
-VxpsTextNode * n = (VxpsTextNode *) 0;
+VxpsTextNode * n = (VxpsTextNode *) nullptr;
 
 
 make_list(current_font, font_size, *afm, node, s);

@@ -72,7 +72,7 @@ void MtdFileBase::base_init_from_scratch()
 
 {
 
-G = (Grid *) 0;
+G = (Grid *) nullptr;
 
 clear();
 
@@ -88,7 +88,7 @@ void MtdFileBase::clear()
 
 {
 
-if ( G )  { delete G;  G = (Grid *) 0; }
+if ( G )  { delete G;  G = (Grid *) nullptr; }
 
 Nx = Ny = Nt = 0;
  
@@ -220,7 +220,7 @@ void MtdFileBase::set_grid(const Grid & g)
 
 {
 
-if ( G )  { delete G;  G = (Grid *) 0; }
+if ( G )  { delete G;  G = (Grid *) nullptr; }
 
 G = new Grid ( g );
 

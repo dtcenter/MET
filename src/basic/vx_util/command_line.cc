@@ -234,7 +234,7 @@ void CLOptionInfoArray::init_from_scratch()
 
 {
 
-e = (CLOptionInfo *) 0;
+e = (CLOptionInfo *) nullptr;
 
 AllocInc = 16;   //  default value
 
@@ -252,7 +252,7 @@ void CLOptionInfoArray::clear()
 
 {
 
-if ( e )  { delete [] e;  e = (CLOptionInfo *) 0; }
+if ( e )  { delete [] e;  e = (CLOptionInfo *) nullptr; }
 
 
 
@@ -298,7 +298,7 @@ if ( n <= Nalloc )  return;
 n = AllocInc*( (n + AllocInc - 1)/AllocInc );
 
 int j;
-CLOptionInfo * u = (CLOptionInfo *) 0;
+CLOptionInfo * u = (CLOptionInfo *) nullptr;
 
 u = new CLOptionInfo [n];
 
@@ -317,11 +317,11 @@ for(j=0; j<Nelements; ++j)  {
 
 }
 
-if ( e )  { delete [] e;  e = (CLOptionInfo *) 0; }
+if ( e )  { delete [] e;  e = (CLOptionInfo *) nullptr; }
 
 e = u;
 
-u = (CLOptionInfo *) 0;
+u = (CLOptionInfo *) nullptr;
 
 Nalloc = n;
 

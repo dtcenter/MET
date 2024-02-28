@@ -90,7 +90,7 @@ void MM_Engine::init_from_scratch()
 
 {
 
-comp_to_eq = (int *) 0;
+comp_to_eq = (int *) nullptr;
 
 clear();
 

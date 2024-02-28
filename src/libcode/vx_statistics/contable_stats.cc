@@ -1077,8 +1077,8 @@ if ( N == 0 ) return bad_data_double;
 int j, k, m, n;
 const double DN = (double) N;
 double t, sum;
-double * p = (double *) 0;
-double * s  = (double *) 0;
+double * p = (double *) nullptr;
+double * s  = (double *) nullptr;
 
    //
    //  can't compute gerrity when the first column contains all zeros
@@ -1140,8 +1140,8 @@ for (j=0; j<Nrows; ++j)  {
    //  done
    //
 
-if ( p  )  { delete [] p;   p  = (double *) 0; }
-if ( s  )  { delete [] s;   s  = (double *) 0; }
+if ( p  )  { delete [] p;   p  = (double *) nullptr; }
+if ( s  )  { delete [] s;   s  = (double *) nullptr; }
 
 return sum;
 
@@ -1165,9 +1165,9 @@ void calc_gerrity_scoring_matrix(int N, const double * p, double * s)
 
 int j, k, n;
 double b, t, sum;
-double * a          = (double *) 0;
-double * recip_sum  = (double *) 0;
-double * direct_sum = (double *) 0;
+double * a          = (double *) nullptr;
+double * recip_sum  = (double *) nullptr;
+double * direct_sum = (double *) nullptr;
 
 
 a          = new double [N];
@@ -1257,9 +1257,9 @@ for (j=0; j<N; ++j)  {
    //  done
    //
 
-if ( a )           { delete [] a;           a          = (double *) 0; }
-if ( recip_sum )   { delete [] recip_sum;   recip_sum  = (double *) 0; }
-if ( direct_sum )  { delete [] direct_sum;  direct_sum = (double *) 0; }
+if ( a )           { delete [] a;           a          = (double *) nullptr; }
+if ( recip_sum )   { delete [] recip_sum;   recip_sum  = (double *) nullptr; }
+if ( direct_sum )  { delete [] direct_sum;  direct_sum = (double *) nullptr; }
 
 return;
 

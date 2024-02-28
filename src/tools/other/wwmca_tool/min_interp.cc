@@ -136,7 +136,7 @@ Interpolator * Min_Interp::copy() const
 
 {
 
-Interpolator * i = (Interpolator *) 0;
+Interpolator * i = (Interpolator *) nullptr;
 
 i = new Min_Interp (*this);
 

@@ -61,7 +61,7 @@ m_strncpy(cbuf, value.c_str(), cbuf_size - 1, method_name);
 
 cbuf[cbuf_size - 1] = (char) 0;
 
-if (att) { delete att;  att = 0; }
+if (att) { delete att;  att = nullptr; }
 
    //
    //  done

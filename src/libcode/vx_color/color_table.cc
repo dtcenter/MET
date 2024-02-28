@@ -53,11 +53,11 @@ extern int color_file_column;
    //  definitions with external linkage
    //
 
-const char * input_filename = (const char *) 0;
+const char * input_filename = (const char *) nullptr;
 
 // ColorList clist;
 
-ColorTable * the_table = (ColorTable *) 0;
+ColorTable * the_table = (ColorTable *) nullptr;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -308,7 +308,7 @@ void ColorTable::init_from_scratch()
 
 {
 
-Entry = (CtableEntry *) 0;
+Entry = (CtableEntry *) nullptr;
 
 clear();
 
@@ -324,7 +324,7 @@ void ColorTable::clear()
 
 {
 
-if ( Entry )  { delete [] Entry;  Entry = (CtableEntry *) 0; }
+if ( Entry )  { delete [] Entry;  Entry = (CtableEntry *) nullptr; }
 
 Nentries = 0;
 
@@ -554,7 +554,7 @@ input_filename = filename;
 
 if ( (colorin = fopen(input_filename, "r")) == nullptr )  {
 
-   colorin = (FILE *) 0;
+   colorin = (FILE *) nullptr;
 
    mlog << Error << "\nColorTable::read(const char *) -> failed to read colortable file \""
         << input_filename << "\"\n\n";
@@ -593,11 +593,11 @@ sort();
    //  done
    //
 
-fclose(colorin);   colorin = (FILE *) 0;
+fclose(colorin);   colorin = (FILE *) nullptr;
 
-input_filename = (const char *) 0;
+input_filename = (const char *) nullptr;
 
-the_table = (ColorTable *) 0;
+the_table = (ColorTable *) nullptr;
 
 clist.clear();
 
@@ -802,7 +802,7 @@ void ColorTable::extend(int n)
 if ( Nalloc >= n )  return;
 
 int j;
-CtableEntry * u = (CtableEntry *) 0;
+CtableEntry * u = (CtableEntry *) nullptr;
 
 j = n/ctable_alloc_inc;
 
@@ -828,11 +828,11 @@ if ( Entry )  {
 
    }
 
-   delete [] Entry;   Entry = (CtableEntry *) 0;
+   delete [] Entry;   Entry = (CtableEntry *) nullptr;
 
 }
 
-Entry = u;   u = (CtableEntry *) 0;
+Entry = u;   u = (CtableEntry *) nullptr;
 
 
    //

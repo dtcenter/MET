@@ -283,14 +283,15 @@ void compute_cts_stats_ci_bca(const gsl_rng *rng_ptr,
    int i, j, c;
    double s;
    NumArray i_na, ir_na, si_na, sr_na;
-   CTSInfo *cts_tmp = (CTSInfo *) 0;
+   CTSInfo *cts_tmp = (CTSInfo *) nullptr;
 
    //
    // Temp file streams for categorical statistics
    //
-   ofstream *cts_i_out = (ofstream *) 0, *cts_r_out = (ofstream *) 0;
-   ConcatString *cts_i_file = (ConcatString *) 0;
-   ConcatString *cts_r_file = (ConcatString *) 0;
+   ofstream *cts_i_out = (ofstream *) nullptr;
+   ofstream *cts_r_out = (ofstream *) nullptr;
+   ConcatString *cts_i_file = (ConcatString *) nullptr;
+   ConcatString *cts_r_file = (ConcatString *) nullptr;
    ConcatString prefix;
 
    //
@@ -378,11 +379,11 @@ void compute_cts_stats_ci_bca(const gsl_rng *rng_ptr,
             }
 
             // deallocate memory
-            if(cts_tmp)    { delete [] cts_tmp;    cts_tmp    = (CTSInfo *)      0; }
-            if(cts_i_out)  { delete [] cts_i_out;  cts_i_out  = (ofstream *)     0; }
-            if(cts_r_out)  { delete [] cts_r_out;  cts_r_out  = (ofstream *)     0; }
-            if(cts_i_file) { delete [] cts_i_file; cts_i_file = (ConcatString *) 0; }
-            if(cts_r_file) { delete [] cts_r_file; cts_r_file = (ConcatString *) 0; }
+            if(cts_tmp)    { delete [] cts_tmp;    cts_tmp    = (CTSInfo *)      nullptr; }
+            if(cts_i_out)  { delete [] cts_i_out;  cts_i_out  = (ofstream *)     nullptr; }
+            if(cts_r_out)  { delete [] cts_r_out;  cts_r_out  = (ofstream *)     nullptr; }
+            if(cts_i_file) { delete [] cts_i_file; cts_i_file = (ConcatString *) nullptr; }
+            if(cts_r_file) { delete [] cts_r_file; cts_r_file = (ConcatString *) nullptr; }
             throw(1);
          }
       }
@@ -712,11 +713,11 @@ void compute_cts_stats_ci_bca(const gsl_rng *rng_ptr,
    //
    // Deallocate memory
    //
-   if(cts_tmp)    { delete [] cts_tmp;    cts_tmp    = (CTSInfo *)      0; }
-   if(cts_i_out)  { delete [] cts_i_out;  cts_i_out  = (ofstream *)     0; }
-   if(cts_r_out)  { delete [] cts_r_out;  cts_r_out  = (ofstream *)     0; }
-   if(cts_i_file) { delete [] cts_i_file; cts_i_file = (ConcatString *) 0; }
-   if(cts_r_file) { delete [] cts_r_file; cts_r_file = (ConcatString *) 0; }
+   if(cts_tmp)    { delete [] cts_tmp;    cts_tmp    = (CTSInfo *)      nullptr; }
+   if(cts_i_out)  { delete [] cts_i_out;  cts_i_out  = (ofstream *)     nullptr; }
+   if(cts_r_out)  { delete [] cts_r_out;  cts_r_out  = (ofstream *)     nullptr; }
+   if(cts_i_file) { delete [] cts_i_file; cts_i_file = (ConcatString *) nullptr; }
+   if(cts_r_file) { delete [] cts_r_file; cts_r_file = (ConcatString *) nullptr; }
 
    return;
 }
@@ -1420,13 +1421,14 @@ void compute_cts_stats_ci_perc(const gsl_rng *rng_ptr,
    int i, j, m, c;
    double s;
    NumArray i_na, ir_na, sr_na;
-   CTSInfo *cts_tmp = (CTSInfo *) 0;
+   CTSInfo *cts_tmp = (CTSInfo *) nullptr;
 
    //
    // Temp file streams for categorical statistics
    //
-   ofstream *cts_r_out = (ofstream *) 0;
-   ConcatString *cts_r_file = (ConcatString *) 0, prefix;
+   ofstream *cts_r_out = (ofstream *) nullptr;
+   ConcatString *cts_r_file = (ConcatString *) nullptr;
+   ConcatString prefix;
 
    //
    // Check that the forecast and observation arrays of the same length
@@ -1506,9 +1508,9 @@ void compute_cts_stats_ci_perc(const gsl_rng *rng_ptr,
            //
            for(i=0; i<n_cts; i++) remove_temp_file(cts_r_file[i]);
 
-           if(cts_tmp)    { delete [] cts_tmp;    cts_tmp    = (CTSInfo *)      0; }
-           if(cts_r_out)  { delete [] cts_r_out;  cts_r_out  = (ofstream *)     0; }
-           if(cts_r_file) { delete [] cts_r_file; cts_r_file = (ConcatString *) 0; }
+           if(cts_tmp)    { delete [] cts_tmp;    cts_tmp    = (CTSInfo *)      nullptr; }
+           if(cts_r_out)  { delete [] cts_r_out;  cts_r_out  = (ofstream *)     nullptr; }
+           if(cts_r_file) { delete [] cts_r_file; cts_r_file = (ConcatString *) nullptr; }
 
             throw(1);
          }
@@ -1802,9 +1804,9 @@ void compute_cts_stats_ci_perc(const gsl_rng *rng_ptr,
    //
    // Deallocate memory
    //
-   if(cts_tmp)    { delete [] cts_tmp;    cts_tmp    = (CTSInfo *)      0; }
-   if(cts_r_out)  { delete [] cts_r_out;  cts_r_out  = (ofstream *)     0; }
-   if(cts_r_file) { delete [] cts_r_file; cts_r_file = (ConcatString *) 0; }
+   if(cts_tmp)    { delete [] cts_tmp;    cts_tmp    = (CTSInfo *)      nullptr; }
+   if(cts_r_out)  { delete [] cts_r_out;  cts_r_out  = (ofstream *)     nullptr; }
+   if(cts_r_file) { delete [] cts_r_file; cts_r_file = (ConcatString *) nullptr; }
 
    return;
 }
@@ -2436,13 +2438,16 @@ void compute_nbrcts_stats_ci_bca(const gsl_rng *rng_ptr,
    int i, j, c;
    double s;
    NumArray i_na, ir_na, si_na, sr_na;
-   NBRCTSInfo *nbrcts_tmp = (NBRCTSInfo *) 0;
+   NBRCTSInfo *nbrcts_tmp = (NBRCTSInfo *) nullptr;
 
    //
    // Temp file streams for categorical statistics
    //
-   ofstream *nbrcts_i_out = (ofstream *) 0, *nbrcts_r_out = (ofstream *) 0;
-   ConcatString *nbrcts_i_file = (ConcatString *) 0, *nbrcts_r_file = (ConcatString *) 0, prefix;
+   ofstream *nbrcts_i_out = (ofstream *) nullptr;
+   ofstream *nbrcts_r_out = (ofstream *) nullptr;
+   ConcatString *nbrcts_i_file = (ConcatString *) nullptr;
+   ConcatString *nbrcts_r_file = (ConcatString *) nullptr;
+   ConcatString prefix;
 
    //
    // Check that the forecast and observation arrays of the same length
@@ -2532,11 +2537,11 @@ void compute_nbrcts_stats_ci_bca(const gsl_rng *rng_ptr,
             }
 
             // deallocate memory
-            if(nbrcts_tmp)    { delete [] nbrcts_tmp;    nbrcts_tmp    = (NBRCTSInfo *)   0; }
-             if(nbrcts_i_out)  { delete [] nbrcts_i_out;  nbrcts_i_out  = (ofstream *)     0; }
-            if(nbrcts_r_out)  { delete [] nbrcts_r_out;  nbrcts_r_out  = (ofstream *)     0; }
-            if(nbrcts_i_file) { delete [] nbrcts_i_file; nbrcts_i_file = (ConcatString *) 0; }
-            if(nbrcts_r_file) { delete [] nbrcts_r_file; nbrcts_r_file = (ConcatString *) 0; }
+            if(nbrcts_tmp)    { delete [] nbrcts_tmp;    nbrcts_tmp    = (NBRCTSInfo *)   nullptr; }
+            if(nbrcts_i_out)  { delete [] nbrcts_i_out;  nbrcts_i_out  = (ofstream *)     nullptr; }
+            if(nbrcts_r_out)  { delete [] nbrcts_r_out;  nbrcts_r_out  = (ofstream *)     nullptr; }
+            if(nbrcts_i_file) { delete [] nbrcts_i_file; nbrcts_i_file = (ConcatString *) nullptr; }
+            if(nbrcts_r_file) { delete [] nbrcts_r_file; nbrcts_r_file = (ConcatString *) nullptr; }
 
             throw(1);
          }
@@ -2855,11 +2860,11 @@ void compute_nbrcts_stats_ci_bca(const gsl_rng *rng_ptr,
    //
    // Deallocate memory
    //
-   if(nbrcts_tmp)    { delete [] nbrcts_tmp;    nbrcts_tmp    = (NBRCTSInfo *)   0; }
-   if(nbrcts_i_out)  { delete [] nbrcts_i_out;  nbrcts_i_out  = (ofstream *)     0; }
-   if(nbrcts_r_out)  { delete [] nbrcts_r_out;  nbrcts_r_out  = (ofstream *)     0; }
-   if(nbrcts_i_file) { delete [] nbrcts_i_file; nbrcts_i_file = (ConcatString *) 0; }
-   if(nbrcts_r_file) { delete [] nbrcts_r_file; nbrcts_r_file = (ConcatString *) 0; }
+   if(nbrcts_tmp)    { delete [] nbrcts_tmp;    nbrcts_tmp    = (NBRCTSInfo *)   nullptr; }
+   if(nbrcts_i_out)  { delete [] nbrcts_i_out;  nbrcts_i_out  = (ofstream *)     nullptr; }
+   if(nbrcts_r_out)  { delete [] nbrcts_r_out;  nbrcts_r_out  = (ofstream *)     nullptr; }
+   if(nbrcts_i_file) { delete [] nbrcts_i_file; nbrcts_i_file = (ConcatString *) nullptr; }
+   if(nbrcts_r_file) { delete [] nbrcts_r_file; nbrcts_r_file = (ConcatString *) nullptr; }
 
    return;
 }
@@ -3088,13 +3093,14 @@ void compute_nbrcts_stats_ci_perc(const gsl_rng *rng_ptr,
    int i, j, c;
    double s;
    NumArray i_na, ir_na, sr_na;
-   NBRCTSInfo *nbrcts_tmp = ( NBRCTSInfo *) 0;
+   NBRCTSInfo *nbrcts_tmp = ( NBRCTSInfo *) nullptr;
 
    //
    // Temp file streams for categorical statistics
    //
-   ofstream *nbrcts_r_out = (ofstream *) 0;
-   ConcatString *nbrcts_r_file = (ConcatString *) 0, prefix;
+   ofstream *nbrcts_r_out = (ofstream *) nullptr;
+   ConcatString *nbrcts_r_file = (ConcatString *) nullptr;
+   ConcatString prefix;
 
    //
    // Check that the forecast and observation arrays of the same length
@@ -3174,9 +3180,9 @@ void compute_nbrcts_stats_ci_perc(const gsl_rng *rng_ptr,
           for(i=0; i<n_nbrcts; i++) remove_temp_file(nbrcts_r_file[i]);
          // Deallocate memory
          //
-         if(nbrcts_tmp)    { delete [] nbrcts_tmp;    nbrcts_tmp    = (NBRCTSInfo *)   0; }
-         if(nbrcts_r_out)  { delete [] nbrcts_r_out;  nbrcts_r_out  = (ofstream *)     0; }
-         if(nbrcts_r_file) { delete [] nbrcts_r_file; nbrcts_r_file = (ConcatString *) 0; }
+         if(nbrcts_tmp)    { delete [] nbrcts_tmp;    nbrcts_tmp    = (NBRCTSInfo *)   nullptr; }
+         if(nbrcts_r_out)  { delete [] nbrcts_r_out;  nbrcts_r_out  = (ofstream *)     nullptr; }
+         if(nbrcts_r_file) { delete [] nbrcts_r_file; nbrcts_r_file = (ConcatString *) nullptr; }
 
             throw(1);
          }
@@ -3460,9 +3466,9 @@ void compute_nbrcts_stats_ci_perc(const gsl_rng *rng_ptr,
    //
    // Deallocate memory
    //
-   if(nbrcts_tmp)    { delete [] nbrcts_tmp;    nbrcts_tmp    = (NBRCTSInfo *)   0; }
-   if(nbrcts_r_out)  { delete [] nbrcts_r_out;  nbrcts_r_out  = (ofstream *)     0; }
-   if(nbrcts_r_file) { delete [] nbrcts_r_file; nbrcts_r_file = (ConcatString *) 0; }
+   if(nbrcts_tmp)    { delete [] nbrcts_tmp;    nbrcts_tmp    = (NBRCTSInfo *)   nullptr; }
+   if(nbrcts_r_out)  { delete [] nbrcts_r_out;  nbrcts_r_out  = (ofstream *)     nullptr; }
+   if(nbrcts_r_file) { delete [] nbrcts_r_file; nbrcts_r_file = (ConcatString *) nullptr; }
 
    return;
 }

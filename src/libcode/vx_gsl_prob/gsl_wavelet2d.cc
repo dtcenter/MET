@@ -27,7 +27,7 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 gsl_wavelet * wavelet_set(gsl_wavelet_type *t, int k) {
-   gsl_wavelet *w = (gsl_wavelet *) 0;
+   gsl_wavelet *w = (gsl_wavelet *) nullptr;
 
    //
    // Allocate space for the wavelet specified
@@ -54,7 +54,7 @@ void wavelet_free(gsl_wavelet *w) {
    //
    gsl_wavelet_free(w);
 
-   w = (gsl_wavelet *) 0;
+   w = (gsl_wavelet *) nullptr;
 
    return;
 }
@@ -77,7 +77,7 @@ const char *wavelet_name(const gsl_wavelet *w) {
 ////////////////////////////////////////////////////////////////////////
 
 gsl_wavelet_workspace * wavelet_workspace_set(int n) {
-   gsl_wavelet_workspace *work = (gsl_wavelet_workspace *) 0;
+   gsl_wavelet_workspace *work = (gsl_wavelet_workspace *) nullptr;
 
    //
    // Allocate space for the wavelet_workspace specified
@@ -105,7 +105,7 @@ void wavelet_workspace_free(gsl_wavelet_workspace *work) {
    //
    gsl_wavelet_workspace_free(work);
 
-   work = (gsl_wavelet_workspace *) 0;
+   work = (gsl_wavelet_workspace *) nullptr;
 
    return;
 }

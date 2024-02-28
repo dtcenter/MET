@@ -46,7 +46,7 @@ RMWAnalysisConfInfo::~RMWAnalysisConfInfo() {
 void RMWAnalysisConfInfo::init_from_scratch() {
 
     // Initialize pointers
-    data_info = (VarInfo**) 0;
+    data_info = (VarInfo**) nullptr;
 
     clear();
 
@@ -80,11 +80,11 @@ void RMWAnalysisConfInfo::clear() {
     if(data_info) {
         for(int i = 0; i < n_data; i++) {
             if(data_info[i]) {
-                data_info[i] = (VarInfo*) 0;
+                data_info[i] = (VarInfo*) nullptr;
             }
         }
         delete data_info;
-        data_info = (VarInfo**) 0;
+        data_info = (VarInfo**) nullptr;
     }
 
     // Reset field count
@@ -115,7 +115,7 @@ void RMWAnalysisConfInfo::read_config(const char* default_file_name,
 void RMWAnalysisConfInfo::process_config() {
 
     VarInfoFactory info_factory;
-    Dictionary *fdict = (Dictionary *) 0;
+    Dictionary *fdict = (Dictionary *) nullptr;
     ConcatString poly_file;
     GrdFileType ftype = FileType_NcCF;
 
@@ -184,7 +184,7 @@ void RMWAnalysisConfInfo::process_config() {
 
     // Initialize pointers
     for(int i = 0; i < n_data; i++) {
-        data_info[i] = (VarInfo*) 0;
+        data_info[i] = (VarInfo*) nullptr;
     }
 
     // Parse data field information

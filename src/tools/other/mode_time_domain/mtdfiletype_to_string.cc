@@ -39,7 +39,7 @@ ConcatString mtdfiletype_to_string(const MtdFileType t)
 
 {
 
-const char * s = (const char *) 0;
+const char * s = (const char *) nullptr;
 
 switch ( t )  {
 

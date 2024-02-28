@@ -2608,7 +2608,7 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
    n_masks    = (apply_mask ? conf_info.vx_opt[i_vx].get_n_mask() : 1);
 
    // Allocate memory
-   float *data = (float *) 0;
+   float *data = (float *) nullptr;
    data = new float [grid.nx()*grid.ny()];
 
    // Set the NetCDF compression level
@@ -3070,7 +3070,7 @@ void clean_up() {
 
       //nc_out->close();
       delete nc_out;
-      nc_out = (NcFile *) 0;
+      nc_out = (NcFile *) nullptr;
    }
 
    // Deallocate memory for data files

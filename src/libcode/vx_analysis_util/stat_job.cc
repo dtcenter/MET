@@ -75,13 +75,13 @@ STATAnalysisJob & STATAnalysisJob::operator=(
 
 void STATAnalysisJob::init_from_scratch() {
 
-   dump_row      = (char *)     0;
-   dr_out        = (ofstream *) 0;
+   dump_row      = (char *)     nullptr;
+   dr_out        = (ofstream *) nullptr;
    n_dump        =              0;
-   stat_file     = (char *)     0;
-   stat_out      = (ofstream *) 0;
-   boot_rng      = (char *)     0;
-   boot_seed     = (char *)     0;
+   stat_file     = (char *)     nullptr;
+   stat_out      = (ofstream *) nullptr;
+   boot_rng      = (char *)     nullptr;
+   boot_seed     = (char *)     nullptr;
 
    model.set_ignore_case(1);
    desc.set_ignore_case(1);
@@ -183,8 +183,8 @@ void STATAnalysisJob::clear() {
    close_dump_row_file();
    close_stat_file();
 
-   if(dump_row)  { delete [] dump_row;  dump_row  = (char *) 0; }
-   if(stat_file) { delete [] stat_file; stat_file = (char *) 0; }
+   if(dump_row)  { delete [] dump_row;  dump_row  = (char *) nullptr; }
+   if(stat_file) { delete [] stat_file; stat_file = (char *) nullptr; }
 
    stat_row = 0;
 
@@ -1102,7 +1102,7 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
 
       jc_array.add(c);
 
-      lp = (char *) 0;
+      lp = (char *) nullptr;
    }
 
    //
@@ -1210,11 +1210,11 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
       if(jc_array[i] == "-job") {
 
          if(set_job_type(jc_array[i+1].c_str()) != 0) {
-            delete [] line;  line = 0;  lp = 0;
+            lp = nullptr;
             mlog << Error << "\nSTATAnalysisJob::STATAnalysisJob::parse_job_command() -> "
                  << "unrecognized job type specified \"" << jc_array[i]
                  << "\" in job command line: " << jobstring << "\n\n";
-            if(line) { delete [] line; line = (char *) 0; }
+            if(line) { delete [] line; line = (char *) nullptr; }
             throw(1);
          }
          i++;
@@ -1636,7 +1636,7 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
               << "unrecognized switch \"" << jc_array[i]
               << "\" in job command line: "
               << jobstring << "\n\n";
-         if(line) { delete [] line; line = (char *) 0; }
+         if(line) { delete [] line; line = (char *) nullptr; }
          throw(1);
       } // end if
 
@@ -1658,7 +1658,7 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
                  << "no match found for "
                  << (line_type.n() == 1 ? line_type[0] : "header")
                  << " column named \"" << hdr_name[i] << "\"\n\n";
-            if(line) { delete [] line; line = (char *) 0; }
+            if(line) { delete [] line; line = (char *) nullptr; }
             throw(1);
          }
       } // end for
@@ -1672,8 +1672,8 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
    //
    // Deallocate memory
    //
-   if(line) { delete [] line; line = (char *) 0; }
-   lp = (char *) 0;
+   if(line) { delete [] line; line = (char *) nullptr; }
+   lp = (char *) nullptr;
 
    return;
 }
@@ -1712,7 +1712,7 @@ int STATAnalysisJob::set_job_type(const char *c) {
 
 void STATAnalysisJob::set_dump_row(const char *c) {
 
-   if(dump_row) { delete [] dump_row; dump_row = (char *) 0; }
+   if(dump_row) { delete [] dump_row; dump_row = (char *) nullptr; }
 
    if(!c) return;
 
@@ -1727,7 +1727,7 @@ void STATAnalysisJob::set_dump_row(const char *c) {
 
 void STATAnalysisJob::set_stat_file(const char *c) {
 
-   if(stat_file) { delete [] stat_file; stat_file = (char *) 0; }
+   if(stat_file) { delete [] stat_file; stat_file = (char *) nullptr; }
 
    if(!c) return;
 
@@ -1823,7 +1823,7 @@ void STATAnalysisJob::set_mask_sid(const char *c) {
 
 void STATAnalysisJob::set_boot_rng(const char *c) {
 
-   if(boot_rng) { delete [] boot_rng; boot_rng = (char *) 0; }
+   if(boot_rng) { delete [] boot_rng; boot_rng = (char *) nullptr; }
 
    if(!c) return;
 
@@ -1838,7 +1838,7 @@ void STATAnalysisJob::set_boot_rng(const char *c) {
 
 void STATAnalysisJob::set_boot_seed(const char *c) {
 
-   if(boot_seed) { delete [] boot_seed; boot_seed = (char *) 0; }
+   if(boot_seed) { delete [] boot_seed; boot_seed = (char *) nullptr; }
 
    if(!c) return;
 
@@ -1915,7 +1915,7 @@ void STATAnalysisJob::close_dump_row_file() {
 
       dr_out->close();
       delete dr_out;
-      dr_out = (ofstream *) 0;
+      dr_out = (ofstream *) nullptr;
       n_dump = 0;
    }
 
@@ -2136,7 +2136,7 @@ void STATAnalysisJob::close_stat_file() {
 
       stat_out->close();
       delete stat_out;
-      stat_out = (ofstream *) 0;
+      stat_out = (ofstream *) nullptr;
    }
 
    return;

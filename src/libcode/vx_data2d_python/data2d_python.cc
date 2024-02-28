@@ -153,7 +153,7 @@ close();
 
 ConcatString full_path, file_name;
 int i, file_argc;
-char **file_argv = (char **) 0; // allocated
+char **file_argv = (char **) nullptr; // allocated
 StringArray sa;
 const char *method_name = "MetPythonDataFile::open() ";
 
@@ -231,9 +231,9 @@ if ( ShiftRight != 0 )  Plane.shift_right(ShiftRight);
 
 if ( file_argv )  {
    for ( i=1; i<file_argc; i++ )  {
-      if ( file_argv[i] )  { delete [] file_argv[i]; file_argv[i] = (char *) 0; }
+      if ( file_argv[i] )  { delete [] file_argv[i]; file_argv[i] = (char *) nullptr; }
    }
-   delete [] file_argv; file_argv = (char **) 0;
+   delete [] file_argv; file_argv = (char **) nullptr;
 }
 
    //

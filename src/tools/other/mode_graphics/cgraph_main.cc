@@ -167,15 +167,15 @@ void CgraphBase::cgraph_init_from_scratch()
 
 {
 
-Surface = (cairo_surface_t *) 0;
+Surface = (cairo_surface_t *) nullptr;
 
-Cr = (cairo_t *) 0;
+Cr = (cairo_t *) nullptr;
 
 Ptype = no_cgraph_plot_type;
 
 Filename.clear();
 
-Library = (FT_Library) 0;
+Library = (FT_Library) nullptr;
 
 CurrentFont = 0;
 
@@ -205,11 +205,11 @@ void CgraphBase::close()
 
 {
 
-if ( Cr )  { cairo_destroy (Cr);   Cr = (cairo_t *) 0; }
+if ( Cr )  { cairo_destroy (Cr);   Cr = (cairo_t *) nullptr; }
 
 if ( Ptype != no_cgraph_plot_type )  write();
 
-if ( Surface )  { cairo_surface_destroy (Surface);   Surface = (cairo_surface_t *) 0; }
+if ( Surface )  { cairo_surface_destroy (Surface);   Surface = (cairo_surface_t *) nullptr; }
 
 Ptype = no_cgraph_plot_type;
 
@@ -220,7 +220,7 @@ DoLigatures = true;
 
 Fonts.clear();
 
-if ( Library )  { FT_Done_FreeType(Library);  Library = (FT_Library) 0; }
+if ( Library )  { FT_Done_FreeType(Library);  Library = (FT_Library) nullptr; }
 
 Family = default_font_family;
 
@@ -794,7 +794,7 @@ double x_page, y_page;
 double x_char_origin;
 FT_Face face = CurrentFont->face;   //  this should be nonzero
 FT_UInt previous;
-FT_Glyph_Metrics * metrics = (FT_Glyph_Metrics *) 0;
+FT_Glyph_Metrics * metrics = (FT_Glyph_Metrics *) nullptr;
 FT_Vector k_delta;
 const bool use_kerning = DoKerning && FT_HAS_KERNING(face);
 const char * new_string = (const char *) nullptr;
@@ -1036,7 +1036,7 @@ if ( render_flag )  {
    //
 
 if ( DoLigatures ) delete [] new_string;
-new_string = (char *) 0;
+new_string = (char *) nullptr;
 
 return;
 
@@ -1126,8 +1126,8 @@ void CgraphBase::import_image(const Ppm & ppm, double x, double y, double u, dou
 {
 
 double x_ll, y_ll;
-cairo_surface_t * i = (cairo_surface_t *) 0;
-unsigned char * buf = (unsigned char *) 0;
+cairo_surface_t * i = (cairo_surface_t *) nullptr;
+unsigned char * buf = (unsigned char *) nullptr;
 
 gsave();
 
@@ -1155,7 +1155,7 @@ cairo_paint (Cr);
    //  done
    //
 
-cairo_surface_destroy (i);  i = (cairo_surface_t *) 0;
+cairo_surface_destroy (i);  i = (cairo_surface_t *) nullptr;
 
 grestore();
 
@@ -1175,9 +1175,9 @@ int R, G, B, alpha;
 int row, col, n;
 int bytes_per_row;
 int error;
-cairo_surface_t * i = (cairo_surface_t *) 0;
-unsigned char * buf = (unsigned char *) 0;
-unsigned char * d = (unsigned char *) 0;
+cairo_surface_t * i = (cairo_surface_t *) nullptr;
+unsigned char * buf = (unsigned char *) nullptr;
+unsigned char * d = (unsigned char *) nullptr;
 const Color cc = current_color();
 const int IR = (int) (cc.red());
 const int IG = (int) (cc.green());
@@ -1262,7 +1262,7 @@ cairo_paint (Cr);
    //  done
    //
 
-cairo_surface_destroy (i);  i = (cairo_surface_t *) 0;
+cairo_surface_destroy (i);  i = (cairo_surface_t *) nullptr;
 
 grestore();
 
@@ -1788,8 +1788,8 @@ void Cgraph::import_image(const Ppm & ppm, double x, double y, double u, double 
 {
 
 double x_ll, y_ul, y_ll;
-cairo_surface_t * i = (cairo_surface_t *) 0;
-unsigned char * buf = (unsigned char *) 0;
+cairo_surface_t * i = (cairo_surface_t *) nullptr;
+unsigned char * buf = (unsigned char *) nullptr;
 const double scaled_nx = x_scale*(ppm.nx());
 const double scaled_ny = y_scale*(ppm.ny());
 
@@ -1827,7 +1827,7 @@ cairo_paint (Cr);
    //  done
    //
 
-cairo_surface_destroy (i);  i = (cairo_surface_t *) 0;
+cairo_surface_destroy (i);  i = (cairo_surface_t *) nullptr;
 
 grestore();
 

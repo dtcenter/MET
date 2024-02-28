@@ -179,7 +179,7 @@ void TCGenVxOpt::clear() {
 
 void TCGenVxOpt::process_config(Dictionary &dict) {
    int i, beg, end;
-   Dictionary *dict2 = (Dictionary *) 0;
+   Dictionary *dict2 = (Dictionary *) nullptr;
    ConcatString file_name;
    StringArray sa;
    bool status;
@@ -390,7 +390,7 @@ void TCGenVxOpt::process_basin_mask(const Grid &basin_grid,
 ////////////////////////////////////////////////////////////////////////
 
 void TCGenVxOpt::parse_nc_info(Dictionary &odict) {
-   const DictionaryEntry * e = (const DictionaryEntry *) 0;
+   const DictionaryEntry * e = (const DictionaryEntry *) nullptr;
 
    e = odict.lookup(conf_key_nc_pairs_flag);
 
@@ -709,7 +709,7 @@ void TCGenConfInfo::read_config(const char *default_file_name,
 ////////////////////////////////////////////////////////////////////////
 
 void TCGenConfInfo::process_config() {
-   Dictionary *dict = (Dictionary *) 0;
+   Dictionary *dict = (Dictionary *) nullptr;
    TCGenVxOpt vx_opt;
    int i, beg, end;
 
@@ -992,8 +992,8 @@ void GenCTCInfo::clear() {
    CTSDev.clear();
    CTSOps.clear();
 
-   VxOpt     = (const TCGenVxOpt *) 0;
-   NcOutGrid = (const Grid *) 0;
+   VxOpt     = (const TCGenVxOpt *) nullptr;
+   NcOutGrid = (const Grid *) nullptr;
 
    ValidGenesisDHrThresh.clear();
    BestUniqueFlag = false;
@@ -1312,7 +1312,7 @@ void ProbGenPCTInfo::clear() {
    BestGenMap.clear();
    BestEvtMap.clear();
 
-   VxOpt = (const TCGenVxOpt *) 0;
+   VxOpt = (const TCGenVxOpt *) nullptr;
    LeadTimes.clear();
 
    return;

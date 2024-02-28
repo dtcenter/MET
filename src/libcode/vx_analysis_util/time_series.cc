@@ -94,7 +94,7 @@ void TimeSeries::init_from_scratch()
 
 {
 
-Value = (double *) 0;
+Value = (double *) nullptr;
 
 clear();
 
@@ -110,7 +110,7 @@ void TimeSeries::clear()
 
 {
 
-if ( Value )  { delete [] Value;  Value = (double *) 0; }
+if ( Value )  { delete [] Value;  Value = (double *) nullptr; }
 
 Nelements = 0;
 

@@ -557,7 +557,7 @@ FileId = -1;
 
 Filename.clear();
 
-if ( Swath )  { delete Swath;  Swath = (CloudsatSwath *) 0; }
+if ( Swath )  { delete Swath;  Swath = (CloudsatSwath *) nullptr; }
 
 Latitude = 0;
 

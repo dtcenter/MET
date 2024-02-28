@@ -135,7 +135,7 @@ Interpolator * Nearest_Interp::copy() const
 
 {
 
-Interpolator * i = (Interpolator *) 0;
+Interpolator * i = (Interpolator *) nullptr;
 
 i = new Nearest_Interp (*this);
 

@@ -166,8 +166,8 @@ StringArray get_filenames_from_dir(const char * directory_path,
 
 {
 
-DIR * directory = (DIR *) 0;
-struct dirent * entry = (struct dirent *) 0;
+DIR * directory = (DIR *) nullptr;
+struct dirent * entry = (struct dirent *) nullptr;
 StringArray a, b;
 char entry_path[PATH_MAX];
 ConcatString regex;
@@ -230,7 +230,7 @@ while ( (entry = readdir(directory)) != nullptr )  {
    //  done
    //
 
-closedir(directory);  directory = (DIR *) 0;
+closedir(directory);  directory = (DIR *) nullptr;
 
 return a;
 

@@ -282,9 +282,9 @@ void SatAttribute::init_from_scratch()
 
 {
 
-Ival = (int *) 0;
+Ival = (int *) nullptr;
 
-Dval = (double *) 0;
+Dval = (double *) nullptr;
 
 clear();
 
@@ -310,8 +310,8 @@ Nvalues = 0;
 
 Sval.clear();
 
-if ( Ival )  { delete [] Ival;  Ival = (int *) 0; }
-if ( Dval )  { delete [] Dval;  Dval = (double *) 0; }
+if ( Ival )  { delete [] Ival;  Ival = (int *) nullptr; }
+if ( Dval )  { delete [] Dval;  Dval = (double *) nullptr; }
 
    //
    //  done
@@ -482,8 +482,8 @@ char c[2];
 
 
 Sval.clear();
-if ( Dval )  { delete [] Dval;  Dval = (double *) 0; }
-if ( Ival )  { delete [] Ival;  Ival = (int *) 0; }
+if ( Dval )  { delete [] Dval;  Dval = (double *) nullptr; }
+if ( Ival )  { delete [] Ival;  Ival = (int *) nullptr; }
 
 Numbertype = nt;
 
@@ -657,7 +657,7 @@ void SwathDataField::init_from_scratch()
 
 {
 
-Dimensions = (SatDimension **) 0;
+Dimensions = (SatDimension **) nullptr;
 
 clear();
 
@@ -681,7 +681,7 @@ Numbertype = -1;
 
 Ndimensions = 0;
 
-if ( Dimensions )  { delete [] Dimensions;  Dimensions = (SatDimension **) 0; }
+if ( Dimensions )  { delete [] Dimensions;  Dimensions = (SatDimension **) nullptr; }
 
    //
    //  done
@@ -831,13 +831,13 @@ if ( k <= 0 )  {
 
 }
 
-if ( Dimensions )  { delete [] Dimensions;  Dimensions = (SatDimension **) 0; }
+if ( Dimensions )  { delete [] Dimensions;  Dimensions = (SatDimension **) nullptr; }
 
 Dimensions = new SatDimension * [k];
 
 int j;
 
-for (j=0; j<k; ++j)  Dimensions[j] = (SatDimension *) 0;
+for (j=0; j<k; ++j)  Dimensions[j] = (SatDimension *) nullptr;
 
 Ndimensions = k;
 
@@ -965,13 +965,13 @@ void CloudsatSwath::init_from_scratch()
 
 {
 
-DataField = (SwathDataField *) 0;
+DataField = (SwathDataField *) nullptr;
 
-Attribute = (SatAttribute *) 0;
+Attribute = (SatAttribute *) nullptr;
 
-GeoField  = (SwathDataField *) 0;
+GeoField  = (SwathDataField *) nullptr;
 
-Dimension = (SatDimension *) 0;
+Dimension = (SatDimension *) nullptr;
 
 clear();
 
@@ -991,13 +991,13 @@ Name.clear();
 
 SwathId = -1;
 
-if ( DataField )  { delete [] DataField;  DataField = (SwathDataField *) 0; }
+if ( DataField )  { delete [] DataField;  DataField = (SwathDataField *) nullptr; }
 
-if ( Attribute )  { delete [] Attribute;  Attribute = (SatAttribute *) 0; }
+if ( Attribute )  { delete [] Attribute;  Attribute = (SatAttribute *) nullptr; }
 
-if (  GeoField )  { delete []  GeoField;   GeoField = (SwathDataField *) 0; }
+if (  GeoField )  { delete []  GeoField;   GeoField = (SwathDataField *) nullptr; }
 
-if ( Dimension )  { delete [] Dimension;  Dimension = (SatDimension *) 0; }
+if ( Dimension )  { delete [] Dimension;  Dimension = (SatDimension *) nullptr; }
 
 Ndatafields = 0;
 
@@ -1007,12 +1007,12 @@ Ngeofields  = 0;
 
 Ndimensions = 0;
 
-Latitude     = (SwathDataField *) 0;
-Longitude    = (SwathDataField *) 0;
+Latitude     = (SwathDataField *) nullptr;
+Longitude    = (SwathDataField *) nullptr;
 
-Height       = (SwathDataField *) 0;
+Height       = (SwathDataField *) nullptr;
 
-Reflectivity = (SwathDataField *) 0;
+Reflectivity = (SwathDataField *) nullptr;
 
 return;
 
@@ -1163,12 +1163,12 @@ void CloudsatSwath::get_data_fields()
 
 int j, k;
 StringArray a;
-const char * c = (const char *) 0;
+const char * c = (const char *) nullptr;
 ConcatString s;
-SatDimension * d = (SatDimension *) 0;
+SatDimension * d = (SatDimension *) nullptr;
 int n_dims;
-int32 * rank       = (int32 *) 0;
-int32 * numbertype = (int32 *) 0;
+int32 * rank       = (int32 *) nullptr;
+int32 * numbertype = (int32 *) nullptr;
 int32 dims[max_dims];
 int32 r, nt;
 
@@ -1267,8 +1267,8 @@ for (j=0; j<Ndatafields; ++j)  {
    //  done
    //
 
-if ( rank )        { delete [] rank;  rank = (int32 *) 0; }
-if ( numbertype )  { delete [] numbertype;  numbertype = (int32 *) 0; }
+if ( rank )        { delete [] rank;  rank = (int32 *) nullptr; }
+if ( numbertype )  { delete [] numbertype;  numbertype = (int32 *) nullptr; }
 
 return;
 
@@ -1306,14 +1306,14 @@ if ( (retval = SWinqattrs(SwathId, att_buf, &att_buf_size)) < 0 )  {
 
    mlog << Error
         << "\n\n  CloudsatSwath::get_attributes() -> can't get attribute names\n\n";
-   if ( att_buf )  { delete [] att_buf;   att_buf = (char *) 0; }
+   if ( att_buf )  { delete [] att_buf;   att_buf = (char *) nullptr; }
 
    exit ( 1 );
 
 }
 
  if ( retval == 0 ) {
-   if ( att_buf )  { delete [] att_buf;   att_buf = (char *) 0; }
+   if ( att_buf )  { delete [] att_buf;   att_buf = (char *) nullptr; }
    return;
  }
 parse_csl(att_buf, a);
@@ -1331,7 +1331,7 @@ for (j=0; j<Nattributes; ++j)  {
       mlog << Error
            << "\n\n  CloudsatSwath::get_attributes() -> can't get info on attribute \"" << (a[j]) << "\"\n\n";
 
-      if ( att_buf )  { delete [] att_buf;   att_buf = (char *) 0; }
+      if ( att_buf )  { delete [] att_buf;   att_buf = (char *) nullptr; }
       exit ( 1 );
 
    }
@@ -1345,7 +1345,7 @@ for (j=0; j<Nattributes; ++j)  {
 
       mlog << Error
            << "\n\n  CloudsatSwath::get_attributes() -> can't get value for attribute \"" << (a[j]) << "\"\n\n";
-      if ( att_buf )  { delete [] att_buf;   att_buf = (char *) 0; }
+      if ( att_buf )  { delete [] att_buf;   att_buf = (char *) nullptr; }
       exit ( 1 );
 
    }
@@ -1360,7 +1360,7 @@ for (j=0; j<Nattributes; ++j)  {
    //  done
    //
 
-if ( att_buf )  { delete [] att_buf;   att_buf = (char *) 0; }
+if ( att_buf )  { delete [] att_buf;   att_buf = (char *) nullptr; }
 
 return;
 
@@ -1376,12 +1376,12 @@ void CloudsatSwath::get_geo_fields()
 
 int j, k;
 int n_dims;
-const char * c = (const char *) 0;
+const char * c = (const char *) nullptr;
 ConcatString s;
-SatDimension * d = (SatDimension *) 0;
+SatDimension * d = (SatDimension *) nullptr;
 StringArray a;
-int32 * rank       = (int32 *) 0;
-int32 * numbertype = (int32 *) 0;
+int32 * rank       = (int32 *) nullptr;
+int32 * numbertype = (int32 *) nullptr;
 int32 dims[max_dims];
 int32 r, nt;
 
@@ -1480,8 +1480,8 @@ for (j=0; j<Ngeofields; ++j)  {
    //  done
    //
 
-if ( rank )  { delete [] rank;  rank = (int32 *) 0; }
-if ( numbertype )  { delete [] numbertype;  numbertype = (int32 *) 0; }
+if ( rank )  { delete [] rank;  rank = (int32 *) nullptr; }
+if ( numbertype )  { delete [] numbertype;  numbertype = (int32 *) nullptr; }
 
 return;
 
@@ -1701,7 +1701,7 @@ SatDimension * CloudsatSwath::dimension(const char * _name) const
 {
 
 int j;
-SatDimension * d = (SatDimension *) 0;
+SatDimension * d = (SatDimension *) nullptr;
 
 for (j=0; j<Ndimensions; ++j)  {
 
@@ -2004,7 +2004,7 @@ void CloudsatSwathFile::init_from_scratch()
 
 FileId = -1;
 
-Swath  = (CloudsatSwath *) 0;
+Swath  = (CloudsatSwath *) nullptr;
 
 close();
 
@@ -2169,7 +2169,7 @@ FileId = -1;
 
 Filename.clear();
 
-if ( Swath )  { delete [] Swath;  Swath = (CloudsatSwath *) 0; }
+if ( Swath )  { delete [] Swath;  Swath = (CloudsatSwath *) nullptr; }
 
 Nswaths = 0;
 

@@ -102,9 +102,9 @@ void ModeNcOutputFile::init_from_scratch()
 
 {
 
-f = (NcFile *) 0;
+f = (NcFile *) nullptr;
 
-_Grid = (Grid *) 0;
+_Grid = (Grid *) nullptr;
 
 close();
 
@@ -120,18 +120,18 @@ void ModeNcOutputFile::close()
 
 {
 
-if ( f )  { delete f;  f = (NcFile *) 0; }
+if ( f )  { delete f;  f = (NcFile *) nullptr; }
 
-if ( _Grid )  { delete _Grid;  _Grid = (Grid *) 0; }
+if ( _Grid )  { delete _Grid;  _Grid = (Grid *) nullptr; }
 
-FcstObjId  = (NcVar *) 0;
-FcstClusId = (NcVar *) 0;
+FcstObjId  = (NcVar *) nullptr;
+FcstClusId = (NcVar *) nullptr;
 
-ObsObjId   = (NcVar *) 0;
-ObsClusId  = (NcVar *) 0;
+ObsObjId   = (NcVar *) nullptr;
+ObsClusId  = (NcVar *) nullptr;
 
-FcstRaw    = (NcVar *) 0;
-ObsRaw     = (NcVar *) 0;
+FcstRaw    = (NcVar *) nullptr;
+ObsRaw     = (NcVar *) nullptr;
 
 Nx = Ny = 0;
 
@@ -167,9 +167,9 @@ bool ModeNcOutputFile::open(const char * _filename)
 
 // int x, y;
 // int value;
-//NcDim * dim = (NcDim *) 0;
+//NcDim * dim = (NcDim *) nullptr;
 NcDim dim;
-NcAtt *att = (NcAtt *)0;
+NcAtt *att = (NcAtt *) nullptr;
 ConcatString s;
 
 
@@ -202,7 +202,7 @@ dim = get_nc_dim(f, "lat");
 Ny = GET_NC_SIZE(dim);
 
 
-//dim = (NcDim *) 0;
+//dim = (NcDim *) nullptr;
 
    //
    //  variables

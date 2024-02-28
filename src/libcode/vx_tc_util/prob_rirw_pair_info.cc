@@ -71,7 +71,7 @@ void ProbRIRWPairInfo::init_from_scratch() {
 void ProbRIRWPairInfo::clear() {
 
    ProbRIRW.clear();
-   BDeck    = (TrackInfo *) 0;
+   BDeck    = (TrackInfo *) nullptr;
    StormName.clear();
    BModel.clear();
    BLat     = BLon    = bad_data_double;
@@ -274,7 +274,7 @@ void ProbRIRWPairInfo::set(const TCStatLine &l) {
    ProbRIRW.set(l);
 
    // Do not populate the BDECK
-   BDeck = (TrackInfo *) 0;
+   BDeck = (TrackInfo *) nullptr;
 
    // Store column information
    StormName = l.get_item("STORM_NAME", false);

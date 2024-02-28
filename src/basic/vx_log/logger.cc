@@ -438,7 +438,7 @@ Logger & Logger::operator=(const Logger & l)
 
 void Logger::init_from_scratch()
 {
-   out = (ofstream *) 0;
+   out = (ofstream *) nullptr;
 
    clear();
 
@@ -458,7 +458,7 @@ void Logger::clear()
 
       delete out;
 
-      out = (ofstream *) 0;
+      out = (ofstream *) nullptr;
 
    }
 

@@ -102,7 +102,7 @@ void GenEnsProdConfInfo::read_config(const ConcatString default_file_name,
 void GenEnsProdConfInfo::process_config(GrdFileType etype, StringArray * ens_files, bool use_ctrl) {
    int i, j;
    VarInfoFactory info_factory;
-   Dictionary *edict = (Dictionary *) 0;
+   Dictionary *edict = (Dictionary *) nullptr;
    Dictionary i_edict;
    InterpMthd mthd;
    VarInfo * next_var;

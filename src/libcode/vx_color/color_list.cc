@@ -261,7 +261,7 @@ void ColorList::init_from_scratch()
 
 {
 
-e = (ClistEntry *) 0;
+e = (ClistEntry *) nullptr;
 
 clear();
 
@@ -277,7 +277,7 @@ void ColorList::clear()
 
 {
 
-if ( e )  { delete [] e;   e = (ClistEntry *) 0; }
+if ( e )  { delete [] e;   e = (ClistEntry *) nullptr; }
 
 Nelements = Nalloc = 0;
 
@@ -325,7 +325,7 @@ void ColorList::extend(int n)
 if ( Nalloc >= n )  return;
 
 int k;
-ClistEntry * u = (ClistEntry *) 0;
+ClistEntry * u = (ClistEntry *) nullptr;
 
 
 k = n/colorlist_alloc_inc;
@@ -348,11 +348,11 @@ if ( e )  {
 
    for (k=0; k<Nelements; ++k)  u[k] = e[k];
 
-   delete [] e;   e = (ClistEntry *) 0;
+   delete [] e;   e = (ClistEntry *) nullptr;
 
 }
 
-e = u;   u = (ClistEntry *) 0;
+e = u;   u = (ClistEntry *) nullptr;
 
 Nalloc = n;
 

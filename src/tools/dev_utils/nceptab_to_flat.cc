@@ -243,7 +243,7 @@ bool parse_line(const char * line)
 int n, k;
 char line2[1024];
 char * s = line2;
-char * c = (char *) 0;
+char * c = (char *) nullptr;
 const char *method_name = "parse_line() -> ";
 
 m_strncpy(line2, line, sizeof(line2), method_name);
@@ -260,7 +260,7 @@ if ( ! strchr(line, '\"') )  return false;
 
 c = strtok(s, " /*");
 
-s = (char *) 0;
+s = (char *) nullptr;
 
 if ( !c )  return false;
 

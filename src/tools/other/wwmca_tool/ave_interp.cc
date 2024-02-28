@@ -135,7 +135,7 @@ Interpolator * Ave_Interp::copy() const
 
 {
 
-Interpolator * i = (Interpolator *) 0;
+Interpolator * i = (Interpolator *) nullptr;
 
 i = new Ave_Interp (*this);
 

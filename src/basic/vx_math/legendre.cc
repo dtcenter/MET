@@ -139,9 +139,9 @@ void Legendre::clear()
 
 {
 
-if ( P )  { delete [] P;  P = 0; }
+if ( P )  { delete [] P;  P = nullptr; }
 
-if ( PP )  { delete [] PP;  PP = 0; }
+if ( PP )  { delete [] PP;  PP = nullptr; }
 
 X = 0.0;
 

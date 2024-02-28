@@ -158,7 +158,7 @@ void do_job(const ConcatString &jobstring, STATAnalysisJob &job,
             const ConcatString &tmp_path, ofstream *sa_out) {
    LineDataFile f;
    int n_in, n_out;
-   gsl_rng *rng_ptr = (gsl_rng *) 0;
+   gsl_rng *rng_ptr = (gsl_rng *) nullptr;
 
    //
    // Open up the temp file for reading the intermediate STAT line data

@@ -39,7 +39,7 @@ ConcatString fontfamily_to_string(const FontFamily t)
 
 {
 
-const char * s = (const char *) 0;
+const char * s = (const char *) nullptr;
 
 switch ( t )  {
 

@@ -214,7 +214,7 @@ GrdFileType get_file_type(const StringArray &file_list,
                           const GrdFileType in_ftype) {
     int i;
     Met2dDataFileFactory mtddf_factory;
-    Met2dDataFile *mtddf = (Met2dDataFile *) 0;
+    Met2dDataFile *mtddf = (Met2dDataFile *) nullptr;
     GrdFileType out_ftype;
 
     // Find the first file that actually exists
@@ -239,7 +239,7 @@ GrdFileType get_file_type(const StringArray &file_list,
     out_ftype = mtddf->file_type();
 
     // Clean up
-    if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) 0; }
+    if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) nullptr; }
 
     return out_ftype;
 }
@@ -561,7 +561,7 @@ void setup_grid() {
 ////////////////////////////////////////////////////////////////////////
 
 void setup_nc_file() {
-    VarInfo* data_info = (VarInfo*) 0;
+    VarInfo* data_info = (VarInfo*) nullptr;
 
     // Create NetCDF file
     nc_out = open_ncfile(out_file.c_str(), true);
@@ -650,7 +650,7 @@ void compute_lat_lon(TcrmwGrid& tcrmw_grid,
 ////////////////////////////////////////////////////////////////////////
 
 void process_fields(const TrackInfoArray& tracks) {
-    VarInfo *data_info = (VarInfo *) 0;
+    VarInfo *data_info = (VarInfo *) nullptr;
     DataPlane data_dp;
 
     // Define latitude and longitude arrays

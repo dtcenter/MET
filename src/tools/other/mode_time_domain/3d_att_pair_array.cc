@@ -94,7 +94,7 @@ void PairAtt3DArray::init_from_scratch()
 
 {
 
-e = (PairAtt3D *) 0;
+e = (PairAtt3D *) nullptr;
 
 AllocInc = 100;   //  default value
 
@@ -112,7 +112,7 @@ void PairAtt3DArray::clear()
 
 {
 
-if ( e )  { delete [] e;  e = (PairAtt3D *) 0; }
+if ( e )  { delete [] e;  e = (PairAtt3D *) nullptr; }
 
 
 
@@ -174,11 +174,11 @@ for(j=0; j<Nelements; ++j)  {
 
 }
 
-if ( e )  { delete [] e;  e = (PairAtt3D *) 0; }
+if ( e )  { delete [] e;  e = (PairAtt3D *) nullptr; }
 
 e = u;
 
-u = (PairAtt3D *) 0;
+u = (PairAtt3D *) nullptr;
 
 Nalloc = N;
 

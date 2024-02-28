@@ -1022,7 +1022,7 @@ fix_float(str);
 if ( DoCommaString )  {
    char junk[256];
    m_strncpy(junk, str.c_str(), str.length(), method_name);
-   char * p = (char *) 0;
+   char * p = (char *) nullptr;
    long X;
    ConcatString s;
    ConcatString j2;
@@ -1248,7 +1248,7 @@ s = out;
    //  done
    //
 
-if ( out )  { delete [] out;  out = (char *) 0; }
+if ( out )  { delete [] out;  out = (char *) nullptr; }
 
 return s;
 

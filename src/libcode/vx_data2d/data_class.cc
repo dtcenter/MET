@@ -106,8 +106,8 @@ void Met2dDataFile::mtddf_init_from_scratch()
 
 {
 
-Raw_Grid  = (Grid *) 0;
-Dest_Grid = (Grid *) 0;
+Raw_Grid  = (Grid *) nullptr;
+Dest_Grid = (Grid *) nullptr;
 
 ShiftRight = 0;
 
@@ -123,8 +123,8 @@ void Met2dDataFile::mtddf_clear()
 
 {
 
-if ( Raw_Grid  )  { delete Raw_Grid;   Raw_Grid  = (Grid *) 0; }
-if ( Dest_Grid )  { delete Dest_Grid;  Dest_Grid = (Grid *) 0; }
+if ( Raw_Grid  )  { delete Raw_Grid;   Raw_Grid  = (Grid *) nullptr; }
+if ( Dest_Grid )  { delete Dest_Grid;  Dest_Grid = (Grid *) nullptr; }
 
 Filename.clear();
 
@@ -268,7 +268,7 @@ mlog << Debug(3) << "Resetting grid definition from \""
 
   }
 
-if ( Dest_Grid )  { delete Dest_Grid;  Dest_Grid = 0; }
+if ( Dest_Grid )  { delete Dest_Grid;  Dest_Grid = nullptr; }
 
 Dest_Grid = new Grid;
 
@@ -295,7 +295,7 @@ if ( ! Raw_Grid )  {
 
 }
 
-if ( Dest_Grid )  { delete Dest_Grid;  Dest_Grid = 0; }
+if ( Dest_Grid )  { delete Dest_Grid;  Dest_Grid = nullptr; }
 
 Dest_Grid = new Grid;
 

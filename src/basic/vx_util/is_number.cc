@@ -120,7 +120,7 @@ if ( n == 0 )  return 0;
 
 int j;
 int pos;
-const char * c = (const char *) 0;
+const char * c = (const char *) nullptr;
 
 
    //
@@ -168,7 +168,7 @@ int is_regular_float(const char * text)
 int j, n;
 int dp_count;
 int digit_count;
-const char * t = (const char *) 0;
+const char * t = (const char *) nullptr;
 
 t = text;
 

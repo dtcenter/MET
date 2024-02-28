@@ -107,7 +107,7 @@ void SingleAtt2DArray::init_from_scratch()
 
 {
 
-e = (SingleAtt2D *) 0;
+e = (SingleAtt2D *) nullptr;
 
 AllocInc = 50;   //  default value
 
@@ -125,7 +125,7 @@ void SingleAtt2DArray::clear()
 
 {
 
-if ( e )  { delete [] e;  e = (SingleAtt2D *) 0; }
+if ( e )  { delete [] e;  e = (SingleAtt2D *) nullptr; }
 
 
 
@@ -187,11 +187,11 @@ for(j=0; j<Nelements; ++j)  {
 
 }
 
-if ( e )  { delete [] e;  e = (SingleAtt2D *) 0; }
+if ( e )  { delete [] e;  e = (SingleAtt2D *) nullptr; }
 
 e = u;
 
-u = (SingleAtt2D *) 0;
+u = (SingleAtt2D *) nullptr;
 
 Nalloc = N;
 

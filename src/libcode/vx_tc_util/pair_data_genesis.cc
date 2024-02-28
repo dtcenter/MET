@@ -28,7 +28,7 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 ConcatString genesispaircategory_to_string(const GenesisPairCategory c) {
-   const char *s = (const char *) 0;
+   const char *s = (const char *) nullptr;
 
    switch(c) {
       case FYOYGenesis:    s = "FYOY";    break;

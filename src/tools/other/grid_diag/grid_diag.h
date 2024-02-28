@@ -85,7 +85,7 @@ static GridDiagConfInfo conf_info;
 ////////////////////////////////////////////////////////////////////////
 
 // Output NetCDF file
-static netCDF::NcFile *nc_out = (netCDF::NcFile *) 0;
+static netCDF::NcFile *nc_out = (netCDF::NcFile *) nullptr;
 vector<netCDF::NcDim> data_var_dims;
 vector<netCDF::NcVar> hist_vars;
 vector<netCDF::NcVar> joint_hist_vars;
@@ -107,7 +107,7 @@ static Grid grid;
 
 // Data file factory and input files
 static Met2dDataFileFactory mtddf_factory;
-static Met2dDataFile *data_mtddf = (Met2dDataFile *) 0;
+static Met2dDataFile *data_mtddf = (Met2dDataFile *) nullptr;
 
 // Variable min/max values
 vector<double> var_mins;

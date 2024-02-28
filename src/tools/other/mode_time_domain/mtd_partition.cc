@@ -110,7 +110,7 @@ void EquivalenceClass::init_from_scratch()
 
 {
 
-E = (int *) 0;
+E = (int *) nullptr;
 
 clear();
 
@@ -126,7 +126,7 @@ void EquivalenceClass::clear()
 
 {
 
-if ( E )  { delete [] E;  E = (int *) 0; }
+if ( E )  { delete [] E;  E = (int *) nullptr; }
 
 Nelements = Nalloc = 0;
 
@@ -182,11 +182,11 @@ if ( E )  {
 
    memcpy(u, E, Nelements*sizeof(int));
 
-   delete [] E;  E = (int *) 0;
+   delete [] E;  E = (int *) nullptr;
 
 }
 
-E = u;  u = (int *) 0;
+E = u;  u = (int *) nullptr;
 
 Nalloc = n;
 
@@ -393,7 +393,7 @@ void Mtd_Partition::init_from_scratch()
 
 {
 
-C = (EquivalenceClass **) 0;
+C = (EquivalenceClass **) nullptr;
 
 clear();
 
@@ -415,11 +415,11 @@ if ( C )  {
 
    for (j=0; j<Nalloc; ++j)  {
 
-      if ( C[j] )  { delete C[j];  C[j] = (EquivalenceClass *) 0; }
+      if ( C[j] )  { delete C[j];  C[j] = (EquivalenceClass *) nullptr; }
 
    }
 
-   delete [] C;   C = (EquivalenceClass **) 0;
+   delete [] C;   C = (EquivalenceClass **) nullptr;
 
 }
 
@@ -485,7 +485,7 @@ if ( C )  {
 
 }
 
-C = u;  u = (EquivalenceClass **) 0;
+C = u;  u = (EquivalenceClass **) nullptr;
 
 Nalloc = n;
 
@@ -612,8 +612,8 @@ if ( nclass_1 == nclass_2 )  return;
 
 int k, n;
 int n_class_min, n_class_max;
-EquivalenceClass * c_min = (EquivalenceClass *) 0;
-EquivalenceClass * c_max = (EquivalenceClass *) 0;
+EquivalenceClass * c_min = (EquivalenceClass *) nullptr;
+EquivalenceClass * c_max = (EquivalenceClass *) nullptr;
 
 
 n_class_min = min(nclass_1, nclass_2);
@@ -637,7 +637,7 @@ for (k=n_class_max; k<(Nelements - 1); ++k)  {
 
 }
 
-C[Nelements - 1] = (EquivalenceClass *) 0;
+C[Nelements - 1] = (EquivalenceClass *) nullptr;
 
 --Nelements;
 

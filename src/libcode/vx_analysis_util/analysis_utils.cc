@@ -56,7 +56,7 @@ while((c = strtok_r(L, delim, &temp_ptr)) != nullptr) {
    //  done
    //
 
-if ( L )  { delete [] L;  L = (char *) 0; }
+if ( L )  { delete [] L;  L = (char *) nullptr; }
 
 return a;
 

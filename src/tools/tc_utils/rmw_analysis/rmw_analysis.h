@@ -81,8 +81,8 @@ static ConcatString out_dir;
 ConcatString out_file;
 
 // NetCDF file information
-static netCDF::NcFile* nc_in = (netCDF::NcFile*) 0;
-static netCDF::NcFile* nc_out = (netCDF::NcFile*) 0;
+static netCDF::NcFile* nc_in = (netCDF::NcFile*) nullptr;
+static netCDF::NcFile* nc_out = (netCDF::NcFile*) nullptr;
 
 // Grid dimension information
 static netCDF::NcDim range_dim;

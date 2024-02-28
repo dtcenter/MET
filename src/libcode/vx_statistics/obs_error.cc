@@ -365,7 +365,7 @@ ObsErrorTable::ObsErrorTable(const ObsErrorTable &f) {
 
 void ObsErrorTable::init_from_scratch() {
 
-   e = (ObsErrorEntry *) 0;
+   e = (ObsErrorEntry *) nullptr;
 
    clear();
 }
@@ -374,7 +374,7 @@ void ObsErrorTable::init_from_scratch() {
 
 void ObsErrorTable::clear() {
 
-   if(e) { delete [] e; e = (ObsErrorEntry *) 0; }
+   if(e) { delete [] e; e = (ObsErrorEntry *) nullptr; }
 
    IsSet      = false;
    N_elements = 0;
@@ -427,7 +427,7 @@ void ObsErrorTable::extend(int len) {
    if(len <= N_alloc )  return;
 
    int i;
-   ObsErrorEntry * u = (ObsErrorEntry *) 0;
+   ObsErrorEntry * u = (ObsErrorEntry *) nullptr;
 
    u = new ObsErrorEntry [len];
 
@@ -435,7 +435,7 @@ void ObsErrorTable::extend(int len) {
 
    e = u;
 
-   u = (ObsErrorEntry *) 0;
+   u = (ObsErrorEntry *) nullptr;
 
    N_alloc = len;
 
@@ -525,7 +525,7 @@ ObsErrorEntry *ObsErrorTable::lookup(
    int cur_pb_rpt,           int cur_in_rpt,           int cur_inst,
    double cur_hgt,           double cur_prs,           double cur_val) {
    int i;
-   ObsErrorEntry * e_match = (ObsErrorEntry *) 0;
+   ObsErrorEntry * e_match = (ObsErrorEntry *) nullptr;
 
    for(i=0; i<N_elements; i++) {
 
@@ -560,7 +560,7 @@ ObsErrorEntry *ObsErrorTable::lookup(
 ObsErrorEntry *ObsErrorTable::lookup(
    const char *cur_var_name, const char *cur_msg_type, double cur_val) {
    int i;
-   ObsErrorEntry * e_match = (ObsErrorEntry *) 0;
+   ObsErrorEntry * e_match = (ObsErrorEntry *) nullptr;
 
    for(i=0; i<N_elements; i++) {
 
@@ -607,7 +607,7 @@ bool ObsErrorTable::has(const char *cur_var_name,
 void ObsErrorInfo::clear() {
    flag = false;
    entry.clear();
-   rng_ptr = (gsl_rng *) 0;
+   rng_ptr = (gsl_rng *) nullptr;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -644,7 +644,7 @@ ObsErrorInfo &ObsErrorInfo::operator=(const ObsErrorInfo &a) noexcept {
 ////////////////////////////////////////////////////////////////////////
 
 ObsErrorInfo parse_conf_obs_error(Dictionary *dict, gsl_rng *rng_ptr) {
-   Dictionary *err_dict = (Dictionary *) 0;
+   Dictionary *err_dict = (Dictionary *) nullptr;
    ObsErrorInfo info;
    int i;
 
@@ -750,7 +750,7 @@ DataPlane add_obs_error_inc(const gsl_rng *r, FieldType t,
    int x, y;
    double obs_v, in_v;
    DataPlane out_dp = in_dp;
-   const ObsErrorEntry *e = (ObsErrorEntry *) 0;
+   const ObsErrorEntry *e = (ObsErrorEntry *) nullptr;
 
    // Check for matching dimensions
    if(in_dp.nx() != obs_dp.nx() || in_dp.ny() != obs_dp.ny()) {
@@ -833,7 +833,7 @@ DataPlane add_obs_error_bc(const gsl_rng *r, FieldType t,
    int x, y;
    double v;
    DataPlane out_dp = in_dp;
-   const ObsErrorEntry *e = (ObsErrorEntry *) 0;
+   const ObsErrorEntry *e = (ObsErrorEntry *) nullptr;
 
    // Check for matching dimensions
    if(in_dp.nx() != obs_dp.nx() || in_dp.ny() != obs_dp.ny()) {

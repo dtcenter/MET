@@ -339,10 +339,10 @@ void DiagFile::read_cira_rt(const ConcatString &path,
       if(convert_map) {
               if(convert_map->count(cs) > 0)    fx_ptr = &convert_map->at(cs);
          else if(convert_map->count(dl[1]) > 0) fx_ptr = &convert_map->at(dl[1]);
-         else                                   fx_ptr = (UserFunc_1Arg *) 0;
+         else                                   fx_ptr = (UserFunc_1Arg *) nullptr;
       }
       else {
-         fx_ptr = (UserFunc_1Arg *) 0;
+         fx_ptr = (UserFunc_1Arg *) nullptr;
       }
 
       // Parse the data values
@@ -492,10 +492,10 @@ void DiagFile::read_ships_rt(const ConcatString &path,
       // Check for a conversion function
       if(convert_map) {
          if(convert_map->count(cs) > 0) fx_ptr = &convert_map->at(cs);
-         else                           fx_ptr = (UserFunc_1Arg *) 0;
+         else                           fx_ptr = (UserFunc_1Arg *) nullptr;
       }
       else {
-         fx_ptr = (UserFunc_1Arg *) 0;
+         fx_ptr = (UserFunc_1Arg *) nullptr;
       }
 
       // Parse the data values

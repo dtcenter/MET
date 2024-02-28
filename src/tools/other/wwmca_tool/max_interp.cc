@@ -135,7 +135,7 @@ Interpolator * Max_Interp::copy() const
 
 {
 
-Interpolator * i = (Interpolator *) 0;
+Interpolator * i = (Interpolator *) nullptr;
 
 i = new Max_Interp (*this);
 

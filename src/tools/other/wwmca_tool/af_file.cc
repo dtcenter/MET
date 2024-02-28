@@ -102,7 +102,7 @@ void AFDataFile::init_from_scratch()
 
 {
 
-grid = (const Grid *) 0;
+grid = (const Grid *) nullptr;
 
 clear();
 
@@ -118,7 +118,7 @@ void AFDataFile::clear()
 
 {
 
-if ( grid )  { delete grid;  grid = (const Grid *) 0; }
+if ( grid )  { delete grid;  grid = (const Grid *) nullptr; }
 
 Filename.clear();
 

@@ -161,7 +161,7 @@ MetPythonDataFile * p = nullptr;
 
 Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(const char *filename) {
    GrdFileType type;
-   Met2dDataFile *mtddf = (Met2dDataFile *) 0;
+   Met2dDataFile *mtddf = (Met2dDataFile *) nullptr;
 
    //
    // Determine the file type
@@ -195,7 +195,7 @@ Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(const char *filename,
 
 {
 
-   Met2dDataFile *mtddf = (Met2dDataFile *) 0;
+   Met2dDataFile *mtddf = (Met2dDataFile *) nullptr;
 
    //
    // Use the file type, if valid
@@ -246,7 +246,7 @@ Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(const char *filename,
 bool is_2d_data_file(const ConcatString &filename,
                      const ConcatString &config_str) {
    Met2dDataFileFactory mtddf_factory;
-   Met2dDataFile *mtddf = (Met2dDataFile *) 0;
+   Met2dDataFile *mtddf = (Met2dDataFile *) nullptr;
    GrdFileType type = FileType_None;
 
    // Check for a requested file type
@@ -260,7 +260,7 @@ bool is_2d_data_file(const ConcatString &filename,
    mtddf = mtddf_factory.new_met_2d_data_file(filename.c_str(), type);
    bool status = (mtddf != 0);
 
-   if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) 0; }
+   if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) nullptr; }
 
    return status;
 }

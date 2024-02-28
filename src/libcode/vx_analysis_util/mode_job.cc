@@ -107,11 +107,11 @@ void BasicModeAnalysisJob::init_from_scratch()
 
 {
 
-accums   = (NumArray *) 0;
+accums   = (NumArray *) nullptr;
 
-dumpfile = (ostream *)  0;   //  don't delete
+dumpfile = (ostream *)  nullptr;   //  don't delete
 
-outfile  = (ostream *)  0;   //  don't delete
+outfile  = (ostream *)  nullptr;   //  don't delete
 
 clear();
 
@@ -133,16 +133,16 @@ atts.clear();
 
 columns.clear();
 
-if ( accums )  { delete [] accums;  accums = (NumArray *) 0; }
+if ( accums )  { delete [] accums;  accums = (NumArray *) nullptr; }
 
 n_lines_read = n_lines_kept = 0;
 
 // Write any remaning lines to the dump file
 if ( dumpfile )  *(dumpfile) << dump_at;
 
-dumpfile = (ostream *) 0;   //  don't delete
+dumpfile = (ostream *) nullptr;   //  don't delete
 
-outfile  = (ostream *) 0;   //  don't delete
+outfile  = (ostream *) nullptr;   //  don't delete
 
 n_dump = 0;
 
@@ -756,7 +756,7 @@ void ByCaseJob::init_from_scratch()
 
 {
 
-info = (ByCaseInfo *) 0;
+info = (ByCaseInfo *) nullptr;
 
 BasicModeAnalysisJob::init_from_scratch();
 
@@ -774,7 +774,7 @@ void ByCaseJob::clear()
 
 BasicModeAnalysisJob::clear();
 
-if ( info )  { delete [] info;  info = (ByCaseInfo *) 0; }
+if ( info )  { delete [] info;  info = (ByCaseInfo *) nullptr; }
 
 valid_times.clear();
 
@@ -995,7 +995,7 @@ valid_times.sort_increasing();
 
 n_valid_times = valid_times.n_elements();
 
-if ( info )  { delete [] info;  info = (ByCaseInfo *) 0; }
+if ( info )  { delete [] info;  info = (ByCaseInfo *) nullptr; }
 
 info = new ByCaseInfo [n_valid_times + 1];  //  in case n_valid_times is zero
 
@@ -1030,7 +1030,7 @@ else            do_output(cout);
    //  done
    //
 
-if ( info )  { delete [] info;  info = (ByCaseInfo *) 0; }
+if ( info )  { delete [] info;  info = (ByCaseInfo *) nullptr; }
 
 return;
 

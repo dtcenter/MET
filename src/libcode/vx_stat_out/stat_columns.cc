@@ -29,7 +29,7 @@ const bool use_weighted_seeps = false;
 ////////////////////////////////////////////////////////////////////////
 
 void parse_row_col(const char *col_name, int &r, int &c) {
-   const char *ptr = (const char *) 0;
+   const char *ptr = (const char *) nullptr;
 
    // Parse Fi_Oj strings
    r = atoi(++col_name);
@@ -76,7 +76,7 @@ void close_txt_file(ofstream *&out, const char *file_name) {
    // Close the output file
    out->close();
    delete out;
-   out = (ofstream *) 0;
+   out = (ofstream *) nullptr;
 
    return;
 }

@@ -253,9 +253,9 @@ void LigatureInfo::init_from_scratch()
 
 {
 
-successor_name = (char *) 0;
+successor_name = (char *) nullptr;
 
-ligature_name = (char *) 0;
+ligature_name = (char *) nullptr;
 
 clear();
 
@@ -273,9 +273,9 @@ void LigatureInfo::clear()
 
 {
 
-if ( successor_name )  { delete [] successor_name;  successor_name = (char *) 0; }
+if ( successor_name )  { delete [] successor_name;  successor_name = (char *) nullptr; }
 
-if ( ligature_name )  { delete [] ligature_name;  ligature_name = (char *) 0; }
+if ( ligature_name )  { delete [] ligature_name;  ligature_name = (char *) nullptr; }
 
 successor_index = ligature_index = -1;
 
@@ -424,9 +424,9 @@ void AfmCharMetrics::init_from_scratch()
 
 {
 
-name = (char *) 0;
+name = (char *) nullptr;
 
-linfo = (LigatureInfo *) 0;
+linfo = (LigatureInfo *) nullptr;
 
 clear();
 
@@ -443,9 +443,9 @@ void AfmCharMetrics::clear()
 
 {
 
-if ( name )  { delete [] name;  name = (char *) 0; }
+if ( name )  { delete [] name;  name = (char *) nullptr; }
 
-if ( linfo )  { delete [] linfo;  linfo = (LigatureInfo *) 0; }
+if ( linfo )  { delete [] linfo;  linfo = (LigatureInfo *) nullptr; }
 
 
 ascii_code = -1;
@@ -622,7 +622,7 @@ void PCC::init_from_scratch()
 
 {
 
-name = (char *) 0;
+name = (char *) nullptr;
 
 clear();
 
@@ -638,7 +638,7 @@ void PCC::clear()
 
 {
 
-if ( name )  { delete [] name;  name = (char *) 0; }
+if ( name )  { delete [] name;  name = (char *) nullptr; }
 
 delta_x = 0;
 
@@ -762,9 +762,9 @@ void AfmCompositeInfo::init_from_scratch()
 
 {
 
-name = (char *) 0;
+name = (char *) nullptr;
 
-pcc = (PCC *) 0;
+pcc = (PCC *) nullptr;
 
 clear();
 
@@ -780,9 +780,9 @@ void AfmCompositeInfo::clear()
 
 {
 
-if ( name )  { delete [] name;  name = (char *) 0; }
+if ( name )  { delete [] name;  name = (char *) nullptr; }
 
-if ( pcc )   { delete [] pcc;   pcc  = (PCC *) 0;  }
+if ( pcc )   { delete [] pcc;   pcc  = (PCC *) nullptr;  }
 
 n_parts = 0;
 
@@ -926,9 +926,9 @@ void KPX::init_from_scratch()
 
 {
 
-name1 = (char *) 0;
+name1 = (char *) nullptr;
 
-name2 = (char *) 0;
+name2 = (char *) nullptr;
 
 
 clear();
@@ -946,8 +946,8 @@ void KPX::clear()
 
 {
 
-if ( name1 )  { delete [] name1;  name1 = (char *) 0; }
-if ( name2 )  { delete [] name2;  name2 = (char *) 0; }
+if ( name1 )  { delete [] name1;  name1 = (char *) nullptr; }
+if ( name2 )  { delete [] name2;  name2 = (char *) nullptr; }
 
 dx = 0.0;
 
@@ -1069,22 +1069,22 @@ void Afm::init_from_scratch()
 
 {
 
-in = (ifstream *) 0;
+in = (ifstream *) nullptr;
 
-cm = (AfmCharMetrics *) 0;
-
-
-FontName       = (char *) 0;
-FullName       = (char *) 0;
-FamilyName     = (char *) 0;
-Weight         = (char *) 0;
-Version        = (char *) 0;
-EncodingScheme = (char *) 0;
+cm = (AfmCharMetrics *) nullptr;
 
 
-compinfo = (AfmCompositeInfo *) 0;
+FontName       = (char *) nullptr;
+FullName       = (char *) nullptr;
+FamilyName     = (char *) nullptr;
+Weight         = (char *) nullptr;
+Version        = (char *) nullptr;
+EncodingScheme = (char *) nullptr;
 
-kpx = (KPX *) 0;
+
+compinfo = (AfmCompositeInfo *) nullptr;
+
+kpx = (KPX *) nullptr;
 
 
 
@@ -1104,28 +1104,28 @@ void Afm::clear()
 
 {
 
-if ( in )  { delete in;  in = (ifstream *) 0; }
+if ( in )  { delete in;  in = (ifstream *) nullptr; }
 
 line_number = 0;
 
 
-if ( FontName       )  { delete [] FontName;        FontName       = (char *) 0; }
-if ( FullName       )  { delete [] FullName;        FullName       = (char *) 0; }
-if ( FamilyName     )  { delete [] FamilyName;      FamilyName     = (char *) 0; }
-if ( Weight         )  { delete [] Weight;          Weight         = (char *) 0; }
-if ( Version        )  { delete [] Version;         Version        = (char *) 0; }
-if ( EncodingScheme )  { delete [] EncodingScheme;  EncodingScheme = (char *) 0; }
+if ( FontName       )  { delete [] FontName;        FontName       = (char *) nullptr; }
+if ( FullName       )  { delete [] FullName;        FullName       = (char *) nullptr; }
+if ( FamilyName     )  { delete [] FamilyName;      FamilyName     = (char *) nullptr; }
+if ( Weight         )  { delete [] Weight;          Weight         = (char *) nullptr; }
+if ( Version        )  { delete [] Version;         Version        = (char *) nullptr; }
+if ( EncodingScheme )  { delete [] EncodingScheme;  EncodingScheme = (char *) nullptr; }
 
 
-if ( cm )  { delete [] cm;  cm = (AfmCharMetrics *) 0; }
+if ( cm )  { delete [] cm;  cm = (AfmCharMetrics *) nullptr; }
 
 n_cms = 0;
 
-if ( compinfo )  { delete [] compinfo;  compinfo = (AfmCompositeInfo *) 0; }
+if ( compinfo )  { delete [] compinfo;  compinfo = (AfmCompositeInfo *) nullptr; }
 
 n_composites = 0;
 
-if ( kpx )  { delete [] kpx;  kpx = (KPX *) 0; }
+if ( kpx )  { delete [] kpx;  kpx = (KPX *) nullptr; }
 
 n_kern_pairs = 0;
 
@@ -1443,7 +1443,7 @@ for (j=0; j<n_cms; ++j)  {
 
 in->close();
 
-delete in;  in = (ifstream *) 0;
+delete in;  in = (ifstream *) nullptr;
 
 line_number = 0;
 
@@ -2231,8 +2231,8 @@ if ( ascii_code_2 < 0 )  ascii_code_2 += 256;
 
 int j;
 int cm_index_1, cm_index_2;
-const char * n1 = (const char *) 0;
-const char * n2 = (const char *) 0;
+const char * n1 = (const char *) nullptr;
+const char * n2 = (const char *) nullptr;
 
 cm_index_1 = lookup_cm(ascii_code_1);
 cm_index_2 = lookup_cm(ascii_code_2);
@@ -2279,7 +2279,7 @@ void set_string(char * & s, const char * text)
 
 {
 
-if ( s )  { delete [] s;  s = (char *) 0; }
+if ( s )  { delete [] s;  s = (char *) nullptr; }
 
 if ( !text )  return;
 

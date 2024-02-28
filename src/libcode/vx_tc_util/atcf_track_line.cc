@@ -553,7 +553,7 @@ WatchWarnType string_to_watchwarntype(const char *s) {
 ////////////////////////////////////////////////////////////////////////
 
 ConcatString watchwarntype_to_string(const WatchWarnType t) {
-   const char *s = (const char *) 0;
+   const char *s = (const char *) nullptr;
 
    switch(t) {
       case TropicalStormWatch: s = "TSWATCH"; break;
@@ -597,7 +597,7 @@ CycloneLevel string_to_cyclonelevel(const char *s) {
 ////////////////////////////////////////////////////////////////////////
 
 ConcatString cyclonelevel_to_string(const CycloneLevel t) {
-   const char *s = (const char *) 0;
+   const char *s = (const char *) nullptr;
 
    switch(t) {
       case Disturbance:           s = "DB";   break;
@@ -657,7 +657,7 @@ QuadrantType string_to_quadranttype(const char *s) {
 ////////////////////////////////////////////////////////////////////////
 
 ConcatString quadranttype_to_string(const QuadrantType t) {
-   const char *s = (const char *) 0;
+   const char *s = (const char *) nullptr;
 
    switch(t) {
       case FullCircle:     s = "AAA";  break;
@@ -698,7 +698,7 @@ SubregionCode string_to_subregioncode(const char *s) {
 ////////////////////////////////////////////////////////////////////////
 
 ConcatString subregioncode_to_string(const SubregionCode t) {
-   const char *s = (const char *) 0;
+   const char *s = (const char *) nullptr;
 
    switch(t) {
       case Arabian_Sea:     s = "A";    break;
@@ -733,7 +733,7 @@ SystemsDepth string_to_systemsdepth(const char *s) {
 ////////////////////////////////////////////////////////////////////////
 
 ConcatString systemsdepth_to_string(const SystemsDepth t) {
-   const char *s = (const char *) 0;
+   const char *s = (const char *) nullptr;
 
    switch(t) {
       case DeepDepth:      s = "D";    break;

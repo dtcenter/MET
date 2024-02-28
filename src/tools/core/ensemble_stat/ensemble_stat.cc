@@ -640,7 +640,7 @@ void process_n_vld() {
 bool get_data_plane(const char *infile, GrdFileType ftype,
                     VarInfo *info, DataPlane &dp, bool do_regrid) {
    bool found;
-   Met2dDataFile *mtddf = (Met2dDataFile *) 0;
+   Met2dDataFile *mtddf = (Met2dDataFile *) nullptr;
 
    // Read the current ensemble file
    if(!(mtddf = mtddf_factory.new_met_2d_data_file(infile, ftype))) {
@@ -916,7 +916,7 @@ void process_point_vx() {
 void process_point_obs(int i_nc) {
    int i_obs, j;
    unixtime hdr_ut;
-   NcFile *obs_in = (NcFile *) 0;
+   NcFile *obs_in = (NcFile *) nullptr;
    const char *method_name = "process_point_obs() -> ";
 
    mlog << Debug(2) << "\n" << sep_str << "\n\n"
@@ -1122,7 +1122,7 @@ bool process_point_ens(int i_vx, int i_ens, DataPlaneArray &fcst_dpa) {
 ////////////////////////////////////////////////////////////////////////
 
 void process_point_scores() {
-   PairDataEnsemble *pd_ptr = (PairDataEnsemble *) 0;
+   PairDataEnsemble *pd_ptr = (PairDataEnsemble *) nullptr;
    PairDataEnsemble pd;
    ConcatString cs;
    int i, j, k, l;
@@ -1326,7 +1326,7 @@ void process_grid_vx() {
                      mlog << Debug(3)
                           << "Observation error for gridded verification is "
                           << "defined by a table lookup for each point.\n";
-                     oerr_ptr = (ObsErrorEntry *) 0;
+                     oerr_ptr = (ObsErrorEntry *) nullptr;
                   }
                }
             }
@@ -1850,7 +1850,7 @@ void setup_txt_files() {
    max_col += n_header_columns;
 
    // Initialize file stream
-   stat_out = (ofstream *) 0;
+   stat_out = (ofstream *) nullptr;
 
    // Build the file name
    stat_file << tmp_str << stat_file_ext;
@@ -1884,7 +1884,7 @@ void setup_txt_files() {
          if(i == i_orank && !point_obs_flag) continue;
 
          // Initialize file stream
-         txt_out[i] = (ofstream *) 0;
+         txt_out[i] = (ofstream *) nullptr;
 
          // Build the file name
          txt_file[i] << tmp_str << "_" << txt_file_abbr[i]

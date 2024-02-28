@@ -100,7 +100,7 @@ void TCStatLine::clear() {
    DataLine::clear();
 
    Type    = NoTCStatLineType;
-   HdrLine = (AsciiHeaderLine *) 0;
+   HdrLine = (AsciiHeaderLine *) nullptr;
 
    return;
 }
@@ -382,7 +382,7 @@ TCStatLineType string_to_tcstatlinetype(const char *s) {
 ////////////////////////////////////////////////////////////////////////
 
 ConcatString tcstatlinetype_to_string(const TCStatLineType t) {
-   const char *s = (const char *) 0;
+   const char *s = (const char *) nullptr;
 
    switch(t) {
       case TCStatLineType_TCMPR:    s = TCStatLineType_TCMPR_Str;    break;

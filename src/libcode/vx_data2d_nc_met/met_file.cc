@@ -95,11 +95,11 @@ void MetNcFile::init_from_scratch()
 
 {
 
-Nc = (NcFile *) 0;
+Nc = (NcFile *) nullptr;
 
-Dim = (NcDim **) 0;
+Dim = (NcDim **) nullptr;
 
-Var = (NcVarInfo *) 0;
+Var = (NcVarInfo *) nullptr;
 
 close();
 
@@ -115,19 +115,19 @@ void MetNcFile::close()
 
 {
 
-if ( Nc )  { delete Nc;  Nc = (NcFile *) 0; }
+if ( Nc )  { delete Nc;  Nc = (NcFile *) nullptr; }
 
-if ( Dim )  { delete [] Dim;  Dim = (NcDim **) 0; }
+if ( Dim )  { delete [] Dim;  Dim = (NcDim **) nullptr; }
 
 Ndims = 0;
 
 DimNames.clear();
 
-Xdim = Ydim = (NcDim *) 0;
+Xdim = Ydim = (NcDim *) nullptr;
 
 Nvars = 0;
 
-if ( Var )  { delete [] Var;  Var = (NcVarInfo *) 0; }
+if ( Var )  { delete [] Var;  Var = (NcVarInfo *) nullptr; }
 
    //
    //  done
@@ -476,7 +476,7 @@ if ( dimCount >= max_met_args )  {
 
 int j, count;
 bool found = false;
-NcVarInfo * var = (NcVarInfo *) 0;
+NcVarInfo * var = (NcVarInfo *) nullptr;
 const int Nx = grid.nx();
 const int Ny = grid.ny();
 LongArray b = a;

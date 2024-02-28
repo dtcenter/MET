@@ -132,7 +132,7 @@ void NCRR_Array<T>::init_from_scratch()
 
 {
 
-e = (T **) 0;
+e = (T **) nullptr;
 
 AllocInc = ncrr_default_alloc_inc;
 
@@ -158,11 +158,11 @@ if ( e )  {
 
    for (j=0; j<Nalloc; ++j)  {
 
-      if ( e[j] )  { delete e[j];  e[j] = (T *) 0; }
+      if ( e[j] )  { delete e[j];  e[j] = (T *) nullptr; }
 
    }
 
-   delete [] e;  e = (T **) 0;
+   delete [] e;  e = (T **) nullptr;
 
 }   //  if e
 
@@ -236,11 +236,11 @@ for(j=0; j<Nelements; ++j)  {
 
 }
 
-if ( e )  { delete [] e;  e = (T **) 0; }
+if ( e )  { delete [] e;  e = (T **) nullptr; }
 
 e = u;
 
-u = (T **) 0;
+u = (T **) nullptr;
 
 Nalloc = N;
 
@@ -395,7 +395,7 @@ if ( Nelements < 2 )  return;
 
 int j, k;
 int jmax;
-T * temp = 0;
+T * temp = nullptr;
 
 jmax = Nelements/2;   //  works whether Nelements is even or odd
 
@@ -429,7 +429,7 @@ void NCRR_Array<T>::bubble_sort_decreasing(ncrr_cmp_func _cmp)
 if ( Nelements < 2 )  return;
 
 int j, k;
-T * temp = 0;
+T * temp = nullptr;
 
 
 for (j=0; j<(Nelements - 1); ++j) {

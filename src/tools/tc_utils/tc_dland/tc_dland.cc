@@ -201,13 +201,13 @@ void process_land_data() {
 void process_distances() {
    int n, x, y, c, npts, nlog, imin;
    double lat, lon;
-   float *dland = (float *) 0;
+   float *dland = (float *) nullptr;
 
    // Instantiate the grid
    Grid grid(GridData);
    
    // NetCDF variables
-   NcFile *f_out     = (NcFile *) 0;
+   NcFile *f_out     = (NcFile *) nullptr;
    NcDim  lat_dim    ;
    NcDim  lon_dim    ;
    NcVar  dland_var ;
@@ -220,7 +220,7 @@ void process_distances() {
            << "trouble opening output file " << out_filename
            << "\n\n";
       delete f_out;
-      f_out = (NcFile *) 0;
+      f_out = (NcFile *) nullptr;
       exit(1);
    }
 
@@ -293,18 +293,18 @@ void process_distances() {
    // Write the computed distances to the output file
    mlog << Debug(3) << "Writing distance to land variable.\n";
    if(!put_nc_data_with_dims(&dland_var, &dland[0], grid.ny(), grid.nx())) {
-      if(dland) { delete [] dland; dland = (float *) 0; }
+      if(dland) { delete [] dland; dland = (float *) nullptr; }
       mlog << Error << "\nprocess_distances() -> "
            << "error with dland_var->put\n\n";
       exit(1);
    }
 
    // Delete allocated memory
-   if(dland) { delete [] dland;  dland = (float *) 0; }
+   if(dland) { delete [] dland;  dland = (float *) nullptr; }
 
    // Close the output NetCDF file
    delete f_out;
-   f_out = (NcFile *) 0;
+   f_out = (NcFile *) nullptr;
 
    // List the output file
    mlog << Debug(1)

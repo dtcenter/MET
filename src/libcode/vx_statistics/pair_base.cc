@@ -64,11 +64,11 @@ void PairBase::clear() {
    IsPointVx = false;
 
    mask_name.clear();
-   mask_area_ptr  = (MaskPlane *)    0;  // Not allocated
-   mask_sid_ptr   = (StringArray *)  0;  // Not allocated
-   mask_llpnt_ptr = (MaskLatLon *)   0;  // Not allocated
+   mask_area_ptr  = (MaskPlane *)    nullptr;  // Not allocated
+   mask_sid_ptr   = (StringArray *)  nullptr;  // Not allocated
+   mask_llpnt_ptr = (MaskLatLon *)   nullptr;  // Not allocated
 
-   cdf_info_ptr = (const ClimoCDFInfo *) 0;  // Not allocated
+   cdf_info_ptr = (const ClimoCDFInfo *) nullptr;  // Not allocated
 
    msg_typ.clear();
    msg_typ_vals.clear();
@@ -114,11 +114,11 @@ void PairBase::erase() {
    IsPointVx = false;
 
    mask_name.erase();
-   mask_area_ptr  = (MaskPlane *)    0;  // Not allocated
-   mask_sid_ptr   = (StringArray *)  0;  // Not allocated
-   mask_llpnt_ptr = (MaskLatLon *)   0;  // Not allocated
+   mask_area_ptr  = (MaskPlane *)    nullptr;  // Not allocated
+   mask_sid_ptr   = (StringArray *)  nullptr;  // Not allocated
+   mask_llpnt_ptr = (MaskLatLon *)   nullptr;  // Not allocated
 
-   cdf_info_ptr = (const ClimoCDFInfo *) 0;  // Not allocated
+   cdf_info_ptr = (const ClimoCDFInfo *) nullptr;  // Not allocated
 
    msg_typ.clear();
    msg_typ_vals.clear();
@@ -1007,7 +1007,7 @@ void get_interp_points(const DataPlaneArray &dpa,
       interp_pnts.erase();
    }
 
-   if ( gt )  { delete gt;  gt = (const GridTemplate *) 0; }
+   if ( gt )  { delete gt;  gt = (const GridTemplate *) nullptr; }
 
    return;
 }

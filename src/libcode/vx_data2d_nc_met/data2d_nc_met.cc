@@ -63,7 +63,7 @@ MetNcMetDataFile & MetNcMetDataFile::operator=(const MetNcMetDataFile &) {
 
 void MetNcMetDataFile::nc_met_init_from_scratch() {
 
-   MetNc  = (MetNcFile *) 0;
+   MetNc  = (MetNcFile *) nullptr;
 
    close();
 
@@ -74,7 +74,7 @@ void MetNcMetDataFile::nc_met_init_from_scratch() {
 
 void MetNcMetDataFile::close() {
 
-   if(MetNc) { delete MetNc; MetNc = (MetNcFile *) 0; }
+   if(MetNc) { delete MetNc; MetNc = (MetNcFile *) nullptr; }
 
    return;
 }
@@ -123,7 +123,7 @@ bool MetNcMetDataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
    bool status = false;
    ConcatString req_time_str, data_time_str;
    VarInfoNcMet * vinfo_nc = (VarInfoNcMet *) &vinfo;
-   NcVarInfo *info = (NcVarInfo *) 0;
+   NcVarInfo *info = (NcVarInfo *) nullptr;
    int i;
 
    // Initialize the data plane

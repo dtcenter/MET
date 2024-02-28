@@ -293,7 +293,7 @@ void process_madis_file(const char *madis_file) {
            << "can't open input NetCDF file \"" << madis_file
            << "\" for reading.\n\n";
       delete f_in;
-      f_in = (NcFile *) 0;
+      f_in = (NcFile *) nullptr;
 
       exit(1);
    }
@@ -344,7 +344,7 @@ void process_madis_file(const char *madis_file) {
    // Close the input NetCDF file
    if(f_in) {
       delete f_in;
-      f_in = (NcFile *) 0;
+      f_in = (NcFile *) nullptr;
    }
 
    return;
@@ -363,7 +363,7 @@ void clean_up() {
    //
    if(f_out) {
       delete f_out;
-      f_out = (NcFile *) 0;
+      f_out = (NcFile *) nullptr;
    }
 
    return;
@@ -386,7 +386,7 @@ void setup_netcdf_out(int nhdr) {
       mlog << Error << "\nsetup_netcdf_out() -> "
            << "trouble opening output file: " << ncfile << "\n\n";
       delete f_out;
-      f_out = (NcFile *) 0;
+      f_out = (NcFile *) nullptr;
       exit(1);
    }
 

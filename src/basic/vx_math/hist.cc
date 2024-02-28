@@ -52,7 +52,7 @@ Histogram::~Histogram()
 
 {
 
-if ( Count )  { delete [] Count;  Count = (int *) 0; }
+if ( Count )  { delete [] Count;  Count = (int *) nullptr; }
 
 }
 
@@ -94,7 +94,7 @@ void Histogram::init_from_scratch()
 
 {
 
-Count = (int *) 0;
+Count = (int *) nullptr;
 
 Nbins = 0;
 
@@ -143,7 +143,7 @@ void Histogram::set_nbd(int n, double b, double d)
 
 {
 
-if ( Count )  { delete [] Count;  Count = (int *) 0; }
+if ( Count )  { delete [] Count;  Count = (int *) nullptr; }
 
 Nbins  = n;
 

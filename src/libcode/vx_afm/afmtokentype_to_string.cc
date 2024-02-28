@@ -39,7 +39,7 @@ ConcatString afmtokentype_to_string(const AfmTokenType t)
 
 {
 
-const char * s = (const char *) 0;
+const char * s = (const char *) nullptr;
 
 switch ( t )  {
 

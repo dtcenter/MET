@@ -418,7 +418,7 @@ ConcatString get_log_msg_for_att(const NcVarAtt *att, string var_name,
 ////////////////////////////////////////////////////////////////////////
 
 NcVarAtt *get_nc_att(const NcVar * var, const ConcatString &att_name, bool exit_on_error) {
-   NcVarAtt *att = (NcVarAtt *)0;
+   NcVarAtt *att = (NcVarAtt *) nullptr;
    static const char *method_name = "get_nc_att(NcVar) -> ";
 
    //
@@ -453,7 +453,7 @@ NcVarAtt *get_nc_att(const NcVar * var, const ConcatString &att_name, bool exit_
 ////////////////////////////////////////////////////////////////////////
 
 NcGroupAtt *get_nc_att(const NcFile * nc, const ConcatString &att_name, bool exit_on_error) {
-   NcGroupAtt *att = (NcGroupAtt *)0;
+   NcGroupAtt *att = (NcGroupAtt *) nullptr;
    static const char *method_name = "get_nc_att(NcFile) -> ";
 
    //
@@ -491,7 +491,7 @@ NcGroupAtt *get_nc_att(const NcFile * nc, const ConcatString &att_name, bool exi
 bool get_nc_att_value(const NcVar *var, const ConcatString &att_name,
                       ConcatString &att_val, int grp_id, bool exit_on_error) {
    bool status = false;
-   NcVarAtt *att = (NcVarAtt *) 0;
+   NcVarAtt *att = (NcVarAtt *) nullptr;
 
    // Initialize
    att_val.clear();
@@ -3456,7 +3456,7 @@ NcVar get_nc_var_time(const NcFile *nc) {
 ////////////////////////////////////////////////////////////////////////
 
 NcFile *open_ncfile(const char * nc_name, bool write) {
-   NcFile *nc = (NcFile *)0;
+   NcFile *nc = (NcFile *) nullptr;
 
    try {
       if (write) {

@@ -321,7 +321,7 @@ void TrackPairInfo::add(const TCStatLine &l) {
 
 void TrackPairInfo::add_tcmpr_line(const TCStatLine &l) {
    TrackPoint apoint, bpoint;
-   TrackPoint *tp = (TrackPoint *) 0;
+   TrackPoint *tp = (TrackPoint *) nullptr;
    QuadInfo wind;
    ConcatString cs;
    int i, j;
@@ -933,7 +933,7 @@ TrackPairInfoArray & TrackPairInfoArray::operator=(const TrackPairInfoArray & t)
 
 void TrackPairInfoArray::init_from_scratch() {
 
-   Pair = (TrackPairInfo *) 0;
+   Pair = (TrackPairInfo *) nullptr;
 
    clear();
 
@@ -944,7 +944,7 @@ void TrackPairInfoArray::init_from_scratch() {
 
 void TrackPairInfoArray::clear() {
 
-   if(Pair) { delete [] Pair; Pair = (TrackPairInfo *) 0; }
+   if(Pair) { delete [] Pair; Pair = (TrackPairInfo *) nullptr; }
    NPairs = NAlloc = 0;
 
    return;
@@ -1021,7 +1021,7 @@ void TrackPairInfoArray::assign(const TrackPairInfoArray &t) {
 
 void TrackPairInfoArray::extend(int n, bool exact) {
    int j, k;
-   TrackPairInfo *new_info = (TrackPairInfo *) 0;
+   TrackPairInfo *new_info = (TrackPairInfo *) nullptr;
 
    // Check if enough memory is already allocated
    if(NAlloc >= n) return;
@@ -1045,12 +1045,12 @@ void TrackPairInfoArray::extend(int n, bool exact) {
    // Copy the array contents and delete the old one
    if(Pair) {
       for(j=0; j<NPairs; j++) new_info[j] = Pair[j];
-      delete [] Pair;  Pair = (TrackPairInfo *) 0;
+      delete [] Pair;  Pair = (TrackPairInfo *) nullptr;
    }
 
    // Point to the new array
    Pair     = new_info;
-   new_info = (TrackPairInfo *) 0;
+   new_info = (TrackPairInfo *) nullptr;
 
    // Store the allocated length
    NAlloc = n;

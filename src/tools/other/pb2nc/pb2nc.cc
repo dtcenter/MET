@@ -2617,7 +2617,7 @@ void clean_up() {
 
    if(f_out) {
       delete f_out;
-      f_out = (NcFile *) 0;
+      f_out = (NcFile *) nullptr;
    }
 
    return;
@@ -3003,7 +3003,7 @@ int combine_tqz_and_uv(map<float, float*> pqtzuv_map_tq,
       // Select first record by 1) merging two records with the same pressure
       // level or 2) interpolate
       int tq_pres, uv_pres;
-      next_pqtzuv = (float *)0;
+      next_pqtzuv = (float *)nullptr;
       it_tq = pqtzuv_map_tq.begin();
       it_uv = pqtzuv_map_uv.begin();
       pqtzuv_tq = (float *)it_tq->second;
