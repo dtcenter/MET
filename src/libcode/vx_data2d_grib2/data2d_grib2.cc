@@ -190,7 +190,7 @@ bool MetGrib2DataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
 
       plane = plane_array[0];
 
-      return(process_data_plane(vinfo_g2, plane));
+      return process_data_plane(vinfo_g2, plane);
 
    }  //  END: if( 1 > listMatch.size() )
 
@@ -1649,7 +1649,7 @@ int MetGrib2DataFile::index( VarInfo &vinfo ){
 ////////////////////////////////////////////////////////////////////////
 
 double scaled2dbl(int scale_factor, int scale_value) {
-   if (scale_factor == 0) return ( (double) scale_value );
+   if (scale_factor == 0) return (double) scale_value;
    if (scale_factor < 0)  return ( scale_value * pow(10.0, -scale_factor) );
    return                        ( scale_value / pow(10.0,  scale_factor) );
 }
@@ -1674,7 +1674,7 @@ int parse_int4(g2int i) {
       i_val = (c[0] << 24) + (c[1] << 16) + (c[2] << 8) + c[3];
    }
 
-   return(i_val);
+   return i_val;
 }
 
 ////////////////////////////////////////////////////////////////////////

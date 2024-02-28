@@ -1042,7 +1042,7 @@ double Grid::calc_area(int x, int y) const
 
 {
 
-if ( !rep )  return ( 0.0 );
+if ( !rep )  return 0.0;
 
 return rep->calc_area(x, y);
 
@@ -1056,7 +1056,7 @@ int Grid::nx() const
 
 {
 
-if ( !rep )  return ( 0 );
+if ( !rep )  return 0;
 
 return rep->nx();
 
@@ -1070,7 +1070,7 @@ int Grid::ny() const
 
 {
 
-if ( !rep )  return ( 0 );
+if ( !rep )  return 0;
 
 return rep->ny();
 

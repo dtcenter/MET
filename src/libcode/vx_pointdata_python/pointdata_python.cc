@@ -188,7 +188,7 @@ print_met_data(obs_data, hdr_data, method_name);
    //  done
    //
 
-return ( status );
+return status;
 
 }
 

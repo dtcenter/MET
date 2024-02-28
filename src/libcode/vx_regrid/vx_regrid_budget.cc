@@ -101,7 +101,7 @@ for (ixt=0; ixt<(to_grid.nx()); ++ixt)  {
    //  done
    //
 
-return ( to_data );
+return to_data;
 
 }
 

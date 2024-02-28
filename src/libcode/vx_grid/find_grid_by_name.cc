@@ -51,7 +51,7 @@ bool status = false;
 
 status = find_grid_by_name(name, i);
 
-if ( !status || !(i.ok()) )  return ( false );
+if ( !status || !(i.ok()) )  return false;
 
 status = false;
 
@@ -69,7 +69,7 @@ if ( i.sl  ) { g.set( *(i.sl)  ); status = true; }
 if ( i.us  ) { g.set( *(i.us)  ); status = true; }
 #endif
 
-return ( status );
+return status;
 
 }
 
@@ -95,7 +95,7 @@ for (j=0; j<n_dtc_lambert_grids; ++j)  {
 
       i.set( dtc_lambert_grids[j] );
 
-      return ( true );
+      return true;
 
    }
 
@@ -111,7 +111,7 @@ for (j=0; j<n_ncep_latlon_grids; ++j)  {
 
       i.set( ncep_latlon_grids[j] );
 
-      return ( true );
+      return true;
 
    }
 
@@ -127,7 +127,7 @@ for (j=0; j<n_ncep_st_grids; ++j)  {
 
       i.set( ncep_st_grids[j] );
 
-      return ( true );
+      return true;
 
    }
 
@@ -143,7 +143,7 @@ for (j=0; j<n_misc_st_grids; ++j)  {
 
       i.set( misc_st_grids[j] );
 
-      return ( true );
+      return true;
 
    }
 
@@ -159,7 +159,7 @@ for (j=0; j<n_ncep_lambert_grids; ++j)  {
 
       i.set( ncep_lambert_grids[j] );
 
-      return ( true );
+      return true;
 
    }
 
@@ -175,7 +175,7 @@ for (j=0; j<n_ncep_mercator_grids; ++j)  {
 
       i.set( ncep_mercator_grids[j] );
 
-      return ( true );
+      return true;
 
    }
 
@@ -191,7 +191,7 @@ for (j=0; j<n_ncep_gaussian_grids; ++j)  {
 
       i.set( ncep_gaussian_grids[j] );
 
-      return ( true );
+      return true;
 
    }
 
@@ -207,7 +207,7 @@ for (j=0; j<n_misc_laea_grids; ++j)  {
 
       i.set( misc_laea_grids[j] );
 
-      return ( true );
+      return true;
 
    }
 
@@ -217,7 +217,7 @@ for (j=0; j<n_misc_laea_grids; ++j)  {
    //  nope
    //
 
-return ( false );
+return false;
 
 }
 
@@ -247,7 +247,7 @@ else                                                               status = fals
    //  done
    //
 
-return ( status );
+return status;
 
 }
 
@@ -369,7 +369,7 @@ if ( ToGrid )  { delete ToGrid; ToGrid = (Grid *) 0; }
    //
 
 
-return ( true );
+return true;
 
 }
 
@@ -392,7 +392,7 @@ if ( N != 10 )  {
    mlog << Warning << "\nparse_stereographic_grid() -> "
         << "polar stereographic grid spec should have 10 entries\n\n";
 
-   return ( false );
+   return false;
 
 }
 
@@ -493,7 +493,7 @@ if ( ToGrid )  { delete ToGrid; ToGrid = (Grid *) 0; }
    //
 
 
-return ( true );
+return true;
 
 }
 
@@ -573,7 +573,7 @@ if ( ToGrid )  { delete ToGrid; ToGrid = (Grid *) 0; }
    //
 
 
-return ( true );
+return true;
 
 }
 
@@ -664,7 +664,7 @@ if ( ToGrid )  { delete ToGrid; ToGrid = (Grid *) 0; }
    //
 
 
-return ( true );
+return true;
 
 }
 
@@ -745,7 +745,7 @@ if ( ToGrid )  { delete ToGrid; ToGrid = (Grid *) 0; }
    //
 
 
-return ( true );
+return true;
 
 }
 
@@ -814,7 +814,7 @@ if ( ToGrid )  { delete ToGrid; ToGrid = (Grid *) 0; }
    //
 
 
-return ( true );
+return true;
 
 }
 

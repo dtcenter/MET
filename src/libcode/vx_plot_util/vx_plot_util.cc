@@ -206,11 +206,11 @@ bool region_overlaps_grid(const Grid & grid, const Box & grid_bb,
       if ((x >= grid_bb.x_ll()) && (x < grid_bb.x_ur()) &&
           (y >= grid_bb.y_ll()) && (y < grid_bb.y_ur()))
 
-         return (true);
+         return true;
 
    }
 
-   return (false);
+   return false;
 
 }
 

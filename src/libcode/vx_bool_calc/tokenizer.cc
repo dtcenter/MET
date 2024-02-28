@@ -139,7 +139,7 @@ while ( (c = source[pos]) != 0 )  {
 
 }
 
-return ( value );
+return value;
 
 }
 
@@ -168,7 +168,7 @@ while ( 1 )  {
 
       tok.set_eof();
 
-      return ( tok );
+      return tok;
 
    }
 
@@ -236,7 +236,7 @@ else {
 }
 
 
-return ( tok );
+return tok;
 
 }
 

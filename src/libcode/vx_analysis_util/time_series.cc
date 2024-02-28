@@ -78,11 +78,11 @@ TimeSeries & TimeSeries::operator=(const TimeSeries & ts)
 
 {
 
-if ( this == &ts )  return ( * this );
+if ( this == &ts )  return *this;
 
 assign(ts);
 
-return ( * this );
+return *this;
 
 }
 
@@ -220,7 +220,7 @@ if ( (index < 0) || (index >= Nelements) )  {
 
 }
 
-return ( Value[index] );
+return Value[index];
 
 }
 

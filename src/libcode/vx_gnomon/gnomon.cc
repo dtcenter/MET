@@ -103,11 +103,11 @@ GnomonicProjection & GnomonicProjection::operator=(const GnomonicProjection & g)
 
 {
 
-if ( this == &g )  return ( * this );
+if ( this == &g )  return *this;
 
 assign(g);
 
-return ( * this );
+return *this;
 
 }
 
@@ -215,7 +215,7 @@ pz =  sind(lat);
 
 p_dot_b3 = px*Ux + py*Uy + pz*Uz;
 
-if ( p_dot_b3 <= 0.0 )  return ( 0 );
+if ( p_dot_b3 <= 0.0 )  return 0;
 
 p_dot_b1 = px*Ex + py*Ey + pz*Ez;
 p_dot_b2 = px*Nx + py*Ny + pz*Nz;
@@ -225,7 +225,7 @@ u = p_dot_b1/p_dot_b3;
 v = p_dot_b2/p_dot_b3;
 
 
-return ( 1 );
+return 1;
 
 }
 

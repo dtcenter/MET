@@ -58,7 +58,7 @@ while((c = strtok_r(L, delim, &temp_ptr)) != nullptr) {
 
 if ( L )  { delete [] L;  L = (char *) 0; }
 
-return ( a );
+return a;
 
 }
 
@@ -76,12 +76,12 @@ n = m_strlen(line);
 
 for (j=0; j<n; ++j)  {
 
-   if ( !(isdigit(line[j])) )  return ( 0 );
+   if ( !(isdigit(line[j])) )  return 0;
 
 }
 
 
-return ( 1 );
+return 1;
 
 }
 

@@ -154,7 +154,7 @@ MetPythonDataFile * p = nullptr;
         << "created new Met2dDataFile object of type \""
         << grdfiletype_to_string(type) << "\".\n";
 
-   return(mtddf);
+   return mtddf;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -186,7 +186,7 @@ Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(const char *filename)
       }
    }
 
-   return(mtddf);
+   return mtddf;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -238,7 +238,7 @@ Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(const char *filename,
       mtddf = new_met_2d_data_file(filename);
    }
 
-   return(mtddf);
+   return mtddf;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -262,7 +262,7 @@ bool is_2d_data_file(const ConcatString &filename,
 
    if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) 0; }
 
-   return(status);
+   return status;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

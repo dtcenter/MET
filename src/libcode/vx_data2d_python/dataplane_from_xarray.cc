@@ -59,7 +59,7 @@ bool status = dataplane_from_numpy_array(np, attrs_dict, dp_out, grid_out, vinfo
    //  done
    //
 
-return ( status );
+return status;
 
 }
 

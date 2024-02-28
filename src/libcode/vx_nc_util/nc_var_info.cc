@@ -99,11 +99,11 @@ assign(i);
 
 NcVarInfo & NcVarInfo::operator=(const NcVarInfo & i) {
 
-if ( this == &i )  return ( * this );
+if ( this == &i )  return *this;
 
 assign(i);
 
-return ( * this );
+return *this;
 
 }
 
@@ -244,7 +244,7 @@ return;
 
 int NcVarInfo::lead_time() const {
 
-return ( (int) (ValidTime - InitTime) );
+return (int) (ValidTime - InitTime);
 
 }
 
@@ -374,7 +374,7 @@ bool get_att_str(const NcVarInfo &info, const ConcatString att_name,
    //  done
    //
 
-   return ( found );
+   return found;
 
 }
 
@@ -407,7 +407,7 @@ bool get_att_int(const NcVarInfo &info, const ConcatString att_name,
    //  done
    //
    
-   return ( found );
+   return found;
 
 }
 
@@ -448,7 +448,7 @@ bool get_att_unixtime(const NcVar *var, const ConcatString att_name,
    //  done
    //
    
-   return ( found );
+   return found;
 
 }
 

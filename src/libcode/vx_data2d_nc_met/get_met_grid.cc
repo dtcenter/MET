@@ -183,7 +183,7 @@ int has_variable(NcFile *f_in, const char *var_name) {
    //
    found = (has_var(f_in, var_name) ? 1 : 0);
 
-   return(found);
+   return found;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -216,7 +216,7 @@ LatLonData get_latlon_data(NcFile * ncfile) {
 
    data.dump();
 
-   return(data);
+   return data;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -257,7 +257,7 @@ RotatedLatLonData get_rot_latlon_data(NcFile * ncfile) {
 
    data.dump();
 
-   return(data);
+   return data;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -314,7 +314,7 @@ LambertData get_lambert_data(NcFile * ncfile) {
 
    data.dump();
 
-   return(data);
+   return data;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -374,7 +374,7 @@ LaeaData get_laea_data(NcFile * ncfile) {
 
    data.dump();
 
-   return(data);
+   return data;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -431,7 +431,7 @@ StereographicData get_stereographic_data(NcFile * ncfile) {
 
    data.dump();
 
-   return(data);
+   return data;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -465,7 +465,7 @@ MercatorData get_mercator_data(NcFile * ncfile) {
 
    data.dump();
 
-   return(data);
+   return data;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -498,7 +498,7 @@ LatLonData get_latlon_data_v2(NcFile * ncfile) {
 
    data.dump();
 
-   return(data);
+   return data;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -550,7 +550,7 @@ LambertData get_lambert_data_v2(NcFile * ncfile) {
 
    data.dump();
 
-   return(data);
+   return data;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -605,7 +605,7 @@ StereographicData get_stereographic_data_v2(NcFile * ncfile) {
 
    data.dump();
 
-   return(data);
+   return data;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -639,7 +639,7 @@ MercatorData get_mercator_data_v2(NcFile * ncfile) {
 
    data.dump();
 
-   return(data);
+   return data;
 
 }
 
@@ -663,7 +663,7 @@ GaussianData get_gaussian_data (NcFile * ncfile) {
 
    data.dump();
 
-   return(data);
+   return data;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -681,7 +681,7 @@ SemiLatLonData get_semilatlon_data (NcFile * ncfile) {
 
    data.dump();
 
-   return(data);
+   return data;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

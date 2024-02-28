@@ -805,7 +805,7 @@ bool get_global_att(const NcFile *nc, const ConcatString& att_name,
       if (status) att_val = tmp_att_val;
    }
 
-   return (status);
+   return status;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1057,7 +1057,7 @@ ConcatString* get_string_val(NcFile * nc, const char * var_name, const int index
                              const int len, ConcatString &tmp_cs) {
    NcVar var = get_var(nc, var_name);
 
-   return (get_string_val(&var, index, len, tmp_cs));
+   return get_string_val(&var, index, len, tmp_cs);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1101,7 +1101,7 @@ ConcatString* get_string_val(NcVar *var, const int index,
    //
    tmp_cs = tmp_str;
 
-   return (&tmp_cs);
+   return &tmp_cs;
 }
 
 ////////////////////////////////////////////////////////////////////////

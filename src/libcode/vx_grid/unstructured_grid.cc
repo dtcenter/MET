@@ -165,7 +165,7 @@ double UnstructuredGrid::calc_area(int x, int y) const {
 
    double area = 0.;
 
-   return ( area );
+   return area;
 
 }
 

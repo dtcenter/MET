@@ -152,7 +152,7 @@ bool MetUGridDataFile::open_metadata(const char * _filename) {
    (*Dest_Grid) = (*Raw_Grid);
    //Dest_Grid->set(*_file->grid.info().us);
 
-   return(true);
+   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -417,7 +417,7 @@ LongArray MetUGridDataFile::collect_time_offsets(VarInfo &vinfo) {
       mlog << Warning << "\n" << method_name
            << "can't find NetCDF variable \"" << vinfo_nc->req_name()
            << "\" in file \"" << Filename << "\".\n\n";
-      return(time_offsets);
+      return time_offsets;
    }
 
    int time_dim_slot = info->t_slot;
@@ -426,7 +426,7 @@ LongArray MetUGridDataFile::collect_time_offsets(VarInfo &vinfo) {
       // The time dimension does not exist at the variable and the time
       // variable exists. Stop time slicing and set the time offset to 0.
       time_offsets.add(0);
-      return(time_offsets);
+      return time_offsets;
    }
 
    double time_lower = bad_data_double;
@@ -604,7 +604,7 @@ LongArray MetUGridDataFile::collect_time_offsets(VarInfo &vinfo) {
       exit(1);
    }
 
-   return(time_offsets);
+   return time_offsets;
 }
 
 
@@ -626,7 +626,7 @@ LongArray MetUGridDataFile::collect_vertical_offsets(VarInfo &vinfo) {
       mlog << Warning << "\n" << method_name
            << "can't find NetCDF variable \"" << vinfo_nc->req_name()
            << "\" in file \"" << Filename << "\".\n\n";
-      return(vertical_offsets);
+      return vertical_offsets;
    }
 
    int z_dim_slot = info->z_slot;
@@ -635,7 +635,7 @@ LongArray MetUGridDataFile::collect_vertical_offsets(VarInfo &vinfo) {
       // The vertical dimension does not exist at the variable and the vertical
       // variable exists. Stop vertical slicing and set the vertical offset to 0.
       vertical_offsets.add(0);
-      return(vertical_offsets);
+      return vertical_offsets;
    }
 
    double z_lower = bad_data_double;
@@ -815,7 +815,7 @@ LongArray MetUGridDataFile::collect_vertical_offsets(VarInfo &vinfo) {
       exit(1);
    }
 
-   return(vertical_offsets);
+   return vertical_offsets;
 }
 */
 

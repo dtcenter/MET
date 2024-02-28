@@ -183,7 +183,7 @@ else {
                                        met_pd_out, filters);
 }
 
-return ( status );
+return status;
 
 }
 
@@ -274,7 +274,7 @@ MetPointHeader *header_data = met_pd_out.get_header_data();
    //  done
    //
 
-return ( true );
+return true;
 
 }
 
@@ -428,7 +428,7 @@ bool process_point_data_list(PyObject *python_point_data, MetPointDataPython &me
    //  done
    //
 
-   return ( true );
+   return true;
 
 }
 
@@ -474,7 +474,7 @@ if ( PyErr_Occurred() )  {
    mlog << Warning << "\n" << method_name
         << "an error occurred initializing python\n\n";
 
-   return ( false );
+   return false;
 
 }
 
@@ -602,7 +602,7 @@ if ( PyErr_Occurred() )  {
    mlog << Warning << "\n" << method_name
         << "an error occurred initializing python\n\n";
 
-   return ( false );
+   return false;
 
 }
 
@@ -701,7 +701,7 @@ if ( PyErr_Occurred() )  {
         << "an error occurred importing module "
         << '\"' << path << "\"\n\n";
 
-   return ( false );
+   return false;
 
 }
 
@@ -710,7 +710,7 @@ if ( ! module_obj )  {
    mlog << Warning << "\n" << method_name
         << "error running python script\n\n";
 
-   return ( false );
+   return false;
 
 }
 
@@ -742,7 +742,7 @@ remove_temp_file(tmp_nc_path);
    //  done
    //
 
-return ( true );
+return true;
 
 }
 

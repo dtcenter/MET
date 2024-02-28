@@ -77,11 +77,11 @@ ClistEntry & ClistEntry::operator=(const ClistEntry & e)
 
 {
 
-if ( this == &e )  return ( * this );
+if ( this == &e )  return *this;
 
 assign(e);
 
-return ( * this );
+return *this;
 
 }
 
@@ -245,11 +245,11 @@ ColorList & ColorList::operator=(const ColorList & c)
 
 {
 
-if ( this == &c )  return ( * this );
+if ( this == &c )  return *this;
 
 assign(c);
 
-return ( * this );
+return *this;
 
 }
 
@@ -412,7 +412,7 @@ for (j=0; j<Nelements; ++j)  {
 
       index = j;
 
-      return ( 1 );
+      return 1;
 
    }
 
@@ -421,7 +421,7 @@ for (j=0; j<Nelements; ++j)  {
 
 
 
-return ( 0 );
+return 0;
 
 }
 
@@ -476,7 +476,7 @@ if ( (n < 0) || (n >= Nelements) )  {
 
 }
 
-return ( e[n] );
+return e[n];
 
 }
 

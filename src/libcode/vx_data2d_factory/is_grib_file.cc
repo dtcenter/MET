@@ -56,7 +56,7 @@ bool is_grib1_file(const char * filename)
 int version;
 bool status = check_grib(filename, version);
 
-if ( !status )  return ( false );
+if ( !status )  return false;
 
    //
    //  done
@@ -77,7 +77,7 @@ bool is_grib2_file(const char * filename)
 int version;
 bool status = check_grib(filename, version);
 
-if ( !status )  return ( false );
+if ( !status )  return false;
 
    //
    //  done
@@ -153,7 +153,7 @@ for ( i=0; i<(read_size - grib_magic_len); ++i)  {
    }
 }
 
-if( !found ) return ( false );
+if( !found ) return false;
 
    //
    //  grab version number
@@ -165,7 +165,7 @@ version = (int) (buf[i+7]);
    //  done
    //
 
-return ( true );
+return true;
 
 }
 

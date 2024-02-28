@@ -205,7 +205,7 @@ SO3::forward(V.x(), V.y(), V.z(), xx, yy, zz);
 VV.set_xyz(xx, yy, zz);
 
 
-return ( VV );
+return VV;
 
 }
 */
@@ -225,7 +225,7 @@ SO3::reverse(V.x(), V.y(), V.z(), xx, yy, zz);
 VV.set_xyz(xx, yy, zz);
 
 
-return ( VV );
+return VV;
 
 }
 */

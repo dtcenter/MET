@@ -160,7 +160,7 @@ PyObject * var = 0;
 
 var = PyDict_GetItemString (Dict, name);
 
-return ( var );
+return var;
 
 }
 
@@ -195,7 +195,7 @@ if ( ! PyList_Check(var) )  {
 
 }
 
-return ( var );
+return var;
 
 }
 

@@ -67,11 +67,11 @@ VarInfoNcCF::VarInfoNcCF(const VarInfoNcCF &f) {
 
 VarInfoNcCF & VarInfoNcCF::operator=(const VarInfoNcCF &f) {
 
-   if ( this == &f )  return ( *this );
+   if ( this == &f )  return *this;
 
    assign(f);
 
-   return ( *this );
+   return *this;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -368,9 +368,9 @@ bool VarInfoNcCF::is_precipitation() const {
    // Check to see if the VarInfo name begins with the GRIB code abbreviation
    // for any precipitation variables.
    //
-   return(has_prefix(grib_precipitation_abbr,
+   return has_prefix(grib_precipitation_abbr,
                      n_grib_precipitation_abbr,
-                     Name.c_str()));
+                     Name.c_str());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -388,9 +388,9 @@ bool VarInfoNcCF::is_specific_humidity() const {
    // Check to see if the VarInfo name begins with the GRIB code abbreviation
    // for any specific humidity variables.
    //
-   return(has_prefix(grib_specific_humidity_abbr,
+   return has_prefix(grib_specific_humidity_abbr,
                      n_grib_specific_humidity_abbr,
-                     Name.c_str()));
+                     Name.c_str());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -404,7 +404,7 @@ bool VarInfoNcCF::is_u_wind() const {
       return(SetAttrIsUWind != 0);
    }
 
-   return(is_grib_code_abbr_match(Name, ugrd_grib_code));
+   return is_grib_code_abbr_match(Name, ugrd_grib_code);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -418,7 +418,7 @@ bool VarInfoNcCF::is_v_wind() const {
       return(SetAttrIsVWind != 0);
    }
 
-   return(is_grib_code_abbr_match(Name, vgrd_grib_code));
+   return is_grib_code_abbr_match(Name, vgrd_grib_code);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -432,7 +432,7 @@ bool VarInfoNcCF::is_wind_speed() const {
       return(SetAttrIsWindSpeed != 0);
    }
 
-   return(is_grib_code_abbr_match(Name, wind_grib_code));
+   return is_grib_code_abbr_match(Name, wind_grib_code);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -446,7 +446,7 @@ bool VarInfoNcCF::is_wind_direction() const {
       return(SetAttrIsWindDirection != 0);
    }
 
-   return(is_grib_code_abbr_match(Name, wdir_grib_code));
+   return is_grib_code_abbr_match(Name, wdir_grib_code);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -459,7 +459,7 @@ bool is_grib_code_abbr_match(const ConcatString &str, int grib_code) {
    ConcatString abbr_str;
    bool match = false;
 
-   if(str.empty()) return(false);
+   if(str.empty()) return false;
 
    //
    // Use the default GRIB1 parameter table version number 2
@@ -472,7 +472,7 @@ bool is_grib_code_abbr_match(const ConcatString &str, int grib_code) {
    //
    if(strncasecmp(str.c_str(), abbr_str.c_str(), abbr_str.length()) == 0) match = true;
 
-   return(match);
+   return match;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

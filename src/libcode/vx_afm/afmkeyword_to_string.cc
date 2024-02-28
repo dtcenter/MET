@@ -102,7 +102,7 @@ switch ( t )  {
 }   //  switch
 
 
-return ( ConcatString (s) );
+return ConcatString(s);
 
 }
 

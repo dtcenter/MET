@@ -143,7 +143,7 @@ bool is_prelim_match( VarInfoGrib & vinfo, const GribRecord & g)
    if ( vinfo_ptv       != ptv       ||
         vinfo_center    != center    ||
         vinfo_subcenter != subcenter ||
-        !isEnsMatch )  return ( false );
+        !isEnsMatch )  return false;
 
    // if p_flag is 'on' (probability field) and the request name is set,
    // get the real name of the field from the begining of a request name
@@ -168,7 +168,7 @@ bool is_prelim_match( VarInfoGrib & vinfo, const GribRecord & g)
          if( !GribTable.lookup_grib1(field_name.c_str(), default_grib1_ptv, code_for_lookup, default_grib1_center, default_grib1_subcenter, tab, tab_match) )
          {
             //  if the lookup still fails, then it's not a match
-            return ( false );
+            return false;
          }
 
       }
@@ -217,7 +217,7 @@ if ( !is_bad_data(vinfo.level().type_num()) &&
         << ") does not match the current level type ("
         << (int) pds->type << ").\n";
 
-   return ( false );
+   return false;
 }
 
    //
@@ -235,8 +235,8 @@ upper = nint ( vinfo.level().upper() );
 if ( vinfo.level().type() == LevelType_RecNumber )  {
 
   if ( lower == g.rec_num &&
-       vinfo.code() == g.gribcode() )  return ( true );
-  else                                 return ( false );
+       vinfo.code() == g.gribcode() )  return true;
+  else                                 return false;
 
 }
 
@@ -244,7 +244,7 @@ if ( vinfo.level().type() == LevelType_RecNumber )  {
    //  gribcode
    //
 
-if ( vinfo.code() != g.gribcode() )  return ( false );
+if ( vinfo.code() != g.gribcode() )  return false;
 
    //
    //  parse timing info from pds
@@ -258,7 +258,7 @@ read_pds(g, bms_flag, init_ut, valid_ut, accum);
 
 ut = vinfo.init();
 
-if ( ut != 0 && ut != init_ut )  return ( false );
+if ( ut != 0 && ut != init_ut )  return false;
 
    //
    //  valid time
@@ -266,7 +266,7 @@ if ( ut != 0 && ut != init_ut )  return ( false );
 
 ut = vinfo.valid();
 
-if ( ut != 0 && ut != valid_ut )  return ( false );
+if ( ut != 0 && ut != valid_ut )  return false;
 
    //
    //  lead time
@@ -274,7 +274,7 @@ if ( ut != 0 && ut != valid_ut )  return ( false );
 
 k = vinfo.lead();
 
-if ( k >= 0 && k != ( valid_ut - init_ut) )  return ( false );
+if ( k >= 0 && k != ( valid_ut - init_ut) )  return false;
 
    //
    //  accumulation interval
@@ -286,20 +286,20 @@ if ( vinfo.level().type() == LevelType_Accum ) {
       //  time range indicator of 4 for accumulation
       //
 
-   if ( pds->tri != 4 )  return ( false );
+   if ( pds->tri != 4 )  return false;
 
       //
       //  check that the accumulation seconds match the limits
       //
 
-   if ( lower != accum || upper != accum )  return ( false );
+   if ( lower != accum || upper != accum )  return false;
 }
 
    //
    //  time range indicator
    //
 
-if ( !is_bad_data(vinfo.tri()) && pds->tri != vinfo.tri() )  return ( false );
+if ( !is_bad_data(vinfo.tri()) && pds->tri != vinfo.tri() )  return false;
 
    //
    //  probability info
@@ -320,21 +320,21 @@ if ( vinfo.p_flag() &&
       //  probabilistic gribcode
       //
 
-   if ( vinfo.p_code() != p_code )  return ( false );
+   if ( vinfo.p_code() != p_code )  return false;
 
       //
       //  lower probabiility threshold
       //
 
    if ( !is_bad_data ( p_thresh_lo ) &&
-        !is_eq ( vinfo.p_thresh_lo().get_value(), p_thresh_lo, loose_tol ) )  return ( false );
+        !is_eq ( vinfo.p_thresh_lo().get_value(), p_thresh_lo, loose_tol ) )  return false;
 
       //
       //  upper probability threshold
       //
 
    if ( !is_bad_data ( p_thresh_hi ) &&
-        !is_eq ( vinfo.p_thresh_hi().get_value(), p_thresh_hi, loose_tol ) )  return ( false );
+        !is_eq ( vinfo.p_thresh_hi().get_value(), p_thresh_hi, loose_tol ) )  return false;
 
 }
 
@@ -345,7 +345,7 @@ if ( vinfo.p_flag() &&
 for ( j=0; j<n_grib_level_list; ++j ) {
    if ( pds->type == grib_level_list[j].level ) break;
 }
-if ( j == n_grib_level_list )  return ( false );
+if ( j == n_grib_level_list )  return false;
 
    //
    //  check that the record level type is consistent with the
@@ -353,16 +353,16 @@ if ( j == n_grib_level_list )  return ( false );
    //
 
 if ( vinfo.level().type() == LevelType_Pres &&
-     grib_level_list[j].type != 3 )  return ( false );
+     grib_level_list[j].type != 3 )  return false;
 
 if ( vinfo.level().type() == LevelType_Vert &&
-     grib_level_list[j].type != 2 )  return ( false );
+     grib_level_list[j].type != 2 )  return false;
 
    //
    //  done
    //
 
-return ( true );
+return true;
 
 }
 
@@ -378,7 +378,7 @@ int lower, upper, grib_lower, grib_upper, grib_type_num;
    //  check common logic
    //
 
-if ( !is_prelim_match(vinfo, g) ) return ( false );
+if ( !is_prelim_match(vinfo, g) ) return false;
 
    //
    //  store requested lower and upper limits
@@ -406,7 +406,7 @@ if ( !is_bad_data(vinfo.level().type_num()) &&
         << ") does not match the current level type ("
         << grib_type_num << ").\n";
 
-   return ( false );
+   return false;
 
 }
 
@@ -425,7 +425,7 @@ if ( ( vinfo.level().type() != LevelType_Accum     ) &&
         << ") do not match the current level values "
         << "(" << grib_lower << " and " << grib_upper << ").\n";
 
-   return ( false );
+   return false;
 
 }
 
@@ -433,7 +433,7 @@ if ( ( vinfo.level().type() != LevelType_Accum     ) &&
    //  done
    //
 
-return ( true );
+return true;
 
 }
 
@@ -451,7 +451,7 @@ int lower, upper, grib_lower, grib_upper, grib_type_num;
    //  check common logic
    //
 
-if ( !is_prelim_match(vinfo, g) ) return ( false );
+if ( !is_prelim_match(vinfo, g) ) return false;
 
    //
    //  store requested lower and upper limits
@@ -479,7 +479,7 @@ if ( !is_bad_data(vinfo.level().type_num()) &&
         << ") does not match the current level type ("
         << grib_type_num << ").\n";
 
-   return ( false );
+   return false;
 }
    //
    //  for non-accumulation intervals and specific record number,
@@ -496,14 +496,14 @@ if ( ( vinfo.level().type() != LevelType_Accum     ) &&
         << ") do not fall within the current range of level values "
         << "(" << grib_lower << " and " << grib_upper << ").\n";
 
-   return ( false );
+   return false;
 }
 
    //
    //  done
    //
 
-return ( true );
+return true;
 
 }
 
@@ -565,7 +565,7 @@ plane.set_accum ( accum );
    //  done
    //
 
-return ( true );
+return true;
 
 }
 

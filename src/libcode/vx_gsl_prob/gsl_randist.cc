@@ -250,7 +250,7 @@ double ran_draw(const gsl_rng *r, DistType t, double p1, double p2) {
 
    }
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -299,7 +299,7 @@ double dist_var(DistType t, double p1, double p2) {
          break;
    }
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -320,7 +320,7 @@ int get_seed() {
    u[1] = u[2];
    u[2] = t;
 
-   return(curr_time);
+   return curr_time;
 }
 
 ////////////////////////////////////////////////////////////////////////
