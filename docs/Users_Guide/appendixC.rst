@@ -976,7 +976,7 @@ RPS
 
 Called "RPS" in RPS output :numref:`table_ES_header_info_es_out_ECNT`
 
-While the above probabilistic verification measures utilize dichotomous observations, the Ranked Probability Score (RPS, :ref:`Epstein, 1969 <Epstein-1969>`, :ref:`Murphy, 1969 <Murphy-1969>`) is the only probabilistic verification measure for discrete multiple-category events available in MET. It is assumed that the categories are ordinal as nominal categorical variables can be collapsed into sequences of binary predictands, which can in turn be evaluated with the above measures for dichotomous variables (:ref:`Wilks, 2011 <Wilks-2011>`). The RPS is the multi-category extension of the Brier score (:ref:`Tödter and Ahrens, 2012 <Todter-2012>`), and is a proper score (:ref:`Mason, 2008 <Mason-2008>`).
+While the above probabilistic verification measures utilize dichotomous observations, the Ranked Probability Score (RPS, :ref:`Epstein, 1969 <Epstein-1969>`, :ref:`Murphy, 1969 <Murphy-1969>`) is the only probabilistic verification measure for discrete multiple-category events available in MET. It is assumed that the categories are ordinal as nominal categorical variables can be collapsed into sequences of binary predictands, which can in turn be evaluated with the above measures for dichotomous variables (:ref:`Wilks, 2011 <Wilks-2011>`). The RPS is the multi-category extension of the Brier score (:ref:`Tödter and Ahrens, 2012 <Tödter-2012>`), and is a proper score (:ref:`Mason, 2008 <Mason-2008>`).
 
 Let :math:`\text{J}` be the number of categories, then both the forecast, :math:`\text{f} = (f_1,…,f_J)`, and observation, :math:`\text{o} = (o_1,…,o_J)`, are length-:math:`\text{J}` vectors, where the components of :math:`\text{f}` include the probabilities forecast for each category :math:`\text{1,…,J}` and :math:`\text{o}` contains 1 in the category that is realized and zero everywhere else. The cumulative forecasts, :math:`F_m`, and observations, :math:`O_m`, are defined to be:
 
@@ -987,7 +987,7 @@ To clarify, :math:`F_1 = f_1` is the first component of :math:`F_m`, :math:`F_2 
 
 .. math:: \text{RPS} = \sum_{m=1}^J (F_m - O_m)^2 = \sum_{m=1}^J BS_m,
 
-where :math:`BS_m` is the Brier score for the m-th category (:ref:`Tödter and Ahrens, 2012 <Todter-2012>`). Subsequently, the RPS lends itself to a decomposition into reliability, resolution and uncertainty components, noting that each component is aggregated over the different categories; these are written to the columns named "RPS_REL", "RPS_RES" and "RPS_UNC" in RPS output :numref:`table_ES_header_info_es_out_ECNT`.
+where :math:`BS_m` is the Brier score for the m-th category (:ref:`Tödter and Ahrens, 2012 <Tödter-2012>`). Subsequently, the RPS lends itself to a decomposition into reliability, resolution and uncertainty components, noting that each component is aggregated over the different categories; these are written to the columns named "RPS_REL", "RPS_RES" and "RPS_UNC" in RPS output :numref:`table_ES_header_info_es_out_ECNT`.
 
 CRPS
 ----
@@ -1112,19 +1112,27 @@ Called "IGN_CONV_OERR" and "IGN_CORR_OERR" in ECNT output :numref:`table_ES_head
 
 One approach that is used to take observation error into account in a summary measure is to add error to the forecast by a convolution with the observation model (e.g., :ref:`Anderson, 1996 <Andersen-1996>`; :ref:`Hamill, 2001 <Hamill-2001>`; :ref:`Saetra et. al., 2004 <Saetra-2004>`; :ref:`Bröcker and Smith, 2007 <Bröcker-2007>`; :ref:`Candille et al., 2007 <Candille-2007>`; :ref:`Candille and Talagrand, 2008 <Candille-2008>`; :ref:`Röpnack et al., 2013 <Röpnack-2013>`). Specifically, suppose :math:`y=x+w`, where :math:`y` is the observed value, :math:`x` is the true value, and :math:`w` is the error. Then, if :math:`f` is the density forecast for :math:`x` and :math:`\nu` is the observation model, then the implied density forecast for :math:`y` is given by the convolution:
 
-.. math:: (f*\nu)(y)=\int\nu(y|x)f(x)dx
+.. math:: (f*\nu)(y) = \int\nu(y|x)f(x)dx
 
 :ref:`Ferro, 2017 <Ferro-2017>` gives the error-convolved version of the ignorance scoring rule (referred to therein as the error-convolved logarithmic scoring rule), which is proper under the model where :math:`w\sim N(0,c^2)`) when the forecast for :math:`x` is :math:`N(\mu,\sigma^2)` with density function :math:`f`, by
 
-.. math:: \text{IGN_CONV_OERR} =
-          s(f,y)=\frac{1}{2}\log(\sigma^2+c^2) +
-          \frac{(y-\mu)^2}{2(\sigma^2+c^2)}
+.. only:: latex
+
+  .. math:: \text{IGN\_CONV\_OERR} = s(f,y) = \frac{1}{2}\log(\sigma^2 + c^2) + \frac{{y - \mu}^2}{2{\sigma^2 + c^2}}
+
+.. only:: html
+
+  .. math:: \text{IGN_CONV_OERR} = s(f,y) = \frac{1}{2}\log(\sigma^2 + c^2) + \frac{{y - \mu}^2}{2{\sigma^2 + c^2}}
 
 Another approach to incorporation of observation uncertainty into a measure is the error-correction approach. The approach merely ensures that the scoring rule, :math:`s`, is unbiased for a scoring rule :math:`s_0` if they have the same expected value. :ref:`Ferro, 2017 <Ferro-2017>` gives the error-corrected ignorance scoring rule (which is also proposer when :math:`w\sim N(0,c^2)`) as
 
-.. math:: \text{IGN_CORR_OERR} =
-          s(f,y) = \log\sigma +
-          \frac{(y-\mu)^2-c^2}{2\sigma^2}
+.. only:: latex
+
+  .. math:: \text{IGN\_CORR\_OERR} = s(f,y) = \log\sigma + \frac{{y - \mu}^2 - c^2}{2\sigma^2}
+
+.. only:: html
+
+  .. math:: \text{IGN_CORR_OERR} = s(f,y) = \log\sigma + \frac{{y - \mu}^2 - c^2}{2\sigma^2}
 
 The expected score for the error-convolved ignorance scoring rule typically differs from the expected score that would be achieved if there were no observation error. The error-corrected score, on the other hand, has the same expectation.
 

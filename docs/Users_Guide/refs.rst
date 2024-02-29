@@ -21,12 +21,11 @@ References
 .. _Andersen-1996:
 
 | Anderson JL., 1996: A method for producing and evaluating probabilistic forecasts
-|   from ensemble model integrations. *J. Clim.* 9: 1518–1530.
+|   from ensemble model integrations. *J. Clim.* 9: 1518-1530.
 |   doi: `https://doi.org/10.1175/1520-0442(1996)009<1518:AMFPAE>2.0.CO;2 <https://doi.org/10.1175/1520-0442(1996)009\<1518:AMFPAE\>2.0.CO;2>`_
 |
 
 .. _Barker-1991:
-
 
 | Barker, T. W., 1991: The relationship between spread and forecast error in
 |   extended-range forecasts. *Journal of Climate*, 4, 733-742.
@@ -37,14 +36,14 @@ References
 | Bradley, A.A., S.S. Schwartz, and T. Hashino, 2008: Sampling Uncertainty
 |   and Confidence Intervals for the Brier Score and Brier Skill Score.
 |   *Weather and Forecasting*, 23, 992-1006.
-| 
+|
 
 .. _Brill-2009:
 
 | Brill, K. F., and F. Mesinger, 2009: Applying a general analytic method
 |   for assessing bias sensitivity to bias-adjusted threat and equitable
 |   threat scores. *Weather and Forecasting*, 24, 1748-1754.
-| 
+|
 
 .. _Brown-2007:
 
@@ -60,7 +59,7 @@ References
 .. _Bröcker-2007:
 
 | Bröcker J, Smith LA., 2007: Scoring probabilistic forecasts: The importance
-|   of being proper. *Weather Forecasting*, 22, 382–388.
+|   of being proper. *Weather Forecasting*, 22, 382-388.
 |   doi: https://doi.org/10.1175/WAF966.1
 |
 
@@ -69,13 +68,13 @@ References
 | Buizza, R., 1997: Potential forecast skill of ensemble prediction and spread
 |   and skill distributions of the ECMWF ensemble prediction system. *Monthly*
 |   *Weather Review*, 125, 99-119.
-| 
+|
 
 .. _Bullock-2016:
 
 | Bullock, R., T. Fowler, and B. Brown, 2016: Method for Object-Based
 |   Diagnostic Evaluation. *NCAR Technical Note* NCAR/TN-532+STR, 66 pp.
-| 
+|
 
 .. _Candille-2007:
 
@@ -90,14 +89,14 @@ References
 | Candille, G., and O. Talagrand, 2008: Impact of observational error on the
 |   validation of ensemble prediction systems. *Quarterly Journal of the Royal*
 |   *Meteorological Society* 134: 959-971.
-| 
+|
 
 .. _Casati-2004:
 
 | Casati, B., G. Ross, and D. Stephenson, 2004: A new intensity-scale approach
 |   for the verification of spatial precipitation forecasts. *Meteorological*
 |   *Applications* 11, 141-154.
-| 
+|
 
 .. _Davis-2006:
 
@@ -109,19 +108,19 @@ References
 | Davis, C.A., B.G. Brown, and R.G. Bullock, 2006b: Object-based verification
 |   of precipitation forecasts, Part II: Application to convective rain systems.
 |   *Monthly Weather Review*, 134, 1785-1795.
-| 
+|
 
 .. _Dawid-1984:
 
 | Dawid, A.P., 1984: Statistical theory: The prequential approach. *Journal of*
 |   *the Royal Statistical Society* A147, 278-292.
-| 
+|
 
 .. _Ebert-2008:
 
 | Ebert, E.E., 2008: Fuzzy verification of high-resolution gridded forecasts:
 |   a review and proposed framework. *Meteorological Applications*, 15, 51-64.
-| 
+|
 
 .. _Eckel-2012:
 
@@ -146,7 +145,7 @@ References
 .. _Ferro-2017:
 
 | Ferro C. A. T., 2017: Measuring forecast performance in the presence of observation error.
-|   *Q. J. R. Meteorol. Soc.*, 143 (708), 2665−2676.
+|   *Q. J. R. Meteorol. Soc.*, 143 (708), 2665-2676.
 |   doi: https://doi.org/10.1002/qj.3115
 |
 
@@ -195,7 +194,7 @@ References
 |   *Minimum CRPS Estimation*. Technical Report no. 449, Department of
 |   Statistics, University of Washington. Available at
 |   http://www.stat.washington.edu/www/research/reports/
-| 
+|
 
 .. _Haiden-2012:
 
@@ -209,33 +208,33 @@ References
 
 | Hamill, T. M., 2001: Interpretation of rank histograms for verifying ensemble
 |   forecasts. *Monthly Weather Review*, 129, 550-560.
-| 
+|
 
 .. _Hersbach-2000:
 
 | Hersbach, H., 2000: Decomposition of the Continuous Ranked Probability Score
 | for Ensemble Prediction Systems. *Weather and Forecasting*, 15, 559-570.
-| 
+|
 
 .. _Jolliffe-2012:
 
 | Jolliffe, I.T., and D.B. Stephenson, 2012: *Forecast verification. A*
 |   *practitioner's guide in atmospheric science.* Wiley and Sons Ltd, 240 pp.
-| 
+|
 
 .. _Knaff-2003:
 
 | Knaff, J.A., M. DeMaria, C.R. Sampson, and J.M. Gross, 2003: Statistical,
 |   Five-Day Tropical Cyclone Intensity Forecasts Derived from Climatology
 |   and Persistence. *Weather and Forecasting*, Vol. 18 Issue 2, p. 80-92.
-| 
+|
 
 .. _Mason-2004:
 
 | Mason, S. J., 2004: On Using "Climatology" as a Reference Strategy
 |   in the Brier and Ranked Probability Skill Scores. *Monthly Weather Review*,
 |   132, 1891-1895.
-| 
+|
 
 .. _Mason-2008:
 
@@ -243,7 +242,6 @@ References
 |   *Meteor. Appl.*, 15, 31-40.
 |   doi: https://doi.org/10.1002/met.51
 |
-
 
 .. _Mittermaier-2014:
 
@@ -255,7 +253,7 @@ References
 
 | Mood, A. M., F. A. Graybill and D. C. Boes, 1974: *Introduction to the*
 |   *Theory of Statistics*, McGraw-Hill, 299-338.
-| 
+|
 
 .. _Murphy-1969:
 
@@ -268,7 +266,7 @@ References
 
 | Murphy, A.H., and R.L. Winkler, 1987: A general framework for forecast
 |   verification. *Monthly Weather Review*, 115, 1330-1338.
-| 
+|
 
 .. _North-2022:
 
@@ -290,7 +288,7 @@ References
 | Roberts, N.M., and H.W. Lean, 2008: Scale-selective verification of rainfall
 |   accumulations from high-resolution forecasts of convective events.
 |   *Monthly Weather Review*, 136, 78-97.
-| 
+|
 
 .. _Rodwell-2010:
 
@@ -326,7 +324,7 @@ References
 | Santos C. and A. Ghelli, 2012: Observational probability method to assess
 |   ensemble precipitation forecasts. *Quarterly Journal of the Royal*
 |   *Meteorological Society* 138: 209-221.
-| 
+|
 
 .. _Schwartz-2017:
 
@@ -339,16 +337,16 @@ References
 
 | Stephenson, D.B., 2000: Use of the "Odds Ratio" for diagnosing
 |   forecast skill. *Weather and Forecasting*, 15, 221-232.
-| 
+|
 
 .. _Stephenson-2008:
 
 | Stephenson, D.B., B. Casati, C.A.T. Ferro, and C.A. Wilson, 2008: The extreme
 |   dependency score: A non-vanishing measure for forecasts of rare events.
 |   *Meteorological Applications* 15, 41-50.
-| 
+|
 
-.. _Todter-2012:
+.. _Tödter-2012:
 
 | Tödter, J. and B. Ahrens, 2012: Generalization of the Ignorance Score:
 |   Continuous ranked version and its decomposition. *Monthly Weather Review*,
@@ -361,7 +359,7 @@ References
 | Weniger, M., F. Kapp, and P. Friederichs, 2016: Spatial Verification Using
 |   Wavelet Transforms: A Review. *Quarterly Journal of the Royal*
 |   *Meteorological Society*, 143, 120-136.
-| 
+|
 
 .. _Wilks-2010:
 
@@ -369,10 +367,10 @@ References
 |   score under serial dependence. *Quarterly Journal of the Royal*
 |   *Meteorological Society*, 136, 2109-2118.
 |   doi: https://doi.org/10.1002/qj.709
-| 
+|
 
 .. _Wilks-2011:
 
 | Wilks, D., 2011: *Statistical methods in the atmospheric sciences.*
 |   Elsevier, San Diego.
-| 
+|
