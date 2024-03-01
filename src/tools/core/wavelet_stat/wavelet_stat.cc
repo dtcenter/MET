@@ -43,7 +43,6 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
@@ -59,7 +58,6 @@ using namespace std;
 #include <unistd.h>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "wavelet_stat.h"
 
@@ -68,6 +66,10 @@ using namespace netCDF;
 #include "vx_regrid.h"
 #include "vx_log.h"
 #include "vx_plot_util.h"
+
+using namespace std;
+using namespace netCDF;
+
 
 ////////////////////////////////////////////////////////////////////////
 

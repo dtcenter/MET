@@ -10,8 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <fstream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -23,6 +21,8 @@ using namespace std;
 #include "vx_util.h"
 
 #include "insitu_nc_file.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////

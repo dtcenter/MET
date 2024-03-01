@@ -18,8 +18,6 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <cstdio>
 #include <iostream>
 #include <stdlib.h>
@@ -31,6 +29,8 @@ using namespace std;
 
 #include "skill_score_index_job.h"
 #include "parse_stat_line.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 //

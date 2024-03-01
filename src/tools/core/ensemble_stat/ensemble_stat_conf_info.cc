@@ -8,8 +8,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <dirent.h>
 #include <iostream>
 #include <unistd.h>
@@ -26,6 +24,8 @@ using namespace std;
 #include "vx_log.h"
 
 #include "GridTemplate.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 //

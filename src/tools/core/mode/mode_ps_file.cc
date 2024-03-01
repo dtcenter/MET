@@ -10,8 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -19,6 +17,8 @@ using namespace std;
 
 #include "mode_ps_file.h"
 #include "vx_plot_util.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////

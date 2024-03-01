@@ -10,8 +10,6 @@
 ///////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
@@ -31,6 +29,12 @@ using namespace std;
 #ifdef WITH_PYTHON
 #include "global_python.h"
 #endif
+
+using namespace std;
+
+
+///////////////////////////////////////////////////////////////////////
+
 
 extern const char * const program_name;
 

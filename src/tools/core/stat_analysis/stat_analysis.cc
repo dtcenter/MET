@@ -46,8 +46,6 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <cstdio>
 #include <dirent.h>
 #include <iostream>
@@ -68,6 +66,8 @@ using namespace std;
 #ifdef WITH_PYTHON
 #include "python_line.h"
 #endif
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 

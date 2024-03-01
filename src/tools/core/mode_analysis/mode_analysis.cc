@@ -33,7 +33,6 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
 
 #include <fstream>
 #include <dirent.h>
@@ -49,6 +48,8 @@ using namespace std;
 #include "vx_analysis_util.h"
 
 #include "config_to_att.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////

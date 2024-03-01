@@ -10,8 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -21,7 +19,6 @@ using namespace std;
 #include <string>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "vx_math.h"
 #include "vx_cal.h"
@@ -29,6 +26,9 @@ using namespace netCDF;
 
 #include "insitu_nc_file.h"
 #include "nc_utils.h"
+
+using namespace std;
+using namespace netCDF;
 
 
 ////////////////////////////////////////////////////////////////////////

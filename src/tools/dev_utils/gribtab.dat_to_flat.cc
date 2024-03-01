@@ -10,8 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <fstream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -21,6 +19,8 @@ using namespace std;
 #include "main.h"
 #include "vx_log.h"
 #include "vx_util.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
