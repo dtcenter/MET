@@ -10,10 +10,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <netcdf>
-using namespace netCDF;
 
 #include <iostream>
 #include <unistd.h>
@@ -25,6 +22,10 @@ using namespace netCDF;
 #include "vx_math.h"
 #include "vx_log.h"
 #include "vx_cal.h"
+
+using namespace std;
+using namespace netCDF;
+
 
 ////////////////////////////////////////////////////////////////////////
 

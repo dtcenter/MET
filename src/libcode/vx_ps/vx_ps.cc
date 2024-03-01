@@ -11,9 +11,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
-
 #include <iostream>
 #include <fstream>
 #include <unistd.h>
@@ -35,6 +32,8 @@ using namespace std;
 #include "flate_filter.h"
 #include "ascii85_filter.h"
 #include "psout_filter.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////

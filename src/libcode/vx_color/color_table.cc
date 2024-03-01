@@ -11,9 +11,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
-
 #include <iostream>
 #include <fstream>
 #include <unistd.h>
@@ -26,6 +23,9 @@ using namespace std;
 #include "color.h"
 #include "vx_log.h"
 #include "vx_math.h"
+
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////

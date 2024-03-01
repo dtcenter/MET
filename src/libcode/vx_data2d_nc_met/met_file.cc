@@ -10,8 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -21,7 +19,6 @@ using namespace std;
 #include <time.h>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "vx_math.h"
 #include "vx_cal.h"
@@ -30,6 +27,9 @@ using namespace netCDF;
 #include "met_file.h"
 #include "get_met_grid.h"
 #include "nc_utils.h"
+
+using namespace std;
+using namespace netCDF;
 
 
 ////////////////////////////////////////////////////////////////////////

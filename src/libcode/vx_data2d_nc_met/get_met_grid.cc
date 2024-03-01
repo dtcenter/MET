@@ -8,7 +8,6 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 
-using namespace std;
 
 #include <iostream>
 #include <unistd.h>
@@ -17,12 +16,15 @@ using namespace std;
 #include <cmath>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "get_met_grid.h"
 
 #include "nc_utils.h"
 #include "vx_log.h"
+
+using namespace std;
+using namespace netCDF;
+
 
 ///////////////////////////////////////////////////////////////////////////////
 

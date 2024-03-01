@@ -10,8 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -21,12 +19,15 @@ using namespace std;
 #include <time.h>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "vx_log.h"
 #include "is_bad_data.h"
 
 #include "nc_point_obs.h"
+
+using namespace std;
+using namespace netCDF;
+
 
 ////////////////////////////////////////////////////////////////////////
 

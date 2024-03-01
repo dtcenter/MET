@@ -6,8 +6,6 @@
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
-using namespace std;
-
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <cctype>
@@ -28,6 +26,8 @@ using namespace std;
 #include "vx_util.h"
 #include "vx_log.h"
 #include "vx_data2d.h"
+
+using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////
 

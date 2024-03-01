@@ -10,9 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
-
 #include <cstdio>
 #include <iostream>
 #include <unistd.h>
@@ -26,6 +23,9 @@ using namespace std;
 
 #include "earth_rotation.h"
 #include "latlon_xyz.h"
+
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////

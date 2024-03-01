@@ -9,8 +9,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <cstdlib>
@@ -20,6 +18,8 @@ using namespace std;
 
 #include "gsl/gsl_randist.h"
 #include "is_bad_data.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 

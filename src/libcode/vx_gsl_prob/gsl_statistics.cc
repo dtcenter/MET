@@ -9,8 +9,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <cstdio>
 #include <iostream>
 #include <unistd.h>
@@ -21,6 +19,8 @@ using namespace std;
 
 #include "gsl_statistics.h"
 #include "gsl/gsl_errno.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 

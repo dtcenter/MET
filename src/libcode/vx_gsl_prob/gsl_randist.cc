@@ -9,8 +9,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <cstdio>
 #include <iostream>
 #include <unistd.h>
@@ -21,6 +19,8 @@ using namespace std;
 
 #include "vx_log.h"
 #include "gsl_randist.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 

@@ -10,8 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -21,6 +19,8 @@ using namespace std;
 #include "grib_utils.h"
 #include "angles.h"
 #include "is_bad_data.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////

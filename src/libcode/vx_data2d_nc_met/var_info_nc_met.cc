@@ -17,8 +17,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <map>
 #include <stdlib.h>
 #include <string.h>
@@ -31,6 +29,8 @@ using namespace std;
 #include "util_constants.h"
 #include "vx_log.h"
 #include "grib_strings.h"
+
+using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////
 
