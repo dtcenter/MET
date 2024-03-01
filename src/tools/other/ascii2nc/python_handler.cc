@@ -10,9 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
-
 #include <iostream>
 #include <stdlib.h>
 
@@ -22,6 +19,8 @@ using namespace std;
 
 #include "vx_python3_utils.h"
 #include "python_handler.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////

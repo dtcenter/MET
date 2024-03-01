@@ -10,19 +10,19 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
 #include <cmath>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "mtd_nc_output.h"
 
 #include "write_netcdf.h"
+
+using namespace std;
+using namespace netCDF;
 
 
 ////////////////////////////////////////////////////////////////////////

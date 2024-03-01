@@ -10,8 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -19,6 +17,8 @@ using namespace std;
 #include <cmath>
 
 #include "sat_utils.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////

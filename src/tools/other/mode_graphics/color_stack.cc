@@ -10,9 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -22,6 +19,8 @@ using namespace std;
 #include "vx_util.h"
 
 #include "color_stack.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////

@@ -9,19 +9,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
-static const int gray_min         = 130;   //  these values must be between 0 and 255 inclusive
-static const int gray_max         = 255;
-
-static const double h_margin      = 40.0;
-static const double v_margin      = 80.0;
-
-static const char map_filename [] = "MET_BASE/map/country_major_lakes_data";
-
-
-////////////////////////////////////////////////////////////////////////
-
 
 #include <fstream>
 #include <unistd.h>
@@ -43,6 +30,19 @@ static const char map_filename [] = "MET_BASE/map/country_major_lakes_data";
 #include "af_file.h"
 #include "af_cp_file.h"
 #include "af_pt_file.h"
+
+using namespace std;
+
+
+////////////////////////////////////////////////////////////////////////
+
+static const int gray_min         = 130;   //  these values must be between 0 and 255 inclusive
+static const int gray_max         = 255;
+
+static const double h_margin      = 40.0;
+static const double v_margin      = 80.0;
+
+static const char map_filename [] = "MET_BASE/map/country_major_lakes_data";
 
 
 ////////////////////////////////////////////////////////////////////////

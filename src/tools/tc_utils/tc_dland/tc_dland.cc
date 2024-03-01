@@ -23,7 +23,6 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
@@ -36,7 +35,6 @@ using namespace std;
 #include <unistd.h>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "main.h"
 #include "grib_classes.h"
@@ -50,6 +48,10 @@ using namespace netCDF;
 #include "nc_utils.h"
 #include "write_netcdf.h"
 #include "tc_poly.h"
+
+using namespace std;
+using namespace netCDF;
+
 
 ////////////////////////////////////////////////////////////////////////
 

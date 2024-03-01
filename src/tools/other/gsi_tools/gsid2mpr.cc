@@ -21,7 +21,6 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
 
 #include <fstream>
 #include <unistd.h>
@@ -45,6 +44,9 @@ using namespace std;
 #include "rad_record.h"
 #include "gsi_util.h"
 #include "gsid2mpr.h"
+
+using namespace std;
+
 
 ////////////////////////////////////////////////////////////////////////
 

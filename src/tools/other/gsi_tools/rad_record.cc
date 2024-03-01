@@ -11,8 +11,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -26,6 +24,8 @@ using namespace std;
 #include "rad_record.h"
 #include "rad_offsets.h"
 #include "ftto.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////

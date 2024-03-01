@@ -30,7 +30,6 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
@@ -52,6 +51,9 @@ using namespace std;
 #include "vx_render.h"
 #include "vx_plot_util.h"
 #include "nc_point_obs_in.h"
+
+using namespace std;
+
 
 ////////////////////////////////////////////////////////////////////////
 

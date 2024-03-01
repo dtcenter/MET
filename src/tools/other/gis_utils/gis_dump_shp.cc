@@ -12,7 +12,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
 
 #include <unistd.h>
 #include <sys/types.h>
@@ -32,11 +31,12 @@ using namespace std;
 #include "shapetype_to_string.h"
 
 
-
 #include "shp_file.h"
 #include "shp_poly_record.h"
 #include "shp_point_record.h"
 #include "shapetype_to_string.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////

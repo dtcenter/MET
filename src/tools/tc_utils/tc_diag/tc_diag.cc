@@ -20,7 +20,6 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
@@ -33,7 +32,6 @@ using namespace std;
 #include <unistd.h>
 
 #include <netcdf>
-using namespace netCDF;
 
 #ifdef _OPENMP
   #include "omp.h"
@@ -56,6 +54,10 @@ using namespace netCDF;
 #include "vx_math.h"
 
 #include "met_file.h"
+
+using namespace std;
+using namespace netCDF;
+
 
 ////////////////////////////////////////////////////////////////////////
 

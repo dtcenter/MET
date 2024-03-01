@@ -11,9 +11,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -23,6 +20,8 @@ using namespace std;
 #include "vx_util.h"
 
 #include "3d_att_pair_array.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
