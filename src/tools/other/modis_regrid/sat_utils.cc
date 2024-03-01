@@ -115,7 +115,7 @@ switch ( nt )  {
 
 }   //  switch
 
-return ( s );
+return s;
 
 }
 

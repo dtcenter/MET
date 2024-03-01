@@ -64,7 +64,7 @@ ConcatString get_grib_code_name(int grib_code, int ptv)
 
    ConcatString str = get_grib_code_list_str(0, grib_code, ptv);
 
-   return ( str );
+   return str;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -75,7 +75,7 @@ ConcatString get_grib_code_unit(int grib_code, int ptv)
 
    ConcatString str = get_grib_code_list_str(1, grib_code, ptv);
 
-   return ( str );
+   return str;
 
 }
 
@@ -87,7 +87,7 @@ ConcatString get_grib_code_abbr(int grib_code, int ptv)
 
    ConcatString str = get_grib_code_list_str(2, grib_code, ptv);
 
-   return ( str );
+   return str;
 
 }
 
@@ -129,7 +129,7 @@ ConcatString get_grib_level_list_str(int k, int grib_level)
 
    }   //  if
 
-   return ( str );
+   return str;
 
 }
 
@@ -141,7 +141,7 @@ ConcatString get_grib_level_name(int grib_level)
 
 ConcatString str = get_grib_level_list_str(0, grib_level);
 
-return ( str );
+return str;
 
 }
 
@@ -153,7 +153,7 @@ ConcatString get_grib_level_abbr(int grib_level)
 
 ConcatString str = get_grib_level_list_str(1, grib_level);
 
-return ( str );
+return str;
 
 }
 
@@ -187,7 +187,7 @@ ConcatString get_grib_level_str(int grib_level, unsigned char *level_info)
 
    }
 
-   return ( str );
+   return str;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -211,7 +211,7 @@ int str_to_grib_code(const char *c)
    if(is_bad_data(gc)) gc = str_to_grib_code(c, 140);
    if(is_bad_data(gc)) gc = str_to_grib_code(c, 141);
 
-   return(gc);
+   return gc;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -256,7 +256,7 @@ int str_to_grib_code(const char *c, int &pcode, double &pthresh_lo, double &pthr
    if(is_bad_data(gc)) gc = str_to_grib_code(c, pcode, pthresh_lo, pthresh_hi, 140);
    if(is_bad_data(gc)) gc = str_to_grib_code(c, pcode, pthresh_lo, pthresh_hi, 141);
 
-   return(gc);
+   return gc;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -266,7 +266,7 @@ int str_to_grib_code(const char *c, int &pcode,
    int gc = bad_data_int;
    const int buf_len = 512;
    char tmp_str[buf_len + 1];
-   char *ptr = (char *) 0, *save_ptr = (char *) 0;
+   char *ptr = (char *) nullptr, *save_ptr = (char *) nullptr;
    const char *method_name = "str_to_grib_code() -> ";
 
    // Parse out strings of the form:
@@ -298,7 +298,7 @@ int str_to_grib_code(const char *c, int &pcode,
      pthresh_lo = pthresh_hi = bad_data_double;
    }
 
-   return(gc);
+   return gc;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -308,7 +308,7 @@ int str_to_prob_info(const char *c, double &pthresh_lo, double &pthresh_hi,
    int gc = bad_data_int, i, n_lt, n_gt;
    const int buf_len = 512;
    char tmp_str[buf_len + 1];
-   char *ptr = (char *) 0, *save_ptr = (char *) 0;
+   char *ptr = (char *) nullptr, *save_ptr = (char *) nullptr;
    SingleThresh st;
    const char *method_name = "str_to_prob_info()";
 
@@ -363,7 +363,7 @@ int str_to_prob_info(const char *c, double &pthresh_lo, double &pthresh_hi,
       exit(1);
    }
 
-   return(gc);
+   return gc;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

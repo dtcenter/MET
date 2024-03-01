@@ -80,7 +80,7 @@ int n_read, bytes;
 int value;
 unsigned int I;
 unsigned long long L;
-unsigned char * b = (unsigned char *) 0;
+unsigned char * b = (unsigned char *) nullptr;
 
 
 switch ( padsize )  {
@@ -105,7 +105,7 @@ switch ( padsize )  {
 
 n_read = read(fd, b, bytes);
 
-if ( n_read == 0 )  return ( 0 );
+if ( n_read == 0 )  return 0;
 
 if ( (n_read < 0) || ((n_read > 0) && (n_read != bytes)) )  {
 
@@ -138,7 +138,7 @@ switch ( padsize )  {
    //  done
    //
 
-return ( value );
+return value;
 
 }
 

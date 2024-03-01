@@ -92,11 +92,11 @@ CgFont & CgFont::operator=(const CgFont & p)
 
 {
 
-if ( this == &p )  return ( * this );
+if ( this == &p )  return *this;
 
 assign(p);
 
-return ( * this );
+return *this;
 
 }
 
@@ -108,7 +108,7 @@ void CgFont::init_from_scratch()
 
 {
 
-afm = (Afm *) 0;
+afm = (Afm *) nullptr;
 
 face = 0;
 
@@ -147,7 +147,7 @@ ps_name.clear();
 
 orig_ps_size = scaled_ps_size = 0.0;
 
-if ( afm )  { delete afm;  afm = (Afm *) 0; }
+if ( afm )  { delete afm;  afm = (Afm *) nullptr; }
 
 ps_font_number = -1;
 
@@ -361,11 +361,11 @@ CgFontCollection & CgFontCollection::operator=(const CgFontCollection & c)
 
 {
 
-if ( this == &c )  return ( * this );
+if ( this == &c )  return *this;
 
 assign(c);
 
-return ( * this );
+return *this;
 
 }
 
@@ -563,11 +563,11 @@ int j;
 
 for (j=0; j<Nelements; ++j)  {
 
-   if ( same_font( e[j], f ) )  return ( true );
+   if ( same_font( e[j], f ) )  return true;
 
 }
 
-return ( false );
+return false;
 
 }
 
@@ -583,12 +583,12 @@ int j;
 
 for (j=0; j<Nelements; ++j)  {
 
-   if ( e[j].ps_font_number == n )  return ( & e[j] );
+   if ( e[j].ps_font_number == n )  return &e[j];
 
 }
 
 
-return ( (CgFont *) 0 );
+return (CgFont *) 0;
 
 }
 
@@ -604,12 +604,12 @@ int j;
 
 for (j=0; j<Nelements; ++j)  {
 
-   if ( e[j].ps_name == name )  return ( & e[j] );
+   if ( e[j].ps_name == name )  return &e[j];
 
 }
 
 
-return ( (CgFont *) 0 );
+return (CgFont *) 0;
 
 }
 
@@ -630,7 +630,7 @@ if ( (k < 0) || (k >= Nelements) )  {
 
 }
 
-return ( & e[k] );
+return &e[k];
 
 }
 
@@ -650,9 +650,9 @@ bool same_font(const CgFont & a, const CgFont & b)
 
 {
 
-if (  a.ps_name == b.ps_name )  return ( true );
+if (  a.ps_name == b.ps_name )  return true;
 
-return ( false );
+return false;
 
 }
 

@@ -240,7 +240,7 @@ int met_main(int argc, char * argv []) {
    //
    clean_up();
 
-   return(0);
+   return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -639,7 +639,7 @@ while((*f) >> line) {
 
 f->close();
 
-if(pldf) { delete pldf; pldf = (PyLineDataFile *) 0; }
+if(pldf) { delete pldf; pldf = (PyLineDataFile *) nullptr; }
 
 return;
 

@@ -111,11 +111,11 @@ Pgm & Pgm::operator=(const Pgm & p)
 
 {
 
-if ( this == &p )  return ( * this );
+if ( this == &p )  return *this;
 
 assign(p);
 
-return ( * this );
+return *this;
 
 }
 
@@ -181,7 +181,7 @@ u = data[n];
 
 color.set_rgb(u, u, u);
 
-return ( color );
+return color;
 
 }
 
@@ -199,7 +199,7 @@ c = x;
 
 r = Nrows - 1 - y;
 
-return ( getrc(r, c) );
+return getrc(r, c);
 
 }
 
@@ -271,7 +271,7 @@ if ( !in )  {
 
    mlog << Warning << "\nPgm::read() -> unable to read image file \"" << filename << "\"\n\n";
 
-   return ( 0 );
+   return 0;
 
 }
 
@@ -287,7 +287,7 @@ if ( !Name )  {
 
    clear();
 
-   return ( 0 );
+   return 0;
 
 }
 
@@ -306,7 +306,7 @@ if ( !in )  {
 
    clear();
 
-   return ( 0 );
+   return 0;
 
 }
 
@@ -316,7 +316,7 @@ if ( (c1 != 'P') || (c2 != '5') )  {
 
    clear();
 
-   return ( 0 );
+   return 0;
 
 }
 
@@ -352,7 +352,7 @@ if ( maxval != 255 )  {
 
    clear();
 
-   return ( 0 );
+   return 0;
 
 }
 
@@ -368,7 +368,7 @@ if ( !(data = new unsigned char [n]) )  {
 
    clear();
 
-   return ( 0 );
+   return 0;
 
 }
 
@@ -378,7 +378,7 @@ if ( !in.read((char *) data, n) )  {
 
    clear();
 
-   return ( 0 );
+   return 0;
 
 }
 
@@ -388,7 +388,7 @@ in.close();
    //  Done
    //
 
-return ( 1 );
+return 1;
 
 }
 
@@ -414,7 +414,7 @@ if ( !out )  {
 
    mlog << Warning << "\nPgm::write() -> unable to open output file \"" << filename << "\"\n\n";
 
-   return ( 0 );
+   return 0;
 
 }
 
@@ -444,7 +444,7 @@ if ( !out )  {
 
    mlog << Warning << "\nPgm::write() -> trouble writing header\n\n";
 
-   return ( 0 );
+   return 0;
 
 }
 
@@ -460,7 +460,7 @@ if ( !out )  {
 
    mlog << Warning << "\nPgm::write() -> trouble writing data\n\n";
 
-   return ( 0 );
+   return 0;
 
 }
 
@@ -470,7 +470,7 @@ if ( !out )  {
 
 out.close();
 
-return ( 1 );
+return 1;
 
 }
 
@@ -610,7 +610,7 @@ int row, col;
 int Nrows_new, Ncols_new, bytes;
 int row_new = 0, col_new = 0;
 int n_new, n_old;
-unsigned char *u = (unsigned char *) 0;
+unsigned char *u = (unsigned char *) nullptr;
 
 
 if ( a == 2 )  {   //  a == 0 has already been checked for
@@ -885,12 +885,12 @@ for (col=1; col<nx; ++col)  {
 
    color = pgm.getrc(row, col);
 
-   if ( color != test )  return ( 0 );
+   if ( color != test )  return 0;
 
 }
 
 
-return ( 1 );
+return 1;
 
 }
 
@@ -913,12 +913,12 @@ for (row=1; row<ny; ++row)  {
 
    color = pgm.getrc(row, col);
 
-   if ( color != test )  return ( 0 );
+   if ( color != test )  return 0;
 
 }
 
 
-return ( 1 );
+return 1;
 
 }
 

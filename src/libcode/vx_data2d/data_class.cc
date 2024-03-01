@@ -107,8 +107,8 @@ void Met2dDataFile::mtddf_init_from_scratch()
 
 {
 
-Raw_Grid  = (Grid *) 0;
-Dest_Grid = (Grid *) 0;
+Raw_Grid  = (Grid *) nullptr;
+Dest_Grid = (Grid *) nullptr;
 
 ShiftRight = 0;
 
@@ -124,8 +124,8 @@ void Met2dDataFile::mtddf_clear()
 
 {
 
-if ( Raw_Grid  )  { delete Raw_Grid;   Raw_Grid  = (Grid *) 0; }
-if ( Dest_Grid )  { delete Dest_Grid;  Dest_Grid = (Grid *) 0; }
+if ( Raw_Grid  )  { delete Raw_Grid;   Raw_Grid  = (Grid *) nullptr; }
+if ( Dest_Grid )  { delete Dest_Grid;  Dest_Grid = (Grid *) nullptr; }
 
 Filename.clear();
 
@@ -200,7 +200,7 @@ if ( ! Dest_Grid )  {
 
 }
 
-return ( *Dest_Grid );
+return *Dest_Grid;
 
 }
 
@@ -221,7 +221,7 @@ if ( ! Raw_Grid )  {
 
 }
 
-return ( *Raw_Grid );
+return *Raw_Grid;
 
 }
 
@@ -269,7 +269,7 @@ mlog << Debug(3) << "Resetting grid definition from \""
 
   }
 
-if ( Dest_Grid )  { delete Dest_Grid;  Dest_Grid = 0; }
+if ( Dest_Grid )  { delete Dest_Grid;  Dest_Grid = nullptr; }
 
 Dest_Grid = new Grid;
 
@@ -296,7 +296,7 @@ if ( ! Raw_Grid )  {
 
 }
 
-if ( Dest_Grid )  { delete Dest_Grid;  Dest_Grid = 0; }
+if ( Dest_Grid )  { delete Dest_Grid;  Dest_Grid = nullptr; }
 
 Dest_Grid = new Grid;
 
@@ -345,7 +345,7 @@ for(int i=0; i<vi_list.size(); i++) {
 
 }
 
-return ( n_valid );
+return n_valid;
 
 }
 
@@ -357,7 +357,7 @@ bool Met2dDataFile::process_data_plane(VarInfo *vinfo, DataPlane &dp)
 
 {
 
-if ( ! vinfo )  return ( false );
+if ( ! vinfo )  return false;
 
    //
    // Check for no valid input data
@@ -427,7 +427,7 @@ if ( mlog.verbosity_level() >= 4 ) {
 
 }
 
-return ( true );
+return true;
 
 }
 

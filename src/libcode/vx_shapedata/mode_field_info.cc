@@ -76,11 +76,11 @@ Mode_Field_Info & Mode_Field_Info::operator=(const Mode_Field_Info & i)
 
 {
 
-if ( this == &i )  return ( * this );
+if ( this == &i )  return *this;
 
 assign(i);
 
-return ( * this );
+return *this;
 
 }
 
@@ -405,7 +405,7 @@ bool Mode_Field_Info::need_merge_thresh () const
 
 bool status = (merge_flag == MergeType_Both) || (merge_flag == MergeType_Thresh);
 
-return ( status );
+return status;
 
 }
 

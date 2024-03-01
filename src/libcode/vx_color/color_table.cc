@@ -53,11 +53,11 @@ extern int color_file_column;
    //  definitions with external linkage
    //
 
-const char * input_filename = (const char *) 0;
+const char * input_filename = (const char *) nullptr;
 
 // ColorList clist;
 
-ColorTable * the_table = (ColorTable *) 0;
+ColorTable * the_table = (ColorTable *) nullptr;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -128,11 +128,11 @@ CtableEntry & CtableEntry::operator=(const CtableEntry & entry)
 
 {
 
-if ( this == &entry )  return ( * this );
+if ( this == &entry )  return *this;
 
 assign(entry);
 
-return ( * this );
+return *this;
 
 }
 
@@ -292,11 +292,11 @@ ColorTable & ColorTable::operator=(const ColorTable & c)
 
 {
 
-if ( this == &c )  return ( * this );
+if ( this == &c )  return *this;
 
 assign(c);
 
-return ( * this );
+return *this;
 
 }
 
@@ -308,7 +308,7 @@ void ColorTable::init_from_scratch()
 
 {
 
-Entry = (CtableEntry *) 0;
+Entry = (CtableEntry *) nullptr;
 
 clear();
 
@@ -324,7 +324,7 @@ void ColorTable::clear()
 
 {
 
-if ( Entry )  { delete [] Entry;  Entry = (CtableEntry *) 0; }
+if ( Entry )  { delete [] Entry;  Entry = (CtableEntry *) nullptr; }
 
 Nentries = 0;
 
@@ -395,11 +395,11 @@ Color color;
 
 double t = ( is_bad_data(t_in) ? bad_data_double : t_in );
 
-if ( Nentries == 0 )  return ( black );
+if ( Nentries == 0 )  return black;
 
-if ( t <= Entry[0].value_low() )  return ( Entry[0].color() );
+if ( t <= Entry[0].value_low() )  return Entry[0].color();
 
-if ( t >= Entry[Nentries - 1].value_high() )  return ( Entry[Nentries - 1].color() );
+if ( t >= Entry[Nentries - 1].value_high() )  return Entry[Nentries - 1].color();
 
 int j;
 double vlo, vhi;
@@ -422,7 +422,7 @@ for (j=0; j<Nentries; ++j)  {
 
       fudge_color(color);
 
-      return ( color );
+      return color;
 
    }
 
@@ -445,7 +445,7 @@ for (j=0; j<Nentries; ++j)  {
 fudge_color(color);
 
 
-return ( color );
+return color;
 
 }
 
@@ -465,15 +465,15 @@ double z = ( is_bad_data(z_in) ? bad_data_double : z_in );
    //  check for empty colortable
    //
 
-if ( Nentries == 0 )  return ( color );
+if ( Nentries == 0 )  return color;
 
    //
    //  check if value outside range
    //
 
-if ( z <= Entry[0].value_low() )  return ( Entry[0].color() );
+if ( z <= Entry[0].value_low() )  return Entry[0].color();
 
-if ( z >= Entry[Nentries - 1].value_high() )  return ( Entry[Nentries - 1].color() );
+if ( z >= Entry[Nentries - 1].value_high() )  return Entry[Nentries - 1].color();
 
 
 int j, k;
@@ -496,7 +496,7 @@ for (j=0; j<Nentries; ++j)  {
 
       fudge_color(color);
 
-      return ( color );
+      return color;
 
    }
 
@@ -521,7 +521,7 @@ for (j=0; j<(Nentries - 1); ++j)  {
 
       fudge_color(color);
 
-      return ( color );
+      return color;
 
    }
 
@@ -554,7 +554,7 @@ input_filename = filename;
 
 if ( (colorin = fopen(input_filename, "r")) == nullptr )  {
 
-   colorin = (FILE *) 0;
+   colorin = (FILE *) nullptr;
 
    mlog << Error << "\nColorTable::read(const char *) -> failed to read colortable file \""
         << input_filename << "\"\n\n";
@@ -593,15 +593,15 @@ sort();
    //  done
    //
 
-fclose(colorin);   colorin = (FILE *) 0;
+fclose(colorin);   colorin = (FILE *) nullptr;
 
-input_filename = (const char *) 0;
+input_filename = (const char *) nullptr;
 
-the_table = (ColorTable *) 0;
+the_table = (ColorTable *) nullptr;
 
 clist.clear();
 
-return ( 1 );
+return 1;
 
 }
 
@@ -624,7 +624,7 @@ if ( !out )  {
 
    // exit ( 1 );
 
-   return ( 0 );
+   return 0;
 
 }
 
@@ -639,7 +639,7 @@ for (j=0; j<Nentries; ++j)  {
 out.close();
 
 
-return ( 1 );
+return 1;
 
 }
 
@@ -802,7 +802,7 @@ void ColorTable::extend(int n)
 if ( Nalloc >= n )  return;
 
 int j;
-CtableEntry * u = (CtableEntry *) 0;
+CtableEntry * u = (CtableEntry *) nullptr;
 
 j = n/ctable_alloc_inc;
 
@@ -828,11 +828,11 @@ if ( Entry )  {
 
    }
 
-   delete [] Entry;   Entry = (CtableEntry *) 0;
+   delete [] Entry;   Entry = (CtableEntry *) nullptr;
 
 }
 
-Entry = u;   u = (CtableEntry *) 0;
+Entry = u;   u = (CtableEntry *) nullptr;
 
 
    //
@@ -921,7 +921,7 @@ if ( (n < 0) || (n >= Nentries) )  {
 
 }
 
-return ( Entry[n] );
+return Entry[n];
 
 }
 
@@ -933,13 +933,13 @@ double ColorTable::data_min() const
 
 {
 
-if ( Nentries == 0 )  return ( 0.0 );
+if ( Nentries == 0 )  return 0.0;
 
 double v;
 
 v = Entry[0].value_low();
 
-return ( v );
+return v;
 
 }
 
@@ -956,7 +956,7 @@ double ColorTable::data_min(double bad_data_value) const
 
 {
 
-if ( Nentries == 0 )  return ( 0.0 );
+if ( Nentries == 0 )  return 0.0;
 
 double v_low;
 int i;
@@ -970,7 +970,7 @@ for(i=0; i<Nentries; i++) {
       v_low = Entry[i].value_low();
 }
 
-return ( v_low );
+return v_low;
 
 }
 
@@ -982,13 +982,13 @@ double ColorTable::data_max() const
 
 {
 
-if ( Nentries == 0 )  return ( 0.0 );
+if ( Nentries == 0 )  return 0.0;
 
 double v;
 
 v = Entry[Nentries - 1].value_high();
 
-return ( v );
+return v;
 
 }
 
@@ -1005,7 +1005,7 @@ double ColorTable::data_max(double bad_data_value) const
 
 {
 
-if ( Nentries == 0 )  return ( 0.0 );
+if ( Nentries == 0 )  return 0.0;
 
 double v_high;
 int i;
@@ -1019,7 +1019,7 @@ for(i=0; i<Nentries; i++) {
       v_high = Entry[i].value_high();
 }
 
-return ( v_high );
+return v_high;
 
 }
 
@@ -1122,7 +1122,7 @@ Color c;
 
 s.getline(line, sizeof(line));
 
-if ( !s )  return ( s );
+if ( !s )  return s;
 
 j = sscanf(line, "%lf%d%d%d", &x, &r, &g, &b);
 
@@ -1142,7 +1142,7 @@ c.set_rgb(r, g, b);
 entry.set_color(c);
 
 
-return ( s );
+return s;
 
 }
 
@@ -1177,7 +1177,7 @@ s << B << "}\n";
 
 
 
-return ( s );
+return s;
 
 }
 

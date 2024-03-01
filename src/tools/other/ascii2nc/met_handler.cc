@@ -185,7 +185,7 @@ bool MetHandler::_readObservations(LineDataFile &ascii_file)
 
 
 double parse_num(const char *s) {
-   if(!s) return(bad_data_double);
+   if(!s) return bad_data_double;
    return( (strcasecmp(s, na_str) == 0 ? bad_data_double : atof(s)) );
 }
 

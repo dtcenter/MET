@@ -165,7 +165,7 @@ ConcatString & ConcatString::operator=(const std::string & Text)
    init_from_scratch();
    if (s) s->assign(Text);
 
-   return(*this);
+   return *this;
 }
 
 
@@ -192,7 +192,7 @@ if ( ! Text )  {
 
    (*s) = s2;
 
-   return(*this);
+   return *this;
 }
 
 
@@ -455,7 +455,7 @@ ConcatString ConcatString::dirname() const
       c = c.s->substr(start, end-start);
    }
 
-   return(c);
+   return c;
 }
 
 
@@ -483,7 +483,7 @@ ConcatString ConcatString::basename() const
       c = c.s->substr(start+1, end-start);
    }
 
-   return(c);
+   return c;
 }
 
 
@@ -612,7 +612,7 @@ const string ConcatString::contents(const char * str) const
    if (s->empty() || *s == "") {
       return (str ? str : "(nul)");
    } else {
-      return ( *s );
+      return *s;
    }
 }
 
@@ -655,7 +655,7 @@ ConcatString uc = cs;
 
 uc.set_upper();
 
-return ( uc );
+return uc;
 
 }
 
@@ -671,7 +671,7 @@ ConcatString lc = cs;
 
 lc.set_lower();
 
-return ( lc );
+return lc;
 
 }
 
@@ -700,7 +700,7 @@ ConcatString & operator<<(ConcatString & cs, const char c)
 
 cs.add(c);
 
-return ( cs );
+return cs;
 
 }
 
@@ -714,7 +714,7 @@ ConcatString & operator<<(ConcatString & cs, const char * s)
 
 cs.add(s);
 
-return ( cs );
+return cs;
 
 }
 
@@ -727,7 +727,7 @@ ConcatString & operator<<(ConcatString & cs, const std::string & s)
 
 cs.add(s);
 
-return ( cs );
+return cs;
 
 }
 
@@ -741,7 +741,7 @@ ConcatString & operator<<(ConcatString & a, const ConcatString & b)
 
 a.add(b);
 
-return ( a );
+return a;
 
 }
 
@@ -757,7 +757,7 @@ std::ostringstream sstream;
 sstream << k;
 a.add(sstream.str());
 
-return ( a );
+return a;
 }
 
 
@@ -772,7 +772,7 @@ std::ostringstream sstream;
 sstream << k;
 a.add(sstream.str());
 
-return ( a );
+return a;
 }
 
 
@@ -787,7 +787,7 @@ std::ostringstream sstream;
 sstream << k;
 a.add(sstream.str());
 
-return ( a );
+return a;
 
 }
 
@@ -806,7 +806,7 @@ sstream << x;
 
 a.add(sstream.str());
 
-return ( a );
+return a;
 
 }
 
@@ -831,7 +831,7 @@ switch ( c )  {
 }   //  switch
 
 
-return ( a );
+return a;
 
 }
 
@@ -857,7 +857,7 @@ for (j=0; j<jmax; ++j)  {
 }
 
 
-return ( a );
+return a;
 
 }
 
@@ -882,8 +882,8 @@ bool ConcatString::operator==(const ConcatString & b) const
 
 {
 
-if ( empty() )  return ( false );
-if ( b.empty() )  return ( false );
+if ( empty() )  return false;
+if ( b.empty() )  return false;
 
 int status = s->compare(*(b.s));
 
@@ -899,7 +899,7 @@ bool ConcatString::operator==(const char * text) const
 
 {
 
-if ( !text || empty() )  return ( false );
+if ( !text || empty() )  return false;
 
 int status = s->compare(text);
 
@@ -915,7 +915,7 @@ bool operator==(const char * text, const ConcatString & a)
 
 {
 
-if ( !text || !a.text() )  return ( false );
+if ( !text || !a.text() )  return false;
 
 int status = strcmp(text, a.text());
 
@@ -931,7 +931,7 @@ bool operator!=(const ConcatString & a, const ConcatString & b)
 
 {
 
-return ( !(a == b) );
+return !(a == b);
 
 }
 
@@ -943,7 +943,7 @@ bool operator!=(const ConcatString & a, const char * text)
 
 {
 
-return ( !(a == text) );
+return !(a == text);
 
 }
 
@@ -955,7 +955,7 @@ bool operator!=(const char * text, const ConcatString & a)
 
 {
 
-return ( !(text == a) );
+return !(text == a);
 
 }
 
@@ -967,8 +967,8 @@ bool operator>=(const ConcatString & a, const ConcatString & b)
 
 {
 
-if ( a.empty() )  return ( false );
-if ( b.empty() )  return ( false );
+if ( a.empty() )  return false;
+if ( b.empty() )  return false;
 
 int status = strcmp(a.text(), b.text());
 
@@ -984,7 +984,7 @@ bool operator>=(const ConcatString & a, const char * text)
 
 {
 
-if ( a.empty() || !text )  return ( false );
+if ( a.empty() || !text )  return false;
 
 int status = strcmp(a.text(), text);
 
@@ -1000,7 +1000,7 @@ bool operator>=(const char * text, const ConcatString & a)
 
 {
 
-if ( a.empty() || !text )  return ( false );
+if ( a.empty() || !text )  return false;
 
 int status = strcmp(text, a.text());
 
@@ -1016,8 +1016,8 @@ bool operator<=(const ConcatString & a, const ConcatString & b)
 
 {
 
-if ( a.empty() )  return ( false );
-if ( b.empty() )  return ( false );
+if ( a.empty() )  return false;
+if ( b.empty() )  return false;
 
 int status = strcmp(a.text(), b.text());
 
@@ -1033,7 +1033,7 @@ bool operator<=(const ConcatString & a, const char * text)
 
 {
 
-if ( a.empty() || !text )  return ( false );
+if ( a.empty() || !text )  return false;
 
 int status = strcmp(a.text(), text);
 
@@ -1049,7 +1049,7 @@ bool operator<=(const char * text, const ConcatString & a)
 
 {
 
-if ( a.empty() || !text )  return ( false );
+if ( a.empty() || !text )  return false;
 
 int status = strcmp(text, a.text());
 
@@ -1065,8 +1065,8 @@ bool operator>(const ConcatString & a, const ConcatString & b)
 
 {
 
-if ( a.empty() )  return ( false );
-if ( b.empty() )  return ( false );
+if ( a.empty() )  return false;
+if ( b.empty() )  return false;
 
 int status = strcmp(a.text(), b.text());
 
@@ -1082,7 +1082,7 @@ bool operator>(const ConcatString & a, const char * text)
 
 {
 
-if ( a.empty() || !text )  return ( false );
+if ( a.empty() || !text )  return false;
 
 int status = strcmp(a.text(), text);
 
@@ -1098,7 +1098,7 @@ bool operator>(const char * text, const ConcatString & a)
 
 {
 
-if ( a.empty() || !text )  return ( false );
+if ( a.empty() || !text )  return false;
 
 int status = strcmp(text, a.text());
 
@@ -1114,8 +1114,8 @@ bool operator<(const ConcatString & a, const ConcatString & b)
 
 {
 
-if ( a.empty() )  return ( false );
-if ( b.empty() )  return ( false );
+if ( a.empty() )  return false;
+if ( b.empty() )  return false;
 
 int status = strcmp(a.text(), b.text());
 
@@ -1131,7 +1131,7 @@ bool operator<(const ConcatString & a, const char * text)
 
 {
 
-if ( a.empty() || !text )  return ( false );
+if ( a.empty() || !text )  return false;
 
 int status = strcmp(a.text(), text);
 
@@ -1147,7 +1147,7 @@ bool operator<(const char * text, const ConcatString & a)
 
 {
 
-if ( a.empty() || !text )  return ( false );
+if ( a.empty() || !text )  return false;
 
 int status = strcmp(text, a.text());
 
@@ -1169,7 +1169,7 @@ for ( int i=0; i<sa.n_elements(); ++i )  {
    css << (i == 0 ? "" : ",") << sa[i];
 }
 
-return(css);
+return css;
 
 }
 
@@ -1201,8 +1201,8 @@ static const char *method_name = "get_env() ";
 env_value.clear();
 
 // SonarQube: two ifs to avoid the side effect by the logical || operator
-if (str.find('/') != string::npos) return(false);
-if ((ptr = getenv(env_name)) == nullptr) return(false);
+if (str.find('/') != string::npos) return false;
+if ((ptr = getenv(env_name)) == nullptr) return false;
 
 env_value = ptr;
 str = env_value;
@@ -1264,7 +1264,7 @@ if (count_replaced > 0) {
         << env_name << " to \"" << env_value << "\"\n";
 }
 
-return(true);
+return true;
 
 }
 

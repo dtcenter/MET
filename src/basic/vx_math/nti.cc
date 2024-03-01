@@ -31,9 +31,9 @@ int gcdi(int a, int b)
 a = abs(a);
 b = abs(b);
 
-if ( a == 0 )  return ( b );
+if ( a == 0 )  return b;
 
-if ( b == 0 )  return ( a );
+if ( b == 0 )  return a;
 
 int c;
 
@@ -50,7 +50,7 @@ do {
 
 
 
-return ( a );
+return a;
 
 }
 
@@ -65,7 +65,7 @@ int lcmi(int a, int b)
 a = abs(a);
 b = abs(b);
 
-if ( (a == 0) || (b == 0) )  return ( 0 );
+if ( (a == 0) || (b == 0) )  return 0;
 
 int c, d;
 
@@ -75,7 +75,7 @@ d = gcdi(a, b);
 c = (a/d)*b;
 
 
-return ( c );
+return c;
 
 }
 

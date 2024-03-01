@@ -104,11 +104,11 @@ Pcm & Pcm::operator=(const Pcm & p)
 
 {
 
-if ( this == &p )  return ( * this );
+if ( this == &p )  return *this;
 
 assign(p);
 
-return ( * this );
+return *this;
 
 }
 
@@ -122,7 +122,7 @@ void Pcm::clear()
 
 clear_common();
 
-if ( Colormap )  { delete [] Colormap;   Colormap = (Color *) 0; }
+if ( Colormap )  { delete [] Colormap;   Colormap = (Color *) nullptr; }
 
 Ncolors = 0;
 
@@ -142,9 +142,9 @@ void Pcm::init_from_scratch()
 // PxmBase::init_from_scratch();
 
 
-Colormap = (Color *) 0;
+Colormap = (Color *) nullptr;
 
-Name = (char *) 0;
+Name = (char *) nullptr;
 
 Ncolors = 0;
 
@@ -218,7 +218,7 @@ c = x;
 
 r = Nrows - 1 - y;
 
-return ( data_getrc(r, c) );
+return data_getrc(r, c);
 
 }
 
@@ -234,7 +234,7 @@ int n;
 
 n = rc_to_n(r, c);
 
-return ( data[n] );
+return data[n];
 
 }
 
@@ -252,7 +252,7 @@ n = rc_to_n(r, c);
 
 k = (int) (data[n]);
 
-return ( Colormap[k] );
+return Colormap[k];
 
 }
 
@@ -270,7 +270,7 @@ c = x;
 
 r = Nrows - 1 - y;
 
-return ( getrc(r, c) );
+return getrc(r, c);
 
 }
 
@@ -391,7 +391,7 @@ if ( !in )  {
 
    mlog << Warning << "\nPcm::read() -> unable to read image file \"" << filename << "\"\n\n";
 
-   return ( 0 );
+   return 0;
 
 }
 
@@ -407,7 +407,7 @@ if ( !Name )  {
 
    clear();
 
-   return ( 0 );
+   return 0;
 
 }
 
@@ -426,7 +426,7 @@ if ( !in )  {
 
    clear();
 
-   return ( 0 );
+   return 0;
 
 }
 
@@ -436,7 +436,7 @@ if ( (c1 != 'P') || (c2 != '9') )  {
 
    clear();
 
-   return ( 0 );
+   return 0;
 
 }
 
@@ -475,7 +475,7 @@ if ( maxval != 255 )  {
 
    clear();
 
-   return ( 0 );
+   return 0;
 
 }
 */
@@ -492,7 +492,7 @@ if ( !Colormap )  {
 
    clear();
 
-   return ( 0 );
+   return 0;
 
 }
 
@@ -512,7 +512,7 @@ for (j=0; j<Ncolors; ++j)  {
 
       clear();
 
-      return ( 0 );
+      return 0;
 
    }
 
@@ -532,7 +532,7 @@ if ( !(data = new unsigned char [n]) )  {
 
    clear();
 
-   return ( 0 );
+   return 0;
 
 }
 
@@ -542,7 +542,7 @@ if ( !in.read((char *) data, n) )  {
 
    clear();
 
-   return ( 0 );
+   return 0;
 
 }
 
@@ -552,7 +552,7 @@ in.close();
    //  Done
    //
 
-return ( 1 );
+return 1;
 
 }
 
@@ -578,7 +578,7 @@ if ( !out )  {
 
    mlog << Warning << "\nPcm::write() -> unable to open output file \"" << filename << "\"\n\n";
 
-   return ( 0 );
+   return 0;
 
 }
 
@@ -609,7 +609,7 @@ if ( !out )  {
 
    mlog << Warning << "\nPcm::write() -> trouble writing header\n\n";
 
-   return ( 0 );
+   return 0;
 
 }
 
@@ -637,7 +637,7 @@ if ( !out )  {
 
    mlog << Warning << "\nPcm::write() -> trouble writing data\n\n";
 
-   return ( 0 );
+   return 0;
 
 }
 
@@ -647,7 +647,7 @@ if ( !out )  {
 
 out.close();
 
-return ( 1 );
+return 1;
 
 }
 
@@ -753,7 +753,7 @@ int row, col;
 int Nrows_new, Ncols_new, bytes;
 int row_new = 0, col_new = 0;
 int n_new, n_old;
-unsigned char *u = (unsigned char *) 0;
+unsigned char *u = (unsigned char *) nullptr;
 
 
 if ( a == 2 )  {
@@ -833,12 +833,12 @@ int j;
 
 for (j=0; j<Ncolors; ++j)  {
 
-   if ( Colormap[j] == color )  return ( j );
+   if ( Colormap[j] == color )  return j;
 
 }
 
 
-return ( -1 );
+return -1;
 
 }
 
@@ -858,7 +858,7 @@ if ( (n < 0) || (n >= Ncolors) )  {
 
 }
 
-return ( Colormap[n] );
+return Colormap[n];
 
 }
 
@@ -870,7 +870,7 @@ void Pcm::set_colormap(const Color * c, int n)
 
 {
 
-if ( Colormap )  { delete [] Colormap;  Colormap = (Color *) 0; }
+if ( Colormap )  { delete [] Colormap;  Colormap = (Color *) nullptr; }
 
 Colormap = new Color [n];
 

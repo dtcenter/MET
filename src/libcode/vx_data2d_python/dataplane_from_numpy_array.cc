@@ -228,7 +228,7 @@ vinfo.set_units      (attrs.lookup_string("units").c_str());
    //  done
    //
 
-return ( true );
+return true;
 
 }
 

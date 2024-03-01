@@ -158,7 +158,7 @@ PSfile::~PSfile()
 
 close();
 
-delete afm;  afm = (Afm *) 0;
+delete afm;  afm = (Afm *) nullptr;
 
 }
 
@@ -170,7 +170,7 @@ void PSfile::init_from_scratch()
 
 {
 
-File = (ofstream *) 0;
+File = (ofstream *) nullptr;
 
 psout.ignore_columns = true;
 
@@ -398,7 +398,7 @@ if ( File )  {
 
    File->close();
 
-   delete File;   File = (ofstream *) 0;
+   delete File;   File = (ofstream *) nullptr;
 
 }
 
@@ -571,7 +571,7 @@ const double scale = 0.001*font_size;
 double x_cur, y_cur;
 double dx, dy;
 VxpsTextNode node;
-VxpsTextNode * n = (VxpsTextNode *) 0;
+VxpsTextNode * n = (VxpsTextNode *) nullptr;
 
 
 make_list(current_font, font_size, *afm, node, s);
@@ -1635,7 +1635,7 @@ int PSfile::roman_font() const
 
 {
 
-return ( ff_to_roman (Family) );
+return ff_to_roman (Family);
 
 }
 
@@ -1647,7 +1647,7 @@ int PSfile::italic_font() const
 
 {
 
-return ( ff_to_italic(Family) );
+return ff_to_italic(Family);
 
 }
 
@@ -1659,7 +1659,7 @@ int PSfile::bold_font() const
 
 {
 
-return ( ff_to_bold(Family) );
+return ff_to_bold(Family);
 
 }
 
@@ -1671,7 +1671,7 @@ int PSfile::bolditalic_font() const
 
 {
 
-return ( ff_to_bolditalic (Family) );
+return ff_to_bolditalic (Family);
 
 }
 
@@ -1860,7 +1860,7 @@ switch ( ascii_code )  {
 
 };
 
-return ( ans );
+return ans;
 
 }
 
@@ -1874,11 +1874,11 @@ bool nonprintable(int ascii_code)
 
 if ( ascii_code < 0 )  ascii_code += 256;
 
-if ( ascii_code < 32 )  return ( true );
+if ( ascii_code < 32 )  return true;
 
-if ( ascii_code > 126 )  return ( true );
+if ( ascii_code > 126 )  return true;
 
-return ( false );
+return false;
 
 }
 
@@ -1930,11 +1930,11 @@ DocumentMedia default_media()
 
 ConcatString cs;
 
-if ( !get_env(papersize_env, cs) )  return ( MediaLetter );
+if ( !get_env(papersize_env, cs) )  return MediaLetter;
 
-if ( cs == "Letter" )  return ( MediaLetter );
+if ( cs == "Letter" )  return MediaLetter;
 
-if ( cs == "A4" )  return ( MediaA4 );
+if ( cs == "A4" )  return MediaA4;
 
 mlog << Error << "\ndefault_media() -> "
      << "bad value \"" << cs << "\" for environment variable "
@@ -1973,7 +1973,7 @@ switch ( f )  {
 }   //  switch
 
 
-return ( n );
+return n;
 
 }
 
@@ -2006,7 +2006,7 @@ switch ( f )  {
 }   //  switch
 
 
-return ( n );
+return n;
 
 }
 
@@ -2039,7 +2039,7 @@ switch ( f )  {
 }   //  switch
 
 
-return ( n );
+return n;
 
 }
 
@@ -2072,7 +2072,7 @@ switch ( f )  {
 }   //  switch
 
 
-return ( n );
+return n;
 
 }
 

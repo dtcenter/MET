@@ -68,7 +68,7 @@ if ( buf )  { free(buf);   buf = 0; }
    //  done
    //
 
-return ( out );
+return out;
 
 }
 
@@ -80,11 +80,11 @@ PyObject * get_attribute(PyObject * obj, const char * attribute_name)
 
 {
 
-if ( PyObject_HasAttrString(obj, attribute_name) == 0 )  return ( (PyObject *) 0 );
+if ( PyObject_HasAttrString(obj, attribute_name) == 0 )  return (PyObject *) 0;
 
 PyObject * att = PyObject_GetAttrString(obj, attribute_name);
 
-return ( att );
+return att;
 
 }
 
@@ -120,7 +120,7 @@ if ( PyLong_Check(obj) )  {   //  long?
 
 }
 
-return ( k );
+return k;
 
 }
 
@@ -168,7 +168,7 @@ if ( PyLong_Check(obj) )  {   //  long?
 
 }
 
-return ( x );
+return x;
 
 }
 
@@ -195,7 +195,7 @@ if ( PyUnicode_Check(obj) )  {   //  string?
 
 }
 
-return ( s );
+return s;
 
 }
 
@@ -222,7 +222,7 @@ if ( PyUnicode_Check(obj) )  {   //  string?
 
 }
 
-return ( s );
+return s;
 
 }
 

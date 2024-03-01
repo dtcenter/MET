@@ -1164,7 +1164,7 @@ bool keep_message_type(const char *mt_str) {
       mlog << Debug(REJECT_DEBUG_LEVEL) << "The message type [" << mt_str << "] is rejected\n";
    }
 
-   return(keep);
+   return keep;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1178,7 +1178,7 @@ bool keep_station_id(const char *sid_str) {
       mlog << Debug(REJECT_DEBUG_LEVEL) << "The station ID [" << sid_str << "] is rejected\n";
    }
 
-   return(keep);
+   return keep;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1205,7 +1205,7 @@ bool keep_valid_time(const unixtime ut,
            << unix_to_yyyymmdd_hhmmss(ut) << "] is rejected\n";
    }
 
-   return(keep);
+   return keep;
 }
 
 ////////////////////////////////////////////////////////////////////////

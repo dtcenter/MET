@@ -87,11 +87,11 @@ MaskPoly & MaskPoly::operator=(const MaskPoly & m)
 
 {
 
-if ( this == &m )  return ( * this );
+if ( this == &m )  return *this;
 
 assign(m);
 
-return ( * this );
+return *this;
 
 }
 
@@ -229,7 +229,7 @@ if ( i < 0 || i >= Npoints ) {
    //   done
    //
 
-return ( Lat[i] );
+return Lat[i];
 
 }
 
@@ -257,7 +257,7 @@ adj_lon -= 360.0*floor((adj_lon + 180.0)/360.0);
    //   done
    //
 
-return ( adj_lon );
+return adj_lon;
 
 }
 
@@ -520,7 +520,7 @@ for (j=0; j<n; ++j)  {
 
 }
 
-return ( nint( (angle - angle0)/2 ) );
+return nint( (angle - angle0)/2 );
 
 }
 

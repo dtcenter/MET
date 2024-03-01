@@ -104,11 +104,11 @@ Ppm & Ppm::operator=(const Ppm & p)
 
 {
 
-if ( this == &p )  return ( * this );
+if ( this == &p )  return *this;
 
 assign(p);
 
-return ( * this );
+return *this;
 
 }
 
@@ -165,7 +165,7 @@ Color Ppm::getrc(int r, int c) const
 {
 
 int n;
-unsigned char * u = (unsigned char *) 0;
+unsigned char * u = (unsigned char *) nullptr;
 Color color;
 
 
@@ -175,7 +175,7 @@ u = data + 3*n;
 
 color.set_rgb(u[0], u[1], u[2]);
 
-return ( color );
+return color;
 
 }
 
@@ -206,7 +206,7 @@ void Ppm::putrc(const Color & color, int r, int c)
 {
 
 int n;
-unsigned char * u = (unsigned char *) 0;
+unsigned char * u = (unsigned char *) nullptr;
 
 
 n = rc_to_n(r, c);
@@ -271,7 +271,7 @@ if ( !in )  {
 
    mlog << Error << "\nPpm::read() -> unable to read image file \"" << filename << "\"\n\n";
 
-   return ( 0 );
+   return 0;
 
 }
 
@@ -287,7 +287,7 @@ if ( !Name )  {
 
    clear();
 
-   return ( 0 );
+   return 0;
 
 }
 
@@ -306,7 +306,7 @@ if ( !in )  {
 
    clear();
 
-   return ( 0 );
+   return 0;
 
 }
 
@@ -316,7 +316,7 @@ if ( (c1 != 'P') || (c2 != '6') )  {
 
    clear();
 
-   return ( 0 );
+   return 0;
 
 }
 
@@ -353,7 +353,7 @@ if ( maxval != 255 )  {
 
    clear();
 
-   return ( 0 );
+   return 0;
 
 }
 
@@ -369,7 +369,7 @@ if ( !(data = new unsigned char [n]) )  {
 
    clear();
 
-   return ( 0 );
+   return 0;
 
 }
 
@@ -379,7 +379,7 @@ if ( !in.read((char *) data, n) )  {
 
    clear();
 
-   return ( 0 );
+   return 0;
 
 }
 
@@ -389,7 +389,7 @@ in.close();
    //  Done
    //
 
-return ( 1 );
+return 1;
 
 }
 
@@ -415,7 +415,7 @@ if ( !out )  {
 
    mlog << Warning << "\nPpm::write() -> unable to open output file \"" << filename << "\"\n\n";
 
-   return ( 0 );
+   return 0;
 
 }
 
@@ -448,7 +448,7 @@ if ( !out )  {
         << strerror(errno)
         << "\n\n";
 
-   return ( 0 );
+   return 0;
 
 }
 
@@ -464,7 +464,7 @@ if ( !out )  {
 
    mlog << Warning << "\nPpm::write() -> trouble writing data\n\n";
 
-   return ( 0 );
+   return 0;
 
 }
 
@@ -474,7 +474,7 @@ if ( !out )  {
 
 out.close();
 
-return ( 1 );
+return 1;
 
 }
 
@@ -605,7 +605,7 @@ void Ppm::make_gray()
 
 int j, n;
 Color c;
-unsigned char * u = (unsigned char *) 0;
+unsigned char * u = (unsigned char *) nullptr;
 
 
 n = Nrows*Ncols;
@@ -644,7 +644,7 @@ int row, col;
 int Nrows_new, Ncols_new, bytes;
 int row_new = 0, col_new = 0;
 int n_new, n_old;
-unsigned char *u = (unsigned char *) 0;
+unsigned char *u = (unsigned char *) nullptr;
 
 
 if ( a == 2 )  {

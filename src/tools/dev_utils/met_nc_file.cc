@@ -81,7 +81,7 @@ bool MetNcFile::readFile(const int desired_grib_code,
          << _filePath << "\n\n";
     //_ncFile->close();
     delete _ncFile;
-    _ncFile = (NcFile *) 0;
+    _ncFile = (NcFile *) nullptr;
 
     return false;
   }
@@ -175,7 +175,7 @@ bool MetNcFile::readFile(const int desired_grib_code,
   char hdr_typ_str_full[hdr_buf_size][typ_len];
   char hdr_sid_str_full[hdr_buf_size][sid_len];
   char hdr_vld_str_full[hdr_buf_size][vld_len];
-  //float **hdr_arr_full = (float **) 0, **obs_arr_block = (float **) 0;
+  //float **hdr_arr_full = (float **) nullptr, **obs_arr_block = (float **) nullptr;
 
   float hdr_arr_full[hdr_buf_size][hdr_arr_len];
   float obs_arr_block[    buf_size][obs_arr_len];
@@ -325,8 +325,8 @@ bool MetNcFile::readFile(const int desired_grib_code,
   }
   // Cleanup
 
-  if (obs_arr) { delete [] obs_arr; obs_arr = (float *) 0; }
-  if (hdr_arr) { delete [] hdr_arr; hdr_arr = (float *) 0; }
+  if (obs_arr) { delete [] obs_arr; obs_arr = (float *) nullptr; }
+  if (hdr_arr) { delete [] hdr_arr; hdr_arr = (float *) nullptr; }
 
   return true;
 }

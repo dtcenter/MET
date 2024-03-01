@@ -78,11 +78,11 @@ FO_Graph & FO_Graph::operator=(const FO_Graph & g)
 
 {
 
-if ( this == &g )  return ( * this );
+if ( this == &g )  return *this;
 
 assign(g);
 
-return ( * this );
+return *this;
 
 }
 
@@ -174,7 +174,7 @@ if ( (f_num < 0) || (f_num >= N_fcst) )  {
 
 }
 
-return ( f_num );
+return f_num;
 
 }
 
@@ -253,7 +253,7 @@ const int i_o = o_index(n_o);
 
 const int n = two_to_one(i_f, i_o);
 
-return ( TheGraph[n].has_edge() );
+return TheGraph[n].has_edge();
 
 }
 
@@ -270,7 +270,7 @@ const int i_f_2 = f_index(n_f_2);
 
 const int n = two_to_one(i_f_1, i_f_2);
 
-return ( TheGraph[n].has_edge() );
+return TheGraph[n].has_edge();
 
 }
 
@@ -287,7 +287,7 @@ const int i_o_2 = o_index(n_o_2);
 
 const int n = two_to_one(i_o_1, i_o_2);
 
-return ( TheGraph[n].has_edge() );
+return TheGraph[n].has_edge();
 
 }
 

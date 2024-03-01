@@ -34,7 +34,7 @@ static float ff[2];
 
 inline float km_to_meters(float km) {
 
-   if ( km == FILL_VALUE )  return ( FILL_VALUE );
+   if ( km == FILL_VALUE )  return FILL_VALUE;
 
    return ( km*1000.f );
 
@@ -332,7 +332,7 @@ t = k + jan_1_1993;
    //  done
    //
 
-return ( t );
+return t;
 
 }
 
@@ -842,13 +842,13 @@ int Calipso_5km_Obs::get_feature_type_qa_value(int layer)
 
 {
 
-if ( n_layers == 0 )  return ( -1 );
+if ( n_layers == 0 )  return -1;
 
 int k;
 
 k = extract_bits(fclass[layer], type_qa_mask, type_qa_shift);
 
-return ( k );
+return k;
 
 }
 
@@ -904,13 +904,13 @@ int Calipso_5km_Obs::get_ice_water_qa_value(int layer)
 
 {
 
-if ( n_layers == 0 )  return ( -1 );
+if ( n_layers == 0 )  return -1;
 
 int k;
 
 k = extract_bits(fclass[layer], ice_water_qa_mask, ice_water_qa_shift);
 
-return ( k );
+return k;
 
 }
 
@@ -966,13 +966,13 @@ int Calipso_5km_Obs::get_cloud_aerosol_qa_value(int layer)
 
 {
 
-if ( n_layers == 0 )  return ( -1 );
+if ( n_layers == 0 )  return -1;
 
 int k;
 
 k = extract_bits(fclass[layer], cloud_aerosol_qa_mask, cloud_aerosol_qa_shift);
 
-return ( k );
+return k;
 
 }
 

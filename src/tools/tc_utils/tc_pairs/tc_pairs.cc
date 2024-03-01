@@ -184,7 +184,7 @@ int met_main(int argc, char *argv[]) {
            << "Output file: " << out_files[i] << "\n";
    }
 
-   return(0);
+   return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -816,7 +816,7 @@ bool is_keeper(const ATCFLineBase * line) {
       keep = false;
 
    // Return the keep status
-   return(keep);
+   return keep;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1269,7 +1269,7 @@ int derive_consensus(TrackInfoArray &tracks) {
    int n_add = 0;
 
    // If no consensus models are defined, nothing to do
-   if(conf_info.NConsensus == 0) return(0);
+   if(conf_info.NConsensus == 0) return 0;
 
    // Loop through the tracks to build a list of cases
    for(i=0; i<tracks.n(); i++) {
@@ -1428,7 +1428,7 @@ int derive_consensus(TrackInfoArray &tracks) {
 
    } // end for i
 
-   return(n_add);
+   return n_add;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1441,7 +1441,7 @@ int derive_lag(TrackInfoArray &tracks) {
    int n_add = 0;
 
    // If no time lags are requested, nothing to do
-   if(conf_info.LagTime.n() == 0) return(0);
+   if(conf_info.LagTime.n() == 0) return 0;
 
    // Loop through the time lags to be applied
    for(i=0; i<conf_info.LagTime.n(); i++) {
@@ -1502,7 +1502,7 @@ int derive_lag(TrackInfoArray &tracks) {
 
    } // end for i
 
-   return(n_add);
+   return n_add;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1515,7 +1515,7 @@ int derive_baseline(TrackInfoArray &atracks, const TrackInfoArray &btracks) {
 
    // If no baseline models are requested, nothing to do
    if(conf_info.OperBaseline.n() == 0 &&
-      conf_info.BestBaseline.n() == 0) return(0);
+      conf_info.BestBaseline.n() == 0) return 0;
 
    mlog << Debug(3)
         << "Building CLIPER/SHIFOR operational baseline forecasts using "
@@ -1578,7 +1578,7 @@ int derive_baseline(TrackInfoArray &atracks, const TrackInfoArray &btracks) {
       } // end for j
    } // end for i
 
-   return(n_add);
+   return n_add;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1795,8 +1795,8 @@ void process_match(const TrackInfo &adeck, const TrackInfo &bdeck,
    double adeck_dland, bdeck_dland, e_tk, e_x, e_y, e_altk, e_crtk;
 
    TrackPairInfo pair;
-   const TrackPoint *adeck_point = (TrackPoint *) 0;
-   const TrackPoint *bdeck_point = (TrackPoint *) 0;
+   const TrackPoint *adeck_point = (TrackPoint *) nullptr;
+   const TrackPoint *bdeck_point = (TrackPoint *) nullptr;
    TrackPoint empty_point;
 
    // Initialize TrackPairInfo with the current tracks
@@ -1907,7 +1907,7 @@ double compute_dland(double lat, double lon) {
       y < 0 || y >= dland_grid.ny())   dist = bad_data_double;
    else                                dist = dland_dp.get(x, y);
 
-   return(dist);
+   return dist;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2105,7 +2105,7 @@ void write_tracks(const TrackPairInfoArray &p) {
    TcHdrColumns tchc;
    ConcatString out_file;
    AsciiTable out_at;
-   ofstream *out = (ofstream *) 0;
+   ofstream *out = (ofstream *) nullptr;
 
    // Set the track pair output file name
    out_file << out_base << tc_stat_file_ext;
@@ -2163,7 +2163,7 @@ void write_tracks(const TrackPairInfoArray &p) {
       *out << out_at;
       out->close();
       delete out;
-      out = (ofstream *) 0;
+      out = (ofstream *) nullptr;
    }
 
    return;
@@ -2176,7 +2176,7 @@ void write_prob_rirw(const ProbRIRWPairInfoArray &p) {
    TcHdrColumns tchc;
    ConcatString out_file;
    AsciiTable out_at;
-   ofstream *out = (ofstream *) 0;
+   ofstream *out = (ofstream *) nullptr;
 
    // Set the track pair output file name
    out_file << out_base << "_PROBRIRW" << tc_stat_file_ext;
@@ -2241,7 +2241,7 @@ void write_prob_rirw(const ProbRIRWPairInfoArray &p) {
       *out << out_at;
       out->close();
       delete out;
-      out = (ofstream *) 0;
+      out = (ofstream *) nullptr;
    }
 
    return;

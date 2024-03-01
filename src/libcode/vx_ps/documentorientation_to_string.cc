@@ -38,7 +38,7 @@ ConcatString documentorientation_to_string(const DocumentOrientation t)
 
 {
 
-const char * s = (const char *) 0;
+const char * s = (const char *) nullptr;
 
 switch ( t )  {
 
@@ -53,7 +53,7 @@ switch ( t )  {
 }   //  switch
 
 
-return ( ConcatString (s) );
+return ConcatString(s);
 
 }
 

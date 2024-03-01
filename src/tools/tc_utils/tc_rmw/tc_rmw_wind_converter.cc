@@ -31,8 +31,8 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 static void wind_ne_to_ra(const TcrmwGrid&,
-			  const DataPlane&, const DataPlane&,
-			  const double*, const double*, double*, double*);
+                          const DataPlane&, const DataPlane&,
+                          const double*, const double*, double*, double*);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -84,7 +84,7 @@ void TCRMW_WindConverter::init(const TCRMWConfInfo *conf) {
     return;
   }
 
-  VarInfo* data_info = (VarInfo*) 0;
+  VarInfo* data_info = (VarInfo*) nullptr;
   for(int i_var = 0; i_var < _conf->get_n_data(); i_var++) {
     data_info = _conf->data_info[i_var];
     string varname = data_info->name_attr().string();
@@ -130,8 +130,8 @@ void TCRMW_WindConverter::update_input(const string &variableName, const string 
 ////////////////////////////////////////////////////////////////////////
 
 void TCRMW_WindConverter::append_nc_output_vars(map<string, vector<string> > &variable_levels,
-						map<string, string> &variable_long_names,
-						map<string, string> &variable_units) {
+                                                map<string, string> &variable_long_names,
+                                                map<string, string> &variable_units) {
   if (!_computeWinds) {
     return;
   }
@@ -147,11 +147,11 @@ void TCRMW_WindConverter::append_nc_output_vars(map<string, vector<string> > &va
   else {
     if (!_foundUInInput) {
       mlog << Warning << "\nTCWRMW_WindConverter::checkInputs() -> "
-	   << "field not found in input \"" << _conf->u_wind_field_name << "\"\n\n";
+           << "field not found in input \"" << _conf->u_wind_field_name << "\"\n\n";
     }
     if (!_foundVInInput) {
       mlog << Warning << "\nTCWRMW_WindConverter::checkInputs() -> "
-	   << "field not found in input \"" << _conf->v_wind_field_name << "\"\n\n";
+           << "field not found in input \"" << _conf->v_wind_field_name << "\"\n\n";
     }
     mlog << Warning << "\nNot computing radial and tangential winds\n\n";
     _computeWinds = false;
@@ -161,24 +161,24 @@ void TCRMW_WindConverter::append_nc_output_vars(map<string, vector<string> > &va
 ////////////////////////////////////////////////////////////////////////
 
 bool TCRMW_WindConverter::compute_winds_if_input_is_u(int i_point,
-						      const string &varName,
-						      const string &varLevel,
-						      unixtime valid_time,
-						      const StringArray &data_files,
-						      const GrdFileType &ftype,
-						      const Grid &latlon_arr,
-						      const double *lat_arr,
-						      const double *lon_arr,
-						      const Grid &grid,
-						      const DataPlane &data_dp,
-						      const TcrmwGrid &tcrmw_grid) {
+                                                      const string &varName,
+                                                      const string &varLevel,
+                                                      unixtime valid_time,
+                                                      const StringArray &data_files,
+                                                      const GrdFileType &ftype,
+                                                      const Grid &latlon_arr,
+                                                      const double *lat_arr,
+                                                      const double *lon_arr,
+                                                      const Grid &grid,
+                                                      const DataPlane &data_dp,
+                                                      const TcrmwGrid &tcrmw_grid) {
   if (!_computeWinds) {
     return false;
   }
 
   int uIndex = -1;
   int vIndex = -1;
-  VarInfo *data_infoV = (VarInfo *) 0;
+  VarInfo *data_infoV = (VarInfo *) nullptr;
   if (varName == _conf->u_wind_field_name.string()) {
     uIndex = _uIndexMap[varLevel];
     vIndex = _vIndexMap[varLevel];
@@ -193,7 +193,7 @@ bool TCRMW_WindConverter::compute_winds_if_input_is_u(int i_point,
   DataPlane data_dpV;
   Grid latlon_arrV;
   get_series_entry(i_point, data_infoV, data_files, ftype, data_dpV,
-		   latlon_arrV);
+                   latlon_arrV);
   double data_min, data_max;
   data_dpV.data_range(data_min, data_max);
   mlog << Debug(4) << "V data_min:" << data_min << "\n";
@@ -205,7 +205,7 @@ bool TCRMW_WindConverter::compute_winds_if_input_is_u(int i_point,
 
   // here's the conversion, at last
   wind_ne_to_ra(tcrmw_grid, data_dp, data_dpV, lat_arr, lon_arr,
-		_windR, _windT);
+                _windR, _windT);
   // _windR and _windT now set
   return true;
 }
@@ -214,9 +214,9 @@ bool TCRMW_WindConverter::compute_winds_if_input_is_u(int i_point,
 ////////////////////////////////////////////////////////////////////////
 
 void wind_ne_to_ra(const TcrmwGrid& tcrmw_grid,
-		   const DataPlane& u_dp, const DataPlane& v_dp,
-		   const double* lat_arr, const double* lon_arr,
-		   double* wind_r_arr, double* wind_t_arr) {
+                   const DataPlane& u_dp, const DataPlane& v_dp,
+                   const double* lat_arr, const double* lon_arr,
+                   double* wind_r_arr, double* wind_t_arr) {
     // Transform (u, v) to (radial, azimuthal)
     for(int ir = 0; ir < tcrmw_grid.range_n(); ir++) {
         for(int ia = 0; ia < tcrmw_grid.azimuth_n(); ia++) {
@@ -227,15 +227,15 @@ void wind_ne_to_ra(const TcrmwGrid& tcrmw_grid,
             double v = v_dp.data()[i];
             double wind_r;
             double wind_t;
-	    if(is_bad_data(u) || is_bad_data(v)) {
-	      mlog << Debug(4) << "wind_ne_to_ra: latlon:" << lat << "," << lon << " winds are missing\n";
-	      wind_r = bad_data_double;
-	      wind_t = bad_data_double;
-	    } else {
-	      tcrmw_grid.wind_ne_to_ra(lat, lon, u, v, wind_r, wind_t);
-	      mlog << Debug(4) << "wind_ne_to_ra: latlon:" << lat << "," << lon << " uv:" << u << ","
-		   << v << ", rt:" << wind_r << "," << wind_t <<"\n";
-	    }
+            if(is_bad_data(u) || is_bad_data(v)) {
+              mlog << Debug(4) << "wind_ne_to_ra: latlon:" << lat << "," << lon << " winds are missing\n";
+              wind_r = bad_data_double;
+              wind_t = bad_data_double;
+            } else {
+              tcrmw_grid.wind_ne_to_ra(lat, lon, u, v, wind_r, wind_t);
+              mlog << Debug(4) << "wind_ne_to_ra: latlon:" << lat << "," << lon << " uv:" << u << ","
+                   << v << ", rt:" << wind_r << "," << wind_t <<"\n";
+            }
             wind_r_arr[i] = wind_r;
             wind_t_arr[i] = wind_t;
         }

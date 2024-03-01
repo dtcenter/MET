@@ -170,7 +170,7 @@ if ( (k < 0) || (k >= N_Dims) )  {
 }
 
 
-return ( Dim[k] );
+return Dim[k];
 
 }
 

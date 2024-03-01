@@ -80,7 +80,7 @@ Grid parse_vx_grid(const RegridInfo info, const Grid *fgrid, const Grid *ogrid) 
    mlog << Debug(3)
         << "Grid Definition: " << vx_grid.serialize() << "\n";
 
-   return(vx_grid);
+   return vx_grid;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -108,7 +108,7 @@ Grid parse_grid_string(const char *grid_str) {
            << grid_str << "\".\n";
 
       Met2dDataFileFactory m_factory;
-      Met2dDataFile *met_ptr = (Met2dDataFile *) 0;
+      Met2dDataFile *met_ptr = (Met2dDataFile *) nullptr;
 
       // Open the data file
       if(!(met_ptr = m_factory.new_met_2d_data_file(grid_str))) {
@@ -125,7 +125,7 @@ Grid parse_grid_string(const char *grid_str) {
       if(met_ptr) { delete met_ptr; met_ptr = 0; }
    }
 
-   return(grid);
+   return grid;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -251,7 +251,7 @@ void parse_grid_mask(const ConcatString &mask_grid_str, Grid &grid) {
            << mask_grid_str << "\".\n";
 
       Met2dDataFileFactory mtddf_factory;
-      Met2dDataFile *mtddf = (Met2dDataFile *) 0;
+      Met2dDataFile *mtddf = (Met2dDataFile *) nullptr;
 
       // Attempt to open the data file
       if(!(mtddf = mtddf_factory.new_met_2d_data_file(
@@ -451,11 +451,11 @@ void parse_poly_2d_data_mask(const ConcatString &mask_poly_str,
 
    // 2D Data file
    Met2dDataFileFactory mtddf_factory;
-   Met2dDataFile *mtddf = (Met2dDataFile *) 0;
+   Met2dDataFile *mtddf = (Met2dDataFile *) nullptr;
 
    // VarInfo object
    VarInfoFactory info_factory;
-   VarInfo *info = (VarInfo *) 0;
+   VarInfo *info = (VarInfo *) nullptr;
 
    // Open the data file
    mtddf = mtddf_factory.new_met_2d_data_file(file_name.c_str(), type);
@@ -504,8 +504,8 @@ void parse_poly_2d_data_mask(const ConcatString &mask_poly_str,
    if(append_thresh) mask_name << st.get_str();
 
    // Clean up
-   if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) 0; }
-   if(info)  { delete info;  info  = (VarInfo *)       0; }
+   if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) nullptr; }
+   if(info)  { delete info;  info  = (VarInfo *)       nullptr; }
 
    return;
 }
@@ -603,15 +603,15 @@ DataPlane parse_geog_data(Dictionary *dict, const Grid &vx_grid,
    StringArray geog_files;
    RegridInfo regrid_info;
    GrdFileType ftype;
-   Dictionary *field_dict = (Dictionary *) 0;
+   Dictionary *field_dict = (Dictionary *) nullptr;
    bool found = false;
    int i;
 
    Met2dDataFileFactory mtddf_factory;
-   Met2dDataFile *mtddf = (Met2dDataFile *) 0;
+   Met2dDataFile *mtddf = (Met2dDataFile *) nullptr;
 
    VarInfoFactory info_factory;
-   VarInfo *info = (VarInfo *) 0;
+   VarInfo *info = (VarInfo *) nullptr;
 
    if(!dict) {
       mlog << Error << "\nparse_geog_data() -> "
@@ -673,8 +673,8 @@ DataPlane parse_geog_data(Dictionary *dict, const Grid &vx_grid,
       }
 
       // Deallocate memory
-      if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) 0; }
-      if(info)  { delete info;  info  = (VarInfo       *) 0; }
+      if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) nullptr; }
+      if(info)  { delete info;  info  = (VarInfo       *) nullptr; }
    }
 
    if(!found) {
@@ -683,7 +683,7 @@ DataPlane parse_geog_data(Dictionary *dict, const Grid &vx_grid,
       exit(1);
    }
 
-   return(dp);
+   return dp;
 }
 
 ////////////////////////////////////////////////////////////////////////

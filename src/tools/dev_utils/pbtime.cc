@@ -94,7 +94,7 @@ int met_main(int argc, char *argv[]) {
    // Delete the temporary blocked file
    remove_temp_file(blk_file);
 
-   return(0);
+   return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////

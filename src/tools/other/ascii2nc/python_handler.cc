@@ -227,7 +227,7 @@ bool status = false;
 if ( use_tmp_ascii )  status = do_tmp_ascii ();
 else                  status = do_straight ();
 
-return ( status );
+return status;
 
 }
 
@@ -277,7 +277,7 @@ if ( PyErr_Occurred() )  {
         << "an error occurred importing module "
         << '\"' << user_base.text() << "\"\n\n";
 
-   return ( false );
+   return false;
 
 }
 
@@ -302,7 +302,7 @@ PyObject * obj = md.lookup_list(list_name);
 load_python_obs(obj);
 
 
-return ( true );
+return true;
 
 }
 
@@ -402,7 +402,7 @@ remove_temp_file(tmp_ascii_path);
    //  done
    //
 
-return ( true );
+return true;
 
 }
 

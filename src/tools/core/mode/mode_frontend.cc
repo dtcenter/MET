@@ -116,7 +116,7 @@ int ModeFrontEnd::run_traditional(const StringArray & Argv)
 #ifdef  WITH_PYTHON
    GP.finalize();
 #endif
-   return (0);
+   return 0;
 }
 
 ///////////////////////////////////////////////////////////////////////

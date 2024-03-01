@@ -66,8 +66,8 @@ void MtdConfigInfo::init_from_scratch()
 {
 
    // Initialize pointers
-   fcst_info = (VarInfo *) 0;
-   obs_info  = (VarInfo *) 0;
+   fcst_info = (VarInfo *) nullptr;
+   obs_info  = (VarInfo *) nullptr;
 
    clear();
 
@@ -133,14 +133,14 @@ void MtdConfigInfo::clear()
    start_time_delta_wt    = bad_data_double;
    end_time_delta_wt      = bad_data_double;
 
-   space_centroid_dist_if = (PiecewiseLinear *) 0;
-   time_centroid_delta_if = (PiecewiseLinear *) 0;
-   speed_delta_if         = (PiecewiseLinear *) 0;
-   direction_diff_if      = (PiecewiseLinear *) 0;
-   volume_ratio_if        = (PiecewiseLinear *) 0;
-   axis_angle_diff_if     = (PiecewiseLinear *) 0;
-   start_time_delta_if    = (PiecewiseLinear *) 0;
-   end_time_delta_if      = (PiecewiseLinear *) 0;
+   space_centroid_dist_if = (PiecewiseLinear *) nullptr;
+   time_centroid_delta_if = (PiecewiseLinear *) nullptr;
+   speed_delta_if         = (PiecewiseLinear *) nullptr;
+   direction_diff_if      = (PiecewiseLinear *) nullptr;
+   volume_ratio_if        = (PiecewiseLinear *) nullptr;
+   axis_angle_diff_if     = (PiecewiseLinear *) nullptr;
+   start_time_delta_if    = (PiecewiseLinear *) nullptr;
+   end_time_delta_if      = (PiecewiseLinear *) nullptr;
 
    total_interest_thresh = bad_data_double;
 
@@ -163,8 +163,8 @@ void MtdConfigInfo::clear()
    delta_t_seconds = 0;
 
    // Deallocate memory
-   if(fcst_info) { delete fcst_info; fcst_info = (VarInfo *) 0; }
-   if(obs_info)  { delete obs_info;  obs_info  = (VarInfo *) 0; }
+   if(fcst_info) { delete fcst_info; fcst_info = (VarInfo *) nullptr; }
+   if(obs_info)  { delete obs_info;  obs_info  = (VarInfo *) nullptr; }
 
    return;
 
@@ -252,9 +252,9 @@ void MtdConfigInfo::process_config(GrdFileType ftype, GrdFileType otype)
 {
 
    VarInfoFactory info_factory;
-   Dictionary *fcst_dict = (Dictionary *) 0;
-   Dictionary *obs_dict  = (Dictionary *) 0;
-   Dictionary *dict      = (Dictionary *) 0;
+   Dictionary *fcst_dict = (Dictionary *) nullptr;
+   Dictionary *obs_dict  = (Dictionary *) nullptr;
+   Dictionary *dict      = (Dictionary *) nullptr;
    PlotInfo plot_info;
    bool status = false;
    double sum;
@@ -558,7 +558,7 @@ void MtdConfigInfo::parse_nc_info()
 
 {
 
-const DictionaryEntry * e = (const DictionaryEntry *) 0;
+const DictionaryEntry * e = (const DictionaryEntry *) nullptr;
 
 e = conf.lookup(conf_key_nc_output);
 
@@ -629,7 +629,7 @@ void MtdConfigInfo::parse_txt_info()
 
 {
 
-const DictionaryEntry * e = (const DictionaryEntry *) 0;
+const DictionaryEntry * e = (const DictionaryEntry *) nullptr;
 
 const char * key = conf_key_txt_output;
 
@@ -854,7 +854,7 @@ bool MtdNcOutInfo::all_false() const
 // bool status = do_latlon || do_raw || do_object_raw || do_object_id || do_cluster_id || do_polylines;
    bool status = do_latlon || do_raw ||                  do_object_id || do_cluster_id;
 
-return ( !status );
+return !status;
 
 }
 

@@ -104,7 +104,7 @@ void GenEnsProdConfInfo::read_config(const ConcatString default_file_name,
 void GenEnsProdConfInfo::process_config(GrdFileType etype, StringArray * ens_files, bool use_ctrl) {
    int i, j;
    VarInfoFactory info_factory;
-   Dictionary *edict = (Dictionary *) 0;
+   Dictionary *edict = (Dictionary *) nullptr;
    Dictionary i_edict;
    InterpMthd mthd;
    VarInfo * next_var;
@@ -379,7 +379,7 @@ GenEnsProdNcOutInfo GenEnsProdConfInfo::parse_nc_info(Dictionary *dict) {
       cur.do_climo_cdp = d->lookup_bool(conf_key_climo_cdp_flag);
    }
 
-   return(cur);
+   return cur;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -410,7 +410,7 @@ bool GenEnsProdNcOutInfo::all_false() const {
                  do_vld    || do_freq || do_nep   || do_nmep  ||
                  do_climo  || do_climo_cdp;
 
-   return(!status);
+   return !status;
 }
 
 ////////////////////////////////////////////////////////////////////////

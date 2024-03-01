@@ -76,11 +76,11 @@ Min_Interp & Min_Interp::operator=(const Min_Interp & m)
 
 {
 
-if ( this == &m )  return ( * this );
+if ( this == &m )  return *this;
 
 assign(m);
 
-return ( * this );
+return *this;
 
 }
 
@@ -136,11 +136,11 @@ Interpolator * Min_Interp::copy() const
 
 {
 
-Interpolator * i = (Interpolator *) 0;
+Interpolator * i = (Interpolator *) nullptr;
 
 i = new Min_Interp (*this);
 
-return ( i );
+return i;
 
 }
 
@@ -226,7 +226,7 @@ if ( good_count >= NgoodNeeded )  {
    //
 
 
-return ( I );
+return I;
 
 }
 

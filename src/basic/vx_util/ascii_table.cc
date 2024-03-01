@@ -99,11 +99,11 @@ AsciiTable & AsciiTable::operator=(const AsciiTable & a)
 
 {
 
-if ( this == &a )  return ( * this );
+if ( this == &a )  return *this;
 
 assign(a);
 
-return ( * this );
+return *this;
 
 }
 
@@ -231,7 +231,7 @@ int n;
 
 n = r*Ncols + c;
 
-return ( n );
+return n;
 
 }
 
@@ -556,9 +556,9 @@ if ( (col_left < 0) || (col_left >= (Ncols - 1)) )  {
 
 }
 
-if ( InterColumnSpace.empty() )  return ( 0 );
+if ( InterColumnSpace.empty() )  return 0;
 
-return ( InterColumnSpace[col_left] );
+return InterColumnSpace[col_left];
 
 }
 
@@ -632,9 +632,9 @@ if ( (row_top < 0) || (row_top >= (Nrows - 1)) )  {
 
 }
 
-if ( InterRowSpace.empty() )  return ( 0 );
+if ( InterRowSpace.empty() )  return 0;
 
-return ( InterRowSpace[row_top] );
+return InterRowSpace[row_top];
 
 }
 
@@ -914,7 +914,7 @@ n = rc_to_n(r, c);   //  "rc_to_n" does range checking on r and c,
                      //    so we don't need to do that here
 
 
-return ( Just[n] );
+return Just[n];
 
 }
 
@@ -1022,7 +1022,7 @@ fix_float(str);
 if ( DoCommaString )  {
    char junk[256];
    m_strncpy(junk, str.c_str(), str.length(), method_name);
-   char * p = (char *) 0;
+   char * p = (char *) nullptr;
    long X;
    ConcatString s;
    ConcatString j2;
@@ -1083,7 +1083,7 @@ int n;
 n = rc_to_n(r, c);   //  "rc_to_n" does range checking on r and c,
                      //    so we don't need to do that here
 
-return ( e[n] );     //  might be null
+return e[n];     //  might be null
 
 }
 
@@ -1095,7 +1095,7 @@ int AsciiTable::col_width(int k) const
 
 {
 
-if ( e.empty() )  return ( 0 );
+if ( e.empty() )  return 0;
 
 if ( (k < 0) || (k >= Ncols) )  {
 
@@ -1105,7 +1105,7 @@ if ( (k < 0) || (k >= Ncols) )  {
 
 }
 
-return ( ColWidth[k] );
+return ColWidth[k];
 
 }
 
@@ -1117,7 +1117,7 @@ int AsciiTable::max_col_width() const
 
 {
 
-if ( e.empty() )  return ( 0 );
+if ( e.empty() )  return 0;
 
 int c, w, k;
 
@@ -1131,7 +1131,7 @@ for (c=0; c<Ncols; ++c)  {
 
 }
 
-return ( k );
+return k;
 
 }
 
@@ -1159,14 +1159,14 @@ for (c=0; c<Ncols; ++c)  {
 
    if ( !e[n].empty() )  {
 
-      if ( !all_blanks(e[n]) )  return ( false );
+      if ( !all_blanks(e[n]) )  return false;
 
    }
 
 }
 
 
-return ( true );
+return true;
 
 }
 
@@ -1200,7 +1200,7 @@ for (c=0; c<Ncols; ++c)  {
 if ( ElimTrailingWhitespace )  s.elim_trailing_whitespace();
 
 
-return ( s );
+return s;
 
 }
 
@@ -1222,7 +1222,7 @@ w = ColWidth[c];
 
 if ( w == 0 )  {
 
-   return ( ConcatString() );
+   return ConcatString();
 
 }
 
@@ -1234,7 +1234,7 @@ if ( e[n].empty() )  {
 
    s.set_repeat(' ', w);
 
-   return ( s );
+   return s;
 
 }
 
@@ -1248,9 +1248,9 @@ s = out;
    //  done
    //
 
-if ( out )  { delete [] out;  out = (char *) 0; }
+if ( out )  { delete [] out;  out = (char *) nullptr; }
 
-return ( s );
+return s;
 
 }
 
@@ -1262,7 +1262,7 @@ int AsciiTable::table_width() const
 
 {
 
-if ( e.empty() )  return ( 0 );
+if ( e.empty() )  return 0;
 
 int j, W;
 
@@ -1272,7 +1272,7 @@ for (j=0; j<Ncols; ++j)  W += ColWidth[j];
 
 for (j=0; j<(Ncols - 1); ++j)  W += InterColumnSpace[j];
 
-return ( W );
+return W;
 
 }
 
@@ -1284,7 +1284,7 @@ int AsciiTable::table_height() const
 
 {
 
-if ( e.empty() )  return ( 0 );
+if ( e.empty() )  return 0;
 
 int j, H;
 
@@ -1292,7 +1292,7 @@ H = Nrows;
 
 for (j=0; j<(Nrows - 1); ++j)  H += InterRowSpace[j];
 
-return ( H );
+return H;
 
 }
 
@@ -1482,7 +1482,7 @@ for (r=0; r<=rmax; ++r)  {
 
 out.flush();
 
-return ( out );
+return out;
 
 }
 
@@ -1633,7 +1633,7 @@ bool all_blanks(std::string text)
 
 if (text.find_first_not_of(' ') != std::string::npos) return false;
 
-return ( true );
+return true;
 
 }
 
@@ -1731,7 +1731,7 @@ ConcatString check_hdr_str(const ConcatString &col_name,
    if(cs_tmp.length() == 0) {
       mlog << Warning << "\ncheck_hdr_str() -> "
            << "output header column " << to_upper(col_name) << " is empty!\n\n";
-      return(na_string);
+      return na_string;
    }
 
    // Check for embedded whitespace
@@ -1742,7 +1742,7 @@ ConcatString check_hdr_str(const ConcatString &col_name,
       exit(1);
    }
 
-   return(cs_tmp);
+   return cs_tmp;
 }
 
 

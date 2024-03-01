@@ -31,13 +31,13 @@ TimeSeriesType string_to_timeseriestype(const char *s) {
    else if(strcasecmp(s, timeseriestype_swing_str) == 0) t = TimeSeriesType_Swing;
    else                                                  t = TimeSeriesType_None;
 
-   return(t);
+   return t;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 const char * timeseriestype_to_string(const TimeSeriesType t) {
-   const char *s = (const char *) 0;
+   const char *s = (const char *) nullptr;
 
    switch(t) {
       case(TimeSeriesType_DyDt):  s = timeseriestype_dydt_str;  break;
@@ -45,7 +45,7 @@ const char * timeseriestype_to_string(const TimeSeriesType t) {
       default:                    s = na_str;                   break;
    }
 
-   return(s);
+   return s;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -77,7 +77,7 @@ bool compute_dydt_ramps(const char *name,
       mlog << Error << "\ncompute_dydt_ramps() -> "
            << "for non-exact differences the ramp threshold ("
            << thresh.get_str() << ") must be of type <, <=, >, or >=.\n\n";
-      return(false);
+      return false;
    }
 
    // Loop over the times
@@ -137,7 +137,7 @@ bool compute_dydt_ramps(const char *name,
       }
    } // end for i
 
-   return(true);
+   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -165,14 +165,14 @@ bool compute_swing_ramps(const char *name,
          ramps.add(bad_data_double);
          slopes.add(bad_data_double);
       }
-      return(true);
+      return true;
    }
 
    mlog << Debug(4)
         << "Applying the swinging door algorithm.\n";
 
    if(!compute_swinging_door_slopes(times, vals, width, slopes)) {
-      return(false);
+      return false;
    }
    
    // Apply the slope threshold to define ramps
@@ -194,7 +194,7 @@ bool compute_swing_ramps(const char *name,
       
    }
    
-   return(true);
+   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////

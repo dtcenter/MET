@@ -71,11 +71,11 @@ Token & Token::operator=(const Token & t)
 
 {
 
-if ( this == &t )  return ( * this );
+if ( this == &t )  return *this;
 
 assign(t);
 
-return ( * this );
+return *this;
 
 }
 
@@ -360,7 +360,7 @@ const bool tf =    (type == tok_union)
                 || (type == tok_negation);
 
 
-return ( tf );
+return tf;
 
 }
 
@@ -382,7 +382,7 @@ ostream & operator<<(ostream & out, const Token & t)
 
 t.dump(out);
 
-return ( out );
+return out;
 
 }
 

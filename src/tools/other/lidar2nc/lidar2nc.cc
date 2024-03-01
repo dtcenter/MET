@@ -148,7 +148,7 @@ nc_point_obs.close();
    //  done
    //
 
-return ( 0 );
+return 0;
 
 }
 
@@ -256,7 +256,7 @@ switch ( hdf_type )  {
 }   //  switch
 
 
-return ( t );
+return t;
 
 }
 

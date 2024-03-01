@@ -69,11 +69,11 @@ AsciiHeaderLine::AsciiHeaderLine(const AsciiHeaderLine &a) {
 
 AsciiHeaderLine & AsciiHeaderLine::operator=(const AsciiHeaderLine & a) {
 
-   if(this == &a) return(*this);
+   if(this == &a) return *this;
 
    assign(a);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -216,7 +216,7 @@ int AsciiHeaderLine::col_offset(const char *name, const int dim) const {
    if(!is_var_length()) {
 
       // Check for no match
-      if(!ColNames.has(name, offset)) return(bad_data_int);
+      if(!ColNames.has(name, offset)) return bad_data_int;
 
    }
    // Handle variable length lines
@@ -232,7 +232,7 @@ int AsciiHeaderLine::col_offset(const char *name, const int dim) const {
       }
 
       // Check for no match
-      if(is_bad_data(match)) return(bad_data_int);
+      if(is_bad_data(match)) return bad_data_int;
 
       // Fixed columns before variable ones
       if(match < VarBegOffset) {
@@ -277,7 +277,7 @@ int AsciiHeaderLine::col_offset(const char *name, const int dim) const {
       }
    } // end else
 
-   return(offset);
+   return offset;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -324,7 +324,7 @@ ConcatString AsciiHeaderLine::col_name(const int offset, int const dim) const {
       } // end else
    }
 
-   return(name);
+   return name;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -363,11 +363,11 @@ AsciiHeader::AsciiHeader(const char *version) {
 
 AsciiHeader & AsciiHeader::operator=(const AsciiHeader & a) {
 
-   if(this == &a) return(*this);
+   if(this == &a) return *this;
 
    assign(a);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -490,7 +490,7 @@ const AsciiHeaderLine * AsciiHeader::header(const char *version,
       exit(1);
    }
 
-   return(&(*it));
+   return &(*it);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -500,7 +500,7 @@ int AsciiHeader::col_offset(const char *version,   const char *data_type,
                             const int dim) {
    const AsciiHeaderLine *line = header(version, data_type, line_type);
 
-   return(line->col_offset(name, dim));
+   return line->col_offset(name, dim);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -510,7 +510,7 @@ ConcatString AsciiHeader::col_name(const char *version,   const char *data_type,
                                    const int dim) {
    const AsciiHeaderLine *line = header(version, data_type, line_type);
 
-   return(line->col_name(offset, dim));
+   return line->col_name(offset, dim);
 }
 
 ////////////////////////////////////////////////////////////////////////

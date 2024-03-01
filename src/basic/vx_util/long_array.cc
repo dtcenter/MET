@@ -76,11 +76,11 @@ LongArray & LongArray::operator=(const LongArray & a)
 
 {
 
-if ( this == &a )  return ( * this );
+if ( this == &a )  return *this;
 
 assign(a);
 
-return ( * this );
+return *this;
 
 }
 
@@ -92,7 +92,7 @@ void LongArray::init_from_scratch()
 
 {
 
-e = (long *) 0;
+e = (long *) nullptr;
 
 AllocInc = 10;   //  default value
 
@@ -110,7 +110,7 @@ void LongArray::clear()
 
 {
 
-if ( e )  { delete [] e;  e = (long *) 0; }
+if ( e )  { delete [] e;  e = (long *) nullptr; }
 
 
 
@@ -160,7 +160,7 @@ if ( ! exact )  {
 }
 
 int j;
-long * u = (long *) 0;
+long * u = (long *) nullptr;
 
 u = new long [n];
 
@@ -181,11 +181,11 @@ for(j=0; j<Nelements; ++j)  {
 
 }
 
-if ( e )  { delete [] e;  e = (long *) 0; }
+if ( e )  { delete [] e;  e = (long *) nullptr; }
 
 e = u;
 
-u = (long *) 0;
+u = (long *) nullptr;
 
 Nalloc = n;
 
@@ -296,11 +296,11 @@ int j;
 
 for (j=0; j<Nelements; ++j)  {
 
-   if ( e[j] == l )  return ( 1 );
+   if ( e[j] == l )  return 1;
 
 }
 
-return ( 0 );
+return 0;
 
 }
 
@@ -320,7 +320,7 @@ if ( (n < 0) || (n >= Nelements) )  {
    exit ( 1 );
 }
 
-return ( e[n] );
+return e[n];
 
 }
 

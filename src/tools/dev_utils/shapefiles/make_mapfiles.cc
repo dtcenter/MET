@@ -180,7 +180,7 @@ if ( do_separate_files )   {
    //  done
    //
 
-return ( 0 );
+return 0;
 
 }
 
@@ -550,7 +550,7 @@ if ( r.admin.nonempty() )  {
 
 }
 
-return ( s );
+return s;
 
 }
 

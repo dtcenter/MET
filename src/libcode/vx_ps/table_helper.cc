@@ -100,9 +100,9 @@ void TableHelper::init_from_scratch()
 
 {
 
-ColWidth = (double *) 0;
+ColWidth = (double *) nullptr;
 
-RowHeight = (double *) 0;
+RowHeight = (double *) nullptr;
 
 clear();
 
@@ -118,11 +118,11 @@ void TableHelper::clear()
 
 {
 
-Plot = (PSfile *) 0;   //  not allocated, so don't delete
+Plot = (PSfile *) nullptr;   //  not allocated, so don't delete
 
-if ( ColWidth )  { delete [] ColWidth;  ColWidth = (double *) 0; }
+if ( ColWidth )  { delete [] ColWidth;  ColWidth = (double *) nullptr; }
 
-if ( RowHeight )  { delete [] RowHeight;  RowHeight = (double *) 0; }
+if ( RowHeight )  { delete [] RowHeight;  RowHeight = (double *) nullptr; }
 
 Xpin = Ypin = Upin = Vpin = 0.0;
 
@@ -266,7 +266,7 @@ double TableHelper::col_width(int c) const
 
 range_check_c(c);
 
-return ( ColWidth[c] );
+return ColWidth[c];
 
 }
 
@@ -280,7 +280,7 @@ double TableHelper::row_height(int r) const
 
 range_check_r(r);
 
-return ( RowHeight[r] );
+return RowHeight[r];
 
 }
 
@@ -297,7 +297,7 @@ double w = 0.0;
 
 for (j=0; j<Ncols; ++j)  w += ColWidth[j];
 
-return ( w );
+return w;
 
 }
 
@@ -314,7 +314,7 @@ double h = 0.0;
 
 for (j=0; j<Nrows; ++j)  h += RowHeight[j];
 
-return ( h );
+return h;
 
 }
 
@@ -326,7 +326,7 @@ double TableHelper::left() const
 
 {
 
-return ( x_ll() );
+return x_ll();
 
 }
 
@@ -362,7 +362,7 @@ double TableHelper::bottom() const
 
 {
 
-return ( y_ll() );
+return y_ll();
 
 }
 
@@ -407,7 +407,7 @@ cell_ll(r, c, cx_ll, cy_ll);
 
 b.set_llwh(cx_ll, cy_ll, col_width(c), row_height(r));
 
-return ( b );
+return b;
 
 }
 
@@ -426,7 +426,7 @@ cell_ll(Nrows - 1, c, cx_ll, cy_ll);
 
 b.set_llwh(cx_ll, cy_ll, col_width(c), height());
 
-return ( b );
+return b;
 
 }
 
@@ -445,7 +445,7 @@ cell_ll(r, 0, rx_ll, ry_ll);
 
 b.set_llwh(rx_ll, ry_ll, width(), row_height(r));
 
-return ( b );
+return b;
 
 }
 
@@ -461,7 +461,7 @@ Box b;
 
 b.set_llwh(x_ll(), y_ll(), width(), height());
 
-return ( b );
+return b;
 
 }
 
@@ -957,7 +957,7 @@ for (j=0; j<r; ++j)  {
    //  done
    //
 
-return ( y );
+return y;
 
 }
 
@@ -969,9 +969,9 @@ double TableHelper::row_bottom(int r) const
 
 {
 
-if ( r == (Nrows - 1) )  return ( y_ll() );
+if ( r == (Nrows - 1) )  return y_ll();
 
-return ( row_top(r + 1) );
+return row_top(r + 1);
 
 }
 
@@ -998,7 +998,7 @@ for (j=0; j<c; ++j)  {
    //  done
    //
 
-return ( x );
+return x;
 
 }
 
@@ -1012,7 +1012,7 @@ double TableHelper::col_right(int c) const
 
 if ( c == (Ncols - 1) )  return ( x_ll() + width() );
 
-return ( col_left(c + 1) );
+return col_left(c + 1);
 
 }
 

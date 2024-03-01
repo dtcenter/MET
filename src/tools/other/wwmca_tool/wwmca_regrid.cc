@@ -167,7 +167,7 @@ regridder.do_output(output_filename.c_str());
    //  done
    //
 
-return ( 0 );
+return 0;
 
 }
 
@@ -294,7 +294,7 @@ int get_compress()
 
 {
 
-return ( compress_level );
+return compress_level;
 
 }
 

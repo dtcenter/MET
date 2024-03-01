@@ -80,11 +80,11 @@ AfmToken & AfmToken::operator=(const AfmToken & t)
 
 {
 
-if ( this == &t )  return ( * this );
+if ( this == &t )  return *this;
 
 assign(t);
 
-return ( * this );
+return *this;
 
 }
 
@@ -242,7 +242,7 @@ switch ( type )  {
 
 };
 
-return ( x );
+return x;
 
 }
 

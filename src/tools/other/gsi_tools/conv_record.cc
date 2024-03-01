@@ -114,7 +114,7 @@ const int n = fortran_two_to_one(nreal, data_index, station);
 double value = (double) (rdiag[n]);
 
 
-return ( value );
+return value;
 
 }
 
@@ -152,7 +152,7 @@ for (j=7; j>=0; --j)  {
 }
 
 
-return ( ConcatString(localbuf) );
+return ConcatString(localbuf);
 
 }
 
@@ -171,7 +171,7 @@ unix_to_mdyhms(date, month, day, year, hour, minute, second);
 
 snprintf(junk, sizeof(junk), "%04d%02d%02d_%02d0000", year, month, day, hour);
 
-return ( ConcatString(junk) );
+return ConcatString(junk);
 
 }
 
@@ -296,7 +296,7 @@ if ( (Fd = met_open(path, O_RDONLY)) < 0 )  {
 
    Fd = -1;
 
-   return ( false );
+   return false;
 
 }
 
@@ -320,7 +320,7 @@ if ( s <= 0 )  {
    mlog << Warning << "\nConvFile::open() -> "
         << "unable to read date from input file: " << Filename << "\n\n";
 
-   return ( false );
+   return false;
 
 }
 
@@ -363,7 +363,7 @@ while ( (*this) >> r )  {
    //  done
    //
 
-return ( true );
+return true;
 
 }
 
@@ -393,7 +393,7 @@ r.extend(512);
 
 long long s = read_fortran_binary(f.Fd, r.Buf, 23, f.RecPadSize, f.SwapEndian);
 
-if ( s == 0 )  return ( false );
+if ( s == 0 )  return false;
 
 if ( s != 19 && s != 23 )  {
 
@@ -454,7 +454,7 @@ if ( f.SwapEndian )  {
    //  done
    //
 
-return ( true );
+return true;
 
 }
 

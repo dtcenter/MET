@@ -77,11 +77,11 @@ ClistEntry & ClistEntry::operator=(const ClistEntry & e)
 
 {
 
-if ( this == &e )  return ( * this );
+if ( this == &e )  return *this;
 
 assign(e);
 
-return ( * this );
+return *this;
 
 }
 
@@ -245,11 +245,11 @@ ColorList & ColorList::operator=(const ColorList & c)
 
 {
 
-if ( this == &c )  return ( * this );
+if ( this == &c )  return *this;
 
 assign(c);
 
-return ( * this );
+return *this;
 
 }
 
@@ -261,7 +261,7 @@ void ColorList::init_from_scratch()
 
 {
 
-e = (ClistEntry *) 0;
+e = (ClistEntry *) nullptr;
 
 clear();
 
@@ -277,7 +277,7 @@ void ColorList::clear()
 
 {
 
-if ( e )  { delete [] e;   e = (ClistEntry *) 0; }
+if ( e )  { delete [] e;   e = (ClistEntry *) nullptr; }
 
 Nelements = Nalloc = 0;
 
@@ -325,7 +325,7 @@ void ColorList::extend(int n)
 if ( Nalloc >= n )  return;
 
 int k;
-ClistEntry * u = (ClistEntry *) 0;
+ClistEntry * u = (ClistEntry *) nullptr;
 
 
 k = n/colorlist_alloc_inc;
@@ -348,11 +348,11 @@ if ( e )  {
 
    for (k=0; k<Nelements; ++k)  u[k] = e[k];
 
-   delete [] e;   e = (ClistEntry *) 0;
+   delete [] e;   e = (ClistEntry *) nullptr;
 
 }
 
-e = u;   u = (ClistEntry *) 0;
+e = u;   u = (ClistEntry *) nullptr;
 
 Nalloc = n;
 
@@ -412,7 +412,7 @@ for (j=0; j<Nelements; ++j)  {
 
       index = j;
 
-      return ( 1 );
+      return 1;
 
    }
 
@@ -421,7 +421,7 @@ for (j=0; j<Nelements; ++j)  {
 
 
 
-return ( 0 );
+return 0;
 
 }
 
@@ -476,7 +476,7 @@ if ( (n < 0) || (n >= Nelements) )  {
 
 }
 
-return ( e[n] );
+return e[n];
 
 }
 

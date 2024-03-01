@@ -80,11 +80,11 @@ SmartBuffer & SmartBuffer::operator=(const SmartBuffer & b)
 
 {
 
-if ( this == &b )  return ( * this );
+if ( this == &b )  return *this;
 
 assign(b);
 
-return ( * this );
+return *this;
 
 }
 
@@ -202,7 +202,7 @@ n_read = ::read(fd, Buf, bytes);
    //  done
    //
 
-return ( n_read );
+return n_read;
 
 }
 
@@ -232,7 +232,7 @@ n_written = ::write(fd, Buf, bytes);
    //  done
    //
 
-return ( n_written );
+return n_written;
 
 }
 

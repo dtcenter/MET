@@ -89,11 +89,11 @@ SO3 & SO3::operator=(const SO3 & s)
 
 {
 
-if ( this == &s )  return ( * this );
+if ( this == &s )  return *this;
 
 assign(s);
 
-return ( * this );
+return *this;
 
 }
 
@@ -421,7 +421,7 @@ y = M21*u + M22*v + M23*w;
 z = M31*u + M32*v + M33*w;
 
 
-return ( true );
+return true;
 
 }
 
@@ -440,7 +440,7 @@ v = M12*x + M22*y + M32*z;
 w = M13*x + M23*y + M33*z;
 
 
-return ( true );
+return true;
 
 }
 
@@ -455,7 +455,7 @@ bool SO3::ccw(double u, double v, double w, double & x, double & y, double & z) 
 bool status = forward(u, v, w, x, y, z);
 
 
-return ( status );
+return status;
 
 }
 
@@ -470,7 +470,7 @@ bool SO3::cw(double x, double y, double z, double & u, double & v, double & w) c
 bool status = reverse(x, y, z, u, v, w);
 
 
-return ( status );
+return status;
 
 }
 
@@ -494,7 +494,7 @@ t =   fabs(M12) + fabs(M21)
     + fabs(M13) + fabs(M31)
     + fabs(M23) + fabs(M32);
 
-if ( t > tol )  return ( false );
+if ( t > tol )  return false;
 
    //
    //  check diagonal elements
@@ -502,13 +502,13 @@ if ( t > tol )  return ( false );
 
 t = fabs(M11) + fabs(M22) + fabs(M33) - 3.0;
 
-if ( t > tol )  return ( false );
+if ( t > tol )  return false;
 
    //
    //  yup
    //
 
-return ( true );
+return true;
 
 }
 
@@ -639,7 +639,7 @@ bool SO3::is_z_axis() const
 
 {
 
-if ( is_identity() )  return ( true );
+if ( is_identity() )  return true;
 
 double ax, ay, az;
 double angle;
@@ -675,7 +675,7 @@ bool SO3::is_x_axis() const
 
 {
 
-if ( is_identity() )  return ( true );
+if ( is_identity() )  return true;
 
 double ax, ay, az;
 double angle;
@@ -711,7 +711,7 @@ bool SO3::is_y_axis() const
 
 {
 
-if ( is_identity() )  return ( true );
+if ( is_identity() )  return true;
 
 double ax, ay, az;
 double angle;
@@ -782,7 +782,7 @@ switch ( k )  {
 }
 
 
-return ( x );
+return x;
 
 }
 
@@ -819,7 +819,7 @@ c.M32 = (a.M31)*(b.M12) + (a.M32)*(b.M22) + (a.M33)*(b.M32);
 c.M33 = (a.M31)*(b.M13) + (a.M32)*(b.M23) + (a.M33)*(b.M33);
 
 
-return ( c );
+return c;
 
 }
 
@@ -850,11 +850,11 @@ int my_signum(double t)
 
 {
 
-if ( t > 0.0 )  return ( 1 );
+if ( t > 0.0 )  return 1;
 
-if ( t < 0.0 )  return ( -1 );
+if ( t < 0.0 )  return -1;
 
-return ( 0 );
+return 0;
 
 }
 

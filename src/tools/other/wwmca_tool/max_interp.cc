@@ -75,11 +75,11 @@ Max_Interp & Max_Interp::operator=(const Max_Interp & m)
 
 {
 
-if ( this == &m )  return ( * this );
+if ( this == &m )  return *this;
 
 assign(m);
 
-return ( * this );
+return *this;
 
 }
 
@@ -135,11 +135,11 @@ Interpolator * Max_Interp::copy() const
 
 {
 
-Interpolator * i = (Interpolator *) 0;
+Interpolator * i = (Interpolator *) nullptr;
 
 i = new Max_Interp (*this);
 
-return ( i );
+return i;
 
 }
 
@@ -226,7 +226,7 @@ if ( good_count >= NgoodNeeded )  {
    //
 
 
-return ( I );
+return I;
 
 }
 

@@ -127,7 +127,7 @@ cout << "\n\n   Read " << count << " records\n\n";
 
 close(fd);
 
-return ( 0 );
+return 0;
 
 }
 

@@ -66,11 +66,11 @@ VarInfoPython::VarInfoPython(const VarInfoPython &f) {
 
 VarInfoPython & VarInfoPython::operator=(const VarInfoPython &f) {
 
-   if ( this == &f )  return ( *this );
+   if ( this == &f )  return *this;
 
    assign(f);
 
-   return ( *this );
+   return *this;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -196,7 +196,7 @@ bool VarInfoPython::is_precipitation() const {
      return(SetAttrIsPrecipitation != 0);
   }
 
-  return ( false );
+  return false;
 }
 
 
@@ -212,7 +212,7 @@ bool VarInfoPython::is_specific_humidity() const {
      return(SetAttrIsSpecificHumidity != 0);
   }
 
-  return ( false );
+  return false;
 }
 
 
@@ -228,7 +228,7 @@ bool VarInfoPython::is_u_wind() const {
     return(SetAttrIsUWind != 0);
   }
 
-  return ( false );
+  return false;
 }
 
 
@@ -244,7 +244,7 @@ bool VarInfoPython::is_v_wind() const {
     return(SetAttrIsVWind != 0);
   }
 
-  return ( false );
+  return false;
 }
 
 
@@ -260,7 +260,7 @@ bool VarInfoPython::is_wind_speed() const {
     return(SetAttrIsWindSpeed != 0);
   }
 
-  return ( false );
+  return false;
 }
 
 
@@ -276,7 +276,7 @@ bool VarInfoPython::is_wind_direction() const {
     return(SetAttrIsWindDirection != 0);
   }
 
-  return ( false );
+  return false;
 }
 
 

@@ -68,11 +68,11 @@ VarInfoGrib2::VarInfoGrib2(const VarInfoGrib2 &f) {
 
 VarInfoGrib2 & VarInfoGrib2::operator=(const VarInfoGrib2 &f) {
 
-   if ( this == &f )  return ( *this );
+   if ( this == &f )  return *this;
 
    assign(f);
 
-   return ( *this );
+   return *this;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -50,11 +50,11 @@ ProbRIRWPairInfo::ProbRIRWPairInfo(const ProbRIRWPairInfo & t) {
 
 ProbRIRWPairInfo & ProbRIRWPairInfo::operator=(const ProbRIRWPairInfo & t) {
 
-   if(this == &t) return(*this);
+   if(this == &t) return *this;
 
    assign(t);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -71,7 +71,7 @@ void ProbRIRWPairInfo::init_from_scratch() {
 void ProbRIRWPairInfo::clear() {
 
    ProbRIRW.clear();
-   BDeck    = (TrackInfo *) 0;
+   BDeck    = (TrackInfo *) nullptr;
    StormName.clear();
    BModel.clear();
    BLat     = BLon    = bad_data_double;
@@ -132,7 +132,7 @@ ConcatString ProbRIRWPairInfo::case_info() const {
      << ", RIRW_BEG = " << ProbRIRW.rirw_beg()
      << ", RIRW_END = " << ProbRIRW.rirw_end();
 
-   return(s);
+   return s;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -157,7 +157,7 @@ ConcatString ProbRIRWPairInfo::serialize() const {
      << ", BMinV = "    << BMinV
      << ", BMaxV = "    << BMaxV;
 
-   return(s);
+   return s;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -172,7 +172,7 @@ ConcatString ProbRIRWPairInfo::serialize_r(int n, int indent_depth) const {
      << prefix2 << "BDeck  = " << (BDeck ? BDeck->serialize().text() : "(nul)")
      << "\n";
 
-   return(s);
+   return s;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -214,7 +214,7 @@ bool ProbRIRWPairInfo::set(const ProbRIRWInfo &prob_rirw_info,
    // Check for bad data
    if(prob_rirw_info.init() == (unixtime) 0  ||
       is_bad_data(prob_rirw_info.rirw_beg()) ||
-      is_bad_data(prob_rirw_info.rirw_end())) return(false);
+      is_bad_data(prob_rirw_info.rirw_end())) return false;
 
    // Define begin and end times
    unixtime beg_ut = prob_rirw_info.init() + (prob_rirw_info.rirw_beg() * sec_per_hour);
@@ -227,7 +227,7 @@ bool ProbRIRWPairInfo::set(const ProbRIRWInfo &prob_rirw_info,
    }
 
    // Check for matching points
-   if(i_beg < 0 || i_end < 0) return(false);
+   if(i_beg < 0 || i_end < 0) return false;
 
    // Store the paired information
    ProbRIRW = prob_rirw_info;
@@ -257,7 +257,7 @@ bool ProbRIRWPairInfo::set(const ProbRIRWInfo &prob_rirw_info,
    latlon_to_xytk_err(prob_rirw_info.lat(), prob_rirw_info.lon(), BLat, BLon,
                       XErr, YErr, TrackErr);
 
-   return(true);
+   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -274,7 +274,7 @@ void ProbRIRWPairInfo::set(const TCStatLine &l) {
    ProbRIRW.set(l);
 
    // Do not populate the BDECK
-   BDeck = (TrackInfo *) 0;
+   BDeck = (TrackInfo *) nullptr;
 
    // Store column information
    StormName = l.get_item("STORM_NAME", false);
@@ -330,11 +330,11 @@ ProbRIRWPairInfoArray::ProbRIRWPairInfoArray(const ProbRIRWPairInfoArray & t) {
 
 ProbRIRWPairInfoArray & ProbRIRWPairInfoArray::operator=(const ProbRIRWPairInfoArray & t) {
 
-   if(this == &t) return(*this);
+   if(this == &t) return *this;
 
    assign(t);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -382,7 +382,7 @@ ConcatString ProbRIRWPairInfoArray::serialize() const {
    s << "ProbRIRWPairInfoArray: "
      << "NPairs = " << n_pairs();
 
-   return(s);
+   return s;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -397,7 +397,7 @@ ConcatString ProbRIRWPairInfoArray::serialize_r(int indent_depth) const {
       s << Pairs[i].serialize_r(i+1, indent_depth+1);
    }
 
-   return(s);
+   return s;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -444,11 +444,11 @@ bool ProbRIRWPairInfoArray::add(const ProbRIRWInfo &p, const TrackInfo &t) {
    ProbRIRWPairInfo pair;
 
    // Attempt to set a new pair
-   if(!pair.set(p, t)) return(false);
+   if(!pair.set(p, t)) return false;
 
    Pairs.push_back(pair);
 
-   return(true);
+   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////

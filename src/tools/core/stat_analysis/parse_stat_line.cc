@@ -150,7 +150,7 @@ void parse_nbrctc_ctable(STATLine &l, TTContingencyTable &ct) {
 void parse_nx2_ctable(STATLine &l, Nx2ContingencyTable &pct) {
    int i, n, oy, on;
    char col_str[max_str_len];
-   double *thresh = (double *) 0;
+   double *thresh = (double *) nullptr;
 
    // N_THRESH
    n = atoi(l.get_item("N_THRESH"));
@@ -181,7 +181,7 @@ void parse_nx2_ctable(STATLine &l, Nx2ContingencyTable &pct) {
    thresh[n-1] = atof(l.get_item(col_str));
    pct.set_thresholds(thresh);
 
-   if ( thresh )  { delete [] thresh; thresh = (double *) 0; }
+   if ( thresh )  { delete [] thresh; thresh = (double *) nullptr; }
 
    return;
 }

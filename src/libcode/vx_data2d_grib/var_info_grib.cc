@@ -66,11 +66,11 @@ VarInfoGrib::VarInfoGrib(const VarInfoGrib &f) {
 
 VarInfoGrib & VarInfoGrib::operator=(const VarInfoGrib &f) {
 
-   if ( this == &f )  return ( *this );
+   if ( this == &f )  return *this;
 
    assign(f);
 
-   return ( *this );
+   return *this;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -367,7 +367,7 @@ bool VarInfoGrib::is_precipitation() const {
       }
    }
 
-   return(status);
+   return status;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -394,7 +394,7 @@ bool VarInfoGrib::is_specific_humidity() const {
       }
    }
 
-   return(status);
+   return status;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

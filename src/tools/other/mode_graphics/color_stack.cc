@@ -76,11 +76,11 @@ ColorStack & ColorStack::operator=(const ColorStack & a)
 
 {
 
-if ( this == &a )  return ( * this );
+if ( this == &a )  return *this;
 
 assign(a);
 
-return ( * this );
+return *this;
 
 }
 
@@ -92,7 +92,7 @@ void ColorStack::init_from_scratch()
 
 {
 
-e = (Color **) 0;
+e = (Color **) nullptr;
 
 AllocInc = 10;   //  default value
 
@@ -116,11 +116,11 @@ if ( e )  {
 
    for (j=0; j<Nalloc; ++j)  {
 
-      if ( e[j] )  { delete e[j];  e[j] = (Color *) 0; }
+      if ( e[j] )  { delete e[j];  e[j] = (Color *) nullptr; }
 
    }
 
-   delete [] e;  e = (Color **) 0;
+   delete [] e;  e = (Color **) nullptr;
 
 }   //  if e
 
@@ -195,11 +195,11 @@ for(j=0; j<Nelements; ++j)  {
 
 }
 
-if ( e )  { delete [] e;  e = (Color **) 0; }
+if ( e )  { delete [] e;  e = (Color **) nullptr; }
 
 e = u;
 
-u = (Color **) 0;
+u = (Color **) nullptr;
 
 Nalloc = n;
 
@@ -306,7 +306,7 @@ Color _t = *(e[Nelements - 1]);
 
 --Nelements;
 
-return ( _t );
+return _t;
 
 }
 
@@ -328,7 +328,7 @@ if ( Nelements <= 0 )  {
 
 Color _t = *(e[Nelements - 1]);
 
-return ( _t );
+return _t;
 
 }
 

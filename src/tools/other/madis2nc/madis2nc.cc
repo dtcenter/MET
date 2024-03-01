@@ -178,7 +178,7 @@ int met_main(int argc, char *argv[]) {
    //
    clean_up();
 
-   return(0);
+   return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -295,7 +295,7 @@ void process_madis_file(const char *madis_file) {
            << "can't open input NetCDF file \"" << madis_file
            << "\" for reading.\n\n";
       delete f_in;
-      f_in = (NcFile *) 0;
+      f_in = (NcFile *) nullptr;
 
       exit(1);
    }
@@ -346,7 +346,7 @@ void process_madis_file(const char *madis_file) {
    // Close the input NetCDF file
    if(f_in) {
       delete f_in;
-      f_in = (NcFile *) 0;
+      f_in = (NcFile *) nullptr;
    }
 
    return;
@@ -365,7 +365,7 @@ void clean_up() {
    //
    if(f_out) {
       delete f_out;
-      f_out = (NcFile *) 0;
+      f_out = (NcFile *) nullptr;
    }
 
    return;
@@ -388,7 +388,7 @@ void setup_netcdf_out(int nhdr) {
       mlog << Error << "\nsetup_netcdf_out() -> "
            << "trouble opening output file: " << ncfile << "\n\n";
       delete f_out;
-      f_out = (NcFile *) 0;
+      f_out = (NcFile *) nullptr;
       exit(1);
    }
 
@@ -675,7 +675,7 @@ MadisType get_madis_type(NcFile *&f_in) {
    else if (get_global_att(f_in, (string)"title", attr_value)) {
       if (attr_value.contents("MADIS ACARS") != "") madis_type = madis_acarsProfiles;
    }
-   return(madis_type);
+   return madis_type;
 }
 
 ////////////////////////////////////////////////////////////////////////

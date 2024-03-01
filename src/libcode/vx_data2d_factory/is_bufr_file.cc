@@ -61,7 +61,7 @@ if ( (fd = met_open(filename, O_RDONLY)) < 0 )  {
 
    exit ( 1 );
 
-   // return ( false );
+   // return false;
 
 }
 
@@ -75,7 +75,7 @@ if ( read(fd, buf, buf_size) != buf_size )  {
 
    exit ( 1 );
 
-   // return ( false );
+   // return false;
 
 }
 
@@ -89,13 +89,13 @@ close(fd);
    //  check for bufr magic cookie
    //
 
-if ( strncmp(buf, bufr_magic, bufr_magic_len) != 0 )  return ( false );
+if ( strncmp(buf, bufr_magic, bufr_magic_len) != 0 )  return false;
 
    //
    //  done
    //
 
-return ( true );
+return true;
 
 }
 

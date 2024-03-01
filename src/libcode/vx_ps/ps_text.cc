@@ -89,11 +89,11 @@ VxpsTextNode & VxpsTextNode::operator=(const VxpsTextNode & n)
 
 {
 
-if ( this == &n )  return ( * this );
+if ( this == &n )  return *this;
 
 assign(n);
 
-return ( * this );
+return *this;
 
 }
 
@@ -105,9 +105,9 @@ void VxpsTextNode::init_from_scratch()
 
 {
 
-Text = (char *) 0;
+Text = (char *) nullptr;
 
-next = (VxpsTextNode *) 0;
+next = (VxpsTextNode *) nullptr;
 
 clear();
 
@@ -127,7 +127,7 @@ void VxpsTextNode::clear()
    //  clear out this node
    //
 
-if ( Text )  { delete [] Text;  Text = (char *) 0; }
+if ( Text )  { delete [] Text;  Text = (char *) nullptr; }
 
 Nchars = Nalloc = 0;
 
@@ -144,7 +144,7 @@ Width = 0.0;
    //  send "clear" message down the chain
    //
 
-if ( next )  { delete next;  next = (VxpsTextNode *) 0; }
+if ( next )  { delete next;  next = (VxpsTextNode *) nullptr; }
 
    //
    //  done
@@ -287,7 +287,7 @@ void VxpsTextNode::extend(int n)
 if ( n < Nalloc )  return;
 
 int k;
-char * u = (char *) 0;
+char * u = (char *) nullptr;
 const char *method_name = "VxpsTextNode::extend";
 
    //
@@ -328,11 +328,11 @@ if ( Text ) m_strncpy(u, Text, (n-1), method_name, "Text");
    //  toss old, grab new
    //
 
-if ( Text )  { delete [] Text;  Text = (char *) 0; }
+if ( Text )  { delete [] Text;  Text = (char *) nullptr; }
 
 Text = u;
 
-u = (char *) 0;
+u = (char *) nullptr;
 
    //
    //  done
@@ -351,7 +351,7 @@ void VxpsTextNode::set_text(const char * s)
 {
 
 const char *method_name = "VxpsTextNode::set_text";
-if ( Text )  { delete [] Text;  Text = (char *) 0; Nalloc = 0; }
+if ( Text )  { delete [] Text;  Text = (char *) nullptr; Nalloc = 0; }
 
 Nchars = m_strlen(s);
 
@@ -435,7 +435,7 @@ while ( n )  {
 
 }
 
-return ( w );
+return w;
 
 }
 
@@ -447,7 +447,7 @@ double VxpsTextNode::total_left() const
 
 {
 
-return ( Left );
+return Left;
 
 }
 
@@ -477,7 +477,7 @@ while ( n->next )  {
 r += n->Right;
 
 
-return ( r );
+return r;
 
 }
 
@@ -501,7 +501,7 @@ while ( n )  {
 
 }
 
-return ( t );
+return t;
 
 }
 
@@ -525,7 +525,7 @@ while ( n )  {
 
 }
 
-return ( b );
+return b;
 
 }
 
@@ -627,7 +627,7 @@ if ( (k < 0) || (k > 255) )  {
 
 int j;
 char junk[16];
-char * c = (char *) 0;
+char * c = (char *) nullptr;
 
 c = junk + (sizeof(junk) - 1);
 

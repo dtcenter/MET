@@ -43,7 +43,7 @@ PSOutputFilter::PSOutputFilter()
 
 {
 
-file = (ofstream *) 0;
+file = (ofstream *) nullptr;
 
 column = 0;
 
@@ -59,7 +59,7 @@ PSOutputFilter::~PSOutputFilter()
 
 {
 
-file = (ofstream *) 0;   //  don't delete it
+file = (ofstream *) nullptr;   //  don't delete it
 
 }
 
@@ -105,7 +105,7 @@ void PSOutputFilter::eod()
 
 {
 
-file = (ofstream *) 0;   //  don't delete it
+file = (ofstream *) nullptr;   //  don't delete it
 
 column = 0;
 

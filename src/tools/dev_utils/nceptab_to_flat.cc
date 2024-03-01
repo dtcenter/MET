@@ -97,7 +97,7 @@ for (j=0; j<(cline.n()); ++j)  {   //  j starts at one, here
    //  done
    //
 
-return ( 0 );
+return 0;
 
 }
 
@@ -241,7 +241,7 @@ bool parse_line(const char * line)
 int n, k;
 char line2[1024];
 char * s = line2;
-char * c = (char *) 0;
+char * c = (char *) nullptr;
 const char *method_name = "parse_line() -> ";
 
 m_strncpy(line2, line, sizeof(line2), method_name);
@@ -250,7 +250,7 @@ m_strncpy(line2, line, sizeof(line2), method_name);
    // check to make sure it's got a double quote in it
    //
 
-if ( ! strchr(line, '\"') )  return ( false );
+if ( ! strchr(line, '\"') )  return false;
 
    //
    //  index and table number
@@ -258,9 +258,9 @@ if ( ! strchr(line, '\"') )  return ( false );
 
 c = strtok(s, " /*");
 
-s = (char *) 0;
+s = (char *) nullptr;
 
-if ( !c )  return ( false );
+if ( !c )  return false;
 
 n = atoi(c);
 
@@ -272,7 +272,7 @@ cout << n << ' ' << table_number << ' ';
 
 c = strtok(s, " /*{\"");
 
-if ( !c )  return ( false );
+if ( !c )  return false;
 
 cout << '\"' << c << "\" ";
 
@@ -287,7 +287,7 @@ k = m_strlen(c) - 1;
 
 if ( c[k] == ' ' )  c[k] = (char) 0;
 
-if ( !c )  return ( false );
+if ( !c )  return false;
 
 cout << '\"' << c << "\" ";
 
@@ -303,7 +303,7 @@ if ( strcmp(c, "undefined") == 0 )  {
 
    c = strtok(s, "]\"");
 
-   if ( !c )  return ( false );
+   if ( !c )  return false;
 
    if ( c[0] == '}' ) cout << "\"\" ";
    else               cout << '\"' << c << "\" ";
@@ -316,7 +316,7 @@ if ( strcmp(c, "undefined") == 0 )  {
 
 cout << '\n' << flush;
 
-return ( true );
+return true;
 
 }
 

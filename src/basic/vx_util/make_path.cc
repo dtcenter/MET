@@ -41,7 +41,7 @@ int make_path(const char * path, int mode)
 {
 
 
-if ( path_exists(path) )  return ( 1 );
+if ( path_exists(path) )  return 1;
 
 int j;
 int status;
@@ -64,8 +64,8 @@ if (subpath) {
    mlog << Debug(1) << "\n\n  " << method_name << "subpath = \"" << subpath << "\"\n\n";
 
    if ( m_strlen(subpath) == 0 ) {
-      if (subpath) { delete [] subpath; subpath = (char *) 0; }
-      return ( 0 );
+      if (subpath) { delete [] subpath; subpath = (char *) nullptr; }
+      return 0;
    }
 
    if ( !(path_exists(subpath)) )  {
@@ -76,11 +76,11 @@ if (subpath) {
 
 status = mkdir(path, mode);
 
-if (subpath) { delete [] subpath; subpath = (char *) 0; }
+if (subpath) { delete [] subpath; subpath = (char *) nullptr; }
 
-if ( status < 0 )   return ( 0 );
+if ( status < 0 )   return 0;
 
-return ( 1 );
+return 1;
 
 }
 
@@ -108,7 +108,7 @@ if ( status < 0 )  {
 
    }
 
-   if ( errno == ENOENT )  return ( 0 );
+   if ( errno == ENOENT )  return 0;
 
       //
       //  must be some obscure error
@@ -123,9 +123,9 @@ if ( status < 0 )  {
 
 status = S_ISDIR(sbuf.st_mode);
 
-if ( status )  return ( 1 );
+if ( status )  return 1;
 
-return ( 0 );
+return 0;
 
 }
 

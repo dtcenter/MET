@@ -110,7 +110,7 @@ NcVarInfo *MetNcCFDataFile::find_first_data_var() {
 
 void MetNcCFDataFile::close() {
 
-   if(_file) { delete _file; _file = (NcCfFile *) 0; }
+   if(_file) { delete _file; _file = (NcCfFile *) nullptr; }
 
    return;
 }
@@ -128,7 +128,7 @@ bool MetNcCFDataFile::open(const char * _filename) {
            << "unable to open NetCDF file \"" << _filename << "\"\n\n";
       close();
 
-      return(false);
+      return false;
    }
 
    Filename = _filename;
@@ -141,7 +141,7 @@ bool MetNcCFDataFile::open(const char * _filename) {
 
    (*Dest_Grid) = (*Raw_Grid);
 
-   return(true);
+   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -260,7 +260,7 @@ bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
   }
 
   // Read the data
-  NcVarInfo *info = (NcVarInfo *) 0;
+  NcVarInfo *info = (NcVarInfo *) nullptr;
 
   bool status = _file->getData(vinfo_nc->req_name().c_str(),
                                dimension,
@@ -377,7 +377,7 @@ int MetNcCFDataFile::data_plane_array(VarInfo &vinfo,
       }
    }
 
-   return(n_rec);
+   return n_rec;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -397,7 +397,7 @@ LongArray MetNcCFDataFile::collect_time_offsets(VarInfo &vinfo) {
       mlog << Warning << "\n" << method_name
            << "can't find NetCDF variable \"" << vinfo_nc->req_name()
            << "\" in file \"" << Filename << "\".\n\n";
-      return(time_offsets);
+      return time_offsets;
    }
 
    int time_dim_slot = info->t_slot;
@@ -406,7 +406,7 @@ LongArray MetNcCFDataFile::collect_time_offsets(VarInfo &vinfo) {
       // The time dimension does not exist at the variable and the time
       // variable exists. Stop time slicing and set the time offset to 0.
       time_offsets.add(0);
-      return(time_offsets);
+      return time_offsets;
    }
 
    double time_lower = bad_data_double;
@@ -584,7 +584,7 @@ LongArray MetNcCFDataFile::collect_time_offsets(VarInfo &vinfo) {
       exit(1);
    }
 
-   return(time_offsets);
+   return time_offsets;
 }
 
 

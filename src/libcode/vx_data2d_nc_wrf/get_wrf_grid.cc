@@ -77,7 +77,7 @@ NcFile nc(wrf_filename, NcFile::read);
 status = get_wrf_grid(nc, grid);
 
 
-return ( status );
+return status;
 
 }
 
@@ -118,7 +118,7 @@ else {
    //  done
    //
 
-return ( status );
+return status;
 
 }
 
@@ -199,7 +199,7 @@ grid.set(data);
 
 data.dump();
 
-return ( true );
+return true;
 
 }
 
@@ -282,7 +282,7 @@ grid.set(data);
 
 data.dump();
 
-return ( true );
+return true;
 
 }
 
@@ -387,7 +387,7 @@ grid.set(data);
 
 data.dump();
 
-return ( true );
+return true;
 
 }
 
@@ -405,7 +405,7 @@ lon_rad = lon*rad_per_deg;
 
 u = -lon_rad;
 
-return ( u );
+return u;
 
 }
 
@@ -421,7 +421,7 @@ double v;
 
 v = log(tand(45.0 + 0.5*lat));
 
-return ( v );
+return v;
 
 }
 

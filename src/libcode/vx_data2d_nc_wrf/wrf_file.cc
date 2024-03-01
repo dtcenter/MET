@@ -124,13 +124,13 @@ void WrfFile::init_from_scratch()
 
 {
 
-Nc = (NcFile *) 0;
+Nc = (NcFile *) nullptr;
 
-Dim = (NcDim **) 0;
+Dim = (NcDim **) nullptr;
 
-Var = (NcVarInfo *) 0;
+Var = (NcVarInfo *) nullptr;
 
-Time = (unixtime *) 0;
+Time = (unixtime *) nullptr;
 
 close();
 
@@ -146,21 +146,21 @@ void WrfFile::close()
 
 {
 
-if ( Nc )  { delete Nc;  Nc = (NcFile *) 0; }
+if ( Nc )  { delete Nc;  Nc = (NcFile *) nullptr; }
 
-if ( Dim )  { delete [] Dim;  Dim = (NcDim **) 0; }
+if ( Dim )  { delete [] Dim;  Dim = (NcDim **) nullptr; }
 
-if ( Time )  { delete [] Time;  Time = (unixtime *) 0; }
+if ( Time )  { delete [] Time;  Time = (unixtime *) nullptr; }
 
 Ndims = 0;
 
 DimNames.clear();
 
-Tdim = (NcDim *) 0;
+Tdim = (NcDim *) nullptr;
 
 Nvars = 0;
 
-if ( Var )  { delete [] Var;  Var = (NcVarInfo *) 0; }
+if ( Var )  { delete [] Var;  Var = (NcVarInfo *) nullptr; }
 
 InitTime = (unixtime) 0;
 
@@ -195,13 +195,13 @@ Nc = open_ncfile(filename);
 mlog << Debug(5) << "\n" << method_name
      << "open \"" << filename << "\".\n\n";
 
-if ( IS_INVALID_NC_P(Nc) )  { close();  return ( false ); }
+if ( IS_INVALID_NC_P(Nc) )  { close();  return false; }
 
    //
    //  grid
    //
 
-if ( !get_wrf_grid(*Nc, grid) )  { close();  return ( false ); }
+if ( !get_wrf_grid(*Nc, grid) )  { close();  return false; }
 
    //
    //  dimensions
@@ -224,7 +224,7 @@ for (j=0; j<Ndims; ++j)  {
    //  times
    //
 
-if ( Ntimes == 0 )  { close();  return ( false ); }
+if ( Ntimes == 0 )  { close();  return false; }
 
 Time = new unixtime [Ntimes];
 
@@ -255,7 +255,7 @@ if ( has_var(Nc, times_var_name) ) {
                    &year, &month, &day, &hour, &minute, &second) != 6) {
             mlog << Error << "\n" << method_name
                  << "error parsing time string \"" << time_str << "\".\n\n";
-            return ( false );
+            return false;
          }
 
          Time[j] = mdyhms_to_unix(month, day, year, hour, minute, second);
@@ -330,7 +330,7 @@ InitTime = parse_init_time(att_value.c_str());
    //  done
    //
 
-return ( true );
+return true;
 
 }
 
@@ -473,7 +473,7 @@ if ( (n < 0) || (n >= Ntimes) )  {
 }
 
 
-return ( Time [n] );
+return Time[n];
 
 }
 
@@ -496,7 +496,7 @@ if ( (n < 0) || (n >= Ntimes) )  {
 
 unixtime dt = Time[n] - InitTime;
 
-return ( (int) dt );
+return (int) dt;
 
 }
 
@@ -557,7 +557,7 @@ if ( !status )  {
    //  done
    //
 
-return ( d );
+return d;
 
 }
 
@@ -575,7 +575,7 @@ if ( !args_ok(a) )  {
 
    a.dump(cerr);
 
-   return ( false );
+   return false;
 
 }
 
@@ -596,7 +596,7 @@ if (dim_count >= max_wrf_args )  {
    mlog << Warning << "\n" << method_name
         << " too may arguments for variable \"" << (var_name) << "\"\n\n";
 
-   return ( false );
+   return false;
 
 }
 
@@ -605,8 +605,8 @@ int j, k, count;
 int x, y;
 double value;
 bool found = false;
-NcVarInfo * var = (NcVarInfo *) 0;
-NcVarInfo * P   = (NcVarInfo *) 0;
+NcVarInfo * var = (NcVarInfo *) nullptr;
+NcVarInfo * P   = (NcVarInfo *) nullptr;
 LongArray b = a;
 
 pressure = bad_data_double;
@@ -628,7 +628,7 @@ if ( !found )  {
    mlog << Warning << "\n" << method_name
         << "variable " << (var_name) << " not found!\n\n";
 
-   return ( false );
+   return false;
 
 }
 
@@ -658,7 +658,7 @@ if ( !found )  {
 
               mlog << Error << "\n" << method_name
                    << "X Dimension \"" << x_dim_subgrid_name << "\" is not supported.\n\n";
-              return ( false );
+              return false;
 
            }
 
@@ -682,7 +682,7 @@ if ( !found )  {
 
               mlog << Error << "\n" << method_name
                    << "Y Dimension \"" << y_dim_subgrid_name << "\" is not supported.\n\n";
-              return ( false );
+              return false;
 
            }
 
@@ -787,7 +787,7 @@ if ( var == nullptr || (var->x_slot < 0) || (var->y_slot < 0) )  {
         << "can't find needed dimensions(s) for variable \""
         << var_name << "\" ... one of the dimensions may be staggered.\n\n";
 
-   return ( false );
+   return false;
 
 }
 
@@ -807,7 +807,7 @@ for (j=0; j<(a.n_elements()); ++j)  {
 
          mlog << Warning << "\n" << method_name << " star found in bad slot\n\n";
 
-         return ( false );
+         return false;
 
       }
 
@@ -819,7 +819,7 @@ if ( count != 2 )  {
 
    mlog << Warning << "\n" << method_name << " bad star count ... " << count << "\n\n";
 
-   return ( false );
+   return false;
 
 }
 
@@ -835,7 +835,7 @@ if ( (x_slot < 0) || (y_slot < 0) )  {
 
    mlog << Warning << "\n" << method_name << " bad x|y slot\n\n";
 
-   return ( false );
+   return false;
 
 }
 
@@ -905,7 +905,7 @@ if ( P && z_slot > 0 )  {
    //  done
    //
 
-return ( true );
+return true;
 
 }
 
@@ -922,7 +922,7 @@ bool WrfFile::data(const char * var_name, const LongArray & a, DataPlane & plane
    if (nullptr != info) found = true;
    else found = get_nc_var_info(var_name, info);
 
-   if ( !found )  return ( false );
+   if ( !found )  return false;
 
    found = data(info->var, a, plane, pressure);
 
@@ -955,7 +955,7 @@ bool WrfFile::data(const char * var_name, const LongArray & a, DataPlane & plane
    //  done
    //
 
-   return ( found );
+   return found;
 
 }
 
@@ -1018,7 +1018,7 @@ if ( j != 6 )  {
 
 t = mdyhms_to_unix(month, day, year, hour, minute, second);
 
-return ( t );
+return t;
 
 }
 
@@ -1030,8 +1030,8 @@ bool is_bad_data_wrf(double v)
 
 {
 
-if (v < wrf_missing )  return ( false );
-else                        return ( true  );
+if (v < wrf_missing )  return false;
+else                        return true;
 
 }
 
@@ -1052,7 +1052,7 @@ for ( j=0; j<n_accum_var_names; ++j )  {
 
 }
 
-return ( found );
+return found;
 
 }
 

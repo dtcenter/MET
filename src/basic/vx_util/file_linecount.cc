@@ -56,7 +56,7 @@ while ( in.get(c) )  {
 
 in.close();
 
-return ( count );
+return count;
 
 }
 

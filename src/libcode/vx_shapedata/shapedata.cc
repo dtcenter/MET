@@ -1254,7 +1254,7 @@ void Cell::clear()
 
 {
 
-if ( e )  { delete [] e;  e = (int *) 0; }
+if ( e )  { delete [] e;  e = (int *) nullptr; }
 
 n = 0;
 

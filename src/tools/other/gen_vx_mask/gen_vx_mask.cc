@@ -98,7 +98,7 @@ int met_main(int argc, char *argv[]) {
    // Write out the mask file to NetCDF
    write_netcdf(dp_out);
 
-   return(0);
+   return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -432,7 +432,7 @@ void get_data_plane(const ConcatString &file_name,
 
    // Attempt to open the data file
    Met2dDataFileFactory mtddf_factory;
-   Met2dDataFile *mtddf_ptr = (Met2dDataFile *) 0;
+   Met2dDataFile *mtddf_ptr = (Met2dDataFile *) nullptr;
    mtddf_ptr = mtddf_factory.new_met_2d_data_file(file_name.c_str(), ftype);
    if(!mtddf_ptr) {
       mlog << Error << "\nget_data_plane() -> "
@@ -454,7 +454,7 @@ void get_data_plane(const ConcatString &file_name,
 
       // Allocate new VarInfo object
       VarInfoFactory vi_factory;
-      VarInfo *vi_ptr = (VarInfo *) 0;
+      VarInfo *vi_ptr = (VarInfo *) nullptr;
       vi_ptr = vi_factory.new_var_info(mtddf_ptr->file_type());
       if(!vi_ptr) {
          mlog << Error << "\nget_data_plane() -> "
@@ -482,7 +482,7 @@ void get_data_plane(const ConcatString &file_name,
            << dmin << " to " << dmax << ".\n";
 
       // Clean up
-      if(vi_ptr) { delete vi_ptr; vi_ptr = (VarInfo *) 0; }
+      if(vi_ptr) { delete vi_ptr; vi_ptr = (VarInfo *) nullptr; }
 
    } // end if
 
@@ -490,7 +490,7 @@ void get_data_plane(const ConcatString &file_name,
    dp_grid = mtddf_ptr->grid();
 
    // Clean up
-   if(mtddf_ptr) { delete mtddf_ptr; mtddf_ptr = (Met2dDataFile *) 0; }
+   if(mtddf_ptr) { delete mtddf_ptr; mtddf_ptr = (Met2dDataFile *) nullptr; }
 
    return;
 }
@@ -504,13 +504,13 @@ bool get_gen_vx_mask_config_str(MetNcMetDataFile *mnmdf_ptr,
    int i;
 
    // Check for null pointer
-   if(!mnmdf_ptr) return(status);
+   if(!mnmdf_ptr) return status;
 
    // Check for the MET_tool global attribute
-   if(!get_global_att(mnmdf_ptr->MetNc->Nc, (string) "MET_tool", tool)) return(status);
+   if(!get_global_att(mnmdf_ptr->MetNc->Nc, (string) "MET_tool", tool)) return status;
 
    // Check for gen_vx_mask output
-   if(tool != program_name) return(status);
+   if(tool != program_name) return status;
 
    // Loop through the NetCDF variables
    for(i=0; i<mnmdf_ptr->MetNc->Nvars; i++) {
@@ -527,7 +527,7 @@ bool get_gen_vx_mask_config_str(MetNcMetDataFile *mnmdf_ptr,
       break;
    }
 
-   return(status);
+   return status;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -691,7 +691,7 @@ bool is_shape_str_match(const int i_shape, const StringArray &names, const Strin
 
    }
 
-   return(match);
+   return match;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1388,7 +1388,7 @@ DataPlane combine(const DataPlane &dp_data, const DataPlane &dp_mask,
 	   << " points inside\n";
    }
 
-   return(dp);
+   return dp;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1397,8 +1397,8 @@ void write_netcdf(const DataPlane &dp) {
    int n, x, y;
    ConcatString cs;
 
-   float *mask_data = (float *)  0;
-   NcFile *f_out    = (NcFile *) 0;
+   float *mask_data = (float *)  nullptr;
+   NcFile *f_out    = (NcFile *) nullptr;
    NcDim lat_dim;
    NcDim lon_dim;
    NcVar mask_var;
@@ -1411,7 +1411,7 @@ void write_netcdf(const DataPlane &dp) {
            << "trouble opening output file " << out_filename
            << "\n\n";
       delete f_out;
-      f_out = (NcFile *) 0;
+      f_out = (NcFile *) nullptr;
       exit(1);
    }
 
@@ -1476,15 +1476,15 @@ void write_netcdf(const DataPlane &dp) {
       mlog << Error << "\nwrite_netcdf() -> "
            << "error with mask_var->put\n\n";
       // Delete allocated memory
-      if(mask_data) { delete[] mask_data; mask_data = (float *) 0; }
+      if(mask_data) { delete[] mask_data; mask_data = (float *) nullptr; }
       exit(1);
    }
 
    // Delete allocated memory
-   if(mask_data) { delete[] mask_data; mask_data = (float *) 0; }
+   if(mask_data) { delete[] mask_data; mask_data = (float *) nullptr; }
 
    delete f_out;
-   f_out = (NcFile *) 0;
+   f_out = (NcFile *) nullptr;
 
    mlog << Debug(1)
         << "Output File:\t\t" << out_filename << "\n";
@@ -1521,13 +1521,13 @@ MaskType string_to_masktype(const char *s) {
       exit(1);
    }
 
-   return(t);
+   return t;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 const char * masktype_to_string(const MaskType t) {
-   const char *s = (const char *) 0;
+   const char *s = (const char *) nullptr;
 
    switch(t) {
       case MaskType_Poly:      s = "poly";           break;
@@ -1543,10 +1543,10 @@ const char * masktype_to_string(const MaskType t) {
       case MaskType_Lon:       s = "lon";            break;
       case MaskType_Shape:     s = "shape";          break;
       case MaskType_None:      s = na_str;           break;
-      default:                 s = (const char *) 0; break;
+      default:                 s = (const char *) nullptr; break;
    }
 
-   return(s);
+   return s;
 }
 
 ////////////////////////////////////////////////////////////////////////

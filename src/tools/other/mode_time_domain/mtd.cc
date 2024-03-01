@@ -177,7 +177,7 @@ if ( single_filenames.n() > 0 )  {
 
    do_single_field(config);
 
-   return ( 0 );
+   return 0;
 
 }
 
@@ -914,7 +914,7 @@ do_mtd_nc_output(config.nc_info, engine, fcst_raw, obs_raw, fcst_obj, obs_obj, c
    //  done
    //
 
-return ( 0 );
+return 0;
 
 }
 
@@ -1077,7 +1077,7 @@ prefix << junk;
 
 
 
-return ( prefix );
+return prefix;
 
 }
 

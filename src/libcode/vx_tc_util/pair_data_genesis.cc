@@ -28,7 +28,7 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 ConcatString genesispaircategory_to_string(const GenesisPairCategory c) {
-   const char *s = (const char *) 0;
+   const char *s = (const char *) nullptr;
 
    switch(c) {
       case FYOYGenesis:    s = "FYOY";    break;
@@ -38,7 +38,7 @@ ConcatString genesispaircategory_to_string(const GenesisPairCategory c) {
       default:             s = na_str;    break;
    }
 
-   return(ConcatString(s));
+   return ConcatString(s);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -96,11 +96,11 @@ PairDataGenesis::PairDataGenesis(const PairDataGenesis &g) {
 
 PairDataGenesis & PairDataGenesis::operator=(const PairDataGenesis &g) {
 
-   if(this == &g) return(*this);
+   if(this == &g) return *this;
 
    assign(g);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -158,7 +158,7 @@ const GenesisInfo * PairDataGenesis::fcst_gen(int i) const {
       exit(1);
    }
 
-   return(FcstGen[i]);
+   return FcstGen[i];
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -172,7 +172,7 @@ const GenesisInfo * PairDataGenesis::best_gen(int i) const {
       exit(1);
    }
 
-   return(BestGen[i]);
+   return BestGen[i];
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -186,7 +186,7 @@ const GenesisPairDiff & PairDataGenesis::gen_diff(int i) const {
       exit(1);
    }
 
-   return(GenDiff[i]);
+   return GenDiff[i];
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -194,29 +194,29 @@ const GenesisPairDiff & PairDataGenesis::gen_diff(int i) const {
 bool PairDataGenesis::has_gen(const vector<const GenesisInfo *>& gi_list,
                               const GenesisInfo *gi, int &i) const {
 
-   if(!gi) return(false);
+   if(!gi) return false;
 
    // Search for a match
    for(i=0; i<NPair; i++) {
-      if(*(gi_list[i]) == *gi) return(true);
+      if(*(gi_list[i]) == *gi) return true;
    }
 
    // No match
    i = bad_data_int;
 
-   return(false);
+   return false;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool PairDataGenesis::has_fcst_gen(const GenesisInfo *fgi, int &i) const {
-   return(has_gen(FcstGen, fgi, i));
+   return has_gen(FcstGen, fgi, i);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool PairDataGenesis::has_best_gen(const GenesisInfo *bgi, int &i) const {
-   return(has_gen(BestGen, bgi, i));
+   return has_gen(BestGen, bgi, i);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -226,13 +226,13 @@ bool PairDataGenesis::has_case(const ConcatString &best_id,
 
    for(i=0; i<NPair; i++) {
       if(BestStormId[i] == best_id.c_str() &&
-         InitTime[i]    == init_ut) return(true);
+         InitTime[i]    == init_ut) return true;
    }
 
    // No match
    i = bad_data_int;
 
-   return(false);
+   return false;
 }
 
 ////////////////////////////////////////////////////////////////////////

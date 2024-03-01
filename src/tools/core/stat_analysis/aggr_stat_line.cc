@@ -527,7 +527,7 @@ StatHdrColumns StatHdrInfo::get_shc(const ConcatString &cur_case,
    // LINE_TYPE
    shc.set_line_type(statlinetype_to_string(lt));
 
-   return(shc);
+   return shc;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -578,7 +578,7 @@ ConcatString StatHdrInfo::get_shc_str(const ConcatString &cur_case,
       shc_str = css;
    }
 
-   return(shc_str);
+   return shc_str;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2379,8 +2379,8 @@ void aggr_isc_lines(LineDataFile &ldf, STATAnalysisJob &job,
          //
          if(m.count(key) == 0) {
             aggr.isc_info.clear();
-            aggr.total_na = aggr.mse_na   = aggr.fen_na   = (NumArray *) 0;
-            aggr.oen_na   = aggr.baser_na = aggr.fbias_na = (NumArray *) 0;
+            aggr.total_na = aggr.mse_na   = aggr.fen_na   = (NumArray *) nullptr;
+            aggr.oen_na   = aggr.baser_na = aggr.fbias_na = (NumArray *) nullptr;
             aggr.hdr.clear();
             m[key] = aggr;
             mlog << Debug(3) << "[Case " << m.size()
@@ -2570,12 +2570,12 @@ void aggr_isc_lines(LineDataFile &ldf, STATAnalysisJob &job,
       //
       // Deallocate memory
       //
-      if(it->second.total_na) { delete [] it->second.total_na; it->second.total_na = (NumArray *) 0; }
-      if(it->second.mse_na  ) { delete [] it->second.mse_na;   it->second.mse_na   = (NumArray *) 0; }
-      if(it->second.fen_na  ) { delete [] it->second.fen_na;   it->second.fen_na   = (NumArray *) 0; }
-      if(it->second.oen_na  ) { delete [] it->second.oen_na;   it->second.oen_na   = (NumArray *) 0; }
-      if(it->second.baser_na) { delete [] it->second.baser_na; it->second.baser_na = (NumArray *) 0; }
-      if(it->second.fbias_na) { delete [] it->second.fbias_na; it->second.fbias_na = (NumArray *) 0; }
+      if(it->second.total_na) { delete [] it->second.total_na; it->second.total_na = (NumArray *) nullptr; }
+      if(it->second.mse_na  ) { delete [] it->second.mse_na;   it->second.mse_na   = (NumArray *) nullptr; }
+      if(it->second.fen_na  ) { delete [] it->second.fen_na;   it->second.fen_na   = (NumArray *) nullptr; }
+      if(it->second.oen_na  ) { delete [] it->second.oen_na;   it->second.oen_na   = (NumArray *) nullptr; }
+      if(it->second.baser_na) { delete [] it->second.baser_na; it->second.baser_na = (NumArray *) nullptr; }
+      if(it->second.fbias_na) { delete [] it->second.fbias_na; it->second.fbias_na = (NumArray *) nullptr; }
 
    } // end for it
 
@@ -3880,7 +3880,7 @@ void mpr_to_ctc(STATAnalysisJob &job, const AggrMPRInfo &info,
 void mpr_to_cts(STATAnalysisJob &job, const AggrMPRInfo &info,
                 int i_thresh, CTSInfo &cts_info,
                 const char *tmp_dir, gsl_rng *rng_ptr) {
-   CTSInfo *cts_info_ptr = (CTSInfo *) 0;
+   CTSInfo *cts_info_ptr = (CTSInfo *) nullptr;
 
    //
    // Initialize
@@ -4205,7 +4205,7 @@ double compute_vif(NumArray &na) {
    // Compute the variance inflation factor
    vif = 1 + 2.0*fabs(corr) - 2.0*fabs(corr)/na.n();
 
-   return(vif);
+   return vif;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -4217,7 +4217,7 @@ bool is_precip_var_name(const ConcatString &s) {
                 has_prefix(grib_precipitation_abbr,
                            n_grib_precipitation_abbr, s.c_str());
 
-   return(match);
+   return match;
 }
 
 ////////////////////////////////////////////////////////////////////////

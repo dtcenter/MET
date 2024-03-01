@@ -47,7 +47,7 @@ void write_grid_to_netcdf(const DataPlane & plane, const Grid & grid,
 
   // Initialization
   VarInfoFactory var_fac;
-  VarInfo* var = (VarInfo *) 0; // allocated, need to delete
+  VarInfo* var = (VarInfo *) nullptr; // allocated, need to delete
   
   //  create a VarInfo object
   var = var_fac.new_var_info((string)"FileType_NcMet");
@@ -64,7 +64,7 @@ void write_grid_to_netcdf(const DataPlane & plane, const Grid & grid,
 
   write_grid_to_netcdf(plane, grid, out_filename, *var);
 
-  if(var) { delete var; var   = (VarInfo *) 0; }
+  if(var) { delete var; var   = (VarInfo *) nullptr; }
 
 }
 
@@ -75,7 +75,7 @@ void write_grid_to_netcdf(const DataPlane & plane, const Grid & grid,
 void write_grid_to_netcdf(const DataPlane & plane, const Grid & grid, const char * out_filename, const VarInfo & var_info) 
 {
   // Initialization
-  NcFile *f_out   = (NcFile *) 0;
+  NcFile *f_out   = (NcFile *) nullptr;
   NcDim  lat_dim  ;
   NcDim  lon_dim  ;
   NcVar  f_var    ;
@@ -89,7 +89,7 @@ void write_grid_to_netcdf(const DataPlane & plane, const Grid & grid, const char
     mlog << Error << "\nwrite_netcdf() -> "
 	 << "trouble opening output file " << out_filename
 	 << "\n\n";
-    delete f_out;  f_out = (NcFile *) 0;
+    delete f_out;  f_out = (NcFile *) nullptr;
     
     exit(1);
   }
@@ -129,7 +129,7 @@ void write_grid_to_netcdf(const DataPlane & plane, const Grid & grid, const char
   
   // Close and clean up
   delete f_out;
-  f_out = (NcFile *) 0;
+  f_out = (NcFile *) nullptr;
   
   return;
 }

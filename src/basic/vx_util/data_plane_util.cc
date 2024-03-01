@@ -194,7 +194,7 @@ DataPlane smooth_field(const DataPlane &dp,
 
    smooth_field(dp, smooth_dp, mthd, width, shape, wrap_lon, t, gaussian);
 
-   return(smooth_dp);
+   return smooth_dp;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -495,7 +495,7 @@ DataPlane subtract(const DataPlane &dp1, const DataPlane &dp2) {
       }
    }
 
-   return(diff);
+   return diff;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -525,7 +525,7 @@ DataPlane normal_cdf(const DataPlane &dp, const DataPlane &mn,
       }
    }
 
-   return(cdf);
+   return cdf;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -561,7 +561,7 @@ DataPlane normal_cdf_inv(const double area, const DataPlane &mn,
       }
    }
 
-   return(cdf_inv);
+   return cdf_inv;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -597,7 +597,7 @@ DataPlane gradient(const DataPlane &dp, int dim, int delta) {
       }
    }
 
-   return(grad_dp);
+   return grad_dp;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -728,7 +728,7 @@ DataPlane distance_map(const DataPlane &dp) {
    // Mask the distance map with bad data values of the input field
    mask_bad_data(dm, dp);
 
-   return(dm);
+   return dm;
 }
 
 ////////////////////////////////////////////////////////////////////////

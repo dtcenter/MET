@@ -257,7 +257,7 @@ for (j=0; j<(int) program.size(); ++j)  {
 }   //  for j
 
 
-return ( n );
+return n;
 
 }
 
@@ -302,7 +302,7 @@ for (j=0; j<(int) program.size(); ++j)  {
 
 
 
-return ( n );
+return n;
 
 }
 

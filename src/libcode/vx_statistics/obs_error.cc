@@ -71,11 +71,11 @@ ObsErrorEntry::ObsErrorEntry(const ObsErrorEntry & e) {
 
 ObsErrorEntry & ObsErrorEntry::operator=(const ObsErrorEntry & e) {
 
-   if(this == &e) return(*this);
+   if(this == &e) return *this;
 
    assign(e);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -190,7 +190,7 @@ bool ObsErrorEntry::parse_line(const DataLine &dl) {
    clear();
 
    // Check for blank line or header
-   if(dl.n_items() == 0 || is_header(dl)) return(false);
+   if(dl.n_items() == 0 || is_header(dl)) return false;
 
    // Check for expected number of elements
    if(dl.n_items() != n_obs_error_columns) {
@@ -256,7 +256,7 @@ bool ObsErrorEntry::parse_line(const DataLine &dl) {
 
    validate();
 
-   return(true);
+   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -264,10 +264,10 @@ bool ObsErrorEntry::parse_line(const DataLine &dl) {
 bool ObsErrorEntry::is_header(const DataLine &dl) {
 
    if(dl.n_items() > 0) {
-      if(strcasecmp(dl[0], "OBS_VAR") == 0) return(true);
+      if(strcasecmp(dl[0], "OBS_VAR") == 0) return true;
    }
 
-   return(false);
+   return false;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -283,28 +283,28 @@ bool ObsErrorEntry::is_match(const char *cur_var_name,
                              double cur_val) {
 
    // Check array filters
-   if(var_name.n()    > 0 && !var_name.reg_exp_match(cur_var_name))  return(false);
-   if(msg_type.n()    > 0 && !msg_type.has(cur_msg_type))            return(false);
-   if(sid.n()         > 0 && !sid.has(cur_sid))                      return(false);
-   if(pb_rpt_type.n() > 0 && !pb_rpt_type.has(cur_pb_rpt))           return(false);
-   if(in_rpt_type.n() > 0 && !in_rpt_type.has(cur_in_rpt))           return(false);
-   if(inst_type.n()   > 0 && !inst_type.has(cur_inst))               return(false);
+   if(var_name.n()    > 0 && !var_name.reg_exp_match(cur_var_name))  return false;
+   if(msg_type.n()    > 0 && !msg_type.has(cur_msg_type))            return false;
+   if(sid.n()         > 0 && !sid.has(cur_sid))                      return false;
+   if(pb_rpt_type.n() > 0 && !pb_rpt_type.has(cur_pb_rpt))           return false;
+   if(in_rpt_type.n() > 0 && !in_rpt_type.has(cur_in_rpt))           return false;
+   if(inst_type.n()   > 0 && !inst_type.has(cur_inst))               return false;
 
    // Check ranges
    if(!is_bad_data(cur_hgt) && hgt_range.n() == 2) {
        if((cur_hgt < hgt_range[0] && !is_eq(cur_hgt, hgt_range[0])) ||
-          (cur_hgt > hgt_range[1] && !is_eq(cur_hgt, hgt_range[1]))) return(false);
+          (cur_hgt > hgt_range[1] && !is_eq(cur_hgt, hgt_range[1]))) return false;
    }
    if(!is_bad_data(cur_prs) && prs_range.n() == 2) {
        if((cur_prs < prs_range[0] && !is_eq(cur_prs, prs_range[0])) ||
-          (cur_prs > prs_range[1] && !is_eq(cur_prs, prs_range[1]))) return(false);
+          (cur_prs > prs_range[1] && !is_eq(cur_prs, prs_range[1]))) return false;
    }
    if(!is_bad_data(cur_val) && val_range.n() == 2) {
        if((cur_val < val_range[0] && !is_eq(cur_val, val_range[0])) ||
-          (cur_val > val_range[1] && !is_eq(cur_val, val_range[1]))) return(false);
+          (cur_val > val_range[1] && !is_eq(cur_val, val_range[1]))) return false;
    }
 
-   return(true);
+   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -365,7 +365,7 @@ ObsErrorTable::ObsErrorTable(const ObsErrorTable &f) {
 
 void ObsErrorTable::init_from_scratch() {
 
-   e = (ObsErrorEntry *) 0;
+   e = (ObsErrorEntry *) nullptr;
 
    clear();
 }
@@ -374,7 +374,7 @@ void ObsErrorTable::init_from_scratch() {
 
 void ObsErrorTable::clear() {
 
-   if(e) { delete [] e; e = (ObsErrorEntry *) 0; }
+   if(e) { delete [] e; e = (ObsErrorEntry *) nullptr; }
 
    IsSet      = false;
    N_elements = 0;
@@ -427,7 +427,7 @@ void ObsErrorTable::extend(int len) {
    if(len <= N_alloc )  return;
 
    int i;
-   ObsErrorEntry * u = (ObsErrorEntry *) 0;
+   ObsErrorEntry * u = (ObsErrorEntry *) nullptr;
 
    u = new ObsErrorEntry [len];
 
@@ -435,7 +435,7 @@ void ObsErrorTable::extend(int len) {
 
    e = u;
 
-   u = (ObsErrorEntry *) 0;
+   u = (ObsErrorEntry *) nullptr;
 
    N_alloc = len;
 
@@ -495,7 +495,7 @@ bool ObsErrorTable::read(const char * file_name) {
    if(!f.open(file_name)) {
       mlog << Warning << "ObsErrorTable::read() -> "
            << "unable to open input file \"" << file_name << "\"\n\n";
-      return(false);
+      return false;
    }
 
    //
@@ -515,7 +515,7 @@ bool ObsErrorTable::read(const char * file_name) {
 
    f.close();
 
-   return(true);
+   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -525,7 +525,7 @@ ObsErrorEntry *ObsErrorTable::lookup(
    int cur_pb_rpt,           int cur_in_rpt,           int cur_inst,
    double cur_hgt,           double cur_prs,           double cur_val) {
    int i;
-   ObsErrorEntry * e_match = (ObsErrorEntry *) 0;
+   ObsErrorEntry * e_match = (ObsErrorEntry *) nullptr;
 
    for(i=0; i<N_elements; i++) {
 
@@ -552,7 +552,7 @@ ObsErrorEntry *ObsErrorTable::lookup(
            << ", val = " << cur_val << "\n\n";
    }
 
-   return(e_match);
+   return e_match;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -560,7 +560,7 @@ ObsErrorEntry *ObsErrorTable::lookup(
 ObsErrorEntry *ObsErrorTable::lookup(
    const char *cur_var_name, const char *cur_msg_type, double cur_val) {
    int i;
-   ObsErrorEntry * e_match = (ObsErrorEntry *) 0;
+   ObsErrorEntry * e_match = (ObsErrorEntry *) nullptr;
 
    for(i=0; i<N_elements; i++) {
 
@@ -581,7 +581,7 @@ ObsErrorEntry *ObsErrorTable::lookup(
            << "\", val = " << cur_val << "\n\n";
    }
 
-   return(e_match);
+   return e_match;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -591,10 +591,10 @@ bool ObsErrorTable::has(const char *cur_var_name,
 
    for(int i=0; i<N_elements; i++) {
       if( (e[i].var_name.n() == 0 || e[i].var_name.reg_exp_match(cur_var_name)) &&
-          (e[i].msg_type.n() == 0 || e[i].msg_type.has(cur_msg_type)) ) return(true);
+          (e[i].msg_type.n() == 0 || e[i].msg_type.has(cur_msg_type)) ) return true;
    }
 
-   return(false);
+   return false;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -607,7 +607,7 @@ bool ObsErrorTable::has(const char *cur_var_name,
 void ObsErrorInfo::clear() {
    flag = false;
    entry.clear();
-   rng_ptr = (gsl_rng *) 0;
+   rng_ptr = (gsl_rng *) nullptr;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -644,7 +644,7 @@ ObsErrorInfo &ObsErrorInfo::operator=(const ObsErrorInfo &a) noexcept {
 ////////////////////////////////////////////////////////////////////////
 
 ObsErrorInfo parse_conf_obs_error(Dictionary *dict, gsl_rng *rng_ptr) {
-   Dictionary *err_dict = (Dictionary *) 0;
+   Dictionary *err_dict = (Dictionary *) nullptr;
    ObsErrorInfo info;
    int i;
 
@@ -664,7 +664,7 @@ ObsErrorInfo parse_conf_obs_error(Dictionary *dict, gsl_rng *rng_ptr) {
    info.flag = err_dict->lookup_bool(conf_key_flag);
 
    // If set to NONE, no work to do
-   if(!info.flag) return(info);
+   if(!info.flag) return info;
 
    // Conf: dist_type - optional
    i = err_dict->lookup_int(conf_key_dist_type, false);
@@ -693,7 +693,7 @@ ObsErrorInfo parse_conf_obs_error(Dictionary *dict, gsl_rng *rng_ptr) {
 
    info.entry.validate();
 
-   return(info);
+   return info;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -704,7 +704,7 @@ double add_obs_error_inc(const gsl_rng *r, FieldType t,
    double v_new = v;
 
    // Check for null pointer or bad input value
-   if(!e || is_bad_data(v)) return(v);
+   if(!e || is_bad_data(v)) return v;
 
    // Apply the specified random perturbation
    if(e->dist_type != DistType_None) {
@@ -737,7 +737,7 @@ double add_obs_error_inc(const gsl_rng *r, FieldType t,
       }
    }
 
-   return(v_new);
+   return v_new;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -750,7 +750,7 @@ DataPlane add_obs_error_inc(const gsl_rng *r, FieldType t,
    int x, y;
    double obs_v, in_v;
    DataPlane out_dp = in_dp;
-   const ObsErrorEntry *e = (ObsErrorEntry *) 0;
+   const ObsErrorEntry *e = (ObsErrorEntry *) nullptr;
 
    // Check for matching dimensions
    if(in_dp.nx() != obs_dp.nx() || in_dp.ny() != obs_dp.ny()) {
@@ -780,7 +780,7 @@ DataPlane add_obs_error_inc(const gsl_rng *r, FieldType t,
       }
    }
 
-   return(out_dp);
+   return out_dp;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -790,7 +790,7 @@ double add_obs_error_bc(const gsl_rng *r, FieldType t,
    double v_new = v;
 
    // Check for null pointer or bad input value
-   if(!e || is_bad_data(v)) return(v);
+   if(!e || is_bad_data(v)) return v;
 
    // Apply instrument bias correction
    if(!is_bad_data(e->bias_scale))  v_new *= e->bias_scale;
@@ -820,7 +820,7 @@ double add_obs_error_bc(const gsl_rng *r, FieldType t,
       }
    }
 
-   return(v_new);
+   return v_new;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -833,7 +833,7 @@ DataPlane add_obs_error_bc(const gsl_rng *r, FieldType t,
    int x, y;
    double v;
    DataPlane out_dp = in_dp;
-   const ObsErrorEntry *e = (ObsErrorEntry *) 0;
+   const ObsErrorEntry *e = (ObsErrorEntry *) nullptr;
 
    // Check for matching dimensions
    if(in_dp.nx() != obs_dp.nx() || in_dp.ny() != obs_dp.ny()) {
@@ -861,7 +861,7 @@ DataPlane add_obs_error_bc(const gsl_rng *r, FieldType t,
       }
    }
 
-   return(out_dp);
+   return out_dp;
 }
 
 ////////////////////////////////////////////////////////////////////////

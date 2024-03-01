@@ -48,7 +48,7 @@ PSFilter::PSFilter()
 
 {
 
-next = (PSFilter *) 0;
+next = (PSFilter *) nullptr;
 
 set_decimal_places(default_decimal_places);
 
@@ -62,7 +62,7 @@ PSFilter::~PSFilter()
 
 {
 
-if ( next )  { delete next;  next = (PSFilter *) 0; }
+if ( next )  { delete next;  next = (PSFilter *) nullptr; }
 
 }
 
@@ -150,7 +150,7 @@ snprintf(junk, sizeof(junk), "%d", k);
 
 (*this) << junk;
 
-return ( *this );
+return *this;
 
 }
 
@@ -180,7 +180,7 @@ while ( *s )  {
 }
 
 
-return ( *this );
+return *this;
 
 }
 
@@ -194,7 +194,7 @@ PSFilter & PSFilter::operator<<(const ConcatString & s)
 
 operator<<(s.text());
 
-return ( *this );
+return *this;
 
 }
 
@@ -212,7 +212,7 @@ PSFilter & PSFilter::operator<<(const double x)
 
   operator<<(junk);
 
-  return ( * this );
+  return *this;
 
 }
 

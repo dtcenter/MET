@@ -57,7 +57,7 @@ if ( argc != 3 )  usage();
    //  done
    //
 
-return ( 0 );
+return 0;
 
 }
 

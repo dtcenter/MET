@@ -110,7 +110,7 @@ void write_pad(int fd, unsigned int value, PadSize padsize)
 int n_written, bytes;
 unsigned int I;
 unsigned long long L;
-unsigned char * b = (unsigned char *) 0;
+unsigned char * b = (unsigned char *) nullptr;
 
 
 switch ( padsize )  {
@@ -174,13 +174,13 @@ while ( (n_read = read(fd, tempbuf, sizeof(tempbuf))) > 0 )  {
          // lseek(fd, pos + 2, SEEK_SET);
             lseek(fd, pos, SEEK_SET);
 
-         return ( pos );
+         return pos;
 
       }
 
    }   //  for j
 
-   if ( n_read < 10 )  return ( -1 );
+   if ( n_read < 10 )  return -1;
 
    pos += n_read - 5;
 
@@ -188,7 +188,7 @@ while ( (n_read = read(fd, tempbuf, sizeof(tempbuf))) > 0 )  {
 
 }   //  while
 
-if ( n_read == 0 )  return ( -1 );
+if ( n_read == 0 )  return -1;
 
 if ( n_read < 0 )  {
 
@@ -199,7 +199,7 @@ if ( n_read < 0 )  {
 
 }
 
-return ( pos );
+return pos;
 
 }
 
@@ -295,7 +295,7 @@ if ( lseek(fd, pos, SEEK_SET) < 0 )  {
    //  done
    //
 
-return ( rec_size );
+return rec_size;
 
 }
 

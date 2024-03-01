@@ -51,7 +51,7 @@ Histogram::~Histogram()
 
 {
 
-if ( Count )  { delete [] Count;  Count = (int *) 0; }
+if ( Count )  { delete [] Count;  Count = (int *) nullptr; }
 
 }
 
@@ -77,11 +77,11 @@ Histogram & Histogram::operator=(const Histogram & h)
 
 {
 
-if ( this == &h )  return ( * this );
+if ( this == &h )  return *this;
 
 assign(h);
 
-return ( * this );
+return *this;
 
 }
 
@@ -93,7 +93,7 @@ void Histogram::init_from_scratch()
 
 {
 
-Count = (int *) 0;
+Count = (int *) nullptr;
 
 Nbins = 0;
 
@@ -142,7 +142,7 @@ void Histogram::set_nbd(int n, double b, double d)
 
 {
 
-if ( Count )  { delete [] Count;  Count = (int *) 0; }
+if ( Count )  { delete [] Count;  Count = (int *) nullptr; }
 
 Nbins  = n;
 
@@ -207,7 +207,7 @@ if ( (k < 0) || (k >= Nbins) )  {
 
 }
 
-return ( Count[k] );
+return Count[k];
 
 }
 
@@ -269,7 +269,7 @@ int Histogram::total_bin_count() const
 
 {
 
-if ( Nbins == 0 )  return ( 0 );
+if ( Nbins == 0 )  return 0;
 
 int j, t;
 
@@ -282,7 +282,7 @@ for (j=0; j<Nbins; ++j)  {
 }
 
 
-return ( t );
+return t;
 
 }
 
@@ -294,7 +294,7 @@ int Histogram::max_bin_count() const
 
 {
 
-if ( Nbins == 0 )  return ( 0 );
+if ( Nbins == 0 )  return 0;
 
 int j, m;
 
@@ -307,7 +307,7 @@ for (j=1; j<Nbins; ++j)  {   //  j starts at one here
 }
 
 
-return ( m );
+return m;
 
 }
 
@@ -319,7 +319,7 @@ int Histogram::min_bin_count() const
 
 {
 
-if ( Nbins == 0 )  return ( 0 );
+if ( Nbins == 0 )  return 0;
 
 int j, m;
 
@@ -332,7 +332,7 @@ for (j=1; j<Nbins; ++j)  {   //  j starts at one here
 }
 
 
-return ( m );
+return m;
 
 }
 

@@ -69,7 +69,7 @@ theta -= 360.0*floor(theta/360.0);
    //  done
    //
 
-return ( theta );
+return theta;
 
 }
 
@@ -104,7 +104,7 @@ lst -= 360.0*floor(lst/360.0);
    //  done
    //
 
-return ( lst );
+return lst;
 
 }
 

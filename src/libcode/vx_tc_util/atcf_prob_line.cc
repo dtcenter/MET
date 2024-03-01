@@ -50,11 +50,11 @@ ATCFProbLine::ATCFProbLine(const ATCFProbLine &l) {
 
 ATCFProbLine & ATCFProbLine::operator=(const ATCFProbLine &l) {
 
-   if(this == &l) return(*this);
+   if(this == &l) return *this;
 
    assign(l);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -116,7 +116,7 @@ int ATCFProbLine::read_line(LineDataFile * ldf) {
       clear();
 
       // Return bad status from the base class
-      if(!(status = ATCFLineBase::read_line(ldf))) return(0);
+      if(!(status = ATCFLineBase::read_line(ldf))) return 0;
 
       // Check the line type
       switch(Type) {
@@ -150,19 +150,19 @@ int ATCFProbLine::read_line(LineDataFile * ldf) {
       }
 	}
 
-   return(1);
+   return 1;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 int ATCFProbLine::prob() const {
-   return(parse_int(get_item(ProbOffset).c_str()));
+   return parse_int(get_item(ProbOffset).c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 int ATCFProbLine::prob_item() const {
-   return(parse_int(get_item(ProbItemOffset).c_str()));
+   return parse_int(get_item(ProbItemOffset).c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////

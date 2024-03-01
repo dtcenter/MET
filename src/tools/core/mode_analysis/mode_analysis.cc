@@ -59,7 +59,7 @@ static const char * default_config_filename = "MET_BASE/config/MODEAnalysisConfi
 
 static ConcatString config_filename;
 
-static BasicModeAnalysisJob * job = (BasicModeAnalysisJob *) 0;
+static BasicModeAnalysisJob * job = (BasicModeAnalysisJob *) nullptr;
 
 static ModeAttributes config_atts;
 
@@ -71,9 +71,9 @@ static StringArray mode_files;
 
 static StringArray lookin_dirs;
 
-static ofstream * dumpfile = (ofstream *) 0;
+static ofstream * dumpfile = (ofstream *) nullptr;
 
-static ofstream * outfile  = (ofstream *) 0;
+static ofstream * outfile  = (ofstream *) nullptr;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -182,10 +182,10 @@ job->clear();
    //  done
    //
 
-if ( dumpfile )  { delete dumpfile;  dumpfile = (ofstream *) 0; }
-if ( outfile  )  { delete  outfile;   outfile = (ofstream *) 0; }
+if ( dumpfile )  { delete dumpfile;  dumpfile = (ofstream *) nullptr; }
+if ( outfile  )  { delete  outfile;   outfile = (ofstream *) nullptr; }
 
-return ( 0 );
+return 0;
 
 }
 

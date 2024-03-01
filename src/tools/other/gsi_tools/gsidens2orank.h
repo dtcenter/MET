@@ -117,7 +117,7 @@ static int            n_ens;
 static bool           conv_flag, retr_flag;
 
 // Pointer to the random number generator to be used
-static gsl_rng     *rng_ptr          = (gsl_rng *) 0;
+static gsl_rng     *rng_ptr          = (gsl_rng *) nullptr;
 static const char  *default_rng_name = "mt19937";
 static const char  *default_rng_seed = "";
 static ConcatString rng_name;

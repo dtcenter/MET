@@ -55,7 +55,7 @@ static ConcatString program_name;
 
 static Grid grid;
 static ConcatString out_file;
-static NcFile       *nc_out = (NcFile *) 0;
+static NcFile       *nc_out = (NcFile *) nullptr;
 static NcDim        lat_dim, lon_dim, cdf_dim;
 static NcVar        cdf_x_var, cdf_y_var;
 
@@ -129,9 +129,9 @@ int met_main(int argc, char *argv[]) {
    mlog << Debug(1)
         << "Finished writing output file: " << out_file << "\n";
    delete nc_out;
-   nc_out = (NcFile *) 0;
+   nc_out = (NcFile *) nullptr;
 
-   return(0);
+   return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -328,7 +328,7 @@ void write_nc_bin(const DataPlane &dp, int i_cdf, double cdf_y) {
    }
 
    // Deallocate and clean up
-   if(data) { delete [] data; data = (float *) 0; }
+   if(data) { delete [] data; data = (float *) nullptr; }
 
    return;
 }
@@ -337,9 +337,9 @@ void write_nc_bin(const DataPlane &dp, int i_cdf, double cdf_y) {
 
 void get_field(const char *file, const char *config_str, DataPlane &dp) {
    GrdFileType ftype;
-   Met2dDataFile * mtddf_ptr = (Met2dDataFile * ) 0;
+   Met2dDataFile * mtddf_ptr = (Met2dDataFile * ) nullptr;
    Met2dDataFileFactory m_factory;
-   VarInfo * vi_ptr = (VarInfo * ) 0;
+   VarInfo * vi_ptr = (VarInfo * ) nullptr;
    VarInfoFactory v_factory;
    double dmin, dmax;
 
@@ -418,8 +418,8 @@ void get_field(const char *file, const char *config_str, DataPlane &dp) {
    }
 
    // Clean up
-   if(mtddf_ptr) { delete mtddf_ptr; mtddf_ptr = (Met2dDataFile * ) 0; }
-   if(vi_ptr)    { delete vi_ptr;    vi_ptr    =        (VarInfo *) 0; }
+   if(mtddf_ptr) { delete mtddf_ptr; mtddf_ptr = (Met2dDataFile * ) nullptr; }
+   if(vi_ptr)    { delete vi_ptr;    vi_ptr    =        (VarInfo *) nullptr; }
 
    return;
 }

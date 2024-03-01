@@ -49,7 +49,7 @@ if ( status < 0 )  {
    //  return the file size in bytes
    //
 
-return( (long long) sbuf.st_size );
+return (long long) sbuf.st_size;
 
 }
 

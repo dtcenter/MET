@@ -47,12 +47,12 @@ WaveletStatConfInfo::~WaveletStatConfInfo() {
 void WaveletStatConfInfo::init_from_scratch() {
 
    // Initialize pointers
-   fcst_info     = (VarInfo **)    0;
-   obs_info      = (VarInfo **)    0;
-   fcat_ta       = (ThreshArray *) 0;
-   ocat_ta       = (ThreshArray *) 0;
-   wvlt_ptr      = (gsl_wavelet *) 0;
-   wvlt_work_ptr = (gsl_wavelet_workspace *) 0;
+   fcst_info     = (VarInfo **)    nullptr;
+   obs_info      = (VarInfo **)    nullptr;
+   fcat_ta       = (ThreshArray *) nullptr;
+   ocat_ta       = (ThreshArray *) nullptr;
+   wvlt_ptr      = (gsl_wavelet *) nullptr;
+   wvlt_work_ptr = (gsl_wavelet_workspace *) nullptr;
 
    clear();
 
@@ -91,21 +91,21 @@ void WaveletStatConfInfo::clear() {
    // Deallocate memory
    if(wvlt_ptr)      { wavelet_free(wvlt_ptr);                }
    if(wvlt_work_ptr) { wavelet_workspace_free(wvlt_work_ptr); }
-   if(fcat_ta)       { delete [] fcat_ta;   fcat_ta   = (ThreshArray *) 0; }
-   if(ocat_ta)       { delete [] ocat_ta;   ocat_ta   = (ThreshArray *) 0; }
+   if(fcat_ta)       { delete [] fcat_ta;   fcat_ta   = (ThreshArray *) nullptr; }
+   if(ocat_ta)       { delete [] ocat_ta;   ocat_ta   = (ThreshArray *) nullptr; }
 
    // Clear fcst_info
    if(fcst_info) {
       for(i=0; i<n_vx; i++)
-         if(fcst_info[i]) { delete fcst_info[i]; fcst_info[i] = (VarInfo *) 0; }
-      delete fcst_info; fcst_info = (VarInfo **) 0;
+         if(fcst_info[i]) { delete fcst_info[i]; fcst_info[i] = (VarInfo *) nullptr; }
+      delete fcst_info; fcst_info = (VarInfo **) nullptr;
    }
 
    // Clear obs_info
    if(obs_info) {
       for(i=0; i<n_vx; i++)
-         if(obs_info[i]) { delete obs_info[i]; obs_info[i] = (VarInfo *) 0; }
-      delete obs_info; obs_info = (VarInfo **) 0;
+         if(obs_info[i]) { delete obs_info[i]; obs_info[i] = (VarInfo *) nullptr; }
+      delete obs_info; obs_info = (VarInfo **) nullptr;
    }
 
    // Reset count
@@ -138,9 +138,9 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype,
    int i, j, n;
    VarInfoFactory info_factory;
    map<STATLineType,STATOutputType>output_map;
-   Dictionary *fcst_dict = (Dictionary *) 0;
-   Dictionary *obs_dict  = (Dictionary *) 0;
-   Dictionary *dict      = (Dictionary *) 0;
+   Dictionary *fcst_dict = (Dictionary *) nullptr;
+   Dictionary *obs_dict  = (Dictionary *) nullptr;
+   Dictionary *dict      = (Dictionary *) nullptr;
    Dictionary i_fdict, i_odict;
    gsl_wavelet_type type;
 
@@ -202,7 +202,7 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype,
    ocat_ta   = new ThreshArray [n_vx];
 
    // Initialize pointers
-   for(i=0; i<n_vx; i++) fcst_info[i] = obs_info[i] = (VarInfo *) 0;
+   for(i=0; i<n_vx; i++) fcst_info[i] = obs_info[i] = (VarInfo *) nullptr;
 
    // Parse the fcst and obs field information
    max_n_thresh = 0;
@@ -457,7 +457,7 @@ void WaveletStatConfInfo::set_perc_thresh(const DataPlane &f_dp,
 ////////////////////////////////////////////////////////////////////////
 
 void WaveletStatConfInfo::parse_nc_info() {
-   const DictionaryEntry * e = (const DictionaryEntry *) 0;
+   const DictionaryEntry * e = (const DictionaryEntry *) nullptr;
 
    e = conf.lookup(conf_key_nc_pairs_flag);
 
@@ -670,14 +670,14 @@ int WaveletStatConfInfo::n_isc_row() {
       if(n_tile > 1) n += (n_scale + 2) * fcat_ta[i].n();
    }
 
-   return(n);
+   return n;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 int WaveletStatConfInfo::n_stat_row() {
 
-   return(n_isc_row());
+   return n_isc_row();
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -693,7 +693,7 @@ int get_pow2(double n) {
    if(fabs(nint(a) - a) > 10E-5) p = -1;
    else                          p = nint(a);
 
-   return(p);
+   return p;
 }
 
 ////////////////////////////////////////////////////////////////////////

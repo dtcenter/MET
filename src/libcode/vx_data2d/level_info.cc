@@ -57,11 +57,11 @@ LevelInfo::LevelInfo(const LevelInfo &f) {
 
 LevelInfo & LevelInfo::operator=(const LevelInfo &f) {
 
-   if ( this == &f )  return ( *this );
+   if ( this == &f )  return *this;
 
    assign(f);
 
-   return ( *this );
+   return *this;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

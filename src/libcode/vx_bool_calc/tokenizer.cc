@@ -64,7 +64,7 @@ void Tokenizer::init_from_scratch()
 
 {
 
-source = 0;
+source = nullptr;
 
 clear();
 
@@ -80,7 +80,7 @@ void Tokenizer::clear()
 
 {
 
-if ( source )  { delete [] source;  source = 0; }
+if ( source )  { delete [] source;  source = nullptr; }
 
 pos = -1;
 
@@ -146,7 +146,7 @@ while ( (c = source[pos]) != 0 )  {
 
 }
 
-return ( value );
+return value;
 
 }
 
@@ -175,7 +175,7 @@ while ( 1 )  {
 
       tok.set_eof();
 
-      return ( tok );
+      return tok;
 
    }
 
@@ -243,7 +243,7 @@ else {
 }
 
 
-return ( tok );
+return tok;
 
 }
 
