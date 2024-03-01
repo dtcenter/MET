@@ -96,6 +96,9 @@ def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, ca
     VALGRIND_OPT_MEM ="--leak-check=full --show-leak-kinds=all --error-limit=no -v"
     VALGRIND_OPT_CALL ="--tool=callgrind --dump-instr=yes --simulate-cache=yes --collect-jumps=yes"
 
+    #for debug:
+    cmd_args_list = []
+    
     # # run each test
     for test in tests:
     #   # print the test name
@@ -156,8 +159,12 @@ def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, ca
     
     #   # run and time the test command
         t_start = dt.now()
-        cmd_args = [arg for arg in cmd.split() if arg!='\\'] + ['2>&1']
-        cmd_outs = subprocess.run(cmd_args, capture_output=True)  #what should this actually contain?
+        cmd_args = [arg for arg in cmd.split() if arg!='\\']# + ['2>&1']
+        cmd_args_list.append(cmd_args)  #debug
+        cmd_outs = subprocess.run(cmd_args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)  #what should this actually contain?
+        print(f"Return code: {cmd_outs.returncode}")
+        #print(f"stderr: {cmd_outs.stderr}")
+        print(f"stdout: {cmd_outs.stdout}")
         t_elaps = dt.now() - t_start
         # unshift @cmd_outs, "$cmd\n";
 
@@ -224,7 +231,7 @@ def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, ca
     #   }
 
     # }
-    return tests, cmd
+    return tests, cmd_args_list
 
 
 def build_tests(test_root):
