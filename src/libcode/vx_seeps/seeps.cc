@@ -1,9 +1,14 @@
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+// ** Copyright UCAR (c) 1992 - 2024
+// ** University Corporation for Atmospheric Research (UCAR)
+// ** National Center for Atmospheric Research (NCAR)
+// ** Research Applications Lab (RAL)
+// ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
 ////////////////////////////////////////////////////////////////////////
 
-
-using namespace std;
 
 #include <iostream>
 #include <unistd.h>
@@ -14,7 +19,6 @@ using namespace std;
 #include <time.h>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "file_exists.h"
 
@@ -22,6 +26,10 @@ using namespace netCDF;
 #include "vx_log.h"
 #include "nc_utils.h"
 #include "seeps.h"
+
+using namespace std;
+using namespace netCDF;
+
 
 ////////////////////////////////////////////////////////////////////////
 

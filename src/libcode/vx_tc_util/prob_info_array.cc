@@ -8,8 +8,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -20,6 +18,8 @@ using namespace std;
 #include "prob_info_base.h"
 #include "prob_rirw_info.h"
 #include "prob_info_array.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 //

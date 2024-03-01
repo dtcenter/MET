@@ -8,8 +8,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <iostream>
 #include <fstream>
 #include <sys/types.h>
@@ -26,6 +24,8 @@ using namespace std;
 #include "tc_columns.h"
 
 #include "vx_log.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 //

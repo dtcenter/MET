@@ -21,8 +21,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -31,6 +29,8 @@ using namespace std;
 
 #include "interest.h"
 #include "vx_math.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 

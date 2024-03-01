@@ -9,9 +9,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -19,6 +16,8 @@ using namespace std;
 
 #include "siderial.h"
 #include "astro_constants.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////

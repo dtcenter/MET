@@ -8,8 +8,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -20,6 +18,8 @@ using namespace std;
 #include "nav.h"
 
 #include "pair_data_genesis.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 //

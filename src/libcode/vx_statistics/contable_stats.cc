@@ -6,8 +6,6 @@
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -22,6 +20,8 @@ using namespace std;
 #include "vx_math.h"
 #include "vx_gsl_prob.h"
 #include "vx_log.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 //

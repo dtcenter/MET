@@ -8,8 +8,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -21,6 +19,8 @@ using namespace std;
 
 #include "genesis_info.h"
 #include "vx_config.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 //

@@ -8,8 +8,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <cstdio>
 #include <iostream>
 #include <limits.h>
@@ -27,6 +25,8 @@ using namespace std;
 #include "vx_grid.h"
 #include "vx_util.h"
 #include "vx_log.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 

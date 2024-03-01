@@ -9,8 +9,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <fstream>
 #include <unistd.h>
@@ -20,6 +18,8 @@ using namespace std;
 
 #include "vx_log.h"
 #include "flate_filter.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
