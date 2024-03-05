@@ -2171,12 +2171,14 @@ void compute_obs_error_log_scores(double emn, double esd,
 
       // Error-convolved logarithmic scoring rule in
       // Ferro (2017, Eq 5) doi:10.1002/qj.3115
-      v_conv = 0.5 * log(sigma2 + ov2) +
+      // Scale by 2.0 * pi for consistency with ignorance score
+      v_conv = 0.5 * log(2.0 * pi * (sigma2 + ov2)) +
                (obs - emn) * (obs - emn) /
                (2.0 * (sigma2 + ov2));
 
       // Error-corrected logarithmic scoring rule in
       // Ferro (2017, Eq 7) doi:10.1002/qj.3115
+      // Scale by 2.0 * pi for consistency with ignorance score
       v_corr = log(esd) +
                ((obs - emn) * (obs - emn) - ov2) /
                (2.0 * sigma2);

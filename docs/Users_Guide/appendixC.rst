@@ -1118,21 +1118,21 @@ One approach that is used to take observation error into account in a summary me
 
 .. only:: latex
 
-  .. math:: \text{IGN\_CONV\_OERR} = s(f,y) = \frac{1}{2}\log(\sigma^2 + c^2) + \frac{{y - \mu}^2}{2{\sigma^2 + c^2}}
+  .. math:: \text{IGN\_CONV\_OERR} = s(f,y) = \frac{1}{2}\log(2 \pi (\sigma^2 + c^2)) + \frac{(y - \mu)^2}{2 (\sigma^2 + c^2)}
 
 .. only:: html
 
-  .. math:: \text{IGN_CONV_OERR} = s(f,y) = \frac{1}{2}\log(\sigma^2 + c^2) + \frac{{y - \mu}^2}{2{\sigma^2 + c^2}}
+  .. math:: \text{IGN_CONV_OERR} = s(f,y) = \frac{1}{2}\log(2 \pi (\sigma^2 + c^2)) + \frac{(y - \mu)^2}{2 (\sigma^2 + c^2)}
 
 Another approach to incorporation of observation uncertainty into a measure is the error-correction approach. The approach merely ensures that the scoring rule, :math:`s`, is unbiased for a scoring rule :math:`s_0` if they have the same expected value. :ref:`Ferro, 2017 <Ferro-2017>` gives the error-corrected ignorance scoring rule (which is also proposer when :math:`w\sim N(0,c^2)`) as
 
 .. only:: latex
 
-  .. math:: \text{IGN\_CORR\_OERR} = s(f,y) = \log\sigma + \frac{{y - \mu}^2 - c^2}{2\sigma^2}
+  .. math:: \text{IGN\_CORR\_OERR} = s(f,y) = \log\sigma + \frac{(y - \mu)^2 - c^2}{2\sigma^2}
 
 .. only:: html
 
-  .. math:: \text{IGN_CORR_OERR} = s(f,y) = \log\sigma + \frac{{y - \mu}^2 - c^2}{2\sigma^2}
+  .. math:: \text{IGN_CORR_OERR} = s(f,y) = \log\sigma + \frac{(y - \mu)^2 - c^2}{2\sigma^2}
 
 The expected score for the error-convolved ignorance scoring rule typically differs from the expected score that would be achieved if there were no observation error. The error-corrected score, on the other hand, has the same expectation.
 
