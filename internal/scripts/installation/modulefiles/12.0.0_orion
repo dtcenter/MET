@@ -10,10 +10,10 @@ proc ModulesHelp { } {
 prereq intel/2020.2
 
 set base /apps/contrib/MET
-set ver 12.0.0-beta2
+set ver 12.0.0
 set share $base/$ver/share/met
-set lib_base $base/12.0.0-beta2
-setenv MET_ROOT $base/$ver/MET-12.0.0-beta2
+set lib_base $base/12.0.0
+setenv MET_ROOT $base/$ver/MET-12.0.0
 
 prepend-path PATH $base/$ver/bin:$lib_base/external_libs/bin:/work/noaa/ovp/miniconda/miniconda3/envs/metplus_v5.1_py3.10/bin
 
