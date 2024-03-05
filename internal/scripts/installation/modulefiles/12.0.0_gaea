@@ -15,3 +15,5 @@ set share $base/$ver/share/met
 set lib_base $base/12.0.0
 
 prepend-path PATH $base/$ver/bin:$lib_base/external_libs/bin:/gpfs/f5/esrl/proj-shared/Julie.Prestopnik/projects/miniconda/miniconda3/envs/metplus_v5.1_py3.10/bin
+
+setenv MET_PYTHON_EXE /gpfs/f5/esrl/proj-shared/Julie.Prestopnik/projects/miniconda/miniconda3/envs/metplus_v5.1_py3.10/bin/python
