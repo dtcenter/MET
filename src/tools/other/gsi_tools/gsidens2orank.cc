@@ -20,8 +20,6 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <fstream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -45,6 +43,8 @@ using namespace std;
 #include "rad_record.h"
 #include "gsi_util.h"
 #include "gsidens2orank.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 

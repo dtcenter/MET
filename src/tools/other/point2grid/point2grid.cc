@@ -24,14 +24,12 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
 #include <dirent.h>
 
 #include<netcdf>
-using namespace netCDF;
 
 #include "main.h"
 #include "vx_log.h"
@@ -51,6 +49,10 @@ using namespace netCDF;
 #include "data2d_nc_met.h"
 #include "pointdata_python.h"
 #endif
+
+using namespace std;
+using namespace netCDF;
+
 
 ////////////////////////////////////////////////////////////////////////
 
