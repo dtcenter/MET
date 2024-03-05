@@ -126,12 +126,12 @@ static ConcatString rng_seed;
 ////////////////////////////////////////////////////////////////////////
 
 // Store conventional and radiance information
-static StringArray      obs_key;
-static map<int,StringArray> obs_key_map;
-static map<int,int>     obs_index_map;
-static vector<ConvData> conv_data;
-static vector<RadData>  rad_data;
-static PairDataEnsemble ens_pd;
+static StringArray           obs_key;
+static std::map<int,StringArray> obs_key_map;
+static std::map<int,int>     obs_index_map;
+static std::vector<ConvData> conv_data;
+static std::vector<RadData>  rad_data;
+static PairDataEnsemble      ens_pd;
 
 ////////////////////////////////////////////////////////////////////////
 
