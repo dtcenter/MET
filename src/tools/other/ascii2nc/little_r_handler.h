@@ -32,12 +32,12 @@ class LittleRHandler : public FileHandler
 
 public:
 
-  LittleRHandler(const string &program_name);
+  LittleRHandler(const std::string &program_name);
   virtual ~LittleRHandler();
 
   virtual bool isFileType(LineDataFile &ascii_file) const;
   
-  static string getFormatString()
+  static std::string getFormatString()
   {
     return "little_r";
   }

@@ -106,7 +106,7 @@ static double mask_val = default_mask_val;
 static ConcatString mask_name;
 static unixtime solar_ut = (unixtime) 0;
 
-static std::map<string,StringArray> shape_str_map;
+static std::map<std::string,StringArray> shape_str_map;
 static NumArray shape_numbers;
 static std::vector<ShpPolyRecord> shape_recs;
 

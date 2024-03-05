@@ -67,8 +67,8 @@ static const char * default_config_filename =
 ////////////////////////////////////////////////////////////////////////
 
 // Input files
-static vector <StringArray> data_files;
-static vector <GrdFileType> file_types;
+static std::vector <StringArray> data_files;
+static std::vector <GrdFileType> file_types;
 static int compress_level = -1;
 
 // Output file
@@ -86,9 +86,9 @@ static GridDiagConfInfo conf_info;
 
 // Output NetCDF file
 static netCDF::NcFile *nc_out = (netCDF::NcFile *) nullptr;
-vector<netCDF::NcDim> data_var_dims;
-vector<netCDF::NcVar> hist_vars;
-vector<netCDF::NcVar> joint_hist_vars;
+std::vector<netCDF::NcDim> data_var_dims;
+std::vector<netCDF::NcVar> hist_vars;
+std::vector<netCDF::NcVar> joint_hist_vars;
 
 static bool multiple_data_sources = false;
 static bool unique_variable_names = true;
@@ -110,16 +110,16 @@ static Met2dDataFileFactory mtddf_factory;
 static Met2dDataFile *data_mtddf = (Met2dDataFile *) nullptr;
 
 // Variable min/max values
-vector<double> var_mins;
-vector<double> var_maxs;
+std::vector<double> var_mins;
+std::vector<double> var_maxs;
 
 // Variable histogram map
-map<ConcatString, vector<long long> > histograms;
-map<ConcatString, vector<long long> > joint_histograms;
-map<ConcatString, vector<double> > bin_mins;
-map<ConcatString, vector<double> > bin_maxs;
-map<ConcatString, vector<double> > bin_mids;
-map<ConcatString, double> bin_deltas;
+std::map<ConcatString, std::vector<long long> > histograms;
+std::map<ConcatString, std::vector<long long> > joint_histograms;
+std::map<ConcatString, std::vector<double> > bin_mins;
+std::map<ConcatString, std::vector<double> > bin_maxs;
+std::map<ConcatString, std::vector<double> > bin_mids;
+std::map<ConcatString, double> bin_deltas;
 
 // Series length
 static int n_series = bad_data_int;
