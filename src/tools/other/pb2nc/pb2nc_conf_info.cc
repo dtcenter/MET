@@ -8,7 +8,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
 
 #include <dirent.h>
 #include <iostream>
@@ -24,6 +23,8 @@ using namespace std;
 #include "apply_mask.h"
 #include "grib_strings.h"
 #include "vx_log.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////

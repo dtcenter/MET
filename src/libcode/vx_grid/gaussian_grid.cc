@@ -10,9 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
-
 #include <cstdio>
 #include <iostream>
 #include <unistd.h>
@@ -24,6 +21,9 @@ using namespace std;
 #include "vx_util.h"
 #include "vx_log.h"
 #include "gaussian_grid.h"
+
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////

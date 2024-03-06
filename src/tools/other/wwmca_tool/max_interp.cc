@@ -10,8 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -20,6 +18,8 @@ using namespace std;
 #include "vx_log.h"
 
 #include "max_interp.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////

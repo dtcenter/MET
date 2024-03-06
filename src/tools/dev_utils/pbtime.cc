@@ -19,7 +19,6 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
@@ -36,6 +35,9 @@ using namespace std;
 #include "vx_cal.h"
 #include "concat_string.h"
 #include "temp_file.h"
+
+using namespace std;
+
 
 ////////////////////////////////////////////////////////////////////////
 

@@ -7,11 +7,7 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
-
 ////////////////////////////////////////////////////////////////////////
-
-
-using namespace std;
 
 
 #include <iostream>
@@ -23,6 +19,9 @@ using namespace std;
 #include "is_number.h"
 #include "str_wrappers.h"
 #include "substring.h"
+
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////

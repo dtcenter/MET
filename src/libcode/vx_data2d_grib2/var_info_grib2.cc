@@ -17,8 +17,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <map>
 #include <string>
 #include <stdlib.h>
@@ -35,6 +33,8 @@ using namespace std;
 #include "vx_util.h"
 #include "vx_data2d.h"
 #include "vx_config.h"
+
+using namespace std;
 
 
 ///////////////////////////////////////////////////////////////////////////////

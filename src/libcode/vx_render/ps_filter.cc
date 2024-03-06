@@ -11,8 +11,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <fstream>
 #include <unistd.h>
@@ -23,6 +21,8 @@ using namespace std;
 #include "vx_log.h"
 #include "empty_string.h"
 #include "ps_filter.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////

@@ -24,12 +24,11 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
-
 #include <string.h>
 
 #include "tokentype_to_string.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -39,7 +38,7 @@ ConcatString tokentype_to_string(const TokenType t)
 
 {
 
-const char * s = (const char *) 0;
+const char * s = (const char *) nullptr;
 
 switch ( t )  {
 
@@ -60,7 +59,7 @@ switch ( t )  {
 }   //  switch
 
 
-return ( ConcatString (s) );
+return ConcatString(s);
 
 }
 

@@ -8,7 +8,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
 
 #include "vx_log.h"
 #include "vx_util.h"
@@ -19,6 +18,9 @@ using namespace std;
 #include "vx_statistics.h"
 
 #include "plot_point_obs_conf_info.h"
+
+using namespace std;
+
 
 ////////////////////////////////////////////////////////////////////////
 

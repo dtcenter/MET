@@ -1,5 +1,3 @@
-
-
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
@@ -9,12 +7,8 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
-
-
 ////////////////////////////////////////////////////////////////////////
 
-
-using namespace std;
 
 #include <iostream>
 #include <unistd.h>
@@ -27,6 +21,8 @@ using namespace std;
 #include "vx_log.h"
 
 #include "file_size.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////

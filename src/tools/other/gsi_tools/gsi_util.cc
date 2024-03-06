@@ -8,7 +8,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
 
 #include <iostream>
 #include <unistd.h>
@@ -24,6 +23,9 @@ using namespace std;
 #include "rad_offsets.h"
 #include "rad_record.h"
 #include "gsi_util.h"
+
+using namespace std;
+
 
 ////////////////////////////////////////////////////////////////////////
 

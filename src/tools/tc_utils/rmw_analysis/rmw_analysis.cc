@@ -6,7 +6,6 @@
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
-using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
@@ -19,7 +18,6 @@ using namespace std;
 #include <unistd.h>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "main.h"
 #include "rmw_analysis.h"
@@ -28,6 +26,9 @@ using namespace netCDF;
 #include "vx_tc_util.h"
 #include "vx_util.h"
 #include "vx_log.h"
+
+using namespace std;
+using namespace netCDF;
 
 ////////////////////////////////////////////////////////////////////////
 

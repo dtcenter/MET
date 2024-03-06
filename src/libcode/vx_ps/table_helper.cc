@@ -10,8 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -22,6 +20,8 @@ using namespace std;
 #include "vx_color.h"
 #include "table_helper.h"
 #include "vx_log.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////

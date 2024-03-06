@@ -48,8 +48,6 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <cstdio>
 #include <iostream>
 #include <stdlib.h>
@@ -65,6 +63,8 @@ using namespace std;
 #include "stat_analysis_job.h"
 #include "parse_stat_line.h"
 #include "aggr_stat_line.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 

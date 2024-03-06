@@ -10,8 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -29,6 +27,8 @@ using namespace std;
 
 #include "af_file.h"
 #include "af_pt_file.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////

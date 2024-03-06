@@ -7,21 +7,19 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
-
-
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <netcdf>
-using namespace netCDF;
 
 #include "vx_log.h"
 #include "vx_math.h"
 
 #include "met_nc_file.h"
 #include "nc_utils.h"
+
+using namespace std;
+using namespace netCDF;
 
 
 ////////////////////////////////////////////////////////////////////////

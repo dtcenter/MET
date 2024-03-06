@@ -27,7 +27,6 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
@@ -41,7 +40,6 @@ using namespace std;
 #include <unistd.h>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "GridTemplate.h"
 
@@ -57,6 +55,10 @@ using namespace netCDF;
 #ifdef WITH_PYTHON
 #include "data2d_python.h"
 #endif
+
+using namespace std;
+using namespace netCDF;
+
 
 ////////////////////////////////////////////////////////////////////////
 

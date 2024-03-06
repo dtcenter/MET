@@ -11,9 +11,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
-
 #include <iostream>
 #include <regex.h>
 #include <unistd.h>
@@ -24,6 +21,9 @@ using namespace std;
 #include "string_array.h"
 #include "logger.h"
 #include "indent.h"
+
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////

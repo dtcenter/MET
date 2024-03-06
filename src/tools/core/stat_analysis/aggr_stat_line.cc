@@ -42,7 +42,6 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
 
 #include <cstdio>
 #include <iostream>
@@ -58,6 +57,9 @@ using namespace std;
 
 #include "aggr_stat_line.h"
 #include "parse_stat_line.h"
+
+using namespace std;
+
 
 ////////////////////////////////////////////////////////////////////////
 

@@ -10,8 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -20,7 +18,6 @@ using namespace std;
 #include <cmath>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "vx_math.h"
 #include "vx_cal.h"
@@ -29,6 +26,9 @@ using namespace netCDF;
 
 #include "wrf_file.h"
 #include "get_wrf_grid.h"
+
+using namespace std;
+using namespace netCDF;
 
 
 ////////////////////////////////////////////////////////////////////////

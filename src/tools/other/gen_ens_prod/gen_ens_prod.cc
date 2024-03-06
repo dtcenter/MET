@@ -23,7 +23,6 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
@@ -37,7 +36,6 @@ using namespace std;
 #include <unistd.h>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "main.h"
 #include "gen_ens_prod.h"
@@ -51,6 +49,10 @@ using namespace netCDF;
 #include "nc_point_obs_in.h"
 
 #include "handle_openmp.h"
+
+using namespace std;
+using namespace netCDF;
+
 
 ////////////////////////////////////////////////////////////////////////
 

@@ -18,11 +18,11 @@
 #include <ctype.h>
 #include <cmath>
 
-using namespace std;
-
 #include "concat_string.h"
 #include "logger.h"
 #include "str_wrappers.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////

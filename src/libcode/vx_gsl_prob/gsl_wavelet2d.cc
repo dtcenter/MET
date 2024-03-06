@@ -9,8 +9,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <cstdlib>
@@ -18,6 +16,8 @@ using namespace std;
 
 #include "vx_log.h"
 #include "gsl_wavelet2d.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 //

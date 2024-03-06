@@ -17,8 +17,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <map>
 #include <stdlib.h>
 #include <string.h>
@@ -34,6 +32,8 @@ using namespace std;
 #include "vx_log.h"
 #include "vx_data2d.h"
 #include "grdfiletype_to_string.h"
+
+using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////
 //

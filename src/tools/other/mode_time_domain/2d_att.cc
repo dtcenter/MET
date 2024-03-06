@@ -11,8 +11,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -27,6 +25,8 @@ using namespace std;
 #include "2d_moments.h"
 #include "3d_txt_header.h"
 #include "2d_columns.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////

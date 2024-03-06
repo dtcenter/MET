@@ -10,8 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -24,7 +22,9 @@ using namespace std;
 #include "is_bad_data.h"
 
 #include "met_point_data.h"
-//#include "nc_point_obs.h"
+
+using namespace std;
+
 
 ////////////////////////////////////////////////////////////////////////
 

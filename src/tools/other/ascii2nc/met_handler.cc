@@ -10,9 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
-
 #include <iostream>
 
 #include "vx_log.h"
@@ -20,6 +17,10 @@ using namespace std;
 
 #include "met_handler.h"
 
+using namespace std;
+
+
+////////////////////////////////////////////////////////////////////////
 
 static const int n_met_col     = 10;
 static const int n_met_col_qty = 11;

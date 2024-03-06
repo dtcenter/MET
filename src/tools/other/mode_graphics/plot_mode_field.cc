@@ -22,17 +22,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-static const int anno_height       = 100;
-
-static const int ctable_width      =  15;
-
-static const int ctable_text_width =  30;
-
-
-////////////////////////////////////////////////////////////////////////
-
-using namespace std;
-
 #include <fstream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -48,9 +37,20 @@ using namespace std;
 #include "vx_config.h"
 #include "configobjecttype_to_string.h"
 
+using namespace std;
+
 
 ////////////////////////////////////////////////////////////////////////
 
+
+static const int anno_height       = 100;
+
+static const int ctable_width      =  15;
+
+static const int ctable_text_width =  30;
+
+
+////////////////////////////////////////////////////////////////////////
 
 static ConcatString program_name;
 

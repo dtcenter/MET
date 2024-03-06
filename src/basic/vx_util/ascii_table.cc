@@ -10,8 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <cstdio>
 #include <cmath>
 #include <iostream>
@@ -28,6 +26,8 @@ using namespace std;
 #include "comma_string.h"
 #include "fix_float.h"
 #include "util_constants.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 

@@ -9,8 +9,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include "multivar_frontend.h"
 
 #include "mode_usage.h"
@@ -18,6 +16,9 @@ using namespace std;
 #ifdef WITH_PYTHON
 #include "global_python.h"
 #endif
+
+using namespace std;
+
 
 ////////////////////////////////////////////////////////////////////////
 

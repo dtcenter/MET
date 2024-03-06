@@ -10,8 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <fstream>
 #include <unistd.h>
@@ -21,6 +19,8 @@ using namespace std;
 #include <cmath>
 
 #include "cgraph_font.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////

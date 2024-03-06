@@ -19,8 +19,6 @@ static const int fl_ligature  = 175;
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -34,6 +32,8 @@ using namespace std;
 #include "cgraphbase_plottype_to_string.h"
 
 #include "gs_ps_map.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////

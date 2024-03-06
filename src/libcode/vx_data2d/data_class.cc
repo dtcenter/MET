@@ -10,8 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -22,6 +20,9 @@ using namespace std;
 #include "data_class.h"
 #include "data2d_utils.h"
 #include "apply_mask.h"
+
+using namespace std;
+
 
 ////////////////////////////////////////////////////////////////////////
 

@@ -7,11 +7,8 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
-
 ////////////////////////////////////////////////////////////////////////
 
-
-using namespace std;
 
 #include <iostream>
 #include <unistd.h>
@@ -29,6 +26,8 @@ using namespace std;
 #include "vx_log.h"
 
 #include "get_filenames.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////

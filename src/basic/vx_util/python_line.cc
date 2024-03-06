@@ -10,9 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
-
 #include <iostream>
 #include <stdlib.h>
 #include <string.h>
@@ -27,6 +24,9 @@ using namespace std;
 #include "temp_file.h"
 
 #include "python_line.h"
+
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////

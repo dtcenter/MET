@@ -34,7 +34,6 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
@@ -48,7 +47,6 @@ using namespace std;
 #include <unistd.h>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "main.h"
 #include "gen_vx_mask.h"
@@ -64,6 +62,10 @@ using namespace netCDF;
 #include "dbf_file.h"
 #include "shp_file.h"
 #include "grid_closed_poly.h"
+
+using namespace std;
+using namespace netCDF;
+
 
 ////////////////////////////////////////////////////////////////////////
 

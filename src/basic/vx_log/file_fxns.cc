@@ -7,8 +7,6 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <cstdio>
 #include <iostream>
 #include <fstream>
@@ -23,6 +21,9 @@ using namespace std;
 #include "vx_log.h"
 
 #include "file_fxns.h"
+
+using namespace std;
+
 
 ////////////////////////////////////////////////////////////////////////
 

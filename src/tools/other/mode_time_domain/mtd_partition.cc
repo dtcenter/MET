@@ -11,8 +11,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <fstream>
 #include <unistd.h>
@@ -31,6 +29,8 @@ using namespace std;
 #include "string_array.h"
 
 #include "mtd_partition.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////

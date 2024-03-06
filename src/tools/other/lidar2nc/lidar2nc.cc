@@ -23,13 +23,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-static const char hdr_typ_string[] = "calipso";
-
-
-////////////////////////////////////////////////////////////////////////
-
-using namespace std;
-
 #include <cstdio>
 #include <cstdlib>
 #include <ctype.h>
@@ -43,7 +36,6 @@ using namespace std;
 #include <vector>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "hdf.h"
 #include "mfhdf.h"
@@ -61,6 +53,14 @@ using namespace netCDF;
 #include "calipso_5km.h"
 #include "nc_obs_util.h"
 #include "nc_point_obs_out.h"
+
+using namespace std;
+using namespace netCDF;
+
+
+////////////////////////////////////////////////////////////////////////
+
+static const char hdr_typ_string[] = "calipso";
 
 ////////////////////////////////////////////////////////////////////////
 

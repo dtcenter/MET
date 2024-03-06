@@ -29,8 +29,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <fstream>
 #include <cstdio>
 #include <unistd.h>
@@ -46,6 +44,8 @@ using namespace std;
 #include "command_line.h"
 #include "string_fxns.h"
 #include "vx_log.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////

@@ -10,15 +10,12 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
 #include <cmath>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "vx_log.h"
 #include "vx_cal.h"
@@ -28,6 +25,9 @@ using namespace netCDF;
 #include "grid_output.h"
 #include "nc_utils.h"
 #include "write_netcdf.h"
+
+using namespace std;
+using namespace netCDF;
 
 
 ////////////////////////////////////////////////////////////////////////

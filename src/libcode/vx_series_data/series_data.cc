@@ -8,8 +8,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <cstdio>
 #include <fstream>
 #include <iostream>
@@ -19,6 +17,8 @@ using namespace std;
 #include <string.h>
 
 #include "series_data.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 

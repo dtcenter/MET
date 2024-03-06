@@ -11,8 +11,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <cstdio>
 #include <ctime>
 #include <iostream>
@@ -22,7 +20,6 @@ using namespace std;
 #include <cmath>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "data_plane_to_netcdf.h"
 #include "vx_log.h"             // mlog
@@ -32,6 +29,11 @@ using namespace netCDF;
 #include "write_netcdf.h"       // write_netcdf functions
 #include "var_info_factory.h"   // VarInfoFactory
 
+using namespace std;
+using namespace netCDF;
+
+
+////////////////////////////////////////////////////////////////////////
 
 extern int get_compress();
 

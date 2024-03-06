@@ -10,19 +10,19 @@
 ///////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
 #include <cmath>
 #include <algorithm>
 #include <netcdf>
-using namespace netCDF;
 
 #include "mode_exec.h"
 #include "nc_utils.h"
 #include "vx_regrid.h"
+
+using namespace std;
+using namespace netCDF;
 
 
 ///////////////////////////////////////////////////////////////////////

@@ -38,7 +38,6 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
@@ -52,7 +51,6 @@ using namespace std;
 #include <unistd.h>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "main.h"
 #include "series_analysis.h"
@@ -61,6 +59,10 @@ using namespace netCDF;
 #include "vx_nc_util.h"
 #include "vx_regrid.h"
 #include "vx_log.h"
+
+using namespace std;
+using namespace netCDF;
+
 
 ////////////////////////////////////////////////////////////////////////
 

@@ -11,9 +11,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
-
 #include <iostream>
 #include <fstream>
 #include <unistd.h>
@@ -26,6 +23,9 @@ using namespace std;
 #include "afm_token.h"
 
 #include "vx_log.h"
+
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////

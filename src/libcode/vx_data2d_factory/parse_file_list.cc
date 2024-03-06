@@ -11,8 +11,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -30,6 +28,8 @@ using namespace std;
 
 #include "parse_file_list.h"
 #include "data2d_factory_utils.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////

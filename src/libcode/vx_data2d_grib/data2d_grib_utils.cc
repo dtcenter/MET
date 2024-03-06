@@ -10,8 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -23,6 +21,8 @@ using namespace std;
 #include "is_bad_data.h"
 #include "vx_log.h"
 #include "vx_math.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////

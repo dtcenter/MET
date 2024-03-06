@@ -36,8 +36,6 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <cstdio>
 #include <iostream>
 #include <stdlib.h>
@@ -49,6 +47,8 @@ using namespace std;
 #include "vx_log.h"
 
 #include "parse_stat_line.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 

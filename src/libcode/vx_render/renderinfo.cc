@@ -11,8 +11,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <fstream>
 #include <unistd.h>
@@ -21,6 +19,8 @@ using namespace std;
 
 #include "vx_log.h"
 #include "renderinfo.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////

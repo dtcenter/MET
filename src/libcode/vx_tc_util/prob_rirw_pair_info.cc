@@ -8,8 +8,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -18,6 +16,8 @@ using namespace std;
 #include <cmath>
 
 #include "prob_rirw_pair_info.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 //

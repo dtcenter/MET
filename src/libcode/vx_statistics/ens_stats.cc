@@ -8,8 +8,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <cstdio>
 #include <iostream>
 #include <unistd.h>
@@ -20,6 +18,8 @@ using namespace std;
 #include "ens_stats.h"
 #include "vx_util.h"
 #include "vx_log.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 //

@@ -8,8 +8,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <cstdio>
 #include <iostream>
 #include <unistd.h>
@@ -22,6 +20,8 @@ using namespace std;
 #include "vx_util.h"
 
 #include "ascii_header.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 

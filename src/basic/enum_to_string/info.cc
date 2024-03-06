@@ -10,8 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -21,6 +19,8 @@ using namespace std;
 
 #include "info.h"
 #include "str_wrappers.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////

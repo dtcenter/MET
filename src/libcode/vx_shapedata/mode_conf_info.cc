@@ -8,8 +8,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <dirent.h>
 #include <iostream>
 #include <unistd.h>
@@ -24,6 +22,8 @@ using namespace std;
 
 #include "vx_data2d_factory.h"
 #include "vx_log.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 

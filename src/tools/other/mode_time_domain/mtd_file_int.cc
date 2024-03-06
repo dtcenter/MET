@@ -11,8 +11,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -22,7 +20,6 @@ using namespace std;
 #include <ctime>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "mtd_file.h"
 #include "mtd_partition.h"
@@ -30,6 +27,9 @@ using namespace netCDF;
 #include "nc_utils_local.h"
 
 #include "vx_math.h"
+
+using namespace std;
+using namespace netCDF;
 
 
 ////////////////////////////////////////////////////////////////////////

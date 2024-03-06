@@ -3,9 +3,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -16,6 +13,8 @@ using namespace std;
 
 #include "python3_util.h"
 #include "global_python.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////

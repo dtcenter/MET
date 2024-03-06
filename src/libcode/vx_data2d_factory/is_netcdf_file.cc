@@ -1,5 +1,3 @@
-
-
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
@@ -14,8 +12,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -26,11 +22,13 @@ using namespace std;
 #include <cmath>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "is_netcdf_file.h"
 
 #include "vx_nc_util.h"
+
+using namespace std;
+using namespace netCDF;
 
 
 ////////////////////////////////////////////////////////////////////////

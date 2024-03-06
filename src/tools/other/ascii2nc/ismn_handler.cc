@@ -8,8 +8,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <iostream>
 
 #include "vx_log.h"
@@ -17,6 +15,11 @@ using namespace std;
 #include "vx_util.h"
 
 #include "ismn_handler.h"
+
+using namespace std;
+
+
+////////////////////////////////////////////////////////////////////////
 
 const int IsmnHandler::MIN_NUM_HDR_COLS = 8;
 const int IsmnHandler::NUM_OBS_COLS = 5;

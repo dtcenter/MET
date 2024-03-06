@@ -10,8 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <cstdio>
 #include <iostream>
 #include <unistd.h>
@@ -20,11 +18,13 @@ using namespace std;
 #include <cmath>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "grid_output.h"
 #include "vx_log.h"
 #include "nc_utils.h"
+
+using namespace std;
+using namespace netCDF;
 
 
 ////////////////////////////////////////////////////////////////////////

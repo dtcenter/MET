@@ -8,8 +8,6 @@
 
 ///////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <cstdio>
 #include <iostream>
 #include <unistd.h>
@@ -22,6 +20,8 @@ using namespace std;
 #include "engine.h"
 #include "mode_columns.h"
 #include "vx_util.h"
+
+using namespace std;
 
 ///////////////////////////////////////////////////////////////////////
 

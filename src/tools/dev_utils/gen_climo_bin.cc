@@ -19,7 +19,6 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
@@ -33,7 +32,6 @@ using namespace std;
 #include <unistd.h>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "main.h"
 #include "vx_util.h"
@@ -42,6 +40,10 @@ using namespace netCDF;
 #include "data_plane.h"
 #include "vx_data2d.h"
 #include "vx_data2d_factory.h"
+
+using namespace std;
+using namespace netCDF;
+
 
 ////////////////////////////////////////////////////////////////////////
 //

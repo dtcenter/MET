@@ -8,8 +8,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -19,6 +17,8 @@ using namespace std;
 
 #include "math_constants.h"
 #include "track_info.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 //

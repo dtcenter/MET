@@ -37,7 +37,6 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
@@ -51,7 +50,6 @@ using namespace std;
 #include <unistd.h>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "main.h"
 #include "madis2nc.h"
@@ -62,6 +60,10 @@ using namespace netCDF;
 #include "vx_math.h"
 #include "vx_log.h"
 #include "nc_point_obs_out.h"
+
+using namespace std;
+using namespace netCDF;
+
 
 ////////////////////////////////////////////////////////////////////////
 

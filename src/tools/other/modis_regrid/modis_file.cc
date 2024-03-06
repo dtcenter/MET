@@ -10,8 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -24,6 +22,8 @@ using namespace std;
 #include "modis_file.h"
 #include "sat_utils.h"
 #include "cloudsat_swath_file.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////

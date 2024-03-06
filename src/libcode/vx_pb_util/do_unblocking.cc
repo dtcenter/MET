@@ -11,8 +11,6 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -24,6 +22,8 @@ using namespace std;
 #include "vx_log.h"
 #include "copy_bytes.h"
 #include "do_unblocking.h"
+
+using namespace std;
 
 
 //////////////////////////////////////////////////////////////////////////////////

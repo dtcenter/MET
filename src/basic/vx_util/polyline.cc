@@ -19,8 +19,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <iostream>
 #include <fstream>
 #include <unistd.h>
@@ -32,6 +30,8 @@ using namespace std;
 #include "vx_log.h"
 #include "vx_math.h"
 #include "vx_util.h"
+
+using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////
 //

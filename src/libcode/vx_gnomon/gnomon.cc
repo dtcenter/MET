@@ -7,6 +7,19 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
+////////////////////////////////////////////////////////////////////////
+
+
+#include <iostream>
+#include <unistd.h>
+#include <stdlib.h>
+#include <cmath>
+
+#include "vx_log.h"
+#include "trig.h"
+#include "gnomon.h"
+
+
 using namespace std;
 
 
@@ -21,19 +34,6 @@ static const double lon0 = 105.0;
 static const double mag_factor = 100.0;
 
 static const double cf = 57.2957795130823208768;
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-#include <iostream>
-#include <unistd.h>
-#include <stdlib.h>
-#include <cmath>
-
-#include "vx_log.h"
-#include "trig.h"
-#include "gnomon.h"
 
 
 ////////////////////////////////////////////////////////////////////////

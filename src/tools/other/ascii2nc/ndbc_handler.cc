@@ -10,9 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
-
 #include <iostream>
 #include <string>
 #include <sstream>
@@ -24,6 +21,11 @@ using namespace std;
 #include "vx_util.h"
 
 #include "ndbc_handler.h"
+
+using namespace std;
+
+
+////////////////////////////////////////////////////////////////////////
 
 static const char *stations_env = "MET_NDBC_STATIONS";
 

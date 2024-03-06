@@ -8,8 +8,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <cstdio>
 #include <iostream>
 #include <unistd.h>
@@ -27,6 +25,8 @@ using namespace std;
 #include "vx_data2d_grib.h"
 #include "vx_math.h"
 #include "vx_log.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 

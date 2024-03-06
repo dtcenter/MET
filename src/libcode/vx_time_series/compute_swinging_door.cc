@@ -8,8 +8,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <cstdio>
 #include <errno.h>
 #include <fstream>
@@ -22,6 +20,8 @@ using namespace std;
 #include "compute_swinging_door.h"
 
 #include "vx_math.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 

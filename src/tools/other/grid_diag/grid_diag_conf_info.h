@@ -58,7 +58,7 @@ class GridDiagConfInfo {
 
       void read_config(const char *, const char *);
       void set_n_data();
-      void process_config(vector<GrdFileType>);
+      void process_config(std::vector<GrdFileType>);
       void process_masks(const Grid &);
 
       int get_n_data() const;

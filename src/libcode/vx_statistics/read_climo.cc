@@ -8,8 +8,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <cstdio>
 #include <iostream>
 #include <unistd.h>
@@ -23,6 +21,8 @@ using namespace std;
 #include "vx_data2d_factory.h"
 #include "vx_data2d.h"
 #include "vx_regrid.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 

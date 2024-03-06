@@ -7,8 +7,6 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <cstdio>
 #include <errno.h>
 #include <fstream>
@@ -19,6 +17,8 @@ using namespace std;
 #include <cmath>
 
 #include "obs_error.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 

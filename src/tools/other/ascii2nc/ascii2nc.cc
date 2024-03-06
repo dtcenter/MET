@@ -53,8 +53,6 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <cstdio>
 #include <cstdlib>
 #include <ctype.h>
@@ -93,6 +91,9 @@ using namespace std;
 #include "global_python.h"
 #include "python_handler.h"
 #endif
+
+using namespace std;
+
 
 ////////////////////////////////////////////////////////////////////////
 
