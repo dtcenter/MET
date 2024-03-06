@@ -167,7 +167,7 @@ char c, c2;
    //  skip whitespace
    //
 
-while ( 1 )  {
+while ( true )  {
 
    c = source[pos];
 

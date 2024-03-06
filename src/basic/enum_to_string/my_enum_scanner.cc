@@ -130,7 +130,7 @@ if ( first_call )  { init();  first_call = false; }
 
 yytext = (char *) lexeme;
 
-while ( 1 )  {
+while ( true )  {
 
    t = next_token();
 
@@ -174,7 +174,7 @@ int c, c2;
    //  skip whitespace
    //
 
-while ( 1 )  {
+while ( true )  {
 
    c = nextchar();
 
@@ -600,7 +600,7 @@ c1 = nextchar();
 c2 = nextchar();
 
 
-while ( 1 )  {
+while ( true )  {
 
    if ( (c1 == EOF) || (c2 == EOF) )  break;
 
@@ -629,7 +629,7 @@ void do_cpp_comment()
 int c;
 
 
-while ( 1 )  {
+while ( true )  {
 
    c = nextchar();
 

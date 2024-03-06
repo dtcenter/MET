@@ -53,7 +53,7 @@ void skip_whitespace(istream & in)
 
 int c;
 
-while ( 1 )  {
+while ( true )  {
 
    c = in.peek();
 
@@ -82,7 +82,7 @@ in.get(c);   //  toss leading '#'
 
 k = 0;
 
-while ( 1 )  {
+while ( true )  {
 
    in.get(c);
 

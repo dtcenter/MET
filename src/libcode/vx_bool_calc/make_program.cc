@@ -65,7 +65,7 @@ tiz.set(input);
 
    ////////////////
 
-while ( 1 )  {
+while ( true )  {
 
    tok = tiz.next_token();
 
