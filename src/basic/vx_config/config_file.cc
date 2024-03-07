@@ -622,7 +622,7 @@ void recursive_envs(string & line)
 
 {
 
-while ( 1 )  {
+while ( true )  {
 
    if ( ! replace_env(line) )  break;
 

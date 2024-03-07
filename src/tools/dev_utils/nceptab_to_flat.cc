@@ -212,7 +212,7 @@ if ( !found )  {
    //
 
 
-while ( 1 )  {
+while ( true )  {
 
    line.read_line(in);
 

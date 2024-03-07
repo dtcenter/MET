@@ -334,7 +334,7 @@ extern istream & operator>>(istream & in, AfmLine & L)
 
 L.clear();
 
-while ( 1 )  {
+while ( true )  {
 
   L.Line.read_line(in);
 

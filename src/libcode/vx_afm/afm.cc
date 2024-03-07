@@ -1903,7 +1903,7 @@ ascii_code = tok.i;
 c.ascii_code = ascii_code;
 
 
-while ( 1 )  {
+while ( true )  {
    tok = line.nexttoken();
 
    if ( tok.type == afm_token_endofline )  break;
@@ -2024,7 +2024,7 @@ c.pcc = new PCC [c.n_parts];
 
 n_pcc = 0;
 
-while ( 1 )  {
+while ( true )  {
 
    tok = line.nexttoken();
 

@@ -188,7 +188,7 @@ if ( first_call )  { init();  first_call = false; }
 
 configtext = (char *) lexeme;
 
-while ( 1 )  {
+while ( true )  {
 
    t = next_token();
 
@@ -218,7 +218,7 @@ int c, c2;
    //  skip whitespace
    //
 
-while ( 1 )  {
+while ( true )  {
 
    c = nextchar();
 
@@ -827,7 +827,7 @@ c1 = nextchar();
 c2 = nextchar();
 
 
-while ( 1 )  {
+while ( true )  {
 
    if ( (c1 == eof) || (c2 == eof) )  break;
 
@@ -858,7 +858,7 @@ int c = 0;
 
 reading_comment = true;
 
-while ( 1 )  {
+while ( true )  {
 
    if ( configin->eof() )  break;
 
@@ -1034,7 +1034,7 @@ if ( c == '$' )  {
 
    env_value = e;
 
-   while ( 1 )  {
+   while ( true )  {
 
       if ( ! replace_env(env_value) )  break;
 

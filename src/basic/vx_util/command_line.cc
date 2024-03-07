@@ -1093,7 +1093,7 @@ a.clear();
 
 count = 0;
 
-while ( 1 )  {
+while ( true )  {
 
    k = pos + count;
 

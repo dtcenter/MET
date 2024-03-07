@@ -326,7 +326,7 @@ if ( (c1 != 'P') || (c2 != '5') )  {
 
 skip_whitespace(in);
 
-while ( 1 )  {
+while ( true )  {
 
    j = in.peek();
 
