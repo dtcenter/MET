@@ -2211,8 +2211,8 @@ void TmpFileInfo::setup_nc_file(const DomainInfo &di,
         << "Defining cylindrical coordinates for (Lat, Lon) = ("
         << pnt_ptr->lat() << ", " << pnt_ptr->lon() << "), Range = "
         << ra_grid.range_n() << " every " << ra_grid.range_delta_km()
-        << ra_grid.range_n() << " every " << ra_grid.range_delta_km()
-        << "km, Azimuth = " << ra_grid.azimuth_n() << "\n";
+        << " km, Azimuth = " << ra_grid.azimuth_n() << " every "
+        << ra_grid.azimuth_delta_deg() << " degrees.\n";
 
    // Write track info
    write_tc_storm(tmp_out,

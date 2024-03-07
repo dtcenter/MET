@@ -213,8 +213,7 @@ RLLD.rot_lat_ll = 90.0 - range_max_deg;
 RLLD.rot_lon_ll =  0.0;
 
 RLLD.delta_rot_lat = range_max_deg/(Range_n - 1);
-// RLLD.delta_rot_lon = 360.0/Azimuth_n;
-RLLD.delta_rot_lon = 360.0/(Azimuth_n - 1);
+RLLD.delta_rot_lon = 360.0/Azimuth_n;
 
 RLLD.Nlat = Range_n;
 RLLD.Nlon = Azimuth_n;
