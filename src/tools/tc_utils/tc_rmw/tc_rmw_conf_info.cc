@@ -72,7 +72,6 @@ void TCRMWConfInfo::clear() {
 
     n_range        = bad_data_int;
     n_azimuth      = bad_data_int;
-    max_range_km   = bad_data_double;
     delta_range_km = bad_data_double;
     rmw_scale      = bad_data_double;
 
@@ -174,9 +173,6 @@ void TCRMWConfInfo::process_config(GrdFileType ftype) {
 
     // Conf: n_azimuth
     n_azimuth = Conf.lookup_int(conf_key_n_azimuth);
-
-    // Conf: max_range
-    max_range_km = Conf.lookup_double(conf_key_max_range);
 
     // Conf: delta_range
     delta_range_km = Conf.lookup_double(conf_key_delta_range);
