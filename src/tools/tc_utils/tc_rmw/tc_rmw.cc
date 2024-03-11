@@ -555,7 +555,6 @@ void setup_grid() {
     grid_data.name = "TCRMW";
     grid_data.range_n = conf_info.n_range;
     grid_data.azimuth_n = conf_info.n_azimuth;
-    grid_data.range_max_km = conf_info.max_range_km;
 
     tcrmw_grid.set_from_data(grid_data);
     grid.set(grid_data);
@@ -607,11 +606,11 @@ void setup_nc_file() {
         // Get VarInfo
         data_info = conf_info.data_info[i_var];
         mlog << Debug(4) << "Processing field: " << data_info->magic_str() << "\n";
-	     string fname = data_info->name_attr();
+        string fname = data_info->name_attr();
         variable_levels[fname].push_back(data_info->level_attr());
         variable_long_names[fname] = data_info->long_name_attr();
         variable_units[fname] = data_info->units_attr();
-	     wind_converter.update_input(fname, data_info->units_attr());
+        wind_converter.update_input(fname, data_info->units_attr());
     }
 
     // Define pressure levels
@@ -645,7 +644,7 @@ void compute_lat_lon(TcrmwGrid& tcrmw_grid,
                 ia * tcrmw_grid.azimuth_delta_deg(),
                 lat, lon);
             lat_arr[i] = lat;
-            lon_arr[i] = - lon;
+            lon_arr[i] = -lon;
         }
     }
 }
@@ -689,11 +688,24 @@ void process_fields(const TrackInfoArray& tracks) {
         grid_data.lat_center = point.lat();
         grid_data.lon_center = -1.0*point.lon(); // internal sign change
 
+        // Set the maximum range in km
         // MET #2833 divide by n-1 since the ranges begin at 0 km
-        // RMW is same as mrd()
-        grid_data.range_max_km = conf_info.rmw_scale *
-           point.mrd() * tc_km_per_nautical_miles *
-           (conf_info.n_range - 1);
+
+        // Set relative to the radius of maximum winds
+        if(!is_bad_data(conf_info.rmw_scale)) {
+            grid_data.range_max_km =
+                conf_info.rmw_scale *
+                point.mrd() * tc_km_per_nautical_miles *
+                (conf_info.n_range - 1);
+        }
+        // Set based on the explicit delta range value
+        else {
+            grid_data.range_max_km =
+                conf_info.delta_range_km *
+                (conf_info.n_range - 1);
+        }
+
+        // Re-define the range/azimuth grid
         tcrmw_grid.clear();
         tcrmw_grid.set_from_data(grid_data);
         grid.clear();
@@ -716,7 +728,7 @@ void process_fields(const TrackInfoArray& tracks) {
 
         for(int i_var = 0; i_var < conf_info.get_n_data(); i_var++) {
 
-            // Update the variable info with the valid time of the track point
+            // Update with the valid time of the track point
             data_info = conf_info.data_info[i_var];
 
             string sname = data_info->name_attr().string();
@@ -734,24 +746,27 @@ void process_fields(const TrackInfoArray& tracks) {
             mlog << Debug(4) << "data_max:" << data_max << "\n";
 
             // Regrid data
-            data_dp = met_regrid(data_dp, latlon_arr, grid, data_info->regrid());
+            data_dp = met_regrid(data_dp, latlon_arr, grid,
+                                 data_info->regrid());
             data_dp.data_range(data_min, data_max);
             mlog << Debug(4) << "data_min:" << data_min << "\n";
             mlog << Debug(4) << "data_max:" << data_max << "\n";
 
-	         // if this is "U", setup everything for matching "V" and compute the radial/tangential
-	         if(wind_converter.compute_winds_if_input_is_u(i_point, sname, slevel, valid_time, data_files, ftype,
-                   latlon_arr, lat_arr, lon_arr, grid, data_dp, tcrmw_grid)) {
-                write_tc_pressure_level_data(nc_out, tcrmw_grid,
-                    pressure_level_indices, data_info->level_attr(), i_point,
-					     data_3d_vars[conf_info.radial_velocity_field_name.string()],
-					     wind_converter.get_wind_r_arr());
-	             write_tc_pressure_level_data(nc_out, tcrmw_grid,
-					     pressure_level_indices, data_info->level_attr(), i_point,
-					     data_3d_vars[conf_info.tangential_velocity_field_name.string()],
-					     wind_converter.get_wind_t_arr());
+            // if this is "U", setup everything for matching "V"
+            // and compute the radial/tangential
+           if(wind_converter.compute_winds_if_input_is_u(
+                  i_point, sname, slevel, valid_time, data_files, ftype,
+                  latlon_arr, lat_arr, lon_arr, grid, data_dp, tcrmw_grid)) {
+               write_tc_pressure_level_data(nc_out, tcrmw_grid,
+                   pressure_level_indices, data_info->level_attr(), i_point,
+                   data_3d_vars[conf_info.radial_velocity_field_name.string()],
+                   wind_converter.get_wind_r_arr());
+               write_tc_pressure_level_data(nc_out, tcrmw_grid,
+                   pressure_level_indices, data_info->level_attr(), i_point,
+                   data_3d_vars[conf_info.tangential_velocity_field_name.string()],
+                   wind_converter.get_wind_t_arr());
             }
-	    
+
             // Write data
             if(variable_levels[data_info->name_attr()].size() > 1) {
                 write_tc_pressure_level_data(nc_out, tcrmw_grid,

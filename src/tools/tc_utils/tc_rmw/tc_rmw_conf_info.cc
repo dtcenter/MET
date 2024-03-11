@@ -180,6 +180,15 @@ void TCRMWConfInfo::process_config(GrdFileType ftype) {
     // Conf: rmw_scale
     rmw_scale = Conf.lookup_double(conf_key_rmw_scale);
 
+    // Error check
+    if(is_bad_data(delta_range_km) && is_bad_data(rmw_scale)) {
+        mlog << Error << "\nTCRMWConfInfo::process_config() -> "
+             << "the \"" << conf_key_delta_range << "\" and \""
+             << conf_key_rmw_scale << "\" configuration options "
+             << "cannot both be set to bad data.\n\n";
+        exit(1);
+    }
+
     compute_tangential_and_radial_winds = Conf.lookup_bool(conf_key_compute_tangential_and_radial_winds);
     u_wind_field_name = Conf.lookup_string(conf_key_u_wind_field_name);
     v_wind_field_name = Conf.lookup_string(conf_key_v_wind_field_name);
@@ -187,7 +196,6 @@ void TCRMWConfInfo::process_config(GrdFileType ftype) {
     radial_velocity_field_name = Conf.lookup_string(conf_key_radial_velocity_field_name);
     tangential_velocity_long_field_name = Conf.lookup_string(conf_key_tangential_velocity_long_field_name);
     radial_velocity_long_field_name = Conf.lookup_string(conf_key_radial_velocity_long_field_name);
-
 
     // Conf: data.field
     fdict = Conf.lookup_array(conf_key_data_field);
