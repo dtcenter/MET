@@ -2205,7 +2205,7 @@ void TmpFileInfo::setup_nc_file(const DomainInfo &di,
    d.lat_center   =      pnt_ptr->lat();
    d.lon_center   = -1.0*pnt_ptr->lon(); // degrees east to west
 
-   // MET #2833 divide by n-1 since the ranges begin at 0 km
+   // MET #2833 multiply by n-1 since the ranges begin at 0 km
    d.range_max_km = di.delta_range_km * (d.range_n - 1);
 
    // Instantiate the grid

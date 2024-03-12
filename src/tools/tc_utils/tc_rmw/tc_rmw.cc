@@ -689,7 +689,7 @@ void process_fields(const TrackInfoArray& tracks) {
         grid_data.lon_center = -1.0*point.lon(); // internal sign change
 
         // Set the maximum range in km
-        // MET #2833 divide by n-1 since the ranges begin at 0 km
+        // MET #2833 multiply by n-1 since the ranges begin at 0 km
 
         // Set relative to the radius of maximum winds
         if(!is_bad_data(conf_info.rmw_scale)) {
@@ -752,8 +752,8 @@ void process_fields(const TrackInfoArray& tracks) {
             mlog << Debug(4) << "data_min:" << data_min << "\n";
             mlog << Debug(4) << "data_max:" << data_max << "\n";
 
-            // if this is "U", setup everything for matching "V"
-            // and compute the radial/tangential
+            // If this is "U", setup everything for matching "V"
+            // and compute the radial/tangential winds
            if(wind_converter.compute_winds_if_input_is_u(
                   i_point, sname, slevel, valid_time, data_files, ftype,
                   latlon_arr, lat_arr, lon_arr, grid, data_dp, tcrmw_grid)) {
