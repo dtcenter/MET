@@ -25,7 +25,6 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
@@ -47,6 +46,9 @@ using namespace std;
 #include "vx_log.h"
 
 #include "met_file.h"
+
+using namespace std;
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -73,7 +75,7 @@ int met_main(int argc, char *argv[]) {
    // Process the jobs in the config file
    process_jobs();
 
-   return(0);
+   return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -165,7 +167,7 @@ void process_search_dirs() {
 
 void process_jobs() {
    TCStatJobFactory factory;
-   TCStatJob *cur_job = (TCStatJob *) 0;
+   TCStatJob *cur_job = (TCStatJob *) nullptr;
    ConcatString jobstring;
    int i, n_jobs;
    TCPointCounts n;
@@ -258,7 +260,7 @@ void process_jobs() {
            << "Rejected for out valid mask      = " << n.RejOutValidMask   << "\n";
 
       // Deallocate current job
-      if(cur_job) { delete cur_job; cur_job = (TCStatJob *) 0; }
+      if(cur_job) { delete cur_job; cur_job = (TCStatJob *) nullptr; }
 
    } // end for i
 
@@ -293,7 +295,7 @@ void open_out_file() {
 void close_out_file() {
 
    // Close the output file
-   if(tc_stat_out != (ofstream *) 0) {
+   if(tc_stat_out != (ofstream *) nullptr) {
 
       // List the file being closed
       mlog << Debug(1)
@@ -302,7 +304,7 @@ void close_out_file() {
       // Close the output file
       tc_stat_out->close();
       delete tc_stat_out;
-      tc_stat_out = (ofstream *) 0;
+      tc_stat_out = (ofstream *) nullptr;
    }
 
    return;

@@ -213,7 +213,7 @@ bool FileHandler::summarizeObs(const TimeSummaryInfo &summary_info)
 void FileHandler::_closeNetcdf()
 {
    delete _ncFile;
-   _ncFile = (NcFile *) 0;
+   _ncFile = (NcFile *) nullptr;
 }
 
 ////////////////////////////////////////////////////////////////////////

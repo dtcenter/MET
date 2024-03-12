@@ -10,9 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -24,6 +21,9 @@ using namespace std;
 #include "vx_util.h"
 #include "vx_log.h"
 #include "st_grid.h"
+
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -163,7 +163,7 @@ double StereographicGrid::f(double lat) const
 
 {
 
-return ( st_func(lat, is_north()) );
+return st_func(lat, is_north());
 
 }
 
@@ -175,7 +175,7 @@ double StereographicGrid::df(double lat) const
 
 {
 
-return ( st_der_func(lat, is_north()) );
+return st_der_func(lat, is_north());
 
 }
 
@@ -281,7 +281,7 @@ sum = uv_closedpolyline_area(u, v, 4);
 
 sum *= earth_radius_km*earth_radius_km;
 
-return ( sum );
+return sum;
 
 }
 
@@ -293,7 +293,7 @@ int StereographicGrid::nx() const
 
 {
 
-return ( Nx );
+return Nx;
 
 }
 
@@ -305,7 +305,7 @@ int StereographicGrid::ny() const
 
 {
 
-return ( Ny );
+return Ny;
 
 }
 
@@ -333,7 +333,7 @@ for (j=0; j<n; ++j)  {
 
 sum = fabs(sum);
 
-return ( sum );
+return sum;
 
 }
 
@@ -347,8 +347,8 @@ double StereographicGrid::xy_closedpolyline_area(const double *x, const double *
 
 int j;
 double sum;
-double *u = (double *) 0;
-double *v = (double *) 0;
+double *u = (double *) nullptr;
+double *v = (double *) nullptr;
 
 u = new double [n];
 v = new double [n];
@@ -372,10 +372,10 @@ sum = uv_closedpolyline_area(u, v, n);
 
 sum *= earth_radius_km*earth_radius_km;
 
-delete [] u;  u = (double *) 0;
-delete [] v;  v = (double *) 0;
+delete [] u;  u = (double *) nullptr;
+delete [] v;  v = (double *) nullptr;
 
-return ( sum );
+return sum;
 
 }
 
@@ -387,7 +387,7 @@ ConcatString StereographicGrid::name() const
 
 {
 
-return ( Name );
+return Name;
 
 }
 
@@ -510,7 +510,7 @@ snprintf(junk, sizeof(junk), "Alpha: %.4f", Alpha);   a << junk;
    //  done
    //
 
-return ( a );
+return a;
 
 }
 
@@ -526,7 +526,7 @@ GridInfo i;
 
 i.set(Data);
 
-return ( i );
+return i;
 
 }
 
@@ -547,7 +547,7 @@ angle = Lon_orient - lon;
 
 if ( is_south() )  angle = -angle;
 
-return ( angle );
+return angle;
 
 }
 
@@ -559,7 +559,7 @@ bool StereographicGrid::wrap_lon() const
 
 {
 
-return ( false );
+return false;
 
 }
 
@@ -592,7 +592,7 @@ StereographicGrid * p = new StereographicGrid (Data);
 
 p->Name = Name;
 
-return ( p );
+return p;
 
 }
 
@@ -620,7 +620,7 @@ else                        r = tand(45.0 + 0.5*lat);
 if (!is_eq(eccentricity, 0.)) {
    r *= pow(((1 + eccentricity*sind(lat)) / (1 - eccentricity*sind(lat))),(eccentricity/2));
 }
-return ( r );
+return r;
 
 }
 
@@ -638,7 +638,7 @@ lat = 90.0 - 2.0*atand(r);
 
 if ( !is_north_hemisphere )  lat = -lat;
 
-return ( lat );
+return lat;
 
 }
 
@@ -655,7 +655,7 @@ double a;
 if ( is_north_hemisphere )  a = -1.0/(1.0 + sind(lat));
 else                        a =  1.0/(1.0 - sind(lat));
 
-return ( a );
+return a;
 
 }
 
@@ -753,7 +753,7 @@ if (is_eq(semi_minor_axis, bad_data_double)) {
 }
 eccentricity = sqrt(semi_major_axis*semi_major_axis - semi_minor_axis*semi_minor_axis) / semi_major_axis;
 
-return ( eccentricity );
+return eccentricity;
 
 }
 
@@ -777,7 +777,7 @@ else tF = tan(M_PI/4 + sp_rad/2) / temp2;
 mF = lat_cos / sqrt(1 - eccentricity*eccentricity * lat_sin*lat_sin);
 scale_factor = mF * sqrt(pow((1+eccentricity),(1+eccentricity)) * pow((1-eccentricity),(1-eccentricity))) / (2 * tF);
 
-return ( scale_factor );
+return scale_factor;
 
 }
 
@@ -794,7 +794,7 @@ double alpha;
 alpha = (1.0 + sind(fabs(scale_lat)))*((r_km)/(d_km));
 
 
-return ( alpha );
+return alpha;
 
 }
 
@@ -835,7 +835,7 @@ answer = atan(t1) - atan(t2);
 
 answer *= 2.0*b*( u0*v1 - u1*v0 );
 
-return ( answer );
+return answer;
 
 }
 
@@ -960,7 +960,7 @@ data.lon_orient = L;
 
 g_new.set(data);
 
-return ( g_new );
+return g_new;
 
 }
 

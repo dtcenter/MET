@@ -8,12 +8,12 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <cstdio>
 #include <string.h>
 
 #include "stat_hdr_columns.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -353,7 +353,7 @@ ConcatString StatHdrColumns::get_fcst_thresh_str() const {
          cs << setlogic_to_symbol(thresh_logic);
       }
    }
-   return(cs);
+   return cs;
 }
 
 ////////////////////////////////////////////////////////////////////////

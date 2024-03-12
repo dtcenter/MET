@@ -8,7 +8,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
 
 #include <iostream>
 #include <unistd.h>
@@ -26,6 +25,9 @@ using namespace std;
 #include "vx_log.h"
 #include "vx_util.h"
 #include "vx_math.h"
+
+using namespace std;
+
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -58,11 +60,11 @@ TCStatFiles::TCStatFiles(const TCStatFiles &j) {
 
 TCStatFiles & TCStatFiles::operator=(const TCStatFiles &j) {
 
-   if(this == &j) return(*this);
+   if(this == &j) return *this;
 
    assign(j);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -137,7 +139,7 @@ bool TCStatFiles::operator>>(TrackPairInfo &pair) {
       CurFile++;
 
       // Check for the last file
-      if(CurFile == FileList.n()) return(false);
+      if(CurFile == FileList.n()) return false;
       else {
 
          // Open the next file for reading
@@ -185,7 +187,7 @@ bool TCStatFiles::operator>>(TrackPairInfo &pair) {
       }
    } // end while
 
-   return(true);
+   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -204,7 +206,7 @@ bool TCStatFiles::operator>>(ProbRIRWPairInfo &pair) {
       CurFile++;
 
       // Check for the last file
-      if(CurFile == FileList.n()) return(false);
+      if(CurFile == FileList.n()) return false;
       else {
 
          // Open the next file for reading
@@ -238,7 +240,7 @@ bool TCStatFiles::operator>>(ProbRIRWPairInfo &pair) {
 
    } // end while
 
-   return(status);
+   return status;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -253,7 +255,7 @@ bool TCStatFiles::operator>>(TCStatLine &line) {
       CurFile++;
 
       // Check for the last file
-      if(CurFile == FileList.n()) return(false);
+      if(CurFile == FileList.n()) return false;
       else {
 
          // Open the next file for reading
@@ -284,7 +286,7 @@ bool TCStatFiles::operator>>(TCStatLine &line) {
 
    } // end while
 
-   return(status);
+   return status;
 }
 
 ////////////////////////////////////////////////////////////////////////

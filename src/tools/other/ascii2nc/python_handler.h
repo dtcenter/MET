@@ -41,13 +41,13 @@ class PythonHandler : public FileHandler
 
    public:
 
-      PythonHandler(const string &program_name);
+      PythonHandler(const std::string &program_name);
       PythonHandler(const char * program_name, const char * ascii_filename);
       virtual ~PythonHandler();
 
       bool isFileType(LineDataFile &ascii_file) const;
   
-      static string getFormatString() { return "python"; }
+      static std::string getFormatString() { return "python"; }
 
 
       bool use_tmp_ascii;
@@ -66,7 +66,7 @@ class PythonHandler : public FileHandler
 
       virtual bool _readObservations(LineDataFile &ascii_file);   //  this shouldn't be called
 
-      virtual bool readAsciiFiles(const vector< ConcatString > &ascii_filename_list);
+      virtual bool readAsciiFiles(const std::vector< ConcatString > &ascii_filename_list);
 
       bool do_straight ();  //  run compiled python interpreter
       bool do_tmp_ascii();  //  run user-defined MET_PYTHON_EXE

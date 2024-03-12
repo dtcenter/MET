@@ -8,7 +8,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
 
 #include <dirent.h>
 #include <iostream>
@@ -24,6 +23,8 @@ using namespace std;
 #include "apply_mask.h"
 #include "grib_strings.h"
 #include "vx_log.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -144,7 +145,7 @@ void PB2NCConfInfo::process_config() {
    ConcatString s, mask_name;
    StringArray sa;
    StringArray * sid_list = 0;
-   Dictionary *dict = (Dictionary *) 0;
+   Dictionary *dict = (Dictionary *) nullptr;
 
    // Dump the contents of the config file
    if(mlog.verbosity_level() >= 5) conf.dump(cout);
@@ -268,7 +269,7 @@ void PB2NCConfInfo::process_config() {
    obs_bufr_map = parse_conf_obs_bufr_map(&conf);
    message_type_map = parse_conf_message_type_map(&conf);
 
-   if ( sid_list )  { delete [] sid_list;   sid_list = (StringArray *) 0; }
+   if ( sid_list )  { delete [] sid_list;   sid_list = (StringArray *) nullptr; }
 
    return;
 }

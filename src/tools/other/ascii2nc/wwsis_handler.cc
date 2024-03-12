@@ -7,12 +7,7 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
-
-
 ////////////////////////////////////////////////////////////////////////
-
-
-using namespace std;
 
 
 #include <iostream>
@@ -22,6 +17,11 @@ using namespace std;
 #include "vx_util.h"
 
 #include "wwsis_handler.h"
+
+using namespace std;
+
+
+////////////////////////////////////////////////////////////////////////
 
 
 const string WwsisHandler::HEADER_TYPE = (string)"WWSIS";

@@ -9,8 +9,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <fstream>
 #include <unistd.h>
@@ -20,6 +18,8 @@ using namespace std;
 
 #include "vx_log.h"
 #include "flate_filter.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -86,10 +86,10 @@ FlateEncodeFilter::~FlateEncodeFilter()
 
 {
 
-if (  inbuf )  { delete []  inbuf;   inbuf = (unsigned char *) 0; }
-if ( outbuf )  { delete [] outbuf;  outbuf = (unsigned char *) 0; }
+if (  inbuf )  { delete []  inbuf;   inbuf = (unsigned char *) nullptr; }
+if ( outbuf )  { delete [] outbuf;  outbuf = (unsigned char *) nullptr; }
 
-if ( s )  { delete s;  s = (z_stream *) 0; }
+if ( s )  { delete s;  s = (z_stream *) nullptr; }
 
 inbytes = 0;
 

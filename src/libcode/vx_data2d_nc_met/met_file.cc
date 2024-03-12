@@ -10,8 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -21,7 +19,6 @@ using namespace std;
 #include <time.h>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "vx_math.h"
 #include "vx_cal.h"
@@ -30,6 +27,9 @@ using namespace netCDF;
 #include "met_file.h"
 #include "get_met_grid.h"
 #include "nc_utils.h"
+
+using namespace std;
+using namespace netCDF;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -95,11 +95,11 @@ void MetNcFile::init_from_scratch()
 
 {
 
-Nc = (NcFile *) 0;
+Nc = (NcFile *) nullptr;
 
-Dim = (NcDim **) 0;
+Dim = (NcDim **) nullptr;
 
-Var = (NcVarInfo *) 0;
+Var = (NcVarInfo *) nullptr;
 
 close();
 
@@ -115,19 +115,19 @@ void MetNcFile::close()
 
 {
 
-if ( Nc )  { delete Nc;  Nc = (NcFile *) 0; }
+if ( Nc )  { delete Nc;  Nc = (NcFile *) nullptr; }
 
-if ( Dim )  { delete [] Dim;  Dim = (NcDim **) 0; }
+if ( Dim )  { delete [] Dim;  Dim = (NcDim **) nullptr; }
 
 Ndims = 0;
 
 DimNames.clear();
 
-Xdim = Ydim = (NcDim *) 0;
+Xdim = Ydim = (NcDim *) nullptr;
 
 Nvars = 0;
 
-if ( Var )  { delete [] Var;  Var = (NcVarInfo *) 0; }
+if ( Var )  { delete [] Var;  Var = (NcVarInfo *) nullptr; }
 
    //
    //  done
@@ -155,7 +155,7 @@ close();
 
 Nc = open_ncfile(filename);
 
-if ( IS_INVALID_NC_P(Nc) )  { close();  return ( false ); }
+if ( IS_INVALID_NC_P(Nc) )  { close();  return false; }
 
    //
    //  grid
@@ -280,7 +280,7 @@ for (j=0; j<Ndims; ++j)  {
    //  done
    //
 
-return ( true );
+return true;
 
 }
 
@@ -427,7 +427,7 @@ if ( !status )  {
    //  done
    //
 
-return ( d );
+return d;
 
 }
 
@@ -476,7 +476,7 @@ if ( dimCount >= max_met_args )  {
 
 int j, count;
 bool found = false;
-NcVarInfo * var = (NcVarInfo *) 0;
+NcVarInfo * var = (NcVarInfo *) nullptr;
 const int Nx = grid.nx();
 const int Ny = grid.ny();
 LongArray b = a;
@@ -619,7 +619,7 @@ plane.set_size(Nx, Ny);
    //  done
    //
 
-return ( true );
+return true;
 
 }
 
@@ -636,7 +636,7 @@ info = find_var_name(var_name);
 
 bool found = ( nullptr != info );
 
-if ( !found )  return ( false );
+if ( !found )  return false;
 
 found = data(info->var, a, plane);
 
@@ -653,7 +653,7 @@ plane.set_accum ( info->AccumTime );
    //  done
    //
 
-return ( found );
+return found;
 
 }
 

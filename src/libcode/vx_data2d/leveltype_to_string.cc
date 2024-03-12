@@ -24,12 +24,11 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
-
 #include <string.h>
 
 #include "leveltype_to_string.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -39,7 +38,7 @@ ConcatString leveltype_to_string(const LevelType t)
 
 {
 
-const char * s = (const char *) 0;
+const char * s = (const char *) nullptr;
 
 switch ( t )  {
 
@@ -59,7 +58,7 @@ switch ( t )  {
 }   //  switch
 
 
-return ( ConcatString (s) );
+return ConcatString(s);
 
 }
 
@@ -71,19 +70,19 @@ bool string_to_leveltype(const char * text, LevelType & t)
 
 {
 
-     if ( strcmp(text, "LevelType_None"     ) == 0 )   { t = LevelType_None;        return ( true ); }
-else if ( strcmp(text, "LevelType_Accum"    ) == 0 )   { t = LevelType_Accum;       return ( true ); }
-else if ( strcmp(text, "LevelType_Vert"     ) == 0 )   { t = LevelType_Vert;        return ( true ); }
-else if ( strcmp(text, "LevelType_Pres"     ) == 0 )   { t = LevelType_Pres;        return ( true ); }
-else if ( strcmp(text, "LevelType_RecNumber") == 0 )   { t = LevelType_RecNumber;   return ( true ); }
+     if ( strcmp(text, "LevelType_None"     ) == 0 )   { t = LevelType_None;        return true; }
+else if ( strcmp(text, "LevelType_Accum"    ) == 0 )   { t = LevelType_Accum;       return true; }
+else if ( strcmp(text, "LevelType_Vert"     ) == 0 )   { t = LevelType_Vert;        return true; }
+else if ( strcmp(text, "LevelType_Pres"     ) == 0 )   { t = LevelType_Pres;        return true; }
+else if ( strcmp(text, "LevelType_RecNumber") == 0 )   { t = LevelType_RecNumber;   return true; }
 
-else if ( strcmp(text, "LevelType_SFC"      ) == 0 )   { t = LevelType_SFC;         return ( true ); }
-else if ( strcmp(text, "LevelType_Time"     ) == 0 )   { t = LevelType_Time;        return ( true ); }
+else if ( strcmp(text, "LevelType_SFC"      ) == 0 )   { t = LevelType_SFC;         return true; }
+else if ( strcmp(text, "LevelType_Time"     ) == 0 )   { t = LevelType_Time;        return true; }
    //
    //  nope
    //
 
-return ( false );
+return false;
 
 }
 

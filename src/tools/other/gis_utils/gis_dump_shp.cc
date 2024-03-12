@@ -12,7 +12,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
 
 #include <unistd.h>
 #include <sys/types.h>
@@ -32,11 +31,12 @@ using namespace std;
 #include "shapetype_to_string.h"
 
 
-
 #include "shp_file.h"
 #include "shp_poly_record.h"
 #include "shp_point_record.h"
 #include "shapetype_to_string.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -116,7 +116,7 @@ f.header()->dump(cout, 1);
 
 cout << '\n' << flush;
 
-if ( header_only )   return ( 0 );
+if ( header_only )   return 0;
 
    //
    //  records
@@ -150,7 +150,7 @@ switch ( shape_type )  {
 
 f.close();
 
-return ( 0 );
+return 0;
 
 }
 

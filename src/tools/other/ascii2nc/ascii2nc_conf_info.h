@@ -27,15 +27,15 @@ public:
   Ascii2NcConfInfo();
   ~Ascii2NcConfInfo();
 
-  void read_config(const string &default_filename,
-		   const string &user_filename);
+  void read_config(const std::string &default_filename,
+                   const std::string &user_filename);
 
   TimeSummaryInfo getSummaryInfo() const
   {
      return _timeSummaryInfo;
   }
   
-  map<ConcatString,ConcatString> getMessageTypeMap() const
+  std::map<ConcatString,ConcatString> getMessageTypeMap() const
   {
      return _messageTypeMap;
   }
@@ -56,7 +56,7 @@ protected:
 
   ConcatString _version;
   TimeSummaryInfo _timeSummaryInfo;
-  map<ConcatString,ConcatString> _messageTypeMap;
+  std::map<ConcatString,ConcatString> _messageTypeMap;
   
 
   ///////////////////////

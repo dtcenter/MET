@@ -117,7 +117,7 @@ static int            n_ens;
 static bool           conv_flag, retr_flag;
 
 // Pointer to the random number generator to be used
-static gsl_rng     *rng_ptr          = (gsl_rng *) 0;
+static gsl_rng     *rng_ptr          = (gsl_rng *) nullptr;
 static const char  *default_rng_name = "mt19937";
 static const char  *default_rng_seed = "";
 static ConcatString rng_name;
@@ -126,12 +126,12 @@ static ConcatString rng_seed;
 ////////////////////////////////////////////////////////////////////////
 
 // Store conventional and radiance information
-static StringArray      obs_key;
-static map<int,StringArray> obs_key_map;
-static map<int,int>     obs_index_map;
-static vector<ConvData> conv_data;
-static vector<RadData>  rad_data;
-static PairDataEnsemble ens_pd;
+static StringArray           obs_key;
+static std::map<int,StringArray> obs_key_map;
+static std::map<int,int>     obs_index_map;
+static std::vector<ConvData> conv_data;
+static std::vector<RadData>  rad_data;
+static PairDataEnsemble      ens_pd;
 
 ////////////////////////////////////////////////////////////////////////
 

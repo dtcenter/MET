@@ -11,9 +11,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -24,6 +21,8 @@ using namespace std;
 
 #include "vx_log.h"
 #include "check_endian.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -65,9 +64,9 @@ void PxmBase::init_from_scratch()
 
 {
 
-data = (unsigned char *) 0;
+data = (unsigned char *) nullptr;
 
-Name = (char *) 0;
+Name = (char *) nullptr;
 
 
 clear_common();
@@ -85,11 +84,11 @@ void PxmBase::clear_common()
 
 {
 
-if ( data )  { delete [] data;  data = (unsigned char *) 0; }
+if ( data )  { delete [] data;  data = (unsigned char *) nullptr; }
 
 Nalloc = 0;
 
-if ( Name )  { delete [] Name;  Name = (char *) 0; }
+if ( Name )  { delete [] Name;  Name = (char *) nullptr; }
 
 Nrows = Ncols = 0;
 
@@ -178,7 +177,7 @@ int n;
 n = r*Ncols + c;
 
 
-return ( n );
+return n;
 
 }
 
@@ -214,7 +213,7 @@ const char * PxmBase::short_name() const
 
 {
 
-if ( !Name )  return ( (const char *) 0 );
+if ( !Name )  return (const char *) 0;
 
 int j;
 
@@ -246,7 +245,7 @@ if ( (n < 0) || (n >= Ncomments) )  {
 }
 
 
-return ( Comment[n] );
+return Comment[n];
 
 }
 
@@ -291,7 +290,7 @@ for (j=0; j<max_comments; ++j)  {
 
    if ( Comment[j] )  {
 
-      delete [] Comment[j];  Comment[j] = (char *) 0;
+      delete [] Comment[j];  Comment[j] = (char *) nullptr;
 
    }
 

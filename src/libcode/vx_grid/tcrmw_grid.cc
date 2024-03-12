@@ -10,8 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -20,6 +18,8 @@ using namespace std;
 #include "tcrmw_grid.h"
 
 #include "trig.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -102,11 +102,11 @@ TcrmwGrid & TcrmwGrid::operator=(const TcrmwGrid & tg)
 
 {
 
-if ( this == &tg )   return ( * this );
+if ( this == &tg )   return *this;
 
 assign(tg);
 
-return ( * this );
+return *this;
 
 }
 

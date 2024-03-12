@@ -10,9 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
-
 #include <iostream>
 #include <string>
 #include <sstream>
@@ -25,6 +22,10 @@ using namespace std;
 
 #include "ndbc_locations.h"
 
+using namespace std;
+
+
+////////////////////////////////////////////////////////////////////////
 
 static bool _parseLine(const string &sline, const string &key, string &value);
 static bool _parseLineForDouble(const string &sline, const string &key, double &value);

@@ -19,7 +19,6 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
@@ -36,6 +35,9 @@ using namespace std;
 #include "vx_cal.h"
 #include "concat_string.h"
 #include "temp_file.h"
+
+using namespace std;
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -92,7 +94,7 @@ int met_main(int argc, char *argv[]) {
    // Delete the temporary blocked file
    remove_temp_file(blk_file);
 
-   return(0);
+   return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////

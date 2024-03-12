@@ -19,8 +19,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -29,6 +27,8 @@ using namespace std;
 
 #include "set.h"
 #include "vx_log.h"
+
+using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -78,11 +78,11 @@ FcstObsSet & FcstObsSet::operator=(const FcstObsSet & s)
 
 {
 
-if ( this == &s )  return ( * this );
+if ( this == &s )  return *this;
 
 assign(s);
 
-return ( * this );
+return *this;
 
 }
 
@@ -261,10 +261,10 @@ int FcstObsSet::has_fcst(int k) const
    int j;
 
    for(j=0; j<n_fcst; j++) {
-      if( fcst_number[j] == k ) return ( 1 );
+      if( fcst_number[j] == k ) return 1;
    }
 
-   return(0);
+   return 0;
 }
 
 
@@ -278,10 +278,10 @@ int FcstObsSet::has_obs(int k) const
    int j;
 
    for(j=0; j<n_obs; j++) {
-      if( obs_number[j] == k ) return ( 1 );
+      if( obs_number[j] == k ) return 1;
    }
 
-   return(0);
+   return 0;
 
 }
 
@@ -382,11 +382,11 @@ SetCollection & SetCollection::operator=(const SetCollection & a)
 
 {
 
-if ( this == &a )  return ( * this );
+if ( this == &a )  return *this;
 
 assign(a);
 
-return ( * this );
+return *this;
 
 }
 
@@ -556,7 +556,7 @@ int SetCollection::merge()
    int jm=0, km=0;
    int need_merge;
 
-   if( n_sets <= 1 ) return(0);
+   if( n_sets <= 1 ) return 0;
 
    need_merge = 0;
 
@@ -576,7 +576,7 @@ int SetCollection::merge()
       merge_two(jm, km);
    }
 
-   return(need_merge);
+   return need_merge;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -623,10 +623,10 @@ int SetCollection::fcst_set_number(int fcst_number) const {
    int j;
 
    for(j=0; j<n_sets; j++) {
-      if( set[j].has_fcst(fcst_number) ) return(j);
+      if( set[j].has_fcst(fcst_number) ) return j;
    }
 
-   return(-1);
+   return -1;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -635,10 +635,10 @@ int SetCollection::obs_set_number(int obs_number) const {
    int j;
 
    for(j=0; j<n_sets; j++) {
-      if( set[j].has_obs(obs_number) ) return(j);
+      if( set[j].has_obs(obs_number) ) return j;
    }
 
-   return(-1);
+   return -1;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -660,7 +660,7 @@ int SetCollection::is_fcst_matched(int fcst_number) const {
       if(set[j].n_obs > 0) matched = 1;
    }
 
-   return(matched);
+   return matched;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -682,7 +682,7 @@ int SetCollection::is_obs_matched(int obs_number) const {
       if(set[j].n_fcst > 0) matched = 1;
    }
 
-   return(matched);
+   return matched;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -730,21 +730,21 @@ int fcst_obs_sets_overlap(const FcstObsSet &a, const FcstObsSet &b) {
    //  check fcst's
    //
    for(j=0; j<(a.n_fcst); j++) {
-      if( b.has_fcst(a.fcst_number[j]) ) return(1);
+      if( b.has_fcst(a.fcst_number[j]) ) return 1;
    }
 
    //
    //  check obs's
    //
    for(j=0; j<(a.n_obs); j++) {
-      if( b.has_obs(a.obs_number[j]) ) return(1);
+      if( b.has_obs(a.obs_number[j]) ) return 1;
    }
 
    //
    //
    //
 
-   return(0);
+   return 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -769,7 +769,7 @@ FcstObsSet union_fcst_obs_sets(const FcstObsSet &a, const FcstObsSet &b) {
       c.add_obs(b.obs_number[j]);
    }
 
-   return(c);
+   return c;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -815,7 +815,7 @@ ostream & operator<<(ostream &out, const FcstObsSet &set) {
    //
    //
 
-   return(out);
+   return out;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -828,7 +828,7 @@ ostream & operator<<(ostream &out, const SetCollection &c) {
       out << (c.set[j]);
    }
 
-   return(out);
+   return out;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

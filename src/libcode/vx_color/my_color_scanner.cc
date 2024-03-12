@@ -1,10 +1,13 @@
-
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+// ** Copyright UCAR (c) 1992 - 2024
+// ** University Corporation for Atmospheric Research (UCAR)
+// ** National Center for Atmospheric Research (NCAR)
+// ** Research Applications Lab (RAL)
+// ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-using namespace std;
 
 
 #include <iostream>
@@ -23,6 +26,8 @@ using namespace std;
 
 #include "color_parser_yacc.h"
 
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -121,11 +126,11 @@ if ( first_call )  { init();  first_call = false; }
 
 colortext = (char *) lexeme;
 
-while ( 1 )  {
+while ( true )  {
 
    t = next_token();
 
-   if ( t == eof )  return ( 0 );
+   if ( t == eof )  return 0;
 
    if ( t < 0 )  continue;
 
@@ -133,7 +138,7 @@ while ( 1 )  {
 
 }   //  while
 
-return ( t );
+return t;
 
 }
 
@@ -151,7 +156,7 @@ int c, c2;
    //  skip whitespace
    //
 
-while ( 1 )  {
+while ( true )  {
 
    c = nextchar();
 
@@ -163,7 +168,7 @@ while ( 1 )  {
 
 }   //  while
 
-if ( c == eof )  return ( eof );
+if ( c == eof )  return eof;
 
 clear_lexeme();
 
@@ -173,12 +178,12 @@ switch ( c )  {
       //  single character tokens
       //
 
-   case '{':  { if ( do_left_curly()  )  return ( token('{') ); }  break;
-   case '}':  { if ( do_right_curly() )  return ( token('}') ); }  break;
-   case '(':  { if ( do_left_paren()  )  return ( token('(') ); }  break;
-   case ')':  { if ( do_right_paren() )  return ( token(')') ); }  break;
-   case ',':  { if ( do_comma()       )  return ( token(',') ); }  break;
-   case '=':  { if ( do_equals()      )  return ( token('=') ); }  break;
+   case '{':  { if ( do_left_curly()  )  return token('{'); }  break;
+   case '}':  { if ( do_right_curly() )  return token('}'); }  break;
+   case '(':  { if ( do_left_paren()  )  return token('('); }  break;
+   case ')':  { if ( do_right_paren() )  return token(')'); }  break;
+   case ',':  { if ( do_comma()       )  return token(','); }  break;
+   case '=':  { if ( do_equals()      )  return token('='); }  break;
 
    default:
       break;
@@ -193,13 +198,13 @@ if ( c == '/' )  {
 
    c2 = nextchar();
 
-   if ( c2 == EOF )  return ( EOF );
+   if ( c2 == EOF )  return EOF;
 
         if ( c2 == '*' )   do_c_comment();
    else if ( c2 == '/' )   do_cpp_comment();
    else                    ungetc(c2, colorin);
 
-   return ( skip );
+   return skip;
 
 }
 
@@ -209,13 +214,13 @@ if ( c == '/' )  {
 
 int k = char_class[c];
 
-if ( k == char_class_other )  return ( skip );
+if ( k == char_class_other )  return skip;
 
    //
    //  quote?
    //
 
-if ( c == '\"' )  { do_quoted_string();   return ( token ( QUOTED_STRING ) ); }
+if ( c == '\"' )  { do_quoted_string();   return token( QUOTED_STRING ); }
 
    //
    //  from this point on, we're only interested in characters
@@ -239,20 +244,20 @@ while ( count < max_lexeme_size )  {
 
 lexeme[max_lexeme_size] = (char) 0;
 
-if ( count == 0 )  return ( skip );
+if ( count == 0 )  return skip;
 
-if ( is_int() )  { if ( do_int() )  return ( token(INTEGER) ); }
+if ( is_int() )  { if ( do_int() )  return token(INTEGER); }
 
-if ( is_float_v2() )  { if ( do_float() )  return ( token(FLOAT) ); }
+if ( is_float_v2() )  { if ( do_float() )  return token(FLOAT); }
 
 int t;
 
-if ( is_id() )  { t = do_id();  return ( token(t) ); }
+if ( is_id() )  { t = do_id();  return token(t); }
 
 
 
 
-return ( skip );
+return skip;
 
 }
 
@@ -313,14 +318,14 @@ bool char_ok(int c)
 
 const int k = char_class[c];
 
-if ( k == char_class_digit )  return ( true );
+if ( k == char_class_digit )  return true;
 
-if ( k == char_class_alpha )  return ( true );
+if ( k == char_class_alpha )  return true;
 
-if ( c == '.' )  return ( true );
+if ( c == '.' )  return true;
 
 
-return ( false );
+return false;
 
 }
 
@@ -346,7 +351,7 @@ for (j=j_start; j<max_lexeme_size; ++j)  {
 
    k = char_class[lexeme[j]];
 
-   if ( k != char_class_digit )  return ( false );
+   if ( k != char_class_digit )  return false;
 
    ++digit_count;
 
@@ -434,7 +439,7 @@ for (j=0; j<max_lexeme_size; ++j)  {
 
    }   //  switch
 
-   if ( state == Error )  return ( false );
+   if ( state == Error )  return false;
 
 }   //  for j
 
@@ -450,14 +455,14 @@ for (j=0; j<max_lexeme_size; ++j)  {
       //  gotta have at least one mantissa digit
       //
 
-if ( m_dig < 1 )  return ( false );
+if ( m_dig < 1 )  return false;
 
       //
       //  if there is an exponent, then there
       //   had better be some exponent digits
       //
 
-if ( has_exp && (e_dig < 1) )  return ( false );
+if ( has_exp && (e_dig < 1) )  return false;
 
       //
       //  If there is no exponent, then there has to be a
@@ -469,7 +474,7 @@ if ( has_exp && (e_dig < 1) )  return ( false );
       //        as floats
       //
 
-if ( !has_exp && (m_dot != 1) )  return ( false );
+if ( !has_exp && (m_dot != 1) )  return false;
 
 
    ///////////////////////////
@@ -480,7 +485,7 @@ if ( !has_exp && (m_dot != 1) )  return ( false );
    //  grudgingly accept
    //
 
-return ( true );
+return true;
 
 }
 
@@ -492,7 +497,7 @@ bool is_id()
 
 {
 
-if ( char_class[lexeme[0]] != char_class_alpha )  return ( false );
+if ( char_class[lexeme[0]] != char_class_alpha )  return false;
 
 int j, k;
 
@@ -502,11 +507,11 @@ for (j=0; j<max_lexeme_size; ++j)  {
 
    k = char_class[lexeme[j]];
 
-   if ( (k != char_class_digit) && (k != char_class_alpha) )  return ( false );
+   if ( (k != char_class_digit) && (k != char_class_alpha) )  return false;
 
 }   //  for j
 
-return ( true );
+return true;
 
 }
 
@@ -520,10 +525,10 @@ int do_id()
 
 const char *method_name = "is_id() -> ";
 
-if ( strcmp(colortext, "blend"    ) == 0 )  return ( BLEND     );
-if ( strcmp(colortext, "hsv"      ) == 0 )  return ( HSV       );
-if ( strcmp(colortext, "cmyk"     ) == 0 )  return ( CMYK      );
-if ( strcmp(colortext, "grayvalue") == 0 )  return ( GRAYVALUE );
+if ( strcmp(colortext, "blend"    ) == 0 )  return BLEND    ;
+if ( strcmp(colortext, "hsv"      ) == 0 )  return HSV      ;
+if ( strcmp(colortext, "cmyk"     ) == 0 )  return CMYK     ;
+if ( strcmp(colortext, "grayvalue") == 0 )  return GRAYVALUE;
 
 
 int index;
@@ -532,7 +537,7 @@ if ( clist.has_name(colortext, index) )  {
 
    colorlval.ival = index;
 
-   return ( COLOR_NAME );
+   return COLOR_NAME;
 
 }
 
@@ -540,7 +545,7 @@ m_strncpy(colorlval.text, colortext, sizeof(colorlval.text) - 1, method_name);
 
 
 
-return ( ID );
+return ID;
 
 }
 
@@ -554,7 +559,7 @@ int do_int()
 
 colorlval.ival = atoi(colortext);
 
-return ( 1 );
+return 1;
 
 }
 
@@ -568,7 +573,7 @@ bool do_float()
 
 colorlval.dval = atof(colortext);
 
-return ( true );
+return true;
 
 }
 
@@ -587,7 +592,7 @@ colorlval.ival = 0;
 lexeme[0] = '{';
 
 
-return ( 1 );
+return 1;
 
 }
 
@@ -606,7 +611,7 @@ colorlval.ival = 0;
 lexeme[0] = '}';
 
 
-return ( 1 );
+return 1;
 
 }
 
@@ -624,7 +629,7 @@ colorlval.ival = 0;
 
 lexeme[0] = '(';
 
-return ( 1 );
+return 1;
 
 }
 
@@ -642,7 +647,7 @@ colorlval.ival = 0;
 
 lexeme[0] = ')';
 
-return ( 1 );
+return 1;
 
 }
 
@@ -656,7 +661,7 @@ int do_comma()
 
 ++color_file_column;
 
-return ( 1 );
+return 1;
 
 }
 
@@ -670,7 +675,7 @@ int do_equals()
 
 ++color_file_column;
 
-return ( 1 );
+return 1;
 
 }
 
@@ -760,7 +765,7 @@ c1 = nextchar();
 c2 = nextchar();
 
 
-while ( 1 )  {
+while ( true )  {
 
    if ( (c1 == EOF) || (c2 == EOF) )  break;
 
@@ -789,7 +794,7 @@ void do_cpp_comment()
 int c;
 
 
-while ( 1 )  {
+while ( true )  {
 
    c = nextchar();
 
@@ -825,7 +830,7 @@ if ( c == '\n' )  {
 }
 
 
-return ( c );
+return c;
 
 }
 
@@ -837,7 +842,7 @@ int token(int t)
 
 {
 
-return ( t );
+return t;
 
 }
 

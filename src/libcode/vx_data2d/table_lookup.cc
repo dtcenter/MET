@@ -10,8 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -25,6 +23,8 @@ using namespace std;
 #include "vx_math.h"
 #include <cerrno>
 #include <sys/stat.h>
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -98,11 +98,11 @@ Grib1TableEntry & Grib1TableEntry::operator=(const Grib1TableEntry & e)
 
 {
 
-if ( this == &e )  return ( * this );
+if ( this == &e )  return *this;
 
 assign(e);
 
-return ( * this );
+return *this;
 
 }
 
@@ -210,10 +210,10 @@ StringArray tok;
 
 tok.parse_wsss(line);
 
-if (tok.n_elements() < 4) return (false);
+if (tok.n_elements() < 4) return false;
 
 for (j=0; j<4; ++j) {
-   if(!is_number(tok[j].c_str())) return (false);
+   if(!is_number(tok[j].c_str())) return false;
 }
 
 code         = atoi(tok[0].c_str());
@@ -227,7 +227,7 @@ subcenter    = atoi(tok[3].c_str());
 
 tok.parse_delim(line, "\"");
 
-if (tok.n_elements() < 6) return (false);
+if (tok.n_elements() < 6) return false;
 
 parm_name = tok[1];
 full_name = tok[3];
@@ -246,7 +246,7 @@ if (units.empty()) units = na_str;
    //  done
    //
 
-return ( true );
+return true;
 
 }
 
@@ -304,11 +304,11 @@ Grib2TableEntry & Grib2TableEntry::operator=(const Grib2TableEntry & e)
 
 {
 
-if ( this == &e )  return ( * this );
+if ( this == &e )  return *this;
 
 assign(e);
 
-return ( * this );
+return *this;
 
 }
 
@@ -424,10 +424,10 @@ StringArray tok;
 
 tok.parse_wsss(line);
 
-if (tok.n_elements() < 8) return (false);
+if (tok.n_elements() < 8) return false;
 
 for (j=0; j<8; ++j) {
-   if(!is_number(tok[j].c_str())) return (false);
+   if(!is_number(tok[j].c_str())) return false;
 }
 
 index_a   = atoi(tok[0].c_str());
@@ -445,7 +445,7 @@ index_c   = atoi(tok[7].c_str());
 
 tok.parse_delim(line, "\"");
 
-if (tok.n_elements() < 6) return (false);
+if (tok.n_elements() < 6) return false;
 
 parm_name = tok[1];
 full_name = tok[3];
@@ -464,7 +464,7 @@ if (units.empty()) units = na_str;
    //  done
    //
 
-return ( true );
+return true;
 
 }
 
@@ -817,7 +817,7 @@ else {
 
 in.close();
 
-return ( status );
+return status;
 
 }
 
@@ -892,7 +892,7 @@ N_grib1_elements += j;
    //  done
    //
 
-return ( true );
+return true;
 
 }
 
@@ -963,7 +963,7 @@ while ( line.read_line(in) )  {
 
 N_grib2_elements += j;
 
-return ( true );
+return true;
 
 }
 
@@ -985,13 +985,13 @@ for (j=0; j<N_grib1_elements; ++j)  {
 
       e = g1e[j];
 
-      return ( true );
+      return true;
 
    }
 
 }
 
-return ( false );
+return false;
 
 }
 
@@ -1019,11 +1019,11 @@ bool TableFlatFile::lookup_grib1(int code, int table_number, int center, int sub
 
          e = g1e[j];
 
-         return ( true );
+         return true;
 
       }
    }
-   return ( false );
+   return false;
 }
 
 
@@ -1039,7 +1039,7 @@ bool status = false;
 
 status = lookup_grib1(code, table_number, e);
 
-return ( status );
+return status;
 
 }
 
@@ -1195,13 +1195,13 @@ for (j=0; j<N_grib2_elements; ++j)  {
 
       e = g2e[j];
 
-      return ( true );
+      return true;
 
    }
 
 }
 
-return ( false );
+return false;
 
 }
 
@@ -1233,11 +1233,11 @@ bool TableFlatFile::lookup_grib2(int a, int b, int c,
 
       e = g2e[j];
 
-      return ( true );
+      return true;
 
    }
 
-   return ( false );
+   return false;
 }
 
 

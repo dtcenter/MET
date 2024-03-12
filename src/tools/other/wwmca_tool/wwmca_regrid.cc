@@ -10,8 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -23,6 +21,8 @@ using namespace std;
 #include "vx_util.h"
 
 #include "wwmca_ref.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -167,7 +167,7 @@ regridder.do_output(output_filename.c_str());
    //  done
    //
 
-return ( 0 );
+return 0;
 
 }
 
@@ -294,7 +294,7 @@ int get_compress()
 
 {
 
-return ( compress_level );
+return compress_level;
 
 }
 

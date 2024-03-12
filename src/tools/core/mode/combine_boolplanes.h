@@ -34,12 +34,10 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-extern void combine_boolplanes(const string &name,
+extern void combine_boolplanes(const std::string &name,
                                const BoolPlane * array, const int n_planes, 
                                BoolCalc & calc, 
                                BoolPlane & bp_out);
-
-                                
 
 
 ////////////////////////////////////////////////////////////////////////

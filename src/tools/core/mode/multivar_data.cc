@@ -10,8 +10,6 @@
 ///////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
@@ -28,6 +26,9 @@ using namespace std;
 #include "multivar_data.h"
 #include "vx_regrid.h"
 #include "vx_shapedata.h"
+
+using namespace std;
+
 
 ////////////////////////////////////////////////////////////////////////
 

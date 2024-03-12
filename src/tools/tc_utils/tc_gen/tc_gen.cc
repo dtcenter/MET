@@ -2588,7 +2588,7 @@ ConcatString string_to_basin_abbr(ConcatString cs) {
    else if(cs == "Central Pacific") abbr = "CP";
    else                             abbr = cs;
 
-   return(abbr);
+   return abbr;
 }
 
 ////////////////////////////////////////////////////////////////////////

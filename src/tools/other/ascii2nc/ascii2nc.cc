@@ -53,8 +53,6 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <cstdio>
 #include <cstdlib>
 #include <ctype.h>
@@ -94,6 +92,9 @@ using namespace std;
 #include "global_python.h"
 #include "python_handler.h"
 #endif
+
+using namespace std;
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -241,7 +242,7 @@ int met_main(int argc, char *argv[]) {
    //
    FileHandler *file_handler = create_file_handler(ascii_format, asfile_list[0]);
 
-   if(file_handler == 0) return(0);
+   if(file_handler == 0) return 0;
 
    int deflate_level = compress_level;
    if(deflate_level < 0) deflate_level = config_info.get_compression_level();
@@ -284,9 +285,9 @@ int met_main(int argc, char *argv[]) {
    int status = file_handler->writeNetcdfFile(ncfile.text());
    delete file_handler;
 
-   if(!status) return(1);
+   if(!status) return 1;
 
-   return(0);
+   return 0;
 
 }
 
@@ -311,47 +312,47 @@ FileHandler *create_file_handler(const ASCIIFormat format, const ConcatString &a
    //
    switch(format) {
       case ASCIIFormat_MET: {
-         return((FileHandler *) new MetHandler(program_name));
+         return (FileHandler *) new MetHandler(program_name);
       }
 
       case ASCIIFormat_Little_R: {
-         return((FileHandler *) new LittleRHandler(program_name));
+         return (FileHandler *) new LittleRHandler(program_name);
       }
 
       case ASCIIFormat_SurfRad: {
-         return((FileHandler *) new SurfradHandler(program_name));
+         return (FileHandler *) new SurfradHandler(program_name);
       }
 
       case ASCIIFormat_WWSIS: {
-         return((FileHandler *) new WwsisHandler(program_name));
+         return (FileHandler *) new WwsisHandler(program_name);
       }
 
       case ASCIIFormat_Airnow_dailyv2: {
          AirnowHandler *handler = new AirnowHandler(program_name);
          handler->setFormatVersion(AirnowHandler::AIRNOW_FORMAT_VERSION_DAILYV2);
-         return((FileHandler *) handler);
+         return (FileHandler *) handler;
       }
 
       case ASCIIFormat_Airnow_hourlyaqobs: {
          AirnowHandler *handler = new AirnowHandler(program_name);
          handler->setFormatVersion(AirnowHandler::AIRNOW_FORMAT_VERSION_HOURLYAQOBS);
-         return((FileHandler *) handler);
+         return (FileHandler *) handler;
       }
 
       case ASCIIFormat_Airnow_hourly: {
          AirnowHandler *handler = new AirnowHandler(program_name);
          handler->setFormatVersion(AirnowHandler::AIRNOW_FORMAT_VERSION_HOURLY);
-         return((FileHandler *) handler);
+         return (FileHandler *) handler;
       }
 
       case ASCIIFormat_NDBC_standard: {
          NdbcHandler *handler = new NdbcHandler(program_name);
          handler->setFormatVersion(NdbcHandler::NDBC_FORMAT_VERSION_STANDARD);
-         return((FileHandler *) handler);
+         return (FileHandler *) handler;
       }
 
       case ASCIIFormat_ISMN: {
-         return((FileHandler *) new IsmnHandler(program_name));
+         return (FileHandler *) new IsmnHandler(program_name);
       }
 
       case ASCIIFormat_IABP: {
@@ -361,24 +362,24 @@ FileHandler *create_file_handler(const ASCIIFormat format, const ConcatString &a
       case ASCIIFormat_Aeronet_v2: {
          AeronetHandler *handler = new AeronetHandler(program_name);
          handler->setFormatVersion(2);
-         return((FileHandler *) handler);
+         return (FileHandler *) handler;
       }
 
       case ASCIIFormat_Aeronet_v3: {
          AeronetHandler *handler = new AeronetHandler(program_name);
          handler->setFormatVersion(3);
-         return((FileHandler *) handler);
+         return (FileHandler *) handler;
       }
       #ifdef ENABLE_PYTHON
       case ASCIIFormat_Python: {
          setup_wrapper_path();
          ph = new PythonHandler(program_name, ascii_filename.text());
-         return((FileHandler *) ph);
+         return (FileHandler *) ph;
       }
       #endif
 
       default: {
-        return(determine_ascii_format(ascii_filename));
+        return determine_ascii_format(ascii_filename);
       }
    }
 }
@@ -427,7 +428,7 @@ FileHandler *determine_ascii_format(const ConcatString &ascii_filename) {
 
    if (met_file->isFileType(f_in)) {
      f_in.close();
-     return((FileHandler *) met_file);
+     return (FileHandler *) met_file;
    }
 
    delete met_file;
@@ -440,7 +441,7 @@ FileHandler *determine_ascii_format(const ConcatString &ascii_filename) {
 
    if (little_r_file->isFileType(f_in)) {
      f_in.close();
-     return((FileHandler *) little_r_file);
+     return (FileHandler *) little_r_file;
    }
 
    delete little_r_file;
@@ -453,7 +454,7 @@ FileHandler *determine_ascii_format(const ConcatString &ascii_filename) {
 
    if (surfrad_file->isFileType(f_in)) {
      f_in.close();
-     return((FileHandler *) surfrad_file);
+     return (FileHandler *) surfrad_file;
    }
 
    delete surfrad_file;
@@ -466,7 +467,7 @@ FileHandler *determine_ascii_format(const ConcatString &ascii_filename) {
 
    if(wwsis_file->isFileType(f_in)) {
      f_in.close();
-     return((FileHandler *) wwsis_file);
+     return (FileHandler *) wwsis_file;
    }
 
    delete wwsis_file;
@@ -479,7 +480,7 @@ FileHandler *determine_ascii_format(const ConcatString &ascii_filename) {
 
    if(aeronet_file->isFileType(f_in)) {
      f_in.close();
-     return((FileHandler *) aeronet_file);
+     return (FileHandler *) aeronet_file;
    }
 
    delete aeronet_file;
@@ -492,7 +493,7 @@ FileHandler *determine_ascii_format(const ConcatString &ascii_filename) {
 
    if(airnow_file->isFileType(f_in)) {
      f_in.close();
-     return((FileHandler *) airnow_file);
+     return (FileHandler *) airnow_file;
    }
 
    delete airnow_file;
@@ -505,7 +506,7 @@ FileHandler *determine_ascii_format(const ConcatString &ascii_filename) {
 
    if(ndbc_file->isFileType(f_in)) {
      f_in.close();
-     return((FileHandler *) ndbc_file);
+     return (FileHandler *) ndbc_file;
    }
 
    delete ndbc_file;
@@ -518,7 +519,7 @@ FileHandler *determine_ascii_format(const ConcatString &ascii_filename) {
 
    if(ismn_file->isFileType(f_in)) {
      f_in.close();
-     return((FileHandler *) ismn_file);
+     return (FileHandler *) ismn_file;
    }
 
    delete ismn_file;

@@ -10,15 +10,12 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
 #include <cmath>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "vx_log.h"
 #include "vx_cal.h"
@@ -28,6 +25,9 @@ using namespace netCDF;
 #include "grid_output.h"
 #include "nc_utils.h"
 #include "write_netcdf.h"
+
+using namespace std;
+using namespace netCDF;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -47,7 +47,7 @@ void WwmcaRegridder::do_output(const char * output_filename)
 
 {
 
-   NcFile * ncfile   = (NcFile *) 0;
+   NcFile * ncfile   = (NcFile *) nullptr;
    NcDim   lat_dim  ;
    NcDim   lon_dim  ;
    NcVar   data_var ;
@@ -233,7 +233,7 @@ void WwmcaRegridder::do_output(const char * output_filename)
    //  done
    //
 
-   if ( ncfile )  { delete ncfile;  ncfile = (NcFile *) 0; }
+   if ( ncfile )  { delete ncfile;  ncfile = (NcFile *) nullptr; }
 
    //
    //  list output file name

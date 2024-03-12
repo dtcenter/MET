@@ -10,9 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
-
 #include <cstdio>
 #include <iostream>
 #include <unistd.h>
@@ -24,6 +21,9 @@ using namespace std;
 #include "vx_util.h"
 #include "vx_log.h"
 #include "merc_grid.h"
+
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -213,7 +213,7 @@ double MercatorGrid::f(double lat) const
 
 {
 
-return ( merc_func(lat/deg_per_rad) );
+return merc_func(lat/deg_per_rad);
 
 }
 
@@ -225,7 +225,7 @@ double MercatorGrid::df(double lat) const
 
 {
 
-return ( merc_der_func(lat/deg_per_rad) );
+return merc_der_func(lat/deg_per_rad);
 
 }
 
@@ -302,7 +302,7 @@ sum = uv_closedpolyline_area(u, v, 4);
 
 sum *= earth_radius_km*earth_radius_km;
 
-return ( sum );
+return sum;
 
 }
 
@@ -314,7 +314,7 @@ int MercatorGrid::nx() const
 
 {
 
-return ( Nx );
+return Nx;
 
 }
 
@@ -326,7 +326,7 @@ int MercatorGrid::ny() const
 
 {
 
-return ( Ny );
+return Ny;
 
 }
 
@@ -338,7 +338,7 @@ ConcatString MercatorGrid::name() const
 
 {
 
-return ( Name );
+return Name;
 
 }
 
@@ -366,7 +366,7 @@ for (j=0; j<n; ++j)  {
 
 sum = fabs(sum);
 
-return ( sum );
+return sum;
 
 }
 
@@ -380,8 +380,8 @@ double MercatorGrid::xy_closedpolyline_area(const double * x, const double * y, 
 
 int j;
 double sum;
-double *u = (double *) 0;
-double *v = (double *) 0;
+double *u = (double *) nullptr;
+double *v = (double *) nullptr;
 
 u = new double [n];
 v = new double [n];
@@ -405,10 +405,10 @@ sum = uv_closedpolyline_area(u, v, n);
 
 sum *= earth_radius_km*earth_radius_km;
 
-delete [] u;  u = (double *) 0;
-delete [] v;  v = (double *) 0;
+delete [] u;  u = (double *) nullptr;
+delete [] v;  v = (double *) nullptr;
 
-return ( sum );
+return sum;
 
 }
 
@@ -521,7 +521,7 @@ snprintf(junk, sizeof(junk), "By: %.4f", By);   a << junk;
    //  done
    //
 
-return ( a );
+return a;
 
 }
 
@@ -537,7 +537,7 @@ GridInfo i;
 
 i.set(Data);
 
-return ( i );
+return i;
 
 }
 
@@ -554,7 +554,7 @@ double MercatorGrid::rot_grid_to_earth(int x, int y) const
 // for the Mercator projection in it's standard aspect
 //
 
-return ( 0.0 );
+return 0.0;
 
 }
 
@@ -566,7 +566,7 @@ bool MercatorGrid::wrap_lon() const
 
 {
 
-return ( false );
+return false;
 
 }
 
@@ -599,7 +599,7 @@ MercatorGrid * p = new MercatorGrid (Data);
 
 p->Name = Name;
 
-return ( p );
+return p;
 
 }
 
@@ -623,7 +623,7 @@ double v;
 
 v = log(tan(piover4 + 0.5*lat_rad));
 
-return ( v );
+return v;
 
 }
 
@@ -639,7 +639,7 @@ double lat_rad;
 
 lat_rad = 2.0*atan(exp(v)) - piover2;
 
-return ( lat_rad );
+return lat_rad;
 
 }
 
@@ -655,7 +655,7 @@ double a;
 
 a = 1.0/(cos(lat_rad));
 
-return ( a );
+return a;
 
 }
 
@@ -688,7 +688,7 @@ if ( fabs(delta_v) < 1.0e-4 )  {
 
    answer = delta_u*(1.0 - tanh(v0));
 
-   return ( answer );
+   return answer;
 
 }
 
@@ -705,7 +705,7 @@ answer = (delta_u/delta_v)*(b1 - b0);
    //  done
    //
 
-return ( answer );
+return answer;
 
 }
 
@@ -723,7 +723,7 @@ lon_rad -= twopi*floor((lon_rad - lon_min)/twopi);
 
 u = -lon_rad;
 
-return ( u );
+return u;
 
 }
 
@@ -741,7 +741,7 @@ lon_rad = -u;
 
 lon_rad -= twopi*floor((lon_rad - lon_min)/twopi);
 
-return ( lon_rad );
+return lon_rad;
 
 }
 

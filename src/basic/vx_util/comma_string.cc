@@ -7,11 +7,7 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
-
 ////////////////////////////////////////////////////////////////////////
-
-
-using namespace std;
 
 
 #include <iostream>
@@ -21,6 +17,9 @@ using namespace std;
 #include <cmath>
 
 #include "comma_string.h"
+
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -77,7 +76,7 @@ ConcatString str;
 
 comma_string(i, str);
 
-return ( str );
+return str;
 
 }
 

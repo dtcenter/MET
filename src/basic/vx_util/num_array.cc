@@ -7,12 +7,8 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
-
 ////////////////////////////////////////////////////////////////////////
 
-
-using namespace std;
-using namespace std;
 
 #include <iostream>
 #include <unistd.h>
@@ -27,6 +23,8 @@ using namespace std;
 #include "ptile.h"
 #include "nint.h"
 #include "vx_log.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -82,11 +80,11 @@ NumArray & NumArray::operator=(const NumArray & a)
 
 {
 
-   if ( this == &a )  return ( * this );
+   if ( this == &a )  return *this;
 
    assign(a);
 
-   return ( * this );
+   return *this;
 
 }
 
@@ -98,7 +96,7 @@ bool NumArray::operator==(const NumArray & a) const
 
 {
 
-   if ( e.size() != a.e.size() )  return ( false );
+   if ( e.size() != a.e.size() )  return false;
 
    bool status = true;
    int n = e.size();
@@ -111,7 +109,7 @@ bool NumArray::operator==(const NumArray & a) const
       }
    }
 
-   return ( status );
+   return status;
 
 }
 
@@ -243,7 +241,7 @@ double NumArray::operator[](int i) const
 
    }
 
-   return ( e[i] );
+   return e[i];
 
 }
 
@@ -287,7 +285,7 @@ int NumArray::has(double d, bool forward) const
       }
    }
    
-   return ( found );
+   return found;
 
 }
 
@@ -642,9 +640,9 @@ int NumArray::rank_array(int &ties)
 
    int n_vld, i;
 
-   double *data      = (double *) 0;
-   int    *data_loc  = (int *) 0;
-   double *data_rank = (double *) 0;
+   double *data      = (double *) nullptr;
+   int    *data_loc  = (int *) nullptr;
+   double *data_rank = (double *) nullptr;
 
    //
    // Arrays to store the raw data values to be ranked, their locations,
@@ -690,13 +688,13 @@ int NumArray::rank_array(int &ties)
    //
    // Deallocate memory
    //
-   if(data)      { delete [] data;      data      = (double *) 0; }
-   if(data_loc)  { delete [] data_loc;  data_loc  = (int *) 0;    }
-   if(data_rank) { delete [] data_rank; data_rank = (double *) 0; }
+   if(data)      { delete [] data;      data      = (double *) nullptr; }
+   if(data_loc)  { delete [] data_loc;  data_loc  = (int *) nullptr;    }
+   if(data_rank) { delete [] data_rank; data_rank = (double *) nullptr; }
 
    Sorted = false;
 
-   return ( n_vld );
+   return n_vld;
 
 }
 
@@ -717,7 +715,7 @@ double NumArray::percentile_array(double t)
 
    v = percentile(e.data(), n_elements(), t);
    
-   return ( v );
+   return v;
 
 }
 
@@ -746,7 +744,7 @@ double NumArray::compute_percentile(double v, bool inclusive) const
    if ( nvld == 0 )  ptile = bad_data_double;
    else              ptile = (double) n / nvld;
 
-   return ( ptile );
+   return ptile;
 
 }
 
@@ -764,7 +762,7 @@ double NumArray::iqr()
    v2 = percentile_array(0.25);
    v  = (is_bad_data(v1) || is_bad_data(v2) ? bad_data_double : v1 - v2);
 
-   return(v);
+   return v;
 
 }
 
@@ -851,7 +849,7 @@ double NumArray::sum() const
 
    if(count == 0) s = bad_data_double;
 
-   return(s);
+   return s;
 
 }
 
@@ -900,7 +898,7 @@ double NumArray::mode() const
    if(max_j >= 0) v = uniq_v[max_j];
    else           v = bad_data_double;
 
-   return(v);
+   return v;
 
 }
 
@@ -912,7 +910,7 @@ double NumArray::min() const
 
 {
 
-   if(n_elements() == 0) return(bad_data_double);
+   if(n_elements() == 0) return bad_data_double;
 
    int j;
 
@@ -923,7 +921,7 @@ double NumArray::min() const
       if(e[j] < min_v) min_v = e[j];
    }
 
-   return(min_v);
+   return min_v;
 
 }
 
@@ -935,7 +933,7 @@ double NumArray::max() const
 
 {
 
-   if(n_elements() == 0) return(bad_data_double);
+   if(n_elements() == 0) return bad_data_double;
 
    int j;
 
@@ -946,7 +944,7 @@ double NumArray::max() const
       if(e[j] > max_v) max_v = e[j];
    }
 
-   return(max_v);
+   return max_v;
 
 }
 
@@ -964,7 +962,7 @@ double NumArray::range() const
    v2 = min();
    v  = (is_bad_data(v1) || is_bad_data(v2) ? bad_data_double : v1 - v2);
 
-   return(v);
+   return v;
 
 }
 
@@ -982,7 +980,7 @@ int NumArray::n_valid() const
       if(!is_bad_data(e[j])) n_vld++;
    }
 
-   return(n_vld);
+   return n_vld;
 
 }
 
@@ -996,14 +994,14 @@ ConcatString NumArray::serialize() const
 
    ConcatString s;
 
-   if(n_elements() == 0) return(s);
+   if(n_elements() == 0) return s;
 
    int j;
 
    s << e[0];
    for(j=1; j<n_elements(); j++) s << " " << e[j];
    
-   return(s);
+   return s;
 
 }
 
@@ -1033,7 +1031,7 @@ ConcatString NumArray::summarize() const
       s << ", min = " << min_v << ", max = " << max_v;
    }
 
-   return(s);
+   return s;
 
 }
 
@@ -1059,7 +1057,7 @@ NumArray NumArray::subset(int beg, int end) const
    // Store subset
    for(int i=beg; i<=end; i++) subset_na.add(e[i]);
 
-   return ( subset_na );
+   return subset_na;
 
 }
 
@@ -1086,7 +1084,7 @@ NumArray NumArray::subset(const NumArray &keep) const
       if(keep[i])  subset_na.add(e[i]);
    }
 
-   return ( subset_na );
+   return subset_na;
 
 }
 
@@ -1110,7 +1108,7 @@ double NumArray::mean() const
    if(count == 0) mn = bad_data_double;
    else           mn = s/count;
 
-   return(mn);
+   return mn;
 
 }
 
@@ -1202,7 +1200,7 @@ double NumArray::wmean_sqrt(const NumArray &wgt) const
 
    if(!is_bad_data(v)) v = sqrt(v);
 
-   return(v);
+   return v;
 
 }
 
@@ -1229,7 +1227,7 @@ double NumArray::wmean_fisher(const NumArray &wgt) const
 
    if(!is_bad_data(v)) v = tanh(v);
 
-   return(v);
+   return v;
 
 }
 
@@ -1241,7 +1239,7 @@ double NumArray::variance(int skip_index) const
 
 {
 
-   if(n() == 0)  return ( bad_data_double );
+   if(n() == 0)  return bad_data_double;
 
    int j, count;
    double s, s_sq, var;
@@ -1281,7 +1279,7 @@ double NumArray::stdev(int skip_index) const
 
    if ( !is_bad_data(v) )  v = sqrt(v);
 
-   return(v);
+   return v;
 
 }
 
@@ -1310,7 +1308,7 @@ double NumArray::mean_abs_diff() const
    if(count == 0) mad = bad_data_double;
    else           mad = sum / count;
    
-   return(mad);
+   return mad;
 
 }
 
@@ -1356,7 +1354,7 @@ ConcatString write_css(const NumArray &na)
       css << (i == 0 ? "" : ",") << na[i];
    }
 
-   return(css);
+   return css;
 
 }
 
@@ -1374,7 +1372,7 @@ ConcatString write_css_hhmmss(const NumArray &na)
       css << (i == 0 ? "" : ",") << sec_to_hhmmss(na[i]);
    }
 
-   return(css);
+   return css;
 
 }
 

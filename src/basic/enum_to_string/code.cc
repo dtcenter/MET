@@ -869,7 +869,7 @@ for (j=0; j<n; ++j)  {
 
    for (m=k; m<max_len; ++m)  out.put(' ');
 
-   out << "   " << "return ( true );";
+   out << "   " << "return true;";
 
    out << " }\n";
 
@@ -881,7 +881,7 @@ out << "   //\n"
     << "   //  nope\n"
     << "   //\n"
     << "\n"
-    << "return ( false );\n"
+    << "return false;\n"
     << "\n"
     << "}\n";
 

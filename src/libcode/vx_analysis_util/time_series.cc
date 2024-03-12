@@ -11,8 +11,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -23,6 +21,8 @@ using namespace std;
 
 #include "vx_util.h"
 #include "vx_log.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -78,11 +78,11 @@ TimeSeries & TimeSeries::operator=(const TimeSeries & ts)
 
 {
 
-if ( this == &ts )  return ( * this );
+if ( this == &ts )  return *this;
 
 assign(ts);
 
-return ( * this );
+return *this;
 
 }
 
@@ -94,7 +94,7 @@ void TimeSeries::init_from_scratch()
 
 {
 
-Value = (double *) 0;
+Value = (double *) nullptr;
 
 clear();
 
@@ -110,7 +110,7 @@ void TimeSeries::clear()
 
 {
 
-if ( Value )  { delete [] Value;  Value = (double *) 0; }
+if ( Value )  { delete [] Value;  Value = (double *) nullptr; }
 
 Nelements = 0;
 
@@ -220,7 +220,7 @@ if ( (index < 0) || (index >= Nelements) )  {
 
 }
 
-return ( Value[index] );
+return Value[index];
 
 }
 

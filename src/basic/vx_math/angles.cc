@@ -41,7 +41,7 @@ double new_lon;
 
    // Check for bad data
 
-if( is_bad_data(lon) )  return ( bad_data_double );
+if( is_bad_data(lon) )  return bad_data_double;
 
 new_lon = lon;
 
@@ -57,7 +57,7 @@ if ( new_lon > 180.0 )  {
 
 }
 
-return ( new_lon );
+return new_lon;
 
 }
 
@@ -76,7 +76,7 @@ double new_deg;
 
    // Check for bad data
 
-if ( is_bad_data(deg) )  return ( bad_data_double );
+if ( is_bad_data(deg) )  return bad_data_double;
 
 if ( ! is_eq(fabs(upper - lower), 360.0) || lower > upper )  {
 
@@ -100,7 +100,7 @@ if ( new_deg > upper )  {
 
 }
 
-return ( new_deg );
+return new_deg;
 
 }
 
@@ -118,7 +118,7 @@ double d, d1, d2;
 
    // Check for bad data
 
-if ( is_bad_data(a) || is_bad_data(b) )  return(bad_data_double);
+if ( is_bad_data(a) || is_bad_data(b) )  return bad_data_double;
 
    // Compute the difference between the angles, and rescale them from
    // 0 to 360
@@ -129,7 +129,7 @@ d2 = rescale_deg(b - a, 0.0, 360.0);
 if ( min(d1, d2) < 90.0 )  d = min(d1, d2);
 else                       d = max(d1, d2) - 180.0;
 
-return ( d );
+return d;
 
 }
 
@@ -149,7 +149,7 @@ double d, a, b;
 
    // Check for bad data
 
-if ( is_bad_data(uf) || is_bad_data(vf) || is_bad_data(uo) || is_bad_data(vo) )  return ( bad_data_double );
+if ( is_bad_data(uf) || is_bad_data(vf) || is_bad_data(uo) || is_bad_data(vo) )  return bad_data_double;
 
    // Normalize the vectors to unit length
 
@@ -158,7 +158,7 @@ convert_u_v_to_unit(uo, vo);
 
    // Check for bad data in the normalized vectors
 
-if ( is_bad_data(uf) || is_bad_data(vf) || is_bad_data(uo) || is_bad_data(vo) )  return ( bad_data_double );
+if ( is_bad_data(uf) || is_bad_data(vf) || is_bad_data(uo) || is_bad_data(vo) )  return bad_data_double;
 
    // Compute sums
 
@@ -170,7 +170,7 @@ b = uo*uf + vo*vf;
 if(is_eq(a, 0.0) && is_eq(b, 0.0)) d = bad_data_double;
 else                               d = atan2d(a, b);
 
-return ( d );
+return d;
 
 }
 
@@ -192,7 +192,7 @@ else  {
 
 }
 
-return ( wdir );
+return wdir;
 
 }
 
@@ -213,7 +213,7 @@ else {
 
 }
 
-return ( wind );
+return wind;
 
 }
 

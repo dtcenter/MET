@@ -10,8 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -24,6 +22,8 @@ using namespace std;
 
 #include "vx_math.h"
 #include "vx_log.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -153,7 +153,7 @@ close();
 
 ConcatString full_path, file_name;
 int i, file_argc;
-char **file_argv = (char **) 0; // allocated
+char **file_argv = (char **) nullptr; // allocated
 StringArray sa;
 const char *method_name = "MetPythonDataFile::open() ";
 
@@ -231,16 +231,16 @@ if ( ShiftRight != 0 )  Plane.shift_right(ShiftRight);
 
 if ( file_argv )  {
    for ( i=1; i<file_argc; i++ )  {
-      if ( file_argv[i] )  { delete [] file_argv[i]; file_argv[i] = (char *) 0; }
+      if ( file_argv[i] )  { delete [] file_argv[i]; file_argv[i] = (char *) nullptr; }
    }
-   delete [] file_argv; file_argv = (char **) 0;
+   delete [] file_argv; file_argv = (char **) nullptr;
 }
 
    //
    //  done
    //
 
-return ( status );
+return status;
 
 }
 
@@ -291,7 +291,7 @@ double MetPythonDataFile::get(int x, int y) const
 
 double value = Plane.get(x, y);
 
-return ( value );
+return value;
 
 }
 
@@ -305,7 +305,7 @@ bool MetPythonDataFile::data_ok(int x, int y) const
 
 const double value = get(x, y);
 
-return ( !is_bad_data(value) );
+return !is_bad_data(value);
 
 }
 
@@ -368,7 +368,7 @@ if ( status ) {
 
 }
 
-if ( !status )  return ( false );
+if ( !status )  return false;
 
    //
    //  ok
@@ -384,7 +384,7 @@ vinfo.set_level_name(VInfo.level_name().c_str());
 vinfo.set_units(VInfo.units().c_str());
 vinfo.set_magic(VInfo.name(), VInfo.level_name());
 
-return ( true );
+return true;
 
 }
 
@@ -434,7 +434,7 @@ if ( status ) {
 
 }
 
-if ( !status )  return ( 0 );
+if ( !status )  return 0;
 
    //
    //  ok
@@ -454,7 +454,7 @@ vinfo.set_level_name(VInfo.level_name().c_str());
 vinfo.set_units(VInfo.units().c_str());
 vinfo.set_magic(VInfo.name(), VInfo.level_name());
 
-return ( 1 );
+return 1;
 
 }
 
@@ -470,7 +470,7 @@ bool MetPythonDataFile::data_plane(DataPlane &plane)
    //  is the file even open?
    //
 
-if ( ! Raw_Grid )  return ( false );
+if ( ! Raw_Grid )  return false;
 
    //
    //  ok
@@ -478,7 +478,7 @@ if ( ! Raw_Grid )  return ( false );
 
 plane = Plane;
 
-return ( true );
+return true;
 
 }
 
@@ -494,13 +494,13 @@ int MetPythonDataFile::index(VarInfo &vinfo)
    //  is the file even open?
    //
 
-if ( ! Raw_Grid )  return ( -1 );
+if ( ! Raw_Grid )  return -1;
 
    //
    //  ok
    //
 
-return ( 0 );
+return 0;
 
 }
 

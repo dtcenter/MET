@@ -22,17 +22,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-static const int anno_height       = 100;
-
-static const int ctable_width      =  15;
-
-static const int ctable_text_width =  30;
-
-
-////////////////////////////////////////////////////////////////////////
-
-using namespace std;
-
 #include <fstream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -48,9 +37,20 @@ using namespace std;
 #include "vx_config.h"
 #include "configobjecttype_to_string.h"
 
+using namespace std;
+
 
 ////////////////////////////////////////////////////////////////////////
 
+
+static const int anno_height       = 100;
+
+static const int ctable_width      =  15;
+
+static const int ctable_text_width =  30;
+
+
+////////////////////////////////////////////////////////////////////////
 
 static ConcatString program_name;
 
@@ -252,7 +252,7 @@ for (j=0; j<(cline.n()); ++j)  {
 }
 
 
-return ( 0 );
+return 0;
 
 }
 
@@ -1114,7 +1114,7 @@ if ( e->type() != StringType )  {
 
 s = e->string_value();
 
-return ( s );
+return s;
 
 }
 
@@ -1144,7 +1144,7 @@ if ( !e )  {
 
 tf = e->b_value();
 
-return ( tf );
+return tf;
 
 }
 
@@ -1174,7 +1174,7 @@ if ( !e )  {
 
 k = e->i_value();
 
-return ( k );
+return k;
 
 }
 
@@ -1215,7 +1215,7 @@ else{
 }
 
 
-return ( t );
+return t;
 
 }
 
@@ -1258,7 +1258,7 @@ for (j=0; j<3; ++j)  {
 
 c.set_rgb(rgb[0], rgb[1], rgb[2]);
 
-return ( c );
+return c;
 
 }
 
@@ -1442,7 +1442,7 @@ s = target_width/(plot.LastTextWidth);
 
 if ( s > 1.0 )  s = 1.0;
 
-return ( s );
+return s;
 
 }
 

@@ -6,8 +6,6 @@
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
-using namespace std;
-
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -28,6 +26,8 @@ using namespace std;
 
 #include "grib_classes.h"
 #include "grib_utils.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -63,7 +63,7 @@ GribRecord::GribRecord()
 {
 
 is  = new Section0_Header;
-pds = (unsigned char *) 0;
+pds = (unsigned char *) nullptr;
 gds = new Section2_Header;
 bms = new Section3_Header;
 bds = new Section4_Header;
@@ -102,8 +102,8 @@ word_size = 0;
 
 data_lseek_offset = record_lseek_offset = (off_t) 0;
 
-// data   = (unsigned char *) 0;
-// bitmap = (unsigned char *) 0;
+// data   = (unsigned char *) nullptr;
+// bitmap = (unsigned char *) nullptr;
 //
 //data_size = data_alloc = 0;
 //bitmap_size = bitmap_alloc = 0;
@@ -135,13 +135,13 @@ GribRecord::~GribRecord()
 
 {
 
-if (  is )  { delete  is;    is = (Section0_Header *) 0; }
-if ( pds )  { delete [] pds;   pds = (unsigned char *)   0; }
-if ( gds )  { delete gds;   gds = (Section2_Header *) 0; }
-if ( bms )  { delete bms;   bms = (Section3_Header *) 0; }
-if ( bds )  { delete bds;   bds = (Section4_Header *) 0; }
-//if ( data ) { delete data; data = (vector<unsigned char> *) 0; }
-//if ( bitmap ) { delete bitmap; bitmap = (vector<unsigned char> *) 0; }
+if (  is )  { delete  is;    is = (Section0_Header *) nullptr; }
+if ( pds )  { delete [] pds;   pds = (unsigned char *)   nullptr; }
+if ( gds )  { delete gds;   gds = (Section2_Header *) nullptr; }
+if ( bms )  { delete bms;   bms = (Section3_Header *) nullptr; }
+if ( bds )  { delete bds;   bds = (Section4_Header *) nullptr; }
+//if ( data ) { delete data; data = (vector<unsigned char> *) nullptr; }
+//if ( bitmap ) { delete bitmap; bitmap = (vector<unsigned char> *) nullptr; }
 }
 
 
@@ -223,7 +223,7 @@ GribRecord & GribRecord::operator=(const GribRecord &g)
 
 {
 
-if ( this == &g )  return ( *this );   //  check for a = a
+if ( this == &g )  return *this;   //  check for a = a
 
 pds = new unsigned char [g.pds_len];
 
@@ -274,7 +274,7 @@ if ( g.bitmap.size() ) {
 
 TO = g.TO;
 
-return ( *this );
+return *this;
 
 }
 
@@ -316,8 +316,8 @@ uint4 GribRecord::long_data_value(int n) const
 
 int k, byte, shift;
 uint4 value, u;
-unsigned char *c1 = (unsigned char *) 0;
-const unsigned char *c2 = (unsigned char *) 0;
+unsigned char *c1 = (unsigned char *) nullptr;
+const unsigned char *c2 = (unsigned char *) nullptr;
 
 k = n*word_size;
 
@@ -350,7 +350,7 @@ shift = 32 - word_size - (k%8);
 
 value = (u >> shift) & mask;
 
-return ( value );
+return value;
 
 }
 
@@ -373,7 +373,7 @@ u = long_data_value(n);
 
 y = m_value*u + b_value;
 
-return ( y );
+return y;
 
 }
 
@@ -452,7 +452,7 @@ a = 0;
 
 if ( bitmap[byte] & uc_mask )  a = 1;
 
-return ( a );
+return a;
 
 }
 
@@ -469,7 +469,7 @@ Section1_Header *pds_ptr = (Section1_Header *) pds;
 
 j = (int) (pds_ptr->grib_code);
 
-return ( j );
+return j;
 
 }
 
@@ -522,7 +522,7 @@ fd = -1;
 
 file_start = (long) -1;
 
-name = (char *) 0;
+name = (char *) nullptr;
 
 referenceCount = n_alloc = issue = lead = 0;
 
@@ -530,9 +530,9 @@ buf_size = (size_t) 0;
 
 n_records = (unsigned int) 0;
 
-buf = (unsigned char *) 0;
+buf = (unsigned char *) nullptr;
 
-record_info = (RecordInfo *) 0;
+record_info = (RecordInfo *) nullptr;
 
 }
 
@@ -546,11 +546,11 @@ GribFileRep::~GribFileRep()
 
 if ( fd >= 0 )  { ::close(fd);  fd = -1; }
 
-if ( buf )  { delete [] buf;  buf = (unsigned char *) 0; }
+if ( buf )  { delete [] buf;  buf = (unsigned char *) nullptr; }
 
-if ( name )  { delete [] name;  name = (char *) 0; }
+if ( name )  { delete [] name;  name = (char *) nullptr; }
 
-if ( n_alloc ) { delete [] record_info;  record_info = (RecordInfo *) 0; }
+if ( n_alloc ) { delete [] record_info;  record_info = (RecordInfo *) nullptr; }
 
 
 }
@@ -565,7 +565,7 @@ void GribFileRep::record_extend(int n)
 if ( n_alloc > n )  return;
 
 int j;
-RecordInfo *r  = (RecordInfo *) 0;
+RecordInfo *r  = (RecordInfo *) nullptr;
 
 
 ++n;
@@ -600,9 +600,9 @@ for (j=n_records; j<n_alloc; ++j)  {
 
 }
 
-delete [] record_info;  record_info = (RecordInfo *) 0;
+delete [] record_info;  record_info = (RecordInfo *) nullptr;
 
-record_info = r;  r = (RecordInfo *) 0;
+record_info = r;  r = (RecordInfo *) nullptr;
 
 return;
 
@@ -616,7 +616,7 @@ void GribFileRep::realloc_buf(size_t n_bytes)
 
 {
 
-if ( buf )  { delete [] buf;  buf = 0;  buf_size = 0; }
+if ( buf )  { delete [] buf;  buf = nullptr;  buf_size = 0; }
 
 buf = new unsigned char [n_bytes];
 
@@ -650,7 +650,7 @@ GribFile::GribFile()
 
 {
 
-rep = (GribFileRep *) 0;
+rep = (GribFileRep *) nullptr;
 
 }
 
@@ -662,7 +662,7 @@ GribFile::GribFile(const char *filename)
 
 {
 
-rep = (GribFileRep *) 0;
+rep = (GribFileRep *) nullptr;
 
 open(filename);
 
@@ -723,13 +723,13 @@ if ( !(rep->buf = new unsigned char [default_gribfile_buf_size]) )  {
 
 rep->buf_size = default_gribfile_buf_size;
 
-if(!skip_header()) return ( false );
+if(!skip_header()) return false;
 
 index_records();
 
 lseek(rep->fd, rep->file_start, SEEK_SET);
 
-return ( true );
+return true;
 
 }
 
@@ -755,7 +755,7 @@ GribFile & GribFile::operator=(const GribFile &g)
 
 {
 
-if ( this == &g )  return ( *this );
+if ( this == &g )  return *this;
 
 close();
 
@@ -763,7 +763,7 @@ rep = g.rep;
 
 if ( rep )  ++rep->referenceCount;
 
-return ( *this );
+return *this;
 
 }
 
@@ -789,11 +789,11 @@ int GribFile::operator>>(GribRecord &g)
 
 int j = read_record(g);
 
-if ( j < 0 )  return ( -1 );
+if ( j < 0 )  return -1;
 
-if ( j > 0 )  return ( 1 );
+if ( j > 0 )  return 1;
 
-return ( 0 );
+return 0;
 
 }
 
@@ -847,7 +847,7 @@ g.Sec0_offset_in_record = bytes_processed;
 
 bytes = sizeof(Section0_Header);
 
-if ( (n_read = read(rep->buf, bytes)) == 0 ) return ( 0 );
+if ( (n_read = read(rep->buf, bytes)) == 0 ) return 0;
 
 memcpy(g.is, rep->buf, 8);
 
@@ -855,7 +855,7 @@ if ( (n_read < 0) || (n_read != bytes) )  {
 
    mlog << Error << "\nGribFile::read_record() -> error reading section 0 header ... nread = " << n_read << "\n\n";
 
-   return ( -1 );
+   return -1;
 
 }
 
@@ -867,7 +867,7 @@ if ( strncmp(g.is->grib_name, "GRIB", 4) != 0 )  {
         << "     reading record number " << (rep->n_records) << ", bytes left in file = "
         << (pos2 - file_pos) << "\n\n";
 
-   return ( 0 );
+   return 0;
 
 }
 
@@ -877,13 +877,13 @@ g.record_lseek_offset = file_pos;
 
 if ( s > (rep->buf_size) )  rep->realloc_buf(s);
 
-if ( read(8, s - 8) == 0 )  return ( 0 );
+if ( read(8, s - 8) == 0 )  return 0;
 
 if ( strncmp((char *) (rep->buf + (s - 4)), "7777", 4) != 0 )  {
 
    mlog << Error << "\nGribFile::read_record(GribRecord &) -> trailing \"7777\" not found in grib record\n\n";
 
-   return ( 0 );
+   return 0;
 }
 
 bytes_processed += 8;
@@ -1088,7 +1088,7 @@ for (j=0; j<(g.word_size); ++j)   g.mask |= (1 << j);
    //  Done
    //
 
-return ( 1 );
+return 1;
 
 }
 
@@ -1122,13 +1122,13 @@ if ( n_read == 0 )  {
    mlog << Error << "\nGribFile::skip_header() -> "
         << "\"GRIB\" magic cookie not found in grib file!!\n\n";
 
-   return ( 0 );
+   return 0;
 
 }
 
 if ( n_read < 0 )  {
 
-   return ( 0 );
+   return 0;
 
 }
 
@@ -1145,7 +1145,7 @@ if ( !found ) {
    mlog << Error << "\nGribFile::skip_header() -> "
         << "can't find \"GRIB\" magic cookie\n\n";
 
-   return ( 0 );
+   return 0;
 
 }
 
@@ -1153,7 +1153,7 @@ rep->file_start = (long) (pos + j);
 
 lseek(rep->fd, rep->file_start, SEEK_SET);
 
-return ( 1 );
+return 1;
 
 }
 
@@ -1166,7 +1166,7 @@ void GribFile::index_records()
 {
 
 GribRecord *g = new GribRecord();
-Section1_Header *pds_ptr = (Section1_Header *) 0;
+Section1_Header *pds_ptr = (Section1_Header *) nullptr;
 
 rep->record_extend(1);
 
@@ -1208,7 +1208,7 @@ if ( (n_read = ::read(rep->fd, (char *) rep->buf, rep->buf_size)) < 0 )  {
 
 }
 
-return ( n_read );
+return n_read;
 
 }
 
@@ -1239,7 +1239,7 @@ if ( (n_read = ::read(rep->fd, (char *) rep->buf, bytes)) < 0 )  {
 
 }
 
-return ( n_read );
+return n_read;
 
 }
 
@@ -1274,7 +1274,7 @@ if ( n_read != B )  {
 
 }
 
-return ( n_read );
+return n_read;
 
 }
 
@@ -1296,7 +1296,7 @@ if ( (n_read = ::read(rep->fd, c, bytes)) < 0 )  {
 
 }
 
-return ( n_read );
+return n_read;
 
 }
 
@@ -1475,7 +1475,7 @@ double char4_to_dbl(const unsigned char *c)
    value = value * mant / 16777216.0;
    if (positive == 0) value = -value;
 
-   return(value);
+   return value;
 }
 
 
@@ -1492,7 +1492,7 @@ i = 0;
 
 for (j=0; j<3; ++j)  i = i*256 + c[j];
 
-return ( i );
+return i;
 
 }
 
@@ -1510,7 +1510,7 @@ i = 0;
 
 for (j=0; j<2; ++j)  i = i*256 + c[j];
 
-return ( i );
+return i;
 
 }
 
@@ -1618,7 +1618,7 @@ file << "   Sec 4 (BDS)  offset in file " << g.Sec4_offset_in_file << ",   offse
 
 file << separator << "\n";
 
-return ( file );
+return file;
 
 }
 
@@ -1657,7 +1657,7 @@ file << "   length:      " << char3_to_int(h.length) << "\n";
 
 file << "   ed_num:      " << (int) (h.ed_num) << "\n\n";
 
-return ( file );
+return file;
 
 }
 
@@ -1725,7 +1725,7 @@ file << "   ens_number:       " << (int) (h.ens_number)       << "\n";
 
 file << "   d_value:     " << char2_to_int(h.d_value) << "\n\n";
 
-return ( file );
+return file;
 
 }
 
@@ -1844,7 +1844,7 @@ else if ((h.type == 10))
    file << "   rotation:  " << char4_to_dbl(h.grid_type.rot_latlon_grid.rotation) << "\n\n";
 }
 
-return ( file );
+return file;
 
 }
 
@@ -1883,7 +1883,7 @@ file << "   num:    " << (int) h.num << "\n";
 
 file << "   flag:   " << char2_to_int(h.flag) << "\n\n";
 
-return ( file );
+return file;
 
 }
 
@@ -1931,7 +1931,7 @@ file << "   size:       " << (int) h.size << "\n";
 
 file << "   data_start: " << (int) h.data_start << "\n\n";
 
-return ( file );
+return file;
 
 }
 
@@ -1960,13 +1960,13 @@ while ( (n_read = read(fd, buf, sizeof(buf))) > 0 )  {
 
          lseek(fd, pos + 2, SEEK_SET);
 
-         return ( pos );
+         return pos;
 
       }
 
    }   //  for j
 
-   if ( n_read < 10 )  return ( -1 );
+   if ( n_read < 10 )  return -1;
 
    pos += n_read - 5;
 
@@ -1974,7 +1974,7 @@ while ( (n_read = read(fd, buf, sizeof(buf))) > 0 )  {
 
 }   //  while
 
-if ( n_read == 0 )  return ( -1 );
+if ( n_read == 0 )  return -1;
 
 if ( n_read < 0 )  {
 
@@ -1984,7 +1984,7 @@ if ( n_read < 0 )  {
 
 }
 
-return ( pos );
+return pos;
 
 }
 

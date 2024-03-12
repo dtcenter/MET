@@ -11,10 +11,10 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include "logger.h"
 #include "str_wrappers.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -49,7 +49,7 @@ void m_strcpy(char *to_str, const char *from_str, const char *method_name,
 // to_string should not allocated. This allocates and return to_str after copying
 
 char *m_strcpy2(const char *from_str, const char *method_name, const char *extra_msg) {
-   char *to_str = (char *) 0;
+   char *to_str = (char *) nullptr;
    if (from_str) {
       int str_len = m_strlen(from_str);
 

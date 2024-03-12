@@ -11,14 +11,14 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
 #include <cmath>
 
 #include "mm_engine.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -74,11 +74,11 @@ MM_Engine & MM_Engine::operator=(const MM_Engine & e)
 
 {
 
-if ( this == &e )  return ( * this );
+if ( this == &e )  return *this;
 
 assign(e);
 
-return ( * this );
+return *this;
 
 }
 
@@ -90,7 +90,7 @@ void MM_Engine::init_from_scratch()
 
 {
 
-comp_to_eq = (int *) 0;
+comp_to_eq = (int *) nullptr;
 
 clear();
 
@@ -333,11 +333,11 @@ for (j=0; j<N_Composites; ++j)  {
 
    eq = part(m);
 
-   if ( eq->has(fcst_num) )  return ( j );
+   if ( eq->has(fcst_num) )  return j;
 
 }
 
-return ( -1 );
+return -1;
 
 }
 
@@ -360,11 +360,11 @@ for (j=0; j<N_Composites; ++j)  {
 
    eq = part(m);
 
-   if ( eq->has(obs_num) )  return ( j );
+   if ( eq->has(obs_num) )  return j;
 
 }
 
-return ( -1 );
+return -1;
 
 }
 
@@ -388,7 +388,7 @@ for (j=0; j<(eq->n_elements()); ++j)  {
 
 }
 
-return ( a );
+return a;
 
 }
 
@@ -412,7 +412,7 @@ for (j=0; j<(eq->n_elements()); ++j)  {
 
 }
 
-return ( a );
+return a;
 
 }
 
@@ -433,12 +433,12 @@ j = part.which_class(k);
 
 for (m=0; m<N_Composites; ++m)  {
 
-   if ( comp_to_eq[m] == j )  return ( m );
+   if ( comp_to_eq[m] == j )  return m;
 
 }
 
 
-return ( -1 );
+return -1;
 
 }
 
@@ -459,12 +459,12 @@ j = part.which_class(k);
 
 for (m=0; m<N_Composites; ++m)  {
 
-   if ( comp_to_eq[m] == j )  return ( m );
+   if ( comp_to_eq[m] == j )  return m;
 
 }
 
 
-return ( -1 );
+return -1;
 
 }
 

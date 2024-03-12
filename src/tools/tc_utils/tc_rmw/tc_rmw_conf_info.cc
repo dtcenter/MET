@@ -8,7 +8,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
 
 #include <dirent.h>
 #include <iostream>
@@ -21,6 +20,9 @@ using namespace std;
 #include "tc_rmw_conf_info.h"
 
 #include "vx_log.h"
+
+using namespace std;
+
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -45,7 +47,7 @@ TCRMWConfInfo::~TCRMWConfInfo() {
 void TCRMWConfInfo::init_from_scratch() {
 
     // Initialize pointers
-    data_info = (VarInfo**) 0;
+    data_info = (VarInfo**) nullptr;
 
     clear();
 
@@ -86,11 +88,11 @@ void TCRMWConfInfo::clear() {
     if(data_info) {
         for(int i = 0; i < n_data; i++) {
             if(data_info[i]) {
-                data_info[i] = (VarInfo*) 0;
+                data_info[i] = (VarInfo*) nullptr;
             }
         }
         delete data_info;
-        data_info = (VarInfo**) 0;
+        data_info = (VarInfo**) nullptr;
     }
 
     // Reset field count
@@ -122,7 +124,7 @@ void TCRMWConfInfo::process_config(GrdFileType ftype) {
     int i;
     StringArray sa;
     VarInfoFactory info_factory;
-    Dictionary *fdict = (Dictionary *) 0;
+    Dictionary *fdict = (Dictionary *) nullptr;
 
     // Conf: version
     check_met_version(Conf.lookup_string(conf_key_version).c_str());
@@ -212,7 +214,7 @@ void TCRMWConfInfo::process_config(GrdFileType ftype) {
 
     // Initialize pointers
     for(i=0; i<n_data; i++) {
-        data_info[i] = (VarInfo*) 0;
+        data_info[i] = (VarInfo*) nullptr;
     }
 
     // Parse data field information

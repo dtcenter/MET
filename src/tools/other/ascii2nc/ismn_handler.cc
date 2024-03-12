@@ -8,8 +8,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <iostream>
 
 #include "vx_log.h"
@@ -17,6 +15,11 @@ using namespace std;
 #include "vx_util.h"
 
 #include "ismn_handler.h"
+
+using namespace std;
+
+
+////////////////////////////////////////////////////////////////////////
 
 const int IsmnHandler::MIN_NUM_HDR_COLS = 8;
 const int IsmnHandler::NUM_OBS_COLS = 5;
@@ -83,7 +86,7 @@ bool IsmnHandler::isFileType(LineDataFile &ascii_file) const {
    ascii_file >> dl;
    if(dl.n_items() != NUM_OBS_COLS) is_file_type = false;
 
-   return(is_file_type);
+   return is_file_type;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -93,11 +96,11 @@ bool IsmnHandler::isFileType(LineDataFile &ascii_file) const {
 bool IsmnHandler::_readObservations(LineDataFile &ascii_file) {
 
    // Read and save the header information
-   if(!_readHeaderInfo(ascii_file)) return(false);
+   if(!_readHeaderInfo(ascii_file)) return false;
 
    // Get the var_id to use
    int var_id = bad_data_int;
-   if(!_varNames.has(_obsVarInfo._varName, var_id)) return(false);
+   if(!_varNames.has(_obsVarInfo._varName, var_id)) return false;
 
    // Process the observation lines
    DataLine dl;
@@ -110,12 +113,12 @@ bool IsmnHandler::_readObservations(LineDataFile &ascii_file) {
               << " != " << NUM_OBS_COLS << ") on line number "
               << dl.line_number() << " of ISMN file \""
               << ascii_file.filename() << "\"!\n\n";
-         return(false);
+         return false;
       }
 
       // Extract the valid time from the data line
       time_t valid_time = _getValidTime(dl);
-      if(valid_time == 0) return(false);
+      if(valid_time == 0) return false;
 
       // Store the observation value
       double obs_value = atof(dl[2]);
@@ -153,7 +156,7 @@ bool IsmnHandler::_readObservations(LineDataFile &ascii_file) {
 
    } // end while
 
-   return(true);
+   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -184,7 +187,7 @@ time_t IsmnHandler::_getValidTime(const DataLine &dl) const {
       time_struct.tm_min  = stoi( hm_str.substr(3, 2));
    }
 
-   return(timegm(&time_struct));
+   return timegm(&time_struct);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -201,7 +204,7 @@ bool IsmnHandler::_readHeaderInfo(LineDataFile &ascii_file) {
       mlog << Error << "\nIsmnHandler::_readHeaderInfo() -> "
            << "unexpected ISMN file name \"" << ascii_file.filename()
            << "\"!\n\n";
-      return(false);
+      return false;
    }
 
    // Validate the variable name
@@ -210,7 +213,7 @@ bool IsmnHandler::_readHeaderInfo(LineDataFile &ascii_file) {
            << "unexpected variable name (" << sa[3]
            << ") found in ISMN file name \"" << ascii_file.filename()
            << "\"!\n\n";
-      return(false);
+      return false;
    }
 
    // Store the observation variable info
@@ -230,7 +233,7 @@ bool IsmnHandler::_readHeaderInfo(LineDataFile &ascii_file) {
            << dl.n_items() << " < " << MIN_NUM_HDR_COLS
            << ") in ISMN file \"" << ascii_file.filename()
            << "\"!\n\n";
-      return(false);
+      return false;
    }
 
    // Store the header information
@@ -249,7 +252,7 @@ bool IsmnHandler::_readHeaderInfo(LineDataFile &ascii_file) {
      _depth = (atof(dl[6]) + atof(dl[7]))/2.0;
    }
 
-   return(true);
+   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////

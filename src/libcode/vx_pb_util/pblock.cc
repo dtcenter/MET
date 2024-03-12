@@ -9,8 +9,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -24,6 +22,9 @@ using namespace std;
 #include "pblock.h"
 #include "do_blocking.h"
 #include "do_unblocking.h"
+
+using namespace std;
+
 
 ////////////////////////////////////////////////////////////////////////
 

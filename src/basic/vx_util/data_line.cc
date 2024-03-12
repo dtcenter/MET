@@ -7,11 +7,8 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
-
 ////////////////////////////////////////////////////////////////////////
 
-
-using namespace std;
 
 #include <iostream>
 #include <fstream>
@@ -33,6 +30,8 @@ using namespace std;
 #ifdef WITH_PYTHON
 #include "python_line.h"
 #endif  /*  WITH_PYTHON  */
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -64,7 +63,7 @@ DataLine::~DataLine()
 
 LineNumber = N_items = N_ints = N_chars = 0;
 
-File = (LineDataFile *) 0;
+File = (LineDataFile *) nullptr;
 
 }
 
@@ -90,11 +89,11 @@ DataLine & DataLine::operator=(const DataLine & a)
 
 {
 
-if ( this == &a )  return ( * this );
+if ( this == &a )  return *this;
 
 assign(a);
 
-return ( * this );
+return *this;
 
 }
 
@@ -114,7 +113,7 @@ N_chars = N_ints = 0;
 
 Delimiter.assign(dataline_default_delim);
 
-File = (LineDataFile *) 0;
+File = (LineDataFile *) nullptr;
 
 IsHeader = false;
 
@@ -138,7 +137,7 @@ LineNumber = 0;
 
 N_items = 0;
 
-File = (LineDataFile *) 0;
+File = (LineDataFile *) nullptr;
 
 
 return;
@@ -276,7 +275,7 @@ const char * DataLine::operator[](int k) const
 
 const char * c = get_item(k);
 
-return ( c );
+return c;
 
 }
 
@@ -288,7 +287,7 @@ int DataLine::max_item_width() const
 
 {
 
-if ( Line.empty() )  return ( 0 );
+if ( Line.empty() )  return 0;
 
 int j, n, w;
 
@@ -303,7 +302,7 @@ for (j=0; j<N_items; ++j)  {
 }
 
 
-return ( n );
+return n;
 
 }
 
@@ -326,7 +325,7 @@ count = 0;
    //  get a line from the file
    //
 
-if ( ! read_single_text_line(ldf) )  { clear();  return ( 0 ); }
+if ( ! read_single_text_line(ldf) )  { clear();  return 0; }
 
    //
    //  parse the line with strtok
@@ -355,7 +354,7 @@ N_items = count;
 LineNumber = ldf->last_line_number() + 1;
 
 
-return ( 1 );
+return 1;
 
 }
 
@@ -373,7 +372,7 @@ clear();
 
 ifstream & f = *(ldf->in);
 
-if ( !f )  return ( 0 );
+if ( !f )  return 0;
 
 File = ldf;
 
@@ -400,7 +399,7 @@ for( i=0; i<n_wdth; i++ )  {
            << max_str_len << ").\n\n";
    }
 
-   if ( !f )  { clear();  return ( 0 ); }
+   if ( !f )  { clear();  return 0; }
 
    ++count;
    
@@ -459,20 +458,20 @@ if (null_char_count > 0)
 
 while ( f.get(c) )  {
 
-   if ( !f )  { clear();  return ( 0 ); }
+   if ( !f )  { clear();  return 0; }
 
    if ( c == '\n' )  break;
 }
 
 
-if ( !f )  { clear();  return ( 0 ); }
+if ( !f )  { clear();  return 0; }
 
 N_items = count;
 
 LineNumber = ldf->last_line_number() + 1;
 
 
-return ( 1 );
+return 1;
 
 }
 
@@ -484,9 +483,9 @@ bool DataLine::is_ok() const
 
 {
 
-if ( N_items == 0 )  return ( false );
+if ( N_items == 0 )  return false;
 
-return ( true );
+return true;
 
 }
 
@@ -498,7 +497,7 @@ bool DataLine::is_header() const
 
 {
 
-return ( IsHeader );
+return IsHeader;
 
 }
 
@@ -522,7 +521,7 @@ bool DataLine::read_single_text_line(LineDataFile * ldf)
 
 {
 
-if ( !ldf )  return ( false );
+if ( !ldf )  return false;
 
 #ifdef  WITH_PYTHON
 
@@ -532,7 +531,7 @@ if ( pldf )  {
 
    const bool status = read_py_single_text_line(pldf);
 
-   return ( status );
+   return status;
 
 }
 
@@ -540,7 +539,7 @@ if ( pldf )  {
 
 ifstream & f = *(ldf->in);
 
-if ( !f )  return ( false );
+if ( !f )  return false;
 
 File = ldf;
 
@@ -549,7 +548,7 @@ char c;
 
 while ( f.get(c) )  {
 
-   if ( !f )  return ( false );
+   if ( !f )  return false;
 
    if ( c == '\n' )  { break; }
 
@@ -557,10 +556,10 @@ while ( f.get(c) )  {
 
 }
 
-if ( !f )  return ( false );
+if ( !f )  return false;
 
 
-return ( true );
+return true;
 
 }
 
@@ -579,11 +578,11 @@ ConcatString s;
 
 status = pldf->next_line(s);
 
-if ( ! status )  return ( false );
+if ( ! status )  return false;
 
 Line = s.text();
 
-return ( true );
+return true;
 
 }
 
@@ -659,7 +658,7 @@ void LineDataFile::init_from_scratch()
 
 {
 
-in = (ifstream *) 0;
+in = (ifstream *) nullptr;
 
 Last_Line_Number = 0;
 
@@ -697,7 +696,7 @@ met_open((*in), path);
 
 if ( !(*in) )  {
 
-   return ( 0 );
+   return 0;
 
 }
 
@@ -716,7 +715,7 @@ ShortFilename.assign(get_short_name(path));
 
 Last_Line_Number = 0;
 
-return ( 1 );
+return 1;
 
 }
 
@@ -732,7 +731,7 @@ if ( in )  {
 
    in->close();
 
-   delete in;  in = (ifstream *) 0;
+   delete in;  in = (ifstream *) nullptr;
 
 }
 
@@ -775,12 +774,12 @@ int LineDataFile::ok() const
 
 {
 
-if ( !in )  return ( 0 );
+if ( !in )  return 0;
 
-if ( !(*in) )  return ( 0 );
+if ( !(*in) )  return 0;
 
 
-return ( 1 );
+return 1;
 
 }
 
@@ -798,7 +797,7 @@ do {
 
    status = a.read_line(this);
 
-   if ( !status ) return ( 0 );
+   if ( !status ) return 0;
 
    ++Last_Line_Number;
 
@@ -807,7 +806,7 @@ do {
 } while ( !(a.is_ok()) );
 
 
-return ( 1 );
+return 1;
 
 }
 
@@ -835,7 +834,7 @@ if ( ok() ) {
 
 }
 
-return ( 1 );
+return 1;
 
 }
 
@@ -876,14 +875,14 @@ do {
 
    status = a.read_fwf_line(this, wdth, n_wdth);
 
-   if ( !status ) return ( 0 );
+   if ( !status ) return 0;
 
    ++Last_Line_Number;
 
 } while ( !(a.is_ok()) );
 
 
-return ( 1 );
+return 1;
 
 }
 
@@ -903,7 +902,7 @@ ostream & operator<<(ostream & out, const DataLine & L)
 
 {
 
-if ( L.n_items() == 0 )  return ( out );
+if ( L.n_items() == 0 )  return out;
 
 int j;
 
@@ -918,7 +917,7 @@ out.put('\n');
 out.flush();
 
 
-return ( out );
+return out;
 
 }
 
@@ -930,7 +929,7 @@ Logger & operator<<(Logger & lgr, const DataLine & L)
 
 {
 
-if ( L.n_items() == 0 )  return ( lgr );
+if ( L.n_items() == 0 )  return lgr;
 
 for (int j = 0; j < L.Items.size(); j++) {
     lgr << L.Items[j];
@@ -941,7 +940,7 @@ for (int j = 0; j < L.Items.size(); j++) {
 lgr << '\n';
 
 
-return ( lgr );
+return lgr;
 
 }
 

@@ -11,8 +11,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -26,6 +24,8 @@ using namespace std;
 #include "rad_record.h"
 #include "rad_offsets.h"
 #include "ftto.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -226,7 +226,7 @@ if ( (index < 0) || (index >= Ndiag) )  {
 
 }
 
-return ( (double) (diag[index]) );
+return (double) (diag[index]);
 
 }
 
@@ -258,7 +258,7 @@ if ( (channel < 0) || (channel >= N2) )  {
 
 const int n = fortran_two_to_one(N1, index, channel);
 
-return ( (double) (diagchan[n]) );
+return (double) (diagchan[n]);
 
 }
 
@@ -290,7 +290,7 @@ if ( (i < 0) || (i >= iextra) || (j < 0) || (j >= jextra) )  {
 
 const int n = fortran_two_to_one(iextra, i, j);
 
-return ( (double) (extra[n]) );
+return (double) (extra[n]);
 
 }
 
@@ -531,7 +531,7 @@ if ( (n < 0) || (n >= Nchannels) )  {
 
 }
 
-return ( C_params[n].nuchan );
+return C_params[n].nuchan;
 
 }
 
@@ -553,7 +553,7 @@ if ( (n < 0) || (n >= Nchannels) )  {
 
 }
 
-return ( C_params[n].iuse );
+return C_params[n].iuse;
 
 }
 
@@ -571,7 +571,7 @@ if ( (Fd = met_open(path, O_RDONLY)) < 0 )  {
 
    Fd = -1;
 
-   return ( false );
+   return false;
 
 }
 
@@ -651,7 +651,7 @@ Npair = Nrec * Nchannels;
    //  done
    //
 
-return ( true );
+return true;
 
 }
 
@@ -705,7 +705,7 @@ r.extend(s);
 
 n_read = read_fortran_binary(f.Fd, r.Buf, r.Nalloc, f.get_rec_pad_size(), f.get_swap_endian());
 
-if ( n_read == 0 )  return ( false );
+if ( n_read == 0 )  return false;
 
 if ( n_read != bytes )  {
 
@@ -748,7 +748,7 @@ if ( f.get_swap_endian() )  {
    //  done
    //
 
-return ( true );
+return true;
 
 }
 

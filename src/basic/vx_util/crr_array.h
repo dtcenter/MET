@@ -110,7 +110,7 @@ void CRR_Array<T>::init_from_scratch()
 
 {
 
-e = (T *) 0;
+e = (T *) nullptr;
 
 AllocInc = 25;   //  default value
 
@@ -130,7 +130,7 @@ void CRR_Array<T>::clear()
 
 {
 
-if ( e )  { delete [] e;  e = (T *) 0; }
+if ( e )  { delete [] e;  e = (T *) nullptr; }
 
 
 
@@ -201,11 +201,11 @@ for(j=0; j<Nelements; ++j)  {
 
 }
 
-if ( e )  { delete [] e;  e = (T *) 0; }
+if ( e )  { delete [] e;  e = (T *) nullptr; }
 
 e = u;
 
-u = (T *) 0;
+u = (T *) nullptr;
 
 Nalloc = N;
 
