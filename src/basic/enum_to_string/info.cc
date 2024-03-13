@@ -275,7 +275,7 @@ for (j=0; j<Nids; ++j)  {
 }
 
 
-return ( max_len );
+return max_len;
 
 }
 

@@ -365,7 +365,7 @@ for (j=j_start; j<max_lexeme_size; ++j)  {
 
 
 
-return ( digit_count > 0 );
+return digit_count > 0;
 
 }
 
