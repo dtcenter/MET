@@ -556,6 +556,13 @@ void setup_grid() {
     grid_data.range_n = conf_info.n_range;
     grid_data.azimuth_n = conf_info.n_azimuth;
 
+    // Define the maximum range in km based on the fixed increment 
+    if(is_bad_data(conf_info.rmw_scale)) {
+        grid_data.range_max_km =
+            conf_info.delta_range_km *
+            (conf_info.n_range - 1);
+    }
+
     tcrmw_grid.set_from_data(grid_data);
     grid.set(grid_data);
 }
@@ -593,8 +600,9 @@ void setup_nc_file() {
         lead_time_str_var, lead_time_sec_var);
 
     // Define range and azimuth dimensions
-    def_tc_range_azimuth(nc_out, range_dim, azimuth_dim, tcrmw_grid,
-        conf_info.rmw_scale);
+    def_tc_range_azimuth(nc_out,
+        range_dim, azimuth_dim,
+        tcrmw_grid, conf_info.rmw_scale);
 
     // Define latitude and longitude arrays
     def_tc_lat_lon(nc_out,
@@ -688,20 +696,11 @@ void process_fields(const TrackInfoArray& tracks) {
         grid_data.lat_center = point.lat();
         grid_data.lon_center = -1.0*point.lon(); // internal sign change
 
-        // Set the maximum range in km
-        // MET #2833 multiply by n-1 since the ranges begin at 0 km
-
-        // Set relative to the radius of maximum winds
+        // Define the maximum range in km relative to the radius of maximum winds
         if(!is_bad_data(conf_info.rmw_scale)) {
             grid_data.range_max_km =
                 conf_info.rmw_scale *
                 point.mrd() * tc_km_per_nautical_miles *
-                (conf_info.n_range - 1);
-        }
-        // Set based on the explicit delta range value
-        else {
-            grid_data.range_max_km =
-                conf_info.delta_range_km *
                 (conf_info.n_range - 1);
         }
 
