@@ -28,7 +28,6 @@
 
 #include "configobjecttype_to_string.h"
 
-
 using namespace std;
 
 
