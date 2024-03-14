@@ -82,38 +82,38 @@ OPT_EXP   {EXP}?
 %%
 
 
-","                                 { ++color_file_column;    return ( ',' ); }
+","                                 { ++color_file_column;    return ','; }
 
 
-"{"                                 { ++color_file_column;    return ( '{' ); }
-"}"                                 { ++color_file_column;    return ( '}' ); }
+"{"                                 { ++color_file_column;    return '{'; }
+"}"                                 { ++color_file_column;    return '}'; }
 
-"("                                 { ++color_file_column;    return ( '(' ); }
-")"                                 { ++color_file_column;    return ( ')' ); }
+"("                                 { ++color_file_column;    return '('; }
+")"                                 { ++color_file_column;    return ')'; }
 
-"="                                 { ++color_file_column;    return ( '=' ); }
-
-
-
-
-"\""                                { do_quoted_string();  return ( QUOTED_STRING ); }
-
-
-({LETTER})({LETTER}|{DIGIT})*       { return ( do_id() ); }
+"="                                 { ++color_file_column;    return '='; }
 
 
 
-("-"?){DIGITS}                      { do_int();    return ( INTEGER ); }
+
+"\""                                { do_quoted_string();  return QUOTED_STRING; }
+
+
+({LETTER})({LETTER}|{DIGIT})*       { return do_id(); }
 
 
 
-("-"?){DIGITS}{EXP}                 { do_float();  return ( FLOAT ); }
+("-"?){DIGITS}                      { do_int();    return INTEGER; }
 
-("-"?)"."{DIGITS}{OPT_EXP}          { do_float();  return ( FLOAT ); }
 
-("-"?){DIGITS}"."{OPT_EXP}          { do_float();  return ( FLOAT ); }
 
-("-"?){DIGITS}"."{DIGITS}{OPT_EXP}  { do_float();  return ( FLOAT ); }
+("-"?){DIGITS}{EXP}                 { do_float();  return FLOAT; }
+
+("-"?)"."{DIGITS}{OPT_EXP}          { do_float();  return FLOAT; }
+
+("-"?){DIGITS}"."{OPT_EXP}          { do_float();  return FLOAT; }
+
+("-"?){DIGITS}"."{DIGITS}{OPT_EXP}  { do_float();  return FLOAT; }
 
 
 
@@ -145,10 +145,10 @@ int do_id()
 color_file_column += strlen(colortext);
 
 
-if ( strcmp(colortext, "blend"    ) == 0 )  return ( BLEND     );
-if ( strcmp(colortext, "hsv"      ) == 0 )  return ( HSV       );
-if ( strcmp(colortext, "cmyk"     ) == 0 )  return ( CMYK      );
-if ( strcmp(colortext, "grayvalue") == 0 )  return ( GRAYVALUE );
+if ( strcmp(colortext, "blend"    ) == 0 )  return BLEND;
+if ( strcmp(colortext, "hsv"      ) == 0 )  return HSV;
+if ( strcmp(colortext, "cmyk"     ) == 0 )  return CMYK;
+if ( strcmp(colortext, "grayvalue") == 0 )  return GRAYVALUE;
 
 
 int index;
@@ -157,13 +157,13 @@ if ( clist.has_name(colortext, index) )  {
 
    colorlval.ival = index;
 
-   return ( COLOR_NAME );
+   return COLOR_NAME;
 
 }
 
 strncpy(colorlval.text, colortext, sizeof(colorlval.text) - 1);
 
-return ( ID );
+return ID;
 
 }
 
@@ -215,7 +215,7 @@ c2 = nextchar();
 comment_depth = 1;
 
 
-while ( 1 )  {
+while ( true )  {
 
    if ( (c1 == EOF) || (c2 == EOF) )  break;
 
@@ -252,7 +252,7 @@ void do_cpp_comment()
 int c;
 
 
-while ( 1 )  {
+while ( true )  {
 
    c = nextchar();
 
@@ -289,7 +289,7 @@ if ( c == '\n' )  {
 }
 
 
-return ( c );
+return c;
 
 }
 
@@ -308,7 +308,7 @@ char line[128];
 
 n = 0;
 
-while ( 1 )  {
+while ( true )  {
 
    c = nextchar();
 
