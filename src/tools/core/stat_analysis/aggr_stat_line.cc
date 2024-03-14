@@ -39,8 +39,6 @@
 //                                      line types.
 //   018    02/13/24  Halley Gotway   MET #2395 Add wind direction stats
 //                                      to VL1L2, VAL1L2, and VCNT.
-//   019    02/21/24  Halley Gotway   MET #2583 Add observation error
-//                                      ECNT statistics.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -2658,8 +2656,6 @@ void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &job,
          m[key].ens_pd.crps_gaus_na.add(cur.crps_gaus);
          m[key].ens_pd.crpscl_gaus_na.add(cur.crpscl_gaus);
          m[key].ens_pd.ign_na.add(cur.ign);
-         m[key].ens_pd.ign_conv_oerr_na.add(cur.ign_conv_oerr);
-         m[key].ens_pd.ign_corr_oerr_na.add(cur.ign_corr_oerr);
          m[key].ens_pd.n_ge_obs_na.add(cur.n_ge_obs);
          m[key].ens_pd.me_ge_obs_na.add(cur.me_ge_obs);
          m[key].ens_pd.n_lt_obs_na.add(cur.n_lt_obs);
@@ -3233,33 +3229,16 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &job,
          m[key].ens_pd.ign_na.add(compute_ens_ign(cur.obs, cur.ens_mean, cur.spread));
          m[key].ens_pd.pit_na.add(compute_ens_pit(cur.obs, cur.ens_mean, cur.spread));
 
-         // Back out the observation error variance
-         double oerr_var = bad_data_double;
-         if(!is_bad_data(cur.spread_plus_oerr) &&
-            !is_bad_data(cur.spread)) {
-            oerr_var = square(cur.spread_plus_oerr) -
-                       square(cur.spread);
-         }
-
          // Store BIAS_RATIO terms
          int n_ge_obs, n_lt_obs;
          double me_ge_obs, me_lt_obs;
-         compute_bias_ratio_terms(
-            cur.obs, cur.ens_na,
-            n_ge_obs, me_ge_obs,
-            n_lt_obs, me_lt_obs);
+         compute_bias_ratio_terms(cur.obs, cur.ens_na,
+                                  n_ge_obs, me_ge_obs,
+                                  n_lt_obs, me_lt_obs);
          m[key].ens_pd.n_ge_obs_na.add(n_ge_obs);
          m[key].ens_pd.me_ge_obs_na.add(me_ge_obs);
          m[key].ens_pd.n_lt_obs_na.add(n_lt_obs);
          m[key].ens_pd.me_lt_obs_na.add(me_lt_obs);
-
-         // Compute observation error log scores
-         double v_conv, v_corr;
-         compute_obs_error_log_scores(
-            cur.ens_mean, cur.spread, cur.obs, oerr_var,
-            v_conv, v_corr);
-         m[key].ens_pd.ign_conv_oerr_na.add(v_conv);
-         m[key].ens_pd.ign_corr_oerr_na.add(v_corr);
 
          //
          // Increment the RHIST counts

@@ -33,8 +33,6 @@
 //                                      line types.
 //   013    02/13/24  Halley Gotway   MET #2395 Add wind direction stats
 //                                      to VL1L2, VAL1L2, and VCNT.
-//   014    02/21/24  Halley Gotway   MET #2583 Add observation error
-//                                      ECNT statistics.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -398,9 +396,6 @@ void parse_ecnt_line(STATLine &l, ECNTData &e_data) {
    e_data.me_ge_obs  = atof(l.get_item("ME_GE_OBS"));
    e_data.n_lt_obs   = atoi(l.get_item("N_LT_OBS"));
    e_data.me_lt_obs  = atof(l.get_item("ME_LT_OBS"));
-
-   e_data.ign_conv_oerr = atof(l.get_item("IGN_CONV_OERR"));
-   e_data.ign_corr_oerr = atof(l.get_item("IGN_CORR_OERR"));
 
    return;
 }

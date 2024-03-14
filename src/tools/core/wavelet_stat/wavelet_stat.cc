@@ -39,7 +39,7 @@
 //   014    07/09/21  Linden          MET #1746 Skip thresholding.
 //   015    07/06/22  Howard Soh      METplus-Internal #19 Rename main to met_main
 //   016    10/03/22  Prestopnik      MET #2227 Remove using namespace netCDF from header files
-//   017    01/29/24  Halley Gotway   MET #2801 Configure time difference warnings
+//   017    01/29/24  Halley Gotway  MET #2801 Configure time difference warnings
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -425,7 +425,7 @@ void process_scores() {
       mlog << Debug(2) << "Observation field: ";
       fill_bad_data(obs_dp_fill,  obs_fill);
 
-      // Pad the fields out to the nearest power of two if requested
+      // Pad the fields out to the nearest power of two if requsted
       if(conf_info.grid_decomp_flag == GridDecompType_Pad) {
          mlog << Debug(2) << "Padding the fields out to the nearest integer "
               << "power of two.\n";
