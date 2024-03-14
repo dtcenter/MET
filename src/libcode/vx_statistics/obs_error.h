@@ -5,6 +5,7 @@
 // ** Research Applications Lab (RAL)
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+
 ////////////////////////////////////////////////////////////////////////
 
 #ifndef  __OBS_ERROR_H__
@@ -67,6 +68,8 @@ class ObsErrorEntry {
          //
          //  get stuff
          //
+
+      double variance() const;
 
          //
          //  do stuff

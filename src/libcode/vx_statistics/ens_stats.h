@@ -82,6 +82,10 @@ class ECNTInfo {
       double me_oerr, mae_oerr, rmse_oerr, spread_oerr;
       double spread_plus_oerr;
 
+      // Log scores that incorporate observational uncertainty,
+      // as advised in Ferro (2017)
+      double ign_conv_oerr, ign_corr_oerr;
+
       // Bias ratio information
       int n_ge_obs, n_lt_obs;
       double me_ge_obs, me_lt_obs;
