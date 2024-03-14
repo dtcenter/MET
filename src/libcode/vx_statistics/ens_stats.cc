@@ -181,13 +181,15 @@ void ECNTInfo::clear() {
    crps_emp_fair    = spread_md   = bad_data_double;
    crps_gaus        = crpscl_gaus = crpss_gaus = bad_data_double;
    ign              = bad_data_double;
-   me               = mae        = rmse        = spread        = bad_data_double;
-   me_oerr          = mae_oerr   = rmse_oerr   = spread_oerr   = bad_data_double;
+   me               = mae         = rmse       = spread      = bad_data_double;
+   me_oerr          = mae_oerr    = rmse_oerr  = spread_oerr = bad_data_double;
    spread_plus_oerr = bad_data_double;
 
-   n_ge_obs   = n_lt_obs   = 0;
-   me_ge_obs  = me_lt_obs  = bias_ratio  = bad_data_double;
-   
+   ign_conv_oerr = ign_corr_oerr = bad_data_double;
+
+   n_ge_obs  = n_lt_obs  = 0;
+   me_ge_obs = me_lt_obs = bias_ratio = bad_data_double;
+
    return;
 }
 
@@ -221,6 +223,8 @@ void ECNTInfo::assign(const ECNTInfo &c) {
    rmse_oerr        = c.rmse_oerr;
    spread_oerr      = c.spread_oerr;
    spread_plus_oerr = c.spread_plus_oerr;
+   ign_conv_oerr    = c.ign_conv_oerr;
+   ign_corr_oerr    = c.ign_corr_oerr;
 
    n_ge_obs         = c.n_ge_obs;
    n_lt_obs         = c.n_lt_obs;
@@ -360,6 +364,10 @@ void ECNTInfo::set(const PairDataEnsemble &pd) {
 
    // Compute the square root of the average variance plus oerr
    spread_plus_oerr = square_root(pd.var_plus_oerr_na.wmean(pd.wgt_na));
+
+   // Compute log scores with observational uncertainty
+   ign_conv_oerr = pd.ign_conv_oerr_na.wmean(pd.wgt_na);
+   ign_corr_oerr = pd.ign_corr_oerr_na.wmean(pd.wgt_na);
 
    // Compute bias ratio terms 
    n_ge_obs  = nint(pd.n_ge_obs_na.sum());

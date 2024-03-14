@@ -726,6 +726,8 @@ extern int  min_int(const int *, int);
 //
 ////////////////////////////////////////////////////////////////////////
 
+extern double compute_mean(double, int);
+
 extern double compute_variance(double, double, int);
 
 extern double compute_stdev(double, double, int);

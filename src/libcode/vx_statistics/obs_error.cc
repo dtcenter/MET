@@ -5,6 +5,7 @@
 // ** Research Applications Lab (RAL)
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+
 ////////////////////////////////////////////////////////////////////////
 
 #include <cstdio>
@@ -180,6 +181,12 @@ void ObsErrorEntry::dump(ostream & out, int depth) const {
    out << prefix << "max = " << v_max << "\n";
 
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double ObsErrorEntry::variance() const {
+   return dist_var(dist_type, dist_parm[0], dist_parm[1]);
 }
 
 ////////////////////////////////////////////////////////////////////////

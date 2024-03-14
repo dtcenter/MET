@@ -108,6 +108,9 @@ void PairDataEnsemble::clear() {
    ign_na.clear();
    pit_na.clear();
 
+   ign_conv_oerr_na.clear();
+   ign_corr_oerr_na.clear();
+
    n_ge_obs_na.clear();
    me_ge_obs_na.clear();
    n_lt_obs_na.clear();
@@ -179,6 +182,8 @@ void PairDataEnsemble::extend(int n) {
    crpscl_gaus_na.extend     (n);
    ign_na.extend             (n);
    pit_na.extend             (n);
+   ign_conv_oerr_na.extend   (n);
+   ign_corr_oerr_na.extend   (n);
    n_ge_obs_na.extend        (n);
    me_ge_obs_na.extend       (n);
    n_lt_obs_na.extend        (n);
@@ -235,14 +240,19 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
    // PairDataEnsemble
    v_na             = pd.v_na;
    r_na             = pd.r_na;
+
    crps_emp_na      = pd.crps_emp_na;
    crps_emp_fair_na = pd.crps_emp_fair_na;
    spread_md_na     = pd.spread_md_na;
    crpscl_emp_na    = pd.crpscl_emp_na;
    crps_gaus_na     = pd.crps_gaus_na;
    crpscl_gaus_na   = pd.crpscl_gaus_na;
+
    ign_na           = pd.ign_na;
    pit_na           = pd.pit_na;
+
+   ign_conv_oerr_na = pd.ign_conv_oerr_na;
+   ign_corr_oerr_na = pd.ign_corr_oerr_na;
 
    n_ge_obs_na    = pd.n_ge_obs_na;
    me_ge_obs_na   = pd.me_ge_obs_na;
@@ -449,6 +459,8 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
          crpscl_gaus_na.add(bad_data_double);
          ign_na.add(bad_data_double);
          pit_na.add(bad_data_double);
+         ign_conv_oerr_na.add(bad_data_double);
+         ign_corr_oerr_na.add(bad_data_double);
          n_ge_obs_na.add(bad_data_double);
          me_ge_obs_na.add(bad_data_double);
          n_lt_obs_na.add(bad_data_double);
@@ -461,22 +473,41 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
          var_unperturbed = compute_variance(esum_na[i], esumsq_na[i], esumn_na[i]);
          var_na.add(var_unperturbed);
 
-         // Process the observation error information.
+         // Process the observation error information
          ObsErrorEntry * e = (has_obs_error() ? obs_error_entry[i] : 0);
          if(e) {
+
+            // Get observation error variance
+            double oerr_var = e->variance();
+
+            // Compute the observation error log scores
+            double v_conv, v_corr;
+            compute_obs_error_log_scores(
+               compute_mean(esum_na[i], esumn_na[i]),
+               compute_stdev(esum_na[i], esumsq_na[i], esumn_na[i]),
+               o_na[i], oerr_var,
+               v_conv, v_corr);
+            ign_conv_oerr_na.add(v_conv);
+            ign_corr_oerr_na.add(v_corr);
 
             // Compute perturbed ensemble mean and variance
             // Exclude the control member from the variance
             mn_oerr_na.add(cur_ens.mean());
             var_oerr_na.add(cur_ens.variance(ctrl_index));
 
-            // Compute the variance plus observation error variance.
-            var_plus_oerr_na.add(var_unperturbed +
-                                 dist_var(e->dist_type,
-                                          e->dist_parm[0], e->dist_parm[1]));
+            // Compute the variance plus observation error variance
+            if(is_bad_data(var_unperturbed) ||
+               is_bad_data(oerr_var)) {
+               var_plus_oerr_na.add(bad_data_double);
+            }
+            else {
+               var_plus_oerr_na.add(var_unperturbed + oerr_var);
+            }
          }
-         // If no observation error specified, store bad data values.
+         // If no observation error specified, store bad data values
          else {
+            ign_conv_oerr_na.add(bad_data_double);
+            ign_corr_oerr_na.add(bad_data_double);
             mn_oerr_na.add(bad_data_double);
             var_oerr_na.add(bad_data_double);
             var_plus_oerr_na.add(bad_data_double);
@@ -506,8 +537,8 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
          derive_climo_vals(cdf_info_ptr, cmn_na[i], csd_na[i], cur_clm);
 
          // Store empirical CRPS stats
-         //
-         // For crps_emp use temporary, local variable so we can use it for the crps_emp_fair calculation
+         // For crps_emp use temporary, local variable so we can use it
+         // for the crps_emp_fair calculation
          double crps_emp = compute_crps_emp(o_na[i], cur_ens);
          crps_emp_na.add(crps_emp);
          crps_emp_fair_na.add(crps_emp - cur_ens.wmean_abs_diff());
@@ -528,9 +559,10 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
          // Compute the Bias Ratio terms 
          int n_ge_obs, n_lt_obs;
          double me_ge_obs, me_lt_obs;
-         compute_bias_ratio_terms(o_na[i], cur_ens,
-                                  n_ge_obs, me_ge_obs,
-                                  n_lt_obs, me_lt_obs);
+         compute_bias_ratio_terms(
+            o_na[i], cur_ens,
+            n_ge_obs, me_ge_obs,
+            n_lt_obs, me_lt_obs);
 
          // Store the Bias Ratio terms 
          n_ge_obs_na.add(n_ge_obs);
@@ -864,8 +896,11 @@ PairDataEnsemble PairDataEnsemble::subset_pairs_obs_thresh(const SingleThresh &o
       //
       // Include in subset:
       //   wgt_na, o_na, cmn_na, csd_na, v_na, r_na,
-      //   crps_emp_na, crps_emp_fair_na, spread_md_na, crpscl_emp_na, crps_gaus_na, crpscl_gaus_na,
-      //   ign_na, pit_na, n_gt_obs_na, me_gt_obs_na, n_lt_obs_na, me_lt_obs_na,
+      //   crps_emp_na, crps_emp_fair_na, spread_md_na,
+      //   crpscl_emp_na, crps_gaus_na, crpscl_gaus_na,
+      //   ign_na, pit_na,
+      //   ign_conv_oerr, ign_corr_oerr,
+      //   n_gt_obs_na, me_gt_obs_na, n_lt_obs_na, me_lt_obs_na,
       //   var_na, var_oerr_na, var_plus_oerr_na,
       //   mn_na, mn_oerr_na, e_na
       //
@@ -888,6 +923,8 @@ PairDataEnsemble PairDataEnsemble::subset_pairs_obs_thresh(const SingleThresh &o
       pd.crpscl_gaus_na.add(crpscl_gaus_na[i]);
       pd.ign_na.add(ign_na[i]);
       pd.pit_na.add(pit_na[i]);
+      pd.ign_conv_oerr_na.add(ign_conv_oerr_na[i]);
+      pd.ign_corr_oerr_na.add(ign_corr_oerr_na[i]);
       pd.n_ge_obs_na.add(n_ge_obs_na[i]);
       pd.me_ge_obs_na.add(me_ge_obs_na[i]);
       pd.n_lt_obs_na.add(n_lt_obs_na[i]);
@@ -1498,7 +1535,7 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
         y < 0 || y >= gr.ny()) return;
 
    // For pressure levels, check if the observation pressure level
-   // falls in the requsted range.
+   // falls in the requested range.
    if(obs_info_grib->level().type() == LevelType_Pres) {
 
       if(obs_lvl < obs_info_grib->level().lower() ||
@@ -1593,7 +1630,8 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
       }
    }
 
-   // Apply observation error logic bias correction, if requested
+   // Apply observation error additive and multiplicative
+   // bias correction, if requested
    if(obs_error_info->flag) {
       obs_v = add_obs_error_bc(obs_error_info->rng_ptr,
                                FieldType_Obs, oerr_ptr, obs_v);
@@ -2111,5 +2149,52 @@ double compute_bias_ratio(double me_ge_obs, double me_lt_obs) {
 
    return v;
 }
-            
+
+////////////////////////////////////////////////////////////////////////
+
+void compute_obs_error_log_scores(double emn, double esd,
+                                  double obs, double oerr_var,
+                                  double &v_conv, double &v_corr) {
+
+   const char *method_name = "compute_obs_error_log_scores() -> ";
+
+   // Check for bad input data
+   if(is_bad_data(emn) ||
+      is_bad_data(esd) ||
+      is_bad_data(obs) ||
+      is_bad_data(oerr_var)) {
+      v_conv = v_corr = bad_data_double;
+   }
+   else {
+      double sigma2 = esd * esd;
+      double ov2    = oerr_var * oerr_var;
+
+      // Error-convolved logarithmic scoring rule in
+      // Ferro (2017, Eq 5) doi:10.1002/qj.3115
+      // Scale by 2.0 * pi for consistency with ignorance score
+      v_conv = 0.5 * log(2.0 * pi * (sigma2 + ov2)) +
+               ((obs - emn) * (obs - emn)) /
+               (2.0 * (sigma2 + ov2));
+
+      // Error-corrected logarithmic scoring rule in
+      // Ferro (2017, Eq 7) doi:10.1002/qj.3115
+      // Scale by 2.0 * pi for consistency with ignorance score
+      v_corr = 0.5 * log(2.0 * pi * sigma2) +
+               ((obs - emn) * (obs - emn) - ov2) /
+               (2.0 * sigma2);
+   }
+
+   if(mlog.verbosity_level() >= 10) {
+      mlog << Debug(10) << method_name
+           << "inputs (emn = " << emn
+           << ", esd = " << esd
+           << ", obs = " << obs
+           << ", oerr_var = " << oerr_var
+           << ") and outputs (ign_oerr_conv = " << v_conv
+           << ", ign_oerr_corr = " << v_corr << ")\n";
+   }
+
+   return;
+}
+
 ////////////////////////////////////////////////////////////////////////

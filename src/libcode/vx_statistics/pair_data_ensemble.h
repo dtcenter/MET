@@ -6,6 +6,8 @@
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
+////////////////////////////////////////////////////////////////////////
+
 #ifndef  __PAIR_DATA_ENSEMBLE_H__
 #define  __PAIR_DATA_ENSEMBLE_H__
 
@@ -74,64 +76,67 @@ class PairDataEnsemble : public PairBase {
       bool                  obs_error_flag;
 
       // Ensemble, valid count, and rank values
-      NumArray  *e_na;            // Ensemble values [n_ens][n_obs]
-      NumArray   v_na;            // Number of valid ensemble values [n_obs]
-      NumArray   r_na;            // Observation ranks [n_obs]
+      NumArray  *e_na;             // Ensemble values [n_ens][n_obs]
+      NumArray   v_na;             // Number of valid ensemble values [n_obs]
+      NumArray   r_na;             // Observation ranks [n_obs]
 
-      NumArray   crps_emp_na;       // Empirical Continuous Ranked Probability Score [n_obs]
-      NumArray   crps_emp_fair_na;  // Fair Empirical Continuous Ranked Probability Score [n_obs]
-      NumArray   spread_md_na;      // Mean absolute difference of ensemble members [n_obs]
-      NumArray   crpscl_emp_na;     // Empirical climatological CRPS [n_obs]
+      NumArray   crps_emp_na;      // Empirical Continuous Ranked Probability Score [n_obs]
+      NumArray   crps_emp_fair_na; // Fair Empirical Continuous Ranked Probability Score [n_obs]
+      NumArray   spread_md_na;     // Mean absolute difference of ensemble members [n_obs]
+      NumArray   crpscl_emp_na;    // Empirical climatological CRPS [n_obs]
 
-      NumArray   crps_gaus_na;    // Gaussian CRPS [n_obs]
-      NumArray   crpscl_gaus_na;  // Gaussian climatological CRPS [n_obs]
+      NumArray   crps_gaus_na;     // Gaussian CRPS [n_obs]
+      NumArray   crpscl_gaus_na;   // Gaussian climatological CRPS [n_obs]
 
-      NumArray   ign_na;          // Ignorance Score [n_obs]
-      NumArray   pit_na;          // Probability Integral Transform [n_obs]
+      NumArray   ign_na;           // Ignorance Score [n_obs]
+      NumArray   pit_na;           // Probability Integral Transform [n_obs]
 
-      NumArray   n_ge_obs_na;     // Number of ensemble memebers >= obs [n_obs]
-      NumArray   me_ge_obs_na;    // Mean error of ensemble members >= obs [n_obs]
-      NumArray   n_lt_obs_na;     // Number of ensemble members < obs [n_obs]
-      NumArray   me_lt_obs_na;    // Mean error of ensemble members < obs [n_obs]
+      NumArray   ign_conv_oerr_na; // Error convolved log score [n_obs]
+      NumArray   ign_corr_oerr_na; // Error corrected log score [n_obs]
 
-      int        n_ens;           // Number of ensemble members
-      int        n_pair;          // Number of valid pairs, n_obs - sum(skip_ba)
-      int        ctrl_index;      // Index of the control member
-      bool       skip_const;      // Skip cases where the observation and
-                                  // all ensemble members are constant
-      BoolArray  skip_ba;         // Flag for each observation [n_obs]
+      NumArray   n_ge_obs_na;      // Number of ensemble memebers >= obs [n_obs]
+      NumArray   me_ge_obs_na;     // Mean error of ensemble members >= obs [n_obs]
+      NumArray   n_lt_obs_na;      // Number of ensemble members < obs [n_obs]
+      NumArray   me_lt_obs_na;     // Mean error of ensemble members < obs [n_obs]
 
-      NumArray   rhist_na;        // Ranked Histogram [n_ens+1]
-      NumArray   relp_na;         // Relative Position Histogram [n_ens]
+      int        n_ens;            // Number of ensemble members
+      int        n_pair;           // Number of valid pairs, n_obs - sum(skip_ba)
+      int        ctrl_index;       // Index of the control member
+      bool       skip_const;       // Skip cases where the observation and
+                                   // all ensemble members are constant
+      BoolArray  skip_ba;          // Flag for each observation [n_obs]
 
-      double     phist_bin_size;  // Ensemble PIT histogram bin width
-      NumArray   phist_na;        // PIT Histogram [n_phist_bin]
+      NumArray   rhist_na;         // Ranked Histogram [n_ens+1]
+      NumArray   relp_na;          // Relative Position Histogram [n_ens]
+
+      double     phist_bin_size;   // Ensemble PIT histogram bin width
+      NumArray   phist_na;         // PIT Histogram [n_phist_bin]
 
       NumArray   var_na;           // Variance of unperturbed members [n_obs]
       NumArray   var_oerr_na;      // Variance of perturbed members [n_obs]
       NumArray   var_plus_oerr_na; // Unperturbed variance plus observation error variance [n_obs]
 
-      NumArray   esum_na;         // Sum of unperturbed ensemble values [n_obs]
-      NumArray   esumsq_na;       // Sum of unperturbed ensemble squared values [n_obs]
-      NumArray   esumn_na;        // Count of ensemble values [n_obs]
+      NumArray   esum_na;          // Sum of unperturbed ensemble values [n_obs]
+      NumArray   esumsq_na;        // Sum of unperturbed ensemble squared values [n_obs]
+      NumArray   esumn_na;         // Count of ensemble values [n_obs]
 
-      NumArray   mn_na;           // Ensemble mean value [n_obs]
-      NumArray   mn_oerr_na;      // Mean of perturbed members [n_obs]
+      NumArray   mn_na;            // Ensemble mean value [n_obs]
+      NumArray   mn_oerr_na;       // Mean of perturbed members [n_obs]
 
-      double     ssvar_bin_size;  // Variance bin size for spread/skill
-      SSVARInfo *ssvar_bins;      // Ensemble spread/skill bin information [n_ssvar_bin]
+      double     ssvar_bin_size;   // Variance bin size for spread/skill
+      SSVARInfo *ssvar_bins;       // Ensemble spread/skill bin information [n_ssvar_bin]
 
-      double     crpss_emp;       // Empirical CRPS skill score
-      double     crpss_gaus;      // Guassian CRPS skill score
+      double     crpss_emp;        // Empirical CRPS skill score
+      double     crpss_gaus;       // Guassian CRPS skill score
 
-      double     me;              // ME for ensemble mean
-      double     mae;             // MAE for ensemble mean
-      double     rmse;            // RMSE for ensemble mean
-      double     me_oerr;         // ME for mean of perturbed members
-      double     mae_oerr;        // MAE for mean of perturbed members
-      double     rmse_oerr;       // RMSE for mean of perturbed members
+      double     me;               // ME for ensemble mean
+      double     mae;              // MAE for ensemble mean
+      double     rmse;             // RMSE for ensemble mean
+      double     me_oerr;          // ME for mean of perturbed members
+      double     mae_oerr;         // MAE for mean of perturbed members
+      double     rmse_oerr;        // RMSE for mean of perturbed members
 
-      double     bias_ratio;      // Bias ratio
+      double     bias_ratio;       // Bias ratio
 
       //////////////////////////////////////////////////////////////////
 
@@ -323,6 +328,9 @@ extern double compute_ens_pit(double, double, double);
 extern void   compute_bias_ratio_terms(double, const NumArray &,
                                        int &, double &, int &, double &);
 extern double compute_bias_ratio(double, double);
+extern void   compute_obs_error_log_scores(
+                 double, double, double, double,
+                 double &, double &);
 
 ////////////////////////////////////////////////////////////////////////
 
