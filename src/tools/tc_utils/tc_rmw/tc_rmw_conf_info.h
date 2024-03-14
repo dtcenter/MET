@@ -50,7 +50,6 @@ class TCRMWConfInfo {
         // Range/Azimuth information
         int    n_range;
         int    n_azimuth;
-        double max_range_km;
         double delta_range_km;
         double rmw_scale;
 

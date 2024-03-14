@@ -98,9 +98,8 @@ regrid = {
 //
 n_range        = 100;
 n_azimuth      = 180;
-max_range_km   = 1000.0;
 delta_range_km = 10.0;
-rmw_scale      = 0.2;
+rmw_scale      = NA;
 
 //
 // Optionally convert u/v winds to tangential/radial winds

@@ -15,6 +15,7 @@
 //   Mod#   Date      Name          Description
 //   ----   ----      ----          -----------
 //   000    09/27/22  Halley Gotway New
+//   001    03/11/24  Halley Gotway MET#2833 range/azimuth grid
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -1557,7 +1558,9 @@ void TmpFileInfo::setup_nc_file(const DomainInfo &di,
    // Set grid center
    d.lat_center   =      pnt_ptr->lat();
    d.lon_center   = -1.0*pnt_ptr->lon(); // degrees east to west
-   d.range_max_km = di.delta_range_km * d.range_n;
+
+   // MET #2833 multiply by n-1 since the ranges begin at 0 km
+   d.range_max_km = di.delta_range_km * (d.range_n - 1);
 
    // Instantiate the grid
    grid_out.set(d);
