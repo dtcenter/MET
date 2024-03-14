@@ -31,12 +31,12 @@ class ModeSuperObject {
  public:
 
    ModeSuperObject(bool isFcst, int n_files, bool do_clusters,
-                   const vector<MultiVarData *> &mvd,
+                   const std::vector<MultiVarData *> &mvd,
                    BoolCalc &calc);
    inline ~ModeSuperObject() {}
 
-   void mask_data_simple(const string &name, MultiVarData &mvd) const;
-   void mask_data_super(const string &name, const MultiVarData &mvd);
+   void mask_data_simple(const std::string &name, MultiVarData &mvd) const;
+   void mask_data_super(const std::string &name, const MultiVarData &mvd);
 
    bool _isFcst;
    bool _hasUnion;

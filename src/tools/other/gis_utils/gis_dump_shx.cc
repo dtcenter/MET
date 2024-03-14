@@ -12,7 +12,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
 
 #include <unistd.h>
 #include <sys/types.h>
@@ -27,6 +26,8 @@ using namespace std;
 #include "vx_log.h"
 
 #include "shx_file.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -126,7 +127,7 @@ cout << "\n\n   Read " << count << " records\n\n";
 
 close(fd);
 
-return ( 0 );
+return 0;
 
 }
 

@@ -88,7 +88,7 @@ static SeriesAnalysisConfInfo conf_info;
 ////////////////////////////////////////////////////////////////////////
 
 // Output NetCDF file
-static netCDF::NcFile *nc_out  = (netCDF::NcFile *) 0;
+static netCDF::NcFile *nc_out  = (netCDF::NcFile *) nullptr;
 static netCDF::NcDim  lat_dim;
 static netCDF::NcDim  lon_dim ;
 
@@ -113,11 +113,11 @@ static int n_reads = 1; // Initialize to at least one pass
 
 // Data file factory and input files
 static Met2dDataFileFactory mtddf_factory;
-static Met2dDataFile *fcst_mtddf = (Met2dDataFile *) 0;
-static Met2dDataFile *obs_mtddf  = (Met2dDataFile *) 0;
+static Met2dDataFile *fcst_mtddf = (Met2dDataFile *) nullptr;
+static Met2dDataFile *obs_mtddf  = (Met2dDataFile *) nullptr;
 
 // Pointer to the random number generator to be used
-static gsl_rng *rng_ptr = (gsl_rng *) 0;
+static gsl_rng *rng_ptr = (gsl_rng *) nullptr;
 
 // Enumeration of ways that a series can be defined
 enum SeriesType {

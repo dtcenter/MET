@@ -8,8 +8,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <dirent.h>
 #include <iostream>
 #include <unistd.h>
@@ -22,6 +20,8 @@ using namespace std;
 
 #include "vx_data2d_factory.h"
 #include "vx_log.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -46,8 +46,8 @@ SeriesAnalysisConfInfo::~SeriesAnalysisConfInfo() {
 void SeriesAnalysisConfInfo::init_from_scratch() {
 
    // Initialize pointers
-   fcst_info = (VarInfo **)    0;
-   obs_info  = (VarInfo **)    0;
+   fcst_info = (VarInfo **) nullptr;
+   obs_info  = (VarInfo **) nullptr;
 
    clear();
 
@@ -92,15 +92,15 @@ void SeriesAnalysisConfInfo::clear() {
    // Clear fcst_info
    if(fcst_info) {
       for(i=0; i<n_fcst; i++)
-         if(fcst_info[i]) { delete fcst_info[i]; fcst_info[i] = (VarInfo *) 0; }
-      delete fcst_info; fcst_info = (VarInfo **) 0;
+         if(fcst_info[i]) { delete fcst_info[i]; fcst_info[i] = (VarInfo *) nullptr; }
+      delete fcst_info; fcst_info = (VarInfo **) nullptr;
    }
 
    // Clear obs_info
    if(obs_info) {
       for(i=0; i<n_obs; i++)
-         if(obs_info[i]) { delete obs_info[i]; obs_info[i] = (VarInfo *) 0; }
-      delete obs_info; obs_info = (VarInfo **) 0;
+         if(obs_info[i]) { delete obs_info[i]; obs_info[i] = (VarInfo *) nullptr; }
+      delete obs_info; obs_info = (VarInfo **) nullptr;
    }
 
    // Reset counts
@@ -136,8 +136,8 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
    StringArray sa;
    ThreshArray cur_ta;
    VarInfoFactory info_factory;
-   Dictionary *fdict = (Dictionary *) 0;
-   Dictionary *odict = (Dictionary *) 0;
+   Dictionary *fdict = (Dictionary *) nullptr;
+   Dictionary *odict = (Dictionary *) nullptr;
    Dictionary i_fdict, i_odict;
    BootInfo boot_info;
    map<STATLineType,StringArray>::iterator it;
@@ -220,8 +220,8 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
    obs_info  = new VarInfo * [n_obs];
 
    // Initialize pointers
-   for(i=0; i<n_fcst; i++) fcst_info[i] = (VarInfo *) 0;
-   for(i=0; i<n_obs;  i++) obs_info[i]  = (VarInfo *) 0;
+   for(i=0; i<n_fcst; i++) fcst_info[i] = (VarInfo *) nullptr;
+   for(i=0; i<n_obs;  i++) obs_info[i]  = (VarInfo *) nullptr;
 
    // Conf: fcst.cat_thresh and obs.cat_thresh
    fcat_ta = fdict->lookup_thresh_array(conf_key_cat_thresh);

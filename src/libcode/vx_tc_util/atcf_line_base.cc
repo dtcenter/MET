@@ -8,8 +8,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -22,6 +20,8 @@ using namespace std;
 
 #include "atcf_line_base.h"
 #include "atcf_offsets.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -56,11 +56,11 @@ ATCFLineBase::ATCFLineBase(const ATCFLineBase &l) {
 
 ATCFLineBase & ATCFLineBase::operator=(const ATCFLineBase &l) {
 
-   if(this == &l) return(*this);
+   if(this == &l) return *this;
 
    assign(l);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -79,10 +79,10 @@ void ATCFLineBase::init_from_scratch() {
    set_delimiter(",");
 
    // Initialize pointers
-   BasinMap      = (map<ConcatString,ConcatString> *) 0;
-   BestTechnique = (StringArray *) 0;
-   OperTechnique = (StringArray *) 0;
-   TechSuffix    = (ConcatString *) 0;
+   BasinMap      = (map<ConcatString,ConcatString> *) nullptr;
+   BestTechnique = (StringArray *) nullptr;
+   OperTechnique = (StringArray *) nullptr;
+   TechSuffix    = (ConcatString *) nullptr;
 
    clear();
 
@@ -167,7 +167,7 @@ int ATCFLineBase::read_line(LineDataFile * ldf) {
    // Check for bad return status or blank line
    if(!status || n_items() == 0) {
       clear();
-      return(0);
+      return 0;
    }
 
    // Set the line type from the technique number column
@@ -194,14 +194,14 @@ int ATCFLineBase::read_line(LineDataFile * ldf) {
       }
    }
 
-   return(1);
+   return 1;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool ATCFLineBase::is_header() const {
-    if(basin().comparecase(0, 5, "BASIN") == 0) return(true);
-    else                                        return(false);
+    if(basin().comparecase(0, 5, "BASIN") == 0) return true;
+    else                                        return false;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -224,7 +224,7 @@ ConcatString ATCFLineBase::get_item(int i) const {
    // Strip off any whitespace
    cs.ws_strip();
 
-   return(cs);
+   return cs;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -232,42 +232,42 @@ ConcatString ATCFLineBase::get_item(int i) const {
 ConcatString ATCFLineBase::get_line() const {
    ConcatString cs;
 
-   if(N_items == 0) return(cs);
+   if(N_items == 0) return cs;
 
    for(int i=0; i<N_items-1; i++) cs << DataLine::get_item(i) << DataLine::get_delimiter();
    cs << DataLine::get_item(N_items-1);
 
-   return(cs);
+   return cs;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 ATCFLineType ATCFLineBase::type() const {
-   return(Type);
+   return Type;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 ConcatString ATCFLineBase::basin() const {
-   return(Basin);
+   return Basin;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 ConcatString ATCFLineBase::cyclone_number() const {
-   return(get_item(CycloneNumberOffset));
+   return get_item(CycloneNumberOffset);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 unixtime ATCFLineBase::warning_time() const {
-   return(parse_time(get_item(WarningTimeOffset).c_str()));
+   return parse_time(get_item(WarningTimeOffset).c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 int ATCFLineBase::technique_number() const {
-   return(parse_int(get_item(TechniqueNumberOffset).c_str()));
+   return parse_int(get_item(TechniqueNumberOffset).c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -291,25 +291,25 @@ ConcatString ATCFLineBase::technique() const {
       cs.replace("AVN", "GFS");
    }
 
-   return(cs);
+   return cs;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 int ATCFLineBase::forecast_period() const {
-   return(parse_int(get_item(ForecastPeriodOffset).c_str()));
+   return parse_int(get_item(ForecastPeriodOffset).c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 double ATCFLineBase::lat() const {
-   return(parse_lat(get_item(LatTenthsOffset).c_str()));
+   return parse_lat(get_item(LatTenthsOffset).c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 double ATCFLineBase::lon() const {
-   return(parse_lon(get_item(LonTenthsOffset).c_str()));
+   return parse_lon(get_item(LonTenthsOffset).c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -330,13 +330,13 @@ unixtime ATCFLineBase::valid() const {
       ut += sec_per_minute * tn;
    }
 
-   return(ut);
+   return ut;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 int ATCFLineBase::valid_hour() const {
-   return(unix_to_sec_of_day(valid()));
+   return unix_to_sec_of_day(valid());
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -353,7 +353,7 @@ int ATCFLineBase::lead() const {
       s = sec_per_hour * fp;
    }
 
-   return(s);
+   return s;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -372,7 +372,7 @@ ConcatString ATCFLineBase::storm_id() const {
                            cyclone_number());
    }
 
-   return(cs);
+   return cs;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -391,7 +391,7 @@ unixtime parse_time(const char *s) {
       exit(1);
    }
 
-   return(mdyhms_to_unix(month, day, year, hour, 0, 0));
+   return mdyhms_to_unix(month, day, year, hour, 0, 0);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -420,7 +420,7 @@ double parse_lat(const char *s) {
    // Range check
    if(is_bad_data(v) || v < -90.0 || v > 90.0) v = bad_data_double;
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -449,7 +449,7 @@ double parse_lon(const char *s) {
    // Range check
    if(is_bad_data(v) || v < -360.0 || v > 360.0) v = bad_data_double;
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -463,7 +463,7 @@ int parse_int(const char *s, const int bad_data) {
    // Check bad data value
    if(v == bad_data) v = bad_data_int;
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -473,7 +473,7 @@ int parse_int(const char *s, const int bad_data) {
 ////////////////////////////////////////////////////////////////////////
 
 int parse_int_check_zero(const char *s) {
-   return(parse_int(s, 0));
+   return parse_int(s, 0);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -497,13 +497,13 @@ ATCFLineType string_to_atcflinetype(const char *s) {
    else if(strcasecmp(s, "ER") == 0) t = ATCFLineType_ProbER;
    else                              t = NoATCFLineType;
 
-   return(t);
+   return t;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 ConcatString atcflinetype_to_string(const ATCFLineType t) {
-   const char *s = (const char *) 0;
+   const char *s = (const char *) nullptr;
 
    switch(t) {
       case ATCFLineType_Track:    s = "Track";    break;
@@ -521,7 +521,7 @@ ConcatString atcflinetype_to_string(const ATCFLineType t) {
       default:                    s = na_str;     break;
    }
 
-   return(ConcatString(s));
+   return ConcatString(s);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -548,7 +548,7 @@ ConcatString define_storm_id(unixtime init_ut, unixtime min_valid_ut,
       storm_id << basin << cyclone << year;
    }
 
-   return(storm_id);
+   return storm_id;
 }
 
 ////////////////////////////////////////////////////////////////////////

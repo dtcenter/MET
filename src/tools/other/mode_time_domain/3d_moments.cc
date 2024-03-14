@@ -11,8 +11,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -21,6 +19,8 @@ using namespace std;
 #include "3d_moments.h"
 #include "trig.h"
 #include "vx_log.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -76,11 +76,11 @@ Mtd_3D_Moments & Mtd_3D_Moments::operator=(const Mtd_3D_Moments & m)
 
 {
 
-if ( this == &m )  return ( * this );
+if ( this == &m )  return *this;
 
 assign(m);
 
-return ( * this );
+return *this;
 
 }
 
@@ -280,7 +280,7 @@ bot = (Sxx - Syy)*Stt + Syt*Syt - Sxt*Sxt;
 
 angle = 0.5*atan2d(top, bot);
 
-return ( angle );
+return angle;
 
 }
 

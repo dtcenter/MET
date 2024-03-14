@@ -1,9 +1,14 @@
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+// ** Copyright UCAR (c) 1992 - 2024
+// ** University Corporation for Atmospheric Research (UCAR)
+// ** National Center for Atmospheric Research (NCAR)
+// ** Research Applications Lab (RAL)
+// ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
 ////////////////////////////////////////////////////////////////////////
 
-
-using namespace std;
 
 #include <iostream>
 #include <unistd.h>
@@ -14,7 +19,6 @@ using namespace std;
 #include <time.h>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "file_exists.h"
 
@@ -22,6 +26,10 @@ using namespace netCDF;
 #include "vx_log.h"
 #include "nc_utils.h"
 #include "seeps.h"
+
+using namespace std;
+using namespace netCDF;
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -121,7 +129,7 @@ void SeepsAggScore::clear() {
 SeepsAggScore & SeepsAggScore::operator+=(const SeepsAggScore &c) {
 
    // Check for degenerate case
-   if(n_obs == 0 && c.n_obs == 0) return(*this);
+   if(n_obs == 0 && c.n_obs == 0) return *this;
 
    // Compute weights
    double w1 = (double)   n_obs / (n_obs + c.n_obs);
@@ -160,7 +168,7 @@ SeepsAggScore & SeepsAggScore::operator+=(const SeepsAggScore &c) {
    score          = weighted_average(score,          w1, c.score,          w2);
    weighted_score = weighted_average(weighted_score, w1, c.weighted_score, w2);
 
-   return(*this);
+   return *this;
 }
 
 

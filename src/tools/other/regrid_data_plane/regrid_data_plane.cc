@@ -28,7 +28,6 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
@@ -44,7 +43,6 @@ using namespace std;
 #include <unistd.h>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "main.h"
 #include "vx_log.h"
@@ -57,6 +55,10 @@ using namespace netCDF;
 #include "vx_statistics.h"
 
 #include "GridTemplate.h"
+
+using namespace std;
+using namespace netCDF;
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -78,7 +80,7 @@ static StringArray VarNameSA;
 static int compress_level = -1;
 
 // Output NetCDF file
-static NcFile *nc_out  = (NcFile *) 0;
+static NcFile *nc_out  = (NcFile *) nullptr;
 static NcDim  lat_dim ;
 static NcDim  lon_dim ;
 
@@ -116,7 +118,7 @@ int met_main(int argc, char *argv[]) {
    // Process the input data file
    process_data_file();
 
-   return(0);
+   return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -219,7 +221,7 @@ void process_data_file() {
    //Variables for GOES
    unixtime valid_time = 0;
    bool opt_all_attrs = false;
-   NcFile *nc_in = (NcFile *)0;
+   NcFile *nc_in = (NcFile *) nullptr;
    static const char *method_name = "process_data_file() ";
 
    // Initialize configuration object
@@ -235,7 +237,7 @@ void process_data_file() {
 
    // Read the input data file
    Met2dDataFileFactory m_factory;
-   Met2dDataFile *fr_mtddf = (Met2dDataFile *) 0;
+   Met2dDataFile *fr_mtddf = (Met2dDataFile *) nullptr;
 
    // Determine the "from" grid
    mlog << Debug(1)  << "Reading data file: " << InputFilename << "\n";
@@ -348,8 +350,8 @@ void process_data_file() {
    delete nc_in;  nc_in  = 0;
 
    // Clean up
-   if(fr_mtddf) { delete fr_mtddf; fr_mtddf = (Met2dDataFile *) 0; }
-   if(vinfo)    { delete vinfo;    vinfo    = (VarInfo *)       0; }
+   if(fr_mtddf) { delete fr_mtddf; fr_mtddf = (Met2dDataFile *) nullptr; }
+   if(vinfo)    { delete vinfo;    vinfo    = (VarInfo *)       nullptr; }
 
    return;
 }
@@ -408,7 +410,7 @@ void write_nc_data(const DataPlane &dp, const Grid &grid, NcVar *data_var) {
    }
 
    // Clean up
-   if(data) { delete [] data;  data = (float *)  0; }
+   if(data) { delete [] data;  data = (float *) nullptr; }
 
    return;
 }
@@ -439,7 +441,7 @@ void close_nc() {
 
    // Clean up
    if(nc_out) {
-      delete nc_out; nc_out = (NcFile *) 0;
+      delete nc_out; nc_out = (NcFile *) nullptr;
    }
 
    // List the output file

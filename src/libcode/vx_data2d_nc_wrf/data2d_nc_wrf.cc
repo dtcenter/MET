@@ -10,8 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -22,6 +20,9 @@ using namespace std;
 #include "vx_nc_util.h"
 #include "vx_math.h"
 #include "vx_log.h"
+
+using namespace std;
+
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -64,7 +65,7 @@ MetNcWrfDataFile & MetNcWrfDataFile::operator=(const MetNcWrfDataFile &) {
 
 void MetNcWrfDataFile::nc_wrf_init_from_scratch() {
 
-   WrfNc  = (WrfFile *) 0;
+   WrfNc  = (WrfFile *) nullptr;
 
    close();
 
@@ -75,7 +76,7 @@ void MetNcWrfDataFile::nc_wrf_init_from_scratch() {
 
 void MetNcWrfDataFile::close() {
 
-   if(WrfNc) { delete WrfNc; WrfNc = (WrfFile *) 0; }
+   if(WrfNc) { delete WrfNc; WrfNc = (WrfFile *) nullptr; }
 
    return;
 }
@@ -93,7 +94,7 @@ bool MetNcWrfDataFile::open(const char * _filename) {
            << "unable to open NetCDF file \"" << _filename << "\"\n\n";
       close();
 
-      return(false);
+      return false;
    }
 
    Filename = _filename;
@@ -106,7 +107,7 @@ bool MetNcWrfDataFile::open(const char * _filename) {
 
    (*Dest_Grid) = (*Raw_Grid);
 
-   return(true);
+   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -125,7 +126,7 @@ bool MetNcWrfDataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
    double pressure;
    ConcatString level_str;
    VarInfoNcWrf * vinfo_nc = (VarInfoNcWrf *) &vinfo;
-   NcVarInfo *info = (NcVarInfo *) 0;
+   NcVarInfo *info = (NcVarInfo *) nullptr;
 
    // Initialize the data plane
    plane.clear();
@@ -191,7 +192,7 @@ bool MetNcWrfDataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
       }
    }
 
-   return(status);
+   return status;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -204,7 +205,7 @@ int MetNcWrfDataFile::data_plane_array(VarInfo &vinfo,
    bool found = false;
    VarInfoNcWrf *vinfo_nc = (VarInfoNcWrf *) &vinfo;
    LongArray dim = vinfo_nc->dimension();
-   NcVarInfo *info = (NcVarInfo *) 0;
+   NcVarInfo *info = (NcVarInfo *) nullptr;
 
    LongArray cur_dim;
    DataPlane cur_plane;
@@ -276,7 +277,7 @@ int MetNcWrfDataFile::data_plane_array(VarInfo &vinfo,
       }
 
       // Check for bad status
-      if(!status) return(0);
+      if(!status) return 0;
 
       // Add current plane to the data plane array
       plane_array.add(cur_plane, pressure, pressure);
@@ -302,7 +303,7 @@ int MetNcWrfDataFile::data_plane_array(VarInfo &vinfo,
                                                   << "-" << nint(min_level);
    vinfo.set_level_name(level_str.c_str());
 
-   return(n_level);
+   return n_level;
 }
 
 ////////////////////////////////////////////////////////////////////////

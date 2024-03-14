@@ -10,8 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -21,12 +19,15 @@ using namespace std;
 #include <time.h>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "vx_log.h"
 #include "is_bad_data.h"
 
 #include "nc_point_obs.h"
+
+using namespace std;
+using namespace netCDF;
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -55,7 +56,7 @@ void MetNcPointObs::init_from_scratch() {
    MetPointData::init_from_scratch();
 
    keep_nc = false;
-   obs_nc = (NcFile *) 0;
+   obs_nc = (NcFile *) nullptr;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -65,7 +66,7 @@ void MetNcPointObs::close() {
 
    if ( !keep_nc && obs_nc ) {
       delete obs_nc;
-      obs_nc = (NcFile *) 0;
+      obs_nc = (NcFile *) nullptr;
    }
 }
 

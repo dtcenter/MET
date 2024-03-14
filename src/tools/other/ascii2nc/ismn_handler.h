@@ -22,7 +22,7 @@
 
 struct obsVarInfo {
    int _gribCode;
-   string _varName;
+   std::string _varName;
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -90,12 +90,12 @@ class IsmnHandler : public FileHandler {
 
    public:
 
-      IsmnHandler(const string &program_name);
+      IsmnHandler(const std::string &program_name);
       virtual ~IsmnHandler();
 
       virtual bool isFileType(LineDataFile &ascii_file) const;
 
-      static string getFormatString() { return "ismn"; }
+      static std::string getFormatString() { return "ismn"; }
 
    protected:
 
@@ -124,8 +124,8 @@ class IsmnHandler : public FileHandler {
       StringArray _varNames;
 
       // Unchanging header information
-      string _networkName;
-      string _stationId;
+      std::string _networkName;
+      std::string _stationId;
       double _stationLat;
       double _stationLon;
       double _stationElv;

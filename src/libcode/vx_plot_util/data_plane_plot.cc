@@ -9,19 +9,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-static const int num_cbar_vals = 300;
-
-static const double one_inch = 72.0;
-
-static const int num_ticks = 9;
-
-static const bool use_flate = true;
-
-
-///////////////////////////////////////////////////////////////////////////////
-
-using namespace std;
-
 ///////////////////////////////////////////////////////////////////////////////
 //
 //   Filename:   data_plane_plot.cc
@@ -48,7 +35,19 @@ using namespace std;
 #include "vx_log.h"
 #include "data_plane_plot.h"
 
+using namespace std;
+
 ////////////////////////////////////////////////////////////////////////////////
+
+static const int num_cbar_vals = 300;
+
+static const double one_inch = 72.0;
+
+static const int num_ticks = 9;
+
+static const bool use_flate = true;
+
+///////////////////////////////////////////////////////////////////////////////
 
 void data_plane_plot(const ConcatString & inname, const ConcatString & outname,
                      const Grid & grid, const ConcatString & title,

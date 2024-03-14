@@ -18,8 +18,6 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <cstdio>
 #include <iostream>
 #include <stdlib.h>
@@ -31,6 +29,8 @@ using namespace std;
 
 #include "skill_score_index_job.h"
 #include "parse_stat_line.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -61,11 +61,11 @@ SSIndexJobInfo::SSIndexJobInfo(const SSIndexJobInfo &c) {
 
 SSIndexJobInfo & SSIndexJobInfo::operator=(const SSIndexJobInfo &c) {
 
-   if(this == &c) return(*this);
+   if(this == &c) return *this;
 
    assign(c);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -168,7 +168,7 @@ bool SSIndexJobInfo::is_keeper(const STATLine &line) {
       }
    }
 
-   return(keep);
+   return keep;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -224,7 +224,7 @@ bool SSIndexJobInfo::add(STATLine &line) {
       init_time.add(line.fcst_init_beg());
    }
 
-   return(keep);
+   return keep;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -345,7 +345,7 @@ SSIDXData SSIndexJobInfo::compute_ss_index() {
            << " since the ratio of valid terms " << n_vld << "/"
            << n_term << " < " << ss_index_vld_thresh << "!\n\n";
       data.n_vld = 0;
-      return(data);
+      return data;
    }
 
    // Compute the weighted average of the skill scores
@@ -370,7 +370,7 @@ SSIDXData SSIndexJobInfo::compute_ss_index() {
         << ss_index_name << " Weighted Average = " << ss_avg << "\n"
         << ss_index_name << " Skill Score Value = " << data.ss_index << "\n";
 
-   return(data);
+   return data;
 }
 
 ////////////////////////////////////////////////////////////////////////

@@ -1,9 +1,14 @@
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+// ** Copyright UCAR (c) 1992 - 2024
+// ** University Corporation for Atmospheric Research (UCAR)
+// ** National Center for Atmospheric Research (NCAR)
+// ** Research Applications Lab (RAL)
+// ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
 ////////////////////////////////////////////////////////////////////////
 
-
-using namespace std;
 
 #include <iostream>
 #include <unistd.h>
@@ -14,6 +19,8 @@ using namespace std;
 #include "make_program.h"
 
 #include "vx_log.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -53,9 +60,9 @@ void BoolCalc::init_from_scratch()
 
 {
 
-s = 0;
+s = nullptr;
 
-program = 0;
+program = nullptr;
 
 clear();
 
@@ -71,9 +78,9 @@ void BoolCalc::clear()
 
 {
 
-if ( s )  { delete s;  s = 0; }
+if ( s )  { delete s;  s = nullptr; }
 
-if ( program )  { delete program;  program = 0; }
+if ( program )  { delete program;  program = nullptr; }
 
 Max_depth = Max_local = 0;
 
@@ -247,7 +254,7 @@ result = s->top();
 
 s->pop();
 
-return ( result );
+return result;
 
 }
 

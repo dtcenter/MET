@@ -17,8 +17,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <map>
 #include <stdlib.h>
 #include <strings.h>
@@ -41,6 +39,9 @@ using namespace std;
 
 #include "vx_cal.h"
 #include "vx_log.h"
+
+using namespace std;
+
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -131,7 +132,7 @@ VarInfo * VarInfoFactory::new_var_info(GrdFileType type)
         << "created new VarInfo object of type \""
         << grdfiletype_to_string(type) << "\".\n";
 
-   return(vi);
+   return vi;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -142,20 +143,20 @@ VarInfo * VarInfoFactory::new_var_info(ConcatString s) {
    // Convert the string to a gridded data file type
    string_to_grdfiletype(s.c_str(), type);
 
-   return(new_var_info(type));
+   return new_var_info(type);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 VarInfo * VarInfoFactory::new_copy(const VarInfo *vi_in) {
 
-   if(!vi_in) return ( nullptr );
+   if(!vi_in) return nullptr;
 
    VarInfo *vi_copy = new_var_info(vi_in->file_type());
 
    *vi_copy = *vi_in;
 
-   return(vi_copy);
+   return vi_copy;
 
 }
 

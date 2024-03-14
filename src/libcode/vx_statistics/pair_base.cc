@@ -8,8 +8,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <cstdio>
 #include <iostream>
 #include <unistd.h>
@@ -27,6 +25,8 @@ using namespace std;
 #include "vx_data2d_grib.h"
 #include "vx_math.h"
 #include "vx_log.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -64,11 +64,11 @@ void PairBase::clear() {
    IsPointVx = false;
 
    mask_name.clear();
-   mask_area_ptr  = (MaskPlane *)    0;  // Not allocated
-   mask_sid_ptr   = (StringArray *)  0;  // Not allocated
-   mask_llpnt_ptr = (MaskLatLon *)   0;  // Not allocated
+   mask_area_ptr  = (MaskPlane *)    nullptr;  // Not allocated
+   mask_sid_ptr   = (StringArray *)  nullptr;  // Not allocated
+   mask_llpnt_ptr = (MaskLatLon *)   nullptr;  // Not allocated
 
-   cdf_info_ptr = (const ClimoCDFInfo *) 0;  // Not allocated
+   cdf_info_ptr = (const ClimoCDFInfo *) nullptr;  // Not allocated
 
    msg_typ.clear();
    msg_typ_vals.clear();
@@ -114,11 +114,11 @@ void PairBase::erase() {
    IsPointVx = false;
 
    mask_name.erase();
-   mask_area_ptr  = (MaskPlane *)    0;  // Not allocated
-   mask_sid_ptr   = (StringArray *)  0;  // Not allocated
-   mask_llpnt_ptr = (MaskLatLon *)   0;  // Not allocated
+   mask_area_ptr  = (MaskPlane *)    nullptr;  // Not allocated
+   mask_sid_ptr   = (StringArray *)  nullptr;  // Not allocated
+   mask_llpnt_ptr = (MaskLatLon *)   nullptr;  // Not allocated
 
-   cdf_info_ptr = (const ClimoCDFInfo *) 0;  // Not allocated
+   cdf_info_ptr = (const ClimoCDFInfo *) nullptr;  // Not allocated
 
    msg_typ.clear();
    msg_typ_vals.clear();
@@ -325,7 +325,7 @@ int PairBase::has_obs_rec(const char *sid, double lat, double lon,
    //
    // Only valid for point data
    //
-   if(!IsPointVx) return(false);
+   if(!IsPointVx) return false;
 
    //
    // Check for an existing record of this observation
@@ -343,7 +343,7 @@ int PairBase::has_obs_rec(const char *sid, double lat, double lon,
       }
    } // end for
 
-   return(status);
+   return status;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -784,7 +784,7 @@ void PairBase::add_grid_obs(double x, double y,
 
 double PairBase::process_obs(VarInfo *vinfo, double v) {
 
-   if(!vinfo) return(v);
+   if(!vinfo) return v;
 
    double new_v = v;
 
@@ -803,7 +803,7 @@ double PairBase::process_obs(VarInfo *vinfo, double v) {
       }
    }
 
-   return(new_v);
+   return new_v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -885,7 +885,7 @@ double compute_interp(const DataPlaneArray &dpa,
    double v, v_blw, v_abv, t;
 
    // Check for no data
-   if(dpa.n_planes() == 0) return(bad_data_double);
+   if(dpa.n_planes() == 0) return bad_data_double;
 
    v_blw = compute_horz_interp(dpa[i_blw], obs_x, obs_y, obs_v, cmn, csd,
                                method, width, shape, wrap_lon,
@@ -901,7 +901,7 @@ double compute_interp(const DataPlaneArray &dpa,
 
       // Check for bad data prior to vertical interpolation
       if(is_bad_data(v_blw) || is_bad_data(v_abv)) {
-         return(bad_data_double);
+         return bad_data_double;
       }
 
       // If verifying specific humidity, do vertical interpolation in
@@ -926,7 +926,7 @@ double compute_interp(const DataPlaneArray &dpa,
       }
    }
 
-   return(v);
+   return v;
 }
 
 
@@ -1007,7 +1007,7 @@ void get_interp_points(const DataPlaneArray &dpa,
       interp_pnts.erase();
    }
 
-   if ( gt )  { delete gt;  gt = (const GridTemplate *) 0; }
+   if ( gt )  { delete gt;  gt = (const GridTemplate *) nullptr; }
 
    return;
 }
@@ -1019,10 +1019,10 @@ bool set_climo_flag(const NumArray &f_na, const NumArray &c_na) {
    // The climo values must have non-zero, consistent length and
    // cannot all be bad data
    if(c_na.n() != f_na.n() || c_na.n() < 1 || is_bad_data(c_na.max())) {
-      return(false);
+      return false;
    }
 
-   return(true);
+   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1094,7 +1094,7 @@ NumArray derive_climo_prob(const ClimoCDFInfo *cdf_info_ptr,
    else if(n_mn > 0 && n_sd > 0) {
 
       // Need cdf_info_ptr set to proceed
-      if(!cdf_info_ptr) return(climo_prob);
+      if(!cdf_info_ptr) return climo_prob;
 
       // Derive climatological probabilities directly
       if(cdf_info_ptr->direct_prob) {
@@ -1183,7 +1183,7 @@ NumArray derive_climo_prob(const ClimoCDFInfo *cdf_info_ptr,
       climo_prob = mn_na;
    }
 
-   return(climo_prob);
+   return climo_prob;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1202,7 +1202,7 @@ double derive_prob(const NumArray &na, const SingleThresh &st) {
    if(n_vld == 0) prob = bad_data_double;
    else           prob = (double) n_event / n_vld;
 
-   return(prob);
+   return prob;
 }
 
 ////////////////////////////////////////////////////////////////////////

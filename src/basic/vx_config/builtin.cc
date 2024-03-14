@@ -328,7 +328,7 @@ if ( b < 0 )  b = -b;
 
 if ( a < 0 )  a = b - a;
 
-if ( b == 0 )  return ( a );
+if ( b == 0 )  return a;
 
 return ( a%b );
 
@@ -346,7 +346,7 @@ if ( a < 0 )  a = b - a;
 
 if ( b < 0 )  b = -b;
 
-if ( b == 0.0 )  return ( a );
+if ( b == 0.0 )  return a;
 
 double c;
 

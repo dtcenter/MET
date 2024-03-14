@@ -10,9 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -24,6 +21,9 @@ using namespace std;
 #include "affine.h"
 #include "viewgravity_to_string.h"
 #include "vx_log.h"
+
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -105,11 +105,11 @@ Box & Box::operator=(const Box & b)
 
 {
 
-if ( this == &b )  return ( * this );
+if ( this == &b )  return *this;
 
 assign(b);
 
-return ( * this );
+return *this;
 
 }
 
@@ -209,7 +209,7 @@ double Box::x_to_u(double x) const
 
 { 
 
-return ( (x - Left)/(Right - Left) );
+return (x - Left)/(Right - Left);
 
 }
 
@@ -221,7 +221,7 @@ double Box::y_to_v(double y) const
 
 {
 
-return ( (y - Bottom)/(Top - Bottom) );
+return (y - Bottom)/(Top - Bottom);
 
 }
 
@@ -400,11 +400,11 @@ Affine & Affine::operator=(const Affine & g)
 
 {
 
-if ( this == &g )  return ( * this );
+if ( this == &g )  return *this;
 
 assign(g);
 
-return ( * this );
+return *this;
 
 }
 
@@ -528,25 +528,25 @@ c = M22*M22 + M12*M12;
    //  diagonal elements (nearly) equal?
    //
 
-if ( fabs (a - c) > tol )  return ( false );
+if ( fabs (a - c) > tol )  return false;
 
    //
    //  off-diagonal elements (nearly) zero?
    //
 
-if ( fabs(b) > tol )  return ( false );
+if ( fabs(b) > tol )  return false;
 
    //
    //  determinant positive?
    //
 
-if ( Det < 0.0 )  return ( false );
+if ( Det < 0.0 )  return false;
 
    //
    //  ok
    //
 
-return ( true );
+return true;
 
 }
 
@@ -750,7 +750,7 @@ GeneralAffine * Affine::copy() const
 
 Affine * a = new Affine ( *this );
 
-return ( a );
+return a;
 
 }
 
@@ -842,11 +842,11 @@ ConformalAffine & ConformalAffine::operator=(const ConformalAffine & c)
 
 {
 
-if ( this == &c )  return ( * this );
+if ( this == &c )  return *this;
 
 assign(c);
 
-return ( * this );
+return *this;
 
 }
 
@@ -995,7 +995,7 @@ ConformalAffine ca = *this;
 
 ca.invert();
 
-return ( ca );
+return ca;
 
 }
 
@@ -1009,7 +1009,7 @@ GeneralAffine * ConformalAffine::copy() const
 
 ConformalAffine * ca = new ConformalAffine ( *this );
 
-return ( ca );
+return ca;
 
 }
 
@@ -1203,7 +1203,7 @@ Affine a;
 a.set_mb(m11(), m12(), m21(), m22(), tx(), ty());
 
 
-return ( a );
+return a;
 
 }
 
@@ -1264,7 +1264,7 @@ mag = min(rho, 1.0);
 
 mag *= (view_width)/(image_width);
 
-return ( mag );
+return mag;
 
 }
 
@@ -1280,7 +1280,7 @@ double mag;
 
 mag = calc_mag(image.width(), image.height(), view.width(), view.height());
 
-return ( mag );
+return mag;
 
 }
 
@@ -1304,7 +1304,7 @@ a.forward(b.TX, b.TY, c.TX, c.TY);
 
 c.calc_det();
 
-return ( c );
+return c;
 
 }
 
@@ -1331,7 +1331,7 @@ c.set_angle( a.Angle + b.Angle );
 a.forward(b.TX, b.TY, c.TX, c.TY);
 
 
-return ( c );
+return c;
 
 }
 
@@ -1363,7 +1363,7 @@ bool bb_intersect(const Box &b1, const Box &b2) {
       intersect = true;
    }
 
-   return(intersect);
+   return intersect;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1376,7 +1376,7 @@ bool is_inside_bb(const Box &bb, double x, double y) {
       inside = true;
    }
 
-   return(inside);
+   return inside;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1389,7 +1389,7 @@ bool is_between(double a, double b, double x) {
       between = true;
    }
 
-   return(between);
+   return between;
 }
 
 

@@ -11,9 +11,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -23,6 +20,8 @@ using namespace std;
 #include "vx_util.h"
 
 #include "3d_att_single_array.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -78,11 +77,11 @@ SingleAtt3DArray & SingleAtt3DArray::operator=(const SingleAtt3DArray & a)
 
 {
 
-if ( this == &a )  return ( * this );
+if ( this == &a )  return *this;
 
 assign(a);
 
-return ( * this );
+return *this;
 
 }
 
@@ -94,7 +93,7 @@ void SingleAtt3DArray::init_from_scratch()
 
 {
 
-e = (SingleAtt3D *) 0;
+e = (SingleAtt3D *) nullptr;
 
 AllocInc = 100;   //  default value
 
@@ -112,7 +111,7 @@ void SingleAtt3DArray::clear()
 
 {
 
-if ( e )  { delete [] e;  e = (SingleAtt3D *) 0; }
+if ( e )  { delete [] e;  e = (SingleAtt3D *) nullptr; }
 
 
 
@@ -174,11 +173,11 @@ for(j=0; j<Nelements; ++j)  {
 
 }
 
-if ( e )  { delete [] e;  e = (SingleAtt3D *) 0; }
+if ( e )  { delete [] e;  e = (SingleAtt3D *) nullptr; }
 
 e = u;
 
-u = (SingleAtt3D *) 0;
+u = (SingleAtt3D *) nullptr;
 
 Nalloc = N;
 

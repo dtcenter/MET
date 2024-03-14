@@ -11,8 +11,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <fstream>
 #include <unistd.h>
@@ -21,6 +19,8 @@ using namespace std;
 
 #include "vx_log.h"
 #include "vx_render.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -34,7 +34,7 @@ plot.gsave();
 
 int j, r, c;
 double w, h;
-PSFilter *out = (PSFilter *) 0;
+PSFilter *out = (PSFilter *) nullptr;
 PSFilter **v = &out;
 Color color;
 
@@ -92,7 +92,7 @@ psout->ignore_columns = false;
 
 *v = psout;
 
-v = (PSFilter **) 0;
+v = (PSFilter **) nullptr;
 
 
 
@@ -164,7 +164,7 @@ for (r=0; r<(image.nrows()); ++r)  {
 
 out->eod();
 
-delete out;   out = (PSFilter *) 0;
+delete out;   out = (PSFilter *) nullptr;
 
 plot.file() << "\n\n";
 

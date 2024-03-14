@@ -8,12 +8,13 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
 
 #include<netcdf>
-using namespace netCDF;
 
 #include "vx_tc_nc_util.h"
+
+using namespace std;
+using namespace netCDF;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -288,7 +289,7 @@ void def_tc_pressure(NcFile* nc_out,
     put_nc_data(&pressure_var, &pressure_data[0]);
 
     // Cleanup
-    if(pressure_data) { delete [] pressure_data; pressure_data = (double *) 0; }
+    if(pressure_data) { delete [] pressure_data; pressure_data = (double *) nullptr; }
 
     return;
 }
@@ -341,8 +342,8 @@ void def_tc_range_azimuth(NcFile* nc_out,
     put_nc_data(&azimuth_var, &azimuth_data[0]);
 
     // Cleanup
-    if(range_data)   { delete [] range_data;   range_data   = (double *) 0; }
-    if(azimuth_data) { delete [] azimuth_data; azimuth_data = (double *) 0; }
+    if(range_data)   { delete [] range_data;   range_data   = (double *) nullptr; }
+    if(azimuth_data) { delete [] azimuth_data; azimuth_data = (double *) nullptr; }
 
     return;
 }

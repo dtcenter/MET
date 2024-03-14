@@ -28,20 +28,20 @@ public:
 
   NdbcLocations();
   virtual ~NdbcLocations();
-  bool initialize(const string &locationsFile);
-  bool lookupLatLonElev(const string aqsid, double &lat, double &lon, double &elev) const;
+  bool initialize(const std::string &locationsFile);
+  bool lookupLatLonElev(const std::string aqsid, double &lat, double &lon, double &elev) const;
   void print(void) const;
 
 private:
   
-  bool _setPtr(DataLine &data_line, const string &headerName, int &ptr) const;
+  bool _setPtr(DataLine &data_line, const std::string &headerName, int &ptr) const;
 
-  string fileName;
+  std::string fileName;
 
-  vector<string> StationId;
-  vector<double> Lat;
-  vector<double> Lon;
-  vector<double> Elev;
+  std::vector<std::string> StationId;
+  std::vector<double> Lat;
+  std::vector<double> Lon;
+  std::vector<double> Elev;
 
 };
 

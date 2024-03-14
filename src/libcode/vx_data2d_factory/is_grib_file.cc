@@ -1,5 +1,3 @@
-
-
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
@@ -14,8 +12,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -28,6 +24,8 @@ using namespace std;
 #include "is_grib_file.h"
 #include "vx_util.h"
 #include "vx_log.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -56,7 +54,7 @@ bool is_grib1_file(const char * filename)
 int version;
 bool status = check_grib(filename, version);
 
-if ( !status )  return ( false );
+if ( !status )  return false;
 
    //
    //  done
@@ -77,7 +75,7 @@ bool is_grib2_file(const char * filename)
 int version;
 bool status = check_grib(filename, version);
 
-if ( !status )  return ( false );
+if ( !status )  return false;
 
    //
    //  done
@@ -153,7 +151,7 @@ for ( i=0; i<(read_size - grib_magic_len); ++i)  {
    }
 }
 
-if( !found ) return ( false );
+if( !found ) return false;
 
    //
    //  grab version number
@@ -165,7 +163,7 @@ version = (int) (buf[i+7]);
    //  done
    //
 
-return ( true );
+return true;
 
 }
 

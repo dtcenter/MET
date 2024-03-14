@@ -30,7 +30,6 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
@@ -52,6 +51,9 @@ using namespace std;
 #include "vx_render.h"
 #include "vx_plot_util.h"
 #include "nc_point_obs_in.h"
+
+using namespace std;
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -128,7 +130,7 @@ int met_main(int argc, char *argv[]) {
    // Plot the result
    create_plot();
 
-   return(0);
+   return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////

@@ -8,7 +8,6 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 
-using namespace std;
 
 #include <iostream>
 #include <unistd.h>
@@ -17,12 +16,15 @@ using namespace std;
 #include <cmath>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "get_met_grid.h"
 
 #include "nc_utils.h"
 #include "vx_log.h"
+
+using namespace std;
+using namespace netCDF;
+
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -183,7 +185,7 @@ int has_variable(NcFile *f_in, const char *var_name) {
    //
    found = (has_var(f_in, var_name) ? 1 : 0);
 
-   return(found);
+   return found;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -216,7 +218,7 @@ LatLonData get_latlon_data(NcFile * ncfile) {
 
    data.dump();
 
-   return(data);
+   return data;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -257,7 +259,7 @@ RotatedLatLonData get_rot_latlon_data(NcFile * ncfile) {
 
    data.dump();
 
-   return(data);
+   return data;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -314,7 +316,7 @@ LambertData get_lambert_data(NcFile * ncfile) {
 
    data.dump();
 
-   return(data);
+   return data;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -374,7 +376,7 @@ LaeaData get_laea_data(NcFile * ncfile) {
 
    data.dump();
 
-   return(data);
+   return data;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -431,7 +433,7 @@ StereographicData get_stereographic_data(NcFile * ncfile) {
 
    data.dump();
 
-   return(data);
+   return data;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -465,7 +467,7 @@ MercatorData get_mercator_data(NcFile * ncfile) {
 
    data.dump();
 
-   return(data);
+   return data;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -498,7 +500,7 @@ LatLonData get_latlon_data_v2(NcFile * ncfile) {
 
    data.dump();
 
-   return(data);
+   return data;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -550,7 +552,7 @@ LambertData get_lambert_data_v2(NcFile * ncfile) {
 
    data.dump();
 
-   return(data);
+   return data;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -605,7 +607,7 @@ StereographicData get_stereographic_data_v2(NcFile * ncfile) {
 
    data.dump();
 
-   return(data);
+   return data;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -639,7 +641,7 @@ MercatorData get_mercator_data_v2(NcFile * ncfile) {
 
    data.dump();
 
-   return(data);
+   return data;
 
 }
 
@@ -663,7 +665,7 @@ GaussianData get_gaussian_data (NcFile * ncfile) {
 
    data.dump();
 
-   return(data);
+   return data;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -681,7 +683,7 @@ SemiLatLonData get_semilatlon_data (NcFile * ncfile) {
 
    data.dump();
 
-   return(data);
+   return data;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -700,7 +702,7 @@ void get_semilatlon_var(NcFile *ncfile, const char * var_name, NumArray &out_na)
    double * data_values = new double[ count ];
    get_nc_data(&nc_var, data_values);
    for(int i=0; i<count; i++)  out_na.add(data_values[i]);
-   if(data_values) { delete [] data_values; data_values = (double *) 0; }
+   if(data_values) { delete [] data_values; data_values = (double *) nullptr; }
 
    return;
 }

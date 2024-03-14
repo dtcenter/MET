@@ -8,8 +8,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <dirent.h>
 #include <iostream>
 #include <unistd.h>
@@ -21,6 +19,8 @@ using namespace std;
 #include "ascii2nc_conf_info.h"
 
 #include "vx_log.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////

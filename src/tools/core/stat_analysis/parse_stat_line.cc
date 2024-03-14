@@ -33,10 +33,10 @@
 //                                      line types.
 //   013    02/13/24  Halley Gotway   MET #2395 Add wind direction stats
 //                                      to VL1L2, VAL1L2, and VCNT.
+//   014    02/21/24  Halley Gotway   MET #2583 Add observation error
+//                                      ECNT statistics.
 //
 ////////////////////////////////////////////////////////////////////////
-
-using namespace std;
 
 #include <cstdio>
 #include <iostream>
@@ -49,6 +49,8 @@ using namespace std;
 #include "vx_log.h"
 
 #include "parse_stat_line.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -150,7 +152,7 @@ void parse_nbrctc_ctable(STATLine &l, TTContingencyTable &ct) {
 void parse_nx2_ctable(STATLine &l, Nx2ContingencyTable &pct) {
    int i, n, oy, on;
    char col_str[max_str_len];
-   double *thresh = (double *) 0;
+   double *thresh = (double *) nullptr;
 
    // N_THRESH
    n = atoi(l.get_item("N_THRESH"));
@@ -181,7 +183,7 @@ void parse_nx2_ctable(STATLine &l, Nx2ContingencyTable &pct) {
    thresh[n-1] = atof(l.get_item(col_str));
    pct.set_thresholds(thresh);
 
-   if ( thresh )  { delete [] thresh; thresh = (double *) 0; }
+   if ( thresh )  { delete [] thresh; thresh = (double *) nullptr; }
 
    return;
 }
@@ -396,6 +398,9 @@ void parse_ecnt_line(STATLine &l, ECNTData &e_data) {
    e_data.me_ge_obs  = atof(l.get_item("ME_GE_OBS"));
    e_data.n_lt_obs   = atoi(l.get_item("N_LT_OBS"));
    e_data.me_lt_obs  = atof(l.get_item("ME_LT_OBS"));
+
+   e_data.ign_conv_oerr = atof(l.get_item("IGN_CONV_OERR"));
+   e_data.ign_corr_oerr = atof(l.get_item("IGN_CORR_OERR"));
 
    return;
 }

@@ -10,8 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -19,6 +17,8 @@ using namespace std;
 
 #include "mode_ps_file.h"
 #include "vx_plot_util.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -115,11 +115,11 @@ void ModePsFile::mpsf_init_from_scratch()
 
 {
 
-   Engine = (ModeFuzzyEngine *) 0;
+   Engine = (ModeFuzzyEngine *) nullptr;
 
-   ConfInfo = (ModeConfInfo *) 0;
+   ConfInfo = (ModeConfInfo *) nullptr;
 
-   grid = (Grid *) 0;
+   grid = (Grid *) nullptr;
 
    MetDataDir = replace_path("MET_BASE");
 
@@ -916,7 +916,7 @@ void ModePsFile::draw_colorbar(bool fcst)
    int i, n_colors;
    char label[max_str_len];
    double bar_width, bar_height, x_ll, y_ll;
-   ColorTable * ct = (ColorTable *) 0;
+   ColorTable * ct = (ColorTable *) nullptr;
    Box b;
    Color c;
 
@@ -1013,7 +1013,7 @@ void ModePsFile::render_ppm(ModeFuzzyEngine & eng, EngineType eng_type, const Sh
    double mag, v;
    Color c;
    Color fill_color;
-   ColorTable *ct = (ColorTable *) 0;
+   ColorTable *ct = (ColorTable *) nullptr;
    const int L = nint(XY_box.left());
    const int B = nint(XY_box.bottom());
 
@@ -1333,7 +1333,7 @@ Box valid_xy_bb(const ShapeData * wd_ptr, const Grid & grid)
 
    bb.set_lrbt(L, R, B, T);
 
-   return ( bb );
+   return bb;
 
 }
 

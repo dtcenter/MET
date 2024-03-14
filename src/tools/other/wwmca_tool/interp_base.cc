@@ -10,9 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -20,6 +17,8 @@ using namespace std;
 
 #include "vx_log.h"
 #include "interp_base.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -75,11 +74,11 @@ InterpolationValue & InterpolationValue::operator=(const InterpolationValue & i)
 
 {
 
-if ( this == &i )  return ( * this );
+if ( this == &i )  return *this;
 
 assign(i);
 
-return ( * this );
+return *this;
 
 }
 
@@ -203,7 +202,7 @@ void Interpolator::init_from_scratch()
 
 {
 
-Data = (InterpolationValue *) 0;
+Data = (InterpolationValue *) nullptr;
 
 clear();
 
@@ -219,7 +218,7 @@ void Interpolator::clear()
 
 {
 
-if ( Data )  { delete [] Data;  Data = (InterpolationValue *) 0; }
+if ( Data )  { delete [] Data;  Data = (InterpolationValue *) nullptr; }
 
 Width = 0;
 
@@ -314,7 +313,7 @@ int n;
 
 n = y*Width + x;
 
-return ( n );
+return n;
 
 }
 
@@ -444,7 +443,7 @@ for (j=0; j<n; ++j)  {
 
 }
 
-return ( count );
+return count;
 
 }
 
@@ -476,7 +475,7 @@ for (j=0; j<n; ++j)  {
 
 }
 
-return ( count );
+return count;
 
 }
 
@@ -499,7 +498,7 @@ ostream & operator<<(ostream & out, const InterpolationValue & I)
 if ( I.ok )  out << (I.value);
 else         out << "(bad)";
 
-return ( out );
+return out;
 
 }
 

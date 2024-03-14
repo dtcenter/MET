@@ -7,11 +7,7 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
-
 ////////////////////////////////////////////////////////////////////////
-
-
-using namespace std;
 
 
 #include <iostream>
@@ -22,6 +18,9 @@ using namespace std;
 
 #include "ordinal.h"
 #include "vx_log.h"
+
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -74,7 +73,7 @@ if ( (n >= 10) && (n <= 20) )   { m_strcpy(out, th, method_name, "out1");  retur
 
 n %= 10;
 
-const char * ans = (const char *) 0;
+const char * ans = (const char *) nullptr;
 
 switch ( n )  {
 

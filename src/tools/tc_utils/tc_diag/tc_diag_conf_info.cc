@@ -8,7 +8,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
 
 #include <dirent.h>
 #include <iostream>
@@ -21,6 +20,9 @@ using namespace std;
 #include "tc_diag_conf_info.h"
 
 #include "vx_log.h"
+
+using namespace std;
+
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -43,7 +45,7 @@ DataOptInfo & DataOptInfo::operator+=(const DataOptInfo &info) {
    tech_ids.add(info.tech_ids);
    data_files.add(info.data_files);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -81,7 +83,7 @@ void DomainInfo::clear() {
    data_files.clear();
    domain.clear();
 
-   data.name         = (const char *) 0;
+   data.name         = (const char *) nullptr;
    data.range_n      = bad_data_int;
    data.azimuth_n    = bad_data_int;
    data.range_max_km = bad_data_double;
@@ -181,7 +183,7 @@ void TCDiagConfInfo::clear() {
 
    // Deallocate memory
    for(int i=0; i<var_info.size(); i++) {
-      if(var_info[i]) { delete var_info[i]; var_info[i] = (VarInfo *) 0; }
+      if(var_info[i]) { delete var_info[i]; var_info[i] = (VarInfo *) nullptr; }
    }
    var_info.clear();
 
@@ -226,7 +228,7 @@ void TCDiagConfInfo::process_config(GrdFileType file_type,
                                     map<string,DataOptInfo> dmap) {
    int i, j;
    StringArray sa;
-   Dictionary *dict = (Dictionary *) 0;
+   Dictionary *dict = (Dictionary *) nullptr;
    VarInfoFactory vi_factory;
 
    // Conf: version
@@ -368,7 +370,7 @@ void TCDiagConfInfo::process_config(GrdFileType file_type,
 ////////////////////////////////////////////////////////////////////////
 
 void TCDiagConfInfo::parse_domain_info(map<string,DataOptInfo> dmap) {
-   Dictionary *dict = (Dictionary *) 0;
+   Dictionary *dict = (Dictionary *) nullptr;
    int i, j;
    bool found;
 

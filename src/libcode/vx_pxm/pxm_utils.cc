@@ -11,9 +11,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -22,6 +19,8 @@ using namespace std;
 #include "vx_log.h"
 #include "pxm_base.h"
 #include "pxm_utils.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -40,7 +39,7 @@ j = 0;
 
 while ( isdigit(c = in.get()) )  j = 10*j + (c - '0');
 
-return ( j );
+return j;
 
 }
 
@@ -54,7 +53,7 @@ void skip_whitespace(istream & in)
 
 int c;
 
-while ( 1 )  {
+while ( true )  {
 
    c = in.peek();
 
@@ -83,7 +82,7 @@ in.get(c);   //  toss leading '#'
 
 k = 0;
 
-while ( 1 )  {
+while ( true )  {
 
    in.get(c);
 

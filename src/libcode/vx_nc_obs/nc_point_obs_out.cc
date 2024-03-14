@@ -10,8 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <string.h>
 #include <cstdio>
@@ -21,6 +19,9 @@ using namespace std;
 #include "nc_point_obs_out.h"
 #include "nc_summary.h"
 #include "write_netcdf.h"
+
+using namespace std;
+
 
 ////////////////////////////////////////////////////////////////////////
 

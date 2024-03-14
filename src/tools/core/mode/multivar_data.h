@@ -30,11 +30,11 @@ class MultiVarData1 {
 
    int *_fill_int_array(ShapeData *sd);
    float *_fill_float_array(ShapeData *sd);
-   void _print_summary(const string &name, int *data, const ShapeData &sd) const;
+   void _print_summary(const std::string &name, int *data, const ShapeData &sd) const;
 
  public:
 
-   inline MultiVarData1(int nx, int ny, const string &name,
+   inline MultiVarData1(int nx, int ny, const std::string &name,
                         ModeDataType dataType) :
       _dataType(dataType),
       _name(name),
@@ -46,13 +46,13 @@ class MultiVarData1 {
       _convThreshArray(),
       _mergeThreshArray()
       {}
-      
+
    inline ~MultiVarData1() {
       if (_obj_sd) delete _obj_sd;
       if (_obj_data) delete [] _obj_data;
       if (_raw_data) delete [] _raw_data;
       if (_sd) delete _sd;
-   }      
+   }
 
    void set_obj(ShapeData *sd);
    void set_raw(ShapeData *sd);
@@ -61,10 +61,10 @@ class MultiVarData1 {
    void set_merge_thresh_array(const ThreshArray &t);
    void objects_from_arrays(bool do_clusters,
                             BoolPlane & out);
-   void print(const string &name) const;
+   void print(const std::string &name) const;
 
    ModeDataType _dataType;
-   string _name;
+   std::string _name;
    ShapeData *_obj_sd;
    int *_obj_data;
    float *_raw_data;
@@ -84,12 +84,12 @@ class MultiVarData {
 
    MultiVarData();
    ~MultiVarData();
-      
+
    void init(ModeDataType dataType,
-             const string &name, 
-             const Grid &grid, 
-             const string &units, 
-             const string &level,
+             const std::string &name,
+             const Grid &grid,
+             const std::string &units,
+             const std::string &level,
              double data_min, double data_max);
 
    void set_obj(ShapeData *sd, bool simple);
@@ -104,11 +104,11 @@ class MultiVarData {
    ModeDataType _dataType;
    MultiVarData1 *_simple;
    MultiVarData1 *_merge;
-   string _name;
+   std::string _name;
    int _nx, _ny;
    Grid *_grid;
-   string _units;
-   string _level;
+   std::string _units;
+   std::string _level;
    double _data_min, _data_max;
 };
 

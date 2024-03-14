@@ -1,9 +1,14 @@
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+// ** Copyright UCAR (c) 1992 - 2024
+// ** University Corporation for Atmospheric Research (UCAR)
+// ** National Center for Atmospheric Research (NCAR)
+// ** Research Applications Lab (RAL)
+// ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
 ////////////////////////////////////////////////////////////////////////
 
-
-using namespace std;
 
 #include <iostream>
 #include <unistd.h>
@@ -16,6 +21,8 @@ using namespace std;
 #include "tokenizer.h"
 
 #include "vx_log.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -57,7 +64,7 @@ void Tokenizer::init_from_scratch()
 
 {
 
-source = 0;
+source = nullptr;
 
 clear();
 
@@ -73,7 +80,7 @@ void Tokenizer::clear()
 
 {
 
-if ( source )  { delete [] source;  source = 0; }
+if ( source )  { delete [] source;  source = nullptr; }
 
 pos = -1;
 
@@ -139,7 +146,7 @@ while ( (c = source[pos]) != 0 )  {
 
 }
 
-return ( value );
+return value;
 
 }
 
@@ -160,7 +167,7 @@ char c, c2;
    //  skip whitespace
    //
 
-while ( 1 )  {
+while ( true )  {
 
    c = source[pos];
 
@@ -168,7 +175,7 @@ while ( 1 )  {
 
       tok.set_eof();
 
-      return ( tok );
+      return tok;
 
    }
 
@@ -236,7 +243,7 @@ else {
 }
 
 
-return ( tok );
+return tok;
 
 }
 

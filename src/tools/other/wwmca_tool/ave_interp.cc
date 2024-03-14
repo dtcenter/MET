@@ -10,8 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -20,6 +18,8 @@ using namespace std;
 #include "vx_log.h"
 
 #include "ave_interp.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -75,11 +75,11 @@ Ave_Interp & Ave_Interp::operator=(const Ave_Interp & a)
 
 {
 
-if ( this == &a )  return ( * this );
+if ( this == &a )  return *this;
 
 assign(a);
 
-return ( * this );
+return *this;
 
 }
 
@@ -135,11 +135,11 @@ Interpolator * Ave_Interp::copy() const
 
 {
 
-Interpolator * i = (Interpolator *) 0;
+Interpolator * i = (Interpolator *) nullptr;
 
 i = new Ave_Interp (*this);
 
-return ( i );
+return i;
 
 }
 
@@ -217,7 +217,7 @@ if ( (good_count > 0) && (good_count >= NgoodNeeded) )  {
    //
 
 
-return ( I );
+return I;
 
 }
 

@@ -7,8 +7,6 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <cstdio>
 #include <iostream>
 #include <fstream>
@@ -24,11 +22,14 @@ using namespace std;
 
 #include "file_fxns.h"
 
+using namespace std;
+
+
 ////////////////////////////////////////////////////////////////////////
 
 bool is_regular_file(const char *path) {
    struct stat path_stat;
-   return(!stat(path, &path_stat) && S_ISREG(path_stat.st_mode));
+   return (!stat(path, &path_stat) && S_ISREG(path_stat.st_mode));
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -51,7 +52,7 @@ ConcatString replace_path(const ConcatString path) {
 
    s.replace(met_base_str, met_base_val.c_str());
 
-   return(s);
+   return s;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -69,7 +70,7 @@ ConcatString replace_path(const char * path) {
 ////////////////////////////////////////////////////////////////////////
 
 int met_open(const char *path, int oflag) {
-  return(open(replace_path(path).c_str(), oflag));
+  return open(replace_path(path).c_str(), oflag);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -89,13 +90,13 @@ void met_open(ofstream &out, const char *path) {
 ////////////////////////////////////////////////////////////////////////
 
 FILE *met_fopen(const char *path, const char *mode) {
-  return(fopen(replace_path(path).c_str(), mode));
+  return fopen(replace_path(path).c_str(), mode);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 DIR *met_opendir(const char *path) {
-  return(opendir(replace_path(path).c_str()));
+  return opendir(replace_path(path).c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////

@@ -39,10 +39,11 @@
 //                                      line types.
 //   018    02/13/24  Halley Gotway   MET #2395 Add wind direction stats
 //                                      to VL1L2, VAL1L2, and VCNT.
+//   019    02/21/24  Halley Gotway   MET #2583 Add observation error
+//                                      ECNT statistics.
 //
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
 
 #include <cstdio>
 #include <iostream>
@@ -58,6 +59,9 @@ using namespace std;
 
 #include "aggr_stat_line.h"
 #include "parse_stat_line.h"
+
+using namespace std;
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -525,7 +529,7 @@ StatHdrColumns StatHdrInfo::get_shc(const ConcatString &cur_case,
    // LINE_TYPE
    shc.set_line_type(statlinetype_to_string(lt));
 
-   return(shc);
+   return shc;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -576,7 +580,7 @@ ConcatString StatHdrInfo::get_shc_str(const ConcatString &cur_case,
       shc_str = css;
    }
 
-   return(shc_str);
+   return shc_str;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2377,8 +2381,8 @@ void aggr_isc_lines(LineDataFile &ldf, STATAnalysisJob &job,
          //
          if(m.count(key) == 0) {
             aggr.isc_info.clear();
-            aggr.total_na = aggr.mse_na   = aggr.fen_na   = (NumArray *) 0;
-            aggr.oen_na   = aggr.baser_na = aggr.fbias_na = (NumArray *) 0;
+            aggr.total_na = aggr.mse_na   = aggr.fen_na   = (NumArray *) nullptr;
+            aggr.oen_na   = aggr.baser_na = aggr.fbias_na = (NumArray *) nullptr;
             aggr.hdr.clear();
             m[key] = aggr;
             mlog << Debug(3) << "[Case " << m.size()
@@ -2568,12 +2572,12 @@ void aggr_isc_lines(LineDataFile &ldf, STATAnalysisJob &job,
       //
       // Deallocate memory
       //
-      if(it->second.total_na) { delete [] it->second.total_na; it->second.total_na = (NumArray *) 0; }
-      if(it->second.mse_na  ) { delete [] it->second.mse_na;   it->second.mse_na   = (NumArray *) 0; }
-      if(it->second.fen_na  ) { delete [] it->second.fen_na;   it->second.fen_na   = (NumArray *) 0; }
-      if(it->second.oen_na  ) { delete [] it->second.oen_na;   it->second.oen_na   = (NumArray *) 0; }
-      if(it->second.baser_na) { delete [] it->second.baser_na; it->second.baser_na = (NumArray *) 0; }
-      if(it->second.fbias_na) { delete [] it->second.fbias_na; it->second.fbias_na = (NumArray *) 0; }
+      if(it->second.total_na) { delete [] it->second.total_na; it->second.total_na = (NumArray *) nullptr; }
+      if(it->second.mse_na  ) { delete [] it->second.mse_na;   it->second.mse_na   = (NumArray *) nullptr; }
+      if(it->second.fen_na  ) { delete [] it->second.fen_na;   it->second.fen_na   = (NumArray *) nullptr; }
+      if(it->second.oen_na  ) { delete [] it->second.oen_na;   it->second.oen_na   = (NumArray *) nullptr; }
+      if(it->second.baser_na) { delete [] it->second.baser_na; it->second.baser_na = (NumArray *) nullptr; }
+      if(it->second.fbias_na) { delete [] it->second.fbias_na; it->second.fbias_na = (NumArray *) nullptr; }
 
    } // end for it
 
@@ -2654,6 +2658,8 @@ void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &job,
          m[key].ens_pd.crps_gaus_na.add(cur.crps_gaus);
          m[key].ens_pd.crpscl_gaus_na.add(cur.crpscl_gaus);
          m[key].ens_pd.ign_na.add(cur.ign);
+         m[key].ens_pd.ign_conv_oerr_na.add(cur.ign_conv_oerr);
+         m[key].ens_pd.ign_corr_oerr_na.add(cur.ign_corr_oerr);
          m[key].ens_pd.n_ge_obs_na.add(cur.n_ge_obs);
          m[key].ens_pd.me_ge_obs_na.add(cur.me_ge_obs);
          m[key].ens_pd.n_lt_obs_na.add(cur.n_lt_obs);
@@ -3227,16 +3233,33 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &job,
          m[key].ens_pd.ign_na.add(compute_ens_ign(cur.obs, cur.ens_mean, cur.spread));
          m[key].ens_pd.pit_na.add(compute_ens_pit(cur.obs, cur.ens_mean, cur.spread));
 
+         // Back out the observation error variance
+         double oerr_var = bad_data_double;
+         if(!is_bad_data(cur.spread_plus_oerr) &&
+            !is_bad_data(cur.spread)) {
+            oerr_var = square(cur.spread_plus_oerr) -
+                       square(cur.spread);
+         }
+
          // Store BIAS_RATIO terms
          int n_ge_obs, n_lt_obs;
          double me_ge_obs, me_lt_obs;
-         compute_bias_ratio_terms(cur.obs, cur.ens_na,
-                                  n_ge_obs, me_ge_obs,
-                                  n_lt_obs, me_lt_obs);
+         compute_bias_ratio_terms(
+            cur.obs, cur.ens_na,
+            n_ge_obs, me_ge_obs,
+            n_lt_obs, me_lt_obs);
          m[key].ens_pd.n_ge_obs_na.add(n_ge_obs);
          m[key].ens_pd.me_ge_obs_na.add(me_ge_obs);
          m[key].ens_pd.n_lt_obs_na.add(n_lt_obs);
          m[key].ens_pd.me_lt_obs_na.add(me_lt_obs);
+
+         // Compute observation error log scores
+         double v_conv, v_corr;
+         compute_obs_error_log_scores(
+            cur.ens_mean, cur.spread, cur.obs, oerr_var,
+            v_conv, v_corr);
+         m[key].ens_pd.ign_conv_oerr_na.add(v_conv);
+         m[key].ens_pd.ign_corr_oerr_na.add(v_corr);
 
          //
          // Increment the RHIST counts
@@ -3878,7 +3901,7 @@ void mpr_to_ctc(STATAnalysisJob &job, const AggrMPRInfo &info,
 void mpr_to_cts(STATAnalysisJob &job, const AggrMPRInfo &info,
                 int i_thresh, CTSInfo &cts_info,
                 const char *tmp_dir, gsl_rng *rng_ptr) {
-   CTSInfo *cts_info_ptr = (CTSInfo *) 0;
+   CTSInfo *cts_info_ptr = (CTSInfo *) nullptr;
 
    //
    // Initialize
@@ -4203,7 +4226,7 @@ double compute_vif(NumArray &na) {
    // Compute the variance inflation factor
    vif = 1 + 2.0*fabs(corr) - 2.0*fabs(corr)/na.n();
 
-   return(vif);
+   return vif;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -4215,7 +4238,7 @@ bool is_precip_var_name(const ConcatString &s) {
                 has_prefix(grib_precipitation_abbr,
                            n_grib_precipitation_abbr, s.c_str());
 
-   return(match);
+   return match;
 }
 
 ////////////////////////////////////////////////////////////////////////

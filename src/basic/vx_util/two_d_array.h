@@ -115,7 +115,7 @@ void TwoD_Array<T>::init_from_scratch()
 
 {
 
-E = (T *) 0;
+E = (T *) nullptr;
 
 clear();
 
@@ -133,7 +133,7 @@ void TwoD_Array<T>::clear()
 
 {
 
-if ( E )  { delete [] E;  E = (T *) 0; }
+if ( E )  { delete [] E;  E = (T *) nullptr; }
 
 Nx = Ny = 0;
 

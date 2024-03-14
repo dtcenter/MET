@@ -11,9 +11,6 @@
 /////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -25,6 +22,9 @@ using namespace std;
 #include "afmkeyword_to_string.h"
 
 #include "vx_log.h"
+
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -80,11 +80,11 @@ AfmToken & AfmToken::operator=(const AfmToken & t)
 
 {
 
-if ( this == &t )  return ( * this );
+if ( this == &t )  return *this;
 
 assign(t);
 
-return ( * this );
+return *this;
 
 }
 
@@ -242,7 +242,7 @@ switch ( type )  {
 
 };
 
-return ( x );
+return x;
 
 }
 

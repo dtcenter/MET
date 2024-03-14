@@ -11,8 +11,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -27,6 +25,8 @@ using namespace std;
 #include "2d_moments.h"
 #include "3d_txt_header.h"
 #include "2d_columns.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -90,11 +90,11 @@ SingleAtt2D & SingleAtt2D::operator=(const SingleAtt2D & a)
 
 {
 
-if ( this == &a )  return ( * this );
+if ( this == &a )  return *this;
 
 assign(a);
 
-return ( * this );
+return *this;
 
 }
 
@@ -389,7 +389,7 @@ SingleAtt2D calc_2d_single_atts(const MtdIntFile & mask_2d, const DataPlane & ra
 
 SingleAtt2D a;
 Mtd_2D_Moments moments;
-float * values = (float *) 0;
+float * values = (float *) nullptr;
 const int    * i = 0;
 const double * r = 0;
 const int nxy = (mask_2d.nx())*(mask_2d.ny());
@@ -405,7 +405,7 @@ if ( moments.N == 0 )  {
 
    // exit ( 1 );
 
-   return ( a );
+   return a;
 
 }
 
@@ -472,7 +472,7 @@ a.Ptile_User = percentile_f(values, n, (double) (a.Ptile_Value/100.0));
 
 if ( values )  { delete [] values;  values = 0; }
 
-return ( a );
+return a;
 
 }
 

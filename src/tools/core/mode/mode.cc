@@ -62,8 +62,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <cstdio>
 #include <cstdlib>
 #include <ctype.h>
@@ -85,6 +83,8 @@ using namespace std;
 #ifdef WITH_PYTHON
 #include "global_python.h"
 #endif
+
+using namespace std;
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -207,7 +207,7 @@ int met_main(int argc, char * argv [])
    //  done
    //
 
-   return ( status );
+   return status;
 
 }
 

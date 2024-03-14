@@ -2421,7 +2421,7 @@ DictionaryEntry e;
 
 count = 0;
 
-while ( 1 )  {
+while ( true )  {
 
    v = icvs.pop();
 

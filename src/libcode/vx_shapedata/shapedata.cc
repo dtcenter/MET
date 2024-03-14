@@ -22,17 +22,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-static const bool use_new = true;
-
-static const int split_enlarge = 4;   //  used for ShapeData  shrink and expand
-
-static const bool do_split_fatten = true;
-
-
-///////////////////////////////////////////////////////////////////////////////
-
-using namespace std;
-
 #include <ctime>
 #include <iostream>
 #include <fstream>
@@ -51,6 +40,18 @@ using namespace std;
 #include "vx_math.h"
 
 #include "ihull.h"
+
+using namespace std;
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+static const bool use_new = true;
+
+static const int split_enlarge = 4;   //  used for ShapeData  shrink and expand
+
+static const bool do_split_fatten = true;
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1253,7 +1254,7 @@ void Cell::clear()
 
 {
 
-if ( e )  { delete [] e;  e = (int *) 0; }
+if ( e )  { delete [] e;  e = (int *) nullptr; }
 
 n = 0;
 

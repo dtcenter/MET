@@ -11,8 +11,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -21,11 +19,13 @@ using namespace std;
 #include <cmath>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "nc_utils.h"
 #include "nc_utils_local.h"
 #include "vx_log.h"
+
+using namespace std;
+using namespace netCDF;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -61,13 +61,13 @@ m_strncpy(cbuf, value.c_str(), cbuf_size - 1, method_name);
 
 cbuf[cbuf_size - 1] = (char) 0;
 
-if (att) { delete att;  att = 0; }
+if (att) { delete att;  att = nullptr; }
 
    //
    //  done
    //
 
-return ( cbuf );
+return cbuf;
 
 }
 
@@ -83,7 +83,7 @@ const char * c = string_att(Nc, name);
 
 double value = atof(c);
 
-return ( value );
+return value;
 
 }
 
@@ -99,7 +99,7 @@ const char * c = string_att(Nc, name);
 
 int k = atoi(c);
 
-return ( k );
+return k;
 
 }
 
@@ -115,7 +115,7 @@ const char * c = string_att(Nc, name);
 
 long long k = atoll(c);
 
-return ( k );
+return k;
 
 }
 
@@ -162,7 +162,7 @@ t = mdyhms_to_unix(month, day, year, hour, minute, second);
    //  done
    //
 
-return ( t );
+return t;
 
 }
 
@@ -181,7 +181,7 @@ unix_to_mdyhms(t, month, day, year, hour, minute, second);
 
 snprintf(junk, sizeof(junk), "%04d%02d%02d_%02d%02d%02d", year, month, day, hour, minute, second);
 
-return ( ConcatString(junk) );
+return ConcatString(junk);
 
 }
 

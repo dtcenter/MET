@@ -11,8 +11,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <fstream>
 #include <unistd.h>
@@ -21,6 +19,8 @@ using namespace std;
 
 #include "vx_log.h"
 #include "renderinfo.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -76,11 +76,11 @@ RenderInfo & RenderInfo::operator=(const RenderInfo & r)
 
 {
 
-if ( this == &r )  return ( * this );
+if ( this == &r )  return *this;
 
 assign(r);
 
-return ( * this );
+return *this;
 
 }
 
@@ -256,7 +256,7 @@ if ( (n < 0) || (n >= Nfilters) )  {
 
 }
 
-return ( Filter[n] );
+return Filter[n];
 
 }
 

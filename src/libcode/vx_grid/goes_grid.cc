@@ -10,9 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
-
 #include <cstdio>
 #include <iostream>
 #include <unistd.h>
@@ -24,6 +21,9 @@ using namespace std;
 #include "vx_util.h"
 #include "vx_log.h"
 #include "goes_grid.h"
+
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -172,7 +172,7 @@ double sum = 0;
 mlog << Error << "\n" << method_name << " -> "
      << "is not implemented.\n\n";
 
-return ( sum );
+return sum;
 }
 
 
@@ -183,7 +183,7 @@ int GoesImagerGrid::nx() const
 
 {
 
-return ( Nx );
+return Nx;
 
 }
 
@@ -195,7 +195,7 @@ int GoesImagerGrid::ny() const
 
 {
 
-return ( Ny );
+return Ny;
 
 }
 
@@ -207,7 +207,7 @@ ConcatString GoesImagerGrid::name() const
 
 {
 
-return ( Name );
+return Name;
 
 }
 
@@ -268,7 +268,7 @@ a << "Ny: " << Ny;
    //  done
    //
 
-return ( a );
+return a;
 
 }
 
@@ -284,7 +284,7 @@ GridInfo i;
 
 i.set(Data);
 
-return ( i );
+return i;
 
 }
 
@@ -301,7 +301,7 @@ double GoesImagerGrid::rot_grid_to_earth(int x, int y) const
 // for the Mercator projection in it's standard aspect
 //
 
-return ( 0.0 );
+return 0.0;
 
 }
 
@@ -313,7 +313,7 @@ bool GoesImagerGrid::wrap_lon() const
 
 {
 
-return ( false );
+return false;
 
 }
 
@@ -346,7 +346,7 @@ GoesImagerGrid * p = new GoesImagerGrid (Data);
 
 p->Name = Name;
 
-return ( p );
+return p;
 
 }
 

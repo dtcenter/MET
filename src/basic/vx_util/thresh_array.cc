@@ -7,8 +7,6 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -18,6 +16,8 @@ using namespace std;
 #include "thresh_array.h"
 #include "vx_math.h"
 #include "vx_log.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -54,18 +54,18 @@ ThreshArray::ThreshArray(const ThreshArray & a) {
 
 ThreshArray & ThreshArray::operator=(const ThreshArray & a) {
 
-   if(this == &a) return(*this);
+   if(this == &a) return *this;
 
    assign(a);
 
-   return(* this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void ThreshArray::init_from_scratch() {
 
-   t = (SingleThresh *) 0;
+   t = (SingleThresh *) nullptr;
 
    clear();
 
@@ -76,7 +76,7 @@ void ThreshArray::init_from_scratch() {
 
 void ThreshArray::clear() {
 
-   if(t) { delete [] t;  t = (SingleThresh *) 0; }
+   if(t) { delete [] t;  t = (SingleThresh *) nullptr; }
 
    Nelements = Nalloc = 0;
 
@@ -134,17 +134,17 @@ void ThreshArray::extend(int n, bool exact) {
       n = k*thresharray_alloc_inc;
    }
 
-   SingleThresh *u = (SingleThresh *) 0;
+   SingleThresh *u = (SingleThresh *) nullptr;
 
    u = new SingleThresh [n];
 
    if(t) {
       for(j=0; j<Nelements; j++) u[j] = t[j];
 
-      delete [] t; t = (SingleThresh *) 0;
+      delete [] t; t = (SingleThresh *) nullptr;
    }
 
-   t = u; u = (SingleThresh *) 0;
+   t = u; u = (SingleThresh *) nullptr;
 
    Nalloc = n;
 
@@ -156,14 +156,14 @@ void ThreshArray::extend(int n, bool exact) {
 bool ThreshArray::operator==(const ThreshArray &ta) const {
 
    // Check for the same length
-   if(Nelements != ta.n()) return(false);
+   if(Nelements != ta.n()) return false;
 
    // Check for equality of individual elements
    for(int i=0; i<Nelements; i++) {
-      if(!(t[i] == ta[i])) return(false);
+      if(!(t[i] == ta[i])) return false;
    }
 
-   return(true);
+   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -177,7 +177,7 @@ SingleThresh ThreshArray::operator[](int n) const {
 
    }
 
-   return(t[n]);
+   return t[n];
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -295,7 +295,7 @@ int ThreshArray::has(const SingleThresh &st) const {
 
    status = has(st, index);
 
-   return(status);
+   return status;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -305,18 +305,18 @@ int ThreshArray::has(const SingleThresh &st, int & index) const {
 
    index = -1;
 
-   if(Nelements == 0) return(0);
+   if(Nelements == 0) return 0;
 
    for(j=0; j<Nelements; j++) {
 
-      if(t[j] == st) { index = j; return(1); }
+      if(t[j] == st) { index = j; return 1; }
    }
 
    //
    // Not found
    //
 
-   return(0);
+   return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -335,7 +335,7 @@ ConcatString ThreshArray::get_str(const char *sep, int precision) const {
       else     tmp_str << sep << cur_str;
    }
 
-   return(tmp_str);
+   return tmp_str;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -354,7 +354,7 @@ ConcatString ThreshArray::get_abbr_str(const char *sep, int precision) const {
       else     tmp_str << sep << cur_str;
    }
 
-   return(tmp_str);
+   return tmp_str;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -387,7 +387,7 @@ void ThreshArray::check_bin_thresh() const {
 ////////////////////////////////////////////////////////////////////////
 
 int ThreshArray::check_bins(double v) const {
-   return(check_bins(v, bad_data_double, bad_data_double));
+   return check_bins(v, bad_data_double, bad_data_double);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -396,7 +396,7 @@ int ThreshArray::check_bins(double v, double mn, double sd) const {
    int i, bin;
 
    // Check for bad data or no thresholds
-   if(is_bad_data(v) || Nelements == 0) return(bad_data_int);
+   if(is_bad_data(v) || Nelements == 0) return bad_data_int;
 
    // For < and <=, check thresholds left to right.
    if(t[0].get_type() == thresh_lt || t[0].get_type() == thresh_le) {
@@ -423,13 +423,13 @@ int ThreshArray::check_bins(double v, double mn, double sd) const {
 
    // The bin value returned is 1-based, not 0-based.
 
-   return(bin);
+   return bin;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool ThreshArray::check_dbl(double v) const {
-   return(check_dbl(v, bad_data_double, bad_data_double));
+   return check_dbl(v, bad_data_double, bad_data_double);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -440,9 +440,9 @@ bool ThreshArray::check_dbl(double v, double mn, double sd) const {
    //
    // Check if the value satisifes all the thresholds in the array
    //
-   for(i=0; i<Nelements; i++) if(!t[i].check(v, mn, sd)) return(false);
+   for(i=0; i<Nelements; i++) if(!t[i].check(v, mn, sd)) return false;
 
-   return(true);
+   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -457,7 +457,7 @@ bool ThreshArray::need_perc() {
       }
    }
 
-   return(status);
+   return status;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -534,7 +534,7 @@ bool ThreshArray::equal_bin_width(double &width) const {
    // Check number of elements
    if(Nelements < 2) {
       width = bad_data_double;
-      return(false);
+      return false;
    }
 
    // Initialize return values
@@ -551,7 +551,7 @@ bool ThreshArray::equal_bin_width(double &width) const {
       }
    } // end for i
 
-   return(is_equal);
+   return is_equal;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -598,7 +598,7 @@ ThreshArray string_to_prob_thresh(const char *s) {
    // Check probability thresholds
    check_prob_thresh(ta);
 
-   return(ta);
+   return ta;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -631,7 +631,7 @@ ThreshArray define_prob_bins(double beg, double end, double inc, int prec) {
       v += inc;
    }
 
-   return(ta);
+   return ta;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -665,7 +665,7 @@ ConcatString prob_thresh_to_string(const ThreshArray &ta) {
    // Return comma-separated list of thresholds
    if(cs.length() == 0) cs = ta.get_str();
 
-   return(cs);
+   return cs;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -689,7 +689,7 @@ bool check_prob_thresh(const ThreshArray &ta, bool error_out) {
          exit(1);
       }
       else {
-         return(false);
+         return false;
       }
    }
 
@@ -710,7 +710,7 @@ bool check_prob_thresh(const ThreshArray &ta, bool error_out) {
             exit(1);
          }
          else {
-            return(false);
+            return false;
          }
       }
 
@@ -731,12 +731,12 @@ bool check_prob_thresh(const ThreshArray &ta, bool error_out) {
             exit(1);
          }
          else {
-            return(false);
+            return false;
          }
       }
    } // end for i
 
-   return(true);
+   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -799,7 +799,7 @@ ThreshArray process_perc_thresh_bins(const ThreshArray &ta_in) {
       }
    } // end for i
 
-   return(ta_out);
+   return ta_out;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -839,7 +839,7 @@ ThreshArray process_rps_cdp_thresh(const ThreshArray &ta) {
       ta_out = ta;
    }
 
-   return(ta_out);
+   return ta_out;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -860,7 +860,7 @@ ThreshArray derive_cdp_thresh(const ThreshArray &ta) {
       ta_out.add(st);
    }
 
-   return(ta_out);
+   return ta_out;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -872,7 +872,7 @@ ConcatString write_css(const ThreshArray &ta) {
       css << (i == 0 ? "" : ",") << ta[i].get_str();
    }
 
-   return(css);
+   return css;
 }
 
 ////////////////////////////////////////////////////////////////////////

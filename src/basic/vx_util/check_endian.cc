@@ -7,11 +7,8 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
-
 ////////////////////////////////////////////////////////////////////////
 
-
-using namespace std;
 
 #include <iostream>
 #include <unistd.h>
@@ -19,6 +16,8 @@ using namespace std;
 #include <cmath>
 
 #include "check_endian.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////

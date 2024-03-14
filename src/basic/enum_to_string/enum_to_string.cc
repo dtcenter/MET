@@ -10,12 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-static const int debug = 0;
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 #include <iostream>
 #include <unistd.h>
 
@@ -39,6 +33,12 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
+static const int debug = 0;
+
+
+////////////////////////////////////////////////////////////////////////
+
+
    //
    //  declarations with external linkage
    //
@@ -47,10 +47,10 @@ using namespace std;
 extern int yyparse();
 
 // extern FILE * yyin;
-FILE * yyin = 0;
+FILE * yyin = nullptr;
 
 // extern char * yytext;
-char * yytext = 0;
+char * yytext = nullptr;
 
 extern int yydebug;
 
@@ -90,7 +90,7 @@ bool do_reverse            = false;
 
 bool verbose               = true;
 
-const char * program_name  = (const char *) 0;
+const char * program_name  = (const char *) nullptr;
 
 
 ////////////////////////////////////////////////////////////////////////

@@ -81,7 +81,7 @@ class SeriesAnalysisConfInfo {
       ConcatString     version;            // Config file version
 
       // Mapping of line type to output statistics
-      map<STATLineType,StringArray> output_stats;
+      std::map<STATLineType,StringArray> output_stats;
 
       SeriesAnalysisConfInfo();
      ~SeriesAnalysisConfInfo();

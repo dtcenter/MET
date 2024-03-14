@@ -129,63 +129,63 @@ REAL_NUMBER  (("-"?){DIGITS}{EXP})|(("-"?)"."{DIGITS}{OPT_EXP})|(("-"?){DIGITS}"
 
 %%
 
-"<"                                 { return ( do_comp() ); }
-">"                                 { return ( do_comp() ); }
-"<="                                { return ( do_comp() ); }
-">="                                { return ( do_comp() ); }
-"=="                                { return ( do_comp() ); }
-"!="                                { return ( do_comp() ); }
-"NA"                                { return ( do_comp() ); }
+"<"                                 { return do_comp(); }
+">"                                 { return do_comp(); }
+"<="                                { return do_comp(); }
+">="                                { return do_comp(); }
+"=="                                { return do_comp(); }
+"!="                                { return do_comp(); }
+"NA"                                { return do_comp(); }
 
 
-"le"({INT_NUMBER}|{REAL_NUMBER})    { return ( do_fort_thresh() ); }
-"lt"({INT_NUMBER}|{REAL_NUMBER})    { return ( do_fort_thresh() ); }
-"gt"({INT_NUMBER}|{REAL_NUMBER})    { return ( do_fort_thresh() ); }
-"ge"({INT_NUMBER}|{REAL_NUMBER})    { return ( do_fort_thresh() ); }
-"eq"({INT_NUMBER}|{REAL_NUMBER})    { return ( do_fort_thresh() ); }
-"ne"({INT_NUMBER}|{REAL_NUMBER})    { return ( do_fort_thresh() ); }
+"le"({INT_NUMBER}|{REAL_NUMBER})    { return do_fort_thresh(); }
+"lt"({INT_NUMBER}|{REAL_NUMBER})    { return do_fort_thresh(); }
+"gt"({INT_NUMBER}|{REAL_NUMBER})    { return do_fort_thresh(); }
+"ge"({INT_NUMBER}|{REAL_NUMBER})    { return do_fort_thresh(); }
+"eq"({INT_NUMBER}|{REAL_NUMBER})    { return do_fort_thresh(); }
+"ne"({INT_NUMBER}|{REAL_NUMBER})    { return do_fort_thresh(); }
 
 
-"&&"                                { Column+=2;   return ( LOGICAL_OP_AND ); }
-"||"                                { Column+=2;   return ( LOGICAL_OP_OR  ); }
+"&&"                                { Column+=2;   return LOGICAL_OP_AND; }
+"||"                                { Column+=2;   return LOGICAL_OP_OR;  }
 
-"!"                                 { Column+=1;   return ( LOGICAL_OP_NOT ); }
-
-
-"["                                 { ++Column;  is_lhs = false;  dict_stack->push_array();  return ( configtext[0] ); }
-"{"                                 { ++Column;  is_lhs = true;   dict_stack->push();        return ( configtext[0] ); }
-
-"]"                                 { ++Column;  return ( configtext[0] ); }
-"}"                                 { ++Column;  return ( configtext[0] ); }
-
-"("                                 { ++Column;  return ( configtext[0] ); }
-")"                                 { ++Column;  return ( configtext[0] ); }
-
-"+"                                 { ++Column;  return ( configtext[0] ); }
-"-"                                 { ++Column;  return ( configtext[0] ); }
-"/"                                 { ++Column;  return ( configtext[0] ); }
-"*"                                 { ++Column;  return ( configtext[0] ); }
-"^"                                 { ++Column;  return ( configtext[0] ); }
-
-"="                                 { ++Column;  return ( configtext[0] ); }
-";"                                 { ++Column;  is_lhs = true;  return ( configtext[0] ); }
-","                                 { ++Column;  return ( configtext[0] ); }
+"!"                                 { Column+=1;   return LOGICAL_OP_NOT; }
 
 
+"["                                 { ++Column;  is_lhs = false;  dict_stack->push_array();  return configtext[0]; }
+"{"                                 { ++Column;  is_lhs = true;   dict_stack->push();        return configtext[0]; }
 
-"\""                                { do_quoted_string();  return ( QUOTED_STRING ); }
+"]"                                 { ++Column;  return configtext[0]; }
+"}"                                 { ++Column;  return configtext[0]; }
+
+"("                                 { ++Column;  return configtext[0]; }
+")"                                 { ++Column;  return configtext[0]; }
+
+"+"                                 { ++Column;  return configtext[0]; }
+"-"                                 { ++Column;  return configtext[0]; }
+"/"                                 { ++Column;  return configtext[0]; }
+"*"                                 { ++Column;  return configtext[0]; }
+"^"                                 { ++Column;  return configtext[0]; }
+
+"="                                 { ++Column;  return configtext[0]; }
+";"                                 { ++Column;  is_lhs = true;  return configtext[0]; }
+","                                 { ++Column;  return configtext[0]; }
+
+
+
+"\""                                { do_quoted_string();  return QUOTED_STRING; }
 
 "${"{IDENTIFIER}"}"                 { do_env(); }
 
-{IDENTIFIER}                        { return ( do_id() ); }
+{IDENTIFIER}                        { return do_id(); }
 
 
 
-{INT_NUMBER}                        { do_int();    return ( INTEGER ); }
+{INT_NUMBER}                        { do_int();    return INTEGER; }
 
 
 
-{REAL_NUMBER}                       { do_float();  return ( FLOAT ); }
+{REAL_NUMBER}                       { do_float();  return FLOAT; }
 
 
 
@@ -199,7 +199,7 @@ REAL_NUMBER  (("-"?){DIGITS}{EXP})|(("-"?)"."{DIGITS}{OPT_EXP})|(("-"?){DIGITS}"
 
 "\n"                                { ++LineNumber;  Column = 1; }
 
-<<EOF>>                             { if ( do_eof() )  return ( 0 ); }
+<<EOF>>                             { if ( do_eof() )  return 0; }
 
 .                                   { ++Column; }
 
@@ -230,7 +230,7 @@ if ( c == '\n' )  {
 }
 
 
-return ( c );
+return c;
 
 }
 
@@ -245,7 +245,7 @@ void do_cpp_comment()
 int c;
 
 
-while ( 1 )  {
+while ( true )  {
 
    c = nextchar();
 
@@ -275,7 +275,7 @@ c2 = nextchar();
 
 comment_depth = 1;
 
-while ( 1 )  {
+while ( true )  {
 
    if ( (c1 == EOF) || (c2 == EOF) )  break;
 
@@ -338,7 +338,7 @@ else {
    //  done
    //
 
-return ( return_value );
+return return_value;
 
 }
 
@@ -389,7 +389,7 @@ char line[max_id_length];
 
 n = 0;
 
-while ( 1 )  {
+while ( true )  {
 
    c = nextchar();
 
@@ -476,32 +476,32 @@ Column += strlen(configtext);
    //  print?
    //
 
-if ( strcmp(configtext, "print"  ) == 0 )  { return ( PRINT ); }
+if ( strcmp(configtext, "print"  ) == 0 )  { return PRINT; }
 
    //
    //  boolean?
    //
 
-if ( strcmp(configtext, "true"  ) == 0 )  { configlval.bval = true;   return ( BOOLEAN ); }
-if ( strcmp(configtext, "false" ) == 0 )  { configlval.bval = false;  return ( BOOLEAN ); }
+if ( strcmp(configtext, "true"  ) == 0 )  { configlval.bval = true;   return BOOLEAN; }
+if ( strcmp(configtext, "false" ) == 0 )  { configlval.bval = false;  return BOOLEAN; }
 
-if ( strcmp(configtext, "TRUE"  ) == 0 )  { configlval.bval = true;   return ( BOOLEAN ); }
-if ( strcmp(configtext, "FALSE" ) == 0 )  { configlval.bval = false;  return ( BOOLEAN ); }
+if ( strcmp(configtext, "TRUE"  ) == 0 )  { configlval.bval = true;   return BOOLEAN; }
+if ( strcmp(configtext, "FALSE" ) == 0 )  { configlval.bval = false;  return BOOLEAN; }
 
    //
    //  comparison?
    //
 
-if ( strcmp(configtext, "lt" ) == 0 )  { configlval.cval = thresh_lt;  return ( COMPARISON ); }
-if ( strcmp(configtext, "le" ) == 0 )  { configlval.cval = thresh_le;  return ( COMPARISON ); }
+if ( strcmp(configtext, "lt" ) == 0 )  { configlval.cval = thresh_lt;  return COMPARISON; }
+if ( strcmp(configtext, "le" ) == 0 )  { configlval.cval = thresh_le;  return COMPARISON; }
 
-if ( strcmp(configtext, "gt" ) == 0 )  { configlval.cval = thresh_gt;  return ( COMPARISON ); }
-if ( strcmp(configtext, "ge" ) == 0 )  { configlval.cval = thresh_ge;  return ( COMPARISON ); }
+if ( strcmp(configtext, "gt" ) == 0 )  { configlval.cval = thresh_gt;  return COMPARISON; }
+if ( strcmp(configtext, "ge" ) == 0 )  { configlval.cval = thresh_ge;  return COMPARISON; }
 
-if ( strcmp(configtext, "ne" ) == 0 )  { configlval.cval = thresh_ne;  return ( COMPARISON ); }
-if ( strcmp(configtext, "eq" ) == 0 )  { configlval.cval = thresh_eq;  return ( COMPARISON ); }
+if ( strcmp(configtext, "ne" ) == 0 )  { configlval.cval = thresh_ne;  return COMPARISON; }
+if ( strcmp(configtext, "eq" ) == 0 )  { configlval.cval = thresh_eq;  return COMPARISON; }
 
-if ( strcmp(configtext, na_str ) == 0 )  { configlval.cval = thresh_na;  return ( NA_COMPARISON ); }
+if ( strcmp(configtext, na_str ) == 0 )  { configlval.cval = thresh_na;  return NA_COMPARISON; }
 
    //
    //  builtin ?
@@ -509,13 +509,13 @@ if ( strcmp(configtext, na_str ) == 0 )  { configlval.cval = thresh_na;  return 
 
 int index;
 
-if ( (! is_lhs) && is_builtin((string)configtext, index) )  { configlval.index = index;  return ( BUILTIN ); }
+if ( (! is_lhs) && is_builtin((string)configtext, index) )  { configlval.index = index;  return BUILTIN; }
 
    //
    //  local variable ?
    //
 
-if ( is_function_def && ida.has(configtext, index) )  { configlval.index = index;  return ( LOCAL_VAR ); }
+if ( is_function_def && ida.has(configtext, index) )  { configlval.index = index;  return LOCAL_VAR; }
 
    //
    //  number?
@@ -529,13 +529,13 @@ if ( e && (e->is_number()) && (! is_lhs) )  {
 
       set_int(configlval.nval, e->i_value());
 
-      return ( INTEGER );
+      return INTEGER;
 
    } else {
 
       set_double(configlval.nval, e->d_value());
 
-      return ( FLOAT );
+      return FLOAT;
 
    }
 
@@ -549,7 +549,7 @@ if ( e && (! is_lhs) && (e->type() == UserFunctionType) )  {
 
    configlval.entry = e;
 
-   return ( USER_FUNCTION ); 
+   return USER_FUNCTION; 
 
 }
 
@@ -560,7 +560,7 @@ if ( e && (! is_lhs) && (e->type() == UserFunctionType) )  {
 
 strncpy(configlval.text, configtext, sizeof(configlval.text) - 1);
 
-return ( IDENTIFIER );
+return IDENTIFIER;
 
 }
 
@@ -759,7 +759,7 @@ bool do_eof()
 
 {
 
-if ( ! reading_env )  return ( true );
+if ( ! reading_env )  return true;
 
 config_delete_buffer(YY_CURRENT_BUFFER);
 
@@ -769,7 +769,7 @@ reading_env = false;
 
 Column += 3;
 
-return ( false );
+return false;
 
 }
 
@@ -844,7 +844,7 @@ int do_fort_thresh()
 
 strncpy(configlval.text, configtext, sizeof(configlval.text));
 
-return ( FORTRAN_THRESHOLD );
+return FORTRAN_THRESHOLD;
 
 }
 

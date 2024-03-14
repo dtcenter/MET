@@ -24,11 +24,11 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-extern int   parse_number     (istream &);
+extern int   parse_number     (std::istream &);
 
-extern void  skip_whitespace  (istream &);
+extern void  skip_whitespace  (std::istream &);
 
-extern void  get_comment      (istream &, char *);
+extern void  get_comment      (std::istream &, char *);
 
 
 ////////////////////////////////////////////////////////////////////////

@@ -1350,7 +1350,7 @@ RegridInfo parse_conf_regrid(Dictionary *dict, bool error_out) {
          exit(1);
       }
       else {
-         return(info);
+         return info;
       }
    }
 
@@ -2010,7 +2010,7 @@ HiRAInfo parse_conf_hira(Dictionary *dict) {
    info.flag = hira_dict->lookup_bool(conf_key_flag);
 
    // If disabled, skip remainder of the dictionary.
-   if(!info.flag) return(info);
+   if(!info.flag) return info;
 
    // Conf: vld_thresh
    info.vld_thresh = hira_dict->lookup_double(conf_key_vld_thresh);
@@ -3308,7 +3308,7 @@ StringArray parse_conf_ens_member_ids(Dictionary *dict) {
            << sa.n() << " entries.\n";
    }
 
-   return(sa);
+   return sa;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

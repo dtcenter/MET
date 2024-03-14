@@ -8,8 +8,6 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -26,6 +24,8 @@ using namespace std;
 
 #include "vx_util.h"
 #include "vx_log.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -58,7 +58,7 @@ void close_tc_txt_file(ofstream *&out, const char *file_name) {
    // Close the output file
    out->close();
    delete out;
-   out = (ofstream *) 0;
+   out = (ofstream *) nullptr;
 
    return;
 }

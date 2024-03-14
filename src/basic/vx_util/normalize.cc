@@ -8,8 +8,6 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <cstdlib>
 #include <iostream>
 #include <math.h>
@@ -17,6 +15,8 @@ using namespace std;
 #include <unistd.h>
 
 #include "normalize.h"
+
+using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -52,7 +52,7 @@ ConcatString normalizetype_to_string(const NormalizeType type) {
          exit(1);
    }
 
-   return(s);
+   return s;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -132,7 +132,7 @@ static int          rej_sid  = 0;
 ////////////////////////////////////////////////////////////////////////
 
 // Output NetCDF file
-NcFile *f_out = (NcFile *) 0;
+netCDF::NcFile *f_out = (netCDF::NcFile *) nullptr;
 
 int    processed_count;
 
@@ -142,7 +142,7 @@ static Madis2NcConfInfo conf_info;
 
 static bool do_summary;
 static bool save_summary_only = false;
-static SummaryObs *summary_obs = 0;
+static SummaryObs *summary_obs = nullptr;
 
 #endif   //  __MADIS2NC_H__
 

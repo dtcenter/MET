@@ -8,8 +8,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <dirent.h>
 #include <iostream>
 #include <unistd.h>
@@ -24,6 +22,8 @@ using namespace std;
 
 #include "vx_data2d_factory.h"
 #include "vx_log.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -54,12 +54,12 @@ ModeConfInfo::~ModeConfInfo()
 
 ModeConfInfo & ModeConfInfo::operator=(const ModeConfInfo &s)
 {
-   if(this == &s) return(*this);
+   if(this == &s) return *this;
 
    clear();
    assign(s);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -137,7 +137,7 @@ void ModeConfInfo::assign( const ModeConfInfo &m)
    }
 
    // need to be recomputed, maybe, so do so just in case
-   Dictionary * dict      = (Dictionary *) 0;
+   Dictionary * dict      = (Dictionary *) nullptr;
    dict = conf.lookup_dictionary(conf_key_interest_function);
    centroid_dist_if    = parse_interest_function(dict, conf_key_centroid_dist);
    boundary_dist_if    = parse_interest_function(dict, conf_key_boundary_dist);
@@ -226,16 +226,16 @@ void ModeConfInfo::clear()
 
    inten_perc_value = bad_data_int;
 
-   centroid_dist_if    = (PiecewiseLinear *) 0;
-   boundary_dist_if    = (PiecewiseLinear *) 0;
-   convex_hull_dist_if = (PiecewiseLinear *) 0;
-   angle_diff_if       = (PiecewiseLinear *) 0;
-   aspect_diff_if      = (PiecewiseLinear *) 0;
-   area_ratio_if       = (PiecewiseLinear *) 0;
-   int_area_ratio_if   = (PiecewiseLinear *) 0;
-   curvature_ratio_if  = (PiecewiseLinear *) 0;
-   complexity_ratio_if = (PiecewiseLinear *) 0;
-   inten_perc_ratio_if = (PiecewiseLinear *) 0;
+   centroid_dist_if    = (PiecewiseLinear *) nullptr;
+   boundary_dist_if    = (PiecewiseLinear *) nullptr;
+   convex_hull_dist_if = (PiecewiseLinear *) nullptr;
+   angle_diff_if       = (PiecewiseLinear *) nullptr;
+   aspect_diff_if      = (PiecewiseLinear *) nullptr;
+   area_ratio_if       = (PiecewiseLinear *) nullptr;
+   int_area_ratio_if   = (PiecewiseLinear *) nullptr;
+   curvature_ratio_if  = (PiecewiseLinear *) nullptr;
+   complexity_ratio_if = (PiecewiseLinear *) nullptr;
+   inten_perc_ratio_if = (PiecewiseLinear *) nullptr;
 
    total_interest_thresh = bad_data_double;
 
@@ -308,7 +308,7 @@ void ModeConfInfo::process_config_traditional(GrdFileType ftype, GrdFileType oty
 
 void ModeConfInfo::process_config_except_fields()
 {
-   Dictionary * dict      = (Dictionary *) 0;
+   Dictionary * dict      = (Dictionary *) nullptr;
 
       // Dump the contents of the config file
 
@@ -536,8 +536,8 @@ void ModeConfInfo::process_config_both(GrdFileType ftype, GrdFileType otype,
    int j, k, n;
 
 
-   Dictionary * fcst_dict = (Dictionary *) 0;
-   Dictionary * obs_dict  = (Dictionary *) 0;
+   Dictionary * fcst_dict = (Dictionary *) nullptr;
+   Dictionary * obs_dict  = (Dictionary *) nullptr;
 
       // Conf: fcst and obs
 
@@ -608,7 +608,7 @@ void ModeConfInfo::process_config_fcst(GrdFileType ftype, int field_index)
 {
    int j, k, n;
 
-   Dictionary * fcst_dict = (Dictionary *) 0;
+   Dictionary * fcst_dict = (Dictionary *) nullptr;
 
    fcst_dict = conf.lookup_dictionary(conf_key_fcst);
    shift_right = fcst_dict->lookup_int(conf_key_shift_right);
@@ -645,7 +645,7 @@ void ModeConfInfo::process_config_obs(GrdFileType otype, int field_index)
 {
    int j, k, n;
 
-   Dictionary * obs_dict  = (Dictionary *) 0;
+   Dictionary * obs_dict  = (Dictionary *) nullptr;
 
    obs_dict  = conf.lookup_dictionary(conf_key_obs);
    shift_right = obs_dict->lookup_int(conf_key_shift_right);
@@ -1087,7 +1087,7 @@ for (int j=0; j<pwl_if->n_points(); ++j)  {
 
 }   //  for j
 
-return ( pwl_if );
+return pwl_if;
 
 }
 
@@ -1270,7 +1270,7 @@ void ModeConfInfo::parse_nc_info()
 
 {
 
-const DictionaryEntry * e = (const DictionaryEntry *) 0;
+const DictionaryEntry * e = (const DictionaryEntry *) nullptr;
 
 e = conf.lookup(conf_key_nc_pairs_flag);
 
@@ -1587,7 +1587,7 @@ GrdFileType ModeConfInfo::file_type_for_field(bool isFcst, int field_index)
    // look at the dictionary for the obs or forecast at index, with
    // parents
    
-   Dictionary * dict = (Dictionary *) 0;
+   Dictionary * dict = (Dictionary *) nullptr;
    if (isFcst) {
       dict = conf.lookup_dictionary(conf_key_fcst);
    } else {
@@ -1670,7 +1670,7 @@ switch ( e2->type() )  {
 }
 
 
-return ( status );
+return status;
 
 }
 
@@ -1682,7 +1682,7 @@ void ModeConfInfo::get_multivar_programs()
 
 {
 
-Dictionary * dict = (Dictionary *) 0;
+Dictionary * dict = (Dictionary *) nullptr;
 
 fcst_multivar_logic.clear();
 obs_multivar_logic.clear();
@@ -1860,7 +1860,7 @@ bool ModeNcOutInfo::all_false() const
 
 bool status = do_latlon || do_raw || do_object_raw || do_object_id || do_cluster_id || do_polylines;
 
-return ( !status );
+return !status;
 
 }
 

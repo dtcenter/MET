@@ -31,12 +31,12 @@ class SurfradHandler : public FileHandler
 
 public:
 
-  SurfradHandler(const string &program_name);
+  SurfradHandler(const std::string &program_name);
   virtual ~SurfradHandler();
 
   virtual bool isFileType(LineDataFile &ascii_file) const;
   
-  static string getFormatString()
+  static std::string getFormatString()
   {
     return "surfrad";
   }
@@ -59,7 +59,7 @@ protected:
 
   // The header type for these observations
 
-  static const string HEADER_TYPE;
+  static const std::string HEADER_TYPE;
 
   // Grib codes for the different fields
 
@@ -91,7 +91,7 @@ protected:
 
   // Unchanging header information
 
-  string _stationId;
+  std::string _stationId;
   double _stationLat;
   double _stationLon;
   double _stationAlt;

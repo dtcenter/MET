@@ -2214,7 +2214,7 @@ double get_nc_var_att_double(const NcVar *nc_var, const char *att_name, bool is_
    double att_val = get_att_value_double(nc_att);
    if (nc_att) delete nc_att;
 
-   return(att_val);
+   return att_val;
 }
 
 
@@ -3450,7 +3450,7 @@ LatLonData NcCfFile::get_data_from_lat_lon_vars(NcVar *lat_var, NcVar *lon_var,
     swap_to_north = false;
   }
 
-  return(data);
+  return data;
 
 }
 

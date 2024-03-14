@@ -8,8 +8,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -20,6 +18,8 @@ using namespace std;
 #include "math_constants.h"
 
 #include "track_pair_info.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -52,11 +52,11 @@ TrackPairInfo::TrackPairInfo(const TrackPairInfo & t) {
 
 TrackPairInfo & TrackPairInfo::operator=(const TrackPairInfo & t) {
 
-   if(this == &t) return(*this);
+   if(this == &t) return *this;
 
    assign(t);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -146,7 +146,7 @@ ConcatString TrackPairInfo::case_info() const {
      << ", INIT = " << unix_to_yyyymmdd_hhmmss(ADeck.init())
      << ", NPoints = " << NPoints;
 
-   return(s);
+   return s;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -157,7 +157,7 @@ ConcatString TrackPairInfo::serialize() const {
    s << "TrackPairInfo: "
      << "NPoints = " << NPoints;
 
-   return(s);
+   return s;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -185,7 +185,7 @@ ConcatString TrackPairInfo::serialize_r(int n, int indent_depth) const {
        << "\n";
    }
 
-   return(s);
+   return s;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -321,7 +321,7 @@ void TrackPairInfo::add(const TCStatLine &l) {
 
 void TrackPairInfo::add_tcmpr_line(const TCStatLine &l) {
    TrackPoint apoint, bpoint;
-   TrackPoint *tp = (TrackPoint *) 0;
+   TrackPoint *tp = (TrackPoint *) nullptr;
    QuadInfo wind;
    ConcatString cs;
    int i, j;
@@ -545,7 +545,7 @@ unixtime TrackPairInfo::valid(int i) const {
    // Use the ADeck valid time, if defined.
    t = (ADeck[i].valid() > 0 ? ADeck[i].valid() : BDeck[i].valid());
 
-   return(t);
+   return t;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -561,7 +561,7 @@ int TrackPairInfo::i_init() const {
 
    if(i < NPoints) i_match = i;
 
-   return(i_match);
+   return i_match;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -575,7 +575,7 @@ WatchWarnType TrackPairInfo::watch_warn(int i) const {
       ww_type = ww_max(ADeck[i].watch_warn(), BDeck[i].watch_warn());
    }
 
-   return(ww_type);
+   return ww_type;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -621,7 +621,7 @@ int TrackPairInfo::check_water_only() {
       }
    } // end for i
 
-   return(n_rej);
+   return n_rej;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -642,7 +642,7 @@ int TrackPairInfo::check_rirw(const TrackType track_type,
    int acur, aprv, bcur, bprv;
 
    // Nothing to do.
-   if(track_type == TrackType_None) return(0);
+   if(track_type == TrackType_None) return 0;
 
    // Check threshold type for non-exact intensity differences.
    if(!exact_adeck &&
@@ -785,7 +785,7 @@ int TrackPairInfo::check_rirw(const TrackType track_type,
       }
    } // end for i
 
-   return(n_rej);
+   return n_rej;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -820,7 +820,7 @@ int TrackPairInfo::check_landfall(const int landfall_beg,
       }
    }
 
-   return(n_rej);
+   return n_rej;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -853,7 +853,7 @@ bool TrackPairInfo::landfall_window(unixtime beg_ut, unixtime end_ut) const {
       }
    }
 
-   return(found);
+   return found;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -888,7 +888,7 @@ TrackPairInfo TrackPairInfo::keep_subset() const {
       }
    }
 
-   return(tpi);
+   return tpi;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -922,18 +922,18 @@ TrackPairInfoArray::TrackPairInfoArray(const TrackPairInfoArray & t) {
 
 TrackPairInfoArray & TrackPairInfoArray::operator=(const TrackPairInfoArray & t) {
 
-   if(this == &t)  return(*this);
+   if(this == &t)  return *this;
 
    assign(t);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void TrackPairInfoArray::init_from_scratch() {
 
-   Pair = (TrackPairInfo *) 0;
+   Pair = (TrackPairInfo *) nullptr;
 
    clear();
 
@@ -944,7 +944,7 @@ void TrackPairInfoArray::init_from_scratch() {
 
 void TrackPairInfoArray::clear() {
 
-   if(Pair) { delete [] Pair; Pair = (TrackPairInfo *) 0; }
+   if(Pair) { delete [] Pair; Pair = (TrackPairInfo *) nullptr; }
    NPairs = NAlloc = 0;
 
    return;
@@ -979,7 +979,7 @@ ConcatString TrackPairInfoArray::serialize() const {
      << "NPairs = " << NPairs
      << ", NAlloc = " << NAlloc;
 
-   return(s);
+   return s;
 
 }
 
@@ -995,7 +995,7 @@ ConcatString TrackPairInfoArray::serialize_r(int indent_depth) const {
    for(i=0; i<NPairs; i++)
       s << Pair[i].serialize_r(i+1, indent_depth+1);
 
-   return(s);
+   return s;
 
 }
 
@@ -1021,7 +1021,7 @@ void TrackPairInfoArray::assign(const TrackPairInfoArray &t) {
 
 void TrackPairInfoArray::extend(int n, bool exact) {
    int j, k;
-   TrackPairInfo *new_info = (TrackPairInfo *) 0;
+   TrackPairInfo *new_info = (TrackPairInfo *) nullptr;
 
    // Check if enough memory is already allocated
    if(NAlloc >= n) return;
@@ -1045,12 +1045,12 @@ void TrackPairInfoArray::extend(int n, bool exact) {
    // Copy the array contents and delete the old one
    if(Pair) {
       for(j=0; j<NPairs; j++) new_info[j] = Pair[j];
-      delete [] Pair;  Pair = (TrackPairInfo *) 0;
+      delete [] Pair;  Pair = (TrackPairInfo *) nullptr;
    }
 
    // Point to the new array
    Pair     = new_info;
-   new_info = (TrackPairInfo *) 0;
+   new_info = (TrackPairInfo *) nullptr;
 
    // Store the allocated length
    NAlloc = n;
@@ -1069,7 +1069,7 @@ const TrackPairInfo & TrackPairInfoArray::operator[](int n) const {
       exit(1);
    }
 
-   return(Pair[n]);
+   return Pair[n];
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1079,7 +1079,7 @@ int TrackPairInfoArray::n_points() const {
 
    for(i=0,n=0; i<NPairs; i++) n += Pair[i].adeck().n_points();
 
-   return(n);
+   return n;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1091,7 +1091,7 @@ int TrackPairInfoArray::max_n_diag() const {
       if(Pair[i].adeck().n_diag() > n) n = Pair[i].adeck().n_diag();
    }
 
-   return(n);
+   return n;
 }
 
 ////////////////////////////////////////////////////////////////////////

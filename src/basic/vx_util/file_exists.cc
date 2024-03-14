@@ -7,12 +7,8 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
-
-
 ////////////////////////////////////////////////////////////////////////
 
-
-using namespace std;
 
 #include <iostream>
 #include <unistd.h>
@@ -26,6 +22,8 @@ using namespace std;
 #include "file_exists.h"
 #include "empty_string.h"
 
+using namespace std;
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -38,9 +36,9 @@ int status;
 
 status = access(path, F_OK);
 
-if ( status == 0 )  return ( true );
+if ( status == 0 )  return true;
 
-return ( false );
+return false;
 
 }
 
@@ -60,7 +58,7 @@ if ( empty(path) )  {
 
 }
 
-if ( ! file_exists(path) )  return ( false );
+if ( ! file_exists(path) )  return false;
 
 struct stat s;
 
@@ -73,9 +71,9 @@ if ( stat(path, &s) < 0 )  {
 
 }
 
-if ( S_ISDIR(s.st_mode) )  return ( true );
+if ( S_ISDIR(s.st_mode) )  return true;
 
-return ( false );
+return false;
 
 }
 
