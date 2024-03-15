@@ -38,13 +38,13 @@ on:
   workflow_dispatch:
 
 jobs:
-  scan_c++:
+  scan_cxx:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0
-    - name: SonarQube C++ Scan
+    - name: SonarQube CXX Scan
       uses: sonarsource/sonarqube-scan-action@master
       with:
         projectBaseDir: src
