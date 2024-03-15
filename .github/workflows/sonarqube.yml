@@ -49,6 +49,7 @@ jobs:
       with:
         projectBaseDir: src
         args: >
+          -Dsonar.projectKey=MET-GitHub-Actions
           -Dsonar.cfamily.build-wrapper-output=bw-outputs
           -Dsonar.sourceEncoding=UTF-8
           -Dsonar.verbose=true
@@ -67,6 +68,7 @@ jobs:
       with:
         projectBaseDir: scripts/python,data/wrappers
         args: >
+          -Dsonar.projectKey=MET-GitHub-Actions
           -Dsonar.python.version=3.6.3
           -Dsonar.sourceEncoding=UTF-8
           -Dsonar.verbose=true
