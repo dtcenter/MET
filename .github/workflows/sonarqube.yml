@@ -45,7 +45,6 @@ jobs:
       with:
         # Disabling shallow clone for improved relevancy of reporting
         fetch-depth: 0
-        projectBaseDir: .
     - name: SonarQube Scan
       uses: sonarsource/sonarqube-scan-action@master
       env:
