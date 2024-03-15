@@ -89,16 +89,16 @@ WS      " "|"\t"
 
 %%
 
-enum                             { do_enum();   return ( token(ENUM)  ); }
-class                            { do_class();  return ( token(CLASS) ); }
+enum                             { do_enum();   return token(ENUM);  }
+class                            { do_class();  return token(CLASS); }
 
-"{"                              { if ( do_left_curly()  )  return ( token(L_CURLY) ); }
-"}"                              { if ( do_right_curly() )  return ( token(R_CURLY) ); }
-"="                              { if ( do_equals()      )  return ( token (EQ) );     }
-";"                              { if ( do_semi()        )  return ( token(';') );     }
-","                              { if ( do_comma()       )  return ( token(',') );     }
-("-"?)({DIGIT})+                 { if ( do_int()         )  return ( token(INTEGER) ); }
-({LETTER})({LETTER}|{DIGIT})*    { if ( do_id()          )  return ( token(ID) );      }
+"{"                              { if ( do_left_curly()  )  return token(L_CURLY); }
+"}"                              { if ( do_right_curly() )  return token(R_CURLY); }
+"="                              { if ( do_equals()      )  return token (EQ);     }
+";"                              { if ( do_semi()        )  return token(';');     }
+","                              { if ( do_comma()       )  return token(',');     }
+("-"?)({DIGIT})+                 { if ( do_int()         )  return token(INTEGER); }
+({LETTER})({LETTER}|{DIGIT})*    { if ( do_id()          )  return token(ID);      }
 
 
 
@@ -160,13 +160,13 @@ if ( enum_mode || last_was_enum || last_was_class )  {
 
    strncpy(yylval.name, yytext, sizeof(yylval.name));
 
-   return ( 1 );
+   return 1;
 
 }
 
 
 
-return ( 0 );
+return 0;
 
 }
 
@@ -180,13 +180,13 @@ int do_int()
 
 column += strlen(yytext);
 
-if ( !enum_mode )  return ( 0 );
+if ( !enum_mode )  return 0;
 
 yylval.ival = atoi(yytext);
 
 
 
-return ( 1 );
+return 1;
 
 }
 
@@ -202,12 +202,12 @@ int do_left_curly()
 
 ++column;
 
-if ( !enum_mode )  return ( 0 );
+if ( !enum_mode )  return 0;
 
 yylval.ival = bracket_level;
 
 
-return ( 1 );
+return 1;
 
 }
 
@@ -225,12 +225,12 @@ int do_right_curly()
 
 ss.clear_to_level(bracket_level);
 
-if ( !enum_mode )  return ( 0 );
+if ( !enum_mode )  return 0;
 
 yylval.ival = bracket_level + 1;
 
 
-return ( 1 );
+return 1;
 
 }
 
@@ -244,10 +244,10 @@ int do_semi()
 
 ++column;
 
-if ( enum_mode )  return ( 1 );
+if ( enum_mode )  return 1;
 
 
-return ( 0 );
+return 0;
 
 }
 
@@ -261,10 +261,10 @@ int do_equals()
 
 ++column;
 
-if ( enum_mode )  return ( 1 );
+if ( enum_mode )  return 1;
 
 
-return ( 0 );
+return 0;
 
 }
 
@@ -278,10 +278,10 @@ int do_comma()
 
 ++column;
 
-if ( enum_mode )  return ( 1 );
+if ( enum_mode )  return 1;
 
 
-return ( 0 );
+return 0;
 
 }
 
@@ -300,7 +300,7 @@ c1 = nextchar();
 c2 = nextchar();
 
 
-while ( 1 )  {
+while ( true )  {
 
    if ( (c1 == EOF) || (c2 == EOF) )  break;
 
@@ -329,7 +329,7 @@ void do_cpp_comment()
 int c;
 
 
-while ( 1 )  {
+while ( true )  {
 
    c = nextchar();
 
@@ -366,7 +366,7 @@ if ( c == '\n' )  {
 }
 
 
-return ( c );
+return c;
 
 }
 
@@ -388,7 +388,7 @@ if ( t == CLASS )  last_was_class = 1;
 if ( t == ENUM  )  last_was_enum  = 1;
 
 
-return ( t );
+return t;
 
 }
 

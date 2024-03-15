@@ -46,7 +46,7 @@ extern bool do_concat_string;
 
 EnumInfo einfo;
 
-const char * header_filename = (const char *) 0;
+const char * header_filename = (const char *) nullptr;
 
 ScopeStack ss;
 
@@ -171,7 +171,7 @@ void set_name(const char * text)
 {
 
 int j, n;
-const char * c = (const char *) 0;
+const char * c = (const char *) nullptr;
 ostringstream s;
 
 
