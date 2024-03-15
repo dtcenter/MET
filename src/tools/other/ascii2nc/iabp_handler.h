@@ -125,6 +125,11 @@ class IabpHandler : public FileHandler {
       double _ts;
       double _ta;
 
+   int _numZero;
+   int _numOneMinOrLess;
+   int _numGreaterThanOneMin;
+   
+
       ///////////////////////
       // Protected methods
       ///////////////////////
@@ -139,6 +144,7 @@ class IabpHandler : public FileHandler {
       // _observations vector
       virtual bool _readObservations(LineDataFile &ascii_file);
 
+   time_t _time2(const string &syear, const string &shour, const string &smin, const string &sdoy);
 };
 
 ////////////////////////////////////////////////////////////////////////

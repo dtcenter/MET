@@ -52,11 +52,17 @@ map<string,obsVarInfo> IabpObsVarMap = {
 IabpHandler::IabpHandler(const string &program_name) :
   FileHandler(program_name) {
    use_var_id = false;
+   _numZero= 0;
+   _numOneMinOrLess=0;
+   _numGreaterThanOneMin=0;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-IabpHandler::~IabpHandler() { }
+IabpHandler::~IabpHandler() {
+   mlog << Debug(1) << "Numzero=" << _numZero << "  numOneMinOrLess="
+        << _numOneMinOrLess << "  num>1min=" << _numGreaterThanOneMin << "\n\n";
+}
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -300,44 +306,113 @@ static time_t _time(const string &syear, const string &shour, const string &smin
    double doy = stod(sdoy);
    time_t retval = doyhms_to_unix((int)doy, year, hour, min, 0);
 
-#ifdef TESTING_ONLY
-   // an approach to compare figuring out hour and minute using doy, as apposed to using input hour/minute
-   int mjd = date_to_mjd(1, 0, year) + (int)doy;
-   int day, month;
-   mjd_to_date(mjd, month, day, year);
+   // // an approach to compare figuring out hour and minute using doy, as apposed to using input hour/minute
+   // int mjd = date_to_mjd(1, 0, year) + (int)doy;
+   // int day, month;
+   // mjd_to_date(mjd, month, day, year);
 
-   // have day and month, now just examine the fractional part of doy, this is in units of days I guess
-   double hms = doy - (double)(int)doy;
+   // // have day and month, now just examine the fractional part of doy, this is in units of days I guess
+   // double hms = doy - (double)(int)doy;
 
-   // 24 hours per day, convert to hours
-   double dhours = hms*24;
+   // // 24 hours per day, convert to hours
+   // double dhours = hms*24;
 
-   // truncate 
-   int hour2 = (int)dhours;  
+   // // truncate 
+   // int hour2 = (int)dhours;  
 
-   double dms = (dhours - (double)hour2)*60.0;
-   // round
-   int min2 = nint(dms-0.5);
-   while (min2 >= 60)
-   {
-      min2 -= 60;
-      hour2 += 1;
-   }
+   // double dms = (dhours - (double)hour2)*60.0;
+   // // round
+   // int min2 = nint(dms);
+   // while (min2 >= 60)
+   // {
+   //    min2 -= 60;
+   //    hour2 += 1;
+   // }
 
-   if (min2 != min || hour2 != hour)
-   {
-      mlog << Warning << "doy=" << doy << " hour=" << hour << " hour2=" << hour2 << " min=" << min << " min2=" << min2 << "\n";
-   }
+   // if (min2 != min || hour2 != hour)
+   // {
+   //    mlog << Warning << "doy=" << doy << " hour=" << hour << " hour2=" << hour2 << " min=" << min << " min2=" << min2 << "\n";
+   // }
 
 
-   int seconds = 0;  // for now
+   // int seconds = 0;  // for now
    
-   time_t answer2 = mdyhms_to_unix(month, day, year, hour2, minute, seconds);
-   // check for consistency
-   if (answer != retval) {
-      mlog << Warning << "\nIabpHandler::_time() -> time mismatch by " << answer-retval << " seconds\n\n";
-   }   
-#endif
+   // time_t answer2 = mdyhms_to_unix(month, day, year, hour2, min2, seconds);
+
+   // int diff = answer2 - retval;
+   // // check for consistency
+   // if (diff != 0) {
+   //     mlog << Warning << "IabpHandler::_time() -> time mismatch by " << diff << " seconds\n";
+   // }   
    
    return retval;
 }
+
+
+// time_t IabpHandler::_time2(const string &syear, const string &shour, const string &smin, const string &sdoy)
+// {
+//    int year = stoi(syear);
+//    int hour = stoi(shour);
+//    int min = stoi(smin);
+//    double doy = stod(sdoy);
+
+//    // an approach to compare figuring out hour and minute using doy, as apposed to using input hour/minute
+//    int mjd = date_to_mjd(1, 0, year) + (int)doy;
+//    int day, month;
+//    mjd_to_date(mjd, month, day, year);
+
+//    time_t retval = doyhms_to_unix((int)doy, year, hour, min, 0);
+
+//    // have day and month, now just examine the fractional part of doy, this is in units of days I guess
+//    double hms = doy - (double)(int)doy;
+
+//    // 24 hours per day, convert to hours
+//    double dhours = hms*24;
+
+//    // truncate 
+//    int hour2 = (int)dhours;  
+
+//    double dms = (dhours - (double)hour2)*60.0;
+
+//    // truncate or round?
+//    int min2 = (int)dms;
+
+   // double s = (dms - (double)min2)*60.0;
+   // // truncate again
+   // int seconds = (int)s;
+
+   // if (seconds > 30)
+   // {
+   //    // round up the minute
+   //    min2 = min2 + 1;
+   //    if (min2 >= 60)
+   //    {
+   //       min2 -= 60;
+   //       hour2 = hour2 + 1;
+   //       if (hour2 >= 24)
+   //       {
+   //          mlog << Warning << "Not yet implemented\n";
+   //       }
+   //    }
+   // }
+
+
+
+//    time_t answer2 = mdyhms_to_unix(month, day, year, hour2, min2, 0);
+
+//    int diff = answer2 - retval;
+//    if (diff == 0) {
+//       _numZero++;
+//    } else if (fabs((double)diff) <= 60.0) {
+//       _numOneMinOrLess++;
+//    } else {
+//       _numGreaterThanOneMin++;
+//    }
+   
+//    // check for consistency
+//    // if (answer2 != retval) {
+//    //    mlog << Warning << "IabpHandler::_time() -> time mismatch by " << answer2-retval << " seconds\n";
+//    // }   
+   
+//    return retval;
+// }
