@@ -38,15 +38,38 @@ on:
   workflow_dispatch:
 
 jobs:
-  sonarqube:
+  scan_c++:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
       with:
-        # Disabling shallow clone for improved relevancy of reporting
         fetch-depth: 0
-    - name: SonarQube Scan
+    - name: SonarQube C++ Scan
       uses: sonarsource/sonarqube-scan-action@master
+      with:
+        projectBaseDir: src
+        args: >
+          -Dsonar.cfamily.build-wrapper-output=bw-outputs
+          -Dsonar.sourceEncoding=UTF-8
+          -Dsonar.verbose=true
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+
+  scan_python:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: SonarQube Python Scan
+      uses: sonarsource/sonarqube-scan-action@master
+      with:
+        projectBaseDir: scripts/python,data/wrappers
+        args: >
+          -Dsonar.python.version=3.6.3
+          -Dsonar.sourceEncoding=UTF-8
+          -Dsonar.verbose=true
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
