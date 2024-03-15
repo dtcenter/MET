@@ -25,7 +25,6 @@ on:
     branches:
       - develop
       - 'main_v**'
-      - feature_2379_sonarqube_gha
     paths-ignore:
       - 'docs/**'
       - '.github/pull_request_template.md'
@@ -38,40 +37,48 @@ on:
   workflow_dispatch:
 
 jobs:
-  scan_cxx:
+  build:
+    name: Build
     runs-on: ubuntu-latest
+    env:
+      SONAR_SCANNER_VERSION: 5.0.1.3006 # Find the latest version in the "Windows" link on this page:
+                                        # https://docs.sonarqube.org/latest/analysis/scan/sonarscanner/
+      SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }} # Value stored in a Github secret
+      BUILD_WRAPPER_OUT_DIR: build_wrapper_output_directory # Directory where build-wrapper output will be placed
     steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-    - name: SonarQube CXX Scan
-      uses: sonarsource/sonarqube-scan-action@master
-      with:
-        projectBaseDir: src
-        args: >
-          -Dsonar.projectKey=MET-GitHub-Actions
-          -Dsonar.cfamily.build-wrapper-output=bw-outputs
-          -Dsonar.sourceEncoding=UTF-8
-          -Dsonar.verbose=true
-      env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-
-  scan_python:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-    - name: SonarQube Python Scan
-      uses: sonarsource/sonarqube-scan-action@master
-      with:
-        projectBaseDir: scripts/python,data/wrappers
-        args: >
-          -Dsonar.projectKey=MET-GitHub-Actions
-          -Dsonar.python.version=3.6.3
-          -Dsonar.sourceEncoding=UTF-8
-          -Dsonar.verbose=true
-      env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
+      - name: Cache SonarQube packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+      - name: Download and set up sonar-scanner
+        env:
+          SONAR_SCANNER_DOWNLOAD_URL: https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${{ env.SONAR_SCANNER_VERSION }}-linux.zip
+        run: |
+          mkdir -p $HOME/.sonar
+          curl -sSLo $HOME/.sonar/sonar-scanner.zip ${{ env.SONAR_SCANNER_DOWNLOAD_URL }}
+          unzip -o $HOME/.sonar/sonar-scanner.zip -d $HOME/.sonar/
+          echo "$HOME/.sonar/sonar-scanner-${{ env.SONAR_SCANNER_VERSION }}-linux/bin" >> $GITHUB_PATH
+      - name: Download and set up build-wrapper
+        env:
+          BUILD_WRAPPER_DOWNLOAD_URL: ${{ env.SONAR_HOST_URL }}/static/cpp/build-wrapper-linux-x86.zip
+        run: |
+          curl -sSLo $HOME/.sonar/build-wrapper-linux-x86.zip ${{ env.BUILD_WRAPPER_DOWNLOAD_URL }}
+          unzip -o $HOME/.sonar/build-wrapper-linux-x86.zip -d $HOME/.sonar/
+          echo "$HOME/.sonar/build-wrapper-linux-x86" >> $GITHUB_PATH
+      - name: Run build-wrapper
+        run: |
+          autoreconf --install
+          ./configure --prefix=`pwd` --enable-all
+          build-wrapper-linux-x86-64 --out-dir ${{ env.BUILD_WRAPPER_OUT_DIR }} make clean all
+      - name: Run sonar-scanner
+        env:
+          SONAR_TOKEN: ${{ secrets.SONARQUBE_TOKEN }} # Put the name of your token here
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        run: |
+          sonar-scanner --define sonar.cfamily.build-wrapper-output="${{ env.BUILD_WRAPPER_OUT_DIR }}" \
+                        --define sonar.projectKey=MET-GitHub-Actions
