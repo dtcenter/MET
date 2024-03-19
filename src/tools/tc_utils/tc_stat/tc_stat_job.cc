@@ -1643,7 +1643,7 @@ void TCStatJob::subset_track_pair(TrackPairInfo &pair, TCPointCounts &n) {
    }
 
    // Check RIRW
-   if(RIRWTrack != TrackType_None) {
+   if(RIRWTrack != TrackType::None) {
 
       // Determine the rapid intensification points
       n_rej = pair.check_rirw(RIRWTrack,
@@ -2958,7 +2958,7 @@ void TCStatJobRIRW::clear() {
    JobType = TCStatJobType_RIRW;
 
    // Disable rapid intensification/weakening filtering logic.
-   RIRWTrack = TrackType_None;
+   RIRWTrack = TrackType::None;
 
    ByColumn.clear();
    RIRWMap.clear();
@@ -3197,7 +3197,7 @@ void TCStatJobRIRW::process_pair(TrackPairInfo &pair) {
    cur_map.clear();
 
    // Apply the rapid intensification/weakening logic
-   pair.check_rirw(TrackType_Both,
+   pair.check_rirw(TrackType::Both,
                    RIRWTimeADeck, RIRWTimeBDeck,
                    RIRWExactADeck, RIRWExactBDeck,
                    RIRWThreshADeck, RIRWThreshBDeck);

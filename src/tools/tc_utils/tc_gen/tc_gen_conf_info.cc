@@ -304,7 +304,7 @@ void TCGenVxOpt::process_config(Dictionary &dict) {
    OutputMap = parse_conf_output_flag(&dict, txt_file_type, n_txt);
 
    for(i=0, status=false; i<OutputMap.size(); i++) {
-      if(OutputMap[txt_file_type[i]] != STATOutputType_None) {
+      if(OutputMap[txt_file_type[i]] != STATOutputType::None) {
          status = true;
          break;
       }
@@ -859,12 +859,12 @@ void TCGenConfInfo::process_flags(
 
    // Update output map
    for(i=0; i<n_txt; i++) {
-      if(m.at(txt_file_type[i]) == STATOutputType_Both) {
-         OutputMap[txt_file_type[i]] = STATOutputType_Both;
+      if(m.at(txt_file_type[i]) == STATOutputType::Both) {
+         OutputMap[txt_file_type[i]] = STATOutputType::Both;
       }
-      else if(m.at(txt_file_type[i]) == STATOutputType_Stat &&
-              OutputMap[txt_file_type[i]] == STATOutputType_None) {
-         OutputMap[txt_file_type[i]] = STATOutputType_Stat;
+      else if(m.at(txt_file_type[i]) == STATOutputType::Stat &&
+              OutputMap[txt_file_type[i]] == STATOutputType::None) {
+         OutputMap[txt_file_type[i]] = STATOutputType::Stat;
       }
    }
 

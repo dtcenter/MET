@@ -67,7 +67,7 @@ void SeriesAnalysisConfInfo::clear() {
    ocat_ta.clear();
    fcnt_ta.clear();
    ocnt_ta.clear();
-   cnt_logic = SetLogic_None;
+   cnt_logic = SetLogic::None;
    cdf_info.clear();
    ci_alpha.clear();
    boot_interval = BootIntervalType_None;

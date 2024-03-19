@@ -362,14 +362,14 @@ void ModeExecutive::setup_traditional_fcst_obs_data()
 
    // Mask out the missing data between fields
 
-   if(engine.conf_info.mask_missing_flag == FieldType_Fcst ||
-      engine.conf_info.mask_missing_flag == FieldType_Both)
+   if(engine.conf_info.mask_missing_flag == FieldType::Fcst ||
+      engine.conf_info.mask_missing_flag == FieldType::Both)
       mask_bad_data(Fcst_sd.data, Obs_sd.data);
 
    // Mask out the missing data between fields
 
-   if(engine.conf_info.mask_missing_flag == FieldType_Obs ||
-      engine.conf_info.mask_missing_flag == FieldType_Both)
+   if(engine.conf_info.mask_missing_flag == FieldType::Obs ||
+      engine.conf_info.mask_missing_flag == FieldType::Both)
       mask_bad_data(Obs_sd.data, Fcst_sd.data);
 
    // Parse the grid and/or polyline masks from the configuration
@@ -984,9 +984,9 @@ void ModeExecutive::do_merging_multivar(const ShapeData &f_merge,
       // set the merge flag and merge_thresh appropriately
       ModeConfInfo & conf = engine.conf_info;
       SingleThresh s("ne-9999");
-      conf.set_fcst_merge_flag(MergeType_Thresh);
+      conf.set_fcst_merge_flag(MergeType::Thresh);
       conf.set_fcst_merge_thresh(s);
-      conf.set_obs_merge_flag(MergeType_Thresh);
+      conf.set_obs_merge_flag(MergeType::Thresh);
       conf.set_obs_merge_thresh(s);
    } else if (p != MULTIVAR_INTENSITY) {
       mlog << Error << "\nModeExecutive::do_merging(shapedata, shapedata, p) -> "
@@ -1069,7 +1069,7 @@ void ModeExecutive::process_masks(ShapeData & fcst_sd, ShapeData & obs_sd)
         << "Processing masking regions.\n";
 
    // Parse the grid mask into a ShapeData object
-   if(engine.conf_info.mask_grid_flag != FieldType_None) {
+   if(engine.conf_info.mask_grid_flag != FieldType::None) {
       mlog << Debug(3)
            << "Processing grid mask: "
            << engine.conf_info.mask_grid_name << "\n";
@@ -1078,7 +1078,7 @@ void ModeExecutive::process_masks(ShapeData & fcst_sd, ShapeData & obs_sd)
    }
 
    // Parse the poly mask into a ShapeData object
-   if(engine.conf_info.mask_poly_flag != FieldType_None) {
+   if(engine.conf_info.mask_poly_flag != FieldType::None) {
       mlog << Debug(3)
            << "Processing poly mask: "
            << engine.conf_info.mask_poly_name << "\n";
@@ -1087,26 +1087,26 @@ void ModeExecutive::process_masks(ShapeData & fcst_sd, ShapeData & obs_sd)
    }
 
    // Apply the grid mask to the forecast field if requested
-   if(engine.conf_info.mask_grid_flag == FieldType_Fcst ||
-      engine.conf_info.mask_grid_flag == FieldType_Both) {
+   if(engine.conf_info.mask_grid_flag == FieldType::Fcst ||
+      engine.conf_info.mask_grid_flag == FieldType::Both) {
       apply_mask(fcst_sd, grid_mask_sd);
    }
 
    // Apply the grid mask to the observation field if requested
-   if(engine.conf_info.mask_grid_flag == FieldType_Obs ||
-      engine.conf_info.mask_grid_flag == FieldType_Both) {
+   if(engine.conf_info.mask_grid_flag == FieldType::Obs ||
+      engine.conf_info.mask_grid_flag == FieldType::Both) {
       apply_mask(obs_sd, grid_mask_sd);
    }
 
    // Apply the polyline mask to the forecast field if requested
-   if(engine.conf_info.mask_poly_flag == FieldType_Fcst ||
-      engine.conf_info.mask_poly_flag == FieldType_Both) {
+   if(engine.conf_info.mask_poly_flag == FieldType::Fcst ||
+      engine.conf_info.mask_poly_flag == FieldType::Both) {
       apply_mask(fcst_sd, poly_mask_sd);
    }
 
    // Apply the polyline mask to the observation field if requested
-   if(engine.conf_info.mask_poly_flag == FieldType_Obs ||
-      engine.conf_info.mask_poly_flag == FieldType_Both) {
+   if(engine.conf_info.mask_poly_flag == FieldType::Obs ||
+      engine.conf_info.mask_poly_flag == FieldType::Both) {
       apply_mask(obs_sd, poly_mask_sd);
    }
 
@@ -1125,7 +1125,7 @@ void ModeExecutive::process_fcst_masks(ShapeData & fcst_sd)
    mlog << Debug(3) << "Processing masking regions.\n";
 
    // Parse the grid mask into a ShapeData object
-   if(engine.conf_info.mask_grid_flag != FieldType_None) {
+   if(engine.conf_info.mask_grid_flag != FieldType::None) {
       mlog << Debug(3)
            << "Processing grid mask: "
            << engine.conf_info.mask_grid_name << "\n";
@@ -1134,7 +1134,7 @@ void ModeExecutive::process_fcst_masks(ShapeData & fcst_sd)
    }
 
    // Parse the poly mask into a ShapeData object
-   if(engine.conf_info.mask_poly_flag != FieldType_None) {
+   if(engine.conf_info.mask_poly_flag != FieldType::None) {
       mlog << Debug(3)
            << "Processing poly mask: "
            << engine.conf_info.mask_poly_name << "\n";
@@ -1143,14 +1143,14 @@ void ModeExecutive::process_fcst_masks(ShapeData & fcst_sd)
    }
 
    // Apply the grid mask to the forecast field if requested
-   if(engine.conf_info.mask_grid_flag == FieldType_Fcst ||
-      engine.conf_info.mask_grid_flag == FieldType_Both) {
+   if(engine.conf_info.mask_grid_flag == FieldType::Fcst ||
+      engine.conf_info.mask_grid_flag == FieldType::Both) {
       apply_mask(fcst_sd, grid_mask_sd);
    }
 
    // Apply the polyline mask to the forecast field if requested
-   if(engine.conf_info.mask_poly_flag == FieldType_Fcst ||
-      engine.conf_info.mask_poly_flag == FieldType_Both) {
+   if(engine.conf_info.mask_poly_flag == FieldType::Fcst ||
+      engine.conf_info.mask_poly_flag == FieldType::Both) {
       apply_mask(fcst_sd, poly_mask_sd);
    }
 
@@ -1170,7 +1170,7 @@ void ModeExecutive::process_obs_masks(ShapeData & obs_sd)
         << "Processing masking regions.\n";
 
    // Parse the grid mask into a ShapeData object
-   if(engine.conf_info.mask_grid_flag != FieldType_None) {
+   if(engine.conf_info.mask_grid_flag != FieldType::None) {
       mlog << Debug(3)
            << "Processing grid mask: "
            << engine.conf_info.mask_grid_name << "\n";
@@ -1179,7 +1179,7 @@ void ModeExecutive::process_obs_masks(ShapeData & obs_sd)
    }
 
    // Parse the poly mask into a ShapeData object
-   if(engine.conf_info.mask_poly_flag != FieldType_None) {
+   if(engine.conf_info.mask_poly_flag != FieldType::None) {
       mlog << Debug(3)
            << "Processing poly mask: "
            << engine.conf_info.mask_poly_name << "\n";
@@ -1188,14 +1188,14 @@ void ModeExecutive::process_obs_masks(ShapeData & obs_sd)
    }
 
    // Apply the grid mask to the observation field if requested
-   if(engine.conf_info.mask_grid_flag == FieldType_Obs ||
-      engine.conf_info.mask_grid_flag == FieldType_Both) {
+   if(engine.conf_info.mask_grid_flag == FieldType::Obs ||
+      engine.conf_info.mask_grid_flag == FieldType::Both) {
       apply_mask(obs_sd, grid_mask_sd);
    }
 
    // Apply the polyline mask to the observation field if requested
-   if(engine.conf_info.mask_poly_flag == FieldType_Obs ||
-      engine.conf_info.mask_poly_flag == FieldType_Both) {
+   if(engine.conf_info.mask_poly_flag == FieldType::Obs ||
+      engine.conf_info.mask_poly_flag == FieldType::Both) {
       apply_mask(obs_sd, poly_mask_sd);
    }
 
@@ -1548,8 +1548,8 @@ void ModeExecutive::write_obj_stats()
 
    out.close();
 
-   if(engine.conf_info.Fcst->merge_flag == MergeType_Both ||
-      engine.conf_info.Fcst->merge_flag == MergeType_Engine) {
+   if(engine.conf_info.Fcst->merge_flag == MergeType::Both ||
+      engine.conf_info.Fcst->merge_flag == MergeType::Engine) {
 
       //
       // Create output stats file for forecast merging
@@ -1580,8 +1580,8 @@ void ModeExecutive::write_obj_stats()
       out.close();
    }
 
-   if(engine.conf_info.Obs->merge_flag == MergeType_Both ||
-      engine.conf_info.Obs->merge_flag == MergeType_Engine) {
+   if(engine.conf_info.Obs->merge_flag == MergeType::Both ||
+      engine.conf_info.Obs->merge_flag == MergeType::Engine) {
 
       //
       // Create output stats file for observation merging

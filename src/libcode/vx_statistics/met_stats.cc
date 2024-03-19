@@ -724,7 +724,7 @@ void CNTInfo::clear() {
 
    fthresh.clear();
    othresh.clear();
-   logic = SetLogic_None;
+   logic = SetLogic::None;
 
    fbar.clear();
    fstdev.clear();
@@ -1202,7 +1202,7 @@ void SL1L2Info::clear() {
 
    fthresh.clear();
    othresh.clear();
-   logic = SetLogic_None;
+   logic = SetLogic::None;
 
    zero_out();
 
@@ -1471,7 +1471,7 @@ void VL1L2Info::clear() {
    
    fthresh.clear();
    othresh.clear();
-   logic = SetLogic_None;
+   logic = SetLogic::None;
 
    FBAR.clear();
    OBAR.clear();

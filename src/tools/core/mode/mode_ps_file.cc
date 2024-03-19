@@ -554,25 +554,25 @@ void ModePsFile::make_plot(bool isMultivarSuper)
 
    plot_engine(*Engine, FOEng, s.c_str());
 
-   if ( (fcst_merge_flag == MergeType_Both) || (fcst_merge_flag == MergeType_Thresh) )  {
+   if ( (fcst_merge_flag == MergeType::Both) || (fcst_merge_flag == MergeType::Thresh) )  {
 
       plot_threshold_merging(*Engine, "Forecast: Threshold Merging", 1);
 
    }
 
-   if ( (fcst_merge_flag == MergeType_Both) || (fcst_merge_flag == MergeType_Engine) )  {
+   if ( (fcst_merge_flag == MergeType::Both) || (fcst_merge_flag == MergeType::Engine) )  {
 
       plot_engine(*(Engine->fcst_engine), FFEng, "Forecast: ModeFuzzyEngine Merging");
 
    }
 
-   if ( (obs_merge_flag == MergeType_Both) || (obs_merge_flag == MergeType_Thresh) )  {
+   if ( (obs_merge_flag == MergeType::Both) || (obs_merge_flag == MergeType::Thresh) )  {
 
       plot_threshold_merging(*Engine, "Observation: Threshold Merging", 0);
 
    }
 
-   if ( (obs_merge_flag == MergeType_Both) || (obs_merge_flag == MergeType_Engine) )  {
+   if ( (obs_merge_flag == MergeType::Both) || (obs_merge_flag == MergeType::Engine) )  {
 
       plot_engine(*(Engine->obs_engine), OOEng, "Observation: ModeFuzzyEngine Merging");
 

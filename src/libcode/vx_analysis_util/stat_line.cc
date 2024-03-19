@@ -829,14 +829,14 @@ SetLogic STATLine::thresh_logic() const
 
 {
 
-SetLogic t = SetLogic_None;
+SetLogic t = SetLogic::None;
 
 ConcatString cs = (string)get_item("FCST_THRESH", false);
 
-     if(cs.endswith(setlogic_symbol_union))        t = SetLogic_Union;
-else if(cs.endswith(setlogic_symbol_intersection)) t = SetLogic_Intersection;
-else if(cs.endswith(setlogic_symbol_symdiff))      t = SetLogic_SymDiff;
-else                                               t = SetLogic_None;
+     if(cs.endswith(setlogic_symbol_union))        t = SetLogic::Union;
+else if(cs.endswith(setlogic_symbol_intersection)) t = SetLogic::Intersection;
+else if(cs.endswith(setlogic_symbol_symdiff))      t = SetLogic::SymDiff;
+else                                               t = SetLogic::None;
 
 return t;
 

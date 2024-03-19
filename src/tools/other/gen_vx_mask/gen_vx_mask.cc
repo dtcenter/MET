@@ -1347,17 +1347,17 @@ DataPlane combine(const DataPlane &dp_data, const DataPlane &dp_mask,
 
          switch(logic) {
 
-            case SetLogic_Union:
+            case SetLogic::Union:
                if(v_data || v_mask) v = mask_val;
                else                 v = 0.0;
                break;
 
-            case SetLogic_Intersection:
+            case SetLogic::Intersection:
                if(v_data && v_mask) v = mask_val;
                else                 v = 0.0;
                break;
 
-            case SetLogic_SymDiff:
+            case SetLogic::SymDiff:
                if((v_data && !v_mask) || (!v_data && v_mask)) v = mask_val;
                else                                           v = 0.0;
                break;
@@ -1380,10 +1380,10 @@ DataPlane combine(const DataPlane &dp_data, const DataPlane &dp_mask,
    } // end for x
 
    // List the number of points inside the mask
-   if(logic != SetLogic_None) {
+   if(logic != SetLogic::None) {
       mlog << Debug(3)
            << "Mask " << setlogic_to_string(logic)
-	   << (logic == SetLogic_Intersection ? ":\t" : ":\t\t")
+	   << (logic == SetLogic::Intersection ? ":\t" : ":\t\t")
            << n_in << " of " << grid.nx() * grid.ny()
 	   << " points inside\n";
    }
@@ -1703,19 +1703,19 @@ void set_complement(const StringArray & a) {
 ////////////////////////////////////////////////////////////////////////
 
 void set_union(const StringArray & a) {
-   set_logic = SetLogic_Union;
+   set_logic = SetLogic::Union;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void set_intersection(const StringArray & a) {
-   set_logic = SetLogic_Intersection;
+   set_logic = SetLogic::Intersection;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void set_symdiff(const StringArray & a) {
-   set_logic = SetLogic_SymDiff;
+   set_logic = SetLogic::SymDiff;
 }
 
 ////////////////////////////////////////////////////////////////////////

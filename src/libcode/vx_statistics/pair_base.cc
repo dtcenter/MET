@@ -97,7 +97,7 @@ void PairBase::clear() {
 
    fcst_ut = 0;
 
-   obs_summary = ObsSummary_None;
+   obs_summary = ObsSummary::None;
    obs_perc_value = bad_data_int;
    check_unique = false;
 
@@ -146,7 +146,7 @@ void PairBase::erase() {
 
    fcst_ut = 0;
 
-   obs_summary = ObsSummary_None;
+   obs_summary = ObsSummary::None;
    obs_perc_value = bad_data_int;
    check_unique = false;
 
@@ -464,7 +464,7 @@ bool PairBase::add_point_obs(const char *sid,
       ret = true;
    }
 
-   if(obs_summary == ObsSummary_None) {
+   if(obs_summary == ObsSummary::None) {
       sid_sa.add(sid);
       lat_na.add(lat);
       lon_na.add(lon);
@@ -630,7 +630,7 @@ void PairBase::print_obs_summary(){
 
    if(!IsPointVx) return;
 
-   if(obs_summary == ObsSummary_None ||
+   if(obs_summary == ObsSummary::None ||
       mlog.verbosity_level() < 4 ||
       !map_val.size()) return;
 
@@ -689,28 +689,28 @@ void PairBase::calc_obs_summary(){
       regex_clean(mat);
 
       switch(obs_summary) {
-         case ObsSummary_Nearest:
+         case ObsSummary::Nearest:
             ob = compute_nearest(msg_key);
             break;
-         case ObsSummary_Min:
+         case ObsSummary::Min:
             ob = compute_min(msg_key);
             break;
-         case ObsSummary_Max:
+         case ObsSummary::Max:
             ob = compute_max(msg_key);
             break;
-         case ObsSummary_UW_Mean:
+         case ObsSummary::UW_Mean:
             ob = compute_uw_mean(msg_key);
             break;
-         case ObsSummary_DW_Mean:
+         case ObsSummary::DW_Mean:
             ob = compute_dw_mean(msg_key);
             break;
-         case ObsSummary_Median:
+         case ObsSummary::Median:
             ob = compute_percentile(msg_key, 50);
             break;
-         case ObsSummary_Perc:
+         case ObsSummary::Perc:
             ob = compute_percentile(msg_key, obs_perc_value);
             break;
-         case ObsSummary_None:
+         case ObsSummary::None:
          default:
             return;
       }

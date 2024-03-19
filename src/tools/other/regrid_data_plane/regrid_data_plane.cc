@@ -139,7 +139,7 @@ void process_command_line(int argc, char **argv) {
 
    // Set default regridding options
    RGInfo.enable     = true;
-   RGInfo.field      = FieldType_None;
+   RGInfo.field      = FieldType::None;
    RGInfo.method     = DefaultInterpMthd;
    RGInfo.width      = DefaultInterpWdth;
    RGInfo.gaussian.dx     = default_gaussian_dx;

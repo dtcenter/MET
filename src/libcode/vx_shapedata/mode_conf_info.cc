@@ -192,7 +192,7 @@ void ModeConfInfo::clear()
    desc.clear();
    obtype.clear();
 
-   mask_missing_flag = FieldType_None;
+   mask_missing_flag = FieldType::None;
 
    grid_res = bad_data_double;
 
@@ -202,15 +202,15 @@ void ModeConfInfo::clear()
    fcst_multivar_logic.clear();
    obs_multivar_logic.clear();
 
-   match_flag = MatchType_None;
+   match_flag = MatchType::None;
 
    max_centroid_dist = bad_data_double;
 
    mask_grid_name.clear();
-   mask_grid_flag = FieldType_None;
+   mask_grid_flag = FieldType::None;
 
    mask_poly_name.clear();
-   mask_poly_flag = FieldType_None;
+   mask_poly_flag = FieldType::None;
 
    centroid_dist_wt    = bad_data_double;
    boundary_dist_wt    = bad_data_double;
@@ -412,7 +412,7 @@ void ModeConfInfo::process_config_except_fields()
 
       // Check that the sum of the weights is non-zero for matching
 
-   if(match_flag != MatchType_None &&
+   if(match_flag != MatchType::None &&
       is_eq(centroid_dist_wt    + boundary_dist_wt   +
             convex_hull_dist_wt + angle_diff_wt      +
             aspect_diff_wt      + area_ratio_wt      +
@@ -850,7 +850,7 @@ void ModeConfInfo::evaluate_fcst_settings(int j)
       
    if ( fcst_array[j].merge_thresh_array.n_elements() == 1 )  fcst_array[j].merge_thresh = fcst_array[j].merge_thresh_array[0];
 
-   if(match_flag == MatchType_None && fcst_array[j].merge_flag != MergeType_None) { 
+   if(match_flag == MatchType::None && fcst_array[j].merge_flag != MergeType::None) { 
       mlog << Warning << "\nModeConfInfo::evaluate_fcst_settings(" << j << ") -> "
            << "When matching is disabled (match_flag = "
            << matchtype_to_string(match_flag)
@@ -903,7 +903,7 @@ void ModeConfInfo::evaluate_obs_settings(int j)
    if (  obs_array[j].merge_thresh_array.n_elements() == 1 )   obs_array[j].merge_thresh =  obs_array[j].merge_thresh_array[0];
 
    // Check that match_flag is set between 0 and 3
-   if(match_flag == MatchType_None && obs_array[j].merge_flag  != MergeType_None) {
+   if(match_flag == MatchType::None && obs_array[j].merge_flag  != MergeType::None) {
       mlog << Warning << "\nModeConfInfo::evaluate_obs_settings(" << j << ") -> "
            << "When matching is disabled (match_flag = "
            << matchtype_to_string(match_flag)
@@ -1735,7 +1735,7 @@ void ModeConfInfo::check_multivar_not_implemented()
    
    for (int i=0; i<N_fields_f; ++i) {
       if (data_type != ModeDataType_MvMode_Obs) {
-         if (fcst_array[i].merge_flag == MergeType_Both || fcst_array[i].merge_flag == MergeType_Engine)
+         if (fcst_array[i].merge_flag == MergeType::Both || fcst_array[i].merge_flag == MergeType::Engine)
          {
             mlog << Error
                  << "\nModeConfInfo::check_multivar_not_implemented():\n"
@@ -1752,7 +1752,7 @@ void ModeConfInfo::check_multivar_not_implemented()
    }
    for (int i=0; i<N_fields_o; ++i) {
       if (data_type != ModeDataType_MvMode_Fcst) {
-         if (obs_array[i].merge_flag == MergeType_Both || obs_array[i].merge_flag == MergeType_Engine) {
+         if (obs_array[i].merge_flag == MergeType::Both || obs_array[i].merge_flag == MergeType::Engine) {
             mlog << Error
                  << "\nModeConfInfo::check_multivar_not_implemented():\n"
                  << "  merge_flag ENGINE or BOTH not implemented for multivariate mode\n\n";

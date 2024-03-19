@@ -1634,7 +1634,7 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
    // bias correction, if requested
    if(obs_error_info->flag) {
       obs_v = add_obs_error_bc(obs_error_info->rng_ptr,
-                               FieldType_Obs, oerr_ptr, obs_v);
+                               FieldType::Obs, oerr_ptr, obs_v);
    }
 
    // Look through all of the PairData objects to see if the observation
@@ -1844,7 +1844,7 @@ void VxPairDataEnsemble::add_ens(int member, bool mn, Grid &gr) {
                      // Apply observation error perturbation, if requested
                      if(obs_error_info->flag) {
                         fcst_v = add_obs_error_inc(
-                                    obs_error_info->rng_ptr, FieldType_Fcst,
+                                    obs_error_info->rng_ptr, FieldType::Fcst,
                                     pd[i][j][k].obs_error_entry[l],
                                     pd[i][j][k].o_na[l], fcst_na[m]);
                      }
@@ -1891,7 +1891,7 @@ void VxPairDataEnsemble::set_duplicate_flag(DuplicateType duplicate_flag) {
    for(int i=0; i < n_msg_typ; i++){
       for(int j=0; j < n_mask; j++){
          for(int k=0; k < n_interp; k++){
-            pd[i][j][k].set_check_unique(duplicate_flag == DuplicateType_Unique);
+            pd[i][j][k].set_check_unique(duplicate_flag == DuplicateType::Unique);
          }
       }
    }

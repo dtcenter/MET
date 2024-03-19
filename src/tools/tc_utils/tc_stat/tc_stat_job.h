@@ -34,7 +34,7 @@ static const bool         default_match_points = false;
 static const bool         default_event_equal  = false;
 
 // Default rapid intensification is an increase of 30 kts over 24 hours
-static const TrackType    default_rirw_track  = TrackType_None;
+static const TrackType    default_rirw_track  = TrackType::None;
 static const int          default_rirw_time   = 86400;
 static const bool         default_rirw_exact  = true;
 static const SingleThresh default_rirw_thresh(">=30.0");

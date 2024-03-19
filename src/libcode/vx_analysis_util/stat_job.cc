@@ -158,7 +158,7 @@ void STATAnalysisJob::clear() {
    obs_thresh.clear();
    cov_thresh.clear();
 
-   thresh_logic = SetLogic_None;
+   thresh_logic = SetLogic::None;
 
    alpha.clear();
 
@@ -192,11 +192,11 @@ void STATAnalysisJob::clear() {
 
    out_fcst_thresh.clear();
    out_obs_thresh.clear();
-   out_cnt_logic = SetLogic_Union;
+   out_cnt_logic = SetLogic::Union;
 
    out_fcst_wind_thresh.clear();
    out_obs_wind_thresh.clear();
-   out_wind_logic = SetLogic_Union;
+   out_wind_logic = SetLogic::Union;
 
    out_alpha      = bad_data_double;
    boot_interval  = bad_data_int;
@@ -942,7 +942,7 @@ int STATAnalysisJob::is_keeper(const STATLine & L) const {
    //
    // thresh_logic
    //
-   if(thresh_logic != SetLogic_None &&
+   if(thresh_logic != SetLogic::None &&
       thresh_logic != L.thresh_logic()) return 0;
 
    //
@@ -2567,7 +2567,7 @@ ConcatString STATAnalysisJob::get_jobstring() const {
    }
 
    // thresh_logic
-   if(thresh_logic != SetLogic_None) {
+   if(thresh_logic != SetLogic::None) {
       js << "-thresh_logic " << setlogic_to_string(thresh_logic) << " ";
    }
 

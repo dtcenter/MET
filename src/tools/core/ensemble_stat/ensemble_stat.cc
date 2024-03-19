@@ -517,7 +517,7 @@ void process_grid(const Grid &fcst_grid) {
    ri = conf_info.vx_opt[0].vx_pd.fcst_info->get_var_info()->regrid();
 
    // Read gridded observation data, if necessary
-   if(ri.field == FieldType_Obs) {
+   if(ri.field == FieldType::Obs) {
 
       if(!grid_obs_flag) {
          mlog << Error << "\nprocess_grid() -> "
@@ -1493,13 +1493,13 @@ void process_grid_vx() {
          shc.set_interp_wdth(wdth);
 
          // Smooth the ensemble mean field, if requested
-         if(field == FieldType_Fcst || field == FieldType_Both) {
+         if(field == FieldType::Fcst || field == FieldType::Both) {
             emn_dp = smooth_field(emn_dp, mthd, wdth, shape, grid.wrap_lon(),
                                   vld_thresh, gaussian);
          }
 
          // Smooth the observation field, if requested
-         if(field == FieldType_Obs || field == FieldType_Both) {
+         if(field == FieldType::Obs || field == FieldType::Both) {
             obs_dp = smooth_field(obs_dp, mthd, wdth, shape, grid.wrap_lon(),
                                   vld_thresh, gaussian);
          }
@@ -1513,7 +1513,7 @@ void process_grid_vx() {
                  << "Applying observation error bias correction to "
                  << "gridded observation data.\n";
             obs_dp = add_obs_error_bc(conf_info.rng_ptr,
-                        FieldType_Obs, oerr_ptr, oraw_dp, oraw_dp,
+                        FieldType::Obs, oerr_ptr, oraw_dp, oraw_dp,
                         conf_info.vx_opt[i].vx_pd.obs_info->name().c_str(),
                         conf_info.obtype.c_str());
          }
@@ -1522,7 +1522,7 @@ void process_grid_vx() {
          for(k=0; k < conf_info.vx_opt[i].vx_pd.fcst_info->inputs_n(); k++) {
 
             // Smooth the forecast field, if requested
-            if(field == FieldType_Fcst || field == FieldType_Both) {
+            if(field == FieldType::Fcst || field == FieldType::Both) {
                fcst_dp[k] = smooth_field(fcst_dp[k], mthd, wdth, shape, grid.wrap_lon(),
                                          vld_thresh, gaussian);
             }
@@ -1538,7 +1538,7 @@ void process_grid_vx() {
                     << "Applying observation error perturbation to "
                     << "ensemble member " << k+1 << ".\n";
                fcst_dp[k] = add_obs_error_inc(conf_info.rng_ptr,
-                               FieldType_Fcst, oerr_ptr, fraw_dp[k], oraw_dp,
+                               FieldType::Fcst, oerr_ptr, fraw_dp[k], oraw_dp,
                                conf_info.vx_opt[i].vx_pd.obs_info->name().c_str(),
                                conf_info.obtype.c_str());
             }
@@ -1719,7 +1719,7 @@ void do_ecnt(const EnsembleStatVxOpt &vx_opt,
    ecnt_info.set(*pd_ptr);
 
    // Write out ECNT
-   if(vx_opt.output_flag[i_ecnt] != STATOutputType_None &&
+   if(vx_opt.output_flag[i_ecnt] != STATOutputType::None &&
       ecnt_info.n_pair > 0) {
       write_ecnt_row(shc, ecnt_info, vx_opt.output_flag[i_ecnt],
                      stat_at, i_stat_row,
@@ -1756,7 +1756,7 @@ void do_rps(const EnsembleStatVxOpt &vx_opt,
    rps_info.set(*pd_ptr);
 
    // Write out RPS
-   if(vx_opt.output_flag[i_rps] != STATOutputType_None &&
+   if(vx_opt.output_flag[i_rps] != STATOutputType::None &&
       rps_info.n_pair > 0) {
       write_rps_row(shc, rps_info, vx_opt.output_flag[i_rps],
                     stat_at, i_stat_row,
@@ -1878,7 +1878,7 @@ void setup_txt_files() {
    for(i=0; i<n_txt; i++) {
 
       // Only set it up if requested in the config file
-      if(conf_info.output_flag[i] == STATOutputType_Both) {
+      if(conf_info.output_flag[i] == STATOutputType::Both) {
 
          // Only create ORANK file when using point observations
          if(i == i_orank && !point_obs_flag) continue;
@@ -2069,17 +2069,17 @@ void write_txt_files(const EnsembleStatVxOpt &vx_opt,
       setup_txt_files();
 
       // Compute ECNT scores
-      if(vx_opt.output_flag[i_ecnt] != STATOutputType_None) {
+      if(vx_opt.output_flag[i_ecnt] != STATOutputType::None) {
          do_ecnt(vx_opt, vx_opt.othr_ta[i], &pd);
       }
 
       // Compute RPS scores
-      if(vx_opt.output_flag[i_rps] != STATOutputType_None) {
+      if(vx_opt.output_flag[i_rps] != STATOutputType::None) {
          do_rps(vx_opt, vx_opt.othr_ta[i], &pd);
       }
 
       // Write RHIST counts
-      if(vx_opt.output_flag[i_rhist] != STATOutputType_None) {
+      if(vx_opt.output_flag[i_rhist] != STATOutputType::None) {
 
          pd.compute_rhist();
 
@@ -2092,7 +2092,7 @@ void write_txt_files(const EnsembleStatVxOpt &vx_opt,
       }
 
       // Write PHIST counts if greater than 0
-      if(vx_opt.output_flag[i_phist] != STATOutputType_None) {
+      if(vx_opt.output_flag[i_phist] != STATOutputType::None) {
 
          pd.phist_bin_size = vx_opt.vx_pd.pd[0][0][0].phist_bin_size;
          pd.compute_phist();
@@ -2106,7 +2106,7 @@ void write_txt_files(const EnsembleStatVxOpt &vx_opt,
       }
 
       // Write RELP counts
-      if(vx_opt.output_flag[i_relp] != STATOutputType_None) {
+      if(vx_opt.output_flag[i_relp] != STATOutputType::None) {
 
          pd.compute_relp();
 
@@ -2119,7 +2119,7 @@ void write_txt_files(const EnsembleStatVxOpt &vx_opt,
       }
 
       // Write SSVAR scores
-      if(vx_opt.output_flag[i_ssvar] != STATOutputType_None) {
+      if(vx_opt.output_flag[i_ssvar] != STATOutputType::None) {
 
          pd.ssvar_bin_size = vx_opt.vx_pd.pd[0][0][0].ssvar_bin_size;
          pd.compute_ssvar();
@@ -2131,7 +2131,7 @@ void write_txt_files(const EnsembleStatVxOpt &vx_opt,
             stat_at.add_rows(pd.ssvar_bins[0].n_bin *
                              vx_opt.ci_alpha.n());
 
-            if(vx_opt.output_flag[i_ssvar] == STATOutputType_Both) {
+            if(vx_opt.output_flag[i_ssvar] == STATOutputType::Both) {
                txt_at[i_ssvar].add_rows(pd.ssvar_bins[0].n_bin *
                                         vx_opt.ci_alpha.n());
             }
@@ -2149,17 +2149,17 @@ void write_txt_files(const EnsembleStatVxOpt &vx_opt,
    } // end for i
 
    // Write PCT counts and scores
-   if(vx_opt.output_flag[i_pct]  != STATOutputType_None ||
-      vx_opt.output_flag[i_pstd] != STATOutputType_None ||
-      vx_opt.output_flag[i_pjc]  != STATOutputType_None ||
-      vx_opt.output_flag[i_prc]  != STATOutputType_None ||
-      vx_opt.output_flag[i_eclv] != STATOutputType_None) {
+   if(vx_opt.output_flag[i_pct]  != STATOutputType::None ||
+      vx_opt.output_flag[i_pstd] != STATOutputType::None ||
+      vx_opt.output_flag[i_pjc]  != STATOutputType::None ||
+      vx_opt.output_flag[i_prc]  != STATOutputType::None ||
+      vx_opt.output_flag[i_eclv] != STATOutputType::None) {
       do_pct(vx_opt, pd_all);
    }
 
    // Write out the unfiltered ORANK lines for point verification
    if(is_point_vx &&
-      vx_opt.output_flag[i_orank] != STATOutputType_None) {
+      vx_opt.output_flag[i_orank] != STATOutputType::None) {
 
       // Set the header column
       shc.set_obs_thresh(na_str);
@@ -2291,7 +2291,7 @@ void do_pct_cat_thresh(const EnsembleStatVxOpt &vx_opt,
          }
 
          // Compute the probabilistic counts and statistics
-         compute_pctinfo(pd, vx_opt.output_flag[i_pstd], pct_info[i_bin]);
+         compute_pctinfo(pd, (STATOutputType::None!=vx_opt.output_flag[i_pstd]), pct_info[i_bin]);
 
       } // end for i_bin
 
@@ -2381,7 +2381,7 @@ void do_pct_cdp_thresh(const EnsembleStatVxOpt &vx_opt,
       }
 
       // Compute the probabilistic counts and statistics
-      compute_pctinfo(pd_pnt, vx_opt.output_flag[i_pstd], pct_info[i_bin]);
+      compute_pctinfo(pd_pnt, (STATOutputType::None!=vx_opt.output_flag[i_pstd]), pct_info[i_bin]);
 
    } // end for i_bin
 
@@ -2405,7 +2405,7 @@ void write_pct_info(const EnsembleStatVxOpt &vx_opt,
 
       // Write out PCT
       if((n_bin == 1 || vx_opt.cdf_info.write_bins) &&
-         vx_opt.output_flag[i_pct] != STATOutputType_None) {
+         vx_opt.output_flag[i_pct] != STATOutputType::None) {
          write_pct_row(shc, pct_info[i_bin],
             vx_opt.output_flag[i_pct],
             i_bin, n_bin, stat_at, i_stat_row,
@@ -2414,7 +2414,7 @@ void write_pct_info(const EnsembleStatVxOpt &vx_opt,
 
       // Write out PSTD
       if((n_bin == 1 || vx_opt.cdf_info.write_bins) &&
-         vx_opt.output_flag[i_pstd] != STATOutputType_None) {
+         vx_opt.output_flag[i_pstd] != STATOutputType::None) {
          write_pstd_row(shc, pct_info[i_bin],
             vx_opt.output_flag[i_pstd],
             i_bin, n_bin, stat_at, i_stat_row,
@@ -2423,7 +2423,7 @@ void write_pct_info(const EnsembleStatVxOpt &vx_opt,
 
       // Write out PJC
       if((n_bin == 1 || vx_opt.cdf_info.write_bins) &&
-         vx_opt.output_flag[i_pjc] != STATOutputType_None) {
+         vx_opt.output_flag[i_pjc] != STATOutputType::None) {
          write_pjc_row(shc, pct_info[i_bin],
             vx_opt.output_flag[i_pjc],
             i_bin, n_bin, stat_at, i_stat_row,
@@ -2432,7 +2432,7 @@ void write_pct_info(const EnsembleStatVxOpt &vx_opt,
 
       // Write out PRC
       if((n_bin == 1 || vx_opt.cdf_info.write_bins) &&
-         vx_opt.output_flag[i_prc] != STATOutputType_None) {
+         vx_opt.output_flag[i_prc] != STATOutputType::None) {
          write_prc_row(shc, pct_info[i_bin],
             vx_opt.output_flag[i_prc],
             i_bin, n_bin, stat_at, i_stat_row,
@@ -2441,7 +2441,7 @@ void write_pct_info(const EnsembleStatVxOpt &vx_opt,
 
       // Write out ECLV
       if((n_bin == 1 || vx_opt.cdf_info.write_bins) &&
-         vx_opt.output_flag[i_eclv] != STATOutputType_None) {
+         vx_opt.output_flag[i_eclv] != STATOutputType::None) {
          write_eclv_row(shc, pct_info[i_bin], vx_opt.eclv_points,
             vx_opt.output_flag[i_eclv],
             i_bin, n_bin, stat_at, i_stat_row,
@@ -2466,7 +2466,7 @@ void write_pct_info(const EnsembleStatVxOpt &vx_opt,
       }
 
       // Write out PSTD
-      if(vx_opt.output_flag[i_pstd] != STATOutputType_None) {
+      if(vx_opt.output_flag[i_pstd] != STATOutputType::None) {
          write_pstd_row(shc, pct_mean,
             vx_opt.output_flag[i_pstd],
             -1, n_bin, stat_at, i_stat_row,
@@ -2602,8 +2602,8 @@ void write_orank_var_float(int i_vx, int i_interp, int i_mask,
    ConcatString type_cs(type_str);
    if(wdth > 1 &&
       (type_cs != "OBS" ||
-       conf_info.vx_opt[i_vx].interp_info.field == FieldType_Obs ||
-       conf_info.vx_opt[i_vx].interp_info.field == FieldType_Both)) {
+       conf_info.vx_opt[i_vx].interp_info.field == FieldType::Obs ||
+       conf_info.vx_opt[i_vx].interp_info.field == FieldType::Both)) {
       var_name << "_" << mthd_str << "_" << wdth*wdth;
       name_str << "_" << mthd_str << "_" << wdth*wdth;
    }
@@ -2739,7 +2739,7 @@ void finish_txt_files() {
    for(i=0; i<n_txt; i++) {
 
       // Only write the table if requested in the config file
-      if(conf_info.output_flag[i] == STATOutputType_Both) {
+      if(conf_info.output_flag[i] == STATOutputType::Both) {
 
          // Write the AsciiTable to a file
          if(txt_out[i]) {

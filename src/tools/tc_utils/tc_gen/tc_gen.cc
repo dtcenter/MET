@@ -1743,7 +1743,7 @@ void setup_txt_files(int n_model, int max_n_prob, int n_pair) {
    for(i=0, stat_rows=0, stat_cols=0; i<n_txt; i++) {
 
       // Ignore disabled line types
-      if(conf_info.OutputMap[txt_file_type[i]] == STATOutputType_None) continue;
+      if(conf_info.OutputMap[txt_file_type[i]] == STATOutputType::None) continue;
 
       // Compute the number of rows for this line type
       switch(i) {
@@ -1801,7 +1801,7 @@ void setup_txt_files(int n_model, int max_n_prob, int n_pair) {
       if(stat_cols < n_cols) stat_cols = n_cols;
 
       // Process optional ouptut files
-      if(conf_info.OutputMap[txt_file_type[i]] == STATOutputType_Both) {
+      if(conf_info.OutputMap[txt_file_type[i]] == STATOutputType::Both) {
 
          // Create new output file and stream
          if(init_from_scratch) {
@@ -1970,7 +1970,7 @@ void write_ctc_stats(const PairDataGenesis &gpd,
                 na_str : gci.VxOpt->VxMaskName.c_str());
 
    // Write out FHO
-   if(gci.VxOpt->output_map(stat_fho) != STATOutputType_None) {
+   if(gci.VxOpt->output_map(stat_fho) != STATOutputType::None) {
 
       if(gci.VxOpt->DevFlag) {
          shc.set_fcst_var(genesis_dev_name);
@@ -1992,7 +1992,7 @@ void write_ctc_stats(const PairDataGenesis &gpd,
    }
 
    // Write out CTC
-   if(gci.VxOpt->output_map(stat_ctc) != STATOutputType_None) {
+   if(gci.VxOpt->output_map(stat_ctc) != STATOutputType::None) {
 
       if(gci.VxOpt->DevFlag) {
          shc.set_fcst_var(genesis_dev_name);
@@ -2014,7 +2014,7 @@ void write_ctc_stats(const PairDataGenesis &gpd,
    }
 
    // Write out CTS
-   if(gci.VxOpt->output_map(stat_cts) != STATOutputType_None) {
+   if(gci.VxOpt->output_map(stat_cts) != STATOutputType::None) {
 
       if(gci.VxOpt->DevFlag) {
          gci.CTSDev.compute_stats();
@@ -2042,7 +2042,7 @@ void write_ctc_stats(const PairDataGenesis &gpd,
    }
 
    // Write out GENMPR
-   if(gci.VxOpt->output_map(stat_genmpr) != STATOutputType_None) {
+   if(gci.VxOpt->output_map(stat_genmpr) != STATOutputType::None) {
       shc.set_fcst_var(genesis_name);
       shc.set_obs_var (genesis_name);
       write_ctc_genmpr_row(shc, gpd,
@@ -2096,7 +2096,7 @@ void write_ctc_genmpr_row(StatHdrColumns &shc,
       write_ctc_genmpr_cols(gpd, i, stat_at, stat_row, n_header_columns);
 
       // If requested, copy row to the text file
-      if(out_type == STATOutputType_Both) {
+      if(out_type == STATOutputType::Both) {
          copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
          // Increment the text row counter
@@ -2219,7 +2219,7 @@ void write_pct_stats(ProbGenPCTInfo &pgi) {
       shc.set_obs_valid_end(pgi.BestEnd);
 
       // Write PCT output
-      if(pgi.VxOpt->output_map(stat_pct) != STATOutputType_None) {
+      if(pgi.VxOpt->output_map(stat_pct) != STATOutputType::None) {
          write_pct_row(shc, pgi.PCTMap[lead_hr],
                        pgi.VxOpt->output_map(stat_pct),
                        1, 1, stat_at, i_stat_row,
@@ -2227,7 +2227,7 @@ void write_pct_stats(ProbGenPCTInfo &pgi) {
       }
 
       // Write PSTD output
-      if(pgi.VxOpt->output_map(stat_pstd) != STATOutputType_None) {
+      if(pgi.VxOpt->output_map(stat_pstd) != STATOutputType::None) {
          pgi.PCTMap[lead_hr].compute_stats();
          pgi.PCTMap[lead_hr].compute_ci();
          write_pstd_row(shc, pgi.PCTMap[lead_hr],
@@ -2237,7 +2237,7 @@ void write_pct_stats(ProbGenPCTInfo &pgi) {
       }
 
       // Write PJC output
-      if(pgi.VxOpt->output_map(stat_pjc) != STATOutputType_None) {
+      if(pgi.VxOpt->output_map(stat_pjc) != STATOutputType::None) {
          write_pjc_row(shc, pgi.PCTMap[lead_hr],
                        pgi.VxOpt->output_map(stat_pjc),
                        1, 1, stat_at, i_stat_row,
@@ -2245,7 +2245,7 @@ void write_pct_stats(ProbGenPCTInfo &pgi) {
       }
 
       // Write PRC output
-      if(pgi.VxOpt->output_map(stat_pjc) != STATOutputType_None) {
+      if(pgi.VxOpt->output_map(stat_pjc) != STATOutputType::None) {
          write_prc_row(shc, pgi.PCTMap[lead_hr],
                        pgi.VxOpt->output_map(stat_prc),
                        1, 1, stat_at, i_stat_row,
@@ -2253,7 +2253,7 @@ void write_pct_stats(ProbGenPCTInfo &pgi) {
       }
 
       // Write out GENMPR
-      if(pgi.VxOpt->output_map(stat_genmpr) != STATOutputType_None) {
+      if(pgi.VxOpt->output_map(stat_genmpr) != STATOutputType::None) {
          write_pct_genmpr_row(shc, pgi, lead_hr,
                               pgi.VxOpt->output_map(stat_genmpr),
                               stat_at, i_stat_row,
@@ -2308,7 +2308,7 @@ void write_pct_genmpr_row(StatHdrColumns &shc,
                             stat_at, stat_row, n_header_columns);
 
       // If requested, copy row to the text file
-      if(out_type == STATOutputType_Both) {
+      if(out_type == STATOutputType::Both) {
          copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
          // Increment the text row counter
@@ -2565,7 +2565,7 @@ void finish_txt_files() {
    for(i=0; i<n_txt; i++) {
 
       // Only write the table if requested in the config file
-      if(conf_info.OutputMap[txt_file_type[i]] == STATOutputType_Both) {
+      if(conf_info.OutputMap[txt_file_type[i]] == STATOutputType::Both) {
 
          // Write the AsciiTable to a file
          if(txt_out[i]) {

@@ -1429,7 +1429,7 @@ void VxPairDataPoint::set_duplicate_flag(DuplicateType duplicate_flag) {
    for(int i=0; i < n_msg_typ; i++){
       for(int j=0; j < n_mask; j++){
          for(int k=0; k < n_interp; k++){
-            pd[i][j][k].set_check_unique(duplicate_flag == DuplicateType_Unique);
+            pd[i][j][k].set_check_unique(duplicate_flag == DuplicateType::Unique);
          }
       }
    }
@@ -1592,25 +1592,25 @@ bool check_fo_thresh(double f, double o, double cmn, double csd,
    // If either of the thresholds is NA, reset the logic to intersection
    // because an NA threshold is always true.
    if(ft.get_type() == thresh_na || ot.get_type() == thresh_na) {
-      t = SetLogic_Intersection;
+      t = SetLogic::Intersection;
    }
 
    switch(t) {
-      case(SetLogic_Union):
+      case(SetLogic::Union):
          if(!fcheck && !ocheck) status = false;
          break;
 
-      case(SetLogic_Intersection):
+      case(SetLogic::Intersection):
          if(!fcheck || !ocheck) status = false;
          break;
 
-      case(SetLogic_SymDiff):
+      case(SetLogic::SymDiff):
          if(fcheck == ocheck) status = false;
          break;
 
       default:
          mlog << Error << "\ncheck_fo_thresh() -> "
-              << "Unexpected SetLogic value of " << type << ".\n\n";
+              << "Unexpected SetLogic value of " << enum_class_as_integer(type) << ".\n\n";
          exit(1);
    }
 

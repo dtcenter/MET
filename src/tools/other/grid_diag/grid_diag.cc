@@ -222,8 +222,8 @@ void process_command_line(int argc, char **argv) {
                         &data_grid, &data_grid);
 
    // The regrid.to_grid option cannot be set to FCST or OBS
-   if(conf_info.data_info[0]->regrid().field == FieldType_Fcst ||
-      conf_info.data_info[0]->regrid().field == FieldType_Obs) {
+   if(conf_info.data_info[0]->regrid().field == FieldType::Fcst ||
+      conf_info.data_info[0]->regrid().field == FieldType::Obs) {
       mlog << Error << "\nprocess_command_line() -> "
            << "the \"regrid.to_grid\" configuration option cannot be set to "
            << "FCST or OBS!\nSpecify a named grid, grid specification string, "

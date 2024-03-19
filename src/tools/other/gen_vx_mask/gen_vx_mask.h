@@ -97,7 +97,7 @@ static bool type_is_set = false;
 
 // Optional arguments
 static ConcatString input_field_str, mask_field_str;
-static SetLogic set_logic = SetLogic_None;
+static SetLogic set_logic = SetLogic::None;
 static bool complement = false;
 static SingleThresh thresh;
 static int height = bad_data_double;

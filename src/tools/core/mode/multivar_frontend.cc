@@ -350,14 +350,14 @@ MultivarFrontEnd::create_intensity_comparisons(int findex, int oindex,
    // from pass1
    conf.Fcst->var_info->set_level_name(mvdf._level.c_str());
    conf.Fcst->var_info->set_units(mvdf._units.c_str());
-   if (fsuper._hasUnion && conf.Fcst->merge_flag == MergeType_Thresh) {
+   if (fsuper._hasUnion && conf.Fcst->merge_flag == MergeType::Thresh) {
       mlog << Warning << "\nModeFrontEnd::multivar_intensity_comparisons() -> "
            << "Logic includes union '||' along with  'merge_flag=THRESH' "
            << ". This can lead to bad results\n\n";
    }
    conf.Obs->var_info->set_level_name(mvdo._level.c_str());
    conf.Obs->var_info->set_units(mvdo._units.c_str());
-   if (osuper._hasUnion && conf.Obs->merge_flag == MergeType_Thresh) {
+   if (osuper._hasUnion && conf.Obs->merge_flag == MergeType::Thresh) {
       mlog << Warning << "\nModeFrontEnd::multivar_intensity_comparisons() -> "
            << "Logic includes union '||' along with  'merge_flag=THRESH' "
            << ". This can lead to bad results\n\n";
@@ -395,8 +395,8 @@ void MultivarFrontEnd::process_superobjects(ModeSuperObject &fsuper,
 
    ModeConfInfo & conf = mode_exec->engine.conf_info;
    if ((fsuper._hasUnion || osuper._hasUnion) &&
-       (conf.Fcst->merge_flag == MergeType_Thresh ||
-        conf.Obs->merge_flag == MergeType_Thresh)) {
+       (conf.Fcst->merge_flag == MergeType::Thresh ||
+        conf.Obs->merge_flag == MergeType::Thresh)) {
       mlog << Warning << "\nModeFrontEnd::run_super() -> "
            << "Logic includes union '||' along with  'merge_flag=THRESH' "
            << ". This can lead to bad results\n\n";

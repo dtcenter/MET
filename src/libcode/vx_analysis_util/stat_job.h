@@ -305,7 +305,7 @@ class STATAnalysisJob {
 
       //
       // Type of bootstrap confidence interval method:
-      //    0 = BCa, 1 = Percentile (Default = 1)
+      //    0 = BCA, 1 = Percentile (Default = 1)
       //
       int boot_interval;
 
