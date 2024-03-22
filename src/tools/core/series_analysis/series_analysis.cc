@@ -930,7 +930,7 @@ void do_cts(int n, const PairDataPoint *pd_ptr) {
 
    // Compute the counts, stats, normal confidence intervals, and
    // bootstrap confidence intervals
-   if(conf_info.boot_interval == BootIntervalType_BCA) {
+   if(conf_info.boot_interval == BootIntervalType::BCA) {
       compute_cts_stats_ci_bca(rng_ptr, *pd_ptr,
          conf_info.n_boot_rep,
          cts_info, n_cts, true,
@@ -994,7 +994,7 @@ void do_mcts(int n, const PairDataPoint *pd_ptr) {
 
    // Compute the counts, stats, normal confidence intervals, and
    // bootstrap confidence intervals
-   if(conf_info.boot_interval == BootIntervalType_BCA) {
+   if(conf_info.boot_interval == BootIntervalType::BCA) {
       compute_mcts_stats_ci_bca(rng_ptr, *pd_ptr,
          conf_info.n_boot_rep,
          mcts_info, true,
@@ -1060,7 +1060,7 @@ void do_cnt(int n, const PairDataPoint *pd_ptr) {
       int precip_flag = (conf_info.fcst_info[0]->is_precipitation() &&
                          conf_info.obs_info[0]->is_precipitation());
 
-      if(conf_info.boot_interval == BootIntervalType_BCA) {
+      if(conf_info.boot_interval == BootIntervalType::BCA) {
          compute_cnt_stats_ci_bca(rng_ptr, pd,
             precip_flag, conf_info.rank_corr_flag,
             conf_info.n_boot_rep,

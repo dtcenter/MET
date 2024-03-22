@@ -1988,7 +1988,7 @@ void do_cts(CTSInfo *&cts_info, int i_vx,
    // Compute the counts, stats, normal confidence intervals, and
    // bootstrap confidence intervals
    //
-   if(conf_info.vx_opt[i_vx].boot_info.interval == BootIntervalType_BCA) {
+   if(conf_info.vx_opt[i_vx].boot_info.interval == BootIntervalType::BCA) {
       compute_cts_stats_ci_bca(rng_ptr, *pd_ptr,
          conf_info.vx_opt[i_vx].boot_info.n_rep,
          cts_info, n_cts,
@@ -2037,7 +2037,7 @@ void do_mcts(MCTSInfo &mcts_info, int i_vx,
    // Compute the counts, stats, normal confidence intervals, and
    // bootstrap confidence intervals
    //
-   if(conf_info.vx_opt[i_vx].boot_info.interval == BootIntervalType_BCA) {
+   if(conf_info.vx_opt[i_vx].boot_info.interval == BootIntervalType::BCA) {
       compute_mcts_stats_ci_bca(rng_ptr, *pd_ptr,
          conf_info.vx_opt[i_vx].boot_info.n_rep,
          mcts_info,
@@ -2164,7 +2164,7 @@ void do_cnt_sl1l2(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
 
             // Compute the stats, normal confidence intervals, and
             // bootstrap confidence intervals
-            if(vx_opt.boot_info.interval == BootIntervalType_BCA) {
+            if(vx_opt.boot_info.interval == BootIntervalType::BCA) {
                compute_cnt_stats_ci_bca(rng_ptr, pd,
                   precip_flag, vx_opt.rank_corr_flag,
                   vx_opt.boot_info.n_rep,
@@ -2469,7 +2469,7 @@ void do_nbrcts(NBRCTSInfo *&nbrcts_info,
    // Compute the stats, normal confidence intervals, and
    // bootstrap confidence intervals
    //
-   if(conf_info.vx_opt[i_vx].boot_info.interval == BootIntervalType_BCA) {
+   if(conf_info.vx_opt[i_vx].boot_info.interval == BootIntervalType::BCA) {
       compute_nbrcts_stats_ci_bca(rng_ptr, *pd_ptr,
          conf_info.vx_opt[i_vx].boot_info.n_rep,
          nbrcts_info, n_nbrcts,
@@ -2530,7 +2530,7 @@ void do_nbrcnt(NBRCNTInfo &nbrcnt_info,
    // Compute the stats, normal confidence intervals, and
    // bootstrap confidence intervals
    //
-   if(conf_info.vx_opt[i_vx].boot_info.interval == BootIntervalType_BCA) {
+   if(conf_info.vx_opt[i_vx].boot_info.interval == BootIntervalType::BCA) {
       compute_nbrcnt_stats_ci_bca(rng_ptr, *pd_ptr, *pd_thr_ptr,
          conf_info.vx_opt[i_vx].boot_info.n_rep,
          nbrcnt_info,

@@ -3927,7 +3927,7 @@ void mpr_to_cts(STATAnalysisJob &job, const AggrMPRInfo &info,
    // bootstrap confidence intervals
    //
    cts_info_ptr = &cts_info;
-   if(job.boot_interval == boot_bca_flag) {
+   if(job.boot_interval == BootIntervalType::BCA) {
       compute_cts_stats_ci_bca(rng_ptr, info.pd,
          job.n_boot_rep,
          cts_info_ptr, 1, 1,
@@ -3997,7 +3997,7 @@ void mpr_to_mcts(STATAnalysisJob &job, const AggrMPRInfo &info,
    // Compute the counts, stats, normal confidence intervals, and
    // bootstrap confidence intervals
    //
-   if(job.boot_interval == boot_bca_flag) {
+   if(job.boot_interval == BootIntervalType::BCA) {
       compute_mcts_stats_ci_bca(rng_ptr, info.pd,
          job.n_boot_rep,
          mcts_info, 1,
@@ -4064,14 +4064,12 @@ void mpr_to_cnt(STATAnalysisJob &job, const AggrMPRInfo &info,
    // Compute the stats, normal confidence intervals, and
    // bootstrap confidence intervals
    //
-   if(job.boot_interval == boot_bca_flag) {
-
+   if(job.boot_interval == BootIntervalType::BCA) {
       compute_cnt_stats_ci_bca(rng_ptr, pd_thr,
          precip_flag, job.rank_corr_flag, job.n_boot_rep,
          cnt_info, tmp_dir);
    }
    else {
-
       compute_cnt_stats_ci_perc(rng_ptr, pd_thr,
          precip_flag, job.rank_corr_flag, job.n_boot_rep, job.boot_rep_prop,
          cnt_info, tmp_dir);

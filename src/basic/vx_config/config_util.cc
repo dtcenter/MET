@@ -1268,7 +1268,7 @@ BootInfo & BootInfo::operator=(const BootInfo &a) noexcept {
 ///////////////////////////////////////////////////////////////////////////////
 
 void BootInfo::clear() {
-   interval = BootIntervalType_None;
+   interval = BootIntervalType::None;
    rep_prop = bad_data_double;
    n_rep    = 0;
    rng.clear();
@@ -1292,8 +1292,12 @@ BootInfo parse_conf_boot(Dictionary *dict) {
    v = dict->lookup_int(conf_key_boot_interval);
 
    // Convert integer to enumerated BootIntervalType
-        if(v == conf_const.lookup_int(conf_val_bca))    info.interval = BootIntervalType_BCA;
-   else if(v == conf_const.lookup_int(conf_val_pctile)) info.interval = BootIntervalType_Percentile;
+   if(v == conf_const.lookup_int(conf_val_bca)) {
+      info.interval = BootIntervalType::BCA;
+   }
+   else if(v == conf_const.lookup_int(conf_val_pctile)) {
+      info.interval = BootIntervalType::PCTile;
+   }
    else {
       mlog << Error << "\nparse_conf_boot() -> "
            << "Unexpected config file value of " << v << " for \""
@@ -2725,6 +2729,32 @@ STATLineType string_to_statlinetype(const char *s) {
    else if(strcasecmp(s, stat_header_str)    == 0) t = stat_header;
 
    else                                            t = no_stat_line_type;
+
+   return t;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+const char * bootintervaltype_to_string(const BootIntervalType t) {
+   const char *s = (const char *) nullptr;
+
+   switch(t) {
+      case(BootIntervalType::BCA):    s = conf_val_bca;     break;
+      case(BootIntervalType::PCTile): s = conf_val_pctile;  break;
+      default:                        s = conf_val_none;    break;
+   }
+
+   return s;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+BootIntervalType string_to_bootintervaltype(const char *s) {
+   BootIntervalType t;
+
+        if(strcasecmp(s, conf_val_bca)    == 0) t = BootIntervalType::BCA;
+   else if(strcasecmp(s, conf_val_pctile) == 0) t = BootIntervalType::PCTile;
+   else                                         t = BootIntervalType::None;
 
    return t;
 }
