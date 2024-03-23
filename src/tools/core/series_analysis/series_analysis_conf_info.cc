@@ -70,7 +70,7 @@ void SeriesAnalysisConfInfo::clear() {
    cnt_logic = SetLogic::None;
    cdf_info.clear();
    ci_alpha.clear();
-   boot_interval = BootIntervalType_None;
+   boot_interval = BootIntervalType::None;
    boot_rep_prop = bad_data_double;
    n_boot_rep = bad_data_int;
    boot_rng.clear();

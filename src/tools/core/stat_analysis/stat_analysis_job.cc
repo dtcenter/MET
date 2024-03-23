@@ -1130,7 +1130,7 @@ void write_job_summary(STATAnalysisJob &job,
          //
          // Compute a bootstrap confidence interval for the mean.
          //
-         if(job.boot_interval == boot_bca_flag) {
+         if(job.boot_interval == BootIntervalType::BCA) {
             compute_mean_stdev_ci_bca(rng_ptr, val_it->second,
                                       job.n_boot_rep,
                                       job.out_alpha, mean_ci, stdev_ci);

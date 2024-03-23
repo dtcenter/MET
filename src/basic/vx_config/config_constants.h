@@ -50,7 +50,7 @@ enum class FieldType {
 // Enumeration for set logic
 //
 
-enum class  SetLogic {
+enum class SetLogic {
    None,         // Default
    Union,        // Union
    Intersection, // Intersection
@@ -256,11 +256,13 @@ struct TimeSummaryInfo {
 // Enumeration for bootstrapping interval configuration parameter
 //
 
-enum BootIntervalType {
-   BootIntervalType_None,      // Default
-   BootIntervalType_BCA,       // Bias-Corrected and adjusted method
-   BootIntervalType_Percentile // Percentile method
+enum class BootIntervalType {
+   None,  // Default
+   BCA,   // Bias-Corrected and adjusted method
+   PCTile // Percentile method
 };
+
+////////////////////////////////////////////////////////////////////////
 
 //
 // Struct to store bootstrapping information

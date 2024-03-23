@@ -199,7 +199,7 @@ void STATAnalysisJob::clear() {
    out_wind_logic = SetLogic::Union;
 
    out_alpha      = bad_data_double;
-   boot_interval  = bad_data_int;
+   boot_interval  = BootIntervalType::None;
    boot_rep_prop  = bad_data_double;
    n_boot_rep     = bad_data_int;
 
@@ -621,7 +621,7 @@ void STATAnalysisJob::dump(ostream & out, int depth) const {
        << swing_width << "\n";
 
    out << prefix << "boot_interval = "
-       << boot_interval << "\n";
+       << bootintervaltype_to_string(boot_interval) << "\n";
 
    out << prefix << "boot_rep_prop = "
        << boot_rep_prop << "\n";
@@ -1592,7 +1592,7 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
          i++;
       }
       else if(jc_array[i] == "-boot_interval") {
-         boot_interval = atoi(jc_array[i+1].c_str());
+         boot_interval = string_to_bootintervaltype(jc_array[i+1].c_str());
          i++;
       }
       else if(jc_array[i] == "-boot_rep_prop") {
@@ -2821,7 +2821,7 @@ ConcatString STATAnalysisJob::get_jobstring() const {
           out_line_type.has(stat_nbrcnt_str))) {
 
          // Bootstrap Information
-         js << "-boot_interval " << boot_interval << " ";
+         js << "-boot_interval " << bootintervaltype_to_string(boot_interval) << " ";
          js << "-boot_rep_prop " << boot_rep_prop << " ";
          js << "-n_boot_rep "    << n_boot_rep    << " ";
          js << "-boot_rng "      << boot_rng      << " ";
