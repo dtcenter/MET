@@ -19,13 +19,6 @@
 #include "file_handler.h"
 
 ////////////////////////////////////////////////////////////////////////
-
-// struct obsVarInfo {
-//    int _gribCode;
-//    string _varName;
-// };
-
-////////////////////////////////////////////////////////////////////////
 //
 // International Arctic Buoy Programme
 //    https://iabp.apl.uw.edu/data.html
@@ -79,28 +72,20 @@ class IabpHandler : public FileHandler {
       // Protected constants
       /////////////////////////
 
-      // The number of columns in the second header line in the file.  This line
-      // is used to determine if this is a IABP file since the first line has
-      // an indeterminate number of tokens.
-
+      // The minimum number of columns in the header line in the file.
       static const int MIN_NUM_HDR_COLS;
 
-      // // The number of columns in the observation lines in the file.
-
-      // static const int NUM_OBS_COLS;
-
+      // a missing data value found in some iabp files
+      static const double IABP_MISSING_VALUE;
+   
       ///////////////////////
       // Protected members
       ///////////////////////
 
-      // Unchanging file name information
-      // obsVarInfo _obsVarInfo;
-
       // Store list of unqiue output variable names
       StringArray _varNames;
 
-      // pointers based on header content, could be fixed
-      // but check just in case
+      // pointers based on header content
       int _idPtr;
       int _yearPtr;
       int _hourPtr;
@@ -113,7 +98,7 @@ class IabpHandler : public FileHandler {
       int _tsPtr;
       int _taPtr;
 
-      // depends on which of the data is present in a file
+      // depends on which of the optional data types are present in a file
       int _numColumns;
 
       string _buoyId;
@@ -125,11 +110,6 @@ class IabpHandler : public FileHandler {
       double _ts;
       double _ta;
 
-   int _numZero;
-   int _numOneMinOrLess;
-   int _numGreaterThanOneMin;
-   
-
       ///////////////////////
       // Protected methods
       ///////////////////////
@@ -138,13 +118,12 @@ class IabpHandler : public FileHandler {
       bool _readHeaderInfo(LineDataFile &ascii_file);
 
       // Get the valid time from the observation line
-      // time_t _getValidTime(const DataLine &data_line) const;
-
       // Read the observations and add them to the
       // _observations vector
       virtual bool _readObservations(LineDataFile &ascii_file);
 
-   time_t _time2(const string &syear, const string &shour, const string &smin, const string &sdoy);
+      // compute the time value from inputs
+      time_t _time2(const string &syear, const string &shour, const string &smin, const string &sdoy);
 };
 
 ////////////////////////////////////////////////////////////////////////

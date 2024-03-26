@@ -18,6 +18,9 @@ using namespace std;
 
 #include "iabp_handler.h"
 
+const double IabpHandler::IABP_MISSING_VALUE = -999.0;
+
+
 const int IabpHandler::MIN_NUM_HDR_COLS = 8;
 
 // days in the month
@@ -27,21 +30,6 @@ static int _lookfor(const DataLine &dl, const string &name);
 static int _lookfor(const DataLine &dl, const string &name, const string &ascii_file, bool &ok);
 static time_t _time(const string &syear, const string &shour, const string &smin, const string &sdoy);
 
-#ifdef NOT
-// const int IabpHandler::NUM_OBS_COLS = 5;
-
-// Mapping of IABP strings to output variable names
-map<string,obsVarInfo> IabpObsVarMap = {
-   { "p",    { PRATE_GRIB_CODE, "PRATE" } },
-   { "sd",   { SNOD_GRIB_CODE,  "SNOD"  } },
-   { "sm",   { SOILW_GRIB_CODE, "SOILW" } },
-   { "su",   { SMS_GRIB_CODE,   "SMS"   } },
-   { "sweq", { WEASD_GRIB_CODE, "WEASD" } },
-   { "ta",   { TMP_GRIB_CODE,   "TMP"   } },
-   { "ts",   { TSOIL_GRIB_CODE, "TSOIL" } },
-   { "tsf",  { AVSFT_GRIB_CODE, "AVSFT" } }
-};
-#endif
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -51,17 +39,12 @@ map<string,obsVarInfo> IabpObsVarMap = {
 
 IabpHandler::IabpHandler(const string &program_name) :
   FileHandler(program_name) {
-   use_var_id = false;
-   _numZero= 0;
-   _numOneMinOrLess=0;
-   _numGreaterThanOneMin=0;
+   use_var_id = true;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 IabpHandler::~IabpHandler() {
-   mlog << Debug(1) << "Numzero=" << _numZero << "  numOneMinOrLess="
-        << _numOneMinOrLess << "  num>1min=" << _numGreaterThanOneMin << "\n\n";
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -88,7 +71,6 @@ bool IabpHandler::isFileType(LineDataFile &ascii_file) const {
    ConcatString cstring(line);
 
    StringArray tokens = cstring.split(" ");
-   //string s = tokens[0];
    if (tokens[0] != "BuoyID") is_file_type = false;
    if (tokens[1] != "Year") is_file_type = false;
    if (tokens[2] != "Hour") is_file_type = false;
@@ -112,10 +94,6 @@ bool IabpHandler::_readObservations(LineDataFile &ascii_file)
 
    string header_type = "IABP_STANDARD";
 
-   // // Get the var_id to use
-   // int var_id = bad_data_int;
-   // if(!_varNames.has(_obsVarInfo._varName, var_id)) return(false);
-   
    // Process the observation lines
    DataLine dl;
    while(ascii_file >> dl) {
@@ -130,10 +108,18 @@ bool IabpHandler::_readObservations(LineDataFile &ascii_file)
          return(false);
       }
 
-      // Extract the valid time from the data line
-      time_t valid_time = _time(dl[_yearPtr], dl[_hourPtr], dl[_minutePtr], dl[_doyPtr]);
-      if(valid_time == 0) return(false);
-
+      // Extract the valid time from the data line, using POS_DOY (scientist is most
+      // interested in location) Use POS_DOY to compute the month and day based on year
+      // (to handle leap year)
+      time_t valid_time = _time(dl[_yearPtr], dl[_hourPtr], dl[_minutePtr], dl[_posdoyPtr]);
+      if(valid_time == 0) {
+         mlog << Warning << "\nIabpHandler::_readObservations() -> "
+              << "No valid time computed in file, line number "
+              << dl.line_number() << " of IABP file \""
+              << ascii_file.filename() << "\".  Ignore this line\n\n";
+         return(false);
+      }
+      
       double lat = stod(dl[_latPtr]);
       double lon = stod(dl[_lonPtr]);
       string stationId = dl[_idPtr];
@@ -146,77 +132,41 @@ bool IabpHandler::_readObservations(LineDataFile &ascii_file)
       double ta = bad_data_double;
 
       if (_bpPtr >= 0) {
+         // is this the right placeholder for this? To always put it in to the
+         // fixed slot of an observation?
          pres = stod(dl[_bpPtr]);
+         if (pres == IABP_MISSING_VALUE) {
+            pres = bad_data_double;
+         }
       }
       if (_tsPtr >= 0) {
          ts = stod(dl[_tsPtr]);
+         if (ts == IABP_MISSING_VALUE) {
+            ts = bad_data_double;
+         }
       }
       _addObservations(Observation(
-                                      header_type, stationId, valid_time,
-                                      lat, lon, elev, quality_flag, grib_code, 
-                                      pres, height_m, ts, "Temp_surface"));
-      // }
+                                   header_type, stationId, valid_time,
+                                   lat, lon, elev, quality_flag, grib_code, 
+                                   pres, height_m, ts, "Temp_surface"));
+      grib_code++;
+      
       if (_taPtr >= 0) {
          ta = stod(dl[_taPtr]);
+         if (ta == IABP_MISSING_VALUE) {
+            ta = bad_data_double;
+         }
       }
       _addObservations(Observation(
-                                      header_type, stationId, valid_time,
-                                      lat, lon, elev, quality_flag, grib_code+1, 
-                                      pres, height_m, ta, "Temp_air"));
-
-      // }
-
-      // if (_tsPtr < 0 && _taPtr < 0) {
-         // add a placeholder that will be all missing, (Need to have a variable).
-      //    _addObservations(Observation(
-      //                                 header_type, stationId, valid_time,
-      //                                 lat, lon, elev, quality_flag, grib_code+1, 
-      //                                 pres, height_m, ta, "Temp_air"));
-      // }
-
+                                   header_type, stationId, valid_time,
+                                   lat, lon, elev, quality_flag, grib_code, 
+                                   pres, height_m, ta, "Temp_air"));
    } // end while
 
    return(true);
 }
 
 // ////////////////////////////////////////////////////////////////////////
-
-// time_t IabpHandler::_getValidTime(const DataLine &dl) const {
-
-
-//    // we have a year, hour, minute, and dayofyear
-   
-//    struct tm time_struct;
-//    memset(&time_struct, 0, sizeof(time_struct));
-
-//    // Formatted as YYYY/MM/DD HH:MM
-//    string ymd_str(dl[0]);
-//    string hm_str(dl[1]);
-
-//    // Validate the time strings
-//    if(!check_reg_exp("^[0-9]\\{4\\}/[0-9]\\{2\\}/[0-9]\\{2\\}$", dl[0]) ||
-//       !check_reg_exp("^[0-9]\\{2\\}:[0-9]\\{2\\}$", dl[1])) {
-//       mlog << Warning << "\nIabpHandler::_getValidTime() -> "
-//            << "unexpected time stamp format on line number "
-//            << dl.line_number() << " of IABP input file:\n"
-//            << "  " << dl << "\n\n";
-//    }
-//    else {
-
-//       // Parse time components
-//       time_struct.tm_year = stoi(ymd_str.substr(0, 4)) - 1900;
-//       time_struct.tm_mon  = stoi(ymd_str.substr(5, 2)) - 1;
-//       time_struct.tm_mday = stoi(ymd_str.substr(8, 2));
-//       time_struct.tm_hour = stoi( hm_str.substr(0, 2));
-//       time_struct.tm_min  = stoi( hm_str.substr(3, 2));
-//    }
-
-//    return(timegm(&time_struct));
-// #endif
-//    return 0;
-// }
-
-////////////////////////////////////////////////////////////////////////
 
 bool IabpHandler::_readHeaderInfo(LineDataFile &ascii_file) {
 
@@ -258,14 +208,6 @@ bool IabpHandler::_readHeaderInfo(LineDataFile &ascii_file) {
    _taPtr = _lookfor(dl, "Ta");
    if (_taPtr >= 0) ++_numColumns;
    return ok;
-
-   // _networkName = dl[1];
-   // _stationId   = dl[2];
-   // _stationLat  = atof(dl[3]);
-   // _stationLon  = atof(dl[4]);
-   // _stationElv  = atof(dl[5]);
-
-   // return(true);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -306,113 +248,5 @@ static time_t _time(const string &syear, const string &shour, const string &smin
    double doy = stod(sdoy);
    time_t retval = doyhms_to_unix((int)doy, year, hour, min, 0);
 
-   // // an approach to compare figuring out hour and minute using doy, as apposed to using input hour/minute
-   // int mjd = date_to_mjd(1, 0, year) + (int)doy;
-   // int day, month;
-   // mjd_to_date(mjd, month, day, year);
-
-   // // have day and month, now just examine the fractional part of doy, this is in units of days I guess
-   // double hms = doy - (double)(int)doy;
-
-   // // 24 hours per day, convert to hours
-   // double dhours = hms*24;
-
-   // // truncate 
-   // int hour2 = (int)dhours;  
-
-   // double dms = (dhours - (double)hour2)*60.0;
-   // // round
-   // int min2 = nint(dms);
-   // while (min2 >= 60)
-   // {
-   //    min2 -= 60;
-   //    hour2 += 1;
-   // }
-
-   // if (min2 != min || hour2 != hour)
-   // {
-   //    mlog << Warning << "doy=" << doy << " hour=" << hour << " hour2=" << hour2 << " min=" << min << " min2=" << min2 << "\n";
-   // }
-
-
-   // int seconds = 0;  // for now
-   
-   // time_t answer2 = mdyhms_to_unix(month, day, year, hour2, min2, seconds);
-
-   // int diff = answer2 - retval;
-   // // check for consistency
-   // if (diff != 0) {
-   //     mlog << Warning << "IabpHandler::_time() -> time mismatch by " << diff << " seconds\n";
-   // }   
-   
    return retval;
 }
-
-
-// time_t IabpHandler::_time2(const string &syear, const string &shour, const string &smin, const string &sdoy)
-// {
-//    int year = stoi(syear);
-//    int hour = stoi(shour);
-//    int min = stoi(smin);
-//    double doy = stod(sdoy);
-
-//    // an approach to compare figuring out hour and minute using doy, as apposed to using input hour/minute
-//    int mjd = date_to_mjd(1, 0, year) + (int)doy;
-//    int day, month;
-//    mjd_to_date(mjd, month, day, year);
-
-//    time_t retval = doyhms_to_unix((int)doy, year, hour, min, 0);
-
-//    // have day and month, now just examine the fractional part of doy, this is in units of days I guess
-//    double hms = doy - (double)(int)doy;
-
-//    // 24 hours per day, convert to hours
-//    double dhours = hms*24;
-
-//    // truncate 
-//    int hour2 = (int)dhours;  
-
-//    double dms = (dhours - (double)hour2)*60.0;
-
-//    // truncate or round?
-//    int min2 = (int)dms;
-
-   // double s = (dms - (double)min2)*60.0;
-   // // truncate again
-   // int seconds = (int)s;
-
-   // if (seconds > 30)
-   // {
-   //    // round up the minute
-   //    min2 = min2 + 1;
-   //    if (min2 >= 60)
-   //    {
-   //       min2 -= 60;
-   //       hour2 = hour2 + 1;
-   //       if (hour2 >= 24)
-   //       {
-   //          mlog << Warning << "Not yet implemented\n";
-   //       }
-   //    }
-   // }
-
-
-
-//    time_t answer2 = mdyhms_to_unix(month, day, year, hour2, min2, 0);
-
-//    int diff = answer2 - retval;
-//    if (diff == 0) {
-//       _numZero++;
-//    } else if (fabs((double)diff) <= 60.0) {
-//       _numOneMinOrLess++;
-//    } else {
-//       _numGreaterThanOneMin++;
-//    }
-   
-//    // check for consistency
-//    // if (answer2 != retval) {
-//    //    mlog << Warning << "IabpHandler::_time() -> time mismatch by " << answer2-retval << " seconds\n";
-//    // }   
-   
-//    return retval;
-// }
