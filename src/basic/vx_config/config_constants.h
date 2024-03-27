@@ -1215,7 +1215,6 @@ static const char conf_key_nc_pairs_grid[]                   = "nc_pairs_grid";
 
 static const char conf_key_n_range[]     = "n_range";
 static const char conf_key_n_azimuth[]   = "n_azimuth";
-static const char conf_key_max_range[]   = "max_range_km";
 static const char conf_key_delta_range[] = "delta_range_km";
 static const char conf_key_rmw_scale[]   = "rmw_scale";
 static const char conf_key_compute_tangential_and_radial_winds[] = "compute_tangential_and_radial_winds";
