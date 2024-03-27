@@ -1,42 +1,11 @@
-# do we need this? / is this right?
 #!/usr/bin/python
 
-#add imports...
-#import lxml     #note: developing with v 4.9.3
 from datetime import datetime as dt
 import os
 from pathlib import Path
 import re
 import subprocess
 import xml.etree.ElementTree as ET
-
-# use lib "$ENV{'MET_TEST_BASE'}/lib";
-
-
-
-# this stuff will go into if __name__==__main__...
-
-# sub usage {
-#   print "usage: $0 [-log {log_file}] [-cmd] [-memchk] [-callchk] [-noexit] {test_xml}
-
-#   where:
-#         log: if present, write output from each test to the specified file
-#         cmd: if present, print the test commands but do not run them, 
-#                overrides -log
-#      memchk: if present, activate valgrind with memcheck
-#     callchk: if present, activate valgrind with callcheck
-#      noexit: if present, the unit tester will continue executing subsequent
-#                tests when a test fails
-#    test_xml: file containing the unit test(s) to perform
-
-# ";
-# }
-# # parse the input options
-# my ($mgnc, $mpnc, $file_log, $cmd_only, $noexit, $memchk, $callchk);
-# GetOptions("log=s" => \$file_log, "cmd" => \$cmd_only, "noexit" => \$noexit,
-#            "memchk" => \$memchk, "callchk" => \$callchk)
-#   or die "ERROR: parsing input options";
-
 
 def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, callchk=False):
     """
@@ -60,9 +29,7 @@ def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, ca
     callchk : bool, default False
         if true, activate valgrind with callcheck
     """
-
-    # read command arguments  --> could do this in if "name"="main"
-   
+  
     # # if command  only mode is enabled, disable logging
     # $cmd_only and $file_log = 0;
 
@@ -158,79 +125,80 @@ def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, ca
             print("\n")
     
     #   # run and time the test command
-        t_start = dt.now()
-        cmd_args = [arg for arg in cmd.split() if arg!='\\']# + ['2>&1']
-        cmd_args_list.append(cmd_args)  #debug
-        cmd_outs = subprocess.run(cmd_args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)  #what should this actually contain?
-        print(f"Return code: {cmd_outs.returncode}")
-        #print(f"stderr: {cmd_outs.stderr}")
-        print(f"stdout: {cmd_outs.stdout}")
-        t_elaps = dt.now() - t_start
-        # unshift @cmd_outs, "$cmd\n";
+        else:
+            t_start = dt.now()
+            cmd_args = [arg for arg in cmd.split() if arg!='\\']# + ['2>&1']
+            cmd_args_list.append(cmd_args)  #debug
+            cmd_outs = subprocess.run(cmd_args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)  #what should this actually contain?
+            print(f"Return code: {cmd_outs.returncode}")
+            #print(f"stderr: {cmd_outs.stderr}")
+            print(f"stdout: {cmd_outs.stdout}")
+            t_elaps = dt.now() - t_start
+            # unshift @cmd_outs, "$cmd\n";
 
-    #   my $t_start = [gettimeofday];
-    #   my @cmd_outs = qx{$cmd 2>&1};
-    #   my $t_elaps = tv_interval( $t_start );
-    #   unshift @cmd_outs, "$cmd\n";
+        #   my $t_start = [gettimeofday];
+        #   my @cmd_outs = qx{$cmd 2>&1};
+        #   my $t_elaps = tv_interval( $t_start );
+        #   unshift @cmd_outs, "$cmd\n";
 
-    #   # check the return status and output files
-        if not(cmd_outs.returncode):
-            pass
-    #   $ret_ok = (! $?);
-    #   if( $ret_ok ){
-    #     $out_ok = 1;
-    #     do{ push @cmd_outs, qx/$mpnc -v $_/; $? and $out_ok = 0 } for ( @{ $test->{"out_pnc"} } );
-    #     do{ push @cmd_outs, qx/$mgnc -v $_/; $? and $out_ok = 0 } for ( @{ $test->{"out_gnc"} } );
-    #     for my $output ( @{ $test->{"out_stat"} } ){
-    #       -s $output or 
-    #         push @cmd_outs, "ERROR: stat file missing \"$output\"\n" and $out_ok = 0 and next;
-    #       int(qx{cat $output 2>/dev/null | egrep -v '^VERSION' | wc -l}) or
-    #         push @cmd_outs, "ERROR: stat data missing from file \"$output\"\n" and $out_ok = 0;
-    #     }
-    #     for my $output ( @{ $test->{"out_ps"} } ){
-    #       -s $output or 
-    #         push @cmd_outs, "ERROR: postscript file missing \"$output\"\n" and $out_ok = 0 and next;
-    #       !(qx{gs -sDEVICE=nullpage -dQUIET -dNOPAUSE -dBATCH $output 2>/dev/null}) or
-    #         push @cmd_outs, "ERROR: ghostscript error for postscript file \"$output\"\n" and $out_ok = 0;
-    #     }
-    #     for my $output ( @{ $test->{"out_exist"} } ){
-    #       -s $output or 
-    #         push @cmd_outs, "ERROR: file missing when it should exist \"$output\"\n" and $out_ok = 0 and next;
-    #     }
-    #     for my $output ( @{ $test->{"out_not_exist"} } ){
-    #       !(-s $output) or 
-    #         push @cmd_outs, "ERROR: file exists when it should be missing \"$output\"\n" and $out_ok = 0 and next;
-    #     }
+        #   # check the return status and output files
+            if not(cmd_outs.returncode):
+                pass
+        #   $ret_ok = (! $?);
+        #   if( $ret_ok ){
+        #     $out_ok = 1;
+        #     do{ push @cmd_outs, qx/$mpnc -v $_/; $? and $out_ok = 0 } for ( @{ $test->{"out_pnc"} } );
+        #     do{ push @cmd_outs, qx/$mgnc -v $_/; $? and $out_ok = 0 } for ( @{ $test->{"out_gnc"} } );
+        #     for my $output ( @{ $test->{"out_stat"} } ){
+        #       -s $output or 
+        #         push @cmd_outs, "ERROR: stat file missing \"$output\"\n" and $out_ok = 0 and next;
+        #       int(qx{cat $output 2>/dev/null | egrep -v '^VERSION' | wc -l}) or
+        #         push @cmd_outs, "ERROR: stat data missing from file \"$output\"\n" and $out_ok = 0;
+        #     }
+        #     for my $output ( @{ $test->{"out_ps"} } ){
+        #       -s $output or 
+        #         push @cmd_outs, "ERROR: postscript file missing \"$output\"\n" and $out_ok = 0 and next;
+        #       !(qx{gs -sDEVICE=nullpage -dQUIET -dNOPAUSE -dBATCH $output 2>/dev/null}) or
+        #         push @cmd_outs, "ERROR: ghostscript error for postscript file \"$output\"\n" and $out_ok = 0;
+        #     }
+        #     for my $output ( @{ $test->{"out_exist"} } ){
+        #       -s $output or 
+        #         push @cmd_outs, "ERROR: file missing when it should exist \"$output\"\n" and $out_ok = 0 and next;
+        #     }
+        #     for my $output ( @{ $test->{"out_not_exist"} } ){
+        #       !(-s $output) or 
+        #         push @cmd_outs, "ERROR: file exists when it should be missing \"$output\"\n" and $out_ok = 0 and next;
+        #     }
+            
+        #   }
+
+        #   # unset the test environment variables
+        #   delete $ENV{$_} for keys %{ $test->{"env"} };
         
-    #   }
+        #   # print the test result
+        #   printf "%s - %7.3f sec\n", $ret_ok && $out_ok ? "pass" : "FAIL", sprintf("%7.3f", $t_elaps);
 
-    #   # unset the test environment variables
-    #   delete $ENV{$_} for keys %{ $test->{"env"} };
-    
-    #   # print the test result
-    #   printf "%s - %7.3f sec\n", $ret_ok && $out_ok ? "pass" : "FAIL", sprintf("%7.3f", $t_elaps);
+        #   # build a list of environment variable exports and unsets for reporting
+        #   my @set_envs;
+        #   push @set_envs, "export $_=\'" . $test->{"env"}{$_} . "\'\n" for sort keys %{ $test->{"env"} };
+        #   my @unset_envs;
+        #   push @unset_envs, "unset $_\n" for sort keys %{ $test->{"env"} };
 
-    #   # build a list of environment variable exports and unsets for reporting
-    #   my @set_envs;
-    #   push @set_envs, "export $_=\'" . $test->{"env"}{$_} . "\'\n" for sort keys %{ $test->{"env"} };
-    #   my @unset_envs;
-    #   push @unset_envs, "unset $_\n" for sort keys %{ $test->{"env"} };
+        #   # if the log file is activated, print the test information
+        #   if( $file_log ){
+        #     print $fh_log "\n\n";
+        #     print $fh_log "$_" for (@set_envs, @cmd_outs, @unset_envs);
+        #     print $fh_log "\n\n";
+        #   }
 
-    #   # if the log file is activated, print the test information
-    #   if( $file_log ){
-    #     print $fh_log "\n\n";
-    #     print $fh_log "$_" for (@set_envs, @cmd_outs, @unset_envs);
-    #     print $fh_log "\n\n";
-    #   }
+        #   # on failure, print the problematic test and exit, if requested
+        #   if( !($ret_ok && $out_ok) ){
+        #     print "$_" for (@set_envs, @cmd_outs, @unset_envs);
+        #     $noexit or exit 1;
+        #     print "\n\n";
+        #   }
 
-    #   # on failure, print the problematic test and exit, if requested
-    #   if( !($ret_ok && $out_ok) ){
-    #     print "$_" for (@set_envs, @cmd_outs, @unset_envs);
-    #     $noexit or exit 1;
-    #     print "\n\n";
-    #   }
-
-    # }
+        # }
     return tests, cmd_args_list
 
 
@@ -327,5 +295,24 @@ def repl_env(string_with_ref):
             string_with_ref = string_with_ref.replace(envar_ref, envar)
 
     return string_with_ref
+
+if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Run a unit test.")
+    parser.add_argument('test_xml', )
+    parser.add_argument('-log', metavar='log_file',
+                        help='if present, write output from each test to log_file')
+    parser.add_argument('-cmd', action='store_true',
+                        help='if present, print the test commands but do not run them, overrides -log')
+    parser.add_argument('-memchk', action='store_true',
+                        help='if present, activate valgrind with memcheck')
+    parser.add_argument('-callchk', action='store_true',
+                        help='if present, activate valgrind with callcheck')
+    parser.add_argument('-noexit', action='store_true',
+                        help='if present, the unit tester will continue executing subsequent tests when a test fails')
+    args = parser.parse_args()
+
+    unit(test_xml=args.test_xml, file_log=args.log, cmd_only=args.cmd, noexit=args.noexit, memchk=args.memchk, callchk=args.callchk)
 
 
