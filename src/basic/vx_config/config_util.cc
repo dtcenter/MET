@@ -2736,7 +2736,7 @@ STATLineType string_to_statlinetype(const char *s) {
 ///////////////////////////////////////////////////////////////////////////////
 
 const char * bootintervaltype_to_string(const BootIntervalType t) {
-   const auto s = (const char *) nullptr;
+   auto s = (const char *) nullptr;
 
    switch(t) {
       case BootIntervalType::BCA:    s = conf_val_bca;     break;
