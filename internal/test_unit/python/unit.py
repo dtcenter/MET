@@ -129,7 +129,8 @@ def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, ca
     #   # run and time the test command
         else:
             t_start = dt.now()
-            cmd_args = [arg for arg in cmd.split() if arg!='\\']# + ['2>&1']
+            cmd_args = [arg.strip('\\') for arg in cmd.split() if arg!='\\']# + ['2>&1']
+            # cmd_args = [arg.strip() for arg in cmd.split('\\\n')]   #this could work also?
             cmd_args_list.append(cmd_args)  #debug
             cmd_outs = subprocess.run(cmd_args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)  #what should this actually contain?
             print(f"Return code: {cmd_outs.returncode}")
