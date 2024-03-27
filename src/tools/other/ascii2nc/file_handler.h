@@ -66,7 +66,7 @@ public:
   void setCompressionLevel(int compressoion_level);
   void setSummaryInfo(bool new_do_summary);
   void setSummaryInfo(const TimeSummaryInfo &summary_info);
-
+  void setValidTimeRange(const time_t &valid_beg, const time_t valid_end);
 
 protected:
 
@@ -114,6 +114,10 @@ protected:
   TimeSummaryInfo _summaryInfo;
   SummaryObs summary_obs;
 
+  time_t valid_beg_ut, valid_end_ut;
+  int num_observations_in_range;
+  int num_observations_out_of_range;
+
   ///////////////////////
   // Protected methods //
   ///////////////////////
@@ -143,6 +147,9 @@ protected:
   void _closeNetcdf();
   bool _openNetcdf(const std::string &nc_filename);
   void debug_print_observations(std::vector< Observation >, std::string);
+
+  bool _keep_valid_time(const time_t &valid_time) const;
+
 };
 
 inline void FileHandler::setCompressionLevel(int compressoion_level) { deflate_level = compressoion_level; }

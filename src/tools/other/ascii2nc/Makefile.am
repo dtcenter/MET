@@ -30,6 +30,7 @@ ascii2nc_SOURCES = ascii2nc.cc \
 	airnow_locations.cc airnow_locations.h \
 	aeronet_handler.cc aeronet_handler.h \
 	ismn_handler.cc ismn_handler.h \
+	iabp_handler.cc iabp_handler.h \
 	$(OPT_PYTHON_SOURCES)
 
 ascii2nc_CPPFLAGS = ${MET_CPPFLAGS} -I../../../basic/vx_log

@@ -57,7 +57,9 @@ FileHandler::FileHandler(const string &program_name) :
   use_var_id(false),
   do_monitor(false),
   deflate_level(DEF_DEFLATE_LEVEL),
-  _dataSummarized(false)
+  _dataSummarized(false),
+  valid_beg_ut((time_t)0),
+  valid_end_ut((time_t)0)
 {
 }
 
@@ -76,6 +78,12 @@ bool FileHandler::readAsciiFiles(const vector< ConcatString > &ascii_filename_li
 
   // Loop through the ASCII files, reading in the observations.  At the end of
   // this loop, all of the observations will be in the _observations vector.
+
+  //
+  // debug counts
+  //
+  num_observations_in_range = 0;
+  num_observations_out_of_range = 0;
 
   for (vector< ConcatString >::const_iterator ascii_filename = ascii_filename_list.begin();
        ascii_filename != ascii_filename_list.end(); ++ascii_filename)
@@ -103,6 +111,9 @@ bool FileHandler::readAsciiFiles(const vector< ConcatString > &ascii_filename_li
     ascii_file.close();
   }
 
+   mlog << Debug(2) << " Kept " << num_observations_in_range
+        << " observations, rejected (out of range) " << num_observations_out_of_range
+        << " observations\n";
   return true;
 }
 
@@ -168,6 +179,14 @@ void FileHandler::setSummaryInfo(const TimeSummaryInfo &summary_info) {
    do_summary = summary_info.flag;
    _summaryInfo = summary_info;
    summary_obs.setSummaryInfo(summary_info);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void FileHandler::setValidTimeRange(const time_t &valid_beg, const time_t valid_end)
+{
+   valid_beg_ut = valid_beg;
+   valid_end_ut = valid_end;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -275,6 +294,16 @@ bool FileHandler::_addObservations(const Observation &obs)
    //
    if(filters.is_filtered_sid(obs.getStationId().c_str())) return false;
 
+   //
+   // Check if valid time is in range
+   //
+   if (_keep_valid_time(obs.getValidTime())) {
+      num_observations_in_range++;
+   } else {
+      num_observations_out_of_range++;
+      return false;
+   }      
+
    // Save obs because the obs vector is sorted after time summary
    _observations.push_back(obs);
    if (do_summary) summary_obs.addObservationObj(obs);
@@ -334,3 +363,23 @@ void FileHandler::debug_print_observations(vector< Observation > my_observation,
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+bool FileHandler::_keep_valid_time(const time_t &valid_time) const
+{
+   bool keep = true;
+
+   // If valid times are both set, check the range
+   if (valid_beg_ut != (time_t) 0 && valid_end_ut != (time_t) 0) {
+      if (valid_time < valid_beg_ut || valid_time > valid_end_ut) keep = false;
+   }
+   // If only beg set, check the lower bound
+   else if (valid_beg_ut != (time_t) 0 && valid_end_ut == (time_t) 0) {
+      if (valid_time < valid_beg_ut) keep = false;
+   }
+   // If only end set, check the upper bound
+   else if (valid_beg_ut == (time_t) 0 && valid_end_ut != (time_t) 0) {
+      if (valid_time > valid_end_ut) keep = false;
+   }
+   return(keep);
+}
+
