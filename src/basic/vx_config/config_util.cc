@@ -2618,51 +2618,51 @@ const char * statlinetype_to_string(const STATLineType t) {
    const char *s = (const char *) nullptr;
 
    switch(t) {
-      case(stat_sl1l2):        s = stat_sl1l2_str;     break;
-      case(stat_sal1l2):       s = stat_sal1l2_str;    break;
-      case(stat_vl1l2):        s = stat_vl1l2_str;     break;
-      case(stat_val1l2):       s = stat_val1l2_str;    break;
-      case(stat_vcnt):         s = stat_vcnt_str;      break;
+      case stat_sl1l2:        s = stat_sl1l2_str;     break;
+      case stat_sal1l2:       s = stat_sal1l2_str;    break;
+      case stat_vl1l2:        s = stat_vl1l2_str;     break;
+      case stat_val1l2:       s = stat_val1l2_str;    break;
+      case stat_vcnt:         s = stat_vcnt_str;      break;
 
-      case(stat_fho):          s = stat_fho_str;       break;
-      case(stat_ctc):          s = stat_ctc_str;       break;
-      case(stat_cts):          s = stat_cts_str;       break;
-      case(stat_mctc):         s = stat_mctc_str;      break;
-      case(stat_mcts):         s = stat_mcts_str;      break;
+      case stat_fho:          s = stat_fho_str;       break;
+      case stat_ctc:          s = stat_ctc_str;       break;
+      case stat_cts:          s = stat_cts_str;       break;
+      case stat_mctc:         s = stat_mctc_str;      break;
+      case stat_mcts:         s = stat_mcts_str;      break;
 
-      case(stat_cnt):          s = stat_cnt_str;       break;
-      case(stat_pct):          s = stat_pct_str;       break;
-      case(stat_pstd):         s = stat_pstd_str;      break;
-      case(stat_pjc):          s = stat_pjc_str;       break;
-      case(stat_prc):          s = stat_prc_str;       break;
+      case stat_cnt:          s = stat_cnt_str;       break;
+      case stat_pct:          s = stat_pct_str;       break;
+      case stat_pstd:         s = stat_pstd_str;      break;
+      case stat_pjc:          s = stat_pjc_str;       break;
+      case stat_prc:          s = stat_prc_str;       break;
 
-      case(stat_eclv):         s = stat_eclv_str;      break;
-      case(stat_mpr):          s = stat_mpr_str;       break;
-      case(stat_seeps):        s = stat_seeps_str;     break;
-      case(stat_seeps_mpr):    s = stat_seeps_mpr_str; break;
-      case(stat_nbrctc):       s = stat_nbrctc_str;    break;
+      case stat_eclv:         s = stat_eclv_str;      break;
+      case stat_mpr:          s = stat_mpr_str;       break;
+      case stat_seeps:        s = stat_seeps_str;     break;
+      case stat_seeps_mpr:    s = stat_seeps_mpr_str; break;
+      case stat_nbrctc:       s = stat_nbrctc_str;    break;
 
-      case(stat_nbrcts):       s = stat_nbrcts_str;    break;
-      case(stat_nbrcnt):       s = stat_nbrcnt_str;    break;
-      case(stat_grad):         s = stat_grad_str;      break;
-      case(stat_dmap):         s = stat_dmap_str;      break;
-      case(stat_isc):          s = stat_isc_str;       break;
+      case stat_nbrcts:       s = stat_nbrcts_str;    break;
+      case stat_nbrcnt:       s = stat_nbrcnt_str;    break;
+      case stat_grad:         s = stat_grad_str;      break;
+      case stat_dmap:         s = stat_dmap_str;      break;
+      case stat_isc:          s = stat_isc_str;       break;
 
-      case(stat_wdir):         s = stat_wdir_str;      break;
-      case(stat_ecnt):         s = stat_ecnt_str;      break;
-      case(stat_rps):          s = stat_rps_str;       break;
-      case(stat_rhist):        s = stat_rhist_str;     break;
-      case(stat_phist):        s = stat_phist_str;     break;
+      case stat_wdir:         s = stat_wdir_str;      break;
+      case stat_ecnt:         s = stat_ecnt_str;      break;
+      case stat_rps:          s = stat_rps_str;       break;
+      case stat_rhist:        s = stat_rhist_str;     break;
+      case stat_phist:        s = stat_phist_str;     break;
 
-      case(stat_orank):        s = stat_orank_str;     break;
-      case(stat_ssvar):        s = stat_ssvar_str;     break;
-      case(stat_relp):         s = stat_relp_str;      break;
-      case(stat_genmpr):       s = stat_genmpr_str;    break;
-      case(stat_ssidx):        s = stat_ssidx_str;     break;
+      case stat_orank:        s = stat_orank_str;     break;
+      case stat_ssvar:        s = stat_ssvar_str;     break;
+      case stat_relp:         s = stat_relp_str;      break;
+      case stat_genmpr:       s = stat_genmpr_str;    break;
+      case stat_ssidx:        s = stat_ssidx_str;     break;
  
-      case(stat_header):       s = stat_header_str;    break;
+      case stat_header:       s = stat_header_str;    break;
 
-      case(no_stat_line_type):
+      case no_stat_line_type:
       default:                 s = stat_na_str;        break;
    }
 
@@ -2736,12 +2736,12 @@ STATLineType string_to_statlinetype(const char *s) {
 ///////////////////////////////////////////////////////////////////////////////
 
 const char * bootintervaltype_to_string(const BootIntervalType t) {
-   const char *s = (const char *) nullptr;
+   const auto s = (const char *) nullptr;
 
    switch(t) {
-      case(BootIntervalType::BCA):    s = conf_val_bca;     break;
-      case(BootIntervalType::PCTile): s = conf_val_pctile;  break;
-      default:                        s = conf_val_none;    break;
+      case BootIntervalType::BCA:    s = conf_val_bca;     break;
+      case BootIntervalType::PCTile: s = conf_val_pctile;  break;
+      default:                       s = conf_val_none;    break;
    }
 
    return s;
@@ -2806,10 +2806,10 @@ ConcatString fieldtype_to_string(FieldType type) {
 
    // Convert enumerated FieldType to string
    switch(type) {
-      case(FieldType::None): s = conf_val_none; break;
-      case(FieldType::Both): s = conf_val_both; break;
-      case(FieldType::Fcst): s = conf_val_fcst; break;
-      case(FieldType::Obs):  s = conf_val_obs; break;
+      case FieldType::None: s = conf_val_none; break;
+      case FieldType::Both: s = conf_val_both; break;
+      case FieldType::Fcst: s = conf_val_fcst; break;
+      case FieldType::Obs:  s = conf_val_obs; break;
       default:
          mlog << Error << "\nfieldtype_to_string() -> "
               << "Unexpected FieldType value of " << enum_class_as_integer(type) << ".\n\n";
@@ -2875,10 +2875,10 @@ ConcatString setlogic_to_string(SetLogic type) {
 
    // Convert enumerated SetLogic to string
    switch(type) {
-      case(SetLogic::None):         s = conf_val_none;         break;
-      case(SetLogic::Union):        s = conf_val_union;        break;
-      case(SetLogic::Intersection): s = conf_val_intersection; break;
-      case(SetLogic::SymDiff):      s = conf_val_symdiff;      break;
+      case SetLogic::None:         s = conf_val_none;         break;
+      case SetLogic::Union:        s = conf_val_union;        break;
+      case SetLogic::Intersection: s = conf_val_intersection; break;
+      case SetLogic::SymDiff:      s = conf_val_symdiff;      break;
       default:
          mlog << Error << "\nsetlogic_to_string() -> "
               << "Unexpected SetLogic value of " << enum_class_as_integer(type) << ".\n\n";
@@ -2895,10 +2895,10 @@ ConcatString setlogic_to_abbr(SetLogic type) {
 
    // Convert enumerated SetLogic to an abbreviation
    switch(type) {
-      case(SetLogic::None):         s = na_str;                     break;
-      case(SetLogic::Union):        s = setlogic_abbr_union;        break;
-      case(SetLogic::Intersection): s = setlogic_abbr_intersection; break;
-      case(SetLogic::SymDiff):      s = setlogic_abbr_symdiff;      break;
+      case SetLogic::None:         s = na_str;                     break;
+      case SetLogic::Union:        s = setlogic_abbr_union;        break;
+      case SetLogic::Intersection: s = setlogic_abbr_intersection; break;
+      case SetLogic::SymDiff:      s = setlogic_abbr_symdiff;      break;
       default:
          mlog << Error << "\nsetlogic_to_abbr() -> "
               << "Unexpected SetLogic value of " << enum_class_as_integer(type) << ".\n\n";
@@ -2915,10 +2915,10 @@ ConcatString setlogic_to_symbol(SetLogic type) {
 
    // Convert enumerated SetLogic to a symbol
    switch(type) {
-      case(SetLogic::None):         s = na_str;                       break;
-      case(SetLogic::Union):        s = setlogic_symbol_union;        break;
-      case(SetLogic::Intersection): s = setlogic_symbol_intersection; break;
-      case(SetLogic::SymDiff):      s = setlogic_symbol_symdiff;      break;
+      case SetLogic::None:         s = na_str;                       break;
+      case SetLogic::Union:        s = setlogic_symbol_union;        break;
+      case SetLogic::Intersection: s = setlogic_symbol_intersection; break;
+      case SetLogic::SymDiff:      s = setlogic_symbol_symdiff;      break;
       default:
          mlog << Error << "\nsetlogic_to_symbol() -> "
               << "Unexpected SetLogic value of " << enum_class_as_integer(type) << ".\n\n";
@@ -2994,10 +2994,10 @@ ConcatString tracktype_to_string(TrackType type) {
 
    // Convert enumerated TrackType to string
    switch(type) {
-      case(TrackType::None):  s = conf_val_none; break;
-      case(TrackType::Both):  s = conf_val_both; break;
-      case(TrackType::ADeck): s = conf_val_adeck; break;
-      case(TrackType::BDeck): s = conf_val_bdeck; break;
+      case TrackType::None:  s = conf_val_none; break;
+      case TrackType::Both:  s = conf_val_both; break;
+      case TrackType::ADeck: s = conf_val_adeck; break;
+      case TrackType::BDeck: s = conf_val_bdeck; break;
       default:
          mlog << Error << "\ntracktype_to_string() -> "
               << "Unexpected TrackType value of " << enum_class_as_integer(type) << ".\n\n";
@@ -3030,11 +3030,11 @@ ConcatString diagtype_to_string(DiagType type) {
 
    // Convert enumerated DiagType to string
    switch(type) {
-      case(DiagType::None):      s = conf_val_none;      break;
-      case(DiagType::CIRA_RT):   s = cira_diag_rt_str;   break;
-      case(DiagType::CIRA_Dev):  s = cira_diag_dev_str;  break;
-      case(DiagType::SHIPS_RT):  s = ships_diag_rt_str;  break;
-      case(DiagType::SHIPS_Dev): s = ships_diag_dev_str; break;
+      case DiagType::None:      s = conf_val_none;      break;
+      case DiagType::CIRA_RT:   s = cira_diag_rt_str;   break;
+      case DiagType::CIRA_Dev:  s = cira_diag_dev_str;  break;
+      case DiagType::SHIPS_RT:  s = ships_diag_rt_str;  break;
+      case DiagType::SHIPS_Dev: s = ships_diag_dev_str; break;
       default:
          mlog << Error << "\ndiagtype_to_string() -> "
               << "Unexpected DiagType value of " << enum_class_as_integer(type) << ".\n\n";
@@ -3087,9 +3087,9 @@ ConcatString interp12type_to_string(Interp12Type type) {
 
    // Convert enumerated Interp12Type to string
    switch(type) {
-      case(Interp12Type::None):    s = conf_val_none;    break;
-      case(Interp12Type::Fill):    s = conf_val_fill;    break;
-      case(Interp12Type::Replace): s = conf_val_replace; break;
+      case Interp12Type::None:    s = conf_val_none;    break;
+      case Interp12Type::Fill:    s = conf_val_fill;    break;
+      case Interp12Type::Replace: s = conf_val_replace; break;
       default:
          mlog << Error << "\ninterp12type_to_string() -> "
               << "Unexpected Interp12Type value of " << enum_class_as_integer(type) << ".\n\n";
@@ -3125,10 +3125,10 @@ ConcatString mergetype_to_string(MergeType type) {
 
    // Convert enumerated MergeType to string
    switch(type) {
-      case(MergeType::None):   s = conf_val_none;   break;
-      case(MergeType::Both):   s = conf_val_both;   break;
-      case(MergeType::Thresh): s = conf_val_thresh; break;
-      case(MergeType::Engine): s = conf_val_engine; break;
+      case MergeType::None:   s = conf_val_none;   break;
+      case MergeType::Both:   s = conf_val_both;   break;
+      case MergeType::Thresh: s = conf_val_thresh; break;
+      case MergeType::Engine: s = conf_val_engine; break;
       default:
          mlog << Error << "\nmergetype_to_string() -> "
               << "Unexpected MergeType value of " << enum_class_as_integer(type) << ".\n\n";
@@ -3145,14 +3145,14 @@ ConcatString obssummary_to_string(ObsSummary type, int perc_val) {
 
    // Convert enumerated ObsSummary to string
    switch(type) {
-      case(ObsSummary::None):    s = conf_val_none;       break;
-      case(ObsSummary::Nearest): s = conf_val_nearest;    break;
-      case(ObsSummary::Min):     s = conf_val_min;        break;
-      case(ObsSummary::Max):     s = conf_val_max;        break;
-      case(ObsSummary::UW_Mean): s = conf_val_uw_mean;    break;
-      case(ObsSummary::DW_Mean): s = conf_val_dw_mean;    break;
-      case(ObsSummary::Median):  s = conf_val_median;     break;
-      case(ObsSummary::Perc):
+      case ObsSummary::None:    s = conf_val_none;       break;
+      case ObsSummary::Nearest: s = conf_val_nearest;    break;
+      case ObsSummary::Min:     s = conf_val_min;        break;
+      case ObsSummary::Max:     s = conf_val_max;        break;
+      case ObsSummary::UW_Mean: s = conf_val_uw_mean;    break;
+      case ObsSummary::DW_Mean: s = conf_val_dw_mean;    break;
+      case ObsSummary::Median:  s = conf_val_median;     break;
+      case ObsSummary::Perc:
          s << conf_val_perc << "(" << perc_val << ")";
          break;
       default:
@@ -3190,10 +3190,10 @@ ConcatString matchtype_to_string(MatchType type) {
 
    // Convert enumerated MatchType to string
    switch(type) {
-      case(MatchType::None):      s = conf_val_none;       break;
-      case(MatchType::MergeBoth): s = conf_val_merge_both; break;
-      case(MatchType::MergeFcst): s = conf_val_merge_fcst; break;
-      case(MatchType::NoMerge):   s = conf_val_no_merge;   break;
+      case MatchType::None:      s = conf_val_none;       break;
+      case MatchType::MergeBoth: s = conf_val_merge_both; break;
+      case MatchType::MergeFcst: s = conf_val_merge_fcst; break;
+      case MatchType::NoMerge:   s = conf_val_no_merge;   break;
       default:
          mlog << Error << "\nmatchtype_to_string() -> "
               << "Unexpected MatchType value of " << enum_class_as_integer(type) << ".\n\n";
@@ -3254,13 +3254,13 @@ ConcatString disttype_to_string(DistType type) {
 
    // Convert enumerated DistType to string
    switch(type) {
-      case(DistType_None):        s = conf_val_none;        break;
-      case(DistType_Normal):      s = conf_val_normal;      break;
-      case(DistType_Exponential): s = conf_val_exponential; break;
-      case(DistType_ChiSquared):  s = conf_val_chisquared;  break;
-      case(DistType_Gamma):       s = conf_val_gamma;       break;
-      case(DistType_Uniform):     s = conf_val_uniform;     break;
-      case(DistType_Beta):        s = conf_val_beta;        break;
+      case DistType_None:        s = conf_val_none;        break;
+      case DistType_Normal:      s = conf_val_normal;      break;
+      case DistType_Exponential: s = conf_val_exponential; break;
+      case DistType_ChiSquared:  s = conf_val_chisquared;  break;
+      case DistType_Gamma:       s = conf_val_gamma;       break;
+      case DistType_Uniform:     s = conf_val_uniform;     break;
+      case DistType_Beta:        s = conf_val_beta;        break;
       default:
          mlog << Error << "\ndisttype_to_string() -> "
               << "Unexpected DistType value of " << enum_class_as_integer(type) << ".\n\n";
@@ -3298,10 +3298,10 @@ ConcatString griddecomptype_to_string(GridDecompType type) {
 
    // Convert enumerated GridDecompType to string
    switch(type) {
-      case(GridDecompType::None): s = conf_val_none; break;
-      case(GridDecompType::Auto): s = conf_val_auto; break;
-      case(GridDecompType::Tile): s = conf_val_tile; break;
-      case(GridDecompType::Pad):  s = conf_val_pad; break;
+      case GridDecompType::None: s = conf_val_none; break;
+      case GridDecompType::Auto: s = conf_val_auto; break;
+      case GridDecompType::Tile: s = conf_val_tile; break;
+      case GridDecompType::Pad:  s = conf_val_pad; break;
       default:
          mlog << Error << "\ngriddecomptype_to_string() -> "
               << "Unexpected GridDecompType value of " << enum_class_as_integer(type) << ".\n\n";
@@ -3318,13 +3318,13 @@ ConcatString wavelettype_to_string(WaveletType type) {
 
    // Convert enumerated WaveletType to string
    switch(type) {
-      case(WaveletType::None):          s = conf_val_none; break;
-      case(WaveletType::Haar):          s = conf_val_haar; break;
-      case(WaveletType::Haar_Cntr):     s = conf_val_haar_cntr; break;
-      case(WaveletType::Daub):          s = conf_val_daub; break;
-      case(WaveletType::Daub_Cntr):     s = conf_val_daub_cntr; break;
-      case(WaveletType::BSpline):       s = conf_val_bspline; break;
-      case(WaveletType::BSpline_Cntr):  s = conf_val_bspline_cntr; break;
+      case WaveletType::None:          s = conf_val_none; break;
+      case WaveletType::Haar:          s = conf_val_haar; break;
+      case WaveletType::Haar_Cntr:     s = conf_val_haar_cntr; break;
+      case WaveletType::Daub:          s = conf_val_daub; break;
+      case WaveletType::Daub_Cntr:     s = conf_val_daub_cntr; break;
+      case WaveletType::BSpline:       s = conf_val_bspline; break;
+      case WaveletType::BSpline_Cntr:  s = conf_val_bspline_cntr; break;
       default:
          mlog << Error << "\nwavlettype_to_string() -> "
               << "Unexpected WaveletType value of " << enum_class_as_integer(type) << ".\n\n";
