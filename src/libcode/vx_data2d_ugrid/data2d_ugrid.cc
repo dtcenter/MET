@@ -322,27 +322,6 @@ int MetUGridDataFile::data_plane_array(VarInfo &vinfo,
       mlog << Error << "\n" << method_name
            << "LevelType_Time for unstructured grid is not enabled\n\n";
       exit(1);
-      /* Not enabled
-      const int debug_level = 7;
-      LongArray time_offsets = collect_time_offsets(vinfo);
-      if (0 < time_offsets.n_elements()) {
-         for (int idx=0; idx<time_offsets.n_elements(); idx++) {
-            _cur_time_index = time_offsets[idx];
-            if (data_plane(vinfo, plane)) {
-               plane_array.add(plane, lvl_lower, lvl_upper);
-               n_rec++;
-            }
-         }
-
-         if (mlog.verbosity_level() >= debug_level) {
-            for (int idx=0; idx< time_offsets.n_elements(); idx++ ) {
-               mlog << Debug(debug_level) << method_name << "time: "
-                    << unix_to_yyyymmdd_hhmmss(_file->ValidTime[time_offsets[idx]])
-                    << " from index " << time_offsets[idx] << "\n";
-            }
-         }
-      }
-      */
    }
    else if (level.type() == LevelType_Pres) {
       if (nullptr == data_vinfo) {
@@ -353,7 +332,7 @@ int MetUGridDataFile::data_plane_array(VarInfo &vinfo,
                if (vlevel >= lvl_lower && vlevel <= lvl_upper) {
                   vinfo.set_req_name(vinfo_list[idx]->name.c_str());
                   if (data_plane(vinfo, plane, vinfo_list[idx])) {
-                     plane_array.add(plane, lvl_lower, lvl_upper);
+                     plane_array.add(plane, vlevel, vlevel);
                      n_rec++;
                   }
                   mlog << Debug(5) << method_name
