@@ -19,6 +19,7 @@
 //   002   07/06/22  Howard Soh      METplus-Internal #19 Rename main to met_main
 //   003   09/28/22  Prestopnik      MET #2227 Remove namspace std and netCDF from header files
 //   004   04/26/23  Halley Gotway   MET #2523 Reorder NetCDF dimensions
+//   005   03/11/24  Halley Gotway   MET #2833 range/azimuth grid
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -552,7 +553,13 @@ void setup_grid() {
     grid_data.name = "TCRMW";
     grid_data.range_n = conf_info.n_range;
     grid_data.azimuth_n = conf_info.n_azimuth;
-    grid_data.range_max_km = conf_info.max_range_km;
+
+    // Define the maximum range in km based on the fixed increment 
+    if(is_bad_data(conf_info.rmw_scale)) {
+        grid_data.range_max_km =
+            conf_info.delta_range_km *
+            (conf_info.n_range - 1);
+    }
 
     tcrmw_grid.set_from_data(grid_data);
     grid.set(grid_data);
@@ -591,8 +598,9 @@ void setup_nc_file() {
         lead_time_str_var, lead_time_sec_var);
 
     // Define range and azimuth dimensions
-    def_tc_range_azimuth(nc_out, range_dim, azimuth_dim, tcrmw_grid,
-        conf_info.rmw_scale);
+    def_tc_range_azimuth(nc_out,
+        range_dim, azimuth_dim,
+        tcrmw_grid, conf_info.rmw_scale);
 
     // Define latitude and longitude arrays
     def_tc_lat_lon(nc_out,
@@ -686,9 +694,15 @@ void process_fields(const TrackInfoArray& tracks) {
         grid_data.lat_center = point.lat();
         grid_data.lon_center = -1.0*point.lon(); // internal sign change
 
-        // RMW is same as mrd()
-        grid_data.range_max_km = conf_info.rmw_scale *
-            point.mrd() * tc_km_per_nautical_miles * conf_info.n_range;
+        // Define the maximum range in km relative to the radius of maximum winds
+        if(!is_bad_data(conf_info.rmw_scale)) {
+            grid_data.range_max_km =
+                conf_info.rmw_scale *
+                point.mrd() * tc_km_per_nautical_miles *
+                (conf_info.n_range - 1);
+        }
+
+        // Re-define the range/azimuth grid
         tcrmw_grid.clear();
         tcrmw_grid.set_from_data(grid_data);
         grid.clear();
