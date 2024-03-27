@@ -1,10 +1,12 @@
 #!/usr/bin/python
 
 from datetime import datetime as dt
+import logging
 import os
 from pathlib import Path
 import re
 import subprocess
+import sys
 import xml.etree.ElementTree as ET
 
 def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, callchk=False):
@@ -30,26 +32,31 @@ def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, ca
         if true, activate valgrind with callcheck
     """
   
+    # initialize logger
+    logger = logging.getLogger(__name__)
+
+    # create/add console handler
+    ch = logging.StreamHandler()
+    logger.addHandler(ch)
+
+    # create/add file handler
+    if file_log:
+        fh = logging.FileHandler(file_log)
+        logger.addHandler(fh)
+
     # # if command  only mode is enabled, disable logging
     # $cmd_only and $file_log = 0;
-
-    # # open the log file, if requested
-    # open(my $fh_log, ">", $file_log) or die "ERROR: unable to open log file $file_log\n"
-    #   if $file_log;
-
     
     # parse xml file
     try:
         test_root = ET.parse(test_xml)
     except e:
-        print(e)
-        # and exit?
-
+        logger.exception(f"Unable to parse xml from {test_xml}")
 
     # # parse the children of the met_test element
     if test_root.getroot().tag != 'met_test':
-        print(f"ERROR: unexpected top-level element. Expected 'met_test', got '{test_root.tag}'")
-        # and exit?
+        logger.error(f"unexpected top-level element. Expected 'met_test', got '{test_root.tag}'")
+        sys.exit(1)
     else:
         tests = build_tests(test_root)
 
@@ -85,18 +92,6 @@ def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, ca
             # calls a perl function from VxUtil.pm (in test_unit/lib) to make the directory 
             output_dir = Path(output).parent
             output_dir.mkdir(parents=True, exist_ok=True)     #should error be raised if dir already exists? 
-
-    #   my @outputs = ( @{$test->{"out_pnc"}}, @{$test->{"out_gnc"}}, @{$test->{"out_stat"}}, @{$test->{"out_ps"}}, @{$test->{"out_exist"}}, @{$test->{"out_not_exist"}} );
-    #   for my $output ( @outputs ){
-    #     -s $output and qx/rm -rf $output/;
-    #     vx_file_mkdir($output);
-    #   }
-        # sub vx_file_mkdir {
-        #   while( my $strFile = shift ){
-        #     (my $strDir = $strFile) =~ s/(.*\/).*/$1/;
-        #     qx/mkdir -p $strDir/;
-        #   }
-        # }
 
     #   # set the test environment variables
         if 'env' in test.keys():
@@ -138,11 +133,6 @@ def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, ca
             print(f"stdout: {cmd_outs.stdout}")
             t_elaps = dt.now() - t_start
             # unshift @cmd_outs, "$cmd\n";
-
-        #   my $t_start = [gettimeofday];
-        #   my @cmd_outs = qx{$cmd 2>&1};
-        #   my $t_elaps = tv_interval( $t_start );
-        #   unshift @cmd_outs, "$cmd\n";
 
         #   # check the return status and output files
             if not(cmd_outs.returncode):
@@ -228,8 +218,14 @@ def build_tests(test_root):
     test_list = []
     for test_el in test_root.iter('test'):
         test = {}
-        test['name'] = test_el.attrib['name']
-        # check that name exists or "ERROR: name attribute not found for test ", $test_idx++ . "\n";
+        try:
+            test['name'] = test_el.attrib['name']
+        except KeyError:
+            logger.error("name attribute not found for test [test index]")
+            sys.exit(1)
+            # should just fail this one test and not fully exit?
+        #debug:
+        print(f"Building {test['name']}")
 
         for el in test_el:
             if (el.tag=='exec' or el.tag=='param'):
@@ -249,10 +245,12 @@ def build_tests(test_root):
             elif el.tag=='env':
                 env_dict = {}
                 for env_el in el:
-                    env_dict[env_el.find('name').text] = env_el.find('value').text
-                    # check for missing names/values:
-#                   $pair_name or die "ERROR: env pair in test \"" . $test{"name"} . "\" " .
-#                               "missing name or value\n";                          
+                    try:
+                        env_dict[env_el.find('name').text] = env_el.find('value').text
+                    except AttributeError:
+                        logger.error(f"env pair in test \\{test['name']}\\ missing name or value")
+                        sys.exit(1)
+                        # should just fail this one test and not fully exit?                      
 
                 test['env'] = env_dict
 
@@ -280,7 +278,7 @@ def repl_env(string_with_ref):
 
     Returns
     -------
-    string_with_env : str
+    string_with_ref : str
         The provided string with ${ENV_NAME} replaced by corresponding environment variable
     """
 
