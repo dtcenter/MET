@@ -175,12 +175,14 @@ static void finish_txt_files();
 static void clean_up();
 
 static void usage();
-static void set_config(const StringArray &);
 static void set_point_obs(const StringArray &);
 static void set_ncfile(const StringArray &);
 static void set_obs_valid_beg_time(const StringArray &);
 static void set_obs_valid_end_time(const StringArray &);
 static void set_outdir(const StringArray &);
+#ifdef WITH_UGRID
+static void set_ugrid_config(const StringArray &);
+#endif
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -240,7 +242,9 @@ void process_command_line(int argc, char **argv) {
    cline.set_usage(usage);
 
    // Add the options function calls
-   cline.add(set_config,             "-config",        1);
+#ifdef WITH_UGRID
+   cline.add(set_ugrid_config,       "-ugrid_config",        1);
+#endif
    cline.add(set_point_obs,          "-point_obs",     1);
    cline.add(set_ncfile,             "-ncfile",        1);
    cline.add(set_obs_valid_beg_time, "-obs_valid_beg", 1);
@@ -283,7 +287,9 @@ void process_command_line(int argc, char **argv) {
 
    // Read the config files
    conf_info.read_config(default_config_file.c_str(), config_file.c_str());
-   conf_info.read_configs(config_files);
+#ifdef WITH_UGRID
+   conf_info.read_ugrid_configs(ugrid_config_files, config_file.c_str());
+#endif
 
    // Get the forecast file type from config, if present
    ftype = parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_fcst));
@@ -2203,7 +2209,9 @@ void usage() {
         << "\tfcst_file\n"
         << "\tobs_file\n"
         << "\tconfig_file\n"
-        << "\t[-config config_file]\n"
+#ifdef WITH_UGRID
+        << "\t[-ugrid_config config_file]\n"
+#endif
         << "\t[-point_obs file]\n"
         << "\t[-obs_valid_beg time]\n"
         << "\t[-obs_valid_end time]\n"
@@ -2220,8 +2228,10 @@ void usage() {
         << "\t\t\"config_file\" is a PointStatConfig file containing "
         << "the desired configuration settings (required).\n"
 
-        << "\t\t\"-config config_file\" specifies additional PointStatConfig file containing "
-        << "the configuration settings for unstructured grid (optional).\n"
+#ifdef WITH_UGRID
+        << "\t\t\"-ugrid_config ugrid_config_file\" is a UGridConfig file containing "
+        << "the desired configuration settings for unstructured grid (required only for UGrid)\n"
+#endif
 
         << "\t\t\"-point_obs file\" specifies additional NetCDF point "
         << "observation files to be used (optional).\n"
@@ -2246,10 +2256,12 @@ void usage() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_config(const StringArray & a)
+#ifdef WITH_UGRID
+void set_ugrid_config(const StringArray & a)
 {
-   config_files.add(a[0]);
+   ugrid_config_files.add(a[0]);
 }
+#endif
 
 ////////////////////////////////////////////////////////////////////////
 

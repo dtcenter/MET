@@ -247,6 +247,7 @@ class PointStatConfInfo {
       ConcatString output_prefix;           // String to customize output file name
       ConcatString version;                 // Config file version
 #ifdef WITH_UGRID
+      bool ignore_ugrid_dataset;
       ConcatString ugrid_nc;                // NetCDF for coordinate variables of unstructured grid
       ConcatString ugrid_dataset;           // UGRid dataset name (mpas, lfric etc)
       ConcatString ugrid_map_config;        // User's configuration file which contains ugrid metadata mapping
@@ -261,7 +262,9 @@ class PointStatConfInfo {
       void clear();
 
       void read_config(const char *, const char *);
-      void read_configs(StringArray user_file_names);
+#ifdef WITH_UGRID
+      void read_ugrid_configs(StringArray ugrid_config_names, const char * user_config);
+#endif
 
       void process_config(GrdFileType);
       void process_grib_codes();
