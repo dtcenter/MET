@@ -65,7 +65,9 @@ bool IabpHandler::isFileType(LineDataFile &ascii_file) const {
    while(dl.n_items() == 0) ascii_file >> dl;
 
    // Check the minimum number of header columns
-   if(dl.n_items() < MIN_NUM_HDR_COLS) is_file_type = false;
+   if(dl.n_items() < MIN_NUM_HDR_COLS) {
+      return false;
+   }
 
    string line = dl.get_line();
    ConcatString cstring(line);
