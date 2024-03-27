@@ -18,12 +18,12 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-enum PadSize {
+enum class PadSize {
 
-   padsize_4,
-   padsize_8,
+   size_4,
+   size_8,
 
-   no_padsize
+   no_pad
 
 };
 

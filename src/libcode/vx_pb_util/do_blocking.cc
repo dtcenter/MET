@@ -115,13 +115,13 @@ unsigned char * b = (unsigned char *) nullptr;
 
 switch ( padsize )  {
 
-   case padsize_4:
+   case PadSize::size_4:
       bytes = 4;
       b = (unsigned char *) (&I);
       I = (unsigned int) value;
       break;
 
-   case padsize_8:
+   case PadSize::size_8:
       bytes = 8;
       b = (unsigned char *) (&L);
       L = (unsigned long long) value;

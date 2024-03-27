@@ -57,9 +57,9 @@ void pblock(const char *infile, const char *outfile, Action action) {
    // Set the block size for this compiler 
    //
    #ifdef BLOCK4
-      padsize = padsize_4;
+      padsize = PadSize::size_4;
    #else
-      padsize = padsize_8;
+      padsize = PadSize::size_8;
    #endif
 
    //
