@@ -598,7 +598,7 @@ if [ $COMPILE_NETCDF -eq 1 ]; then
   echo "cd `pwd`"
   configure_lib_args=""
   if [[ $machine == "Mac" ]]; then
-    configure_lib_args="-lhdf5_hl -lhdf5 -lz"
+    configure_lib_args="-lnetcdf -lm -lhdf5_hl -lhdf5 -lz"
   fi
   run_cmd "./configure --prefix=${LIB_DIR} LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include LIBS=\"${LIBS} ${configure_lib_args}\" > netcdf-cxx.configure.log 2>&1"
 
@@ -743,9 +743,9 @@ fi
 configure_cmd="${configure_cmd} ${OPT_ARGS}"
 
 echo "cd `pwd`"
-run_cmd "${configure_cmd} > met.configure.log 2>&1"
+run_cmd "${configure_cmd} > configure.log 2>&1"
 run_cmd "make ${MAKE_ARGS} > met.make.log 2>&1"
-run_cmd "make ${MAKE_ARGS} install > met.make_install.log 2>&1"
-run_cmd "make ${MAKE_ARGS} test > met.make_test.log 2>&1"
+run_cmd "make install > met.make_install.log 2>&1"
+run_cmd "make test > met.make_test.log 2>&1"
 
 echo "Finished compiling at `date`"
