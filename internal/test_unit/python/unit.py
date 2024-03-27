@@ -117,11 +117,13 @@ def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, ca
         
     #   # if writing a command file, print the environment and command, then loop
         if cmd_only:
-            for key, val in sorted(test['env'].items()):
-                print(f"export {key}={val}")
+            if 'env' in test.keys():
+                for key, val in sorted(test['env'].items()):
+                    print(f"export {key}={val}")
             print(f"{cmd}")
-            for key, val in sorted(test['env'].items()):
-                print(f"unset {key}")
+            if 'env' in test.keys():
+                for key, val in sorted(test['env'].items()):
+                    print(f"unset {key}")
             print("\n")
     
     #   # run and time the test command
