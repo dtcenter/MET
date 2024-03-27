@@ -958,25 +958,32 @@ void UGridFile::read_netcdf_grid()
 
 void UGridFile::set_dataset(ConcatString _dataset_name) {
 
-  const char *ugrid_config_name = nullptr;
+  ConcatString ugrid_config_name;
+  const string method_nmame = "UGridFile::set_dataset() ";
 
   if (0 == _dataset_name.length()) {
-    mlog << Error << "\nUGridFile::set_dataset()"
-         << " The \"" << conf_key_ugrid_dataset
+    mlog << Error << "\n" << method_nmame
+         << "The \"" << conf_key_ugrid_dataset
          << "\" is not defined at the configuration file.\n\n";
     exit(1);
   }
   dataset_name = _dataset_name;
-  ConcatString dataset_config(def_config_prefix);
-  dataset_config.add(dataset_name);
-  if (!file_exists(dataset_config.c_str())) {
-    dataset_config = def_config_prefix2;
-    dataset_config.add(dataset_name);
-    dataset_config = replace_path(dataset_config.c_str());
+  if (file_exists(dataset_name.c_str())) {
+    /* UGridConfig file was passed as the ugrid_dataset */
+    ugrid_config_name = dataset_name;
   }
-  ugrid_config_name = dataset_config.c_str();
-  if (file_exists(ugrid_config_name)) {
-    read_config(ugrid_config_name);
+  else {
+    ConcatString dataset_config(def_config_prefix);
+    dataset_config.add(dataset_name);
+    if (!file_exists(dataset_config.c_str())) {
+      dataset_config = def_config_prefix2;
+      dataset_config.add(dataset_name);
+      dataset_config = replace_path(dataset_config.c_str());
+    }
+    ugrid_config_name = dataset_config;
+  }
+  if (file_exists(ugrid_config_name.c_str())) {
+    read_config(ugrid_config_name.c_str());
   }
   else {
     mlog << Error << "\nUGridFile::set_dataset()"
@@ -984,7 +991,6 @@ void UGridFile::set_dataset(ConcatString _dataset_name) {
          << ugrid_config_name << "\".\n\n";
     exit(1);
   }
-
 }
 
 ////////////////////////////////////////////////////////////////////////
