@@ -40,6 +40,15 @@ using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////
 
+template <typename Enumeration>
+auto enum_class_as_integer(Enumeration const value)
+    -> typename std::underlying_type<Enumeration>::type
+{
+    return static_cast<typename std::underlying_type<Enumeration>::type>(value);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 GridTemplate::GridTemplate(void) :
    _wrapLon(false) {
    // Do nothing
@@ -591,11 +600,11 @@ void GridTemplate::_setEdgeOffsets() {
 ///////////////////////////////////////////////////////////////////////////////
 
 GridTemplateFactory::GridTemplateFactory() {
-   enum_to_string.resize(GridTemplate_NUM_TEMPLATES);
+   enum_to_string.resize(enum_class_as_integer(GridTemplates::NUM_TEMPLATES));
 
-   enum_to_string[GridTemplate_None] = "";
-   enum_to_string[GridTemplate_Square] = "SQUARE";
-   enum_to_string[GridTemplate_Circle] = "CIRCLE";
+   enum_to_string[enum_class_as_integer(GridTemplates::None)] = "";
+   enum_to_string[enum_class_as_integer(GridTemplates::Square)] = "SQUARE";
+   enum_to_string[enum_class_as_integer(GridTemplates::Circle)] = "CIRCLE";
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -612,7 +621,7 @@ GridTemplateFactory::~GridTemplateFactory() {
 
 GridTemplateFactory::GridTemplates GridTemplateFactory::string2Enum(string target) {
 
-   for(unsigned int ix = 0; ix < GridTemplate_NUM_TEMPLATES; ix++) {
+   for(unsigned int ix = 0; ix < enum_class_as_integer(GridTemplates::NUM_TEMPLATES); ix++) {
       if(enum_to_string[ix] == target) {
          return static_cast<GridTemplates>(ix);
       }
@@ -632,7 +641,7 @@ string GridTemplateFactory::enum2String(GridTemplates target) {
 
    if(static_cast<int>(target) > enum_to_string.size() - 1) {
       mlog << Error << "\nGridTemplateFactory::enum2String() -> "
-           << "target out of range " << target << " > "
+           << "target out of range " << enum_class_as_integer(target) << " > "
            << (static_cast<int>(enum_to_string.size()) - 1)
            << ".\n\n";
       exit(1);
@@ -659,15 +668,15 @@ GridTemplate* GridTemplateFactory::buildGT(string gt, int width, bool wrap_lon) 
 GridTemplate* GridTemplateFactory::buildGT(GridTemplates gt, int width, bool wrap_lon) {
 
    switch (gt) {
-      case(GridTemplate_Square):
+      case(GridTemplates::Square):
          return new RectangularTemplate(width, width, wrap_lon);
 
-      case(GridTemplate_Circle):
+      case(GridTemplates::Circle):
          return new CircularTemplate(width, wrap_lon);
 
       default:
          mlog << Error << "\nbuildGT() -> "
-              << "Unexpected GridTemplates value (" << gt << ").\n\n";
+              << "Unexpected GridTemplates value (" << enum_class_as_integer(gt) << ").\n\n";
          exit(1);
       }
 }

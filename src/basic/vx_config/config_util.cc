@@ -124,10 +124,10 @@ void RegridInfo::clear() {
    field = FieldType::None;
    vld_thresh = bad_data_double;
    name.clear();
-   method = InterpMthd_None;
+   method = InterpMthd::None;
    width = bad_data_int;
    gaussian.clear();
-   shape = GridTemplateFactory::GridTemplate_None;
+   shape = GridTemplateFactory::GridTemplates::None;
    convert_fx.clear();
    censor_thresh.clear();
    censor_val.clear();
@@ -144,10 +144,10 @@ RegridInfo::RegridInfo() {
 void RegridInfo::validate() {
 
    // Check for unsupported regridding options
-   if(method == InterpMthd_Best       ||
-      method == InterpMthd_Geog_Match ||
-      method == InterpMthd_Gaussian   ||
-      method == InterpMthd_HiRA) {
+   if(method == InterpMthd::Best       ||
+      method == InterpMthd::Geog_Match ||
+      method == InterpMthd::Gaussian   ||
+      method == InterpMthd::HiRA) {
       mlog << Error << "\nRegridInfo::validate() -> "
            << "\"" << interpmthd_to_string(method)
            << "\" not valid for regridding, only interpolating.\n\n";
@@ -156,31 +156,31 @@ void RegridInfo::validate() {
 
    // Check the nearest neighbor special case
    if(width  == 1 &&
-      method != InterpMthd_None &&
-      method != InterpMthd_Nearest &&
-      method != InterpMthd_Force &&
-      method != InterpMthd_Upper_Left &&
-      method != InterpMthd_Upper_Right &&
-      method != InterpMthd_Lower_Right &&
-      method != InterpMthd_Lower_Left &&
-      method != InterpMthd_AW_Mean &&
-      method != InterpMthd_MaxGauss) {
+      method != InterpMthd::None &&
+      method != InterpMthd::Nearest &&
+      method != InterpMthd::Force &&
+      method != InterpMthd::Upper_Left &&
+      method != InterpMthd::Upper_Right &&
+      method != InterpMthd::Lower_Right &&
+      method != InterpMthd::Lower_Left &&
+      method != InterpMthd::AW_Mean &&
+      method != InterpMthd::MaxGauss) {
       mlog << Warning << "\nRegridInfo::validate() -> "
            << "Resetting the regridding method from \""
            << interpmthd_to_string(method) << "\" to \""
            << interpmthd_nearest_str
            << "\" since the regridding width is 1.\n\n";
-      method = InterpMthd_Nearest;
+      method = InterpMthd::Nearest;
    }
 
    // Check for some methods, that width is 1
-   if((method == InterpMthd_Nearest ||
-       method == InterpMthd_Force ||
-       method == InterpMthd_Upper_Left ||
-       method == InterpMthd_Upper_Right ||
-       method == InterpMthd_Lower_Right ||
-       method == InterpMthd_Lower_Left ||
-       method == InterpMthd_AW_Mean) &&
+   if((method == InterpMthd::Nearest ||
+       method == InterpMthd::Force ||
+       method == InterpMthd::Upper_Left ||
+       method == InterpMthd::Upper_Right ||
+       method == InterpMthd::Lower_Right ||
+       method == InterpMthd::Lower_Left ||
+       method == InterpMthd::AW_Mean) &&
       width != 1) {
       mlog << Warning << "\nRegridInfo::validate() -> "
            << "Resetting regridding width from "
@@ -190,8 +190,8 @@ void RegridInfo::validate() {
    }
 
    // Check the bilinear and budget special cases
-   if((method == InterpMthd_Bilin ||
-       method == InterpMthd_Budget) &&
+   if((method == InterpMthd::Bilin ||
+       method == InterpMthd::Budget) &&
       width != 2) {
       mlog << Warning << "\nRegridInfo::validate() -> "
            << "Resetting the regridding width from "
@@ -201,7 +201,7 @@ void RegridInfo::validate() {
    }
 
    // Check the Gaussian filter
-   if(method == InterpMthd_MaxGauss && gaussian.radius < gaussian.dx) {
+   if(method == InterpMthd::MaxGauss && gaussian.radius < gaussian.dx) {
       mlog << Error << "\nRegridInfo::validate() -> "
            << "The radius of influence (" << gaussian.radius
            << ") is less than the delta distance (" << gaussian.dx
@@ -226,20 +226,20 @@ void RegridInfo::validate() {
 void RegridInfo::validate_point() {
 
    // Check for unsupported regridding options
-   if(method != InterpMthd_Max &&
-      method != InterpMthd_Min &&
-      method != InterpMthd_Median &&
-      method != InterpMthd_UW_Mean) {
+   if(method != InterpMthd::Max &&
+      method != InterpMthd::Min &&
+      method != InterpMthd::Median &&
+      method != InterpMthd::UW_Mean) {
       mlog << Warning << "\nRegridInfo::validate_point() -> "
            << "Resetting the regridding method from \""
            << interpmthd_to_string(method) << "\" to \""
            << interpmthd_uw_mean_str << ".\n"
            << "\tAvailable methods: "
-           << interpmthd_to_string(InterpMthd_UW_Mean) << ", "
-           << interpmthd_to_string(InterpMthd_Max) << ", "
-           << interpmthd_to_string(InterpMthd_Min) << ", "
-           << interpmthd_to_string(InterpMthd_Median) << ".\n\n";
-      method = InterpMthd_UW_Mean;
+           << interpmthd_to_string(InterpMthd::UW_Mean) << ", "
+           << interpmthd_to_string(InterpMthd::Max) << ", "
+           << interpmthd_to_string(InterpMthd::Min) << ", "
+           << interpmthd_to_string(InterpMthd::Median) << ".\n\n";
+      method = InterpMthd::UW_Mean;
    }
 
 }
@@ -1398,7 +1398,7 @@ RegridInfo parse_conf_regrid(Dictionary *dict, bool error_out) {
    }
    else {
       // If not specified, use the default square shape
-      info.shape = GridTemplateFactory::GridTemplate_Square;
+      info.shape = GridTemplateFactory::GridTemplates::Square;
    }
 
    // Conf: gaussian dx and radius
@@ -1408,7 +1408,7 @@ RegridInfo parse_conf_regrid(Dictionary *dict, bool error_out) {
    info.gaussian.radius = (is_bad_data(conf_value) ? default_gaussian_radius : conf_value);
    conf_value = regrid_dict->lookup_double(conf_key_trunc_factor, false);
    info.gaussian.trunc_factor = (is_bad_data(conf_value) ? default_trunc_factor : conf_value);
-   if (info.method == InterpMthd_Gaussian || info.method == InterpMthd_MaxGauss) info.gaussian.compute();
+   if (info.method == InterpMthd::Gaussian || info.method == InterpMthd::MaxGauss) info.gaussian.compute();
 
    // MET#2437 Do not search the higher levels of config file context for convert,
    //          censor_thresh, and censor_val. They must be specified within the
@@ -1438,7 +1438,7 @@ void InterpInfo::clear() {
    method.clear();
    width.clear();
    gaussian.clear();
-   shape = GridTemplateFactory::GridTemplate_None;
+   shape = GridTemplateFactory::GridTemplates::None;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1451,15 +1451,15 @@ void InterpInfo::validate() {
 
       // Check the nearest neighbor special case
       if(width[i] == 1 &&
-         methodi  != InterpMthd_None &&
-         methodi  != InterpMthd_Nearest &&
-         methodi  != InterpMthd_Force &&
-         methodi  != InterpMthd_Upper_Left &&
-         methodi  != InterpMthd_Upper_Right &&
-         methodi  != InterpMthd_Lower_Right &&
-         methodi  != InterpMthd_Lower_Left &&
-         methodi  != InterpMthd_Gaussian &&
-         methodi  != InterpMthd_MaxGauss) {
+         methodi  != InterpMthd::None &&
+         methodi  != InterpMthd::Nearest &&
+         methodi  != InterpMthd::Force &&
+         methodi  != InterpMthd::Upper_Left &&
+         methodi  != InterpMthd::Upper_Right &&
+         methodi  != InterpMthd::Lower_Right &&
+         methodi  != InterpMthd::Lower_Left &&
+         methodi  != InterpMthd::Gaussian &&
+         methodi  != InterpMthd::MaxGauss) {
          mlog << Warning << "\nInterpInfo::validate() -> "
               << "Resetting interpolation method " << (int) i << " from \""
               << method[i] << "\" to \""
@@ -1469,11 +1469,11 @@ void InterpInfo::validate() {
       }
 
       // Check for some methods, that width is 1
-      if((methodi == InterpMthd_Nearest ||
-          methodi == InterpMthd_Upper_Left ||
-          methodi == InterpMthd_Upper_Right ||
-          methodi == InterpMthd_Lower_Right ||
-          methodi == InterpMthd_Lower_Left) &&
+      if((methodi == InterpMthd::Nearest ||
+          methodi == InterpMthd::Upper_Left ||
+          methodi == InterpMthd::Upper_Right ||
+          methodi == InterpMthd::Lower_Right ||
+          methodi == InterpMthd::Lower_Left) &&
          width[i] != 1) {
          mlog << Warning << "\nInterpInfo::validate() -> "
               << "Resetting interpolation width " << (int) i << " from "
@@ -1483,8 +1483,8 @@ void InterpInfo::validate() {
       }
 
       // Check the bilinear and budget special cases
-      if((methodi == InterpMthd_Bilin ||
-          methodi == InterpMthd_Budget) &&
+      if((methodi == InterpMthd::Bilin ||
+          methodi == InterpMthd::Budget) &&
          width[i] != 2) {
          mlog << Warning << "\nInterpInfo::validate() -> "
               << "Resetting interpolation width " << (int) i << " from "
@@ -1494,8 +1494,8 @@ void InterpInfo::validate() {
       }
 
       // Check the Gaussian filter
-      if(methodi == InterpMthd_Gaussian ||
-         methodi == InterpMthd_MaxGauss) {
+      if(methodi == InterpMthd::Gaussian ||
+         methodi == InterpMthd::MaxGauss) {
          if (gaussian.radius < gaussian.dx) {
             mlog << Error << "\n"
                  << "The radius of influence (" << gaussian.radius
@@ -1591,7 +1591,7 @@ InterpInfo parse_conf_interp(Dictionary *dict, const char *conf_key) {
    }
    else {
       // If not specified, use the default square shape
-      info.shape = GridTemplateFactory::GridTemplate_Square;
+      info.shape = GridTemplateFactory::GridTemplates::Square;
    }
 
    // Conf: gaussian dx and radius
@@ -1645,8 +1645,8 @@ InterpInfo parse_conf_interp(Dictionary *dict, const char *conf_key) {
          method = int_to_interpmthd(mthd_na[j]);
 
          // Check for unsupported interpolation options
-         if(method == InterpMthd_Budget ||
-            method == InterpMthd_Force) {
+         if(method == InterpMthd::Budget ||
+            method == InterpMthd::Force) {
             mlog << Error << "\nparse_conf_interp() -> "
                  << "\"" << interpmthd_to_string(method)
                  << "\" not valid for interpolating, only regridding.\n\n";
@@ -1666,7 +1666,7 @@ InterpInfo parse_conf_interp(Dictionary *dict, const char *conf_key) {
 
          } // end for k
 
-         if(method == InterpMthd_Gaussian || method == InterpMthd_MaxGauss) {
+         if(method == InterpMthd::Gaussian || method == InterpMthd::MaxGauss) {
             info.gaussian.compute();
          }
       } // end for j
@@ -1861,7 +1861,7 @@ void NbrhdInfo::clear() {
    vld_thresh = bad_data_double;
    width.clear();
    cov_ta.clear();
-   shape = GridTemplateFactory::GridTemplate_None;
+   shape = GridTemplateFactory::GridTemplates::None;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1949,7 +1949,7 @@ NbrhdInfo parse_conf_nbrhd(Dictionary *dict, const char *conf_key) {
    }
    else {
       // If not specified, use the default square shape
-      info.shape = GridTemplateFactory::GridTemplate_Square;
+      info.shape = GridTemplateFactory::GridTemplates::Square;
    }
 
    // Conf: cov_thresh
@@ -1979,7 +1979,7 @@ void HiRAInfo::clear() {
    vld_thresh = bad_data_double;
    cov_ta.clear();
    prob_cat_ta.clear();
-   shape = GridTemplateFactory::GridTemplate_None;
+   shape = GridTemplateFactory::GridTemplates::None;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2065,7 +2065,7 @@ HiRAInfo parse_conf_hira(Dictionary *dict) {
    }
    else {
       // If not specified, use the default square shape
-      info.shape = GridTemplateFactory::GridTemplate_Square;
+      info.shape = GridTemplateFactory::GridTemplates::Square;
    }
 
    // Conf: cov_thresh
@@ -2552,30 +2552,30 @@ void check_climo_n_vx(Dictionary *dict, const int n_vx) {
 ///////////////////////////////////////////////////////////////////////////////
 
 InterpMthd int_to_interpmthd(int i) {
-   InterpMthd m = InterpMthd_None;
+   InterpMthd m = InterpMthd::None;
 
-        if(i == conf_const.lookup_int(interpmthd_none_str))        m = InterpMthd_None;
-   else if(i == conf_const.lookup_int(interpmthd_min_str))         m = InterpMthd_Min;
-   else if(i == conf_const.lookup_int(interpmthd_max_str))         m = InterpMthd_Max;
-   else if(i == conf_const.lookup_int(interpmthd_median_str))      m = InterpMthd_Median;
-   else if(i == conf_const.lookup_int(interpmthd_uw_mean_str))     m = InterpMthd_UW_Mean;
-   else if(i == conf_const.lookup_int(interpmthd_dw_mean_str))     m = InterpMthd_DW_Mean;
-   else if(i == conf_const.lookup_int(interpmthd_aw_mean_str))     m = InterpMthd_AW_Mean;
-   else if(i == conf_const.lookup_int(interpmthd_ls_fit_str))      m = InterpMthd_LS_Fit;
-   else if(i == conf_const.lookup_int(interpmthd_bilin_str))       m = InterpMthd_Bilin;
-   else if(i == conf_const.lookup_int(interpmthd_nbrhd_str))       m = InterpMthd_Nbrhd;
-   else if(i == conf_const.lookup_int(interpmthd_nearest_str))     m = InterpMthd_Nearest;
-   else if(i == conf_const.lookup_int(interpmthd_budget_str))      m = InterpMthd_Budget;
-   else if(i == conf_const.lookup_int(interpmthd_force_str))       m = InterpMthd_Force;
-   else if(i == conf_const.lookup_int(interpmthd_best_str))        m = InterpMthd_Best;
-   else if(i == conf_const.lookup_int(interpmthd_upper_left_str))  m = InterpMthd_Upper_Left;
-   else if(i == conf_const.lookup_int(interpmthd_upper_right_str)) m = InterpMthd_Upper_Right;
-   else if(i == conf_const.lookup_int(interpmthd_lower_right_str)) m = InterpMthd_Lower_Right;
-   else if(i == conf_const.lookup_int(interpmthd_lower_left_str))  m = InterpMthd_Lower_Left;
-   else if(i == conf_const.lookup_int(interpmthd_gaussian_str))    m = InterpMthd_Gaussian;
-   else if(i == conf_const.lookup_int(interpmthd_maxgauss_str))    m = InterpMthd_MaxGauss;
-   else if(i == conf_const.lookup_int(interpmthd_geog_match_str))  m = InterpMthd_Geog_Match;
-   else if(i == conf_const.lookup_int(interpmthd_hira_str))        m = InterpMthd_HiRA;
+        if(i == conf_const.lookup_int(interpmthd_none_str))        m = InterpMthd::None;
+   else if(i == conf_const.lookup_int(interpmthd_min_str))         m = InterpMthd::Min;
+   else if(i == conf_const.lookup_int(interpmthd_max_str))         m = InterpMthd::Max;
+   else if(i == conf_const.lookup_int(interpmthd_median_str))      m = InterpMthd::Median;
+   else if(i == conf_const.lookup_int(interpmthd_uw_mean_str))     m = InterpMthd::UW_Mean;
+   else if(i == conf_const.lookup_int(interpmthd_dw_mean_str))     m = InterpMthd::DW_Mean;
+   else if(i == conf_const.lookup_int(interpmthd_aw_mean_str))     m = InterpMthd::AW_Mean;
+   else if(i == conf_const.lookup_int(interpmthd_ls_fit_str))      m = InterpMthd::LS_Fit;
+   else if(i == conf_const.lookup_int(interpmthd_bilin_str))       m = InterpMthd::Bilin;
+   else if(i == conf_const.lookup_int(interpmthd_nbrhd_str))       m = InterpMthd::Nbrhd;
+   else if(i == conf_const.lookup_int(interpmthd_nearest_str))     m = InterpMthd::Nearest;
+   else if(i == conf_const.lookup_int(interpmthd_budget_str))      m = InterpMthd::Budget;
+   else if(i == conf_const.lookup_int(interpmthd_force_str))       m = InterpMthd::Force;
+   else if(i == conf_const.lookup_int(interpmthd_best_str))        m = InterpMthd::Best;
+   else if(i == conf_const.lookup_int(interpmthd_upper_left_str))  m = InterpMthd::Upper_Left;
+   else if(i == conf_const.lookup_int(interpmthd_upper_right_str)) m = InterpMthd::Upper_Right;
+   else if(i == conf_const.lookup_int(interpmthd_lower_right_str)) m = InterpMthd::Lower_Right;
+   else if(i == conf_const.lookup_int(interpmthd_lower_left_str))  m = InterpMthd::Lower_Left;
+   else if(i == conf_const.lookup_int(interpmthd_gaussian_str))    m = InterpMthd::Gaussian;
+   else if(i == conf_const.lookup_int(interpmthd_maxgauss_str))    m = InterpMthd::MaxGauss;
+   else if(i == conf_const.lookup_int(interpmthd_geog_match_str))  m = InterpMthd::Geog_Match;
+   else if(i == conf_const.lookup_int(interpmthd_hira_str))        m = InterpMthd::HiRA;
    else {
       mlog << Error << "\nconf_int_to_interpmthd() -> "
            << "Unexpected value of " << i
@@ -2781,14 +2781,14 @@ FieldType int_to_fieldtype(int v) {
 ///////////////////////////////////////////////////////////////////////////////
 
 GridTemplateFactory::GridTemplates int_to_gridtemplate(int v) {
-   GridTemplateFactory::GridTemplates t = GridTemplateFactory::GridTemplate_Square;
+   GridTemplateFactory::GridTemplates t = GridTemplateFactory::GridTemplates::Square;
 
    // Convert integer to enumerated FieldType
    if(v == conf_const.lookup_int(conf_val_square)) {
-      t = GridTemplateFactory::GridTemplate_Square;
+      t = GridTemplateFactory::GridTemplates::Square;
    }
    else if(v == conf_const.lookup_int(conf_val_circle)) {
-      t = GridTemplateFactory::GridTemplate_Circle;
+      t = GridTemplateFactory::GridTemplates::Circle;
    }
    else {
       mlog << Error << "\nint_to_gridtemplate() -> "
@@ -3206,16 +3206,16 @@ ConcatString matchtype_to_string(MatchType type) {
 ///////////////////////////////////////////////////////////////////////////////
 
 DistType int_to_disttype(int v) {
-   DistType t = DistType_None;
+   DistType t = DistType::None;
 
    // Convert integer to enumerated DistType
-        if(v == conf_const.lookup_int(conf_val_none))        t = DistType_None;
-   else if(v == conf_const.lookup_int(conf_val_normal))      t = DistType_Normal;
-   else if(v == conf_const.lookup_int(conf_val_exponential)) t = DistType_Exponential;
-   else if(v == conf_const.lookup_int(conf_val_chisquared))  t = DistType_ChiSquared;
-   else if(v == conf_const.lookup_int(conf_val_gamma))       t = DistType_Gamma;
-   else if(v == conf_const.lookup_int(conf_val_uniform))     t = DistType_Uniform;
-   else if(v == conf_const.lookup_int(conf_val_beta))        t = DistType_Beta;
+        if(v == conf_const.lookup_int(conf_val_none))        t = DistType::None;
+   else if(v == conf_const.lookup_int(conf_val_normal))      t = DistType::Normal;
+   else if(v == conf_const.lookup_int(conf_val_exponential)) t = DistType::Exponential;
+   else if(v == conf_const.lookup_int(conf_val_chisquared))  t = DistType::ChiSquared;
+   else if(v == conf_const.lookup_int(conf_val_gamma))       t = DistType::Gamma;
+   else if(v == conf_const.lookup_int(conf_val_uniform))     t = DistType::Uniform;
+   else if(v == conf_const.lookup_int(conf_val_beta))        t = DistType::Beta;
    else {
       mlog << Error << "\nint_to_disttype() -> "
            << "Unexpected value of " << v << ".\n\n";
@@ -3228,16 +3228,16 @@ DistType int_to_disttype(int v) {
 ///////////////////////////////////////////////////////////////////////////////
 
 DistType string_to_disttype(const char *s) {
-   DistType t = DistType_None;
+   DistType t = DistType::None;
 
    // Convert string to enumerated DistType
-        if(strcasecmp(s, conf_val_none)        == 0) t = DistType_None;
-   else if(strcasecmp(s, conf_val_normal)      == 0) t = DistType_Normal;
-   else if(strcasecmp(s, conf_val_exponential) == 0) t = DistType_Exponential;
-   else if(strcasecmp(s, conf_val_chisquared)  == 0) t = DistType_ChiSquared;
-   else if(strcasecmp(s, conf_val_gamma)       == 0) t = DistType_Gamma;
-   else if(strcasecmp(s, conf_val_uniform)     == 0) t = DistType_Uniform;
-   else if(strcasecmp(s, conf_val_beta)        == 0) t = DistType_Beta;
+        if(strcasecmp(s, conf_val_none)        == 0) t = DistType::None;
+   else if(strcasecmp(s, conf_val_normal)      == 0) t = DistType::Normal;
+   else if(strcasecmp(s, conf_val_exponential) == 0) t = DistType::Exponential;
+   else if(strcasecmp(s, conf_val_chisquared)  == 0) t = DistType::ChiSquared;
+   else if(strcasecmp(s, conf_val_gamma)       == 0) t = DistType::Gamma;
+   else if(strcasecmp(s, conf_val_uniform)     == 0) t = DistType::Uniform;
+   else if(strcasecmp(s, conf_val_beta)        == 0) t = DistType::Beta;
    else {
       mlog << Error << "\nstring_to_disttype() -> "
            << "Unexpected DistType string \"" << s << "\".\n\n";
@@ -3254,13 +3254,13 @@ ConcatString disttype_to_string(DistType type) {
 
    // Convert enumerated DistType to string
    switch(type) {
-      case DistType_None:        s = conf_val_none;        break;
-      case DistType_Normal:      s = conf_val_normal;      break;
-      case DistType_Exponential: s = conf_val_exponential; break;
-      case DistType_ChiSquared:  s = conf_val_chisquared;  break;
-      case DistType_Gamma:       s = conf_val_gamma;       break;
-      case DistType_Uniform:     s = conf_val_uniform;     break;
-      case DistType_Beta:        s = conf_val_beta;        break;
+      case DistType::None:        s = conf_val_none;        break;
+      case DistType::Normal:      s = conf_val_normal;      break;
+      case DistType::Exponential: s = conf_val_exponential; break;
+      case DistType::ChiSquared:  s = conf_val_chisquared;  break;
+      case DistType::Gamma:       s = conf_val_gamma;       break;
+      case DistType::Uniform:     s = conf_val_uniform;     break;
+      case DistType::Beta:        s = conf_val_beta;        break;
       default:
          mlog << Error << "\ndisttype_to_string() -> "
               << "Unexpected DistType value of " << enum_class_as_integer(type) << ".\n\n";
@@ -3278,11 +3278,11 @@ ConcatString dist_to_string(DistType type, const NumArray &parm) {
    s = disttype_to_string(type);
 
    // Append distribution parameters
-   if(type != DistType_None && parm.n() == 2) {
+   if(type != DistType::None && parm.n() == 2) {
       s << "(" << parm[0];
-      if(type == DistType_Gamma   ||
-         type == DistType_Uniform ||
-         type == DistType_Beta) {
+      if(type == DistType::Gamma   ||
+         type == DistType::Uniform ||
+         type == DistType::Beta) {
          s << ", " << parm[1];
       }
       s << ")";
@@ -3353,7 +3353,7 @@ StringArray parse_conf_ens_member_ids(Dictionary *dict) {
 ///////////////////////////////////////////////////////////////////////////////
 
 NormalizeType parse_conf_normalize(Dictionary *dict) {
-   NormalizeType t = NormalizeType_None;
+   NormalizeType t = NormalizeType::None;
    int v;
 
    if(!dict) {
@@ -3366,11 +3366,11 @@ NormalizeType parse_conf_normalize(Dictionary *dict) {
    v = dict->lookup_int(conf_key_normalize);
 
    // Convert integer to enumerated NormalizeType
-        if(v == conf_const.lookup_int(normalizetype_none_str))           t = NormalizeType_None;
-   else if(v == conf_const.lookup_int(normalizetype_climo_anom_str))     t = NormalizeType_ClimoAnom;
-   else if(v == conf_const.lookup_int(normalizetype_climo_std_anom_str)) t = NormalizeType_ClimoStdAnom;
-   else if(v == conf_const.lookup_int(normalizetype_fcst_anom_str))      t = NormalizeType_FcstAnom;
-   else if(v == conf_const.lookup_int(normalizetype_fcst_std_anom_str))  t = NormalizeType_FcstStdAnom;
+        if(v == conf_const.lookup_int(normalizetype_none_str))           t = NormalizeType::None;
+   else if(v == conf_const.lookup_int(normalizetype_climo_anom_str))     t = NormalizeType::ClimoAnom;
+   else if(v == conf_const.lookup_int(normalizetype_climo_std_anom_str)) t = NormalizeType::ClimoStdAnom;
+   else if(v == conf_const.lookup_int(normalizetype_fcst_anom_str))      t = NormalizeType::FcstAnom;
+   else if(v == conf_const.lookup_int(normalizetype_fcst_std_anom_str))  t = NormalizeType::FcstStdAnom;
    else {
       mlog << Error << "\nparse_conf_normalize() -> "
            << "Unexpected value of " << v << ".\n\n";

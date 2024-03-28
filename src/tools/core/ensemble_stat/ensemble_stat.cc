@@ -1285,7 +1285,7 @@ void process_grid_vx() {
       if(conf_info.vx_opt[i].obs_error.flag) {
 
          // Use config file setting, if specified
-         if(conf_info.vx_opt[i].obs_error.entry.dist_type != DistType_None) {
+         if(conf_info.vx_opt[i].obs_error.entry.dist_type != DistType::None) {
             mlog << Debug(3)
                  << "Observation error for gridded verification is "
                  << "defined in the configuration file.\n";
@@ -1476,11 +1476,11 @@ void process_grid_vx() {
          FieldType    field      = conf_info.vx_opt[i].interp_info.field;
 
          // Check for allowable smoothing operation
-         if(mthd == InterpMthd_DW_Mean ||
-            mthd == InterpMthd_LS_Fit  ||
-            mthd == InterpMthd_Bilin   ||
-            mthd == InterpMthd_Nbrhd   ||
-            mthd == InterpMthd_HiRA) {
+         if(mthd == InterpMthd::DW_Mean ||
+            mthd == InterpMthd::LS_Fit  ||
+            mthd == InterpMthd::Bilin   ||
+            mthd == InterpMthd::Nbrhd   ||
+            mthd == InterpMthd::HiRA) {
 
             mlog << Warning << "\nprocess_grid_vx() -> "
                  << mthd_str << " option not supported for "

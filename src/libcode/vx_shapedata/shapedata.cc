@@ -532,7 +532,7 @@ void ShapeData::conv_filter_circ(int diameter, double vld_thresh) {
 
       // Build the grid template with shape circle and wrap_lon false
       GridTemplateFactory gtf;
-      GridTemplate* gt = gtf.buildGT(GridTemplateFactory::GridTemplate_Circle,
+      GridTemplate* gt = gtf.buildGT(GridTemplateFactory::GridTemplates::Circle,
                                      diameter, false);
 
 #pragma omp single

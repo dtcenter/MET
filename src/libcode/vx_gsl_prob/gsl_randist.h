@@ -23,14 +23,14 @@
 // Enumeration for distribution types
 //
 
-enum DistType {
-   DistType_None,        // No distribution
-   DistType_Normal,      // Normal distribution
-   DistType_Exponential, // Exponential distribution
-   DistType_ChiSquared,  // Chi-Squared distribution
-   DistType_Gamma,       // Gamma distribution
-   DistType_Uniform,     // Uniform distribution
-   DistType_Beta         // Beta distribution
+enum class DistType {
+   None,        // No distribution
+   Normal,      // Normal distribution
+   Exponential, // Exponential distribution
+   ChiSquared,  // Chi-Squared distribution
+   Gamma,       // Gamma distribution
+   Uniform,     // Uniform distribution
+   Beta         // Beta distribution
 };
 
 ////////////////////////////////////////////////////////////////////////

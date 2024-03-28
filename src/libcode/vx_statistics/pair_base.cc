@@ -74,8 +74,8 @@ void PairBase::clear() {
    msg_typ_vals.clear();
 
    interp_wdth = 0;
-   interp_mthd = InterpMthd_None;
-   interp_shape = GridTemplateFactory::GridTemplate_None;
+   interp_mthd = InterpMthd::None;
+   interp_shape = GridTemplateFactory::GridTemplates::None;
 
    o_na.clear();
    x_na.clear();
@@ -123,8 +123,8 @@ void PairBase::erase() {
    msg_typ.clear();
    msg_typ_vals.clear();
 
-   interp_mthd = InterpMthd_None;
-   interp_shape = GridTemplateFactory::GridTemplate_None;
+   interp_mthd = InterpMthd::None;
+   interp_shape = GridTemplateFactory::GridTemplates::None;
 
    o_na.erase();
    x_na.erase();

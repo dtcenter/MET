@@ -16,6 +16,7 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "config_util.h"
 #include "interp_util.h"
 #include "GridTemplate.h"
 #include "RectangularTemplate.h"
@@ -25,6 +26,15 @@
 
 using namespace std;
 
+
+////////////////////////////////////////////////////////////////////////
+
+template <typename Enumeration>
+auto enum_class_as_integer(Enumeration const value)
+    -> typename std::underlying_type<Enumeration>::type
+{
+    return static_cast<typename std::underlying_type<Enumeration>::type>(value);
+}
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -958,68 +968,68 @@ double compute_sfc_interp(const DataPlane &dp,
    // Compute the interpolated value for the fields above and below
    switch(mthd) {
 
-      case(InterpMthd_Min):         // Minimum
+      case(InterpMthd::Min):         // Minimum
          v = interp_min(dp, *gt, x, y, interp_thresh, &sfc_mask);
          break;
 
-      case(InterpMthd_Max):         // Maximum
+      case(InterpMthd::Max):         // Maximum
          v = interp_max(dp, *gt, x, y, interp_thresh, &sfc_mask);
          break;
 
-      case(InterpMthd_Median):      // Median
+      case(InterpMthd::Median):      // Median
          v = interp_median(dp, *gt, x, y, interp_thresh, &sfc_mask);
          break;
 
-      case(InterpMthd_UW_Mean):     // Unweighted Mean
+      case(InterpMthd::UW_Mean):     // Unweighted Mean
          v = interp_uw_mean(dp, *gt, x, y, interp_thresh, &sfc_mask);
          break;
 
-      case(InterpMthd_DW_Mean):     // Distance-Weighted Mean
+      case(InterpMthd::DW_Mean):     // Distance-Weighted Mean
          v = interp_dw_mean(dp, *gt, obs_x, obs_y,
                             dw_mean_pow, interp_thresh, &sfc_mask);
          break;
 
-      case(InterpMthd_LS_Fit):      // Least-squares fit
+      case(InterpMthd::LS_Fit):      // Least-squares fit
          v = interp_ls_fit(dp, *gt, obs_x, obs_y,
                            interp_thresh, &sfc_mask);
          break;
 
-      case(InterpMthd_Bilin):       // Bilinear interpolation
+      case(InterpMthd::Bilin):       // Bilinear interpolation
          v = interp_bilin(dp, wrap_lon, obs_x, obs_y, &sfc_mask);
          break;
 
-      case(InterpMthd_Nearest):     // Nearest Neighbor
+      case(InterpMthd::Nearest):     // Nearest Neighbor
          v = interp_xy(dp, wrap_lon, x, y, &sfc_mask);
          break;
 
-      case(InterpMthd_Best):        // Best Match
+      case(InterpMthd::Best):        // Best Match
          v = interp_best(dp, *gt, x, y, obs_v, interp_thresh, &sfc_mask);
          break;
 
-      case(InterpMthd_Upper_Left):  // Upper Left corner of the grid box
+      case(InterpMthd::Upper_Left):  // Upper Left corner of the grid box
          v = interp_xy(dp, wrap_lon, floor(obs_x), ceil(obs_y), &sfc_mask);
          break;
 
-      case(InterpMthd_Upper_Right): // Upper Right corner of the grid box
+      case(InterpMthd::Upper_Right): // Upper Right corner of the grid box
          v = interp_xy(dp, wrap_lon, ceil(obs_x), ceil(obs_y), &sfc_mask);
          break;
 
-      case(InterpMthd_Lower_Right): // Lower Right corner of the grid box
+      case(InterpMthd::Lower_Right): // Lower Right corner of the grid box
          v = interp_xy(dp, wrap_lon, ceil(obs_x), floor(obs_y), &sfc_mask);
          break;
 
-      case(InterpMthd_Lower_Left):  // Lower Left corner of the grid box
+      case(InterpMthd::Lower_Left):  // Lower Left corner of the grid box
          v = interp_xy(dp, wrap_lon, floor(obs_x), floor(obs_y), &sfc_mask);
          break;
 
-      case(InterpMthd_Geog_Match):  // Geography Match for surface point verification
+      case(InterpMthd::Geog_Match):  // Geography Match for surface point verification
          v = interp_geog_match(dp, *gt, obs_x, obs_y, obs_v, &sfc_mask);
          break;
 
       default:
          mlog << Error << "\ncompute_sfc_interp() -> "
               << "unsupported interpolation method encountered: "
-              << interpmthd_to_string(mthd) << "(" << mthd << ")\n\n";
+              << interpmthd_to_string(mthd) << "(" << enum_class_as_integer(mthd) << ")\n\n";
          exit(1);
    }
 
@@ -1127,73 +1137,73 @@ double compute_horz_interp(const DataPlane &dp,
    // Compute the interpolated value for the fields above and below
    switch(mthd) {
 
-      case(InterpMthd_Min):         // Minimum
+      case(InterpMthd::Min):         // Minimum
          v = interp_min(dp, *gt, x, y, interp_thresh);
          break;
 
-      case(InterpMthd_Max):         // Maximum
+      case(InterpMthd::Max):         // Maximum
          v = interp_max(dp, *gt, x, y, interp_thresh);
          break;
 
-      case(InterpMthd_Median):      // Median
+      case(InterpMthd::Median):      // Median
          v = interp_median(dp, *gt, x, y, interp_thresh);
          break;
 
-      case(InterpMthd_UW_Mean):     // Unweighted Mean
+      case(InterpMthd::UW_Mean):     // Unweighted Mean
          v = interp_uw_mean(dp, *gt, x, y, interp_thresh);
          break;
 
-      case(InterpMthd_DW_Mean):     // Distance-Weighted Mean
+      case(InterpMthd::DW_Mean):     // Distance-Weighted Mean
          v = interp_dw_mean(dp, *gt, obs_x, obs_y,
                             dw_mean_pow, interp_thresh);
          break;
 
-      case(InterpMthd_LS_Fit):      // Least-squares fit
+      case(InterpMthd::LS_Fit):      // Least-squares fit
          v = interp_ls_fit(dp, *gt, obs_x, obs_y,
                            interp_thresh);
          break;
 
-      case(InterpMthd_Nbrhd):       // Neighborhood fractional coverage
+      case(InterpMthd::Nbrhd):       // Neighborhood fractional coverage
          v = interp_nbrhd(dp, *gt, x, y,
                           interp_thresh, cat_thresh, cmn, csd);
          break;
 
-      case(InterpMthd_Bilin):       // Bilinear interpolation
+      case(InterpMthd::Bilin):       // Bilinear interpolation
          v = interp_bilin(dp, wrap_lon, obs_x, obs_y);
          break;
 
-      case(InterpMthd_Nearest):     // Nearest Neighbor
+      case(InterpMthd::Nearest):     // Nearest Neighbor
          v = interp_xy(dp, wrap_lon, x, y);
          break;
 
-      case(InterpMthd_Best):        // Best Match
+      case(InterpMthd::Best):        // Best Match
          v = interp_best(dp, *gt, x, y, obs_v, interp_thresh);
          break;
 
-      case(InterpMthd_Upper_Left):  // Upper Left corner of the grid box
+      case(InterpMthd::Upper_Left):  // Upper Left corner of the grid box
          v = interp_xy(dp, wrap_lon, floor(obs_x), ceil(obs_y));
          break;
 
-      case(InterpMthd_Upper_Right): // Upper Right corner of the grid box
+      case(InterpMthd::Upper_Right): // Upper Right corner of the grid box
          v = interp_xy(dp, wrap_lon, ceil(obs_x), ceil(obs_y));
          break;
 
-      case(InterpMthd_Lower_Right): // Lower Right corner of the grid box
+      case(InterpMthd::Lower_Right): // Lower Right corner of the grid box
          v = interp_xy(dp, wrap_lon, ceil(obs_x), floor(obs_y));
          break;
 
-      case(InterpMthd_Lower_Left):  // Lower Left corner of the grid box
+      case(InterpMthd::Lower_Left):  // Lower Left corner of the grid box
          v = interp_xy(dp, wrap_lon, floor(obs_x), floor(obs_y));
          break;
 
-      case(InterpMthd_Geog_Match):  // Geography Match for surface point verification
+      case(InterpMthd::Geog_Match):  // Geography Match for surface point verification
          v = interp_geog_match(dp, *gt, obs_x, obs_y, obs_v);
          break;
 
       default:
          mlog << Error << "\ncompute_horz_interp() -> "
               << "unsupported interpolation method encountered: "
-              << interpmthd_to_string(mthd) << "(" << mthd << ")\n\n";
+              << interpmthd_to_string(mthd) << "(" << enum_class_as_integer(mthd) << ")\n\n";
          exit(1);
    }
 
@@ -1308,37 +1318,37 @@ DataPlane valid_time_interp(const DataPlane &in1, const DataPlane &in2,
 
    // Compute interpolation weights
    switch(mthd) {
-      case(InterpMthd_Min):     // Minimum
-      case(InterpMthd_Max):     // Maximum
+      case(InterpMthd::Min):     // Minimum
+      case(InterpMthd::Max):     // Maximum
          w1 = w2 = bad_data_double;
          break;
 
-      case(InterpMthd_UW_Mean): // Unweighted Mean
+      case(InterpMthd::UW_Mean): // Unweighted Mean
          w1 = w2 = 0.5;
          break;
 
-      case(InterpMthd_DW_Mean): // Distance-Weighted Mean
+      case(InterpMthd::DW_Mean): // Distance-Weighted Mean
          w1 = (double) (dp2.valid() - to_ut) /
                        (dp2.valid() - dp1.valid());
          w2 = (double) (to_ut - dp1.valid()) /
                        (dp2.valid() - dp1.valid());
          break;
 
-      case(InterpMthd_Nearest): // Nearest Neighbor
+      case(InterpMthd::Nearest): // Nearest Neighbor
          use_min = ((to_ut - dp1.valid()) <=
                     (dp2.valid() - to_ut));
          w1 = (use_min ? 1.0 : 0.0);
          w2 = (use_min ? 0.0 : 1.0);
          break;
 
-      case(InterpMthd_AW_Mean): // Area-Weighted Mean
-      case(InterpMthd_Median):  // Median
-      case(InterpMthd_LS_Fit):  // Least-squares fit
-      case(InterpMthd_Bilin):   // Bilinear interpolation
+      case(InterpMthd::AW_Mean): // Area-Weighted Mean
+      case(InterpMthd::Median):  // Median
+      case(InterpMthd::LS_Fit):  // Least-squares fit
+      case(InterpMthd::Bilin):   // Bilinear interpolation
       default:
          mlog << Error << "\nvalid_time_interp() -> "
               << "unsupported interpolation method encountered: "
-              << interpmthd_to_string(mthd) << "(" << mthd << ")\n\n";
+              << interpmthd_to_string(mthd) << "(" << enum_class_as_integer(mthd) << ")\n\n";
          exit(1);
    }
 
@@ -1360,11 +1370,11 @@ DataPlane valid_time_interp(const DataPlane &in1, const DataPlane &in2,
          if(!is_bad_data(v1) && !is_bad_data(v2)) {
 
             // Minimum
-                 if(mthd == InterpMthd_Min) v = min(v1, v2);
+                 if(mthd == InterpMthd::Min) v = min(v1, v2);
             // Maximum
-            else if(mthd == InterpMthd_Max) v = max(v1, v2);
+            else if(mthd == InterpMthd::Max) v = max(v1, v2);
             // Apply weights
-            else                            v = w1*v1 + w2*v2;
+            else                             v = w1*v1 + w2*v2;
          }
 
          // Store interpolated value

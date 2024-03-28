@@ -303,12 +303,12 @@ void process_ensemble() {
       // read climatology separately for each member
       set_climo_ens_mem_id =
          (conf_info.ens_member_ids.n() > 1) &&
-         ((*var_it)->normalize == NormalizeType_ClimoAnom ||
-          (*var_it)->normalize == NormalizeType_ClimoStdAnom);
+         ((*var_it)->normalize == NormalizeType::ClimoAnom ||
+          (*var_it)->normalize == NormalizeType::ClimoStdAnom);
 
       // Print out the normalization flag
       cs << cs_erase;
-      if((*var_it)->normalize != NormalizeType_None) {
+      if((*var_it)->normalize != NormalizeType::None) {
          cs << " with normalize = "
             << normalizetype_to_string((*var_it)->normalize);
       }
@@ -359,8 +359,8 @@ void process_ensemble() {
                                  i_ens, cmn_dp, csd_dp);
 
             // Compute the ensemble summary data, if needed
-            if((*var_it)->normalize == NormalizeType_FcstAnom ||
-               (*var_it)->normalize == NormalizeType_FcstStdAnom) {
+            if((*var_it)->normalize == NormalizeType::FcstAnom ||
+               (*var_it)->normalize == NormalizeType::FcstStdAnom) {
                get_ens_mean_stdev((*var_it), emn_dp, esd_dp);
             }
             else {
@@ -394,7 +394,7 @@ void process_ensemble() {
                }
 
                // Normalize, if requested
-               if((*var_it)->normalize != NormalizeType_None) {
+               if((*var_it)->normalize != NormalizeType::None) {
                   normalize_data(ctrl_dp, (*var_it)->normalize,
                                  &cmn_dp, &csd_dp, &emn_dp, &esd_dp);
                }
@@ -421,7 +421,7 @@ void process_ensemble() {
          }
 
          // Normalize, if requested
-         if((*var_it)->normalize != NormalizeType_None) {
+         if((*var_it)->normalize != NormalizeType::None) {
             normalize_data(ens_dp, (*var_it)->normalize,
                            &cmn_dp, &csd_dp, &emn_dp, &esd_dp);
          }
@@ -950,7 +950,7 @@ void write_ens_nc(GenEnsProdVarInfo *ens_info, int n_ens_vld,
             // Loop over the neighborhoods
             for(j=0; j<conf_info.get_n_nbrhd(); j++) {
 
-               nbrhd_dp = smooth_field(prob_dp, InterpMthd_UW_Mean,
+               nbrhd_dp = smooth_field(prob_dp, InterpMthd::UW_Mean,
                              conf_info.nbrhd_prob.width[j],
                              conf_info.nbrhd_prob.shape, grid.wrap_lon(),
                              conf_info.nbrhd_prob.vld_thresh, info);
@@ -958,7 +958,7 @@ void write_ens_nc(GenEnsProdVarInfo *ens_info, int n_ens_vld,
                // Write neighborhood ensemble probability
                snprintf(type_str, sizeof(type_str), "ENS_NEP_%s_%s%i",
                         ens_info->cat_ta[i].get_abbr_str().contents().c_str(),
-                        interpmthd_to_string(InterpMthd_Nbrhd).c_str(),
+                        interpmthd_to_string(InterpMthd::Nbrhd).c_str(),
                         conf_info.nbrhd_prob.width[j]*conf_info.nbrhd_prob.width[j]);
                write_ens_data_plane(ens_info, nbrhd_dp, ens_dp, type_str,
                                     "Neighborhood Ensemble Probability");
@@ -1001,7 +1001,7 @@ void write_ens_nc(GenEnsProdVarInfo *ens_info, int n_ens_vld,
                // Write neighborhood maximum ensemble probability
                snprintf(type_str, sizeof(type_str), "ENS_NMEP_%s_%s%i_%s%i",
                         ens_info->cat_ta[i].get_abbr_str().contents().c_str(),
-                        interpmthd_to_string(InterpMthd_Nbrhd).c_str(),
+                        interpmthd_to_string(InterpMthd::Nbrhd).c_str(),
                         conf_info.nbrhd_prob.width[j]*conf_info.nbrhd_prob.width[j],
                         conf_info.nmep_smooth.method[k].c_str(),
                         conf_info.nmep_smooth.width[k]*conf_info.nmep_smooth.width[k]);

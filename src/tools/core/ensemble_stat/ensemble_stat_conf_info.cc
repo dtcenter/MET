@@ -284,7 +284,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
 
       // Track the maximum HiRA size
       for(j=0; j<vx_opt[i].interp_info.n_interp; j++) {
-         if(string_to_interpmthd(vx_opt[i].interp_info.method[j].c_str()) == InterpMthd_HiRA) {
+         if(string_to_interpmthd(vx_opt[i].interp_info.method[j].c_str()) == InterpMthd::HiRA) {
             GridTemplateFactory gtf;
             GridTemplate* gt = gtf.buildGT(vx_opt[i].interp_info.shape,
                                            vx_opt[i].interp_info.width[j],
@@ -837,7 +837,7 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
    }
 
    // Print debug information
-   if(obs_error.entry.dist_type != DistType_None) {
+   if(obs_error.entry.dist_type != DistType::None) {
       mlog << Debug(3)
            << "Observation error for point verification is "
            << "defined in the configuration file.\n";

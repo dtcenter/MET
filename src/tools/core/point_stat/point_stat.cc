@@ -1805,7 +1805,7 @@ void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
    bool spfh_flag = conf_info.vx_opt[i_vx].vx_pd.fcst_info->is_specific_humidity() &&
                     conf_info.vx_opt[i_vx].vx_pd.obs_info->is_specific_humidity();
 
-   shc.set_interp_mthd(InterpMthd_Nbrhd,
+   shc.set_interp_mthd(InterpMthd::Nbrhd,
                        conf_info.vx_opt[i_vx].hira_info.shape);
 
    // Loop over the HiRA widths
@@ -1841,7 +1841,7 @@ void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
          // Get the nearby forecast values
          get_interp_points(conf_info.vx_opt[i_vx].vx_pd.fcst_dpa,
             pd_ptr->x_na[j], pd_ptr->y_na[j],
-            InterpMthd_Nbrhd, conf_info.vx_opt[i_vx].hira_info.width[i],
+            InterpMthd::Nbrhd, conf_info.vx_opt[i_vx].hira_info.width[i],
             conf_info.vx_opt[i_vx].hira_info.shape, grid.wrap_lon(),
             conf_info.vx_opt[i_vx].hira_info.vld_thresh, spfh_flag,
             conf_info.vx_opt[i_vx].vx_pd.fcst_info->level().type(),
@@ -1988,7 +1988,7 @@ void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
    bool precip_flag = conf_info.vx_opt[i_vx].vx_pd.fcst_info->is_precipitation() &&
                       conf_info.vx_opt[i_vx].vx_pd.obs_info->is_precipitation();
 
-   shc.set_interp_mthd(InterpMthd_Nbrhd,
+   shc.set_interp_mthd(InterpMthd::Nbrhd,
                        conf_info.vx_opt[i_vx].hira_info.shape);
 
    // Loop over categorical thresholds and HiRA widths
@@ -2019,7 +2019,7 @@ void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
             f_cov = compute_interp(conf_info.vx_opt[i_vx].vx_pd.fcst_dpa,
                        pd_ptr->x_na[k], pd_ptr->y_na[k], pd_ptr->o_na[k],
                        pd_ptr->cmn_na[k], pd_ptr->csd_na[k],
-                       InterpMthd_Nbrhd, conf_info.vx_opt[i_vx].hira_info.width[j],
+                       InterpMthd::Nbrhd, conf_info.vx_opt[i_vx].hira_info.width[j],
                        conf_info.vx_opt[i_vx].hira_info.shape, grid.wrap_lon(),
                        conf_info.vx_opt[i_vx].hira_info.vld_thresh, spfh_flag,
                        conf_info.vx_opt[i_vx].vx_pd.fcst_info->level().type(),
@@ -2038,7 +2038,7 @@ void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
                cmn_cov = compute_interp(conf_info.vx_opt[i_vx].vx_pd.climo_mn_dpa,
                             pd_ptr->x_na[k], pd_ptr->y_na[k], pd_ptr->o_na[k],
                             pd_ptr->cmn_na[k], pd_ptr->csd_na[k],
-                            InterpMthd_Nbrhd, conf_info.vx_opt[i_vx].hira_info.width[j],
+                            InterpMthd::Nbrhd, conf_info.vx_opt[i_vx].hira_info.width[j],
                             conf_info.vx_opt[i_vx].hira_info.shape, grid.wrap_lon(),
                             conf_info.vx_opt[i_vx].hira_info.vld_thresh, spfh_flag,
                             conf_info.vx_opt[i_vx].vx_pd.fcst_info->level().type(),

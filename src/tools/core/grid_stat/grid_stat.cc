@@ -1444,7 +1444,7 @@ void process_scores() {
          // Loop through and apply each of the neighborhood widths
          for(j=0; j<nbrhd->width.n(); j++) {
 
-            shc.set_interp_mthd(InterpMthd_Nbrhd, nbrhd->shape);
+            shc.set_interp_mthd(InterpMthd::Nbrhd, nbrhd->shape);
             shc.set_interp_wdth(nbrhd->width[j]);
 
             // Loop through and apply each of the raw threshold values
@@ -1727,7 +1727,7 @@ void process_scores() {
             cs << "-" << conf_info.vx_opt[i].wave_1d_end[j];
          }
 
-         shc.set_interp_mthd(cs, GridTemplateFactory::GridTemplate_None);
+         shc.set_interp_mthd(cs, GridTemplateFactory::GridTemplates::None);
          shc.set_interp_pnts(bad_data_int);
 
          // Loop through the masks to be applied
@@ -2592,7 +2592,7 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
 
    // Append smoothing info for all but nearest neighbor
    if(interp_pnts > 1 ||
-      interp_mthd == interpmthd_to_string(InterpMthd_Gaussian)) {
+      interp_mthd == interpmthd_to_string(InterpMthd::Gaussian)) {
       interp_str << "_" << interp_mthd << "_" << interp_pnts;
    }
    // Append Fourier decomposition info
@@ -2882,7 +2882,7 @@ void write_nbrhd_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
    NcVar obs_var;
 
    // Get the interpolation strings
-   mthd_str = interpmthd_to_string(InterpMthd_Nbrhd);
+   mthd_str = interpmthd_to_string(InterpMthd::Nbrhd);
    if(wdth > 1) nbrhd_str << "_" << mthd_str << "_" << wdth*wdth;
 
    int deflate_level = compress_level;

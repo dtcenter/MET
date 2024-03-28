@@ -29,6 +29,15 @@
 using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
+
+template <typename Enumeration>
+auto enum_class_as_integer(Enumeration const value)
+    -> typename std::underlying_type<Enumeration>::type
+{
+    return static_cast<typename std::underlying_type<Enumeration>::type>(value);
+}
+
+////////////////////////////////////////////////////////////////////////
 //
 // Code for class PairDataPoint
 //
@@ -1081,8 +1090,8 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
       // Interpolate model topography to observation location
       double topo = compute_horz_interp(
                        *sfc_info.topo_ptr, obs_x, obs_y, hdr_elv,
-                        InterpMthd_Bilin, 2,
-                        GridTemplateFactory::GridTemplate_Square,
+                        InterpMthd::Bilin, 2,
+                        GridTemplateFactory::GridTemplates::Square,
                         gr.wrap_lon(), 1.0);
 
       // Skip bad topography values
@@ -1277,10 +1286,10 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
 
             // Check for valid interpolation options
             if(climo_sd_dpa.n_planes() > 0 &&
-               (pd[0][0][k].interp_mthd == InterpMthd_Min    ||
-                pd[0][0][k].interp_mthd == InterpMthd_Max    ||
-                pd[0][0][k].interp_mthd == InterpMthd_Median ||
-                pd[0][0][k].interp_mthd == InterpMthd_Best)) {
+               (pd[0][0][k].interp_mthd == InterpMthd::Min    ||
+                pd[0][0][k].interp_mthd == InterpMthd::Max    ||
+                pd[0][0][k].interp_mthd == InterpMthd::Median ||
+                pd[0][0][k].interp_mthd == InterpMthd::Best)) {
                mlog << Warning << "\nVxPairDataPoint::add_point_obs() -> "
                     << "applying the "
                     << interpmthd_to_string(pd[0][0][k].interp_mthd)

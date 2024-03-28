@@ -28,7 +28,6 @@
 
 #include "viewgravity_to_string.h"
 
-
 using namespace std;
 
 

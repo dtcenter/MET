@@ -6,6 +6,7 @@
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
+
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -26,7 +27,6 @@
 #include <string.h>
 
 #include "asciitablejust_to_string.h"
-
 
 using namespace std;
 

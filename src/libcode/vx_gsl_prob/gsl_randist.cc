@@ -219,31 +219,31 @@ double ran_draw(const gsl_rng *r, DistType t, double p1, double p2) {
    // Switch on the distribution type
    switch(t) {
 
-      case(DistType_Normal):
+      case(DistType::Normal):
          v = gsl_ran_gaussian(r, p1);
          break;
 
-      case(DistType_Exponential):
+      case(DistType::Exponential):
          v = gsl_ran_exponential(r, p1);
          break;
 
-      case(DistType_ChiSquared):
+      case(DistType::ChiSquared):
          v = gsl_ran_chisq(r, p1);
          break;
 
-      case(DistType_Gamma):
+      case(DistType::Gamma):
          v = gsl_ran_gamma(r, p1, p2);
          break;
 
-      case(DistType_Uniform):
+      case(DistType::Uniform):
          v = gsl_ran_flat(r, p1, p2);
          break;
 
-      case(DistType_Beta):
+      case(DistType::Beta):
          v = gsl_ran_beta(r, p1, p2);
          break;
 
-      case(DistType_None):
+      case(DistType::None):
       default:
          v = 0.0;
          break;
@@ -269,31 +269,31 @@ double dist_var(DistType t, double p1, double p2) {
    // Switch on the distribution type
    switch(t) {
 
-      case(DistType_Normal):
+      case(DistType::Normal):
          v = p1*p1;
          break;
 
-      case(DistType_Exponential):
+      case(DistType::Exponential):
          v = 1.0 / (p1*p1);
          break;
 
-      case(DistType_ChiSquared):
+      case(DistType::ChiSquared):
          v = 2*p1;
          break;
 
-      case(DistType_Gamma):
+      case(DistType::Gamma):
          v = p1 / (p2*p2);
          break;
 
-      case(DistType_Uniform):
+      case(DistType::Uniform):
          v = ((p2-p1)*(p2-p1)) / 12.0;
          break;
 
-      case(DistType_Beta):
+      case(DistType::Beta):
          v = (p1*p2) / ((p1+p2)*(p1+p2)*(p1+p2+1.0));
          break;
 
-      case(DistType_None):
+      case(DistType::None):
       default:
          v = 0.0;
          break;

@@ -72,9 +72,9 @@ static double ToLon = bad_data_double;
 static ConcatString InputFilename;
 static ConcatString OutputFilename;
 static ConcatString FieldString;
-static InterpMthd Method = InterpMthd_DW_Mean;
+static InterpMthd Method = InterpMthd::DW_Mean;
 static int Width = 2;
-static GridTemplateFactory::GridTemplates Shape = GridTemplateFactory::GridTemplate_Square;
+static GridTemplateFactory::GridTemplates Shape = GridTemplateFactory::GridTemplates::Square;
 static int compress_level = -1;
 
 // Static global variables

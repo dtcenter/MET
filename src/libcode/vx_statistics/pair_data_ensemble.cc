@@ -1399,7 +1399,7 @@ void VxPairDataEnsemble::set_ens_size(int n) {
          for(int k=0; k<n_interp; k++) {
 
             // Handle HiRA neighborhoods
-            if(pd[i][j][k].interp_mthd == InterpMthd_HiRA) {
+            if(pd[i][j][k].interp_mthd == InterpMthd::HiRA) {
                GridTemplateFactory gtf;
                GridTemplate* gt = gtf.buildGT(pd[i][j][k].interp_shape,
                                               pd[i][j][k].interp_wdth,
@@ -1604,7 +1604,7 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
    if(obs_error_info->flag) {
 
       // Use config file setting, if specified
-      if(obs_error_info->entry.dist_type != DistType_None) {
+      if(obs_error_info->entry.dist_type != DistType::None) {
          oerr_ptr = &(obs_error_info->entry);
       }
       // Otherwise, do a table lookup
@@ -1692,10 +1692,10 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
 
             // Check for valid interpolation options
             if(climo_sd_dpa.n_planes() > 0 &&
-               (pd[0][0][k].interp_mthd == InterpMthd_Min    ||
-                pd[0][0][k].interp_mthd == InterpMthd_Max    ||
-                pd[0][0][k].interp_mthd == InterpMthd_Median ||
-                pd[0][0][k].interp_mthd == InterpMthd_Best)) {
+               (pd[0][0][k].interp_mthd == InterpMthd::Min    ||
+                pd[0][0][k].interp_mthd == InterpMthd::Max    ||
+                pd[0][0][k].interp_mthd == InterpMthd::Median ||
+                pd[0][0][k].interp_mthd == InterpMthd::Best)) {
                mlog << Warning << "\nVxPairDataEnsemble::add_point_obs() -> "
                     << "applying the "
                     << interpmthd_to_string(pd[0][0][k].interp_mthd)
@@ -1752,7 +1752,7 @@ void VxPairDataEnsemble::add_ens(int member, bool mn, Grid &gr) {
          for(k=0; k<n_interp; k++) {
 
             // Only apply HiRA to single levels
-            if(pd[0][0][k].interp_mthd == InterpMthd_HiRA &&
+            if(pd[0][0][k].interp_mthd == InterpMthd::HiRA &&
                fcst_dpa.n_planes() != 1 ) {
 
                mlog << Warning << "\nVxPairDataEnsemble::add_ens() -> "
@@ -1785,7 +1785,7 @@ void VxPairDataEnsemble::add_ens(int member, bool mn, Grid &gr) {
                }
 
                // Extract the HiRA neighborhood of values
-               if(pd[0][0][k].interp_mthd == InterpMthd_HiRA) {
+               if(pd[0][0][k].interp_mthd == InterpMthd::HiRA) {
 
                   // For HiRA, set the ensemble mean to bad data
                   if(mn) {

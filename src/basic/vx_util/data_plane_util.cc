@@ -18,6 +18,7 @@
   #include "omp.h"
 #endif
 
+#include "config_util.h"
 #include "data_plane_util.h"
 #include "interp_util.h"
 #include "two_to_one.h"
@@ -35,6 +36,13 @@ using namespace std;
 // Utility functions operating on a DataPlane
 //
 ////////////////////////////////////////////////////////////////////////
+
+template <typename Enumeration>
+auto enum_class_as_integer(Enumeration const value)
+    -> typename std::underlying_type<Enumeration>::type
+{
+    return static_cast<typename std::underlying_type<Enumeration>::type>(value);
+}
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -106,7 +114,7 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
    smooth_dp = dp;
 
    // For nearest neighbor, no work to do.
-   if(width == 1 && mthd == InterpMthd_Nearest) return;
+   if(width == 1 && mthd == InterpMthd::Nearest) return;
 
    // build the grid template
    GridTemplateFactory gtf;
@@ -125,27 +133,27 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
          // Compute the smoothed value based on the interpolation method
          switch(mthd) {
 
-            case(InterpMthd_Min):      // Minimum
+            case(InterpMthd::Min):      // Minimum
                v = interp_min(dp, *gt, x, y, t);
                break;
 
-            case(InterpMthd_Max):      // Maximum
+            case(InterpMthd::Max):      // Maximum
                v = interp_max(dp, *gt, x, y, t);
                break;
 
-            case(InterpMthd_Median):   // Median
+            case(InterpMthd::Median):   // Median
                v = interp_median(dp, *gt, x, y, t);
                break;
 
-            case(InterpMthd_UW_Mean):  // Unweighted Mean
+            case(InterpMthd::UW_Mean):  // Unweighted Mean
                v = interp_uw_mean(dp, *gt, x, y, t);
                break;
 
-            case(InterpMthd_Gaussian): // For Gaussian, pass the data through
+            case(InterpMthd::Gaussian): // For Gaussian, pass the data through
                v = dp.get(x, y);
                break;
 
-            case(InterpMthd_MaxGauss): // For Max Gaussian, compute the max
+            case(InterpMthd::MaxGauss): // For Max Gaussian, compute the max
                v = interp_max(dp, *gt, x, y, 0);
                break;
 
@@ -156,7 +164,7 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
             default:
                mlog << Error << "\nsmooth_field() -> "
                     << "unsupported interpolation method encountered: "
-                    << interpmthd_to_string(mthd) << "(" << mthd
+                    << interpmthd_to_string(mthd) << "(" << enum_class_as_integer(mthd)
                     << ")\n\n";
                exit(1);
          }
@@ -168,8 +176,8 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
    } // end for x
 
    // Apply the Gaussian smoother 
-   if(mthd == InterpMthd_Gaussian ||
-      mthd == InterpMthd_MaxGauss) {
+   if(mthd == InterpMthd::Gaussian ||
+      mthd == InterpMthd::MaxGauss) {
       interp_gaussian_dp(smooth_dp, gaussian, t);
    }
 
@@ -265,7 +273,7 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
        mlog << Debug(3)
             << "Computing fractional coverage field using the "
             << t.get_str() << " threshold and the "
-            << interpmthd_to_string(InterpMthd_Nbrhd) << "(" << gt->size()
+            << interpmthd_to_string(InterpMthd::Nbrhd) << "(" << gt->size()
             << ") " << gt->getClassName() << " interpolation method.\n";
 
        // Initialize the fractional coverage field

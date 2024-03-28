@@ -804,9 +804,9 @@ void GridStatVxOpt::process_config(
       mthd = string_to_interpmthd(interp_info.method[i].c_str());
 
       // Check for unsupported interpolation methods
-      if(mthd == InterpMthd_DW_Mean ||
-         mthd == InterpMthd_LS_Fit  ||
-         mthd == InterpMthd_Bilin) {
+      if(mthd == InterpMthd::DW_Mean ||
+         mthd == InterpMthd::LS_Fit  ||
+         mthd == InterpMthd::Bilin) {
          mlog << Error << "\nGridStatVxOpt::process_config() -> "
               << "Interpolation methods DW_MEAN, LS_FIT, and BILIN are "
               << "not supported in Grid-Stat.\n\n";

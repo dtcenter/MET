@@ -1682,8 +1682,8 @@ void write_isc_row(StatHdrColumns &shc, const ISCInfo &isc_info,
    shc.set_line_type(stat_isc_str);
 
    // Not Applicable
-   shc.set_interp_mthd(InterpMthd_None,
-                       GridTemplateFactory::GridTemplate_None);
+   shc.set_interp_mthd(InterpMthd::None,
+                       GridTemplateFactory::GridTemplates::None);
    shc.set_interp_wdth(bad_data_int);
    shc.set_cov_thresh(na_str);
    shc.set_alpha(bad_data_double);
