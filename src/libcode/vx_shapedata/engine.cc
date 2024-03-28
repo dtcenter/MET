@@ -31,6 +31,15 @@ static const int print_interest_log_level = 5;
 
 static inline double area_ratio_conf(double t) { return t; }
 
+////////////////////////////////////////////////////////////////////////
+
+template <typename Enumeration>
+auto enum_class_as_integer(Enumeration const value)
+    -> typename std::underlying_type<Enumeration>::type
+{
+    return static_cast<typename std::underlying_type<Enumeration>::type>(value);
+}
+
 ///////////////////////////////////////////////////////////////////////
 //
 // Code for class ModeFuzzyEngine
