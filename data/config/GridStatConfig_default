@@ -263,15 +263,6 @@ nc_pairs_flag = {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Followings are optional. User should set them to use the unstructued grid.
-// The unstructued grid is an optional feature.
-//
-
-//ugrid_dataset = "";
-//ugrid_max_distance_km = 30;
-//ugrid_coordinates_file = "";
-
-////////////////////////////////////////////////////////////////////////////////
 
 grid_weight_flag = NONE;
 tmp_dir          = "/tmp";

@@ -298,15 +298,6 @@ output_flag = {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Followings are optional. User should set them to use the unstructued grid.
-// which The unstructued grid is an optional feature.
-//
-
-//ugrid_dataset = "";
-//ugrid_max_distance_km = 30;
-//ugrid_coordinates_file = "";
-
-////////////////////////////////////////////////////////////////////////////////
 
 tmp_dir        = "/tmp";
 output_prefix  = "";
