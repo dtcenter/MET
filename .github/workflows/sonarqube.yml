@@ -65,7 +65,7 @@ jobs:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-      - name: Copy all build log files into logs directory
+      - name: Copy all log files into logs directory
         if: always()
         run: cp ${GITHUB_WORKSPACE}/*.log ${RUNNER_WORKSPACE}/logs/
 
@@ -73,7 +73,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: logs_compile
+          name: logs_sonarqube
           path: ${{ runner.workspace }}/logs
           if-no-files-found: ignore
 
