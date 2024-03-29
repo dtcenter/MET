@@ -17,10 +17,18 @@ if [ ! -e internal/scripts/docker/build_met_sonarqube.sh ]; then
   exit 1
 fi
 
+echo "Running script to scan MET with SonarQube in Docker"
+
 # Source the docker build environment
 source ~/.bashrc
 source internal/scripts/environment/development.docker 
 source .github/jobs/bash_functions.sh
+
+# Check whether MET_CONFIG_OPTS is defined
+if [ -z ${MET_CONFIG_OPTS+x} ]; then
+  MET_CONFIG_OPTS='--enable-all'
+  echo "Setting MET_CONFIG_OPTS=${MET_CONFIG_OPTS} to scan all available options."
+fi
 
 # Locate the wrapper
 WRAPPER_NAME=build-wrapper-linux-x86-64
@@ -58,7 +66,7 @@ SONAR_PROPERTIES=sonar-project.properties
 sed -e "s|SONAR_TOKEN_VALUE|$SONAR_TOKEN|" -e "s|SONAR_SERVER_URL|$SONAR_HOST_URL|" $SONAR_PROPERTIES_DIR/$SONAR_PROPERTIES > $SONAR_PROPERTIES
 
 # Run the configure script
-time_command ./configure --prefix=`pwd` --enable-all
+time_command ./configure --prefix=`pwd` ${MET_CONFIG_OPTS}
 
 # Run make clean
 time_command make clean
