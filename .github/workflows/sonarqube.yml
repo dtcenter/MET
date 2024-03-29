@@ -54,7 +54,7 @@ jobs:
         id: get_branch_name
         run: echo branch_name=${GITHUB_REF#refs/heads/} >> $GITHUB_OUTPUT
 
-      - name: Compile MET with SonarQube
+      - name: Scan MET with SonarQube
         run: .github/jobs/build_sonarqube_image.sh
         env:
           MET_BASE_REPO: met-base
