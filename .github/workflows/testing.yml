@@ -5,11 +5,11 @@ name: Testing
 
 on:
 
-  # TODO: Add 'feature_**' back in prior to submitting PR
   push:
     branches:
       - develop
       - develop-ref
+      - 'feature_**'
       - 'main_v**'
       - 'bugfix_**'
     paths-ignore:

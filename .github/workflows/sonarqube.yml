@@ -5,12 +5,10 @@ name: SonarQube Static Code Analysis
 on:
 
   # Trigger analysis for pushes to develop and main_vX.Y branches
-  # TODO: Remove feature_2379_sonarqube_gha prior to submitting PR
   push:
     branches:
       - develop
       - 'main_v**'
-      - feature_2379_sonarqube_gha
     paths-ignore:
       - 'docs/**'
       - '.github/pull_request_template.md'

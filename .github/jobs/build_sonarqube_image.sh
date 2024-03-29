@@ -17,11 +17,7 @@ time_command docker build -t ${DOCKERHUB_TAG} \
     --build-arg SONAR_HOST_URL \
     --build-arg SONAR_TOKEN \
     -f $DOCKERFILE_PATH ${GITHUB_WORKSPACE}
-
-# Check for bad status
-# JHG if [ $? != 0 ]; then
-if [ $? == 0 ]; then
+if [ $? != 0 ]; then
   cat ${CMD_LOGFILE}
   exit 1
 fi
-
