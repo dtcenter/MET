@@ -111,13 +111,7 @@ run_command "git checkout ${1}"
 export MET_DEVELOPMENT=true
 
 # Run the configure script
-run_command "./configure --prefix=`pwd` \
-            --enable-grib2 \
-            --enable-modis \
-            --enable-mode_graphics \
-            --enable-lidar2nc \
-            --enable-python \
-            --enable-ugrid"
+run_command "./configure --prefix=`pwd` --enable-all"
 
 # Set the build id
 #BUILD_ID="MET-${1}"
@@ -131,14 +125,24 @@ if [ -z "$SONAR_TOKEN_VALUE" ]; then
   echo "  == ERROR == SONAR_TOKEN_VALUE is not defined"
   exit 1
 else
-  sed -e "s|SONAR_TOKEN_VALUE|$SONAR_TOKEN_VALUE|" -e "s|SONAR_SERVER_URL|$SONAR_SERVER_URL|" $SCRIPT_DIR/python.sonar-project.properties > $SONAR_PROPERTIES
+  sed -e "s|SONAR_TOKEN_VALUE|$SONAR_TOKEN_VALUE|" \
+      -e "s|SONAR_SERVER_URL|$SONAR_SERVER_URL|" \
+      -e "s|SONAR_PROJECT_KEY|MET_python_NB|" \
+      -e "s|SONAR_PROJECT_NAME|MET python Nightly Build" \
+      -e "s|SONAR_BRANCH_NAME|develop" \
+      $SCRIPT_DIR/python.sonar-project.properties > $SONAR_PROPERTIES
 
   # Run SonarQube scan for Python code
   run_command "$SONAR_SCANNER"
 
   # Copy sonar-project.properties for C/C++ code
   [ -e $SONAR_PROPERTIES ] && rm $SONAR_PROPERTIES
-  sed -e "s|SONAR_TOKEN_VALUE|$SONAR_TOKEN_VALUE|" -e "s|SONAR_SERVER_URL|$SONAR_SERVER_URL|" $SCRIPT_DIR/sonar-project.properties > $SONAR_PROPERTIES
+  sed -e "s|SONAR_TOKEN_VALUE|$SONAR_TOKEN_VALUE|" \
+      -e "s|SONAR_SERVER_URL|$SONAR_SERVER_URL|" \
+      -e "s|SONAR_PROJECT_KEY|MET_develop_NB|" \
+      -e "s|SONAR_PROJECT_NAME|MET Nightly Build" \
+      -e "s|SONAR_BRANCH_NAME|develop" \
+      $SCRIPT_DIR/sonar-project.properties > $SONAR_PROPERTIES
 
   # Run SonarQube clean
   run_command "make clean"

@@ -1,13 +1,18 @@
 #!/bin/bash
 #
-# Run SonarQube Source Code Analyzer within a docker container
+# Run SonarQube Source Code Analyzer within a Docker container
 #=======================================================================
 #
 # This build_met_sonarqube.sh script must be run from the top-level
-# directory of the MET repository to be analyzed. It builds MET with the
-# SonarQube Source Code Analyzer.
+# directory of the MET repository to be analyzed. It runs SonarQube to
+# scan both the Python and C/C++ MET source code.
 #
 # Usage: internal/scripts/docker/build_met_sonarqube.sh
+#
+# Required Enviornment Variables:
+#   SONAR_TOKEN_VALUE
+#   SONAR_SERVER_URL
+#   MET_GIT_NAME
 #
 #=======================================================================
 
@@ -23,6 +28,20 @@ echo "Running script to scan MET with SonarQube in Docker"
 source ~/.bashrc
 source internal/scripts/environment/development.docker 
 source .github/jobs/bash_functions.sh
+
+# Check required environment variables
+if [ -z ${SONAR_TOKEN_VALUE+x} ]; then
+  echo "ERROR: \$SONAR_TOKEN_VALUE not defined!"
+  exit 1
+fi
+if [ -z ${SONAR_SERVER_URL+x} ]; then
+  echo "ERROR: \$SONAR_SERVER_URL not defined!"
+  exit 1
+fi
+if [ -z ${MET_GIT_NAME+x} ]; then
+  echo "ERROR: \$MET_GIT_NAME not defined!"
+  exit 1
+fi
 
 # Check whether MET_CONFIG_OPTS is defined
 if [ -z ${MET_CONFIG_OPTS+x} ]; then
@@ -61,9 +80,26 @@ fi
 SONAR_PROPERTIES_DIR=internal/scripts/sonarqube
 SONAR_PROPERTIES=sonar-project.properties
 
+# Copy sonar-project.properties for Python code
+[ -e $SONAR_PROPERTIES ] && rm $SONAR_PROPERTIES
+sed -e "s|SONAR_TOKEN_VALUE|$SONAR_TOKEN_VALUE|" \
+    -e "s|SONAR_SERVER_URL|$SONAR_SERVER_URL|" \
+    -e "s|SONAR_PROJECT_KEY|MET-GitHub-Actions-Python|" \
+    -e "s|SONAR_PROJECT_NAME|MET GitHub Actions Python" \
+    -e "s|SONAR_BRANCH_NAME|$MET_GIT_NAME" \
+    $SCRIPT_DIR/python.sonar-project.properties > $SONAR_PROPERTIES
+
+# Run SonarQube scan for Python code
+run_command "$SONAR_SCANNER"
+
 # Copy sonar-project.properties for C/C++ code
 [ -e $SONAR_PROPERTIES ] && rm $SONAR_PROPERTIES
-sed -e "s|SONAR_TOKEN_VALUE|$SONAR_TOKEN|" -e "s|SONAR_SERVER_URL|$SONAR_HOST_URL|" $SONAR_PROPERTIES_DIR/$SONAR_PROPERTIES > $SONAR_PROPERTIES
+sed -e "s|SONAR_TOKEN_VALUE|$SONAR_TOKEN|" \
+    -e "s|SONAR_SERVER_URL|$SONAR_HOST_URL|" \
+    -e "s|SONAR_PROJECT_KEY|MET-GitHub-Actions|" \
+    -e "s|SONAR_PROJECT_NAME|MET GitHub Actions" \
+    -e "s|SONAR_BRANCH_NAME|$MET_GIT_NAME" \
+    $SONAR_PROPERTIES_DIR/sonar-project.properties > $SONAR_PROPERTIES
 
 # Run the configure script
 time_command ./configure --prefix=`pwd` ${MET_CONFIG_OPTS}
