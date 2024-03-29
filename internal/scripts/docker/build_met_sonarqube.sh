@@ -84,8 +84,8 @@ SONAR_PROPERTIES=sonar-project.properties
 [ -e $SONAR_PROPERTIES ] && rm $SONAR_PROPERTIES
 sed -e "s|SONAR_TOKEN_VALUE|$SONAR_TOKEN_VALUE|" \
     -e "s|SONAR_SERVER_URL|$SONAR_SERVER_URL|" \
-    -e "s|SONAR_PROJECT_KEY|MET-GitHub-Actions-Python|" \
-    -e "s|SONAR_PROJECT_NAME|MET GitHub Actions Python" \
+    -e "s|SONAR_PROJECT_KEY|MET-GHA-Python|" \
+    -e "s|SONAR_PROJECT_NAME|MET GHA Python" \
     -e "s|SONAR_BRANCH_NAME|$MET_GIT_NAME" \
     $SCRIPT_DIR/python.sonar-project.properties > $SONAR_PROPERTIES
 
@@ -96,8 +96,8 @@ run_command "$SONAR_SCANNER"
 [ -e $SONAR_PROPERTIES ] && rm $SONAR_PROPERTIES
 sed -e "s|SONAR_TOKEN_VALUE|$SONAR_TOKEN|" \
     -e "s|SONAR_SERVER_URL|$SONAR_HOST_URL|" \
-    -e "s|SONAR_PROJECT_KEY|MET-GitHub-Actions|" \
-    -e "s|SONAR_PROJECT_NAME|MET GitHub Actions" \
+    -e "s|SONAR_PROJECT_KEY|MET-GHA-CXX|" \
+    -e "s|SONAR_PROJECT_NAME|MET GHA CXX" \
     -e "s|SONAR_BRANCH_NAME|$MET_GIT_NAME" \
     $SONAR_PROPERTIES_DIR/sonar-project.properties > $SONAR_PROPERTIES
 
