@@ -87,7 +87,7 @@ sed -e "s|SONAR_TOKEN|$SONAR_TOKEN|" \
     -e "s|SONAR_PROJECT_KEY|MET-GHA-Python|" \
     -e "s|SONAR_PROJECT_NAME|MET GHA Python|" \
     -e "s|SONAR_BRANCH_NAME|$MET_GIT_NAME|" \
-    $SCRIPT_DIR/python.sonar-project.properties > $SONAR_PROPERTIES
+    $SONAR_PROPERTIES_DIR/python.sonar-project.properties > $SONAR_PROPERTIES
 
 # Run SonarQube scan for Python code
 time_command $SONAR_SCANNER
