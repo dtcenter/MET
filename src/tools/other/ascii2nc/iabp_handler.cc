@@ -133,6 +133,15 @@ bool IabpHandler::_readObservations(LineDataFile &ascii_file)
       double ts = bad_data_double;
       double ta = bad_data_double;
 
+      if (lat == IABP_MISSING_VALUE || lon == IABP_MISSING_VALUE) {
+         // This is either a rare event or never happens
+         mlog << Warning << "\nIabpHandler::_readObservations() -> "
+              << "Latitude/longitude has missing value " << IABP_MISSING_VALUE
+              << ", line number " << dl.line_number() << " of IABP file \""
+              << ascii_file.filename() << "\".  Ignore this line\n\n";
+         return(false);
+      }
+      
       if (_bpPtr >= 0) {
          // is this the right placeholder for this? To always put it in to the
          // fixed slot of an observation?
@@ -141,28 +150,38 @@ bool IabpHandler::_readObservations(LineDataFile &ascii_file)
             pres = bad_data_double;
          }
       }
-      if (_tsPtr >= 0) {
-         ts = stod(dl[_tsPtr]);
-         if (ts == IABP_MISSING_VALUE) {
-            ts = bad_data_double;
-         }
-      }
+
+      // Add a location placeholder observation in case neither of the temps are available
+      // Otherwise there would be no observations for this entry, and we want to have
+      // valid entries for every time/lat/lon.
       _addObservations(Observation(
                                    header_type, stationId, valid_time,
                                    lat, lon, elev, quality_flag, grib_code, 
-                                   pres, height_m, ts, "Temp_surface"));
+                                   pres, height_m, 1.0, "Location"));
       grib_code++;
       
-      if (_taPtr >= 0) {
-         ta = stod(dl[_taPtr]);
-         if (ta == IABP_MISSING_VALUE) {
-            ta = bad_data_double;
+      if (_tsPtr >= 0) {
+         ts = stod(dl[_tsPtr]);
+         if (ts != IABP_MISSING_VALUE) {
+            _addObservations(Observation(
+                                         header_type, stationId, valid_time,
+                                         lat, lon, elev, quality_flag, grib_code, 
+                                         pres, height_m, ts, "Temp_surface"));
+            grib_code++;
          }
       }
-      _addObservations(Observation(
-                                   header_type, stationId, valid_time,
-                                   lat, lon, elev, quality_flag, grib_code, 
-                                   pres, height_m, ta, "Temp_air"));
+      if (_taPtr >= 0) {
+         ta = stod(dl[_taPtr]);
+         if (ta != IABP_MISSING_VALUE) {
+            _addObservations(Observation(
+                                         header_type, stationId, valid_time,
+                                         lat, lon, elev, quality_flag, grib_code, 
+                                         pres, height_m, ta, "Temp_air"));
+         }
+      }
+
+      
+      
    } // end while
 
    return(true);
