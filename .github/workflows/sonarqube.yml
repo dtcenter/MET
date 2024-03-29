@@ -39,7 +39,6 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
-    env:
 
     steps:
 
@@ -79,4 +78,3 @@ jobs:
           name: logs_compile
           path: ${{ runner.workspace }}/logs
           if-no-files-found: ignore
-
