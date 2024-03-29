@@ -37,7 +37,7 @@ on:
 
 jobs:
   build:
-    name: Build
+    name: Scan MET C++ 
     runs-on: ubuntu-latest
 
     steps:
@@ -61,8 +61,6 @@ jobs:
           MET_BASE_TAG: v3.2
           SOURCE_BRANCH: ${{ steps.get_branch_name.outputs.branch_name }}
           MET_CONFIG_OPTS: '--enable-all'
-          # Sonar Version Information:
-          #   https://docs.sonarqube.org/latest/analysis/scan/sonarscanner/
           SONAR_SCANNER_VERSION: 5.0.1.3006
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -78,3 +76,4 @@ jobs:
           name: logs_compile
           path: ${{ runner.workspace }}/logs
           if-no-files-found: ignore
+

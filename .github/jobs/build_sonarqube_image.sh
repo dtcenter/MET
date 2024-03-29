@@ -8,7 +8,7 @@ DOCKERFILE_PATH=${GITHUB_WORKSPACE}/internal/scripts/docker/Dockerfile.sonarqube
 
 CMD_LOGFILE=${GITHUB_WORKSPACE}/sonarqube_build.log
 
-time_command docker build -t met-sonarqube${DOCKERHUB_TAG} \
+time_command docker build -t ${DOCKERHUB_TAG} \
     --build-arg MET_BASE_REPO \
     --build-arg MET_BASE_TAG \
     --build-arg SOURCE_BRANCH \
