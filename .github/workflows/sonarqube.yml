@@ -33,7 +33,6 @@ on:
       - '**/README.md'
       - '**/LICENSE.md'
 
-  # Add manual trigger
   workflow_dispatch:
 
 jobs:
@@ -41,44 +40,43 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     env:
-      SONAR_SCANNER_VERSION: 5.0.1.3006 # Find the latest version in the "Windows" link on this page:
-                                        # https://docs.sonarqube.org/latest/analysis/scan/sonarscanner/
-      SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }} # Value stored in a Github secret
-      BUILD_WRAPPER_OUT_DIR: build_wrapper_output_directory # Directory where build-wrapper output will be placed
+
     steps:
+
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
-      - name: Cache SonarQube packages
-        uses: actions/cache@v3
-        with:
-          path: ~/.sonar/cache
-          key: ${{ runner.os }}-sonar
-          restore-keys: ${{ runner.os }}-sonar
-      - name: Download and set up sonar-scanner
+          # Disable shallow clones for better analysis
+          fetch-depth: 0
+
+      - name: Create directories to store output
+        run: mkdir -p ${RUNNER_WORKSPACE}/logs
+
+      - name: Get branch name
+        id: get_branch_name
+        run: echo branch_name=${GITHUB_REF#refs/heads/} >> $GITHUB_OUTPUT
+
+      - name: Compile MET with SonarQube
+        run: .github/jobs/build_sonarqube_image.sh
         env:
-          SONAR_SCANNER_DOWNLOAD_URL: https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${{ env.SONAR_SCANNER_VERSION }}-linux.zip
-        run: |
-          mkdir -p $HOME/.sonar
-          curl -sSLo $HOME/.sonar/sonar-scanner.zip ${{ env.SONAR_SCANNER_DOWNLOAD_URL }}
-          unzip -o $HOME/.sonar/sonar-scanner.zip -d $HOME/.sonar/
-          echo "$HOME/.sonar/sonar-scanner-${{ env.SONAR_SCANNER_VERSION }}-linux/bin" >> $GITHUB_PATH
-      - name: Download and set up build-wrapper
-        env:
-          BUILD_WRAPPER_DOWNLOAD_URL: ${{ env.SONAR_HOST_URL }}/static/cpp/build-wrapper-linux-x86.zip
-        run: |
-          curl -sSLo $HOME/.sonar/build-wrapper-linux-x86.zip ${{ env.BUILD_WRAPPER_DOWNLOAD_URL }}
-          unzip -o $HOME/.sonar/build-wrapper-linux-x86.zip -d $HOME/.sonar/
-          echo "$HOME/.sonar/build-wrapper-linux-x86" >> $GITHUB_PATH
-      - name: Run build-wrapper
-        run: |
-          autoreconf --install
-          ./configure --prefix=`pwd` --enable-all
-          build-wrapper-linux-x86-64 --out-dir ${{ env.BUILD_WRAPPER_OUT_DIR }} make clean all
-      - name: Run sonar-scanner
-        env:
-          SONAR_TOKEN: ${{ secrets.SONARQUBE_TOKEN }} # Put the name of your token here
+          MET_BASE_REPO: met-base
+          MET_BASE_TAG: v3.2
+          SOURCE_BRANCH: ${{ steps.get_branch_name.outputs.branch_name }}
+          MET_CONFIG_OPTS: '--enable-all'
+          # Sonar Version Information:
+          #   https://docs.sonarqube.org/latest/analysis/scan/sonarscanner/
+          SONAR_SCANNER_VERSION: 5.0.1.3006
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-        run: |
-          sonar-scanner --define sonar.cfamily.build-wrapper-output="${{ env.BUILD_WRAPPER_OUT_DIR }}" \
-                        --define sonar.projectKey=MET-GitHub-Actions
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      - name: Copy all build log files into logs directory
+        if: always()
+        run: cp ${GITHUB_WORKSPACE}/*.log ${RUNNER_WORKSPACE}/logs/
+
+      - name: Upload logs as artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: logs_compile
+          path: ${{ runner.workspace }}/logs
+          if-no-files-found: ignore
+

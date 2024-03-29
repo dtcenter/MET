@@ -3,11 +3,11 @@
 # Run SonarQube Source Code Analyzer within a docker container
 #=======================================================================
 #
-# This run_sonarqube_docker.sh script must be run from the top-level
-# directory of the MET repository to be analyzed. It runs the SonarQube
-# Source Code Analyzer on it.
+# This build_met_sonarqube.sh script must be run from the top-level
+# directory of the MET repository to be analyzed. It builds MET with the
+# SonarQube Source Code Analyzer.
 #
-# Usage: internal/scripts/sonarqube/run_sonarqube_docker.sh
+# Usage: internal/scripts/docker/build_met_sonarqube.sh
 #
 #=======================================================================
 
@@ -21,8 +21,6 @@ fi
 source ~/.bashrc
 source internal/scripts/environment/development.docker 
 source .github/jobs/bash_functions.sh
-
-echo PATH=${PATH}
 
 # Locate the wrapper
 WRAPPER_NAME=build-wrapper-linux-x86-64
@@ -57,7 +55,7 @@ SONAR_PROPERTIES=sonar-project.properties
 
 # Copy sonar-project.properties for C/C++ code
 [ -e $SONAR_PROPERTIES ] && rm $SONAR_PROPERTIES
-sed -e "s|SONAR_TOKEN_VALUE|$SONAR_TOKEN_VALUE|" -e "s|SONAR_SERVER_URL|$SONAR_SERVER_URL|" $SONAR_PROPERTIES_DIR/sonar-project.properties > $SONAR_PROPERTIES
+sed -e "s|SONAR_TOKEN_VALUE|$SONAR_TOKEN|" -e "s|SONAR_SERVER_URL|$SONAR_HOST_URL|" $SONAR_PROPERTIES_DIR/$SONAR_PROPERTIES > $SONAR_PROPERTIES
 
 # Run the configure script
 time_command ./configure --prefix=`pwd` --enable-all

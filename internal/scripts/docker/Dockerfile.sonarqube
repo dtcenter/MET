@@ -7,7 +7,28 @@ MAINTAINER John Halley Gotway <johnhg@ucar.edu>
 #
 # This Dockerfile checks out MET from GitHub and runs the
 # SonarQube static code analysis on the specified branch or tag.
+# https://docs.sonarqube.org/latest/analysis/scan/sonarscanner/
 #
+ARG SONAR_SCANNER_VERSION=5.0.1.3006
+ARG SONAR_HOST_URL
+ARG SONAR_TOKEN
+
+#
+# SONAR_HOST_URL is required.
+#
+RUN if [ "x${SONAR_HOST_URL}" = "x" ]; then \
+      echo "ERROR: SONAR_HOST_URL undefined! Rebuild with \"--build-arg SONAR_HOST_URL={url}\""; \
+      exit 1; \
+    fi
+
+#
+# SONAR_TOKEN is required.
+#
+RUN if [ "x${SONAR_TOKEN}" = "x" ]; then \
+      echo "ERROR: SONAR_TOKEN undefined! Rebuild with \"--build-arg SONAR_TOKEN={token}\""; \
+      exit 1; \
+    fi
+
 ARG SOURCE_BRANCH
 
 #
@@ -25,16 +46,8 @@ ENV MET_REPO_DIR /met/MET-${MET_GIT_NAME}
 ENV MET_GIT_URL  https://github.com/dtcenter/MET
 
 #
-# SonarQube version info:
-#   https://docs.sonarqube.org/latest/analysis/scan/sonarscanner/
+# Download and install the Sonar software.
 #
-ENV SONAR_SCANNER_VERSION 5.0.1.3006
-
-# TODO: The following should be defined vai GitHub secrets and build args rather than hard-coded here
-ENV SONAR_HOST_URL    https://needham.rap.ucar.edu
-ENV SONAR_TOKEN_VALUE squ_dc703a41ce76b4c421b7e68dc79c6d211272900d
-ENV SONAR_SERVER_URL  https://needham.rap.ucar.edu
-
 RUN echo "Installing SonarQube into $HOME/.sonar" \
  && mkdir -p $HOME/.sonar \
  && curl -sSLo $HOME/.sonar/sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${SONAR_SCANNER_VERSION}-linux.zip \
@@ -55,7 +68,7 @@ RUN apt update
 WORKDIR /met
 
 #
-# Copy MET Download and install MET and GhostScript fonts.
+# Copy MET Download and install MET.
 #
 RUN echo "Copying MET into ${MET_REPO_DIR}" \
  && mkdir -p ${MET_REPO_DIR}
