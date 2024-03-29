@@ -37,7 +37,7 @@ on:
 
 jobs:
   build:
-    name: MET SonarQube Scan 
+    name: SonarQube Scan 
     runs-on: ubuntu-latest
 
     steps:
@@ -54,7 +54,7 @@ jobs:
         id: get_branch_name
         run: echo branch_name=${GITHUB_REF#refs/heads/} >> $GITHUB_OUTPUT
 
-      - name: Scan MET with SonarQube
+      - name: Run SonarQube in Docker
         run: .github/jobs/build_sonarqube_image.sh
         env:
           MET_BASE_REPO: met-base

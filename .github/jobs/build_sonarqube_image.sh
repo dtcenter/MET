@@ -17,11 +17,12 @@ time_command docker build -t ${DOCKERHUB_TAG} \
     --build-arg SONAR_HOST_URL \
     --build-arg SONAR_TOKEN \
     -f $DOCKERFILE_PATH ${GITHUB_WORKSPACE}
+
 if [ $? != 0 ]; then
   cat ${CMD_LOGFILE}
   exit 1
 else
   echo "SonarQube Scan completed successfully!"
-  egrep -i success ${CMD_LOGFILE}
+  grep SUCCESS ${CMD_LOGFILE}
 fi
 
