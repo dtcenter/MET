@@ -85,8 +85,8 @@ SONAR_PROPERTIES=sonar-project.properties
 sed -e "s|SONAR_TOKEN|$SONAR_TOKEN|" \
     -e "s|SONAR_HOST_URL|$SONAR_HOST_URL|" \
     -e "s|SONAR_PROJECT_KEY|MET-GHA-Python|" \
-    -e "s|SONAR_PROJECT_NAME|MET GHA Python" \
-    -e "s|SONAR_BRANCH_NAME|$MET_GIT_NAME" \
+    -e "s|SONAR_PROJECT_NAME|MET GHA Python|" \
+    -e "s|SONAR_BRANCH_NAME|$MET_GIT_NAME|" \
     $SCRIPT_DIR/python.sonar-project.properties > $SONAR_PROPERTIES
 
 # Run SonarQube scan for Python code
@@ -97,12 +97,17 @@ run_command "$SONAR_SCANNER"
 sed -e "s|SONAR_TOKEN|$SONAR_TOKEN|" \
     -e "s|SONAR_HOST_URL|$SONAR_HOST_URL|" \
     -e "s|SONAR_PROJECT_KEY|MET-GHA-CXX|" \
-    -e "s|SONAR_PROJECT_NAME|MET GHA CXX" \
-    -e "s|SONAR_BRANCH_NAME|$MET_GIT_NAME" \
+    -e "s|SONAR_PROJECT_NAME|MET GHA CXX|" \
+    -e "s|SONAR_BRANCH_NAME|$MET_GIT_NAME|" \
     $SONAR_PROPERTIES_DIR/sonar-project.properties > $SONAR_PROPERTIES
 
 # Run the configure script
-time_command ./configure --prefix=`pwd` ${MET_CONFIG_OPTS}
+time_command ./configure \
+  BUFRLIB_NAME=${BUFRLIB_NAME} \
+  GRIB2CLIB_NAME=${GRIB2CLIB_NAME} \
+  ${MET_CONFIG_OPTS} \
+  CPPFLAGS="-I/usr/local/include -I/usr/local/include/freetype2 -I/usr/local/include/cairo" \
+  LIBS="-ltirpc"
 
 # Run make clean
 time_command make clean

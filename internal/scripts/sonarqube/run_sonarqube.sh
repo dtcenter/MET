@@ -128,8 +128,8 @@ else
   sed -e "s|SONAR_TOKEN|$SONAR_TOKEN|" \
       -e "s|SONAR_HOST_URL|$SONAR_HOST_URL|" \
       -e "s|SONAR_PROJECT_KEY|MET_python_NB|" \
-      -e "s|SONAR_PROJECT_NAME|MET python Nightly Build" \
-      -e "s|SONAR_BRANCH_NAME|develop" \
+      -e "s|SONAR_PROJECT_NAME|MET python Nightly Build|" \
+      -e "s|SONAR_BRANCH_NAME|develop|" \
       $SCRIPT_DIR/python.sonar-project.properties > $SONAR_PROPERTIES
 
   # Run SonarQube scan for Python code
@@ -140,8 +140,8 @@ else
   sed -e "s|SONAR_TOKEN|$SONAR_TOKEN|" \
       -e "s|SONAR_HOST_URL|$SONAR_HOST_URL|" \
       -e "s|SONAR_PROJECT_KEY|MET_develop_NB|" \
-      -e "s|SONAR_PROJECT_NAME|MET Nightly Build" \
-      -e "s|SONAR_BRANCH_NAME|develop" \
+      -e "s|SONAR_PROJECT_NAME|MET Nightly Build|" \
+      -e "s|SONAR_BRANCH_NAME|develop|" \
       $SCRIPT_DIR/sonar-project.properties > $SONAR_PROPERTIES
 
   # Run SonarQube clean

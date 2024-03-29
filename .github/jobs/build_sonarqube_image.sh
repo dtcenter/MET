@@ -20,6 +20,9 @@ time_command docker build -t ${DOCKERHUB_TAG} \
 if [ $? != 0 ]; then
   cat ${CMD_LOGFILE}
   exit 1
+else
+  echo "SonarQube Scan completed successfully!"
+  grep "ANALYSIS SUCCESSFUL" ${CMD_LOGFILE}
 fi
 
 # Copy the log directory from the image
