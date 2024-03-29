@@ -1213,3 +1213,34 @@ For how to use the script, issue the command:
 .. code-block:: none
 
    python3 MET_BASE/python/utility/print_pointnc2ascii.py -h
+
+IABP retrieval Python Utilities
+====================================
+
+`IABP data<https://iabp.apl.uw.edu`_. (International Arctic Buoy Programme) is one of the data types supported by ascii2nc.  A utility script that pulls all this data from the web and stores it locally, called get_iabp_from_web.py is included.  This script accesses the appropriate webpage and downloads the ascii files for all buoys.  It is straightforward, but can be time intensive as the archive of this data is extensive and files are downloaded one at a time.
+
+The script can be found at:
+
+.. code-block:: none
+
+   MET_BASE/python/utility/get_iabp_from_web.py
+
+For how to use the script, issue the command:
+
+.. code-block:: none
+
+   python3 MET_BASE/python/utility/print_pointnc2ascii.py -h
+
+Another IABP utility script is included for users, to be run after all files have been downloaded using get_iabp_from_web.py.  This script examines all the files and lists those files that contain entries that fall within a user specified range of days.  It is called find_iabp_in_timerange.py.
+
+The script can be found at:
+
+.. code-block:: none
+
+   MET_BASE/python/utility/find_iabp_in_timerange.py
+
+For how to use the script, issue the command:
+
+.. code-block:: none
+
+   python3 MET_BASE/python/utility/find_iabp_in_timerange.py -h
