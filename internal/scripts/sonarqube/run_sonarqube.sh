@@ -120,13 +120,13 @@ SONAR_PROPERTIES=sonar-project.properties
 
 # Copy sonar-project.properties for Python code
 [ -e $SONAR_PROPERTIES ] && rm $SONAR_PROPERTIES
-[ -z "$SONAR_SERVER_URL" ] && SONAR_SERVER_URL="http://localhost:9000"
-if [ -z "$SONAR_TOKEN_VALUE" ]; then
-  echo "  == ERROR == SONAR_TOKEN_VALUE is not defined"
+[ -z "$SONAR_HOST_URL" ] && SONAR_HOST_URL="http://localhost:9000"
+if [ -z "$SONAR_TOKEN" ]; then
+  echo "  == ERROR == SONAR_TOKEN is not defined"
   exit 1
 else
-  sed -e "s|SONAR_TOKEN_VALUE|$SONAR_TOKEN_VALUE|" \
-      -e "s|SONAR_SERVER_URL|$SONAR_SERVER_URL|" \
+  sed -e "s|SONAR_TOKEN|$SONAR_TOKEN|" \
+      -e "s|SONAR_HOST_URL|$SONAR_HOST_URL|" \
       -e "s|SONAR_PROJECT_KEY|MET_python_NB|" \
       -e "s|SONAR_PROJECT_NAME|MET python Nightly Build" \
       -e "s|SONAR_BRANCH_NAME|develop" \
@@ -137,8 +137,8 @@ else
 
   # Copy sonar-project.properties for C/C++ code
   [ -e $SONAR_PROPERTIES ] && rm $SONAR_PROPERTIES
-  sed -e "s|SONAR_TOKEN_VALUE|$SONAR_TOKEN_VALUE|" \
-      -e "s|SONAR_SERVER_URL|$SONAR_SERVER_URL|" \
+  sed -e "s|SONAR_TOKEN|$SONAR_TOKEN|" \
+      -e "s|SONAR_HOST_URL|$SONAR_HOST_URL|" \
       -e "s|SONAR_PROJECT_KEY|MET_develop_NB|" \
       -e "s|SONAR_PROJECT_NAME|MET Nightly Build" \
       -e "s|SONAR_BRANCH_NAME|develop" \
