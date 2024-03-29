@@ -549,11 +549,9 @@ Optional Arguments for ascii2nc
 
 4. The **-config file** option is the configuration file for generating time summaries.
 
-5.
-The **-valid_beg** time option in YYYYMMDD[_HH[MMSS]] format sets the beginning of the retention time window.
+5. The **-valid_beg** time option in YYYYMMDD[_HH[MMSS]] format sets the beginning of the retention time window.
 
-6.
-The **-valid_end** time option in YYYYMMDD[_HH[MMSS]] format sets the end of the retention time window.
+6. The **-valid_end** time option in YYYYMMDD[_HH[MMSS]] format sets the end of the retention time window.
 
 7. The **-mask_grid** string option is a named grid or a gridded data file to filter the point observations spatially.
 
