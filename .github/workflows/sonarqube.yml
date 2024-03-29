@@ -37,7 +37,7 @@ on:
 
 jobs:
   build:
-    name: Scan MET C++ 
+    name: MET SonarQube Scan 
     runs-on: ubuntu-latest
 
     steps:
