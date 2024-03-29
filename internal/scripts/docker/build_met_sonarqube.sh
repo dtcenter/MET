@@ -18,7 +18,7 @@
 
 # Check that this is being run from the top-level MET directory
 if [ ! -e internal/scripts/docker/build_met_sonarqube.sh ]; then
-  echo "ERROR: ${0} must be run from the top-level MET directory"
+  echo "ERROR: ${0} -> must be run from the top-level MET directory"
   exit 1
 fi
 
@@ -31,15 +31,15 @@ source .github/jobs/bash_functions.sh
 
 # Check required environment variables
 if [ -z ${SONAR_HOST_URL+x} ]; then
-  echo "ERROR: \$SONAR_HOST_URL not defined!"
+  echo "ERROR: ${0} -> \$SONAR_HOST_URL not defined!"
   exit 1
 fi
 if [ -z ${SONAR_TOKEN+x} ]; then
-  echo "ERROR: \$SONAR_TOKEN not defined!"
+  echo "ERROR: ${0} -> \$SONAR_TOKEN not defined!"
   exit 1
 fi
 if [ -z ${MET_GIT_NAME+x} ]; then
-  echo "ERROR: \$MET_GIT_NAME not defined!"
+  echo "ERROR: ${0} -> \$MET_GIT_NAME not defined!"
   exit 1
 fi
 
@@ -54,7 +54,7 @@ WRAPPER_NAME=build-wrapper-linux-x86-64
 SONAR_WRAPPER=$(which $WRAPPER_NAME 2> /dev/null)
 
 if [ ! -e $SONAR_WRAPPER ]; then
-  echo "ERROR: $WRAPPER_NAME not found in the path"
+  echo "ERROR: ${0} -> $WRAPPER_NAME not found in the path"
   exit 1
 else
   echo "SONAR_WRAPPER=$SONAR_WRAPPER"
@@ -65,7 +65,7 @@ SCANNER_NAME=sonar-scanner
 SONAR_SCANNER=$(which $SCANNER_NAME 2> /dev/null)
 
 if [ ! -e $SONAR_SCANNER ]; then
-  echo "ERROR: $SCANNER_NAME not found in the path"
+  echo "ERROR: ${0} -> $SCANNER_NAME not found in the path"
   exit 1
 else
   echo "SONAR_SCANNER=$SONAR_SCANNER"
@@ -90,7 +90,7 @@ sed -e "s|SONAR_TOKEN|$SONAR_TOKEN|" \
     $SCRIPT_DIR/python.sonar-project.properties > $SONAR_PROPERTIES
 
 # Run SonarQube scan for Python code
-run_command "$SONAR_SCANNER"
+time_command $SONAR_SCANNER
 
 # Copy sonar-project.properties for C/C++ code
 [ -e $SONAR_PROPERTIES ] && rm $SONAR_PROPERTIES
