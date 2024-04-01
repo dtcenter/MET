@@ -13,6 +13,7 @@
 #include <limits.h>
 
 #include "config_util.h"
+#include "enum_as_int.hpp"
 
 #include "vx_math.h"
 #include "vx_util.h"
@@ -264,14 +265,6 @@ RegridInfo &RegridInfo::operator=(const RegridInfo &a) noexcept {
    return *this;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-
-template <typename Enumeration>
-auto enum_class_as_integer(Enumeration const value)
-    -> typename std::underlying_type<Enumeration>::type
-{
-    return static_cast<typename std::underlying_type<Enumeration>::type>(value);
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -2812,7 +2805,7 @@ ConcatString fieldtype_to_string(FieldType type) {
       case FieldType::Obs:  s = conf_val_obs; break;
       default:
          mlog << Error << "\nfieldtype_to_string() -> "
-              << "Unexpected FieldType value of " << enum_class_as_integer(type) << ".\n\n";
+              << "Unexpected FieldType value of " << enum_class_as_int(type) << ".\n\n";
          exit(1);
    }
 
@@ -2881,7 +2874,7 @@ ConcatString setlogic_to_string(SetLogic type) {
       case SetLogic::SymDiff:      s = conf_val_symdiff;      break;
       default:
          mlog << Error << "\nsetlogic_to_string() -> "
-              << "Unexpected SetLogic value of " << enum_class_as_integer(type) << ".\n\n";
+              << "Unexpected SetLogic value of " << enum_class_as_int(type) << ".\n\n";
          exit(1);
    }
 
@@ -2901,7 +2894,7 @@ ConcatString setlogic_to_abbr(SetLogic type) {
       case SetLogic::SymDiff:      s = setlogic_abbr_symdiff;      break;
       default:
          mlog << Error << "\nsetlogic_to_abbr() -> "
-              << "Unexpected SetLogic value of " << enum_class_as_integer(type) << ".\n\n";
+              << "Unexpected SetLogic value of " << enum_class_as_int(type) << ".\n\n";
          exit(1);
    }
 
@@ -2921,7 +2914,7 @@ ConcatString setlogic_to_symbol(SetLogic type) {
       case SetLogic::SymDiff:      s = setlogic_symbol_symdiff;      break;
       default:
          mlog << Error << "\nsetlogic_to_symbol() -> "
-              << "Unexpected SetLogic value of " << enum_class_as_integer(type) << ".\n\n";
+              << "Unexpected SetLogic value of " << enum_class_as_int(type) << ".\n\n";
          exit(1);
    }
 
@@ -3000,7 +2993,7 @@ ConcatString tracktype_to_string(TrackType type) {
       case TrackType::BDeck: s = conf_val_bdeck; break;
       default:
          mlog << Error << "\ntracktype_to_string() -> "
-              << "Unexpected TrackType value of " << enum_class_as_integer(type) << ".\n\n";
+              << "Unexpected TrackType value of " << enum_class_as_int(type) << ".\n\n";
          exit(1);
    }
 
@@ -3037,7 +3030,7 @@ ConcatString diagtype_to_string(DiagType type) {
       case DiagType::SHIPS_Dev: s = ships_diag_dev_str; break;
       default:
          mlog << Error << "\ndiagtype_to_string() -> "
-              << "Unexpected DiagType value of " << enum_class_as_integer(type) << ".\n\n";
+              << "Unexpected DiagType value of " << enum_class_as_int(type) << ".\n\n";
          exit(1);
    }
 
@@ -3092,7 +3085,7 @@ ConcatString interp12type_to_string(Interp12Type type) {
       case Interp12Type::Replace: s = conf_val_replace; break;
       default:
          mlog << Error << "\ninterp12type_to_string() -> "
-              << "Unexpected Interp12Type value of " << enum_class_as_integer(type) << ".\n\n";
+              << "Unexpected Interp12Type value of " << enum_class_as_int(type) << ".\n\n";
          exit(1);
    }
 
@@ -3131,7 +3124,7 @@ ConcatString mergetype_to_string(MergeType type) {
       case MergeType::Engine: s = conf_val_engine; break;
       default:
          mlog << Error << "\nmergetype_to_string() -> "
-              << "Unexpected MergeType value of " << enum_class_as_integer(type) << ".\n\n";
+              << "Unexpected MergeType value of " << enum_class_as_int(type) << ".\n\n";
          exit(1);
    }
 
@@ -3157,7 +3150,7 @@ ConcatString obssummary_to_string(ObsSummary type, int perc_val) {
          break;
       default:
          mlog << Error << "\nobssummary_to_string() -> "
-              << "Unexpected ObsSummary value of " << enum_class_as_integer(type) << ".\n\n";
+              << "Unexpected ObsSummary value of " << enum_class_as_int(type) << ".\n\n";
          exit(1);
    }
 
@@ -3196,7 +3189,7 @@ ConcatString matchtype_to_string(MatchType type) {
       case MatchType::NoMerge:   s = conf_val_no_merge;   break;
       default:
          mlog << Error << "\nmatchtype_to_string() -> "
-              << "Unexpected MatchType value of " << enum_class_as_integer(type) << ".\n\n";
+              << "Unexpected MatchType value of " << enum_class_as_int(type) << ".\n\n";
          exit(1);
    }
 
@@ -3263,7 +3256,7 @@ ConcatString disttype_to_string(DistType type) {
       case DistType::Beta:        s = conf_val_beta;        break;
       default:
          mlog << Error << "\ndisttype_to_string() -> "
-              << "Unexpected DistType value of " << enum_class_as_integer(type) << ".\n\n";
+              << "Unexpected DistType value of " << enum_class_as_int(type) << ".\n\n";
          exit(1);
    }
 
@@ -3304,7 +3297,7 @@ ConcatString griddecomptype_to_string(GridDecompType type) {
       case GridDecompType::Pad:  s = conf_val_pad; break;
       default:
          mlog << Error << "\ngriddecomptype_to_string() -> "
-              << "Unexpected GridDecompType value of " << enum_class_as_integer(type) << ".\n\n";
+              << "Unexpected GridDecompType value of " << enum_class_as_int(type) << ".\n\n";
          exit(1);
    }
 
@@ -3327,7 +3320,7 @@ ConcatString wavelettype_to_string(WaveletType type) {
       case WaveletType::BSpline_Cntr:  s = conf_val_bspline_cntr; break;
       default:
          mlog << Error << "\nwavlettype_to_string() -> "
-              << "Unexpected WaveletType value of " << enum_class_as_integer(type) << ".\n\n";
+              << "Unexpected WaveletType value of " << enum_class_as_int(type) << ".\n\n";
          exit(1);
    }
 
