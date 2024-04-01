@@ -1,4 +1,4 @@
-name: SonarQube Static Code Analysis
+name: SonarQube Scan
 
 # Run SonarQube for Pull Requests and changes to the develop and main_vX.Y branches
 
