@@ -22,6 +22,8 @@ else
   export SONAR_REFERENCE_BRANCH=${SOURCE_BRANCH}
 fi
 
+echo SONAR_REFERENCE_BRANCH=${SONAR_REFERENCE_BRANCH}
+
 time_command docker build -t ${DOCKERHUB_TAG} \
     --build-arg MET_BASE_REPO \
     --build-arg MET_BASE_TAG \
