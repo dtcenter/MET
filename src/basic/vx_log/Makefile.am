@@ -17,7 +17,7 @@ libvx_log_a_SOURCES = concat_string.cc concat_string.h \
                logger.cc logger.h \
                string_array.cc string_array.h \
                str_wrappers.cc str_wrappers.h \
-               vx_log.h
+               enum_as_int.hpp vx_log.h
 
 # Build the library when making a distribution so that
 # we can make enum_to_string and chk4copyright.
