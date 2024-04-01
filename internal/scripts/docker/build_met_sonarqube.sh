@@ -13,6 +13,7 @@
 #   SONAR_HOST_URL
 #   SONAR_TOKEN
 #   MET_GIT_NAME
+#   SONAR_REFERENCE_BRANCH
 #
 #=======================================================================
 
@@ -40,6 +41,10 @@ if [ -z ${SONAR_TOKEN+x} ]; then
 fi
 if [ -z ${MET_GIT_NAME+x} ]; then
   echo "ERROR: ${0} -> \$MET_GIT_NAME not defined!"
+  exit 1
+fi
+if [ -z ${SONAR_REFERENCE_BRANCH+x} ]; then
+  echo "ERROR: ${0} -> \$SONAR_REFERENCE_BRANCH not defined!"
   exit 1
 fi
 
@@ -87,6 +92,7 @@ sed -e "s|SONAR_TOKEN|$SONAR_TOKEN|" \
     -e "s|SONAR_PROJECT_KEY|MET-GHA-Python|" \
     -e "s|SONAR_PROJECT_NAME|MET GHA Python|" \
     -e "s|SONAR_BRANCH_NAME|$MET_GIT_NAME|" \
+    -e "s|SONAR_REFERENCE_BRANCH|$SONAR_REFERENCE_BRANCH|" \
     $SONAR_PROPERTIES_DIR/python.sonar-project.properties > $SONAR_PROPERTIES
 
 # Run SonarQube scan for Python code
@@ -99,6 +105,7 @@ sed -e "s|SONAR_TOKEN|$SONAR_TOKEN|" \
     -e "s|SONAR_PROJECT_KEY|MET-GHA-CXX|" \
     -e "s|SONAR_PROJECT_NAME|MET GHA CXX|" \
     -e "s|SONAR_BRANCH_NAME|$MET_GIT_NAME|" \
+    -e "s|SONAR_REFERENCE_BRANCH|$SONAR_REFERENCE_BRANCH|" \
     $SONAR_PROPERTIES_DIR/sonar-project.properties > $SONAR_PROPERTIES
 
 # Run the configure script

@@ -12,6 +12,8 @@ MAINTAINER John Halley Gotway <johnhg@ucar.edu>
 ARG SONAR_SCANNER_VERSION=5.0.1.3006
 ARG SONAR_HOST_URL
 ARG SONAR_TOKEN
+ARG SOURCE_BRANCH
+ARG SONAR_REFERENCE_BRANCH
 
 #
 # SONAR_HOST_URL is required.
@@ -29,16 +31,24 @@ RUN if [ "x${SONAR_TOKEN}" = "x" ]; then \
       exit 1; \
     fi
 
-ARG SOURCE_BRANCH
-
 #
-# SOURCE_BRANCH is not defined when built via Docker Hub.
+# SOURCE_BRANCH is the branch name of the MET source code.
 #
 RUN if [ "x${SOURCE_BRANCH}" = "x" ]; then \
       echo "ERROR: SOURCE_BRANCH undefined! Rebuild with \"--build-arg SOURCE_BRANCH={branch name}\""; \
       exit 1; \
     else \
       echo "Build Argument SOURCE_BRANCH=${SOURCE_BRANCH}"; \
+    fi
+
+#
+# SONAR_REFERENCE_BRANCH defines to the version against which this scan should be compared.
+#
+RUN if [ "x${SONAR_REFERENCE_BRANCH}" = "x" ]; then \
+      echo "ERROR: SONAR_REFERENCE_BRANCH undefined! Rebuild with \"--build-arg SONAR_REFERENCE_BRANCH={branch name}\""; \
+      exit 1; \
+    else \
+      echo "Build Argument SONAR_REFERENCE_BRANCH=${SONAR_REFERENCE_BRANCH}"; \
     fi
 
 ENV MET_GIT_NAME ${SOURCE_BRANCH}
