@@ -25,17 +25,9 @@
 #include "vx_grid.h"
 #include "vx_math.h"
 #include "vx_log.h"
+#include "enum_as_int.hpp"
 
 using namespace std;
-
-////////////////////////////////////////////////////////////////////////
-
-template <typename Enumeration>
-auto enum_class_as_integer(Enumeration const value)
-    -> typename std::underlying_type<Enumeration>::type
-{
-    return static_cast<typename std::underlying_type<Enumeration>::type>(value);
-}
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -1619,7 +1611,7 @@ bool check_fo_thresh(double f, double o, double cmn, double csd,
 
       default:
          mlog << Error << "\ncheck_fo_thresh() -> "
-              << "Unexpected SetLogic value of " << enum_class_as_integer(type) << ".\n\n";
+              << "Unexpected SetLogic value of " << enum_class_as_int(type) << ".\n\n";
          exit(1);
    }
 

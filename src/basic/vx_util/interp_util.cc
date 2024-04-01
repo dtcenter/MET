@@ -23,18 +23,10 @@
 
 #include "vx_math.h"
 #include "vx_log.h"
+#include "enum_as_int.hpp"
 
 using namespace std;
 
-
-////////////////////////////////////////////////////////////////////////
-
-template <typename Enumeration>
-auto enum_class_as_integer(Enumeration const value)
-    -> typename std::underlying_type<Enumeration>::type
-{
-    return static_cast<typename std::underlying_type<Enumeration>::type>(value);
-}
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -1029,7 +1021,7 @@ double compute_sfc_interp(const DataPlane &dp,
       default:
          mlog << Error << "\ncompute_sfc_interp() -> "
               << "unsupported interpolation method encountered: "
-              << interpmthd_to_string(mthd) << "(" << enum_class_as_integer(mthd) << ")\n\n";
+              << interpmthd_to_string(mthd) << "(" << enum_class_as_int(mthd) << ")\n\n";
          exit(1);
    }
 
@@ -1203,7 +1195,7 @@ double compute_horz_interp(const DataPlane &dp,
       default:
          mlog << Error << "\ncompute_horz_interp() -> "
               << "unsupported interpolation method encountered: "
-              << interpmthd_to_string(mthd) << "(" << enum_class_as_integer(mthd) << ")\n\n";
+              << interpmthd_to_string(mthd) << "(" << enum_class_as_int(mthd) << ")\n\n";
          exit(1);
    }
 
@@ -1348,7 +1340,7 @@ DataPlane valid_time_interp(const DataPlane &in1, const DataPlane &in2,
       default:
          mlog << Error << "\nvalid_time_interp() -> "
               << "unsupported interpolation method encountered: "
-              << interpmthd_to_string(mthd) << "(" << enum_class_as_integer(mthd) << ")\n\n";
+              << interpmthd_to_string(mthd) << "(" << enum_class_as_int(mthd) << ")\n\n";
          exit(1);
    }
 

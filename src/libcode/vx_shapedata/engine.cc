@@ -17,6 +17,7 @@
 #include <set>
 #include <map>
 
+#include "enum_as_int.hpp"
 #include "engine.h"
 #include "mode_columns.h"
 #include "vx_util.h"
@@ -30,15 +31,6 @@ static const int print_interest_log_level = 5;
 ///////////////////////////////////////////////////////////////////////
 
 static inline double area_ratio_conf(double t) { return t; }
-
-////////////////////////////////////////////////////////////////////////
-
-template <typename Enumeration>
-auto enum_class_as_integer(Enumeration const value)
-    -> typename std::underlying_type<Enumeration>::type
-{
-    return static_cast<typename std::underlying_type<Enumeration>::type>(value);
-}
 
 ///////////////////////////////////////////////////////////////////////
 //
@@ -1062,7 +1054,7 @@ void ModeFuzzyEngine::do_matching() {
    }
    else {
       mlog << Error << "\nModeFuzzyEngine::do_matching() -> "
-           << "invalid match_flag value of " << enum_class_as_integer(conf_info.match_flag)
+           << "invalid match_flag value of " << enum_class_as_int(conf_info.match_flag)
            << " specified.\n\n";
       exit(1);
    }

@@ -21,17 +21,9 @@
 
 #include "vx_data2d_factory.h"
 #include "vx_log.h"
+#include "enum_as_int.hpp"
 
 using namespace std;
-
-////////////////////////////////////////////////////////////////////////
-
-template <typename Enumeration>
-auto enum_class_as_integer(Enumeration const value)
-    -> typename std::underlying_type<Enumeration>::type
-{
-    return static_cast<typename std::underlying_type<Enumeration>::type>(value);
-}
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -349,7 +341,7 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype,
       case(WaveletType::None):
       default:
          mlog << Error << "\nWaveletStatConfInfo::process_config() -> "
-              << "Unsupported wavelet type value of " << enum_class_as_integer(wvlt_type) << ".\n\n";
+              << "Unsupported wavelet type value of " << enum_class_as_int(wvlt_type) << ".\n\n";
          exit(1);
    }
 
@@ -395,7 +387,7 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype,
       case(WaveletType::None):
       default:
          mlog << Error << "\nWaveletStatConfInfo::process_config() -> "
-              << "Unsupported wavelet type value of " << enum_class_as_integer(wvlt_type) << ".\n\n";
+              << "Unsupported wavelet type value of " << enum_class_as_int(wvlt_type) << ".\n\n";
          exit(1);
    }
 
@@ -574,7 +566,7 @@ void WaveletStatConfInfo::process_tiles(const Grid &grid) {
       default:
          mlog << Error << "\nWaveletStatConfInfo::process_tiles() -> "
               << "Unsupported grid decomposition type of "
-              << enum_class_as_integer(grid_decomp_flag) << ".\n\n";
+              << enum_class_as_int(grid_decomp_flag) << ".\n\n";
          exit(1);
    } // end switch
 

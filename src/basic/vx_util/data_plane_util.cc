@@ -26,6 +26,7 @@
 #include "vx_gsl_prob.h"
 #include "vx_math.h"
 #include "vx_log.h"
+#include "enum_as_int.hpp"
 
 #include "GridTemplate.h"
 
@@ -37,12 +38,6 @@ using namespace std;
 //
 ////////////////////////////////////////////////////////////////////////
 
-template <typename Enumeration>
-auto enum_class_as_integer(Enumeration const value)
-    -> typename std::underlying_type<Enumeration>::type
-{
-    return static_cast<typename std::underlying_type<Enumeration>::type>(value);
-}
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -164,7 +159,7 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
             default:
                mlog << Error << "\nsmooth_field() -> "
                     << "unsupported interpolation method encountered: "
-                    << interpmthd_to_string(mthd) << "(" << enum_class_as_integer(mthd)
+                    << interpmthd_to_string(mthd) << "(" << enum_class_as_int(mthd)
                     << ")\n\n";
                exit(1);
          }

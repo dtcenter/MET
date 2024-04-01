@@ -29,6 +29,7 @@
 
 #include "vx_log.h"
 #include "nint.h"
+#include "enum_as_int.hpp"
 
 #include "GridTemplate.h"
 #include "GridOffset.h"
@@ -37,15 +38,6 @@
 #include "CircularTemplate.h"
 
 using namespace std;
-
-///////////////////////////////////////////////////////////////////////////////
-
-template <typename Enumeration>
-auto enum_class_as_integer(Enumeration const value)
-    -> typename std::underlying_type<Enumeration>::type
-{
-    return static_cast<typename std::underlying_type<Enumeration>::type>(value);
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -600,11 +592,11 @@ void GridTemplate::_setEdgeOffsets() {
 ///////////////////////////////////////////////////////////////////////////////
 
 GridTemplateFactory::GridTemplateFactory() {
-   enum_to_string.resize(enum_class_as_integer(GridTemplates::NUM_TEMPLATES));
+   enum_to_string.resize(enum_class_as_int(GridTemplates::NUM_TEMPLATES));
 
-   enum_to_string[enum_class_as_integer(GridTemplates::None)] = "";
-   enum_to_string[enum_class_as_integer(GridTemplates::Square)] = "SQUARE";
-   enum_to_string[enum_class_as_integer(GridTemplates::Circle)] = "CIRCLE";
+   enum_to_string[enum_class_as_int(GridTemplates::None)] = "";
+   enum_to_string[enum_class_as_int(GridTemplates::Square)] = "SQUARE";
+   enum_to_string[enum_class_as_int(GridTemplates::Circle)] = "CIRCLE";
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -621,7 +613,7 @@ GridTemplateFactory::~GridTemplateFactory() {
 
 GridTemplateFactory::GridTemplates GridTemplateFactory::string2Enum(string target) {
 
-   for(unsigned int ix = 0; ix < enum_class_as_integer(GridTemplates::NUM_TEMPLATES); ix++) {
+   for(unsigned int ix = 0; ix < enum_class_as_int(GridTemplates::NUM_TEMPLATES); ix++) {
       if(enum_to_string[ix] == target) {
          return static_cast<GridTemplates>(ix);
       }
@@ -641,7 +633,7 @@ string GridTemplateFactory::enum2String(GridTemplates target) {
 
    if(static_cast<int>(target) > enum_to_string.size() - 1) {
       mlog << Error << "\nGridTemplateFactory::enum2String() -> "
-           << "target out of range " << enum_class_as_integer(target) << " > "
+           << "target out of range " << enum_class_as_int(target) << " > "
            << (static_cast<int>(enum_to_string.size()) - 1)
            << ".\n\n";
       exit(1);
@@ -676,7 +668,7 @@ GridTemplate* GridTemplateFactory::buildGT(GridTemplates gt, int width, bool wra
 
       default:
          mlog << Error << "\nbuildGT() -> "
-              << "Unexpected GridTemplates value (" << enum_class_as_integer(gt) << ").\n\n";
+              << "Unexpected GridTemplates value (" << enum_class_as_int(gt) << ").\n\n";
          exit(1);
       }
 }

@@ -16,17 +16,9 @@
 
 #include "config_util.h"
 #include "normalize.h"
+#include "enum_as_int.hpp"
 
 using namespace std;
-
-////////////////////////////////////////////////////////////////////////
-
-template <typename Enumeration>
-auto enum_class_as_integer(Enumeration const value)
-    -> typename std::underlying_type<Enumeration>::type
-{
-    return static_cast<typename std::underlying_type<Enumeration>::type>(value);
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -58,7 +50,7 @@ ConcatString normalizetype_to_string(const NormalizeType type) {
 
       default:
          mlog << Error << "\nnormalizetype_to_string() -> "
-              << "Unexpected NormalizeType value of " << enum_class_as_integer(type) << ".\n\n";
+              << "Unexpected NormalizeType value of " << enum_class_as_int(type) << ".\n\n";
          exit(1);
    }
 
@@ -125,7 +117,7 @@ void normalize_data(DataPlane &dp, const NormalizeType type,
       default:
          mlog << Error << "\nnormalize_data() -> "
               << "unexpected NormalizeType value ("
-              << enum_class_as_integer(type) << ")\n\n";
+              << enum_class_as_int(type) << ")\n\n";
          exit(1);
    } // end switch
 
