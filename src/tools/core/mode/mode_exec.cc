@@ -2155,16 +2155,16 @@ void ModeExecutive::write_poly_netcdf(NcFile * f_out)
    // present.
    //
    if(engine.n_fcst > 0) {
-      write_poly_netcdf(f_out, FcstSimpBdyPoly);
-      write_poly_netcdf(f_out, FcstSimpHullPoly);
+      write_poly_netcdf(f_out, ObjPolyType::FcstSimpBdy);
+      write_poly_netcdf(f_out, ObjPolyType::FcstSimpHull);
    }
    if(engine.n_obs > 0) {
-      write_poly_netcdf(f_out, ObsSimpBdyPoly);
-      write_poly_netcdf(f_out, ObsSimpHullPoly);
+      write_poly_netcdf(f_out, ObjPolyType::ObsSimpBdy);
+      write_poly_netcdf(f_out, ObjPolyType::ObsSimpHull);
    }
    if(engine.n_clus > 0) {
-      write_poly_netcdf(f_out, FcstClusHullPoly);
-      write_poly_netcdf(f_out, ObsClusHullPoly);
+      write_poly_netcdf(f_out, ObjPolyType::FcstClusHull);
+      write_poly_netcdf(f_out, ObjPolyType::ObsClusHull);
    }
 
    return;
@@ -2217,7 +2217,7 @@ void ModeExecutive::write_poly_netcdf(NcFile *f_out, ObjPolyType poly_type)
    // and set up strings
    switch(poly_type) {
 
-   case FcstSimpBdyPoly:
+   case ObjPolyType::FcstSimpBdy:
       n_poly     = engine.n_fcst;
       field_name = "fcst";
       field_long = "Forecast";
@@ -2225,7 +2225,7 @@ void ModeExecutive::write_poly_netcdf(NcFile *f_out, ObjPolyType poly_type)
       poly_long  = "Simple Boundary";
       break;
 
-   case ObsSimpBdyPoly:
+   case ObjPolyType::ObsSimpBdy:
       n_poly     = engine.n_obs;
       field_name = "obs";
       field_long = "Observation";
@@ -2233,7 +2233,7 @@ void ModeExecutive::write_poly_netcdf(NcFile *f_out, ObjPolyType poly_type)
       poly_long  = "Simple Boundary";
       break;
 
-   case FcstSimpHullPoly:
+   case ObjPolyType::FcstSimpHull:
       n_poly     = engine.n_fcst;
       field_name = "fcst";
       field_long = "Forecast";
@@ -2241,7 +2241,7 @@ void ModeExecutive::write_poly_netcdf(NcFile *f_out, ObjPolyType poly_type)
       poly_long  = "Simple Convex Hull";
       break;
 
-   case ObsSimpHullPoly:
+   case ObjPolyType::ObsSimpHull:
       n_poly     = engine.n_obs;
       field_name = "obs";
       field_long = "Observation";
@@ -2249,7 +2249,7 @@ void ModeExecutive::write_poly_netcdf(NcFile *f_out, ObjPolyType poly_type)
       poly_long  = "Simple Convex Hull";
       break;
 
-   case FcstClusHullPoly:
+   case ObjPolyType::FcstClusHull:
       n_poly     = engine.n_clus;
       field_name = "fcst";
       field_long = "Forecast";
@@ -2257,7 +2257,7 @@ void ModeExecutive::write_poly_netcdf(NcFile *f_out, ObjPolyType poly_type)
       poly_long  = "Cluster Convex Hull";
       break;
 
-   case ObsClusHullPoly:
+   case ObjPolyType::ObsClusHull:
       n_poly     = engine.n_clus;
       field_name = "obs";
       field_long = "Observation";
@@ -2270,8 +2270,8 @@ void ModeExecutive::write_poly_netcdf(NcFile *f_out, ObjPolyType poly_type)
    }
 
    // Setup dimension name strings
-   if(poly_type == FcstClusHullPoly ||
-      poly_type == ObsClusHullPoly) {
+   if(poly_type == ObjPolyType::FcstClusHull ||
+      poly_type == ObjPolyType::ObsClusHull) {
       obj_dim_name << cs_erase << field_name << "_clus";
    }
    else {
@@ -2301,27 +2301,27 @@ void ModeExecutive::write_poly_netcdf(NcFile *f_out, ObjPolyType poly_type)
 
       switch(poly_type) {
 
-      case FcstSimpBdyPoly:
+      case ObjPolyType::FcstSimpBdy:
          poly[i] = &engine.fcst_single[i].boundary[0];
          break;
 
-      case ObsSimpBdyPoly:
+      case ObjPolyType::ObsSimpBdy:
          poly[i] = &engine.obs_single[i].boundary[0];
          break;
 
-      case FcstSimpHullPoly:
+      case ObjPolyType::FcstSimpHull:
          poly[i] = &engine.fcst_single[i].convex_hull;
          break;
 
-      case ObsSimpHullPoly:
+      case ObjPolyType::ObsSimpHull:
          poly[i] = &engine.obs_single[i].convex_hull;
          break;
 
-      case FcstClusHullPoly:
+      case ObjPolyType::FcstClusHull:
          poly[i] = &engine.fcst_cluster[i].convex_hull;
          break;
 
-      case ObsClusHullPoly:
+      case ObjPolyType::ObsClusHull:
          poly[i] = &engine.obs_cluster[i].convex_hull;
          break;
 

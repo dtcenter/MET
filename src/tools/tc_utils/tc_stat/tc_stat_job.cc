@@ -54,7 +54,7 @@ static bool         check_masks        (const MaskPoly &, const Grid &, const Ma
 
 TCStatJob *TCStatJobFactory::new_tc_stat_job_type(const char *type_str) {
    TCStatJob *job = (TCStatJob *) nullptr;
-   TCStatJobType type = NoTCStatJobType;
+   TCStatJobType type = TCStatJobType::None;
 
    // Determine the TCStatJobType
    type = string_to_tcstatjobtype((string)type_str);
@@ -63,23 +63,23 @@ TCStatJob *TCStatJobFactory::new_tc_stat_job_type(const char *type_str) {
    // The TCStatJob object is allocated and needs to be deleted by caller.
    switch(type) {
 
-      case TCStatJobType_Filter:
+      case TCStatJobType::Filter:
          job = new TCStatJobFilter;
          break;
 
-      case TCStatJobType_Summary:
+      case TCStatJobType::Summary:
          job = new TCStatJobSummary;
          break;
 
-      case TCStatJobType_RIRW:
+      case TCStatJobType::RIRW:
          job = new TCStatJobRIRW;
          break;
 
-      case TCStatJobType_ProbRIRW:
+      case TCStatJobType::ProbRIRW:
          job = new TCStatJobProbRIRW;
          break;
 
-      case NoTCStatJobType:
+      case TCStatJobType::None:
       default:
          mlog << Error << "\nTCStatJobFactory::new_tc_stat_job_type() -> "
               << "unsupported job type \"" << type_str << "\"\n\n";
@@ -196,7 +196,7 @@ void TCStatJob::clear() {
 
    Precision = default_precision;
 
-   JobType = NoTCStatJobType;
+   JobType = TCStatJobType::None;
 
    AModel.clear();
    BModel.clear();
@@ -712,7 +712,7 @@ bool TCStatJob::is_keeper_line(const TCStatLine &line,
                                TCPointCounts &n) const {
 
    // Does not apply to TCDIAG lines
-   if(line.type() == TCStatLineType_TCDIAG) return true;
+   if(line.type() == TCStatLineType::TCDIAG) return true;
 
    bool keep = true;
    double v_dbl, alat, alon, blat, blon;
@@ -767,7 +767,7 @@ bool TCStatJob::is_keeper_line(const TCStatLine &line,
      !LineType.has(line.line_type()))   { keep = false; n.RejLineType++;  }
 
    // Check that PROBRIRW lines include the requested probability type
-   else if(line.type() == TCStatLineType_ProbRIRW &&
+   else if(line.type() == TCStatLineType::ProbRIRW &&
            !is_bad_data(ProbRIRWThresh) &&
            is_bad_data(get_probrirw_value(line, ProbRIRWThresh))) {
      keep = false;
@@ -885,7 +885,7 @@ double TCStatJob::get_column_double(const TCStatLine &line,
 
    // Check for PROBRIRW_PROB special case
    if(strcasecmp(column.c_str(), "PROBRIRW_PROB") == 0 &&
-      line.type() == TCStatLineType_ProbRIRW) {
+      line.type() == TCStatLineType::ProbRIRW) {
       v = get_probrirw_value(line, ProbRIRWThresh);
       return v;
    }
@@ -1289,7 +1289,7 @@ ConcatString TCStatJob::serialize() const {
    s.clear();
    s.set_precision(get_precision());
 
-   if(JobType != NoTCStatJobType)
+   if(JobType != TCStatJobType::None)
       s << "-job " << tcstatjobtype_to_string(JobType) << " ";
    for(i=0; i<AModel.n(); i++)
       s << "-amodel " << AModel[i] << " ";
@@ -1744,7 +1744,7 @@ void TCStatJobFilter::clear() {
 
    TCStatJob::clear();
 
-   JobType = TCStatJobType_Filter;
+   JobType = TCStatJobType::Filter;
 
    return;
 }
@@ -1968,7 +1968,7 @@ void TCStatJobSummary::clear() {
 
    TCStatJob::clear();
 
-   JobType = TCStatJobType_Summary;
+   JobType = TCStatJobType::Summary;
 
    ReqColumn.clear();
    Column.clear();
@@ -2691,11 +2691,11 @@ void TCStatJobSummary::compute_fsp(NumArray &total, NumArray &best,
 TCStatJobType string_to_tcstatjobtype(const ConcatString s) {
    TCStatJobType t;
 
-        if(strcasecmp(s.c_str(), TCStatJobType_FilterStr)   == 0) t = TCStatJobType_Filter;
-   else if(strcasecmp(s.c_str(), TCStatJobType_SummaryStr)  == 0) t = TCStatJobType_Summary;
-   else if(strcasecmp(s.c_str(), TCStatJobType_RIRWStr)     == 0) t = TCStatJobType_RIRW;
-   else if(strcasecmp(s.c_str(), TCStatJobType_ProbRIRWStr) == 0) t = TCStatJobType_ProbRIRW;
-   else                                                           t = NoTCStatJobType;
+        if(strcasecmp(s.c_str(), TCStatJobType_FilterStr)   == 0) t = TCStatJobType::Filter;
+   else if(strcasecmp(s.c_str(), TCStatJobType_SummaryStr)  == 0) t = TCStatJobType::Summary;
+   else if(strcasecmp(s.c_str(), TCStatJobType_RIRWStr)     == 0) t = TCStatJobType::RIRW;
+   else if(strcasecmp(s.c_str(), TCStatJobType_ProbRIRWStr) == 0) t = TCStatJobType::ProbRIRW;
+   else                                                           t = TCStatJobType::None;
 
    return t;
 }
@@ -2706,11 +2706,11 @@ ConcatString tcstatjobtype_to_string(const TCStatJobType t) {
    const char *s = (const char *) nullptr;
 
    switch(t) {
-      case TCStatJobType_Filter:   s = TCStatJobType_FilterStr;   break;
-      case TCStatJobType_Summary:  s = TCStatJobType_SummaryStr;  break;
-      case TCStatJobType_RIRW:     s = TCStatJobType_RIRWStr;     break;
-      case TCStatJobType_ProbRIRW: s = TCStatJobType_ProbRIRWStr; break;
-      default:                     s = na_str;                    break;
+      case TCStatJobType::Filter:   s = TCStatJobType_FilterStr;   break;
+      case TCStatJobType::Summary:  s = TCStatJobType_SummaryStr;  break;
+      case TCStatJobType::RIRW:     s = TCStatJobType_RIRWStr;     break;
+      case TCStatJobType::ProbRIRW: s = TCStatJobType_ProbRIRWStr; break;
+      default:                      s = na_str;                    break;
    }
 
    return ConcatString(s);
@@ -2955,7 +2955,7 @@ void TCStatJobRIRW::clear() {
 
    TCStatJob::clear();
 
-   JobType = TCStatJobType_RIRW;
+   JobType = TCStatJobType::RIRW;
 
    // Disable rapid intensification/weakening filtering logic.
    RIRWTrack = TrackType::None;
@@ -3995,7 +3995,7 @@ void TCStatJobProbRIRW::clear() {
 
    TCStatJob::clear();
 
-   JobType = TCStatJobType_ProbRIRW;
+   JobType = TCStatJobType::ProbRIRW;
 
    ByColumn.clear();
    ProbRIRWMap.clear();
@@ -4580,7 +4580,7 @@ double get_probrirw_value(const TCStatLine &line, double ProbRIRWThresh) {
    ConcatString cs;
 
    // Only valid for the PROBRIRW line type
-   if(line.type() != TCStatLineType_ProbRIRW) return bad_data_double;
+   if(line.type() != TCStatLineType::ProbRIRW) return bad_data_double;
 
    // Get the number of threhsolds
    n = atoi(line.get_item("N_THRESH"));

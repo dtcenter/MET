@@ -86,15 +86,15 @@ static const char    annofontsize_name [] = "anno_font_size";
 static const char   titlefontsize_name [] = "title_font_size";
 static const char  ctablefontsize_name [] = "colortable_font_size";
 
-enum PlotField {
+enum class PlotField {
 
-   raw_field,
+   raw,
 
-   simple_obj_field,
+   simple_obj,
 
-   cluster_obj_field,
+   cluster_obj,
 
-   no_plot_field
+   none
 
 };
 
@@ -149,7 +149,7 @@ static double map_width = 0.0;
    //  default values for command-line switches
    //
 
-static PlotField plot_field = no_plot_field;
+static PlotField plot_field = PlotField::none;
 
 static ConcatString config_filename;   //  no default ... must be set on command line
 
@@ -454,19 +454,19 @@ output_filename << (do_obs ? "_obs" : "_fcst");
 
 switch ( plot_field )  {
 
-   case raw_field:
+   case PlotField::raw:
       output_filename << "_raw.png";
       is_object_field = false;
       break;
 
-   case simple_obj_field:
+   case PlotField::simple_obj:
       output_filename << "_simple.png";
       is_object_field = true;
       n_fcst = mode_in.n_fcst_simple_objs();
       n_obs  = mode_in.n_obs_simple_objs();
       break;
 
-   case cluster_obj_field:
+   case PlotField::cluster_obj:
       output_filename << "_cluster.png";
       is_object_field = true;
       n_fcst = mode_in.n_fcst_clus_objs();
@@ -652,7 +652,7 @@ void set_raw(const StringArray &)
 
 {
 
-plot_field = raw_field;
+plot_field = PlotField::raw;
 
 do_data_rescale = true;
 
@@ -700,7 +700,7 @@ void set_simple(const StringArray &)
 
 {
 
-plot_field = simple_obj_field;
+plot_field = PlotField::simple_obj;
 
 return;
 
@@ -714,7 +714,7 @@ void set_cluster(const StringArray &)
 
 {
 
-plot_field = cluster_obj_field;
+plot_field = PlotField::cluster_obj;
 
 return;
 
@@ -737,7 +737,7 @@ if ( !fcst_obs_set )  {
 
 }
 
-if ( plot_field == no_plot_field )  {
+if ( plot_field == PlotField::none )  {
 
    mlog << Error
         << "\n\n  " << program_name << ": plot field not set!\n\n";
@@ -770,7 +770,7 @@ if ( ! do_anno )  border_width = 0;
 
 if ( plot_size < 1 )  plot_size = 1;
 
-if ( plot_field == raw_field )  ctable_filename = raw_ctable_filename;
+if ( plot_field == PlotField::raw )  ctable_filename = raw_ctable_filename;
 else                            ctable_filename = obj_ctable_filename;
 
 return;
@@ -813,7 +813,7 @@ for (x=0; x<(image.nx()); ++x)  {
 
       my = y/plot_size;
 
-      if ( plot_field == raw_field )  {
+      if ( plot_field == PlotField::raw )  {
 
          if ( do_obs )  value = mode_in.obs_raw  (mx, my);
          else           value = mode_in.fcst_raw (mx, my);
@@ -824,7 +824,7 @@ for (x=0; x<(image.nx()); ++x)  {
 
       } else {   //  object
 
-         if ( plot_field == cluster_obj_field )  {
+         if ( plot_field == PlotField::cluster_obj )  {
 
             if ( do_obs )  k = mode_in.obs_clus_id  (mx, my);
             else           k = mode_in.fcst_clus_id (mx, my);
@@ -1314,15 +1314,15 @@ else           fcst_obs = "Forecast";
 
 switch ( plot_field )  {
 
-   case raw_field:
+   case PlotField::raw:
       raw_obj = "Raw";
       break;
 
-   case simple_obj_field:
+   case PlotField::simple_obj:
       raw_obj = "Simple Object";
       break;
 
-   case cluster_obj_field:
+   case PlotField::cluster_obj:
       raw_obj = "Cluster Object";
       break;
 

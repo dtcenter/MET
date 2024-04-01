@@ -3794,7 +3794,7 @@ void write_job_ramp(STATAnalysisJob &job,
 
          vals_part = it->second.f_na.subset(ts.index(beg[i]), ts.index(end[i]));
 
-         if(job.ramp_type == TimeSeriesType_DyDt) {
+         if(job.ramp_type == TimeSeriesType::DyDt) {
             compute_dydt_ramps(cs.c_str(), vals_part, ts_part,
                job.ramp_time_fcst, job.ramp_exact_fcst, job.ramp_thresh_fcst,
                ramp_part, dat_part);
@@ -3823,7 +3823,7 @@ void write_job_ramp(STATAnalysisJob &job,
 
          vals_part = it->second.o_na.subset(ts.index(beg[i]), ts.index(end[i]));
 
-         if(job.ramp_type == TimeSeriesType_DyDt) {
+         if(job.ramp_type == TimeSeriesType::DyDt) {
             compute_dydt_ramps(cs.c_str(), vals_part, ts_part,
                job.ramp_time_obs, job.ramp_exact_obs, job.ramp_thresh_obs,
                ramp_part, dat_part);
@@ -3948,7 +3948,7 @@ void write_job_ramp(STATAnalysisJob &job,
             mpr_at.set_entry(r_mpr, c++, unix_to_yyyymmdd_hhmmss(init_ut));
             mpr_at.set_entry(r_mpr, c++, sec_to_hhmmss((int) valid_ut - init_ut));
             mpr_at.set_entry(r_mpr, c++, unix_to_yyyymmdd_hhmmss(valid_ut));
-            if(job.ramp_type == TimeSeriesType_DyDt) {
+            if(job.ramp_type == TimeSeriesType::DyDt) {
                mpr_at.set_entry(r_mpr, c++, fdat[k]);
                mpr_at.set_entry(r_mpr, c++, it->second.f_na[k]);
                mpr_at.set_entry(r_mpr, c++, (is_bad_data(fdat[k]) || is_bad_data(it->second.f_na[k]) ?
@@ -3960,7 +3960,7 @@ void write_job_ramp(STATAnalysisJob &job,
                mpr_at.set_entry(r_mpr, c++, fdat[k]);
             }
             mpr_at.set_entry(r_mpr, c++, (is_bad_data(f) ? na_str : bool_to_string(f)));
-            if(job.ramp_type == TimeSeriesType_DyDt) {
+            if(job.ramp_type == TimeSeriesType::DyDt) {
                mpr_at.set_entry(r_mpr, c++, odat[k]);
                mpr_at.set_entry(r_mpr, c++, it->second.o_na[k]);
                mpr_at.set_entry(r_mpr, c++, (is_bad_data(odat[k]) || is_bad_data(it->second.o_na[k]) ?
@@ -4329,8 +4329,8 @@ void do_job_ramp(const ConcatString &jobstring, LineDataFile &f,
    //
    // Check the ramp type
    //
-   if(job.ramp_type != TimeSeriesType_DyDt &&
-      job.ramp_type != TimeSeriesType_Swing) {
+   if(job.ramp_type != TimeSeriesType::DyDt &&
+      job.ramp_type != TimeSeriesType::Swing) {
       mlog << Error << "\ndo_job_ramp() -> "
            << "unsupported \"-ramp_type\" option: "
            << jobstring << "\n\n";
@@ -4340,7 +4340,7 @@ void do_job_ramp(const ConcatString &jobstring, LineDataFile &f,
    //
    // Check swing_width for the swinging door algorithm
    //
-   if(job.ramp_type == TimeSeriesType_Swing &&
+   if(job.ramp_type == TimeSeriesType::Swing &&
       is_bad_data(job.swing_width)) {
       mlog << Error << "\ndo_job_ramp() -> "
            << "the \"-swing_width\" option is required for \"-ramp_type SWING\": "

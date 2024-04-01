@@ -119,10 +119,10 @@ static const char derive_options  [] =
    "sum, min, max, range, mean, stdev, vld_count";
 
 // Run Command enumeration
-enum RunCommand { sum = 0, add = 1, sub = 2, der = 3 };
+enum class RunCommand { sum = 0, add = 1, sub = 2, der = 3 };
 
 // Variables for top-level command line arguments
-static RunCommand run_command = sum;
+static RunCommand run_command = RunCommand::sum;
 
 // Variables common to all commands
 static int          n_files;
@@ -232,8 +232,8 @@ int met_main(int argc, char *argv[]) {
       // Perform the requested run or subtract command.
       // Derive handles add and derive.
       //
-           if(run_command == sum) do_sum_command();
-      else if(run_command == sub) do_sub_command();
+           if(run_command == RunCommand::sum) do_sum_command();
+      else if(run_command == RunCommand::sub) do_sub_command();
       else                        do_derive_command();
    }
 
@@ -264,7 +264,7 @@ void process_command_line(int argc, char **argv) {
    //
    // Default to running the sum command
    //
-   run_command = sum;
+   run_command = RunCommand::sum;
    derive_list.add("sum");
 
    //
@@ -305,8 +305,8 @@ void process_command_line(int argc, char **argv) {
    //
    // Process the specific command arguments.
    //
-   if(run_command == sum) process_sum_args(cline);
-   else                   process_add_sub_derive_args(cline);
+   if(run_command == RunCommand::sum) process_sum_args(cline);
+   else                               process_add_sub_derive_args(cline);
 
    //
    // If -field not set, set to a list of length 1 with an empty string.
@@ -1295,21 +1295,21 @@ void open_nc(const Grid &grid) {
    // Add global attributes.
    write_netcdf_global(nc_out, out_filename.c_str(), program_name.c_str());
 
-   if(run_command == sum) {
+   if(run_command == RunCommand::sum) {
       command_str << cs_erase
                   << "Sum: " << n_files
                   << " files with accumulations of "
                   << sec_to_hhmmss(in_accum) << '.';
-   } else if(run_command == add) {
+   } else if(run_command == RunCommand::add) {
       command_str << cs_erase
                   << "Addition: " << n_files << " files.";
    }
-   else if(run_command == sub) {
+   else if(run_command == RunCommand::sub) {
       command_str << cs_erase
                   << "Subtraction: "
                   << file_list[0] << " minus " << file_list[1];
    }
-   else { // run_command = der
+   else { // run_command = RunCommand::der
       command_str << cs_erase
                   << "Derive: " << write_css(derive_list) << " of "
                   << n_files << " files.";
@@ -1391,7 +1391,7 @@ void write_nc_data(unixtime nc_init, unixtime nc_valid, int nc_accum,
       //
       // Append the derivation string.
       //
-      if(run_command == der) var_str << "_" << derive_str;
+      if(run_command == RunCommand::der) var_str << "_" << derive_str;
    }
 
    mlog << Debug(2)
@@ -1408,8 +1408,8 @@ void write_nc_data(unixtime nc_init, unixtime nc_valid, int nc_accum,
 
    // Add variable attributes.
    add_att(&nc_var, "name",  var_str.c_str());
-   if(run_command == der) cs = long_name_prefix;
-   else                   cs.clear();
+   if(run_command == RunCommand::der) cs = long_name_prefix;
+   else                               cs.clear();
    cs << var_info->long_name_attr();
    add_att(&nc_var, "long_name", cs.c_str());
 
@@ -1624,7 +1624,7 @@ void usage() {
 ////////////////////////////////////////////////////////////////////////
 
 void set_sum(const StringArray &) {
-   run_command = sum;
+   run_command = RunCommand::sum;
    derive_list.clear();
    derive_list.add("sum");
 }
@@ -1632,7 +1632,7 @@ void set_sum(const StringArray &) {
 ////////////////////////////////////////////////////////////////////////
 
 void set_add(const StringArray &) {
-   run_command = add;
+   run_command = RunCommand::add;
    derive_list.clear();
    derive_list.add("sum");
 }
@@ -1640,7 +1640,7 @@ void set_add(const StringArray &) {
 ////////////////////////////////////////////////////////////////////////
 
 void set_subtract(const StringArray &) {
-   run_command = sub;
+   run_command = RunCommand::sub;
    derive_list.clear();
    derive_list.add("diff");
 }
@@ -1648,7 +1648,7 @@ void set_subtract(const StringArray &) {
 ////////////////////////////////////////////////////////////////////////
 
 void set_derive(const StringArray & a) {
-   run_command = der;
+   run_command = RunCommand::der;
    derive_list.clear();
 
    StringArray sa;

@@ -1550,7 +1550,7 @@ void process_edecks(const StringArray &files,
          if((line.valid_hour() % valid_freq_sec) != 0) continue;
 
          // Only process genesis probability lines
-         if(line.type() == ATCFLineType_ProbGN) {
+         if(line.type() == ATCFLineType::ProbGN) {
             dland = conf_info.compute_dland(line.lat(), -1.0*line.lon());
             if(probs.add(line, dland, false)) n_lines++;
          }
@@ -1564,7 +1564,7 @@ void process_edecks(const StringArray &files,
    // Dump out the total number of lines
    mlog << Debug(3)
         << "Read a total of " << n_lines << " "
-        << atcflinetype_to_string(ATCFLineType_ProbGN)
+        << atcflinetype_to_string(ATCFLineType::ProbGN)
         << " lines from " << files.n() << " input files.\n";
 
    // Dump out very verbose output

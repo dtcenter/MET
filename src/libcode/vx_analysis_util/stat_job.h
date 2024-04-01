@@ -37,7 +37,7 @@ static const bool   default_column_union = false;
 //
 // Ramp job type defaults
 //
-static const TimeSeriesType default_ramp_type            = TimeSeriesType_DyDt;
+static const TimeSeriesType default_ramp_type            = TimeSeriesType::DyDt;
 static const char           default_ramp_line_type[]     = "MPR";
 static const char           default_ramp_out_line_type[] = "CTC,CTS";
 static const char           default_ramp_fcst_col[]      = "FCST";

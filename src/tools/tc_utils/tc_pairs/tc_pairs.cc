@@ -710,7 +710,7 @@ void process_prob_files(const StringArray &files,
          if(!is_keeper(&line)) continue;
 
          // Only process probability of RI lines
-         if(line.type() == ATCFLineType_ProbRI) {
+         if(line.type() == ATCFLineType::ProbRI) {
             dland = compute_dland(line.lat(), -1.0*line.lon());
             if(probs.add(line, dland, conf_info.CheckDup)) {
                cur_add++;
@@ -1013,7 +1013,7 @@ void filter_probs(ProbInfoArray &probs) {
       }
 
       // If we've made it here, retain this probability
-      if(p[i]->type() == ATCFLineType_ProbRI) probs.add(p.prob_rirw(i));
+      if(p[i]->type() == ATCFLineType::ProbRI) probs.add(p.prob_rirw(i));
    }
 
    // Print summary filtering info

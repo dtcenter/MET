@@ -24,11 +24,11 @@
 // Enumerate all the possible line types
 enum TCStatLineType {
 
-   TCStatLineType_TCMPR,
-   TCStatLineType_TCDIAG,
-   TCStatLineType_ProbRIRW,
-   TCStatLineType_Header,
-   NoTCStatLineType
+   TCMPR,
+   TCDIAG,
+   ProbRIRW,
+   Header,
+   None
 
 };
 
@@ -103,7 +103,7 @@ class TCStatLine : public DataLine {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline  TCStatLineType TCStatLine::type() const { return(Type); }
+inline  TCStatLineType TCStatLine::type() const { return Type; }
 
 ////////////////////////////////////////////////////////////////////////
 

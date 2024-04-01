@@ -576,8 +576,8 @@ void ModePsFile::do_page_1(ModeFuzzyEngine & eng, EngineType eng_type, const cha
    Htab_b = Htab_a + 5.0*TextSep;
    Htab_c = Htab_a + 10.0*TextSep;
 
-   if ( eng_type == FOEng )  do_page_1_FOEng (eng, eng_type, title);
-   else                      do_page_1_other (eng, eng_type, title);
+   if ( eng_type == EngineType::FOEng ) do_page_1_FOEng (eng, eng_type, title);
+   else                                 do_page_1_other (eng, eng_type, title);
 
    showpage();
 

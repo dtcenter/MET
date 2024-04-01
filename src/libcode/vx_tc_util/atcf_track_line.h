@@ -177,7 +177,7 @@ class ATCFTrackLine : public ATCFLineBase {
       bool          warm_core       () const;      
 
          //
-         // specific to ATCFLineType_Track
+         // specific to ATCFLineType::Track
          //
 
       int           gusts           () const;
@@ -198,7 +198,7 @@ class ATCFTrackLine : public ATCFLineBase {
       int           seas_radius4    () const;
 
          //
-         // specific to ATCFLineType_GenTrack
+         // specific to ATCFLineType::GenTrack
          //
 
       double        parameter_b     () const;

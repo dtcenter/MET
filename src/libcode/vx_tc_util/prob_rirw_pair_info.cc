@@ -268,7 +268,7 @@ void ProbRIRWPairInfo::set(const TCStatLine &l) {
    clear();
 
    // Check the line type
-   if(l.type() != TCStatLineType_ProbRIRW) return;
+   if(l.type() != TCStatLineType::ProbRIRW) return;
 
    // Parse ProbRIRWInfo
    ProbRIRW.set(l);

@@ -109,17 +109,17 @@ struct cs_cmp {
 //
 // Enumerate all the possible TC-STAT Analysis Job Types
 //
-enum TCStatJobType {
+enum class TCStatJobType {
 
-   TCStatJobType_Filter,   // Filter out the TC-STAT data and write
-                           // the lines to the filename specified.
-   TCStatJobType_Summary,  // Compute summary info for one or more
-                           // columns of data.
-   TCStatJobType_RIRW,     // Derive contingency table and statistics
-                           // for RI/RW events.
-   TCStatJobType_ProbRIRW, // Derive probabilistic contingency table and
-                           // statistics for PROBRIRW lines.
-   NoTCStatJobType         // Default value
+   Filter,   // Filter out the TC-STAT data and write
+             // the lines to the filename specified.
+   Summary,  // Compute summary info for one or more
+             // columns of data.
+   RIRW,     // Derive contingency table and statistics
+             // for RI/RW events.
+   ProbRIRW, // Derive probabilistic contingency table and
+             // statistics for PROBRIRW lines.
+   None      // Default value
 };
 
 extern TCStatJobType string_to_tcstatjobtype(const ConcatString);

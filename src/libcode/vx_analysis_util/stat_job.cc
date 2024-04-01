@@ -2743,7 +2743,7 @@ ConcatString STATAnalysisJob::get_jobstring() const {
       // ramp_type
       js << "-ramp_type " << timeseriestype_to_string(ramp_type) << " ";
 
-      if(ramp_type == TimeSeriesType_DyDt) {
+      if(ramp_type == TimeSeriesType::DyDt) {
 
          // ramp_time
          if(ramp_time_fcst == ramp_time_obs) {
@@ -2767,7 +2767,7 @@ ConcatString STATAnalysisJob::get_jobstring() const {
          }
       }
 
-      if(ramp_type == TimeSeriesType_Swing) {
+      if(ramp_type == TimeSeriesType::Swing) {
 
          // swing_width
          js << "-swing_width " << swing_width << " ";

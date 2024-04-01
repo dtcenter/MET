@@ -552,7 +552,7 @@ void ModePsFile::make_plot(bool isMultivarSuper)
         << ConfInfo->Obs->var_info->level_attr();
    }
 
-   plot_engine(*Engine, FOEng, s.c_str());
+   plot_engine(*Engine, EngineType::FOEng, s.c_str());
 
    if ( (fcst_merge_flag == MergeType::Both) || (fcst_merge_flag == MergeType::Thresh) )  {
 
@@ -562,7 +562,7 @@ void ModePsFile::make_plot(bool isMultivarSuper)
 
    if ( (fcst_merge_flag == MergeType::Both) || (fcst_merge_flag == MergeType::Engine) )  {
 
-      plot_engine(*(Engine->fcst_engine), FFEng, "Forecast: ModeFuzzyEngine Merging");
+      plot_engine(*(Engine->fcst_engine), EngineType::FFEng, "Forecast: ModeFuzzyEngine Merging");
 
    }
 
@@ -574,7 +574,7 @@ void ModePsFile::make_plot(bool isMultivarSuper)
 
    if ( (obs_merge_flag == MergeType::Both) || (obs_merge_flag == MergeType::Engine) )  {
 
-      plot_engine(*(Engine->obs_engine), OOEng, "Observation: ModeFuzzyEngine Merging");
+      plot_engine(*(Engine->obs_engine), EngineType::OOEng, "Observation: ModeFuzzyEngine Merging");
 
    }
 
@@ -633,12 +633,12 @@ void ModePsFile::plot_threshold_merging (ModeFuzzyEngine & eng, const char * tit
    if ( fcst )  {
 
       comment("threshold merging page: fcst raw");
-      render_ppm(eng, FOEng, *(eng.fcst_raw), fcst, 0);
+      render_ppm(eng, EngineType::FOEng, *(eng.fcst_raw), fcst, 0);
 
    } else {
 
       comment("threshold merging page: obs raw");
-      render_ppm(eng, FOEng, *(eng.obs_raw),  fcst, 0);
+      render_ppm(eng, EngineType::FOEng, *(eng.obs_raw),  fcst, 0);
 
    }
 
@@ -661,12 +661,12 @@ void ModePsFile::plot_threshold_merging (ModeFuzzyEngine & eng, const char * tit
    if ( fcst )  {
 
       comment("threshold merging page: fcst raw");
-      render_ppm(eng, FOEng, *(eng.fcst_split), fcst, 2);
+      render_ppm(eng, EngineType::FOEng, *(eng.fcst_split), fcst, 2);
 
    } else {
 
       comment("threshold merging page: obs split");
-      render_ppm(eng, FOEng, *(eng.obs_split),  fcst, 2);
+      render_ppm(eng, EngineType::FOEng, *(eng.obs_split),  fcst, 2);
 
    }
 
@@ -1021,17 +1021,17 @@ void ModePsFile::render_ppm(ModeFuzzyEngine & eng, EngineType eng_type, const Sh
    // Set up pointers to the appropriate colortable and fill color values
    //
 
-   if ( eng_type == FFEng ) {
+   if ( eng_type == EngineType::FFEng ) {
 
       ct         = &FcstRawCtable;
       fill_color =  FcstFillColor;
 
-   } else if ( eng_type == OOEng ) {
+   } else if ( eng_type == EngineType::OOEng ) {
 
       ct         = &ObsRawCtable;
       fill_color =  ObsFillColor;
 
-   } else { // eng_type == FOEng
+   } else { // eng_type == EngineType::FOEng
 
       if ( fcst )  {
 

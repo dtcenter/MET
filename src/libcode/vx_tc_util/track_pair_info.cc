@@ -311,8 +311,8 @@ void TrackPairInfo::add(const TrackPoint &a, const TrackPoint &b,
 void TrackPairInfo::add(const TCStatLine &l) {
 
    // Check the line type
-        if(l.type() == TCStatLineType_TCMPR)  add_tcmpr_line(l);
-   else if(l.type() == TCStatLineType_TCDIAG) add_tcdiag_line(l);
+        if(l.type() == TCStatLineType::TCMPR)  add_tcmpr_line(l);
+   else if(l.type() == TCStatLineType::TCDIAG) add_tcdiag_line(l);
 
    return;
 }
@@ -327,7 +327,7 @@ void TrackPairInfo::add_tcmpr_line(const TCStatLine &l) {
    int i, j;
 
    // Check the line type
-   if(l.type() != TCStatLineType_TCMPR) return;
+   if(l.type() != TCStatLineType::TCMPR) return;
 
    // Store the input TCMPR line and TCDIAG placeholder
    TCMPRLine.push_back(l);
@@ -439,7 +439,7 @@ void TrackPairInfo::add_tcdiag_line(const TCStatLine &l) {
    ConcatString cs;
 
    // Check the line type
-   if(l.type() != TCStatLineType_TCDIAG) return;
+   if(l.type() != TCStatLineType::TCDIAG) return;
 
    // Should have already parsed TCMPR
    if(NPoints == 0) {

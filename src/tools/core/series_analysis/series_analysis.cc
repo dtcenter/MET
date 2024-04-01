@@ -59,6 +59,7 @@
 #include "vx_nc_util.h"
 #include "vx_regrid.h"
 #include "vx_log.h"
+#include "enum_as_int.hpp"
 
 using namespace std;
 using namespace netCDF;
@@ -262,35 +263,35 @@ void process_command_line(int argc, char **argv) {
    // - Forecast file list
    // - Observation file list
    if(conf_info.get_n_fcst() > 1) {
-      series_type = SeriesType_Fcst_Conf;
+      series_type = SeriesType::Fcst_Conf;
       n_series = conf_info.get_n_fcst();
       mlog << Debug(1)
            << "Series defined by the \"fcst.field\" configuration entry "
            << "of length " << n_series << ".\n";
    }
    else if(conf_info.get_n_obs() > 1) {
-      series_type = SeriesType_Obs_Conf;
+      series_type = SeriesType::Obs_Conf;
       n_series = conf_info.get_n_obs();
       mlog << Debug(1)
            << "Series defined by the \"obs.field\" configuration entry "
            << "of length " << n_series << ".\n";
    }
    else if(fcst_files.n() > 1) {
-      series_type = SeriesType_Fcst_Files;
+      series_type = SeriesType::Fcst_Files;
       n_series = fcst_files.n();
       mlog << Debug(1)
            << "Series defined by the forecast file list of length "
            << n_series << ".\n";
    }
    else if(obs_files.n() > 1) {
-      series_type = SeriesType_Obs_Files;
+      series_type = SeriesType::Obs_Files;
       n_series = obs_files.n();
       mlog << Debug(1)
            << "Series defined by the observation file list of length "
            << n_series << ".\n";
    }
    else {
-      series_type = SeriesType_Fcst_Conf;
+      series_type = SeriesType::Fcst_Conf;
       n_series = 1;
       mlog << Debug(1)
            << "The \"fcst.field\" and \"obs.field\" configuration entries "
@@ -424,7 +425,7 @@ void get_series_data(int i_series,
    // Switch on the series type
    switch(series_type) {
 
-      case SeriesType_Fcst_Conf:
+      case SeriesType::Fcst_Conf:
          get_series_entry(i_series, fcst_info, fcst_files,
                           ftype, found_fcst_files, fcst_dp, fcst_grid);
          if(conf_info.get_n_obs() == 1) {
@@ -438,7 +439,7 @@ void get_series_data(int i_series,
                           otype, found_obs_files, obs_dp, obs_grid);
          break;
 
-      case SeriesType_Obs_Conf:
+      case SeriesType::Obs_Conf:
          get_series_entry(i_series, obs_info, obs_files,
                           otype, found_obs_files, obs_dp, obs_grid);
          if(conf_info.get_n_fcst() == 1) {
@@ -452,7 +453,7 @@ void get_series_data(int i_series,
                           ftype, found_fcst_files, fcst_dp, fcst_grid);
          break;
 
-      case SeriesType_Fcst_Files:
+      case SeriesType::Fcst_Files:
          found_fcst_files.set(i_series, fcst_files[i_series]);
          get_series_entry(i_series, fcst_info, fcst_files,
                           ftype, found_fcst_files, fcst_dp, fcst_grid);
@@ -470,7 +471,7 @@ void get_series_data(int i_series,
                           otype, found_obs_files, obs_dp, obs_grid);
          break;
 
-      case SeriesType_Obs_Files:
+      case SeriesType::Obs_Files:
          found_obs_files.set(i_series, obs_files[i_series]);
          get_series_entry(i_series, obs_info, obs_files,
                           otype, found_obs_files, obs_dp, obs_grid);
@@ -491,7 +492,7 @@ void get_series_data(int i_series,
       default:
          mlog << Error << "\nget_series_data() -> "
               << "unexpected SeriesType value: "
-              << series_type << "\n\n";
+              << enum_class_as_int(series_type) << "\n\n";
          exit(1);
    }
 
