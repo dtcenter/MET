@@ -41,6 +41,5 @@ fi
 
 # Copy the .scannerwork directory from the image
 id=$(docker create ${DOCKERHUB_TAG})
-/met/MET-develop/.scannerwork/report-task.txt
 time_command docker cp $id:/met/.scannerwork .scannerwork
 docker rm -v $id
