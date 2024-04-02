@@ -130,7 +130,6 @@ else
       -e "s|SONAR_PROJECT_KEY|MET_python_NB|" \
       -e "s|SONAR_PROJECT_NAME|MET python Nightly Build|" \
       -e "s|SONAR_BRANCH_NAME|develop|" \
-      -e "s|SONAR_REFERENCE_BRANCH|develop|" \
       $SCRIPT_DIR/python.sonar-project.properties > $SONAR_PROPERTIES
 
   # Run SonarQube scan for Python code
@@ -143,7 +142,6 @@ else
       -e "s|SONAR_PROJECT_KEY|MET_develop_NB|" \
       -e "s|SONAR_PROJECT_NAME|MET Nightly Build|" \
       -e "s|SONAR_BRANCH_NAME|develop|" \
-      -e "s|SONAR_REFERENCE_BRANCH|develop|" \
       $SCRIPT_DIR/sonar-project.properties > $SONAR_PROPERTIES
 
   # Run SonarQube clean

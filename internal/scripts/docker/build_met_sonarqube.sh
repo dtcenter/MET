@@ -95,6 +95,11 @@ sed -e "s|SONAR_TOKEN|$SONAR_TOKEN|" \
     -e "s|SONAR_REFERENCE_BRANCH|$SONAR_REFERENCE_BRANCH|" \
     $SONAR_PROPERTIES_DIR/python.sonar-project.properties > $SONAR_PROPERTIES
 
+# The source and reference branches must differ to define new code
+if [ "$MET_GIT_NAME" != "$SONAR_REFERENCE_BRANCH" ]; then
+  echo "sonar.newCode.referenceBranch=${SONAR_REFERENCE_BRANCH}" >> $SONAR_PROPERTIES
+fi
+ 
 # Run SonarQube scan for Python code
 time_command $SONAR_SCANNER
 
@@ -112,6 +117,11 @@ sed -e "s|SONAR_TOKEN|$SONAR_TOKEN|" \
     -e "s|SONAR_REFERENCE_BRANCH|$SONAR_REFERENCE_BRANCH|" \
     $SONAR_PROPERTIES_DIR/sonar-project.properties > $SONAR_PROPERTIES
 
+# The source and reference branches must differ to define new code
+if [ "$MET_GIT_NAME" != "$SONAR_REFERENCE_BRANCH" ]; then
+  echo "sonar.newCode.referenceBranch=${SONAR_REFERENCE_BRANCH}" >> $SONAR_PROPERTIES
+fi
+ 
 # Run the configure script
 time_command ./configure \
   BUFRLIB_NAME=${BUFRLIB_NAME} \
