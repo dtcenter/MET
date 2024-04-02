@@ -41,6 +41,6 @@ fi
 
 # Copy the .scannerwork directory from the image
 id=$(docker create ${DOCKERHUB_TAG})
-time_command docker cp $id:/met/.scannerwork met_sonarqube 
-mv met_sonarqube/*task-report.txt ${GITHUB_WORKSPACE}/.
+time_command docker cp $id:/met/.scannerwork met_scannerwork 
+mv met_scannerwork/*.txt ${GITHUB_WORKSPACE}/.
 docker rm -v $id
