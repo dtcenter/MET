@@ -22,6 +22,9 @@ If **yes**, describe the new output and/or changes to the existing output:</br>
 - [ ] Will this PR result in changes to existing METplus Use Cases? **[Yes or No]**</br>
 If **yes**, create a new **Update Truth** [METplus issue](https://github.com/dtcenter/METplus/issues/new/choose) to describe them.
 
+- [ ] Do these changes introduce new SonarQube findings? **[Yes or No]**</br>
+If **yes**, please describe:
+
 - [ ] Please complete this pull request review by **[Fill in date]**.</br>
 
 ## Pull Request Checklist ##
