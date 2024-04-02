@@ -38,3 +38,10 @@ if [ $? != 0 ]; then
   cat ${CMD_LOGFILE}
   exit 1
 fi
+
+# Copy the .scannerwork directory from the image
+id=$(docker create ${DOCKERHUB_TAG})
+/met/MET-develop/.scannerwork/report-task.txt
+time_command docker cp $id:/met/.scannerwork .scannerwork
+mv .scannerwork ${GITHUB_WORKSPACE}/.
+docker rm -v $id
