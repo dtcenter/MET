@@ -73,8 +73,8 @@ jobs:
 
       - name: Copy report tasks into sonarqube directory
         run: |
-          cp ${GITHUB_WORKSPACE}/*report-task.txt ${RUNNER_WORKSPACE}/sonarqube/
-          grep dashboardUrl ${RUNNER_WORKSPACE}/sonarqube/*report-task.txt | cut -d'=' -f2-10 
+          cp /tmp/met_scannerwork/*.txt ${RUNNER_WORKSPACE}/sonarqube/
+          grep dashboardUrl ${RUNNER_WORKSPACE}/sonarqube/*.txt | cut -d'=' -f2-10 
 
       - name: SonarQube Python Quality Gate check
         id: sonarqube-python-quality-gate-check
