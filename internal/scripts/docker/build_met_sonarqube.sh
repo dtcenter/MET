@@ -100,7 +100,7 @@ time_command $SONAR_SCANNER
 
 # Copy the Python scan report-task.txt file
 mkdir -p /met/.scannerwork
-cp /met/MET-*/.scannerwork/report-task.txt /met/.scannerwork/python-report-task.txt
+cp .scannerwork/report-task.txt /met/.scannerwork/python-report-task.txt
 
 # Copy sonar-project.properties for C/C++ code
 [ -e $SONAR_PROPERTIES ] && rm $SONAR_PROPERTIES
@@ -131,6 +131,6 @@ time_command $SONAR_SCANNER
 
 # Copy the C/C++ scan report-task.txt file
 mkdir -p /met/.scannerwork
-cp /met/MET-*/.scannerwork/report-task.txt /met/.scannerwork/cxx-report-task.txt
+cp .scannerwork/report-task.txt /met/.scannerwork/cxx-report-task.txt
 
 [ -e $SONAR_PROPERTIES ] && rm $SONAR_PROPERTIES
