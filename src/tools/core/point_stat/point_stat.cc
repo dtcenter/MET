@@ -381,7 +381,7 @@ void setup_first_pass(const DataPlane &dp, const Grid &data_grid) {
 ////////////////////////////////////////////////////////////////////////
 
 void setup_txt_files() {
-   int i, max_col, max_prob_col, max_mctc_col, max_orank_col;
+   int max_col, max_prob_col, max_mctc_col, max_orank_col;
    int n_prob, n_cat, n_eclv, n_ens;
    ConcatString base_name;
 
@@ -439,10 +439,7 @@ void setup_txt_files() {
    /////////////////////////////////////////////////////////////////////
 
    // Loop through output file type
-   // JHG MET #2379 introduce a code smell to see if SonarQube
-   //               correctly identifies it as a new code smell 
-   // for(int i=0; i<n_txt; i++) {
-   for(i=0; i<n_txt; i++) {
+   for(int i=0; i<n_txt; i++) {
 
       // Only set it up if requested in the config file
       if(conf_info.output_flag[i] == STATOutputType_Both) {
