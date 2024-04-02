@@ -39,11 +39,11 @@ if [ $? != 0 ]; then
   exit 1
 fi
 
-time_command docker run -it --rm ${DOCKERHUB_TAG} ls /
-time_command docker run -it --rm ${DOCKERHUB_TAG} ls /met
-time_command docker run -it --rm ${DOCKERHUB_TAG} ls /met/.scannerwork
-time_command docker run -it --rm ${DOCKERHUB_TAG} cat /met/.scannerwork/python-report-task.txt
-time_command docker run -it --rm ${DOCKERHUB_TAG} cat /met/.scannerwork/cxx-report-task.txt
+time_command docker run --rm ${DOCKERHUB_TAG} ls /
+time_command docker run --rm ${DOCKERHUB_TAG} ls /met
+time_command docker run --rm ${DOCKERHUB_TAG} ls /met/.scannerwork
+time_command docker run --rm ${DOCKERHUB_TAG} cat /met/.scannerwork/python-report-task.txt
+time_command docker run --rm ${DOCKERHUB_TAG} cat /met/.scannerwork/cxx-report-task.txt
 
 # Copy the .scannerwork directory from the image
 id=$(docker create ${DOCKERHUB_TAG})
