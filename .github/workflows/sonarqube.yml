@@ -51,7 +51,7 @@ jobs:
           fetch-depth: 0
 
       - name: Create directories to store output
-        run: mkdir -p ${RUNNER_WORKSPACE}/logs
+        run: mkdir -p ${RUNNER_WORKSPACE}/logs ${RUNNER_WORKSPACE}/.scannerwork
 
       - name: Get branch name
         id: get_branch_name
@@ -69,12 +69,9 @@ jobs:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-      - name: Copy .scannerwork directory 
-        run: |
-          cp -r ${GITHUB_WORKSPACE}/.scannerwork ${RUNNER_WORKSPACE}/.
-          ls ${RUNNER_WORKSPACE}/.scannerwork
-          cat ${RUNNER_WORKSPACE}/.scannerwork/python-report-task.txt
-          cat ${RUNNER_WORKSPACE}/.scannerwork/cxx-report-task.txt
+      - name: Copy report tasks into .scannerwork directory
+        if: always()
+        run: cp ${GITHUB_WORKSPACE}/*report-task.txt ${RUNNER_WORKSPACE}/.scannerwork/
 
       - name: SonarQube Python Quality Gate check
         id: sonarqube-python-quality-gate-check
@@ -96,7 +93,7 @@ jobs:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-      - name: Copy all log files into logs directory
+      - name: Copy log files into logs directory
         if: always()
         run: cp ${GITHUB_WORKSPACE}/*.log ${RUNNER_WORKSPACE}/logs/
 
