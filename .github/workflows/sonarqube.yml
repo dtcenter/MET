@@ -57,7 +57,7 @@ jobs:
         id: get_branch_name
         run: echo branch_name=${GITHUB_REF#refs/heads/} >> $GITHUB_OUTPUT
 
-      - name: Run SonarQube in Docker
+      - name: SonarQube Scan in Docker
         run: .github/jobs/build_sonarqube_image.sh
         env:
           MET_BASE_REPO: met-base
@@ -66,6 +66,14 @@ jobs:
           WD_REFERENCE_BRANCH: ${{ github.event.inputs.reference_branch }}
           MET_CONFIG_OPTS: '--enable-all'
           SONAR_SCANNER_VERSION: 5.0.1.3006
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      - name: SonarQube Quality Gate check
+        id: sonarqube-quality-gate-check
+        uses: sonarsource/sonarqube-quality-gate-action@master
+        timeout-minutes: 5
+        env:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
