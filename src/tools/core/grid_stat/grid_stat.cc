@@ -309,8 +309,6 @@ void process_command_line(int argc, char **argv) {
 #ifdef WITH_UGRID
       ConcatString ugrid_dataset = conf_info.ugrid_dataset;
       if (0 < ugrid_dataset.length()) {
-      }
-      if (0 < ugrid_dataset.length()) {
          double max_distance_km = conf_info.ugrid_max_distance_km;
          ConcatString ugrid_nc = conf_info.ugrid_nc;
          ConcatString ugrid_map_config_filename = conf_info.ugrid_map_config;
