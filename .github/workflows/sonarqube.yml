@@ -50,8 +50,10 @@ jobs:
           # Disable shallow clones for better analysis
           fetch-depth: 0
 
-      - name: Create directories to store output
-        run: mkdir -p ${RUNNER_WORKSPACE}/logs ${RUNNER_WORKSPACE}/.scannerwork
+      - name: Create output directories
+        run: |
+          mkdir -p ${RUNNER_WORKSPACE}/logs
+          mkdir -p ${RUNNER_WORKSPACE}/sonarqube
 
       - name: Get branch name
         id: get_branch_name
@@ -69,15 +71,16 @@ jobs:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-      - name: Copy report tasks into .scannerwork directory
-        if: always()
-        run: cp ${GITHUB_WORKSPACE}/*report-task.txt ${RUNNER_WORKSPACE}/.scannerwork/
+      - name: Copy report tasks into sonarqube directory
+        run: |
+          cp ${GITHUB_WORKSPACE}/*report-task.txt ${RUNNER_WORKSPACE}/sonarqube/
+          grep dashboardUrl ${RUNNER_WORKSPACE}/sonarqube/*report-task.txt | cut -d'=' -f2-10 
 
       - name: SonarQube Python Quality Gate check
         id: sonarqube-python-quality-gate-check
         uses: sonarsource/sonarqube-quality-gate-action@master
         with:
-          scanMetadataReportFile: ${RUNNER_WORKSPACE}/.scannerwork/python-report-task.txt
+          scanMetadataReportFile: ${RUNNER_WORKSPACE}/sonarqube/python-report-task.txt
         timeout-minutes: 5
         env:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
@@ -87,7 +90,7 @@ jobs:
         id: sonarqube-cxx-quality-gate-check
         uses: sonarsource/sonarqube-quality-gate-action@master
         with:
-          scanMetadataReportFile: ${RUNNER_WORKSPACE}/.scannerwork/cxx-report-task.txt
+          scanMetadataReportFile: ${RUNNER_WORKSPACE}/sonarqube/cxx-report-task.txt
         timeout-minutes: 5
         env:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
