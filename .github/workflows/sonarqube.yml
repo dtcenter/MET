@@ -70,7 +70,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       - name: SonarQube Python Quality Gate check
-        id: sonarqube-quality-gate-check
+        id: sonarqube-python-quality-gate-check
         uses: sonarsource/sonarqube-quality-gate-action@master
         with:
           scanMetadataReportFile: .scannerwork/python-report-task.txt
@@ -80,7 +80,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       - name: SonarQube CXX Quality Gate check
-        id: sonarqube-quality-gate-check
+        id: sonarqube-cxx-quality-gate-check
         uses: sonarsource/sonarqube-quality-gate-action@master
         with:
           scanMetadataReportFile: .scannerwork/cxx-report-task.txt
