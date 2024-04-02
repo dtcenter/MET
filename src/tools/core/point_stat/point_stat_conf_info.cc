@@ -49,7 +49,9 @@ void PointStatConfInfo::init_from_scratch() {
    // Initialize pointers
    vx_opt = (PointStatVxOpt *) nullptr;
 
+#ifdef WITH_UGRID
    ignore_ugrid_dataset = false;
+#endif
    clear();
 
    return;
@@ -116,7 +118,6 @@ void PointStatConfInfo::read_ugrid_configs(StringArray ugrid_config_names, const
          conf.read(file_name.c_str());
          ugrid_dataset = file_name;
          ignore_ugrid_dataset = true;
-cout << "  DEBUG ignore_ugrid_dataset = " << ignore_ugrid_dataset << "  ugrid_dataset = " << ugrid_dataset<< "==========================\n";
       }
       else mlog << Warning << "\nPointStatConfInfo::read_ugrid_configs(StringArray) -> "
                 << "The configuration file \"" << ugrid_config_names[i]<< "\" does not exist.\n\n";
@@ -152,7 +153,6 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
 
 #ifdef WITH_UGRID
    // Conf: ugrid_dataset
-cout << "  DEBUG ===== ignore_ugrid_dataset = " << ignore_ugrid_dataset << "   ugrid_dataset=" << ugrid_dataset<< "==========================\n";
    if (!ignore_ugrid_dataset) ugrid_dataset = parse_conf_ugrid_dataset(&conf);
 
    // Conf: ugrid_nc

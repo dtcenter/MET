@@ -49,7 +49,9 @@ void GridStatConfInfo::init_from_scratch() {
    // Initialize pointers
    vx_opt = (GridStatVxOpt *) nullptr;
 
+#ifdef WITH_UGRID
    ignore_ugrid_dataset = false;
+#endif
    clear();
 
    return;
