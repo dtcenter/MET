@@ -69,11 +69,14 @@ jobs:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
+      - name: Copy .scannerwork directory 
+        run: cp -r ${GITHUB_WORKSPACE}/.scannerwork ${RUNNER_WORKSPACE}/.
+
       - name: SonarQube Python Quality Gate check
         id: sonarqube-python-quality-gate-check
         uses: sonarsource/sonarqube-quality-gate-action@master
         with:
-          scanMetadataReportFile: .scannerwork/python-report-task.txt
+          scanMetadataReportFile: ${RUNNER_WORKSPACE}/.scannerwork/python-report-task.txt
         timeout-minutes: 5
         env:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
@@ -83,7 +86,7 @@ jobs:
         id: sonarqube-cxx-quality-gate-check
         uses: sonarsource/sonarqube-quality-gate-action@master
         with:
-          scanMetadataReportFile: .scannerwork/cxx-report-task.txt
+          scanMetadataReportFile: ${RUNNER_WORKSPACE}/.scannerwork/cxx-report-task.txt
         timeout-minutes: 5
         env:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}

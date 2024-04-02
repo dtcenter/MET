@@ -41,5 +41,5 @@ fi
 
 # Copy the .scannerwork directory from the image
 id=$(docker create ${DOCKERHUB_TAG})
-time_command docker cp $id:/met/.scannerwork .scannerwork
+time_command docker cp $id:/met/.scannerwork ${GITHUB_WORKSPACE}/.scannerwork
 docker rm -v $id
