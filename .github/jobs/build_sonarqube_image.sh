@@ -43,5 +43,4 @@ fi
 id=$(docker create ${DOCKERHUB_TAG})
 /met/MET-develop/.scannerwork/report-task.txt
 time_command docker cp $id:/met/.scannerwork .scannerwork
-mv .scannerwork ${GITHUB_WORKSPACE}/.
 docker rm -v $id

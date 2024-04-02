@@ -99,8 +99,8 @@ sed -e "s|SONAR_TOKEN|$SONAR_TOKEN|" \
 time_command $SONAR_SCANNER
 
 # Copy the Python scan report-task.txt file
-time_command mkdir -p /met/.scannerwork
-time_command cp /met/MET-*/.scannerwork/report-task.txt /met/.scannerwork/python-report-task.txt
+mkdir -p /met/.scannerwork
+cp /met/MET-*/.scannerwork/report-task.txt /met/.scannerwork/python-report-task.txt
 
 # Copy sonar-project.properties for C/C++ code
 [ -e $SONAR_PROPERTIES ] && rm $SONAR_PROPERTIES
@@ -130,7 +130,7 @@ time_command $SONAR_WRAPPER --out-dir $SONARQUBE_OUT_DIR make
 time_command $SONAR_SCANNER
 
 # Copy the C/C++ scan report-task.txt file
-time_command mkdir -p /met/.scannerwork
-time_command cp /met/MET-*/.scannerwork/report-task.txt /met/.scannerwork/cxx-report-task.txt
+mkdir -p /met/.scannerwork
+cp /met/MET-*/.scannerwork/report-task.txt /met/.scannerwork/cxx-report-task.txt
 
 [ -e $SONAR_PROPERTIES ] && rm $SONAR_PROPERTIES
