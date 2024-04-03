@@ -201,13 +201,13 @@ void do_job(const ConcatString &jobstring, STATAnalysisJob &job,
    // Print warning for by_column option
    //
    if(job.by_column.n() > 0              &&
-      job.job_type != stat_job_summary   &&
-      job.job_type != stat_job_aggr      &&
-      job.job_type != stat_job_aggr_stat &&
-      job.job_type != stat_job_ramp      &&
-      job.job_type != stat_job_go_index  &&
-      job.job_type != stat_job_cbs_index &&
-      job.job_type != stat_job_ss_index) {
+      job.job_type != STATJobType::summary   &&
+      job.job_type != STATJobType::aggr      &&
+      job.job_type != STATJobType::aggr_stat &&
+      job.job_type != STATJobType::ramp      &&
+      job.job_type != STATJobType::go_index  &&
+      job.job_type != STATJobType::cbs_index &&
+      job.job_type != STATJobType::ss_index) {
       mlog << Warning << "\nThe -by option is ignored for the \""
            << statjobtype_to_string(job.job_type) << "\" job type.\n\n";
    }
@@ -216,8 +216,8 @@ void do_job(const ConcatString &jobstring, STATAnalysisJob &job,
    // Set up the random number generator and seed value
    // for the summary and aggregate stat jobs.
    //
-   if(job.job_type == stat_job_summary ||
-      job.job_type == stat_job_aggr_stat) {
+   if(job.job_type == STATJobType::summary ||
+      job.job_type == STATJobType::aggr_stat) {
       rng_set(rng_ptr, job.boot_rng, job.boot_seed);
    }
 
@@ -226,29 +226,29 @@ void do_job(const ConcatString &jobstring, STATAnalysisJob &job,
    //
    switch(job.job_type) {
 
-      case(stat_job_filter):
+      case(STATJobType::filter):
          do_job_filter(jobstring, f, job, n_in, n_out, sa_out);
          break;
 
-      case(stat_job_summary):
+      case(STATJobType::summary):
          do_job_summary(jobstring, f, job, n_in, n_out, sa_out, rng_ptr);
          break;
 
-      case(stat_job_aggr):
+      case(STATJobType::aggr):
          do_job_aggr(jobstring, f, job, n_in, n_out, sa_out);
          break;
 
-      case(stat_job_aggr_stat):
+      case(STATJobType::aggr_stat):
          do_job_aggr_stat(jobstring, f, job, n_in, n_out, sa_out, tmp_dir, rng_ptr);
          break;
 
-      case(stat_job_go_index):
-      case(stat_job_cbs_index):
-      case(stat_job_ss_index):
+      case(STATJobType::go_index):
+      case(STATJobType::cbs_index):
+      case(STATJobType::ss_index):
          do_job_ss_index(jobstring, f, job, n_in, n_out, sa_out);
          break;
 
-      case(stat_job_ramp):
+      case(STATJobType::ramp):
          do_job_ramp(jobstring, f, job, n_in, n_out, sa_out);
          break;
 

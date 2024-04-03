@@ -22,6 +22,7 @@
 #include "vx_statistics.h"
 #include "vx_math.h"
 #include "vx_log.h"
+#include "enum_as_int.hpp"
 
 using namespace std;
 
@@ -110,7 +111,7 @@ void STATAnalysisJob::clear() {
 
    precision = default_precision;
 
-   job_type = no_stat_job_type;
+   job_type = STATJobType::None;
 
    model.clear();
    desc.clear();
@@ -1704,7 +1705,7 @@ int STATAnalysisJob::set_job_type(const char *c) {
 
    job_type = string_to_statjobtype(c);
 
-   if(job_type == no_stat_job_type) return 1;
+   if(job_type == STATJobType::None) return 1;
    else                             return 0;
 }
 
@@ -2347,7 +2348,7 @@ ConcatString STATAnalysisJob::get_jobstring() const {
    js.clear();
 
    // job type
-   if(job_type != no_stat_job_type) {
+   if(job_type != STATJobType::None) {
       js << "-job " << statjobtype_to_string(job_type) << " ";
    }
 
@@ -2690,7 +2691,7 @@ ConcatString STATAnalysisJob::get_jobstring() const {
    }
 
    // out_cnt_logic
-   if(job_type == stat_job_aggr_stat &&
+   if(job_type == STATJobType::aggr_stat &&
       line_type.has(stat_mpr_str) &&
       (out_line_type.has(stat_cnt_str)  || out_line_type.has(stat_sl1l2_str)) &&
       (out_fcst_thresh.n() > 0 || out_obs_thresh.n() > 0)) {
@@ -2716,7 +2717,7 @@ ConcatString STATAnalysisJob::get_jobstring() const {
    }
 
    // out_wind_logic
-   if(job_type == stat_job_aggr_stat &&
+   if(job_type == STATJobType::aggr_stat &&
       line_type.has(stat_mpr_str) &&
       out_line_type.has(stat_wdir_str) &&
       (out_fcst_wind_thresh.get_type() != thresh_na ||
@@ -2725,7 +2726,7 @@ ConcatString STATAnalysisJob::get_jobstring() const {
    }
 
    // Jobs which use out_alpha
-   if(job_type == stat_job_summary        ||
+   if(job_type == STATJobType::summary        ||
        out_line_type.has(stat_cts_str)    ||
        out_line_type.has(stat_mcts_str)   ||
        out_line_type.has(stat_cnt_str)    ||
@@ -2738,7 +2739,7 @@ ConcatString STATAnalysisJob::get_jobstring() const {
    }
 
    // Ramp jobs
-   if(job_type == stat_job_ramp) {
+   if(job_type == STATJobType::ramp) {
 
       // ramp_type
       js << "-ramp_type " << timeseriestype_to_string(ramp_type) << " ";
@@ -2837,9 +2838,9 @@ ConcatString STATAnalysisJob::get_jobstring() const {
    }
 
    // Jobs which compute the skill score index
-   if(job_type == stat_job_go_index  ||
-      job_type == stat_job_cbs_index ||
-      job_type == stat_job_ss_index) {
+   if(job_type == STATJobType::go_index  ||
+      job_type == STATJobType::cbs_index ||
+      job_type == STATJobType::ss_index) {
 
       // ss_index_name
       js << "-ss_index_name " << ss_index_name << " ";
@@ -2937,7 +2938,7 @@ int STATAnalysisJob::is_in_mask_sid(const char *sid) const {
 ////////////////////////////////////////////////////////////////////////
 
 const char * statjobtype_to_string(const STATJobType t) {
-   return statjobtype_str[t];
+   return statjobtype_str[enum_class_as_int(t)];
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2956,23 +2957,23 @@ STATJobType string_to_statjobtype(const char *str) {
    STATJobType t;
 
    if(     strcasecmp(str, statjobtype_str[0]) == 0)
-      t = stat_job_filter;
+      t = STATJobType::filter;
    else if(strcasecmp(str, statjobtype_str[1]) == 0)
-      t = stat_job_summary;
+      t = STATJobType::summary;
    else if(strcasecmp(str, statjobtype_str[2]) == 0)
-      t = stat_job_aggr;
+      t = STATJobType::aggr;
    else if(strcasecmp(str, statjobtype_str[3]) == 0)
-      t = stat_job_aggr_stat;
+      t = STATJobType::aggr_stat;
    else if(strcasecmp(str, statjobtype_str[4]) == 0)
-      t = stat_job_go_index;
+      t = STATJobType::go_index;
    else if(strcasecmp(str, statjobtype_str[5]) == 0)
-      t = stat_job_cbs_index;
+      t = STATJobType::cbs_index;
    else if(strcasecmp(str, statjobtype_str[6]) == 0)
-      t = stat_job_ss_index;
+      t = STATJobType::ss_index;
    else if(strcasecmp(str, statjobtype_str[7]) == 0)
-      t = stat_job_ramp;
+      t = STATJobType::ramp;
    else
-      t = no_stat_job_type;
+      t = STATJobType::None;
 
    return t;
 }

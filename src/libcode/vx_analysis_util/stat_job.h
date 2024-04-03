@@ -57,30 +57,30 @@ static const int dump_stat_buffer_cols = 512;
 //
 // Enumerate all the possible STAT Analysis Job Types
 //
-enum STATJobType {
+enum class STATJobType {
 
-   stat_job_filter    = 0, // Filter out the STAT data and write the
-                           // lines to the filename specified.
+   filter    = 0, /* Filter out the STAT data and write the
+                     lines to the filename specified. */
 
-   stat_job_summary   = 1, // Compute min, max, mean, stdev and
-                           // percentiles for a column of data.
+   summary   = 1, /* Compute min, max, mean, stdev and
+                     percentiles for a column of data. */
 
-   stat_job_aggr      = 2, // Aggregate the input counts/scores and
-                           // generate the same output line type
-                           // containing the aggregated counts/scores.
+   aggr      = 2, /* Aggregate the input counts/scores and
+                     generate the same output line type
+                     containing the aggregated counts/scores. */
 
-   stat_job_aggr_stat = 3, // Aggregate the input counts/scores and
-                           // generate the requested output line type.
+   aggr_stat = 3, /* Aggregate the input counts/scores and
+                           // generate the requested output line type. */
 
-   stat_job_go_index  = 4, // Compute the GO Index.
+   go_index  = 4, /* Compute the GO Index. */
 
-   stat_job_cbs_index = 5, // Compute the CBS Index.
+   cbs_index = 5, /* Compute the CBS Index. */
 
-   stat_job_ss_index  = 6, // Compute the Skill Score Index.
+   ss_index  = 6, /* Compute the Skill Score Index. */
 
-   stat_job_ramp      = 7, // Time-series ramp evaluation.
+   ramp      = 7, /* Time-series ramp evaluation. */
 
-   no_stat_job_type   = 8  // Default value
+   None      = 8  /* Default value */
 };
 
 static const int n_statjobtypes = 9;
@@ -267,14 +267,14 @@ class STATAnalysisJob {
       NumArray     out_eclv_points;      // output ECLV points
 
       //
-      // Variables used for the stat_job_summary job type
+      // Variables used for the STATJobType::summary job type
       //
       bool         do_derive;
       StringArray  wmo_sqrt_stats;
       StringArray  wmo_fisher_stats;
 
       //
-      // Variables used for the stat_job_aggr_mpr job type
+      // Variables used for the STATJobType::aggr_mpr job type
       //
       ConcatString mask_grid_str;
       ConcatString mask_poly_str;
@@ -286,7 +286,7 @@ class STATAnalysisJob {
       StringArray  mask_sid;
 
       //
-      // Variables used for the stat_job_ramp job type
+      // Variables used for the STATJobType::ramp job type
       //
       TimeSeriesType ramp_type;
       int            ramp_time_fcst;   // stored in seconds

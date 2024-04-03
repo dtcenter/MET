@@ -3769,7 +3769,7 @@ void aggr_ss_index(LineDataFile &f, STATAnalysisJob &job,
       // and set the type to aggregation
       //
       fcst_term = job;
-      fcst_term.set_job_type(stat_job_aggr);
+      fcst_term.set_job_type(STATJobType::aggr);
 
       //
       // line_type
