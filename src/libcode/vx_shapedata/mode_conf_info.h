@@ -316,7 +316,7 @@ inline int ModeConfInfo::n_conv_radii() const
 {
    // this could break down if multivar mode relaxes
    // its limitations on number of radii (obs and fcst could be different)
-   if (data_type == ModeDataType_MvMode_Obs)
+   if (data_type == ModeDataType::MvMode_Obs)
    {
       return ( Obs->conv_radius_array.n_elements() );
    } else {
@@ -328,7 +328,7 @@ inline int ModeConfInfo::n_conv_threshs() const
 {
    // this could break down if multivar mode relaxes
    // its limitations on number of thresh (obs and fcst could be different)
-   if (data_type == ModeDataType_MvMode_Obs)
+   if (data_type == ModeDataType::MvMode_Obs)
    {
       return ( Obs->conv_thresh_array.n_elements() );
    } else {

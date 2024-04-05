@@ -192,7 +192,7 @@ void ModeFuzzyEngine::init_from_scratch() {
 
    clear_features();
 
-   data_type = ModeDataType_Traditional;
+   data_type = ModeDataType::Traditional;
  
    return;
 }
@@ -249,9 +249,9 @@ void ModeFuzzyEngine::clear_colors() {
 void ModeFuzzyEngine::set(const ShapeData &fcst_wd, const ShapeData &obs_wd)
 
 {
-   if (data_type == ModeDataType_MvMode_Fcst) {
+   if (data_type == ModeDataType::MvMode_Fcst) {
       set_fcst(fcst_wd);
-   } else if (data_type == ModeDataType_MvMode_Obs) {
+   } else if (data_type == ModeDataType::MvMode_Obs) {
       set_obs(obs_wd);
    } else {
       ConcatString path;
@@ -280,9 +280,9 @@ void ModeFuzzyEngine::set(const ShapeData &fcst_wd, const ShapeData &obs_wd)
 void ModeFuzzyEngine::set_no_conv(const ShapeData &fcst_wd, const ShapeData &obs_wd)
 
 {
-   if (data_type == ModeDataType_MvMode_Fcst) {
+   if (data_type == ModeDataType::MvMode_Fcst) {
       set_fcst_no_conv(fcst_wd);
-   } else if (data_type == ModeDataType_MvMode_Obs) {
+   } else if (data_type == ModeDataType::MvMode_Obs) {
       set_obs_no_conv  ( obs_wd);
    } else {      
       ConcatString path;
@@ -311,9 +311,9 @@ void ModeFuzzyEngine::set_only_split(const ShapeData &fcst_wd, const ShapeData &
 
 {
 
-   if (data_type == ModeDataType_MvMode_Fcst) {
+   if (data_type == ModeDataType::MvMode_Fcst) {
       set_fcst_only_split (fcst_wd);
-   } else if (data_type == ModeDataType_MvMode_Obs) {
+   } else if (data_type == ModeDataType::MvMode_Obs) {
       set_obs_only_split  ( obs_wd);
    } else {
       ConcatString path;

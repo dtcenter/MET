@@ -70,14 +70,14 @@ int MultivarFrontEnd::run(const StringArray & Argv)
       GrdFileType ft, ot;
       ft = config.file_type_for_field(true, i);
       ot = parse_conf_file_type(config.conf.lookup_dictionary(conf_key_obs));
-      read_input(fcst_filenames[i], i, ModeDataType_MvMode_Fcst, ft, ot, shift);
+      read_input(fcst_filenames[i], i, ModeDataType::MvMode_Fcst, ft, ot, shift);
 
    }
    for (int i=0; i<n_obs_files; ++i) {
       GrdFileType ft, ot;
       ft = parse_conf_file_type(config.conf.lookup_dictionary(conf_key_fcst));
       ot = config.file_type_for_field(false, i);
-      read_input(obs_filenames[i], i, ModeDataType_MvMode_Obs, ot, ft, shift);
+      read_input(obs_filenames[i], i, ModeDataType::MvMode_Obs, ot, ft, shift);
    }
    
    // double check some thing that are now set
@@ -101,7 +101,7 @@ int MultivarFrontEnd::run(const StringArray & Argv)
       mlog << Debug(2) 
            << "\n" << sep << "\ncreating simple forecast objects from forecast "
            << (j + 1) << " of " << n_fcst_files << "\n" << sep << "\n";
-      MultiVarData *mvdi = create_simple_objects(ModeDataType_MvMode_Fcst, j,
+      MultiVarData *mvdi = create_simple_objects(ModeDataType::MvMode_Fcst, j,
                                                  n_fcst_files, fcst_filenames[j],
                                                  fcstInput[j]);
       mvdFcst.push_back(mvdi);
@@ -113,7 +113,7 @@ int MultivarFrontEnd::run(const StringArray & Argv)
       mlog << Debug(2) 
            << "\n" << sep << "\ncreating simple obs objects from obs "
            << (j + 1) << " of " << n_obs_files << "\n" << sep << "\n";
-      MultiVarData *mvdi = create_simple_objects(ModeDataType_MvMode_Obs, j,
+      MultiVarData *mvdi = create_simple_objects(ModeDataType::MvMode_Obs, j,
                                                  n_obs_files, obs_filenames[j],
                                                  obsInput[j]);
       mvdObs.push_back(mvdi);
@@ -273,7 +273,7 @@ void MultivarFrontEnd::read_input(const string &name, int index, ModeDataType ty
    // update config now that we know file type (this sets Fcst to index i)
    DataPlane dp;
 
-   if (type == ModeDataType_MvMode_Fcst) {
+   if (type == ModeDataType::MvMode_Fcst) {
       config.process_config_field(ft, other_t, type, index);
       f->data_plane(*(config.Fcst->var_info), dp);
       fcstInput.push_back(ModeInputData(name, dp, g));
@@ -637,7 +637,7 @@ void MultivarFrontEnd::_simple_objects(ModeExecutive::Processing_t p,
                                        int j, int n_files, const string &filename,
                                        const ModeInputData &input)
 {
-   if (dtype == ModeDataType_MvMode_Fcst) {
+   if (dtype == ModeDataType::MvMode_Fcst) {
       _init_exec(p, filename, "None");
       mode_exec->init_multivar_simple(j, n_files, dtype, config);
       mode_exec->setup_multivar_fcst_data(verification_grid, input);

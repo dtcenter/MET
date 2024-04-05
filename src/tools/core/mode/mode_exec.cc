@@ -231,7 +231,7 @@ void ModeExecutive::init_multivar_intensities(const ModeConfInfo &conf)
    engine.conf_info = conf;
    
    // tell the engine which type of data it is
-   engine.set_data_type(ModeDataType_MvMode_Both);
+   engine.set_data_type(ModeDataType::MvMode_Both);
 
    // check one again for multivar problems
    engine.conf_info.check_multivar_not_implemented();
@@ -426,7 +426,7 @@ void ModeExecutive::setup_verification_grid(const ModeInputData &fcst,
    // set this local conf to point to forecast 0, so that that regrid info
    // can be accessed and it can be decided if we are to use fcst or obs
    // input
-   engine.conf_info.set_data_type(ModeDataType_MvMode_Fcst);
+   engine.conf_info.set_data_type(ModeDataType::MvMode_Fcst);
    engine.conf_info.set_field_index(0);
    grid = parse_vx_grid(engine.conf_info.Fcst->var_info->regrid(),
                         &fcst._grid, &obs._grid);
@@ -915,7 +915,7 @@ void ModeExecutive::do_conv_thresh_multivar_simple(Processing_t p)
    //
 
    string what;
-   if (conf.data_type == ModeDataType_MvMode_Obs) {
+   if (conf.data_type == ModeDataType::MvMode_Obs) {
       what = "observation field";
    } else {
       what = "forecast field";
@@ -1624,7 +1624,7 @@ MultiVarData *ModeExecutive::get_multivar_data(ModeDataType dtype)
 
    switch (dtype)
    {
-   case ModeDataType_MvMode_Obs:
+   case ModeDataType::MvMode_Obs:
       obs_magic_string = engine.conf_info.Obs->var_info->magic_str().c_str();
       // replace forward slashes with underscores to prevent new directories
       replace(obs_magic_string.begin(), obs_magic_string.end(), '/', '_');   
@@ -1636,7 +1636,7 @@ MultiVarData *ModeExecutive::get_multivar_data(ModeDataType dtype)
       mvd->set_conv_thresh_array(engine.conf_info.Obs->conv_thresh_array, simple);
       mvd->set_merge_thresh_array(engine.conf_info.Obs->merge_thresh_array, simple);
       break;
-   case ModeDataType_MvMode_Fcst:
+   case ModeDataType::MvMode_Fcst:
       fcst_magic_string = engine.conf_info.Fcst->var_info->magic_str().c_str();
       // replace forward slashes with underscores to prevent new directories
       replace(fcst_magic_string.begin(), fcst_magic_string.end(), '/', '_');   
@@ -1664,14 +1664,14 @@ void ModeExecutive::add_multivar_merge_data(MultiVarData *mvd, ModeDataType dtyp
    bool simple = false;
    switch (dtype)
    {
-   case ModeDataType_MvMode_Obs:
+   case ModeDataType::MvMode_Obs:
       mvd->set_obj(engine.obs_split, simple);
       mvd->set_raw(engine.obs_raw, simple);
       mvd->set_shapedata(Obs_sd, simple);
       mvd->set_conv_thresh_array(engine.conf_info.Obs->conv_thresh_array, simple);
       mvd->set_merge_thresh_array(engine.conf_info.Obs->merge_thresh_array, simple);
       break;
-   case ModeDataType_MvMode_Fcst:
+   case ModeDataType::MvMode_Fcst:
       mvd->set_obj(engine.fcst_split, simple);
       mvd->set_raw(engine.fcst_raw, simple);
       mvd->set_shapedata(Fcst_sd, simple);

@@ -267,7 +267,7 @@ void ModeConfInfo::clear()
     Obs = 0;
 
    // so traditional mode will have the right value
-   data_type = ModeDataType_Traditional; 
+   data_type = ModeDataType::Traditional;
 
    N_fields_f = 0;
    N_fields_o = 0;
@@ -301,7 +301,7 @@ void ModeConfInfo::read_config(const char * default_file_name, const char * user
 void ModeConfInfo::process_config_traditional(GrdFileType ftype, GrdFileType otype)
 {
    process_config_except_fields();
-   process_config_field (ftype, otype, ModeDataType_Traditional, 0);
+   process_config_field (ftype, otype, ModeDataType::Traditional, 0);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -513,11 +513,11 @@ void ModeConfInfo::process_config_field(GrdFileType ftype, GrdFileType otype,
 {
    set_data_type(dt);
 
-   if (data_type == ModeDataType_MvMode_Fcst) {
+   if (data_type == ModeDataType::MvMode_Fcst) {
 
       process_config_fcst(ftype, field_index);
 
-   } else if (data_type == ModeDataType_MvMode_Obs) {
+   } else if (data_type == ModeDataType::MvMode_Obs) {
 
       process_config_obs(otype, field_index);
 
@@ -580,7 +580,7 @@ void ModeConfInfo::process_config_both(GrdFileType ftype, GrdFileType otype,
    evaluate_fcst_settings(field_index);
    evaluate_obs_settings(field_index);
 
-   if (data_type == ModeDataType_Traditional) {
+   if (data_type == ModeDataType::Traditional) {
 
       if ( fcst_array[field_index].conv_radius_array.n_elements() !=
            obs_array[field_index].conv_radius_array.n_elements() )  {
@@ -702,7 +702,7 @@ void ModeConfInfo::config_set_all_percentile_thresholds(const std::vector<ModeIn
       {
       case perc_thresh_sample_fcst:
          // do this now... this might be done twice depending on obs settings that need both?
-         data_type = ModeDataType_MvMode_Fcst;
+         data_type = ModeDataType::MvMode_Fcst;
          set_field_index(j);
          set_perc_thresh(fdata[j]._dataPlane);
          break;
@@ -739,7 +739,7 @@ void ModeConfInfo::config_set_all_percentile_thresholds(const std::vector<ModeIn
       {
       case perc_thresh_sample_obs:
          // do this now... this might be done twice depending on obs settings that need both?
-         data_type = ModeDataType_MvMode_Obs;
+         data_type = ModeDataType::MvMode_Obs;
          set_field_index(j);
          set_perc_thresh(odata[j]._dataPlane);
          break;
@@ -803,7 +803,7 @@ void ModeConfInfo::config_set_all_percentile_thresholds(const std::vector<ModeIn
    // and SFP on obs  
    for (size_t i=0; i<indices_with_both.size(); ++i) {
       int index = indices_with_both[i];
-      data_type = ModeDataType_MvMode_Both;
+      data_type = ModeDataType::MvMode_Both;
       set_field_index(index, index);
       set_perc_thresh(fdata[index]._dataPlane, odata[index]._dataPlane);
    }
@@ -942,7 +942,7 @@ if ( field->is_array() ) {
    const DictionaryEntry * e = 0;
    const Dictionary & D = *field;
 
-   if (data_type == ModeDataType_Traditional) {
+   if (data_type == ModeDataType::Traditional) {
       // traditional mode, extra test
       if ( (N_fields_f > 0) && (N != N_fields_f) )  {
          mlog << Error
@@ -1098,7 +1098,7 @@ return pwl_if;
 void ModeConfInfo::set_field_index(int k)
 
 {
-   if (data_type == ModeDataType_MvMode_Obs) {
+   if (data_type == ModeDataType::MvMode_Obs) {
       if ( (k < 0) || (k >= N_fields_o) ) {
          mlog << Error
               << "\nModeConfInfo::set_field_index(int) -> range check error\n\n";
@@ -1108,7 +1108,7 @@ void ModeConfInfo::set_field_index(int k)
       Field_Index_f = -1;
       Obs =  obs_array + k;
    }
-   else if (data_type == ModeDataType_MvMode_Fcst) {
+   else if (data_type == ModeDataType::MvMode_Fcst) {
       if ( (k < 0) || (k >= N_fields_f) ) {
          mlog << Error
               << "\nModeConfInfo::set_field_index(int) -> range check error\n\n";
@@ -1144,10 +1144,10 @@ if ( (f_index < 0) || (f_index >= N_fields_f) || (o_index < 0) ||
 Field_Index_f = f_index;
 Field_Index_o = o_index;
 
-if (data_type != ModeDataType_MvMode_Fcst) {
+if (data_type != ModeDataType::MvMode_Fcst) {
    Obs =  obs_array + o_index;
 }
-if (data_type != ModeDataType_MvMode_Obs) {
+if (data_type != ModeDataType::MvMode_Obs) {
    Fcst = fcst_array + f_index;
 }
 return;
@@ -1220,9 +1220,9 @@ void ModeConfInfo::set_perc_thresh(const DataPlane &dp)
    //
    Mode_Field_Info *F;
    
-   if (data_type == ModeDataType_MvMode_Obs) {
+   if (data_type == ModeDataType::MvMode_Obs) {
       F = Obs;
-   } else if (data_type == ModeDataType_MvMode_Fcst) {
+   } else if (data_type == ModeDataType::MvMode_Fcst) {
       F = Fcst;
    } else {
       mlog << Warning 
@@ -1337,7 +1337,7 @@ return;
 void ModeConfInfo::set_conv_radius_by_index(int k)
 
 {
-   if (data_type != ModeDataType_MvMode_Obs) {
+   if (data_type != ModeDataType::MvMode_Obs) {
       if ( (k < 0) || (k >= Fcst->conv_radius_array.n_elements()) )  {
          mlog << Error 
               << "\nModeConfInfo::set_conv_radius_by_index(int) -> "
@@ -1346,7 +1346,7 @@ void ModeConfInfo::set_conv_radius_by_index(int k)
       }
       Fcst->conv_radius =  Fcst->conv_radius_array[k];
    }
-   if (data_type != ModeDataType_MvMode_Fcst) {
+   if (data_type != ModeDataType::MvMode_Fcst) {
       if ( (k < 0) || (k >= Obs->conv_radius_array.n_elements()) )  {
          
          mlog << Error 
@@ -1365,10 +1365,10 @@ void ModeConfInfo::set_conv_radius_by_index(int k)
 
 void ModeConfInfo::set_conv_thresh(SingleThresh s)
 {
-   if (data_type != ModeDataType_MvMode_Obs) {
+   if (data_type != ModeDataType::MvMode_Obs) {
       Fcst->conv_thresh = s;
    }
-   if (data_type != ModeDataType_MvMode_Fcst) {
+   if (data_type != ModeDataType::MvMode_Fcst) {
       Obs->conv_thresh =  s;
    }
 }
@@ -1377,10 +1377,10 @@ void ModeConfInfo::set_conv_thresh(SingleThresh s)
 
 void ModeConfInfo::set_conv_radius(int r)
 {
-   if (data_type != ModeDataType_MvMode_Obs) {
+   if (data_type != ModeDataType::MvMode_Obs) {
       Fcst->conv_radius = r;
    }
-   if (data_type != ModeDataType_MvMode_Fcst) {
+   if (data_type != ModeDataType::MvMode_Fcst) {
       Obs->conv_radius = r;
    }
 }
@@ -1390,7 +1390,7 @@ void ModeConfInfo::set_conv_radius(int r)
 void ModeConfInfo::set_conv_thresh_by_index(int k)
 
 {
-   if (data_type != ModeDataType_MvMode_Fcst) {
+   if (data_type != ModeDataType::MvMode_Fcst) {
       if ( (k < 0) || (k >= Obs->conv_thresh_array.n_elements()) )  {
          mlog << Error 
               << "\nModeConfInfo::set_conv_thresh_by_index(int) -> "
@@ -1399,7 +1399,7 @@ void ModeConfInfo::set_conv_thresh_by_index(int k)
       }
       Obs->conv_thresh =  Obs->conv_thresh_array[k];
    }
-   if (data_type != ModeDataType_MvMode_Obs) {
+   if (data_type != ModeDataType::MvMode_Obs) {
       if ( (k < 0) || (k >= Fcst->conv_thresh_array.n_elements()) )  {
          
          mlog << Error 
@@ -1417,10 +1417,10 @@ void ModeConfInfo::set_conv_thresh_by_index(int k)
 
 void ModeConfInfo::set_merge_thresh_by_index(int k)
 {
-   if (data_type != ModeDataType_MvMode_Fcst) {
+   if (data_type != ModeDataType::MvMode_Fcst) {
       if ( Obs->need_merge_thresh  () )  set_obs_merge_thresh_by_index  (k);
    }
-   if (data_type != ModeDataType_MvMode_Obs) {
+   if (data_type != ModeDataType::MvMode_Obs) {
          if ( Fcst->need_merge_thresh () )  set_fcst_merge_thresh_by_index (k);
    }
 }   
@@ -1431,7 +1431,7 @@ void ModeConfInfo::set_merge_thresh_by_index(int k)
 void ModeConfInfo::set_fcst_merge_thresh_by_index(int k)
 
 {
-   if (data_type == ModeDataType_MvMode_Obs)
+   if (data_type == ModeDataType::MvMode_Obs)
    {
       mlog << Error 
            << "\nModeConfInfo::set_fcst_merge_thresh_by_index(int) -> "
@@ -1451,10 +1451,10 @@ void ModeConfInfo::set_fcst_merge_thresh_by_index(int k)
 
 void ModeConfInfo::set_conv_thresh_by_merge_index(int k)
 {
-   if (data_type != ModeDataType_MvMode_Fcst) {
+   if (data_type != ModeDataType::MvMode_Fcst) {
       if (Obs->need_merge_thresh()) set_obs_conv_thresh_by_merge_index (k);
    }
-   if (data_type != ModeDataType_MvMode_Obs) {
+   if (data_type != ModeDataType::MvMode_Obs) {
       if (Fcst->need_merge_thresh()) set_fcst_conv_thresh_by_merge_index (k);
    }
 }
@@ -1465,7 +1465,7 @@ void ModeConfInfo::set_conv_thresh_by_merge_index(int k)
 void ModeConfInfo::set_fcst_conv_thresh_by_merge_index(int k)
 
 {
-   if (data_type == ModeDataType_MvMode_Obs)
+   if (data_type == ModeDataType::MvMode_Obs)
    {
       mlog << Error 
            << "\nModeConfInfo::set_fcst_conv_thresh_by_merge_index(int) -> "
@@ -1485,7 +1485,7 @@ void ModeConfInfo::set_fcst_conv_thresh_by_merge_index(int k)
 void ModeConfInfo::set_obs_conv_thresh_by_merge_index(int k)
 
 {
-   if (data_type == ModeDataType_MvMode_Fcst)
+   if (data_type == ModeDataType::MvMode_Fcst)
    {
       mlog << Error 
            << "\nModeConfInfo::set_obs_conv_thresh_by_merge_index(int) -> "
@@ -1502,7 +1502,7 @@ void ModeConfInfo::set_obs_conv_thresh_by_merge_index(int k)
 
 void ModeConfInfo::set_fcst_merge_flag(MergeType t)
 {
-   if (data_type == ModeDataType_MvMode_Obs)
+   if (data_type == ModeDataType::MvMode_Obs)
    {
       mlog << Error 
            << "\nModeConfInfo::set_fcst_merge_flag(int) -> "
@@ -1516,7 +1516,7 @@ void ModeConfInfo::set_fcst_merge_flag(MergeType t)
 
 void ModeConfInfo::set_obs_merge_flag(MergeType t)
 {
-   if (data_type == ModeDataType_MvMode_Fcst)
+   if (data_type == ModeDataType::MvMode_Fcst)
    {
       mlog << Error 
            << "\nModeConfInfo::set_obs_merge_flag(int) -> "
@@ -1530,7 +1530,7 @@ void ModeConfInfo::set_obs_merge_flag(MergeType t)
 
 void ModeConfInfo::set_fcst_merge_thresh(SingleThresh s)
 {
-   if (data_type == ModeDataType_MvMode_Obs)
+   if (data_type == ModeDataType::MvMode_Obs)
    {
       mlog << Error 
            << "\nModeConfInfo::set_fcst_merge_thresh(int) -> "
@@ -1544,7 +1544,7 @@ void ModeConfInfo::set_fcst_merge_thresh(SingleThresh s)
 
 void ModeConfInfo::set_obs_merge_thresh(SingleThresh s)
 {
-   if (data_type == ModeDataType_MvMode_Fcst)
+   if (data_type == ModeDataType::MvMode_Fcst)
    {
       mlog << Error 
            << "\nModeConfInfo::set_obs_merge_thresh(int) -> "
@@ -1560,7 +1560,7 @@ void ModeConfInfo::set_obs_merge_thresh(SingleThresh s)
 void ModeConfInfo::set_obs_merge_thresh_by_index(int k)
 
 {
-   if (data_type == ModeDataType_MvMode_Fcst)
+   if (data_type == ModeDataType::MvMode_Fcst)
    {
       mlog << Error 
            << "\nModeConfInfo::set_obs_merge_thresh_by_index(int) -> "
@@ -1734,7 +1734,7 @@ void ModeConfInfo::check_multivar_not_implemented()
    }
    
    for (int i=0; i<N_fields_f; ++i) {
-      if (data_type != ModeDataType_MvMode_Obs) {
+      if (data_type != ModeDataType::MvMode_Obs) {
          if (fcst_array[i].merge_flag == MergeType::Both || fcst_array[i].merge_flag == MergeType::Engine)
          {
             mlog << Error
@@ -1751,7 +1751,7 @@ void ModeConfInfo::check_multivar_not_implemented()
       }
    }
    for (int i=0; i<N_fields_o; ++i) {
-      if (data_type != ModeDataType_MvMode_Fcst) {
+      if (data_type != ModeDataType::MvMode_Fcst) {
          if (obs_array[i].merge_flag == MergeType::Both || obs_array[i].merge_flag == MergeType::Engine) {
             mlog << Error
                  << "\nModeConfInfo::check_multivar_not_implemented():\n"
