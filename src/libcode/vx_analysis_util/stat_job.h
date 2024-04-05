@@ -70,7 +70,7 @@ enum class STATJobType {
                      containing the aggregated counts/scores. */
 
    aggr_stat = 3, /* Aggregate the input counts/scores and
-                           // generate the requested output line type. */
+                     generate the requested output line type. */
 
    go_index  = 4, /* Compute the GO Index. */
 
