@@ -297,7 +297,6 @@ if ( n <= Nalloc )  return;
 
 n = AllocInc*( (n + AllocInc - 1)/AllocInc );
 
-int j;
 CLOptionInfo * u = (CLOptionInfo *) nullptr;
 
 u = new CLOptionInfo [n];
@@ -311,7 +310,7 @@ if ( !u )  {
 
 }
 
-for(j=0; j<Nelements; ++j)  {
+for(int j=0; j<Nelements; ++j)  {
 
    u[j] = e[j];
 
@@ -343,9 +342,7 @@ out << prefix << "Nelements = " << Nelements << "\n";
 out << prefix << "Nalloc    = " << Nalloc    << "\n";
 out << prefix << "AllocInc  = " << AllocInc  << "\n";
 
-int j;
-
-for(j=0; j<Nelements; ++j)  {
+for(int j=0; j<Nelements; ++j)  {
 
    out << prefix << "Element # " << j << " ... \n";
 
@@ -407,11 +404,9 @@ void CLOptionInfoArray::add(const CLOptionInfoArray & a)
 
 {
 
-int j;
-
 extend(Nelements + a.n_elements());
 
-for (j=0; j<(a.n_elements()); ++j)  {
+for (int j=0; j<(a.n_elements()); ++j)  {
 
    add(a[j]);
 
@@ -449,10 +444,9 @@ int CLOptionInfoArray::lookup(const string & name) const
 
 {
 
-int j;
 ConcatString cs = name;
 
-for (j=0; j<Nelements; ++j)  {
+for (int j=0; j<Nelements; ++j)  {
 
   if ( e[j].option_text == cs )  return j;
 
@@ -633,11 +627,9 @@ void CommandLine::set(int argc, char ** argv)
 
 clear();
 
-int j;
-
 ProgramName = get_short_name(argv[0]);
 
-for (j=1; j<argc; ++j)  {   //  j starts at one here, not zero
+for (int j=1; j<argc; ++j)  {   //  j starts at one here, not zero
 
    args.add(argv[j]);
 
@@ -658,13 +650,12 @@ void CommandLine::set(const StringArray & a)
 
 clear();
 
-int j;
 ConcatString s;
 
 
 ProgramName = get_short_name(a[0].c_str());
 
-for (j=1; j<(a.n()); ++j)  {   //  j starts at one here, not zero
+for (int j=1; j<(a.n()); ++j)  {   //  j starts at one here, not zero
 
    s = a[j];
 
@@ -756,12 +747,12 @@ int CommandLine::next_option(int & option_index) const
 
 {
 
-int j, N;
+int N;
 
 
 N = args.n_elements();
 
-for (j=0; j<N; ++j)  {
+for (int j=0; j<N; ++j)  {
 
    if ( is_switch(args[j]) )  {
 
@@ -1039,10 +1030,10 @@ a.clear();
 
 if ( Nargs == 0 )  return;
 
-int j, k;
+int k;
 
 
-for (j=0; j<Nargs; ++j)  {
+for (int j=0; j<Nargs; ++j)  {
 
    k = j + pos;
 

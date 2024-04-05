@@ -773,9 +773,7 @@ if ( v.Ncells == 0 )  return;
 
 extend(Ncells + v.Ncells);
 
-int j;
-
-for (j=0; j<(v.Ncells); ++j)  {
+for (int j=0; j<(v.Ncells); ++j)  {
 
    Cell[Ncells + j] = v.Cell[j];
 
@@ -822,7 +820,6 @@ void IcodeVector::dump(ostream & out, int indent_depth) const
 
 {
 
-int j;
 // const char * sep = "/////////////////////////////////\n";
    const char * sep = "---------------------------------\n";
 Indent prefix;
@@ -835,7 +832,7 @@ out << prefix << "N cells = " << Ncells << "\n";
 
 
 
-for (j=0; j<Ncells; ++j)  {
+for (int j=0; j<Ncells; ++j)  {
 
    out << prefix << sep;
 
@@ -987,9 +984,7 @@ clear();
 
 Depth = s.Depth;
 
-int j;
-
-for (j=0; j<Depth; ++j)  {
+for (int j=0; j<Depth; ++j)  {
 
    cell[j] = s.cell[j];
 
@@ -1239,11 +1234,9 @@ clear();
 
 if ( s.Depth == 0 )  return;
 
-int j;
-
 Depth = s.Depth;
 
-for (j=0; j<Depth; ++j)  {
+for (int j=0; j<Depth; ++j)  {
 
    v[j] = new IcodeVector;
 
@@ -1393,7 +1386,6 @@ void ICVStack::dump(ostream & out, int indent_depth) const
 
 {
 
-int j;
 Indent prefix;
 
 
@@ -1403,7 +1395,7 @@ out << prefix << "ICVStack dump ... \n";
 out << prefix << "Depth = " << Depth << "\n";
 
 
-for (j=0; j<Depth; ++j)  {
+for (int j=0; j<Depth; ++j)  {
 
    out << prefix << "Level " << j << "\n";
 

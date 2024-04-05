@@ -421,9 +421,7 @@ memset(lexeme, 0, sizeof(lexeme));
 
 pos = 0;
 
-int j;
-
-for (j=n_putback_chars; j<max_putback_chars; ++j)  putback_chars[j] = 0;
+for (int j=n_putback_chars; j<max_putback_chars; ++j)  putback_chars[j] = 0;
 
 return;
 
@@ -514,7 +512,7 @@ int do_id()
 
 {
 
-int j, k;
+int k;
 const char *method_name = "do_id() -> ";
 
 Column += m_strlen(configtext);
@@ -544,7 +542,7 @@ if ( strcmp(configtext, "FALSE" ) == 0 )  { configlval.bval = false;  return BOO
    //  comparison?
    //
 
-for (j=0; j<n_fort_thresh_strings; ++j)  {
+for (int j=0; j<n_fort_thresh_strings; ++j)  {
 
    if ( strcmp(configtext, fort_thresh_string[j] ) == 0 )  { configlval.cval = thresh_lt;  return COMPARISON; }
 
@@ -606,7 +604,7 @@ if ( e && (! is_lhs) && (e->type() == UserFunctionType) )  {
    //  fortran threshold without spaces?  (example: "le150")
    //
 
-for (j=0; j<n_fort_thresh_strings; ++j)  {
+for (int j=0; j<n_fort_thresh_strings; ++j)  {
 
    if (    (strncmp(configtext, fort_thresh_string[j], 2) == 0)
         && (is_number(configtext + 2, max_id_length - 2))  )
@@ -618,7 +616,7 @@ for (j=0; j<n_fort_thresh_strings; ++j)  {
    //  simple percentile threshold?  (example: "SOP50")
    //
 
-for (j=0; j<n_perc_thresh_infos; ++j)  {
+for (int j=0; j<n_perc_thresh_infos; ++j)  {
 
    k = perc_thresh_info[j].short_name_length;
 
@@ -1150,7 +1148,6 @@ bool is_float_v2(const char * text, int len)
 
 {
 
-int j;
 int c;
 int state;
 const int Error = -1;
@@ -1162,7 +1159,7 @@ int m_dot = 0;   //  mantissa dot count
 
 state = 0;
 
-for (j=0; j<len; ++j)  {
+for (int j=0; j<len; ++j)  {
 
    c = (int) (text[j]);
 
@@ -1275,7 +1272,7 @@ bool is_int (const char * text, int len)
 
 {
 
-int j, k, m;
+int k, m;
 int j_start = 0;
 int digit_count = 0;
 
@@ -1287,7 +1284,7 @@ k = char_class[m];
 
 if ( k == char_class_sign )  j_start = 1;
 
-for (j=j_start; j<len; ++j)  {
+for (int j=j_start; j<len; ++j)  {
 
    if ( text[j] == 0 )  break;
 
@@ -1394,9 +1391,7 @@ bool is_fort_thresh_no_spaces()
 
 {
 
-int j;
-
-for (j=0; j<n_fort_thresh_strings; ++j)  {
+for (int j=0; j<n_fort_thresh_strings; ++j)  {
 
    if (    (strncmp(configtext, fort_thresh_string[j], 2) == 0)
         && (is_number(configtext + 2, max_id_length - 2))  )
@@ -1417,13 +1412,13 @@ bool is_simple_perc_thresh()
 
 {
 
-int j, k;
+int k;
 
    //
    //  simple percentile threshold?  (example: "SOP50.0")
    //
 
-for (j=0; j<n_perc_thresh_infos; ++j)  {
+for (int j=0; j<n_perc_thresh_infos; ++j)  {
 
    k = perc_thresh_info[j].short_name_length;
 
@@ -1446,11 +1441,11 @@ int do_simple_perc_thresh()
 
 {
 
-int j, k;
+int k;
 int index = -1;
 double value = bad_data_double;
 
-for (j=0; j<n_perc_thresh_infos; ++j)  {
+for (int j=0; j<n_perc_thresh_infos; ++j)  {
 
    k = perc_thresh_info[j].short_name_length;
 

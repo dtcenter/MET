@@ -250,9 +250,6 @@ if ( a.e.empty() )  return;
 set_size(a.nrows(), a.ncols());
 
 
-int r, c;
-
-
 ColWidth = a.ColWidth;
 
 InterColumnSpace = a.InterColumnSpace;
@@ -292,9 +289,9 @@ AlignDecimalPoints = a.AlignDecimalPoints;
 DecimalPointsAligned = a.DecimalPointsAligned;
 
 
-for (r=0; r<Nrows; ++r)  {
+for (int r=0; r<Nrows; ++r)  {
 
-   for (c=0; c<Ncols; ++c)  {
+   for (int c=0; c<Ncols; ++c)  {
 
       set_entry(r, c, a(r, c));
 
@@ -399,7 +396,6 @@ if ( NR <= 0 )  {
    //  allocate some new memory
    //
 
-int jr, jc;
 const int n_rows_new = Nrows + NR;
 const int n_rows_old = Nrows;
 const int nrc_new = n_rows_new*Ncols;
@@ -421,9 +417,9 @@ e.resize(nrc_new);
    //    row into all of the new rows
    //
 
-for (jr=0; jr<NR; ++jr)  {
+for (int jr=0; jr<NR; ++jr)  {
 
-   for (jc=0; jc<Ncols; ++jc)  {
+   for (int jc=0; jc<Ncols; ++jc)  {
 
      Just[rc_to_n(jr + n_rows_old, jc)] = Just[rc_to_n(n_rows_old - 1, jc)];
 
@@ -465,11 +461,9 @@ AsciiTable at = *this;
 
 set_size(max(Nrows, NR), max(Ncols, NC));
 
-int r, c;
+for (int r=0; r<at.nrows(); ++r)  {
 
-for (r=0; r<at.nrows(); ++r)  {
-
-   for (c=0; c<at.ncols(); ++c)  {
+   for (int c=0; c<at.ncols(); ++c)  {
 
       set_entry(r, c, at(r, c));
 
@@ -501,9 +495,7 @@ if ( (value < 0) || (value > max_ics) )  {
 
 }
 
-int j;
-
-for (j=0; j<(Ncols - 1); ++j)  InterColumnSpace[j] = value;
+for (int j=0; j<(Ncols - 1); ++j)  InterColumnSpace[j] = value;
 
 return;
 
@@ -578,9 +570,7 @@ if ( (value < 0) || (value > max_irs) )  {
 
 }
 
-int j;
-
-for (j=0; j<(Nrows - 1); ++j)  InterRowSpace[j] = value;
+for (int j=0; j<(Nrows - 1); ++j)  InterRowSpace[j] = value;
 
 return;
 
@@ -812,10 +802,9 @@ void AsciiTable::set_table_just(const AsciiTableJust just)
 
 {
 
-int j;
 const int N = Nrows*Ncols;
 
-for (j=0; j<N; ++j)  Just[j] = just;
+for (int j=0; j<N; ++j)  Just[j] = just;
 
 return;
 
@@ -837,9 +826,9 @@ if ( (c < 0) || (c >= Ncols) )  {
 
 }
 
-int r, n;
+int n;
 
-for (r=0; r<Nrows; ++r)  {
+for (int r=0; r<Nrows; ++r)  {
 
    n = rc_to_n(r, c);
 
@@ -867,9 +856,9 @@ if ( (r < 0) || (r >= Nrows) )  {
 
 }
 
-int c, n;
+int n;
 
-for (c=0; c<Ncols; ++c)  {
+for (int c=0; c<Ncols; ++c)  {
 
    n = rc_to_n(r, c);
 
@@ -1119,11 +1108,11 @@ int AsciiTable::max_col_width() const
 
 if ( e.empty() )  return 0;
 
-int c, w, k;
+int w, k;
 
 k = 0;
 
-for (c=0; c<Ncols; ++c)  {
+for (int c=0; c<Ncols; ++c)  {
 
    w = ColWidth[c];
 
@@ -1151,9 +1140,9 @@ if ( (r < 0) || (r >= Nrows) )  {
 
 }
 
-int c, n;
+int n;
 
-for (c=0; c<Ncols; ++c)  {
+for (int c=0; c<Ncols; ++c)  {
 
    n = rc_to_n(r, c);
 
@@ -1178,17 +1167,17 @@ ConcatString AsciiTable::padded_row(const int r) const
 
 {
 
-int c, j, k;
+int k;
 ConcatString s;
 
 
-for (c=0; c<Ncols; ++c)  {
+for (int c=0; c<Ncols; ++c)  {
 
    if ( c > 0 )  {
 
       k = InterColumnSpace[c - 1];
 
-      for (j=0; j<k; ++j)  s << ColSepChar;
+      for (int j=0; j<k; ++j)  s << ColSepChar;
 
    }
 
@@ -1264,13 +1253,13 @@ int AsciiTable::table_width() const
 
 if ( e.empty() )  return 0;
 
-int j, W;
+int W;
 
 W = 0;
 
-for (j=0; j<Ncols; ++j)  W += ColWidth[j];
+for (int j=0; j<Ncols; ++j)  W += ColWidth[j];
 
-for (j=0; j<(Ncols - 1); ++j)  W += InterColumnSpace[j];
+for (int j=0; j<(Ncols - 1); ++j)  W += InterColumnSpace[j];
 
 return W;
 
@@ -1286,11 +1275,11 @@ int AsciiTable::table_height() const
 
 if ( e.empty() )  return 0;
 
-int j, H;
+int H;
 
 H = Nrows;
 
-for (j=0; j<(Nrows - 1); ++j)  H += InterRowSpace[j];
+for (int j=0; j<(Nrows - 1); ++j)  H += InterRowSpace[j];
 
 return H;
 
@@ -1315,7 +1304,7 @@ if ( n < 0 )  {
 
 if ( n == 0 )  return;
 
-int j, k;
+int k;
 
 k = rc_to_n(r, c);   //  "rc_to_n" does range checking on r and c,
                      //    so we don't need to do that here
@@ -1324,7 +1313,7 @@ if ( e[k].empty() )  return;
 
 ConcatString s = e[k];
 
-for (j=0; j<n; ++j)  s << fill_char;
+for (int j=0; j<n; ++j)  s << fill_char;
 
 set_entry(r, c, s);
 
@@ -1358,18 +1347,18 @@ if ( Nrows <= 2 )  return;
 std::vector<int> left (Nrows, 0);
 std::vector<int> right(Nrows, 0);
 
-int r, c, n, k;
+int n, k;
 int max_left, max_right;
 const char fill_char = ' ';
 const int r_start = 1;   //  skip the header row
 
-for (c=0; c<Ncols; ++c)  {
+for (int c=0; c<Ncols; ++c)  {
 
       //  get the pad size for that column
 
    max_left = max_right = -5;  // negative value as the minimum offset of the text
 
-   for (r=r_start; r<Nrows; ++r)  {
+   for (int r=r_start; r<Nrows; ++r)  {
 
       n = rc_to_n(r, c);
 
@@ -1381,9 +1370,9 @@ for (c=0; c<Ncols; ++c)  {
 
       //
       //  pad each entry in that column
-      //
+      //4
 
-   for (r=r_start; r<Nrows; ++r)  {
+   for (int r=r_start; r<Nrows; ++r)  {
 
       k = max_right - right[r];
 
@@ -1412,10 +1401,9 @@ void AsciiTable::underline_row(const int row, const char underline_char)
 
 {
 
-int j;
 ConcatString s;
 
-for (j=0; j<Ncols; ++j)  {
+for (int j=0; j<Ncols; ++j)  {
 
    s.set_repeat(underline_char, ColWidth[j]);
 
@@ -1447,7 +1435,7 @@ ostream & operator<<(ostream & out, AsciiTable & t)
 
 if ( t.align_decimal_points() && !t.decimal_points_aligned() ) t.line_up_decimal_points();
 
-int j, r, c, n;
+int n;
 int rmax;
 const int indent = t.table_indent();
 const int W      = t.table_width();
@@ -1460,17 +1448,17 @@ if ( t.delete_trailing_blank_rows() )  {
 
 }
 
-for (r=0; r<=rmax; ++r)  {
+for (int r=0; r<=rmax; ++r)  {
 
    if ( r > 0 )  {
 
       n = t.inter_row_space(r - 1);
 
-      for (j=0; j<n; ++j)  do_blank_line(out, t.fill_blank(), W + indent);
+      for (int j=0; j<n; ++j)  do_blank_line(out, t.fill_blank(), W + indent);
 
    }
 
-   for (c=0; c<indent; ++c)  out.put(' ');
+   for (int c=0; c<indent; ++c)  out.put(' ');
 
    out << t.padded_row(r) << '\n';
 
@@ -1537,14 +1525,14 @@ if ( !out )  {
    //  get to work
    //
 
-int j, len;
+int len;
 int offset = 0;
 
    //
    //  fill the output field with the pad character
    //
 
-for (j=0; j<field_width; ++j)  out[j] = pad;
+for (int j=0; j<field_width; ++j)  out[j] = pad;
 
 out[field_width] = (char) 0;   //  end-of-string marker
 
@@ -1593,7 +1581,7 @@ switch ( just )  {
    //  write the text into the field
    //
 
-for (j=0; j<len; ++j)     out[offset + j] = text[j];
+for (int j=0; j<len; ++j)     out[offset + j] = text[j];
 
    //
    //  done
@@ -1613,9 +1601,7 @@ void do_blank_line(ostream & out, bool FillBlank, int width)
 
 if ( !FillBlank )  { out.put('\n');  return; }
 
-int j;
-
-for (j=0; j<width; ++j)  out.put(' ');
+for (int j=0; j<width; ++j)  out.put(' ');
 
 out.put('\n');
 
@@ -1644,9 +1630,8 @@ return true;
 void copy_ascii_table_row(const AsciiTable &at_from, const int r_from,
                           AsciiTable &at_to,         const int r_to)
 {
-int i;
 
-for ( i=0; i<at_from.ncols() && i<at_to.ncols(); i++ )  {
+for (int  i=0; i<at_from.ncols() && i<at_to.ncols(); i++ )  {
 
    at_to.set_entry ( r_to, i, at_from(r_from, i) );
 
@@ -1693,7 +1678,6 @@ return;
 
 
 void justify_met_at(AsciiTable &at, const int n_hdr_cols) {
-   int i;
 
    // Check for minimum number of columns
    if(at.ncols() < n_hdr_cols) {
@@ -1705,7 +1689,7 @@ void justify_met_at(AsciiTable &at, const int n_hdr_cols) {
    }
 
    // Left-justify header columns and right-justify data columns
-   for(i=0; i<at.ncols(); i++) {
+   for(int i=0; i<at.ncols(); i++) {
       if(i < n_hdr_cols) at.set_column_just(i, LeftJust);
       else               at.set_column_just(i, RightJust);
    }

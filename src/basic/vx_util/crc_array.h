@@ -65,11 +65,11 @@ class CRC_Array {
 
       CRC_Array & operator=(const CRC_Array <T> & _a)  {
 
-         if ( this == &_a )  return ( * this );
+         if ( this == &_a )  return *this;
 
          assign(_a);
 
-         return ( * this );
+         return *this;
 
       }
 
@@ -94,8 +94,8 @@ class CRC_Array {
          //  get stuff
          //
 
-      int n_elements() const { return ( Nelements ); }
-      int n         () const { return ( Nelements ); }
+      int n_elements() const { return Nelements; }
+      int n         () const { return Nelements; }
 
       T operator[] (int) const;
 
@@ -145,7 +145,7 @@ clear();
 
 for(int j=0; j<a.n_elements(); ++j) add(nint(a[j]));
 
-return ( * this );
+return *this;
 
 }
 
@@ -159,13 +159,13 @@ bool CRC_Array<T>::operator==(const CRC_Array<T> & a) const
 
 {
 
-if ( Nelements != a.Nelements )  return ( false );
+if ( Nelements != a.Nelements )  return false;
 
 for(int j=0; j<Nelements; ++j)  {
-   if(e[j] != a.e[j])  return ( false );
+   if(e[j] != a.e[j])  return false;
 }
 
-return ( true );
+return true;
 
 }
 
@@ -277,9 +277,7 @@ Indent prefix(depth);
 out << prefix << "Nelements = " << Nelements << "\n";
 out << prefix << "Nalloc    = " << Nalloc    << "\n";
 
-int j;
-
-for (j=0; j<Nelements; ++j)  {
+for (int j=0; j<Nelements; ++j)  {
 
    out << prefix << "Element # " << j << " = " << e[j] << "\n";
 
@@ -305,12 +303,11 @@ void CRC_Array<T>::dump_one_line(std::ostream & out, int depth) const
 
 {
 
-int j;
 Indent prefix(depth);
 
 out << prefix << '(' << Nelements << ") ";
 
-for (j=0; j<Nelements; ++j)  {
+for (int j=0; j<Nelements; ++j)  {
 
    if ( j > 0 )  out << ' ';
 
@@ -391,7 +388,7 @@ if ( (i < 0) || (i >= Nelements) )  {
 
 }
 
-return ( e[i] );
+return e[i];
 
 }
 
@@ -405,10 +402,9 @@ bool CRC_Array<T>::has(const T & k, bool forward) const
 
 {
 
-int j;
 bool found = false;
 if (forward) {
-   for (j=0; j<Nelements; ++j)  {
+   for (int j=0; j<Nelements; ++j)  {
       if ( e[j] == k ) {
           found = true;
           break;
@@ -416,7 +412,7 @@ if (forward) {
    }
 }
 else {
-   for (j=Nelements-1; j>=0; --j)  {
+   for (int j=Nelements-1; j>=0; --j)  {
       if ( e[j] == k ) {
           found = true;
           break;
@@ -424,7 +420,7 @@ else {
    }
 }
 
-return ( found );
+return found;
 
 }
 
@@ -438,23 +434,22 @@ bool CRC_Array<T>::has(const T & k, int & index, bool forward) const
 
 {
 
-int j;
 bool found = false;
 
 index = -1;
 
 if (forward) {
-   for (j=0; j<Nelements; ++j)  {
+   for (int j=0; j<Nelements; ++j)  {
       if ( e[j] == k )  { index = j; found = true; break; }
    }
 }
 else {
-   for (j=Nelements-1; j>=0; --j)  {
+   for (int j=Nelements-1; j>=0; --j)  {
       if ( e[j] == k )  { index = j; found = true; break; }
    }
 }
 
-return ( found );
+return found;
 
 }
 
@@ -490,9 +485,7 @@ void CRC_Array<T>::add(const CRC_Array<T> & a)
 
 extend(Nelements + a.Nelements);
 
-int j;
-
-for (j=0; j<(a.Nelements); ++j)  {
+for (int j=0; j<(a.Nelements); ++j)  {
 
    e.push_back(a.e[j]);
 
@@ -521,9 +514,7 @@ sa.parse_css(text);
 
 extend(Nelements + sa.n_elements());
 
-int j;
-
-for (j=0; j<(sa.n_elements()); j++)  {
+for (int j=0; j<(sa.n_elements()); j++)  {
 
   add(timestring_to_sec(sa[j].c_str()));
 
@@ -561,12 +552,12 @@ T CRC_Array<T>::sum() const
 
 {
 
-int j, count;
+int count;
 T s;
 
 s = 0;
 
-for(j=0, count=0; j<Nelements; j++) {
+for(int j=0, count=0; j<Nelements; j++) {
 
    if ( is_bad_data(e[j]) ) continue;
 
@@ -577,7 +568,7 @@ for(j=0, count=0; j<Nelements; j++) {
 
 if ( count == 0 )  s = bad_data_double;
 
-return ( s );
+return s;
 
 }
 
@@ -591,13 +582,11 @@ T CRC_Array<T>::min() const
 
 {
 
-if ( Nelements == 0 )  return ( bad_data_int );
-
-int j;
+if ( Nelements == 0 )  return bad_data_int;
 
 T min_v = e[0];
 
-for(j=0; j<Nelements; j++) {
+for(int j=0; j<Nelements; j++) {
 
    if ( is_bad_data(e[j]) ) continue;
 
@@ -605,7 +594,7 @@ for(j=0; j<Nelements; j++) {
 
 }
 
-return ( min_v );
+return min_v;
 
 }
 
@@ -621,11 +610,9 @@ T CRC_Array<T>::max() const
 
 if(Nelements == 0) return(bad_data_int);
 
-int j;
-
 T max_v = e[0];
 
-for(j=0; j<Nelements; j++) {
+for(int j=0; j<Nelements; j++) {
 
    if ( is_bad_data(e[j]) )  continue;
 
@@ -633,7 +620,7 @@ for(j=0; j<Nelements; j++) {
 
 }
 
-return ( max_v );
+return max_v;
 
 }
 
@@ -647,9 +634,7 @@ void CRC_Array<T>::increment(const T & k)
 
 {
 
-int j;
-
-for (j=0; j<Nelements; ++j)  {
+for (int j=0; j<Nelements; ++j)  {
 
    e[j] += k;
 

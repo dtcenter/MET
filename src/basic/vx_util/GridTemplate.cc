@@ -50,9 +50,7 @@ GridTemplate::GridTemplate(void) :
 GridTemplate::GridTemplate(const GridTemplate& rhs) {
    _wrapLon = rhs._wrapLon;
 
-   vector<GridOffset*>::const_iterator offset_iter;
-
-   for (offset_iter = rhs._offsetList.begin();
+   for (vector<GridOffset*>::const_iterator offset_iter = rhs._offsetList.begin();
         offset_iter != rhs._offsetList.end(); ++offset_iter)
       _offsetList.push_back(new GridOffset(*offset_iter));
 
@@ -67,8 +65,7 @@ GridTemplate::GridTemplate(const GridTemplate& rhs) {
 GridTemplate::~GridTemplate(void) {
 
    // Reclaim the space for the offset list
-   vector<GridOffset*>::iterator list_iter;
-   for(list_iter = _offsetList.begin(); list_iter != _offsetList.end();
+   for(vector<GridOffset*>::iterator list_iter = _offsetList.begin(); list_iter != _offsetList.end();
        ++list_iter)
       delete *list_iter;
 
@@ -479,9 +476,8 @@ void GridTemplate::incBaseY(const int &y_inc) const {
 ///////////////////////////////////////////////////////////////////////////////
 
 void GridTemplate::printOffsetList(FILE *stream) {
-   vector< GridOffset* >::iterator ol_iterator;
 
-   for(ol_iterator  = _offsetList.begin();
+   for(vector< GridOffset* >::iterator ol_iterator  = _offsetList.begin();
        ol_iterator != _offsetList.end();
        ol_iterator++) {
       GridOffset *offset = *ol_iterator;
@@ -517,8 +513,6 @@ void GridTemplate::_addOffset(int x_offset, int y_offset) {
 ///////////////////////////////////////////////////////////////////////////////
 
 void GridTemplate::_setEdgeOffsets() {
-   vector<GridOffset*>::iterator v_iterator;
-   map<int, GridOffset*>::iterator m_iterator;
    map<int, GridOffset*> min_x_by_y;
    map<int, GridOffset*> max_x_by_y;
    map<int, GridOffset*> min_y_by_x;
@@ -529,7 +523,7 @@ void GridTemplate::_setEdgeOffsets() {
    // For each row, find the min/max col.
    // For each col, find the min/max row.
 
-   for(v_iterator  = _offsetList.begin();
+   for(vector<GridOffset*>::iterator v_iterator = _offsetList.begin();
        v_iterator != _offsetList.end();
        v_iterator++) {
       GridOffset *offset = *v_iterator;
@@ -554,28 +548,28 @@ void GridTemplate::_setEdgeOffsets() {
    }
 
    // Store min_x_by_y map as _offsetLftEdge vector
-   for(m_iterator  = min_x_by_y.begin();
+   for(map<int, GridOffset*>::iterator m_iterator  = min_x_by_y.begin();
        m_iterator != min_x_by_y.end();
        m_iterator++) {
       _offsetLftEdge.push_back(m_iterator->second);
    }
 
    // Store max_x_by_y map as _offsetRgtEdge vector
-   for(m_iterator  = max_x_by_y.begin();
+   for(map<int, GridOffset*>::iterator m_iterator  = max_x_by_y.begin();
        m_iterator != max_x_by_y.end();
        m_iterator++) {
       _offsetRgtEdge.push_back(m_iterator->second);
    }
 
    // Store max_y_by_x map as _offsetTopEdge vector
-   for(m_iterator  = max_y_by_x.begin();
+   for(map<int, GridOffset*>::iterator m_iterator  = max_y_by_x.begin();
        m_iterator != max_y_by_x.end();
        m_iterator++) {
       _offsetTopEdge.push_back(m_iterator->second);
    }
 
    // Store min_y_by_x map as _offsetBotEdge vector
-   for(m_iterator  = min_y_by_x.begin();
+   for(map<int, GridOffset*>::iterator m_iterator  = min_y_by_x.begin();
        m_iterator != min_y_by_x.end();
        m_iterator++) {
       _offsetBotEdge.push_back(m_iterator->second);

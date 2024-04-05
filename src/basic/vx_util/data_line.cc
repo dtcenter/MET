@@ -178,7 +178,6 @@ void DataLine::dump(ostream & out, int depth) const
 
 {
 
-int j;
 char junk[256];
 Indent prefix(depth);
 
@@ -192,7 +191,7 @@ out << prefix << "\n";
 
 if ( N_items == 0 )  { out.flush();  return; }
 
-for (j=0; j<N_items; ++j)  {
+for (int j=0; j<N_items; ++j)  {
 
    snprintf(junk, sizeof(junk), "Item[%2d]       = \"", j);
 
@@ -206,7 +205,7 @@ for (j=0; j<N_items; ++j)  {
 
 out << prefix << "\n";
 
-for (j=0; j<N_items; ++j)  {
+for (int j=0; j<N_items; ++j)  {
 
    snprintf(junk, sizeof(junk), "Offset[%2d]     = ", j);
 
@@ -289,11 +288,11 @@ int DataLine::max_item_width() const
 
 if ( Line.empty() )  return 0;
 
-int j, n, w;
+int n, w;
 
 n = 0;
 
-for (j=0; j<N_items; ++j)  {
+for (int j=0; j<N_items; ++j)  {
 
    w = Items[j].size();
 
@@ -376,7 +375,6 @@ if ( !f )  return 0;
 
 File = ldf;
 
-int i, j;
 char buf[max_str_len];
 char c;
 int start, pos, count;
@@ -389,7 +387,7 @@ int null_char_count;
 null_char_count = pos = count = 0;
 
 int line_len;
-for( i=0; i<n_wdth; i++ )  {
+for(int i=0; i<n_wdth; i++ )  {
    line_len = wdth[i];
    if (wdth[i] >= max_str_len) {
       line_len = (max_str_len-1);
@@ -417,7 +415,7 @@ for( i=0; i<n_wdth; i++ )  {
    //
    //  store this entry
    //
-   for( j=0; j<line_len; j++ )  {
+   for(int j=0; j<line_len; j++ )  {
 
      Line += buf[j]; pos++;
 
@@ -846,11 +844,9 @@ void LineDataFile::set_header(DataLine & a)
 
 {
 
-int j;
-
 Header.clear();
 
-for (j=0; j<a.n_items(); ++j)  {
+for (int j=0; j<a.n_items(); ++j)  {
 
    Header.add(a.get_item(j));
 
@@ -904,9 +900,7 @@ ostream & operator<<(ostream & out, const DataLine & L)
 
 if ( L.n_items() == 0 )  return out;
 
-int j;
-
-for (j = 0; j < L.Items.size(); j++) {
+for (int j = 0; j < L.Items.size(); j++) {
     out << L.Items[j];
     if (j < (L.Items.size() - 1))
         out << ' ';

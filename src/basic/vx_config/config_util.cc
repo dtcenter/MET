@@ -1113,14 +1113,14 @@ map<ConcatString,StringArray> parse_conf_key_values_map(
       Dictionary *dict, const char *conf_key, const char *caller) {
    StringArray sa;
    map<ConcatString,ConcatString> cs_map;
-   map<ConcatString,ConcatString>::const_iterator it;
    map<ConcatString,StringArray> sa_map;
    const char *method_name = (nullptr != caller) ? caller : "parse_conf_key_values_map() -> ";
 
    cs_map = parse_conf_key_value_map(dict, conf_key, method_name);
 
    // Convert input comma-separated strings to StringArray
-   for(it=cs_map.begin(); it!= cs_map.end(); it++) {
+   for(map<ConcatString,ConcatString>::const_iterator it=cs_map.begin();
+       it!= cs_map.end(); it++) {
       sa.parse_css(it->second);
       sa_map[it->first] = sa;
    }

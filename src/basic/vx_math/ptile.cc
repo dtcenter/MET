@@ -212,7 +212,7 @@ int do_rank(const double *array, double *rank, int n)
 
 if ( n <= 1 )  return 0;
 
-int i, j, ties_current, ties_total, tie_rank_start = 0, tie_rank_end;
+int ties_current, ties_total, tie_rank_start = 0, tie_rank_end;
 double tie_rank_mean;
 RankInfo *rank_info = (RankInfo *) nullptr;
 double *ordered_array = (double *) nullptr;
@@ -223,7 +223,7 @@ ordered_array = new double [n];
 
 // Each RankInfo structure contains a index value from 0 to n-1 and a pointer
 // to the data to be ranked
-for(i=0; i<n; i++) {
+for(int i=0; i<n; i++) {
    rank_info[i].index = i;
    rank_info[i].data = array;
 }
@@ -233,17 +233,17 @@ for(i=0; i<n; i++) {
 qsort(rank_info, n, sizeof(RankInfo), compare_rank);
 
 // Compute and store the inverse permutation of the ranks computed
-for(i=0; i<n; i++) rank[rank_info[i].index] = i+1;
+for(int i=0; i<n; i++) rank[rank_info[i].index] = i+1;
 
 // Use the rank just computed to create an ordered version of the data
-for(i=0; i<n; i++) { ordered_array[nint(rank[i] - 1)] = array[i]; }
+for(int i=0; i<n; i++) { ordered_array[nint(rank[i] - 1)] = array[i]; }
 
 // Search through the ordered array looking for ties.  When ties are found
 // replace the corresponding ranks with the mean of the ranks.
 prev_v = -1.0e30;
 ties_current = ties_total = 0;
 
-for(i=0; i<n; i++) {
+for(int i=0; i<n; i++) {
 
    v = ordered_array[i];
 
@@ -270,7 +270,7 @@ for(i=0; i<n; i++) {
 
          // For each rank between tie_rank_start and tie_rank_end,
          // replace it with tie_rank_mean
-         for(j=tie_rank_start; j<=tie_rank_end; j++) {
+         for(int j=tie_rank_start; j<=tie_rank_end; j++) {
             reset_rank(rank, n, j, tie_rank_mean);
          }
 
@@ -290,7 +290,7 @@ if(ties_current != 0) {
 
    // For each rank between tie_rank_start and tie_rank_end,
    // replace it with tie_rank_mean
-   for(j=tie_rank_start; j<=tie_rank_end; j++) {
+   for(int j=tie_rank_start; j<=tie_rank_end; j++) {
       reset_rank(rank, n, j, tie_rank_mean);
    }
 }
@@ -298,7 +298,7 @@ if(ties_current != 0) {
 if(rank_info)     { delete [] rank_info;     rank_info = (RankInfo *) nullptr; }
 if(ordered_array) { delete [] ordered_array; ordered_array = (double *) nullptr; }
 
-return(ties_total);
+return ties_total;
 
 }
 
@@ -327,9 +327,8 @@ return 0;
 static void reset_rank(double *rank, int n, int old_rank, double new_rank)
 
 {
-int i;
 
-for(i=0; i<n; i++) {
+for(int i=0; i<n; i++) {
    if(is_eq(rank[i], old_rank)) rank[i] = new_rank;
 }
 

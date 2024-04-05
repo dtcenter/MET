@@ -225,9 +225,7 @@ out << prefix << "Nelements = " << Nelements << "\n";
 out << prefix << "Nalloc    = " << Nalloc    << "\n";
 out << prefix << "AllocInc  = " << AllocInc  << "\n";
 
-int j;
-
-for(j=0; j<Nelements; ++j)  {
+for(int j=0; j<Nelements; ++j)  {
 
    out << prefix << "Element # " << j << "\n";
 

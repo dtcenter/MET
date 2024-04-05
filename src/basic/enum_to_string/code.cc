@@ -1054,7 +1054,6 @@ void make_array(const EnumInfo & e, ostream & f)
 {
 
 int jmax;
-int k;
 const int max_len = e.max_id_length();
 
 
@@ -1077,7 +1076,7 @@ for (int j=0; j<=jmax; ++j)  {
 
    f << "   ";
 
-   for (k=m_strlen(e.id(j)); k<max_len; ++k)  f.put(' ');
+   for (int k=m_strlen(e.id(j)); k<max_len; ++k)  f.put(' ');
 
    f << "//  # " << j;
 
