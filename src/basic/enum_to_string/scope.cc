@@ -250,10 +250,9 @@ void ScopeStack::clear()
 
 {
 
-int j;
 ScopeStackElement e;
 
-for (j=0; j<max_scope_stack_depth; ++j)  {
+for (int j=0; j<max_scope_stack_depth; ++j)  {
 
    s[j].clear();
 
@@ -282,9 +281,7 @@ if ( ss.N == 0 )  return;
 
 N = ss.N;
 
-int j;
-
-for (j=0; j<N; ++j)  {
+for (int j=0; j<N; ++j)  {
 
    s[j] = ss.s[j];
 
@@ -456,13 +453,12 @@ if ( ss.n_elements() == 0 )  {
 
 }
 
-int j;
 int n;
 ScopeStackElement e;
 
 n = ss.n_elements();
 
-for (j=0; j<n; ++j)  {
+for (int j=0; j<n; ++j)  {
 
    e = ss.peek(j);
 

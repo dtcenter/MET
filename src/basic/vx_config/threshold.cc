@@ -936,7 +936,6 @@ void Simple_Node::set_perc(const NumArray *fptr, const NumArray *optr, const Num
 
 {
 
-int i;
 double ptile, diff;
 NumArray data;
 const NumArray * ptr = nullptr;
@@ -1067,7 +1066,7 @@ if ( ptr->has(bad_data_double) ) {
 
    data.extend(ptr->n());
 
-   for ( i=0; i<ptr->n(); i++ )  {
+   for (int i=0; i<ptr->n(); i++ )  {
 
       if ( !is_bad_data(ptr->vals()[i]) )  data.add(ptr->vals()[i]);
 

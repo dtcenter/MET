@@ -123,9 +123,7 @@ void EnumInfo::clear()
 if ( !s )  return;
 
 
-int j;
-
-for (j=0; j<Nids; ++j)  {
+for (int j=0; j<Nids; ++j)  {
 
    if ( s[j] )  { delete [] s[j];  s[j] = (char *) nullptr; }
 
@@ -162,11 +160,9 @@ clear();
 
 if ( !(e.s) )  return;
 
-int j;
-
 extend(e.Nids);
 
-for (j=0; j<(e.Nids); ++j)  {
+for (int j=0; j<(e.Nids); ++j)  {
 
    add_id(e.s[j]);
 
@@ -198,7 +194,6 @@ n = (n + enuminfo_alloc_increment - 1)/enuminfo_alloc_increment;
 
 n *= enuminfo_alloc_increment;
 
-int j;
 char ** u = (char **) nullptr;
 
 u = s;
@@ -213,11 +208,11 @@ if ( !s )  {
 
 }
 
-for (j=0; j<n; ++j)  s[j] = (char *) nullptr;
+for (int j=0; j<n; ++j)  s[j] = (char *) nullptr;
 
 if ( u )  {
 
-   for (j=0; j<Nids; ++j)  {
+   for (int j=0; j<Nids; ++j)  {
 
       s[j] = u[j];
 
@@ -261,12 +256,12 @@ int EnumInfo::max_id_length() const
 
 if ( Nids == 0 )  return 0;
 
-int j, k;
+int k;
 int max_len;
 
 max_len = 0;
 
-for (j=0; j<Nids; ++j)  {
+for (int j=0; j<Nids; ++j)  {
 
    k = m_strlen(s[j]);
 
@@ -321,7 +316,7 @@ if ( LowerCaseName )  { delete [] LowerCaseName;  LowerCaseName = (char *) nullp
 
 if ( !text )  return;
 
-int j, k;
+int k;
 
 k = m_strlen(text);
 
@@ -337,7 +332,7 @@ m_strncpy(LowerCaseName, text, k, method_name, "LowerCaseName");
 
 LowerCaseName[k] = (char) 0;   //  just to make sure
 
-for (j=0; j<k; ++j)  {
+for (int j=0; j<k; ++j)  {
 
    LowerCaseName[j] = tolower(LowerCaseName[j]);
 
@@ -361,7 +356,7 @@ if ( U_Scope )  { delete [] U_Scope;  U_Scope = (char *) nullptr; }
 
 if ( !text )  return;
 
-int j, k, m;
+int k, m;
 char c;
 
 
@@ -377,7 +372,7 @@ U_Scope = new char [1 + k];
 
 m = 0;
 
-for (j=0; j<k; ++j)  {
+for (int j=0; j<k; ++j)  {
 
    c = Scope[j];
 
@@ -437,7 +432,6 @@ ostream & operator<<(ostream & s, const EnumInfo & e)
 
 {
 
-int j;
 const char * c = "(nul)";
 
 
@@ -453,7 +447,7 @@ s << c << "\n";
 
 s << "There are " << (e.Nids) << " ids\n";
 
-for (j=0; j<(e.Nids); ++j)  {
+for (int j=0; j<(e.Nids); ++j)  {
 
    s << "    " << j << "   \"";
 

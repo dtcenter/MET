@@ -155,9 +155,7 @@ if ( s.depth() == 0 )  return;
 
 extend(s.depth());
 
-int j;
-
-for (j=0; j<(s.depth()); ++j)  {
+for (int j=0; j<(s.depth()); ++j)  {
 
    e[j] = s.e[j];
 
@@ -185,7 +183,6 @@ if ( AllocInc <= 0 )  AllocInc = default_ns_alloc_inc;
 
 n = AllocInc*( (n + AllocInc - 1)/AllocInc );
 
-int j;
 Number * u = new Number [n];
 
 if ( !u )  {
@@ -196,7 +193,7 @@ if ( !u )  {
 
 }
 
-for(j=0; j<Nelements; ++j)  {
+for(int j=0; j<Nelements; ++j)  {
 
    u[j] = e[j];
 

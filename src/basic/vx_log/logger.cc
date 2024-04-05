@@ -1515,7 +1515,7 @@ Logger & Logger::operator<<(const bool b)
 
 Logger & Logger::operator<<(const Indent & i)
 {
-   int j, jmax;
+   int jmax;
    ConcatString tmp_str;
 
    tmp_str.erase();
@@ -1528,7 +1528,7 @@ Logger & Logger::operator<<(const Indent & i)
       //
       // fill the temporary string with the correct type of characters
       //
-   for (j = 0; j < jmax; j++)
+   for (int j = 0; j < jmax; j++)
    {
       if ((j % (i.delta)) == 0)
          tmp_str << i.on_char;

@@ -110,9 +110,7 @@ bool StringArray::operator==(const StringArray & a) const
 
 if ( n() != a.n() )  return false;
 
-int j;
-
-for (j=0; j<n(); ++j)  {
+for (int j=0; j<n(); ++j)  {
 
   if ( s[j] != a.s[j] )  return false;
 
@@ -191,9 +189,7 @@ Indent prefix2(depth + 1);
 out << prefix << "IgnoreCase = " << IgnoreCase << "\n";
 out << prefix << "Sorted     = " << (Sorted ? "true" : "false") << "\n";
 
-int j;
-
-for (j=0; j<n(); ++j)  {
+for (int j=0; j<n(); ++j)  {
 
    out << prefix2 << "Element # " << j << " = \"" << s[j] << "\"\n";
 
@@ -653,9 +649,7 @@ bool StringArray::has_option(int & index) const
 
 index = -1;
 
-int j;
-
-for (j=0; j<n(); ++j)  {
+for (int j=0; j<n(); ++j)  {
 
    if ( s[j][0] == '-' )  {
 
@@ -682,9 +676,7 @@ bool StringArray::reg_exp_match(const char * text) const
 
 if ( n() == 0 || !text )  return false;
 
-int j;
-
- for (j=0; j<n(); ++j)  {
+for (int j=0; j<n(); ++j)  {
 
    if ( check_reg_exp(s[j].c_str(), text) )  { return true; }
 

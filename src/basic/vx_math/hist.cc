@@ -120,9 +120,7 @@ void Histogram::clear()
 
 {
 
-int j;
-
-for (j=0; j<Nbins; ++j)  Count[j] = 0;
+for (int j=0; j<Nbins; ++j)  Count[j] = 0;
 
 is_empty = 1;
 
@@ -171,10 +169,8 @@ set_nbd(h.Nbins, h.Bottom, h.Delta);
 
 is_empty = h.is_empty;
 
-int j;
 
-
-for (j=0; j<Nbins; ++j)  {
+for (int j=0; j<Nbins; ++j)  {
 
    Count[j] = h.Count[j];
 
@@ -271,11 +267,11 @@ int Histogram::total_bin_count() const
 
 if ( Nbins == 0 )  return 0;
 
-int j, t;
+int t;
 
 t = 0;
 
-for (j=0; j<Nbins; ++j)  {
+for (int j=0; j<Nbins; ++j)  {
 
    t += Count[j];
 
@@ -296,11 +292,11 @@ int Histogram::max_bin_count() const
 
 if ( Nbins == 0 )  return 0;
 
-int j, m;
+int m;
 
 m = Count[0];
 
-for (j=1; j<Nbins; ++j)  {   //  j starts at one here
+for (int j=1; j<Nbins; ++j)  {   //  j starts at one here
 
    if ( Count[j] > m )  m = Count[j];
 
@@ -321,11 +317,11 @@ int Histogram::min_bin_count() const
 
 if ( Nbins == 0 )  return 0;
 
-int j, m;
+int m;
 
 m = Count[0];
 
-for (j=1; j<Nbins; ++j)  {   //  j starts at one here
+for (int j=1; j<Nbins; ++j)  {   //  j starts at one here
 
    if ( Count[j] < m )  m = Count[j];
 

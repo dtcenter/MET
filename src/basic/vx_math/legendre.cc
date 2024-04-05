@@ -164,9 +164,7 @@ set_max_degree(L.MaxDegree);
 
 X = L.X;
 
-int j;
-
-for (j=0; j<=MaxDegree; ++j)  {
+for (int j=0; j<=MaxDegree; ++j)  {
 
    P[j] = L.P[j];
 
@@ -233,7 +231,6 @@ void Legendre::calc(double xx)
 
 {
 
-int j;
 double nm2, nm1, d_nm1;
 double v, dv;
 
@@ -247,7 +244,7 @@ PP[0] = 0.0;
 
 d_nm1 = PP[1] = 1.0;
 
-for (j=2; j<=MaxDegree; ++j)  {
+for (int j=2; j<=MaxDegree; ++j)  {
 
    v = 2.0*xx*nm1 - nm2 - ( xx*nm1 -  nm2 )/j;
 

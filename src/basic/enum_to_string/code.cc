@@ -72,7 +72,6 @@ void write_header(const EnumInfo & e)
 
 if ( e.n_ids() == 0 )  return;
 
-int j;
 ofstream f;
 char filename[256];
 char lower[256];
@@ -89,7 +88,7 @@ max_len = 0;
 if ( e.scope() )  scope_len = m_strlen(e.scope()) + 2;   //  includes "::"
 else              scope_len = 0;
 
-for (j=0; j<(e.n_ids()); ++j)  {
+for (int j=0; j<(e.n_ids()); ++j)  {
 
    len = m_strlen(e.id(j));
 
@@ -655,7 +654,7 @@ void forward(const EnumInfo & e, const char * lower, ostream & out)
 
 if ( e.n_ids() == 0 )  return;
 
-int j, k, m;
+int k, m;
 int max_len;
 char full_id[256];
 
@@ -678,7 +677,7 @@ out << "switch ( t )  {\n"
 
 max_len = e.max_id_length();
 
-for (j=0; j<(e.n_ids()); ++j)  {
+for (int j=0; j<(e.n_ids()); ++j)  {
 
    if ( e.scope() )  snprintf(full_id, sizeof(full_id), "%s::%s", e.scope(), e.id(j));
    else              snprintf(full_id, sizeof(full_id), "%s", e.id(j));
@@ -738,7 +737,7 @@ void forward_cs(const EnumInfo & e, const char * lower, ostream & out)
 
 if ( e.n_ids() == 0 )  return;
 
-int j, k, m;
+int k;
 int max_len;
 char full_id[256];
 
@@ -762,7 +761,7 @@ out << "switch ( t )  {\n"
 
 max_len = e.max_id_length();
 
-for (j=0; j<(e.n_ids()); ++j)  {
+for (int j=0; j<(e.n_ids()); ++j)  {
 
    if ( e.scope() )  snprintf(full_id, sizeof(full_id), "%s::%s", e.scope(), e.id(j));
    else              snprintf(full_id, sizeof(full_id), "%s", e.id(j));
@@ -771,11 +770,11 @@ for (j=0; j<(e.n_ids()); ++j)  {
 
    out << "   " << "case " << full_id << ":   ";
 
-   for (m=k; m<max_len; ++m)  out.put(' ');
+   for (int m=k; m<max_len; ++m)  out.put(' ');
 
    out << "s = \"" << full_id << "\";";
 
-   for (m=k; m<max_len; ++m)  out.put(' ');
+   for (int m=k; m<max_len; ++m)  out.put(' ');
 
    out << "   " << "break;";
 
@@ -820,7 +819,7 @@ void reverse(const EnumInfo & e, const char * lower, ostream & out)
 
 {
 
-int j, k, m, n;
+int k, n;
 int max_len;
 
 
@@ -842,7 +841,7 @@ out << e.name() << " & t)\n"
 
 n = e.n_ids();
 
-for (j=0; j<n; ++j)  {
+for (int j=0; j<n; ++j)  {
 
    k = m_strlen(e.id(j));
 
@@ -855,7 +854,7 @@ for (j=0; j<n; ++j)  {
 
    out << e.id(j) << "\"";
 
-   for (m=k; m<max_len; ++m)  out.put(' ');
+   for (int m=k; m<max_len; ++m)  out.put(' ');
 
    out << ") == 0 )   { t = ";
 
@@ -863,7 +862,7 @@ for (j=0; j<n; ++j)  {
 
    out << e.id(j) << ";";
 
-   for (m=k; m<max_len; ++m)  out.put(' ');
+   for (int m=k; m<max_len; ++m)  out.put(' ');
 
    out << "   " << "return true;";
 
@@ -906,7 +905,8 @@ void make_lowercase(const char * in, char * out)
 
 {
 
-int j, k;
+int j;
+int k;
 
 k = m_strlen(in);
 
@@ -931,7 +931,8 @@ void make_uppercase(const char * in, char * out)
 
 {
 
-int j, k;
+int j;
+int k;
 
 k = m_strlen(in);
 
@@ -995,7 +996,7 @@ void patch_name(char * len_name)
 
 {
 
-int j, n;
+int n;
 int pos;
 char * new_name = (char *) nullptr;
 char c;
@@ -1007,7 +1008,7 @@ new_name = new char [n + 1];
 
 pos = 0;
 
-for (j=0; j<n; ++j)  {
+for (int j=0; j<n; ++j)  {
 
    c = len_name[j];
 
@@ -1052,7 +1053,7 @@ void make_array(const EnumInfo & e, ostream & f)
 
 {
 
-int j, jmax;
+int jmax;
 int k;
 const int max_len = e.max_id_length();
 
@@ -1067,7 +1068,7 @@ f << "static const " << (e.name()) << " enum_" << (e.lowercase_name()) << "_arra
 
 jmax = e.n_ids() - 1;
 
-for (j=0; j<=jmax; ++j)  {
+for (int j=0; j<=jmax; ++j)  {
 
    f << "   " << e.id(j);
 

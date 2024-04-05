@@ -279,14 +279,12 @@ void init()
 
 {
 
-int j;
+for (int j=0; j<256; ++j)     char_class[j] = char_class_other;
 
-for (j=0; j<256; ++j)     char_class[j] = char_class_other;
+for (int j='0'; j<='9'; ++j)  char_class[j] = char_class_digit;
 
-for (j='0'; j<='9'; ++j)  char_class[j] = char_class_digit;
-
-for (j='A'; j<='Z'; ++j)  char_class[j] = char_class_alpha;
-for (j='a'; j<='z'; ++j)  char_class[j] = char_class_alpha;
+for (int j='A'; j<='Z'; ++j)  char_class[j] = char_class_alpha;
+for (int j='a'; j<='z'; ++j)  char_class[j] = char_class_alpha;
 
 char_class['_']  = char_class_alpha;
 
@@ -343,7 +341,7 @@ bool is_int()
 
 {
 
-int j, k;
+int k;
 int j_start = 0;
 int digit_count = 0;
 
@@ -351,7 +349,7 @@ k = char_class[lexeme[0]];
 
 if ( k == char_class_sign )  j_start = 1;
 
-for (j=j_start; j<max_lexeme_size; ++j)  {
+for (int j=j_start; j<max_lexeme_size; ++j)  {
 
    if ( lexeme[j] == 0 )  break;
 

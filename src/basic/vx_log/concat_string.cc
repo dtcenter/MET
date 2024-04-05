@@ -843,13 +843,13 @@ ConcatString & operator<<(ConcatString & a, const Indent & i)
 
 {
 
-int j, jmax;
+int jmax;
 
 
 jmax = (i.delta)*(i.depth);
 
 
-for (j=0; j<jmax; ++j)  {
+for (int j=0; j<jmax; ++j)  {
 
    if ( (j%(i.delta)) == 0 )  a << i.on_char;
    else                       a << i.off_char;

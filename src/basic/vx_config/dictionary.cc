@@ -321,7 +321,6 @@ void DictionaryEntry::dump_config_format(ostream & out, int depth) const
 
 {
 
-int k;
 const ConcatString s = config_prefix(depth);
 
 out << s;
@@ -384,7 +383,7 @@ switch ( Type )  {
 
    case PwlFunctionType:
       out << "( ";
-      for (k=0; k<(PWL->n_points()); ++k)  {
+      for (int k=0; k<(PWL->n_points()); ++k)  {
 
          out << '(' << (PWL->x(k)) << ", " << (PWL->y(k)) << ')';
 
@@ -667,12 +666,11 @@ Dict = new Dictionary;
    //  zero out parents for dictionaries in array
    //
 
-int j;
 const DictionaryEntry * E = (const DictionaryEntry *) nullptr;
 Dictionary * D = (Dictionary *) nullptr;
 Dictionary & DD = *Dict;
 
-for (j=0; j<(Dict->n_entries()); ++j)  {
+for (int j=0; j<(Dict->n_entries()); ++j)  {
 
    E = DD[j];
 
@@ -1011,9 +1009,8 @@ if ( d.Nentries > 0 )  {
 
    extend(d.Nentries);
 
-   int j;
 
-   for (j=0; j<(d.Nentries); ++j)  {
+   for (int j=0; j<(d.Nentries); ++j)  {
 
       store( *(d.e[j]) );
 
@@ -1110,16 +1107,15 @@ if ( Nalloc >= n )  return;
 
 n = dictionary_alloc_inc*((n + dictionary_alloc_inc - 1)/dictionary_alloc_inc);
 
-int j;
 DictionaryEntry ** u = (DictionaryEntry **) nullptr;
 
 u = new DictionaryEntry * [n];
 
-for (j=0; j<n; ++j)  u[j] = (DictionaryEntry *) nullptr;
+for (int j=0; j<n; ++j)  u[j] = (DictionaryEntry *) nullptr;
 
 if ( e )  {
 
-   for (j=0; j<Nentries; ++j)  u[j] = e[j];
+   for (int j=0; j<Nentries; ++j)  u[j] = e[j];
 
    delete [] e;  e = (DictionaryEntry **) nullptr;
 
@@ -1266,7 +1262,6 @@ if ( Nentries == 0 )  {
    return (const DictionaryEntry *) nullptr;
 }
 
-int j;
 StringArray scope;
 ConcatString Name = name;
 const DictionaryEntry * E = (const DictionaryEntry *) nullptr;
@@ -1285,7 +1280,7 @@ if ( scope.n_elements() == 1 )  {
 
 }
 
-for (j=0; j<(scope.n_elements() - 1); ++j)  {
+for (int j=0; j<(scope.n_elements() - 1); ++j)  {
 
   E = D->lookup(scope[j].c_str(), search_parent);
 
@@ -2439,9 +2434,7 @@ void DictionaryStack::init_from_scratch()
 
 {
 
-int j;
-
-for (j=0; j<max_dictionary_depth; ++j)  {
+for (int j=0; j<max_dictionary_depth; ++j)  {
 
    D[j] = (Dictionary *) nullptr;
 
@@ -2461,9 +2454,7 @@ void DictionaryStack::clear()
 
 {
 
-int j;
-
-for (j=1; j<max_dictionary_depth; ++j)  {   //  j starts at one, here
+for (int j=1; j<max_dictionary_depth; ++j)  {   //  j starts at one, here
 
    if ( D[j] )  { delete D[j];  D[j] = (Dictionary *) nullptr; }
 
@@ -2487,9 +2478,7 @@ clear();
 
 if ( s.Nelements == nullptr )  return;
 
-int j;
-
-for (j=0; j<(s.Nelements); ++j)  {
+for (int j=0; j<(s.Nelements); ++j)  {
 
    D[j] = new Dictionary;
 
@@ -2794,10 +2783,9 @@ const DictionaryEntry * DictionaryStack::lookup(const std::string name) const
 
 if ( Nelements == 0 )  return (const DictionaryEntry *) nullptr;
 
-int j;
 const DictionaryEntry * E = (const DictionaryEntry *) nullptr;
 
-for (j=(Nelements - 1); j>=0; --j)  {
+for (int j=(Nelements - 1); j>=0; --j)  {
 
    E = D[j]->lookup(name);
 
@@ -2830,12 +2818,11 @@ ConcatString config_prefix(int depth)
 {
 
 
-int j;
 ConcatString s;
 
 if ( depth == 0 )   { s << ' ';  return s; }
 
-for (j=0; j<depth; ++j)  {
+for (int j=0; j<depth; ++j)  {
 
    s << config_tab;
 
