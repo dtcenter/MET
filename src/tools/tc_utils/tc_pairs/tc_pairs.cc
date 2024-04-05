@@ -2079,7 +2079,7 @@ void process_watch_warn(TrackPairInfoArray &p) {
       ww_sid.ws_strip();
 
       // Determine the maximum severity watch/warning in effect
-      for(i=0, ww_type=NoWatchWarnType; i<n_ww; i++) {
+      for(i=0, ww_type=WatchWarnType::None; i<n_ww; i++) {
 
          // Read the next line
          f_in >> dl;

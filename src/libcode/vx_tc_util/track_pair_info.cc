@@ -567,7 +567,7 @@ int TrackPairInfo::i_init() const {
 ////////////////////////////////////////////////////////////////////////
 
 WatchWarnType TrackPairInfo::watch_warn(int i) const {
-   WatchWarnType ww_type = NoWatchWarnType;
+   WatchWarnType ww_type = WatchWarnType::None;
 
    // Only check points common to both the ADECK and BDECK tracks
    if(!is_bad_data(ADeck[i].lat()) && !is_bad_data(ADeck[i].lon()) &&

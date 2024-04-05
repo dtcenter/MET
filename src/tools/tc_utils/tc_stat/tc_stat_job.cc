@@ -551,10 +551,10 @@ bool TCStatJob::is_keeper_track(const TrackPairInfo &pair,
          //    HUWARN, TSWARN, HUWATCH, TSWATCH
          if(TrackWatchWarn.has(watchwarntype_to_string(ww_type)) ||
             (TrackWatchWarn.has("ALL") &&
-             (ww_type == HurricaneWarn     ||
-              ww_type == TropicalStormWarn ||
-              ww_type == HurricaneWatch    ||
-              ww_type == TropicalStormWatch))) {
+             (ww_type == WatchWarnType::HurricaneWarn     ||
+              ww_type == WatchWarnType::TropicalStormWarn ||
+              ww_type == WatchWarnType::HurricaneWatch    ||
+              ww_type == WatchWarnType::TropicalStormWatch))) {
             keep = true;
             break;
          }

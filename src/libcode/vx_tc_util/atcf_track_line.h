@@ -26,7 +26,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-enum WatchWarnType {
+enum class WatchWarnType {
    TropicalStormWatch, // Tropical Storm Watch
    TropicalStormWarn,  // Tropical Storm Warning
 
@@ -36,7 +36,7 @@ enum WatchWarnType {
    HurricaneWatch,     // Hurricane Watch
    HurricaneWarn,      // Hurricane Warning
 
-   NoWatchWarnType
+   None
 };
 
 extern WatchWarnType ww_max(const WatchWarnType, const WatchWarnType);
@@ -46,7 +46,7 @@ extern ConcatString  watchwarntype_to_string(const WatchWarnType);
 
 ////////////////////////////////////////////////////////////////////////
 
-enum CycloneLevel {
+enum class CycloneLevel {
    Disturbance,            // DB
    TropicalDepression,     // TD
    TropicalStorm,          // TS
@@ -67,7 +67,7 @@ enum CycloneLevel {
    TropicalWave,           // WV
    Extrapolated,           // ET
 
-   NoCycloneLevel          // XX
+   None                    // XX
 };
 
 extern CycloneLevel string_to_cyclonelevel(const char *);
@@ -76,20 +76,20 @@ extern CycloneLevel wind_speed_to_cyclonelevel(int);
 
 ////////////////////////////////////////////////////////////////////////
 
-enum QuadrantType {
+enum class QuadrantType {
     FullCircle, // AAA
 
-    N_Quadrant, // NNQ
-    E_Quadrant, // EEQ
-    S_Quadrant, // SSQ
-    W_Quadrant, // WWQ
+    N, // NNQ
+    E, // EEQ
+    S, // SSQ
+    W, // WWQ
 
-   NE_Quadrant, // NEQ
-   SE_Quadrant, // SEQ
-   SW_Quadrant, // SWQ
-   NW_Quadrant, // NWQ
+   NE, // NEQ
+   SE, // SEQ
+   SW, // SWQ
+   NW, // NWQ
 
-   NoQuadrantType
+   None
 };
 
 extern QuadrantType string_to_quadranttype(const char *);
@@ -97,7 +97,7 @@ extern ConcatString quadranttype_to_string(const QuadrantType);
 
 ////////////////////////////////////////////////////////////////////////
 
-enum SubregionCode {
+enum class SubregionCode {
    Arabian_Sea,       // A
    Bay_of_Bengal,     // B
    Central_Pacific,   // C
@@ -107,7 +107,7 @@ enum SubregionCode {
    South_Atlantic,    // Q
    South_IO,          // S
    Western_Pacific,   // W
-   NoSubregionCode
+   None
 };
 
 extern SubregionCode string_to_subregioncode(const char *);
@@ -115,11 +115,11 @@ extern ConcatString  subregioncode_to_string(const SubregionCode);
 
 ////////////////////////////////////////////////////////////////////////
 
-enum SystemsDepth {
-   DeepDepth,         // D
-   MediumDepth,       // M
-   ShallowDepth,      // S
-   NoSystemsDepth     // X
+enum class SystemsDepth {
+   Deep,         // D
+   Medium,       // M
+   Shallow,      // S
+   None          // X
 };
 
 extern SystemsDepth string_to_systemsdepth(const char *);
