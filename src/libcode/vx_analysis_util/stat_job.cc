@@ -2799,8 +2799,8 @@ ConcatString STATAnalysisJob::get_jobstring() const {
       }
    }
 
-   // Jobs which use out_eclv_points
    if(line_type.n() > 0) {
+      // Jobs which use out_eclv_points
       if(string_to_statlinetype(line_type[0].c_str()) == STATLineType::mpr &&
          out_line_type.has(stat_eclv_str)) {
 
@@ -2809,10 +2809,8 @@ ConcatString STATAnalysisJob::get_jobstring() const {
             js << "-out_eclv_points " << out_eclv_points[i] << " ";
          }
       }
-   }
 
-   // Jobs which perform bootstrapping
-   if(line_type.n() > 0) {
+      // Jobs which perform bootstrapping
       type = string_to_statlinetype(line_type[0].c_str());
       if(type == STATLineType::mpr           &&
          (out_line_type.has(stat_cts_str)    ||
