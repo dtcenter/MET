@@ -22,7 +22,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 // Enumerate all the possible line types
-enum TCStatLineType {
+enum class TCStatLineType {
 
    TCMPR,
    TCDIAG,

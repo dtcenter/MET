@@ -705,8 +705,8 @@ void do_genesis_ctc(const TCGenVxOpt &vx_opt,
               << ") is a dev and ops FALSE ALARM.\n";
 
          // FALSE ALARM for both methods
-         diff.DevCategory = FYONGenesis;
-         diff.OpsCategory = FYONGenesis;
+         diff.DevCategory = GenesisPairCategory::FYON;
+         diff.OpsCategory = GenesisPairCategory::FYON;
       }
 
       // Unmatched BEST genesis (MISS)
@@ -719,8 +719,8 @@ void do_genesis_ctc(const TCGenVxOpt &vx_opt,
               << ") is a dev and ops MISS.\n";
 
          // MISS for both methods
-         diff.DevCategory = FNOYGenesis;
-         diff.OpsCategory = FNOYGenesis;
+         diff.DevCategory = GenesisPairCategory::FNOY;
+         diff.OpsCategory = GenesisPairCategory::FNOY;
       }
 
       // Matched genesis pairs (DISCARD, HIT, or FALSE ALARM)
@@ -743,8 +743,8 @@ void do_genesis_ctc(const TCGenVxOpt &vx_opt,
                  << " genesis time.\n";
 
             // DISCARD for both methods
-            diff.DevCategory = DiscardGenesis;
-            diff.OpsCategory = DiscardGenesis;
+            diff.DevCategory = GenesisPairCategory::Discard;
+            diff.OpsCategory = GenesisPairCategory::Discard;
          }
          // Check for a HIT
          else {
@@ -769,14 +769,14 @@ void do_genesis_ctc(const TCGenVxOpt &vx_opt,
                     << " is a dev method HIT " << offset_cs;
 
                // HIT for the development method
-               diff.DevCategory = FYOYGenesis;
+               diff.DevCategory = GenesisPairCategory::FYOY;
             }
             else {
                mlog << Debug(4) << case_cs
                     << " is a dev method FALSE ALARM " << offset_cs;
 
                // FALSE ALARM for the development method
-               diff.DevCategory = FYONGenesis;
+               diff.DevCategory = GenesisPairCategory::FYON;
             }
 
             // Compute init/genesis time offset
@@ -796,14 +796,14 @@ void do_genesis_ctc(const TCGenVxOpt &vx_opt,
                     << " is an ops method HIT " << offset_cs;
 
                // HIT for the operational method
-               diff.OpsCategory = FYOYGenesis;
+               diff.OpsCategory = GenesisPairCategory::FYOY;
             }
             else {
                mlog << Debug(4) << case_cs
                     << " is an ops method FALSE ALARM " << offset_cs;
 
                // FALSE ALARM for the operational method
-               diff.OpsCategory = FYONGenesis;
+               diff.OpsCategory = GenesisPairCategory::FYON;
             }
          }
       }
