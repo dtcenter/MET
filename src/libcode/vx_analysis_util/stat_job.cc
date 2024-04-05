@@ -1706,7 +1706,7 @@ int STATAnalysisJob::set_job_type(const char *c) {
    job_type = string_to_statjobtype(c);
 
    if(job_type == STATJobType::None) return 1;
-   else                             return 0;
+   else                              return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2726,7 +2726,7 @@ ConcatString STATAnalysisJob::get_jobstring() const {
    }
 
    // Jobs which use out_alpha
-   if(job_type == STATJobType::summary        ||
+   if(job_type == STATJobType::summary    ||
        out_line_type.has(stat_cts_str)    ||
        out_line_type.has(stat_mcts_str)   ||
        out_line_type.has(stat_cnt_str)    ||
