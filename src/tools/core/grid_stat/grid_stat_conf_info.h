@@ -66,34 +66,34 @@ static const int n_txt    = 22;
 // Text file type
 static const STATLineType txt_file_type[n_txt] = {
 
-   stat_fho,        //  0
-   stat_ctc,        //  1
-   stat_cts,        //  2
+   STATLineType::fho,        //  0
+   STATLineType::ctc,        //  1
+   STATLineType::cts,        //  2
 
-   stat_mctc,       //  3
-   stat_mcts,       //  4
-   stat_cnt,        //  5
+   STATLineType::mctc,       //  3
+   STATLineType::mcts,       //  4
+   STATLineType::cnt,        //  5
 
-   stat_sl1l2,      //  6
-   stat_sal1l2,     //  7
-   stat_vl1l2,      //  8
+   STATLineType::sl1l2,      //  6
+   STATLineType::sal1l2,     //  7
+   STATLineType::vl1l2,      //  8
 
-   stat_val1l2,     //  9
-   stat_pct,        //  10
-   stat_pstd,       //  11
+   STATLineType::val1l2,     //  9
+   STATLineType::pct,        //  10
+   STATLineType::pstd,       //  11
 
-   stat_pjc,        //  12
-   stat_prc,        //  13
-   stat_eclv,       //  14
+   STATLineType::pjc,        //  12
+   STATLineType::prc,        //  13
+   STATLineType::eclv,       //  14
 
-   stat_nbrctc,     //  15
-   stat_nbrcts,     //  16
-   stat_nbrcnt,     //  17
+   STATLineType::nbrctc,     //  15
+   STATLineType::nbrcts,     //  16
+   STATLineType::nbrcnt,     //  17
 
-   stat_grad,       //  18
-   stat_vcnt,       //  19
-   stat_dmap,       //  20
-   stat_seeps       //  21
+   STATLineType::grad,       //  18
+   STATLineType::vcnt,       //  19
+   STATLineType::dmap,       //  20
+   STATLineType::seeps       //  21
 
 };
 

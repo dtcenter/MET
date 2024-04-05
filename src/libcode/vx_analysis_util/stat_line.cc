@@ -140,7 +140,7 @@ void STATLine::clear()
 
 DataLine::clear();
 
-Type    = no_stat_line_type;
+Type    = STATLineType::none;
 HdrLine = (AsciiHeaderLine *) nullptr;
 
 return;
@@ -265,7 +265,7 @@ if ( !status || n_items() == 0 )  {
 
 if ( strcmp(get_item(0), "VERSION") == 0 ) {
 
-   Type = stat_header;
+   Type = STATLineType::header;
 
    return 1;
 }
@@ -278,7 +278,7 @@ offset = METHdrTable.col_offset(get_item(0), "STAT", na_str, "LINE_TYPE");
 
 if( is_bad_data(offset) || n_items() < (offset + 1) )  {
 
-   Type = no_stat_line_type;
+   Type = STATLineType::none;
 
    return 0;
 }
@@ -315,7 +315,7 @@ bool STATLine::is_header() const
 
 {
 
-return ( Type == stat_header );
+return ( Type == STATLineType::header );
 
 }
 

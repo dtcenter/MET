@@ -3689,7 +3689,7 @@ void TCStatJobRIRW::setup_stat_file(int n_row) {
              OutLineType : LineType);
 
    out_lt = (out_sa.n() == 1 ?
-             string_to_statlinetype(out_sa[0].c_str()) : no_stat_line_type);
+             string_to_statlinetype(out_sa[0].c_str()) : STATLineType::none);
 
    //
    // Loop through the output line types and determine the number of
@@ -3698,8 +3698,8 @@ void TCStatJobRIRW::setup_stat_file(int n_row) {
    for(i=0, c=0, n_col=0; i<out_sa.n(); i++) {
       cur_lt = string_to_statlinetype(out_sa[i].c_str());
       switch(cur_lt) {
-         case stat_ctc:    c = n_ctc_columns;          break;
-         case stat_cts:    c = n_cts_columns;          break;
+         case STATLineType::ctc:    c = n_ctc_columns;          break;
+         case STATLineType::cts:    c = n_cts_columns;          break;
          default:
          mlog << Error << "\nSTATAnalysisJob::setup_stat_file() -> "
               << "unexpected stat line type \"" << statlinetype_to_string(cur_lt)
@@ -3741,16 +3741,16 @@ void TCStatJobRIRW::setup_stat_file(int n_row) {
       // Write the STAT header row
       //
       switch(out_lt) {
-         case stat_ctc:
+         case STATLineType::ctc:
             write_header_row(ctc_columns, n_ctc_columns, 1, stat_at, 0, 0);
             break;
 
-         case stat_cts:
+         case STATLineType::cts:
             write_header_row(cts_columns, n_cts_columns, 1, stat_at, 0, 0);
             break;
 
          // Write only header columns for unspecified line type
-         case no_stat_line_type:
+         case STATLineType::none:
             write_header_row((const char **) 0, 0, 1, stat_at, 0, 0);
             break;
           
@@ -4337,10 +4337,10 @@ void TCStatJobProbRIRW::do_output(ostream &out) {
       out_lt = string_to_statlinetype(OutLineType[i].c_str());
 
       // Write the header columns
-           if(out_lt == stat_pct)  lt_cols = get_n_pct_columns (n);
-      else if(out_lt == stat_pstd) lt_cols = get_n_pstd_columns(n);
-      else if(out_lt == stat_prc)  lt_cols = get_n_prc_columns (n);
-      else if(out_lt == stat_pjc)  lt_cols = get_n_pjc_columns (n);
+           if(out_lt == STATLineType::pct)  lt_cols = get_n_pct_columns (n);
+      else if(out_lt == STATLineType::pstd) lt_cols = get_n_pstd_columns(n);
+      else if(out_lt == STATLineType::prc)  lt_cols = get_n_prc_columns (n);
+      else if(out_lt == STATLineType::pjc)  lt_cols = get_n_pjc_columns (n);
       else {
          mlog << Error << "\nvoid TCStatJobProbRIRW::do_output(ostream &out) -> "
               << "unsupported output line type \"" << OutLineType[i] << "\"\n\n";
@@ -4371,10 +4371,10 @@ void TCStatJobProbRIRW::do_output(ostream &out) {
          out_at.set_entry(r, c++, ByColumn[j]);
 
       // Write the header columns
-           if(out_lt == stat_pct)  write_pct_header_row (0, n, out_at, r, c);
-      else if(out_lt == stat_pstd) write_pstd_header_row(0, n, out_at, r, c);
-      else if(out_lt == stat_prc)  write_prc_header_row (0, n, out_at, r, c);
-      else if(out_lt == stat_pjc)  write_pjc_header_row (0, n, out_at, r, c);
+           if(out_lt == STATLineType::pct)  write_pct_header_row (0, n, out_at, r, c);
+      else if(out_lt == STATLineType::pstd) write_pstd_header_row(0, n, out_at, r, c);
+      else if(out_lt == STATLineType::prc)  write_prc_header_row (0, n, out_at, r, c);
+      else if(out_lt == STATLineType::pjc)  write_pjc_header_row (0, n, out_at, r, c);
 
       // Loop over the map entries and populate the output table
       for(it=ProbRIRWMap.begin(),r=1; it!=ProbRIRWMap.end(); it++,r++) {
@@ -4399,7 +4399,7 @@ void TCStatJobProbRIRW::do_output(ostream &out) {
             out_at.set_entry(r, c++, sa[j]);
 
          // Compute PSTD statistics
-         if(out_lt == stat_pstd) {
+         if(out_lt == STATLineType::pstd) {
             it->second.Info.allocate_n_alpha(1);
             it->second.Info.alpha[0] = OutAlpha;
             it->second.Info.compute_stats();
@@ -4407,10 +4407,10 @@ void TCStatJobProbRIRW::do_output(ostream &out) {
          }
 
          // Write output columns
-              if(out_lt == stat_pct)  write_pct_cols (it->second.Info,    out_at, r, c);
-         else if(out_lt == stat_pstd) write_pstd_cols(it->second.Info, 0, out_at, r, c);
-         else if(out_lt == stat_prc)  write_prc_cols (it->second.Info,    out_at, r, c);
-         else if(out_lt == stat_pjc)  write_pjc_cols (it->second.Info,    out_at, r, c);
+              if(out_lt == STATLineType::pct)  write_pct_cols (it->second.Info,    out_at, r, c);
+         else if(out_lt == STATLineType::pstd) write_pstd_cols(it->second.Info, 0, out_at, r, c);
+         else if(out_lt == STATLineType::prc)  write_prc_cols (it->second.Info,    out_at, r, c);
+         else if(out_lt == STATLineType::pjc)  write_pjc_cols (it->second.Info,    out_at, r, c);
       } // end for it
 
       // Write the table for the current output line type

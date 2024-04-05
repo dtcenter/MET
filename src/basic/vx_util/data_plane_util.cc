@@ -128,27 +128,27 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
          // Compute the smoothed value based on the interpolation method
          switch(mthd) {
 
-            case(InterpMthd::Min):      // Minimum
+            case InterpMthd::Min:      // Minimum
                v = interp_min(dp, *gt, x, y, t);
                break;
 
-            case(InterpMthd::Max):      // Maximum
+            case InterpMthd::Max:      // Maximum
                v = interp_max(dp, *gt, x, y, t);
                break;
 
-            case(InterpMthd::Median):   // Median
+            case InterpMthd::Median:   // Median
                v = interp_median(dp, *gt, x, y, t);
                break;
 
-            case(InterpMthd::UW_Mean):  // Unweighted Mean
+            case InterpMthd::UW_Mean:  // Unweighted Mean
                v = interp_uw_mean(dp, *gt, x, y, t);
                break;
 
-            case(InterpMthd::Gaussian): // For Gaussian, pass the data through
+            case InterpMthd::Gaussian: // For Gaussian, pass the data through
                v = dp.get(x, y);
                break;
 
-            case(InterpMthd::MaxGauss): // For Max Gaussian, compute the max
+            case InterpMthd::MaxGauss: // For Max Gaussian, compute the max
                v = interp_max(dp, *gt, x, y, 0);
                break;
 

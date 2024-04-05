@@ -176,18 +176,18 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
    }
 
    // Set flags
-   bool do_cat = (output_stats[stat_fho].n()    +
-                  output_stats[stat_ctc].n()    +
-                  output_stats[stat_cts].n()    +
-                  output_stats[stat_mctc].n()   +
-                  output_stats[stat_mcts].n()   +
-                  output_stats[stat_pct].n()    +
-                  output_stats[stat_pstd].n()   +
-                  output_stats[stat_pjc].n()    +
-                  output_stats[stat_prc].n()) > 0;
-   bool do_cnt = (output_stats[stat_sl1l2].n()  +
-                  output_stats[stat_sal1l2].n() +
-                  output_stats[stat_cnt].n()) > 0;
+   bool do_cat = (output_stats[STATLineType::fho].n()    +
+                  output_stats[STATLineType::ctc].n()    +
+                  output_stats[STATLineType::cts].n()    +
+                  output_stats[STATLineType::mctc].n()   +
+                  output_stats[STATLineType::mcts].n()   +
+                  output_stats[STATLineType::pct].n()    +
+                  output_stats[STATLineType::pstd].n()   +
+                  output_stats[STATLineType::pjc].n()    +
+                  output_stats[STATLineType::prc].n()) > 0;
+   bool do_cnt = (output_stats[STATLineType::sl1l2].n()  +
+                  output_stats[STATLineType::sal1l2].n() +
+                  output_stats[STATLineType::cnt].n()) > 0;
 
    // Conf: fcst.field and obs.field
    fdict = conf.lookup_array(conf_key_fcst_field);
@@ -384,8 +384,8 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
 
       // Verifying with multi-category contingency tables
       if(!fcst_info[0]->is_prob() &&
-         (output_stats[stat_mctc].n() > 0 ||
-          output_stats[stat_mcts].n() > 0)) {
+         (output_stats[STATLineType::mctc].n() > 0 ||
+          output_stats[STATLineType::mcts].n() > 0)) {
          check_mctc_thresh(fcat_ta);
          check_mctc_thresh(ocat_ta);
       }

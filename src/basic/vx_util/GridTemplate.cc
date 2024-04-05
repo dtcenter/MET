@@ -660,10 +660,10 @@ GridTemplate* GridTemplateFactory::buildGT(string gt, int width, bool wrap_lon) 
 GridTemplate* GridTemplateFactory::buildGT(GridTemplates gt, int width, bool wrap_lon) {
 
    switch (gt) {
-      case(GridTemplates::Square):
+      case GridTemplates::Square:
          return new RectangularTemplate(width, width, wrap_lon);
 
-      case(GridTemplates::Circle):
+      case GridTemplates::Circle:
          return new CircularTemplate(width, wrap_lon);
 
       default:

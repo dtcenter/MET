@@ -820,38 +820,38 @@ void process_scores() {
 
          // Compute contingency table counts and statistics
          if(!conf_info.fcst_info[0]->is_prob() &&
-            (conf_info.output_stats[stat_fho].n() +
-             conf_info.output_stats[stat_ctc].n() +
-             conf_info.output_stats[stat_cts].n()) > 0) {
+            (conf_info.output_stats[STATLineType::fho].n() +
+             conf_info.output_stats[STATLineType::ctc].n() +
+             conf_info.output_stats[STATLineType::cts].n()) > 0) {
             do_cts(i_point+i, &pd_ptr[i]);
          }
 
          // Compute multi-category contingency table counts and statistics
          if(!conf_info.fcst_info[0]->is_prob() &&
-            (conf_info.output_stats[stat_mctc].n() +
-             conf_info.output_stats[stat_mcts].n()) > 0) {
+            (conf_info.output_stats[STATLineType::mctc].n() +
+             conf_info.output_stats[STATLineType::mcts].n()) > 0) {
             do_mcts(i_point+i, &pd_ptr[i]);
          }
 
          // Compute continuous statistics
          if(!conf_info.fcst_info[0]->is_prob() &&
-            conf_info.output_stats[stat_cnt].n() > 0) {
+            conf_info.output_stats[STATLineType::cnt].n() > 0) {
             do_cnt(i_point+i, &pd_ptr[i]);
          }
 
          // Compute partial sums
          if(!conf_info.fcst_info[0]->is_prob() &&
-            (conf_info.output_stats[stat_sl1l2].n()  > 0 ||
-             conf_info.output_stats[stat_sal1l2].n() > 0)) {
+            (conf_info.output_stats[STATLineType::sl1l2].n()  > 0 ||
+             conf_info.output_stats[STATLineType::sal1l2].n() > 0)) {
             do_sl1l2(i_point+i, &pd_ptr[i]);
          }
 
          // Compute probabilistics counts and statistics
          if(conf_info.fcst_info[0]->is_prob() &&
-            (conf_info.output_stats[stat_pct].n() +
-             conf_info.output_stats[stat_pstd].n() +
-             conf_info.output_stats[stat_pjc].n() +
-             conf_info.output_stats[stat_prc].n()) > 0) {
+            (conf_info.output_stats[STATLineType::pct].n() +
+             conf_info.output_stats[STATLineType::pstd].n() +
+             conf_info.output_stats[STATLineType::pjc].n() +
+             conf_info.output_stats[STATLineType::prc].n()) > 0) {
             do_pct(i_point+i, &pd_ptr[i]);
          }
       } // end for i
@@ -948,20 +948,20 @@ void do_cts(int n, const PairDataPoint *pd_ptr) {
    for(i=0; i<n_cts; i++) {
 
       // Add statistic value for each possible FHO column
-      for(j=0; j<conf_info.output_stats[stat_fho].n(); j++) {
-         store_stat_fho(n, conf_info.output_stats[stat_fho][j],
+      for(j=0; j<conf_info.output_stats[STATLineType::fho].n(); j++) {
+         store_stat_fho(n, conf_info.output_stats[STATLineType::fho][j],
                         cts_info[i]);
       }
 
       // Add statistic value for each possible CTC column
-      for(j=0; j<conf_info.output_stats[stat_ctc].n(); j++) {
-         store_stat_ctc(n, conf_info.output_stats[stat_ctc][j],
+      for(j=0; j<conf_info.output_stats[STATLineType::ctc].n(); j++) {
+         store_stat_ctc(n, conf_info.output_stats[STATLineType::ctc][j],
                         cts_info[i]);
       }
 
       // Add statistic value for each possible CTS column
-      for(j=0; j<conf_info.output_stats[stat_cts].n(); j++) {
-         store_stat_cts(n, conf_info.output_stats[stat_cts][j],
+      for(j=0; j<conf_info.output_stats[STATLineType::cts].n(); j++) {
+         store_stat_cts(n, conf_info.output_stats[STATLineType::cts][j],
                         cts_info[i]);
       }
    } // end for i
@@ -1009,14 +1009,14 @@ void do_mcts(int n, const PairDataPoint *pd_ptr) {
    }
 
    // Add statistic value for each possible MCTC column
-   for(i=0; i<conf_info.output_stats[stat_mctc].n(); i++) {
-      store_stat_mctc(n, conf_info.output_stats[stat_mctc][i],
+   for(i=0; i<conf_info.output_stats[STATLineType::mctc].n(); i++) {
+      store_stat_mctc(n, conf_info.output_stats[STATLineType::mctc][i],
                       mcts_info);
    }
 
    // Add statistic value for each possible MCTS column
-   for(i=0; i<conf_info.output_stats[stat_mcts].n(); i++) {
-      store_stat_mcts(n, conf_info.output_stats[stat_mcts][i],
+   for(i=0; i<conf_info.output_stats[STATLineType::mcts].n(); i++) {
+      store_stat_mcts(n, conf_info.output_stats[STATLineType::mcts][i],
                       mcts_info);
    }
 
@@ -1075,8 +1075,8 @@ void do_cnt(int n, const PairDataPoint *pd_ptr) {
       }
 
       // Add statistic value for each possible CNT column
-      for(j=0; j<conf_info.output_stats[stat_cnt].n(); j++) {
-         store_stat_cnt(n, conf_info.output_stats[stat_cnt][j],
+      for(j=0; j<conf_info.output_stats[STATLineType::cnt].n(); j++) {
+         store_stat_cnt(n, conf_info.output_stats[STATLineType::cnt][j],
                         cnt_info);
       }
    } // end for i
@@ -1104,8 +1104,8 @@ void do_sl1l2(int n, const PairDataPoint *pd_ptr) {
       s_info.set(*pd_ptr);
 
       // Add statistic value for each possible SL1L2 column
-      for(j=0; j<conf_info.output_stats[stat_sl1l2].n(); j++) {
-         store_stat_sl1l2(n, conf_info.output_stats[stat_sl1l2][j], s_info);
+      for(j=0; j<conf_info.output_stats[STATLineType::sl1l2].n(); j++) {
+         store_stat_sl1l2(n, conf_info.output_stats[STATLineType::sl1l2][j], s_info);
       }
    } // end for i
 
@@ -1140,26 +1140,26 @@ void do_pct(int n, const PairDataPoint *pd_ptr) {
       compute_pctinfo(*pd_ptr, true, pct_info);
 
       // Add statistic value for each possible PCT column
-      for(j=0; j<conf_info.output_stats[stat_pct].n(); j++) {
-         store_stat_pct(n, conf_info.output_stats[stat_pct][j],
+      for(j=0; j<conf_info.output_stats[STATLineType::pct].n(); j++) {
+         store_stat_pct(n, conf_info.output_stats[STATLineType::pct][j],
                         pct_info);
       }
 
       // Add statistic value for each possible PSTD column
-      for(j=0; j<conf_info.output_stats[stat_pstd].n(); j++) {
-         store_stat_pstd(n, conf_info.output_stats[stat_pstd][j],
+      for(j=0; j<conf_info.output_stats[STATLineType::pstd].n(); j++) {
+         store_stat_pstd(n, conf_info.output_stats[STATLineType::pstd][j],
                          pct_info);
       }
 
       // Add statistic value for each possible PJC column
-      for(j=0; j<conf_info.output_stats[stat_pjc].n(); j++) {
-         store_stat_pjc(n, conf_info.output_stats[stat_pjc][j],
+      for(j=0; j<conf_info.output_stats[STATLineType::pjc].n(); j++) {
+         store_stat_pjc(n, conf_info.output_stats[STATLineType::pjc][j],
                         pct_info);
       }
 
       // Add statistic value for each possible PRC column
-      for(j=0; j<conf_info.output_stats[stat_prc].n(); j++) {
-         store_stat_prc(n, conf_info.output_stats[stat_prc][j],
+      for(j=0; j<conf_info.output_stats[STATLineType::prc].n(); j++) {
+         store_stat_prc(n, conf_info.output_stats[STATLineType::prc][j],
                         pct_info);
       }
    } // end for i

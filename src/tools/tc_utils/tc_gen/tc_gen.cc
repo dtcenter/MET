@@ -1734,7 +1734,7 @@ void setup_txt_files(int n_model, int max_n_prob, int n_pair) {
    int i, n_rows, n_cols, stat_rows, stat_cols, n_prob;
 
    // Check to see if the stat file stream has already been setup
-   bool init_from_scratch = (stat_out == (ofstream *) 0);
+   bool init_from_scratch = (stat_out == (ofstream *) nullptr);
 
    // Get the maximum number of probability thresholds
    n_prob = conf_info.get_max_n_prob_thresh();
@@ -1970,13 +1970,13 @@ void write_ctc_stats(const PairDataGenesis &gpd,
                 na_str : gci.VxOpt->VxMaskName.c_str());
 
    // Write out FHO
-   if(gci.VxOpt->output_map(stat_fho) != STATOutputType::None) {
+   if(gci.VxOpt->output_map(STATLineType::fho) != STATOutputType::None) {
 
       if(gci.VxOpt->DevFlag) {
          shc.set_fcst_var(genesis_dev_name);
          shc.set_obs_var (genesis_dev_name);
          write_fho_row(shc, gci.CTSDev,
-                       gci.VxOpt->output_map(stat_fho),
+                       gci.VxOpt->output_map(STATLineType::fho),
                        stat_at, i_stat_row,
                        txt_at[i_fho], i_txt_row[i_fho]);
       }
@@ -1985,20 +1985,20 @@ void write_ctc_stats(const PairDataGenesis &gpd,
          shc.set_fcst_var(genesis_ops_name);
          shc.set_obs_var (genesis_ops_name);
          write_fho_row(shc, gci.CTSOps,
-                       gci.VxOpt->output_map(stat_fho),
+                       gci.VxOpt->output_map(STATLineType::fho),
                        stat_at, i_stat_row,
                        txt_at[i_fho], i_txt_row[i_fho]);
       }
    }
 
    // Write out CTC
-   if(gci.VxOpt->output_map(stat_ctc) != STATOutputType::None) {
+   if(gci.VxOpt->output_map(STATLineType::ctc) != STATOutputType::None) {
 
       if(gci.VxOpt->DevFlag) {
          shc.set_fcst_var(genesis_dev_name);
          shc.set_obs_var (genesis_dev_name);
          write_ctc_row(shc, gci.CTSDev,
-                       gci.VxOpt->output_map(stat_ctc),
+                       gci.VxOpt->output_map(STATLineType::ctc),
                        stat_at, i_stat_row,
                        txt_at[i_ctc], i_txt_row[i_ctc]);
       }
@@ -2007,14 +2007,14 @@ void write_ctc_stats(const PairDataGenesis &gpd,
          shc.set_fcst_var(genesis_ops_name);
          shc.set_obs_var (genesis_ops_name);
          write_ctc_row(shc, gci.CTSOps,
-                       gci.VxOpt->output_map(stat_ctc),
+                       gci.VxOpt->output_map(STATLineType::ctc),
                        stat_at, i_stat_row,
                        txt_at[i_ctc], i_txt_row[i_ctc]);
       }
    }
 
    // Write out CTS
-   if(gci.VxOpt->output_map(stat_cts) != STATOutputType::None) {
+   if(gci.VxOpt->output_map(STATLineType::cts) != STATOutputType::None) {
 
       if(gci.VxOpt->DevFlag) {
          gci.CTSDev.compute_stats();
@@ -2023,7 +2023,7 @@ void write_ctc_stats(const PairDataGenesis &gpd,
          shc.set_fcst_var(genesis_dev_name);
          shc.set_obs_var (genesis_dev_name);
          write_cts_row(shc, gci.CTSDev,
-                       gci.VxOpt->output_map(stat_cts),
+                       gci.VxOpt->output_map(STATLineType::cts),
                        stat_at, i_stat_row,
                        txt_at[i_cts], i_txt_row[i_cts]);
       }
@@ -2035,18 +2035,18 @@ void write_ctc_stats(const PairDataGenesis &gpd,
          shc.set_fcst_var(genesis_ops_name);
          shc.set_obs_var (genesis_ops_name);
          write_cts_row(shc, gci.CTSOps,
-                       gci.VxOpt->output_map(stat_cts),
+                       gci.VxOpt->output_map(STATLineType::cts),
                        stat_at, i_stat_row,
                        txt_at[i_cts], i_txt_row[i_cts]);
       }
    }
 
    // Write out GENMPR
-   if(gci.VxOpt->output_map(stat_genmpr) != STATOutputType::None) {
+   if(gci.VxOpt->output_map(STATLineType::genmpr) != STATOutputType::None) {
       shc.set_fcst_var(genesis_name);
       shc.set_obs_var (genesis_name);
       write_ctc_genmpr_row(shc, gpd,
-                           gci.VxOpt->output_map(stat_genmpr),
+                           gci.VxOpt->output_map(STATLineType::genmpr),
                            stat_at, i_stat_row,
                            txt_at[i_genmpr], i_txt_row[i_genmpr]);
    }
@@ -2219,43 +2219,43 @@ void write_pct_stats(ProbGenPCTInfo &pgi) {
       shc.set_obs_valid_end(pgi.BestEnd);
 
       // Write PCT output
-      if(pgi.VxOpt->output_map(stat_pct) != STATOutputType::None) {
+      if(pgi.VxOpt->output_map(STATLineType::pct) != STATOutputType::None) {
          write_pct_row(shc, pgi.PCTMap[lead_hr],
-                       pgi.VxOpt->output_map(stat_pct),
+                       pgi.VxOpt->output_map(STATLineType::pct),
                        1, 1, stat_at, i_stat_row,
                        txt_at[i_pct], i_txt_row[i_pct]);
       }
 
       // Write PSTD output
-      if(pgi.VxOpt->output_map(stat_pstd) != STATOutputType::None) {
+      if(pgi.VxOpt->output_map(STATLineType::pstd) != STATOutputType::None) {
          pgi.PCTMap[lead_hr].compute_stats();
          pgi.PCTMap[lead_hr].compute_ci();
          write_pstd_row(shc, pgi.PCTMap[lead_hr],
-                        pgi.VxOpt->output_map(stat_pstd),
+                        pgi.VxOpt->output_map(STATLineType::pstd),
                         1, 1, stat_at, i_stat_row,
                         txt_at[i_pstd], i_txt_row[i_pstd]);
       }
 
       // Write PJC output
-      if(pgi.VxOpt->output_map(stat_pjc) != STATOutputType::None) {
+      if(pgi.VxOpt->output_map(STATLineType::pjc) != STATOutputType::None) {
          write_pjc_row(shc, pgi.PCTMap[lead_hr],
-                       pgi.VxOpt->output_map(stat_pjc),
+                       pgi.VxOpt->output_map(STATLineType::pjc),
                        1, 1, stat_at, i_stat_row,
                        txt_at[i_pjc], i_txt_row[i_pjc]);
       }
 
       // Write PRC output
-      if(pgi.VxOpt->output_map(stat_pjc) != STATOutputType::None) {
+      if(pgi.VxOpt->output_map(STATLineType::pjc) != STATOutputType::None) {
          write_prc_row(shc, pgi.PCTMap[lead_hr],
-                       pgi.VxOpt->output_map(stat_prc),
+                       pgi.VxOpt->output_map(STATLineType::prc),
                        1, 1, stat_at, i_stat_row,
                        txt_at[i_prc], i_txt_row[i_prc]);
       }
 
       // Write out GENMPR
-      if(pgi.VxOpt->output_map(stat_genmpr) != STATOutputType::None) {
+      if(pgi.VxOpt->output_map(STATLineType::genmpr) != STATOutputType::None) {
          write_pct_genmpr_row(shc, pgi, lead_hr,
-                              pgi.VxOpt->output_map(stat_genmpr),
+                              pgi.VxOpt->output_map(STATLineType::genmpr),
                               stat_at, i_stat_row,
                               txt_at[i_genmpr], i_txt_row[i_genmpr]);
       }

@@ -565,7 +565,7 @@ void process_stat_file(const char *filename, const STATAnalysisJob &job, int &n_
       //
       // Continue if the line is not a valid STAT line.
       //
-      if(line.type() == no_stat_line_type) continue;
+      if(line.type() == STATLineType::none) continue;
 
       if(!line.is_header()) n_read++;
 
@@ -620,7 +620,7 @@ while((*f) >> line) {
       // Continue if the line is not a valid STAT line.
       //
 
-   if(line.type() == no_stat_line_type) continue;
+   if(line.type() == STATLineType::none) continue;
 
       //
       // Pass header lines through to the output

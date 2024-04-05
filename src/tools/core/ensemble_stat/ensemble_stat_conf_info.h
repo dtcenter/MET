@@ -43,9 +43,9 @@ static const int n_txt      = 12;
 
 // Text file type
 static const STATLineType txt_file_type[n_txt] = {
-   stat_ecnt,  stat_rps,   stat_rhist, stat_phist,
-   stat_orank, stat_ssvar, stat_relp,  stat_pct,
-   stat_pstd,  stat_pjc,   stat_prc,   stat_eclv
+   STATLineType::ecnt,  STATLineType::rps,   STATLineType::rhist, STATLineType::phist,
+   STATLineType::orank, STATLineType::ssvar, STATLineType::relp,  STATLineType::pct,
+   STATLineType::pstd,  STATLineType::pjc,   STATLineType::prc,   STATLineType::eclv
 };
 
 ////////////////////////////////////////////////////////////////////////
