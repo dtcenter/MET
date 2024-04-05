@@ -67,11 +67,11 @@ void pblock(const char *infile, const char *outfile, Action action) {
    //
    switch(action)  {
 
-      case block:
+      case Action::block:
          do_blocking(in, out, padsize);
          break;
 
-      case unblock:
+      case Action::unblock:
          do_unblocking(in, out, padsize);
          break;
 
