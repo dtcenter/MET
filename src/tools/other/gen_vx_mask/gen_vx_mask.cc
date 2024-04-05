@@ -334,7 +334,7 @@ void process_mask_file(DataPlane &dp) {
    // For solar masking, parse the valid time from gridded data
    if(is_solar_masktype(mask_type) && solar_ut == (unixtime) 0) {
 
-      if(mask_field_str.length() == 0) {
+      if(mask_field_str.empty()) {
          mlog << Error << "\nprocess_mask_file() -> "
               << "use \"-mask_field\" to specify the data whose valid "
               << "time should be used for \"solar_alt\" and "
@@ -349,7 +349,7 @@ void process_mask_file(DataPlane &dp) {
    }
 
    // Check that mask_field has been set for data masking
-   if(mask_type == MaskType::Data && mask_field_str.length() == 0) {
+   if(mask_type == MaskType::Data && mask_field_str.empty()) {
       mlog << Error << "\nprocess_mask_file() -> "
            << "use \"-mask_field\" to specify the field for "
            << "\"data\" masking.\n\n";
