@@ -35,6 +35,7 @@
 
 #include "shapedata.h"
 #include "mode_columns.h"
+#include "enum_as_int.hpp"
 #include "vx_log.h"
 #include "vx_util.h"
 #include "vx_math.h"
@@ -64,7 +65,7 @@ static const bool do_split_fatten = true;
 
 static double dot(double, double, double, double);
 static void   boundary_step(const ShapeData &, int &, int &, int &);
-static int    get_step_case(bool, bool, bool, bool);
+static StepCase get_step_case(bool, bool, bool, bool);
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -1698,7 +1699,7 @@ void boundary_step(const ShapeData &sd, int &xn, int &yn, int &direction) {
    //
    switch(direction) {
 
-      case(plus_x):
+      case plus_x:
          if(sd.s_is_on(xn,   yn-1, false)) lr = true;
          if(sd.s_is_on(xn+1, yn-1, false)) ur = true;
          if(sd.s_is_on(xn+1, yn  , false)) ul = true;
@@ -1707,7 +1708,7 @@ void boundary_step(const ShapeData &sd, int &xn, int &yn, int &direction) {
          xn += 1;
          break;
 
-      case(plus_y):
+      case plus_y:
          if(sd.s_is_on(xn,   yn  , false)) lr = true;
          if(sd.s_is_on(xn,   yn+1, false)) ur = true;
          if(sd.s_is_on(xn-1, yn+1, false)) ul = true;
@@ -1716,7 +1717,7 @@ void boundary_step(const ShapeData &sd, int &xn, int &yn, int &direction) {
          yn += 1;
          break;
 
-      case(minus_x):
+      case minus_x:
          if(sd.s_is_on(xn-1, yn  , false)) lr = true;
          if(sd.s_is_on(xn-2, yn  , false)) ur = true;
          if(sd.s_is_on(xn-2, yn-1, false)) ul = true;
@@ -1725,7 +1726,7 @@ void boundary_step(const ShapeData &sd, int &xn, int &yn, int &direction) {
          xn -= 1;
          break;
 
-      case(minus_y):
+      case minus_y:
          if(sd.s_is_on(xn-1, yn-1, false)) lr = true;
          if(sd.s_is_on(xn-1, yn-2, false)) ur = true;
          if(sd.s_is_on(xn,   yn-2, false)) ul = true;
@@ -1745,24 +1746,24 @@ void boundary_step(const ShapeData &sd, int &xn, int &yn, int &direction) {
    //
    switch(get_step_case(lr, ur, ul, ll)) {
 
-      case ll_case:
-      case lr_ul_case:
-      case lr_ur_ul_case:
+      case StepCase::ll_case:
+      case StepCase::lr_ul_case:
+      case StepCase::lr_ur_ul_case:
          // Turn left
          direction = (direction + 1)%4;
          if(direction < 0) direction += 4;
          break;
 
-      case lr_case:
-      case ur_ll_case:
-      case ur_ul_ll_case:
+      case StepCase::lr_case:
+      case StepCase::ur_ll_case:
+      case StepCase::ur_ul_ll_case:
          // Turn right
          direction = (direction - 1)%4;
          if(direction < 0) direction += 4;
          break;
 
-      case ul_ll_case:
-      case lr_ur_case:
+      case StepCase::ul_ll_case:
+      case StepCase::lr_ur_case:
          // Continue straight: direction remains unchanged
          break;
 
@@ -1770,7 +1771,7 @@ void boundary_step(const ShapeData &sd, int &xn, int &yn, int &direction) {
 
          mlog << Error << "\nboundary_step() -> "
               << "bad step case: "
-              << get_step_case(lr, ur, ul, ll) << "\n\n";
+              << enum_class_as_int(get_step_case(lr, ur, ul, ll)) << "\n\n";
          exit(1);
    }
 
@@ -1779,38 +1780,38 @@ void boundary_step(const ShapeData &sd, int &xn, int &yn, int &direction) {
 
 ////////////////////////////////////////////////////////////////////////
 
-int get_step_case(bool lr, bool ur, bool ul, bool ll) {
+StepCase get_step_case(bool lr, bool ur, bool ul, bool ll) {
 
    //
    // Valid cases with exactly one cell on
    //
 
    // Lower Left
-   if(!lr && !ur && !ul && ll) return ll_case;
+   if(!lr && !ur && !ul && ll) return StepCase::ll_case;
    // Lower Right
-   else if(lr && !ur && !ul && !ll) return lr_case;
+   else if(lr && !ur && !ul && !ll) return StepCase::lr_case;
 
    //
    // Valid cases with exactly two cells on
    //
 
    // Upper Left, Lower Left
-   else if(!lr && !ur && ul && ll) return ul_ll_case;
+   else if(!lr && !ur && ul && ll) return StepCase::ul_ll_case;
    // Lower Right, Upper Right
-   else if(lr && ur && !ul && !ll) return lr_ur_case;
+   else if(lr && ur && !ul && !ll) return StepCase::lr_ur_case;
    // Lower Right, Upper Left
-   else if(lr && !ur && ul && !ll) return lr_ul_case;
+   else if(lr && !ur && ul && !ll) return StepCase::lr_ul_case;
    // Upper Right, Lower Left
-   else if(!lr && ur && !ul && ll) return ur_ll_case;
+   else if(!lr && ur && !ul && ll) return StepCase::ur_ll_case;
 
    //
    // Valid cases with exactly three cells on
    //
 
    // Upper Right, Upper Left, Lower Left
-   else if(!lr && ur && ul && ll) return ur_ul_ll_case;
+   else if(!lr && ur && ul && ll) return StepCase::ur_ul_ll_case;
    // Lower Right, Upper Right, Upper Left
-   else if(lr && ur && ul && !ll) return lr_ur_ul_case;
+   else if(lr && ur && ul && !ll) return StepCase::lr_ur_ul_case;
 
    //
    // Otherwise, combination is invalid

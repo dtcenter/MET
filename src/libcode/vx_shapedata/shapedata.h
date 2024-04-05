@@ -39,7 +39,7 @@
 //
 // Enumerations used in computing the boundary of a ShapeData object
 //
-enum StepCase {
+enum class StepCase {
    ll_case       = 0,
    lr_case       = 1,
    ul_ll_case    = 2,
