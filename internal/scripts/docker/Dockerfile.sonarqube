@@ -92,4 +92,3 @@ RUN if [ ! -e "${MET_REPO_DIR}/configure.ac" ]; then \
 
 RUN cd ${MET_REPO_DIR} \
  && internal/scripts/docker/build_met_sonarqube.sh
-

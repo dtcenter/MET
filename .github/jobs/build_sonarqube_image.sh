@@ -43,4 +43,3 @@ fi
 id=$(docker create ${DOCKERHUB_TAG})
 time_command docker cp $id:/met/.scannerwork /tmp/met_scannerwork 
 docker rm -v $id
-

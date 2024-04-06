@@ -81,48 +81,29 @@ if [ -z ${SONARQUBE_OUT_DIR} ]; then
   export SONARQUBE_OUT_DIR=bw-outputs
 fi
 
+# Define the version string
+SONAR_PROJECT_VERSION=$(cat docs/version | cut -d'=' -f2 | tr -d '" ')
+
 # Store the full path to the scripts directory
 SONAR_PROPERTIES_DIR=internal/scripts/sonarqube
 SONAR_PROPERTIES=sonar-project.properties
 
-# Copy sonar-project.properties for Python code
+# Configure the sonar-project.properties
 [ -e $SONAR_PROPERTIES ] && rm $SONAR_PROPERTIES
-sed -e "s|SONAR_TOKEN|$SONAR_TOKEN|" \
+sed -e "s|SONAR_PROJECT_KEY|METcalcpy_NB|" \
+    -e "s|SONAR_PROJECT_NAME|METcalcpy Nightly Build|" \
+    -e "s|SONAR_PROJECT_VERSION|$SONAR_PROJECT_VERSION|" \
     -e "s|SONAR_HOST_URL|$SONAR_HOST_URL|" \
-    -e "s|SONAR_PROJECT_KEY|MET-GHA-Python|" \
-    -e "s|SONAR_PROJECT_NAME|MET GHA Python|" \
+    -e "s|SONAR_TOKEN|$SONAR_TOKEN|" \
     -e "s|SONAR_BRANCH_NAME|$MET_GIT_NAME|" \
-    -e "s|SONAR_REFERENCE_BRANCH|$SONAR_REFERENCE_BRANCH|" \
-    $SONAR_PROPERTIES_DIR/python.sonar-project.properties > $SONAR_PROPERTIES
+    $SCRIPT_DIR/$SONAR_PROPERTIES > $SONAR_PROPERTIES
 
 # The source and reference branches must differ to define new code
 if [ "$MET_GIT_NAME" != "$SONAR_REFERENCE_BRANCH" ]; then
   echo "sonar.newCode.referenceBranch=${SONAR_REFERENCE_BRANCH}" >> $SONAR_PROPERTIES
 fi
- 
-# Run SonarQube scan for Python code
-time_command $SONAR_SCANNER
 
-# Copy the Python scan report-task.txt file
-mkdir -p /met/.scannerwork
-cp .scannerwork/report-task.txt /met/.scannerwork/python-report-task.txt
-
-# Copy sonar-project.properties for C/C++ code
-[ -e $SONAR_PROPERTIES ] && rm $SONAR_PROPERTIES
-sed -e "s|SONAR_TOKEN|$SONAR_TOKEN|" \
-    -e "s|SONAR_HOST_URL|$SONAR_HOST_URL|" \
-    -e "s|SONAR_PROJECT_KEY|MET-GHA-CXX|" \
-    -e "s|SONAR_PROJECT_NAME|MET GHA CXX|" \
-    -e "s|SONAR_BRANCH_NAME|$MET_GIT_NAME|" \
-    -e "s|SONAR_REFERENCE_BRANCH|$SONAR_REFERENCE_BRANCH|" \
-    $SONAR_PROPERTIES_DIR/sonar-project.properties > $SONAR_PROPERTIES
-
-# The source and reference branches must differ to define new code
-if [ "$MET_GIT_NAME" != "$SONAR_REFERENCE_BRANCH" ]; then
-  echo "sonar.newCode.referenceBranch=${SONAR_REFERENCE_BRANCH}" >> $SONAR_PROPERTIES
-fi
- 
-# Run the configure script
+# Run the MET configure script
 time_command ./configure \
   BUFRLIB_NAME=${BUFRLIB_NAME} \
   GRIB2CLIB_NAME=${GRIB2CLIB_NAME} \
@@ -136,11 +117,11 @@ time_command make clean
 # Run SonarQube make
 time_command $SONAR_WRAPPER --out-dir $SONARQUBE_OUT_DIR make
 
-# Run SonarQube scan for C/C++ code
+# Run SonarQube scan
 time_command $SONAR_SCANNER
 
-# Copy the C/C++ scan report-task.txt file
+# Copy the scan report-task.txt file
 mkdir -p /met/.scannerwork
-cp .scannerwork/report-task.txt /met/.scannerwork/cxx-report-task.txt
+cp .scannerwork/report-task.txt /met/.scannerwork/report-task.txt
 
 [ -e $SONAR_PROPERTIES ] && rm $SONAR_PROPERTIES

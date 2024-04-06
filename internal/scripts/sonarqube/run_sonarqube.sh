@@ -90,7 +90,6 @@ function run_command() {
   return ${STATUS}
 }
 
-
 # Store the full path to the scripts directory
 SCRIPT_DIR=`dirname $0`
 if [[ ${0:0:1} != "/" ]]; then SCRIPT_DIR=$(pwd)/${SCRIPT_DIR}; fi 
@@ -113,8 +112,8 @@ export MET_DEVELOPMENT=true
 # Run the configure script
 run_command "./configure --prefix=`pwd` --enable-all"
 
-# Set the build id
-#BUILD_ID="MET-${1}"
+# Define the version string
+SONAR_PROJECT_VERSION=$(grep "^version" docs/conf.py | cut -d'=' -f2 | tr -d "\'\" ")
 
 SONAR_PROPERTIES=sonar-project.properties
 
@@ -125,11 +124,12 @@ if [ -z "$SONAR_TOKEN" ]; then
   echo "  == ERROR == SONAR_TOKEN is not defined"
   exit 1
 else
-  sed -e "s|SONAR_TOKEN|$SONAR_TOKEN|" \
-      -e "s|SONAR_HOST_URL|$SONAR_HOST_URL|" \
-      -e "s|SONAR_PROJECT_KEY|MET_python_NB|" \
+  sed -e "s|SONAR_PROJECT_KEY|MET_python_NB|" \
       -e "s|SONAR_PROJECT_NAME|MET python Nightly Build|" \
-      -e "s|SONAR_BRANCH_NAME|develop|" \
+      -e "s|SONAR_PROJECT_VERSION|$SONAR_PROJECT_VERSION|" \
+      -e "s|SONAR_HOST_URL|$SONAR_HOST_URL|" \
+      -e "s|SONAR_TOKEN|$SONAR_TOKEN|" \
+      -e "s|SONAR_BRANCH_NAME|${1}|" \
       $SCRIPT_DIR/python.sonar-project.properties > $SONAR_PROPERTIES
 
   # Run SonarQube scan for Python code
@@ -137,11 +137,12 @@ else
 
   # Copy sonar-project.properties for C/C++ code
   [ -e $SONAR_PROPERTIES ] && rm $SONAR_PROPERTIES
-  sed -e "s|SONAR_TOKEN|$SONAR_TOKEN|" \
-      -e "s|SONAR_HOST_URL|$SONAR_HOST_URL|" \
-      -e "s|SONAR_PROJECT_KEY|MET_develop_NB|" \
+  sed -e "s|SONAR_PROJECT_KEY|MET_develop_NB|" \
       -e "s|SONAR_PROJECT_NAME|MET Nightly Build|" \
-      -e "s|SONAR_BRANCH_NAME|develop|" \
+      -e "s|SONAR_PROJECT_VERSION|$SONAR_PROJECT_VERSION|" \
+      -e "s|SONAR_HOST_URL|$SONAR_HOST_URL|" \
+      -e "s|SONAR_TOKEN|$SONAR_TOKEN|" \
+      -e "s|SONAR_BRANCH_NAME|${1}|" \
       $SCRIPT_DIR/sonar-project.properties > $SONAR_PROPERTIES
 
   # Run SonarQube clean
@@ -155,6 +156,3 @@ else
 
   [ -e $SONAR_PROPERTIES ] && rm $SONAR_PROPERTIES
 fi
-
-# Run SonarQube report generator to make a PDF file
-#TODAY=`date +%Y%m%d`
