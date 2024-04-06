@@ -90,7 +90,7 @@ sed -e "s|SONAR_PROJECT_KEY|MET-GHA|" \
     -e "s|SONAR_HOST_URL|$SONAR_HOST_URL|" \
     -e "s|SONAR_TOKEN|$SONAR_TOKEN|" \
     -e "s|SONAR_BRANCH_NAME|$MET_GIT_NAME|" \
-    $SCRIPT_DIR/$SONAR_PROPERTIES > $SONAR_PROPERTIES
+    $SONAR_PROPERTIES_DIR/$SONAR_PROPERTIES > $SONAR_PROPERTIES
 
 # The source and reference branches must differ to define new code
 if [ "$MET_GIT_NAME" != "$SONAR_REFERENCE_BRANCH" ]; then
