@@ -5,7 +5,7 @@
 #
 # This build_met_sonarqube.sh script must be run from the top-level
 # directory of the MET repository to be analyzed. It runs SonarQube to
-# scan both the Python and C/C++ MET source code.
+# scan the MET source code.
 #
 # Usage: internal/scripts/docker/build_met_sonarqube.sh
 #
@@ -48,12 +48,6 @@ if [ -z ${SONAR_REFERENCE_BRANCH+x} ]; then
   exit 1
 fi
 
-# Check whether MET_CONFIG_OPTS is defined
-if [ -z ${MET_CONFIG_OPTS+x} ]; then
-  MET_CONFIG_OPTS='--enable-all'
-  echo "Setting MET_CONFIG_OPTS=${MET_CONFIG_OPTS} to scan all available options."
-fi
-
 # Locate the wrapper
 WRAPPER_NAME=build-wrapper-linux-x86-64
 SONAR_WRAPPER=$(which $WRAPPER_NAME 2> /dev/null)
@@ -90,8 +84,8 @@ SONAR_PROPERTIES=sonar-project.properties
 
 # Configure the sonar-project.properties
 [ -e $SONAR_PROPERTIES ] && rm $SONAR_PROPERTIES
-sed -e "s|SONAR_PROJECT_KEY|METcalcpy_NB|" \
-    -e "s|SONAR_PROJECT_NAME|METcalcpy Nightly Build|" \
+sed -e "s|SONAR_PROJECT_KEY|MET-GHA|" \
+    -e "s|SONAR_PROJECT_NAME|MET GHA|" \
     -e "s|SONAR_PROJECT_VERSION|$SONAR_PROJECT_VERSION|" \
     -e "s|SONAR_HOST_URL|$SONAR_HOST_URL|" \
     -e "s|SONAR_TOKEN|$SONAR_TOKEN|" \
@@ -107,7 +101,7 @@ fi
 time_command ./configure \
   BUFRLIB_NAME=${BUFRLIB_NAME} \
   GRIB2CLIB_NAME=${GRIB2CLIB_NAME} \
-  ${MET_CONFIG_OPTS} \
+  --enable-all \
   CPPFLAGS="-I/usr/local/include -I/usr/local/include/freetype2 -I/usr/local/include/cairo" \
   LIBS="-ltirpc"
 
