@@ -24,10 +24,10 @@
 GIT_REPO="https://github.com/dtcenter/${GIT_REPO_NAME}"
 
 function usage {
-        echo
-        echo "USAGE: $(basename $0) name"
-        echo "   where \"name\" specifies a branch, tag, or hash."
-        echo
+  echo
+  echo "USAGE: $(basename $0) name"
+  echo "   where \"name\" specifies a branch, tag, or hash."
+  echo
 }
 
 # Check for arguments

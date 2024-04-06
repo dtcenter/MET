@@ -113,11 +113,11 @@ time_command $SONAR_WRAPPER --out-dir $SONARQUBE_OUT_DIR make
 
 # Run SonarQube scan
 time_command $SONAR_SCANNER
-status = $?
+status=$?
 
 # Check return status
-if [ $status -ne 0 ]; then
-  echo "ERROR: ${0} -> the SonarQube scan failed with status ${status}!"
+if [[ $status -ne 0 ]]; then
+  echo "ERROR: ${0} -> the SonarQube scan returned with non-zero status (${status})!"
   exit ${status}
 fi
 
