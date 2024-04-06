@@ -34,14 +34,17 @@ def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, ca
   
     # initialize logger
     logger = logging.getLogger(__name__)
+    logger.setLevel(logging.DEBUG)
 
     # create/add console handler
     ch = logging.StreamHandler()
+    ch.setLevel(logging.INFO)
     logger.addHandler(ch)
 
     # create/add file handler
     if file_log:
         fh = logging.FileHandler(file_log)
+        fh.setLevel(logging.DEBUG)
         logger.addHandler(fh)
 
     # # if command  only mode is enabled, disable logging
@@ -58,6 +61,15 @@ def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, ca
         logger.error(f"unexpected top-level element. Expected 'met_test', got '{test_root.tag}'")
         sys.exit(1)
     else:
+        # read test_dir
+        try:
+            test_dir = test_root.find('test_dir').text
+            mgnc = test_dir + '/bin/mgnc.sh'
+            mpnc = test_dir + '/bin/mpnc.sh'
+        except e:
+            logger.exception(f"unable to read test_dir from {test_xml}")
+            sys.exit(1)
+
         tests = build_tests(test_root)
 
     # # determine the max length of the test names
@@ -76,7 +88,7 @@ def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, ca
     # # run each test
     for test in tests:
     #   # print the test name
-        print(f"TEST: {test['name']}")
+        logger.info(f"TEST: {test['name']}")
     #   $cmd_only or printf "TEST: %-*s - ", $name_wid, $test->{"name"};
 
     #   # prepare the output space
@@ -128,9 +140,9 @@ def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, ca
             # cmd_args = [arg.strip() for arg in cmd.split('\\\n')]   #this could work also?
             cmd_args_list.append(cmd_args)  #debug
             cmd_outs = subprocess.run(cmd_args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)  #what should this actually contain?
-            print(f"Return code: {cmd_outs.returncode}")
+            logger.debug(f"Return code: {cmd_outs.returncode}")
             #print(f"stderr: {cmd_outs.stderr}")
-            print(f"stdout: {cmd_outs.stdout}")
+            logger.debug(f"{cmd_outs.stdout}")
             t_elaps = dt.now() - t_start
             # unshift @cmd_outs, "$cmd\n";
 
@@ -166,7 +178,9 @@ def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, ca
         #   }
 
         #   # unset the test environment variables
-        #   delete $ENV{$_} for keys %{ $test->{"env"} };
+        if 'env' in test.keys():
+            for key in test['env'].keys():
+                del os.environ[key]
         
         #   # print the test result
         #   printf "%s - %7.3f sec\n", $ret_ok && $out_ok ? "pass" : "FAIL", sprintf("%7.3f", $t_elaps);
@@ -178,11 +192,19 @@ def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, ca
         #   push @unset_envs, "unset $_\n" for sort keys %{ $test->{"env"} };
 
         #   # if the log file is activated, print the test information
-        #   if( $file_log ){
-        #     print $fh_log "\n\n";
-        #     print $fh_log "$_" for (@set_envs, @cmd_outs, @unset_envs);
-        #     print $fh_log "\n\n";
-        #   }
+        # would like to redo this so the log is being written as commands are executed... not after
+        # also, this could be done simultaneously with cmd_only option
+        # might want to improve formatting here too
+        if file_log:
+            logger.debug("\n\n")
+            if 'env' in test.keys():
+                for key, val in sorted(test['env'].items()):
+                    logger.debug(f"export {key}={val}")
+            logger.debug(f"{cmd}")
+            if 'env' in test.keys():
+                for key, val in sorted(test['env'].items()):
+                    logger.debug(f"unset {key}")
+            logger.debug("\n")
 
         #   # on failure, print the problematic test and exit, if requested
         #   if( !($ret_ok && $out_ok) ){
@@ -209,11 +231,6 @@ def build_tests(test_root):
 
     """
 
-    # read test_dir
-    test_dir = test_root.find('test_dir').text
-    #mgnc = ?
-    #mpnc = ?
-
     # find all tests in test_xml, and create a dictionary of attributes for each test
     test_list = []
     for test_el in test_root.iter('test'):
@@ -224,8 +241,6 @@ def build_tests(test_root):
             logger.error("name attribute not found for test [test index]")
             sys.exit(1)
             # should just fail this one test and not fully exit?
-        #debug:
-        print(f"Building {test['name']}")
 
         for el in test_el:
             if (el.tag=='exec' or el.tag=='param'):
