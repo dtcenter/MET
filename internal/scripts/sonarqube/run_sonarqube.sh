@@ -117,41 +117,29 @@ SONAR_PROJECT_VERSION=$(grep "^version" docs/conf.py | cut -d'=' -f2 | tr -d "\'
 
 SONAR_PROPERTIES=sonar-project.properties
 
-# Copy sonar-project.properties for Python code
+# Configure sonar-project.properties
 [ -e $SONAR_PROPERTIES ] && rm $SONAR_PROPERTIES
 [ -z "$SONAR_HOST_URL" ] && SONAR_HOST_URL="http://localhost:9000"
 if [ -z "$SONAR_TOKEN" ]; then
   echo "  == ERROR == SONAR_TOKEN is not defined"
   exit 1
 else
-  sed -e "s|SONAR_PROJECT_KEY|MET_python_NB|" \
-      -e "s|SONAR_PROJECT_NAME|MET python Nightly Build|" \
-      -e "s|SONAR_PROJECT_VERSION|$SONAR_PROJECT_VERSION|" \
-      -e "s|SONAR_HOST_URL|$SONAR_HOST_URL|" \
-      -e "s|SONAR_TOKEN|$SONAR_TOKEN|" \
-      -e "s|SONAR_BRANCH_NAME|${1}|" \
-      $SCRIPT_DIR/python.sonar-project.properties > $SONAR_PROPERTIES
-
-  # Run SonarQube scan for Python code
-  run_command "$SONAR_SCANNER"
-
-  # Copy sonar-project.properties for C/C++ code
   [ -e $SONAR_PROPERTIES ] && rm $SONAR_PROPERTIES
-  sed -e "s|SONAR_PROJECT_KEY|MET_develop_NB|" \
+  sed -e "s|SONAR_PROJECT_KEY|MET_NB|" \
       -e "s|SONAR_PROJECT_NAME|MET Nightly Build|" \
       -e "s|SONAR_PROJECT_VERSION|$SONAR_PROJECT_VERSION|" \
       -e "s|SONAR_HOST_URL|$SONAR_HOST_URL|" \
       -e "s|SONAR_TOKEN|$SONAR_TOKEN|" \
       -e "s|SONAR_BRANCH_NAME|${1}|" \
-      $SCRIPT_DIR/sonar-project.properties > $SONAR_PROPERTIES
+      $SCRIPT_DIR/$SONAR_PROPERTIES > $SONAR_PROPERTIES
 
   # Run SonarQube clean
   run_command "make clean"
 
-  # Run SonarQube make
+  # Run SonarQube build wrapper
   run_command "$SONAR_WRAPPER --out-dir $SONARQUBE_OUT_DIR make"
 
-  # Run SonarQube scan for C/C++ code
+  # Run SonarQube scan
   run_command "$SONAR_SCANNER"
 
   [ -e $SONAR_PROPERTIES ] && rm $SONAR_PROPERTIES
