@@ -53,8 +53,9 @@ def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, ca
     # parse xml file
     try:
         test_root = ET.parse(test_xml)
-    except e:
+    except Exception as e:
         logger.exception(f"Unable to parse xml from {test_xml}")
+        raise
 
     # # parse the children of the met_test element
     if test_root.getroot().tag != 'met_test':
@@ -64,11 +65,11 @@ def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, ca
         # read test_dir
         try:
             test_dir = test_root.find('test_dir').text
-            mgnc = test_dir + '/bin/mgnc.sh'
-            mpnc = test_dir + '/bin/mpnc.sh'
-        except e:
+            mgnc = repl_env(test_dir + '/bin/mgnc.sh')
+            mpnc = repl_env(test_dir + '/bin/mpnc.sh')
+        except Exception as e:
             logger.exception(f"unable to read test_dir from {test_xml}")
-            sys.exit(1)
+            raise
 
         tests = build_tests(test_root)
 
@@ -99,8 +100,9 @@ def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, ca
                 Path(output).unlink()
             except FileNotFoundError:
                 pass
-            except e:
-                print(e)
+            except Exception as e:
+                logger.exception()
+                raise
             # calls a perl function from VxUtil.pm (in test_unit/lib) to make the directory 
             output_dir = Path(output).parent
             output_dir.mkdir(parents=True, exist_ok=True)     #should error be raised if dir already exists? 
@@ -139,57 +141,113 @@ def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, ca
             cmd_args = [arg.strip('\\') for arg in cmd.split() if arg!='\\']# + ['2>&1']
             # cmd_args = [arg.strip() for arg in cmd.split('\\\n')]   #this could work also?
             cmd_args_list.append(cmd_args)  #debug
-            cmd_outs = subprocess.run(cmd_args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)  #what should this actually contain?
-            logger.debug(f"Return code: {cmd_outs.returncode}")
+            cmd_return = subprocess.run(cmd_args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)  #should retun STDERR and STDOUT (as list?)
+            logger.debug(f"Return code: {cmd_return.returncode}")
             #print(f"stderr: {cmd_outs.stderr}")
-            logger.debug(f"{cmd_outs.stdout}")
+            cmd_outs = cmd_return.stdout
+            logger.debug(f"{cmd_outs}")
             t_elaps = dt.now() - t_start
             # unshift @cmd_outs, "$cmd\n";
 
         #   # check the return status and output files
-            if not(cmd_outs.returncode):
-                pass
-        #   $ret_ok = (! $?);
-        #   if( $ret_ok ){
-        #     $out_ok = 1;
-        #     do{ push @cmd_outs, qx/$mpnc -v $_/; $? and $out_ok = 0 } for ( @{ $test->{"out_pnc"} } );
-        #     do{ push @cmd_outs, qx/$mgnc -v $_/; $? and $out_ok = 0 } for ( @{ $test->{"out_gnc"} } );
-        #     for my $output ( @{ $test->{"out_stat"} } ){
-        #       -s $output or 
-        #         push @cmd_outs, "ERROR: stat file missing \"$output\"\n" and $out_ok = 0 and next;
-        #       int(qx{cat $output 2>/dev/null | egrep -v '^VERSION' | wc -l}) or
-        #         push @cmd_outs, "ERROR: stat data missing from file \"$output\"\n" and $out_ok = 0;
-        #     }
-        #     for my $output ( @{ $test->{"out_ps"} } ){
-        #       -s $output or 
-        #         push @cmd_outs, "ERROR: postscript file missing \"$output\"\n" and $out_ok = 0 and next;
-        #       !(qx{gs -sDEVICE=nullpage -dQUIET -dNOPAUSE -dBATCH $output 2>/dev/null}) or
-        #         push @cmd_outs, "ERROR: ghostscript error for postscript file \"$output\"\n" and $out_ok = 0;
-        #     }
-        #     for my $output ( @{ $test->{"out_exist"} } ){
-        #       -s $output or 
-        #         push @cmd_outs, "ERROR: file missing when it should exist \"$output\"\n" and $out_ok = 0 and next;
-        #     }
-        #     for my $output ( @{ $test->{"out_not_exist"} } ){
-        #       !(-s $output) or 
-        #         push @cmd_outs, "ERROR: file exists when it should be missing \"$output\"\n" and $out_ok = 0 and next;
-        #     }
-            
-        #   }
+            ret_ok = not cmd_return.returncode
+            if ret_ok:
+                out_ok = True
+
+                try:
+                    for filepath in test['out_pnc']:
+                        result = subprocess.run([mpnc, '-v', filepath], 
+                                                stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+                        cmd_outs += ("\n"+result.stdout)
+                        out_ok = not result.returncode
+                except KeyError:
+                    pass
+                
+                try:
+                    for filepath in test['out_gnc']:
+                        result = subprocess.run([mgnc, '-v', filepath], 
+                                                stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+                        cmd_outs += ("\n"+result.stdout)
+                        out_ok = not result.returncode
+                except KeyError:
+                    pass
+                
+                try:
+                    for filepath in test['out_stat']:
+                        # check stat file exists and is nonzero size
+                        try:
+                            filesize = os.stat(filepath).st_size
+                            if filesize==0:
+                                cmd_outs += (f"\nERROR: stat file empty {filepath}\n")
+                                out_ok = False
+                                break
+                        except FileNotFoundError:
+                            cmd_outs += (f"\nERROR: stat file missing {filepath}\n")
+                            out_ok = False
+                            break
+                        # check stat file has non-header lines
+                        with open(filepath) as f:
+                            numlines = len([l for l in f.readlines() if not l.startswith('VERSION')])
+                        if numlines==0:
+                            cmd_outs += (f"\nERROR: stat data missing from file {filepath}\n")
+                            out_ok = False
+                except KeyError:
+                    pass
+
+                try:
+                    for filepath in test['out_ps']:
+                        # check postscript file exists and is nonzero size
+                        try:
+                            filesize = os.stat(filepath).st_size
+                            if filesize==0:
+                                cmd_outs += (f"\nERROR: postscript file empty {filepath}\n")
+                                out_ok = False
+                                break
+                        except FileNotFoundError:
+                            cmd_outs += (f"\nERROR: postscript file missing {filepath}\n")
+                            out_ok = False
+                            break
+                        # check for ghostscript errors
+                        result = subprocess.run(['gs', '-sDEVICE=nullpage', '-dQUIET', '-dNOPAUSE', '-dBATCH', filepath])
+                        if result.returncode:
+                            cmd_outs += (f"\nERROR: ghostscript error for postscript file {filepath}")
+                            out_ok = False
+                except KeyError:
+                    pass
+                
+                try:
+                    for filepath in test['out_exist']:
+                        # check output file exists and is nonzero size
+                        try:
+                            filesize = os.stat(filepath).st_size
+                            if filesize==0:
+                                cmd_outs += (f"\nERROR: file empty {filepath}\n")
+                                out_ok = False
+                                break
+                        except FileNotFoundError:
+                            cmd_outs += (f"\nERROR: file missing when it should exist {filepath}\n")
+                            out_ok = False
+                except KeyError:
+                    pass
+
+                try:
+                    for filepath in test['out_not_exist']:
+                        # check output file doesn't exist
+                        if os.path.isfile(filepath):
+                            cmd_outs += (f"\nERROR: file exists when it should be missing {filepath}\n")
+                            out_ok = False
+                except KeyError:
+                    pass
 
         #   # unset the test environment variables
         if 'env' in test.keys():
-            for key in test['env'].keys():
-                del os.environ[key]
+            for key, val in test['env'].items():
+                if val:
+                    del os.environ[key]
         
         #   # print the test result
-        #   printf "%s - %7.3f sec\n", $ret_ok && $out_ok ? "pass" : "FAIL", sprintf("%7.3f", $t_elaps);
-
-        #   # build a list of environment variable exports and unsets for reporting
-        #   my @set_envs;
-        #   push @set_envs, "export $_=\'" . $test->{"env"}{$_} . "\'\n" for sort keys %{ $test->{"env"} };
-        #   my @unset_envs;
-        #   push @unset_envs, "unset $_\n" for sort keys %{ $test->{"env"} };
+        test_result = "pass" if (ret_ok and out_ok) else "FAIL"
+        logger.info(f"{test_result} - {t_elaps} sec\n")
 
         #   # if the log file is activated, print the test information
         # would like to redo this so the log is being written as commands are executed... not after
@@ -207,13 +265,13 @@ def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, ca
             logger.debug("\n")
 
         #   # on failure, print the problematic test and exit, if requested
-        #   if( !($ret_ok && $out_ok) ){
+        if not (ret_ok and out_ok):
+            logger.info(cmd_outs)   #skipping the setting/unsetting envs here ?
         #     print "$_" for (@set_envs, @cmd_outs, @unset_envs);
-        #     $noexit or exit 1;
+            if not noexit:
+                sys.exit(1)
         #     print "\n\n";
-        #   }
 
-        # }
     return tests, cmd_args_list
 
 
@@ -239,7 +297,7 @@ def build_tests(test_root):
             test['name'] = test_el.attrib['name']
         except KeyError:
             logger.error("name attribute not found for test [test index]")
-            sys.exit(1)
+            raise
             # should just fail this one test and not fully exit?
 
         for el in test_el:
@@ -264,7 +322,7 @@ def build_tests(test_root):
                         env_dict[env_el.find('name').text] = env_el.find('value').text
                     except AttributeError:
                         logger.error(f"env pair in test \\{test['name']}\\ missing name or value")
-                        sys.exit(1)
+                        raise
                         # should just fail this one test and not fully exit?                      
 
                 test['env'] = env_dict
@@ -306,8 +364,8 @@ def repl_env(string_with_ref):
         for envar_ref in envar_ref_unique:
             envar_name = envar_ref[2:-1]
             envar = os.getenv(envar_name)
-            # will want to check for no envar found and log:
-            #   "ERROR: environment variable $1 not found\n"
+            if not envar:
+                logger.error(f"ERROR: environment variable {envar_name} not found")
             string_with_ref = string_with_ref.replace(envar_ref, envar)
 
     return string_with_ref
