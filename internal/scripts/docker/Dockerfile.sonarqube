@@ -1,0 +1,94 @@
+ARG MET_BASE_REPO=met-base
+ARG MET_BASE_TAG=v3.2
+
+FROM dtcenter/${MET_BASE_REPO}:${MET_BASE_TAG}
+MAINTAINER John Halley Gotway <johnhg@ucar.edu>
+
+#
+# This Dockerfile checks out MET from GitHub and runs the
+# SonarQube static code analysis on the specified branch or tag.
+# https://docs.sonarqube.org/latest/analysis/scan/sonarscanner/
+#
+ARG SONAR_SCANNER_VERSION=5.0.1.3006
+ARG SONAR_HOST_URL
+ARG SONAR_TOKEN
+ARG SOURCE_BRANCH
+ARG SONAR_REFERENCE_BRANCH
+
+#
+# SONAR_HOST_URL is required.
+#
+RUN if [ "x${SONAR_HOST_URL}" = "x" ]; then \
+      echo "ERROR: SONAR_HOST_URL undefined! Rebuild with \"--build-arg SONAR_HOST_URL={url}\""; \
+      exit 1; \
+    fi
+
+#
+# SONAR_TOKEN is required.
+#
+RUN if [ "x${SONAR_TOKEN}" = "x" ]; then \
+      echo "ERROR: SONAR_TOKEN undefined! Rebuild with \"--build-arg SONAR_TOKEN={token}\""; \
+      exit 1; \
+    fi
+
+#
+# SOURCE_BRANCH is the branch name of the MET source code.
+#
+RUN if [ "x${SOURCE_BRANCH}" = "x" ]; then \
+      echo "ERROR: SOURCE_BRANCH undefined! Rebuild with \"--build-arg SOURCE_BRANCH={branch name}\""; \
+      exit 1; \
+    else \
+      echo "Build Argument SOURCE_BRANCH=${SOURCE_BRANCH}"; \
+    fi
+
+#
+# SONAR_REFERENCE_BRANCH defines to the version against which this scan should be compared.
+#
+RUN if [ "x${SONAR_REFERENCE_BRANCH}" = "x" ]; then \
+      echo "ERROR: SONAR_REFERENCE_BRANCH undefined! Rebuild with \"--build-arg SONAR_REFERENCE_BRANCH={branch name}\""; \
+      exit 1; \
+    else \
+      echo "Build Argument SONAR_REFERENCE_BRANCH=${SONAR_REFERENCE_BRANCH}"; \
+    fi
+
+ENV MET_GIT_NAME ${SOURCE_BRANCH}
+ENV MET_REPO_DIR /met/MET-${MET_GIT_NAME}
+ENV MET_GIT_URL  https://github.com/dtcenter/MET
+
+#
+# Download and install the Sonar software.
+#
+RUN echo "Installing SonarQube into $HOME/.sonar" \
+ && mkdir -p $HOME/.sonar \
+ && curl -sSLo $HOME/.sonar/sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${SONAR_SCANNER_VERSION}-linux.zip \
+ && unzip -o $HOME/.sonar/sonar-scanner.zip -d $HOME/.sonar/ \
+ && echo export PATH="$HOME/.sonar/sonar-scanner-${SONAR_SCANNER_VERSION}-linux/bin:\$PATH" >> $HOME/.bashrc \
+ && curl -sSLo $HOME/.sonar/build-wrapper-linux-x86.zip ${SONAR_HOST_URL}/static/cpp/build-wrapper-linux-x86.zip \
+ && unzip -o $HOME/.sonar/build-wrapper-linux-x86.zip -d $HOME/.sonar/ \
+ && echo export PATH="$HOME/.sonar/build-wrapper-linux-x86:\$PATH" >> $HOME/.bashrc
+
+#
+# Update the OS, as needed.
+#
+RUN apt update
+
+#
+# Set the working directory.
+#
+WORKDIR /met
+
+#
+# Copy MET Download and install MET.
+#
+RUN echo "Copying MET into ${MET_REPO_DIR}" \
+ && mkdir -p ${MET_REPO_DIR}
+
+COPY . ${MET_REPO_DIR}
+
+RUN if [ ! -e "${MET_REPO_DIR}/configure.ac" ]; then \
+    echo "ERROR: docker build must be run from the MET directory: `ls`"; \
+    exit 1; \
+  fi
+
+RUN cd ${MET_REPO_DIR} \
+ && internal/scripts/docker/build_met_sonarqube.sh

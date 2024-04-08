@@ -146,10 +146,6 @@ static Grid      grid;
 static double* lat_arr;
 static double* lon_arr;
 
-// Wind arrays
-/* static double* wind_r_arr; */
-/* static double* wind_t_arr; */
-
 ////////////////////////////////////////////////////////////////////////
 
 #endif  //  __TC_RMW_H__
