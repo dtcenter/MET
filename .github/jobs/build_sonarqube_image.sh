@@ -28,7 +28,6 @@ time_command docker build -t ${DOCKERHUB_TAG} \
     --build-arg MET_BASE_REPO \
     --build-arg MET_BASE_TAG \
     --build-arg SOURCE_BRANCH \
-    --build-arg MET_CONFIG_OPTS \
     --build-arg SONAR_SCANNER_VERSION \
     --build-arg SONAR_HOST_URL \
     --build-arg SONAR_TOKEN \
@@ -41,6 +40,6 @@ fi
 
 # Copy the .scannerwork directory from the image
 id=$(docker create ${DOCKERHUB_TAG})
-time_command docker cp $id:/met/.scannerwork /tmp/met_scannerwork 
+time_command mkdir -p /tmp/scannerwork
+time_command docker cp $id:/met/.scannerwork/report-task.txt /tmp/scannerwork/report-task.txt
 docker rm -v $id
-
