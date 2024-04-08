@@ -39,14 +39,14 @@ static const int n_txt = 8;
 
 // Text file type
 static const STATLineType txt_file_type[n_txt] = {
-   stat_fho,   //  0
-   stat_ctc,   //  1
-   stat_cts,   //  2
-   stat_pct,   //  3
-   stat_pstd,  //  4
-   stat_pjc,   //  5
-   stat_prc,   //  6
-   stat_genmpr //  7
+   STATLineType::fho,   //  0
+   STATLineType::ctc,   //  1
+   STATLineType::cts,   //  2
+   STATLineType::pct,   //  3
+   STATLineType::pstd,  //  4
+   STATLineType::pjc,   //  5
+   STATLineType::prc,   //  6
+   STATLineType::genmpr //  7
 };
 
 // Output data type names

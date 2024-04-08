@@ -99,7 +99,7 @@ void TCStatLine::clear() {
 
    DataLine::clear();
 
-   Type    = NoTCStatLineType;
+   Type    = TCStatLineType::None;
    HdrLine = (AsciiHeaderLine *) nullptr;
 
    return;
@@ -126,7 +126,7 @@ int TCStatLine::read_line(LineDataFile * ldf) {
    // Check for a header line
    //
    if(strcmp(get_item(0), "VERSION") == 0) {
-      Type = TCStatLineType_Header;
+      Type = TCStatLineType::Header;
       return 1;
    }
 
@@ -136,7 +136,7 @@ int TCStatLine::read_line(LineDataFile * ldf) {
    offset = METHdrTable.col_offset(get_item(0), "TCST", na_str, "LINE_TYPE");
 
    if(is_bad_data(offset) || n_items() < (offset + 1)) {
-      Type = NoTCStatLineType;
+      Type = TCStatLineType::None;
       return 0;
    }
 
@@ -159,7 +159,7 @@ bool TCStatLine::is_ok() const {
 ////////////////////////////////////////////////////////////////////////
 
 bool TCStatLine::is_header() const {
-   return(Type == TCStatLineType_Header);
+   return(Type == TCStatLineType::Header);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -370,11 +370,11 @@ ConcatString TCStatLine::header() const {
 TCStatLineType string_to_tcstatlinetype(const char *s) {
    TCStatLineType t;
 
-        if(strcmp(s, TCStatLineType_TCMPR_Str)    == 0) t = TCStatLineType_TCMPR;
-   else if(strcmp(s, TCStatLineType_TCDIAG_Str)   == 0) t = TCStatLineType_TCDIAG;
-   else if(strcmp(s, TCStatLineType_ProbRIRW_Str) == 0) t = TCStatLineType_ProbRIRW;
-   else if(strcmp(s, TCStatLineType_Header_Str)   == 0) t = TCStatLineType_Header;
-   else                                                 t = NoTCStatLineType;
+        if(strcmp(s, TCStatLineType_TCMPR_Str)    == 0) t = TCStatLineType::TCMPR;
+   else if(strcmp(s, TCStatLineType_TCDIAG_Str)   == 0) t = TCStatLineType::TCDIAG;
+   else if(strcmp(s, TCStatLineType_ProbRIRW_Str) == 0) t = TCStatLineType::ProbRIRW;
+   else if(strcmp(s, TCStatLineType_Header_Str)   == 0) t = TCStatLineType::Header;
+   else                                                 t = TCStatLineType::None;
 
    return t;
 }
@@ -385,11 +385,11 @@ ConcatString tcstatlinetype_to_string(const TCStatLineType t) {
    const char *s = (const char *) nullptr;
 
    switch(t) {
-      case TCStatLineType_TCMPR:    s = TCStatLineType_TCMPR_Str;    break;
-      case TCStatLineType_TCDIAG:   s = TCStatLineType_TCDIAG_Str;   break;
-      case TCStatLineType_ProbRIRW: s = TCStatLineType_ProbRIRW_Str; break;
-      case TCStatLineType_Header:   s = TCStatLineType_Header_Str;   break;
-      default:                      s = na_str;                      break;
+      case TCStatLineType::TCMPR:    s = TCStatLineType_TCMPR_Str;    break;
+      case TCStatLineType::TCDIAG:   s = TCStatLineType_TCDIAG_Str;   break;
+      case TCStatLineType::ProbRIRW: s = TCStatLineType_ProbRIRW_Str; break;
+      case TCStatLineType::Header:   s = TCStatLineType_Header_Str;   break;
+      default:                       s = na_str;                      break;
    }
 
    return ConcatString(s);

@@ -391,9 +391,9 @@ const BuiltinInfo & info = binfo[which];
    //  nint and sign are treated differently
    //
 
-if ( info.id == builtin_nint )  { do_nint();  return; }
+if ( info.id == Builtin::nint )  { do_nint();  return; }
 
-if ( info.id == builtin_sign )  { do_sign();  return; }
+if ( info.id == Builtin::sign )  { do_sign();  return; }
 
    //
    //

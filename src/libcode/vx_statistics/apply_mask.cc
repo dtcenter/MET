@@ -59,12 +59,12 @@ Grid parse_vx_grid(const RegridInfo info, const Grid *fgrid, const Grid *ogrid) 
    else {
 
       // Verify on the forecast grid
-      if(info.field == FieldType_Fcst) {
+      if(info.field == FieldType::Fcst) {
          mlog << Debug(2) << "Using the forecast grid as the verification grid\n";
          vx_grid = *fgrid;
       }
       // Verify on the observation grid
-      else if(info.field == FieldType_Obs) {
+      else if(info.field == FieldType::Obs) {
          mlog << Debug(2) << "Using the observation grid as the verification grid\n";
          vx_grid = *ogrid;
       }
@@ -143,11 +143,11 @@ void parse_grid_weight(const Grid &grid, const GridWeightType t,
    for(x=0; x<grid.nx(); x++) {
       for(y=0; y<grid.ny(); y++) {
 
-         if(t == GridWeightType_Cos_Lat) {
+         if(t == GridWeightType::Cos_Lat) {
             grid.xy_to_latlon(x, y, lat, lon);
             w = cosd(lat);
          }
-         else if(t == GridWeightType_Area) {
+         else if(t == GridWeightType::Area) {
             w = grid.calc_area(x, y);
          }
          else {

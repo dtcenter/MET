@@ -108,7 +108,7 @@ void ObsErrorEntry::clear() {
 
    bias_scale = bias_offset = bad_data_double;
 
-   dist_type = DistType_None;
+   dist_type = DistType::None;
    dist_parm.clear();
 
    v_min = bad_data_double;
@@ -240,7 +240,7 @@ bool ObsErrorEntry::parse_line(const DataLine &dl) {
    bias_offset = (strcmp(dl[10], na_str) == 0 ?
                   bad_data_double : atof(dl[10]));
    dist_type = string_to_disttype(dl[11]);
-   if(dist_type != DistType_None) dist_parm.add_css(dl[12]);
+   if(dist_type != DistType::None) dist_parm.add_css(dl[12]);
 
    // Range check
    if((hgt_range.n() != 0 && hgt_range.n() != 2) ||
@@ -320,13 +320,13 @@ void ObsErrorEntry::validate() {
    int n_req;
 
    // Number of distribution parameters
-   if(dist_type == DistType_Gamma   ||
-      dist_type == DistType_Uniform ||
-      dist_type == DistType_Beta) n_req = 2;
+   if(dist_type == DistType::Gamma   ||
+      dist_type == DistType::Uniform ||
+      dist_type == DistType::Beta) n_req = 2;
    else                           n_req = 1;
 
    // Make sure we have the expected number of parameters
-   if(dist_type != DistType_None &&
+   if(dist_type != DistType::None &&
       dist_parm.n() != n_req) {
       mlog << Error << "\nObsErrorEntry::validate() -> "
            << "expected " << n_req << " parameter(s) but got "
@@ -714,7 +714,7 @@ double add_obs_error_inc(const gsl_rng *r, FieldType t,
    if(!e || is_bad_data(v)) return v;
 
    // Apply the specified random perturbation
-   if(e->dist_type != DistType_None) {
+   if(e->dist_type != DistType::None) {
       v_new += ran_draw(r, e->dist_type,
                         e->dist_parm[0], e->dist_parm[1]);
    }
@@ -727,7 +727,7 @@ double add_obs_error_inc(const gsl_rng *r, FieldType t,
    if(mlog.verbosity_level() >= 4) {
 
       // Check for no updates
-      if(e->dist_type == DistType_None) {
+      if(e->dist_type == DistType::None) {
          mlog << Debug(4)
               << "Applying no observation error update for "
               << fieldtype_to_string(t) << " value " <<  v

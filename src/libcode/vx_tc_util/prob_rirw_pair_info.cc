@@ -15,6 +15,7 @@
 #include <cstdio>
 #include <cmath>
 
+#include "enum_as_int.hpp"
 #include "prob_rirw_pair_info.h"
 
 using namespace std;
@@ -80,7 +81,7 @@ void ProbRIRWPairInfo::clear() {
    XErr     = YErr    = bad_data_double;
    BBegV    = BEndV   = bad_data_double;
    BMinV    = BMaxV   = bad_data_double;
-   BBegLev  = BEndLev = NoCycloneLevel;
+   BBegLev  = BEndLev = CycloneLevel::None;
    Line.clear();
 
    return;
@@ -102,9 +103,9 @@ void ProbRIRWPairInfo::dump(ostream &out, int indent_depth) const {
        << prefix << "XErr      = " << XErr      << "\n"
        << prefix << "YErr      = " << YErr      << "\n"
        << prefix << "BBegV     = " << BBegV     << "\n"
-       << prefix << "BBegLev   = " << BBegLev   << "\n"
+       << prefix << "BBegLev   = " << enum_class_as_int(BBegLev) << "\n"
        << prefix << "BEndV     = " << BEndV     << "\n"
-       << prefix << "BEndLev   = " << BEndLev   << "\n"
+       << prefix << "BEndLev   = " << enum_class_as_int(BEndLev) << "\n"
        << prefix << "BMinV     = " << BMinV     << "\n"
        << prefix << "BMaxV     = " << BMaxV     << "\n"
        << prefix << "ProbRIRW: " << "\n";
@@ -268,7 +269,7 @@ void ProbRIRWPairInfo::set(const TCStatLine &l) {
    clear();
 
    // Check the line type
-   if(l.type() != TCStatLineType_ProbRIRW) return;
+   if(l.type() != TCStatLineType::ProbRIRW) return;
 
    // Parse ProbRIRWInfo
    ProbRIRW.set(l);

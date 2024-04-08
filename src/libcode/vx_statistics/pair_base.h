@@ -109,7 +109,7 @@ class PairBase {
 
       bool       check_unique;   // Check for duplicates, keeping unique obs
       ObsSummary obs_summary;    // Summarize multiple observations
-      int        obs_perc_value; // Percentile value for ObsSummary_Perc
+      int        obs_perc_value; // Percentile value for ObsSummary::Perc
 
       StringArray map_key;
       std::map<std::string,station_values_t> map_val; // Storage for single obs values

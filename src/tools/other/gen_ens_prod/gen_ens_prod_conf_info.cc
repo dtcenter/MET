@@ -304,9 +304,9 @@ void GenEnsProdConfInfo::process_config(GrdFileType etype, StringArray * ens_fil
       mthd = string_to_interpmthd(nmep_smooth.method[i].c_str());
 
       // Check for unsupported neighborhood probability smoothing methods
-      if(mthd == InterpMthd_DW_Mean ||
-         mthd == InterpMthd_LS_Fit  ||
-         mthd == InterpMthd_Bilin) {
+      if(mthd == InterpMthd::DW_Mean ||
+         mthd == InterpMthd::LS_Fit  ||
+         mthd == InterpMthd::Bilin) {
          mlog << Error << "\nGenEnsProdConfInfo::process_config() -> "
               << "Neighborhood probability smoothing methods DW_MEAN, "
               << "LS_FIT, and BILIN are not supported for \""

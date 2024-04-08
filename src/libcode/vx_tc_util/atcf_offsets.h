@@ -30,7 +30,7 @@ static const int LonTenthsOffset       = 7;
 //
 // Offsets specific to the ADECK and BDECK track lines
 //   http://www.nrlmry.navy.mil/atcf_web/docs/database/new/abrdeck.html
-// Offsets for columns common to ATCFLineType_Track and ATCFLineType_GenTrack
+// Offsets for columns common to ATCFLineType::Track and ATCFLineType::GenTrack
 //
 
 static const int VMaxOffset            = 8;
@@ -49,7 +49,7 @@ static const int IsobarRadiusOffset    = 18;
 static const int MaxWindRadiusOffset   = 19;
 
 //
-// Offsets for columns specific to the ATCFLineType_Track
+// Offsets for columns specific to the ATCFLineType::Track
 //
 
 static const int GustsOffset           = 20;
@@ -76,7 +76,7 @@ static const int WarmCoreOffset        = 39;
 static const char ThermoParams_Str[]   = "THERMO PARARMS";
 
 //
-// Offsets for columns specific to the ATCFLineType_GenTrack
+// Offsets for columns specific to the ATCFLineType::GenTrack
 // Reference: https://dtcenter.org/HurrWRF/users/docs/users_guide/HWRF-UG-2018.pdf
 //
 

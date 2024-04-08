@@ -401,13 +401,13 @@ void process_scores() {
            << " versus " << conf_info.obs_info[i]->magic_str() << ".\n";
 
       // Mask out the missing data between fields
-      if(conf_info.mask_missing_flag == FieldType_Fcst ||
-         conf_info.mask_missing_flag == FieldType_Both)
+      if(conf_info.mask_missing_flag == FieldType::Fcst ||
+         conf_info.mask_missing_flag == FieldType::Both)
          mask_bad_data(fcst_dp, obs_dp);
 
       // Mask out the missing data between fields
-      if(conf_info.mask_missing_flag == FieldType_Obs ||
-         conf_info.mask_missing_flag == FieldType_Both)
+      if(conf_info.mask_missing_flag == FieldType::Obs ||
+         conf_info.mask_missing_flag == FieldType::Both)
          mask_bad_data(obs_dp, fcst_dp);
 
       // Get the fill data value to be used for each field
@@ -426,7 +426,7 @@ void process_scores() {
       fill_bad_data(obs_dp_fill,  obs_fill);
 
       // Pad the fields out to the nearest power of two if requested
-      if(conf_info.grid_decomp_flag == GridDecompType_Pad) {
+      if(conf_info.grid_decomp_flag == GridDecompType::Pad) {
          mlog << Debug(2) << "Padding the fields out to the nearest integer "
               << "power of two.\n";
          pad_field(fcst_dp_fill, fcst_fill);
@@ -459,7 +459,7 @@ void process_scores() {
          get_tile(fcst_dp_fill, obs_dp_fill, i, j, f_na, o_na);
 
          // Compute Intensity-Scale scores
-         if(conf_info.output_flag[i_isc] != STATOutputType_None) {
+         if(conf_info.output_flag[i_isc] != STATOutputType::None) {
 
             // Do the intensity-scale decomposition
             do_intensity_scale(f_na, o_na, isc_info[j], i, j);
@@ -599,7 +599,7 @@ void setup_txt_files(unixtime valid_ut, int lead_sec) {
    //
    /////////////////////////////////////////////////////////////////////
 
-   if(conf_info.output_flag[i_isc] != STATOutputType_None) {
+   if(conf_info.output_flag[i_isc] != STATOutputType::None) {
 
 
       // Initialize file stream
@@ -1887,7 +1887,7 @@ void close_out_files() {
 
    // Write out the contents of the ISC AsciiTable and
    // close the ISC output files
-   if(conf_info.output_flag[i_isc] == STATOutputType_Both) {
+   if(conf_info.output_flag[i_isc] == STATOutputType::Both) {
       if(isc_out) {
          *isc_out << isc_at;
          close_txt_file(isc_out, isc_file.c_str());
@@ -2745,7 +2745,7 @@ void draw_tiles(PSfile *p, Box &dim,
    for(i=tile_start; i<=tile_end; i++) {
 
       // If padding was performed, the tile is the size of the domain
-      if(conf_info.grid_decomp_flag == GridDecompType_Pad) {
+      if(conf_info.grid_decomp_flag == GridDecompType::Pad) {
          tile_bb = dim;
       }
       // Find the lower-left and upper-right corners of the tile

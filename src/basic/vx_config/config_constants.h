@@ -25,10 +25,10 @@
 // Enumeration for output_flag configuration parameter
 //
 
-enum STATOutputType {
-   STATOutputType_None, // Do not output this line type
-   STATOutputType_Stat, // Write output to the .stat file
-   STATOutputType_Both  // Write output to .stat and .txt files
+enum class STATOutputType {
+   None, // Do not output this line type
+   Stat, // Write output to the .stat file
+   Both  // Write output to .stat and .txt files
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -37,11 +37,11 @@ enum STATOutputType {
 // Enumeration for field type configuration parameters
 //
 
-enum FieldType {
-   FieldType_None, // Default
-   FieldType_Fcst, // Apply to forecast field
-   FieldType_Obs,  // Apply to observation field
-   FieldType_Both  // Apply to both forecast and observation field
+enum class FieldType {
+   None, // Default
+   Fcst, // Apply to forecast field
+   Obs,  // Apply to observation field
+   Both  // Apply to both forecast and observation field
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -50,11 +50,11 @@ enum FieldType {
 // Enumeration for set logic
 //
 
-enum SetLogic {
-   SetLogic_None,         // Default
-   SetLogic_Union,        // Union
-   SetLogic_Intersection, // Intersection
-   SetLogic_SymDiff       // Symmetric Difference
+enum class SetLogic {
+   None,         // Default
+   Union,        // Union
+   Intersection, // Intersection
+   SymDiff       // Symmetric Difference
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -77,11 +77,11 @@ static const char setlogic_symbol_symdiff[]      = "*";
 // Enumeration for track type configuration parameters
 //
 
-enum TrackType {
-   TrackType_None,  // Default
-   TrackType_ADeck, // Apply to ADeck tracks
-   TrackType_BDeck, // Apply to BDeck tracks
-   TrackType_Both   // Apply to both ADeck and BDeck tracks
+enum class TrackType {
+   None,  // Default
+   ADeck, // Apply to ADeck tracks
+   BDeck, // Apply to BDeck tracks
+   Both   // Apply to both ADeck and BDeck tracks
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -90,12 +90,12 @@ enum TrackType {
 // Enumeration for tropical cyclone diagnostic types
 //
 
-enum DiagType {
-   DiagType_None,      // Default
-   DiagType_CIRA_RT,   // Realtime CIRA Tropical Cyclone Diagnostics
-   DiagType_CIRA_Dev,  // Developmental CIRA Tropical Cyclone Diagnostics
-   DiagType_SHIPS_RT,  // Realtime SHIPS Large Scale Diagnostics
-   DiagType_SHIPS_Dev  // Developmental SHIPS Large Scale Diagnostics
+enum class DiagType {
+   None,      // Default
+   CIRA_RT,   // Realtime CIRA Tropical Cyclone Diagnostics
+   CIRA_Dev,  // Developmental CIRA Tropical Cyclone Diagnostics
+   SHIPS_RT,  // Realtime SHIPS Large Scale Diagnostics
+   SHIPS_Dev  // Developmental SHIPS Large Scale Diagnostics
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -117,10 +117,10 @@ static const char ships_diag_dev_str[] = "SHIPS_DIAG_DEV";
 // Enumeration for 12-hour interpolation logic
 //
 
-enum Interp12Type {
-   Interp12Type_None,   // Do not apply 12-hour interpolation logic
-   Interp12Type_Fill,   // Fill in missing 'I' tracks with '2' tracks
-   Interp12Type_Replace // Replace all 'I' tracks with '2' tracks
+enum class Interp12Type {
+   None,   // Do not apply 12-hour interpolation logic
+   Fill,   // Fill in missing 'I' tracks with '2' tracks
+   Replace // Replace all 'I' tracks with '2' tracks
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -129,48 +129,48 @@ enum Interp12Type {
 // Enumeration for all the possible STAT line types
 //
 
-enum STATLineType {
+enum class STATLineType {
 
-   stat_sl1l2,
-   stat_sal1l2,
-   stat_vl1l2,
-   stat_val1l2,
+   sl1l2,
+   sal1l2,
+   vl1l2,
+   val1l2,
 
-   stat_vcnt,
+   vcnt,
 
-   stat_fho,
-   stat_ctc,
-   stat_cts,
-   stat_mctc,
-   stat_mcts,
-   stat_cnt,
-   stat_pct,
-   stat_pstd,
-   stat_pjc,
-   stat_prc,
-   stat_mpr,
-   stat_seeps,
-   stat_seeps_mpr,
-   stat_nbrctc,
-   stat_nbrcts,
-   stat_nbrcnt,
-   stat_isc,
-   stat_wdir,
-   stat_ecnt,
-   stat_rps,
-   stat_rhist,
-   stat_phist,
-   stat_orank,
-   stat_ssvar,
-   stat_relp,
-   stat_eclv,
-   stat_grad,
-   stat_dmap,
-   stat_genmpr,
-   stat_ssidx,
-   stat_header,
+   fho,
+   ctc,
+   cts,
+   mctc,
+   mcts,
+   cnt,
+   pct,
+   pstd,
+   pjc,
+   prc,
+   mpr,
+   seeps,
+   seeps_mpr,
+   nbrctc,
+   nbrcts,
+   nbrcnt,
+   isc,
+   wdir,
+   ecnt,
+   rps,
+   rhist,
+   phist,
+   orank,
+   ssvar,
+   relp,
+   eclv,
+   grad,
+   dmap,
+   genmpr,
+   ssidx,
+   header,
 
-   no_stat_line_type
+   none
 
 };
 
@@ -256,11 +256,13 @@ struct TimeSummaryInfo {
 // Enumeration for bootstrapping interval configuration parameter
 //
 
-enum BootIntervalType {
-   BootIntervalType_None,      // Default
-   BootIntervalType_BCA,       // Bias-Corrected and adjusted method
-   BootIntervalType_Percentile // Percentile method
+enum class BootIntervalType {
+   None,  // Default
+   BCA,   // Bias-Corrected and adjusted method
+   PCTile // Percentile method
 };
+
+////////////////////////////////////////////////////////////////////////
 
 //
 // Struct to store bootstrapping information
@@ -423,9 +425,9 @@ struct MaskLatLon {
 // Enumeration for duplicate_flag configuration parameter
 //
 
-enum DuplicateType {
-   DuplicateType_None,  // Apply no logic for duplicate point obs
-   DuplicateType_Unique // Filter out duplicate observation values
+enum class DuplicateType {
+   None,  // Apply no logic for duplicate point obs
+   Unique // Filter out duplicate observation values
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -434,15 +436,15 @@ enum DuplicateType {
 // Enumeration for obs_summary configuration parameter
 //
 
-enum ObsSummary {
-   ObsSummary_None,    // Keep all observations, no statistics
-   ObsSummary_Nearest, // Keep only the observation closest in time
-   ObsSummary_Min,     // Keep only smallest value
-   ObsSummary_Max,     // Keep only largest value
-   ObsSummary_UW_Mean, // Calculate un-weighted mean
-   ObsSummary_DW_Mean, // Calculate time weighted mean
-   ObsSummary_Median,  // Calculate median
-   ObsSummary_Perc     // Calculate precentile
+enum class ObsSummary {
+   None,    // Keep all observations, no statistics
+   Nearest, // Keep only the observation closest in time
+   Min,     // Keep only smallest value
+   Max,     // Keep only largest value
+   UW_Mean, // Calculate un-weighted mean
+   DW_Mean, // Calculate time weighted mean
+   Median,  // Calculate median
+   Perc     // Calculate precentile
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -451,10 +453,10 @@ enum ObsSummary {
 // Enumeration for grid_weight_flag configuration parameter
 //
 
-enum GridWeightType {
-   GridWeightType_None,    // Apply no grid box weighting
-   GridWeightType_Cos_Lat, // Apply cosine latitude weighting
-   GridWeightType_Area     // Apply true grid box area weighting
+enum class GridWeightType {
+   None,    // Apply no grid box weighting
+   Cos_Lat, // Apply cosine latitude weighting
+   Area     // Apply true grid box area weighting
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -463,11 +465,11 @@ enum GridWeightType {
 // Enumeration for grid_decomp_flag configuration parameter
 //
 
-enum GridDecompType {
-   GridDecompType_None, // Default
-   GridDecompType_Auto, // Automatic tiling
-   GridDecompType_Tile, // User-specified tile definitions
-   GridDecompType_Pad   // Pad out to next largest tile
+enum class GridDecompType {
+   None, // Default
+   Auto, // Automatic tiling
+   Tile, // User-specified tile definitions
+   Pad   // Pad out to next largest tile
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -476,14 +478,14 @@ enum GridDecompType {
 // Enumeration for wavelet.type configuration parameter
 //
 
-enum WaveletType {
-   WaveletType_None,        // Default
-   WaveletType_Haar,        // Haar wavelet
-   WaveletType_Haar_Cntr,   // Centered Haar wavelet
-   WaveletType_Daub,        // Daubechies wavelet
-   WaveletType_Daub_Cntr,   // Centered Daubechies wavelet
-   WaveletType_BSpline,     // BSpline wavelet
-   WaveletType_BSpline_Cntr // Centered BSpline wavelet
+enum class WaveletType {
+   None,        // Default
+   Haar,        // Haar wavelet
+   Haar_Cntr,   // Centered Haar wavelet
+   Daub,        // Daubechies wavelet
+   Daub_Cntr,   // Centered Daubechies wavelet
+   BSpline,     // BSpline wavelet
+   BSpline_Cntr // Centered BSpline wavelet
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -492,11 +494,11 @@ enum WaveletType {
 // Enumeration for MODE merging options
 //
 
-enum MergeType {
-   MergeType_None,   // No additional merging
-   MergeType_Both,   // Double-threshold and fuzzy engine
-   MergeType_Thresh, // Double-threshold only
-   MergeType_Engine  // Fuzzy engine only
+enum class MergeType {
+   None,   // No additional merging
+   Both,   // Double-threshold and fuzzy engine
+   Thresh, // Double-threshold only
+   Engine  // Fuzzy engine only
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -505,11 +507,11 @@ enum MergeType {
 // Enumeration for MODE matching options
 //
 
-enum MatchType {
-   MatchType_None,      // No matching
-   MatchType_MergeBoth, // Match with merging in both fcst and obs
-   MatchType_MergeFcst, // Match with merging in fcst only
-   MatchType_NoMerge    // Match with no additional merging
+enum class MatchType {
+   None,      // No matching
+   MergeBoth, // Match with merging in both fcst and obs
+   MergeFcst, // Match with merging in fcst only
+   NoMerge    // Match with no additional merging
 };
 
 ////////////////////////////////////////////////////////////////////////

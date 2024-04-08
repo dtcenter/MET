@@ -71,7 +71,7 @@ void ProbInfoBase::init_from_scratch() {
 
 void ProbInfoBase::clear() {
 
-   Type = NoATCFLineType;
+   Type = ATCFLineType::None;
    StormId.clear();
    Basin.clear();
    Cyclone.clear();
@@ -266,7 +266,7 @@ bool ProbInfoBase::add(const ATCFProbLine &l, double dland, bool check_dup) {
    }
 
    // Initialize the header information, if necessary
-   if(Type == NoATCFLineType) initialize(l, dland);
+   if(Type == ATCFLineType::None) initialize(l, dland);
 
    // Check for matching header information
    if(!is_match(l)) return false;
@@ -292,8 +292,8 @@ void ProbInfoBase::set(const TCStatLine &l) {
    // Store column information
    switch(l.type()) {
 
-      case TCStatLineType_ProbRIRW:
-         Type = ATCFLineType_ProbRI;
+      case TCStatLineType::ProbRIRW:
+         Type = ATCFLineType::ProbRI;
          break;
 
       default:
