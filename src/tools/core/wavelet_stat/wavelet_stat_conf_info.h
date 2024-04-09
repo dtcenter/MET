@@ -34,7 +34,7 @@ static const int n_txt = 1;
 
 // Text file type
 static const STATLineType txt_file_type[n_txt] = {
-   stat_isc
+   STATLineType::isc
 };
 
 ////////////////////////////////////////////////////////////////////////

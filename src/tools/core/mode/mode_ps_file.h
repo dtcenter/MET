@@ -36,7 +36,7 @@ static const bool use_zlib = true;
 ////////////////////////////////////////////////////////////////////////
 
 
-enum EngineType {
+enum class EngineType {
    NoEng = 0,
    FOEng = 1,
    FFEng = 2,

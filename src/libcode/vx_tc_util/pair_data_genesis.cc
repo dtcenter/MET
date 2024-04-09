@@ -31,11 +31,11 @@ ConcatString genesispaircategory_to_string(const GenesisPairCategory c) {
    const char *s = (const char *) nullptr;
 
    switch(c) {
-      case FYOYGenesis:    s = "FYOY";    break;
-      case FYONGenesis:    s = "FYON";    break;
-      case FNOYGenesis:    s = "FNOY";    break;
-      case DiscardGenesis: s = "DISCARD"; break;
-      default:             s = na_str;    break;
+      case GenesisPairCategory::FYOY:    s = "FYOY";    break;
+      case GenesisPairCategory::FYON:    s = "FYON";    break;
+      case GenesisPairCategory::FNOY:    s = "FNOY";    break;
+      case GenesisPairCategory::Discard: s = "DISCARD"; break;
+      default:                           s = na_str;    break;
    }
 
    return ConcatString(s);
@@ -59,8 +59,8 @@ void GenesisPairDiff::clear() {
    DevDist     = bad_data_double;
    DevDSec     = bad_data_int;
    OpsDSec     = bad_data_int;
-   DevCategory = NoGenesisPairCategory;
-   OpsCategory = NoGenesisPairCategory;
+   DevCategory = GenesisPairCategory::None;
+   OpsCategory = GenesisPairCategory::None;
 
    return;
 }

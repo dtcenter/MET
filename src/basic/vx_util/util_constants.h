@@ -95,10 +95,6 @@ static const char ws_reg_exp[] = "[ \t\r\n]";
 static const char ws_line_reg_exp[] = "^[ \t\r\n]*$";
 static const char sep_str[] = "--------------------------------------------------------------------------------";
 
-// Bootstrap methods
-static const int boot_bca_flag  = 0;
-static const int boot_perc_flag = 1;
-
 ////////////////////////////////////////////////////////////////////////
 
 static const int max_line_len = 2048;

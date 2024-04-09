@@ -28,12 +28,12 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-enum GenesisPairCategory {
-   FYOYGenesis,    // Hit
-   FYONGenesis,    // False Alarm
-   FNOYGenesis,    // Miss
-   DiscardGenesis, // Discard
-   NoGenesisPairCategory
+enum class GenesisPairCategory {
+   FYOY,    // Hit
+   FYON,    // False Alarm
+   FNOY,    // Miss
+   Discard, // Discard
+   None
 };
 
 extern ConcatString genesispaircategory_to_string(const GenesisPairCategory);

@@ -107,23 +107,23 @@ static const char *DEFAULT_CONFIG_FILENAME =
 ////////////////////////////////////////////////////////////////////////
 
 // Supported input ASCII formats
-enum ASCIIFormat {
-   ASCIIFormat_None,
-   ASCIIFormat_MET,
-   ASCIIFormat_Little_R,
-   ASCIIFormat_SurfRad,
-   ASCIIFormat_WWSIS,
-   ASCIIFormat_Airnow_dailyv2,
-   ASCIIFormat_Airnow_hourlyaqobs,
-   ASCIIFormat_Airnow_hourly,
-   ASCIIFormat_NDBC_standard,
-   ASCIIFormat_ISMN,
-   ASCIIFormat_IABP,
-   ASCIIFormat_Aeronet_v2,
-   ASCIIFormat_Aeronet_v3, 
-   ASCIIFormat_Python, 
+enum class ASCIIFormat {
+   None,
+   MET,
+   Little_R,
+   SurfRad,
+   WWSIS,
+   Airnow_dailyv2,
+   Airnow_hourlyaqobs,
+   Airnow_hourly,
+   NDBC_standard,
+   ISMN,
+   IABP,
+   Aeronet_v2,
+   Aeronet_v3, 
+   Python, 
 };
-static ASCIIFormat ascii_format = ASCIIFormat_None;
+static ASCIIFormat ascii_format = ASCIIFormat::None;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -311,67 +311,67 @@ FileHandler *create_file_handler(const ASCIIFormat format, const ConcatString &a
    // file to guess the format.
    //
    switch(format) {
-      case ASCIIFormat_MET: {
+      case ASCIIFormat::MET: {
          return (FileHandler *) new MetHandler(program_name);
       }
 
-      case ASCIIFormat_Little_R: {
+      case ASCIIFormat::Little_R: {
          return (FileHandler *) new LittleRHandler(program_name);
       }
 
-      case ASCIIFormat_SurfRad: {
+      case ASCIIFormat::SurfRad: {
          return (FileHandler *) new SurfradHandler(program_name);
       }
 
-      case ASCIIFormat_WWSIS: {
+      case ASCIIFormat::WWSIS: {
          return (FileHandler *) new WwsisHandler(program_name);
       }
 
-      case ASCIIFormat_Airnow_dailyv2: {
+      case ASCIIFormat::Airnow_dailyv2: {
          AirnowHandler *handler = new AirnowHandler(program_name);
          handler->setFormatVersion(AirnowHandler::AIRNOW_FORMAT_VERSION_DAILYV2);
          return (FileHandler *) handler;
       }
 
-      case ASCIIFormat_Airnow_hourlyaqobs: {
+      case ASCIIFormat::Airnow_hourlyaqobs: {
          AirnowHandler *handler = new AirnowHandler(program_name);
          handler->setFormatVersion(AirnowHandler::AIRNOW_FORMAT_VERSION_HOURLYAQOBS);
          return (FileHandler *) handler;
       }
 
-      case ASCIIFormat_Airnow_hourly: {
+      case ASCIIFormat::Airnow_hourly: {
          AirnowHandler *handler = new AirnowHandler(program_name);
          handler->setFormatVersion(AirnowHandler::AIRNOW_FORMAT_VERSION_HOURLY);
          return (FileHandler *) handler;
       }
 
-      case ASCIIFormat_NDBC_standard: {
+      case ASCIIFormat::NDBC_standard: {
          NdbcHandler *handler = new NdbcHandler(program_name);
          handler->setFormatVersion(NdbcHandler::NDBC_FORMAT_VERSION_STANDARD);
          return (FileHandler *) handler;
       }
 
-      case ASCIIFormat_ISMN: {
+      case ASCIIFormat::ISMN: {
          return (FileHandler *) new IsmnHandler(program_name);
       }
 
-      case ASCIIFormat_IABP: {
+      case ASCIIFormat::IABP: {
          return((FileHandler *) new IabpHandler(program_name));
       }
 
-      case ASCIIFormat_Aeronet_v2: {
+      case ASCIIFormat::Aeronet_v2: {
          AeronetHandler *handler = new AeronetHandler(program_name);
          handler->setFormatVersion(2);
          return (FileHandler *) handler;
       }
 
-      case ASCIIFormat_Aeronet_v3: {
+      case ASCIIFormat::Aeronet_v3: {
          AeronetHandler *handler = new AeronetHandler(program_name);
          handler->setFormatVersion(3);
          return (FileHandler *) handler;
       }
       #ifdef ENABLE_PYTHON
-      case ASCIIFormat_Python: {
+      case ASCIIFormat::Python: {
          setup_wrapper_path();
          ph = new PythonHandler(program_name, ascii_filename.text());
          return (FileHandler *) ph;
@@ -637,45 +637,45 @@ void usage() {
 void set_format(const StringArray & a) {
 
    if(MetHandler::getFormatString() == a[0]) {
-      ascii_format = ASCIIFormat_MET;
+      ascii_format = ASCIIFormat::MET;
    }
    else if(LittleRHandler::getFormatString() == a[0]) {
-     ascii_format = ASCIIFormat_Little_R;
+     ascii_format = ASCIIFormat::Little_R;
    }
    else if(SurfradHandler::getFormatString() == a[0]) {
-     ascii_format = ASCIIFormat_SurfRad;
+     ascii_format = ASCIIFormat::SurfRad;
    }
    else if(WwsisHandler::getFormatString() == a[0]) {
-     ascii_format = ASCIIFormat_WWSIS;
+     ascii_format = ASCIIFormat::WWSIS;
    }
    else if(AirnowHandler::getFormatStringDailyV2() == a[0]) {
-     ascii_format = ASCIIFormat_Airnow_dailyv2;
+     ascii_format = ASCIIFormat::Airnow_dailyv2;
    }
    else if(AirnowHandler::getFormatStringHourlyAqObs() == a[0]) {
-     ascii_format = ASCIIFormat_Airnow_hourlyaqobs;
+     ascii_format = ASCIIFormat::Airnow_hourlyaqobs;
    }
    else if(AirnowHandler::getFormatStringHourly() == a[0]) {
-     ascii_format = ASCIIFormat_Airnow_hourly;
+     ascii_format = ASCIIFormat::Airnow_hourly;
    }
    else if(NdbcHandler::getFormatStringStandard() == a[0]) {
-     ascii_format = ASCIIFormat_NDBC_standard;
+     ascii_format = ASCIIFormat::NDBC_standard;
    }
    else if(IsmnHandler::getFormatString() == a[0]) {
-     ascii_format = ASCIIFormat_ISMN;
+     ascii_format = ASCIIFormat::ISMN;
    }
    else if(IabpHandler::getFormatString() == a[0]) {
-     ascii_format = ASCIIFormat_IABP;
+     ascii_format = ASCIIFormat::IABP;
    }
    else if(AeronetHandler::getFormatString() == a[0]
      || AeronetHandler::getFormatString_v2() == a[0]) {
-     ascii_format = ASCIIFormat_Aeronet_v2;
+     ascii_format = ASCIIFormat::Aeronet_v2;
    }
    else if(AeronetHandler::getFormatString_v3() == a[0]) {
-     ascii_format = ASCIIFormat_Aeronet_v3;
+     ascii_format = ASCIIFormat::Aeronet_v3;
    }
    #ifdef ENABLE_PYTHON
    else if(PythonHandler::getFormatString() == a[0]) {
-     ascii_format = ASCIIFormat_Python;
+     ascii_format = ASCIIFormat::Python;
    }
    #endif
    else if("python" == a[0]) {

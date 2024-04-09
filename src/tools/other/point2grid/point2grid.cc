@@ -66,7 +66,7 @@ static const int TYPE_GOES     = 5;
 static const int TYPE_GOES_ADP = 6;
 static const int TYPE_PYTHON   = 7;     // MET Point Obs NetCDF from PYTHON
 
-static const InterpMthd DefaultInterpMthd = InterpMthd_UW_Mean;
+static const InterpMthd DefaultInterpMthd = InterpMthd::UW_Mean;
 static const int        DefaultInterpWdth = 2;
 static const double     DefaultVldThresh  = 0.5;
 
@@ -238,7 +238,7 @@ void process_command_line(int argc, char **argv) {
 
    // Set default regridding options
    RGInfo.enable     = true;
-   RGInfo.field      = FieldType_None;
+   RGInfo.field      = FieldType::None;
    RGInfo.method     = DefaultInterpMthd;
    RGInfo.width      = DefaultInterpWdth;
    RGInfo.vld_thresh = DefaultVldThresh;
@@ -995,9 +995,9 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
                      int data_count = dataArray.n();
                      if (0 < data_count) {
                         float to_value;
-                        if      (RGInfo.method == InterpMthd_Min) to_value = dataArray.min();
-                        else if (RGInfo.method == InterpMthd_Max) to_value = dataArray.max();
-                        else if (RGInfo.method == InterpMthd_Median) {
+                        if      (RGInfo.method == InterpMthd::Min) to_value = dataArray.min();
+                        else if (RGInfo.method == InterpMthd::Max) to_value = dataArray.max();
+                        else if (RGInfo.method == InterpMthd::Median) {
                            dataArray.sort_array();
                            to_value = dataArray[data_count/2];
                            if (0 == data_count % 2)
@@ -1486,9 +1486,9 @@ void regrid_nc_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
                   float to_value;
                   int data_cnt = dataArray.n();
                   if (1 == data_cnt) to_value = dataArray[0];
-                  else if (RGInfo.method == InterpMthd_Min) to_value = dataArray.min();
-                  else if (RGInfo.method == InterpMthd_Max) to_value = dataArray.max();
-                  else if (RGInfo.method == InterpMthd_Median) {
+                  else if (RGInfo.method == InterpMthd::Min) to_value = dataArray.min();
+                  else if (RGInfo.method == InterpMthd::Max) to_value = dataArray.max();
+                  else if (RGInfo.method == InterpMthd::Median) {
                      dataArray.sort_array();
                      to_value = dataArray[data_cnt/2];
                      if (0 == data_cnt % 2)
@@ -2600,9 +2600,9 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
             if (0 < dataArray.n()) {
                int data_count = dataArray.n();
                float to_value;
-               if      (RGInfo.method == InterpMthd_Min) to_value = dataArray.min();
-               else if (RGInfo.method == InterpMthd_Max) to_value = dataArray.max();
-               else if (RGInfo.method == InterpMthd_Median) {
+               if      (RGInfo.method == InterpMthd::Min) to_value = dataArray.min();
+               else if (RGInfo.method == InterpMthd::Max) to_value = dataArray.max();
+               else if (RGInfo.method == InterpMthd::Median) {
                   dataArray.sort_array();
                   to_value = dataArray[data_count/2];
                   if (0 == data_count % 2)
@@ -2847,9 +2847,9 @@ void set_field(const StringArray &a) {
 
 void set_method(const StringArray &a) {
    InterpMthd method_id = string_to_interpmthd(a[0].c_str());
-   if (method_id == InterpMthd_Gaussian || method_id == InterpMthd_MaxGauss ) {
+   if (method_id == InterpMthd::Gaussian || method_id == InterpMthd::MaxGauss ) {
       do_gaussian_filter = true;
-      if (method_id == InterpMthd_MaxGauss) RGInfo.method = InterpMthd_Max;
+      if (method_id == InterpMthd::MaxGauss) RGInfo.method = InterpMthd::Max;
    }
    else RGInfo.method = method_id;
    opt_override_method = true;

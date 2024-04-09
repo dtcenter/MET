@@ -167,7 +167,7 @@ conv_thresh.clear();
 
 merge_thresh.clear();
 
-merge_flag = MergeType_Engine;
+merge_flag = MergeType::Engine;
 
 file_type = FileType_None;
  
@@ -263,7 +263,7 @@ if ( dict->lookup(conf_key_vld_thresh) )  {
 if ( _multivar ) {
    // set defaults to no merging
    merge_thresh.clear();
-   merge_flag = MergeType_None;
+   merge_flag = MergeType::None;
 
    // pull out the name
    string name = var_info->name();
@@ -286,7 +286,7 @@ if ( _multivar ) {
          // because that is inconsistent
          merge_thresh_array = dict->lookup_thresh_array(conf_key_merge_thresh);
 
-         if (merge_flag != MergeType_None) {
+         if (merge_flag != MergeType::None) {
             mlog << Error << "\nMode_Field_Info::set() -> "
                  << "Field:" << name << ". "
                  << " When 'merge_flag' is explicitly set, 'merge_thresh' must be explicitly set for multivariate mode\n\n";
@@ -310,7 +310,7 @@ if ( _multivar ) {
             // individual entry doesn't have a merge_thresh, parent has a merge_flag
             // expect parent to have a merge_thresh
             merge_thresh_array = dict->lookup_thresh_array(conf_key_merge_thresh);
-            if (merge_thresh_array.n() == 0 && merge_flag != MergeType_None) {
+            if (merge_thresh_array.n() == 0 && merge_flag != MergeType::None) {
                // parent has a merge_flag but no merge_thresh
                mlog << Error << "\nMode_Field_Info::set() -> "
                     << "Field:" << name << ". using parent merge_flag: " << merge_name
@@ -403,7 +403,7 @@ bool Mode_Field_Info::need_merge_thresh () const
 
 {
 
-bool status = (merge_flag == MergeType_Both) || (merge_flag == MergeType_Thresh);
+bool status = (merge_flag == MergeType::Both) || (merge_flag == MergeType::Thresh);
 
 return status;
 

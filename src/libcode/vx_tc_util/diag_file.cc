@@ -163,7 +163,7 @@ void DiagFile::init_from_scratch() {
 void DiagFile::clear() {
 
    // Initialize values
-   DiagSource = DiagType_None;
+   DiagSource = DiagType::None;
    TrackSource.clear();
    FieldSource.clear();
    StormId.clear();
@@ -215,10 +215,10 @@ void DiagFile::read(const ConcatString &path, const ConcatString &diag_source,
    DiagType type = string_to_diagtype(diag_source.c_str());
 
    // Read diagnostics based on the source type
-   if(type == DiagType_CIRA_RT) {
+   if(type == DiagType::CIRA_RT) {
       read_cira_rt(path, convert_map);
    }
-   else if(type == DiagType_SHIPS_RT) {
+   else if(type == DiagType::SHIPS_RT) {
       read_ships_rt(path, convert_map);
    }
    else {
@@ -249,7 +249,7 @@ void DiagFile::read_cira_rt(const ConcatString &path,
    clear();
 
    // Store the file type
-   DiagSource = DiagType_CIRA_RT;
+   DiagSource = DiagType::CIRA_RT;
 
    // Open the file
    open(path.c_str());
@@ -399,7 +399,7 @@ void DiagFile::read_ships_rt(const ConcatString &path,
    clear();
 
    // Store the file type
-   DiagSource = DiagType_SHIPS_RT;
+   DiagSource = DiagType::SHIPS_RT;
 
    // Open the file
    open(path.c_str());

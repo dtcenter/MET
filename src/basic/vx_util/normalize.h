@@ -22,12 +22,12 @@
 // Enumeration for normalization types
 //
 
-enum NormalizeType {
-   NormalizeType_None,         // No normalization
-   NormalizeType_ClimoAnom,    // Subtract climo mean
-   NormalizeType_ClimoStdAnom, // Subtract climo mean and divide stdev
-   NormalizeType_FcstAnom,     // Subtract fcst mean
-   NormalizeType_FcstStdAnom   // Subtract fcst mean and divide stdev
+enum class NormalizeType {
+   None,         // No normalization
+   ClimoAnom,    // Subtract climo mean
+   ClimoStdAnom, // Subtract climo mean and divide stdev
+   FcstAnom,     // Subtract fcst mean
+   FcstStdAnom   // Subtract fcst mean and divide stdev
 };
 
 ///////////////////////////////////////////////////////////////////////////////

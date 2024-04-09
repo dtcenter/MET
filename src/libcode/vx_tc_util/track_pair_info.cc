@@ -311,8 +311,8 @@ void TrackPairInfo::add(const TrackPoint &a, const TrackPoint &b,
 void TrackPairInfo::add(const TCStatLine &l) {
 
    // Check the line type
-        if(l.type() == TCStatLineType_TCMPR)  add_tcmpr_line(l);
-   else if(l.type() == TCStatLineType_TCDIAG) add_tcdiag_line(l);
+        if(l.type() == TCStatLineType::TCMPR)  add_tcmpr_line(l);
+   else if(l.type() == TCStatLineType::TCDIAG) add_tcdiag_line(l);
 
    return;
 }
@@ -327,7 +327,7 @@ void TrackPairInfo::add_tcmpr_line(const TCStatLine &l) {
    int i, j;
 
    // Check the line type
-   if(l.type() != TCStatLineType_TCMPR) return;
+   if(l.type() != TCStatLineType::TCMPR) return;
 
    // Store the input TCMPR line and TCDIAG placeholder
    TCMPRLine.push_back(l);
@@ -439,7 +439,7 @@ void TrackPairInfo::add_tcdiag_line(const TCStatLine &l) {
    ConcatString cs;
 
    // Check the line type
-   if(l.type() != TCStatLineType_TCDIAG) return;
+   if(l.type() != TCStatLineType::TCDIAG) return;
 
    // Should have already parsed TCMPR
    if(NPoints == 0) {
@@ -473,7 +473,7 @@ void TrackPairInfo::add_tcdiag_line(const TCStatLine &l) {
 
    // Make sure DIAG_SOURCE does not change
    DiagType diag_source = string_to_diagtype(l.get_item("DIAG_SOURCE"));
-   if(ADeck.diag_source() != DiagType_None &&
+   if(ADeck.diag_source() != DiagType::None &&
       ADeck.diag_source() != diag_source) {
       mlog << Error << "\nTrackPairInfo::add_tcdiag_line() -> "
            << "the diagnostic source type has changed ("
@@ -567,7 +567,7 @@ int TrackPairInfo::i_init() const {
 ////////////////////////////////////////////////////////////////////////
 
 WatchWarnType TrackPairInfo::watch_warn(int i) const {
-   WatchWarnType ww_type = NoWatchWarnType;
+   WatchWarnType ww_type = WatchWarnType::None;
 
    // Only check points common to both the ADECK and BDECK tracks
    if(!is_bad_data(ADeck[i].lat()) && !is_bad_data(ADeck[i].lon()) &&
@@ -642,7 +642,7 @@ int TrackPairInfo::check_rirw(const TrackType track_type,
    int acur, aprv, bcur, bprv;
 
    // Nothing to do.
-   if(track_type == TrackType_None) return 0;
+   if(track_type == TrackType::None) return 0;
 
    // Check threshold type for non-exact intensity differences.
    if(!exact_adeck &&
@@ -751,7 +751,7 @@ int TrackPairInfo::check_rirw(const TrackType track_type,
 
       // Print debug message when rapid intensification is found
       if(is_eq(ADeckRIRW[i], 1.0) &&
-         (track_type == TrackType_ADeck || track_type == TrackType_Both)) {
+         (track_type == TrackType::ADeck || track_type == TrackType::Both)) {
          mlog << Debug(4)
               << "Found ADECK RI/RW: " << case_info()
               << ", VALID = " << unix_to_yyyymmdd_hhmmss(ADeck[i].valid()) << ", "
@@ -762,7 +762,7 @@ int TrackPairInfo::check_rirw(const TrackType track_type,
               << acur - aprv << st_adeck.get_str() << "\n";
       }
       if(is_eq(BDeckRIRW[i], 1.0) &&
-         (track_type == TrackType_BDeck || track_type == TrackType_Both)) {
+         (track_type == TrackType::BDeck || track_type == TrackType::Both)) {
          mlog << Debug(4)
               << "Found BDECK RI/RW: " << case_info()
               << ", VALID = " << unix_to_yyyymmdd_hhmmss(BDeck[i].valid()) << ", "
@@ -777,9 +777,9 @@ int TrackPairInfo::check_rirw(const TrackType track_type,
       if(!Keep[i]) continue;
 
       // Update the keep status
-      if((track_type == TrackType_ADeck && !is_eq(ADeckRIRW[i], 1.0)) ||
-         (track_type == TrackType_BDeck && !is_eq(BDeckRIRW[i], 1.0)) ||
-         (track_type == TrackType_Both  && !is_eq(ADeckRIRW[i], 1.0) && !is_eq(BDeckRIRW[i], 1.0))) {
+      if((track_type == TrackType::ADeck && !is_eq(ADeckRIRW[i], 1.0)) ||
+         (track_type == TrackType::BDeck && !is_eq(BDeckRIRW[i], 1.0)) ||
+         (track_type == TrackType::Both  && !is_eq(ADeckRIRW[i], 1.0) && !is_eq(BDeckRIRW[i], 1.0))) {
          Keep.set(i, 0);
          n_rej++;
       }

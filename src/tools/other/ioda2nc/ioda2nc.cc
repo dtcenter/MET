@@ -73,7 +73,7 @@ static const char *qc_postfix = "PreQC";
 static const char *obs_group_name = "ObsValue";
 static const char *derived_obs_group_name = "DerivedObsValue";
 
-enum e_ioda_format { ioda_v1, ioda_v2 };
+enum class e_ioda_format { v1, v2 };
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -439,7 +439,7 @@ void process_ioda_file(int i_pb) {
    StringArray metadata_vars;
    StringArray obs_value_vars;
    bool error_out = true;
-   e_ioda_format ioda_format = ioda_v2;
+   e_ioda_format ioda_format = e_ioda_format::v2;
 
    get_dim_names(f_in, &dim_names);
    ConcatString nlocs_name = find_meta_name("nlocs", dim_names);
@@ -447,9 +447,9 @@ void process_ioda_file(int i_pb) {
 
    nvars = bad_data_int ;
    nstring = string_data_len;
-   if (! has_nc_group(f_in, obs_group_name)) ioda_format = ioda_v1;
+   if (! has_nc_group(f_in, obs_group_name)) ioda_format = e_ioda_format::v1;
 
-   if ( ioda_format == ioda_v1 ) {
+   if ( ioda_format == e_ioda_format::v1 ) {
       StringArray var_names;
       get_var_names(f_in, &var_names);
       for(idx=0; idx<var_names.n(); idx++) {
@@ -1216,7 +1216,7 @@ bool check_core_data(const bool has_msg_type, const bool has_station_id,
    bool is_netcdf_ready = true;
    static const char *method_name = "check_core_data() -> ";
 
-   StringArray &t_core_dims = (ioda_format == ioda_v2)
+   StringArray &t_core_dims = (ioda_format == e_ioda_format::v2)
                               ? core_dims : core_dims_v1;
    for(int idx=0; idx<t_core_dims.n(); idx++) {
       if (!is_in_metadata_map(t_core_dims[idx], dim_names)) {
@@ -1226,7 +1226,7 @@ bool check_core_data(const bool has_msg_type, const bool has_station_id,
       }
    }
 
-   if (ioda_format == ioda_v1) {
+   if (ioda_format == e_ioda_format::v1) {
       if(has_msg_type || has_station_id) {
          if (!is_in_metadata_map("nstring", dim_names)) {
             mlog << Error << "\n" << method_name << "-> "
@@ -1349,7 +1349,7 @@ bool get_obs_data_float(NcFile *f_in, const ConcatString var_name,
    if(var_name.length() > 0) {
       ConcatString qc_name = var_name;
       ConcatString qc_group = qc_postfix;
-      if (ioda_format == ioda_v2) {
+      if (ioda_format == e_ioda_format::v2) {
          NcGroup nc_grp = get_nc_group(f_in, qc_postfix);
          if (IS_INVALID_NC(nc_grp)) qc_group = qc_group_name;
          StringArray qc_names = conf_info.obs_to_qc_map[var_name];
