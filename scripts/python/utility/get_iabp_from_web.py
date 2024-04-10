@@ -161,7 +161,7 @@ def nextStation(data_all, index_all):
 
 #----------------------------------------------
 def getStation(sfile):
-    cmd = "wget  https://iabp.apl.uw.edu/WebData/" + sfile
+    cmd = "wget https://iabp.apl.uw.edu/WebData/" + sfile
     print(cmd)
     doCmd(cmd, True)
 
@@ -181,7 +181,7 @@ def getStation(sfile):
 
             
 #----------------------------------------------
-def run2(output_path):
+def run(output_path):
 
     cwd = os.getcwd()
 
@@ -192,7 +192,7 @@ def run2(output_path):
     makeOrScrub(outpath, True)
     os.chdir(outpath)
 
-    cmd = "wget  https://iabp.apl.uw.edu/WebData"
+    cmd = "wget https://iabp.apl.uw.edu/WebData"
     print(cmd)
     s = doCmd(cmd, True)
     if not s:
@@ -219,28 +219,6 @@ def run2(output_path):
     os.chdir(cwd)
 
 #----------------------------------------------
-def run():
-    # this does not work, but keeping it in for now as a reference
-    #——first open and read “ArcticTable_Current.txt” to get the table of updating buoys:
-    fid=urllib.request.urlopen('https://iabp.apl.uw.edu/TABLES/ArcticTable_Current.txt')
-    table=fid.read()
-    fid.close()
-    s = str(table)
-    tables=s.split('\n')  #The "\n" is the "new line" character. Splitting the table data on it breaks the table into a list of rows.
-    print(tables)
-    return True
-
-    #—— next cycle through the rows in table and download the associated data:
-    for row in table:
-        buoyID=row.split(';')[0] #The elements of "row" are separated by a ";" This code splits row on the ";" and grabs the first resulting element in the created list of row elements
-        fid=urllib.Request.urlopen('https://iabp.apl.uw.edu/WebData/'+buoyID+'.dat')
-        data=fid.read()
-        fid.close()
-        writeto=open('./'+buoyID+'.dat','w')
-        writeto.write(data)
-        writeto.close()
-
-#----------------------------------------------
 def create_parser_options(parser):
     parser.add_option("-o", "--output_path", dest="output_path",
             default="./iabp_files", help=" create an output path or clear out what is there and put output files to that path (default: ./iabp_files)")
@@ -253,8 +231,5 @@ if __name__ == "__main__":
   usage_str = "%prog [options]"
   parser = OptionParser(usage = usage_str)
   options, args = create_parser_options(parser)
-  #if options.options:
-  #  usage()
-  #  exit(0)
-  run2(options.output_path)
+  run(options.output_path)
   exit(0)
