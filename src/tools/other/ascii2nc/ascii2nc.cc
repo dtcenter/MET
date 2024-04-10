@@ -86,6 +86,7 @@
 #include "airnow_handler.h"
 #include "ndbc_handler.h"
 #include "ismn_handler.h"
+#include "iabp_handler.h"
 
 #ifdef ENABLE_PYTHON
 #include "global_python.h"
@@ -117,6 +118,7 @@ enum class ASCIIFormat {
    Airnow_hourly,
    NDBC_standard,
    ISMN,
+   IABP,
    Aeronet_v2,
    Aeronet_v3, 
    Python, 
@@ -137,6 +139,10 @@ static MaskPlane   mask_area;
 static MaskPoly    mask_poly;
 static StringArray mask_sid;
 
+// Beginning and ending times
+static unixtime valid_beg_ut;
+static unixtime valid_end_ut;
+
 static int compress_level = -1;
 
 ////////////////////////////////////////////////////////////////////////
@@ -152,6 +158,8 @@ static void set_mask_grid(const StringArray &);
 static void set_mask_poly(const StringArray &);
 static void set_mask_sid(const StringArray &);
 static void set_compress(const StringArray &);
+static void set_valid_beg_time(const StringArray &);
+static void set_valid_end_time(const StringArray &);
 
 static void setup_wrapper_path();
 
@@ -165,6 +173,9 @@ int met_main(int argc, char *argv[]) {
    // Check for zero arguments
    //
    if(argc == 1) { usage(); return 0; }
+
+   // Initialize time range
+   valid_beg_ut = valid_end_ut = (unixtime) 0;
 
    //
    // Parse the command line into tokens
@@ -184,6 +195,8 @@ int met_main(int argc, char *argv[]) {
    cline.add(set_mask_grid, "-mask_grid", 1);
    cline.add(set_mask_poly, "-mask_poly", 1);
    cline.add(set_mask_sid,  "-mask_sid",  1);
+   cline.add(set_valid_beg_time, "-valid_beg", 1);
+   cline.add(set_valid_end_time, "-valid_end", 1);
    cline.add(set_compress,  "-compress",  1);
 
    //
@@ -211,6 +224,17 @@ int met_main(int argc, char *argv[]) {
         << "Config File: " << config_filename << "\n";
    config_info.read_config(DEFAULT_CONFIG_FILENAME, config_filename.text());
 
+   // Check that valid_end_ut >= valid_beg_ut
+   if(valid_beg_ut != (unixtime) 0 &&
+      valid_end_ut != (unixtime) 0 &&
+      valid_beg_ut > valid_end_ut) {
+      mlog << Error << "\nmet_main() -> "
+           << "the ending time (" << unix_to_yyyymmdd_hhmmss(valid_end_ut)
+           << ") must be greater than the beginning time ("
+           << unix_to_yyyymmdd_hhmmss(valid_beg_ut) << ").\n\n";
+      exit(1);
+   }
+
    //
    // Create the file handler based on the ascii format specified on
    // the command line.  If one wasn't specified, we'll look in the
@@ -225,7 +249,8 @@ int met_main(int argc, char *argv[]) {
    if(deflate_level > 9) deflate_level = config_info.get_compression_level();
    file_handler->setCompressionLevel(deflate_level);
    file_handler->setSummaryInfo(config_info.getSummaryInfo());
-
+   file_handler->setValidTimeRange(valid_beg_ut, valid_end_ut);
+   
    //
    // Set the masking grid and polyline, if specified.
    //
@@ -330,6 +355,10 @@ FileHandler *create_file_handler(const ASCIIFormat format, const ConcatString &a
          return (FileHandler *) new IsmnHandler(program_name);
       }
 
+      case ASCIIFormat::IABP: {
+         return((FileHandler *) new IabpHandler(program_name));
+      }
+
       case ASCIIFormat::Aeronet_v2: {
          AeronetHandler *handler = new AeronetHandler(program_name);
          handler->setFormatVersion(2);
@@ -374,6 +403,22 @@ FileHandler *determine_ascii_format(const ConcatString &ascii_filename) {
           << "\" for reading\n\n";
      exit(1);
    }
+
+   //
+   // See if this is an IABP file.
+   // put this first as it can have the same number of columns as some
+   // other ones, which look only at the number of columns
+   //
+   f_in.rewind();
+   IabpHandler *iabp_file = new IabpHandler(program_name);
+
+   if(iabp_file->isFileType(f_in)) {
+     f_in.close();
+     return((FileHandler *) iabp_file);
+   }
+
+   delete iabp_file;
+
 
    //
    // See if this is a MET file.
@@ -505,6 +550,8 @@ void usage() {
         << "\t[-mask_sid file|list]\n"
         << "\t[-log file]\n"
         << "\t[-v level]\n"
+        << "\t[-valid_beg time]\n"
+        << "\t[-valid_end time]\n"
         << "\t[-compress level]\n\n"
 
         << "\twhere\t\"ascii_file\" is the formatted ASCII "
@@ -524,6 +571,7 @@ void usage() {
         << AirnowHandler::getFormatStringHourly() << "\", \""
         << NdbcHandler::getFormatStringStandard() << "\", \""
         << IsmnHandler::getFormatString() << "\", \""
+        << IabpHandler::getFormatString() << "\", \""
         << AeronetHandler::getFormatString() << "\", \""
         << AeronetHandler::getFormatString_v2() << "\", \""
         << AeronetHandler::getFormatString_v3() << "\"";
@@ -555,6 +603,12 @@ void usage() {
 
         << "\t\t\"-v level\" overrides the default level of logging ("
         << mlog.verbosity_level() << ") (optional).\n"
+
+        << "\t\t\"-valid_beg time\" in YYYYMMDD[_HH[MMSS]] sets the "
+        << "beginning of the processed data time window (optional).\n"
+
+        << "\t\t\"-valid_end time\" in YYYYMMDD[_HH[MMSS]] sets the "
+        << "end of the processed data time window (optional).\n"
 
         << "\t\t\"-compress level\" overrides the compression level of NetCDF variable ("
         << config_info.get_compression_level() << ") (optional).\n\n"
@@ -608,6 +662,9 @@ void set_format(const StringArray & a) {
    }
    else if(IsmnHandler::getFormatString() == a[0]) {
      ascii_format = ASCIIFormat::ISMN;
+   }
+   else if(IabpHandler::getFormatString() == a[0]) {
+     ascii_format = ASCIIFormat::IABP;
    }
    else if(AeronetHandler::getFormatString() == a[0]
      || AeronetHandler::getFormatString_v2() == a[0]) {
@@ -698,6 +755,20 @@ void set_mask_sid(const StringArray & a) {
    mlog << Debug(2)
         << "Parsed Station ID Mask: " << mask_name
         << " containing " << mask_sid.n_elements() << " points\n";
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_valid_beg_time(const StringArray & a)
+{
+   valid_beg_ut = timestring_to_unix(a[0].c_str());
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_valid_end_time(const StringArray & a)
+{
+   valid_end_ut = timestring_to_unix(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
