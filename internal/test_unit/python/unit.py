@@ -84,17 +84,18 @@ def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, ca
     VALGRIND_OPT_CALL ="--tool=callgrind --dump-instr=yes --simulate-cache=yes --collect-jumps=yes"
 
     #for debug:
-    cmd_args_list = []
+    #cmd_args_list = []
     
     # # run each test
     for test in tests:
     #   # print the test name
+        logger.debug("\n")
         logger.info(f"TEST: {test['name']}")
     #   $cmd_only or printf "TEST: %-*s - ", $name_wid, $test->{"name"};
 
     #   # prepare the output space
         output_keys = [key for key in test.keys() if key.startswith('out_')]
-        outputs = [test[key] for key in output_keys]
+        outputs = [output for key in output_keys for output in test[key]]
         for output in outputs:
             try:
                 Path(output).unlink()
@@ -109,9 +110,10 @@ def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, ca
 
     #   # set the test environment variables
         if 'env' in test.keys():
-            for key, val in test['env'].items():
-                if val:
+            for key, val in sorted(test['env'].items()):
+                #if val:
                     os.environ[key] = val
+                    logger.debug(f"export {key}={val}")
 
     #   # build the text command
         cmd = test['exec'] + test['param']
@@ -137,17 +139,18 @@ def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, ca
     
     #   # run and time the test command
         else:
-            t_start = dt.now()
-            cmd_args = [arg.strip('\\') for arg in cmd.split() if arg!='\\']# + ['2>&1']
+            logger.debug(f"{cmd}")
+            cmd_args = [arg.strip('\\') for arg in cmd.split() if arg!='\\']
             # cmd_args = [arg.strip() for arg in cmd.split('\\\n')]   #this could work also?
-            cmd_args_list.append(cmd_args)  #debug
+            #cmd_args_list.append(cmd_args)  #debug
+            t_start = dt.now()
             cmd_return = subprocess.run(cmd_args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)  #should retun STDERR and STDOUT (as list?)
-            logger.debug(f"Return code: {cmd_return.returncode}")
-            #print(f"stderr: {cmd_outs.stderr}")
+            t_elaps = dt.now() - t_start
+
             cmd_outs = cmd_return.stdout
             logger.debug(f"{cmd_outs}")
-            t_elaps = dt.now() - t_start
-            # unshift @cmd_outs, "$cmd\n";
+            logger.debug(f"Return code: {cmd_return.returncode}")
+            
 
         #   # check the return status and output files
             ret_ok = not cmd_return.returncode
@@ -159,6 +162,7 @@ def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, ca
                         result = subprocess.run([mpnc, '-v', filepath], 
                                                 stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
                         cmd_outs += ("\n"+result.stdout)
+                        logger.debug(result.stdout)
                         out_ok = not result.returncode
                 except KeyError:
                     pass
@@ -168,6 +172,7 @@ def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, ca
                         result = subprocess.run([mgnc, '-v', filepath], 
                                                 stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
                         cmd_outs += ("\n"+result.stdout)
+                        logger.debug(result.stdout)
                         out_ok = not result.returncode
                 except KeyError:
                     pass
@@ -183,6 +188,7 @@ def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, ca
                                 break
                         except FileNotFoundError:
                             cmd_outs += (f"\nERROR: stat file missing {filepath}\n")
+                            logger.debug(result.stdout)
                             out_ok = False
                             break
                         # check stat file has non-header lines
@@ -241,38 +247,39 @@ def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, ca
 
         #   # unset the test environment variables
         if 'env' in test.keys():
-            for key, val in test['env'].items():
-                if val:
+            for key, val in sorted(test['env'].items()):
+                # if val:
                     del os.environ[key]
+                    logger.debug(f"unset {key}")
         
         #   # print the test result
         test_result = "pass" if (ret_ok and out_ok) else "FAIL"
-        logger.info(f"{test_result} - {t_elaps} sec\n")
+        logger.info(f"{test_result} - {round(t_elaps.total_seconds(),3)} sec\n")
 
         #   # if the log file is activated, print the test information
         # would like to redo this so the log is being written as commands are executed... not after
         # also, this could be done simultaneously with cmd_only option
         # might want to improve formatting here too
-        if file_log:
-            logger.debug("\n\n")
-            if 'env' in test.keys():
-                for key, val in sorted(test['env'].items()):
-                    logger.debug(f"export {key}={val}")
-            logger.debug(f"{cmd}")
-            if 'env' in test.keys():
-                for key, val in sorted(test['env'].items()):
-                    logger.debug(f"unset {key}")
-            logger.debug("\n")
+        # if file_log:
+        #     logger.debug("\n\n")
+        #     if 'env' in test.keys():
+        #         for key, val in sorted(test['env'].items()):
+        #             logger.debug(f"export {key}={val}")
+        #     logger.debug(f"{cmd}")
+        #     if 'env' in test.keys():
+        #         for key, val in sorted(test['env'].items()):
+        #             logger.debug(f"unset {key}")
+        #     logger.debug("\n")
 
         #   # on failure, print the problematic test and exit, if requested
         if not (ret_ok and out_ok):
-            logger.info(cmd_outs)   #skipping the setting/unsetting envs here ?
+            logger.info(cmd + cmd_outs)   #skipping the setting/unsetting envs here ?
         #     print "$_" for (@set_envs, @cmd_outs, @unset_envs);
             if not noexit:
                 sys.exit(1)
         #     print "\n\n";
 
-    return tests, cmd_args_list
+    return tests, #cmd_args_list
 
 
 def build_tests(test_root):
@@ -304,6 +311,12 @@ def build_tests(test_root):
             if (el.tag=='exec' or el.tag=='param'):
                 test[el.tag] = repl_env(el.text)
             elif el.tag=='output':
+                test['out_pnc'] = []
+                test['out_gnc'] = []
+                test['out_stat'] = []
+                test['out_ps'] = []
+                test['out_exist'] = []
+                test['out_not_exist'] = []
                 output_names = {
                     'point_nc' : 'out_pnc',
                     'grid_nc' : 'out_gnc',
@@ -313,13 +326,16 @@ def build_tests(test_root):
                     'not_exist' : 'out_not_exist',
                 }
                 for output_el in el:
-                    test[output_names[output_el.tag]] = repl_env(output_el.text)
+                    test[output_names[output_el.tag]].append(repl_env(output_el.text))
 
             elif el.tag=='env':
                 env_dict = {}
                 for env_el in el:
                     try:
-                        env_dict[env_el.find('name').text] = env_el.find('value').text
+                        env_name = env_el.find('name').text
+                        env_dict[env_name] = env_el.find('value').text
+                        if not env_dict[env_name]:
+                            env_dict[env_name] = ''
                     except AttributeError:
                         logger.error(f"env pair in test \\{test['name']}\\ missing name or value")
                         raise
