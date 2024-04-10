@@ -318,8 +318,8 @@ void process_bdecks(TrackInfoArray &bdeck_tracks) {
    mlog << Debug(2)
         << "Processing " << files.n() << " BDECK file(s).\n";
    process_track_files(files, files_model_suffix, bdeck_tracks, false,
-                       (conf_info.AnlyTrack == TrackType_BDeck ||
-                        conf_info.AnlyTrack == TrackType_Both));
+                       (conf_info.AnlyTrack == TrackType::BDeck ||
+                        conf_info.AnlyTrack == TrackType::Both));
    mlog << Debug(2)
         << "Found " << bdeck_tracks.n() << " BDECK track(s).\n";
 
@@ -341,15 +341,15 @@ void process_adecks(const TrackInfoArray &bdeck_tracks) {
    mlog << Debug(2)
         << "Processing " << files.n() << " ADECK file(s).\n";
    process_track_files(files, files_model_suffix, adeck_tracks, true,
-                       (conf_info.AnlyTrack == TrackType_ADeck ||
-                        conf_info.AnlyTrack == TrackType_Both));
+                       (conf_info.AnlyTrack == TrackType::ADeck ||
+                        conf_info.AnlyTrack == TrackType::Both));
 
    //
    // Derive new track types
    //
 
    // Handle 12-hourly interpolated models
-   if(conf_info.Interp12) {
+   if(Interp12Type::None != conf_info.Interp12) {
       mlog << Debug(2)
            << "Deriving 12-hour interpolated ADECK tracks.\n";
       derive_interp12(adeck_tracks);
@@ -710,7 +710,7 @@ void process_prob_files(const StringArray &files,
          if(!is_keeper(&line)) continue;
 
          // Only process probability of RI lines
-         if(line.type() == ATCFLineType_ProbRI) {
+         if(line.type() == ATCFLineType::ProbRI) {
             dland = compute_dland(line.lat(), -1.0*line.lon());
             if(probs.add(line, dland, conf_info.CheckDup)) {
                cur_add++;
@@ -1013,7 +1013,7 @@ void filter_probs(ProbInfoArray &probs) {
       }
 
       // If we've made it here, retain this probability
-      if(p[i]->type() == ATCFLineType_ProbRI) probs.add(p.prob_rirw(i));
+      if(p[i]->type() == ATCFLineType::ProbRI) probs.add(p.prob_rirw(i));
    }
 
    // Print summary filtering info
@@ -1172,7 +1172,7 @@ void derive_interp12(TrackInfoArray &tracks) {
    char c;
 
    // If Interp12 logic set to NONE, Nothing to do.
-   if(conf_info.Interp12 == Interp12Type_None) return;
+   if(conf_info.Interp12 == Interp12Type::None) return;
 
    // Loop through the track array and store case information
    for(i=0; i<tracks.n(); i++) {
@@ -1236,7 +1236,7 @@ void derive_interp12(TrackInfoArray &tracks) {
       else {
 
          // Check logic before replacing existing 'I' track with new one.
-         if(conf_info.Interp12 == Interp12Type_Replace) {
+         if(conf_info.Interp12 == Interp12Type::Replace) {
 
             mlog << Debug(3)
                  << "Replacing existing track for Interp12 case \"" << track_case
@@ -2079,7 +2079,7 @@ void process_watch_warn(TrackPairInfoArray &p) {
       ww_sid.ws_strip();
 
       // Determine the maximum severity watch/warning in effect
-      for(i=0, ww_type=NoWatchWarnType; i<n_ww; i++) {
+      for(i=0, ww_type=WatchWarnType::None; i<n_ww; i++) {
 
          // Read the next line
          f_in >> dl;

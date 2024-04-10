@@ -165,8 +165,8 @@ bool TCStatFiles::operator>>(TrackPairInfo &pair) {
 
       // Skip header and non-TCMPR/TCDIAG lines
       if(line.is_header() ||
-         (line.type() != TCStatLineType_TCMPR &&
-          line.type() != TCStatLineType_TCDIAG)) continue;
+         (line.type() != TCStatLineType::TCMPR &&
+          line.type() != TCStatLineType::TCDIAG)) continue;
 
       // Add the current point
       pair.add(line);
@@ -177,7 +177,7 @@ bool TCStatFiles::operator>>(TrackPairInfo &pair) {
 
          // Check for a trailing TCDIAG line
          if(CurLDF.peek_line(line)) {
-            if(line.type() == TCStatLineType_TCDIAG) {
+            if(line.type() == TCStatLineType::TCDIAG) {
                pair.add(line);
                CurLDF >> line;
             }
@@ -231,7 +231,7 @@ bool TCStatFiles::operator>>(ProbRIRWPairInfo &pair) {
    while((status = (CurLDF >> line))) {
 
       // Skip header and non-PROBRIRW lines
-      if(line.is_header() || line.type() != TCStatLineType_ProbRIRW) continue;
+      if(line.is_header() || line.type() != TCStatLineType::ProbRIRW) continue;
 
       // Add the current point
       pair.set(line);
@@ -280,7 +280,7 @@ bool TCStatFiles::operator>>(TCStatLine &line) {
    while((status = (CurLDF >> line))) {
 
       // Skip header and invalid line types
-      if(line.is_header() || line.type() == NoTCStatLineType) continue;
+      if(line.is_header() || line.type() == TCStatLineType::None) continue;
 
       break;
 

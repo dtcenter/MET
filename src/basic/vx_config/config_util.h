@@ -105,6 +105,9 @@ extern const char * statlinetype_to_string(const STATLineType);
 extern void         statlinetype_to_string(const STATLineType, char *);
 extern STATLineType string_to_statlinetype(const char *);
 
+extern const char *     bootintervaltype_to_string(const BootIntervalType);
+extern BootIntervalType string_to_bootintervaltype(const char *);
+
 extern FieldType    int_to_fieldtype(int);
 extern ConcatString fieldtype_to_string(FieldType);
 
@@ -150,7 +153,7 @@ extern int parse_conf_percentile(Dictionary *dict);
 extern void python_compile_error(const char *caller=nullptr);
 extern void ugrid_compile_error(const char *caller=nullptr);
 
-////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
 #endif   /*  __CONFIG_UTIL_H__  */
 

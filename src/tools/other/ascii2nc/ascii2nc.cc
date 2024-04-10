@@ -86,6 +86,7 @@
 #include "airnow_handler.h"
 #include "ndbc_handler.h"
 #include "ismn_handler.h"
+#include "iabp_handler.h"
 
 #ifdef ENABLE_PYTHON
 #include "global_python.h"
@@ -106,22 +107,23 @@ static const char *DEFAULT_CONFIG_FILENAME =
 ////////////////////////////////////////////////////////////////////////
 
 // Supported input ASCII formats
-enum ASCIIFormat {
-   ASCIIFormat_None,
-   ASCIIFormat_MET,
-   ASCIIFormat_Little_R,
-   ASCIIFormat_SurfRad,
-   ASCIIFormat_WWSIS,
-   ASCIIFormat_Airnow_dailyv2,
-   ASCIIFormat_Airnow_hourlyaqobs,
-   ASCIIFormat_Airnow_hourly,
-   ASCIIFormat_NDBC_standard,
-   ASCIIFormat_ISMN,
-   ASCIIFormat_Aeronet_v2,
-   ASCIIFormat_Aeronet_v3, 
-   ASCIIFormat_Python, 
+enum class ASCIIFormat {
+   None,
+   MET,
+   Little_R,
+   SurfRad,
+   WWSIS,
+   Airnow_dailyv2,
+   Airnow_hourlyaqobs,
+   Airnow_hourly,
+   NDBC_standard,
+   ISMN,
+   IABP,
+   Aeronet_v2,
+   Aeronet_v3, 
+   Python, 
 };
-static ASCIIFormat ascii_format = ASCIIFormat_None;
+static ASCIIFormat ascii_format = ASCIIFormat::None;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -136,6 +138,10 @@ static Grid        mask_grid;
 static MaskPlane   mask_area;
 static MaskPoly    mask_poly;
 static StringArray mask_sid;
+
+// Beginning and ending times
+static unixtime valid_beg_ut;
+static unixtime valid_end_ut;
 
 static int compress_level = -1;
 
@@ -152,6 +158,8 @@ static void set_mask_grid(const StringArray &);
 static void set_mask_poly(const StringArray &);
 static void set_mask_sid(const StringArray &);
 static void set_compress(const StringArray &);
+static void set_valid_beg_time(const StringArray &);
+static void set_valid_end_time(const StringArray &);
 
 static void setup_wrapper_path();
 
@@ -165,6 +173,9 @@ int met_main(int argc, char *argv[]) {
    // Check for zero arguments
    //
    if(argc == 1) { usage(); return 0; }
+
+   // Initialize time range
+   valid_beg_ut = valid_end_ut = (unixtime) 0;
 
    //
    // Parse the command line into tokens
@@ -184,6 +195,8 @@ int met_main(int argc, char *argv[]) {
    cline.add(set_mask_grid, "-mask_grid", 1);
    cline.add(set_mask_poly, "-mask_poly", 1);
    cline.add(set_mask_sid,  "-mask_sid",  1);
+   cline.add(set_valid_beg_time, "-valid_beg", 1);
+   cline.add(set_valid_end_time, "-valid_end", 1);
    cline.add(set_compress,  "-compress",  1);
 
    //
@@ -211,6 +224,17 @@ int met_main(int argc, char *argv[]) {
         << "Config File: " << config_filename << "\n";
    config_info.read_config(DEFAULT_CONFIG_FILENAME, config_filename.text());
 
+   // Check that valid_end_ut >= valid_beg_ut
+   if(valid_beg_ut != (unixtime) 0 &&
+      valid_end_ut != (unixtime) 0 &&
+      valid_beg_ut > valid_end_ut) {
+      mlog << Error << "\nmet_main() -> "
+           << "the ending time (" << unix_to_yyyymmdd_hhmmss(valid_end_ut)
+           << ") must be greater than the beginning time ("
+           << unix_to_yyyymmdd_hhmmss(valid_beg_ut) << ").\n\n";
+      exit(1);
+   }
+
    //
    // Create the file handler based on the ascii format specified on
    // the command line.  If one wasn't specified, we'll look in the
@@ -225,7 +249,8 @@ int met_main(int argc, char *argv[]) {
    if(deflate_level > 9) deflate_level = config_info.get_compression_level();
    file_handler->setCompressionLevel(deflate_level);
    file_handler->setSummaryInfo(config_info.getSummaryInfo());
-
+   file_handler->setValidTimeRange(valid_beg_ut, valid_end_ut);
+   
    //
    // Set the masking grid and polyline, if specified.
    //
@@ -286,63 +311,67 @@ FileHandler *create_file_handler(const ASCIIFormat format, const ConcatString &a
    // file to guess the format.
    //
    switch(format) {
-      case ASCIIFormat_MET: {
+      case ASCIIFormat::MET: {
          return (FileHandler *) new MetHandler(program_name);
       }
 
-      case ASCIIFormat_Little_R: {
+      case ASCIIFormat::Little_R: {
          return (FileHandler *) new LittleRHandler(program_name);
       }
 
-      case ASCIIFormat_SurfRad: {
+      case ASCIIFormat::SurfRad: {
          return (FileHandler *) new SurfradHandler(program_name);
       }
 
-      case ASCIIFormat_WWSIS: {
+      case ASCIIFormat::WWSIS: {
          return (FileHandler *) new WwsisHandler(program_name);
       }
 
-      case ASCIIFormat_Airnow_dailyv2: {
+      case ASCIIFormat::Airnow_dailyv2: {
          AirnowHandler *handler = new AirnowHandler(program_name);
          handler->setFormatVersion(AirnowHandler::AIRNOW_FORMAT_VERSION_DAILYV2);
          return (FileHandler *) handler;
       }
 
-      case ASCIIFormat_Airnow_hourlyaqobs: {
+      case ASCIIFormat::Airnow_hourlyaqobs: {
          AirnowHandler *handler = new AirnowHandler(program_name);
          handler->setFormatVersion(AirnowHandler::AIRNOW_FORMAT_VERSION_HOURLYAQOBS);
          return (FileHandler *) handler;
       }
 
-      case ASCIIFormat_Airnow_hourly: {
+      case ASCIIFormat::Airnow_hourly: {
          AirnowHandler *handler = new AirnowHandler(program_name);
          handler->setFormatVersion(AirnowHandler::AIRNOW_FORMAT_VERSION_HOURLY);
          return (FileHandler *) handler;
       }
 
-      case ASCIIFormat_NDBC_standard: {
+      case ASCIIFormat::NDBC_standard: {
          NdbcHandler *handler = new NdbcHandler(program_name);
          handler->setFormatVersion(NdbcHandler::NDBC_FORMAT_VERSION_STANDARD);
          return (FileHandler *) handler;
       }
 
-      case ASCIIFormat_ISMN: {
+      case ASCIIFormat::ISMN: {
          return (FileHandler *) new IsmnHandler(program_name);
       }
 
-      case ASCIIFormat_Aeronet_v2: {
+      case ASCIIFormat::IABP: {
+         return((FileHandler *) new IabpHandler(program_name));
+      }
+
+      case ASCIIFormat::Aeronet_v2: {
          AeronetHandler *handler = new AeronetHandler(program_name);
          handler->setFormatVersion(2);
          return (FileHandler *) handler;
       }
 
-      case ASCIIFormat_Aeronet_v3: {
+      case ASCIIFormat::Aeronet_v3: {
          AeronetHandler *handler = new AeronetHandler(program_name);
          handler->setFormatVersion(3);
          return (FileHandler *) handler;
       }
       #ifdef ENABLE_PYTHON
-      case ASCIIFormat_Python: {
+      case ASCIIFormat::Python: {
          setup_wrapper_path();
          ph = new PythonHandler(program_name, ascii_filename.text());
          return (FileHandler *) ph;
@@ -374,6 +403,22 @@ FileHandler *determine_ascii_format(const ConcatString &ascii_filename) {
           << "\" for reading\n\n";
      exit(1);
    }
+
+   //
+   // See if this is an IABP file.
+   // put this first as it can have the same number of columns as some
+   // other ones, which look only at the number of columns
+   //
+   f_in.rewind();
+   IabpHandler *iabp_file = new IabpHandler(program_name);
+
+   if(iabp_file->isFileType(f_in)) {
+     f_in.close();
+     return((FileHandler *) iabp_file);
+   }
+
+   delete iabp_file;
+
 
    //
    // See if this is a MET file.
@@ -505,6 +550,8 @@ void usage() {
         << "\t[-mask_sid file|list]\n"
         << "\t[-log file]\n"
         << "\t[-v level]\n"
+        << "\t[-valid_beg time]\n"
+        << "\t[-valid_end time]\n"
         << "\t[-compress level]\n\n"
 
         << "\twhere\t\"ascii_file\" is the formatted ASCII "
@@ -524,6 +571,7 @@ void usage() {
         << AirnowHandler::getFormatStringHourly() << "\", \""
         << NdbcHandler::getFormatStringStandard() << "\", \""
         << IsmnHandler::getFormatString() << "\", \""
+        << IabpHandler::getFormatString() << "\", \""
         << AeronetHandler::getFormatString() << "\", \""
         << AeronetHandler::getFormatString_v2() << "\", \""
         << AeronetHandler::getFormatString_v3() << "\"";
@@ -556,6 +604,12 @@ void usage() {
         << "\t\t\"-v level\" overrides the default level of logging ("
         << mlog.verbosity_level() << ") (optional).\n"
 
+        << "\t\t\"-valid_beg time\" in YYYYMMDD[_HH[MMSS]] sets the "
+        << "beginning of the processed data time window (optional).\n"
+
+        << "\t\t\"-valid_end time\" in YYYYMMDD[_HH[MMSS]] sets the "
+        << "end of the processed data time window (optional).\n"
+
         << "\t\t\"-compress level\" overrides the compression level of NetCDF variable ("
         << config_info.get_compression_level() << ") (optional).\n\n"
 
@@ -583,42 +637,45 @@ void usage() {
 void set_format(const StringArray & a) {
 
    if(MetHandler::getFormatString() == a[0]) {
-      ascii_format = ASCIIFormat_MET;
+      ascii_format = ASCIIFormat::MET;
    }
    else if(LittleRHandler::getFormatString() == a[0]) {
-     ascii_format = ASCIIFormat_Little_R;
+     ascii_format = ASCIIFormat::Little_R;
    }
    else if(SurfradHandler::getFormatString() == a[0]) {
-     ascii_format = ASCIIFormat_SurfRad;
+     ascii_format = ASCIIFormat::SurfRad;
    }
    else if(WwsisHandler::getFormatString() == a[0]) {
-     ascii_format = ASCIIFormat_WWSIS;
+     ascii_format = ASCIIFormat::WWSIS;
    }
    else if(AirnowHandler::getFormatStringDailyV2() == a[0]) {
-     ascii_format = ASCIIFormat_Airnow_dailyv2;
+     ascii_format = ASCIIFormat::Airnow_dailyv2;
    }
    else if(AirnowHandler::getFormatStringHourlyAqObs() == a[0]) {
-     ascii_format = ASCIIFormat_Airnow_hourlyaqobs;
+     ascii_format = ASCIIFormat::Airnow_hourlyaqobs;
    }
    else if(AirnowHandler::getFormatStringHourly() == a[0]) {
-     ascii_format = ASCIIFormat_Airnow_hourly;
+     ascii_format = ASCIIFormat::Airnow_hourly;
    }
    else if(NdbcHandler::getFormatStringStandard() == a[0]) {
-     ascii_format = ASCIIFormat_NDBC_standard;
+     ascii_format = ASCIIFormat::NDBC_standard;
    }
    else if(IsmnHandler::getFormatString() == a[0]) {
-     ascii_format = ASCIIFormat_ISMN;
+     ascii_format = ASCIIFormat::ISMN;
+   }
+   else if(IabpHandler::getFormatString() == a[0]) {
+     ascii_format = ASCIIFormat::IABP;
    }
    else if(AeronetHandler::getFormatString() == a[0]
      || AeronetHandler::getFormatString_v2() == a[0]) {
-     ascii_format = ASCIIFormat_Aeronet_v2;
+     ascii_format = ASCIIFormat::Aeronet_v2;
    }
    else if(AeronetHandler::getFormatString_v3() == a[0]) {
-     ascii_format = ASCIIFormat_Aeronet_v3;
+     ascii_format = ASCIIFormat::Aeronet_v3;
    }
    #ifdef ENABLE_PYTHON
    else if(PythonHandler::getFormatString() == a[0]) {
-     ascii_format = ASCIIFormat_Python;
+     ascii_format = ASCIIFormat::Python;
    }
    #endif
    else if("python" == a[0]) {
@@ -698,6 +755,20 @@ void set_mask_sid(const StringArray & a) {
    mlog << Debug(2)
         << "Parsed Station ID Mask: " << mask_name
         << " containing " << mask_sid.n_elements() << " points\n";
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_valid_beg_time(const StringArray & a)
+{
+   valid_beg_ut = timestring_to_unix(a[0].c_str());
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_valid_end_time(const StringArray & a)
+{
+   valid_end_ut = timestring_to_unix(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////

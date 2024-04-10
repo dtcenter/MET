@@ -140,7 +140,7 @@ void STATLine::clear()
 
 DataLine::clear();
 
-Type    = no_stat_line_type;
+Type    = STATLineType::none;
 HdrLine = (AsciiHeaderLine *) nullptr;
 
 return;
@@ -265,7 +265,7 @@ if ( !status || n_items() == 0 )  {
 
 if ( strcmp(get_item(0), "VERSION") == 0 ) {
 
-   Type = stat_header;
+   Type = STATLineType::header;
 
    return 1;
 }
@@ -278,7 +278,7 @@ offset = METHdrTable.col_offset(get_item(0), "STAT", na_str, "LINE_TYPE");
 
 if( is_bad_data(offset) || n_items() < (offset + 1) )  {
 
-   Type = no_stat_line_type;
+   Type = STATLineType::none;
 
    return 0;
 }
@@ -315,7 +315,7 @@ bool STATLine::is_header() const
 
 {
 
-return ( Type == stat_header );
+return ( Type == STATLineType::header );
 
 }
 
@@ -829,14 +829,14 @@ SetLogic STATLine::thresh_logic() const
 
 {
 
-SetLogic t = SetLogic_None;
+SetLogic t = SetLogic::None;
 
 ConcatString cs = (string)get_item("FCST_THRESH", false);
 
-     if(cs.endswith(setlogic_symbol_union))        t = SetLogic_Union;
-else if(cs.endswith(setlogic_symbol_intersection)) t = SetLogic_Intersection;
-else if(cs.endswith(setlogic_symbol_symdiff))      t = SetLogic_SymDiff;
-else                                               t = SetLogic_None;
+     if(cs.endswith(setlogic_symbol_union))        t = SetLogic::Union;
+else if(cs.endswith(setlogic_symbol_intersection)) t = SetLogic::Intersection;
+else if(cs.endswith(setlogic_symbol_symdiff))      t = SetLogic::SymDiff;
+else                                               t = SetLogic::None;
 
 return t;
 

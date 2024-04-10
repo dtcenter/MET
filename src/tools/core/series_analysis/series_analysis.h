@@ -120,14 +120,14 @@ static Met2dDataFile *obs_mtddf  = (Met2dDataFile *) nullptr;
 static gsl_rng *rng_ptr = (gsl_rng *) nullptr;
 
 // Enumeration of ways that a series can be defined
-enum SeriesType {
-   SeriesType_None,       // Undefined series type
-   SeriesType_Fcst_Conf,  // Defined by fcst.field configuration
-   SeriesType_Obs_Conf,   // Defined by obs.field configuration
-   SeriesType_Fcst_Files, // Defined by -fcst command line option
-   SeriesType_Obs_Files   // Defined by -obs command line option
+enum class SeriesType {
+   None,       // Undefined series type
+   Fcst_Conf,  // Defined by fcst.field configuration
+   Obs_Conf,   // Defined by obs.field configuration
+   Fcst_Files, // Defined by -fcst command line option
+   Obs_Files   // Defined by -obs command line option
 };
-static SeriesType series_type = SeriesType_None;
+static SeriesType series_type = SeriesType::None;
 
 // Series length
 static int n_series = 0;

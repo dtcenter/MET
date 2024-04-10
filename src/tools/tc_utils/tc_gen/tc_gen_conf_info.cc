@@ -304,7 +304,7 @@ void TCGenVxOpt::process_config(Dictionary &dict) {
    OutputMap = parse_conf_output_flag(&dict, txt_file_type, n_txt);
 
    for(i=0, status=false; i<OutputMap.size(); i++) {
-      if(OutputMap[txt_file_type[i]] != STATOutputType_None) {
+      if(OutputMap[txt_file_type[i]] != STATOutputType::None) {
          status = true;
          break;
       }
@@ -859,12 +859,12 @@ void TCGenConfInfo::process_flags(
 
    // Update output map
    for(i=0; i<n_txt; i++) {
-      if(m.at(txt_file_type[i]) == STATOutputType_Both) {
-         OutputMap[txt_file_type[i]] = STATOutputType_Both;
+      if(m.at(txt_file_type[i]) == STATOutputType::Both) {
+         OutputMap[txt_file_type[i]] = STATOutputType::Both;
       }
-      else if(m.at(txt_file_type[i]) == STATOutputType_Stat &&
-              OutputMap[txt_file_type[i]] == STATOutputType_None) {
-         OutputMap[txt_file_type[i]] = STATOutputType_Stat;
+      else if(m.at(txt_file_type[i]) == STATOutputType::Stat &&
+              OutputMap[txt_file_type[i]] == STATOutputType::None) {
+         OutputMap[txt_file_type[i]] = STATOutputType::Stat;
       }
    }
 
@@ -1067,11 +1067,11 @@ void GenCTCInfo::inc_dev(GenesisPairCategory c,
                          const GenesisInfo *bgi) {
 
    // Discard
-   if(c == DiscardGenesis) {
+   if(c == GenesisPairCategory::Discard) {
       return;
    }
    // Hits
-   else if(c == FYOYGenesis) {
+   else if(c == GenesisPairCategory::FYOY) {
       CTSDev.cts.inc_fy_oy();
       inc_pnt(fgi->lat(), fgi->lon(), fdev_fyoy_str);
       BestDevHitMap[bgi] += 1;
@@ -1082,12 +1082,12 @@ void GenCTCInfo::inc_dev(GenesisPairCategory c,
       }
    }
    // False Alarms
-   else if(c == FYONGenesis) {
+   else if(c == GenesisPairCategory::FYON) {
       CTSDev.cts.inc_fy_on();
       inc_pnt(fgi->lat(), fgi->lon(), fdev_fyon_str);
    }
    // Misses
-   else if(c == FNOYGenesis) {
+   else if(c == GenesisPairCategory::FNOY) {
       CTSDev.cts.inc_fn_oy();
 
       // Count all BEST track genesis pairs
@@ -1110,11 +1110,11 @@ void GenCTCInfo::inc_ops(GenesisPairCategory c,
                          const GenesisInfo *bgi) {
 
    // Discard
-   if(c == DiscardGenesis) {
+   if(c == GenesisPairCategory::Discard) {
       return;
    }
    // Hits
-   else if(c == FYOYGenesis) {
+   else if(c == GenesisPairCategory::FYOY) {
       CTSOps.cts.inc_fy_oy();
       inc_pnt(fgi->lat(), fgi->lon(), fops_fyoy_str);
       BestOpsHitMap[bgi] += 1;
@@ -1125,12 +1125,12 @@ void GenCTCInfo::inc_ops(GenesisPairCategory c,
       }
    }
    // False Alarms
-   else if(c == FYONGenesis) {
+   else if(c == GenesisPairCategory::FYON) {
       CTSOps.cts.inc_fy_on();
       inc_pnt(fgi->lat(), fgi->lon(), fops_fyon_str);
    }
    // Misses
-   else if(c == FNOYGenesis) {
+   else if(c == GenesisPairCategory::FNOY) {
       CTSOps.cts.inc_fn_oy();
 
       // Count all BEST track genesis pairs

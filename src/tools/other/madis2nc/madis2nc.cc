@@ -59,6 +59,7 @@
 #include "vx_cal.h"
 #include "vx_math.h"
 #include "vx_log.h"
+#include "enum_as_int.hpp"
 #include "nc_point_obs_out.h"
 
 using namespace std;
@@ -300,45 +301,45 @@ void process_madis_file(const char *madis_file) {
       exit(1);
    }
    // If the MADIS type is not already set, try to guess.
-   if(my_mtype == madis_none) my_mtype = get_madis_type(f_in);
+   if(my_mtype == MadisType::none) my_mtype = get_madis_type(f_in);
 
    // Switch on the MADIS type and process accordingly.
    switch(my_mtype) {
-      case(madis_metar):
+      case(MadisType::metar):
          process_madis_metar(f_in);
          break;
-      case(madis_raob):
+      case(MadisType::raob):
          process_madis_raob(f_in);
          break;
-      case (madis_profiler):
+      case (MadisType::profiler):
          process_madis_profiler(f_in);
          break;
-      case(madis_maritime):
+      case(MadisType::maritime):
          process_madis_maritime(f_in);
          break;
 
-      case(madis_mesonet):
+      case(MadisType::mesonet):
          process_madis_mesonet(f_in);
          break;
 
-      case(madis_acarsProfiles):
+      case(MadisType::acarsProfiles):
          process_madis_acarsProfiles(f_in);
          break;
 
-      case(madis_coop):
-      case(madis_HDW):
-      case(madis_HDW1h):
-      case(madis_hydro):
-      case(madis_POES):
-      case(madis_acars):
-      case(madis_radiometer):
-      case(madis_sao):
-      case(madis_satrad):
-      case(madis_snow):
-      case(madis_none):
+      case(MadisType::coop):
+      case(MadisType::HDW):
+      case(MadisType::HDW1h):
+      case(MadisType::hydro):
+      case(MadisType::POES):
+      case(MadisType::acars):
+      case(MadisType::radiometer):
+      case(MadisType::sao):
+      case(MadisType::satrad):
+      case(MadisType::snow):
+      case(MadisType::none):
       default:
          mlog << Error << "\nprocess_madis_file() -> "
-              << "MADIS type (" << my_mtype
+              << "MADIS type (" << enum_class_as_int(my_mtype)
               << ") not currently supported.\n\n";
          exit(1);
    }
@@ -662,18 +663,18 @@ int process_obs(const int in_gc, const float conversion,
 ////////////////////////////////////////////////////////////////////////
 
 MadisType get_madis_type(NcFile *&f_in) {
-   MadisType madis_type = madis_none;
+   MadisType madis_type = MadisType::none;
    ConcatString attr_value;
    //
    // FUTURE WORK: Interrogate the MADIS file and determine it's type.
    //
    if (get_global_att(f_in, (string)"id", attr_value)) {
-      if (attr_value == "MADIS_MARITIME")     madis_type = madis_maritime;
-      else if (attr_value == "MADIS_MESONET") madis_type = madis_mesonet;
-      else if (attr_value == "MADIS_METAR")   madis_type = madis_metar;
+      if (attr_value == "MADIS_MARITIME")     madis_type = MadisType::maritime;
+      else if (attr_value == "MADIS_MESONET") madis_type = MadisType::mesonet;
+      else if (attr_value == "MADIS_METAR")   madis_type = MadisType::metar;
    }
    else if (get_global_att(f_in, (string)"title", attr_value)) {
-      if (attr_value.contents("MADIS ACARS") != "") madis_type = madis_acarsProfiles;
+      if (attr_value.contents("MADIS ACARS") != "") madis_type = MadisType::acarsProfiles;
    }
    return madis_type;
 }
@@ -3629,22 +3630,22 @@ void set_type(const StringArray & a)
    // Parse the MADIS type
    //
    if(strcasecmp(a[0].c_str(), metar_str) == 0) {
-      mtype = madis_metar;
+      mtype = MadisType::metar;
    }
    else if(strcasecmp(a[0].c_str(), raob_str) == 0) {
-      mtype = madis_raob;
+      mtype = MadisType::raob;
    }
    else if(strcasecmp(a[0].c_str(), profiler_str) == 0) {
-      mtype = madis_profiler;
+      mtype = MadisType::profiler;
    }
    else if(strcasecmp(a[0].c_str(), maritime_str) == 0) {
-      mtype = madis_maritime;
+      mtype = MadisType::maritime;
    }
    else if(strcasecmp(a[0].c_str(), mesonet_str) == 0) {
-      mtype = madis_mesonet;
+      mtype = MadisType::mesonet;
    }
    else if(strcasecmp(a[0].c_str(), acarsProfiles_str) == 0) {
-      mtype = madis_acarsProfiles;
+      mtype = MadisType::acarsProfiles;
    }
    else {
       mlog << Error << "\nprocess_command_line() -> "

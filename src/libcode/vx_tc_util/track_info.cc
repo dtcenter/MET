@@ -91,7 +91,7 @@ void TrackInfo::clear() {
    MaxValidTime    = (unixtime) 0;
    MinWarmCore     = (unixtime) 0;
    MaxWarmCore     = (unixtime) 0;
-   DiagSource      = DiagType_None;
+   DiagSource      = DiagType::None;
    TrackSource.clear();
    FieldSource.clear();
    DiagName.clear();

@@ -95,14 +95,14 @@ void TCPairsConfInfo::clear() {
    ValidAreaMask.clear();
    LeadReq.clear();
    CheckDup = true;
-   Interp12 = Interp12Type_Replace;
+   Interp12 = Interp12Type::Replace;
    NConsensus = 0;
    LagTime.clear();
    BestTechnique.clear();
    BestBaseline.clear();
    OperTechnique.clear();
    OperBaseline.clear();
-   AnlyTrack = TrackType_None;
+   AnlyTrack = TrackType::None;
    MatchPoints = false;
    DLandFile.clear();
    WatchWarnFile.clear();

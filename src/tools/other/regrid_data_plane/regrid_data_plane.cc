@@ -65,7 +65,7 @@ using namespace netCDF;
 static ConcatString program_name;
 
 // Constants
-static const InterpMthd DefaultInterpMthd = InterpMthd_Nearest;
+static const InterpMthd DefaultInterpMthd = InterpMthd::Nearest;
 static const int        DefaultInterpWdth = 1;
 static const double     DefaultVldThresh  = 0.5;
 
@@ -139,14 +139,14 @@ void process_command_line(int argc, char **argv) {
 
    // Set default regridding options
    RGInfo.enable     = true;
-   RGInfo.field      = FieldType_None;
+   RGInfo.field      = FieldType::None;
    RGInfo.method     = DefaultInterpMthd;
    RGInfo.width      = DefaultInterpWdth;
    RGInfo.gaussian.dx     = default_gaussian_dx;
    RGInfo.gaussian.radius = default_gaussian_radius;
    RGInfo.gaussian.trunc_factor = default_trunc_factor;
    RGInfo.vld_thresh = DefaultVldThresh;
-   RGInfo.shape      = GridTemplateFactory::GridTemplate_Square;
+   RGInfo.shape      = GridTemplateFactory::GridTemplates::Square;
 
    // Check for zero arguments
    if(argc == 1) usage();
@@ -204,7 +204,7 @@ void process_command_line(int argc, char **argv) {
    }
 
    RGInfo.validate();
-   if (RGInfo.method == InterpMthd_Gaussian || RGInfo.method == InterpMthd_MaxGauss)
+   if (RGInfo.method == InterpMthd::Gaussian || RGInfo.method == InterpMthd::MaxGauss)
       RGInfo.gaussian.compute();
 
    return;

@@ -133,9 +133,9 @@ class StatHdrColumns {
       void set_mask          (const char *);
 
       void set_interp_mthd   (ConcatString s,
-                              GridTemplateFactory::GridTemplates shape = GridTemplateFactory::GridTemplate_None);
+                              GridTemplateFactory::GridTemplates shape = GridTemplateFactory::GridTemplates::None);
       void set_interp_mthd   (const InterpMthd m,
-                              GridTemplateFactory::GridTemplates shape = GridTemplateFactory::GridTemplate_None);
+                              GridTemplateFactory::GridTemplates shape = GridTemplateFactory::GridTemplates::None);
       void set_interp_pnts   (const int);
       void set_interp_wdth   (const int);
 
