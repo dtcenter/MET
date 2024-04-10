@@ -1227,7 +1227,7 @@ For how to use the script, issue the command:
 
 .. code-block:: none
 
-   python3 MET_BASE/python/utility/print_pointnc2ascii.py -h
+   python3 MET_BASE/python/utility/get_iabp_from_web.py -h
 
 Another IABP utility script is included for users, to be run after all files have been downloaded using get_iabp_from_web.py.  This script examines all the files and lists those files that contain entries that fall within a user specified range of days.  It is called find_iabp_in_timerange.py.
 
