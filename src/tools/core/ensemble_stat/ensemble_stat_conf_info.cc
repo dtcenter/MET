@@ -804,10 +804,10 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
    // The number of thresholds must match
    if(fcat_ta.n() != ocat_ta.n()) {
       mlog << Error << "\nEnsembleStatVxOpt::process_config() -> "
-           << "The number of forecast (" << fcat_ta.n()
-           << ") and observation (" << ocat_ta.n()
+           << "The number of forecast (" << write_css(fcat_ta)
+           << ") and observation (" << write_css(ocat_ta)
            << ") probability category thresholds in \""
-           << conf_key_prob_cat_thresh << "\" must match.\n\n";
+           << conf_key_prob_cat_thresh << "\" must match!\n\n";
       exit(1);
    }
 
