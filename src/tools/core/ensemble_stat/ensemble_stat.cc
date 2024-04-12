@@ -1752,8 +1752,14 @@ void do_rps(const EnsembleStatVxOpt &vx_opt,
       rps_info.set_cdp_thresh(vx_opt.cdf_info.cdf_ta);
    }
 
-   // Compute ensemble RPS statistics
-   rps_info.set(*pd_ptr);
+   // Compute ensemble RPS statistics from pre-computed binned probabilities
+   if(vx_opt.vx_pd.fcst_info->get_var_info()->is_prob()) {
+      rps_info.set_climo_prob(*pd_ptr, vx_opt.ocat_ta);
+   }
+   // Compute ensemble RPS statistics from ensemble member values
+   else {
+      rps_info.set(*pd_ptr);
+   }
 
    // Write out RPS
    if(vx_opt.output_flag[i_rps] != STATOutputType::None &&
