@@ -2074,8 +2074,12 @@ void write_txt_files(const EnsembleStatVxOpt &vx_opt,
       // Create output text files, if needed
       setup_txt_files();
 
+      // Check for probabilistic input
+      bool is_prob = vx_opt.vx_pd.fcst_info->get_var_info()->is_prob();
+
       // Compute ECNT scores
-      if(vx_opt.output_flag[i_ecnt] != STATOutputType::None) {
+      if(vx_opt.output_flag[i_ecnt] != STATOutputType::None &&
+         !is_prob) {
          do_ecnt(vx_opt, vx_opt.othr_ta[i], &pd);
       }
 
@@ -2085,7 +2089,8 @@ void write_txt_files(const EnsembleStatVxOpt &vx_opt,
       }
 
       // Write RHIST counts
-      if(vx_opt.output_flag[i_rhist] != STATOutputType::None) {
+      if(vx_opt.output_flag[i_rhist] != STATOutputType::None &&
+         !is_prob) {
 
          pd.compute_rhist();
 
@@ -2098,7 +2103,8 @@ void write_txt_files(const EnsembleStatVxOpt &vx_opt,
       }
 
       // Write PHIST counts if greater than 0
-      if(vx_opt.output_flag[i_phist] != STATOutputType::None) {
+      if(vx_opt.output_flag[i_phist] != STATOutputType::None &&
+         !is_prob) {
 
          pd.phist_bin_size = vx_opt.vx_pd.pd[0][0][0].phist_bin_size;
          pd.compute_phist();
@@ -2112,7 +2118,8 @@ void write_txt_files(const EnsembleStatVxOpt &vx_opt,
       }
 
       // Write RELP counts
-      if(vx_opt.output_flag[i_relp] != STATOutputType::None) {
+      if(vx_opt.output_flag[i_relp] != STATOutputType::None &&
+         !is_prob) {
 
          pd.compute_relp();
 
@@ -2125,7 +2132,8 @@ void write_txt_files(const EnsembleStatVxOpt &vx_opt,
       }
 
       // Write SSVAR scores
-      if(vx_opt.output_flag[i_ssvar] != STATOutputType::None) {
+      if(vx_opt.output_flag[i_ssvar] != STATOutputType::None &&
+         !is_prob) {
 
          pd.ssvar_bin_size = vx_opt.vx_pd.pd[0][0][0].ssvar_bin_size;
          pd.compute_ssvar();
