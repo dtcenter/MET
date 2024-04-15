@@ -140,8 +140,8 @@ class RPSInfo {
 
       // Compute statistics
       void set(const PairDataEnsemble &);
-      void set_climo_prob(const PairDataEnsemble &,
-                          const ThreshArray &);
+      void set_climo_bin_prob(const PairDataEnsemble &,
+                              const ThreshArray &);
 
       // Compute the complement of the RPS
       double rps_comp() const;

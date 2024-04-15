@@ -632,20 +632,20 @@ void RPSInfo::set(const PairDataEnsemble &pd) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void RPSInfo::set_climo_prob(const PairDataEnsemble &pd,
-                             const ThreshArray &ocat_ta) {
-   int i, j;
-   double p;
-   NumArray p_thresh;
+void RPSInfo::set_climo_bin_prob(const PairDataEnsemble &pd,
+                                 const ThreshArray &ocat_ta) {
+
+   // Compute RPS directly from the binned probabilities rather
+   // than with an Nx2 probabilistic contingency table.
 
    // Store the dimensions
    n_pair = pd.n_pair;
    n_prob = pd.n_ens;
 
-   // Check that the number of thresholds and probability bins match
+   // Check that the number of thresholds and bins match
    if(fthresh.n() != pd.n_ens ||
       ocat_ta.n() != pd.n_ens) {
-      mlog << Error << "\nRPSInfo::set_climo_prob(const PairDataEnsemble &) -> "
+      mlog << Error << "\nRPSInfo::set_climo_bin_prob() -> "
            << "the number of climatology probability bins (" << pd.n_ens
            << ") must match the number of forecast (" << write_css(fthresh)
            << ") and observation (" << write_css(ocat_ta)
@@ -654,71 +654,65 @@ void RPSInfo::set_climo_prob(const PairDataEnsemble &pd,
       exit(1);
    }
 
-   // Setup probability thresholds, assuming equally-space climo prob bins
-   for(i=0; i<=n_prob; i++) p_thresh.add((double) i/n_prob);
+   // Initialize RPS
+   rps = rpscl = 0.0;
 
-   // Setup forecast probabilistic contingency table
-   Nx2ContingencyTable fcst_pct;
-   fcst_pct.set_size(n_prob);
-   fcst_pct.set_thresholds(p_thresh.vals());
+   // Loop over the observations
+   for(int i_obs=0; i_obs<pd.n_obs; i_obs++) {
 
-   // Setup climatology probabilistic contingency table
-   Nx2ContingencyTable climo_pct;
-   climo_pct.set_size(n_prob);
-   climo_pct.set_thresholds(p_thresh.vals());
+      // Initialize
+      double pfcst_sum = 0.0;
+      double pclim_sum = 0.0;
+      double rps_obs   = 0.0;
+      double rpscl_obs = 0.0;
 
-   // Initialize
-   rps_rel = rps_res = rps_unc = 0.0;
-   rps     = rpscl   = 0.0;
+      // Loop over the probability bins
+      for(int i_bin=0; i_bin<pd.n_ens; i_bin++) {
 
-   // Loop over the climo probability categories and populate PCT tables for each
-   for(i=0; i<n_prob; i++) {
+         // Update the cumulative probabilities
+         pfcst_sum += pd.e_na[i_bin][i_obs];
+         pclim_sum += 1.0/pd.n_ens;
 
-      // Initialize PCT counts
-      fcst_pct.zero_out();
-      climo_pct.zero_out();
-
-      // Loop over the observations
-      for(j=0; j<pd.n_obs; j++) {
-
-         // Update the forecast PCT counts
-         p = pd.e_na[i][j];
-         if(ocat_ta[i].check(pd.o_na[j])) {
-            fcst_pct.inc_event(p);
+         // Range check sums
+         if(i_bin == (pd.n_ens - 1) && !is_eq(pfcst_sum, 1.0)) {
+            mlog << Warning << "\nRPSInfo::set_climo_bin_prob() -> "
+                 << "unexpected sum of binned probabilities ("
+                 << pfcst_sum << " != 1).\n\n";
          }
+
+         // Increment sums for the event
+         if(ocat_ta[i_bin].check(pd.o_na[i_obs])) {
+            rps_obs   += (1.0 - pfcst_sum)*(1.0 - pfcst_sum);
+            rpscl_obs += (1.0 - pclim_sum)*(1.0 - pclim_sum);
+         }
+         // Increment sums for the non-event
          else {
-            fcst_pct.inc_nonevent(p);
+            rps_obs   += (0.0 - pfcst_sum)*(0.0 - pfcst_sum);
+            rpscl_obs += (0.0 - pclim_sum)*(0.0 - pclim_sum);
          }
 
-         // Update the climatology PCT counts
-         p = p_thresh[i];
-         if(ocat_ta[i].check(pd.o_na[j])) {
-            climo_pct.inc_event(p);
-         }
-         else {
-            climo_pct.inc_nonevent(p);
-         }
+      } // end for i_bin
 
-      } // end for j
+      // Divide by number of bins minus 1
+      rps_obs   /= (pd.n_ens - 1);
+      rpscl_obs /= (pd.n_ens - 1);
 
-      // Increment sums
-      rps_rel += fcst_pct.reliability()  / fthresh.n();
-      rps_res += fcst_pct.resolution()   / fthresh.n();
-      rps_unc += fcst_pct.uncertainty()  / fthresh.n();
-      rps     += fcst_pct.brier_score()  / fthresh.n();
-      rpscl   += climo_pct.brier_score() / fthresh.n();
+      // Increment running sums
+      rps   += rps_obs   / pd.n_obs ;
+      rpscl += rpscl_obs / pd.n_obs;
 
-   } // end for i
+   } // end for i_obs
 
-   // Compute RPSS with sample climatology
-   rpss_smpl = (!is_eq(rps_unc, 0.0) ?
-               (rps_res - rps_rel) / rps_unc :
-               bad_data_double);
+   // Compute RPSS relative to climatology
+   rpss = (!is_eq(rpscl, 0.0) ?
+           1.0 - (rps / rpscl) :
+           bad_data_double);
 
-   // Compute RPSS with external climatology
-   rpss      = (!is_eq(rpscl, 0.0) ?
-                1.0 - (rps / rpscl) :
-                bad_data_double);
+   // Store other RPS statistics as bad data
+   rpss_smpl = bad_data_double;
+   rps_rel   = bad_data_double;
+   rps_res   = bad_data_double;
+   rps_unc   = bad_data_double;
 
    return;
 }

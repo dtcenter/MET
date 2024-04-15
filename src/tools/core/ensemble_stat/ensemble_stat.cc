@@ -1754,7 +1754,7 @@ void do_rps(const EnsembleStatVxOpt &vx_opt,
 
    // Compute ensemble RPS statistics from pre-computed binned probabilities
    if(vx_opt.vx_pd.fcst_info->get_var_info()->is_prob()) {
-      rps_info.set_climo_prob(*pd_ptr, vx_opt.ocat_ta);
+      rps_info.set_climo_bin_prob(*pd_ptr, vx_opt.ocat_ta);
    }
    // Compute ensemble RPS statistics from ensemble member values
    else {
