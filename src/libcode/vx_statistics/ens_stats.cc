@@ -642,14 +642,17 @@ void RPSInfo::set_climo_bin_prob(const PairDataEnsemble &pd,
    n_pair = pd.n_pair;
    n_prob = pd.n_ens;
 
-   // Check that the number of thresholds and bins match
-   if(fthresh.n() != pd.n_ens ||
-      ocat_ta.n() != pd.n_ens) {
+   // If no forecast thresholds are provided, store a single NA thresh
+   if(fthresh.n() == 0) fthresh.add(na_str);
+
+   // Check that the number of observation category thresholds
+   // and bins match
+   if(ocat_ta.n() != pd.n_ens) {
       mlog << Error << "\nRPSInfo::set_climo_bin_prob() -> "
-           << "the number of climatology probability bins (" << pd.n_ens
-           << ") must match the number of forecast (" << write_css(fthresh)
-           << ") and observation (" << write_css(ocat_ta)
-           << ") thresholds defined by the \"" << conf_key_prob_cat_thresh
+           << "the number of climatology probability bins ("
+           << pd.n_ens << ") must match the number of observation "
+           << " category thresholds (" << write_css(ocat_ta)
+           << ") defined by the \"" << conf_key_prob_cat_thresh
            << "\" configuration file option.\n\n";
       exit(1);
    }
@@ -666,6 +669,9 @@ void RPSInfo::set_climo_bin_prob(const PairDataEnsemble &pd,
       double rps_obs   = 0.0;
       double rpscl_obs = 0.0;
 
+      // Expect the event to occur in exactly one bin
+      int n_event = 0;
+
       // Loop over the probability bins
       for(int i_bin=0; i_bin<pd.n_ens; i_bin++) {
 
@@ -673,8 +679,8 @@ void RPSInfo::set_climo_bin_prob(const PairDataEnsemble &pd,
          pfcst_sum += pd.e_na[i_bin][i_obs];
          pclim_sum += 1.0/pd.n_ens;
 
-         // Range check sums
-         if(i_bin == (pd.n_ens - 1) && !is_eq(pfcst_sum, 1.0)) {
+         // Make sure bins sum to 1.0 within 0.01
+         if(i_bin == (pd.n_ens - 1) && !is_eq(pfcst_sum, 1.0, 0.01)) {
             mlog << Warning << "\nRPSInfo::set_climo_bin_prob() -> "
                  << "unexpected sum of binned probabilities ("
                  << pfcst_sum << " != 1).\n\n";
@@ -682,6 +688,7 @@ void RPSInfo::set_climo_bin_prob(const PairDataEnsemble &pd,
 
          // Increment sums for the event
          if(ocat_ta[i_bin].check(pd.o_na[i_obs])) {
+            n_event++;
             rps_obs   += (1.0 - pfcst_sum)*(1.0 - pfcst_sum);
             rpscl_obs += (1.0 - pclim_sum)*(1.0 - pclim_sum);
          }
@@ -692,6 +699,15 @@ void RPSInfo::set_climo_bin_prob(const PairDataEnsemble &pd,
          }
 
       } // end for i_bin
+
+      // Make sure the event occurs in exactly 1 bin
+      if(n_event != 1) {
+         mlog << Warning << "\nRPSInfo::set_climo_bin_prob() -> "
+              << "the observation value (" << pd.o_na[i_obs]
+              << ") met " << n_event << " of the observation "
+              << " category thresholds (" << write_css(ocat_ta)
+              << ") instead of exactly 1!\n\n";
+      }
 
       // Divide by number of bins minus 1
       rps_obs   /= (pd.n_ens - 1);

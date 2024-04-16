@@ -74,7 +74,6 @@ fcst = {
          name    = "MET_ENS_MEMBER_ID";
          level   = "(*,*)";
          is_prob = TRUE;
-         prob_cat_thresh = [ <33.3, >33.3&&<66.7, >66.7 ];
          set_attr_name = "TMEAN_TERCILES";
       }
    ];
