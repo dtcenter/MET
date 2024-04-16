@@ -801,8 +801,9 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
    fcat_ta = fdict.lookup_thresh_array(conf_key_prob_cat_thresh);
    ocat_ta = odict.lookup_thresh_array(conf_key_prob_cat_thresh);
 
-   // The number of thresholds must match
-   if(fcat_ta.n() != ocat_ta.n()) {
+   // The number of thresholds must match for non-probability forecasts
+   if(!vx_pd.fcst_info->get_var_info()->is_prob() &&
+      fcat_ta.n() != ocat_ta.n()) {
       mlog << Error << "\nEnsembleStatVxOpt::process_config() -> "
            << "The number of forecast (" << write_css(fcat_ta)
            << ") and observation (" << write_css(ocat_ta)
