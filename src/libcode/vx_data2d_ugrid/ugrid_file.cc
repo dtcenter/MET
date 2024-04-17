@@ -959,10 +959,10 @@ void UGridFile::read_netcdf_grid()
 void UGridFile::set_dataset(ConcatString _dataset_name) {
 
   ConcatString ugrid_config_name;
-  const string method_nmame = "UGridFile::set_dataset() ";
+  const string method_name = "UGridFile::set_dataset() ";
 
   if (0 == _dataset_name.length()) {
-    mlog << Error << "\n" << method_nmame
+    mlog << Error << "\n" << method_name
          << "The \"" << conf_key_ugrid_dataset
          << "\" is not defined at the configuration file.\n\n";
     exit(1);
@@ -986,8 +986,8 @@ void UGridFile::set_dataset(ConcatString _dataset_name) {
     read_config(ugrid_config_name.c_str());
   }
   else {
-    mlog << Error << "\nUGridFile::set_dataset()"
-         << " The UGrid dataset \"" << dataset_name << "\" is not supported. Please add \""
+    mlog << Error << "\n" << method_name
+         << "The UGrid dataset \"" << dataset_name << "\" is not supported. Please add \""
          << ugrid_config_name << "\".\n\n";
     exit(1);
   }
