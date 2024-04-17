@@ -63,6 +63,8 @@ When computing the CRPS skill score for (:ref:`Gneiting et al., 2004 <Gneiting-2
 
 The climatological distribution is also used for the RPSS. The forecast RPS statistic is computed from a probabilistic contingency table in which the probabilities are derived from the ensemble member values. In a simliar fashion, the climatogical probability for each observed value is derived from the climatological distribution. The area of the distribution to the left of the observed value is interpreted as the climatological probability. These climatological probabilities are also evaluated using a probabilistic contingency table from which the reference RPS score is computed. The skill scores are derived by comparing the forecast statistic to the reference climatology statistic.
 
+The Ensemble-Stat tool also allows the computation of RPS and RPSS utilizing an ensemble forecast in probabilistic space. This unique ability is for users with ensemble data that is formulated relative to climatology; it does not require the use of any climatological datasets, instead relying on the assumption that each ensemble member has a climatologically equal chance of occurring. Each ensemble member's field should contain values in the range [0, 1] or [0, 100]. However, when MET encounters a probability field with a range [0, 100], it will automatically rescale it to be [0, 1]. The sum of all ensemble member fields should equal 1 (if range is [0, 1]) or 100 (if range is [0, 100]). When calculating RPS, the ensemble member field values are cumulatively summed in the order that they are evaluated by Ensemble-Stat. Each of these sums is then used to calculate a squared probability error relative to observations and their appropriate thresolds. Note that it is expected each observation point or observation gridpoint will indicate exactly one climatological probability bin where the observation occurred. The cumulative sum and squared probability errors are also calculated for climatology using an even, constant probability bin width that is equal to 1 divided by the number of ensemble members (ex. three ensemble members are evaluated with three climatology probability bins of width 0.333). The accompanying skill score is derived by comparing the forecast RPS to the reference climatology RPS.
+
 Ensemble Observation Error
 --------------------------
 
@@ -199,12 +201,21 @@ _______________________
 
 .. code-block:: none
 
+  is_prob = TRUE;
+
+
+While **is_prob** is not a unique setting to the Ensemble-Stat tool, setting this boolean to **TRUE** in the **fcst** dictionary field does allow users the ability to pass ensemble member data in probabilistic space relative to a climatology. Doing so will disable the requirement for setting **prob_cat_thresh** in the **fcst** dictionary field but does require that the **obs** dictionary field contain a **prob_cat_thresh** array with the same number of inequality entries as ensemble members being evaluated. These inequalities must be monotonically increasing and of the same inequality type. Using this feature will disable all **output_flag** line type outputs requested other than the RPS. Additionally the RPS line type columns decomposing the RPS into Reliability, Resolution, and Uncertainty, as well as the RPSS relative to a sample climatology, will have entries of N/A.
+
+_______________________
+
+.. code-block:: none
+
   ens_member_ids = [];
   control_id = "";
 
 
 The **ens_member_ids** array is only used if reading a single file that contains all ensemble members.
-It should contain a list of string identifiers that are substituted into the **ens** and/or **fcst** dictionary fields
+It should contain a list of string identifiers that are substituted into the **fcst** dictionary field
 to determine which data to read from the file.
 The length of the array determines how many ensemble members will be processed for a given field.
 Each value in the array will replace the text **MET_ENS_MEMBER_ID**.
@@ -233,6 +244,23 @@ Each value in the array will replace the text **MET_ENS_MEMBER_ID**.
         name     = "fcst";
         level    = "L0";
         GRIB_ens = "MET_ENS_MEMBER_ID";
+      }
+    ];
+  }
+
+The **ens_member_ids** array can also be used to control the **name** field of the **fcst** dictionary. When used in this manner, Ensemble-Stat will use the first string of **ens_member_ids** to set the **FCST_VAR** column in line type output. Users may find it useful to override this behavior using **set_attr_name**:
+
+.. code-block:: none
+
+  fcst = {
+    ens_thresh        = 0.75;
+    vld_thresh        = 1.0;
+
+    field = [
+      {
+        name          = "MET_ENS_MEMBER_ID";
+        level         = "(*,*)";
+        set_attr_name = "TMEAN_TERCILES";
       }
     ];
   }
@@ -688,10 +716,10 @@ The format of the STAT and ASCII output of the Ensemble-Stat tool are described 
     - RPS Uncertainty, mean of the uncertainties for each RPS threshold
   * - 30
     - RPS
-    - Ranked Probability Score, mean of the Brier Scores for each RPS threshold
+    - Ranked Probability Score, mean of the Brier Scores for each RPS threshold OR mean of the climatology-based probabilistic ensemble members 
   * - 31
     - RPSS
-    - Ranked Probability Skill Score relative to external climatology
+    - Ranked Probability Skill Score relative to external climatology OR relative to a fixed climatology value of one divided by the number of ensemble members when using climatology-based probabilistic ensemble members
   * - 32
     - RPSS_SMPL
     - Ranked Probability Skill Score relative to sample climatology
