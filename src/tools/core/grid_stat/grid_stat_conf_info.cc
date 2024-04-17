@@ -66,7 +66,7 @@ void GridStatConfInfo::clear() {
    model.clear();
    obtype.clear();
    mask_map.clear();
-   grid_weight_flag = GridWeightType_None;
+   grid_weight_flag = GridWeightType::None;
    tmp_dir.clear();
    output_prefix.clear();
    version.clear();
@@ -77,7 +77,7 @@ void GridStatConfInfo::clear() {
    ugrid_max_distance_km = bad_data_double;
 #endif
 
-   for(i=0; i<n_txt; i++) output_flag[i] = STATOutputType_None;
+   for(i=0; i<n_txt; i++) output_flag[i] = STATOutputType::None;
 
    nc_info.clear();
 
@@ -219,9 +219,9 @@ void GridStatConfInfo::process_config(GrdFileType ftype,
    process_flags();
 
    // If VL1L2, VAL1L2, or VCNT is requested, set the uv_index
-   if(output_flag[i_vl1l2]  != STATOutputType_None ||
-      output_flag[i_val1l2] != STATOutputType_None ||
-      output_flag[i_vcnt]   != STATOutputType_None) {
+   if(output_flag[i_vl1l2]  != STATOutputType::None ||
+      output_flag[i_val1l2] != STATOutputType::None ||
+      output_flag[i_vcnt]   != STATOutputType::None) {
 
       for(i=0; i<n_vx; i++) {
 
@@ -310,7 +310,7 @@ void GridStatConfInfo::process_config(GrdFileType ftype,
 void GridStatConfInfo::process_flags() {
 
    // Initialize
-   for(int i=0; i<n_txt; i++) output_flag[i] = STATOutputType_None;
+   for(int i=0; i<n_txt; i++) output_flag[i] = STATOutputType::None;
    nc_info.set_all_false();
    output_ascii_flag = false;
 
@@ -319,13 +319,13 @@ void GridStatConfInfo::process_flags() {
 
       // Summary of output_flag settings
       for(int j=0; j<n_txt; j++) {
-         if(vx_opt[i].output_flag[j] == STATOutputType_Both) {
-            output_flag[j] = STATOutputType_Both;
+         if(vx_opt[i].output_flag[j] == STATOutputType::Both) {
+            output_flag[j] = STATOutputType::Both;
             output_ascii_flag = true;
          }
-         else if(vx_opt[i].output_flag[j] == STATOutputType_Stat &&
-                           output_flag[j] == STATOutputType_None) {
-            output_flag[j] = STATOutputType_Stat;
+         else if(vx_opt[i].output_flag[j] == STATOutputType::Stat &&
+                           output_flag[j] == STATOutputType::None) {
+            output_flag[j] = STATOutputType::Stat;
             output_ascii_flag = true;
          }
       }
@@ -583,11 +583,11 @@ void GridStatVxOpt::clear() {
 
    fcnt_ta.clear();
    ocnt_ta.clear();
-   cnt_logic = SetLogic_None;
+   cnt_logic = SetLogic::None;
 
    fwind_ta.clear();
    owind_ta.clear();
-   wind_logic = SetLogic_None;
+   wind_logic = SetLogic::None;
 
    mask_grid.clear();
    mask_poly.clear();
@@ -620,7 +620,7 @@ void GridStatVxOpt::clear() {
 
    seeps_p1_thresh.clear();
 
-   for(i=0; i<n_txt; i++) output_flag[i] = STATOutputType_None;
+   for(i=0; i<n_txt; i++) output_flag[i] = STATOutputType::None;
 
    nc_info.clear();
 
@@ -781,8 +781,8 @@ void GridStatVxOpt::process_config(
 
    // Verifying with multi-category contingency tables
    if(!fcst_info->is_prob() &&
-      (output_flag[i_mctc] != STATOutputType_None ||
-       output_flag[i_mcts] != STATOutputType_None)) {
+      (output_flag[i_mctc] != STATOutputType::None ||
+       output_flag[i_mcts] != STATOutputType::None)) {
       check_mctc_thresh(fcat_ta);
       check_mctc_thresh(ocat_ta);
    }
@@ -814,9 +814,9 @@ void GridStatVxOpt::process_config(
       mthd = string_to_interpmthd(interp_info.method[i].c_str());
 
       // Check for unsupported interpolation methods
-      if(mthd == InterpMthd_DW_Mean ||
-         mthd == InterpMthd_LS_Fit  ||
-         mthd == InterpMthd_Bilin) {
+      if(mthd == InterpMthd::DW_Mean ||
+         mthd == InterpMthd::LS_Fit  ||
+         mthd == InterpMthd::Bilin) {
          mlog << Error << "\nGridStatVxOpt::process_config() -> "
               << "Interpolation methods DW_MEAN, LS_FIT, and BILIN are "
               << "not supported in Grid-Stat.\n\n";
@@ -1059,7 +1059,7 @@ int GridStatVxOpt::n_txt_row(int i_txt_row) const {
    }
 
    // Check if this output line type is requested
-   if(output_flag[i_txt_row] == STATOutputType_None) return 0;
+   if(output_flag[i_txt_row] == STATOutputType::None) return 0;
 
    bool prob_flag = fcst_info->is_prob();
    bool vect_flag = (fcst_info->is_u_wind() && obs_info->is_u_wind());

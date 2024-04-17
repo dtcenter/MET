@@ -32,30 +32,30 @@ DataPlane out;
 
 switch ( info.method )  {
 
-   case InterpMthd_Min:
-   case InterpMthd_Max:
-   case InterpMthd_Median:
-   case InterpMthd_UW_Mean:
-   case InterpMthd_DW_Mean:
-   case InterpMthd_LS_Fit:
-   case InterpMthd_Bilin:
-   case InterpMthd_Nearest:
+   case InterpMthd::Min:
+   case InterpMthd::Max:
+   case InterpMthd::Median:
+   case InterpMthd::UW_Mean:
+   case InterpMthd::DW_Mean:
+   case InterpMthd::LS_Fit:
+   case InterpMthd::Bilin:
+   case InterpMthd::Nearest:
       out = met_regrid_generic (in, from_grid, to_grid, info);
       break;
 
-   case InterpMthd_Budget:
+   case InterpMthd::Budget:
       out = met_regrid_budget (in, from_grid, to_grid, info);
       break;
 
-   case InterpMthd_AW_Mean:
+   case InterpMthd::AW_Mean:
       out = met_regrid_area_weighted (in, from_grid, to_grid, info);
       break;
 
-   case InterpMthd_Force:
+   case InterpMthd::Force:
       out = met_regrid_force (in, from_grid, to_grid, info);
       break;
 
-   case InterpMthd_MaxGauss:
+   case InterpMthd::MaxGauss:
       out = met_regrid_maxgauss (in, from_grid, to_grid, info);
       break;
 
@@ -97,9 +97,9 @@ DataPlane met_regrid_nearest (const DataPlane & from_data, const Grid & from_gri
 
 RegridInfo ri;
 ri.enable = true;
-ri.method = InterpMthd_Nearest;
+ri.method = InterpMthd::Nearest;
 ri.width  = 1;
-ri.shape  = GridTemplateFactory::GridTemplate_Square;
+ri.shape  = GridTemplateFactory::GridTemplates::Square;
 
 return met_regrid_generic(from_data, from_grid, to_grid, ri);
 
@@ -346,7 +346,7 @@ for (xt=0; xt<(to_grid.nx()); ++xt)  {
 
       } else {
          value = compute_horz_interp(from_data, x_from, y_from,
-                    bad_data_double, InterpMthd_Max, info.width,
+                    bad_data_double, InterpMthd::Max, info.width,
                     info.shape, from_grid.wrap_lon(), info.vld_thresh);
       }
 

@@ -187,12 +187,12 @@ bool SSIndexJobInfo::add(STATLine &line) {
          n_fcst_lines.inc(i, 1);
 
          // Aggregate SL1L2
-         if(job_lt[i] == stat_sl1l2) {
+         if(job_lt[i] == STATLineType::sl1l2) {
             parse_sl1l2_line(line, sl1l2);
             fcst_sl1l2[i] += sl1l2;
          }
          // Aggregate CTC
-         else if(job_lt[i] == stat_ctc) {
+         else if(job_lt[i] == STATLineType::ctc) {
             parse_ctc_ctable(line, ctc);
             fcst_cts[i].cts += ctc;
          }
@@ -204,12 +204,12 @@ bool SSIndexJobInfo::add(STATLine &line) {
          n_ref_lines.inc(i, 1);
 
          // Aggregate SL1L2
-         if(job_lt[i] == stat_sl1l2) {
+         if(job_lt[i] == STATLineType::sl1l2) {
             parse_sl1l2_line(line, sl1l2);
             ref_sl1l2[i] += sl1l2;
          }
          // Aggregate CTC
-         else if(job_lt[i] == stat_ctc) {
+         else if(job_lt[i] == STATLineType::ctc) {
             parse_ctc_ctable(line, ctc);
             ref_cts[i].cts += ctc;
          }
@@ -244,14 +244,14 @@ SSIDXData SSIndexJobInfo::compute_ss_index() {
    for(i=0, n_vld=0, n_diff=0, ss_sum=weight_sum=0.0; i<n_term; i++) {
 
       // Continuous stats
-      if(job_lt[i] == stat_sl1l2) {
+      if(job_lt[i] == STATLineType::sl1l2) {
          compute_cntinfo(fcst_sl1l2[i], 0, fcst_cnt);
          fcst_stat = fcst_cnt.get_stat(fcst_job[i].column[0].c_str());
          compute_cntinfo(ref_sl1l2[i], 0, ref_cnt);
          ref_stat = ref_cnt.get_stat(fcst_job[i].column[0].c_str());
       }
       // Categorical stats
-      else if(job_lt[i] == stat_ctc) {
+      else if(job_lt[i] == STATLineType::ctc) {
          fcst_cts[i].compute_stats();
          fcst_stat = fcst_cts[i].get_stat(fcst_job[i].column[0].c_str());
          ref_cts[i].compute_stats();

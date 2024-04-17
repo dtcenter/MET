@@ -477,7 +477,7 @@ void setup_txt_files(unixtime valid_ut, int lead_sec) {
    for(i=0; i<n_txt; i++) {
 
       // Only set it up if requested in the config file
-      if(conf_info.output_flag[i] == STATOutputType_Both) {
+      if(conf_info.output_flag[i] == STATOutputType::Both) {
 
          // Initialize file stream
          txt_out[i] = (ofstream *) nullptr;
@@ -684,10 +684,10 @@ void process_scores() {
    // Allocate memory in one big chunk based on grid size
    pd.extend(grid.nx()*grid.ny());
 
-   if(conf_info.output_flag[i_nbrctc] != STATOutputType_None ||
-      conf_info.output_flag[i_nbrcts] != STATOutputType_None ||
-      conf_info.output_flag[i_nbrcnt] != STATOutputType_None ||
-      conf_info.output_flag[i_dmap]   != STATOutputType_None) {
+   if(conf_info.output_flag[i_nbrctc] != STATOutputType::None ||
+      conf_info.output_flag[i_nbrcts] != STATOutputType::None ||
+      conf_info.output_flag[i_nbrcnt] != STATOutputType::None ||
+      conf_info.output_flag[i_dmap]   != STATOutputType::None) {
       pd_thr.extend(grid.nx()*grid.ny());
    }
 
@@ -850,8 +850,8 @@ void process_scores() {
          delete gt;
 
          // If requested in the config file, smooth the forecast field
-         if(interp->field == FieldType_Fcst ||
-            interp->field == FieldType_Both) {
+         if(interp->field == FieldType::Fcst ||
+            interp->field == FieldType::Both) {
             smooth_field(fcst_dp, fcst_dp_smooth, interp_mthd,
                          interp->width[j], interp->shape, grid.wrap_lon(),
                          interp->vld_thresh, interp->gaussian);
@@ -862,8 +862,8 @@ void process_scores() {
          }
 
          // If requested in the config file, smooth the observation field
-         if(interp->field == FieldType_Obs ||
-            interp->field == FieldType_Both) {
+         if(interp->field == FieldType::Obs ||
+            interp->field == FieldType::Both) {
             smooth_field(obs_dp, obs_dp_smooth, interp_mthd,
                          interp->width[j], interp->shape, grid.wrap_lon(),
                          interp->vld_thresh, interp->gaussian);
@@ -917,10 +917,10 @@ void process_scores() {
             // Compute CTS scores
             if(!conf_info.vx_opt[i].fcst_info->is_prob()                       &&
                 conf_info.vx_opt[i].fcat_ta.n() > 0                            &&
-               (conf_info.vx_opt[i].output_flag[i_fho]  != STATOutputType_None ||
-                conf_info.vx_opt[i].output_flag[i_ctc]  != STATOutputType_None ||
-                conf_info.vx_opt[i].output_flag[i_cts]  != STATOutputType_None ||
-                conf_info.vx_opt[i].output_flag[i_eclv] != STATOutputType_None)) {
+               (conf_info.vx_opt[i].output_flag[i_fho]  != STATOutputType::None ||
+                conf_info.vx_opt[i].output_flag[i_ctc]  != STATOutputType::None ||
+                conf_info.vx_opt[i].output_flag[i_cts]  != STATOutputType::None ||
+                conf_info.vx_opt[i].output_flag[i_eclv] != STATOutputType::None)) {
 
                // Initialize
                for(m=0; m<n_cat; m++) cts_info[m].clear();
@@ -932,7 +932,7 @@ void process_scores() {
                for(m=0; m<conf_info.vx_opt[i].fcat_ta.n(); m++) {
 
                   // Write out FHO
-                  if(conf_info.vx_opt[i].output_flag[i_fho] != STATOutputType_None &&
+                  if(conf_info.vx_opt[i].output_flag[i_fho] != STATOutputType::None &&
                      cts_info[m].cts.n() > 0) {
 
                      write_fho_row(shc, cts_info[m],
@@ -942,7 +942,7 @@ void process_scores() {
                   }
 
                   // Write out CTC
-                  if(conf_info.vx_opt[i].output_flag[i_ctc] != STATOutputType_None &&
+                  if(conf_info.vx_opt[i].output_flag[i_ctc] != STATOutputType::None &&
                      cts_info[m].cts.n() > 0) {
 
                      write_ctc_row(shc, cts_info[m],
@@ -952,7 +952,7 @@ void process_scores() {
                   }
 
                   // Write out CTS
-                  if(conf_info.vx_opt[i].output_flag[i_cts] != STATOutputType_None &&
+                  if(conf_info.vx_opt[i].output_flag[i_cts] != STATOutputType::None &&
                      cts_info[m].cts.n() > 0) {
 
                      write_cts_row(shc, cts_info[m],
@@ -962,7 +962,7 @@ void process_scores() {
                   }
 
                   // Write out ECLV
-                  if(conf_info.vx_opt[i].output_flag[i_eclv] != STATOutputType_None &&
+                  if(conf_info.vx_opt[i].output_flag[i_eclv] != STATOutputType::None &&
                      cts_info[m].cts.n() > 0) {
 
                      write_eclv_row(shc, cts_info[m], conf_info.vx_opt[i].eclv_points,
@@ -976,8 +976,8 @@ void process_scores() {
             // Compute MCTS scores
             if(!conf_info.vx_opt[i].fcst_info->is_prob()                       &&
                 conf_info.vx_opt[i].fcat_ta.n() > 1                            &&
-               (conf_info.vx_opt[i].output_flag[i_mctc] != STATOutputType_None ||
-                conf_info.vx_opt[i].output_flag[i_mcts] != STATOutputType_None)) {
+               (conf_info.vx_opt[i].output_flag[i_mctc] != STATOutputType::None ||
+                conf_info.vx_opt[i].output_flag[i_mcts] != STATOutputType::None)) {
 
                // Initialize
                mcts_info.clear();
@@ -986,7 +986,7 @@ void process_scores() {
                do_mcts(mcts_info, i, &pd);
 
                // Write out MCTC
-               if(conf_info.vx_opt[i].output_flag[i_mctc] != STATOutputType_None &&
+               if(conf_info.vx_opt[i].output_flag[i_mctc] != STATOutputType::None &&
                   mcts_info.cts.total() > 0) {
 
                   write_mctc_row(shc, mcts_info,
@@ -996,7 +996,7 @@ void process_scores() {
                }
 
                // Write out MCTS
-               if(conf_info.vx_opt[i].output_flag[i_mcts] != STATOutputType_None &&
+               if(conf_info.vx_opt[i].output_flag[i_mcts] != STATOutputType::None &&
                   mcts_info.cts.total() > 0) {
 
                   write_mcts_row(shc, mcts_info,
@@ -1008,9 +1008,9 @@ void process_scores() {
 
             // Compute CNT, SL1L2, and SAL1L2 scores
             if(!conf_info.vx_opt[i].fcst_info->is_prob() &&
-               (conf_info.vx_opt[i].output_flag[i_cnt]    != STATOutputType_None ||
-                conf_info.vx_opt[i].output_flag[i_sl1l2]  != STATOutputType_None ||
-                conf_info.vx_opt[i].output_flag[i_sal1l2] != STATOutputType_None)) {
+               (conf_info.vx_opt[i].output_flag[i_cnt]    != STATOutputType::None ||
+                conf_info.vx_opt[i].output_flag[i_sl1l2]  != STATOutputType::None ||
+                conf_info.vx_opt[i].output_flag[i_sal1l2] != STATOutputType::None)) {
                do_cnt_sl1l2(conf_info.vx_opt[i], &pd);
             }
 
@@ -1018,9 +1018,9 @@ void process_scores() {
             if(!conf_info.vx_opt[i].fcst_info->is_prob()                         &&
                 conf_info.vx_opt[i].fcst_info->is_v_wind()                       &&
                 conf_info.vx_opt[i].fcst_info->uv_index() >= 0                   &&
-               (conf_info.vx_opt[i].output_flag[i_vl1l2]  != STATOutputType_None ||
-                conf_info.vx_opt[i].output_flag[i_val1l2] != STATOutputType_None ||
-                conf_info.vx_opt[i].output_flag[i_vcnt]   != STATOutputType_None)) {
+               (conf_info.vx_opt[i].output_flag[i_vl1l2]  != STATOutputType::None ||
+                conf_info.vx_opt[i].output_flag[i_val1l2] != STATOutputType::None ||
+                conf_info.vx_opt[i].output_flag[i_vcnt]   != STATOutputType::None)) {
 
                // Store the forecast variable name
                shc.set_fcst_var(ugrd_vgrd_abbr_str);
@@ -1052,8 +1052,8 @@ void process_scores() {
 
                // If requested in the config file, smooth the forecast
                // and climatology U-wind fields
-               if(interp->field == FieldType_Fcst ||
-                  interp->field == FieldType_Both) {
+               if(interp->field == FieldType::Fcst ||
+                  interp->field == FieldType::Both) {
                   smooth_field(fu_dp, fu_dp_smooth, interp_mthd,
                                interp->width[j], interp->shape, grid.wrap_lon(),
                                interp->vld_thresh, interp->gaussian);
@@ -1065,8 +1065,8 @@ void process_scores() {
 
                // If requested in the config file, smooth the observation
                // U-wind field
-               if(interp->field == FieldType_Obs ||
-                  interp->field == FieldType_Both) {
+               if(interp->field == FieldType::Obs ||
+                  interp->field == FieldType::Both) {
                   smooth_field(ou_dp, ou_dp_smooth,
                                interp_mthd, interp->width[j],
                                interp->shape,  grid.wrap_lon(),
@@ -1089,7 +1089,7 @@ void process_scores() {
                for(m=0; m<conf_info.vx_opt[i].fwind_ta.n(); m++) {
 
                   // Write out VL1L2
-                  if(conf_info.vx_opt[i].output_flag[i_vl1l2] != STATOutputType_None &&
+                  if(conf_info.vx_opt[i].output_flag[i_vl1l2] != STATOutputType::None &&
                      vl1l2_info[m].vcount > 0) {
                      write_vl1l2_row(shc, vl1l2_info[m],
                         conf_info.vx_opt[i].output_flag[i_vl1l2],
@@ -1098,7 +1098,7 @@ void process_scores() {
                   }
 
                   // Write out VAL1L2
-                  if(conf_info.vx_opt[i].output_flag[i_val1l2] != STATOutputType_None &&
+                  if(conf_info.vx_opt[i].output_flag[i_val1l2] != STATOutputType::None &&
                      vl1l2_info[m].vacount > 0) {
                      write_val1l2_row(shc, vl1l2_info[m],
                         conf_info.vx_opt[i].output_flag[i_val1l2],
@@ -1107,7 +1107,7 @@ void process_scores() {
                   }
 
                   // Write out VCNT
-                  if(conf_info.vx_opt[i].output_flag[i_vcnt] != STATOutputType_None &&
+                  if(conf_info.vx_opt[i].output_flag[i_vcnt] != STATOutputType::None &&
                      vl1l2_info[m].vcount > 0) {
                      write_vcnt_row(shc, vl1l2_info[m],
                         conf_info.vx_opt[i].output_flag[i_vcnt],
@@ -1127,11 +1127,11 @@ void process_scores() {
 
             // Compute PCT counts and scores
             if(conf_info.vx_opt[i].fcst_info->is_prob()                        &&
-               (conf_info.vx_opt[i].output_flag[i_pct]  != STATOutputType_None ||
-                conf_info.vx_opt[i].output_flag[i_pstd] != STATOutputType_None ||
-                conf_info.vx_opt[i].output_flag[i_pjc]  != STATOutputType_None ||
-                conf_info.vx_opt[i].output_flag[i_prc]  != STATOutputType_None ||
-                conf_info.vx_opt[i].output_flag[i_eclv] != STATOutputType_None)) {
+               (conf_info.vx_opt[i].output_flag[i_pct]  != STATOutputType::None ||
+                conf_info.vx_opt[i].output_flag[i_pstd] != STATOutputType::None ||
+                conf_info.vx_opt[i].output_flag[i_pjc]  != STATOutputType::None ||
+                conf_info.vx_opt[i].output_flag[i_prc]  != STATOutputType::None ||
+                conf_info.vx_opt[i].output_flag[i_eclv] != STATOutputType::None)) {
                do_pct(conf_info.vx_opt[i], &pd);
             }
 
@@ -1196,7 +1196,7 @@ void process_scores() {
          }
 
          // Write out the fields of requested SEEPS
-         if(conf_info.vx_opt[i].output_flag[i_seeps] != STATOutputType_None
+         if(conf_info.vx_opt[i].output_flag[i_seeps] != STATOutputType::None
                && conf_info.vx_opt[i].fcst_info->is_precipitation()
                && conf_info.vx_opt[i].obs_info->is_precipitation()) {
             SeepsAggScore seeps;
@@ -1220,7 +1220,7 @@ void process_scores() {
 
          // Compute gradient statistics if requested in the config file
          if(!conf_info.vx_opt[i].fcst_info->is_prob() &&
-            conf_info.vx_opt[i].output_flag[i_grad] != STATOutputType_None) {
+            conf_info.vx_opt[i].output_flag[i_grad] != STATOutputType::None) {
 
             // Allocate memory in one big chunk based on grid size
             DataPlane fgx_dp, fgy_dp, ogx_dp, ogy_dp;
@@ -1275,7 +1275,7 @@ void process_scores() {
                                 pd_gx.o_na, pd_gy.o_na, pd_gx.wgt_na);
 
                   // Write out GRAD
-                  if(conf_info.vx_opt[i].output_flag[i_grad] != STATOutputType_None &&
+                  if(conf_info.vx_opt[i].output_flag[i_grad] != STATOutputType::None &&
                      grad_info.total > 0) {
 
                      write_grad_row(shc, grad_info,
@@ -1308,7 +1308,7 @@ void process_scores() {
 
          // Compute distance map statistics if requested in the config file
          if(!conf_info.vx_opt[i].fcst_info->is_prob() &&
-             conf_info.vx_opt[i].output_flag[i_dmap] != STATOutputType_None) {
+             conf_info.vx_opt[i].output_flag[i_dmap] != STATOutputType::None) {
 
             // Allocate memory in one big chunk based on grid size
             DataPlane fcst_dp_dmap, obs_dp_dmap;
@@ -1419,7 +1419,7 @@ void process_scores() {
                                 pd.f_na, pd.o_na, pd_thr.f_na, pd_thr.o_na);
 
                   // Write out DMAP
-                  if(conf_info.vx_opt[i].output_flag[i_dmap] != STATOutputType_None &&
+                  if(conf_info.vx_opt[i].output_flag[i_dmap] != STATOutputType::None &&
                      dmap_info.total > 0) {
 
                      write_dmap_row(shc, dmap_info,
@@ -1438,9 +1438,9 @@ void process_scores() {
       // Loop through and apply the Neighborhood methods for each of the
       // neighborhood widths if requested in the config file
       if(!conf_info.vx_opt[i].fcst_info->is_prob() &&
-         (conf_info.vx_opt[i].output_flag[i_nbrctc] != STATOutputType_None ||
-          conf_info.vx_opt[i].output_flag[i_nbrcts] != STATOutputType_None ||
-          conf_info.vx_opt[i].output_flag[i_nbrcnt] != STATOutputType_None)) {
+         (conf_info.vx_opt[i].output_flag[i_nbrctc] != STATOutputType::None ||
+          conf_info.vx_opt[i].output_flag[i_nbrcts] != STATOutputType::None ||
+          conf_info.vx_opt[i].output_flag[i_nbrcnt] != STATOutputType::None)) {
 
          // Pointer to current interpolation object
          NbrhdInfo * nbrhd = &conf_info.vx_opt[i].nbrhd_info;
@@ -1451,7 +1451,7 @@ void process_scores() {
          // Loop through and apply each of the neighborhood widths
          for(j=0; j<nbrhd->width.n(); j++) {
 
-            shc.set_interp_mthd(InterpMthd_Nbrhd, nbrhd->shape);
+            shc.set_interp_mthd(InterpMthd::Nbrhd, nbrhd->shape);
             shc.set_interp_wdth(nbrhd->width[j]);
 
             // Loop through and apply each of the raw threshold values
@@ -1486,8 +1486,8 @@ void process_scores() {
                   }
 
                   // Process the forecast data
-                  if(nbrhd->field == FieldType_Fcst ||
-                     nbrhd->field == FieldType_Both) {
+                  if(nbrhd->field == FieldType::Fcst ||
+                     nbrhd->field == FieldType::Both) {
 
                      // Compute fractional coverage field, if necessary.
                      if(fcst_dp_smooth.is_empty() ||
@@ -1526,8 +1526,8 @@ void process_scores() {
                   }
 
                   // Process the observation data
-                  if(nbrhd->field == FieldType_Obs ||
-                     nbrhd->field == FieldType_Both) {
+                  if(nbrhd->field == FieldType::Obs ||
+                     nbrhd->field == FieldType::Both) {
 
                      // Compute fractional coverage field, if necessary.
                      if(obs_dp_smooth.is_empty() ||
@@ -1569,13 +1569,13 @@ void process_scores() {
                   mask_bad_data(mask_mp, fcst_dp_smooth);
                   mask_bad_data(mask_mp, obs_dp_smooth);
 
-                  if(nbrhd->field == FieldType_Fcst ||
-                     nbrhd->field == FieldType_Both) {
+                  if(nbrhd->field == FieldType::Fcst ||
+                     nbrhd->field == FieldType::Both) {
                      mask_bad_data(mask_mp, fcst_dp_thresh);
                   }
 
-                  if(nbrhd->field == FieldType_Obs ||
-                     nbrhd->field == FieldType_Both) {
+                  if(nbrhd->field == FieldType::Obs ||
+                     nbrhd->field == FieldType::Both) {
                      mask_bad_data(mask_mp, obs_dp_thresh);
                   }
 
@@ -1611,8 +1611,8 @@ void process_scores() {
                   if(pd.f_na.n() == 0) continue;
 
                   // Compute NBRCTS scores
-                  if(conf_info.vx_opt[i].output_flag[i_nbrctc] != STATOutputType_None ||
-                     conf_info.vx_opt[i].output_flag[i_nbrcts] != STATOutputType_None) {
+                  if(conf_info.vx_opt[i].output_flag[i_nbrctc] != STATOutputType::None ||
+                     conf_info.vx_opt[i].output_flag[i_nbrcts] != STATOutputType::None) {
 
                      // Initialize
                      for(n=0; n<conf_info.vx_opt[i].get_n_cov_thresh(); n++) {
@@ -1628,7 +1628,7 @@ void process_scores() {
                         if(nbrcts_info[n].cts_info.cts.n() > 0) {
 
                            // Write out NBRCTC
-                           if(conf_info.vx_opt[i].output_flag[i_nbrctc] != STATOutputType_None) {
+                           if(conf_info.vx_opt[i].output_flag[i_nbrctc] != STATOutputType::None) {
 
                               write_nbrctc_row(shc, nbrcts_info[n],
                                  conf_info.vx_opt[i].output_flag[i_nbrctc],
@@ -1637,7 +1637,7 @@ void process_scores() {
                            }
 
                            // Write out NBRCTS
-                           if(conf_info.vx_opt[i].output_flag[i_nbrcts] != STATOutputType_None) {
+                           if(conf_info.vx_opt[i].output_flag[i_nbrcts] != STATOutputType::None) {
 
                               write_nbrcts_row(shc, nbrcts_info[n],
                                  conf_info.vx_opt[i].output_flag[i_nbrcts],
@@ -1649,7 +1649,7 @@ void process_scores() {
                   } // end compute NBRCTS
 
                   // Compute NBRCNT scores
-                  if(conf_info.vx_opt[i].output_flag[i_nbrcnt] != STATOutputType_None) {
+                  if(conf_info.vx_opt[i].output_flag[i_nbrcnt] != STATOutputType::None) {
 
                      // Initialize
                      nbrcnt_info.clear();
@@ -1658,7 +1658,7 @@ void process_scores() {
 
                      // Write out NBRCNT
                      if(nbrcnt_info.sl1l2_info.scount > 0 &&
-                        conf_info.vx_opt[i].output_flag[i_nbrcnt]) {
+                        (STATOutputType::None!=conf_info.vx_opt[i].output_flag[i_nbrcnt])) {
 
                         write_nbrcnt_row(shc, nbrcnt_info,
                            conf_info.vx_opt[i].output_flag[i_nbrcnt],
@@ -1677,12 +1677,12 @@ void process_scores() {
                } // end for m
 
                // If not computing fractional coverage, all finished with thresholds
-               if(nbrhd->field == FieldType_None) break;
+               if(nbrhd->field == FieldType::None) break;
 
             } // end for k
 
             // If not computing fractional coverage, all finished with neighborhood widths
-            if(nbrhd->field == FieldType_None) break;
+            if(nbrhd->field == FieldType::None) break;
 
          } // end for j
       } // end if
@@ -1734,7 +1734,7 @@ void process_scores() {
             cs << "-" << conf_info.vx_opt[i].wave_1d_end[j];
          }
 
-         shc.set_interp_mthd(cs, GridTemplateFactory::GridTemplate_None);
+         shc.set_interp_mthd(cs, GridTemplateFactory::GridTemplates::None);
          shc.set_interp_pnts(bad_data_int);
 
          // Loop through the masks to be applied
@@ -1775,9 +1775,9 @@ void process_scores() {
 
             // Compute CNT, SL1L2, and SAL1L2 scores
             if(!conf_info.vx_opt[i].fcst_info->is_prob() &&
-               (conf_info.vx_opt[i].output_flag[i_cnt]    != STATOutputType_None ||
-                conf_info.vx_opt[i].output_flag[i_sl1l2]  != STATOutputType_None ||
-                conf_info.vx_opt[i].output_flag[i_sal1l2] != STATOutputType_None)) {
+               (conf_info.vx_opt[i].output_flag[i_cnt]    != STATOutputType::None ||
+                conf_info.vx_opt[i].output_flag[i_sl1l2]  != STATOutputType::None ||
+                conf_info.vx_opt[i].output_flag[i_sal1l2] != STATOutputType::None)) {
                do_cnt_sl1l2(conf_info.vx_opt[i], &pd);
             }
 
@@ -1785,9 +1785,9 @@ void process_scores() {
             if(!conf_info.vx_opt[i].fcst_info->is_prob()                         &&
                 conf_info.vx_opt[i].fcst_info->is_v_wind()                       &&
                 conf_info.vx_opt[i].fcst_info->uv_index() >= 0                   &&
-               (conf_info.vx_opt[i].output_flag[i_vl1l2]  != STATOutputType_None ||
-                conf_info.vx_opt[i].output_flag[i_val1l2] != STATOutputType_None ||
-                conf_info.vx_opt[i].output_flag[i_vcnt]   != STATOutputType_None)) {
+               (conf_info.vx_opt[i].output_flag[i_vl1l2]  != STATOutputType::None ||
+                conf_info.vx_opt[i].output_flag[i_val1l2] != STATOutputType::None ||
+                conf_info.vx_opt[i].output_flag[i_vcnt]   != STATOutputType::None)) {
 
                // Store the forecast variable name
                shc.set_fcst_var(ugrd_vgrd_abbr_str);
@@ -1857,7 +1857,7 @@ void process_scores() {
                for(m=0; m<conf_info.vx_opt[i].fwind_ta.n(); m++) {
 
                   // Write out VL1L2
-                  if(conf_info.vx_opt[i].output_flag[i_vl1l2] != STATOutputType_None &&
+                  if(conf_info.vx_opt[i].output_flag[i_vl1l2] != STATOutputType::None &&
                      vl1l2_info[m].vcount > 0) {
                      write_vl1l2_row(shc, vl1l2_info[m],
                         conf_info.vx_opt[i].output_flag[i_vl1l2],
@@ -1866,7 +1866,7 @@ void process_scores() {
                   }
 
                   // Write out VAL1L2
-                  if(conf_info.vx_opt[i].output_flag[i_val1l2] != STATOutputType_None &&
+                  if(conf_info.vx_opt[i].output_flag[i_val1l2] != STATOutputType::None &&
                      vl1l2_info[m].vacount > 0) {
                      write_val1l2_row(shc, vl1l2_info[m],
                         conf_info.vx_opt[i].output_flag[i_val1l2],
@@ -1875,7 +1875,7 @@ void process_scores() {
                   }
 
                   // Write out VCNT
-                  if(conf_info.vx_opt[i].output_flag[i_vcnt] != STATOutputType_None &&
+                  if(conf_info.vx_opt[i].output_flag[i_vcnt] != STATOutputType::None &&
                      vl1l2_info[m].vcount > 0) {
                      write_vcnt_row(shc, vl1l2_info[m],
                         conf_info.vx_opt[i].output_flag[i_vcnt],
@@ -1901,18 +1901,18 @@ void process_scores() {
             // Write out the data fields if requested in the config file
             if(conf_info.vx_opt[i].nc_info.do_raw) {
                write_nc((string)"FCST", fcst_dp_smooth, i, shc.get_interp_mthd(),
-                        bad_data_int,  FieldType_Both);
+                        bad_data_int,  FieldType::Both);
                write_nc((string)"OBS",  obs_dp_smooth, i, shc.get_interp_mthd(),
-                        bad_data_int, FieldType_Both);
+                        bad_data_int, FieldType::Both);
             }
             if(conf_info.vx_opt[i].nc_info.do_diff) {
                write_nc((string)"DIFF", subtract(fcst_dp_smooth, obs_dp_smooth),
                         i, shc.get_interp_mthd(), bad_data_int,
-                        FieldType_Both);
+                        FieldType::Both);
             }
             if(conf_info.vx_opt[i].nc_info.do_climo && !cmn_dp_smooth.is_empty()) {
                write_nc((string)"CLIMO_MEAN", cmn_dp_smooth, i, shc.get_interp_mthd(),
-                        bad_data_int,  FieldType_Both);
+                        bad_data_int,  FieldType::Both);
             }
          } // end if
 
@@ -1995,11 +1995,11 @@ void do_cts(CTSInfo *&cts_info, int i_vx,
    // Compute the counts, stats, normal confidence intervals, and
    // bootstrap confidence intervals
    //
-   if(conf_info.vx_opt[i_vx].boot_info.interval == BootIntervalType_BCA) {
+   if(conf_info.vx_opt[i_vx].boot_info.interval == BootIntervalType::BCA) {
       compute_cts_stats_ci_bca(rng_ptr, *pd_ptr,
          conf_info.vx_opt[i_vx].boot_info.n_rep,
          cts_info, n_cts,
-         conf_info.vx_opt[i_vx].output_flag[i_cts] != STATOutputType_None,
+         conf_info.vx_opt[i_vx].output_flag[i_cts] != STATOutputType::None,
          conf_info.vx_opt[i_vx].rank_corr_flag, conf_info.tmp_dir.c_str());
    }
    else {
@@ -2007,7 +2007,7 @@ void do_cts(CTSInfo *&cts_info, int i_vx,
          conf_info.vx_opt[i_vx].boot_info.n_rep,
          conf_info.vx_opt[i_vx].boot_info.rep_prop,
          cts_info, n_cts,
-         conf_info.vx_opt[i_vx].output_flag[i_cts] != STATOutputType_None,
+         conf_info.vx_opt[i_vx].output_flag[i_cts] != STATOutputType::None,
          conf_info.vx_opt[i_vx].rank_corr_flag, conf_info.tmp_dir.c_str());
    }
 
@@ -2044,11 +2044,11 @@ void do_mcts(MCTSInfo &mcts_info, int i_vx,
    // Compute the counts, stats, normal confidence intervals, and
    // bootstrap confidence intervals
    //
-   if(conf_info.vx_opt[i_vx].boot_info.interval == BootIntervalType_BCA) {
+   if(conf_info.vx_opt[i_vx].boot_info.interval == BootIntervalType::BCA) {
       compute_mcts_stats_ci_bca(rng_ptr, *pd_ptr,
          conf_info.vx_opt[i_vx].boot_info.n_rep,
          mcts_info,
-         conf_info.vx_opt[i_vx].output_flag[i_mcts] != STATOutputType_None,
+         conf_info.vx_opt[i_vx].output_flag[i_mcts] != STATOutputType::None,
          conf_info.vx_opt[i_vx].rank_corr_flag, conf_info.tmp_dir.c_str());
    }
    else {
@@ -2056,7 +2056,7 @@ void do_mcts(MCTSInfo &mcts_info, int i_vx,
          conf_info.vx_opt[i_vx].boot_info.n_rep,
          conf_info.vx_opt[i_vx].boot_info.rep_prop,
          mcts_info,
-         conf_info.vx_opt[i_vx].output_flag[i_mcts] != STATOutputType_None,
+         conf_info.vx_opt[i_vx].output_flag[i_mcts] != STATOutputType::None,
          conf_info.vx_opt[i_vx].rank_corr_flag, conf_info.tmp_dir.c_str());
    }
 
@@ -2085,9 +2085,9 @@ void do_cnt_sl1l2(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
    }
 
    // Set flags
-   bool do_sl1l2    = (vx_opt.output_flag[i_sl1l2]  != STATOutputType_None ||
-                       vx_opt.output_flag[i_sal1l2] != STATOutputType_None);
-   bool do_cnt      = (vx_opt.output_flag[i_cnt]    != STATOutputType_None);
+   bool do_sl1l2    = (vx_opt.output_flag[i_sl1l2]  != STATOutputType::None ||
+                       vx_opt.output_flag[i_sal1l2] != STATOutputType::None);
+   bool do_cnt      = (vx_opt.output_flag[i_cnt]    != STATOutputType::None);
    bool precip_flag = (vx_opt.fcst_info->is_precipitation() &&
                        vx_opt.obs_info->is_precipitation());
 
@@ -2134,7 +2134,7 @@ void do_cnt_sl1l2(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
 
             // Write out SL1L2
             if((n_bin == 1 || vx_opt.cdf_info.write_bins) &&
-               vx_opt.output_flag[i_sl1l2] != STATOutputType_None &&
+               vx_opt.output_flag[i_sl1l2] != STATOutputType::None &&
                sl1l2_info[j].scount > 0) {
 
                write_sl1l2_row(shc, sl1l2_info[j],
@@ -2145,7 +2145,7 @@ void do_cnt_sl1l2(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
 
             // Write out SAL1L2
             if((n_bin == 1 || vx_opt.cdf_info.write_bins) &&
-               vx_opt.output_flag[i_sal1l2] != STATOutputType_None &&
+               vx_opt.output_flag[i_sal1l2] != STATOutputType::None &&
                sl1l2_info[j].sacount > 0) {
 
                write_sal1l2_row(shc, sl1l2_info[j],
@@ -2171,7 +2171,7 @@ void do_cnt_sl1l2(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
 
             // Compute the stats, normal confidence intervals, and
             // bootstrap confidence intervals
-            if(vx_opt.boot_info.interval == BootIntervalType_BCA) {
+            if(vx_opt.boot_info.interval == BootIntervalType::BCA) {
                compute_cnt_stats_ci_bca(rng_ptr, pd,
                   precip_flag, vx_opt.rank_corr_flag,
                   vx_opt.boot_info.n_rep,
@@ -2187,7 +2187,7 @@ void do_cnt_sl1l2(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
 
             // Write out CNT
             if((n_bin == 1 || vx_opt.cdf_info.write_bins) &&
-               vx_opt.output_flag[i_cnt] != STATOutputType_None &&
+               vx_opt.output_flag[i_cnt] != STATOutputType::None &&
                cnt_info[j].n > 0) {
 
                write_cnt_row(shc, cnt_info[j],
@@ -2201,14 +2201,14 @@ void do_cnt_sl1l2(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
       if(n_bin > 1) {
 
          // Compute SL1L2 climo CDF bin means
-         if(vx_opt.output_flag[i_sl1l2]  != STATOutputType_None ||
-            vx_opt.output_flag[i_sal1l2] != STATOutputType_None) {
+         if(vx_opt.output_flag[i_sl1l2]  != STATOutputType::None ||
+            vx_opt.output_flag[i_sal1l2] != STATOutputType::None) {
 
             SL1L2Info sl1l2_mean;
             compute_sl1l2_mean(sl1l2_info, n_bin, sl1l2_mean);
 
             // Write out SL1L2
-            if(vx_opt.output_flag[i_sl1l2]  != STATOutputType_None &&
+            if(vx_opt.output_flag[i_sl1l2]  != STATOutputType::None &&
                sl1l2_mean.scount > 0) {
 
                write_sl1l2_row(shc, sl1l2_mean,
@@ -2218,7 +2218,7 @@ void do_cnt_sl1l2(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
             }
 
             // Write out SAL1L2
-            if(vx_opt.output_flag[i_sal1l2] != STATOutputType_None &&
+            if(vx_opt.output_flag[i_sal1l2] != STATOutputType::None &&
                sl1l2_mean.sacount > 0) {
 
                write_sal1l2_row(shc, sl1l2_mean,
@@ -2229,7 +2229,7 @@ void do_cnt_sl1l2(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
          }
 
          // Compute CNT climo CDF bin means
-         if(vx_opt.output_flag[i_cnt] != STATOutputType_None) {
+         if(vx_opt.output_flag[i_cnt] != STATOutputType::None) {
 
             CNTInfo cnt_mean;
             compute_cnt_mean(cnt_info, n_bin, cnt_mean);
@@ -2346,14 +2346,14 @@ void do_pct(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
          }
 
          // Compute the probabilistic counts and statistics
-         compute_pctinfo(pd, vx_opt.output_flag[i_pstd], pct_info[j]);
+         compute_pctinfo(pd, ( STATOutputType::None!=vx_opt.output_flag[i_pstd]), pct_info[j]);
 
          // Check for no matched pairs to process
          if(pd.n_obs == 0) continue;
 
          // Write out PCT
          if((n_bin == 1 || vx_opt.cdf_info.write_bins) &&
-            vx_opt.output_flag[i_pct] != STATOutputType_None) {
+            vx_opt.output_flag[i_pct] != STATOutputType::None) {
             write_pct_row(shc, pct_info[j],
                vx_opt.output_flag[i_pct],
                j, n_bin, stat_at, i_stat_row,
@@ -2362,7 +2362,7 @@ void do_pct(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
 
          // Write out PSTD
          if((n_bin == 1 || vx_opt.cdf_info.write_bins) &&
-            vx_opt.output_flag[i_pstd] != STATOutputType_None) {
+            vx_opt.output_flag[i_pstd] != STATOutputType::None) {
             write_pstd_row(shc, pct_info[j],
                vx_opt.output_flag[i_pstd],
                j, n_bin, stat_at, i_stat_row,
@@ -2371,7 +2371,7 @@ void do_pct(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
 
          // Write out PJC
          if((n_bin == 1 || vx_opt.cdf_info.write_bins) &&
-            vx_opt.output_flag[i_pjc] != STATOutputType_None) {
+            vx_opt.output_flag[i_pjc] != STATOutputType::None) {
             write_pjc_row(shc, pct_info[j],
                vx_opt.output_flag[i_pjc],
                j, n_bin, stat_at, i_stat_row,
@@ -2380,7 +2380,7 @@ void do_pct(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
 
          // Write out PRC
          if((n_bin == 1 || vx_opt.cdf_info.write_bins) &&
-            vx_opt.output_flag[i_prc] != STATOutputType_None) {
+            vx_opt.output_flag[i_prc] != STATOutputType::None) {
             write_prc_row(shc, pct_info[j],
                vx_opt.output_flag[i_prc],
                j, n_bin, stat_at, i_stat_row,
@@ -2389,7 +2389,7 @@ void do_pct(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
 
          // Write out ECLV
          if((n_bin == 1 || vx_opt.cdf_info.write_bins) &&
-            vx_opt.output_flag[i_eclv] != STATOutputType_None) {
+            vx_opt.output_flag[i_eclv] != STATOutputType::None) {
             write_eclv_row(shc, pct_info[j], vx_opt.eclv_points,
                vx_opt.output_flag[i_eclv],
                j, n_bin, stat_at, i_stat_row,
@@ -2404,7 +2404,7 @@ void do_pct(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
          compute_pct_mean(pct_info, n_bin, pct_mean);
 
          // Write out PSTD
-         if(vx_opt.output_flag[i_pstd] != STATOutputType_None) {
+         if(vx_opt.output_flag[i_pstd] != STATOutputType::None) {
             write_pstd_row(shc, pct_mean,
                vx_opt.output_flag[i_pstd],
                -1, n_bin, stat_at, i_stat_row,
@@ -2434,7 +2434,7 @@ void do_nbrcts(NBRCTSInfo *&nbrcts_info,
    n_nbrcts = conf_info.vx_opt[i_vx].get_n_cov_thresh();
    for(i=0; i<n_nbrcts; i++) {
 
-      if(field == FieldType_Fcst || field == FieldType_Both) {
+      if(field == FieldType::Fcst || field == FieldType::Both) {
          nbrcts_info[i].fthresh =
             conf_info.vx_opt[i_vx].fcat_ta[i_thresh];
       }
@@ -2442,7 +2442,7 @@ void do_nbrcts(NBRCTSInfo *&nbrcts_info,
          nbrcts_info[i].fthresh.set_na();
       }
 
-      if(field == FieldType_Obs || field == FieldType_Both) {
+      if(field == FieldType::Obs || field == FieldType::Both) {
          nbrcts_info[i].othresh =
             conf_info.vx_opt[i_vx].ocat_ta[i_thresh];
       }
@@ -2476,11 +2476,11 @@ void do_nbrcts(NBRCTSInfo *&nbrcts_info,
    // Compute the stats, normal confidence intervals, and
    // bootstrap confidence intervals
    //
-   if(conf_info.vx_opt[i_vx].boot_info.interval == BootIntervalType_BCA) {
+   if(conf_info.vx_opt[i_vx].boot_info.interval == BootIntervalType::BCA) {
       compute_nbrcts_stats_ci_bca(rng_ptr, *pd_ptr,
          conf_info.vx_opt[i_vx].boot_info.n_rep,
          nbrcts_info, n_nbrcts,
-         conf_info.vx_opt[i_vx].output_flag[i_nbrcts] != STATOutputType_None,
+         conf_info.vx_opt[i_vx].output_flag[i_nbrcts] != STATOutputType::None,
          conf_info.tmp_dir.c_str());
    }
    else {
@@ -2488,7 +2488,7 @@ void do_nbrcts(NBRCTSInfo *&nbrcts_info,
          conf_info.vx_opt[i_vx].boot_info.n_rep,
          conf_info.vx_opt[i_vx].boot_info.rep_prop,
          nbrcts_info, n_nbrcts,
-         conf_info.vx_opt[i_vx].output_flag[i_nbrcts] != STATOutputType_None,
+         conf_info.vx_opt[i_vx].output_flag[i_nbrcts] != STATOutputType::None,
          conf_info.tmp_dir.c_str());
    }
 
@@ -2507,14 +2507,14 @@ void do_nbrcnt(NBRCNTInfo &nbrcnt_info,
    //
    // Set up the NBRCNTInfo threshold and alpha values
    //
-   if(field == FieldType_Fcst || field == FieldType_Both) {
+   if(field == FieldType::Fcst || field == FieldType::Both) {
       nbrcnt_info.fthresh = conf_info.vx_opt[i_vx].fcat_ta[i_thresh];
    }
    else {
       nbrcnt_info.fthresh.set_na();
    }
 
-   if(field == FieldType_Obs || field == FieldType_Both) {
+   if(field == FieldType::Obs || field == FieldType::Both) {
       nbrcnt_info.othresh = conf_info.vx_opt[i_vx].ocat_ta[i_thresh];
    }
    else {
@@ -2537,11 +2537,11 @@ void do_nbrcnt(NBRCNTInfo &nbrcnt_info,
    // Compute the stats, normal confidence intervals, and
    // bootstrap confidence intervals
    //
-   if(conf_info.vx_opt[i_vx].boot_info.interval == BootIntervalType_BCA) {
+   if(conf_info.vx_opt[i_vx].boot_info.interval == BootIntervalType::BCA) {
       compute_nbrcnt_stats_ci_bca(rng_ptr, *pd_ptr, *pd_thr_ptr,
          conf_info.vx_opt[i_vx].boot_info.n_rep,
          nbrcnt_info,
-         conf_info.vx_opt[i_vx].output_flag[i_nbrcnt] != STATOutputType_None,
+         conf_info.vx_opt[i_vx].output_flag[i_nbrcnt] != STATOutputType::None,
          conf_info.tmp_dir.c_str());
    }
    else {
@@ -2549,7 +2549,7 @@ void do_nbrcnt(NBRCNTInfo &nbrcnt_info,
          conf_info.vx_opt[i_vx].boot_info.n_rep,
          conf_info.vx_opt[i_vx].boot_info.rep_prop,
          nbrcnt_info,
-         conf_info.vx_opt[i_vx].output_flag[i_nbrcnt] != STATOutputType_None,
+         conf_info.vx_opt[i_vx].output_flag[i_nbrcnt] != STATOutputType::None,
          conf_info.tmp_dir.c_str());
    }
 
@@ -2599,7 +2599,7 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
 
    // Append smoothing info for all but nearest neighbor
    if(interp_pnts > 1 ||
-      interp_mthd == interpmthd_to_string(InterpMthd_Gaussian)) {
+      interp_mthd == interpmthd_to_string(InterpMthd::Gaussian)) {
       interp_str << "_" << interp_mthd << "_" << interp_pnts;
    }
    // Append Fourier decomposition info
@@ -2633,8 +2633,8 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
       if(field_name == "FCST") {
          var_name  << cs_erase << field_name << "_"
                    << fcst_name << var_suffix << "_" << mask_str;
-         if(field_type == FieldType_Fcst ||
-            field_type == FieldType_Both) {
+         if(field_type == FieldType::Fcst ||
+            field_type == FieldType::Both) {
             var_name << interp_str;
          }
          long_att  = fcst_long_name;
@@ -2644,8 +2644,8 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
       else if(field_name == "OBS") {
          var_name  << cs_erase << field_name << "_"
                    << obs_name << var_suffix << "_" << mask_str;
-         if(field_type == FieldType_Obs ||
-            field_type == FieldType_Both) {
+         if(field_type == FieldType::Obs ||
+            field_type == FieldType::Both) {
             var_name << interp_str;
          }
          long_att  = obs_long_name;
@@ -2712,8 +2712,8 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
               check_reg_exp("FCST_YGRAD_", field_name.c_str())) {
          var_name  << cs_erase << field_name << "_"
                    << fcst_name << var_suffix << "_" << mask_str;
-         if(field_type == FieldType_Fcst ||
-            field_type == FieldType_Both) {
+         if(field_type == FieldType::Fcst ||
+            field_type == FieldType::Both) {
             var_name << interp_str;
          }
          long_att  << cs_erase
@@ -2726,8 +2726,8 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
               check_reg_exp("OBS_YGRAD_", field_name.c_str())) {
          var_name  << cs_erase << field_name << "_"
                    << obs_name << var_suffix << "_" << mask_str;
-         if(field_type == FieldType_Obs ||
-            field_type == FieldType_Both) {
+         if(field_type == FieldType::Obs ||
+            field_type == FieldType::Both) {
             var_name << interp_str;
          }
          long_att  << cs_erase
@@ -2739,8 +2739,8 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
       else if(check_reg_exp("FCST_DMAP_", field_name.c_str())) {
          var_name  << cs_erase << field_name << "_"
                    << fcst_name << var_suffix << "_" << mask_str;
-         if(field_type == FieldType_Fcst ||
-            field_type == FieldType_Both) {
+         if(field_type == FieldType::Fcst ||
+            field_type == FieldType::Both) {
             var_name << interp_str;
          }
          long_att  << cs_erase
@@ -2752,8 +2752,8 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
       else if(check_reg_exp("OBS_DMAP_", field_name.c_str())) {
          var_name  << cs_erase << field_name << "_"
                    << obs_name << var_suffix << "_" << mask_str;
-         if(field_type == FieldType_Obs ||
-            field_type == FieldType_Both) {
+         if(field_type == FieldType::Obs ||
+            field_type == FieldType::Both) {
             var_name << interp_str;
          }
          long_att  << cs_erase
@@ -2766,8 +2766,8 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
          ConcatString seeps_desc;
          var_name  << cs_erase << field_name << "_"
                    << obs_name << var_suffix << "_" << mask_str;
-         if(field_type == FieldType_Obs ||
-            field_type == FieldType_Both) {
+         if(field_type == FieldType::Obs ||
+            field_type == FieldType::Both) {
             var_name << interp_str;
          }
          if(strncmp(field_name.c_str(), "SEEPS_MPR_SCORE", 15) == 0)
@@ -2889,7 +2889,7 @@ void write_nbrhd_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
    NcVar obs_var;
 
    // Get the interpolation strings
-   mthd_str = interpmthd_to_string(InterpMthd_Nbrhd);
+   mthd_str = interpmthd_to_string(InterpMthd::Nbrhd);
    if(wdth > 1) nbrhd_str << "_" << mthd_str << "_" << wdth*wdth;
 
    int deflate_level = compress_level;
@@ -3049,7 +3049,7 @@ void finish_txt_files() {
    for(i=0; i<n_txt; i++) {
 
       // Only write the table if requested in the config file
-      if(conf_info.output_flag[i] == STATOutputType_Both) {
+      if(conf_info.output_flag[i] == STATOutputType::Both) {
 
          // Write the AsciiTable to a file
          if(txt_out[i]) {

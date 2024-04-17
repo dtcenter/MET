@@ -244,7 +244,7 @@ bool ProbInfoArray::add(const ATCFProbLine &l, double dland, bool check_dup) {
    // Store based on the input line type
    switch(l.type()) {
 
-      case(ATCFLineType_ProbRI):
+      case(ATCFLineType::ProbRI):
 
          // Add line to an existing entry
          if(ProbRIRW.size()  > 0 &&
@@ -260,7 +260,7 @@ bool ProbInfoArray::add(const ATCFProbLine &l, double dland, bool check_dup) {
          }
          break;
 
-      case(ATCFLineType_ProbGN):
+      case(ATCFLineType::ProbGN):
 
          // Add line to an existing entry
          if(ProbGen.size()  > 0 &&
@@ -276,14 +276,14 @@ bool ProbInfoArray::add(const ATCFProbLine &l, double dland, bool check_dup) {
             if(gi.gen_or_dis() != "genFcst") {
                mlog << Debug(4)
                     << "bool ProbInfoArray::add() -> "
-                    << "skipping ATCF " << atcflinetype_to_string(ATCFLineType_ProbGN)
+                    << "skipping ATCF " << atcflinetype_to_string(ATCFLineType::ProbGN)
                     << " line with non-genesis probability type ("
                     << gi.gen_or_dis() << " != genFcst).\n";
             }
             else if(is_bad_data(gi.lat()) || is_bad_data(gi.lon())) {
                mlog << Debug(4)
                     << "bool ProbInfoArray::add() -> "
-                    << "skipping ATCF " << atcflinetype_to_string(ATCFLineType_ProbGN)
+                    << "skipping ATCF " << atcflinetype_to_string(ATCFLineType::ProbGN)
                     << " line with no predicted genesis location.\n";
             }
             else {

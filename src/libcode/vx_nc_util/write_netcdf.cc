@@ -228,12 +228,12 @@ void write_netcdf_grid_weight(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
 
    switch(t) {
 
-      case GridWeightType_Cos_Lat:
+      case GridWeightType::Cos_Lat:
          add_att(&wgt_var, long_name_att_name, "cosine latitude grid weight");
          add_att(&wgt_var, units_att_name, "NA");
          break;
 
-      case GridWeightType_Area:
+      case GridWeightType::Area:
          add_att(&wgt_var, long_name_att_name, "true area grid weight");
          add_att(&wgt_var, units_att_name, "km^2");
          break;

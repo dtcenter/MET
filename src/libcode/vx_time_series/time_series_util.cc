@@ -27,9 +27,9 @@ using namespace std;
 TimeSeriesType string_to_timeseriestype(const char *s) {
    TimeSeriesType t;
 
-        if(strcasecmp(s, timeseriestype_dydt_str)  == 0) t = TimeSeriesType_DyDt;
-   else if(strcasecmp(s, timeseriestype_swing_str) == 0) t = TimeSeriesType_Swing;
-   else                                                  t = TimeSeriesType_None;
+        if(strcasecmp(s, timeseriestype_dydt_str)  == 0) t = TimeSeriesType::DyDt;
+   else if(strcasecmp(s, timeseriestype_swing_str) == 0) t = TimeSeriesType::Swing;
+   else                                                  t = TimeSeriesType::None;
 
    return t;
 }
@@ -40,9 +40,9 @@ const char * timeseriestype_to_string(const TimeSeriesType t) {
    const char *s = (const char *) nullptr;
 
    switch(t) {
-      case(TimeSeriesType_DyDt):  s = timeseriestype_dydt_str;  break;
-      case(TimeSeriesType_Swing): s = timeseriestype_swing_str; break;
-      default:                    s = na_str;                   break;
+      case(TimeSeriesType::DyDt):  s = timeseriestype_dydt_str;  break;
+      case(TimeSeriesType::Swing): s = timeseriestype_swing_str; break;
+      default:                     s = na_str;                   break;
    }
 
    return s;

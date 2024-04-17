@@ -17,6 +17,7 @@
 #include <set>
 #include <map>
 
+#include "enum_as_int.hpp"
 #include "engine.h"
 #include "mode_columns.h"
 #include "vx_util.h"
@@ -191,7 +192,7 @@ void ModeFuzzyEngine::init_from_scratch() {
 
    clear_features();
 
-   data_type = ModeDataType_Traditional;
+   data_type = ModeDataType::Traditional;
  
    return;
 }
@@ -248,9 +249,9 @@ void ModeFuzzyEngine::clear_colors() {
 void ModeFuzzyEngine::set(const ShapeData &fcst_wd, const ShapeData &obs_wd)
 
 {
-   if (data_type == ModeDataType_MvMode_Fcst) {
+   if (data_type == ModeDataType::MvMode_Fcst) {
       set_fcst(fcst_wd);
-   } else if (data_type == ModeDataType_MvMode_Obs) {
+   } else if (data_type == ModeDataType::MvMode_Obs) {
       set_obs(obs_wd);
    } else {
       ConcatString path;
@@ -279,9 +280,9 @@ void ModeFuzzyEngine::set(const ShapeData &fcst_wd, const ShapeData &obs_wd)
 void ModeFuzzyEngine::set_no_conv(const ShapeData &fcst_wd, const ShapeData &obs_wd)
 
 {
-   if (data_type == ModeDataType_MvMode_Fcst) {
+   if (data_type == ModeDataType::MvMode_Fcst) {
       set_fcst_no_conv(fcst_wd);
-   } else if (data_type == ModeDataType_MvMode_Obs) {
+   } else if (data_type == ModeDataType::MvMode_Obs) {
       set_obs_no_conv  ( obs_wd);
    } else {      
       ConcatString path;
@@ -310,9 +311,9 @@ void ModeFuzzyEngine::set_only_split(const ShapeData &fcst_wd, const ShapeData &
 
 {
 
-   if (data_type == ModeDataType_MvMode_Fcst) {
+   if (data_type == ModeDataType::MvMode_Fcst) {
       set_fcst_only_split (fcst_wd);
-   } else if (data_type == ModeDataType_MvMode_Obs) {
+   } else if (data_type == ModeDataType::MvMode_Obs) {
       set_obs_only_split  ( obs_wd);
    } else {
       ConcatString path;
@@ -916,12 +917,12 @@ void ModeFuzzyEngine::do_fcst_merging(const char *default_config,
 
    if(!need_fcst_merge) return;
 
-   if(conf_info.Fcst->merge_flag == MergeType_Both ||
-      conf_info.Fcst->merge_flag == MergeType_Thresh)
+   if(conf_info.Fcst->merge_flag == MergeType::Both ||
+      conf_info.Fcst->merge_flag == MergeType::Thresh)
       do_fcst_merge_thresh();
 
-   if(conf_info.Fcst->merge_flag == MergeType_Both ||
-      conf_info.Fcst->merge_flag == MergeType_Engine)
+   if(conf_info.Fcst->merge_flag == MergeType::Both ||
+      conf_info.Fcst->merge_flag == MergeType::Engine)
       do_fcst_merge_engine(default_config, merge_config);
 
    //
@@ -944,12 +945,12 @@ void ModeFuzzyEngine::do_obs_merging(const char *default_config,
 
    if(!need_obs_merge) return;
 
-   if(conf_info.Obs->merge_flag == MergeType_Both ||
-      conf_info.Obs->merge_flag == MergeType_Thresh)
+   if(conf_info.Obs->merge_flag == MergeType::Both ||
+      conf_info.Obs->merge_flag == MergeType::Thresh)
       do_obs_merge_thresh();
 
-   if(conf_info.Obs->merge_flag == MergeType_Both ||
-      conf_info.Obs->merge_flag == MergeType_Engine)
+   if(conf_info.Obs->merge_flag == MergeType::Both ||
+      conf_info.Obs->merge_flag == MergeType::Engine)
       do_obs_merge_engine(default_config, merge_config);
 
    //
@@ -978,12 +979,12 @@ void ModeFuzzyEngine::do_fcst_merging(const ShapeData &merge_data)
       exit(1);
    }
    
-   if(conf_info.Fcst->merge_flag == MergeType_Both ||
-      conf_info.Fcst->merge_flag == MergeType_Thresh)
+   if(conf_info.Fcst->merge_flag == MergeType::Both ||
+      conf_info.Fcst->merge_flag == MergeType::Thresh)
       do_fcst_merge_thresh(merge_data);
 
-   if(conf_info.Fcst->merge_flag == MergeType_Both ||
-      conf_info.Fcst->merge_flag == MergeType_Engine)
+   if(conf_info.Fcst->merge_flag == MergeType::Both ||
+      conf_info.Fcst->merge_flag == MergeType::Engine)
       do_fcst_merge_engine("", "");
 
    //
@@ -1012,12 +1013,12 @@ void ModeFuzzyEngine::do_obs_merging(const ShapeData &merge_data)
       exit(1);
    }
 
-   if(conf_info.Obs->merge_flag == MergeType_Both ||
-      conf_info.Obs->merge_flag == MergeType_Thresh)
+   if(conf_info.Obs->merge_flag == MergeType::Both ||
+      conf_info.Obs->merge_flag == MergeType::Thresh)
       do_obs_merge_thresh(merge_data);
 
-   if(conf_info.Obs->merge_flag == MergeType_Both ||
-      conf_info.Obs->merge_flag == MergeType_Engine)
+   if(conf_info.Obs->merge_flag == MergeType::Both ||
+      conf_info.Obs->merge_flag == MergeType::Engine)
       do_obs_merge_engine("", "");
 
    //
@@ -1037,23 +1038,23 @@ void ModeFuzzyEngine::do_matching() {
 
    if(!need_match) return;
 
-   if(conf_info.match_flag == MatchType_None) {
+   if(conf_info.match_flag == MatchType::None) {
       mlog << Warning << "\nModeFuzzyEngine::do_matching() -> "
            << "no matching requested in configuration file\n\n";
       do_no_match();
    }
-   else if(conf_info.match_flag == MatchType_MergeBoth) {
+   else if(conf_info.match_flag == MatchType::MergeBoth) {
       do_match_merge();
    }
-   else if(conf_info.match_flag == MatchType_MergeFcst) {
+   else if(conf_info.match_flag == MatchType::MergeFcst) {
       do_match_fcst_merge();
    }
-   else if(conf_info.match_flag == MatchType_NoMerge) {
+   else if(conf_info.match_flag == MatchType::NoMerge) {
       do_match_only();
    }
    else {
       mlog << Error << "\nModeFuzzyEngine::do_matching() -> "
-           << "invalid match_flag value of " << conf_info.match_flag
+           << "invalid match_flag value of " << enum_class_as_int(conf_info.match_flag)
            << " specified.\n\n";
       exit(1);
    }
@@ -2928,9 +2929,9 @@ double interest_percentile(ModeFuzzyEngine &eng, const double p, const int flag)
    double *v = (double *) nullptr;
    NumArray fcst_na, obs_na;
 
-   if(eng.conf_info.match_flag == 0 ||
-      eng.n_fcst                    == 0 ||
-      eng.n_obs                     == 0) return 0.0;
+   if(eng.conf_info.match_flag == MatchType::None ||
+      eng.n_fcst               == 0 ||
+      eng.n_obs                == 0) return 0.0;
 
    //
    // Initialize the maximum interest value for each object to zero.
@@ -3079,7 +3080,7 @@ for (x=0; x<(grid.nx()); ++x)  {
    //
    // If no matching was requested, don't write any more
    //
-   if(eng.conf_info.match_flag == 0) return;
+   if(eng.conf_info.match_flag == MatchType::None) return;
 
    //
    // Object pairs, increment the counter within the subroutine

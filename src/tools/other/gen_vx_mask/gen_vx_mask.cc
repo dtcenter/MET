@@ -53,6 +53,7 @@
 
 #include "grib_classes.h"
 
+#include "enum_as_int.hpp"
 #include "vx_log.h"
 #include "nav.h"
 #include "vx_math.h"
@@ -82,11 +83,11 @@ int met_main(int argc, char *argv[]) {
    process_mask_file(dp_mask);
 
    // Apply combination logic if the current mask is binary
-   if(mask_type == MaskType_Poly    ||
-      mask_type == MaskType_Poly_XY ||
-      mask_type == MaskType_Shape   ||
-      mask_type == MaskType_Box     ||
-      mask_type == MaskType_Grid    ||
+   if(mask_type == MaskType::Poly    ||
+      mask_type == MaskType::Poly_XY ||
+      mask_type == MaskType::Shape   ||
+      mask_type == MaskType::Box     ||
+      mask_type == MaskType::Grid    ||
       thresh.get_type() != thresh_na) {
       dp_out = combine(dp_data, dp_mask, set_logic);
    }
@@ -155,7 +156,7 @@ void process_command_line(int argc, char **argv) {
    out_filename   = cline[2];
 
    // Check for the mask type (from -type string)
-   if(mask_type == MaskType_None) {
+   if(mask_type == MaskType::None) {
      mlog << Error << "\n" << program_name << " -> "
           << "the -type command line requirement must be set to a specific masking type!\n"
           << "\t\t   \"poly\", \"box\", \"circle\", \"track\", \"grid\", "
@@ -223,11 +224,11 @@ void process_mask_file(DataPlane &dp) {
    solar_ut = (unixtime) 0;
 
    // Process the mask file as a lat/lon polyline file
-   if(mask_type == MaskType_Poly    ||
-      mask_type == MaskType_Poly_XY ||
-      mask_type == MaskType_Box     ||
-      mask_type == MaskType_Circle  ||
-      mask_type == MaskType_Track) {
+   if(mask_type == MaskType::Poly    ||
+      mask_type == MaskType::Poly_XY ||
+      mask_type == MaskType::Box     ||
+      mask_type == MaskType::Circle  ||
+      mask_type == MaskType::Track) {
 
       poly_mask.clear();
       poly_mask.load(mask_filename.c_str());
@@ -238,7 +239,7 @@ void process_mask_file(DataPlane &dp) {
    }
 
    // Process the mask from a shapefile
-   else if(mask_type == MaskType_Shape) {
+   else if(mask_type == MaskType::Shape) {
 
       // If -shape_str was specified, find the matching records
       if(shape_str_map.size() > 0) get_shapefile_strings();
@@ -272,8 +273,8 @@ void process_mask_file(DataPlane &dp) {
    }
 
    // Nothing to do for Lat/Lon masking types
-   else if(mask_type == MaskType_Lat ||
-           mask_type == MaskType_Lon) {
+   else if(mask_type == MaskType::Lat ||
+           mask_type == MaskType::Lon) {
    }
 
    // Otherwise, process the mask file as a named grid, grid specification
@@ -282,7 +283,7 @@ void process_mask_file(DataPlane &dp) {
 
       // For the grid mask type, support named grids and grid
       // specification strings
-      if(mask_type == MaskType_Grid) {
+      if(mask_type == MaskType::Grid) {
 
          // Parse the mask file as a white-space separated string
          StringArray sa;
@@ -311,7 +312,7 @@ void process_mask_file(DataPlane &dp) {
 
          // Read the mask grid and data plane, if requested
          get_data_plane(mask_filename, mask_field_str,
-                        mask_type == MaskType_Data,
+                        mask_type == MaskType::Data,
                         dp, grid_mask);
       }
 
@@ -320,7 +321,7 @@ void process_mask_file(DataPlane &dp) {
            << " (" << grid_mask.nx() << " x " << grid_mask.ny() << ")\n";
 
       // Check for matching grids
-      if(mask_type == MaskType_Data && grid != grid_mask) {
+      if(mask_type == MaskType::Data && grid != grid_mask) {
          mlog << Error << "\nprocess_mask_file() -> "
               << "The input grid and mask grid must be identical for "
               << "\"data\" masking.\n"
@@ -333,7 +334,7 @@ void process_mask_file(DataPlane &dp) {
    // For solar masking, parse the valid time from gridded data
    if(is_solar_masktype(mask_type) && solar_ut == (unixtime) 0) {
 
-      if(mask_field_str.length() == 0) {
+      if(mask_field_str.empty()) {
          mlog << Error << "\nprocess_mask_file() -> "
               << "use \"-mask_field\" to specify the data whose valid "
               << "time should be used for \"solar_alt\" and "
@@ -348,7 +349,7 @@ void process_mask_file(DataPlane &dp) {
    }
 
    // Check that mask_field has been set for data masking
-   if(mask_type == MaskType_Data && mask_field_str.length() == 0) {
+   if(mask_type == MaskType::Data && mask_field_str.empty()) {
       mlog << Error << "\nprocess_mask_file() -> "
            << "use \"-mask_field\" to specify the field for "
            << "\"data\" masking.\n\n";
@@ -361,51 +362,51 @@ void process_mask_file(DataPlane &dp) {
    // Construct the mask
    switch(mask_type) {
 
-      case MaskType_Poly:
+      case MaskType::Poly:
          apply_poly_mask(dp);
          break;
 
-      case MaskType_Poly_XY:
+      case MaskType::Poly_XY:
          apply_poly_xy_mask(dp);
          break;
 
-      case MaskType_Box:
+      case MaskType::Box:
          apply_box_mask(dp);
          break;
 
-      case MaskType_Circle:
+      case MaskType::Circle:
          apply_circle_mask(dp);
          break;
 
-      case MaskType_Track:
+      case MaskType::Track:
          apply_track_mask(dp);
          break;
 
-      case MaskType_Grid:
+      case MaskType::Grid:
          apply_grid_mask(dp);
          break;
 
-      case MaskType_Data:
+      case MaskType::Data:
          apply_data_mask(dp);
          break;
 
-      case MaskType_Solar_Alt:
-      case MaskType_Solar_Azi:
+      case MaskType::Solar_Alt:
+      case MaskType::Solar_Azi:
          apply_solar_mask(dp);
          break;
 
-      case MaskType_Lat:
-      case MaskType_Lon:
+      case MaskType::Lat:
+      case MaskType::Lon:
          apply_lat_lon_mask(dp);
          break;
 
-      case MaskType_Shape:
+      case MaskType::Shape:
          apply_shape_mask(dp);
          break;
 
       default:
          mlog << Error << "\nprocess_mask_file() -> "
-              << "Unxpected MaskType value (" << mask_type << ")\n\n";
+              << "Unxpected MaskType value (" << enum_class_as_int(mask_type) << ")\n\n";
          exit(1);
    }
 
@@ -1135,7 +1136,7 @@ void apply_solar_mask(DataPlane &dp) {
 
          // Compute the solar altitude and azimuth
          solar_altaz(solar_ut, lat, lon, alt, azi);
-         v = (mask_type == MaskType_Solar_Alt ? alt : azi);
+         v = (mask_type == MaskType::Solar_Alt ? alt : azi);
 
          // Apply threshold, if specified
          if(thresh.get_type() != thresh_na) {
@@ -1162,7 +1163,7 @@ void apply_solar_mask(DataPlane &dp) {
            << masktype_to_string(mask_type) << " mask.\n";
    }
 
-   const char *mask_str = (mask_type == MaskType_Solar_Alt ?
+   const char *mask_str = (mask_type == MaskType::Solar_Alt ?
                            "Altitude" : "Azimuth");
 
    // List the number of points inside the mask
@@ -1205,7 +1206,7 @@ void apply_lat_lon_mask(DataPlane &dp) {
 
          // Lat/Lon value for the current grid point
          grid.xy_to_latlon(x, y, lat, lon);
-         v = (mask_type == MaskType_Lat ? lat :
+         v = (mask_type == MaskType::Lat ? lat :
               rescale_deg(-1.0*lon, -180.0, 180.0));
 
          // Apply threshold, if specified
@@ -1233,7 +1234,7 @@ void apply_lat_lon_mask(DataPlane &dp) {
            << masktype_to_string(mask_type) << " mask.\n";
    }
 
-   const char *mask_str = (mask_type == MaskType_Lat ?
+   const char *mask_str = (mask_type == MaskType::Lat ?
                            "Latitude" : "Longitude");
 
    // List the number of points inside the mask
@@ -1347,17 +1348,17 @@ DataPlane combine(const DataPlane &dp_data, const DataPlane &dp_mask,
 
          switch(logic) {
 
-            case SetLogic_Union:
+            case SetLogic::Union:
                if(v_data || v_mask) v = mask_val;
                else                 v = 0.0;
                break;
 
-            case SetLogic_Intersection:
+            case SetLogic::Intersection:
                if(v_data && v_mask) v = mask_val;
                else                 v = 0.0;
                break;
 
-            case SetLogic_SymDiff:
+            case SetLogic::SymDiff:
                if((v_data && !v_mask) || (!v_data && v_mask)) v = mask_val;
                else                                           v = 0.0;
                break;
@@ -1380,10 +1381,10 @@ DataPlane combine(const DataPlane &dp_data, const DataPlane &dp_mask,
    } // end for x
 
    // List the number of points inside the mask
-   if(logic != SetLogic_None) {
+   if(logic != SetLogic::None) {
       mlog << Debug(3)
            << "Mask " << setlogic_to_string(logic)
-	   << (logic == SetLogic_Intersection ? ":\t" : ":\t\t")
+	   << (logic == SetLogic::Intersection ? ":\t" : ":\t\t")
            << n_in << " of " << grid.nx() * grid.ny()
 	   << " points inside\n";
    }
@@ -1426,10 +1427,10 @@ void write_netcdf(const DataPlane &dp) {
 
    // Set the mask_name, if not already set
    if(mask_name.length() == 0) {
-      if(mask_type == MaskType_Poly    ||
-         mask_type == MaskType_Poly_XY ||
-         mask_type == MaskType_Circle  ||
-         mask_type == MaskType_Track) {
+      if(mask_type == MaskType::Poly    ||
+         mask_type == MaskType::Poly_XY ||
+         mask_type == MaskType::Circle  ||
+         mask_type == MaskType::Track) {
          mask_name = poly_mask.name();
       }
       else {
@@ -1495,26 +1496,26 @@ void write_netcdf(const DataPlane &dp) {
 ////////////////////////////////////////////////////////////////////////
 
 bool is_solar_masktype(MaskType t) {
-   return(t == MaskType_Solar_Alt || t == MaskType_Solar_Azi);
+   return(t == MaskType::Solar_Alt || t == MaskType::Solar_Azi);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 MaskType string_to_masktype(const char *s) {
-   MaskType t = MaskType_None;
+   MaskType t = MaskType::None;
 
-        if(strcasecmp(s, "poly")      == 0) t = MaskType_Poly;
-   else if(strcasecmp(s, "poly_xy")   == 0) t = MaskType_Poly_XY;
-   else if(strcasecmp(s, "box")       == 0) t = MaskType_Box;
-   else if(strcasecmp(s, "circle")    == 0) t = MaskType_Circle;
-   else if(strcasecmp(s, "track")     == 0) t = MaskType_Track;
-   else if(strcasecmp(s, "grid")      == 0) t = MaskType_Grid;
-   else if(strcasecmp(s, "data")      == 0) t = MaskType_Data;
-   else if(strcasecmp(s, "solar_alt") == 0) t = MaskType_Solar_Alt;
-   else if(strcasecmp(s, "solar_azi") == 0) t = MaskType_Solar_Azi;
-   else if(strcasecmp(s, "lat")       == 0) t = MaskType_Lat;
-   else if(strcasecmp(s, "lon")       == 0) t = MaskType_Lon;
-   else if(strcasecmp(s, "shape")     == 0) t = MaskType_Shape;
+        if(strcasecmp(s, "poly")      == 0) t = MaskType::Poly;
+   else if(strcasecmp(s, "poly_xy")   == 0) t = MaskType::Poly_XY;
+   else if(strcasecmp(s, "box")       == 0) t = MaskType::Box;
+   else if(strcasecmp(s, "circle")    == 0) t = MaskType::Circle;
+   else if(strcasecmp(s, "track")     == 0) t = MaskType::Track;
+   else if(strcasecmp(s, "grid")      == 0) t = MaskType::Grid;
+   else if(strcasecmp(s, "data")      == 0) t = MaskType::Data;
+   else if(strcasecmp(s, "solar_alt") == 0) t = MaskType::Solar_Alt;
+   else if(strcasecmp(s, "solar_azi") == 0) t = MaskType::Solar_Azi;
+   else if(strcasecmp(s, "lat")       == 0) t = MaskType::Lat;
+   else if(strcasecmp(s, "lon")       == 0) t = MaskType::Lon;
+   else if(strcasecmp(s, "shape")     == 0) t = MaskType::Shape;
    else {
       mlog << Error << "\nstring_to_masktype() -> "
            << "unsupported masking type \"" << s << "\"\n\n";
@@ -1530,19 +1531,19 @@ const char * masktype_to_string(const MaskType t) {
    const char *s = (const char *) nullptr;
 
    switch(t) {
-      case MaskType_Poly:      s = "poly";           break;
-      case MaskType_Poly_XY:   s = "poly_xy";        break;
-      case MaskType_Box:       s = "box";            break;
-      case MaskType_Circle:    s = "circle";         break;
-      case MaskType_Track:     s = "track";          break;
-      case MaskType_Grid:      s = "grid";           break;
-      case MaskType_Data:      s = "data";           break;
-      case MaskType_Solar_Alt: s = "solar_alt";      break;
-      case MaskType_Solar_Azi: s = "solar_azi";      break;
-      case MaskType_Lat:       s = "lat";            break;
-      case MaskType_Lon:       s = "lon";            break;
-      case MaskType_Shape:     s = "shape";          break;
-      case MaskType_None:      s = na_str;           break;
+      case MaskType::Poly:      s = "poly";           break;
+      case MaskType::Poly_XY:   s = "poly_xy";        break;
+      case MaskType::Box:       s = "box";            break;
+      case MaskType::Circle:    s = "circle";         break;
+      case MaskType::Track:     s = "track";          break;
+      case MaskType::Grid:      s = "grid";           break;
+      case MaskType::Data:      s = "data";           break;
+      case MaskType::Solar_Alt: s = "solar_alt";      break;
+      case MaskType::Solar_Azi: s = "solar_azi";      break;
+      case MaskType::Lat:       s = "lat";            break;
+      case MaskType::Lon:       s = "lon";            break;
+      case MaskType::Shape:     s = "shape";          break;
+      case MaskType::None:      s = na_str;           break;
       default:                 s = (const char *) nullptr; break;
    }
 
@@ -1703,19 +1704,19 @@ void set_complement(const StringArray & a) {
 ////////////////////////////////////////////////////////////////////////
 
 void set_union(const StringArray & a) {
-   set_logic = SetLogic_Union;
+   set_logic = SetLogic::Union;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void set_intersection(const StringArray & a) {
-   set_logic = SetLogic_Intersection;
+   set_logic = SetLogic::Intersection;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void set_symdiff(const StringArray & a) {
-   set_logic = SetLogic_SymDiff;
+   set_logic = SetLogic::SymDiff;
 }
 
 ////////////////////////////////////////////////////////////////////////

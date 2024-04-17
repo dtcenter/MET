@@ -930,7 +930,7 @@ void process_pbfile(int i_pb) {
 
    // Assume that the input PrepBufr file is unblocked.
    // Block the PrepBufr file and open it for reading.
-   pblock(file_name.c_str(), blk_file.c_str(), block);
+   pblock(file_name.c_str(), blk_file.c_str(), Action::block);
 
    // Dump the contents of the PrepBufr file to ASCII files
    if(dump_flag) {
@@ -2140,7 +2140,7 @@ void process_pbfile_metadata(int i_pb) {
 
    // Assume that the input PrepBufr file is unblocked.
    // Block the PrepBufr file and open it for reading.
-   pblock(file_name.c_str(), blk_file.c_str(), block);
+   pblock(file_name.c_str(), blk_file.c_str(), Action::block);
 
    unit = dump_unit + i_pb + file_unit;
    if (unit > MAX_FORTRAN_FILE_ID || unit < MIN_FORTRAN_FILE_ID) {

@@ -146,7 +146,7 @@ void ATCFLineBase::clear() {
    // Do not reset pointers:
    // BasinMap, BestTechnique, OperTechnique, TechSuffix
 
-   Type = NoATCFLineType;
+   Type = ATCFLineType::None;
    Basin.clear();
    Technique.clear();
    IsBestTrack = false;
@@ -210,14 +210,14 @@ ConcatString ATCFLineBase::get_item(int i) const {
    ConcatString cs;
    int i_col = i;
 
-   // For ATCFLineType_GenTrack:
+   // For ATCFLineType::GenTrack:
    //    Columns 1 and 2 are consistent:
    //       Use offsets 0 and 1
    //    Column 3 for is an EXTRA column for this line type:
    //       Add special handling in storm_id()
-   //    Columns 4-20 are the same as columns 3-19 of ATCFLineType_Track:
+   //    Columns 4-20 are the same as columns 3-19 of ATCFLineType::Track:
    //       Shift those column indices by 1.
-   if(Type == ATCFLineType_GenTrack && i >= 2 && i <= 18) i_col++;
+   if(Type == ATCFLineType::GenTrack && i >= 2 && i <= 18) i_col++;
 
    cs = DataLine::get_item(i_col);
 
@@ -361,9 +361,9 @@ int ATCFLineBase::lead() const {
 ConcatString ATCFLineBase::storm_id() const {
    ConcatString cs;
 
-   // For ATCFLineType_GenTrack, use the contents of the extra 3rd column
+   // For ATCFLineType::GenTrack, use the contents of the extra 3rd column
    // Call DataLine::get_item() to avoid the column shifting logic
-   if(Type == ATCFLineType_GenTrack) {
+   if(Type == ATCFLineType::GenTrack) {
       cs = DataLine::get_item(GenStormIdOffset);
    }
    else {
@@ -481,21 +481,21 @@ int parse_int_check_zero(const char *s) {
 ATCFLineType string_to_atcflinetype(const char *s) {
    ATCFLineType t;
 
-        if(!s)                       t = NoATCFLineType;
+        if(!s)                       t = ATCFLineType::None;
    // YYYYMMDDHH in the 4th column for Genesis Tracks
-   else if(is_yyyymmddhh(s))         t = ATCFLineType_GenTrack;
-   else if(is_number(s))             t = ATCFLineType_Track;  // ADECK
-   else if(m_strlen(s) == 0)         t = ATCFLineType_Track;  // BDECK
-   else if(strcasecmp(s, "TR") == 0) t = ATCFLineType_ProbTR;
-   else if(strcasecmp(s, "IN") == 0) t = ATCFLineType_ProbIN;
-   else if(strcasecmp(s, "RI") == 0) t = ATCFLineType_ProbRI;
-   else if(strcasecmp(s, "RW") == 0) t = ATCFLineType_ProbRW;
-   else if(strcasecmp(s, "WR") == 0) t = ATCFLineType_ProbWR;
-   else if(strcasecmp(s, "PR") == 0) t = ATCFLineType_ProbPR;
-   else if(strcasecmp(s, "GN") == 0) t = ATCFLineType_ProbGN;
-   else if(strcasecmp(s, "GS") == 0) t = ATCFLineType_ProbGS;
-   else if(strcasecmp(s, "ER") == 0) t = ATCFLineType_ProbER;
-   else                              t = NoATCFLineType;
+   else if(is_yyyymmddhh(s))         t = ATCFLineType::GenTrack;
+   else if(is_number(s))             t = ATCFLineType::Track;  // ADECK
+   else if(m_strlen(s) == 0)         t = ATCFLineType::Track;  // BDECK
+   else if(strcasecmp(s, "TR") == 0) t = ATCFLineType::ProbTR;
+   else if(strcasecmp(s, "IN") == 0) t = ATCFLineType::ProbIN;
+   else if(strcasecmp(s, "RI") == 0) t = ATCFLineType::ProbRI;
+   else if(strcasecmp(s, "RW") == 0) t = ATCFLineType::ProbRW;
+   else if(strcasecmp(s, "WR") == 0) t = ATCFLineType::ProbWR;
+   else if(strcasecmp(s, "PR") == 0) t = ATCFLineType::ProbPR;
+   else if(strcasecmp(s, "GN") == 0) t = ATCFLineType::ProbGN;
+   else if(strcasecmp(s, "GS") == 0) t = ATCFLineType::ProbGS;
+   else if(strcasecmp(s, "ER") == 0) t = ATCFLineType::ProbER;
+   else                              t = ATCFLineType::None;
 
    return t;
 }
@@ -506,19 +506,19 @@ ConcatString atcflinetype_to_string(const ATCFLineType t) {
    const char *s = (const char *) nullptr;
 
    switch(t) {
-      case ATCFLineType_Track:    s = "Track";    break;
-      case ATCFLineType_GenTrack: s = "GenTrack"; break;
-      case ATCFLineType_ProbTR:   s = "ProbTR";   break;
-      case ATCFLineType_ProbIN:   s = "ProbIN";   break;
-      case ATCFLineType_ProbRI:   s = "ProbRI";   break;
-      case ATCFLineType_ProbRW:   s = "ProbRW";   break;
-      case ATCFLineType_ProbWR:   s = "ProbWR";   break;
-      case ATCFLineType_ProbPR:   s = "ProbPR";   break;
-      case ATCFLineType_ProbGN:   s = "ProbGN";   break;
-      case ATCFLineType_ProbGS:   s = "ProbGS";   break;
-      case ATCFLineType_ProbER:   s = "ProbER";   break;
-      case NoATCFLineType:        s = na_str;     break;
-      default:                    s = na_str;     break;
+      case ATCFLineType::Track:    s = "Track";    break;
+      case ATCFLineType::GenTrack: s = "GenTrack"; break;
+      case ATCFLineType::ProbTR:   s = "ProbTR";   break;
+      case ATCFLineType::ProbIN:   s = "ProbIN";   break;
+      case ATCFLineType::ProbRI:   s = "ProbRI";   break;
+      case ATCFLineType::ProbRW:   s = "ProbRW";   break;
+      case ATCFLineType::ProbWR:   s = "ProbWR";   break;
+      case ATCFLineType::ProbPR:   s = "ProbPR";   break;
+      case ATCFLineType::ProbGN:   s = "ProbGN";   break;
+      case ATCFLineType::ProbGS:   s = "ProbGS";   break;
+      case ATCFLineType::ProbER:   s = "ProbER";   break;
+      case ATCFLineType::None:     s = na_str;     break;
+      default:                     s = na_str;     break;
    }
 
    return ConcatString(s);

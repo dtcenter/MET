@@ -91,7 +91,7 @@ void MtdConfigInfo::clear()
    do_2d_att_ascii = true;
    do_3d_att_ascii = true;
 
-   mask_missing_flag = FieldType_None;
+   mask_missing_flag = FieldType::None;
 
    fcst_conv_radius = bad_data_int;
    obs_conv_radius = bad_data_int;
@@ -111,18 +111,18 @@ void MtdConfigInfo::clear()
    fcst_merge_thresh.clear();
    obs_merge_thresh.clear();
 
-   fcst_merge_flag = MergeType_None;
-   obs_merge_flag = MergeType_None;
+   fcst_merge_flag = MergeType::None;
+   obs_merge_flag = MergeType::None;
 
-   match_flag = MatchType_None;
+   match_flag = MatchType::None;
 
    max_centroid_dist = bad_data_double;
 
    mask_grid_name.clear();
-   mask_grid_flag = FieldType_None;
+   mask_grid_flag = FieldType::None;
 
    mask_poly_name.clear();
-   mask_poly_flag = FieldType_None;
+   mask_poly_flag = FieldType::None;
 
    space_centroid_dist_wt = bad_data_double;
    time_centroid_delta_wt = bad_data_double;
@@ -375,8 +375,8 @@ void MtdConfigInfo::process_config(GrdFileType ftype, GrdFileType otype)
 
       // Check that match_flag is set between 0 and 3
 /*
-   if(match_flag == MatchType_None &&
-      (fcst_merge_flag != MergeType_None || obs_merge_flag  != MergeType_None) ) {
+   if(match_flag == MatchType::None &&
+      (fcst_merge_flag != MergeType::None || obs_merge_flag  != MergeType::None) ) {
       mlog << Warning << "\nMtdConfigInfo::process_config() -> "
            << "When matching is disabled (match_flag = "
            << matchtype_to_string(match_flag)
@@ -458,7 +458,7 @@ void MtdConfigInfo::process_config(GrdFileType ftype, GrdFileType otype)
          + start_time_delta_wt
          + end_time_delta_wt;
 
-   if(match_flag != MatchType_None &&
+   if(match_flag != MatchType::None &&
       is_eq( sum, 0.0)) {
       mlog << Error << "\nMtdConfigInfo::process_config() -> "
            << "When matching is requested, the sum of the fuzzy engine "

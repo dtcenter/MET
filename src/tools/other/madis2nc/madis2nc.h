@@ -47,24 +47,24 @@
 
 
 // Enumeration of possible MADIS observation types
-enum MadisType {
-  madis_none,
-  madis_coop,
-  madis_HDW,
-  madis_HDW1h,
-  madis_hydro,
-  madis_POES,
-  madis_acars,
-  madis_acarsProfiles,
-  madis_maritime,
-  madis_metar,
-  madis_mesonet,
-  madis_profiler,
-  madis_radiometer,
-  madis_raob,
-  madis_sao,
-  madis_satrad,
-  madis_snow
+enum class MadisType {
+  none,
+  coop,
+  HDW,
+  HDW1h,
+  hydro,
+  POES,
+  acars,
+  acarsProfiles,
+  maritime,
+  metar,
+  mesonet,
+  profiler,
+  radiometer,
+  raob,
+  sao,
+  satrad,
+  snow
 };
 
 // Constants
@@ -103,7 +103,7 @@ static const char *in_recNum_str        = "recNum";
 
 static ConcatString mdfile;
 static ConcatString ncfile;
-static MadisType    mtype = madis_none;
+static MadisType    mtype = MadisType::none;
 static StringArray  qc_dd_sa;
 static StringArray  lvl_dim_sa;
 static int          rec_beg = 0;

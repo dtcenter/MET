@@ -91,7 +91,7 @@ void StatHdrColumns::clear() {
    obs_thresh.clear();
    cov_thresh.clear();
 
-   thresh_logic = SetLogic_None;
+   thresh_logic = SetLogic::None;
 
    return;
 }
@@ -221,7 +221,7 @@ void StatHdrColumns::set_interp_mthd(ConcatString s,
    ConcatString mthd = s;
 
    // Only append the interpolation shape when applicable
-   if(shape != GridTemplateFactory::GridTemplate_None &&
+   if(shape != GridTemplateFactory::GridTemplates::None &&
       mthd  != interpmthd_none_str        &&
       mthd  != interpmthd_bilin_str       &&
       mthd  != interpmthd_nearest_str     &&
@@ -346,7 +346,7 @@ ConcatString StatHdrColumns::get_fcst_thresh_str() const {
    // Append thresh_logic symbol
    if(fcst_thresh.n_elements() == 1 &&
       obs_thresh.n_elements()  == 1 &&
-      thresh_logic != SetLogic_None) {
+      thresh_logic != SetLogic::None) {
 
       if(fcst_thresh[0].get_type() != thresh_na &&
           obs_thresh[0].get_type() != thresh_na) {

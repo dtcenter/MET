@@ -110,8 +110,8 @@ am__ascii2nc_SOURCES_DIST = ascii2nc.cc ascii2nc_conf_info.cc \
 	airnow_handler.h ndbc_handler.cc ndbc_handler.h \
 	ndbc_locations.cc ndbc_locations.h airnow_locations.cc \
 	airnow_locations.h aeronet_handler.cc aeronet_handler.h \
-	ismn_handler.cc ismn_handler.h python_handler.h \
-	python_handler.cc
+	ismn_handler.cc ismn_handler.h iabp_handler.cc iabp_handler.h \
+	python_handler.h python_handler.cc
 @ENABLE_PYTHON_TRUE@am__objects_1 = ascii2nc-python_handler.$(OBJEXT)
 am__objects_2 = $(am__objects_1)
 am_ascii2nc_OBJECTS = ascii2nc-ascii2nc.$(OBJEXT) \
@@ -126,7 +126,8 @@ am_ascii2nc_OBJECTS = ascii2nc-ascii2nc.$(OBJEXT) \
 	ascii2nc-ndbc_locations.$(OBJEXT) \
 	ascii2nc-airnow_locations.$(OBJEXT) \
 	ascii2nc-aeronet_handler.$(OBJEXT) \
-	ascii2nc-ismn_handler.$(OBJEXT) $(am__objects_2)
+	ascii2nc-ismn_handler.$(OBJEXT) \
+	ascii2nc-iabp_handler.$(OBJEXT) $(am__objects_2)
 ascii2nc_OBJECTS = $(am_ascii2nc_OBJECTS)
 am__DEPENDENCIES_1 =
 ascii2nc_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
@@ -155,6 +156,7 @@ am__depfiles_remade = ./$(DEPDIR)/ascii2nc-aeronet_handler.Po \
 	./$(DEPDIR)/ascii2nc-ascii2nc.Po \
 	./$(DEPDIR)/ascii2nc-ascii2nc_conf_info.Po \
 	./$(DEPDIR)/ascii2nc-file_handler.Po \
+	./$(DEPDIR)/ascii2nc-iabp_handler.Po \
 	./$(DEPDIR)/ascii2nc-ismn_handler.Po \
 	./$(DEPDIR)/ascii2nc-little_r_handler.Po \
 	./$(DEPDIR)/ascii2nc-met_handler.Po \
@@ -392,6 +394,7 @@ ascii2nc_SOURCES = ascii2nc.cc \
 	airnow_locations.cc airnow_locations.h \
 	aeronet_handler.cc aeronet_handler.h \
 	ismn_handler.cc ismn_handler.h \
+	iabp_handler.cc iabp_handler.h \
 	$(OPT_PYTHON_SOURCES)
 
 ascii2nc_CPPFLAGS = ${MET_CPPFLAGS} -I../../../basic/vx_log
@@ -519,6 +522,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ascii2nc-ascii2nc.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ascii2nc-ascii2nc_conf_info.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ascii2nc-file_handler.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ascii2nc-iabp_handler.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ascii2nc-ismn_handler.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ascii2nc-little_r_handler.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ascii2nc-met_handler.Po@am__quote@ # am--include-marker
@@ -730,6 +734,20 @@ ascii2nc-ismn_handler.obj: ismn_handler.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(ascii2nc_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ascii2nc-ismn_handler.obj `if test -f 'ismn_handler.cc'; then $(CYGPATH_W) 'ismn_handler.cc'; else $(CYGPATH_W) '$(srcdir)/ismn_handler.cc'; fi`
 
+ascii2nc-iabp_handler.o: iabp_handler.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(ascii2nc_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ascii2nc-iabp_handler.o -MD -MP -MF $(DEPDIR)/ascii2nc-iabp_handler.Tpo -c -o ascii2nc-iabp_handler.o `test -f 'iabp_handler.cc' || echo '$(srcdir)/'`iabp_handler.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/ascii2nc-iabp_handler.Tpo $(DEPDIR)/ascii2nc-iabp_handler.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='iabp_handler.cc' object='ascii2nc-iabp_handler.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(ascii2nc_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ascii2nc-iabp_handler.o `test -f 'iabp_handler.cc' || echo '$(srcdir)/'`iabp_handler.cc
+
+ascii2nc-iabp_handler.obj: iabp_handler.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(ascii2nc_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ascii2nc-iabp_handler.obj -MD -MP -MF $(DEPDIR)/ascii2nc-iabp_handler.Tpo -c -o ascii2nc-iabp_handler.obj `if test -f 'iabp_handler.cc'; then $(CYGPATH_W) 'iabp_handler.cc'; else $(CYGPATH_W) '$(srcdir)/iabp_handler.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/ascii2nc-iabp_handler.Tpo $(DEPDIR)/ascii2nc-iabp_handler.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='iabp_handler.cc' object='ascii2nc-iabp_handler.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(ascii2nc_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ascii2nc-iabp_handler.obj `if test -f 'iabp_handler.cc'; then $(CYGPATH_W) 'iabp_handler.cc'; else $(CYGPATH_W) '$(srcdir)/iabp_handler.cc'; fi`
+
 ascii2nc-python_handler.o: python_handler.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(ascii2nc_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ascii2nc-python_handler.o -MD -MP -MF $(DEPDIR)/ascii2nc-python_handler.Tpo -c -o ascii2nc-python_handler.o `test -f 'python_handler.cc' || echo '$(srcdir)/'`python_handler.cc
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/ascii2nc-python_handler.Tpo $(DEPDIR)/ascii2nc-python_handler.Po
@@ -877,6 +895,7 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/ascii2nc-ascii2nc.Po
 	-rm -f ./$(DEPDIR)/ascii2nc-ascii2nc_conf_info.Po
 	-rm -f ./$(DEPDIR)/ascii2nc-file_handler.Po
+	-rm -f ./$(DEPDIR)/ascii2nc-iabp_handler.Po
 	-rm -f ./$(DEPDIR)/ascii2nc-ismn_handler.Po
 	-rm -f ./$(DEPDIR)/ascii2nc-little_r_handler.Po
 	-rm -f ./$(DEPDIR)/ascii2nc-met_handler.Po
@@ -936,6 +955,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/ascii2nc-ascii2nc.Po
 	-rm -f ./$(DEPDIR)/ascii2nc-ascii2nc_conf_info.Po
 	-rm -f ./$(DEPDIR)/ascii2nc-file_handler.Po
+	-rm -f ./$(DEPDIR)/ascii2nc-iabp_handler.Po
 	-rm -f ./$(DEPDIR)/ascii2nc-ismn_handler.Po
 	-rm -f ./$(DEPDIR)/ascii2nc-little_r_handler.Po
 	-rm -f ./$(DEPDIR)/ascii2nc-met_handler.Po

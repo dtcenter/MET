@@ -191,7 +191,7 @@ bool ProbRIRWInfo::add(const ATCFProbLine &l, double dland, bool check_dup) {
    }
 
    // Initialize the header information, if necessary
-   if(Type == NoATCFLineType) initialize(l, dland);
+   if(Type == ATCFLineType::None) initialize(l, dland);
 
    // Check for matching header information
    if(!is_match(l)) return false;

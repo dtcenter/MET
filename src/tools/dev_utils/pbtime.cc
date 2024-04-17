@@ -78,7 +78,7 @@ int met_main(int argc, char *argv[]) {
    blk_file = make_temp_file_name("/tmp/tmp_pbtime_blk", nullptr);
 
    // Block the PrepBufr file and open it for reading.
-   pblock(pb_file.c_str(), blk_file.c_str(), block);
+   pblock(pb_file.c_str(), blk_file.c_str(), Action::block);
 
    // Open the blocked temp PrepBufr file for reading
    openpb_(blk_file.c_str(), &file_unit);

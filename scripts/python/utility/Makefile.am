@@ -26,8 +26,11 @@
 pythonutilitydir = $(pkgdatadir)/python/utility
 
 pythonutility_DATA = \
+	build_ndbc_stations_from_web.py \
+	find_iabp_in_timerange.py \
+	get_iabp_from_web.py \
 	print_pointnc2ascii.py \
-	build_ndbc_stations_from_web.py
+	rgb2ctable.py
 
 EXTRA_DIST = ${pythonutility_DATA}
 

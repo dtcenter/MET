@@ -73,7 +73,7 @@ void EnsembleStatConfInfo::clear() {
    msg_typ_sfc.clear();
    mask_area_map.clear();
    mask_sid_map.clear();
-   grid_weight_flag = GridWeightType_None;
+   grid_weight_flag = GridWeightType::None;
    tmp_dir.clear();
    output_prefix.clear();
    version.clear();
@@ -81,7 +81,7 @@ void EnsembleStatConfInfo::clear() {
    // Deallocate memory for the random number generator
    if(rng_ptr) rng_free(rng_ptr);
 
-   for(i=0; i<n_txt; i++) output_flag[i] = STATOutputType_None;
+   for(i=0; i<n_txt; i++) output_flag[i] = STATOutputType::None;
 
    nc_info.clear();
 
@@ -284,7 +284,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
 
       // Track the maximum HiRA size
       for(j=0; j<vx_opt[i].interp_info.n_interp; j++) {
-         if(string_to_interpmthd(vx_opt[i].interp_info.method[j].c_str()) == InterpMthd_HiRA) {
+         if(string_to_interpmthd(vx_opt[i].interp_info.method[j].c_str()) == InterpMthd::HiRA) {
             GridTemplateFactory gtf;
             GridTemplate* gt = gtf.buildGT(vx_opt[i].interp_info.shape,
                                            vx_opt[i].interp_info.width[j],
@@ -333,7 +333,7 @@ void EnsembleStatConfInfo::process_flags() {
    bool output_ascii_flag = false;
 
    // Initialize
-   for(i=0; i<n_txt; i++) output_flag[i] = STATOutputType_None;
+   for(i=0; i<n_txt; i++) output_flag[i] = STATOutputType::None;
    nc_info.set_all_false();
 
    // Loop over the verification tasks
@@ -341,13 +341,13 @@ void EnsembleStatConfInfo::process_flags() {
 
       // Summary of output_flag settings
       for(j=0; j<n_txt; j++) {
-         if(vx_opt[i].output_flag[j] == STATOutputType_Both) {
-            output_flag[j] = STATOutputType_Both;
+         if(vx_opt[i].output_flag[j] == STATOutputType::Both) {
+            output_flag[j] = STATOutputType::Both;
             output_ascii_flag = true;
          }
-         else if(vx_opt[i].output_flag[j] == STATOutputType_Stat &&
-                           output_flag[j] == STATOutputType_None) {
-            output_flag[j] = STATOutputType_Stat;
+         else if(vx_opt[i].output_flag[j] == STATOutputType::Stat &&
+                           output_flag[j] == STATOutputType::None) {
+            output_flag[j] = STATOutputType::Stat;
             output_ascii_flag = true;
          }
       }
@@ -614,13 +614,13 @@ void EnsembleStatVxOpt::clear() {
    ocat_ta.clear();
    fpct_ta.clear();
 
-   duplicate_flag = DuplicateType_None;
-   obs_summary = ObsSummary_None;
+   duplicate_flag = DuplicateType::None;
+   obs_summary = ObsSummary::None;
    obs_perc = bad_data_int;
    skip_const = false;
    obs_error.clear();
 
-   for(i=0; i<n_txt; i++) output_flag[i] = STATOutputType_None;
+   for(i=0; i<n_txt; i++) output_flag[i] = STATOutputType::None;
 
    nc_info.clear();
 
@@ -837,7 +837,7 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
    }
 
    // Print debug information
-   if(obs_error.entry.dist_type != DistType_None) {
+   if(obs_error.entry.dist_type != DistType::None) {
       mlog << Debug(3)
            << "Observation error for point verification is "
            << "defined in the configuration file.\n";
@@ -1064,7 +1064,7 @@ int EnsembleStatVxOpt::n_txt_row(int i_txt_row) const {
    }
 
    // Check if this output line type is requested
-   if(output_flag[i_txt_row] == STATOutputType_None) return 0;
+   if(output_flag[i_txt_row] == STATOutputType::None) return 0;
 
    // Switch on the index of the line type
    switch(i_txt_row) {

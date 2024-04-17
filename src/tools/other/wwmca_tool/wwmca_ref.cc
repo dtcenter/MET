@@ -124,7 +124,7 @@ ConfigFilename.clear();
 
 Width = 0;
 
-Method = InterpMthd_None;
+Method = InterpMthd::None;
 
 interp_func = 0;
 
@@ -335,7 +335,7 @@ const RegridInfo regrid_info = parse_conf_regrid(Config);
 
 Width = regrid_info.width;
 
-Method = InterpMthd_Nearest;
+Method = InterpMthd::Nearest;
 
 Fraction = regrid_info.vld_thresh;
 
@@ -367,15 +367,15 @@ if ( Width > 1 )  {
 
    switch ( Method )  {
 
-      case InterpMthd_Min:
+      case InterpMthd::Min:
          interp_func = &dp_interp_min;
          break;
 
-      case InterpMthd_Max:
+      case InterpMthd::Max:
          interp_func = &dp_interp_max;
          break;
 
-      case InterpMthd_UW_Mean:
+      case InterpMthd::UW_Mean:
          interp_func = &dp_interp_uw_mean;
          break;
 

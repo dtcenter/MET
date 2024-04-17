@@ -230,32 +230,32 @@ void QuadInfo::set_quad_vals(QuadrantType ref_quad,
    switch(ref_quad) {
 
      // Full circle radius is stored in the first radius
-     case(FullCircle):
+     case QuadrantType::FullCircle:
         ALVal = rad1;
         break;
 
-     case(NE_Quadrant):
+     case QuadrantType::NE:
         NEVal = rad1;
         SEVal = rad2;
         SWVal = rad3;
         NWVal = rad4;
         break;
 
-     case(SE_Quadrant):
+     case QuadrantType::SE:
         NEVal = rad4;
         SEVal = rad1;
         SWVal = rad2;
         NWVal = rad3;
         break;
 
-     case(SW_Quadrant):
+     case QuadrantType::SW:
         NEVal = rad3;
         SEVal = rad4;
         SWVal = rad1;
         NWVal = rad2;
         break;
 
-     case(NW_Quadrant):
+     case QuadrantType::NW:
         NEVal = rad2;
         SEVal = rad3;
         SWVal = rad4;
@@ -263,7 +263,7 @@ void QuadInfo::set_quad_vals(QuadrantType ref_quad,
         break;
 
      // Nothing to do
-     case(NoQuadrantType):
+     case QuadrantType::None:
         break;
 
      default:
@@ -441,7 +441,7 @@ void TrackPoint::clear() {
    Lon       = bad_data_double;
    Vmax      = bad_data_int;
    MSLP      = bad_data_int;
-   Level     = NoCycloneLevel;
+   Level     = CycloneLevel::None;
    RadP      = bad_data_double;
    RRP       = bad_data_double;
    MRD       = bad_data_double;
@@ -449,9 +449,9 @@ void TrackPoint::clear() {
    Eye       = bad_data_double;
    Direction = bad_data_double;
    Speed     = bad_data_double;
-   Depth     = NoSystemsDepth;
+   Depth     = SystemsDepth::None;
    WarmCore  = false;
-   WatchWarn = NoWatchWarnType;
+   WatchWarn = WatchWarnType::None;
 
    NumMembers  = bad_data_int;
    TrackSpread = bad_data_double;

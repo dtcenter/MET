@@ -719,19 +719,19 @@ for (x=0; x<Nx; ++x)  {
 
       switch ( field )  {
 
-         case mof_fcst_obj:
+         case ModeObjectField::fcst_obj:
             value = fcst_obj_id(x, y);
             break;
 
-         case mof_fcst_clus:
+         case ModeObjectField::fcst_clus:
             value = fcst_clus_id(x, y);
             break;
 
-         case mof_obs_obj:
+         case ModeObjectField::obs_obj:
             value = obs_obj_id(x, y);
             break;
 
-         case mof_obs_clus:
+         case ModeObjectField::obs_clus:
             value = obs_clus_id(x, y);
             break;
 
@@ -766,7 +766,7 @@ DataPlane ModeNcOutputFile::select_fcst_obj  (int n) const
 
 DataPlane fdata;
 
-fdata = select_obj(mof_fcst_obj, n);
+fdata = select_obj(ModeObjectField::fcst_obj, n);
 
 return fdata;
 
@@ -782,7 +782,7 @@ DataPlane ModeNcOutputFile::select_fcst_clus (int n) const
 
 DataPlane fdata;
 
-fdata = select_obj(mof_fcst_clus, n);
+fdata = select_obj(ModeObjectField::fcst_clus, n);
 
 return fdata;
 
@@ -798,7 +798,7 @@ DataPlane ModeNcOutputFile::select_obs_obj   (int n) const
 
 DataPlane fdata;
 
-fdata = select_obj(mof_obs_obj, n);
+fdata = select_obj(ModeObjectField::obs_obj, n);
 
 return fdata;
 
@@ -814,7 +814,7 @@ DataPlane ModeNcOutputFile::select_obs_clus  (int n) const
 
 DataPlane fdata;
 
-fdata = select_obj(mof_obs_clus, n);
+fdata = select_obj(ModeObjectField::obs_clus, n);
 
 return fdata;
 

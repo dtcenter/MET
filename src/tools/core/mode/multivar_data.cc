@@ -138,7 +138,7 @@ void MultiVarData1::_print_summary(const string &name, int *data, const ShapeDat
 }
 
 MultiVarData::MultiVarData() :
-   _dataType(ModeDataType_MvMode_Both),
+   _dataType(ModeDataType::MvMode_Both),
    _simple(0),
    _merge(0),
    _name("notset"),
