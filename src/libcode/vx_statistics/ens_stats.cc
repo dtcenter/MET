@@ -632,6 +632,109 @@ void RPSInfo::set(const PairDataEnsemble &pd) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void RPSInfo::set_climo_bin_prob(const PairDataEnsemble &pd,
+                                 const ThreshArray &ocat_ta) {
+
+   // Compute RPS directly from the binned probabilities rather
+   // than with an Nx2 probabilistic contingency table.
+
+   // Store the dimensions
+   n_pair = pd.n_pair;
+   n_prob = pd.n_ens;
+
+   // If no forecast thresholds are provided, store a single NA thresh
+   if(fthresh.n() == 0) fthresh.add(na_str);
+
+   // Check that the number of observation category thresholds
+   // and bins match
+   if(ocat_ta.n() != pd.n_ens) {
+      mlog << Error << "\nRPSInfo::set_climo_bin_prob() -> "
+           << "the number of climatology probability bins ("
+           << pd.n_ens << ") must match the number of observation "
+           << " category thresholds (" << write_css(ocat_ta)
+           << ") defined by the \"" << conf_key_prob_cat_thresh
+           << "\" configuration file option.\n\n";
+      exit(1);
+   }
+
+   // Initialize RPS
+   rps = rpscl = 0.0;
+
+   // Loop over the observations
+   for(int i_obs=0; i_obs<pd.n_obs; i_obs++) {
+
+      // Initialize
+      double pfcst_sum = 0.0;
+      double pclim_sum = 0.0;
+      double rps_obs   = 0.0;
+      double rpscl_obs = 0.0;
+
+      // Expect the event to occur in exactly one bin
+      int n_event = 0;
+
+      // Loop over the probability bins
+      for(int i_bin=0; i_bin<pd.n_ens; i_bin++) {
+
+         // Update the cumulative probabilities
+         pfcst_sum += pd.e_na[i_bin][i_obs];
+         pclim_sum += 1.0/pd.n_ens;
+
+         // Make sure bins sum to 1.0 within 0.01
+         if(i_bin == (pd.n_ens - 1) && !is_eq(pfcst_sum, 1.0, 0.01)) {
+            mlog << Warning << "\nRPSInfo::set_climo_bin_prob() -> "
+                 << "unexpected sum of binned probabilities ("
+                 << pfcst_sum << " != 1).\n\n";
+         }
+
+         // Increment sums for the event
+         if(ocat_ta[i_bin].check(pd.o_na[i_obs])) {
+            n_event++;
+            rps_obs   += (1.0 - pfcst_sum)*(1.0 - pfcst_sum);
+            rpscl_obs += (1.0 - pclim_sum)*(1.0 - pclim_sum);
+         }
+         // Increment sums for the non-event
+         else {
+            rps_obs   += (0.0 - pfcst_sum)*(0.0 - pfcst_sum);
+            rpscl_obs += (0.0 - pclim_sum)*(0.0 - pclim_sum);
+         }
+
+      } // end for i_bin
+
+      // Make sure the event occurs in exactly 1 bin
+      if(n_event != 1) {
+         mlog << Warning << "\nRPSInfo::set_climo_bin_prob() -> "
+              << "the observation value (" << pd.o_na[i_obs]
+              << ") met " << n_event << " of the observation "
+              << " category thresholds (" << write_css(ocat_ta)
+              << ") instead of exactly 1!\n\n";
+      }
+
+      // Divide by number of bins minus 1
+      rps_obs   /= (pd.n_ens - 1);
+      rpscl_obs /= (pd.n_ens - 1);
+
+      // Increment running sums
+      rps   += rps_obs   / pd.n_obs ;
+      rpscl += rpscl_obs / pd.n_obs;
+
+   } // end for i_obs
+
+   // Compute RPSS relative to climatology
+   rpss = (!is_eq(rpscl, 0.0) ?
+           1.0 - (rps / rpscl) :
+           bad_data_double);
+
+   // Store other RPS statistics as bad data
+   rpss_smpl = bad_data_double;
+   rps_rel   = bad_data_double;
+   rps_res   = bad_data_double;
+   rps_unc   = bad_data_double;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 double RPSInfo::rps_comp() const {
    return(is_bad_data(rps) ? bad_data_double : 1.0 - rps);
 }
