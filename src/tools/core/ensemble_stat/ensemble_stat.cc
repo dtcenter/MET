@@ -665,6 +665,9 @@ bool get_data_plane(const char *infile, GrdFileType ftype,
          dp = met_regrid(dp, mtddf->grid(), grid, info->regrid());
       }
 
+      // Rescale probabilities from [0, 100] to [0, 1]
+      if(info->is_prob()) rescale_probability(dp);
+
       // Store the valid time, if not already set
       if(ens_valid_ut == (unixtime) 0) {
          ens_valid_ut = dp.valid();
@@ -724,6 +727,13 @@ bool get_data_plane_array(const char *infile, GrdFileType ftype,
                                 info->regrid());
          }
       }
+
+      // Rescale probabilities from [0, 100] to [0, 1]
+      if(info->is_prob()) {
+         for(i=0; i<dpa.n_planes(); i++) {
+            rescale_probability(dpa[i]);
+         }
+      } // end for i
 
       // Store the valid time, if not already set
       if(ens_valid_ut == (unixtime) 0) {
