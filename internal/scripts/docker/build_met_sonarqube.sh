@@ -84,9 +84,7 @@ SONAR_PROPERTIES=sonar-project.properties
 
 # Configure the sonar-project.properties
 [ -e $SONAR_PROPERTIES ] && rm $SONAR_PROPERTIES
-sed -e "s|SONAR_PROJECT_KEY|MET-GHA|" \
-    -e "s|SONAR_PROJECT_NAME|MET GHA|" \
-    -e "s|SONAR_PROJECT_VERSION|$SONAR_PROJECT_VERSION|" \
+sed -e "s|SONAR_PROJECT_VERSION|$SONAR_PROJECT_VERSION|" \
     -e "s|SONAR_HOST_URL|$SONAR_HOST_URL|" \
     -e "s|SONAR_TOKEN|$SONAR_TOKEN|" \
     -e "s|SONAR_BRANCH_NAME|$MET_GIT_NAME|" \
