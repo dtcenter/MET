@@ -130,9 +130,7 @@ if [ -z "$SONAR_TOKEN" ]; then
   exit 1
 else
   [ -e $SONAR_PROPERTIES ] && rm $SONAR_PROPERTIES
-  sed -e "s|SONAR_PROJECT_KEY|MET_NB|" \
-      -e "s|SONAR_PROJECT_NAME|MET Nightly Build|" \
-      -e "s|SONAR_PROJECT_VERSION|$SONAR_PROJECT_VERSION|" \
+  sed -e "s|SONAR_PROJECT_VERSION|$SONAR_PROJECT_VERSION|" \
       -e "s|SONAR_HOST_URL|$SONAR_HOST_URL|" \
       -e "s|SONAR_TOKEN|$SONAR_TOKEN|" \
       -e "s|SONAR_BRANCH_NAME|${1}|" \
