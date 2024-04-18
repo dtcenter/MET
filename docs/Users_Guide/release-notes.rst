@@ -33,7 +33,6 @@ MET Version 12.0.0-beta4 Release Notes (20240417)
      * Enhance Multivariate MODE to read input data only once rather than multiple times (`#2707 <https://github.com/dtcenter/MET/issues/2707>`_).
      * Enhance the calculation of RPSS to support starting from probabilistic data (`#2786 <https://github.com/dtcenter/MET/issues/2786>`_).
      * Add convex hull to MODE output (`#2819 <https://github.com/dtcenter/MET/issues/2819>`_).
-     * Enhance Point2Grid to check "coordinates" variable attribute for ingesting non-traditional grids (`#2858 <https://github.com/dtcenter/MET/issues/2858>`_).
 
 MET Version 12.0.0-beta3 Release Notes (20240207)
 -------------------------------------------------
