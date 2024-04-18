@@ -24,7 +24,7 @@ ugrid_metadata_map = [
    { key = "lon_edge";  val = "Mesh2d_edge_x"; },
    { key = "lat_node";  val = "Mesh2d_node_y"; },
    { key = "lon_node";  val = "Mesh2d_node_x"; },
-   { key = "time";      val = "time_centered"; }
+   { key = "time";      val = "time_instant"; }
 ];
 
 ugrid_max_distance_km = 30;
