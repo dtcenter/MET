@@ -68,8 +68,8 @@ def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, ca
             mgnc = repl_env(test_dir + '/bin/mgnc.sh')
             mpnc = repl_env(test_dir + '/bin/mpnc.sh')
         except Exception as e:
-            logger.exception(f"unable to read test_dir from {test_xml}")
-            raise
+            logger.error(f"WARNING: unable to read test_dir from {test_xml}")
+            pass
 
         tests = build_tests(test_root)
 
@@ -140,16 +140,21 @@ def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, ca
     #   # run and time the test command
         else:
             logger.debug(f"{cmd}")
+            #cmd_subs = cmd.split(';')
+            t_start = dt.now()
+            #for cmd_sub in cmd_subs:
             cmd_args = [arg.strip('\\') for arg in cmd.split() if arg!='\\']
             # cmd_args = [arg.strip() for arg in cmd.split('\\\n')]   #this could work also?
             #cmd_args_list.append(cmd_args)  #debug
-            t_start = dt.now()
-            cmd_return = subprocess.run(cmd_args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)  #should retun STDERR and STDOUT (as list?)
+            
+            cmd_return = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, shell=True)
+            #cmd_return = subprocess.run(cmd_args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)  #should retun STDERR and STDOUT (as list?)
             t_elaps = dt.now() - t_start
 
             cmd_outs = cmd_return.stdout
             logger.debug(f"{cmd_outs}")
             logger.debug(f"Return code: {cmd_return.returncode}")
+            #now that i'm splitting up compound commands into sub commands, only the last return code will be carried on... not sure if this is the best
             
 
         #   # check the return status and output files
