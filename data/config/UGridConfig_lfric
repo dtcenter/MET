@@ -17,7 +17,7 @@ ugrid_metadata_map = [
    { key = "lat_face";  val = "Mesh2d_face_y"; },
    { key = "lon_face";  val = "Mesh2d_face_x"; },
    { key = "vert_face"; val = ""; },            // optional
-   { key = "time";      val = "time_centered"; }
+   { key = "time";      val = "time_instant"; }
 ];
 
 ////////////////////////////////////////////////////////////////////////////////
