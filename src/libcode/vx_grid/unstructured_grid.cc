@@ -151,8 +151,8 @@ void UnstructuredGrid::xy_to_latlon(double x, double y, double &lat, double &lon
 
    lat = Data.pointLonLat[x].y();
    lon = Data.pointLonLat[x].x();
-   if (lon >= 180.0) long -= 360.0;
-   else if (lon < -180.0) long += 360.0;
+   if (lon >= 180.0) long = long - 360.0;
+   else if (lon < -180.0) long = long + 360.0;
 
    if(mlog.verbosity_level() >= UGRID_DEBUG_LEVEL) mlog
         << Debug(UGRID_DEBUG_LEVEL) << "UnstructuredGrid::xy_to_latlon() "
