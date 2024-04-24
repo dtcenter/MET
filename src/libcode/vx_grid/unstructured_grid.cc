@@ -120,8 +120,6 @@ void UnstructuredGrid::set_max_distance_km(double max_distance) {
 
 void UnstructuredGrid::latlon_to_xy(double lat, double lon, double &x, double &y) const {
 
-   if (lon >= 180.0) lon -= 360.0;
-   else if (lon < -180.0) lon += 360.0;
    PointLonLat _point_lonlat(lon, lat);
 
    IndexKDTree::ValueList neighbor = Data.kdtree->closestPoints(_point_lonlat, 1);
@@ -149,8 +147,6 @@ void UnstructuredGrid::xy_to_latlon(double x, double y, double &lat, double &lon
 
    lat = Data.point_lonlat[x].y();
    lon = Data.point_lonlat[x].x();
-   if (lon >= 180.0) lon -= 360.0;
-   else if (lon < -180.0) lon += 360.0;
 
    if(mlog.verbosity_level() >= UGRID_DEBUG_LEVEL) mlog
         << Debug(UGRID_DEBUG_LEVEL) << "UnstructuredGrid::xy_to_latlon() "
@@ -354,10 +350,7 @@ void UnstructuredData::build_tree() {
    kdtree = new IndexKDTree(atlas_geometry);
    kdtree->reserve(n_face);
    for (int i=0; i<n_face; i++) {
-      double lon = point_lonlat[i].x();
-      if (lon >= 180.0) lon -= 360.0;
-      else if (lon < -180.0) lon += 360.0;
-      PointLonLat pointLL(lon, point_lonlat[i].y());
+      PointLonLat pointLL(point_lonlat[i].x(), point_lonlat[i].y());
       pointLL.normalise();
       kdtree->insert(pointLL, n++);
       lat_checksum += (i+1) * point_lonlat[i].y();
@@ -431,7 +424,7 @@ void UnstructuredData::set_points(int count, const std::vector<PointLonLat> &ptL
       point_lonlat[i] = {(ptLonLat)[i].x(), (ptLonLat)[i].y()};
    }
    if(mlog.verbosity_level() >= UGRID_DEBUG_LEVEL) mlog
-        << Debug(UGRID_DEBUG_LEVEL) << "UnstructuredData::set_points(std::vector<PointLonLat> &) first: ("
+        << Debug(UGRID_DEBUG_LEVEL) << "UnstructuredData::set_points(int, std::vector<PointLonLat> &) first: ("
         << point_lonlat[0].x() << ", " << point_lonlat[0].y() << ") and last ("
         << point_lonlat[count-1].x() << ", " << point_lonlat[count-1].y() << ") from ("
         << ptLonLat[0].x() << ", " << ptLonLat[0].y() << ") and ("
