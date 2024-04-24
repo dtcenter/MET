@@ -126,6 +126,7 @@ static NcFile *nc_out  = (NcFile *) nullptr;
 static NcDim  lat_dim ;
 static NcDim  lon_dim ;
 
+static bool is_baseline_algorithm = true;   /* false for Enterprise algorithm */
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -942,8 +943,6 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
             int valid_count = 0;
             int absent_count = 0;
             int censored_count = 0;
-            int qc_filtered_count = 0;
-            int adp_qc_filtered_count = 0;
             float data_value;
             float from_min_value =  10e10;
             float from_max_value = -10e10;
@@ -1187,7 +1186,6 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
 
 void process_point_python(string python_command, MetConfig &config, VarInfo *vinfo,
                           const Grid to_grid, bool use_xarray) {
-   int idx, hdr_idx;
    ConcatString vname, vname_cnt, vname_mask;
    DataPlane fr_dp, to_dp;
    DataPlane cnt_dp, mask_dp;
@@ -1195,8 +1193,6 @@ void process_point_python(string python_command, MetConfig &config, VarInfo *vin
    NcVar var_obs_gc, var_obs_var;
 
    clock_t start_clock =  clock();
-   bool has_prob_thresh = !prob_cat_thresh.check(bad_data_double);
-
    unixtime requested_valid_time, valid_time;
    static const char *method_name = "process_point_python() -> ";
    static const char *method_name_s = "process_point_python()";
@@ -1866,6 +1862,30 @@ void check_lat_lon(int data_size, float  *latitudes, float  *longitudes) {
 }
 
 ////////////////////////////////////////////////////////////////////////
+//              QC flags: 0=high, 1=medium, 2=low
+//   Enterpise algorithm: 0=high, 1=medium, 2=low
+//    Baseline algorithm: 3=high, 1=medium, 0=low (high=12/48, medium=4/16)
+// returns bad_data_int if it does not belong to high, mediuam, or low.
+
+int compute_adp_qc_flag(int adp_qc, int shift_bits) {
+   int particle_qc = ((adp_qc >> shift_bits) & 0x03);
+   int qc_for_flag = particle_qc;
+
+   if (is_baseline_algorithm) {
+      switch (particle_qc) {
+         case 3:  qc_for_flag = 0;    break; /* high */
+         case 1:  qc_for_flag = 1;    break; /* medium */
+         case 0:  qc_for_flag = 2;    break; /* low */
+         default: qc_for_flag = bad_data_int;   break;
+      }
+   }
+   else if (3 == particle_qc) qc_for_flag = bad_data_int;   /* Enterprise algorithm */
+
+   return qc_for_flag;
+}
+
+
+////////////////////////////////////////////////////////////////////////
 
 static unixtime compute_unixtime(NcVar *time_var, unixtime var_value) {
    unixtime obs_time = bad_data_int;
@@ -2523,18 +2543,19 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
    int non_missing_count = 0;
    int qc_filtered_count = 0;
    int adp_qc_filtered_count = 0;
-   float data_value;
    float from_min_value =  10e10;
    float from_max_value = -10e10;
    float qc_min_value =  10e10;
    float qc_max_value = -10e10;
    IntArray cellArray;
    NumArray dataArray;
-   int particle_qc;
    bool has_qc_flags = (qc_flags.n() > 0);
 
    missing_count = non_missing_count = 0;
    to_dp.set_constant(bad_data_double);
+
+   int shift_bits = 2;
+   if (is_dust_only) shift_bits += 2;
 
    for (int xIdx=0; xIdx<to_lon_count; xIdx++) {
       for (int yIdx=0; yIdx<to_lat_count; yIdx++) {
@@ -2546,43 +2567,55 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
             dataArray.extend(cellArray.n());
             for (int dIdx=0; dIdx<cellArray.n(); dIdx++) {
                from_index = cellArray[dIdx];
-               data_value = from_data[from_index];
+               float data_value = from_data[from_index];
                if (is_bad_data(data_value)) {
                   missing_count++;
                   continue;
                }
-
                non_missing_count++;
                if(mlog.verbosity_level() >= 4) {
                   if (from_min_value > data_value) from_min_value = data_value;
                   if (from_max_value < data_value) from_max_value = data_value;
                }
 
-               // Filter by QC flag
-               qc_value = qc_data[from_index];
-               if (!has_qc_var || !has_qc_flags || qc_flags.has(qc_value)) {
-                  for(int i=0; i<vinfo->censor_thresh().n(); i++) {
-                     // Break out after the first match.
-                     if(vinfo->censor_thresh()[i].check(data_value)) {
-                        data_value = vinfo->censor_val()[i];
-                        censored_count++;
-                        break;
-                     }
+               // Apply censor threshold
+               for(int i=0; i<vinfo->censor_thresh().n(); i++) {
+                  // Break out after the first match.
+                  if(vinfo->censor_thresh()[i].check(data_value)) {
+                     data_value = vinfo->censor_val()[i];
+                     censored_count++;
+                     break;
                   }
-                  if (0 == adp_data[from_index]) {
-                     absent_count++;
-                     continue;
-                  }
+               }
 
-                  if (has_adp_qc_var && has_qc_flags) {
-                     int shift_bits = 2;
-                     if (is_dust_only) shift_bits += 2;
-                     particle_qc = ((adp_qc_data[from_index] >> shift_bits) & 0x03);
-                     int qc_for_flag = 3 - particle_qc; // high = 3, qc_flag for high = 0
-                     if (!qc_flags.has(qc_for_flag)) {
+               // Check the data existance (always 1 if ADP variable does not exist)
+               if (0 == adp_data[from_index]) {
+                  absent_count++;
+                  continue;
+               }
+
+               // Filter by QC flag
+               if (has_qc_var || has_adp_qc_var) {
+                  qc_value = qc_data[from_index];
+                  if (has_adp_qc_var) {
+                     int qc_for_flag = compute_adp_qc_flag(adp_qc_data[from_index], shift_bits);
+                     bool filter_out = is_eq(qc_for_flag, bad_data_int);
+
+                     if (!filter_out) {
+                        /* Adjust the quality by AOD data QC */
+                        if (1 == qc_value && 0 == qc_for_flag) qc_for_flag = 1; /* high to medium quality */
+                        else if (2 == qc_value) qc_for_flag = 2;                /* high/medium to low quality */
+
+                        if (has_qc_flags && !qc_flags.has(qc_for_flag)) filter_out = true;
+                     }
+                     if (filter_out) {
                         adp_qc_filtered_count++;
                         continue;
                      }
+                  }
+                  else if (has_qc_var && has_qc_flags && !qc_flags.has(qc_value)) {
+                     qc_filtered_count++;
+                     continue;
                   }
 
                   dataArray.add(data_value);
@@ -2590,9 +2623,6 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
                      if (qc_min_value > qc_value) qc_min_value = qc_value;
                      if (qc_max_value < qc_value) qc_max_value = qc_value;
                   }
-               }
-               else {
-                  qc_filtered_count++;
                }
                valid_count++;
             }
@@ -2620,7 +2650,6 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
                     << data_count << " data values.\n";
             }
          }
-         else {}
       }
    }
 
