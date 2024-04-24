@@ -69,14 +69,18 @@ class nc_point_obs(met_point_obs):
 
    def read_data(self, nc_filename):
       method_name = f"{self.__class__.__name__}.read_data()"
-      if nc_filename is None:
-         self.log_error_msg(f"{method_name} The input NetCDF filename is missing")
+      if not nc_filename:
+         print(f"ERROR: {method_name} The input NetCDF filename is missing")
          return False
       if not os.path.exists(nc_filename):
-         self.log_error_msg(f"{method_name} input NetCDF file ({nc_filename}) does not exist")
+         print(f"ERROR: {method_name} input NetCDF file ({nc_filename}) does not exist")
          return False
 
-      dataset = nc.Dataset(nc_filename, 'r')
+      try:
+          dataset = nc.Dataset(nc_filename, 'r')
+      except OSError:
+         print(f"ERROR: {method_name} Could not open NetCDF file ({nc_filename}")
+         return False
 
       attr_name = 'use_var_id'
       use_var_id_str = dataset.getncattr(attr_name) if attr_name in dataset.ncattrs() else "false"
