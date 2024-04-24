@@ -8,10 +8,12 @@ Created on Jan 10, 2024
 
 '''
 
+import sys
 import os
     
 import numpy as np
 import netCDF4 as nc
+import pandas as pd
 
 from met.point import met_point_obs, met_point_tools
 
@@ -274,6 +276,22 @@ class nc_point_obs(met_point_obs):
          print(f'  === ERROR at {method_name} type(nc_dataset)={type(nc_dataset)} type(point_obs)={type(point_obs)}')
          raise
 
+   def to_pandas(self):
+       return pd.DataFrame({
+           'typ': [self.hdr_typ_table[i] for i in self.hdr_typ],
+           'sid': [self.hdr_sid_table[i] for i in self.hdr_sid],
+           'vld': [self.hdr_vld_table[i] for i in self.hdr_vld],
+           'lat': self.hdr_lat,
+           'lon': self.hdr_lon,
+           'elv': self.hdr_elv,
+           'var': [self.obs_var_table[i] if self.use_var_id else f'{i}'
+                   for i in self.obs_vid],
+           'lvl': self.obs_lvl,
+           'hgt': self.obs_hgt,
+           'qc': [np.nan if np.ma.is_masked(i) else self.obs_qty_table[i]
+                  for i in self.obs_qty],
+           'obs': self.obs_val,
+       })
 
 def main(argv):
    if len(argv) != 1 and argv[1] != ARG_PRINT_DATA:
