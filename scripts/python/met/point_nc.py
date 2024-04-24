@@ -71,60 +71,63 @@ class nc_point_obs(met_point_obs):
       method_name = f"{self.__class__.__name__}.read_data()"
       if nc_filename is None:
          self.log_error_msg(f"{method_name} The input NetCDF filename is missing")
-      elif not os.path.exists(nc_filename):
+         return False
+      if not os.path.exists(nc_filename):
          self.log_error_msg(f"{method_name} input NetCDF file ({nc_filename}) does not exist")
+         return False
+
+      dataset = nc.Dataset(nc_filename, 'r')
+
+      attr_name = 'use_var_id'
+      use_var_id_str = dataset.getncattr(attr_name) if attr_name in dataset.ncattrs() else "false"
+      self.use_var_id = use_var_id_str.lower() == 'true'
+
+      # Header
+      self.hdr_typ = dataset['hdr_typ'][:]
+      self.hdr_sid = dataset['hdr_sid'][:]
+      self.hdr_vld = dataset['hdr_vld'][:]
+      self.hdr_lat = dataset['hdr_lat'][:]
+      self.hdr_lon = dataset['hdr_lon'][:]
+      self.hdr_elv = dataset['hdr_elv'][:]
+      self.hdr_typ_table = met_point_nc_tools.get_string_array(dataset, 'hdr_typ_table')
+      self.hdr_sid_table = met_point_nc_tools.get_string_array(dataset, 'hdr_sid_table')
+      self.hdr_vld_table = met_point_nc_tools.get_string_array(dataset, 'hdr_vld_table')
+
+      nc_var = dataset.variables.get('obs_unit', None)
+      if nc_var:
+         self.obs_var_unit  = nc_var[:]
+      nc_var = dataset.variables.get('obs_desc', None)
+      if nc_var:
+         self.obs_var_desc  = nc_var[:]
+
+      nc_var = dataset.variables.get('hdr_prpt_typ', None)
+      if nc_var:
+         self.hdr_prpt_typ  = nc_var[:]
+      nc_var = dataset.variables.get('hdr_irpt_typ', None)
+      if nc_var:
+         self.hdr_irpt_typ  = nc_var[:]
+      nc_var = dataset.variables.get('hdr_inst_typ', None)
+      if nc_var:
+         self.hdr_inst_typ  =nc_var[:]
+
+      #Observation data
+      self.hdr_sid = dataset['hdr_sid'][:]
+      self.obs_qty = np.array(dataset['obs_qty'][:])
+      self.obs_hid = np.array(dataset['obs_hid'][:])
+      self.obs_lvl = np.array(dataset['obs_lvl'][:])
+      self.obs_hgt = np.array(dataset['obs_hgt'][:])
+      self.obs_val = np.array(dataset['obs_val'][:])
+      nc_var = dataset.variables.get('obs_vid', None)
+      if nc_var is None:
+         self.use_var_id = False
+         nc_var = dataset.variables.get('obs_gc', None)
       else:
-         dataset = nc.Dataset(nc_filename, 'r')
+         self.obs_var_table = met_point_nc_tools.get_string_array(dataset, 'obs_var')
+      if nc_var:
+         self.obs_vid = np.array(nc_var[:])
 
-         attr_name = 'use_var_id'
-         use_var_id_str = dataset.getncattr(attr_name) if attr_name in dataset.ncattrs() else "false"
-         self.use_var_id = use_var_id_str.lower() == 'true'
-
-         # Header
-         self.hdr_typ = dataset['hdr_typ'][:]
-         self.hdr_sid = dataset['hdr_sid'][:]
-         self.hdr_vld = dataset['hdr_vld'][:]
-         self.hdr_lat = dataset['hdr_lat'][:]
-         self.hdr_lon = dataset['hdr_lon'][:]
-         self.hdr_elv = dataset['hdr_elv'][:]
-         self.hdr_typ_table = met_point_nc_tools.get_string_array(dataset, 'hdr_typ_table')
-         self.hdr_sid_table = met_point_nc_tools.get_string_array(dataset, 'hdr_sid_table')
-         self.hdr_vld_table = met_point_nc_tools.get_string_array(dataset, 'hdr_vld_table')
-
-         nc_var = dataset.variables.get('obs_unit', None)
-         if nc_var:
-            self.obs_var_unit  = nc_var[:]
-         nc_var = dataset.variables.get('obs_desc', None)
-         if nc_var:
-            self.obs_var_desc  = nc_var[:]
-
-         nc_var = dataset.variables.get('hdr_prpt_typ', None)
-         if nc_var:
-            self.hdr_prpt_typ  = nc_var[:]
-         nc_var = dataset.variables.get('hdr_irpt_typ', None)
-         if nc_var:
-            self.hdr_irpt_typ  = nc_var[:]
-         nc_var = dataset.variables.get('hdr_inst_typ', None)
-         if nc_var:
-            self.hdr_inst_typ  =nc_var[:]
-
-         #Observation data        
-         self.hdr_sid = dataset['hdr_sid'][:]
-         self.obs_qty = np.array(dataset['obs_qty'][:])
-         self.obs_hid = np.array(dataset['obs_hid'][:])
-         self.obs_lvl = np.array(dataset['obs_lvl'][:])
-         self.obs_hgt = np.array(dataset['obs_hgt'][:])
-         self.obs_val = np.array(dataset['obs_val'][:])
-         nc_var = dataset.variables.get('obs_vid', None)
-         if nc_var is None:
-            self.use_var_id = False
-            nc_var = dataset.variables.get('obs_gc', None)
-         else:
-            self.obs_var_table = met_point_nc_tools.get_string_array(dataset, 'obs_var')
-         if nc_var:
-            self.obs_vid = np.array(nc_var[:])
-          
-         self.obs_qty_table = met_point_nc_tools.get_string_array(dataset, 'obs_qty_table')
+      self.obs_qty_table = met_point_nc_tools.get_string_array(dataset, 'obs_qty_table')
+      return True
 
    def save_ncfile(self, nc_filename):
       met_data = self.get_point_data()
@@ -307,5 +310,5 @@ def main(argv):
          point_obs_data.print_point_data(met_point_data)
 
 if __name__ == '__main__':
-   main()
+   main(sys.argv)
    print('Done python script')
