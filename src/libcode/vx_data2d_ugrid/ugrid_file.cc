@@ -941,7 +941,7 @@ void UGridFile::read_netcdf_grid()
   }
 
   // Convert longitude from degrees east to west
-  for (int idx=0; idx<face_count; idx++) _lon[idx] = -1.0*rescale_deg(_lon[idx]);
+  for (int idx=0; idx<face_count; idx++) _lon[idx] = -1.0*rescale_deg(_lon[idx], -180, 180);
 
   grid_data.set_points(face_count, _lon, _lat);
   grid_data.max_distance_km = max_distance_km;
