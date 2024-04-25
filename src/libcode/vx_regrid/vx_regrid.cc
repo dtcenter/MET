@@ -133,9 +133,7 @@ to_data.set_accum (from_data.accum());
    //
    //  copy data
    //
-cout << "  DEBUG HS met_regrid_generic() to_grid.nx()=" << to_grid.nx() << ", to_grid.ny()=" << to_grid.ny()<< "\n";
 for (xt=0; xt<(to_grid.nx()); ++xt)  {
-cout << "  DEBUG HS met_regrid_generic() xt=" << xt<< "\n";
 
    for (yt=0; yt<(to_grid.ny()); ++yt)  {
 
@@ -161,7 +159,6 @@ cout << "  DEBUG HS met_regrid_generic() xt=" << xt<< "\n";
    }   //  for yt
 
 }   //  for xt
-cout << "  DEBUG HS met_regrid_generic() to_grid.nx()=" << to_grid.nx() << ", to_grid.ny()=" << to_grid.ny()<< " -- Done\n";
 
    //
    //  done
