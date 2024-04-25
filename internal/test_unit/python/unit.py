@@ -11,12 +11,10 @@ import xml.etree.ElementTree as ET
 
 def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, callchk=False):
     """
-    unit testing script
+    Parse a unit test xml file, run the associated tests, and display test results.
 
     Parameters
     -----------
-    mgnc : 
-    mpnc : 
     test_xml : pathlike
         path to file containing the unit test(s) to perform
     file_log : pathlike, default None
@@ -42,24 +40,21 @@ def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, ca
     logger.addHandler(ch)
 
     # create/add file handler
-    if file_log:
+    if file_log and not cmd_only:
         fh = logging.FileHandler(file_log)
         fh.setLevel(logging.DEBUG)
         logger.addHandler(fh)
-
-    # # if command  only mode is enabled, disable logging
-    # $cmd_only and $file_log = 0;
-    
+   
     # parse xml file
     try:
         test_root = ET.parse(test_xml)
     except Exception as e:
-        logger.exception(f"Unable to parse xml from {test_xml}")
+        logger.exception(f"ERROR: Unable to parse xml from {test_xml}")
         raise
 
-    # # parse the children of the met_test element
+    # parse the children of the met_test element
     if test_root.getroot().tag != 'met_test':
-        logger.error(f"unexpected top-level element. Expected 'met_test', got '{test_root.tag}'")
+        logger.error(f"ERROR: unexpected top-level element. Expected 'met_test', got '{test_root.tag}'")
         sys.exit(1)
     else:
         # read test_dir
@@ -68,30 +63,23 @@ def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, ca
             mgnc = repl_env(test_dir + '/bin/mgnc.sh')
             mpnc = repl_env(test_dir + '/bin/mpnc.sh')
         except Exception as e:
-            logger.error(f"WARNING: unable to read test_dir from {test_xml}")
+            logger.WARNING(f"WARNING: unable to read test_dir from {test_xml}")
             pass
 
         tests = build_tests(test_root)
 
-    # # determine the max length of the test names
+    # determine the max length of the test names
+    #   not used, unless format of test result display is changed
     name_wid = max([len(test['name']) for test in tests])
     
-    
-
-    # # default return value
-    # my $ret_val = 0;
     VALGRIND_OPT_MEM ="--leak-check=full --show-leak-kinds=all --error-limit=no -v"
     VALGRIND_OPT_CALL ="--tool=callgrind --dump-instr=yes --simulate-cache=yes --collect-jumps=yes"
 
-    #for debug:
-    #cmd_args_list = []
-    
-    # # run each test
+    # run each test
     for test in tests:
-    #   # print the test name
+    #   # print the test name ... may want to change this to only if cmd_only=False
         logger.debug("\n")
         logger.info(f"TEST: {test['name']}")
-    #   $cmd_only or printf "TEST: %-*s - ", $name_wid, $test->{"name"};
 
     #   # prepare the output space
         output_keys = [key for key in test.keys() if key.startswith('out_')]
@@ -104,22 +92,22 @@ def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, ca
             except Exception as e:
                 logger.exception()
                 raise
-            # calls a perl function from VxUtil.pm (in test_unit/lib) to make the directory 
             output_dir = Path(output).parent
-            output_dir.mkdir(parents=True, exist_ok=True)     #should error be raised if dir already exists? 
+            output_dir.mkdir(parents=True, exist_ok=True)     #should error/warning be raised if dir already exists? 
 
     #   # set the test environment variables
+        set_envs = []
         if 'env' in test.keys():
             for key, val in sorted(test['env'].items()):
-                #if val:
-                    os.environ[key] = val
-                    logger.debug(f"export {key}={val}")
+                os.environ[key] = val
+                set_cmd = f"export {key}={val}"
+                logger.debug(set_cmd)
+                set_envs.append(set_cmd)
 
     #   # build the text command
         cmd = test['exec'] + test['param']
         cmd = re.sub('[ \n\t]+$', '', cmd)  # not sure this is doing what it should;
                                             #  may need to remove the +$ from the regex?
-    #   my ($cmd, $ret_ok, $out_ok) = ($test->{"exec"} . $test->{"param"});
         if memchk:
             cmd = f"valgrind {VALGRIND_OPT_MEM} {cmd}"
         elif callchk:
@@ -127,6 +115,7 @@ def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, ca
 
         
     #   # if writing a command file, print the environment and command, then loop
+        #   consider tying this into logging...
         if cmd_only:
             if 'env' in test.keys():
                 for key, val in sorted(test['env'].items()):
@@ -140,166 +129,133 @@ def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, ca
     #   # run and time the test command
         else:
             logger.debug(f"{cmd}")
-            #cmd_subs = cmd.split(';')
             t_start = dt.now()
-            #for cmd_sub in cmd_subs:
-            cmd_args = [arg.strip('\\') for arg in cmd.split() if arg!='\\']
-            # cmd_args = [arg.strip() for arg in cmd.split('\\\n')]   #this could work also?
-            #cmd_args_list.append(cmd_args)  #debug
-            
             cmd_return = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, shell=True)
-            #cmd_return = subprocess.run(cmd_args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)  #should retun STDERR and STDOUT (as list?)
             t_elaps = dt.now() - t_start
 
             cmd_outs = cmd_return.stdout
             logger.debug(f"{cmd_outs}")
             logger.debug(f"Return code: {cmd_return.returncode}")
-            #now that i'm splitting up compound commands into sub commands, only the last return code will be carried on... not sure if this is the best
-            
 
         #   # check the return status and output files
             ret_ok = not cmd_return.returncode
             if ret_ok:
                 out_ok = True
 
-                try:
-                    for filepath in test['out_pnc']:
-                        result = subprocess.run([mpnc, '-v', filepath], 
-                                                stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
-                        cmd_outs += ("\n"+result.stdout)
-                        logger.debug(result.stdout)
-                        out_ok = not result.returncode
-                except KeyError:
-                    pass
+                for filepath in test['out_pnc']:
+                    result = subprocess.run([mpnc, '-v', filepath], 
+                                            stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+                    cmd_outs += ("\n"+result.stdout)
+                    logger.debug(result.stdout)
+                    if result.returncode:
+                        out_ok = False
                 
-                try:
-                    for filepath in test['out_gnc']:
-                        result = subprocess.run([mgnc, '-v', filepath], 
-                                                stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
-                        cmd_outs += ("\n"+result.stdout)
-                        logger.debug(result.stdout)
-                        out_ok = not result.returncode
-                except KeyError:
-                    pass
+                for filepath in test['out_gnc']:
+                    result = subprocess.run([mgnc, '-v', filepath], 
+                                            stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+                    cmd_outs += ("\n"+result.stdout)
+                    logger.debug(result.stdout)
+                    if result.returncode:
+                        out_ok = False
                 
-                try:
-                    for filepath in test['out_stat']:
-                        # check stat file exists and is nonzero size
-                        try:
-                            filesize = os.stat(filepath).st_size
-                            if filesize==0:
-                                cmd_outs += (f"\nERROR: stat file empty {filepath}\n")
-                                out_ok = False
-                                break
-                        except FileNotFoundError:
-                            cmd_outs += (f"\nERROR: stat file missing {filepath}\n")
-                            logger.debug(result.stdout)
+                for filepath in test['out_stat']:
+                    # check stat file exists and is nonzero size
+                    try:
+                        filesize = os.stat(filepath).st_size
+                        if filesize==0:
+                            cmd_outs += (f"\nERROR: stat file empty {filepath}\n")
                             out_ok = False
                             break
-                        # check stat file has non-header lines
-                        with open(filepath) as f:
-                            numlines = len([l for l in f.readlines() if not l.startswith('VERSION')])
-                        if numlines==0:
-                            cmd_outs += (f"\nERROR: stat data missing from file {filepath}\n")
-                            out_ok = False
-                except KeyError:
-                    pass
+                    except FileNotFoundError:
+                        cmd_outs += (f"\nERROR: stat file missing {filepath}\n")
+                        logger.debug(result.stdout)
+                        out_ok = False
+                        break
+                    # check stat file has non-header lines
+                    with open(filepath) as f:
+                        numlines = len([l for l in f.readlines() if not l.startswith('VERSION')])
+                    if numlines==0:
+                        cmd_outs += (f"\nERROR: stat data missing from file {filepath}\n")
+                        out_ok = False
 
-                try:
-                    for filepath in test['out_ps']:
-                        # check postscript file exists and is nonzero size
-                        try:
-                            filesize = os.stat(filepath).st_size
-                            if filesize==0:
-                                cmd_outs += (f"\nERROR: postscript file empty {filepath}\n")
-                                out_ok = False
-                                break
-                        except FileNotFoundError:
-                            cmd_outs += (f"\nERROR: postscript file missing {filepath}\n")
+                for filepath in test['out_ps']:
+                    # check postscript file exists and is nonzero size
+                    try:
+                        filesize = os.stat(filepath).st_size
+                        if filesize==0:
+                            cmd_outs += (f"\nERROR: postscript file empty {filepath}\n")
                             out_ok = False
                             break
-                        # check for ghostscript errors
-                        result = subprocess.run(['gs', '-sDEVICE=nullpage', '-dQUIET', '-dNOPAUSE', '-dBATCH', filepath])
-                        if result.returncode:
-                            cmd_outs += (f"\nERROR: ghostscript error for postscript file {filepath}")
-                            out_ok = False
-                except KeyError:
-                    pass
+                    except FileNotFoundError:
+                        cmd_outs += (f"\nERROR: postscript file missing {filepath}\n")
+                        out_ok = False
+                        break
+                    # check for ghostscript errors
+                    result = subprocess.run(['gs', '-sDEVICE=nullpage', '-dQUIET', '-dNOPAUSE', '-dBATCH', filepath])
+                    if result.returncode:
+                        cmd_outs += (f"\nERROR: ghostscript error for postscript file {filepath}")
+                        out_ok = False
                 
-                try:
-                    for filepath in test['out_exist']:
-                        # check output file exists and is nonzero size
-                        try:
-                            filesize = os.stat(filepath).st_size
-                            if filesize==0:
-                                cmd_outs += (f"\nERROR: file empty {filepath}\n")
-                                out_ok = False
-                                break
-                        except FileNotFoundError:
-                            cmd_outs += (f"\nERROR: file missing when it should exist {filepath}\n")
+                for filepath in test['out_exist']:
+                    # check output file exists and is nonzero size
+                    try:
+                        filesize = os.stat(filepath).st_size
+                        if filesize==0:
+                            cmd_outs += (f"\nERROR: file empty {filepath}\n")
                             out_ok = False
-                except KeyError:
-                    pass
+                            break
+                    except FileNotFoundError:
+                        cmd_outs += (f"\nERROR: file missing when it should exist {filepath}\n")
+                        out_ok = False
 
-                try:
-                    for filepath in test['out_not_exist']:
-                        # check output file doesn't exist
-                        if os.path.isfile(filepath):
-                            cmd_outs += (f"\nERROR: file exists when it should be missing {filepath}\n")
-                            out_ok = False
-                except KeyError:
-                    pass
+                for filepath in test['out_not_exist']:
+                    # check output file doesn't exist
+                    if os.path.isfile(filepath):
+                        cmd_outs += (f"\nERROR: file exists when it should be missing {filepath}\n")
+                        out_ok = False
 
-        #   # unset the test environment variables
-        if 'env' in test.keys():
-            for key, val in sorted(test['env'].items()):
-                # if val:
+            #   # unset the test environment variables
+            unset_envs = []
+            if 'env' in test.keys():
+                for key, val in sorted(test['env'].items()):
                     del os.environ[key]
-                    logger.debug(f"unset {key}")
-        
-        #   # print the test result
-        test_result = "pass" if (ret_ok and out_ok) else "FAIL"
-        logger.info(f"{test_result} - {round(t_elaps.total_seconds(),3)} sec\n")
+                    unset_cmd = f"unset {key}"
+                    logger.debug(unset_cmd)
+                    unset_envs.append(unset_cmd)
+            
+            #   # print the test result
+            test_result = "pass" if (ret_ok and out_ok) else "FAIL"
+            logger.info(f"\t- {test_result} - \t{round(t_elaps.total_seconds(),3)} sec")
 
-        #   # if the log file is activated, print the test information
-        # would like to redo this so the log is being written as commands are executed... not after
-        # also, this could be done simultaneously with cmd_only option
-        # might want to improve formatting here too
-        # if file_log:
-        #     logger.debug("\n\n")
-        #     if 'env' in test.keys():
-        #         for key, val in sorted(test['env'].items()):
-        #             logger.debug(f"export {key}={val}")
-        #     logger.debug(f"{cmd}")
-        #     if 'env' in test.keys():
-        #         for key, val in sorted(test['env'].items()):
-        #             logger.debug(f"unset {key}")
-        #     logger.debug("\n")
-
-        #   # on failure, print the problematic test and exit, if requested
-        if not (ret_ok and out_ok):
-            logger.info(cmd + cmd_outs)   #skipping the setting/unsetting envs here ?
-        #     print "$_" for (@set_envs, @cmd_outs, @unset_envs);
-            if not noexit:
-                sys.exit(1)
-        #     print "\n\n";
-
-    return tests, #cmd_args_list
+            #   # on failure, print the problematic test and exit, if requested
+            if not (ret_ok and out_ok):
+                logger.info("\n".join(set_envs) + cmd + cmd_outs + "\n".join(unset_envs) + "\n")
+                if not noexit:
+                    sys.exit(1)
 
 
 def build_tests(test_root):
     """
-    # #   This function assumes that the inputs are the body elements of
-    # #   a parsed XML file using XML::Parser.  The components of each test
-    # #   element are parsed and the test elements are returned as an array
-    # #   of hashes.
-    # #
+    Parse the test components.
+
+    Take an ElementTree element extracted from a unit test xml file.
+    Return a list of all tests, where each test is represented as a dictionary,
+    with its keys representing each test component.
+
     Parameters
     ----------
     test_root : ElementTree element
         parsed from XML file containing the unit test(s) to perform
 
+    Returns
+    -------
+    test_list: 
+        list of test dicts, containing test attributes parsed from xml object
+
     """
+
+    # define logger
+    logger = logging.getLogger(__name__)
 
     # find all tests in test_xml, and create a dictionary of attributes for each test
     test_list = []
@@ -308,7 +264,7 @@ def build_tests(test_root):
         try:
             test['name'] = test_el.attrib['name']
         except KeyError:
-            logger.error("name attribute not found for test [test index]")
+            logger.error("ERROR: name attribute not found for test")
             raise
             # should just fail this one test and not fully exit?
 
@@ -342,19 +298,21 @@ def build_tests(test_root):
                         if not env_dict[env_name]:
                             env_dict[env_name] = ''
                     except AttributeError:
-                        logger.error(f"env pair in test \\{test['name']}\\ missing name or value")
+                        logger.error(f"ERROR: env pair in test \\{test['name']}\\ missing name or value")
                         raise
                         # should just fail this one test and not fully exit?                      
 
                 test['env'] = env_dict
 
         #   validate test format/details
+        expected_keys = ['exec', 'param', 'out_pnc', 'out_gnc', 'out_stat', 'out_ps', 
+                         'out_exist', 'out_not_exist']
+        for key in expected_keys:
+            if key not in test.keys():
+                logger.error(f"ERROR: test {test['name']} missing {key} element")
+                sys.exit(1)
+        
         test_list.append(test)
-        #     # verify the structure of the test element
-        #     $test{"exec"}   or die "ERROR: test " . $test{"name"} . " missing exec element\n";
-        #     $test{"param"}  or die "ERROR: test " . $test{"name"} . " missing param element\n";
-        #     ( $test{"out_pnc"} && $test{"out_gnc"} && $test{"out_stat"} && $test{"out_ps"} && $test{"out_exist"} && $test{"out_not_exist"} ) 
-        #                     or die "ERROR: test " . $test{"name"} . " missing output element\n";
 
     return test_list
 
