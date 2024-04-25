@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -31,9 +31,9 @@ extern GlobalPython GP;   //  this needs external linkage
 
 static const char * user_ppath            = nullptr;
 
-static const char write_tmp_nc         [] = "MET_BASE/python/pyembed/write_tmp_dataplane.py";
+static const char write_tmp_py         [] = "MET_BASE/python/pyembed/write_tmp_dataplane.py";
 
-static const char read_tmp_nc          [] = "MET_BASE/python/pyembed/read_tmp_dataplane.py";
+static const char read_tmp_py          [] = "MET_BASE/python/pyembed/read_tmp_dataplane.py";
 
 static const char tmp_nc_var_name      [] = "met_info";
 
@@ -48,10 +48,10 @@ static bool straight_python_dataplane(const char * script_name,
                                       Grid & met_grid_out, VarInfoPython &vinfo);
 
 
-static bool tmp_nc_dataplane(const char * script_name,
-                             int script_argc, char ** script_argv,
-                             const bool use_xarray, DataPlane & met_dp_out,
-                             Grid & met_grid_out, VarInfoPython &vinfo);
+static bool tmp_dataplane(const char * script_name,
+                          int script_argc, char ** script_argv,
+                          const bool use_xarray, DataPlane & met_dp_out,
+                          Grid & met_grid_out, VarInfoPython &vinfo);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -83,10 +83,10 @@ bool status = false;
 
 if ( (user_ppath = getenv(user_python_path_env)) != 0 )  {   //  do_tmp_nc = true;
 
-   status = tmp_nc_dataplane(user_script_name,
-                             user_script_argc, user_script_argv,
-                             use_xarray, met_dp_out,
-                             met_grid_out, vinfo);
+   status = tmp_dataplane(user_script_name,
+                          user_script_argc, user_script_argv,
+                          use_xarray, met_dp_out,
+                          met_grid_out, vinfo);
 
 } else {
 
@@ -100,7 +100,7 @@ if ( (user_ppath = getenv(user_python_path_env)) != 0 )  {   //  do_tmp_nc = tru
 
 
 
-return ( status );
+return status;
 
 }
 
@@ -165,7 +165,7 @@ if ( PyErr_Occurred() )  {
         << "an error occurred initializing python\n\n";
    release_memory(script_argc, script_argv);
 
-   return ( false );
+   return false;
 
 }
 
@@ -218,7 +218,7 @@ if ( PyErr_Occurred() )  {
         << "an error occurred importing module \""
         << user_script_name << "\"\n\n";
 
-   return ( false );
+   return false;
 
 }
 
@@ -228,7 +228,7 @@ if ( ! module_obj )  {
         << "error running python script \""
         << user_script_name << "\"\n\n";
 
-   return ( false );
+   return false;
 
 }
 
@@ -258,7 +258,7 @@ if ( use_xarray )  {
            << "trouble reading data from \""
            << user_script_name << "\"\n\n";
 
-      return ( false );
+      return false;
    }
 
    dataplane_from_xarray(data_array_obj, met_dp_out, met_grid_out, vinfo);
@@ -286,7 +286,7 @@ if ( use_xarray )  {
                                   << numpy_dict_name << " is missing\n";
       mlog << Warning << "\n";
 
-      return ( false );
+      return false;
    }
 
    Python3_Numpy np;
@@ -301,7 +301,7 @@ if ( use_xarray )  {
    //  done
    //
 
-return ( true );
+return true;
 
 }
 
@@ -309,10 +309,10 @@ return ( true );
 ////////////////////////////////////////////////////////////////////////
 
 
-bool tmp_nc_dataplane(const char * user_script_name,
-                      int user_script_argc, char ** user_script_argv,
-                      const bool use_xarray, DataPlane & met_dp_out,
-                      Grid & met_grid_out, VarInfoPython &vinfo)
+bool tmp_dataplane(const char * user_script_name,
+                   int user_script_argc, char ** user_script_argv,
+                   const bool use_xarray, DataPlane & met_dp_out,
+                   Grid & met_grid_out, VarInfoPython &vinfo)
 
 {
 
@@ -334,13 +334,13 @@ if ( ! tmp_dir )  tmp_dir = default_tmp_dir;
 
 path << cs_erase
      << tmp_dir << '/'
-     << tmp_nc_base_name;
+     << tmp_py_base_name;
 
 tmp_nc_path = make_temp_file_name(path.text(), 0);
 
 command << cs_erase
         << user_ppath                    << ' '    //  user's path to python
-        << replace_path(write_tmp_nc)    << ' '    //  write_tmp_nc.py
+        << replace_path(write_tmp_py)    << ' '    //  write_tmp_nc.py
         << tmp_nc_path                   << ' '    //  tmp_nc output filename
         << user_script_name;                       //  user's script name
 
@@ -385,7 +385,7 @@ if ( PyErr_Occurred() )  {
    mlog << Warning << "\ntmp_nc_dataplane() -> "
         << "an error occurred initializing python\n\n";
 
-   return ( false );
+   return false;
 
 }
 
@@ -397,7 +397,7 @@ StringArray a;
 
 a.add(validate_dataplane);
 
-a.add(replace_path(read_tmp_nc));
+a.add(replace_path(read_tmp_py));
 
 a.add(tmp_nc_path);
 
@@ -412,7 +412,7 @@ mlog << Debug(4) << "Reading temporary Python dataplane file: "
    //  import the python wrapper script as a module
    //
 
-//path = get_short_name(read_tmp_nc);
+//path = get_short_name(read_tmp_py);
 path = get_short_name(validate_dataplane);
 
 PyObject * module_obj = PyImport_ImportModule (path.text());
@@ -435,7 +435,7 @@ if ( PyErr_Occurred() )  {
         << "an error occurred importing module "
         << '\"' << path << "\"\n\n";
 
-   return ( false );
+   return false;
 
 }
 
@@ -444,7 +444,7 @@ if ( ! module_obj )  {
    mlog << Warning << "\ntmp_nc_dataplane() -> "
         << "error running python script\n\n";
 
-   return ( false );
+   return false;
 
 }
 
@@ -495,7 +495,7 @@ remove_temp_file(tmp_nc_path);
    //  done
    //
 
-return ( true );
+return true;
 
 }
 

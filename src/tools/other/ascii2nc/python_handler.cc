@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -8,9 +8,6 @@
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-using namespace std;
 
 
 #include <iostream>
@@ -22,6 +19,8 @@ using namespace std;
 
 #include "vx_python3_utils.h"
 #include "python_handler.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -68,14 +67,13 @@ PythonHandler::PythonHandler(const char * program_name, const char * ascii_filen
 
 {
 
-int j;
 ConcatString s = ascii_filename;
 StringArray a = s.split(" ");
 
 
 user_script_filename = a[0];
 
-for (j=1; j<(a.n()); ++j)  {   //  j starts at one here, not zero
+for (int j=1; j<(a.n()); ++j)  {   //  j starts at one here, not zero
 
    user_script_args.add(a[j]);
 
@@ -117,7 +115,7 @@ bool PythonHandler::isFileType(LineDataFile &ascii_file) const
 
 {
 
-return ( false );
+return false;
 
 }
 
@@ -153,8 +151,7 @@ if ( ! PyList_Check(obj) )  {
 
 }
 
-int j;
-PyObject * a = 0;
+PyObject * a = nullptr;
 Python3_List list(obj);
 Observation obs;
 
@@ -164,7 +161,7 @@ Observation obs;
 
 use_var_id = false;
 
-for (j=0; j<(list.size()); ++j)  {
+for (int j=0; j<(list.size()); ++j)  {
 
    a = list[j];
 
@@ -230,7 +227,7 @@ bool status = false;
 if ( use_tmp_ascii )  status = do_tmp_ascii ();
 else                  status = do_straight ();
 
-return ( status );
+return status;
 
 }
 
@@ -280,7 +277,7 @@ if ( PyErr_Occurred() )  {
         << "an error occurred importing module "
         << '\"' << user_base.text() << "\"\n\n";
 
-   return ( false );
+   return false;
 
 }
 
@@ -305,7 +302,7 @@ PyObject * obj = md.lookup_list(list_name);
 load_python_obs(obj);
 
 
-return ( true );
+return true;
 
 }
 
@@ -405,7 +402,7 @@ remove_temp_file(tmp_ascii_path);
    //  done
    //
 
-return ( true );
+return true;
 
 }
 

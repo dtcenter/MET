@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -117,11 +117,11 @@ MsgLevel::MsgLevel(const MsgLevel & m)
 MsgLevel & MsgLevel::operator=(const MsgLevel & m)
 {
    if (this == &m)
-      return (*this);
+      return *this;
 
    assign(m);
 
-   return (*this);
+   return *this;
 
 }
 
@@ -200,7 +200,7 @@ LoggerError & LoggerError::operator=(const LoggerError & le)
 {
    err = le.err;
 
-   return (*this);
+   return *this;
 
 }
 
@@ -272,7 +272,7 @@ LoggerWarning & LoggerWarning::operator=(const LoggerWarning & lw)
 
    NeedToExit = lw.NeedToExit;
 
-   return (*this);
+   return *this;
 
 }
 
@@ -342,11 +342,11 @@ LoggerDebug::LoggerDebug(const LoggerDebug & m)
 LoggerDebug & LoggerDebug::operator=(const LoggerDebug & m)
 {
    if (this == &m)
-      return (*this);
+      return *this;
 
    assign(m);
 
-   return (*this);
+   return *this;
 
 }
 
@@ -438,7 +438,7 @@ Logger & Logger::operator=(const Logger & l)
 
 void Logger::init_from_scratch()
 {
-   out = (ofstream *) 0;
+   out = (ofstream *) nullptr;
 
    clear();
 
@@ -458,7 +458,7 @@ void Logger::clear()
 
       delete out;
 
-      out = (ofstream *) 0;
+      out = (ofstream *) nullptr;
 
    }
 
@@ -503,7 +503,7 @@ void Logger::dump(ostream & dump_out, int depth) const
 bool Logger::print_warning() const
 {
 
-   return (Warning.PrintWarning);
+   return Warning.PrintWarning;
 
 }
 
@@ -750,7 +750,7 @@ Logger & Logger::operator<<(const string s)
 
    }
 
-   return (*this);
+   return *this;
 
 }
 
@@ -915,7 +915,7 @@ Logger & Logger::operator<<(const char * s)
 
    }
 
-   return (*this);
+   return *this;
 
 }
 
@@ -978,7 +978,7 @@ Logger & Logger::operator<<(const int n)
       }
    }
 
-   return (*this);
+   return *this;
 
 }
 
@@ -1044,7 +1044,7 @@ Logger & Logger::operator<<(const unsigned int n)
       }
    }
 
-   return (*this);
+   return *this;
 
 }
 
@@ -1110,7 +1110,7 @@ Logger & Logger::operator<<(const long l)
       }
    }
 
-   return (*this);
+   return *this;
 
 }
 
@@ -1175,7 +1175,7 @@ Logger & Logger::operator<<(const unsigned long l)
       }
    }
 
-   return (*this);
+   return *this;
 
 }
 
@@ -1241,7 +1241,7 @@ Logger & Logger::operator<<(const long long l)
       }
    }
 
-   return (*this);
+   return *this;
 
 }
 
@@ -1307,7 +1307,7 @@ Logger & Logger::operator<<(const unsigned long long l)
       }
    }
 
-   return (*this);
+   return *this;
 
 }
 
@@ -1373,7 +1373,7 @@ Logger & Logger::operator<<(const double d)
       }
    }
 
-   return (*this);
+   return *this;
 
 }
 
@@ -1439,7 +1439,7 @@ Logger & Logger::operator<<(const char c)
       }
    }
 
-   return (*this);
+   return *this;
 
 }
 
@@ -1505,7 +1505,7 @@ Logger & Logger::operator<<(const bool b)
       }
    }
 
-   return (*this);
+   return *this;
 
 }
 
@@ -1595,7 +1595,7 @@ Logger & Logger::operator<<(const Indent & i)
       }
    }
 
-   return (*this);
+   return *this;
 
 }
 
@@ -1614,7 +1614,7 @@ Logger & Logger::operator<<(const MsgLevel & m)
 
    need_to_output_type = false;
 
-   return (*this);
+   return *this;
 
 }
 
@@ -1626,7 +1626,7 @@ Logger & Logger::operator<<(const LoggerError e)
 {
    (*this) << level(ErrorMessageLevel);
 
-   return (*this);
+   return *this;
 
 }
 
@@ -1643,7 +1643,7 @@ Logger & Logger::operator<<(const LoggerWarning w)
    
    if (Warning.ExitOnWarning) Warning.NeedToExit = true;
    
-   return (*this);
+   return *this;
 
 }
 
@@ -1655,7 +1655,7 @@ Logger & Logger::operator<<(const LoggerDebug d)
 {
    (*this) << level(d.value());
 
-   return (*this);
+   return *this;
 
 }
 
@@ -1750,7 +1750,7 @@ MsgLevel & level(const int n)
       //
       // return a reference to the MsgLevel object
       //
-   return (Global_Level);
+   return Global_Level;
 
 }
 
@@ -1774,7 +1774,7 @@ MsgLevel & Debug(const int n)
       //
       // return a reference to the MsgLevel object
       //
-   return (Global_Level);
+   return Global_Level;
 
 }
 

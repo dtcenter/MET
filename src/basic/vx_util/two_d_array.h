@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -115,7 +115,7 @@ void TwoD_Array<T>::init_from_scratch()
 
 {
 
-E = (T *) 0;
+E = (T *) nullptr;
 
 clear();
 
@@ -133,7 +133,7 @@ void TwoD_Array<T>::clear()
 
 {
 
-if ( E )  { delete [] E;  E = (T *) 0; }
+if ( E )  { delete [] E;  E = (T *) nullptr; }
 
 Nx = Ny = 0;
 

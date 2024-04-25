@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -14,16 +14,18 @@
 //      Common routines for time summary (into NetCDF).
 //
 
-using namespace std;
 
 #include <iostream>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "vx_nc_util.h"
 
 #include "nc_obs_util.h"
+
+using namespace std;
+using namespace netCDF;
+
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -545,7 +547,6 @@ void NetcdfObsVars::read_dims_vars(NcFile *f_in) {
 ////////////////////////////////////////////////////////////////////////
 
 void NetcdfObsVars::read_header_data(MetPointHeader &hdr_data) {
-   bool is_valid_obs_nc = true;
    long nhdr_count  = get_dim_size(&hdr_dim);
    int  strl_len    = get_dim_size(&strl_dim);
    int  strl2_len   = strl_len;

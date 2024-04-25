@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -152,7 +152,7 @@ bool MetUGridDataFile::open_metadata(const char * _filename) {
    (*Dest_Grid) = (*Raw_Grid);
    //Dest_Grid->set(*_file->grid.info().us);
 
-   return(true);
+   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -170,7 +170,6 @@ bool MetUGridDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
 {
    bool status = false;
    NcVarInfo *data_var = (NcVarInfo *)nullptr;
-   const long time_cnt = (long)_file->ValidTime.n();
    static const string method_name
       = "MetUGridDataFile::data_plane(VarInfo &, DataPlane &) -> ";
 
@@ -229,15 +228,13 @@ bool MetUGridDataFile::data_plane(VarInfo &vinfo, DataPlane &plane, NcVarInfo *d
 
    plane.clear();
 
-   int zdim_slot = bad_data_int;
-   int time_dim_slot = bad_data_int;
    NumArray dim_value = vinfo_nc->dim_value();
    LongArray dimension(vinfo_nc->dimension());
    BoolArray is_offset(vinfo_nc->is_offset());
 
    if (nullptr != data_var) {
-      zdim_slot = data_var->z_slot;
-      time_dim_slot = data_var->t_slot;
+      int zdim_slot = data_var->z_slot;
+      int time_dim_slot = data_var->t_slot;
 
       // Adjust dimension and is_offset
       int dim_size = dimension.n_elements();
@@ -310,7 +307,6 @@ int MetUGridDataFile::data_plane_array(VarInfo &vinfo,
                                        DataPlaneArray &plane_array) {
    int n_rec = 0;
    DataPlane plane;
-   bool status = false;
    static const string method_name
          = "MetUGridDataFile::data_plane_array(VarInfo &, DataPlaneArray &) -> ";
 
@@ -320,33 +316,12 @@ int MetUGridDataFile::data_plane_array(VarInfo &vinfo,
    LevelInfo level = vinfo.level();
    long lvl_lower = level.lower();
    long lvl_upper = level.upper();
-   const int debug_level = 7;
    ConcatString req_name = vinfo.req_name();
    NcVarInfo *data_vinfo  = _file->find_by_name(req_name.c_str());
    if (level.type() == LevelType_Time) {
       mlog << Error << "\n" << method_name
            << "LevelType_Time for unstructured grid is not enabled\n\n";
       exit(1);
-      /* Not enabled
-      LongArray time_offsets = collect_time_offsets(vinfo);
-      if (0 < time_offsets.n_elements()) {
-         for (int idx=0; idx<time_offsets.n_elements(); idx++) {
-            _cur_time_index = time_offsets[idx];
-            if (data_plane(vinfo, plane)) {
-               plane_array.add(plane, lvl_lower, lvl_upper);
-               n_rec++;
-            }
-         }
-
-         if (mlog.verbosity_level() >= debug_level) {
-            for (int idx=0; idx< time_offsets.n_elements(); idx++ ) {
-               mlog << Debug(debug_level) << method_name << "time: "
-                    << unix_to_yyyymmdd_hhmmss(_file->ValidTime[time_offsets[idx]])
-                    << " from index " << time_offsets[idx] << "\n";
-            }
-         }
-      }
-      */
    }
    else if (level.type() == LevelType_Pres) {
       if (nullptr == data_vinfo) {
@@ -357,7 +332,7 @@ int MetUGridDataFile::data_plane_array(VarInfo &vinfo,
                if (vlevel >= lvl_lower && vlevel <= lvl_upper) {
                   vinfo.set_req_name(vinfo_list[idx]->name.c_str());
                   if (data_plane(vinfo, plane, vinfo_list[idx])) {
-                     plane_array.add(plane, lvl_lower, lvl_upper);
+                     plane_array.add(plane, vlevel, vlevel);
                      n_rec++;
                   }
                   mlog << Debug(5) << method_name
@@ -382,7 +357,6 @@ int MetUGridDataFile::data_plane_array(VarInfo &vinfo,
       if (lvl_lower != lvl_upper && nullptr != data_vinfo) {
          int tmp_lower = lvl_lower;
          int tmp_upper = lvl_upper;
-         int z_offset = bad_data_int;
          if (data_vinfo->z_slot >= 0) {
             int zdim_size = get_dim_size(data_vinfo->var, data_vinfo->z_slot);
             if (tmp_lower >= zdim_size) tmp_lower = zdim_size - 1;
@@ -422,7 +396,7 @@ LongArray MetUGridDataFile::collect_time_offsets(VarInfo &vinfo) {
       mlog << Warning << "\n" << method_name
            << "can't find NetCDF variable \"" << vinfo_nc->req_name()
            << "\" in file \"" << Filename << "\".\n\n";
-      return(time_offsets);
+      return time_offsets;
    }
 
    int time_dim_slot = info->t_slot;
@@ -431,7 +405,7 @@ LongArray MetUGridDataFile::collect_time_offsets(VarInfo &vinfo) {
       // The time dimension does not exist at the variable and the time
       // variable exists. Stop time slicing and set the time offset to 0.
       time_offsets.add(0);
-      return(time_offsets);
+      return time_offsets;
    }
 
    double time_lower = bad_data_double;
@@ -609,7 +583,7 @@ LongArray MetUGridDataFile::collect_time_offsets(VarInfo &vinfo) {
       exit(1);
    }
 
-   return(time_offsets);
+   return time_offsets;
 }
 
 
@@ -631,7 +605,7 @@ LongArray MetUGridDataFile::collect_vertical_offsets(VarInfo &vinfo) {
       mlog << Warning << "\n" << method_name
            << "can't find NetCDF variable \"" << vinfo_nc->req_name()
            << "\" in file \"" << Filename << "\".\n\n";
-      return(vertical_offsets);
+      return vertical_offsets;
    }
 
    int z_dim_slot = info->z_slot;
@@ -640,7 +614,7 @@ LongArray MetUGridDataFile::collect_vertical_offsets(VarInfo &vinfo) {
       // The vertical dimension does not exist at the variable and the vertical
       // variable exists. Stop vertical slicing and set the vertical offset to 0.
       vertical_offsets.add(0);
-      return(vertical_offsets);
+      return vertical_offsets;
    }
 
    double z_lower = bad_data_double;
@@ -820,7 +794,7 @@ LongArray MetUGridDataFile::collect_vertical_offsets(VarInfo &vinfo) {
       exit(1);
    }
 
-   return(vertical_offsets);
+   return vertical_offsets;
 }
 */
 

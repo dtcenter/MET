@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -24,12 +24,11 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
-
 #include <string.h>
 
 #include "mtdfiletype_to_string.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -39,7 +38,7 @@ ConcatString mtdfiletype_to_string(const MtdFileType t)
 
 {
 
-const char * s = (const char *) 0;
+const char * s = (const char *) nullptr;
 
 switch ( t )  {
 
@@ -57,7 +56,7 @@ switch ( t )  {
 }   //  switch
 
 
-return ( ConcatString (s) );
+return ConcatString(s);
 
 }
 
@@ -69,16 +68,16 @@ bool string_to_mtdfiletype(const char * text, MtdFileType & t)
 
 {
 
-     if ( strcmp(text, "mtd_file_raw"    ) == 0 )   { t = mtd_file_raw;       return ( true ); }
-else if ( strcmp(text, "mtd_file_conv"   ) == 0 )   { t = mtd_file_conv;      return ( true ); }
-else if ( strcmp(text, "mtd_file_mask"   ) == 0 )   { t = mtd_file_mask;      return ( true ); }
-else if ( strcmp(text, "mtd_file_object" ) == 0 )   { t = mtd_file_object;    return ( true ); }
-else if ( strcmp(text, "no_mtd_file_type") == 0 )   { t = no_mtd_file_type;   return ( true ); }
+     if ( strcmp(text, "mtd_file_raw"    ) == 0 )   { t = mtd_file_raw;       return true; }
+else if ( strcmp(text, "mtd_file_conv"   ) == 0 )   { t = mtd_file_conv;      return true; }
+else if ( strcmp(text, "mtd_file_mask"   ) == 0 )   { t = mtd_file_mask;      return true; }
+else if ( strcmp(text, "mtd_file_object" ) == 0 )   { t = mtd_file_object;    return true; }
+else if ( strcmp(text, "no_mtd_file_type") == 0 )   { t = no_mtd_file_type;   return true; }
    //
    //  nope
    //
 
-return ( false );
+return false;
 
 }
 

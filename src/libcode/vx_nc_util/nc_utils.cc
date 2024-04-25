@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -199,9 +199,9 @@ bool get_att_value_chars(const NcAtt *att, ConcatString &value) {
                att->getValues(att_value);
                value = att_value[0];
             }
-            catch (exceptions::NcException &ex) {
+            catch (exceptions::NcException &ex2) {
                mlog << Warning << "\n" << method_name
-                    << "Exception: " << ex.what() << "\n"
+                    << "Exception: " << ex2.what() << "\n"
                     << "Fail to read " << GET_NC_NAME_P(att) << " attribute ("
                     << GET_NC_TYPE_NAME_P(att) << " type).\n"
                     << "Please check the encoding of the "<< GET_NC_NAME_P(att) << " attribute.\n\n";
@@ -418,7 +418,7 @@ ConcatString get_log_msg_for_att(const NcVarAtt *att, string var_name,
 ////////////////////////////////////////////////////////////////////////
 
 NcVarAtt *get_nc_att(const NcVar * var, const ConcatString &att_name, bool exit_on_error) {
-   NcVarAtt *att = (NcVarAtt *)0;
+   NcVarAtt *att = (NcVarAtt *) nullptr;
    static const char *method_name = "get_nc_att(NcVar) -> ";
 
    //
@@ -453,7 +453,7 @@ NcVarAtt *get_nc_att(const NcVar * var, const ConcatString &att_name, bool exit_
 ////////////////////////////////////////////////////////////////////////
 
 NcGroupAtt *get_nc_att(const NcFile * nc, const ConcatString &att_name, bool exit_on_error) {
-   NcGroupAtt *att = (NcGroupAtt *)0;
+   NcGroupAtt *att = (NcGroupAtt *) nullptr;
    static const char *method_name = "get_nc_att(NcFile) -> ";
 
    //
@@ -491,7 +491,7 @@ NcGroupAtt *get_nc_att(const NcFile * nc, const ConcatString &att_name, bool exi
 bool get_nc_att_value(const NcVar *var, const ConcatString &att_name,
                       ConcatString &att_val, int grp_id, bool exit_on_error) {
    bool status = false;
-   NcVarAtt *att = (NcVarAtt *) 0;
+   NcVarAtt *att = (NcVarAtt *) nullptr;
 
    // Initialize
    att_val.clear();
@@ -805,7 +805,7 @@ bool get_global_att(const NcFile *nc, const ConcatString& att_name,
       if (status) att_val = tmp_att_val;
    }
 
-   return (status);
+   return status;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1057,7 +1057,7 @@ ConcatString* get_string_val(NcFile * nc, const char * var_name, const int index
                              const int len, ConcatString &tmp_cs) {
    NcVar var = get_var(nc, var_name);
 
-   return (get_string_val(&var, index, len, tmp_cs));
+   return get_string_val(&var, index, len, tmp_cs);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1101,7 +1101,7 @@ ConcatString* get_string_val(NcVar *var, const int index,
    //
    tmp_cs = tmp_str;
 
-   return (&tmp_cs);
+   return &tmp_cs;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1273,7 +1273,7 @@ float get_float_var(NcVar * var, const int index) {
             exit(1);
          }
       }
-      else if ((index > dim_size) && (0 < dim_size)){
+      else if (index > dim_size){
          NcDim nc_dim = get_nc_dim(var, dim_idx);
          mlog << Error << "\n" << method_name << "The start offset ("
               << index << ") exceeds the dimension " << dim_size << " "
@@ -1391,11 +1391,10 @@ bool get_nc_data(NcVar *var, float *data) {
                {
                   double *packed_data = new double[cell_count];
                   if (get_nc_data_t(var, packed_data)) {
-                     double a_data;
                      double fill_value;
                      bool has_fill_value = get_var_fill_value(var, fill_value);
                      for (int idx=0; idx<cell_count; idx++) {
-                        a_data = packed_data[idx];
+                        double a_data = packed_data[idx];
                         if(has_fill_value && is_eq(a_data, fill_value))
                            data[idx] = bad_data_float;
                         else data[idx] = (float)a_data;
@@ -2212,9 +2211,9 @@ bool put_nc_data_with_dims(NcVar *var, const double *data,
 ////////////////////////////////////////////////////////////////////////
 
 bool args_ok(const LongArray & a) {
-   int j, k;
+   int k;
 
-   for (j=0; j<(a.n_elements()); ++j)  {
+   for (int j=0; j<(a.n_elements()); ++j)  {
 
       k = a[j];
 
@@ -3457,7 +3456,7 @@ NcVar get_nc_var_time(const NcFile *nc) {
 ////////////////////////////////////////////////////////////////////////
 
 NcFile *open_ncfile(const char * nc_name, bool write) {
-   NcFile *nc = (NcFile *)0;
+   NcFile *nc = (NcFile *) nullptr;
 
    try {
       if (write) {

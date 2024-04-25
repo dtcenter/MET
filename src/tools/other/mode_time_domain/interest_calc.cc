@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -11,8 +11,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -21,6 +19,8 @@ using namespace std;
 #include "vx_math.h"
 
 #include "interest_calc.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -82,11 +82,11 @@ InterestCalculator & InterestCalculator::operator=(const InterestCalculator & i)
 
 {
 
-if ( this == &i )  return ( * this );
+if ( this == &i )  return *this;
 
 assign(i);
 
-return ( * this );
+return *this;
 
 }
 
@@ -353,7 +353,7 @@ for (j=0; j<Nelements; ++j)  {
 
 sum *= Scale;
 
-return ( sum );
+return sum;
 
 }
 

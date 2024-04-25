@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -77,6 +77,7 @@
 //                    the -pcpdir option.
 //   024    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
 //   025    09/29/22  Prestopnik     MET #2227 Remove namespace netCDF from header files
+//   026    01/29/24  Halley Gotway  MET #2801 Configure time difference warnings
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -118,10 +119,10 @@ static const char derive_options  [] =
    "sum, min, max, range, mean, stdev, vld_count";
 
 // Run Command enumeration
-enum RunCommand { sum = 0, add = 1, sub = 2, der = 3 };
+enum class RunCommand { sum = 0, add = 1, sub = 2, der = 3 };
 
 // Variables for top-level command line arguments
-static RunCommand run_command = sum;
+static RunCommand run_command = RunCommand::sum;
 
 // Variables common to all commands
 static int          n_files;
@@ -231,8 +232,8 @@ int met_main(int argc, char *argv[]) {
       // Perform the requested run or subtract command.
       // Derive handles add and derive.
       //
-           if(run_command == sum) do_sum_command();
-      else if(run_command == sub) do_sub_command();
+           if(run_command == RunCommand::sum) do_sum_command();
+      else if(run_command == RunCommand::sub) do_sub_command();
       else                        do_derive_command();
    }
 
@@ -263,7 +264,7 @@ void process_command_line(int argc, char **argv) {
    //
    // Default to running the sum command
    //
-   run_command = sum;
+   run_command = RunCommand::sum;
    derive_list.add("sum");
 
    //
@@ -304,8 +305,8 @@ void process_command_line(int argc, char **argv) {
    //
    // Process the specific command arguments.
    //
-   if(run_command == sum) process_sum_args(cline);
-   else                   process_add_sub_derive_args(cline);
+   if(run_command == RunCommand::sum) process_sum_args(cline);
+   else                               process_add_sub_derive_args(cline);
 
    //
    // If -field not set, set to a list of length 1 with an empty string.
@@ -755,9 +756,9 @@ int search_pcp_dir(const char *cur_dir, const unixtime cur_ut,
          cur_file << cs_erase << cur_dir << '/' << dirp->d_name;
 
          Met2dDataFileFactory factory;
-         Met2dDataFile * mtddf = (Met2dDataFile *) nullptr;
+         Met2dDataFile * mtddf;
          VarInfoFactory var_fac;
-         VarInfo * cur_var = (VarInfo *) nullptr;
+         VarInfo * cur_var;
 
          //
          // Create a data file object.
@@ -815,7 +816,7 @@ int search_pcp_dir(const char *cur_dir, const unixtime cur_ut,
 
    if(dp) met_closedir(dp);
 
-   return(i_rec);
+   return i_rec;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -869,15 +870,25 @@ void do_sub_command() {
    nc_valid_time = plus.valid();
 
    //
-   // Output initialization time
-   // Warning if init_time1 != init_time2.
+   // Check that the initialization times match
    //
    if(plus.init() != minus.init()) {
-      mlog << Warning << "\ndo_sub_command() -> "
-           << "the initialization times do not match ("
-           << unix_to_yyyymmdd_hhmmss(plus.init()) <<  " != "
-           << unix_to_yyyymmdd_hhmmss(minus.init())
-           << ") for subtraction.  Using the first value.\n\n";
+
+      ConcatString cs;
+      cs << cs_erase
+         << "The initialization times do not match ("
+         << unix_to_yyyymmdd_hhmmss(plus.init()) << " != "
+         << unix_to_yyyymmdd_hhmmss(minus.init())
+         << ") for subtraction. Using the first value.";
+
+      if(config.time_offset_warning(
+            (int) (plus.init() - minus.init()))) {
+         mlog << Warning << "\ndo_sub_command() -> "
+               << cs << "\n\n";
+      }
+      else {
+         mlog << Debug(3) << cs << "\n";
+      }
    }
    nc_init_time = plus.init();
 
@@ -1145,13 +1156,13 @@ void do_derive_command() {
          for(j=0; j<nxy; j++) {
             double s  = sum_dp.data()[j];
             double sq = sum_sq_dp.data()[j];
-            double n  = vld_dp.data()[j];
+            double nd  = vld_dp.data()[j];
             if(is_bad_data(s) || is_bad_data(sq) ||
-               is_bad_data(n) || n <= 1) {
+               is_bad_data(nd) || nd <= 1) {
                der_dp.buf()[j] = bad_data_double;
             }
             else {
-               v = (sq - s*s/n)/(n-1);
+               v = (sq - s*s/nd)/(nd-1);
                if(is_eq(v, 0.0)) v = 0.0;
                der_dp.buf()[j] = sqrt(v);
             }
@@ -1284,21 +1295,21 @@ void open_nc(const Grid &grid) {
    // Add global attributes.
    write_netcdf_global(nc_out, out_filename.c_str(), program_name.c_str());
 
-   if(run_command == sum) {
+   if(run_command == RunCommand::sum) {
       command_str << cs_erase
                   << "Sum: " << n_files
                   << " files with accumulations of "
                   << sec_to_hhmmss(in_accum) << '.';
-   } else if(run_command == add) {
+   } else if(run_command == RunCommand::add) {
       command_str << cs_erase
                   << "Addition: " << n_files << " files.";
    }
-   else if(run_command == sub) {
+   else if(run_command == RunCommand::sub) {
       command_str << cs_erase
                   << "Subtraction: "
                   << file_list[0] << " minus " << file_list[1];
    }
-   else { // run_command = der
+   else { // run_command = RunCommand::der
       command_str << cs_erase
                   << "Derive: " << write_css(derive_list) << " of "
                   << n_files << " files.";
@@ -1380,7 +1391,7 @@ void write_nc_data(unixtime nc_init, unixtime nc_valid, int nc_accum,
       //
       // Append the derivation string.
       //
-      if(run_command == der) var_str << "_" << derive_str;
+      if(run_command == RunCommand::der) var_str << "_" << derive_str;
    }
 
    mlog << Debug(2)
@@ -1397,8 +1408,8 @@ void write_nc_data(unixtime nc_init, unixtime nc_valid, int nc_accum,
 
    // Add variable attributes.
    add_att(&nc_var, "name",  var_str.c_str());
-   if(run_command == der) cs = long_name_prefix;
-   else                   cs.clear();
+   if(run_command == RunCommand::der) cs = long_name_prefix;
+   else                               cs.clear();
    cs << var_info->long_name_attr();
    add_att(&nc_var, "long_name", cs.c_str());
 
@@ -1477,17 +1488,17 @@ ConcatString parse_config_str(const char *s) {
       config_str = s;
    }
 
-   return(config_str);
+   return config_str;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool is_timestring(const char * text) {
 
-   if(is_hh(text))     return(true);
-   if(is_hhmmss(text)) return(true);
+   if(is_hh(text))     return true;
+   if(is_hhmmss(text)) return true;
 
-   return(false);
+   return false;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1613,7 +1624,7 @@ void usage() {
 ////////////////////////////////////////////////////////////////////////
 
 void set_sum(const StringArray &) {
-   run_command = sum;
+   run_command = RunCommand::sum;
    derive_list.clear();
    derive_list.add("sum");
 }
@@ -1621,7 +1632,7 @@ void set_sum(const StringArray &) {
 ////////////////////////////////////////////////////////////////////////
 
 void set_add(const StringArray &) {
-   run_command = add;
+   run_command = RunCommand::add;
    derive_list.clear();
    derive_list.add("sum");
 }
@@ -1629,7 +1640,7 @@ void set_add(const StringArray &) {
 ////////////////////////////////////////////////////////////////////////
 
 void set_subtract(const StringArray &) {
-   run_command = sub;
+   run_command = RunCommand::sub;
    derive_list.clear();
    derive_list.add("diff");
 }
@@ -1637,7 +1648,7 @@ void set_subtract(const StringArray &) {
 ////////////////////////////////////////////////////////////////////////
 
 void set_derive(const StringArray & a) {
-   run_command = der;
+   run_command = RunCommand::der;
    derive_list.clear();
 
    StringArray sa;

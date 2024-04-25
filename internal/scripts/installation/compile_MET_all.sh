@@ -50,8 +50,8 @@
 # Please supply values for the following environment variables
 # in the input environment configuration file (install_met_env.<machine_name>:
 # MET_GRIB2CLIB, MET_GRIB2CINC, GRIB2CLIB_NAME, MET_BUFRLIB, BUFRLIB_NAME, 
-# MET_HDF5, MET_NETCDF, MET_PROJ, MET_GSL, LIB_JASPER, LIB_PNG, LIB_Z,
-# SQLITE_INCLUDE_DIR, SQLITE_LIB_DIR.
+# MET_HDF5, MET_NETCDF, MET_PROJ, MET_GSL, LIB_JASPER, LIB_LIBPNG, LIB_Z,
+# SQLITE_INCLUDE_DIR, SQLITE_LIB_DIR, TIFF_INCLUDE_DIR, TIFF_LIB_DIR.
 #
 # The optional libraries ecKit and atlas offer support for unstructured
 # grids. The optional libraries HDF4, HDFEOS, FREETYPE, and CAIRO are
@@ -157,6 +157,13 @@ if [[ -z "$LIB_Z" ]]; then
   LIB_Z=${LIB_DIR}/lib
 fi
 
+# if TIFF is not defined in the environment file, enable its compilation                                                                                                                                                               
+if [[ -z ${TIFF_INCLUDE_DIR} ]] && [[ -z ${TIFF_LIB_DIR} ]]; then
+   COMPILE_TIFF=1
+else
+   COMPILE_TIFF=0
+fi
+
 # if SQLITE is not defined in the environment file, enable its compilation
 if [[ -z ${SQLITE_INCLUDE_DIR} ]] && [[ -z ${SQLITE_LIB_DIR} ]]; then
    COMPILE_SQLITE=1
@@ -177,29 +184,13 @@ else
   COMPILE_G2CLIB=0
 fi
 
-if [ -z ${MET_BUFRLIB} ]; then
-  COMPILE_BUFRLIB=1
-else
-  COMPILE_BUFRLIB=0
-fi
+if [ -z ${MET_BUFRLIB} ]; then COMPILE_BUFRLIB=1; else COMPILE_BUFRLIB=0; fi
 
-if [ -z ${MET_NETCDF} ]; then
-  COMPILE_NETCDF=1
-else
-  COMPILE_NETCDF=0
-fi
+if [ -z ${MET_NETCDF} ]; then COMPILE_NETCDF=1; else COMPILE_NETCDF=0; fi
 
-if [ -z ${MET_PROJ} ]; then
-  COMPILE_PROJ=1
-else
-  COMPILE_PROJ=0
-fi
+if [ -z ${MET_PROJ} ]; then COMPILE_PROJ=1; else COMPILE_PROJ=0; fi
 
-if [ -z ${MET_GSL} ]; then
-  COMPILE_GSL=1
-else
-  COMPILE_GSL=0
-fi
+if [ -z ${MET_GSL} ]; then COMPILE_GSL=1; else COMPILE_GSL=0; fi
 
 # Only set COMPILE_ECKIT and COMPILE_ATLAS if you want to compile and enable support for unstructued grids
 if [ ! -z "${COMPILE_ECKIT}" ]; then COMPILE_ECKIT=1; else COMPILE_ECKIT=0; fi
@@ -388,12 +379,6 @@ else
   exit
 fi
 
-#export CC
-#export CXX
-#export FC
-#export F77
-#export F90
-
 echo "export  CC=${CC}"
 echo "export CXX=${CXX}"
 echo "export  FC=${FC}"
@@ -411,10 +396,17 @@ case "${unameOut}" in
     *)          machine="UNKNOWN:${unameOut}"
 esac
 
+# change sed command and extension for dynamic library files
 if [[ $machine == "Mac" ]]; then
     sed_inline="sed -i ''"
 else
     sed_inline="sed -i''"
+fi
+
+if [[ "$(uname -m)" == "arm64" ]]; then
+    dynamic_lib_ext="dylib"
+else
+    dynamic_lib_ext="so"
 fi
 
 # Load Python module
@@ -442,6 +434,22 @@ fi
 # Compile Proj
 if [ $COMPILE_PROJ -eq 1 ]; then
 
+
+  if [ $COMPILE_TIFF -eq 1 ]; then
+    echo
+    echo "Compiling TIFF at `date`"
+    mkdir -p ${LIB_DIR}/tiff
+    rm -rf ${LIB_DIR}/tiff/tiff*
+    tar -xzf ${TAR_DIR}/tiff*.tar.gz -C ${LIB_DIR}/tiff
+    cd ${LIB_DIR}/tiff/tiff*
+    echo "cd `pwd`"
+    run_cmd "./configure --prefix=${LIB_DIR} > $(pwd)/tiff.configure.log 2>&1"
+    run_cmd "make ${MAKE_ARGS} > $(pwd)/tiff.make.log 2>&1"
+    run_cmd "make ${MAKE_ARGS} install > $(pwd)/tiff.make_install.log 2>&1"
+    export TIFF_INCLUDE_DIR=${LIB_DIR}/include
+    export TIFF_LIB_DIR=${LIB_DIR}/lib
+  fi
+
   if [ $COMPILE_SQLITE -eq 1 ]; then
     echo
     echo "Compiling SQLITE at `date`"
@@ -450,17 +458,18 @@ if [ $COMPILE_PROJ -eq 1 ]; then
     tar -xf ${TAR_DIR}/sqlite*.tar.gz -C ${LIB_DIR}/sqlite > /dev/null 2>&1
     cd ${LIB_DIR}/sqlite/sqlite*
     echo "cd `pwd`"
-    run_cmd "./configure --enable-shared --prefix=${LIB_DIR} > sqlite.configure.log 2>&1"
-    run_cmd "make ${MAKE_ARGS} > sqlite.make.log 2>&1"
-    run_cmd "make ${MAKE_ARGS} install > sqlite.make_install.log 2>&1"
+    run_cmd "./configure --enable-shared --prefix=${LIB_DIR} > $(pwd)/sqlite.configure.log 2>&1"
+    run_cmd "make ${MAKE_ARGS} > $(pwd)/sqlite.make.log 2>&1"
+    run_cmd "make ${MAKE_ARGS} install > $(pwd)/sqlite.make_install.log 2>&1"
     export SQLITE_INCLUDE_DIR=${LIB_DIR}/include
     export SQLITE_LIB_DIR=${LIB_DIR}/lib
   fi
 
-  vrs="7.1.0";
+  vrs="7.1.0"
 
   echo
   echo "Compiling PROJ_${vrs} at `date`"
+  echo "cmake version `cmake --version`"
   mkdir -p ${LIB_DIR}/proj
   rm -rf ${LIB_DIR}/proj/proj*
   tar -xf ${TAR_DIR}/proj-${vrs}.tar.gz -C ${LIB_DIR}/proj
@@ -468,13 +477,20 @@ if [ $COMPILE_PROJ -eq 1 ]; then
   echo "cd `pwd`"
   export PATH=${LIB_DIR}/bin:${PATH}
   run_cmd "mkdir build; cd build"
-  if [[ -z "$LIB_TIFF" ]]; then
-      run_cmd "cmake -DCMAKE_INSTALL_PREFIX=${LIB_DIR} -DSQLITE3_INCLUDE_DIR=${SQLITE_INCLUDE_DIR} -DSQLITE3_LIBRARY=${SQLITE_LIB_DIR}/libsqlite3.so .."
-  else
-      run_cmd "cmake -DCMAKE_INSTALL_PREFIX=${LIB_DIR} -DSQLITE3_INCLUDE_DIR=${SQLITE_INCLUDE_DIR} -DSQLITE3_LIBRARY=${SQLITE_LIB_DIR}/libsqlite3.so -DTIFF_LIBRARY_RELEASE=${LIB_TIFF} .."
+
+  tiff_arg=""
+  # add tiff library and include arguments if necessary
+  if [[ ! -z "$TIFF_LIB_DIR" ]]; then
+    tiff_arg+="-DTIFF_LIBRARY_RELEASE=${TIFF_LIB_DIR}/libtiff.${dynamic_lib_ext}"
   fi
-  run_cmd "cmake --build ."
-  run_cmd "cmake --build . --target install"
+  if [[ ! -z "$TIFF_INCLUDE_DIR" ]]; then
+    tiff_arg+=" -DTIFF_INCLUDE_DIR=${TIFF_INCLUDE_DIR}"
+  fi
+
+  cmd="cmake -DCMAKE_INSTALL_PREFIX=${LIB_DIR} -DSQLITE3_INCLUDE_DIR=${SQLITE_INCLUDE_DIR} -DSQLITE3_LIBRARY=${SQLITE_LIB_DIR}/libsqlite3.${dynamic_lib_ext} ${tiff_arg} .. > $(pwd)/proj.cmake.log 2>&1"
+  run_cmd ${cmd}
+  run_cmd "cmake --build . > $(pwd)/proj.cmake_build.log 2>&1"
+  run_cmd "cmake --build . --target install > $(pwd)/proj.cmake_install.log 2>&1"
 
 fi
 
@@ -482,9 +498,9 @@ fi
 if [ $COMPILE_GSL -eq 1 ]; then
 
   if [ ${COMPILER_FAMILY} = "pgi" ]; then
-    vrs="1.11";
+    vrs="1.11"
   else
-    vrs="2.7.1";
+    vrs="2.7.1"
   fi
 
   echo
@@ -494,15 +510,15 @@ if [ $COMPILE_GSL -eq 1 ]; then
   tar -xf ${TAR_DIR}/gsl-${vrs}.tar.gz -C ${LIB_DIR}/gsl
   cd ${LIB_DIR}/gsl/gsl*
   echo "cd `pwd`"
-  run_cmd "./configure --prefix=${LIB_DIR} > gsl.configure.log 2>&1"
-  run_cmd "make ${MAKE_ARGS} > gsl.make.log 2>&1"
-  run_cmd "make ${MAKE_ARGS} install > gsl.make_install.log 2>&1"
+  run_cmd "./configure --prefix=${LIB_DIR} > $(pwd)/gsl.configure.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} > $(pwd)/gsl.make.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} install > $(pwd)/gsl.make_install.log 2>&1"
 fi
 
 # Compile BUFRLIB
 if [ $COMPILE_BUFRLIB -eq 1 ]; then
 
-  vrs="v11.6.0";
+  vrs="v11.6.0"
 
   echo
   echo "Compiling bufr_${vrs} at `date`"
@@ -514,11 +530,11 @@ if [ $COMPILE_BUFRLIB -eq 1 ]; then
   echo "cd `pwd`"
   run_cmd "mkdir build"
   export BUILD_DIR=${SOURCE_DIR}/build
-  run_cmd "cmake -H${SOURCE_DIR} -B${BUILD_DIR} -DCMAKE_INSTALL_PREFIX=${LIB_DIR} -DCMAKE_BUILD_TYPE=Debug"
+  run_cmd "cmake -H${SOURCE_DIR} -B${BUILD_DIR} -DCMAKE_INSTALL_PREFIX=${LIB_DIR} -DCMAKE_BUILD_TYPE=Debug > $(pwd)/bufr.cmake.log 2>&1"
   run_cmd "cd ${BUILD_DIR}"
-  run_cmd "make ${MAKE_ARGS} > bufr.make.log 2>&1"
-  run_cmd "ctest > bufr.ctest.log 2>&1"
-  run_cmd "make ${MAKE_ARGS} install > bufr.make_install.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} > $(pwd)/bufr.make.log 2>&1"
+  run_cmd "ctest > $(pwd)/bufr.ctest.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} install > $(pwd)/bufr.make_install.log 2>&1"
 fi
 
 
@@ -531,14 +547,13 @@ if [ $COMPILE_ZLIB -eq 1 ]; then
   tar -xzf ${TAR_DIR}/zlib*.tar.gz -C ${LIB_DIR}/zlib
   cd ${LIB_DIR}/zlib/zlib*
   echo "cd `pwd`"
-  run_cmd "./configure --prefix=${LIB_DIR} > zlib.configure.log 2>&1"
-  run_cmd "make ${MAKE_ARGS} > zlib.make.log 2>&1"
-  run_cmd "make ${MAKE_ARGS} install > zlib.make_install.log 2>&1"
+  run_cmd "./configure --prefix=${LIB_DIR} > $(pwd)/zlib.configure.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} > $(pwd)/zlib.make.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} install > $(pwd)/zlib.make_install.log 2>&1"
 
   # GPM: why is this removed? Could we add a comment to
   # describe why this is needed?
-  echo "rm ${LIB_DIR}/lib/zlib.a"
-  rm ${LIB_DIR}/lib/libz.a
+  run_cmd "rm ${LIB_DIR}/lib/libz.a"
 fi
 
 # Compile LIBPNG
@@ -550,15 +565,15 @@ if [[ $COMPILE_LIBPNG -eq 1 && $HOST != ys* ]]; then
   tar -xzf ${TAR_DIR}/libpng*.tar.gz -C ${LIB_DIR}/libpng
   cd ${LIB_DIR}/libpng/libpng*
   echo "cd `pwd`"
-  run_cmd "./configure --prefix=${LIB_DIR} LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include > libpng.configure.log 2>&1"
-  run_cmd "make ${MAKE_ARGS} > libpng.make.log 2>&1"
-  run_cmd "make ${MAKE_ARGS} install > libpng.make_install.log 2>&1"
+  run_cmd "./configure --prefix=${LIB_DIR} LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include > $(pwd)/libpng.configure.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} > $(pwd)/libpng.make.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} install > $(pwd)/libpng.make_install.log 2>&1"
 fi
 
 # Compile JASPER
 if [ $COMPILE_JASPER -eq 1 ]; then
 
-  vrs="2.0.25";  
+  vrs="2.0.25"
     
   echo
   echo "Compiling JASPER at `date`"
@@ -570,17 +585,19 @@ if [ $COMPILE_JASPER -eq 1 ]; then
   export SOURCE_DIR=${LIB_DIR}/jasper/jasper-version-${vrs}
   echo "cd `pwd`"
   export BUILD_DIR=${LIB_DIR}/jasper/jasper-version-${vrs}/build
-  run_cmd "cmake -G \"Unix Makefiles\" -H${SOURCE_DIR} -B${BUILD_DIR} -DCMAKE_INSTALL_PREFIX=${LIB_DIR}"
+  run_cmd "cmake -G \"Unix Makefiles\" -H${SOURCE_DIR} -B${BUILD_DIR} -DCMAKE_INSTALL_PREFIX=${LIB_DIR} -DJAS_ENABLE_DOC=false > $(pwd)/jasper.cmake.log 2>&1"
   run_cmd "cd ${BUILD_DIR}"
-  run_cmd "make clean all"
-  run_cmd "make ${MAKE_ARGS} test > jasper.make_test.log 2>&1"
-  run_cmd "make ${MAKE_ARGS} install > jasper.make_install.log 2>&1"
+  run_cmd "make clean all > $(pwd)/jasper.make.log 2>&1"
+  # Commented out due to “which: no opj2_compress in …” error, which causes one of four tests to fail
+  # This is a known problem, so skipping tests for now: https://github.com/AAROC/CODE-RADE/issues/36#issuecomment-359744351
+  #run_cmd "make ${MAKE_ARGS} test > $(pwd)/jasper.make_test.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} install > $(pwd)/jasper.make_install.log 2>&1"
 fi
 
 # Compile G2CLIB
 if [ $COMPILE_G2CLIB -eq 1 ]; then
 
-  vrs="1.6.4";   
+  vrs="1.6.4"
 
   echo
   echo "Compiling G2CLIB at `date`"
@@ -590,10 +607,10 @@ if [ $COMPILE_G2CLIB -eq 1 ]; then
   cd ${LIB_DIR}/g2clib/NCEP*
   echo "cd `pwd`"
   run_cmd "mkdir build; cd build"
-  run_cmd "cmake -DCMAKE_INSTALL_PREFIX=${LIB_DIR} -DCMAKE_PREFIX_PATH=${LIB_DIR} .."
-  run_cmd "make ${MAKE_ARGS} > g2c.make.log 2>&1"
-  run_cmd "make ${MAKE_ARGS} test > g2c.make_test.log 2>&1"
-  run_cmd "make ${MAKE_ARGS} install > g2c.make_install.log 2>&1"
+  run_cmd "cmake -DCMAKE_INSTALL_PREFIX=${LIB_DIR} -DCMAKE_PREFIX_PATH=${LIB_DIR} .. > $(pwd)/g2c.cmake.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} > $(pwd)/g2c.make.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} test > $(pwd)/g2c.make_test.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} install > $(pwd)/g2c.make_install.log 2>&1"
 fi
 
 # Compile ECKIT
@@ -601,7 +618,7 @@ if  [ $COMPILE_ECKIT -eq 1 ]; then
 
   # Need to obtain ecbuild before installing eckit
 
-  vrs="3.5.0";  
+  vrs="3.5.0"
     
   echo  
   echo "Compiling ECBUILD at `date`"
@@ -611,10 +628,10 @@ if  [ $COMPILE_ECKIT -eq 1 ]; then
   cd ${LIB_DIR}/ecbuild/ecbuild*
   echo "cd `pwd`"
   run_cmd "mkdir build; cd build"
-  run_cmd "cmake ../ -DCMAKE_INSTALL_PREFIX=${LIB_DIR}"
-  run_cmd "make ${MAKE_ARGS} install > ecbuild.make_install.log 2>&1"
+  run_cmd "cmake ../ -DCMAKE_INSTALL_PREFIX=${LIB_DIR} > $(pwd)/ecbuild.cmake.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} install > $(pwd)/ecbuild.make_install.log 2>&1"
   
-  vrs="1.20.2";
+  vrs="1.20.2"
 
   echo
   echo "Compiling ECKIT at `date`"
@@ -624,15 +641,15 @@ if  [ $COMPILE_ECKIT -eq 1 ]; then
   cd ${LIB_DIR}/eckit/eckit*
   echo "cd `pwd`"
   run_cmd "mkdir build; cd build"
-  run_cmd "cmake ../ -DCMAKE_INSTALL_PREFIX=${LIB_DIR} -DCMAKE_PREFIX_PATH=${LIB_DIR}"
-  run_cmd "make ${MAKE_ARGS} install > eckit.make_install.log 2>&1"
+  run_cmd "cmake ../ -DCMAKE_INSTALL_PREFIX=${LIB_DIR} -DCMAKE_PREFIX_PATH=${LIB_DIR} > $(pwd)/eckit.cmake.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} install > $(pwd)/eckit.make_install.log 2>&1"
 
 fi
 
 # Compile ATLAS
 if [ $COMPILE_ATLAS -eq 1 ]; then
 
-  vrs="0.30.0";
+  vrs="0.30.0"
 
   echo
   echo "Compiling ATLAS at `date`"
@@ -642,9 +659,9 @@ if [ $COMPILE_ATLAS -eq 1 ]; then
   cd ${LIB_DIR}/atlas/atlas*
   echo "cd `pwd`"
   run_cmd "mkdir build; cd build"
-  run_cmd "cmake ../ -DCMAKE_INSTALL_PREFIX=${LIB_DIR} -DCMAKE_PREFIX_PATH=${LIB_DIR}"
-  run_cmd "make ${MAKE_ARGS} > atlas.make.log 2>&1"
-  run_cmd "make ${MAKE_ARGS} install > atlas.make_install.log 2>&1"
+  run_cmd "cmake ../ -DCMAKE_INSTALL_PREFIX=${LIB_DIR} -DCMAKE_PREFIX_PATH=${LIB_DIR} > $(pwd)/atlas.cmake.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} > $(pwd)/atlas.make.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} install > $(pwd)/atlas.make_install.log 2>&1"
 
 fi
 
@@ -661,7 +678,7 @@ if [ $COMPILE_HDF -eq 1 ]; then
   tar -xf ${TAR_DIR}/HDF4.2*.tar.gz -C ${LIB_DIR}/hdf
   cd ${LIB_DIR}/hdf/HDF*
   echo "cd `pwd`"
-  run_cmd "./configure --prefix=${LIB_DIR} --disable-netcdf --with-jpeg=${LIB_DIR} --with-zlib=${LIB_DIR} CPPFLAGS=-I/usr/include/tirpc LIBS='-lm -ltirpc' > hdf4.configure.log 2>&1"
+  run_cmd "./configure --prefix=${LIB_DIR} --disable-netcdf --with-jpeg=${LIB_DIR} --with-zlib=${LIB_DIR} CPPFLAGS=-I/usr/include/tirpc LIBS='-lm -ltirpc' > $(pwd)/hdf4.configure.log 2>&1"
   if [[ ${COMPILER_MAJOR_VERSION} -ge 10 ]]; then
     cat hdf/src/Makefile | \
       sed 's/FFLAGS =  -O2/FFLAGS = -w -fallow-argument-mismatch -O2/g' \
@@ -672,8 +689,8 @@ if [ $COMPILE_HDF -eq 1 ]; then
       > Makefile_new
   fi
   mv Makefile_new hdf/src/Makefile
-  run_cmd "make ${MAKE_ARGS} > hdf4.make.log 2>&1"
-  run_cmd "make ${MAKE_ARGS} install > hdf4.make_install.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} > $(pwd)/hdf4.make.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} install > $(pwd)/hdf4.make_install.log 2>&1"
 fi
 
 # Compile HDFEOS
@@ -686,9 +703,9 @@ if [ $COMPILE_HDFEOS -eq 1 ]; then
   tar -xzf ${TAR_DIR}/HDF-EOS*.tar.* -C ${LIB_DIR}/hdfeos
   cd ${LIB_DIR}/hdfeos/hdfeos
   echo "cd `pwd`"
-  run_cmd "./configure --prefix=${LIB_DIR} --with-hdf4=${LIB_DIR} --with-jpeg=${LIB_DIR} > hdf-eos.configure.log 2>&1"
-  run_cmd "make ${MAKE_ARGS} > hed-eos.make.log 2>&1"
-  run_cmd "make ${MAKE_ARGS} install > hsf-eos.make_install.log 2>&1"
+  run_cmd "./configure --prefix=${LIB_DIR} --with-hdf4=${LIB_DIR} --with-jpeg=${LIB_DIR} > $(pwd)/hdf-eos.configure.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} > $(pwd)/hed-eos.make.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} install > $(pwd)/hsf-eos.make_install.log 2>&1"
 
   cp include/*.h ${LIB_DIR}/include/
 fi
@@ -703,8 +720,8 @@ if [ $COMPILE_NETCDF -eq 1 ]; then
   tar -xzf ${TAR_DIR}/hdf5*.tar.gz -C ${LIB_DIR}/hdf5
   cd ${LIB_DIR}/hdf5/hdf5*
   echo "cd `pwd`"
-  run_cmd "./configure --prefix=${LIB_DIR} --with-zlib=${LIB_Z} CFLAGS=-fPIC CXXFLAGS=-fPIC FFLAGS=-fPIC LDFLAGS=-L${LIB_DIR}/lib:${LIB_Z} CPPFLAGS=-I${LIB_DIR}/include > hdf5.configure.log 2>&1"
-  run_cmd "make ${MAKE_ARGS} install > hdf5.make_install.log 2>&1"
+  run_cmd "./configure --prefix=${LIB_DIR} --with-zlib=${LIB_Z} CFLAGS=-fPIC CXXFLAGS=-fPIC FFLAGS=-fPIC LDFLAGS=-L${LIB_DIR}/lib:${LIB_Z} CPPFLAGS=-I${LIB_DIR}/include > $(pwd)/hdf5.configure.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} install > $(pwd)/hdf5.make_install.log 2>&1"
 
   echo
   echo "Compiling NetCDF-C at `date`"
@@ -715,8 +732,8 @@ if [ $COMPILE_NETCDF -eq 1 ]; then
   export FC=''
   export F90=''
   echo "cd `pwd`"
-  run_cmd "./configure --prefix=${LIB_DIR} CFLAGS=-fPIC CXXFLAGS=-fPIC LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include > netcdf-c.configure.log 2>&1"
-  run_cmd "make ${MAKE_ARGS} install > netcdf-c.make_install.log 2>&1"
+  run_cmd "./configure --prefix=${LIB_DIR} CFLAGS=-fPIC CXXFLAGS=-fPIC LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include > $(pwd)/netcdf-c.configure.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} install > $(pwd)/netcdf-c.make_install.log 2>&1"
   
   echo
   echo "Compiling NetCDF-CXX at `date`"
@@ -727,9 +744,8 @@ if [ $COMPILE_NETCDF -eq 1 ]; then
   if [[ $machine == "Mac" ]]; then
     configure_lib_args="-lnetcdf -lhdf5_hl -lhdf5 -lz"
   fi
-  run_cmd "./configure --prefix=${LIB_DIR} LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include LIBS=\"${LIBS} ${configure_lib_args}\" > netcdf-cxx.configure.log 2>&1"
-
-  run_cmd "make ${MAKE_ARGS} install > netcdf-cxx.make_install.log 2>&1"
+  run_cmd "./configure --prefix=${LIB_DIR} LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include LIBS=\"${LIBS} ${configure_lib_args}\" > $(pwd)/netcdf-cxx.configure.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} install > $(pwd)/netcdf-cxx.make_install.log 2>&1"
 fi
 
 # Compile FREETYPE
@@ -741,9 +757,9 @@ if [ $COMPILE_FREETYPE -eq 1 ]; then
   tar -xzf ${TAR_DIR}/freetype*.tar.gz -C ${LIB_DIR}/freetype
   cd ${LIB_DIR}/freetype/freetype*
   echo "cd `pwd`"
-  run_cmd "./configure --prefix=${LIB_DIR} --with-png=yes > freetype.configure.log 2>&1"
-  run_cmd "make ${MAKE_ARGS} > freetype.make.log 2>&1"
-  run_cmd "make ${MAKE_ARGS} install > freetype.make_install.log 2>&1"
+  run_cmd "./configure --prefix=${LIB_DIR} --with-png=yes > $(pwd)/freetype.configure.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} > $(pwd)/freetype.make.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} install > $(pwd)/freetype.make_install.log 2>&1"
 fi
 
 
@@ -759,9 +775,9 @@ if [ $COMPILE_CAIRO -eq 1 ]; then
     tar -xzf ${TAR_DIR}/pixman*.tar.gz -C ${LIB_DIR}/pixman
     cd ${LIB_DIR}/pixman/pixman*
     echo "cd `pwd`"
-    run_cmd "./configure --prefix=${LIB_DIR} > pixman.configure.log 2>&1"
-    run_cmd "make ${MAKE_ARGS} > pixman.make.log 2>&1"
-    run_cmd "make ${MAKE_ARGS} install > pixman.make_install.log 2>&1"
+    run_cmd "./configure --prefix=${LIB_DIR} > $(pwd)/pixman.configure.log 2>&1"
+    run_cmd "make ${MAKE_ARGS} > $(pwd)/pixman.make.log 2>&1"
+    run_cmd "make ${MAKE_ARGS} install > $(pwd)/pixman.make_install.log 2>&1"
   fi
 
   echo
@@ -775,9 +791,9 @@ if [ $COMPILE_CAIRO -eq 1 ]; then
     export PKG_CONFIG_PATH=${LIB_DIR}/lib/pkgconfig/
   fi
   echo "cd `pwd`"
-  run_cmd "./configure --prefix=${LIB_DIR} ax_cv_c_float_words_bigendian=no LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include > cairo.configure.log 2>&1"
-  run_cmd "make ${MAKE_ARGS} > cairo.make.log 2>&1"
-  run_cmd "make ${MAKE_ARGS} install > cairo.make_install.log 2>&1"
+  run_cmd "./configure --prefix=${LIB_DIR} ax_cv_c_float_words_bigendian=no LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include > $(pwd)/cairo.configure.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} > $(pwd)/cairo.make.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} install > $(pwd)/cairo.make_install.log 2>&1"
 fi
 
 # Compile MET
@@ -827,19 +843,46 @@ fi
 export MET_PYTHON_BIN_EXE=${MET_PYTHON_BIN_EXE:=${MET_PYTHON}/bin/python3}
 export MET_PYTHON_LD
 export MET_PYTHON_CC
-export LDFLAGS="-Wl,--disable-new-dtags"
 
-if [[ $machine == "Mac" ]]; then
-  export LDFLAGS=""
+# add flags to user-defined LDFLAGS for MacOS
+if [[ $machine != "Mac" ]]; then
+  LDFLAGS="${LDFLAGS} -Wl,--disable-new-dtags"
 fi
 
 # https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html
 # ${parameter:+word}
 # If parameter is null or unset, nothing is substituted, otherwise the expansion of word is substituted.
-export LDFLAGS="${LDFLAGS} -Wl,-rpath,${LIB_DIR}/lib:${MET_PROJ:+:$MET_PROJ/lib64}:${LIB_DIR}/lib${MET_NETCDF:+:$MET_NETCDF/lib}${MET_HDF5:+:$MET_HDF5/lib}${MET_BUFRLIB:+:$MET_BUFRLIB}${MET_GRIB2CLIB:+:$MET_GRIB2CLIB}${MET_PYTHON_LIB:+:$MET_PYTHON_LIB}${MET_GSL:+:$MET_GSL/lib}${ADDTL_DIR:+:$ADDTL_DIR}"
-export LDFLAGS="${LDFLAGS} -Wl,-rpath,${LIB_JASPER:+$LIB_JASPER}${LIB_LIBPNG:+:$LIB_PNG}${LIB_Z:+$LIB_Z}"
-export LDFLAGS="${LDFLAGS} ${LIB_JASPER:+-L$LIB_JASPER} ${LIB_LIBPNG:+-L$LIB_LIBPNG} ${MET_HDF5:+-L$MET_HDF5/lib} ${ADDTL_DIR:+-L$ADDTL_DIR}"
-export LIBS="${LIBS} -lhdf5_hl -lhdf5 -lz -ltiff"
+
+# add LIB_DIR/lib and LIB_DIR/lib64 to rpath and -L
+LDFLAGS="${LDFLAGS} -Wl,-rpath,${LIB_DIR}/lib -L${LIB_DIR}/lib  -Wl,-rpath,${LIB_DIR}/lib64 -L${LIB_DIR}/lib64"
+
+# if variables are set, add <VALUE>/lib to rpath and -L
+for x in $MET_CAIRO $MET_FREETYPE $MET_GSL $MET_HDF $MET_HDF5 $MET_NETCDF; do
+    arg="${x:+-Wl,-rpath,$x/lib -L$x/lib}"
+    if [[ "$LDFLAGS" != *"$arg"* ]]; then
+      LDFLAGS+=" $arg"
+    fi
+done
+
+# if variables are set, add <VALUE>/lib64 to rpath and -L
+for x in $MET_ATLAS $MET_BUFR $MET_ECKIT $MET_GRIB2C $MET_PROJ $LIB_JASPER; do
+    arg="${x:+-Wl,-rpath,$x/lib64 -L$x/lib64}"
+    if [[ "$LDFLAGS" != *"$arg"* ]]; then
+      LDFLAGS+=" $arg"
+    fi
+done
+	
+# if variables are set, add <VALUE> to rpath and -L
+for x in $MET_ATLASLIB $MET_BUFRLIB $MET_CAIROLIB $MET_ECKITLIB $MET_FREETYPELIB $MET_GRIB2CLIB $MET_GSLLIB $MET_HDF5LIB $MET_HDFLIB $MET_NETCDFLIB $MET_PROJLIB $MET_PYTHON_LIB $LIB_JASPER $LIB_LIBPNG $LIB_Z $ADDTL_DIR; do
+    arg="${x:+-Wl,-rpath,$x -L$x}"
+    if [[ "$LDFLAGS" != *"$arg"* ]]; then
+      LDFLAGS+=" $arg"
+    fi
+done
+
+export LDFLAGS
+
+export LIBS="${LIBS} -lhdf5_hl -lhdf5 -lz"
 export MET_FONT_DIR=${TEST_BASE}/fonts
 
 
@@ -874,9 +917,9 @@ fi
 configure_cmd="${configure_cmd} ${OPT_ARGS}"
 
 echo "cd `pwd`"
-run_cmd "${configure_cmd} > met.configure.log 2>&1"
-run_cmd "make ${MAKE_ARGS} > met.make.log 2>&1"
-run_cmd "make ${MAKE_ARGS} install > met.make_install.log 2>&1"
-run_cmd "make ${MAKE_ARGS} test > met.make_test.log 2>&1"
+run_cmd "${configure_cmd} > $(pwd)/configure.log 2>&1"
+run_cmd "make ${MAKE_ARGS} > $(pwd)/met.make.log 2>&1"
+run_cmd "make install > $(pwd)/met.make_install.log 2>&1"
+run_cmd "make test > $(pwd)/met.make_test.log 2>&1"
 
 echo "Finished compiling at `date`"

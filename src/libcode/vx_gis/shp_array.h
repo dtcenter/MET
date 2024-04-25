@@ -4,7 +4,7 @@
 
 
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -123,7 +123,7 @@ void Shp_Array<T>::init_from_scratch()
 
 {
 
-E = (T *) 0;
+E = (T *) nullptr;
 
 AllocInc = 25;   //  default value
 
@@ -143,7 +143,7 @@ void Shp_Array<T>::clear()
 
 {
 
-if ( E )  { delete [] E;  E = (T *) 0; }
+if ( E )  { delete [] E;  E = (T *) nullptr; }
 
 
 
@@ -214,11 +214,11 @@ for(j=0; j<Nelements; ++j)  {
 
 }
 
-if ( E )  { delete [] E;  E = (T *) 0; }
+if ( E )  { delete [] E;  E = (T *) nullptr; }
 
 E = u;
 
-u = (T *) 0;
+u = (T *) nullptr;
 
 Nalloc = N;
 

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -17,8 +17,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <map>
 #include <string>
 #include <stdlib.h>
@@ -35,6 +33,8 @@ using namespace std;
 #include "vx_util.h"
 #include "vx_data2d.h"
 #include "vx_config.h"
+
+using namespace std;
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -68,11 +68,20 @@ VarInfoGrib2::VarInfoGrib2(const VarInfoGrib2 &f) {
 
 VarInfoGrib2 & VarInfoGrib2::operator=(const VarInfoGrib2 &f) {
 
-   if ( this == &f )  return ( *this );
+   if ( this == &f )  return *this;
 
    assign(f);
 
-   return ( *this );
+   return *this;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+VarInfo *VarInfoGrib2::clone() const {
+
+   VarInfoGrib2 *ret = new VarInfoGrib2(*this);
+
+   return (VarInfo *)ret;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -110,6 +119,11 @@ void VarInfoGrib2::assign(const VarInfoGrib2 &v) {
    StatType   = v.StatType;
    PercVal    = v.PercVal;
 
+   AerosolType         = v.AerosolType;
+   AerosolIntervalType = v.AerosolIntervalType;
+   AerosolSizeLower    = v.AerosolSizeLower;
+   AerosolSizeUpper    = v.AerosolSizeUpper;
+
    IPDTmplIndex = v.IPDTmplIndex;
    IPDTmplVal   = v.IPDTmplVal;
 
@@ -137,6 +151,11 @@ void VarInfoGrib2::clear() {
    StatType   = bad_data_int;
    PercVal    = bad_data_int;
 
+   AerosolType         = bad_data_int;
+   AerosolIntervalType = bad_data_int;
+   AerosolSizeLower    = bad_data_double;
+   AerosolSizeUpper    = bad_data_double;
+
    IPDTmplIndex.clear();
    IPDTmplVal.clear();
 
@@ -149,18 +168,22 @@ void VarInfoGrib2::dump(ostream &out) const {
 
    // Dump out the contents
    out << "VarInfoGrib2::dump():\n"
-       << "  Record     = " << Record     << "\n"
-       << "  Discipline = " << Discipline << "\n"
-       << "  MTable     = " << MTable     << "\n"
-       << "  LTable     = " << LTable     << "\n"
-       << "  ParmCat    = " << ParmCat    << "\n"
-       << "  Parm       = " << Parm       << "\n"
-       << "  PDTmpl     = " << PDTmpl     << "\n"
-       << "  Process    = " << Process    << "\n"
-       << "  EnsType    = " << EnsType    << "\n"
-       << "  DerType    = " << DerType    << "\n"
-       << "  StatType   = " << StatType   << "\n"
-       << "  PercVal    = " << PercVal    << "\n";
+       << "  Record              = " << Record              << "\n"
+       << "  Discipline          = " << Discipline          << "\n"
+       << "  MTable              = " << MTable              << "\n"
+       << "  LTable              = " << LTable              << "\n"
+       << "  ParmCat             = " << ParmCat             << "\n"
+       << "  Parm                = " << Parm                << "\n"
+       << "  PDTmpl              = " << PDTmpl              << "\n"
+       << "  Process             = " << Process             << "\n"
+       << "  EnsType             = " << EnsType             << "\n"
+       << "  DerType             = " << DerType             << "\n"
+       << "  StatType            = " << StatType            << "\n"
+       << "  PercVal             = " << PercVal             << "\n"
+       << "  AerosolType         = " << AerosolType         << "\n"
+       << "  AerosolIntervalType = " << AerosolIntervalType << "\n"
+       << "  AerosolSizeLower    = " << AerosolSizeLower    << "\n"
+       << "  AerosolSizeUpper    = " << AerosolSizeUpper    << "\n";
    out << "  IPDTmplIndex:\n";
    IPDTmplIndex.dump(out);
    out << "  IPDTmplVal:\n";
@@ -255,6 +278,34 @@ void VarInfoGrib2::set_perc_val(int v) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void VarInfoGrib2::set_aerosol_type(int v) {
+   AerosolType = v;
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void VarInfoGrib2::set_aerosol_interval_type(int v) {
+   AerosolIntervalType = v;
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void VarInfoGrib2::set_aerosol_size_lower(double v) {
+   AerosolSizeLower = v;
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void VarInfoGrib2::set_aerosol_size_upper(double v) {
+   AerosolSizeUpper = v;
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 void VarInfoGrib2::set_ipdtmpl_index(const IntArray &v) {
    IPDTmplIndex = v;
    return;
@@ -291,6 +342,11 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
    DerType                 = dict.lookup_int   (conf_key_GRIB2_der_type,  false);
    StatType                = dict.lookup_int   (conf_key_GRIB2_stat_type, false);
    PercVal                 = dict.lookup_int   (conf_key_GRIB2_perc_val,  false);
+
+   AerosolType             = dict.lookup_int   (conf_key_GRIB2_aerosol_type,          false);
+   AerosolIntervalType     = dict.lookup_int   (conf_key_GRIB2_aerosol_interval_type, false);
+   AerosolSizeLower        = dict.lookup_double(conf_key_GRIB2_aerosol_size_lower,    false);
+   AerosolSizeUpper        = dict.lookup_double(conf_key_GRIB2_aerosol_size_upper,    false);
 
    IPDTmplIndex = dict.lookup_int_array(conf_key_GRIB2_ipdtmpl_index, false);
    IPDTmplVal   = dict.lookup_int_array(conf_key_GRIB2_ipdtmpl_val,   false);

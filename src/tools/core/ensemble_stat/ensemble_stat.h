@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -123,7 +123,7 @@ static int compress_level = -1;
 // Output NetCDF file
 static bool         out_nc_flag = false;
 static ConcatString out_nc_file;
-static netCDF::NcFile       *nc_out  = (netCDF::NcFile *) 0;
+static netCDF::NcFile       *nc_out  = (netCDF::NcFile *) nullptr;
 static netCDF::NcDim        lat_dim;
 static netCDF::NcDim        lon_dim;
 
@@ -133,7 +133,7 @@ static StringArray nc_orank_var_sa;
 
 // Output STAT file
 static ConcatString     stat_file;
-static std::ofstream    *stat_out = (std::ofstream *)  0;
+static std::ofstream    *stat_out = (std::ofstream *) nullptr;
 static AsciiTable       stat_at;
 static int              i_stat_row;
 

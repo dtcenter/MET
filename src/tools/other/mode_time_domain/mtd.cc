@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -26,25 +26,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-static const char default_config_path          [] = "MET_BASE/config/MTDConfig_default";
-
-static const char txt_2d_suffix                [] = "2d.txt";
-
-static const char txt_3d_single_simple_suffix  [] = "3d_single_simple.txt";
-static const char txt_3d_pair_simple_suffix    [] = "3d_pair_simple.txt";
-
-static const char txt_3d_single_cluster_suffix [] = "3d_single_cluster.txt";
-static const char txt_3d_pair_cluster_suffix   [] = "3d_pair_cluster.txt";
-
-static const char nc_suffix                    [] = "obj.nc";
-
-static const char default_prefix               [] = "mtd";
-
-
-////////////////////////////////////////////////////////////////////////
-
-using namespace std;
-
 #include <unistd.h>
 #include <stdlib.h>
 #include <cmath>
@@ -60,6 +41,26 @@ using namespace std;
 #include "mtd_read_data.h"
 #include "mm_engine.h"
 #include "mtd_nc_output.h"
+
+using namespace std;
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+static const char default_config_path          [] = "MET_BASE/config/MTDConfig_default";
+
+static const char txt_2d_suffix                [] = "2d.txt";
+
+static const char txt_3d_single_simple_suffix  [] = "3d_single_simple.txt";
+static const char txt_3d_pair_simple_suffix    [] = "3d_pair_simple.txt";
+
+static const char txt_3d_single_cluster_suffix [] = "3d_single_cluster.txt";
+static const char txt_3d_pair_cluster_suffix   [] = "3d_pair_cluster.txt";
+
+static const char nc_suffix                    [] = "obj.nc";
+
+static const char default_prefix               [] = "mtd";
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -176,7 +177,7 @@ if ( single_filenames.n() > 0 )  {
 
    do_single_field(config);
 
-   return ( 0 );
+   return 0;
 
 }
 
@@ -913,7 +914,7 @@ do_mtd_nc_output(config.nc_info, engine, fcst_raw, obs_raw, fcst_obj, obs_obj, c
    //  done
    //
 
-return ( 0 );
+return 0;
 
 }
 
@@ -1076,7 +1077,7 @@ prefix << junk;
 
 
 
-return ( prefix );
+return prefix;
 
 }
 

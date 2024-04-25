@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -8,7 +8,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
 
 #include <dirent.h>
 #include <iostream>
@@ -22,6 +21,9 @@ using namespace std;
 
 #include "vx_data2d_factory.h"
 #include "vx_log.h"
+
+using namespace std;
+
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -44,7 +46,7 @@ GridDiagConfInfo::~GridDiagConfInfo() {
 void GridDiagConfInfo::init_from_scratch() {
 
    // Initialize pointers
-   data_info = (VarInfo **) 0;
+   data_info = (VarInfo **) nullptr;
 
    clear();
 
@@ -69,10 +71,10 @@ void GridDiagConfInfo::clear() {
       for(int i=0; i<n_data; i++)
         if(data_info[i]) {
            delete data_info[i];
-           data_info[i] = (VarInfo *) 0;
+           data_info[i] = (VarInfo *) nullptr;
         }
       delete data_info;
-      data_info = (VarInfo **) 0;
+      data_info = (VarInfo **) nullptr;
    }
 
    // Reset counts
@@ -101,7 +103,7 @@ void GridDiagConfInfo::read_config(const char *default_file_name,
 ////////////////////////////////////////////////////////////////////////
 
 void GridDiagConfInfo::set_n_data() {
-   Dictionary *dict = (Dictionary *) 0;
+   Dictionary *dict = (Dictionary *) nullptr;
 
    // Conf: data.field
    dict = conf.lookup_array(conf_key_data_field);
@@ -123,7 +125,7 @@ void GridDiagConfInfo::process_config(vector<GrdFileType> file_types) {
    ConcatString s;
    StringArray sa;
    VarInfoFactory info_factory;
-   Dictionary *dict = (Dictionary *) 0;
+   Dictionary *dict = (Dictionary *) nullptr;
    Dictionary i_dict;
    GrdFileType file_type;
 
@@ -143,7 +145,7 @@ void GridDiagConfInfo::process_config(vector<GrdFileType> file_types) {
    data_info = new VarInfo * [n_data];
 
    // Initialize pointers
-   for(int i=0; i<n_data; i++) data_info[i] = (VarInfo *) 0;
+   for(int i=0; i<n_data; i++) data_info[i] = (VarInfo *) nullptr;
 
    // Parse the data field information
    for(int i=0; i<n_data; i++) {

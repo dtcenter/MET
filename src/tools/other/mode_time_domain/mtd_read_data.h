@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -30,9 +30,9 @@
 // returns the actual valid times
 //
 
-extern vector<unixtime> mtd_read_data(MtdConfigInfo &, VarInfo &,
-                                      const StringArray & filenames,
-                                      MtdFloatFile &);
+extern std::vector<unixtime> mtd_read_data(MtdConfigInfo &, VarInfo &,
+                                           const StringArray & filenames,
+                                           MtdFloatFile &);
 
 
 ////////////////////////////////////////////////////////////////////////

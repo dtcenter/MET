@@ -101,13 +101,13 @@ The configuration file language supports the following data types:
       the user has already determined to be 2.5 outside of MET.
       
     * "==FBIAS" for a user-specified frequency bias value.
-      e.g. "==FBIAS1" to automatically de-bias the data, "==FBIAS0.9" to select a low-bias threshold, or "==FBIAS1.1" to select a high-bias threshold.
-      This option must be used in
-      conjunction with a simple threshold in the other field. For example,
-      when "obs.cat_thresh = >5.0" and "fcst.cat_thresh = ==FBIAS1;",
-      MET applies the >5.0 threshold to the observations and then chooses a
-      forecast threshold which results in a frequency bias of 1.
-      The frequency bias can be any float value > 0.0.
+      e.g. "==FBIAS1" to automatically de-bias the data, "==FBIAS0.9" to
+      select a low-bias threshold, or "==FBIAS1.1" to select a high-bias
+      threshold. This option must be used in conjunction with a simple
+      threshold in the other field. For example, when "obs.cat_thresh = >5.0"
+      and "fcst.cat_thresh = ==FBIAS1;", MET applies the >5.0 threshold to
+      the observations and then chooses a forecast threshold which results in
+      a frequency bias of 1. The frequency bias can be any float value > 0.0.
       
     * "CDP" for climatological distribution percentile thresholds.
       These thresholds require that the climatological mean and standard
@@ -494,6 +494,49 @@ Where code is running in a production context, it is worth being familiar with
 the binding / affinitization method on the particular system and building it
 into any relevant scripting.
 
+.. _met_keep_temp_file:
+
+MET_KEEP_TEMP_FILE
+------------------
+
+The MET_KEEP_TEMP_FILE environment variable can be set to control the runtime
+behavior of the MET tools. The MET tools write temporary files in several places
+in the application and library code. By default, those temporary files are deleted
+when they are no longer needed. However it can be useful for development, testing,
+and debugging to keep them for further inspection. Setting this environment variable
+to a value of :code:`yes` or :code:`true` instructs the MET tools to retain temporary
+files instead of deleting them.
+
+Note that doing so may fill up the temporary directory. It is the responsiblity of
+the user to monitor the temporary directory usage and remove temporary files that
+are no longer needed.
+
+When running with this option, users are advised to refer to section
+:numref:`config_tmp_dir` and write temporary files to a personal location rather than
+the default shared :code:`/tmp` directory.
+
+.. _met_python_debug:
+
+MET_PYTHON_DEBUG
+----------------
+
+The MET_PYTHON_DEBUG environment variable can be set to enable debugging log messages
+related to Python embedding. These log messages are disabled by default. The environment
+variable can be set to a value of :code:`all` for all log messages, :code:`dataplane`
+for log messages when reading gridded data, or :code:`point` for log messages when
+reading point data.
+
+.. _met_python_tmp_format:
+
+MET_PYTHON_TMP_FORMAT
+---------------------
+
+The MET_PYTHON_TMP_FORMAT environment variable defines whether temporary files for
+Python embedding should be written as NetCDF files or using JSON/NumPy serialization.
+By default, they are written using JSON for attributes and NumPy serialization for data
+to avoid NetCDF library conflicts between MET and Python. Setting this environment
+variable to :code:`netcdf` enables the use of temporary NetCDF files instead.
+
 Settings Common to Multiple Tools
 =================================
 
@@ -505,8 +548,24 @@ If set to true and a MET tool encounters a warning, it will immediately exit
 with bad status after writing the warning message.
 
 .. code-block:: none
-		
+
   exit_on_warning = FALSE;
+
+time_offset_warning
+-------------------
+
+The "time_offset_warning" entry in ConfigConstants defines an allowable
+offset in seconds to silence time differences warning messages. Several
+MET tools check the timestamps of the datasets being compared and print a
+warning message if they differ. Increasing this option from its default
+value of 0 seconds enables datasets that are close in time to be compared
+without triggering a warning. If the absolute value of a non-zero time
+difference is less than or equal to this setting, a debug log message is
+written instead of a warning.
+
+.. code-block:: none
+
+  time_offset_warning = 0;
 
 nc_compression
 --------------
@@ -527,7 +586,7 @@ WARNING: Selecting a high compression level may slow down the reading and
 writing of NetCDF files within MET significantly.
 
 .. code-block:: none
-		
+
   nc_compression = 0;
 
 output_precision
@@ -539,7 +598,7 @@ files. Setting this option in the config file of one of the tools will
 override the default value set in ConfigConstants.
 
 .. code-block:: none
-		
+
   output_precision = 5;
 
 .. _config_tmp_dir:
@@ -554,7 +613,7 @@ Some tools override the temporary directory by the command line argument
 "-tmp_dir <diretory_name>".
 
 .. code-block:: none
-		
+
   tmp_dir = "/tmp";
 
 A description of the use of temporary files in MET can be found in
@@ -573,7 +632,7 @@ logic should be applied. If not defined, the default values listed below are
 used.
 
 .. code-block:: none
-		
+
   mesage_type_group_map = [
      { key = "SURFACE"; val = "ADPSFC,SFCSHP,MSONET";               },
      { key = "ANYAIR";  val = "AIRCAR,AIRCFT";                      },
@@ -592,7 +651,7 @@ is also supported in PBN2NC as a way of renaming input PREPBUFR message
 types.
 
 .. code-block:: none
-		
+
   message_type_map = [
      { key = "FM-12 SYNOP";  val = "ADPSFC"; },
      { key = "FM-13 SHIP";   val = "SFCSHP"; },
@@ -615,7 +674,7 @@ whitespace) to distinguish between their output.
 e.g. model = "GFS";
 
 .. code-block:: none
-		
+
   model = "FCST";
 
 desc
@@ -631,7 +690,7 @@ between their output.
 e.g. desc = "QC_9";
 
 .. code-block:: none
-		
+
   desc = "NA";
 
 obtype
@@ -646,7 +705,7 @@ observation message type value is written to the OBTYPE column. Otherwise,
 the configuration file obtype value is written.
 
 .. code-block:: none
-		
+
   obtype = "ANALYS";
 
 .. _regrid:
@@ -748,7 +807,7 @@ using the following entries:
   Settings defined at higher levels of config file context are not applied. 
 
 .. code-block:: none
-		
+
   regrid = {
      to_grid         = NONE;
      method          = NEAREST;
@@ -783,32 +842,37 @@ to be verified. This dictionary may include the following entries:
 
     When set as a boolean to TRUE, it indicates that the "fcst.field" data
     should be treated as probabilities. For example, when verifying the
-    probabilistic NetCDF output of Ensemble-Stat, one could configure the
-    Grid-Stat or Point-Stat tools as follows:
+    probabilistic NetCDF output of Gen-Ens-Prod for an ensemble of size 10,
+    one could configure the Grid-Stat or Point-Stat tools as follows:
 
     .. code-block:: none
-    
+
       fcst = {
-         field = [ { name  = "APCP_24_A24_ENS_FREQ_gt0.0";
-                     level = "(*,*)";
-                     prob  = TRUE; } ];
+         field = [ { name       = "APCP_24_A24_ENS_FREQ_gt0.0";
+                     level      = "(*,*)";
+                     cat_thresh = ==10;
+                     prob       = TRUE; } ];
          }
 
     Setting "prob = TRUE" indicates that the "APCP_24_A24_ENS_FREQ_gt0.0"
-    data should be processed as probabilities.
+    data should be processed as probabilities. Setting "cat_thresh = ==10"
+    indicates that these probabilities are derived from an ensemble with 10
+    members and 11 probability bins should be defined, each centered on the
+    value n/10 for n = 0, 1, ... 10.
 
     When set as a dictionary, it defines the probabilistic field to be
     used. For example, when verifying GRIB files containing probabilistic
-    data,  one could configure the Grid-Stat or Point-Stat tools as
-    follows:
+    data, one could configure the Grid-Stat or Point-Stat tools as follows:
 
     .. code-block:: none
 
       fcst = {
-         field = [ { name = "PROB"; level = "A24";
-                     prob = { name = "APCP"; thresh_lo = 2.54; } },
-                   { name = "PROB"; level = "P850";
-                     prob = { name = "TMP"; thresh_hi = 273; } } ];
+         field = [ { name       = "PROB"; level = "A24";
+                     prob       = { name = "APCP"; thresh_lo = 2.54; }
+                     cat_thresh = ==0.25; },
+                   { name       = "PROB"; level = "P850";
+                     prob       = { name = "TMP"; thresh_hi = 273; }
+                     cat_thresh = ==0.1; } ];
       }
 
     The example above selects two probabilistic fields. In both, "name"
@@ -823,6 +887,31 @@ to be verified. This dictionary may include the following entries:
     [0, 1] or [0, 100]. However, when MET encounters a probability field
     with a range [0, 100], it will automatically rescale it to be [0, 1]
     before applying the probabilistic verification methods.
+
+    Probabilistic statistics in MET are derived from an Nx2 probabilistic
+    contingency table. The N-dimension is determined by the number of
+    probability bins requested. The "cat_thresh" configuration option
+    defines the number of and size of these probabibility bins. The bins
+    must include the full range of possible probability values, [0, 1].
+    Since selecting bins of equal width is common, shorthand notation is
+    provided to do so. The following options are supported.
+
+    * :code:`cat_thresh = [ ==0.25 ];` specifies an equal probability bin
+      width of 0.25 and defines 4 bins between the values 0, 0.25, 0.5, 0.75,
+      and 1.0. The :code:`==p` threshold may be set to any probability bin
+      width greater than 0 and less than 1.
+
+    * :code:`cat_thresh = [ ==10 ];` specifies probability bins for an
+      ensemble of size 10 and defines 11 bins between the values -0.05, 0.05,
+      0.15, ..., 0.95, and 1.05. Note that each bin is centered on the
+      probability value n/10, for n = 0 to 10. The :code:`==n` threshold may
+      be set to any integer number of ensemble members greater than 1 to
+      define n+1 probability bins.
+
+    * :code:`cat_thresh = [ >=0, >=0.5, >=0.75, >=1.0 ];` explicitly
+      specifies the probability thresholds and defines 3 bins of unequal
+      width between the values 0, 0.5, 0.75, and 1.0. By convention, the
+      greater-than-or-equal-to (">=" or "ge") inequality type is required.
 
   * Set "prob_as_scalar = TRUE" to override the processing of probability
     data. When the "prob" entry is set as a dictionary to define the
@@ -871,7 +960,7 @@ to be verified. This dictionary may include the following entries:
     Examples of user-defined data censoring operations include:
 
     .. code-block:: none
-		    
+
       censor_thresh = [ >12000 ];
       censor_val    = [  12000 ];
 
@@ -945,11 +1034,12 @@ to be verified. This dictionary may include the following entries:
   For example:
 
   .. code-block:: none
-		    
+
     fcst = {
        file_type = GRIB1;         GRIB version 1
        file_type = GRIB2;         GRIB version 2
        file_type = NETCDF_MET;    NetCDF created by another MET tool
+       file_type = NETCDF_WRF;    NetCDF WRF output.
        file_type = NETCDF_PINT;   NetCDF created by running the p_interp
                                   or wrf_interp utility on WRF output.
                                   May be used to read unstaggered raw WRF
@@ -1084,7 +1174,19 @@ File-format specific settings for the "field" entry:
     * The "GRIB2_perc_val" is an integer specifying the requested percentile
       value (0 to 100) to be used. This applies only to GRIB2 product
       definition templates 4.6 and 4.10.
-       
+
+    * The "GRIB2_aerosol_type" is an integer specifying the aerosol type
+      (Table 4.233). This applies only to GRIB2 product defintion templates
+      4.46 and 4.48.
+
+    * The "GRIB2_aerosol_interval_type" is an integer specifying the aerosol
+      size interval (Table 4.91). This applies only to GRIB2 product defintion
+      templates 4.46 and 4.48.
+
+    * The "GRIB2_aerosol_size_lower" and "GRIB2_aerosol_size_upper" are doubles
+      specifying the endpoints of the aerosol size interval. These applies only
+      to GRIB2 product defintion templates 4.46 and 4.48.
+
     * The "GRIB2_ipdtmpl_index" and "GRIB2_ipdtmpl_val" entries are arrays
       of integers which specify the product description template values to
       be used. The indices are 0-based. For example, use the following to
@@ -1152,7 +1254,7 @@ File-format specific settings for the "field" entry:
         For example:
 
          .. code-block:: none
-        
+
            field = [
              { name = "read_ascii_numpy.py data/python/fcst.txt FCST"; }
            ];
@@ -1174,16 +1276,15 @@ File-format specific settings for the "field" entry:
         For example:
 
         .. code-block:: none
-			 
-	  file_type = PYTHON_NUMPY;
+
+          file_type = PYTHON_NUMPY;
           field     = [
             { name = "read_ascii_numpy.py MET_PYTHON_INPUT_ARG FCST"; }
           ];
 
-	  
-	  
+
 .. code-block:: none
-		
+
   fcst = {
      censor_thresh = [];
      censor_val    = [];
@@ -1217,13 +1318,13 @@ in a non-trivial way. The length of the "obs.field" array must match the
 length of the "fcst.field" array.  For example:
 
 .. code-block:: none
-		
+
         obs = fcst;
 
 or
 
 .. code-block:: none
-		
+
    fcst = {
      censor_thresh = [];
      censor_val    = [];
@@ -1277,7 +1378,7 @@ or
   than one "message_type" entry is desired within the config file. For example:
 
   .. code-block:: none
-     
+
      fcst = {
          censor_thresh = [];
          censor_val    = [];
@@ -1327,7 +1428,7 @@ or
    are included or excluded for each verification task.
 
 .. code-block:: none
-		
+
   obs = fcst;
 
 climo_mean
@@ -1370,7 +1471,7 @@ of several entires defining the climatology file names and fields to be used.
   entries "match_month", "match_day", and "time_step".
 
 .. code-block:: none
-		
+
   climo_mean = {
   
      file_name = [ "/path/to/climatological/mean/files" ];
@@ -1412,7 +1513,7 @@ rather than means. In the example below, this dictionary is set by copying
 over the "climo_mean" setting and then updating the "file_name" entry.
 
 .. code-block:: none
-		
+
   climo_stdev = climo_mean;
   climo_stdev = {
      file_name = [ "/path/to/climatological/standard/deviation/files" ];
@@ -1450,7 +1551,7 @@ climatological bins. The array must begin with 0.0 and end with 1.0.
 For example:
 
 .. code-block:: none
-		
+
   cdf_bins = [ 0.0, 0.10, 0.25, 0.75, 0.90, 1.0 ];
 
 When "cdf_bins" is set to an integer, it defines the number of bins to be
@@ -1459,7 +1560,7 @@ centered on 0.5. An odd number of bins can be centered or uncentered while
 an even number of bins can only be  uncentered. For example:
 
 .. code-block:: none
-		
+
   4 uncentered bins (cdf_bins = 4; center_bins = FALSE;) yields:
     0.0, 0.25, 0.50, 0.75, 1.0
   5 uncentered bins (cdf_bins = 5; center_bins = FALSE;) yields:
@@ -1477,7 +1578,7 @@ Setting the number of bins to 1 effectively disables this logic by grouping
 all pairs into a single climatological bin.
 
 .. code-block:: none
-		
+
   climo_cdf = {
      cdf_bins    = 11;    or an array of floats
      center_bins = TRUE;  or FALSE
@@ -1538,7 +1639,7 @@ in the Wavelet-Stat and MODE tools:
  * "BOTH" to mask both fields with missing data from the other
 
 .. code-block:: none
-		
+
   mask_missing_flag = BOTH;
 
 
@@ -1553,7 +1654,7 @@ In PB2NC, the reference time is the PREPBUFR files center time. In
 Point-Stat and Ensemble-Stat, the reference time is the forecast valid time.
 
 .. code-block:: none
-		
+
   obs_window = {
      beg = -5400;
      end =  5400;
@@ -1667,7 +1768,7 @@ domain. If the nearest grid point is inside the mask, that point observation
 is included in the mask.
 
 .. code-block:: none
-		
+
   mask = {
      grid    = [ "FULL" ];
      poly    = [ "MET_BASE/poly/LMV.poly",
@@ -1695,7 +1796,7 @@ value. Therefore, an alpha value of 0.05 corresponds to a 95% confidence
 interval.
 
 .. code-block:: none
-		
+
   ci_alpha = [ 0.05, 0.10 ];
 
 .. _config_boot:
@@ -1754,7 +1855,7 @@ should be used for computing bootstrap confidence intervals:
   computing platform.
 
 .. code-block:: none
-		
+
   boot = {
      interval = PCTILE;
      rep_prop = 1.0;
@@ -1823,7 +1924,7 @@ This dictionary may include the following entries:
     
     * DW_MEAN     for the distance-weighted average value
       where weight = distance^-2
-		
+
     * LS_FIT      for a least-squares fit
     
     * BILIN       for bilinear interpolation (width = 2)
@@ -1859,12 +1960,12 @@ This dictionary may include the following entries:
     permutations of their values are applied.
 
 .. code-block:: none
-		
+
   interp = {
      field      = BOTH;
      vld_thresh = 1.0;
      shape      = SQUARE;
-  
+
      type = [
         {
            method = [ NEAREST ];
@@ -1892,7 +1993,7 @@ threshold which defines land (threshold is true) and water (threshold is false).
 The "land_mask.flag" entry may be set separately in each "obs.field" entry.
 
 .. code-block:: none
-		
+
   land_mask = {
      flag      = FALSE;
      file_name = [];
@@ -1921,7 +2022,7 @@ the verification domain.
 The "topo_mask.flag" entry may be set separately in each "obs.field" entry.
 
 .. code-block:: none
-		
+
   topo_mask = {
      flag               = FALSE;
      file_name          = [];
@@ -1974,9 +2075,9 @@ This dictionary may include the following entries:
   the obs.cat_thresh thresholds will be used instead.
 
 .. code-block:: none
-		
+
   hira = {
-      flag            = FALSE;
+     flag            = FALSE;
      width           = [ 2, 3, 4, 5 ];
      vld_thresh      = 1.0;
      cov_thresh      = [ ==0.25 ];
@@ -1999,7 +2100,7 @@ output line type from the MET tools. Each line type may be set to one of:
   "_type.txt" file, a more readable ASCII file sorted by line type.
 
 .. code-block:: none
-		
+
   output_flag = {
      fho    = NONE;  Forecast, Hit, Observation Rates
      ctc    = NONE;  Contingency Table Counts
@@ -2051,7 +2152,7 @@ the output of all the different fields). A value of false means no
 netcdf output will be generated.
 
 .. code-block:: none
-		
+
   nc_pairs_flag = {
      latlon       = TRUE;
      raw          = TRUE;
@@ -2083,7 +2184,7 @@ For example:
 |
  
 .. code-block:: none
-		
+
   nc_pairs_var_name = "";
 
 nc_pairs_var_suffix
@@ -2106,7 +2207,7 @@ NOTE: This option was previously named "nc_pairs_var_str", which is
 now deprecated.
 
 .. code-block:: none
-		
+
   nc_pairs_var_suffix = "";
 
 ps_plot_flag
@@ -2117,7 +2218,7 @@ indicating whether a PostScript plot should be generated summarizing
 the verification.
 
 .. code-block:: none
-		
+
   ps_plot_flag = TRUE;
 
 grid_weight_flag
@@ -2141,7 +2242,7 @@ The weights are ultimately computed as the weight at each grid point divided
 by the sum of the weights for the current masking region.
 
 .. code-block:: none
-		
+
   grid_weight_flag = NONE;
 
 hss_ec_value
@@ -2159,7 +2260,7 @@ If set, it must greater than or equal to 0.0 and less than 1.0. A value of
 0.0 produces an HSS_EC statistic equal to the Accuracy statistic.
 
 .. code-block:: none
-		
+
   hss_ec_value = NA;
 
 rank_corr_flag
@@ -2171,7 +2272,7 @@ be computed. Computing them over large datasets is computationally
 intensive and slows down the runtime significantly.
 
 .. code-block:: none
-		
+
   rank_corr_flag = FALSE;
 
 duplicate_flag
@@ -2193,7 +2294,7 @@ about where duplicates were detected and which observations were used
 in those cases.
 
 .. code-block:: none
-		
+
   duplicate_flag = NONE;
 
 obs_summary
@@ -2228,7 +2329,7 @@ about where duplicates were detected and which observations were used
 in those cases.
 
 .. code-block:: none
-		
+
   obs_summary = NONE;
 
 
@@ -2238,13 +2339,13 @@ obs_perc_value
 Percentile value to use when obs_summary = PERC
 
 .. code-block:: none
-		
+
   obs_perc_value = 50;
 
   
 obs_quality_inc
 ---------------
-		
+
 The "obs_quality_inc" entry specifies the quality flag values that are to be
 retained and used for verification. An empty list signifies that all
 point observations should be used, regardless of their quality flag value.
@@ -2254,13 +2355,13 @@ an array of strings, even if the values themselves are numeric.
 Note "obs_quality_inc" replaces the older option "obs_quality".
 
 .. code-block:: none
-		
+
   obs_quality_inc = [ "1", "2", "3", "9" ];
 
   
 obs_quality_exc
 ---------------
-		
+
 The "obs_quality_exc" entry specifies the quality flag values that are to be
 ignored and not used for verification. An empty list signifies that all
 point observations should be used, regardless of their quality flag value.
@@ -2269,7 +2370,7 @@ observations. The quality flag values to ignore should be specified as
 an array of strings, even if the values themselves are numeric.
 
 .. code-block:: none
-		
+
   obs_quality_exc = [ "1", "2", "3", "9" ];
 
   
@@ -2282,7 +2383,7 @@ should be set to the installed *share/met* directory so the MET tools can
 locate the static data files they need at run time.
 
 .. code-block:: none
-		
+
   met_data_dir = "MET_BASE";
 
 many_plots
@@ -2305,7 +2406,7 @@ forecast field:
   for this plot.
 
 .. code-block:: none
-		
+
   fcst_raw_plot = {
      color_table   = "MET_BASE/colortables/met_default.ctable";
      plot_min      = 0.0;
@@ -2327,7 +2428,7 @@ to modify the output file name and avoid naming conflicts for multiple runs
 of the same tool.
 
 .. code-block:: none
-		
+
   output_prefix  = "";
 
 version
@@ -2338,7 +2439,7 @@ The configuration file version number should match the version number of
 the MET code being run. This value should generally not be modified.
 
 .. code-block:: none
-		
+
   version = "VN.N";
 
 time_summary
@@ -2356,7 +2457,7 @@ ending time offsets in seconds.
 For example:
 
 .. code-block:: none
-		
+
    beg = "00";
    end = "235959";
    step = 300;
@@ -2374,7 +2475,7 @@ uncentered time intervals. The following example requests observations for
 one hour prior:
 
 .. code-block:: none
-		
+
   width = { beg = -3600; end = 0; }
 
 The summaries will only be calculated for the specified GRIB codes
@@ -2408,7 +2509,7 @@ They are inclusive (union). All variables are included if both options
 are empty. Note: grib_code 11 is equivalent to obs_var "TMP".
 
 .. code-block:: none
-		
+
   time_summary = {
     flag = FALSE;
     beg = "000000";
@@ -2456,7 +2557,7 @@ entries. This dictionary may include the following entries:
   ensemble field.
 
 .. code-block:: none
-		
+
   ens = {
      censor_thresh = [];
      censor_val    = [];
@@ -2487,7 +2588,7 @@ combination of the categorical threshold (cat_thresh) and neighborhood width
 specified.
 
 .. code-block:: none
-		
+
   nbrhd_prob = {
      width      = [ 5 ];
      shape      = CIRCLE;
@@ -2507,7 +2608,7 @@ combination of the categorical threshold (cat_thresh), neighborhood width
 (nbrhd_prob.width), and smoothing method (nmep_smooth.type) specified.
 
 .. code-block:: none
-		
+
   nmep_smooth = {
      vld_thresh      = 0.0;
      shape           = CIRCLE;
@@ -2558,7 +2659,7 @@ which ensemble products should be generated:
   rank NetCDF output file.
 
 .. code-block:: none
-		
+
   ensemble_flag = {
     latlon     = TRUE;
      mean      = TRUE;
@@ -2602,7 +2703,7 @@ computation of the ranked probability score.  If left empty, but climatology
 data is provided, the climo_cdf thresholds will be used instead.
 
 .. code-block:: none
-		
+
   fcst = {
      message_type       = [ "ADPUPA" ];
      ens_ssvar_bin_size = 1;
@@ -2632,7 +2733,7 @@ unique.
 e.g. nc_var_str = "MIN";
 
 .. code-block:: none
-		
+
   nc_var_str = "";
 
 obs_thresh
@@ -2646,7 +2747,7 @@ Verification output will be computed separately for each threshold specified.
 This option may be set separately for each obs.field entry.
 
 .. code-block:: none
-		
+
   obs_thresh = [ NA ];
 
 skip_const
@@ -2660,7 +2761,7 @@ false, constant points are included and the observation rank is chosen at
 random.
 
 .. code-block:: none
-		
+
   skip_const = FALSE;
 
 obs_error
@@ -2710,7 +2811,7 @@ type, instrument type, station ID, range of heights, range of pressure
 levels, and range of values.
 
 .. code-block:: none
-		
+
   obs_error = {
      flag             = FALSE;   TRUE or FALSE
      dist_type        = NONE;    Distribution type
@@ -2728,7 +2829,7 @@ See: `Random Number Generator Performance <https://www.gnu.org/software/gsl/doc/
 used for random assignment of ranks when they are tied.
 
 .. code-block:: none
-		
+
   rng = {
      type = "mt19937";
      seed = "";
@@ -2761,7 +2862,7 @@ This toggle indicates whether forecast or observed lines should be used for
 analysis.
 
 .. code-block:: none
-		
+
   fcst      = FALSE;
   obs       = FALSE;
 
@@ -2769,7 +2870,7 @@ This toggle indicates whether single object or object pair lines should be
 used.
 
 .. code-block:: none
-		
+
   single    = FALSE;
   pair      = FALSE;
 
@@ -2777,7 +2878,7 @@ This toggle indicates whether simple object or object cluster object lines
 should be used.
 
 .. code-block:: none
-		
+
   simple    = FALSE;
   cluster   = FALSE;
 
@@ -2785,7 +2886,7 @@ This toggle indicates whether matched or unmatched object lines should be
 used.
 
 .. code-block:: none
-		
+
   matched   = FALSE;
   unmatched = FALSE;
 
@@ -3088,7 +3189,7 @@ thresholds must match. For N radii and M thresholds, NxM configurations of
 MODE will be run.
 
 .. code-block:: none
-		
+
   quilt = false;
 
 fcst, obs
@@ -3105,7 +3206,7 @@ The object definition settings for MODE are contained within the "fcst" and
   Multiple convolution radii may be specified as an array. For example:
 
   .. code-block:: none
-		  
+
     conv_radius = [ 5, 10, 15 ];
 
 * The "conv_thresh" entry specifies the convolution threshold used to
@@ -3113,7 +3214,7 @@ The object definition settings for MODE are contained within the "fcst" and
   Multiple convolution thresholds may be specified as an array. For example:
 
   .. code-block:: none
-		  
+
     conv_thresh = [ >=5.0, >=10.0, >=15.0 ];
 
 * The "vld_thresh" entry is described above.
@@ -3143,7 +3244,7 @@ The object definition settings for MODE are contained within the "fcst" and
   Multiple merge thresholds may be specified as an array. For example:
 
   .. code-block:: none
-		  
+
     merge_thresh = [ >=1.0, >=2.0, >=3.0 ];
 
 * The "merge_flag" entry specifies the merging methods to be applied:
@@ -3158,7 +3259,7 @@ The object definition settings for MODE are contained within the "fcst" and
    * "BOTH" for both the double-threshold and engine merging methods
 
 .. code-block:: none
-		
+
   fcst = {
      field = {
         name  = "APCP";
@@ -3186,7 +3287,7 @@ setting the appropriately will help ensure that appropriate default values
 are used for these variables.
 
 .. code-block:: none
-		
+
   grid_res = 4;
 
 match_flag
@@ -3205,7 +3306,7 @@ The "match_flag" entry specifies the matching method to be applied:
 * "NO_MERGE" for matching with no additional merging in either field
 
 .. code-block:: none
-		
+
   match_flag = MERGE_BOTH;
 
 max_centroid_dist
@@ -3217,7 +3318,7 @@ Setting this to a reasonable value speeds up the runtime enabling MODE to
 skip unreasonable object comparisons.
 
 .. code-block:: none
-		
+
   max_centroid_dist = 800.0/grid_res;
 
 weight
@@ -3230,7 +3331,7 @@ total interest value is computed, the weighted sum is normalized by the
 sum of the weights listed.
 
 .. code-block:: none
-		
+
   weight = {
      centroid_dist    = 2.0;
      boundary_dist    = 4.0;
@@ -3245,7 +3346,7 @@ sum of the weights listed.
 
 interest_function
 ^^^^^^^^^^^^^^^^^
-		
+
 The set of interest function variables listed define which values are of
 interest for each pairwise attribute measured. The interest functions may be
 defined as a piecewise linear function or as an algebraic expression. A
@@ -3254,7 +3355,7 @@ graph. An algebraic function may be defined in terms of several built-in
 mathematical functions.
 
 .. code-block:: none
-		
+
   interest_function = {
   
      centroid_dist = (
@@ -3308,7 +3409,7 @@ threshold is applied to the total interest values computed for each pair of
 objects and is used in determining matches.
 
 .. code-block:: none
-		
+
   total_interest_thresh = 0.7;
 
 print_interest_thresh
@@ -3323,7 +3424,7 @@ be written as long as the distance between the object centroids is less than
 the max_centroid_dist variable.
 
 .. code-block:: none
-		
+
   print_interest_thresh = 0.0;
 
 plot_valid_flag
@@ -3335,7 +3436,7 @@ indicates the entire domain should be plotted; FALSE indicates only the
 region containing valid data after masking should be plotted.
 
 .. code-block:: none
-		
+
   plot_valid_flag = FALSE;
 
 plot_gcarc_flag
@@ -3346,7 +3447,7 @@ polylines should be plotted using great circle arcs as opposed to straight
 lines in the grid.
 
 .. code-block:: none
-		
+
   plot_gcarc_flag = FALSE;
 
 ct_stats_flag
@@ -3356,7 +3457,7 @@ The ct_stats_flag can be set to TRUE or FALSE to produce additional output,
 in the form of contingency table counts and statistics.
 
 .. code-block:: none
-		
+
   ct_stats_flag = TRUE;
 
 shift_right
@@ -3371,7 +3472,7 @@ This option provides a very specialized case of automated regridding. The
 much more flexible "regrid" option may be used instead.
 
 .. code-block:: none
-		
+
   shift_right = 0;
 
 PB2NCConfig_default
@@ -3454,7 +3555,7 @@ For example:
 `Current Table A Entries in PREPBUFR mnemonic table <http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_1.htm>`_
 
 .. code-block:: none
-		
+
   message_type = [];
 
 station_id
@@ -3468,7 +3569,7 @@ stations should be retained.
 For example:  station_id = [ "KDEN" ];
 
 .. code-block:: none
-		
+
   station_id = [];
 
 elevation_range
@@ -3479,7 +3580,7 @@ entries specifying the range of observing locations elevations to be
 retained.
 
 .. code-block:: none
-		
+
   elevation_range = {
      beg =  -1000;
      end = 100000;
@@ -3503,7 +3604,7 @@ For example:
 |
 
 .. code-block:: none
-		
+
   pb_report_type  = [];
 
 in_report_type
@@ -3523,7 +3624,7 @@ For example:
 |
 
 .. code-block:: none
-		
+
   in_report_type = [];
 
 instrument_type
@@ -3533,7 +3634,7 @@ The "instrument_type" entry is an array of instrument types to be retained.
 An empty list indicates that all should be retained.
 
 .. code-block:: none
-		
+
   instrument_type = [];
 
 level_range
@@ -3543,7 +3644,7 @@ The "level_range" entry is a dictionary which contains "beg" and "end"
 entries specifying the range of vertical levels (1 to 255) to be retained.
 
 .. code-block:: none
-		
+
   level_range = {
      beg = 1;
      end = 255;
@@ -3583,7 +3684,7 @@ An empty list indicates that all should be retained.
 See: `Current Table A Entries in PREPBUFR mnemonic table <http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_1.htm>`_
 
 .. code-block:: none
-		
+
   level_category = [];
 
 obs_bufr_var
@@ -3604,7 +3705,7 @@ command line option to see the list of available observation variables.
 |
 
 .. code-block:: none
-		
+
   obs_bufr_var = [ "QOB", "TOB", "ZOB", "UOB", "VOB" ];
 
 obs_bufr_map
@@ -3616,7 +3717,7 @@ Users may choose to rename BUFR variables to match the naming convention
 of the forecast the observation is used to verify.
 
 .. code-block:: none
-		
+
   obs_bufr_map = [];
 
 obs_prepbufr_map
@@ -3629,7 +3730,7 @@ backward-compatibility for earlier versions of MET which wrote GRIB
 abbreviations to the output.
 
 .. code-block:: none
-		
+
   obs_prepbufr_map = [
      { key = "POB";     val = "PRES";  },
      { key = "QOB";     val = "SPFH";  },
@@ -3656,7 +3757,7 @@ GREATER THAN this threshold will be discarded.
 See `Code table for observation quality markers <http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_7.htm>`_
 
 .. code-block:: none
-		
+
   quality_mark_thresh = 2;
 
 event_stack_flag
@@ -3667,7 +3768,7 @@ specify whether observations should be drawn from the top of the event
 stack (most quality controlled) or the bottom of the event stack (most raw).
 
 .. code-block:: none
-		
+
   event_stack_flag = TOP;
 
 SeriesAnalysisConfig_default
@@ -3684,7 +3785,7 @@ If set less than or equal to 0, it is automatically reset to the number
 of grid points, and they are all processed concurrently.
 
 .. code-block:: none
-		
+
   block_size = 1024;
 
 vld_thresh
@@ -3697,7 +3798,7 @@ setting requires all data in the series to be valid.
 
 
 .. code-block:: none
-		
+
   vld_thresh = 1.0;
 
 output_stats
@@ -3709,7 +3810,7 @@ it is recommended to process a few output types at a time, especially if the
 grid is large.
 
 .. code-block:: none
-		
+
   output_stats = {
      fho    = [];
      ctc    = [];
@@ -3742,13 +3843,22 @@ Where "job_name" is set to one of the following:
 
 * "filter"
   
-  To filter out the STAT or TCMPR lines matching the job filtering
-  criteria specified below and using the optional arguments below.
+  To filter out the STAT lines matching the job filtering criteria
+  specified below and using the optional arguments below.
   The output STAT lines are written to the file specified using the
   "-dump_row" argument.
+
   Required Args: -dump_row
 
-|    
+  Optional Args:
+
+  .. code-block:: none
+
+    -set_hdr column_name value
+       May be used multiple times to override data written to the
+       output dump_row file.
+
+|
 
 * "summary"
   
@@ -3777,8 +3887,8 @@ Where "job_name" is set to one of the following:
 	   
   * Format the -column option as LINE_TYPE:COLUMN.
 
-|     
-    
+|
+
   Use the -derive job command option to automatically derive
   statistics on the fly from input contingency tables and partial
   sums.
@@ -3803,11 +3913,15 @@ Where "job_name" is set to one of the following:
   Optional Args:
 
   .. code-block:: none
-		  
-    -by column_name to specify case information
-    -out_alpha to override default alpha value of 0.05
-    -derive to derive statistics on the fly
-    -column_union to summarize multiple columns
+
+    -by column_name
+       To specify case information.
+    -out_alpha
+       To override the default alpha value.
+    -derive
+       To derive statistics on the fly.
+    -column_union
+       To summarize multiple columns.
 
 * "aggregate"
   
@@ -3817,15 +3931,15 @@ Where "job_name" is set to one of the following:
   types may be aggregated:
 
   .. code-block:: none
-		  
+
     -line_type FHO, CTC, MCTC,
                SL1L2, SAL1L2, VL1L2, VAL1L2,
                PCT, NBRCNT, NBRCTC, GRAD,
                ISC, ECNT, RPS, RHIST, PHIST, RELP, SSVAR
 	       
   Required Args: -line_type
-  
-| 
+
+|
 
 * "aggregate_stat"
   
@@ -3835,7 +3949,7 @@ Where "job_name" is set to one of the following:
   combinations of "-line_type" and "-out_line_type" are listed below.
 
   .. code-block:: none
-		  
+
     -line_type FHO, CTC,      -out_line_type CTS, ECLV
     -line_type MCTC           -out_line_type MCTS
     -line_type SL1L2, SAL1L2, -out_line_type CNT
@@ -3857,15 +3971,15 @@ Where "job_name" is set to one of the following:
   Additional Required Args for -line_type MPR:
 
   .. code-block:: none
-		  
+
     -out_thresh or -out_fcst_thresh and -out_obs_thresh
-     When -out_line_type FHO, CTC, CTS, MCTC, MCTS,
-                         PCT, PSTD, PJC, PRC
+       When -out_line_type FHO, CTC, CTS, MCTC, MCTS,
+                           PCT, PSTD, PJC, PRC
 
   Additional Optional Args for -line_type MPR:
 
   .. code-block:: none
-		  
+
     -mask_grid, -mask_poly, -mask_sid
     -out_thresh or -out_fcst_thresh and -out_obs_thresh
     -out_cnt_logic
@@ -3873,30 +3987,30 @@ Where "job_name" is set to one of the following:
     -out_obs_wind_thresh
     -out_wind_logic
     When -out_line_type WDIR
-	    
+
   Additional Optional Arg for:
 
   .. code-block:: none
-		  
+
     -line_type ORANK -out_line_type PHIST, SSVAR ...
     -out_bin_size
-	    
+
   Additional Optional Args for:
 
   .. code-block:: none
-		  
+
     -out_line_type ECLV ...
     -out_eclv_points
 
 * "ss_index"
-  
+
   The skill score index job can be configured to compute a weighted
   average of skill scores derived from a configurable set of
   variables, levels, lead times, and statistics. The skill score
   index is computed using two models, a forecast model and a
   reference model. For each statistic in the index, a skill score
   is computed as:
-  
+
   SS = 1 - (S[model]*S[model])/(S[reference]*S[reference])
 
   Where S is the statistic.
@@ -3928,7 +4042,7 @@ Where "job_name" is set to one of the following:
   For lead times of 12, 24, 36, and 48 hours, it contains RMSE for:
 
   .. code-block:: none
-		  
+
     - Wind Speed at the surface(b), 850(a), 400(a), 250(a) mb
     - Dew point Temperature at the surface(b), 850(b), 700(b), 400(b) mB
     - Temperature at the surface(b), 400(a) mB
@@ -3953,7 +4067,7 @@ Where "job_name" is set to one of the following:
   Required Args:
 
   .. code-block:: none
-		  
+
     -ramp_thresh (-ramp_thresh_fcst or -ramp_thresh_obs)
        For DYDT, threshold for the amount of change required to
        define an event.
@@ -3964,7 +4078,7 @@ Where "job_name" is set to one of the following:
   Optional Args:
 
   .. code-block:: none
-		  
+
     -ramp_type str
        Overrides the default ramp definition algorithm to be used.
        May be set to DYDT (default) or SWING for the swinging door
@@ -3997,7 +4111,7 @@ Where "job_name" is set to one of the following:
   union:
 
   .. code-block:: none
-		  
+
     "-model            name"
     "-fcst_lead        HHMMSS"
     "-obs_lead         HHMMSS"
@@ -4040,7 +4154,7 @@ Where "job_name" is set to one of the following:
   performed on their intersection:
 
   .. code-block:: none
-		  
+
     "-column_min     col_name value"     e.g. -column_min BASER 0.02
     "-column_max     col_name value"
     "-column_eq      col_name value"
@@ -4065,7 +4179,7 @@ Where "job_name" is set to one of the following:
     "-mask_sid        file|list" see description of "sid" entry above
 
   .. code-block:: none
-		  
+
     "-out_line_type   name"
     "-out_thresh      value" sets both -out_fcst_thresh and -out_obs_thresh
     "-out_fcst_thresh value" multiple for multi-category contingency tables
@@ -4090,7 +4204,7 @@ Where "job_name" is set to one of the following:
                              entry
 
   .. code-block:: none
-		  
+
     "-out_alpha       value"
 
   .. code-block:: none
@@ -4107,17 +4221,19 @@ Where "job_name" is set to one of the following:
     "-rank_corr_flag  value"
     "-vif_flag        value"
 
-  For aggregate and aggregate_stat job types:
-
   .. code-block:: none
-		    
-    "-out_stat        path"   to write a .stat output file for the job
-                              including the .stat header columns. Multiple
-                              values for each header column are written as
-                              a comma-separated list.
-    "-set_hdr col_name value" may be used multiple times to explicity
-                              specify what should be written to the header
-                              columns of the output .stat file.
+
+    -out_stat path
+       To write a .stat output file for aggregate and aggregate_stat jobs
+       including the .stat header columns. Multiple input values for each
+       header column are written to the output as a comma-separated list
+       of unique values.
+
+    -set_hdr col_name value
+       May be used multiple times to explicity specify what should be
+       written to the header columns of the output .stat file for
+       aggregate and aggregate_stat jobs or output dump_row file
+       for filter jobs.
 
   When using the "-by" job command option, you may reference those columns
   in the "-set_hdr" job command options. For example, when computing statistics
@@ -4125,7 +4241,7 @@ Where "job_name" is set to one of the following:
   of the output .stat output file:
 
   .. code-block:: none
-		  
+
     -job aggregate_stat -line_type MPR -out_line_type CNT \
     -by OBS_SID -set_hdr VX_MASK OBS_SID -stat_out out.stat
     When using mulitple "-by" options, use "CASE" to reference the full string:
@@ -4133,7 +4249,7 @@ Where "job_name" is set to one of the following:
 
 
 .. code-block:: none
-		
+
   jobs = [
      "-job filter         -line_type SL1L2 -vx_mask DTC165 \
       -dump_row  job_filter_SL1L2.stat",
@@ -4179,7 +4295,7 @@ statistic name. Statistics using the default arithemtic mean method do not
 need to be listed.
 
 .. code-block:: none
-		
+
   wmo_sqrt_stats   = [];
   wmo_fisher_stats = [];
 
@@ -4189,7 +4305,7 @@ table counts or partial sums. The VIF is used to adjust the normal
 confidence intervals computed for the aggregated statistics.
 
 .. code-block:: none
-		
+
   vif_flag = FALSE;
 
 WaveletStatConfig_default
@@ -4208,7 +4324,7 @@ Wavelet-Stat into dyadic (2^n x 2^n) tiles:
 * "PAD" to pad the input data out to the nearest integer power of 2.
 
 .. code-block:: none
-		
+
   grid_decomp_flag = AUTO;
 
 tile
@@ -4225,7 +4341,7 @@ in Wavelet-Stat when the "grid_decomp_flag" is set to "TILE":
   coordinates of the tile.
 
 .. code-block:: none
-		
+
   tile = {
      width = 0;
      location = [
@@ -4266,7 +4382,7 @@ wavelet decomposition should be performed:
     204, 206, 208, 301, 303, 305, 307, 309)
 
 .. code-block:: none
-		
+
   wavelet = {
      type   = HAAR;
      member = 2;
@@ -4300,7 +4416,7 @@ Supply the NetCDF output information.  For example:
    level         = "SFC";
 
 .. code-block:: none
-		
+
   variable_name = "";
   units         = "";
   long_name     = "";
@@ -4323,7 +4439,7 @@ The swap_endian option indicates whether the endian-ness of the data should
 be swapped after reading.
 
 .. code-block:: none
-		
+
   swap_endian = TRUE;
 
 write_pixel_age
@@ -4334,5 +4450,5 @@ command line to the output file. This option writes the pixel age data,
 in minutes, to the output file instead.
 
 .. code-block:: none
-		
+
   write_pixel_age = FALSE;

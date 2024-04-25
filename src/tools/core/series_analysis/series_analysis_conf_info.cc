@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -7,8 +7,6 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 ////////////////////////////////////////////////////////////////////////
-
-using namespace std;
 
 #include <dirent.h>
 #include <iostream>
@@ -22,6 +20,8 @@ using namespace std;
 
 #include "vx_data2d_factory.h"
 #include "vx_log.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -46,8 +46,8 @@ SeriesAnalysisConfInfo::~SeriesAnalysisConfInfo() {
 void SeriesAnalysisConfInfo::init_from_scratch() {
 
    // Initialize pointers
-   fcst_info = (VarInfo **)    0;
-   obs_info  = (VarInfo **)    0;
+   fcst_info = (VarInfo **) nullptr;
+   obs_info  = (VarInfo **) nullptr;
 
    clear();
 
@@ -67,10 +67,10 @@ void SeriesAnalysisConfInfo::clear() {
    ocat_ta.clear();
    fcnt_ta.clear();
    ocnt_ta.clear();
-   cnt_logic = SetLogic_None;
+   cnt_logic = SetLogic::None;
    cdf_info.clear();
    ci_alpha.clear();
-   boot_interval = BootIntervalType_None;
+   boot_interval = BootIntervalType::None;
    boot_rep_prop = bad_data_double;
    n_boot_rep = bad_data_int;
    boot_rng.clear();
@@ -92,15 +92,15 @@ void SeriesAnalysisConfInfo::clear() {
    // Clear fcst_info
    if(fcst_info) {
       for(i=0; i<n_fcst; i++)
-         if(fcst_info[i]) { delete fcst_info[i]; fcst_info[i] = (VarInfo *) 0; }
-      delete fcst_info; fcst_info = (VarInfo **) 0;
+         if(fcst_info[i]) { delete fcst_info[i]; fcst_info[i] = (VarInfo *) nullptr; }
+      delete fcst_info; fcst_info = (VarInfo **) nullptr;
    }
 
    // Clear obs_info
    if(obs_info) {
       for(i=0; i<n_obs; i++)
-         if(obs_info[i]) { delete obs_info[i]; obs_info[i] = (VarInfo *) 0; }
-      delete obs_info; obs_info = (VarInfo **) 0;
+         if(obs_info[i]) { delete obs_info[i]; obs_info[i] = (VarInfo *) nullptr; }
+      delete obs_info; obs_info = (VarInfo **) nullptr;
    }
 
    // Reset counts
@@ -136,8 +136,8 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
    StringArray sa;
    ThreshArray cur_ta;
    VarInfoFactory info_factory;
-   Dictionary *fdict = (Dictionary *) 0;
-   Dictionary *odict = (Dictionary *) 0;
+   Dictionary *fdict = (Dictionary *) nullptr;
+   Dictionary *odict = (Dictionary *) nullptr;
    Dictionary i_fdict, i_odict;
    BootInfo boot_info;
    map<STATLineType,StringArray>::iterator it;
@@ -176,18 +176,18 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
    }
 
    // Set flags
-   bool do_cat = (output_stats[stat_fho].n()    +
-                  output_stats[stat_ctc].n()    +
-                  output_stats[stat_cts].n()    +
-                  output_stats[stat_mctc].n()   +
-                  output_stats[stat_mcts].n()   +
-                  output_stats[stat_pct].n()    +
-                  output_stats[stat_pstd].n()   +
-                  output_stats[stat_pjc].n()    +
-                  output_stats[stat_prc].n()) > 0;
-   bool do_cnt = (output_stats[stat_sl1l2].n()  +
-                  output_stats[stat_sal1l2].n() +
-                  output_stats[stat_cnt].n()) > 0;
+   bool do_cat = (output_stats[STATLineType::fho].n()    +
+                  output_stats[STATLineType::ctc].n()    +
+                  output_stats[STATLineType::cts].n()    +
+                  output_stats[STATLineType::mctc].n()   +
+                  output_stats[STATLineType::mcts].n()   +
+                  output_stats[STATLineType::pct].n()    +
+                  output_stats[STATLineType::pstd].n()   +
+                  output_stats[STATLineType::pjc].n()    +
+                  output_stats[STATLineType::prc].n()) > 0;
+   bool do_cnt = (output_stats[STATLineType::sl1l2].n()  +
+                  output_stats[STATLineType::sal1l2].n() +
+                  output_stats[STATLineType::cnt].n()) > 0;
 
    // Conf: fcst.field and obs.field
    fdict = conf.lookup_array(conf_key_fcst_field);
@@ -220,8 +220,8 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
    obs_info  = new VarInfo * [n_obs];
 
    // Initialize pointers
-   for(i=0; i<n_fcst; i++) fcst_info[i] = (VarInfo *) 0;
-   for(i=0; i<n_obs;  i++) obs_info[i]  = (VarInfo *) 0;
+   for(i=0; i<n_fcst; i++) fcst_info[i] = (VarInfo *) nullptr;
+   for(i=0; i<n_obs;  i++) obs_info[i]  = (VarInfo *) nullptr;
 
    // Conf: fcst.cat_thresh and obs.cat_thresh
    fcat_ta = fdict->lookup_thresh_array(conf_key_cat_thresh);
@@ -384,8 +384,8 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
 
       // Verifying with multi-category contingency tables
       if(!fcst_info[0]->is_prob() &&
-         (output_stats[stat_mctc].n() > 0 ||
-          output_stats[stat_mcts].n() > 0)) {
+         (output_stats[STATLineType::mctc].n() > 0 ||
+          output_stats[STATLineType::mcts].n() > 0)) {
          check_mctc_thresh(fcat_ta);
          check_mctc_thresh(ocat_ta);
       }

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -7,8 +7,6 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 ////////////////////////////////////////////////////////////////////////
-
-using namespace std;
 
 #include <iostream>
 #include <unistd.h>
@@ -19,6 +17,9 @@ using namespace std;
 
 #include "prob_info_base.h"
 
+using namespace std;
+
+////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
 //
 //  Code for class ProbInfoBase
@@ -50,11 +51,11 @@ ProbInfoBase::ProbInfoBase(const ProbInfoBase & t) {
 
 ProbInfoBase & ProbInfoBase::operator=(const ProbInfoBase & t) {
 
-   if(this == &t) return(*this);
+   if(this == &t) return *this;
 
    assign(t);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -70,7 +71,7 @@ void ProbInfoBase::init_from_scratch() {
 
 void ProbInfoBase::clear() {
 
-   Type = NoATCFLineType;
+   Type = ATCFLineType::None;
    StormId.clear();
    Basin.clear();
    Cyclone.clear();
@@ -135,7 +136,7 @@ ConcatString ProbInfoBase::serialize() const {
      << ", DLand = " << DLand
      << ", NProb = " << NProb;
 
-   return(s);
+   return s;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -153,7 +154,7 @@ ConcatString ProbInfoBase::serialize_r(int n, int indent_depth) const {
         << "% probability for " << ProbItem[i] << "\n";
    }
 
-   return(s);
+   return s;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -237,7 +238,7 @@ bool ProbInfoBase::is_match(const TrackInfo &t) const {
       match = false;
 
    // Check that technique is defined
-   if(Technique == "" || t.technique() == "") return(false);
+   if(Technique == "" || t.technique() == "") return false;
 
    // Check that init times match for non-BEST, non-analysis tracks
    if(!t.is_best_track() &&
@@ -246,7 +247,7 @@ bool ProbInfoBase::is_match(const TrackInfo &t) const {
       match = false;
    }
 
-   return(match);
+   return match;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -260,15 +261,15 @@ bool ProbInfoBase::add(const ATCFProbLine &l, double dland, bool check_dup) {
               << "\nProbInfoBase::add(const ATCFProbLine &l, bool check_dup) -> "
               << "skipping duplicate ATCFProbLine:\n"
               << l.get_line() << "\n\n";
-         return(false);
+         return false;
       }
    }
 
    // Initialize the header information, if necessary
-   if(Type == NoATCFLineType) initialize(l, dland);
+   if(Type == ATCFLineType::None) initialize(l, dland);
 
    // Check for matching header information
-   if(!is_match(l)) return(false);
+   if(!is_match(l)) return false;
 
    // Add probability information
    NProb++;
@@ -278,7 +279,7 @@ bool ProbInfoBase::add(const ATCFProbLine &l, double dland, bool check_dup) {
    // Store the ATCFProbLine that was just added
    if(check_dup) ProbLines.add(l.get_line());
 
-   return(true);
+   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -291,8 +292,8 @@ void ProbInfoBase::set(const TCStatLine &l) {
    // Store column information
    switch(l.type()) {
 
-      case TCStatLineType_ProbRIRW:
-         Type = ATCFLineType_ProbRI;
+      case TCStatLineType::ProbRIRW:
+         Type = ATCFLineType::ProbRI;
          break;
 
       default:
@@ -324,7 +325,7 @@ void ProbInfoBase::set(const TCStatLine &l) {
 ////////////////////////////////////////////////////////////////////////
 
 bool ProbInfoBase::has(const ATCFProbLine &l) const {
-   return(ProbLines.has(l.get_line()));
+   return ProbLines.has(l.get_line());
 }
 
 ////////////////////////////////////////////////////////////////////////

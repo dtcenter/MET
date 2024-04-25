@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -81,7 +81,7 @@ class SeriesAnalysisConfInfo {
       ConcatString     version;            // Config file version
 
       // Mapping of line type to output statistics
-      map<STATLineType,StringArray> output_stats;
+      std::map<STATLineType,StringArray> output_stats;
 
       SeriesAnalysisConfInfo();
      ~SeriesAnalysisConfInfo();

@@ -33,8 +33,6 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <csignal>
 #include <pwd.h>
 
@@ -42,6 +40,8 @@ using namespace std;
 #include "concat_string.h"
 #include "memory.h"
 #include "logger.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////

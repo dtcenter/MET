@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -8,19 +8,6 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 
-
-static const int num_cbar_vals = 300;
-
-static const double one_inch = 72.0;
-
-static const int num_ticks = 9;
-
-static const bool use_flate = true;
-
-
-///////////////////////////////////////////////////////////////////////////////
-
-using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -48,7 +35,19 @@ using namespace std;
 #include "vx_log.h"
 #include "data_plane_plot.h"
 
+using namespace std;
+
 ////////////////////////////////////////////////////////////////////////////////
+
+static const int num_cbar_vals = 300;
+
+static const double one_inch = 72.0;
+
+static const int num_ticks = 9;
+
+static const bool use_flate = true;
+
+///////////////////////////////////////////////////////////////////////////////
 
 void data_plane_plot(const ConcatString & inname, const ConcatString & outname,
                      const Grid & grid, const ConcatString & title,

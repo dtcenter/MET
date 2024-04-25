@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -10,8 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <cstdio>
 #include <iostream>
 #include <unistd.h>
@@ -20,11 +18,13 @@ using namespace std;
 #include <cmath>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "grid_output.h"
 #include "vx_log.h"
 #include "nc_utils.h"
+
+using namespace std;
+using namespace netCDF;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -882,7 +882,7 @@ if ( standard_name_str )  add_att(&nc_var, standard_name_att_name, standard_name
 
 put_nc_data(&nc_var, &var_data[0], nc_dim->getSize(), 0);
 
-if ( var_data )  { delete [] var_data; var_data = (float *) 0; }
+if ( var_data )  { delete [] var_data; var_data = (float *) nullptr; }
 
    //
    //  done

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -113,7 +113,7 @@ else  {
    //  done
    //
 
-return ( true );
+return true;
 
 }
 
@@ -211,7 +211,7 @@ else  {
    //  done
    //
 
-return ( true );
+return true;
 
 }
 
@@ -310,7 +310,7 @@ else  {
    //  done
    //
 
-return ( true );
+return true;
 
 }
 
@@ -409,7 +409,7 @@ else  {
    //  done
    //
 
-return ( true );
+return true;
 
 }
 
@@ -433,7 +433,7 @@ data_out->add(a);
    //  done
    //
 
-return ( true );
+return true;
 
 }
 
@@ -447,7 +447,7 @@ bool pointdata_from_python_list(PyObject * data_array, float *data_out)
    for (int idx=0; idx<PyList_Size(data_array); idx++) {
       *(data_out+idx) = (float)PyFloat_AsDouble(PyList_GetItem(data_array, idx));
    }
-   return ( true );
+   return true;
 
 }
 
@@ -461,7 +461,7 @@ bool pointdata_from_python_list(PyObject * data_array, NumArray *data_out)
       data_out->add((float)PyFloat_AsDouble(PyList_GetItem(data_array, idx)));
    }
 
-   return ( true );
+   return true;
 
 }
 
@@ -485,7 +485,7 @@ bool pointdata_from_python_list(PyObject * data_array, int *data_out)
        // exit by caller with additional log message
    }
 
-   return ( status );
+   return status;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -507,7 +507,7 @@ bool pointdata_from_python_list(PyObject * data_array, IntArray *data_out)
        // exit by caller with additional log message
    }
 
-   return ( status );
+   return status;
 
 }
 

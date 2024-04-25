@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -10,8 +10,8 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-#ifndef  __SURFRADHANDLER_H__
-#define  __SURFRADHANDLER_H__
+#ifndef  __SURFRAD_HANDLER_H__
+#define  __SURFRAD_HANDLER_H__
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -31,12 +31,12 @@ class SurfradHandler : public FileHandler
 
 public:
 
-  SurfradHandler(const string &program_name);
+  SurfradHandler(const std::string &program_name);
   virtual ~SurfradHandler();
 
   virtual bool isFileType(LineDataFile &ascii_file) const;
   
-  static string getFormatString()
+  static std::string getFormatString()
   {
     return "surfrad";
   }
@@ -59,7 +59,7 @@ protected:
 
   // The header type for these observations
 
-  static const string HEADER_TYPE;
+  static const std::string HEADER_TYPE;
 
   // Grib codes for the different fields
 
@@ -91,7 +91,7 @@ protected:
 
   // Unchanging header information
 
-  string _stationId;
+  std::string _stationId;
   double _stationLat;
   double _stationLon;
   double _stationAlt;
@@ -136,7 +136,7 @@ protected:
 ////////////////////////////////////////////////////////////////////////
 
 
-#endif   /*  __SURFRADHANDLER_H__  */
+#endif   /*  __SURFRAD_HANDLER_H__  */
 
 
 ////////////////////////////////////////////////////////////////////////

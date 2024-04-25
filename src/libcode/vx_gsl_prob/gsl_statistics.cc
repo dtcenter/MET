@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -8,8 +8,6 @@
 
 
 ////////////////////////////////////////////////////////////////////////
-
-using namespace std;
 
 #include <cstdio>
 #include <iostream>
@@ -22,11 +20,13 @@ using namespace std;
 #include "gsl_statistics.h"
 #include "gsl/gsl_errno.h"
 
+using namespace std;
+
 ////////////////////////////////////////////////////////////////////////
 
 double stats_lag1_autocorrelation(const NumArray &na) {
    double corr;
-   double *src = (double *) 0;
+   double *src = (double *) nullptr;
    int n, i;
 
    n   = na.n_elements();
@@ -36,9 +36,9 @@ double stats_lag1_autocorrelation(const NumArray &na) {
 
    corr = gsl_stats_lag1_autocorrelation(src, 1, n);
 
-   if(src) { delete [] src; src = (double *) 0; }
+   if(src) { delete [] src; src = (double *) nullptr; }
 
-   return(corr);
+   return corr;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -57,7 +57,7 @@ double sf_lambert_W0(const double x) {
       w = lw.val;
    }
 
-   return(w);
+   return w;
 }
 
 ////////////////////////////////////////////////////////////////////////

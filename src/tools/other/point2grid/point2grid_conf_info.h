@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -31,8 +31,8 @@ class PointToGridConfInfo {
       void init_from_scratch();
 
    protected:
-      map<ConcatString,ConcatString> var_name_map;
-      map<ConcatString,ConcatString> def_var_name_map;
+      std::map<ConcatString,ConcatString> var_name_map;
+      std::map<ConcatString,ConcatString> def_var_name_map;
 
    public:
 

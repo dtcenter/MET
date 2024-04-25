@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -94,10 +94,6 @@ static const char yyyymmdd_hhmmss_reg_exp[] =
 static const char ws_reg_exp[] = "[ \t\r\n]";
 static const char ws_line_reg_exp[] = "^[ \t\r\n]*$";
 static const char sep_str[] = "--------------------------------------------------------------------------------";
-
-// Bootstrap methods
-static const int boot_bca_flag  = 0;
-static const int boot_perc_flag = 1;
 
 ////////////////////////////////////////////////////////////////////////
 

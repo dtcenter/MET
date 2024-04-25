@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -11,12 +11,11 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include "vx_regrid.h"
 
 #include "interp_mthd.h"
 
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -101,7 +100,7 @@ for (ixt=0; ixt<(to_grid.nx()); ++ixt)  {
    //  done
    //
 
-return ( to_data );
+return to_data;
 
 }
 

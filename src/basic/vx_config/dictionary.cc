@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -1281,7 +1281,7 @@ scope = Name.split(".");
 
 if ( scope.n_elements() == 1 )  {
 
-   return ( lookup_simple(name, search_parent) );
+   return lookup_simple(name, search_parent);
 
 }
 
@@ -1505,7 +1505,7 @@ if ( !Entry || !is_correct_type )  {
 
    }
 
-   return ( false );
+   return false;
 
 }
 
@@ -1529,7 +1529,7 @@ for (int i=0; i<num_array.n_elements(); i++) {
    array.add( num_array[i] == 1 ? true:false);
 }
 
-return ( array );
+return array;
 
 }
 
@@ -2626,7 +2626,7 @@ const Dictionary * DictionaryStack::top() const
 
 {
 
-if ( Nelements == 0 )  return ( (const Dictionary *) nullptr );
+if ( Nelements == 0 )  return (const Dictionary *) nullptr;
 
 return D[Nelements - 1];
 

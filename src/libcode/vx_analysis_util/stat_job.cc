@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -7,8 +7,6 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 ////////////////////////////////////////////////////////////////////////
-
-using namespace std;
 
 #include <iostream>
 #include <unistd.h>
@@ -24,6 +22,9 @@ using namespace std;
 #include "vx_statistics.h"
 #include "vx_math.h"
 #include "vx_log.h"
+#include "enum_as_int.hpp"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -64,24 +65,24 @@ STATAnalysisJob::STATAnalysisJob(const STATAnalysisJob & aj) {
 STATAnalysisJob & STATAnalysisJob::operator=(
    const STATAnalysisJob & aj) {
 
-   if(this == &aj ) return ( * this );
+   if(this == &aj ) return *this;
 
    assign(aj);
 
-   return (* this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void STATAnalysisJob::init_from_scratch() {
 
-   dump_row      = (char *)     0;
-   dr_out        = (ofstream *) 0;
+   dump_row      = (char *)     nullptr;
+   dr_out        = (ofstream *) nullptr;
    n_dump        =              0;
-   stat_file     = (char *)     0;
-   stat_out      = (ofstream *) 0;
-   boot_rng      = (char *)     0;
-   boot_seed     = (char *)     0;
+   stat_file     = (char *)     nullptr;
+   stat_out      = (ofstream *) nullptr;
+   boot_rng      = (char *)     nullptr;
+   boot_seed     = (char *)     nullptr;
 
    model.set_ignore_case(1);
    desc.set_ignore_case(1);
@@ -110,7 +111,7 @@ void STATAnalysisJob::clear() {
 
    precision = default_precision;
 
-   job_type = no_stat_job_type;
+   job_type = STATJobType::None;
 
    model.clear();
    desc.clear();
@@ -158,7 +159,7 @@ void STATAnalysisJob::clear() {
    obs_thresh.clear();
    cov_thresh.clear();
 
-   thresh_logic = SetLogic_None;
+   thresh_logic = SetLogic::None;
 
    alpha.clear();
 
@@ -183,8 +184,8 @@ void STATAnalysisJob::clear() {
    close_dump_row_file();
    close_stat_file();
 
-   if(dump_row)  { delete [] dump_row;  dump_row  = (char *) 0; }
-   if(stat_file) { delete [] stat_file; stat_file = (char *) 0; }
+   if(dump_row)  { delete [] dump_row;  dump_row  = (char *) nullptr; }
+   if(stat_file) { delete [] stat_file; stat_file = (char *) nullptr; }
 
    stat_row = 0;
 
@@ -192,14 +193,14 @@ void STATAnalysisJob::clear() {
 
    out_fcst_thresh.clear();
    out_obs_thresh.clear();
-   out_cnt_logic = SetLogic_Union;
+   out_cnt_logic = SetLogic::Union;
 
    out_fcst_wind_thresh.clear();
    out_obs_wind_thresh.clear();
-   out_wind_logic = SetLogic_Union;
+   out_wind_logic = SetLogic::Union;
 
    out_alpha      = bad_data_double;
-   boot_interval  = bad_data_int;
+   boot_interval  = BootIntervalType::None;
    boot_rep_prop  = bad_data_double;
    n_boot_rep     = bad_data_int;
 
@@ -621,7 +622,7 @@ void STATAnalysisJob::dump(ostream & out, int depth) const {
        << swing_width << "\n";
 
    out << prefix << "boot_interval = "
-       << boot_interval << "\n";
+       << bootintervaltype_to_string(boot_interval) << "\n";
 
    out << prefix << "boot_rep_prop = "
        << boot_rep_prop << "\n";
@@ -664,41 +665,41 @@ int STATAnalysisJob::is_keeper(const STATLine & L) const {
    // model
    //
    if(model.n() > 0) {
-      if(!(model.has(L.model()))) return(0);
+      if(!(model.has(L.model()))) return 0;
    }
 
    //
    // desc
    //
    if(desc.n() > 0) {
-      if(!(desc.has(L.desc()))) return(0);
+      if(!(desc.has(L.desc()))) return 0;
    }
 
    //
    // fcst_lead (in seconds)
    //
    if(fcst_lead.n() > 0) {
-      if(!fcst_lead.has(L.fcst_lead())) return(0);
+      if(!fcst_lead.has(L.fcst_lead())) return 0;
    }
 
    //
    // fcst_valid_beg
    //
    if((fcst_valid_beg > 0) && (L.fcst_valid_beg() < fcst_valid_beg))
-      return(0);
+      return 0;
 
    //
    // fcst_valid_end
    //
    if((fcst_valid_end > 0) && (L.fcst_valid_end() > fcst_valid_end))
-      return(0);
+      return 0;
 
    //
    // fcst_valid_inc
    //
    if(fcst_valid_inc.n() > 0) {
       if(!fcst_valid_inc.has(L.fcst_valid_beg()) ||
-         !fcst_valid_inc.has(L.fcst_valid_end())) return(0);
+         !fcst_valid_inc.has(L.fcst_valid_end())) return 0;
    }
 
    //
@@ -706,7 +707,7 @@ int STATAnalysisJob::is_keeper(const STATLine & L) const {
    //
    if(fcst_valid_exc.n() > 0) {
       if(fcst_valid_exc.has(L.fcst_valid_beg()) ||
-         fcst_valid_exc.has(L.fcst_valid_end())) return(0);
+         fcst_valid_exc.has(L.fcst_valid_end())) return 0;
    }
 
    //
@@ -716,29 +717,29 @@ int STATAnalysisJob::is_keeper(const STATLine & L) const {
    if(fcst_valid_hour.n() > 0) {
 
       // Check that fcst_valid_beg = fcst_valid_end
-      if(L.fcst_valid_beg() != L.fcst_valid_end()) return(0);
+      if(L.fcst_valid_beg() != L.fcst_valid_end()) return 0;
 
-      if(!fcst_valid_hour.has(L.fcst_valid_hour())) return(0);
+      if(!fcst_valid_hour.has(L.fcst_valid_hour())) return 0;
    }
 
    //
    // fcst_init_beg
    //
    if((fcst_init_beg > 0) && (L.fcst_init_beg() < fcst_init_beg))
-      return(0);
+      return 0;
 
    //
    // fcst_init_end
    //
    if((fcst_init_end > 0) && (L.fcst_init_end() > fcst_init_end))
-      return(0);
+      return 0;
 
    //
    // fcst_init_inc
    //
    if(fcst_init_inc.n() > 0) {
       if(!fcst_init_inc.has(L.fcst_init_beg()) ||
-         !fcst_init_inc.has(L.fcst_init_end())) return(0);
+         !fcst_init_inc.has(L.fcst_init_end())) return 0;
    }
 
    //
@@ -746,7 +747,7 @@ int STATAnalysisJob::is_keeper(const STATLine & L) const {
    //
    if(fcst_init_exc.n() > 0) {
       if(fcst_init_exc.has(L.fcst_init_beg()) ||
-         fcst_init_exc.has(L.fcst_init_end())) return(0);
+         fcst_init_exc.has(L.fcst_init_end())) return 0;
    }
 
    //
@@ -756,36 +757,36 @@ int STATAnalysisJob::is_keeper(const STATLine & L) const {
    if(fcst_init_hour.n() > 0) {
 
       // Check that fcst_init_beg = fcst_init_end
-      if(L.fcst_init_beg() != L.fcst_init_end()) return(0);
+      if(L.fcst_init_beg() != L.fcst_init_end()) return 0;
 
-      if(!fcst_init_hour.has(L.fcst_init_hour())) return(0);
+      if(!fcst_init_hour.has(L.fcst_init_hour())) return 0;
    }
 
    //
    // obs_lead (in seconds)
    //
    if(obs_lead.n() > 0) {
-      if(!obs_lead.has(L.obs_lead())) return(0);
+      if(!obs_lead.has(L.obs_lead())) return 0;
    }
 
    //
    // obs_valid_beg
    //
    if((obs_valid_beg > 0) && (L.obs_valid_beg() < obs_valid_beg))
-      return(0);
+      return 0;
 
    //
    // obs_valid_end
    //
    if((obs_valid_end > 0) && (L.obs_valid_end() > obs_valid_end))
-      return(0);
+      return 0;
 
    //
    // obs_valid_inc
    //
    if(obs_valid_inc.n() > 0) {
       if(!obs_valid_inc.has(L.obs_valid_beg()) ||
-         !obs_valid_inc.has(L.obs_valid_end())) return(0);
+         !obs_valid_inc.has(L.obs_valid_end())) return 0;
    }
 
    //
@@ -793,7 +794,7 @@ int STATAnalysisJob::is_keeper(const STATLine & L) const {
    //
    if(obs_valid_exc.n() > 0) {
       if(obs_valid_exc.has(L.obs_valid_beg()) ||
-         obs_valid_exc.has(L.obs_valid_end())) return(0);
+         obs_valid_exc.has(L.obs_valid_end())) return 0;
    }
 
    //
@@ -803,29 +804,29 @@ int STATAnalysisJob::is_keeper(const STATLine & L) const {
    if(obs_valid_hour.n() > 0) {
 
       // Check that obs_valid_beg = obs_valid_end
-      if(L.obs_valid_beg() != L.obs_valid_end()) return(0);
+      if(L.obs_valid_beg() != L.obs_valid_end()) return 0;
 
-      if(!obs_valid_hour.has(L.obs_valid_hour())) return(0);
+      if(!obs_valid_hour.has(L.obs_valid_hour())) return 0;
    }
 
    //
    // obs_init_beg
    //
    if((obs_init_beg > 0) && (L.obs_init_beg() < obs_init_beg))
-      return(0);
+      return 0;
 
    //
    // obs_init_end
    //
    if((obs_init_end > 0) && (L.obs_init_end() > obs_init_end))
-      return(0);
+      return 0;
 
    //
    // obs_init_inc
    //
    if(obs_init_inc.n() > 0) {
       if(!obs_init_inc.has(L.obs_init_beg()) ||
-         !obs_init_inc.has(L.obs_init_end())) return(0);
+         !obs_init_inc.has(L.obs_init_end())) return 0;
    }
 
    //
@@ -833,7 +834,7 @@ int STATAnalysisJob::is_keeper(const STATLine & L) const {
    //
    if(obs_init_exc.n() > 0) {
       if(obs_init_exc.has(L.obs_init_beg()) ||
-         obs_init_exc.has(L.obs_init_end())) return(0);
+         obs_init_exc.has(L.obs_init_end())) return 0;
    }
 
    //
@@ -843,120 +844,120 @@ int STATAnalysisJob::is_keeper(const STATLine & L) const {
    if(obs_init_hour.n() > 0) {
 
       // Check that obs_init_beg = obs_init_end
-      if(L.obs_init_beg() != L.obs_init_end()) return(0);
+      if(L.obs_init_beg() != L.obs_init_end()) return 0;
 
-      if(!obs_init_hour.has(L.obs_init_hour())) return(0);
+      if(!obs_init_hour.has(L.obs_init_hour())) return 0;
    }
 
    //
    // fcst_var
    //
    if(fcst_var.n() > 0) {
-      if(!(fcst_var.has(L.fcst_var()))) return(0);
+      if(!(fcst_var.has(L.fcst_var()))) return 0;
    }
 
    //
    // fcst_units
    //
    if(fcst_units.n() > 0) {
-      if(!(fcst_units.has(L.fcst_units()))) return(0);
+      if(!(fcst_units.has(L.fcst_units()))) return 0;
    }
 
    //
    // fcst_lev
    //
    if(fcst_lev.n() > 0) {
-      if(!(fcst_lev.has(L.fcst_lev()))) return(0);
+      if(!(fcst_lev.has(L.fcst_lev()))) return 0;
    }
 
    //
    // obs_var
    //
    if(obs_var.n() > 0) {
-      if(!(obs_var.has(L.obs_var()))) return(0);
+      if(!(obs_var.has(L.obs_var()))) return 0;
    }
 
    //
    // obs_units
    //
    if(obs_units.n() > 0) {
-      if(!(obs_units.has(L.obs_units()))) return(0);
+      if(!(obs_units.has(L.obs_units()))) return 0;
    }
 
    //
    // obs_lev
    //
    if(obs_lev.n() > 0) {
-      if(!(obs_lev.has(L.obs_lev()))) return(0);
+      if(!(obs_lev.has(L.obs_lev()))) return 0;
    }
 
    //
    // obtype
    //
    if(obtype.n() > 0) {
-      if(!(obtype.has(L.obtype()))) return(0);
+      if(!(obtype.has(L.obtype()))) return 0;
    }
 
    //
    // vx_mask
    //
    if(vx_mask.n() > 0) {
-      if(!(vx_mask.has(L.vx_mask()))) return(0);
+      if(!(vx_mask.has(L.vx_mask()))) return 0;
    }
 
    //
    // interp_mthd
    //
    if(interp_mthd.n() > 0) {
-      if(!(interp_mthd.has(L.interp_mthd()))) return(0);
+      if(!(interp_mthd.has(L.interp_mthd()))) return 0;
    }
 
    //
    // interp_pnts
    //
    if(interp_pnts.n() > 0) {
-      if(!interp_pnts.has(L.interp_pnts())) return(0);
+      if(!interp_pnts.has(L.interp_pnts())) return 0;
    }
 
    //
    // fcst_thresh
    //
    if(fcst_thresh.n() > 0) {
-      if(!check_thresh_column(fcst_thresh, L.fcst_thresh())) return(0);
+      if(!check_thresh_column(fcst_thresh, L.fcst_thresh())) return 0;
    }
 
    //
    // obs_thresh
    //
    if(obs_thresh.n() > 0) {
-      if(!check_thresh_column(obs_thresh, L.obs_thresh())) return(0);
+      if(!check_thresh_column(obs_thresh, L.obs_thresh())) return 0;
    }
 
    //
    // cov_thresh
    //
    if(cov_thresh.n() > 0) {
-      if(!check_thresh_column(cov_thresh, L.cov_thresh())) return(0);
+      if(!check_thresh_column(cov_thresh, L.cov_thresh())) return 0;
    }
 
    //
    // thresh_logic
    //
-   if(thresh_logic != SetLogic_None &&
-      thresh_logic != L.thresh_logic()) return(0);
+   if(thresh_logic != SetLogic::None &&
+      thresh_logic != L.thresh_logic()) return 0;
 
    //
    // alpha
    //
    if(alpha.n() > 0) {
-      if(!alpha.has(L.alpha())) return(0);
+      if(!alpha.has(L.alpha())) return 0;
    }
 
    //
    // line_type
    //
    if(line_type.n() > 0) {
-      if(!(line_type.has(L.line_type()))) return(0);
+      if(!(line_type.has(L.line_type()))) return 0;
    }
 
    //
@@ -973,7 +974,7 @@ int STATAnalysisJob::is_keeper(const STATLine & L) const {
       //
       // Check the column threshold
       //
-      if(!thr_it->second.check_dbl(v_dbl)) return(0);
+      if(!thr_it->second.check_dbl(v_dbl)) return 0;
    }
 
    //
@@ -985,7 +986,7 @@ int STATAnalysisJob::is_keeper(const STATLine & L) const {
       //
       // Check if the current value is in the list for the column
       //
-      if(!str_it->second.has(L.get_item(str_it->first.c_str(), false))) return(0);
+      if(!str_it->second.has(L.get_item(str_it->first.c_str(), false))) return 0;
    }
 
    //
@@ -997,22 +998,22 @@ int STATAnalysisJob::is_keeper(const STATLine & L) const {
       //
       // Check if the current value is not in the list for the column
       //
-      if(str_it->second.has(L.get_item(str_it->first.c_str(), false))) return(0);
+      if(str_it->second.has(L.get_item(str_it->first.c_str(), false))) return 0;
    }
 
    //
    // For MPR lines, check mask_grid, mask_poly, and mask_sid
    //
-   if(string_to_statlinetype(L.line_type()) == stat_mpr) {
+   if(string_to_statlinetype(L.line_type()) == STATLineType::mpr) {
       double lat = atof(L.get_item("OBS_LAT"));
       double lon = atof(L.get_item("OBS_LON"));
 
       if(!is_in_mask_grid(lat, lon) ||
          !is_in_mask_poly(lat, lon) ||
-         !is_in_mask_sid (L.get_item("OBS_SID"))) return(0);
+         !is_in_mask_sid (L.get_item("OBS_SID"))) return 0;
    }
 
-   return(1);
+   return 1;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1059,7 +1060,7 @@ double STATAnalysisJob::get_column_double(const STATLine &L,
    // Apply absolute value, if requested
    if(abs_flag && !is_bad_data(v)) v = fabs(v);
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1102,7 +1103,7 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
 
       jc_array.add(c);
 
-      lp = (char *) 0;
+      lp = (char *) nullptr;
    }
 
    //
@@ -1210,11 +1211,11 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
       if(jc_array[i] == "-job") {
 
          if(set_job_type(jc_array[i+1].c_str()) != 0) {
-            delete [] line;  line = 0;  lp = 0;
+            lp = nullptr;
             mlog << Error << "\nSTATAnalysisJob::STATAnalysisJob::parse_job_command() -> "
                  << "unrecognized job type specified \"" << jc_array[i]
                  << "\" in job command line: " << jobstring << "\n\n";
-            if(line) { delete [] line; line = (char *) 0; }
+            if(line) { delete [] line; line = (char *) nullptr; }
             throw(1);
          }
          i++;
@@ -1450,14 +1451,6 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
          i+=2;
       }
       else if(jc_array[i] == "-set_hdr") {
-         n = METHdrTable.header(met_version, "STAT", na_str)->col_offset(to_upper(jc_array[i+1]).c_str());
-         if(is_bad_data(n)) {
-            mlog << Error << "\nSTATAnalysisJob::parse_job_command() -> "
-                 << "no match found for header column named: \""
-                 << to_upper((string)jc_array[i+1]) << "\"\n\n";
-            if(line) { delete [] line; line = (char *) 0; }
-            throw(1);
-         }
          hdr_name.add_css(to_upper(jc_array[i+1]));
          hdr_value.add_css(jc_array[i+2]);
          i+=2;
@@ -1600,7 +1593,7 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
          i++;
       }
       else if(jc_array[i] == "-boot_interval") {
-         boot_interval = atoi(jc_array[i+1].c_str());
+         boot_interval = string_to_bootintervaltype(jc_array[i+1].c_str());
          i++;
       }
       else if(jc_array[i] == "-boot_rep_prop") {
@@ -1644,11 +1637,33 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
               << "unrecognized switch \"" << jc_array[i]
               << "\" in job command line: "
               << jobstring << "\n\n";
-         if(line) { delete [] line; line = (char *) 0; }
+         if(line) { delete [] line; line = (char *) nullptr; }
          throw(1);
       } // end if
 
    } // end for
+
+   // Validate set_hdr column names
+   if(hdr_name.n() > 0) {
+
+      string lt_str = (line_type.n() == 1 ?
+                       line_type[0] : na_str);
+
+      for(i=0; i<hdr_name.n(); i++) {
+
+         n = METHdrTable.header(met_version, "STAT", lt_str.c_str())->
+                col_offset(hdr_name[i].c_str());
+
+         if(is_bad_data(n)) {
+            mlog << Error << "\nSTATAnalysisJob::parse_job_command() -> "
+                 << "no match found for "
+                 << (line_type.n() == 1 ? line_type[0] : "header")
+                 << " column named \"" << hdr_name[i] << "\"\n\n";
+            if(line) { delete [] line; line = (char *) nullptr; }
+            throw(1);
+         }
+      } // end for
+   }
 
    // Expand out_eclv_points
    if(out_eclv_points.n() == 1) {
@@ -1658,8 +1673,8 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
    //
    // Deallocate memory
    //
-   if(line) { delete [] line; line = (char *) 0; }
-   lp = (char *) 0;
+   if(line) { delete [] line; line = (char *) nullptr; }
+   lp = (char *) nullptr;
 
    return;
 }
@@ -1690,15 +1705,15 @@ int STATAnalysisJob::set_job_type(const char *c) {
 
    job_type = string_to_statjobtype(c);
 
-   if(job_type == no_stat_job_type) return(1);
-   else                             return(0);
+   if(job_type == STATJobType::None) return 1;
+   else                              return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void STATAnalysisJob::set_dump_row(const char *c) {
 
-   if(dump_row) { delete [] dump_row; dump_row = (char *) 0; }
+   if(dump_row) { delete [] dump_row; dump_row = (char *) nullptr; }
 
    if(!c) return;
 
@@ -1713,7 +1728,7 @@ void STATAnalysisJob::set_dump_row(const char *c) {
 
 void STATAnalysisJob::set_stat_file(const char *c) {
 
-   if(stat_file) { delete [] stat_file; stat_file = (char *) 0; }
+   if(stat_file) { delete [] stat_file; stat_file = (char *) nullptr; }
 
    if(!c) return;
 
@@ -1809,7 +1824,7 @@ void STATAnalysisJob::set_mask_sid(const char *c) {
 
 void STATAnalysisJob::set_boot_rng(const char *c) {
 
-   if(boot_rng) { delete [] boot_rng; boot_rng = (char *) 0; }
+   if(boot_rng) { delete [] boot_rng; boot_rng = (char *) nullptr; }
 
    if(!c) return;
 
@@ -1824,7 +1839,7 @@ void STATAnalysisJob::set_boot_rng(const char *c) {
 
 void STATAnalysisJob::set_boot_seed(const char *c) {
 
-   if(boot_seed) { delete [] boot_seed; boot_seed = (char *) 0; }
+   if(boot_seed) { delete [] boot_seed; boot_seed = (char *) nullptr; }
 
    if(!c) return;
 
@@ -1901,7 +1916,7 @@ void STATAnalysisJob::close_dump_row_file() {
 
       dr_out->close();
       delete dr_out;
-      dr_out = (ofstream *) 0;
+      dr_out = (ofstream *) nullptr;
       n_dump = 0;
    }
 
@@ -1950,7 +1965,7 @@ void STATAnalysisJob::setup_stat_file(int n_row, int n) {
    out_sa = (out_line_type.n() > 0 ?
              out_line_type : line_type);
    out_lt = (out_sa.n() == 1 ?
-             string_to_statlinetype(out_sa[0].c_str()) : no_stat_line_type);
+             string_to_statlinetype(out_sa[0].c_str()) : STATLineType::none);
 
    //
    // Loop through the output line types and determine the number of
@@ -1959,38 +1974,38 @@ void STATAnalysisJob::setup_stat_file(int n_row, int n) {
    for(i=0, c=0, n_col=0; i<out_sa.n(); i++) {
       cur_lt = string_to_statlinetype(out_sa[i].c_str());
       switch(cur_lt) {
-         case stat_sl1l2:  c = n_sl1l2_columns;        break;
-         case stat_sal1l2: c = n_sal1l2_columns;       break;
-         case stat_vl1l2:  c = n_vl1l2_columns;        break;
-         case stat_val1l2: c = n_val1l2_columns;       break;
-         case stat_fho:    c = n_fho_columns;          break;
-         case stat_ctc:    c = n_ctc_columns;          break;
-         case stat_cts:    c = n_cts_columns;          break;
-         case stat_mctc:   c = get_n_mctc_columns(n);  break;
-         case stat_mcts:   c = n_mcts_columns;         break;
-         case stat_cnt:    c = n_cnt_columns;          break;
-         case stat_vcnt:   c = n_vcnt_columns;         break;
-         case stat_pct:    c = get_n_pct_columns(n);   break;
-         case stat_pstd:   c = get_n_pstd_columns(n);  break;
-         case stat_pjc:    c = get_n_pjc_columns(n);   break;
-         case stat_prc:    c = get_n_prc_columns(n);   break;
-         case stat_eclv:   c = get_n_eclv_columns(n);  break;
-         case stat_mpr:    c = n_mpr_columns;          break;
-         case stat_nbrctc: c = n_nbrctc_columns;       break;
-         case stat_nbrcts: c = n_nbrcts_columns;       break;
-         case stat_nbrcnt: c = n_nbrcnt_columns;       break;
-         case stat_grad:   c = n_grad_columns;         break;
-         case stat_isc:    c = n_isc_columns;          break;
-         case stat_wdir:   c = n_job_wdir_columns;     break;
-         case stat_ecnt:   c = n_ecnt_columns;         break;
-         case stat_rps:    c = n_rps_columns;          break;
-         case stat_rhist:  c = get_n_rhist_columns(n); break;
-         case stat_phist:  c = get_n_phist_columns(n); break;
-         case stat_relp:   c = get_n_relp_columns(n);  break;
-         case stat_orank:  c = n_orank_columns;        break;
-         case stat_ssvar:  c = n_ssvar_columns;        break;
-         case stat_genmpr: c = n_genmpr_columns;       break;
-         case stat_ssidx:  c = n_ssidx_columns;        break;
+         case STATLineType::sl1l2:  c = n_sl1l2_columns;        break;
+         case STATLineType::sal1l2: c = n_sal1l2_columns;       break;
+         case STATLineType::vl1l2:  c = n_vl1l2_columns;        break;
+         case STATLineType::val1l2: c = n_val1l2_columns;       break;
+         case STATLineType::fho:    c = n_fho_columns;          break;
+         case STATLineType::ctc:    c = n_ctc_columns;          break;
+         case STATLineType::cts:    c = n_cts_columns;          break;
+         case STATLineType::mctc:   c = get_n_mctc_columns(n);  break;
+         case STATLineType::mcts:   c = n_mcts_columns;         break;
+         case STATLineType::cnt:    c = n_cnt_columns;          break;
+         case STATLineType::vcnt:   c = n_vcnt_columns;         break;
+         case STATLineType::pct:    c = get_n_pct_columns(n);   break;
+         case STATLineType::pstd:   c = get_n_pstd_columns(n);  break;
+         case STATLineType::pjc:    c = get_n_pjc_columns(n);   break;
+         case STATLineType::prc:    c = get_n_prc_columns(n);   break;
+         case STATLineType::eclv:   c = get_n_eclv_columns(n);  break;
+         case STATLineType::mpr:    c = n_mpr_columns;          break;
+         case STATLineType::nbrctc: c = n_nbrctc_columns;       break;
+         case STATLineType::nbrcts: c = n_nbrcts_columns;       break;
+         case STATLineType::nbrcnt: c = n_nbrcnt_columns;       break;
+         case STATLineType::grad:   c = n_grad_columns;         break;
+         case STATLineType::isc:    c = n_isc_columns;          break;
+         case STATLineType::wdir:   c = n_job_wdir_columns;     break;
+         case STATLineType::ecnt:   c = n_ecnt_columns;         break;
+         case STATLineType::rps:    c = n_rps_columns;          break;
+         case STATLineType::rhist:  c = get_n_rhist_columns(n); break;
+         case STATLineType::phist:  c = get_n_phist_columns(n); break;
+         case STATLineType::relp:   c = get_n_relp_columns(n);  break;
+         case STATLineType::orank:  c = n_orank_columns;        break;
+         case STATLineType::ssvar:  c = n_ssvar_columns;        break;
+         case STATLineType::genmpr: c = n_genmpr_columns;       break;
+         case STATLineType::ssidx:  c = n_ssidx_columns;        break;
          default:
             mlog << Error << "\nSTATAnalysisJob::setup_stat_file() -> "
                  << "unexpected stat line type \"" << statlinetype_to_string(cur_lt)
@@ -2030,44 +2045,44 @@ void STATAnalysisJob::setup_stat_file(int n_row, int n) {
       // Write the STAT header row
       //
       switch(out_lt) {
-         case stat_sl1l2:  write_header_row       (sl1l2_columns, n_sl1l2_columns, 1,       stat_at, 0, 0); break;
-         case stat_sal1l2: write_header_row       (sal1l2_columns, n_sal1l2_columns, 1,     stat_at, 0, 0); break;
-         case stat_vl1l2:  write_header_row       (vl1l2_columns, n_vl1l2_columns, 1,       stat_at, 0, 0); break;
-         case stat_val1l2: write_header_row       (val1l2_columns, n_val1l2_columns, 1,     stat_at, 0, 0); break;
-         case stat_fho:    write_header_row       (fho_columns, n_fho_columns, 1,           stat_at, 0, 0); break;
-         case stat_ctc:    write_header_row       (ctc_columns, n_ctc_columns, 1,           stat_at, 0, 0); break;
-         case stat_cts:    write_header_row       (cts_columns, n_cts_columns, 1,           stat_at, 0, 0); break;
-         case stat_mctc:   write_mctc_header_row  (1, n,                                    stat_at, 0, 0); break;
-         case stat_mcts:   write_header_row       (mcts_columns, n_mcts_columns, 1,         stat_at, 0, 0); break;
-         case stat_cnt:    write_header_row       (cnt_columns, n_cnt_columns, 1,           stat_at, 0, 0); break;
-         case stat_vcnt:   write_header_row       (vcnt_columns, n_vcnt_columns, 1,         stat_at, 0, 0); break;
-         case stat_pct:    write_pct_header_row   (1, n,                                    stat_at, 0, 0); break;
-         case stat_pstd:   write_pstd_header_row  (1, n,                                    stat_at, 0, 0); break;
-         case stat_pjc:    write_pjc_header_row   (1, n,                                    stat_at, 0, 0); break;
-         case stat_prc:    write_prc_header_row   (1, n,                                    stat_at, 0, 0); break;
-         case stat_eclv:   write_eclv_header_row  (1, n,                                    stat_at, 0, 0); break;
-         case stat_mpr:    write_header_row       (mpr_columns, n_mpr_columns, 1,           stat_at, 0, 0); break;
-         case stat_nbrctc: write_header_row       (nbrctc_columns, n_nbrctc_columns, 1,     stat_at, 0, 0); break;
-         case stat_nbrcts: write_header_row       (nbrcts_columns, n_nbrcts_columns, 1,     stat_at, 0, 0); break;
-         case stat_nbrcnt: write_header_row       (nbrcnt_columns, n_nbrcnt_columns, 1,     stat_at, 0, 0); break;
-         case stat_grad:   write_header_row       (grad_columns, n_grad_columns, 1,         stat_at, 0, 0); break;
-         case stat_isc:    write_header_row       (isc_columns, n_isc_columns, 1,           stat_at, 0, 0); break;
-         case stat_wdir:   write_header_row       (job_wdir_columns, n_job_wdir_columns, 1, stat_at, 0, 0); break;
-         case stat_ecnt:   write_header_row       (ecnt_columns, n_ecnt_columns, 1,         stat_at, 0, 0); break;
-         case stat_rps:    write_header_row       (rps_columns, n_rps_columns, 1,           stat_at, 0, 0); break;
-         case stat_rhist:  write_rhist_header_row (1, n,                                    stat_at, 0, 0); break;
-         case stat_phist:  write_phist_header_row (1, n,                                    stat_at, 0, 0); break;
-         case stat_relp:   write_relp_header_row  (1, n,                                    stat_at, 0, 0); break;
-         case stat_orank:  write_header_row       (orank_columns, n_orank_columns, 1,       stat_at, 0, 0); break;
-         case stat_ssvar:  write_header_row       (ssvar_columns, n_ssvar_columns, 1,       stat_at, 0, 0); break;
-         case stat_genmpr: write_header_row       (genmpr_columns, n_genmpr_columns, 1,     stat_at, 0, 0); break;
-         case stat_ssidx:  write_header_row       (ssidx_columns, n_ssidx_columns, 1,       stat_at, 0, 0); break;
+         case STATLineType::sl1l2:  write_header_row       (sl1l2_columns, n_sl1l2_columns, 1,       stat_at, 0, 0); break;
+         case STATLineType::sal1l2: write_header_row       (sal1l2_columns, n_sal1l2_columns, 1,     stat_at, 0, 0); break;
+         case STATLineType::vl1l2:  write_header_row       (vl1l2_columns, n_vl1l2_columns, 1,       stat_at, 0, 0); break;
+         case STATLineType::val1l2: write_header_row       (val1l2_columns, n_val1l2_columns, 1,     stat_at, 0, 0); break;
+         case STATLineType::fho:    write_header_row       (fho_columns, n_fho_columns, 1,           stat_at, 0, 0); break;
+         case STATLineType::ctc:    write_header_row       (ctc_columns, n_ctc_columns, 1,           stat_at, 0, 0); break;
+         case STATLineType::cts:    write_header_row       (cts_columns, n_cts_columns, 1,           stat_at, 0, 0); break;
+         case STATLineType::mctc:   write_mctc_header_row  (1, n,                                    stat_at, 0, 0); break;
+         case STATLineType::mcts:   write_header_row       (mcts_columns, n_mcts_columns, 1,         stat_at, 0, 0); break;
+         case STATLineType::cnt:    write_header_row       (cnt_columns, n_cnt_columns, 1,           stat_at, 0, 0); break;
+         case STATLineType::vcnt:   write_header_row       (vcnt_columns, n_vcnt_columns, 1,         stat_at, 0, 0); break;
+         case STATLineType::pct:    write_pct_header_row   (1, n,                                    stat_at, 0, 0); break;
+         case STATLineType::pstd:   write_pstd_header_row  (1, n,                                    stat_at, 0, 0); break;
+         case STATLineType::pjc:    write_pjc_header_row   (1, n,                                    stat_at, 0, 0); break;
+         case STATLineType::prc:    write_prc_header_row   (1, n,                                    stat_at, 0, 0); break;
+         case STATLineType::eclv:   write_eclv_header_row  (1, n,                                    stat_at, 0, 0); break;
+         case STATLineType::mpr:    write_header_row       (mpr_columns, n_mpr_columns, 1,           stat_at, 0, 0); break;
+         case STATLineType::nbrctc: write_header_row       (nbrctc_columns, n_nbrctc_columns, 1,     stat_at, 0, 0); break;
+         case STATLineType::nbrcts: write_header_row       (nbrcts_columns, n_nbrcts_columns, 1,     stat_at, 0, 0); break;
+         case STATLineType::nbrcnt: write_header_row       (nbrcnt_columns, n_nbrcnt_columns, 1,     stat_at, 0, 0); break;
+         case STATLineType::grad:   write_header_row       (grad_columns, n_grad_columns, 1,         stat_at, 0, 0); break;
+         case STATLineType::isc:    write_header_row       (isc_columns, n_isc_columns, 1,           stat_at, 0, 0); break;
+         case STATLineType::wdir:   write_header_row       (job_wdir_columns, n_job_wdir_columns, 1, stat_at, 0, 0); break;
+         case STATLineType::ecnt:   write_header_row       (ecnt_columns, n_ecnt_columns, 1,         stat_at, 0, 0); break;
+         case STATLineType::rps:    write_header_row       (rps_columns, n_rps_columns, 1,           stat_at, 0, 0); break;
+         case STATLineType::rhist:  write_rhist_header_row (1, n,                                    stat_at, 0, 0); break;
+         case STATLineType::phist:  write_phist_header_row (1, n,                                    stat_at, 0, 0); break;
+         case STATLineType::relp:   write_relp_header_row  (1, n,                                    stat_at, 0, 0); break;
+         case STATLineType::orank:  write_header_row       (orank_columns, n_orank_columns, 1,       stat_at, 0, 0); break;
+         case STATLineType::ssvar:  write_header_row       (ssvar_columns, n_ssvar_columns, 1,       stat_at, 0, 0); break;
+         case STATLineType::genmpr: write_header_row       (genmpr_columns, n_genmpr_columns, 1,     stat_at, 0, 0); break;
+         case STATLineType::ssidx:  write_header_row       (ssidx_columns, n_ssidx_columns, 1,       stat_at, 0, 0); break;
 
          //
          // Write only header columns for unspecified line type
          //
-         case no_stat_line_type:
-                           write_header_row       ((const char **) 0, 0, 1,                 stat_at, 0, 0); break;
+         case STATLineType::none:
+                                    write_header_row       ((const char **) 0, 0, 1,                 stat_at, 0, 0); break;
 
          default:
             mlog << Error << "\nSTATAnalysisJob::setup_stat_file() -> "
@@ -2122,7 +2137,7 @@ void STATAnalysisJob::close_stat_file() {
 
       stat_out->close();
       delete stat_out;
-      stat_out = (ofstream *) 0;
+      stat_out = (ofstream *) nullptr;
    }
 
    return;
@@ -2130,7 +2145,8 @@ void STATAnalysisJob::close_stat_file() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void STATAnalysisJob::dump_stat_line(const STATLine &line) {
+void STATAnalysisJob::dump_stat_line(const STATLine &line,
+                                     bool do_set_hdr) {
    int i;
 
    //
@@ -2160,91 +2176,91 @@ void STATAnalysisJob::dump_stat_line(const STATLine &line) {
       if(line_type.n() == 1) {
 
          switch(string_to_statlinetype(line_type[0].c_str())) {
-            case(stat_fho):
+            case STATLineType::fho:
                write_header_row(fho_columns, n_fho_columns, 1, dump_at, 0, 0);
                break;
 
-            case(stat_ctc):
+            case STATLineType::ctc:
                write_header_row(ctc_columns, n_ctc_columns, 1, dump_at, 0, 0);
                break;
 
-            case(stat_cts):
+            case STATLineType::cts:
                write_header_row(cts_columns, n_cts_columns, 1, dump_at, 0, 0);
                break;
 
-            case(stat_cnt):
+            case STATLineType::cnt:
                write_header_row(cnt_columns, n_cnt_columns, 1, dump_at, 0, 0);
                break;
 
-            case(stat_sl1l2):
+            case STATLineType::sl1l2:
                write_header_row(sl1l2_columns, n_sl1l2_columns, 1, dump_at, 0, 0);
                break;
 
-            case(stat_sal1l2):
+            case STATLineType::sal1l2:
                write_header_row(sal1l2_columns, n_sal1l2_columns, 1, dump_at, 0, 0);
                break;
 
-            case(stat_vl1l2):
+            case STATLineType::vl1l2:
                write_header_row(vl1l2_columns, n_vl1l2_columns, 1, dump_at, 0, 0);
                break;
 
-            case(stat_val1l2):
+            case STATLineType::val1l2:
                write_header_row(val1l2_columns, n_val1l2_columns, 1, dump_at, 0, 0);
                break;
 
-            case(stat_mpr):
+            case STATLineType::mpr:
                write_header_row(mpr_columns, n_mpr_columns, 1, dump_at, 0, 0);
                break;
 
-            case(stat_nbrctc):
+            case STATLineType::nbrctc:
                write_header_row(nbrctc_columns, n_nbrctc_columns, 1, dump_at, 0, 0);
                break;
 
-            case(stat_nbrcts):
+            case STATLineType::nbrcts:
                write_header_row(nbrcts_columns, n_nbrcts_columns, 1, dump_at, 0, 0);
                break;
 
-            case(stat_nbrcnt):
+            case STATLineType::nbrcnt:
                write_header_row(nbrcnt_columns, n_nbrcnt_columns, 1, dump_at, 0, 0);
                break;
 
-            case(stat_grad):
+            case STATLineType::grad:
                write_header_row(grad_columns, n_grad_columns, 1, dump_at, 0, 0);
                break;
 
-            case(stat_ecnt):
+            case STATLineType::ecnt:
                write_header_row(ecnt_columns, n_ecnt_columns, 1, dump_at, 0, 0);
                break;
 
-            case(stat_isc):
+            case STATLineType::isc:
                write_header_row(isc_columns, n_isc_columns, 1, dump_at, 0, 0);
                break;
 
-            case(stat_ssvar):
+            case STATLineType::ssvar:
                write_header_row(ssvar_columns, n_ssvar_columns, 1, dump_at, 0, 0);
                break;
 
-            case(stat_seeps):
+            case STATLineType::seeps:
                write_header_row(seeps_columns, n_seeps_columns, 1, dump_at, 0, 0);
                break;
 
-            case(stat_seeps_mpr):
+            case STATLineType::seeps_mpr:
                write_header_row(seeps_mpr_columns, n_seeps_mpr_columns, 1, dump_at, 0, 0);
                break;
 
             // Just write a STAT header line for indeterminant line types
-            case(stat_mctc):
-            case(stat_mcts):
-            case(stat_pct):
-            case(stat_pstd):
-            case(stat_pjc):
-            case(stat_prc):
-            case(stat_eclv):
-            case(stat_rhist):
-            case(stat_phist):
-            case(stat_relp):
-            case(stat_orank):
-            case(stat_genmpr):
+            case STATLineType::mctc:
+            case STATLineType::mcts:
+            case STATLineType::pct:
+            case STATLineType::pstd:
+            case STATLineType::pjc:
+            case STATLineType::prc:
+            case STATLineType::eclv:
+            case STATLineType::rhist:
+            case STATLineType::phist:
+            case STATLineType::relp:
+            case STATLineType::orank:
+            case STATLineType::genmpr:
                write_header_row((const char **) 0, 0, 1, dump_at, 0, 0);
                break;
 
@@ -2268,8 +2284,24 @@ void STATAnalysisJob::dump_stat_line(const STATLine &line) {
    // Store the data line
    //
    for(i=0; i<line.n_items(); i++) {
-     dump_at.set_entry(n_dump%dump_at.nrows(), i, (string)line.get_item(i));
+     dump_at.set_entry(n_dump%dump_at.nrows(), i,
+                       (string) line.get_item(i));
    }
+
+   //
+   // Apply -set_hdr options, if requested
+   //
+   if(do_set_hdr) {
+      for(i=0; i<hdr_name.n(); i++) {
+         dump_at.set_entry(n_dump%dump_at.nrows(),
+                           line.get_offset(hdr_name[i].c_str()),
+                           (string) hdr_value[i]);
+      }
+   }
+
+   //
+   // Increment the counter
+   //
    n_dump++;
 
    //
@@ -2302,7 +2334,7 @@ ConcatString STATAnalysisJob::get_case_info(const STATLine & L) const {
       key << (i == 0 ? "" : ":") << cs;
    }
 
-   return(key);
+   return key;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2316,7 +2348,7 @@ ConcatString STATAnalysisJob::get_jobstring() const {
    js.clear();
 
    // job type
-   if(job_type != no_stat_job_type) {
+   if(job_type != STATJobType::None) {
       js << "-job " << statjobtype_to_string(job_type) << " ";
    }
 
@@ -2536,7 +2568,7 @@ ConcatString STATAnalysisJob::get_jobstring() const {
    }
 
    // thresh_logic
-   if(thresh_logic != SetLogic_None) {
+   if(thresh_logic != SetLogic::None) {
       js << "-thresh_logic " << setlogic_to_string(thresh_logic) << " ";
    }
 
@@ -2659,7 +2691,7 @@ ConcatString STATAnalysisJob::get_jobstring() const {
    }
 
    // out_cnt_logic
-   if(job_type == stat_job_aggr_stat &&
+   if(job_type == STATJobType::aggr_stat &&
       line_type.has(stat_mpr_str) &&
       (out_line_type.has(stat_cnt_str)  || out_line_type.has(stat_sl1l2_str)) &&
       (out_fcst_thresh.n() > 0 || out_obs_thresh.n() > 0)) {
@@ -2685,7 +2717,7 @@ ConcatString STATAnalysisJob::get_jobstring() const {
    }
 
    // out_wind_logic
-   if(job_type == stat_job_aggr_stat &&
+   if(job_type == STATJobType::aggr_stat &&
       line_type.has(stat_mpr_str) &&
       out_line_type.has(stat_wdir_str) &&
       (out_fcst_wind_thresh.get_type() != thresh_na ||
@@ -2694,7 +2726,7 @@ ConcatString STATAnalysisJob::get_jobstring() const {
    }
 
    // Jobs which use out_alpha
-   if(job_type == stat_job_summary        ||
+   if(job_type == STATJobType::summary    ||
        out_line_type.has(stat_cts_str)    ||
        out_line_type.has(stat_mcts_str)   ||
        out_line_type.has(stat_cnt_str)    ||
@@ -2707,12 +2739,12 @@ ConcatString STATAnalysisJob::get_jobstring() const {
    }
 
    // Ramp jobs
-   if(job_type == stat_job_ramp) {
+   if(job_type == STATJobType::ramp) {
 
       // ramp_type
       js << "-ramp_type " << timeseriestype_to_string(ramp_type) << " ";
 
-      if(ramp_type == TimeSeriesType_DyDt) {
+      if(ramp_type == TimeSeriesType::DyDt) {
 
          // ramp_time
          if(ramp_time_fcst == ramp_time_obs) {
@@ -2736,7 +2768,7 @@ ConcatString STATAnalysisJob::get_jobstring() const {
          }
       }
 
-      if(ramp_type == TimeSeriesType_Swing) {
+      if(ramp_type == TimeSeriesType::Swing) {
 
          // swing_width
          js << "-swing_width " << swing_width << " ";
@@ -2758,7 +2790,7 @@ ConcatString STATAnalysisJob::get_jobstring() const {
 
    // Jobs which use out_bin_size
    if(line_type.n() > 0) {
-      if(string_to_statlinetype(line_type[0].c_str()) == stat_orank &&
+      if(string_to_statlinetype(line_type[0].c_str()) == STATLineType::orank &&
          (out_line_type.has(stat_phist_str) ||
           out_line_type.has(stat_ecnt_str))) {
 
@@ -2767,9 +2799,9 @@ ConcatString STATAnalysisJob::get_jobstring() const {
       }
    }
 
-   // Jobs which use out_eclv_points
    if(line_type.n() > 0) {
-      if(string_to_statlinetype(line_type[0].c_str()) == stat_mpr &&
+      // Jobs which use out_eclv_points
+      if(string_to_statlinetype(line_type[0].c_str()) == STATLineType::mpr &&
          out_line_type.has(stat_eclv_str)) {
 
          // out_eclv_points
@@ -2777,12 +2809,10 @@ ConcatString STATAnalysisJob::get_jobstring() const {
             js << "-out_eclv_points " << out_eclv_points[i] << " ";
          }
       }
-   }
 
-   // Jobs which perform bootstrapping
-   if(line_type.n() > 0) {
+      // Jobs which perform bootstrapping
       type = string_to_statlinetype(line_type[0].c_str());
-      if(type == stat_mpr                    &&
+      if(type == STATLineType::mpr           &&
          (out_line_type.has(stat_cts_str)    ||
           out_line_type.has(stat_mcts_str)   ||
           out_line_type.has(stat_cnt_str)    ||
@@ -2790,7 +2820,7 @@ ConcatString STATAnalysisJob::get_jobstring() const {
           out_line_type.has(stat_nbrcnt_str))) {
 
          // Bootstrap Information
-         js << "-boot_interval " << boot_interval << " ";
+         js << "-boot_interval " << bootintervaltype_to_string(boot_interval) << " ";
          js << "-boot_rep_prop " << boot_rep_prop << " ";
          js << "-n_boot_rep "    << n_boot_rep    << " ";
          js << "-boot_rng "      << boot_rng      << " ";
@@ -2806,9 +2836,9 @@ ConcatString STATAnalysisJob::get_jobstring() const {
    }
 
    // Jobs which compute the skill score index
-   if(job_type == stat_job_go_index  ||
-      job_type == stat_job_cbs_index ||
-      job_type == stat_job_ss_index) {
+   if(job_type == STATJobType::go_index  ||
+      job_type == STATJobType::cbs_index ||
+      job_type == STATJobType::ss_index) {
 
       // ss_index_name
       js << "-ss_index_name " << ss_index_name << " ";
@@ -2840,7 +2870,7 @@ ConcatString STATAnalysisJob::get_jobstring() const {
       js << "-vif_flag " << vif_flag << " ";
    }
 
-   return(js);
+   return js;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2868,7 +2898,7 @@ int STATAnalysisJob::is_in_mask_grid(double lat, double lon) const {
       }
    }
 
-   return(true);
+   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2883,7 +2913,7 @@ int STATAnalysisJob::is_in_mask_poly(double lat, double lon) const {
       r = mask_poly.latlon_is_inside_dege(lat, lon);
    }
 
-   return(r);
+   return r;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2896,7 +2926,7 @@ int STATAnalysisJob::is_in_mask_sid(const char *sid) const {
    //
    if(mask_sid.n() > 0) r = mask_sid.has(sid);
 
-   return(r);
+   return r;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2906,7 +2936,7 @@ int STATAnalysisJob::is_in_mask_sid(const char *sid) const {
 ////////////////////////////////////////////////////////////////////////
 
 const char * statjobtype_to_string(const STATJobType t) {
-   return(statjobtype_str[t]);
+   return statjobtype_str[enum_class_as_int(t)];
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2925,25 +2955,25 @@ STATJobType string_to_statjobtype(const char *str) {
    STATJobType t;
 
    if(     strcasecmp(str, statjobtype_str[0]) == 0)
-      t = stat_job_filter;
+      t = STATJobType::filter;
    else if(strcasecmp(str, statjobtype_str[1]) == 0)
-      t = stat_job_summary;
+      t = STATJobType::summary;
    else if(strcasecmp(str, statjobtype_str[2]) == 0)
-      t = stat_job_aggr;
+      t = STATJobType::aggr;
    else if(strcasecmp(str, statjobtype_str[3]) == 0)
-      t = stat_job_aggr_stat;
+      t = STATJobType::aggr_stat;
    else if(strcasecmp(str, statjobtype_str[4]) == 0)
-      t = stat_job_go_index;
+      t = STATJobType::go_index;
    else if(strcasecmp(str, statjobtype_str[5]) == 0)
-      t = stat_job_cbs_index;
+      t = STATJobType::cbs_index;
    else if(strcasecmp(str, statjobtype_str[6]) == 0)
-      t = stat_job_ss_index;
+      t = STATJobType::ss_index;
    else if(strcasecmp(str, statjobtype_str[7]) == 0)
-      t = stat_job_ramp;
+      t = STATJobType::ramp;
    else
-      t = no_stat_job_type;
+      t = STATJobType::None;
 
-   return(t);
+   return t;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2958,7 +2988,7 @@ ConcatString timestring(const unixtime t) {
             short_month_name[month], day, year,
             hour, minute, second);
 
-   return(s);
+   return s;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2966,15 +2996,15 @@ ConcatString timestring(const unixtime t) {
 bool check_thresh_column(const ThreshArray &list, const ThreshArray &item) {
 
    // Return true for an empty search list.
-   if(list.n() == 0) return(true);
+   if(list.n() == 0) return true;
 
    // If the item is a single threshold, search for it in the list.
    if(item.n() == 1) {
-      return(list.has(item[0]));
+      return list.has(item[0]);
    }
 
    // Otherwise, check that the list and item exactly match.
-   return(list == item);
+   return (list == item);
 }
 
 ////////////////////////////////////////////////////////////////////////

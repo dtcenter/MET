@@ -1,16 +1,10 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-
-////////////////////////////////////////////////////////////////////////
-
-
-using namespace std;
-
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -21,6 +15,8 @@ using namespace std;
 #include "concat_string.h"
 
 #include "python3_dict.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -179,7 +175,7 @@ if ( ! PyLong_Check(a) )  {
 
 k = (int) PyLong_AS_LONG(a);
 
-return ( k );
+return k;
 
 }
 
@@ -216,7 +212,7 @@ if ( ! PyFloat_Check(a) )  {
 
 t = PyFloat_AS_DOUBLE(a);
 
-return ( t );
+return t;
 
 }
 
@@ -262,7 +258,7 @@ else {
 
 }
 
-return ( s );
+return s;
 
 }
 
@@ -287,7 +283,7 @@ if ( ! a )  {
 
 }
 
-return ( a );
+return a;
 
 }
 
@@ -322,7 +318,7 @@ if ( ! PyDict_Check(a) )  {
 }
 
 
-return ( a );
+return a;
 
 }
 
@@ -360,7 +356,7 @@ if ( ! PyList_Check(a) )  {
 }
 
 
-return ( a );
+return a;
 
 }
 

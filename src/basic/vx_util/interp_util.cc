@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -7,8 +7,6 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 ////////////////////////////////////////////////////////////////////////
-
-using namespace std;
 
 #include <cstdlib>
 #include <iostream>
@@ -18,12 +16,16 @@ using namespace std;
 #include <string.h>
 #include <unistd.h>
 
+#include "config_util.h"
 #include "interp_util.h"
 #include "GridTemplate.h"
 #include "RectangularTemplate.h"
 
 #include "vx_math.h"
 #include "vx_log.h"
+#include "enum_as_int.hpp"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -33,8 +35,8 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 void SurfaceInfo::clear() {
-   land_ptr = (MaskPlane *) 0;
-   topo_ptr = (DataPlane *) 0;
+   land_ptr = (MaskPlane *) nullptr;
+   topo_ptr = (DataPlane *) nullptr;
    topo_use_obs_thresh.clear();
    topo_interp_fcst_thresh.clear();
 }
@@ -61,7 +63,7 @@ NumArray interp_points(const DataPlane &dp, const GridTemplate &gt, double x_dbl
       y = floor(y_dbl);
    }
 
-   return(interp_points(dp, gt, x, y));
+   return interp_points(dp, gt, x, y);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -82,7 +84,7 @@ NumArray interp_points(const DataPlane &dp, const GridTemplate &gt, int x, int y
       }
    }
 
-   return(points);
+   return points;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -151,7 +153,7 @@ double interp_min_ll(const DataPlane &dp, int x_ll, int y_ll, int wdth, double t
       min_v = bad_data_double;
    }
 
-   return(min_v);
+   return min_v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -218,7 +220,7 @@ double interp_max_ll(const DataPlane &dp, int x_ll, int y_ll, int wdth, double t
       max_v = bad_data_double;
    }
 
-   return(max_v);
+   return max_v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -226,7 +228,7 @@ double interp_max_ll(const DataPlane &dp, int x_ll, int y_ll, int wdth, double t
 double interp_median(const DataPlane &dp, const GridTemplate &gt,
                      int x, int y, double t, const MaskPlane *mp) {
 
-   double *data = (double *) 0;
+   double *data = (double *) nullptr;
    int num_good_points = 0;
    int num_points = gt.size();
    double median_v;
@@ -270,7 +272,7 @@ double interp_median(const DataPlane &dp, const GridTemplate &gt,
 ////////////////////////////////////////////////////////////////////////
 
 double interp_median_ll(const DataPlane &dp, int x_ll, int y_ll, int wdth, double t) {
-   double *data = (double *) 0;
+   double *data = (double *) nullptr;
    int x, y, count;
    double v, median_v;
 
@@ -302,9 +304,9 @@ double interp_median_ll(const DataPlane &dp, int x_ll, int y_ll, int wdth, doubl
       median_v = percentile(data, count, 0.50);
    }
 
-   if(data) { delete [] data; data = (double *) 0; }
+   if(data) { delete [] data; data = (double *) nullptr; }
 
-   return(median_v);
+   return median_v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -377,7 +379,7 @@ double interp_uw_mean_ll(const DataPlane &dp, int x_ll, int y_ll, int wdth, doub
       uw_mean_v = sum/count;
    }
 
-   return(uw_mean_v);
+   return uw_mean_v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -438,7 +440,7 @@ double interp_dw_mean(const DataPlane &dp, const GridTemplate &gt,
       return bad_data_double;
    }
 
-   return(numerator/wght_sum);
+   return numerator/wght_sum;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -533,7 +535,7 @@ double interp_ls_fit(const DataPlane &dp, const GridTemplate &gt,
       z = bad_data_double;
    }
 
-   return(z);
+   return z;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -624,7 +626,7 @@ double interp_gaussian(const DataPlane &dp, const DataPlane &g_dp,
       gaussian_value /= weight_sum;
    }
 
-   return(gaussian_value);
+   return gaussian_value;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -692,7 +694,7 @@ double interp_geog_match(const DataPlane &dp, const GridTemplate &gt,
            << interp_x << ", " << interp_y << ").\n";
    }
 
-   return(interp_v);
+   return interp_v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -729,7 +731,7 @@ double interp_nbrhd(const DataPlane &dp, const GridTemplate &gt, int x, int y,
       return bad_data_double;
    }
 
-   return((double) count_thr/count);
+   return (double) count_thr/count;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -756,7 +758,7 @@ double interp_bilin(const DataPlane &dp, bool wrap_lon,
       if(!(*mp)(x,   y  ) ||
          !(*mp)(xp1, y  ) ||
          !(*mp)(x,   y+1) ||
-         !(*mp)(xp1, y+1)) return(bad_data_double);
+         !(*mp)(xp1, y+1)) return bad_data_double;
    }
 
    // Compute dx and dy
@@ -831,7 +833,7 @@ double interp_bilin(const DataPlane &dp, bool wrap_lon,
       }
    }
 
-   return(bilin_v);
+   return bilin_v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -849,13 +851,13 @@ double interp_xy(const DataPlane &dp, bool wrap_lon, int x, int y,
 
    // Check the optional mask
    if(mp) {
-      if(!(*mp)(x, y)) return(bad_data_double);
+      if(!(*mp)(x, y)) return bad_data_double;
    }
 
    if(x < 0 || x >= dp.nx() || y < 0 || y >= dp.ny()) v = bad_data_double;
    else                                               v = dp.get(x, y);
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -897,7 +899,7 @@ double interp_best(const DataPlane &dp, const GridTemplate &gt,
       return bad_data_double;
    }
 
-   return(min_v);
+   return min_v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -958,73 +960,73 @@ double compute_sfc_interp(const DataPlane &dp,
    // Compute the interpolated value for the fields above and below
    switch(mthd) {
 
-      case(InterpMthd_Min):         // Minimum
+      case InterpMthd::Min:         // Minimum
          v = interp_min(dp, *gt, x, y, interp_thresh, &sfc_mask);
          break;
 
-      case(InterpMthd_Max):         // Maximum
+      case InterpMthd::Max:         // Maximum
          v = interp_max(dp, *gt, x, y, interp_thresh, &sfc_mask);
          break;
 
-      case(InterpMthd_Median):      // Median
+      case InterpMthd::Median:      // Median
          v = interp_median(dp, *gt, x, y, interp_thresh, &sfc_mask);
          break;
 
-      case(InterpMthd_UW_Mean):     // Unweighted Mean
+      case InterpMthd::UW_Mean:     // Unweighted Mean
          v = interp_uw_mean(dp, *gt, x, y, interp_thresh, &sfc_mask);
          break;
 
-      case(InterpMthd_DW_Mean):     // Distance-Weighted Mean
+      case InterpMthd::DW_Mean:     // Distance-Weighted Mean
          v = interp_dw_mean(dp, *gt, obs_x, obs_y,
                             dw_mean_pow, interp_thresh, &sfc_mask);
          break;
 
-      case(InterpMthd_LS_Fit):      // Least-squares fit
+      case InterpMthd::LS_Fit:      // Least-squares fit
          v = interp_ls_fit(dp, *gt, obs_x, obs_y,
                            interp_thresh, &sfc_mask);
          break;
 
-      case(InterpMthd_Bilin):       // Bilinear interpolation
+      case InterpMthd::Bilin:       // Bilinear interpolation
          v = interp_bilin(dp, wrap_lon, obs_x, obs_y, &sfc_mask);
          break;
 
-      case(InterpMthd_Nearest):     // Nearest Neighbor
+      case InterpMthd::Nearest:     // Nearest Neighbor
          v = interp_xy(dp, wrap_lon, x, y, &sfc_mask);
          break;
 
-      case(InterpMthd_Best):        // Best Match
+      case InterpMthd::Best:        // Best Match
          v = interp_best(dp, *gt, x, y, obs_v, interp_thresh, &sfc_mask);
          break;
 
-      case(InterpMthd_Upper_Left):  // Upper Left corner of the grid box
+      case InterpMthd::Upper_Left:  // Upper Left corner of the grid box
          v = interp_xy(dp, wrap_lon, floor(obs_x), ceil(obs_y), &sfc_mask);
          break;
 
-      case(InterpMthd_Upper_Right): // Upper Right corner of the grid box
+      case InterpMthd::Upper_Right: // Upper Right corner of the grid box
          v = interp_xy(dp, wrap_lon, ceil(obs_x), ceil(obs_y), &sfc_mask);
          break;
 
-      case(InterpMthd_Lower_Right): // Lower Right corner of the grid box
+      case InterpMthd::Lower_Right: // Lower Right corner of the grid box
          v = interp_xy(dp, wrap_lon, ceil(obs_x), floor(obs_y), &sfc_mask);
          break;
 
-      case(InterpMthd_Lower_Left):  // Lower Left corner of the grid box
+      case InterpMthd::Lower_Left:  // Lower Left corner of the grid box
          v = interp_xy(dp, wrap_lon, floor(obs_x), floor(obs_y), &sfc_mask);
          break;
 
-      case(InterpMthd_Geog_Match):  // Geography Match for surface point verification
+      case InterpMthd::Geog_Match:  // Geography Match for surface point verification
          v = interp_geog_match(dp, *gt, obs_x, obs_y, obs_v, &sfc_mask);
          break;
 
       default:
          mlog << Error << "\ncompute_sfc_interp() -> "
               << "unsupported interpolation method encountered: "
-              << interpmthd_to_string(mthd) << "(" << mthd << ")\n\n";
+              << interpmthd_to_string(mthd) << "(" << enum_class_as_int(mthd) << ")\n\n";
          exit(1);
    }
 
    delete gt;
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1082,7 +1084,7 @@ MaskPlane compute_sfc_mask(const GridTemplate &gt, int x, int y,
       mp.put((land_ok & topo_ok), gp->x, gp->y);
    }
 
-   return(mp);
+   return mp;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1097,9 +1099,9 @@ double compute_horz_interp(const DataPlane &dp,
                            const GridTemplateFactory::GridTemplates shape,
                            bool wrap_lon, double interp_thresh,
                            const SingleThresh *cat_thresh) {
-   return(compute_horz_interp(dp, obs_x, obs_y, obs_v, bad_data_double,
+   return compute_horz_interp(dp, obs_x, obs_y, obs_v, bad_data_double,
              bad_data_double, mthd, width, shape, wrap_lon,
-             interp_thresh, cat_thresh));
+             interp_thresh, cat_thresh);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1127,78 +1129,78 @@ double compute_horz_interp(const DataPlane &dp,
    // Compute the interpolated value for the fields above and below
    switch(mthd) {
 
-      case(InterpMthd_Min):         // Minimum
+      case InterpMthd::Min:         // Minimum
          v = interp_min(dp, *gt, x, y, interp_thresh);
          break;
 
-      case(InterpMthd_Max):         // Maximum
+      case InterpMthd::Max:         // Maximum
          v = interp_max(dp, *gt, x, y, interp_thresh);
          break;
 
-      case(InterpMthd_Median):      // Median
+      case InterpMthd::Median:      // Median
          v = interp_median(dp, *gt, x, y, interp_thresh);
          break;
 
-      case(InterpMthd_UW_Mean):     // Unweighted Mean
+      case InterpMthd::UW_Mean:     // Unweighted Mean
          v = interp_uw_mean(dp, *gt, x, y, interp_thresh);
          break;
 
-      case(InterpMthd_DW_Mean):     // Distance-Weighted Mean
+      case InterpMthd::DW_Mean:     // Distance-Weighted Mean
          v = interp_dw_mean(dp, *gt, obs_x, obs_y,
                             dw_mean_pow, interp_thresh);
          break;
 
-      case(InterpMthd_LS_Fit):      // Least-squares fit
+      case InterpMthd::LS_Fit:      // Least-squares fit
          v = interp_ls_fit(dp, *gt, obs_x, obs_y,
                            interp_thresh);
          break;
 
-      case(InterpMthd_Nbrhd):       // Neighborhood fractional coverage
+      case InterpMthd::Nbrhd:       // Neighborhood fractional coverage
          v = interp_nbrhd(dp, *gt, x, y,
                           interp_thresh, cat_thresh, cmn, csd);
          break;
 
-      case(InterpMthd_Bilin):       // Bilinear interpolation
+      case InterpMthd::Bilin:       // Bilinear interpolation
          v = interp_bilin(dp, wrap_lon, obs_x, obs_y);
          break;
 
-      case(InterpMthd_Nearest):     // Nearest Neighbor
+      case InterpMthd::Nearest:     // Nearest Neighbor
          v = interp_xy(dp, wrap_lon, x, y);
          break;
 
-      case(InterpMthd_Best):        // Best Match
+      case InterpMthd::Best:        // Best Match
          v = interp_best(dp, *gt, x, y, obs_v, interp_thresh);
          break;
 
-      case(InterpMthd_Upper_Left):  // Upper Left corner of the grid box
+      case InterpMthd::Upper_Left:  // Upper Left corner of the grid box
          v = interp_xy(dp, wrap_lon, floor(obs_x), ceil(obs_y));
          break;
 
-      case(InterpMthd_Upper_Right): // Upper Right corner of the grid box
+      case InterpMthd::Upper_Right: // Upper Right corner of the grid box
          v = interp_xy(dp, wrap_lon, ceil(obs_x), ceil(obs_y));
          break;
 
-      case(InterpMthd_Lower_Right): // Lower Right corner of the grid box
+      case InterpMthd::Lower_Right: // Lower Right corner of the grid box
          v = interp_xy(dp, wrap_lon, ceil(obs_x), floor(obs_y));
          break;
 
-      case(InterpMthd_Lower_Left):  // Lower Left corner of the grid box
+      case InterpMthd::Lower_Left:  // Lower Left corner of the grid box
          v = interp_xy(dp, wrap_lon, floor(obs_x), floor(obs_y));
          break;
 
-      case(InterpMthd_Geog_Match):  // Geography Match for surface point verification
+      case InterpMthd::Geog_Match:  // Geography Match for surface point verification
          v = interp_geog_match(dp, *gt, obs_x, obs_y, obs_v);
          break;
 
       default:
          mlog << Error << "\ncompute_horz_interp() -> "
               << "unsupported interpolation method encountered: "
-              << interpmthd_to_string(mthd) << "(" << mthd << ")\n\n";
+              << interpmthd_to_string(mthd) << "(" << enum_class_as_int(mthd) << ")\n\n";
          exit(1);
    }
 
    delete gt;
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1230,7 +1232,7 @@ double compute_vert_pinterp(double v1, double prs1,
 
    v_interp = v1 + ((v2-v1)*log(prs1/to_prs)/log(prs1/prs2));
 
-   return(v_interp);
+   return v_interp;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1266,7 +1268,7 @@ double compute_vert_zinterp(double v1, double lvl1,
    // Linearly interpolate betwen lvl_1 and lvl_2
    v_interp = v1*(1.0 - d1/(d1+d2)) + v2*(1.0 - d2/(d1+d2));
 
-   return(v_interp);
+   return v_interp;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1285,7 +1287,7 @@ DataPlane valid_time_interp(const DataPlane &in1, const DataPlane &in2,
    dp2 = (in1.valid() >  in2.valid() ? in1 : in2);
 
    // Check for matching valid times
-   if(dp1.valid() == dp2.valid()) return(dp1);
+   if(dp1.valid() == dp2.valid()) return dp1;
 
    // Range check the times
    if(dp1.valid() > to_ut || dp2.valid() < to_ut) {
@@ -1308,37 +1310,37 @@ DataPlane valid_time_interp(const DataPlane &in1, const DataPlane &in2,
 
    // Compute interpolation weights
    switch(mthd) {
-      case(InterpMthd_Min):     // Minimum
-      case(InterpMthd_Max):     // Maximum
+      case InterpMthd::Min:     // Minimum
+      case InterpMthd::Max:     // Maximum
          w1 = w2 = bad_data_double;
          break;
 
-      case(InterpMthd_UW_Mean): // Unweighted Mean
+      case InterpMthd::UW_Mean: // Unweighted Mean
          w1 = w2 = 0.5;
          break;
 
-      case(InterpMthd_DW_Mean): // Distance-Weighted Mean
+      case InterpMthd::DW_Mean: // Distance-Weighted Mean
          w1 = (double) (dp2.valid() - to_ut) /
                        (dp2.valid() - dp1.valid());
          w2 = (double) (to_ut - dp1.valid()) /
                        (dp2.valid() - dp1.valid());
          break;
 
-      case(InterpMthd_Nearest): // Nearest Neighbor
+      case InterpMthd::Nearest: // Nearest Neighbor
          use_min = ((to_ut - dp1.valid()) <=
                     (dp2.valid() - to_ut));
          w1 = (use_min ? 1.0 : 0.0);
          w2 = (use_min ? 0.0 : 1.0);
          break;
 
-      case(InterpMthd_AW_Mean): // Area-Weighted Mean
-      case(InterpMthd_Median):  // Median
-      case(InterpMthd_LS_Fit):  // Least-squares fit
-      case(InterpMthd_Bilin):   // Bilinear interpolation
+      case InterpMthd::AW_Mean: // Area-Weighted Mean
+      case InterpMthd::Median:  // Median
+      case InterpMthd::LS_Fit:  // Least-squares fit
+      case InterpMthd::Bilin:   // Bilinear interpolation
       default:
          mlog << Error << "\nvalid_time_interp() -> "
               << "unsupported interpolation method encountered: "
-              << interpmthd_to_string(mthd) << "(" << mthd << ")\n\n";
+              << interpmthd_to_string(mthd) << "(" << enum_class_as_int(mthd) << ")\n\n";
          exit(1);
    }
 
@@ -1360,11 +1362,11 @@ DataPlane valid_time_interp(const DataPlane &in1, const DataPlane &in2,
          if(!is_bad_data(v1) && !is_bad_data(v2)) {
 
             // Minimum
-                 if(mthd == InterpMthd_Min) v = min(v1, v2);
+                 if(mthd == InterpMthd::Min) v = min(v1, v2);
             // Maximum
-            else if(mthd == InterpMthd_Max) v = max(v1, v2);
+            else if(mthd == InterpMthd::Max) v = max(v1, v2);
             // Apply weights
-            else                            v = w1*v1 + w2*v2;
+            else                             v = w1*v1 + w2*v2;
          }
 
          // Store interpolated value
@@ -1372,7 +1374,7 @@ DataPlane valid_time_interp(const DataPlane &in1, const DataPlane &in2,
       } // end for y
    } // end for x
 
-   return(dp);
+   return dp;
 }
 
 ////////////////////////////////////////////////////////////////////////

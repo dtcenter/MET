@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -10,8 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <fstream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -21,6 +19,8 @@ using namespace std;
 #include "main.h"
 #include "vx_log.h"
 #include "vx_util.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -72,7 +72,7 @@ while ( in.getline(line, sizeof(line)) )  {
 
 in.close();
 
-return ( 0 );
+return 0;
 
 }
 
@@ -96,7 +96,7 @@ int j;
 int i[6];
 const char i_delim [] = "{} ,\"";
 const char s_delim [] = ",\"";
-const char * c = (const char *) 0;
+const char * c = (const char *) nullptr;
 char line2[512];
 char * s = line2;
 const char *method_name = "parse_line() -> ";
@@ -113,7 +113,7 @@ for (j=0; j<6; ++j)  {
 
    i[j] = atoi(c);
 
-   s = (char *) 0;
+   s = (char *) nullptr;
 
 }   //  while
 
@@ -134,7 +134,7 @@ for (j=0; j<3; ++j)  {
 
    cout << ' ' << '\"' << c << '\"';
 
-   s = (char *) 0;
+   s = (char *) nullptr;
 
 }   //  while
 

@@ -1,13 +1,11 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 ////////////////////////////////////////////////////////////////////////
-
-using namespace std;
 
 #include <cstdio>
 #include <iostream>
@@ -24,11 +22,14 @@ using namespace std;
 
 #include "file_fxns.h"
 
+using namespace std;
+
+
 ////////////////////////////////////////////////////////////////////////
 
 bool is_regular_file(const char *path) {
    struct stat path_stat;
-   return(!stat(path, &path_stat) && S_ISREG(path_stat.st_mode));
+   return (!stat(path, &path_stat) && S_ISREG(path_stat.st_mode));
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -51,7 +52,7 @@ ConcatString replace_path(const ConcatString path) {
 
    s.replace(met_base_str, met_base_val.c_str());
 
-   return(s);
+   return s;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -69,7 +70,7 @@ ConcatString replace_path(const char * path) {
 ////////////////////////////////////////////////////////////////////////
 
 int met_open(const char *path, int oflag) {
-  return(open(replace_path(path).c_str(), oflag));
+  return open(replace_path(path).c_str(), oflag);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -89,13 +90,13 @@ void met_open(ofstream &out, const char *path) {
 ////////////////////////////////////////////////////////////////////////
 
 FILE *met_fopen(const char *path, const char *mode) {
-  return(fopen(replace_path(path).c_str(), mode));
+  return fopen(replace_path(path).c_str(), mode);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 DIR *met_opendir(const char *path) {
-  return(opendir(replace_path(path).c_str()));
+  return opendir(replace_path(path).c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////

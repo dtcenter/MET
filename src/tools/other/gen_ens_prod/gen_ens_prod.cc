@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -23,7 +23,6 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
@@ -37,7 +36,6 @@ using namespace std;
 #include <unistd.h>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "main.h"
 #include "gen_ens_prod.h"
@@ -51,6 +49,10 @@ using namespace netCDF;
 #include "nc_point_obs_in.h"
 
 #include "handle_openmp.h"
+
+using namespace std;
+using namespace netCDF;
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -104,7 +106,7 @@ int met_main(int argc, char *argv[]) {
    // Close output files and deallocate memory
    clean_up();
 
-   return(0);
+   return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -121,7 +123,7 @@ void process_command_line(int argc, char **argv) {
    int i;
    CommandLine cline;
    ConcatString default_config_file;
-   Met2dDataFile *ens_mtddf = (Met2dDataFile *) 0;
+   Met2dDataFile *ens_mtddf = (Met2dDataFile *) nullptr;
 
    //
    // Check for zero arguments
@@ -250,7 +252,7 @@ void process_command_line(int argc, char **argv) {
    }
 
    // Deallocate memory for data files
-   if(ens_mtddf) { delete ens_mtddf; ens_mtddf = (Met2dDataFile *) 0; }
+   if(ens_mtddf) { delete ens_mtddf; ens_mtddf = (Met2dDataFile *) nullptr; }
 
    return;
 }
@@ -301,12 +303,12 @@ void process_ensemble() {
       // read climatology separately for each member
       set_climo_ens_mem_id =
          (conf_info.ens_member_ids.n() > 1) &&
-         ((*var_it)->normalize == NormalizeType_ClimoAnom ||
-          (*var_it)->normalize == NormalizeType_ClimoStdAnom);
+         ((*var_it)->normalize == NormalizeType::ClimoAnom ||
+          (*var_it)->normalize == NormalizeType::ClimoStdAnom);
 
       // Print out the normalization flag
       cs << cs_erase;
-      if((*var_it)->normalize != NormalizeType_None) {
+      if((*var_it)->normalize != NormalizeType::None) {
          cs << " with normalize = "
             << normalizetype_to_string((*var_it)->normalize);
       }
@@ -357,8 +359,8 @@ void process_ensemble() {
                                  i_ens, cmn_dp, csd_dp);
 
             // Compute the ensemble summary data, if needed
-            if((*var_it)->normalize == NormalizeType_FcstAnom ||
-               (*var_it)->normalize == NormalizeType_FcstStdAnom) {
+            if((*var_it)->normalize == NormalizeType::FcstAnom ||
+               (*var_it)->normalize == NormalizeType::FcstStdAnom) {
                get_ens_mean_stdev((*var_it), emn_dp, esd_dp);
             }
             else {
@@ -392,7 +394,7 @@ void process_ensemble() {
                }
 
                // Normalize, if requested
-               if((*var_it)->normalize != NormalizeType_None) {
+               if((*var_it)->normalize != NormalizeType::None) {
                   normalize_data(ctrl_dp, (*var_it)->normalize,
                                  &cmn_dp, &csd_dp, &emn_dp, &esd_dp);
                }
@@ -419,7 +421,7 @@ void process_ensemble() {
          }
 
          // Normalize, if requested
-         if((*var_it)->normalize != NormalizeType_None) {
+         if((*var_it)->normalize != NormalizeType::None) {
             normalize_data(ens_dp, (*var_it)->normalize,
                            &cmn_dp, &csd_dp, &emn_dp, &esd_dp);
          }
@@ -626,7 +628,7 @@ void get_ens_mean_stdev(GenEnsProdVarInfo *ens_info,
 bool get_data_plane(const char *infile, GrdFileType ftype,
                     VarInfo *info, DataPlane &dp) {
    bool found;
-   Met2dDataFile *mtddf = (Met2dDataFile *) 0;
+   Met2dDataFile *mtddf = (Met2dDataFile *) nullptr;
 
    // Read the current ensemble file
    if(!(mtddf = mtddf_factory.new_met_2d_data_file(infile, ftype))) {
@@ -668,9 +670,9 @@ bool get_data_plane(const char *infile, GrdFileType ftype,
    } // end if found
 
    // Deallocate the data file pointer, if necessary
-   if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) 0; }
+   if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) nullptr; }
 
-   return(found);
+   return found;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -948,7 +950,7 @@ void write_ens_nc(GenEnsProdVarInfo *ens_info, int n_ens_vld,
             // Loop over the neighborhoods
             for(j=0; j<conf_info.get_n_nbrhd(); j++) {
 
-               nbrhd_dp = smooth_field(prob_dp, InterpMthd_UW_Mean,
+               nbrhd_dp = smooth_field(prob_dp, InterpMthd::UW_Mean,
                              conf_info.nbrhd_prob.width[j],
                              conf_info.nbrhd_prob.shape, grid.wrap_lon(),
                              conf_info.nbrhd_prob.vld_thresh, info);
@@ -956,7 +958,7 @@ void write_ens_nc(GenEnsProdVarInfo *ens_info, int n_ens_vld,
                // Write neighborhood ensemble probability
                snprintf(type_str, sizeof(type_str), "ENS_NEP_%s_%s%i",
                         ens_info->cat_ta[i].get_abbr_str().contents().c_str(),
-                        interpmthd_to_string(InterpMthd_Nbrhd).c_str(),
+                        interpmthd_to_string(InterpMthd::Nbrhd).c_str(),
                         conf_info.nbrhd_prob.width[j]*conf_info.nbrhd_prob.width[j]);
                write_ens_data_plane(ens_info, nbrhd_dp, ens_dp, type_str,
                                     "Neighborhood Ensemble Probability");
@@ -999,7 +1001,7 @@ void write_ens_nc(GenEnsProdVarInfo *ens_info, int n_ens_vld,
                // Write neighborhood maximum ensemble probability
                snprintf(type_str, sizeof(type_str), "ENS_NMEP_%s_%s%i_%s%i",
                         ens_info->cat_ta[i].get_abbr_str().contents().c_str(),
-                        interpmthd_to_string(InterpMthd_Nbrhd).c_str(),
+                        interpmthd_to_string(InterpMthd::Nbrhd).c_str(),
                         conf_info.nbrhd_prob.width[j]*conf_info.nbrhd_prob.width[j],
                         conf_info.nmep_smooth.method[k].c_str(),
                         conf_info.nmep_smooth.width[k]*conf_info.nmep_smooth.width[k]);
@@ -1049,14 +1051,14 @@ void write_ens_nc(GenEnsProdVarInfo *ens_info, int n_ens_vld,
    }
 
    // Deallocate and clean up
-   if(ens_mean)  { delete [] ens_mean;  ens_mean  = (float *) 0; }
-   if(ens_stdev) { delete [] ens_stdev; ens_stdev = (float *) 0; }
-   if(ens_minus) { delete [] ens_minus; ens_minus = (float *) 0; }
-   if(ens_plus)  { delete [] ens_plus;  ens_plus  = (float *) 0; }
-   if(ens_min)   { delete [] ens_min;   ens_min   = (float *) 0; }
-   if(ens_max)   { delete [] ens_max;   ens_max   = (float *) 0; }
-   if(ens_range) { delete [] ens_range; ens_range = (float *) 0; }
-   if(ens_vld)   { delete [] ens_vld;   ens_vld   = (int   *) 0; }
+   if(ens_mean)  { delete [] ens_mean;  ens_mean  = (float *) nullptr; }
+   if(ens_stdev) { delete [] ens_stdev; ens_stdev = (float *) nullptr; }
+   if(ens_minus) { delete [] ens_minus; ens_minus = (float *) nullptr; }
+   if(ens_plus)  { delete [] ens_plus;  ens_plus  = (float *) nullptr; }
+   if(ens_min)   { delete [] ens_min;   ens_min   = (float *) nullptr; }
+   if(ens_max)   { delete [] ens_max;   ens_max   = (float *) nullptr; }
+   if(ens_range) { delete [] ens_range; ens_range = (float *) nullptr; }
+   if(ens_vld)   { delete [] ens_vld;   ens_vld   = (int   *) nullptr; }
 
    return;
 }
@@ -1179,7 +1181,7 @@ void write_ens_data_plane(GenEnsProdVarInfo *ens_info, const DataPlane &ens_dp, 
    write_ens_var_float(ens_info, ens_data, dp, type_str, long_name_str);
 
    // Cleanup
-   if(ens_data) { delete [] ens_data; ens_data = (float *) 0; }
+   if(ens_data) { delete [] ens_data; ens_data = (float *) nullptr; }
 
    return;
 }
@@ -1226,7 +1228,7 @@ void clean_up() {
    mlog << Debug(1) << "Output file: " << out_file << "\n";
 
    // Close the output NetCDF file
-   if(nc_out) { delete nc_out; nc_out = (NcFile *) 0; }
+   if(nc_out) { delete nc_out; nc_out = (NcFile *) nullptr; }
 
    // Deallocate threshold count arrays
    if(thresh_cnt_na) {
@@ -1234,7 +1236,7 @@ void clean_up() {
          thresh_cnt_na[i].clear();
       }
       delete [] thresh_cnt_na;
-      thresh_cnt_na = (NumArray *) 0;
+      thresh_cnt_na = (NumArray *) nullptr;
    }
    if(thresh_nbrhd_cnt_na) {
       for(i=0; i<conf_info.get_max_n_cat(); i++) {
@@ -1242,10 +1244,10 @@ void clean_up() {
             thresh_nbrhd_cnt_na[i][j].clear();
          }
          delete [] thresh_nbrhd_cnt_na[i];
-         thresh_nbrhd_cnt_na[i] = (NumArray *) 0;
+         thresh_nbrhd_cnt_na[i] = (NumArray *) nullptr;
       }
       delete [] thresh_nbrhd_cnt_na;
-      thresh_nbrhd_cnt_na = (NumArray **) 0;
+      thresh_nbrhd_cnt_na = (NumArray **) nullptr;
    }
 
    return;

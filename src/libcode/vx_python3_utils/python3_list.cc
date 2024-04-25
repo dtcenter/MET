@@ -1,16 +1,10 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-
-////////////////////////////////////////////////////////////////////////
-
-
-using namespace std;
-
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -21,6 +15,8 @@ using namespace std;
 #include "concat_string.h"
 
 #include "python3_list.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -182,7 +178,7 @@ if ( (n < 0) || (n >= Size) )  {
 a = PyList_GetItem(Object, n);
 
 
-return ( a );
+return a;
 
 }
 

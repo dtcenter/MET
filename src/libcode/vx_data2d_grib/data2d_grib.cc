@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -9,8 +9,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-
-using namespace std;
 
 #include <iostream>
 #include <unistd.h>
@@ -24,6 +22,8 @@ using namespace std;
 
 #include "vx_math.h"
 #include "vx_log.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -103,7 +103,7 @@ void MetGrib1DataFile::grib1_init_from_scratch()
 
 {
 
-GF = (GribFile *) 0;
+GF = (GribFile *) nullptr;
 
 Plane.clear();
 
@@ -121,7 +121,7 @@ void MetGrib1DataFile::close()
 
 {
 
-if ( GF )  { delete GF;  GF = (GribFile *) 0; }
+if ( GF )  { delete GF;  GF = (GribFile *) nullptr; }
 
 CurrentRecord.reset();
 
@@ -152,7 +152,7 @@ if ( ! (GF->open(_filename)) )  {
 
    close();
 
-   return ( false );
+   return false;
 
 }
 
@@ -187,7 +187,7 @@ if ( ShiftRight != 0 )  Plane.shift_right(ShiftRight);
    //  done
    //
 
-return ( true );
+return true;
 
 }
 
@@ -238,7 +238,7 @@ double MetGrib1DataFile::get(int x, int y) const
 
 double value = Plane.get(x, y);
 
-return ( value );
+return value;
 
 }
 
@@ -252,7 +252,7 @@ bool MetGrib1DataFile::data_ok(int x, int y) const
 
 const double value = get(x, y);
 
-return ( !is_bad_data(value) );
+return !is_bad_data(value);
 
 }
 
@@ -303,7 +303,7 @@ if ( ! ( (*GF) >> CurrentRecord) )  {
 mlog << Error << "\nMetGrib1DataFile::read_record() -> "
      << "trouble reading record number " << n << "\n\n";
 
-return (false);
+return false;
 
 }
 
@@ -314,7 +314,7 @@ if( read_plane ) get_data_plane(CurrentRecord, Plane);
 
 if ( ShiftRight != 0 )  Plane.shift_right(ShiftRight);
 
-return (true);
+return true;
 
 }
 
@@ -331,7 +331,7 @@ if ( !GF )  {
    mlog << Error << "\nMetGrib1DataFile::read_record(const VarInfoGrib &) -> "
         << "no grib file open!\n\n";
 
-   return ( -1 );
+   return -1;
 
 }
 
@@ -349,7 +349,7 @@ for (j=0; j<(GF->n_records()); ++j)  {
 
       mlog << Error << "\nMetGrib1DataFile::read_record(const VarInfoGrib &) -> trouble reading record!\n\n";
 
-      return ( -1 );
+      return -1;
 
    }
 
@@ -388,7 +388,7 @@ if ( j_match >= 0 )  {
       mlog << Error << "\nMetGrib1DataFile::read_record(const VarInfoGrib &) -> "
            << "trouble reading record!\n\n";
 
-      return ( -1 );
+      return -1;
 
    }
 
@@ -398,7 +398,7 @@ if ( j_match >= 0 )  {
    //  done
    //
 
-return ( count );
+return count;
 
 }
 
@@ -458,7 +458,7 @@ bool MetGrib1DataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
            << filename() << "\".\n\n";
    }
 
-   return(status);
+   return status;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -572,7 +572,7 @@ int MetGrib1DataFile::data_plane_array(VarInfo &vinfo,
                  << u_plane_array.n_planes() << ") does not match the "
                  << "number of V-wind records (" << v_plane_array.n_planes()
                  << ") for GRIB file \"" << filename() << "\".\n\n";
-            return(0);
+            return 0;
          }
 
          // Loop through each of the data planes
@@ -590,7 +590,7 @@ int MetGrib1DataFile::data_plane_array(VarInfo &vinfo,
                     << v_plane_array.lower(i) << ", " << v_plane_array.upper(i)
                     << ") in GRIB file \"" << filename() << "\".\n\n";
                plane_array.clear();
-               return(0);
+               return 0;
             }
 
             // Derive wind direction
@@ -616,7 +616,7 @@ int MetGrib1DataFile::data_plane_array(VarInfo &vinfo,
         << vinfo.magic_str() << "\" in GRIB file \""
         << filename() << "\".\n";
 
-   return(plane_array.n_planes());
+   return plane_array.n_planes();
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -711,7 +711,7 @@ bool MetGrib1DataFile::data_plane_scalar(VarInfoGrib &vinfo_grib,
            << filename() << "\".\n\n";
    }
 
-   return(status);
+   return status;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -780,9 +780,9 @@ int get_bit_from_octet(unsigned char u, int bit) {
 
    unsigned char mask = (unsigned char) (1 << (8 - bit));
 
-   if(u & mask) return(1);
+   if(u & mask) return 1;
 
-   return(0);
+   return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////

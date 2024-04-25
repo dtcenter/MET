@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -11,8 +11,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <fstream>
 #include <unistd.h>
@@ -20,6 +18,8 @@ using namespace std;
 #include <string.h>
 
 #include "psout_filter.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -43,7 +43,7 @@ PSOutputFilter::PSOutputFilter()
 
 {
 
-file = (ofstream *) 0;
+file = (ofstream *) nullptr;
 
 column = 0;
 
@@ -59,7 +59,7 @@ PSOutputFilter::~PSOutputFilter()
 
 {
 
-file = (ofstream *) 0;   //  don't delete it
+file = (ofstream *) nullptr;   //  don't delete it
 
 }
 
@@ -105,7 +105,7 @@ void PSOutputFilter::eod()
 
 {
 
-file = (ofstream *) 0;   //  don't delete it
+file = (ofstream *) nullptr;   //  don't delete it
 
 column = 0;
 

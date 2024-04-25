@@ -1,9 +1,14 @@
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+// ** Copyright UCAR (c) 1992 - 2024
+// ** University Corporation for Atmospheric Research (UCAR)
+// ** National Center for Atmospheric Research (NCAR)
+// ** Research Applications Lab (RAL)
+// ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
 ////////////////////////////////////////////////////////////////////////
 
-
-using namespace std;
 
 #include <iostream>
 #include <unistd.h>
@@ -12,6 +17,8 @@ using namespace std;
 #include <cmath>
 
 #include "ihull.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -147,22 +154,22 @@ int lex_compare(const void * _a, const void * _b)
 const IntPoint & a = *((const IntPoint *) _a);
 const IntPoint & b = *((const IntPoint *) _b);
 
-if ( a.x < b.x )  return ( -1 );
-if ( a.x > b.x )  return (  1 );
+if ( a.x < b.x )  return -1;
+if ( a.x > b.x )  return 1;
 
    //
    //  now we know that a.x = b.x
    //
 
-if ( a.y < b.y )  return ( -1 );
-if ( a.y > b.y )  return (  1 );
+if ( a.y < b.y )  return -1;
+if ( a.y > b.y )  return 1;
 
 
    //
    //  done
    //
 
-return ( 0 );
+return 0;
 
 }
 

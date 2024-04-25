@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -108,7 +108,7 @@ static StringArray  obs_file;
 
 // Input Config file
 static ConcatString      config_file;
-static StringArray       config_files;
+static StringArray       ugrid_config_files;
 static PointStatConfInfo conf_info;
 
 // Optional arguments
@@ -128,7 +128,7 @@ static int      fcst_lead_sec = bad_data_int;
 
 // Output STAT file
 static ConcatString     stat_file;
-static std::ofstream    *stat_out = (std::ofstream *)  0;
+static std::ofstream    *stat_out = (std::ofstream *) nullptr;
 static AsciiTable       stat_at;
 static int              i_stat_row;
 
@@ -150,7 +150,7 @@ static bool is_first_pass = true;
 
 // Data file factory and input files
 static Met2dDataFileFactory mtddf_factory;
-static Met2dDataFile *fcst_mtddf = (Met2dDataFile *) 0;
+static Met2dDataFile *fcst_mtddf = (Met2dDataFile *) nullptr;
 
 // Pointer to the random number generator to be used
 static gsl_rng *rng_ptr = (gsl_rng *) nullptr;

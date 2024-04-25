@@ -2,7 +2,7 @@
 
 
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -12,7 +12,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
 
 #include <unistd.h>
 #include <sys/types.h>
@@ -27,6 +26,8 @@ using namespace std;
 #include "vx_log.h"
 
 #include "dbf_file.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -151,7 +152,7 @@ for (j=0; j<(h.n_records); ++j)  {
 
 close(fd);
 
-return ( 0 );
+return 0;
 
 }
 

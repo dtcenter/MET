@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -7,8 +7,6 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 ////////////////////////////////////////////////////////////////////////
-
-using namespace std;
 
 #include <cstdlib>
 #include <iostream>
@@ -20,6 +18,7 @@ using namespace std;
   #include "omp.h"
 #endif
 
+#include "config_util.h"
 #include "data_plane_util.h"
 #include "interp_util.h"
 #include "two_to_one.h"
@@ -27,14 +26,18 @@ using namespace std;
 #include "vx_gsl_prob.h"
 #include "vx_math.h"
 #include "vx_log.h"
+#include "enum_as_int.hpp"
 
 #include "GridTemplate.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 //
 // Utility functions operating on a DataPlane
 //
 ////////////////////////////////////////////////////////////////////////
+
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -106,7 +109,7 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
    smooth_dp = dp;
 
    // For nearest neighbor, no work to do.
-   if(width == 1 && mthd == InterpMthd_Nearest) return;
+   if(width == 1 && mthd == InterpMthd::Nearest) return;
 
    // build the grid template
    GridTemplateFactory gtf;
@@ -125,27 +128,27 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
          // Compute the smoothed value based on the interpolation method
          switch(mthd) {
 
-            case(InterpMthd_Min):      // Minimum
+            case InterpMthd::Min:      // Minimum
                v = interp_min(dp, *gt, x, y, t);
                break;
 
-            case(InterpMthd_Max):      // Maximum
+            case InterpMthd::Max:      // Maximum
                v = interp_max(dp, *gt, x, y, t);
                break;
 
-            case(InterpMthd_Median):   // Median
+            case InterpMthd::Median:   // Median
                v = interp_median(dp, *gt, x, y, t);
                break;
 
-            case(InterpMthd_UW_Mean):  // Unweighted Mean
+            case InterpMthd::UW_Mean:  // Unweighted Mean
                v = interp_uw_mean(dp, *gt, x, y, t);
                break;
 
-            case(InterpMthd_Gaussian): // For Gaussian, pass the data through
+            case InterpMthd::Gaussian: // For Gaussian, pass the data through
                v = dp.get(x, y);
                break;
 
-            case(InterpMthd_MaxGauss): // For Max Gaussian, compute the max
+            case InterpMthd::MaxGauss: // For Max Gaussian, compute the max
                v = interp_max(dp, *gt, x, y, 0);
                break;
 
@@ -156,7 +159,7 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
             default:
                mlog << Error << "\nsmooth_field() -> "
                     << "unsupported interpolation method encountered: "
-                    << interpmthd_to_string(mthd) << "(" << mthd
+                    << interpmthd_to_string(mthd) << "(" << enum_class_as_int(mthd)
                     << ")\n\n";
                exit(1);
          }
@@ -168,8 +171,8 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
    } // end for x
 
    // Apply the Gaussian smoother 
-   if(mthd == InterpMthd_Gaussian ||
-      mthd == InterpMthd_MaxGauss) {
+   if(mthd == InterpMthd::Gaussian ||
+      mthd == InterpMthd::MaxGauss) {
       interp_gaussian_dp(smooth_dp, gaussian, t);
    }
 
@@ -194,7 +197,7 @@ DataPlane smooth_field(const DataPlane &dp,
 
    smooth_field(dp, smooth_dp, mthd, width, shape, wrap_lon, t, gaussian);
 
-   return(smooth_dp);
+   return smooth_dp;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -265,7 +268,7 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
        mlog << Debug(3)
             << "Computing fractional coverage field using the "
             << t.get_str() << " threshold and the "
-            << interpmthd_to_string(InterpMthd_Nbrhd) << "(" << gt->size()
+            << interpmthd_to_string(InterpMthd::Nbrhd) << "(" << gt->size()
             << ") " << gt->getClassName() << " interpolation method.\n";
 
        // Initialize the fractional coverage field
@@ -495,7 +498,7 @@ DataPlane subtract(const DataPlane &dp1, const DataPlane &dp2) {
       }
    }
 
-   return(diff);
+   return diff;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -525,7 +528,7 @@ DataPlane normal_cdf(const DataPlane &dp, const DataPlane &mn,
       }
    }
 
-   return(cdf);
+   return cdf;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -561,7 +564,7 @@ DataPlane normal_cdf_inv(const double area, const DataPlane &mn,
       }
    }
 
-   return(cdf_inv);
+   return cdf_inv;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -597,7 +600,7 @@ DataPlane gradient(const DataPlane &dp, int dim, int delta) {
       }
    }
 
-   return(grad_dp);
+   return grad_dp;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -728,7 +731,7 @@ DataPlane distance_map(const DataPlane &dp) {
    // Mask the distance map with bad data values of the input field
    mask_bad_data(dm, dp);
 
-   return(dm);
+   return dm;
 }
 
 ////////////////////////////////////////////////////////////////////////

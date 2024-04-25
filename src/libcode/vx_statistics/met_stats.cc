@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -7,8 +7,6 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 ////////////////////////////////////////////////////////////////////////
-
-using namespace std;
 
 #include <cstdio>
 #include <iostream>
@@ -23,6 +21,8 @@ using namespace std;
 #include "grib_strings.h"
 #include "vx_util.h"
 #include "vx_log.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -53,22 +53,22 @@ CIInfo::CIInfo(const CIInfo &c) {
 
 CIInfo & CIInfo::operator=(const CIInfo &c) {
 
-   if(this == &c) return(*this);
+   if(this == &c) return *this;
 
    assign(c);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void CIInfo::init_from_scratch() {
 
-   v_ncl = (double *) 0;
-   v_ncu = (double *) 0;
+   v_ncl = (double *) nullptr;
+   v_ncu = (double *) nullptr;
 
-   v_bcl = (double *) 0;
-   v_bcu = (double *) 0;
+   v_bcl = (double *) nullptr;
+   v_bcu = (double *) nullptr;
 
    clear();
 
@@ -83,11 +83,11 @@ void CIInfo::clear() {
    v   = bad_data_double;
    vif = 1.0;
 
-   if(v_ncl) { delete [] v_ncl; v_ncl = (double *) 0; }
-   if(v_ncu) { delete [] v_ncu; v_ncu = (double *) 0; }
+   if(v_ncl) { delete [] v_ncl; v_ncl = (double *) nullptr; }
+   if(v_ncu) { delete [] v_ncu; v_ncu = (double *) nullptr; }
 
-   if(v_bcl) { delete [] v_bcl; v_bcl = (double *) 0; }
-   if(v_bcu) { delete [] v_bcu; v_bcu = (double *) 0; }
+   if(v_bcl) { delete [] v_bcl; v_bcl = (double *) nullptr; }
+   if(v_bcu) { delete [] v_bcu; v_bcu = (double *) nullptr; }
 
    return;
 }
@@ -190,18 +190,18 @@ CTSInfo::CTSInfo(const CTSInfo &c) {
 
 CTSInfo & CTSInfo::operator=(const CTSInfo &c) {
 
-   if(this == &c) return(*this);
+   if(this == &c) return *this;
 
    assign(c);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void CTSInfo::init_from_scratch() {
 
-   alpha = (double *) 0;
+   alpha = (double *) nullptr;
 
    clear();
 
@@ -213,7 +213,7 @@ void CTSInfo::init_from_scratch() {
 void CTSInfo::clear() {
 
    n_alpha = 0;
-   if(alpha) { delete [] alpha; alpha = (double *) 0; }
+   if(alpha) { delete [] alpha; alpha = (double *) nullptr; }
 
    cts.zero_out();
    fthresh.clear();
@@ -470,7 +470,7 @@ double CTSInfo::get_stat(const char *stat_name) {
       v = bad_data_double;
    }
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -502,18 +502,18 @@ MCTSInfo::MCTSInfo(const MCTSInfo &c) {
 
 MCTSInfo & MCTSInfo::operator=(const MCTSInfo &c) {
 
-   if(this == &c) return(*this);
+   if(this == &c) return *this;
 
    assign(c);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void MCTSInfo::init_from_scratch() {
 
-   alpha = (double *) 0;
+   alpha = (double *) nullptr;
 
    clear();
 
@@ -525,7 +525,7 @@ void MCTSInfo::init_from_scratch() {
 void MCTSInfo::clear() {
 
    n_alpha = 0;
-   if(alpha) { delete [] alpha; alpha = (double *) 0; }
+   if(alpha) { delete [] alpha; alpha = (double *) nullptr; }
 
    cts.zero_out();
    fthresh.clear();
@@ -696,18 +696,18 @@ CNTInfo::CNTInfo(const CNTInfo &c) {
 
 CNTInfo & CNTInfo::operator=(const CNTInfo &c) {
 
-   if(this == &c) return(*this);
+   if(this == &c) return *this;
 
    assign(c);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void CNTInfo::init_from_scratch() {
 
-   alpha = (double *) 0;
+   alpha = (double *) nullptr;
 
    clear();
 
@@ -720,11 +720,11 @@ void CNTInfo::clear() {
 
    n = 0;
    n_alpha = 0;
-   if(alpha) { delete [] alpha; alpha = (double *) 0; }
+   if(alpha) { delete [] alpha; alpha = (double *) nullptr; }
 
    fthresh.clear();
    othresh.clear();
-   logic = SetLogic_None;
+   logic = SetLogic::None;
 
    fbar.clear();
    fstdev.clear();
@@ -1085,7 +1085,7 @@ double CNTInfo::get_stat(const char *stat_name) {
       v = bad_data_double;
    }
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1117,11 +1117,11 @@ SL1L2Info::SL1L2Info(const SL1L2Info &c) {
 
 SL1L2Info & SL1L2Info::operator=(const SL1L2Info &c) {
 
-   if(this == &c) return(*this);
+   if(this == &c) return *this;
 
    assign(c);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1165,7 +1165,7 @@ SL1L2Info & SL1L2Info::operator+=(const SL1L2Info &c) {
 
    assign(s_info);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1202,7 +1202,7 @@ void SL1L2Info::clear() {
 
    fthresh.clear();
    othresh.clear();
-   logic = SetLogic_None;
+   logic = SetLogic::None;
 
    zero_out();
 
@@ -1346,11 +1346,11 @@ VL1L2Info::VL1L2Info(const VL1L2Info &c) {
 
 VL1L2Info & VL1L2Info::operator=(const VL1L2Info &c) {
 
-   if(this == &c) return(*this);
+   if(this == &c) return *this;
 
    assign(c);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1362,7 +1362,7 @@ VL1L2Info & VL1L2Info::operator+=(const VL1L2Info &c) {
    v_info.allocate_n_alpha(n_alpha);
    for(int i=0; i<n_alpha; i++) v_info.alpha[i] = alpha[i];
 
-   v_info.vcount  = vcount + c.vcount;
+   v_info.vcount = vcount + c.vcount;
 
    if(v_info.vcount > 0) {
       v_info.uf_bar      = (uf_bar*vcount      + c.uf_bar*c.vcount)     /v_info.vcount;
@@ -1374,34 +1374,40 @@ VL1L2Info & VL1L2Info::operator+=(const VL1L2Info &c) {
       v_info.uvoo_bar    = (uvoo_bar*vcount    + c.uvoo_bar*c.vcount)   /v_info.vcount;
       v_info.f_speed_bar = (f_speed_bar*vcount + c.f_speed_bar*c.vcount)/v_info.vcount;
       v_info.o_speed_bar = (o_speed_bar*vcount + c.o_speed_bar*c.vcount)/v_info.vcount;
+      v_info.dir_bar     = (dir_bar*vcount     + c.dir_bar*c.vcount)    /v_info.vcount;
+      v_info.absdir_bar  = (absdir_bar*vcount  + c.absdir_bar*c.vcount) /v_info.vcount;
+      v_info.dir2_bar    = (dir2_bar*vcount    + c.dir2_bar*c.vcount)   /v_info.vcount;
    }
 
-   v_info.vacount  = vacount + c.vacount;
+   v_info.vacount = vacount + c.vacount;
 
    if(v_info.vacount > 0) {
-      v_info.ufa_bar      = (ufa_bar*vacount   + c.ufa_bar*c.vacount)  /v_info.vacount;
-      v_info.vfa_bar      = (vfa_bar*vacount   + c.vfa_bar*c.vacount)  /v_info.vacount;
-      v_info.uoa_bar      = (uoa_bar*vacount   + c.uoa_bar*c.vacount)  /v_info.vacount;
-      v_info.voa_bar      = (voa_bar*vacount   + c.voa_bar*c.vacount)  /v_info.vacount;
-      v_info.uvfoa_bar    = (uvfoa_bar*vacount + c.uvfoa_bar*c.vacount)/v_info.vacount;
-      v_info.uvffa_bar    = (uvffa_bar*vacount + c.uvffa_bar*c.vacount)/v_info.vacount;
-      v_info.uvooa_bar    = (uvooa_bar*vacount + c.uvooa_bar*c.vacount)/v_info.vacount;
+      v_info.ufa_bar      = (ufa_bar*vacount      + c.ufa_bar*c.vacount)     /v_info.vacount;
+      v_info.vfa_bar      = (vfa_bar*vacount      + c.vfa_bar*c.vacount)     /v_info.vacount;
+      v_info.uoa_bar      = (uoa_bar*vacount      + c.uoa_bar*c.vacount)     /v_info.vacount;
+      v_info.voa_bar      = (voa_bar*vacount      + c.voa_bar*c.vacount)     /v_info.vacount;
+      v_info.uvfoa_bar    = (uvfoa_bar*vacount    + c.uvfoa_bar*c.vacount)   /v_info.vacount;
+      v_info.uvffa_bar    = (uvffa_bar*vacount    + c.uvffa_bar*c.vacount)   /v_info.vacount;
+      v_info.uvooa_bar    = (uvooa_bar*vacount    + c.uvooa_bar*c.vacount)   /v_info.vacount;
       v_info.fa_speed_bar = (fa_speed_bar*vacount + c.fa_speed_bar*c.vacount)/v_info.vacount;
       v_info.oa_speed_bar = (oa_speed_bar*vacount + c.oa_speed_bar*c.vacount)/v_info.vacount;
+      v_info.dira_bar     = (dira_bar*vacount     + c.dira_bar*c.vacount)    /v_info.vacount;
+      v_info.absdira_bar  = (absdira_bar*vacount  + c.absdira_bar*c.vacount) /v_info.vacount;
+      v_info.dira2_bar    = (dira2_bar*vacount    + c.dira2_bar*c.vacount)   /v_info.vacount;
    }
 
    v_info.compute_stats();
 
    assign(v_info);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void VL1L2Info::init_from_scratch() {
 
-   alpha = (double *) 0;
+   alpha = (double *) nullptr;
    
    clear();
 
@@ -1416,24 +1422,20 @@ void VL1L2Info::zero_out() {
    // VL1L2 Quantities
    //
 
-   uf_bar      = 0.0;
-   vf_bar      = 0.0;
-   uo_bar      = 0.0;
-   vo_bar      = 0.0;
-   uvfo_bar    = 0.0;
-   uvff_bar    = 0.0;
-   uvoo_bar    = 0.0;
-   f_speed_bar = 0.0;
-   o_speed_bar = 0.0;
+   uf_bar       = 0.0;
+   vf_bar       = 0.0;
+   uo_bar       = 0.0;
+   vo_bar       = 0.0;
+   uvfo_bar     = 0.0;
+   uvff_bar     = 0.0;
+   uvoo_bar     = 0.0;
+   f_speed_bar  = 0.0;
+   o_speed_bar  = 0.0;
+   dir_bar      = 0.0;
+   absdir_bar   = 0.0;
+   dir2_bar     = 0.0;
 
-   f_bar       = 0.0;
-   o_bar       = 0.0;
-   me          = 0.0;
-   mse         = 0.0;
-   rmse        = 0.0;
-   speed_bias  = 0.0;
-
-   vcount      = 0;
+   vcount       = 0;
 
    //
    // VAL1L2 Quantities
@@ -1448,6 +1450,9 @@ void VL1L2Info::zero_out() {
    uvooa_bar    = 0.0;
    fa_speed_bar = 0.0;
    oa_speed_bar = 0.0;
+   dira_bar     = 0.0;
+   absdira_bar  = 0.0;
+   dira2_bar    = 0.0;
 
    vacount      = 0;
 
@@ -1459,12 +1464,14 @@ void VL1L2Info::zero_out() {
 void VL1L2Info::clear() {
 
    n = 0;
+   n_dir_undef = 0;
+   n_dira_undef = 0;
    n_alpha = 0;
-   if(alpha) { delete [] alpha; alpha = (double *) 0; }
+   if(alpha) { delete [] alpha; alpha = (double *) nullptr; }
    
    fthresh.clear();
    othresh.clear();
-   logic = SetLogic_None;
+   logic = SetLogic::None;
 
    FBAR.clear();
    OBAR.clear();
@@ -1486,6 +1493,10 @@ void VL1L2Info::clear() {
    DIR_ABSERR.clear();
    ANOM_CORR.clear();
    ANOM_CORR_UNCNTR.clear();
+   DIR_ME.clear();
+   DIR_MAE.clear();
+   DIR_MSE.clear();
+   DIR_RMSE.clear();
    
    zero_out();
 
@@ -1504,27 +1515,26 @@ void VL1L2Info::assign(const VL1L2Info &c) {
    logic   = c.logic;
 
    n = c.n;
+   n_dir_undef = c.n_dir_undef;
+   n_dira_undef = c.n_dira_undef;
    allocate_n_alpha(c.n_alpha);
    for(i=0; i<c.n_alpha; i++) { alpha[i] = c.alpha[i]; }
    
    // VL1L2 Quantities
-   uf_bar      = c.uf_bar;
-   vf_bar      = c.vf_bar;
-   uo_bar      = c.uo_bar;
-   vo_bar      = c.vo_bar;
-   uvfo_bar    = c.uvfo_bar;
-   uvff_bar    = c.uvff_bar;
-   uvoo_bar    = c.uvoo_bar;
-   f_speed_bar = c.f_speed_bar;
-   o_speed_bar = c.o_speed_bar;
+   uf_bar       = c.uf_bar;
+   vf_bar       = c.vf_bar;
+   uo_bar       = c.uo_bar;
+   vo_bar       = c.vo_bar;
+   uvfo_bar     = c.uvfo_bar;
+   uvff_bar     = c.uvff_bar;
+   uvoo_bar     = c.uvoo_bar;
+   f_speed_bar  = c.f_speed_bar;
+   o_speed_bar  = c.o_speed_bar;
+   dir_bar      = c.dir_bar;
+   absdir_bar   = c.absdir_bar;
+   dir2_bar     = c.dir2_bar;
 
-   f_bar       = c.f_bar;
-   o_bar       = c.o_bar;
-   me          = c.me;
-   mse         = c.mse;
-   speed_bias  = c.speed_bias;
-
-   vcount      = c.vcount;
+   vcount       = c.vcount;
 
    // VAL1L2 Quantities
    ufa_bar      = c.ufa_bar;
@@ -1536,6 +1546,9 @@ void VL1L2Info::assign(const VL1L2Info &c) {
    uvooa_bar    = c.uvooa_bar;
    fa_speed_bar = c.fa_speed_bar;
    oa_speed_bar = c.oa_speed_bar;
+   dira_bar     = c.dira_bar;
+   absdira_bar  = c.absdira_bar;
+   dira2_bar    = c.dira2_bar;
 
    vacount      = c.vacount;
 
@@ -1573,6 +1586,11 @@ void VL1L2Info::assign(const VL1L2Info &c) {
    ANOM_CORR = c.ANOM_CORR;
    ANOM_CORR_UNCNTR = c.ANOM_CORR_UNCNTR;
    
+   DIR_ME = c.DIR_ME;
+   DIR_MAE = c.DIR_MAE;
+   DIR_MSE = c.DIR_MSE;
+   DIR_RMSE = c.DIR_RMSE;
+
    return;
 }
 
@@ -1583,6 +1601,7 @@ void VL1L2Info::set(const PairDataPoint &pd_u_all,
    int i;
    double uf, vf, uo, vo, uc, vc, wgt, wgt_sum;
    double u_diff, v_diff;
+   double d_diff, dir_wgt_sum, dira_wgt_sum;
    PairDataPoint pd_u, pd_v;
 
    // Initialize
@@ -1608,6 +1627,10 @@ void VL1L2Info::set(const PairDataPoint &pd_u_all,
    // Get the sum of the weights
    wgt_sum = pd_u.wgt_na.sum();
 
+   // Initialize the wind direction difference weight sums
+   // to handle missing data
+   dir_wgt_sum = dira_wgt_sum = 0.0;
+
    // Loop through the filtered pair data compute partial sums
    for(i=0; i<pd_u.f_na.n(); i++) {
 
@@ -1625,28 +1648,32 @@ void VL1L2Info::set(const PairDataPoint &pd_u_all,
       wgt = pd_u.wgt_na[i]/wgt_sum;
 
       // VL1L2 sums
-      vcount      += 1;
+      vcount          += 1;
 
-      uf_bar      += wgt*uf;
-      vf_bar      += wgt*vf;
-      uo_bar      += wgt*uo;
-      vo_bar      += wgt*vo;
+      uf_bar          += wgt*uf;
+      vf_bar          += wgt*vf;
+      uo_bar          += wgt*uo;
+      vo_bar          += wgt*vo;
 
-      uvfo_bar    += wgt*(uf*uo + vf*vo);
-      uvff_bar    += wgt*(uf*uf + vf*vf);
-      uvoo_bar    += wgt*(uo*uo + vo*vo);
+      uvfo_bar        += wgt*(uf*uo + vf*vo);
+      uvff_bar        += wgt*(uf*uf + vf*vf);
+      uvoo_bar        += wgt*(uo*uo + vo*vo);
 
-      f_speed_bar += wgt*sqrt(uf*uf + vf*vf);
-      o_speed_bar += wgt*sqrt(uo*uo + vo*vo);
+      f_speed_bar     += wgt*sqrt(uf*uf + vf*vf);
+      o_speed_bar     += wgt*sqrt(uo*uo + vo*vo);
 
-      f_bar       += wgt*sqrt(uf*uf + vf*vf);
-      o_bar       += wgt*sqrt(uo*uo + vo*vo);
+      // Exclude undefined angle differences from the running sums
+      d_diff = angle_difference(uf, vf, uo, vo);
 
-      me          += wgt*sqrt(u_diff*u_diff + v_diff*v_diff);
-
-      mse         += wgt*(u_diff*u_diff + v_diff*v_diff);
-
-      speed_bias  += wgt*(sqrt(uf*uf + vf*vf) - sqrt(uo*uo + vo*vo));
+      if(is_bad_data(d_diff)) {
+         n_dir_undef  += 1;
+      } 
+      else {
+         dir_wgt_sum  += pd_u.wgt_na[i];
+         dir_bar      += pd_u.wgt_na[i]*d_diff;
+         absdir_bar   += pd_u.wgt_na[i]*abs(d_diff);
+         dir2_bar     += pd_u.wgt_na[i]*d_diff*d_diff;
+      }
 
       // VAL1L2 sums
       if(!is_bad_data(uc) && !is_bad_data(vc)) {
@@ -1663,13 +1690,40 @@ void VL1L2Info::set(const PairDataPoint &pd_u_all,
 
          fa_speed_bar += wgt*sqrt((uf-uc)*(uf-uc) + (vf-vc)*(vf-vc));
          oa_speed_bar += wgt*sqrt((uo-uc)*(uo-uc) + (vo-vc)*(vo-vc));
+
+         // Exclude undefined angle differences from the running sums
+         d_diff = angle_difference(uf-uc, vf-vc, uo-uc, vo-vc);
+
+         if(is_bad_data(d_diff)) {
+            n_dira_undef += 1;
+         }
+         else {
+            dira_wgt_sum += pd_u.wgt_na[i];
+            dira_bar     += pd_u.wgt_na[i]*d_diff;
+            absdira_bar  += pd_u.wgt_na[i]*abs(d_diff);
+            dira2_bar    += pd_u.wgt_na[i]*d_diff*d_diff;
+         }
       }
 
    }  // end for i
 
+   // Normalize wind direction differences
+   if(dir_wgt_sum > 0) {
+      dir_bar     /= dir_wgt_sum;
+      absdir_bar  /= dir_wgt_sum;
+      dir2_bar    /= dir_wgt_sum;
+   }
+
+   // Normalize anomalous wind direction differences
+   if(dira_wgt_sum > 0) {
+      dira_bar    /= dira_wgt_sum;
+      absdira_bar /= dira_wgt_sum;
+      dira2_bar   /= dira_wgt_sum;
+   }
+
    if(vcount > 0) compute_stats();
 
-   // Check for 0 points
+   // Check for zero points
    if(vcount == 0) {
 
       uf_bar             = bad_data_double;
@@ -1681,11 +1735,9 @@ void VL1L2Info::set(const PairDataPoint &pd_u_all,
       uvoo_bar           = bad_data_double;
       f_speed_bar        = bad_data_double;
       o_speed_bar        = bad_data_double;
-
-      me                 = bad_data_double;
-      mse                = bad_data_double;
-      rmse               = bad_data_double;
-      speed_bias         = bad_data_double;
+      dir_bar            = bad_data_double;
+      absdir_bar         = bad_data_double;
+      dir2_bar           = bad_data_double;
 
       FBAR.v             = bad_data_double;
       OBAR.v             = bad_data_double;
@@ -1716,9 +1768,11 @@ void VL1L2Info::set(const PairDataPoint &pd_u_all,
 
       ANOM_CORR.v        = bad_data_double;
       ANOM_CORR_UNCNTR.v = bad_data_double;
-   }
-   else {
-      rmse = sqrt(mse);
+
+      DIR_ME.v           = bad_data_double;
+      DIR_MAE.v          = bad_data_double;
+      DIR_MSE.v          = bad_data_double;
+      DIR_RMSE.v         = bad_data_double;
    }
 
    if(vacount == 0) {
@@ -1731,6 +1785,9 @@ void VL1L2Info::set(const PairDataPoint &pd_u_all,
       uvooa_bar    = bad_data_double;
       fa_speed_bar = bad_data_double;
       oa_speed_bar = bad_data_double;
+      dira_bar     = bad_data_double;
+      absdira_bar  = bad_data_double;
+      dira2_bar    = bad_data_double;
    }
 
    return;
@@ -1772,6 +1829,10 @@ void VL1L2Info::allocate_n_alpha(int i) {
       DIR_ABSERR.allocate_n_alpha(n_alpha);
       ANOM_CORR.allocate_n_alpha(n_alpha);
       ANOM_CORR_UNCNTR.allocate_n_alpha(n_alpha);
+      DIR_ME.allocate_n_alpha(n_alpha);
+      DIR_MAE.allocate_n_alpha(n_alpha);
+      DIR_MSE.allocate_n_alpha(n_alpha);
+      DIR_RMSE.allocate_n_alpha(n_alpha);
    }  
    
    return;
@@ -1820,6 +1881,20 @@ void VL1L2Info::compute_stats() {
                               uf_bar*uo_bar + vf_bar*vo_bar);
 
       DIR_ABSERR.v   = fabs(DIR_ERR.v);
+ 
+      // Print undefined wind direction warning message
+      if(n_dir_undef > 0) {
+         mlog << Warning << "\nVL1L2Info::compute_stats() -> "
+              << "Skipping " << n_dir_undef << " of " << vcount
+              << " vector pairs for which the direction difference is undefined.\n"
+              << "Set the \"wind_thresh\" and \"wind_logic\" configuration options "
+              << "to exclude zero vectors.\n\n";
+      }
+
+      DIR_ME.v       = dir_bar;
+      DIR_MAE.v      = absdir_bar;
+      DIR_MSE.v      = dir2_bar;
+      DIR_RMSE.v     = sqrt(dir2_bar);
    }
 
    if(vacount > 0) {
@@ -1837,6 +1912,15 @@ void VL1L2Info::compute_stats() {
       }
 
       ANOM_CORR_UNCNTR.v = compute_anom_corr_uncntr(uvffa_bar, uvooa_bar, uvfoa_bar);
+
+      // Print undefined wind direction warning message
+      if(n_dira_undef > 0) {
+         mlog << Warning << "\nVL1L2Info::compute_stats() -> "
+              << "Skipping " << n_dira_undef << " of " << vacount
+              << " anomaly vector pairs for which the direction difference is undefined.\n"
+              << "Set the \"wind_thresh\" and \"wind_logic\" configuration options "
+              << "to exclude zero vectors.\n\n";
+      }
    }
 
    // Compute parametric confidence intervals
@@ -1932,6 +2016,10 @@ double VL1L2Info::get_stat(const char *stat_name) {
    else if(strcmp(stat_name, "DIR_ABSERR"      ) == 0) v = DIR_ABSERR.v;
    else if(strcmp(stat_name, "ANOM_CORR"       ) == 0) v = ANOM_CORR.v;
    else if(strcmp(stat_name, "ANOM_CORR_UNCNTR") == 0) v = ANOM_CORR_UNCNTR.v;
+   else if(strcmp(stat_name, "DIR_ME"          ) == 0) v = DIR_ME.v;
+   else if(strcmp(stat_name, "DIR_MAE"         ) == 0) v = DIR_MAE.v;
+   else if(strcmp(stat_name, "DIR_MSE"         ) == 0) v = DIR_MSE.v;
+   else if(strcmp(stat_name, "DIR_RMSE"        ) == 0) v = DIR_RMSE.v;
    else {
       mlog << Error << "\nVL1L2Info::get_stat() -> "
            << "unknown continuous statistic name \"" << stat_name
@@ -1939,7 +2027,7 @@ double VL1L2Info::get_stat(const char *stat_name) {
       exit(1);
    }
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1971,11 +2059,11 @@ NBRCTSInfo::NBRCTSInfo(const NBRCTSInfo &c) {
 
 NBRCTSInfo & NBRCTSInfo::operator=(const NBRCTSInfo &c) {
 
-   if(this == &c) return(*this);
+   if(this == &c) return *this;
 
    assign(c);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2053,11 +2141,11 @@ NBRCNTInfo::NBRCNTInfo(const NBRCNTInfo &c) {
 
 NBRCNTInfo & NBRCNTInfo::operator=(const NBRCNTInfo &c) {
 
-   if(this == &c) return(*this);
+   if(this == &c) return *this;
 
    assign(c);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2126,14 +2214,14 @@ NBRCNTInfo & NBRCNTInfo::operator+=(const NBRCNTInfo &c) {
 
    assign(n_info);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void NBRCNTInfo::init_from_scratch() {
 
-   alpha = (double *) 0;
+   alpha = (double *) nullptr;
 
    clear();
 
@@ -2145,7 +2233,7 @@ void NBRCNTInfo::init_from_scratch() {
 void NBRCNTInfo::clear() {
 
    n_alpha = 0;
-   if(alpha) { delete [] alpha; alpha = (double *) 0; }
+   if(alpha) { delete [] alpha; alpha = (double *) nullptr; }
 
    fthresh.clear();
    othresh.clear();
@@ -2266,21 +2354,21 @@ ISCInfo::ISCInfo(const ISCInfo &c) {
 
 ISCInfo & ISCInfo::operator=(const ISCInfo &c) {
 
-   if(this == &c) return(*this);
+   if(this == &c) return *this;
 
    assign(c);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void ISCInfo::init_from_scratch() {
 
-   mse_scale = (double *) 0;
-   isc_scale = (double *) 0;
-   fen_scale = (double *) 0;
-   oen_scale = (double *) 0;
+   mse_scale = (double *) nullptr;
+   isc_scale = (double *) nullptr;
+   fen_scale = (double *) nullptr;
+   oen_scale = (double *) nullptr;
 
    clear();
 
@@ -2306,10 +2394,10 @@ void ISCInfo::clear() {
    n_scale  = 0;
    total    = 0;
 
-   if(mse_scale) { delete [] mse_scale; mse_scale = (double *) 0; }
-   if(isc_scale) { delete [] isc_scale; isc_scale = (double *) 0; }
-   if(fen_scale) { delete [] fen_scale; fen_scale = (double *) 0; }
-   if(oen_scale) { delete [] oen_scale; oen_scale = (double *) 0; }
+   if(mse_scale) { delete [] mse_scale; mse_scale = (double *) nullptr; }
+   if(isc_scale) { delete [] isc_scale; isc_scale = (double *) nullptr; }
+   if(fen_scale) { delete [] fen_scale; fen_scale = (double *) nullptr; }
+   if(oen_scale) { delete [] oen_scale; oen_scale = (double *) nullptr; }
 
    return;
 }
@@ -2508,18 +2596,18 @@ PCTInfo::PCTInfo(const PCTInfo &c) {
 
 PCTInfo & PCTInfo::operator=(const PCTInfo &c) {
 
-   if(this == &c) return(*this);
+   if(this == &c) return *this;
 
    assign(c);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void PCTInfo::init_from_scratch() {
 
-   alpha = (double *) 0;
+   alpha = (double *) nullptr;
 
    clear();
 
@@ -2531,7 +2619,7 @@ void PCTInfo::init_from_scratch() {
 void PCTInfo::clear() {
 
    n_alpha = 0;
-   if(alpha) { delete [] alpha; alpha = (double *) 0; }
+   if(alpha) { delete [] alpha; alpha = (double *) nullptr; }
 
    pct.zero_out();
    climo_pct.zero_out();
@@ -2720,11 +2808,11 @@ GRADInfo::GRADInfo(const GRADInfo &c) {
 
 GRADInfo & GRADInfo::operator=(const GRADInfo &c) {
 
-   if(this == &c) return(*this);
+   if(this == &c) return *this;
 
    assign(c);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2753,7 +2841,7 @@ GRADInfo & GRADInfo::operator+=(const GRADInfo &c) {
 
    assign(g_info);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2809,7 +2897,7 @@ double GRADInfo::s1() const {
       v = 100.0 * egbar / mgbar;
    }
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2824,7 +2912,7 @@ double GRADInfo::s1_og() const {
       v = 100.0 * egbar / ogbar;
    }
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2839,7 +2927,7 @@ double GRADInfo::fgog_ratio() const {
       v = fgbar / ogbar;
    }
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2935,11 +3023,11 @@ DMAPInfo::DMAPInfo(const DMAPInfo &c) {
 
 DMAPInfo & DMAPInfo::operator=(const DMAPInfo &c) {
 
-   if(this == &c) return(*this);
+   if(this == &c) return *this;
 
    assign(c);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -3036,7 +3124,7 @@ double DMAPInfo::fbias() const {
    if(oy == 0) v = bad_data_double;
    else        v = (double) fy / oy;
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -3268,7 +3356,7 @@ int parse_message_type(const char *msg_typ_str, char **&msg_typ_arr) {
    n = num_tokens(msg_typ_str, " ");
 
    // Check for no tokens in string
-   if(n == 0) return(0);
+   if(n == 0) return 0;
 
    // Allocate space for the list of tokens
    msg_typ_arr = new char * [n];
@@ -3285,7 +3373,7 @@ int parse_message_type(const char *msg_typ_str, char **&msg_typ_arr) {
       msg_typ_arr[i] = m_strcpy2(c, method_name, a_var_name);
    }
 
-   return(n);
+   return n;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -3301,7 +3389,7 @@ int parse_dbl_list(const char *dbl_str, double *&dbl_arr) {
    n = num_tokens(dbl_str, " ");
 
    // Check for no tokens in string
-   if(n == 0) return(0);
+   if(n == 0) return 0;
 
    // Allocate space for the list of tokens
    dbl_arr = new double [n];
@@ -3312,7 +3400,7 @@ int parse_dbl_list(const char *dbl_str, double *&dbl_arr) {
    // Tokenize the string and store the double values
    for(int i=0; i<n; i++) dbl_arr[i] = atof(strtok_r(tmp_str, " ", &temp_ptr));
 
-   return(n);
+   return n;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -3328,7 +3416,7 @@ int parse_int_list(const char *int_str, int *&int_arr) {
    n = num_tokens(int_str, " ");
 
    // Check for no tokens in string
-   if(n == 0) return(0);
+   if(n == 0) return 0;
 
    // Allocate space for the list of tokens
    int_arr = new int [n];
@@ -3339,7 +3427,7 @@ int parse_int_list(const char *int_str, int *&int_arr) {
    // Tokenize the string and store the integer values
    for(int i=0; i<n; i++) int_arr[i] = nint(atof(strtok_r(tmp_str, " ", &temp_ptr)));
 
-   return(n);
+   return n;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -3347,12 +3435,12 @@ int parse_int_list(const char *int_str, int *&int_arr) {
 int max_int(const int *v_int, int n) {
    int i, v_max;
 
-   if(n <= 0) return(0);
+   if(n <= 0) return 0;
 
    v_max = v_int[0];
    for(i=1; i<n; i++) if(v_int[i] > v_max) v_max = v_int[i];
 
-   return(v_max);
+   return v_max;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -3360,12 +3448,31 @@ int max_int(const int *v_int, int n) {
 int min_int(const int *v_int, int n) {
    int i, v_min;
 
-   if(n <= 0) return(0);
+   if(n <= 0) return 0;
 
    v_min = v_int[0];
    for(i=1; i<n; i++) if(v_int[i] < v_min) v_min = v_int[i];
 
-   return(v_min);
+   return v_min;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Compute mean from a sum
+//
+////////////////////////////////////////////////////////////////////////
+
+double compute_mean(double sum, int n) {
+   double v;
+
+   if(is_bad_data(sum) || is_bad_data(n) || n == 0) {
+      v = bad_data_double;
+   }
+   else {
+      v = sum / n;
+   }
+
+   return(v);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -3387,7 +3494,7 @@ double compute_variance(double sum, double sum_sq, int n) {
       else if(v < 0)         v = bad_data_double;
    }
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -3424,7 +3531,7 @@ double compute_corr(double f, double o, double ff, double oo, double fo,
       else if(c < -1) c = -1.0;
    }
 
-   return(c);
+   return c;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -3451,7 +3558,7 @@ double compute_anom_corr_uncntr(double ffa, double ooa, double foa) {
       else if(c < -1) c = -1.0;
    }
 
-   return(c);
+   return c;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -3472,7 +3579,7 @@ double compute_afss(double f_rate, double o_rate) {
       afss = num/den;
    }
 
-   return(afss);
+   return afss;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -3500,7 +3607,7 @@ double compute_ufss(double o_rate) {
 int compute_rank(const DataPlane &dp, DataPlane &dp_rank, double *data_rank, int &ties) {
    int x, y, n, i;
    double *data = (double *) 0, v;
-   int *data_loc = (int *) 0;
+   int *data_loc = (int *) nullptr;
 
    // Arrays to store the raw data values to be ranked, their locations,
    // and their computed ranks.  The ranks are stored as doubles since
@@ -3536,10 +3643,10 @@ int compute_rank(const DataPlane &dp, DataPlane &dp_rank, double *data_rank, int
    }
 
    // Deallocate memory
-   if(data)      { delete [] data;      data = (double *) 0;  }
-   if(data_loc)  { delete [] data_loc;  data_loc = (int *) 0; }
+   if(data)      { delete [] data;      data = (double *) nullptr;  }
+   if(data_loc)  { delete [] data_loc;  data_loc = (int *) nullptr; }
 
-   return(n);
+   return n;
 }
 
 ////////////////////////////////////////////////////////////////////////

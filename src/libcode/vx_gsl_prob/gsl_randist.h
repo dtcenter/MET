@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -23,14 +23,14 @@
 // Enumeration for distribution types
 //
 
-enum DistType {
-   DistType_None,        // No distribution
-   DistType_Normal,      // Normal distribution
-   DistType_Exponential, // Exponential distribution
-   DistType_ChiSquared,  // Chi-Squared distribution
-   DistType_Gamma,       // Gamma distribution
-   DistType_Uniform,     // Uniform distribution
-   DistType_Beta         // Beta distribution
+enum class DistType {
+   None,        // No distribution
+   Normal,      // Normal distribution
+   Exponential, // Exponential distribution
+   ChiSquared,  // Chi-Squared distribution
+   Gamma,       // Gamma distribution
+   Uniform,     // Uniform distribution
+   Beta         // Beta distribution
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -58,9 +58,9 @@ extern void ran_sample(const gsl_rng *r, double *, int, double *, int);
 extern void ran_sample(const gsl_rng *r, NumArray &, NumArray &, int);
 
 extern double ran_draw(const gsl_rng *r, DistType,
-                       double p1, double p2 = bad_data_int);
+                       double p1, double p2 = bad_data_double);
 extern double dist_var(DistType,
-                       double p1, double p2 = bad_data_int);
+                       double p1, double p2 = bad_data_double);
 
 ////////////////////////////////////////////////////////////////////////
 

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -27,13 +27,13 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-enum ModeObjectField {
+enum class ModeObjectField {
 
-   mof_fcst_obj, 
-   mof_fcst_clus, 
+   fcst_obj, 
+   fcst_clus, 
 
-   mof_obs_obj, 
-   mof_obs_clus, 
+   obs_obj, 
+   obs_clus, 
 
 };
 

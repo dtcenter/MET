@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -10,8 +10,6 @@
 
 //////////////////////////////////////////////////////////////////////////////////
 
-
-using namespace std;
 
 #include <iostream>
 #include <unistd.h>
@@ -24,6 +22,8 @@ using namespace std;
 #include "vx_log.h"
 #include "copy_bytes.h"
 #include "do_unblocking.h"
+
+using namespace std;
 
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -80,17 +80,17 @@ int n_read, bytes;
 int value;
 unsigned int I;
 unsigned long long L;
-unsigned char * b = (unsigned char *) 0;
+unsigned char * b = (unsigned char *) nullptr;
 
 
 switch ( padsize )  {
 
-   case padsize_4:
+   case PadSize::size_4:
       bytes = 4;
       b = (unsigned char *) (&I);
       break;
 
-   case padsize_8:
+   case PadSize::size_8:
       bytes = 8;
       b = (unsigned char *) (&L);
       break;
@@ -105,7 +105,7 @@ switch ( padsize )  {
 
 n_read = read(fd, b, bytes);
 
-if ( n_read == 0 )  return ( 0 );
+if ( n_read == 0 )  return 0;
 
 if ( (n_read < 0) || ((n_read > 0) && (n_read != bytes)) )  {
 
@@ -119,11 +119,11 @@ if ( (n_read < 0) || ((n_read > 0) && (n_read != bytes)) )  {
 
 switch ( padsize )  {
 
-   case padsize_4:
+   case PadSize::size_4:
       value = I;
       break;
 
-   case padsize_8:
+   case PadSize::size_8:
       value = (int) L;
       break;
 
@@ -138,7 +138,7 @@ switch ( padsize )  {
    //  done
    //
 
-return ( value );
+return value;
 
 }
 

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -70,7 +70,7 @@ static StringArray files;
 
 // Output file set with -out
 static ConcatString    out_file;
-static std::ofstream   *sa_out   = (std::ofstream *) 0;
+static std::ofstream   *sa_out   = (std::ofstream *) nullptr;
 
 // Config file set with -config
 static ConcatString config_file;

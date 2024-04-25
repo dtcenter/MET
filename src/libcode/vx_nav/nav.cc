@@ -1,13 +1,10 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-
-
-using namespace std;
 
 
 //////////////////////////////////////////////////////////////////
@@ -18,6 +15,9 @@ using namespace std;
 
 #include "vx_math.h"
 #include "nav.h"
+
+
+using namespace std;
 
 
 //////////////////////////////////////////////////////////////////
@@ -82,7 +82,7 @@ x = haversine(dp) + cos(lat1_radians)*cos(lat2_radians)*haversine(dl);
 
 x = earth_radius_km*ahaversine(x);
 
-return ( x );
+return x;
 
 }
 
@@ -132,7 +132,7 @@ double ahaversine(double t)
 
 double a = 2.0*asin(sqrt(t));
 
-return ( a );
+return a;
 
 }
 
@@ -164,7 +164,7 @@ if ( fabs(lat1 - lat2) < 0.0001 )  {
    d = earth_radius_km*cosd(lat1)*(lon1 - lon2) * rad_per_deg;
 //   d = earth_radius_km*cos(lat1/cf)*((lon1 - lon2)/cf);
 
-   return ( fabs(d) );
+   return fabs(d);
 
 }
 
@@ -173,7 +173,7 @@ beta = rl_bearing(lat1, lon1, lat2, lon2);
 d = earth_radius_km*( rad_per_deg * (lat1 - lat2)/cosd(beta) );
 //d = earth_radius_km*( ((lat1 - lat2)/cf)/cos(beta/cf) );
 
-return ( fabs(d) );
+return fabs(d);
 
 }
 
@@ -207,7 +207,7 @@ mp2 = meridional_parts(lat2);
 beta = atan2d( rad_per_deg * (lon1 - lon2), mp2 - mp1);
 //beta = cf*atan2((lon1 - lon2)/cf, mp2 - mp1);
 
-return ( beta );
+return beta;
 
 }
 
@@ -233,7 +233,7 @@ double meridional_parts(double a)
 a = a * rad_per_deg;
 //a /= cf;
 
-return ( log(tan(piover4 + (0.5*a))) );
+return log(tan(piover4 + (0.5*a)));
 
 }
 
@@ -276,7 +276,7 @@ y = cosd(lat2)*sind(dl);
 beta = atan2d(y, x);
 //beta = cf*atan2(y, x);
 
-return ( beta );
+return beta;
 
 }
 
@@ -580,7 +580,7 @@ double gc_dist_to_line(double lat1, double lon1,
                  gc_dist(lat2, lon2, lat3, lon3));
    }
    
-   return(dist);  
+   return dist;
 }
 
 //////////////////////////////////////////////////////////////////
@@ -592,7 +592,7 @@ Vector3D latlon_to_xyz(double lat, double lon) {
    v.y = cosd(lat) * sind(lon) * earth_radius_km;
    v.z = sind(lat) * earth_radius_km;
    
-   return(v);
+   return v;
 }
 
 //////////////////////////////////////////////////////////////////
@@ -621,7 +621,7 @@ Vector3D cross_product(Vector3D v1, Vector3D v2) {
    v.y = v2.x*v1.z - v1.x*v2.z;
    v.z = v1.x*v2.y - v1.y*v2.x; 
    
-   return(v);
+   return v;
 }
 
 //////////////////////////////////////////////////////////////////

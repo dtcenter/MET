@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -7,8 +7,6 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 ////////////////////////////////////////////////////////////////////////
-
-using namespace std;
 
 #include <iostream>
 #include <unistd.h>
@@ -22,6 +20,8 @@ using namespace std;
 #include "vx_util.h"
 #include "vx_log.h"
 
+using namespace std;
+
 ////////////////////////////////////////////////////////////////////////
 
 const bool use_weighted_seeps = false;
@@ -29,7 +29,7 @@ const bool use_weighted_seeps = false;
 ////////////////////////////////////////////////////////////////////////
 
 void parse_row_col(const char *col_name, int &r, int &c) {
-   const char *ptr = (const char *) 0;
+   const char *ptr = (const char *) nullptr;
 
    // Parse Fi_Oj strings
    r = atoi(++col_name);
@@ -76,7 +76,7 @@ void close_txt_file(ofstream *&out, const char *file_name) {
    // Close the output file
    out->close();
    delete out;
-   out = (ofstream *) 0;
+   out = (ofstream *) nullptr;
 
    return;
 }
@@ -86,7 +86,7 @@ void close_txt_file(ofstream *&out, const char *file_name) {
 ConcatString append_climo_bin(const ConcatString &mask_name,
                               int i_bin, int n_bin) {
 
-   if(n_bin == 1) return(mask_name);
+   if(n_bin == 1) return mask_name;
 
    // Append the climo CDF bin number.
    ConcatString cs;
@@ -94,7 +94,7 @@ ConcatString append_climo_bin(const ConcatString &mask_name,
    if(i_bin == -1) cs << "MEAN";
    else            cs << i_bin+1;
 
-   return(cs);
+   return cs;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -536,7 +536,7 @@ void write_fho_row(StatHdrColumns &shc, const CTSInfo &cts_info,
    shc.set_obs_thresh(cts_info.othresh);
 
    // Not Applicable
-   shc.set_thresh_logic(SetLogic_None);
+   shc.set_thresh_logic(SetLogic::None);
    shc.set_alpha(bad_data_double);
    shc.set_cov_thresh(na_str);
 
@@ -547,7 +547,7 @@ void write_fho_row(StatHdrColumns &shc, const CTSInfo &cts_info,
    write_fho_cols(cts_info, stat_at, stat_row, n_header_columns);
 
    // If requested, copy row to the text file
-   if(out_type == STATOutputType_Both) {
+   if(out_type == STATOutputType::Both) {
       copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
       // Increment the text row counter
@@ -575,7 +575,7 @@ void write_ctc_row(StatHdrColumns &shc, const CTSInfo &cts_info,
    shc.set_obs_thresh(cts_info.othresh);
 
    // Not Applicable
-   shc.set_thresh_logic(SetLogic_None);
+   shc.set_thresh_logic(SetLogic::None);
    shc.set_alpha(bad_data_double);
    shc.set_cov_thresh(na_str);
 
@@ -586,7 +586,7 @@ void write_ctc_row(StatHdrColumns &shc, const CTSInfo &cts_info,
    write_ctc_cols(cts_info, stat_at, stat_row, n_header_columns);
 
    // If requested, copy row to the text file
-   if(out_type == STATOutputType_Both) {
+   if(out_type == STATOutputType::Both) {
       copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
       // Increment the text row counter
@@ -615,7 +615,7 @@ void write_cts_row(StatHdrColumns &shc, const CTSInfo &cts_info,
    shc.set_obs_thresh(cts_info.othresh);
 
    // Not Applicable
-   shc.set_thresh_logic(SetLogic_None);
+   shc.set_thresh_logic(SetLogic::None);
    shc.set_cov_thresh(na_str);
 
    // Write a line for each alpha value
@@ -631,7 +631,7 @@ void write_cts_row(StatHdrColumns &shc, const CTSInfo &cts_info,
       write_cts_cols(cts_info, i, stat_at, stat_row, n_header_columns);
 
       // If requested, copy row to the text file
-      if(out_type == STATOutputType_Both) {
+      if(out_type == STATOutputType::Both) {
          copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
          // Increment the text row counter
@@ -660,7 +660,7 @@ void write_mctc_row(StatHdrColumns &shc, const MCTSInfo &mcts_info,
    shc.set_obs_thresh(mcts_info.othresh);
 
    // Not Applicable
-   shc.set_thresh_logic(SetLogic_None);
+   shc.set_thresh_logic(SetLogic::None);
    shc.set_alpha(bad_data_double);
    shc.set_cov_thresh(na_str);
 
@@ -671,7 +671,7 @@ void write_mctc_row(StatHdrColumns &shc, const MCTSInfo &mcts_info,
    write_mctc_cols(mcts_info, stat_at, stat_row, n_header_columns);
 
    // If requested, copy row to the text file
-   if(out_type == STATOutputType_Both) {
+   if(out_type == STATOutputType::Both) {
       copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
       // Increment the text row counter
@@ -700,7 +700,7 @@ void write_mcts_row(StatHdrColumns &shc, const MCTSInfo &mcts_info,
    shc.set_obs_thresh(mcts_info.othresh);
 
    // Not Applicable
-   shc.set_thresh_logic(SetLogic_None);
+   shc.set_thresh_logic(SetLogic::None);
    shc.set_cov_thresh(na_str);
 
    // Write a line for each alpha value
@@ -716,7 +716,7 @@ void write_mcts_row(StatHdrColumns &shc, const MCTSInfo &mcts_info,
       write_mcts_cols(mcts_info, i, stat_at, stat_row, n_header_columns);
 
       // If requested, copy row to the text file
-      if(out_type == STATOutputType_Both) {
+      if(out_type == STATOutputType::Both) {
          copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
          // Increment the text row counter
@@ -767,7 +767,7 @@ void write_cnt_row(StatHdrColumns &shc, const CNTInfo &cnt_info,
       write_cnt_cols(cnt_info, i, stat_at, stat_row, n_header_columns);
 
       // If requested, copy row to the text file
-      if(out_type == STATOutputType_Both) {
+      if(out_type == STATOutputType::Both) {
          copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
          // Increment the text row counter
@@ -815,7 +815,7 @@ void write_sl1l2_row(StatHdrColumns &shc, const SL1L2Info &sl1l2_info,
    write_sl1l2_cols(sl1l2_info, stat_at, stat_row, n_header_columns);
 
    // If requested, copy row to the text file
-   if(out_type == STATOutputType_Both) {
+   if(out_type == STATOutputType::Both) {
       copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
       // Increment the text row counter
@@ -862,7 +862,7 @@ void write_sal1l2_row(StatHdrColumns &shc, const SL1L2Info &sl1l2_info,
    write_sal1l2_cols(sl1l2_info, stat_at, stat_row, n_header_columns);
 
    // If requested, copy row to the text file
-   if(out_type == STATOutputType_Both) {
+   if(out_type == STATOutputType::Both) {
       copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
       // Increment the text row counter
@@ -904,7 +904,7 @@ void write_vl1l2_row(StatHdrColumns &shc, const VL1L2Info &vl1l2_info,
    write_vl1l2_cols(vl1l2_info, stat_at, stat_row, n_header_columns);
 
    // If requested, copy row to the text file
-   if(out_type == STATOutputType_Both) {
+   if(out_type == STATOutputType::Both) {
       copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
       // Increment the text row counter
@@ -943,7 +943,7 @@ void write_val1l2_row(StatHdrColumns &shc, const VL1L2Info &vl1l2_info,
    write_val1l2_cols(vl1l2_info, stat_at, stat_row, n_header_columns);
 
    // If requested, copy row to the text file
-   if(out_type == STATOutputType_Both) {
+   if(out_type == STATOutputType::Both) {
       copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
       // Increment the text row counter
@@ -988,7 +988,7 @@ void write_vcnt_row(StatHdrColumns &shc, const VL1L2Info &vcnt_info,
       write_vcnt_cols(vcnt_info, i, stat_at, stat_row, n_header_columns);
 
       // If requested, copy row to the text file
-      if(out_type == STATOutputType_Both) {
+      if(out_type == STATOutputType::Both) {
          copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
          // Increment the text row counter
@@ -1019,7 +1019,7 @@ void write_pct_row(StatHdrColumns &shc, const PCTInfo &pct_info,
    if(update_thresh) {
       shc.set_fcst_thresh(pct_info.fthresh);
       shc.set_obs_thresh(pct_info.othresh);
-      shc.set_thresh_logic(SetLogic_None);
+      shc.set_thresh_logic(SetLogic::None);
       shc.set_cov_thresh(na_str);
    }
 
@@ -1037,7 +1037,7 @@ void write_pct_row(StatHdrColumns &shc, const PCTInfo &pct_info,
    write_pct_cols(pct_info, stat_at, stat_row, n_header_columns);
 
    // If requested, copy row to the text file
-   if(out_type == STATOutputType_Both) {
+   if(out_type == STATOutputType::Both) {
       copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
       // Increment the text row counter
@@ -1070,7 +1070,7 @@ void write_pstd_row(StatHdrColumns &shc, const PCTInfo &pct_info,
    if(update_thresh) {
       shc.set_fcst_thresh(pct_info.fthresh);
       shc.set_obs_thresh(pct_info.othresh);
-      shc.set_thresh_logic(SetLogic_None);
+      shc.set_thresh_logic(SetLogic::None);
       shc.set_cov_thresh(na_str);
    }
 
@@ -1091,7 +1091,7 @@ void write_pstd_row(StatHdrColumns &shc, const PCTInfo &pct_info,
       write_pstd_cols(pct_info, i, stat_at, stat_row, n_header_columns);
 
       // If requested, copy row to the text file
-      if(out_type == STATOutputType_Both) {
+      if(out_type == STATOutputType::Both) {
          copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
          // Increment the text row counter
@@ -1124,7 +1124,7 @@ void write_pjc_row(StatHdrColumns &shc, const PCTInfo &pct_info,
    if(update_thresh) {
       shc.set_fcst_thresh(pct_info.fthresh);
       shc.set_obs_thresh(pct_info.othresh);
-      shc.set_thresh_logic(SetLogic_None);
+      shc.set_thresh_logic(SetLogic::None);
       shc.set_cov_thresh(na_str);
    }
 
@@ -1142,7 +1142,7 @@ void write_pjc_row(StatHdrColumns &shc, const PCTInfo &pct_info,
    write_pjc_cols(pct_info, stat_at, stat_row, n_header_columns);
 
    // If requested, copy row to the text file
-   if(out_type == STATOutputType_Both) {
+   if(out_type == STATOutputType::Both) {
       copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
       // Increment the text row counter
@@ -1174,7 +1174,7 @@ void write_prc_row(StatHdrColumns &shc, const PCTInfo &pct_info,
    if(update_thresh) {
       shc.set_fcst_thresh(pct_info.fthresh);
       shc.set_obs_thresh(pct_info.othresh);
-      shc.set_thresh_logic(SetLogic_None);
+      shc.set_thresh_logic(SetLogic::None);
       shc.set_cov_thresh(na_str);
    }
 
@@ -1192,7 +1192,7 @@ void write_prc_row(StatHdrColumns &shc, const PCTInfo &pct_info,
    write_prc_cols(pct_info, stat_at, stat_row, n_header_columns);
 
    // If requested, copy row to the text file
-   if(out_type == STATOutputType_Both) {
+   if(out_type == STATOutputType::Both) {
       copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
       // Increment the text row counter
@@ -1223,7 +1223,7 @@ void write_eclv_row(StatHdrColumns &shc, const PCTInfo &pct_info,
 
    // Set the threshold columns, if requested.
    shc.set_obs_thresh(pct_info.othresh);
-   shc.set_thresh_logic(SetLogic_None);
+   shc.set_thresh_logic(SetLogic::None);
    shc.set_cov_thresh(na_str);
 
    // Not Applicable
@@ -1247,7 +1247,7 @@ void write_eclv_row(StatHdrColumns &shc, const PCTInfo &pct_info,
                       stat_at, stat_row, n_header_columns);
 
       // If requested, copy row to the text file
-      if(out_type == STATOutputType_Both) {
+      if(out_type == STATOutputType::Both) {
          copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
          // Increment the text row counter
@@ -1280,7 +1280,7 @@ void write_eclv_row(StatHdrColumns &shc, const CTSInfo &cts_info,
    shc.set_obs_thresh(cts_info.othresh);
 
    // Not Applicable
-   shc.set_thresh_logic(SetLogic_None);
+   shc.set_thresh_logic(SetLogic::None);
    shc.set_alpha(bad_data_double);
    shc.set_cov_thresh(na_str);
 
@@ -1292,7 +1292,7 @@ void write_eclv_row(StatHdrColumns &shc, const CTSInfo &cts_info,
                    stat_at, stat_row, n_header_columns);
 
    // If requested, copy row to the text file
-   if(out_type == STATOutputType_Both) {
+   if(out_type == STATOutputType::Both) {
       copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
       // Increment the text row counter
@@ -1323,7 +1323,7 @@ void write_nbrctc_row(StatHdrColumns &shc, const NBRCTSInfo &nbrcts_info,
    shc.set_cov_thresh(nbrcts_info.cthresh);
 
    // Not Applicable
-   shc.set_thresh_logic(SetLogic_None);
+   shc.set_thresh_logic(SetLogic::None);
    shc.set_alpha(bad_data_double);
 
    // Write the header columns
@@ -1333,7 +1333,7 @@ void write_nbrctc_row(StatHdrColumns &shc, const NBRCTSInfo &nbrcts_info,
    write_nbrctc_cols(nbrcts_info, stat_at, stat_row, n_header_columns);
 
    // If requested, copy row to the text file
-   if(out_type == STATOutputType_Both) {
+   if(out_type == STATOutputType::Both) {
       copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
       // Increment the text row counter
@@ -1365,7 +1365,7 @@ void write_nbrcts_row(StatHdrColumns &shc, const NBRCTSInfo &nbrcts_info,
    shc.set_cov_thresh(nbrcts_info.cthresh);
 
    // Not Applicable
-   shc.set_thresh_logic(SetLogic_None);
+   shc.set_thresh_logic(SetLogic::None);
 
    // Write a line for each alpha value
    for(i=0; i<nbrcts_info.cts_info.n_alpha; i++) {
@@ -1381,7 +1381,7 @@ void write_nbrcts_row(StatHdrColumns &shc, const NBRCTSInfo &nbrcts_info,
                         n_header_columns);
 
       // If requested, copy row to the text file
-      if(out_type == STATOutputType_Both) {
+      if(out_type == STATOutputType::Both) {
          copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
          // Increment the text row counter
@@ -1411,7 +1411,7 @@ void write_nbrcnt_row(StatHdrColumns &shc, const NBRCNTInfo &nbrcnt_info,
    shc.set_obs_thresh(nbrcnt_info.othresh);
 
    // Not applicable
-   shc.set_thresh_logic(SetLogic_None);
+   shc.set_thresh_logic(SetLogic::None);
    shc.set_cov_thresh(na_str);
 
    // Write a line for each alpha value
@@ -1428,7 +1428,7 @@ void write_nbrcnt_row(StatHdrColumns &shc, const NBRCNTInfo &nbrcnt_info,
                         n_header_columns);
 
       // If requested, copy row to the text file
-      if(out_type == STATOutputType_Both) {
+      if(out_type == STATOutputType::Both) {
          copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
          // Increment the text row counter
@@ -1455,7 +1455,7 @@ void write_grad_row(StatHdrColumns &shc, const GRADInfo &grad_info,
    // Not applicable
    shc.set_fcst_thresh(na_str);
    shc.set_obs_thresh(na_str);
-   shc.set_thresh_logic(SetLogic_None);
+   shc.set_thresh_logic(SetLogic::None);
    shc.set_cov_thresh(na_str);
    shc.set_alpha(bad_data_double);
 
@@ -1466,7 +1466,7 @@ void write_grad_row(StatHdrColumns &shc, const GRADInfo &grad_info,
    write_grad_cols(grad_info, stat_at, stat_row, n_header_columns);
 
    // If requested, copy row to the text file
-   if(out_type == STATOutputType_Both) {
+   if(out_type == STATOutputType::Both) {
       copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
       // Increment the text row counter
@@ -1494,7 +1494,7 @@ void write_dmap_row(StatHdrColumns &shc, const DMAPInfo &dmap_info,
    shc.set_obs_thresh(dmap_info.othresh);
 
    // Not Applicable
-   shc.set_thresh_logic(SetLogic_None);
+   shc.set_thresh_logic(SetLogic::None);
    shc.set_alpha(bad_data_double);
    shc.set_cov_thresh(na_str);
 
@@ -1505,7 +1505,7 @@ void write_dmap_row(StatHdrColumns &shc, const DMAPInfo &dmap_info,
    write_dmap_cols(dmap_info, stat_at, stat_row, n_header_columns);
 
    // If requested, copy row to the text file
-   if(out_type == STATOutputType_Both) {
+   if(out_type == STATOutputType::Both) {
       copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
       // Increment the text row counter
@@ -1534,7 +1534,7 @@ void write_mpr_row(StatHdrColumns &shc, const PairDataPoint *pd_ptr,
    if(update_thresh) {
       shc.set_fcst_thresh(na_str);
       shc.set_obs_thresh(na_str);
-      shc.set_thresh_logic(SetLogic_None);
+      shc.set_thresh_logic(SetLogic::None);
       shc.set_cov_thresh(na_str);
    }
 
@@ -1555,7 +1555,7 @@ void write_mpr_row(StatHdrColumns &shc, const PairDataPoint *pd_ptr,
       write_mpr_cols(pd_ptr, i, stat_at, stat_row, n_header_columns);
 
       // If requested, copy row to the text file
-      if(out_type == STATOutputType_Both) {
+      if(out_type == STATOutputType::Both) {
          copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
          // Increment the text row counter
@@ -1585,7 +1585,7 @@ void write_seeps_row(StatHdrColumns &shc, const SeepsAggScore *seeps,
    if(update_thresh) {
       shc.set_fcst_thresh(na_str);
       shc.set_obs_thresh(na_str);
-      shc.set_thresh_logic(SetLogic_None);
+      shc.set_thresh_logic(SetLogic::None);
       shc.set_cov_thresh(na_str);
    }
 
@@ -1602,7 +1602,7 @@ void write_seeps_row(StatHdrColumns &shc, const SeepsAggScore *seeps,
       write_seeps_cols(seeps, stat_at, stat_row, n_header_columns);
 
       // If requested, copy row to the text file
-      if(out_type == STATOutputType_Both) {
+      if(out_type == STATOutputType::Both) {
          copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
          // Increment the text row counter
@@ -1631,7 +1631,7 @@ void write_seeps_mpr_row(StatHdrColumns &shc, const PairDataPoint *pd_ptr,
    if(update_thresh) {
       shc.set_fcst_thresh(na_str);
       shc.set_obs_thresh(na_str);
-      shc.set_thresh_logic(SetLogic_None);
+      shc.set_thresh_logic(SetLogic::None);
       shc.set_cov_thresh(na_str);
    }
 
@@ -1656,7 +1656,7 @@ void write_seeps_mpr_row(StatHdrColumns &shc, const PairDataPoint *pd_ptr,
       write_seeps_mpr_cols(pd_ptr, i, stat_at, stat_row, n_header_columns);
 
       // If requested, copy row to the text file
-      if(out_type == STATOutputType_Both) {
+      if(out_type == STATOutputType::Both) {
          copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
          // Increment the text row counter
@@ -1682,8 +1682,8 @@ void write_isc_row(StatHdrColumns &shc, const ISCInfo &isc_info,
    shc.set_line_type(stat_isc_str);
 
    // Not Applicable
-   shc.set_interp_mthd(InterpMthd_None,
-                       GridTemplateFactory::GridTemplate_None);
+   shc.set_interp_mthd(InterpMthd::None,
+                       GridTemplateFactory::GridTemplates::None);
    shc.set_interp_wdth(bad_data_int);
    shc.set_cov_thresh(na_str);
    shc.set_alpha(bad_data_double);
@@ -1699,7 +1699,7 @@ void write_isc_row(StatHdrColumns &shc, const ISCInfo &isc_info,
       write_isc_cols(isc_info, i, stat_at, stat_row, n_header_columns);
 
       // If requested, copy row to the text file
-      if(out_type == STATOutputType_Both) {
+      if(out_type == STATOutputType::Both) {
          copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
          // Increment the text row counter
@@ -1728,7 +1728,7 @@ void write_ecnt_row(StatHdrColumns &shc, const ECNTInfo &ecnt_info,
 
    // Not Applicable
    shc.set_fcst_thresh(na_str);
-   shc.set_thresh_logic(SetLogic_None);
+   shc.set_thresh_logic(SetLogic::None);
    shc.set_cov_thresh(na_str);
    shc.set_alpha(bad_data_double);
 
@@ -1739,7 +1739,7 @@ void write_ecnt_row(StatHdrColumns &shc, const ECNTInfo &ecnt_info,
    write_ecnt_cols(ecnt_info, stat_at, stat_row, n_header_columns);
 
    // If requested, copy row to the text file
-   if(out_type == STATOutputType_Both) {
+   if(out_type == STATOutputType::Both) {
       copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
       // Increment the text row counter
@@ -1768,7 +1768,7 @@ void write_rps_row(StatHdrColumns &shc, const RPSInfo &rps_info,
    shc.set_obs_thresh(rps_info.othresh);
 
    // Not Applicable
-   shc.set_thresh_logic(SetLogic_None);
+   shc.set_thresh_logic(SetLogic::None);
    shc.set_cov_thresh(na_str);
    shc.set_alpha(bad_data_double);
 
@@ -1779,7 +1779,7 @@ void write_rps_row(StatHdrColumns &shc, const RPSInfo &rps_info,
    write_rps_cols(rps_info, stat_at, stat_row, n_header_columns);
 
    // If requested, copy row to the text file
-   if(out_type == STATOutputType_Both) {
+   if(out_type == STATOutputType::Both) {
       copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
       // Increment the text row counter
@@ -1808,7 +1808,7 @@ void write_rhist_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
 
    // Not Applicable
    shc.set_fcst_thresh(na_str);
-   shc.set_thresh_logic(SetLogic_None);
+   shc.set_thresh_logic(SetLogic::None);
    shc.set_cov_thresh(na_str);
    shc.set_alpha(bad_data_double);
 
@@ -1819,7 +1819,7 @@ void write_rhist_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
    write_rhist_cols(pd_ptr, stat_at, stat_row, n_header_columns);
 
    // If requested, copy row to the text file
-   if(out_type == STATOutputType_Both) {
+   if(out_type == STATOutputType::Both) {
       copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
       // Increment the text row counter
@@ -1848,7 +1848,7 @@ void write_phist_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
 
    // Not Applicable
    shc.set_fcst_thresh(na_str);
-   shc.set_thresh_logic(SetLogic_None);
+   shc.set_thresh_logic(SetLogic::None);
    shc.set_cov_thresh(na_str);
    shc.set_alpha(bad_data_double);
 
@@ -1859,7 +1859,7 @@ void write_phist_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
    write_phist_cols(pd_ptr, stat_at, stat_row, n_header_columns);
 
    // If requested, copy row to the text file
-   if(out_type == STATOutputType_Both) {
+   if(out_type == STATOutputType::Both) {
       copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
       // Increment the text row counter
@@ -1885,7 +1885,7 @@ void write_orank_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
 
    // Not Applicable
    shc.set_fcst_thresh(na_str);
-   shc.set_thresh_logic(SetLogic_None);
+   shc.set_thresh_logic(SetLogic::None);
    shc.set_cov_thresh(na_str);
    shc.set_alpha(bad_data_double);
 
@@ -1903,7 +1903,7 @@ void write_orank_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
       write_orank_cols(pd_ptr, i, stat_at, stat_row, n_header_columns);
 
       // If requested, copy row to the text file
-      if(out_type == STATOutputType_Both) {
+      if(out_type == STATOutputType::Both) {
          copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
          // Increment the text row counter
@@ -1930,7 +1930,7 @@ void write_ssvar_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
 
    // Not Applicable
    shc.set_fcst_thresh(na_str);
-   shc.set_thresh_logic(SetLogic_None);
+   shc.set_thresh_logic(SetLogic::None);
    shc.set_cov_thresh(na_str);
 
    // Alpha value
@@ -1947,7 +1947,7 @@ void write_ssvar_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
                        stat_at, stat_row, n_header_columns);
 
       // If requested, copy row to the text file
-      if(out_type == STATOutputType_Both) {
+      if(out_type == STATOutputType::Both) {
          copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
          // Increment the text row counter
@@ -1978,7 +1978,7 @@ void write_relp_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
 
    // Not Applicable
    shc.set_fcst_thresh(na_str);
-   shc.set_thresh_logic(SetLogic_None);
+   shc.set_thresh_logic(SetLogic::None);
    shc.set_cov_thresh(na_str);
    shc.set_alpha(bad_data_double);
 
@@ -1989,7 +1989,7 @@ void write_relp_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
    write_relp_cols(pd_ptr, stat_at, stat_row, n_header_columns);
 
    // If requested, copy row to the text file
-   if(out_type == STATOutputType_Both) {
+   if(out_type == STATOutputType::Both) {
       copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
       // Increment the text row counter
@@ -2901,7 +2901,8 @@ void write_sl1l2_cols(const SL1L2Info &sl1l2_info,
    // Scalar L1L2 Line Type (SL1L2)
    // Dump out the SL1L2 line:
    //    TOTAL,       FBAR,        OBAR,
-   //    FOBAR,       FFBAR,       OOBAR
+   //    FOBAR,       FFBAR,       OOBAR,
+   //    MAE
    //
    at.set_entry(r, c+0,  // Total Count
       sl1l2_info.scount);
@@ -2974,7 +2975,8 @@ void write_vl1l2_cols(const VL1L2Info &vl1l2_info,
    //    TOTAL,       UFBAR,       VFBAR,
    //    UOBAR,       VOBAR,       UVFOBAR,
    //    UVFFBAR,     UVOOBAR      F_SPEED_BAR,
-   //    O_SPEED_BAR,
+   //    O_SPEED_BAR, DIR_ME,      DIR_MAE,
+   //    DIR_MSE
    //
 
    at.set_entry(r, c+0,  // Total Count
@@ -3007,6 +3009,15 @@ void write_vl1l2_cols(const VL1L2Info &vl1l2_info,
    at.set_entry(r, c+9,  // O_SPEED_BAR
       vl1l2_info.o_speed_bar);
 
+   at.set_entry(r, c+10, // DIR_ME
+      vl1l2_info.dir_bar);
+
+   at.set_entry(r, c+11, // DIR_MAE
+      vl1l2_info.absdir_bar);
+
+   at.set_entry(r, c+12, // DIR_MSE
+      vl1l2_info.dir2_bar);
+
    return;
 }
 
@@ -3018,10 +3029,11 @@ void write_val1l2_cols(const VL1L2Info &vl1l2_info,
    //
    // Vector Anomaly L1L2 Line Type (VAL1L2)
    // Dump out the VAL1L2 line:
-   //    TOTAL,       UFABAR,      VFABAR,
-   //    UOABAR,      VOABAR,      UVFOABAR,
-   //    UVFFABAR,    UVOOABAR,    FA_SPEED_BAR,
-   //    OA_SPEED_BAR
+   //    TOTAL,        UFABAR,      VFABAR,
+   //    UOABAR,       VOABAR,      UVFOABAR,
+   //    UVFFABAR,     UVOOABAR,    FA_SPEED_BAR,
+   //    OA_SPEED_BAR, DIRA_ME,     DIRA_MAE,
+   //    DIRA_MSE
    //
 
    at.set_entry(r, c+0,  // Total Anomaly Count
@@ -3054,6 +3066,15 @@ void write_val1l2_cols(const VL1L2Info &vl1l2_info,
    at.set_entry(r, c+9,  // OA_SPEED_BAR
       vl1l2_info.oa_speed_bar);
 
+   at.set_entry(r, c+10, // DIRA_ME
+      vl1l2_info.dira_bar);
+
+   at.set_entry(r, c+11, // DIRA_MAE
+      vl1l2_info.absdira_bar);
+
+   at.set_entry(r, c+12, // DIRA_MSE
+      vl1l2_info.dira2_bar);
+
    return;
 }
 
@@ -3084,9 +3105,16 @@ void write_vcnt_cols(const VL1L2Info &vcnt_info, int i,
    //    SPD_ABSERR,       SPD_ABSERR_BCL,       SPD_ABSERR_BCU,
    //    DIR_ERR,          DIR_ERR_BCL,          DIR_ERR_BCU,
    //    DIR_ABSERR,       DIR_ABSERR_BCL,       DIR_ABSERR_BCU,
-   //    ANOM_CORR,        ANOM_CORR_NCL,        ANOM_CORR_NCU,       ANOM_CORR_BCL,   ANOM_CORR_BCU
-   //    ANOM_CORR_UNCNTR, ANOM_CORR_UNCNTR_BCL, ANOM_CORR_UNCNTR_BCU
+   //    ANOM_CORR,        ANOM_CORR_NCL,        ANOM_CORR_NCU,
+   //                      ANOM_CORR_BCL,        ANOM_CORR_BCU
+   //    ANOM_CORR_UNCNTR, ANOM_CORR_UNCNTR_BCL, ANOM_CORR_UNCNTR_BCU,
+   //    DIR_ME,           DIR_ME_BCL,           DIR_ME_BCU,
+   //    DIR_MAE,          DIR_MAE_BCL,          DIR_MAE_BCU,
+   //    DIR_MSE,          DIR_MSE_BCL,          DIR_MSE_BCU,
+   //    DIR_RMSE,         DIR_RMSE_BCL,         DIR_RMSE_BCU
    //
+
+   // TODO: MET #963 Compute the VCNT bootstrap CI's
 
    at.set_entry(r, c++, max(vcnt_info.vcount,          // TOTAL
                             vcnt_info.vacount));
@@ -3172,6 +3200,22 @@ void write_vcnt_cols(const VL1L2Info &vcnt_info, int i,
    at.set_entry(r, c++, vcnt_info.ANOM_CORR_UNCNTR.v); // ANOM_CORR_UNCNTR
    at.set_entry(r, c++, (string)na_str);               // ANOM_CORR_UNCNTR_BCL
    at.set_entry(r, c++, (string)na_str);               // ANOM_CORR_UNCNTR_BCU
+
+   at.set_entry(r, c++, vcnt_info.DIR_ME.v);           // DIR_ME
+   at.set_entry(r, c++, (string)na_str);               // DIR_ME_BCL
+   at.set_entry(r, c++, (string)na_str);               // DIR_ME_BCU
+
+   at.set_entry(r, c++, vcnt_info.DIR_MAE.v);          // DIR_MAE
+   at.set_entry(r, c++, (string)na_str);               // DIR_MAE_BCL
+   at.set_entry(r, c++, (string)na_str);               // DIR_MAE_BCU
+
+   at.set_entry(r, c++, vcnt_info.DIR_MSE.v);          // DIR_MSE
+   at.set_entry(r, c++, (string)na_str);               // DIR_MSE_BCL
+   at.set_entry(r, c++, (string)na_str);               // DIR_MSE_BCU
+
+   at.set_entry(r, c++, vcnt_info.DIR_RMSE.v);         // DIR_RMSE
+   at.set_entry(r, c++, (string)na_str);               // DIR_RMSE_BCL
+   at.set_entry(r, c++, (string)na_str);               // DIR_RMSE_BCU
 
    return;
 }
@@ -4231,7 +4275,7 @@ void write_ecnt_cols(const ECNTInfo &ecnt_info,
    //    CRPSS_EMP  CRPS_EMP_FAIR, SPREAD_MD,
    //    MAE,       MAE_OERR,      BIAS_RATIO,
    //    N_GE_OBS,  ME_GE_OBS,     N_LT_OBS,
-   //    ME_LT_OBS
+   //    ME_LT_OBS, IGN_CONV_OERR, IGN_CORR_OERR
    //
    at.set_entry(r, c+0,  // Total Number of Pairs
       ecnt_info.n_pair);
@@ -4307,6 +4351,12 @@ void write_ecnt_cols(const ECNTInfo &ecnt_info,
 
    at.set_entry(r, c+24,  // ME of ensemble values < observations
       ecnt_info.me_lt_obs);
+
+   at.set_entry(r, c+25,  // Ignorance Score, observation error convolved
+      ecnt_info.ign_conv_oerr);
+
+   at.set_entry(r, c+26,  // Ignorance Score, observation error corrected
+      ecnt_info.ign_corr_oerr);
 
    return;
 }

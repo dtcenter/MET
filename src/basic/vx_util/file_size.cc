@@ -1,7 +1,5 @@
-
-
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -9,12 +7,8 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
-
-
 ////////////////////////////////////////////////////////////////////////
 
-
-using namespace std;
 
 #include <iostream>
 #include <unistd.h>
@@ -27,6 +21,8 @@ using namespace std;
 #include "vx_log.h"
 
 #include "file_size.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -53,7 +49,7 @@ if ( status < 0 )  {
    //  return the file size in bytes
    //
 
-return( (long long) sbuf.st_size );
+return (long long) sbuf.st_size;
 
 }
 

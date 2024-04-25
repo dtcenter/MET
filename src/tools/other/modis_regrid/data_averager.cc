@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -10,8 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -21,6 +19,8 @@ using namespace std;
 
 #include "vx_math.h"
 #include "vx_cal.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -68,7 +68,7 @@ Counts = 0;
 
 Sum = 0;
 
-DataOk = (bool *) 0;
+DataOk = (bool *) nullptr;
 
 clear();
 
@@ -199,13 +199,13 @@ double DataAverager::ave(int x, int y) const
 
 const int n = two_to_one(x, y);
 
-if ( ! DataOk[n] )  return ( bad_data_float );
+if ( ! DataOk[n] )  return bad_data_float;
 
 const int c = Counts[n];
 
-if ( c == 0 )  return ( 0.0 );
+if ( c == 0 )  return 0.0;
 
-return ( (Sum[n])/c );
+return (Sum[n])/c;
 
 }
 

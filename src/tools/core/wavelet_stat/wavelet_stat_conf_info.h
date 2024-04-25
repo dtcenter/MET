@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -34,7 +34,7 @@ static const int n_txt = 1;
 
 // Text file type
 static const STATLineType txt_file_type[n_txt] = {
-   stat_isc
+   STATLineType::isc
 };
 
 ////////////////////////////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -9,8 +9,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-
-using namespace std;
 
 #include <fstream>
 #include <unistd.h>
@@ -29,6 +27,8 @@ using namespace std;
 #include "dbf_file.h"
 #include "shp_poly_record.h"
 #include "int_array.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -180,7 +180,7 @@ if ( do_separate_files )   {
    //  done
    //
 
-return ( 0 );
+return 0;
 
 }
 
@@ -550,7 +550,7 @@ if ( r.admin.nonempty() )  {
 
 }
 
-return ( s );
+return s;
 
 }
 

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -8,9 +8,6 @@
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-using namespace std;
 
 
 #include <cstdio>
@@ -24,6 +21,9 @@ using namespace std;
 #include "vx_util.h"
 #include "vx_log.h"
 #include "gaussian_grid.h"
+
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -290,7 +290,7 @@ area *= sind(lat_top) - sind(lat_bot);
 
 area *= earth_radius_km*earth_radius_km;
 
-return ( area );
+return area;
 
 }
 
@@ -302,7 +302,7 @@ int GaussianGrid::nx() const
 
 {
 
-return ( Nx );
+return Nx;
 
 }
 
@@ -314,7 +314,7 @@ int GaussianGrid::ny() const
 
 {
 
-return ( Ny );
+return Ny;
 
 }
 
@@ -326,7 +326,7 @@ ConcatString GaussianGrid::name() const
 
 {
 
-return ( Name );
+return Name;
 
 }
 
@@ -384,7 +384,7 @@ a << "Ny: " << Ny;
    //  done
    //
 
-return ( a );
+return a;
 
 }
 
@@ -401,7 +401,7 @@ GridInfo i;
 
 i.set( Data );
 
-return ( i );
+return i;
 
 }
 
@@ -419,7 +419,7 @@ double GaussianGrid::rot_grid_to_earth(int x, int y) const
    //  need to be changed when support is added for GRIB2.
    //
 
-return ( 0.0 );
+return 0.0;
 
 }
 
@@ -431,7 +431,7 @@ bool GaussianGrid::wrap_lon() const
 
 {
 
-return ( true );
+return true;
 
 }
 
@@ -461,7 +461,7 @@ GaussianGrid * p = new GaussianGrid (Data);
 
 p->Name = Name;
 
-return ( p );
+return p;
 
 }
 

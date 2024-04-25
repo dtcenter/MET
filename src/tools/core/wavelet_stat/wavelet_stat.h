@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -93,7 +93,7 @@ static ConcatString out_dir;
 
 // Output NetCDF file
 static ConcatString out_nc_file;
-static netCDF::NcFile       *nc_out    = (netCDF::NcFile *) 0;
+static netCDF::NcFile       *nc_out    = (netCDF::NcFile *) nullptr;
 static netCDF::NcDim        x_dim     ;
 static netCDF::NcDim        y_dim     ;
 static netCDF::NcDim        scale_dim ;
@@ -104,17 +104,17 @@ static netCDF::NcVar        diff_var  ;
 
 // Output PostScript file
 static ConcatString out_ps_file;
-static PSfile       *ps_out = (PSfile *) 0;
+static PSfile       *ps_out = (PSfile *) nullptr;
 
 // Output STAT file
 static ConcatString     stat_file;
-static std::ofstream    *stat_out = (std::ofstream *)  0;
+static std::ofstream    *stat_out = (std::ofstream *) nullptr;
 static AsciiTable       stat_at;
 static int              i_stat_row;
 
 // Optional ISC output file
 static ConcatString     isc_file;
-static std::ofstream    *isc_out = (std::ofstream *) 0;
+static std::ofstream    *isc_out = (std::ofstream *) nullptr;
 static AsciiTable       isc_at;
 static int              i_isc_row;
 
@@ -177,8 +177,8 @@ static bool is_first_pass = true;
 
 // Data file factory and input files
 static Met2dDataFileFactory mtddf_factory;
-static Met2dDataFile *fcst_mtddf = (Met2dDataFile *) 0;
-static Met2dDataFile *obs_mtddf  = (Met2dDataFile *) 0;
+static Met2dDataFile *fcst_mtddf = (Met2dDataFile *) nullptr;
+static Met2dDataFile *obs_mtddf  = (Met2dDataFile *) nullptr;
 
 // Strings to be output in the STAT and optional text files
 static StatHdrColumns shc;

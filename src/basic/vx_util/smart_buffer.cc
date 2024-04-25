@@ -1,21 +1,15 @@
-
-
 ////////////////////////////////////////////////////////////////////////
 
-
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
-
 ////////////////////////////////////////////////////////////////////////
 
-
-using namespace std;
 
 #include <iostream>
 #include <unistd.h>
@@ -29,6 +23,8 @@ using namespace std;
 #include "vx_log.h"
 
 #include "smart_buffer.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -84,11 +80,11 @@ SmartBuffer & SmartBuffer::operator=(const SmartBuffer & b)
 
 {
 
-if ( this == &b )  return ( * this );
+if ( this == &b )  return *this;
 
 assign(b);
 
-return ( * this );
+return *this;
 
 }
 
@@ -206,7 +202,7 @@ n_read = ::read(fd, Buf, bytes);
    //  done
    //
 
-return ( n_read );
+return n_read;
 
 }
 
@@ -236,7 +232,7 @@ n_written = ::write(fd, Buf, bytes);
    //  done
    //
 
-return ( n_written );
+return n_written;
 
 }
 

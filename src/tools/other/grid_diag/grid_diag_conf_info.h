@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -58,7 +58,7 @@ class GridDiagConfInfo {
 
       void read_config(const char *, const char *);
       void set_n_data();
-      void process_config(vector<GrdFileType>);
+      void process_config(std::vector<GrdFileType>);
       void process_masks(const Grid &);
 
       int get_n_data() const;

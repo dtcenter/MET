@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -8,7 +8,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
 
 #include <dirent.h>
 #include <iostream>
@@ -25,6 +24,9 @@ using namespace std;
 
 #include "vx_data2d_factory.h"
 #include "vx_log.h"
+
+using namespace std;
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -64,8 +66,8 @@ void MtdConfigInfo::init_from_scratch()
 {
 
    // Initialize pointers
-   fcst_info = (VarInfo *) 0;
-   obs_info  = (VarInfo *) 0;
+   fcst_info = (VarInfo *) nullptr;
+   obs_info  = (VarInfo *) nullptr;
 
    clear();
 
@@ -89,7 +91,7 @@ void MtdConfigInfo::clear()
    do_2d_att_ascii = true;
    do_3d_att_ascii = true;
 
-   mask_missing_flag = FieldType_None;
+   mask_missing_flag = FieldType::None;
 
    fcst_conv_radius = bad_data_int;
    obs_conv_radius = bad_data_int;
@@ -109,18 +111,18 @@ void MtdConfigInfo::clear()
    fcst_merge_thresh.clear();
    obs_merge_thresh.clear();
 
-   fcst_merge_flag = MergeType_None;
-   obs_merge_flag = MergeType_None;
+   fcst_merge_flag = MergeType::None;
+   obs_merge_flag = MergeType::None;
 
-   match_flag = MatchType_None;
+   match_flag = MatchType::None;
 
    max_centroid_dist = bad_data_double;
 
    mask_grid_name.clear();
-   mask_grid_flag = FieldType_None;
+   mask_grid_flag = FieldType::None;
 
    mask_poly_name.clear();
-   mask_poly_flag = FieldType_None;
+   mask_poly_flag = FieldType::None;
 
    space_centroid_dist_wt = bad_data_double;
    time_centroid_delta_wt = bad_data_double;
@@ -131,14 +133,14 @@ void MtdConfigInfo::clear()
    start_time_delta_wt    = bad_data_double;
    end_time_delta_wt      = bad_data_double;
 
-   space_centroid_dist_if = (PiecewiseLinear *) 0;
-   time_centroid_delta_if = (PiecewiseLinear *) 0;
-   speed_delta_if         = (PiecewiseLinear *) 0;
-   direction_diff_if      = (PiecewiseLinear *) 0;
-   volume_ratio_if        = (PiecewiseLinear *) 0;
-   axis_angle_diff_if     = (PiecewiseLinear *) 0;
-   start_time_delta_if    = (PiecewiseLinear *) 0;
-   end_time_delta_if      = (PiecewiseLinear *) 0;
+   space_centroid_dist_if = (PiecewiseLinear *) nullptr;
+   time_centroid_delta_if = (PiecewiseLinear *) nullptr;
+   speed_delta_if         = (PiecewiseLinear *) nullptr;
+   direction_diff_if      = (PiecewiseLinear *) nullptr;
+   volume_ratio_if        = (PiecewiseLinear *) nullptr;
+   axis_angle_diff_if     = (PiecewiseLinear *) nullptr;
+   start_time_delta_if    = (PiecewiseLinear *) nullptr;
+   end_time_delta_if      = (PiecewiseLinear *) nullptr;
 
    total_interest_thresh = bad_data_double;
 
@@ -161,8 +163,8 @@ void MtdConfigInfo::clear()
    delta_t_seconds = 0;
 
    // Deallocate memory
-   if(fcst_info) { delete fcst_info; fcst_info = (VarInfo *) 0; }
-   if(obs_info)  { delete obs_info;  obs_info  = (VarInfo *) 0; }
+   if(fcst_info) { delete fcst_info; fcst_info = (VarInfo *) nullptr; }
+   if(obs_info)  { delete obs_info;  obs_info  = (VarInfo *) nullptr; }
 
    return;
 
@@ -250,9 +252,9 @@ void MtdConfigInfo::process_config(GrdFileType ftype, GrdFileType otype)
 {
 
    VarInfoFactory info_factory;
-   Dictionary *fcst_dict = (Dictionary *) 0;
-   Dictionary *obs_dict  = (Dictionary *) 0;
-   Dictionary *dict      = (Dictionary *) 0;
+   Dictionary *fcst_dict = (Dictionary *) nullptr;
+   Dictionary *obs_dict  = (Dictionary *) nullptr;
+   Dictionary *dict      = (Dictionary *) nullptr;
    PlotInfo plot_info;
    bool status = false;
    double sum;
@@ -373,8 +375,8 @@ void MtdConfigInfo::process_config(GrdFileType ftype, GrdFileType otype)
 
       // Check that match_flag is set between 0 and 3
 /*
-   if(match_flag == MatchType_None &&
-      (fcst_merge_flag != MergeType_None || obs_merge_flag  != MergeType_None) ) {
+   if(match_flag == MatchType::None &&
+      (fcst_merge_flag != MergeType::None || obs_merge_flag  != MergeType::None) ) {
       mlog << Warning << "\nMtdConfigInfo::process_config() -> "
            << "When matching is disabled (match_flag = "
            << matchtype_to_string(match_flag)
@@ -456,7 +458,7 @@ void MtdConfigInfo::process_config(GrdFileType ftype, GrdFileType otype)
          + start_time_delta_wt
          + end_time_delta_wt;
 
-   if(match_flag != MatchType_None &&
+   if(match_flag != MatchType::None &&
       is_eq( sum, 0.0)) {
       mlog << Error << "\nMtdConfigInfo::process_config() -> "
            << "When matching is requested, the sum of the fuzzy engine "
@@ -556,7 +558,7 @@ void MtdConfigInfo::parse_nc_info()
 
 {
 
-const DictionaryEntry * e = (const DictionaryEntry *) 0;
+const DictionaryEntry * e = (const DictionaryEntry *) nullptr;
 
 e = conf.lookup(conf_key_nc_output);
 
@@ -627,7 +629,7 @@ void MtdConfigInfo::parse_txt_info()
 
 {
 
-const DictionaryEntry * e = (const DictionaryEntry *) 0;
+const DictionaryEntry * e = (const DictionaryEntry *) nullptr;
 
 const char * key = conf_key_txt_output;
 
@@ -852,7 +854,7 @@ bool MtdNcOutInfo::all_false() const
 // bool status = do_latlon || do_raw || do_object_raw || do_object_id || do_cluster_id || do_polylines;
    bool status = do_latlon || do_raw ||                  do_object_id || do_cluster_id;
 
-return ( !status );
+return !status;
 
 }
 

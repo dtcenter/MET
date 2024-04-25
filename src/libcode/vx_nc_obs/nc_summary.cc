@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -14,17 +14,19 @@
 //      Common routines for time summary (into NetCDF).
 //
 
-using namespace std;
 
 #include <iostream>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "write_netcdf.h"
 
 #include "nc_obs_util.h"
 #include "vx_summary.h"
+
+using namespace std;
+using namespace netCDF;
+
 
 ////////////////////////////////////////////////////////////////////////
 

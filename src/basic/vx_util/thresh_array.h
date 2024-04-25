@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -87,6 +87,8 @@ class ThreshArray {
 
       bool check_dbl(double) const;
       bool check_dbl(double, double, double) const;
+
+      bool equal_bin_width(double &) const;
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -99,7 +101,8 @@ inline       SingleThresh * ThreshArray::buf()        const { return ( t );     
 ////////////////////////////////////////////////////////////////////////
 
 extern ThreshArray  string_to_prob_thresh    (const char *);
-extern ConcatString prob_thresh_to_string    (const ThreshArray &); 
+extern ConcatString prob_thresh_to_string    (const ThreshArray &);
+extern ThreshArray  define_prob_bins         (double, double, double, int);
 extern bool         check_prob_thresh        (const ThreshArray &, bool error_out = true);
 extern ThreshArray  process_perc_thresh_bins (const ThreshArray &);
 extern ThreshArray  process_rps_cdp_thresh   (const ThreshArray &);

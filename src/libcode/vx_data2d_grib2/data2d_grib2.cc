@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -8,8 +8,6 @@
 
 
 ////////////////////////////////////////////////////////////////////////
-
-using namespace std;
 
 #include <iostream>
 #include <unistd.h>
@@ -190,7 +188,7 @@ bool MetGrib2DataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
 
       plane = plane_array[0];
 
-      return(process_data_plane(vinfo_g2, plane));
+      return process_data_plane(vinfo_g2, plane);
 
    }  //  END: if( 1 > listMatch.size() )
 
@@ -198,8 +196,9 @@ bool MetGrib2DataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
    if( 1 < listMatch.size() ){
       ConcatString msg;
       for(size_t i=0; i < listMatch.size(); i++) {
-         msg << "record " << listMatch[i]->RecNum
+         msg << "  Record " << listMatch[i]->RecNum
              << " field " << listMatch[i]->FieldNum
+             << ", table 4." << listMatch[i]->PdsTmpl
              << ": ipdtmpl[" << listMatch[i]->IPDTmpl.n()
              << "] = ";
          for(int j=0; j < listMatch[i]->IPDTmpl.n(); j++) {
@@ -259,8 +258,9 @@ int MetGrib2DataFile::data_plane_array(VarInfo &vinfo,
       if( 1 < listMatchExact.size() ){
          ConcatString msg;
          for(size_t i=0; i < listMatchExact.size(); i++) {
-            msg << "record " << listMatchExact[i]->RecNum
+            msg << "  Record " << listMatchExact[i]->RecNum
                 << " field " << listMatchExact[i]->FieldNum
+                << ", table 4." << listMatchExact[i]->PdsTmpl
                 << ": ipdtmpl[" << listMatchExact[i]->IPDTmpl.n()
                 << "] = ";
             for(int j=0; j < listMatchExact[i]->IPDTmpl.n(); j++) {
@@ -432,6 +432,14 @@ void MetGrib2DataFile::find_record_matches(VarInfoGrib2* vinfo,
           (!is_bad_data(vinfo->der_type())  && vinfo->der_type()  != (*it)->DerType  ) ||
           (!is_bad_data(vinfo->stat_type()) && vinfo->stat_type() != (*it)->StatType ) ||
           (!is_bad_data(vinfo->perc_val())  && vinfo->perc_val()  != (*it)->PercVal  ) ){
+         continue;
+      }
+
+      //  test aerosol config file options
+      if( (!is_bad_data(vinfo->aerosol_type())          && vinfo->aerosol_type()          != (*it)->AerosolType )         ||
+          (!is_bad_data(vinfo->aerosol_interval_type()) && vinfo->aerosol_interval_type() != (*it)->AerosolIntervalType ) ||
+          (!is_bad_data(vinfo->aerosol_size_lower())    && !is_eq(vinfo->aerosol_size_lower(), (*it)->AerosolSizeLower )) ||
+          (!is_bad_data(vinfo->aerosol_size_upper())    && !is_eq(vinfo->aerosol_size_upper(), (*it)->AerosolSizeUpper )) ){
          continue;
       }
 
@@ -728,11 +736,17 @@ void MetGrib2DataFile::read_grib2_record_list() {
          rec->PdsTmpl      = gfld->ipdtnum;
          rec->ParmCat      = gfld->ipdtmpl[0];
          rec->Parm         = gfld->ipdtmpl[1];
-         rec->Process      = gfld->ipdtmpl[2];
+
+         //  get the process id
+         if( gfld->ipdtnum != 46 && gfld->ipdtnum != 48 ) {
+            rec->Process   = gfld->ipdtmpl[2];
+         }
 
          //  get the level type
          if( gfld->ipdtnum == 46 ) {
             rec->LvlTyp    = gfld->ipdtmpl[15];
+         } else if( gfld->ipdtnum == 48 ) {
+            rec->LvlTyp    = gfld->ipdtmpl[20];
          } else {
             rec->LvlTyp    = gfld->ipdtmpl[9];
          }
@@ -745,10 +759,16 @@ void MetGrib2DataFile::read_grib2_record_list() {
          //  check for template number 46
          if( gfld->ipdtnum == 46 ) {
             rec->LvlVal1 = scaled2dbl(gfld->ipdtmpl[16], gfld->ipdtmpl[17]);
-            rec->LvlVal2 = rec->LvlVal1;    
-           //  check for special fixed level types (1 through 10 or 101) and set the level values to 0
-           //  Reference: https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_table4-5.shtml
-         } else if( (rec->LvlTyp >= 1 && rec->LvlTyp <= 10) || rec->LvlTyp == 101 ) {
+            rec->LvlVal2 = rec->LvlVal1;
+         }
+         //  check for template number 48
+         else if( gfld->ipdtnum == 48 ) {
+            rec->LvlVal1 = scaled2dbl(gfld->ipdtmpl[21], gfld->ipdtmpl[22]);
+            rec->LvlVal2 = rec->LvlVal1;
+         }
+         //  check for special fixed level types (1 through 10 or 101) and set the level values to 0
+         //  Reference: https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_table4-5.shtml
+         else if( (rec->LvlTyp >= 1 && rec->LvlTyp <= 10) || rec->LvlTyp == 101 ) {
             rec->LvlVal1 = 0;
             rec->LvlVal2 = 0;
          } else {
@@ -803,6 +823,14 @@ void MetGrib2DataFile::read_grib2_record_list() {
          //  percentile value for templates 6 and 10
          if( 6 == gfld->ipdtnum || 10 == gfld->ipdtnum ){
             rec->PercVal = gfld->ipdtmpl[15];
+         }
+
+         //  aerosol type and size for templates 46 and 48
+         if( 46 == gfld->ipdtnum || 48 == gfld->ipdtnum ){
+            rec->AerosolType         = gfld->ipdtmpl[2];
+            rec->AerosolIntervalType = gfld->ipdtmpl[3];
+            rec->AerosolSizeLower    = scaled2dbl(gfld->ipdtmpl[4], gfld->ipdtmpl[5]);
+            rec->AerosolSizeUpper    = scaled2dbl(gfld->ipdtmpl[6], gfld->ipdtmpl[7]);
          }
 
          //  depending on the template number, determine the reference times
@@ -956,6 +984,8 @@ void MetGrib2DataFile::read_grib2_record_list() {
 
 void MetGrib2DataFile::read_grib2_grid(gribfield *gfld) {
 
+   const char * method_name = "MetGrib2DataFile::read_grib2_grid() -> ";
+
    double d, r_km;
    int ResCompFlag;
    char hem = 0;
@@ -1010,7 +1040,7 @@ void MetGrib2DataFile::read_grib2_grid(gribfield *gfld) {
 
       //  check for thinned lat/lon grid
       if( data.Nlon == -1 ){
-         mlog << Error << "\nMetGrib2DataFile::read_grib2_grid() -> "
+         mlog << Error << "\n" << method_name
               << "Thinned Lat/Lon grids are not supported for GRIB version 2.\n\n";
          exit(1);
       }
@@ -1299,7 +1329,7 @@ void MetGrib2DataFile::read_grib2_grid(gribfield *gfld) {
       //  build an LaeaData struct with the projection information
       LaeaData laea;
       laea.name           = laea_proj_type;
-      laea.spheroid_name  = "Grib template";
+      m_strncpy(laea.spheroid_name, "Grib template",m_strlen("Grib template"), method_name);
 
       //  earth shape
       //  Reference: https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_table3-2.shtml
@@ -1355,7 +1385,7 @@ void MetGrib2DataFile::read_grib2_grid(gribfield *gfld) {
             break;
 
          default:
-            mlog << Error << "\nMetGrib2DataFile::read_grib2_grid() -> "
+            mlog << Error << "\n" << method_name
                  << "unsupported earth shape value of " << earth_shape_int << "!\n\n";
             exit(1);
       }
@@ -1403,7 +1433,7 @@ void MetGrib2DataFile::read_grib2_grid(gribfield *gfld) {
    //  unrecognized grid
    else {
 
-      mlog << Error << "\nMetGrib2DataFile::read_grib2_grid() -> "
+      mlog << Error << "\n" << method_name
            << "found unrecognized grid definition (" << gfld->igdtnum << ")\n\n";
       exit(1);
 
@@ -1551,7 +1581,7 @@ long MetGrib2DataFile::read_grib2_record(long offset, g2int unpack,
    fread(cgrib, sizeof(unsigned char), lgrib, FileGrib2);
 
    if(g2_info(cgrib, listsec0, listsec1, &numfields, &numlocal)) {
-      if(cgrib) { delete [] cgrib; cgrib = (unsigned char *) 0; }
+      if(cgrib) { delete [] cgrib; cgrib = (unsigned char *) nullptr; }
       return -1;
    }
 
@@ -1559,7 +1589,7 @@ long MetGrib2DataFile::read_grib2_record(long offset, g2int unpack,
    g2_getfld(cgrib, ifld, unpack, 1, &gfld);
 
    //  cleanup
-   if(cgrib) { delete [] cgrib; cgrib = (unsigned char *) 0; }
+   if(cgrib) { delete [] cgrib; cgrib = (unsigned char *) nullptr; }
 
    //  reset to default out of memory handler
    set_new_handler(oom);
@@ -1617,7 +1647,7 @@ int MetGrib2DataFile::index( VarInfo &vinfo ){
 ////////////////////////////////////////////////////////////////////////
 
 double scaled2dbl(int scale_factor, int scale_value) {
-   if (scale_factor == 0) return ( (double) scale_value );
+   if (scale_factor == 0) return (double) scale_value;
    if (scale_factor < 0)  return ( scale_value * pow(10.0, -scale_factor) );
    return                        ( scale_value / pow(10.0,  scale_factor) );
 }
@@ -1642,7 +1672,7 @@ int parse_int4(g2int i) {
       i_val = (c[0] << 24) + (c[1] << 16) + (c[2] << 8) + c[3];
    }
 
-   return(i_val);
+   return i_val;
 }
 
 ////////////////////////////////////////////////////////////////////////

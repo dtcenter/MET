@@ -1,6 +1,6 @@
 // ** National Center for Atmospheric Research (NCAR)
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** Research Applications Lab (RAL)
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
@@ -9,9 +9,6 @@
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-using namespace std;
 
 
 #include <iostream>
@@ -28,6 +25,8 @@ using namespace std;
 #include "3d_txt_header.h"
 #include "3d_single_columns.h"
 #include "2d_columns.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////

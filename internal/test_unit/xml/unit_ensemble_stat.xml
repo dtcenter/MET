@@ -330,4 +330,24 @@
     </output>
   </test>
 
+  <!--  Compute RPS line type using probabilistic inputs. -->
+
+  <test name="ensemble_stat_RPS_CLIMO_BIN_PROB">
+    <exec>&MET_BIN;/ensemble_stat</exec>
+    <env>
+      <pair><name>DESC</name>           <value>RPS_CLIMO_BIN_PROB</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>  <value>RPS_CLIMO_BIN_PROB</value></pair>
+    </env>
+    <param> \
+      1 \
+      &DATA_DIR_MODEL;/cpc_climo_prob/gefs-00z_aer-rfcst-cal_tmean_20210101_week2_cats_33-67ptile.nc \
+      &CONFIG_DIR;/EnsembleStatConfig_rps_climo_bin_prob \
+      -grid_obs &DATA_DIR_MODEL;/cpc_climo_prob/tmean_07d_20210115_cats_33-67ptile.nc \
+      -outdir &OUTPUT_DIR;/ensemble_stat -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_RPS_CLIMO_BIN_PROB_20210101_000000V.stat</stat>
+    </output>
+  </test>
+
 </met_test>

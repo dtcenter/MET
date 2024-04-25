@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -9,8 +9,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-
-using namespace std;
 
 #include <algorithm>
 #include <iostream>
@@ -28,6 +26,9 @@ using namespace std;
 #include "summary_calc_stdev.h"
 #include "summary_key.h"
 #include "summary_obs.h"
+
+using namespace std;
+
 
 ////////////////////////////////////////////////////////////////////////
 

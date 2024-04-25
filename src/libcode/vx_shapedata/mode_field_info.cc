@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -76,14 +76,40 @@ Mode_Field_Info & Mode_Field_Info::operator=(const Mode_Field_Info & i)
 
 {
 
-if ( this == &i )  return ( * this );
+if ( this == &i )  return *this;
 
 assign(i);
 
-return ( * this );
+return *this;
 
 }
 
+
+////////////////////////////////////////////////////////////////////////
+
+void Mode_Field_Info::clone(const Mode_Field_Info & i)
+{
+   dict = i.dict;
+   conf = i.conf;
+   gft = i.gft;
+   FO = i.FO;
+   Multivar = i.Multivar;
+   index = i.index;
+   conv_radius = i.conv_radius;
+   vld_thresh = i.vld_thresh;
+
+   var_info = i.var_info->clone();
+
+   conv_radius_array = i.conv_radius_array; 
+   conv_thresh_array = i.conv_thresh_array;
+   merge_thresh_array = i.merge_thresh_array;
+   conv_thresh = i.conv_thresh;
+   merge_thresh = i.merge_thresh;
+   merge_flag = i.merge_flag;
+   raw_pi = i.raw_pi;
+   filter_attr_map = i.filter_attr_map;
+   file_type = i.file_type;
+}
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -141,8 +167,10 @@ conv_thresh.clear();
 
 merge_thresh.clear();
 
-merge_flag = MergeType_Engine;
+merge_flag = MergeType::Engine;
 
+file_type = FileType_None;
+ 
 // raw_pi.clear();
 
 }
@@ -235,7 +263,7 @@ if ( dict->lookup(conf_key_vld_thresh) )  {
 if ( _multivar ) {
    // set defaults to no merging
    merge_thresh.clear();
-   merge_flag = MergeType_None;
+   merge_flag = MergeType::None;
 
    // pull out the name
    string name = var_info->name();
@@ -258,7 +286,7 @@ if ( _multivar ) {
          // because that is inconsistent
          merge_thresh_array = dict->lookup_thresh_array(conf_key_merge_thresh);
 
-         if (merge_flag != MergeType_None) {
+         if (merge_flag != MergeType::None) {
             mlog << Error << "\nMode_Field_Info::set() -> "
                  << "Field:" << name << ". "
                  << " When 'merge_flag' is explicitly set, 'merge_thresh' must be explicitly set for multivariate mode\n\n";
@@ -282,7 +310,7 @@ if ( _multivar ) {
             // individual entry doesn't have a merge_thresh, parent has a merge_flag
             // expect parent to have a merge_thresh
             merge_thresh_array = dict->lookup_thresh_array(conf_key_merge_thresh);
-            if (merge_thresh_array.n() == 0 && merge_flag != MergeType_None) {
+            if (merge_thresh_array.n() == 0 && merge_flag != MergeType::None) {
                // parent has a merge_flag but no merge_thresh
                mlog << Error << "\nMode_Field_Info::set() -> "
                     << "Field:" << name << ". using parent merge_flag: " << merge_name
@@ -310,8 +338,8 @@ if ( FO == 'F' )  raw_pi = parse_conf_plot_info(conf->lookup_dictionary(conf_key
 else              raw_pi = parse_conf_plot_info(conf->lookup_dictionary(conf_key_obs_raw_plot));
 
 
-
-
+file_type = parse_conf_file_type(dict);
+ 
    //
    //  done
    //
@@ -375,9 +403,9 @@ bool Mode_Field_Info::need_merge_thresh () const
 
 {
 
-bool status = (merge_flag == MergeType_Both) || (merge_flag == MergeType_Thresh);
+bool status = (merge_flag == MergeType::Both) || (merge_flag == MergeType::Thresh);
 
-return ( status );
+return status;
 
 }
 

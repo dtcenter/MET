@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -10,14 +10,14 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
 #include <cmath>
 
 #include "mode_ps_file.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -38,21 +38,21 @@ void ModePsFile::plot_engine(ModeFuzzyEngine & eng, EngineType eng_type, const c
    //  setup fcst & obs strings
    //
 
-   if ( eng_type == FOEng )  { // Plot forecast versus observation
+   if ( eng_type == EngineType::FOEng )  { // Plot forecast versus observation
 
       FcstString      = "Forecast";
       FcstShortString = "Fcst";
       ObsString       = "Observation";
       ObsShortString  = "Obs";
 
-   } else if ( eng_type == FFEng )  { // Plot forecast versus forecast
+   } else if ( eng_type == EngineType::FFEng )  { // Plot forecast versus forecast
 
       FcstString      = "Forecast";
       FcstShortString = "Fcst";
       ObsString       = "Forecast";
       ObsShortString  = "Fcst";
 
-   } else if ( eng_type == OOEng )  { // Plot observation versus observation
+   } else if ( eng_type == EngineType::OOEng )  { // Plot observation versus observation
 
       FcstString      = "Observation";
       FcstShortString = "Obs";
@@ -67,11 +67,11 @@ void ModePsFile::plot_engine(ModeFuzzyEngine & eng, EngineType eng_type, const c
 
    do_page_1(eng, eng_type, title);
 
-   if ( (eng_type == FOEng) || (eng_type == FFEng) )   do_fcst_enlarge_page(eng, eng_type, title);
+   if ( (eng_type == EngineType::FOEng) || (eng_type == EngineType::FFEng) )   do_fcst_enlarge_page(eng, eng_type, title);
 
-   if ( (eng_type == FOEng) || (eng_type == OOEng) )   do_obs_enlarge_page(eng, eng_type, title);
+   if ( (eng_type == EngineType::FOEng) || (eng_type == EngineType::OOEng) )   do_obs_enlarge_page(eng, eng_type, title);
 
-   if ( eng_type == FOEng )  {
+   if ( eng_type == EngineType::FOEng )  {
 
       do_overlap_page(eng, eng_type, title);
       do_cluster_page(eng, eng_type, title);

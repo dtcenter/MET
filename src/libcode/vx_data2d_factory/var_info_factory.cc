@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -17,8 +17,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <map>
 #include <stdlib.h>
 #include <strings.h>
@@ -26,9 +24,9 @@ using namespace std;
 #include "var_info_factory.h"
 #include "grdfiletype_to_string.h"
 #include "var_info_grib.h"
-#include "var_info_nccf.h"
+#include "var_info_nc_cf.h"
 #include "var_info_nc_met.h"
-#include "var_info_nc_pinterp.h"
+#include "var_info_nc_wrf.h"
 #include "var_info_ugrid.h"
 
 #ifdef WITH_PYTHON
@@ -41,6 +39,9 @@ using namespace std;
 
 #include "vx_cal.h"
 #include "vx_log.h"
+
+using namespace std;
+
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -85,8 +86,9 @@ VarInfo * VarInfoFactory::new_var_info(GrdFileType type)
          vi = new VarInfoNcMet;
          break;
 
+      case FileType_NcWrf:
       case FileType_NcPinterp:
-         vi = new VarInfoNcPinterp;
+         vi = new VarInfoNcWrf;
          break;
 
       case FileType_Python_Numpy:
@@ -130,7 +132,7 @@ VarInfo * VarInfoFactory::new_var_info(GrdFileType type)
         << "created new VarInfo object of type \""
         << grdfiletype_to_string(type) << "\".\n";
 
-   return(vi);
+   return vi;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -141,20 +143,20 @@ VarInfo * VarInfoFactory::new_var_info(ConcatString s) {
    // Convert the string to a gridded data file type
    string_to_grdfiletype(s.c_str(), type);
 
-   return(new_var_info(type));
+   return new_var_info(type);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 VarInfo * VarInfoFactory::new_copy(const VarInfo *vi_in) {
 
-   if(!vi_in) return ( nullptr );
+   if(!vi_in) return nullptr;
 
    VarInfo *vi_copy = new_var_info(vi_in->file_type());
 
    *vi_copy = *vi_in;
 
-   return(vi_copy);
+   return vi_copy;
 
 }
 

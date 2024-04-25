@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -54,7 +54,7 @@ static bool         check_masks        (const MaskPoly &, const Grid &, const Ma
 
 TCStatJob *TCStatJobFactory::new_tc_stat_job_type(const char *type_str) {
    TCStatJob *job = (TCStatJob *) nullptr;
-   TCStatJobType type = NoTCStatJobType;
+   TCStatJobType type = TCStatJobType::None;
 
    // Determine the TCStatJobType
    type = string_to_tcstatjobtype((string)type_str);
@@ -63,23 +63,23 @@ TCStatJob *TCStatJobFactory::new_tc_stat_job_type(const char *type_str) {
    // The TCStatJob object is allocated and needs to be deleted by caller.
    switch(type) {
 
-      case TCStatJobType_Filter:
+      case TCStatJobType::Filter:
          job = new TCStatJobFilter;
          break;
 
-      case TCStatJobType_Summary:
+      case TCStatJobType::Summary:
          job = new TCStatJobSummary;
          break;
 
-      case TCStatJobType_RIRW:
+      case TCStatJobType::RIRW:
          job = new TCStatJobRIRW;
          break;
 
-      case TCStatJobType_ProbRIRW:
+      case TCStatJobType::ProbRIRW:
          job = new TCStatJobProbRIRW;
          break;
 
-      case NoTCStatJobType:
+      case TCStatJobType::None:
       default:
          mlog << Error << "\nTCStatJobFactory::new_tc_stat_job_type() -> "
               << "unsupported job type \"" << type_str << "\"\n\n";
@@ -196,7 +196,7 @@ void TCStatJob::clear() {
 
    Precision = default_precision;
 
-   JobType = NoTCStatJobType;
+   JobType = TCStatJobType::None;
 
    AModel.clear();
    BModel.clear();
@@ -551,10 +551,10 @@ bool TCStatJob::is_keeper_track(const TrackPairInfo &pair,
          //    HUWARN, TSWARN, HUWATCH, TSWATCH
          if(TrackWatchWarn.has(watchwarntype_to_string(ww_type)) ||
             (TrackWatchWarn.has("ALL") &&
-             (ww_type == HurricaneWarn     ||
-              ww_type == TropicalStormWarn ||
-              ww_type == HurricaneWatch    ||
-              ww_type == TropicalStormWatch))) {
+             (ww_type == WatchWarnType::HurricaneWarn     ||
+              ww_type == WatchWarnType::TropicalStormWarn ||
+              ww_type == WatchWarnType::HurricaneWatch    ||
+              ww_type == WatchWarnType::TropicalStormWatch))) {
             keep = true;
             break;
          }
@@ -712,7 +712,7 @@ bool TCStatJob::is_keeper_line(const TCStatLine &line,
                                TCPointCounts &n) const {
 
    // Does not apply to TCDIAG lines
-   if(line.type() == TCStatLineType_TCDIAG) return true;
+   if(line.type() == TCStatLineType::TCDIAG) return true;
 
    bool keep = true;
    double v_dbl, alat, alon, blat, blon;
@@ -767,7 +767,7 @@ bool TCStatJob::is_keeper_line(const TCStatLine &line,
      !LineType.has(line.line_type()))   { keep = false; n.RejLineType++;  }
 
    // Check that PROBRIRW lines include the requested probability type
-   else if(line.type() == TCStatLineType_ProbRIRW &&
+   else if(line.type() == TCStatLineType::ProbRIRW &&
            !is_bad_data(ProbRIRWThresh) &&
            is_bad_data(get_probrirw_value(line, ProbRIRWThresh))) {
      keep = false;
@@ -885,7 +885,7 @@ double TCStatJob::get_column_double(const TCStatLine &line,
 
    // Check for PROBRIRW_PROB special case
    if(strcasecmp(column.c_str(), "PROBRIRW_PROB") == 0 &&
-      line.type() == TCStatLineType_ProbRIRW) {
+      line.type() == TCStatLineType::ProbRIRW) {
       v = get_probrirw_value(line, ProbRIRWThresh);
       return v;
    }
@@ -1289,7 +1289,7 @@ ConcatString TCStatJob::serialize() const {
    s.clear();
    s.set_precision(get_precision());
 
-   if(JobType != NoTCStatJobType)
+   if(JobType != TCStatJobType::None)
       s << "-job " << tcstatjobtype_to_string(JobType) << " ";
    for(i=0; i<AModel.n(); i++)
       s << "-amodel " << AModel[i] << " ";
@@ -1643,7 +1643,7 @@ void TCStatJob::subset_track_pair(TrackPairInfo &pair, TCPointCounts &n) {
    }
 
    // Check RIRW
-   if(RIRWTrack != TrackType_None) {
+   if(RIRWTrack != TrackType::None) {
 
       // Determine the rapid intensification points
       n_rej = pair.check_rirw(RIRWTrack,
@@ -1744,7 +1744,7 @@ void TCStatJobFilter::clear() {
 
    TCStatJob::clear();
 
-   JobType = TCStatJobType_Filter;
+   JobType = TCStatJobType::Filter;
 
    return;
 }
@@ -1968,7 +1968,7 @@ void TCStatJobSummary::clear() {
 
    TCStatJob::clear();
 
-   JobType = TCStatJobType_Summary;
+   JobType = TCStatJobType::Summary;
 
    ReqColumn.clear();
    Column.clear();
@@ -2691,11 +2691,11 @@ void TCStatJobSummary::compute_fsp(NumArray &total, NumArray &best,
 TCStatJobType string_to_tcstatjobtype(const ConcatString s) {
    TCStatJobType t;
 
-        if(strcasecmp(s.c_str(), TCStatJobType_FilterStr)   == 0) t = TCStatJobType_Filter;
-   else if(strcasecmp(s.c_str(), TCStatJobType_SummaryStr)  == 0) t = TCStatJobType_Summary;
-   else if(strcasecmp(s.c_str(), TCStatJobType_RIRWStr)     == 0) t = TCStatJobType_RIRW;
-   else if(strcasecmp(s.c_str(), TCStatJobType_ProbRIRWStr) == 0) t = TCStatJobType_ProbRIRW;
-   else                                                           t = NoTCStatJobType;
+        if(strcasecmp(s.c_str(), TCStatJobType_FilterStr)   == 0) t = TCStatJobType::Filter;
+   else if(strcasecmp(s.c_str(), TCStatJobType_SummaryStr)  == 0) t = TCStatJobType::Summary;
+   else if(strcasecmp(s.c_str(), TCStatJobType_RIRWStr)     == 0) t = TCStatJobType::RIRW;
+   else if(strcasecmp(s.c_str(), TCStatJobType_ProbRIRWStr) == 0) t = TCStatJobType::ProbRIRW;
+   else                                                           t = TCStatJobType::None;
 
    return t;
 }
@@ -2703,14 +2703,14 @@ TCStatJobType string_to_tcstatjobtype(const ConcatString s) {
 ////////////////////////////////////////////////////////////////////////
 
 ConcatString tcstatjobtype_to_string(const TCStatJobType t) {
-   const char *s = (const char *) 0;
+   const char *s = (const char *) nullptr;
 
    switch(t) {
-      case TCStatJobType_Filter:   s = TCStatJobType_FilterStr;   break;
-      case TCStatJobType_Summary:  s = TCStatJobType_SummaryStr;  break;
-      case TCStatJobType_RIRW:     s = TCStatJobType_RIRWStr;     break;
-      case TCStatJobType_ProbRIRW: s = TCStatJobType_ProbRIRWStr; break;
-      default:                     s = na_str;                    break;
+      case TCStatJobType::Filter:   s = TCStatJobType_FilterStr;   break;
+      case TCStatJobType::Summary:  s = TCStatJobType_SummaryStr;  break;
+      case TCStatJobType::RIRW:     s = TCStatJobType_RIRWStr;     break;
+      case TCStatJobType::ProbRIRW: s = TCStatJobType_ProbRIRWStr; break;
+      default:                      s = na_str;                    break;
    }
 
    return ConcatString(s);
@@ -2936,7 +2936,7 @@ TCStatJobRIRW & TCStatJobRIRW::operator=(const TCStatJobRIRW &j) {
 void TCStatJobRIRW::init_from_scratch() {
    int i;
 
-   for(i=0; i<4; i++) DumpOutCTC[i] = (ofstream *) 0;
+   for(i=0; i<4; i++) DumpOutCTC[i] = (ofstream *) nullptr;
 
    TCStatJob::init_from_scratch();
 
@@ -2955,10 +2955,10 @@ void TCStatJobRIRW::clear() {
 
    TCStatJob::clear();
 
-   JobType = TCStatJobType_RIRW;
+   JobType = TCStatJobType::RIRW;
 
    // Disable rapid intensification/weakening filtering logic.
-   RIRWTrack = TrackType_None;
+   RIRWTrack = TrackType::None;
 
    ByColumn.clear();
    RIRWMap.clear();
@@ -3066,7 +3066,7 @@ void TCStatJobRIRW::close_dump_file() {
 
          DumpOutCTC[i]->close();
          delete DumpOutCTC[i];
-         DumpOutCTC[i] = (ofstream *) 0;
+         DumpOutCTC[i] = (ofstream *) nullptr;
       }
    }
 
@@ -3197,7 +3197,7 @@ void TCStatJobRIRW::process_pair(TrackPairInfo &pair) {
    cur_map.clear();
 
    // Apply the rapid intensification/weakening logic
-   pair.check_rirw(TrackType_Both,
+   pair.check_rirw(TrackType::Both,
                    RIRWTimeADeck, RIRWTimeBDeck,
                    RIRWExactADeck, RIRWExactBDeck,
                    RIRWThreshADeck, RIRWThreshBDeck);
@@ -3689,7 +3689,7 @@ void TCStatJobRIRW::setup_stat_file(int n_row) {
              OutLineType : LineType);
 
    out_lt = (out_sa.n() == 1 ?
-             string_to_statlinetype(out_sa[0].c_str()) : no_stat_line_type);
+             string_to_statlinetype(out_sa[0].c_str()) : STATLineType::none);
 
    //
    // Loop through the output line types and determine the number of
@@ -3698,8 +3698,8 @@ void TCStatJobRIRW::setup_stat_file(int n_row) {
    for(i=0, c=0, n_col=0; i<out_sa.n(); i++) {
       cur_lt = string_to_statlinetype(out_sa[i].c_str());
       switch(cur_lt) {
-         case stat_ctc:    c = n_ctc_columns;          break;
-         case stat_cts:    c = n_cts_columns;          break;
+         case STATLineType::ctc:    c = n_ctc_columns;          break;
+         case STATLineType::cts:    c = n_cts_columns;          break;
          default:
          mlog << Error << "\nSTATAnalysisJob::setup_stat_file() -> "
               << "unexpected stat line type \"" << statlinetype_to_string(cur_lt)
@@ -3741,16 +3741,16 @@ void TCStatJobRIRW::setup_stat_file(int n_row) {
       // Write the STAT header row
       //
       switch(out_lt) {
-         case stat_ctc:
+         case STATLineType::ctc:
             write_header_row(ctc_columns, n_ctc_columns, 1, stat_at, 0, 0);
             break;
 
-         case stat_cts:
+         case STATLineType::cts:
             write_header_row(cts_columns, n_cts_columns, 1, stat_at, 0, 0);
             break;
 
          // Write only header columns for unspecified line type
-         case no_stat_line_type:
+         case STATLineType::none:
             write_header_row((const char **) 0, 0, 1, stat_at, 0, 0);
             break;
           
@@ -3977,7 +3977,7 @@ TCStatJobProbRIRW & TCStatJobProbRIRW::operator=(const TCStatJobProbRIRW &j) {
 
 void TCStatJobProbRIRW::init_from_scratch() {
 
-   StatOut = (ofstream *) 0;
+   StatOut = (ofstream *) nullptr;
 
    TCStatJob::init_from_scratch();
 
@@ -3995,7 +3995,7 @@ void TCStatJobProbRIRW::clear() {
 
    TCStatJob::clear();
 
-   JobType = TCStatJobType_ProbRIRW;
+   JobType = TCStatJobType::ProbRIRW;
 
    ByColumn.clear();
    ProbRIRWMap.clear();
@@ -4081,7 +4081,7 @@ void TCStatJobProbRIRW::close_dump_file() {
    if(DumpOut) {
       DumpOut->close();
       delete DumpOut;
-      DumpOut = (ofstream *) 0;
+      DumpOut = (ofstream *) nullptr;
    }
 
    // Prepare nicely formatted AsciiTable object
@@ -4337,10 +4337,10 @@ void TCStatJobProbRIRW::do_output(ostream &out) {
       out_lt = string_to_statlinetype(OutLineType[i].c_str());
 
       // Write the header columns
-           if(out_lt == stat_pct)  lt_cols = get_n_pct_columns (n);
-      else if(out_lt == stat_pstd) lt_cols = get_n_pstd_columns(n);
-      else if(out_lt == stat_prc)  lt_cols = get_n_prc_columns (n);
-      else if(out_lt == stat_pjc)  lt_cols = get_n_pjc_columns (n);
+           if(out_lt == STATLineType::pct)  lt_cols = get_n_pct_columns (n);
+      else if(out_lt == STATLineType::pstd) lt_cols = get_n_pstd_columns(n);
+      else if(out_lt == STATLineType::prc)  lt_cols = get_n_prc_columns (n);
+      else if(out_lt == STATLineType::pjc)  lt_cols = get_n_pjc_columns (n);
       else {
          mlog << Error << "\nvoid TCStatJobProbRIRW::do_output(ostream &out) -> "
               << "unsupported output line type \"" << OutLineType[i] << "\"\n\n";
@@ -4371,10 +4371,10 @@ void TCStatJobProbRIRW::do_output(ostream &out) {
          out_at.set_entry(r, c++, ByColumn[j]);
 
       // Write the header columns
-           if(out_lt == stat_pct)  write_pct_header_row (0, n, out_at, r, c);
-      else if(out_lt == stat_pstd) write_pstd_header_row(0, n, out_at, r, c);
-      else if(out_lt == stat_prc)  write_prc_header_row (0, n, out_at, r, c);
-      else if(out_lt == stat_pjc)  write_pjc_header_row (0, n, out_at, r, c);
+           if(out_lt == STATLineType::pct)  write_pct_header_row (0, n, out_at, r, c);
+      else if(out_lt == STATLineType::pstd) write_pstd_header_row(0, n, out_at, r, c);
+      else if(out_lt == STATLineType::prc)  write_prc_header_row (0, n, out_at, r, c);
+      else if(out_lt == STATLineType::pjc)  write_pjc_header_row (0, n, out_at, r, c);
 
       // Loop over the map entries and populate the output table
       for(it=ProbRIRWMap.begin(),r=1; it!=ProbRIRWMap.end(); it++,r++) {
@@ -4399,7 +4399,7 @@ void TCStatJobProbRIRW::do_output(ostream &out) {
             out_at.set_entry(r, c++, sa[j]);
 
          // Compute PSTD statistics
-         if(out_lt == stat_pstd) {
+         if(out_lt == STATLineType::pstd) {
             it->second.Info.allocate_n_alpha(1);
             it->second.Info.alpha[0] = OutAlpha;
             it->second.Info.compute_stats();
@@ -4407,10 +4407,10 @@ void TCStatJobProbRIRW::do_output(ostream &out) {
          }
 
          // Write output columns
-              if(out_lt == stat_pct)  write_pct_cols (it->second.Info,    out_at, r, c);
-         else if(out_lt == stat_pstd) write_pstd_cols(it->second.Info, 0, out_at, r, c);
-         else if(out_lt == stat_prc)  write_prc_cols (it->second.Info,    out_at, r, c);
-         else if(out_lt == stat_pjc)  write_pjc_cols (it->second.Info,    out_at, r, c);
+              if(out_lt == STATLineType::pct)  write_pct_cols (it->second.Info,    out_at, r, c);
+         else if(out_lt == STATLineType::pstd) write_pstd_cols(it->second.Info, 0, out_at, r, c);
+         else if(out_lt == STATLineType::prc)  write_prc_cols (it->second.Info,    out_at, r, c);
+         else if(out_lt == STATLineType::pjc)  write_pjc_cols (it->second.Info,    out_at, r, c);
       } // end for it
 
       // Write the table for the current output line type
@@ -4580,7 +4580,7 @@ double get_probrirw_value(const TCStatLine &line, double ProbRIRWThresh) {
    ConcatString cs;
 
    // Only valid for the PROBRIRW line type
-   if(line.type() != TCStatLineType_ProbRIRW) return bad_data_double;
+   if(line.type() != TCStatLineType::ProbRIRW) return bad_data_double;
 
    // Get the number of threhsolds
    n = atoi(line.get_item("N_THRESH"));

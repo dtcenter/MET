@@ -7,6 +7,9 @@
 // Warning message results in tool exiting.
 exit_on_warning = FALSE;
 
+// Allowable offset in seconds to silence time difference warning messages
+time_offset_warning = 0;
+
 // NetCDF Compression per variable (0 to 9, 0: disable compression)
 // This will be overridden by the environment variable MET_NC_COMPRESS and the
 // command line argument.
@@ -60,11 +63,12 @@ MB_to_PA(p)  = HPA_to_PA(p);
 GRIB1          = 1;
 GRIB2          = 2;
 NETCDF_MET     = 3;
-NETCDF_PINT    = 4;
-NETCDF_NCCF    = 5;
-PYTHON_NUMPY   = 6;
-PYTHON_XARRAY  = 7;
-NETCDF_UGRID   = 8;
+NETCDF_WRF     = 4;
+NETCDF_PINT    = 5;
+NETCDF_NCCF    = 6;
+PYTHON_NUMPY   = 7;
+PYTHON_XARRAY  = 8;
+NETCDF_UGRID   = 9;
 
 // Set Logic
 NONE           = 1;

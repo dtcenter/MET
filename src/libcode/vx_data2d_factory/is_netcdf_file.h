@@ -1,7 +1,7 @@
 
 
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -28,6 +28,8 @@ extern bool is_nccf_file(const char * filename);
 extern bool is_ncmet_file(const char * filename);
 
 extern bool is_ncpinterp_file(const char * filename);
+
+extern bool is_ncwrf_file(const char * filename);
 
 extern bool is_ugrid_file(const char * filename);
 

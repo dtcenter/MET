@@ -1,23 +1,10 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-
-
-////////////////////////////////////////////////////////////////////////
-
-using namespace std;
-
-static const int gray_min         = 130;   //  these values must be between 0 and 255 inclusive
-static const int gray_max         = 255;
-
-static const double h_margin      = 40.0;
-static const double v_margin      = 80.0;
-
-static const char map_filename [] = "MET_BASE/map/country_major_lakes_data";
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -44,6 +31,19 @@ static const char map_filename [] = "MET_BASE/map/country_major_lakes_data";
 #include "af_cp_file.h"
 #include "af_pt_file.h"
 
+using namespace std;
+
+
+////////////////////////////////////////////////////////////////////////
+
+static const int gray_min         = 130;   //  these values must be between 0 and 255 inclusive
+static const int gray_max         = 255;
+
+static const double h_margin      = 40.0;
+static const double v_margin      = 80.0;
+
+static const char map_filename [] = "MET_BASE/map/country_major_lakes_data";
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -68,7 +68,7 @@ static CommandLine cline;
 static const Grid nh(wwmca_north_data);
 static const Grid sh(wwmca_south_data);
 
-static const Grid * grid = (const Grid *) 0;
+static const Grid * grid = (const Grid *) nullptr;
 
 static int Nx, Ny;
 
@@ -162,7 +162,7 @@ for (j=0; j<(cline.n()); ++j)  {
    //  done
    //
 
-return ( 0 );
+return 0;
 
 }
 
@@ -243,7 +243,7 @@ AFCloudPctFile f_cp;
 AFPixelTimeFile f_pt;
 ConcatString short_name;
 ConcatString output_filename;
-char * pt_filename = (char *) 0;
+char * pt_filename = (char *) nullptr;
 Pgm image;
 RenderInfo info;
 PSfile plot;
@@ -280,7 +280,7 @@ if ( !(f_pt.read(pt_filename, bad_data_char)) )  {
 
 }
 
-if (pt_filename)  { delete [] pt_filename; pt_filename = (char *) 0; }
+if (pt_filename)  { delete [] pt_filename; pt_filename = (char *) nullptr; }
 
 if ( output_directory.length() > 0 )  output_filename << output_directory << '/';
 
@@ -472,7 +472,7 @@ k = ((gray_max - gray_min)*value)/100 + gray_min;
 
 c.set_gray(k);
 
-return ( c );
+return c;
 
 }
 
@@ -505,7 +505,7 @@ bool region_ok(const MapRegion & r, const char hemisphere)
 
 {
 
-return ( true );
+return true;
 
 }
 

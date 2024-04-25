@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -98,7 +98,7 @@ Or_Node::Or_Node()
 
 {
 
-left_child = right_child = 0;
+left_child = right_child = nullptr;
 
 }
 
@@ -110,8 +110,8 @@ Or_Node::~Or_Node()
 
 {
 
-if (  left_child )  { delete  left_child;   left_child = 0; }
-if ( right_child )  { delete right_child;  right_child = 0; }
+if (  left_child )  { delete  left_child;   left_child = nullptr; }
+if ( right_child )  { delete right_child;  right_child = nullptr; }
 
 }
 
@@ -319,7 +319,7 @@ And_Node::And_Node()
 
 {
 
-left_child = right_child = 0;
+left_child = right_child = nullptr;
 
 }
 
@@ -331,8 +331,8 @@ And_Node::~And_Node()
 
 {
 
-if (  left_child )  { delete  left_child;   left_child = 0; }
-if ( right_child )  { delete right_child;  right_child = 0; }
+if (  left_child )  { delete  left_child;   left_child = nullptr; }
+if ( right_child )  { delete right_child;  right_child = nullptr; }
 
 }
 
@@ -344,7 +344,7 @@ bool And_Node::check(double x) const
 
 {
 
-return ( check(x, bad_data_double, bad_data_double) );
+return check(x, bad_data_double, bad_data_double);
 
 }
 
@@ -558,7 +558,7 @@ Not_Node::Not_Node()
 
 {
 
-child = 0;
+child = nullptr;
 
 }
 
@@ -570,7 +570,7 @@ Not_Node::~Not_Node()
 
 {
 
-if ( child )  { delete child;  child = 0; }
+if ( child )  { delete child;  child = nullptr; }
 
 }
 
@@ -596,7 +596,7 @@ bool Not_Node::check(double x, double cmn, double csd) const
 
 const bool tf = child->check(x, cmn, csd);
 
-return ( ! tf );
+return !tf;
 
 }
 
@@ -796,7 +796,7 @@ bool Simple_Node::check(double x, double cmn, double csd) const
 
 {
 
-if ( op == thresh_na )  return ( true );
+if ( op == thresh_na )  return true;
 
 double tval;
 
@@ -939,7 +939,7 @@ void Simple_Node::set_perc(const NumArray *fptr, const NumArray *optr, const Num
 int i;
 double ptile, diff;
 NumArray data;
-const NumArray * ptr = 0;
+const NumArray * ptr = nullptr;
 bool fbias_fcst = false;
 
    //
@@ -1371,7 +1371,7 @@ SingleThresh & SingleThresh::operator=(const SingleThresh & c)
 
 {
 
-if ( this == &c ) return ( * this );
+if ( this == &c ) return *this;
 
 assign(c);
 
@@ -1389,9 +1389,9 @@ bool SingleThresh::operator==(const SingleThresh &st) const
 
    //  return true when both null and false when only one is null
 
-if ( !node && !(st.node) )  return ( true );
+if ( !node && !(st.node) )  return true;
 
-if ( !node || !(st.node) )  return ( false );
+if ( !node || !(st.node) )  return false;
 
    //  for complex thresholds, check the string representation
 
@@ -1427,7 +1427,7 @@ void SingleThresh::init_from_scratch()
 
 {
 
-node = 0;
+node = nullptr;
 
 clear();
 
@@ -1443,7 +1443,7 @@ void SingleThresh::clear()
 
 {
 
-if ( node )  { delete node;  node = 0; }
+if ( node )  { delete node;  node = nullptr; }
 
 return;
 
@@ -1486,7 +1486,7 @@ a->abbr_s << thresh_abbr_str[ind] << t;
 
 node = a;
 
-a = 0;
+a = nullptr;
 
 return;
 
@@ -1527,7 +1527,7 @@ a->abbr_s << thresh_abbr_str[ind] << cs;
 
 node = a;
 
-a = 0;
+a = nullptr;
 
 return;
 
@@ -1565,7 +1565,7 @@ a->set_na();
 
 node = a;
 
-a = 0;
+a = nullptr;
 
 return;
 
@@ -1644,11 +1644,11 @@ bool SingleThresh::need_perc() const
 
 if ( node )  {
 
-   return ( node->need_perc() );
+   return node->need_perc();
 
 }
 
-return ( false );
+return false;
 
 }
 

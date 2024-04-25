@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -8,9 +8,6 @@
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-using namespace std;
 
 
 #include <iostream>
@@ -27,6 +24,9 @@ using namespace std;
 #include "temp_file.h"
 
 #include "python_line.h"
+
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -179,7 +179,7 @@ N = PyList_Size(main_list);
    //  done
    //
 
-return ( true );
+return true;
 
 }
 
@@ -222,7 +222,7 @@ line << "LINE_TYPE";
    //  done
    //
 
-return ( line );
+return line;
 
 }
 
@@ -293,7 +293,7 @@ for (j=0; j<N; ++j)  {
    //  done
    //
 
-return ( line );
+return line;
 
 }
 
@@ -479,7 +479,7 @@ if ( first_call )  {
 
    first_call = false;
 
-   return ( true );
+   return true;
 
 }
 
@@ -489,12 +489,12 @@ if ( first_call )  {
 
 ++index;
 
-if ( index >= N )  return ( false );
+if ( index >= N )  return false;
 
 s_out = make_data_line();
 
 
-return ( true );
+return true;
 
 }
 
@@ -612,7 +612,7 @@ bool is_na (PyObject * obj)
 
 {
 
-if ( ! PyUnicode_Check(obj) )  return ( false );
+if ( ! PyUnicode_Check(obj) )  return false;
 
    //
    //  now we know it's a string, the value had better be "NA"
@@ -620,13 +620,13 @@ if ( ! PyUnicode_Check(obj) )  return ( false );
 
 ConcatString s = pyobject_as_concat_string(obj);
 
-if ( strcmp(s.text(), na_string.c_str()) == 0 )  return ( true );
+if ( strcmp(s.text(), na_string.c_str()) == 0 )  return true;
 
    //
    //  done
    //
 
-return ( false );   //  control flow should never get here
+return false;   //  control flow should never get here
 
 }
 

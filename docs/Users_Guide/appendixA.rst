@@ -1684,7 +1684,7 @@ Q. Why is the grid upside down?
      but the data is packed upside down.
 
      Try using the "file_type" entry. The "file_type" entry specifies the
-     input file type (e.g. GRIB1, GRIB2, NETCDF_MET, NETCDF_PINT, NETCDF_NCCF)
+     input file type (e.g. GRIB1, GRIB2, NETCDF_MET, NETCDF_WRF, NETCDF_PINT, NETCDF_NCCF)
      rather than letting the code determine it itself. For valid file_type
      values, see "File types" in the *data/config/ConfigConstants* file. This
      entry should be defined within the "fcst" or "obs" dictionaries.

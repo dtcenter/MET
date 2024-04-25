@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -8,7 +8,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
 
 #include <iostream>
 #include <unistd.h>
@@ -26,6 +25,9 @@ using namespace std;
 #include "vx_log.h"
 #include "vx_util.h"
 #include "vx_math.h"
+
+using namespace std;
+
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -58,11 +60,11 @@ TCStatFiles::TCStatFiles(const TCStatFiles &j) {
 
 TCStatFiles & TCStatFiles::operator=(const TCStatFiles &j) {
 
-   if(this == &j) return(*this);
+   if(this == &j) return *this;
 
    assign(j);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -137,7 +139,7 @@ bool TCStatFiles::operator>>(TrackPairInfo &pair) {
       CurFile++;
 
       // Check for the last file
-      if(CurFile == FileList.n()) return(false);
+      if(CurFile == FileList.n()) return false;
       else {
 
          // Open the next file for reading
@@ -163,8 +165,8 @@ bool TCStatFiles::operator>>(TrackPairInfo &pair) {
 
       // Skip header and non-TCMPR/TCDIAG lines
       if(line.is_header() ||
-         (line.type() != TCStatLineType_TCMPR &&
-          line.type() != TCStatLineType_TCDIAG)) continue;
+         (line.type() != TCStatLineType::TCMPR &&
+          line.type() != TCStatLineType::TCDIAG)) continue;
 
       // Add the current point
       pair.add(line);
@@ -175,7 +177,7 @@ bool TCStatFiles::operator>>(TrackPairInfo &pair) {
 
          // Check for a trailing TCDIAG line
          if(CurLDF.peek_line(line)) {
-            if(line.type() == TCStatLineType_TCDIAG) {
+            if(line.type() == TCStatLineType::TCDIAG) {
                pair.add(line);
                CurLDF >> line;
             }
@@ -185,7 +187,7 @@ bool TCStatFiles::operator>>(TrackPairInfo &pair) {
       }
    } // end while
 
-   return(true);
+   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -204,7 +206,7 @@ bool TCStatFiles::operator>>(ProbRIRWPairInfo &pair) {
       CurFile++;
 
       // Check for the last file
-      if(CurFile == FileList.n()) return(false);
+      if(CurFile == FileList.n()) return false;
       else {
 
          // Open the next file for reading
@@ -229,7 +231,7 @@ bool TCStatFiles::operator>>(ProbRIRWPairInfo &pair) {
    while((status = (CurLDF >> line))) {
 
       // Skip header and non-PROBRIRW lines
-      if(line.is_header() || line.type() != TCStatLineType_ProbRIRW) continue;
+      if(line.is_header() || line.type() != TCStatLineType::ProbRIRW) continue;
 
       // Add the current point
       pair.set(line);
@@ -238,7 +240,7 @@ bool TCStatFiles::operator>>(ProbRIRWPairInfo &pair) {
 
    } // end while
 
-   return(status);
+   return status;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -253,7 +255,7 @@ bool TCStatFiles::operator>>(TCStatLine &line) {
       CurFile++;
 
       // Check for the last file
-      if(CurFile == FileList.n()) return(false);
+      if(CurFile == FileList.n()) return false;
       else {
 
          // Open the next file for reading
@@ -278,13 +280,13 @@ bool TCStatFiles::operator>>(TCStatLine &line) {
    while((status = (CurLDF >> line))) {
 
       // Skip header and invalid line types
-      if(line.is_header() || line.type() == NoTCStatLineType) continue;
+      if(line.is_header() || line.type() == TCStatLineType::None) continue;
 
       break;
 
    } // end while
 
-   return(status);
+   return status;
 }
 
 ////////////////////////////////////////////////////////////////////////

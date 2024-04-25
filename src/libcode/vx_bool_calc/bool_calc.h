@@ -26,7 +26,7 @@ class BoolCalc {
       void init_from_scratch();
 
 
-      stack<bool> * s;     //  allocated
+      std::stack<bool> * s;     //  allocated
 
       Program * program;   //  allocated
 
@@ -52,7 +52,7 @@ class BoolCalc {
 
       void set(const char *);   //  algebraic boolean expression
 
-      bool run(const vector<bool>);
+      bool run(const std::vector<bool>);
 
      // return true if one of the operations is a union (or)
      bool has_union() const; 

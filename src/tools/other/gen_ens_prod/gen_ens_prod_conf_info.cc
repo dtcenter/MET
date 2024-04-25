@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -8,7 +8,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
 
 #include <dirent.h>
 #include <iostream>
@@ -26,6 +25,9 @@ using namespace std;
 #include "vx_log.h"
 
 #include "GridTemplate.h"
+
+using namespace std;
+
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -102,7 +104,7 @@ void GenEnsProdConfInfo::read_config(const ConcatString default_file_name,
 void GenEnsProdConfInfo::process_config(GrdFileType etype, StringArray * ens_files, bool use_ctrl) {
    int i, j;
    VarInfoFactory info_factory;
-   Dictionary *edict = (Dictionary *) 0;
+   Dictionary *edict = (Dictionary *) nullptr;
    Dictionary i_edict;
    InterpMthd mthd;
    VarInfo * next_var;
@@ -302,9 +304,9 @@ void GenEnsProdConfInfo::process_config(GrdFileType etype, StringArray * ens_fil
       mthd = string_to_interpmthd(nmep_smooth.method[i].c_str());
 
       // Check for unsupported neighborhood probability smoothing methods
-      if(mthd == InterpMthd_DW_Mean ||
-         mthd == InterpMthd_LS_Fit  ||
-         mthd == InterpMthd_Bilin) {
+      if(mthd == InterpMthd::DW_Mean ||
+         mthd == InterpMthd::LS_Fit  ||
+         mthd == InterpMthd::Bilin) {
          mlog << Error << "\nGenEnsProdConfInfo::process_config() -> "
               << "Neighborhood probability smoothing methods DW_MEAN, "
               << "LS_FIT, and BILIN are not supported for \""
@@ -377,7 +379,7 @@ GenEnsProdNcOutInfo GenEnsProdConfInfo::parse_nc_info(Dictionary *dict) {
       cur.do_climo_cdp = d->lookup_bool(conf_key_climo_cdp_flag);
    }
 
-   return(cur);
+   return cur;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -408,7 +410,7 @@ bool GenEnsProdNcOutInfo::all_false() const {
                  do_vld    || do_freq || do_nep   || do_nmep  ||
                  do_climo  || do_climo_cdp;
 
-   return(!status);
+   return !status;
 }
 
 ////////////////////////////////////////////////////////////////////////

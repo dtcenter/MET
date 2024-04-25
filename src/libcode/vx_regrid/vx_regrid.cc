@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -11,13 +11,13 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include "vx_regrid.h"
 
 #include "interp_mthd.h"
 
 #include "GridTemplate.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -32,30 +32,30 @@ DataPlane out;
 
 switch ( info.method )  {
 
-   case InterpMthd_Min:
-   case InterpMthd_Max:
-   case InterpMthd_Median:
-   case InterpMthd_UW_Mean:
-   case InterpMthd_DW_Mean:
-   case InterpMthd_LS_Fit:
-   case InterpMthd_Bilin:
-   case InterpMthd_Nearest:
+   case InterpMthd::Min:
+   case InterpMthd::Max:
+   case InterpMthd::Median:
+   case InterpMthd::UW_Mean:
+   case InterpMthd::DW_Mean:
+   case InterpMthd::LS_Fit:
+   case InterpMthd::Bilin:
+   case InterpMthd::Nearest:
       out = met_regrid_generic (in, from_grid, to_grid, info);
       break;
 
-   case InterpMthd_Budget:
+   case InterpMthd::Budget:
       out = met_regrid_budget (in, from_grid, to_grid, info);
       break;
 
-   case InterpMthd_AW_Mean:
+   case InterpMthd::AW_Mean:
       out = met_regrid_area_weighted (in, from_grid, to_grid, info);
       break;
 
-   case InterpMthd_Force:
+   case InterpMthd::Force:
       out = met_regrid_force (in, from_grid, to_grid, info);
       break;
 
-   case InterpMthd_MaxGauss:
+   case InterpMthd::MaxGauss:
       out = met_regrid_maxgauss (in, from_grid, to_grid, info);
       break;
 
@@ -83,7 +83,7 @@ out.censor(info.censor_thresh, info.censor_val);
    //  done
    //
 
-return ( out );
+return out;
 
 }
 
@@ -97,11 +97,11 @@ DataPlane met_regrid_nearest (const DataPlane & from_data, const Grid & from_gri
 
 RegridInfo ri;
 ri.enable = true;
-ri.method = InterpMthd_Nearest;
+ri.method = InterpMthd::Nearest;
 ri.width  = 1;
-ri.shape  = GridTemplateFactory::GridTemplate_Square;
+ri.shape  = GridTemplateFactory::GridTemplates::Square;
 
-return ( met_regrid_generic(from_data, from_grid, to_grid, ri) );
+return met_regrid_generic(from_data, from_grid, to_grid, ri);
 
 }
 
@@ -133,7 +133,6 @@ to_data.set_accum (from_data.accum());
    //
    //  copy data
    //
-
 for (xt=0; xt<(to_grid.nx()); ++xt)  {
 
    for (yt=0; yt<(to_grid.ny()); ++yt)  {
@@ -165,7 +164,7 @@ for (xt=0; xt<(to_grid.nx()); ++xt)  {
    //  done
    //
 
-return ( to_data );
+return to_data;
 
 }
 
@@ -268,7 +267,7 @@ for (xt=0; xt<(to_grid.nx()); ++xt)  {
    //  done
    //
 
-return ( to_data );
+return to_data;
 
 }
 
@@ -296,7 +295,7 @@ if ( from_grid.nx() != to_grid.nx() || from_grid.ny() != to_grid.ny() ) {
 
 }
 
-return ( from_data );
+return from_data;
 
 }
 
@@ -346,7 +345,7 @@ for (xt=0; xt<(to_grid.nx()); ++xt)  {
 
       } else {
          value = compute_horz_interp(from_data, x_from, y_from,
-                    bad_data_double, InterpMthd_Max, info.width,
+                    bad_data_double, InterpMthd::Max, info.width,
                     info.shape, from_grid.wrap_lon(), info.vld_thresh);
       }
 
@@ -358,7 +357,7 @@ for (xt=0; xt<(to_grid.nx()); ++xt)  {
 
 interp_gaussian_dp(to_data, info.gaussian, info.vld_thresh);
 
-return ( to_data );
+return to_data;
 
 }
 

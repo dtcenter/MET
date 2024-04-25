@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -7,8 +7,6 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 ////////////////////////////////////////////////////////////////////////
-
-using namespace std;
 
 #include <iostream>
 #include <fstream>
@@ -26,6 +24,8 @@ using namespace std;
 #include "tc_columns.h"
 
 #include "vx_log.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -62,11 +62,11 @@ TCStatLine::TCStatLine(const TCStatLine & L) {
 
 TCStatLine & TCStatLine::operator=(const TCStatLine & L) {
 
-   if(this == &L) return(*this);
+   if(this == &L) return *this;
 
    assign(L);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -99,8 +99,8 @@ void TCStatLine::clear() {
 
    DataLine::clear();
 
-   Type    = NoTCStatLineType;
-   HdrLine = (AsciiHeaderLine *) 0;
+   Type    = TCStatLineType::None;
+   HdrLine = (AsciiHeaderLine *) nullptr;
 
    return;
 }
@@ -119,15 +119,15 @@ int TCStatLine::read_line(LineDataFile * ldf) {
    //
    if(!status || n_items() == 0) {
       clear();
-      return(0);
+      return 0;
    }
 
    //
    // Check for a header line
    //
    if(strcmp(get_item(0), "VERSION") == 0) {
-      Type = TCStatLineType_Header;
-      return(1);
+      Type = TCStatLineType::Header;
+      return 1;
    }
 
    //
@@ -136,8 +136,8 @@ int TCStatLine::read_line(LineDataFile * ldf) {
    offset = METHdrTable.col_offset(get_item(0), "TCST", na_str, "LINE_TYPE");
 
    if(is_bad_data(offset) || n_items() < (offset + 1)) {
-      Type = NoTCStatLineType;
-      return(0);
+      Type = TCStatLineType::None;
+      return 0;
    }
 
    //
@@ -147,19 +147,19 @@ int TCStatLine::read_line(LineDataFile * ldf) {
 
    Type = string_to_tcstatlinetype(get_item(offset));
 
-   return(1);
+   return 1;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool TCStatLine::is_ok() const {
-   return(DataLine::is_ok());
+   return DataLine::is_ok();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool TCStatLine::is_header() const {
-   return(Type == TCStatLineType_Header);
+   return(Type == TCStatLineType::Header);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -179,7 +179,7 @@ ConcatString TCStatLine::get(const char *col_str, bool check_na) const {
          cs = sec_to_hhmmss(valid_hour());
    }
 
-   return(cs);
+   return cs;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -210,8 +210,8 @@ const char * TCStatLine::get_item(const char *col_str, bool check_na) const {
    //
    // Return bad data string for no match
    //
-   if(is_bad_data(offset)) return(bad_data_str);
-   else                    return(get_item(offset, check_na));
+   if(is_bad_data(offset)) return bad_data_str;
+   else                    return get_item(offset, check_na);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -219,61 +219,61 @@ const char * TCStatLine::get_item(const char *col_str, bool check_na) const {
 const char * TCStatLine::get_item(int offset, bool check_na) const {
 
    // Range check
-   if(offset < 0 || offset >= N_items) return(bad_data_str);
+   if(offset < 0 || offset >= N_items) return bad_data_str;
 
    const char * c = DataLine::get_item(offset);
 
    // Check for the NA string and interpret it as bad data
-   if(check_na && strcmp(c, na_str) == 0) return(bad_data_str);
-   else                                   return(c);
+   if(check_na && strcmp(c, na_str) == 0) return bad_data_str;
+   else                                   return c;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 const char * TCStatLine::version() const {
-   return(get_item("VERSION", false));
+   return get_item("VERSION", false);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 const char * TCStatLine::amodel() const {
-   return(get_item("AMODEL", false));
+   return get_item("AMODEL", false);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 const char * TCStatLine::bmodel() const {
-   return(get_item("BMODEL", false));
+   return get_item("BMODEL", false);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 const char * TCStatLine::desc() const {
-   return(get_item("DESC", false));
+   return get_item("DESC", false);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 const char * TCStatLine::storm_id() const {
-   return(get_item("STORM_ID", false));
+   return get_item("STORM_ID", false);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 const char * TCStatLine::basin() const {
-   return(get_item("BASIN", false));
+   return get_item("BASIN", false);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 const char * TCStatLine::cyclone() const {
-   return(get_item("CYCLONE", false));
+   return get_item("CYCLONE", false);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 const char * TCStatLine::storm_name() const {
-   return(get_item("STORM_NAME", false));
+   return get_item("STORM_NAME", false);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -284,13 +284,13 @@ unixtime TCStatLine::init() const {
 
    t = timestring_to_unix(c);
 
-   return(t);
+   return t;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 int TCStatLine::init_hour() const {
-   return(init()%sec_per_day);
+   return init()%sec_per_day;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -301,7 +301,7 @@ int TCStatLine::lead() const {
 
    s = timestring_to_sec(c);
 
-   return(s);
+   return s;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -312,7 +312,7 @@ unixtime TCStatLine::valid() const {
 
    t = timestring_to_unix(c);
 
-   return(t);
+   return t;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -324,25 +324,25 @@ int TCStatLine::valid_hour() const {
 ////////////////////////////////////////////////////////////////////////
 
 const char * TCStatLine::init_mask() const {
-   return(get_item("INIT_MASK", false));
+   return get_item("INIT_MASK", false);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 const char * TCStatLine::valid_mask() const {
-   return(get_item("VALID_MASK", false));
+   return get_item("VALID_MASK", false);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 const char * TCStatLine::initials() const {
-   return(get_item("INITIALS", false));
+   return get_item("INITIALS", false);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 const char * TCStatLine::line_type() const {
-   return(get_item("LINE_TYPE", false));
+   return get_item("LINE_TYPE", false);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -358,7 +358,7 @@ ConcatString TCStatLine::header() const {
        << (!is_bad_data(lead()) ? sec_to_hhmmss(lead()).text() : na_str) << sep
        << (valid() > 0 ? unix_to_yyyymmdd_hhmmss(valid()).text() : na_str);
 
-   return(hdr);
+   return hdr;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -370,29 +370,29 @@ ConcatString TCStatLine::header() const {
 TCStatLineType string_to_tcstatlinetype(const char *s) {
    TCStatLineType t;
 
-        if(strcmp(s, TCStatLineType_TCMPR_Str)    == 0) t = TCStatLineType_TCMPR;
-   else if(strcmp(s, TCStatLineType_TCDIAG_Str)   == 0) t = TCStatLineType_TCDIAG;
-   else if(strcmp(s, TCStatLineType_ProbRIRW_Str) == 0) t = TCStatLineType_ProbRIRW;
-   else if(strcmp(s, TCStatLineType_Header_Str)   == 0) t = TCStatLineType_Header;
-   else                                                 t = NoTCStatLineType;
+        if(strcmp(s, TCStatLineType_TCMPR_Str)    == 0) t = TCStatLineType::TCMPR;
+   else if(strcmp(s, TCStatLineType_TCDIAG_Str)   == 0) t = TCStatLineType::TCDIAG;
+   else if(strcmp(s, TCStatLineType_ProbRIRW_Str) == 0) t = TCStatLineType::ProbRIRW;
+   else if(strcmp(s, TCStatLineType_Header_Str)   == 0) t = TCStatLineType::Header;
+   else                                                 t = TCStatLineType::None;
 
-   return(t);
+   return t;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 ConcatString tcstatlinetype_to_string(const TCStatLineType t) {
-   const char *s = (const char *) 0;
+   const char *s = (const char *) nullptr;
 
    switch(t) {
-      case TCStatLineType_TCMPR:    s = TCStatLineType_TCMPR_Str;    break;
-      case TCStatLineType_TCDIAG:   s = TCStatLineType_TCDIAG_Str;   break;
-      case TCStatLineType_ProbRIRW: s = TCStatLineType_ProbRIRW_Str; break;
-      case TCStatLineType_Header:   s = TCStatLineType_Header_Str;   break;
-      default:                      s = na_str;                      break;
+      case TCStatLineType::TCMPR:    s = TCStatLineType_TCMPR_Str;    break;
+      case TCStatLineType::TCDIAG:   s = TCStatLineType_TCDIAG_Str;   break;
+      case TCStatLineType::ProbRIRW: s = TCStatLineType_ProbRIRW_Str; break;
+      case TCStatLineType::Header:   s = TCStatLineType_Header_Str;   break;
+      default:                       s = na_str;                      break;
    }
 
-   return(ConcatString(s));
+   return ConcatString(s);
 }
 
 ////////////////////////////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -12,8 +12,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -25,6 +23,8 @@ using namespace std;
 
 #include "is_bufr_file.h"
 #include "vx_log.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -61,7 +61,7 @@ if ( (fd = met_open(filename, O_RDONLY)) < 0 )  {
 
    exit ( 1 );
 
-   // return ( false );
+   // return false;
 
 }
 
@@ -75,7 +75,7 @@ if ( read(fd, buf, buf_size) != buf_size )  {
 
    exit ( 1 );
 
-   // return ( false );
+   // return false;
 
 }
 
@@ -89,13 +89,13 @@ close(fd);
    //  check for bufr magic cookie
    //
 
-if ( strncmp(buf, bufr_magic, bufr_magic_len) != 0 )  return ( false );
+if ( strncmp(buf, bufr_magic, bufr_magic_len) != 0 )  return false;
 
    //
    //  done
    //
 
-return ( true );
+return true;
 
 }
 

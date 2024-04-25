@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -90,17 +90,17 @@ class EnumInfo {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int EnumInfo::n_ids() const { return ( Nids ); }
+inline int EnumInfo::n_ids() const { return Nids; }
 
-inline const char * EnumInfo::name() const { return ( Name ); }
+inline const char * EnumInfo::name() const { return Name; }
 
-inline const char * EnumInfo::lowercase_name() const { return ( LowerCaseName ); }
+inline const char * EnumInfo::lowercase_name() const { return LowerCaseName; }
 
-inline const char * EnumInfo::scope() const { return ( Scope ); }
+inline const char * EnumInfo::scope() const { return Scope; }
 
-inline const char * EnumInfo::u_scope() const { return ( U_Scope ); }
+inline const char * EnumInfo::u_scope() const { return U_Scope; }
 
-inline const char * EnumInfo::header() const { return ( Header ); }
+inline const char * EnumInfo::header() const { return Header; }
 
 
 ////////////////////////////////////////////////////////////////////////

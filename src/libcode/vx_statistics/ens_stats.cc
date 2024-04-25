@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -7,8 +7,6 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 ////////////////////////////////////////////////////////////////////////
-
-using namespace std;
 
 #include <cstdio>
 #include <iostream>
@@ -20,6 +18,8 @@ using namespace std;
 #include "ens_stats.h"
 #include "vx_util.h"
 #include "vx_log.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -50,11 +50,11 @@ SSVARInfo::SSVARInfo(const SSVARInfo &c) {
 
 SSVARInfo & SSVARInfo::operator=(const SSVARInfo &c) {
 
-   if(this == &c) return(*this);
+   if(this == &c) return *this;
 
    assign(c);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -88,7 +88,7 @@ SSVARInfo & SSVARInfo::operator+=(const SSVARInfo &c) {
 
    assign(ssvar_info);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -155,11 +155,11 @@ ECNTInfo::ECNTInfo(const ECNTInfo &c) {
 
 ECNTInfo & ECNTInfo::operator=(const ECNTInfo &c) {
 
-   if(this == &c) return(*this);
+   if(this == &c) return *this;
 
    assign(c);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -181,13 +181,15 @@ void ECNTInfo::clear() {
    crps_emp_fair    = spread_md   = bad_data_double;
    crps_gaus        = crpscl_gaus = crpss_gaus = bad_data_double;
    ign              = bad_data_double;
-   me               = mae        = rmse        = spread        = bad_data_double;
-   me_oerr          = mae_oerr   = rmse_oerr   = spread_oerr   = bad_data_double;
+   me               = mae         = rmse       = spread      = bad_data_double;
+   me_oerr          = mae_oerr    = rmse_oerr  = spread_oerr = bad_data_double;
    spread_plus_oerr = bad_data_double;
 
-   n_ge_obs   = n_lt_obs   = 0;
-   me_ge_obs  = me_lt_obs  = bias_ratio  = bad_data_double;
-   
+   ign_conv_oerr = ign_corr_oerr = bad_data_double;
+
+   n_ge_obs  = n_lt_obs  = 0;
+   me_ge_obs = me_lt_obs = bias_ratio = bad_data_double;
+
    return;
 }
 
@@ -221,6 +223,8 @@ void ECNTInfo::assign(const ECNTInfo &c) {
    rmse_oerr        = c.rmse_oerr;
    spread_oerr      = c.spread_oerr;
    spread_plus_oerr = c.spread_plus_oerr;
+   ign_conv_oerr    = c.ign_conv_oerr;
+   ign_corr_oerr    = c.ign_corr_oerr;
 
    n_ge_obs         = c.n_ge_obs;
    n_lt_obs         = c.n_lt_obs;
@@ -361,6 +365,10 @@ void ECNTInfo::set(const PairDataEnsemble &pd) {
    // Compute the square root of the average variance plus oerr
    spread_plus_oerr = square_root(pd.var_plus_oerr_na.wmean(pd.wgt_na));
 
+   // Compute log scores with observational uncertainty
+   ign_conv_oerr = pd.ign_conv_oerr_na.wmean(pd.wgt_na);
+   ign_corr_oerr = pd.ign_corr_oerr_na.wmean(pd.wgt_na);
+
    // Compute bias ratio terms 
    n_ge_obs  = nint(pd.n_ge_obs_na.sum());
    me_ge_obs = pd.me_ge_obs_na.wmean(pd.n_ge_obs_na);
@@ -402,11 +410,11 @@ RPSInfo::RPSInfo(const RPSInfo &c) {
 
 RPSInfo & RPSInfo::operator=(const RPSInfo &c) {
 
-   if(this == &c) return(*this);
+   if(this == &c) return *this;
 
    assign(c);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -453,7 +461,7 @@ RPSInfo & RPSInfo::operator+=(const RPSInfo &c) {
 
    assign(r_info);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -618,6 +626,109 @@ void RPSInfo::set(const PairDataEnsemble &pd) {
    rpss      = (cmn_flag && !is_eq(rpscl, 0.0) ?
                 1.0 - (rps / rpscl) :
                 bad_data_double);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void RPSInfo::set_climo_bin_prob(const PairDataEnsemble &pd,
+                                 const ThreshArray &ocat_ta) {
+
+   // Compute RPS directly from the binned probabilities rather
+   // than with an Nx2 probabilistic contingency table.
+
+   // Store the dimensions
+   n_pair = pd.n_pair;
+   n_prob = pd.n_ens;
+
+   // If no forecast thresholds are provided, store a single NA thresh
+   if(fthresh.n() == 0) fthresh.add(na_str);
+
+   // Check that the number of observation category thresholds
+   // and bins match
+   if(ocat_ta.n() != pd.n_ens) {
+      mlog << Error << "\nRPSInfo::set_climo_bin_prob() -> "
+           << "the number of climatology probability bins ("
+           << pd.n_ens << ") must match the number of observation "
+           << " category thresholds (" << write_css(ocat_ta)
+           << ") defined by the \"" << conf_key_prob_cat_thresh
+           << "\" configuration file option.\n\n";
+      exit(1);
+   }
+
+   // Initialize RPS
+   rps = rpscl = 0.0;
+
+   // Loop over the observations
+   for(int i_obs=0; i_obs<pd.n_obs; i_obs++) {
+
+      // Initialize
+      double pfcst_sum = 0.0;
+      double pclim_sum = 0.0;
+      double rps_obs   = 0.0;
+      double rpscl_obs = 0.0;
+
+      // Expect the event to occur in exactly one bin
+      int n_event = 0;
+
+      // Loop over the probability bins
+      for(int i_bin=0; i_bin<pd.n_ens; i_bin++) {
+
+         // Update the cumulative probabilities
+         pfcst_sum += pd.e_na[i_bin][i_obs];
+         pclim_sum += 1.0/pd.n_ens;
+
+         // Make sure bins sum to 1.0 within 0.01
+         if(i_bin == (pd.n_ens - 1) && !is_eq(pfcst_sum, 1.0, 0.01)) {
+            mlog << Warning << "\nRPSInfo::set_climo_bin_prob() -> "
+                 << "unexpected sum of binned probabilities ("
+                 << pfcst_sum << " != 1).\n\n";
+         }
+
+         // Increment sums for the event
+         if(ocat_ta[i_bin].check(pd.o_na[i_obs])) {
+            n_event++;
+            rps_obs   += (1.0 - pfcst_sum)*(1.0 - pfcst_sum);
+            rpscl_obs += (1.0 - pclim_sum)*(1.0 - pclim_sum);
+         }
+         // Increment sums for the non-event
+         else {
+            rps_obs   += (0.0 - pfcst_sum)*(0.0 - pfcst_sum);
+            rpscl_obs += (0.0 - pclim_sum)*(0.0 - pclim_sum);
+         }
+
+      } // end for i_bin
+
+      // Make sure the event occurs in exactly 1 bin
+      if(n_event != 1) {
+         mlog << Warning << "\nRPSInfo::set_climo_bin_prob() -> "
+              << "the observation value (" << pd.o_na[i_obs]
+              << ") met " << n_event << " of the observation "
+              << " category thresholds (" << write_css(ocat_ta)
+              << ") instead of exactly 1!\n\n";
+      }
+
+      // Divide by number of bins minus 1
+      rps_obs   /= (pd.n_ens - 1);
+      rpscl_obs /= (pd.n_ens - 1);
+
+      // Increment running sums
+      rps   += rps_obs   / pd.n_obs ;
+      rpscl += rpscl_obs / pd.n_obs;
+
+   } // end for i_obs
+
+   // Compute RPSS relative to climatology
+   rpss = (!is_eq(rpscl, 0.0) ?
+           1.0 - (rps / rpscl) :
+           bad_data_double);
+
+   // Store other RPS statistics as bad data
+   rpss_smpl = bad_data_double;
+   rps_rel   = bad_data_double;
+   rps_res   = bad_data_double;
+   rps_unc   = bad_data_double;
 
    return;
 }

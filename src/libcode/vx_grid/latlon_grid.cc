@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -8,9 +8,6 @@
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-using namespace std;
 
 
 #include <cstdio>
@@ -24,6 +21,9 @@ using namespace std;
 #include "vx_util.h"
 #include "vx_log.h"
 #include "latlon_grid.h"
+
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -207,7 +207,7 @@ area = ( sin(lat_top_rad) - sin(lat_bottom_rad) )*delta_lon_rad;
 area = fabs(area)*earth_radius_km*earth_radius_km;
 
 
-return ( area );
+return area;
 
 }
 
@@ -219,7 +219,7 @@ int LatLonGrid::nx() const
 
 {
 
-return ( Nx );
+return Nx;
 
 }
 
@@ -231,7 +231,7 @@ int LatLonGrid::ny() const
 
 {
 
-return ( Ny );
+return Ny;
 
 }
 
@@ -243,7 +243,7 @@ ConcatString LatLonGrid::name() const
 
 {
 
-return ( Name );
+return Name;
 
 }
 
@@ -311,7 +311,7 @@ snprintf(junk, sizeof(junk), "wrapLon: %s", bool_to_string(wrapLon));   a << jun
    //  done
    //
 
-return ( a );
+return a;
 
 }
 
@@ -327,7 +327,7 @@ GridInfo i;
 
 i.set( Data );
 
-return ( i );
+return i;
 
 }
 
@@ -345,7 +345,7 @@ double LatLonGrid::rot_grid_to_earth(int x, int y) const
 // need to be changed when support is added for GRIB2.
 //
 
-return ( 0.0 );
+return 0.0;
 
 }
 
@@ -403,7 +403,7 @@ LatLonGrid * p = new LatLonGrid (Data);
 
 p->Name = Name;
 
-return ( p );
+return p;
 
 }
 

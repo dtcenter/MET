@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -10,8 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -20,6 +18,8 @@ using namespace std;
 #include "mode_ps_file.h"
 #include "mode_ps_table_defs.h"
 #include "table_helper.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -576,8 +576,8 @@ void ModePsFile::do_page_1(ModeFuzzyEngine & eng, EngineType eng_type, const cha
    Htab_b = Htab_a + 5.0*TextSep;
    Htab_c = Htab_a + 10.0*TextSep;
 
-   if ( eng_type == FOEng )  do_page_1_FOEng (eng, eng_type, title);
-   else                      do_page_1_other (eng, eng_type, title);
+   if ( eng_type == EngineType::FOEng ) do_page_1_FOEng (eng, eng_type, title);
+   else                                 do_page_1_other (eng, eng_type, title);
 
    showpage();
 
@@ -690,26 +690,26 @@ void ModePsFile::do_page_1_FOEng(ModeFuzzyEngine & eng, EngineType eng_type, con
    // Mask missing, grid, and polyline Flags
    //
    // write_centered_text(1, 1, Htab_a, text_y, 0.0, 0.5, "Mask M/G/P:");
-   if(eng.conf_info.mask_missing_flag == FieldType_Both ||
-      eng.conf_info.mask_missing_flag == FieldType_Fcst) tmp1_str = "on";
+   if(eng.conf_info.mask_missing_flag == FieldType::Both ||
+      eng.conf_info.mask_missing_flag == FieldType::Fcst) tmp1_str = "on";
    else                                                  tmp1_str = "off";
-   if(eng.conf_info.mask_grid_flag == FieldType_Both ||
-      eng.conf_info.mask_grid_flag == FieldType_Fcst)    tmp2_str = "on";
+   if(eng.conf_info.mask_grid_flag == FieldType::Both ||
+      eng.conf_info.mask_grid_flag == FieldType::Fcst)    tmp2_str = "on";
    else                                                  tmp2_str = "off";
-   if(eng.conf_info.mask_grid_flag == FieldType_Both ||
-      eng.conf_info.mask_grid_flag == FieldType_Fcst)    tmp3_str = "on";
+   if(eng.conf_info.mask_grid_flag == FieldType::Both ||
+      eng.conf_info.mask_grid_flag == FieldType::Fcst)    tmp3_str = "on";
    else                                                  tmp3_str = "off";
    label << cs_erase << tmp1_str << '/' << tmp2_str << '/' << tmp3_str;
    t.write_xy1_to_cell(r, 1, dx, dy, 0.0, 0.0, label.c_str());
 
-   if(eng.conf_info.mask_missing_flag == FieldType_Both ||
-      eng.conf_info.mask_missing_flag == FieldType_Obs)  tmp1_str = "on";
+   if(eng.conf_info.mask_missing_flag == FieldType::Both ||
+      eng.conf_info.mask_missing_flag == FieldType::Obs)  tmp1_str = "on";
    else                                                  tmp1_str = "off";
-   if(eng.conf_info.mask_grid_flag == FieldType_Both ||
-      eng.conf_info.mask_grid_flag == FieldType_Obs)     tmp2_str = "on";
+   if(eng.conf_info.mask_grid_flag == FieldType::Both ||
+      eng.conf_info.mask_grid_flag == FieldType::Obs)     tmp2_str = "on";
    else                                                  tmp2_str = "off";
-   if(eng.conf_info.mask_grid_flag == FieldType_Both ||
-      eng.conf_info.mask_grid_flag == FieldType_Obs)     tmp3_str = "on";
+   if(eng.conf_info.mask_grid_flag == FieldType::Both ||
+      eng.conf_info.mask_grid_flag == FieldType::Obs)     tmp3_str = "on";
    else                                                  tmp3_str = "off";
    label << cs_erase << tmp1_str << '/' << tmp2_str << '/' << tmp3_str;
    t.write_xy1_to_cell(r, 2, dx, dy, 0.0, 0.0, label.c_str());
@@ -792,15 +792,15 @@ void ModePsFile::do_page_1_FOEng(ModeFuzzyEngine & eng, EngineType eng_type, con
    // Merging flag
    //
 
-   if(eng.conf_info.Fcst->merge_flag == MergeType_Thresh) label = "thresh";
-   else if(eng.conf_info.Fcst->merge_flag == MergeType_Engine) label = "engine";
-   else if(eng.conf_info.Fcst->merge_flag == MergeType_Both)   label = "thresh/engine";
+   if(eng.conf_info.Fcst->merge_flag == MergeType::Thresh) label = "thresh";
+   else if(eng.conf_info.Fcst->merge_flag == MergeType::Engine) label = "engine";
+   else if(eng.conf_info.Fcst->merge_flag == MergeType::Both)   label = "thresh/engine";
    else                                                       label = "none";
    t.write_xy1_to_cell(r, 1, dx, dy, 0.0, 0.0, label.c_str());
 
-   if(eng.conf_info.Obs->merge_flag == MergeType_Thresh) label = "thresh";
-   else if(eng.conf_info.Obs->merge_flag == MergeType_Engine) label = "engine";
-   else if(eng.conf_info.Obs->merge_flag == MergeType_Both)   label = "thresh/engine";
+   if(eng.conf_info.Obs->merge_flag == MergeType::Thresh) label = "thresh";
+   else if(eng.conf_info.Obs->merge_flag == MergeType::Engine) label = "engine";
+   else if(eng.conf_info.Obs->merge_flag == MergeType::Both)   label = "thresh/engine";
    else                                                      label = "none";
    t.write_xy1_to_cell(r, 2, dx, dy, 0.0, 0.0, label.c_str());
 
@@ -811,9 +811,9 @@ void ModePsFile::do_page_1_FOEng(ModeFuzzyEngine & eng, EngineType eng_type, con
    // Matching scheme
    //
 
-   if(eng.conf_info.match_flag == MatchType_MergeBoth) label = "match/merge";
-   else if(eng.conf_info.match_flag == MatchType_MergeFcst) label = "match/fcst merge";
-   else if(eng.conf_info.match_flag == MatchType_NoMerge)   label = "match/no merge";
+   if(eng.conf_info.match_flag == MatchType::MergeBoth) label = "match/merge";
+   else if(eng.conf_info.match_flag == MatchType::MergeFcst) label = "match/fcst merge";
+   else if(eng.conf_info.match_flag == MatchType::NoMerge)   label = "match/no merge";
    else                                                     label = "none";
    t.write_xy1_to_cell(r, 2, 0.0, dy, 0.5, 0.0, label.c_str());
 

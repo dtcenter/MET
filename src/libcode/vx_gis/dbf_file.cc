@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -7,8 +7,6 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 ////////////////////////////////////////////////////////////////////////
-
-using namespace std;
 
 #include <iostream>
 #include <unistd.h>
@@ -24,6 +22,8 @@ using namespace std;
 #include "vx_cal.h"
 
 #include "dbf_file.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -79,11 +79,11 @@ DbfHeader & DbfHeader::operator=(const DbfHeader & h)
 
 {
 
-if ( this == &h )  return ( * this );
+if ( this == &h )  return *this;
 
 assign(h);
 
-return ( * this );
+return *this;
 
 }
 
@@ -383,7 +383,7 @@ for (j=0; j<n_subrecs; ++j)  {
 }
 
 
-return ( 0 );
+return 0;
 
 }
 
@@ -441,11 +441,11 @@ DbfSubRecord & DbfSubRecord::operator=(const DbfSubRecord & r)
 
 {
 
-if ( this == &r )  return ( * this );
+if ( this == &r )  return *this;
 
 assign(r);
 
-return ( * this );
+return *this;
 
 }
 
@@ -769,9 +769,9 @@ const char * DbfFile::filename() const
 
 {
 
-if ( Filename.empty() )  return ( (const char *) 0 );
+if ( Filename.empty() )  return (const char *) 0;
 
-return ( Filename.text() );
+return Filename.text();
 
 }
 
@@ -792,7 +792,7 @@ if ( (fd = met_open(path, O_RDONLY)) < 0 )  {
 
    fd = -1;
 
-   return ( false );
+   return false;
 
 }
 
@@ -813,7 +813,7 @@ if((n_read = ::read(fd, buf, bytes)) != bytes) {
         << path << "\"\n\n";
    close();
 
-   return(false);
+   return false;
 }
 
 Header.set_header(buf);
@@ -828,7 +828,7 @@ Header.set_subrecords(fd);
    //  done
    //
 
-return ( true );
+return true;
 
 }
 
@@ -860,7 +860,7 @@ if ( pos < 0 )  {
 }
 
 
-return ( pos );
+return pos;
 
 }
 
@@ -926,11 +926,11 @@ if ( n_read < 0 )  {   //  some kind of error
 
 }
 
-if ( n_read == 0 )  return ( false );
+if ( n_read == 0 )  return false;
 
-if ( n_read == n_bytes )  return ( true );
+if ( n_read == n_bytes )  return true;
 
-return ( false );   //  gotta return something
+return false;   //  gotta return something
 
 }
 
@@ -958,7 +958,7 @@ if ( Header.subrec )  {
 
 }
 
-return ( sa );
+return sa;
 
 }
 
@@ -1033,7 +1033,7 @@ for (int j=0,pos=1; j<(Header.n_subrecs); ++j)  {
 
 }
 
-return ( sa );
+return sa;
 
 }
 

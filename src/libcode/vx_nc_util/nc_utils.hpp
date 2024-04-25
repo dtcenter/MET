@@ -396,7 +396,7 @@ bool get_nc_data_(netCDF::NcVar *var, T *data, T met_missing, const long dim, co
             exit(1);
          }
       }
-      else if (((cur+dim) > dim_size) && (0 < dim_size)) {
+      else if ((cur+dim) > dim_size) {
          netCDF::NcDim nc_dim = get_nc_dim(var, dim_idx);
          mlog << Error << "\n" << method_name << "The start offset and count ("
               << cur << " + " << dim << ") exceeds the dimension " << dim_size << " "
@@ -433,7 +433,7 @@ bool get_nc_data_(netCDF::NcVar *var, T *data, T met_missing, const long dim, co
 template <typename T>
 bool get_nc_data_(netCDF::NcVar *var, T *data, T bad_data, const LongArray &curs) {
    bool return_status = false;
-   const char *method_name = "get_nc_data_(*curs) ";
+   //const char *method_name = "get_nc_data_(*curs) ";
 
    if (IS_VALID_NC_P(var)) {
 
@@ -559,11 +559,12 @@ void copy_nc_data_t(netCDF::NcVar *var, double *data, const T *packed_data,
                     const int cell_count, const char *data_type,
                     double add_offset, double scale_factor,
                     bool has_missing, T missing_value) {
-   int unpacked_count = 0;
    const char *method_name = "copy_nc_data_t(double) ";
 
    if (cell_count > 0) {
-      int idx, first_idx;
+      int idx;
+      int first_idx;
+      int unpacked_count = 0;
       double min_value, max_value;
       bool do_scale_factor = has_scale_factor_attr(var) || has_add_offset_attr(var);
 

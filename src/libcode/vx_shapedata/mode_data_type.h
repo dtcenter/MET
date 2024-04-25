@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -20,10 +20,10 @@ using std::string;
 
 enum ModeDataType
 {
-   ModeDataType_Traditional,   // default
-   ModeDataType_MvMode_Obs,           // mvmode, obs data only
-   ModeDataType_MvMode_Fcst,          // mvmode, fcst data only
-   ModeDataType_MvMode_Both           // mvmode, fcst and obs
+  Traditional,   // default
+  MvMode_Obs,    // mvmode, obs data only
+  MvMode_Fcst,   // mvmode, fcst data only
+  MvMode_Both    // mvmode, fcst and obs
 };
 
 
@@ -33,13 +33,13 @@ inline string sprintModeDataType(ModeDataType type)
 {
    switch (type)
    {
-   case ModeDataType_MvMode_Obs:
+   case ModeDataType::MvMode_Obs:
       return "MvMode_Obs";
-   case ModeDataType_MvMode_Fcst:
+   case ModeDataType::MvMode_Fcst:
       return "MvMode_Fcst";
-   case ModeDataType_MvMode_Both:
+   case ModeDataType::MvMode_Both:
       return "MvMode_Both";
-   case ModeDataType_Traditional:
+   case ModeDataType::Traditional:
    default:
       return "TraditionalMode";
    }

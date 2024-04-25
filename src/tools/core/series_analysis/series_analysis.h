@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -88,7 +88,7 @@ static SeriesAnalysisConfInfo conf_info;
 ////////////////////////////////////////////////////////////////////////
 
 // Output NetCDF file
-static netCDF::NcFile *nc_out  = (netCDF::NcFile *) 0;
+static netCDF::NcFile *nc_out  = (netCDF::NcFile *) nullptr;
 static netCDF::NcDim  lat_dim;
 static netCDF::NcDim  lon_dim ;
 
@@ -113,21 +113,21 @@ static int n_reads = 1; // Initialize to at least one pass
 
 // Data file factory and input files
 static Met2dDataFileFactory mtddf_factory;
-static Met2dDataFile *fcst_mtddf = (Met2dDataFile *) 0;
-static Met2dDataFile *obs_mtddf  = (Met2dDataFile *) 0;
+static Met2dDataFile *fcst_mtddf = (Met2dDataFile *) nullptr;
+static Met2dDataFile *obs_mtddf  = (Met2dDataFile *) nullptr;
 
 // Pointer to the random number generator to be used
-static gsl_rng *rng_ptr = (gsl_rng *) 0;
+static gsl_rng *rng_ptr = (gsl_rng *) nullptr;
 
 // Enumeration of ways that a series can be defined
-enum SeriesType {
-   SeriesType_None,       // Undefined series type
-   SeriesType_Fcst_Conf,  // Defined by fcst.field configuration
-   SeriesType_Obs_Conf,   // Defined by obs.field configuration
-   SeriesType_Fcst_Files, // Defined by -fcst command line option
-   SeriesType_Obs_Files   // Defined by -obs command line option
+enum class SeriesType {
+   None,       // Undefined series type
+   Fcst_Conf,  // Defined by fcst.field configuration
+   Obs_Conf,   // Defined by obs.field configuration
+   Fcst_Files, // Defined by -fcst command line option
+   Obs_Files   // Defined by -obs command line option
 };
-static SeriesType series_type = SeriesType_None;
+static SeriesType series_type = SeriesType::None;
 
 // Series length
 static int n_series = 0;

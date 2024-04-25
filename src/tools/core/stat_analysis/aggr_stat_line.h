@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -178,7 +178,7 @@ struct ssvar_bin_cmp {
     // Otherwise, parse list of numbers and compare each element
     StringArray sa1 = cs1.split(":");
     StringArray sa2 = cs2.split(":");
-    for(int i=0; i<min(sa1.n_elements(), sa2.n_elements()); i++) {
+    for(int i=0; i<std::min(sa1.n_elements(), sa2.n_elements()); i++) {
        if(!is_eq(atof(sa1[i].c_str()), atof(sa2[i].c_str()))) {
           return(atof(sa1[i].c_str()) < atof(sa2[i].c_str()));
        }

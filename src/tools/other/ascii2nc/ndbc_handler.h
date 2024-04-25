@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -10,8 +10,8 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-#ifndef  __NDBCHANDLER_H__
-#define  __NDBCHANDLER_H__
+#ifndef  __NDBC_HANDLER_H__
+#define  __NDBC_HANDLER_H__
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -38,12 +38,12 @@ private:
   class Column
   {
   public:
-    string name;  // name of the header as found in the file
+    std::string name;  // name of the header as found in the file
     int ptr;      // column index for that data (0,1,..)
-    inline Column(const string &n) : name(n), ptr(-1) {}
+    inline Column(const std::string &n) : name(n), ptr(-1) {}
     inline ~Column() {}
     inline void clear(void) {ptr = -1;}
-    inline bool nameEquals(const string &s) const {return name == s;}
+    inline bool nameEquals(const std::string &s) const {return name == s;}
     inline void setPtr(int ipt) {ptr = ipt;}
     inline bool notSet(void) const {return ptr == -1;}
   };
@@ -51,14 +51,14 @@ private:
 
 public:
 
-  NdbcHandler(const string &program_name);
+  NdbcHandler(const std::string &program_name);
   virtual ~NdbcHandler();
 
   virtual bool isFileType(LineDataFile &ascii_file) const;
 
   void setFormatVersion(int version);
 
-  static string getFormatStringStandard()
+  static std::string getFormatStringStandard()
   {
     return "ndbc_standard";
   }
@@ -92,7 +92,7 @@ protected:
   //
   // Unchanging header information for a file (each file is one station)
   //
-  string stationId;
+  std::string stationId;
   double stationLat;
   double stationLon;
   double stationAlt;
@@ -107,10 +107,10 @@ protected:
   int column_pointer_minute;
 
   // storage for non time column information (name/pointer)
-  vector<Column> column;
+  std::vector<Column> column;
 
   // the lookup file for location information
-  string locationsFileName;
+  std::string locationsFileName;
 
   // the lookup object
   NdbcLocations locations;
@@ -126,7 +126,7 @@ protected:
   // parse the file name to identify the station, then lookup and set the
   // location
   //
-  bool _setStationInfo(const string &filename);
+  bool _setStationInfo(const std::string &filename);
 
   // Read and save the header information from the given file,  The file pointer
   // is assumed to be at the beginning of the file.  Sets all the pointers based
@@ -151,9 +151,9 @@ protected:
   // parse one line from the ascii file and add to observations
 
   bool _parseObservationLineStandard(DataLine &data_line,
-				     const string &filename);
+                                     const std::string &filename);
 
-  string _extractColumn(const DataLine &data_line, int ptr) const;
+  std::string _extractColumn(const DataLine &data_line, int ptr) const;
   double _extractDouble(const DataLine &data_line, int ptr) const;
 
 };

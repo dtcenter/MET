@@ -4,7 +4,7 @@
 
 
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -391,9 +391,9 @@ const BuiltinInfo & info = binfo[which];
    //  nint and sign are treated differently
    //
 
-if ( info.id == builtin_nint )  { do_nint();  return; }
+if ( info.id == Builtin::nint )  { do_nint();  return; }
 
-if ( info.id == builtin_sign )  { do_sign();  return; }
+if ( info.id == Builtin::sign )  { do_sign();  return; }
 
    //
    //

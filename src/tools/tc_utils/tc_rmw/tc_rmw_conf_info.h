@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -50,18 +50,17 @@ class TCRMWConfInfo {
         // Range/Azimuth information
         int    n_range;
         int    n_azimuth;
-        double max_range_km;
         double delta_range_km;
         double rmw_scale;
 
-	// Wind conversion information
-	bool compute_tangential_and_radial_winds;
-	ConcatString u_wind_field_name;
-	ConcatString v_wind_field_name;
-	ConcatString tangential_velocity_field_name;
-	ConcatString radial_velocity_field_name;
-	ConcatString tangential_velocity_long_field_name;
-	ConcatString radial_velocity_long_field_name;
+        // Wind conversion information
+        bool compute_tangential_and_radial_winds;
+        ConcatString u_wind_field_name;
+        ConcatString v_wind_field_name;
+        ConcatString tangential_velocity_field_name;
+        ConcatString radial_velocity_field_name;
+        ConcatString tangential_velocity_long_field_name;
+        ConcatString radial_velocity_long_field_name;
 
         // Variable information
         VarInfo** data_info;

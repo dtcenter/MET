@@ -1,7 +1,7 @@
 
 
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -29,6 +29,7 @@
 #include "leveltype_to_string.h"
 #include "var_info.h"
 #include "table_lookup.h"
+#include "mask_filters.h"
 
 
 ////////////////////////////////////////////////////////////////////////

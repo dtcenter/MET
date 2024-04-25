@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -81,7 +81,7 @@ static ConcatString command_line_job;
 ////////////////////////////////////////////////////////////////////////
 
 // Output file stream
-static std::ofstream *tc_stat_out = (std::ofstream *) 0;
+static std::ofstream *tc_stat_out = (std::ofstream *) nullptr;
 
 ////////////////////////////////////////////////////////////////////////
 //

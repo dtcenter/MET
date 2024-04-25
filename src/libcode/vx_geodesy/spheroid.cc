@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -8,9 +8,6 @@
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-using namespace std;
 
 
 #include <iostream>
@@ -22,6 +19,9 @@ using namespace std;
 #include "spheroid.h"
 #include "vx_util.h"
 #include "vx_math.h"
+
+
+using namespace std;
 
 
 
@@ -160,11 +160,11 @@ Spheroid & Spheroid::operator=(const Spheroid & g)
 
 {
 
-if ( this == &g )  return ( * this );
+if ( this == &g )  return *this;
 
 assign(g);
 
-return ( * this );
+return *this;
 
 }
 
@@ -435,7 +435,7 @@ q = t1 - t2;
 q *= 1.0 - E2;
 
 
-return ( q );
+return q;
 
 }
 
@@ -447,7 +447,7 @@ double Spheroid::qp_direct() const
 
 {
 
-if ( is_sphere() )  return ( 2.0 );
+if ( is_sphere() )  return 2.0;
 
 
 double Qp;
@@ -459,7 +459,7 @@ Qp = log( (1.0 - E)/(1.0 + E) );
 Qp = 1.0 - ((1.0 - E*E)*Qp)/(2.0*E);
 
 
-return ( Qp );
+return Qp;
 
 }
 
@@ -471,7 +471,7 @@ double Spheroid::rq_km() const
 
 {
 
-if ( is_sphere() )  return ( A_km );
+if ( is_sphere() )  return A_km;
 
 
 double r;
@@ -483,7 +483,7 @@ r = sqrt(0.5*qp);
 r *= A_km;
 
 
-return ( r );
+return r;
 
 }
 
@@ -495,7 +495,7 @@ double Spheroid::beta(double lat) const
 
 {
 
-if ( is_sphere() )  return ( lat );
+if ( is_sphere() )  return lat;
 
 
 double q, qp;
@@ -507,7 +507,7 @@ q = q_func(lat);
 qp = qp_direct();
 
 
-return ( asind(q/qp) );
+return asind(q/qp);
 
 }
 
@@ -529,7 +529,7 @@ m = sqrt( 1.0 - E*E*s*s );
 
 m = c/m;
 
-return ( m );
+return m;
 
 }
 
@@ -557,7 +557,7 @@ t = b/a;
 e = sqrt( 1.0 - t*t );
 
 
-return ( e );
+return e;
 
 }
 
@@ -577,7 +577,7 @@ t = b/a;
 f = 1.0 - t;
 
 
-return ( f );
+return f;
 
 }
 
@@ -595,7 +595,7 @@ double u;
 u = atan2d(b*sind(phi), a*cosd(phi));
 
 
-return ( u );
+return u;
 
 }
 
@@ -613,7 +613,7 @@ double phi;
 phi = atan2d(a*sind(u), b*cosd(u));
 
 
-return ( phi );
+return phi;
 
 }
 

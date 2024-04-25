@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -7,8 +7,6 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 ////////////////////////////////////////////////////////////////////////
-
-using namespace std;
 
 #include <dirent.h>
 #include <iostream>
@@ -23,6 +21,8 @@ using namespace std;
 
 #include "vx_data2d_factory.h"
 #include "vx_log.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -49,6 +49,9 @@ void GridStatConfInfo::init_from_scratch() {
    // Initialize pointers
    vx_opt = (GridStatVxOpt *) nullptr;
 
+#ifdef WITH_UGRID
+   ignore_ugrid_dataset = false;
+#endif
    clear();
 
    return;
@@ -63,18 +66,18 @@ void GridStatConfInfo::clear() {
    model.clear();
    obtype.clear();
    mask_map.clear();
-   grid_weight_flag = GridWeightType_None;
+   grid_weight_flag = GridWeightType::None;
    tmp_dir.clear();
    output_prefix.clear();
    version.clear();
 #ifdef WITH_UGRID
    ugrid_nc.clear();
-   ugrid_dataset.clear();
+   if (!ignore_ugrid_dataset) ugrid_dataset.clear();
    ugrid_map_config.clear();
    ugrid_max_distance_km = bad_data_double;
 #endif
 
-   for(i=0; i<n_txt; i++) output_flag[i] = STATOutputType_None;
+   for(i=0; i<n_txt; i++) output_flag[i] = STATOutputType::None;
 
    nc_info.clear();
 
@@ -109,18 +112,25 @@ void GridStatConfInfo::read_config(const char *default_file_name,
 
 ////////////////////////////////////////////////////////////////////////
 
-void GridStatConfInfo::read_configs(StringArray user_file_names) {
+#ifdef WITH_UGRID
+void GridStatConfInfo::read_ugrid_configs(StringArray ugrid_config_names, const char * user_config) {
 
-   const char *file_name;
-   for (int i=0; i<user_file_names.n_elements(); i++) {
-      file_name = replace_path(user_file_names[i].c_str()).c_str();
-      if (file_exists(file_name)) conf.read(file_name);
-      else mlog << Warning << "\nGridStatConfInfo::read_configs(StringArray) -> "
-                << "The configuration file \"" << user_file_names[i]<< "\" does not exist.\n\n";
+   ConcatString file_name;
+   for (int i=0; i<ugrid_config_names.n_elements(); i++) {
+      file_name = replace_path(ugrid_config_names[i].c_str());
+      if (file_exists(file_name.c_str())) {
+         conf.read(file_name.c_str());
+         ignore_ugrid_dataset = true;
+         ugrid_dataset = file_name;
+      }
+      else mlog << Warning << "\nGridStatConfInfo::read_ugrid_configs(StringArray) -> "
+                << "The configuration file \"" << ugrid_config_names[i]<< "\" does not exist.\n\n";
    }
+   if (file_exists(user_config)) conf.read(user_config);   /* to avoid overriding by ugrid_config_names */
 
    return;
 }
+#endif
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -154,7 +164,7 @@ void GridStatConfInfo::process_config(GrdFileType ftype,
 
 #ifdef WITH_UGRID
    // Conf: ugrid_dataset
-   ugrid_dataset = parse_conf_ugrid_dataset(&conf);
+   if (!ignore_ugrid_dataset) ugrid_dataset = parse_conf_ugrid_dataset(&conf);
 
    // Conf: ugrid_nc
    ugrid_nc = parse_conf_ugrid_coordinates_file(&conf);
@@ -209,9 +219,9 @@ void GridStatConfInfo::process_config(GrdFileType ftype,
    process_flags();
 
    // If VL1L2, VAL1L2, or VCNT is requested, set the uv_index
-   if(output_flag[i_vl1l2]  != STATOutputType_None ||
-      output_flag[i_val1l2] != STATOutputType_None ||
-      output_flag[i_vcnt]   != STATOutputType_None) {
+   if(output_flag[i_vl1l2]  != STATOutputType::None ||
+      output_flag[i_val1l2] != STATOutputType::None ||
+      output_flag[i_vcnt]   != STATOutputType::None) {
 
       for(i=0; i<n_vx; i++) {
 
@@ -300,7 +310,7 @@ void GridStatConfInfo::process_config(GrdFileType ftype,
 void GridStatConfInfo::process_flags() {
 
    // Initialize
-   for(int i=0; i<n_txt; i++) output_flag[i] = STATOutputType_None;
+   for(int i=0; i<n_txt; i++) output_flag[i] = STATOutputType::None;
    nc_info.set_all_false();
    output_ascii_flag = false;
 
@@ -309,13 +319,13 @@ void GridStatConfInfo::process_flags() {
 
       // Summary of output_flag settings
       for(int j=0; j<n_txt; j++) {
-         if(vx_opt[i].output_flag[j] == STATOutputType_Both) {
-            output_flag[j] = STATOutputType_Both;
+         if(vx_opt[i].output_flag[j] == STATOutputType::Both) {
+            output_flag[j] = STATOutputType::Both;
             output_ascii_flag = true;
          }
-         else if(vx_opt[i].output_flag[j] == STATOutputType_Stat &&
-                           output_flag[j] == STATOutputType_None) {
-            output_flag[j] = STATOutputType_Stat;
+         else if(vx_opt[i].output_flag[j] == STATOutputType::Stat &&
+                           output_flag[j] == STATOutputType::None) {
+            output_flag[j] = STATOutputType::Stat;
             output_ascii_flag = true;
          }
       }
@@ -439,7 +449,7 @@ int GridStatConfInfo::n_txt_row(int i_txt_row) const {
    // Loop over the tasks and sum the line counts for this line type
    for(int i=0; i<n_vx; i++) n += vx_opt[i].n_txt_row(i_txt_row);
 
-   return(n);
+   return n;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -450,7 +460,7 @@ int GridStatConfInfo::n_stat_row() const {
    // Loop over the line types and sum the line counts
    for(int i=0; i<n_txt; i++) n += n_txt_row(i);
 
-   return(n);
+   return n;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -460,7 +470,7 @@ int GridStatConfInfo::get_max_n_cat_thresh() const {
 
    for(int i=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_cat_thresh());
 
-   return(n);
+   return n;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -470,7 +480,7 @@ int GridStatConfInfo::get_max_n_cnt_thresh() const {
 
    for(int i=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_cnt_thresh());
 
-   return(n);
+   return n;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -480,7 +490,7 @@ int GridStatConfInfo::get_max_n_wind_thresh() const {
 
    for(int i=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_wind_thresh());
 
-   return(n);
+   return n;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -490,7 +500,7 @@ int GridStatConfInfo::get_max_n_fprob_thresh() const {
 
    for(int i=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_fprob_thresh());
 
-   return(n);
+   return n;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -500,7 +510,7 @@ int GridStatConfInfo::get_max_n_oprob_thresh() const {
 
    for(int i=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_oprob_thresh());
 
-   return(n);
+   return n;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -510,7 +520,7 @@ int GridStatConfInfo::get_max_n_eclv_points() const {
 
    for(int i=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_eclv_points());
 
-   return(n);
+   return n;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -520,7 +530,7 @@ int GridStatConfInfo::get_max_n_cov_thresh() const {
 
    for(int i=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_cov_thresh());
 
-   return(n);
+   return n;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -573,11 +583,11 @@ void GridStatVxOpt::clear() {
 
    fcnt_ta.clear();
    ocnt_ta.clear();
-   cnt_logic = SetLogic_None;
+   cnt_logic = SetLogic::None;
 
    fwind_ta.clear();
    owind_ta.clear();
-   wind_logic = SetLogic_None;
+   wind_logic = SetLogic::None;
 
    mask_grid.clear();
    mask_poly.clear();
@@ -610,7 +620,7 @@ void GridStatVxOpt::clear() {
 
    seeps_p1_thresh.clear();
 
-   for(i=0; i<n_txt; i++) output_flag[i] = STATOutputType_None;
+   for(i=0; i<n_txt; i++) output_flag[i] = STATOutputType::None;
 
    nc_info.clear();
 
@@ -771,8 +781,8 @@ void GridStatVxOpt::process_config(
 
    // Verifying with multi-category contingency tables
    if(!fcst_info->is_prob() &&
-      (output_flag[i_mctc] != STATOutputType_None ||
-       output_flag[i_mcts] != STATOutputType_None)) {
+      (output_flag[i_mctc] != STATOutputType::None ||
+       output_flag[i_mcts] != STATOutputType::None)) {
       check_mctc_thresh(fcat_ta);
       check_mctc_thresh(ocat_ta);
    }
@@ -804,9 +814,9 @@ void GridStatVxOpt::process_config(
       mthd = string_to_interpmthd(interp_info.method[i].c_str());
 
       // Check for unsupported interpolation methods
-      if(mthd == InterpMthd_DW_Mean ||
-         mthd == InterpMthd_LS_Fit  ||
-         mthd == InterpMthd_Bilin) {
+      if(mthd == InterpMthd::DW_Mean ||
+         mthd == InterpMthd::LS_Fit  ||
+         mthd == InterpMthd::Bilin) {
          mlog << Error << "\nGridStatVxOpt::process_config() -> "
               << "Interpolation methods DW_MEAN, LS_FIT, and BILIN are "
               << "not supported in Grid-Stat.\n\n";
@@ -1000,7 +1010,7 @@ bool GridStatVxOpt::is_uv_match(const GridStatVxOpt &v) const {
       !(mask_name   == v.mask_name  ) ||
       !(interp_info == v.interp_info)) match = false;
 
-   return(match);
+   return match;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1049,7 +1059,7 @@ int GridStatVxOpt::n_txt_row(int i_txt_row) const {
    }
 
    // Check if this output line type is requested
-   if(output_flag[i_txt_row] == STATOutputType_None) return 0;
+   if(output_flag[i_txt_row] == STATOutputType::None) return 0;
 
    bool prob_flag = fcst_info->is_prob();
    bool vect_flag = (fcst_info->is_u_wind() && obs_info->is_u_wind());
@@ -1280,7 +1290,7 @@ bool GridStatNcOutInfo::all_false() const {
                  do_nbrhd        || do_fourier    || do_gradient ||
                  do_distance_map || do_apply_mask;
 
-   return(!status);
+   return !status;
 }
 
 ////////////////////////////////////////////////////////////////////////

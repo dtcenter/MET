@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -8,8 +8,6 @@
 
 
 ////////////////////////////////////////////////////////////////////////
-
-using namespace std;
 
 #include <iostream>
 #include <unistd.h>
@@ -21,6 +19,8 @@ using namespace std;
 #include "vx_util.h"
 #include "vx_math.h"
 #include "vx_log.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -42,7 +42,7 @@ bool derive_wdir(const DataPlane &u2d, const DataPlane &v2d,
            << "the dimensions for U and V do not match: ("
            << u2d.nx() << ", " << u2d.ny() << ") != ("
            << v2d.nx() << ", " << v2d.ny() << ")\n\n";
-      return(false);
+      return false;
    }
 
    //
@@ -81,7 +81,7 @@ bool derive_wdir(const DataPlane &u2d, const DataPlane &v2d,
       } // end for y
    } // end for x
 
-   return(true);
+   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -104,7 +104,7 @@ bool derive_wind(const DataPlane &u2d, const DataPlane &v2d,
            << "the dimensions for U and V do not match: ("
            << u2d.nx() << ", " << u2d.ny() << ") != ("
            << v2d.nx() << ", " << v2d.ny() << ")\n\n";
-      return(false);
+      return false;
    }
 
    //
@@ -143,7 +143,7 @@ bool derive_wind(const DataPlane &u2d, const DataPlane &v2d,
       } // end for y
    } // end for x
 
-   return(true);
+   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -223,7 +223,7 @@ bool rotate_uv_grid_to_earth(const DataPlane &u2d, const DataPlane &v2d,
            << "the dimensions for U and V do not match: ("
            << u2d.nx() << ", " << u2d.ny() << ") != ("
            << v2d.nx() << ", " << v2d.ny() << ")\n\n";
-      return(false);
+      return false;
    }
 
    //
@@ -273,7 +273,7 @@ bool rotate_uv_grid_to_earth(const DataPlane &u2d, const DataPlane &v2d,
       } // end for y
    } // end for x
 
-   return(true);
+   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////

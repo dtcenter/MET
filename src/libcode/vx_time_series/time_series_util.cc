@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -7,8 +7,6 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 ////////////////////////////////////////////////////////////////////////
-
-using namespace std;
 
 #include <cstdio>
 #include <errno.h>
@@ -22,30 +20,32 @@ using namespace std;
 #include "time_series_util.h"
 #include "compute_swinging_door.h"
 
+using namespace std;
+
 ////////////////////////////////////////////////////////////////////////
 
 TimeSeriesType string_to_timeseriestype(const char *s) {
    TimeSeriesType t;
 
-        if(strcasecmp(s, timeseriestype_dydt_str)  == 0) t = TimeSeriesType_DyDt;
-   else if(strcasecmp(s, timeseriestype_swing_str) == 0) t = TimeSeriesType_Swing;
-   else                                                  t = TimeSeriesType_None;
+        if(strcasecmp(s, timeseriestype_dydt_str)  == 0) t = TimeSeriesType::DyDt;
+   else if(strcasecmp(s, timeseriestype_swing_str) == 0) t = TimeSeriesType::Swing;
+   else                                                  t = TimeSeriesType::None;
 
-   return(t);
+   return t;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 const char * timeseriestype_to_string(const TimeSeriesType t) {
-   const char *s = (const char *) 0;
+   const char *s = (const char *) nullptr;
 
    switch(t) {
-      case(TimeSeriesType_DyDt):  s = timeseriestype_dydt_str;  break;
-      case(TimeSeriesType_Swing): s = timeseriestype_swing_str; break;
-      default:                    s = na_str;                   break;
+      case(TimeSeriesType::DyDt):  s = timeseriestype_dydt_str;  break;
+      case(TimeSeriesType::Swing): s = timeseriestype_swing_str; break;
+      default:                     s = na_str;                   break;
    }
 
-   return(s);
+   return s;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -77,7 +77,7 @@ bool compute_dydt_ramps(const char *name,
       mlog << Error << "\ncompute_dydt_ramps() -> "
            << "for non-exact differences the ramp threshold ("
            << thresh.get_str() << ") must be of type <, <=, >, or >=.\n\n";
-      return(false);
+      return false;
    }
 
    // Loop over the times
@@ -137,7 +137,7 @@ bool compute_dydt_ramps(const char *name,
       }
    } // end for i
 
-   return(true);
+   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -165,14 +165,14 @@ bool compute_swing_ramps(const char *name,
          ramps.add(bad_data_double);
          slopes.add(bad_data_double);
       }
-      return(true);
+      return true;
    }
 
    mlog << Debug(4)
         << "Applying the swinging door algorithm.\n";
 
    if(!compute_swinging_door_slopes(times, vals, width, slopes)) {
-      return(false);
+      return false;
    }
    
    // Apply the slope threshold to define ramps
@@ -194,7 +194,7 @@ bool compute_swing_ramps(const char *name,
       
    }
    
-   return(true);
+   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -10,8 +10,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-
-using namespace std;
 
 #include <iostream>
 #include <unistd.h>
@@ -30,6 +28,8 @@ using namespace std;
 
 #include "parse_file_list.h"
 #include "data2d_factory_utils.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -78,7 +78,7 @@ if ( in_list.n() == 1 )  {
 if ( out_list.n() == 0 )  out_list = in_list;
 
 
-return(out_list);
+return out_list;
 
 }
 
@@ -101,7 +101,7 @@ bool check_files_exist = true;
    //  If the input is not a regular file, return an empty list
    //
 
-if ( !is_regular_file(path) )  return(a);
+if ( !is_regular_file(path) )  return a;
 
    //
    //  If the input is a known gridded data file, return an empty list
@@ -114,7 +114,7 @@ if ( (file_type = grd_file_type(path)) != FileType_None )  {
         << grdfiletype_to_string(file_type)
         << " is not an ASCII file list.\n";
 
-   return(a);
+   return a;
 }
 
    //
@@ -196,7 +196,7 @@ if ( check_files_exist )  {
 
 f_in.close();
 
-return(a);
+return a;
 
 }
 

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -11,9 +11,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
-
 #include <iostream>
 #include <fstream>
 #include <unistd.h>
@@ -23,6 +20,8 @@ using namespace std;
 
 #include "afm_line.h"
 #include "vx_util.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -97,11 +96,11 @@ AfmLine & AfmLine::operator=(const AfmLine & a)
 
 {
 
-if ( this == &a )  return ( * this );
+if ( this == &a )  return *this;
 
 assign(a);
 
-return ( * this );
+return *this;
 
 }
 
@@ -184,7 +183,7 @@ AfmKeyword key;
 
 if(LineItems.n() == 0 || item_index == LineItems.n()) {
    tok.type = afm_token_endofline;
-   return ( tok );
+   return tok;
 }
 
 ConcatString tok_pointer = LineItems[item_index++];
@@ -193,7 +192,7 @@ if ( tok_pointer == "" )  {
 
    tok.type = afm_token_endofline;
 
-   return ( tok );
+   return tok;
 
 }
 
@@ -239,7 +238,7 @@ if ( is_integer(tok_pointer.c_str()) )  {
 
 }
 
-return ( tok );
+return tok;
 
 }
 
@@ -258,7 +257,7 @@ AfmToken tok;
 }
 
 
-return ( tok );
+return tok;
 
 }
 
@@ -274,14 +273,14 @@ int j;
 
 
 for (j=0; j<LineLength; ++j)  {
-   if ( is_keeper(Line[j]) )  return ( 1 );
+   if ( is_keeper(Line[j]) )  return 1;
 
 }
 
 
 
 
-return ( 0 );
+return 0;
 
 }
 
@@ -306,7 +305,7 @@ int is_boolean(const char * text, int & truth_value)
 
    truth_value = 1;
 
-   return ( 1 );
+   return 1;
 
 }
 
@@ -314,7 +313,7 @@ int is_boolean(const char * text, int & truth_value)
 
    truth_value = 0;
 
-   return ( 1 );
+   return 1;
 
 }
 
@@ -322,7 +321,7 @@ int is_boolean(const char * text, int & truth_value)
 
 
 
-return ( 0 );
+return 0;
 
 }
 
@@ -335,7 +334,7 @@ extern istream & operator>>(istream & in, AfmLine & L)
 
 L.clear();
 
-while ( 1 )  {
+while ( true )  {
 
   L.Line.read_line(in);
 
@@ -344,13 +343,13 @@ while ( 1 )  {
    if ( !in )  {
 
       L.clear();
-      return ( in );
+      return in;
 
    }
 
    L.split_line();
 
-   if ( L.is_ok() )  return ( in );
+   if ( L.is_ok() )  return in;
 
 }   //  while
 
@@ -365,17 +364,17 @@ int is_keeper(const char c)
 
 {
 
-if ( c == 13 )  return ( 0 );   //  control_m
+if ( c == 13 )  return 0;   //  control_m
 
-if ( c == 26 )  return ( 0 );   //  control_z
+if ( c == 26 )  return 0;   //  control_z
 
-if ( c == 10 )  return ( 0 );   //  newline
+if ( c == 10 )  return 0;   //  newline
 
-if ( c == 32 )  return ( 0 );   //  space
+if ( c == 32 )  return 0;   //  space
 
 
 
-return ( 1 );
+return 1;
 
 }
 

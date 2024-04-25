@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -12,8 +12,8 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-#ifndef  __WWSISHANDLER_H__
-#define  __WWSISHANDLER_H__
+#ifndef  __WWSIS_HANDLER_H__
+#define  __WWSIS_HANDLER_H__
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -33,12 +33,12 @@ class WwsisHandler : public FileHandler
 
 public:
 
-  WwsisHandler(const string &program_name);
+  WwsisHandler(const std::string &program_name);
   virtual ~WwsisHandler();
 
   virtual bool isFileType(LineDataFile &ascii_file) const;
   
-  static string getFormatString()
+  static std::string getFormatString()
   {
     return "wwsis";
   }
@@ -51,7 +51,7 @@ protected:
 
   // The header type for these observations
 
-  static const string HEADER_TYPE;
+  static const std::string HEADER_TYPE;
 
   // Grib code for the field
 
@@ -70,7 +70,7 @@ protected:
   int _stepSecs;
   double _watts;
   double _derate;
-  string _tracking;
+  std::string _tracking;
   double _tilt;
   double _azimuth;
   
@@ -101,8 +101,8 @@ protected:
   
   // Get the initial valid time from the file name
 
-  int _getYearFromFilename(const string &filename) const;
-  time_t _initValidTime(const string &filename) const;
+  int _getYearFromFilename(const std::string &filename) const;
+  time_t _initValidTime(const std::string &filename) const;
   
   // Read the observations from the given file and add them to the
   // _observations vector.
@@ -115,7 +115,7 @@ protected:
 ////////////////////////////////////////////////////////////////////////
 
 
-#endif   /*  __WWSISHANDLER_H__  */
+#endif   /*  __WWSIS_HANDLER_H__  */
 
 
 ////////////////////////////////////////////////////////////////////////

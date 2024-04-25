@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -7,8 +7,6 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 ////////////////////////////////////////////////////////////////////////
-
-using namespace std;
 
 #include <iostream>
 #include <unistd.h>
@@ -24,6 +22,8 @@ using namespace std;
 #include "vx_log.h"
 
 #include "diag_file.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -66,7 +66,7 @@ int DiagFile::lead(int i) const {
       exit(1);
    }
 
-   return(LeadTime[i]);
+   return LeadTime[i];
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -95,7 +95,7 @@ double DiagFile::lat(int i) const {
       exit(1);
    }
 
-   return(Lat[i]);
+   return Lat[i];
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -109,13 +109,13 @@ double DiagFile::lon(int i) const {
       exit(1);
    }
 
-   return(Lon[i]);
+   return Lon[i];
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool DiagFile::has_diag(const string &str) const {
-   return(DiagName.has(str));
+   return DiagName.has(str);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -130,7 +130,7 @@ const NumArray & DiagFile::diag_val(const string &str) const {
       exit(1);
    }
 
-   return(DiagVal[i]);
+   return DiagVal[i];
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -163,7 +163,7 @@ void DiagFile::init_from_scratch() {
 void DiagFile::clear() {
 
    // Initialize values
-   DiagSource = DiagType_None;
+   DiagSource = DiagType::None;
    TrackSource.clear();
    FieldSource.clear();
    StormId.clear();
@@ -215,10 +215,10 @@ void DiagFile::read(const ConcatString &path, const ConcatString &diag_source,
    DiagType type = string_to_diagtype(diag_source.c_str());
 
    // Read diagnostics based on the source type
-   if(type == DiagType_CIRA_RT) {
+   if(type == DiagType::CIRA_RT) {
       read_cira_rt(path, convert_map);
    }
-   else if(type == DiagType_SHIPS_RT) {
+   else if(type == DiagType::SHIPS_RT) {
       read_ships_rt(path, convert_map);
    }
    else {
@@ -249,7 +249,7 @@ void DiagFile::read_cira_rt(const ConcatString &path,
    clear();
 
    // Store the file type
-   DiagSource = DiagType_CIRA_RT;
+   DiagSource = DiagType::CIRA_RT;
 
    // Open the file
    open(path.c_str());
@@ -339,10 +339,10 @@ void DiagFile::read_cira_rt(const ConcatString &path,
       if(convert_map) {
               if(convert_map->count(cs) > 0)    fx_ptr = &convert_map->at(cs);
          else if(convert_map->count(dl[1]) > 0) fx_ptr = &convert_map->at(dl[1]);
-         else                                   fx_ptr = (UserFunc_1Arg *) 0;
+         else                                   fx_ptr = (UserFunc_1Arg *) nullptr;
       }
       else {
-         fx_ptr = (UserFunc_1Arg *) 0;
+         fx_ptr = (UserFunc_1Arg *) nullptr;
       }
 
       // Parse the data values
@@ -399,7 +399,7 @@ void DiagFile::read_ships_rt(const ConcatString &path,
    clear();
 
    // Store the file type
-   DiagSource = DiagType_SHIPS_RT;
+   DiagSource = DiagType::SHIPS_RT;
 
    // Open the file
    open(path.c_str());
@@ -492,10 +492,10 @@ void DiagFile::read_ships_rt(const ConcatString &path,
       // Check for a conversion function
       if(convert_map) {
          if(convert_map->count(cs) > 0) fx_ptr = &convert_map->at(cs);
-         else                           fx_ptr = (UserFunc_1Arg *) 0;
+         else                           fx_ptr = (UserFunc_1Arg *) nullptr;
       }
       else {
-         fx_ptr = (UserFunc_1Arg *) 0;
+         fx_ptr = (UserFunc_1Arg *) nullptr;
       }
 
       // Parse the data values

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -7,8 +7,6 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 ////////////////////////////////////////////////////////////////////////
-
-using namespace std;
 
 #include <iostream>
 #include <unistd.h>
@@ -21,6 +19,8 @@ using namespace std;
 
 #include "prob_gen_info.h"
 #include "atcf_offsets.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -53,11 +53,11 @@ ProbGenInfo::ProbGenInfo(const ProbGenInfo & t) {
 
 ProbGenInfo & ProbGenInfo::operator=(const ProbGenInfo & t) {
 
-   if(this == &t) return(*this);
+   if(this == &t) return *this;
 
    assign(t);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -113,7 +113,7 @@ ConcatString ProbGenInfo::serialize() const {
      << ", GenesisTime = " << unix_to_yyyymmdd_hhmmss(GenesisTime)
      << ", GenesisLead = " << sec_to_hhmmss(GenesisLead) << "\n";
 
-   return(s);
+   return s;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -123,7 +123,7 @@ ConcatString ProbGenInfo::serialize_r(int n, int indent_depth) const {
 
    s << ProbInfoBase::serialize_r(n, indent_depth);
 
-   return(s);
+   return s;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -175,7 +175,7 @@ void ProbGenInfo::initialize(const ATCFProbLine &l, double dland) {
 
 bool ProbGenInfo::is_match(const ATCFProbLine &l) const {
 
-   if(!ProbInfoBase::is_match(l)) return(false);
+   if(!ProbInfoBase::is_match(l)) return false;
 
    unixtime gen_ut = (l.get_item(ProbGenTimeOffset).empty() ?
                       (unixtime) 0 :
@@ -195,15 +195,15 @@ bool ProbGenInfo::add(const ATCFProbLine &l, double dland, bool check_dup) {
               << "\nProbGenInfo::add(const ATCFProbLine &l, bool check_dup) -> "
               << "skipping duplicate ATCF line:\n"
               << l.get_line() << "\n\n";
-         return(false);
+         return false;
       }
    }
 
    // Initialize the header information, if necessary
-   if(Type == NoATCFLineType) initialize(l, dland);
+   if(Type == ATCFLineType::None) initialize(l, dland);
 
    // Check for matching header information
-   if(!is_match(l)) return(false);
+   if(!is_match(l)) return false;
 
    // Add probability information
    NProb++;
@@ -213,7 +213,7 @@ bool ProbGenInfo::add(const ATCFProbLine &l, double dland, bool check_dup) {
    // Store the ATCFProbLine that was just added
    if(check_dup) ProbLines.add(l.get_line());
 
-   return(true);
+   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////

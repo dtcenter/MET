@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -8,9 +8,6 @@
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-using namespace std;
 
 
 #include <cstdio>
@@ -26,6 +23,9 @@ using namespace std;
 
 #include "earth_rotation.h"
 #include "latlon_xyz.h"
+
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -205,7 +205,7 @@ SO3::forward(V.x(), V.y(), V.z(), xx, yy, zz);
 VV.set_xyz(xx, yy, zz);
 
 
-return ( VV );
+return VV;
 
 }
 */
@@ -225,7 +225,7 @@ SO3::reverse(V.x(), V.y(), V.z(), xx, yy, zz);
 VV.set_xyz(xx, yy, zz);
 
 
-return ( VV );
+return VV;
 
 }
 */

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -8,8 +8,6 @@
 
 
 ////////////////////////////////////////////////////////////////////////
-
-using namespace std;
 
 #include <iostream>
 #include <unistd.h>
@@ -20,6 +18,8 @@ using namespace std;
 #include "conversions.h"
 #include "util_constants.h"
 #include "is_bad_data.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -39,7 +39,7 @@ double convert_gpm_to_msl(double gpm, double lat) {
       msl  = (gpm*const_gop)/gphi;
    }
 
-   return(msl);
+   return msl;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -64,7 +64,7 @@ double convert_p_t_z_to_prmsl(double p, double t, double z, double lat) {
       prmsl = p*exp(a);
    }
 
-   return(prmsl);
+   return prmsl;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -77,7 +77,7 @@ double convert_q_to_w(double q) {
    else
       w = q/(1.0 - q);
 
-   return(w);
+   return w;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -95,7 +95,7 @@ double convert_p_w_to_vp(double p, double w) {
       vp   = (p_mb * w)/(w + 0.622);
    }
 
-   return(vp);
+   return vp;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -114,7 +114,7 @@ double convert_vp_to_dpt(double vp) {
       else                dpt = num/den;
    }
 
-   return(dpt);
+   return dpt;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -127,7 +127,7 @@ double convert_t_to_svp(double t) {
    else
       svp = const_c*(pow(vx_math_e, const_b*(const_a - 1.0/t)));
 
-   return(svp);
+   return svp;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -140,7 +140,7 @@ double convert_vp_svp_to_rh(double vp, double svp) {
    else
       rh = (vp/svp)*100.0;
 
-   return(rh);
+   return rh;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -169,7 +169,7 @@ double convert_p_q_t_to_rh(double p, double q, double t) {
       if(rh > 100.0) rh = 100.0;
    }
 
-   return(rh);
+   return rh;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -181,7 +181,7 @@ double gop_by_lat(double lat) {
                      2.64e-3 * cos(2.0*lat) +
                      5.90e-10 * cos(2.0*lat) * cos(2.0*lat));
 
-   return(gphi);
+   return gphi;
 }
 
 ////////////////////////////////////////////////////////////////////////

@@ -4,7 +4,7 @@
 
 
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -30,69 +30,69 @@ static const int max_builtin_args = 2;
 ////////////////////////////////////////////////////////////////////////
 
 
-enum Builtin {
+enum class Builtin {
 
 
       //
       //  built-in functions of one variable
       //
 
-   builtin_sin,
-   builtin_cos,
-   builtin_tan,
+   sin,
+   cos,
+   tan,
 
-   builtin_sind,
-   builtin_cosd,
-   builtin_tand,
+   sind,
+   cosd,
+   tand,
 
-   builtin_asin,
-   builtin_acos,
-   builtin_atan,
+   asin,
+   acos,
+   atan,
 
-   builtin_asind,
-   builtin_acosd,
-   builtin_atand,
+   asind,
+   acosd,
+   atand,
 
-   builtin_log,
-   builtin_exp,
+   log,
+   exp,
 
-   builtin_log10,
-   builtin_exp10,
+   log10,
+   exp10,
 
-   builtin_sqrt,
-   builtin_abs,
-   builtin_floor,
-   builtin_ceil,
-   builtin_nint,
-   builtin_sign,
+   sqrt,
+   abs,
+   floor,
+   ceil,
+   nint,
+   sign,
 
-   builtin_step,
+   step,
 
    // Functions defined in ConfigConstants
-   // builtin_F_to_C,
-   // builtin_C_to_F,
+   // F_to_C,
+   // C_to_F,
 
 
       //
       //  built-in functions of two variables
       //
 
-   builtin_atan2,
-   builtin_atan2d,
+   atan2,
+   atan2d,
 
-   builtin_arg,
-   builtin_argd,
+   arg,
+   argd,
 
-   builtin_min,
-   builtin_max,
+   min,
+   max,
 
-   builtin_mod,
+   mod,
 
       //
       //  built-in functions of three variables
       //
 
-   // builtin_ifte
+   // ifte
 
       //
       //  flag value

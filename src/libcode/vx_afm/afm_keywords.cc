@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -11,9 +11,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -21,6 +18,9 @@ using namespace std;
 #include <cmath>
 
 #include "afm_keywords.h"
+
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -40,14 +40,14 @@ for (j=0; j<n_kw_infos; ++j)  {
 
       a = kw_info[j].key;
 
-      return ( 1 );
+      return 1;
 
    }
 
 }
 
 
-return ( 0 );
+return 0;
 
 }
 

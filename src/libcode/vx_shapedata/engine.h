@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -215,16 +215,19 @@ class ModeFuzzyEngine {
       void do_fcst_merging();
       void do_obs_merging();
 
+      // traditional version
       void do_fcst_merging(const char *default_config,
                            const char *merge_config);
-      void do_fcst_merging(const char *default_config,
-                           const char *merge_config,
-                           const ShapeData &merge_data);
+
+      // multivar version
+      void do_fcst_merging(const ShapeData &merge_data);
+
+      // traditional version
       void do_obs_merging(const char *default_config,
                           const char *merge_config);
-      void do_obs_merging(const char *default_config,
-                          const char *merge_config,
-                          const ShapeData &merge_data);
+
+      // multivar version
+      void do_obs_merging(const ShapeData &merge_data);
 
       void do_matching();
 

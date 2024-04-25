@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -9,9 +9,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -19,6 +16,8 @@ using namespace std;
 
 #include "siderial.h"
 #include "astro_constants.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -70,7 +69,7 @@ theta -= 360.0*floor(theta/360.0);
    //  done
    //
 
-return ( theta );
+return theta;
 
 }
 
@@ -105,7 +104,7 @@ lst -= 360.0*floor(lst/360.0);
    //  done
    //
 
-return ( lst );
+return lst;
 
 }
 

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -11,14 +11,14 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <stdlib.h>
 #include <cmath>
 
 #include "color.h"
 #include "vx_log.h"
 #include "vx_math.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -81,11 +81,11 @@ Color & Color::operator=(const Color &c)
 
 {
 
-if ( this == &c )  return ( *this );
+if ( this == &c )  return *this;
 
 assign(c);
 
-return ( *this );
+return *this;
 
 }
 
@@ -288,11 +288,11 @@ int operator==(const Color &a, const Color &b)
 
 {
 
-if ( a.R != b.R )  return ( 0 );
-if ( a.G != b.G )  return ( 0 );
-if ( a.B != b.B )  return ( 0 );
+if ( a.R != b.R )  return 0;
+if ( a.G != b.G )  return 0;
+if ( a.B != b.B )  return 0;
 
-return ( 1 );
+return 1;
 
 }
 
@@ -304,11 +304,11 @@ int operator!=(const Color &a, const Color &b)
 
 {
 
-if ( a.R != b.R )  return ( 1 );
-if ( a.G != b.G )  return ( 1 );
-if ( a.B != b.B )  return ( 1 );
+if ( a.R != b.R )  return 1;
+if ( a.G != b.G )  return 1;
+if ( a.B != b.B )  return 1;
 
-return ( 0 );
+return 0;
 
 }
 
@@ -335,7 +335,7 @@ if ( j > 255 )  j = 255;
 
 a = (unsigned char) j;
 
-return ( a );
+return a;
 
 }
 
@@ -554,7 +554,7 @@ B = nint( t*(color1.blue() ) + omt*(color0.blue() ) );
 result.set_rgb((unsigned char) R, (unsigned char) G, (unsigned char) B);
 
 
-return ( result );
+return result;
 
 }
 

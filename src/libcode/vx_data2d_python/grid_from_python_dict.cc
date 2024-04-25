@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -151,7 +151,7 @@ if ( ! west_longitude_positive )  {
 
 g.set(data);
 
-if ( data.name )  { delete [] data.name;  data.name = (const char *) 0; }
+if ( data.name )  { delete [] data.name;  data.name = (const char *) nullptr; }
 
 return;
 
@@ -229,7 +229,7 @@ if ( ! west_longitude_positive )  {
 
 g.set(data);
 
-if ( data.name )  { delete [] data.name;  data.name = (const char *) 0; }
+if ( data.name )  { delete [] data.name;  data.name = (const char *) nullptr; }
 
 return;
 
@@ -287,7 +287,7 @@ data.ny = dict.lookup_int("ny");
 
 g.set(data);
 
-if ( data.name )  { delete [] data.name;  data.name = (const char *) 0; }
+if ( data.name )  { delete [] data.name;  data.name = (const char *) nullptr; }
 
 return;
 
@@ -338,7 +338,7 @@ if ( ! west_longitude_positive )  {
 
 g.set(data);
 
-if ( data.name )  { delete [] data.name;  data.name = (const char *) 0; }
+if ( data.name )  { delete [] data.name;  data.name = (const char *) nullptr; }
 
 return;
 
@@ -399,7 +399,7 @@ if ( ! west_longitude_positive )  {
 
 g.set(data);
 
-if ( data.name )  { delete [] data.name;  data.name = (const char *) 0; }
+if ( data.name )  { delete [] data.name;  data.name = (const char *) nullptr; }
 
 return;
 
@@ -444,7 +444,7 @@ if ( ! west_longitude_positive )  {
 
 g.set(data);
 
-if ( data.name )  { delete [] data.name;  data.name = (const char *) 0; }
+if ( data.name )  { delete [] data.name;  data.name = (const char *) nullptr; }
 
 return;
 
@@ -487,7 +487,7 @@ lookup_python_num_array(dict, "times",  data.times);
 
 g.set(data);
 
-if ( data.name )  { delete [] data.name;  data.name = (const char *) 0; }
+if ( data.name )  { delete [] data.name;  data.name = (const char *) nullptr; }
 
 return;
 

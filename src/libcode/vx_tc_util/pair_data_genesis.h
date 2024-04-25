@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -28,12 +28,12 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-enum GenesisPairCategory {
-   FYOYGenesis,    // Hit
-   FYONGenesis,    // False Alarm
-   FNOYGenesis,    // Miss
-   DiscardGenesis, // Discard
-   NoGenesisPairCategory
+enum class GenesisPairCategory {
+   FYOY,    // Hit
+   FYON,    // False Alarm
+   FNOY,    // Miss
+   Discard, // Discard
+   None
 };
 
 extern ConcatString genesispaircategory_to_string(const GenesisPairCategory);

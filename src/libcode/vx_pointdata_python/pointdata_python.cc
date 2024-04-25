@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -9,8 +9,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-
-using namespace std;
 
 #include <iostream>
 #include <unistd.h>
@@ -23,6 +21,8 @@ using namespace std;
 
 #include "vx_math.h"
 #include "vx_log.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -133,7 +133,7 @@ close();
 
 ConcatString full_path, file_name;
 int i, file_argc;
-char **file_argv = (char **) 0; // allocated
+char **file_argv = (char **) nullptr; // allocated
 StringArray sa;
 const char *method_name = "MetPythonPointDataFile::open() ";
 
@@ -188,7 +188,7 @@ print_met_data(obs_data, hdr_data, method_name);
    //  done
    //
 
-return ( status );
+return status;
 
 }
 

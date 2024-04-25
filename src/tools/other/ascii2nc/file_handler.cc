@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -10,13 +10,10 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <algorithm>
 #include <iostream>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "vx_math.h"
 #include "vx_nc_util.h"
@@ -30,6 +27,10 @@ using namespace netCDF;
 #include "summary_calc_percentile.h"
 #include "summary_calc_range.h"
 #include "summary_calc_stdev.h"
+
+using namespace std;
+using namespace netCDF;
+
 
 const float FileHandler::FILL_VALUE = -9999.f;
 
@@ -56,7 +57,9 @@ FileHandler::FileHandler(const string &program_name) :
   use_var_id(false),
   do_monitor(false),
   deflate_level(DEF_DEFLATE_LEVEL),
-  _dataSummarized(false)
+  _dataSummarized(false),
+  valid_beg_ut((time_t)0),
+  valid_end_ut((time_t)0)
 {
 }
 
@@ -75,6 +78,12 @@ bool FileHandler::readAsciiFiles(const vector< ConcatString > &ascii_filename_li
 
   // Loop through the ASCII files, reading in the observations.  At the end of
   // this loop, all of the observations will be in the _observations vector.
+
+  //
+  // debug counts
+  //
+  num_observations_in_range = 0;
+  num_observations_out_of_range = 0;
 
   for (vector< ConcatString >::const_iterator ascii_filename = ascii_filename_list.begin();
        ascii_filename != ascii_filename_list.end(); ++ascii_filename)
@@ -102,6 +111,9 @@ bool FileHandler::readAsciiFiles(const vector< ConcatString > &ascii_filename_li
     ascii_file.close();
   }
 
+   mlog << Debug(2) << " Kept " << num_observations_in_range
+        << " observations, rejected (out of range) " << num_observations_out_of_range
+        << " observations\n";
   return true;
 }
 
@@ -171,6 +183,14 @@ void FileHandler::setSummaryInfo(const TimeSummaryInfo &summary_info) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void FileHandler::setValidTimeRange(const time_t &valid_beg, const time_t valid_end)
+{
+   valid_beg_ut = valid_beg;
+   valid_end_ut = valid_end;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 bool FileHandler::summarizeObs(const TimeSummaryInfo &summary_info)
 {
    bool result = summary_obs.summarizeObs(summary_info);
@@ -193,7 +213,7 @@ bool FileHandler::summarizeObs(const TimeSummaryInfo &summary_info)
 void FileHandler::_closeNetcdf()
 {
    delete _ncFile;
-   _ncFile = (NcFile *) 0;
+   _ncFile = (NcFile *) nullptr;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -263,7 +283,6 @@ bool FileHandler::_openNetcdf(const string &nc_filename)
 
 bool FileHandler::_addObservations(const Observation &obs)
 {
-   double grid_x, grid_y;
 
    //
    // Apply the grid mask, the area mask, and the polyline mask
@@ -274,6 +293,16 @@ bool FileHandler::_addObservations(const Observation &obs)
    // Apply the station ID mask
    //
    if(filters.is_filtered_sid(obs.getStationId().c_str())) return false;
+
+   //
+   // Check if valid time is in range
+   //
+   if (_keep_valid_time(obs.getValidTime())) {
+      num_observations_in_range++;
+   } else {
+      num_observations_out_of_range++;
+      return false;
+   }      
 
    // Save obs because the obs vector is sorted after time summary
    _observations.push_back(obs);
@@ -334,3 +363,23 @@ void FileHandler::debug_print_observations(vector< Observation > my_observation,
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+bool FileHandler::_keep_valid_time(const time_t &valid_time) const
+{
+   bool keep = true;
+
+   // If valid times are both set, check the range
+   if (valid_beg_ut != (time_t) 0 && valid_end_ut != (time_t) 0) {
+      if (valid_time < valid_beg_ut || valid_time > valid_end_ut) keep = false;
+   }
+   // If only beg set, check the lower bound
+   else if (valid_beg_ut != (time_t) 0 && valid_end_ut == (time_t) 0) {
+      if (valid_time < valid_beg_ut) keep = false;
+   }
+   // If only end set, check the upper bound
+   else if (valid_beg_ut == (time_t) 0 && valid_end_ut != (time_t) 0) {
+      if (valid_time > valid_end_ut) keep = false;
+   }
+   return(keep);
+}
+

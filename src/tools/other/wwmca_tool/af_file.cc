@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -9,8 +9,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-
-using namespace std;
 
 #include <iostream>
 #include <unistd.h>
@@ -29,6 +27,8 @@ using namespace std;
 #include "vx_cal.h"
 
 #include "af_file.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -86,11 +86,11 @@ AFDataFile & AFDataFile::operator=(const AFDataFile & a)
 
 {
 
-if ( this == &a )  return ( * this );
+if ( this == &a )  return *this;
 
 assign(a);
 
-return ( * this );
+return *this;
 
 }
 
@@ -102,7 +102,7 @@ void AFDataFile::init_from_scratch()
 
 {
 
-grid = (const Grid *) 0;
+grid = (const Grid *) nullptr;
 
 clear();
 
@@ -118,7 +118,7 @@ void AFDataFile::clear()
 
 {
 
-if ( grid )  { delete grid;  grid = (const Grid *) 0; }
+if ( grid )  { delete grid;  grid = (const Grid *) nullptr; }
 
 Filename.clear();
 
@@ -228,7 +228,7 @@ if ( Valid == (unixtime) 0 )  {
 if ( Hemisphere == 'N' )  grid = new Grid(wwmca_north_data);
 else                      grid = new Grid(wwmca_south_data);
 
-return ( true );
+return true;
 
 }
 
@@ -243,10 +243,10 @@ double lat, lon;
 
 grid->xy_to_latlon((double) x, (double) y, lat, lon);
 
-if ( (Hemisphere == 'N') && (lat < 0.0) )  return ( false );
-if ( (Hemisphere == 'S') && (lat > 0.0) )  return ( false );
+if ( (Hemisphere == 'N') && (lat < 0.0) )  return false;
+if ( (Hemisphere == 'S') && (lat > 0.0) )  return false;
 
-return ( true );
+return true;
 
 }
 
@@ -272,7 +272,7 @@ yy = af_ny - 1 - y;
 
 n = yy*af_nx + x;
 
-return ( n );
+return n;
 
 }
 

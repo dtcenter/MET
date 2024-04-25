@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -17,7 +17,7 @@
 //   000    12/09/14  Halley Gotway   New
 //   001    06/02/16  Halley Gotway   Add box masking type.
 //   002    11/15/16  Halley Gotway   Add solar masking types.
-//   003    06/03/21  Seth Linden     Changed default mask type to MaskType_None.
+//   003    06/03/21  Seth Linden     Changed default mask type to MaskType::None.
 //   004    08/30/21  Halley Gotway   MET #1891 fix input and mask fields.
 //   005    05/05/22  Halley Gotway   MET #2152 Add -type poly_xy.
 //   006    09/29/22  Prestopnik      MET #2227 Remove namespace std from header files
@@ -47,27 +47,27 @@ static const char *program_name = "gen_vx_mask";
 
 ////////////////////////////////////////////////////////////////////////
 
-enum MaskType {
+enum class MaskType {
 
-   MaskType_Poly,      // Polyline masking in lat/lon space
-   MaskType_Poly_XY,   // Polyline masking in grid x/y space
+   Poly,      // Polyline masking in lat/lon space
+   Poly_XY,   // Polyline masking in grid x/y space
 
-   MaskType_Box,       // Box masking type
-   MaskType_Circle,    // Circle masking region
+   Box,       // Box masking type
+   Circle,    // Circle masking region
 
-   MaskType_Track,     // Track masking region
-   MaskType_Grid,      // Grid masking type
-   MaskType_Data,      // Data masking type
+   Track,     // Track masking region
+   Grid,      // Grid masking type
+   Data,      // Data masking type
 
-   MaskType_Solar_Alt, // Solar altitude masking type
-   MaskType_Solar_Azi, // Solar azimuth masking type
+   Solar_Alt, // Solar altitude masking type
+   Solar_Azi, // Solar azimuth masking type
 
-   MaskType_Lat,       // Latitude masking type
-   MaskType_Lon,       // Longitude masking type
+   Lat,       // Latitude masking type
+   Lon,       // Longitude masking type
 
-   MaskType_Shape,     // Shapefile
+   Shape,     // Shapefile
 
-   MaskType_None
+   None
 
 };
 
@@ -81,7 +81,7 @@ extern const char * masktype_to_string(MaskType);
 //
 ////////////////////////////////////////////////////////////////////////
 
-static const MaskType default_mask_type = MaskType_None;
+static const MaskType default_mask_type = MaskType::None;
 static const double default_mask_val = 1.0;
 
 ////////////////////////////////////////////////////////////////////////
@@ -97,7 +97,7 @@ static bool type_is_set = false;
 
 // Optional arguments
 static ConcatString input_field_str, mask_field_str;
-static SetLogic set_logic = SetLogic_None;
+static SetLogic set_logic = SetLogic::None;
 static bool complement = false;
 static SingleThresh thresh;
 static int height = bad_data_double;
@@ -106,7 +106,7 @@ static double mask_val = default_mask_val;
 static ConcatString mask_name;
 static unixtime solar_ut = (unixtime) 0;
 
-static std::map<string,StringArray> shape_str_map;
+static std::map<std::string,StringArray> shape_str_map;
 static NumArray shape_numbers;
 static std::vector<ShpPolyRecord> shape_recs;
 

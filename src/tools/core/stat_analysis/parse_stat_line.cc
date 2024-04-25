@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -31,10 +31,12 @@
 //   011    01/24/20  Halley Gotway   Add RPS line type.
 //   012    11/10/22  Halley Gotway   MET #2339 Add SEEPS and SEEPS_MPR
 //                                      line types.
+//   013    02/13/24  Halley Gotway   MET #2395 Add wind direction stats
+//                                      to VL1L2, VAL1L2, and VCNT.
+//   014    02/21/24  Halley Gotway   MET #2583 Add observation error
+//                                      ECNT statistics.
 //
 ////////////////////////////////////////////////////////////////////////
-
-using namespace std;
 
 #include <cstdio>
 #include <iostream>
@@ -47,6 +49,8 @@ using namespace std;
 #include "vx_log.h"
 
 #include "parse_stat_line.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -148,7 +152,7 @@ void parse_nbrctc_ctable(STATLine &l, TTContingencyTable &ct) {
 void parse_nx2_ctable(STATLine &l, Nx2ContingencyTable &pct) {
    int i, n, oy, on;
    char col_str[max_str_len];
-   double *thresh = (double *) 0;
+   double *thresh = (double *) nullptr;
 
    // N_THRESH
    n = atoi(l.get_item("N_THRESH"));
@@ -179,7 +183,7 @@ void parse_nx2_ctable(STATLine &l, Nx2ContingencyTable &pct) {
    thresh[n-1] = atof(l.get_item(col_str));
    pct.set_thresholds(thresh);
 
-   if ( thresh )  { delete [] thresh; thresh = (double *) 0; }
+   if ( thresh )  { delete [] thresh; thresh = (double *) nullptr; }
 
    return;
 }
@@ -234,6 +238,9 @@ void parse_vl1l2_line(STATLine &l, VL1L2Info &v_info) {
    v_info.uvoo_bar    = atof(l.get_item("UVOOBAR"));
    v_info.f_speed_bar = atof(l.get_item("F_SPEED_BAR"));
    v_info.o_speed_bar = atof(l.get_item("O_SPEED_BAR"));
+   v_info.dir_bar     = atof(l.get_item("DIR_ME"));
+   v_info.absdir_bar  = atof(l.get_item("DIR_MAE"));
+   v_info.dir2_bar    = atof(l.get_item("DIR_MSE"));
 
    v_info.compute_stats();
 
@@ -256,6 +263,9 @@ void parse_val1l2_line(STATLine &l, VL1L2Info &v_info) {
    v_info.uvooa_bar    = atof(l.get_item("UVOOABAR"));
    v_info.fa_speed_bar = atof(l.get_item("FA_SPEED_BAR"));
    v_info.oa_speed_bar = atof(l.get_item("OA_SPEED_BAR"));
+   v_info.dira_bar     = atof(l.get_item("DIRA_ME"));
+   v_info.absdira_bar  = atof(l.get_item("DIRA_MAE"));
+   v_info.dira2_bar    = atof(l.get_item("DIRA_MSE"));
 
    v_info.compute_stats();
 
@@ -388,6 +398,9 @@ void parse_ecnt_line(STATLine &l, ECNTData &e_data) {
    e_data.me_ge_obs  = atof(l.get_item("ME_GE_OBS"));
    e_data.n_lt_obs   = atoi(l.get_item("N_LT_OBS"));
    e_data.me_lt_obs  = atof(l.get_item("ME_LT_OBS"));
+
+   e_data.ign_conv_oerr = atof(l.get_item("IGN_CONV_OERR"));
+   e_data.ign_corr_oerr = atof(l.get_item("IGN_CORR_OERR"));
 
    return;
 }

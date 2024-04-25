@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -8,9 +8,6 @@
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-using namespace std;
 
 
 #include <cstdio>
@@ -24,6 +21,9 @@ using namespace std;
 #include "vx_util.h"
 #include "vx_log.h"
 #include "semilatlon_grid.h"
+
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -166,8 +166,8 @@ Lons.clear();
 Levels.clear();
 Times.clear();
 
-xDim = (NumArray *) 0;
-yDim = (NumArray *) 0;
+xDim = (NumArray *) nullptr;
+yDim = (NumArray *) nullptr;
 
 IsLatLon = false;
 Nx = 0;
@@ -273,7 +273,7 @@ double SemiLatLonGrid::calc_area(int x, int y) const
 
    // Grid cell area is not defined for semilatlon grids
 
-return ( bad_data_double );
+return bad_data_double;
 
 }
 
@@ -285,7 +285,7 @@ int SemiLatLonGrid::nx() const
 
 {
 
-return ( Nx );
+return Nx;
 
 }
 
@@ -297,7 +297,7 @@ int SemiLatLonGrid::ny() const
 
 {
 
-return ( Ny );
+return Ny;
 
 }
 
@@ -309,7 +309,7 @@ ConcatString SemiLatLonGrid::name() const
 
 {
 
-return ( Name );
+return Name;
 
 }
 
@@ -383,7 +383,7 @@ a << "Times: " << Times.summarize() << sep;
    //  done
    //
 
-return ( a );
+return a;
 
 }
 
@@ -399,7 +399,7 @@ GridInfo i;
 
 i.set(Data);
 
-return ( i );
+return i;
 
 }
 
@@ -416,7 +416,7 @@ double SemiLatLonGrid::rot_grid_to_earth(int x, int y) const
 // does not apply to semilatlon grids
 //
 
-return ( 0.0 );
+return 0.0;
 
 }
 
@@ -428,7 +428,7 @@ bool SemiLatLonGrid::wrap_lon() const
 
 {
 
-return ( false );
+return false;
 
 }
 
@@ -459,7 +459,7 @@ SemiLatLonGrid * p = new SemiLatLonGrid (Data);
 
 p->Name = Name;
 
-return ( p );
+return p;
 
 }
 

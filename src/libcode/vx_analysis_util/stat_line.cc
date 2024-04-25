@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -10,8 +10,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-
-using namespace std;
 
 #include <iostream>
 #include <fstream>
@@ -32,6 +30,8 @@ using namespace std;
 
 #include "vx_util.h"
 #include "vx_log.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -89,11 +89,11 @@ STATLine & STATLine::operator=(const STATLine & L)
 
 {
 
-if ( this == &L )  return ( * this );
+if ( this == &L )  return *this;
 
 assign(L);
 
-return ( * this );
+return *this;
 
 }
 
@@ -140,8 +140,8 @@ void STATLine::clear()
 
 DataLine::clear();
 
-Type    = no_stat_line_type;
-HdrLine = (AsciiHeaderLine *) 0;
+Type    = STATLineType::none;
+HdrLine = (AsciiHeaderLine *) nullptr;
 
 return;
 
@@ -255,7 +255,7 @@ if ( !status || n_items() == 0 )  {
 
    clear();
 
-   return ( 0 );
+   return 0;
 
 }
 
@@ -265,9 +265,9 @@ if ( !status || n_items() == 0 )  {
 
 if ( strcmp(get_item(0), "VERSION") == 0 ) {
 
-   Type = stat_header;
+   Type = STATLineType::header;
 
-   return ( 1 );
+   return 1;
 }
 
 //
@@ -278,9 +278,9 @@ offset = METHdrTable.col_offset(get_item(0), "STAT", na_str, "LINE_TYPE");
 
 if( is_bad_data(offset) || n_items() < (offset + 1) )  {
 
-   Type = no_stat_line_type;
+   Type = STATLineType::none;
 
-   return ( 0 );
+   return 0;
 }
 
 //
@@ -291,7 +291,7 @@ HdrLine = METHdrTable.header(get_item(0), "STAT", get_item(offset));
 
 Type = string_to_statlinetype(get_item(offset));
 
-return ( 1 );
+return 1;
 
 }
 
@@ -303,7 +303,7 @@ bool STATLine::is_ok() const
 
 {
 
-return ( DataLine::is_ok() );
+return DataLine::is_ok();
 
 }
 
@@ -315,7 +315,7 @@ bool STATLine::is_header() const
 
 {
 
-return ( Type == stat_header );
+return ( Type == STATLineType::header );
 
 }
 
@@ -327,7 +327,7 @@ bool STATLine::has(const char *col_str) const
 
 {
 
-return ( !is_bad_data(get_offset(col_str)) );
+return !is_bad_data(get_offset(col_str));
 
 }
 
@@ -368,7 +368,7 @@ if ( is_bad_data(offset) ) {
    // Return the offset value
    //
 
-return ( offset );
+return offset;
 
 }
 
@@ -407,7 +407,7 @@ if ( cs == bad_data_str )  {
 
 }
 
-return ( cs );
+return cs;
 
 }
 
@@ -448,8 +448,8 @@ if ( is_bad_data(offset) ) {
    // Return bad data string for no match
    //
 
-if ( is_bad_data(offset) ) return ( bad_data_str );
-else                       return ( get_item(offset, check_na) );
+if ( is_bad_data(offset) ) return bad_data_str;
+else                       return get_item(offset, check_na);
 
 }
 
@@ -465,7 +465,7 @@ const char * STATLine::get_item(int offset, bool check_na) const
    // Range check
    //
 
-if ( offset < 0 || offset >= N_items ) return ( bad_data_str );
+if ( offset < 0 || offset >= N_items ) return bad_data_str;
 
 const char * c = DataLine::get_item(offset);
 
@@ -473,8 +473,8 @@ const char * c = DataLine::get_item(offset);
    // Check for the NA string and interpret it as bad data
    //
 
-if ( check_na && strcmp(c, na_str) == 0 ) return ( bad_data_str );
-else                                      return ( c );
+if ( check_na && strcmp(c, na_str) == 0 ) return bad_data_str;
+else                                      return c;
 
 }
 
@@ -488,7 +488,7 @@ const char * STATLine::version() const
 
 const char * c = get_item("VERSION", false);
 
-return ( c );
+return c;
 
 }
 
@@ -502,7 +502,7 @@ const char * STATLine::model() const
 
 const char * c = get_item("MODEL", false);
 
-return ( c );
+return c;
 
 }
 
@@ -516,7 +516,7 @@ const char * STATLine::desc() const
 
 const char * c = get_item("DESC", false);
 
-return ( c );
+return c;
 
 }
 
@@ -533,7 +533,7 @@ const char * c = get_item("FCST_LEAD");
 
 j = timestring_to_sec(c);
 
-return ( j );
+return j;
 
 }
 
@@ -549,7 +549,7 @@ unixtime t;
 const char * c = get_item("FCST_VALID_BEG");
 t = timestring_to_unix(c);
 
-return ( t );
+return t;
 
 }
 
@@ -565,7 +565,7 @@ unixtime t;
 const char * c = get_item("FCST_VALID_END");
 t = timestring_to_unix(c);
 
-return ( t );
+return t;
 
 }
 
@@ -577,7 +577,7 @@ int STATLine::fcst_valid_hour() const
 
 {
 
-return ( unix_to_sec_of_day(fcst_valid_beg()) );
+return unix_to_sec_of_day(fcst_valid_beg());
 
 }
 
@@ -594,7 +594,7 @@ const char * c = get_item("OBS_LEAD");
 
 j = timestring_to_sec(c);
 
-return ( j );
+return j;
 
 }
 
@@ -610,7 +610,7 @@ unixtime t;
 const char * c = get_item("OBS_VALID_BEG");
 t = timestring_to_unix(c);
 
-return ( t );
+return t;
 
 }
 
@@ -626,7 +626,7 @@ unixtime t;
 const char * c = get_item("OBS_VALID_END");
 t = timestring_to_unix(c);
 
-return ( t );
+return t;
 
 }
 
@@ -638,7 +638,7 @@ int STATLine::obs_valid_hour() const
 
 {
 
-return ( unix_to_sec_of_day(obs_valid_beg()) );
+return unix_to_sec_of_day(obs_valid_beg());
 
 }
 
@@ -652,7 +652,7 @@ const char * STATLine::fcst_var() const
 
 const char * c = get_item("FCST_VAR", false);
 
-return ( c );
+return c;
 
 }
 
@@ -666,7 +666,7 @@ const char * STATLine::fcst_units() const
 
 const char * c = get_item("FCST_UNITS", false);
 
-return ( c );
+return c;
 
 }
 
@@ -680,7 +680,7 @@ const char * STATLine::fcst_lev() const
 
 const char * c = get_item("FCST_LEV", false);
 
-return ( c );
+return c;
 
 }
 
@@ -694,7 +694,7 @@ const char * STATLine::obs_var() const
 
 const char * c = get_item("OBS_VAR", false);
 
-return ( c );
+return c;
 
 }
 
@@ -708,7 +708,7 @@ const char * STATLine::obs_units() const
 
 const char * c = get_item("OBS_UNITS", false);
 
-return ( c );
+return c;
 
 }
 
@@ -722,7 +722,7 @@ const char * STATLine::obs_lev() const
 
 const char * c = get_item("OBS_LEV", false);
 
-return ( c );
+return c;
 
 }
 
@@ -736,7 +736,7 @@ const char * STATLine::obtype() const
 
 const char * c = get_item("OBTYPE", false);
 
-return ( c );
+return c;
 
 }
 
@@ -750,7 +750,7 @@ const char * STATLine::vx_mask() const
 
 const char * c = get_item("VX_MASK", false);
 
-return ( c );
+return c;
 
 }
 
@@ -764,7 +764,7 @@ const char * STATLine::interp_mthd() const
 
 const char * c = get_item("INTERP_MTHD", false);
 
-return ( c );
+return c;
 
 }
 
@@ -781,7 +781,7 @@ const char * c = get_item("INTERP_PNTS", false);
 
 k = atoi(c);
 
-return ( k );
+return k;
 
 }
 
@@ -799,7 +799,7 @@ const char * c = get_item("FCST_THRESH", false);
 
 ta.add_css(c);
 
-return ( ta );
+return ta;
 
 }
 
@@ -817,7 +817,7 @@ const char * c = get_item("OBS_THRESH", false);
 
 ta.add_css(c);
 
-return ( ta );
+return ta;
 
 }
 
@@ -829,16 +829,16 @@ SetLogic STATLine::thresh_logic() const
 
 {
 
-SetLogic t = SetLogic_None;
+SetLogic t = SetLogic::None;
 
 ConcatString cs = (string)get_item("FCST_THRESH", false);
 
-     if(cs.endswith(setlogic_symbol_union))        t = SetLogic_Union;
-else if(cs.endswith(setlogic_symbol_intersection)) t = SetLogic_Intersection;
-else if(cs.endswith(setlogic_symbol_symdiff))      t = SetLogic_SymDiff;
-else                                               t = SetLogic_None;
+     if(cs.endswith(setlogic_symbol_union))        t = SetLogic::Union;
+else if(cs.endswith(setlogic_symbol_intersection)) t = SetLogic::Intersection;
+else if(cs.endswith(setlogic_symbol_symdiff))      t = SetLogic::SymDiff;
+else                                               t = SetLogic::None;
 
-return ( t );
+return t;
 
 }
 
@@ -856,7 +856,7 @@ const char * c = get_item("COV_THRESH", false);
 
 ta.add_css(c);
 
-return ( ta );
+return ta;
 
 }
 
@@ -874,7 +874,7 @@ const char * c = get_item("ALPHA");
 
 a = atof(c);
 
-return ( a );
+return a;
 
 }
 
@@ -888,7 +888,7 @@ const char * STATLine::line_type() const
 
 const char * c = get_item("LINE_TYPE", false);
 
-return ( c );
+return c;
 
 }
 
@@ -909,7 +909,7 @@ s = fcst_lead();
 
 t -= s;
 
-return ( t );
+return t;
 
 }
 
@@ -930,7 +930,7 @@ s = fcst_lead();
 
 t -= s;
 
-return ( t );
+return t;
 
 }
 
@@ -942,7 +942,7 @@ int STATLine::fcst_init_hour() const
 
 {
 
-return ( unix_to_sec_of_day(fcst_init_beg()) );
+return unix_to_sec_of_day(fcst_init_beg());
 
 }
 
@@ -963,7 +963,7 @@ s = obs_lead();
 
 t -= s;
 
-return ( t );
+return t;
 
 }
 
@@ -984,7 +984,7 @@ s = obs_lead();
 
 t -= s;
 
-return ( t );
+return t;
 
 }
 
@@ -996,7 +996,7 @@ int STATLine::obs_init_hour() const
 
 {
 
-return ( unix_to_sec_of_day(obs_init_beg()) );
+return unix_to_sec_of_day(obs_init_beg());
 
 }
 

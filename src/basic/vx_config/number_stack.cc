@@ -4,7 +4,7 @@
 
 
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -90,7 +90,7 @@ NumberStack & NumberStack::operator=(const NumberStack & a)
 
 {
 
-if ( this == &a )  return ( * this );
+if ( this == &a )  return *this;
 
 assign(a);
 
@@ -106,7 +106,7 @@ void NumberStack::init_from_scratch()
 
 {
 
-e = 0;
+e = nullptr;
 
 AllocInc = default_ns_alloc_inc;
 
@@ -124,7 +124,7 @@ void NumberStack::clear(bool initialize)
 
 {
 
-if ( e )  { delete [] e;  e = 0; }
+if ( e )  { delete [] e;  e = nullptr; }
 
 
 Nelements = 0;
@@ -202,7 +202,7 @@ for(j=0; j<Nelements; ++j)  {
 
 }
 
-if ( e )  { delete [] e;  e = 0; }
+if ( e )  { delete [] e;  e = nullptr; }
 
 e = u;
 
@@ -331,7 +331,7 @@ if ( Nelements <= 0 )  {
 
 }
 
-return ( e[--Nelements] );
+return e[--Nelements];
 
 }
 

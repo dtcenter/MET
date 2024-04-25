@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -39,7 +39,7 @@
 //
 // Enumerations used in computing the boundary of a ShapeData object
 //
-enum StepCase {
+enum class StepCase {
    ll_case       = 0,
    lr_case       = 1,
    ul_ll_case    = 2,

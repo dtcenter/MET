@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -21,29 +21,29 @@
 //
 // Enumeration for interpolation methods
 //
-enum InterpMthd {
-   InterpMthd_None,
-   InterpMthd_Min,
-   InterpMthd_Max,
-   InterpMthd_Median,
-   InterpMthd_UW_Mean,
-   InterpMthd_DW_Mean,
-   InterpMthd_AW_Mean,
-   InterpMthd_LS_Fit,
-   InterpMthd_Nbrhd,
-   InterpMthd_Bilin,
-   InterpMthd_Nearest,
-   InterpMthd_Budget,
-   InterpMthd_Force,
-   InterpMthd_Best,
-   InterpMthd_Upper_Left,
-   InterpMthd_Upper_Right,
-   InterpMthd_Lower_Right,
-   InterpMthd_Lower_Left,
-   InterpMthd_Gaussian,
-   InterpMthd_MaxGauss,
-   InterpMthd_Geog_Match,
-   InterpMthd_HiRA
+enum class InterpMthd {
+   None,
+   Min,
+   Max,
+   Median,
+   UW_Mean,
+   DW_Mean,
+   AW_Mean,
+   LS_Fit,
+   Nbrhd,
+   Bilin,
+   Nearest,
+   Budget,
+   Force,
+   Best,
+   Upper_Left,
+   Upper_Right,
+   Lower_Right,
+   Lower_Left,
+   Gaussian,
+   MaxGauss,
+   Geog_Match,
+   HiRA
 };
 
 //

@@ -350,7 +350,7 @@ libvx_log_a_SOURCES = concat_string.cc concat_string.h \
                logger.cc logger.h \
                string_array.cc string_array.h \
                str_wrappers.cc str_wrappers.h \
-               vx_log.h
+               enum_as_int.hpp vx_log.h
 
 all: all-am
 

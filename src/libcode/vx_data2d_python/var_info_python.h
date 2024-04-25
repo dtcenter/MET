@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -41,6 +41,7 @@ class VarInfoPython : public VarInfo
       ~VarInfoPython();
       VarInfoPython(const VarInfoPython &);
       VarInfoPython & operator=(const VarInfoPython &);
+      VarInfo *clone() const;
 
       void dump(std::ostream &) const;
       void clear();

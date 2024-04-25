@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -9,9 +9,6 @@
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-using namespace std;
 
 
 #include <iostream>
@@ -24,6 +21,9 @@ using namespace std;
 #include "string_array.h"
 #include "logger.h"
 #include "indent.h"
+
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -91,12 +91,12 @@ StringArray & StringArray::operator=(const StringArray & a)
 
 {
 
-if ( this == &a )  return ( * this );
+if ( this == &a )  return *this;
 
 assign(a);
 
 
-return ( * this );
+return *this;
 
 }
 
@@ -108,17 +108,17 @@ bool StringArray::operator==(const StringArray & a) const
 
 {
 
-if ( n() != a.n() )  return ( false );
+if ( n() != a.n() )  return false;
 
 int j;
 
 for (j=0; j<n(); ++j)  {
 
-  if ( s[j] != a.s[j] )  return ( false );
+  if ( s[j] != a.s[j] )  return false;
 
 }
 
-return ( true );
+return true;
 
 }
 
@@ -227,7 +227,7 @@ if ( (len < 0) || (len >= n()) )  {
 }
 
 
-return ( s[len] );
+return s[len];
 
 }
 
@@ -427,7 +427,7 @@ string StringArray::serialize(const char *sep) const
       if((it+1) != s.end()) all_s.append(sep);
    }
 
-   return(all_s);
+   return all_s;
 
 }
 
@@ -469,7 +469,7 @@ bool StringArray::has(const std::string text) const
       found = binary_search(s.begin(), s.end(), text);
 }
 else {
-      return ( has(text, forward) );
+      return has(text, forward);
 }
 
    return found;
@@ -483,7 +483,7 @@ bool StringArray::has(const std::string text, bool forward) const
 
 {
    int index;
-   return ( has(text, index, forward) );
+   return has(text, index, forward);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -661,13 +661,13 @@ for (j=0; j<n(); ++j)  {
 
       index = j;
 
-      return ( true );
+      return true;
 
    }
 
 }
 
-return ( false );
+return false;
 
 }
 
@@ -680,13 +680,13 @@ bool StringArray::reg_exp_match(const char * text) const
 
 {
 
-if ( n() == 0 || !text )  return ( false );
+if ( n() == 0 || !text )  return false;
 
 int j;
 
  for (j=0; j<n(); ++j)  {
 
-   if ( check_reg_exp(s[j].c_str(), text) )  { return ( true ); }
+   if ( check_reg_exp(s[j].c_str(), text) )  { return true; }
 
 }
 
@@ -694,7 +694,7 @@ int j;
    //  nope
    //
 
-return ( false );
+return false;
 
 }
 
@@ -714,7 +714,7 @@ if ( (k < 0) || (k >= n()) )  {
 
 }
 
-return ( s[k].length() );
+return s[k].length();
 
 }
 
@@ -818,7 +818,7 @@ const char ** cb = (const char **) b;
 status = strcmp(*ca, *cb);
 
 
-return ( status );
+return status;
 
 }
 

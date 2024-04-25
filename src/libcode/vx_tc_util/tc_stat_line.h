@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -22,13 +22,13 @@
 ////////////////////////////////////////////////////////////////////////
 
 // Enumerate all the possible line types
-enum TCStatLineType {
+enum class TCStatLineType {
 
-   TCStatLineType_TCMPR,
-   TCStatLineType_TCDIAG,
-   TCStatLineType_ProbRIRW,
-   TCStatLineType_Header,
-   NoTCStatLineType
+   TCMPR,
+   TCDIAG,
+   ProbRIRW,
+   Header,
+   None
 
 };
 
@@ -103,7 +103,7 @@ class TCStatLine : public DataLine {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline  TCStatLineType TCStatLine::type() const { return(Type); }
+inline  TCStatLineType TCStatLine::type() const { return Type; }
 
 ////////////////////////////////////////////////////////////////////////
 

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -79,9 +79,9 @@ class MsgLevel
 //////////////////////////////////////////////////////////////////
 
 
-inline int MsgLevel::value() const { return (Value); }
+inline int MsgLevel::value() const { return Value; }
 
-inline MsgLevel::operator const int & () const { return (Value); }
+inline MsgLevel::operator const int & () const { return Value; }
 
 
 //////////////////////////////////////////////////////////////////

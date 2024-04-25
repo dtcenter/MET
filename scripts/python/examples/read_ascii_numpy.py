@@ -1,11 +1,12 @@
 import os
 import sys
+import numpy
 from met.dataplane import dataplane
 
 ###########################################
 
 def log(msg):
-   dataplane.log_msg(msg)
+   dataplane.log_message(msg)
 
 def set_dataplane_attrs():
    # attrs is a dictionary which contains attributes describing the dataplane.
@@ -67,33 +68,47 @@ log("Python Script:\t" + repr(sys.argv[0]))
 ##  load the data into the numpy array
 ##
 
-if len(sys.argv) != 3:
-   dataplane.quit("read_ascii_numpy.py -> Must specify exactly one input file and a name for the data.")
+SCRIPT_NAME = "read_ascii_numpy.py ->"
+if len(sys.argv) < 3:
+   dataplane.quit(f"{SCRIPT_NAME} Must specify exactly one input file and a name for the data.")
+elif len(sys.argv) > 4:
+   dataplane.quit(f"{SCRIPT_NAME} Have not supported arguments [{sys.argv[4:]}]")
 
 # Read the input file as the first argument
 input_file = os.path.expandvars(sys.argv[1])
 data_name  = sys.argv[2]
 
 try:
-   log("Input File:\t" + repr(input_file))
-   log("Data Name:\t" + repr(data_name))
+   user_fill_value = None
+   try:
+      if len(sys.argv) > 3:
+         user_fill_value = float(sys.argv[3])
+   except:
+      log(f"{SCRIPT_NAME} Ignored argument {sys.argv[3]}")
+      pass
+
+   log(f"{SCRIPT_NAME} Input File:\t{repr(input_file)}")
+   log(f"{SCRIPT_NAME} Data Name:\t{repr(data_name)}")
    if os.path.exists(input_file):
       # read_2d_text_input() reads n by m text data and returns 2D numpy array
       met_data = dataplane.read_2d_text_input(input_file)
       if met_data is None:
-         dataplane.quit(f" Fail to build met_data from {input_file}")
+         dataplane.quit(f"{SCRIPT_NAME} Fail to build met_data from {input_file}")
       else:
-         log("Data Shape:\t" + repr(met_data.shape))
-         log("Data Type:\t" + repr(met_data.dtype))
+         log(f"{SCRIPT_NAME} Data Shape:\t{repr(met_data.shape)}")
+         log(f"{SCRIPT_NAME} Data Type:\t{repr(met_data.dtype)}")
+         if user_fill_value is not None:
+            met_data = numpy.ma.masked_values(met_data, user_fill_value)
+         log(f"{SCRIPT_NAME} Python Type:\t{type(met_data)}")
    else:
-      dataplane.quit(f"input {input_file} does exist!!!")
+      dataplane.quit(f"{SCRIPT_NAME} input {input_file} does exist!!!")
 except:
    import traceback
    traceback.print_exc()
-   dataplane.quit(f"Unknown error with {sys.argv[0]}: ")
+   dataplane.quit(f"{SCRIPT_NAME} Unknown error with {sys.argv[0]}: ")
 
 attrs = set_dataplane_attrs()
-log("Attributes:\t" + repr(attrs))
+log(f"{SCRIPT_NAME} Attributes:\t{repr(attrs)}")
 
-# Sets fill_value if it exists
+# Sets fill_value if it exists at the dataplane
 #attrs['fill_value'] = 255  # for letter.txt

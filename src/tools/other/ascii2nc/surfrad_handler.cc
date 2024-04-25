@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -10,9 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
-
 #include <iostream>
 
 #include "vx_log.h"
@@ -21,6 +18,10 @@ using namespace std;
 
 #include "surfrad_handler.h"
 
+using namespace std;
+
+
+////////////////////////////////////////////////////////////////////////
 
 const int SurfradHandler::NUM_HDR_COLS = 6;
 const int SurfradHandler::NUM_OBS_COLS = 48;

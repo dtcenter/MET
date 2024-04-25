@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -7,11 +7,8 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
-
 ////////////////////////////////////////////////////////////////////////
 
-
-using namespace std;
 
 #include <iostream>
 #include <unistd.h>
@@ -22,6 +19,8 @@ using namespace std;
 #include "met_buffer.h"
 #include "read_fortran_binary.h"
 #include "vx_log.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -85,11 +84,11 @@ MetBuffer & MetBuffer::operator=(const MetBuffer & b)
 
 {
 
-if ( this == &b )  return ( * this );
+if ( this == &b )  return *this;
 
 mb_assign(b);
 
-return ( * this );
+return *this;
 
 }
 
@@ -282,9 +281,9 @@ n_read = ::read(fd, Buf, bytes);
 
 Nbytes = n_read;
 
-if ( n_read < 0 )  return ( -1 );
+if ( n_read < 0 )  return -1;
 
-return ( n_read );
+return n_read;
 
 }
 
@@ -306,7 +305,7 @@ n_read = ::read_fortran_binary(fd, Buf, Nalloc, RecPadSize, SwapEndian);
 
 Nbytes = n_read;
 
-return ( false );
+return false;
 
 }
 

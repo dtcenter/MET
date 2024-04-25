@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -57,9 +57,9 @@ class ScopeStackElement {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int ScopeStackElement::level() const { return ( Level ); }
+inline int ScopeStackElement::level() const { return Level; }
 
-inline const char * ScopeStackElement::name() const { return ( Name ); }
+inline const char * ScopeStackElement::name() const { return Name; }
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -113,7 +113,7 @@ class ScopeStack {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int ScopeStack::n_elements() const { return ( N ); }
+inline int ScopeStack::n_elements() const { return N; }
 
 
 ////////////////////////////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -27,7 +27,6 @@
 #include <string.h>
 
 #include "configobjecttype_to_string.h"
-
 
 using namespace std;
 
@@ -63,7 +62,7 @@ switch ( t )  {
 }   //  switch
 
 
-return ConcatString (s);
+return ConcatString(s);
 
 }
 

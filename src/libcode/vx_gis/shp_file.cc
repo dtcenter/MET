@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -9,8 +9,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-
-using namespace std;
 
 #include <iostream>
 #include <unistd.h>
@@ -28,6 +26,8 @@ using namespace std;
 
 #include "shp_file.h"
 #include "shapetype_to_string.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -284,9 +284,9 @@ const char * ShpFile::filename() const
 
 {
 
-if ( Filename.empty() )  return ( (const char *) 0 );
+if ( Filename.empty() )  return (const char *) 0;
 
-return ( Filename.text() );
+return Filename.text();
 
 }
 
@@ -304,7 +304,7 @@ if ( (fd = met_open(path, O_RDONLY)) < 0 )  {
 
    fd = -1;
 
-   return ( false );
+   return false;
 
 }
 
@@ -325,7 +325,7 @@ if ( (n_read = ::read(fd, buf, shp_file_header_bytes)) != shp_file_header_bytes 
 
    close();
 
-   return ( false );
+   return false;
 
 }
 
@@ -335,7 +335,7 @@ Header.set(buf);
    //  done
    //
 
-return ( true );
+return true;
 
 }
 
@@ -370,7 +370,7 @@ if ( pos < 0 )  {
 }
 
 
-return ( pos );
+return pos;
 
 }
 
@@ -440,14 +440,14 @@ if ( n_read < 0 )  {   //  some kind of error
 
    //
 
-if ( n_read == 0 )  return ( false );
+if ( n_read == 0 )  return false;
 
    //
 
-if ( n_read == n_bytes )  return ( true );
+if ( n_read == n_bytes )  return true;
 
 
-return ( false );   //  gotta return something
+return false;   //  gotta return something
 
 }
 
@@ -463,13 +463,13 @@ int n_read;
 
 n_read = buf.read(fd, n_bytes);
 
-if ( n_read == n_bytes )  return ( true );
+if ( n_read == n_bytes )  return true;
 
 if ( n_read == 0 )  {
 
    At_Eof = true;
 
-   return ( false );
+   return false;
 
 }
 
@@ -484,7 +484,7 @@ if ( n_read < 0 )  {   //  some kind of error
 }
 
 
-return ( false );
+return false;
 
 }
 

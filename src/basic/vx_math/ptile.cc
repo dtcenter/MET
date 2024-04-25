@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -7,11 +7,7 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
-
 ///////////////////////////////////////////////////////////////////////////////
-
-
-using namespace std;
 
 
 #include <iostream>
@@ -24,6 +20,9 @@ using namespace std;
 
 #include "nint.h"
 #include "vx_log.h"
+
+
+using namespace std;
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -91,7 +90,7 @@ if ( n > 0 ) {
 
 }
 
-return ( p );
+return p;
 
 }
 
@@ -150,7 +149,7 @@ if ( n > 0 ) {
 
 }
 
-return ( p );
+return p;
 
 }
 
@@ -166,12 +165,12 @@ const double *a = (const double *) p1;
 const double *b = (const double *) p2;
 
 
-if ( (*a) < (*b) )  return ( -1 );
+if ( (*a) < (*b) )  return -1;
 
-if ( (*a) > (*b) )  return (  1 );
+if ( (*a) > (*b) )  return 1;
 
 
-return ( 0 );
+return 0;
 
 }
 
@@ -187,12 +186,12 @@ const float * a = (const float *) p1;
 const float * b = (const float *) p2;
 
 
-if ( (*a) < (*b) )  return ( -1 );
+if ( (*a) < (*b) )  return -1;
 
-if ( (*a) > (*b) )  return (  1 );
+if ( (*a) > (*b) )  return 1;
 
 
-return ( 0 );
+return 0;
 
 }
 
@@ -211,12 +210,12 @@ int do_rank(const double *array, double *rank, int n)
 
 {
 
-if ( n <= 1 )  return(0);
+if ( n <= 1 )  return 0;
 
 int i, j, ties_current, ties_total, tie_rank_start = 0, tie_rank_end;
 double tie_rank_mean;
-RankInfo *rank_info = (RankInfo *) 0;
-double *ordered_array = (double *) 0;
+RankInfo *rank_info = (RankInfo *) nullptr;
+double *ordered_array = (double *) nullptr;
 double prev_v, v;
 
 rank_info = new RankInfo [n];
@@ -296,8 +295,8 @@ if(ties_current != 0) {
    }
 }
 
-if(rank_info)     { delete [] rank_info;     rank_info = (RankInfo *) 0; }
-if(ordered_array) { delete [] ordered_array; ordered_array = (double *) 0; }
+if(rank_info)     { delete [] rank_info;     rank_info = (RankInfo *) nullptr; }
+if(ordered_array) { delete [] ordered_array; ordered_array = (double *) nullptr; }
 
 return(ties_total);
 
@@ -314,11 +313,11 @@ int compare_rank(const void *p1, const void *p2)
 const RankInfo a = *((RankInfo *) p1);
 const RankInfo b = *((RankInfo *) p2);
 
-if ( a.data[a.index] < b.data[b.index] )  return ( -1 );
+if ( a.data[a.index] < b.data[b.index] )  return -1;
 
-if ( a.data[a.index] > b.data[b.index] )  return (  1 );
+if ( a.data[a.index] > b.data[b.index] )  return 1;
 
-return ( 0 );
+return 0;
 
 }
 

@@ -1,21 +1,15 @@
-
-
 ////////////////////////////////////////////////////////////////////////
 
-
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
-
 ////////////////////////////////////////////////////////////////////////
 
-
-using namespace std;
 
 #include <iostream>
 #include <unistd.h>
@@ -24,6 +18,8 @@ using namespace std;
 
 #include "legendre.h"
 #include "vx_log.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -105,11 +101,11 @@ Legendre & Legendre::operator=(const Legendre & L)
 
 {
 
-if ( this == &L )  return ( * this );
+if ( this == &L )  return *this;
 
 assign(L);
 
-return ( * this );
+return *this;
 
 }
 
@@ -139,9 +135,9 @@ void Legendre::clear()
 
 {
 
-if ( P )  { delete [] P;  P = 0; }
+if ( P )  { delete [] P;  P = nullptr; }
 
-if ( PP )  { delete [] PP;  PP = 0; }
+if ( PP )  { delete [] PP;  PP = nullptr; }
 
 X = 0.0;
 
@@ -287,7 +283,7 @@ double r, w;
 
 d_and_r_root_weight(k, r, w);
 
-return ( r );
+return r;
 
 }
 
@@ -471,7 +467,7 @@ t = (4.0*K - 1.0)/(4.0*n + 2.0);
 x = (1.0 - 1.0/(8.0*n*n) + 1.0/(8.0*n*n*n))*cos(t*pi);
 
 
-return ( x );
+return x;
 
 }
 
@@ -535,7 +531,7 @@ if ( K == 1 )  {
    //  done
    //
 
-return ( x );
+return x;
 
 }
 

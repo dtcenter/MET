@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -24,14 +24,12 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
 #include <dirent.h>
 
 #include<netcdf>
-using namespace netCDF;
 
 #include "main.h"
 #include "vx_log.h"
@@ -52,6 +50,10 @@ using namespace netCDF;
 #include "pointdata_python.h"
 #endif
 
+using namespace std;
+using namespace netCDF;
+
+
 ////////////////////////////////////////////////////////////////////////
 
 static ConcatString program_name;
@@ -64,7 +66,7 @@ static const int TYPE_GOES     = 5;
 static const int TYPE_GOES_ADP = 6;
 static const int TYPE_PYTHON   = 7;     // MET Point Obs NetCDF from PYTHON
 
-static const InterpMthd DefaultInterpMthd = InterpMthd_UW_Mean;
+static const InterpMthd DefaultInterpMthd = InterpMthd::UW_Mean;
 static const int        DefaultInterpWdth = 2;
 static const double     DefaultVldThresh  = 0.5;
 
@@ -120,7 +122,7 @@ static bool do_gaussian_filter = false;
 static SingleThresh prob_cat_thresh;
 
 // Output NetCDF file
-static NcFile *nc_out  = (NcFile *) 0;
+static NcFile *nc_out  = (NcFile *) nullptr;
 static NcDim  lat_dim ;
 static NcDim  lon_dim ;
 
@@ -219,7 +221,7 @@ int met_main(int argc, char *argv[]) {
    // Process the input data file
    process_data_file();
 
-   return(0);
+   return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -236,7 +238,7 @@ void process_command_line(int argc, char **argv) {
 
    // Set default regridding options
    RGInfo.enable     = true;
-   RGInfo.field      = FieldType_None;
+   RGInfo.field      = FieldType::None;
    RGInfo.method     = DefaultInterpMthd;
    RGInfo.width      = DefaultInterpWdth;
    RGInfo.vld_thresh = DefaultVldThresh;
@@ -338,7 +340,7 @@ void process_command_line(int argc, char **argv) {
          else var_names.add(vname);
       }
       // Clean up
-      if(vinfo) { delete vinfo; vinfo = (VarInfo *) 0; }
+      if(vinfo) { delete vinfo; vinfo = (VarInfo *) nullptr; }
    }
    // Check that the number of output names and fields match
    else if(VarNameSA.n() != FieldSA.n()) {
@@ -367,7 +369,7 @@ void process_data_file() {
    Grid fr_grid, to_grid;
    GrdFileType ftype;
    ConcatString run_cs;
-   NcFile *nc_in = (NcFile *)0;
+   NcFile *nc_in = (NcFile *) nullptr;
    static const char *method_name = "process_data_file() -> ";
 
    // Initialize configuration object
@@ -387,7 +389,7 @@ void process_data_file() {
    bool use_python = false;
    int obs_type;
    Met2dDataFileFactory m_factory;
-   Met2dDataFile *fr_mtddf = (Met2dDataFile *) 0;
+   Met2dDataFile *fr_mtddf = (Met2dDataFile *) nullptr;
 #ifdef WITH_PYTHON
    string python_command = InputFilename;
    bool use_xarray = (0 == python_command.find(conf_val_python_xarray));
@@ -496,8 +498,8 @@ void process_data_file() {
 
    // Clean up
    if(nc_in)    { delete nc_in;    nc_in  = 0; }
-   if(fr_mtddf) { delete fr_mtddf; fr_mtddf = (Met2dDataFile *) 0; }
-   if(vinfo)    { delete vinfo;    vinfo    = (VarInfo *)       0; }
+   if(fr_mtddf) { delete fr_mtddf; fr_mtddf = (Met2dDataFile *) nullptr; }
+   if(vinfo)    { delete vinfo;    vinfo    = (VarInfo *)       nullptr; }
 
    return;
 }
@@ -745,7 +747,7 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
       // Loop through the requested fields
       int obs_count_zero_to, obs_count_non_zero_to;
       int obs_count_zero_from, obs_count_non_zero_from;
-      IntArray *cellMapping = (IntArray *)0;
+      IntArray *cellMapping = (IntArray *) nullptr;
 
       obs_count_zero_to = obs_count_non_zero_to = 0;
       obs_count_zero_from = obs_count_non_zero_from = 0;
@@ -993,9 +995,9 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
                      int data_count = dataArray.n();
                      if (0 < data_count) {
                         float to_value;
-                        if      (RGInfo.method == InterpMthd_Min) to_value = dataArray.min();
-                        else if (RGInfo.method == InterpMthd_Max) to_value = dataArray.max();
-                        else if (RGInfo.method == InterpMthd_Median) {
+                        if      (RGInfo.method == InterpMthd::Min) to_value = dataArray.min();
+                        else if (RGInfo.method == InterpMthd::Max) to_value = dataArray.max();
+                        else if (RGInfo.method == InterpMthd::Median) {
                            dataArray.sort_array();
                            to_value = dataArray[data_count/2];
                            if (0 == data_count % 2)
@@ -1130,7 +1132,7 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
       } // end for i
 
       if (cellMapping) {
-         delete [] cellMapping;   cellMapping = (IntArray *)0;
+         delete [] cellMapping;   cellMapping = (IntArray *) nullptr;
       }
    }
 
@@ -1387,7 +1389,7 @@ void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
    } // end for i
 
    delete [] cellMapping;
-   cellMapping = (IntArray *)0;
+   cellMapping = (IntArray *) nullptr;
    if( 0 < filtered_by_time ) {
       mlog << Debug(2) << method_name << "Filtered by time: " << filtered_by_time
            << " out of " << from_size
@@ -1484,9 +1486,9 @@ void regrid_nc_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
                   float to_value;
                   int data_cnt = dataArray.n();
                   if (1 == data_cnt) to_value = dataArray[0];
-                  else if (RGInfo.method == InterpMthd_Min) to_value = dataArray.min();
-                  else if (RGInfo.method == InterpMthd_Max) to_value = dataArray.max();
-                  else if (RGInfo.method == InterpMthd_Median) {
+                  else if (RGInfo.method == InterpMthd::Min) to_value = dataArray.min();
+                  else if (RGInfo.method == InterpMthd::Max) to_value = dataArray.max();
+                  else if (RGInfo.method == InterpMthd::Median) {
                      dataArray.sort_array();
                      to_value = dataArray[data_cnt/2];
                      if (0 == data_cnt % 2)
@@ -1594,7 +1596,7 @@ void write_nc_data(const DataPlane &dp, const Grid &grid, NcVar *data_var) {
    }
 
    // Clean up
-   if(data) { delete [] data;  data = (float *)  0; }
+   if(data) { delete [] data;  data = (float *) nullptr; }
 
    return;
 }
@@ -1624,7 +1626,7 @@ void write_nc_data_int(const DataPlane &dp, const Grid &grid, NcVar *data_var) {
    }
 
    // Clean up
-   if(data) { delete [] data;  data = (int *)  0; }
+   if(data) { delete [] data;  data = (int *) nullptr; }
 
    return;
 }
@@ -1687,7 +1689,7 @@ void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
    int global_attr_count;
    bool opt_all_attrs = false;
    clock_t start_clock =  clock();
-   NcFile *nc_adp = (NcFile *)0;
+   NcFile *nc_adp = (NcFile *) nullptr;
    static const char *method_name = "process_goes_file() -> ";
 
    ConcatString tmp_dir = config.get_tmp_dir();
@@ -1816,7 +1818,7 @@ void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
    //copy_nc_atts(_nc_in, nc_out, opt_all_attrs);
 
    delete nc_adp; nc_adp = 0;
-   delete [] cellMapping;   cellMapping = (IntArray *)0;
+   delete [] cellMapping;   cellMapping = (IntArray *) nullptr;
    mlog << Debug(LEVEL_FOR_PERFORMANCE) << method_name << "took "
         << (clock()-start_clock)/double(CLOCKS_PER_SEC) << " seconds\n";
 
@@ -2184,7 +2186,7 @@ void get_grid_mapping(Grid fr_grid, Grid to_grid, IntArray *cellMapping,
    }
 
    // Override the from nx & ny from NetCDF if exists
-   NcFile *coord_nc_in = (NcFile *)0;
+   NcFile *coord_nc_in = (NcFile *) nullptr;
    if (has_coord_input) {
       mlog << Debug(2)  << method_name << "Reading coord file: " << cur_coord_name << "\n";
       coord_nc_in = open_ncfile(cur_coord_name.c_str());
@@ -2598,9 +2600,9 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
             if (0 < dataArray.n()) {
                int data_count = dataArray.n();
                float to_value;
-               if      (RGInfo.method == InterpMthd_Min) to_value = dataArray.min();
-               else if (RGInfo.method == InterpMthd_Max) to_value = dataArray.max();
-               else if (RGInfo.method == InterpMthd_Median) {
+               if      (RGInfo.method == InterpMthd::Min) to_value = dataArray.min();
+               else if (RGInfo.method == InterpMthd::Max) to_value = dataArray.max();
+               else if (RGInfo.method == InterpMthd::Median) {
                   dataArray.sort_array();
                   to_value = dataArray[data_count/2];
                   if (0 == data_count % 2)
@@ -2720,7 +2722,7 @@ void close_nc() {
 
    // Clean up
    if(nc_out) {
-      delete nc_out; nc_out = (NcFile *) 0;
+      delete nc_out; nc_out = (NcFile *) nullptr;
    }
 
    // List the output file
@@ -2740,7 +2742,7 @@ bool keep_message_type(const int mt_index) {
    keep = message_type_list.n() == 0 ||
           message_type_list.has(mt_index);
 
-   return(keep);
+   return keep;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2845,9 +2847,9 @@ void set_field(const StringArray &a) {
 
 void set_method(const StringArray &a) {
    InterpMthd method_id = string_to_interpmthd(a[0].c_str());
-   if (method_id == InterpMthd_Gaussian || method_id == InterpMthd_MaxGauss ) {
+   if (method_id == InterpMthd::Gaussian || method_id == InterpMthd::MaxGauss ) {
       do_gaussian_filter = true;
-      if (method_id == InterpMthd_MaxGauss) RGInfo.method = InterpMthd_Max;
+      if (method_id == InterpMthd::MaxGauss) RGInfo.method = InterpMthd::Max;
    }
    else RGInfo.method = method_id;
    opt_override_method = true;

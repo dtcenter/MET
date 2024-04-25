@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -21,10 +21,10 @@
 // Enumeration for time-series analysis types
 //
 
-enum TimeSeriesType {
-   TimeSeriesType_None,  // Default
-   TimeSeriesType_DyDt,  // Threshold change over time window
-   TimeSeriesType_Swing  // Apply swinging door algorithm
+enum class TimeSeriesType {
+   None,  // Default
+   DyDt,  // Threshold change over time window
+   Swing  // Apply swinging door algorithm
 };
 
 static const char timeseriestype_dydt_str[]  = "DYDT";

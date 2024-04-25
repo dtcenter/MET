@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -7,8 +7,6 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 ////////////////////////////////////////////////////////////////////////
-
-using namespace std;
 
 #include <iostream>
 #include <unistd.h>
@@ -20,6 +18,8 @@ using namespace std;
 #include "vx_math.h"
 
 #include "track_point.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -52,11 +52,11 @@ QuadInfo::QuadInfo(const QuadInfo &t) {
 
 QuadInfo & QuadInfo::operator=(const QuadInfo &t) {
 
-   if(this == &t) return(*this);
+   if(this == &t) return *this;
 
    assign(t);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -82,7 +82,7 @@ QuadInfo & QuadInfo::operator+=(const QuadInfo &t) {
    if(is_bad_data(NWVal) || is_bad_data(t.NWVal)) NWVal  = bad_data_double;
    else                                           NWVal += t.NWVal;
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -151,7 +151,7 @@ ConcatString QuadInfo::serialize() const {
      << ", SWVal = " << SWVal
      << ", NWVal = " << NWVal;
 
-   return(s);
+   return s;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -162,7 +162,7 @@ ConcatString QuadInfo::serialize_r(int n, int indent_depth) const {
 
    s << prefix << "[" << n << "] " << serialize() << "\n";
 
-   return(s);
+   return s;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -230,32 +230,32 @@ void QuadInfo::set_quad_vals(QuadrantType ref_quad,
    switch(ref_quad) {
 
      // Full circle radius is stored in the first radius
-     case(FullCircle):
+     case QuadrantType::FullCircle:
         ALVal = rad1;
         break;
 
-     case(NE_Quadrant):
+     case QuadrantType::NE:
         NEVal = rad1;
         SEVal = rad2;
         SWVal = rad3;
         NWVal = rad4;
         break;
 
-     case(SE_Quadrant):
+     case QuadrantType::SE:
         NEVal = rad4;
         SEVal = rad1;
         SWVal = rad2;
         NWVal = rad3;
         break;
 
-     case(SW_Quadrant):
+     case QuadrantType::SW:
         NEVal = rad3;
         SEVal = rad4;
         SWVal = rad1;
         NWVal = rad2;
         break;
 
-     case(NW_Quadrant):
+     case QuadrantType::NW:
         NEVal = rad2;
         SEVal = rad3;
         SWVal = rad4;
@@ -263,7 +263,7 @@ void QuadInfo::set_quad_vals(QuadrantType ref_quad,
         break;
 
      // Nothing to do
-     case(NoQuadrantType):
+     case QuadrantType::None:
         break;
 
      default:
@@ -307,7 +307,7 @@ bool QuadInfo::is_match_wind(const ATCFTrackLine &l) const {
    // Parse the line into a QuadInfo object
    qi.set_wind(l);
 
-   return(*this == qi);
+   return (*this == qi);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -318,7 +318,7 @@ bool QuadInfo::is_match_seas(const ATCFTrackLine &l) const {
    // Parse the line into a QuadInfo object
    qi.set_seas(l);
 
-   return(*this == qi);
+   return (*this == qi);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -352,11 +352,11 @@ TrackPoint::TrackPoint(const TrackPoint &p) {
 
 TrackPoint & TrackPoint::operator=(const TrackPoint &p) {
 
-   if(this == &p) return(*this);
+   if(this == &p) return *this;
 
    assign(p);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -416,7 +416,7 @@ TrackPoint & TrackPoint::operator+=(const TrackPoint &p) {
    // Increment wind quadrants
    for(i=0; i<NWinds; i++) Wind[i] += p[i];
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -441,7 +441,7 @@ void TrackPoint::clear() {
    Lon       = bad_data_double;
    Vmax      = bad_data_int;
    MSLP      = bad_data_int;
-   Level     = NoCycloneLevel;
+   Level     = CycloneLevel::None;
    RadP      = bad_data_double;
    RRP       = bad_data_double;
    MRD       = bad_data_double;
@@ -449,9 +449,9 @@ void TrackPoint::clear() {
    Eye       = bad_data_double;
    Direction = bad_data_double;
    Speed     = bad_data_double;
-   Depth     = NoSystemsDepth;
+   Depth     = SystemsDepth::None;
    WarmCore  = false;
-   WatchWarn = NoWatchWarnType;
+   WatchWarn = WatchWarnType::None;
 
    NumMembers  = bad_data_int;
    TrackSpread = bad_data_double;
@@ -541,7 +541,7 @@ ConcatString TrackPoint::serialize() const {
      << ", MSLPStdev = " << MSLPStdev
      << ", NDiag = " << DiagVal.n();
 
-   return(s);
+   return s;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -556,7 +556,7 @@ ConcatString TrackPoint::serialize_r(int n, int indent_depth) const {
    for(i=0; i<NWinds; i++)
       s << Wind[i].serialize_r(i+1, indent_depth+1) << "\n";
 
-   return(s);
+   return s;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -641,7 +641,7 @@ const QuadInfo & TrackPoint::operator[](int n) const {
       exit(1);
    }
 
-   return(Wind[n]);
+   return Wind[n];
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -671,7 +671,7 @@ bool TrackPoint::set(const ATCFTrackLine &l) {
    // Attempt to set each WindInfo object with ATCFTrackLine
    for(i=0; i<NWinds; i++) Wind[i].set_wind(l);
 
-   return(true);
+   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -706,7 +706,7 @@ bool TrackPoint::is_match(const ATCFTrackLine &l) const {
       Level     != l.level())
       match = false;
 
-   return(match);
+   return match;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -741,7 +741,7 @@ double TrackPoint::get_diag_val(const StringArray &diag_names, const string cur_
    else
       diag_val = bad_data_double;
    
-   return(diag_val);
+   return diag_val;
 }
 
 ////////////////////////////////////////////////////////////////////////

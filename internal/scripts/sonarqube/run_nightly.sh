@@ -20,9 +20,9 @@
 #=======================================================================
 
 # Constants
-#EMAIL_LIST="johnhg@ucar.edu hsoh@ucar.edu jpresto@ucar.edu linden@ucar.edu mccabe@ucar.edu"
-EMAIL_LIST="hsoh@ucar.edu"
+EMAIL_LIST="hsoh@ucar.edu"  # overridden by $MET_CRON_EMAIL_LIST_MET or $MET_CRON_EMAIL_LIST
 KEEP_DAYS=5
+GIT_REPO_NAME=MET
 
 function usage {
   echo
@@ -65,8 +65,12 @@ LOGFILE=${RUN_DIR}/run_sonarqube_${TODAY}.log
 # Run scan and check for bad return status
 ${SCRIPT_DIR}/run_sonarqube.sh ${1} > ${LOGFILE}
 if [[ $? -ne 0 ]]; then
-  echo "$0: The nightly SonarQube scan FAILED in `basename ${RUN_DIR}`." >> ${LOGFILE}
-  cat ${LOGFILE} | mail -s "MET SonarQube scan Failed for ${1} in `basename ${RUN_DIR}` (autogen msg)" ${EMAIL_LIST}
+  my_cmd="echo \$MET_CRON_EMAIL_LIST_${GIT_REPO_NAME}"
+  _EMAIL_LIST="$(eval $my_cmd)"
+  [ -z "$_EMAIL_LIST" ] && _EMAIL_LIST="$MET_CRON_EMAIL_LIST"
+  [ -z "$_EMAIL_LIST" ] && _EMAIL_LIST="$EMAIL_LIST"
+  echo "$0: The nightly SonarQube scanning for $GIT_REPO_NAME FAILED in `basename ${RUN_DIR}`." >> ${LOGFILE}
+  cat ${LOGFILE} | mail -s "$GIT_REPO_NAME SonarQube scanning failed for ${1} in `basename ${RUN_DIR}` (autogen msg)" ${_EMAIL_LIST}
   exit 1
 fi
 

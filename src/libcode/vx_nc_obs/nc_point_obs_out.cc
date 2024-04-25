@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -10,8 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <string.h>
 #include <cstdio>
@@ -21,6 +19,9 @@ using namespace std;
 #include "nc_point_obs_out.h"
 #include "nc_summary.h"
 #include "write_netcdf.h"
+
+using namespace std;
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -491,7 +492,7 @@ void MetNcPointObsOut::write_obs_data()
         << ", save_raw_data: " << (do_save_raw_data ? "true" : "false")
         << "\n";
 
-   if (!do_summary || (do_summary && do_save_raw_data)) {
+   if (!do_summary || do_save_raw_data) {
      mlog << Debug(5) << method_name << "writing " 
           << (int)out_data.observations.size() << " raw data...\n";
      write_obs_data(out_data.observations, do_header);
@@ -517,8 +518,6 @@ int MetNcPointObsOut::write_obs_data(const vector< Observation > observations,
                                      const bool do_header)
 {
    int prev_hdr_idx = -1;
-   string prev_header_type = "";
-   string prev_station_id = "";
    ConcatString obs_qty;
    int headerOffset = data_buffer.cur_hdr_idx;
    const string method_name = "  write_obs_data()";

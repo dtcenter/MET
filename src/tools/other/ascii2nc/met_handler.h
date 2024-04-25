@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -10,8 +10,8 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-#ifndef  __METHANDLER_H__
-#define  __METHANDLER_H__
+#ifndef  __MET_HANDLER_H__
+#define  __MET_HANDLER_H__
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -30,12 +30,12 @@ class MetHandler : public FileHandler
 
 public:
 
-  MetHandler(const string &program_name);
+  MetHandler(const std::string &program_name);
   virtual ~MetHandler();
 
   virtual bool isFileType(LineDataFile &ascii_file) const;
   
-  static string getFormatString()
+  static std::string getFormatString()
   {
     return "met_point";
   }
@@ -54,7 +54,7 @@ protected:
 ////////////////////////////////////////////////////////////////////////
 
 
-#endif   /*  __METHANDLER_H__  */
+#endif   /*  __MET_HANDLER_H__  */
 
 
 ////////////////////////////////////////////////////////////////////////

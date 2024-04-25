@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -9,8 +9,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-
-using namespace std;
 
 #include <iostream>
 #include <fstream>
@@ -25,6 +23,8 @@ using namespace std;
 #include "vx_math.h"
 #include "vx_util.h"
 #include "vx_log.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -87,11 +87,11 @@ MaskPoly & MaskPoly::operator=(const MaskPoly & m)
 
 {
 
-if ( this == &m )  return ( * this );
+if ( this == &m )  return *this;
 
 assign(m);
 
-return ( * this );
+return *this;
 
 }
 
@@ -229,7 +229,7 @@ if ( i < 0 || i >= Npoints ) {
    //   done
    //
 
-return ( Lat[i] );
+return Lat[i];
 
 }
 
@@ -257,7 +257,7 @@ adj_lon -= 360.0*floor((adj_lon + 180.0)/360.0);
    //   done
    //
 
-return ( adj_lon );
+return adj_lon;
 
 }
 
@@ -520,7 +520,7 @@ for (j=0; j<n; ++j)  {
 
 }
 
-return ( nint( (angle - angle0)/2 ) );
+return nint( (angle - angle0)/2 );
 
 }
 

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -46,8 +46,6 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <cstdio>
 #include <dirent.h>
 #include <iostream>
@@ -68,6 +66,8 @@ using namespace std;
 #ifdef WITH_PYTHON
 #include "python_line.h"
 #endif
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -193,7 +193,7 @@ int met_main(int argc, char * argv []) {
       //
       // If a job was specified on the command line, run it.
       //
-      if(default_job.job_type != no_stat_job_type) {
+      if(default_job.job_type != STATJobType::None) {
          process_job(command_line_job_options.c_str(), 1);
       }
       //
@@ -240,7 +240,7 @@ int met_main(int argc, char * argv []) {
    //
    clean_up();
 
-   return(0);
+   return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -470,14 +470,14 @@ void process_search_dirs() {
    //
    // Apply the GO Index or CBS Index filtering criteria.
    //
-   if(default_job.job_type == stat_job_go_index ||
-      default_job.job_type == stat_job_cbs_index) {
+   if(default_job.job_type == STATJobType::go_index ||
+      default_job.job_type == STATJobType::cbs_index) {
 
       MetConfig ss_index_conf;
       STATAnalysisJob ss_index_job;
 
       ConcatString config_file =
-         (default_job.job_type == stat_job_go_index ?
+         (default_job.job_type == STATJobType::go_index ?
           replace_path(go_index_config_file) :
           replace_path(cbs_index_config_file));
 
@@ -565,7 +565,7 @@ void process_stat_file(const char *filename, const STATAnalysisJob &job, int &n_
       //
       // Continue if the line is not a valid STAT line.
       //
-      if(line.type() == no_stat_line_type) continue;
+      if(line.type() == STATLineType::none) continue;
 
       if(!line.is_header()) n_read++;
 
@@ -620,7 +620,7 @@ while((*f) >> line) {
       // Continue if the line is not a valid STAT line.
       //
 
-   if(line.type() == no_stat_line_type) continue;
+   if(line.type() == STATLineType::none) continue;
 
       //
       // Pass header lines through to the output
@@ -639,7 +639,7 @@ while((*f) >> line) {
 
 f->close();
 
-if(pldf) { delete pldf; pldf = (PyLineDataFile *) 0; }
+if(pldf) { delete pldf; pldf = (PyLineDataFile *) nullptr; }
 
 return;
 
@@ -677,14 +677,14 @@ void process_job(const char * jobstring, int n_job) {
    //
    // Special processing for the GO Index and CBS Index jobs.
    //
-   if(job.job_type == stat_job_go_index ||
-      job.job_type == stat_job_cbs_index) {
+   if(job.job_type == STATJobType::go_index ||
+      job.job_type == STATJobType::cbs_index) {
 
       MetConfig ss_index_conf;
       STATAnalysisJob ss_index_job;
 
       ConcatString config_file =
-         (job.job_type == stat_job_go_index ?
+         (job.job_type == STATJobType::go_index ?
           replace_path(go_index_config_file) :
           replace_path(cbs_index_config_file));
 

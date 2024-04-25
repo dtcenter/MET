@@ -1,16 +1,10 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-static const int debug = 0;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -39,6 +33,12 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
+static const int debug = 0;
+
+
+////////////////////////////////////////////////////////////////////////
+
+
    //
    //  declarations with external linkage
    //
@@ -47,10 +47,10 @@ using namespace std;
 extern int yyparse();
 
 // extern FILE * yyin;
-FILE * yyin = 0;
+FILE * yyin = nullptr;
 
 // extern char * yytext;
-char * yytext = 0;
+char * yytext = nullptr;
 
 extern int yydebug;
 
@@ -90,7 +90,7 @@ bool do_reverse            = false;
 
 bool verbose               = true;
 
-const char * program_name  = (const char *) 0;
+const char * program_name  = (const char *) nullptr;
 
 
 ////////////////////////////////////////////////////////////////////////

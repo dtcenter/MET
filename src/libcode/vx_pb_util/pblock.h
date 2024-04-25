@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -18,12 +18,12 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-enum PadSize {
+enum class PadSize {
 
-   padsize_4,
-   padsize_8,
+   size_4,
+   size_8,
 
-   no_padsize
+   no_pad
 
 };
 
@@ -31,7 +31,7 @@ enum PadSize {
 ////////////////////////////////////////////////////////////////////////
 
 
-enum Action {
+enum class Action {
 
    block,
    unblock,

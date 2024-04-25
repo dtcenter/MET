@@ -50,7 +50,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set job controls
         id: job_status
         run: .github/jobs/set_job_controls.sh
@@ -76,7 +76,7 @@ jobs:
     needs: job_control
     if: ${{ needs.job_control.outputs.run_compile == 'true' }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Create directories to store output
         run: mkdir -p ${RUNNER_WORKSPACE}/logs
@@ -87,6 +87,7 @@ jobs:
           SOURCE_BRANCH: ${{ needs.job_control.outputs.branch_name }}
           MET_BASE_REPO: ${{ needs.job_control.outputs.met_base_repo }}
           MET_BASE_TAG: ${{ needs.job_control.outputs.met_base_tag }}
+          MET_CONFIG_OPTS: '--enable-all'
 
       - name: Copy all build log files into logs directory
         if: always()
@@ -102,9 +103,9 @@ jobs:
 
       - name: Upload logs as artifact
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: logs
+          name: logs_compile
           path: ${{ runner.workspace }}/logs
           if-no-files-found: ignore
 
@@ -131,12 +132,14 @@ jobs:
     if: ${{ needs.job_control.outputs.run_unit_tests == 'true' }}
     strategy:
       matrix:
-        tests:
-          - 'ascii2nc'
-          - 'pb2nc madis2nc pcp_combine'
+        include:
+          - jobid: 'job1' 
+            tests: 'ascii2nc'
+          - jobid: 'job2'
+            tests: 'pb2nc madis2nc pcp_combine gen_ens_prod'
       fail-fast: false
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Free disk space
         run: .github/jobs/free_disk_space.sh
@@ -149,16 +152,16 @@ jobs:
           INPUT_DATA_VERSION: ${{ needs.job_control.outputs.input_data_version }}-all
 
       - name: Upload output as artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: unit_1a
+          name: unit_1a_${{ matrix.jobid }}
           path: ${{ runner.workspace }}/output
 
       - name: Upload logs as artifact
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: logs
+          name: logs_unit_1a_${{ matrix.jobid }}
           path: ${{ runner.workspace }}/logs
           if-no-files-found: ignore
 
@@ -169,12 +172,14 @@ jobs:
     if: ${{ needs.job_control.outputs.run_unit_tests == 'true' }}
     strategy:
       matrix:
-        tests:
-          - 'ascii2nc_indy pb2nc_indy tc_dland tc_pairs tc_stat plot_tc tc_rmw rmw_analysis tc_diag tc_gen'
-          - 'met_test_scripts mode_multivar mode_graphics mtd regrid airnow gsi_tools netcdf modis series_analysis gen_ens_prod wwmca_regrid gen_vx_mask grid_weight interp_shape grid_diag grib_tables lidar2nc shift_data_plane trmm2nc aeronet wwmca_plot ioda2nc gaussian'
+        include:
+          - jobid: 'job1'
+            tests: 'ascii2nc_indy pb2nc_indy tc_dland tc_pairs tc_stat plot_tc tc_rmw rmw_analysis tc_diag tc_gen'
+          - jobid: 'job2'
+            tests: 'met_test_scripts mode_multivar mode_graphics mtd regrid airnow gsi_tools netcdf modis series_analysis wwmca_regrid gen_vx_mask grid_weight interp_shape grid_diag grib_tables lidar2nc shift_data_plane trmm2nc aeronet wwmca_plot ioda2nc gaussian'
       fail-fast: false
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Free disk space
         run: .github/jobs/free_disk_space.sh
@@ -187,33 +192,36 @@ jobs:
           INPUT_DATA_VERSION: ${{ needs.job_control.outputs.input_data_version }}-all
 
       - name: Upload output as artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: unit_1b
+          name: unit_1b_${{ matrix.jobid }}
           path: ${{ runner.workspace }}/output
 
       - name: Upload logs as artifact
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: logs
+          name: logs_unit_1b_${{ matrix.jobid }}
           path: ${{ runner.workspace }}/logs
           if-no-files-found: ignore
 
-  unit_rc_leads:
-    name: Unit RC leads
+  unit_1c:
+    name: Unit 1c
     runs-on: ubuntu-latest
     needs: [job_control, update_input_data, compile]
     if: ${{ needs.job_control.outputs.run_unit_tests == 'true' }}
     strategy:
       matrix:
-        tests:
-          - 'ref_config_lead_00 ref_config_lead_12'
-          - 'ref_config_lead_24 ref_config_lead_48'
-          - 'ref_config_lead_36'
+        include:
+          - jobid: 'job1'
+            tests: 'ref_config_lead_00 ref_config_lead_12'
+          - jobid: 'job2'
+            tests: 'ref_config_lead_24 ref_config_lead_48'
+          - jobid: 'job3'
+            tests: 'ref_config_lead_36'
       fail-fast: false
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Free disk space
         run: .github/jobs/free_disk_space.sh
@@ -226,40 +234,42 @@ jobs:
           INPUT_DATA_VERSION: ${{ needs.job_control.outputs.input_data_version }}-all
 
       - name: Upload output as artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: unit_rc_leads
+          name: unit_1c_${{ matrix.jobid }}
           path: ${{ runner.workspace }}/output
 
       - name: Upload logs as artifact
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: logs
+          name: logs_rc_leads_${{ matrix.jobid }}
           path: ${{ runner.workspace }}/logs
           if-no-files-found: ignore
 
-  unit_rc:
-    name: Unit RC
+  unit_2c:
+    name: Unit 2c 
     runs-on: ubuntu-latest
-    needs: [job_control, unit_rc_leads]
+    needs: [job_control, unit_1c]
     if: ${{ needs.job_control.outputs.run_unit_tests == 'true' }}
     strategy:
       matrix:
-        tests:
-          - 'ref_config'
+        include:
+          - jobid: 'job1'
+            tests: 'ref_config'
       fail-fast: false
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Free disk space
         run: .github/jobs/free_disk_space.sh
 
       - name: Download ref_config_leads output from artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
-          name: unit_rc_leads
           path: ${{ runner.workspace }}/output
+          pattern: unit_1c_job*
+          merge-multiple: true
 
       - name: Run Unit Tests in Docker
         run: .github/jobs/run_unit_docker.sh
@@ -269,16 +279,16 @@ jobs:
           INPUT_DATA_VERSION: 'none'
 
       - name: Upload output as artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: unit_rc
+          name: unit_2c_${{ matrix.jobid }}
           path: ${{ runner.workspace }}/output
 
       - name: Upload logs as artifact
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: logs
+          name: logs_unit_2c_${{ matrix.jobid }}
           path: ${{ runner.workspace }}/logs
           if-no-files-found: ignore
 
@@ -289,24 +299,30 @@ jobs:
     if: ${{ needs.job_control.outputs.run_unit_tests == 'true' }}
     strategy:
       matrix:
-        tests:
-          - 'point_stat stat_analysis_ps'
-          - 'grid_stat stat_analysis_gs'
-          - 'wavelet_stat stat_analysis_ws'
-          - 'ensemble_stat stat_analysis_es'
-          - 'ugrid'
+        include:
+          - jobid: 'job1'
+            tests: 'point_stat stat_analysis_ps'
+          - jobid: 'job2'
+            tests: 'grid_stat stat_analysis_gs'
+          - jobid: 'job3'
+            tests: 'wavelet_stat stat_analysis_ws'
+          - jobid: 'job4'
+            tests: 'ensemble_stat stat_analysis_es'
+          - jobid: 'job5'
+            tests: 'ugrid'
       fail-fast: false
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Free disk space
         run: .github/jobs/free_disk_space.sh
 
       - name: Download 1a output from artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
-          name: unit_1a
           path: ${{ runner.workspace }}/output
+          pattern: unit_1a_job*
+          merge-multiple: true
 
       - name: Run Unit Tests in Docker
         run: .github/jobs/run_unit_docker.sh
@@ -316,16 +332,16 @@ jobs:
           INPUT_DATA_VERSION: ${{ needs.job_control.outputs.input_data_version }}-all
 
       - name: Upload output as artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: unit_2a
+          name: unit_2a_${{ matrix.jobid }}
           path: ${{ runner.workspace }}/output
 
       - name: Upload logs as artifact
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: logs
+          name: logs_unit_2a_${{ matrix.jobid }}
           path: ${{ runner.workspace }}/logs
           if-no-files-found: ignore
 
@@ -336,23 +352,28 @@ jobs:
     if: ${{ needs.job_control.outputs.run_unit_tests == 'true' }}
     strategy:
       matrix:
-        tests:
-          - 'climatology_1.0deg'
-          - 'climatology_1.5deg'
-          - 'climatology_2.5deg'
-          - 'python point2grid plot_data_plane mode mode_analysis perc_thresh hira plot_point_obs quality_filter obs_summary duplicate_flag'
+        include:
+          - jobid: 'job1'
+            tests: 'climatology_1.0deg'
+          - jobid: 'job2'
+            tests: 'climatology_1.5deg'
+          - jobid: 'job3'
+            tests: 'climatology_2.5deg'
+          - jobid: 'job4'
+            tests: 'python point2grid plot_data_plane mode mode_analysis perc_thresh hira plot_point_obs quality_filter obs_summary duplicate_flag'
       fail-fast: false
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Free disk space
         run: .github/jobs/free_disk_space.sh
 
       - name: Download 1a output from artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
-          name: unit_1a
           path: ${{ runner.workspace }}/output
+          pattern: unit_1a_job*
+          merge-multiple: true
 
       - name: Run Unit Tests in Docker
         run: .github/jobs/run_unit_docker.sh
@@ -362,34 +383,34 @@ jobs:
           INPUT_DATA_VERSION: ${{ needs.job_control.outputs.input_data_version }}-all
 
       - name: Upload output as artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: unit_2b
+          name: unit_2b_${{ matrix.jobid }}
           path: ${{ runner.workspace }}/output
 
       - name: Upload logs as artifact
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: logs
+          name: logs_unit_2b_${{ matrix.jobid }}
           path: ${{ runner.workspace }}/logs
           if-no-files-found: ignore
 
   run_diffs:
     name: Check for Differences
     runs-on: ubuntu-latest
-    needs: [job_control, unit_1b, unit_2a, unit_2b, unit_rc]
+    needs: [job_control, unit_1b, unit_2a, unit_2b, unit_2c]
     if: ${{ needs.job_control.outputs.run_diff == 'true' }}
     steps:
       - name: Download data from previous jobs
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
 
       - name: Copy test output into single directory
         run: |
           mkdir ${RUNNER_WORKSPACE}/output
           cp -r unit_*/* ${RUNNER_WORKSPACE}/output/
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Run Diff Tests in Docker
         run: .github/jobs/run_diff_docker.sh
@@ -400,7 +421,7 @@ jobs:
 
       - name: Upload diff files as artifact
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: diff
           path: ${{ runner.workspace }}/diff
@@ -408,25 +429,38 @@ jobs:
 
       - name: Upload logs as artifact
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: logs
+          name: logs_diff
           path: ${{ runner.workspace }}/logs
           if-no-files-found: ignore
+
+  merge_logs:
+    name: Merge Log Artifacts
+    runs-on: ubuntu-latest
+    needs: [run_diffs]
+    if: ${{ always() }}
+    steps:
+      - name: Upload merged logs as artifact
+        uses: actions/upload-artifact/merge@v4
+        with:
+          name: logs
+          pattern: logs_*
+          delete-merged: true
 
   update_truth:
     name: Update Truth Data
     runs-on: ubuntu-latest
-    needs: [job_control, unit_1b, unit_2a, unit_2b, unit_rc]
+    needs: [job_control, unit_1b, unit_2a, unit_2b, unit_2c]
     if: ${{ needs.job_control.outputs.run_update_truth == 'true' }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Free disk space
         run: .github/jobs/free_disk_space.sh
 
       - name: Download data from previous jobs
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
 
       - name: Copy test output into single directory
         run: |

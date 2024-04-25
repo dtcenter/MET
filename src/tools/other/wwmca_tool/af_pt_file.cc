@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -9,8 +9,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-
-using namespace std;
 
 #include <iostream>
 #include <unistd.h>
@@ -29,6 +27,8 @@ using namespace std;
 
 #include "af_file.h"
 #include "af_pt_file.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -96,11 +96,11 @@ AFPixelTimeFile & AFPixelTimeFile::operator=(const AFPixelTimeFile & a)
 
 {
 
-if ( this == &a )  return ( * this );
+if ( this == &a )  return *this;
 
 assign(a);
 
-return ( * this );
+return *this;
 
 }
 
@@ -112,7 +112,7 @@ void AFPixelTimeFile::init_from_scratch()
 
 {
 
-Buf = (unsigned char *) 0;
+Buf = (unsigned char *) nullptr;
 
 clear();
 
@@ -128,7 +128,7 @@ void AFPixelTimeFile::clear()
 
 {
 
-if ( Buf )  { delete [] Buf;  Buf = (unsigned char *) 0; }
+if ( Buf )  { delete [] Buf;  Buf = (unsigned char *) nullptr; }
 
 AFDataFile::clear();
 
@@ -184,7 +184,7 @@ if ( (fd = met_open(filename, O_RDONLY)) < 0 )  {
    mlog << Error << "\nAFPixelTimeFile::read(const char *) -> "
         << "can't open file \"" << filename << "\"\n\n";
 
-   return ( false );
+   return false;
 
 }
 
@@ -199,7 +199,7 @@ if ( ::read(fd, Buf, bytes) != bytes )  {
 
    ::close(fd);
 
-   return ( false );
+   return false;
 
 }
 
@@ -212,7 +212,7 @@ Filename = get_short_name(filename);
 
 ::close(fd);
 
-return ( true );
+return true;
 
 }
 
@@ -246,7 +246,7 @@ else {
 
 }
 
-return ( k );
+return k;
 
 }
 

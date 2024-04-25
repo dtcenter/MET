@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -8,7 +8,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
 
 #include <cstdio>
 #include <iostream>
@@ -32,6 +31,7 @@ using namespace std;
 #include "vx_log.h"
 
 using namespace std;
+
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -62,20 +62,20 @@ PairDataEnsemble::PairDataEnsemble(const PairDataEnsemble &pd) {
 
 PairDataEnsemble & PairDataEnsemble::operator=(const PairDataEnsemble &pd) {
 
-   if(this == &pd) return(*this);
+   if(this == &pd) return *this;
 
    assign(pd);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void PairDataEnsemble::init_from_scratch() {
 
-   e_na       = (NumArray *) 0;
+   e_na       = (NumArray *) nullptr;
    n_ens      = 0;
-   ssvar_bins = (SSVARInfo *) 0;
+   ssvar_bins = (SSVARInfo *) nullptr;
 
    clear();
 
@@ -93,7 +93,7 @@ void PairDataEnsemble::clear() {
    obs_error_flag = false;
 
    for(i=0; i<n_ens; i++) e_na[i].clear();
-   if(e_na) { delete [] e_na; e_na = (NumArray *) 0; }
+   if(e_na) { delete [] e_na; e_na = (NumArray *) nullptr; }
 
    v_na.clear();
    r_na.clear();
@@ -107,6 +107,9 @@ void PairDataEnsemble::clear() {
 
    ign_na.clear();
    pit_na.clear();
+
+   ign_conv_oerr_na.clear();
+   ign_corr_oerr_na.clear();
 
    n_ge_obs_na.clear();
    me_ge_obs_na.clear();
@@ -134,7 +137,7 @@ void PairDataEnsemble::clear() {
    mn_na.clear();
    mn_oerr_na.clear();
 
-   if(ssvar_bins) { delete [] ssvar_bins; ssvar_bins = (SSVARInfo *) 0; }
+   if(ssvar_bins) { delete [] ssvar_bins; ssvar_bins = (SSVARInfo *) nullptr; }
 
    ssvar_bin_size = bad_data_double;
    phist_bin_size = bad_data_double;
@@ -179,6 +182,8 @@ void PairDataEnsemble::extend(int n) {
    crpscl_gaus_na.extend     (n);
    ign_na.extend             (n);
    pit_na.extend             (n);
+   ign_conv_oerr_na.extend   (n);
+   ign_corr_oerr_na.extend   (n);
    n_ge_obs_na.extend        (n);
    me_ge_obs_na.extend       (n);
    n_lt_obs_na.extend        (n);
@@ -235,14 +240,19 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
    // PairDataEnsemble
    v_na             = pd.v_na;
    r_na             = pd.r_na;
+
    crps_emp_na      = pd.crps_emp_na;
    crps_emp_fair_na = pd.crps_emp_fair_na;
    spread_md_na     = pd.spread_md_na;
    crpscl_emp_na    = pd.crpscl_emp_na;
    crps_gaus_na     = pd.crps_gaus_na;
    crpscl_gaus_na   = pd.crpscl_gaus_na;
+
    ign_na           = pd.ign_na;
    pit_na           = pd.pit_na;
+
+   ign_conv_oerr_na = pd.ign_conv_oerr_na;
+   ign_corr_oerr_na = pd.ign_corr_oerr_na;
 
    n_ge_obs_na    = pd.n_ge_obs_na;
    me_ge_obs_na   = pd.me_ge_obs_na;
@@ -304,7 +314,7 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
 ////////////////////////////////////////////////////////////////////////
 
 bool PairDataEnsemble::has_obs_error() const {
-   return(obs_error_flag);
+   return obs_error_flag;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -449,6 +459,8 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
          crpscl_gaus_na.add(bad_data_double);
          ign_na.add(bad_data_double);
          pit_na.add(bad_data_double);
+         ign_conv_oerr_na.add(bad_data_double);
+         ign_corr_oerr_na.add(bad_data_double);
          n_ge_obs_na.add(bad_data_double);
          me_ge_obs_na.add(bad_data_double);
          n_lt_obs_na.add(bad_data_double);
@@ -461,22 +473,41 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
          var_unperturbed = compute_variance(esum_na[i], esumsq_na[i], esumn_na[i]);
          var_na.add(var_unperturbed);
 
-         // Process the observation error information.
+         // Process the observation error information
          ObsErrorEntry * e = (has_obs_error() ? obs_error_entry[i] : 0);
          if(e) {
+
+            // Get observation error variance
+            double oerr_var = e->variance();
+
+            // Compute the observation error log scores
+            double v_conv, v_corr;
+            compute_obs_error_log_scores(
+               compute_mean(esum_na[i], esumn_na[i]),
+               compute_stdev(esum_na[i], esumsq_na[i], esumn_na[i]),
+               o_na[i], oerr_var,
+               v_conv, v_corr);
+            ign_conv_oerr_na.add(v_conv);
+            ign_corr_oerr_na.add(v_corr);
 
             // Compute perturbed ensemble mean and variance
             // Exclude the control member from the variance
             mn_oerr_na.add(cur_ens.mean());
             var_oerr_na.add(cur_ens.variance(ctrl_index));
 
-            // Compute the variance plus observation error variance.
-            var_plus_oerr_na.add(var_unperturbed +
-                                 dist_var(e->dist_type,
-                                          e->dist_parm[0], e->dist_parm[1]));
+            // Compute the variance plus observation error variance
+            if(is_bad_data(var_unperturbed) ||
+               is_bad_data(oerr_var)) {
+               var_plus_oerr_na.add(bad_data_double);
+            }
+            else {
+               var_plus_oerr_na.add(var_unperturbed + oerr_var);
+            }
          }
-         // If no observation error specified, store bad data values.
+         // If no observation error specified, store bad data values
          else {
+            ign_conv_oerr_na.add(bad_data_double);
+            ign_corr_oerr_na.add(bad_data_double);
             mn_oerr_na.add(bad_data_double);
             var_oerr_na.add(bad_data_double);
             var_plus_oerr_na.add(bad_data_double);
@@ -506,8 +537,8 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
          derive_climo_vals(cdf_info_ptr, cmn_na[i], csd_na[i], cur_clm);
 
          // Store empirical CRPS stats
-         //
-         // For crps_emp use temporary, local variable so we can use it for the crps_emp_fair calculation
+         // For crps_emp use temporary, local variable so we can use it
+         // for the crps_emp_fair calculation
          double crps_emp = compute_crps_emp(o_na[i], cur_ens);
          crps_emp_na.add(crps_emp);
          crps_emp_fair_na.add(crps_emp - cur_ens.wmean_abs_diff());
@@ -528,9 +559,10 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
          // Compute the Bias Ratio terms 
          int n_ge_obs, n_lt_obs;
          double me_ge_obs, me_lt_obs;
-         compute_bias_ratio_terms(o_na[i], cur_ens,
-                                  n_ge_obs, me_ge_obs,
-                                  n_lt_obs, me_lt_obs);
+         compute_bias_ratio_terms(
+            o_na[i], cur_ens,
+            n_ge_obs, me_ge_obs,
+            n_lt_obs, me_lt_obs);
 
          // Store the Bias Ratio terms 
          n_ge_obs_na.add(n_ge_obs);
@@ -830,7 +862,7 @@ void PairDataEnsemble::compute_ssvar() {
 PairDataEnsemble PairDataEnsemble::subset_pairs_obs_thresh(const SingleThresh &ot) const {
 
    // Check for no work to be done
-   if(ot.get_type() == thresh_na) return(*this);
+   if(ot.get_type() == thresh_na) return *this;
 
    int i, j;
    PairDataEnsemble pd;
@@ -864,8 +896,11 @@ PairDataEnsemble PairDataEnsemble::subset_pairs_obs_thresh(const SingleThresh &o
       //
       // Include in subset:
       //   wgt_na, o_na, cmn_na, csd_na, v_na, r_na,
-      //   crps_emp_na, crps_emp_fair_na, spread_md_na, crpscl_emp_na, crps_gaus_na, crpscl_gaus_na,
-      //   ign_na, pit_na, n_gt_obs_na, me_gt_obs_na, n_lt_obs_na, me_lt_obs_na,
+      //   crps_emp_na, crps_emp_fair_na, spread_md_na,
+      //   crpscl_emp_na, crps_gaus_na, crpscl_gaus_na,
+      //   ign_na, pit_na,
+      //   ign_conv_oerr, ign_corr_oerr,
+      //   n_gt_obs_na, me_gt_obs_na, n_lt_obs_na, me_lt_obs_na,
       //   var_na, var_oerr_na, var_plus_oerr_na,
       //   mn_na, mn_oerr_na, e_na
       //
@@ -888,6 +923,8 @@ PairDataEnsemble PairDataEnsemble::subset_pairs_obs_thresh(const SingleThresh &o
       pd.crpscl_gaus_na.add(crpscl_gaus_na[i]);
       pd.ign_na.add(ign_na[i]);
       pd.pit_na.add(pit_na[i]);
+      pd.ign_conv_oerr_na.add(ign_conv_oerr_na[i]);
+      pd.ign_corr_oerr_na.add(ign_corr_oerr_na[i]);
       pd.n_ge_obs_na.add(n_ge_obs_na[i]);
       pd.me_ge_obs_na.add(me_ge_obs_na[i]);
       pd.n_lt_obs_na.add(n_lt_obs_na[i]);
@@ -912,7 +949,7 @@ PairDataEnsemble PairDataEnsemble::subset_pairs_obs_thresh(const SingleThresh &o
         << " ensemble pairs for observation filtering threshold "
         << ot.get_str() << ".\n";
 
-   return(pd);
+   return pd;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -944,21 +981,21 @@ VxPairDataEnsemble::VxPairDataEnsemble(const VxPairDataEnsemble &vx_pd) {
 
 VxPairDataEnsemble & VxPairDataEnsemble::operator=(const VxPairDataEnsemble &vx_pd) {
 
-   if(this == &vx_pd) return(*this);
+   if(this == &vx_pd) return *this;
 
    assign(vx_pd);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void VxPairDataEnsemble::init_from_scratch() {
 
-   fcst_info    = (EnsVarInfo *) 0;
-   climo_info   = (VarInfo *) 0;
-   obs_info     = (VarInfo *) 0;
-   pd           = (PairDataEnsemble ***) 0;
+   fcst_info    = (EnsVarInfo *) nullptr;
+   climo_info   = (VarInfo *) nullptr;
+   obs_info     = (VarInfo *) nullptr;
+   pd           = (PairDataEnsemble ***) nullptr;
 
    n_msg_typ    = 0;
    n_mask       = 0;
@@ -974,9 +1011,9 @@ void VxPairDataEnsemble::init_from_scratch() {
 void VxPairDataEnsemble::clear() {
    int i, j, k;
 
-   if(fcst_info)  { delete fcst_info;  fcst_info  = (EnsVarInfo *) 0; }
-   if(climo_info) { delete climo_info; climo_info = (VarInfo *) 0; }
-   if(obs_info)   { delete obs_info;   obs_info   = (VarInfo *) 0; }
+   if(fcst_info)  { delete fcst_info;  fcst_info  = (EnsVarInfo *) nullptr; }
+   if(climo_info) { delete climo_info; climo_info = (VarInfo *) nullptr; }
+   if(obs_info)   { delete obs_info;   obs_info   = (VarInfo *) nullptr; }
 
    desc.clear();
 
@@ -992,7 +1029,7 @@ void VxPairDataEnsemble::clear() {
    obs_qty_inc_filt.clear();
    obs_qty_exc_filt.clear();
    
-   obs_error_info = (ObsErrorInfo *) 0;
+   obs_error_info = (ObsErrorInfo *) nullptr;
 
    fcst_ut = (unixtime) 0;
    beg_ut  = (unixtime) 0;
@@ -1061,7 +1098,7 @@ void VxPairDataEnsemble::set_fcst_info(EnsVarInfo *info) {
    VarInfoFactory f;
 
    // Deallocate, if necessary
-   if(fcst_info) { delete fcst_info; fcst_info = (EnsVarInfo *) 0; }
+   if(fcst_info) { delete fcst_info; fcst_info = (EnsVarInfo *) nullptr; }
 
    // Perform a deep copy
    fcst_info = new EnsVarInfo(*info);
@@ -1075,7 +1112,7 @@ void VxPairDataEnsemble::set_climo_info(VarInfo *info) {
    VarInfoFactory f;
 
    // Deallocate, if necessary
-   if(climo_info) { delete climo_info; climo_info = (VarInfo *) 0; }
+   if(climo_info) { delete climo_info; climo_info = (VarInfo *) nullptr; }
 
    // Perform a deep copy
    climo_info = f.new_var_info(info->file_type());
@@ -1090,7 +1127,7 @@ void VxPairDataEnsemble::set_obs_info(VarInfo *info) {
    VarInfoFactory f;
 
    // Deallocate, if necessary
-   if(obs_info) { delete obs_info; obs_info = (VarInfo *) 0; }
+   if(obs_info) { delete obs_info; obs_info = (VarInfo *) nullptr; }
 
    // Perform a deep copy
    obs_info = f.new_var_info(info->file_type());
@@ -1362,7 +1399,7 @@ void VxPairDataEnsemble::set_ens_size(int n) {
          for(int k=0; k<n_interp; k++) {
 
             // Handle HiRA neighborhoods
-            if(pd[i][j][k].interp_mthd == InterpMthd_HiRA) {
+            if(pd[i][j][k].interp_mthd == InterpMthd::HiRA) {
                GridTemplateFactory gtf;
                GridTemplate* gt = gtf.buildGT(pd[i][j][k].interp_shape,
                                               pd[i][j][k].interp_wdth,
@@ -1439,7 +1476,7 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
    double cmn_v, csd_v, obs_v, wgt_v;
    int cmn_lvl_blw, cmn_lvl_abv;
    int csd_lvl_blw, csd_lvl_abv;
-   ObsErrorEntry *oerr_ptr = (ObsErrorEntry *) 0;
+   ObsErrorEntry *oerr_ptr = (ObsErrorEntry *) nullptr;
 
    // Check the observation VarInfo file type
    if(obs_info->file_type() != FileType_Gb1) {
@@ -1498,7 +1535,7 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
         y < 0 || y >= gr.ny()) return;
 
    // For pressure levels, check if the observation pressure level
-   // falls in the requsted range.
+   // falls in the requested range.
    if(obs_info_grib->level().type() == LevelType_Pres) {
 
       if(obs_lvl < obs_info_grib->level().lower() ||
@@ -1567,7 +1604,7 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
    if(obs_error_info->flag) {
 
       // Use config file setting, if specified
-      if(obs_error_info->entry.dist_type != DistType_None) {
+      if(obs_error_info->entry.dist_type != DistType::None) {
          oerr_ptr = &(obs_error_info->entry);
       }
       // Otherwise, do a table lookup
@@ -1593,10 +1630,11 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
       }
    }
 
-   // Apply observation error logic bias correction, if requested
+   // Apply observation error additive and multiplicative
+   // bias correction, if requested
    if(obs_error_info->flag) {
       obs_v = add_obs_error_bc(obs_error_info->rng_ptr,
-                               FieldType_Obs, oerr_ptr, obs_v);
+                               FieldType::Obs, oerr_ptr, obs_v);
    }
 
    // Look through all of the PairData objects to see if the observation
@@ -1654,10 +1692,10 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
 
             // Check for valid interpolation options
             if(climo_sd_dpa.n_planes() > 0 &&
-               (pd[0][0][k].interp_mthd == InterpMthd_Min    ||
-                pd[0][0][k].interp_mthd == InterpMthd_Max    ||
-                pd[0][0][k].interp_mthd == InterpMthd_Median ||
-                pd[0][0][k].interp_mthd == InterpMthd_Best)) {
+               (pd[0][0][k].interp_mthd == InterpMthd::Min    ||
+                pd[0][0][k].interp_mthd == InterpMthd::Max    ||
+                pd[0][0][k].interp_mthd == InterpMthd::Median ||
+                pd[0][0][k].interp_mthd == InterpMthd::Best)) {
                mlog << Warning << "\nVxPairDataEnsemble::add_point_obs() -> "
                     << "applying the "
                     << interpmthd_to_string(pd[0][0][k].interp_mthd)
@@ -1714,7 +1752,7 @@ void VxPairDataEnsemble::add_ens(int member, bool mn, Grid &gr) {
          for(k=0; k<n_interp; k++) {
 
             // Only apply HiRA to single levels
-            if(pd[0][0][k].interp_mthd == InterpMthd_HiRA &&
+            if(pd[0][0][k].interp_mthd == InterpMthd::HiRA &&
                fcst_dpa.n_planes() != 1 ) {
 
                mlog << Warning << "\nVxPairDataEnsemble::add_ens() -> "
@@ -1747,7 +1785,7 @@ void VxPairDataEnsemble::add_ens(int member, bool mn, Grid &gr) {
                }
 
                // Extract the HiRA neighborhood of values
-               if(pd[0][0][k].interp_mthd == InterpMthd_HiRA) {
+               if(pd[0][0][k].interp_mthd == InterpMthd::HiRA) {
 
                   // For HiRA, set the ensemble mean to bad data
                   if(mn) {
@@ -1806,7 +1844,7 @@ void VxPairDataEnsemble::add_ens(int member, bool mn, Grid &gr) {
                      // Apply observation error perturbation, if requested
                      if(obs_error_info->flag) {
                         fcst_v = add_obs_error_inc(
-                                    obs_error_info->rng_ptr, FieldType_Fcst,
+                                    obs_error_info->rng_ptr, FieldType::Fcst,
                                     pd[i][j][k].obs_error_entry[l],
                                     pd[i][j][k].o_na[l], fcst_na[m]);
                      }
@@ -1843,7 +1881,7 @@ int VxPairDataEnsemble::get_n_pair() const {
       }
    }
 
-   return(n);
+   return n;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1853,7 +1891,7 @@ void VxPairDataEnsemble::set_duplicate_flag(DuplicateType duplicate_flag) {
    for(int i=0; i < n_msg_typ; i++){
       for(int j=0; j < n_mask; j++){
          for(int k=0; k < n_interp; k++){
-            pd[i][j][k].set_check_unique(duplicate_flag == DuplicateType_Unique);
+            pd[i][j][k].set_check_unique(duplicate_flag == DuplicateType::Unique);
          }
       }
    }
@@ -1970,7 +2008,7 @@ double compute_crps_emp(double obs, const NumArray &ens_na) {
    evals.sort_array();
 
    // Check for bad or no data
-   if(is_bad_data(obs) || evals.n() == 0) return(bad_data_double);
+   if(is_bad_data(obs) || evals.n() == 0) return bad_data_double;
 
    // Initialize
    double obs_cdf  = 0.0;
@@ -1997,7 +2035,7 @@ double compute_crps_emp(double obs, const NumArray &ens_na) {
    // Handle obs being >= all ensemble members
    if(is_eq(obs_cdf, 0.0)) integral += (obs - fcst);
 
-   return(integral);
+   return integral;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2017,7 +2055,7 @@ double compute_crps_gaus(double obs, double m, double s) {
       v = s*(z*(2.0*znorm(z) - 1) + 2.0*dnorm(z) - 1.0/sqrt(pi));
    }
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2036,7 +2074,7 @@ double compute_ens_ign(double obs, double m, double s) {
       v = 0.5*log(2.0*pi*s*s) + (obs - m)*(obs - m)/(2.0*s*s);
    }
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2055,7 +2093,7 @@ double compute_ens_pit(double obs, double m, double s) {
       v = normal_cdf(obs, m, s);
    }
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2109,7 +2147,54 @@ double compute_bias_ratio(double me_ge_obs, double me_lt_obs) {
       v = me_ge_obs / abs(me_lt_obs);
    }
 
-   return(v);
+   return v;
 }
-            
+
+////////////////////////////////////////////////////////////////////////
+
+void compute_obs_error_log_scores(double emn, double esd,
+                                  double obs, double oerr_var,
+                                  double &v_conv, double &v_corr) {
+
+   const char *method_name = "compute_obs_error_log_scores() -> ";
+
+   // Check for bad input data
+   if(is_bad_data(emn) ||
+      is_bad_data(esd) ||
+      is_bad_data(obs) ||
+      is_bad_data(oerr_var)) {
+      v_conv = v_corr = bad_data_double;
+   }
+   else {
+      double sigma2 = esd * esd;
+      double ov2    = oerr_var * oerr_var;
+
+      // Error-convolved logarithmic scoring rule in
+      // Ferro (2017, Eq 5) doi:10.1002/qj.3115
+      // Scale by 2.0 * pi for consistency with ignorance score
+      v_conv = 0.5 * log(2.0 * pi * (sigma2 + ov2)) +
+               ((obs - emn) * (obs - emn)) /
+               (2.0 * (sigma2 + ov2));
+
+      // Error-corrected logarithmic scoring rule in
+      // Ferro (2017, Eq 7) doi:10.1002/qj.3115
+      // Scale by 2.0 * pi for consistency with ignorance score
+      v_corr = 0.5 * log(2.0 * pi * sigma2) +
+               ((obs - emn) * (obs - emn) - ov2) /
+               (2.0 * sigma2);
+   }
+
+   if(mlog.verbosity_level() >= 10) {
+      mlog << Debug(10) << method_name
+           << "inputs (emn = " << emn
+           << ", esd = " << esd
+           << ", obs = " << obs
+           << ", oerr_var = " << oerr_var
+           << ") and outputs (ign_oerr_conv = " << v_conv
+           << ", ign_oerr_corr = " << v_corr << ")\n";
+   }
+
+   return;
+}
+
 ////////////////////////////////////////////////////////////////////////

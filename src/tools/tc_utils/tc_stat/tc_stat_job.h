@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -34,7 +34,7 @@ static const bool         default_match_points = false;
 static const bool         default_event_equal  = false;
 
 // Default rapid intensification is an increase of 30 kts over 24 hours
-static const TrackType    default_rirw_track  = TrackType_None;
+static const TrackType    default_rirw_track  = TrackType::None;
 static const int          default_rirw_time   = 86400;
 static const bool         default_rirw_exact  = true;
 static const SingleThresh default_rirw_thresh(">=30.0");
@@ -109,17 +109,17 @@ struct cs_cmp {
 //
 // Enumerate all the possible TC-STAT Analysis Job Types
 //
-enum TCStatJobType {
+enum class TCStatJobType {
 
-   TCStatJobType_Filter,   // Filter out the TC-STAT data and write
-                           // the lines to the filename specified.
-   TCStatJobType_Summary,  // Compute summary info for one or more
-                           // columns of data.
-   TCStatJobType_RIRW,     // Derive contingency table and statistics
-                           // for RI/RW events.
-   TCStatJobType_ProbRIRW, // Derive probabilistic contingency table and
-                           // statistics for PROBRIRW lines.
-   NoTCStatJobType         // Default value
+   Filter,   // Filter out the TC-STAT data and write
+             // the lines to the filename specified.
+   Summary,  // Compute summary info for one or more
+             // columns of data.
+   RIRW,     // Derive contingency table and statistics
+             // for RI/RW events.
+   ProbRIRW, // Derive probabilistic contingency table and
+             // statistics for PROBRIRW lines.
+   None      // Default value
 };
 
 extern TCStatJobType string_to_tcstatjobtype(const ConcatString);

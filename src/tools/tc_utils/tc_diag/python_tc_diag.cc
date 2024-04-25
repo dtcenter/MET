@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -173,7 +173,7 @@ bool straight_python_tc_diag(const ConcatString &diag_script,
    }
 
    // Parse the diagnostics from python
-   return(parse_python_diag_data(module_obj, tmp_info));
+   return parse_python_diag_data(module_obj, tmp_info);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -233,7 +233,7 @@ bool user_python_tc_diag(const ConcatString &diag_script,
       PyErr_Print();
       mlog << Warning << "\n" << method_name
            << "an error occurred initializing python\n\n";
-      return(false);
+      return false;
    }
 
    run_python_string("import sys");
@@ -270,13 +270,13 @@ bool user_python_tc_diag(const ConcatString &diag_script,
       mlog << Warning << "\n" << method_name
            << "an error occurred importing module "
            << "\"" << path << "\"\n\n";
-      return(false);
+      return false;
    }
 
    if(!module_obj) {
       mlog << Warning << "\n" << method_name
            << "error running python script\n\n";
-      return(false);
+      return false;
    }
 
    // Parse the diagnostics from python
@@ -285,7 +285,7 @@ bool user_python_tc_diag(const ConcatString &diag_script,
    // Cleanup
    remove_temp_file(tmp_file_name);
 
-   return(status);
+   return status;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -301,7 +301,7 @@ bool parse_python_diag_data(PyObject *module_obj,
    if(!module_dict_obj || !PyDict_Check(module_dict_obj)) {
       mlog << Warning << "\n" << method_name
            << "python module is not a dictionary.\n\n";
-      return(false);
+      return false;
    }
 
    // Get the diag_data item
@@ -312,7 +312,7 @@ bool parse_python_diag_data(PyObject *module_obj,
       mlog << Warning << "\n" << method_name
            << "trouble parsing the \"" << diag_data_dict_name
            << "\" python dictionary.\n\n";
-      return(false);
+      return false;
    }
 
    // Storm data
@@ -365,7 +365,7 @@ bool parse_python_diag_data(PyObject *module_obj,
       }
    }
 
-   return(status);
+   return status;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -390,7 +390,7 @@ bool parse_python_string_value_map(PyObject *dict,
       mlog << Warning << "\n" << method_name
            << "trouble parsing the \"" << name
            << "\" python dictionary.\n\n";
-      return(false);
+      return false;
    }
 
    // Initialize
@@ -436,7 +436,7 @@ bool parse_python_string_value_map(PyObject *dict,
       }
    } // end while
 
-   return(true);
+   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -458,7 +458,7 @@ bool parse_python_string_string_map(PyObject *dict,
       mlog << Warning << "\n" << method_name
            << "trouble parsing the \"" << name
            << "\" python dictionary.\n\n";
-      return(false);
+      return false;
    }
 
    // Initialize
@@ -492,7 +492,7 @@ bool parse_python_string_string_map(PyObject *dict,
       }
    } // end while
 
-   return(true);
+   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -509,13 +509,13 @@ bool parse_python_string(PyObject *dict,
       mlog << Warning << "\n" << method_name
            << "trouble parsing the \"" << name
            << "\" python string.\n\n";
-      return(false);
+      return false;
    }
 
    // Store the string
    s = PyUnicode_AsUTF8(data_obj);
 
-   return(true);
+   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////

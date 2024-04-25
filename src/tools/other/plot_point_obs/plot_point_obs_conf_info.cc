@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -8,7 +8,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
 
 #include "vx_log.h"
 #include "vx_util.h"
@@ -19,6 +18,9 @@ using namespace std;
 #include "vx_statistics.h"
 
 #include "plot_point_obs_conf_info.h"
+
+using namespace std;
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -231,48 +233,48 @@ bool PlotPointObsOpt::add(const Observation &obs) {
 
    // message type
    if(msg_typ.n() > 0 && !msg_typ.has(obs.getHeaderType())) {
-      return(false);
+      return false;
    }
 
    // station id
    if((sid_inc.n() > 0 && !sid_inc.has(obs.getStationId())) ||
       (sid_exc.n() > 0 &&  sid_exc.has(obs.getStationId()))) {
-      return(false);
+      return false;
    }
 
    // observation variable
    if(obs_var.n() > 0 && !obs_var.has(obs.getVarName())) {
-      return(false);
+      return false;
    }
 
    // observation GRIB code
    if(obs_gc.n() > 0 && !obs_gc.has(obs.getGribCode())) {
-      return(false);
+      return false;
    }
 
    // quality control string
    if(obs_qty.n() > 0 && !obs_qty.has(obs.getQualityFlag())) {
-      return(false);
+      return false;
    }
     
    // valid time
    unixtime ut = obs.getValidTime();
    if((valid_beg > 0 && ut < valid_beg) ||
       (valid_end > 0 && ut > valid_end)) {
-      return(false);
+      return false;
    }
 
    // lat, lon
    if(!lat_thresh.check(obs.getLatitude()) ||
       !lon_thresh.check(obs.getLongitude())) {
-      return(false);
+      return false;
    }
 
    // elevation, height, pressure
    if(!elv_thresh.check(obs.getElevation()) ||
       !hgt_thresh.check(obs.getHeight()) ||
       !prs_thresh.check(obs.getPressureLevel())) {
-      return(false);
+      return false;
    }
 
    // store the current observation value
@@ -293,7 +295,7 @@ bool PlotPointObsOpt::add(const Observation &obs) {
 
    // observation value
    if(!obs_thresh.check(cur_val)) {
-      return(false);
+      return false;
    }
 
    // Store this matching point location
@@ -308,7 +310,7 @@ bool PlotPointObsOpt::add(const Observation &obs) {
    n_obs++;
    if(!has(cur_loc)) locations.push_back(cur_loc);
 
-   return(true);
+   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -324,7 +326,7 @@ bool PlotPointObsOpt::has(const LocationInfo &loc) {
       }
    }
 
-   return(match);
+   return match;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -350,7 +352,7 @@ PlotPointObsConfInfo::~PlotPointObsConfInfo() {
 void PlotPointObsConfInfo::init_from_scratch() {
 
    // Initialize pointers
-   grid_data_info = (VarInfo *) 0;
+   grid_data_info = (VarInfo *) nullptr;
 
    clear();
 
@@ -405,12 +407,12 @@ void PlotPointObsConfInfo::read_config(const char *user_file_name) {
 
 void PlotPointObsConfInfo::process_config(
                               const char *plot_grid_string) {
-   Dictionary  *dict = (Dictionary *) 0;
-   Dictionary *fdict = (Dictionary *) 0;
+   Dictionary  *dict = (Dictionary *) nullptr;
+   Dictionary *fdict = (Dictionary *) nullptr;
    Dictionary i_fdict;
    StringArray sa;
    Met2dDataFileFactory m_factory;
-   Met2dDataFile *met_ptr = (Met2dDataFile *) 0;
+   Met2dDataFile *met_ptr = (Met2dDataFile *) nullptr;
    PlotPointObsOpt opt;
    int i, n_vx;
 
@@ -608,7 +610,7 @@ bool PlotPointObsConfInfo::add(const Observation &obs) {
       if((match = it->add(obs))) break;
    }
 
-   return(match);
+   return match;
 }
     
 ////////////////////////////////////////////////////////////////////////

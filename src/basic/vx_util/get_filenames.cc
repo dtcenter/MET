@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -7,11 +7,8 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
-
 ////////////////////////////////////////////////////////////////////////
 
-
-using namespace std;
 
 #include <iostream>
 #include <unistd.h>
@@ -29,6 +26,8 @@ using namespace std;
 #include "vx_log.h"
 
 #include "get_filenames.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -84,7 +83,7 @@ for (j=0; j<N; ++j)  {
 
 }
 
-return ( a );
+return a;
 
 }
 
@@ -105,7 +104,7 @@ struct stat sbuf;
    mlog << Warning << "\nget_filenames() -> "
         << "can't stat \"" << search_dir << "\"\n\n";
 
-   return ( a );
+   return a;
 
 }
 
@@ -152,7 +151,7 @@ if ( S_ISDIR(sbuf.st_mode) )  {
    }
 }
 
-return ( a );
+return a;
 
 }
 
@@ -166,8 +165,8 @@ StringArray get_filenames_from_dir(const char * directory_path,
 
 {
 
-DIR * directory = (DIR *) 0;
-struct dirent * entry = (struct dirent *) 0;
+DIR * directory = (DIR *) nullptr;
+struct dirent * entry = (struct dirent *) nullptr;
 StringArray a, b;
 char entry_path[PATH_MAX];
 ConcatString regex;
@@ -230,9 +229,9 @@ while ( (entry = readdir(directory)) != nullptr )  {
    //  done
    //
 
-closedir(directory);  directory = (DIR *) 0;
+closedir(directory);  directory = (DIR *) nullptr;
 
-return ( a );
+return a;
 
 }
 
@@ -272,7 +271,7 @@ if ( keep && suffix ) {
 
 }
 
-return(keep);
+return keep;
 
 }
 

@@ -1,10 +1,8 @@
-
-
 ////////////////////////////////////////////////////////////////////////
 
 
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -14,8 +12,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-
-using namespace std;
 
 #include <iostream>
 #include <unistd.h>
@@ -30,6 +26,8 @@ using namespace std;
 #include "shp_file.h"
 #include "shp_point_record.h"
 #include "shapetype_to_string.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -118,7 +116,7 @@ unsigned char xy_buf[shp_point_record_bytes];
 
 if ( ! file.read(rh_buf, shp_record_header_bytes) )  {
 
-   if ( file.at_eof() )  return ( false );
+   if ( file.at_eof() )  return false;
 
    mlog << Error
         << "\n\n  operator>>(ShpFile &, ShpPointRecord &) -> trouble reading record header from shp file \""
@@ -160,7 +158,7 @@ record.set(xy_buf);
    //  done
    //
 
-return ( true );
+return true;
 
 }
 

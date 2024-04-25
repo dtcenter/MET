@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -9,8 +9,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-
-using namespace std;
 
 #include <iostream>
 #include <unistd.h>
@@ -25,6 +23,8 @@ using namespace std;
 #include "vx_data2d.h"
 #include "vx_util.h"
 #include "vx_log.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -66,11 +66,11 @@ GrdFileType data_type   = FileType_None;
    //
 
 if ( strcasecmp(filename, conf_val_python_numpy) == 0 )  {
-   return ( FileType_Python_Numpy );
+   return FileType_Python_Numpy;
 }
 
 else if ( strcasecmp(filename, conf_val_python_xarray) == 0 )  {
-   return ( FileType_Python_Xarray );
+   return FileType_Python_Xarray;
 }
 
    //
@@ -98,6 +98,7 @@ suffix_type = file_type_by_suffix(filename);
      if ( is_grib1_file     (filename) ) data_type = FileType_Gb1;
 else if ( is_grib2_file     (filename) ) data_type = FileType_Gb2;
 else if ( is_ncpinterp_file (filename) ) data_type = FileType_NcPinterp;
+else if ( is_ncwrf_file     (filename) ) data_type = FileType_NcWrf;
 else if ( is_nccf_file      (filename) ) data_type = FileType_NcCF;
 else if ( is_ncmet_file     (filename) ) data_type = FileType_NcMet;
 else if ( is_bufr_file      (filename) ) data_type = FileType_Bufr;
@@ -136,7 +137,7 @@ int j;
 const ConcatString suffix = filename_suffix(filename);
 
 
-if ( suffix.empty() ) return ( FileType_None );
+if ( suffix.empty() ) return FileType_None;
 
    //
    //  grib ?
@@ -144,7 +145,7 @@ if ( suffix.empty() ) return ( FileType_None );
 
 for (j=0; j<n_gb_file_ext; ++j)  {
 
-   if ( suffix == gb_file_ext[j] )  return ( FileType_Gb1 );
+   if ( suffix == gb_file_ext[j] )  return FileType_Gb1;
 
 }
 
@@ -154,7 +155,7 @@ for (j=0; j<n_gb_file_ext; ++j)  {
 
 for (j=0; j<n_gb2_file_ext; ++j)  {
 
-   if ( suffix == gb2_file_ext[j] )  return ( FileType_Gb2 );
+   if ( suffix == gb2_file_ext[j] )  return FileType_Gb2;
 
 }
 
@@ -164,7 +165,7 @@ for (j=0; j<n_gb2_file_ext; ++j)  {
 
 for (j=0; j<n_bf_file_ext; ++j)  {
 
-   if ( suffix == bf_file_ext[j] )  return ( FileType_Bufr );
+   if ( suffix == bf_file_ext[j] )  return FileType_Bufr;
 
 }
 
@@ -172,7 +173,7 @@ for (j=0; j<n_bf_file_ext; ++j)  {
    //  nope
    //
 
-return ( FileType_None );
+return FileType_None;
 
 }
 

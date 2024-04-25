@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -11,8 +11,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -20,6 +18,8 @@ using namespace std;
 #include <cmath>
 
 #include "analysis_utils.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -56,9 +56,9 @@ while((c = strtok_r(L, delim, &temp_ptr)) != nullptr) {
    //  done
    //
 
-if ( L )  { delete [] L;  L = (char *) 0; }
+if ( L )  { delete [] L;  L = (char *) nullptr; }
 
-return ( a );
+return a;
 
 }
 
@@ -76,12 +76,12 @@ n = m_strlen(line);
 
 for (j=0; j<n; ++j)  {
 
-   if ( !(isdigit(line[j])) )  return ( 0 );
+   if ( !(isdigit(line[j])) )  return 0;
 
 }
 
 
-return ( 1 );
+return 1;
 
 }
 

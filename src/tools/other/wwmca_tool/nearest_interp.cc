@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -10,8 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -20,6 +18,8 @@ using namespace std;
 #include "vx_log.h"
 
 #include "nearest_interp.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -75,11 +75,11 @@ Nearest_Interp & Nearest_Interp::operator=(const Nearest_Interp & n)
 
 {
 
-if ( this == &n )  return ( * this );
+if ( this == &n )  return *this;
 
 assign(n);
 
-return ( * this );
+return *this;
 
 }
 
@@ -135,11 +135,11 @@ Interpolator * Nearest_Interp::copy() const
 
 {
 
-Interpolator * i = (Interpolator *) 0;
+Interpolator * i = (Interpolator *) nullptr;
 
 i = new Nearest_Interp (*this);
 
-return ( i );
+return i;
 
 }
 
@@ -196,7 +196,7 @@ I = Data[n];
    //
 
 
-return ( I );
+return I;
 
 }
 

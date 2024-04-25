@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -24,11 +24,11 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-extern int   parse_number     (istream &);
+extern int   parse_number     (std::istream &);
 
-extern void  skip_whitespace  (istream &);
+extern void  skip_whitespace  (std::istream &);
 
-extern void  get_comment      (istream &, char *);
+extern void  get_comment      (std::istream &, char *);
 
 
 ////////////////////////////////////////////////////////////////////////

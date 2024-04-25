@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -9,8 +9,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-
-using namespace std;
 
 #include <iostream>
 #include <unistd.h>
@@ -24,7 +22,9 @@ using namespace std;
 #include "is_bad_data.h"
 
 #include "met_point_data.h"
-//#include "nc_point_obs.h"
+
+using namespace std;
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -38,7 +38,7 @@ using namespace std;
 
 MetPointData::MetPointData() {
    // Derived class should set obs_data
-   obs_data = (MetPointObsData *)0;
+   obs_data = (MetPointObsData *) nullptr;
    init_from_scratch();
 }
 
@@ -267,31 +267,31 @@ void MetPointObsData::clear() {
 void MetPointObsData::clear_numbers() {
    if (0 != obs_ids) {
       delete [] obs_ids;
-      obs_ids = (int *)0;
+      obs_ids = (int *) nullptr;
    }
    if (0 != obs_hids) {
       delete [] obs_hids;
-      obs_hids = (int *)0;
+      obs_hids = (int *) nullptr;
    }
    if (0 != obs_qids) {
       delete [] obs_qids;
-      obs_qids = (int *)0;
+      obs_qids = (int *) nullptr;
    }
    if (0 != obs_lvls) {
       delete [] obs_lvls;
-      obs_lvls = (float *)0;
+      obs_lvls = (float *) nullptr;
    }
    if (0 != obs_hgts) {
       delete [] obs_hgts;
-      obs_hgts = (float *)0;
+      obs_hgts = (float *) nullptr;
    }
    if (0 != obs_vals) {
       delete [] obs_vals;
-      obs_vals = (float *)0;
+      obs_vals = (float *) nullptr;
    }
    if (0 != obs_arr) {
       delete [] obs_arr;
-      obs_arr = (float *)0;
+      obs_arr = (float *) nullptr;
    }
 }
 

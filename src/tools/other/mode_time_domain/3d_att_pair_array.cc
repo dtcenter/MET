@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2023
+// ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -11,9 +11,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -23,6 +20,8 @@ using namespace std;
 #include "vx_util.h"
 
 #include "3d_att_pair_array.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -78,11 +77,11 @@ PairAtt3DArray & PairAtt3DArray::operator=(const PairAtt3DArray & a)
 
 {
 
-if ( this == &a )  return ( * this );
+if ( this == &a )  return *this;
 
 assign(a);
 
-return ( * this );
+return *this;
 
 }
 
@@ -94,7 +93,7 @@ void PairAtt3DArray::init_from_scratch()
 
 {
 
-e = (PairAtt3D *) 0;
+e = (PairAtt3D *) nullptr;
 
 AllocInc = 100;   //  default value
 
@@ -112,7 +111,7 @@ void PairAtt3DArray::clear()
 
 {
 
-if ( e )  { delete [] e;  e = (PairAtt3D *) 0; }
+if ( e )  { delete [] e;  e = (PairAtt3D *) nullptr; }
 
 
 
@@ -174,11 +173,11 @@ for(j=0; j<Nelements; ++j)  {
 
 }
 
-if ( e )  { delete [] e;  e = (PairAtt3D *) 0; }
+if ( e )  { delete [] e;  e = (PairAtt3D *) nullptr; }
 
 e = u;
 
-u = (PairAtt3D *) 0;
+u = (PairAtt3D *) nullptr;
 
 Nalloc = N;
 
@@ -292,7 +291,7 @@ if ( (N < 0) || (N >= Nelements) )  {
    exit ( 1 );
 }
 
-return ( e[N] );
+return e[N];
 
 }
 
@@ -312,7 +311,7 @@ if ( (k < 0) || (k >= Nelements) )  {
 
 }
 
-return ( e[k].fcst_obj_number() );
+return e[k].fcst_obj_number();
 
 }
 
@@ -332,7 +331,7 @@ if ( (k < 0) || (k >= Nelements) )  {
 
 }
 
-return ( e[k].obs_obj_number() );
+return e[k].obs_obj_number();
 
 }
 
@@ -352,7 +351,7 @@ if ( (k < 0) || (k >= Nelements) )  {
 
 }
 
-return ( e[k].fcst_cluster_number() );
+return e[k].fcst_cluster_number();
 
 }
 
@@ -372,7 +371,7 @@ if ( (k < 0) || (k >= Nelements) )  {
 
 }
 
-return ( e[k].obs_cluster_number() );
+return e[k].obs_cluster_number();
 
 }
 
@@ -392,7 +391,7 @@ if ( (k < 0) || (k >= Nelements) )  {
 
 }
 
-return ( e[k].total_interest() );
+return e[k].total_interest();
 
 }
 
