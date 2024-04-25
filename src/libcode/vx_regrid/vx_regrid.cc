@@ -133,7 +133,6 @@ to_data.set_accum (from_data.accum());
    //
    //  copy data
    //
-
 for (xt=0; xt<(to_grid.nx()); ++xt)  {
 
    for (yt=0; yt<(to_grid.ny()); ++yt)  {

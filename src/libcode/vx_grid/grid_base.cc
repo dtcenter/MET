@@ -321,8 +321,8 @@ void UnstructuredData::clear() {
 
 void UnstructuredData::clear_data() {
 
-   Nface = Nnode = Nedge = 0;
-   pointLonLat.clear();
+   n_face = n_node = n_edge = 0;
+   point_lonlat.clear();
    lat_checksum = lon_checksum = 0.;
 
    if (kdtree) { delete kdtree; kdtree = nullptr; }
@@ -337,7 +337,7 @@ void UnstructuredData::dump() const {
 
    mlog << Debug(grid_debug_level)
         << "\nUnstructured Grid Data:\n"
-        << "           Nface: " << Nface << "\n"
+        << "           n_face: " << n_face << "\n"
         << "    lat_checksum: " << lat_checksum << "\n"
         << "    lon_checksum: " << lon_checksum << "\n"
         << " max_distance_km: " << max_distance_km << "\n"
@@ -761,10 +761,10 @@ clear();
 
 UnstructuredData *D = new UnstructuredData;
 
-D->Nedge = data.Nedge;
-D->Nnode = data.Nnode;
+D->n_edge = data.n_edge;
+D->n_node = data.n_node;
 D->max_distance_km = data.max_distance_km;
-D->set_points(data.Nface, data.pointLonLat);
+D->set_points(data.n_face, data.point_lonlat);
 us = D;
 D = (UnstructuredData *)nullptr;
 
@@ -1690,11 +1690,11 @@ bool is_eq(const UnstructuredData * us1, const UnstructuredData * us2)
   bool status = false;
   if (us1 && us2) {
     if (us1 == us2) status = true;
-    else status = us1->Nface == us2->Nface
-                  && us1->Nnode == us2->Nnode
-                  && us1->Nedge == us2->Nedge
-                  && us1->pointLonLat[0] == us2->pointLonLat[0]
-                  && (us1->Nface > 0 && us1->pointLonLat[us1->Nface-1] == us2->pointLonLat[us2->Nface-1])
+    else status = us1->n_face == us2->n_face
+                  && us1->n_node == us2->n_node
+                  && us1->n_edge == us2->n_edge
+                  && us1->point_lonlat[0] == us2->point_lonlat[0]
+                  && (us1->n_face > 0 && us1->point_lonlat[us1->n_face-1] == us2->point_lonlat[us2->n_face-1])
                   && is_eq(us1->lat_checksum, us2->lat_checksum)
                   && is_eq(us1->lon_checksum, us2->lon_checksum);
   }
