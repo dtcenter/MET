@@ -103,6 +103,7 @@
 //   051    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
 //   052    09/29/22  Halley Gotway  MET #2286 Refine GRIB1 table lookup logic.
 //   053    10/03/22  Prestopnik     MET #2227 Remove using namespace netCDF from header files
+//   054    04/29/24  Halley Gotway  MET #2795 Move level mismatch warning
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -622,8 +623,8 @@ void process_fcst_climo_files() {
          continue;
       }
 
-      // For multiple individual forecast levels, print a warning
-      // if the observations levels are not fully covered.
+      // MET#2795, for multiple individual forecast levels, print a
+      // warning if the observations levels are not fully covered.
       if(n_fcst > 1 &&
          !is_eq(fcst_info->level().lower(), fcst_info->level().upper()) &&
          (obs_info->level().lower() < fcst_info->level().lower() ||
