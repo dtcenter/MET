@@ -49,6 +49,9 @@ void PointStatConfInfo::init_from_scratch() {
    // Initialize pointers
    vx_opt = (PointStatVxOpt *) nullptr;
 
+#ifdef WITH_UGRID
+   ignore_ugrid_dataset = false;
+#endif
    clear();
 
    return;
@@ -73,7 +76,7 @@ void PointStatConfInfo::clear() {
    version.clear();
 #ifdef WITH_UGRID
    ugrid_nc.clear();
-   ugrid_dataset.clear();
+   if (!ignore_ugrid_dataset) ugrid_dataset.clear();
    ugrid_map_config.clear();
    ugrid_max_distance_km = bad_data_double;
 #endif
@@ -105,18 +108,25 @@ void PointStatConfInfo::read_config(const char *default_file_name,
 
 ////////////////////////////////////////////////////////////////////////
 
-void PointStatConfInfo::read_configs(StringArray user_file_names) {
+#ifdef WITH_UGRID
+void PointStatConfInfo::read_ugrid_configs(StringArray ugrid_config_names, const char * user_config) {
 
-   const char *file_name;
-   for (int i=0; i<user_file_names.n_elements(); i++) {
-      file_name = replace_path(user_file_names[i].c_str()).c_str();
-      if (file_exists(file_name)) conf.read(file_name);
-      else mlog << Warning << "\nPointStatConfInfo::read_configs(StringArray) -> "
-                << "The configuration file \"" << user_file_names[i]<< "\" does not exist.\n\n";
+   ConcatString file_name;
+   for (int i=0; i<ugrid_config_names.n_elements(); i++) {
+      file_name = replace_path(ugrid_config_names[i].c_str());
+      if (file_exists(file_name.c_str())) {
+         conf.read(file_name.c_str());
+         ugrid_dataset = file_name;
+         ignore_ugrid_dataset = true;
+      }
+      else mlog << Warning << "\nPointStatConfInfo::read_ugrid_configs(StringArray) -> "
+                << "The configuration file \"" << ugrid_config_names[i]<< "\" does not exist.\n\n";
    }
+   if (file_exists(user_config)) conf.read(user_config);   /* to avoid overriding by ugrid_config_names */
 
    return;
 }
+#endif
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -143,7 +153,7 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
 
 #ifdef WITH_UGRID
    // Conf: ugrid_dataset
-   ugrid_dataset = parse_conf_ugrid_dataset(&conf);
+   if (!ignore_ugrid_dataset) ugrid_dataset = parse_conf_ugrid_dataset(&conf);
 
    // Conf: ugrid_nc
    ugrid_nc = parse_conf_ugrid_coordinates_file(&conf);

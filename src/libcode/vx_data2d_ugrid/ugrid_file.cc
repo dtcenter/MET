@@ -940,6 +940,9 @@ void UGridFile::read_netcdf_grid()
     }
   }
 
+  // Convert longitude from degrees east to west
+  for (int idx=0; idx<face_count; idx++) _lon[idx] = -1.0*rescale_deg(_lon[idx], -180, 180);
+
   grid_data.set_points(face_count, _lon, _lat);
   grid_data.max_distance_km = max_distance_km;
 
@@ -958,33 +961,39 @@ void UGridFile::read_netcdf_grid()
 
 void UGridFile::set_dataset(ConcatString _dataset_name) {
 
-  const char *ugrid_config_name = nullptr;
+  ConcatString ugrid_config_name;
+  const string method_name = "UGridFile::set_dataset() ";
 
   if (0 == _dataset_name.length()) {
-    mlog << Error << "\nUGridFile::set_dataset()"
-         << " The \"" << conf_key_ugrid_dataset
+    mlog << Error << "\n" << method_name
+         << "The \"" << conf_key_ugrid_dataset
          << "\" is not defined at the configuration file.\n\n";
     exit(1);
   }
   dataset_name = _dataset_name;
-  ConcatString dataset_config(def_config_prefix);
-  dataset_config.add(dataset_name);
-  if (!file_exists(dataset_config.c_str())) {
-    dataset_config = def_config_prefix2;
-    dataset_config.add(dataset_name);
-    dataset_config = replace_path(dataset_config.c_str());
-  }
-  ugrid_config_name = dataset_config.c_str();
-  if (file_exists(ugrid_config_name)) {
-    read_config(ugrid_config_name);
+  if (file_exists(dataset_name.c_str())) {
+    /* UGridConfig file was passed as the ugrid_dataset */
+    ugrid_config_name = dataset_name;
   }
   else {
-    mlog << Error << "\nUGridFile::set_dataset()"
-         << " The UGrid dataset \"" << dataset_name << "\" is not supported. Please add \""
+    ConcatString dataset_config(def_config_prefix);
+    dataset_config.add(dataset_name);
+    if (!file_exists(dataset_config.c_str())) {
+      dataset_config = def_config_prefix2;
+      dataset_config.add(dataset_name);
+      dataset_config = replace_path(dataset_config.c_str());
+    }
+    ugrid_config_name = dataset_config;
+  }
+  if (file_exists(ugrid_config_name.c_str())) {
+    read_config(ugrid_config_name.c_str());
+  }
+  else {
+    mlog << Error << "\n" << method_name
+         << "The UGrid dataset \"" << dataset_name << "\" is not supported. Please add \""
          << ugrid_config_name << "\".\n\n";
     exit(1);
   }
-
 }
 
 ////////////////////////////////////////////////////////////////////////

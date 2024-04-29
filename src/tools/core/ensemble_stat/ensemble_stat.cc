@@ -69,7 +69,9 @@
 //   037    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main.
 //   038    09/06/22  Halley Gotway  MET #1908 Remove ensemble processing logic.
 //   039    09/29/22  Halley Gotway  MET #2286 Refine GRIB1 table lookup logic.
-//   040    10/03/22  Prestopnik     MET #2227 Remove using namespace netCDF from header files                                                                                  
+//   040    10/03/22  Prestopnik     MET #2227 Remove using namespace netCDF from
+//                                   header files
+//   041    04/16/24  Halley Gotway  MET #2786 Compute RPS from climo bin probs.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -663,6 +665,9 @@ bool get_data_plane(const char *infile, GrdFileType ftype,
          dp = met_regrid(dp, mtddf->grid(), grid, info->regrid());
       }
 
+      // Rescale probabilities from [0, 100] to [0, 1]
+      if(info->is_prob()) rescale_probability(dp);
+
       // Store the valid time, if not already set
       if(ens_valid_ut == (unixtime) 0) {
          ens_valid_ut = dp.valid();
@@ -722,6 +727,13 @@ bool get_data_plane_array(const char *infile, GrdFileType ftype,
                                 info->regrid());
          }
       }
+
+      // Rescale probabilities from [0, 100] to [0, 1]
+      if(info->is_prob()) {
+         for(i=0; i<dpa.n_planes(); i++) {
+            rescale_probability(dpa[i]);
+         }
+      } // end for i
 
       // Store the valid time, if not already set
       if(ens_valid_ut == (unixtime) 0) {
@@ -1752,8 +1764,14 @@ void do_rps(const EnsembleStatVxOpt &vx_opt,
       rps_info.set_cdp_thresh(vx_opt.cdf_info.cdf_ta);
    }
 
-   // Compute ensemble RPS statistics
-   rps_info.set(*pd_ptr);
+   // Compute ensemble RPS statistics from pre-computed binned probabilities
+   if(vx_opt.vx_pd.fcst_info->get_var_info()->is_prob()) {
+      rps_info.set_climo_bin_prob(*pd_ptr, vx_opt.ocat_ta);
+   }
+   // Compute ensemble RPS statistics from ensemble member values
+   else {
+      rps_info.set(*pd_ptr);
+   }
 
    // Write out RPS
    if(vx_opt.output_flag[i_rps] != STATOutputType::None &&
@@ -2053,6 +2071,9 @@ void write_txt_files(const EnsembleStatVxOpt &vx_opt,
    int i, j;
    PairDataEnsemble pd;
 
+   // Check for probabilistic input
+   bool is_prob = vx_opt.vx_pd.fcst_info->get_var_info()->is_prob();
+
    // Process each observation filtering threshold
    for(i=0; i<vx_opt.othr_ta.n(); i++) {
 
@@ -2069,17 +2090,19 @@ void write_txt_files(const EnsembleStatVxOpt &vx_opt,
       setup_txt_files();
 
       // Compute ECNT scores
-      if(vx_opt.output_flag[i_ecnt] != STATOutputType::None) {
+      if(!is_prob &&
+         vx_opt.output_flag[i_ecnt] != STATOutputType::None) {
          do_ecnt(vx_opt, vx_opt.othr_ta[i], &pd);
       }
 
-      // Compute RPS scores
+      // Compute RPS scores, only support for forecast probabilities
       if(vx_opt.output_flag[i_rps] != STATOutputType::None) {
          do_rps(vx_opt, vx_opt.othr_ta[i], &pd);
       }
 
       // Write RHIST counts
-      if(vx_opt.output_flag[i_rhist] != STATOutputType::None) {
+      if(!is_prob &&
+         vx_opt.output_flag[i_rhist] != STATOutputType::None) {
 
          pd.compute_rhist();
 
@@ -2092,7 +2115,8 @@ void write_txt_files(const EnsembleStatVxOpt &vx_opt,
       }
 
       // Write PHIST counts if greater than 0
-      if(vx_opt.output_flag[i_phist] != STATOutputType::None) {
+      if(!is_prob &&
+         vx_opt.output_flag[i_phist] != STATOutputType::None) {
 
          pd.phist_bin_size = vx_opt.vx_pd.pd[0][0][0].phist_bin_size;
          pd.compute_phist();
@@ -2106,7 +2130,8 @@ void write_txt_files(const EnsembleStatVxOpt &vx_opt,
       }
 
       // Write RELP counts
-      if(vx_opt.output_flag[i_relp] != STATOutputType::None) {
+      if(!is_prob &&
+         vx_opt.output_flag[i_relp] != STATOutputType::None) {
 
          pd.compute_relp();
 
@@ -2119,7 +2144,8 @@ void write_txt_files(const EnsembleStatVxOpt &vx_opt,
       }
 
       // Write SSVAR scores
-      if(vx_opt.output_flag[i_ssvar] != STATOutputType::None) {
+      if(!is_prob &&
+         vx_opt.output_flag[i_ssvar] != STATOutputType::None) {
 
          pd.ssvar_bin_size = vx_opt.vx_pd.pd[0][0][0].ssvar_bin_size;
          pd.compute_ssvar();
@@ -2149,16 +2175,17 @@ void write_txt_files(const EnsembleStatVxOpt &vx_opt,
    } // end for i
 
    // Write PCT counts and scores
-   if(vx_opt.output_flag[i_pct]  != STATOutputType::None ||
-      vx_opt.output_flag[i_pstd] != STATOutputType::None ||
-      vx_opt.output_flag[i_pjc]  != STATOutputType::None ||
-      vx_opt.output_flag[i_prc]  != STATOutputType::None ||
-      vx_opt.output_flag[i_eclv] != STATOutputType::None) {
+   if(!is_prob &&
+      (vx_opt.output_flag[i_pct]  != STATOutputType::None ||
+       vx_opt.output_flag[i_pstd] != STATOutputType::None ||
+       vx_opt.output_flag[i_pjc]  != STATOutputType::None ||
+       vx_opt.output_flag[i_prc]  != STATOutputType::None ||
+       vx_opt.output_flag[i_eclv] != STATOutputType::None)) {
       do_pct(vx_opt, pd_all);
    }
 
    // Write out the unfiltered ORANK lines for point verification
-   if(is_point_vx &&
+   if(is_point_vx && !is_prob &&
       vx_opt.output_flag[i_orank] != STATOutputType::None) {
 
       // Set the header column
