@@ -623,7 +623,7 @@ void process_fcst_climo_files() {
          continue;
       }
 
-      // MET#2795, for multiple individual forecast levels, print a
+      // MET #2795, for multiple individual forecast levels, print a
       // warning if the observations levels are not fully covered.
       if(n_fcst > 1 &&
          !is_eq(fcst_info->level().lower(), fcst_info->level().upper()) &&
