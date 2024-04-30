@@ -9,6 +9,31 @@ When applicable, release notes are followed by the GitHub issue number which des
 enhancement, or new feature (`MET GitHub issues <https://github.com/dtcenter/MET/issues>`_).
 Important issues are listed **in bold** for emphasis.
 
+MET Version 12.0.0-beta4 Release Notes (20240417)
+-------------------------------------------------
+
+  .. dropdown:: Repository, build, and test
+
+     * Add GitHub action to run SonarQube for MET pull requests and feature branches (`#2379 <https://github.com/dtcenter/MET/issues/2379>`_).
+     * Move namespace specifications below include directives (`#2696 <https://github.com/dtcenter/MET/issues/2696>`_).
+     * Enhance GitHub action compilation options and testing workflows (`#2815 <https://github.com/dtcenter/MET/issues/2815>`_).
+     * Fix the SonarQube findings for MET version 12.0.0 (`#2673 <https://github.com/dtcenter/MET/issues/2673>`_).
+     * SonarQube: Replace "enum" to "enum class" (`#2830 <https://github.com/dtcenter/MET/issues/2830>`_).
+
+  .. dropdown:: Bugfixes
+
+     * **Bugfix: Fix the TC-Diag and TC-RMW tools to correctly handle the range and azimuth settings in range/azimuth grids** (`#2833 <https://github.com/dtcenter/MET/issues/2833>`_).
+
+  .. dropdown:: Enhancements
+
+     * **Refine configuration options for defining bins in the verification of probabilistic forecasts** (`#2280 <https://github.com/dtcenter/MET/issues/2280>`_).
+     * **Add new wind direction verification statistics for RMSE, Bias, and MAE** (`#2395 <https://github.com/dtcenter/MET/issues/2395>`_).
+     * Add new ECNT statistics that incorporate observational uncertainty as advised in Ferro (2017) (`#2583 <https://github.com/dtcenter/MET/issues/2583>`_).
+     * Enhance ASCII2NC to support IABP/IPAB Arctic and Antarctic drifting buoy observations (`#2654 <https://github.com/dtcenter/MET/issues/2654>`_).
+     * Enhance Multivariate MODE to read input data only once rather than multiple times (`#2707 <https://github.com/dtcenter/MET/issues/2707>`_).
+     * Enhance the calculation of RPSS to support starting from probabilistic data (`#2786 <https://github.com/dtcenter/MET/issues/2786>`_).
+     * Add convex hull to MODE output (`#2819 <https://github.com/dtcenter/MET/issues/2819>`_).
+
 MET Version 12.0.0-beta3 Release Notes (20240207)
 -------------------------------------------------
 
@@ -108,3 +133,5 @@ MET Version 12.0.0 Upgrade Instructions
   * The required `Proj <https://proj.org/>`_ library dependency was added in the 12.0.0-beta1 development cycle (`#2669 <https://github.com/dtcenter/MET/issues/2669>`_).
   * The optional `Atlas <https://sites.ecmwf.int/docs/atlas/>`_ library dependency was added in the 12.0.0-beta2 development cycle (`#2574 <https://github.com/dtcenter/MET/issues/2574>`_).
   * The optional `ecKit <https://github.com/ecmwf/eckit>`_ library dependency was added in the 12.0.0-beta2 development cycle (`#2574 <https://github.com/dtcenter/MET/issues/2574>`_).
+
+* Note that the `#2833 <https://github.com/dtcenter/MET/issues/2833>`_ bugfix affects all previously generated output from the TC-Diag and TC-RMW tools.
