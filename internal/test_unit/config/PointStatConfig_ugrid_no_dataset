@@ -119,9 +119,9 @@ hira = {
 ////////////////////////////////////////////////////////////////////////////////
 
 output_flag = {
-   fho    = STAT;
-   ctc    = STAT;
-   cts    = STAT;
+   fho    = NONE;
+   ctc    = NONE;
+   cts    = NONE;
    mctc   = NONE;
    mcts   = NONE;
    cnt    = NONE;
