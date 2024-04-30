@@ -70,8 +70,9 @@
 //   038    09/06/22  Halley Gotway  MET #1908 Remove ensemble processing logic.
 //   039    09/29/22  Halley Gotway  MET #2286 Refine GRIB1 table lookup logic.
 //   040    10/03/22  Prestopnik     MET #2227 Remove using namespace netCDF from
-//                                   header files
+//                                   header files.
 //   041    04/16/24  Halley Gotway  MET #2786 Compute RPS from climo bin probs.
+//   042    04/29/24  Halley Gotway  MET #2795 Move level mismatch warning.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -839,6 +840,10 @@ void process_point_vx() {
    // Loop through each of the fields to be verified
    for(i=0; i<conf_info.get_n_vx(); i++) {
 
+      VarInfo *fcst_info = conf_info.vx_opt[i].vx_pd.fcst_info->get_var_info();
+      VarInfo *obs_info  = conf_info.vx_opt[i].vx_pd.obs_info;
+      bool print_level_mismatch_warning = true;
+
       // Initialize
       emn_dpa.clear();
 
@@ -855,6 +860,23 @@ void process_point_vx() {
          else if(!process_point_ens(i, j, fcst_dpa)) {
             n_miss++;
             continue;
+         }
+
+         // MET #2795, for multiple individual forecast levels, print a
+         // warning if the observations levels are not fully covered.
+         if(print_level_mismatch_warning &&
+            fcst_dpa.n_planes() > 1 &&
+            !is_eq(fcst_info->level().lower(), fcst_info->level().upper()) &&
+            (obs_info->level().lower() < fcst_info->level().lower() ||
+             obs_info->level().upper() > fcst_info->level().upper())) {
+            mlog << Warning << "\nprocess_point_vx() -> "
+                 << "The forecast level range (" << fcst_info->magic_str()
+                 << ") does not fully contain the observation level range ("
+                 << obs_info->magic_str() << "). No vertical interpolation "
+                 << "will be performed for observations falling outside "
+                 << "the range of forecast levels. Instead, they will be "
+                 << "matched to the single nearest forecast level.\n\n";
+            print_level_mismatch_warning = false;
          }
 
          // Store ensemble member data
@@ -875,20 +897,18 @@ void process_point_vx() {
          mlog << Debug(2) << "Processing ensemble mean file: "
               << ens_mean_file << "\n";
 
-         VarInfo *info = conf_info.vx_opt[i].vx_pd.fcst_info->get_var_info();
-
          // Read the gridded data from the ensemble mean file
-         if(!get_data_plane_array(ens_mean_file.c_str(), info->file_type(), info,
-                                  emn_dpa, true)) {
+         if(!get_data_plane_array(ens_mean_file.c_str(), fcst_info->file_type(),
+                                  fcst_info, emn_dpa, true)) {
             mlog << Error << "\nprocess_point_vx() -> "
                  << "trouble reading the ensemble mean field \""
-                 << info->magic_str() << "\" from file \""
+                 << fcst_info->magic_str() << "\" from file \""
                  << ens_mean_file << "\"\n\n";
             exit(1);
          }
 
          // Dump out the number of levels found
-         mlog << Debug(2) << "For " << info->magic_str()
+         mlog << Debug(2) << "For " << fcst_info->magic_str()
               << " found " << emn_dpa.n_planes() << " forecast levels.\n";
 
       }
