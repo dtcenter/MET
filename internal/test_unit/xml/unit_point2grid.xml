@@ -137,7 +137,7 @@
       <grid_nc>&OUTPUT_DIR;/point2grid/point2grid_GOES_16_AOD_TO_G212_compute.nc</grid_nc>
     </output>
   </test>
-  
+
   <test name="point2grid_GOES_16_AOD_TO_G212_GAUSSIAN">
     <exec>&MET_BIN;/point2grid</exec>
     <env>
@@ -155,7 +155,7 @@
       <grid_nc>&OUTPUT_DIR;/point2grid/point2grid_GOES_16_AOD_TO_G212_gaussian.nc</grid_nc>
     </output>
   </test>
-  
+
   <test name="point2grid_GOES_16_ADP">
     <exec>&MET_BIN;/point2grid</exec>
     <env>
@@ -174,7 +174,7 @@
       <grid_nc>&OUTPUT_DIR;/point2grid/point2grid_GOES_16_ADP.nc</grid_nc>
     </output>
   </test>
-  
+
   <test name="point2grid_GOES_16_AOD_TO_G212_GRID_MAP">
     <exec>&MET_BIN;/point2grid</exec>
     <env>
@@ -185,7 +185,7 @@
       G212 \
       &OUTPUT_DIR;/point2grid/point2grid_GOES_16_AOD_TO_G212_grid_map.nc \
       -field 'name="AOD";  level="(*,*)";' \
-      -qc 1,2,3 -method MAX \
+      -qc 0,1,2 -method MAX \
       -v 1
     </param>
     <output>
@@ -205,11 +205,30 @@
       G212 \
       &OUTPUT_DIR;/point2grid/point2grid_GOES_16_AOD_TO_G212.nc \
       -field 'name="AOD";  level="(*,*)";' \
-      -qc 1,2,3 -method MAX \
+      -qc 0,1,2 -method MAX \
       -v 1
     </param>
     <output>
       <grid_nc>&OUTPUT_DIR;/point2grid/point2grid_GOES_16_AOD_TO_G212.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="point2grid_GOES_16_ADP_Enterprise_high">
+    <exec>&MET_BIN;/point2grid</exec>
+    <env>
+      <pair><name>MET_TMP_DIR</name>  <value>&OUTPUT_DIR;/point2grid</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/goes_16/OR_ABI-L2-AODC-M6_G16_s20241100001171_e20241100003544_c20241100006242.nc \
+      G212 \
+      &OUTPUT_DIR;/point2grid/point2grid_GOES_16_ADP_Enterprise_high.nc \
+      -field 'name="AOD_Smoke";  level="(*,*)";' \
+      -adp &DATA_DIR_MODEL;/goes_16/OR_ABI-L2-ADPC-M6_G16_s20241100001171_e20241100003544_c20241100006361.nc \
+      -qc 0,1 -method MAX \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/point2grid/point2grid_GOES_16_ADP_Enterprise_high.nc</grid_nc>
     </output>
   </test>
 
