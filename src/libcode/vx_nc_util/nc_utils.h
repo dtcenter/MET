@@ -195,6 +195,7 @@ extern bool get_nc_att_value(const netCDF::NcVar *, const ConcatString &, Concat
 extern bool get_nc_att_value(const netCDF::NcVar *, const ConcatString &, int          &, bool exit_on_error = false);
 extern bool get_nc_att_value(const netCDF::NcVar *, const ConcatString &, float        &, bool exit_on_error = false);
 extern bool get_nc_att_value(const netCDF::NcVar *, const ConcatString &, double       &, bool exit_on_error = false);
+extern bool get_nc_att_values(const netCDF::NcVar *, const ConcatString &, unsigned short *, bool exit_on_error = false);
 
 extern bool has_att(netCDF::NcFile *, const ConcatString name, bool exit_on_error=false);
 extern bool has_att(netCDF::NcVar *, const ConcatString name, bool do_log=false);
@@ -257,11 +258,11 @@ extern ConcatString* get_string_val(netCDF::NcVar *var, const int index, const i
 extern bool get_nc_data(netCDF::NcVar *, int    *data);
 extern bool get_nc_data(netCDF::NcVar *, char   *data);
 extern bool get_nc_data(netCDF::NcVar *, char  **data);
-extern bool get_nc_data(netCDF::NcVar *, uchar  *data);
+extern bool get_nc_data(netCDF::NcVar *, uchar  *data, bool allow_conversion=false);
 extern bool get_nc_data(netCDF::NcVar *, float  *data);
 extern bool get_nc_data(netCDF::NcVar *, double *data);
 extern bool get_nc_data(netCDF::NcVar *, time_t *data);
-extern bool get_nc_data(netCDF::NcVar *, ncbyte *data);
+//extern bool get_nc_data(netCDF::NcVar *, ncbyte *data);
 extern bool get_nc_data(netCDF::NcVar *, unsigned short *data);
 
 extern bool get_nc_data(netCDF::NcVar *, int    *data, const LongArray &curs);
