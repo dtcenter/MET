@@ -20,9 +20,9 @@
 //   003    02/17/22  Halley Gotway  MET #1918 Add normalize config option.
 //   004    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
 //   005    10/03/22  Prestopnik     MET #2227 Remove using namespace std and netCDF from header files
+//   006    04/29/24  Halley Gotway  MET #2870 Ignore MISSING keyword.
 //
 ////////////////////////////////////////////////////////////////////////
-
 
 #include <cstdio>
 #include <cstdlib>
@@ -52,7 +52,6 @@
 
 using namespace std;
 using namespace netCDF;
-
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -111,11 +110,9 @@ int met_main(int argc, char *argv[]) {
 
 ////////////////////////////////////////////////////////////////////////
 
-
 const string get_tool_name() {
    return "gen_ens_prod";
 }
-
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -123,7 +120,7 @@ void process_command_line(int argc, char **argv) {
    int i;
    CommandLine cline;
    ConcatString default_config_file;
-   Met2dDataFile *ens_mtddf = (Met2dDataFile *) nullptr;
+   const char *method_name = "process_command_line() -> ";
 
    //
    // Check for zero arguments
@@ -159,19 +156,19 @@ void process_command_line(int argc, char **argv) {
    // Check that the required arguments have been set
    n_ens_files = ens_files.n();
    if(n_ens_files == 0) {
-      mlog << Error << "\nprocess_command_line() -> "
+      mlog << Error << "\n" << method_name
            << "the ensemble file list must be set using the "
            << "\"-ens\" option.\n\n";
       exit(1);
    }
    if(out_file.length() == 0) {
-      mlog << Error << "\nprocess_command_line() -> "
+      mlog << Error << "\n" << method_name
            << "the output file must be set using the "
            << "\"-out\" option.\n\n";
       exit(1);
    }
    if(config_file.length() == 0) {
-      mlog << Error << "\nprocess_command_line() -> "
+      mlog << Error << "\n" << method_name
            << "the configuration file must be set using the "
            << "\"-config\" option.\n\n";
       exit(1);
@@ -191,15 +188,18 @@ void process_command_line(int argc, char **argv) {
    // Get the ensemble file type from config, if present
    etype = parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_ens));
 
-   // Read the first input ensemble file
-   if(!(ens_mtddf = mtddf_factory.new_met_2d_data_file(ens_files[0].c_str(), etype))) {
-      mlog << Error << "\nprocess_command_line() -> "
-           << "trouble reading ensemble file \"" << ens_files[0] << "\"\n\n";
-      exit(1);
+   // Get the ensemble file type from the files
+   if(etype == FileType_None) {
+      etype = parse_file_list_type(ens_files);
    }
 
-   // Store the input ensemble file type
-   etype = ens_mtddf->file_type();
+   // UGrid not supported
+   if(etype == FileType_UGrid) {
+      mlog << Error << "\n" << method_name
+           << grdfiletype_to_string(etype)
+           << " ensemble files are not supported\n\n";
+      exit(1);
+   }
 
    // Process the configuration
    conf_info.process_config(etype, &ens_files, ctrl_file.nonempty());
@@ -225,7 +225,7 @@ void process_command_line(int argc, char **argv) {
 
    // Check for control in the list of ensemble files
    if(ctrl_file.nonempty() && ens_files.has(ctrl_file) && n_ens_files != 1) {
-      mlog << Error << "\nprocess_command_line() -> "
+      mlog << Error << "\n" << method_name
            << "the ensemble control file should not appear in the list "
            << "of ensemble member files:\n" << ctrl_file << "\n\n";
       exit(1);
@@ -235,9 +235,7 @@ void process_command_line(int argc, char **argv) {
    for(i=0; i<n_ens_files; i++) {
       if(!file_exists(ens_files[i].c_str()) &&
          !is_python_grdfiletype(etype)) {
-         mlog << Warning << "\nprocess_command_line() -> "
-              << "cannot open input ensemble file: "
-              << ens_files[i] << "\n\n";
+         log_missing_file(method_name, "input ensemble file", ens_files[i]);
          ens_file_vld.add(0);
       }
       else {
@@ -246,13 +244,10 @@ void process_command_line(int argc, char **argv) {
    }
 
    if(conf_info.control_id.nonempty() && ctrl_file.empty()) {
-      mlog << Warning << "\nprocess_command_line() -> "
+      mlog << Warning << "\n" << method_name
            << "control_id is set in the config file but "
            << "control file is not provided with -ctrl argument\n\n";
    }
-
-   // Deallocate memory for data files
-   if(ens_mtddf) { delete ens_mtddf; ens_mtddf = (Met2dDataFile *) nullptr; }
 
    return;
 }
