@@ -106,6 +106,29 @@ bool get_nc_att_value_(const netCDF::NcVar *var, const ConcatString &att_name,
 ////////////////////////////////////////////////////////////////////////
 
 template <typename T>
+bool get_nc_att_values_(const netCDF::NcVar *var, const ConcatString &att_name,
+                        T *att_vals, bool exit_on_error,
+                        T bad_data, const char *caller_name) {
+   // caller should initialize att_vals
+
+   //
+   // Retrieve the NetCDF variable attribute.
+   //
+   netCDF::NcVarAtt *att = get_nc_att(var, att_name);
+   bool status = IS_VALID_NC_P(att);
+   if (status) att->getValues(att_vals);
+   else {
+      mlog << Error << "\n" << caller_name
+           << get_log_msg_for_att(att, GET_SAFE_NC_NAME_P(var), att_name);
+   }
+   if (att) delete att;
+   if (!status && exit_on_error) exit(1);
+   return status;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+template <typename T>
 bool get_nc_att_value_(const netCDF::NcVarAtt *att, T &att_val, bool exit_on_error,
                        T bad_data, const char *caller_name) {
 
