@@ -119,17 +119,17 @@ hira = {
 ////////////////////////////////////////////////////////////////////////////////
 
 output_flag = {
-   fho    = BOTH;
-   ctc    = BOTH;
-   cts    = BOTH;
+   fho    = STAT;
+   ctc    = STAT;
+   cts    = STAT;
    mctc   = NONE;
    mcts   = NONE;
-   cnt    = BOTH;
-   sl1l2  = NONE;
+   cnt    = NONE;
+   sl1l2  = STAT;
    sal1l2 = NONE;
    vl1l2  = NONE;
    val1l2 = NONE;
-   vcnt   = BOTH;
+   vcnt   = NONE;
    pct    = NONE;
    pstd   = NONE;
    pjc    = NONE;
@@ -137,8 +137,8 @@ output_flag = {
    ecnt   = NONE;
    orank  = NONE;
    rps    = NONE;
-   eclv   = BOTH;
-   mpr    = BOTH;
+   eclv   = NONE;
+   mpr    = STAT;
    seeps  = NONE;
    seeps_mpr = NONE;
 }
