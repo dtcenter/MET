@@ -102,8 +102,8 @@
 //   050    02/11/22  Halley Gotway  MET #2045 Fix HiRA output.
 //   051    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
 //   052    09/29/22  Halley Gotway  MET #2286 Refine GRIB1 table lookup logic.
-//   053    10/03/22  Prestopnik     MET #2227 Remove using namespace netCDF from header files
-//   054    04/29/24  Halley Gotway  MET #2795 Move level mismatch warning
+//   053    10/03/22  Prestopnik     MET #2227 Remove using namespace netCDF from header files.
+//   054    04/29/24  Halley Gotway  MET #2795 Move level mismatch warning.
 //
 ////////////////////////////////////////////////////////////////////////
 
