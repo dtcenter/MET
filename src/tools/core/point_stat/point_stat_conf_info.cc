@@ -851,25 +851,6 @@ void PointStatVxOpt::process_config(GrdFileType ftype,
       vx_pd.obs_info->dump(cout);
    }
 
-   // Check the levels for the forecast and observation fields.  If the
-   // forecast field is a range of pressure levels, check to see if the
-   // range of observation field pressure levels is wholly contained in the
-   // fcst levels.  If not, print a warning message.
-   if(vx_pd.fcst_info->level().type() == LevelType_Pres &&
-      !is_eq(vx_pd.fcst_info->level().lower(), vx_pd.fcst_info->level().upper()) &&
-      (vx_pd.obs_info->level().lower() < vx_pd.fcst_info->level().lower() ||
-       vx_pd.obs_info->level().upper() > vx_pd.fcst_info->level().upper())) {
-
-      mlog << Warning
-           << "\nPointStatVxOpt::process_config() -> "
-           << "The range of requested observation pressure levels "
-           << "is not contained within the range of requested "
-           << "forecast pressure levels.  No vertical interpolation "
-           << "will be performed for observations falling outside "
-           << "the range of forecast levels.  Instead, they will be "
-           << "matched to the single nearest forecast level.\n\n";
-   }
-
    // No support for wind direction
    if(vx_pd.fcst_info->is_wind_direction() ||
       vx_pd.obs_info->is_wind_direction()) {
