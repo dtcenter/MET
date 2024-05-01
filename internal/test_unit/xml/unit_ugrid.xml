@@ -77,12 +77,6 @@
     </param>
     <output>
       <stat>&OUTPUT_DIR;/point_stat_ugrid/point_stat_UGRID_MPAS_DIAG_TEMP_000000L_20120409_120000V.stat</stat>
-      <stat>&OUTPUT_DIR;/point_stat_ugrid/point_stat_UGRID_MPAS_DIAG_TEMP_000000L_20120409_120000V_fho.txt</stat>
-      <stat>&OUTPUT_DIR;/point_stat_ugrid/point_stat_UGRID_MPAS_DIAG_TEMP_000000L_20120409_120000V_ctc.txt</stat>
-      <stat>&OUTPUT_DIR;/point_stat_ugrid/point_stat_UGRID_MPAS_DIAG_TEMP_000000L_20120409_120000V_cts.txt</stat>
-      <stat>&OUTPUT_DIR;/point_stat_ugrid/point_stat_UGRID_MPAS_DIAG_TEMP_000000L_20120409_120000V_cnt.txt</stat>
-      <stat>&OUTPUT_DIR;/point_stat_ugrid/point_stat_UGRID_MPAS_DIAG_TEMP_000000L_20120409_120000V_eclv.txt</stat>
-      <stat>&OUTPUT_DIR;/point_stat_ugrid/point_stat_UGRID_MPAS_DIAG_TEMP_000000L_20120409_120000V_mpr.txt</stat>
     </output>
   </test>
 
@@ -102,12 +96,6 @@
     </param>
     <output>
       <stat>&OUTPUT_DIR;/point_stat_ugrid/point_stat_UGRID_MPAS_OUT_TEMP_000000L_20120409_120000V.stat</stat>
-      <stat>&OUTPUT_DIR;/point_stat_ugrid/point_stat_UGRID_MPAS_OUT_TEMP_000000L_20120409_120000V_fho.txt</stat>
-      <stat>&OUTPUT_DIR;/point_stat_ugrid/point_stat_UGRID_MPAS_OUT_TEMP_000000L_20120409_120000V_ctc.txt</stat>
-      <stat>&OUTPUT_DIR;/point_stat_ugrid/point_stat_UGRID_MPAS_OUT_TEMP_000000L_20120409_120000V_cts.txt</stat>
-      <stat>&OUTPUT_DIR;/point_stat_ugrid/point_stat_UGRID_MPAS_OUT_TEMP_000000L_20120409_120000V_cnt.txt</stat>
-      <stat>&OUTPUT_DIR;/point_stat_ugrid/point_stat_UGRID_MPAS_OUT_TEMP_000000L_20120409_120000V_eclv.txt</stat>
-      <stat>&OUTPUT_DIR;/point_stat_ugrid/point_stat_UGRID_MPAS_OUT_TEMP_000000L_20120409_120000V_mpr.txt</stat>
     </output>
   </test>
 
@@ -128,12 +116,6 @@
     </param>
     <output>
       <stat>&OUTPUT_DIR;/point_stat_ugrid/point_stat_UGRID_MPAS_CFG_OUT_TEMP_000000L_20120409_120000V.stat</stat>
-      <stat>&OUTPUT_DIR;/point_stat_ugrid/point_stat_UGRID_MPAS_CFG_OUT_TEMP_000000L_20120409_120000V_fho.txt</stat>
-      <stat>&OUTPUT_DIR;/point_stat_ugrid/point_stat_UGRID_MPAS_CFG_OUT_TEMP_000000L_20120409_120000V_ctc.txt</stat>
-      <stat>&OUTPUT_DIR;/point_stat_ugrid/point_stat_UGRID_MPAS_CFG_OUT_TEMP_000000L_20120409_120000V_cts.txt</stat>
-      <stat>&OUTPUT_DIR;/point_stat_ugrid/point_stat_UGRID_MPAS_CFG_OUT_TEMP_000000L_20120409_120000V_cnt.txt</stat>
-      <stat>&OUTPUT_DIR;/point_stat_ugrid/point_stat_UGRID_MPAS_CFG_OUT_TEMP_000000L_20120409_120000V_eclv.txt</stat>
-      <stat>&OUTPUT_DIR;/point_stat_ugrid/point_stat_UGRID_MPAS_CFG_OUT_TEMP_000000L_20120409_120000V_mpr.txt</stat>
     </output>
   </test>
 
