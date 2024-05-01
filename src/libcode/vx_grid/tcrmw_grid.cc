@@ -334,7 +334,6 @@ Vector E, N, V;
 Vector B_range, B_azi;
 double azi_deg, range_deg, range_km;
 
-
 latlon_to_range_azi(lat, lon, range_km, azi_deg);
 
 range_deg = deg_per_km*range_km;
@@ -344,18 +343,28 @@ N = latlon_to_north (lat, lon);
 
 V = east_component*E + north_component*N;
 
-
 range_azi_to_basis(range_deg, azi_deg, B_range, B_azi);
 
-
-
-   radial_component = dot(V, B_range);
+radial_component = dot(V, B_range);
 
 azimuthal_component = dot(V, B_azi);
 
+/* JHG From diapost.F90
+         xxx = wcos(icen(k),jcen(k))
+         yyy = wsin(icen(k),jcen(k))
+         IF (  xxx > sqrt2_ ) THEN
+            alfa = Asin(yyy)
+         ELSEIF (  xxx  < -sqrt2_ ) THEN
+            alfa = pi_cnst*Sign(1.,yyy) - Asin(yyy)
+         ELSE ! ( |xxx| <= sqrt2_ ) !
+            alfa = Acos(xxx)*Sign(1.,yyy)
+         ENDIF !* SOUTH-POLAR PROJECTION
+          phi = pi3_2 - alfa - i*dphi
+         rcos = cos(phi) ; rsin = sin(phi)
 
-
-
+             wks(i,j,21) =   rcos*uur + rsin*vvr !*   radial   wind
+             wks(i,j,22) = - rsin*uur + rcos*vvr !* tangential wind
+*/
 
 return;
 
@@ -387,17 +396,13 @@ void TcrmwGrid::range_azi_to_basis(const double range_deg, const double azi_deg,
 
 double u, v, w;
 
-
 u =  cosd(range_deg)*sind(azi_deg);
 
 v =  cosd(range_deg)*cosd(azi_deg);
 
 w = -sind(range_deg);
 
-
-
 B_range = u*Ir + v*Jr + w*Kr;
-
 
 u =  cosd(azi_deg);
 
@@ -405,9 +410,7 @@ v = -sind(azi_deg);
 
 w =  0.0;
 
-
 B_azi = u*Ir + v*Jr + w*Kr;
-
 
 return;
 
@@ -426,7 +429,6 @@ RotatedLatLonGrid::latlon_to_xy(true_lat, true_lon, x, y);
 x -= Nx*floor(x/Nx);
 
 x -= Nx*floor(x/Nx);
-
 
 return;
 
@@ -499,8 +501,4 @@ return;
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-
-
 

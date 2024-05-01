@@ -67,22 +67,21 @@ static bool file_is_ok(const ConcatString &, const GrdFileType);
 static void process_rmw();
 static void process_tracks(TrackInfoArray&);
 static void get_atcf_files(const StringArray&,
-    const StringArray&, StringArray&, StringArray&);
+                const StringArray&, StringArray&, StringArray&);
 static void process_track_files(const StringArray&,
-    const StringArray&, TrackInfoArray&);
+                const StringArray&, TrackInfoArray&);
 static bool is_keeper(const ATCFLineBase *);
 static void set_deck(const StringArray&);
 static void set_atcf_source(const StringArray&,
-    StringArray&, StringArray&);
+                StringArray&, StringArray&);
 static void set_data_files(const StringArray&);
 static void set_config(const StringArray&);
 static void set_out(const StringArray&);
 static void setup_grid();
 static void setup_nc_file();
 static void build_outfile_name(const ConcatString&,
-    const char*, ConcatString&);
-static void compute_lat_lon(TcrmwGrid&,
-    double*, double*);
+                const char*, ConcatString&);
+static void compute_lat_lon(TcrmwGrid&, double*, double*);
 static void process_fields(const TrackInfoArray&);
 
 ////////////////////////////////////////////////////////////////////////
@@ -612,11 +611,11 @@ void setup_nc_file() {
         // Get VarInfo
         data_info = conf_info.data_info[i_var];
         mlog << Debug(4) << "Processing field: " << data_info->magic_str() << "\n";
-	     string fname = data_info->name_attr();
+        string fname = data_info->name_attr();
         variable_levels[fname].push_back(data_info->level_attr());
         variable_long_names[fname] = data_info->long_name_attr();
         variable_units[fname] = data_info->units_attr();
-	     wind_converter.update_input(fname, data_info->units_attr());
+        wind_converter.update_input(fname, data_info->units_attr());
     }
 
     // Define pressure levels
@@ -650,7 +649,7 @@ void compute_lat_lon(TcrmwGrid& tcrmw_grid,
                 ia * tcrmw_grid.azimuth_delta_deg(),
                 lat, lon);
             lat_arr[i] = lat;
-            lon_arr[i] = - lon;
+            lon_arr[i] = -lon; // switch degrees west to east
         }
     }
 }
@@ -736,31 +735,29 @@ void process_fields(const TrackInfoArray& tracks) {
             // Find data for this track point
             get_series_entry(i_point, data_info, data_files, ftype, data_dp, latlon_arr);
 
-            // Check data range
-            double data_min, data_max;
-            data_dp.data_range(data_min, data_max);
-            mlog << Debug(4) << "data_min:" << data_min << "\n";
-            mlog << Debug(4) << "data_max:" << data_max << "\n";
-
-            // Regrid data
+            // Regrid data and log the range of values before and after
+            double dmin, dmax, dmin_rgd, dmax_rgd;
+            data_dp.data_range(dmin, dmax);
             data_dp = met_regrid(data_dp, latlon_arr, grid, data_info->regrid());
-            data_dp.data_range(data_min, data_max);
-            mlog << Debug(4) << "data_min:" << data_min << "\n";
-            mlog << Debug(4) << "data_max:" << data_max << "\n";
+            data_dp.data_range(dmin_rgd, dmax_rgd);
 
-	         // if this is "U", setup everything for matching "V" and compute the radial/tangential
-	         if(wind_converter.compute_winds_if_input_is_u(i_point, sname, slevel, valid_time, data_files, ftype,
+            mlog << Debug(4) << data_info->magic_str()
+                 << " input range (" << dmin << ", " << dmax
+                 << "), regrid range (" << dmin_rgd << ", " << dmax_rgd << ")\n";
+
+            // if this is "U", setup everything for matching "V" and compute the radial/tangential
+            if(wind_converter.compute_winds_if_input_is_u(i_point, sname, slevel, valid_time, data_files, ftype,
                    latlon_arr, lat_arr, lon_arr, grid, data_dp, tcrmw_grid)) {
                 write_tc_pressure_level_data(nc_out, tcrmw_grid,
                     pressure_level_indices, data_info->level_attr(), i_point,
-					     data_3d_vars[conf_info.radial_velocity_field_name.string()],
-					     wind_converter.get_wind_r_arr());
-	             write_tc_pressure_level_data(nc_out, tcrmw_grid,
-					     pressure_level_indices, data_info->level_attr(), i_point,
-					     data_3d_vars[conf_info.tangential_velocity_field_name.string()],
-					     wind_converter.get_wind_t_arr());
+                    data_3d_vars[conf_info.radial_velocity_field_name.string()],
+                    wind_converter.get_wind_r_arr());
+                write_tc_pressure_level_data(nc_out, tcrmw_grid,
+                    pressure_level_indices, data_info->level_attr(), i_point,
+                    data_3d_vars[conf_info.tangential_velocity_field_name.string()],
+                    wind_converter.get_wind_t_arr());
             }
-	    
+
             // Write data
             if(variable_levels[data_info->name_attr()].size() > 1) {
                 write_tc_pressure_level_data(nc_out, tcrmw_grid,

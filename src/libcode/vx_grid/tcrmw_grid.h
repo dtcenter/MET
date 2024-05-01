@@ -89,12 +89,9 @@ class TcrmwGrid : public RotatedLatLonGrid {
 
       void xy_to_latlon(double x, double y, double & true_lat, double & true_lon) const;
 
-
-
       void wind_ne_to_ra(const double lat, const double lon, 
                          const double east_component, const double north_component, 
                          double & radial_component,   double & azimuthal_component) const;
-
 
          //
          //  possibly toggles the signs of the radial and/or azimuthal components
