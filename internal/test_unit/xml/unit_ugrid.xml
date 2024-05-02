@@ -36,7 +36,7 @@
     </param>
     <output>
       <stat>&OUTPUT_DIR;/grid_stat_ugrid/grid_stat_UGRID_MPAS_OUT_TO_GRID_000000L_20120409_120000V.stat</stat>
-      <exists>&OUTPUT_DIR;/grid_stat_ugrid/grid_stat_UGRID_MPAS_OUT_TO_GRID_000000L_20120409_120000V_pairs.nc</exists>
+      <exist>&OUTPUT_DIR;/grid_stat_ugrid/grid_stat_UGRID_MPAS_OUT_TO_GRID_000000L_20120409_120000V_pairs.nc</exist>
     </output>
   </test>
 
@@ -54,7 +54,7 @@
     </param>
     <output>
       <stat>&OUTPUT_DIR;/grid_stat_ugrid/grid_stat_UGRID_MPAS_DIAG_000000L_20120409_120000V.stat</stat>
-      <exists>&OUTPUT_DIR;/grid_stat_ugrid/grid_stat_UGRID_MPAS_DIAG_000000L_20120409_120000V_pairs.nc</exists>
+      <exist>&OUTPUT_DIR;/grid_stat_ugrid/grid_stat_UGRID_MPAS_DIAG_000000L_20120409_120000V_pairs.nc</exist>
     </output>
   </test>
 
