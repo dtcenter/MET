@@ -333,6 +333,8 @@ def repl_env(string_with_ref):
     string_with_ref : str
         The provided string with ${ENV_NAME} replaced by corresponding environment variable
     """
+    # define logger
+    logger = logging.getLogger(__name__)
 
     envar_ref_list = re.findall('\$\{\w+}', string_with_ref)
     envar_ref_unique = [
