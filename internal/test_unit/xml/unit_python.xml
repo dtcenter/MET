@@ -162,9 +162,9 @@
     </param>
     <output>
       <ps>&OUTPUT_DIR;/python/mode_python_mixed_300000L_20120410_180000V_060000A.ps</ps>
-      <txt>&OUTPUT_DIR;/python/mode_python_mixed_300000L_20120410_180000V_060000A_cts.txt</txt>
-      <txt>&OUTPUT_DIR;/python/mode_python_mixed_300000L_20120410_180000V_060000A_obj.txt</txt>
-      <nc>&OUTPUT_DIR;/python/mode_python_mixed_300000L_20120410_180000V_060000A_obj.nc</nc>
+      <stat>&OUTPUT_DIR;/python/mode_python_mixed_300000L_20120410_180000V_060000A_cts.txt</stat>
+      <stat>&OUTPUT_DIR;/python/mode_python_mixed_300000L_20120410_180000V_060000A_obj.txt</stat>
+      <grid_nc>&OUTPUT_DIR;/python/mode_python_mixed_300000L_20120410_180000V_060000A_obj.nc</grid_nc>
     </output>
   </test>
 
@@ -182,9 +182,9 @@
     </param>
     <output>
       <ps>&OUTPUT_DIR;/python/mode_python_120000L_20050807_120000V_120000A.ps</ps>
-      <txt>&OUTPUT_DIR;/python/mode_python_120000L_20050807_120000V_120000A_obj.txt</txt>
-      <txt>&OUTPUT_DIR;/python/mode_python_120000L_20050807_120000V_120000A_cts.txt</txt>
-      <nc>&OUTPUT_DIR;/python/mode_python_120000L_20050807_120000V_120000A_obj.nc</nc>
+      <stat>&OUTPUT_DIR;/python/mode_python_120000L_20050807_120000V_120000A_obj.txt</stat>
+      <stat>&OUTPUT_DIR;/python/mode_python_120000L_20050807_120000V_120000A_cts.txt</stat>
+      <grid_nc>&OUTPUT_DIR;/python/mode_python_120000L_20050807_120000V_120000A_obj.nc</grid_nc>
     </output>
   </test>
 
@@ -200,8 +200,7 @@
       -outdir &OUTPUT_DIR;/python -v 1
     </param>
     <output>
-      <txt>&OUTPUT_DIR;/python/grid_stat_python_mixed_120000L_20120409_120000V.stat</txt>
-      <nc>&OUTPUT_DIR;/python/grid_stat_python_mixed_120000L_20120409_120000V_pairs.nc</nc>
+      <grid_nc>&OUTPUT_DIR;/python/grid_stat_python_mixed_120000L_20120409_120000V_pairs.nc</grid_nc>
     </output>
   </test>
 
@@ -218,7 +217,7 @@
       -outdir &OUTPUT_DIR;/python -v 1
     </param>
     <output>
-      <nc>&OUTPUT_DIR;/python/grid_stat_python_120000L_20050807_120000V_pairs.nc</nc>
+      <grid_nc>&OUTPUT_DIR;/python/grid_stat_python_120000L_20050807_120000V_pairs.nc</grid_nc>
     </output>
   </test>
 
@@ -237,7 +236,7 @@
       -outdir &OUTPUT_DIR;/python -v 1
     </param>
     <output>
-      <nc>&OUTPUT_DIR;/python/point_stat_python_120000L_20120409_120000V.stat</nc>
+      <stat>&OUTPUT_DIR;/python/point_stat_120000L_20050807_120000V.stat</stat>
     </output>
   </test>
 
@@ -255,7 +254,7 @@
     </param>
     <output>
       <stat>&OUTPUT_DIR;/python/wavelet_stat_python_120000L_20050807_120000V.stat</stat>
-      <txt>&OUTPUT_DIR;/python/wavelet_stat_python_120000L_20050807_120000V_isc.txt</txt>
+      <stat>&OUTPUT_DIR;/python/wavelet_stat_python_120000L_20050807_120000V_isc.txt</stat>
       <grid_nc>&OUTPUT_DIR;/python/wavelet_stat_python_120000L_20050807_120000V.nc</grid_nc>
       <ps>&OUTPUT_DIR;/python/wavelet_stat_python_120000L_20050807_120000V.ps</ps>
     </output>
@@ -274,7 +273,7 @@
     </param>
     <output>
       <stat>&OUTPUT_DIR;/python/wavelet_stat_python_mixed_120000L_20050807_120000V.stat</stat>
-      <txt>&OUTPUT_DIR;/python/wavelet_stat_python_mixed_120000L_20050807_120000V_isc.txt</txt>
+      <stat>&OUTPUT_DIR;/python/wavelet_stat_python_mixed_120000L_20050807_120000V_isc.txt</stat>
       <grid_nc>&OUTPUT_DIR;/python/wavelet_stat_python_mixed_120000L_20050807_120000V.nc</grid_nc>
       <ps>&OUTPUT_DIR;/python/wavelet_stat_python_mixed_120000L_20050807_120000V.ps</ps>
     </output>
