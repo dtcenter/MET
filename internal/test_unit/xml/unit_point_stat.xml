@@ -18,6 +18,8 @@
   <!--                                    -->
   <!--  point_stat                        -->
   <!--                                    -->
+  <test_dir>&TEST_DIR;</test_dir>
+  <exit_on_fail>true</exit_on_fail>
 
   <test name="point_stat_GRIB1_NAM_GDAS">
     <exec>&MET_BIN;/point_stat</exec>

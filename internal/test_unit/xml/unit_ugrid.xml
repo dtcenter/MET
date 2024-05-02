@@ -20,6 +20,9 @@
   <!--  grid_stat                         -->
   <!--                                    -->
 
+  <test_dir>&TEST_DIR;</test_dir>
+  <exit_on_fail>true</exit_on_fail>
+
   <test name="grid_stat_ugrid_mpas_out_to_grid">
     <exec>&MET_BIN;/grid_stat</exec>
     <env>
