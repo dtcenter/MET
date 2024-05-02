@@ -285,12 +285,12 @@ class nc_point_obs(met_point_obs):
 
    def to_pandas(self):
        return pd.DataFrame({
-           'typ': [self.hdr_typ_table[i] for i in self.hdr_typ],
-           'sid': [self.hdr_sid_table[i] for i in self.hdr_sid],
-           'vld': [self.hdr_vld_table[i] for i in self.hdr_vld],
-           'lat': self.hdr_lat,
-           'lon': self.hdr_lon,
-           'elv': self.hdr_elv,
+           'typ': [self.hdr_typ_table[self.hdr_typ[i]] for i in self.obs_hid],
+           'sid': [self.hdr_sid_table[self.hdr_sid[i]] for i in self.obs_hid],
+           'vld': [self.hdr_vld_table[self.hdr_vld[i]] for i in self.obs_hid],
+           'lat': [self.hdr_lat[i] for i in self.obs_hid],
+           'lon': [self.hdr_lon[i] for i in self.obs_hid],
+           'elv': [self.hdr_elv[i] for i in self.obs_hid],
            'var': [self.obs_var_table[i] if self.use_var_id else f'{i}'
                    for i in self.obs_vid],
            'lvl': self.obs_lvl,
