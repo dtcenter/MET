@@ -63,7 +63,7 @@ def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, ca
             mgnc = repl_env(test_dir + '/bin/mgnc.sh')
             mpnc = repl_env(test_dir + '/bin/mpnc.sh')
         except Exception as e:
-            logger.WARNING(f"WARNING: unable to read test_dir from {test_xml}")
+            logger.warning(f"WARNING: unable to read test_dir from {test_xml}")
             pass
 
         tests = build_tests(test_root)
