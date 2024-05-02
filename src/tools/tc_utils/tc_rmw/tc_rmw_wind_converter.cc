@@ -102,13 +102,16 @@ void TCRMW_WindConverter::init(const TCRMWConfInfo *conf) {
          << _conf->v_wind_field_name.string() << " has " << _vIndexMap.size() << " inputs\n";
     _computeWinds = false;
   }
-  map<string,int>::const_iterator iu, iv;
-  for (iu=_uIndexMap.begin(), iv=_vIndexMap.begin(); iu!=_uIndexMap.end(); ++iu, ++iv) {
-    if (iu->first != iv->first) {
-      mlog << Warning << "Ordering of u/v wind input levels not the same, "
-           << "not implemented, no wind conversions will be done:\n"
-           << "    " << iu->first  << " " << iv->first << "\n";
-      _computeWinds = false;
+  if (_computeWinds) {
+    map<string,int>::const_iterator iu, iv;
+    for (iu=_uIndexMap.begin(), iv=_vIndexMap.begin(); iu!=_uIndexMap.end(); ++iu, ++iv) {
+      if (iu->first != iv->first) {
+        mlog << Warning << "Ordering of u/v wind input levels not the same, "
+             << "not implemented, no wind conversions will be done:\n"
+             << "    " << iu->first  << " " << iv->first << "\n";
+        _computeWinds = false;
+        break;
+      }
     }
   }
 }
