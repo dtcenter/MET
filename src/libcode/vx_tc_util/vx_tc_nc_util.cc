@@ -158,6 +158,21 @@ void write_tc_rmw(NcFile* nc_out,
 
 ////////////////////////////////////////////////////////////////////////
 
+bool has_pressure_level(vector<string> levels) {
+
+    bool status = false;
+
+    for (int j = 0; j < levels.size(); j++) {
+        if (levels[j].substr(0, 1) == "P") {
+            status = true;
+	    break;
+        }
+    }
+
+    return status;
+}
+    
+////////////////////////////////////////////////////////////////////////
 
 set<string> get_pressure_level_strings(
     map<string, vector<string> > variable_levels) {
@@ -538,7 +553,7 @@ void def_tc_variables(NcFile* nc_out,
         string long_name = variable_long_names[i->first];
         string units = variable_units[i->first];
 
-        if (levels.size() > 1) {
+        if (has_pressure_level(levels)) {
             data_var = nc_out->addVar(
                 var_name, ncDouble, dims_3d);
             add_att(&data_var, "long_name", long_name);
