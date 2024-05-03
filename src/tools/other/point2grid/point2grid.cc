@@ -2715,9 +2715,9 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
         << " medium=" << cnt_aod_qc_medium << ", low=" << cnt_aod_qc_low
         << ", no_retrieval=" << cnt_aod_qc_nr
         << "\n   ADP QC: high=" << cnt_adjused_high << " (" << cnt_adp_qc_high
-		<< "), medium=" << cnt_adjused_medium  << " (" << cnt_adp_qc_medium
-		<< "), low=" << cnt_adjused_low << " (" << cnt_adp_qc_low
-		<< "), no_retrieval=" << cnt_adp_qc_nr
+    	<< "), medium=" << cnt_adjused_medium  << " (" << cnt_adp_qc_medium
+    	<< "), low=" << cnt_adjused_low << " (" << cnt_adp_qc_low
+    	<< "), no_retrieval=" << cnt_adp_qc_nr
         << "\n   adjusted: high to medium=" << cnt_adp_qc_high_to_medium
         << ", high to low=" << cnt_adp_qc_high_to_low
         << ", medium to low=" << cnt_adp_qc_medium_to_low
