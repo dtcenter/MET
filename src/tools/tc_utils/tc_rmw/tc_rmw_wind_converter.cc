@@ -17,6 +17,7 @@
 //   ----   ----      ----           -----------
 //   000   05/11/22   Albo           Pulled the wind conversion into a class
 //   001   09/28/22   Prestopnik     MET #2227 Remove namespace std from header files
+//   002   05/03/24   Halley Gotway  MET #2841 Fix radial and tangential winds
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -28,7 +29,7 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
-static void wind_ne_to_ra(const TcrmwGrid&,
+static void wind_ne_to_rt(const TcrmwGrid&,
                           const DataPlane&, const DataPlane&,
                           const double*, const double*,
                           double*, double*);
@@ -206,7 +207,7 @@ bool TCRMW_WindConverter::compute_winds_if_input_is_u(int i_point,
        << "), regrid range (" << dmin_rgd << ", " << dmax_rgd << ")\n";
 
   // Compute the radial and tangential winds and store in _windR and _windT
-  wind_ne_to_ra(tcrmw_grid, data_dp, data_dpV, lat_arr, lon_arr,
+  wind_ne_to_rt(tcrmw_grid, data_dp, data_dpV, lat_arr, lon_arr,
                 _windR, _windT);
 
   return true;
@@ -214,37 +215,33 @@ bool TCRMW_WindConverter::compute_winds_if_input_is_u(int i_point,
 
 ////////////////////////////////////////////////////////////////////////
 
-void wind_ne_to_ra(const TcrmwGrid& tcrmw_grid,
+void wind_ne_to_rt(const TcrmwGrid& tcrmw_grid,
                    const DataPlane& u_dp, const DataPlane& v_dp,
                    const double* lat_arr, const double* lon_arr,
                    double* wind_r_arr, double* wind_t_arr) {
 
-  // Transform (u, v) to (radial, azimuthal)
+  // Transform (u, v) to (radial, tangential) winds
   for(int ir = 0; ir < tcrmw_grid.range_n(); ir++) {
     for(int ia = 0; ia < tcrmw_grid.azimuth_n(); ia++) {
+
       int i = ir * tcrmw_grid.azimuth_n() + ia;
-      double lat = lat_arr[i];
-      double lon = -lon_arr[i]; // convert degrees east to west
-      double u = u_dp.data()[i];
-      double v = v_dp.data()[i];
-      double wind_r;
-      double wind_t;
-      if(is_bad_data(u) || is_bad_data(v)) {
-        mlog << Debug(4) << "wind_ne_to_ra() -> "
-             << "latlon (" << lat << "," << lon
-             << ") winds are missing\n";
-        wind_r = bad_data_double;
-        wind_t = bad_data_double;
-      } else {
-        tcrmw_grid.wind_ne_to_ra(lat, lon, u, v, wind_r, wind_t);
-        mlog << Debug(4) << "wind_ne_to_ra() -> "
-             << "latlon (" << lat << ", " << lon
-             << "), uv (" << u << ", " << v
-             << "), radial wind: " << wind_r
-             << ", tangential wind: " << wind_t << "\n";
-      }
-      wind_r_arr[i] = wind_r;
-      wind_t_arr[i] = wind_t;
+
+      double azi_deg  = ia * tcrmw_grid.azimuth_delta_deg();
+      double range_km = ir * tcrmw_grid.range_delta_km();
+
+      tcrmw_grid.wind_ne_to_rt(azi_deg, u_dp.data()[i], v_dp.data()[i],
+                               wind_r_arr[i], wind_t_arr[i]);
+
+      mlog << Debug(4) << "wind_ne_to_rt() -> "
+           << "center (" << tcrmw_grid.lat_center_deg()
+           << ", " << tcrmw_grid.lon_center_deg()
+           << "), range (km): " << range_km
+           << ", azimuth (deg): " << azi_deg
+           << ", point (" << lat_arr[i] << ", " << -lon_arr[i]
+           << "), uv (" << u_dp.data()[i] << ", " << v_dp.data()[i]
+           << "), radial wind: " << wind_r_arr[i]
+           << ", tangential wind: " << wind_t_arr[i] << "\n";
+
     } // end for ia
   } // end for ir
 
