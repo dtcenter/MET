@@ -124,6 +124,9 @@ static NcFile *nc_out  = (NcFile *) 0;
 static NcDim  lat_dim ;
 static NcDim  lon_dim ;
 
+static int adp_qc_high;     /* 3 as baseline algorithm, 0 for enterpirse algorithm */
+static int adp_qc_medium;   /* 1 as baseline algorithm, 1 for enterpirse algorithm */
+static int adp_qc_low;      /* 0 as baseline algorithm, 2 for enterpirse algorithm */
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -170,6 +173,7 @@ static void regrid_nc_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
 static bool keep_message_type(const int mt_index);
 
 static bool has_lat_lon_vars(NcFile *nc_in);
+static void set_adp_gc_values(NcVar var_adp_qc);
 
 ////////////////////////////////////////////////////////////////////////
 // for GOES 16
@@ -940,8 +944,6 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
             int valid_count = 0;
             int absent_count = 0;
             int censored_count = 0;
-            int qc_filtered_count = 0;
-            int adp_qc_filtered_count = 0;
             float data_value;
             float from_min_value =  10e10;
             float from_max_value = -10e10;
@@ -1185,7 +1187,6 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
 
 void process_point_python(string python_command, MetConfig &config, VarInfo *vinfo,
                           const Grid to_grid, bool use_xarray) {
-   int idx, hdr_idx;
    ConcatString vname, vname_cnt, vname_mask;
    DataPlane fr_dp, to_dp;
    DataPlane cnt_dp, mask_dp;
@@ -1193,8 +1194,6 @@ void process_point_python(string python_command, MetConfig &config, VarInfo *vin
    NcVar var_obs_gc, var_obs_var;
 
    clock_t start_clock =  clock();
-   bool has_prob_thresh = !prob_cat_thresh.check(bad_data_double);
-
    unixtime requested_valid_time, valid_time;
    static const char *method_name = "process_point_python() -> ";
    static const char *method_name_s = "process_point_python()";
@@ -1864,6 +1863,24 @@ void check_lat_lon(int data_size, float  *latitudes, float  *longitudes) {
 }
 
 ////////////////////////////////////////////////////////////////////////
+//              QC flags: 0=high, 1=medium, 2=low
+//   Enterpise algorithm: 0=high, 1=medium, 2=low
+//    Baseline algorithm: 3=high, 1=medium, 0=low (high=12/48, medium=4/16)
+// returns bad_data_int if it does not belong to high, mediuam, or low.
+
+int compute_adp_qc_flag(int adp_qc, int shift_bits) {
+   int particle_qc = ((adp_qc >> shift_bits) & 0x03);
+   int qc_for_flag;
+
+   if (particle_qc == adp_qc_high)        qc_for_flag = 0;
+   else if (particle_qc == adp_qc_medium) qc_for_flag = 1;
+   else if (particle_qc == adp_qc_low)    qc_for_flag = 2;
+   else qc_for_flag = bad_data_int;
+
+   return qc_for_flag;
+}
+
+////////////////////////////////////////////////////////////////////////
 
 static unixtime compute_unixtime(NcVar *time_var, unixtime var_value) {
    unixtime obs_time = bad_data_int;
@@ -2342,12 +2359,17 @@ int get_lon_count(NcFile *_nc) {
 
 static NcVar get_goes_nc_var(NcFile *nc, const ConcatString var_name,
                              bool exit_if_error) {
-   NcVar var_data = get_nc_var(nc, var_name.c_str(), false);
+   NcVar var_data;
+   static const char *method_name = "get_goes_nc_var() -> ";
+   if (has_var(nc, var_name.c_str())) var_data = get_nc_var(nc, var_name.c_str(), false);
    if (IS_INVALID_NC(var_data)) {
-       var_data = get_nc_var(nc, var_name.split("_")[0].c_str());
+      mlog << Debug(4) << method_name
+           << "The variable \"" << var_name << "\" does not exist. Find \""
+           << var_name.split("_")[0] << "\" variable\n";
+      var_data = get_nc_var(nc, var_name.split("_")[0].c_str());
    }
    if (IS_INVALID_NC(var_data)) {
-      mlog << Error << "\nget_goes_nc_var() -> "
+      mlog << Error << "\n" << method_name
            << "The variable \"" << var_name << "\" does not exist\n\n";
       if (exit_if_error) exit(1);
    }
@@ -2424,6 +2446,7 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
 
    bool has_qc_var = false;
    bool has_adp_qc_var = false;
+   const int log_debug_level = 4;
    clock_t start_clock =  clock();
    int to_lat_count = to_grid.ny();
    int to_lon_count = to_grid.nx();
@@ -2442,6 +2465,10 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
 
    // -99 is arbitrary number as invalid QC value
    memset(qc_data, -99, from_data_size*sizeof(uchar));
+
+   adp_qc_high = 3;     /* 3 as baseline algorithm, 0 for enterpirse algorithm */
+   adp_qc_medium = 1;   /* 1 as baseline algorithm, 1 for enterpirse algorithm */
+   adp_qc_low = 0;      /* 0 as baseline algorithm, 2 for enterpirse algorithm */
 
    NcVar var_qc;
    NcVar var_adp;
@@ -2465,13 +2492,14 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
       else if (is_smoke_only)   var_adp = get_goes_nc_var(nc_adp, vname_smoke);
 
       if (IS_VALID_NC(var_adp)) {
-         get_nc_data(&var_adp, adp_data);
+         get_nc_data(&var_adp, adp_data, true);
 
          //Smoke:ancillary_variables = "DQF" ; ubyte DQF(y, x) ;
          if (get_att_value_string(&var_adp, (string)"ancillary_variables", qc_var_name)) {
             var_adp_qc = get_nc_var(nc_adp, qc_var_name.c_str());
             if (IS_VALID_NC(var_adp_qc)) {
                get_nc_data(&var_adp_qc, adp_qc_data);
+               set_adp_gc_values(var_adp_qc);
                has_adp_qc_var = true;
                mlog << Debug(5) << method_name << "found QC var: " << qc_var_name
                     << " for " << GET_NC_NAME(var_adp) << ".\n";
@@ -2521,7 +2549,6 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
    int non_missing_count = 0;
    int qc_filtered_count = 0;
    int adp_qc_filtered_count = 0;
-   float data_value;
    float from_min_value =  10e10;
    float from_max_value = -10e10;
    float qc_min_value =  10e10;
@@ -2534,6 +2561,18 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
    missing_count = non_missing_count = 0;
    to_dp.set_constant(bad_data_double);
 
+   int shift_bits = 2;
+   if (is_dust_only) shift_bits += 2;
+
+   int cnt_aod_qc_low = 0;
+   int cnt_aod_qc_high = 0;
+   int cnt_aod_qc_medium = 0;
+   int cnt_aod_qc_nr = 0;   // no_retrieval_qf
+   int cnt_adp_qc_low = 0;
+   int cnt_adp_qc_high = 0;
+   int cnt_adp_qc_medium = 0;
+   int cnt_adp_qc_nr = 0;   // no_retrieval_qf
+   int cnt_adp_qc_adjused = 0;
    for (int xIdx=0; xIdx<to_lon_count; xIdx++) {
       for (int yIdx=0; yIdx<to_lat_count; yIdx++) {
          int offset = to_dp.two_to_one(xIdx,yIdx);
@@ -2544,7 +2583,7 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
             dataArray.extend(cellArray.n());
             for (int dIdx=0; dIdx<cellArray.n(); dIdx++) {
                from_index = cellArray[dIdx];
-               data_value = from_data[from_index];
+               float data_value = from_data[from_index];
                if (is_bad_data(data_value)) {
                   missing_count++;
                   continue;
@@ -2556,42 +2595,71 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
                   if (from_max_value < data_value) from_max_value = data_value;
                }
 
+               // Apply censor threshold
+               for(int i=0; i<vinfo->censor_thresh().n(); i++) {
+                  // Break out after the first match.
+                  if(vinfo->censor_thresh()[i].check(data_value)) {
+                     data_value = vinfo->censor_val()[i];
+                     censored_count++;
+                     break;
+                  }
+               }
+
+               // Check the data existance (always 1 if ADP variable does not exist)
+               if (0 == adp_data[from_index]) {
+                  absent_count++;
+                  continue;
+               }
+
                // Filter by QC flag
-               qc_value = qc_data[from_index];
-               if (!has_qc_var || !has_qc_flags || qc_flags.has(qc_value)) {
-                  for(int i=0; i<vinfo->censor_thresh().n(); i++) {
-                     // Break out after the first match.
-                     if(vinfo->censor_thresh()[i].check(data_value)) {
-                        data_value = vinfo->censor_val()[i];
-                        censored_count++;
-                        break;
+               if (has_qc_var || has_adp_qc_var) {
+                  qc_value = qc_data[from_index];
+                  if (mlog.verbosity_level() >= log_debug_level) {
+                     if (qc_min_value > qc_value) qc_min_value = qc_value;
+                     if (qc_max_value < qc_value) qc_max_value = qc_value;
+                     switch (qc_value) {
+                        case 0: cnt_aod_qc_high++;     break;
+                        case 1: cnt_aod_qc_medium++;   break;
+                        case 2: cnt_aod_qc_low++;      break;
+                        default: cnt_aod_qc_nr++;      break;
                      }
                   }
-                  if (0 == adp_data[from_index]) {
-                     absent_count++;
-                     continue;
-                  }
+                  if (has_adp_qc_var) {
+                     int qc_for_flag = compute_adp_qc_flag(adp_qc_data[from_index], shift_bits);
+                     bool filter_out = is_eq(qc_for_flag, bad_data_int);
 
-                  if (has_adp_qc_var && has_qc_flags) {
-                     int shift_bits = 2;
-                     if (is_dust_only) shift_bits += 2;
-                     particle_qc = ((adp_qc_data[from_index] >> shift_bits) & 0x03);
-                     int qc_for_flag = 3 - particle_qc; // high = 3, qc_flag for high = 0
-                     if (!qc_flags.has(qc_for_flag)) {
+                     if (mlog.verbosity_level() >= log_debug_level) {
+                        switch (qc_for_flag) {
+                           case 0:  cnt_adp_qc_high++;      break;
+                           case 1:  cnt_adp_qc_medium++;    break;
+                           case 2:  cnt_adp_qc_low++;       break;
+                           default: cnt_adp_qc_nr++;        break;
+                        }
+                     }
+
+                     if (!filter_out) {
+                        /* Adjust the quality by AOD data QC */
+                        if (1 == qc_value && 0 == qc_for_flag) {
+                           qc_for_flag = 1;         /* high to medium quality */
+                           cnt_adp_qc_adjused++;
+                        }
+                        else if (2 == qc_value) {
+                           qc_for_flag = 2;         /* high/medium to low quality */
+                           cnt_adp_qc_adjused++;
+                        }
+                        if (has_qc_flags && !qc_flags.has(qc_for_flag)) filter_out = true;
+                     }
+                     if (filter_out) {
                         adp_qc_filtered_count++;
                         continue;
                      }
                   }
-
-                  dataArray.add(data_value);
-                  if (mlog.verbosity_level() >= 4) {
-                     if (qc_min_value > qc_value) qc_min_value = qc_value;
-                     if (qc_max_value < qc_value) qc_max_value = qc_value;
+                  else if (has_qc_var && has_qc_flags && !qc_flags.has(qc_value)) {
+                     qc_filtered_count++;
+                     continue;
                   }
                }
-               else {
-                  qc_filtered_count++;
-               }
+               dataArray.add(data_value);
                valid_count++;
             }
 
@@ -2618,7 +2686,6 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
                     << data_count << " data values.\n";
             }
          }
-         else {}
       }
    }
 
@@ -2627,14 +2694,20 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
    delete [] from_data;
    delete [] adp_qc_data;
 
-   mlog << Debug(4) << method_name << "Count: actual: " << to_cell_count
+   mlog << Debug(log_debug_level) << method_name << "Count: actual: " << to_cell_count
         << ", missing: " << missing_count << ", non_missing: " << non_missing_count
-        << "\n\tFiltered: by QC: " << qc_filtered_count
+        << "\n   Filtered: by QC: " << qc_filtered_count
         << ", by adp QC: " << adp_qc_filtered_count
         << ", by absent: " << absent_count
         << ", total: " << (qc_filtered_count + adp_qc_filtered_count + absent_count)
-        << "\n\tRange:  data: [" << from_min_value << " - " << from_max_value
-        << "]  QC: [" << qc_min_value << " - " << qc_max_value << "]\n";
+        << "\n   Range:  data: [" << from_min_value << " - " << from_max_value
+        << "]  QC: [" << qc_min_value << " - " << qc_max_value << "]"
+        << "\n   AOD QC: high=" << cnt_aod_qc_high
+        << " medium=" << cnt_aod_qc_medium << ", low=" << cnt_aod_qc_low
+        << ", no_retrieval=" << cnt_aod_qc_nr
+        << "\n   ADP QC: high=" << cnt_adp_qc_high << " medium=" << cnt_adp_qc_medium
+        << ", low=" << cnt_adp_qc_low << ", no_retrieval=" << cnt_adp_qc_nr
+        << ", adjusted=" << cnt_adp_qc_adjused << "\n";
 
    if (to_cell_count == 0) {
       mlog << Warning << "\n" << method_name
@@ -2833,6 +2906,38 @@ void usage() {
         << "\t\t\"-compress level\" overrides the compression level of NetCDF variable (optional).\n\n" << flush;
 
    exit(1);
+}
+
+////////////////////////////////////////////////////////////////////////
+const static ConcatString att_name_values = "flag_values";
+const static ConcatString att_name_meanings = "flag_meanings";
+
+void set_adp_gc_values(NcVar var_adp_qc) {
+   ConcatString att_flag_meanings;
+
+   if (get_nc_att_value(&var_adp_qc, (ConcatString)"flag_meanings", att_flag_meanings)) {
+      StringArray flag_meanings = to_lower(att_flag_meanings).split(" ");
+      unsigned short flag_values[256];
+      for (int i=0; i<flag_meanings.n(); i++) flag_values[i] = (unsigned short)-1;
+
+      if (get_nc_att_values(&var_adp_qc, att_name_values, flag_values)) {
+         int idx;
+         StringArray flag_meanings = to_lower(att_flag_meanings).split(" ");
+         if (flag_meanings.has("low_confidence_smoke_detection_qf", idx)) {
+            adp_qc_low = (flag_values[idx] >> 2) & 0x03;
+         }
+         if (flag_meanings.has("medium_confidence_smoke_detection_qf", idx)) {
+            adp_qc_medium = (flag_values[idx] >> 2) & 0x03;
+         }
+         if (flag_meanings.has("high_confidence_smoke_detection_qf", idx)) {
+            adp_qc_high = (flag_values[idx] >> 2) & 0x03;
+         }
+      }
+      mlog << Debug(4) << "set_adp_gc_values() "
+           << " high_confidence = "  << adp_qc_high
+           << ", medium_confidence = " << adp_qc_medium
+           << ", low_confidence = " << adp_qc_low << "\n";
+   }
 }
 
 ////////////////////////////////////////////////////////////////////////
