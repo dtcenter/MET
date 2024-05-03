@@ -2722,7 +2722,7 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
         << ", high to low=" << cnt_adp_qc_high_to_low
         << ", medium to low=" << cnt_adp_qc_medium_to_low
         << ", total=" << cnt_adjused_total
-		<< "\n";
+        << "\n";
 
 
    if (to_cell_count == 0) {
