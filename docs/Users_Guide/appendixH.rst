@@ -7,7 +7,7 @@ Appendix H Unstructured Grids
 Introduction
 ============
 
-METv12.0.0+ includes limited support for using datasets on unstructured grids (UGRIDs) in the PointStat and GridStat tools. This support includes verifying UGRID forecasts against point observations (PointStat), and verifying UGRID forecasts regridded to a structured grid against gridded observations on a structured grid (GridStat). The implementation of UGRID support in METv12.0.0+ provides a mechanism for a user to describe the topology of their unstructured grid. Thus far, development to support datasets on unstructured grids has been driven by the LFRic (“elfrick”) NWP model (:ref:`Adams et al. 2019 <Adams-2019>`), and the Model for Prediction Across Scales (MPAS) NWP model (:ref:`Skamarock et al., 2012 <Skamarock-2012>`). However, the support for unstructured grids was implemented in such a way that additional unstructured grids can be utilized, with the appropriate mapping of the users topology to the elements that MET requires.
+METv12.0.0+ includes limited support for using datasets on unstructured grids (UGRIDs) in the PointStat and GridStat tools. This support includes verifying UGRID forecasts against point observations (PointStat), and verifying UGRID forecasts regridded to a structured grid against gridded observations on a structured grid (GridStat). The implementation of UGRID support in METv12.0.0+ provides a mechanism for a user to describe the topology of their unstructured grid. Thus far, development to support datasets on unstructured grids has been driven by the LFRic (“elfrick”) NWP model (:ref:`Adams et al. 2019 <Adams-2019>`), and the Model for Prediction Across Scales (MPAS) NWP model (:ref:`Skamarock et al., 2012 <Skamarock-2012>`). However, the support for unstructured grids was implemented in such a way that additional unstructured grids can be utilized, with the appropriate mapping of the user's topology to the elements that MET requires.
 
 Unstructured Grid Files
 =======================
@@ -17,7 +17,7 @@ Support for UGRID files in NetCDF format is provided. MET will attempt to auto-d
 Required Unstructured Grid Metadata
 ===================================
 
-To correctly parse the UGRID topology, MET needs the following information that must be contained within the UGRID coordinates file or the UGRID data file. It is often the case that the variable names for these elements differ between UGRIDs. If the user is not using one of the supported UGRIDs, they will need to define the **ugrid_metadata_map** in a custom configuration file that they provide on the command line using the **-ugrid_config** command line argument, which tells MET the variable names the correspond to the following elements:
+To correctly parse the UGRID topology, MET needs the following information that must be contained within the UGRID coordinates file or the UGRID data file. It is often the case that the variable names for these elements differ between UGRIDs. If the user is not using one of the supported UGRIDs, they will need to define the **ugrid_metadata_map** in a custom configuration file that they provide on the command line using the **-ugrid_config** command line argument, which tells MET the variable names that correspond to the following elements:
 
 .. _table_ugrid_metadata:
 
@@ -53,7 +53,7 @@ To correctly parse the UGRID topology, MET needs the following information that 
 Unstructured Grid Configuration Entries
 =======================================
 
-In the PointStat and GridStat config files, a user can control aspects of the UGRID capability. Since the UGRID support in MET is optional, these items are not included in the default MET config files. If the user requires modification for any of these, they must add them to their MET config file.
+In the PointStat and GridStat config files, a user can control aspects of the UGRID capability. Since the UGRID support in MET is optional, these items are not included in the default MET config files. If the user requires modification for any of the following, they must add them to their MET config file.
 
 ugrid_dataset
 -------------
@@ -63,7 +63,7 @@ If the UGRID dataset is supported by MET, then this item is set to the string id
 ugrid_max_distance_km
 ---------------------
 
-For PointStat, this is the distance from each UGRID cell center that PointStat will search outward to collect observations to use for verification. The default is 0 km, which by default will use the closest observation to the UGRID cell for verification. For GridStat, this is the distance from each UGRID forecast cell center to search for observation grid cells to include when interpolating to the UGRID forecast cell locations. Currently, only the nearest point observation or gridded observation cell is used.
+For PointStat, this is the distance from each UGRID cell center that PointStat will search outward to collect observations to use for verification. The default is 0 km, which by default will use the closest observation to the UGRID cell for verification. For GridStat, this is the distance from each forecast grid point to search for observation grid cells to include when interpolating to the forecast grid point locations. Currently, only the nearest point observation or gridded observation cell is used. See `Unstructured Grid Limitations`_ for additional details about interpolation when using GridStat.
 
 ugrid_coordinates_file
 ----------------------
@@ -73,7 +73,7 @@ The absolute path to the ancillary NetCDF file that describes the UGRID topology
 ugrid_metadata_map
 ------------------
 
-The mapping dictionary which allows a user to specify the variable names of the required UGRID topology elements that are required by MET. For "lfric" and "mpas", **ugrid_metadata_map** comes pre-configured with MET and a user can simply set **ugrid_dataset**. Otherwise, the user must create a separate UGRID configuration file containing **ugrid_metadata_map** and provide it on the command line using the **-ugrid_config** command line argument.
+The mapping dictionary which allows a user to specify the variable names of the required UGRID topology elements that are required by MET. For "lfric" and "mpas", **ugrid_metadata_map** comes pre-configured with MET and a user can simply set **ugrid_dataset**. Otherwise, the user must create a separate UGRID configuration file containing the **ugrid_metadata_map** containing the elements from table_ugrid_metadata_ and provide it on the command line using the **-ugrid_config** command line argument.
 
 Unstructured Grid Limitations
 =============================
