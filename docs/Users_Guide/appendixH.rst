@@ -73,7 +73,7 @@ The absolute path to the ancillary NetCDF file that describes the UGRID topology
 ugrid_metadata_map
 ------------------
 
-The mapping dictionary which allows a user to specify the variable names of the required UGRID topology elements that are required by MET. For "lfric" and "mpas", **ugrid_metadata_map** comes pre-configured with MET and a user can simply set **ugrid_dataset**. Otherwise, the user must create a separate UGRID configuration file containing the **ugrid_metadata_map** containing the elements from table_ugrid_metadata_ and provide it on the command line using the **-ugrid_config** command line argument.
+The mapping dictionary which allows a user to specify the variable names of the required UGRID topology elements that are required by MET. For "lfric" and "mpas", **ugrid_metadata_map** comes pre-configured with MET and a user can simply set **ugrid_dataset**. Otherwise, the user must create a separate UGRID configuration file containing the **ugrid_metadata_map** containing the elements from :numref:`table_ugrid_metadata` and provide it on the command line using the **-ugrid_config** command line argument.
 
 Unstructured Grid Limitations
 =============================
