@@ -31,7 +31,6 @@ using namespace std;
 
 static void wind_ne_to_rt(const TcrmwGrid&,
                           const DataPlane&, const DataPlane&,
-                          const double*, const double*,
                           double*, double*);
 
 ////////////////////////////////////////////////////////////////////////
@@ -169,11 +168,9 @@ bool TCRMW_WindConverter::compute_winds_if_input_is_u(int i_point,
                                                       unixtime valid_time,
                                                       const StringArray &data_files,
                                                       const GrdFileType &ftype,
-                                                      const Grid &latlon_arr,
-                                                      const double *lat_arr,
-                                                      const double *lon_arr,
-                                                      const Grid &grid,
-                                                      const DataPlane &data_dp,
+                                                      const Grid &grid_in,
+                                                      const Grid &grid_out,
+                                                      const DataPlane &u_wind_dp,
                                                       const TcrmwGrid &tcrmw_grid) {
   if (!_computeWinds) {
     return false;
@@ -181,34 +178,33 @@ bool TCRMW_WindConverter::compute_winds_if_input_is_u(int i_point,
 
   int uIndex = -1;
   int vIndex = -1;
-  VarInfo *data_infoV = (VarInfo *) 0;
+  VarInfo *v_wind_info = (VarInfo *) 0;
   if (varName == _conf->u_wind_field_name.string()) {
     uIndex = _uIndexMap[varLevel];
     vIndex = _vIndexMap[varLevel];
-    data_infoV = _conf->data_info[vIndex];
-    data_infoV->set_valid(valid_time);
+    v_wind_info = _conf->data_info[vIndex];
+    v_wind_info->set_valid(valid_time);
   }
   else {
     // not the U input
     return false;
   }
 
-  DataPlane data_dpV;
-  Grid latlon_arrV;
-  get_series_entry(i_point, data_infoV, data_files, ftype,
-                   data_dpV, latlon_arrV);
+  DataPlane v_wind_dp;
+  Grid v_wind_grid;
+  get_series_entry(i_point, v_wind_info, data_files, ftype,
+                   v_wind_dp, v_wind_grid);
   double dmin, dmax, dmin_rgd, dmax_rgd;
-  data_dpV.data_range(dmin, dmax);
-  data_dpV = met_regrid(data_dpV, latlon_arr, grid, data_infoV->regrid());
-  data_dpV.data_range(dmin_rgd, dmax_rgd);
+  v_wind_dp.data_range(dmin, dmax);
+  v_wind_dp = met_regrid(v_wind_dp, v_wind_grid, grid_out, v_wind_info->regrid());
+  v_wind_dp.data_range(dmin_rgd, dmax_rgd);
 
-  mlog << Debug(4) << data_infoV->magic_str()
+  mlog << Debug(4) << v_wind_info->magic_str()
        << " input range (" << dmin << ", " << dmax
        << "), regrid range (" << dmin_rgd << ", " << dmax_rgd << ")\n";
 
   // Compute the radial and tangential winds and store in _windR and _windT
-  wind_ne_to_rt(tcrmw_grid, data_dp, data_dpV, lat_arr, lon_arr,
-                _windR, _windT);
+  wind_ne_to_rt(tcrmw_grid, u_wind_dp, v_wind_dp, _windR, _windT);
 
   return true;
 }
@@ -217,31 +213,36 @@ bool TCRMW_WindConverter::compute_winds_if_input_is_u(int i_point,
 
 void wind_ne_to_rt(const TcrmwGrid& tcrmw_grid,
                    const DataPlane& u_dp, const DataPlane& v_dp,
-                   const double* lat_arr, const double* lon_arr,
                    double* wind_r_arr, double* wind_t_arr) {
 
-  // Transform (u, v) to (radial, tangential) winds
-  for(int ir = 0; ir < tcrmw_grid.range_n(); ir++) {
-    for(int ia = 0; ia < tcrmw_grid.azimuth_n(); ia++) {
+  int n_rng = tcrmw_grid.range_n();
+  int n_azi = tcrmw_grid.azimuth_n(); 
 
-      int i = ir * tcrmw_grid.azimuth_n() + ia;
+  // Transform (u, v) to (radial, tangential) winds
+  for(int ir = 0; ir < n_rng; ir++) {
+    for(int ia = 0; ia < n_azi; ia++) {
+
+      // Store data in reverse order
+      int i_rev = (n_rng - ir - 1) * n_azi + ia;
 
       double azi_deg  = ia * tcrmw_grid.azimuth_delta_deg();
       double range_km = ir * tcrmw_grid.range_delta_km();
 
-      tcrmw_grid.wind_ne_to_rt(azi_deg, u_dp.data()[i], v_dp.data()[i],
-                               wind_r_arr[i], wind_t_arr[i]);
+      double lat, lon;
+      tcrmw_grid.range_azi_to_latlon(range_km, azi_deg, lat, lon);
+
+      tcrmw_grid.wind_ne_to_rt(azi_deg, u_dp.data()[i_rev], v_dp.data()[i_rev],
+                               wind_r_arr[i_rev], wind_t_arr[i_rev]);
 
       mlog << Debug(4) << "wind_ne_to_rt() -> "
-           << "center (" << tcrmw_grid.lat_center_deg()
+           << "center lat/lon (" << tcrmw_grid.lat_center_deg()
            << ", " << tcrmw_grid.lon_center_deg()
            << "), range (km): " << range_km
            << ", azimuth (deg): " << azi_deg
-           << ", point (" << lat_arr[i] << ", " << -lon_arr[i]
-           << "), uv (" << u_dp.data()[i] << ", " << v_dp.data()[i]
-           << "), radial wind: " << wind_r_arr[i]
-           << ", tangential wind: " << wind_t_arr[i] << "\n";
-
+           << ", point lat/lon (" << lat << ", " << lon
+           << "), uv (" << u_dp.data()[i_rev] << ", " << v_dp.data()[i_rev]
+           << "), radial wind: " << wind_r_arr[i_rev]
+           << ", tangential wind: " << wind_t_arr[i_rev] << "\n";
     } // end for ia
   } // end for ir
 

@@ -113,11 +113,9 @@ class TCRMW_WindConverter {
                                    unixtime valid_time,
                                    const StringArray &data_files,
                                    const GrdFileType &ftype,
-                                   const Grid &latlon_arr,
-                                   const double *lat_arr,
-                                   const double *lon_arr,
-                                   const Grid &grid,
-                                   const DataPlane &data_dp,
+                                   const Grid &grid_in,
+                                   const Grid &grid_out,
+                                   const DataPlane &u_wind_dp,
                                    const TcrmwGrid &tcrmw_grid);
 };
 
