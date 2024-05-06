@@ -2572,7 +2572,9 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
    int cnt_adp_qc_high = 0;
    int cnt_adp_qc_medium = 0;
    int cnt_adp_qc_nr = 0;   // no_retrieval_qf
-   int cnt_adp_qc_adjused = 0;
+   int cnt_adp_qc_high_to_low = 0;
+   int cnt_adp_qc_high_to_medium = 0;
+   int cnt_adp_qc_medium_to_low = 0;
    for (int xIdx=0; xIdx<to_lon_count; xIdx++) {
       for (int yIdx=0; yIdx<to_lat_count; yIdx++) {
          int offset = to_dp.two_to_one(xIdx,yIdx);
@@ -2639,13 +2641,16 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
 
                      if (!filter_out) {
                         /* Adjust the quality by AOD data QC */
-                        if (1 == qc_value && 0 == qc_for_flag) {
-                           qc_for_flag = 1;         /* high to medium quality */
-                           cnt_adp_qc_adjused++;
+                        if (2 == qc_value) {
+                           if (2 > qc_for_flag) {
+                              if (0 == qc_for_flag) cnt_adp_qc_high_to_low++;
+                              else if (1 == qc_for_flag) cnt_adp_qc_medium_to_low++;
+                              qc_for_flag = 2;         /* high/medium to low quality */
+                           }
                         }
-                        else if (2 == qc_value) {
-                           qc_for_flag = 2;         /* high/medium to low quality */
-                           cnt_adp_qc_adjused++;
+                        else if (1 == qc_value && 0 == qc_for_flag) {
+                           qc_for_flag = 1;         /* high to medium quality */
+                           cnt_adp_qc_high_to_medium++;
                         }
                         if (has_qc_flags && !qc_flags.has(qc_for_flag)) filter_out = true;
                      }
@@ -2694,6 +2699,10 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
    delete [] from_data;
    delete [] adp_qc_data;
 
+   int cnt_adjused_low = cnt_adp_qc_low + cnt_adp_qc_high_to_low + cnt_adp_qc_medium_to_low;
+   int cnt_adjused_high = cnt_adp_qc_high - cnt_adp_qc_high_to_medium - cnt_adp_qc_high_to_low;
+   int cnt_adjused_medium = cnt_adp_qc_medium + cnt_adp_qc_high_to_medium - cnt_adp_qc_medium_to_low;
+   int cnt_adjused_total = cnt_adp_qc_high_to_medium + cnt_adp_qc_high_to_low + cnt_adp_qc_medium_to_low;
    mlog << Debug(log_debug_level) << method_name << "Count: actual: " << to_cell_count
         << ", missing: " << missing_count << ", non_missing: " << non_missing_count
         << "\n   Filtered: by QC: " << qc_filtered_count
@@ -2705,9 +2714,16 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
         << "\n   AOD QC: high=" << cnt_aod_qc_high
         << " medium=" << cnt_aod_qc_medium << ", low=" << cnt_aod_qc_low
         << ", no_retrieval=" << cnt_aod_qc_nr
-        << "\n   ADP QC: high=" << cnt_adp_qc_high << " medium=" << cnt_adp_qc_medium
-        << ", low=" << cnt_adp_qc_low << ", no_retrieval=" << cnt_adp_qc_nr
-        << ", adjusted=" << cnt_adp_qc_adjused << "\n";
+        << "\n   ADP QC: high=" << cnt_adjused_high << " (" << cnt_adp_qc_high
+    	<< "), medium=" << cnt_adjused_medium  << " (" << cnt_adp_qc_medium
+    	<< "), low=" << cnt_adjused_low << " (" << cnt_adp_qc_low
+    	<< "), no_retrieval=" << cnt_adp_qc_nr
+        << "\n   adjusted: high to medium=" << cnt_adp_qc_high_to_medium
+        << ", high to low=" << cnt_adp_qc_high_to_low
+        << ", medium to low=" << cnt_adp_qc_medium_to_low
+        << ", total=" << cnt_adjused_total
+        << "\n";
+
 
    if (to_cell_count == 0) {
       mlog << Warning << "\n" << method_name
