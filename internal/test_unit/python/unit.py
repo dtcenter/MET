@@ -56,17 +56,16 @@ def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, ca
     if test_root.getroot().tag != 'met_test':
         logger.error(f"ERROR: unexpected top-level element. Expected 'met_test', got '{test_root.tag}'")
         sys.exit(1)
-    else:
-        # read test_dir
-        try:
-            test_dir = test_root.find('test_dir').text
-            mgnc = repl_env(test_dir + '/bin/mgnc.sh')
-            mpnc = repl_env(test_dir + '/bin/mpnc.sh')
-        except Exception as e:
-            logger.warning(f"WARNING: unable to read test_dir from {test_xml}")
-            pass
+    # read test_dir
+    try:
+        test_dir = test_root.find('test_dir').text
+        mgnc = repl_env(test_dir + '/bin/mgnc.sh')
+        mpnc = repl_env(test_dir + '/bin/mpnc.sh')
+    except Exception as e:
+        logger.warning(f"WARNING: unable to read test_dir from {test_xml}")
+        pass
 
-        tests = build_tests(test_root)
+    tests = build_tests(test_root)
 
     # determine the max length of the test names
     #   not used, unless format of test result display is changed
@@ -105,9 +104,8 @@ def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, ca
                 set_envs.append(set_cmd)
 
     #   # build the text command
-        cmd = test['exec'] + test['param']
-        cmd = re.sub('[ \n\t]+$', '', cmd)  # not sure this is doing what it should;
-                                            #  may need to remove the +$ from the regex?
+        cmd = (test['exec'] + test['param']).strip()
+
         if memchk:
             cmd = f"valgrind {VALGRIND_OPT_MEM} {cmd}"
         elif callchk:
@@ -266,7 +264,6 @@ def build_tests(test_root):
         except KeyError:
             logger.error("ERROR: name attribute not found for test")
             raise
-            # should just fail this one test and not fully exit?
 
         for el in test_el:
             if (el.tag=='exec' or el.tag=='param'):
@@ -299,8 +296,7 @@ def build_tests(test_root):
                             env_dict[env_name] = ''
                     except AttributeError:
                         logger.error(f"ERROR: env pair in test \\{test['name']}\\ missing name or value")
-                        raise
-                        # should just fail this one test and not fully exit?                      
+                        raise                
 
                 test['env'] = env_dict
 
