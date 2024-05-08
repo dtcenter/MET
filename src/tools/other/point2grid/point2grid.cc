@@ -130,6 +130,14 @@ static int adp_qc_high;     /* 3 as baseline algorithm, 0 for enterpirse algorit
 static int adp_qc_medium;   /* 1 as baseline algorithm, 1 for enterpirse algorithm */
 static int adp_qc_low;      /* 0 as baseline algorithm, 2 for enterpirse algorithm */
 
+static const int MET_ADP_QC_HIGH = 0;
+static const int MET_ADP_QC_MEDIUM = 1;
+static const int MET_ADP_QC_LOW = 2;
+static const int MET_ADP_QC_NA = bad_data_int;
+
+static const ConcatString att_name_values = "flag_values";
+static const ConcatString att_name_meanings = "flag_meanings";
+
 ////////////////////////////////////////////////////////////////////////
 
 static void process_command_line(int, char **);
@@ -1874,10 +1882,10 @@ int compute_adp_qc_flag(int adp_qc, int shift_bits) {
    int particle_qc = ((adp_qc >> shift_bits) & 0x03);
    int qc_for_flag;
 
-   if (particle_qc == adp_qc_high)        qc_for_flag = 0;
-   else if (particle_qc == adp_qc_medium) qc_for_flag = 1;
-   else if (particle_qc == adp_qc_low)    qc_for_flag = 2;
-   else qc_for_flag = bad_data_int;
+   if (particle_qc == adp_qc_high)        qc_for_flag = MET_ADP_QC_HIGH;
+   else if (particle_qc == adp_qc_medium) qc_for_flag = MET_ADP_QC_MEDIUM;
+   else if (particle_qc == adp_qc_low)    qc_for_flag = MET_ADP_QC_LOW;
+   else qc_for_flag = MET_ADP_QC_NA;
 
    return qc_for_flag;
 }
@@ -2369,7 +2377,7 @@ static NcVar get_goes_nc_var(NcFile *nc, const ConcatString var_name,
       mlog << Debug(4) << method_name
            << "The variable \"" << var_name << "\" does not exist. Find \""
            << var_name.split("_")[0] << "\" variable\n";
-       var_data = get_nc_var(nc, var_name.split("_")[0].c_str());
+      var_data = get_nc_var(nc, var_name.split("_")[0].c_str());
    }
    if (IS_INVALID_NC(var_data)) {
       mlog << Error << "\n" << method_name
@@ -2447,9 +2455,9 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
       DataPlane &fr_dp, DataPlane &to_dp,
       Grid fr_grid, Grid to_grid, IntArray *cellMapping, NcFile *nc_adp) {
 
-   const int log_debug_level = 4;
    bool has_qc_var = false;
    bool has_adp_qc_var = false;
+   const int log_debug_level = 4;
    clock_t start_clock =  clock();
    int to_lat_count = to_grid.ny();
    int to_lon_count = to_grid.nx();
@@ -2502,10 +2510,10 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
             var_adp_qc = get_nc_var(nc_adp, qc_var_name.c_str());
             if (IS_VALID_NC(var_adp_qc)) {
                get_nc_data(&var_adp_qc, adp_qc_data);
+               set_adp_gc_values(var_adp_qc);
                has_adp_qc_var = true;
                mlog << Debug(5) << method_name << "found QC var: " << qc_var_name
                     << " for " << GET_NC_NAME(var_adp) << ".\n";
-               set_adp_gc_values(var_adp_qc);
             }
          }
          else {
@@ -2574,7 +2582,9 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
    int cnt_adp_qc_high = 0;
    int cnt_adp_qc_medium = 0;
    int cnt_adp_qc_nr = 0;   // no_retrieval_qf
-   int cnt_adp_qc_adjused = 0;
+   int cnt_adp_qc_high_to_low = 0;
+   int cnt_adp_qc_high_to_medium = 0;
+   int cnt_adp_qc_medium_to_low = 0;
    for (int xIdx=0; xIdx<to_lon_count; xIdx++) {
       for (int yIdx=0; yIdx<to_lat_count; yIdx++) {
          int offset = to_dp.two_to_one(xIdx,yIdx);
@@ -2619,9 +2629,9 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
                      if (qc_min_value > qc_value) qc_min_value = qc_value;
                      if (qc_max_value < qc_value) qc_max_value = qc_value;
                      switch (qc_value) {
-                        case 0: cnt_aod_qc_high++;     break;
-                        case 1: cnt_aod_qc_medium++;   break;
-                        case 2: cnt_aod_qc_low++;      break;
+                        case MET_ADP_QC_HIGH:   cnt_aod_qc_high++;     break;
+                        case MET_ADP_QC_MEDIUM: cnt_aod_qc_medium++;   break;
+                        case MET_ADP_QC_LOW:    cnt_aod_qc_low++;      break;
                         default: cnt_aod_qc_nr++;      break;
                      }
                   }
@@ -2631,24 +2641,26 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
 
                      if (mlog.verbosity_level() >= log_debug_level) {
                         switch (qc_for_flag) {
-                           case 0:  cnt_adp_qc_high++;      break;
-                           case 1:  cnt_adp_qc_medium++;    break;
-                           case 2:  cnt_adp_qc_low++;       break;
+                           case MET_ADP_QC_HIGH:    cnt_adp_qc_high++;      break;
+                           case MET_ADP_QC_MEDIUM:  cnt_adp_qc_medium++;    break;
+                           case MET_ADP_QC_LOW:     cnt_adp_qc_low++;       break;
                            default: cnt_adp_qc_nr++;        break;
                         }
                      }
 
                      if (!filter_out) {
                         /* Adjust the quality by AOD data QC */
-                        if (1 == qc_value && 0 == qc_for_flag) {
-                           qc_for_flag = 1;         /* high to medium quality */
-                           cnt_adp_qc_adjused++;
+                        if (MET_ADP_QC_LOW == qc_value) {
+                           if (MET_ADP_QC_LOW > qc_for_flag) {
+                              if (MET_ADP_QC_HIGH == qc_for_flag) cnt_adp_qc_high_to_low++;
+                              else if (MET_ADP_QC_MEDIUM == qc_for_flag) cnt_adp_qc_medium_to_low++;
+                              qc_for_flag = MET_ADP_QC_LOW; /* high/medium to low quality */
+                           }
                         }
-                        else if (2 == qc_value) {
-                           qc_for_flag = 2;         /* high/medium to low quality */
-                           cnt_adp_qc_adjused++;
+                        else if (MET_ADP_QC_MEDIUM == qc_value && MET_ADP_QC_HIGH == qc_for_flag) {
+                           qc_for_flag = MET_ADP_QC_MEDIUM; /* high to medium quality */
+                           cnt_adp_qc_high_to_medium++;
                         }
-
                         if (has_qc_flags && !qc_flags.has(qc_for_flag)) filter_out = true;
                      }
                      if (filter_out) {
@@ -2696,6 +2708,11 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
    delete [] from_data;
    delete [] adp_qc_data;
 
+   int cnt_adjused_low = cnt_adp_qc_low + cnt_adp_qc_high_to_low + cnt_adp_qc_medium_to_low;
+   int cnt_adjused_high = cnt_adp_qc_high - cnt_adp_qc_high_to_medium - cnt_adp_qc_high_to_low;
+   int cnt_adjused_medium = cnt_adp_qc_medium + cnt_adp_qc_high_to_medium - cnt_adp_qc_medium_to_low;
+   int cnt_adjused_total = cnt_adp_qc_high_to_medium + cnt_adp_qc_high_to_low + cnt_adp_qc_medium_to_low;
+
    mlog << Debug(log_debug_level) << method_name << "Count: actual: " << to_cell_count
         << ", missing: " << missing_count << ", non_missing: " << non_missing_count
         << "\n   Filtered: by QC: " << qc_filtered_count
@@ -2704,12 +2721,15 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
         << ", total: " << (qc_filtered_count + adp_qc_filtered_count + absent_count)
         << "\n   Range:  data: [" << from_min_value << " - " << from_max_value
         << "]  QC: [" << qc_min_value << " - " << qc_max_value << "]"
-        << "\n   AOD QC: high=" << cnt_aod_qc_high
-        << " medium=" << cnt_aod_qc_medium << ", low=" << cnt_aod_qc_low
-        << ", no_retrieval=" << cnt_aod_qc_nr
-        << "\n   ADP QC: high=" << cnt_adp_qc_high << " medium=" << cnt_adp_qc_medium
-        << ", low=" << cnt_adp_qc_low << ", no_retrieval=" << cnt_adp_qc_nr
-        << ", adjusted=" << cnt_adp_qc_adjused << "\n";
+        << "\n   ADP QC: high=" << cnt_adjused_high << " (" << cnt_adp_qc_high
+        << "), medium=" << cnt_adjused_medium  << " (" << cnt_adp_qc_medium
+        << "), low=" << cnt_adjused_low << " (" << cnt_adp_qc_low
+        << "), no_retrieval=" << cnt_adp_qc_nr
+        << "\n   adjusted: high to medium=" << cnt_adp_qc_high_to_medium
+        << ", high to low=" << cnt_adp_qc_high_to_low
+        << ", medium to low=" << cnt_adp_qc_medium_to_low
+        << ", total=" << cnt_adjused_total
+        << "\n";
 
    if (to_cell_count == 0) {
       mlog << Warning << "\n" << method_name
@@ -2911,13 +2931,8 @@ void usage() {
 }
 
 ////////////////////////////////////////////////////////////////////////
-const static ConcatString att_name_values = "flag_values";
-const static ConcatString att_name_meanings = "flag_meanings";
 
 void set_adp_gc_values(NcVar var_adp_qc) {
-   //NcVarAtt *nc_att_values = get_nc_att(&var_adp_qc, "flag_values");
-   //NcVarAtt *nc_att_meanings = get_nc_att(&var_adp_qc, "flag_meanings");
-   //unsigned short *flag_values = new unsigned short [256];
    ConcatString att_flag_meanings;
 
    if (get_nc_att_value(&var_adp_qc, (ConcatString)"flag_meanings", att_flag_meanings)) {
