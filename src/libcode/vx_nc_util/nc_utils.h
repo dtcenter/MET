@@ -19,7 +19,7 @@
 #include <netcdf>
 
 #ifndef ncbyte
-typedef signed char ncbyte; // from ncvalues.h
+typedef signed char ncbyte; /* from ncvalues.h */
 #endif   /*  ncbyte  */
 #ifndef uchar
 typedef unsigned char uchar;
@@ -262,7 +262,6 @@ extern bool get_nc_data(netCDF::NcVar *, uchar  *data, bool allow_conversion=fal
 extern bool get_nc_data(netCDF::NcVar *, float  *data);
 extern bool get_nc_data(netCDF::NcVar *, double *data);
 extern bool get_nc_data(netCDF::NcVar *, time_t *data);
-//extern bool get_nc_data(netCDF::NcVar *, ncbyte *data);
 extern bool get_nc_data(netCDF::NcVar *, unsigned short *data);
 
 extern bool get_nc_data(netCDF::NcVar *, int    *data, const LongArray &curs);
