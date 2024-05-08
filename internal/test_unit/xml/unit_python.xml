@@ -557,6 +557,20 @@
     </output>
   </test>
 
+  <test name="python_plot_point_obs_met_nc_to_pandas">
+    <exec>&MET_BIN;/plot_point_obs</exec>
+    <param> \
+      'PYTHON_NUMPY=&MET_BASE;/python/examples/read_met_point_obs_pandas.py &OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.nc' \
+      &OUTPUT_DIR;/python/ndas.20120409.t12z.prepbufr.tm00.nr_met_nc_to_pandas.ps \
+      -data_file &DATA_DIR_MODEL;/grib2/nam/nam_2012040900_F012.grib2 \
+      -dotsize 2.0 \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/python/ndas.20120409.t12z.prepbufr.tm00.nr_met_nc_to_pandas.ps</ps>
+    </output>
+  </test>
+
   <test name="python_ensemble_stat_FILE_LIST">
     <exec>echo "&DATA_DIR_MODEL;/grib1/arw-fer-gep1/arw-fer-gep1_2012040912_F024.grib \
                 &DATA_DIR_MODEL;/grib1/arw-fer-gep5/arw-fer-gep5_2012040912_F024.grib \
