@@ -33,8 +33,9 @@ input_file = os.path.expandvars(sys.argv[1])
 print("Input File:\t" + repr(input_file))
 
 # Read MET point observation NetCDF file
-point_obs = nc_point_obs()
-if not point_obs.read_data(input_file):
+try:
+    point_obs = nc_point_obs(input_file)
+except TypeError:
     print(f"ERROR: Could not read MET point data file {input_file}")
     sys.exit(1)
 

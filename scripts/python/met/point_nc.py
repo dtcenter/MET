@@ -55,6 +55,10 @@ class met_point_nc_tools(met_point_tools):
 
 class nc_point_obs(met_point_obs):
 
+   def __init__(self, nc_filename=None):
+      if nc_filename:
+         self.read_data(nc_filename)
+
    # args should be string, list, or dictionary
    def get_nc_filename(self, args):
       nc_filename = None
@@ -70,17 +74,14 @@ class nc_point_obs(met_point_obs):
    def read_data(self, nc_filename):
       method_name = f"{self.__class__.__name__}.read_data()"
       if not nc_filename:
-         print(f"ERROR: {method_name} The input NetCDF filename is missing")
-         return False
+         raise TypeError(f"{method_name} The input NetCDF filename is missing")
       if not os.path.exists(nc_filename):
-         print(f"ERROR: {method_name} input NetCDF file ({nc_filename}) does not exist")
-         return False
+         raise TypeError(f"{method_name} input NetCDF file ({nc_filename}) does not exist")
 
       try:
-          dataset = nc.Dataset(nc_filename, 'r')
+         dataset = nc.Dataset(nc_filename, 'r')
       except OSError:
-         print(f"ERROR: {method_name} Could not open NetCDF file ({nc_filename}")
-         return False
+         raise TypeError(f"{method_name} Could not open NetCDF file ({nc_filename}")
 
       attr_name = 'use_var_id'
       use_var_id_str = dataset.getncattr(attr_name) if attr_name in dataset.ncattrs() else "false"
@@ -131,7 +132,6 @@ class nc_point_obs(met_point_obs):
          self.obs_vid = np.array(nc_var[:])
 
       self.obs_qty_table = met_point_nc_tools.get_string_array(dataset, 'obs_qty_table')
-      return True
 
    def save_ncfile(self, nc_filename):
       met_data = self.get_point_data()
