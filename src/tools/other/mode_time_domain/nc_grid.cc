@@ -11,8 +11,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -21,10 +19,12 @@ using namespace std;
 #include <cmath>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "nc_utils_local.h"
 #include "nc_grid.h"
+
+using namespace std;
+using namespace netCDF;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -71,7 +71,7 @@ bool read_nc_grid(NcFile & f, Grid & g)
    
       mlog << Error << "\n\n  read_nc_grid() -> haven't written code to parse \"" << proj << "\" grids yet!\n\n";
    
-      return ( false );
+      return false;
    
    }
 
@@ -80,7 +80,7 @@ bool read_nc_grid(NcFile & f, Grid & g)
    //  done
    //
 
-return ( status );
+return status;
 
 }
 
@@ -117,7 +117,7 @@ else {
    //  done
    //
 
-return ( false );
+return false;
 
 }
 
@@ -203,7 +203,7 @@ data.dy_km = data.d_km;
 
 g.set(data);
 
-return ( true );
+return true;
 
 }
 
@@ -281,7 +281,7 @@ data.so2_angle = 0.0;
 
 g.set(data);
 
-return ( true );
+return true;
 
 }
 
@@ -333,7 +333,7 @@ data.Nlon = string_att_as_int(f, "Nlon");
 
 g.set(data);
 
-return ( true );
+return true;
 
 }
 

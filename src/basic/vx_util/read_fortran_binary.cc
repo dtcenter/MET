@@ -7,11 +7,8 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
-
 ////////////////////////////////////////////////////////////////////////
 
-
-using namespace std;
 
 #include <iostream>
 #include <unistd.h>
@@ -25,6 +22,8 @@ using namespace std;
 #include "read_fortran_binary.h"
 #include "check_endian.h"
 #include "vx_log.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -84,9 +83,9 @@ int bytes;
 
 n_read = ::read(fd, local_buf, rec_pad_length);
 
-if ( n_read == 0 )  return ( 0LL );
+if ( n_read == 0 )  return 0LL;
 
-if ( n_read < 0 )  return ( (long long) (-1) );
+if ( n_read < 0 )  return (long long) (-1);
 
 if ( swap_endian )  shuffle(local_buf);
 
@@ -149,7 +148,7 @@ if ( rec_size_2 != rec_size_1 )  {
    //  done
    //
 
-return ( rec_size_1 );
+return rec_size_1;
 
 }
 
@@ -191,9 +190,9 @@ long long rec_size_1, rec_size_2;
 
 n_read = ::read(fd, local_buf, rec_pad_length);
 
-if ( n_read == 0 )  return ( 0LL );
+if ( n_read == 0 )  return 0LL;
 
-if ( n_read < 0 )  return ( (long long) (-1) );
+if ( n_read < 0 )  return (long long) (-1);
 
 if ( swap_endian )  shuffle(local_buf);
 
@@ -272,7 +271,7 @@ if ( rec_size_2 != rec_size_1 )  {
    //  done
    //
 
-return ( rec_size_1 );
+return rec_size_1;
 
 }
 
@@ -299,7 +298,7 @@ if ( rec_pad_length >= (int) sizeof(peek_buf) )  {
 
 n_read = read(fd, peek_buf, rec_pad_length);
 
-if ( n_read == 0 )  return ( 0LL );
+if ( n_read == 0 )  return 0LL;
 
 switch ( rec_pad_length )  {
 
@@ -335,7 +334,7 @@ if ( lseek(fd, -rec_pad_length, SEEK_CUR) < 0 )  {
    //  done
    //
 
-return ( size );
+return size;
 
 }
 
@@ -368,7 +367,7 @@ if ( rec_pad_length == 4 )  {
 }
 
 
-return ( s );
+return s;
 
 }
 
@@ -450,7 +449,7 @@ if ( lseek(fd, 0, SEEK_SET) < 0 )  {
    //  nope
    //
 
-return ( status );
+return status;
 
 }
 
@@ -518,7 +517,7 @@ if ( test_pad_len == 4 )  {
 }
 
 
-if ( (rec_size_1 + 2*test_pad_len) > ((unsigned long long) file_size) )  return ( false );
+if ( (rec_size_1 + 2*test_pad_len) > ((unsigned long long) file_size) )  return false;
 
    //
    //  lseek to the end of this data record
@@ -575,7 +574,7 @@ if ( rec_size_1 == rec_size_2 )  status = true;
    //  nope
    //
 
-return ( status );
+return status;
 
 }
 

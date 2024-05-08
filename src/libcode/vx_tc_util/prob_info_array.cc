@@ -8,8 +8,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -20,6 +18,8 @@ using namespace std;
 #include "prob_info_base.h"
 #include "prob_rirw_info.h"
 #include "prob_info_array.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -52,11 +52,11 @@ ProbInfoArray::ProbInfoArray(const ProbInfoArray & t) {
 
 ProbInfoArray & ProbInfoArray::operator=(const ProbInfoArray & t) {
 
-   if(this == &t) return(*this);
+   if(this == &t) return *this;
 
    assign(t);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -114,7 +114,7 @@ ConcatString ProbInfoArray::serialize() const {
      << "NProbRIRW = " << n_prob_rirw()
      << ", NProbGen = " << n_prob_gen();
 
-   return(s);
+   return s;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -139,7 +139,7 @@ ConcatString ProbInfoArray::serialize_r(int indent_depth) const {
       s << ProbGen[i].serialize_r(i+1, indent_depth+1);
    }
 
-   return(s);
+   return s;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -176,7 +176,7 @@ const ProbInfoBase * ProbInfoArray::operator[](int n) const {
       ptr = &ProbGen[n];
    }
 
-   return(ptr);
+   return ptr;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -190,7 +190,7 @@ ProbRIRWInfo & ProbInfoArray::prob_rirw(int n) {
       exit(1);
    }
 
-   return(ProbRIRW[n]);
+   return ProbRIRW[n];
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -204,7 +204,7 @@ ProbGenInfo & ProbInfoArray::prob_gen(int n) {
       exit(1);
    }
 
-   return(ProbGen[n]);
+   return ProbGen[n];
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -224,7 +224,7 @@ int ProbInfoArray::n_technique() const {
       }
    }
 
-   return(sa.n());
+   return sa.n();
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -238,13 +238,13 @@ bool ProbInfoArray::add(const ATCFProbLine &l, double dland, bool check_dup) {
            << "bool ProbInfoArray::add() -> "
            << "skipping probability value (" << l.prob()
            << ") outside of range (0, 100).\n";
-      return(false);
+      return false;
    }
 
    // Store based on the input line type
    switch(l.type()) {
 
-      case(ATCFLineType_ProbRI):
+      case(ATCFLineType::ProbRI):
 
          // Add line to an existing entry
          if(ProbRIRW.size()  > 0 &&
@@ -260,7 +260,7 @@ bool ProbInfoArray::add(const ATCFProbLine &l, double dland, bool check_dup) {
          }
          break;
 
-      case(ATCFLineType_ProbGN):
+      case(ATCFLineType::ProbGN):
 
          // Add line to an existing entry
          if(ProbGen.size()  > 0 &&
@@ -276,14 +276,14 @@ bool ProbInfoArray::add(const ATCFProbLine &l, double dland, bool check_dup) {
             if(gi.gen_or_dis() != "genFcst") {
                mlog << Debug(4)
                     << "bool ProbInfoArray::add() -> "
-                    << "skipping ATCF " << atcflinetype_to_string(ATCFLineType_ProbGN)
+                    << "skipping ATCF " << atcflinetype_to_string(ATCFLineType::ProbGN)
                     << " line with non-genesis probability type ("
                     << gi.gen_or_dis() << " != genFcst).\n";
             }
             else if(is_bad_data(gi.lat()) || is_bad_data(gi.lon())) {
                mlog << Debug(4)
                     << "bool ProbInfoArray::add() -> "
-                    << "skipping ATCF " << atcflinetype_to_string(ATCFLineType_ProbGN)
+                    << "skipping ATCF " << atcflinetype_to_string(ATCFLineType::ProbGN)
                     << " line with no predicted genesis location.\n";
             }
             else {
@@ -300,7 +300,7 @@ bool ProbInfoArray::add(const ATCFProbLine &l, double dland, bool check_dup) {
          status = false;
    }
 
-   return(status);
+   return status;
 }
 
 ////////////////////////////////////////////////////////////////////////

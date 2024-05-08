@@ -32,20 +32,20 @@ private:
    StringArray fcst_filenames;
    StringArray  obs_filenames;
    BoolCalc f_calc, o_calc ;
-   vector<ModeInputData> fcstInput, obsInput;
-   vector<MultiVarData *> mvdFcst, mvdObs;
-   string fcst_fof;
-   string obs_fof;
+   std::vector<ModeInputData> fcstInput, obsInput;
+   std::vector<MultiVarData *> mvdFcst, mvdObs;
+   std::string fcst_fof;
+   std::string obs_fof;
 
    void _process_command_line(const StringArray &);
-   void _read_config(const string & filename);
+   void _read_config(const std::string & filename);
    void _setup_inputs();
    void _set_output_path();
    int  _mkdir(const char *dir);
    void _simple_objects(ModeExecutive::Processing_t p, ModeDataType dtype,
-                        int j, int n_files, const string &filename,
+                        int j, int n_files, const std::string &filename,
                         const ModeInputData &input);
-   void _init_exec(ModeExecutive::Processing_t p, const string &ffile, const string &ofile);
+   void _init_exec(ModeExecutive::Processing_t p, const std::string &ffile, const std::string &ofile);
    void _superobject_mode_algorithm(const ModeSuperObject &fsuper, const ModeSuperObject &osuper);
    void _intensity_compare_mode_algorithm(const MultiVarData &mvdf, const MultiVarData &mvdo,
                                           const ModeSuperObject &fsuper, const ModeSuperObject &osuper);
@@ -55,11 +55,11 @@ private:
 public:
 
    bool do_clusters;
-   string default_out_dir;
+   std::string default_out_dir;
    ModeConfInfo config;
    ConcatString output_path;
-   string   mode_path;
-   string config_file;
+   std::string   mode_path;
+   std::string config_file;
    Grid verification_grid;
 
    MultivarFrontEnd();
@@ -75,22 +75,22 @@ public:
    static void set_verbosity (const StringArray &);
    static void set_compress  (const StringArray &);
 
-   void read_input(const string &name, int index, ModeDataType type,
+   void read_input(const std::string &name, int index, ModeDataType type,
                    GrdFileType f_t, GrdFileType other_t, int shift);
 
 
    void create_verif_grid(void);
 
    MultiVarData *create_simple_objects(ModeDataType dtype, int j, int n_files,
-                                       const string &filename, 
+                                       const std::string &filename,
                                        const ModeInputData &input);
 
    void create_intensity_comparisons(int findex, int oindex,
                                      const ModeSuperObject &fsuper,
                                      const ModeSuperObject &osuper,
                                      MultiVarData &mvdf, MultiVarData &mvdo,
-                                     const string &fcst_filename,
-                                     const string &obs_filename);
+                                     const std::string &fcst_filename,
+                                     const std::string &obs_filename);
 
    void process_superobjects(ModeSuperObject &fsuper,
                              ModeSuperObject &osuper,

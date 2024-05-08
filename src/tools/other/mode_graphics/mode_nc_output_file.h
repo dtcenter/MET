@@ -27,13 +27,13 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-enum ModeObjectField {
+enum class ModeObjectField {
 
-   mof_fcst_obj, 
-   mof_fcst_clus, 
+   fcst_obj, 
+   fcst_clus, 
 
-   mof_obs_obj, 
-   mof_obs_clus, 
+   obs_obj, 
+   obs_clus, 
 
 };
 

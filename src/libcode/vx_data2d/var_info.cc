@@ -17,8 +17,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <map>
 #include <stdlib.h>
 #include <strings.h>
@@ -28,6 +26,8 @@ using namespace std;
 #include "vx_cal.h"
 #include "vx_math.h"
 #include "vx_log.h"
+
+using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -65,11 +65,11 @@ VarInfo::VarInfo(const VarInfo &f) {
 
 VarInfo & VarInfo::operator=(const VarInfo &f) {
 
-   if ( this == &f )  return ( *this );
+   if ( this == &f )  return *this;
 
    assign(f);
 
-   return ( *this );
+   return *this;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -258,7 +258,7 @@ ConcatString VarInfo::magic_time_str() const {
       cs << ", LeadTime = " << sec_to_hhmmss(Lead);
    }
 
-   return(cs);
+   return cs;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -463,7 +463,7 @@ ConcatString VarInfo::magic_str_attr() const {
    if(lstr.nonempty() && lstr[0] != '(') mstr << "/";
    mstr << lstr;
 
-   return(mstr);
+   return mstr;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -807,7 +807,7 @@ ConcatString parse_set_attr_string(Dictionary &dict, const char *key,
       }
    }
 
-   return(cs);
+   return cs;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -822,7 +822,7 @@ int parse_set_attr_flag(Dictionary &dict, const char *key) {
       v = (int) b;
    }
 
-   return(v);
+   return v;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -985,7 +985,7 @@ bool is_req_level_match(const ConcatString &s1, const ConcatString &s2) {
    // No match if either is non-empty and they are not equal
    if((s1.nonempty() || s2.nonempty()) && !(s1 == s2)) match = false;
 
-   return(match);
+   return match;
 }
 
 ////////////////////////////////////////////////////////////////////////

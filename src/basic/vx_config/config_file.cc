@@ -119,13 +119,13 @@ assign(c);
 
 MetConfig & MetConfig::operator=(const MetConfig &s)
 {
-   if(this == &s) return(*this);
+   if(this == &s) return *this;
 
    init_from_scratch();
 
    assign(s);
 
-   return(*this);
+   return *this;
 
 }
 
@@ -622,7 +622,7 @@ void recursive_envs(string & line)
 
 {
 
-while ( 1 )  {
+while ( true )  {
 
    if ( ! replace_env(line) )  break;
 

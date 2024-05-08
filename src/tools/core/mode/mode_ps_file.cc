@@ -10,8 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -19,6 +17,8 @@ using namespace std;
 
 #include "mode_ps_file.h"
 #include "vx_plot_util.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -115,11 +115,11 @@ void ModePsFile::mpsf_init_from_scratch()
 
 {
 
-   Engine = (ModeFuzzyEngine *) 0;
+   Engine = (ModeFuzzyEngine *) nullptr;
 
-   ConfInfo = (ModeConfInfo *) 0;
+   ConfInfo = (ModeConfInfo *) nullptr;
 
-   grid = (Grid *) 0;
+   grid = (Grid *) nullptr;
 
    MetDataDir = replace_path("MET_BASE");
 
@@ -552,29 +552,29 @@ void ModePsFile::make_plot(bool isMultivarSuper)
         << ConfInfo->Obs->var_info->level_attr();
    }
 
-   plot_engine(*Engine, FOEng, s.c_str());
+   plot_engine(*Engine, EngineType::FOEng, s.c_str());
 
-   if ( (fcst_merge_flag == MergeType_Both) || (fcst_merge_flag == MergeType_Thresh) )  {
+   if ( (fcst_merge_flag == MergeType::Both) || (fcst_merge_flag == MergeType::Thresh) )  {
 
       plot_threshold_merging(*Engine, "Forecast: Threshold Merging", 1);
 
    }
 
-   if ( (fcst_merge_flag == MergeType_Both) || (fcst_merge_flag == MergeType_Engine) )  {
+   if ( (fcst_merge_flag == MergeType::Both) || (fcst_merge_flag == MergeType::Engine) )  {
 
-      plot_engine(*(Engine->fcst_engine), FFEng, "Forecast: ModeFuzzyEngine Merging");
+      plot_engine(*(Engine->fcst_engine), EngineType::FFEng, "Forecast: ModeFuzzyEngine Merging");
 
    }
 
-   if ( (obs_merge_flag == MergeType_Both) || (obs_merge_flag == MergeType_Thresh) )  {
+   if ( (obs_merge_flag == MergeType::Both) || (obs_merge_flag == MergeType::Thresh) )  {
 
       plot_threshold_merging(*Engine, "Observation: Threshold Merging", 0);
 
    }
 
-   if ( (obs_merge_flag == MergeType_Both) || (obs_merge_flag == MergeType_Engine) )  {
+   if ( (obs_merge_flag == MergeType::Both) || (obs_merge_flag == MergeType::Engine) )  {
 
-      plot_engine(*(Engine->obs_engine), OOEng, "Observation: ModeFuzzyEngine Merging");
+      plot_engine(*(Engine->obs_engine), EngineType::OOEng, "Observation: ModeFuzzyEngine Merging");
 
    }
 
@@ -633,12 +633,12 @@ void ModePsFile::plot_threshold_merging (ModeFuzzyEngine & eng, const char * tit
    if ( fcst )  {
 
       comment("threshold merging page: fcst raw");
-      render_ppm(eng, FOEng, *(eng.fcst_raw), fcst, 0);
+      render_ppm(eng, EngineType::FOEng, *(eng.fcst_raw), fcst, 0);
 
    } else {
 
       comment("threshold merging page: obs raw");
-      render_ppm(eng, FOEng, *(eng.obs_raw),  fcst, 0);
+      render_ppm(eng, EngineType::FOEng, *(eng.obs_raw),  fcst, 0);
 
    }
 
@@ -661,12 +661,12 @@ void ModePsFile::plot_threshold_merging (ModeFuzzyEngine & eng, const char * tit
    if ( fcst )  {
 
       comment("threshold merging page: fcst raw");
-      render_ppm(eng, FOEng, *(eng.fcst_split), fcst, 2);
+      render_ppm(eng, EngineType::FOEng, *(eng.fcst_split), fcst, 2);
 
    } else {
 
       comment("threshold merging page: obs split");
-      render_ppm(eng, FOEng, *(eng.obs_split),  fcst, 2);
+      render_ppm(eng, EngineType::FOEng, *(eng.obs_split),  fcst, 2);
 
    }
 
@@ -916,7 +916,7 @@ void ModePsFile::draw_colorbar(bool fcst)
    int i, n_colors;
    char label[max_str_len];
    double bar_width, bar_height, x_ll, y_ll;
-   ColorTable * ct = (ColorTable *) 0;
+   ColorTable * ct = (ColorTable *) nullptr;
    Box b;
    Color c;
 
@@ -1013,7 +1013,7 @@ void ModePsFile::render_ppm(ModeFuzzyEngine & eng, EngineType eng_type, const Sh
    double mag, v;
    Color c;
    Color fill_color;
-   ColorTable *ct = (ColorTable *) 0;
+   ColorTable *ct = (ColorTable *) nullptr;
    const int L = nint(XY_box.left());
    const int B = nint(XY_box.bottom());
 
@@ -1021,17 +1021,17 @@ void ModePsFile::render_ppm(ModeFuzzyEngine & eng, EngineType eng_type, const Sh
    // Set up pointers to the appropriate colortable and fill color values
    //
 
-   if ( eng_type == FFEng ) {
+   if ( eng_type == EngineType::FFEng ) {
 
       ct         = &FcstRawCtable;
       fill_color =  FcstFillColor;
 
-   } else if ( eng_type == OOEng ) {
+   } else if ( eng_type == EngineType::OOEng ) {
 
       ct         = &ObsRawCtable;
       fill_color =  ObsFillColor;
 
-   } else { // eng_type == FOEng
+   } else { // eng_type == EngineType::FOEng
 
       if ( fcst )  {
 
@@ -1333,7 +1333,7 @@ Box valid_xy_bb(const ShapeData * wd_ptr, const Grid & grid)
 
    bb.set_lrbt(L, R, B, T);
 
-   return ( bb );
+   return bb;
 
 }
 

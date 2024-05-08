@@ -11,9 +11,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
-
 #include <iostream>
 #include <fstream>
 #include <unistd.h>
@@ -28,6 +25,8 @@ using namespace std;
 #include "3d_txt_header.h"
 #include "3d_single_columns.h"
 #include "2d_columns.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////

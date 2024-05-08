@@ -8,8 +8,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <dirent.h>
 #include <iostream>
 #include <unistd.h>
@@ -26,6 +24,8 @@ using namespace std;
 #include "vx_log.h"
 
 #include "GridTemplate.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -50,8 +50,8 @@ EnsembleStatConfInfo::~EnsembleStatConfInfo() {
 void EnsembleStatConfInfo::init_from_scratch() {
 
    // Initialize pointers
-   vx_opt   = (EnsembleStatVxOpt *) 0;
-   rng_ptr  = (gsl_rng *)           0;
+   vx_opt   = (EnsembleStatVxOpt *) nullptr;
+   rng_ptr  = (gsl_rng *)           nullptr;
 
    clear();
 
@@ -73,7 +73,7 @@ void EnsembleStatConfInfo::clear() {
    msg_typ_sfc.clear();
    mask_area_map.clear();
    mask_sid_map.clear();
-   grid_weight_flag = GridWeightType_None;
+   grid_weight_flag = GridWeightType::None;
    tmp_dir.clear();
    output_prefix.clear();
    version.clear();
@@ -81,12 +81,12 @@ void EnsembleStatConfInfo::clear() {
    // Deallocate memory for the random number generator
    if(rng_ptr) rng_free(rng_ptr);
 
-   for(i=0; i<n_txt; i++) output_flag[i] = STATOutputType_None;
+   for(i=0; i<n_txt; i++) output_flag[i] = STATOutputType::None;
 
    nc_info.clear();
 
    // Deallocate memory
-   if(vx_opt) { delete [] vx_opt; vx_opt = (EnsembleStatVxOpt *) 0; }
+   if(vx_opt) { delete [] vx_opt; vx_opt = (EnsembleStatVxOpt *) nullptr; }
 
    // Reset counts
    n_vx          = 0;
@@ -122,8 +122,8 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
    int i, j, n_ens_files;
    VarInfoFactory info_factory;
    map<STATLineType,STATOutputType>output_map;
-   Dictionary *fdict = (Dictionary *) 0;
-   Dictionary *odict  = (Dictionary *) 0;
+   Dictionary *fdict = (Dictionary *) nullptr;
+   Dictionary *odict  = (Dictionary *) nullptr;
    Dictionary i_fdict, i_odict;
    InterpMthd mthd;
 
@@ -284,7 +284,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
 
       // Track the maximum HiRA size
       for(j=0; j<vx_opt[i].interp_info.n_interp; j++) {
-         if(string_to_interpmthd(vx_opt[i].interp_info.method[j].c_str()) == InterpMthd_HiRA) {
+         if(string_to_interpmthd(vx_opt[i].interp_info.method[j].c_str()) == InterpMthd::HiRA) {
             GridTemplateFactory gtf;
             GridTemplate* gt = gtf.buildGT(vx_opt[i].interp_info.shape,
                                            vx_opt[i].interp_info.width[j],
@@ -333,7 +333,7 @@ void EnsembleStatConfInfo::process_flags() {
    bool output_ascii_flag = false;
 
    // Initialize
-   for(i=0; i<n_txt; i++) output_flag[i] = STATOutputType_None;
+   for(i=0; i<n_txt; i++) output_flag[i] = STATOutputType::None;
    nc_info.set_all_false();
 
    // Loop over the verification tasks
@@ -341,13 +341,13 @@ void EnsembleStatConfInfo::process_flags() {
 
       // Summary of output_flag settings
       for(j=0; j<n_txt; j++) {
-         if(vx_opt[i].output_flag[j] == STATOutputType_Both) {
-            output_flag[j] = STATOutputType_Both;
+         if(vx_opt[i].output_flag[j] == STATOutputType::Both) {
+            output_flag[j] = STATOutputType::Both;
             output_ascii_flag = true;
          }
-         else if(vx_opt[i].output_flag[j] == STATOutputType_Stat &&
-                           output_flag[j] == STATOutputType_None) {
-            output_flag[j] = STATOutputType_Stat;
+         else if(vx_opt[i].output_flag[j] == STATOutputType::Stat &&
+                           output_flag[j] == STATOutputType::None) {
+            output_flag[j] = STATOutputType::Stat;
             output_ascii_flag = true;
          }
       }
@@ -494,7 +494,7 @@ int EnsembleStatConfInfo::n_txt_row(int i_txt_row) const {
    // Loop over the tasks and sum the line counts for this line type
    for(i=0, n=0; i<n_vx; i++) n += vx_opt[i].n_txt_row(i_txt_row);
 
-   return(n);
+   return n;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -505,7 +505,7 @@ int EnsembleStatConfInfo::n_stat_row() const {
    // Loop over the line types and sum the line counts
    for(i=0, n=0; i<n_txt; i++) n += n_txt_row(i);
 
-   return(n);
+   return n;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -515,7 +515,7 @@ int EnsembleStatConfInfo::get_max_n_prob_cat_thresh() const {
 
    for(i=0,n=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_prob_cat_thresh());
 
-   return(n);
+   return n;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -525,7 +525,7 @@ int EnsembleStatConfInfo::get_max_n_prob_pct_thresh() const {
 
    for(i=0,n=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_prob_pct_thresh());
 
-   return(n);
+   return n;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -535,7 +535,7 @@ int EnsembleStatConfInfo::get_max_n_eclv_points() const {
 
    for(i=0,n=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_eclv_points());
 
-   return(n);
+   return n;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -614,13 +614,13 @@ void EnsembleStatVxOpt::clear() {
    ocat_ta.clear();
    fpct_ta.clear();
 
-   duplicate_flag = DuplicateType_None;
-   obs_summary = ObsSummary_None;
+   duplicate_flag = DuplicateType::None;
+   obs_summary = ObsSummary::None;
    obs_perc = bad_data_int;
    skip_const = false;
    obs_error.clear();
 
-   for(i=0; i<n_txt; i++) output_flag[i] = STATOutputType_None;
+   for(i=0; i<n_txt; i++) output_flag[i] = STATOutputType::None;
 
    nc_info.clear();
 
@@ -710,25 +710,6 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
       vx_pd.obs_info->dump(cout);
    }
 
-   // Check the levels for the forecast and observation fields.  If the
-   // forecast field is a range of pressure levels, check to see if the
-   // range of observation field pressure levels is wholly contained in the
-   // fcst levels.  If not, print a warning message.
-   if(vx_pd.fcst_info->get_var_info()->level().type() == LevelType_Pres &&
-      !is_eq(vx_pd.fcst_info->get_var_info()->level().lower(), vx_pd.fcst_info->get_var_info()->level().upper()) &&
-      (vx_pd.obs_info->level().lower() < vx_pd.fcst_info->get_var_info()->level().lower() ||
-       vx_pd.obs_info->level().upper() > vx_pd.fcst_info->get_var_info()->level().upper())) {
-
-      mlog << Warning
-           << "\nEnsembleStatVxOpt::process_config() -> "
-           << "The range of requested observation pressure levels "
-           << "is not contained within the range of requested "
-           << "forecast pressure levels.  No vertical interpolation "
-           << "will be performed for observations falling outside "
-           << "the range of forecast levels.  Instead, they will be "
-           << "matched to the single nearest forecast level.\n\n";
-   }
-
    // No support for wind direction
    if(vx_pd.fcst_info->get_var_info()->is_wind_direction() ||
       vx_pd.obs_info->is_wind_direction()) {
@@ -801,13 +782,14 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
    fcat_ta = fdict.lookup_thresh_array(conf_key_prob_cat_thresh);
    ocat_ta = odict.lookup_thresh_array(conf_key_prob_cat_thresh);
 
-   // The number of thresholds must match
-   if(fcat_ta.n() != ocat_ta.n()) {
+   // The number of thresholds must match for non-probability forecasts
+   if(!vx_pd.fcst_info->get_var_info()->is_prob() &&
+      fcat_ta.n() != ocat_ta.n()) {
       mlog << Error << "\nEnsembleStatVxOpt::process_config() -> "
-           << "The number of forecast (" << fcat_ta.n()
-           << ") and observation (" << ocat_ta.n()
+           << "The number of forecast (" << write_css(fcat_ta)
+           << ") and observation (" << write_css(ocat_ta)
            << ") probability category thresholds in \""
-           << conf_key_prob_cat_thresh << "\" must match.\n\n";
+           << conf_key_prob_cat_thresh << "\" must match!\n\n";
       exit(1);
    }
 
@@ -837,7 +819,7 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
    }
 
    // Print debug information
-   if(obs_error.entry.dist_type != DistType_None) {
+   if(obs_error.entry.dist_type != DistType::None) {
       mlog << Debug(3)
            << "Observation error for point verification is "
            << "defined in the configuration file.\n";
@@ -869,7 +851,7 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
 ////////////////////////////////////////////////////////////////////////
 
 void EnsembleStatVxOpt::parse_nc_info(Dictionary &odict) {
-   const DictionaryEntry * e = (const DictionaryEntry *) 0;
+   const DictionaryEntry * e = (const DictionaryEntry *) nullptr;
 
    e = odict.lookup(conf_key_nc_orank_flag);
 
@@ -1064,7 +1046,7 @@ int EnsembleStatVxOpt::n_txt_row(int i_txt_row) const {
    }
 
    // Check if this output line type is requested
-   if(output_flag[i_txt_row] == STATOutputType_None) return(0);
+   if(output_flag[i_txt_row] == STATOutputType::None) return 0;
 
    // Switch on the index of the line type
    switch(i_txt_row) {
@@ -1143,7 +1125,7 @@ int EnsembleStatVxOpt::n_txt_row(int i_txt_row) const {
          exit(1);
    }
 
-   return(n);
+   return n;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1152,7 +1134,7 @@ int EnsembleStatVxOpt::get_n_prob_cat_thresh() const {
 
    // Probability categories can be defined by the prob_cat_thresh or
    // climo_cdf.bins configuration file options.
-   return(max(fcat_ta.n(), cdf_info.cdf_ta.n()));
+   return max(fcat_ta.n(), cdf_info.cdf_ta.n());
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1182,7 +1164,7 @@ bool EnsembleStatNcOutInfo::all_false() const {
                  do_rank   || do_pit  || do_vld ||
                  do_weight;
 
-   return(!status);
+   return !status;
 }
 
 ////////////////////////////////////////////////////////////////////////

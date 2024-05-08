@@ -8,8 +8,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -19,6 +17,8 @@ using namespace std;
 
 #include "prob_rirw_info.h"
 #include "atcf_offsets.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -51,11 +51,11 @@ ProbRIRWInfo::ProbRIRWInfo(const ProbRIRWInfo & t) {
 
 ProbRIRWInfo & ProbRIRWInfo::operator=(const ProbRIRWInfo & t) {
 
-   if(this == &t) return(*this);
+   if(this == &t) return *this;
 
    assign(t);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -111,7 +111,7 @@ ConcatString ProbRIRWInfo::serialize() const {
      << ", RIRWBeg = " << RIRWBeg
      << ", RIRWEnd = " << RIRWEnd;
 
-   return(s);
+   return s;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -121,7 +121,7 @@ ConcatString ProbRIRWInfo::serialize_r(int n, int indent_depth) const {
 
    s << ProbInfoBase::serialize_r(n, indent_depth);
 
-   return(s);
+   return s;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -167,7 +167,7 @@ void ProbRIRWInfo::initialize(const ATCFProbLine &l, double dland) {
 
 bool ProbRIRWInfo::is_match(const ATCFProbLine &l) const {
 
-   if(!ProbInfoBase::is_match(l)) return(false);
+   if(!ProbInfoBase::is_match(l)) return false;
 
    return(ValidTime == l.valid() &&
           Value     == parse_int(l.get_item(ProbRIRWValueOffset).c_str()) &&
@@ -186,15 +186,15 @@ bool ProbRIRWInfo::add(const ATCFProbLine &l, double dland, bool check_dup) {
               << "\nProbRIRWInfo::add(const ATCFProbLine &l, bool check_dup) -> "
               << "skipping duplicate ATCF line:\n"
               << l.get_line() << "\n\n";
-         return(false);
+         return false;
       }
    }
 
    // Initialize the header information, if necessary
-   if(Type == NoATCFLineType) initialize(l, dland);
+   if(Type == ATCFLineType::None) initialize(l, dland);
 
    // Check for matching header information
-   if(!is_match(l)) return(false);
+   if(!is_match(l)) return false;
 
    // Add probability information
    NProb++;
@@ -204,7 +204,7 @@ bool ProbRIRWInfo::add(const ATCFProbLine &l, double dland, bool check_dup) {
    // Store the ATCFProbLine that was just added
    if(check_dup) ProbLines.add(l.get_line());
 
-   return(true);
+   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////

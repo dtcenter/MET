@@ -10,8 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -24,6 +22,8 @@ using namespace std;
 #include "filename_suffix.h"
 #include "concat_string.h"
 
+using namespace std;
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -35,7 +35,7 @@ ConcatString filename_suffix(const char * filename, bool make_lowercase)
 ConcatString suffix;
 char t;
 
-if ( !filename || !(*filename) )  return ( suffix );
+if ( !filename || !(*filename) )  return suffix;
 
 const char * f = get_short_name(filename);   //  to avoid things like "./foo"
 
@@ -51,7 +51,7 @@ const char * s = f + (m_strlen(f) - 1);
 
 while ( (s >= f) && (*s != '.') )  --s;
 
-if ( s < f )  return ( suffix );
+if ( s < f )  return suffix;
 
 if ( make_lowercase )  {
 
@@ -68,7 +68,7 @@ if ( make_lowercase )  {
    //  done
    //
 
-return ( suffix );
+return suffix;
 
 }
 

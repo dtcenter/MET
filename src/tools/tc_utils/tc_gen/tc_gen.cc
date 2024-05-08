@@ -705,8 +705,8 @@ void do_genesis_ctc(const TCGenVxOpt &vx_opt,
               << ") is a dev and ops FALSE ALARM.\n";
 
          // FALSE ALARM for both methods
-         diff.DevCategory = FYONGenesis;
-         diff.OpsCategory = FYONGenesis;
+         diff.DevCategory = GenesisPairCategory::FYON;
+         diff.OpsCategory = GenesisPairCategory::FYON;
       }
 
       // Unmatched BEST genesis (MISS)
@@ -719,8 +719,8 @@ void do_genesis_ctc(const TCGenVxOpt &vx_opt,
               << ") is a dev and ops MISS.\n";
 
          // MISS for both methods
-         diff.DevCategory = FNOYGenesis;
-         diff.OpsCategory = FNOYGenesis;
+         diff.DevCategory = GenesisPairCategory::FNOY;
+         diff.OpsCategory = GenesisPairCategory::FNOY;
       }
 
       // Matched genesis pairs (DISCARD, HIT, or FALSE ALARM)
@@ -743,8 +743,8 @@ void do_genesis_ctc(const TCGenVxOpt &vx_opt,
                  << " genesis time.\n";
 
             // DISCARD for both methods
-            diff.DevCategory = DiscardGenesis;
-            diff.OpsCategory = DiscardGenesis;
+            diff.DevCategory = GenesisPairCategory::Discard;
+            diff.OpsCategory = GenesisPairCategory::Discard;
          }
          // Check for a HIT
          else {
@@ -769,14 +769,14 @@ void do_genesis_ctc(const TCGenVxOpt &vx_opt,
                     << " is a dev method HIT " << offset_cs;
 
                // HIT for the development method
-               diff.DevCategory = FYOYGenesis;
+               diff.DevCategory = GenesisPairCategory::FYOY;
             }
             else {
                mlog << Debug(4) << case_cs
                     << " is a dev method FALSE ALARM " << offset_cs;
 
                // FALSE ALARM for the development method
-               diff.DevCategory = FYONGenesis;
+               diff.DevCategory = GenesisPairCategory::FYON;
             }
 
             // Compute init/genesis time offset
@@ -796,14 +796,14 @@ void do_genesis_ctc(const TCGenVxOpt &vx_opt,
                     << " is an ops method HIT " << offset_cs;
 
                // HIT for the operational method
-               diff.OpsCategory = FYOYGenesis;
+               diff.OpsCategory = GenesisPairCategory::FYOY;
             }
             else {
                mlog << Debug(4) << case_cs
                     << " is an ops method FALSE ALARM " << offset_cs;
 
                // FALSE ALARM for the operational method
-               diff.OpsCategory = FYONGenesis;
+               diff.OpsCategory = GenesisPairCategory::FYON;
             }
          }
       }
@@ -1550,7 +1550,7 @@ void process_edecks(const StringArray &files,
          if((line.valid_hour() % valid_freq_sec) != 0) continue;
 
          // Only process genesis probability lines
-         if(line.type() == ATCFLineType_ProbGN) {
+         if(line.type() == ATCFLineType::ProbGN) {
             dland = conf_info.compute_dland(line.lat(), -1.0*line.lon());
             if(probs.add(line, dland, false)) n_lines++;
          }
@@ -1564,7 +1564,7 @@ void process_edecks(const StringArray &files,
    // Dump out the total number of lines
    mlog << Debug(3)
         << "Read a total of " << n_lines << " "
-        << atcflinetype_to_string(ATCFLineType_ProbGN)
+        << atcflinetype_to_string(ATCFLineType::ProbGN)
         << " lines from " << files.n() << " input files.\n";
 
    // Dump out very verbose output
@@ -1734,7 +1734,7 @@ void setup_txt_files(int n_model, int max_n_prob, int n_pair) {
    int i, n_rows, n_cols, stat_rows, stat_cols, n_prob;
 
    // Check to see if the stat file stream has already been setup
-   bool init_from_scratch = (stat_out == (ofstream *) 0);
+   bool init_from_scratch = (stat_out == (ofstream *) nullptr);
 
    // Get the maximum number of probability thresholds
    n_prob = conf_info.get_max_n_prob_thresh();
@@ -1743,7 +1743,7 @@ void setup_txt_files(int n_model, int max_n_prob, int n_pair) {
    for(i=0, stat_rows=0, stat_cols=0; i<n_txt; i++) {
 
       // Ignore disabled line types
-      if(conf_info.OutputMap[txt_file_type[i]] == STATOutputType_None) continue;
+      if(conf_info.OutputMap[txt_file_type[i]] == STATOutputType::None) continue;
 
       // Compute the number of rows for this line type
       switch(i) {
@@ -1801,7 +1801,7 @@ void setup_txt_files(int n_model, int max_n_prob, int n_pair) {
       if(stat_cols < n_cols) stat_cols = n_cols;
 
       // Process optional ouptut files
-      if(conf_info.OutputMap[txt_file_type[i]] == STATOutputType_Both) {
+      if(conf_info.OutputMap[txt_file_type[i]] == STATOutputType::Both) {
 
          // Create new output file and stream
          if(init_from_scratch) {
@@ -1970,13 +1970,13 @@ void write_ctc_stats(const PairDataGenesis &gpd,
                 na_str : gci.VxOpt->VxMaskName.c_str());
 
    // Write out FHO
-   if(gci.VxOpt->output_map(stat_fho) != STATOutputType_None) {
+   if(gci.VxOpt->output_map(STATLineType::fho) != STATOutputType::None) {
 
       if(gci.VxOpt->DevFlag) {
          shc.set_fcst_var(genesis_dev_name);
          shc.set_obs_var (genesis_dev_name);
          write_fho_row(shc, gci.CTSDev,
-                       gci.VxOpt->output_map(stat_fho),
+                       gci.VxOpt->output_map(STATLineType::fho),
                        stat_at, i_stat_row,
                        txt_at[i_fho], i_txt_row[i_fho]);
       }
@@ -1985,20 +1985,20 @@ void write_ctc_stats(const PairDataGenesis &gpd,
          shc.set_fcst_var(genesis_ops_name);
          shc.set_obs_var (genesis_ops_name);
          write_fho_row(shc, gci.CTSOps,
-                       gci.VxOpt->output_map(stat_fho),
+                       gci.VxOpt->output_map(STATLineType::fho),
                        stat_at, i_stat_row,
                        txt_at[i_fho], i_txt_row[i_fho]);
       }
    }
 
    // Write out CTC
-   if(gci.VxOpt->output_map(stat_ctc) != STATOutputType_None) {
+   if(gci.VxOpt->output_map(STATLineType::ctc) != STATOutputType::None) {
 
       if(gci.VxOpt->DevFlag) {
          shc.set_fcst_var(genesis_dev_name);
          shc.set_obs_var (genesis_dev_name);
          write_ctc_row(shc, gci.CTSDev,
-                       gci.VxOpt->output_map(stat_ctc),
+                       gci.VxOpt->output_map(STATLineType::ctc),
                        stat_at, i_stat_row,
                        txt_at[i_ctc], i_txt_row[i_ctc]);
       }
@@ -2007,14 +2007,14 @@ void write_ctc_stats(const PairDataGenesis &gpd,
          shc.set_fcst_var(genesis_ops_name);
          shc.set_obs_var (genesis_ops_name);
          write_ctc_row(shc, gci.CTSOps,
-                       gci.VxOpt->output_map(stat_ctc),
+                       gci.VxOpt->output_map(STATLineType::ctc),
                        stat_at, i_stat_row,
                        txt_at[i_ctc], i_txt_row[i_ctc]);
       }
    }
 
    // Write out CTS
-   if(gci.VxOpt->output_map(stat_cts) != STATOutputType_None) {
+   if(gci.VxOpt->output_map(STATLineType::cts) != STATOutputType::None) {
 
       if(gci.VxOpt->DevFlag) {
          gci.CTSDev.compute_stats();
@@ -2023,7 +2023,7 @@ void write_ctc_stats(const PairDataGenesis &gpd,
          shc.set_fcst_var(genesis_dev_name);
          shc.set_obs_var (genesis_dev_name);
          write_cts_row(shc, gci.CTSDev,
-                       gci.VxOpt->output_map(stat_cts),
+                       gci.VxOpt->output_map(STATLineType::cts),
                        stat_at, i_stat_row,
                        txt_at[i_cts], i_txt_row[i_cts]);
       }
@@ -2035,18 +2035,18 @@ void write_ctc_stats(const PairDataGenesis &gpd,
          shc.set_fcst_var(genesis_ops_name);
          shc.set_obs_var (genesis_ops_name);
          write_cts_row(shc, gci.CTSOps,
-                       gci.VxOpt->output_map(stat_cts),
+                       gci.VxOpt->output_map(STATLineType::cts),
                        stat_at, i_stat_row,
                        txt_at[i_cts], i_txt_row[i_cts]);
       }
    }
 
    // Write out GENMPR
-   if(gci.VxOpt->output_map(stat_genmpr) != STATOutputType_None) {
+   if(gci.VxOpt->output_map(STATLineType::genmpr) != STATOutputType::None) {
       shc.set_fcst_var(genesis_name);
       shc.set_obs_var (genesis_name);
       write_ctc_genmpr_row(shc, gpd,
-                           gci.VxOpt->output_map(stat_genmpr),
+                           gci.VxOpt->output_map(STATLineType::genmpr),
                            stat_at, i_stat_row,
                            txt_at[i_genmpr], i_txt_row[i_genmpr]);
    }
@@ -2096,7 +2096,7 @@ void write_ctc_genmpr_row(StatHdrColumns &shc,
       write_ctc_genmpr_cols(gpd, i, stat_at, stat_row, n_header_columns);
 
       // If requested, copy row to the text file
-      if(out_type == STATOutputType_Both) {
+      if(out_type == STATOutputType::Both) {
          copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
          // Increment the text row counter
@@ -2219,43 +2219,43 @@ void write_pct_stats(ProbGenPCTInfo &pgi) {
       shc.set_obs_valid_end(pgi.BestEnd);
 
       // Write PCT output
-      if(pgi.VxOpt->output_map(stat_pct) != STATOutputType_None) {
+      if(pgi.VxOpt->output_map(STATLineType::pct) != STATOutputType::None) {
          write_pct_row(shc, pgi.PCTMap[lead_hr],
-                       pgi.VxOpt->output_map(stat_pct),
+                       pgi.VxOpt->output_map(STATLineType::pct),
                        1, 1, stat_at, i_stat_row,
                        txt_at[i_pct], i_txt_row[i_pct]);
       }
 
       // Write PSTD output
-      if(pgi.VxOpt->output_map(stat_pstd) != STATOutputType_None) {
+      if(pgi.VxOpt->output_map(STATLineType::pstd) != STATOutputType::None) {
          pgi.PCTMap[lead_hr].compute_stats();
          pgi.PCTMap[lead_hr].compute_ci();
          write_pstd_row(shc, pgi.PCTMap[lead_hr],
-                        pgi.VxOpt->output_map(stat_pstd),
+                        pgi.VxOpt->output_map(STATLineType::pstd),
                         1, 1, stat_at, i_stat_row,
                         txt_at[i_pstd], i_txt_row[i_pstd]);
       }
 
       // Write PJC output
-      if(pgi.VxOpt->output_map(stat_pjc) != STATOutputType_None) {
+      if(pgi.VxOpt->output_map(STATLineType::pjc) != STATOutputType::None) {
          write_pjc_row(shc, pgi.PCTMap[lead_hr],
-                       pgi.VxOpt->output_map(stat_pjc),
+                       pgi.VxOpt->output_map(STATLineType::pjc),
                        1, 1, stat_at, i_stat_row,
                        txt_at[i_pjc], i_txt_row[i_pjc]);
       }
 
       // Write PRC output
-      if(pgi.VxOpt->output_map(stat_pjc) != STATOutputType_None) {
+      if(pgi.VxOpt->output_map(STATLineType::pjc) != STATOutputType::None) {
          write_prc_row(shc, pgi.PCTMap[lead_hr],
-                       pgi.VxOpt->output_map(stat_prc),
+                       pgi.VxOpt->output_map(STATLineType::prc),
                        1, 1, stat_at, i_stat_row,
                        txt_at[i_prc], i_txt_row[i_prc]);
       }
 
       // Write out GENMPR
-      if(pgi.VxOpt->output_map(stat_genmpr) != STATOutputType_None) {
+      if(pgi.VxOpt->output_map(STATLineType::genmpr) != STATOutputType::None) {
          write_pct_genmpr_row(shc, pgi, lead_hr,
-                              pgi.VxOpt->output_map(stat_genmpr),
+                              pgi.VxOpt->output_map(STATLineType::genmpr),
                               stat_at, i_stat_row,
                               txt_at[i_genmpr], i_txt_row[i_genmpr]);
       }
@@ -2308,7 +2308,7 @@ void write_pct_genmpr_row(StatHdrColumns &shc,
                             stat_at, stat_row, n_header_columns);
 
       // If requested, copy row to the text file
-      if(out_type == STATOutputType_Both) {
+      if(out_type == STATOutputType::Both) {
          copy_ascii_table_row(stat_at, stat_row, txt_at, txt_row);
 
          // Increment the text row counter
@@ -2565,7 +2565,7 @@ void finish_txt_files() {
    for(i=0; i<n_txt; i++) {
 
       // Only write the table if requested in the config file
-      if(conf_info.OutputMap[txt_file_type[i]] == STATOutputType_Both) {
+      if(conf_info.OutputMap[txt_file_type[i]] == STATOutputType::Both) {
 
          // Write the AsciiTable to a file
          if(txt_out[i]) {
@@ -2588,7 +2588,7 @@ ConcatString string_to_basin_abbr(ConcatString cs) {
    else if(cs == "Central Pacific") abbr = "CP";
    else                             abbr = cs;
 
-   return(abbr);
+   return abbr;
 }
 
 ////////////////////////////////////////////////////////////////////////

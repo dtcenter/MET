@@ -13,6 +13,7 @@
 #include <limits.h>
 
 #include "config_util.h"
+#include "enum_as_int.hpp"
 
 #include "vx_math.h"
 #include "vx_util.h"
@@ -121,13 +122,13 @@ void GaussianInfo::validate() {
 
 void RegridInfo::clear() {
    enable = false;
-   field = FieldType_None;
+   field = FieldType::None;
    vld_thresh = bad_data_double;
    name.clear();
-   method = InterpMthd_None;
+   method = InterpMthd::None;
    width = bad_data_int;
    gaussian.clear();
-   shape = GridTemplateFactory::GridTemplate_None;
+   shape = GridTemplateFactory::GridTemplates::None;
    convert_fx.clear();
    censor_thresh.clear();
    censor_val.clear();
@@ -144,10 +145,10 @@ RegridInfo::RegridInfo() {
 void RegridInfo::validate() {
 
    // Check for unsupported regridding options
-   if(method == InterpMthd_Best       ||
-      method == InterpMthd_Geog_Match ||
-      method == InterpMthd_Gaussian   ||
-      method == InterpMthd_HiRA) {
+   if(method == InterpMthd::Best       ||
+      method == InterpMthd::Geog_Match ||
+      method == InterpMthd::Gaussian   ||
+      method == InterpMthd::HiRA) {
       mlog << Error << "\nRegridInfo::validate() -> "
            << "\"" << interpmthd_to_string(method)
            << "\" not valid for regridding, only interpolating.\n\n";
@@ -156,31 +157,31 @@ void RegridInfo::validate() {
 
    // Check the nearest neighbor special case
    if(width  == 1 &&
-      method != InterpMthd_None &&
-      method != InterpMthd_Nearest &&
-      method != InterpMthd_Force &&
-      method != InterpMthd_Upper_Left &&
-      method != InterpMthd_Upper_Right &&
-      method != InterpMthd_Lower_Right &&
-      method != InterpMthd_Lower_Left &&
-      method != InterpMthd_AW_Mean &&
-      method != InterpMthd_MaxGauss) {
+      method != InterpMthd::None &&
+      method != InterpMthd::Nearest &&
+      method != InterpMthd::Force &&
+      method != InterpMthd::Upper_Left &&
+      method != InterpMthd::Upper_Right &&
+      method != InterpMthd::Lower_Right &&
+      method != InterpMthd::Lower_Left &&
+      method != InterpMthd::AW_Mean &&
+      method != InterpMthd::MaxGauss) {
       mlog << Warning << "\nRegridInfo::validate() -> "
            << "Resetting the regridding method from \""
            << interpmthd_to_string(method) << "\" to \""
            << interpmthd_nearest_str
            << "\" since the regridding width is 1.\n\n";
-      method = InterpMthd_Nearest;
+      method = InterpMthd::Nearest;
    }
 
    // Check for some methods, that width is 1
-   if((method == InterpMthd_Nearest ||
-       method == InterpMthd_Force ||
-       method == InterpMthd_Upper_Left ||
-       method == InterpMthd_Upper_Right ||
-       method == InterpMthd_Lower_Right ||
-       method == InterpMthd_Lower_Left ||
-       method == InterpMthd_AW_Mean) &&
+   if((method == InterpMthd::Nearest ||
+       method == InterpMthd::Force ||
+       method == InterpMthd::Upper_Left ||
+       method == InterpMthd::Upper_Right ||
+       method == InterpMthd::Lower_Right ||
+       method == InterpMthd::Lower_Left ||
+       method == InterpMthd::AW_Mean) &&
       width != 1) {
       mlog << Warning << "\nRegridInfo::validate() -> "
            << "Resetting regridding width from "
@@ -190,8 +191,8 @@ void RegridInfo::validate() {
    }
 
    // Check the bilinear and budget special cases
-   if((method == InterpMthd_Bilin ||
-       method == InterpMthd_Budget) &&
+   if((method == InterpMthd::Bilin ||
+       method == InterpMthd::Budget) &&
       width != 2) {
       mlog << Warning << "\nRegridInfo::validate() -> "
            << "Resetting the regridding width from "
@@ -201,7 +202,7 @@ void RegridInfo::validate() {
    }
 
    // Check the Gaussian filter
-   if(method == InterpMthd_MaxGauss && gaussian.radius < gaussian.dx) {
+   if(method == InterpMthd::MaxGauss && gaussian.radius < gaussian.dx) {
       mlog << Error << "\nRegridInfo::validate() -> "
            << "The radius of influence (" << gaussian.radius
            << ") is less than the delta distance (" << gaussian.dx
@@ -226,20 +227,20 @@ void RegridInfo::validate() {
 void RegridInfo::validate_point() {
 
    // Check for unsupported regridding options
-   if(method != InterpMthd_Max &&
-      method != InterpMthd_Min &&
-      method != InterpMthd_Median &&
-      method != InterpMthd_UW_Mean) {
+   if(method != InterpMthd::Max &&
+      method != InterpMthd::Min &&
+      method != InterpMthd::Median &&
+      method != InterpMthd::UW_Mean) {
       mlog << Warning << "\nRegridInfo::validate_point() -> "
            << "Resetting the regridding method from \""
            << interpmthd_to_string(method) << "\" to \""
            << interpmthd_uw_mean_str << ".\n"
            << "\tAvailable methods: "
-           << interpmthd_to_string(InterpMthd_UW_Mean) << ", "
-           << interpmthd_to_string(InterpMthd_Max) << ", "
-           << interpmthd_to_string(InterpMthd_Min) << ", "
-           << interpmthd_to_string(InterpMthd_Median) << ".\n\n";
-      method = InterpMthd_UW_Mean;
+           << interpmthd_to_string(InterpMthd::UW_Mean) << ", "
+           << interpmthd_to_string(InterpMthd::Max) << ", "
+           << interpmthd_to_string(InterpMthd::Min) << ", "
+           << interpmthd_to_string(InterpMthd::Median) << ".\n\n";
+      method = InterpMthd::UW_Mean;
    }
 
 }
@@ -263,6 +264,7 @@ RegridInfo &RegridInfo::operator=(const RegridInfo &a) noexcept {
    }
    return *this;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -375,7 +377,7 @@ GrdFileType parse_conf_file_type(Dictionary *dict) {
 map<STATLineType,STATOutputType> parse_conf_output_flag(Dictionary *dict,
                                  const STATLineType *line_type, int n_lty) {
    map<STATLineType,STATOutputType> output_map;
-   STATOutputType t = STATOutputType_None;
+   STATOutputType t = STATOutputType::None;
    ConcatString cs;
    int v;
 
@@ -397,9 +399,9 @@ map<STATLineType,STATOutputType> parse_conf_output_flag(Dictionary *dict,
       v = dict->lookup_int(cs.c_str());
 
       // Convert integer to enumerated STATOutputType
-           if(v == conf_const.lookup_int(conf_val_none)) t = STATOutputType_None;
-      else if(v == conf_const.lookup_int(conf_val_stat)) t = STATOutputType_Stat;
-      else if(v == conf_const.lookup_int(conf_val_both)) t = STATOutputType_Both;
+           if(v == conf_const.lookup_int(conf_val_none)) t = STATOutputType::None;
+      else if(v == conf_const.lookup_int(conf_val_stat)) t = STATOutputType::Stat;
+      else if(v == conf_const.lookup_int(conf_val_both)) t = STATOutputType::Both;
       else {
          mlog << Error << "\nparse_conf_output_flag() -> "
               << "Unexpected config file value of " << v << " for \""
@@ -1259,7 +1261,7 @@ BootInfo & BootInfo::operator=(const BootInfo &a) noexcept {
 ///////////////////////////////////////////////////////////////////////////////
 
 void BootInfo::clear() {
-   interval = BootIntervalType_None;
+   interval = BootIntervalType::None;
    rep_prop = bad_data_double;
    n_rep    = 0;
    rng.clear();
@@ -1283,8 +1285,12 @@ BootInfo parse_conf_boot(Dictionary *dict) {
    v = dict->lookup_int(conf_key_boot_interval);
 
    // Convert integer to enumerated BootIntervalType
-        if(v == conf_const.lookup_int(conf_val_bca))    info.interval = BootIntervalType_BCA;
-   else if(v == conf_const.lookup_int(conf_val_pctile)) info.interval = BootIntervalType_Percentile;
+   if(v == conf_const.lookup_int(conf_val_bca)) {
+      info.interval = BootIntervalType::BCA;
+   }
+   else if(v == conf_const.lookup_int(conf_val_pctile)) {
+      info.interval = BootIntervalType::PCTile;
+   }
    else {
       mlog << Error << "\nparse_conf_boot() -> "
            << "Unexpected config file value of " << v << " for \""
@@ -1350,7 +1356,7 @@ RegridInfo parse_conf_regrid(Dictionary *dict, bool error_out) {
          exit(1);
       }
       else {
-         return(info);
+         return info;
       }
    }
 
@@ -1360,8 +1366,8 @@ RegridInfo parse_conf_regrid(Dictionary *dict, bool error_out) {
    // If integer lookup successful, convert to FieldType.
    if(regrid_dict->last_lookup_status()) {
       info.field  = int_to_fieldtype(v);
-      info.enable = (info.field == FieldType_Fcst ||
-                     info.field == FieldType_Obs);
+      info.enable = (info.field == FieldType::Fcst ||
+                     info.field == FieldType::Obs);
    }
    // If integer lookup unsuccessful, parse vx_grid as a string.
    // Do not error out since to_grid isn't specified for climo.regrid.
@@ -1385,7 +1391,7 @@ RegridInfo parse_conf_regrid(Dictionary *dict, bool error_out) {
    }
    else {
       // If not specified, use the default square shape
-      info.shape = GridTemplateFactory::GridTemplate_Square;
+      info.shape = GridTemplateFactory::GridTemplates::Square;
    }
 
    // Conf: gaussian dx and radius
@@ -1395,7 +1401,7 @@ RegridInfo parse_conf_regrid(Dictionary *dict, bool error_out) {
    info.gaussian.radius = (is_bad_data(conf_value) ? default_gaussian_radius : conf_value);
    conf_value = regrid_dict->lookup_double(conf_key_trunc_factor, false);
    info.gaussian.trunc_factor = (is_bad_data(conf_value) ? default_trunc_factor : conf_value);
-   if (info.method == InterpMthd_Gaussian || info.method == InterpMthd_MaxGauss) info.gaussian.compute();
+   if (info.method == InterpMthd::Gaussian || info.method == InterpMthd::MaxGauss) info.gaussian.compute();
 
    // MET#2437 Do not search the higher levels of config file context for convert,
    //          censor_thresh, and censor_val. They must be specified within the
@@ -1419,13 +1425,13 @@ RegridInfo parse_conf_regrid(Dictionary *dict, bool error_out) {
 ///////////////////////////////////////////////////////////////////////////////
 
 void InterpInfo::clear() {
-   field = FieldType_None;
+   field = FieldType::None;
    vld_thresh = bad_data_double;
    n_interp = 0;
    method.clear();
    width.clear();
    gaussian.clear();
-   shape = GridTemplateFactory::GridTemplate_None;
+   shape = GridTemplateFactory::GridTemplates::None;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1438,15 +1444,15 @@ void InterpInfo::validate() {
 
       // Check the nearest neighbor special case
       if(width[i] == 1 &&
-         methodi  != InterpMthd_None &&
-         methodi  != InterpMthd_Nearest &&
-         methodi  != InterpMthd_Force &&
-         methodi  != InterpMthd_Upper_Left &&
-         methodi  != InterpMthd_Upper_Right &&
-         methodi  != InterpMthd_Lower_Right &&
-         methodi  != InterpMthd_Lower_Left &&
-         methodi  != InterpMthd_Gaussian &&
-         methodi  != InterpMthd_MaxGauss) {
+         methodi  != InterpMthd::None &&
+         methodi  != InterpMthd::Nearest &&
+         methodi  != InterpMthd::Force &&
+         methodi  != InterpMthd::Upper_Left &&
+         methodi  != InterpMthd::Upper_Right &&
+         methodi  != InterpMthd::Lower_Right &&
+         methodi  != InterpMthd::Lower_Left &&
+         methodi  != InterpMthd::Gaussian &&
+         methodi  != InterpMthd::MaxGauss) {
          mlog << Warning << "\nInterpInfo::validate() -> "
               << "Resetting interpolation method " << (int) i << " from \""
               << method[i] << "\" to \""
@@ -1456,11 +1462,11 @@ void InterpInfo::validate() {
       }
 
       // Check for some methods, that width is 1
-      if((methodi == InterpMthd_Nearest ||
-          methodi == InterpMthd_Upper_Left ||
-          methodi == InterpMthd_Upper_Right ||
-          methodi == InterpMthd_Lower_Right ||
-          methodi == InterpMthd_Lower_Left) &&
+      if((methodi == InterpMthd::Nearest ||
+          methodi == InterpMthd::Upper_Left ||
+          methodi == InterpMthd::Upper_Right ||
+          methodi == InterpMthd::Lower_Right ||
+          methodi == InterpMthd::Lower_Left) &&
          width[i] != 1) {
          mlog << Warning << "\nInterpInfo::validate() -> "
               << "Resetting interpolation width " << (int) i << " from "
@@ -1470,8 +1476,8 @@ void InterpInfo::validate() {
       }
 
       // Check the bilinear and budget special cases
-      if((methodi == InterpMthd_Bilin ||
-          methodi == InterpMthd_Budget) &&
+      if((methodi == InterpMthd::Bilin ||
+          methodi == InterpMthd::Budget) &&
          width[i] != 2) {
          mlog << Warning << "\nInterpInfo::validate() -> "
               << "Resetting interpolation width " << (int) i << " from "
@@ -1481,8 +1487,8 @@ void InterpInfo::validate() {
       }
 
       // Check the Gaussian filter
-      if(methodi == InterpMthd_Gaussian ||
-         methodi == InterpMthd_MaxGauss) {
+      if(methodi == InterpMthd::Gaussian ||
+         methodi == InterpMthd::MaxGauss) {
          if (gaussian.radius < gaussian.dx) {
             mlog << Error << "\n"
                  << "The radius of influence (" << gaussian.radius
@@ -1556,7 +1562,7 @@ InterpInfo parse_conf_interp(Dictionary *dict, const char *conf_key) {
 
    // If found, interpret value.  Otherwise, set to a default value.
    if(interp_dict->last_lookup_status()) info.field = int_to_fieldtype(v);
-   else                                  info.field = FieldType_None;
+   else                                  info.field = FieldType::None;
 
    // Conf: vld_thresh
    double thr      = interp_dict->lookup_double(conf_key_vld_thresh, false);
@@ -1578,7 +1584,7 @@ InterpInfo parse_conf_interp(Dictionary *dict, const char *conf_key) {
    }
    else {
       // If not specified, use the default square shape
-      info.shape = GridTemplateFactory::GridTemplate_Square;
+      info.shape = GridTemplateFactory::GridTemplates::Square;
    }
 
    // Conf: gaussian dx and radius
@@ -1632,8 +1638,8 @@ InterpInfo parse_conf_interp(Dictionary *dict, const char *conf_key) {
          method = int_to_interpmthd(mthd_na[j]);
 
          // Check for unsupported interpolation options
-         if(method == InterpMthd_Budget ||
-            method == InterpMthd_Force) {
+         if(method == InterpMthd::Budget ||
+            method == InterpMthd::Force) {
             mlog << Error << "\nparse_conf_interp() -> "
                  << "\"" << interpmthd_to_string(method)
                  << "\" not valid for interpolating, only regridding.\n\n";
@@ -1653,7 +1659,7 @@ InterpInfo parse_conf_interp(Dictionary *dict, const char *conf_key) {
 
          } // end for k
 
-         if(method == InterpMthd_Gaussian || method == InterpMthd_MaxGauss) {
+         if(method == InterpMthd::Gaussian || method == InterpMthd::MaxGauss) {
             info.gaussian.compute();
          }
       } // end for j
@@ -1844,11 +1850,11 @@ ClimoCDFInfo parse_conf_climo_cdf(Dictionary *dict) {
 
 
 void NbrhdInfo::clear() {
-   field = FieldType_None;
+   field = FieldType::None;
    vld_thresh = bad_data_double;
    width.clear();
    cov_ta.clear();
-   shape = GridTemplateFactory::GridTemplate_None;
+   shape = GridTemplateFactory::GridTemplates::None;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1885,7 +1891,7 @@ NbrhdInfo parse_conf_nbrhd(Dictionary *dict, const char *conf_key) {
    // Conf: field - may be missing
 
    // Default info.field to BOTH
-   info.field = FieldType_Both;
+   info.field = FieldType::Both;
 
    // Skip lookup for conf_key_nbrhd_prob
    if(strncmp(conf_key, conf_key_nbrhd_prob, strlen(conf_key_nbrhd_prob)) != 0) {
@@ -1936,7 +1942,7 @@ NbrhdInfo parse_conf_nbrhd(Dictionary *dict, const char *conf_key) {
    }
    else {
       // If not specified, use the default square shape
-      info.shape = GridTemplateFactory::GridTemplate_Square;
+      info.shape = GridTemplateFactory::GridTemplates::Square;
    }
 
    // Conf: cov_thresh
@@ -1966,7 +1972,7 @@ void HiRAInfo::clear() {
    vld_thresh = bad_data_double;
    cov_ta.clear();
    prob_cat_ta.clear();
-   shape = GridTemplateFactory::GridTemplate_None;
+   shape = GridTemplateFactory::GridTemplates::None;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2010,7 +2016,7 @@ HiRAInfo parse_conf_hira(Dictionary *dict) {
    info.flag = hira_dict->lookup_bool(conf_key_flag);
 
    // If disabled, skip remainder of the dictionary.
-   if(!info.flag) return(info);
+   if(!info.flag) return info;
 
    // Conf: vld_thresh
    info.vld_thresh = hira_dict->lookup_double(conf_key_vld_thresh);
@@ -2052,7 +2058,7 @@ HiRAInfo parse_conf_hira(Dictionary *dict) {
    }
    else {
       // If not specified, use the default square shape
-      info.shape = GridTemplateFactory::GridTemplate_Square;
+      info.shape = GridTemplateFactory::GridTemplates::Square;
    }
 
    // Conf: cov_thresh
@@ -2073,7 +2079,7 @@ HiRAInfo parse_conf_hira(Dictionary *dict) {
 ///////////////////////////////////////////////////////////////////////////////
 
 GridWeightType parse_conf_grid_weight_flag(Dictionary *dict) {
-   GridWeightType t = GridWeightType_None;
+   GridWeightType t = GridWeightType::None;
    int v;
 
    if(!dict) {
@@ -2086,9 +2092,9 @@ GridWeightType parse_conf_grid_weight_flag(Dictionary *dict) {
    v = dict->lookup_int(conf_key_grid_weight_flag);
 
    // Convert integer to enumerated GridWeightType
-        if(v == conf_const.lookup_int(conf_val_none))    t = GridWeightType_None;
-   else if(v == conf_const.lookup_int(conf_val_cos_lat)) t = GridWeightType_Cos_Lat;
-   else if(v == conf_const.lookup_int(conf_val_area))    t = GridWeightType_Area;
+        if(v == conf_const.lookup_int(conf_val_none))    t = GridWeightType::None;
+   else if(v == conf_const.lookup_int(conf_val_cos_lat)) t = GridWeightType::Cos_Lat;
+   else if(v == conf_const.lookup_int(conf_val_area))    t = GridWeightType::Area;
    else {
       mlog << Error << "\nparse_conf_grid_weight_flag() -> "
            << "Unexpected config file value of " << v << " for \""
@@ -2102,7 +2108,7 @@ GridWeightType parse_conf_grid_weight_flag(Dictionary *dict) {
 ///////////////////////////////////////////////////////////////////////////////
 
 DuplicateType parse_conf_duplicate_flag(Dictionary *dict) {
-   DuplicateType t = DuplicateType_None;
+   DuplicateType t = DuplicateType::None;
    int v;
 
    if(!dict) {
@@ -2115,8 +2121,8 @@ DuplicateType parse_conf_duplicate_flag(Dictionary *dict) {
    v = dict->lookup_int(conf_key_duplicate_flag);
 
    // Convert integer to enumerated DuplicateType
-        if(v == conf_const.lookup_int(conf_val_none))   t = DuplicateType_None;
-   else if(v == conf_const.lookup_int(conf_val_unique)) t = DuplicateType_Unique;
+        if(v == conf_const.lookup_int(conf_val_none))   t = DuplicateType::None;
+   else if(v == conf_const.lookup_int(conf_val_unique)) t = DuplicateType::Unique;
    else if(v == conf_const.lookup_int(conf_val_single)) {
      mlog << Error << "\nparse_conf_duplicate_flag() -> "
           << "duplicate_flag = SINGLE has been deprecated\n"
@@ -2136,7 +2142,7 @@ DuplicateType parse_conf_duplicate_flag(Dictionary *dict) {
 ///////////////////////////////////////////////////////////////////////////////
 
 ObsSummary parse_conf_obs_summary(Dictionary *dict) {
-   ObsSummary t = ObsSummary_None;
+   ObsSummary t = ObsSummary::None;
    int v;
 
    if(!dict) {
@@ -2149,14 +2155,14 @@ ObsSummary parse_conf_obs_summary(Dictionary *dict) {
    v = dict->lookup_int(conf_key_obs_summary);
 
    // Convert integer to enumerated ObsSummary
-        if(v == conf_const.lookup_int(conf_val_none))    t = ObsSummary_None;
-   else if(v == conf_const.lookup_int(conf_val_nearest)) t = ObsSummary_Nearest;
-   else if(v == conf_const.lookup_int(conf_val_min))     t = ObsSummary_Min;
-   else if(v == conf_const.lookup_int(conf_val_max))     t = ObsSummary_Max;
-   else if(v == conf_const.lookup_int(conf_val_uw_mean)) t = ObsSummary_UW_Mean;
-   else if(v == conf_const.lookup_int(conf_val_dw_mean)) t = ObsSummary_DW_Mean;
-   else if(v == conf_const.lookup_int(conf_val_median))  t = ObsSummary_Median;
-   else if(v == conf_const.lookup_int(conf_val_perc))    t = ObsSummary_Perc;
+        if(v == conf_const.lookup_int(conf_val_none))    t = ObsSummary::None;
+   else if(v == conf_const.lookup_int(conf_val_nearest)) t = ObsSummary::Nearest;
+   else if(v == conf_const.lookup_int(conf_val_min))     t = ObsSummary::Min;
+   else if(v == conf_const.lookup_int(conf_val_max))     t = ObsSummary::Max;
+   else if(v == conf_const.lookup_int(conf_val_uw_mean)) t = ObsSummary::UW_Mean;
+   else if(v == conf_const.lookup_int(conf_val_dw_mean)) t = ObsSummary::DW_Mean;
+   else if(v == conf_const.lookup_int(conf_val_median))  t = ObsSummary::Median;
+   else if(v == conf_const.lookup_int(conf_val_perc))    t = ObsSummary::Perc;
    else {
       mlog << Error << "\nparse_conf_obs_summary() -> "
            << "Unexpected config file value of " << v << " for \""
@@ -2225,7 +2231,7 @@ ConcatString parse_conf_tmp_dir(Dictionary *dict) {
 ///////////////////////////////////////////////////////////////////////////////
 
 GridDecompType parse_conf_grid_decomp_flag(Dictionary *dict) {
-   GridDecompType t = GridDecompType_None;
+   GridDecompType t = GridDecompType::None;
    int v;
 
    if(!dict) {
@@ -2238,10 +2244,10 @@ GridDecompType parse_conf_grid_decomp_flag(Dictionary *dict) {
    v = dict->lookup_int(conf_key_grid_decomp_flag);
 
    // Convert integer to enumerated GridDecompType
-        if(v == conf_const.lookup_int(conf_val_none)) t = GridDecompType_None;
-   else if(v == conf_const.lookup_int(conf_val_auto)) t = GridDecompType_Auto;
-   else if(v == conf_const.lookup_int(conf_val_tile)) t = GridDecompType_Tile;
-   else if(v == conf_const.lookup_int(conf_val_pad))  t = GridDecompType_Pad;
+        if(v == conf_const.lookup_int(conf_val_none)) t = GridDecompType::None;
+   else if(v == conf_const.lookup_int(conf_val_auto)) t = GridDecompType::Auto;
+   else if(v == conf_const.lookup_int(conf_val_tile)) t = GridDecompType::Tile;
+   else if(v == conf_const.lookup_int(conf_val_pad))  t = GridDecompType::Pad;
    else {
       mlog << Error << "\nparse_conf_grid_decomp_flag() -> "
            << "Unexpected config file value of " << v << " for \""
@@ -2255,7 +2261,7 @@ GridDecompType parse_conf_grid_decomp_flag(Dictionary *dict) {
 ///////////////////////////////////////////////////////////////////////////////
 
 WaveletType parse_conf_wavelet_type(Dictionary *dict) {
-   WaveletType t = WaveletType_None;
+   WaveletType t = WaveletType::None;
    int v;
 
    if(!dict) {
@@ -2268,13 +2274,13 @@ WaveletType parse_conf_wavelet_type(Dictionary *dict) {
    v = dict->lookup_int(conf_key_wavelet_type);
 
    // Convert integer to enumerated WaveletType
-        if(v == conf_const.lookup_int(conf_val_none))         t = WaveletType_None;
-   else if(v == conf_const.lookup_int(conf_val_haar))         t = WaveletType_Haar;
-   else if(v == conf_const.lookup_int(conf_val_haar_cntr))    t = WaveletType_Haar_Cntr;
-   else if(v == conf_const.lookup_int(conf_val_daub))         t = WaveletType_Daub;
-   else if(v == conf_const.lookup_int(conf_val_daub_cntr))    t = WaveletType_Daub_Cntr;
-   else if(v == conf_const.lookup_int(conf_val_bspline))      t = WaveletType_BSpline;
-   else if(v == conf_const.lookup_int(conf_val_bspline_cntr)) t = WaveletType_BSpline_Cntr;
+        if(v == conf_const.lookup_int(conf_val_none))         t = WaveletType::None;
+   else if(v == conf_const.lookup_int(conf_val_haar))         t = WaveletType::Haar;
+   else if(v == conf_const.lookup_int(conf_val_haar_cntr))    t = WaveletType::Haar_Cntr;
+   else if(v == conf_const.lookup_int(conf_val_daub))         t = WaveletType::Daub;
+   else if(v == conf_const.lookup_int(conf_val_daub_cntr))    t = WaveletType::Daub_Cntr;
+   else if(v == conf_const.lookup_int(conf_val_bspline))      t = WaveletType::BSpline;
+   else if(v == conf_const.lookup_int(conf_val_bspline_cntr)) t = WaveletType::BSpline_Cntr;
    else {
       mlog << Error << "\nparse_conf_wavelet_type() -> "
            << "Unexpected config file value of " << v << " for \""
@@ -2539,30 +2545,30 @@ void check_climo_n_vx(Dictionary *dict, const int n_vx) {
 ///////////////////////////////////////////////////////////////////////////////
 
 InterpMthd int_to_interpmthd(int i) {
-   InterpMthd m = InterpMthd_None;
+   InterpMthd m = InterpMthd::None;
 
-        if(i == conf_const.lookup_int(interpmthd_none_str))        m = InterpMthd_None;
-   else if(i == conf_const.lookup_int(interpmthd_min_str))         m = InterpMthd_Min;
-   else if(i == conf_const.lookup_int(interpmthd_max_str))         m = InterpMthd_Max;
-   else if(i == conf_const.lookup_int(interpmthd_median_str))      m = InterpMthd_Median;
-   else if(i == conf_const.lookup_int(interpmthd_uw_mean_str))     m = InterpMthd_UW_Mean;
-   else if(i == conf_const.lookup_int(interpmthd_dw_mean_str))     m = InterpMthd_DW_Mean;
-   else if(i == conf_const.lookup_int(interpmthd_aw_mean_str))     m = InterpMthd_AW_Mean;
-   else if(i == conf_const.lookup_int(interpmthd_ls_fit_str))      m = InterpMthd_LS_Fit;
-   else if(i == conf_const.lookup_int(interpmthd_bilin_str))       m = InterpMthd_Bilin;
-   else if(i == conf_const.lookup_int(interpmthd_nbrhd_str))       m = InterpMthd_Nbrhd;
-   else if(i == conf_const.lookup_int(interpmthd_nearest_str))     m = InterpMthd_Nearest;
-   else if(i == conf_const.lookup_int(interpmthd_budget_str))      m = InterpMthd_Budget;
-   else if(i == conf_const.lookup_int(interpmthd_force_str))       m = InterpMthd_Force;
-   else if(i == conf_const.lookup_int(interpmthd_best_str))        m = InterpMthd_Best;
-   else if(i == conf_const.lookup_int(interpmthd_upper_left_str))  m = InterpMthd_Upper_Left;
-   else if(i == conf_const.lookup_int(interpmthd_upper_right_str)) m = InterpMthd_Upper_Right;
-   else if(i == conf_const.lookup_int(interpmthd_lower_right_str)) m = InterpMthd_Lower_Right;
-   else if(i == conf_const.lookup_int(interpmthd_lower_left_str))  m = InterpMthd_Lower_Left;
-   else if(i == conf_const.lookup_int(interpmthd_gaussian_str))    m = InterpMthd_Gaussian;
-   else if(i == conf_const.lookup_int(interpmthd_maxgauss_str))    m = InterpMthd_MaxGauss;
-   else if(i == conf_const.lookup_int(interpmthd_geog_match_str))  m = InterpMthd_Geog_Match;
-   else if(i == conf_const.lookup_int(interpmthd_hira_str))        m = InterpMthd_HiRA;
+        if(i == conf_const.lookup_int(interpmthd_none_str))        m = InterpMthd::None;
+   else if(i == conf_const.lookup_int(interpmthd_min_str))         m = InterpMthd::Min;
+   else if(i == conf_const.lookup_int(interpmthd_max_str))         m = InterpMthd::Max;
+   else if(i == conf_const.lookup_int(interpmthd_median_str))      m = InterpMthd::Median;
+   else if(i == conf_const.lookup_int(interpmthd_uw_mean_str))     m = InterpMthd::UW_Mean;
+   else if(i == conf_const.lookup_int(interpmthd_dw_mean_str))     m = InterpMthd::DW_Mean;
+   else if(i == conf_const.lookup_int(interpmthd_aw_mean_str))     m = InterpMthd::AW_Mean;
+   else if(i == conf_const.lookup_int(interpmthd_ls_fit_str))      m = InterpMthd::LS_Fit;
+   else if(i == conf_const.lookup_int(interpmthd_bilin_str))       m = InterpMthd::Bilin;
+   else if(i == conf_const.lookup_int(interpmthd_nbrhd_str))       m = InterpMthd::Nbrhd;
+   else if(i == conf_const.lookup_int(interpmthd_nearest_str))     m = InterpMthd::Nearest;
+   else if(i == conf_const.lookup_int(interpmthd_budget_str))      m = InterpMthd::Budget;
+   else if(i == conf_const.lookup_int(interpmthd_force_str))       m = InterpMthd::Force;
+   else if(i == conf_const.lookup_int(interpmthd_best_str))        m = InterpMthd::Best;
+   else if(i == conf_const.lookup_int(interpmthd_upper_left_str))  m = InterpMthd::Upper_Left;
+   else if(i == conf_const.lookup_int(interpmthd_upper_right_str)) m = InterpMthd::Upper_Right;
+   else if(i == conf_const.lookup_int(interpmthd_lower_right_str)) m = InterpMthd::Lower_Right;
+   else if(i == conf_const.lookup_int(interpmthd_lower_left_str))  m = InterpMthd::Lower_Left;
+   else if(i == conf_const.lookup_int(interpmthd_gaussian_str))    m = InterpMthd::Gaussian;
+   else if(i == conf_const.lookup_int(interpmthd_maxgauss_str))    m = InterpMthd::MaxGauss;
+   else if(i == conf_const.lookup_int(interpmthd_geog_match_str))  m = InterpMthd::Geog_Match;
+   else if(i == conf_const.lookup_int(interpmthd_hira_str))        m = InterpMthd::HiRA;
    else {
       mlog << Error << "\nconf_int_to_interpmthd() -> "
            << "Unexpected value of " << i
@@ -2605,52 +2611,52 @@ const char * statlinetype_to_string(const STATLineType t) {
    const char *s = (const char *) nullptr;
 
    switch(t) {
-      case(stat_sl1l2):        s = stat_sl1l2_str;     break;
-      case(stat_sal1l2):       s = stat_sal1l2_str;    break;
-      case(stat_vl1l2):        s = stat_vl1l2_str;     break;
-      case(stat_val1l2):       s = stat_val1l2_str;    break;
-      case(stat_vcnt):         s = stat_vcnt_str;      break;
+      case STATLineType::sl1l2:      s = stat_sl1l2_str;     break;
+      case STATLineType::sal1l2:     s = stat_sal1l2_str;    break;
+      case STATLineType::vl1l2:      s = stat_vl1l2_str;     break;
+      case STATLineType::val1l2:     s = stat_val1l2_str;    break;
+      case STATLineType::vcnt:       s = stat_vcnt_str;      break;
 
-      case(stat_fho):          s = stat_fho_str;       break;
-      case(stat_ctc):          s = stat_ctc_str;       break;
-      case(stat_cts):          s = stat_cts_str;       break;
-      case(stat_mctc):         s = stat_mctc_str;      break;
-      case(stat_mcts):         s = stat_mcts_str;      break;
+      case STATLineType::fho:        s = stat_fho_str;       break;
+      case STATLineType::ctc:        s = stat_ctc_str;       break;
+      case STATLineType::cts:        s = stat_cts_str;       break;
+      case STATLineType::mctc:       s = stat_mctc_str;      break;
+      case STATLineType::mcts:       s = stat_mcts_str;      break;
 
-      case(stat_cnt):          s = stat_cnt_str;       break;
-      case(stat_pct):          s = stat_pct_str;       break;
-      case(stat_pstd):         s = stat_pstd_str;      break;
-      case(stat_pjc):          s = stat_pjc_str;       break;
-      case(stat_prc):          s = stat_prc_str;       break;
+      case STATLineType::cnt:        s = stat_cnt_str;       break;
+      case STATLineType::pct:        s = stat_pct_str;       break;
+      case STATLineType::pstd:       s = stat_pstd_str;      break;
+      case STATLineType::pjc:        s = stat_pjc_str;       break;
+      case STATLineType::prc:        s = stat_prc_str;       break;
 
-      case(stat_eclv):         s = stat_eclv_str;      break;
-      case(stat_mpr):          s = stat_mpr_str;       break;
-      case(stat_seeps):        s = stat_seeps_str;     break;
-      case(stat_seeps_mpr):    s = stat_seeps_mpr_str; break;
-      case(stat_nbrctc):       s = stat_nbrctc_str;    break;
+      case STATLineType::eclv:       s = stat_eclv_str;      break;
+      case STATLineType::mpr:        s = stat_mpr_str;       break;
+      case STATLineType::seeps:      s = stat_seeps_str;     break;
+      case STATLineType::seeps_mpr:  s = stat_seeps_mpr_str; break;
+      case STATLineType::nbrctc:     s = stat_nbrctc_str;    break;
 
-      case(stat_nbrcts):       s = stat_nbrcts_str;    break;
-      case(stat_nbrcnt):       s = stat_nbrcnt_str;    break;
-      case(stat_grad):         s = stat_grad_str;      break;
-      case(stat_dmap):         s = stat_dmap_str;      break;
-      case(stat_isc):          s = stat_isc_str;       break;
+      case STATLineType::nbrcts:     s = stat_nbrcts_str;    break;
+      case STATLineType::nbrcnt:     s = stat_nbrcnt_str;    break;
+      case STATLineType::grad:       s = stat_grad_str;      break;
+      case STATLineType::dmap:       s = stat_dmap_str;      break;
+      case STATLineType::isc:        s = stat_isc_str;       break;
 
-      case(stat_wdir):         s = stat_wdir_str;      break;
-      case(stat_ecnt):         s = stat_ecnt_str;      break;
-      case(stat_rps):          s = stat_rps_str;       break;
-      case(stat_rhist):        s = stat_rhist_str;     break;
-      case(stat_phist):        s = stat_phist_str;     break;
+      case STATLineType::wdir:       s = stat_wdir_str;      break;
+      case STATLineType::ecnt:       s = stat_ecnt_str;      break;
+      case STATLineType::rps:        s = stat_rps_str;       break;
+      case STATLineType::rhist:      s = stat_rhist_str;     break;
+      case STATLineType::phist:      s = stat_phist_str;     break;
 
-      case(stat_orank):        s = stat_orank_str;     break;
-      case(stat_ssvar):        s = stat_ssvar_str;     break;
-      case(stat_relp):         s = stat_relp_str;      break;
-      case(stat_genmpr):       s = stat_genmpr_str;    break;
-      case(stat_ssidx):        s = stat_ssidx_str;     break;
+      case STATLineType::orank:      s = stat_orank_str;     break;
+      case STATLineType::ssvar:      s = stat_ssvar_str;     break;
+      case STATLineType::relp:       s = stat_relp_str;      break;
+      case STATLineType::genmpr:     s = stat_genmpr_str;    break;
+      case STATLineType::ssidx:      s = stat_ssidx_str;     break;
  
-      case(stat_header):       s = stat_header_str;    break;
+      case STATLineType::header:     s = stat_header_str;    break;
 
-      case(no_stat_line_type):
-      default:                 s = stat_na_str;        break;
+      /*case STATLineType::none:*/
+      default:                       s = stat_na_str;        break;
    }
 
    return s;
@@ -2671,51 +2677,77 @@ void statlinetype_to_string(const STATLineType t, char *out) {
 STATLineType string_to_statlinetype(const char *s) {
    STATLineType t;
 
-        if(strcasecmp(s, stat_sl1l2_str)     == 0) t = stat_sl1l2;
-   else if(strcasecmp(s, stat_sal1l2_str)    == 0) t = stat_sal1l2;
-   else if(strcasecmp(s, stat_vl1l2_str)     == 0) t = stat_vl1l2;
-   else if(strcasecmp(s, stat_val1l2_str)    == 0) t = stat_val1l2;
-   else if(strcasecmp(s, stat_vcnt_str)      == 0) t = stat_vcnt;
+        if(strcasecmp(s, stat_sl1l2_str)     == 0) t = STATLineType::sl1l2;
+   else if(strcasecmp(s, stat_sal1l2_str)    == 0) t = STATLineType::sal1l2;
+   else if(strcasecmp(s, stat_vl1l2_str)     == 0) t = STATLineType::vl1l2;
+   else if(strcasecmp(s, stat_val1l2_str)    == 0) t = STATLineType::val1l2;
+   else if(strcasecmp(s, stat_vcnt_str)      == 0) t = STATLineType::vcnt;
 
-   else if(strcasecmp(s, stat_fho_str)       == 0) t = stat_fho;
-   else if(strcasecmp(s, stat_ctc_str)       == 0) t = stat_ctc;
-   else if(strcasecmp(s, stat_cts_str)       == 0) t = stat_cts;
-   else if(strcasecmp(s, stat_mctc_str)      == 0) t = stat_mctc;
-   else if(strcasecmp(s, stat_mcts_str)      == 0) t = stat_mcts;
+   else if(strcasecmp(s, stat_fho_str)       == 0) t = STATLineType::fho;
+   else if(strcasecmp(s, stat_ctc_str)       == 0) t = STATLineType::ctc;
+   else if(strcasecmp(s, stat_cts_str)       == 0) t = STATLineType::cts;
+   else if(strcasecmp(s, stat_mctc_str)      == 0) t = STATLineType::mctc;
+   else if(strcasecmp(s, stat_mcts_str)      == 0) t = STATLineType::mcts;
 
-   else if(strcasecmp(s, stat_cnt_str)       == 0) t = stat_cnt;
-   else if(strcasecmp(s, stat_pct_str)       == 0) t = stat_pct;
-   else if(strcasecmp(s, stat_pstd_str)      == 0) t = stat_pstd;
-   else if(strcasecmp(s, stat_pjc_str)       == 0) t = stat_pjc;
-   else if(strcasecmp(s, stat_prc_str)       == 0) t = stat_prc;
+   else if(strcasecmp(s, stat_cnt_str)       == 0) t = STATLineType::cnt;
+   else if(strcasecmp(s, stat_pct_str)       == 0) t = STATLineType::pct;
+   else if(strcasecmp(s, stat_pstd_str)      == 0) t = STATLineType::pstd;
+   else if(strcasecmp(s, stat_pjc_str)       == 0) t = STATLineType::pjc;
+   else if(strcasecmp(s, stat_prc_str)       == 0) t = STATLineType::prc;
 
-   else if(strcasecmp(s, stat_eclv_str)      == 0) t = stat_eclv;
-   else if(strcasecmp(s, stat_mpr_str)       == 0) t = stat_mpr;
-   else if(strcasecmp(s, stat_seeps_str)     == 0) t = stat_seeps;
-   else if(strcasecmp(s, stat_seeps_mpr_str) == 0) t = stat_seeps_mpr;
-   else if(strcasecmp(s, stat_nbrctc_str)    == 0) t = stat_nbrctc;
+   else if(strcasecmp(s, stat_eclv_str)      == 0) t = STATLineType::eclv;
+   else if(strcasecmp(s, stat_mpr_str)       == 0) t = STATLineType::mpr;
+   else if(strcasecmp(s, stat_seeps_str)     == 0) t = STATLineType::seeps;
+   else if(strcasecmp(s, stat_seeps_mpr_str) == 0) t = STATLineType::seeps_mpr;
+   else if(strcasecmp(s, stat_nbrctc_str)    == 0) t = STATLineType::nbrctc;
 
-   else if(strcasecmp(s, stat_nbrcts_str)    == 0) t = stat_nbrcts;
-   else if(strcasecmp(s, stat_nbrcnt_str)    == 0) t = stat_nbrcnt;
-   else if(strcasecmp(s, stat_grad_str)      == 0) t = stat_grad;
-   else if(strcasecmp(s, stat_dmap_str)      == 0) t = stat_dmap;
-   else if(strcasecmp(s, stat_isc_str)       == 0) t = stat_isc;
+   else if(strcasecmp(s, stat_nbrcts_str)    == 0) t = STATLineType::nbrcts;
+   else if(strcasecmp(s, stat_nbrcnt_str)    == 0) t = STATLineType::nbrcnt;
+   else if(strcasecmp(s, stat_grad_str)      == 0) t = STATLineType::grad;
+   else if(strcasecmp(s, stat_dmap_str)      == 0) t = STATLineType::dmap;
+   else if(strcasecmp(s, stat_isc_str)       == 0) t = STATLineType::isc;
 
-   else if(strcasecmp(s, stat_wdir_str)      == 0) t = stat_wdir;
-   else if(strcasecmp(s, stat_ecnt_str)      == 0) t = stat_ecnt;
-   else if(strcasecmp(s, stat_rps_str)       == 0) t = stat_rps;
-   else if(strcasecmp(s, stat_rhist_str)     == 0) t = stat_rhist;
-   else if(strcasecmp(s, stat_phist_str)     == 0) t = stat_phist;
+   else if(strcasecmp(s, stat_wdir_str)      == 0) t = STATLineType::wdir;
+   else if(strcasecmp(s, stat_ecnt_str)      == 0) t = STATLineType::ecnt;
+   else if(strcasecmp(s, stat_rps_str)       == 0) t = STATLineType::rps;
+   else if(strcasecmp(s, stat_rhist_str)     == 0) t = STATLineType::rhist;
+   else if(strcasecmp(s, stat_phist_str)     == 0) t = STATLineType::phist;
 
-   else if(strcasecmp(s, stat_orank_str)     == 0) t = stat_orank;
-   else if(strcasecmp(s, stat_ssvar_str)     == 0) t = stat_ssvar;
-   else if(strcasecmp(s, stat_relp_str)      == 0) t = stat_relp;
-   else if(strcasecmp(s, stat_genmpr_str)    == 0) t = stat_genmpr;
-   else if(strcasecmp(s, stat_ssidx_str)     == 0) t = stat_ssidx;
+   else if(strcasecmp(s, stat_orank_str)     == 0) t = STATLineType::orank;
+   else if(strcasecmp(s, stat_ssvar_str)     == 0) t = STATLineType::ssvar;
+   else if(strcasecmp(s, stat_relp_str)      == 0) t = STATLineType::relp;
+   else if(strcasecmp(s, stat_genmpr_str)    == 0) t = STATLineType::genmpr;
+   else if(strcasecmp(s, stat_ssidx_str)     == 0) t = STATLineType::ssidx;
 
-   else if(strcasecmp(s, stat_header_str)    == 0) t = stat_header;
+   else if(strcasecmp(s, stat_header_str)    == 0) t = STATLineType::header;
 
-   else                                            t = no_stat_line_type;
+   else                                            t = STATLineType::none;
+
+   return t;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+const char * bootintervaltype_to_string(const BootIntervalType t) {
+   auto s = (const char *) nullptr;
+
+   switch(t) {
+      case BootIntervalType::BCA:    s = conf_val_bca;     break;
+      case BootIntervalType::PCTile: s = conf_val_pctile;  break;
+      default:                       s = conf_val_none;    break;
+   }
+
+   return s;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+BootIntervalType string_to_bootintervaltype(const char *s) {
+   BootIntervalType t;
+
+        if(strcasecmp(s, conf_val_bca)    == 0) t = BootIntervalType::BCA;
+   else if(strcasecmp(s, conf_val_pctile) == 0) t = BootIntervalType::PCTile;
+   else                                         t = BootIntervalType::None;
 
    return t;
 }
@@ -2723,13 +2755,13 @@ STATLineType string_to_statlinetype(const char *s) {
 ///////////////////////////////////////////////////////////////////////////////
 
 FieldType int_to_fieldtype(int v) {
-   FieldType t = FieldType_None;
+   FieldType t = FieldType::None;
 
    // Convert integer to enumerated FieldType
-        if(v == conf_const.lookup_int(conf_val_none)) t = FieldType_None;
-   else if(v == conf_const.lookup_int(conf_val_both)) t = FieldType_Both;
-   else if(v == conf_const.lookup_int(conf_val_fcst)) t = FieldType_Fcst;
-   else if(v == conf_const.lookup_int(conf_val_obs))  t = FieldType_Obs;
+        if(v == conf_const.lookup_int(conf_val_none)) t = FieldType::None;
+   else if(v == conf_const.lookup_int(conf_val_both)) t = FieldType::Both;
+   else if(v == conf_const.lookup_int(conf_val_fcst)) t = FieldType::Fcst;
+   else if(v == conf_const.lookup_int(conf_val_obs))  t = FieldType::Obs;
    else {
       mlog << Error << "\nint_to_fieldtype() -> "
            << "Unexpected value of " << v << ".\n\n";
@@ -2742,14 +2774,14 @@ FieldType int_to_fieldtype(int v) {
 ///////////////////////////////////////////////////////////////////////////////
 
 GridTemplateFactory::GridTemplates int_to_gridtemplate(int v) {
-   GridTemplateFactory::GridTemplates t = GridTemplateFactory::GridTemplate_Square;
+   GridTemplateFactory::GridTemplates t = GridTemplateFactory::GridTemplates::Square;
 
    // Convert integer to enumerated FieldType
    if(v == conf_const.lookup_int(conf_val_square)) {
-      t = GridTemplateFactory::GridTemplate_Square;
+      t = GridTemplateFactory::GridTemplates::Square;
    }
    else if(v == conf_const.lookup_int(conf_val_circle)) {
-      t = GridTemplateFactory::GridTemplate_Circle;
+      t = GridTemplateFactory::GridTemplates::Circle;
    }
    else {
       mlog << Error << "\nint_to_gridtemplate() -> "
@@ -2767,13 +2799,13 @@ ConcatString fieldtype_to_string(FieldType type) {
 
    // Convert enumerated FieldType to string
    switch(type) {
-      case(FieldType_None): s = conf_val_none; break;
-      case(FieldType_Both): s = conf_val_both; break;
-      case(FieldType_Fcst): s = conf_val_fcst; break;
-      case(FieldType_Obs):  s = conf_val_obs; break;
+      case FieldType::None: s = conf_val_none; break;
+      case FieldType::Both: s = conf_val_both; break;
+      case FieldType::Fcst: s = conf_val_fcst; break;
+      case FieldType::Obs:  s = conf_val_obs; break;
       default:
          mlog << Error << "\nfieldtype_to_string() -> "
-              << "Unexpected FieldType value of " << type << ".\n\n";
+              << "Unexpected FieldType value of " << enum_class_as_int(type) << ".\n\n";
          exit(1);
    }
 
@@ -2783,13 +2815,13 @@ ConcatString fieldtype_to_string(FieldType type) {
 ///////////////////////////////////////////////////////////////////////////////
 
 SetLogic int_to_setlogic(int v) {
-   SetLogic t = SetLogic_None;
+   SetLogic t = SetLogic::None;
 
    // Convert integer to enumerated SetLogic
-        if(v == conf_const.lookup_int(conf_val_none))         t = SetLogic_None;
-   else if(v == conf_const.lookup_int(conf_val_union))        t = SetLogic_Union;
-   else if(v == conf_const.lookup_int(conf_val_intersection)) t = SetLogic_Intersection;
-   else if(v == conf_const.lookup_int(conf_val_symdiff))      t = SetLogic_SymDiff;
+        if(v == conf_const.lookup_int(conf_val_none))         t = SetLogic::None;
+   else if(v == conf_const.lookup_int(conf_val_union))        t = SetLogic::Union;
+   else if(v == conf_const.lookup_int(conf_val_intersection)) t = SetLogic::Intersection;
+   else if(v == conf_const.lookup_int(conf_val_symdiff))      t = SetLogic::SymDiff;
    else {
       mlog << Error << "\nint_to_setlogic() -> "
            << "Unexpected value of " << v << ".\n\n";
@@ -2802,22 +2834,22 @@ SetLogic int_to_setlogic(int v) {
 ///////////////////////////////////////////////////////////////////////////////
 
 SetLogic string_to_setlogic(const char *s) {
-   SetLogic t = SetLogic_None;
+   SetLogic t = SetLogic::None;
 
    // Convert string to enumerated SetLogic
-        if(strcasecmp(s, conf_val_none)                == 0) t = SetLogic_None;
+        if(strcasecmp(s, conf_val_none)                == 0) t = SetLogic::None;
 
    else if(strcasecmp(s, conf_val_union)               == 0 ||
            strcasecmp(s, setlogic_abbr_union)          == 0 ||
-           strcasecmp(s, setlogic_symbol_union)        == 0) t = SetLogic_Union;
+           strcasecmp(s, setlogic_symbol_union)        == 0) t = SetLogic::Union;
 
    else if(strcasecmp(s, conf_val_intersection)        == 0 ||
            strcasecmp(s, setlogic_abbr_intersection)   == 0 ||
-           strcasecmp(s, setlogic_symbol_intersection) == 0) t = SetLogic_Intersection;
+           strcasecmp(s, setlogic_symbol_intersection) == 0) t = SetLogic::Intersection;
 
    else if(strcasecmp(s, conf_val_symdiff)             == 0 ||
            strcasecmp(s, setlogic_abbr_symdiff)        == 0 ||
-           strcasecmp(s, setlogic_symbol_symdiff)      == 0) t = SetLogic_SymDiff;
+           strcasecmp(s, setlogic_symbol_symdiff)      == 0) t = SetLogic::SymDiff;
 
    else {
       mlog << Error << "\nstring_to_setlogic() -> "
@@ -2836,13 +2868,13 @@ ConcatString setlogic_to_string(SetLogic type) {
 
    // Convert enumerated SetLogic to string
    switch(type) {
-      case(SetLogic_None):         s = conf_val_none;         break;
-      case(SetLogic_Union):        s = conf_val_union;        break;
-      case(SetLogic_Intersection): s = conf_val_intersection; break;
-      case(SetLogic_SymDiff):      s = conf_val_symdiff;      break;
+      case SetLogic::None:         s = conf_val_none;         break;
+      case SetLogic::Union:        s = conf_val_union;        break;
+      case SetLogic::Intersection: s = conf_val_intersection; break;
+      case SetLogic::SymDiff:      s = conf_val_symdiff;      break;
       default:
          mlog << Error << "\nsetlogic_to_string() -> "
-              << "Unexpected SetLogic value of " << type << ".\n\n";
+              << "Unexpected SetLogic value of " << enum_class_as_int(type) << ".\n\n";
          exit(1);
    }
 
@@ -2856,13 +2888,13 @@ ConcatString setlogic_to_abbr(SetLogic type) {
 
    // Convert enumerated SetLogic to an abbreviation
    switch(type) {
-      case(SetLogic_None):         s = na_str;                     break;
-      case(SetLogic_Union):        s = setlogic_abbr_union;        break;
-      case(SetLogic_Intersection): s = setlogic_abbr_intersection; break;
-      case(SetLogic_SymDiff):      s = setlogic_abbr_symdiff;      break;
+      case SetLogic::None:         s = na_str;                     break;
+      case SetLogic::Union:        s = setlogic_abbr_union;        break;
+      case SetLogic::Intersection: s = setlogic_abbr_intersection; break;
+      case SetLogic::SymDiff:      s = setlogic_abbr_symdiff;      break;
       default:
          mlog << Error << "\nsetlogic_to_abbr() -> "
-              << "Unexpected SetLogic value of " << type << ".\n\n";
+              << "Unexpected SetLogic value of " << enum_class_as_int(type) << ".\n\n";
          exit(1);
    }
 
@@ -2876,13 +2908,13 @@ ConcatString setlogic_to_symbol(SetLogic type) {
 
    // Convert enumerated SetLogic to a symbol
    switch(type) {
-      case(SetLogic_None):         s = na_str;                       break;
-      case(SetLogic_Union):        s = setlogic_symbol_union;        break;
-      case(SetLogic_Intersection): s = setlogic_symbol_intersection; break;
-      case(SetLogic_SymDiff):      s = setlogic_symbol_symdiff;      break;
+      case SetLogic::None:         s = na_str;                       break;
+      case SetLogic::Union:        s = setlogic_symbol_union;        break;
+      case SetLogic::Intersection: s = setlogic_symbol_intersection; break;
+      case SetLogic::SymDiff:      s = setlogic_symbol_symdiff;      break;
       default:
          mlog << Error << "\nsetlogic_to_symbol() -> "
-              << "Unexpected SetLogic value of " << type << ".\n\n";
+              << "Unexpected SetLogic value of " << enum_class_as_int(type) << ".\n\n";
          exit(1);
    }
 
@@ -2892,12 +2924,12 @@ ConcatString setlogic_to_symbol(SetLogic type) {
 ///////////////////////////////////////////////////////////////////////////////
 
 SetLogic check_setlogic(SetLogic t1, SetLogic t2) {
-   SetLogic t = SetLogic_None;
+   SetLogic t = SetLogic::None;
 
    // If not equal, select the non-default logic type
         if(t1 == t2)            t = t1;
-   else if(t1 == SetLogic_None) t = t2;
-   else if(t2 == SetLogic_None) t = t1;
+   else if(t1 == SetLogic::None) t = t2;
+   else if(t2 == SetLogic::None) t = t1;
    // If not equal and both non-default, error out
    else {
       mlog << Error << "\ncheck_setlogic() -> "
@@ -2913,13 +2945,13 @@ SetLogic check_setlogic(SetLogic t1, SetLogic t2) {
 ///////////////////////////////////////////////////////////////////////////////
 
 TrackType int_to_tracktype(int v) {
-   TrackType t = TrackType_None;
+   TrackType t = TrackType::None;
 
    // Convert integer to enumerated TrackType
-        if(v == conf_const.lookup_int(conf_val_none))  t = TrackType_None;
-   else if(v == conf_const.lookup_int(conf_val_both))  t = TrackType_Both;
-   else if(v == conf_const.lookup_int(conf_val_adeck)) t = TrackType_ADeck;
-   else if(v == conf_const.lookup_int(conf_val_bdeck)) t = TrackType_BDeck;
+        if(v == conf_const.lookup_int(conf_val_none))  t = TrackType::None;
+   else if(v == conf_const.lookup_int(conf_val_both))  t = TrackType::Both;
+   else if(v == conf_const.lookup_int(conf_val_adeck)) t = TrackType::ADeck;
+   else if(v == conf_const.lookup_int(conf_val_bdeck)) t = TrackType::BDeck;
    else {
       mlog << Error << "\nint_to_tracktype() -> "
            << "Unexpected value of " << v << ".\n\n";
@@ -2932,13 +2964,13 @@ TrackType int_to_tracktype(int v) {
 ///////////////////////////////////////////////////////////////////////////////
 
 TrackType string_to_tracktype(const char *s) {
-   TrackType t = TrackType_None;
+   TrackType t = TrackType::None;
 
    // Convert string to enumerated TrackType
-        if(strcasecmp(s, conf_val_none)  == 0) t = TrackType_None;
-   else if(strcasecmp(s, conf_val_both)  == 0) t = TrackType_Both;
-   else if(strcasecmp(s, conf_val_adeck) == 0) t = TrackType_ADeck;
-   else if(strcasecmp(s, conf_val_bdeck) == 0) t = TrackType_BDeck;
+        if(strcasecmp(s, conf_val_none)  == 0) t = TrackType::None;
+   else if(strcasecmp(s, conf_val_both)  == 0) t = TrackType::Both;
+   else if(strcasecmp(s, conf_val_adeck) == 0) t = TrackType::ADeck;
+   else if(strcasecmp(s, conf_val_bdeck) == 0) t = TrackType::BDeck;
    else {
       mlog << Error << "\nstring_to_tracktype() -> "
            << "Unexpected TrackType string \"" << s << "\".\n\n";
@@ -2955,13 +2987,13 @@ ConcatString tracktype_to_string(TrackType type) {
 
    // Convert enumerated TrackType to string
    switch(type) {
-      case(TrackType_None):  s = conf_val_none; break;
-      case(TrackType_Both):  s = conf_val_both; break;
-      case(TrackType_ADeck): s = conf_val_adeck; break;
-      case(TrackType_BDeck): s = conf_val_bdeck; break;
+      case TrackType::None:  s = conf_val_none; break;
+      case TrackType::Both:  s = conf_val_both; break;
+      case TrackType::ADeck: s = conf_val_adeck; break;
+      case TrackType::BDeck: s = conf_val_bdeck; break;
       default:
          mlog << Error << "\ntracktype_to_string() -> "
-              << "Unexpected TrackType value of " << type << ".\n\n";
+              << "Unexpected TrackType value of " << enum_class_as_int(type) << ".\n\n";
          exit(1);
    }
 
@@ -2971,15 +3003,15 @@ ConcatString tracktype_to_string(TrackType type) {
 ///////////////////////////////////////////////////////////////////////////////
 
 DiagType string_to_diagtype(const char *s) {
-   DiagType t = DiagType_None;
+   DiagType t = DiagType::None;
 
    // Convert string to enumerated DiagType, storing unknown strings
    // as the default type
-        if(strcasecmp(s, cira_diag_rt_str)   == 0) t = DiagType_CIRA_RT;
-   else if(strcasecmp(s, cira_diag_dev_str)  == 0) t = DiagType_CIRA_Dev;
-   else if(strcasecmp(s, ships_diag_rt_str)  == 0) t = DiagType_SHIPS_RT;
-   else if(strcasecmp(s, ships_diag_dev_str) == 0) t = DiagType_SHIPS_Dev;
-   else                                            t = DiagType_None;
+        if(strcasecmp(s, cira_diag_rt_str)   == 0) t = DiagType::CIRA_RT;
+   else if(strcasecmp(s, cira_diag_dev_str)  == 0) t = DiagType::CIRA_Dev;
+   else if(strcasecmp(s, ships_diag_rt_str)  == 0) t = DiagType::SHIPS_RT;
+   else if(strcasecmp(s, ships_diag_dev_str) == 0) t = DiagType::SHIPS_Dev;
+   else                                            t = DiagType::None;
 
    return t;
 }
@@ -2991,14 +3023,14 @@ ConcatString diagtype_to_string(DiagType type) {
 
    // Convert enumerated DiagType to string
    switch(type) {
-      case(DiagType_None):      s = conf_val_none;      break;
-      case(DiagType_CIRA_RT):   s = cira_diag_rt_str;   break;
-      case(DiagType_CIRA_Dev):  s = cira_diag_dev_str;  break;
-      case(DiagType_SHIPS_RT):  s = ships_diag_rt_str;  break;
-      case(DiagType_SHIPS_Dev): s = ships_diag_dev_str; break;
+      case DiagType::None:      s = conf_val_none;      break;
+      case DiagType::CIRA_RT:   s = cira_diag_rt_str;   break;
+      case DiagType::CIRA_Dev:  s = cira_diag_dev_str;  break;
+      case DiagType::SHIPS_RT:  s = ships_diag_rt_str;  break;
+      case DiagType::SHIPS_Dev: s = ships_diag_dev_str; break;
       default:
          mlog << Error << "\ndiagtype_to_string() -> "
-              << "Unexpected DiagType value of " << type << ".\n\n";
+              << "Unexpected DiagType value of " << enum_class_as_int(type) << ".\n\n";
          exit(1);
    }
 
@@ -3008,12 +3040,12 @@ ConcatString diagtype_to_string(DiagType type) {
 ///////////////////////////////////////////////////////////////////////////////
 
 Interp12Type int_to_interp12type(int v) {
-   Interp12Type t = Interp12Type_None;
+   Interp12Type t = Interp12Type::None;
 
    // Convert integer to enumerated Interp12Type
-        if(v == conf_const.lookup_int(conf_val_none))    t = Interp12Type_None;
-   else if(v == conf_const.lookup_int(conf_val_fill))    t = Interp12Type_Fill;
-   else if(v == conf_const.lookup_int(conf_val_replace)) t = Interp12Type_Replace;
+        if(v == conf_const.lookup_int(conf_val_none))    t = Interp12Type::None;
+   else if(v == conf_const.lookup_int(conf_val_fill))    t = Interp12Type::Fill;
+   else if(v == conf_const.lookup_int(conf_val_replace)) t = Interp12Type::Replace;
    else {
       mlog << Error << "\nint_to_interp12type() -> "
            << "Unexpected value of " << v << ".\n\n";
@@ -3026,12 +3058,12 @@ Interp12Type int_to_interp12type(int v) {
 ///////////////////////////////////////////////////////////////////////////////
 
 Interp12Type string_to_interp12type(const char *s) {
-   Interp12Type t = Interp12Type_None;
+   Interp12Type t = Interp12Type::None;
 
    // Convert string to enumerated Interp12Type
-        if(strcasecmp(s, conf_val_none)    == 0) t = Interp12Type_None;
-   else if(strcasecmp(s, conf_val_fill)    == 0) t = Interp12Type_Fill;
-   else if(strcasecmp(s, conf_val_replace) == 0) t = Interp12Type_Replace;
+        if(strcasecmp(s, conf_val_none)    == 0) t = Interp12Type::None;
+   else if(strcasecmp(s, conf_val_fill)    == 0) t = Interp12Type::Fill;
+   else if(strcasecmp(s, conf_val_replace) == 0) t = Interp12Type::Replace;
    else {
       mlog << Error << "\nstring_to_interp12type() -> "
            << "Unexpected Interp12Type string \"" << s << "\".\n\n";
@@ -3048,12 +3080,12 @@ ConcatString interp12type_to_string(Interp12Type type) {
 
    // Convert enumerated Interp12Type to string
    switch(type) {
-      case(Interp12Type_None):    s = conf_val_none;    break;
-      case(Interp12Type_Fill):    s = conf_val_fill;    break;
-      case(Interp12Type_Replace): s = conf_val_replace; break;
+      case Interp12Type::None:    s = conf_val_none;    break;
+      case Interp12Type::Fill:    s = conf_val_fill;    break;
+      case Interp12Type::Replace: s = conf_val_replace; break;
       default:
          mlog << Error << "\ninterp12type_to_string() -> "
-              << "Unexpected Interp12Type value of " << type << ".\n\n";
+              << "Unexpected Interp12Type value of " << enum_class_as_int(type) << ".\n\n";
          exit(1);
    }
 
@@ -3063,13 +3095,13 @@ ConcatString interp12type_to_string(Interp12Type type) {
 ///////////////////////////////////////////////////////////////////////////////
 
 MergeType int_to_mergetype(int v) {
-   MergeType t = MergeType_None;
+   MergeType t = MergeType::None;
 
    // Convert integer to enumerated MergeType
-        if(v == conf_const.lookup_int(conf_val_none))   t = MergeType_None;
-   else if(v == conf_const.lookup_int(conf_val_both))   t = MergeType_Both;
-   else if(v == conf_const.lookup_int(conf_val_thresh)) t = MergeType_Thresh;
-   else if(v == conf_const.lookup_int(conf_val_engine)) t = MergeType_Engine;
+        if(v == conf_const.lookup_int(conf_val_none))   t = MergeType::None;
+   else if(v == conf_const.lookup_int(conf_val_both))   t = MergeType::Both;
+   else if(v == conf_const.lookup_int(conf_val_thresh)) t = MergeType::Thresh;
+   else if(v == conf_const.lookup_int(conf_val_engine)) t = MergeType::Engine;
    else {
       mlog << Error << "\nint_to_mergetype() -> "
            << "Unexpected value of " << v << ".\n\n";
@@ -3086,13 +3118,13 @@ ConcatString mergetype_to_string(MergeType type) {
 
    // Convert enumerated MergeType to string
    switch(type) {
-      case(MergeType_None):   s = conf_val_none;   break;
-      case(MergeType_Both):   s = conf_val_both;   break;
-      case(MergeType_Thresh): s = conf_val_thresh; break;
-      case(MergeType_Engine): s = conf_val_engine; break;
+      case MergeType::None:   s = conf_val_none;   break;
+      case MergeType::Both:   s = conf_val_both;   break;
+      case MergeType::Thresh: s = conf_val_thresh; break;
+      case MergeType::Engine: s = conf_val_engine; break;
       default:
          mlog << Error << "\nmergetype_to_string() -> "
-              << "Unexpected MergeType value of " << type << ".\n\n";
+              << "Unexpected MergeType value of " << enum_class_as_int(type) << ".\n\n";
          exit(1);
    }
 
@@ -3106,19 +3138,19 @@ ConcatString obssummary_to_string(ObsSummary type, int perc_val) {
 
    // Convert enumerated ObsSummary to string
    switch(type) {
-      case(ObsSummary_None):    s = conf_val_none;       break;
-      case(ObsSummary_Nearest): s = conf_val_nearest;    break;
-      case(ObsSummary_Min):     s = conf_val_min;        break;
-      case(ObsSummary_Max):     s = conf_val_max;        break;
-      case(ObsSummary_UW_Mean): s = conf_val_uw_mean;    break;
-      case(ObsSummary_DW_Mean): s = conf_val_dw_mean;    break;
-      case(ObsSummary_Median):  s = conf_val_median;     break;
-      case(ObsSummary_Perc):
+      case ObsSummary::None:    s = conf_val_none;       break;
+      case ObsSummary::Nearest: s = conf_val_nearest;    break;
+      case ObsSummary::Min:     s = conf_val_min;        break;
+      case ObsSummary::Max:     s = conf_val_max;        break;
+      case ObsSummary::UW_Mean: s = conf_val_uw_mean;    break;
+      case ObsSummary::DW_Mean: s = conf_val_dw_mean;    break;
+      case ObsSummary::Median:  s = conf_val_median;     break;
+      case ObsSummary::Perc:
          s << conf_val_perc << "(" << perc_val << ")";
          break;
       default:
          mlog << Error << "\nobssummary_to_string() -> "
-              << "Unexpected ObsSummary value of " << type << ".\n\n";
+              << "Unexpected ObsSummary value of " << enum_class_as_int(type) << ".\n\n";
          exit(1);
    }
 
@@ -3128,13 +3160,13 @@ ConcatString obssummary_to_string(ObsSummary type, int perc_val) {
 ///////////////////////////////////////////////////////////////////////////////
 
 MatchType int_to_matchtype(int v) {
-   MatchType t = MatchType_None;
+   MatchType t = MatchType::None;
 
    // Convert integer to enumerated MatchType
-        if(v == conf_const.lookup_int(conf_val_none))       t = MatchType_None;
-   else if(v == conf_const.lookup_int(conf_val_merge_both)) t = MatchType_MergeBoth;
-   else if(v == conf_const.lookup_int(conf_val_merge_fcst)) t = MatchType_MergeFcst;
-   else if(v == conf_const.lookup_int(conf_val_no_merge))   t = MatchType_NoMerge;
+        if(v == conf_const.lookup_int(conf_val_none))       t = MatchType::None;
+   else if(v == conf_const.lookup_int(conf_val_merge_both)) t = MatchType::MergeBoth;
+   else if(v == conf_const.lookup_int(conf_val_merge_fcst)) t = MatchType::MergeFcst;
+   else if(v == conf_const.lookup_int(conf_val_no_merge))   t = MatchType::NoMerge;
    else {
       mlog << Error << "\nint_to_matchtype() -> "
            << "Unexpected value of " << v << ".\n\n";
@@ -3151,13 +3183,13 @@ ConcatString matchtype_to_string(MatchType type) {
 
    // Convert enumerated MatchType to string
    switch(type) {
-      case(MatchType_None):      s = conf_val_none;       break;
-      case(MatchType_MergeBoth): s = conf_val_merge_both; break;
-      case(MatchType_MergeFcst): s = conf_val_merge_fcst; break;
-      case(MatchType_NoMerge):   s = conf_val_no_merge;   break;
+      case MatchType::None:      s = conf_val_none;       break;
+      case MatchType::MergeBoth: s = conf_val_merge_both; break;
+      case MatchType::MergeFcst: s = conf_val_merge_fcst; break;
+      case MatchType::NoMerge:   s = conf_val_no_merge;   break;
       default:
          mlog << Error << "\nmatchtype_to_string() -> "
-              << "Unexpected MatchType value of " << type << ".\n\n";
+              << "Unexpected MatchType value of " << enum_class_as_int(type) << ".\n\n";
          exit(1);
    }
 
@@ -3167,16 +3199,16 @@ ConcatString matchtype_to_string(MatchType type) {
 ///////////////////////////////////////////////////////////////////////////////
 
 DistType int_to_disttype(int v) {
-   DistType t = DistType_None;
+   DistType t = DistType::None;
 
    // Convert integer to enumerated DistType
-        if(v == conf_const.lookup_int(conf_val_none))        t = DistType_None;
-   else if(v == conf_const.lookup_int(conf_val_normal))      t = DistType_Normal;
-   else if(v == conf_const.lookup_int(conf_val_exponential)) t = DistType_Exponential;
-   else if(v == conf_const.lookup_int(conf_val_chisquared))  t = DistType_ChiSquared;
-   else if(v == conf_const.lookup_int(conf_val_gamma))       t = DistType_Gamma;
-   else if(v == conf_const.lookup_int(conf_val_uniform))     t = DistType_Uniform;
-   else if(v == conf_const.lookup_int(conf_val_beta))        t = DistType_Beta;
+        if(v == conf_const.lookup_int(conf_val_none))        t = DistType::None;
+   else if(v == conf_const.lookup_int(conf_val_normal))      t = DistType::Normal;
+   else if(v == conf_const.lookup_int(conf_val_exponential)) t = DistType::Exponential;
+   else if(v == conf_const.lookup_int(conf_val_chisquared))  t = DistType::ChiSquared;
+   else if(v == conf_const.lookup_int(conf_val_gamma))       t = DistType::Gamma;
+   else if(v == conf_const.lookup_int(conf_val_uniform))     t = DistType::Uniform;
+   else if(v == conf_const.lookup_int(conf_val_beta))        t = DistType::Beta;
    else {
       mlog << Error << "\nint_to_disttype() -> "
            << "Unexpected value of " << v << ".\n\n";
@@ -3189,16 +3221,16 @@ DistType int_to_disttype(int v) {
 ///////////////////////////////////////////////////////////////////////////////
 
 DistType string_to_disttype(const char *s) {
-   DistType t = DistType_None;
+   DistType t = DistType::None;
 
    // Convert string to enumerated DistType
-        if(strcasecmp(s, conf_val_none)        == 0) t = DistType_None;
-   else if(strcasecmp(s, conf_val_normal)      == 0) t = DistType_Normal;
-   else if(strcasecmp(s, conf_val_exponential) == 0) t = DistType_Exponential;
-   else if(strcasecmp(s, conf_val_chisquared)  == 0) t = DistType_ChiSquared;
-   else if(strcasecmp(s, conf_val_gamma)       == 0) t = DistType_Gamma;
-   else if(strcasecmp(s, conf_val_uniform)     == 0) t = DistType_Uniform;
-   else if(strcasecmp(s, conf_val_beta)        == 0) t = DistType_Beta;
+        if(strcasecmp(s, conf_val_none)        == 0) t = DistType::None;
+   else if(strcasecmp(s, conf_val_normal)      == 0) t = DistType::Normal;
+   else if(strcasecmp(s, conf_val_exponential) == 0) t = DistType::Exponential;
+   else if(strcasecmp(s, conf_val_chisquared)  == 0) t = DistType::ChiSquared;
+   else if(strcasecmp(s, conf_val_gamma)       == 0) t = DistType::Gamma;
+   else if(strcasecmp(s, conf_val_uniform)     == 0) t = DistType::Uniform;
+   else if(strcasecmp(s, conf_val_beta)        == 0) t = DistType::Beta;
    else {
       mlog << Error << "\nstring_to_disttype() -> "
            << "Unexpected DistType string \"" << s << "\".\n\n";
@@ -3215,16 +3247,16 @@ ConcatString disttype_to_string(DistType type) {
 
    // Convert enumerated DistType to string
    switch(type) {
-      case(DistType_None):        s = conf_val_none;        break;
-      case(DistType_Normal):      s = conf_val_normal;      break;
-      case(DistType_Exponential): s = conf_val_exponential; break;
-      case(DistType_ChiSquared):  s = conf_val_chisquared;  break;
-      case(DistType_Gamma):       s = conf_val_gamma;       break;
-      case(DistType_Uniform):     s = conf_val_uniform;     break;
-      case(DistType_Beta):        s = conf_val_beta;        break;
+      case DistType::None:        s = conf_val_none;        break;
+      case DistType::Normal:      s = conf_val_normal;      break;
+      case DistType::Exponential: s = conf_val_exponential; break;
+      case DistType::ChiSquared:  s = conf_val_chisquared;  break;
+      case DistType::Gamma:       s = conf_val_gamma;       break;
+      case DistType::Uniform:     s = conf_val_uniform;     break;
+      case DistType::Beta:        s = conf_val_beta;        break;
       default:
          mlog << Error << "\ndisttype_to_string() -> "
-              << "Unexpected DistType value of " << type << ".\n\n";
+              << "Unexpected DistType value of " << enum_class_as_int(type) << ".\n\n";
          exit(1);
    }
 
@@ -3239,11 +3271,11 @@ ConcatString dist_to_string(DistType type, const NumArray &parm) {
    s = disttype_to_string(type);
 
    // Append distribution parameters
-   if(type != DistType_None && parm.n() == 2) {
+   if(type != DistType::None && parm.n() == 2) {
       s << "(" << parm[0];
-      if(type == DistType_Gamma   ||
-         type == DistType_Uniform ||
-         type == DistType_Beta) {
+      if(type == DistType::Gamma   ||
+         type == DistType::Uniform ||
+         type == DistType::Beta) {
          s << ", " << parm[1];
       }
       s << ")";
@@ -3259,13 +3291,13 @@ ConcatString griddecomptype_to_string(GridDecompType type) {
 
    // Convert enumerated GridDecompType to string
    switch(type) {
-      case(GridDecompType_None): s = conf_val_none; break;
-      case(GridDecompType_Auto): s = conf_val_auto; break;
-      case(GridDecompType_Tile): s = conf_val_tile; break;
-      case(GridDecompType_Pad):  s = conf_val_pad; break;
+      case GridDecompType::None: s = conf_val_none; break;
+      case GridDecompType::Auto: s = conf_val_auto; break;
+      case GridDecompType::Tile: s = conf_val_tile; break;
+      case GridDecompType::Pad:  s = conf_val_pad; break;
       default:
          mlog << Error << "\ngriddecomptype_to_string() -> "
-              << "Unexpected GridDecompType value of " << type << ".\n\n";
+              << "Unexpected GridDecompType value of " << enum_class_as_int(type) << ".\n\n";
          exit(1);
    }
 
@@ -3279,16 +3311,16 @@ ConcatString wavelettype_to_string(WaveletType type) {
 
    // Convert enumerated WaveletType to string
    switch(type) {
-      case(WaveletType_None):          s = conf_val_none; break;
-      case(WaveletType_Haar):          s = conf_val_haar; break;
-      case(WaveletType_Haar_Cntr):     s = conf_val_haar_cntr; break;
-      case(WaveletType_Daub):          s = conf_val_daub; break;
-      case(WaveletType_Daub_Cntr):     s = conf_val_daub_cntr; break;
-      case(WaveletType_BSpline):       s = conf_val_bspline; break;
-      case(WaveletType_BSpline_Cntr):  s = conf_val_bspline_cntr; break;
+      case WaveletType::None:          s = conf_val_none; break;
+      case WaveletType::Haar:          s = conf_val_haar; break;
+      case WaveletType::Haar_Cntr:     s = conf_val_haar_cntr; break;
+      case WaveletType::Daub:          s = conf_val_daub; break;
+      case WaveletType::Daub_Cntr:     s = conf_val_daub_cntr; break;
+      case WaveletType::BSpline:       s = conf_val_bspline; break;
+      case WaveletType::BSpline_Cntr:  s = conf_val_bspline_cntr; break;
       default:
          mlog << Error << "\nwavlettype_to_string() -> "
-              << "Unexpected WaveletType value of " << type << ".\n\n";
+              << "Unexpected WaveletType value of " << enum_class_as_int(type) << ".\n\n";
          exit(1);
    }
 
@@ -3308,13 +3340,13 @@ StringArray parse_conf_ens_member_ids(Dictionary *dict) {
            << sa.n() << " entries.\n";
    }
 
-   return(sa);
+   return sa;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 NormalizeType parse_conf_normalize(Dictionary *dict) {
-   NormalizeType t = NormalizeType_None;
+   NormalizeType t = NormalizeType::None;
    int v;
 
    if(!dict) {
@@ -3327,11 +3359,11 @@ NormalizeType parse_conf_normalize(Dictionary *dict) {
    v = dict->lookup_int(conf_key_normalize);
 
    // Convert integer to enumerated NormalizeType
-        if(v == conf_const.lookup_int(normalizetype_none_str))           t = NormalizeType_None;
-   else if(v == conf_const.lookup_int(normalizetype_climo_anom_str))     t = NormalizeType_ClimoAnom;
-   else if(v == conf_const.lookup_int(normalizetype_climo_std_anom_str)) t = NormalizeType_ClimoStdAnom;
-   else if(v == conf_const.lookup_int(normalizetype_fcst_anom_str))      t = NormalizeType_FcstAnom;
-   else if(v == conf_const.lookup_int(normalizetype_fcst_std_anom_str))  t = NormalizeType_FcstStdAnom;
+        if(v == conf_const.lookup_int(normalizetype_none_str))           t = NormalizeType::None;
+   else if(v == conf_const.lookup_int(normalizetype_climo_anom_str))     t = NormalizeType::ClimoAnom;
+   else if(v == conf_const.lookup_int(normalizetype_climo_std_anom_str)) t = NormalizeType::ClimoStdAnom;
+   else if(v == conf_const.lookup_int(normalizetype_fcst_anom_str))      t = NormalizeType::FcstAnom;
+   else if(v == conf_const.lookup_int(normalizetype_fcst_std_anom_str))  t = NormalizeType::FcstStdAnom;
    else {
       mlog << Error << "\nparse_conf_normalize() -> "
            << "Unexpected value of " << v << ".\n\n";

@@ -11,14 +11,14 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
 #include <cmath>
 
 #include "rad_config.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -128,11 +128,11 @@ clear();
 
 const bool status = Config.read(filename);
 
-if ( ! status )  return ( status );
+if ( ! status )  return status;
 
 get_config_data();
 
-return ( status );
+return status;
 
 }
 

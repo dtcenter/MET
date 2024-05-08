@@ -28,7 +28,6 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
@@ -44,7 +43,6 @@ using namespace std;
 #include <unistd.h>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "main.h"
 #include "vx_log.h"
@@ -58,12 +56,16 @@ using namespace netCDF;
 
 #include "GridTemplate.h"
 
+using namespace std;
+using namespace netCDF;
+
+
 ////////////////////////////////////////////////////////////////////////
 
 static ConcatString program_name;
 
 // Constants
-static const InterpMthd DefaultInterpMthd = InterpMthd_Nearest;
+static const InterpMthd DefaultInterpMthd = InterpMthd::Nearest;
 static const int        DefaultInterpWdth = 1;
 static const double     DefaultVldThresh  = 0.5;
 
@@ -78,7 +80,7 @@ static StringArray VarNameSA;
 static int compress_level = -1;
 
 // Output NetCDF file
-static NcFile *nc_out  = (NcFile *) 0;
+static NcFile *nc_out  = (NcFile *) nullptr;
 static NcDim  lat_dim ;
 static NcDim  lon_dim ;
 
@@ -116,7 +118,7 @@ int met_main(int argc, char *argv[]) {
    // Process the input data file
    process_data_file();
 
-   return(0);
+   return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -137,14 +139,14 @@ void process_command_line(int argc, char **argv) {
 
    // Set default regridding options
    RGInfo.enable     = true;
-   RGInfo.field      = FieldType_None;
+   RGInfo.field      = FieldType::None;
    RGInfo.method     = DefaultInterpMthd;
    RGInfo.width      = DefaultInterpWdth;
    RGInfo.gaussian.dx     = default_gaussian_dx;
    RGInfo.gaussian.radius = default_gaussian_radius;
    RGInfo.gaussian.trunc_factor = default_trunc_factor;
    RGInfo.vld_thresh = DefaultVldThresh;
-   RGInfo.shape      = GridTemplateFactory::GridTemplate_Square;
+   RGInfo.shape      = GridTemplateFactory::GridTemplates::Square;
 
    // Check for zero arguments
    if(argc == 1) usage();
@@ -202,7 +204,7 @@ void process_command_line(int argc, char **argv) {
    }
 
    RGInfo.validate();
-   if (RGInfo.method == InterpMthd_Gaussian || RGInfo.method == InterpMthd_MaxGauss)
+   if (RGInfo.method == InterpMthd::Gaussian || RGInfo.method == InterpMthd::MaxGauss)
       RGInfo.gaussian.compute();
 
    return;
@@ -219,7 +221,7 @@ void process_data_file() {
    //Variables for GOES
    unixtime valid_time = 0;
    bool opt_all_attrs = false;
-   NcFile *nc_in = (NcFile *)0;
+   NcFile *nc_in = (NcFile *) nullptr;
    static const char *method_name = "process_data_file() ";
 
    // Initialize configuration object
@@ -235,7 +237,7 @@ void process_data_file() {
 
    // Read the input data file
    Met2dDataFileFactory m_factory;
-   Met2dDataFile *fr_mtddf = (Met2dDataFile *) 0;
+   Met2dDataFile *fr_mtddf = (Met2dDataFile *) nullptr;
 
    // Determine the "from" grid
    mlog << Debug(1)  << "Reading data file: " << InputFilename << "\n";
@@ -348,8 +350,8 @@ void process_data_file() {
    delete nc_in;  nc_in  = 0;
 
    // Clean up
-   if(fr_mtddf) { delete fr_mtddf; fr_mtddf = (Met2dDataFile *) 0; }
-   if(vinfo)    { delete vinfo;    vinfo    = (VarInfo *)       0; }
+   if(fr_mtddf) { delete fr_mtddf; fr_mtddf = (Met2dDataFile *) nullptr; }
+   if(vinfo)    { delete vinfo;    vinfo    = (VarInfo *)       nullptr; }
 
    return;
 }
@@ -408,7 +410,7 @@ void write_nc_data(const DataPlane &dp, const Grid &grid, NcVar *data_var) {
    }
 
    // Clean up
-   if(data) { delete [] data;  data = (float *)  0; }
+   if(data) { delete [] data;  data = (float *) nullptr; }
 
    return;
 }
@@ -439,7 +441,7 @@ void close_nc() {
 
    // Clean up
    if(nc_out) {
-      delete nc_out; nc_out = (NcFile *) 0;
+      delete nc_out; nc_out = (NcFile *) nullptr;
    }
 
    // List the output file

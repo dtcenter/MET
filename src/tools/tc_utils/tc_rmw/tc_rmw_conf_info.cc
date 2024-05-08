@@ -8,7 +8,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
 
 #include <dirent.h>
 #include <iostream>
@@ -21,6 +20,9 @@ using namespace std;
 #include "tc_rmw_conf_info.h"
 
 #include "vx_log.h"
+
+using namespace std;
+
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -45,7 +47,7 @@ TCRMWConfInfo::~TCRMWConfInfo() {
 void TCRMWConfInfo::init_from_scratch() {
 
     // Initialize pointers
-    data_info = (VarInfo**) 0;
+    data_info = (VarInfo**) nullptr;
 
     clear();
 
@@ -70,7 +72,6 @@ void TCRMWConfInfo::clear() {
 
     n_range        = bad_data_int;
     n_azimuth      = bad_data_int;
-    max_range_km   = bad_data_double;
     delta_range_km = bad_data_double;
     rmw_scale      = bad_data_double;
 
@@ -86,11 +87,11 @@ void TCRMWConfInfo::clear() {
     if(data_info) {
         for(int i = 0; i < n_data; i++) {
             if(data_info[i]) {
-                data_info[i] = (VarInfo*) 0;
+                data_info[i] = (VarInfo*) nullptr;
             }
         }
         delete data_info;
-        data_info = (VarInfo**) 0;
+        data_info = (VarInfo**) nullptr;
     }
 
     // Reset field count
@@ -122,7 +123,7 @@ void TCRMWConfInfo::process_config(GrdFileType ftype) {
     int i;
     StringArray sa;
     VarInfoFactory info_factory;
-    Dictionary *fdict = (Dictionary *) 0;
+    Dictionary *fdict = (Dictionary *) nullptr;
 
     // Conf: version
     check_met_version(Conf.lookup_string(conf_key_version).c_str());
@@ -173,14 +174,20 @@ void TCRMWConfInfo::process_config(GrdFileType ftype) {
     // Conf: n_azimuth
     n_azimuth = Conf.lookup_int(conf_key_n_azimuth);
 
-    // Conf: max_range
-    max_range_km = Conf.lookup_double(conf_key_max_range);
-
     // Conf: delta_range
     delta_range_km = Conf.lookup_double(conf_key_delta_range);
 
     // Conf: rmw_scale
     rmw_scale = Conf.lookup_double(conf_key_rmw_scale);
+
+    // Error check
+    if(is_bad_data(delta_range_km) && is_bad_data(rmw_scale)) {
+        mlog << Error << "\nTCRMWConfInfo::process_config() -> "
+             << "the \"" << conf_key_delta_range << "\" and \""
+             << conf_key_rmw_scale << "\" configuration options "
+             << "cannot both be set to bad data.\n\n";
+        exit(1);
+    }
 
     compute_tangential_and_radial_winds = Conf.lookup_bool(conf_key_compute_tangential_and_radial_winds);
     u_wind_field_name = Conf.lookup_string(conf_key_u_wind_field_name);
@@ -189,7 +196,6 @@ void TCRMWConfInfo::process_config(GrdFileType ftype) {
     radial_velocity_field_name = Conf.lookup_string(conf_key_radial_velocity_field_name);
     tangential_velocity_long_field_name = Conf.lookup_string(conf_key_tangential_velocity_long_field_name);
     radial_velocity_long_field_name = Conf.lookup_string(conf_key_radial_velocity_long_field_name);
-
 
     // Conf: data.field
     fdict = Conf.lookup_array(conf_key_data_field);
@@ -212,7 +218,7 @@ void TCRMWConfInfo::process_config(GrdFileType ftype) {
 
     // Initialize pointers
     for(i=0; i<n_data; i++) {
-        data_info[i] = (VarInfo*) 0;
+        data_info[i] = (VarInfo*) nullptr;
     }
 
     // Parse data field information

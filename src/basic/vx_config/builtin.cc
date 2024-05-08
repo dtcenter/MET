@@ -75,54 +75,54 @@ static double  my_C_to_F    (double);
 
 const BuiltinInfo binfo[] = {
 
-   { "sin",    1, builtin_sin,     nullptr, nullptr, sin, nullptr },
-   { "cos",    1, builtin_cos,     nullptr, nullptr, cos, nullptr },
-   { "tan",    1, builtin_tan,     nullptr, nullptr, tan, nullptr },
+   { "sin",    1, Builtin::sin,     nullptr, nullptr, sin, nullptr },
+   { "cos",    1, Builtin::cos,     nullptr, nullptr, cos, nullptr },
+   { "tan",    1, Builtin::tan,     nullptr, nullptr, tan, nullptr },
 
-   { "sind",   1, builtin_sind,    nullptr, nullptr, sin_deg, nullptr },
-   { "cosd",   1, builtin_cosd,    nullptr, nullptr, cos_deg, nullptr },
-   { "tand",   1, builtin_tand,    nullptr, nullptr, tan_deg, nullptr },
+   { "sind",   1, Builtin::sind,    nullptr, nullptr, sin_deg, nullptr },
+   { "cosd",   1, Builtin::cosd,    nullptr, nullptr, cos_deg, nullptr },
+   { "tand",   1, Builtin::tand,    nullptr, nullptr, tan_deg, nullptr },
 
-   { "asin",   1, builtin_asin,    nullptr, nullptr, asin, nullptr },
-   { "acos",   1, builtin_acos,    nullptr, nullptr, acos, nullptr },
-   { "atan",   1, builtin_atan,    nullptr, nullptr, atan, nullptr },
+   { "asin",   1, Builtin::asin,    nullptr, nullptr, asin, nullptr },
+   { "acos",   1, Builtin::acos,    nullptr, nullptr, acos, nullptr },
+   { "atan",   1, Builtin::atan,    nullptr, nullptr, atan, nullptr },
 
-   { "asind",  1, builtin_sind,    nullptr, nullptr, arc_sin_deg, nullptr },
-   { "acosd",  1, builtin_cosd,    nullptr, nullptr, arc_cos_deg, nullptr },
-   { "atand",  1, builtin_tand,    nullptr, nullptr, arc_tan_deg, nullptr },
+   { "asind",  1, Builtin::sind,    nullptr, nullptr, arc_sin_deg, nullptr },
+   { "acosd",  1, Builtin::cosd,    nullptr, nullptr, arc_cos_deg, nullptr },
+   { "atand",  1, Builtin::tand,    nullptr, nullptr, arc_tan_deg, nullptr },
 
-   { "atan2",  2, builtin_atan2,   nullptr, nullptr, nullptr, atan2 },
-   { "atan2d", 2, builtin_atan2d,  nullptr, nullptr, nullptr, atan2_deg },
+   { "atan2",  2, Builtin::atan2,   nullptr, nullptr, nullptr, atan2 },
+   { "atan2d", 2, Builtin::atan2d,  nullptr, nullptr, nullptr, atan2_deg },
 
-   { "arg",    2, builtin_arg,     nullptr, nullptr, nullptr, my_arg     },
-   { "argd",   2, builtin_argd,    nullptr, nullptr, nullptr, my_arg_deg },
+   { "arg",    2, Builtin::arg,     nullptr, nullptr, nullptr, my_arg     },
+   { "argd",   2, Builtin::argd,    nullptr, nullptr, nullptr, my_arg_deg },
 
-   { "log",    1, builtin_log,     nullptr, nullptr, log, nullptr },
-   { "exp",    1, builtin_exp,     nullptr, nullptr, exp, nullptr },
+   { "log",    1, Builtin::log,     nullptr, nullptr, log, nullptr },
+   { "exp",    1, Builtin::exp,     nullptr, nullptr, exp, nullptr },
 
-   { "log10",  1, builtin_log10,   nullptr, nullptr, log10,    nullptr },
-   { "exp10",  1, builtin_exp10,   nullptr, nullptr, my_exp10, nullptr },
+   { "log10",  1, Builtin::log10,   nullptr, nullptr, log10,    nullptr },
+   { "exp10",  1, Builtin::exp10,   nullptr, nullptr, my_exp10, nullptr },
 
-   { "sqrt",   1, builtin_sqrt,    nullptr, nullptr, sqrt, nullptr },
+   { "sqrt",   1, Builtin::sqrt,    nullptr, nullptr, sqrt, nullptr },
 
-   { "abs",    1, builtin_abs,     abs, nullptr, fabs, nullptr },
+   { "abs",    1, Builtin::abs,     abs, nullptr, fabs, nullptr },
 
-   { "min",    2, builtin_min,     nullptr, my_imin, nullptr, my_dmin },
-   { "max",    2, builtin_max,     nullptr, my_imax, nullptr, my_dmax },
+   { "min",    2, Builtin::min,     nullptr, my_imin, nullptr, my_dmin },
+   { "max",    2, Builtin::max,     nullptr, my_imax, nullptr, my_dmax },
 
-   { "mod",    2, builtin_mod,     nullptr, my_imod, nullptr, my_dmod },
+   { "mod",    2, Builtin::mod,     nullptr, my_imod, nullptr, my_dmod },
 
-   { "floor",  1, builtin_floor,   nullptr, nullptr, floor, nullptr },
-   { "ceil",   1, builtin_ceil,    nullptr, nullptr, ceil,  nullptr },
+   { "floor",  1, Builtin::floor,   nullptr, nullptr, floor, nullptr },
+   { "ceil",   1, Builtin::ceil,    nullptr, nullptr, ceil,  nullptr },
 
-   { "step",   1, builtin_step,    my_istep, nullptr, my_dstep,  nullptr },
+   { "step",   1, Builtin::step,    my_istep, nullptr, my_dstep,  nullptr },
 
    // Functions defined in ConfigConstants
-   // { "F_to_C", 1, builtin_F_to_C,  nullptr, nullptr, my_F_to_C,  nullptr },
-   // { "C_to_F", 1, builtin_C_to_F,  nullptr, nullptr, my_C_to_F,  nullptr },
+   // { "F_to_C", 1, Builtin::F_to_C,  nullptr, nullptr, my_F_to_C,  nullptr },
+   // { "C_to_F", 1, Builtin::C_to_F,  nullptr, nullptr, my_C_to_F,  nullptr },
 
-   { "nint",   1, builtin_nint,    nullptr, nullptr, nullptr,  nullptr },
-   { "sign",   1, builtin_sign,    nullptr, nullptr, nullptr,  nullptr },
+   { "nint",   1, Builtin::nint,    nullptr, nullptr, nullptr,  nullptr },
+   { "sign",   1, Builtin::sign,    nullptr, nullptr, nullptr,  nullptr },
 
 
       //
@@ -328,7 +328,7 @@ if ( b < 0 )  b = -b;
 
 if ( a < 0 )  a = b - a;
 
-if ( b == 0 )  return ( a );
+if ( b == 0 )  return a;
 
 return ( a%b );
 
@@ -346,7 +346,7 @@ if ( a < 0 )  a = b - a;
 
 if ( b < 0 )  b = -b;
 
-if ( b == 0.0 )  return ( a );
+if ( b == 0.0 )  return a;
 
 double c;
 

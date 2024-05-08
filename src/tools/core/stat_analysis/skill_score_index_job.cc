@@ -18,8 +18,6 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <cstdio>
 #include <iostream>
 #include <stdlib.h>
@@ -31,6 +29,8 @@ using namespace std;
 
 #include "skill_score_index_job.h"
 #include "parse_stat_line.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -61,11 +61,11 @@ SSIndexJobInfo::SSIndexJobInfo(const SSIndexJobInfo &c) {
 
 SSIndexJobInfo & SSIndexJobInfo::operator=(const SSIndexJobInfo &c) {
 
-   if(this == &c) return(*this);
+   if(this == &c) return *this;
 
    assign(c);
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -168,7 +168,7 @@ bool SSIndexJobInfo::is_keeper(const STATLine &line) {
       }
    }
 
-   return(keep);
+   return keep;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -187,12 +187,12 @@ bool SSIndexJobInfo::add(STATLine &line) {
          n_fcst_lines.inc(i, 1);
 
          // Aggregate SL1L2
-         if(job_lt[i] == stat_sl1l2) {
+         if(job_lt[i] == STATLineType::sl1l2) {
             parse_sl1l2_line(line, sl1l2);
             fcst_sl1l2[i] += sl1l2;
          }
          // Aggregate CTC
-         else if(job_lt[i] == stat_ctc) {
+         else if(job_lt[i] == STATLineType::ctc) {
             parse_ctc_ctable(line, ctc);
             fcst_cts[i].cts += ctc;
          }
@@ -204,12 +204,12 @@ bool SSIndexJobInfo::add(STATLine &line) {
          n_ref_lines.inc(i, 1);
 
          // Aggregate SL1L2
-         if(job_lt[i] == stat_sl1l2) {
+         if(job_lt[i] == STATLineType::sl1l2) {
             parse_sl1l2_line(line, sl1l2);
             ref_sl1l2[i] += sl1l2;
          }
          // Aggregate CTC
-         else if(job_lt[i] == stat_ctc) {
+         else if(job_lt[i] == STATLineType::ctc) {
             parse_ctc_ctable(line, ctc);
             ref_cts[i].cts += ctc;
          }
@@ -224,7 +224,7 @@ bool SSIndexJobInfo::add(STATLine &line) {
       init_time.add(line.fcst_init_beg());
    }
 
-   return(keep);
+   return keep;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -244,14 +244,14 @@ SSIDXData SSIndexJobInfo::compute_ss_index() {
    for(i=0, n_vld=0, n_diff=0, ss_sum=weight_sum=0.0; i<n_term; i++) {
 
       // Continuous stats
-      if(job_lt[i] == stat_sl1l2) {
+      if(job_lt[i] == STATLineType::sl1l2) {
          compute_cntinfo(fcst_sl1l2[i], 0, fcst_cnt);
          fcst_stat = fcst_cnt.get_stat(fcst_job[i].column[0].c_str());
          compute_cntinfo(ref_sl1l2[i], 0, ref_cnt);
          ref_stat = ref_cnt.get_stat(fcst_job[i].column[0].c_str());
       }
       // Categorical stats
-      else if(job_lt[i] == stat_ctc) {
+      else if(job_lt[i] == STATLineType::ctc) {
          fcst_cts[i].compute_stats();
          fcst_stat = fcst_cts[i].get_stat(fcst_job[i].column[0].c_str());
          ref_cts[i].compute_stats();
@@ -345,7 +345,7 @@ SSIDXData SSIndexJobInfo::compute_ss_index() {
            << " since the ratio of valid terms " << n_vld << "/"
            << n_term << " < " << ss_index_vld_thresh << "!\n\n";
       data.n_vld = 0;
-      return(data);
+      return data;
    }
 
    // Compute the weighted average of the skill scores
@@ -370,7 +370,7 @@ SSIDXData SSIndexJobInfo::compute_ss_index() {
         << ss_index_name << " Weighted Average = " << ss_avg << "\n"
         << ss_index_name << " Skill Score Value = " << data.ss_index << "\n";
 
-   return(data);
+   return data;
 }
 
 ////////////////////////////////////////////////////////////////////////

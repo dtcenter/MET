@@ -11,8 +11,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -21,6 +19,8 @@ using namespace std;
 #include "vx_util.h"
 
 #include "fo_node.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -76,11 +76,11 @@ FO_Node & FO_Node::operator=(const FO_Node & n)
 
 {
 
-if ( this == &n )  return ( * this );
+if ( this == &n )  return *this;
 
 assign(n);
 
-return ( * this );
+return *this;
 
 }
 

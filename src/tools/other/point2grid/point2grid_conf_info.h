@@ -31,8 +31,8 @@ class PointToGridConfInfo {
       void init_from_scratch();
 
    protected:
-      map<ConcatString,ConcatString> var_name_map;
-      map<ConcatString,ConcatString> def_var_name_map;
+      std::map<ConcatString,ConcatString> var_name_map;
+      std::map<ConcatString,ConcatString> def_var_name_map;
 
    public:
 

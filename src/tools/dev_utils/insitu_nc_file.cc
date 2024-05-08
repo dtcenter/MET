@@ -10,8 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -21,7 +19,6 @@ using namespace std;
 #include <string>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "vx_math.h"
 #include "vx_cal.h"
@@ -29,6 +26,9 @@ using namespace netCDF;
 
 #include "insitu_nc_file.h"
 #include "nc_utils.h"
+
+using namespace std;
+using namespace netCDF;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -75,7 +75,7 @@ void InsituNcFile::init_from_scratch()
 {
   // Initialize the pointers
 
-  _ncFile = (NcFile *) 0;
+  _ncFile = (NcFile *) nullptr;
 
   // Close any existing file
 
@@ -96,7 +96,7 @@ void InsituNcFile::close()
   if (_ncFile)
   {
     delete _ncFile;
-    _ncFile = (NcFile *)0;
+    _ncFile = (NcFile *) nullptr;
   }
 
   // Reclaim the space used for the variables
@@ -144,7 +144,7 @@ bool InsituNcFile::open(const char * filename)
     if (_ncFile)    // close() is called already
     {
       delete _ncFile;
-      _ncFile = (NcFile *)0;
+      _ncFile = (NcFile *) nullptr;
     }
     return false;
   }

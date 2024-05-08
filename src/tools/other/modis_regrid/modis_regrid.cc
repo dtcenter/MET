@@ -10,13 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-static const char default_units [] = "none";
-
-
-////////////////////////////////////////////////////////////////////////
-
-using namespace std;
-
 #include <unistd.h>
 #include <stdlib.h>
 #include <cmath>
@@ -34,6 +27,14 @@ using namespace std;
 #include "data_plane_to_netcdf.h"
 
 #include "data_averager.h"
+
+using namespace std;
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+static const char default_units [] = "none";
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -152,7 +153,7 @@ process(modis_filename.c_str());
    //  done
    //
 
-return ( 0 );
+return 0;
 
 }
 
@@ -270,7 +271,7 @@ void get_grid()
    //  stole this code from plot_data_plane.cc
    //
 
-Met2dDataFile * met_ptr = (Met2dDataFile * ) 0;
+Met2dDataFile * met_ptr = (Met2dDataFile * ) nullptr;
 Met2dDataFileFactory m_factory;
 
 mlog << Debug(1)  << "Opening data file: " << grid_data_file << "\n";
@@ -289,7 +290,7 @@ grid = met_ptr->grid();
    //  done
    //
 
-delete met_ptr;   met_ptr = (Met2dDataFile *) 0;
+delete met_ptr;   met_ptr = (Met2dDataFile *) nullptr;
 
 return;
 

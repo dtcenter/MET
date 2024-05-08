@@ -10,14 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-static const bool verbose = false; 
-
-static const bool do_ppms = false;
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -41,6 +33,10 @@ using namespace netCDF;
 
 ////////////////////////////////////////////////////////////////////////
 
+
+static const bool verbose = false;
+
+static const bool do_ppms = false;
 
 static int spatial_conv_radius = -1;
 
@@ -76,7 +72,7 @@ struct DataHandle {
 
       }
 
-      return ( k );
+      return k;
 
    }
 
@@ -205,9 +201,9 @@ struct DataHandle {
 
 static void get_data_plane(const MtdFloatFile &, const int t, double * data_plane, bool * ok_plane);
 
-static void calc_sum_plane(const int nx, const int ny, 
-                           const double * data_plane_in, const bool * ok_plane_in, 
-                                 double * sum_plane_out,       bool * ok_sum_plane_out);
+static void calc_sum_plane(const int nx, const int ny,
+                           const double * data_plane_in, const bool * ok_plane_in,
+                           double * sum_plane_out,       bool * ok_sum_plane_out);
 
 static void load_handle(DataHandle &, const MtdFloatFile & in, const int t, const int time_beg, const int time_end);
 
@@ -245,8 +241,8 @@ const int trp1 = 2*spatial_R + 1;
 const double scale = 1.0/(trp1*trp1);
 
 
-file_id = 1;   //  This is declared static in the netCDF library header file ncGroup.h, 
-               //  so we have to do **something** with this or the compiler complains 
+file_id = 1;   //  This is declared static in the netCDF library header file ncGroup.h,
+               //  so we have to do **something** with this or the compiler complains
                //  about an unused variable
 
 spatial_conv_radius = spatial_R;
@@ -305,16 +301,16 @@ for (t=0; t<Nt; ++t)  {
 
    }
 
-      // 
+      //
       //   the order of loops is important here
-      // 
+      //
 
    for (j=0; j<Nxy; ++j)  {
 
       // if ( (t == 0) && (j == 243846) )  {
-      // 
+      //
       //    cerr << "ok\n";
-      // 
+      //
       // }
 
       bool has_good_data = false;
@@ -439,7 +435,7 @@ if ( conv_data )  { delete [] conv_data;  conv_data = (double *) nullptr; }
 if (    sum_plane_buf )  { delete []    sum_plane_buf;     sum_plane_buf = nullptr; }
 if ( ok_sum_plane_buf )  { delete [] ok_sum_plane_buf;  ok_sum_plane_buf = nullptr; }
 
-return ( out );
+return out;
 
 }
 
@@ -577,9 +573,9 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void calc_sum_plane(const int nx, const int ny, 
-                    const double * data_plane, const bool * ok_plane, 
-                          double * sum_plane,        bool * ok_sum_plane)
+void calc_sum_plane(const int nx, const int ny,
+                    const double * data_plane, const bool * ok_plane,
+                    double * sum_plane,        bool * ok_sum_plane)
 
 {
 

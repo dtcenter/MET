@@ -49,6 +49,9 @@ void PointStatConfInfo::init_from_scratch() {
    // Initialize pointers
    vx_opt = (PointStatVxOpt *) nullptr;
 
+#ifdef WITH_UGRID
+   ignore_ugrid_dataset = false;
+#endif
    clear();
 
    return;
@@ -73,7 +76,7 @@ void PointStatConfInfo::clear() {
    version.clear();
 #ifdef WITH_UGRID
    ugrid_nc.clear();
-   ugrid_dataset.clear();
+   if (!ignore_ugrid_dataset) ugrid_dataset.clear();
    ugrid_map_config.clear();
    ugrid_max_distance_km = bad_data_double;
 #endif
@@ -105,18 +108,25 @@ void PointStatConfInfo::read_config(const char *default_file_name,
 
 ////////////////////////////////////////////////////////////////////////
 
-void PointStatConfInfo::read_configs(StringArray user_file_names) {
+#ifdef WITH_UGRID
+void PointStatConfInfo::read_ugrid_configs(StringArray ugrid_config_names, const char * user_config) {
 
-   const char *file_name;
-   for (int i=0; i<user_file_names.n_elements(); i++) {
-      file_name = replace_path(user_file_names[i].c_str()).c_str();
-      if (file_exists(file_name)) conf.read(file_name);
-      else mlog << Warning << "\nPointStatConfInfo::read_configs(StringArray) -> "
-                << "The configuration file \"" << user_file_names[i]<< "\" does not exist.\n\n";
+   ConcatString file_name;
+   for (int i=0; i<ugrid_config_names.n_elements(); i++) {
+      file_name = replace_path(ugrid_config_names[i].c_str());
+      if (file_exists(file_name.c_str())) {
+         conf.read(file_name.c_str());
+         ugrid_dataset = file_name;
+         ignore_ugrid_dataset = true;
+      }
+      else mlog << Warning << "\nPointStatConfInfo::read_ugrid_configs(StringArray) -> "
+                << "The configuration file \"" << ugrid_config_names[i]<< "\" does not exist.\n\n";
    }
+   if (file_exists(user_config)) conf.read(user_config);   /* to avoid overriding by ugrid_config_names */
 
    return;
 }
+#endif
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -143,7 +153,7 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
 
 #ifdef WITH_UGRID
    // Conf: ugrid_dataset
-   ugrid_dataset = parse_conf_ugrid_dataset(&conf);
+   if (!ignore_ugrid_dataset) ugrid_dataset = parse_conf_ugrid_dataset(&conf);
 
    // Conf: ugrid_nc
    ugrid_nc = parse_conf_ugrid_coordinates_file(&conf);
@@ -203,9 +213,9 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
    // If VL1L2, VAL1L2, or VCNT is requested, set the uv_index.
    // When processing vectors, need to make sure the message types,
    // masking regions, and interpolation methods are consistent.
-   if(output_flag[i_vl1l2]  != STATOutputType_None ||
-      output_flag[i_val1l2] != STATOutputType_None ||
-      output_flag[i_vcnt]   != STATOutputType_None) {
+   if(output_flag[i_vl1l2]  != STATOutputType::None ||
+      output_flag[i_val1l2] != STATOutputType::None ||
+      output_flag[i_vcnt]   != STATOutputType::None) {
 
       for(i=0; i<n_vx; i++) {
 
@@ -322,7 +332,7 @@ void PointStatConfInfo::process_flags() {
    bool output_ascii_flag = false;
 
    // Initialize
-   for(i=0; i<n_txt; i++) output_flag[i] = STATOutputType_None;
+   for(i=0; i<n_txt; i++) output_flag[i] = STATOutputType::None;
 
    // Loop over the verification tasks
    for(i=0; i<n_vx; i++) {
@@ -330,13 +340,13 @@ void PointStatConfInfo::process_flags() {
       // Summary of output_flag settings
       for(j=0; j<n_txt; j++) {
 
-         if(vx_opt[i].output_flag[j] == STATOutputType_Both) {
-            output_flag[j] = STATOutputType_Both;
+         if(vx_opt[i].output_flag[j] == STATOutputType::Both) {
+            output_flag[j] = STATOutputType::Both;
             output_ascii_flag = true;
          }
-         else if(vx_opt[i].output_flag[j] == STATOutputType_Stat &&
-                           output_flag[j] == STATOutputType_None) {
-            output_flag[j] = STATOutputType_Stat;
+         else if(vx_opt[i].output_flag[j] == STATOutputType::Stat &&
+                           output_flag[j] == STATOutputType::None) {
+            output_flag[j] = STATOutputType::Stat;
             output_ascii_flag = true;
          }
       } //  for j
@@ -656,8 +666,8 @@ bool PointStatConfInfo::get_vflag() const {
    bool vflag = false;
 
    // Vector output must be requested
-   if(output_flag[i_vl1l2]  == STATOutputType_None &&
-      output_flag[i_val1l2] == STATOutputType_None) {
+   if(output_flag[i_vl1l2]  == STATOutputType::None &&
+      output_flag[i_val1l2] == STATOutputType::None) {
       return false;
    }
 
@@ -720,11 +730,11 @@ void PointStatVxOpt::clear() {
 
    fcnt_ta.clear();
    ocnt_ta.clear();
-   cnt_logic = SetLogic_None;
+   cnt_logic = SetLogic::None;
 
    fwind_ta.clear();
    owind_ta.clear();
-   wind_logic = SetLogic_None;
+   wind_logic = SetLogic::None;
 
    land_flag = false;
    topo_flag = false;
@@ -756,11 +766,11 @@ void PointStatVxOpt::clear() {
 
    seeps_p1_thresh.clear();
 
-   duplicate_flag = DuplicateType_None;
-   obs_summary = ObsSummary_None;
+   duplicate_flag = DuplicateType::None;
+   obs_summary = ObsSummary::None;
    obs_perc = bad_data_int;
 
-   for(i=0; i<n_txt; i++) output_flag[i] = STATOutputType_None;
+   for(i=0; i<n_txt; i++) output_flag[i] = STATOutputType::None;
 
    return;
 }
@@ -839,25 +849,6 @@ void PointStatVxOpt::process_config(GrdFileType ftype,
       mlog << Debug(5)
            << "Parsed observation field:\n";
       vx_pd.obs_info->dump(cout);
-   }
-
-   // Check the levels for the forecast and observation fields.  If the
-   // forecast field is a range of pressure levels, check to see if the
-   // range of observation field pressure levels is wholly contained in the
-   // fcst levels.  If not, print a warning message.
-   if(vx_pd.fcst_info->level().type() == LevelType_Pres &&
-      !is_eq(vx_pd.fcst_info->level().lower(), vx_pd.fcst_info->level().upper()) &&
-      (vx_pd.obs_info->level().lower() < vx_pd.fcst_info->level().lower() ||
-       vx_pd.obs_info->level().upper() > vx_pd.fcst_info->level().upper())) {
-
-      mlog << Warning
-           << "\nPointStatVxOpt::process_config() -> "
-           << "The range of requested observation pressure levels "
-           << "is not contained within the range of requested "
-           << "forecast pressure levels.  No vertical interpolation "
-           << "will be performed for observations falling outside "
-           << "the range of forecast levels.  Instead, they will be "
-           << "matched to the single nearest forecast level.\n\n";
    }
 
    // No support for wind direction
@@ -960,8 +951,8 @@ void PointStatVxOpt::process_config(GrdFileType ftype,
 
    // Verifying with multi-category contingency tables
    if(!vx_pd.fcst_info->is_prob() &&
-      (output_flag[i_mctc] != STATOutputType_None ||
-       output_flag[i_mcts] != STATOutputType_None)) {
+      (output_flag[i_mctc] != STATOutputType::None ||
+       output_flag[i_mcts] != STATOutputType::None)) {
       check_mctc_thresh(fcat_ta);
       check_mctc_thresh(ocat_ta);
    }
@@ -1168,8 +1159,8 @@ void PointStatVxOpt::set_vx_pd(PointStatConfInfo *conf_info) {
    vx_pd.set_duplicate_flag(duplicate_flag);
    vx_pd.set_obs_summary(obs_summary);
    vx_pd.set_obs_perc_value(obs_perc);
-   if (output_flag[i_seeps_mpr] != STATOutputType_None
-       || output_flag[i_seeps] != STATOutputType_None) {
+   if (output_flag[i_seeps_mpr] != STATOutputType::None
+       || output_flag[i_seeps] != STATOutputType::None) {
      vx_pd.load_seeps_climo();
      vx_pd.set_seeps_thresh(seeps_p1_thresh);
    }
@@ -1223,7 +1214,7 @@ int PointStatVxOpt::n_txt_row(int i_txt_row) const {
    }
 
    // Check if this output line type is requested
-   if(output_flag[i_txt_row] == STATOutputType_None) return 0;
+   if(output_flag[i_txt_row] == STATOutputType::None) return 0;
 
    bool prob_flag = vx_pd.fcst_info->is_prob();
    bool vect_flag = vx_pd.fcst_info->is_v_wind() &&

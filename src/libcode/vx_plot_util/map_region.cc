@@ -10,8 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -20,6 +18,8 @@ using namespace std;
 
 #include "vx_log.h"
 #include "map_region.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -75,11 +75,11 @@ MapRegion & MapRegion::operator=(const MapRegion & r)
 
 {
 
-if ( this == &r )  return ( * this );
+if ( this == &r )  return *this;
 
 assign(r);
 
-return ( * this );
+return *this;
 
 }
 
@@ -165,7 +165,7 @@ ConcatString line;
 StringArray a;
 
    // read the map region meta data
-   if(!line.read_line(in)) return (false);
+   if(!line.read_line(in)) return false;
 
    // split up the meta data line
    a = line.split(" ");
@@ -177,7 +177,7 @@ StringArray a;
            << "found fewer than the expected number of elements ("
            << a.n_elements() << "<" << min_region_header_elements
            << ") in map region line:\n" << line << "\n\n";
-      return(false);
+      return false;
    }
 
    // parse the region header line:
@@ -203,7 +203,7 @@ StringArray a;
 
    // parse the lat/lon data lines
    for(j=0; j<r.n_points; j++) {
-      if(!line.read_line(in)) return (false);
+      if(!line.read_line(in)) return false;
       a = line.split(" ");
       r.lat[j] = atof(a[0].c_str());
       r.lon[j] = atof(a[1].c_str());
@@ -213,7 +213,7 @@ StringArray a;
    //  done
    //
 
-return ( true );
+return true;
 
 }
 

@@ -24,9 +24,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -36,6 +33,8 @@ using namespace std;
 #include "vx_util.h"
 
 #include "2d_att_array.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -91,11 +90,11 @@ SingleAtt2DArray & SingleAtt2DArray::operator=(const SingleAtt2DArray & a)
 
 {
 
-if ( this == &a )  return ( * this );
+if ( this == &a )  return *this;
 
 assign(a);
 
-return ( * this );
+return *this;
 
 }
 
@@ -107,7 +106,7 @@ void SingleAtt2DArray::init_from_scratch()
 
 {
 
-e = (SingleAtt2D *) 0;
+e = (SingleAtt2D *) nullptr;
 
 AllocInc = 50;   //  default value
 
@@ -125,7 +124,7 @@ void SingleAtt2DArray::clear()
 
 {
 
-if ( e )  { delete [] e;  e = (SingleAtt2D *) 0; }
+if ( e )  { delete [] e;  e = (SingleAtt2D *) nullptr; }
 
 
 
@@ -187,11 +186,11 @@ for(j=0; j<Nelements; ++j)  {
 
 }
 
-if ( e )  { delete [] e;  e = (SingleAtt2D *) 0; }
+if ( e )  { delete [] e;  e = (SingleAtt2D *) nullptr; }
 
 e = u;
 
-u = (SingleAtt2D *) 0;
+u = (SingleAtt2D *) nullptr;
 
 Nalloc = N;
 
@@ -305,7 +304,7 @@ if ( (N < 0) || (N >= Nelements) )  {
    exit ( 1 );
 }
 
-return ( e[N] );
+return e[N];
 
 }
 
@@ -352,7 +351,7 @@ if ( (index < 0) || (index >= Nelements) )  {
 
 }
 
-return ( e[index].valid_time() );
+return e[index].valid_time();
 
 }
 
@@ -373,7 +372,7 @@ if ( (index < 0) || (index >= Nelements) )  {
 
 }
 
-return ( e[index].lead_time() );
+return e[index].lead_time();
 
 }
 
@@ -394,7 +393,7 @@ if ( (index < 0) || (index >= Nelements) )  {
 
 }
 
-return ( e[index].time_index() );
+return e[index].time_index();
 
 }
 

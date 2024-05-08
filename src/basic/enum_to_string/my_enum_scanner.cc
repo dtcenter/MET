@@ -130,11 +130,11 @@ if ( first_call )  { init();  first_call = false; }
 
 yytext = (char *) lexeme;
 
-while ( 1 )  {
+while ( true )  {
 
    t = next_token();
 
-   if ( t == eof )  return ( 0 );
+   if ( t == eof )  return 0;
 
    if ( t < 0 )  continue;
 
@@ -174,7 +174,7 @@ int c, c2;
    //  skip whitespace
    //
 
-while ( 1 )  {
+while ( true )  {
 
    c = nextchar();
 
@@ -186,7 +186,7 @@ while ( 1 )  {
 
 }   //  while
 
-if ( c == eof )  return ( eof );
+if ( c == eof )  return eof;
 
 clear_lexeme();
 
@@ -196,11 +196,11 @@ switch ( c )  {
       //  single character tokens
       //
 
-   case '{':  { if ( do_left_curly()  )  return ( token(L_CURLY) ); }  break;
-   case '}':  { if ( do_right_curly() )  return ( token(R_CURLY) ); }  break;
-   case '=':  { if ( do_equals()      )  return ( token (EQ) );     }  break;
-   case ';':  { if ( do_semi()        )  return ( token(';') );     }  break;
-   case ',':  { if ( do_comma()       )  return ( token(',') );     }  break;
+   case '{':  { if ( do_left_curly()  )  return token(L_CURLY); }  break;
+   case '}':  { if ( do_right_curly() )  return token(R_CURLY); }  break;
+   case '=':  { if ( do_equals()      )  return token (EQ);     }  break;
+   case ';':  { if ( do_semi()        )  return token(';');     }  break;
+   case ',':  { if ( do_comma()       )  return token(',');     }  break;
 
    default:
       break;
@@ -215,13 +215,13 @@ if ( c == '/' )  {
 
    c2 = nextchar();
 
-   if ( c2 == EOF )  return ( EOF );
+   if ( c2 == EOF )  return EOF;
 
         if ( c2 == '*' )   do_c_comment();
    else if ( c2 == '/' )   do_cpp_comment();
    else                    ungetc(c2, yyin);
 
-   return ( skip );
+   return skip;
 
 }
 
@@ -231,7 +231,7 @@ if ( c == '/' )  {
 
 int k = char_class[c];
 
-if ( k == char_class_other )  return ( skip );
+if ( k == char_class_other )  return skip;
 
    //
    //  from this point on, we're only interested in characters
@@ -255,14 +255,14 @@ while ( count < max_lexeme_size )  {
 
 lexeme[max_lexeme_size] = (char) 0;
 
-if ( count == 0 )  return ( skip );
+if ( count == 0 )  return skip;
 
-if ( strncmp((char *) lexeme, "enum",  max_lexeme_size) == 0 )  { do_enum();   return ( token(ENUM)  ); }
-if ( strncmp((char *) lexeme, "class", max_lexeme_size) == 0 )  { do_class();  return ( token(CLASS) ); }
+if ( strncmp((char *) lexeme, "enum",  max_lexeme_size) == 0 )  { do_enum();   return token(ENUM) ; }
+if ( strncmp((char *) lexeme, "class", max_lexeme_size) == 0 )  { do_class();  return token(CLASS); }
 
-if ( is_int() )  { if ( do_int() )  return ( token(INTEGER) ); }
+if ( is_int() )  { if ( do_int() )  return token(INTEGER); }
 
-if ( is_id() )  { if ( do_id() )  return ( token(ID) ); }
+if ( is_id() )  { if ( do_id() )  return token(ID); }
 
 
 
@@ -326,9 +326,9 @@ bool char_ok(int c)
 
 const int k = char_class[c];
 
-if ( k == char_class_digit )  return ( true );
+if ( k == char_class_digit )  return true;
 
-if ( k == char_class_alpha )  return ( true );
+if ( k == char_class_alpha )  return true;
 
 
 return false;
@@ -357,7 +357,7 @@ for (j=j_start; j<max_lexeme_size; ++j)  {
 
    k = char_class[lexeme[j]];
 
-   if ( k != char_class_digit )  return ( false );
+   if ( k != char_class_digit )  return false;
 
    ++digit_count;
 
@@ -365,7 +365,7 @@ for (j=j_start; j<max_lexeme_size; ++j)  {
 
 
 
-return ( digit_count > 0 );
+return digit_count > 0;
 
 }
 
@@ -377,7 +377,7 @@ bool is_id()
 
 {
 
-if ( char_class[lexeme[0]] != char_class_alpha )  return ( false );
+if ( char_class[lexeme[0]] != char_class_alpha )  return false;
 
 int k;
 
@@ -387,11 +387,11 @@ for (int j=0; j<max_lexeme_size; ++j)  {
 
    k = char_class[lexeme[j]];
 
-   if ( (k != char_class_digit) && (k != char_class_alpha) )  return ( false );
+   if ( (k != char_class_digit) && (k != char_class_alpha) )  return false;
 
 }   //  for j
 
-return ( true );
+return true;
 
 }
 
@@ -600,7 +600,7 @@ c1 = nextchar();
 c2 = nextchar();
 
 
-while ( 1 )  {
+while ( true )  {
 
    if ( (c1 == EOF) || (c2 == EOF) )  break;
 
@@ -629,7 +629,7 @@ void do_cpp_comment()
 int c;
 
 
-while ( 1 )  {
+while ( true )  {
 
    c = nextchar();
 

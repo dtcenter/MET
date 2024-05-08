@@ -62,7 +62,7 @@ class InsituNcFile {
       // Variables
       //
 
-      string *_aircraftId;
+      std::string *_aircraftId;
       time_t*_timeObs;
       double *_latitude;
       double *_longitude;
@@ -75,10 +75,10 @@ class InsituNcFile {
       // Get the next record in the file
       //
 
-      bool getNextRecord(string &aircraftId, time_t &timeObs,
-			 double &latitude, double &longitude,
-			 double &altitude, double &QCconfidence,
-			 double &medEDR, double &maxEDR);
+      bool getNextRecord(std::string &aircraftId, time_t &timeObs,
+                         double &latitude, double &longitude,
+                         double &altitude, double &QCconfidence,
+                         double &medEDR, double &maxEDR);
       
       void init_from_scratch();
 

@@ -39,10 +39,11 @@
 //                                      line types.
 //   018    02/13/24  Halley Gotway   MET #2395 Add wind direction stats
 //                                      to VL1L2, VAL1L2, and VCNT.
+//   019    02/21/24  Halley Gotway   MET #2583 Add observation error
+//                                      ECNT statistics.
 //
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
 
 #include <cstdio>
 #include <iostream>
@@ -58,6 +59,9 @@ using namespace std;
 
 #include "aggr_stat_line.h"
 #include "parse_stat_line.h"
+
+using namespace std;
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -525,7 +529,7 @@ StatHdrColumns StatHdrInfo::get_shc(const ConcatString &cur_case,
    // LINE_TYPE
    shc.set_line_type(statlinetype_to_string(lt));
 
-   return(shc);
+   return shc;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -576,7 +580,7 @@ ConcatString StatHdrInfo::get_shc_str(const ConcatString &cur_case,
       shc_str = css;
    }
 
-   return(shc_str);
+   return shc_str;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -779,18 +783,18 @@ void aggr_summary_lines(LineDataFile &f, STATAnalysisJob &job,
          //
          // Derive categorical statistics
          //
-         if(do_cts && line.type() == stat_fho) {
+         if(do_cts && line.type() == STATLineType::fho) {
             parse_fho_ctable(line, cts_info.cts);
          }
-         else if(do_cts && line.type() == stat_ctc) {
+         else if(do_cts && line.type() == STATLineType::ctc) {
             parse_ctc_ctable(line, cts_info.cts);
          }
 
          //
          // Derive continuous statistics
          //
-         else if(do_cnt && (line.type() == stat_sl1l2 ||
-                            line.type() == stat_sal1l2)) {
+         else if(do_cnt && (line.type() == STATLineType::sl1l2 ||
+                            line.type() == STATLineType::sal1l2)) {
             parse_sl1l2_line(line, sl1l2_info);
             compute_cntinfo(sl1l2_info, 0, cnt_info);
          }
@@ -798,7 +802,7 @@ void aggr_summary_lines(LineDataFile &f, STATAnalysisJob &job,
          //
          // Derive vector continuous statistics
          //
-         else if(do_vcnt && line.type() == stat_vl1l2) {
+         else if(do_vcnt && line.type() == STATLineType::vl1l2) {
             parse_vl1l2_line(line, vl1l2_info);
          }
 
@@ -815,20 +819,20 @@ void aggr_summary_lines(LineDataFile &f, STATAnalysisJob &job,
             //
             // Retrieve the column value, checking dervied stats
             //
-            if((line.type() == stat_fho ||
-                line.type() == stat_ctc) && lty == stat_cts) {
+            if((line.type() == STATLineType::fho ||
+                line.type() == STATLineType::ctc) && lty == STATLineType::cts) {
                v = cts_info.get_stat(req_col[i].c_str());
                w = cts_info.cts.n();
             }
-            else if(line.type() == stat_sl1l2 && lty == stat_cnt) {
+            else if(line.type() == STATLineType::sl1l2 && lty == STATLineType::cnt) {
                v = cnt_info.get_stat(req_col[i].c_str());
                w = cnt_info.n;
             }
-            else if(line.type() == stat_sal1l2 && lty == stat_cnt) {
+            else if(line.type() == STATLineType::sal1l2 && lty == STATLineType::cnt) {
                v = cnt_info.get_stat(req_col[i].c_str());
                w = cnt_info.n;
             }
-            else if(line.type() == stat_vl1l2 && lty == stat_vcnt) {
+            else if(line.type() == STATLineType::vl1l2 && lty == STATLineType::vcnt) {
                v = vl1l2_info.get_stat(req_col[i].c_str());
                w = vl1l2_info.vcount;
             }
@@ -919,15 +923,15 @@ void aggr_ctc_lines(LineDataFile &f, STATAnalysisJob &job,
          //
          switch(line.type()) {
 
-            case(stat_fho):
+            case STATLineType::fho:
                parse_fho_ctable(line, cur.cts);
                break;
 
-            case(stat_ctc):
+            case STATLineType::ctc:
                parse_ctc_ctable(line, cur.cts);
                break;
 
-            case(stat_nbrctc):
+            case STATLineType::nbrctc:
                parse_nbrctc_ctable(line, cur.cts);
                break;
 
@@ -1122,7 +1126,7 @@ void aggr_mctc_lines(LineDataFile &f, STATAnalysisJob &job,
          //
          // Check for expected line type
          //
-         if(line.type() != stat_mctc) {
+         if(line.type() != STATLineType::mctc) {
             mlog << Error << "\naggr_mctc_lines() -> "
                  << "should only encounter multi-category contingency table count "
                  << "(MCTC) line types.\n"
@@ -1302,7 +1306,7 @@ void aggr_pct_lines(LineDataFile &f, STATAnalysisJob &job,
          //
          // Check for expected line type
          //
-         if(line.type() != stat_pct) {
+         if(line.type() != STATLineType::pct) {
             mlog << Error << "\naggr_pct_lines() -> "
                  << "should only encounter probability contingency table (PCT) "
                  << "line types.\n"
@@ -1519,23 +1523,23 @@ void aggr_psum_lines(LineDataFile &f, STATAnalysisJob &job,
          //
          switch(line.type()) {
 
-            case(stat_sl1l2):
+            case STATLineType::sl1l2:
                parse_sl1l2_line(line, cur_sl1l2);
                break;
 
-            case(stat_sal1l2):
+            case STATLineType::sal1l2:
                parse_sal1l2_line(line, cur_sl1l2);
                break;
 
-            case(stat_vl1l2):
+            case STATLineType::vl1l2:
                parse_vl1l2_line(line, cur_vl1l2);
                break;
 
-            case(stat_val1l2):
+            case STATLineType::val1l2:
                parse_val1l2_line(line, cur_vl1l2);
                break;
 
-            case(stat_nbrcnt):
+            case STATLineType::nbrcnt:
                parse_nbrcnt_line(line, cur_nbrcnt);
                break;
 
@@ -1580,7 +1584,7 @@ void aggr_psum_lines(LineDataFile &f, STATAnalysisJob &job,
          //
          // Keep track of scores for each time step for VIF
          //
-         if(line.type() == stat_sl1l2 && job.vif_flag) {
+         if(line.type() == STATLineType::sl1l2 && job.vif_flag) {
 
             //
             // Cannot compute VIF when the times are not unique
@@ -1697,7 +1701,7 @@ void aggr_grad_lines(LineDataFile &f, STATAnalysisJob &job,
 
          job.dump_stat_line(line);
 
-         if(line.type() != stat_grad) {
+         if(line.type() != STATLineType::grad) {
             mlog << Error << "\naggr_grad_lines() -> "
                  << "should only encounter gradient (GRAD) line types.\n"
                  << "ERROR occurred on STAT line:\n" << line << "\n\n";
@@ -1805,13 +1809,13 @@ void aggr_wind_lines(LineDataFile &f, STATAnalysisJob &job,
          //
          switch(line.type()) {
 
-            case(stat_vl1l2):
+            case STATLineType::vl1l2:
                parse_vl1l2_line(line, cur);
                convert_u_v_to_unit(cur.uf_bar, cur.vf_bar, uf, vf);
                convert_u_v_to_unit(cur.uo_bar, cur.vo_bar, uo, vo);
                break;
 
-            case(stat_val1l2):
+            case STATLineType::val1l2:
                parse_val1l2_line(line, cur);
                convert_u_v_to_unit(cur.ufa_bar, cur.vfa_bar, uf, vf);
                convert_u_v_to_unit(cur.uoa_bar, cur.voa_bar, uo, vo);
@@ -2224,7 +2228,7 @@ void aggr_mpr_lines(LineDataFile &f, STATAnalysisJob &job,
          //
          // Check for expected line type
          //
-         if(line.type() != stat_mpr) {
+         if(line.type() != STATLineType::mpr) {
             mlog << Error << "\naggr_mpr_lines() -> "
                  << "should only encounter matched pair (MPR) line types.\n"
                  << "ERROR occurred on STAT line:\n" << line << "\n\n";
@@ -2347,7 +2351,7 @@ void aggr_isc_lines(LineDataFile &ldf, STATAnalysisJob &job,
 
          job.dump_stat_line(line);
 
-         if(line.type() != stat_isc) {
+         if(line.type() != STATLineType::isc) {
             mlog << Error << "\naggr_isc_lines() -> "
                  << "should only encounter intensity-scale "
                  << "(ISC) line types.\n"
@@ -2377,8 +2381,8 @@ void aggr_isc_lines(LineDataFile &ldf, STATAnalysisJob &job,
          //
          if(m.count(key) == 0) {
             aggr.isc_info.clear();
-            aggr.total_na = aggr.mse_na   = aggr.fen_na   = (NumArray *) 0;
-            aggr.oen_na   = aggr.baser_na = aggr.fbias_na = (NumArray *) 0;
+            aggr.total_na = aggr.mse_na   = aggr.fen_na   = (NumArray *) nullptr;
+            aggr.oen_na   = aggr.baser_na = aggr.fbias_na = (NumArray *) nullptr;
             aggr.hdr.clear();
             m[key] = aggr;
             mlog << Debug(3) << "[Case " << m.size()
@@ -2568,12 +2572,12 @@ void aggr_isc_lines(LineDataFile &ldf, STATAnalysisJob &job,
       //
       // Deallocate memory
       //
-      if(it->second.total_na) { delete [] it->second.total_na; it->second.total_na = (NumArray *) 0; }
-      if(it->second.mse_na  ) { delete [] it->second.mse_na;   it->second.mse_na   = (NumArray *) 0; }
-      if(it->second.fen_na  ) { delete [] it->second.fen_na;   it->second.fen_na   = (NumArray *) 0; }
-      if(it->second.oen_na  ) { delete [] it->second.oen_na;   it->second.oen_na   = (NumArray *) 0; }
-      if(it->second.baser_na) { delete [] it->second.baser_na; it->second.baser_na = (NumArray *) 0; }
-      if(it->second.fbias_na) { delete [] it->second.fbias_na; it->second.fbias_na = (NumArray *) 0; }
+      if(it->second.total_na) { delete [] it->second.total_na; it->second.total_na = (NumArray *) nullptr; }
+      if(it->second.mse_na  ) { delete [] it->second.mse_na;   it->second.mse_na   = (NumArray *) nullptr; }
+      if(it->second.fen_na  ) { delete [] it->second.fen_na;   it->second.fen_na   = (NumArray *) nullptr; }
+      if(it->second.oen_na  ) { delete [] it->second.oen_na;   it->second.oen_na   = (NumArray *) nullptr; }
+      if(it->second.baser_na) { delete [] it->second.baser_na; it->second.baser_na = (NumArray *) nullptr; }
+      if(it->second.fbias_na) { delete [] it->second.fbias_na; it->second.fbias_na = (NumArray *) nullptr; }
 
    } // end for it
 
@@ -2605,7 +2609,7 @@ void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &job,
 
          job.dump_stat_line(line);
 
-         if(line.type() != stat_ecnt) {
+         if(line.type() != STATLineType::ecnt) {
             mlog << Error << "\naggr_ecnt_lines() -> "
                  << "should only encounter ensemble continuous statistics "
                  << "(ECNT) line types.\n"
@@ -2654,6 +2658,8 @@ void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &job,
          m[key].ens_pd.crps_gaus_na.add(cur.crps_gaus);
          m[key].ens_pd.crpscl_gaus_na.add(cur.crpscl_gaus);
          m[key].ens_pd.ign_na.add(cur.ign);
+         m[key].ens_pd.ign_conv_oerr_na.add(cur.ign_conv_oerr);
+         m[key].ens_pd.ign_corr_oerr_na.add(cur.ign_corr_oerr);
          m[key].ens_pd.n_ge_obs_na.add(cur.n_ge_obs);
          m[key].ens_pd.me_ge_obs_na.add(cur.me_ge_obs);
          m[key].ens_pd.n_lt_obs_na.add(cur.n_lt_obs);
@@ -2754,7 +2760,7 @@ void aggr_rps_lines(LineDataFile &f, STATAnalysisJob &job,
          //
          // Check for expected line type
          //
-         if(line.type() != stat_rps) {
+         if(line.type() != STATLineType::rps) {
             mlog << Error << "\naggr_rps_lines() -> "
                  << "should only encounter ranked probability score "
                  << "(RPS) line types.\n"
@@ -2846,7 +2852,7 @@ void aggr_rhist_lines(LineDataFile &f, STATAnalysisJob &job,
 
          job.dump_stat_line(line);
 
-         if(line.type() != stat_rhist) {
+         if(line.type() != STATLineType::rhist) {
             mlog << Error << "\naggr_rhist_lines() -> "
                  << "should only encounter ranked histogram "
                  << "(RHIST) line types.\n"
@@ -2936,7 +2942,7 @@ void aggr_phist_lines(LineDataFile &f, STATAnalysisJob &job,
 
          job.dump_stat_line(line);
 
-         if(line.type() != stat_phist) {
+         if(line.type() != STATLineType::phist) {
             mlog << Error << "\naggr_phist_lines() -> "
                  << "should only encounter probability integral "
                  << "transform histogram (PHIST) line types.\n"
@@ -3027,7 +3033,7 @@ void aggr_relp_lines(LineDataFile &f, STATAnalysisJob &job,
 
          job.dump_stat_line(line);
 
-         if(line.type() != stat_relp) {
+         if(line.type() != STATLineType::relp) {
             mlog << Error << "\naggr_relp_lines() -> "
                  << "should only encounter relative position (RELP) "
                  << "line types.\n"
@@ -3119,7 +3125,7 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &job,
 
          job.dump_stat_line(line);
 
-         if(line.type() != stat_orank) {
+         if(line.type() != STATLineType::orank) {
             mlog << Error << "\naggr_orank_lines() -> "
                  << "should only encounter observation rank "
                  << "(ORANK) line types.\n"
@@ -3227,16 +3233,33 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &job,
          m[key].ens_pd.ign_na.add(compute_ens_ign(cur.obs, cur.ens_mean, cur.spread));
          m[key].ens_pd.pit_na.add(compute_ens_pit(cur.obs, cur.ens_mean, cur.spread));
 
+         // Back out the observation error variance
+         double oerr_var = bad_data_double;
+         if(!is_bad_data(cur.spread_plus_oerr) &&
+            !is_bad_data(cur.spread)) {
+            oerr_var = square(cur.spread_plus_oerr) -
+                       square(cur.spread);
+         }
+
          // Store BIAS_RATIO terms
          int n_ge_obs, n_lt_obs;
          double me_ge_obs, me_lt_obs;
-         compute_bias_ratio_terms(cur.obs, cur.ens_na,
-                                  n_ge_obs, me_ge_obs,
-                                  n_lt_obs, me_lt_obs);
+         compute_bias_ratio_terms(
+            cur.obs, cur.ens_na,
+            n_ge_obs, me_ge_obs,
+            n_lt_obs, me_lt_obs);
          m[key].ens_pd.n_ge_obs_na.add(n_ge_obs);
          m[key].ens_pd.me_ge_obs_na.add(me_ge_obs);
          m[key].ens_pd.n_lt_obs_na.add(n_lt_obs);
          m[key].ens_pd.me_lt_obs_na.add(me_lt_obs);
+
+         // Compute observation error log scores
+         double v_conv, v_corr;
+         compute_obs_error_log_scores(
+            cur.ens_mean, cur.spread, cur.obs, oerr_var,
+            v_conv, v_corr);
+         m[key].ens_pd.ign_conv_oerr_na.add(v_conv);
+         m[key].ens_pd.ign_corr_oerr_na.add(v_corr);
 
          //
          // Increment the RHIST counts
@@ -3291,7 +3314,7 @@ void aggr_ssvar_lines(LineDataFile &f, STATAnalysisJob &job,
 
          job.dump_stat_line(line);
 
-         if(line.type() != stat_ssvar) {
+         if(line.type() != STATLineType::ssvar) {
             mlog << Error << "\naggr_ssvar_lines() -> "
                  << "should only encounter spread-skill variance "
                  << "(SSVAR) line types.\n"
@@ -3396,7 +3419,7 @@ void aggr_seeps_lines(LineDataFile &f, STATAnalysisJob &job,
 
          job.dump_stat_line(line);
 
-         if(line.type() != stat_seeps) {
+         if(line.type() != STATLineType::seeps) {
             mlog << Error << "\naggr_seeps_lines() -> "
                  << "should only encounter SEEPS line types.\n"
                  << "ERROR occurred on STAT line:\n" << line << "\n\n";
@@ -3480,7 +3503,7 @@ void aggr_seeps_mpr_lines(LineDataFile &f, STATAnalysisJob &job,
 
          job.dump_stat_line(line);
 
-         if(line.type() != stat_seeps_mpr) {
+         if(line.type() != STATLineType::seeps_mpr) {
             mlog << Error << "\naggr_seeps_mpr_lines() -> "
                  << "should only encounter SEEPS_MPR line types.\n"
                  << "ERROR occurred on STAT line:\n" << line << "\n\n";
@@ -3746,7 +3769,7 @@ void aggr_ss_index(LineDataFile &f, STATAnalysisJob &job,
       // and set the type to aggregation
       //
       fcst_term = job;
-      fcst_term.set_job_type(stat_job_aggr);
+      fcst_term.set_job_type(STATJobType::aggr);
 
       //
       // line_type
@@ -3755,7 +3778,7 @@ void aggr_ss_index(LineDataFile &f, STATAnalysisJob &job,
          fcst_term.line_type.set(job.line_type[i]);
 
          STATLineType lt = string_to_statlinetype(job.line_type[i].c_str());
-         if(lt != stat_sl1l2 && lt != stat_ctc) {
+         if(lt != STATLineType::sl1l2 && lt != STATLineType::ctc) {
             mlog << Error << "\naggr_ss_index() -> "
                  << "a skill score index can only be computed using "
                  << "statistics derived from SL1L2 or CTC line types."
@@ -3878,7 +3901,7 @@ void mpr_to_ctc(STATAnalysisJob &job, const AggrMPRInfo &info,
 void mpr_to_cts(STATAnalysisJob &job, const AggrMPRInfo &info,
                 int i_thresh, CTSInfo &cts_info,
                 const char *tmp_dir, gsl_rng *rng_ptr) {
-   CTSInfo *cts_info_ptr = (CTSInfo *) 0;
+   CTSInfo *cts_info_ptr = (CTSInfo *) nullptr;
 
    //
    // Initialize
@@ -3904,7 +3927,7 @@ void mpr_to_cts(STATAnalysisJob &job, const AggrMPRInfo &info,
    // bootstrap confidence intervals
    //
    cts_info_ptr = &cts_info;
-   if(job.boot_interval == boot_bca_flag) {
+   if(job.boot_interval == BootIntervalType::BCA) {
       compute_cts_stats_ci_bca(rng_ptr, info.pd,
          job.n_boot_rep,
          cts_info_ptr, 1, 1,
@@ -3974,7 +3997,7 @@ void mpr_to_mcts(STATAnalysisJob &job, const AggrMPRInfo &info,
    // Compute the counts, stats, normal confidence intervals, and
    // bootstrap confidence intervals
    //
-   if(job.boot_interval == boot_bca_flag) {
+   if(job.boot_interval == BootIntervalType::BCA) {
       compute_mcts_stats_ci_bca(rng_ptr, info.pd,
          job.n_boot_rep,
          mcts_info, 1,
@@ -4041,14 +4064,12 @@ void mpr_to_cnt(STATAnalysisJob &job, const AggrMPRInfo &info,
    // Compute the stats, normal confidence intervals, and
    // bootstrap confidence intervals
    //
-   if(job.boot_interval == boot_bca_flag) {
-
+   if(job.boot_interval == BootIntervalType::BCA) {
       compute_cnt_stats_ci_bca(rng_ptr, pd_thr,
          precip_flag, job.rank_corr_flag, job.n_boot_rep,
          cnt_info, tmp_dir);
    }
    else {
-
       compute_cnt_stats_ci_perc(rng_ptr, pd_thr,
          precip_flag, job.rank_corr_flag, job.n_boot_rep, job.boot_rep_prop,
          cnt_info, tmp_dir);
@@ -4203,7 +4224,7 @@ double compute_vif(NumArray &na) {
    // Compute the variance inflation factor
    vif = 1 + 2.0*fabs(corr) - 2.0*fabs(corr)/na.n();
 
-   return(vif);
+   return vif;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -4215,7 +4236,7 @@ bool is_precip_var_name(const ConcatString &s) {
                 has_prefix(grib_precipitation_abbr,
                            n_grib_precipitation_abbr, s.c_str());
 
-   return(match);
+   return match;
 }
 
 ////////////////////////////////////////////////////////////////////////

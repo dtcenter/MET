@@ -103,25 +103,17 @@ _______________________
 
 .. code-block:: none
 
-  max_range_km = 100.0;
-
-The **max_range_km** parameter specifies the maximum range of the range-azimuth grid, in kilometers. If this parameter is specified and not **rmw_scale**, the radial grid spacing will be **max_range_km / n_range**.
-
-_______________________
-
-.. code-block:: none
-
   delta_range_km = 10.0;
 
-The **delta_range_km** parameter specifies the spacing of the range rings, in kilometers.
+The **delta_range_km** parameter specifies the spacing of the range rings, in kilometers. The range values start with 0 km and extend out to **n_range - 1** times this delta spacing.
 
 _______________________
 
 .. code-block:: none
 
-  rmw_scale = 0.2;
+  rmw_scale = NA;
 
-The **rmw_scale** parameter overrides the **max_range_km** parameter. When this is set the radial grid spacing will be **rmw_scale** in units of the RMW, which varies along the storm track.
+If changed from its default value of **NA**, the **rmw_scale** parameter overrides the **delta_range_km** parameter. The radial grid spacing is defined using **rmw_scale** in units of the RMW, which varies along the storm track. For example, setting **rmw_scale** to 0.2 would define the delta range spacing as 20% of the radius of maximum winds around each point. Note that RMW is defined in nautical miles but is converted to kilometers for this computation. 
 
 _______________________
 

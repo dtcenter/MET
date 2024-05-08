@@ -9,8 +9,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <cstdlib>
@@ -20,6 +18,8 @@ using namespace std;
 
 #include "gsl/gsl_randist.h"
 #include "is_bad_data.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -36,7 +36,7 @@ double y;
 y = ( is_bad_data(x) ?
       bad_data_double : gsl_cdf_ugaussian_P(x) );
 
-return ( y );
+return y;
 
 }
 
@@ -51,7 +51,7 @@ double x;
 x = ( is_bad_data(y) ?
       bad_data_double : gsl_cdf_ugaussian_Pinv(y) );
 
-return ( x );
+return x;
 
 }
 
@@ -66,7 +66,7 @@ double y;
 y = ( is_bad_data(x) ?
       bad_data_double : gsl_ran_ugaussian_pdf(x) );
 
-return ( y );
+return y;
 
 }
 
@@ -81,7 +81,7 @@ double y;
 y = ( is_bad_data(x) || is_bad_data(mu) || is_bad_data(sigma) ?
       bad_data_double : gsl_cdf_gaussian_P(x - mu, sigma) );
 
-return ( y );
+return y;
 
 }
 
@@ -96,7 +96,7 @@ double x;
 x = ( is_bad_data(y) || is_bad_data(mu) || is_bad_data(sigma) ?
       bad_data_double : mu + gsl_cdf_gaussian_Pinv(y, sigma) );
 
-return ( x );
+return x;
 
 }
 
@@ -111,7 +111,7 @@ double y;
 y = ( is_bad_data(x) || is_bad_data(sigma) ?
       bad_data_double : gsl_ran_gaussian_pdf(x, sigma) );
 
-return ( y );
+return y;
 
 }
 
@@ -126,7 +126,7 @@ double y;
 y = ( is_bad_data(x) || is_bad_data(deg_freedom) ?
       bad_data_double : gsl_cdf_chisq_P(x, deg_freedom) );
 
-return ( y );
+return y;
 
 }
 
@@ -139,7 +139,7 @@ double chi2_cdf_inv(double y, double deg_freedom)
 double x, cv_normal;
 double large_n = 50.0;
 
-if(is_bad_data(y) || is_bad_data(deg_freedom))  return ( bad_data_double );
+if(is_bad_data(y) || is_bad_data(deg_freedom))  return bad_data_double;
 
 //
 // The following is a workaround for handling a GSL bug when the
@@ -160,7 +160,7 @@ else {
    x = gsl_cdf_chisq_Pinv(y, deg_freedom);
 }
 
-return ( x );
+return x;
 
 }
 
@@ -175,7 +175,7 @@ double y;
 y = ( is_bad_data(x) || is_bad_data(deg_freedom) ?
       bad_data_double : gsl_cdf_tdist_P(x, deg_freedom) );
 
-return ( y );
+return y;
 
 }
 
@@ -190,7 +190,7 @@ double x;
 x = ( is_bad_data(y) || is_bad_data(deg_freedom) ?
       bad_data_double : gsl_cdf_tdist_Pinv(y, deg_freedom) );
 
-return ( x );
+return x;
 
 }
 
@@ -205,7 +205,7 @@ double y;
 y = ( is_bad_data(x) || is_bad_data(deg_freedom_1) || is_bad_data(deg_freedom_2) ?
       bad_data_double : gsl_cdf_fdist_P(x, deg_freedom_1, deg_freedom_2) );
 
-return ( y );
+return y;
 
 }
 
@@ -219,7 +219,7 @@ double x, x_new, cor;
 const double tol = 1.0e-10;
 
 if(is_bad_data(y) || is_bad_data(deg_freedom_1) || is_bad_data(deg_freedom_2))
-   return ( bad_data_double );
+   return bad_data_double;
 
 x = 1.0;   //  starting value
 
@@ -234,7 +234,7 @@ do {
 
 }  while ( cor >= tol );
 
-return ( x );
+return x;
 
 }
 

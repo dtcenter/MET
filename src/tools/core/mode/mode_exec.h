@@ -51,13 +51,13 @@ static const int n_cts = 2;
 ////////////////////////////////////////////////////////////////////////
 
 
-enum ObjPolyType {
-   FcstSimpBdyPoly  = 0,
-   ObsSimpBdyPoly   = 1,
-   FcstSimpHullPoly = 2,
-   ObsSimpHullPoly  = 3,
-   FcstClusHullPoly = 4,
-   ObsClusHullPoly  = 5
+enum class ObjPolyType {
+   FcstSimpBdy  = 0,
+   ObsSimpBdy   = 1,
+   FcstSimpHull = 2,
+   ObsSimpHull  = 3,
+   FcstClusHull = 4,
+   ObsClusHull  = 5
 };
 
 

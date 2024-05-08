@@ -10,8 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -31,6 +29,8 @@ using namespace std;
 
 #include "grid_output.h"
 #include "apply_mask.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -62,8 +62,8 @@ WwmcaRegridder::~WwmcaRegridder()
 
 clear();
 
-if ( NHgrid )  { delete NHgrid;  NHgrid = (const Grid *) 0; }
-if ( SHgrid )  { delete SHgrid;  SHgrid = (const Grid *) 0; }
+if ( NHgrid )  { delete NHgrid;  NHgrid = (const Grid *) nullptr; }
+if ( SHgrid )  { delete SHgrid;  SHgrid = (const Grid *) nullptr; }
 
 }
 
@@ -78,15 +78,15 @@ void WwmcaRegridder::init_from_scratch()
 NHgrid = new Grid (wwmca_north_data);
 SHgrid = new Grid (wwmca_south_data);
 
-cp_nh = (const AFCloudPctFile *) 0;
-cp_sh = (const AFCloudPctFile *) 0;
+cp_nh = (const AFCloudPctFile *) nullptr;
+cp_sh = (const AFCloudPctFile *) nullptr;
 
-pt_nh = (const AFPixelTimeFile *) 0;
-pt_sh = (const AFPixelTimeFile *) 0;
+pt_nh = (const AFPixelTimeFile *) nullptr;
+pt_sh = (const AFPixelTimeFile *) nullptr;
 
-ToGrid = (const Grid *) 0;
+ToGrid = (const Grid *) nullptr;
 
-Config = (MetConfig *) 0;
+Config = (MetConfig *) nullptr;
 
 interp_func = 0;
 
@@ -106,25 +106,25 @@ void WwmcaRegridder::clear()
 
 {
 
-if ( cp_nh )  { delete cp_nh;  cp_nh = (const AFCloudPctFile *) 0; }
-if ( cp_sh )  { delete cp_sh;  cp_sh = (const AFCloudPctFile *) 0; }
+if ( cp_nh )  { delete cp_nh;  cp_nh = (const AFCloudPctFile *) nullptr; }
+if ( cp_sh )  { delete cp_sh;  cp_sh = (const AFCloudPctFile *) nullptr; }
 
-if ( pt_nh )  { delete pt_nh;  pt_nh = (const AFPixelTimeFile *) 0; }
-if ( pt_sh )  { delete pt_sh;  pt_sh = (const AFPixelTimeFile *) 0; }
+if ( pt_nh )  { delete pt_nh;  pt_nh = (const AFPixelTimeFile *) nullptr; }
+if ( pt_sh )  { delete pt_sh;  pt_sh = (const AFPixelTimeFile *) nullptr; }
 
-if ( ToGrid )  { delete ToGrid;  ToGrid = (const Grid *) 0; }
+if ( ToGrid )  { delete ToGrid;  ToGrid = (const Grid *) nullptr; }
 
 Hemi = no_hemisphere;
 
 grid_strings.clear();
 
-Config = (MetConfig *) 0;
+Config = (MetConfig *) nullptr;
 
 ConfigFilename.clear();
 
 Width = 0;
 
-Method = InterpMthd_None;
+Method = InterpMthd::None;
 
 interp_func = 0;
 
@@ -230,7 +230,7 @@ if ( !(f->read(filename, 'N')) )  {
 
 }
 
-cp_nh = (const AFCloudPctFile *) f;  f = (AFCloudPctFile *) 0;
+cp_nh = (const AFCloudPctFile *) f;  f = (AFCloudPctFile *) nullptr;
 
 return;
 
@@ -255,7 +255,7 @@ if ( !(f->read(filename, 'S')) )  {
 
 }
 
-cp_sh = (const AFCloudPctFile *) f;  f = (AFCloudPctFile *) 0;
+cp_sh = (const AFCloudPctFile *) f;  f = (AFCloudPctFile *) nullptr;
 
 return;
 
@@ -282,7 +282,7 @@ if ( !(f->read(filename, 'N')) )  {
 
 f->set_swap_endian(swap);
 
-pt_nh = (const AFPixelTimeFile *) f;  f = (AFPixelTimeFile *) 0;
+pt_nh = (const AFPixelTimeFile *) f;  f = (AFPixelTimeFile *) nullptr;
 
 return;
 
@@ -309,7 +309,7 @@ if ( !(f->read(filename, 'S')) )  {
 
 f->set_swap_endian(swap);
 
-pt_sh = (const AFPixelTimeFile *) f;  f = (AFPixelTimeFile *) 0;
+pt_sh = (const AFPixelTimeFile *) f;  f = (AFPixelTimeFile *) nullptr;
 
 return;
 
@@ -335,7 +335,7 @@ const RegridInfo regrid_info = parse_conf_regrid(Config);
 
 Width = regrid_info.width;
 
-Method = InterpMthd_Nearest;
+Method = InterpMthd::Nearest;
 
 Fraction = regrid_info.vld_thresh;
 
@@ -367,15 +367,15 @@ if ( Width > 1 )  {
 
    switch ( Method )  {
 
-      case InterpMthd_Min:
+      case InterpMthd::Min:
          interp_func = &dp_interp_min;
          break;
 
-      case InterpMthd_Max:
+      case InterpMthd::Max:
          interp_func = &dp_interp_max;
          break;
 
-      case InterpMthd_UW_Mean:
+      case InterpMthd::UW_Mean:
          interp_func = &dp_interp_uw_mean;
          break;
 

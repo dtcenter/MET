@@ -8,8 +8,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <dirent.h>
 #include <iostream>
 #include <unistd.h>
@@ -23,6 +21,9 @@ using namespace std;
 
 #include "vx_data2d_factory.h"
 #include "vx_log.h"
+#include "enum_as_int.hpp"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -47,12 +48,12 @@ WaveletStatConfInfo::~WaveletStatConfInfo() {
 void WaveletStatConfInfo::init_from_scratch() {
 
    // Initialize pointers
-   fcst_info     = (VarInfo **)    0;
-   obs_info      = (VarInfo **)    0;
-   fcat_ta       = (ThreshArray *) 0;
-   ocat_ta       = (ThreshArray *) 0;
-   wvlt_ptr      = (gsl_wavelet *) 0;
-   wvlt_work_ptr = (gsl_wavelet_workspace *) 0;
+   fcst_info     = (VarInfo **)    nullptr;
+   obs_info      = (VarInfo **)    nullptr;
+   fcat_ta       = (ThreshArray *) nullptr;
+   ocat_ta       = (ThreshArray *) nullptr;
+   wvlt_ptr      = (gsl_wavelet *) nullptr;
+   wvlt_work_ptr = (gsl_wavelet_workspace *) nullptr;
 
    clear();
 
@@ -72,13 +73,13 @@ void WaveletStatConfInfo::clear() {
    model.clear();
    desc.clear();
    obtype.clear();
-   mask_missing_flag = FieldType_None;
-   grid_decomp_flag = GridDecompType_None;
+   mask_missing_flag = FieldType::None;
+   grid_decomp_flag = GridDecompType::None;
    tile_dim = 0;
    tile_xll.clear();
    tile_yll.clear();
    pad_bb.set_llwh(0.0, 0.0, 0.0, 0.0);
-   wvlt_type = WaveletType_None;
+   wvlt_type = WaveletType::None;
    // nc_pairs_flag = false;
    nc_info.set_all_true();
    ps_plot_flag = false;
@@ -86,26 +87,26 @@ void WaveletStatConfInfo::clear() {
    output_prefix.clear();
    version.clear();
 
-   for(i=0; i<n_txt; i++) output_flag[i] = STATOutputType_None;
+   for(i=0; i<n_txt; i++) output_flag[i] = STATOutputType::None;
 
    // Deallocate memory
    if(wvlt_ptr)      { wavelet_free(wvlt_ptr);                }
    if(wvlt_work_ptr) { wavelet_workspace_free(wvlt_work_ptr); }
-   if(fcat_ta)       { delete [] fcat_ta;   fcat_ta   = (ThreshArray *) 0; }
-   if(ocat_ta)       { delete [] ocat_ta;   ocat_ta   = (ThreshArray *) 0; }
+   if(fcat_ta)       { delete [] fcat_ta;   fcat_ta   = (ThreshArray *) nullptr; }
+   if(ocat_ta)       { delete [] ocat_ta;   ocat_ta   = (ThreshArray *) nullptr; }
 
    // Clear fcst_info
    if(fcst_info) {
       for(i=0; i<n_vx; i++)
-         if(fcst_info[i]) { delete fcst_info[i]; fcst_info[i] = (VarInfo *) 0; }
-      delete fcst_info; fcst_info = (VarInfo **) 0;
+         if(fcst_info[i]) { delete fcst_info[i]; fcst_info[i] = (VarInfo *) nullptr; }
+      delete fcst_info; fcst_info = (VarInfo **) nullptr;
    }
 
    // Clear obs_info
    if(obs_info) {
       for(i=0; i<n_vx; i++)
-         if(obs_info[i]) { delete obs_info[i]; obs_info[i] = (VarInfo *) 0; }
-      delete obs_info; obs_info = (VarInfo **) 0;
+         if(obs_info[i]) { delete obs_info[i]; obs_info[i] = (VarInfo *) nullptr; }
+      delete obs_info; obs_info = (VarInfo **) nullptr;
    }
 
    // Reset count
@@ -138,9 +139,9 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype,
    int i, j, n;
    VarInfoFactory info_factory;
    map<STATLineType,STATOutputType>output_map;
-   Dictionary *fcst_dict = (Dictionary *) 0;
-   Dictionary *obs_dict  = (Dictionary *) 0;
-   Dictionary *dict      = (Dictionary *) 0;
+   Dictionary *fcst_dict = (Dictionary *) nullptr;
+   Dictionary *obs_dict  = (Dictionary *) nullptr;
+   Dictionary *dict      = (Dictionary *) nullptr;
    Dictionary i_fdict, i_odict;
    gsl_wavelet_type type;
 
@@ -168,7 +169,7 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype,
    // Populate the output_flag array with map values
    for(i=0,n=0; i<n_txt; i++) {
       output_flag[i] = output_map[txt_file_type[i]];
-      if(output_flag[i] != STATOutputType_None) n++;
+      if(output_flag[i] != STATOutputType::None) n++;
    }
 
    // Check for at least one output line type
@@ -202,7 +203,7 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype,
    ocat_ta   = new ThreshArray [n_vx];
 
    // Initialize pointers
-   for(i=0; i<n_vx; i++) fcst_info[i] = obs_info[i] = (VarInfo *) 0;
+   for(i=0; i<n_vx; i++) fcst_info[i] = obs_info[i] = (VarInfo *) nullptr;
 
    // Parse the fcst and obs field information
    max_n_thresh = 0;
@@ -300,8 +301,8 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype,
    // Conf: grid_decomp_flag
    grid_decomp_flag = parse_conf_grid_decomp_flag(&conf);
 
-   // Only check tile definitions for GridDecompType_Tile
-   if(grid_decomp_flag == GridDecompType_Tile) {
+   // Only check tile definitions for GridDecompType::Tile
+   if(grid_decomp_flag == GridDecompType::Tile) {
 
       // Conf: tile.width
       tile_dim = conf.lookup_int(conf_key_tile_width);
@@ -331,16 +332,16 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype,
 
    // Process the wavelet type
    switch(wvlt_type) {
-      case(WaveletType_Haar):         type = *(gsl_wavelet_haar); break;
-      case(WaveletType_Haar_Cntr):    type = *(gsl_wavelet_haar_centered); break;
-      case(WaveletType_Daub):         type = *(gsl_wavelet_daubechies); break;
-      case(WaveletType_Daub_Cntr):    type = *(gsl_wavelet_daubechies_centered); break;
-      case(WaveletType_BSpline):      type = *(gsl_wavelet_bspline); break;
-      case(WaveletType_BSpline_Cntr): type = *(gsl_wavelet_bspline_centered); break;
-      case(WaveletType_None):
+      case(WaveletType::Haar):         type = *(gsl_wavelet_haar); break;
+      case(WaveletType::Haar_Cntr):    type = *(gsl_wavelet_haar_centered); break;
+      case(WaveletType::Daub):         type = *(gsl_wavelet_daubechies); break;
+      case(WaveletType::Daub_Cntr):    type = *(gsl_wavelet_daubechies_centered); break;
+      case(WaveletType::BSpline):      type = *(gsl_wavelet_bspline); break;
+      case(WaveletType::BSpline_Cntr): type = *(gsl_wavelet_bspline_centered); break;
+      case(WaveletType::None):
       default:
          mlog << Error << "\nWaveletStatConfInfo::process_config() -> "
-              << "Unsupported wavelet type value of " << wvlt_type << ".\n\n";
+              << "Unsupported wavelet type value of " << enum_class_as_int(wvlt_type) << ".\n\n";
          exit(1);
    }
 
@@ -349,8 +350,8 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype,
 
    // Check for valid member number
    switch(wvlt_type) {
-      case(WaveletType_Haar):
-      case(WaveletType_Haar_Cntr):
+      case(WaveletType::Haar):
+      case(WaveletType::Haar_Cntr):
          if(wvlt_member != 2) {
             mlog << Error << "\nWaveletStatConfInfo::process_config() -> "
                  << "For Haar wavelets, \"" << conf_key_wavelet_member
@@ -359,8 +360,8 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype,
          }
          break;
 
-      case(WaveletType_Daub):
-      case(WaveletType_Daub_Cntr):
+      case(WaveletType::Daub):
+      case(WaveletType::Daub_Cntr):
          if(wvlt_member < 4 || wvlt_member > 20 || wvlt_member%2 == 1) {
             mlog << Error << "\nWaveletStatConfInfo::process_config() -> "
                  << "For Daubechies wavelets, \"" << conf_key_wavelet_member
@@ -369,8 +370,8 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype,
          }
          break;
 
-      case(WaveletType_BSpline):
-      case(WaveletType_BSpline_Cntr):
+      case(WaveletType::BSpline):
+      case(WaveletType::BSpline_Cntr):
          if(wvlt_member != 103 && wvlt_member != 105 && wvlt_member != 202 &&
             wvlt_member != 204 && wvlt_member != 206 && wvlt_member != 208 &&
             wvlt_member != 301 && wvlt_member != 303 && wvlt_member != 305 &&
@@ -383,10 +384,10 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype,
          }
          break;
 
-      case(WaveletType_None):
+      case(WaveletType::None):
       default:
          mlog << Error << "\nWaveletStatConfInfo::process_config() -> "
-              << "Unsupported wavelet type value of " << wvlt_type << ".\n\n";
+              << "Unsupported wavelet type value of " << enum_class_as_int(wvlt_type) << ".\n\n";
          exit(1);
    }
 
@@ -457,7 +458,7 @@ void WaveletStatConfInfo::set_perc_thresh(const DataPlane &f_dp,
 ////////////////////////////////////////////////////////////////////////
 
 void WaveletStatConfInfo::parse_nc_info() {
-   const DictionaryEntry * e = (const DictionaryEntry *) 0;
+   const DictionaryEntry * e = (const DictionaryEntry *) nullptr;
 
    e = conf.lookup(conf_key_nc_pairs_flag);
 
@@ -510,7 +511,7 @@ void WaveletStatConfInfo::process_tiles(const Grid &grid) {
       // Tile the input data using tiles of dimension n by n where n
       // is the largest integer power of 2 less than the smallest
       // dimension of the input data and allowing no overlap.
-      case(GridDecompType_Auto):
+      case(GridDecompType::Auto):
 
          center_tiles(grid.nx(), grid.ny());
 
@@ -527,7 +528,7 @@ void WaveletStatConfInfo::process_tiles(const Grid &grid) {
          break;
 
       // Apply the tiles specified in the configuration file
-      case(GridDecompType_Tile):
+      case(GridDecompType::Tile):
 
          // Number of tiles based on the user-specified locations
          n_tile = tile_xll.n();
@@ -546,7 +547,7 @@ void WaveletStatConfInfo::process_tiles(const Grid &grid) {
 
       // Setup tiles for padding the input fields out to the nearest
       // integer power of two
-      case(GridDecompType_Pad):
+      case(GridDecompType::Pad):
 
          pad_tiles(grid.nx(), grid.ny());
 
@@ -561,11 +562,11 @@ void WaveletStatConfInfo::process_tiles(const Grid &grid) {
 
          break;
 
-      case(GridDecompType_None):
+      case(GridDecompType::None):
       default:
          mlog << Error << "\nWaveletStatConfInfo::process_tiles() -> "
               << "Unsupported grid decomposition type of "
-              << grid_decomp_flag << ".\n\n";
+              << enum_class_as_int(grid_decomp_flag) << ".\n\n";
          exit(1);
    } // end switch
 
@@ -670,14 +671,14 @@ int WaveletStatConfInfo::n_isc_row() {
       if(n_tile > 1) n += (n_scale + 2) * fcat_ta[i].n();
    }
 
-   return(n);
+   return n;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 int WaveletStatConfInfo::n_stat_row() {
 
-   return(n_isc_row());
+   return n_isc_row();
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -693,7 +694,7 @@ int get_pow2(double n) {
    if(fabs(nint(a) - a) > 10E-5) p = -1;
    else                          p = nint(a);
 
-   return(p);
+   return p;
 }
 
 ////////////////////////////////////////////////////////////////////////

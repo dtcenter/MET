@@ -25,8 +25,6 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 
 #include <iostream>
 #include <unistd.h>
@@ -34,9 +32,11 @@ using namespace std;
 #include <string.h>
 #include <cmath>
 
-
 #include "config_to_att.h"
 #include "is_bad_data.h"
+
+using namespace std;
+
 
 ////////////////////////////////////////////////////////////////////////
 

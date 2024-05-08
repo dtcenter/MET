@@ -69,7 +69,7 @@ class TcrmwGrid : public RotatedLatLonGrid {
       int azimuth_n () const;
 
       double range_max_km      () const;
-      double range_delta_km    () const;   //  Range_Max_km/Range_n
+      double range_delta_km    () const;   //  Range_max_km/(Range_n - 1)
 
       double azimuth_delta_deg () const;   //  360.0/Azimuth_n
 
@@ -117,7 +117,7 @@ inline int TcrmwGrid::azimuth_n () const { return ( Azimuth_n ); }
 
 inline double TcrmwGrid::range_max_km () const { return ( Range_max_km ); }
 
-inline double TcrmwGrid::range_delta_km () const { return ( Range_max_km/Range_n ); }
+inline double TcrmwGrid::range_delta_km () const { return ( Range_max_km/(Range_n - 1) ); }
 
 inline double TcrmwGrid::azimuth_delta_deg () const { return ( 360.0/Azimuth_n ); }
 

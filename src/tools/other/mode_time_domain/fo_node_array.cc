@@ -11,9 +11,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -23,6 +20,8 @@ using namespace std;
 #include "vx_util.h"
 
 #include "fo_node_array.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -78,11 +77,11 @@ FO_Node_Array & FO_Node_Array::operator=(const FO_Node_Array & a)
 
 {
 
-if ( this == &a )  return ( * this );
+if ( this == &a )  return *this;
 
 assign(a);
 
-return ( * this );
+return *this;
 
 }
 
@@ -94,7 +93,7 @@ void FO_Node_Array::init_from_scratch()
 
 {
 
-e = (FO_Node *) 0;
+e = (FO_Node *) nullptr;
 
 AllocInc = 30;   //  default value
 
@@ -112,7 +111,7 @@ void FO_Node_Array::clear()
 
 {
 
-if ( e )  { delete [] e;  e = (FO_Node *) 0; }
+if ( e )  { delete [] e;  e = (FO_Node *) nullptr; }
 
 
 
@@ -174,11 +173,11 @@ for(j=0; j<Nelements; ++j)  {
 
 }
 
-if ( e )  { delete [] e;  e = (FO_Node *) 0; }
+if ( e )  { delete [] e;  e = (FO_Node *) nullptr; }
 
 e = u;
 
-u = (FO_Node *) 0;
+u = (FO_Node *) nullptr;
 
 Nalloc = N;
 
@@ -292,7 +291,7 @@ if ( (N < 0) || (N >= Nelements) )  {
    exit ( 1 );
 }
 
-return ( e[N] );
+return e[N];
 
 }
 

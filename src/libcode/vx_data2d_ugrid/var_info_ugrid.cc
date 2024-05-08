@@ -67,11 +67,11 @@ VarInfoUGrid::VarInfoUGrid(const VarInfoUGrid &f) {
 
 VarInfoUGrid & VarInfoUGrid::operator=(const VarInfoUGrid &f) {
 
-   if ( this == &f )  return ( *this );
+   if ( this == &f )  return *this;
 
    assign(f);
 
-   return ( *this );
+   return *this;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -231,61 +231,6 @@ void VarInfoUGrid::set_magic(const ConcatString &nstr, const ConcatString &lstr)
                   Level.set_is_offset(as_offset);
                }
             }
-            // Check for a range of times
-            else if ((ptr3 = strchr(ptr2, ':')) != nullptr) {
-               // Check if a range has already been supplied
-               if (Dimension.has(range_flag)) {
-                  mlog << Error << "\n" << method_name
-                       << "only one dimension can have a range for NetCDF variable \""
-                       << MagicStr << "\".\n\n";
-                  exit(1);
-               }
-               else {
-                  int increment = 1;
-                  // Store the dimension of the range and limits
-                  *ptr3++ = 0;
-                  char *ptr_inc = strchr(ptr3, ':');
-                  if (ptr_inc != nullptr) *ptr_inc++ = 0;
-                  mlog << Debug(7) << method_name
-                       << " start: " << ptr2 << ", end: " << ptr3 << "\n";
-
-                  bool datestring_start = is_datestring(ptr2);
-                  bool datestring_end   = is_datestring(ptr3);
-                  if (datestring_start != datestring_end) {
-                     mlog << Error << "\n" << method_name
-                          << "the time value and an index/offset can not be mixed for NetCDF variable \""
-                          << MagicStr << "\".\n\n";
-                     exit(1);
-                  }
-                  if (datestring_start && datestring_end) as_offset = false;
-
-                  unixtime time_lower = datestring_start
-                                        ? timestring_to_unix(ptr2)
-                                        : (as_offset ? atoi(ptr2) : atof(ptr2));
-                  unixtime time_upper = datestring_end
-                                        ? timestring_to_unix(ptr3)
-                                        : (as_offset ? atoi(ptr3) : atof(ptr3));
-                  if (ptr_inc != nullptr) {
-                     if (as_offset) increment = atoi(ptr_inc);
-                     else {
-                        increment = is_float(ptr_inc)
-                                    ? atof(ptr_inc) : timestring_to_sec(ptr_inc);
-                        mlog << Debug(7) << method_name
-                             << " increment: \"" << ptr_inc << "\" to "
-                             << increment << " seconds.\n";
-                     }
-                  }
-
-                  add_dimension(range_flag, as_offset);
-                  Level.set_lower(time_lower);
-                  Level.set_upper(time_upper);
-                  Level.set_increment(increment);
-
-                  // Assume time level type for a range of levels
-                  Level.set_type(LevelType_Time);
-                  Level.set_is_offset(as_offset);
-               }
-            }
             else {
                // Single level
                int level = 0;
@@ -386,9 +331,9 @@ bool VarInfoUGrid::is_precipitation() const {
    // Check to see if the VarInfo name begins with the GRIB code abbreviation
    // for any precipitation variables.
    //
-   return(has_prefix(grib_precipitation_abbr,
+   return has_prefix(grib_precipitation_abbr,
                      n_grib_precipitation_abbr,
-                     Name.c_str()));
+                     Name.c_str());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -406,9 +351,9 @@ bool VarInfoUGrid::is_specific_humidity() const {
    // Check to see if the VarInfo name begins with the GRIB code abbreviation
    // for any specific humidity variables.
    //
-   return(has_prefix(grib_specific_humidity_abbr,
+   return has_prefix(grib_specific_humidity_abbr,
                      n_grib_specific_humidity_abbr,
-                     Name.c_str()));
+                     Name.c_str());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -422,7 +367,7 @@ bool VarInfoUGrid::is_u_wind() const {
       return(SetAttrIsUWind != 0);
    }
 
-   return(is_grib_code_abbr_match(Name, ugrd_grib_code));
+   return is_grib_code_abbr_match(Name, ugrd_grib_code);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -436,7 +381,7 @@ bool VarInfoUGrid::is_v_wind() const {
       return(SetAttrIsVWind != 0);
    }
 
-   return(is_grib_code_abbr_match(Name, vgrd_grib_code));
+   return is_grib_code_abbr_match(Name, vgrd_grib_code);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -450,7 +395,7 @@ bool VarInfoUGrid::is_wind_speed() const {
       return(SetAttrIsWindSpeed != 0);
    }
 
-   return(is_grib_code_abbr_match(Name, wind_grib_code));
+   return is_grib_code_abbr_match(Name, wind_grib_code);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -464,7 +409,7 @@ bool VarInfoUGrid::is_wind_direction() const {
       return(SetAttrIsWindDirection != 0);
    }
 
-   return(is_grib_code_abbr_match(Name, wdir_grib_code));
+   return is_grib_code_abbr_match(Name, wdir_grib_code);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -477,7 +422,7 @@ bool is_grib_code_abbr_match(const ConcatString &str, int grib_code) {
    ConcatString abbr_str;
    bool match = false;
 
-   if(str.empty()) return(false);
+   if(str.empty()) return false;
 
    //
    // Use the default GRIB1 parameter table version number 2
@@ -490,7 +435,7 @@ bool is_grib_code_abbr_match(const ConcatString &str, int grib_code) {
    //
    if(strncasecmp(str.c_str(), abbr_str.c_str(), abbr_str.length()) == 0) match = true;
 
-   return(match);
+   return match;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

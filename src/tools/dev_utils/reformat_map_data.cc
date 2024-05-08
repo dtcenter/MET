@@ -9,7 +9,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
 
 #include <fstream>
 #include <unistd.h>
@@ -19,6 +18,8 @@ using namespace std;
 
 #include "main.h"
 #include "vx_util.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -56,7 +57,7 @@ if ( argc != 3 )  usage();
    //  done
    //
 
-return ( 0 );
+return 0;
 
 }
 

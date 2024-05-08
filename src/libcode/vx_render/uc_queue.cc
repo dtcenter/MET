@@ -11,8 +11,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <fstream>
 #include <unistd.h>
@@ -21,6 +19,8 @@ using namespace std;
 
 #include "vx_log.h"
 #include "uc_queue.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -74,11 +74,11 @@ UCQueue & UCQueue::operator=(const UCQueue &Q)
 
 {
 
-if ( this == &Q )  return ( *this );
+if ( this == &Q )  return *this;
 
 assign(Q);
 
-return ( *this );
+return *this;
 
 }
 
@@ -136,7 +136,7 @@ int UCQueue::n_elements() const
 
 {
 
-return ( NElements );
+return NElements;
 
 }
 
@@ -148,9 +148,9 @@ int UCQueue::last_char() const
 
 {
 
-if ( NElements == 0 )  return ( -1 );
+if ( NElements == 0 )  return -1;
 
-return ( (int) (data[0]) );
+return (int) (data[0]);
 
 }
 
@@ -162,7 +162,7 @@ int UCQueue::run_count() const
 
 {
 
-return ( calc_run_count() );
+return calc_run_count();
 
 }
 
@@ -220,7 +220,7 @@ u = data[NElements - 1];
 
 --NElements;
 
-return ( u );
+return u;
 
 }
 
@@ -234,7 +234,7 @@ int UCQueue::calc_run_count() const
 
 int j, count;
 
-if ( NElements <= 1 )  return ( NElements );
+if ( NElements <= 1 )  return NElements;
 
 count = 1;
 
@@ -247,7 +247,7 @@ for (j=1; j<NElements; ++j)  {
 }
 
 
-return ( count );
+return count;
 
 }
 

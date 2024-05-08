@@ -11,8 +11,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -31,12 +29,15 @@ using namespace std;
 #include "parse_file_list.h"
 #include "data2d_factory_utils.h"
 
+using namespace std;
+
 
 ////////////////////////////////////////////////////////////////////////
 
 
 static const char python_str    [] = "python";
 static const char file_list_str [] = "file_list";
+static const char missing_str   [] = "MISSING";
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -78,7 +79,7 @@ if ( in_list.n() == 1 )  {
 if ( out_list.n() == 0 )  out_list = in_list;
 
 
-return(out_list);
+return out_list;
 
 }
 
@@ -101,7 +102,7 @@ bool check_files_exist = true;
    //  If the input is not a regular file, return an empty list
    //
 
-if ( !is_regular_file(path) )  return(a);
+if ( !is_regular_file(path) )  return a;
 
    //
    //  If the input is a known gridded data file, return an empty list
@@ -114,7 +115,7 @@ if ( (file_type = grd_file_type(path)) != FileType_None )  {
         << grdfiletype_to_string(file_type)
         << " is not an ASCII file list.\n";
 
-   return(a);
+   return a;
 }
 
    //
@@ -196,7 +197,71 @@ if ( check_files_exist )  {
 
 f_in.close();
 
-return(a);
+return a;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+GrdFileType parse_file_list_type(const StringArray& file_list)
+
+{
+
+GrdFileType ftype = FileType_None;
+
+for ( int i=0; i<file_list.n(); i++ )  {
+
+   //
+   //  skip missing files
+   //
+
+   if( !file_exists(file_list[i].c_str()) ) continue;
+
+   //
+   //  get the current file type
+   //
+
+   ftype = grd_file_type(file_list[i].c_str());
+
+   if ( ftype != FileType_None ) break;
+
+}
+
+return ftype;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void log_missing_file(const char *method_name,
+                      const char *desc_str,
+                      const string &file_name)
+
+{
+
+ConcatString cs;
+ConcatString missing_cs(missing_str);
+
+cs << method_name << "cannot open "
+   << desc_str << ": " << file_name;
+
+   //
+   //  Write a warning message for missing files or
+   //  a debug message for the MISSING keyword
+   //
+
+if ( file_name.find(missing_cs, 0) == 0 )  {
+   mlog << Debug(3) << cs << "\n";
+}
+else {
+   mlog << Warning << "\n" << cs << "\n\n";
+}
+
+return;
 
 }
 

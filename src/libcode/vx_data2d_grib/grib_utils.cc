@@ -10,8 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -21,6 +19,8 @@ using namespace std;
 #include "grib_utils.h"
 #include "angles.h"
 #include "is_bad_data.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -696,11 +696,11 @@ int i;
 
 for (i=0; i<n; i++) {
 
-   if ( p[i] != 0xff )  return ( false );
+   if ( p[i] != 0xff )  return false;
 
 }
 
-return ( true );
+return true;
 
 }
 

@@ -9,14 +9,14 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <cstdlib>
 #include <cmath>
 
 #include "gsl_bvn.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -72,7 +72,7 @@ ellipse.b = radius*sqrt(fabs(d22));
    //  done
    //
 
-return ( ellipse );
+return ellipse;
 
 }
 
@@ -95,7 +95,7 @@ r2 = z_1*z_1 + z_2*z_2;
 
 q = 1.0 - exp(-0.5*r2);
 
-return ( q );
+return q;
 
 }
 
@@ -194,7 +194,7 @@ rho2 = Suv;
 
 angle_degrees = cf*0.5*atan2(rho2, rho1);
 
-return ( angle_degrees );
+return angle_degrees;
 
 }
 

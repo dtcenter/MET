@@ -277,6 +277,7 @@ The usage statement for the Point-Stat tool is shown below:
          fcst_file
          obs_file
          config_file
+         [-ugrid_config config_file]
          [-point_obs file]
          [-obs_valid_beg time]
          [-obs_valid_end time]
@@ -298,17 +299,19 @@ Required Arguments for point_stat
 Optional Arguments for point_stat
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-4. The **-point_obs** file may be used to pass additional NetCDF point observation files to be used in the verification. Python embedding for point observations is also supported, as described in :numref:`pyembed-point-obs-data`.
+5. The **-ugrid_config** option provides a way for a user to provide a separate config file with metadata about their UGRID.
 
-5. The **-obs_valid_beg** time option in YYYYMMDD[_HH[MMSS]] format sets the beginning of the observation matching time window, overriding the configuration file setting.
+5. The **-point_obs** file may be used to pass additional NetCDF point observation files to be used in the verification. Python embedding for point observations is also supported, as described in :numref:`pyembed-point-obs-data`.
 
-6. The **-obs_valid_end** time option in YYYYMMDD[_HH[MMSS]] format sets the end of the observation matching time window, overriding the configuration file setting.
+6. The **-obs_valid_beg** time option in YYYYMMDD[_HH[MMSS]] format sets the beginning of the observation matching time window, overriding the configuration file setting.
 
-7. The **-outdir path** indicates the directory where output files should be written. 
+7. The **-obs_valid_end** time option in YYYYMMDD[_HH[MMSS]] format sets the end of the observation matching time window, overriding the configuration file setting.
 
-8. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file. 
+8. The **-outdir path** indicates the directory where output files should be written. 
 
-9. The **-v level** option indicates the desired level of verbosity. The value of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity will increase the amount of logging.
+9. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file. 
+
+10. The **-v level** option indicates the desired level of verbosity. The value of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity will increase the amount of logging.
 
 An example of the point_stat calling sequence is shown below:
 

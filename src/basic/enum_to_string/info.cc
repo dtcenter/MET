@@ -10,8 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -21,6 +19,8 @@ using namespace std;
 
 #include "info.h"
 #include "str_wrappers.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -78,11 +78,11 @@ EnumInfo & EnumInfo::operator=(const EnumInfo & e)
 
 {
 
-if ( this == &e )  return ( * this );
+if ( this == &e )  return *this;
 
 assign(e);
 
-return ( * this );
+return *this;
 
 }
 
@@ -247,7 +247,7 @@ if ( (n < 0) || (n >= Nids) )  {
 
 }
 
-return ( s[n] );
+return s[n];
 
 }
 
@@ -259,7 +259,7 @@ int EnumInfo::max_id_length() const
 
 {
 
-if ( Nids == 0 )  return ( 0 );
+if ( Nids == 0 )  return 0;
 
 int j, k;
 int max_len;
@@ -275,7 +275,7 @@ for (j=0; j<Nids; ++j)  {
 }
 
 
-return ( max_len );
+return max_len;
 
 }
 
@@ -468,7 +468,7 @@ for (j=0; j<(e.Nids); ++j)  {
 
 s.flush();
 
-return ( s );
+return s;
 
 }
 

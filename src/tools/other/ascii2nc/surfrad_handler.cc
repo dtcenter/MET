@@ -10,9 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
-
 #include <iostream>
 
 #include "vx_log.h"
@@ -21,6 +18,10 @@ using namespace std;
 
 #include "surfrad_handler.h"
 
+using namespace std;
+
+
+////////////////////////////////////////////////////////////////////////
 
 const int SurfradHandler::NUM_HDR_COLS = 6;
 const int SurfradHandler::NUM_OBS_COLS = 48;

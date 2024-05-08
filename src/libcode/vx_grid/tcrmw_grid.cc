@@ -10,8 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -20,6 +18,8 @@ using namespace std;
 #include "tcrmw_grid.h"
 
 #include "trig.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -102,11 +102,11 @@ TcrmwGrid & TcrmwGrid::operator=(const TcrmwGrid & tg)
 
 {
 
-if ( this == &tg )   return ( * this );
+if ( this == &tg )   return *this;
 
 assign(tg);
 
-return ( * this );
+return *this;
 
 }
 
@@ -213,6 +213,8 @@ RLLD.rot_lat_ll = 90.0 - range_max_deg;
 RLLD.rot_lon_ll =  0.0;
 
 RLLD.delta_rot_lat = range_max_deg/(Range_n - 1);
+
+// MET #2833 divide by n rather than n-1 for the azimuth increment
 RLLD.delta_rot_lon = 360.0/Azimuth_n;
 
 RLLD.Nlat = Range_n;

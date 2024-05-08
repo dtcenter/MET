@@ -8,8 +8,6 @@
 
 ///////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <cstdio>
 #include <iostream>
 #include <unistd.h>
@@ -19,9 +17,12 @@ using namespace std;
 #include <set>
 #include <map>
 
+#include "enum_as_int.hpp"
 #include "engine.h"
 #include "mode_columns.h"
 #include "vx_util.h"
+
+using namespace std;
 
 ///////////////////////////////////////////////////////////////////////
 
@@ -29,7 +30,7 @@ static const int print_interest_log_level = 5;
 
 ///////////////////////////////////////////////////////////////////////
 
-static inline double area_ratio_conf(double t) { return(t); }
+static inline double area_ratio_conf(double t) { return t; }
 
 ///////////////////////////////////////////////////////////////////////
 //
@@ -53,27 +54,27 @@ ModeFuzzyEngine::~ModeFuzzyEngine() {
    //
    if(fcst_raw) {
       delete fcst_raw;
-      fcst_raw = (ShapeData *) 0;
+      fcst_raw = (ShapeData *) nullptr;
    }
    if(fcst_thresh) {
       delete fcst_thresh;
-      fcst_thresh = (ShapeData *) 0;
+      fcst_thresh = (ShapeData *) nullptr;
    }
    if(fcst_conv) {
       delete fcst_conv;
-      fcst_conv = (ShapeData *) 0;
+      fcst_conv = (ShapeData *) nullptr;
    }
    if(fcst_mask) {
       delete fcst_mask;
-      fcst_mask = (ShapeData *) 0;
+      fcst_mask = (ShapeData *) nullptr;
    }
    if(fcst_split) {
       delete fcst_split;
-      fcst_split = (ShapeData *) 0;
+      fcst_split = (ShapeData *) nullptr;
    }
    if(fcst_clus_split) {
       delete fcst_clus_split;
-      fcst_clus_split = (ShapeData *) 0;
+      fcst_clus_split = (ShapeData *) nullptr;
    }
 
    //
@@ -81,27 +82,27 @@ ModeFuzzyEngine::~ModeFuzzyEngine() {
    //
    if(obs_raw) {
       delete obs_raw;
-      obs_raw = (ShapeData *) 0;
+      obs_raw = (ShapeData *) nullptr;
    }
    if(obs_thresh) {
       delete obs_thresh;
-      obs_thresh = (ShapeData *) 0;
+      obs_thresh = (ShapeData *) nullptr;
    }
    if(obs_conv) {
       delete obs_conv;
-      obs_conv = (ShapeData *) 0;
+      obs_conv = (ShapeData *) nullptr;
    }
    if(obs_mask) {
       delete obs_mask;
-      obs_mask = (ShapeData *) 0;
+      obs_mask = (ShapeData *) nullptr;
    }
    if(obs_split) {
       delete obs_split;
-      obs_split = (ShapeData *) 0;
+      obs_split = (ShapeData *) nullptr;
    }
    if(obs_clus_split) {
       delete obs_clus_split;
-      obs_clus_split = (ShapeData *) 0;
+      obs_clus_split = (ShapeData *) nullptr;
    }
 
    //
@@ -109,11 +110,11 @@ ModeFuzzyEngine::~ModeFuzzyEngine() {
    //
    if(fcst_engine) {
       delete fcst_engine;
-      fcst_engine = (ModeFuzzyEngine *) 0;
+      fcst_engine = (ModeFuzzyEngine *) nullptr;
    }
    if(obs_engine) {
       delete obs_engine;
-      obs_engine = (ModeFuzzyEngine *) 0;
+      obs_engine = (ModeFuzzyEngine *) nullptr;
    }
 }
 
@@ -139,7 +140,7 @@ ModeFuzzyEngine & ModeFuzzyEngine::operator=(const ModeFuzzyEngine & eng) {
 
 void ModeFuzzyEngine::init_from_scratch() {
 
-   grid = (Grid *) 0;
+   grid = (Grid *) nullptr;
 
    //
    // Reset all fcst and obs processing flags to initial state
@@ -178,8 +179,8 @@ void ModeFuzzyEngine::init_from_scratch() {
    obs_split        = new ShapeData;
    obs_clus_split   = new ShapeData;
 
-   fcst_engine      = (ModeFuzzyEngine *) 0;
-   obs_engine       = (ModeFuzzyEngine *) 0;
+   fcst_engine      = (ModeFuzzyEngine *) nullptr;
+   obs_engine       = (ModeFuzzyEngine *) nullptr;
 
    n_fcst           = 0;
    n_obs            = 0;
@@ -191,7 +192,7 @@ void ModeFuzzyEngine::init_from_scratch() {
 
    clear_features();
 
-   data_type = ModeDataType_Traditional;
+   data_type = ModeDataType::Traditional;
  
    return;
 }
@@ -248,9 +249,9 @@ void ModeFuzzyEngine::clear_colors() {
 void ModeFuzzyEngine::set(const ShapeData &fcst_wd, const ShapeData &obs_wd)
 
 {
-   if (data_type == ModeDataType_MvMode_Fcst) {
+   if (data_type == ModeDataType::MvMode_Fcst) {
       set_fcst(fcst_wd);
-   } else if (data_type == ModeDataType_MvMode_Obs) {
+   } else if (data_type == ModeDataType::MvMode_Obs) {
       set_obs(obs_wd);
    } else {
       ConcatString path;
@@ -279,9 +280,9 @@ void ModeFuzzyEngine::set(const ShapeData &fcst_wd, const ShapeData &obs_wd)
 void ModeFuzzyEngine::set_no_conv(const ShapeData &fcst_wd, const ShapeData &obs_wd)
 
 {
-   if (data_type == ModeDataType_MvMode_Fcst) {
+   if (data_type == ModeDataType::MvMode_Fcst) {
       set_fcst_no_conv(fcst_wd);
-   } else if (data_type == ModeDataType_MvMode_Obs) {
+   } else if (data_type == ModeDataType::MvMode_Obs) {
       set_obs_no_conv  ( obs_wd);
    } else {      
       ConcatString path;
@@ -310,9 +311,9 @@ void ModeFuzzyEngine::set_only_split(const ShapeData &fcst_wd, const ShapeData &
 
 {
 
-   if (data_type == ModeDataType_MvMode_Fcst) {
+   if (data_type == ModeDataType::MvMode_Fcst) {
       set_fcst_only_split (fcst_wd);
-   } else if (data_type == ModeDataType_MvMode_Obs) {
+   } else if (data_type == ModeDataType::MvMode_Obs) {
       set_obs_only_split  ( obs_wd);
    } else {
       ConcatString path;
@@ -588,7 +589,7 @@ int ModeFuzzyEngine::two_to_one(int n_f, int n_o) const {
 
    n = n_o*n_fcst + n_f;
 
-   return(n);
+   return n;
 }
 
 
@@ -916,12 +917,12 @@ void ModeFuzzyEngine::do_fcst_merging(const char *default_config,
 
    if(!need_fcst_merge) return;
 
-   if(conf_info.Fcst->merge_flag == MergeType_Both ||
-      conf_info.Fcst->merge_flag == MergeType_Thresh)
+   if(conf_info.Fcst->merge_flag == MergeType::Both ||
+      conf_info.Fcst->merge_flag == MergeType::Thresh)
       do_fcst_merge_thresh();
 
-   if(conf_info.Fcst->merge_flag == MergeType_Both ||
-      conf_info.Fcst->merge_flag == MergeType_Engine)
+   if(conf_info.Fcst->merge_flag == MergeType::Both ||
+      conf_info.Fcst->merge_flag == MergeType::Engine)
       do_fcst_merge_engine(default_config, merge_config);
 
    //
@@ -944,12 +945,12 @@ void ModeFuzzyEngine::do_obs_merging(const char *default_config,
 
    if(!need_obs_merge) return;
 
-   if(conf_info.Obs->merge_flag == MergeType_Both ||
-      conf_info.Obs->merge_flag == MergeType_Thresh)
+   if(conf_info.Obs->merge_flag == MergeType::Both ||
+      conf_info.Obs->merge_flag == MergeType::Thresh)
       do_obs_merge_thresh();
 
-   if(conf_info.Obs->merge_flag == MergeType_Both ||
-      conf_info.Obs->merge_flag == MergeType_Engine)
+   if(conf_info.Obs->merge_flag == MergeType::Both ||
+      conf_info.Obs->merge_flag == MergeType::Engine)
       do_obs_merge_engine(default_config, merge_config);
 
    //
@@ -978,12 +979,12 @@ void ModeFuzzyEngine::do_fcst_merging(const ShapeData &merge_data)
       exit(1);
    }
    
-   if(conf_info.Fcst->merge_flag == MergeType_Both ||
-      conf_info.Fcst->merge_flag == MergeType_Thresh)
+   if(conf_info.Fcst->merge_flag == MergeType::Both ||
+      conf_info.Fcst->merge_flag == MergeType::Thresh)
       do_fcst_merge_thresh(merge_data);
 
-   if(conf_info.Fcst->merge_flag == MergeType_Both ||
-      conf_info.Fcst->merge_flag == MergeType_Engine)
+   if(conf_info.Fcst->merge_flag == MergeType::Both ||
+      conf_info.Fcst->merge_flag == MergeType::Engine)
       do_fcst_merge_engine("", "");
 
    //
@@ -1012,12 +1013,12 @@ void ModeFuzzyEngine::do_obs_merging(const ShapeData &merge_data)
       exit(1);
    }
 
-   if(conf_info.Obs->merge_flag == MergeType_Both ||
-      conf_info.Obs->merge_flag == MergeType_Thresh)
+   if(conf_info.Obs->merge_flag == MergeType::Both ||
+      conf_info.Obs->merge_flag == MergeType::Thresh)
       do_obs_merge_thresh(merge_data);
 
-   if(conf_info.Obs->merge_flag == MergeType_Both ||
-      conf_info.Obs->merge_flag == MergeType_Engine)
+   if(conf_info.Obs->merge_flag == MergeType::Both ||
+      conf_info.Obs->merge_flag == MergeType::Engine)
       do_obs_merge_engine("", "");
 
    //
@@ -1037,23 +1038,23 @@ void ModeFuzzyEngine::do_matching() {
 
    if(!need_match) return;
 
-   if(conf_info.match_flag == MatchType_None) {
+   if(conf_info.match_flag == MatchType::None) {
       mlog << Warning << "\nModeFuzzyEngine::do_matching() -> "
            << "no matching requested in configuration file\n\n";
       do_no_match();
    }
-   else if(conf_info.match_flag == MatchType_MergeBoth) {
+   else if(conf_info.match_flag == MatchType::MergeBoth) {
       do_match_merge();
    }
-   else if(conf_info.match_flag == MatchType_MergeFcst) {
+   else if(conf_info.match_flag == MatchType::MergeFcst) {
       do_match_fcst_merge();
    }
-   else if(conf_info.match_flag == MatchType_NoMerge) {
+   else if(conf_info.match_flag == MatchType::NoMerge) {
       do_match_only();
    }
    else {
       mlog << Error << "\nModeFuzzyEngine::do_matching() -> "
-           << "invalid match_flag value of " << conf_info.match_flag
+           << "invalid match_flag value of " << enum_class_as_int(conf_info.match_flag)
            << " specified.\n\n";
       exit(1);
    }
@@ -2508,11 +2509,11 @@ int ModeFuzzyEngine::get_info_index(int pair_n) const {
 
    for(i=0; i<(info_singles.n()); i++) {
 
-      if(info_singles[i].pair_number == pair_n) return(i);
+      if(info_singles[i].pair_number == pair_n) return i;
 
    }
 
-   return(-1);
+   return -1;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -2530,7 +2531,7 @@ int ModeFuzzyEngine::get_matched_fcst(int area) const {
       }
    }
 
-   return(count);
+   return count;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -2548,7 +2549,7 @@ int ModeFuzzyEngine::get_unmatched_fcst(int area) const {
       }
    }
 
-   return(count);
+   return count;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -2566,7 +2567,7 @@ int ModeFuzzyEngine::get_matched_obs(int area) const {
       }
    }
 
-   return(count);
+   return count;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -2584,7 +2585,7 @@ int ModeFuzzyEngine::get_unmatched_obs(int area) const {
       }
    }
 
-   return(count);
+   return count;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -2631,7 +2632,7 @@ double total_interest(ModeConfInfo &mc, const PairFeature &p,
               << ") > Max Centroid Distance ("
               << mc.max_centroid_dist << ")\n";
       }
-      return(total);
+      return total;
    }
 
    sum = 0.0;
@@ -2917,7 +2918,7 @@ double total_interest(ModeConfInfo &mc, const PairFeature &p,
            << "               = " << total << "\n\n";
    }
 
-   return(total);
+   return total;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -2925,12 +2926,12 @@ double total_interest(ModeConfInfo &mc, const PairFeature &p,
 double interest_percentile(ModeFuzzyEngine &eng, const double p, const int flag) {
    int i, fcst_i, obs_i, n_values;
    double interest, ptile;
-   double *v = (double *) 0;
+   double *v = (double *) nullptr;
    NumArray fcst_na, obs_na;
 
-   if(eng.conf_info.match_flag == 0 ||
-      eng.n_fcst                    == 0 ||
-      eng.n_obs                     == 0) return(0.0);
+   if(eng.conf_info.match_flag == MatchType::None ||
+      eng.n_fcst               == 0 ||
+      eng.n_obs                == 0) return 0.0;
 
    //
    // Initialize the maximum interest value for each object to zero.
@@ -2993,9 +2994,9 @@ double interest_percentile(ModeFuzzyEngine &eng, const double p, const int flag)
    // Done
    //
 
-   if(v) { delete [] v; v = (double *) 0; }
+   if(v) { delete [] v; v = (double *) nullptr; }
 
-   return(ptile);
+   return ptile;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -3079,7 +3080,7 @@ for (x=0; x<(grid.nx()); ++x)  {
    //
    // If no matching was requested, don't write any more
    //
-   if(eng.conf_info.match_flag == 0) return;
+   if(eng.conf_info.match_flag == MatchType::None) return;
 
    //
    // Object pairs, increment the counter within the subroutine
@@ -4144,7 +4145,7 @@ double aspect_ratio_conf(double t)
 const double tm1   = t - 1.0;
 const double ratio = (tm1*tm1)/(t*t + 1.0);
 
-return( pow(ratio, 0.3) );
+return pow(ratio, 0.3);
 
 }
 

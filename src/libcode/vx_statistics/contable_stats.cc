@@ -6,8 +6,6 @@
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -23,6 +21,8 @@ using namespace std;
 #include "vx_gsl_prob.h"
 #include "vx_log.h"
 
+using namespace std;
+
 ////////////////////////////////////////////////////////////////////////
 //
 // Code for stats for 2x2 contingency tables
@@ -31,7 +31,7 @@ using namespace std;
 
 double TTContingencyTable::baser() const {
 
-   return(oy_tp());
+   return oy_tp();
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -44,14 +44,14 @@ double TTContingencyTable::baser_ci(double alpha,
 
    compute_proportion_ci(v, n(), alpha, 1.0, cl, cu);
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 double TTContingencyTable::fmean() const {
 
-   return(fy_tp());
+   return fy_tp();
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -64,7 +64,7 @@ double TTContingencyTable::fmean_ci(double alpha,
 
    compute_proportion_ci(v, n(), alpha, 1.0, cl, cu);
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -78,7 +78,7 @@ double TTContingencyTable::accuracy() const {
    if(is_eq(den, 0.0)) v = bad_data_double;
    else                v = num/den;
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -91,7 +91,7 @@ double TTContingencyTable::accuracy_ci(double alpha,
 
    compute_proportion_ci(v, n(), alpha, 1.0, cl, cu);
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -109,7 +109,7 @@ double TTContingencyTable::fbias() const {
    if(is_eq(den, 0.0)) v = bad_data_double;
    else                v = num/den;
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -127,7 +127,7 @@ double TTContingencyTable::pod_yes() const {
    if(is_eq(den, 0.0)) v = bad_data_double;
    else                v = num/den;
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -140,7 +140,7 @@ double TTContingencyTable::pod_yes_ci(double alpha,
 
    compute_proportion_ci(v, n(), alpha, 1.0, cl, cu);
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -154,7 +154,7 @@ double TTContingencyTable::pod_no() const {
    if(is_eq(den, 0.0)) v = bad_data_double;
    else                v = num/den;
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -167,7 +167,7 @@ double TTContingencyTable::pod_no_ci(double alpha,
 
    compute_proportion_ci(v, n(), alpha, 1.0, cl, cu);
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -180,7 +180,7 @@ double TTContingencyTable::pofd() const {
    if(is_bad_data(d)) v = bad_data_double;
    else               v = 1.0 - d;
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -193,7 +193,7 @@ double TTContingencyTable::pofd_ci(double alpha,
 
    compute_proportion_ci(v, n(), alpha, 1.0, cl, cu);
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -211,7 +211,7 @@ double TTContingencyTable::far() const {
    if(is_eq(den, 0.0)) v = bad_data_double;
    else                v = num/den;
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -224,7 +224,7 @@ double TTContingencyTable::far_ci(double alpha,
 
    compute_proportion_ci(v, n(), alpha, 1.0, cl, cu);
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -242,7 +242,7 @@ double TTContingencyTable::csi() const {
    if(is_eq(den, 0.0)) v = bad_data_double;
    else                v = num/den;
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -255,7 +255,7 @@ double TTContingencyTable::csi_ci(double alpha,
 
    compute_proportion_ci(v, n(), alpha, 1.0, cl, cu);
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -272,7 +272,7 @@ double TTContingencyTable::gss() const {
    b = (long long) fy_on();
    c = (long long) fn_oy();
 
-   if(n() == 0) return(bad_data_double);
+   if(n() == 0) return bad_data_double;
 
    q   = (double) (a + b)*(a + c)/(n());
    num = (double) (a - q);
@@ -281,7 +281,7 @@ double TTContingencyTable::gss() const {
    if(is_eq(den, 0.0)) v = bad_data_double;
    else                v = num/den;
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -296,14 +296,14 @@ double TTContingencyTable::bagss() const {
    double lf, lw, ha, num, den, v;
 
    if(n() == 0 || oy() == 0 || fn_oy() == 0 || fy_on() == 0) {
-      return(bad_data_double);
+      return bad_data_double;
    }
 
    lf = log((double) oy() / fn_oy());
    lw = sf_lambert_W0((double) oy() / fy_on() * lf);
 
    if(is_bad_data(lw) || is_bad_data(lf) || is_eq(lf, 0.0)) {
-      return(bad_data_double);
+      return bad_data_double;
    }
    else {
       ha = (double) oy() - (fy_on() / lf) * lw;
@@ -315,7 +315,7 @@ double TTContingencyTable::bagss() const {
    if(is_eq(den, 0.0)) v = bad_data_double;
    else                v = num/den;
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -340,7 +340,7 @@ double TTContingencyTable::hk() const {
    if(is_eq(den, 0.0)) v = bad_data_double;
    else                v = (double) num/den;
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -354,7 +354,7 @@ double TTContingencyTable::hk_ci(double alpha,
    compute_hk_ci(v, alpha, 1.0, fy_oy(), fy_on(), fn_oy(), fn_on(),
                  cl, cu);
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -379,7 +379,7 @@ double TTContingencyTable::hss() const {
    if(is_eq(den, 0.0)) v = bad_data_double;
    else                v = (double) num/den;
 
-   return(v);
+   return v;
 }
 
 
@@ -396,7 +396,7 @@ double TTContingencyTable::odds() const {
    pn = pofd();
 
    if(is_eq(py, 1.0) || is_bad_data(py) ||
-      is_eq(pn, 1.0) || is_bad_data(pn)) return(bad_data_double);
+      is_eq(pn, 1.0) || is_bad_data(pn)) return bad_data_double;
 
    num = py/(1 - py);
    den = pn/(1 - pn);
@@ -404,7 +404,7 @@ double TTContingencyTable::odds() const {
    if(is_eq(den, 0.0)) v = bad_data_double;
    else                v = num/den;
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -418,7 +418,7 @@ double TTContingencyTable::odds_ci(double alpha,
    compute_woolf_ci(v, alpha, fy_oy(), fy_on(), fn_oy(), fn_on(),
                     cl, cu);
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -434,7 +434,7 @@ double TTContingencyTable::lodds() const {
           log((double) fy_on()) - log((double) fn_oy());
    }
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -450,7 +450,7 @@ double TTContingencyTable::slor2() const {
       v  = 1.0/df;
    }
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -464,7 +464,7 @@ double TTContingencyTable::lodds_ci(double alpha,
 
    if(is_bad_data(v) || is_bad_data(s)) {
       cl = cu = bad_data_double;
-      return(v);
+      return v;
    }
 
    //
@@ -474,7 +474,7 @@ double TTContingencyTable::lodds_ci(double alpha,
 
    compute_normal_ci(v, alpha, se, cl, cu);
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -488,7 +488,7 @@ double TTContingencyTable::orss() const {
    if(den == 0) v = bad_data_double;
    else         v = (double) num / den;
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -503,7 +503,7 @@ double TTContingencyTable::orss_ci(double alpha,
 
    if(is_bad_data(v) || is_bad_data(r) || is_bad_data(s)) {
       cl = cu = bad_data_double;
-      return(v);
+      return v;
    }
 
    //
@@ -513,7 +513,7 @@ double TTContingencyTable::orss_ci(double alpha,
 
    compute_normal_ci(v, alpha, se, cl, cu);
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -539,7 +539,7 @@ double TTContingencyTable::eds() const {
       else                v = 2.0 * num / den - 1.0;
    }
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -555,7 +555,7 @@ double TTContingencyTable::eds_ci(double alpha,
    if(is_bad_data(v) || is_bad_data(b) || is_bad_data(h) ||
       is_eq(b, 0.0)  || is_eq(h, 0.0)) {
       cl = cu = bad_data_double;
-      return(v);
+      return v;
    }
 
    //
@@ -567,7 +567,7 @@ double TTContingencyTable::eds_ci(double alpha,
 
    compute_normal_ci(v, alpha, se, cl, cu);
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -588,7 +588,7 @@ double TTContingencyTable::seds() const {
       else                v = num / den - 1.0;
    }
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -604,7 +604,7 @@ double TTContingencyTable::seds_ci(double alpha,
    if(is_bad_data(v) || is_bad_data(b) || is_bad_data(h) ||
       is_eq(b, 0.0)  || is_eq(h, 0.0)) {
       cl = cu = bad_data_double;
-      return(v);
+      return v;
    }
 
    //
@@ -616,7 +616,7 @@ double TTContingencyTable::seds_ci(double alpha,
 
    compute_normal_ci(v, alpha, se, cl, cu);
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -637,7 +637,7 @@ double TTContingencyTable::edi() const {
       else                v = num/den;
    }
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -654,7 +654,7 @@ double TTContingencyTable::edi_ci(double alpha,
    if(is_bad_data(f) || is_bad_data(h) || is_bad_data(b) ||
       is_eq(f, 0.0)  || is_eq(h, 0.0)  || is_eq(h, 1.0)) {
       cl = cu = bad_data_double;
-      return(v);
+      return v;
    }
 
    //
@@ -666,7 +666,7 @@ double TTContingencyTable::edi_ci(double alpha,
 
    compute_normal_ci(v, alpha, se, cl, cu);
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -689,7 +689,7 @@ double TTContingencyTable::sedi() const {
       else                v = num/den;
    }
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -707,7 +707,7 @@ double TTContingencyTable::sedi_ci(double alpha,
       is_eq(f, 0.0)  || is_eq(h, 0.0)  ||
       is_eq(f, 1.0)  || is_eq(h, 1.0)) {
       cl = cu = bad_data_double;
-      return(v);
+      return v;
    }
 
    //
@@ -724,7 +724,7 @@ double TTContingencyTable::sedi_ci(double alpha,
 
    compute_normal_ci(v, alpha, se, cl, cu);
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -755,7 +755,7 @@ double TTContingencyTable::cost_loss(double r) const {
    if(is_eq(den, 0.0)) v = bad_data_double;
    else                v = num/den;
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -789,7 +789,7 @@ double ContingencyTable::gaccuracy() const {
    if(is_eq(den, 0.0)) v = bad_data_double;
    else                v = num/den;
 
-   return(v);
+   return v;
 }
 
 
@@ -815,7 +815,7 @@ const int N = total();
    //  MET #2542: return bad data for empty tables rather than erroring out
    //
 
-if ( N == 0 ) return ( bad_data_double );
+if ( N == 0 ) return bad_data_double;
 
 const double DN = (double) N;
 int j, k, m, n;
@@ -870,7 +870,7 @@ else                   ans = num/denom;
    //  done
    //
 
-return ( ans );
+return ans;
 
 }
 
@@ -913,7 +913,7 @@ const int N = total();
    //  MET #2542: return bad data for empty tables rather than erroring out
    //
 
-if ( N == 0 ) return ( bad_data_double );
+if ( N == 0 ) return bad_data_double;
 
 int j, sum;
 double num, denom, ans;
@@ -948,7 +948,7 @@ else                   ans = num/denom;
    //  done
    //
 
-return ( ans );
+return ans;
 
 }
 
@@ -975,7 +975,7 @@ const int N = total();
    //  MET #2542: return bad data for empty tables rather than erroring out
    //
 
-if ( N == 0 ) return ( bad_data_double );
+if ( N == 0 ) return bad_data_double;
 
 const double DN = (double) N;
 int j, k, m, n;
@@ -1044,7 +1044,7 @@ else                   ans = num/denom;
    //  done
    //
 
-return ( ans );
+return ans;
 
 }
 
@@ -1072,19 +1072,19 @@ const int N = total();
    //  MET #2542: return bad data for empty tables rather than erroring out
    //
 
-if ( N == 0 ) return ( bad_data_double );
+if ( N == 0 ) return bad_data_double;
 
 int j, k, m, n;
 const double DN = (double) N;
 double t, sum;
-double * p = (double *) 0;
-double * s  = (double *) 0;
+double * p = (double *) nullptr;
+double * s  = (double *) nullptr;
 
    //
    //  can't compute gerrity when the first column contains all zeros
    //
 
-if ( col_total(0) == 0 ) return ( bad_data_double );
+if ( col_total(0) == 0 ) return bad_data_double;
 
 p = new double [Nrows];
 
@@ -1140,10 +1140,10 @@ for (j=0; j<Nrows; ++j)  {
    //  done
    //
 
-if ( p  )  { delete [] p;   p  = (double *) 0; }
-if ( s  )  { delete [] s;   s  = (double *) 0; }
+if ( p  )  { delete [] p;   p  = (double *) nullptr; }
+if ( s  )  { delete [] s;   s  = (double *) nullptr; }
 
-return ( sum );
+return sum;
 
 }
 
@@ -1165,9 +1165,9 @@ void calc_gerrity_scoring_matrix(int N, const double * p, double * s)
 
 int j, k, n;
 double b, t, sum;
-double * a          = (double *) 0;
-double * recip_sum  = (double *) 0;
-double * direct_sum = (double *) 0;
+double * a          = (double *) nullptr;
+double * recip_sum  = (double *) nullptr;
+double * direct_sum = (double *) nullptr;
 
 
 a          = new double [N];
@@ -1257,9 +1257,9 @@ for (j=0; j<N; ++j)  {
    //  done
    //
 
-if ( a )           { delete [] a;           a          = (double *) 0; }
-if ( recip_sum )   { delete [] recip_sum;   recip_sum  = (double *) 0; }
-if ( direct_sum )  { delete [] direct_sum;  direct_sum = (double *) 0; }
+if ( a )           { delete [] a;           a          = (double *) nullptr; }
+if ( recip_sum )   { delete [] recip_sum;   recip_sum  = (double *) nullptr; }
+if ( direct_sum )  { delete [] direct_sum;  direct_sum = (double *) nullptr; }
 
 return;
 

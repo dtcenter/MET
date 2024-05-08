@@ -10,8 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <fstream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -29,6 +27,8 @@ using namespace std;
 #include "dbf_file.h"
 #include "shp_poly_record.h"
 #include "int_array.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -180,7 +180,7 @@ if ( do_separate_files )   {
    //  done
    //
 
-return ( 0 );
+return 0;
 
 }
 
@@ -550,7 +550,7 @@ if ( r.admin.nonempty() )  {
 
 }
 
-return ( s );
+return s;
 
 }
 

@@ -27,7 +27,6 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
@@ -41,7 +40,6 @@ using namespace std;
 #include <unistd.h>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "GridTemplate.h"
 
@@ -58,6 +56,10 @@ using namespace netCDF;
 #include "data2d_python.h"
 #endif
 
+using namespace std;
+using namespace netCDF;
+
+
 ////////////////////////////////////////////////////////////////////////
 
 static ConcatString program_name;
@@ -70,9 +72,9 @@ static double ToLon = bad_data_double;
 static ConcatString InputFilename;
 static ConcatString OutputFilename;
 static ConcatString FieldString;
-static InterpMthd Method = InterpMthd_DW_Mean;
+static InterpMthd Method = InterpMthd::DW_Mean;
 static int Width = 2;
-static GridTemplateFactory::GridTemplates Shape = GridTemplateFactory::GridTemplate_Square;
+static GridTemplateFactory::GridTemplates Shape = GridTemplateFactory::GridTemplates::Square;
 static int compress_level = -1;
 
 // Static global variables
@@ -105,7 +107,7 @@ int met_main(int argc, char *argv[]) {
    // Process the input data file
    process_data_file();
 
-   return(0);
+   return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -185,7 +187,7 @@ void process_data_file() {
 
    // Read the input data file
    Met2dDataFileFactory m_factory;
-   Met2dDataFile *mtddf = (Met2dDataFile *) 0;
+   Met2dDataFile *mtddf = (Met2dDataFile *) nullptr;
 
    mlog << Debug(1)  << "Reading input file: " << InputFilename << "\n";
    mtddf = m_factory.new_met_2d_data_file(InputFilename.c_str(), ftype);
@@ -271,8 +273,8 @@ void process_data_file() {
    write_netcdf(dp_shift, grid, vinfo, mtddf->file_type());
 
    // Clean up
-   if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) 0; }
-   if(vinfo) { delete vinfo; vinfo = (VarInfo *)       0; }
+   if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) nullptr; }
+   if(vinfo) { delete vinfo; vinfo = (VarInfo *)       nullptr; }
 
    #ifdef  WITH_PYTHON
       GP.finalize();
@@ -352,9 +354,9 @@ void write_netcdf(const DataPlane &dp, const Grid &grid,
    }
 
    // Clean up
-   if(data)  {                 delete [] data; data  = (float *)  0; }
+   if(data)  {                 delete [] data; data  = (float *) nullptr; }
    if(f_out) {
-      delete f_out;   f_out = (NcFile *) 0;
+      delete f_out;   f_out = (NcFile *) nullptr;
    }
 
    // List the output file

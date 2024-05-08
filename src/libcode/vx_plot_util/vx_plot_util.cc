@@ -8,8 +8,6 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 //
 // ach_plotting_pkg.cc
 //
@@ -28,6 +26,9 @@ using namespace std;
 #include "vx_log.h"
 #include "vx_plot_util.h"
 
+using namespace std;
+
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 // Draw a map in a PostScript file.
@@ -45,7 +46,7 @@ void draw_map(const Grid &gr, const Box &gr_bb, PSfile &p, const Box &dim,
    }
 
    int i;
-   Dictionary *map_dict = (Dictionary *) 0;
+   Dictionary *map_dict = (Dictionary *) nullptr;
    ConcatString file_name, line_dash;
    NumArray line_color;
    double line_width;
@@ -206,11 +207,11 @@ bool region_overlaps_grid(const Grid & grid, const Box & grid_bb,
       if ((x >= grid_bb.x_ll()) && (x < grid_bb.x_ur()) &&
           (y >= grid_bb.y_ll()) && (y < grid_bb.y_ur()))
 
-         return (true);
+         return true;
 
    }
 
-   return (false);
+   return false;
 
 }
 

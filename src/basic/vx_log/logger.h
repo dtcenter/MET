@@ -79,9 +79,9 @@ class MsgLevel
 //////////////////////////////////////////////////////////////////
 
 
-inline int MsgLevel::value() const { return (Value); }
+inline int MsgLevel::value() const { return Value; }
 
-inline MsgLevel::operator const int & () const { return (Value); }
+inline MsgLevel::operator const int & () const { return Value; }
 
 
 //////////////////////////////////////////////////////////////////

@@ -17,10 +17,10 @@
 //   000    09/27/22  Halley Gotway New
 //   001    08/17/23  Halley Gotway MET #2609 handle missing data
 //   002    10/24/23  Halley Gotway MET #2550 enhance diagnostics
+//   003    03/11/24  Halley Gotway MET #2833 range/azimuth grid
 //
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
@@ -33,7 +33,6 @@ using namespace std;
 #include <unistd.h>
 
 #include <netcdf>
-using namespace netCDF;
 
 #ifdef _OPENMP
   #include "omp.h"
@@ -56,6 +55,10 @@ using namespace netCDF;
 #include "vx_math.h"
 
 #include "met_file.h"
+
+using namespace std;
+using namespace netCDF;
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -133,7 +136,7 @@ int met_main(int argc, char *argv[]) {
    // Process the output files
    process_out_files(tracks);
 
-   return(0);
+   return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -244,7 +247,7 @@ void process_command_line(int argc, char **argv) {
 
 void get_file_type() {
    Met2dDataFileFactory mtddf_factory;
-   Met2dDataFile *mtddf = (Met2dDataFile *) 0;
+   Met2dDataFile *mtddf = (Met2dDataFile *) nullptr;
    int i;
 
    // Build one long list of input data files
@@ -284,7 +287,7 @@ void get_file_type() {
    file_type = mtddf->file_type();
 
    // Clean up
-   if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) 0; }
+   if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) nullptr; }
 
    return;
 }
@@ -521,7 +524,7 @@ bool is_keeper(const ATCFLineBase * line) {
    }
 
    // Return the keep status
-   return(keep);
+   return keep;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -670,7 +673,7 @@ ConcatString get_out_key(const TrackInfo &track) {
       << track.technique() << "_"
       << unix_to_yyyymmddhh(track.init());
 
-   return(cs);
+   return cs;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -686,7 +689,7 @@ ConcatString get_tmp_key(const TrackInfo &track,
       << point.lead() /sec_per_hour << "_"
       << domain;
 
-   return(cs);
+   return cs;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -703,7 +706,7 @@ ConcatString build_tmp_file_name(const TrackInfo *trk_ptr,
       << "/tmp_" << program_name << "_"
       << get_tmp_key(*trk_ptr, *pnt_ptr, domain);
 
-   return(make_temp_file_name(cs.text(), ".nc"));
+   return make_temp_file_name(cs.text(), ".nc");
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -774,7 +777,7 @@ ConcatString build_out_file_name(const TrackInfo *trk_ptr,
 
    } // end while
 
-   return(cs);
+   return cs;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -973,7 +976,7 @@ void process_fields(const TrackInfoArray &tracks,
    int i, j, i_pnt;
    Grid grid_dp;
    VarInfoFactory vi_factory;
-   VarInfo *vi = (VarInfo *) 0;
+   VarInfo *vi = (VarInfo *) nullptr;
    vector<VarInfo *> vi_list;
    DataPlane dp;
    vector<DataPlane> dp_list;
@@ -1063,7 +1066,7 @@ void process_fields(const TrackInfoArray &tracks,
       // Deallocate memory
       if(vi_list[i]) {
          delete vi_list[i];
-         vi_list[i] = (VarInfo *) 0;
+         vi_list[i] = (VarInfo *) nullptr;
       }
 
    } // end for i
@@ -1188,7 +1191,7 @@ void process_out_files(const TrackInfoArray& tracks) {
 ////////////////////////////////////////////////////////////////////////
 
 void merge_tmp_files(const vector<TmpFileInfo *> tmp_files) {
-   NcFile *nc_out = (NcFile *) 0;
+   NcFile *nc_out = (NcFile *) nullptr;
 
    // Loop over temp files
    for(int i_tmp=0; i_tmp<tmp_files.size(); i_tmp++) {
@@ -1335,7 +1338,7 @@ void copy_time_vars(NcFile *to_nc, NcFile *from_nc, int i_time) {
       to_var.putVar(offsets, counts, buf);
 
       // Cleanup
-      if(buf) { delete[] buf; buf = (double *) 0; }
+      if(buf) { delete[] buf; buf = (double *) nullptr; }
 
    } // end for i
 
@@ -1363,11 +1366,11 @@ OutFileInfo::~OutFileInfo() {
 void OutFileInfo::init_from_scratch() {
 
    // Initialize track pointer
-   trk_ptr = (TrackInfo *) 0;
+   trk_ptr = (TrackInfo *) nullptr;
 
    // Initialize output file stream pointers
-   nc_diag_out   = (NcFile *) 0;
-   cira_diag_out = (ofstream *) 0;
+   nc_diag_out   = (NcFile *) nullptr;
+   cira_diag_out = (ofstream *) nullptr;
 
    clear();
 
@@ -1378,7 +1381,7 @@ void OutFileInfo::init_from_scratch() {
 
 void OutFileInfo::clear() {
 
-   trk_ptr = (TrackInfo *) 0;
+   trk_ptr = (TrackInfo *) nullptr;
 
    // Clear the diagnostics keys and maps
    diag_storm_keys.clear();
@@ -1405,7 +1408,7 @@ void OutFileInfo::clear() {
       // Close the output file
       nc_diag_out->close();
       delete nc_diag_out;
-      nc_diag_out = (NcFile *) 0;
+      nc_diag_out = (NcFile *) nullptr;
    }
    nc_diag_file.clear();
 
@@ -1418,7 +1421,7 @@ void OutFileInfo::clear() {
       // Close the output file
       cira_diag_out->close();
       delete cira_diag_out;
-      cira_diag_out = (ofstream *) 0;
+      cira_diag_out = (ofstream *) nullptr;
    }
    cira_diag_file.clear();
 
@@ -1429,7 +1432,7 @@ void OutFileInfo::clear() {
 
 NcFile *OutFileInfo::setup_nc_file(const string &out_file) {
 
-   if(!trk_ptr) return(nullptr);
+   if(!trk_ptr) return nullptr;
 
    // Open the output NetCDF file
    NcFile *nc_out = open_ncfile(out_file.c_str(), true);
@@ -1458,7 +1461,7 @@ NcFile *OutFileInfo::setup_nc_file(const string &out_file) {
    write_tc_times(nc_out, vld_dim,
                   trk_ptr, nullptr);
 
-   return(nc_out);
+   return nc_out;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1706,7 +1709,7 @@ void OutFileInfo::write_nc_diag() {
    }
 
    // Clean up
-   if(prs_data) { delete [] prs_data; prs_data = (float *) 0; }
+   if(prs_data) { delete [] prs_data; prs_data = (float *) nullptr; }
 
    return;
 }
@@ -2061,7 +2064,7 @@ string OutFileInfo::get_diag_units(const string &s) {
       units = na_str;
    }
 
-   return(units);
+   return units;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2085,9 +2088,9 @@ TmpFileInfo::~TmpFileInfo() {
 void TmpFileInfo::init_from_scratch() {
 
    // Initialize pointers
-   trk_ptr = (TrackInfo *) 0;
-   pnt_ptr = (TrackPoint *) 0;
-   tmp_out = (NcFile *) 0;
+   trk_ptr = (TrackInfo *) nullptr;
+   pnt_ptr = (TrackPoint *) nullptr;
+   tmp_out = (NcFile *) nullptr;
 
    clear();
 
@@ -2127,7 +2130,7 @@ void TmpFileInfo::close() {
            << tmp_file << "\n";
 
       delete tmp_out;
-      tmp_out = (NcFile *) 0;
+      tmp_out = (NcFile *) nullptr;
    }
 
    return;
@@ -2137,8 +2140,8 @@ void TmpFileInfo::close() {
 
 void TmpFileInfo::clear() {
 
-   trk_ptr = (TrackInfo *) 0;
-   pnt_ptr = (TrackPoint *) 0;
+   trk_ptr = (TrackInfo *) nullptr;
+   pnt_ptr = (TrackPoint *) nullptr;
 
    // Clear the diagnostics keys and maps
    diag_storm_keys.clear();
@@ -2167,7 +2170,7 @@ void TmpFileInfo::clear() {
 
       remove_temp_file(tmp_file);
 
-      tmp_out = (NcFile *) 0;
+      tmp_out = (NcFile *) nullptr;
    }
    tmp_file.clear();
 
@@ -2201,7 +2204,9 @@ void TmpFileInfo::setup_nc_file(const DomainInfo &di,
    // Set grid center
    d.lat_center   =      pnt_ptr->lat();
    d.lon_center   = -1.0*pnt_ptr->lon(); // degrees east to west
-   d.range_max_km = di.delta_range_km * d.range_n;
+
+   // MET #2833 multiply by n-1 since the ranges begin at 0 km
+   d.range_max_km = di.delta_range_km * (d.range_n - 1);
 
    // Instantiate the grid
    grid_out.set(d);
@@ -2267,8 +2272,8 @@ void TmpFileInfo::setup_nc_file(const DomainInfo &di,
    write_tc_track_point(tmp_out, vld_dim, *pnt_ptr);
 
    // Clean up
-   if(lat_arr) { delete[] lat_arr; lat_arr = (double *) 0; }
-   if(lon_arr) { delete[] lon_arr; lon_arr = (double *) 0; }
+   if(lat_arr) { delete[] lat_arr; lat_arr = (double *) nullptr; }
+   if(lon_arr) { delete[] lon_arr; lon_arr = (double *) nullptr; }
 
    return;
 }

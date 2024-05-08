@@ -489,20 +489,18 @@ warning(out);
 out << "\n\n"
     << sep
     << "\n\n"
-    << "using namespace std;\n"
-    << "\n\n"
     << "#include <string.h>\n"
     << "\n"
     << "#include " << L << lower << "_to_string";
 
 if ( header_suffix )    out << header_suffix;
 
-out << R 
-    << "\n"
+out << R
+    << "\n\n"
+    << "using namespace std;\n"
     << "\n\n"
     << sep
     << "\n\n";
-
 
 forward(e, lower, out);
 
@@ -607,8 +605,6 @@ warning(out);
 out << "\n\n"
     << sep
     << "\n\n"
-    << "using namespace std;\n"
-    << "\n\n"
     << "#include <string.h>\n"
     << "\n"
     << "#include " << L << lower << "_to_string";
@@ -616,11 +612,11 @@ out << "\n\n"
 if ( header_suffix )    out << header_suffix;
 
 out << R 
-    << "\n"
+    << "\n\n"
+    << "using namespace std;\n"
     << "\n\n"
     << sep
     << "\n\n";
-
 
 forward_cs(e, lower, out);
 
@@ -758,7 +754,7 @@ out << e.name() << " t)\n"
     << "{\n"
     << "\n";
 
-out << "const char * s = (const char *) 0;\n\n";
+out << "const char * s = (const char *) nullptr;\n\n";
 
 out << "switch ( t )  {\n"
     << "\n";
@@ -802,7 +798,7 @@ out << "\n"
     << "}   //  switch\n"
     << "\n\n";
 
-out << "return ( ConcatString (s) );\n"
+out << "return ConcatString(s);\n"
     << "\n";
 
 out << "}\n";
@@ -869,7 +865,7 @@ for (j=0; j<n; ++j)  {
 
    for (m=k; m<max_len; ++m)  out.put(' ');
 
-   out << "   " << "return ( true );";
+   out << "   " << "return true;";
 
    out << " }\n";
 
@@ -881,7 +877,7 @@ out << "   //\n"
     << "   //  nope\n"
     << "   //\n"
     << "\n"
-    << "return ( false );\n"
+    << "return false;\n"
     << "\n"
     << "}\n";
 

@@ -49,7 +49,6 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
@@ -72,6 +71,9 @@ using namespace std;
 #include "vx_log.h"
 
 #include "met_file.h"
+
+using namespace std;
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -182,7 +184,7 @@ int met_main(int argc, char *argv[]) {
            << "Output file: " << out_files[i] << "\n";
    }
 
-   return(0);
+   return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -316,8 +318,8 @@ void process_bdecks(TrackInfoArray &bdeck_tracks) {
    mlog << Debug(2)
         << "Processing " << files.n() << " BDECK file(s).\n";
    process_track_files(files, files_model_suffix, bdeck_tracks, false,
-                       (conf_info.AnlyTrack == TrackType_BDeck ||
-                        conf_info.AnlyTrack == TrackType_Both));
+                       (conf_info.AnlyTrack == TrackType::BDeck ||
+                        conf_info.AnlyTrack == TrackType::Both));
    mlog << Debug(2)
         << "Found " << bdeck_tracks.n() << " BDECK track(s).\n";
 
@@ -339,15 +341,15 @@ void process_adecks(const TrackInfoArray &bdeck_tracks) {
    mlog << Debug(2)
         << "Processing " << files.n() << " ADECK file(s).\n";
    process_track_files(files, files_model_suffix, adeck_tracks, true,
-                       (conf_info.AnlyTrack == TrackType_ADeck ||
-                        conf_info.AnlyTrack == TrackType_Both));
+                       (conf_info.AnlyTrack == TrackType::ADeck ||
+                        conf_info.AnlyTrack == TrackType::Both));
 
    //
    // Derive new track types
    //
 
    // Handle 12-hourly interpolated models
-   if(conf_info.Interp12) {
+   if(Interp12Type::None != conf_info.Interp12) {
       mlog << Debug(2)
            << "Deriving 12-hour interpolated ADECK tracks.\n";
       derive_interp12(adeck_tracks);
@@ -708,7 +710,7 @@ void process_prob_files(const StringArray &files,
          if(!is_keeper(&line)) continue;
 
          // Only process probability of RI lines
-         if(line.type() == ATCFLineType_ProbRI) {
+         if(line.type() == ATCFLineType::ProbRI) {
             dland = compute_dland(line.lat(), -1.0*line.lon());
             if(probs.add(line, dland, conf_info.CheckDup)) {
                cur_add++;
@@ -814,7 +816,7 @@ bool is_keeper(const ATCFLineBase * line) {
       keep = false;
 
    // Return the keep status
-   return(keep);
+   return keep;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1011,7 +1013,7 @@ void filter_probs(ProbInfoArray &probs) {
       }
 
       // If we've made it here, retain this probability
-      if(p[i]->type() == ATCFLineType_ProbRI) probs.add(p.prob_rirw(i));
+      if(p[i]->type() == ATCFLineType::ProbRI) probs.add(p.prob_rirw(i));
    }
 
    // Print summary filtering info
@@ -1170,7 +1172,7 @@ void derive_interp12(TrackInfoArray &tracks) {
    char c;
 
    // If Interp12 logic set to NONE, Nothing to do.
-   if(conf_info.Interp12 == Interp12Type_None) return;
+   if(conf_info.Interp12 == Interp12Type::None) return;
 
    // Loop through the track array and store case information
    for(i=0; i<tracks.n(); i++) {
@@ -1234,7 +1236,7 @@ void derive_interp12(TrackInfoArray &tracks) {
       else {
 
          // Check logic before replacing existing 'I' track with new one.
-         if(conf_info.Interp12 == Interp12Type_Replace) {
+         if(conf_info.Interp12 == Interp12Type::Replace) {
 
             mlog << Debug(3)
                  << "Replacing existing track for Interp12 case \"" << track_case
@@ -1267,7 +1269,7 @@ int derive_consensus(TrackInfoArray &tracks) {
    int n_add = 0;
 
    // If no consensus models are defined, nothing to do
-   if(conf_info.NConsensus == 0) return(0);
+   if(conf_info.NConsensus == 0) return 0;
 
    // Loop through the tracks to build a list of cases
    for(i=0; i<tracks.n(); i++) {
@@ -1426,7 +1428,7 @@ int derive_consensus(TrackInfoArray &tracks) {
 
    } // end for i
 
-   return(n_add);
+   return n_add;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1439,7 +1441,7 @@ int derive_lag(TrackInfoArray &tracks) {
    int n_add = 0;
 
    // If no time lags are requested, nothing to do
-   if(conf_info.LagTime.n() == 0) return(0);
+   if(conf_info.LagTime.n() == 0) return 0;
 
    // Loop through the time lags to be applied
    for(i=0; i<conf_info.LagTime.n(); i++) {
@@ -1500,7 +1502,7 @@ int derive_lag(TrackInfoArray &tracks) {
 
    } // end for i
 
-   return(n_add);
+   return n_add;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1513,7 +1515,7 @@ int derive_baseline(TrackInfoArray &atracks, const TrackInfoArray &btracks) {
 
    // If no baseline models are requested, nothing to do
    if(conf_info.OperBaseline.n() == 0 &&
-      conf_info.BestBaseline.n() == 0) return(0);
+      conf_info.BestBaseline.n() == 0) return 0;
 
    mlog << Debug(3)
         << "Building CLIPER/SHIFOR operational baseline forecasts using "
@@ -1576,7 +1578,7 @@ int derive_baseline(TrackInfoArray &atracks, const TrackInfoArray &btracks) {
       } // end for j
    } // end for i
 
-   return(n_add);
+   return n_add;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1793,8 +1795,8 @@ void process_match(const TrackInfo &adeck, const TrackInfo &bdeck,
    double adeck_dland, bdeck_dland, e_tk, e_x, e_y, e_altk, e_crtk;
 
    TrackPairInfo pair;
-   const TrackPoint *adeck_point = (TrackPoint *) 0;
-   const TrackPoint *bdeck_point = (TrackPoint *) 0;
+   const TrackPoint *adeck_point = (TrackPoint *) nullptr;
+   const TrackPoint *bdeck_point = (TrackPoint *) nullptr;
    TrackPoint empty_point;
 
    // Initialize TrackPairInfo with the current tracks
@@ -1905,7 +1907,7 @@ double compute_dland(double lat, double lon) {
       y < 0 || y >= dland_grid.ny())   dist = bad_data_double;
    else                                dist = dland_dp.get(x, y);
 
-   return(dist);
+   return dist;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2077,7 +2079,7 @@ void process_watch_warn(TrackPairInfoArray &p) {
       ww_sid.ws_strip();
 
       // Determine the maximum severity watch/warning in effect
-      for(i=0, ww_type=NoWatchWarnType; i<n_ww; i++) {
+      for(i=0, ww_type=WatchWarnType::None; i<n_ww; i++) {
 
          // Read the next line
          f_in >> dl;
@@ -2103,7 +2105,7 @@ void write_tracks(const TrackPairInfoArray &p) {
    TcHdrColumns tchc;
    ConcatString out_file;
    AsciiTable out_at;
-   ofstream *out = (ofstream *) 0;
+   ofstream *out = (ofstream *) nullptr;
 
    // Set the track pair output file name
    out_file << out_base << tc_stat_file_ext;
@@ -2161,7 +2163,7 @@ void write_tracks(const TrackPairInfoArray &p) {
       *out << out_at;
       out->close();
       delete out;
-      out = (ofstream *) 0;
+      out = (ofstream *) nullptr;
    }
 
    return;
@@ -2174,7 +2176,7 @@ void write_prob_rirw(const ProbRIRWPairInfoArray &p) {
    TcHdrColumns tchc;
    ConcatString out_file;
    AsciiTable out_at;
-   ofstream *out = (ofstream *) 0;
+   ofstream *out = (ofstream *) nullptr;
 
    // Set the track pair output file name
    out_file << out_base << "_PROBRIRW" << tc_stat_file_ext;
@@ -2239,7 +2241,7 @@ void write_prob_rirw(const ProbRIRWPairInfoArray &p) {
       *out << out_at;
       out->close();
       delete out;
-      out = (ofstream *) 0;
+      out = (ofstream *) nullptr;
    }
 
    return;

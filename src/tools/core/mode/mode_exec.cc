@@ -10,19 +10,19 @@
 ///////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
 #include <cmath>
 #include <algorithm>
 #include <netcdf>
-using namespace netCDF;
 
 #include "mode_exec.h"
 #include "nc_utils.h"
 #include "vx_regrid.h"
+
+using namespace std;
+using namespace netCDF;
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -87,8 +87,8 @@ void ModeExecutive::init_from_scratch()
 
 {
 
-   fcst_mtddf = (Met2dDataFile *) 0;
-   obs_mtddf = (Met2dDataFile *) 0;
+   fcst_mtddf = (Met2dDataFile *) nullptr;
+   obs_mtddf = (Met2dDataFile *) nullptr;
 
    clear();
 
@@ -111,8 +111,8 @@ void ModeExecutive::clear()
    fcst_file.clear();
    obs_file.clear();
 
-   if ( fcst_mtddf )  { delete fcst_mtddf;  fcst_mtddf = (Met2dDataFile *) 0; }
-   if (  obs_mtddf )  { delete  obs_mtddf;   obs_mtddf = (Met2dDataFile *) 0; }
+   if ( fcst_mtddf )  { delete fcst_mtddf;  fcst_mtddf = (Met2dDataFile *) nullptr; }
+   if (  obs_mtddf )  { delete  obs_mtddf;   obs_mtddf = (Met2dDataFile *) nullptr; }
 
    for (int j=0; j<n_cts; ++j)  cts[j].zero_out();
 
@@ -231,7 +231,7 @@ void ModeExecutive::init_multivar_intensities(const ModeConfInfo &conf)
    engine.conf_info = conf;
    
    // tell the engine which type of data it is
-   engine.set_data_type(ModeDataType_MvMode_Both);
+   engine.set_data_type(ModeDataType::MvMode_Both);
 
    // check one again for multivar problems
    engine.conf_info.check_multivar_not_implemented();
@@ -362,14 +362,14 @@ void ModeExecutive::setup_traditional_fcst_obs_data()
 
    // Mask out the missing data between fields
 
-   if(engine.conf_info.mask_missing_flag == FieldType_Fcst ||
-      engine.conf_info.mask_missing_flag == FieldType_Both)
+   if(engine.conf_info.mask_missing_flag == FieldType::Fcst ||
+      engine.conf_info.mask_missing_flag == FieldType::Both)
       mask_bad_data(Fcst_sd.data, Obs_sd.data);
 
    // Mask out the missing data between fields
 
-   if(engine.conf_info.mask_missing_flag == FieldType_Obs ||
-      engine.conf_info.mask_missing_flag == FieldType_Both)
+   if(engine.conf_info.mask_missing_flag == FieldType::Obs ||
+      engine.conf_info.mask_missing_flag == FieldType::Both)
       mask_bad_data(Obs_sd.data, Fcst_sd.data);
 
    // Parse the grid and/or polyline masks from the configuration
@@ -426,7 +426,7 @@ void ModeExecutive::setup_verification_grid(const ModeInputData &fcst,
    // set this local conf to point to forecast 0, so that that regrid info
    // can be accessed and it can be decided if we are to use fcst or obs
    // input
-   engine.conf_info.set_data_type(ModeDataType_MvMode_Fcst);
+   engine.conf_info.set_data_type(ModeDataType::MvMode_Fcst);
    engine.conf_info.set_field_index(0);
    grid = parse_vx_grid(engine.conf_info.Fcst->var_info->regrid(),
                         &fcst._grid, &obs._grid);
@@ -915,7 +915,7 @@ void ModeExecutive::do_conv_thresh_multivar_simple(Processing_t p)
    //
 
    string what;
-   if (conf.data_type == ModeDataType_MvMode_Obs) {
+   if (conf.data_type == ModeDataType::MvMode_Obs) {
       what = "observation field";
    } else {
       what = "forecast field";
@@ -984,9 +984,9 @@ void ModeExecutive::do_merging_multivar(const ShapeData &f_merge,
       // set the merge flag and merge_thresh appropriately
       ModeConfInfo & conf = engine.conf_info;
       SingleThresh s("ne-9999");
-      conf.set_fcst_merge_flag(MergeType_Thresh);
+      conf.set_fcst_merge_flag(MergeType::Thresh);
       conf.set_fcst_merge_thresh(s);
-      conf.set_obs_merge_flag(MergeType_Thresh);
+      conf.set_obs_merge_flag(MergeType::Thresh);
       conf.set_obs_merge_thresh(s);
    } else if (p != MULTIVAR_INTENSITY) {
       mlog << Error << "\nModeExecutive::do_merging(shapedata, shapedata, p) -> "
@@ -1069,7 +1069,7 @@ void ModeExecutive::process_masks(ShapeData & fcst_sd, ShapeData & obs_sd)
         << "Processing masking regions.\n";
 
    // Parse the grid mask into a ShapeData object
-   if(engine.conf_info.mask_grid_flag != FieldType_None) {
+   if(engine.conf_info.mask_grid_flag != FieldType::None) {
       mlog << Debug(3)
            << "Processing grid mask: "
            << engine.conf_info.mask_grid_name << "\n";
@@ -1078,7 +1078,7 @@ void ModeExecutive::process_masks(ShapeData & fcst_sd, ShapeData & obs_sd)
    }
 
    // Parse the poly mask into a ShapeData object
-   if(engine.conf_info.mask_poly_flag != FieldType_None) {
+   if(engine.conf_info.mask_poly_flag != FieldType::None) {
       mlog << Debug(3)
            << "Processing poly mask: "
            << engine.conf_info.mask_poly_name << "\n";
@@ -1087,26 +1087,26 @@ void ModeExecutive::process_masks(ShapeData & fcst_sd, ShapeData & obs_sd)
    }
 
    // Apply the grid mask to the forecast field if requested
-   if(engine.conf_info.mask_grid_flag == FieldType_Fcst ||
-      engine.conf_info.mask_grid_flag == FieldType_Both) {
+   if(engine.conf_info.mask_grid_flag == FieldType::Fcst ||
+      engine.conf_info.mask_grid_flag == FieldType::Both) {
       apply_mask(fcst_sd, grid_mask_sd);
    }
 
    // Apply the grid mask to the observation field if requested
-   if(engine.conf_info.mask_grid_flag == FieldType_Obs ||
-      engine.conf_info.mask_grid_flag == FieldType_Both) {
+   if(engine.conf_info.mask_grid_flag == FieldType::Obs ||
+      engine.conf_info.mask_grid_flag == FieldType::Both) {
       apply_mask(obs_sd, grid_mask_sd);
    }
 
    // Apply the polyline mask to the forecast field if requested
-   if(engine.conf_info.mask_poly_flag == FieldType_Fcst ||
-      engine.conf_info.mask_poly_flag == FieldType_Both) {
+   if(engine.conf_info.mask_poly_flag == FieldType::Fcst ||
+      engine.conf_info.mask_poly_flag == FieldType::Both) {
       apply_mask(fcst_sd, poly_mask_sd);
    }
 
    // Apply the polyline mask to the observation field if requested
-   if(engine.conf_info.mask_poly_flag == FieldType_Obs ||
-      engine.conf_info.mask_poly_flag == FieldType_Both) {
+   if(engine.conf_info.mask_poly_flag == FieldType::Obs ||
+      engine.conf_info.mask_poly_flag == FieldType::Both) {
       apply_mask(obs_sd, poly_mask_sd);
    }
 
@@ -1125,7 +1125,7 @@ void ModeExecutive::process_fcst_masks(ShapeData & fcst_sd)
    mlog << Debug(3) << "Processing masking regions.\n";
 
    // Parse the grid mask into a ShapeData object
-   if(engine.conf_info.mask_grid_flag != FieldType_None) {
+   if(engine.conf_info.mask_grid_flag != FieldType::None) {
       mlog << Debug(3)
            << "Processing grid mask: "
            << engine.conf_info.mask_grid_name << "\n";
@@ -1134,7 +1134,7 @@ void ModeExecutive::process_fcst_masks(ShapeData & fcst_sd)
    }
 
    // Parse the poly mask into a ShapeData object
-   if(engine.conf_info.mask_poly_flag != FieldType_None) {
+   if(engine.conf_info.mask_poly_flag != FieldType::None) {
       mlog << Debug(3)
            << "Processing poly mask: "
            << engine.conf_info.mask_poly_name << "\n";
@@ -1143,14 +1143,14 @@ void ModeExecutive::process_fcst_masks(ShapeData & fcst_sd)
    }
 
    // Apply the grid mask to the forecast field if requested
-   if(engine.conf_info.mask_grid_flag == FieldType_Fcst ||
-      engine.conf_info.mask_grid_flag == FieldType_Both) {
+   if(engine.conf_info.mask_grid_flag == FieldType::Fcst ||
+      engine.conf_info.mask_grid_flag == FieldType::Both) {
       apply_mask(fcst_sd, grid_mask_sd);
    }
 
    // Apply the polyline mask to the forecast field if requested
-   if(engine.conf_info.mask_poly_flag == FieldType_Fcst ||
-      engine.conf_info.mask_poly_flag == FieldType_Both) {
+   if(engine.conf_info.mask_poly_flag == FieldType::Fcst ||
+      engine.conf_info.mask_poly_flag == FieldType::Both) {
       apply_mask(fcst_sd, poly_mask_sd);
    }
 
@@ -1170,7 +1170,7 @@ void ModeExecutive::process_obs_masks(ShapeData & obs_sd)
         << "Processing masking regions.\n";
 
    // Parse the grid mask into a ShapeData object
-   if(engine.conf_info.mask_grid_flag != FieldType_None) {
+   if(engine.conf_info.mask_grid_flag != FieldType::None) {
       mlog << Debug(3)
            << "Processing grid mask: "
            << engine.conf_info.mask_grid_name << "\n";
@@ -1179,7 +1179,7 @@ void ModeExecutive::process_obs_masks(ShapeData & obs_sd)
    }
 
    // Parse the poly mask into a ShapeData object
-   if(engine.conf_info.mask_poly_flag != FieldType_None) {
+   if(engine.conf_info.mask_poly_flag != FieldType::None) {
       mlog << Debug(3)
            << "Processing poly mask: "
            << engine.conf_info.mask_poly_name << "\n";
@@ -1188,14 +1188,14 @@ void ModeExecutive::process_obs_masks(ShapeData & obs_sd)
    }
 
    // Apply the grid mask to the observation field if requested
-   if(engine.conf_info.mask_grid_flag == FieldType_Obs ||
-      engine.conf_info.mask_grid_flag == FieldType_Both) {
+   if(engine.conf_info.mask_grid_flag == FieldType::Obs ||
+      engine.conf_info.mask_grid_flag == FieldType::Both) {
       apply_mask(obs_sd, grid_mask_sd);
    }
 
    // Apply the polyline mask to the observation field if requested
-   if(engine.conf_info.mask_poly_flag == FieldType_Obs ||
-      engine.conf_info.mask_poly_flag == FieldType_Both) {
+   if(engine.conf_info.mask_poly_flag == FieldType::Obs ||
+      engine.conf_info.mask_poly_flag == FieldType::Both) {
       apply_mask(obs_sd, poly_mask_sd);
    }
 
@@ -1548,8 +1548,8 @@ void ModeExecutive::write_obj_stats()
 
    out.close();
 
-   if(engine.conf_info.Fcst->merge_flag == MergeType_Both ||
-      engine.conf_info.Fcst->merge_flag == MergeType_Engine) {
+   if(engine.conf_info.Fcst->merge_flag == MergeType::Both ||
+      engine.conf_info.Fcst->merge_flag == MergeType::Engine) {
 
       //
       // Create output stats file for forecast merging
@@ -1580,8 +1580,8 @@ void ModeExecutive::write_obj_stats()
       out.close();
    }
 
-   if(engine.conf_info.Obs->merge_flag == MergeType_Both ||
-      engine.conf_info.Obs->merge_flag == MergeType_Engine) {
+   if(engine.conf_info.Obs->merge_flag == MergeType::Both ||
+      engine.conf_info.Obs->merge_flag == MergeType::Engine) {
 
       //
       // Create output stats file for observation merging
@@ -1624,7 +1624,7 @@ MultiVarData *ModeExecutive::get_multivar_data(ModeDataType dtype)
 
    switch (dtype)
    {
-   case ModeDataType_MvMode_Obs:
+   case ModeDataType::MvMode_Obs:
       obs_magic_string = engine.conf_info.Obs->var_info->magic_str().c_str();
       // replace forward slashes with underscores to prevent new directories
       replace(obs_magic_string.begin(), obs_magic_string.end(), '/', '_');   
@@ -1636,7 +1636,7 @@ MultiVarData *ModeExecutive::get_multivar_data(ModeDataType dtype)
       mvd->set_conv_thresh_array(engine.conf_info.Obs->conv_thresh_array, simple);
       mvd->set_merge_thresh_array(engine.conf_info.Obs->merge_thresh_array, simple);
       break;
-   case ModeDataType_MvMode_Fcst:
+   case ModeDataType::MvMode_Fcst:
       fcst_magic_string = engine.conf_info.Fcst->var_info->magic_str().c_str();
       // replace forward slashes with underscores to prevent new directories
       replace(fcst_magic_string.begin(), fcst_magic_string.end(), '/', '_');   
@@ -1664,14 +1664,14 @@ void ModeExecutive::add_multivar_merge_data(MultiVarData *mvd, ModeDataType dtyp
    bool simple = false;
    switch (dtype)
    {
-   case ModeDataType_MvMode_Obs:
+   case ModeDataType::MvMode_Obs:
       mvd->set_obj(engine.obs_split, simple);
       mvd->set_raw(engine.obs_raw, simple);
       mvd->set_shapedata(Obs_sd, simple);
       mvd->set_conv_thresh_array(engine.conf_info.Obs->conv_thresh_array, simple);
       mvd->set_merge_thresh_array(engine.conf_info.Obs->merge_thresh_array, simple);
       break;
-   case ModeDataType_MvMode_Fcst:
+   case ModeDataType::MvMode_Fcst:
       mvd->set_obj(engine.fcst_split, simple);
       mvd->set_raw(engine.fcst_raw, simple);
       mvd->set_shapedata(Fcst_sd, simple);
@@ -1700,17 +1700,17 @@ void ModeExecutive::write_obj_netcdf(const ModeNcOutInfo & info)
    const ConcatString fcst_thresh = engine.conf_info.Fcst->conv_thresh.get_str(5);
    const ConcatString  obs_thresh = engine.conf_info.Obs->conv_thresh.get_str(5);
 
-   float *fcst_raw_data      = (float *) 0;
-   float *fcst_obj_raw_data  = (float *) 0;
-   int   *fcst_obj_data      = (int *)   0;
-   int   *fcst_clus_data     = (int *)   0;
+   float *fcst_raw_data      = (float *) nullptr;
+   float *fcst_obj_raw_data  = (float *) nullptr;
+   int   *fcst_obj_data      = (int *)   nullptr;
+   int   *fcst_clus_data     = (int *)   nullptr;
 
-   float *obs_raw_data       = (float *) 0;
-   float *obs_obj_raw_data   = (float *) 0;
-   int   *obs_obj_data       = (int *)   0;
-   int   *obs_clus_data      = (int *)   0;
+   float *obs_raw_data       = (float *) nullptr;
+   float *obs_obj_raw_data   = (float *) nullptr;
+   int   *obs_obj_data       = (int *)   nullptr;
+   int   *obs_clus_data      = (int *)   nullptr;
 
-   NcFile *f_out             = (NcFile *) 0;
+   NcFile *f_out             = (NcFile *) nullptr;
 
    NcDim  lat_dim           ;
    NcDim  lon_dim           ;
@@ -1752,7 +1752,7 @@ void ModeExecutive::write_obj_netcdf(const ModeNcOutInfo & info)
       mlog << Error << "\nModeExecutive::write_obj_netcdf() -> trouble opening output file "
            << out_file << "\n\n";
       delete f_out;
-      f_out = (NcFile *) 0;
+      f_out = (NcFile *) nullptr;
 
       exit(1);
    }
@@ -2094,15 +2094,15 @@ void ModeExecutive::write_obj_netcdf(const ModeNcOutInfo & info)
    // Delete allocated memory
    //
 
-   if (fcst_raw_data)      { delete [] fcst_raw_data;      fcst_raw_data     = (float *) 0; }
-   if (fcst_obj_raw_data)  { delete [] fcst_obj_raw_data;  fcst_obj_raw_data = (float *) 0; }
-   if (fcst_obj_data)      { delete [] fcst_obj_data;      fcst_obj_data     = (int *) 0; }
-   if (fcst_clus_data)     { delete [] fcst_clus_data;     fcst_clus_data    = (int *) 0; }
+   if (fcst_raw_data)      { delete [] fcst_raw_data;      fcst_raw_data     = (float *) nullptr; }
+   if (fcst_obj_raw_data)  { delete [] fcst_obj_raw_data;  fcst_obj_raw_data = (float *) nullptr; }
+   if (fcst_obj_data)      { delete [] fcst_obj_data;      fcst_obj_data     = (int *)   nullptr; }
+   if (fcst_clus_data)     { delete [] fcst_clus_data;     fcst_clus_data    = (int *)   nullptr; }
 
-   if (obs_raw_data)       { delete [] obs_raw_data;       obs_raw_data      = (float *) 0; }
-   if (obs_obj_raw_data)   { delete [] obs_obj_raw_data;   obs_obj_raw_data  = (float *) 0; }
-   if (obs_obj_data)       { delete [] obs_obj_data;       obs_obj_data      = (int *) 0; }
-   if (obs_clus_data)      { delete [] obs_clus_data;      obs_clus_data     = (int *) 0; }
+   if (obs_raw_data)       { delete [] obs_raw_data;       obs_raw_data      = (float *) nullptr; }
+   if (obs_obj_raw_data)   { delete [] obs_obj_raw_data;   obs_obj_raw_data  = (float *) nullptr; }
+   if (obs_obj_data)       { delete [] obs_obj_data;       obs_obj_data      = (int *)   nullptr; }
+   if (obs_clus_data)      { delete [] obs_clus_data;      obs_clus_data     = (int *)   nullptr; }
 
    //
    // Write out the values of the vertices of the polylines.
@@ -2114,7 +2114,7 @@ void ModeExecutive::write_obj_netcdf(const ModeNcOutInfo & info)
    // Close the NetCDF file
    //
    delete f_out;
-   f_out = (NcFile *) 0;
+   f_out = (NcFile *) nullptr;
 
    return;
 }
@@ -2155,16 +2155,16 @@ void ModeExecutive::write_poly_netcdf(NcFile * f_out)
    // present.
    //
    if(engine.n_fcst > 0) {
-      write_poly_netcdf(f_out, FcstSimpBdyPoly);
-      write_poly_netcdf(f_out, FcstSimpHullPoly);
+      write_poly_netcdf(f_out, ObjPolyType::FcstSimpBdy);
+      write_poly_netcdf(f_out, ObjPolyType::FcstSimpHull);
    }
    if(engine.n_obs > 0) {
-      write_poly_netcdf(f_out, ObsSimpBdyPoly);
-      write_poly_netcdf(f_out, ObsSimpHullPoly);
+      write_poly_netcdf(f_out, ObjPolyType::ObsSimpBdy);
+      write_poly_netcdf(f_out, ObjPolyType::ObsSimpHull);
    }
    if(engine.n_clus > 0) {
-      write_poly_netcdf(f_out, FcstClusHullPoly);
-      write_poly_netcdf(f_out, ObsClusHullPoly);
+      write_poly_netcdf(f_out, ObjPolyType::FcstClusHull);
+      write_poly_netcdf(f_out, ObjPolyType::ObsClusHull);
    }
 
    return;
@@ -2179,14 +2179,14 @@ void ModeExecutive::write_poly_netcdf(NcFile *f_out, ObjPolyType poly_type)
    int i, j, x, y, n_pts, n_poly;
    double lat, lon;
 
-   Polyline **poly            = (Polyline **) 0;
+   Polyline **poly            = (Polyline **) nullptr;
 
-   int   *poly_start          = (int       *) 0;
-   int   *poly_npts           = (int       *) 0;
-   float *poly_lat            = (float     *) 0;
-   float *poly_lon            = (float     *) 0;
-   int   *poly_x              = (int       *) 0;
-   int   *poly_y              = (int       *) 0;
+   int   *poly_start          = (int       *) nullptr;
+   int   *poly_npts           = (int       *) nullptr;
+   float *poly_lat            = (float     *) nullptr;
+   float *poly_lon            = (float     *) nullptr;
+   int   *poly_x              = (int       *) nullptr;
+   int   *poly_y              = (int       *) nullptr;
 
    // Dimensions and variables for each object
    NcDim  obj_dim            ;
@@ -2217,7 +2217,7 @@ void ModeExecutive::write_poly_netcdf(NcFile *f_out, ObjPolyType poly_type)
    // and set up strings
    switch(poly_type) {
 
-   case FcstSimpBdyPoly:
+   case ObjPolyType::FcstSimpBdy:
       n_poly     = engine.n_fcst;
       field_name = "fcst";
       field_long = "Forecast";
@@ -2225,7 +2225,7 @@ void ModeExecutive::write_poly_netcdf(NcFile *f_out, ObjPolyType poly_type)
       poly_long  = "Simple Boundary";
       break;
 
-   case ObsSimpBdyPoly:
+   case ObjPolyType::ObsSimpBdy:
       n_poly     = engine.n_obs;
       field_name = "obs";
       field_long = "Observation";
@@ -2233,7 +2233,7 @@ void ModeExecutive::write_poly_netcdf(NcFile *f_out, ObjPolyType poly_type)
       poly_long  = "Simple Boundary";
       break;
 
-   case FcstSimpHullPoly:
+   case ObjPolyType::FcstSimpHull:
       n_poly     = engine.n_fcst;
       field_name = "fcst";
       field_long = "Forecast";
@@ -2241,7 +2241,7 @@ void ModeExecutive::write_poly_netcdf(NcFile *f_out, ObjPolyType poly_type)
       poly_long  = "Simple Convex Hull";
       break;
 
-   case ObsSimpHullPoly:
+   case ObjPolyType::ObsSimpHull:
       n_poly     = engine.n_obs;
       field_name = "obs";
       field_long = "Observation";
@@ -2249,7 +2249,7 @@ void ModeExecutive::write_poly_netcdf(NcFile *f_out, ObjPolyType poly_type)
       poly_long  = "Simple Convex Hull";
       break;
 
-   case FcstClusHullPoly:
+   case ObjPolyType::FcstClusHull:
       n_poly     = engine.n_clus;
       field_name = "fcst";
       field_long = "Forecast";
@@ -2257,7 +2257,7 @@ void ModeExecutive::write_poly_netcdf(NcFile *f_out, ObjPolyType poly_type)
       poly_long  = "Cluster Convex Hull";
       break;
 
-   case ObsClusHullPoly:
+   case ObjPolyType::ObsClusHull:
       n_poly     = engine.n_clus;
       field_name = "obs";
       field_long = "Observation";
@@ -2270,8 +2270,8 @@ void ModeExecutive::write_poly_netcdf(NcFile *f_out, ObjPolyType poly_type)
    }
 
    // Setup dimension name strings
-   if(poly_type == FcstClusHullPoly ||
-      poly_type == ObsClusHullPoly) {
+   if(poly_type == ObjPolyType::FcstClusHull ||
+      poly_type == ObjPolyType::ObsClusHull) {
       obj_dim_name << cs_erase << field_name << "_clus";
    }
    else {
@@ -2301,27 +2301,27 @@ void ModeExecutive::write_poly_netcdf(NcFile *f_out, ObjPolyType poly_type)
 
       switch(poly_type) {
 
-      case FcstSimpBdyPoly:
+      case ObjPolyType::FcstSimpBdy:
          poly[i] = &engine.fcst_single[i].boundary[0];
          break;
 
-      case ObsSimpBdyPoly:
+      case ObjPolyType::ObsSimpBdy:
          poly[i] = &engine.obs_single[i].boundary[0];
          break;
 
-      case FcstSimpHullPoly:
+      case ObjPolyType::FcstSimpHull:
          poly[i] = &engine.fcst_single[i].convex_hull;
          break;
 
-      case ObsSimpHullPoly:
+      case ObjPolyType::ObsSimpHull:
          poly[i] = &engine.obs_single[i].convex_hull;
          break;
 
-      case FcstClusHullPoly:
+      case ObjPolyType::FcstClusHull:
          poly[i] = &engine.fcst_cluster[i].convex_hull;
          break;
 
-      case ObsClusHullPoly:
+      case ObjPolyType::ObsClusHull:
          poly[i] = &engine.obs_cluster[i].convex_hull;
          break;
 
@@ -2436,13 +2436,13 @@ void ModeExecutive::write_poly_netcdf(NcFile *f_out, ObjPolyType poly_type)
    //
    // Delete allocated memory
    //
-   if(poly)       { delete [] poly;       poly       = (Polyline **) 0; }
-   if(poly_start) { delete [] poly_start; poly_start = (int       *) 0; }
-   if(poly_npts)  { delete [] poly_npts;  poly_npts  = (int       *) 0; }
-   if(poly_lat)   { delete [] poly_lat;   poly_lat   = (float     *) 0; }
-   if(poly_lon)   { delete [] poly_lon;   poly_lon   = (float     *) 0; }
-   if(poly_x)     { delete [] poly_x;     poly_x     = (int       *) 0; }
-   if(poly_y)     { delete [] poly_y;     poly_y     = (int       *) 0; }
+   if(poly)       { delete [] poly;       poly       = (Polyline **) nullptr; }
+   if(poly_start) { delete [] poly_start; poly_start = (int       *) nullptr; }
+   if(poly_npts)  { delete [] poly_npts;  poly_npts  = (int       *) nullptr; }
+   if(poly_lat)   { delete [] poly_lat;   poly_lat   = (float     *) nullptr; }
+   if(poly_lon)   { delete [] poly_lon;   poly_lon   = (float     *) nullptr; }
+   if(poly_x)     { delete [] poly_x;     poly_x     = (int       *) nullptr; }
+   if(poly_y)     { delete [] poly_y;     poly_y     = (int       *) nullptr; }
 
    return;
 }

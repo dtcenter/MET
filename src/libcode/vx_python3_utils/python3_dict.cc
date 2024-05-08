@@ -9,18 +9,14 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 #include <iostream>
 
 #include "vx_log.h"
 #include "concat_string.h"
 
 #include "python3_dict.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -179,7 +175,7 @@ if ( ! PyLong_Check(a) )  {
 
 k = (int) PyLong_AS_LONG(a);
 
-return ( k );
+return k;
 
 }
 
@@ -216,7 +212,7 @@ if ( ! PyFloat_Check(a) )  {
 
 t = PyFloat_AS_DOUBLE(a);
 
-return ( t );
+return t;
 
 }
 
@@ -262,7 +258,7 @@ else {
 
 }
 
-return ( s );
+return s;
 
 }
 
@@ -287,7 +283,7 @@ if ( ! a )  {
 
 }
 
-return ( a );
+return a;
 
 }
 
@@ -322,7 +318,7 @@ if ( ! PyDict_Check(a) )  {
 }
 
 
-return ( a );
+return a;
 
 }
 
@@ -360,7 +356,7 @@ if ( ! PyList_Check(a) )  {
 }
 
 
-return ( a );
+return a;
 
 }
 

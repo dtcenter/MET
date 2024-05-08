@@ -48,8 +48,6 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <cstdio>
 #include <iostream>
 #include <stdlib.h>
@@ -65,6 +63,8 @@ using namespace std;
 #include "stat_analysis_job.h"
 #include "parse_stat_line.h"
 #include "aggr_stat_line.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -158,7 +158,7 @@ void do_job(const ConcatString &jobstring, STATAnalysisJob &job,
             const ConcatString &tmp_path, ofstream *sa_out) {
    LineDataFile f;
    int n_in, n_out;
-   gsl_rng *rng_ptr = (gsl_rng *) 0;
+   gsl_rng *rng_ptr = (gsl_rng *) nullptr;
 
    //
    // Open up the temp file for reading the intermediate STAT line data
@@ -201,13 +201,13 @@ void do_job(const ConcatString &jobstring, STATAnalysisJob &job,
    // Print warning for by_column option
    //
    if(job.by_column.n() > 0              &&
-      job.job_type != stat_job_summary   &&
-      job.job_type != stat_job_aggr      &&
-      job.job_type != stat_job_aggr_stat &&
-      job.job_type != stat_job_ramp      &&
-      job.job_type != stat_job_go_index  &&
-      job.job_type != stat_job_cbs_index &&
-      job.job_type != stat_job_ss_index) {
+      job.job_type != STATJobType::summary   &&
+      job.job_type != STATJobType::aggr      &&
+      job.job_type != STATJobType::aggr_stat &&
+      job.job_type != STATJobType::ramp      &&
+      job.job_type != STATJobType::go_index  &&
+      job.job_type != STATJobType::cbs_index &&
+      job.job_type != STATJobType::ss_index) {
       mlog << Warning << "\nThe -by option is ignored for the \""
            << statjobtype_to_string(job.job_type) << "\" job type.\n\n";
    }
@@ -216,8 +216,8 @@ void do_job(const ConcatString &jobstring, STATAnalysisJob &job,
    // Set up the random number generator and seed value
    // for the summary and aggregate stat jobs.
    //
-   if(job.job_type == stat_job_summary ||
-      job.job_type == stat_job_aggr_stat) {
+   if(job.job_type == STATJobType::summary ||
+      job.job_type == STATJobType::aggr_stat) {
       rng_set(rng_ptr, job.boot_rng, job.boot_seed);
    }
 
@@ -226,29 +226,29 @@ void do_job(const ConcatString &jobstring, STATAnalysisJob &job,
    //
    switch(job.job_type) {
 
-      case(stat_job_filter):
+      case STATJobType::filter:
          do_job_filter(jobstring, f, job, n_in, n_out, sa_out);
          break;
 
-      case(stat_job_summary):
+      case STATJobType::summary:
          do_job_summary(jobstring, f, job, n_in, n_out, sa_out, rng_ptr);
          break;
 
-      case(stat_job_aggr):
+      case STATJobType::aggr:
          do_job_aggr(jobstring, f, job, n_in, n_out, sa_out);
          break;
 
-      case(stat_job_aggr_stat):
+      case STATJobType::aggr_stat:
          do_job_aggr_stat(jobstring, f, job, n_in, n_out, sa_out, tmp_dir, rng_ptr);
          break;
 
-      case(stat_job_go_index):
-      case(stat_job_cbs_index):
-      case(stat_job_ss_index):
+      case STATJobType::go_index:
+      case STATJobType::cbs_index:
+      case STATJobType::ss_index:
          do_job_ss_index(jobstring, f, job, n_in, n_out, sa_out);
          break;
 
-      case(stat_job_ramp):
+      case STATJobType::ramp:
          do_job_ramp(jobstring, f, job, n_in, n_out, sa_out);
          break;
 
@@ -444,16 +444,16 @@ void do_job_aggr(const ConcatString &jobstring, LineDataFile &f,
    //
    // Check that a valid line type has been selected
    //
-   if(lt != stat_fho    && lt != stat_ctc    &&
-      lt != stat_mctc   && lt != stat_sl1l2  &&
-      lt != stat_sal1l2 && lt != stat_vl1l2  &&
-      lt != stat_val1l2 && lt != stat_pct    &&
-      lt != stat_nbrctc && lt != stat_nbrcnt &&
-      lt != stat_grad   && lt != stat_ecnt   &&
-      lt != stat_rps    && lt != stat_rhist  &&
-      lt != stat_phist  && lt != stat_relp   &&
-      lt != stat_ssvar  && lt != stat_isc    &&
-      lt != stat_seeps) {
+   if(lt != STATLineType::fho    && lt != STATLineType::ctc    &&
+      lt != STATLineType::mctc   && lt != STATLineType::sl1l2  &&
+      lt != STATLineType::sal1l2 && lt != STATLineType::vl1l2  &&
+      lt != STATLineType::val1l2 && lt != STATLineType::pct    &&
+      lt != STATLineType::nbrctc && lt != STATLineType::nbrcnt &&
+      lt != STATLineType::grad   && lt != STATLineType::ecnt   &&
+      lt != STATLineType::rps    && lt != STATLineType::rhist  &&
+      lt != STATLineType::phist  && lt != STATLineType::relp   &&
+      lt != STATLineType::ssvar  && lt != STATLineType::isc    &&
+      lt != STATLineType::seeps) {
       mlog << Error << "\ndo_job_aggr() -> "
            << "the \"-line_type\" option must be set to one of:\n"
            << "\tFHO, CTC, MCTC,\n"
@@ -472,9 +472,9 @@ void do_job_aggr(const ConcatString &jobstring, LineDataFile &f,
    // Sum up the contingency table type lines:
    //    FHO, CTC, NBRCTC
    //
-   if(lt == stat_fho ||
-      lt == stat_ctc ||
-      lt == stat_nbrctc) {
+   if(lt == STATLineType::fho ||
+      lt == STATLineType::ctc ||
+      lt == STATLineType::nbrctc) {
       aggr_ctc_lines(f, job, ctc_map, n_in, n_out);
       write_job_aggr_ctc(job, lt, ctc_map, out_at);
    }
@@ -483,7 +483,7 @@ void do_job_aggr(const ConcatString &jobstring, LineDataFile &f,
    // Sum up the multi-category contingency table type lines:
    //    MCTC
    //
-   else if(lt == stat_mctc) {
+   else if(lt == STATLineType::mctc) {
       aggr_mctc_lines(f, job, mctc_map, n_in, n_out);
       write_job_aggr_mctc(job, lt, mctc_map, out_at);
    }
@@ -492,7 +492,7 @@ void do_job_aggr(const ConcatString &jobstring, LineDataFile &f,
    // Sum up the Nx2 contingency table lines:
    //    PCT
    //
-   else if(lt == stat_pct) {
+   else if(lt == STATLineType::pct) {
       aggr_pct_lines(f, job, pct_map, n_in, n_out);
       write_job_aggr_pct(job, lt, pct_map, out_at);
    }
@@ -501,11 +501,11 @@ void do_job_aggr(const ConcatString &jobstring, LineDataFile &f,
    // Sum the partial sum line types:
    //    SL1L2, SAL1L2, VL1L2, VAL1L2, NBRCNT
    //
-   else if(lt == stat_sl1l2  ||
-           lt == stat_sal1l2 ||
-           lt == stat_vl1l2  ||
-           lt == stat_val1l2 ||
-           lt == stat_nbrcnt) {
+   else if(lt == STATLineType::sl1l2  ||
+           lt == STATLineType::sal1l2 ||
+           lt == STATLineType::vl1l2  ||
+           lt == STATLineType::val1l2 ||
+           lt == STATLineType::nbrcnt) {
       aggr_psum_lines(f, job, psum_map, n_in, n_out);
       write_job_aggr_psum(job, lt, psum_map, out_at);
    }
@@ -514,7 +514,7 @@ void do_job_aggr(const ConcatString &jobstring, LineDataFile &f,
    // Sum the gradient line type:
    //    GRAD
    //
-   else if(lt == stat_grad) {
+   else if(lt == STATLineType::grad) {
       aggr_grad_lines(f, job, grad_map, n_in, n_out);
       write_job_aggr_grad(job, lt, grad_map, out_at);
    }
@@ -522,7 +522,7 @@ void do_job_aggr(const ConcatString &jobstring, LineDataFile &f,
    //
    // Sum the ISC line types
    //
-   else if(lt == stat_isc) {
+   else if(lt == STATLineType::isc) {
       aggr_isc_lines(f, job, isc_map, n_in, n_out);
       write_job_aggr_isc(job, lt, isc_map, out_at);
    }
@@ -530,7 +530,7 @@ void do_job_aggr(const ConcatString &jobstring, LineDataFile &f,
    //
    // Sum the ECNT line types
    //
-   else if(lt == stat_ecnt) {
+   else if(lt == STATLineType::ecnt) {
       aggr_ecnt_lines(f, job, ens_map, n_in, n_out);
       write_job_aggr_ecnt(job, lt, ens_map, out_at);
    }
@@ -538,7 +538,7 @@ void do_job_aggr(const ConcatString &jobstring, LineDataFile &f,
    //
    // Sum the RPS line types
    //
-   else if(lt == stat_rps) {
+   else if(lt == STATLineType::rps) {
       aggr_rps_lines(f, job, rps_map, n_in, n_out);
       write_job_aggr_rps(job, lt, rps_map, out_at);
    }
@@ -546,7 +546,7 @@ void do_job_aggr(const ConcatString &jobstring, LineDataFile &f,
    //
    // Sum the RHIST line types
    //
-   else if(lt == stat_rhist) {
+   else if(lt == STATLineType::rhist) {
       aggr_rhist_lines(f, job, ens_map, n_in, n_out);
       write_job_aggr_rhist(job, lt, ens_map, out_at);
    }
@@ -554,7 +554,7 @@ void do_job_aggr(const ConcatString &jobstring, LineDataFile &f,
    //
    // Sum the PHIST line types
    //
-   else if(lt == stat_phist) {
+   else if(lt == STATLineType::phist) {
       aggr_phist_lines(f, job, ens_map, n_in, n_out);
       write_job_aggr_phist(job, lt, ens_map, out_at);
    }
@@ -562,7 +562,7 @@ void do_job_aggr(const ConcatString &jobstring, LineDataFile &f,
    //
    // Sum the RELP line types
    //
-   else if(lt == stat_relp) {
+   else if(lt == STATLineType::relp) {
       aggr_relp_lines(f, job, ens_map, n_in, n_out);
       write_job_aggr_relp(job, lt, ens_map, out_at);
    }
@@ -570,7 +570,7 @@ void do_job_aggr(const ConcatString &jobstring, LineDataFile &f,
    //
    // Sum the SSVAR line types
    //
-   else if(lt == stat_ssvar) {
+   else if(lt == STATLineType::ssvar) {
       aggr_ssvar_lines(f, job, ssvar_map, n_in, n_out);
       write_job_aggr_ssvar(job, lt, ssvar_map, out_at);
    }
@@ -578,7 +578,7 @@ void do_job_aggr(const ConcatString &jobstring, LineDataFile &f,
    //
    // Sum the SEEPS line types
    //
-   else if(lt == stat_seeps) {
+   else if(lt == STATLineType::seeps) {
       aggr_seeps_lines(f, job, seeps_map, n_in, n_out);
       write_job_aggr_seeps(job, lt, seeps_map, out_at);
    }
@@ -679,12 +679,12 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
    //    FHO, CTC -> CTS, ECLV
    //    NBRCTC -> NBRCTS
    //
-   if(((in_lt == stat_fho ||
-        in_lt == stat_ctc) &&
-       (has_line_type(out_lt, stat_cts) ||
-        has_line_type(out_lt, stat_eclv))) ||
-      (in_lt == stat_nbrctc &&
-       has_line_type(out_lt, stat_nbrcts))) {
+   if(((in_lt == STATLineType::fho ||
+        in_lt == STATLineType::ctc) &&
+       (has_line_type(out_lt, STATLineType::cts) ||
+        has_line_type(out_lt, STATLineType::eclv))) ||
+      (in_lt == STATLineType::nbrctc &&
+       has_line_type(out_lt, STATLineType::nbrcts))) {
       aggr_ctc_lines(f, job, ctc_map, n_in, n_out);
       for(it=out_lt.begin(); it!=out_lt.end(); it++) {
          write_job_aggr_ctc(job, *it, ctc_map, out_at);
@@ -696,8 +696,8 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
    // Sum up the multi-category contingency table type lines:
    //    MCTC -> MCTS
    //
-   else if(in_lt  == stat_mctc &&
-           has_line_type(out_lt, stat_mcts)) {
+   else if(in_lt  == STATLineType::mctc &&
+           has_line_type(out_lt, STATLineType::mcts)) {
       aggr_mctc_lines(f, job, mctc_map, n_in, n_out);
       for(it=out_lt.begin(); it!=out_lt.end(); it++) {
          write_job_aggr_mctc(job, *it, mctc_map, out_at);
@@ -709,11 +709,11 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
    // Sum up the Nx2 contingency table lines:
    //    PCT -> PSTD, PJC, PRC, ECLV
    //
-   else if(in_lt == stat_pct &&
-           (has_line_type(out_lt, stat_pstd) ||
-            has_line_type(out_lt, stat_pjc)  ||
-            has_line_type(out_lt, stat_prc)  ||
-            has_line_type(out_lt, stat_eclv))) {
+   else if(in_lt == STATLineType::pct &&
+           (has_line_type(out_lt, STATLineType::pstd) ||
+            has_line_type(out_lt, STATLineType::pjc)  ||
+            has_line_type(out_lt, STATLineType::prc)  ||
+            has_line_type(out_lt, STATLineType::eclv))) {
       aggr_pct_lines(f, job, pct_map, n_in, n_out);
       for(it=out_lt.begin(); it!=out_lt.end(); it++) {
          write_job_aggr_pct(job, *it, pct_map, out_at);
@@ -726,9 +726,9 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
    //    SL1L2, SAL1L2 -> CNT
    //    NBRCTC -> NBRCNT
    //
-   else if((in_lt == stat_sl1l2 ||
-            in_lt == stat_sal1l2) &&
-            has_line_type(out_lt, stat_cnt)) {
+   else if((in_lt == STATLineType::sl1l2 ||
+            in_lt == STATLineType::sal1l2) &&
+            has_line_type(out_lt, STATLineType::cnt)) {
       aggr_psum_lines(f, job, psum_map, n_in, n_out);
       for(it=out_lt.begin(); it!=out_lt.end(); it++) {
          write_job_aggr_psum(job, *it, psum_map, out_at);
@@ -740,9 +740,9 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
    // Sum the vector partial sum line types:
    //    VL1L2, VAL1L2 -> VCNT
    //
-   else if((in_lt == stat_vl1l2 ||
-            in_lt == stat_val1l2) &&
-            has_line_type(out_lt, stat_vcnt)) {
+   else if((in_lt == STATLineType::vl1l2 ||
+            in_lt == STATLineType::val1l2) &&
+            has_line_type(out_lt, STATLineType::vcnt)) {
       aggr_psum_lines(f, job, psum_map, n_in, n_out);
       for(it=out_lt.begin(); it!=out_lt.end(); it++) {
          write_job_aggr_psum(job, *it, psum_map, out_at);
@@ -754,9 +754,9 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
    // Sum the vector partial sum line types:
    //    VL1L2, VAL1L2 -> WDIR
    //
-   else if((in_lt == stat_vl1l2 ||
-            in_lt == stat_val1l2) &&
-            has_line_type(out_lt, stat_wdir)) {
+   else if((in_lt == STATLineType::vl1l2 ||
+            in_lt == STATLineType::val1l2) &&
+            has_line_type(out_lt, STATLineType::wdir)) {
       aggr_wind_lines(f, job, wind_map, n_in, n_out);
       write_job_aggr_wind(job, in_lt, wind_map, out_at);
       if(!job.stat_out) write_table(out_at, sa_out);
@@ -766,10 +766,10 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
    // Sum the UGRD and VGRD matched pair lines:
    //    MPR -> WDIR
    //
-   else if(in_lt == stat_mpr &&
-           (has_line_type(out_lt, stat_wdir) ||
-            has_line_type(out_lt, stat_vl1l2) ||
-            has_line_type(out_lt, stat_vcnt))) {
+   else if(in_lt == STATLineType::mpr &&
+           (has_line_type(out_lt, STATLineType::wdir) ||
+            has_line_type(out_lt, STATLineType::vl1l2) ||
+            has_line_type(out_lt, STATLineType::vcnt))) {
 
       mlog << Debug(4) << "do_job_aggr_stat() -> "
            << "For MPR wind aggregation, searching for UGRD and VGRD MPR lines.\n";
@@ -780,7 +780,7 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
 
       aggr_mpr_wind_lines(f, job, wind_map, n_in, n_out);
       for(it=out_lt.begin(); it!=out_lt.end(); it++) {
-         if(*it == stat_wdir) {
+         if(*it == STATLineType::wdir) {
             write_job_aggr_wind(job, in_lt, wind_map, out_at);
             if(!job.stat_out) write_table(out_at, sa_out);
          }
@@ -795,18 +795,18 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
    // Sum the observation rank line types:
    //    ORANK -> ECNT, RPS, RHIST, PHIST, RELP, SSVAR
    //
-   else if(in_lt == stat_orank &&
-           (has_line_type(out_lt, stat_ecnt)  ||
-            has_line_type(out_lt, stat_rps)   ||
-            has_line_type(out_lt, stat_rhist) ||
-            has_line_type(out_lt, stat_phist) ||
-            has_line_type(out_lt, stat_relp)  ||
-            has_line_type(out_lt, stat_ssvar))) {
+   else if(in_lt == STATLineType::orank &&
+           (has_line_type(out_lt, STATLineType::ecnt)  ||
+            has_line_type(out_lt, STATLineType::rps)   ||
+            has_line_type(out_lt, STATLineType::rhist) ||
+            has_line_type(out_lt, STATLineType::phist) ||
+            has_line_type(out_lt, STATLineType::relp)  ||
+            has_line_type(out_lt, STATLineType::ssvar))) {
 
       //
       // Check forecast thresholds for RPS
       //
-      if(has_line_type(out_lt, stat_rps)) {
+      if(has_line_type(out_lt, STATLineType::rps)) {
 
          if(job.out_fcst_thresh.n() == 0) {
             mlog << Error << "\ndo_job_aggr_stat() -> "
@@ -828,8 +828,8 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
    // Sum the SEEPS_MPR lines:
    //    SEEPS_MPR -> SEEPS
    //
-   else if(in_lt == stat_seeps_mpr &&
-           has_line_type(out_lt, stat_seeps)) {
+   else if(in_lt == STATLineType::seeps_mpr &&
+           has_line_type(out_lt, STATLineType::seeps)) {
 
       aggr_seeps_mpr_lines(f, job, seeps_mpr_map, n_in, n_out);
       for(it=out_lt.begin(); it!=out_lt.end(); it++) {
@@ -844,27 +844,27 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
    //    MPR -> FHO, CTC, CTS, MCTC, MCTS, CNT,
    //           SL1L2, SAL1L2, PCT, PSTD, PJC, PRC, ECLV
    //
-   else if(in_lt == stat_mpr &&
-           (has_line_type(out_lt, stat_fho)    ||
-            has_line_type(out_lt, stat_ctc)    ||
-            has_line_type(out_lt, stat_cts)    ||
-            has_line_type(out_lt, stat_mctc)   ||
-            has_line_type(out_lt, stat_mcts)   ||
-            has_line_type(out_lt, stat_cnt)    ||
-            has_line_type(out_lt, stat_sl1l2)  ||
-            has_line_type(out_lt, stat_sal1l2) ||
-            has_line_type(out_lt, stat_pct)    ||
-            has_line_type(out_lt, stat_pstd)   ||
-            has_line_type(out_lt, stat_pjc)    ||
-            has_line_type(out_lt, stat_prc)    ||
-            has_line_type(out_lt, stat_eclv))) {
+   else if(in_lt == STATLineType::mpr &&
+           (has_line_type(out_lt, STATLineType::fho)    ||
+            has_line_type(out_lt, STATLineType::ctc)    ||
+            has_line_type(out_lt, STATLineType::cts)    ||
+            has_line_type(out_lt, STATLineType::mctc)   ||
+            has_line_type(out_lt, STATLineType::mcts)   ||
+            has_line_type(out_lt, STATLineType::cnt)    ||
+            has_line_type(out_lt, STATLineType::sl1l2)  ||
+            has_line_type(out_lt, STATLineType::sal1l2) ||
+            has_line_type(out_lt, STATLineType::pct)    ||
+            has_line_type(out_lt, STATLineType::pstd)   ||
+            has_line_type(out_lt, STATLineType::pjc)    ||
+            has_line_type(out_lt, STATLineType::prc)    ||
+            has_line_type(out_lt, STATLineType::eclv))) {
 
       //
       // Check output thresholds for continuous line types
       //
-      if(has_line_type(out_lt, stat_cnt)   ||
-         has_line_type(out_lt, stat_sl1l2) ||
-         has_line_type(out_lt, stat_sal1l2)) {
+      if(has_line_type(out_lt, STATLineType::cnt)   ||
+         has_line_type(out_lt, STATLineType::sl1l2) ||
+         has_line_type(out_lt, STATLineType::sal1l2)) {
 
          if(job.out_fcst_thresh.n() != job.out_obs_thresh.n()) {
             mlog << Error << "\ndo_job_aggr_stat() -> "
@@ -885,10 +885,10 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
       //
       // Check output threshold values for 2x2 contingency table
       //
-      if(has_line_type(out_lt, stat_fho) ||
-         has_line_type(out_lt, stat_ctc) ||
-         has_line_type(out_lt, stat_cts) ||
-         has_line_type(out_lt, stat_eclv)) {
+      if(has_line_type(out_lt, STATLineType::fho) ||
+         has_line_type(out_lt, STATLineType::ctc) ||
+         has_line_type(out_lt, STATLineType::cts) ||
+         has_line_type(out_lt, STATLineType::eclv)) {
 
          if(job.out_fcst_thresh.n() == 0 ||
             job.out_obs_thresh.n()  == 0 ||
@@ -906,8 +906,8 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
       //
       // Check output threshold values for NxN contingency table
       //
-      if(has_line_type(out_lt, stat_mctc) ||
-         has_line_type(out_lt, stat_mcts)) {
+      if(has_line_type(out_lt, STATLineType::mctc) ||
+         has_line_type(out_lt, STATLineType::mcts)) {
 
          if(job.out_fcst_thresh.n() <= 1 ||
             job.out_fcst_thresh.n() != job.out_obs_thresh.n()) {
@@ -943,10 +943,10 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
       //
       // Check for output threshold values
       //
-      if(has_line_type(out_lt, stat_pct)  ||
-         has_line_type(out_lt, stat_pstd) ||
-         has_line_type(out_lt, stat_pjc)  ||
-         has_line_type(out_lt, stat_prc)) {
+      if(has_line_type(out_lt, STATLineType::pct)  ||
+         has_line_type(out_lt, STATLineType::pstd) ||
+         has_line_type(out_lt, STATLineType::pjc)  ||
+         has_line_type(out_lt, STATLineType::prc)) {
 
          if(job.out_obs_thresh.n() != 1) {
             mlog << Error << "\ndo_job_aggr_stat() -> "
@@ -1130,7 +1130,7 @@ void write_job_summary(STATAnalysisJob &job,
          //
          // Compute a bootstrap confidence interval for the mean.
          //
-         if(job.boot_interval == boot_bca_flag) {
+         if(job.boot_interval == BootIntervalType::BCA) {
             compute_mean_stdev_ci_bca(rng_ptr, val_it->second,
                                       job.n_boot_rep,
                                       job.out_alpha, mean_ci, stdev_ci);
@@ -1255,24 +1255,24 @@ void write_job_aggr_ctc(STATAnalysisJob &job, STATLineType lt,
    //
    n_row = 1 + m.size();
    n_col = 1 + job.by_column.n();
-        if(lt == stat_fho)    n_col += n_fho_columns;
-   else if(lt == stat_ctc)    n_col += n_ctc_columns;
-   else if(lt == stat_cts)    n_col += n_cts_columns;
-   else if(lt == stat_eclv)   n_col += get_n_eclv_columns(n_pnt);
-   else if(lt == stat_nbrctc) n_col += n_nbrctc_columns;
-   else if(lt == stat_nbrcts) n_col += n_nbrcts_columns;
+        if(lt == STATLineType::fho)    n_col += n_fho_columns;
+   else if(lt == STATLineType::ctc)    n_col += n_ctc_columns;
+   else if(lt == STATLineType::cts)    n_col += n_cts_columns;
+   else if(lt == STATLineType::eclv)   n_col += get_n_eclv_columns(n_pnt);
+   else if(lt == STATLineType::nbrctc) n_col += n_nbrctc_columns;
+   else if(lt == STATLineType::nbrcts) n_col += n_nbrcts_columns;
    write_job_aggr_hdr(job, n_row, n_col, at);
 
    //
    // Write the output header row
    //
    c = 1 + job.by_column.n();
-        if(lt == stat_fho)    write_header_row(fho_columns,    n_fho_columns,    0, at, 0, c);
-   else if(lt == stat_ctc)    write_header_row(ctc_columns,    n_ctc_columns,    0, at, 0, c);
-   else if(lt == stat_cts)    write_header_row(cts_columns,    n_cts_columns,    0, at, 0, c);
-   else if(lt == stat_eclv)   write_eclv_header_row(        0, n_pnt,               at, 0, c);
-   else if(lt == stat_nbrctc) write_header_row(nbrctc_columns, n_nbrctc_columns, 0, at, 0, c);
-   else if(lt == stat_nbrcts) write_header_row(nbrcts_columns, n_nbrcts_columns, 0, at, 0, c);
+        if(lt == STATLineType::fho)    write_header_row(fho_columns,    n_fho_columns,    0, at, 0, c);
+   else if(lt == STATLineType::ctc)    write_header_row(ctc_columns,    n_ctc_columns,    0, at, 0, c);
+   else if(lt == STATLineType::cts)    write_header_row(cts_columns,    n_cts_columns,    0, at, 0, c);
+   else if(lt == STATLineType::eclv)   write_eclv_header_row(        0, n_pnt,               at, 0, c);
+   else if(lt == STATLineType::nbrctc) write_header_row(nbrctc_columns, n_nbrctc_columns, 0, at, 0, c);
+   else if(lt == STATLineType::nbrcts) write_header_row(nbrcts_columns, n_nbrcts_columns, 0, at, 0, c);
 
    //
    // Setup the output STAT file
@@ -1293,7 +1293,7 @@ void write_job_aggr_ctc(STATAnalysisJob &job, STATLineType lt,
       shc = it->second.hdr.get_shc(it->first, job.by_column,
                                    job.hdr_name, job.hdr_value, lt);
       if(job.stat_out) {
-         if(lt == stat_cts || lt == stat_nbrcts) shc.set_alpha(job.out_alpha);
+         if(lt == STATLineType::cts || lt == STATLineType::nbrcts) shc.set_alpha(job.out_alpha);
          write_header_cols(shc, job.stat_at, job.stat_row);
       }
 
@@ -1305,7 +1305,7 @@ void write_job_aggr_ctc(STATAnalysisJob &job, STATLineType lt,
       //
       // FHO output line
       //
-      if(lt == stat_fho) {
+      if(lt == STATLineType::fho) {
          if(job.stat_out) {
             write_fho_cols(it->second.cts_info, job.stat_at,
                            job.stat_row++, n_header_columns);
@@ -1319,7 +1319,7 @@ void write_job_aggr_ctc(STATAnalysisJob &job, STATLineType lt,
       //
       // CTC output line
       //
-      else if(lt == stat_ctc) {
+      else if(lt == STATLineType::ctc) {
          if(job.stat_out) {
             write_ctc_cols(it->second.cts_info, job.stat_at,
                            job.stat_row++, n_header_columns);
@@ -1333,7 +1333,7 @@ void write_job_aggr_ctc(STATAnalysisJob &job, STATLineType lt,
       //
       // CTS output line
       //
-      else if(lt == stat_cts) {
+      else if(lt == STATLineType::cts) {
 
          //
          // Store the alpha information in the CTSInfo object
@@ -1364,7 +1364,7 @@ void write_job_aggr_ctc(STATAnalysisJob &job, STATLineType lt,
       //
       // ECLV output line
       //
-      else if(lt == stat_eclv) {
+      else if(lt == STATLineType::eclv) {
          if(job.stat_out) {
             write_eclv_cols(it->second.cts_info.cts,
                             job.out_eclv_points, job.stat_at,
@@ -1379,7 +1379,7 @@ void write_job_aggr_ctc(STATAnalysisJob &job, STATLineType lt,
       //
       // NBRCTC output line
       //
-      else if(lt == stat_nbrctc) {
+      else if(lt == STATLineType::nbrctc) {
 
          nbrcts_info.clear();
          nbrcts_info.cts_info = it->second.cts_info;
@@ -1397,7 +1397,7 @@ void write_job_aggr_ctc(STATAnalysisJob &job, STATLineType lt,
       //
       // NBRCTS output line
       //
-      else if(lt == stat_nbrcts) {
+      else if(lt == STATLineType::nbrcts) {
 
          nbrcts_info.clear();
          nbrcts_info.cts_info = it->second.cts_info;
@@ -1463,16 +1463,16 @@ void write_job_aggr_mctc(STATAnalysisJob &job, STATLineType lt,
    //
    n_row = 1 + m.size();
    n_col = 1 + job.by_column.n();
-        if(lt == stat_mctc) n_col += get_n_mctc_columns(n);
-   else if(lt == stat_mcts) n_col += n_mcts_columns;
+        if(lt == STATLineType::mctc) n_col += get_n_mctc_columns(n);
+   else if(lt == STATLineType::mcts) n_col += n_mcts_columns;
    write_job_aggr_hdr(job, n_row, n_col, at);
 
    //
    // Write the rest of the header row
    //
    c = 1 + job.by_column.n();
-        if(lt == stat_mctc) write_mctc_header_row(0, n, at, 0, c);
-   else if(lt == stat_mcts) write_header_row(mcts_columns, n_mcts_columns, 0, at, 0, c);
+        if(lt == STATLineType::mctc) write_mctc_header_row(0, n, at, 0, c);
+   else if(lt == STATLineType::mcts) write_header_row(mcts_columns, n_mcts_columns, 0, at, 0, c);
 
    //
    // Setup the output STAT file
@@ -1493,7 +1493,7 @@ void write_job_aggr_mctc(STATAnalysisJob &job, STATLineType lt,
       shc = it->second.hdr.get_shc(it->first, job.by_column,
                                    job.hdr_name, job.hdr_value, lt);
       if(job.stat_out) {
-         if(lt == stat_mcts) shc.set_alpha(job.out_alpha);
+         if(lt == STATLineType::mcts) shc.set_alpha(job.out_alpha);
          write_header_cols(shc, job.stat_at, job.stat_row);
       }
 
@@ -1505,7 +1505,7 @@ void write_job_aggr_mctc(STATAnalysisJob &job, STATLineType lt,
       //
       // MCTC output line
       //
-      if(lt == stat_mctc) {
+      if(lt == STATLineType::mctc) {
          if(job.stat_out) {
             write_mctc_cols(it->second.mcts_info, job.stat_at,
                             job.stat_row++, n_header_columns);
@@ -1519,7 +1519,7 @@ void write_job_aggr_mctc(STATAnalysisJob &job, STATLineType lt,
       //
       // MCTS output line
       //
-      else if(lt == stat_mcts) {
+      else if(lt == STATLineType::mcts) {
 
          //
          // Store the alpha information in the CTSInfo object
@@ -1582,31 +1582,31 @@ void write_job_aggr_pct(STATAnalysisJob &job, STATLineType lt,
    //
    // Setup the output table
    //
-   if(lt == stat_eclv) n_row = 1 + m.size() * n;
-   else                n_row = 1 + m.size();
+   if(lt == STATLineType::eclv) n_row = 1 + m.size() * n;
+   else                         n_row = 1 + m.size();
    n_col = 1 + job.by_column.n();
-        if(lt == stat_pct)  n_col += get_n_pct_columns(n);
-   else if(lt == stat_pstd) n_col += get_n_pstd_columns(n);
-   else if(lt == stat_pjc)  n_col += get_n_pjc_columns(n);
-   else if(lt == stat_prc)  n_col += get_n_prc_columns(n);
-   else if(lt == stat_eclv) n_col += get_n_eclv_columns(n_pnt);
+        if(lt == STATLineType::pct)  n_col += get_n_pct_columns(n);
+   else if(lt == STATLineType::pstd) n_col += get_n_pstd_columns(n);
+   else if(lt == STATLineType::pjc)  n_col += get_n_pjc_columns(n);
+   else if(lt == STATLineType::prc)  n_col += get_n_prc_columns(n);
+   else if(lt == STATLineType::eclv) n_col += get_n_eclv_columns(n_pnt);
    write_job_aggr_hdr(job, n_row, n_col, at);
 
    //
    // Write the rest of the header row
    //
    c = 1 + job.by_column.n();
-        if(lt == stat_pct)  write_pct_header_row (0, n, at, 0, c);
-   else if(lt == stat_pstd) write_pstd_header_row(0, n, at, 0, c);
-   else if(lt == stat_pjc)  write_pjc_header_row (0, n, at, 0, c);
-   else if(lt == stat_prc)  write_prc_header_row (0, n, at, 0, c);
-   else if(lt == stat_eclv) write_eclv_header_row(0, n_pnt, at, 0, c);
+        if(lt == STATLineType::pct)  write_pct_header_row (0, n, at, 0, c);
+   else if(lt == STATLineType::pstd) write_pstd_header_row(0, n, at, 0, c);
+   else if(lt == STATLineType::pjc)  write_pjc_header_row (0, n, at, 0, c);
+   else if(lt == STATLineType::prc)  write_prc_header_row (0, n, at, 0, c);
+   else if(lt == STATLineType::eclv) write_eclv_header_row(0, n_pnt, at, 0, c);
 
    //
    // Setup the output STAT file
    //
-   if(lt == stat_eclv) job.setup_stat_file(n_row, n_pnt);
-   else                job.setup_stat_file(n_row, n);
+   if(lt == STATLineType::eclv) job.setup_stat_file(n_row, n_pnt);
+   else                         job.setup_stat_file(n_row, n);
 
    mlog << Debug(2) << "Computing output for "
         << (int) m.size() << " case(s).\n";
@@ -1622,7 +1622,7 @@ void write_job_aggr_pct(STATAnalysisJob &job, STATLineType lt,
       shc = it->second.hdr.get_shc(it->first, job.by_column,
                                    job.hdr_name, job.hdr_value, lt);
       if(job.stat_out) {
-         if(lt == stat_pstd) shc.set_alpha(job.out_alpha);
+         if(lt == STATLineType::pstd) shc.set_alpha(job.out_alpha);
          write_header_cols(shc, job.stat_at, job.stat_row);
       }
 
@@ -1634,7 +1634,7 @@ void write_job_aggr_pct(STATAnalysisJob &job, STATLineType lt,
       //
       // PCT output line
       //
-      if(lt == stat_pct) {
+      if(lt == STATLineType::pct) {
          if(job.stat_out) {
             write_pct_cols(it->second.pct_info, job.stat_at,
                            job.stat_row++, n_header_columns);
@@ -1648,7 +1648,7 @@ void write_job_aggr_pct(STATAnalysisJob &job, STATLineType lt,
       //
       // PSTD output line
       //
-      else if(lt == stat_pstd) {
+      else if(lt == STATLineType::pstd) {
 
          //
          // Store the alpha information in the PCTInfo object
@@ -1679,7 +1679,7 @@ void write_job_aggr_pct(STATAnalysisJob &job, STATLineType lt,
       //
       // PJC output line
       //
-      else if(lt == stat_pjc) {
+      else if(lt == STATLineType::pjc) {
          if(job.stat_out) {
             write_pjc_cols(it->second.pct_info, job.stat_at,
                            job.stat_row++, n_header_columns);
@@ -1693,7 +1693,7 @@ void write_job_aggr_pct(STATAnalysisJob &job, STATLineType lt,
       //
       // PRC output line
       //
-      else if(lt == stat_prc) {
+      else if(lt == STATLineType::prc) {
          if(job.stat_out) {
             write_prc_cols(it->second.pct_info, job.stat_at,
                            job.stat_row++, n_header_columns);
@@ -1707,7 +1707,7 @@ void write_job_aggr_pct(STATAnalysisJob &job, STATLineType lt,
       //
       // ECLV output lines
       //
-      else if(lt == stat_eclv) {
+      else if(lt == STATLineType::eclv) {
          ThreshArray prob_ta = string_to_prob_thresh(shc.get_fcst_thresh_str().c_str());
          for(i=0; i<it->second.pct_info.pct.nrows(); i++) {
             if(job.stat_out) {
@@ -1753,26 +1753,26 @@ void write_job_aggr_psum(STATAnalysisJob &job, STATLineType lt,
    //
    n_row = 1 + m.size();
    n_col = 1 + job.by_column.n();
-        if(lt == stat_sl1l2)  n_col += n_sl1l2_columns;
-   else if(lt == stat_sal1l2) n_col += n_sal1l2_columns;
-   else if(lt == stat_vl1l2)  n_col += n_vl1l2_columns;
-   else if(lt == stat_val1l2) n_col += n_val1l2_columns;
-   else if(lt == stat_cnt)    n_col += n_cnt_columns;
-   else if(lt == stat_vcnt)   n_col += n_vcnt_columns;
-   else if(lt == stat_nbrcnt) n_col += n_nbrcnt_columns;
+        if(lt == STATLineType::sl1l2)  n_col += n_sl1l2_columns;
+   else if(lt == STATLineType::sal1l2) n_col += n_sal1l2_columns;
+   else if(lt == STATLineType::vl1l2)  n_col += n_vl1l2_columns;
+   else if(lt == STATLineType::val1l2) n_col += n_val1l2_columns;
+   else if(lt == STATLineType::cnt)    n_col += n_cnt_columns;
+   else if(lt == STATLineType::vcnt)   n_col += n_vcnt_columns;
+   else if(lt == STATLineType::nbrcnt) n_col += n_nbrcnt_columns;
    write_job_aggr_hdr(job, n_row, n_col, at);
 
    //
    // Write the rest of the header row
    //
    c = 1 + job.by_column.n();
-        if(lt == stat_sl1l2)  write_header_row(sl1l2_columns,  n_sl1l2_columns,  0, at, 0, c);
-   else if(lt == stat_sal1l2) write_header_row(sal1l2_columns, n_sal1l2_columns, 0, at, 0, c);
-   else if(lt == stat_vl1l2)  write_header_row(vl1l2_columns,  n_vl1l2_columns,  0, at, 0, c);
-   else if(lt == stat_val1l2) write_header_row(val1l2_columns, n_val1l2_columns, 0, at, 0, c);
-   else if(lt == stat_cnt)    write_header_row(cnt_columns,    n_cnt_columns,    0, at, 0, c);
-   else if(lt == stat_vcnt)   write_header_row(vcnt_columns,   n_vcnt_columns,   0, at, 0, c);
-   else if(lt == stat_nbrcnt) write_header_row(nbrcnt_columns, n_nbrcnt_columns, 0, at, 0, c);
+        if(lt == STATLineType::sl1l2)  write_header_row(sl1l2_columns,  n_sl1l2_columns,  0, at, 0, c);
+   else if(lt == STATLineType::sal1l2) write_header_row(sal1l2_columns, n_sal1l2_columns, 0, at, 0, c);
+   else if(lt == STATLineType::vl1l2)  write_header_row(vl1l2_columns,  n_vl1l2_columns,  0, at, 0, c);
+   else if(lt == STATLineType::val1l2) write_header_row(val1l2_columns, n_val1l2_columns, 0, at, 0, c);
+   else if(lt == STATLineType::cnt)    write_header_row(cnt_columns,    n_cnt_columns,    0, at, 0, c);
+   else if(lt == STATLineType::vcnt)   write_header_row(vcnt_columns,   n_vcnt_columns,   0, at, 0, c);
+   else if(lt == STATLineType::nbrcnt) write_header_row(nbrcnt_columns, n_nbrcnt_columns, 0, at, 0, c);
 
    //
    // Setup the output STAT file
@@ -1793,7 +1793,7 @@ void write_job_aggr_psum(STATAnalysisJob &job, STATLineType lt,
       shc = it->second.hdr.get_shc(it->first, job.by_column,
                                    job.hdr_name, job.hdr_value, lt);
       if(job.stat_out) {
-         if(lt == stat_cnt || lt == stat_vcnt || lt == stat_nbrcnt) {
+         if(lt == STATLineType::cnt || lt == STATLineType::vcnt || lt == STATLineType::nbrcnt) {
             shc.set_alpha(job.out_alpha);
          }
          write_header_cols(shc, job.stat_at, job.stat_row);
@@ -1807,7 +1807,7 @@ void write_job_aggr_psum(STATAnalysisJob &job, STATLineType lt,
       //
       // SL1L2 output line
       //
-      if(lt == stat_sl1l2) {
+      if(lt == STATLineType::sl1l2) {
          if(job.stat_out) {
             write_sl1l2_cols(it->second.sl1l2_info, job.stat_at,
                              job.stat_row++, n_header_columns);
@@ -1821,7 +1821,7 @@ void write_job_aggr_psum(STATAnalysisJob &job, STATLineType lt,
       //
       // SAL1L2 output line
       //
-      else if(lt == stat_sal1l2) {
+      else if(lt == STATLineType::sal1l2) {
          if(job.stat_out) {
             write_sal1l2_cols(it->second.sl1l2_info, job.stat_at,
                               job.stat_row++, n_header_columns);
@@ -1835,7 +1835,7 @@ void write_job_aggr_psum(STATAnalysisJob &job, STATLineType lt,
       //
       // VL1L2 output line
       //
-      else if(lt == stat_vl1l2) {
+      else if(lt == STATLineType::vl1l2) {
          if(job.stat_out) {
             write_vl1l2_cols(it->second.vl1l2_info, job.stat_at,
                              job.stat_row++, n_header_columns);
@@ -1849,7 +1849,7 @@ void write_job_aggr_psum(STATAnalysisJob &job, STATLineType lt,
       //
       // VAL1L2 output line
       //
-      else if(lt == stat_val1l2) {
+      else if(lt == STATLineType::val1l2) {
          if(job.stat_out) {
             write_val1l2_cols(it->second.vl1l2_info, job.stat_at,
                               job.stat_row++, n_header_columns);
@@ -1863,7 +1863,7 @@ void write_job_aggr_psum(STATAnalysisJob &job, STATLineType lt,
       //
       // CNT output line
       //
-      else if(lt == stat_cnt) {
+      else if(lt == STATLineType::cnt) {
 
          it->second.cnt_info.clear();
 
@@ -1894,7 +1894,7 @@ void write_job_aggr_psum(STATAnalysisJob &job, STATLineType lt,
       //
       // VCNT output line
       //
-      else if(lt == stat_vcnt) {
+      else if(lt == STATLineType::vcnt) {
          if(job.stat_out) {
             write_vcnt_cols(it->second.vl1l2_info, 0, job.stat_at,
                             job.stat_row++, n_header_columns);
@@ -1908,7 +1908,7 @@ void write_job_aggr_psum(STATAnalysisJob &job, STATLineType lt,
       //
       // NBRCNT output line
       //
-      else if(lt == stat_nbrcnt) {
+      else if(lt == STATLineType::nbrcnt) {
 
          //
          // Allocate space for confidence intervals
@@ -2126,14 +2126,14 @@ void write_job_aggr_wind(STATAnalysisJob &job, STATLineType lt,
       //
       r++;
 
-      if(lt == stat_vl1l2 || lt == stat_mpr) {
+      if(lt == STATLineType::vl1l2 || lt == STATLineType::mpr) {
          uf    = it->second.vl1l2_info.uf_bar;
          vf    = it->second.vl1l2_info.vf_bar;
          uo    = it->second.vl1l2_info.uo_bar;
          vo    = it->second.vl1l2_info.vo_bar;
          count = it->second.vl1l2_info.vcount;
       }
-      else if(lt == stat_val1l2) {
+      else if(lt == STATLineType::val1l2) {
          uf    = it->second.vl1l2_info.ufa_bar;
          vf    = it->second.vl1l2_info.vfa_bar;
          uo    = it->second.vl1l2_info.uoa_bar;
@@ -2859,10 +2859,10 @@ void write_job_aggr_orank(STATAnalysisJob &job, STATLineType lt,
    // - Ensemble members for RELP
    //
    for(it = m.begin(), n = 0; it != m.end(); it++) {
-           if(lt == stat_rhist) n  = max(it->second.ens_pd.rhist_na.n(), n);
-      else if(lt == stat_phist) n  = max(it->second.ens_pd.phist_na.n(), n);
-      else if(lt == stat_relp)  n  = max(it->second.ens_pd.n_ens, n);
-      else if(lt == stat_ssvar) {
+           if(lt == STATLineType::rhist) n  = max(it->second.ens_pd.rhist_na.n(), n);
+      else if(lt == STATLineType::phist) n  = max(it->second.ens_pd.phist_na.n(), n);
+      else if(lt == STATLineType::relp)  n  = max(it->second.ens_pd.n_ens, n);
+      else if(lt == STATLineType::ssvar) {
          it->second.ens_pd.compute_ssvar();
          if(it->second.ens_pd.ssvar_bins) n += it->second.ens_pd.ssvar_bins[0].n_bin;
       }
@@ -2873,27 +2873,27 @@ void write_job_aggr_orank(STATAnalysisJob &job, STATLineType lt,
    //
    n_row = 0;
    n_col = 1 + job.by_column.n();
-   if(lt == stat_ecnt) {
+   if(lt == STATLineType::ecnt) {
       n_row  = 1 + m.size();
       n_col += n_ecnt_columns;
    }
-   if(lt == stat_rps) {
+   if(lt == STATLineType::rps) {
       n_row  = 1 + m.size();
       n_col += n_rps_columns;
    }
-   else if(lt == stat_rhist) {
+   else if(lt == STATLineType::rhist) {
       n_row  = 1 + m.size();
       n_col += get_n_rhist_columns(n);
    }
-   else if(lt == stat_phist) {
+   else if(lt == STATLineType::phist) {
       n_row  = 1 + m.size();
       n_col += get_n_phist_columns(n);
    }
-   else if(lt == stat_relp) {
+   else if(lt == STATLineType::relp) {
       n_row  = 1 + m.size();
       n_col += get_n_relp_columns(n);
    }
-   else if(lt == stat_ssvar) {
+   else if(lt == STATLineType::ssvar) {
       n_row  = 1 + n;
       n_col += n_ssvar_columns;
    }
@@ -2903,22 +2903,22 @@ void write_job_aggr_orank(STATAnalysisJob &job, STATLineType lt,
    // Write the rest of the header row
    //
    c = 1 + job.by_column.n();
-        if(lt == stat_ecnt)  write_header_row(ecnt_columns, n_ecnt_columns, 0, at, 0, c);
-   else if(lt == stat_rps)   write_header_row(rps_columns, n_rps_columns, 0, at, 0, c);
-   else if(lt == stat_rhist) write_rhist_header_row(0, n, at, 0, c);
-   else if(lt == stat_phist) write_phist_header_row(0, n, at, 0, c);
-   else if(lt == stat_relp)  write_relp_header_row (0, n, at, 0, c);
-   else if(lt == stat_ssvar) write_header_row(ssvar_columns, n_ssvar_columns, 0, at, 0, c);
+        if(lt == STATLineType::ecnt)  write_header_row(ecnt_columns, n_ecnt_columns, 0, at, 0, c);
+   else if(lt == STATLineType::rps)   write_header_row(rps_columns, n_rps_columns, 0, at, 0, c);
+   else if(lt == STATLineType::rhist) write_rhist_header_row(0, n, at, 0, c);
+   else if(lt == STATLineType::phist) write_phist_header_row(0, n, at, 0, c);
+   else if(lt == STATLineType::relp)  write_relp_header_row (0, n, at, 0, c);
+   else if(lt == STATLineType::ssvar) write_header_row(ssvar_columns, n_ssvar_columns, 0, at, 0, c);
 
    //
    // Setup the output STAT file
    //
-        if(lt == stat_ecnt)  job.setup_stat_file(n_row, 0);
-   else if(lt == stat_rps)   job.setup_stat_file(n_row, 0);
-   else if(lt == stat_rhist) job.setup_stat_file(n_row, n);
-   else if(lt == stat_phist) job.setup_stat_file(n_row, n);
-   else if(lt == stat_relp)  job.setup_stat_file(n_row, n);
-   else if(lt == stat_ssvar) job.setup_stat_file(n_row, 0);
+        if(lt == STATLineType::ecnt)  job.setup_stat_file(n_row, 0);
+   else if(lt == STATLineType::rps)   job.setup_stat_file(n_row, 0);
+   else if(lt == STATLineType::rhist) job.setup_stat_file(n_row, n);
+   else if(lt == STATLineType::phist) job.setup_stat_file(n_row, n);
+   else if(lt == STATLineType::relp)  job.setup_stat_file(n_row, n);
+   else if(lt == STATLineType::ssvar) job.setup_stat_file(n_row, 0);
 
    mlog << Debug(2) << "Computing output for "
         << (int) m.size() << " case(s).\n";
@@ -2937,7 +2937,7 @@ void write_job_aggr_orank(STATAnalysisJob &job, STATLineType lt,
       //
       // Set SSVAR alpha value
       //
-      if(lt == stat_ssvar) shc.set_alpha(job.out_alpha);
+      if(lt == STATLineType::ssvar) shc.set_alpha(job.out_alpha);
 
       //
       // Initialize
@@ -2947,7 +2947,7 @@ void write_job_aggr_orank(STATAnalysisJob &job, STATLineType lt,
       //
       // ECNT output line
       //
-      if(lt == stat_ecnt) {
+      if(lt == STATLineType::ecnt) {
          ECNTInfo ecnt_info;
          ecnt_info.set(it->second.ens_pd);
 
@@ -2965,7 +2965,7 @@ void write_job_aggr_orank(STATAnalysisJob &job, STATLineType lt,
       //
       // RPS output line
       //
-      else if(lt == stat_rps) {
+      else if(lt == STATLineType::rps) {
          RPSInfo rps_info;
          rps_info.fthresh = job.out_fcst_thresh;
          rps_info.set(it->second.ens_pd);
@@ -2985,7 +2985,7 @@ void write_job_aggr_orank(STATAnalysisJob &job, STATLineType lt,
       //
       // RHIST output line
       //
-      else if(lt == stat_rhist) {
+      else if(lt == STATLineType::rhist) {
          it->second.ens_pd.compute_rhist();
 
          if(job.stat_out) {
@@ -3002,7 +3002,7 @@ void write_job_aggr_orank(STATAnalysisJob &job, STATLineType lt,
       //
       // PHIST output line
       //
-      else if(lt == stat_phist) {
+      else if(lt == STATLineType::phist) {
          if(job.stat_out) {
             write_header_cols(shc, job.stat_at, job.stat_row);
             write_phist_cols(&(it->second.ens_pd), job.stat_at,
@@ -3017,7 +3017,7 @@ void write_job_aggr_orank(STATAnalysisJob &job, STATLineType lt,
       //
       // RELP output line
       //
-      else if(lt == stat_relp) {
+      else if(lt == STATLineType::relp) {
          it->second.ens_pd.compute_relp();
 
          if(job.stat_out) {
@@ -3034,7 +3034,7 @@ void write_job_aggr_orank(STATAnalysisJob &job, STATLineType lt,
       //
       // SSVAR output lines
       //
-      else if(lt == stat_ssvar) {
+      else if(lt == STATLineType::ssvar) {
 
          if(!it->second.ens_pd.ssvar_bins) continue;
 
@@ -3160,10 +3160,10 @@ void write_job_aggr_mpr(STATAnalysisJob &job, STATLineType lt,
 
    // Number of rows
    n_row = 1;
-   if(lt == stat_fho    || lt == stat_ctc   ||
-      lt == stat_cts    || lt == stat_eclv  ||
-      lt == stat_cnt    || lt == stat_sl1l2 ||
-      lt == stat_sal1l2) {
+   if(lt == STATLineType::fho    || lt == STATLineType::ctc   ||
+      lt == STATLineType::cts    || lt == STATLineType::eclv  ||
+      lt == STATLineType::cnt    || lt == STATLineType::sl1l2 ||
+      lt == STATLineType::sal1l2) {
       n_row += job.out_fcst_thresh.n() * m.size();
    }
    else {
@@ -3172,44 +3172,44 @@ void write_job_aggr_mpr(STATAnalysisJob &job, STATLineType lt,
 
    // Number of columns
    n_col = 1 + job.by_column.n();
-        if(lt == stat_fho)    { n_col += n_fho_columns; }
-   else if(lt == stat_ctc)    { n_col += n_ctc_columns; }
-   else if(lt == stat_cts)    { n_col += n_cts_columns; }
-   else if(lt == stat_eclv)   { n      = job.out_eclv_points.n();
-                                n_col += get_n_eclv_columns(n); }
-   else if(lt == stat_mctc)   { n      = job.out_fcst_thresh.n()+1;
-                                n_col += get_n_mctc_columns(n); }
-   else if(lt == stat_mcts)   { n_col += n_mcts_columns; }
-   else if(lt == stat_cnt)    { n_col += n_cnt_columns; }
-   else if(lt == stat_sl1l2)  { n_col += n_sl1l2_columns; }
-   else if(lt == stat_sal1l2) { n_col += n_sal1l2_columns; }
-   else if(lt == stat_pct)    { n      = job.out_fcst_thresh.n();
-                                n_col += get_n_pct_columns(n); }
-   else if(lt == stat_pstd)   { n      = job.out_fcst_thresh.n();
-                                n_col += get_n_pstd_columns(n); }
-   else if(lt == stat_pjc)    { n      = job.out_fcst_thresh.n();
-                                n_col += get_n_pjc_columns(n); }
-   else if(lt == stat_prc)    { n      = job.out_fcst_thresh.n();
-                                n_col += get_n_prc_columns(n); }
+        if(lt == STATLineType::fho)    { n_col += n_fho_columns; }
+   else if(lt == STATLineType::ctc)    { n_col += n_ctc_columns; }
+   else if(lt == STATLineType::cts)    { n_col += n_cts_columns; }
+   else if(lt == STATLineType::eclv)   { n      = job.out_eclv_points.n();
+                                         n_col += get_n_eclv_columns(n); }
+   else if(lt == STATLineType::mctc)   { n      = job.out_fcst_thresh.n()+1;
+                                         n_col += get_n_mctc_columns(n); }
+   else if(lt == STATLineType::mcts)   { n_col += n_mcts_columns; }
+   else if(lt == STATLineType::cnt)    { n_col += n_cnt_columns; }
+   else if(lt == STATLineType::sl1l2)  { n_col += n_sl1l2_columns; }
+   else if(lt == STATLineType::sal1l2) { n_col += n_sal1l2_columns; }
+   else if(lt == STATLineType::pct)    { n      = job.out_fcst_thresh.n();
+                                         n_col += get_n_pct_columns(n); }
+   else if(lt == STATLineType::pstd)   { n      = job.out_fcst_thresh.n();
+                                         n_col += get_n_pstd_columns(n); }
+   else if(lt == STATLineType::pjc)    { n      = job.out_fcst_thresh.n();
+                                          n_col += get_n_pjc_columns(n); }
+   else if(lt == STATLineType::prc)    { n      = job.out_fcst_thresh.n();
+                                         n_col += get_n_prc_columns(n); }
    write_job_aggr_hdr(job, n_row, n_col, at);
 
    //
    // Write the rest of the header row
    //
    c = 1 + job.by_column.n();
-        if(lt == stat_fho)    write_header_row(fho_columns,    n_fho_columns,    0, at, 0, c);
-   else if(lt == stat_ctc)    write_header_row(ctc_columns,    n_ctc_columns,    0, at, 0, c);
-   else if(lt == stat_cts)    write_header_row(cts_columns,    n_cts_columns,    0, at, 0, c);
-   else if(lt == stat_eclv)   write_eclv_header_row(0, n, at, 0, c);
-   else if(lt == stat_mctc)   write_mctc_header_row(0, n, at, 0, c);
-   else if(lt == stat_mcts)   write_header_row(mcts_columns,   n_mcts_columns,   0, at, 0, c);
-   else if(lt == stat_cnt)    write_header_row(cnt_columns,    n_cnt_columns,    0, at, 0, c);
-   else if(lt == stat_sl1l2)  write_header_row(sl1l2_columns,  n_sl1l2_columns,  0, at, 0, c);
-   else if(lt == stat_sal1l2) write_header_row(sal1l2_columns, n_sal1l2_columns, 0, at, 0, c);
-   else if(lt == stat_pct)    write_pct_header_row (0, n, at, 0, c);
-   else if(lt == stat_pstd)   write_pstd_header_row(0, n, at, 0, c);
-   else if(lt == stat_pjc)    write_pjc_header_row (0, n, at, 0, c);
-   else if(lt == stat_prc)    write_prc_header_row (0, n, at, 0, c);
+        if(lt == STATLineType::fho)    write_header_row(fho_columns,    n_fho_columns,    0, at, 0, c);
+   else if(lt == STATLineType::ctc)    write_header_row(ctc_columns,    n_ctc_columns,    0, at, 0, c);
+   else if(lt == STATLineType::cts)    write_header_row(cts_columns,    n_cts_columns,    0, at, 0, c);
+   else if(lt == STATLineType::eclv)   write_eclv_header_row(0, n, at, 0, c);
+   else if(lt == STATLineType::mctc)   write_mctc_header_row(0, n, at, 0, c);
+   else if(lt == STATLineType::mcts)   write_header_row(mcts_columns,   n_mcts_columns,   0, at, 0, c);
+   else if(lt == STATLineType::cnt)    write_header_row(cnt_columns,    n_cnt_columns,    0, at, 0, c);
+   else if(lt == STATLineType::sl1l2)  write_header_row(sl1l2_columns,  n_sl1l2_columns,  0, at, 0, c);
+   else if(lt == STATLineType::sal1l2) write_header_row(sal1l2_columns, n_sal1l2_columns, 0, at, 0, c);
+   else if(lt == STATLineType::pct)    write_pct_header_row (0, n, at, 0, c);
+   else if(lt == STATLineType::pstd)   write_pstd_header_row(0, n, at, 0, c);
+   else if(lt == STATLineType::pjc)    write_pjc_header_row (0, n, at, 0, c);
+   else if(lt == STATLineType::prc)    write_prc_header_row (0, n, at, 0, c);
 
    //
    // Setup the output STAT file
@@ -3238,7 +3238,7 @@ void write_job_aggr_mpr(STATAnalysisJob &job, STATLineType lt,
       //
       // FHO output line
       //
-      if(lt == stat_fho) {
+      if(lt == STATLineType::fho) {
          for(i=0; i<job.out_fcst_thresh.n(); i++) {
             mpr_to_ctc(job, it->second, i, cts_info);
             if(job.stat_out) {
@@ -3259,7 +3259,7 @@ void write_job_aggr_mpr(STATAnalysisJob &job, STATLineType lt,
       //
       // CTC output line
       //
-      else if(lt == stat_ctc) {
+      else if(lt == STATLineType::ctc) {
          for(i=0; i<job.out_fcst_thresh.n(); i++) {
             mpr_to_ctc(job, it->second, i, cts_info);
             if(job.stat_out) {
@@ -3280,7 +3280,7 @@ void write_job_aggr_mpr(STATAnalysisJob &job, STATLineType lt,
       //
       // CTS output line
       //
-      else if(lt == stat_cts) {
+      else if(lt == STATLineType::cts) {
          for(i=0; i<job.out_fcst_thresh.n(); i++) {
             mpr_to_cts(job, it->second, i, cts_info, tmp_dir, rng_ptr);
             if(job.stat_out) {
@@ -3302,7 +3302,7 @@ void write_job_aggr_mpr(STATAnalysisJob &job, STATLineType lt,
       //
       // ECLV output line
       //
-      else if(lt == stat_eclv) {
+      else if(lt == STATLineType::eclv) {
          for(i=0; i<job.out_fcst_thresh.n(); i++) {
             mpr_to_ctc(job, it->second, i, cts_info);
             if(job.stat_out) {
@@ -3323,7 +3323,7 @@ void write_job_aggr_mpr(STATAnalysisJob &job, STATLineType lt,
       //
       // MCTC output line
       //
-      else if(lt == stat_mctc) {
+      else if(lt == STATLineType::mctc) {
          mpr_to_mctc(job, it->second, mcts_info);
          if(job.stat_out) {
             shc.set_fcst_thresh(job.out_fcst_thresh);
@@ -3342,7 +3342,7 @@ void write_job_aggr_mpr(STATAnalysisJob &job, STATLineType lt,
       //
       // MCTS output line
       //
-      else if(lt == stat_mcts) {
+      else if(lt == STATLineType::mcts) {
          mpr_to_mcts(job, it->second, mcts_info, tmp_dir, rng_ptr);
          if(job.stat_out) {
             shc.set_fcst_thresh(job.out_fcst_thresh);
@@ -3362,7 +3362,7 @@ void write_job_aggr_mpr(STATAnalysisJob &job, STATLineType lt,
       //
       // CNT output line
       //
-      else if(lt == stat_cnt) {
+      else if(lt == STATLineType::cnt) {
          for(i=0; i<job.out_fcst_thresh.n(); i++) {
             mpr_to_cnt(job, it->second, i, cnt_info, tmp_dir, rng_ptr);
             if(cnt_info.n == 0) continue;
@@ -3386,7 +3386,7 @@ void write_job_aggr_mpr(STATAnalysisJob &job, STATLineType lt,
       //
       // SL1L2 output line
       //
-      else if(lt == stat_sl1l2) {
+      else if(lt == STATLineType::sl1l2) {
          for(i=0; i<job.out_fcst_thresh.n(); i++) {
             mpr_to_psum(job, it->second, i, sl1l2_info);
             if(sl1l2_info.scount == 0) continue;
@@ -3409,7 +3409,7 @@ void write_job_aggr_mpr(STATAnalysisJob &job, STATLineType lt,
       //
       // SAL1L2 output line
       //
-      else if(lt == stat_sal1l2) {
+      else if(lt == STATLineType::sal1l2) {
          for(i=0; i<job.out_fcst_thresh.n(); i++) {
             mpr_to_psum(job, it->second, i, sl1l2_info);
             if(sl1l2_info.sacount == 0) continue;
@@ -3432,7 +3432,7 @@ void write_job_aggr_mpr(STATAnalysisJob &job, STATLineType lt,
       //
       // PCT output line
       //
-      else if(lt == stat_pct) {
+      else if(lt == STATLineType::pct) {
          mpr_to_pct(job, it->second, pct_info);
          if(job.stat_out) {
             shc.set_fcst_thresh(job.out_fcst_thresh);
@@ -3451,7 +3451,7 @@ void write_job_aggr_mpr(STATAnalysisJob &job, STATLineType lt,
       //
       // PSTD output line
       //
-      else if(lt == stat_pstd) {
+      else if(lt == STATLineType::pstd) {
          mpr_to_pct(job, it->second, pct_info);
          if(job.stat_out) {
             shc.set_fcst_thresh(job.out_fcst_thresh);
@@ -3471,7 +3471,7 @@ void write_job_aggr_mpr(STATAnalysisJob &job, STATLineType lt,
       //
       // PJC output line
       //
-      else if(lt == stat_pjc) {
+      else if(lt == STATLineType::pjc) {
          mpr_to_pct(job, it->second, pct_info);
          if(job.stat_out) {
             shc.set_fcst_thresh(job.out_fcst_thresh);
@@ -3491,7 +3491,7 @@ void write_job_aggr_mpr(STATAnalysisJob &job, STATLineType lt,
       //
       // PRC output line
       //
-      else if(lt == stat_prc) {
+      else if(lt == STATLineType::prc) {
          mpr_to_pct(job, it->second, pct_info);
          if(job.stat_out) {
             shc.set_fcst_thresh(job.out_fcst_thresh);
@@ -3541,16 +3541,16 @@ void write_job_aggr_mpr_wind(STATAnalysisJob &job, STATLineType lt,
    //
    n_row = 1 + m.size();
    n_col = 1 + job.by_column.n();
-        if(lt == stat_vl1l2) n_col += n_vl1l2_columns;
-   else if(lt == stat_vcnt)  n_col += n_vcnt_columns;
+        if(lt == STATLineType::vl1l2) n_col += n_vl1l2_columns;
+   else if(lt == STATLineType::vcnt)  n_col += n_vcnt_columns;
    write_job_aggr_hdr(job, n_row, n_col, at);
 
    //
    // Write the rest of the header row
    //
    c = 1 + job.by_column.n();
-        if(lt == stat_vl1l2) write_header_row(vl1l2_columns, n_vl1l2_columns, 0, at, 0, c);
-   else if(lt == stat_vcnt)  write_header_row(vcnt_columns,  n_vcnt_columns,  0, at, 0, c);
+        if(lt == STATLineType::vl1l2) write_header_row(vl1l2_columns, n_vl1l2_columns, 0, at, 0, c);
+   else if(lt == STATLineType::vcnt)  write_header_row(vcnt_columns,  n_vcnt_columns,  0, at, 0, c);
 
    //
    // Setup the output STAT file
@@ -3571,7 +3571,7 @@ void write_job_aggr_mpr_wind(STATAnalysisJob &job, STATLineType lt,
       shc = it->second.hdr.get_shc(it->first, job.by_column,
                                    job.hdr_name, job.hdr_value, lt);
       if(job.stat_out) {
-         if(lt == stat_cnt || lt == stat_nbrcnt) shc.set_alpha(job.out_alpha);
+         if(lt == STATLineType::cnt || lt == STATLineType::nbrcnt) shc.set_alpha(job.out_alpha);
          write_header_cols(shc, job.stat_at, job.stat_row);
       }
 
@@ -3583,7 +3583,7 @@ void write_job_aggr_mpr_wind(STATAnalysisJob &job, STATLineType lt,
       //
       // VL1L2 output line
       //
-      if(lt == stat_vl1l2) {
+      if(lt == STATLineType::vl1l2) {
          if(job.stat_out) {
             write_vl1l2_cols(it->second.vl1l2_info, job.stat_at,
                              job.stat_row++, n_header_columns);
@@ -3597,7 +3597,7 @@ void write_job_aggr_mpr_wind(STATAnalysisJob &job, STATLineType lt,
       //
       // VCNT output line
       //
-      else if(lt == stat_vcnt) {
+      else if(lt == STATLineType::vcnt) {
          if(job.stat_out) {
             write_vcnt_cols(it->second.vl1l2_info, 0, job.stat_at,
                             job.stat_row++, n_header_columns);
@@ -3794,7 +3794,7 @@ void write_job_ramp(STATAnalysisJob &job,
 
          vals_part = it->second.f_na.subset(ts.index(beg[i]), ts.index(end[i]));
 
-         if(job.ramp_type == TimeSeriesType_DyDt) {
+         if(job.ramp_type == TimeSeriesType::DyDt) {
             compute_dydt_ramps(cs.c_str(), vals_part, ts_part,
                job.ramp_time_fcst, job.ramp_exact_fcst, job.ramp_thresh_fcst,
                ramp_part, dat_part);
@@ -3823,7 +3823,7 @@ void write_job_ramp(STATAnalysisJob &job,
 
          vals_part = it->second.o_na.subset(ts.index(beg[i]), ts.index(end[i]));
 
-         if(job.ramp_type == TimeSeriesType_DyDt) {
+         if(job.ramp_type == TimeSeriesType::DyDt) {
             compute_dydt_ramps(cs.c_str(), vals_part, ts_part,
                job.ramp_time_obs, job.ramp_exact_obs, job.ramp_thresh_obs,
                ramp_part, dat_part);
@@ -3948,7 +3948,7 @@ void write_job_ramp(STATAnalysisJob &job,
             mpr_at.set_entry(r_mpr, c++, unix_to_yyyymmdd_hhmmss(init_ut));
             mpr_at.set_entry(r_mpr, c++, sec_to_hhmmss((int) valid_ut - init_ut));
             mpr_at.set_entry(r_mpr, c++, unix_to_yyyymmdd_hhmmss(valid_ut));
-            if(job.ramp_type == TimeSeriesType_DyDt) {
+            if(job.ramp_type == TimeSeriesType::DyDt) {
                mpr_at.set_entry(r_mpr, c++, fdat[k]);
                mpr_at.set_entry(r_mpr, c++, it->second.f_na[k]);
                mpr_at.set_entry(r_mpr, c++, (is_bad_data(fdat[k]) || is_bad_data(it->second.f_na[k]) ?
@@ -3960,7 +3960,7 @@ void write_job_ramp(STATAnalysisJob &job,
                mpr_at.set_entry(r_mpr, c++, fdat[k]);
             }
             mpr_at.set_entry(r_mpr, c++, (is_bad_data(f) ? na_str : bool_to_string(f)));
-            if(job.ramp_type == TimeSeriesType_DyDt) {
+            if(job.ramp_type == TimeSeriesType::DyDt) {
                mpr_at.set_entry(r_mpr, c++, odat[k]);
                mpr_at.set_entry(r_mpr, c++, it->second.o_na[k]);
                mpr_at.set_entry(r_mpr, c++, (is_bad_data(odat[k]) || is_bad_data(it->second.o_na[k]) ?
@@ -3992,7 +3992,7 @@ void write_job_ramp(STATAnalysisJob &job,
       //
       ctc_shc = it->second.hdr.get_shc(it->first, job.by_column,
                                        job.hdr_name, job.hdr_value,
-                                       stat_ctc);
+                                       STATLineType::ctc);
 
       //
       // Compute contingency table statistics, if requested
@@ -4000,7 +4000,7 @@ void write_job_ramp(STATAnalysisJob &job,
       if(job.out_line_type.has(stat_cts_str)) {
          cts_shc = it->second.hdr.get_shc(it->first, job.by_column,
                                           job.hdr_name, job.hdr_value,
-                                          stat_cts);
+                                          STATLineType::cts);
          cts_shc.set_alpha(job.out_alpha);
          cts_info.compute_stats();
          cts_info.compute_ci();
@@ -4160,7 +4160,7 @@ void write_job_ss_index(STATAnalysisJob &job,
       // Format the output STAT header columns
       //
       shc = it->second.hdr.get_shc(it->first, job.by_column,
-                                   job.hdr_name, job.hdr_value, stat_ssidx);
+                                   job.hdr_name, job.hdr_value, STATLineType::ssidx);
 
       //
       // Set FCST/OBS_VAR = skill score index type
@@ -4329,8 +4329,8 @@ void do_job_ramp(const ConcatString &jobstring, LineDataFile &f,
    //
    // Check the ramp type
    //
-   if(job.ramp_type != TimeSeriesType_DyDt &&
-      job.ramp_type != TimeSeriesType_Swing) {
+   if(job.ramp_type != TimeSeriesType::DyDt &&
+      job.ramp_type != TimeSeriesType::Swing) {
       mlog << Error << "\ndo_job_ramp() -> "
            << "unsupported \"-ramp_type\" option: "
            << jobstring << "\n\n";
@@ -4340,7 +4340,7 @@ void do_job_ramp(const ConcatString &jobstring, LineDataFile &f,
    //
    // Check swing_width for the swinging door algorithm
    //
-   if(job.ramp_type == TimeSeriesType_Swing &&
+   if(job.ramp_type == TimeSeriesType::Swing &&
       is_bad_data(job.swing_width)) {
       mlog << Error << "\ndo_job_ramp() -> "
            << "the \"-swing_width\" option is required for \"-ramp_type SWING\": "

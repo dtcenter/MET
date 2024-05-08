@@ -38,7 +38,6 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
 
 #include <cstdio>
 #include <cstdlib>
@@ -52,7 +51,6 @@ using namespace std;
 #include <unistd.h>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "main.h"
 #include "series_analysis.h"
@@ -61,6 +59,11 @@ using namespace netCDF;
 #include "vx_nc_util.h"
 #include "vx_regrid.h"
 #include "vx_log.h"
+#include "enum_as_int.hpp"
+
+using namespace std;
+using namespace netCDF;
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -135,7 +138,7 @@ int met_main(int argc, char *argv[]) {
    // Close the text files and deallocate memory
    clean_up();
 
-   return(0);
+   return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -260,35 +263,35 @@ void process_command_line(int argc, char **argv) {
    // - Forecast file list
    // - Observation file list
    if(conf_info.get_n_fcst() > 1) {
-      series_type = SeriesType_Fcst_Conf;
+      series_type = SeriesType::Fcst_Conf;
       n_series = conf_info.get_n_fcst();
       mlog << Debug(1)
            << "Series defined by the \"fcst.field\" configuration entry "
            << "of length " << n_series << ".\n";
    }
    else if(conf_info.get_n_obs() > 1) {
-      series_type = SeriesType_Obs_Conf;
+      series_type = SeriesType::Obs_Conf;
       n_series = conf_info.get_n_obs();
       mlog << Debug(1)
            << "Series defined by the \"obs.field\" configuration entry "
            << "of length " << n_series << ".\n";
    }
    else if(fcst_files.n() > 1) {
-      series_type = SeriesType_Fcst_Files;
+      series_type = SeriesType::Fcst_Files;
       n_series = fcst_files.n();
       mlog << Debug(1)
            << "Series defined by the forecast file list of length "
            << n_series << ".\n";
    }
    else if(obs_files.n() > 1) {
-      series_type = SeriesType_Obs_Files;
+      series_type = SeriesType::Obs_Files;
       n_series = obs_files.n();
       mlog << Debug(1)
            << "Series defined by the observation file list of length "
            << n_series << ".\n";
    }
    else {
-      series_type = SeriesType_Fcst_Conf;
+      series_type = SeriesType::Fcst_Conf;
       n_series = 1;
       mlog << Debug(1)
            << "The \"fcst.field\" and \"obs.field\" configuration entries "
@@ -378,7 +381,7 @@ void process_grid(const Grid &fcst_grid, const Grid &obs_grid) {
 Met2dDataFile *get_mtddf(const StringArray &file_list,
                          const GrdFileType type) {
    int i;
-   Met2dDataFile *mtddf = (Met2dDataFile *) 0;
+   Met2dDataFile *mtddf = (Met2dDataFile *) nullptr;
 
    // Find the first file that actually exists
    for(i=0; i<file_list.n(); i++) {
@@ -398,7 +401,7 @@ Met2dDataFile *get_mtddf(const StringArray &file_list,
       exit(1);
    }
 
-   return(mtddf);
+   return mtddf;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -422,7 +425,7 @@ void get_series_data(int i_series,
    // Switch on the series type
    switch(series_type) {
 
-      case SeriesType_Fcst_Conf:
+      case SeriesType::Fcst_Conf:
          get_series_entry(i_series, fcst_info, fcst_files,
                           ftype, found_fcst_files, fcst_dp, fcst_grid);
          if(conf_info.get_n_obs() == 1) {
@@ -436,7 +439,7 @@ void get_series_data(int i_series,
                           otype, found_obs_files, obs_dp, obs_grid);
          break;
 
-      case SeriesType_Obs_Conf:
+      case SeriesType::Obs_Conf:
          get_series_entry(i_series, obs_info, obs_files,
                           otype, found_obs_files, obs_dp, obs_grid);
          if(conf_info.get_n_fcst() == 1) {
@@ -450,7 +453,7 @@ void get_series_data(int i_series,
                           ftype, found_fcst_files, fcst_dp, fcst_grid);
          break;
 
-      case SeriesType_Fcst_Files:
+      case SeriesType::Fcst_Files:
          found_fcst_files.set(i_series, fcst_files[i_series]);
          get_series_entry(i_series, fcst_info, fcst_files,
                           ftype, found_fcst_files, fcst_dp, fcst_grid);
@@ -468,7 +471,7 @@ void get_series_data(int i_series,
                           otype, found_obs_files, obs_dp, obs_grid);
          break;
 
-      case SeriesType_Obs_Files:
+      case SeriesType::Obs_Files:
          found_obs_files.set(i_series, obs_files[i_series]);
          get_series_entry(i_series, obs_info, obs_files,
                           otype, found_obs_files, obs_dp, obs_grid);
@@ -489,7 +492,7 @@ void get_series_data(int i_series,
       default:
          mlog << Error << "\nget_series_data() -> "
               << "unexpected SeriesType value: "
-              << series_type << "\n\n";
+              << enum_class_as_int(series_type) << "\n\n";
          exit(1);
    }
 
@@ -648,14 +651,14 @@ void get_series_entry(int i_series, VarInfo *info,
 bool read_single_entry(VarInfo *info, const ConcatString &cur_file,
                        const GrdFileType type, DataPlane &dp,
                        Grid &cur_grid) {
-   Met2dDataFile *mtddf = (Met2dDataFile *) 0;
+   Met2dDataFile *mtddf = (Met2dDataFile *) nullptr;
    bool found = false;
 
    // Check that the file exists
    if(!file_is_ok(cur_file, type)) {
       mlog << Warning << "\nread_single_entry() -> "
            << "File does not exist: " << cur_file << "\n\n";
-      return(false);
+      return false;
    }
 
    // Open the data file
@@ -668,18 +671,18 @@ bool read_single_entry(VarInfo *info, const ConcatString &cur_file,
    if(found) cur_grid = mtddf->grid();
 
    // Close the data file
-   delete mtddf; mtddf = (Met2dDataFile *) 0;
+   delete mtddf; mtddf = (Met2dDataFile *) nullptr;
 
-   return(found);
+   return found;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void process_scores() {
    int i, x, y, i_read, i_series, i_point, i_fcst;
-   VarInfo *fcst_info = (VarInfo *) 0;
-   VarInfo *obs_info  = (VarInfo *) 0;
-   PairDataPoint *pd_ptr = (PairDataPoint *) 0;
+   VarInfo *fcst_info = (VarInfo *) nullptr;
+   VarInfo *obs_info  = (VarInfo *) nullptr;
+   PairDataPoint *pd_ptr = (PairDataPoint *) nullptr;
    DataPlane fcst_dp, obs_dp;
    const char *method_name = "process_scores() ";
 
@@ -817,38 +820,38 @@ void process_scores() {
 
          // Compute contingency table counts and statistics
          if(!conf_info.fcst_info[0]->is_prob() &&
-            (conf_info.output_stats[stat_fho].n() +
-             conf_info.output_stats[stat_ctc].n() +
-             conf_info.output_stats[stat_cts].n()) > 0) {
+            (conf_info.output_stats[STATLineType::fho].n() +
+             conf_info.output_stats[STATLineType::ctc].n() +
+             conf_info.output_stats[STATLineType::cts].n()) > 0) {
             do_cts(i_point+i, &pd_ptr[i]);
          }
 
          // Compute multi-category contingency table counts and statistics
          if(!conf_info.fcst_info[0]->is_prob() &&
-            (conf_info.output_stats[stat_mctc].n() +
-             conf_info.output_stats[stat_mcts].n()) > 0) {
+            (conf_info.output_stats[STATLineType::mctc].n() +
+             conf_info.output_stats[STATLineType::mcts].n()) > 0) {
             do_mcts(i_point+i, &pd_ptr[i]);
          }
 
          // Compute continuous statistics
          if(!conf_info.fcst_info[0]->is_prob() &&
-            conf_info.output_stats[stat_cnt].n() > 0) {
+            conf_info.output_stats[STATLineType::cnt].n() > 0) {
             do_cnt(i_point+i, &pd_ptr[i]);
          }
 
          // Compute partial sums
          if(!conf_info.fcst_info[0]->is_prob() &&
-            (conf_info.output_stats[stat_sl1l2].n()  > 0 ||
-             conf_info.output_stats[stat_sal1l2].n() > 0)) {
+            (conf_info.output_stats[STATLineType::sl1l2].n()  > 0 ||
+             conf_info.output_stats[STATLineType::sal1l2].n() > 0)) {
             do_sl1l2(i_point+i, &pd_ptr[i]);
          }
 
          // Compute probabilistics counts and statistics
          if(conf_info.fcst_info[0]->is_prob() &&
-            (conf_info.output_stats[stat_pct].n() +
-             conf_info.output_stats[stat_pstd].n() +
-             conf_info.output_stats[stat_pjc].n() +
-             conf_info.output_stats[stat_prc].n()) > 0) {
+            (conf_info.output_stats[STATLineType::pct].n() +
+             conf_info.output_stats[STATLineType::pstd].n() +
+             conf_info.output_stats[STATLineType::pjc].n() +
+             conf_info.output_stats[STATLineType::prc].n()) > 0) {
             do_pct(i_point+i, &pd_ptr[i]);
          }
       } // end for i
@@ -878,7 +881,7 @@ void process_scores() {
    add_att(nc_out, "obs_lead_end",   (string)sec_to_hhmmss(obs_lead_end));
 
    // Clean up
-   if(pd_ptr) { delete [] pd_ptr; pd_ptr = (PairDataPoint *) 0; }
+   if(pd_ptr) { delete [] pd_ptr; pd_ptr = (PairDataPoint *) nullptr; }
 
    // Print summary counts
    mlog << Debug(2)
@@ -928,7 +931,7 @@ void do_cts(int n, const PairDataPoint *pd_ptr) {
 
    // Compute the counts, stats, normal confidence intervals, and
    // bootstrap confidence intervals
-   if(conf_info.boot_interval == BootIntervalType_BCA) {
+   if(conf_info.boot_interval == BootIntervalType::BCA) {
       compute_cts_stats_ci_bca(rng_ptr, *pd_ptr,
          conf_info.n_boot_rep,
          cts_info, n_cts, true,
@@ -945,26 +948,26 @@ void do_cts(int n, const PairDataPoint *pd_ptr) {
    for(i=0; i<n_cts; i++) {
 
       // Add statistic value for each possible FHO column
-      for(j=0; j<conf_info.output_stats[stat_fho].n(); j++) {
-         store_stat_fho(n, conf_info.output_stats[stat_fho][j],
+      for(j=0; j<conf_info.output_stats[STATLineType::fho].n(); j++) {
+         store_stat_fho(n, conf_info.output_stats[STATLineType::fho][j],
                         cts_info[i]);
       }
 
       // Add statistic value for each possible CTC column
-      for(j=0; j<conf_info.output_stats[stat_ctc].n(); j++) {
-         store_stat_ctc(n, conf_info.output_stats[stat_ctc][j],
+      for(j=0; j<conf_info.output_stats[STATLineType::ctc].n(); j++) {
+         store_stat_ctc(n, conf_info.output_stats[STATLineType::ctc][j],
                         cts_info[i]);
       }
 
       // Add statistic value for each possible CTS column
-      for(j=0; j<conf_info.output_stats[stat_cts].n(); j++) {
-         store_stat_cts(n, conf_info.output_stats[stat_cts][j],
+      for(j=0; j<conf_info.output_stats[STATLineType::cts].n(); j++) {
+         store_stat_cts(n, conf_info.output_stats[STATLineType::cts][j],
                         cts_info[i]);
       }
    } // end for i
 
    // Deallocate memory
-   if(cts_info) { delete [] cts_info; cts_info = (CTSInfo *) 0; }
+   if(cts_info) { delete [] cts_info; cts_info = (CTSInfo *) nullptr; }
 
    return;
 }
@@ -992,7 +995,7 @@ void do_mcts(int n, const PairDataPoint *pd_ptr) {
 
    // Compute the counts, stats, normal confidence intervals, and
    // bootstrap confidence intervals
-   if(conf_info.boot_interval == BootIntervalType_BCA) {
+   if(conf_info.boot_interval == BootIntervalType::BCA) {
       compute_mcts_stats_ci_bca(rng_ptr, *pd_ptr,
          conf_info.n_boot_rep,
          mcts_info, true,
@@ -1006,14 +1009,14 @@ void do_mcts(int n, const PairDataPoint *pd_ptr) {
    }
 
    // Add statistic value for each possible MCTC column
-   for(i=0; i<conf_info.output_stats[stat_mctc].n(); i++) {
-      store_stat_mctc(n, conf_info.output_stats[stat_mctc][i],
+   for(i=0; i<conf_info.output_stats[STATLineType::mctc].n(); i++) {
+      store_stat_mctc(n, conf_info.output_stats[STATLineType::mctc][i],
                       mcts_info);
    }
 
    // Add statistic value for each possible MCTS column
-   for(i=0; i<conf_info.output_stats[stat_mcts].n(); i++) {
-      store_stat_mcts(n, conf_info.output_stats[stat_mcts][i],
+   for(i=0; i<conf_info.output_stats[STATLineType::mcts].n(); i++) {
+      store_stat_mcts(n, conf_info.output_stats[STATLineType::mcts][i],
                       mcts_info);
    }
 
@@ -1058,7 +1061,7 @@ void do_cnt(int n, const PairDataPoint *pd_ptr) {
       int precip_flag = (conf_info.fcst_info[0]->is_precipitation() &&
                          conf_info.obs_info[0]->is_precipitation());
 
-      if(conf_info.boot_interval == BootIntervalType_BCA) {
+      if(conf_info.boot_interval == BootIntervalType::BCA) {
          compute_cnt_stats_ci_bca(rng_ptr, pd,
             precip_flag, conf_info.rank_corr_flag,
             conf_info.n_boot_rep,
@@ -1072,8 +1075,8 @@ void do_cnt(int n, const PairDataPoint *pd_ptr) {
       }
 
       // Add statistic value for each possible CNT column
-      for(j=0; j<conf_info.output_stats[stat_cnt].n(); j++) {
-         store_stat_cnt(n, conf_info.output_stats[stat_cnt][j],
+      for(j=0; j<conf_info.output_stats[STATLineType::cnt].n(); j++) {
+         store_stat_cnt(n, conf_info.output_stats[STATLineType::cnt][j],
                         cnt_info);
       }
    } // end for i
@@ -1101,8 +1104,8 @@ void do_sl1l2(int n, const PairDataPoint *pd_ptr) {
       s_info.set(*pd_ptr);
 
       // Add statistic value for each possible SL1L2 column
-      for(j=0; j<conf_info.output_stats[stat_sl1l2].n(); j++) {
-         store_stat_sl1l2(n, conf_info.output_stats[stat_sl1l2][j], s_info);
+      for(j=0; j<conf_info.output_stats[STATLineType::sl1l2].n(); j++) {
+         store_stat_sl1l2(n, conf_info.output_stats[STATLineType::sl1l2][j], s_info);
       }
    } // end for i
 
@@ -1137,26 +1140,26 @@ void do_pct(int n, const PairDataPoint *pd_ptr) {
       compute_pctinfo(*pd_ptr, true, pct_info);
 
       // Add statistic value for each possible PCT column
-      for(j=0; j<conf_info.output_stats[stat_pct].n(); j++) {
-         store_stat_pct(n, conf_info.output_stats[stat_pct][j],
+      for(j=0; j<conf_info.output_stats[STATLineType::pct].n(); j++) {
+         store_stat_pct(n, conf_info.output_stats[STATLineType::pct][j],
                         pct_info);
       }
 
       // Add statistic value for each possible PSTD column
-      for(j=0; j<conf_info.output_stats[stat_pstd].n(); j++) {
-         store_stat_pstd(n, conf_info.output_stats[stat_pstd][j],
+      for(j=0; j<conf_info.output_stats[STATLineType::pstd].n(); j++) {
+         store_stat_pstd(n, conf_info.output_stats[STATLineType::pstd][j],
                          pct_info);
       }
 
       // Add statistic value for each possible PJC column
-      for(j=0; j<conf_info.output_stats[stat_pjc].n(); j++) {
-         store_stat_pjc(n, conf_info.output_stats[stat_pjc][j],
+      for(j=0; j<conf_info.output_stats[STATLineType::pjc].n(); j++) {
+         store_stat_pjc(n, conf_info.output_stats[STATLineType::pjc][j],
                         pct_info);
       }
 
       // Add statistic value for each possible PRC column
-      for(j=0; j<conf_info.output_stats[stat_prc].n(); j++) {
-         store_stat_prc(n, conf_info.output_stats[stat_prc][j],
+      for(j=0; j<conf_info.output_stats[STATLineType::prc].n(); j++) {
+         store_stat_prc(n, conf_info.output_stats[STATLineType::prc][j],
                         pct_info);
       }
    } // end for i
@@ -2238,12 +2241,12 @@ void clean_up() {
       mlog << Debug(1) << "Output file: " << out_file << "\n";
 
       delete nc_out;
-      nc_out = (NcFile *) 0;
+      nc_out = (NcFile *) nullptr;
    }
 
    // Deallocate memory for data files
-   if(fcst_mtddf) { delete fcst_mtddf; fcst_mtddf = (Met2dDataFile *) 0; }
-   if(obs_mtddf)  { delete obs_mtddf;  obs_mtddf  = (Met2dDataFile *) 0; }
+   if(fcst_mtddf) { delete fcst_mtddf; fcst_mtddf = (Met2dDataFile *) nullptr; }
+   if(obs_mtddf)  { delete obs_mtddf;  obs_mtddf  = (Met2dDataFile *) nullptr; }
 
    // Deallocate memory for the random number generator
    rng_free(rng_ptr);

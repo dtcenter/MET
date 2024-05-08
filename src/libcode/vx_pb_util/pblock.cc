@@ -9,8 +9,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -24,6 +22,9 @@ using namespace std;
 #include "pblock.h"
 #include "do_blocking.h"
 #include "do_unblocking.h"
+
+using namespace std;
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -56,9 +57,9 @@ void pblock(const char *infile, const char *outfile, Action action) {
    // Set the block size for this compiler 
    //
    #ifdef BLOCK4
-      padsize = padsize_4;
+      padsize = PadSize::size_4;
    #else
-      padsize = padsize_8;
+      padsize = PadSize::size_8;
    #endif
 
    //
@@ -66,11 +67,11 @@ void pblock(const char *infile, const char *outfile, Action action) {
    //
    switch(action)  {
 
-      case block:
+      case Action::block:
          do_blocking(in, out, padsize);
          break;
 
-      case unblock:
+      case Action::unblock:
          do_unblocking(in, out, padsize);
          break;
 

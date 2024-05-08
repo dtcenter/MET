@@ -11,8 +11,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <fstream>
 #include <unistd.h>
@@ -21,6 +19,8 @@ using namespace std;
 
 #include "vx_log.h"
 #include "vx_render.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -46,7 +46,7 @@ int pad;
 double w, h;
 unsigned char u;
 Color color;
-PSFilter *out = (PSFilter *) 0;
+PSFilter *out = (PSFilter *) nullptr;
 PSFilter **v = &out;
 
 
@@ -117,7 +117,7 @@ psout->ignore_columns = false;
 
 *v = psout;
 
-v = (PSFilter **) 0;
+v = (PSFilter **) nullptr;
 
 
 
@@ -194,7 +194,7 @@ for (r=0; r<ny; ++r)  {
 
 out->eod();
 
-delete out;   out = (PSFilter *) 0;
+delete out;   out = (PSFilter *) nullptr;
 
 plot.file() << "\n\n";
 

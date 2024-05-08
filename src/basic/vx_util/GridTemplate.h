@@ -158,12 +158,12 @@ class GridTemplateFactory {
 
       // do not assign specific values to these enumes.
       // other code requires them to start at zero and increase by 1
-      // make sure GridTemplate_NUM_TEMPLATES is always last.
-      enum GridTemplates {
-         GridTemplate_None,
-         GridTemplate_Square,
-         GridTemplate_Circle,
-         GridTemplate_NUM_TEMPLATES
+      // make sure GridTemplate::NUM_TEMPLATES is always last.
+      enum class GridTemplates {
+         None,
+         Square,
+         Circle,
+         NUM_TEMPLATES
       };
 
       // String corresponding to the enumerated values above

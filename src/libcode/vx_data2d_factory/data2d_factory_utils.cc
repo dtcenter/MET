@@ -10,8 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -25,6 +23,8 @@ using namespace std;
 #include "vx_data2d.h"
 #include "vx_util.h"
 #include "vx_log.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -66,11 +66,11 @@ GrdFileType data_type   = FileType_None;
    //
 
 if ( strcasecmp(filename, conf_val_python_numpy) == 0 )  {
-   return ( FileType_Python_Numpy );
+   return FileType_Python_Numpy;
 }
 
 else if ( strcasecmp(filename, conf_val_python_xarray) == 0 )  {
-   return ( FileType_Python_Xarray );
+   return FileType_Python_Xarray;
 }
 
    //
@@ -137,7 +137,7 @@ int j;
 const ConcatString suffix = filename_suffix(filename);
 
 
-if ( suffix.empty() ) return ( FileType_None );
+if ( suffix.empty() ) return FileType_None;
 
    //
    //  grib ?
@@ -145,7 +145,7 @@ if ( suffix.empty() ) return ( FileType_None );
 
 for (j=0; j<n_gb_file_ext; ++j)  {
 
-   if ( suffix == gb_file_ext[j] )  return ( FileType_Gb1 );
+   if ( suffix == gb_file_ext[j] )  return FileType_Gb1;
 
 }
 
@@ -155,7 +155,7 @@ for (j=0; j<n_gb_file_ext; ++j)  {
 
 for (j=0; j<n_gb2_file_ext; ++j)  {
 
-   if ( suffix == gb2_file_ext[j] )  return ( FileType_Gb2 );
+   if ( suffix == gb2_file_ext[j] )  return FileType_Gb2;
 
 }
 
@@ -165,7 +165,7 @@ for (j=0; j<n_gb2_file_ext; ++j)  {
 
 for (j=0; j<n_bf_file_ext; ++j)  {
 
-   if ( suffix == bf_file_ext[j] )  return ( FileType_Bufr );
+   if ( suffix == bf_file_ext[j] )  return FileType_Bufr;
 
 }
 
@@ -173,7 +173,7 @@ for (j=0; j<n_bf_file_ext; ++j)  {
    //  nope
    //
 
-return ( FileType_None );
+return FileType_None;
 
 }
 

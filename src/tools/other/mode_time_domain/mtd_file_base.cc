@@ -11,8 +11,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -21,7 +19,6 @@ using namespace std;
 #include <cmath>
 
 #include <netcdf>
-using namespace netCDF;
 
 #include "mtd_file.h"
 #include "mtd_partition.h"
@@ -31,6 +28,9 @@ using namespace netCDF;
 #include "mtdfiletype_to_string.h"
 
 #include "vx_math.h"
+
+using namespace std;
+using namespace netCDF;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -72,7 +72,7 @@ void MtdFileBase::base_init_from_scratch()
 
 {
 
-G = (Grid *) 0;
+G = (Grid *) nullptr;
 
 clear();
 
@@ -88,7 +88,7 @@ void MtdFileBase::clear()
 
 {
 
-if ( G )  { delete G;  G = (Grid *) 0; }
+if ( G )  { delete G;  G = (Grid *) nullptr; }
 
 Nx = Ny = Nt = 0;
  
@@ -220,7 +220,7 @@ void MtdFileBase::set_grid(const Grid & g)
 
 {
 
-if ( G )  { delete G;  G = (Grid *) 0; }
+if ( G )  { delete G;  G = (Grid *) nullptr; }
 
 G = new Grid ( g );
 
@@ -245,7 +245,7 @@ if ( !G )  {
 }
 
 
-return ( *G );
+return *G;
 
 }
 
@@ -257,7 +257,7 @@ const Grid * MtdFileBase::grid_p() const
 
 {
 
-return ( G );
+return G;
 
 }
 
@@ -381,7 +381,7 @@ if ( (t < 0) || ( t >= (int)ActualValidTimes.size()) )  {
 
 }
 
-return ( ActualValidTimes[t] );
+return ActualValidTimes[t];
 
 }
 
@@ -401,7 +401,7 @@ if ( (index < 0) || ( index >= Nt) )  {
 
 }
 
-return ( Lead_Times[index] );
+return Lead_Times[index];
 
 }
 

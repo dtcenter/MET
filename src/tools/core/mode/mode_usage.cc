@@ -10,8 +10,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 
 #include "mode_usage.h"
@@ -19,6 +17,8 @@ using namespace std;
 
 #include "util_constants.h"
 #include "logger.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////

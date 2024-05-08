@@ -30,9 +30,9 @@
 // returns the actual valid times
 //
 
-extern vector<unixtime> mtd_read_data(MtdConfigInfo &, VarInfo &,
-                                      const StringArray & filenames,
-                                      MtdFloatFile &);
+extern std::vector<unixtime> mtd_read_data(MtdConfigInfo &, VarInfo &,
+                                           const StringArray & filenames,
+                                           MtdFloatFile &);
 
 
 ////////////////////////////////////////////////////////////////////////

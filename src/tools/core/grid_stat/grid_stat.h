@@ -113,7 +113,7 @@ static ConcatString obs_file;
 
 // Input Config file
 static ConcatString     config_file;
-static StringArray      config_files;
+static StringArray      ugrid_config_files;
 static GridStatConfInfo conf_info;
 
 // Optional arguments
@@ -127,7 +127,7 @@ static ConcatString out_dir;
 
 // Output Netcdf file
 static ConcatString         out_nc_file;
-static netCDF::NcFile      *nc_out = (netCDF::NcFile *) 0;
+static netCDF::NcFile      *nc_out = (netCDF::NcFile *) nullptr;
 static netCDF::NcDim        lat_dim;
 static netCDF::NcDim        lon_dim;
 
@@ -136,7 +136,7 @@ static StringArray nc_var_sa;
 
 // Output STAT file
 static ConcatString     stat_file;
-static std::ofstream    *stat_out = (std::ofstream *)  0;
+static std::ofstream    *stat_out = (std::ofstream *) nullptr;
 static AsciiTable       stat_at;
 static int              i_stat_row;
 
@@ -163,11 +163,11 @@ static DataPlane wgt_dp;
 
 // Data file factory and input files
 static Met2dDataFileFactory mtddf_factory;
-static Met2dDataFile *fcst_mtddf = (Met2dDataFile *) 0;
-static Met2dDataFile *obs_mtddf  = (Met2dDataFile *) 0;
+static Met2dDataFile *fcst_mtddf = (Met2dDataFile *) nullptr;
+static Met2dDataFile *obs_mtddf  = (Met2dDataFile *) nullptr;
 
 // Pointer to the random number generator to be used
-static gsl_rng *rng_ptr = (gsl_rng *) 0;
+static gsl_rng *rng_ptr = (gsl_rng *) nullptr;
 
 // Strings to be output in the STAT and optional text files
 static StatHdrColumns shc;

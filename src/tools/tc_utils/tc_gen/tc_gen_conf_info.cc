@@ -50,7 +50,7 @@ TCGenNcOutInfo & TCGenNcOutInfo::operator+=(const TCGenNcOutInfo &t) {
    if(t.do_best_fn_oy)   do_best_fn_oy   = true;
 
 
-   return(*this);
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -72,7 +72,7 @@ bool TCGenNcOutInfo::all_false() const {
                  do_best_genesis || do_best_tracks ||
                  do_best_fy_oy   || do_best_fn_oy;
 
-   return(!status);
+   return !status;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -179,7 +179,7 @@ void TCGenVxOpt::clear() {
 
 void TCGenVxOpt::process_config(Dictionary &dict) {
    int i, beg, end;
-   Dictionary *dict2 = (Dictionary *) 0;
+   Dictionary *dict2 = (Dictionary *) nullptr;
    ConcatString file_name;
    StringArray sa;
    bool status;
@@ -304,7 +304,7 @@ void TCGenVxOpt::process_config(Dictionary &dict) {
    OutputMap = parse_conf_output_flag(&dict, txt_file_type, n_txt);
 
    for(i=0, status=false; i<OutputMap.size(); i++) {
-      if(OutputMap[txt_file_type[i]] != STATOutputType_None) {
+      if(OutputMap[txt_file_type[i]] != STATOutputType::None) {
          status = true;
          break;
       }
@@ -390,7 +390,7 @@ void TCGenVxOpt::process_basin_mask(const Grid &basin_grid,
 ////////////////////////////////////////////////////////////////////////
 
 void TCGenVxOpt::parse_nc_info(Dictionary &odict) {
-   const DictionaryEntry * e = (const DictionaryEntry *) 0;
+   const DictionaryEntry * e = (const DictionaryEntry *) nullptr;
 
    e = odict.lookup(conf_key_nc_pairs_flag);
 
@@ -458,7 +458,7 @@ bool TCGenVxOpt::is_keeper(const GenesisInfo &gi) const {
          keep = false;
    }
 
-   if(!keep) return(keep);
+   if(!keep) return keep;
 
    // Only check intialization and lead times for forecast and
    // operational tracks.
@@ -481,7 +481,7 @@ bool TCGenVxOpt::is_keeper(const GenesisInfo &gi) const {
          keep = false;
    }
 
-   if(!keep) return(keep);
+   if(!keep) return keep;
 
    // Valid time window
    if((ValidBeg > 0 && ValidBeg > gi.valid_min()) ||
@@ -512,7 +512,7 @@ bool TCGenVxOpt::is_keeper(const GenesisInfo &gi) const {
       keep = false;
 
    // Return the keep status
-   return(keep);
+   return keep;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -568,7 +568,7 @@ bool TCGenVxOpt::is_keeper(const ProbGenInfo &gi) const {
       keep = false;
 
    // Return the keep status
-   return(keep);
+   return keep;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -622,13 +622,13 @@ bool TCGenVxOpt::is_keeper(const GenShapeInfo &gsi) const {
    // Distance to land does not apply
 
    // Return the keep status
-   return(keep);
+   return keep;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 STATOutputType TCGenVxOpt::output_map(STATLineType t) const {
-   return(OutputMap.at(t));
+   return OutputMap.at(t);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -709,7 +709,7 @@ void TCGenConfInfo::read_config(const char *default_file_name,
 ////////////////////////////////////////////////////////////////////////
 
 void TCGenConfInfo::process_config() {
-   Dictionary *dict = (Dictionary *) 0;
+   Dictionary *dict = (Dictionary *) nullptr;
    TCGenVxOpt vx_opt;
    int i, beg, end;
 
@@ -859,12 +859,12 @@ void TCGenConfInfo::process_flags(
 
    // Update output map
    for(i=0; i<n_txt; i++) {
-      if(m.at(txt_file_type[i]) == STATOutputType_Both) {
-         OutputMap[txt_file_type[i]] = STATOutputType_Both;
+      if(m.at(txt_file_type[i]) == STATOutputType::Both) {
+         OutputMap[txt_file_type[i]] = STATOutputType::Both;
       }
-      else if(m.at(txt_file_type[i]) == STATOutputType_Stat &&
-              OutputMap[txt_file_type[i]] == STATOutputType_None) {
-         OutputMap[txt_file_type[i]] = STATOutputType_Stat;
+      else if(m.at(txt_file_type[i]) == STATOutputType::Stat &&
+              OutputMap[txt_file_type[i]] == STATOutputType::None) {
+         OutputMap[txt_file_type[i]] = STATOutputType::Stat;
       }
    }
 
@@ -896,7 +896,7 @@ double TCGenConfInfo::compute_dland(double lat, double lon) {
       y < 0 || y >= DLandGrid.ny())   dist = bad_data_double;
    else                               dist = DLandData.get(x, y);
 
-   return(dist);
+   return dist;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -933,13 +933,13 @@ ConcatString TCGenConfInfo::compute_basin(double lat, double lon) {
       exit(1);
    }
 
-   return(BasinAbbr[i]);
+   return BasinAbbr[i];
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 STATOutputType TCGenConfInfo::output_map(STATLineType t) const {
-   return(OutputMap.at(t));
+   return OutputMap.at(t);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -951,7 +951,7 @@ int TCGenConfInfo::get_max_n_prob_thresh() const {
       n = max(n, VxOpt[i].ProbGenThresh.n());
    }
 
-   return(n);
+   return n;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -992,8 +992,8 @@ void GenCTCInfo::clear() {
    CTSDev.clear();
    CTSOps.clear();
 
-   VxOpt     = (const TCGenVxOpt *) 0;
-   NcOutGrid = (const Grid *) 0;
+   VxOpt     = (const TCGenVxOpt *) nullptr;
+   NcOutGrid = (const Grid *) nullptr;
 
    ValidGenesisDHrThresh.clear();
    BestUniqueFlag = false;
@@ -1067,11 +1067,11 @@ void GenCTCInfo::inc_dev(GenesisPairCategory c,
                          const GenesisInfo *bgi) {
 
    // Discard
-   if(c == DiscardGenesis) {
+   if(c == GenesisPairCategory::Discard) {
       return;
    }
    // Hits
-   else if(c == FYOYGenesis) {
+   else if(c == GenesisPairCategory::FYOY) {
       CTSDev.cts.inc_fy_oy();
       inc_pnt(fgi->lat(), fgi->lon(), fdev_fyoy_str);
       BestDevHitMap[bgi] += 1;
@@ -1082,12 +1082,12 @@ void GenCTCInfo::inc_dev(GenesisPairCategory c,
       }
    }
    // False Alarms
-   else if(c == FYONGenesis) {
+   else if(c == GenesisPairCategory::FYON) {
       CTSDev.cts.inc_fy_on();
       inc_pnt(fgi->lat(), fgi->lon(), fdev_fyon_str);
    }
    // Misses
-   else if(c == FNOYGenesis) {
+   else if(c == GenesisPairCategory::FNOY) {
       CTSDev.cts.inc_fn_oy();
 
       // Count all BEST track genesis pairs
@@ -1110,11 +1110,11 @@ void GenCTCInfo::inc_ops(GenesisPairCategory c,
                          const GenesisInfo *bgi) {
 
    // Discard
-   if(c == DiscardGenesis) {
+   if(c == GenesisPairCategory::Discard) {
       return;
    }
    // Hits
-   else if(c == FYOYGenesis) {
+   else if(c == GenesisPairCategory::FYOY) {
       CTSOps.cts.inc_fy_oy();
       inc_pnt(fgi->lat(), fgi->lon(), fops_fyoy_str);
       BestOpsHitMap[bgi] += 1;
@@ -1125,12 +1125,12 @@ void GenCTCInfo::inc_ops(GenesisPairCategory c,
       }
    }
    // False Alarms
-   else if(c == FYONGenesis) {
+   else if(c == GenesisPairCategory::FYON) {
       CTSOps.cts.inc_fy_on();
       inc_pnt(fgi->lat(), fgi->lon(), fops_fyon_str);
    }
    // Misses
-   else if(c == FNOYGenesis) {
+   else if(c == GenesisPairCategory::FNOY) {
       CTSOps.cts.inc_fn_oy();
 
       // Count all BEST track genesis pairs
@@ -1312,7 +1312,7 @@ void ProbGenPCTInfo::clear() {
    BestGenMap.clear();
    BestEvtMap.clear();
 
-   VxOpt = (const TCGenVxOpt *) 0;
+   VxOpt = (const TCGenVxOpt *) nullptr;
    LeadTimes.clear();
 
    return;

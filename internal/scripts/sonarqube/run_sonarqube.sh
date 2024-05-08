@@ -24,10 +24,10 @@
 GIT_REPO="https://github.com/dtcenter/${GIT_REPO_NAME}"
 
 function usage {
-        echo
-        echo "USAGE: $(basename $0) name"
-        echo "   where \"name\" specifies a branch, tag, or hash."
-        echo
+  echo
+  echo "USAGE: $(basename $0) name"
+  echo "   where \"name\" specifies a branch, tag, or hash."
+  echo
 }
 
 # Check for arguments
@@ -90,7 +90,6 @@ function run_command() {
   return ${STATUS}
 }
 
-
 # Store the full path to the scripts directory
 SCRIPT_DIR=`dirname $0`
 if [[ ${0:0:1} != "/" ]]; then SCRIPT_DIR=$(pwd)/${SCRIPT_DIR}; fi 
@@ -111,46 +110,35 @@ run_command "git checkout ${1}"
 export MET_DEVELOPMENT=true
 
 # Run the configure script
-run_command "./configure --prefix=`pwd` \
-            --enable-grib2 \
-            --enable-modis \
-            --enable-mode_graphics \
-            --enable-lidar2nc \
-            --enable-python \
-            --enable-ugrid"
+run_command "./configure --prefix=`pwd` --enable-all"
 
-# Set the build id
-#BUILD_ID="MET-${1}"
+# Define the version string
+SONAR_PROJECT_VERSION=$(grep "^version" docs/conf.py | cut -d'=' -f2 | tr -d "\'\" ")
 
 SONAR_PROPERTIES=sonar-project.properties
 
-# Copy sonar-project.properties for Python code
+# Configure sonar-project.properties
 [ -e $SONAR_PROPERTIES ] && rm $SONAR_PROPERTIES
-[ -z "$SONAR_SERVER_URL" ] && SONAR_SERVER_URL="http://localhost:9000"
-if [ -z "$SONAR_TOKEN_VALUE" ]; then
-  echo "  == ERROR == SONAR_TOKEN_VALUE is not defined"
+[ -z "$SONAR_HOST_URL" ] && SONAR_HOST_URL="http://localhost:9000"
+if [ -z "$SONAR_TOKEN" ]; then
+  echo "  == ERROR == SONAR_TOKEN is not defined"
   exit 1
 else
-  sed -e "s|SONAR_TOKEN_VALUE|$SONAR_TOKEN_VALUE|" -e "s|SONAR_SERVER_URL|$SONAR_SERVER_URL|" $SCRIPT_DIR/python.sonar-project.properties > $SONAR_PROPERTIES
-
-  # Run SonarQube scan for Python code
-  run_command "$SONAR_SCANNER"
-
-  # Copy sonar-project.properties for C/C++ code
   [ -e $SONAR_PROPERTIES ] && rm $SONAR_PROPERTIES
-  sed -e "s|SONAR_TOKEN_VALUE|$SONAR_TOKEN_VALUE|" -e "s|SONAR_SERVER_URL|$SONAR_SERVER_URL|" $SCRIPT_DIR/sonar-project.properties > $SONAR_PROPERTIES
+  sed -e "s|SONAR_PROJECT_VERSION|$SONAR_PROJECT_VERSION|" \
+      -e "s|SONAR_HOST_URL|$SONAR_HOST_URL|" \
+      -e "s|SONAR_TOKEN|$SONAR_TOKEN|" \
+      -e "s|SONAR_BRANCH_NAME|${1}|" \
+      $SCRIPT_DIR/$SONAR_PROPERTIES > $SONAR_PROPERTIES
 
   # Run SonarQube clean
   run_command "make clean"
 
-  # Run SonarQube make
+  # Run SonarQube build wrapper
   run_command "$SONAR_WRAPPER --out-dir $SONARQUBE_OUT_DIR make"
 
-  # Run SonarQube scan for C/C++ code
+  # Run SonarQube scan
   run_command "$SONAR_SCANNER"
 
   [ -e $SONAR_PROPERTIES ] && rm $SONAR_PROPERTIES
 fi
-
-# Run SonarQube report generator to make a PDF file
-#TODAY=`date +%Y%m%d`

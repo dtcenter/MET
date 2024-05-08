@@ -29,8 +29,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <fstream>
 #include <cstdio>
 #include <unistd.h>
@@ -46,6 +44,8 @@ using namespace std;
 #include "command_line.h"
 #include "string_fxns.h"
 #include "vx_log.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -210,8 +210,8 @@ void set_quiet(const StringArray &)
 
 void process_directory(const char * dir_name)
 {
-   DIR *dir = (DIR *) 0;  // pointer to a DIR structure
-   dirent *pde = (dirent *) 0;  // pointer to a portable directory entry
+   DIR *dir = (DIR *) nullptr;  // pointer to a DIR structure
+   dirent *pde = (dirent *) nullptr;  // pointer to a portable directory entry
    ConcatString new_directory;
    ConcatString tmp_directory;
    ConcatString new_filename;
@@ -437,7 +437,7 @@ int get_line(int & fd, ConcatString & s)
    while (read(fd, buf, n_bytes_to_read) > 0)
    {
       if (buf[0] == '\n')
-         return (1);
+         return 1;
 
       s.add(buf);
 
@@ -446,7 +446,7 @@ int get_line(int & fd, ConcatString & s)
       //
       // end of file
       //
-   return (0);
+   return 0;
 
 }
 
