@@ -538,7 +538,7 @@ bool get_nc_att_value(const NcVar *var, const ConcatString &att_name,
 ////////////////////////////////////////////////////////////////////////
 
 bool get_nc_att_values(const NcVar *var, const ConcatString &att_name,
-                      unsigned short *att_val, bool exit_on_error) {
+                       unsigned short *att_val, bool exit_on_error) {
    static const char *method_name = "get_nc_att_value(NcVar,float) -> ";
    bool status = get_nc_att_values_(var, att_name, att_val, exit_on_error,
                                     (unsigned short)bad_data_int, method_name);
