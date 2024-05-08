@@ -8,10 +8,12 @@ Created on Jan 10, 2024
 
 '''
 
+import sys
 import os
     
 import numpy as np
 import netCDF4 as nc
+import pandas as pd
 
 from met.point import met_point_obs, met_point_tools
 
@@ -53,6 +55,11 @@ class met_point_nc_tools(met_point_tools):
 
 class nc_point_obs(met_point_obs):
 
+   def __init__(self, nc_filename=None):
+      super().__init__()
+      if nc_filename:
+         self.read_data(nc_filename)
+
    # args should be string, list, or dictionary
    def get_nc_filename(self, args):
       nc_filename = None
@@ -67,62 +74,65 @@ class nc_point_obs(met_point_obs):
 
    def read_data(self, nc_filename):
       method_name = f"{self.__class__.__name__}.read_data()"
-      if nc_filename is None:
-         self.log_error_msg(f"{method_name} The input NetCDF filename is missing")
-      elif not os.path.exists(nc_filename):
-         self.log_error_msg(f"{method_name} input NetCDF file ({nc_filename}) does not exist")
-      else:
+      if not nc_filename:
+         raise TypeError(f"{method_name} The input NetCDF filename is missing")
+      if not os.path.exists(nc_filename):
+         raise TypeError(f"{method_name} input NetCDF file ({nc_filename}) does not exist")
+
+      try:
          dataset = nc.Dataset(nc_filename, 'r')
+      except OSError:
+         raise TypeError(f"{method_name} Could not open NetCDF file ({nc_filename}")
 
-         attr_name = 'use_var_id'
-         use_var_id_str = dataset.getncattr(attr_name) if attr_name in dataset.ncattrs() else "false"
-         self.use_var_id = use_var_id_str.lower() == 'true'
+      attr_name = 'use_var_id'
+      use_var_id_str = dataset.getncattr(attr_name) if attr_name in dataset.ncattrs() else "false"
+      self.use_var_id = use_var_id_str.lower() == 'true'
 
-         # Header
-         self.hdr_typ = dataset['hdr_typ'][:]
-         self.hdr_sid = dataset['hdr_sid'][:]
-         self.hdr_vld = dataset['hdr_vld'][:]
-         self.hdr_lat = dataset['hdr_lat'][:]
-         self.hdr_lon = dataset['hdr_lon'][:]
-         self.hdr_elv = dataset['hdr_elv'][:]
-         self.hdr_typ_table = met_point_nc_tools.get_string_array(dataset, 'hdr_typ_table')
-         self.hdr_sid_table = met_point_nc_tools.get_string_array(dataset, 'hdr_sid_table')
-         self.hdr_vld_table = met_point_nc_tools.get_string_array(dataset, 'hdr_vld_table')
+      # Header
+      self.hdr_typ = dataset['hdr_typ'][:]
+      self.hdr_sid = dataset['hdr_sid'][:]
+      self.hdr_vld = dataset['hdr_vld'][:]
+      self.hdr_lat = dataset['hdr_lat'][:]
+      self.hdr_lon = dataset['hdr_lon'][:]
+      self.hdr_elv = dataset['hdr_elv'][:]
+      self.hdr_typ_table = met_point_nc_tools.get_string_array(dataset, 'hdr_typ_table')
+      self.hdr_sid_table = met_point_nc_tools.get_string_array(dataset, 'hdr_sid_table')
+      self.hdr_vld_table = met_point_nc_tools.get_string_array(dataset, 'hdr_vld_table')
 
-         nc_var = dataset.variables.get('obs_unit', None)
-         if nc_var:
-            self.obs_var_unit  = nc_var[:]
-         nc_var = dataset.variables.get('obs_desc', None)
-         if nc_var:
-            self.obs_var_desc  = nc_var[:]
+      nc_var = dataset.variables.get('obs_unit', None)
+      if nc_var:
+         self.obs_var_unit  = nc_var[:]
+      nc_var = dataset.variables.get('obs_desc', None)
+      if nc_var:
+         self.obs_var_desc  = nc_var[:]
 
-         nc_var = dataset.variables.get('hdr_prpt_typ', None)
-         if nc_var:
-            self.hdr_prpt_typ  = nc_var[:]
-         nc_var = dataset.variables.get('hdr_irpt_typ', None)
-         if nc_var:
-            self.hdr_irpt_typ  = nc_var[:]
-         nc_var = dataset.variables.get('hdr_inst_typ', None)
-         if nc_var:
-            self.hdr_inst_typ  =nc_var[:]
+      nc_var = dataset.variables.get('hdr_prpt_typ', None)
+      if nc_var:
+         self.hdr_prpt_typ  = nc_var[:]
+      nc_var = dataset.variables.get('hdr_irpt_typ', None)
+      if nc_var:
+         self.hdr_irpt_typ  = nc_var[:]
+      nc_var = dataset.variables.get('hdr_inst_typ', None)
+      if nc_var:
+         self.hdr_inst_typ  =nc_var[:]
 
-         #Observation data        
-         self.hdr_sid = dataset['hdr_sid'][:]
-         self.obs_qty = np.array(dataset['obs_qty'][:])
-         self.obs_hid = np.array(dataset['obs_hid'][:])
-         self.obs_lvl = np.array(dataset['obs_lvl'][:])
-         self.obs_hgt = np.array(dataset['obs_hgt'][:])
-         self.obs_val = np.array(dataset['obs_val'][:])
-         nc_var = dataset.variables.get('obs_vid', None)
-         if nc_var is None:
-            self.use_var_id = False
-            nc_var = dataset.variables.get('obs_gc', None)
-         else:
-            self.obs_var_table = met_point_nc_tools.get_string_array(dataset, 'obs_var')
-         if nc_var:
-            self.obs_vid = np.array(nc_var[:])
-          
-         self.obs_qty_table = met_point_nc_tools.get_string_array(dataset, 'obs_qty_table')
+      #Observation data
+      self.hdr_sid = dataset['hdr_sid'][:]
+      self.obs_qty = np.array(dataset['obs_qty'][:])
+      self.obs_hid = np.array(dataset['obs_hid'][:])
+      self.obs_lvl = np.array(dataset['obs_lvl'][:])
+      self.obs_hgt = np.array(dataset['obs_hgt'][:])
+      self.obs_val = np.array(dataset['obs_val'][:])
+      nc_var = dataset.variables.get('obs_vid', None)
+      if nc_var is None:
+         self.use_var_id = False
+         nc_var = dataset.variables.get('obs_gc', None)
+      else:
+         self.obs_var_table = met_point_nc_tools.get_string_array(dataset, 'obs_var')
+      if nc_var:
+         self.obs_vid = np.array(nc_var[:])
+
+      self.obs_qty_table = met_point_nc_tools.get_string_array(dataset, 'obs_qty_table')
 
    def save_ncfile(self, nc_filename):
       met_data = self.get_point_data()
@@ -274,6 +284,22 @@ class nc_point_obs(met_point_obs):
          print(f'  === ERROR at {method_name} type(nc_dataset)={type(nc_dataset)} type(point_obs)={type(point_obs)}')
          raise
 
+   def to_pandas(self):
+       return pd.DataFrame({
+           'typ': [self.hdr_typ_table[self.hdr_typ[i]] for i in self.obs_hid],
+           'sid': [self.hdr_sid_table[self.hdr_sid[i]] for i in self.obs_hid],
+           'vld': [self.hdr_vld_table[self.hdr_vld[i]] for i in self.obs_hid],
+           'lat': [self.hdr_lat[i] for i in self.obs_hid],
+           'lon': [self.hdr_lon[i] for i in self.obs_hid],
+           'elv': [self.hdr_elv[i] for i in self.obs_hid],
+           'var': [self.obs_var_table[i] if self.use_var_id else f'{i}'
+                   for i in self.obs_vid],
+           'lvl': self.obs_lvl,
+           'hgt': self.obs_hgt,
+           'qc': [np.nan if np.ma.is_masked(i) else self.obs_qty_table[i]
+                  for i in self.obs_qty],
+           'obs': self.obs_val,
+       })
 
 def main(argv):
    if len(argv) != 1 and argv[1] != ARG_PRINT_DATA:
@@ -289,5 +315,5 @@ def main(argv):
          point_obs_data.print_point_data(met_point_data)
 
 if __name__ == '__main__':
-   main()
+   main(sys.argv)
    print('Done python script')
