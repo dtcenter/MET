@@ -56,6 +56,7 @@ class met_point_nc_tools(met_point_tools):
 class nc_point_obs(met_point_obs):
 
    def __init__(self, nc_filename=None):
+      super().__init__()
       if nc_filename:
          self.read_data(nc_filename)
 
