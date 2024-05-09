@@ -105,7 +105,7 @@ bool get_nc_att_value_(const netCDF::NcVar *var, const ConcatString &att_name,
 template <typename T>
 bool get_nc_att_values_(const netCDF::NcVar *var, const ConcatString &att_name,
                         T *att_vals, bool exit_on_error,
-                        T bad_data, const char *caller_name) {
+                        const char *caller_name) {
    // caller should initialize att_vals
 
    //
