@@ -59,27 +59,24 @@ using namespace netCDF;
 static ConcatString program_name;
 
 // Constants
-static const int TYPE_UNKNOWN  = 0;     // Can not process the input file
-static const int TYPE_OBS      = 1;     // MET Point Obs NetCDF (from xxx2nc)
-static const int TYPE_NCCF     = 2;     // CF NetCDF with time and lat/lon variables
-static const int TYPE_GOES     = 5;
-static const int TYPE_GOES_ADP = 6;
-static const int TYPE_PYTHON   = 7;     // MET Point Obs NetCDF from PYTHON
+constexpr int TYPE_UNKNOWN  = 0;     // Can not process the input file
+constexpr int TYPE_OBS      = 1;     // MET Point Obs NetCDF (from xxx2nc)
+constexpr int TYPE_NCCF     = 2;     // CF NetCDF with time and lat/lon variables
+constexpr int TYPE_GOES     = 5;
+constexpr int TYPE_GOES_ADP = 6;
+constexpr int TYPE_PYTHON   = 7;     // MET Point Obs NetCDF from PYTHON
 
-static const InterpMthd DefaultInterpMthd = InterpMthd::UW_Mean;
-static const int        DefaultInterpWdth = 2;
-static const double     DefaultVldThresh  = 0.5;
+constexpr InterpMthd DefaultInterpMthd = InterpMthd::UW_Mean;
+constexpr int        DefaultInterpWdth = 2;
+constexpr double     DefaultVldThresh  = 0.5;
 
-static const float      MISSING_LATLON = -999.0;
-static const int        QC_NA_INDEX = -1;
-static const int        LEVEL_FOR_PERFORMANCE = 6;
+constexpr float      MISSING_LATLON = -999.0;
+constexpr int        QC_NA_INDEX = -1;
+constexpr int        LEVEL_FOR_PERFORMANCE = 6;
 
-static const char * default_config_filename = "MET_BASE/config/Point2GridConfig_default";
+constexpr char default_config_filename[] = "MET_BASE/config/Point2GridConfig_default";
 
-static const string lat_dim_name_list = "x"; // "lat,latitude";
-static const string lon_dim_name_list = "y"; // "lon,longitude";
-
-static const char * GOES_global_attr_names[] = {
+std::vector<std::string> GOES_global_attr_names = {
       "naming_authority",
       "project",
       "production_site",
@@ -110,7 +107,7 @@ static IntArray message_type_list;
 // Variables for command line arguments
 static ConcatString InputFilename;
 static ConcatString OutputFilename;
-static ConcatString AdpFilename;
+static ConcatString adp_filename;
 static ConcatString config_filename;
 static PointToGridConfInfo conf_info;
 static StringArray FieldSA;
@@ -130,10 +127,10 @@ static int adp_qc_high;     /* 3 as baseline algorithm, 0 for enterpirse algorit
 static int adp_qc_medium;   /* 1 as baseline algorithm, 1 for enterpirse algorithm */
 static int adp_qc_low;      /* 0 as baseline algorithm, 2 for enterpirse algorithm */
 
-static const int MET_ADP_QC_HIGH = 0;
-static const int MET_ADP_QC_MEDIUM = 1;
-static const int MET_ADP_QC_LOW = 2;
-static const int MET_ADP_QC_NA = bad_data_int;
+constexpr int MET_ADP_QC_HIGH = 0;
+constexpr int MET_ADP_QC_MEDIUM = 1;
+constexpr int MET_ADP_QC_LOW = 2;
+constexpr int MET_ADP_QC_NA = bad_data_int;
 
 static const ConcatString att_name_values = "flag_values";
 static const ConcatString att_name_meanings = "flag_meanings";
@@ -189,11 +186,11 @@ static void set_adp_gc_values(NcVar var_adp_qc);
 // for GOES 16
 //
 static const int factor_float_to_int = 1000000;
-static const char *key_geostationary_data = "MET_GEOSTATIONARY_DATA";
-static const char *dim_name_lat = "lat";
-static const char *dim_name_lon = "lon";
-static const char *var_name_lat = "latitude";
-static const char *var_name_lon = "longitude";
+constexpr char key_geostationary_data[] = "MET_GEOSTATIONARY_DATA";
+constexpr char dim_name_lat[] = "lat";
+constexpr char dim_name_lon[] = "lon";
+constexpr char var_name_lat[] = "latitude";
+constexpr char var_name_lon[] = "longitude";
 static const ConcatString vname_dust("Dust");
 static const ConcatString vname_smoke("Smoke");
 
@@ -210,8 +207,7 @@ static int  get_lon_count(NcFile *);
 static NcVar get_goes_nc_var(NcFile *nc, const ConcatString var_name,
                              bool exit_if_error=true);
 static bool is_time_mismatch(NcFile *nc_in, NcFile *nc_adp);
-static ConcatString make_geostationary_filename(Grid fr_grid, Grid to_grid,
-                                                ConcatString regrid_name);
+static ConcatString make_geostationary_filename(Grid fr_grid, Grid to_grid);
 static void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
             DataPlane &fr_dp, DataPlane &to_dp,
             Grid fr_grid, Grid to_grid, IntArray *cellMapping, NcFile *nc_adp);
@@ -244,7 +240,7 @@ const string get_tool_name() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_command_line(int argc, char **argv) {
+static void process_command_line(int argc, char **argv) {
    CommandLine cline;
    static const char *method_name = "process_command_line() -> ";
 
@@ -304,7 +300,7 @@ void process_command_line(int argc, char **argv) {
    // Check if the input file
 #ifdef WITH_PYTHON
    if (use_python) {
-      int offset = python_command.find("=");
+      auto offset = python_command.find("=");
       if (offset == std::string::npos) {
          mlog << Error << "\n" << method_name
               << "trouble parsing the python command " << python_command << ".\n\n";
@@ -330,12 +326,10 @@ void process_command_line(int argc, char **argv) {
 
    // Check that same variable is required multiple times without -name argument
    if(VarNameSA.n() == 0) {
-      VarInfo *vinfo;
       MetConfig config;
-      VarInfoFactory v_factory;
       ConcatString vname;
       StringArray var_names;
-      vinfo = v_factory.new_var_info(FileType_NcMet);
+      VarInfo *vinfo = VarInfoFactory::new_var_info(FileType_NcMet);
       for(int i=0; i<FieldSA.n(); i++) {
          vinfo->clear();
          // Populate the VarInfo object using the config string
@@ -377,11 +371,11 @@ void process_command_line(int argc, char **argv) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_data_file() {
+static void process_data_file() {
    Grid fr_grid, to_grid;
    GrdFileType ftype;
    ConcatString run_cs;
-   NcFile *nc_in = (NcFile *) nullptr;
+   auto nc_in = (NcFile *) nullptr;
    static const char *method_name = "process_data_file() -> ";
 
    // Initialize configuration object
@@ -400,14 +394,13 @@ void process_data_file() {
    bool goes_data = false;
    bool use_python = false;
    int obs_type;
-   Met2dDataFileFactory m_factory;
-   Met2dDataFile *fr_mtddf = (Met2dDataFile *) nullptr;
+   auto fr_mtddf = (Met2dDataFile *) nullptr;
 #ifdef WITH_PYTHON
    string python_command = InputFilename;
    bool use_xarray = (0 == python_command.find(conf_val_python_xarray));
    use_python = use_xarray || (0 == python_command.find(conf_val_python_numpy));
    if (use_python) {
-      int offset = python_command.find("=");
+      auto offset = python_command.find("=");
       if (offset == std::string::npos) {
          mlog << Error << "\n" << method_name
               << "trouble parsing the python command " << python_command << ".\n\n";
@@ -430,7 +423,7 @@ void process_data_file() {
       if (obs_type == TYPE_NCCF) setenv(nc_att_met_point_nccf, "yes", 1);
 
       // Read the input data file
-      fr_mtddf = m_factory.new_met_2d_data_file(InputFilename.c_str(), ftype);
+      fr_mtddf = Met2dDataFileFactory::new_met_2d_data_file(InputFilename.c_str(), ftype);
    }
 
    if(!fr_mtddf) {
@@ -444,8 +437,7 @@ void process_data_file() {
 
    // Setup the VarInfo request object
    VarInfoFactory v_factory;
-   VarInfo *vinfo;
-   vinfo = v_factory.new_var_info(ftype);
+   VarInfo *vinfo = VarInfoFactory::new_var_info(ftype);
 
    if(!vinfo) {
       mlog << Error << "\n" << method_name
@@ -472,11 +464,11 @@ void process_data_file() {
 
    // Build the run command string
    run_cs << "Point obs (" << fr_grid.serialize() << ") to " << to_grid.serialize();
-   
+
    if (goes_data) {
       mlog << Debug(2) << "Input grid: " << fr_grid.serialize() << "\n";
       ConcatString grid_string = get_goes_grid_input(config, fr_grid, to_grid);
-      if (grid_string.length() > 0) run_cs << " with " << grid_string;
+      if (!grid_string.empty()) run_cs << " with " << grid_string;
    }
    mlog << Debug(2) << "Output grid: " << to_grid.serialize() << "\n";
 
@@ -509,7 +501,7 @@ void process_data_file() {
    close_nc();
 
    // Clean up
-   if(nc_in)    { delete nc_in;    nc_in  = 0; }
+   if(nc_in)    { delete nc_in;    nc_in  = nullptr; }
    if(fr_mtddf) { delete fr_mtddf; fr_mtddf = (Met2dDataFile *) nullptr; }
    if(vinfo)    { delete vinfo;    vinfo    = (VarInfo *)       nullptr; }
 
@@ -521,7 +513,7 @@ void process_data_file() {
 
 bool get_nc_data_int_array(NcFile *nc, char *var_name, int *data_array, bool stop=true) {
    bool status = false;
-   NcVar nc_var = get_nc_var(nc, (char *)var_name, stop);
+   NcVar nc_var = get_nc_var(nc, var_name, stop);
    if (IS_INVALID_NC(nc_var)) {
       if (stop) exit(1);
    }
@@ -548,7 +540,7 @@ bool get_nc_data_int_array(NcFile *nc, const char *var_name, int *data_array, bo
 // returns true if no error
 
 bool get_nc_data_float_array(NcFile *nc, char *var_name, float *data_array) {
-   NcVar nc_var = get_nc_var(nc, (char *)var_name);
+   NcVar nc_var = get_nc_var(nc, var_name);
    if (IS_INVALID_NC(nc_var)) exit(1);
 
    bool status = get_nc_data(&nc_var, data_array);
@@ -597,24 +589,24 @@ bool get_nc_data_string_array(NcFile *nc, const char *var_name,
 
 ////////////////////////////////////////////////////////////////////////
 
-int get_obs_type(NcFile *nc) {
+static int get_obs_type(NcFile *nc) {
    int obs_type = TYPE_UNKNOWN;
    ConcatString att_val_scene_id;
    ConcatString att_val_project;
    ConcatString input_type;
    static const char *method_name = "get_obs_type() -> ";
-   
+
    bool has_project = get_global_att(nc, (string)"project", att_val_project);
    bool has_scene_id = get_global_att(nc, (string)"scene_id", att_val_scene_id);
    if( has_scene_id && has_project && att_val_project == "GOES" ) {
       obs_type = TYPE_GOES;
       input_type = "GOES";
-      if (0 < AdpFilename.length()) {
+      if (!adp_filename.empty()) {
          obs_type = TYPE_GOES_ADP;
          input_type = "GOES_ADP";
-         if (!file_exists(AdpFilename.c_str())) {
+         if (!file_exists(adp_filename.c_str())) {
             mlog << Error << "\n" << method_name
-                 << "ADP input \"" << AdpFilename << "\" does not exist!\n\n";
+                 << "ADP input \"" << adp_filename << "\" does not exist!\n\n";
             exit(1);
          }
       }
@@ -636,7 +628,7 @@ int get_obs_type(NcFile *nc) {
 ////////////////////////////////////////////////////////////////////////
 // Check the message types
 
-void prepare_message_types(const StringArray hdr_types) {
+void prepare_message_types(const StringArray &hdr_types) {
    static const char *method_name = "prepare_message_types() -> ";
    message_type_list.clear();
    if (0 < conf_info.message_type.n()) {
@@ -665,14 +657,14 @@ void prepare_message_types(const StringArray hdr_types) {
 
 ////////////////////////////////////////////////////////////////////////
 
-IntArray prepare_qc_array(const IntArray qc_flags, StringArray qc_tables) {
+IntArray prepare_qc_array(const IntArray &_qc_flags, StringArray &qc_tables) {
    IntArray qc_idx_array;
-   bool has_qc_flags = (qc_flags.n() > 0);
+   bool has_qc_flags = (_qc_flags.n() > 0);
    if (has_qc_flags) {
       for(int idx=0; idx<qc_tables.n(); idx++) {
          int qc_value = (qc_tables[idx] == "NA")
                         ? QC_NA_INDEX : atoi(qc_tables[idx].c_str());
-         if (qc_flags.has(qc_value) && !qc_idx_array.has(idx)) {
+         if (_qc_flags.has(qc_value) && !qc_idx_array.has(idx)) {
             qc_idx_array.add(idx);
          }
       }
@@ -683,7 +675,7 @@ IntArray prepare_qc_array(const IntArray qc_flags, StringArray qc_tables) {
 ////////////////////////////////////////////////////////////////////////
 
 void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarInfo *vinfo,
-                            const Grid to_grid) {
+                            const Grid &to_grid) {
    int nhdr, nobs;
    int nx, ny, var_count, to_count, var_count2;
    int idx, hdr_idx;
@@ -695,12 +687,10 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
    DataPlane prob_dp, prob_mask_dp;
    NcVar var_obs_gc, var_obs_var;
 
-   clock_t start_clock =  clock();
    bool has_prob_thresh = !prob_cat_thresh.check(bad_data_double);
 
    unixtime requested_valid_time, valid_time;
    static const char *method_name = "process_point_met_data() -> ";
-   static const char *method_name_s = "process_point_met_data()";
 
    // Check for at least one configuration string
    if(FieldSA.n() < 1) {
@@ -709,8 +699,7 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
       usage();
    }
 
-//   MetNcPointObsIn nc_point_obs;
-   MetPointHeader *header_data = met_point_obs->get_header_data();
+   const MetPointHeader *header_data = met_point_obs->get_header_data();
    MetPointObsData *obs_data = met_point_obs->get_point_obs_data();
 
    nhdr = met_point_obs->get_hdr_cnt();
@@ -718,8 +707,8 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
    bool empty_input = (nhdr == 0 && nobs == 0);
    bool use_var_id = met_point_obs->is_using_var_id();
 
-   float *hdr_lats = new float[nhdr];
-   float *hdr_lons = new float[nhdr];
+   auto hdr_lats = new float[nhdr];
+   auto hdr_lons = new float[nhdr];
    IntArray var_index_array;
    IntArray valid_time_array;
    StringArray qc_tables = met_point_obs->get_qty_data();
@@ -734,416 +723,410 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
    prepare_message_types(header_data->typ_array);
 
    // Check and read obs_vid and obs_var if exists
-   bool success_to_read = true;
 
-   if (success_to_read) {
-      bool has_qc_flags = (qc_flags.n() > 0);
-      IntArray qc_idx_array = prepare_qc_array(qc_flags, qc_tables);
+   bool has_qc_flags = (qc_flags.n() > 0);
+   IntArray qc_idx_array = prepare_qc_array(qc_flags, qc_tables);
 
-      // Initialize size and values of output fields
-      nx = to_grid.nx();
-      ny = to_grid.ny();
-      to_dp.set_size(nx, ny);
-      to_dp.set_constant(bad_data_double);
-      cnt_dp.set_size(nx, ny);
-      cnt_dp.set_constant(0);
-      mask_dp.set_size(nx, ny);
-      mask_dp.set_constant(0);
-      if (has_prob_thresh || do_gaussian_filter) {
-         prob_dp.set_size(nx, ny);
-         prob_dp.set_constant(0);
-         prob_mask_dp.set_size(nx, ny);
-         prob_mask_dp.set_constant(0);
+   // Initialize size and values of output fields
+   nx = to_grid.nx();
+   ny = to_grid.ny();
+   to_dp.set_size(nx, ny);
+   to_dp.set_constant(bad_data_double);
+   cnt_dp.set_size(nx, ny);
+   cnt_dp.set_constant(0);
+   mask_dp.set_size(nx, ny);
+   mask_dp.set_constant(0);
+   if (has_prob_thresh || do_gaussian_filter) {
+      prob_dp.set_size(nx, ny);
+      prob_dp.set_constant(0);
+      prob_mask_dp.set_size(nx, ny);
+      prob_mask_dp.set_constant(0);
+   }
+
+   // Loop through the requested fields
+   int obs_count_zero_to, obs_count_non_zero_to;
+   int obs_count_zero_from, obs_count_non_zero_from;
+   IntArray *cellMapping = (IntArray *) nullptr;
+
+   obs_count_zero_to = obs_count_non_zero_to = 0;
+   obs_count_zero_from = obs_count_non_zero_from = 0;
+   for(int i=0; i<FieldSA.n(); i++) {
+
+      var_idx_or_gc = -1;
+
+      // Initialize
+      vinfo->clear();
+
+      // Populate the VarInfo object using the config string
+      config.read_string(FieldSA[i].c_str());
+      vinfo->set_dict(config);
+
+      // Check the variable name
+      ConcatString error_msg;
+      vname = vinfo->name();
+      bool exit_by_field_name_error = false;
+      if (vname == "obs_val" || vname == "obs_lvl" || vname == "obs_hgt") {
+         exit_by_field_name_error = true;
+         error_msg << "The variable \"" << vname
+                   << "\" exists but is not a valid field name.\n";
       }
-      
-      // Loop through the requested fields
-      int obs_count_zero_to, obs_count_non_zero_to;
-      int obs_count_zero_from, obs_count_non_zero_from;
-      IntArray *cellMapping = (IntArray *) nullptr;
-
-      obs_count_zero_to = obs_count_non_zero_to = 0;
-      obs_count_zero_from = obs_count_non_zero_from = 0;
-      for(int i=0; i<FieldSA.n(); i++) {
-
-         var_idx_or_gc = -1;
-   
-         // Initialize
-         vinfo->clear();
-
-         // Populate the VarInfo object using the config string
-         config.read_string(FieldSA[i].c_str());
-         vinfo->set_dict(config);
-
-         // Check the variable name
-         ConcatString error_msg;
-         vname = vinfo->name();
-         bool exit_by_field_name_error = false;
-         if (vname == "obs_val" || vname == "obs_lvl" || vname == "obs_hgt") {
-            exit_by_field_name_error = true;
-            error_msg << "The variable \"" << vname
-                      << "\" exists but is not a valid field name.\n";
+      else {
+         if (use_var_id) {
+            if (!var_names.has(vname, var_idx_or_gc)) {
+               exit_by_field_name_error = true;
+               error_msg << "The variable \"" << vname << "\" is not available.\n";
+            }
          }
          else {
-            if (use_var_id) {
-               if (!var_names.has(vname, var_idx_or_gc)) {
-                  exit_by_field_name_error = true;
-                  error_msg << "The variable \"" << vname << "\" is not available.\n";
-               }
-            }
-            else {
-               const int TMP_BUF_LEN = 128;
-               char grib_code[TMP_BUF_LEN + 1];
-               var_idx_or_gc = atoi(vname.c_str());
-               snprintf(grib_code, TMP_BUF_LEN, "%d", var_idx_or_gc);
-               if (vname != grib_code) {
-                  ConcatString var_id = conf_info.get_var_id(vname);
-                  if( var_id.nonempty() ) {
-                     var_idx_or_gc = atoi(var_id.c_str());
-                     snprintf(grib_code, TMP_BUF_LEN, "%d", var_idx_or_gc);
-                  }
-                  else {
-                     exit_by_field_name_error = true;
-                     error_msg << "Invalid GRIB code [" << vname << "]\n";
-                  }
+            const int TMP_BUF_LEN = 128;
+            char grib_code[TMP_BUF_LEN + 1];
+            var_idx_or_gc = atoi(vname.c_str());
+            snprintf(grib_code, TMP_BUF_LEN, "%d", var_idx_or_gc);
+            if (vname != grib_code) {
+               ConcatString var_id = conf_info.get_var_id(vname);
+               if( var_id.nonempty() ) {
+                  var_idx_or_gc = atoi(var_id.c_str());
+                  snprintf(grib_code, TMP_BUF_LEN, "%d", var_idx_or_gc);
                }
                else {
-                  bool not_found_grib_code = true;
-                  for (idx=0; idx<nobs; idx++) {
-                     if (var_idx_or_gc == obs_data->obs_ids[idx]) {
-                        not_found_grib_code = false;
-                        break;
-                     }
-                  }
-                  if (not_found_grib_code) {
-                     exit_by_field_name_error = true;
-                     error_msg << "No data for the GRIB code [" << vname << "]\n";
-                  }
-               }
-            }
-         }
-
-         if (exit_by_field_name_error) {
-            ConcatString log_msg;
-            if (use_var_id) {
-               for (idx=0; idx<var_names.n(); idx++) {
-                  if (0 < idx) log_msg << ", ";
-                  log_msg << var_names[idx];
+                  exit_by_field_name_error = true;
+                  error_msg << "Invalid GRIB code [" << vname << "]\n";
                }
             }
             else {
-               log_msg << "GRIB codes: ";
-               IntArray grib_codes;
+               bool not_found_grib_code = true;
                for (idx=0; idx<nobs; idx++) {
-                  if (!grib_codes.has(obs_data->obs_ids[idx])) {
-                     grib_codes.add(obs_data->obs_ids[idx]);
-                     if (0 < idx) log_msg << ", ";
-                     log_msg << obs_data->obs_ids[idx];
+                  if (var_idx_or_gc == obs_data->obs_ids[idx]) {
+                     not_found_grib_code = false;
+                     break;
                   }
                }
-            }
-            if (empty_input) {
-               mlog << Warning << "\n" << method_name
-                    << error_msg << "\tBut ignored because of empty input\n\n";
-            }
-            else {
-               mlog << Error << "\n" << method_name
-                    << error_msg
-                    << "Try setting the \"name\" in the \"-field\" command line option to one of the available names:\n"
-                    << "\t" << log_msg << "\n\n";
-               exit(1);
-            }
-         }
-
-         // Check the time range. Apply the time window
-         bool valid_time_from_config = true;
-         unixtime valid_beg_ut, valid_end_ut, obs_time;
-
-         valid_time_array.clear();
-         valid_time = vinfo->valid();
-         if (valid_time == 0) valid_time = conf_info.valid_time;
-         requested_valid_time = valid_time;
-         if (0 < valid_time) {
-            valid_beg_ut = valid_end_ut = valid_time;
-            if (!is_bad_data(conf_info.beg_ds)) valid_beg_ut += conf_info.beg_ds;
-            if (!is_bad_data(conf_info.end_ds)) valid_end_ut += conf_info.end_ds;
-            for(idx=0; idx<hdr_valid_times.n(); idx++) {
-               obs_time = timestring_to_unix(hdr_valid_times[idx].c_str());
-               if (valid_beg_ut <= obs_time && obs_time <= valid_end_ut) {
-                  valid_time_array.add(idx);
-                  mlog << Debug(4) << method_name << "The obs time "
-                       << hdr_valid_times[idx] << " was included\n";
-               }
-            }
-            valid_time_array.add(bad_data_int);    // added dummy entry
-         }
-         else {
-            valid_time_from_config = false;
-            // Set the latest available valid time
-            valid_time = 0;
-            for(idx=0; idx<hdr_valid_times.n(); idx++) {
-               obs_time = timestring_to_unix(hdr_valid_times[idx].c_str());
-               if (obs_time > valid_time) valid_time = obs_time;
-            }
-         }
-         mlog << Debug(3) << method_name << "valid_time from "
-              << (valid_time_from_config ? "config" : "input data") << ": "
-              << unix_to_yyyymmdd_hhmmss(valid_time) << "\n";
-
-         to_dp.set_init(valid_time);
-         to_dp.set_valid(valid_time);
-         cnt_dp.set_init(valid_time);
-         cnt_dp.set_valid(valid_time);
-         mask_dp.set_init(valid_time);
-         mask_dp.set_valid(valid_time);
-         if (has_prob_thresh || do_gaussian_filter) {
-            prob_dp.set_init(valid_time);
-            prob_dp.set_valid(valid_time);
-            prob_mask_dp.set_init(valid_time);
-            prob_mask_dp.set_valid(valid_time);
-         }
-
-         var_index_array.clear();
-         // Select output variable name
-         vname = (VarNameSA.n() == 0)
-                 ? conf_info.get_var_name(vinfo->name())
-                 : conf_info.get_var_name(VarNameSA[i]);
-         mlog << Debug(4) << method_name
-              << "var: " << vname << ", index: " << var_idx_or_gc << ".\n";
-
-         var_count = var_count2 = to_count = 0;
-         filtered_by_time = filtered_by_msg_type = filtered_by_qc = 0;
-         for (idx=0; idx < nobs; idx++) {
-            if (var_idx_or_gc == obs_data->obs_ids[idx]) {
-               var_count2++;
-               hdr_idx = obs_data->obs_hids[idx];
-               if (0 < valid_time_array.n() &&
-                     !valid_time_array.has(header_data->vld_idx_array[hdr_idx])) {
-                  filtered_by_time++;
-                  continue;
-               }
-
-               if(!keep_message_type(header_data->typ_idx_array[hdr_idx])) {
-                  filtered_by_msg_type++;
-                  continue;
-               }
-
-               // Filter by QC flag
-               if (has_qc_flags && !qc_idx_array.has(obs_data->obs_qids[idx])) {
-                  filtered_by_qc++;
-                  continue;
-               }
-
-               var_index_array.add(idx);
-               var_count++;
-               if (is_eq(obs_data->obs_vals[idx], 0.)) obs_count_zero_from++;
-               else obs_count_non_zero_from++;
-            }
-         }
-
-         if (cellMapping) {
-            for (idx=0; idx<(nx*ny); idx++) cellMapping[idx].clear();
-            delete [] cellMapping;
-         }
-         cellMapping = new IntArray[nx * ny];
-         if( get_grid_mapping(to_grid, cellMapping, var_index_array,
-                              obs_data->obs_hids, hdr_lats, hdr_lons) ) {
-            int from_index;
-            IntArray cellArray;
-            NumArray dataArray;
-            int offset = 0;
-            int valid_count = 0;
-            int absent_count = 0;
-            int censored_count = 0;
-            float data_value;
-            float from_min_value =  10e10;
-            float from_max_value = -10e10;
-
-            // Initialize counter and output fields
-            to_count = 0;
-            to_dp.set_constant(bad_data_double);
-            cnt_dp.set_constant(0);
-            mask_dp.set_constant(0);
-            if (has_prob_thresh || do_gaussian_filter) {
-               prob_dp.set_constant(0);
-               prob_mask_dp.set_constant(0);
-            }
-
-            for (int x_idx = 0; x_idx<nx; x_idx++) {
-               for (int y_idx = 0; y_idx<ny; y_idx++) {
-                  offset = to_dp.two_to_one(x_idx,y_idx);
-                  cellArray = cellMapping[offset];
-                  int prob_cnt = 0;
-                  int prob_value_sum = 0;
-                  if (0 < cellArray.n()) {
-                     valid_count = 0;
-                     dataArray.clear();
-                     dataArray.extend(cellArray.n());
-                     for (int dIdx=0; dIdx<cellArray.n(); dIdx++) {
-                        from_index = cellArray[dIdx];
-                        data_value = obs_data->get_obs_val(from_index);
-                        if (is_bad_data(data_value)) continue;
-
-                        if(mlog.verbosity_level() >= 4) {
-                           if (from_min_value > data_value) from_min_value = data_value;
-                           if (from_max_value < data_value) from_max_value = data_value;
-                        }
-
-                        for(int ic=0; ic<vinfo->censor_thresh().n(); ic++) {
-                           // Break out after the first match.
-                           if(vinfo->censor_thresh()[ic].check(data_value)) {
-                              data_value = vinfo->censor_val()[ic];
-                              censored_count++;
-                              break;
-                           }
-                        }
-
-                        dataArray.add(data_value);
-                        valid_count++;
-                     }
-                     if (0 < valid_count) to_count++;
-
-                     int data_count = dataArray.n();
-                     if (0 < data_count) {
-                        float to_value;
-                        if      (RGInfo.method == InterpMthd::Min) to_value = dataArray.min();
-                        else if (RGInfo.method == InterpMthd::Max) to_value = dataArray.max();
-                        else if (RGInfo.method == InterpMthd::Median) {
-                           dataArray.sort_array();
-                           to_value = dataArray[data_count/2];
-                           if (0 == data_count % 2)
-                              to_value = (to_value + dataArray[(data_count/2)+1])/2;
-                        }
-                        else to_value = dataArray.sum() / data_count;
-
-                        if (is_eq(to_value, 0.)) obs_count_zero_to++;
-                        else obs_count_non_zero_to++;
-
-                        cnt_dp.set(data_count, x_idx, y_idx);
-                        mask_dp.set(1, x_idx, y_idx);
-                        to_dp.set(to_value, x_idx, y_idx);
-                        if ((has_prob_thresh && prob_cat_thresh.check(to_value))
-                            || (do_gaussian_filter && !has_prob_thresh)) {
-                           prob_dp.set(1, x_idx, y_idx);
-                           prob_mask_dp.set(1, x_idx, y_idx);
-                        }
-
-                        if (1 < data_count) {
-                           mlog << Debug(9) << method_name
-                                << " to_value:" << to_value
-                                << " at " << x_idx << "," << y_idx
-                                << ", max: " << dataArray.max()
-                                << ", min: " << dataArray.min()
-                                << ", mean: " << dataArray.sum()/data_count
-                                << " from " << data_count << " data values.\n";
-                        }
-                        mlog << Debug(8) << method_name << "data at " << x_idx << "," << y_idx
-                             << ", value: " << to_value << "\n";
-                     }
-                  }
+               if (not_found_grib_code) {
+                  exit_by_field_name_error = true;
+                  error_msg << "No data for the GRIB code [" << vname << "]\n";
                }
             }
          }
+      }
 
-         // Write the regridded data
-         write_nc(to_dp, to_grid, vinfo, vname.c_str());
-
-         vname_cnt = vname;
-         vname_cnt << "_cnt";
-         vname_mask = vname;
-         vname_mask << "_mask";
-
-         ConcatString tmp_long_name;
-         ConcatString var_long_name = vinfo->long_name();
-         ConcatString dim_string = "(*,*)";
-
-         tmp_long_name = vname_cnt;
-         tmp_long_name << dim_string;
-         vinfo->set_long_name(tmp_long_name.c_str());
-         write_nc_int(cnt_dp, to_grid, vinfo, vname_cnt.c_str());
-
-         tmp_long_name = vname_mask;
-         tmp_long_name << dim_string;
-         vinfo->set_long_name(tmp_long_name.c_str());
-         write_nc_int(mask_dp, to_grid, vinfo, vname_mask.c_str());
-
-         if (has_prob_thresh || do_gaussian_filter) {
-            ConcatString vname_prob = vname;
-            vname_prob << "_prob_" << prob_cat_thresh.get_abbr_str();
-            ConcatString vname_prob_mask = vname_prob;
-            vname_prob_mask << "_mask";
-
-            if (do_gaussian_filter) interp_gaussian_dp(prob_dp, RGInfo.gaussian, RGInfo.vld_thresh);
-
-            tmp_long_name = vname_prob;
-            tmp_long_name << dim_string;
-            vinfo->set_long_name(tmp_long_name.c_str());
-            write_nc(prob_dp, to_grid, vinfo, vname_prob.c_str());
-            if (do_gaussian_filter) {
-               NcVar prob_var = get_var(nc_out, vname_prob.c_str());
-               if (IS_VALID_NC(prob_var)) {
-                  add_att(&prob_var, "gaussian_radius", RGInfo.gaussian.radius);
-                  add_att(&prob_var, "gaussian_dx", RGInfo.gaussian.dx);
-                  add_att(&prob_var, "trunc_factor", RGInfo.gaussian.trunc_factor);
-               }
-            }
-
-            tmp_long_name = vname_prob_mask;
-            tmp_long_name << dim_string;
-            vinfo->set_long_name(tmp_long_name.c_str());
-            write_nc_int(prob_mask_dp, to_grid, vinfo, vname_prob_mask.c_str());
-         }
-         vinfo->set_long_name(var_long_name.c_str());
-
-         mlog << Debug(7) << method_name << "obs_count_zero_to: " << obs_count_zero_to
-              << ", obs_count_non_zero_to: " << obs_count_non_zero_to << "\n";
-
+      if (exit_by_field_name_error) {
          ConcatString log_msg;
-         log_msg << "Filtered by time: " << filtered_by_time;
-         if (0 < requested_valid_time) {
-            log_msg << " [" << unix_to_yyyymmdd_hhmmss(requested_valid_time) << "]";
-         }
-         log_msg << ", by msg_type: " << filtered_by_msg_type;
-         if (0 < filtered_by_msg_type) {
-            log_msg << " [";
-            for(idx=0; idx<conf_info.message_type.n(); idx++) {
-               if (idx > 0) log_msg << ",";
-               log_msg << conf_info.message_type[idx];
-            }
-            log_msg << "]";
-         }
-         log_msg << ", by QC: " << filtered_by_qc;
-         if (0 < filtered_by_qc) {
-            log_msg << " [";
-            for(idx=0; idx<qc_flags.n(); idx++) {
-               if (idx > 0) log_msg << ",";
-               log_msg << qc_flags[idx];
-            }
-            log_msg << "]";
-         }
-         log_msg << ", out of " << var_count2;
-         int filtered_count = filtered_by_msg_type + filtered_by_qc + requested_valid_time;
-         if (0 == var_count) {
-            if (0 == filtered_count) {
-               mlog << Warning << "\n" << method_name
-                    << "No valid data for the variable ["
-                    << vinfo->name() << "]\n\n";
-            }
-            else {
-               mlog << Warning << "\n" << method_name
-                    << "No valid data after filtering.\n\t"
-                    << log_msg << ".\n\n";
+         if (use_var_id) {
+            for (idx=0; idx<var_names.n(); idx++) {
+               if (0 < idx) log_msg << ", ";
+               log_msg << var_names[idx];
             }
          }
          else {
-            mlog << Debug(2) << method_name << "var_count=" << var_count
-                 << ", grid: " << to_count << " out of " << (nx * ny) << "  "
-                 << (0 < filtered_count ? log_msg.c_str() : " ") << "\n";
+            log_msg << "GRIB codes: ";
+            IntArray grib_codes;
+            for (idx=0; idx<nobs; idx++) {
+               if (!grib_codes.has(obs_data->obs_ids[idx])) {
+                  grib_codes.add(obs_data->obs_ids[idx]);
+                  if (0 < idx) log_msg << ", ";
+                  log_msg << obs_data->obs_ids[idx];
+               }
+            }
          }
-      } // end for i
+         if (empty_input) {
+            mlog << Warning << "\n" << method_name
+                 << error_msg << "\tBut ignored because of empty input\n\n";
+         }
+         else {
+            mlog << Error << "\n" << method_name
+                 << error_msg
+                 << "Try setting the \"name\" in the \"-field\" command line option to one of the available names:\n"
+                 << "\t" << log_msg << "\n\n";
+            exit(1);
+         }
+      }
+
+      // Check the time range. Apply the time window
+      bool valid_time_from_config = true;
+      unixtime valid_beg_ut, valid_end_ut, obs_time;
+
+      valid_time_array.clear();
+      valid_time = vinfo->valid();
+      if (valid_time == 0) valid_time = conf_info.valid_time;
+      requested_valid_time = valid_time;
+      if (0 < valid_time) {
+         valid_beg_ut = valid_end_ut = valid_time;
+         if (!is_bad_data(conf_info.beg_ds)) valid_beg_ut += conf_info.beg_ds;
+         if (!is_bad_data(conf_info.end_ds)) valid_end_ut += conf_info.end_ds;
+         for(idx=0; idx<hdr_valid_times.n(); idx++) {
+            obs_time = timestring_to_unix(hdr_valid_times[idx].c_str());
+            if (valid_beg_ut <= obs_time && obs_time <= valid_end_ut) {
+               valid_time_array.add(idx);
+               mlog << Debug(4) << method_name << "The obs time "
+                    << hdr_valid_times[idx] << " was included\n";
+            }
+         }
+         valid_time_array.add(bad_data_int);    // added dummy entry
+      }
+      else {
+         valid_time_from_config = false;
+         // Set the latest available valid time
+         valid_time = 0;
+         for(idx=0; idx<hdr_valid_times.n(); idx++) {
+            obs_time = timestring_to_unix(hdr_valid_times[idx].c_str());
+            if (obs_time > valid_time) valid_time = obs_time;
+         }
+      }
+      mlog << Debug(3) << method_name << "valid_time from "
+           << (valid_time_from_config ? "config" : "input data") << ": "
+           << unix_to_yyyymmdd_hhmmss(valid_time) << "\n";
+
+      to_dp.set_init(valid_time);
+      to_dp.set_valid(valid_time);
+      cnt_dp.set_init(valid_time);
+      cnt_dp.set_valid(valid_time);
+      mask_dp.set_init(valid_time);
+      mask_dp.set_valid(valid_time);
+      if (has_prob_thresh || do_gaussian_filter) {
+         prob_dp.set_init(valid_time);
+         prob_dp.set_valid(valid_time);
+         prob_mask_dp.set_init(valid_time);
+         prob_mask_dp.set_valid(valid_time);
+      }
+
+      var_index_array.clear();
+      // Select output variable name
+      vname = (VarNameSA.n() == 0)
+              ? conf_info.get_var_name(vinfo->name())
+              : conf_info.get_var_name(VarNameSA[i]);
+      mlog << Debug(4) << method_name
+           << "var: " << vname << ", index: " << var_idx_or_gc << ".\n";
+
+      var_count = var_count2 = to_count = 0;
+      filtered_by_time = filtered_by_msg_type = filtered_by_qc = 0;
+      for (idx=0; idx < nobs; idx++) {
+         if (var_idx_or_gc == obs_data->obs_ids[idx]) {
+            var_count2++;
+            hdr_idx = obs_data->obs_hids[idx];
+            if (0 < valid_time_array.n() &&
+                  !valid_time_array.has(header_data->vld_idx_array[hdr_idx])) {
+               filtered_by_time++;
+               continue;
+            }
+
+            if(!keep_message_type(header_data->typ_idx_array[hdr_idx])) {
+               filtered_by_msg_type++;
+               continue;
+            }
+
+            // Filter by QC flag
+            if (has_qc_flags && !qc_idx_array.has(obs_data->obs_qids[idx])) {
+               filtered_by_qc++;
+               continue;
+            }
+
+            var_index_array.add(idx);
+            var_count++;
+            if (is_eq(obs_data->obs_vals[idx], 0.)) obs_count_zero_from++;
+            else obs_count_non_zero_from++;
+         }
+      }
 
       if (cellMapping) {
-         delete [] cellMapping;   cellMapping = (IntArray *) nullptr;
+         for (idx=0; idx<(nx*ny); idx++) cellMapping[idx].clear();
+         delete [] cellMapping;
       }
+      cellMapping = new IntArray[nx * ny];
+      if( get_grid_mapping(to_grid, cellMapping, var_index_array,
+                           obs_data->obs_hids, hdr_lats, hdr_lons) ) {
+         int from_index;
+         IntArray cellArray;
+         NumArray dataArray;
+         int offset = 0;
+         int valid_count = 0;
+         int censored_count = 0;
+         double data_value;
+         double from_min_value =  10e10;
+         double from_max_value = -10e10;
+
+         // Initialize counter and output fields
+         to_count = 0;
+         to_dp.set_constant(bad_data_double);
+         cnt_dp.set_constant(0);
+         mask_dp.set_constant(0);
+         if (has_prob_thresh || do_gaussian_filter) {
+            prob_dp.set_constant(0);
+            prob_mask_dp.set_constant(0);
+         }
+
+         for (int x_idx = 0; x_idx<nx; x_idx++) {
+            for (int y_idx = 0; y_idx<ny; y_idx++) {
+               offset = to_dp.two_to_one(x_idx,y_idx);
+               cellArray = cellMapping[offset];
+               if (0 < cellArray.n()) {
+                  valid_count = 0;
+                  dataArray.clear();
+                  dataArray.extend(cellArray.n());
+                  for (int dIdx=0; dIdx<cellArray.n(); dIdx++) {
+                     from_index = cellArray[dIdx];
+                     data_value = obs_data->get_obs_val(from_index);
+                     if (is_bad_data(data_value)) continue;
+
+                     if(mlog.verbosity_level() >= 4) {
+                        if (from_min_value > data_value) from_min_value = data_value;
+                        if (from_max_value < data_value) from_max_value = data_value;
+                     }
+
+                     for(int ic=0; ic<vinfo->censor_thresh().n(); ic++) {
+                        // Break out after the first match.
+                        if(vinfo->censor_thresh()[ic].check(data_value)) {
+                           data_value = vinfo->censor_val()[ic];
+                           censored_count++;
+                           break;
+                        }
+                     }
+
+                     dataArray.add(data_value);
+                     valid_count++;
+                  }
+                  if (0 < valid_count) to_count++;
+
+                  int data_count = dataArray.n();
+                  if (0 < data_count) {
+                     double to_value;
+                     if      (RGInfo.method == InterpMthd::Min) to_value = dataArray.min();
+                     else if (RGInfo.method == InterpMthd::Max) to_value = dataArray.max();
+                     else if (RGInfo.method == InterpMthd::Median) {
+                        dataArray.sort_array();
+                        to_value = dataArray[data_count/2];
+                        if (0 == data_count % 2)
+                           to_value = (float)(to_value + dataArray[(data_count/2)+1])/2;
+                     }
+                     else to_value = dataArray.sum() / data_count;
+
+                     if (is_eq(to_value, 0.)) obs_count_zero_to++;
+                     else obs_count_non_zero_to++;
+
+                     cnt_dp.set(data_count, x_idx, y_idx);
+                     mask_dp.set(1, x_idx, y_idx);
+                     to_dp.set(to_value, x_idx, y_idx);
+                     if ((has_prob_thresh && prob_cat_thresh.check(to_value))
+                         || (do_gaussian_filter && !has_prob_thresh)) {
+                        prob_dp.set(1, x_idx, y_idx);
+                        prob_mask_dp.set(1, x_idx, y_idx);
+                     }
+
+                     if (1 < data_count) {
+                        mlog << Debug(9) << method_name
+                             << " to_value:" << to_value
+                             << " at " << x_idx << "," << y_idx
+                             << ", max: " << dataArray.max()
+                             << ", min: " << dataArray.min()
+                             << ", mean: " << dataArray.sum()/data_count
+                             << " from " << data_count << " data values.\n";
+                     }
+                     mlog << Debug(8) << method_name << "data at " << x_idx << "," << y_idx
+                          << ", value: " << to_value << "\n";
+                  }
+               }
+            }
+         }
+      }
+
+      // Write the regridded data
+      write_nc(to_dp, to_grid, vinfo, vname.c_str());
+
+      vname_cnt = vname;
+      vname_cnt << "_cnt";
+      vname_mask = vname;
+      vname_mask << "_mask";
+
+      ConcatString tmp_long_name;
+      ConcatString var_long_name = vinfo->long_name();
+      ConcatString dim_string = "(*,*)";
+
+      tmp_long_name = vname_cnt;
+      tmp_long_name << dim_string;
+      vinfo->set_long_name(tmp_long_name.c_str());
+      write_nc_int(cnt_dp, to_grid, vinfo, vname_cnt.c_str());
+
+      tmp_long_name = vname_mask;
+      tmp_long_name << dim_string;
+      vinfo->set_long_name(tmp_long_name.c_str());
+      write_nc_int(mask_dp, to_grid, vinfo, vname_mask.c_str());
+
+      if (has_prob_thresh || do_gaussian_filter) {
+         ConcatString vname_prob = vname;
+         vname_prob << "_prob_" << prob_cat_thresh.get_abbr_str();
+         ConcatString vname_prob_mask = vname_prob;
+         vname_prob_mask << "_mask";
+
+         if (do_gaussian_filter) interp_gaussian_dp(prob_dp, RGInfo.gaussian, RGInfo.vld_thresh);
+
+         tmp_long_name = vname_prob;
+         tmp_long_name << dim_string;
+         vinfo->set_long_name(tmp_long_name.c_str());
+         write_nc(prob_dp, to_grid, vinfo, vname_prob.c_str());
+         if (do_gaussian_filter) {
+            NcVar prob_var = get_var(nc_out, vname_prob.c_str());
+            if (IS_VALID_NC(prob_var)) {
+               add_att(&prob_var, "gaussian_radius", RGInfo.gaussian.radius);
+               add_att(&prob_var, "gaussian_dx", RGInfo.gaussian.dx);
+               add_att(&prob_var, "trunc_factor", RGInfo.gaussian.trunc_factor);
+            }
+         }
+
+         tmp_long_name = vname_prob_mask;
+         tmp_long_name << dim_string;
+         vinfo->set_long_name(tmp_long_name.c_str());
+         write_nc_int(prob_mask_dp, to_grid, vinfo, vname_prob_mask.c_str());
+      }
+      vinfo->set_long_name(var_long_name.c_str());
+
+      mlog << Debug(7) << method_name << "obs_count_zero_to: " << obs_count_zero_to
+           << ", obs_count_non_zero_to: " << obs_count_non_zero_to << "\n";
+
+      ConcatString log_msg;
+      log_msg << "Filtered by time: " << filtered_by_time;
+      if (0 < requested_valid_time) {
+         log_msg << " [" << unix_to_yyyymmdd_hhmmss(requested_valid_time) << "]";
+      }
+      log_msg << ", by msg_type: " << filtered_by_msg_type;
+      if (0 < filtered_by_msg_type) {
+         log_msg << " [";
+         for(idx=0; idx<conf_info.message_type.n(); idx++) {
+            if (idx > 0) log_msg << ",";
+            log_msg << conf_info.message_type[idx];
+         }
+         log_msg << "]";
+      }
+      log_msg << ", by QC: " << filtered_by_qc;
+      if (0 < filtered_by_qc) {
+         log_msg << " [";
+         for(idx=0; idx<qc_flags.n(); idx++) {
+            if (idx > 0) log_msg << ",";
+            log_msg << qc_flags[idx];
+         }
+         log_msg << "]";
+      }
+      log_msg << ", out of " << var_count2;
+      int filtered_count = filtered_by_msg_type + filtered_by_qc + (int)requested_valid_time;
+      if (0 == var_count) {
+         if (0 == filtered_count) {
+            mlog << Warning << "\n" << method_name
+                 << "No valid data for the variable ["
+                 << vinfo->name() << "]\n\n";
+         }
+         else {
+            mlog << Warning << "\n" << method_name
+                 << "No valid data after filtering.\n\t"
+                 << log_msg << ".\n\n";
+         }
+      }
+      else {
+         mlog << Debug(2) << method_name << "var_count=" << var_count
+              << ", grid: " << to_count << " out of " << (nx * ny) << "  "
+              << (0 < filtered_count ? log_msg.c_str() : " ") << "\n";
+      }
+   } // end for i
+
+   if (cellMapping) {
+      delete [] cellMapping;   cellMapping = (IntArray *) nullptr;
    }
 
    delete [] hdr_lats;
@@ -1154,7 +1137,7 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
+static void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
                         const Grid to_grid) {
    ConcatString vname, vname_cnt, vname_mask;
    DataPlane fr_dp, to_dp;
@@ -1164,7 +1147,6 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
 
    clock_t start_clock =  clock();
 
-   unixtime requested_valid_time, valid_time;
    static const char *method_name = "process_point_file() -> ";
    static const char *method_name_s = "process_point_file()";
 
@@ -1195,8 +1177,8 @@ void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
 
 #ifdef WITH_PYTHON
 
-void process_point_python(string python_command, MetConfig &config, VarInfo *vinfo,
-                          const Grid to_grid, bool use_xarray) {
+static void process_point_python(string python_command, MetConfig &config, VarInfo *vinfo,
+                                 const Grid to_grid, bool use_xarray) {
    ConcatString vname, vname_cnt, vname_mask;
    DataPlane fr_dp, to_dp;
    DataPlane cnt_dp, mask_dp;
@@ -1204,9 +1186,7 @@ void process_point_python(string python_command, MetConfig &config, VarInfo *vin
    NcVar var_obs_gc, var_obs_var;
 
    clock_t start_clock =  clock();
-   unixtime requested_valid_time, valid_time;
    static const char *method_name = "process_point_python() -> ";
-   static const char *method_name_s = "process_point_python()";
 
    // Check for at least one configuration string
    if(FieldSA.n() < 1) {
@@ -1240,15 +1220,15 @@ void process_point_python(string python_command, MetConfig &config, VarInfo *vin
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
-                             VarInfo *vinfo, Met2dDataFile *fr_mtddf,
-                             const Grid to_grid) {
+static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
+                                    VarInfo *vinfo, Met2dDataFile *fr_mtddf,
+                                    const Grid to_grid) {
    ConcatString vname, vname_cnt, vname_mask;
    DataPlane fr_dp, to_dp;
    DataPlane cnt_dp, mask_dp;
    unixtime valid_beg_ut, valid_end_ut;
-   bool *skip_times = 0;
-   double *valid_times = 0;
+   bool *skip_times = nullptr;
+   double *valid_times = nullptr;
    int filtered_by_time = 0;
    clock_t start_clock =  clock();
    bool opt_all_attrs = false;
@@ -1268,7 +1248,7 @@ void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
            << "can not find the longitude variable.\n\n";
       exit(1);
    }
-   
+
    // Check for at least one configuration string
    if(FieldSA.n() < 1) {
       mlog << Error << "\n" << method_name
@@ -1278,7 +1258,7 @@ void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
 
    unixtime valid_time = bad_data_int;
    valid_beg_ut = valid_end_ut = conf_info.valid_time;
-   
+
    NcVar time_var = get_nc_var_time(nc_in);
    if( IS_VALID_NC(time_var) ) {
       if( 1 < get_dim_count(&time_var) ) {
@@ -1288,7 +1268,7 @@ void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
          if (get_nc_data(&time_var, valid_times)) {
             int sec_per_unit = 0;
             bool no_leap_year = false;
-            unixtime ref_ut = (unixtime) 0;
+            auto ref_ut = (unixtime) 0;
             unixtime tmp_time;
             if( conf_info.valid_time > 0 ) {
                if (!is_bad_data(conf_info.beg_ds)) valid_beg_ut += conf_info.beg_ds;
@@ -1311,7 +1291,7 @@ void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
       else valid_time = find_valid_time(time_var);
    }
    to_dp.set_size(to_grid.nx(), to_grid.ny());
-   IntArray *cellMapping = new IntArray[to_grid.nx() * to_grid.ny()];
+   auto cellMapping = new IntArray[to_grid.nx() * to_grid.ny()];
    get_grid_mapping(fr_grid, to_grid, cellMapping, var_lat, var_lon, skip_times);
    if( skip_times ) delete [] skip_times;
    if( valid_times ) delete [] valid_times;
@@ -1411,9 +1391,9 @@ void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
 
 ////////////////////////////////////////////////////////////////////////
 
-void regrid_nc_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
-                        VarInfo *vinfo, DataPlane &fr_dp, DataPlane &to_dp,
-                        Grid to_grid, IntArray *cellMapping) {
+static void regrid_nc_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
+                               VarInfo *vinfo, DataPlane &fr_dp, DataPlane &to_dp,
+                               Grid to_grid, IntArray *cellMapping) {
 
    int to_cell_cnt = 0;
    clock_t start_clock =  clock();
@@ -1427,7 +1407,7 @@ void regrid_nc_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
            << InputFilename << "\"\n\n";
       exit(1);
    }
-   
+
    int from_lat_cnt = fr_grid.ny();
    int from_lon_cnt = fr_grid.nx();
    int from_data_size = from_lat_cnt * from_lon_cnt;
@@ -1440,7 +1420,7 @@ void regrid_nc_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
    }
    else {
       bool is_to_north = !fr_grid.get_swap_to_north();
-      float *from_data = new float[from_data_size];
+      auto from_data = new float[from_data_size];
       for (int xIdx=0; xIdx<from_lon_cnt; xIdx++) {
          for (int yIdx=0; yIdx<from_lat_cnt; yIdx++) {
             int offset = fr_dp.two_to_one(xIdx,yIdx,is_to_north);
@@ -1452,20 +1432,19 @@ void regrid_nc_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
 
       int from_index;
       int no_map_cnt = 0;
-      int censored_cnt = 0;
       int missing_cnt = 0;
       int non_missing_cnt = 0;
-      float data_value;
+      double data_value;
       IntArray cellArray;
       NumArray dataArray;
-      float from_min_value =  10e10;
-      float from_max_value = -10e10;
+      double from_min_value =  10e10;
+      double from_max_value = -10e10;
       int to_lat_cnt = to_grid.ny();
       int to_lon_cnt = to_grid.nx();
-      
+
       missing_cnt = non_missing_cnt = 0;
       to_dp.set_constant(bad_data_double);
-      
+
       for (int xIdx=0; xIdx<to_lon_cnt; xIdx++) {
          for (int yIdx=0; yIdx<to_lat_cnt; yIdx++) {
             int offset = to_dp.two_to_one(xIdx,yIdx);
@@ -1480,7 +1459,7 @@ void regrid_nc_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
                      missing_cnt++;
                      continue;
                   }
-      
+
                   dataArray.add(data_value);
                   non_missing_cnt++;
                   if(mlog.verbosity_level() >= 4) {
@@ -1490,7 +1469,7 @@ void regrid_nc_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
                }
 
                if (0 < dataArray.n()) {
-                  float to_value;
+                  double to_value;
                   int data_cnt = dataArray.n();
                   if (1 == data_cnt) to_value = dataArray[0];
                   else if (RGInfo.method == InterpMthd::Min) to_value = dataArray.min();
@@ -1502,7 +1481,7 @@ void regrid_nc_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
                         to_value = (to_value + dataArray[(data_cnt/2)+1])/2;
                   }
                   else to_value = dataArray.sum() / data_cnt;    // UW_Mean
-      
+
                   to_dp.set(to_value, xIdx, yIdx);
                   to_cell_cnt++;
                   if(mlog.verbosity_level() >= 9) {
@@ -1529,9 +1508,9 @@ void regrid_nc_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
             }
          }
       }
-      
+
       delete [] from_data;
-      
+
       mlog << Debug(4) << method_name << "[Count] data cells: " << to_cell_cnt
            << ", missing: " << missing_cnt << ", non_missing: " << non_missing_cnt
            << ", non mapped cells: " << no_map_cnt
@@ -1541,7 +1520,7 @@ void regrid_nc_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
    }
 
    if (to_cell_cnt == 0) {
-      mlog << Warning << "\n" << method_name 
+      mlog << Warning << "\n" << method_name
            << " There are no matching cells between input and the target grid.\n\n";
    }
 
@@ -1551,7 +1530,7 @@ void regrid_nc_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
 
 ////////////////////////////////////////////////////////////////////////
 
-void open_nc(const Grid &grid, ConcatString run_cs) {
+static void open_nc(const Grid &grid, ConcatString run_cs) {
 
    // Create output file
    nc_out = open_ncfile(OutputFilename.c_str(), true);
@@ -1583,7 +1562,7 @@ void open_nc(const Grid &grid, ConcatString run_cs) {
 void write_nc_data(const DataPlane &dp, const Grid &grid, NcVar *data_var) {
 
    // Allocate memory to store data values for each grid point
-   float *data = new float [grid.nx()*grid.ny()];
+   auto data = new float [grid.nx()*grid.ny()];
 
    // Store the data
    int grid_nx = grid.nx();
@@ -1613,7 +1592,7 @@ void write_nc_data(const DataPlane &dp, const Grid &grid, NcVar *data_var) {
 void write_nc_data_int(const DataPlane &dp, const Grid &grid, NcVar *data_var) {
 
    // Allocate memory to store data values for each grid point
-   int *data = new int [grid.nx()*grid.ny()];
+   auto data = new int [grid.nx()*grid.ny()];
 
    // Store the data
    int grid_nx = grid.nx();
@@ -1640,8 +1619,8 @@ void write_nc_data_int(const DataPlane &dp, const Grid &grid, NcVar *data_var) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_nc(const DataPlane &dp, const Grid &grid,
-              const VarInfo *vinfo, const char *vname) {
+static void write_nc(const DataPlane &dp, const Grid &grid,
+                     const VarInfo *vinfo, const char *vname) {
 
    int deflate_level = compress_level;
    if (deflate_level < 0) deflate_level = 0;
@@ -1662,8 +1641,8 @@ void write_nc(const DataPlane &dp, const Grid &grid,
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_nc_int(const DataPlane &dp, const Grid &grid,
-              const VarInfo *vinfo, const char *vname) {
+static void write_nc_int(const DataPlane &dp, const Grid &grid,
+                         const VarInfo *vinfo, const char *vname) {
 
    int deflate_level = compress_level;
    if (deflate_level < 0) deflate_level = 0;
@@ -1689,27 +1668,27 @@ void write_nc_int(const DataPlane &dp, const Grid &grid,
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
-      const Grid fr_grid, const Grid to_grid) {
+static void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
+                              const Grid fr_grid, const Grid to_grid) {
    DataPlane fr_dp, to_dp;
    ConcatString vname;
-   int global_attr_count;
+   const int global_attr_count = GOES_global_attr_names.size();
    bool opt_all_attrs = false;
    clock_t start_clock =  clock();
-   NcFile *nc_adp = (NcFile *) nullptr;
+   auto nc_adp = (NcFile *) nullptr;
    static const char *method_name = "process_goes_file() -> ";
 
    ConcatString tmp_dir = config.get_tmp_dir();
    ConcatString geostationary_file(tmp_dir);
    geostationary_file.add("/");
-   geostationary_file.add(make_geostationary_filename(fr_grid, to_grid, RGInfo.name));
+   geostationary_file.add(make_geostationary_filename(fr_grid, to_grid));
 
    // Open ADP file if exists
-   if (0 < AdpFilename.length() && file_exists(AdpFilename.c_str())) {
-      nc_adp = open_ncfile(AdpFilename.c_str());
+   if (!adp_filename.empty() && file_exists(adp_filename.c_str())) {
+      nc_adp = open_ncfile(adp_filename.c_str());
       if (IS_INVALID_NC_P(nc_adp)) {
          mlog << Error << "\n" << method_name
-              << "Can't open the ADP input \"" << AdpFilename << "\"\n\n";
+              << "Can't open the ADP input \"" << adp_filename << "\"\n\n";
          exit(1);
       }
       else if (is_time_mismatch(nc_in, nc_adp)) {
@@ -1720,8 +1699,7 @@ void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
    NcVar time_var = get_nc_var_time(nc_in);
    unixtime valid_time = find_valid_time(time_var);
    to_dp.set_size(to_grid.nx(), to_grid.ny());
-   global_attr_count =  sizeof(GOES_global_attr_names)/sizeof(*GOES_global_attr_names);
-   IntArray *cellMapping = new IntArray[to_grid.nx() * to_grid.ny()];
+   auto cellMapping = new IntArray[to_grid.nx() * to_grid.ny()];
    get_grid_mapping(fr_grid, to_grid, cellMapping, geostationary_file);
 
    // Loop through the requested fields
@@ -1783,7 +1761,7 @@ void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
          prob_dp.set_constant(0);
          for (int x=0; x<nx; x++) {
             for (int y=0; y<ny; y++) {
-               float value = to_dp.get(x, y);
+               double value = to_dp.get(x, y);
                if (!is_bad_data(value) &&
                      ((has_prob_thresh && prob_cat_thresh.check(value))
                        || (do_gaussian_filter && !has_prob_thresh))) {
@@ -1814,7 +1792,7 @@ void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
    } // end for i
 
    multimap<string,NcVar> mapVar = GET_NC_VARS_P(nc_in);
-   for (multimap<string,NcVar>::iterator itVar = mapVar.begin();
+   for (auto itVar = mapVar.begin();
          itVar != mapVar.end(); ++itVar) {
       if ((*itVar).first == "t"
             || string::npos != (*itVar).first.find("time")) {
@@ -1822,9 +1800,8 @@ void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
          copy_nc_var(nc_out, &from_var);
       }
    }
-   //copy_nc_atts(_nc_in, nc_out, opt_all_attrs);
 
-   delete nc_adp; nc_adp = 0;
+   delete nc_adp; nc_adp = nullptr;
    delete [] cellMapping;   cellMapping = (IntArray *) nullptr;
    mlog << Debug(LEVEL_FOR_PERFORMANCE) << method_name << "took "
         << (clock()-start_clock)/double(CLOCKS_PER_SEC) << " seconds\n";
@@ -1985,20 +1962,20 @@ static void get_grid_mapping_latlon(
    int data_size  = from_lat_count * from_lon_count;
    static const char *method_name = "get_grid_mapping(lats, lons) -> ";
 
-   int *to_cell_counts = new int[to_size];
-   int *mapping_indices = new int[data_size];
+   auto to_cell_counts = new int[to_size];
+   auto mapping_indices = new int[data_size];
    for (int xIdx=0; xIdx<to_size; xIdx++) to_cell_counts[xIdx] = 0;
    for (int xIdx=0; xIdx<data_size; xIdx++) mapping_indices[xIdx] = bad_data_int;
 
    to_grid.xy_to_latlon(0, 0, to_ll_lat, to_ll_lon);
    mlog << Debug(5) << method_name << " to_grid ll corner: (" << to_ll_lon << ", " << to_ll_lat << ")\n";
-   
+
    //Count the number of cells to be mapped to TO_GRID
    //Following the logic at DataPlane::two_to_one(int x, int y) n = y*Nx + x;
    for (int yIdx=0; yIdx<from_lat_count; yIdx++) {
       for (int xIdx=0; xIdx<from_lon_count; xIdx++) {
          int coord_offset = from_dp.two_to_one(xIdx, yIdx, to_north);
-         if( skip_times != 0 && skip_times[coord_offset] ) continue;
+         if( skip_times != nullptr && skip_times[coord_offset] ) continue;
          lat = latitudes[coord_offset];
          lon = longitudes[coord_offset];
          if( lat < MISSING_LATLON || lon < MISSING_LATLON ) continue;
@@ -2024,7 +2001,7 @@ static void get_grid_mapping_latlon(
 
    // Count the mapping cells for each to_cell and prepare IntArray
    int max_count = 0;
-   clock_t tmp_clock =  clock();
+   clock_t tmp_clock = clock();
    for (int xIdx=0; xIdx<to_size; xIdx++) {
       int cell_count = to_cell_counts[xIdx];
       if( cell_count > 0 ) {
@@ -2104,8 +2081,8 @@ static bool get_grid_mapping(Grid fr_grid, Grid to_grid, IntArray *cellMapping,
    }
    else if (data_size > 0) {
       int last_idx = data_size - 1;
-      float *latitudes  = new float[data_size];
-      float *longitudes = new float[data_size];
+      auto latitudes  = new float[data_size];
+      auto longitudes = new float[data_size];
       status = get_nc_data(&var_lat, latitudes);
       if( status ) status = get_nc_data(&var_lon, longitudes);
       if( status ) {
@@ -2138,7 +2115,7 @@ static unixtime find_valid_time(NcVar time_var) {
 
    if( IS_VALID_NC(time_var) || get_dim_count(&time_var) < 2) {
       int time_count = get_dim_size(&time_var, 0);
-      
+
       double time_values [time_count + 1];
       if (get_nc_data(&time_var, time_values)) {
          valid_time = compute_unixtime(&time_var, time_values[0]);
@@ -2162,13 +2139,13 @@ static unixtime find_valid_time(NcVar time_var) {
 
 ////////////////////////////////////////////////////////////////////////
 
-ConcatString get_goes_grid_input(MetConfig config, Grid fr_grid, Grid to_grid) {
+static ConcatString get_goes_grid_input(MetConfig config, Grid fr_grid, Grid to_grid) {
    ConcatString run_string;
    ConcatString env_coord_name;
    ConcatString tmp_dir = config.get_tmp_dir();
    ConcatString geostationary_file(tmp_dir);
    geostationary_file.add("/");
-   geostationary_file.add(make_geostationary_filename(fr_grid, to_grid, RGInfo.name));
+   geostationary_file.add(make_geostationary_filename(fr_grid, to_grid));
    if (get_env(key_geostationary_data, env_coord_name)
        && env_coord_name.nonempty()
        && file_exists(env_coord_name.c_str())) {
@@ -2183,7 +2160,7 @@ ConcatString get_goes_grid_input(MetConfig config, Grid fr_grid, Grid to_grid) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void get_grid_mapping(Grid fr_grid, Grid to_grid, IntArray *cellMapping,
+static void get_grid_mapping(Grid fr_grid, Grid to_grid, IntArray *cellMapping,
                       ConcatString geostationary_file) {
    static const char *method_name = "get_grid_mapping() -> ";
    DataPlane from_dp, to_dp;
@@ -2212,7 +2189,7 @@ void get_grid_mapping(Grid fr_grid, Grid to_grid, IntArray *cellMapping,
    }
 
    // Override the from nx & ny from NetCDF if exists
-   NcFile *coord_nc_in = (NcFile *) nullptr;
+   auto coord_nc_in = (NcFile *) nullptr;
    if (has_coord_input) {
       mlog << Debug(2)  << method_name << "Reading coord file: " << cur_coord_name << "\n";
       coord_nc_in = open_ncfile(cur_coord_name.c_str());
@@ -2231,10 +2208,10 @@ void get_grid_mapping(Grid fr_grid, Grid to_grid, IntArray *cellMapping,
    to_dp.set_size(to_lon_count, to_lat_count);
 
    if (data_size > 0) {
-      float  *latitudes  = (float *)nullptr;
-      float  *longitudes = (float *)nullptr;
-      float  *latitudes_buf  = (float *)nullptr;
-      float  *longitudes_buf = (float *)nullptr;
+      auto latitudes  = (float *)nullptr;
+      auto longitudes = (float *)nullptr;
+      auto latitudes_buf  = (float *)nullptr;
+      auto longitudes_buf = (float *)nullptr;
       int buff_size = data_size*sizeof(float);
       GoesImagerData grid_data;
       grid_data.reset();
@@ -2272,8 +2249,8 @@ void get_grid_mapping(Grid fr_grid, Grid to_grid, IntArray *cellMapping,
                int lat_mis_matching_count = 0;
                int lon_matching_count = 0;
                int lon_mis_matching_count = 0;
-               float *tmp_lats  = grid_data.lat_values;
-               float *tmp_lons  = grid_data.lon_values;
+               const float *tmp_lats = grid_data.lat_values;
+               const float *tmp_lons = grid_data.lon_values;
 
                for (int idx=0; idx<data_size; idx++) {
                    if ((latitudes[idx] > MISSING_LATLON) && (tmp_lats[idx] > MISSING_LATLON)) {
@@ -2320,18 +2297,18 @@ void get_grid_mapping(Grid fr_grid, Grid to_grid, IntArray *cellMapping,
             }
          }
       }
-      if (0 == latitudes) {
+      if (nullptr == latitudes) {
          mlog << Error << "\n" << method_name
               << "Fail to get latitudes!\n\n";
       }
-      else if (0 == longitudes) {
+      else if (nullptr == longitudes) {
          mlog << Error << "\n" << method_name
               << "Fail to get longitudes!\n\n";
       }
       else {
          check_lat_lon(data_size, latitudes, longitudes);
          get_grid_mapping_latlon(from_dp, to_dp, to_grid, cellMapping, latitudes,
-                                 longitudes, from_lat_count, from_lon_count, 0,
+                                 longitudes, from_lat_count, from_lon_count, nullptr,
                                  !fr_grid.get_swap_to_north());
       }
 
@@ -2350,7 +2327,7 @@ void get_grid_mapping(Grid fr_grid, Grid to_grid, IntArray *cellMapping,
 
 ////////////////////////////////////////////////////////////////////////
 
-int get_lat_count(NcFile *_nc) {
+static int get_lat_count(NcFile *_nc) {
    int lat_count = 0;
    NcDim dim_lat = get_nc_dim(_nc, dim_name_lat);
    if(IS_INVALID_NC(dim_lat)) dim_lat = get_nc_dim(_nc, "y");
@@ -2358,7 +2335,9 @@ int get_lat_count(NcFile *_nc) {
    return lat_count;
 }
 
-int get_lon_count(NcFile *_nc) {
+////////////////////////////////////////////////////////////////////////
+
+static int get_lon_count(NcFile *_nc) {
    int lon_count = 0;
    NcDim dim_lon = get_nc_dim(_nc, dim_name_lon);
    if(IS_INVALID_NC(dim_lon)) dim_lon = get_nc_dim(_nc, "x");
@@ -2390,8 +2369,7 @@ static NcVar get_goes_nc_var(NcFile *nc, const ConcatString var_name,
 ////////////////////////////////////////////////////////////////////////
 
 
-static ConcatString make_geostationary_filename(Grid fr_grid, Grid to_grid,
-                                                ConcatString regrid_name) {
+static ConcatString make_geostationary_filename(Grid fr_grid, Grid to_grid) {
    ConcatString geo_data_filename;
    GridInfo info = fr_grid.info();
 
@@ -2451,7 +2429,7 @@ static bool is_time_mismatch(NcFile *nc_in, NcFile *nc_adp) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
+static void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
       DataPlane &fr_dp, DataPlane &to_dp,
       Grid fr_grid, Grid to_grid, IntArray *cellMapping, NcFile *nc_adp) {
 
@@ -2468,10 +2446,10 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
    ConcatString goes_var_sub_name;
    ConcatString qc_var_name;
    uchar qc_value;
-   uchar *qc_data = new uchar[from_data_size];
-   uchar *adp_data = new uchar[from_data_size];
-   float *from_data = new float[from_data_size];
-   unsigned short *adp_qc_data = new unsigned short[from_data_size];
+   auto qc_data = new uchar[from_data_size];
+   auto adp_data = new uchar[from_data_size];
+   auto from_data = new float[from_data_size];
+   auto adp_qc_data = new unsigned short[from_data_size];
    static const char *method_name = "regrid_goes_variable() -> ";
 
    // -99 is arbitrary number as invalid QC value
@@ -2488,7 +2466,7 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
    bool is_dust_only = false;
    bool is_smoke_only = false;
    string actual_var_name = GET_NC_NAME(var_data);
-   int  actual_var_len = actual_var_name.length();
+   auto actual_var_len = actual_var_name.length();
    bool is_adp_variable = (0 != actual_var_name.compare(vinfo->name().c_str()));
 
    memset(adp_data, 1, from_data_size*sizeof(uchar));   // Default: 1 = data present
@@ -2505,7 +2483,7 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
       if (IS_VALID_NC(var_adp)) {
          get_nc_data(&var_adp, adp_data, true);
 
-         //Smoke:ancillary_variables = "DQF" ; ubyte DQF(y, x) ;
+         //ADP::Smoke:ancillary_variables = ubyte DQF(y, x)
          if (get_att_value_string(&var_adp, (string)"ancillary_variables", qc_var_name)) {
             var_adp_qc = get_nc_var(nc_adp, qc_var_name.c_str());
             if (IS_VALID_NC(var_adp_qc)) {
@@ -2527,7 +2505,7 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
    mlog << Debug(5) << method_name << "is_dust: " << is_dust_only
         << ", is_smoke: " << is_smoke_only << "\n";
 
-   //AOD:ancillary_variables = "DQF" ; byte DQF(y, x) ;
+   //AOD:ancillary_variables = byte DQF(y, x)
    if (get_att_value_string(&var_data, (string)"ancillary_variables", qc_var_name)) {
       var_qc = get_nc_var(nc_in, qc_var_name.c_str());
       if (IS_VALID_NC(var_qc)) {
@@ -2542,7 +2520,7 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
       }
    }
 
-   get_nc_data(&var_data, (float *)from_data);
+   get_nc_data(&var_data, from_data);
 
    fr_dp.set_size(from_lon_count, from_lat_count);
    for (int xIdx=0; xIdx<from_lon_count; xIdx++) {
@@ -2595,7 +2573,7 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
             dataArray.extend(cellArray.n());
             for (int dIdx=0; dIdx<cellArray.n(); dIdx++) {
                from_index = cellArray[dIdx];
-               float data_value = from_data[from_index];
+               auto data_value = from_data[from_index];
                if (is_bad_data(data_value)) {
                   missing_count++;
                   continue;
@@ -2632,19 +2610,19 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
                         case MET_ADP_QC_HIGH:   cnt_aod_qc_high++;     break;
                         case MET_ADP_QC_MEDIUM: cnt_aod_qc_medium++;   break;
                         case MET_ADP_QC_LOW:    cnt_aod_qc_low++;      break;
-                        default: cnt_aod_qc_nr++;      break;
+                        default: cnt_aod_qc_nr++;                      break;
                      }
                   }
                   if (has_adp_qc_var) {
                      int qc_for_flag = compute_adp_qc_flag(adp_qc_data[from_index], shift_bits);
-                     bool filter_out = is_eq(qc_for_flag, bad_data_int);
+                     bool filter_out = is_eq(qc_for_flag, MET_ADP_QC_NA);
 
                      if (mlog.verbosity_level() >= log_debug_level) {
                         switch (qc_for_flag) {
                            case MET_ADP_QC_HIGH:    cnt_adp_qc_high++;      break;
                            case MET_ADP_QC_MEDIUM:  cnt_adp_qc_medium++;    break;
                            case MET_ADP_QC_LOW:     cnt_adp_qc_low++;       break;
-                           default: cnt_adp_qc_nr++;        break;
+                           default: cnt_adp_qc_nr++;                        break;
                         }
                      }
 
@@ -2679,7 +2657,7 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
 
             if (0 < dataArray.n()) {
                int data_count = dataArray.n();
-               float to_value;
+               double to_value;
                if      (RGInfo.method == InterpMthd::Min) to_value = dataArray.min();
                else if (RGInfo.method == InterpMthd::Max) to_value = dataArray.max();
                else if (RGInfo.method == InterpMthd::Median) {
@@ -2767,7 +2745,7 @@ static void save_geostationary_data(const ConcatString geostationary_file,
          add_att(&lat_var, "units","degrees_south");
       }
       add_att(&lat_var, "dy_rad", grid_data.dy_rad);
-      if(!put_nc_data((NcVar *)&lat_var, latitudes)) {
+      if(!put_nc_data(&lat_var, latitudes)) {
          has_error = true;
          mlog << Warning << "\nsave_geostationary_data() -> "
               << "Cannot save latitudes!\n\n";
@@ -2783,7 +2761,7 @@ static void save_geostationary_data(const ConcatString geostationary_file,
          add_att(&lon_var, "units","degrees_west");
       }
       add_att(&lon_var, "dx_rad", grid_data.dx_rad);
-      if(!put_nc_data((NcVar *)&lon_var, longitudes)) {
+      if(!put_nc_data(&lon_var, longitudes)) {
          has_error = true;
          mlog << Warning << "\nsave_geostationary_data() -> "
               << "Cannot save longitudes!\n\n";
@@ -2803,7 +2781,7 @@ static void save_geostationary_data(const ConcatString geostationary_file,
           << geostationary_file << ") was saved\n";
    }
 
-   delete nc_file;  nc_file = 0;
+   delete nc_file;  nc_file = nullptr;
 
    mlog << Debug(LEVEL_FOR_PERFORMANCE) << method_name << "took "
         << (clock()-start_clock)/double(CLOCKS_PER_SEC) << " seconds\n";
@@ -2811,7 +2789,7 @@ static void save_geostationary_data(const ConcatString geostationary_file,
 
 ////////////////////////////////////////////////////////////////////////
 
-void close_nc() {
+static void close_nc() {
 
    // Clean up
    if(nc_out) {
@@ -2827,8 +2805,7 @@ void close_nc() {
 
 ////////////////////////////////////////////////////////////////////////
 
-//bool keep_message_type(const char *mt_str) {
-bool keep_message_type(const int mt_index) {
+static bool keep_message_type(const int mt_index) {
 
    bool keep = false;
 
@@ -2840,7 +2817,7 @@ bool keep_message_type(const int mt_index) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool has_lat_lon_vars(NcFile *nc) {
+static bool has_lat_lon_vars(NcFile *nc) {
 
    bool has_lat_var = IS_VALID_NC(get_nc_var_lat(nc));
    bool has_lon_var = IS_VALID_NC(get_nc_var_lon(nc));
@@ -2856,7 +2833,7 @@ bool has_lat_lon_vars(NcFile *nc) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void usage() {
+static void usage() {
 
    cout << "\n*** Model Evaluation Tools (MET" << met_version
         << ") ***\n\n"
@@ -2932,17 +2909,16 @@ void usage() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_adp_gc_values(NcVar var_adp_qc) {
+static void set_adp_gc_values(NcVar var_adp_qc) {
    ConcatString att_flag_meanings;
 
    if (get_nc_att_value(&var_adp_qc, (ConcatString)"flag_meanings", att_flag_meanings)) {
       StringArray flag_meanings = to_lower(att_flag_meanings).split(" ");
-      unsigned short flag_values[256];
+      unsigned short flag_values[flag_meanings.n()+128];    /* reserve enough storage */
       for (int i=0; i<flag_meanings.n(); i++) flag_values[i] = (unsigned short)-1;
 
       if (get_nc_att_values(&var_adp_qc, att_name_values, flag_values)) {
          int idx;
-         StringArray flag_meanings = to_lower(att_flag_meanings).split(" ");
          if (flag_meanings.has("low_confidence_smoke_detection_qf", idx)) {
             adp_qc_low = (flag_values[idx] >> 2) & 0x03;
          }
@@ -2962,13 +2938,13 @@ void set_adp_gc_values(NcVar var_adp_qc) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_field(const StringArray &a) {
+static void set_field(const StringArray &a) {
    FieldSA.add(a[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_method(const StringArray &a) {
+static void set_method(const StringArray &a) {
    InterpMthd method_id = string_to_interpmthd(a[0].c_str());
    if (method_id == InterpMthd::Gaussian || method_id == InterpMthd::MaxGauss ) {
       do_gaussian_filter = true;
@@ -2980,13 +2956,13 @@ void set_method(const StringArray &a) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_prob_cat_thresh(const StringArray &a) {
+static void set_prob_cat_thresh(const StringArray &a) {
    prob_cat_thresh.set(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_vld_thresh(const StringArray &a) {
+static void set_vld_thresh(const StringArray &a) {
    RGInfo.vld_thresh = atof(a[0].c_str());
    if(RGInfo.vld_thresh > 1 || RGInfo.vld_thresh < 0) {
       mlog << Error << "\nset_vld_thresh() -> "
@@ -2998,25 +2974,25 @@ void set_vld_thresh(const StringArray &a) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_name(const StringArray & a) {
+static void set_name(const StringArray & a) {
    VarNameSA.add_css(a[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_config(const StringArray & a) {
+static void set_config(const StringArray & a) {
    config_filename = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_compress(const StringArray & a) {
+static void set_compress(const StringArray & a) {
    compress_level = atoi(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_qc_flags(const StringArray & a) {
+static void set_qc_flags(const StringArray & a) {
    int qc_flag;
    StringArray sa;
 
@@ -3029,24 +3005,24 @@ void set_qc_flags(const StringArray & a) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_adp(const StringArray & a) {
-   AdpFilename = a[0];
-   if (!file_exists(AdpFilename.c_str())) {
+static void set_adp(const StringArray & a) {
+   adp_filename = a[0];
+   if (!file_exists(adp_filename.c_str())) {
       mlog << Error << "\nset_adp() -> "
-           << "\"" << AdpFilename << "\" does not exist\n\n";
+           << "\"" << adp_filename << "\" does not exist\n\n";
       exit(1);
    }
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_gaussian_dx(const StringArray &a) {
+static void set_gaussian_dx(const StringArray &a) {
    RGInfo.gaussian.dx = atof(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_gaussian_radius(const StringArray &a) {
+static void set_gaussian_radius(const StringArray &a) {
    RGInfo.gaussian.radius = atof(a[0].c_str());
 }
 
