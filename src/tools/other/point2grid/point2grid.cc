@@ -2614,7 +2614,7 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
                }
 
                // Filter by QC flag
-               if (has_qc_var || has_adp_qc_var) {
+               if (has_qc_flags && (has_qc_var || has_adp_qc_var)) {
                   qc_value = qc_data[from_index];
                   if (mlog.verbosity_level() >= log_debug_level) {
                      if (qc_min_value > qc_value) qc_min_value = qc_value;
@@ -2628,8 +2628,6 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
                   }
                   if (has_adp_qc_var) {
                      int qc_for_flag = compute_adp_qc_flag(adp_qc_data[from_index], shift_bits);
-                     bool filter_out = is_eq(qc_for_flag, bad_data_int);
-
                      if (mlog.verbosity_level() >= log_debug_level) {
                         switch (qc_for_flag) {
                            case 0:  cnt_adp_qc_high++;      break;
@@ -2639,6 +2637,7 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
                         }
                      }
 
+                     bool filter_out = is_eq(qc_for_flag, bad_data_int);
                      if (!filter_out) {
                         /* Adjust the quality by AOD data QC */
                         if (2 == qc_value) {
@@ -2659,7 +2658,7 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
                         continue;
                      }
                   }
-                  else if (has_qc_var && has_qc_flags && !qc_flags.has(qc_value)) {
+                  else if (has_qc_var && !qc_flags.has(qc_value)) {
                      qc_filtered_count++;
                      continue;
                   }
@@ -2710,19 +2709,21 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
         << ", by absent: " << absent_count
         << ", total: " << (qc_filtered_count + adp_qc_filtered_count + absent_count)
         << "\n   Range:  data: [" << from_min_value << " - " << from_max_value
-        << "]  QC: [" << qc_min_value << " - " << qc_max_value << "]"
-        << "\n   AOD QC: high=" << cnt_aod_qc_high
-        << " medium=" << cnt_aod_qc_medium << ", low=" << cnt_aod_qc_low
-        << ", no_retrieval=" << cnt_aod_qc_nr
-        << "\n   ADP QC: high=" << cnt_adjused_high << " (" << cnt_adp_qc_high
-    	<< "), medium=" << cnt_adjused_medium  << " (" << cnt_adp_qc_medium
-    	<< "), low=" << cnt_adjused_low << " (" << cnt_adp_qc_low
-    	<< "), no_retrieval=" << cnt_adp_qc_nr
-        << "\n   adjusted: high to medium=" << cnt_adp_qc_high_to_medium
-        << ", high to low=" << cnt_adp_qc_high_to_low
-        << ", medium to low=" << cnt_adp_qc_medium_to_low
-        << ", total=" << cnt_adjused_total
-        << "\n";
+        << "]  QC: [" << qc_min_value << " - " << qc_max_value << "]\n";
+   if (has_qc_flags)
+      mlog << Debug(log_debug_level)
+           << "   AOD QC: high=" << cnt_aod_qc_high
+           << " medium=" << cnt_aod_qc_medium << ", low=" << cnt_aod_qc_low
+           << ", no_retrieval=" << cnt_aod_qc_nr
+           << "\n   ADP QC: high=" << cnt_adjused_high << " (" << cnt_adp_qc_high
+           << "), medium=" << cnt_adjused_medium  << " (" << cnt_adp_qc_medium
+           << "), low=" << cnt_adjused_low << " (" << cnt_adp_qc_low
+           << "), no_retrieval=" << cnt_adp_qc_nr
+           << "\n   adjusted: high to medium=" << cnt_adp_qc_high_to_medium
+           << ", high to low=" << cnt_adp_qc_high_to_low
+           << ", medium to low=" << cnt_adp_qc_medium_to_low
+           << ", total=" << cnt_adjused_total
+           << "\n";
 
 
    if (to_cell_count == 0) {
@@ -2938,7 +2939,6 @@ void set_adp_gc_values(NcVar var_adp_qc) {
 
       if (get_nc_att_values(&var_adp_qc, att_name_values, flag_values)) {
          int idx;
-         StringArray flag_meanings = to_lower(att_flag_meanings).split(" ");
          if (flag_meanings.has("low_confidence_smoke_detection_qf", idx)) {
             adp_qc_low = (flag_values[idx] >> 2) & 0x03;
          }
