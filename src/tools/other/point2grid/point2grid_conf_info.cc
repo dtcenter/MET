@@ -85,7 +85,7 @@ void PointToGridConfInfo::read_config(const char *default_file_name,
 void PointToGridConfInfo::process_config() {
    ConcatString s;
    StringArray sa;
-   Dictionary *dict = (Dictionary *) nullptr;
+   auto dict = (Dictionary *) nullptr;
 
    // Dump the contents of the config file
    if(mlog.verbosity_level() >= 5) conf.dump(cout);
@@ -126,7 +126,7 @@ void PointToGridConfInfo::process_config() {
 
 ////////////////////////////////////////////////////////////////////////
 
-ConcatString PointToGridConfInfo::get_var_id(const ConcatString var_name) {
+ConcatString PointToGridConfInfo::get_var_id(const ConcatString &var_name) {
    ConcatString var_id;
 
    map<ConcatString,ConcatString>::iterator ptr;
@@ -151,7 +151,7 @@ ConcatString PointToGridConfInfo::get_var_id(const ConcatString var_name) {
 
 ////////////////////////////////////////////////////////////////////////
 
-ConcatString PointToGridConfInfo::get_var_name(const ConcatString var_name) {
+ConcatString PointToGridConfInfo::get_var_name(const ConcatString &var_name) {
    ConcatString out_var;
    ConcatString t_name;
    
