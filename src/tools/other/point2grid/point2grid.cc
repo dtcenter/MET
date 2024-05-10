@@ -167,9 +167,9 @@ static void set_gaussian_dx(const StringArray &);
 static void set_gaussian_radius(const StringArray &);
 
 static unixtime compute_unixtime(NcVar *time_var, unixtime var_value);
-static bool get_grid_mapping(const Grid fr_grid, const Grid to_grid, IntArray *cellMapping,
+static bool get_grid_mapping(const Grid &fr_grid, const Grid &to_grid, IntArray *cellMapping,
                              NcVar var_lat, NcVar var_lon, bool *skip_times);
-static bool get_grid_mapping(const Grid to_grid, IntArray *cellMapping,
+static bool get_grid_mapping(const Grid &to_grid, IntArray *cellMapping,
                              const IntArray obs_index_array, const int *obs_hids,
                              const float *hdr_lats, const float *hdr_lons);
 static int  get_obs_type(NcFile *nc_in);
@@ -200,8 +200,8 @@ static void process_goes_file(NcFile *nc_in, MetConfig &config,
             VarInfo *, const Grid fr_grid, const Grid to_grid);
 static unixtime find_valid_time(NcVar time_var);
 static ConcatString get_goes_grid_input(MetConfig config, Grid fr_grid, Grid to_grid);
-static void get_grid_mapping(const Grid fr_grid, const Grid to_grid,
-                             IntArray *cellMapping, ConcatString &geostationary_file);
+static void get_grid_mapping(const Grid &fr_grid, const Grid &to_grid,
+                             IntArray *cellMapping, const ConcatString &geostationary_file);
 static int  get_lat_count(NcFile *);
 static int  get_lon_count(NcFile *);
 static NcVar get_goes_nc_var(NcFile *nc, const ConcatString &var_name,
@@ -675,10 +675,8 @@ IntArray prepare_qc_array(const IntArray &_qc_flags, const StringArray &qc_table
 
 void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarInfo *vinfo,
                             const Grid &to_grid) {
-   int var_count, to_count, var_count2;
    int idx, hdr_idx;
    int var_idx_or_gc;
-   int filtered_by_time, filtered_by_msg_type, filtered_by_qc;
    ConcatString vname;
    DataPlane fr_dp, to_dp;
    DataPlane cnt_dp, mask_dp;
@@ -893,8 +891,12 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
       mlog << Debug(4) << method_name
            << "var: " << vname << ", index: " << var_idx_or_gc << ".\n";
 
-      var_count = var_count2 = to_count = 0;
-      filtered_by_time = filtered_by_msg_type = filtered_by_qc = 0;
+      int var_count = 0;
+      int var_count2 = 0;
+      int to_count = 0;
+      int filtered_by_time = 0;
+      int filtered_by_msg_type = 0;
+      int filtered_by_qc = 0;
       for (idx=0; idx < nobs; idx++) {
          if (var_idx_or_gc == obs_data->obs_ids[idx]) {
             var_count2++;
@@ -941,7 +943,6 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
          double from_max_value = -10e10;
 
          // Initialize counter and output fields
-         to_count = 0;
          to_dp.set_constant(bad_data_double);
          cnt_dp.set_constant(0);
          mask_dp.set_constant(0);
@@ -1871,7 +1872,7 @@ static unixtime compute_unixtime(NcVar *time_var, unixtime var_value) {
 
 ////////////////////////////////////////////////////////////////////////
 
-static bool get_grid_mapping(const Grid to_grid, IntArray *cellMapping,
+static bool get_grid_mapping(const Grid &to_grid, IntArray *cellMapping,
                              const IntArray obs_index_array, const int *obs_hids,
                              const float *hdr_lats, const float *hdr_lons) {
    bool status = false;
@@ -2022,7 +2023,7 @@ static void get_grid_mapping_latlon(
 
 ////////////////////////////////////////////////////////////////////////
 
-static bool get_grid_mapping(const Grid fr_grid, const Grid to_grid, IntArray *cellMapping,
+static bool get_grid_mapping(const Grid &fr_grid, const Grid &to_grid, IntArray *cellMapping,
                              NcVar var_lat, NcVar var_lon, bool *skip_times) {
    bool status = false;
    DataPlane from_dp, to_dp;
@@ -2136,8 +2137,8 @@ static ConcatString get_goes_grid_input(MetConfig config, Grid fr_grid, Grid to_
 
 ////////////////////////////////////////////////////////////////////////
 
-static void get_grid_mapping(const Grid fr_grid, const Grid to_grid, IntArray *cellMapping,
-                             ConcatString &geostationary_file) {
+static void get_grid_mapping(const Grid &fr_grid, const Grid &to_grid, IntArray *cellMapping,
+                             const ConcatString &geostationary_file) {
    static const char *method_name = "get_grid_mapping() -> ";
    DataPlane from_dp, to_dp;
    ConcatString cur_coord_name;
