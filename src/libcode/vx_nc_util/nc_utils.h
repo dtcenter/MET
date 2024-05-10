@@ -18,18 +18,20 @@
 
 #include <netcdf>
 
+#include "concat_string.h"
+#include "int_array.h"
+#include "long_array.h"
+#include "num_array.h"
+#include "nc_var_info.h"
+
+////////////////////////////////////////////////////////////////////////
+
 #ifndef ncbyte
 typedef signed char ncbyte; /* from ncvalues.h */
 #endif   /*  ncbyte  */
 #ifndef uchar
 typedef unsigned char uchar;
 #endif   /*  uchar  */
-
-#include "concat_string.h"
-#include "int_array.h"
-#include "long_array.h"
-#include "num_array.h"
-#include "nc_var_info.h"
 
 ////////////////////////////////////////////////////////////////////////
 
