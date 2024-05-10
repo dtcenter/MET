@@ -75,9 +75,10 @@
 //   022    03/08/19  Halley Gotway  Support multiple -field options.
 //   023    08/29/19  Halley Gotway  Support multiple arguments for the
 //                    the -pcpdir option.
-//   024    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
-//   025    09/29/22  Prestopnik     MET #2227 Remove namespace netCDF from header files
-//   026    01/29/24  Halley Gotway  MET #2801 Configure time difference warnings
+//   024    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main.
+//   025    09/29/22  Prestopnik     MET #2227 Remove namespace netCDF from header files.
+//   026    01/29/24  Halley Gotway  MET #2801 Configure time difference warnings.
+//   027    05/09/24  Halley Gotway  MET #2883 Allow missing input files.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -135,6 +136,7 @@ static int          i_out_var = 0;
 static int          n_out_var;
 static MetConfig    config;
 static VarInfo *    var_info = (VarInfo *) nullptr;
+static double       input_thresh = 1.0;
 static double       vld_thresh = 1.0;
 static int          compress_level = -1;
 
@@ -171,10 +173,11 @@ static void sum_data_files(Grid &, DataPlane &);
 static int  search_pcp_dir(const char *, const unixtime,
                            ConcatString &);
 
-static void get_field(const char * filename, const char * cur_field,
+static bool get_field(const char * filename, const char * cur_field,
                       const unixtime get_init_ut,
                       const unixtime get_valid_ut,
-                      Grid & grid, DataPlane & plane);
+                      Grid & grid, DataPlane & plane,
+                      bool error_out);
 
 static void open_nc(const Grid &);
 static void write_nc_data(unixtime, unixtime, int, const DataPlane &,
@@ -194,6 +197,7 @@ static void set_pcpdir(const StringArray &);
 static void set_pcprx(const StringArray &);
 static void set_field(const StringArray & a);
 static void set_name(const StringArray & a);
+static void set_input_thresh(const StringArray & a);
 static void set_vld_thresh(const StringArray & a);
 static void set_compress(const StringArray &);
 
@@ -234,7 +238,7 @@ int met_main(int argc, char *argv[]) {
       //
            if(run_command == RunCommand::sum) do_sum_command();
       else if(run_command == RunCommand::sub) do_sub_command();
-      else                        do_derive_command();
+      else                                    do_derive_command();
    }
 
    //
@@ -268,7 +272,7 @@ void process_command_line(int argc, char **argv) {
    derive_list.add("sum");
 
    //
-   // parse the command line into tokens
+   // Parse the command line into tokens
    //
    cline.set(argc, argv);
 
@@ -280,17 +284,18 @@ void process_command_line(int argc, char **argv) {
    //
    // Add the options function calls
    //
-   cline.add(set_sum,        "-sum",        0);
-   cline.add(set_add,        "-add",        0);
-   cline.add(set_subtract,   "-subtract",   0);
-   cline.add(set_derive,     "-derive",     1);
-   cline.add(set_pcpdir,     "-pcpdir",    -1);
-   cline.add(set_pcprx,      "-pcprx",      1);
-   cline.add(set_field,      "-field",      1);
-   cline.add(set_name,       "-name",       1);
-   cline.add(set_name,       "-varname",    1);
-   cline.add(set_vld_thresh, "-vld_thresh", 1);
-   cline.add(set_compress,   "-compress",   1);
+   cline.add(set_sum,          "-sum",          0);
+   cline.add(set_add,          "-add",          0);
+   cline.add(set_subtract,     "-subtract",     0);
+   cline.add(set_derive,       "-derive",       1);
+   cline.add(set_pcpdir,       "-pcpdir",      -1);
+   cline.add(set_pcprx,        "-pcprx",        1);
+   cline.add(set_field,        "-field",        1);
+   cline.add(set_name,         "-name",         1);
+   cline.add(set_name,         "-varname",      1);
+   cline.add(set_input_thresh, "-input_thresh", 1);
+   cline.add(set_vld_thresh,   "-vld_thresh",   1);
+   cline.add(set_compress,     "-compress",     1);
 
    //
    // Parse the command line.
@@ -535,7 +540,7 @@ void do_sum_command() {
    }
 
    //
-   // Check that the lead time is divisible by the the input.
+   // Check that the lead time is divisible by the input
    // accumulation time except when init_time = 0 for observations.
    //
    if(lead_time%in_accum != 0 && init_time != (unixtime) 0) {
@@ -651,9 +656,11 @@ void sum_data_files(Grid & grid, DataPlane & plane) {
 
       //
       // Read data for the file.
+      // Error out for any problems reading the requested data.
       //
-      get_field(pcp_files[i].c_str(), cur_field.c_str(), init_time, pcp_times[i],
-                cur_grid, part);
+      get_field(pcp_files[i].c_str(), cur_field.c_str(),
+                init_time, pcp_times[i],
+                cur_grid, part, true);
 
       //
       // For the first file processed store the grid, allocate memory
@@ -807,8 +814,11 @@ int search_pcp_dir(const char *cur_dir, const unixtime cur_ut,
          if(mtddf)   { delete mtddf;   mtddf   = (Met2dDataFile *) nullptr; }
          if(cur_var) { delete cur_var; cur_var = (VarInfo *)       nullptr; }
 
-         //  check for a valid match
-         if( -1 != i_rec ) { met_closedir(dp);  break; }
+         // Check for a valid match
+         if(i_rec != -1) {
+            met_closedir(dp);
+            break;
+         }
 
       } // end if
 
@@ -828,7 +838,7 @@ void do_sub_command() {
    int i, nxy, nc_accum;
 
    //
-   // Check for exactly two input files
+   // Check for exactly two input files.
    //
    if(n_files != 2) {
       mlog << Error << "\ndo_sub_command() -> "
@@ -838,18 +848,21 @@ void do_sub_command() {
    }
 
    //
-   // Read the two specified data files
+   // Read the two specified data files.
+   // Error out for any problems reading the requested data.
    //
    mlog << Debug(1)
         << "Reading input file: " << file_list[0] << "\n";
-   get_field(file_list[0].c_str(), field_list[0].c_str(), 0, 0, grid1, plus);
+   get_field(file_list[0].c_str(), field_list[0].c_str(),
+             0, 0, grid1, plus, true);
 
    mlog << Debug(1)
         << "Reading input file: " << file_list[1] << "\n";
-   get_field(file_list[1].c_str(), field_list[1].c_str(), 0, 0, grid2, minus);
+   get_field(file_list[1].c_str(), field_list[1].c_str(),
+             0, 0, grid2, minus, true);
 
    //
-   // Check for the same grid dimensions
+   // Check for the same grid dimensions.
    //
    if(grid1 != grid2) {
       mlog << Error << "\ndo_sub_command() -> "
@@ -870,7 +883,7 @@ void do_sub_command() {
    nc_valid_time = plus.valid();
 
    //
-   // Check that the initialization times match
+   // Check that the initialization times match.
    //
    if(plus.init() != minus.init()) {
 
@@ -941,7 +954,7 @@ void do_derive_command() {
    MaskPlane mask;
    unixtime nc_init_time, nc_valid_time;
    int nc_accum, nc_accum_sum;
-   int i, j, n, nxy;
+   int i, j, n_skip, nxy, n_vld;
    ConcatString derive_list_css;
    double v;
 
@@ -972,12 +985,15 @@ void do_derive_command() {
    //
    // Loop through the input files.
    //
-   for(i=0; i<n_files; i++) {
+   for(i=0, n_vld=0; i<n_files; i++) {
 
       //
       // Read the current field.
+      // Keep track of the file number of successful file reads.
       //
-      get_field(file_list[i].c_str(), field_list[i].c_str(), 0, 0, cur_grid, cur_dp);
+      if(get_field(file_list[i].c_str(), field_list[i].c_str(),
+                   0, 0, cur_grid, cur_dp, false)) n_vld++;
+      else                                         continue;
 
       //
       // Initialize
@@ -1015,7 +1031,7 @@ void do_derive_command() {
          vld_dp    = der_dp;
       }
       //
-      // Check for grid mismatch
+      // Check for grid mismatch.
       //
       else if(grid != cur_grid) {
          mlog << Error << "\ndo_derive_command() -> "
@@ -1073,19 +1089,28 @@ void do_derive_command() {
          sum_dp.buf()[j]    += v;
          sum_sq_dp.buf()[j] += v*v;
       }
+   } // end for i in n_files
+
+   // Check for enough valid input files.
+   if((double) n_vld/n_files < input_thresh) {
+      mlog << Error << "\ndo_derive_command() -> "
+           << n_vld << " of " << n_files << " (" << (double) n_vld/n_files
+           << ") valid inputs does not meet the required input threshold ("
+           << input_thresh << ").\n\n";
+      exit(1);
    }
 
    //
-   // Compute the valid data mask.
+   // Compute the valid data mask, relative the number of valid inputs.
    //
    mask.set_size(grid.nx(), grid.ny());
-   for(j=0, n=0; j<nxy; j++) {
-      mask.buf()[j] = ((double) vld_dp.data()[j]/n_files) >= vld_thresh;
-      if(!mask.data()[j]) n++;
+   for(j=0, n_skip=0; j<nxy; j++) {
+      mask.buf()[j] = ((double) vld_dp.data()[j]/n_vld) >= vld_thresh;
+      if(!mask.data()[j]) n_skip++;
    }
 
    mlog << Debug(2)
-        << "Skipping " << n << " of " << nxy << " grid points which "
+        << "Skipping " << n_skip << " of " << nxy << " grid points which "
         << "do not meet the valid data threshold (" << vld_thresh
         << ").\n";
 
@@ -1182,17 +1207,23 @@ void do_derive_command() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void get_field(const char *filename, const char *cur_field,
+bool get_field(const char *filename, const char *cur_field,
                const unixtime get_init_ut, const unixtime get_valid_ut,
-               Grid & grid, DataPlane & plane) {
+               Grid & grid, DataPlane & plane, bool error_out) {
    Met2dDataFileFactory factory;
-   Met2dDataFile *mtddf = (Met2dDataFile *) nullptr;
+   Met2dDataFile *mtddf = nullptr;
    GrdFileType ftype;
    VarInfoFactory var_fac;
-   VarInfo *cur_var;
+   VarInfo *cur_var = nullptr;
+   const char *method_name = "get_field() -> ";
 
    //
-   // Build the field config string
+   // Track the read status.
+   //
+   bool status = true;
+
+   //
+   // Build the field config string.
    //
    ConcatString config_str = parse_config_str(cur_field);
 
@@ -1201,7 +1232,7 @@ void get_field(const char *filename, const char *cur_field,
         << ") from input file: " << filename << "\n";
 
    //
-   // Parse the config string
+   // Parse the config string.
    //
    config.read_string(config_str.c_str());
 
@@ -1211,52 +1242,77 @@ void get_field(const char *filename, const char *cur_field,
    ftype = parse_conf_file_type(&config);
 
    //
-   // Open the data file and build a VarInfo object.
+   // Check that the file exists.
    //
-   mtddf = factory.new_met_2d_data_file(filename, ftype);
-   if(!mtddf) {
-      mlog << Error << "\nget_field() -> "
-           << "can't open data file \"" << filename << "\"\n\n";
-      exit(1);
-   }
-
-   cur_var = var_fac.new_var_info(mtddf->file_type());
-   if(!cur_var) {
-      mlog << Error << "\nget_field() -> "
-           << "unable to determine filetype of \"" << filename
-           << "\"\n\n";
-      exit(1);
+   if(!file_exists(filename) &&
+      !is_python_grdfiletype(ftype)) {
+      log_missing_file(method_name, "input file", filename);
+      status = false;
    }
 
    //
-   // Initialize the VarInfo object with a config.
+   // Open the data file.
    //
-   cur_var->set_dict(config);
-
-   //
-   // Set the VarInfo timing object
-   //
-   if(get_valid_ut != 0) cur_var->set_valid(get_valid_ut);
-   if(get_init_ut  != 0) cur_var->set_init(get_init_ut);
-
-   //
-   // Read the record of interest into a DataPlane object.
-   //
-   if(!mtddf->data_plane(*cur_var, plane)) {
-      mlog << Error << "\nget_field() -> "
-           << "can't get data plane from file \"" << filename
-           << "\"\n\n";
-      exit(1);
+   if(status) {
+      mtddf = factory.new_met_2d_data_file(filename, ftype);
+      if(!mtddf) {
+         mlog << Warning << "\n" << method_name
+              << "can't open data file \"" << filename << "\"\n\n";
+         status = false;
+      }
    }
 
-   grid = mtddf->grid();
+   //
+   // Build a VarInfo object.
+   //
+   if(status) {
+      cur_var = var_fac.new_var_info(mtddf->file_type());
+      if(!cur_var) {
+         mlog << Warning << "\n" << method_name
+              << "unable to determine filetype of \"" << filename
+              << "\"\n\n";
+         status = false;
+      }
+   }
 
    //
-   // Set the global var_info, if needed.
+   // Setup the VarInfo object and read the data.
    //
-   if(!var_info) {
-      var_info = var_fac.new_var_info(mtddf->file_type());
-      *var_info = *cur_var;
+   if(status) {
+
+      //
+      // Initialize the VarInfo object with a config.
+      //
+      cur_var->set_dict(config);
+
+      //
+      // Set the VarInfo timing object.
+      //
+      if(get_valid_ut != 0) cur_var->set_valid(get_valid_ut);
+      if(get_init_ut  != 0) cur_var->set_init(get_init_ut);
+
+      //
+      // Read the record of interest into a DataPlane object.
+      //
+      if(!mtddf->data_plane(*cur_var, plane)) {
+         mlog << Warning << "\n" << method_name
+              << "can't get data plane from file \"" << filename
+              << "\"\n\n";
+         status = false;
+      }
+   }
+
+   //
+   // Store grid and global VarInfo, if needed.
+   //
+   if(status) {
+
+      grid = mtddf->grid();
+
+      if(!var_info) {
+         var_info = var_fac.new_var_info(mtddf->file_type());
+         *var_info = *cur_var;
+      }
    }
 
    //
@@ -1265,9 +1321,17 @@ void get_field(const char *filename, const char *cur_field,
    if(mtddf)   { delete mtddf;   mtddf   = (Met2dDataFile *) nullptr; }
    if(cur_var) { delete cur_var; cur_var = (VarInfo *)       nullptr; }
 
-   // if ( var )  { delete var;  var = nullptr; }
+   //
+   // Error out and exit, if requested.
+   //
+   if(!status && error_out) {
+      mlog << Error << "\n" << method_name
+           << "trouble reading data (" << config_str
+           << ") from required input file: " << filename << "\n\n";
+      exit(1);
+   }
 
-   return;
+   return status;
 
 }
 
@@ -1276,7 +1340,7 @@ void get_field(const char *filename, const char *cur_field,
 void open_nc(const Grid &grid) {
    ConcatString command_str;
 
-   // List the output file
+   // List the output file.
    mlog << Debug(1)
         << "Creating output file: " << out_filename << "\n";
 
@@ -1402,7 +1466,7 @@ void write_nc_data(unixtime nc_init, unixtime nc_valid, int nc_accum,
    int deflate_level = compress_level;
    if(deflate_level < 0) deflate_level = config.nc_compression();
 
-   // Define Variable.
+   // Define variable.
    nc_var = add_var(nc_out, var_str.c_str(), ncFloat,
                     lat_dim, lon_dim, deflate_level);
 
@@ -1516,6 +1580,7 @@ void usage() {
         << "\tout_file\n"
         << "\t[-field string]\n"
         << "\t[-name list]\n"
+        << "\t[-input_thresh n]\n"
         << "\t[-vld_thresh n]\n"
         << "\t[-log file]\n"
         << "\t[-v level]\n"
@@ -1545,6 +1610,9 @@ void usage() {
         << "\t\t\"-name list\" is a comma-separated list of output "
         << "variable names to be written to the \"out_file\" "
         << "(optional).\n"
+
+        << "\t\t\"-input_thresh\" overrides the default required ratio "
+        << "of valid input files (" << input_thresh << ") (optional).\n"
 
         << "\t\t\"-vld_thresh\" overrides the default required ratio "
         << "of valid data (" << vld_thresh << ") (optional).\n"
@@ -1691,6 +1759,18 @@ void set_field(const StringArray & a) {
 
 void set_name(const StringArray & a) {
    req_out_var_name.add_css(a[0]);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_input_thresh(const StringArray & a) {
+   input_thresh = atof(a[0].c_str());
+   if(input_thresh > 1 || input_thresh < 0) {
+      mlog << Error << "\nset_input_thresh() -> "
+           << "the \"-input_thresh\" command line option (" << input_thresh
+           << ") must be set between 0 and 1!\n\n";
+      exit(1);
+   }
 }
 
 ////////////////////////////////////////////////////////////////////////
