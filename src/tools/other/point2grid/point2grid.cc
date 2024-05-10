@@ -76,7 +76,7 @@ constexpr int        LEVEL_FOR_PERFORMANCE = 6;
 
 constexpr char default_config_filename[] = "MET_BASE/config/Point2GridConfig_default";
 
-std::vector<std::string> GOES_global_attr_names = {
+static const vector<string> GOES_global_attr_names = {
       "naming_authority",
       "project",
       "production_site",
@@ -167,9 +167,9 @@ static void set_gaussian_dx(const StringArray &);
 static void set_gaussian_radius(const StringArray &);
 
 static unixtime compute_unixtime(NcVar *time_var, unixtime var_value);
-static bool get_grid_mapping(Grid fr_grid, Grid to_grid, IntArray *cellMapping,
+static bool get_grid_mapping(const Grid fr_grid, const Grid to_grid, IntArray *cellMapping,
                              NcVar var_lat, NcVar var_lon, bool *skip_times);
-static bool get_grid_mapping(Grid to_grid, IntArray *cellMapping,
+static bool get_grid_mapping(const Grid to_grid, IntArray *cellMapping,
                              const IntArray obs_index_array, const int *obs_hids,
                              const float *hdr_lats, const float *hdr_lons);
 static int  get_obs_type(NcFile *nc_in);
@@ -200,11 +200,11 @@ static void process_goes_file(NcFile *nc_in, MetConfig &config,
             VarInfo *, const Grid fr_grid, const Grid to_grid);
 static unixtime find_valid_time(NcVar time_var);
 static ConcatString get_goes_grid_input(MetConfig config, Grid fr_grid, Grid to_grid);
-static void get_grid_mapping(Grid fr_grid, Grid to_grid,
-                             IntArray *cellMapping, ConcatString geostationary_file);
+static void get_grid_mapping(const Grid fr_grid, const Grid to_grid,
+                             IntArray *cellMapping, ConcatString &geostationary_file);
 static int  get_lat_count(NcFile *);
 static int  get_lon_count(NcFile *);
-static NcVar get_goes_nc_var(NcFile *nc, const ConcatString var_name,
+static NcVar get_goes_nc_var(NcFile *nc, const ConcatString &var_name,
                              bool exit_if_error=true);
 static bool is_time_mismatch(NcFile *nc_in, NcFile *nc_adp);
 static ConcatString make_geostationary_filename(Grid fr_grid, Grid to_grid);
@@ -213,7 +213,7 @@ static void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
             Grid fr_grid, Grid to_grid, IntArray *cellMapping, NcFile *nc_adp);
 static void save_geostationary_data(const ConcatString geostationary_file,
             const float *latitudes, const float *longitudes,
-            const GoesImagerData grid_data);
+            const GoesImagerData &grid_data);
 static void set_qc_flags(const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
@@ -234,7 +234,7 @@ int met_main(int argc, char *argv[]) {
 
 ////////////////////////////////////////////////////////////////////////
 
-const string get_tool_name() {
+string get_tool_name() {
    return "point2grid";
 }
 
@@ -372,7 +372,7 @@ static void process_command_line(int argc, char **argv) {
 ////////////////////////////////////////////////////////////////////////
 
 static void process_data_file() {
-   Grid fr_grid, to_grid;
+   Grid fr_grid;
    GrdFileType ftype;
    ConcatString run_cs;
    auto nc_in = (NcFile *) nullptr;
@@ -436,7 +436,6 @@ static void process_data_file() {
    ftype = fr_mtddf->file_type();
 
    // Setup the VarInfo request object
-   VarInfoFactory v_factory;
    VarInfo *vinfo = VarInfoFactory::new_var_info(ftype);
 
    if(!vinfo) {
@@ -456,7 +455,7 @@ static void process_data_file() {
 #endif
 
    // Determine the "to" grid
-   to_grid = parse_vx_grid(RGInfo, &fr_grid, &fr_grid);
+   Grid to_grid = parse_vx_grid(RGInfo, &fr_grid, &fr_grid);
 
    mlog << Debug(2) << "Interpolation options: "
         << "method = " << interpmthd_to_string(RGInfo.method)
@@ -657,7 +656,7 @@ void prepare_message_types(const StringArray &hdr_types) {
 
 ////////////////////////////////////////////////////////////////////////
 
-IntArray prepare_qc_array(const IntArray &_qc_flags, StringArray &qc_tables) {
+IntArray prepare_qc_array(const IntArray &_qc_flags, const StringArray &qc_tables) {
    IntArray qc_idx_array;
    bool has_qc_flags = (_qc_flags.n() > 0);
    if (has_qc_flags) {
@@ -676,16 +675,14 @@ IntArray prepare_qc_array(const IntArray &_qc_flags, StringArray &qc_tables) {
 
 void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarInfo *vinfo,
                             const Grid &to_grid) {
-   int nhdr, nobs;
-   int nx, ny, var_count, to_count, var_count2;
+   int var_count, to_count, var_count2;
    int idx, hdr_idx;
    int var_idx_or_gc;
    int filtered_by_time, filtered_by_msg_type, filtered_by_qc;
-   ConcatString vname, vname_cnt, vname_mask;
+   ConcatString vname;
    DataPlane fr_dp, to_dp;
    DataPlane cnt_dp, mask_dp;
    DataPlane prob_dp, prob_mask_dp;
-   NcVar var_obs_gc, var_obs_var;
 
    bool has_prob_thresh = !prob_cat_thresh.check(bad_data_double);
 
@@ -702,8 +699,8 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
    const MetPointHeader *header_data = met_point_obs->get_header_data();
    MetPointObsData *obs_data = met_point_obs->get_point_obs_data();
 
-   nhdr = met_point_obs->get_hdr_cnt();
-   nobs = met_point_obs->get_obs_cnt();
+   int nhdr = met_point_obs->get_hdr_cnt();
+   int nobs = met_point_obs->get_obs_cnt();
    bool empty_input = (nhdr == 0 && nobs == 0);
    bool use_var_id = met_point_obs->is_using_var_id();
 
@@ -728,8 +725,8 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
    IntArray qc_idx_array = prepare_qc_array(qc_flags, qc_tables);
 
    // Initialize size and values of output fields
-   nx = to_grid.nx();
-   ny = to_grid.ny();
+   int nx = to_grid.nx();
+   int ny = to_grid.ny();
    to_dp.set_size(nx, ny);
    to_dp.set_constant(bad_data_double);
    cnt_dp.set_size(nx, ny);
@@ -744,12 +741,11 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
    }
 
    // Loop through the requested fields
-   int obs_count_zero_to, obs_count_non_zero_to;
-   int obs_count_zero_from, obs_count_non_zero_from;
-   IntArray *cellMapping = (IntArray *) nullptr;
-
-   obs_count_zero_to = obs_count_non_zero_to = 0;
-   obs_count_zero_from = obs_count_non_zero_from = 0;
+   int obs_count_zero_to = 0;
+   int obs_count_zero_from = 0;
+   int obs_count_non_zero_to = 0;
+   int obs_count_non_zero_from = 0;
+   auto cellMapping = (IntArray *) nullptr;
    for(int i=0; i<FieldSA.n(); i++) {
 
       var_idx_or_gc = -1;
@@ -1031,16 +1027,15 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
       // Write the regridded data
       write_nc(to_dp, to_grid, vinfo, vname.c_str());
 
-      vname_cnt = vname;
+      ConcatString vname_cnt = vname;
       vname_cnt << "_cnt";
-      vname_mask = vname;
+      ConcatString vname_mask = vname;
       vname_mask << "_mask";
 
-      ConcatString tmp_long_name;
       ConcatString var_long_name = vinfo->long_name();
       ConcatString dim_string = "(*,*)";
 
-      tmp_long_name = vname_cnt;
+      ConcatString tmp_long_name = vname_cnt;
       tmp_long_name << dim_string;
       vinfo->set_long_name(tmp_long_name.c_str());
       write_nc_int(cnt_dp, to_grid, vinfo, vname_cnt.c_str());
@@ -1138,15 +1133,9 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
 ////////////////////////////////////////////////////////////////////////
 
 static void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
-                        const Grid to_grid) {
-   ConcatString vname, vname_cnt, vname_mask;
-   DataPlane fr_dp, to_dp;
-   DataPlane cnt_dp, mask_dp;
-   DataPlane prob_dp, prob_mask_dp;
-   NcVar var_obs_gc, var_obs_var;
-
+                               const Grid to_grid) {
+   ConcatString vname;
    clock_t start_clock =  clock();
-
    static const char *method_name = "process_point_file() -> ";
    static const char *method_name_s = "process_point_file()";
 
@@ -1179,12 +1168,6 @@ static void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
 
 static void process_point_python(string python_command, MetConfig &config, VarInfo *vinfo,
                                  const Grid to_grid, bool use_xarray) {
-   ConcatString vname, vname_cnt, vname_mask;
-   DataPlane fr_dp, to_dp;
-   DataPlane cnt_dp, mask_dp;
-   DataPlane prob_dp, prob_mask_dp;
-   NcVar var_obs_gc, var_obs_var;
-
    clock_t start_clock =  clock();
    static const char *method_name = "process_point_python() -> ";
 
@@ -1223,7 +1206,7 @@ static void process_point_python(string python_command, MetConfig &config, VarIn
 static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
                                     VarInfo *vinfo, Met2dDataFile *fr_mtddf,
                                     const Grid to_grid) {
-   ConcatString vname, vname_cnt, vname_mask;
+   ConcatString vname;
    DataPlane fr_dp, to_dp;
    DataPlane cnt_dp, mask_dp;
    unixtime valid_beg_ut, valid_end_ut;
@@ -1348,7 +1331,7 @@ static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
          prob_dp.set_constant(0);
          for (int x=0; x<nx; x++) {
             for (int y=0; y<ny; y++) {
-               float value = to_dp.get(x, y);
+               auto value = to_dp.get(x, y);
                if (!is_bad_data(value) &&
                      ((has_prob_thresh && prob_cat_thresh.check(value))
                        || (do_gaussian_filter && !has_prob_thresh))) {
@@ -1570,7 +1553,7 @@ void write_nc_data(const DataPlane &dp, const Grid &grid, NcVar *data_var) {
    for(int x=0; x<grid_nx; x++) {
       for(int y=0; y<grid_ny; y++) {
          int n = DefaultTO.two_to_one(grid_nx, grid_ny, x, y);
-         data[n] = (float) dp(x, y);
+         data[n] = (float)dp(x, y);
       } // end for y
    } // end for x
 
@@ -1672,7 +1655,7 @@ static void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
                               const Grid fr_grid, const Grid to_grid) {
    DataPlane fr_dp, to_dp;
    ConcatString vname;
-   const int global_attr_count = GOES_global_attr_names.size();
+   const size_t global_attr_count = GOES_global_attr_names.size();
    bool opt_all_attrs = false;
    clock_t start_clock =  clock();
    auto nc_adp = (NcFile *) nullptr;
@@ -1742,7 +1725,7 @@ static void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
       NcVar to_var = get_nc_var(nc_out, vname.c_str());
       NcVar var_data = get_goes_nc_var(nc_in, vinfo->name());
       if(IS_VALID_NC(var_data)) {
-         for (int idx=0; idx<global_attr_count; idx++) {
+         for (size_t idx=0; idx<global_attr_count; idx++) {
             copy_nc_att(nc_in, &to_var, (string)GOES_global_attr_names[idx]);
          }
          copy_nc_atts(&var_data, &to_var, opt_all_attrs);
@@ -1774,7 +1757,7 @@ static void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
          write_nc(prob_dp, to_grid, vinfo, vname_prob.c_str());
          if(IS_VALID_NC(var_data)) {
             NcVar out_var = get_nc_var(nc_out, vname.c_str());
-            for (int idx=0; idx<global_attr_count; idx++) {
+            for (size_t idx=0; idx<global_attr_count; idx++) {
                copy_nc_att(nc_in, &out_var, (string)GOES_global_attr_names[idx]);
             }
             copy_nc_atts(&var_data, &out_var, opt_all_attrs);
@@ -1888,7 +1871,7 @@ static unixtime compute_unixtime(NcVar *time_var, unixtime var_value) {
 
 ////////////////////////////////////////////////////////////////////////
 
-static bool get_grid_mapping(Grid to_grid, IntArray *cellMapping,
+static bool get_grid_mapping(const Grid to_grid, IntArray *cellMapping,
                              const IntArray obs_index_array, const int *obs_hids,
                              const float *hdr_lats, const float *hdr_lons) {
    bool status = false;
@@ -1902,28 +1885,23 @@ static bool get_grid_mapping(Grid to_grid, IntArray *cellMapping,
       return status;
    }
 
-   int hdr_idx, obs_idx;
-   int count_in_grid;
    double x, y;
-   float  lat, lon;
    DataPlane to_dp;
-   int to_offset, idx_x, idx_y;
    int to_lat_count = to_grid.ny();
    int to_lon_count = to_grid.nx();
-
-   count_in_grid = 0;
+   int count_in_grid = 0;
    to_dp.set_size(to_lon_count, to_lat_count);
    for (int idx=0; idx<obs_count; idx++) {
-      obs_idx = obs_index_array[idx];
-      hdr_idx = obs_hids[obs_idx];
-      lat = hdr_lats[hdr_idx];
-      lon = hdr_lons[hdr_idx];
+      int obs_idx = obs_index_array[idx];
+      int hdr_idx = obs_hids[obs_idx];
+      float lat = hdr_lats[hdr_idx];
+      float lon = hdr_lons[hdr_idx];
       if( lat < MISSING_LATLON || lon < MISSING_LATLON ) continue;
       to_grid.latlon_to_xy(lat, -1.0*lon, x, y);
-      idx_x = nint(x);
-      idx_y = nint(y);
+      int idx_x = nint(x);
+      int idx_y = nint(y);
       if (0 <= idx_x && idx_x < to_lon_count && 0 <= idx_y && idx_y < to_lat_count) {
-         to_offset = to_dp.two_to_one(idx_x, idx_y);
+         int to_offset = to_dp.two_to_one(idx_x, idx_y);
          cellMapping[to_offset].add(obs_idx);
          count_in_grid++;
       }
@@ -1952,8 +1930,6 @@ static void get_grid_mapping_latlon(
       int from_lat_count, int from_lon_count, bool *skip_times, bool to_north) {
    double x, y;
    double to_ll_lat, to_ll_lon;
-   float lat, lon;
-   int idx_x, idx_y, to_offset;
    int count_in_grid = 0;
    clock_t start_clock =  clock();
    int to_lat_count = to_grid.ny();
@@ -1976,14 +1952,14 @@ static void get_grid_mapping_latlon(
       for (int xIdx=0; xIdx<from_lon_count; xIdx++) {
          int coord_offset = from_dp.two_to_one(xIdx, yIdx, to_north);
          if( skip_times != nullptr && skip_times[coord_offset] ) continue;
-         lat = latitudes[coord_offset];
-         lon = longitudes[coord_offset];
+         float lat = latitudes[coord_offset];
+         float lon = longitudes[coord_offset];
          if( lat < MISSING_LATLON || lon < MISSING_LATLON ) continue;
          to_grid.latlon_to_xy(lat, -1.0*lon, x, y);
-         idx_x = nint(x);
-         idx_y = nint(y);
+         int idx_x = nint(x);
+         int idx_y = nint(y);
          if (0 <= idx_x && idx_x < to_lon_count && 0 <= idx_y && idx_y < to_lat_count) {
-            to_offset = to_dp.two_to_one(idx_x, idx_y);
+            int to_offset = to_dp.two_to_one(idx_x, idx_y);
             mapping_indices[coord_offset] = to_offset;
             to_cell_counts[to_offset] += 1;
             count_in_grid++;
@@ -2025,7 +2001,7 @@ static void get_grid_mapping_latlon(
 
    // Build cell mapping
    for (int xIdx=0; xIdx<data_size; xIdx++) {
-      to_offset = mapping_indices[xIdx];
+      int to_offset = mapping_indices[xIdx];
       if( is_bad_data(to_offset) ) continue;
       if( to_offset < 0 || to_offset >= to_size ) {
          mlog << Error << "\n" << method_name
@@ -2046,7 +2022,7 @@ static void get_grid_mapping_latlon(
 
 ////////////////////////////////////////////////////////////////////////
 
-static bool get_grid_mapping(Grid fr_grid, Grid to_grid, IntArray *cellMapping,
+static bool get_grid_mapping(const Grid fr_grid, const Grid to_grid, IntArray *cellMapping,
                              NcVar var_lat, NcVar var_lon, bool *skip_times) {
    bool status = false;
    DataPlane from_dp, to_dp;
@@ -2160,8 +2136,8 @@ static ConcatString get_goes_grid_input(MetConfig config, Grid fr_grid, Grid to_
 
 ////////////////////////////////////////////////////////////////////////
 
-static void get_grid_mapping(Grid fr_grid, Grid to_grid, IntArray *cellMapping,
-                      ConcatString geostationary_file) {
+static void get_grid_mapping(const Grid fr_grid, const Grid to_grid, IntArray *cellMapping,
+                             ConcatString &geostationary_file) {
    static const char *method_name = "get_grid_mapping() -> ";
    DataPlane from_dp, to_dp;
    ConcatString cur_coord_name;
@@ -2347,7 +2323,7 @@ static int get_lon_count(NcFile *_nc) {
 
 ////////////////////////////////////////////////////////////////////////
 
-static NcVar get_goes_nc_var(NcFile *nc, const ConcatString var_name,
+static NcVar get_goes_nc_var(NcFile *nc, const ConcatString &var_name,
                              bool exit_if_error) {
    NcVar var_data;
    static const char *method_name = "get_goes_nc_var() -> ";
@@ -2483,7 +2459,7 @@ static void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
       if (IS_VALID_NC(var_adp)) {
          get_nc_data(&var_adp, adp_data, true);
 
-         //ADP::Smoke:ancillary_variables = ubyte DQF(y, x)
+         //ADP Smoke:ancillary_variables: ubyte DQF(y, x)
          if (get_att_value_string(&var_adp, (string)"ancillary_variables", qc_var_name)) {
             var_adp_qc = get_nc_var(nc_adp, qc_var_name.c_str());
             if (IS_VALID_NC(var_adp_qc)) {
@@ -2505,7 +2481,7 @@ static void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
    mlog << Debug(5) << method_name << "is_dust: " << is_dust_only
         << ", is_smoke: " << is_smoke_only << "\n";
 
-   //AOD:ancillary_variables = byte DQF(y, x)
+   //AOD ancillary_variables: byte DQF(y, x)
    if (get_att_value_string(&var_data, (string)"ancillary_variables", qc_var_name)) {
       var_qc = get_nc_var(nc_in, qc_var_name.c_str());
       if (IS_VALID_NC(var_qc)) {
@@ -2722,7 +2698,7 @@ static void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
 
 static void save_geostationary_data(const ConcatString geostationary_file,
       const float *latitudes, const float *longitudes,
-      const GoesImagerData grid_data) {
+      const GoesImagerData &grid_data) {
    bool has_error = false;
    int deflate_level = 0;
    clock_t start_clock =  clock();
