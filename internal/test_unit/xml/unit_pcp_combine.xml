@@ -292,14 +292,17 @@
   <!--    - multiple -field options                  -->
   <!--                                               -->
   <test name="pcp_combine_derive_MULTIPLE_FIELDS">
-     <exec>echo "&DATA_DIR_MODEL;/grib1/arw-fer-gep1/arw-fer-gep1_2012040912_F024.grib \
+     <exec>echo "MISSING \
+                 &DATA_DIR_MODEL;/grib1/arw-fer-gep1/arw-fer-gep1_2012040912_F024.grib \
                  &DATA_DIR_MODEL;/grib1/arw-fer-gep5/arw-fer-gep5_2012040912_F024.grib \
                  &DATA_DIR_MODEL;/grib1/arw-sch-gep2/arw-sch-gep2_2012040912_F024.grib \
                  &DATA_DIR_MODEL;/grib1/arw-sch-gep6/arw-sch-gep6_2012040912_F024.grib \
+                 MISSING/optional/path/to/missing/file \
                  &DATA_DIR_MODEL;/grib1/arw-tom-gep0/arw-tom-gep0_2012040912_F024.grib \
                  &DATA_DIR_MODEL;/grib1/arw-tom-gep7/arw-tom-gep7_2012040912_F024.grib \
                  &DATA_DIR_MODEL;/grib1/nmm-fer-gep4/nmm-fer-gep4_2012040912_F024.grib \
-                 &DATA_DIR_MODEL;/grib1/nmm-fer-gep8/nmm-fer-gep8_2012040912_F024.grib" \
+                 &DATA_DIR_MODEL;/grib1/nmm-fer-gep8/nmm-fer-gep8_2012040912_F024.grib \
+                 &DATA_DIR_MODEL;/path/to/missing/file" \
                  > &OUTPUT_DIR;/pcp_combine/derive_file_list; \
            &MET_BIN;/pcp_combine</exec>
     <param> \
@@ -308,6 +311,7 @@
       -field 'name="TMP";  level="Z2";' \
       -field 'name="UGRD"; level="Z10";' \
       -field 'name="VGRD"; level="Z10";' \
+      -input_thresh 0.7 \
       &OUTPUT_DIR;/pcp_combine/derive_2012040912_F024_MULTIPLE_FIELDS.nc
     </param>
     <output>
