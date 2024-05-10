@@ -38,6 +38,7 @@ The usage statement for the Pcp-Combine tool is shown below:
          out_file
          [-field string]
          [-name list]
+         [-input_thresh n]
          [-vld_thresh n]
          [-log file]
          [-v level]
@@ -79,13 +80,15 @@ Optional Arguments for pcp_combine
 
 4. The **-name list** option is a comma-separated list of output variable names which override the default choices. If specified, the number of names must match the number of variables to be written to the output file.
 
-5. The **-vld_thresh n** option overrides the default required ratio of valid data for at each grid point for an output value to be written. The default is 1.0.
+5. The **-input_thresh n** option overrides the default required ratio of valid input files. This option does not apply to the -sub command where exactly two valid inputs are required. The default is 1.0.
 
-6. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file.
+6. The **-vld_thresh n** option overrides the default required ratio of valid data at each grid point for an output value to be written. The default is 1.0.
 
-7. The **-v level** option indicates the desired level of verbosity. The contents of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
+7. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file.
 
-8. The **-compress level** option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of "level" will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
+8. The **-v level** option indicates the desired level of verbosity. The contents of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
+
+9. The **-compress level** option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of "level" will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
 
 Required Arguments for the pcp_combine Sum Command
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
