@@ -32,8 +32,6 @@ class PointToGridConfInfo {
       std::map<ConcatString,ConcatString> var_name_map;
       std::map<ConcatString,ConcatString> def_var_name_map;
 
-   protected:
-
    public:
 
       // PointToGrid configuration object
