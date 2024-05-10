@@ -127,10 +127,10 @@ static int adp_qc_high;     /* 3 as baseline algorithm, 0 for enterpirse algorit
 static int adp_qc_medium;   /* 1 as baseline algorithm, 1 for enterpirse algorithm */
 static int adp_qc_low;      /* 0 as baseline algorithm, 2 for enterpirse algorithm */
 
-constexpr int MET_ADP_QC_HIGH = 0;
-constexpr int MET_ADP_QC_MEDIUM = 1;
-constexpr int MET_ADP_QC_LOW = 2;
-constexpr int MET_ADP_QC_NA = bad_data_int;
+constexpr int MET_QC_HIGH = 0;
+constexpr int MET_QC_MEDIUM = 1;
+constexpr int MET_QC_LOW = 2;
+constexpr int MET_QC_NA = 3;
 
 static const ConcatString att_name_values = "flag_values";
 static const ConcatString att_name_meanings = "flag_meanings";
@@ -1841,14 +1841,14 @@ void check_lat_lon(int data_size, float  *latitudes, float  *longitudes) {
 
 int compute_adp_qc_flag(int adp_qc, int shift_bits) {
    int particle_qc = ((adp_qc >> shift_bits) & 0x03);
-   int qc_for_flag;
+   int adp_qc_flag;
 
-   if (particle_qc == adp_qc_high)        qc_for_flag = MET_ADP_QC_HIGH;
-   else if (particle_qc == adp_qc_medium) qc_for_flag = MET_ADP_QC_MEDIUM;
-   else if (particle_qc == adp_qc_low)    qc_for_flag = MET_ADP_QC_LOW;
-   else qc_for_flag = MET_ADP_QC_NA;
+   if (particle_qc == adp_qc_high)        adp_qc_flag = MET_QC_HIGH;
+   else if (particle_qc == adp_qc_medium) adp_qc_flag = MET_QC_MEDIUM;
+   else if (particle_qc == adp_qc_low)    adp_qc_flag = MET_QC_LOW;
+   else adp_qc_flag = MET_QC_NA;
 
-   return qc_for_flag;
+   return adp_qc_flag;
 }
 
 
@@ -2578,52 +2578,51 @@ static void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
                }
 
                // Filter by QC flag
-               if (has_qc_var || has_adp_qc_var) {
+               if (has_qc_flags && (has_qc_var || has_adp_qc_var)) {
                   qc_value = qc_data[from_index];
                   if (mlog.verbosity_level() >= log_debug_level) {
                      if (qc_min_value > qc_value) qc_min_value = qc_value;
                      if (qc_max_value < qc_value) qc_max_value = qc_value;
                      switch (qc_value) {
-                        case MET_ADP_QC_HIGH:   cnt_aod_qc_high++;     break;
-                        case MET_ADP_QC_MEDIUM: cnt_aod_qc_medium++;   break;
-                        case MET_ADP_QC_LOW:    cnt_aod_qc_low++;      break;
-                        default: cnt_aod_qc_nr++;                      break;
+                        case MET_QC_HIGH:   cnt_aod_qc_high++;     break;
+                        case MET_QC_MEDIUM: cnt_aod_qc_medium++;   break;
+                        case MET_QC_LOW:    cnt_aod_qc_low++;      break;
+                        default: cnt_aod_qc_nr++;                  break;
                      }
                   }
                   if (has_adp_qc_var) {
-                     int qc_for_flag = compute_adp_qc_flag(adp_qc_data[from_index], shift_bits);
-                     bool filter_out = is_eq(qc_for_flag, MET_ADP_QC_NA);
-
+                     int adp_qc_flag = compute_adp_qc_flag(adp_qc_data[from_index], shift_bits);
                      if (mlog.verbosity_level() >= log_debug_level) {
-                        switch (qc_for_flag) {
-                           case MET_ADP_QC_HIGH:    cnt_adp_qc_high++;      break;
-                           case MET_ADP_QC_MEDIUM:  cnt_adp_qc_medium++;    break;
-                           case MET_ADP_QC_LOW:     cnt_adp_qc_low++;       break;
-                           default: cnt_adp_qc_nr++;                        break;
+                        switch (adp_qc_flag) {
+                           case MET_QC_HIGH:    cnt_adp_qc_high++;      break;
+                           case MET_QC_MEDIUM:  cnt_adp_qc_medium++;    break;
+                           case MET_QC_LOW:     cnt_adp_qc_low++;       break;
+                           default: cnt_adp_qc_nr++;                    break;
                         }
                      }
 
+                     bool filter_out = is_eq(adp_qc_flag, MET_QC_NA);
                      if (!filter_out) {
                         /* Adjust the quality by AOD data QC */
-                        if (MET_ADP_QC_LOW == qc_value) {
-                           if (MET_ADP_QC_LOW > qc_for_flag) {
-                              if (MET_ADP_QC_HIGH == qc_for_flag) cnt_adp_qc_high_to_low++;
-                              else if (MET_ADP_QC_MEDIUM == qc_for_flag) cnt_adp_qc_medium_to_low++;
-                              qc_for_flag = MET_ADP_QC_LOW; /* high/medium to low quality */
+                        if (MET_QC_LOW == qc_value) {
+                           if (MET_QC_LOW != adp_qc_flag) {
+                              if (MET_QC_HIGH == adp_qc_flag) cnt_adp_qc_high_to_low++;
+                              else if (MET_QC_MEDIUM == adp_qc_flag) cnt_adp_qc_medium_to_low++;
+                              adp_qc_flag = MET_QC_LOW; /* high/medium to low quality */
                            }
                         }
-                        else if (MET_ADP_QC_MEDIUM == qc_value && MET_ADP_QC_HIGH == qc_for_flag) {
-                           qc_for_flag = MET_ADP_QC_MEDIUM; /* high to medium quality */
+                        else if (MET_QC_MEDIUM == qc_value && MET_QC_HIGH == adp_qc_flag) {
+                           adp_qc_flag = MET_QC_MEDIUM; /* high to medium quality */
                            cnt_adp_qc_high_to_medium++;
                         }
-                        if (has_qc_flags && !qc_flags.has(qc_for_flag)) filter_out = true;
+                        if (!qc_flags.has(adp_qc_flag)) filter_out = true;
                      }
                      if (filter_out) {
                         adp_qc_filtered_count++;
                         continue;
                      }
                   }
-                  else if (has_qc_var && has_qc_flags && !qc_flags.has(qc_value)) {
+                  else if (has_qc_var && !qc_flags.has(qc_value)) {
                      qc_filtered_count++;
                      continue;
                   }
@@ -2675,16 +2674,19 @@ static void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
         << ", by absent: " << absent_count
         << ", total: " << (qc_filtered_count + adp_qc_filtered_count + absent_count)
         << "\n   Range:  data: [" << from_min_value << " - " << from_max_value
-        << "]  QC: [" << qc_min_value << " - " << qc_max_value << "]"
-        << "\n   ADP QC: high=" << cnt_adjused_high << " (" << cnt_adp_qc_high
-        << "), medium=" << cnt_adjused_medium  << " (" << cnt_adp_qc_medium
-        << "), low=" << cnt_adjused_low << " (" << cnt_adp_qc_low
-        << "), no_retrieval=" << cnt_adp_qc_nr
-        << "\n   adjusted: high to medium=" << cnt_adp_qc_high_to_medium
-        << ", high to low=" << cnt_adp_qc_high_to_low
-        << ", medium to low=" << cnt_adp_qc_medium_to_low
-        << ", total=" << cnt_adjused_total
-        << "\n";
+        << "]  QC: [" << qc_min_value << " - " << qc_max_value << "]\n";
+   if (has_qc_flags) {
+      mlog << Debug(log_debug_level)
+           << "\n   ADP QC: high=" << cnt_adjused_high << " (" << cnt_adp_qc_high
+           << "), medium=" << cnt_adjused_medium  << " (" << cnt_adp_qc_medium
+           << "), low=" << cnt_adjused_low << " (" << cnt_adp_qc_low
+           << "), no_retrieval=" << cnt_adp_qc_nr
+           << "\n   adjusted: high to medium=" << cnt_adp_qc_high_to_medium
+           << ", high to low=" << cnt_adp_qc_high_to_low
+           << ", medium to low=" << cnt_adp_qc_medium_to_low
+           << ", total=" << cnt_adjused_total
+           << "\n";
+   }
 
    if (to_cell_count == 0) {
       mlog << Warning << "\n" << method_name
