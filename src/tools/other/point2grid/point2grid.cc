@@ -127,10 +127,12 @@ static int adp_qc_high;     /* 3 as baseline algorithm, 0 for enterpirse algorit
 static int adp_qc_medium;   /* 1 as baseline algorithm, 1 for enterpirse algorithm */
 static int adp_qc_low;      /* 0 as baseline algorithm, 2 for enterpirse algorithm */
 
-constexpr int MET_QC_HIGH = 0;
-constexpr int MET_QC_MEDIUM = 1;
-constexpr int MET_QC_LOW = 2;
-constexpr int MET_QC_NA = 3;
+enum class GOES_QC {
+   HIGH = 0,
+   MEDIUM,
+   LOW,
+   NA
+};
 
 static const ConcatString att_name_values = "flag_values";
 static const ConcatString att_name_meanings = "flag_meanings";
@@ -656,19 +658,33 @@ void prepare_message_types(const StringArray &hdr_types) {
 
 ////////////////////////////////////////////////////////////////////////
 
-IntArray prepare_qc_array(const IntArray &_qc_flags, const StringArray &qc_tables) {
+IntArray prepare_qc_array(const StringArray &qc_tables) {
    IntArray qc_idx_array;
-   bool has_qc_flags = (_qc_flags.n() > 0);
-   if (has_qc_flags) {
+   if (qc_flags.n() > 0) {
       for(int idx=0; idx<qc_tables.n(); idx++) {
          int qc_value = (qc_tables[idx] == "NA")
                         ? QC_NA_INDEX : atoi(qc_tables[idx].c_str());
-         if (_qc_flags.has(qc_value) && !qc_idx_array.has(idx)) {
+         if (qc_flags.has(qc_value) && !qc_idx_array.has(idx)) {
             qc_idx_array.add(idx);
          }
       }
    }
    return qc_idx_array;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+std::set<GOES_QC> prepare_qoes_qc_array() {
+   std::set<GOES_QC> qc_flags_set;
+   for(int idx=0; idx<qc_flags.n(); idx++) {
+      switch (qc_flags[idx]) {
+         case 0: qc_flags_set.insert(GOES_QC::HIGH);    break;
+         case 1: qc_flags_set.insert(GOES_QC::MEDIUM);  break;
+         case 2: qc_flags_set.insert(GOES_QC::LOW);     break;
+         default:                                       break;
+      }
+   }
+   return qc_flags_set;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -720,7 +736,7 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
    // Check and read obs_vid and obs_var if exists
 
    bool has_qc_flags = (qc_flags.n() > 0);
-   IntArray qc_idx_array = prepare_qc_array(qc_flags, qc_tables);
+   IntArray qc_idx_array = prepare_qc_array(qc_tables);
 
    // Initialize size and values of output fields
    int nx = to_grid.nx();
@@ -1839,14 +1855,13 @@ void check_lat_lon(int data_size, float  *latitudes, float  *longitudes) {
 //    Baseline algorithm: 3=high, 1=medium, 0=low (high=12/48, medium=4/16)
 // returns bad_data_int if it does not belong to high, mediuam, or low.
 
-int compute_adp_qc_flag(int adp_qc, int shift_bits) {
+GOES_QC compute_adp_qc_flag(int adp_qc, int shift_bits) {
+   GOES_QC adp_qc_flag;
    int particle_qc = ((adp_qc >> shift_bits) & 0x03);
-   int adp_qc_flag;
-
-   if (particle_qc == adp_qc_high)        adp_qc_flag = MET_QC_HIGH;
-   else if (particle_qc == adp_qc_medium) adp_qc_flag = MET_QC_MEDIUM;
-   else if (particle_qc == adp_qc_low)    adp_qc_flag = MET_QC_LOW;
-   else adp_qc_flag = MET_QC_NA;
+   if (particle_qc == adp_qc_high)        adp_qc_flag = GOES_QC::HIGH;
+   else if (particle_qc == adp_qc_medium) adp_qc_flag = GOES_QC::MEDIUM;
+   else if (particle_qc == adp_qc_low)    adp_qc_flag = GOES_QC::LOW;
+   else adp_qc_flag = GOES_QC::NA;
 
    return adp_qc_flag;
 }
@@ -1868,6 +1883,18 @@ static unixtime compute_unixtime(NcVar *time_var, unixtime var_value) {
    }
 
    return obs_time;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+GOES_QC convert_aod_qc_flag(int aod_qc) {
+   GOES_QC aod_qc_flag;
+   if (0 == aod_qc)      aod_qc_flag = GOES_QC::HIGH;
+   else if (1 == aod_qc) aod_qc_flag = GOES_QC::MEDIUM;
+   else if (2 == aod_qc) aod_qc_flag = GOES_QC::LOW;
+   else aod_qc_flag = GOES_QC::NA;
+
+   return aod_qc_flag;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2522,6 +2549,7 @@ static void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
    IntArray cellArray;
    NumArray dataArray;
    bool has_qc_flags = (qc_flags.n() > 0);
+   std::set<GOES_QC> aod_qc_flags = prepare_qoes_qc_array();
 
    missing_count = non_missing_count = 0;
    to_dp.set_constant(bad_data_double);
@@ -2580,49 +2608,50 @@ static void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
                // Filter by QC flag
                if (has_qc_flags && (has_qc_var || has_adp_qc_var)) {
                   qc_value = qc_data[from_index];
+                  GOES_QC aod_qc_flag = convert_aod_qc_flag(qc_value);
                   if (mlog.verbosity_level() >= log_debug_level) {
                      if (qc_min_value > qc_value) qc_min_value = qc_value;
                      if (qc_max_value < qc_value) qc_max_value = qc_value;
-                     switch (qc_value) {
-                        case MET_QC_HIGH:   cnt_aod_qc_high++;     break;
-                        case MET_QC_MEDIUM: cnt_aod_qc_medium++;   break;
-                        case MET_QC_LOW:    cnt_aod_qc_low++;      break;
-                        default: cnt_aod_qc_nr++;                  break;
+                     switch (aod_qc_flag) {
+                        case GOES_QC::HIGH:   cnt_aod_qc_high++;    break;
+                        case GOES_QC::MEDIUM: cnt_aod_qc_medium++;  break;
+                        case GOES_QC::LOW:    cnt_aod_qc_low++;     break;
+                        default: cnt_aod_qc_nr++;                   break;
                      }
                   }
                   if (has_adp_qc_var) {
-                     int adp_qc_flag = compute_adp_qc_flag(adp_qc_data[from_index], shift_bits);
+                     GOES_QC adp_qc_flag = compute_adp_qc_flag(adp_qc_data[from_index], shift_bits);
                      if (mlog.verbosity_level() >= log_debug_level) {
                         switch (adp_qc_flag) {
-                           case MET_QC_HIGH:    cnt_adp_qc_high++;      break;
-                           case MET_QC_MEDIUM:  cnt_adp_qc_medium++;    break;
-                           case MET_QC_LOW:     cnt_adp_qc_low++;       break;
+                           case GOES_QC::HIGH:   cnt_adp_qc_high++;     break;
+                           case GOES_QC::MEDIUM: cnt_adp_qc_medium++;   break;
+                           case GOES_QC::LOW:    cnt_adp_qc_low++;      break;
                            default: cnt_adp_qc_nr++;                    break;
                         }
                      }
 
-                     bool filter_out = is_eq(adp_qc_flag, MET_QC_NA);
+                     bool filter_out = GOES_QC::NA == adp_qc_flag;
                      if (!filter_out) {
                         /* Adjust the quality by AOD data QC */
-                        if (MET_QC_LOW == qc_value) {
-                           if (MET_QC_LOW != adp_qc_flag) {
-                              if (MET_QC_HIGH == adp_qc_flag) cnt_adp_qc_high_to_low++;
-                              else if (MET_QC_MEDIUM == adp_qc_flag) cnt_adp_qc_medium_to_low++;
-                              adp_qc_flag = MET_QC_LOW; /* high/medium to low quality */
+                        if (GOES_QC::LOW == aod_qc_flag) {
+                           if (GOES_QC::LOW != adp_qc_flag) {
+                              if (GOES_QC::HIGH == adp_qc_flag) cnt_adp_qc_high_to_low++;
+                              else if (GOES_QC::MEDIUM == adp_qc_flag) cnt_adp_qc_medium_to_low++;
+                              adp_qc_flag = GOES_QC::LOW; /* high/medium to low quality */
                            }
                         }
-                        else if (MET_QC_MEDIUM == qc_value && MET_QC_HIGH == adp_qc_flag) {
-                           adp_qc_flag = MET_QC_MEDIUM; /* high to medium quality */
+                        else if (GOES_QC::MEDIUM == aod_qc_flag && GOES_QC::HIGH == adp_qc_flag) {
+                           adp_qc_flag = GOES_QC::MEDIUM; /* high to medium quality */
                            cnt_adp_qc_high_to_medium++;
                         }
-                        if (!qc_flags.has(adp_qc_flag)) filter_out = true;
+                        if (0 == aod_qc_flags.count(adp_qc_flag)) filter_out = true;
                      }
                      if (filter_out) {
                         adp_qc_filtered_count++;
                         continue;
                      }
                   }
-                  else if (has_qc_var && !qc_flags.has(qc_value)) {
+                  else if (has_qc_var && 0 == aod_qc_flags.count(aod_qc_flag)) {
                      qc_filtered_count++;
                      continue;
                   }
