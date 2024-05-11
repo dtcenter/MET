@@ -521,7 +521,7 @@ void do_sum_command() {
       mlog << Error << "\ndo_sum_command() -> "
            << "the output accumulation time ("
            << sec_to_hhmmss(out_accum)
-           << ") cannot be greater than the lead time ("
+           << ") can't be greater than the lead time ("
            << sec_to_hhmmss(lead_time) << ").\n\n";
       exit(1);
    }
@@ -568,7 +568,7 @@ void do_sum_command() {
 ////////////////////////////////////////////////////////////////////////
 
 void sum_data_files(Grid & grid, DataPlane & plane) {
-   int i, j, x, y;
+   int i, j, x, y, n_vld;
    DataPlane part;
    double v_sum, v_part;
    Grid cur_grid;
@@ -604,7 +604,7 @@ void sum_data_files(Grid & grid, DataPlane & plane) {
    //
    // Search for each file time.
    //
-   for(i=0; i<n_files; i++) {
+   for(i=0, n_vld=0; i<n_files; i++) {
 
       //
       // Search in each directory for the current file time.
@@ -620,29 +620,45 @@ void sum_data_files(Grid & grid, DataPlane & plane) {
                  << " matches valid time of "
                  << unix_to_yyyymmdd_hhmmss(pcp_times[i]) << "\n";
             break;
-         } // if
+         } // end if
 
       } // end for j
 
       //
       // Check for no matching file found.
       //
-      if(pcp_recs[i] == -1) {
-         mlog << Error << "\nsum_data_files() -> "
-              << "cannot find a file with a valid time of "
+      if(pcp_recs[i] != -1) {
+         n_vld++;
+      }
+      else {
+         mlog << Warning << "\nsum_data_files() -> "
+              << "can't find a file with a valid time of "
               << unix_to_yyyymmdd_hhmmss(pcp_times[i])
               << " and accumulation time of "
               << sec_to_hhmmss(in_accum) << " matching the regular "
               << "expression \"" << pcp_reg_exp << "\"\n\n";
-         exit(1);
       }
 
    } // end for i
+
+   // Check for enough valid input files.
+   if((double) n_vld/n_files < input_thresh) {
+      mlog << Error << "\nsum_data_files() -> "
+           << n_vld << " of " << n_files << " (" << (double) n_vld/n_files
+           << ") valid inputs does not meet the required input threshold ("
+           << input_thresh << ").\n\n";
+      exit(1);
+   }
 
    //
    // Open each of the files found and parse the data.
    //
    for(i=0; i<n_files; i++) {
+
+      //
+      // Skip missing inputs.
+      //
+      if(pcp_recs[i] == -1) continue;
 
       mlog << Debug(1)
            << "[" << (i+1) << "] Reading input file: " << pcp_files[i]
@@ -663,10 +679,9 @@ void sum_data_files(Grid & grid, DataPlane & plane) {
                 cur_grid, part, true);
 
       //
-      // For the first file processed store the grid, allocate memory
-      // to store the precipitation sums, and initialize the sums.
+      // Initialize the grid and data after the first successful read.
       //
-      if(i == 0) {
+      if(grid.nxy() == 0) {
          grid  = cur_grid;
          plane = part;
       }
@@ -732,7 +747,7 @@ int search_pcp_dir(const char *cur_dir, const unixtime cur_ut,
    dp = met_opendir(cur_dir);
    if(!dp) {
       mlog << Error << "\nsearch_pcp_dir() -> "
-           << "cannot open search directory: " << cur_dir << "\n\n";
+           << "can't open search directory: " << cur_dir << "\n\n";
       exit(1);
    }
 

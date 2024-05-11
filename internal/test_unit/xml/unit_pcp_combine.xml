@@ -33,6 +33,19 @@
     </output>
   </test>
 
+  <test name="pcp_combine_sum_GRIB1_MISSING">
+    <exec>&MET_BIN;/pcp_combine</exec>
+    <param> \
+      20120409_00 3 20120412_15 12 \
+      &OUTPUT_DIR;/pcp_combine/nam_2012040900_F087_APCP12.nc \
+      -pcpdir &DATA_DIR_MODEL;/grib1/nam \
+      -input_thresh 0.75
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/pcp_combine/nam_2012040900_F087_APCP12.nc</grid_nc>
+    </output>
+  </test>
+
   <test name="pcp_combine_sum_GRIB1_MULTIPLE_FIELDS">
     <exec>&MET_BIN;/pcp_combine</exec>
     <param> \
