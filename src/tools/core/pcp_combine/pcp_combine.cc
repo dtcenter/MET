@@ -457,7 +457,7 @@ void process_add_sub_derive_args(const CommandLine & cline) {
            << "parsing the command line arguments a list of files, "
            << "each followed by a configuration string.\n";
 
-      for(int i=0, n_files=0; i<(cline.n() - 1); i+=2) {
+      for(int i=0; i<(cline.n() - 1); i+=2) {
          file_list.add(cline[i]);
 
          //
@@ -492,7 +492,7 @@ void do_sum_command() {
    //
    // Compute the lead time.
    //
-   int lead_time = valid_time - init_time;
+   int lead_time = (int) (valid_time - init_time);
 
    //
    // Build init time string.
@@ -1100,7 +1100,7 @@ void do_derive_command() {
    mask.set_size(grid.nx(), grid.ny());
    int n_skip = 0;
    for(int j=0; j<nxy; j++) {
-      mask.buf()[j] = ((double) vld_dp.data()[j]/n_vld) >= vld_thresh;
+      mask.buf()[j] = (vld_dp.data()[j]/n_vld) >= vld_thresh;
       if(!mask.data()[j]) n_skip++;
    }
 
