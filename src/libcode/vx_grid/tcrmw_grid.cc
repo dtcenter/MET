@@ -378,7 +378,7 @@ RotatedLatLonGrid::latlon_to_xy(true_lat, true_lon, x, y);
 
 x -= Nx*floor(x/Nx);
 
-x -= Nx*floor(x/Nx);
+y -= Ny*floor(y/Ny);
 
 return;
 
@@ -394,7 +394,7 @@ void TcrmwGrid::xy_to_latlon(double x, double y, double & true_lat, double & tru
 
 x -= Nx*floor(x/Nx);
 
-x -= Nx*floor(x/Nx);
+y -= Ny*floor(y/Ny);
 
 RotatedLatLonGrid::xy_to_latlon(x, y, true_lat, true_lon);
 
