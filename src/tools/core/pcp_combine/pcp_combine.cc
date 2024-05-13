@@ -1630,7 +1630,8 @@ void usage() {
         << "of valid input files (" << input_thresh << ") (optional).\n"
 
         << "\t\t\"-vld_thresh\" overrides the default required ratio "
-        << "of valid data (" << vld_thresh << ") (optional).\n"
+        << "of valid data at each grid point (" << vld_thresh
+        << ") (optional).\n"
 
         << "\t\t\"-log file\" write log messages to the specified file "
         << "(optional).\n"
