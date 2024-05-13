@@ -80,7 +80,7 @@ Optional Arguments for pcp_combine
 
 4. The **-name list** option is a comma-separated list of output variable names which override the default choices. If specified, the number of names must match the number of variables to be written to the output file.
 
-5. The **-input_thresh n** option overrides the default required ratio of valid input files. This option does not apply to the -sub command where exactly two valid inputs are required. The default is 1.0.
+5. The **-input_thresh n** option overrides the default required ratio of valid input files. This option does not apply to the -subtract command where exactly two valid inputs are required. The default is 1.0.
 
 6. The **-vld_thresh n** option overrides the default required ratio of valid data at each grid point for an output value to be written. The default is 1.0.
 
