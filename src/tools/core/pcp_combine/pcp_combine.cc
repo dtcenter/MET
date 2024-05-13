@@ -92,6 +92,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <vector>
 
 #include <netcdf>
 
@@ -568,22 +569,18 @@ void do_sum_command() {
 ////////////////////////////////////////////////////////////////////////
 
 void sum_data_files(Grid & grid, DataPlane & plane) {
-   int i, j, x, y, n_vld;
+   int n_vld;
    DataPlane part;
    double v_sum, v_part;
    Grid cur_grid;
-   unixtime     * pcp_times = (unixtime *) nullptr;
-   int          * pcp_recs  = (int *) nullptr;
-   ConcatString * pcp_files = (ConcatString *) nullptr;
+   vector<unixtime> pcp_times;
+   vector<int> pcp_recs;
+   vector<ConcatString> pcp_files;
 
    //
-   // Compute the number of forecast precipitation files to be found,
-   // and allocate memory to store their names and times.
+   // Compute the number of forecast precipitation files to be found.
    //
-   n_files   = out_accum/in_accum;
-   pcp_times = new unixtime [n_files];
-   pcp_recs  = new int [n_files];
-   pcp_files = new ConcatString [n_files];
+   n_files = out_accum/in_accum;
 
    mlog << Debug(2)
         << "Searching for " << n_files << " files "
@@ -594,19 +591,19 @@ void sum_data_files(Grid & grid, DataPlane & plane) {
    //
    // Search for each file time.
    //
-   for(i=0, n_vld=0; i<n_files; i++) {
+   for(int i=0, n_vld=0; i<n_files; i++) {
 
       //
       // Define the target valid time and initialize.
       //
-      pcp_times[i] = valid_time - i*in_accum;
-      pcp_recs[i] = -1;
-      pcp_files[i] = "";
+      pcp_times.push_back(valid_time - i*in_accum);
+      pcp_recs.push_back(-1);
+      pcp_files.push_back("");
 
       //
       // Search in each directory for the current file time.
       //
-      for(j=0; j<pcp_dir.n_elements(); j++) {
+      for(int j=0; j<pcp_dir.n_elements(); j++) {
 
          pcp_recs[i] = search_pcp_dir(pcp_dir[j].c_str(), pcp_times[i],
                                       pcp_files[i]);
@@ -650,7 +647,7 @@ void sum_data_files(Grid & grid, DataPlane & plane) {
    //
    // Open each of the files found and parse the data.
    //
-   for(i=0; i<n_files; i++) {
+   for(int i=0; i<n_files; i++) {
 
       //
       // Skip missing inputs.
@@ -699,8 +696,8 @@ void sum_data_files(Grid & grid, DataPlane & plane) {
          // Increment the precipitation sums keeping track of the bad
          // data values.
          //
-         for(x=0; x<grid.nx(); x++) {
-            for(y=0; y<grid.ny(); y++) {
+         for(int x=0; x<grid.nx(); x++) {
+            for(int y=0; y<grid.ny(); y++) {
 
                v_sum = plane(x, y);
 
@@ -718,13 +715,6 @@ void sum_data_files(Grid & grid, DataPlane & plane) {
          } // for x
       } // end else
    } // end for i
-
-   //
-   // Deallocate any memory that was allocated above.
-   //
-   if(pcp_files) { delete [] pcp_files; pcp_files = (ConcatString *) nullptr; }
-   if(pcp_times) { delete [] pcp_times; pcp_times = (unixtime *) nullptr; }
-   if(pcp_recs ) { delete [] pcp_recs;  pcp_recs  = (int *) nullptr; }
 
    return;
 }
