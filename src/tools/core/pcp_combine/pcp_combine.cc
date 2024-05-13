@@ -592,19 +592,16 @@ void sum_data_files(Grid & grid, DataPlane & plane) {
         << sec_to_hhmmss(out_accum) << ".\n";
 
    //
-   // Compute the valid times for the precipitation files
-   // to be found.
-   //
-   for(i=0; i<n_files; i++) {
-      pcp_times[i] = valid_time - i*in_accum;
-      pcp_recs[i] = -1;
-      pcp_files[i] = "";
-   }
-
-   //
    // Search for each file time.
    //
    for(i=0, n_vld=0; i<n_files; i++) {
+
+      //
+      // Define the target valid time and initialize.
+      //
+      pcp_times[i] = valid_time - i*in_accum;
+      pcp_recs[i] = -1;
+      pcp_files[i] = "";
 
       //
       // Search in each directory for the current file time.
